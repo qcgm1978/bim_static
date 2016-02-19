@@ -31,10 +31,12 @@ App.Todo.NavView = Backbone.View.extend({
 		App.Todo.fetch("complete");
 	},
 
+	template:_.templateUrl("./todo/tpls/todo.Nav.html",true),
+
 
 	render: function() {
 
-		this.$el.html('<ul><li class="commission selected">代办</li><li class="already last">已办</li></ul>');
+		this.$el.html(this.template);
 		//type=="my-backbone-fast" && this.$el.find(".fast").addClass('selected')|| this.$el.find(".msg").addClass('selected');
 		return this;
 
