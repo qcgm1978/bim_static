@@ -1,7 +1,7 @@
 
 
 /**
- * @require /todo/module/todo.list.js
+ * @require /todo/module/todo.list.es6
  */
 
 App.Todo = {

@@ -84,6 +84,8 @@ router/index.js
  */
 
 
+二：backbone.view 扩展直接 append 到页面，有时有发生数据重复现象
 
+解决方案：不要直接append到某个元素下，用 this.$el.html 的方式可以解决
 
 

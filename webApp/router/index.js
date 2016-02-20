@@ -13,6 +13,7 @@ var AppRoute=Backbone.Router.extend({
 	},
 
 	todo:function(){ 
+		$("#topBar .nav").find(".item").removeClass("selected").end().find(".todo").addClass('selected');
 		//加载css js
 		_.require('/dist/todo/todo.css');
 		_.require('/dist/todo/todo.js');  
@@ -21,28 +22,39 @@ var AppRoute=Backbone.Router.extend({
 
  
 	projects:function(){
-	   $("#contains").html("项目");  
+		$("#topBar .nav").find(".item").removeClass("selected").end().find(".projects").addClass('selected');
+		//加载css js
+		_.require('/dist/projects/projects.css');
+		_.require('/dist/projects/projects.js');  
+		App.Projects.init();  
+	  
 	},
 
 	flow:function(){
+		$("#topBar .nav").find(".item").removeClass("selected").end().find(".flow").addClass('selected');
 		 
 		  $("#contains").html("flow");
 		 
 	},
 
 	resources:function(){
+		$("#topBar .nav").find(".item").removeClass("selected").end().find(".resources").addClass('selected');
 		 
 		  $("#contains").html("resources");
 		 
 	},
 
 	console:function(){ 
+		$("#topBar .nav").find(".item").removeClass("selected").end().find(".console").addClass('selected');
 		$("#contains").html("console");
 	}
 
 	 
 
 });
+
+
+
  
 App.Router=new AppRoute();
  

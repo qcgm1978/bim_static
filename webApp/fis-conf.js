@@ -63,7 +63,7 @@ fis.match('/comm/**.js', {
   useHash:true,
 	//useHash:true,
   packTo: '/dist/comm/comm.js'
-});
+}); 
 
 
 // 代办
@@ -79,7 +79,7 @@ fis.match('/login/**.{less,css}', {
 
 
 // 代办
-fis.match('/todo/**.js', {
+fis.match('/todo/**.{js,es6}', {
   //useHash:true,
   packTo: '/dist/todo/todo.js'
 });
@@ -88,6 +88,19 @@ fis.match('/todo/**.{less,css}', {
   //useHash:true,
   packTo: '/dist/todo/todo.css'
 });
+
+
+//项目
+fis.match('/projects/**.{less,css}', {
+  useHash:true,
+  packTo: '/dist/projects/projects.css'
+});
+fis.match('/projects/**.js', {
+  useHash:true,
+  //useHash:true,
+  packTo: '/dist/projects/projects.js'
+});
+
 
 
 // 清除其他配置，只保留如下配置
