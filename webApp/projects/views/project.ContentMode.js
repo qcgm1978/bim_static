@@ -1,33 +1,33 @@
+App.Projects.ContentMode = Backbone.View.extend({
 
-App.Projects.ContentMode=Backbone.View.extend({
+	tagName: 'div',
 
-	tagName:'div',
-	
-	id:'projectModes',
+	id: 'projectModes',
 
 	// 重写初始化
-	initialize:function(){
-		this.listenTo(App.Projects.ProjectCollection,"add",this.addOne);
-	}, 
+	initialize: function() {
+		this.listenTo(App.Projects.ProjectCollection, "add", this.addOne);
+	},
 
-	template:_.templateUrl('/projects/tpls/project.ContentMode.html',true),
+	template: _.templateUrl('/projects/tpls/project.ContentMode.html', true),
 
-	render:function(){
+	render: function() {
 		this.$el.html(this.template);
 		return this;
 	},
 
 	//切换改变
-	addOne:function(model){ 
-		 
-		//列表
-		if (App.Projects.Settings.type=="list") {
+	addOne: function(model) {
 
-			var listView=new App.Projects.listView({model:model});
+		//列表
+		if (App.Projects.Settings.type == "list") {
+
+			var listView = new App.Projects.listView({
+				model: model
+			});
 			this.$el.find(".proListBox").append(listView.render().el);
 
-		}else{
-			//地图
+		} else {
 
 		}
 	}

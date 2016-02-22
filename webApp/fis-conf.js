@@ -95,7 +95,7 @@ fis.match('/projects/**.{less,css}', {
   useHash:true,
   packTo: '/dist/projects/projects.css'
 });
-fis.match('/projects/**.js', {
+fis.match('/projects/**.{js,es6}', {
   useHash:true,
   //useHash:true,
   packTo: '/dist/projects/projects.js'
