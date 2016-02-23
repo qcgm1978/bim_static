@@ -1,15 +1,15 @@
+App.Project.ProjectHeader = Backbone.View.extend({
 
-App.Project.ProjectHeader=Backbone.View.extend({
+	tagName: 'div',
 
-	tagName:'div',
+	className: 'projectHeader', 
 
-	className:'projectHeader',
+	template: _.templateUrl('/projects/tpls/project/project.header.html',true),
 
-	template:_.templateUrl('/projects/tpls/project/project.header.html'),
-
-	render:function(){
-		this.$el.html(this.template({}));
+	render: function() {
+		this.$el.html(this.template);
 		return this;
 	}
 
+	 
 });

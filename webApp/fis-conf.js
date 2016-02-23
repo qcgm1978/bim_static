@@ -59,7 +59,7 @@ fis.match('/comm/**.{less,css}', {
 });
 
 //合并公共文件
-fis.match('/comm/**.js', {
+fis.match('/comm/**.{js,es6}', {
   useHash:true,
 	//useHash:true,
   packTo: '/dist/comm/comm.js'

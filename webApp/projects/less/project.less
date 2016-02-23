@@ -1,40 +1,51 @@
-
-
-.projectHeader{
-	height: 37px;    background-color: #f5f5f5;border-bottom: 1px #ccc solid;
-	.projectTab{float: right;height: 37px;
-		.item{float: left;height: 100%;line-height: 37px;width:35px;font-size:16px;position: relative;text-align: center;
-			margin-right: 40px;cursor: pointer;
-
-			.line{bottom: 0px;width:100%;height: 3px;position: absolute;left:0px;text-align: center;}
-
-			&.last{margin-right: 20px;}
-
-			&.selected{
-				.line{
-					background-color: #06c;
-				}
+.projectHeader{height:37px;background-color:#f5f5f5;border-bottom:1px #ccc solid;
+	.projectTab{float:right;height:37px;
+		.item{float:left;height:100%;line-height:37px;width:35px;font-size:16px;position:relative;text-align:center;margin-right:40px;cursor:pointer;
+			.line{bottom:0px;width:100%;height:3px;position:absolute;left:0px;text-align:center;}
+			&.last{margin-right:20px}
+			&.selected{.line{background-color:#06c;}
 			}
-
-			&:hover{.line{
-					background-color: #06c;
-				}}
-
+			&:hover{.line{background-color:#06c;}
+			}
 		}
 	}
+	.breadcrumbNav{line-height:37px;padding-left:20px;
+		.allProject{cursor:pointer}
+	}
+}
+#projectDesignNav{float:left;width:238px;border:1px #ccc solid;position: relative;
+	.projectNav{background-color:#ddd;height:29px;border-bottom: 1px #ccc solid;padding-left: 24px;
+		.item{float: left;line-height: 24px;width:88px;border:1px #ddd solid;text-align: center;margin-top: 3px;cursor: pointer;
+			&:hover{}
+			&.selected{ border:1px #ccc solid; border-top-width: 2px; border-top-color:#006ECF; border-bottom-color: #fff;background-color: #fff; }
+		}
+	}
+	.projectNavContent{min-height: 600px;margin-top:1px;overflow: auto;}
+}
+#projectDesignContent{margin-left:240px;
+	.fileContainer{
+		padding:10px;
+		.btnNormal{
+			padding:8px 15px;display: inline-block;border:1px #ccc solid;cursor: pointer;margin-right: 3px;
+		}
+		.fileContent{ border:1px #ccc solid;margin-top: 10px;border-bottom: 0;
+			.inlineBlock{display: inline-block;}
+			.filecKAll{width:5%;text-align: center;}
+			.fileBg{width:7%;
+				img{    width: 34px;height: 28px;vertical-align: top;margin-top: 5px;}
+			}
+			.fileName{width:42%;}
+			.fileStatus{width:11%;}
+			.fileOp{width:11%;}
+			.fileSize {width:11%;}
+			.fileDate{width:11%;}  
 
+			.header,.item{
+				height: 38px;line-height: 38px;border-bottom: 1px #ccc solid;
+			}
+			.header{background-color: #eee;}
+		}
 
-	.breadcrumbNav{
-		line-height: 37px;padding-left: 20px;
-		.allProject{cursor: pointer;}
 	}
 
-}
-
-.projectNav{
-	float: left;width:238px;border:1px #ddd solid;
-}
-
-#projectContainer{
-	margin-left: 240px;
 }

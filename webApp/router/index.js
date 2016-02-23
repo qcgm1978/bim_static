@@ -32,6 +32,7 @@ var AppRoute = Backbone.Router.extend({
 
 
 	project: function(id) {
+		$("#topBar .nav").find(".item").removeClass("selected").end().find(".projects").addClass('selected');
 		_.require('/dist/projects/projects.css');
 		_.require('/dist/projects/projects.js');
 		App.Project.init();
