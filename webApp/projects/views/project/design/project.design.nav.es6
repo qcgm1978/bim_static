@@ -20,14 +20,19 @@ App.Project.ProjectDesignNav = Backbone.View.extend({
 		App.Project.Settings.fetchNavType = $(event.target).addClass("selected").siblings().removeClass("selected").end().data("type");
 		if (App.Project.Settings.fetchNavType == "file") {
 			$("#projectContainer .fileContainer").show();
-			$("#projectContainer .modelContainer").hide(); 
+			$("#projectContainer .modelContainer").hide();
 			App.Project.fetchDesignFileNav();
 		} else {
 			$("#projectContainer .fileContainer").hide();
-			$("#projectContainer .modelContainer").show(); 
+			$("#projectContainer .modelContainer").show();
 			App.Project.fetchDesignModelNav();
-		} 
-		
+			new BIM({
+				element: $("#projectDesignContent .modelContainer")[0],
+				projectId: 'n4',
+				tools: true
+			});
+		}
+
 
 	}
 });

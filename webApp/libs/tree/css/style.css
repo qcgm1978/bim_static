@@ -1,0 +1,469 @@
+.select{
+  cursor:default;
+}
+.move{
+  cursor:-webkit-grab;
+}
+.fly{
+  cursor:crosshair;
+}
+/**
+  * @name zhangyy-g@grandsoft.com.cn
+  * @description zhangyy's code
+  * @markup
+  *
+  */
+.mod-bar {
+  position: absolute;
+  z-index: 20;
+  background: #333;
+  width: 40px;
+  left:20px;
+  top:10px;
+}
+.mod-bar .divide {
+  display: block;
+  border-top: 1px solid #666;
+  width: 32px;
+  margin-left: 4px;
+}
+.bar-item {
+  cursor: pointer;
+  border: 1px solid transparent;
+  margin: 3px;
+}
+.bar-item.horizontal {
+  display: inline-block;
+}
+.bar-item:hover {
+  border: 1px solid #666;
+}
+.bar-item.selected {
+  background-color: #666;
+}
+.sub-bar{
+  position: absolute;
+  z-index: 20;
+  background: #333;
+  width: 40px;
+}
+.sub-bar.camera-bar{
+  left:65px;
+  top:232px;
+}
+.sub-bar.cross-panel{
+  left:65px;
+  top:270px;
+  width:220px;
+  height:220px;
+  background-color:rgba(0,0,0,.8);
+  z-index:2;
+  cursor:default;
+}
+.cross-section-head {
+  height: 35px;
+  color: #fff;
+  position: relative;
+  width: 180px;
+  line-height: 2.5em;
+  padding: 0 20px;
+  margin: 0;
+  border-bottom: 1px solid #000;
+}
+.cross-panel .close {
+  position: absolute;
+  cursor:pointer;
+  color: #fff;
+  font-size: 30px;
+  display: inline-block;
+  line-height: 0px;
+  padding:3px 5px;
+  right: 0px;
+  top: 0;
+}
+.cross-panel .close:before {
+  content: "×";
+  line-height:1;
+}
+.tab-content{
+  padding:10px 20px;
+}
+.tab-content .slider-box {
+  position: relative;
+  height: 50px;
+  border-bottom: 1px solid #000;
+}
+.tab-content .slider{
+  width:140px;
+  position:absolute;
+  left:40px;
+  margin:22px 0;
+  padding:0;
+}
+.tab-content .last {
+  border-bottom: none;
+}
+
+.tab-content i {
+  position: absolute;
+  left: 0;
+  margin-top: -16px;
+  top: 50%;
+  background-image: url(../images/bar.png);
+  background-repeat:no-repeat;
+  display: block;
+  width: 32px;
+  height: 32px;
+  vertical-align: middle;
+}
+.bar-section-offset{
+  background-position: 0 -1056px;
+}
+.bar-section-rotatex{
+  background-position: 0 -1025px;
+}
+.bar-section-rotatey{
+  background-position: 0 -992px;
+}
+.slider-range{
+  height:100%;
+  background:#eee;
+  width:50%;
+  border-radius:1000px;
+}
+.slider-handle{
+  position: absolute;
+  height: 10px;
+  border: 1px solid #aaa;
+  cursor:pointer;
+  z-index: 2;
+  width: 10px;
+  margin-left: -5px;
+  border-radius: 3px;
+  text-shadow: 0 0 0 rgba(195,177,177,0.8);
+  background-color: #aaa;
+  top: -3px;
+  left:50%;
+  font-weight: normal;
+}
+/**
+  * @name zhangyy-g@grandsoft.com.cn
+  * @description zhangyy's code
+  * @markup
+  * 给bar设置背景ICON
+  */
+.bar-item {
+    background: url(../images/bar.png) no-repeat;
+    display: block;
+    width: 32px;
+    height: 32px;
+    vertical-align: middle;
+}
+.bar-home {
+    background-position: 0 -896px;
+}
+.bar-home.selected {
+    background-position:  -32px -896px;
+}
+.bar-select {
+    background-position: 0 0;
+}
+
+.bar-select.selected {
+    background-position: -32px 0;
+}
+
+.bar-handle {
+    background-position: 0 -32px;
+}
+
+.bar-pan.selected {
+    background-position: -32px -32px;
+}
+
+.bar-zoomIn {
+    background-position: 0 -64px;
+}
+
+.bar-zoomin.selected {
+    background-position: -32px -64px;
+}
+
+.bar-zoomOut {
+    background-position: 0 -96px;
+}
+
+.bar-zoomout.selected {
+    background-position: -32px -96px;
+}
+
+.bar-fit {
+    background-position: 0 -128px;
+}
+
+.bar-fit.selected {
+    background-position: -32px -128px;
+}
+
+.bar-rotate {
+    background-position: 0 -160px;
+}
+
+.bar-rotate.selected {
+    background-position: -32px -160px;
+}
+
+.bar-section {
+    background-position: 0 -192px;
+}
+
+.bar-section.selected {
+    background-position: -32px -192px;
+}
+
+.bar-fly {
+    background-position: 0 -224px;
+}
+
+.bar-walk.selected {
+    background-position: -32px -224px;
+}
+
+.bar-camera {
+    background-position: 0 -256px;
+}
+
+.bar-camera.selected {
+    background-position: -32px -256px;
+}
+
+.bar-camera-southEast {
+    background-position: 0 -288px;
+}
+
+.bar-camera-southEast.selected {
+    background-position: -32px -288px;
+}
+
+.bar-camera-top {
+    background-position: 0 -320px;
+}
+
+.bar-camera-top.selected {
+    background-position: -32px -320px;
+}
+
+.bar-camera-bottom {
+    background-position: 0 -352px;
+}
+
+.bar-camera-bottom.selected {
+    background-position: -32px -352px;
+}
+
+.bar-camera-left {
+    background-position: 0 -384px;
+}
+
+.bar-camera-left.selected {
+    background-position: -32px -384px;
+}
+
+.bar-camera-right {
+    background-position: 0 -416px;
+}
+
+.bar-camera-right.selected {
+    background-position: -32px -416px;
+}
+
+.bar-camera-front {
+    background-position: 0 -448px;
+}
+
+.bar-camera-front.selected {
+    background-position: -32px -448px;
+}
+
+.bar-camera-behind {
+    background-position: 0 -480px;
+}
+
+.bar-camera-behind.selected {
+    background-position: -32px -480px;
+}
+
+.bar-2d-fit {
+    background-position: 0 -512px;
+}
+
+.bar-2d-fit.selected {
+    background-position: -32px -512px;
+}
+
+.bar-rotate-ni {
+    background-position: 0 -544px;
+}
+
+.bar-rotate-ni.selected {
+    background-position: -32px -544px;
+}
+
+.bar-rotate-shun {
+    background-position: 0 -576px;
+}
+
+.bar-rotate-shun.selected {
+    background-position: -32px -576px;
+}
+
+.bar-mark {
+    background-position: 0 -608px;
+}
+
+.bar-mark.selected {
+    background-position: -32px -608px;
+}
+
+.bar-mark-yun {
+    background-position: 0 -640px;
+}
+
+.bar-mark-yun.selected {
+    background-position: -32px -640px;
+}
+
+.bar-mark-arrow {
+    background-position: 0 -672px;
+}
+
+.bar-mark-arrow.selected {
+    background-position: -32px -672px;
+}
+
+.bar-mark-rect {
+    background-position: 0 -704px;
+}
+
+.bar-mark-rect.selected {
+    background-position: -32px -704px;
+}
+
+.bar-mark-circle {
+    background-position: 0 -736px;
+}
+
+.bar-mark-circle.selected {
+    background-position: -32px -736px;
+}
+
+.bar-mark-cross {
+    background-position: 0 -768px;
+}
+
+.bar-mark-cross.selected {
+    background-position: -32px -768px;
+}
+
+.bar-mark-text {
+    background-position: 0 -800px;
+}
+
+.bar-mark-text.selected {
+    background-position: -32px -800px;
+}
+
+.bar-mark-back {
+    background-position: 0 -832px;
+}
+
+.bar-mark-back.selected {
+    background-position: -32px -832px;
+}
+
+.bar-fullscreen {
+    background-position: 0 -864px;
+}
+
+.bar-fullscreen.selected {
+    background-position: -32px -864px;
+}
+.bar-section-horizontal{
+    background-position: -32px -960px;
+}
+.bar-section-vertical{
+    background-position: -32px -930px;
+}
+
+.bar-section-offset{
+    background-position: 0 -1056px;
+
+}
+.bar-section-rotatex{
+    background-position: 0 -1025px;
+}
+.bar-section-rotatey{
+    background-position: 0 -992px;
+}
+
+#keyControlPanel{
+    position: absolute;
+    left: 10px;
+    opacity: 0.95;
+    top: 0px
+}
+
+.guide-list {
+    /*background-color:#005500;
+    border:#999999 1px dashed;*/
+    margin: 0px;
+    padding:0px;
+    width: 262px;
+    height: 312px;
+    list-style: none;
+}
+
+.guide-list li {
+    float:left;
+}
+
+.key-panel{
+    background:transparent;
+    margin: 2px;
+    width: 48px;
+    height: 48px;
+    text-align:center;
+    position:relative
+}
+
+.key-panel p{
+    width: 48px;
+    height: 18px;
+    padding:0px;
+    margin:0px;
+}
+
+.key-panel p.tip-top{
+    position:absolute;
+    top:0px;
+}
+
+.key-panel p.tip-bottom{
+    position:absolute;
+    bottom:0px;
+}
+
+.key-panel p.tip-left{
+    position:absolute;
+    left: 0px;
+}
+
+.key-panel p.tip-right{
+    position:absolute;
+    right: 0px;
+}
+
+.key-selected{
+    background-color:#0055ff;
+    opacity: 0.65;
+}
