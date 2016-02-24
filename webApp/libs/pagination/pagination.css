@@ -1,0 +1,33 @@
+.pagination a {
+    text-decoration: none;
+    border: solid 1px #ccc;
+    color: #666;
+}
+
+.pagination a:hover {
+    border-color: #408cdf;
+}
+
+.pagination a,
+.pagination span {
+    display: inline-block;
+    vertical-align: middle;
+    padding: 0.3em 0.5em;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    min-width: 1em;
+    text-align: center;
+}
+
+.pagination .current {
+    background: #418cdf;
+    color: #fff;
+    border: solid 1px #408cdf;
+}
+
+.pagination .current.prev,
+.pagination .current.next {
+    color: #999;
+    border-color: #999;
+    background: #fff;
+}

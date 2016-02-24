@@ -14,11 +14,12 @@ App.Project.ProjectDesingn = Backbone.View.extend({
 	//template: _.templateUrl('/projects/tpls/project/project.design.html', true),
 
 	render: function() {
+		
 		//设计导航
 		this.$el.html(new App.Project.ProjectDesignNav().render().el);
 		//项目设计内容
 		this.$el.append(new App.Project.ProjectDesingnContent().render().el);
-
+		
 		return this;
 	} 
 	 

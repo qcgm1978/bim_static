@@ -216,29 +216,4 @@ App.Projects.BaiduMap = {
 
 
 }
-
-
-
- //百度地图
- //  下面示例显示一个地图，等待两秒钟后，它会移动到新中心点。panTo()方法将让地图平滑移动至新中心点，如果移动距离超过了当前地图区域大小，则地图会直跳到该点。
- // var map = new BMap.Map("container");    
- // var point = new BMap.Point(116.404, 39.915);    
- // map.centerAndZoom(point, 15);    
- // window.setTimeout(function(){  
- //     map.panTo(new BMap.Point(116.409, 39.918));    
- // }, 2000);
-
- // 地图API中提供的控件有：
- // Control：控件的抽象基类，所有控件均继承此类的方法、属性。通过此类您可实现自定义控件。
- // NavigationControl：地图平移缩放控件，PC端默认位于地图左上方，它包含控制地图的平移和缩放的功能。移动端提供缩放控件，默认位于地图右下方。
- // OverviewMapControl：缩略地图控件，默认位于地图右下方，是一个可折叠的缩略地图。
- // ScaleControl：比例尺控件，默认位于地图左下方，显示地图的比例关系。
- // MapTypeControl：地图类型控件，默认位于地图右上方。
- // CopyrightControl：版权控件，默认位于地图左下方。
- // GeolocationControl：定位控件，针对移动端开发，默认位于地图左下方。
- // var opts = {offset: new BMap.Size(150, 5)}    
- // // map.addControl(new BMap.ScaleControl(opts));
- // BMAP_NAVIGATION_CONTROL_LARGE 表示显示完整的平移缩放控件。
- // BMAP_NAVIGATION_CONTROL_SMALL 表示显示小型的平移缩放控件。
- // BMAP_NAVIGATION_CONTROL_PAN 表示只显示控件的平移部分功能。
- // BMAP_NAVIGATION_CONTROL_ZOOM 表示只显示控件的缩放部分功能。
+ 

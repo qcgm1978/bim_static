@@ -13,7 +13,7 @@ App.Project.ProjectDesingnContent = Backbone.View.extend({
 
 	},
 
-	template: _.templateUrl('/projects/tpls/project/project.design.content.html', true),
+	template: _.templateUrl('/projects/tpls/project/design/project.design.content.html', true),
 
 	render: function() { 
 
@@ -23,8 +23,7 @@ App.Project.ProjectDesingnContent = Backbone.View.extend({
 	},
 
 	//添加单个li
-	addOneFile:function(model){
-		  
+	addOneFile:function(model){ 
 		var view=new App.Project.ProjectDesingnFileDetail({
 			model:model
 		});

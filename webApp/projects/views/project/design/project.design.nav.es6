@@ -8,7 +8,7 @@ App.Project.ProjectDesignNav = Backbone.View.extend({
 		"click .item": "itemClick"
 	},
 
-	template: _.templateUrl('/projects/tpls/project/project.nav.html', true),
+	template: _.templateUrl('/projects/tpls/project/design/project.design.nav.html', true),
 
 	render: function() {
 		this.$el.html(this.template);
@@ -20,13 +20,14 @@ App.Project.ProjectDesignNav = Backbone.View.extend({
 		App.Project.Settings.fetchNavType = $(event.target).addClass("selected").siblings().removeClass("selected").end().data("type");
 		if (App.Project.Settings.fetchNavType == "file") {
 			$("#projectContainer .fileContainer").show();
-			$("#projectContainer .modelContainer").hide();
-			App.Project.fetchFile();
+			$("#projectContainer .modelContainer").hide(); 
+			App.Project.fetchDesignFileNav();
 		} else {
 			$("#projectContainer .fileContainer").hide();
-			$("#projectContainer .modelContainer").show();
-			App.Project.fetchNav();
+			$("#projectContainer .modelContainer").show(); 
+			App.Project.fetchDesignModelNav();
 		} 
+		
 
 	}
 });

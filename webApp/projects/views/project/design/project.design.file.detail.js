@@ -17,7 +17,7 @@ App.Project.ProjectDesingnFileDetail=Backbone.View.extend({
 
 	},
 	
-	template:_.templateUrl("/projects/tpls/project/project.file.detail.html"),
+	template:_.templateUrl("/projects/tpls/project/design/project.design.file.detail.html"),
 
 	//渲染
 	render:function(){

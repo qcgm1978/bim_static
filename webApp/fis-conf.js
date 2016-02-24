@@ -50,17 +50,19 @@ fis.match('*.es6', {
 fis.match('/libs/**.js', { 
   packTo: '/dist/libs/commLib.js'
 });
-
+fis.match('/libs/**.css', { 
+  packTo: '/dist/libs/commLibCss.css'
+});
 
 //合并公共样式文件
 fis.match('/comm/**.{less,css}', {
-	useHash:true,
+	useHash:false,
   packTo: '/dist/comm/comm.css'
 });
 
 //合并公共文件
 fis.match('/comm/**.{js,es6}', {
-  useHash:true,
+  useHash:false,
 	//useHash:true,
   packTo: '/dist/comm/comm.js'
 }); 
@@ -92,11 +94,11 @@ fis.match('/todo/**.{less,css}', {
 
 //项目
 fis.match('/projects/**.{less,css}', {
-  useHash:true,
+  useHash:false,
   packTo: '/dist/projects/projects.css'
 });
 fis.match('/projects/**.{js,es6}', {
-  useHash:true,
+  useHash:false,
   //useHash:true,
   packTo: '/dist/projects/projects.js'
 });
