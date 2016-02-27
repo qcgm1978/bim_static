@@ -22,6 +22,7 @@
         return ('draggable' in div) || ('ondragstart' in div && 'ondrop' in div)
     }
 
+    //默认配置
     var defaultOptions = {
         // plupload options
         url: '/document/id/file/?upload&returnFirst',
@@ -40,18 +41,20 @@
 
     var upload = {
         init: function (container, options) {
-            debugger;
+           
             if (!container) return
             upload.container = container
             upload.options = options || {}
             upload.__initPlUpload($.extend({}, defaultOptions, upload.options))
         },
 
+        //设置最大下载尺寸
         setMaxSize: function (size) {
             if(!upload.container) return false
             upload.container.pluploadQueue().settings.max_file_size = size
         },
 
+        //初始化
         __initPlUpload: function (options) {
 
             var self = upload
@@ -134,6 +137,7 @@
                     }
                 },
                 Init: function (up) {
+                    
                     if (options.draggable && !isSafari && up.features.dragdrop) {
                         //add dragdrop tip
                         var tip = '可以把文件直接拖到浏览器中进行上传'
@@ -148,13 +152,17 @@
                     }
                 }
             }
+
+            //是否可以上传文件夹
             if (supportDirectory() && options.directory && options.runtimes !== 'flash') {
                 var buttonsIds = self.__initDirectoryUpload(options)
                 options.directoryUpload = true
                 options.browse_button = buttonsIds.browseButtonId
                 options.browse_dir_button = buttonsIds.browseDirButtonId
             }
-            //self.container.pluploadQueue(options)
+
+            self.container.pluploadQueue(options)
+            //关闭弹出层
             self.container.append($('<div>', {
                 'class': 'plupload plupload-icon-remove',
                 title: '关闭',
@@ -167,6 +175,8 @@
                     return false
                 }
             }))
+
+            //最小化弹出层
             self.container.append($('<div>', {
                 'class': 'plupload plupload-icon-minus',
                 title: '最小化窗口',
@@ -175,11 +185,15 @@
                     return false
                 }
             }))
+
+            // 存在 容量
             if (options.getQuotaInfo) {
                 self.container.append($('<div>', {
                     'class': 'plupload quota-tip-info'
                 }))
             }
+           
+            //拖拽移动上传的弹出层
             if (options.draggable && self.container.draggable) {
                 self.container.draggable({
                     axis: 'x',
@@ -187,14 +201,18 @@
                     handle: '.plupload_header'
                 })
             }
+
+            //双击头部收起展开
             self.container.find('.plupload_header').dblclick(function () {
                 self.__toggleUploadModal()
             })
-            // drag and drop upload
+
+
+            // drag and drop upload 是否可以拖拽上传 仅仅 H5
             if (options.dragAndDropUpload && supportDragdrop) {
                 $(document.body).append(drapAndDropPH)
                 var dragArea = $(document.body)
-                dragArea.bind('drop', function (e) {
+                dragArea.bind('drop.upload', function (e) {
                     dragArea.removeClass('dragupload-drag-over')
                     if (!options.canUploadFile()) return
                     if (!e.originalEvent.dataTransfer) return
@@ -237,16 +255,16 @@
                     }
                     return false
                 })
-                dragArea.bind('dragenter dragover', function (e) {
+                dragArea.bind('dragenter.upload dragover.upload', function (e) {
                     if (dragArea.find(e.target).length === 1 && options.canUploadFile()) {
                         dragArea.addClass('dragupload-drag-over')
                         return false
                     }
                 })
-                dragArea.bind('dragleave', function (e) {
+                dragArea.bind('dragleave.upload', function (e) {
                     dragArea.removeClass('dragupload-drag-over')
                 })
-                $(window).on('beforeunload', function () {
+                $(window).on('beforeunload.upload', function () {
                     if (isUploading) {
                         return '有文件还未上传完成，确定要离开吗？'
                     }
@@ -254,6 +272,7 @@
             }
         },
 
+        //显示上传谈层
         __showUploadModal: function () {
             upload.container.css({
                 bottom: 0
@@ -265,6 +284,7 @@
                 })
         },
 
+        //隐藏上传弹出层
         __hideUploadModal: function () {
             upload.container.animate({
                 bottom: -382
@@ -274,6 +294,7 @@
             })
         },
 
+        // 切换 最大化 最小化
         __toggleUploadModal: function () {
             if (upload.container.css('bottom') === '-382px') {
                 upload.container.animate({
@@ -296,6 +317,7 @@
             }
         },
 
+        //遍历文件夹目录
         __traverseDirectory: function (entry, callback) {
             if (entry.isFile) {
                 upload.__readFile(entry, callback)
@@ -310,6 +332,7 @@
             }
         },
 
+        //读取文件
         __readFile: function (fileEntry, callback) {
             fileEntry.file(function (file) {
                 file.fullPath = fileEntry.fullPath
@@ -317,10 +340,12 @@
             })
         },
 
+        //将文件添加到队列
         __addFiles: function (files) {
             upload.container.pluploadQueue().addFiles(files)
         },
 
+        //初始化文件夹上传
         __initDirectoryUpload: function (options) {
             var uploadButton = $('#' + options.browse_button)
             var uploadButtons = $('<div class="upload-dropdown-buttons">' +
@@ -334,7 +359,7 @@
             uploadButton.click(function (e) {
                 var p = $(this).offset()
                 uploadButtons.css({
-                    top: p.top + $(this).height() + 2,
+                    top: p.top + $(this).height() + 18,
                     left: p.left
                 }).show()
                 $(document).one('click.hideuploaddropdown', function () {
@@ -349,6 +374,7 @@
         }
     }
 
+    //拖拽定义
     var drapAndDropPH = '' +
         '<div class="drag-helper-view-top"></div>' +
         '<div class="drag-helper-view-right"></div>' +
@@ -359,18 +385,23 @@
     App.Comm.upload = {
         init: upload.init,
         setMaxSize: upload.setMaxSize,
+        //获取上传实例
         getUploadInstance: function () {
             if(!upload.container) return {}
             return upload.container.pluploadQueue()
         },
+        //设置配置信息 右下角
         setQuotaInfo: function (text) {
             if(!upload.container) return null
             upload.container.find('.quota-tip-info').text(text)
         },
-        destroy: function () {
+        //销毁
+        destroy: function () { 
             if(!upload.container) return null
-            upload.container.pluploadQueue().trigger('Destroy')
+            upload.container.pluploadQueue().trigger('Destroy');
+            $(".mod-plupload,.plupload,.upload-dropdown-buttons,.drag-helper-view-top,.drag-helper-view-right,.drag-helper-view-bottom,.drag-helper-view-left").remove();
+            $(document.body).unbind(".upload");
         }
     }
 
-})(jQuery)
+})(jQuery);

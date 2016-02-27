@@ -11,6 +11,8 @@ App.Project.ProjectDesignNav = Backbone.View.extend({
 	template: _.templateUrl('/projects/tpls/project/design/project.design.nav.html', true),
 
 	render: function() {
+
+		 
 		this.$el.html(this.template);
 		return this;
 	},
@@ -21,8 +23,10 @@ App.Project.ProjectDesignNav = Backbone.View.extend({
 		if (App.Project.Settings.fetchNavType == "file") {
 			$("#projectContainer .fileContainer").show();
 			$("#projectContainer .modelContainer").hide();
+			//加载文件
 			App.Project.fetchDesignFileNav();
 		} else {
+
 			$("#projectContainer .fileContainer").hide();
 			$("#projectContainer .modelContainer").show();
 			App.Project.fetchDesignModelNav();

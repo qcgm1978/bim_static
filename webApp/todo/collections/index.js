@@ -2,7 +2,7 @@
 
 /**
  * @require /todo/module/todo.list.es6
- */
+ */ 
 
 App.Todo = {
 
@@ -12,7 +12,11 @@ App.Todo = {
 
 	TodoCollection: new(Backbone.Collection.extend({
 
-		model: App.TodoModule.TodoListModule
+		model: App.TodoModule.TodoListModule,
+
+		debugUrl:"/dataJson/todo/todo.json",
+
+		url:""
 
 		//parse 
 	})),
@@ -24,13 +28,47 @@ App.Todo = {
 		//nav
 		$("#contains").html(new App.Todo.NavView().render().$el);
 		// list contain
-		$("#contains").append(new App.Todo.TodoListView().render().$el);
+		$("#contains").append(new App.Todo.TodoListView().render().$el); 
+
 		// load list
-		App.Todo.fetch();
+		App.Todo.TodoCollection.fetch();
 		//App.Todo.TodoCollection.fetch();
 
+		//初始化滚动条
+		App.Todo.initScroll();
 	},
 
+	initScroll:function(){
+
+		//  $(selector).mCustomScrollbar("destroy");
+
+		var $content=$("#todoContent");
+
+		  $content.find(".commissionBox").mCustomScrollbar({
+		  		set_height:"100%",
+                theme: 'minimal-dark',
+                axis: 'y',
+                keyboard: {
+                    enable: true
+                },
+                scrollInertia: 0
+            });
+
+		   $content.find(".alreadyBox").mCustomScrollbar({
+		  		set_height:"100%",
+                theme: 'minimal-dark',
+                axis: 'y',
+                keyboard: {
+                    enable: true
+                },
+                scrollInertia: 0
+            });
+
+	 
+	},
+
+
+	//未用
 	fetch : function(type) {
 
 		//删除所有数据
@@ -44,11 +82,7 @@ App.Todo = {
 			msg="我是已经完成"
 		};
 		for (var i = 0; i < 13; i++) {
-			data.push({
-				title: msg + i,
-				userName:'张三'+i,
-				time:'2016-12-12'
-			});
+			data.push();
 		}
 
 		App.Todo.TodoCollection.add(data);

@@ -12,6 +12,8 @@ var AppRoute = Backbone.Router.extend({
 	},
 
 	todo: function() {
+		//销毁上传
+		App.Comm.upload.destroy();
 		$("#topBar .nav").find(".item").removeClass("selected").end().find(".todo").addClass('selected');
 		//加载css js
 		_.require('/dist/todo/todo.css');
@@ -21,6 +23,7 @@ var AppRoute = Backbone.Router.extend({
 
 
 	projects: function() {
+		//销毁上传
 		$("#topBar .nav").find(".item").removeClass("selected").end().find(".projects").addClass('selected');
 		//加载css js
 		_.require('/dist/projects/projects.css');
@@ -40,13 +43,17 @@ var AppRoute = Backbone.Router.extend({
 
 
 	flow: function() {
+		//销毁上传
 		$("#topBar .nav").find(".item").removeClass("selected").end().find(".flow").addClass('selected');
+		_.require('/dist/flow/flow.css');
+		_.require('/dist/flow/flow.js');
 
-		$("#contains").html("flow");
+		$("#contains").html(new App.Flow().render().el);
 
 	},
 
 	resources: function() {
+		//销毁上传
 		$("#topBar .nav").find(".item").removeClass("selected").end().find(".resources").addClass('selected');
 
 		$("#contains").html("resources");
@@ -54,6 +61,7 @@ var AppRoute = Backbone.Router.extend({
 	},
 
 	console: function() {
+		//销毁上传
 		$("#topBar .nav").find(".item").removeClass("selected").end().find(".console").addClass('selected');
 		$("#contains").html("console");
 	}

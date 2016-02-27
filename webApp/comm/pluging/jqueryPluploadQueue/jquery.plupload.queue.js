@@ -11,7 +11,12 @@
 // JSLint defined globals
 /*global plupload:false, jQuery:false, alert:false */
 
-(function ($) {
+/**
+ * @require /libs/jquery-1.12.0.min.js
+ */
+
+
+;(function ($) {
     var uploaders = {};
 
     var formatSize = function (size) {
@@ -234,4 +239,5 @@
             return uploaders[$(this[0]).attr('id')];
         }
     };
+
 })(jQuery);

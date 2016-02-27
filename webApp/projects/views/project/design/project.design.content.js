@@ -22,12 +22,34 @@ App.Project.ProjectDesingnContent = Backbone.View.extend({
 		return this;
 	},
 
+	initDesignScroll: function() { 
+
+		this.$el.find(".fileContainerScrollContent").mCustomScrollbar({
+			set_height: "100%",
+			theme: 'minimal-dark',
+			axis: 'y',
+			keyboard: {
+				enable: true
+			},
+			scrollInertia: 0
+		});
+
+
+	},
+
+
 	//添加单个li
 	addOneFile:function(model){ 
 		var view=new App.Project.ProjectDesingnFileDetail({
 			model:model
 		});
-		this.$el.find(".fileContent").append(view.render().el);
+		this.$el.find(".fileContent:last").prepend(view.render().el);
+
+		//判断滚动条是否绑定过 
+		if (!this.$el.find(".fileContainerScrollContent").hasClass('mCustomScrollbar')) {
+			this.initDesignScroll(); 
+		}
+
 	}
 
 

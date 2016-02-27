@@ -45,6 +45,15 @@ fis.match('*.es6', {
     rExt: 'js'
 }); 
  
+ fis.match('**.{gif,png,jpg}', {
+  //useHash:true,
+  release:"/dist/images/$0"
+});
+
+  fis.match('**.{otf,eot,svg,ttf,woff}', {
+  //useHash:true,
+  release:"/dist/comm/$0"
+});
 
 //合并裤文件
 fis.match('/libs/**.js', { 
@@ -52,6 +61,16 @@ fis.match('/libs/**.js', {
 });
 fis.match('/libs/**.css', { 
   packTo: '/dist/libs/commLibCss.css'
+});
+
+
+//合并裤文件
+fis.match('/libsH5/**.js', { 
+  packTo: '/dist/libs/libsH5.js'
+});
+
+fis.match('/libsH5/**.css', { 
+  packTo: '/dist/libs/libsH5.css'
 });
 
 //合并公共样式文件
@@ -103,7 +122,16 @@ fis.match('/projects/**.{js,es6}', {
   packTo: '/dist/projects/projects.js'
 });
 
+// 流程
+fis.match('/flow/**.{js,es6}', {
+  //useHash:true,
+  packTo: '/dist/flow/flow.js'
+});
 
+fis.match('/flow/**.{less,css}', {
+  //useHash:true,
+  packTo: '/dist/flow/flow.css'
+});
 
 // 清除其他配置，只保留如下配置
 fis.media("prod").match('*.{js,es6}', {

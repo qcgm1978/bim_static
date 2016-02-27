@@ -1,8 +1,54 @@
+<div class="searchHeadText">
+    <div class="vLine"></div>
+    <span>查询条件</span>
+</div>
 
-<span class="textSearch">项目名称：</span>
-<input type="text" placeholder="请输入项目名称" class="txtSearch" />
-<span class="btnSearch">查询</span>
-<span class="seniorSearch">高级查询</span>
 
-
- 
+<div class="quickSearch">
+    <span class="textSearch">项目名称：</span>
+    <input type="text" placeholder="请输入项目名称" class="txtSearch txtInput" />
+    <span class="btnSearch">查询</span>
+</div>
+<div class="advancedQueryConditions">
+    <div class="item">
+        <span>项目类型：</span>
+        <select class="form-control">
+            <option value="">请选择</option>
+        </select>
+        <span>物业类别：</span>
+        <select class="form-control">
+            <option value="">请选择</option>
+        </select>
+        <span>管理分区：</span>
+        <select class="form-control">
+            <option value="">请选择</option>
+        </select>
+        <span>是否完成：</span>
+        <label>
+            <input type="radio" name="status" />是</label>
+        <label>
+            <input type="radio" name="status" />否</label>
+    </div>
+    <div class="item">
+        <span>所属省份：</span>
+        <select class="form-control">
+            <option value="">请选择</option>
+        </select>
+        <span>是否开业：</span>
+        <select class="form-control">
+            <option value="">请选择</option>
+        </select>
+        <span>开业时间：</span>
+        <input type="text" />
+        <span>--至--</span>
+        <input type="text" />
+    </div>
+    <div class="item">
+        <span>项目名称：</span>
+        <input type="text" class="txtInput" />
+    </div>
+    <div class="item">
+       <span class="btnSearch">查询</span>
+    </div>
+</div>
+<span class="seniorSearch">高级查询<i class="icon-angle-down"></i></span>

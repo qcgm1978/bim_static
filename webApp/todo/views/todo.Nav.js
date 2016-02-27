@@ -16,19 +16,23 @@ App.Todo.NavView = Backbone.View.extend({
 		$(".todoNav .already").removeClass("selected");
 
 		//显示并清空
-		$("#content").find(".alreadyBox").hide().end().find(".commissionBox").show().find(".commissionLists").empty();
+		$("#todoContent").find(".alreadyBox").hide().end().find(".commissionBox").show().find(".commissionLists").empty();
 
 		App.Todo.Settings.type = "commission";
-		App.Todo.fetch();
+		//App.Todo.fetch();
+		App.Todo.TodoCollection.debugUrl="/dataJson/todo/todo.json?commission";
+		App.Todo.TodoCollection.fetch();
 	},
 
 	already: function() {
 		$(".todoNav .already").addClass("selected");
 		$(".todoNav .commission").removeClass("selected");
 		//显示并清空
-		$("#content").find(".commissionBox").hide().end().find(".alreadyBox").show().find(".alreadyLists").empty();
+		$("#todoContent").find(".commissionBox").hide().end().find(".alreadyBox").show().find(".alreadyLists").empty();
 		App.Todo.Settings.type = "already";
-		App.Todo.fetch("complete");
+	App.Todo.TodoCollection.debugUrl="/dataJson/todo/todo.json?already";
+		App.Todo.TodoCollection.fetch();
+		//App.Todo.fetch("complete");
 	},
 
 	template:_.templateUrl("./todo/tpls/todo.Nav.html",true),

@@ -25,11 +25,10 @@ App.Projects.ContentMode = Backbone.View.extend({
 			var listView = new App.Projects.listView({
 				model: model
 			});
+
 			this.$el.find(".proListBox").append(listView.render().el);
 
-		} else {
-
-		}
+		}  
 	}
 
 });

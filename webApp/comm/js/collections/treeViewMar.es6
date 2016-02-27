@@ -51,7 +51,7 @@ App.Comm.TreeViewMar.prototype.TreeViewBuild = function() {
 			}
 		},
 		//点击单个
-		itemClick: function() {
+		itemClick: function(event) {
 
 			$(".treeViewMarUl .selected").removeClass("selected");
 
