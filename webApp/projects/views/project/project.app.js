@@ -11,49 +11,22 @@ App.Project.ProjectApp = Backbone.View.extend({
 
 	render: function() {
 		//nav
-		this.$el.html(new App.Project.ProjectHeader().render().$el);
-		this.$el.append('<div id="projectContainer" />');
-		//根据类型渲染数据
-		this.renderContentByType();
+		this.$el.html(new App.Project.ProjectContainer().render().$el);
+
+		//初始化数据
+		this.initData();
 		return this;
 	},
 
-	//根据类型渲染数据
-	renderContentByType: function() {
+	//加载tab 的内容
+	initData: function() {
+		// 导航文件
+		App.Project.fetchFileNav();
+		//导航模型
+		App.Project.fetchModelNav();
 
-		var type = App.Project.Settings.projectNav;
-		//设计
-		if (type == "design") {
-			this.$el.find("#projectContainer").html(new App.Project.ProjectDesingn().render().$el);
-
-			//获取设计数据 
-			//App.Project.FileCollection.fetch({success:function(){},error:function(){console.log(1)}}); 
-			//设计导航
-			if (App.Project.Settings.fetchNavType == "file") {
-				//列表
-				App.Project.FileCollection.fetch();
-				//导航
-				App.Project.fetchDesignFileNav();
-			} else {
-				//导航
-				App.Project.fetchDesignModelNav();
-			} 
-
-		} else if (type == "plan") {
-			//计划
-			this.$el.find("#projectContainer").html(new App.Project.ProjectPlan().render().$el);
-
-
-		} else if (type == "cost") {
-			//成本
-			this.$el.find("#projectContainer").html(new App.Project.ProjectCost().render().$el);
-
-
-		} else if (type == "quality") {
-			//质量
-			this.$el.find("#projectContainer").html(new App.Project.ProjectQuality().render().$el);
-
-		}
+		//文件列表
+		App.Project.FileCollection.fetch();
 	}, 
 
 	// 切换项目Tab
@@ -63,10 +36,37 @@ App.Project.ProjectApp = Backbone.View.extend({
 		//样式处理
 		$el.addClass('selected').siblings().removeClass('selected');
 		App.Project.Settings.projectNav = $el.data("type");
-		//根据类型渲染数据
-		this.renderContentByType();
+		//非文件导航
+		if (App.Project.Settings.fetchNavType != "file") { 
+			//根据类型渲染数据
+			this.renderContentByType();  
+		} 
+	},
+	//根据类型渲染数据
+	renderContentByType: function(isFirst) {
 
-	}
+		var type = App.Project.Settings.projectNav;
+		//设计
+		if (type == "design") {
+
+			 
+
+		} else if (type == "plan") {
+			//计划
+			this.$el.find("#rightPropety").html(new App.Project.ProjectPlan().render().$el);
+
+
+		} else if (type == "cost") {
+			//成本
+			this.$el.find("#rightPropety").html(new App.Project.ProjectCost().render().$el);
+
+
+		} else if (type == "quality") {
+			//质量
+			this.$el.find("#rightPropety").html(new App.Project.ProjectQuality().render().$el);
+
+		}
+	},
 
 
 

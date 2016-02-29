@@ -1,10 +1,10 @@
-App.Project.ProjectHeader = Backbone.View.extend({
+App.Project.ProjectContainer = Backbone.View.extend({
 
 	tagName: 'div',
 
-	className: 'projectHeader', 
+	className: 'projectContent', 
 
-	template: _.templateUrl('/projects/tpls/project/project.header.html',true),
+	template: _.templateUrl('/projects/tpls/project/project.container.html',true),
 
 	events:{
 		"click .breadItem":"breadItemClick"
@@ -12,6 +12,11 @@ App.Project.ProjectHeader = Backbone.View.extend({
 
 	render: function() {
 		this.$el.html(this.template);
+		//导航
+		this.$el.find("#projectContainer").prepend(new App.Project.leftNav().render().el);
+		 
+		//加载文件
+		this.$el.find(".projectCotent").prepend(new App.Project.FileContainer().render().el);
 		return this;
 	},
 

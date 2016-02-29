@@ -35,19 +35,7 @@ App.Project = {
 	//初始化滚动条
 	initScroll:function(){
 
-		$("#projectDesignNav").find(".projectNavContent").mCustomScrollbar({
-             set_height: "100%",
-             set_width:"100%",
-             theme: 'minimal-dark',
-             axis: 'yx',
-             keyboard: {
-                 enable: true
-             },
-             scrollInertia: 0
-         });
-
-
-		$("#projectDesignContainer").find(".designContainer").mCustomScrollbar({
+		$("#projectContainer").find(".projectFileNavContent").mCustomScrollbar({
              set_height: "100%",
              set_width:"100%",
              theme: 'minimal-dark',
@@ -57,10 +45,33 @@ App.Project = {
              },
              scrollInertia: 0
          });
+
+		$("#projectContainer").find(".projectModelNavContent").mCustomScrollbar({
+             set_height: "100%",
+             set_width:"100%",
+             theme: 'minimal-dark',
+             axis: 'y',
+             keyboard: {
+                 enable: true
+             },
+             scrollInertia: 0
+         });
+
+
+		// $("#projectDesignContainer").find(".designContainer").mCustomScrollbar({
+  //            set_height: "100%",
+  //            set_width:"100%",
+  //            theme: 'minimal-dark',
+  //            axis: 'y',
+  //            keyboard: {
+  //                enable: true
+  //            },
+  //            scrollInertia: 0
+  //        });
 	},
 
 	//设计导航
-	fetchDesignFileNav: function() {
+	fetchFileNav: function() {
 
 		var data = {
 			URLtype: "fetchDesignFileNav"
@@ -68,21 +79,20 @@ App.Project = {
 
 		App.Comm.ajax(data).done(function(data) {
 			var navHtml = new App.Comm.TreeViewMar(data);
-			$("#projectDesignNav .projectNavContainer ").html(navHtml);
+			$("#projectContainer .projectNavFileContainer").html(navHtml);
 		});
 
 	},
 
 	//设计模型
-	fetchDesignModelNav: function() {
-
+	fetchModelNav: function() { 
 		var data = {
 			URLtype: "fetchDesignModelNav"
 		};
 
 		App.Comm.ajax(data).done(function(data) {
 			var navHtml = new App.Comm.TreeViewMar(data);
-			$("#projectDesignNav .projectNavContainer").html(navHtml);
+			$("#projectContainer .projectNavModelContainer").html(navHtml);
 		});
 	}
 

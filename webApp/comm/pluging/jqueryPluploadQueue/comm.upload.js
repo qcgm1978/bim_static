@@ -105,6 +105,7 @@
                     }
                 },
                 UploadFile: function (up, file) {
+                   this.settings.url+="&length="+file.size;
                     isUploading = true
                 },
                 FileUploaded: function (up, file, response) {

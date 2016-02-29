@@ -9,11 +9,11 @@
 			}
 		}
 	}
-	.breadcrumbNav { line-height: 37px; padding-left: 20px;font-size: 14px;
-		.breadItem{margin-left: 6px;
-			.icon-angle-right{font-size: 16px;margin-left: 6px;}
-			.breadItemText{margin-left: 6px;cursor: pointer;
-				.icon-sort-down{ font-size: 16px;margin-left: 11px;vertical-align: 2px;}
+	.breadcrumbNav { line-height: 37px; padding-left: 20px; font-size: 14px;
+		.breadItem { margin-left: 6px;
+			.icon-angle-right { font-size: 16px; margin-left: 6px; }
+			.breadItemText { margin-left: 6px; cursor: pointer;
+				.icon-sort-down { font-size: 16px; margin-left: 11px; vertical-align: 2px; }
 			}
 		}
 		.allProject { cursor: pointer }
@@ -26,39 +26,44 @@
 		}
 	}
 }
-#projectDesignNav { float: left; width: 238px; border: 1px #ccc solid; position: relative;height: 100%;
-	.projectNavContentBox{ margin-top: 1px;position: absolute;top: 26px;width: 100%;bottom: 0px;
-		.mCSB_container{width:680px;}
-	}
-}
-#projectDesignContent { margin-left: 240px; position: relative;height: 100%;
-	.fileContainer { padding: 10px;height: 100%;box-sizing: border-box;
-		.fileContainerScroll{    position: absolute;top: 78px;bottom: 0px;left:10px;right: 10px;}
-		.btnNormal { padding: 4px 12px; display: inline-block; border: 1px #ccc solid; cursor: pointer; margin-right: 3px; 
-			i{   color: #85B200;font-size: 20px;vertical-align: -3px;margin-right: 5px;}
-		}
-		.fileContent { border: 1px #ccc solid; margin-top: 10px; border-bottom: 0;
-			&.zIndex{position: relative;z-index: 1;}
-
-			.inlineBlock { display: inline-block; }
-			.filecKAll { width: 5%; text-align: center; }
-			.fileBg { width: 7%;
-				img { width: 34px; height: 28px; vertical-align: top; margin-top: 5px; }
-			}
-			.fileName { width: 42%; }
-			.fileStatus { width: 11%; }
-			.fileOp { width: 11%; }
-			.fileSize { width: 11%; }
-			.fileDate { width: 11%; }
-			.header, .item { height: 38px; line-height: 38px; border-bottom: 1px #ccc solid; }
-			.header { background-color: #eee; }
-		}
-		.modelContainer { height: 500px; position: relative; }
-	}
-}
+ 
+#projectDesignContent { margin-left: 240px; position: relative; height: 100%; }
 #ProjectPlanNavContainer, #ProjectCostNavContainer, #ProjectQualityNavContainer { width: 398px; float: right; }
 #projectContainer #ProjectPlanNavContainer .projectNav .item { width: 72px; }
 .projectContainerApp { height: 100%;
+	.projectContent { height: 100%;
+		.leftNav { float: left; width: 238px; border: 1px #ccc solid; position: relative; height: 100%;
+			.projectNavContentBox { margin-top: 1px; position: absolute; top: 26px; width: 100%; bottom: 0px;
+				.projectModelNavContent { display: none; }
+				.mCSB_container { }
+			}
+		}
+		.rightPropety { float: right; margin-right: -2px; border: 1px #ddd solid; position: relative; height: 100%; }
+		.projectCotent { position: relative; height: 100%; margin-left: 240px;
+			.fileContainer { padding: 10px; height: 100%; box-sizing: border-box;
+				.fileContainerScroll { position: absolute; top: 78px; bottom: 0px; left: 10px; right: 10px; }
+				.btnNormal { padding: 4px 12px; display: inline-block; border: 1px #ccc solid; cursor: pointer; margin-right: 3px;
+					i { color: #85B200; font-size: 20px; vertical-align: -3px; margin-right: 5px; }
+				}
+				.fileContent,.fileContentHeader { border: 1px #ccc solid; margin-top: 10px; border-bottom: 0;
+					&.zIndex { position: relative; z-index: 1; }
+					.inlineBlock { display: inline-block; }
+					.filecKAll { width: 5%; text-align: center; }
+					.fileBg { width: 7%;
+						img { width: 34px; height: 28px; vertical-align: top; margin-top: 5px; }
+					}
+					.fileName { width: 42%; }
+					.fileStatus { width: 11%; }
+					.fileOp { width: 11%; }
+					.fileSize { width: 11%; }
+					.fileDate { width: 11%; }
+					.header, .item { height: 38px; line-height: 38px; border-bottom: 1px #ccc solid; }
+					.header { background-color: #eee; }
+				}
+				.modelContainer { height: 500px; position: relative; }
+			}
+		}
+	}
 	#projectContainer { height: 100%; margin-top: -40px; padding-top: 40px;
 		#projectDesignContainer { height: 100%; position: relative; }
 	}

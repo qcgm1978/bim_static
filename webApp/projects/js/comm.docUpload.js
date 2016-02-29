@@ -32,6 +32,7 @@
 
                 //是否可以上传
                 canUploadFile: function() {
+
                     return true;
                     //return App.Comm.modules.util.canUploadFile()
                 },
@@ -45,7 +46,7 @@
                 //获取上传url
                 getUploadUrl: function() {
 
-                    return "https://yun.glodon.com/document/id/file/6082094159886999668?upload&returnFirst";
+                    return "http://172.16.233.210:8080/bim/api/1232321/file/data?fileId=444444444444";
                     // return App.Comm.modules.util.getUrl(App.Comm.modules.util.getParentId(), {
                     //     upload: false,
                     //     returnFirst: false
