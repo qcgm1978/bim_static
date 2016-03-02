@@ -33,9 +33,9 @@ App.Todo = {
 		App.Todo.TodoCollection.fetch({
 			success: function(collection, response, options) {
 				var $content = $("#todoContent");
-				todopage=$content.find(".commissionListPagination").pagination(300, {
-					num_edge_entries: 4, //边缘页数
-					num_display_entries: 8, //主体页数
+				todopage=$content.find(".commissionListPagination").pagination(3000, {
+					num_edge_entries: 3, //边缘页数
+					num_display_entries: 5, //主体页数
 					callback: function(){
 						console.log(arguments);
 					},

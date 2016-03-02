@@ -1,0 +1,17 @@
+.myDropDown{display: inline-block;position: relative;
+	   background-color: #fff;z-index: 9;
+	.myDropText{width:146px;padding:0px 12px; display: inline-block; box-sizing: border-box;  line-height: 28px;
+	 line-height: 28px; border: 1px solid #ccc;cursor: pointer;
+	 	.text{font-size: 14px;}
+	}
+	.myDropArrorw{float: right;width:10px;background: url(../../../images/commIcon.png) no-repeat;height: 10px;    margin-top: 14px;
+		&.down{background-position: 0px -10px;}
+	}
+
+	.myDropList{position: absolute;background-color: #fff;width: 146px;border: 1px #ddd solid; left: -1px;display: none;
+		    max-height: 250px; overflow: auto; top: 39px; box-sizing: border-box;
+		.myItem{height: 25px;line-height: 25px;padding: 0px 12px;
+			&:hover{background-color: #9fd8fd;}
+		}
+	}
+}

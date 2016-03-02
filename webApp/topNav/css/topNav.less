@@ -1,67 +1,18 @@
-.transparent_class(@opacity:0.6) {
-  @ie_value: (@opacity * 100);
-  filter: alpha(opacity=@ie_value);
-  -moz-opacity: @opacity;
-  -khtml-opacity: @opacity;
-  opacity: @opacity;
-}
-.rounded-corners (@radius:4px) {
-  -webkit-border-radius: @radius;
-  -moz-border-radius: @radius;
-  -ms-border-radius: @radius;
-  -o-border-radius: @radius;
-  border-radius: @radius;
-}
-#topBar {
-  height: 50px;
-  background-color: #005BAC;
-  color: #fff;
-  padding: 0 20px;
-  min-width: 1000px;
-  position: relative;
-  z-index: 999;
-
-  .nav {
-    float: right;
-
-    li {
-      float: left;
-
-      a, span {
-        padding: 0px 28px;
-        height: 50px;
-        line-height: 50px;
-        font-size: 20px;
-        cursor: pointer;
-        display: block;
-        .transparent_class;
-      }
+.transparent_class(@opacity:0.6) { @ie_value: (@opacity * 100); filter: alpha(opacity=@ie_value); -moz-opacity: @opacity; -khtml-opacity: @opacity; opacity: @opacity; }
+.rounded-corners (@radius:4px) { -webkit-border-radius: @radius; -moz-border-radius: @radius; -ms-border-radius: @radius; -o-border-radius: @radius; border-radius: @radius; }
+#topBar { height: 50px; background-color: #005BAC; color: #fff; padding: 0 20px; min-width: 1000px; position: relative; z-index: 999;
+  .navHeader { float: right;
+    li { float: left;
+      a, span { padding: 0px 28px; height: 50px; line-height: 50px; font-size: 20px; cursor: pointer; display: block; .transparent_class; }
     }
   }
 }
-#topBar .nav li.item:hover {
-  a, span{
-    .transparent_class(1);
-  } 
+#topBar .navHeader li.item:hover { a, span { .transparent_class(1); }
 }
-#topBar .nav li.selected {
-  background-color: #006ECF;
+#topBar .navHeader li.selected { background-color: #006ECF; }
+#topBar .navHeader li.selected a { .transparent_class(1); }
+#topBar .logo { height: 50px; background: url('/topNav/images/logo.png') no-repeat 0px 10px; padding-left: 129px;
+  .text { font-size: 16px; display: inline-block; vertical-align: top; margin-top: 16px; border-left: 1px #ccc solid; padding-left: 16px; margin-left: 16px; }
 }
-#topBar .nav li.selected a {
-  .transparent_class(1);
-}
-#topBar .logo {
-  height: 50px;
-  background: url('/topNav/images/logo.png') no-repeat 0px 10px;
-  padding-left: 129px;
-
-  .text {
-    font-size: 16px;
-    display: inline-block;
-    vertical-align: top;
-    margin-top: 16px;
-    border-left: 1px #ccc solid;
-    padding-left: 16px;
-    margin-left: 16px;
-  }
+#topBar { a:hover, a:focus { color: #fff; text-decoration: none; }
 }

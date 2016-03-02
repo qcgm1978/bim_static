@@ -1,9 +1,9 @@
 
-App.Project.ProjectCostNav=Backbone.View.extend({
+App.Project.ProjectCostProperty=Backbone.View.extend({
 
 	tagName:"div",
 
-	id:"ProjectCostNavContainer",
+	className:"ProjectCostPropetyContainer projectNav",
 
 	template:_.templateUrl("/projects/tpls/project/cost/project.cost.nav.html",true),
 

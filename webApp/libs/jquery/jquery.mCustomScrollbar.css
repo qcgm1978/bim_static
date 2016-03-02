@@ -1270,3 +1270,23 @@ yx-axis
 	.mCS-inset-3-dark.mCSB_scrollTools .mCSB_dragger.mCSB_dragger_onDrag .mCSB_dragger_bar{ background-color: #fff; background-color: rgba(255,255,255,0.9); }
 	
 	/* ---------------------------------------- */
+
+/*   默认 */
+.mCustomScrollbar  .mCSB_scrollTools_vertical .mCSB_dragger .mCSB_dragger_bar{width:8px;background-color: #ddd;}
+.mCustomScrollbar  .mCSB_scrollTools_vertical .mCSB_draggerContainer{background-color: #eee;border-radius: 4px;width: 10px;}
+/*  hover */
+.mCustomScrollbar  .mCSB_scrollTools_vertical .mCSB_draggerContainer:hover .mCSB_dragger_bar{background-color: #bbb;}
+.mCustomScrollbar  .mCSB_scrollTools_vertical .mCSB_draggerContainer:hover{background-color: #ddd;} 
+/* mousedown  */
+.mCustomScrollbar  .mCSB_scrollTools_vertical.mCSB_scrollTools_onDrag .mCSB_draggerContainer{background-color: #ddd;}
+.mCustomScrollbar  .mCSB_scrollTools_vertical.mCSB_scrollTools_onDrag .mCSB_dragger .mCSB_dragger_bar{width:8px;background-color: #aaa;}
+
+/*   默认 */
+.mCustomScrollbar  .mCSB_scrollTools_horizontal .mCSB_dragger .mCSB_dragger_bar{height:8px;background-color: #ddd;margin: 0px;}
+.mCustomScrollbar  .mCSB_scrollTools_horizontal .mCSB_draggerContainer{background-color: #eee;border-radius: 4px;height: 10px;}
+/*  hover */
+.mCustomScrollbar  .mCSB_scrollTools_horizontal .mCSB_draggerContainer:hover .mCSB_dragger_bar{background-color: #bbb;}
+.mCustomScrollbar  .mCSB_scrollTools_horizontal .mCSB_draggerContainer:hover{background-color: #ddd;} 
+/* mousedown  */
+.mCustomScrollbar  .mCSB_scrollTools_horizontal.mCSB_scrollTools_onDrag .mCSB_draggerContainer{background-color: #ddd;}
+.mCustomScrollbar  .mCSB_scrollTools_horizontal.mCSB_scrollTools_onDrag .mCSB_dragger .mCSB_dragger_bar{height:8px;background-color: #aaa;}

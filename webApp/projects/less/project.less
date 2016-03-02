@@ -1,4 +1,4 @@
-.projectHeader { height: 37px; background-color: #f5f5f5; border-bottom: 1px #ccc solid;
+.projectHeader { height: 37px; background-color: #f5f5f5; border-bottom: 1px #ccc solid;position: relative;z-index: 5;
 	.projectTab { float: right; height: 37px;
 		.item { float: left; height: 100%; line-height: 37px; width: 35px; font-size: 16px; position: relative; text-align: center; margin-right: 40px; cursor: pointer;
 			.line { bottom: 0px; width: 100%; height: 3px; position: absolute; left: 0px; text-align: center; }
@@ -19,33 +19,44 @@
 		.allProject { cursor: pointer }
 	}
 }
-#projectContainer { .projectNav { background-color: #ddd; height: 29px; border-bottom: 1px #ccc solid; padding-left: 24px;
+#projectContainer { .projectNav { background-color: #ddd; height: 29px; border-bottom: 1px #ccc solid;
 		.item { float: left; line-height: 24px; width: 88px; border: 1px #ddd solid; text-align: center; margin-top: 3px; cursor: pointer;
 			&:hover { }
 			&.selected { border: 1px #ccc solid; border-top-width: 2px; border-top-color: #006ECF; border-bottom-color: #fff; background-color: #fff; }
 		}
+		.projectPropetyHeader { padding-left: 24px; }
+		.projectNavContentBox { margin-top: 1px; position: absolute; top: 26px; width: 100%; bottom: 0px;
+
+			/* 设计 */
+			.designVerification,.designProperties{display: none;}
+
+		 }
 	}
 }
- 
 #projectDesignContent { margin-left: 240px; position: relative; height: 100%; }
-#ProjectPlanNavContainer, #ProjectCostNavContainer, #ProjectQualityNavContainer { width: 398px; float: right; }
-#projectContainer #ProjectPlanNavContainer .projectNav .item { width: 72px; }
+#projectContainer .projectNav .item { width: 66px; }
 .projectContainerApp { height: 100%;
 	.projectContent { height: 100%;
-		.leftNav { float: left; width: 238px; border: 1px #ccc solid; position: relative; height: 100%;
+		.leftNav { float: left; width: 238px; border: 1px #ccc solid; position: absolute;top:40px;bottom: 0px;z-index: 990;background-color: #fff;
+			.leftNavContent{height: 100%;}
+			.projectNav { padding-left: 24px; }
 			.projectNavContentBox { margin-top: 1px; position: absolute; top: 26px; width: 100%; bottom: 0px;
 				.projectModelNavContent { display: none; }
 				.mCSB_container { }
 			}
 		}
-		.rightPropety { float: right; margin-right: -2px; border: 1px #ddd solid; position: relative; height: 100%; }
+		.rightProperty {   border: 1px #ddd solid; display: none;position: absolute;right: 0px;top: 40px;bottom: 0px;background-color: #fff;z-index: 600;
+			.rightPropertyContentBox{height: 100%;position: relative;}
+			&.showPropety { width: 398px; display: block; }
+		}
 		.projectCotent { position: relative; height: 100%; margin-left: 240px;
+			&.showPropety { margin-right: 398px; }
 			.fileContainer { padding: 10px; height: 100%; box-sizing: border-box;
 				.fileContainerScroll { position: absolute; top: 78px; bottom: 0px; left: 10px; right: 10px; }
 				.btnNormal { padding: 4px 12px; display: inline-block; border: 1px #ccc solid; cursor: pointer; margin-right: 3px;
 					i { color: #85B200; font-size: 20px; vertical-align: -3px; margin-right: 5px; }
 				}
-				.fileContent,.fileContentHeader { border: 1px #ccc solid; margin-top: 10px; border-bottom: 0;
+				.fileContent, .fileContentHeader { border: 1px #ccc solid; margin-top: 10px; border-bottom: 0;
 					&.zIndex { position: relative; z-index: 1; }
 					.inlineBlock { display: inline-block; }
 					.filecKAll { width: 5%; text-align: center; }
@@ -64,7 +75,14 @@
 			}
 		}
 	}
-	#projectContainer { height: 100%; margin-top: -40px; padding-top: 40px;
+	#projectContainer { height: 100%; margin-top: -40px; padding-top: 40px;position: relative;
 		#projectDesignContainer { height: 100%; position: relative; }
+		.dragSize { position: absolute; top: 0px; bottom: 0px; width: 10px;  right: -6px; cursor: col-resize; z-index: 999; display: none; }
+		.slideBar { width: 15px; height: 32px; right: -15px; z-index: 99; position: absolute; display: none; background-color: #fff; border: 2px #ccc solid; line-height: 26px; box-sizing: border-box; padding-left: 2px; cursor: pointer; }
+		.rightPropertyContentBox{
+			.dragSize{left: -5px;right: inherit;display: block;}
+			.slideBar{right: inherit;display: block;left:-15px;}
+		}
+
 	}
 }

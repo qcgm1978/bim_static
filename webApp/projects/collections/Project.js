@@ -39,7 +39,7 @@ App.Project = {
              set_height: "100%",
              set_width:"100%",
              theme: 'minimal-dark',
-             axis: 'y',
+             axis: 'y', 
              keyboard: {
                  enable: true
              },
@@ -50,14 +50,13 @@ App.Project = {
              set_height: "100%",
              set_width:"100%",
              theme: 'minimal-dark',
-             axis: 'y',
+             axis: 'yx',
              keyboard: {
                  enable: true
              },
              scrollInertia: 0
          });
-
-
+ 
 		// $("#projectDesignContainer").find(".designContainer").mCustomScrollbar({
   //            set_height: "100%",
   //            set_width:"100%",
@@ -68,6 +67,36 @@ App.Project = {
   //            },
   //            scrollInertia: 0
   //        });
+	},
+
+	//根据类型渲染数据
+	renderModelContentByType: function() {
+
+		var type = App.Project.Settings.projectNav;
+		//设计
+		if (type == "design") {
+
+			$("#projectContainer .rightPropertyContent").html(new App.Project.ProjectDesignPropety().render().$el);
+
+		} else if (type == "plan") {
+			//计划
+			$("#projectContainer .rightPropertyContent").html(new App.Project.ProjectPlanProperty().render().$el);
+
+
+		} else if (type == "cost") {
+			//成本
+			$("#projectContainer .rightPropertyContent").html(new App.Project.ProjectCostProperty().render().$el);
+
+
+		} else if (type == "quality") {
+			//质量
+			 $("#projectContainer .rightPropertyContent").html(new App.Project.ProjectQualityProperty().render().$el);
+
+		} 
+
+		//添加样式
+		$("#projectContainer").find(".rightProperty").addClass("showPropety").end().find(".projectCotent").addClass("showPropety")
+
 	},
 
 	//设计导航

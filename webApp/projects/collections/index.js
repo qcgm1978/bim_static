@@ -38,9 +38,44 @@
 
          //拉取数据
          App.Projects.ProjectCollection.fetch();
+         App.Projects.initDate();
+         App.Projects.initEvent();
 
-        //初始化滚动条
-         App.Projects.initScroll(); 
+         //初始化滚动条
+         App.Projects.initScroll();
+
+     },
+
+     initEvent:function(){
+        //下拉
+         $(".advancedQueryConditions .pickProvince").myDropDown();
+         //单选
+         $(".groupRadio").myRadioCk();
+          $(".groupRadio2").myRadioCk();
+     },
+
+     //初始化日期控件
+     initDate: function() {
+         $('#dateStar').datetimepicker({
+               language: 'zh-CN',
+                autoclose: true,
+                format: 'yyyy-mm-dd',
+                minView: 'month',
+                endDate: new Date()
+               
+         });
+         $('#dateEnd').datetimepicker({
+               language: 'zh-CN',
+                autoclose: true,
+                format: 'yyyy-mm-dd',
+                minView: 'month',
+                endDate: new Date()
+               
+         });
+
+         $(".dateBox .iconCal").click(function(){ 
+            $(this).next().focus();
+         });
 
      },
 

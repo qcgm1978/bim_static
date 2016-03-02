@@ -1,57 +1,43 @@
-.overflowEllipsis {
-    display: inline-block;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-#contains{
-	min-width: 1000px;
-	margin:0 auto;
-	height: 100%;
-    position: relative;
-    box-sizing: border-box;
-    margin-top: -50px;
-    padding-top: 50px;
-}
-.hidden{display: none;}
-.right{float: right;}
-.left{float: left;}
-.clear{clear: both;}
-
+.overflowEllipsis { display: inline-block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#contains { min-width: 1000px; margin: 0 auto; height: 100%; position: relative; box-sizing: border-box; margin-top: -50px; padding-top: 50px; }
+.hidden { display: none; }
+.right { float: right; }
+.left { float: left; }
+.clear { clear: both; }
 
 /* bootstrap  */
-.form-control { 
-    height: 34px;
-    padding: 6px 12px;
-    font-size: 14px;
-    line-height: 1.42857143;
-    color: #555;
-    background-color: #fff;
-    background-image: none;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
-    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
-    -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
-    -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
-    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+.txtInput { height: 30px; padding: 6px 8px; outline: none; font-size: 14px; line-height: 1.2; color: #666; background-color: #fff; border: 1px solid #ccc; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box; }
+.txtInput:focus { border-color: #00d57f; }
+.txtInput.disabled { border-color: #ccc; background-color: #eee; color: #333; }
+.txtNoneBorder { border: 1px #ccc solid; }
+.myBtn { height: 30px; box-sizing: border-box; display: inline-block; padding: 6px 10px; font-weight: normal; line-height: 1.42857143; text-align: center; white-space: nowrap; vertical-align: middle; -ms-touch-action: manipulation; touch-action: manipulation; cursor: pointer; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; border: 1px solid transparent; min-width: 80px; }
+.myBtn:focus, .myBtn:active:focus, .myBtn.active:focus, .myBtn.focus, .myBtn:active.focus, .myBtn.active.focus { outline: thin dotted; outline: 5px auto -webkit-focus-ring-color; outline-offset: -2px; }
+.myBtn:hover, .myBtn:focus, .myBtn.focus { color: #333; text-decoration: none; }
+.myBtn:active, .myBtn.active { background-image: none; outline: 0; -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125); box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125); }
+.sm { height: 25px; padding: 3px 8px; min-width: 60px; }
+.myBtn-default { color: #666; background-color: #fff; border-color: #ccc; }
+.myBtn-default:hover { color: #999; border-color: #ccc; }
+.myBtn-default:active, .myBtn-default.active { color: #666; background-color: #ddd; border-color: #ccc; }
+.myBtn-default.disabled { background-color: #eee; border-color: #ccc; color: #ccc; }
+.myBtn-primary { color: #fff; background-color: #208aee; }
+.myBtn-primary:hover { background-color: #51a6f2; color: #fff; }
+.myBtn-primary:active, .myBtn-primary.active { color: #fff; background-color: #106bbe; }
+.myBtn-primary.disabled { background-color: #bcdcfa; color: #fff; }
+.btnRadio { cursor: pointer; margin-right: 5px;  padding-left: 20px;display: inline-block;vertical-align: middle;
+    padding-right: 15px;line-height: 1.2; height: 15px;background: url(/dist/images/comm/images/commIcon.png) no-repeat 0px -80px;
+	&.selected { background-position: 0px -60px;
+			&.disable { background-position: 0px -100px; }
+		}
+		&.disable { background-position: 0px -120px; }
+
+	 
 }
-.txtInput{
-    height: 34px;
-    padding: 6px 12px;
-    font-size: 14px;
-    line-height: 1.42857143;
-    color: #555;
-    background-color: #fff;
-    background-image: none;
-    border: 1px solid #ccc; 
-    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
-    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
-    -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
-    -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
-    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
+.btnCk { cursor: pointer; margin-right: 5px;  padding-left: 20px;display: inline-block;vertical-align: middle;
+    padding-right: 15px;line-height: 1.2; height: 15px;background: url(/dist/images/comm/images/commIcon.png) no-repeat 0px -160px;
+	&.selected { background-position: 0px -140px;
+			&.disable { background-position: 0px -180px; }
+		}
+		&.disable { background-position: 0px -200px; }
+
+	 
 }
