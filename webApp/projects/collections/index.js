@@ -9,9 +9,8 @@
              }
          }),
 
-         debugUrl: "/dataJson/project/project.list.json",
+         urlType: "fetchProjects",
 
-         url: ""
 
      })),
 
@@ -36,9 +35,7 @@
              App.Projects.initBodyEvent();
          }
 
-         //拉取数据
-         App.Projects.ProjectCollection.fetch();
-         App.Projects.initDate();
+         App.Projects.loadData();
          App.Projects.initEvent();
 
          //初始化滚动条
@@ -46,38 +43,45 @@
 
      },
 
-     initEvent:function(){
-        //下拉
+
+     //加载数据
+     loadData: function() {
+         //拉取数据
+         App.Projects.ProjectCollection.fetch();
+     },
+
+
+     initEvent: function() {
+
+        //日期控件初始化
+         $('#dateStar').datetimepicker({
+             language: 'zh-CN',
+             autoclose: true,
+             format: 'yyyy-mm-dd',
+             minView: 'month',
+             endDate: new Date()
+
+         });
+         $('#dateEnd').datetimepicker({
+             language: 'zh-CN',
+             autoclose: true,
+             format: 'yyyy-mm-dd',
+             minView: 'month',
+             endDate: new Date()
+
+         });
+
+         $(".dateBox .iconCal").click(function() {
+             $(this).next().focus();
+         });
+         //下拉
          $(".advancedQueryConditions .pickProvince").myDropDown();
          //单选
          $(".groupRadio").myRadioCk();
-          $(".groupRadio2").myRadioCk();
+         $(".groupRadio2").myRadioCk();
      },
 
-     //初始化日期控件
-     initDate: function() {
-         $('#dateStar').datetimepicker({
-               language: 'zh-CN',
-                autoclose: true,
-                format: 'yyyy-mm-dd',
-                minView: 'month',
-                endDate: new Date()
-               
-         });
-         $('#dateEnd').datetimepicker({
-               language: 'zh-CN',
-                autoclose: true,
-                format: 'yyyy-mm-dd',
-                minView: 'month',
-                endDate: new Date()
-               
-         });
 
-         $(".dateBox .iconCal").click(function(){ 
-            $(this).next().focus();
-         });
-
-     },
 
      //初始化滚动条
      initScroll: function() {

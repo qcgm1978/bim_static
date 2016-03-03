@@ -85,7 +85,7 @@
 				this.createLink(i, current_page, opts).appendTo(container);
 			}
 		},
-		getLinks:function(current_page, eventHandler) {
+		getLinks:function(current_page, eventHandler,opts) {
 			var begin, end,
 				interval = this.pc.getInterval(current_page),
 				np = this.pc.numPages(),
@@ -122,7 +122,9 @@
 			if(this.opts.next_text && (current_page < np-1 || this.opts.next_show_always)){
 				fragment.append(this.createLink(current_page+1, current_page, {text:this.opts.next_text, classes:"next",rel:"next"}));
 			}
-			$('a', fragment).click(eventHandler);
+			$('a', fragment).click(function(){
+				eventHandler(event,opts);
+			});
 			return fragment;
 		}
 	});
@@ -145,22 +147,28 @@
 			renderer:"defaultRenderer",
 			show_if_single_page:false,
 			load_first_page:true,
-			callback:function(){return false;}
+			callback:function(){return false;},
+			click:null,
 		},opts||{});
 		
 		var containers = this,
 			renderer, links, current_page;
+			 
 		
 		/**
 		 * This is the event handling function for the pagination links. 
 		 * @param {int} page_id The new page number
 		 */
-		function paginationClickHandler(evt){
+		function paginationClickHandler(evt,opts){
+			 
 			var links, 
 				new_current_page = $(evt.target).data('page_id'),
 				continuePropagation = selectPage(new_current_page);
 			if (!continuePropagation) {
 				evt.stopPropagation();
+			}
+			if ($.isFunction(opts.itemCallback)) {
+				opts.itemCallback(new_current_page);
 			}
 			return continuePropagation;
 		}
@@ -174,7 +182,7 @@
 		function selectPage(new_current_page) {
 			// update the link display of a all containers
 			containers.data('current_page', new_current_page);
-			links = renderer.getLinks(new_current_page, paginationClickHandler);
+			links = renderer.getLinks(new_current_page, paginationClickHandler,opts);
 			containers.empty();
 			links.appendTo(containers);
 			// call the callback and propagate the event if it does not return false
@@ -199,13 +207,16 @@
 		
 		// Attach control events to the DOM elements
 		var pc = new $.PaginationCalculator(maxentries, opts);
-		var np = pc.numPages();
+		var np = pc.numPages(); 
+ 
+
 		containers.off('setPage').on('setPage', {numPages:np}, function(evt, page_id) { 
 				if(page_id >= 0 && page_id < evt.data.numPages) {
 					selectPage(page_id); return false;
 				}
 		});
 		containers.off('prevPage').on('prevPage', function(evt){
+
 				var current_page = $(this).data('current_page');
 				if (current_page > 0) {
 					selectPage(current_page - 1);
@@ -224,9 +235,11 @@
 				selectPage(current_page);
 				return false;
 		});
+
+		
 		
 		// When all initialisation is done, draw the links
-		links = renderer.getLinks(current_page, paginationClickHandler);
+		links = renderer.getLinks(current_page, paginationClickHandler,opts);
 		containers.empty();
 		if(np > 1 || opts.show_if_single_page) {
 			links.appendTo(containers);

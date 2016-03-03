@@ -1,5 +1,6 @@
-
-
+/**
+ * @require /projects/collections/Project.js
+ */
 App.Project.DesignAttr={
 
 		// 碰撞collection
@@ -42,7 +43,7 @@ App.Project.DesignAttr={
 			}
 		})
 
-	})),
+	}))
 
 
 }

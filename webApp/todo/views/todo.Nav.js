@@ -19,8 +19,9 @@ App.Todo.NavView = Backbone.View.extend({
 		$("#todoContent").find(".alreadyBox").hide().end().find(".commissionBox").show().find(".commissionLists").empty();
 
 		App.Todo.Settings.type = "commission";
+		App.Todo.Settings.pageIndex=1;
 		//App.Todo.fetch();
-		App.Todo.TodoCollection.debugUrl="/dataJson/todo/todo.json?commission";
+	 	App.Todo.loadData();
 		App.Todo.TodoCollection.fetch();
 	},
 
@@ -30,9 +31,9 @@ App.Todo.NavView = Backbone.View.extend({
 		//显示并清空
 		$("#todoContent").find(".commissionBox").hide().end().find(".alreadyBox").show().find(".alreadyLists").empty();
 		App.Todo.Settings.type = "already";
-	App.Todo.TodoCollection.debugUrl="/dataJson/todo/todo.json?already";
-		App.Todo.TodoCollection.fetch();
-		//App.Todo.fetch("complete");
+		App.Todo.Settings.pageIndex=1;
+		App.Todo.loadData(); 
+	 
 	},
 
 	template:_.templateUrl("./todo/tpls/todo.Nav.html",true),
