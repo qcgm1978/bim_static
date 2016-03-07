@@ -62,11 +62,11 @@ App.Project.leftNav = Backbone.View.extend({
 			$("#projectContainer").find(".projectModelNavContent .mCS_no_scrollbar_y").width(800);
 			//渲染模型属性
 			App.Project.renderModelContentByType();
-			// new BIM({
-			// 	element: $("#projectDesignContent .modelContainer")[0],
-			// 	projectId: 'n4',
-			// 	tools: true
-			// });
+			new BIM({
+				element: $("#projectContainer .modelContainerContent")[0],
+				projectId: 'n4',
+				tools: true
+			});
 		}
 
 	}

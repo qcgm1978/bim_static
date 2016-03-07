@@ -48,7 +48,9 @@
 }
 
 #projectModes{    position: absolute;left: 0px;right: 0px;top: 184px;bottom: 0px; 
-	.proListBox{
+	.proListSite{position: relative;height: 100%;}
+	.proListContent{position: absolute;top: 40px;left: 20px;right: 20px;bottom: 0px;}
+	.proListBox,.proListBoxHeader{
 		span{display: inline-block;vertical-align: top;}
 		.header,.item{
 			height: 36px;border:1px #ddd solid;border-width:1px 0px;background-color: #ddd;line-height: 36px;margin: 0px 20px;
@@ -71,7 +73,13 @@
 			}
 
 		}
+		
 	}
+	.proListBoxScroll{
+			.sumDesc{float: left;margin-left: 20px;margin-top: 20px;}
+			.listPagination{float: right;margin-right: 20px;}
+
+		}
 	&.projectModesDown{ top: 355px;}
 }
 

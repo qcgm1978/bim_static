@@ -1,5 +1,5 @@
  
-//设计属性 碰撞
+//设计属性 检查
 App.Project.DesignVerification=Backbone.View.extend({
 
 	tagName:"div",
@@ -10,9 +10,20 @@ App.Project.DesignVerification=Backbone.View.extend({
 		this.listenTo(App.Project.DesignAttr.VerificationCollection,"add",this.addOne);
 	},
 
-	render:function(){ 
+	template:_.templateUrl("/projects/tpls/project/design/project.design.property.verification.html"),
+
+	render:function(){
+		this.$el.html("正在加载，请稍候……");
 		return this;
+	},
+
+	//数据返回
+	addOne:function(model){
+         var data=model.toJSON();
+         this.$el.html(this.template(data));
 	}
+
+	 
 
 });
 

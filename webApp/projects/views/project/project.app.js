@@ -11,23 +11,10 @@ App.Project.ProjectApp = Backbone.View.extend({
 
 	render: function() {
 		//nav
-		this.$el.html(new App.Project.ProjectContainer().render().$el);
-
-		//初始化数据
-		this.initData();
+		this.$el.html(new App.Project.ProjectContainer().render().$el); 
 		return this;
-	},
-
-	//加载tab 的内容
-	initData: function() {
-		// 导航文件
-		App.Project.fetchFileNav();
-		//导航模型
-		App.Project.fetchModelNav();
-
-		//文件列表
-		App.Project.FileCollection.fetch();
 	}, 
+	
 
 	// 切换项目Tab
 	SwitchProjectNav: function() {
@@ -36,7 +23,7 @@ App.Project.ProjectApp = Backbone.View.extend({
 		//样式处理
 		$el.addClass('selected').siblings().removeClass('selected');
 		App.Project.Settings.projectNav = $el.data("type");
-		//非文件导航
+		//非文件导航 设计 计划 成本 质量
 		if (App.Project.Settings.fetchNavType != "file") { 
 			//根据类型渲染数据
 			App.Project.renderModelContentByType();  

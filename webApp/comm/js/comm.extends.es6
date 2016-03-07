@@ -24,8 +24,15 @@ _.templateUrl = function(url, notCompile) {
 
 App.Comm.requireCache = [];
 
+
+
 //按需加载 
-_.require = function(url) {
+_.require = function(url) { 
+
+	var index = url.lastIndexOf("."); 
+	var type = url.substring(index + 1);
+	
+	url = url.substring(0, index) + "_" + App.Comm.Settings.v + "." + type;
 
 	//加载过不再加载
 	if (App.Comm.requireCache.indexOf(url) == -1) {
@@ -34,7 +41,7 @@ _.require = function(url) {
 		return;
 	}
 
-	var type = url.substring(url.lastIndexOf(".") + 1);
+
 	if (type == "js") {
 		$("head").append('<script type="text/javascript" src="' + url + '" id="todoJs"></script>');
 	} else if (type = "css") {
@@ -160,17 +167,54 @@ String.prototype.format = function(args) {
 
 var BackboneSync = Backbone.sync;
 //重写backbone 的 sync 
-Backbone.sync = function(method, model) {
+Backbone.sync = function(method, model, options) {
 
 	// 在没有url 的情况下 取 api 的值 以防有特别的处理
-	if (!model.url) {
-		//测试
-		if (App.Comm.Settings.debug) {
-			model.url =App.API.DEBUGURL[model.urlType];
-		} else {
-			model.url = App.Comm.Settings.hostname + App.API.URL[model.urlType];
+	//if (!model.url) {
+	//测试
+	if (App.API.Settings.debug) {
+		model.url = App.API.DEBUGURL[model.urlType];
+	} else {
+		model.url = App.API.Settings.hostname + App.API.URL[model.urlType];
+		//跨域
+		// if (!options.crossDomain) {
+		// 	options.crossDomain = true;
+		// }
+
+		// if (!options.xhrFields) {
+		// 	options.xhrFields = {
+		// 		withCredentials: true
+		// 	};
+		// }
+		// options.dataType = "jsonp"; 
+	}
+	//}
+
+	//url 是否有参数
+	var urlPars = model.url.match(/\{([\s\S]+?(\}?)+)\}/g);
+	if (urlPars) {
+		for (var i = 0; i < urlPars.length; i++) {
+			var rex = urlPars[i],
+				par = rex.replace(/[{|}]/g, ""),
+				val = model[par];
+			if (val) {
+				model.url = model.url.replace(rex, val);
+			}
 		}
-	} 
+	}
+
+
+
+	// if (App.Comm.Settings.debug) {
+	// 	//调用backbone 原本的方法
+	// 	return BackboneSync.apply(this, arguments);
+	// } else {
+	// 	return $.ajax({
+	// 		url: "http://172.16.233.97:9090/platform/api/todo",
+	// 		dataType: "jsonp"
+	// 	});
+	// }
+
 	//调用backbone 原本的方法
 	return BackboneSync.apply(this, arguments);
 };

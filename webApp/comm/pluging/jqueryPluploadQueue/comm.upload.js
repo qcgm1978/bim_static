@@ -14,7 +14,7 @@
     var supportDirectory = function () {
         var input = document.createElement('input')
         // todo: now is chrome only
-        return ('webkitdirectory' in input)
+        return false;// ('webkitdirectory' in input)
     }
 
     var supportDragdrop = function () {

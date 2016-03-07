@@ -1,4 +1,4 @@
-.projectHeader { height: 37px; background-color: #f5f5f5; border-bottom: 1px #ccc solid;position: relative;z-index: 5;
+.projectHeader { height: 37px; background-color: #f5f5f5; border-bottom: 1px #ccc solid; position: relative; z-index: 5;
 	.projectTab { float: right; height: 37px;
 		.item { float: left; height: 100%; line-height: 37px; width: 35px; font-size: 16px; position: relative; text-align: center; margin-right: 40px; cursor: pointer;
 			.line { bottom: 0px; width: 100%; height: 3px; position: absolute; left: 0px; text-align: center; }
@@ -19,7 +19,7 @@
 		.allProject { cursor: pointer }
 	}
 }
-#projectContainer { .projectNav { background-color: #ddd; height: 29px; border-bottom: 1px #ccc solid;
+#projectContainer { .projectNav { background-color: #ddd; height: 30px; border-bottom: 1px #ccc solid;
 		.item { float: left; line-height: 24px; width: 88px; border: 1px #ddd solid; text-align: center; margin-top: 3px; cursor: pointer;
 			&:hover { }
 			&.selected { border: 1px #ccc solid; border-top-width: 2px; border-top-color: #006ECF; border-bottom-color: #fff; background-color: #fff; }
@@ -28,25 +28,24 @@
 		.projectNavContentBox { margin-top: 1px; position: absolute; top: 26px; width: 100%; bottom: 0px;
 
 			/* 设计 */
-			.designVerification,.designProperties{display: none;}
-
-		 }
+			.designVerification, .designProperties { display: none; }
+		}
 	}
 }
 #projectDesignContent { margin-left: 240px; position: relative; height: 100%; }
 #projectContainer .projectNav .item { width: 66px; }
 .projectContainerApp { height: 100%;
 	.projectContent { height: 100%;
-		.leftNav { float: left; width: 238px; border: 1px #ccc solid; position: absolute;top:40px;bottom: 0px;z-index: 990;background-color: #fff;
-			.leftNavContent{height: 100%;}
+		.leftNav { float: left; width: 238px; border: 1px #ccc solid; position: absolute; top: 40px; bottom: 0px; z-index: 990; background-color: #fff;
+			.leftNavContent { height: 100%; }
 			.projectNav { padding-left: 24px; }
 			.projectNavContentBox { margin-top: 1px; position: absolute; top: 26px; width: 100%; bottom: 0px;
 				.projectModelNavContent { display: none; }
 				.mCSB_container { }
 			}
 		}
-		.rightProperty {   border: 1px #ddd solid; display: none;position: absolute;right: 0px;top: 40px;bottom: 0px;background-color: #fff;z-index: 600;
-			.rightPropertyContentBox{height: 100%;position: relative;}
+		.rightProperty { border: 1px #ddd solid; display: none; position: absolute; right: 0px; top: 40px; bottom: 0px; background-color: #fff; z-index: 600;
+			.rightPropertyContentBox { height: 100%; position: relative; }
 			&.showPropety { width: 398px; display: block; }
 		}
 		.projectCotent { position: relative; height: 100%; margin-left: 240px;
@@ -73,16 +72,79 @@
 				}
 				.modelContainer { height: 500px; position: relative; }
 			}
+			.modelContainer { height: 100%; display: none;
+				.modelContainerScroll { height: 100%; }
+				.move { height: 100%; }
+			}
 		}
 	}
-	#projectContainer { height: 100%; margin-top: -40px; padding-top: 40px;position: relative;
+	#projectContainer { height: 100%; margin-top: -40px; padding-top: 40px; position: relative;
 		#projectDesignContainer { height: 100%; position: relative; }
-		.dragSize { position: absolute; top: 0px; bottom: 0px; width: 10px;  right: -6px; cursor: col-resize; z-index: 999; display: none; }
+		.dragSize { position: absolute; top: 0px; bottom: 0px; width: 10px; right: -6px; cursor: col-resize; z-index: 999; display: none; }
 		.slideBar { width: 15px; height: 32px; right: -15px; z-index: 99; position: absolute; display: none; background-color: #fff; border: 2px #ccc solid; line-height: 26px; box-sizing: border-box; padding-left: 2px; cursor: pointer; }
-		.rightPropertyContentBox{
-			.dragSize{left: -5px;right: inherit;display: block;}
-			.slideBar{right: inherit;display: block;left:-15px;}
+		.rightPropertyContentBox { .dragSize { left: -5px; right: inherit; display: block; }
+			.slideBar { right: inherit; display: block; left: -15px; }
 		}
-
+	}
+}
+.rightProperty { .designVerification { height: 100%; }
+	.modle { .modleShowHide { background: url(/comm/images/commIcon.png) no-repeat 0px -256px; float: right; margin-right: 12px; margin-top: 6px; height: 14px; width: 14px; cursor: pointer; }
+		.modleName { font-weight: bold; height: 24px; line-height: 24px; padding-left: 12px; }
+		.modleList { background-color: #eee; border-top: 1px #ccc solid;
+			.modleItem { border-bottom: 1px #ccc solid;
+				.modleName { width: 25%; display: inline-block; box-sizing: border-box; padding-left: 12px; border-right: 1px #ccc solid; }
+				.modleVal { display: inline-block; width: 72%; box-sizing: border-box; padding-left: 12px; margin-left: -3px; }
+				.modelLink { display: inline-block; padding-left: 12px; color: #3F8CDF; height: 24px; line-height: 24px; }
+			}
+		}
+	}
+	.ckBox { overflow: auto; height: 100%;
+		.ckTable { min-width: 500px; width: 100%;
+			th { height: 24px; line-height: 24px; text-align: center; }
+			td, th { border: 1px #ccc solid; }
+			.issue { width: 55%; }
+			.status { width: 11%; }
+			.category { width: 10%; }
+			.specialty { width: 12%; }
+			.professional { width: 12%; }
+		}
+		tbody { td { padding-top: 10px; padding-bottom: 10px; vertical-align: middle; text-align: center; }
+			.issue { text-align: left;
+				.ckImg { float: left; padding: 0px 10px; }
+				.ckHeader { margin-left: 84px; }
+			}
+		}
+	}
+	.collBox { height: 100%; overflow: auto;
+		.ckTable { width: 100%; min-width: 390px;
+			th { height: 24px; line-height: 24px; text-align: center; }
+			td, th { border: 1px #ccc solid; }
+			.collList { width: 56%; }
+			.collStatus { width: 34%; }
+			.collLev { width: 17%; }
+			tbody { td { padding-top: 10px; padding-bottom: 10px; vertical-align: middle; text-align: center; }
+				.collList { text-align: left;
+					.ckImg { float: left; padding: 0px 10px; }
+					.ckHeader { margin-left: 84px; }
+				}
+			}
+		}
+	}
+	.planBox { position: absolute; top: 62px; bottom: 0px; left: 0px; right: 0px;
+		.planContent { height: 100%;
+			.tbPlan { border: 1px #ccc solid; width: 100%; min-width: 398px;
+				th, td { border: 1px #ccc solid; }
+				th { text-align: center; height: 28px; line-height: 28px; }
+				td { height: 24px; line-height: 24px; }
+				tr.odd { background-color: #eee; }
+				tbody { td { box-sizing: border-box; padding-left: 8px; }
+				}
+			}
+			.ckItem { width: 7%; }
+			.planId { width: 9%; }
+			.operationalMatters { width: 40%; }
+			.start { width: 20%; }
+			.end { width: 20%; }
+		}
 	}
 }

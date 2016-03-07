@@ -18,7 +18,8 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		this.$el.find("#projectContainer").prepend(new App.Project.leftNav().render().el);
 
 		//加载文件
-		this.$el.find(".projectCotent").prepend(new App.Project.FileContainer().render().el);
+		this.$el.find(".projectCotent").append(new App.Project.FileContainer().render().el);
+		this.$el.find(".projectCotent").append('<div class="modelContainer"> <div class="modelContainerScroll"><div class="modelContainerContent"></div></div> </div>');
 		return this;
 	},
 
@@ -57,6 +58,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 				"margin-left": "0px"
 			}, 500, function() {
 				$leftNav.find(".dragSize").show().end().find(".slideBar i").toggleClass('icon-caret-left icon-caret-right');
+				$("#projectContainer .projectCotent").css("margin-left", $leftNav.width());
 			});
 
 		} else {
@@ -65,6 +67,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 				"margin-left": -width
 			}, 500, function() {
 				$leftNav.find(".dragSize").hide().end().find(".slideBar i").toggleClass('icon-caret-left icon-caret-right');
+				$("#projectContainer .projectCotent").css("margin-left",0);
 			});
 
 		}
@@ -74,14 +77,15 @@ App.Project.ProjectContainer = Backbone.View.extend({
 	//右侧收起和暂开
 	navBarRightShowAndHide: function() {
 		var $rightProperty = $("#projectContainer .rightProperty "),
-			mLeft = parseInt($rightProperty.css("margin-right"));
+			mRight = parseInt($rightProperty.css("margin-right"));
 		//隐藏状态
-		if (mLeft < 0) {
+		if (mRight < 0) {
 
 			$rightProperty.animate({
 				"margin-right": "0px"
 			}, 500, function() {
 				$rightProperty.find(".dragSize").show().end().find(".slideBar i").toggleClass('icon-caret-left icon-caret-right');
+				$("#projectContainer .projectCotent").css("margin-right", $rightProperty.width());
 			});
 
 		} else {
@@ -90,6 +94,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 				"margin-right": -width
 			}, 500, function() {
 				$rightProperty.find(".dragSize").hide().end().find(".slideBar i").toggleClass('icon-caret-left icon-caret-right');
+				$("#projectContainer .projectCotent").css("margin-right",0);
 			});
 
 		}

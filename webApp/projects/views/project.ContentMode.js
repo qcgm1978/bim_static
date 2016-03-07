@@ -19,16 +19,16 @@ App.Projects.ContentMode = Backbone.View.extend({
 	//切换改变
 	addOne: function(model) {
 
+		
+		var listView = new App.Projects.listView({
+			model: model
+		});
+
+		this.$el.find(".proListBox").append(listView.render().el);
 		//列表
-		if (App.Projects.Settings.type == "list") {
+		//if (App.Projects.Settings.type == "list") { 
 
-			var listView = new App.Projects.listView({
-				model: model
-			});
-
-			this.$el.find(".proListBox").append(listView.render().el);
-
-		}  
+		//}  
 	}
 
 });

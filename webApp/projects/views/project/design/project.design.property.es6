@@ -7,7 +7,7 @@ App.Project.ProjectDesignPropety = Backbone.View.extend({
 	template: _.templateUrl("/projects/tpls/project/design/project.design.propety.html"),
 
 	events: {
-		"click .projectPropetyHeader .item": "itemClick"
+		"click .projectPropetyHeader .item": "navItemClick"
 	},
 
 	render: function() {
@@ -19,7 +19,7 @@ App.Project.ProjectDesignPropety = Backbone.View.extend({
 	},
 
 	//切换tab
-	itemClick: function(event) {
+	navItemClick: function(event) {
 		var $target = $(event.target),
 			type = $target.data("type");
 		$target.addClass('selected').siblings().removeClass('selected');
@@ -42,11 +42,8 @@ App.Project.ProjectDesignPropety = Backbone.View.extend({
 
 			this.$el.find(".designProperties").show().siblings().hide();
 			App.Project.DesignAttr.PropertiesCollection.fetch();
-		}
-
-
-
-		console.log(type);
+		} 
+		 
 
 	}
 

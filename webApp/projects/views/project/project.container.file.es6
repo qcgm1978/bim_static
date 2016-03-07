@@ -17,8 +17,25 @@ App.Project.FileContainer=Backbone.View.extend({
 	render:function(){
 		this.$el.html(this.template);
 		return this;
-	}, 
+	},  
 
+
+	//添加单个li
+	addOneFile:function(model){ 
+		 
+		var view=new App.Project.FileContainerDetail({
+			model:model
+		});
+		this.$el.find(".fileContent").prepend(view.render().el);
+
+		//判断滚动条是否绑定过 
+		if (!this.$el.find(".fileContainerScrollContent").hasClass('mCustomScrollbar')) {
+			this.initDesignScroll(); 
+		}
+
+	},
+
+	//初始化滚动条
 	initDesignScroll: function() { 
 
 		this.$el.find(".fileContainerScrollContent").mCustomScrollbar({
@@ -35,18 +52,5 @@ App.Project.FileContainer=Backbone.View.extend({
 	},
 
 
-	//添加单个li
-	addOneFile:function(model){ 
-		var view=new App.Project.FileContainerDetail({
-			model:model
-		});
-		this.$el.find(".fileContent").prepend(view.render().el);
-
-		//判断滚动条是否绑定过 
-		if (!this.$el.find(".fileContainerScrollContent").hasClass('mCustomScrollbar')) {
-			this.initDesignScroll(); 
-		}
-
-	}
 
 });

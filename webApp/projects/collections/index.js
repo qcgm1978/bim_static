@@ -11,13 +11,21 @@
 
          urlType: "fetchProjects",
 
+         parse: function(response) {
+
+             if (response.message == "success") {
+                 return response.data.items;
+             }
+         }
+
 
      })),
 
      Settings: {
          type: "list",
          isInitMap: false,
-         initBodyEvent: false
+         initBodyEvent: false,
+         pageIndex: 1,
      },
 
      init: function() {
@@ -46,14 +54,78 @@
 
      //加载数据
      loadData: function() {
+
+         App.Projects.ProjectCollection.reset();
+         App.Projects.ProjectCollection.project="project";
          //拉取数据
-         App.Projects.ProjectCollection.fetch();
+         App.Projects.ProjectCollection.fetch({
+
+             data: {
+                 projectType: 1,
+                 name: "",
+                 estateType: "",
+                 province: "",
+                 region: "",
+                 complete: "",
+                 open: "",
+                 openTimeStart: "",
+                 openTimEnd: ""
+
+             },
+
+             success: function(collection, response, options) {
+
+                 var $content = $("#projectModes"),
+                     pageCount = response.data.totalItemCount;
+
+                 $content.find(".sumDesc").html('共 ' + pageCount + ' 个项目');
+
+                 $content.find(".listPagination").pagination(pageCount, {
+                     items_per_page: response.data.pageItemCount,
+                     current_page: response.data.pageIndex - 1,
+                     num_edge_entries: 3, //边缘页数
+                     num_display_entries: 5, //主体页数
+                     link_to: 'javascript:void(0);',
+                     itemCallback: function(pageIndex) {
+                         //加载数据
+                         App.Projects.Settings.pageIndex = pageIndex + 1;
+                         App.Projects.onlyLoadData();
+                     },
+                     prev_text: "上一页",
+                     next_text: "下一页"
+
+                 });
+             }
+
+         });
+     },
+
+     //只是加载数据
+     onlyLoadData: function() {
+
+        
+
+         App.Projects.ProjectCollection.fetch({
+
+             data: {
+                 projectType: 1,
+                 name: "",
+                 estateType: "",
+                 province: "",
+                 region: "",
+                 complete: "",
+                 open: "",
+                 openTimeStart: "",
+                 openTimEnd: ""
+
+             }
+         });
      },
 
 
      initEvent: function() {
 
-        //日期控件初始化
+         //日期控件初始化
          $('#dateStar').datetimepicker({
              language: 'zh-CN',
              autoclose: true,

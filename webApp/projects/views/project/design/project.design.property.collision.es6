@@ -10,8 +10,17 @@ App.Project.DesignCollision=Backbone.View.extend({
 		this.listenTo(App.Project.DesignAttr.CollisionCollection,"add",this.addOne);
 	},
 
+	template:_.templateUrl("/projects/tpls/project/design/project.design.property.collision.html"),
+
 	render:function(){ 
+		this.$el.html("正在加载，请稍后……");
 		return this;
+	},
+
+	//添加数据
+	addOne:function(model){ 
+		var data=model.toJSON();
+		this.$el.html(this.template(data));
 	}
 
 });

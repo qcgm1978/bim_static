@@ -59,7 +59,7 @@ App.Comm.TreeViewMar.prototype.TreeViewBuild = function() {
 			$el.addClass("selected");
 
 			if ($.isFunction(that.settings.click)) {
-				that.settings.click.apply(this);
+				that.settings.click.apply(this,arguments);
 			}
 
 		},
@@ -71,7 +71,7 @@ App.Comm.TreeViewMar.prototype.TreeViewBuild = function() {
 	});
 
 	var model = new(Backbone.Model.extend({
-		defaults: settings.data
+		defaults: settings
 	}));
 
 	var treeView = new this.TreeViewDetail({
@@ -89,7 +89,7 @@ App.Comm.TreeViewMar.prototype.TreeViewBuild = function() {
 App.Comm.TreeViewMar.prototype.treeRoot = function(it) {
 
 	var sb = new StringBuilder();
-	var trees = it.trees,
+	var trees = it.data,
 		item,
 		treeCount = trees.length;
 
@@ -142,8 +142,13 @@ App.Comm.TreeViewMar.prototype.treeNode = function(item) {
 	}
 
 
+ 
 
-	sb.Append('<span class="text-field overflowEllipsis">' + item.title + '</span> ');
+	var dataItem=$.extend({},item);
+	delete dataItem.children;
+	var itemString=JSON.stringify(dataItem);
+
+	sb.Append('<span class="text-field overflowEllipsis" data-file=\''+itemString+'\'>' + item.name + '</span> ');
 
 	sb.Append('</div>');
 

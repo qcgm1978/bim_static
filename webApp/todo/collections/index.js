@@ -38,7 +38,8 @@ App.Todo = {
 		//App.Todo.TodoCollection.fetch();
 
 		//初始化滚动条
-		App.Todo.initScroll();
+		App.Todo.initScroll(); 
+		 
 	},
 
 	//加载数据
@@ -87,7 +88,7 @@ App.Todo = {
 
 	//只是加载数据  不分页
 	onlyLoadData: function() {
-
+	 
 		App.Todo.TodoCollection.fetch({
 			data: {
 				status: App.Todo.Settings.type == "commission" ? 0 : 1,
