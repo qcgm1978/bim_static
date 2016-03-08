@@ -62,11 +62,39 @@ App.Project.leftNav = Backbone.View.extend({
 			$("#projectContainer").find(".projectModelNavContent .mCS_no_scrollbar_y").width(800);
 			//渲染模型属性
 			App.Project.renderModelContentByType();
-			new BIM({
+
+			var viewer = new BIM({
 				element: $("#projectContainer .modelContainerContent")[0],
-				projectId: 'n4',
+				projectId: 'testrvt',
+				// projectId:'testrvt',
 				tools: true
 			});
+
+			viewer.on("changed",function(model){
+				App.Project.Settings.modelId=model.userId; 
+				//设计  
+				if (App.Project.Settings.projectNav=="design") {
+					//属性
+					if ( App.Project.Settings.property=="attr") {
+						App.Project.DesignAttr.PropertiesCollection.fetch({
+							data:{
+								elementId:"002e08e8-4a5f-4ee2-9d88-825c510c4c53",
+								fileVersionId:12345,
+								fileId:model.userId
+							}
+						});
+						console.log("哥要获取属性");
+					}
+					
+				}
+				 
+			});
+
+			// new BIM({
+			// 	element: $("#projectContainer .modelContainerContent")[0],
+			// 	projectId: 'n4',
+			// 	tools: true
+			// });
 		}
 
 	}

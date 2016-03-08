@@ -82,6 +82,7 @@
                 },
                 BeforeUpload: function (up, file) {
                     if (options.getUploadedBytesUrl && (file.size > options.skipCheckSize && typeof file.uploadedBytes === 'undefined')) {
+                        
                         up.stop()
                         $.getJSON(options.getUploadedBytesUrl(file.parentId), {
                             name: file.name,
@@ -91,6 +92,7 @@
                             up.start()
                         })
                     } else {
+                        debugger;
                         var fn = file.fullPath || file.name
                         up.settings.multipart_params = {
                             fileId: file.parentId,
@@ -100,12 +102,11 @@
                         }
                         up.settings.uploaded_bytes = file.uploadedBytes || 0
                         if (options.getUploadUrl) {
-                            up.settings.url = options.getUploadUrl()
+                            up.settings.url = options.getUploadUrl(file)
                         }
                     }
                 },
-                UploadFile: function (up, file) {
-                   this.settings.url+="&length="+file.size;
+                UploadFile: function (up, file) { 
                     isUploading = true
                 },
                 FileUploaded: function (up, file, response) {

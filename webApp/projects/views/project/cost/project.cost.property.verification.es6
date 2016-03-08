@@ -1,0 +1,1 @@
+project.cost.property.verification.es6

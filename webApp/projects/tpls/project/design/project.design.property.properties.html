@@ -1,30 +1,26 @@
+<% var count=obj.length,item; %>
+
+<% for(var i=0;i<count;i++){ %>
+	<% item=obj[i]; %>
 <div class="modle">
-	<i class="modleShowHide"></i> <h1 class="modleName">类型</h1>
+	<i class="modleShowHide"></i> <h1 class="modleName"><%= item.group%></h1>
 	<ul class="modleList">
+
+	<% var subItems=item.items,subCount=subItems.length,subItem %>
+
+	<% for(var j=0;j<subCount;j++){ %>
+		<% subItem=subItems[j];  %>
 		<li class="modleItem">
-			<span class="modleName">名称</span> <span class="modleVal">建筑楼板-100</span>
+			<span class="modleName"><%=subItem.name%></span> <span class="modleVal"><%=subItem.value%></span>
 		</li>
 
-		<li class="modleItem">
-			<span class="modleName">类型</span> <span class="modleVal">楼板</span>
-		</li>
-
-		<li class="modleItem">
-			<span class="modleName">内部类型</span> <span class="modleVal">LcRevitComposite</span>
-		</li>
-
-		<li class="modleItem">
-			<span class="modleName">材质</span> <span class="modleVal">混凝土 - 沙/水泥找平 -分格</span>
-		</li>
-
-
-		<li class="modleItem">
-			<span class="modleName">源文件</span> <span class="modleVal">WD_ARCH.rvt</span>
-		</li>
+		<% } %> 
 
 	</ul>
 
 </div>
+
+<% } %>
 
 <div class="modle">
 	<i class="modleShowHide"></i> <h1 class="modleName">尺寸标注</h1>

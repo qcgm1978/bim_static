@@ -3,6 +3,11 @@ App.Project = {
 	Settings: {
 		fetchNavType: 'file', // model file
 		projectNav: "design",
+		property:"",
+		fileId: "782867504277696",
+		projectId: 100,
+		projectVersionId: 100,
+		modelId:""
 	},
 
 	// 文件 容器
@@ -19,8 +24,8 @@ App.Project = {
 
 		urlType: "fetchFileList",
 
-		parse:function(responese){
-			if (responese.message=="success") {
+		parse: function(responese) {
+			if (responese.message == "success") {
 				return responese.data;
 			}
 		}
@@ -39,11 +44,14 @@ App.Project = {
 		//App.Project.fetchDesign();
 
 		//加载数据
-		 App.Project.loadData();
+		App.Project.loadData();
 
 
 		//初始化滚动条
 		App.Project.initScroll();
+
+		//事件初始化
+		App.Project.initEvent();
 	},
 
 	// 加载数据
@@ -53,12 +61,14 @@ App.Project = {
 		//导航模型
 		App.Project.fetchModelNav();
 
-		App.Project.FileCollection.projectId=100;
-		App.Project.FileCollection.projectVersionId=100;
-		App.Project.FileCollection.parentId=782867504277696;
-
+		App.Project.FileCollection.projectId = App.Project.Settings.projectId;
+		App.Project.FileCollection.projectVersionId = App.Project.Settings.projectVersionId;
 		//文件列表
-		App.Project.FileCollection.fetch();
+		App.Project.FileCollection.fetch({
+			data: {
+				parentId: App.Project.Settings.fileId
+			}
+		});
 	},
 
 	//初始化滚动条
@@ -98,6 +108,38 @@ App.Project = {
 		//        });
 	},
 
+	//事件初始化
+	initEvent: function() {
+
+		//下载
+		$("#projectContainer").on("click",".btnFileDownLoad", function() {
+
+			var $selFile=$("#projectContainer .fileContent :checkbox:checked:first");
+
+			if ($selFile.length<1) {
+				alert("请选择需要下载的文件");
+				return;
+			}
+
+			var fileId=$selFile.parent().data("id");
+
+			// //请求数据
+			var data = {
+				URLtype: "downLoad",
+				data: {
+					projectId: 100,
+					projectVersionId: 100,
+					fileId:fileId
+				}
+			};
+
+			App.Comm.ajax(data).done(function(){
+				console.log("下载完成");
+			});
+
+		});
+	},
+
 	//根据类型渲染数据
 	renderModelContentByType: function() {
 
@@ -133,34 +175,42 @@ App.Project = {
 
 	//设计导航
 	fetchFileNav: function() {
+
 		//请求数据
 		var data = {
 			URLtype: "fetchDesignFileNav",
-			data:{
-				projectId:100,
-				projectVersionId:100
+			data: {
+				projectId: 100,
+				projectVersionId: 100
 			}
 		};
-		 
+
 		App.Comm.ajax(data).done(function(data) {
-			 
+
 			if (_.isString(data)) {
 				// to json
 				if (JSON && JSON.parse) {
-					data=JSON.parse(data);
-				}else{
-					data= $.parseJSON(data);
-				}  
+					data = JSON.parse(data);
+				} else {
+					data = $.parseJSON(data);
+				}
+
 			}
 
-			data.click=function(event){  
-				var file=$(event.target).data("file");
-			 	//App.Project.FileCollection.parentId=file.id;
-			 	App.Project.FileCollection.fetch({
-			 		data:{parentId:file.id}
-			 	}); 
+			data.click = function(event) {
+				var file = $(event.target).data("file");
+				//App.Project.FileCollection.parentId=file.id;
+				//清空数据
+				App.Project.FileCollection.reset();
+				$(".fileContainerScroll .fileContent").empty();
+				App.Project.Settings.fileId = file.id;
+				App.Project.FileCollection.fetch({
+					data: {
+						parentId: file.id
+					}
+				});
 			}
-
+			data.iconType = 1;
 			var navHtml = new App.Comm.TreeViewMar(data);
 			$("#projectContainer .projectNavFileContainer").html(navHtml);
 		});
@@ -177,14 +227,42 @@ App.Project = {
 			if (_.isString(data)) {
 				// to json
 				if (JSON && JSON.parse) {
-					data=JSON.parse(data);
-				}else{
-					data= $.parseJSON(data);
-				} 
+					data = JSON.parse(data);
+				} else {
+					data = $.parseJSON(data);
+				}
 			}
 			var navHtml = new App.Comm.TreeViewMar(data);
 			$("#projectContainer .projectNavModelContainer").html(navHtml);
 		});
+	},
+
+	//状态转换
+	convertStatus: function(storeStatus, status) {
+
+		//存储状态 0：待上传；1：上传中；2：上传完成，若为文件夹此字段无意义
+
+		//流转状态1：待审核；2：已报审；3：修改中；4：已确认；5：已移交；
+		var result = "";
+		if (storeStatus == 0) {
+			result = "待上传";
+		} else if (storeStatus == 1) {
+			result = "上传中";
+		} else if (storeStatus == 2) {
+			if (status == 1) {
+				result = "待审核";
+			} else if (status == 2) {
+				result = "已报审";
+			} else if (status == 3) {
+				result = "修改中";
+			} else if (status == 4) {
+				result = "已确认";
+			} else if (status == 5) {
+				result = "已移交";
+			}
+		}
+
+		return result;
 	}
 
 

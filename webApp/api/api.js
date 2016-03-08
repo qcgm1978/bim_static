@@ -14,13 +14,13 @@ App.API={
 		fetchProjects:"platform/api/project", //项目列表 
 		fetchFileList:"doc/{projectId}/{projectVersionId}/file/children",//获取文件列表  ?fileId={parentId}
 		fetchDesignFileNav:"doc/{projectId}/{projectVersionId}/file/tree",//项目设计文件导航 
-		fetchDesignModelNav:"",//项目设计模型导航
+		fetchDesignModelNav:"dataJson/project/project.design.model.json",//项目设计模型导航
 
-		uploadFile:"doc/{projectId}/{projectVersionId}/file/data", //上传文件  ?parentId={parentId}&fileName={fileName}&size={size}&digest={digest}&position={position}
+		uploadFile:"doc/{projectId}/{projectVersionId}/file/data", //上传文件  ?parentId={parentId}&fileName={fileName}&size={size}&digest={digest}&position={position} 
 		downLoad:"doc/{projectId}/{projectVersionId}/file/data", //文件下载  ?fileId={fileId}
 
 		//设计
-		fetchDesignProperties:"", //设计属性
+		fetchDesignProperties:"sixD/1/property", //设计属性  ?fileVersionId={fileVersionId}&elementId={elementId}
 		fetchDesignVerification:"",  // 设计 检测
 		fetchDesignCollision:"",    // 设计碰撞
 

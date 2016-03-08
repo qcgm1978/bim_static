@@ -1,0 +1,65 @@
+/* treeView  */
+.tree-view,
+.tree-view ul{
+  margin:0;
+  padding:0;
+  list-style:none;
+  padding-left:15px;
+  font-size:12px;
+}
+.tree-view .rootNode,
+.tree-view .tree-view .itemNode {
+  position: relative;
+  list-style-type: none;
+}
+.tree-view .item-content{
+  padding:3px;
+}
+.tree-view .item-content:hover {
+  background-color: #06c;
+  color:#fff;
+}
+.tree-view .nodeSwitch {
+  width:9px;
+  height: 9px;
+  display:inline-block;
+  cursor: pointer;
+  vertical-align:top;
+  margin-top: 2px;
+  color:#333;
+  background:url(../images/tree.png) no-repeat;
+  background-position:0 0;
+}
+.tree-view .open .nodeSwitch{
+  background-position:0 -20px;
+}
+.tree-view .open + .treeViewSub{
+  display:block;
+}
+.tree-view .noneSwitch {
+  float: left;
+  width: 14px;
+  height: 12px;
+}
+.treeViewSub{
+  display:none;
+}
+.checkbox{
+  display:inline-block;
+  width:13px;
+  height:13px;
+}
+.checkbox input{
+  display:none;
+}
+.checkbox .box{
+  display:inline-block;
+  vertical-align:-3px;
+  width:13px;
+  height:13px;
+  background:url(../images/tree.png) no-repeat;
+  background-position:0 -60px;
+}
+.checkbox input:checked + .box{
+  background-position:0 -40px;
+}

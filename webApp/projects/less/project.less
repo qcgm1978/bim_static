@@ -25,7 +25,7 @@
 			&.selected { border: 1px #ccc solid; border-top-width: 2px; border-top-color: #006ECF; border-bottom-color: #fff; background-color: #fff; }
 		}
 		.projectPropetyHeader { padding-left: 24px; }
-		.projectNavContentBox { margin-top: 1px; position: absolute; top: 26px; width: 100%; bottom: 0px;
+		.projectNavContentBox { margin-top: 1px; position: absolute; top: 30px; width: 100%; bottom: 0px; overflow: auto;
 
 			/* 设计 */
 			.designVerification, .designProperties { display: none; }
@@ -39,7 +39,7 @@
 		.leftNav { float: left; width: 238px; border: 1px #ccc solid; position: absolute; top: 40px; bottom: 0px; z-index: 990; background-color: #fff;
 			.leftNavContent { height: 100%; }
 			.projectNav { padding-left: 24px; }
-			.projectNavContentBox { margin-top: 1px; position: absolute; top: 26px; width: 100%; bottom: 0px;
+			.projectNavContentBox { margin-top: 1px; position: absolute; top: 30px; width: 100%; bottom: 0px;
 				.projectModelNavContent { display: none; }
 				.mCSB_container { }
 			}
@@ -73,7 +73,9 @@
 				.modelContainer { height: 500px; position: relative; }
 			}
 			.modelContainer { height: 100%; display: none;
-				.modelContainerScroll { height: 100%; }
+				.modelContainerScroll { height: 100%;
+					.modelContainerContent { height: 100%; }
+				}
 				.move { height: 100%; }
 			}
 		}
@@ -145,6 +147,22 @@
 			.operationalMatters { width: 40%; }
 			.start { width: 20%; }
 			.end { width: 20%; }
+		}
+	}
+}
+.planInterest { .contentBox { height: 100%; }
+	.title { height: 28px; line-height: 28px; font-weight: bold; padding-left: 15px; }
+	.inspecId { width: 10%; text-align: center; }
+	.businessMatters { width: 88%; }
+	table { width: 100%;
+		th, td { border: 1px #ccc solid; }
+		thead { background-color: #eee; height: 28px; line-height: 28px;
+			.businessMatters { text-align: center; }
+		}
+		tbody { tr { background-color: #ddd;
+			td{height: 26px;line-height: 26px;}
+			.businessMatters{padding-left: 5px;}
+		 }
 		}
 	}
 }

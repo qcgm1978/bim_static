@@ -54,7 +54,7 @@
 
      //加载数据
      loadData: function() {
-
+        debugger;
          App.Projects.ProjectCollection.reset();
          App.Projects.ProjectCollection.project="project";
          //拉取数据
@@ -150,7 +150,7 @@
          $(".advancedQueryConditions .pickProvince").myDropDown();
          //单选
          $(".groupRadio").myRadioCk();
-         $(".groupRadio2").myRadioCk();
+        // $(".groupRadio2").myRadioCk();
      },
 
 

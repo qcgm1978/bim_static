@@ -1,8 +1,9 @@
 
-<span class="filecKAll inlineBlock"><input type="checkbox" class="ckAll" /></span>
+<span data-id="<%=id%>" class="filecKAll inlineBlock"><input type="checkbox" class="ckAll" /></span>
 <span class="fileBg inlineBlock"> <img src="/projects/images/proDefault.png"/></span>
-<span class="fileName inlineBlock"><%=name%></span>
-<span class="fileStatus inlineBlock"><%= storeStatus?'已上传':'待上传'   %></span>
+<span class="fileName inlineBlock"><%=name%></span> 
+
+<span class="fileStatus inlineBlock"><%=  App.Project.convertStatus(storeStatus,status) %></span>
 <span class="fileOp inlineBlock"><%= creatorName %></span>
 <span class="fileSize inlineBlock"><%=digest%></span>
 <span class="fileDate inlineBlock"><%= new Date(createTime).format("yyyy-MM-dd") %></span>

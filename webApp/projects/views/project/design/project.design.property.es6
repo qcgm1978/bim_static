@@ -23,7 +23,7 @@ App.Project.ProjectDesignPropety = Backbone.View.extend({
 		var $target = $(event.target),
 			type = $target.data("type");
 		$target.addClass('selected').siblings().removeClass('selected');
-
+		App.Project.Settings.property=type;
 
 
 		if (type == "collision") {
@@ -41,7 +41,8 @@ App.Project.ProjectDesignPropety = Backbone.View.extend({
 			//属性
 
 			this.$el.find(".designProperties").show().siblings().hide();
-			App.Project.DesignAttr.PropertiesCollection.fetch();
+			
+			//App.Project.DesignAttr.PropertiesCollection.fetch();
 		} 
 		 
 

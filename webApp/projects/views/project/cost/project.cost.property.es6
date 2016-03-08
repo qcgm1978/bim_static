@@ -11,7 +11,7 @@ App.Project.ProjectCostProperty=Backbone.View.extend({
 
 	},
 
-	render:function(){
+	render:function(){ 
 
 		this.$el.html(this.template);
 

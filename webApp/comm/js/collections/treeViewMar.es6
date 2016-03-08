@@ -1,5 +1,5 @@
 App.Comm.TreeViewMar = function(settings) {
-
+ 
 	this.settings = settings;
 
 	var treeView = this.TreeViewBuild();

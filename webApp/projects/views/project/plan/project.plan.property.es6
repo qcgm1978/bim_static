@@ -13,7 +13,11 @@ App.Project.ProjectPlanProperty = Backbone.View.extend({
 	render: function() {
 
 		this.$el.html(this.template);
-		this.$el.find(".planContainer").append(new App.Project.PlanModel().render().el); 
+		this.$el.find(".planContainer").append(new App.Project.PlanModel().render().el); //模块化
+		this.$el.find(".planContainer").append(new App.Project.PlanAnalog().render().el); //模拟
+		this.$el.find(".planContainer").append(new App.Project.PlanPublicity().render().el); //关注
+		this.$el.find(".planContainer").append(new App.Project.PlanInspection().render().el); //效验
+		this.$el.find(".planContainer").append(new App.Project.PlanProperties().render().el); //属性
 		return this;
 	},
 

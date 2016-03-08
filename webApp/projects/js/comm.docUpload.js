@@ -23,7 +23,7 @@
             App.Comm.upload.init(upload, {
 
                 getParentId: function() {
-                    // return App.Comm.modules.util.getParentId()
+                    return App.Project.Settings.fileId; 
                 },
 
                 getQuotaInfo: function() {
@@ -37,16 +37,27 @@
                     //return App.Comm.modules.util.canUploadFile()
                 },
 
-                getUploadedBytesUrl: function(parentId) {
-                    // return App.Comm.modules.util.getUrl(parentId, {
-                    //     bytes: false
-                    // })
-                },
+                // getUploadedBytesUrl: function(parentId) {
+                //     // return App.Comm.modules.util.getUrl(parentId, {
+                //     //     bytes: false
+                //     // })
+                // },
 
                 //获取上传url
-                getUploadUrl: function() {
+                getUploadUrl: function(file) {
+                  
+                    var data = {
+                        data: {
+                            projectId: App.Project.Settings.projectId,
+                            projectVersionId: App.Project.Settings.projectVersionId
+                        }, 
+                        URLtype: "uploadFile"
+                    }; 
 
-                    return "http://172.16.233.210:8080/bim/api/1232321/file/data?fileId=444444444444";
+                    return  App.Comm.getUrlByType(data).url; 
+
+
+                    //return "http://172.16.233.210:8080/bim/api/1232321/file/data?fileId=444444444444";
                     // return App.Comm.modules.util.getUrl(App.Comm.modules.util.getParentId(), {
                     //     upload: false,
                     //     returnFirst: false

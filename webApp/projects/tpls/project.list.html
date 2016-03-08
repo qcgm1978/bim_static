@@ -1,8 +1,10 @@
  
 
 <span class="proImg"><img src="/projects/images/proDefault.png" /></span>
-<span class="proName"><%=name%></span>
-<span class="proAddress"><%=name%></span>
-<span class="proStar"><%=name%></span>
-<span class="proEnd"><%=name%></span>
-<span class="proOp"> <a href="/#projects/<%=projectNo %>" data-id="/#project/<%=projectNo %>">进入项目</a> </span>
+<span class="proName"><a href="/#projects/<%=projectNo %>" data-id="/#project/<%=projectNo %>"><%=name%></a></span>
+<span class="proType"><%=estateType==1?"轻资产":"重资产"%></span>
+     <span class="proProvince"><%=province%></span>
+            <span class="proCity"><%=province%></span> 
+<span class="proStar"><%= new Date(createTime).format("yyyy-MM-dd")%></span>
+<span class="proEnd"><%=openTime%></span>
+ 

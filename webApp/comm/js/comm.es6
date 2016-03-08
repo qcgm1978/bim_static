@@ -8,11 +8,18 @@ App.Comm = {
 	//封装ajax 
 	ajax: function(data) {
 
+		data=App.Comm.getUrlByType(data);
+
+		return $.ajax(data);
+	},
+
+	getUrlByType: function(data) {
+
 		//是否调试
 		if (App.API.Settings.debug) {
 			data.url = App.API.DEBUGURL[data.URLtype];
 		} else {
-			data.url = App.Comm.Settings.hostname + App.API.URL[data.URLtype];
+			data.url = App.API.Settings.hostname + App.API.URL[data.URLtype];
 		}
 
 		//没有调试接口
@@ -33,11 +40,13 @@ App.Comm = {
 			}
 		}
 
+		return data;
 
-		return $.ajax(data);
 	}
 
 };
+
+
 
 //模块
 App.Comm.modules = {};
