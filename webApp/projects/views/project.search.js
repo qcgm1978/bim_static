@@ -22,7 +22,7 @@ App.Projects.searchView = Backbone.View.extend({
 
 	//显示隐藏高级收缩
 	seniorSearch: function() {
-
+		
 		var $advancedQueryConditions = this.$el.find(".advancedQueryConditions");
 		if ($advancedQueryConditions.is(":hidden")) {
 			this.$el.find(".quickSearch").hide();

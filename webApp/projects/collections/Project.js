@@ -4,7 +4,7 @@ App.Project = {
 		fetchNavType: 'file', // model file
 		projectNav: "design",
 		property:"",
-		fileId: "782867504277696",
+		fileId: "784280535935168",
 		projectId: 100,
 		projectVersionId: 100,
 		modelId:""
@@ -63,6 +63,7 @@ App.Project = {
 
 		App.Project.FileCollection.projectId = App.Project.Settings.projectId;
 		App.Project.FileCollection.projectVersionId = App.Project.Settings.projectVersionId;
+		App.Project.FileCollection.reset();
 		//文件列表
 		App.Project.FileCollection.fetch({
 			data: {
@@ -114,28 +115,35 @@ App.Project = {
 		//下载
 		$("#projectContainer").on("click",".btnFileDownLoad", function() {
 
-			var $selFile=$("#projectContainer .fileContent :checkbox:checked:first");
+			var $selFile=$("#projectContainer .fileContent :checkbox:checked");
+
+			if ($selFile.length>1) {
+				alert("目前只支持单文件下载");
+				return;
+			}
 
 			if ($selFile.length<1) {
 				alert("请选择需要下载的文件");
 				return;
-			}
-
-			var fileId=$selFile.parent().data("id");
+			} 
+			var fileVersionId=$selFile.parent().data("fileversionid");
 
 			// //请求数据
 			var data = {
 				URLtype: "downLoad",
 				data: {
 					projectId: 100,
-					projectVersionId: 100,
-					fileId:fileId
+					projectVersionId: 100				 
 				}
 			};
+		 
+			var data=App.Comm.getUrlByType(data);
+			var url=data.url+"?fileVersionId="+fileVersionId;
+			window.location.href=url;
 
-			App.Comm.ajax(data).done(function(){
-				console.log("下载完成");
-			});
+			// App.Comm.ajax(data).done(function(){
+			// 	console.log("下载完成");
+			// });
 
 		});
 	},

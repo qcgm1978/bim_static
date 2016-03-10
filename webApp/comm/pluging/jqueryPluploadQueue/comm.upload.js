@@ -93,12 +93,12 @@
                         })
                     } else {
                         debugger;
-                        var fn = file.fullPath || file.name
+                        var fn = file.name //file.fullPath || file.name
                         up.settings.multipart_params = {
                             fileId: file.parentId,
                             fileName: fn,
-                            size: file.size,
-                            position: file.uploadedBytes || 0
+                            size: file.size
+                           // position: file.uploadedBytes || 0
                         }
                         up.settings.uploaded_bytes = file.uploadedBytes || 0
                         if (options.getUploadUrl) {

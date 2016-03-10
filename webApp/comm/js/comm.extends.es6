@@ -6,6 +6,15 @@
 
 //获取模板根据URL
 _.templateUrl = function(url, notCompile) {
+
+	if (url.substr(0,1)==".") {
+		url="/static/dist/tpls"+url.substr(1); 
+	}else if (url.substr(0,1)=="/") {
+		url="/static/dist/tpls"+url; 
+	}
+
+ 
+
 	var result;
 	$.ajax({
 		url: url,

@@ -63,6 +63,10 @@ App.Project.leftNav = Backbone.View.extend({
 			//渲染模型属性
 			App.Project.renderModelContentByType();
 
+			if (!typeof(Worker)) {
+				return;
+			}
+
 			var viewer = new BIM({
 				element: $("#projectContainer .modelContainerContent")[0],
 				projectId: 'testrvt',

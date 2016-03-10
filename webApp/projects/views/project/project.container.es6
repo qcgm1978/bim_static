@@ -25,16 +25,24 @@ App.Project.ProjectContainer = Backbone.View.extend({
 
 	//点击面包靴
 	breadItemClick: function(event) {
-		var dialog = new App.Comm.modules.Dialog({
+
+		var $target=$(event.target).closest(".breadItem");
+		 
+		if ($target.hasClass('project')) {
+			console.log("project");
+		}else{
+			console.log("projectVersion");
+		}
+
+		/*var dialog = new App.Comm.modules.Dialog({
 			width: 580,
 			height: 268,
 			limitHeight: false,
 			title: '新建任务',
 			cssClass: 'task-create-dialog',
 			okText: '添&nbsp;&nbsp;加',
-			message: "内容"
-
-		})
+			message: "内容" 
+		})*/
 	},
 
 	//显示和隐藏

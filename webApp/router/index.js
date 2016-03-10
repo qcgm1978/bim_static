@@ -16,8 +16,8 @@ var AppRoute = Backbone.Router.extend({
 		App.Comm.upload.destroy();
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".todo").addClass('selected');
 		//加载css js
-		_.require('/dist/todo/todo.css');
-		_.require('/dist/todo/todo.js');
+		_.require('/static/dist/todo/todo.css');
+		_.require('/static/dist/todo/todo.js');
 		App.Todo.init();
 	},
 
@@ -26,8 +26,8 @@ var AppRoute = Backbone.Router.extend({
 		//销毁上传
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".projects").addClass('selected');
 		//加载css js
-		_.require('/dist/projects/projects.css');
-		_.require('/dist/projects/projects.js');
+		_.require('/static/dist/projects/projects.css');
+		_.require('/static/dist/projects/projects.js');
 		//_.require('http://www.api.map.baidu.com/api?v=2.0&ak=osmP2eNEjPlvebAAIVhcDc6c');
 		App.Projects.init();
 
@@ -36,8 +36,8 @@ var AppRoute = Backbone.Router.extend({
 
 	project: function(id) {
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".projects").addClass('selected');
-		_.require('/dist/projects/projects.css');
-		_.require('/dist/projects/projects.js');
+		_.require('/static/dist/projects/projects.css');
+		_.require('/static/dist/projects/projects.js');
 		App.Project.init();
 	},
 
@@ -45,8 +45,8 @@ var AppRoute = Backbone.Router.extend({
 	flow: function() {
 		//销毁上传
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".flow").addClass('selected');
-		_.require('/dist/flow/flow.css');
-		_.require('/dist/flow/flow.js');
+		_.require('/static/dist/flow/flow.css');
+		_.require('/static/dist/flow/flow.js');
 
 		$("#contains").html(new App.Flow().render().el);
 

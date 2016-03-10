@@ -6,7 +6,9 @@ App.Projects.listView=Backbone.View.extend({
 
 	className:'item',
 
-	events:{},
+	events:{
+		"click .aProName":"beforeBreak"
+	},
 
 	template:_.templateUrl("/projects/tpls/project.list.html"),
 
@@ -21,6 +23,13 @@ App.Projects.listView=Backbone.View.extend({
 		var data=this.model.toJSON();
 		this.$el.html(this.template(data)).attr("cid",this.model.cid);
 		return this;
+	},
+
+	//跳转之前
+	beforeBreak:function(event){
+		var $target=$(event.target);
+		App.Projects.Settings.projectId=$target.data("id");
+		App.Projects.Settings.projectName=$target.text();
 	}
 
 });

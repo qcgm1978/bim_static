@@ -38,7 +38,7 @@ fis.match('::package', {
 
 // less 文件处理
 fis.match('*.less', {
-  release:"/dist/$0",
+  release:"/static/dist/$0",
   useHash:true,
   parser: fis.plugin('less'), 
   rExt: '.css'
@@ -47,7 +47,7 @@ fis.match('*.less', {
 
 //es6 编译
 fis.match('*.es6', {
-     release:"/dist/$0",
+     release:"/static/dist/$0",
     useHash:true,
     parser: fis.plugin('babel-6.x'),
     rExt: 'js'
@@ -55,90 +55,142 @@ fis.match('*.es6', {
  
  fis.match('**.{gif,png,jpg}', {
   //useHash:true,
-  release:"/dist/images/$0"
+  release:"/static/dist/images/$0"
+});
+
+
+ fis.match('comm/**.html', {
+  //useHash:true,
+  release:"/static/dist/tpls/$0"
+});
+ fis.match('console/**.html', {
+  //useHash:true,
+  release:"/static/dist/tpls/$0"
+});
+  fis.match('flow/**.html', {
+  //useHash:true,
+  release:"/static/dist/tpls/$0"
+});
+   fis.match('libs/**.html', {
+  //useHash:true,
+  release:"/static/dist/tpls/$0"
+});
+ fis.match('libsH5/**.html', {
+  //useHash:true,
+  release:"/static/dist/tpls/$0"
+});
+ fis.match('login/**.html', {
+  //useHash:true,
+  release:"/static/dist/tpls/$0"
+});
+ fis.match('projects/**.html', {
+  //useHash:true,
+  release:"/static/dist/tpls/$0"
+});
+  fis.match('todo/**.html', {
+  //useHash:true,
+  release:"/static/dist/tpls/$0"
+});
+    fis.match('app/**.html', {
+  //useHash:true,
+  release:"/static/dist/$0"
 });
 
   fis.match('**.{otf,eot,svg,ttf,woff}', {
   //useHash:true,
-  release:"/dist/comm/$0"
+  release:"/static/dist/comm/$0"
 });
 
 //合并裤文件
 fis.match('/libs/**.js', { 
-  packTo: '/dist/libs/commLib_'+v+'.js'
+  packTo: '/static/dist/libs/commLib_'+v+'.js'
 });
 fis.match('/libs/**.css', { 
-  packTo: '/dist/libs/commLibCss_'+v+'.css'
+  packTo: '/static/dist/libs/commLibCss_'+v+'.css'
 });
 
 
 //合并裤文件
 fis.match('/libsH5/**.js', { 
-  packTo: '/dist/libs/libsH5_'+v+'.js'
+  packTo: '/static/dist/libs/libsH5_'+v+'.js'
 });
 
 fis.match('/libsH5/**.css', { 
-  packTo: '/dist/libs/libsH5_'+v+'.css'
+  packTo: '/static/dist/libs/libsH5_'+v+'.css'
 });
 
 //合并公共样式文件
 fis.match('/comm/**.{less,css}', {
 	useHash:false,
-  packTo: '/dist/comm/comm_'+v+'.css'
+  packTo: '/static/dist/comm/comm_'+v+'.css'
 });
 
 //合并公共文件
 fis.match('/comm/**.{js,es6}', {
   useHash:false,
 	//useHash:true,
-  packTo: '/dist/comm/comm_'+v+'.js'
+  packTo: '/static/dist/comm/comm_'+v+'.js'
 }); 
 
 
 // 代办
 fis.match('/login/**.{js,es6}', {
   //useHash:true,
-  packTo: '/dist/login/login_'+v+'.js'
+  packTo: '/static/dist/login/login_'+v+'.js'
 });
 
 fis.match('/login/**.{less,css}', {
   //useHash:true,
-  packTo: '/dist/login/login_'+v+'.css'
+  packTo: '/static/dist/login/login_'+v+'.css'
 });
 
 
 // 代办
 fis.match('/todo/**.{js,es6}', {
   //useHash:true,
-  packTo: '/dist/todo/todo_'+v+'.js'
+  packTo: '/static/dist/todo/todo_'+v+'.js'
 });
 
 fis.match('/todo/**.{less,css}', {
   //useHash:true,
-  packTo: '/dist/todo/todo_'+v+'.css'
+  packTo: '/static/dist/todo/todo_'+v+'.css'
+});
+
+fis.match('/router/**.{js,es6}', {
+  //useHash:true,
+  packTo: '/static/dist/$0'
+});
+fis.match('/router/**.{less,css}', {
+  //useHash:true,
+  packTo: '/static/dist/$0'
+});
+
+fis.match('/api/**.{es6,js}', {
+  //useHash:true,
+  packTo: '/static/dist/$0'
 });
 
 
 //项目
 fis.match('/projects/**.{less,css}', {
   useHash:false,
-  packTo: '/dist/projects/projects_'+v+'.css'
+  packTo: '/static/dist/projects/projects_'+v+'.css'
 });
 fis.match('/projects/**.{js,es6}', {
   useHash:false,
   //useHash:true,
-  packTo: '/dist/projects/projects_'+v+'.js'
+  packTo: '/static/dist/projects/projects_'+v+'.js'
 });
 
 // 流程
 fis.match('/flow/**.{js,es6}', {
   //useHash:true,
-  packTo: '/dist/flow/flow_'+v+'.js'
+  packTo: '/static/dist/flow/flow_'+v+'.js'
 });
 
 fis.match('/flow/**.{less,css}', {
   //useHash:true,
-  packTo: '/dist/flow/flow_'+v+'.css'
+  packTo: '/static/dist/flow/flow_'+v+'.css'
 });
 
 // 清除其他配置，只保留如下配置

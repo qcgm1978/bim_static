@@ -22,6 +22,8 @@
      })),
 
      Settings: {
+         projectId: "",
+         projectName: "",
          type: "list",
          isInitMap: false,
          initBodyEvent: false,
@@ -54,9 +56,9 @@
 
      //加载数据
      loadData: function() {
-        debugger;
+
          App.Projects.ProjectCollection.reset();
-         App.Projects.ProjectCollection.project="project";
+         App.Projects.ProjectCollection.project = "project";
          //拉取数据
          App.Projects.ProjectCollection.fetch({
 
@@ -103,7 +105,7 @@
      //只是加载数据
      onlyLoadData: function() {
 
-        
+
 
          App.Projects.ProjectCollection.fetch({
 
@@ -150,7 +152,7 @@
          $(".advancedQueryConditions .pickProvince").myDropDown();
          //单选
          $(".groupRadio").myRadioCk();
-        // $(".groupRadio2").myRadioCk();
+         // $(".groupRadio2").myRadioCk();
      },
 
 
