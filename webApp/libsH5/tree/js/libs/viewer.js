@@ -95,20 +95,20 @@ BIM.common = {
         fn:'fit',
         key:'I'
       },
-      {
-        id:'zoomIn',
-        icon:'bar-zoomIn',
-        title:'放大(X)',
-        fn:'zoomIn',
-        key:'X'
-      },
-      {
-        id:'zoomOut',
-        icon:'bar-zoomOut',
-        title:'缩小(Z)',
-        fn:'zoomOut',
-        key:'Z'
-      },
+      // {
+      //   id:'zoomIn',
+      //   icon:'bar-zoomIn',
+      //   title:'放大(X)',
+      //   fn:'zoomIn',
+      //   key:'X'
+      // },
+      // {
+      //   id:'zoomOut',
+      //   icon:'bar-zoomOut',
+      //   title:'缩小(Z)',
+      //   fn:'zoomOut',
+      //   key:'Z'
+      // },
       {
         id:'divide'
       },
