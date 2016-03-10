@@ -6,11 +6,29 @@ App.Comm = {
 	},
 
 	//封装ajax 
-	ajax: function(data) {
+	ajax: function(data, callback) {
 
-		data=App.Comm.getUrlByType(data);
+		data = App.Comm.getUrlByType(data);
 
-		return $.ajax(data);
+		if ($.isFunction(callback)) {
+			$.ajax(data).done(function(data) {
+				if (_.isString(data)) {
+					// to json
+					if (JSON && JSON.parse) {
+						data = JSON.parse(data);
+					} else {
+						data = $.parseJSON(data);
+					}
+				}
+
+				//回调
+				callback(data);
+
+			});
+		} else {
+			return $.ajax(data);
+		}
+
 	},
 
 	getUrlByType: function(data) {
@@ -42,6 +60,31 @@ App.Comm = {
 
 		return data;
 
+	},
+
+	//JS操作cookies方法!
+	//写cookies
+	setCookie: function(name, value) {
+		var Days = 30;
+		var exp = new Date();
+		exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 1000);
+		document.cookie = name + "=" + escape(value) + ";expires=" + exp.toGMTString();
+	},
+	//获取cookie
+	getCookie: function(name) {
+		var arr, reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)");
+		if (arr = document.cookie.match(reg))
+			return unescape(arr[2]);
+		else
+			return null;
+	},
+	//删除cookie
+	delCookie: function(name) {
+		var exp = new Date();
+		exp.setTime(exp.getTime() - 1);
+		var cval = getCookie(name);
+		if (cval != null)
+			document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString();
 	}
 
 };

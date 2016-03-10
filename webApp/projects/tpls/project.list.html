@@ -1,10 +1,10 @@
  
 
 <span class="proImg"><img src="/projects/images/proDefault.png" /></span>
-<span class="proName"><a class="aProName" href="/#projects/<%=projectNo %>" data-id="<%=projectNo %>"><%=name%></a></span>
+<span class="proName"><a class="aProName" href="/#projects/<%=id %>" data-id="<%=id %>"><%=name%></a></span>
 <span class="proType"><%=estateType==1?"轻资产":"重资产"%></span>
      <span class="proProvince"><%=province%></span>
             <span class="proCity"><%=province%></span> 
 <span class="proStar"><%= new Date(createTime).format("yyyy-MM-dd")%></span>
-<span class="proEnd"><%=openTime%></span>
+<span class="proEnd"><%= openTime ? new Date(openTime).format("yyyy-MM-dd"):"" %></span>
  

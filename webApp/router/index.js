@@ -38,6 +38,7 @@ var AppRoute = Backbone.Router.extend({
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".projects").addClass('selected');
 		_.require('/static/dist/projects/projects.css');
 		_.require('/static/dist/projects/projects.js');
+		App.Project.Settings.projectId=id;
 		App.Project.init();
 	},
 

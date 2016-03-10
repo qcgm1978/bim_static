@@ -4,7 +4,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 
 	className: 'projectContent',
 
-	template: _.templateUrl('/projects/tpls/project/project.container.html', true),
+	template: _.templateUrl('/projects/tpls/project/project.container.html'),
 
 	events: {
 		"click .breadItem": "breadItemClick",
@@ -13,7 +13,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 	},
 
 	render: function() {
-		this.$el.html(this.template);
+		this.$el.html(this.template({}));
 		//导航
 		this.$el.find("#projectContainer").prepend(new App.Project.leftNav().render().el);
 
@@ -26,12 +26,27 @@ App.Project.ProjectContainer = Backbone.View.extend({
 	//点击面包靴
 	breadItemClick: function(event) {
 
-		var $target=$(event.target).closest(".breadItem");
-		 
+		var $target = $(event.target).closest(".breadItem");
+
 		if ($target.hasClass('project')) {
-			console.log("project");
-		}else{
-			console.log("projectVersion");
+			var $projectList = $(".breadItem .projectList");
+			if (!$projectList.is(":hidden")) {
+				return;
+			}
+			$projectList.find(".loading").show();
+			$projectList.find(".listContent").hide();
+			$projectList.show();
+			this.loadProjectList();
+
+		} else {
+			var $projectVersionList = $(".breadItem .projectVersionList");
+			if (!$projectVersionList.is(":hidden")) {
+				return;
+			}
+			$projectVersionList.find(".loading").show();
+			$projectVersionList.find(".listContent").hide();
+			$projectVersionList.show();
+			this.loadProjectVersionList();
 		}
 
 		/*var dialog = new App.Comm.modules.Dialog({
@@ -44,6 +59,52 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			message: "内容" 
 		})*/
 	},
+
+	//加载分组项目
+	loadProjectList: function() {
+
+
+
+		var data = {
+			URLtype: "fetchCrumbsProject",
+			data: {
+				projectId: App.Project.Settings.projectId
+			}
+		};
+
+		//渲染数据
+		App.Comm.ajax(data, function(data) {
+
+			var $projectList = $(".breadItem .projectList");
+			var template = _.templateUrl("/projects/tpls/project/project.container.project.html");
+			$projectList.find(".container").html(template(data.data));
+			console.log(data);
+
+			$projectList.find(".loading").hide();
+			$projectList.find(".listContent").show();
+
+		});
+
+	},
+
+	loadProjectVersionList: function() {
+
+		App.Project.loadVersion(function(data) {
+
+
+			var $projectVersionList = $(".breadItem .projectVersionList");
+			var template = _.templateUrl("/projects/tpls/project/project.container.version.html");
+			$projectVersionList.find(".container").html(template(data.data));
+
+			//显示
+
+			$projectVersionList.find(".loading").hide();
+			$projectVersionList.find(".listContent").show();
+
+		});
+
+	},
+
 
 	//显示和隐藏
 	navBarShowAndHide: function(event) {
@@ -75,7 +136,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 				"margin-left": -width
 			}, 500, function() {
 				$leftNav.find(".dragSize").hide().end().find(".slideBar i").toggleClass('icon-caret-left icon-caret-right');
-				$("#projectContainer .projectCotent").css("margin-left",0);
+				$("#projectContainer .projectCotent").css("margin-left", 0);
 			});
 
 		}
@@ -102,7 +163,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 				"margin-right": -width
 			}, 500, function() {
 				$rightProperty.find(".dragSize").hide().end().find(".slideBar i").toggleClass('icon-caret-left icon-caret-right');
-				$("#projectContainer .projectCotent").css("margin-right",0);
+				$("#projectContainer .projectCotent").css("margin-right", 0);
 			});
 
 		}
@@ -157,7 +218,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 				$("#projectContainer .projectCotent").css(mPos, maxWidth);
 
 			} else {
-				$("#projectContainer .projectCotent").css(mPos,leftNavWidth);
+				$("#projectContainer .projectCotent").css(mPos, leftNavWidth);
 			}
 		});
 

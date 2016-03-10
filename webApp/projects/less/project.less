@@ -1,5 +1,5 @@
 .projectHeader { height: 37px; background-color: #f5f5f5; border-bottom: 1px #ccc solid; position: relative; z-index: 5;
-	.projectTab { float: right; height: 37px;position: relative;z-index: 3000;
+	.projectTab { float: right; height: 37px; position: relative; z-index: 3000;
 		.item { float: left; height: 100%; line-height: 37px; width: 35px; font-size: 16px; position: relative; text-align: center; margin-right: 40px; cursor: pointer;
 			.line { bottom: 0px; width: 100%; height: 3px; position: absolute; left: 0px; text-align: center; }
 			&.last { margin-right: 20px }
@@ -9,11 +9,34 @@
 			}
 		}
 	}
-	.breadcrumbNav { line-height: 37px; padding-left: 20px; font-size: 14px;position: relative;
+	.breadcrumbNav { line-height: 37px; padding-left: 20px; font-size: 14px; position: relative;
+		.projectText, .breadItem { float: left; }
 		.breadItem { margin-left: 6px;
 			.icon-angle-right { font-size: 16px; margin-left: 6px; }
 			.breadItemText { margin-left: 6px; cursor: pointer;
 				.icon-sort-down { font-size: 16px; margin-left: 11px; vertical-align: 2px; }
+			}
+			.projectList, .projectVersionList { display: none;
+				.container { width: 100%; padding: 10px; padding-top: 0px;
+					.header { margin-top: 5px; height: 26px; line-height: 26px; font-size: 12px; background-color: #f2f2f2; padding-left: 12px; }
+					.item { cursor: pointer; height: 26px; line-height: 26px; font-size: 12px; padding-left: 12px; color: #A599B2; margin-top: 5px;
+						&:hover { background-color: #A8DBFD; }
+					}
+				}
+				.loading { text-align: center; color: #ccc; }
+			}
+			.projectList { position: absolute; width: 236px; background-color: #fff; max-height: 420px; overflow-y: auto; border: 1px #ccc solid; top: 32; left: 0px;
+				.txtSearch { margin: 5px 10px 1px 10px; width: 214px; }
+			}
+			.projectVersionList { position: absolute; top: 32px; border: 1px #ccc solid; background-color: #fff; left: 0px; width: 288px; max-height: 378px;
+				.listContent { display: none;
+					.nav { border: 1px #ccc solid; border: 1px #ccc solid; margin: 0px 10px; background-color: #f5f5f5; font-size: 12px; margin-top: 5px;
+						.item { cursor: pointer; float: left; height: 24px; line-height: 24px; width: 132px; text-align: center;
+							&.selected { background-color: #dadada; color: #a9a9a9; }
+						}
+					}
+					.txtSearch { margin: 5px 10px 1px 10px; width: 265px; }
+				}
 			}
 		}
 		.allProject { cursor: pointer }
@@ -36,7 +59,7 @@
 #projectContainer .projectNav .item { width: 66px; }
 .projectContainerApp { height: 100%;
 	.projectContent { height: 100%;
-		.leftNav { float: left; width: 238px; border: 1px #ccc solid; position: absolute; top: 40px; bottom: 0px; z-index: 990; background-color: #fff;
+		.leftNav { float: left; width: 238px; border: 1px #ccc solid; position: absolute; top: 40px; bottom: 0px; background-color: #fff;
 			.leftNavContent { height: 100%; }
 			.projectNav { padding-left: 24px; }
 			.projectNavContentBox { margin-top: 1px; position: absolute; top: 30px; width: 100%; bottom: 0px;
@@ -160,14 +183,10 @@
 			.businessMatters { text-align: center; }
 		}
 		tbody { tr { background-color: #ddd;
-			td{height: 26px;line-height: 26px;}
-			.businessMatters{padding-left: 5px;}
-		 }
+				td { height: 26px; line-height: 26px; }
+				.businessMatters { padding-left: 5px; }
+			}
 		}
 	}
 }
-
-
-.rightProperty{
-	
-}
+.rightProperty { }

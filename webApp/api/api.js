@@ -2,7 +2,7 @@ App.API={
 
 	Settings:{
 		hostname:"http://bim.wanda.com/",
-		debug:true
+		debug:false
 	},
 
 	URL:{
@@ -11,13 +11,17 @@ App.API={
 		fetchTodoData:"platform/todo",   //获取代办数据
  
 		//项目 
-		fetchProjects:"platform/project", //项目列表 
+		fetchProjects:"platform/project", //项目列表   
 		fetchFileList:"doc/{projectId}/{projectVersionId}/file/children",//获取文件列表  ?fileId={parentId}
 		fetchDesignFileNav:"doc/{projectId}/{projectVersionId}/file/tree",//项目设计文件导航 
 		fetchDesignModelNav:"dataJson/project/project.design.model.json",//项目设计模型导航
 
-		//crumbsProject:"platform/api/project/groupByProvince",   // 项目导航
-		//projectVersion:"", //项目版本
+		// 项目面包屑
+		fetchCrumbsProject:"platform/project/groupByProvince",   // 项目导航
+		fetchCrumbsProjectVersion:"platform/project/{projectId}/version", //项目面包屑版本
+		fetchProjectVersionInfo:"platform/project/{projectId}/version/{projectVersionId}", //项目版本信息
+
+
 
 		uploadFile:"doc/{projectId}/{projectVersionId}/file/data", //上传文件  ?parentId={parentId}&fileName={fileName}&size={size}&digest={digest}&position={position} 
 		downLoad:"doc/{projectId}/{projectVersionId}/file/data", //文件下载  ?fileId={fileId}
@@ -67,6 +71,11 @@ App.API={
 		fetchFileList:"dataJson/project/project.design.json", //获取文件列表
 		fetchDesignFileNav:"/dataJson/project/project.design.file.json",  //项目设计文件导航
 		fetchDesignModelNav:"/dataJson/project/project.design.model.json",//项目设计模型导航
+
+		// 项目面包屑
+		fetchCrumbsProject:"/dataJson/project/fetchCrumbsProject.json",   // 项目导航
+		fetchCrumbsProjectVersion:"/dataJson/project/fetchCrumbsProjectVersion.json", //项目面包屑版本
+		fetchProjectVersionInfo:"platform/project/{projectId}/version/{projectVersionId}", //项目版本信息
 
 		//设计
 		fetchDesignProperties:"/dataJson/project/project.design.property.json",  //设计属性

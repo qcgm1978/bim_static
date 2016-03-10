@@ -3,7 +3,7 @@
 <span class="fileBg inlineBlock"> <img src="/projects/images/proDefault.png"/></span>
 <span class="fileName inlineBlock"><%=name%></span> 
 
-<span class="fileStatus inlineBlock"><%=  App.Project.convertStatus(storeStatus,status) %></span>
+<span class="fileStatus inlineBlock"><%=  App.Project.convertStatus(status) %></span>
 <span class="fileOp inlineBlock"><%= creatorName %></span>
 <span class="fileSize inlineBlock"><%=digest%></span>
 <span class="fileDate inlineBlock"><%= new Date(createTime).format("yyyy-MM-dd") %></span>
