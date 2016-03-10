@@ -65,21 +65,23 @@ App.Project.leftNav = Backbone.View.extend({
 
 			if (!typeof(Worker)) {
 				return;
-			}
+			} 
 
 			var viewer = new BIM({
 				element: $("#projectContainer .modelContainerContent")[0],
-				projectId: 'testrvt',
+				projectId: "b7554b6591ff6381af854fa4efa41f81",//App.Project.Settings.projectId,
 				// projectId:'testrvt',
-				tools: true
+				tools: true,
+				treeElement:$("#projectContainer .projectNavModelContainer")[0]
 			});
 
-			viewer.on("changed",function(model){
+			viewer.on("click",function(model){
 				App.Project.Settings.modelId=model.userId; 
 				//设计  
 				if (App.Project.Settings.projectNav=="design") {
 					//属性
 					if ( App.Project.Settings.property=="attr") {
+
 						App.Project.DesignAttr.PropertiesCollection.fetch({
 							data:{
 								elementId:"002e08e8-4a5f-4ee2-9d88-825c510c4c53",

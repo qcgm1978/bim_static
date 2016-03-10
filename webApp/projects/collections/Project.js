@@ -41,19 +41,7 @@ App.Project = {
 		//App.Project.loadData();
 
 		//加载 项目版本
-		App.Project.loadVersion(App.Project.renderVersion);
-
-		//初始化滚动条
-		App.Project.initScroll();
-
-		//事件初始化
-		App.Project.initEvent();
-
-		//全局事件 只绑定一次
-		if (!App.Project.Settings.initGlobalEvent) {
-			App.Project.Settings.initGlobalEvent = true;
-			App.Project.initGlobalEvent();
-		}
+		App.Project.loadVersion(App.Project.renderVersion); 
 
 	},
 
@@ -86,7 +74,7 @@ App.Project = {
 
 	//渲染版本
 	renderVersion: function(data) {
-		debugger;
+		 
 		//成功
 		if (data.message == "success") {
 			App.Project.Settings.projectName = "谁呀";
@@ -96,7 +84,7 @@ App.Project = {
 				cVersion;
 			for (var i = 0; i < vCount; i++) {
 				cVersion = Versions[i];
-				if (!cVersion.lastest) {
+				if (cVersion.lastest) {
 					App.Project.Settings.CurrentVersion = cVersion;
 					break;
 				}
@@ -138,9 +126,23 @@ App.Project = {
 		//文件列表
 		App.Project.FileCollection.fetch({
 			data: {
-				fileId: App.Project.Settings.fileId
+				parentId: App.Project.Settings.fileId
 			}
 		});
+
+
+			//初始化滚动条
+		App.Project.initScroll();
+
+		//事件初始化
+		App.Project.initEvent();
+
+		//全局事件 只绑定一次
+		if (!App.Project.Settings.initGlobalEvent) {
+			App.Project.Settings.initGlobalEvent = true;
+			App.Project.initGlobalEvent();
+		}
+
 	},
 
 	//初始化滚动条
@@ -204,7 +206,7 @@ App.Project = {
 				URLtype: "downLoad",
 				data: {
 					projectId: App.Project.Settings.projectId,
-					projectVersionId: App.Project.CurrentVersion.id
+					projectVersionId: App.Project.Settings.CurrentVersion.id
 				}
 			};
 
@@ -301,7 +303,7 @@ App.Project = {
 				App.Project.Settings.fileId = file.id;
 				App.Project.FileCollection.fetch({
 					data: {
-						fileId: file.id
+						parentId: file.id
 					}
 				});
 			}

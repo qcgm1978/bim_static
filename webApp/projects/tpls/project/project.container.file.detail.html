@@ -1,6 +1,9 @@
 
 <span data-fileversionid="<%=fileVersionId%>" class="filecKAll inlineBlock"><input type="checkbox" class="ckAll" /></span>
-<span class="fileBg inlineBlock"> <img src="/projects/images/proDefault.png"/></span>
+<span class="fileBg inlineBlock"> 
+	<span class=" fileType <%= folder?'folder':'file' %>"></span>
+
+</span>
 <span class="fileName inlineBlock"><%=name%></span> 
 
 <span class="fileStatus inlineBlock"><%=  App.Project.convertStatus(status) %></span>

@@ -1,66 +1,49 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-	<meta charset="utf-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>万达项目</title> 
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>万达项目</title>
     <link rel="styleSheet" href="./libs/jquery/jquery.mCustomScrollbar.css" />
-    	<link rel="styleSheet" href="./comm/css/treeView.less" />
- 	<link rel="styleSheet" href="./topNav/css/topNav.less" />
+    <link rel="styleSheet" href="./comm/css/treeView.less" />
+    <link rel="styleSheet" href="./topNav/css/topNav.less" />
 </head>
+
 <body>
-	
-<div id="topBar">
-	 
- 	
-	<ul class="navHeader">
-		<li class="item todo"> <a href="#todo">待办</a></li>
-		<li class="item projects"> <a href="#projects">项目</a></li>
-		<li class="item flow"> <a href="#flow">流程</a></li>
-		<li class="item resources"> <a href="#resources">资源库</a></li>
-		<li class="item console"> <a href="#console">控制台</a></li>  
-		<li class="user"><span>User</span></li>
-		<li class="more"><span>More</span></li>
-	</ul>
- <div class="logo"><span class="text">BIM平台</span></div>
-
- 
-</div>
-
-<div id="contains"></div>
-
-
+    <div id="topBar">
+        <ul class="navHeader">
+            <li class="item todo"> <a href="#todo">待办</a></li>
+            <li class="item projects"> <a href="#projects">项目</a></li>
+            <li class="item flow"> <a href="#flow">流程</a></li>
+            <li class="item resources"> <a href="#resources">资源库</a></li>
+            <li class="item console"> <a href="#console">服务</a></li>
+            <li class="user">
+                <div class="userBg"></div> <span>您好，</span> <span class="userName"> zhongping <i class="icon-angle-down"></i></span> </li>
+        </ul>
+        <div class="logo"><span class="text">BIM平台</span></div>
+    </div>
+    <div id="contains"></div>
 </body>
-
 <script type="text/javascript">
-	var App={}; 
-	App.modules={};
-</script> 
-
-<script type="text/javascript" src="./libs/underscore.1.8.2.js"></script> 
-<script type="text/javascript" src="./libs/json2.js"></script>  
+var App = {};
+App.modules = {};
+</script>
+<script type="text/javascript" src="./libs/underscore.1.8.2.js"></script>
+<script type="text/javascript" src="./libs/json2.js"></script>
 <script type="text/javascript" src="./libs/jquery/jquery-1.12.0.min.js"></script>
-<script type="text/javascript" src="./libs/backbone.1.1.2.js"></script> 
+<script type="text/javascript" src="./libs/backbone.1.1.2.js"></script>
 <script type="text/javascript" src="./libs/doT.js"></script>
 <script src="./libs/thirdparty/es5-shim.min.js"></script>
 <script src="./libs/thirdparty/es5-sham.min.js"></script>
 <script src="./libs/thirdparty/console-polyfill.js"></script>
-
-
-
-<script type="text/javascript" src="./libsH5/tree/js/libs/three.js"></script> 
+<script type="text/javascript" src="./libsH5/tree/js/libs/three.js"></script>
 <link rel="styleSheet" href="./libsH5/tree/css/style.css" />
-
-
 <script type="text/javascript" src="./api/api.js"></script>
 <script type="text/javascript" src="./comm/js/comm.es6"></script>
 <script type="text/javascript" src="./comm/js/collections/treeView.js"></script>
-
 <script type="text/javascript" src="./topNav/js/topNav.es6"></script>
- 
-
 <script type="text/javascript" src="./router/index.js"></script>
+<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=osmP2eNEjPlvebAAIVhcDc6c"></script>
 
- <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=osmP2eNEjPlvebAAIVhcDc6c"></script>
- 
 </html>

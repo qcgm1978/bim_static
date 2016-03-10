@@ -83,7 +83,9 @@
 					.inlineBlock { display: inline-block; }
 					.filecKAll { width: 5%; text-align: center; }
 					.fileBg { width: 7%;
-						img { width: 34px; height: 28px; vertical-align: top; margin-top: 5px; }
+						.fileType { display: inline-block; margin-top: 5px; vertical-align: top; width: 35px; height: 30px; background: url('/projects/images/fileicon.png') no-repeat;
+							&.file { background-position: 0px -39px; }
+						}
 					}
 					.fileName { width: 42%; }
 					.fileStatus { width: 11%; }
