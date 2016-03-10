@@ -1,7 +1,3 @@
- /**
- * @require /libs/tree/js/libs/inflate.min.js
- */
-
 // File:src/Three.js
 
 /**

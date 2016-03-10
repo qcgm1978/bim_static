@@ -104,19 +104,23 @@
 .tab-content .slider-box {
   position: relative;
   height: 50px;
-  border-top: 1px solid #000;
+  border-bottom: 1px solid #000;
 }
 .slider-box .reset{
   width:50%;
+  cursor:pointer;
   font-size:12px;
   display:block;
-  margin:19px 0;
+  color:#ccc;
+  margin:16px 0;
   float:left;
 }
 .slider-box .switch{
   width:50%;
+  cursor:pointer;
   font-size:12px;
   margin:16px 0;
+  color:#ccc;
   float:left;
   text-align:right;
 }
@@ -125,9 +129,15 @@
 }
 .slider-box .switch .checkbox{
   display:inline-block;
+  margin-left:3px;
+  vertical-align:middle;
+  width:15px;
+  height:15px;
+  background:url(../images/bar.png) no-repeat;
+  background-position:-32px -1088px;
 }
 .slider-box .switch input:checked + .checkbox{
-
+  background-position:0 -1088px;
 }
 .tab-content .slider{
   width:140px;
