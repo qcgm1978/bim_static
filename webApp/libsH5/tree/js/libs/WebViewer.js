@@ -1,7 +1,6 @@
  /**
  * @require /libs/tree/js/libs/three.min.js
  */
-
 var CLOUD = CLOUD || {};
 CLOUD.Version = "v3.a";
 
@@ -15,7 +14,8 @@ CLOUD.GlobalData = {
     ShowSubSceneBox: false,
     ShowCellBox: false,
     DynamicRelease: false,
-    EmptyGeometry: new THREE.Geometry()
+    SubSceneVisibleDistance: 100,
+    CellVisibleDistance: 2500,
 };
 
 CLOUD.EnumStandardView = {
@@ -100,7 +100,7 @@ CLOUD.Utils = {
         return null;
     },
 
-    parseTransform: function (node, objJson) {
+    parseTransform: function (node, objJson, trf) {
 
         var updateMatrix = false;
         if (objJson.rotation) {
@@ -129,6 +129,13 @@ CLOUD.Utils = {
 
         if (objJson.matrix) {
             node.matrix.fromArray(objJson.matrix);
+            node.matrixAutoUpdate = false;
+        }
+
+        if (trf) {
+            var localTrf = node.matrix.clone();
+            localTrf.multiplyMatrices(trf, node.matrix);
+            node.matrix = localTrf;
             node.matrixAutoUpdate = false;
         }
 
@@ -446,14 +453,14 @@ CLOUD.GeomUtil = {
         return geometry;
     },
 
-    parseNodeProperties: function (object, objJSON, nodeId) {
+    parseNodeProperties: function (object, objJSON, nodeId, trf) {
 
         object.name = nodeId;
 
         if (objJSON.userId)
             object.userId = objJSON.userId;
 
-        CLOUD.Utils.parseTransform(object, objJSON);
+        CLOUD.Utils.parseTransform(object, objJSON, trf);
     },
 
     parseSceneNode: function(object, objJSON, modelManager, level) {
@@ -527,6 +534,41 @@ CLOUD.GeomUtil = {
         object.matrixAutoUpdate = false;
     },
 
+    parsePGeomNodeInstance: function (objJSON, matObj, trf) {
+
+        var object;
+
+        if (objJSON.geomType == "pipe") {
+
+            var geometry = CLOUD.GeomUtil.UnitCylinderInstance;
+            object = new CLOUD.Mesh(geometry, matObj);
+            CLOUD.GeomUtil.parseCylinderNode(object, objJSON.params);
+
+        }
+        else if (objJSON.geomType == "box") {
+
+            var geometry = CLOUD.GeomUtil.UnitBoxInstance;
+            object = new CLOUD.Mesh(geometry, matObj);
+
+            CLOUD.GeomUtil.parseBoxNode(object, objJSON);
+
+        }
+        else {
+            console.log("unknonw geometry!");
+            return object;
+        }
+
+        if (trf) {
+            var localTrf = trf.clone();
+            localTrf.multiply(object.matrix);
+            object.matrix = localTrf;
+            object.matrixAutoUpdate = false;
+        }
+
+        return object;
+     },
+
+    EmptyGeometry: new THREE.Geometry(),
     UnitCylinderInstance: new THREE.CylinderGeometry(1, 1, 1),
     UnitBoxInstance : new THREE.BoxGeometry(1, 1, 1)
 };
@@ -2390,7 +2432,7 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
                     currentIncrementalListIdx = 0;
                 }
 
-                isTransparentObjectsRenderFinish = renderIncrementObjects( transparentObjects, camera, lights, fog, overrideMaterial );
+                isTransparentObjectsRenderFinish = renderIncrementObjects( transparentObjects, camera, lights, fog, overrideMaterial, true);
             }
 
 
@@ -2413,7 +2455,7 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
                     currentIncrementalListIdx = 0;
                 }
 
-                isTransparentObjectsRenderFinish = renderIncrementObjects( transparentObjects, camera, lights, fog );
+                isTransparentObjectsRenderFinish = renderIncrementObjects( transparentObjects, camera, lights, fog,  undefined,true );
             }
         }
 
@@ -2457,59 +2499,18 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
         _filterObject = filterObject;
     };
 
-    function isVisibleForFilter(id) {
+    function isVisibleForFilter(node) {
 
-        if (id && _filterObject && _filterObject.visibilityFilter.ids && (_filterObject.visibilityFilter.ids[id] === 0)) {
-            return false;
-        }
-
-        return true;
+        return _filterObject && _filterObject.isVisible(node);
     }
 
-    function isOverrideForFilter(id) {
+    function getOverridedMaterial(object) {
 
-        if (_filterObject && _filterObject.overrideFilter.ids && _filterObject.overrideFilter.ids[id]) {
-            return true;
+        if (_filterObject) {
+            return _filterObject.getOverridedMaterial(object);
         }
 
-        return false;
-    }
-
-    function isSelectedForFilter(id) {
-
-        if (_filterObject && _filterObject.selectFilter.ids && _filterObject.selectFilter.ids[id]) {
-            return true;
-        }
-
-        return false;
-    }
-
-    function chooseMaterialForFilter(id) {
-        var material = null;
-
-        if (!id) {
-            return null;
-        }
-
-        // 优先判断Select
-        if (isSelectedForFilter(id)) {
-            material = _filterObject.selectFilter.material;
-        } else {
-            // 修改材质
-            if (isOverrideForFilter(id)) {
-                // id值表示选取哪个材质
-                var idx = _filterObject.overrideFilter.ids[id];
-
-                //_filterObject.overrideFilter.hasOwnProperty(idx)
-                if (idx in _filterObject.overrideFilter) {
-                    material = _filterObject.overrideFilter[idx];
-                } else {
-                    material = _filterObject.overrideFilter[0];
-                }
-            }
-        }
-
-        return material;
+        return null;
     }
 
     function buildIncrementObjectList( scene, camera) {
@@ -2570,7 +2571,7 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
         }
     }
 
-    function renderIncrementObjects( renderList, camera, lights, fog, overrideMaterial ) {
+    function renderIncrementObjects( renderList, camera, lights, fog, overrideMaterial, tansparent ) {
 
         var isRenderFinish = true;
 
@@ -2579,7 +2580,12 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
         //startTime = window.performance.now();
         startTime = Date.now();
 
-        for ( var i = currentIncrementalListIdx, l = renderList.length; i < l; i ++ ) {
+        var l = renderList.length;
+        //if (tansparent === undefined)
+        //    l = Math.min(renderList.length, 20000);
+
+        var i = currentIncrementalListIdx;
+        for (; i < l; i++) {
 
             var renderItem = renderList[ i ];
 
@@ -2611,19 +2617,11 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
 
             }
 
-            //endTime = window.performance.now();
-            endTime = Date.now();
+            if (i % 100 === 99) {
+                //endTime = window.performance.now();
+                endTime = Date.now();
 
-            elapseTime = endTime - startTime;
-
-
-            if (i === l - 1) {
-
-                //console.log("end - elapse time : " + elapseTime + ",my_idx = " + currentIncrementalListIdx);
-
-                currentIncrementalListIdx = i + 1;
-                isRenderFinish = true;
-            } else {
+                elapseTime = endTime - startTime;
 
                 if (elapseTime > limitFrameTime) {
 
@@ -2634,6 +2632,12 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
                     break;
                 }
             }
+        }
+
+        if (i === l - 1) {
+
+            currentIncrementalListIdx = i + 1;
+            isRenderFinish = true;
         }
 
         return isRenderFinish;
@@ -2725,7 +2729,7 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
             } else if ( object instanceof THREE.Mesh || object instanceof THREE.Line || object instanceof THREE.Points ) {
 
                 // 元素可见性过滤
-                if (!isVisibleForFilter(object.userId)) {
+                if (!isVisibleForFilter(object)) {
                     return;
                 }
 
@@ -2740,7 +2744,7 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
                     //var material = object.material;
 
                     // 材质过滤
-                    var material = chooseMaterialForFilter(object.userId);
+                    var material = getOverridedMaterial(object);
                     material = material || object.material;
 
                     if ( material.visible === true ) {
@@ -5973,7 +5977,7 @@ CLOUD.CameraInfo = function (position, target, up) {
 CLOUD.CameraUtil = {
 
     // camera = {"camera_position":"26513.603437903, -14576.4810728955, 15107.6582255056","camera_direction":"-220.050259546712, 169.277369901229, -125.801809656091","camera_up":"0, 0, 304.8"}
-    transformCamera: function (camera) {
+    transformCamera: function (camera, scene) {
         var position = new THREE.Vector3();
 
         var str2float = function (strarr) {
@@ -5989,11 +5993,11 @@ CLOUD.CameraUtil = {
         var target = new THREE.Vector3();
         target.addVectors(position, dir);
 
-        position.applyMatrix4(this.scene.rootNode.matrix);
-        target.applyMatrix4(this.scene.rootNode.matrix);
+        position.applyMatrix4(scene.rootNode.matrix);
+        target.applyMatrix4(scene.rootNode.matrix);
 
         var rotMat = new THREE.Matrix4();
-        rotMat.makeRotationFromEuler(this.scene.rootNode.rotation);
+        rotMat.makeRotationFromEuler(scene.rootNode.rotation);
         up.applyMatrix4(rotMat);
         up.normalize();
 
@@ -6023,7 +6027,10 @@ CLOUD.CameraUtil = {
 };
 
 CLOUD.Camera = function (width, height, fov, near, far, orthoNear, orthoFar) {
+
     THREE.CombinedCamera.call(this, width, height, fov, near, far, orthoNear, orthoFar);
+
+    this.positionPlane = new THREE.Plane();
 };
 
 CLOUD.Camera.prototype = Object.create(THREE.CombinedCamera.prototype);
@@ -6041,6 +6048,11 @@ CLOUD.Camera.prototype.LookAt = function (target, dir, up, focal) {
     this.target = target.clone();
 };
 
+CLOUD.Camera.prototype.updatePositionPlane = function(){
+
+    this.positionPlane.setFromNormalAndCoplanarPoint(this.getWorldDirection(), this.position);
+
+};
 // 用THREE.Camera.getWorldDirection替换
 //CLOUD.Camera.prototype.LookDir = function () {
 //    var vector = new THREE.Vector3(0, 0, -1);
@@ -6053,7 +6065,7 @@ CLOUD.Camera.prototype.setStandardView = function (stdView, bbox) {
     var focal = CLOUD.GlobalData.SceneSize / 2;
     switch (stdView) {
         case CLOUD.EnumStandardView.ISO:
-            var position = new THREE.Vector3(CLOUD.GlobalData.SceneSize, CLOUD.GlobalData.SceneSize, CLOUD.GlobalData.SceneSize);
+            var position = new THREE.Vector3(-CLOUD.GlobalData.SceneSize, CLOUD.GlobalData.SceneSize, CLOUD.GlobalData.SceneSize);
             //target = new THREE.Vector3();
             var dir = new THREE.Vector3();
             dir.subVectors(target, position);
@@ -6585,34 +6597,36 @@ CLOUD.ClipWidget.prototype = Object.create(THREE.Object3D.prototype);
 CLOUD.ClipWidget.prototype.constructor = CLOUD.ClipWidget;
 
 
+CLOUD.ViewHouse = function (viewer) {
 
+    var scope = this;
 
+    this.viewer = viewer;
+    // Mouse buttons
+    this.mouseButtons = {LEFT: THREE.MOUSE.LEFT, RIGHT: THREE.MOUSE.RIGHT};
+    this.visible = true;
+    this.isAnimationFinish = true; // 是否动画结束
+    this.pickedColor = 0xb1d1ec;
+    this.width = 0;
+    this.height = 0;
 
-CLOUD.ViewHouse = function () {
+    var houseContainer, renderer;
 
     // House 尺寸规格
-    this.enumSizeMode = {
-        Big : 0,
+    var enumSizeMode = {
+        Big: 0,
         Medium: 1,
-        Small : 2
+        Small: 2
     };
 
     // House 尺寸
-    this.enumSize = {
-        Big : 220,
+    var enumSize = {
+        Big: 220,
         Medium: 165,
-        Small : 110
+        Small: 110
     };
 
-    // view house所在视口位置大小
-    this.viewPort = {
-        x : 100,
-        y : 100,
-        width : this.enumSize.Small,
-        height : this.enumSize.Small
-    };
-
-    this.enumView = {
+    var enumViewMode = {
         Home: 0,
         Top: 1,
         Bottom: 2,
@@ -6640,136 +6654,259 @@ CLOUD.ViewHouse = function () {
         RoofSouthWest: 24,
         RoofNorthEast: 25,
         RoofNorthWest: 26,
-        TopTurnRight:27,
-        TopTurnBack:28,
-        TopTurnLeft:29,
-        BottomTurnRight:30,
-        BottomTurnBack:31,
-        BottomTurnLeft:32,
-        FrontTurnRight:33,
-        FrontTurnTop:34,
-        FrontTurnLeft:35,
-        RightTurnBack:36,
-        RightTurnTop:37,
-        RightTurnFront:38,
-        BackTurnRight:39,
-        BackTurnTop:40,
-        BackTurnLeft:41,
-        LeftTurnFront:42,
-        LeftTurnTop:43,
-        LeftTurnBack:44
+        TopTurnRight: 27,
+        TopTurnBack: 28,
+        TopTurnLeft: 29,
+        BottomTurnRight: 30,
+        BottomTurnBack: 31,
+        BottomTurnLeft: 32,
+        FrontTurnRight: 33,
+        FrontTurnTop: 34,
+        FrontTurnLeft: 35,
+        RightTurnBack: 36,
+        RightTurnTop: 37,
+        RightTurnFront: 38,
+        BackTurnRight: 39,
+        BackTurnTop: 40,
+        BackTurnLeft: 41,
+        LeftTurnFront: 42,
+        LeftTurnTop: 43,
+        LeftTurnBack: 44
     };
 
-    this.names = {
-        Compass : "compass",
-        Home:"home",
+    // 房屋各构件名字
+    var componentNames = {
+        Compass: "compass",
+        Home: "home",
         BottomFloor: "Bottom_Floor",
         BottomSouth: "Bottom_South",
         BottomNorth: "Bottom_North",
         BottomEast: "Bottom_East",
-        BottomWest:"Bottom_West",
+        BottomWest: "Bottom_West",
         BottomSouthEast: "Bottom_SouthEast",
         BottomSouthWest: "Bottom_SouthWest",
         BottomNorthWest: "Bottom_NorthWest",
         BottomNorthEast: "Bottom_NorthEast",
-        MiddleSouth:"Middle_South",
-        MiddleNorth:"Middle_North",
-        MiddleEast:"Middle_East",
-        MiddleWest:"Middle_West",
-        MiddleSouthEast:"Middle_SouthEast",
-        MiddleSouthWest:"Middle_SouthWest",
-        MiddleNorthWest:"Middle_NorthWest",
-        MiddleNorthEast:"Middle_NorthEast",
-        MiddleDoor:"Middle_Door",
-        MiddleRightWindow:"Middle_RightWindow",
-        MiddleLeftWindow:"Middle_LeftWindow",
-        RoofCenter:"Roof_Center",
-        RoofSouth:"Roof_South",
-        RoofNorth:"Roof_North",
-        RoofEast:"Roof_East",
-        RoofWest:"Roof_West",
-        RoofEaves:"Roof_Eaves",
-        RoofSouthEast:"Roof_SouthEast",
-        RoofSouthWest:"Roof_SouthWest",
-        RoofNorthWest:"Roof_NorthWest",
-        RoofNorthEast:"Roof_NorthEast",
-        ControlPointNorth:"ControlPoint_North",
-        ControlPointSouth:"ControlPoint_South",
-        ControlPointEast:"ControlPoint_East",
-        ControlPointWest:"ControlPoint_West",
-        ControlRingNorthEast:"ControlRing_NorthEast",
-        ControlRingSouthWest:"ControlRing_SouthWest",
-        ControlRingNorthWest:"ControlRing_NorthWest",
-        ControlRingSouthEast:"ControlRing_SouthEast"
+        MiddleSouth: "Middle_South",
+        MiddleNorth: "Middle_North",
+        MiddleEast: "Middle_East",
+        MiddleWest: "Middle_West",
+        MiddleSouthEast: "Middle_SouthEast",
+        MiddleSouthWest: "Middle_SouthWest",
+        MiddleNorthWest: "Middle_NorthWest",
+        MiddleNorthEast: "Middle_NorthEast",
+        MiddleDoor: "Middle_Door",
+        MiddleRightWindow: "Middle_RightWindow",
+        MiddleLeftWindow: "Middle_LeftWindow",
+        RoofCenter: "Roof_Center",
+        RoofSouth: "Roof_South",
+        RoofNorth: "Roof_North",
+        RoofEast: "Roof_East",
+        RoofWest: "Roof_West",
+        RoofEaves: "Roof_Eaves",
+        RoofSouthEast: "Roof_SouthEast",
+        RoofSouthWest: "Roof_SouthWest",
+        RoofNorthWest: "Roof_NorthWest",
+        RoofNorthEast: "Roof_NorthEast",
+        ControlPointNorth: "ControlPoint_North",
+        ControlPointSouth: "ControlPoint_South",
+        ControlPointEast: "ControlPoint_East",
+        ControlPointWest: "ControlPoint_West",
+        ControlRingNorthEast: "ControlRing_NorthEast",
+        ControlRingSouthWest: "ControlRing_SouthWest",
+        ControlRingNorthWest: "ControlRing_NorthWest",
+        ControlRingSouthEast: "ControlRing_SouthEast"
     };
 
-    // Mouse buttons
-    this.mouseButtons = { LEFT: THREE.MOUSE.LEFT, RIGHT: THREE.MOUSE.RIGHT };
+    var threshold = 0.0001; // 精度阈值 (1e-4)
 
-    this.threshold = 0.0001; // 精度阈值 (1e-4)
+    // house
+    var houseScene = new THREE.Scene();
+    var houseCamera = new THREE.OrthographicCamera(-enumSize.Big / 2, enumSize.Big / 2, enumSize.Big / 2, -enumSize.Big / 2, -enumSize.Big / 2, enumSize.Big / 2);
+    var houseRaycaster = new THREE.Raycaster();
 
-    this.scene = new THREE.Scene();
-    this.camera = new THREE.OrthographicCamera( -this.enumSize.Big/2, this.enumSize.Big/2, this.enumSize.Big/2, -this.enumSize.Big/2, -this.enumSize.Big/2, this.enumSize.Big/2 );
-    this.raycaster = new THREE.Raycaster();
+    // home(Billboard)
+    var homeScene = new THREE.Scene();
+    var homeCamera = houseCamera.clone(); // 克隆一份，这样鼠标位置可以通用
+    var homeRaycaster = new THREE.Raycaster();
 
-    // Billboard
-    this.scene2 = new THREE.Scene();
-    this.camera2 = this.camera.clone(); // 克隆一份，这样鼠标位置可以通用
-    this.raycaster2 = new THREE.Raycaster();
+    var groupCompass = new THREE.Group(); // 指北针组
+    var groupControlRing = new THREE.Group(); // 控制圆环组
+    var groupHouse = new THREE.Group(); // 房屋组
+    var groupHome = new THREE.Group(); // 主页组
+    var groupPick = new THREE.Group(); // 参与挑选
+    var groupHightLight = new THREE.Group(); // 高亮组
 
-    this.groupCompass = new THREE.Group(); // 指北针组
-    this.groupControlRing = new THREE.Group(); // 控制圆环组
-    this.groupHouse = new THREE.Group(); // 房屋组
-    this.groupHome = new THREE.Group(); // 主页组
-    this.groupPick = new THREE.Group(); // 参与挑选
-    //this.groupNotPick = new THREE.Group(); // 不参与挑选
-    this.groupHightLight = new THREE.Group(); // 高亮组
+    // 保存初始位置
+    var groupControlRingPos = new THREE.Vector3();
+    var groupHightLightPos = new THREE.Vector3();
 
-    // 保持初始位置
-    this.groupControlRingPos = new THREE.Vector3();
-    this.groupHightLightPos = new THREE.Vector3();
+    // ------ 状态保存 S ------ //
+    // 门
+    var houseDoorMesh = null;
+    var houseDoorColor = null;
+    // 前墙
+    var houseFrontMesh = null;
+    var houseFrontColor = null;
+    // 左窗
+    var HouseLeftWindowMesh = null;
+    var houseLeftWindowColor = null;
+    // 右窗
+    var houseRightWindowMesh = null;
+    var houseRightWindowColor = null;
+    // 左墙
+    var houseLeftMesh = null;
+    var houseLeftColor = null;
+    // 右墙
+    var houseRightMesh = null;
+    var houseRightColor = null;
 
-    this.mouse = new THREE.Vector2();
-    this.hasPickedObject = false;
-    this.pickedColor = 0xb1d1ec;
-    //this.pickedBorder = null; // 选中对象对应的边框
+    // 高亮圆环
+    var highLightRingRadius = 0;
+    var highlightRingMesh = null;
+    var highlightRingQuat = null;
+    var highlightRingPos = null;
 
-    // 注意启用禁用和显示隐藏的区别：启用禁用有外部用户决定；显示隐藏由是否标准视图模式来决定。
+    // 高亮圆环控制点
+    var highlightPointMesh = null;
+    var highlightPointQuat = null;
+    var highlightPointPos = null;
+
+    // 高亮圆环箭头
+    var highlightArrowMesh = null;
+    var highlightArrowQuat = null;
+    var highlightArrowPos = null;
+    // ------ 状态保存 E ------ //
+
+    // 注意启用禁用和显示隐藏的区别：启用禁用由外部用户决定；显示隐藏由是否标准视图模式来决定。
     // 启用禁用优先级高。
-    this.isEnableCompass = true; // 是否启用或禁用指北针
-    this.isShowHome = false; // 是否显示home
-    this.isRotate = false; // 旋转控制
-    this.isTransparent = true; // 是否透明
-    this.opacityCoe = 0.6; // 不透明度
+    var isEnableCompass = true; // 是否启用或禁用指北针
+    var isShowHome = false; // 是否显示home
+    var isRotate = false; // 旋转控制
+    var isTransparent = true; // 是否透明
+    var opacityCoe = 0.6; // 不透明度
 
     // 保持旋转量
-    this.rotateStart = new THREE.Vector2();
-    this.rotateEnd = new THREE.Vector2();
-    this.rotateDelta = new THREE.Vector2();
+    var rotateStart = new THREE.Vector2();
+    var rotateEnd = new THREE.Vector2();
+    var rotateDelta = new THREE.Vector2();
 
-    this.halfHeight = 0; // 屋半高
-    this.currentViewMode = -1; // 当前观察模式
+    var mouseCoord = new THREE.Vector2();
+    var hasPickedObject = false;
+    var lastPickedObjectName = ""; // 上次选中对象的名字
+    var Intersected = null;
 
-    this.visible = true;
+    var viewHouseRadius = 110; // 最大半径
+    var halfHeight = 0; // 房屋半高
+    var halfWidth = 0; // 房屋前后墙半宽
+    var lineWidth = 5; // 线宽
 
-    this.isAnimationFinish = true; // 是否动画结束
+    var currentViewMode = -1; // 当前观察模式
 
-    // 创建view house
-    this.createViewHouse();
+    var lastMouseOverHouse = false;
 
-    // 设置透明
-    this.enableTransparent(true);
+    /// 构造房屋线框
+    // @param {object} container 父容器
+    // @param {Array} vertices 顶点集
+    // @param {Array} indices 索引集
+    // @param {Number} color 颜色
+    // @returns
+    var createWireFrame = function (container, vertices, indices, color, lineWidth) {
 
-    // 隐藏home
-    this.showHome(false);
-};
+        var len = vertices.length;
+        var positions = new Float32Array(len * 3);
 
-CLOUD.ViewHouse.prototype = {
-    createViewHouse : function(){
+        for (var i = 0; i < len; ++i) {
+            positions[i * 3] = vertices[i].x;
+            positions[i * 3 + 1] = vertices[i].y;
+            positions[i * 3 + 2] = vertices[i].z;
+        }
 
-        var scope = this;
+        var geometry = new THREE.BufferGeometry();
 
-        var viewHouseRadius = 110; // 最大尺寸
+        geometry.setIndex(new THREE.BufferAttribute(new Uint16Array(indices), 1));
+        geometry.addAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+        var material = new THREE.LineBasicMaterial({color: color, linewidth: lineWidth});
+        var mesh = new THREE.Line(geometry, material);
+        container.add(mesh);
+    };
+
+    // 保持需要特殊处理的mesh
+    var holdSpecialMesh = function (name, mesh, color) {
+        // 特殊处理
+        if (name === componentNames.MiddleDoor) {
+            houseDoorMesh = mesh;
+            houseDoorColor = color;
+        }
+        if (name === componentNames.MiddleSouth) {
+            houseFrontMesh = mesh;
+            houseFrontColor = color;
+        }
+        if (name === componentNames.MiddleLeftWindow) {
+            HouseLeftWindowMesh = mesh;
+            houseLeftWindowColor = color;
+        }
+        if (name === componentNames.MiddleRightWindow) {
+            houseRightWindowMesh = mesh;
+            houseRightWindowColor = color;
+        }
+        if (name === componentNames.MiddleWest) {
+            houseLeftMesh = mesh;
+            houseLeftColor = color;
+        }
+        if (name === componentNames.MiddleEast) {
+            houseRightMesh = mesh;
+            houseRightColor = color;
+        }
+    };
+
+    /// 构造房屋面
+    // @param {object} container 父容器
+    // @param {Array} vertices 顶点集
+    // @param {Array} indices 索引集
+    // @param {Number} color 颜色
+    // @returns
+    var createMesh = function (container, vertices, indices, color, name) {
+
+        var geometry = new THREE.Geometry();
+        var vertex;
+        var face;
+        var offset = 0;
+        var len = vertices.length;
+
+        while (offset < len) {
+
+            vertex = new THREE.Vector3();
+            vertex = vertices[offset++];
+            geometry.vertices.push(vertex);
+        }
+
+        offset = 0;
+        len = indices.length;
+
+        while (offset < len) {
+
+            face = new THREE.Face3();
+            face.a = indices[offset++];
+            face.b = indices[offset++];
+            face.c = indices[offset++];
+
+            geometry.faces.push(face);
+        }
+
+        var material = new THREE.MeshBasicMaterial({color: color/*, side: THREE.DoubleSide*/});
+        var mesh = new THREE.Mesh(geometry, material);
+        mesh.name = name;
+
+        // 保持需要特殊处理的mesh
+        holdSpecialMesh(name, mesh, color);
+
+        container.add(mesh);
+    };
+
+    // 构造房屋
+    var createHouse = function () {
 
         // ----------- 房屋 ----------- //
         // 房屋颜色
@@ -6802,6 +6939,514 @@ CLOUD.ViewHouse.prototype = {
         var houseHalfHeight = houseHeight / 2; // 房屋半高
         var houseCornerWidth = 9.0;// 房屋角落宽度
 
+        halfHeight = houseHalfHeight; // 保持半高
+        halfWidth = houseWallWidth / 2;
+
+        // 房子坐北朝南(门在南)，相机从南往北看
+        // 以向上为Z轴正方向，North为Y轴正方向，East为X轴正方向建立模型：房子前墙在Y负方向，后墙在Y正方向。
+        // -----------------------------------
+        //                  N (Y 正)
+        //                   ^
+        //                  |
+        //     W  < ------- |------- >  E （X 正）
+        //                  |
+        //                  v
+        //                S
+        // -----------------------------------
+
+
+        // 以中心点为基准
+        var wallFarOffsetX = houseWallLength / 2.0;
+        var wallNearOffsetX = houseWallLength / 2.0 - houseCornerWidth;
+        var wallFarOffsetY = houseWallWidth / 2.0;
+        var wallNearOffsetY = houseWallWidth / 2.0 - houseCornerWidth;
+
+        // ------ House Bottom ------ //
+        var bottomNearOffsetZ = houseHalfHeight - houseCornerWidth;
+        var bottomFarOffsetZ = houseHalfHeight;
+
+        // 1-1. South (Front)
+        var sillBottomNearOffsetX = houseSillBottomWidth / 2.0;
+        var sillBottomFarOffsetY = houseWallWidth / 2.0 + houseSillBottomDepth + 0.01;
+        var sillBottomNearOffsetY = houseWallWidth / 2.0 + 0.01;
+        var sillBottomNearOffsetZ = houseHalfHeight - houseSillHeight;
+        var sillBottomFarOffsetZ = houseHalfHeight;
+
+        var sillTopNearOffsetX = houseSillTopWidth / 2.0;
+        var sillTopFarOffsetY = houseWallWidth / 2.0 + houseSillTopDepth + 0.01;
+        var sillTopNearOffsetY = houseWallWidth / 2.0 + 0.01;
+        var sillTopNearOffsetZ = houseHalfHeight - houseSillHeight * 2;
+        var sillTopFarOffsetZ = houseHalfHeight - houseSillHeight;
+
+        var bottomSouthFace = [];
+        // sill bottom
+        bottomSouthFace.push(new THREE.Vector3(-sillBottomNearOffsetX, -sillBottomFarOffsetY, -sillBottomFarOffsetZ));
+        bottomSouthFace.push(new THREE.Vector3(sillBottomNearOffsetX, -sillBottomFarOffsetY, -sillBottomFarOffsetZ));
+        bottomSouthFace.push(new THREE.Vector3(sillBottomNearOffsetX, -sillBottomFarOffsetY, -sillBottomNearOffsetZ));
+        bottomSouthFace.push(new THREE.Vector3(-sillBottomNearOffsetX, -sillBottomFarOffsetY, -sillBottomNearOffsetZ));
+        bottomSouthFace.push(new THREE.Vector3(-sillBottomNearOffsetX, -sillBottomNearOffsetY, -sillBottomFarOffsetZ));
+        bottomSouthFace.push(new THREE.Vector3(sillBottomNearOffsetX, -sillBottomNearOffsetY, -sillBottomFarOffsetZ));
+        bottomSouthFace.push(new THREE.Vector3(sillBottomNearOffsetX, -sillBottomNearOffsetY, -sillBottomNearOffsetZ));
+        bottomSouthFace.push(new THREE.Vector3(-sillBottomNearOffsetX, -sillBottomNearOffsetY, -sillBottomNearOffsetZ));
+        // sill top
+        bottomSouthFace.push(new THREE.Vector3(-sillTopNearOffsetX, -sillTopFarOffsetY, -sillTopFarOffsetZ));
+        bottomSouthFace.push(new THREE.Vector3(sillTopNearOffsetX, -sillTopFarOffsetY, -sillTopFarOffsetZ));
+        bottomSouthFace.push(new THREE.Vector3(sillTopNearOffsetX, -sillTopFarOffsetY, -sillTopNearOffsetZ));
+        bottomSouthFace.push(new THREE.Vector3(-sillTopNearOffsetX, -sillTopFarOffsetY, -sillTopNearOffsetZ));
+        bottomSouthFace.push(new THREE.Vector3(-sillTopNearOffsetX, -sillTopNearOffsetY, -sillTopFarOffsetZ));
+        bottomSouthFace.push(new THREE.Vector3(sillTopNearOffsetX, -sillTopNearOffsetY, -sillTopFarOffsetZ));
+        bottomSouthFace.push(new THREE.Vector3(sillTopNearOffsetX, -sillTopNearOffsetY, -sillTopNearOffsetZ));
+        bottomSouthFace.push(new THREE.Vector3(-sillTopNearOffsetX, -sillTopNearOffsetY, -sillTopNearOffsetZ));
+        var bottomSouthFaceIndex = [
+            4, 5, 6, 6, 7, 4, 5, 1, 2, 2, 6, 5, 0, 4, 7, 7, 3, 0, 7, 6, 2, 2, 3, 7, 0, 1, 5, 5, 4, 0,
+            12, 13, 14, 14, 15, 12, 13, 9, 10, 10, 14, 13, 8, 12, 15, 15, 11, 8, 15, 14, 10, 10, 11, 15, 8, 9, 13, 13, 12, 8];
+        //var bottomSouthFaceWireIndex = [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0];
+
+        // 1-2. South East
+        var bottomSouthEastFace = [];
+        bottomSouthEastFace.push(new THREE.Vector3(wallFarOffsetX, -wallFarOffsetY, -bottomFarOffsetZ));
+        bottomSouthEastFace.push(new THREE.Vector3(wallNearOffsetX, -wallFarOffsetY, -bottomFarOffsetZ));
+        bottomSouthEastFace.push(new THREE.Vector3(wallNearOffsetX, -wallFarOffsetY, -bottomNearOffsetZ));
+        bottomSouthEastFace.push(new THREE.Vector3(wallFarOffsetX, -wallFarOffsetY, -bottomNearOffsetZ));
+        bottomSouthEastFace.push(new THREE.Vector3(wallFarOffsetX, -wallNearOffsetY, -bottomNearOffsetZ));
+        bottomSouthEastFace.push(new THREE.Vector3(wallFarOffsetX, -wallNearOffsetY, -bottomFarOffsetZ));
+        bottomSouthEastFace.push(new THREE.Vector3(wallNearOffsetX, -wallNearOffsetY, -bottomFarOffsetZ));
+        var bottomSouthEastFaceIndex = [0, 3, 2, 2, 1, 0, 3, 0, 5, 5, 4, 3, 0, 1, 6, 6, 5, 0];
+        //var bottomSouthEastFaceWireIndex = [ 0, 1, 2, 3, 4, 5, 6 ];
+
+        // 1-3. East (Right)
+        var bottomEastFace = [];
+        bottomEastFace.push(new THREE.Vector3(wallFarOffsetX, wallNearOffsetY, -bottomFarOffsetZ));
+        bottomEastFace.push(new THREE.Vector3(wallFarOffsetX, wallNearOffsetY, -bottomNearOffsetZ));
+        bottomEastFace.push(new THREE.Vector3(wallFarOffsetX, -wallNearOffsetY, -bottomNearOffsetZ));
+        bottomEastFace.push(new THREE.Vector3(wallFarOffsetX, -wallNearOffsetY, -bottomFarOffsetZ));
+        bottomEastFace.push(new THREE.Vector3(wallNearOffsetX, -wallNearOffsetY, -bottomFarOffsetZ));
+        bottomEastFace.push(new THREE.Vector3(wallNearOffsetX, wallNearOffsetY, -bottomFarOffsetZ));
+        var bottomEastFaceIndex = [0, 1, 2, 2, 3, 0, 3, 4, 5, 5, 0, 3];
+
+        // 1-4. North East
+        var bottomNorthEastFace = [];
+        bottomNorthEastFace.push(new THREE.Vector3(wallFarOffsetX, wallFarOffsetY, -bottomFarOffsetZ));
+        bottomNorthEastFace.push(new THREE.Vector3(wallNearOffsetX, wallFarOffsetY, -bottomFarOffsetZ));
+        bottomNorthEastFace.push(new THREE.Vector3(wallNearOffsetX, wallFarOffsetY, -bottomNearOffsetZ));
+        bottomNorthEastFace.push(new THREE.Vector3(wallFarOffsetX, wallFarOffsetY, -bottomNearOffsetZ));
+        bottomNorthEastFace.push(new THREE.Vector3(wallFarOffsetX, wallNearOffsetY, -bottomNearOffsetZ));
+        bottomNorthEastFace.push(new THREE.Vector3(wallFarOffsetX, wallNearOffsetY, -bottomFarOffsetZ));
+        bottomNorthEastFace.push(new THREE.Vector3(wallNearOffsetX, wallNearOffsetY, -bottomFarOffsetZ));
+        var bottomNorthEastFaceIndex = [0, 1, 2, 2, 3, 0, 3, 4, 5, 5, 0, 3, 0, 5, 6, 6, 1, 0];
+
+        // 1-5. North (Back)
+        var bottomNorthFace = [];
+        bottomNorthFace.push(new THREE.Vector3(-wallNearOffsetX, wallFarOffsetY, -bottomFarOffsetZ));
+        bottomNorthFace.push(new THREE.Vector3(-wallNearOffsetX, wallFarOffsetY, -bottomNearOffsetZ));
+        bottomNorthFace.push(new THREE.Vector3(wallNearOffsetX, wallFarOffsetY, -bottomNearOffsetZ));
+        bottomNorthFace.push(new THREE.Vector3(wallNearOffsetX, wallFarOffsetY, -bottomFarOffsetZ));
+        bottomNorthFace.push(new THREE.Vector3(wallNearOffsetX, wallNearOffsetY, -bottomFarOffsetZ));
+        bottomNorthFace.push(new THREE.Vector3(-wallNearOffsetX, wallNearOffsetY, -bottomFarOffsetZ));
+        var bottomNorthFaceIndex = [0, 1, 2, 2, 3, 0, 3, 4, 5, 5, 0, 3];
+
+        // 1-6. North West
+        var bottomNorthWestFace = [];
+        bottomNorthWestFace.push(new THREE.Vector3(-wallFarOffsetX, wallFarOffsetY, -bottomFarOffsetZ));
+        bottomNorthWestFace.push(new THREE.Vector3(-wallNearOffsetX, wallFarOffsetY, -bottomFarOffsetZ));
+        bottomNorthWestFace.push(new THREE.Vector3(-wallNearOffsetX, wallFarOffsetY, -bottomNearOffsetZ));
+        bottomNorthWestFace.push(new THREE.Vector3(-wallFarOffsetX, wallFarOffsetY, -bottomNearOffsetZ));
+        bottomNorthWestFace.push(new THREE.Vector3(-wallFarOffsetX, wallNearOffsetY, -bottomNearOffsetZ));
+        bottomNorthWestFace.push(new THREE.Vector3(-wallFarOffsetX, wallNearOffsetY, -bottomFarOffsetZ));
+        bottomNorthWestFace.push(new THREE.Vector3(-wallNearOffsetX, wallNearOffsetY, -bottomFarOffsetZ));
+        var bottomNorthWestFaceIndex = [0, 3, 2, 2, 1, 0, 3, 0, 5, 5, 4, 3, 0, 1, 6, 6, 5, 0];
+
+        // 1-7. West (Left)
+        var bottomWestFace = [];
+        bottomWestFace.push(new THREE.Vector3(-wallFarOffsetX, wallNearOffsetY, -bottomFarOffsetZ));
+        bottomWestFace.push(new THREE.Vector3(-wallFarOffsetX, wallNearOffsetY, -bottomNearOffsetZ));
+        bottomWestFace.push(new THREE.Vector3(-wallFarOffsetX, -wallNearOffsetY, -bottomNearOffsetZ));
+        bottomWestFace.push(new THREE.Vector3(-wallFarOffsetX, -wallNearOffsetY, -bottomFarOffsetZ));
+        bottomWestFace.push(new THREE.Vector3(-wallNearOffsetX, -wallNearOffsetY, -bottomFarOffsetZ));
+        bottomWestFace.push(new THREE.Vector3(-wallNearOffsetX, wallNearOffsetY, -bottomFarOffsetZ));
+        var bottomWestFaceIndex = [0, 3, 2, 2, 1, 0, 3, 0, 5, 5, 4, 3];
+
+        // 1-8. South West
+        var bottomSouthWestFace = [];
+        bottomSouthWestFace.push(new THREE.Vector3(-wallFarOffsetX, -wallFarOffsetY, -bottomFarOffsetZ));
+        bottomSouthWestFace.push(new THREE.Vector3(-wallNearOffsetX, -wallFarOffsetY, -bottomFarOffsetZ));
+        bottomSouthWestFace.push(new THREE.Vector3(-wallNearOffsetX, -wallFarOffsetY, -bottomNearOffsetZ));
+        bottomSouthWestFace.push(new THREE.Vector3(-wallFarOffsetX, -wallFarOffsetY, -bottomNearOffsetZ));
+        bottomSouthWestFace.push(new THREE.Vector3(-wallFarOffsetX, -wallNearOffsetY, -bottomNearOffsetZ));
+        bottomSouthWestFace.push(new THREE.Vector3(-wallFarOffsetX, -wallNearOffsetY, -bottomFarOffsetZ));
+        bottomSouthWestFace.push(new THREE.Vector3(-wallNearOffsetX, -wallNearOffsetY, -bottomFarOffsetZ));
+        var bottomSouthWestFaceIndex = [0, 1, 2, 2, 3, 0, 3, 4, 5, 5, 0, 3, 0, 5, 6, 6, 1, 0];
+
+        // 1-9. Floor
+        var bottomFloorFace = [];
+        bottomFloorFace.push(new THREE.Vector3(-wallNearOffsetX, -wallFarOffsetY, -bottomFarOffsetZ));
+        bottomFloorFace.push(new THREE.Vector3(-wallNearOffsetX, wallNearOffsetY, -bottomFarOffsetZ));
+        bottomFloorFace.push(new THREE.Vector3(wallNearOffsetX, wallNearOffsetY, -bottomFarOffsetZ));
+        bottomFloorFace.push(new THREE.Vector3(wallNearOffsetX, -wallFarOffsetY, -bottomFarOffsetZ));
+        var bottomFloorFaceIndex = [0, 1, 2, 2, 3, 0];
+
+        // ----- House Middle -----
+        var middleFarOffsetZ = houseHalfHeight - houseCornerWidth;
+        var middleNearOffsetZ = houseWallHeight - houseHalfHeight;
+
+        // 2-1. South (Front)
+        var middleSouthFace = [];
+        middleSouthFace.push(new THREE.Vector3(-wallNearOffsetX, -wallFarOffsetY, -bottomFarOffsetZ));
+        middleSouthFace.push(new THREE.Vector3(wallNearOffsetX, -wallFarOffsetY, -bottomFarOffsetZ));
+        middleSouthFace.push(new THREE.Vector3(wallNearOffsetX, -wallFarOffsetY, middleNearOffsetZ));
+        middleSouthFace.push(new THREE.Vector3(-wallNearOffsetX, -wallFarOffsetY, middleNearOffsetZ));
+        var middleSouthFaceIndex = [0, 1, 2, 2, 3, 0];
+
+        // 2-2. South East
+        var middleSouthEastFace = [];
+        middleSouthEastFace.push(new THREE.Vector3(wallNearOffsetX, -wallFarOffsetY, -middleFarOffsetZ));
+        middleSouthEastFace.push(new THREE.Vector3(wallNearOffsetX, -wallFarOffsetY, middleNearOffsetZ));
+        middleSouthEastFace.push(new THREE.Vector3(wallFarOffsetX, -wallFarOffsetY, middleNearOffsetZ));
+        middleSouthEastFace.push(new THREE.Vector3(wallFarOffsetX, -wallFarOffsetY, -middleFarOffsetZ));
+        middleSouthEastFace.push(new THREE.Vector3(wallFarOffsetX, -wallNearOffsetY, -middleFarOffsetZ));
+        middleSouthEastFace.push(new THREE.Vector3(wallFarOffsetX, -wallNearOffsetY, middleNearOffsetZ));
+        var middleSouthEastFaceIndex = [0, 3, 2, 2, 1, 0, 3, 4, 5, 5, 2, 3];
+
+        // 2-3. East (Right)
+        // Wall
+        var middleEastFace = [];
+        middleEastFace.push(new THREE.Vector3(wallFarOffsetX, -wallNearOffsetY, -middleFarOffsetZ));
+        middleEastFace.push(new THREE.Vector3(wallFarOffsetX, wallNearOffsetY, -middleFarOffsetZ));
+        middleEastFace.push(new THREE.Vector3(wallFarOffsetX, wallNearOffsetY, middleNearOffsetZ));
+        middleEastFace.push(new THREE.Vector3(wallFarOffsetX, -wallNearOffsetY, middleNearOffsetZ));
+        var middleEastFaceIndex = [0, 1, 2, 2, 3, 0];
+
+        // 2-4. North East
+        var middleNorthEastFace = [];
+        middleNorthEastFace.push(new THREE.Vector3(wallNearOffsetX, wallFarOffsetY, -middleFarOffsetZ));
+        middleNorthEastFace.push(new THREE.Vector3(wallNearOffsetX, wallFarOffsetY, middleNearOffsetZ));
+        middleNorthEastFace.push(new THREE.Vector3(wallFarOffsetX, wallFarOffsetY, middleNearOffsetZ));
+        middleNorthEastFace.push(new THREE.Vector3(wallFarOffsetX, wallFarOffsetY, -middleFarOffsetZ));
+        middleNorthEastFace.push(new THREE.Vector3(wallFarOffsetX, wallNearOffsetY, -middleFarOffsetZ));
+        middleNorthEastFace.push(new THREE.Vector3(wallFarOffsetX, wallNearOffsetY, middleNearOffsetZ));
+        var middleNorthEastFaceIndex = [0, 1, 2, 2, 3, 0, 3, 2, 5, 5, 4, 3];
+
+        // 2-5. North (Back)
+        var middleNorthFace = [];
+        middleNorthFace.push(new THREE.Vector3(-wallNearOffsetX, wallFarOffsetY, -middleFarOffsetZ));
+        middleNorthFace.push(new THREE.Vector3(wallNearOffsetX, wallFarOffsetY, -middleFarOffsetZ));
+        middleNorthFace.push(new THREE.Vector3(wallNearOffsetX, wallFarOffsetY, middleNearOffsetZ));
+        middleNorthFace.push(new THREE.Vector3(-wallNearOffsetX, wallFarOffsetY, middleNearOffsetZ));
+        var middleNorthFaceIndex = [0, 3, 2, 2, 1, 0];
+
+        // 2-6. North West
+        var middleNorthWestFace = [];
+        middleNorthWestFace.push(new THREE.Vector3(-wallNearOffsetX, wallFarOffsetY, -middleFarOffsetZ));
+        middleNorthWestFace.push(new THREE.Vector3(-wallNearOffsetX, wallFarOffsetY, middleNearOffsetZ));
+        middleNorthWestFace.push(new THREE.Vector3(-wallFarOffsetX, wallFarOffsetY, middleNearOffsetZ));
+        middleNorthWestFace.push(new THREE.Vector3(-wallFarOffsetX, wallFarOffsetY, -middleFarOffsetZ));
+        middleNorthWestFace.push(new THREE.Vector3(-wallFarOffsetX, wallNearOffsetY, -middleFarOffsetZ));
+        middleNorthWestFace.push(new THREE.Vector3(-wallFarOffsetX, wallNearOffsetY, middleNearOffsetZ));
+        var middleNorthWestFaceIndex = [0, 3, 2, 2, 1, 0, 3, 4, 5, 5, 2, 3];
+
+        // 2-7. West (Left)
+        // Wall
+        var middleWestFace = [];
+        middleWestFace.push(new THREE.Vector3(-wallFarOffsetX, -wallNearOffsetY, -middleFarOffsetZ));
+        middleWestFace.push(new THREE.Vector3(-wallFarOffsetX, wallNearOffsetY, -middleFarOffsetZ));
+        middleWestFace.push(new THREE.Vector3(-wallFarOffsetX, wallNearOffsetY, middleNearOffsetZ));
+        middleWestFace.push(new THREE.Vector3(-wallFarOffsetX, -wallNearOffsetY, middleNearOffsetZ));
+        var middleWestFaceIndex = [0, 3, 2, 2, 1, 0];
+
+        // 2-8. South West
+        var middleSouthWestFace = [];
+        middleSouthWestFace.push(new THREE.Vector3(-wallNearOffsetX, -wallFarOffsetY, -middleFarOffsetZ));
+        middleSouthWestFace.push(new THREE.Vector3(-wallNearOffsetX, -wallFarOffsetY, middleNearOffsetZ));
+        middleSouthWestFace.push(new THREE.Vector3(-wallFarOffsetX, -wallFarOffsetY, middleNearOffsetZ));
+        middleSouthWestFace.push(new THREE.Vector3(-wallFarOffsetX, -wallFarOffsetY, -middleFarOffsetZ));
+        middleSouthWestFace.push(new THREE.Vector3(-wallFarOffsetX, -wallNearOffsetY, -middleFarOffsetZ));
+        middleSouthWestFace.push(new THREE.Vector3(-wallFarOffsetX, -wallNearOffsetY, middleNearOffsetZ));
+        var middleSouthWestFaceIndex = [0, 1, 2, 2, 3, 0, 3, 2, 5, 5, 4, 3];
+
+        // Door
+        var doorFarOffsetX = houseDoorWidth / 2.0;
+        var doorFarOffsetY = wallFarOffsetY + 0.01;
+        var doorNearOffsetZ = houseSillHeight * 2 + houseDoorHeight - houseHalfHeight;
+        var doorFarOffsetZ = houseHalfHeight - houseSillHeight * 2;
+        var middleDoorFace = [];
+        middleDoorFace.push(new THREE.Vector3(-doorFarOffsetX, -doorFarOffsetY, -doorFarOffsetZ));
+        middleDoorFace.push(new THREE.Vector3(doorFarOffsetX, -doorFarOffsetY, -doorFarOffsetZ));
+        middleDoorFace.push(new THREE.Vector3(doorFarOffsetX, -doorFarOffsetY, doorNearOffsetZ));
+        middleDoorFace.push(new THREE.Vector3(-doorFarOffsetX, -doorFarOffsetY, doorNearOffsetZ));
+        var middleDoorFaceIndex = [0, 1, 2, 2, 3, 0];
+
+        // Right Window
+        var windowFarOffsetX = wallFarOffsetX + 0.01;
+        var windowFarOffsetY = houseWindowWidth / 2.0;
+        var windowFarOffsetZ = houseSillHeight * 2 + houseDoorHeight - houseHalfHeight;
+        var windowNearOffsetZ = houseSillHeight * 2 + houseDoorHeight - houseWindowWidth - houseHalfHeight;
+        var middleRightWindowFace = [];
+        middleRightWindowFace.push(new THREE.Vector3(windowFarOffsetX, -windowFarOffsetY, windowNearOffsetZ));
+        middleRightWindowFace.push(new THREE.Vector3(windowFarOffsetX, windowFarOffsetY, windowNearOffsetZ));
+        middleRightWindowFace.push(new THREE.Vector3(windowFarOffsetX, windowFarOffsetY, windowFarOffsetZ));
+        middleRightWindowFace.push(new THREE.Vector3(windowFarOffsetX, -windowFarOffsetY, windowFarOffsetZ));
+        var middleRightWindowFaceIndex = [0, 1, 2, 2, 3, 0];
+
+        // Left Window
+        var middleLeftWindowFace = [];
+        middleLeftWindowFace.push(new THREE.Vector3(-windowFarOffsetX, -windowFarOffsetY, windowNearOffsetZ));
+        middleLeftWindowFace.push(new THREE.Vector3(-windowFarOffsetX, windowFarOffsetY, windowNearOffsetZ));
+        middleLeftWindowFace.push(new THREE.Vector3(-windowFarOffsetX, windowFarOffsetY, windowFarOffsetZ));
+        middleLeftWindowFace.push(new THREE.Vector3(-windowFarOffsetX, -windowFarOffsetY, windowFarOffsetZ));
+        var middleLeftWindowFaceIndex = [0, 3, 2, 2, 1, 0];
+
+        // ----- House Roof -----
+        var roofBottomFarOffsetX = houseRoofBottomLength / 2.0;
+        var roofBottomNearOffsetX = houseRoofBottomLength / 2.0 - houseCornerWidth;
+        var roofBottomFarOffsetY = houseRoofBottomWidth / 2.0;
+        var roofBottomNearOffsetY = houseRoofBottomWidth / 2.0 - houseCornerWidth;
+
+        var roofTopFarOffsetX = houseRoofTopLength / 2.0;
+        var roofTopNearOffsetX = houseRoofTopLength / 2.0 - houseCornerWidth;
+        var roofTopFarOffsetY = houseRoofTopWidth / 2.0;
+        var roofTopNearOffsetY = houseRoofTopWidth / 2.0 - houseCornerWidth;
+
+        var roofFarOffsetZ = houseHalfHeight;
+        var roofNearOffsetZ = houseWallHeight - houseHalfHeight;
+
+        // 3-1. South (Front)
+        var roofSouthFace = [];
+        roofSouthFace.push(new THREE.Vector3(-roofBottomNearOffsetX, -roofBottomFarOffsetY, roofNearOffsetZ));
+        roofSouthFace.push(new THREE.Vector3(roofBottomNearOffsetX, -roofBottomFarOffsetY, roofNearOffsetZ));
+        roofSouthFace.push(new THREE.Vector3(roofTopNearOffsetX, -roofTopFarOffsetY, roofFarOffsetZ));
+        roofSouthFace.push(new THREE.Vector3(-roofTopNearOffsetX, -roofTopFarOffsetY, roofFarOffsetZ));
+        roofSouthFace.push(new THREE.Vector3(-roofTopNearOffsetX, -roofTopNearOffsetY, roofFarOffsetZ));
+        roofSouthFace.push(new THREE.Vector3(roofTopNearOffsetX, -roofTopNearOffsetY, roofFarOffsetZ));
+        var roofSouthFaceIndex = [0, 1, 2, 0, 2, 3, 4, 3, 2, 4, 2, 5];
+
+        // 3-2. South East
+        var roofSouthEastFace = [];
+        roofSouthEastFace.push(new THREE.Vector3(roofTopFarOffsetX, -roofTopFarOffsetY, roofFarOffsetZ));
+        roofSouthEastFace.push(new THREE.Vector3(roofTopFarOffsetX, -roofTopNearOffsetY, roofFarOffsetZ));
+        roofSouthEastFace.push(new THREE.Vector3(roofTopNearOffsetX, -roofTopNearOffsetY, roofFarOffsetZ));
+        roofSouthEastFace.push(new THREE.Vector3(roofTopNearOffsetX, -roofTopFarOffsetY, roofFarOffsetZ));
+        roofSouthEastFace.push(new THREE.Vector3(roofBottomNearOffsetX, -roofBottomFarOffsetY, roofNearOffsetZ));
+        roofSouthEastFace.push(new THREE.Vector3(roofBottomFarOffsetX, -roofBottomFarOffsetY, roofNearOffsetZ));
+        roofSouthEastFace.push(new THREE.Vector3(roofBottomFarOffsetX, -roofBottomNearOffsetY, roofNearOffsetZ));
+        var roofSouthEastFaceIndex = [0, 1, 2, 2, 3, 0, 3, 4, 5, 5, 0, 3, 0, 5, 6, 6, 1, 0];
+
+        // 3-3. East (Right)
+        var roofEastFace = [];
+        roofEastFace.push(new THREE.Vector3(roofBottomFarOffsetX, -roofBottomNearOffsetY, roofNearOffsetZ));
+        roofEastFace.push(new THREE.Vector3(roofBottomFarOffsetX, roofBottomNearOffsetY, roofNearOffsetZ));
+        roofEastFace.push(new THREE.Vector3(roofTopFarOffsetX, roofTopNearOffsetY, roofFarOffsetZ));
+        roofEastFace.push(new THREE.Vector3(roofTopFarOffsetX, -roofTopNearOffsetY, roofFarOffsetZ));
+        roofEastFace.push(new THREE.Vector3(roofTopFarOffsetX - houseCornerWidth, -roofTopNearOffsetY, roofFarOffsetZ));
+        roofEastFace.push(new THREE.Vector3(roofTopFarOffsetX - houseCornerWidth, roofTopNearOffsetY, roofFarOffsetZ));
+        var roofEastFaceIndex = [0, 1, 2, 0, 2, 3, 4, 3, 2, 4, 2, 5];
+
+        // 3-4. North East
+        var roofNorthEastFace = [];
+        roofNorthEastFace.push(new THREE.Vector3(roofTopFarOffsetX, roofTopFarOffsetY, roofFarOffsetZ));
+        roofNorthEastFace.push(new THREE.Vector3(roofTopFarOffsetX, roofTopNearOffsetY, roofFarOffsetZ));
+        roofNorthEastFace.push(new THREE.Vector3(roofTopNearOffsetX, roofTopNearOffsetY, roofFarOffsetZ));
+        roofNorthEastFace.push(new THREE.Vector3(roofTopNearOffsetX, roofTopFarOffsetY, roofFarOffsetZ));
+        roofNorthEastFace.push(new THREE.Vector3(roofBottomNearOffsetX, roofBottomFarOffsetY, roofNearOffsetZ));
+        roofNorthEastFace.push(new THREE.Vector3(roofBottomFarOffsetX, roofBottomFarOffsetY, roofNearOffsetZ));
+        roofNorthEastFace.push(new THREE.Vector3(roofBottomFarOffsetX, roofBottomNearOffsetY, roofNearOffsetZ));
+        var roofNorthEastFaceIndex = [0, 3, 2, 2, 1, 0, 3, 0, 5, 5, 4, 3, 0, 1, 6, 6, 5, 0];
+
+        // 3-5. North (Back)
+        var roofNorthFace = [];
+        roofNorthFace.push(new THREE.Vector3(roofBottomNearOffsetX, roofBottomFarOffsetY, roofNearOffsetZ));
+        roofNorthFace.push(new THREE.Vector3(-roofBottomNearOffsetX, roofBottomFarOffsetY, roofNearOffsetZ));
+        roofNorthFace.push(new THREE.Vector3(-roofTopNearOffsetX, roofTopFarOffsetY, roofFarOffsetZ));
+        roofNorthFace.push(new THREE.Vector3(roofTopNearOffsetX, roofTopFarOffsetY, roofFarOffsetZ));
+        roofNorthFace.push(new THREE.Vector3(roofTopNearOffsetX, roofTopNearOffsetY, roofFarOffsetZ));
+        roofNorthFace.push(new THREE.Vector3(-roofTopNearOffsetX, roofTopNearOffsetY, roofFarOffsetZ));
+        var roofNorthFaceIndex = [0, 1, 2, 0, 2, 3, 4, 3, 2, 4, 2, 5];
+
+        // 3-6. North West
+        var roofNorthWestFace = [];
+        roofNorthWestFace.push(new THREE.Vector3(-roofTopFarOffsetX, roofTopFarOffsetY, roofFarOffsetZ));
+        roofNorthWestFace.push(new THREE.Vector3(-roofTopFarOffsetX, roofTopNearOffsetY, roofFarOffsetZ));
+        roofNorthWestFace.push(new THREE.Vector3(-roofTopNearOffsetX, roofTopNearOffsetY, roofFarOffsetZ));
+        roofNorthWestFace.push(new THREE.Vector3(-roofTopNearOffsetX, roofTopFarOffsetY, roofFarOffsetZ));
+        roofNorthWestFace.push(new THREE.Vector3(-roofBottomNearOffsetX, roofBottomFarOffsetY, roofNearOffsetZ));
+        roofNorthWestFace.push(new THREE.Vector3(-roofBottomFarOffsetX, roofBottomFarOffsetY, roofNearOffsetZ));
+        roofNorthWestFace.push(new THREE.Vector3(-roofBottomFarOffsetX, roofBottomNearOffsetY, roofNearOffsetZ));
+        var roofNorthWestFaceIndex = [0, 1, 2, 2, 3, 0, 3, 4, 5, 5, 0, 3, 0, 5, 6, 6, 1, 0];
+
+        // 3-7. West (Left)
+        var roofWestFace = [];
+        roofWestFace.push(new THREE.Vector3(-roofBottomFarOffsetX, roofBottomNearOffsetY, roofNearOffsetZ));
+        roofWestFace.push(new THREE.Vector3(-roofBottomFarOffsetX, -roofBottomNearOffsetY, roofNearOffsetZ));
+        roofWestFace.push(new THREE.Vector3(-roofTopFarOffsetX, -roofTopNearOffsetY, roofFarOffsetZ));
+        roofWestFace.push(new THREE.Vector3(-roofTopFarOffsetX, roofTopNearOffsetY, roofFarOffsetZ));
+        roofWestFace.push(new THREE.Vector3(-roofTopNearOffsetX, roofTopNearOffsetY, roofFarOffsetZ));
+        roofWestFace.push(new THREE.Vector3(-roofTopNearOffsetX, -roofTopNearOffsetY, roofFarOffsetZ));
+        var roofWestFaceIndex = [0, 1, 2, 0, 2, 3, 4, 3, 2, 4, 2, 5];
+
+        // 3-8. South West
+        var roofSouthWestFace = [];
+        roofSouthWestFace.push(new THREE.Vector3(-roofTopFarOffsetX, -roofTopFarOffsetY, roofFarOffsetZ));
+        roofSouthWestFace.push(new THREE.Vector3(-roofTopFarOffsetX, -roofTopNearOffsetY, roofFarOffsetZ));
+        roofSouthWestFace.push(new THREE.Vector3(-roofTopNearOffsetX, -roofTopNearOffsetY, roofFarOffsetZ));
+        roofSouthWestFace.push(new THREE.Vector3(-roofTopNearOffsetX, -roofTopFarOffsetY, roofFarOffsetZ));
+        roofSouthWestFace.push(new THREE.Vector3(-roofBottomNearOffsetX, -roofBottomFarOffsetY, roofNearOffsetZ));
+        roofSouthWestFace.push(new THREE.Vector3(-roofBottomFarOffsetX, -roofBottomFarOffsetY, roofNearOffsetZ));
+        roofSouthWestFace.push(new THREE.Vector3(-roofBottomFarOffsetX, -roofBottomNearOffsetY, roofNearOffsetZ));
+        var roofSouthWestFaceIndex = [0, 3, 2, 2, 1, 0, 3, 0, 5, 5, 4, 3, 0, 1, 6, 6, 5, 0];
+
+        // 3-9. Roof Top
+        // Center
+        var roofCenterFace = [];
+        roofCenterFace.push(new THREE.Vector3(roofTopNearOffsetX, -roofTopNearOffsetY, roofFarOffsetZ));
+        roofCenterFace.push(new THREE.Vector3(-roofTopNearOffsetX, -roofTopNearOffsetY, roofFarOffsetZ));
+        roofCenterFace.push(new THREE.Vector3(-roofTopNearOffsetX, roofTopNearOffsetY, roofFarOffsetZ));
+        roofCenterFace.push(new THREE.Vector3(roofTopNearOffsetX, roofTopNearOffsetY, roofFarOffsetZ));
+        var roofCenterFaceIndex = [0, 2, 1, 0, 3, 2];
+
+        // Eaves bottom
+        var roofEavesFace = [];
+        roofEavesFace.push(new THREE.Vector3(roofBottomFarOffsetX, roofBottomFarOffsetY, roofNearOffsetZ));
+        roofEavesFace.push(new THREE.Vector3(-roofBottomFarOffsetX, roofBottomFarOffsetY, roofNearOffsetZ));
+        roofEavesFace.push(new THREE.Vector3(-roofBottomFarOffsetX, -roofBottomFarOffsetY, roofNearOffsetZ));
+        roofEavesFace.push(new THREE.Vector3(roofBottomFarOffsetX, -roofBottomFarOffsetY, roofNearOffsetZ));
+        roofEavesFace.push(new THREE.Vector3(wallFarOffsetX, wallFarOffsetY, roofNearOffsetZ));
+        roofEavesFace.push(new THREE.Vector3(-wallFarOffsetX, wallFarOffsetY, roofNearOffsetZ));
+        roofEavesFace.push(new THREE.Vector3(-wallFarOffsetX, -wallFarOffsetY, roofNearOffsetZ));
+        roofEavesFace.push(new THREE.Vector3(wallFarOffsetX, -wallFarOffsetY, roofNearOffsetZ));
+        var roofEavesFaceIndex = [0, 4, 5, 5, 1, 0, 1, 5, 6, 6, 2, 1, 2, 6, 7, 7, 3, 2, 3, 7, 4, 4, 0, 3];
+
+        var verticesList = [
+            bottomSouthFace, bottomSouthEastFace, bottomEastFace, bottomNorthEastFace,
+            bottomNorthFace, bottomNorthWestFace, bottomWestFace, bottomSouthWestFace,
+            bottomFloorFace,
+            middleSouthFace, middleSouthEastFace, middleEastFace, middleNorthEastFace,
+            middleNorthFace, middleNorthWestFace, middleWestFace, middleSouthWestFace,
+            middleDoorFace, middleRightWindowFace, middleLeftWindowFace,
+            roofSouthFace, roofSouthEastFace, roofEastFace, roofNorthEastFace,
+            roofNorthFace, roofNorthWestFace, roofWestFace, roofSouthWestFace,
+            roofCenterFace, roofEavesFace
+        ];
+
+        var indicesList = [
+            bottomSouthFaceIndex, bottomSouthEastFaceIndex, bottomEastFaceIndex, bottomNorthEastFaceIndex,
+            bottomNorthFaceIndex, bottomNorthWestFaceIndex, bottomWestFaceIndex, bottomSouthWestFaceIndex,
+            bottomFloorFaceIndex,
+            middleSouthFaceIndex, middleSouthEastFaceIndex, middleEastFaceIndex, middleNorthEastFaceIndex,
+            middleNorthFaceIndex, middleNorthWestFaceIndex, middleWestFaceIndex, middleSouthWestFaceIndex,
+            middleDoorFaceIndex, middleRightWindowFaceIndex, middleLeftWindowFaceIndex,
+            roofSouthFaceIndex, roofSouthEastFaceIndex, roofEastFaceIndex, roofNorthEastFaceIndex,
+            roofNorthFaceIndex, roofNorthWestFaceIndex, roofWestFaceIndex, roofSouthWestFaceIndex,
+            roofCenterFaceIndex, roofEavesFaceIndex
+        ];
+
+        var namesList = [
+            componentNames.BottomSouth, componentNames.BottomSouthEast, componentNames.BottomEast, componentNames.BottomNorthEast,
+            componentNames.BottomNorth, componentNames.BottomNorthWest, componentNames.BottomWest, componentNames.BottomSouthWest,
+            componentNames.BottomFloor,
+            componentNames.MiddleSouth, componentNames.MiddleSouthEast, componentNames.MiddleEast, componentNames.MiddleNorthEast,
+            componentNames.MiddleNorth, componentNames.MiddleNorthWest, componentNames.MiddleWest, componentNames.MiddleSouthWest,
+            componentNames.MiddleDoor, componentNames.MiddleRightWindow, componentNames.MiddleLeftWindow,
+            componentNames.RoofSouth, componentNames.RoofSouthEast, componentNames.RoofEast, componentNames.RoofNorthEast,
+            componentNames.RoofNorth, componentNames.RoofNorthWest, componentNames.RoofWest, componentNames.RoofSouthWest,
+            componentNames.RoofCenter, componentNames.RoofEaves
+        ];
+
+        var colors = [
+            houseDoorRoofColor, houseWallColor, houseWallColor, houseWallColor,
+            houseWallColor, houseWallColor, houseWallColor, houseWallColor,
+            houseWallColor,
+            houseWallColor, houseWallColor, houseWallColor, houseWallColor,
+            houseWallColor, houseWallColor, houseWallColor, houseWallColor,
+            houseDoorRoofColor, houseDoorRoofColor, houseDoorRoofColor,
+            houseDoorRoofColor, houseDoorRoofColor, houseDoorRoofColor, houseDoorRoofColor,
+            houseDoorRoofColor, houseDoorRoofColor, houseDoorRoofColor, houseDoorRoofColor,
+            houseWallColor, houseWallColor
+        ];
+
+        for (var i = 0; i < verticesList.length; ++i) {
+            createMesh(groupHouse, verticesList[i], indicesList[i], colors[i], namesList[i]);
+        }
+
+        // --------------------- house wire frame --------------------- //
+        var houseWireVertex = []; // house wire frame
+
+        // floor
+        houseWireVertex.push(new THREE.Vector3(-wallFarOffsetX, -wallFarOffsetY, -bottomFarOffsetZ));
+        houseWireVertex.push(new THREE.Vector3(wallFarOffsetX, -wallFarOffsetY, -bottomFarOffsetZ));
+        houseWireVertex.push(new THREE.Vector3(wallFarOffsetX, wallFarOffsetY, -bottomFarOffsetZ));
+        houseWireVertex.push(new THREE.Vector3(-wallFarOffsetX, wallFarOffsetY, -bottomFarOffsetZ));
+
+        // ceiling
+        houseWireVertex.push(new THREE.Vector3(-wallFarOffsetX, -wallFarOffsetY, roofNearOffsetZ));
+        houseWireVertex.push(new THREE.Vector3(wallFarOffsetX, -wallFarOffsetY, roofNearOffsetZ));
+        houseWireVertex.push(new THREE.Vector3(wallFarOffsetX, wallFarOffsetY, roofNearOffsetZ));
+        houseWireVertex.push(new THREE.Vector3(-wallFarOffsetX, wallFarOffsetY, roofNearOffsetZ));
+
+        // roof bottom
+        houseWireVertex.push(new THREE.Vector3(-roofBottomFarOffsetX, -roofBottomFarOffsetY, roofNearOffsetZ));
+        houseWireVertex.push(new THREE.Vector3(roofBottomFarOffsetX, -roofBottomFarOffsetY, roofNearOffsetZ));
+        houseWireVertex.push(new THREE.Vector3(roofBottomFarOffsetX, roofBottomFarOffsetY, roofNearOffsetZ));
+        houseWireVertex.push(new THREE.Vector3(-roofBottomFarOffsetX, roofBottomFarOffsetY, roofNearOffsetZ));
+
+        // roof top
+        houseWireVertex.push(new THREE.Vector3(-roofTopFarOffsetX, -roofTopFarOffsetY, roofFarOffsetZ));
+        houseWireVertex.push(new THREE.Vector3(roofTopFarOffsetX, -roofTopFarOffsetY, roofFarOffsetZ));
+        houseWireVertex.push(new THREE.Vector3(roofTopFarOffsetX, roofTopFarOffsetY, roofFarOffsetZ));
+        houseWireVertex.push(new THREE.Vector3(-roofTopFarOffsetX, roofTopFarOffsetY, roofFarOffsetZ));
+
+        // sill bottom
+        houseWireVertex.push(new THREE.Vector3(-sillBottomNearOffsetX, -sillBottomFarOffsetY, -sillBottomFarOffsetZ));
+        houseWireVertex.push(new THREE.Vector3(sillBottomNearOffsetX, -sillBottomFarOffsetY, -sillBottomFarOffsetZ));
+        houseWireVertex.push(new THREE.Vector3(sillBottomNearOffsetX, -sillBottomFarOffsetY, -sillBottomNearOffsetZ));
+        houseWireVertex.push(new THREE.Vector3(-sillBottomNearOffsetX, -sillBottomFarOffsetY, -sillBottomNearOffsetZ));
+        houseWireVertex.push(new THREE.Vector3(-sillBottomNearOffsetX, -sillBottomNearOffsetY, -sillBottomFarOffsetZ));
+        houseWireVertex.push(new THREE.Vector3(sillBottomNearOffsetX, -sillBottomNearOffsetY, -sillBottomFarOffsetZ));
+        houseWireVertex.push(new THREE.Vector3(sillBottomNearOffsetX, -sillBottomNearOffsetY, -sillBottomNearOffsetZ));
+        houseWireVertex.push(new THREE.Vector3(-sillBottomNearOffsetX, -sillBottomNearOffsetY, -sillBottomNearOffsetZ));
+        // sill top
+        houseWireVertex.push(new THREE.Vector3(-sillTopNearOffsetX, -sillTopFarOffsetY, -sillTopFarOffsetZ));
+        houseWireVertex.push(new THREE.Vector3(sillTopNearOffsetX, -sillTopFarOffsetY, -sillTopFarOffsetZ));
+        houseWireVertex.push(new THREE.Vector3(sillTopNearOffsetX, -sillTopFarOffsetY, -sillTopNearOffsetZ));
+        houseWireVertex.push(new THREE.Vector3(-sillTopNearOffsetX, -sillTopFarOffsetY, -sillTopNearOffsetZ));
+        houseWireVertex.push(new THREE.Vector3(-sillTopNearOffsetX, -sillTopNearOffsetY, -bottomNearOffsetZ));
+        houseWireVertex.push(new THREE.Vector3(sillTopNearOffsetX, -sillTopNearOffsetY, -bottomNearOffsetZ));
+        houseWireVertex.push(new THREE.Vector3(sillTopNearOffsetX, -sillTopNearOffsetY, -sillTopNearOffsetZ));
+        houseWireVertex.push(new THREE.Vector3(-sillTopNearOffsetX, -sillTopNearOffsetY, -sillTopNearOffsetZ));
+
+        // door
+        houseWireVertex.push(new THREE.Vector3(-doorFarOffsetX, -doorFarOffsetY, -doorFarOffsetZ));
+        houseWireVertex.push(new THREE.Vector3(doorFarOffsetX, -doorFarOffsetY, -doorFarOffsetZ));
+        houseWireVertex.push(new THREE.Vector3(doorFarOffsetX, -doorFarOffsetY, doorNearOffsetZ));
+        houseWireVertex.push(new THREE.Vector3(-doorFarOffsetX, -doorFarOffsetY, doorNearOffsetZ));
+
+        // left window
+        houseWireVertex.push(new THREE.Vector3(-windowFarOffsetX, -windowFarOffsetY, windowNearOffsetZ));
+        houseWireVertex.push(new THREE.Vector3(-windowFarOffsetX, windowFarOffsetY, windowNearOffsetZ));
+        houseWireVertex.push(new THREE.Vector3(-windowFarOffsetX, windowFarOffsetY, windowFarOffsetZ));
+        houseWireVertex.push(new THREE.Vector3(-windowFarOffsetX, -windowFarOffsetY, windowFarOffsetZ));
+        // right window
+        houseWireVertex.push(new THREE.Vector3(windowFarOffsetX, -windowFarOffsetY, windowNearOffsetZ));
+        houseWireVertex.push(new THREE.Vector3(windowFarOffsetX, windowFarOffsetY, windowNearOffsetZ));
+        houseWireVertex.push(new THREE.Vector3(windowFarOffsetX, windowFarOffsetY, windowFarOffsetZ));
+        houseWireVertex.push(new THREE.Vector3(windowFarOffsetX, -windowFarOffsetY, windowFarOffsetZ));
+
+        // 外框
+        var wireFrameIndexList = [
+            [0, 1, 2, 3, 0], [4, 5, 6, 7, 4], [0, 4], [1, 5], [3, 7], [2, 6], [8, 9, 10, 11, 8], [12, 13, 14, 15, 12], [8, 12], [9, 13], [10, 14], [11, 15],
+            [16, 17, 18, 19, 16], [20, 21, 22, 23, 20], [16, 20], [17, 21], [18, 22], [19, 23],
+            [24, 25, 26, 27, 24], [28, 29, 30, 31, 28], [24, 28], [25, 29], [26, 30], [27, 31],
+            [32, 33, 34, 35, 32],
+            [36, 37, 38, 39, 36],
+            [40, 41, 42, 43, 40]
+        ];
+
+        for (var j = 0; j < wireFrameIndexList.length; ++j) {
+            createWireFrame(groupHouse, houseWireVertex, wireFrameIndexList[j], houseWireFrameColor, lineWidth);
+        }
+    };
+
+    // 构造指北针转盘
+    var createCompass = function () {
+
         // ----------- 指北针 ----------- //
         var compassOutsiderRadius = 82; // 指北针圆盘外环
         var compassInsiderRadius = 65; // 指北针圆盘内环
@@ -6810,12 +7455,197 @@ CLOUD.ViewHouse.prototype = {
         var compassColor = 0xdbdbdb; // 指北针圆盘颜色
         var compassFontColor = 0xff0000; // 字体颜色
 
+        // 转盘材质
+        var materialDisc = new THREE.MeshBasicMaterial({color: compassColor, side: THREE.DoubleSide});
+        // N方向材质
+        var materialNorth = new THREE.MeshBasicMaterial({
+            color: compassNorthColor,
+            side: THREE.DoubleSide,
+            depthTest: false
+        });
+        // 字体材质
+        var materialFont = new THREE.MeshBasicMaterial({
+            color: compassFontColor,
+            overdraw: 0.0,
+            side: THREE.DoubleSide,
+            depthTest: false
+        });
+
+        // -------- 三角面 -------- //
+        var triangleShape = new THREE.Shape();
+        triangleShape.moveTo(compassTriangleHeight, 0);
+        triangleShape.lineTo(0, compassTriangleHeight / 2);
+        triangleShape.lineTo(0, -compassTriangleHeight / 2);
+        triangleShape.lineTo(compassTriangleHeight, 0);
+
+        var geometry = new THREE.ShapeGeometry(triangleShape);
+
+        // East
+        var meshE = new THREE.Mesh(geometry, materialDisc);
+        meshE.translateX(compassOutsiderRadius - 2);
+
+        // West
+        var meshW = new THREE.Mesh(geometry, materialDisc);
+        meshW.rotateZ(Math.PI);
+        meshW.translateX(compassOutsiderRadius - 2);
+
+        // North
+        var meshN = new THREE.Mesh(geometry, materialNorth);
+        meshN.rotateZ(Math.PI / 2);
+        meshN.translateX(compassOutsiderRadius - 2);
+
+        // South
+        var meshS = new THREE.Mesh(geometry, materialDisc);
+        meshS.rotateZ(-Math.PI / 2);
+        meshS.translateX(compassOutsiderRadius - 2);
+
+        groupCompass.add(meshE);
+        groupCompass.add(meshW);
+        groupCompass.add(meshN);
+        groupCompass.add(meshS);
+
+        // -------- 文字标注 S -------- //
+        var theTextN = "N";
+        var theTextS = "S";
+        var theTextE = "E";
+        var theTextW = "W";
+        var font_parameters = {
+            size: 12,
+            height: 1,
+            curveSegments: 2,
+            font: "helvetiker"
+        };
+
+        // 文字坐标原点为左下角
+        //     - - - -
+        //   |   A   |
+        //  o - - - -
+        var geoTextN = new THREE.TextGeometry(theTextN, font_parameters);
+        var geoTextS = new THREE.TextGeometry(theTextS, font_parameters);
+        var geoTextE = new THREE.TextGeometry(theTextE, font_parameters);
+        var geoTextW = new THREE.TextGeometry(theTextW, font_parameters);
+
+        // 计算包围框
+        geoTextN.computeBoundingBox();
+        geoTextS.computeBoundingBox();
+        geoTextE.computeBoundingBox();
+        geoTextW.computeBoundingBox();
+
+        var offsetX;
+        var meshTextN, meshTextS, meshTextE, meshTextW;
+
+        offsetX = -0.5 * ( geoTextN.boundingBox.max.x - geoTextN.boundingBox.min.x );
+        meshTextN = new THREE.Mesh(geoTextN, materialFont);
+        meshTextN.translateX(offsetX);
+        meshTextN.translateY(compassOutsiderRadius);
+
+        offsetX = -0.5 * ( geoTextS.boundingBox.max.x - geoTextS.boundingBox.min.x );
+        meshTextS = new THREE.Mesh(geoTextS, materialFont);
+        meshTextS.rotateZ(Math.PI);
+        meshTextS.translateX(offsetX);
+        meshTextS.translateY(compassOutsiderRadius);
+
+        offsetX = -0.5 * ( geoTextE.boundingBox.max.x - geoTextE.boundingBox.min.x );
+        meshTextE = new THREE.Mesh(geoTextE, materialFont);
+        meshTextE.rotateZ(-Math.PI / 2);
+        meshTextE.translateX(offsetX);
+        meshTextE.translateY(compassOutsiderRadius);
+
+        offsetX = -0.5 * ( geoTextE.boundingBox.max.x - geoTextE.boundingBox.min.x );
+        meshTextW = new THREE.Mesh(geoTextW, materialFont);
+        meshTextW.rotateZ(Math.PI / 2);
+        meshTextW.translateX(offsetX);
+        meshTextW.translateY(compassOutsiderRadius);
+
+        groupCompass.add(meshTextN);
+        groupCompass.add(meshTextS);
+        groupCompass.add(meshTextE);
+        groupCompass.add(meshTextW);
+
+        // -------- 文字标注 E -------- //
+
+        // -------- 指北针圆盘 -------- //
+        var discShape = new THREE.RingGeometry(compassInsiderRadius, compassOutsiderRadius, 32, 5, 0, Math.PI * 2);
+        var mesh = new THREE.Mesh(discShape, materialDisc);
+        mesh.name = componentNames.Compass;
+        groupCompass.add(mesh);
+    };
+
+    // 构造控制圆环
+    var createControlRing = function () {
         // ----------- 控制圆环 ----------- //
         var ringColor = 0x99a4b5; // 圆环及圆环控制点颜色
         var ringRadius = 75; // 圆环半径
         var ringPointRadius = 10; // 圆环控制点半径
         var ringWidth = 3; // 圆环宽度
 
+        // 圆环材质
+        var materialRingParameter = {color: ringColor, side: THREE.DoubleSide};
+        var materialPointParameter = {color: ringColor, side: THREE.DoubleSide};
+
+        // -------- 圆环 由4段构成 -------- //
+        var startAngle = Math.asin(ringPointRadius / ringRadius);
+        var endAngle = Math.PI / 2 - startAngle * 2;
+        var ringShape = new THREE.RingGeometry(ringRadius - ringWidth / 2, ringRadius + ringWidth / 2, 32, 5, startAngle, endAngle);
+
+        // NorthEast
+        var mesh = new THREE.Mesh(ringShape, new THREE.MeshBasicMaterial(materialRingParameter));
+        mesh.name = componentNames.ControlRingNorthEast;
+        groupControlRing.add(mesh);
+
+        // NorthWest
+        var mesh = new THREE.Mesh(ringShape, new THREE.MeshBasicMaterial(materialRingParameter));
+        mesh.name = componentNames.ControlRingNorthWest;
+        mesh.rotateZ(Math.PI / 2);
+        groupControlRing.add(mesh);
+
+        // SouthWest
+        var mesh = new THREE.Mesh(ringShape, new THREE.MeshBasicMaterial(materialRingParameter));
+        mesh.name = componentNames.ControlRingSouthWest;
+        mesh.rotateZ(Math.PI);
+        groupControlRing.add(mesh);
+
+        // SouthEast
+        var mesh = new THREE.Mesh(ringShape, new THREE.MeshBasicMaterial(materialRingParameter));
+        mesh.name = componentNames.ControlRingSouthEast;
+        mesh.rotateZ(-Math.PI / 2);
+        groupControlRing.add(mesh);
+
+        // -------- 圆形控制点 -------- //
+        var circleShape = new THREE.Shape();
+        circleShape.moveTo(ringPointRadius, 0);
+        circleShape.absarc(0, 0, ringPointRadius, 0, Math.PI * 2, false);
+        var geometry = new THREE.ShapeGeometry(circleShape);
+
+        // N
+        var mesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial(materialPointParameter));
+        mesh.name = componentNames.ControlPointNorth;
+        mesh.rotateZ(Math.PI / 2);
+        mesh.translateX(ringRadius);
+        groupControlRing.add(mesh);
+
+        // S
+        var mesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial(materialPointParameter));
+        mesh.name = componentNames.ControlPointSouth;
+        mesh.rotateZ(-Math.PI / 2);
+        mesh.translateX(ringRadius);
+        groupControlRing.add(mesh);
+
+        // E
+        var mesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial(materialPointParameter));
+        mesh.name = componentNames.ControlPointEast;
+        mesh.translateX(ringRadius);
+        groupControlRing.add(mesh);
+
+        // W
+        var mesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial(materialPointParameter));
+        mesh.name = componentNames.ControlPointWest;
+        mesh.translateX(-ringRadius);
+        groupControlRing.add(mesh);
+    };
+
+    // 构造Home模型
+    var createHome = function () {
         // ----------- Home ----------- //
         var homeWallColor = 0xe7e7ec; // 墙壁颜色
         var homeWireFrameColor = 0x787878;// 线框颜色
@@ -6829,916 +7659,139 @@ CLOUD.ViewHouse.prototype = {
         var homeOffsetX = viewHouseRadius - homeRoofWidth / 2; // 距离中心点偏移量
         var homeOffsetZ = viewHouseRadius - (homeWallHeight + homeRoofHeight); // 距离中心点偏移量
 
+        var houseVertices = [];
+        houseVertices.push(new THREE.Vector3(0, homeWallHeight + homeRoofHeight, 0));
+        houseVertices.push(new THREE.Vector3(-homeRoofWidth / 2, homeWallHeight, 0));
+        houseVertices.push(new THREE.Vector3(-homeWallWidth / 2, homeWallHeight, 0));
+        houseVertices.push(new THREE.Vector3(-homeWallWidth / 2, 0, 0));
+        houseVertices.push(new THREE.Vector3(-homeDoorWidth / 2, 0, 0));
+        houseVertices.push(new THREE.Vector3(-homeDoorWidth / 2, homeDoorHeight, 0));
+        houseVertices.push(new THREE.Vector3(homeDoorWidth / 2, homeDoorHeight, 0));
+        houseVertices.push(new THREE.Vector3(homeDoorWidth / 2, 0, 0));
+        houseVertices.push(new THREE.Vector3(homeWallWidth / 2, 0, 0));
+        houseVertices.push(new THREE.Vector3(homeWallWidth / 2, homeWallHeight, 0));
+        houseVertices.push(new THREE.Vector3(homeRoofWidth / 2, homeWallHeight, 0));
+        houseVertices.push(new THREE.Vector3(0, homeWallHeight + homeRoofHeight, 0));
+
+        // 轮廓线
+        var geometry = new THREE.Geometry();
+
+        for (var i = 0; i < houseVertices.length; ++i) {
+            geometry.vertices.push(houseVertices[i].multiplyScalar(homeScaleCoe));
+        }
+
+        var mesh = new THREE.Line(geometry, new THREE.LineBasicMaterial({
+            color: homeWireFrameColor,
+            linewidth: lineWidth
+        }));
+        mesh.position.x = -homeOffsetX;
+        mesh.position.y = homeOffsetZ;
+        groupHome.add(mesh);
+
+        // 内部面
+        var houseShape = new THREE.Shape();
+        houseShape.moveTo(houseVertices[0].x, houseVertices[0].y);
+
+        for (var j = 1; j < houseVertices.length; ++j) {
+            houseShape.lineTo(houseVertices[j].x, houseVertices[j].y);
+        }
+
+        var geometry = new THREE.ShapeGeometry(houseShape);
+        var mesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({
+            color: homeWallColor,
+            side: THREE.DoubleSide
+        }));
+        mesh.position.x = -homeOffsetX;
+        mesh.position.y = homeOffsetZ;
+        mesh.name = componentNames.Home;
+        groupHome.add(mesh);
+
+        // ------ 主视图图标 E ------ //
+    };
+
+    // 构建高亮圆环
+    var createHighLightRing = function () {
+
         // ----------- 高亮 ----------- //
         var activeColor = 0xb1d1ec; // 选中区域高亮颜色
         var activeEdgeColor = 0x776d4;// 选中区域高亮边线颜色
-
-        var lineWidth = 5; // 线宽
-
-        scope.halfHeight = houseHalfHeight; // 保持半高
-
-        /// 构造房屋线框
-        // @param {object} container 父容器
-        // @param {Array} vertices 顶点集
-        // @param {Array} indices 索引集
-        // @param {Number} color 颜色
-        // @returns
-        var createWireFrame = function(container, vertices, indices, color){
-
-            //var lineWidth = 3;
-            var len = vertices.length;
-            var positions = new Float32Array( len * 3);
-
-            for ( var i = 0; i < len; ++i) {
-                positions[i * 3    ] = vertices[i].x;
-                positions[i * 3 + 1] = vertices[i].y;
-                positions[i * 3 + 2] = vertices[i].z;
-            }
-
-            var geometry = new THREE.BufferGeometry();
-
-            geometry.setIndex(new THREE.BufferAttribute( new Uint16Array(indices), 1 ) );
-            geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
-
-            var material = new THREE.LineBasicMaterial( { color: color, linewidth: lineWidth });
-            var mesh = new THREE.Line( geometry, material);
-            container.add( mesh );
-        };
-
-        /// 构造房屋面
-        // @param {object} container 父容器
-        // @param {Array} vertices 顶点集
-        // @param {Array} indices 索引集
-        // @param {Number} color 颜色
-        // @returns
-        var createMesh = function(container, vertices, indices, color, name) {
-
-            var geometry = new THREE.Geometry();
-            var vertex;
-            var face;
-            var offset = 0;
-            var len = vertices.length;
-
-            while ( offset < len ) {
-
-                vertex = new THREE.Vector3();
-                vertex = vertices[offset++];
-                geometry.vertices.push(vertex);
-            }
-
-            offset = 0;
-            len = indices.length;
-
-            while ( offset < len ) {
-
-                face = new THREE.Face3();
-                face.a = indices[ offset ++ ];
-                face.b = indices[ offset ++ ];
-                face.c = indices[ offset ++ ];
-
-                geometry.faces.push( face );
-            }
-
-            var material = new THREE.MeshBasicMaterial( { color: color/*, side: THREE.DoubleSide*/} );
-            var mesh = new THREE.Mesh( geometry,  material);
-            mesh.name = name;
-
-            // 特殊处理
-            if (name === scope.names.MiddleDoor) {
-                scope.meshHouseDoor = mesh;
-                scope.meshHouseDoorColor = color;
-            }
-            if (name === scope.names.MiddleSouth) {
-                scope.meshHouseFront = mesh;
-                scope.meshHouseFrontColor = color;
-            }
-            if (name === scope.names.MiddleLeftWindow) {
-                scope.meshHouseLeftWindow = mesh;
-                scope.meshHouseLeftWindowColor = color;
-            }
-            if (name === scope.names.MiddleRightWindow) {
-                scope.meshHouseRightWindow = mesh;
-                scope.meshHouseRightWindowColor = color;
-            }
-            if (name === scope.names.MiddleWest) {
-                scope.meshHouseLeft = mesh;
-                scope.meshHouseLeftColor = color;
-            }
-            if (name === scope.names.MiddleEast) {
-                scope.meshHouseRight = mesh;
-                scope.meshHouseRightColor = color;
-            }
-
-            container.add( mesh );
-        };
-
-        // 构造房屋
-        var createHouse = function() {
-
-            // 房子坐北朝南(门在南)，相机从南往北看
-            // 以向上为Z轴正方向，North为Y轴正方向，East为X轴正方向建立模型：房子前墙在Y负方向，后墙在Y正方向。
-            // -----------------------------------
-            //                  N (Y 正)
-            //                   ^
-            //                  |
-            //     W  < ------- |------- >  E （X 正）
-            //                  |
-            //                  v
-            //                S
-            // -----------------------------------
-
-
-            // 以中心点为基准
-            var wallFarOffsetX =  houseWallLength / 2.0;
-            var wallNearOffsetX = houseWallLength / 2.0 - houseCornerWidth;
-            var wallFarOffsetY = houseWallWidth / 2.0;
-            var wallNearOffsetY = houseWallWidth / 2.0 - houseCornerWidth;
-
-            // ------ House Bottom ------ //
-            var bottomNearOffsetZ = houseHalfHeight - houseCornerWidth;
-            var bottomFarOffsetZ = houseHalfHeight;
-
-            // 1-1. South (Front)
-            var sillBottomNearOffsetX = houseSillBottomWidth / 2.0;
-            var sillBottomFarOffsetY = houseWallWidth / 2.0 + houseSillBottomDepth + 0.01;
-            var sillBottomNearOffsetY = houseWallWidth / 2.0 + 0.01;
-            var sillBottomNearOffsetZ = houseHalfHeight - houseSillHeight;
-            var sillBottomFarOffsetZ = houseHalfHeight;
-
-            var sillTopNearOffsetX = houseSillTopWidth / 2.0;
-            var sillTopFarOffsetY = houseWallWidth / 2.0 + houseSillTopDepth + 0.01;
-            var sillTopNearOffsetY = houseWallWidth / 2.0 + 0.01;
-            var sillTopNearOffsetZ = houseHalfHeight - houseSillHeight * 2;
-            var sillTopFarOffsetZ = houseHalfHeight - houseSillHeight;
-
-            var bottomSouthFace = [];
-            // sill bottom
-            bottomSouthFace.push(new THREE.Vector3(-sillBottomNearOffsetX, -sillBottomFarOffsetY, -sillBottomFarOffsetZ));
-            bottomSouthFace.push(new THREE.Vector3(sillBottomNearOffsetX, -sillBottomFarOffsetY, -sillBottomFarOffsetZ));
-            bottomSouthFace.push(new THREE.Vector3(sillBottomNearOffsetX, -sillBottomFarOffsetY, -sillBottomNearOffsetZ));
-            bottomSouthFace.push(new THREE.Vector3(-sillBottomNearOffsetX, -sillBottomFarOffsetY, -sillBottomNearOffsetZ));
-            bottomSouthFace.push(new THREE.Vector3(-sillBottomNearOffsetX, -sillBottomNearOffsetY, -sillBottomFarOffsetZ));
-            bottomSouthFace.push(new THREE.Vector3(sillBottomNearOffsetX, -sillBottomNearOffsetY, -sillBottomFarOffsetZ));
-            bottomSouthFace.push(new THREE.Vector3(sillBottomNearOffsetX, -sillBottomNearOffsetY, -sillBottomNearOffsetZ));
-            bottomSouthFace.push(new THREE.Vector3(-sillBottomNearOffsetX, -sillBottomNearOffsetY, -sillBottomNearOffsetZ));
-            // sill top
-            bottomSouthFace.push(new THREE.Vector3(-sillTopNearOffsetX, -sillTopFarOffsetY, -sillTopFarOffsetZ));
-            bottomSouthFace.push(new THREE.Vector3(sillTopNearOffsetX, -sillTopFarOffsetY, -sillTopFarOffsetZ));
-            bottomSouthFace.push(new THREE.Vector3(sillTopNearOffsetX, -sillTopFarOffsetY, -sillTopNearOffsetZ));
-            bottomSouthFace.push(new THREE.Vector3(-sillTopNearOffsetX, -sillTopFarOffsetY, -sillTopNearOffsetZ));
-            bottomSouthFace.push(new THREE.Vector3(-sillTopNearOffsetX, -sillTopNearOffsetY, -sillTopFarOffsetZ));
-            bottomSouthFace.push(new THREE.Vector3(sillTopNearOffsetX, -sillTopNearOffsetY, -sillTopFarOffsetZ));
-            bottomSouthFace.push(new THREE.Vector3(sillTopNearOffsetX, -sillTopNearOffsetY, -sillTopNearOffsetZ));
-            bottomSouthFace.push(new THREE.Vector3(-sillTopNearOffsetX, -sillTopNearOffsetY, -sillTopNearOffsetZ));
-            var bottomSouthFaceIndex = [
-                 4,  5,  6,  6,  7,  4,  5,  1,  2,  2,  6,  5,  0,  4,  7,  7,  3,  0,  7,  6,  2,  2,  3,  7,  0,  1,  5,  5,  4,  0,
-                12, 13, 14, 14, 15, 12, 13,  9, 10, 10, 14, 13,  8, 12, 15, 15, 11,  8, 15, 14, 10, 10, 11, 15,  8,  9, 13, 13, 12,  8 ];
-            //var bottomSouthFaceWireIndex = [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0];
-
-            // 1-2. South East
-            var bottomSouthEastFace = [];
-            bottomSouthEastFace.push(new THREE.Vector3(wallFarOffsetX, -wallFarOffsetY, -bottomFarOffsetZ));
-            bottomSouthEastFace.push(new THREE.Vector3(wallNearOffsetX, -wallFarOffsetY, -bottomFarOffsetZ));
-            bottomSouthEastFace.push(new THREE.Vector3(wallNearOffsetX, -wallFarOffsetY, -bottomNearOffsetZ));
-            bottomSouthEastFace.push(new THREE.Vector3(wallFarOffsetX, -wallFarOffsetY, -bottomNearOffsetZ));
-            bottomSouthEastFace.push(new THREE.Vector3(wallFarOffsetX, -wallNearOffsetY, -bottomNearOffsetZ));
-            bottomSouthEastFace.push(new THREE.Vector3(wallFarOffsetX, -wallNearOffsetY, -bottomFarOffsetZ));
-            bottomSouthEastFace.push(new THREE.Vector3(wallNearOffsetX, -wallNearOffsetY, -bottomFarOffsetZ));
-            var bottomSouthEastFaceIndex = [ 0, 3, 2, 2, 1, 0, 3, 0, 5, 5, 4, 3, 0, 1, 6, 6, 5, 0 ];
-            //var bottomSouthEastFaceWireIndex = [ 0, 1, 2, 3, 4, 5, 6 ];
-
-            // 1-3. East (Right)
-            var bottomEastFace = [];
-            bottomEastFace.push(new THREE.Vector3(wallFarOffsetX, wallNearOffsetY, -bottomFarOffsetZ));
-            bottomEastFace.push(new THREE.Vector3(wallFarOffsetX, wallNearOffsetY, -bottomNearOffsetZ));
-            bottomEastFace.push(new THREE.Vector3(wallFarOffsetX, -wallNearOffsetY, -bottomNearOffsetZ));
-            bottomEastFace.push(new THREE.Vector3(wallFarOffsetX, -wallNearOffsetY, -bottomFarOffsetZ));
-            bottomEastFace.push(new THREE.Vector3(wallNearOffsetX, -wallNearOffsetY, -bottomFarOffsetZ));
-            bottomEastFace.push(new THREE.Vector3(wallNearOffsetX, wallNearOffsetY, -bottomFarOffsetZ));
-            var bottomEastFaceIndex = [ 0, 1, 2, 2, 3, 0, 3, 4, 5, 5, 0, 3 ];
-
-            // 1-4. North East
-            var bottomNorthEastFace = [];
-            bottomNorthEastFace.push(new THREE.Vector3(wallFarOffsetX, wallFarOffsetY, -bottomFarOffsetZ));
-            bottomNorthEastFace.push(new THREE.Vector3(wallNearOffsetX, wallFarOffsetY, -bottomFarOffsetZ));
-            bottomNorthEastFace.push(new THREE.Vector3(wallNearOffsetX, wallFarOffsetY, -bottomNearOffsetZ));
-            bottomNorthEastFace.push(new THREE.Vector3(wallFarOffsetX, wallFarOffsetY, -bottomNearOffsetZ));
-            bottomNorthEastFace.push(new THREE.Vector3(wallFarOffsetX, wallNearOffsetY, -bottomNearOffsetZ));
-            bottomNorthEastFace.push(new THREE.Vector3(wallFarOffsetX, wallNearOffsetY, -bottomFarOffsetZ));
-            bottomNorthEastFace.push(new THREE.Vector3(wallNearOffsetX, wallNearOffsetY, -bottomFarOffsetZ));
-            var bottomNorthEastFaceIndex = [ 0, 1, 2, 2, 3, 0, 3, 4, 5, 5, 0, 3, 0, 5, 6, 6, 1, 0 ];
-
-            // 1-5. North (Back)
-            var bottomNorthFace = [];
-            bottomNorthFace.push(new THREE.Vector3(-wallNearOffsetX , wallFarOffsetY, -bottomFarOffsetZ));
-            bottomNorthFace.push(new THREE.Vector3(-wallNearOffsetX , wallFarOffsetY, -bottomNearOffsetZ));
-            bottomNorthFace.push(new THREE.Vector3(wallNearOffsetX , wallFarOffsetY, -bottomNearOffsetZ));
-            bottomNorthFace.push(new THREE.Vector3(wallNearOffsetX , wallFarOffsetY, -bottomFarOffsetZ));
-            bottomNorthFace.push(new THREE.Vector3(wallNearOffsetX , wallNearOffsetY, -bottomFarOffsetZ));
-            bottomNorthFace.push(new THREE.Vector3(-wallNearOffsetX , wallNearOffsetY, -bottomFarOffsetZ));
-            var bottomNorthFaceIndex = [ 0, 1, 2, 2, 3, 0, 3, 4, 5, 5, 0, 3 ];
-
-            // 1-6. North West
-            var bottomNorthWestFace = [];
-            bottomNorthWestFace.push(new THREE.Vector3( -wallFarOffsetX,  wallFarOffsetY, -bottomFarOffsetZ));
-            bottomNorthWestFace.push(new THREE.Vector3(-wallNearOffsetX,  wallFarOffsetY, -bottomFarOffsetZ));
-            bottomNorthWestFace.push(new THREE.Vector3(-wallNearOffsetX,  wallFarOffsetY, -bottomNearOffsetZ));
-            bottomNorthWestFace.push(new THREE.Vector3(-wallFarOffsetX,  wallFarOffsetY, -bottomNearOffsetZ));
-            bottomNorthWestFace.push(new THREE.Vector3(-wallFarOffsetX,  wallNearOffsetY, -bottomNearOffsetZ));
-            bottomNorthWestFace.push(new THREE.Vector3(-wallFarOffsetX,  wallNearOffsetY, -bottomFarOffsetZ));
-            bottomNorthWestFace.push(new THREE.Vector3(-wallNearOffsetX,  wallNearOffsetY, -bottomFarOffsetZ));
-            var bottomNorthWestFaceIndex = [ 0, 3, 2, 2, 1, 0, 3, 0, 5, 5, 4, 3, 0, 1, 6, 6, 5, 0 ];
-
-            // 1-7. West (Left)
-            var bottomWestFace = [];
-            bottomWestFace.push(new THREE.Vector3(-wallFarOffsetX, wallNearOffsetY, -bottomFarOffsetZ));
-            bottomWestFace.push(new THREE.Vector3(-wallFarOffsetX, wallNearOffsetY, -bottomNearOffsetZ));
-            bottomWestFace.push(new THREE.Vector3(-wallFarOffsetX, -wallNearOffsetY, -bottomNearOffsetZ));
-            bottomWestFace.push(new THREE.Vector3(-wallFarOffsetX, -wallNearOffsetY, -bottomFarOffsetZ));
-            bottomWestFace.push(new THREE.Vector3(-wallNearOffsetX, -wallNearOffsetY, -bottomFarOffsetZ));
-            bottomWestFace.push(new THREE.Vector3(-wallNearOffsetX, wallNearOffsetY, -bottomFarOffsetZ));
-            var bottomWestFaceIndex = [ 0, 3, 2, 2, 1, 0, 3, 0, 5, 5, 4, 3 ];
-
-            // 1-8. South West
-            var bottomSouthWestFace = [];
-            bottomSouthWestFace.push(new THREE.Vector3(-wallFarOffsetX, -wallFarOffsetY, -bottomFarOffsetZ));
-            bottomSouthWestFace.push(new THREE.Vector3(-wallNearOffsetX, -wallFarOffsetY, -bottomFarOffsetZ));
-            bottomSouthWestFace.push(new THREE.Vector3(-wallNearOffsetX, -wallFarOffsetY, -bottomNearOffsetZ));
-            bottomSouthWestFace.push(new THREE.Vector3(-wallFarOffsetX, -wallFarOffsetY, -bottomNearOffsetZ));
-            bottomSouthWestFace.push(new THREE.Vector3(-wallFarOffsetX, -wallNearOffsetY, -bottomNearOffsetZ));
-            bottomSouthWestFace.push(new THREE.Vector3(-wallFarOffsetX, -wallNearOffsetY, -bottomFarOffsetZ));
-            bottomSouthWestFace.push(new THREE.Vector3(-wallNearOffsetX, -wallNearOffsetY, -bottomFarOffsetZ));
-            var bottomSouthWestFaceIndex = [ 0, 1, 2, 2, 3, 0, 3, 4, 5, 5, 0, 3, 0, 5, 6, 6, 1, 0 ];
-
-            // 1-9. Floor
-            var bottomFloorFace = [];
-            bottomFloorFace.push(new THREE.Vector3(-wallNearOffsetX, -wallFarOffsetY, -bottomFarOffsetZ));
-            bottomFloorFace.push(new THREE.Vector3(-wallNearOffsetX,  wallNearOffsetY, -bottomFarOffsetZ));
-            bottomFloorFace.push(new THREE.Vector3( wallNearOffsetX,  wallNearOffsetY, -bottomFarOffsetZ));
-            bottomFloorFace.push(new THREE.Vector3( wallNearOffsetX, -wallFarOffsetY, -bottomFarOffsetZ));
-            var bottomFloorFaceIndex = [ 0, 1, 2, 2, 3, 0 ];
-
-            // ----- House Middle -----
-            var middleFarOffsetZ = houseHalfHeight - houseCornerWidth;
-            var middleNearOffsetZ = houseWallHeight - houseHalfHeight;
-
-            // 2-1. South (Front)
-            var middleSouthFace = [];
-            middleSouthFace.push(new THREE.Vector3(-wallNearOffsetX, -wallFarOffsetY, -bottomFarOffsetZ));
-            middleSouthFace.push(new THREE.Vector3(wallNearOffsetX, -wallFarOffsetY, -bottomFarOffsetZ));
-            middleSouthFace.push(new THREE.Vector3(wallNearOffsetX, -wallFarOffsetY, middleNearOffsetZ));
-            middleSouthFace.push(new THREE.Vector3(-wallNearOffsetX, -wallFarOffsetY, middleNearOffsetZ));
-            var middleSouthFaceIndex =[0, 1, 2, 2, 3, 0];
-
-            // 2-2. South East
-            var middleSouthEastFace = [];
-            middleSouthEastFace.push(new THREE.Vector3(wallNearOffsetX, -wallFarOffsetY, -middleFarOffsetZ));
-            middleSouthEastFace.push(new THREE.Vector3(wallNearOffsetX, -wallFarOffsetY, middleNearOffsetZ));
-            middleSouthEastFace.push(new THREE.Vector3(wallFarOffsetX, -wallFarOffsetY, middleNearOffsetZ));
-            middleSouthEastFace.push(new THREE.Vector3(wallFarOffsetX, -wallFarOffsetY, -middleFarOffsetZ));
-            middleSouthEastFace.push(new THREE.Vector3(wallFarOffsetX, -wallNearOffsetY, -middleFarOffsetZ));
-            middleSouthEastFace.push(new THREE.Vector3(wallFarOffsetX, -wallNearOffsetY, middleNearOffsetZ));
-            var middleSouthEastFaceIndex = [ 0, 3, 2, 2, 1, 0, 3, 4, 5, 5, 2, 3 ];
-
-            // 2-3. East (Right)
-            // Wall
-            var middleEastFace = [];
-            middleEastFace.push(new THREE.Vector3(wallFarOffsetX, -wallNearOffsetY, -middleFarOffsetZ));
-            middleEastFace.push(new THREE.Vector3(wallFarOffsetX, wallNearOffsetY, -middleFarOffsetZ));
-            middleEastFace.push(new THREE.Vector3(wallFarOffsetX, wallNearOffsetY, middleNearOffsetZ));
-            middleEastFace.push(new THREE.Vector3(wallFarOffsetX, -wallNearOffsetY, middleNearOffsetZ));
-            var middleEastFaceIndex = [ 0, 1, 2, 2, 3, 0 ];
-
-            // 2-4. North East
-            var middleNorthEastFace = [];
-            middleNorthEastFace.push(new THREE.Vector3(wallNearOffsetX, wallFarOffsetY, -middleFarOffsetZ));
-            middleNorthEastFace.push(new THREE.Vector3(wallNearOffsetX, wallFarOffsetY, middleNearOffsetZ));
-            middleNorthEastFace.push(new THREE.Vector3(wallFarOffsetX, wallFarOffsetY , middleNearOffsetZ));
-            middleNorthEastFace.push(new THREE.Vector3(wallFarOffsetX, wallFarOffsetY , -middleFarOffsetZ));
-            middleNorthEastFace.push(new THREE.Vector3(wallFarOffsetX, wallNearOffsetY , -middleFarOffsetZ));
-            middleNorthEastFace.push(new THREE.Vector3(wallFarOffsetX, wallNearOffsetY , middleNearOffsetZ));
-            var middleNorthEastFaceIndex = [ 0, 1, 2, 2, 3, 0, 3, 2, 5, 5, 4, 3 ];
-
-            // 2-5. North (Back)
-            var middleNorthFace = [];
-            middleNorthFace.push(new THREE.Vector3(-wallNearOffsetX, wallFarOffsetY, -middleFarOffsetZ));
-            middleNorthFace.push(new THREE.Vector3(wallNearOffsetX, wallFarOffsetY, -middleFarOffsetZ));
-            middleNorthFace.push(new THREE.Vector3(wallNearOffsetX, wallFarOffsetY, middleNearOffsetZ));
-            middleNorthFace.push(new THREE.Vector3(-wallNearOffsetX, wallFarOffsetY, middleNearOffsetZ));
-            var middleNorthFaceIndex = [ 0, 3, 2, 2, 1, 0 ];
-
-            // 2-6. North West
-            var middleNorthWestFace = [];
-            middleNorthWestFace.push(new THREE.Vector3(-wallNearOffsetX, wallFarOffsetY, -middleFarOffsetZ));
-            middleNorthWestFace.push(new THREE.Vector3(-wallNearOffsetX, wallFarOffsetY, middleNearOffsetZ));
-            middleNorthWestFace.push(new THREE.Vector3(-wallFarOffsetX, wallFarOffsetY, middleNearOffsetZ));
-            middleNorthWestFace.push(new THREE.Vector3(-wallFarOffsetX, wallFarOffsetY, -middleFarOffsetZ));
-            middleNorthWestFace.push(new THREE.Vector3(-wallFarOffsetX, wallNearOffsetY, -middleFarOffsetZ));
-            middleNorthWestFace.push(new THREE.Vector3(-wallFarOffsetX, wallNearOffsetY, middleNearOffsetZ));
-            var middleNorthWestFaceIndex = [ 0, 3, 2, 2, 1, 0, 3, 4, 5, 5, 2, 3 ];
-
-            // 2-7. West (Left)
-            // Wall
-            var middleWestFace = [];
-            middleWestFace.push(new THREE.Vector3( -wallFarOffsetX, -wallNearOffsetY, -middleFarOffsetZ));
-            middleWestFace.push(new THREE.Vector3( -wallFarOffsetX, wallNearOffsetY, -middleFarOffsetZ));
-            middleWestFace.push(new THREE.Vector3( -wallFarOffsetX, wallNearOffsetY, middleNearOffsetZ));
-            middleWestFace.push(new THREE.Vector3( -wallFarOffsetX, -wallNearOffsetY, middleNearOffsetZ));
-            var middleWestFaceIndex = [0, 3, 2, 2, 1, 0 ];
-
-            // 2-8. South West
-            var middleSouthWestFace = [];
-            middleSouthWestFace.push(new THREE.Vector3(-wallNearOffsetX, -wallFarOffsetY, -middleFarOffsetZ));
-            middleSouthWestFace.push(new THREE.Vector3(-wallNearOffsetX, -wallFarOffsetY, middleNearOffsetZ));
-            middleSouthWestFace.push(new THREE.Vector3(-wallFarOffsetX, -wallFarOffsetY, middleNearOffsetZ));
-            middleSouthWestFace.push(new THREE.Vector3(-wallFarOffsetX, -wallFarOffsetY, -middleFarOffsetZ));
-            middleSouthWestFace.push(new THREE.Vector3(-wallFarOffsetX, -wallNearOffsetY, -middleFarOffsetZ));
-            middleSouthWestFace.push(new THREE.Vector3(-wallFarOffsetX, -wallNearOffsetY, middleNearOffsetZ));
-            var middleSouthWestFaceIndex = [ 0, 1, 2, 2, 3, 0, 3, 2, 5, 5, 4, 3 ];
-
-            // Door
-            var doorFarOffsetX = houseDoorWidth / 2.0;
-            var doorFarOffsetY = wallFarOffsetY + 0.01;
-            var doorNearOffsetZ =  houseSillHeight * 2 + houseDoorHeight - houseHalfHeight;
-            var doorFarOffsetZ = houseHalfHeight - houseSillHeight * 2;
-            var middleDoorFace = [];
-            middleDoorFace.push(new THREE.Vector3(-doorFarOffsetX, -doorFarOffsetY, -doorFarOffsetZ));
-            middleDoorFace.push(new THREE.Vector3(doorFarOffsetX, -doorFarOffsetY, -doorFarOffsetZ));
-            middleDoorFace.push(new THREE.Vector3(doorFarOffsetX, -doorFarOffsetY, doorNearOffsetZ));
-            middleDoorFace.push(new THREE.Vector3(-doorFarOffsetX, -doorFarOffsetY, doorNearOffsetZ));
-            var middleDoorFaceIndex = [ 0, 1, 2, 2, 3, 0 ];
-
-            // Right Window
-            var windowFarOffsetX = wallFarOffsetX + 0.01;
-            var windowFarOffsetY = houseWindowWidth / 2.0;
-            var windowFarOffsetZ =  houseSillHeight * 2 + houseDoorHeight - houseHalfHeight;
-            var windowNearOffsetZ = houseSillHeight * 2 + houseDoorHeight - houseWindowWidth - houseHalfHeight;
-            var middleRightWindowFace = [];
-            middleRightWindowFace.push(new THREE.Vector3(windowFarOffsetX, -windowFarOffsetY, windowNearOffsetZ));
-            middleRightWindowFace.push(new THREE.Vector3(windowFarOffsetX, windowFarOffsetY, windowNearOffsetZ));
-            middleRightWindowFace.push(new THREE.Vector3(windowFarOffsetX, windowFarOffsetY, windowFarOffsetZ));
-            middleRightWindowFace.push(new THREE.Vector3(windowFarOffsetX, -windowFarOffsetY, windowFarOffsetZ));
-            var middleRightWindowFaceIndex = [ 0, 1, 2, 2, 3, 0 ];
-
-            // Left Window
-            var middleLeftWindowFace = [];
-            middleLeftWindowFace.push(new THREE.Vector3(-windowFarOffsetX, -windowFarOffsetY, windowNearOffsetZ));
-            middleLeftWindowFace.push(new THREE.Vector3(-windowFarOffsetX, windowFarOffsetY, windowNearOffsetZ));
-            middleLeftWindowFace.push(new THREE.Vector3(-windowFarOffsetX, windowFarOffsetY, windowFarOffsetZ));
-            middleLeftWindowFace.push(new THREE.Vector3(-windowFarOffsetX, -windowFarOffsetY, windowFarOffsetZ));
-            var middleLeftWindowFaceIndex = [ 0, 3, 2, 2, 1, 0 ];
-
-            // ----- House Roof -----
-            var roofBottomFarOffsetX = houseRoofBottomLength / 2.0;
-            var roofBottomNearOffsetX = houseRoofBottomLength / 2.0 - houseCornerWidth;
-            var roofBottomFarOffsetY = houseRoofBottomWidth / 2.0;
-            var roofBottomNearOffsetY = houseRoofBottomWidth / 2.0 - houseCornerWidth;
-
-            var roofTopFarOffsetX = houseRoofTopLength / 2.0;
-            var roofTopNearOffsetX = houseRoofTopLength / 2.0 - houseCornerWidth;
-            var roofTopFarOffsetY = houseRoofTopWidth / 2.0;
-            var roofTopNearOffsetY = houseRoofTopWidth / 2.0 - houseCornerWidth;
-
-            var roofFarOffsetZ = houseHalfHeight;
-            var roofNearOffsetZ = houseWallHeight - houseHalfHeight;
-
-            // 3-1. South (Front)
-            var roofSouthFace = [];
-            roofSouthFace.push(new THREE.Vector3(-roofBottomNearOffsetX, -roofBottomFarOffsetY, roofNearOffsetZ));
-            roofSouthFace.push(new THREE.Vector3(roofBottomNearOffsetX, -roofBottomFarOffsetY, roofNearOffsetZ));
-            roofSouthFace.push(new THREE.Vector3(roofTopNearOffsetX,-roofTopFarOffsetY, roofFarOffsetZ));
-            roofSouthFace.push(new THREE.Vector3(-roofTopNearOffsetX, -roofTopFarOffsetY, roofFarOffsetZ));
-            roofSouthFace.push(new THREE.Vector3(-roofTopNearOffsetX,-roofTopNearOffsetY, roofFarOffsetZ));
-            roofSouthFace.push(new THREE.Vector3(roofTopNearOffsetX, -roofTopNearOffsetY, roofFarOffsetZ));
-            var roofSouthFaceIndex = [ 0, 1, 2, 0, 2, 3, 4, 3, 2, 4, 2, 5 ];
-
-            // 3-2. South East
-            var roofSouthEastFace = [];
-            roofSouthEastFace.push(new THREE.Vector3(roofTopFarOffsetX, -roofTopFarOffsetY, roofFarOffsetZ));
-            roofSouthEastFace.push(new THREE.Vector3(roofTopFarOffsetX, -roofTopNearOffsetY, roofFarOffsetZ));
-            roofSouthEastFace.push(new THREE.Vector3(roofTopNearOffsetX, -roofTopNearOffsetY, roofFarOffsetZ));
-            roofSouthEastFace.push(new THREE.Vector3(roofTopNearOffsetX, -roofTopFarOffsetY, roofFarOffsetZ));
-            roofSouthEastFace.push(new THREE.Vector3(roofBottomNearOffsetX, -roofBottomFarOffsetY, roofNearOffsetZ));
-            roofSouthEastFace.push(new THREE.Vector3(roofBottomFarOffsetX, -roofBottomFarOffsetY, roofNearOffsetZ));
-            roofSouthEastFace.push(new THREE.Vector3(roofBottomFarOffsetX, -roofBottomNearOffsetY, roofNearOffsetZ));
-            var roofSouthEastFaceIndex = [ 0, 1, 2, 2, 3, 0, 3, 4, 5, 5, 0, 3, 0, 5, 6, 6, 1, 0 ];
-
-            // 3-3. East (Right)
-            var roofEastFace = [];
-            roofEastFace.push(new THREE.Vector3(roofBottomFarOffsetX, -roofBottomNearOffsetY, roofNearOffsetZ));
-            roofEastFace.push(new THREE.Vector3(roofBottomFarOffsetX, roofBottomNearOffsetY, roofNearOffsetZ));
-            roofEastFace.push(new THREE.Vector3(roofTopFarOffsetX, roofTopNearOffsetY, roofFarOffsetZ));
-            roofEastFace.push(new THREE.Vector3(roofTopFarOffsetX, -roofTopNearOffsetY, roofFarOffsetZ));
-            roofEastFace.push(new THREE.Vector3(roofTopFarOffsetX-houseCornerWidth, -roofTopNearOffsetY, roofFarOffsetZ));
-            roofEastFace.push(new THREE.Vector3(roofTopFarOffsetX-houseCornerWidth, roofTopNearOffsetY, roofFarOffsetZ));
-            var roofEastFaceIndex = [ 0, 1, 2, 0, 2, 3,4, 3, 2, 4, 2, 5 ];
-
-            // 3-4. North East
-            var roofNorthEastFace = [];
-            roofNorthEastFace.push(new THREE.Vector3(roofTopFarOffsetX, roofTopFarOffsetY, roofFarOffsetZ));
-            roofNorthEastFace.push(new THREE.Vector3(roofTopFarOffsetX, roofTopNearOffsetY, roofFarOffsetZ));
-            roofNorthEastFace.push(new THREE.Vector3(roofTopNearOffsetX, roofTopNearOffsetY, roofFarOffsetZ));
-            roofNorthEastFace.push(new THREE.Vector3(roofTopNearOffsetX, roofTopFarOffsetY, roofFarOffsetZ));
-            roofNorthEastFace.push(new THREE.Vector3(roofBottomNearOffsetX, roofBottomFarOffsetY, roofNearOffsetZ));
-            roofNorthEastFace.push(new THREE.Vector3(roofBottomFarOffsetX, roofBottomFarOffsetY, roofNearOffsetZ));
-            roofNorthEastFace.push(new THREE.Vector3(roofBottomFarOffsetX, roofBottomNearOffsetY, roofNearOffsetZ));
-            var roofNorthEastFaceIndex = [ 0, 3, 2, 2, 1, 0, 3, 0, 5, 5, 4, 3, 0, 1, 6, 6, 5, 0 ];
-
-            // 3-5. North (Back)
-            var roofNorthFace = [];
-            roofNorthFace.push(new THREE.Vector3(roofBottomNearOffsetX, roofBottomFarOffsetY, roofNearOffsetZ));
-            roofNorthFace.push(new THREE.Vector3(-roofBottomNearOffsetX, roofBottomFarOffsetY, roofNearOffsetZ));
-            roofNorthFace.push(new THREE.Vector3(-roofTopNearOffsetX, roofTopFarOffsetY, roofFarOffsetZ));
-            roofNorthFace.push(new THREE.Vector3(roofTopNearOffsetX, roofTopFarOffsetY, roofFarOffsetZ));
-            roofNorthFace.push(new THREE.Vector3(roofTopNearOffsetX, roofTopNearOffsetY, roofFarOffsetZ));
-            roofNorthFace.push(new THREE.Vector3(-roofTopNearOffsetX, roofTopNearOffsetY, roofFarOffsetZ));
-            var roofNorthFaceIndex = [ 0, 1, 2, 0, 2, 3, 4, 3, 2, 4, 2, 5 ];
-
-            // 3-6. North West
-            var roofNorthWestFace = [];
-            roofNorthWestFace.push(new THREE.Vector3( -roofTopFarOffsetX, roofTopFarOffsetY, roofFarOffsetZ));
-            roofNorthWestFace.push(new THREE.Vector3( -roofTopFarOffsetX, roofTopNearOffsetY, roofFarOffsetZ));
-            roofNorthWestFace.push(new THREE.Vector3( -roofTopNearOffsetX, roofTopNearOffsetY, roofFarOffsetZ));
-            roofNorthWestFace.push(new THREE.Vector3( -roofTopNearOffsetX, roofTopFarOffsetY, roofFarOffsetZ));
-            roofNorthWestFace.push(new THREE.Vector3( -roofBottomNearOffsetX, roofBottomFarOffsetY, roofNearOffsetZ));
-            roofNorthWestFace.push(new THREE.Vector3( -roofBottomFarOffsetX, roofBottomFarOffsetY, roofNearOffsetZ));
-            roofNorthWestFace.push(new THREE.Vector3( -roofBottomFarOffsetX, roofBottomNearOffsetY, roofNearOffsetZ));
-            var roofNorthWestFaceIndex = [ 0, 1, 2, 2, 3, 0, 3, 4, 5, 5, 0, 3, 0, 5, 6, 6, 1, 0 ];
-
-            // 3-7. West (Left)
-            var roofWestFace = [];
-            roofWestFace.push(new THREE.Vector3(-roofBottomFarOffsetX, roofBottomNearOffsetY, roofNearOffsetZ));
-            roofWestFace.push(new THREE.Vector3(-roofBottomFarOffsetX, -roofBottomNearOffsetY, roofNearOffsetZ));
-            roofWestFace.push(new THREE.Vector3(-roofTopFarOffsetX, -roofTopNearOffsetY, roofFarOffsetZ));
-            roofWestFace.push(new THREE.Vector3(-roofTopFarOffsetX, roofTopNearOffsetY, roofFarOffsetZ));
-            roofWestFace.push(new THREE.Vector3(-roofTopNearOffsetX, roofTopNearOffsetY, roofFarOffsetZ));
-            roofWestFace.push(new THREE.Vector3(-roofTopNearOffsetX,  -roofTopNearOffsetY, roofFarOffsetZ));
-            var roofWestFaceIndex = [ 0, 1, 2, 0, 2, 3, 4, 3, 2, 4, 2, 5 ];
-
-            // 3-8. South West
-            var roofSouthWestFace = [];
-            roofSouthWestFace.push(new THREE.Vector3(-roofTopFarOffsetX, -roofTopFarOffsetY, roofFarOffsetZ));
-            roofSouthWestFace.push(new THREE.Vector3(-roofTopFarOffsetX, -roofTopNearOffsetY, roofFarOffsetZ));
-            roofSouthWestFace.push(new THREE.Vector3(-roofTopNearOffsetX, -roofTopNearOffsetY, roofFarOffsetZ));
-            roofSouthWestFace.push(new THREE.Vector3(-roofTopNearOffsetX, -roofTopFarOffsetY, roofFarOffsetZ));
-            roofSouthWestFace.push(new THREE.Vector3(-roofBottomNearOffsetX, -roofBottomFarOffsetY, roofNearOffsetZ));
-            roofSouthWestFace.push(new THREE.Vector3(-roofBottomFarOffsetX, -roofBottomFarOffsetY, roofNearOffsetZ));
-            roofSouthWestFace.push(new THREE.Vector3(-roofBottomFarOffsetX, -roofBottomNearOffsetY, roofNearOffsetZ));
-            var roofSouthWestFaceIndex = [ 0, 3, 2, 2, 1, 0, 3, 0, 5, 5, 4, 3, 0, 1, 6, 6, 5, 0 ];
-
-            // 3-9. Roof Top
-            // Center
-            var roofCenterFace = [];
-            roofCenterFace.push(new THREE.Vector3(roofTopNearOffsetX, -roofTopNearOffsetY, roofFarOffsetZ));
-            roofCenterFace.push(new THREE.Vector3(-roofTopNearOffsetX, -roofTopNearOffsetY, roofFarOffsetZ));
-            roofCenterFace.push(new THREE.Vector3(-roofTopNearOffsetX, roofTopNearOffsetY, roofFarOffsetZ));
-            roofCenterFace.push(new THREE.Vector3(roofTopNearOffsetX, roofTopNearOffsetY, roofFarOffsetZ));
-            var roofCenterFaceIndex = [ 0, 2, 1, 0, 3, 2 ];
-
-            // Eaves bottom
-            var roofEavesFace = [];
-            roofEavesFace.push(new THREE.Vector3(roofBottomFarOffsetX, roofBottomFarOffsetY, roofNearOffsetZ));
-            roofEavesFace.push(new THREE.Vector3(-roofBottomFarOffsetX, roofBottomFarOffsetY, roofNearOffsetZ));
-            roofEavesFace.push(new THREE.Vector3(-roofBottomFarOffsetX, -roofBottomFarOffsetY, roofNearOffsetZ));
-            roofEavesFace.push(new THREE.Vector3(roofBottomFarOffsetX, -roofBottomFarOffsetY, roofNearOffsetZ));
-            roofEavesFace.push(new THREE.Vector3(wallFarOffsetX, wallFarOffsetY, roofNearOffsetZ));
-            roofEavesFace.push(new THREE.Vector3(-wallFarOffsetX, wallFarOffsetY, roofNearOffsetZ));
-            roofEavesFace.push(new THREE.Vector3(-wallFarOffsetX, -wallFarOffsetY, roofNearOffsetZ));
-            roofEavesFace.push(new THREE.Vector3(wallFarOffsetX, -wallFarOffsetY, roofNearOffsetZ));
-            var roofEavesFaceIndex = [ 0, 4, 5, 5, 1, 0, 1, 5, 6, 6, 2, 1, 2, 6, 7, 7, 3, 2, 3, 7, 4, 4, 0, 3 ];
-
-            var verticesList = [
-                bottomSouthFace,bottomSouthEastFace,bottomEastFace,bottomNorthEastFace,
-                bottomNorthFace,bottomNorthWestFace,bottomWestFace,bottomSouthWestFace,
-                bottomFloorFace,
-                middleSouthFace,middleSouthEastFace,middleEastFace,middleNorthEastFace,
-                middleNorthFace, middleNorthWestFace,middleWestFace,middleSouthWestFace,
-                middleDoorFace,middleRightWindowFace,middleLeftWindowFace,
-                roofSouthFace,roofSouthEastFace,roofEastFace,roofNorthEastFace,
-                roofNorthFace,roofNorthWestFace,roofWestFace,roofSouthWestFace,
-                roofCenterFace,roofEavesFace
-            ];
-
-            var indicesList = [
-                bottomSouthFaceIndex,bottomSouthEastFaceIndex,bottomEastFaceIndex,bottomNorthEastFaceIndex,
-                bottomNorthFaceIndex,bottomNorthWestFaceIndex,bottomWestFaceIndex,bottomSouthWestFaceIndex,
-                bottomFloorFaceIndex,
-                middleSouthFaceIndex,middleSouthEastFaceIndex, middleEastFaceIndex,middleNorthEastFaceIndex,
-                middleNorthFaceIndex,middleNorthWestFaceIndex,middleWestFaceIndex,middleSouthWestFaceIndex,
-                middleDoorFaceIndex,middleRightWindowFaceIndex,middleLeftWindowFaceIndex,
-                roofSouthFaceIndex,roofSouthEastFaceIndex,roofEastFaceIndex,roofNorthEastFaceIndex,
-                roofNorthFaceIndex,roofNorthWestFaceIndex,roofWestFaceIndex,roofSouthWestFaceIndex,
-                roofCenterFaceIndex,roofEavesFaceIndex
-            ];
-
-            var namesList = [
-                scope.names.BottomSouth,scope.names.BottomSouthEast,scope.names.BottomEast,scope.names.BottomNorthEast,
-                scope.names.BottomNorth,scope.names.BottomNorthWest,scope.names.BottomWest,scope.names.BottomSouthWest,
-                scope.names.BottomFloor,
-                scope.names.MiddleSouth,scope.names.MiddleSouthEast,scope.names.MiddleEast,scope.names.MiddleNorthEast,
-                scope.names.MiddleNorth, scope.names.MiddleNorthWest,scope.names.MiddleWest,scope.names.MiddleSouthWest,
-                scope.names.MiddleDoor,scope.names.MiddleRightWindow,scope.names.MiddleLeftWindow,
-                scope.names.RoofSouth,scope.names.RoofSouthEast,scope.names.RoofEast,scope.names.RoofNorthEast,
-                scope.names.RoofNorth, scope.names.RoofNorthWest,scope.names.RoofWest,scope.names.RoofSouthWest,
-                scope.names.RoofCenter,scope.names.RoofEaves
-            ];
-
-            var colors = [
-                houseDoorRoofColor, houseWallColor, houseWallColor,houseWallColor,
-                houseWallColor,houseWallColor,houseWallColor,houseWallColor,
-                houseWallColor,
-                houseWallColor,houseWallColor,houseWallColor,houseWallColor,
-                houseWallColor,houseWallColor,houseWallColor, houseWallColor,
-                houseDoorRoofColor,houseDoorRoofColor,houseDoorRoofColor,
-                houseDoorRoofColor,houseDoorRoofColor,houseDoorRoofColor,houseDoorRoofColor,
-                houseDoorRoofColor,houseDoorRoofColor,houseDoorRoofColor,houseDoorRoofColor,
-                houseWallColor,houseWallColor
-            ];
-
-            for (var i = 0; i < verticesList.length; ++i){
-                createMesh(scope.groupHouse,verticesList[i], indicesList[i], colors[i], namesList[i]);
-            }
-
-            // --------------------- house wire frame --------------------- //
-            var houseWireVertex = []; // house wire frame
-
-            // floor
-            houseWireVertex.push(new THREE.Vector3(-wallFarOffsetX, -wallFarOffsetY, -bottomFarOffsetZ));
-            houseWireVertex.push(new THREE.Vector3(wallFarOffsetX, -wallFarOffsetY, -bottomFarOffsetZ));
-            houseWireVertex.push(new THREE.Vector3(wallFarOffsetX, wallFarOffsetY, -bottomFarOffsetZ));
-            houseWireVertex.push(new THREE.Vector3(-wallFarOffsetX, wallFarOffsetY, -bottomFarOffsetZ));
-
-            // ceiling
-            houseWireVertex.push(new THREE.Vector3(-wallFarOffsetX, -wallFarOffsetY, roofNearOffsetZ));
-            houseWireVertex.push(new THREE.Vector3(wallFarOffsetX, -wallFarOffsetY, roofNearOffsetZ));
-            houseWireVertex.push(new THREE.Vector3(wallFarOffsetX, wallFarOffsetY, roofNearOffsetZ));
-            houseWireVertex.push(new THREE.Vector3(-wallFarOffsetX, wallFarOffsetY, roofNearOffsetZ));
-
-            // roof bottom
-            houseWireVertex.push(new THREE.Vector3(-roofBottomFarOffsetX, -roofBottomFarOffsetY, roofNearOffsetZ));
-            houseWireVertex.push(new THREE.Vector3(roofBottomFarOffsetX, -roofBottomFarOffsetY, roofNearOffsetZ));
-            houseWireVertex.push(new THREE.Vector3(roofBottomFarOffsetX, roofBottomFarOffsetY, roofNearOffsetZ));
-            houseWireVertex.push(new THREE.Vector3(-roofBottomFarOffsetX, roofBottomFarOffsetY, roofNearOffsetZ));
-
-            // roof top
-            houseWireVertex.push(new THREE.Vector3(-roofTopFarOffsetX, -roofTopFarOffsetY, roofFarOffsetZ));
-            houseWireVertex.push(new THREE.Vector3(roofTopFarOffsetX, -roofTopFarOffsetY, roofFarOffsetZ));
-            houseWireVertex.push(new THREE.Vector3(roofTopFarOffsetX, roofTopFarOffsetY, roofFarOffsetZ));
-            houseWireVertex.push(new THREE.Vector3(-roofTopFarOffsetX, roofTopFarOffsetY, roofFarOffsetZ));
-
-            // sill bottom
-            houseWireVertex.push(new THREE.Vector3(-sillBottomNearOffsetX, -sillBottomFarOffsetY, -sillBottomFarOffsetZ));
-            houseWireVertex.push(new THREE.Vector3(sillBottomNearOffsetX, -sillBottomFarOffsetY, -sillBottomFarOffsetZ));
-            houseWireVertex.push(new THREE.Vector3(sillBottomNearOffsetX, -sillBottomFarOffsetY, -sillBottomNearOffsetZ));
-            houseWireVertex.push(new THREE.Vector3(-sillBottomNearOffsetX, -sillBottomFarOffsetY, -sillBottomNearOffsetZ));
-            houseWireVertex.push(new THREE.Vector3(-sillBottomNearOffsetX, -sillBottomNearOffsetY, -sillBottomFarOffsetZ));
-            houseWireVertex.push(new THREE.Vector3(sillBottomNearOffsetX, -sillBottomNearOffsetY, -sillBottomFarOffsetZ));
-            houseWireVertex.push(new THREE.Vector3(sillBottomNearOffsetX, -sillBottomNearOffsetY, -sillBottomNearOffsetZ));
-            houseWireVertex.push(new THREE.Vector3(-sillBottomNearOffsetX, -sillBottomNearOffsetY, -sillBottomNearOffsetZ));
-            // sill top
-            houseWireVertex.push(new THREE.Vector3(-sillTopNearOffsetX, -sillTopFarOffsetY, -sillTopFarOffsetZ));
-            houseWireVertex.push(new THREE.Vector3(sillTopNearOffsetX, -sillTopFarOffsetY, -sillTopFarOffsetZ));
-            houseWireVertex.push(new THREE.Vector3(sillTopNearOffsetX, -sillTopFarOffsetY,  -sillTopNearOffsetZ));
-            houseWireVertex.push(new THREE.Vector3(-sillTopNearOffsetX, -sillTopFarOffsetY,  -sillTopNearOffsetZ));
-            houseWireVertex.push(new THREE.Vector3(-sillTopNearOffsetX, -sillTopNearOffsetY, -bottomNearOffsetZ));
-            houseWireVertex.push(new THREE.Vector3(sillTopNearOffsetX, -sillTopNearOffsetY, -bottomNearOffsetZ));
-            houseWireVertex.push(new THREE.Vector3(sillTopNearOffsetX, -sillTopNearOffsetY,  -sillTopNearOffsetZ));
-            houseWireVertex.push(new THREE.Vector3(-sillTopNearOffsetX, -sillTopNearOffsetY,  -sillTopNearOffsetZ));
-
-            // door
-            houseWireVertex.push(new THREE.Vector3(-doorFarOffsetX, -doorFarOffsetY, -doorFarOffsetZ));
-            houseWireVertex.push(new THREE.Vector3(doorFarOffsetX, -doorFarOffsetY, -doorFarOffsetZ));
-            houseWireVertex.push(new THREE.Vector3(doorFarOffsetX, -doorFarOffsetY, doorNearOffsetZ));
-            houseWireVertex.push(new THREE.Vector3(-doorFarOffsetX, -doorFarOffsetY, doorNearOffsetZ));
-
-            // left window
-            houseWireVertex.push(new THREE.Vector3(-windowFarOffsetX, -windowFarOffsetY, windowNearOffsetZ));
-            houseWireVertex.push(new THREE.Vector3(-windowFarOffsetX, windowFarOffsetY, windowNearOffsetZ));
-            houseWireVertex.push(new THREE.Vector3(-windowFarOffsetX, windowFarOffsetY, windowFarOffsetZ));
-            houseWireVertex.push(new THREE.Vector3(-windowFarOffsetX, -windowFarOffsetY, windowFarOffsetZ));
-            // right window
-            houseWireVertex.push(new THREE.Vector3(windowFarOffsetX,  -windowFarOffsetY, windowNearOffsetZ));
-            houseWireVertex.push(new THREE.Vector3(windowFarOffsetX,  windowFarOffsetY, windowNearOffsetZ));
-            houseWireVertex.push(new THREE.Vector3(windowFarOffsetX,  windowFarOffsetY, windowFarOffsetZ));
-            houseWireVertex.push(new THREE.Vector3(windowFarOffsetX,  -windowFarOffsetY, windowFarOffsetZ));
-
-            // 外框
-            var wireFrameIndexList = [
-                [0, 1, 2, 3, 0],[4, 5, 6, 7, 4],[0, 4],[1, 5],[3,7],[2,6],[8, 9, 10, 11, 8],[12, 13, 14, 15, 12],[8, 12],[9,13],[10,14],[11,15],
-                [16,17,18,19,16],[20,21,22,23,20],[16,20],[17,21],[18,22],[19,23],
-                [24,25,26,27,24],[28,29,30,31,28],[24,28],[25,29],[26,30],[27,31],
-                [32,33,34,35,32],
-                [36,37,38,39,36],
-                [40,41,42,43,40]
-            ];
-
-            for (var j = 0; j < wireFrameIndexList.length; ++j){
-                createWireFrame(scope.groupHouse,houseWireVertex,wireFrameIndexList[j], houseWireFrameColor);
-            }
-        };
-
-        // 构造指北针转盘
-        var createCompass = function(){
-
-            // 转盘材质
-            var materialDisc = new THREE.MeshBasicMaterial( { color: compassColor, side: THREE.DoubleSide} );
-            // N方向材质
-            var materialNorth = new THREE.MeshBasicMaterial( { color: compassNorthColor, side: THREE.DoubleSide, depthTest: false } );
-            // 字体材质
-            var materialFont = new THREE.MeshBasicMaterial( { color: compassFontColor, overdraw: 0.0, side: THREE.DoubleSide, depthTest: false  } );
-
-            // -------- 三角面 -------- //
-            var triangleShape = new THREE.Shape();
-            triangleShape.moveTo( compassTriangleHeight, 0 );
-            triangleShape.lineTo( 0, compassTriangleHeight / 2);
-            triangleShape.lineTo( 0, -compassTriangleHeight / 2 );
-            triangleShape.lineTo( compassTriangleHeight, 0 );
-
-            var geometry = new THREE.ShapeGeometry( triangleShape );
-
-            // East
-            var meshE = new THREE.Mesh( geometry, materialDisc);
-            meshE.translateX(compassOutsiderRadius - 2);
-
-            // West
-            var meshW = new THREE.Mesh( geometry, materialDisc );
-            meshW.rotateZ(Math.PI);
-            meshW.translateX(compassOutsiderRadius - 2);
-
-            // North
-            var meshN = new THREE.Mesh( geometry, materialNorth);
-            meshN.rotateZ(Math.PI / 2);
-            meshN.translateX(compassOutsiderRadius - 2);
-
-            // South
-            var meshS = new THREE.Mesh( geometry, materialDisc );
-            meshS.rotateZ(-Math.PI / 2);
-            meshS.translateX(compassOutsiderRadius - 2);
-
-            scope.groupCompass.add( meshE );
-            scope.groupCompass.add( meshW );
-            scope.groupCompass.add( meshN );
-            scope.groupCompass.add( meshS );
-
-            // -------- 文字标注 S -------- //
-            var theTextN = "N";
-            var theTextS = "S";
-            var theTextE = "E";
-            var theTextW = "W";
-            var font_parameters = {
-                size: 12,
-                height: 1,
-                curveSegments: 2,
-                font: "helvetiker"
-            };
-
-            // 文字坐标原点为左下角
-            //     - - - -
-            //   |   A   |
-            //  o - - - -
-            var geoTextN = new THREE.TextGeometry( theTextN, font_parameters);
-            var geoTextS = new THREE.TextGeometry( theTextS, font_parameters);
-            var geoTextE = new THREE.TextGeometry( theTextE, font_parameters);
-            var geoTextW = new THREE.TextGeometry( theTextW, font_parameters);
-
-            // 计算包围框
-            geoTextN.computeBoundingBox();
-            geoTextS.computeBoundingBox();
-            geoTextE.computeBoundingBox();
-            geoTextW.computeBoundingBox();
-
-            var offsetX;
-            var meshTextN, meshTextS, meshTextE,meshTextW;
-
-            offsetX = -0.5 * ( geoTextN.boundingBox.max.x - geoTextN.boundingBox.min.x );
-            meshTextN = new THREE.Mesh( geoTextN, materialFont);
-            meshTextN.translateX(offsetX);
-            meshTextN.translateY(compassOutsiderRadius);
-
-            offsetX = -0.5 * ( geoTextS.boundingBox.max.x - geoTextS.boundingBox.min.x );
-            meshTextS = new THREE.Mesh( geoTextS, materialFont );
-            meshTextS.rotateZ(Math.PI);
-            meshTextS.translateX(offsetX);
-            meshTextS.translateY(compassOutsiderRadius);
-
-            offsetX = -0.5 * ( geoTextE.boundingBox.max.x - geoTextE.boundingBox.min.x );
-            meshTextE = new THREE.Mesh( geoTextE, materialFont );
-            meshTextE.rotateZ(-Math.PI / 2);
-            meshTextE.translateX(offsetX);
-            meshTextE.translateY(compassOutsiderRadius);
-
-            offsetX = -0.5 * ( geoTextE.boundingBox.max.x - geoTextE.boundingBox.min.x );
-            meshTextW = new THREE.Mesh( geoTextW, materialFont );
-            meshTextW.rotateZ(Math.PI / 2);
-            meshTextW.translateX(offsetX);
-            meshTextW.translateY(compassOutsiderRadius);
-
-            scope.groupCompass.add( meshTextN );
-            scope.groupCompass.add( meshTextS );
-            scope.groupCompass.add( meshTextE );
-            scope.groupCompass.add( meshTextW );
-
-            // -------- 文字标注 E -------- //
-
-            // -------- 指北针圆盘 -------- //
-            var discShape = new THREE.RingGeometry( compassInsiderRadius, compassOutsiderRadius, 32, 5, 0, Math.PI * 2 );
-            var mesh = new THREE.Mesh(discShape, materialDisc );
-            mesh.name = scope.names.Compass;
-            scope.groupCompass.add( mesh );
-
-            // 指北针位置下移半个房屋高度
-            scope.groupCompass.translateZ(-houseHalfHeight);
-        };
-
-        // 构造控制圆环
-        var createControlRing = function() {
-            // 圆环材质
-            var materialRingParameter = { color: ringColor, side: THREE.DoubleSide};
-            var materialPointParameter = { color: ringColor, side: THREE.DoubleSide };
-
-            // -------- 圆环 由4段构成 -------- //
-            var startAngle = Math.asin(ringPointRadius / ringRadius);
-            var endAngle = Math.PI / 2 - startAngle * 2;
-            var ringShape = new THREE.RingGeometry( ringRadius - ringWidth / 2, ringRadius + ringWidth / 2, 32, 5, startAngle, endAngle );
-
-            // NorthEast
-            var mesh = new THREE.Mesh(ringShape, new THREE.MeshBasicMaterial( materialRingParameter ) );
-            mesh.name = scope.names.ControlRingNorthEast;
-            scope.groupControlRing.add( mesh );
-
-            // NorthWest
-            var mesh = new THREE.Mesh(ringShape, new THREE.MeshBasicMaterial( materialRingParameter ) );
-            mesh.name = scope.names.ControlRingNorthWest;
-            mesh.rotateZ(Math.PI / 2);
-            scope.groupControlRing.add( mesh );
-
-            // SouthWest
-            var mesh = new THREE.Mesh(ringShape, new THREE.MeshBasicMaterial( materialRingParameter ) );
-            mesh.name = scope.names.ControlRingSouthWest;
-            mesh.rotateZ(Math.PI);
-            scope.groupControlRing.add( mesh );
-
-            // SouthEast
-            var mesh = new THREE.Mesh(ringShape, new THREE.MeshBasicMaterial( materialRingParameter ) );
-            mesh.name = scope.names.ControlRingSouthEast;
-            mesh.rotateZ(-Math.PI / 2);
-            scope.groupControlRing.add( mesh );
-
-            // -------- 圆形控制点 -------- //
-            var circleShape = new THREE.Shape();
-            circleShape.moveTo( ringPointRadius, 0);
-            circleShape.absarc( 0, 0, ringPointRadius, 0, Math.PI*2, false );
-            var geometry = new THREE.ShapeGeometry( circleShape);
-
-            // N
-            var mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( materialPointParameter ) );
-            mesh.name = scope.names.ControlPointNorth;
-            mesh.rotateZ(Math.PI / 2);
-            mesh.translateX(ringRadius);
-            scope.groupControlRing.add( mesh );
-
-            // S
-            var mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( materialPointParameter ) );
-            mesh.name = scope.names.ControlPointSouth;
-            mesh.rotateZ(-Math.PI / 2);
-            mesh.translateX(ringRadius);
-            scope.groupControlRing.add( mesh );
-
-            // E
-            var mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( materialPointParameter) );
-            mesh.name = scope.names.ControlPointEast;
-            mesh.translateX(ringRadius);
-            scope.groupControlRing.add( mesh );
-
-            // W
-            var mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( materialPointParameter ) );
-            mesh.name = scope.names.ControlPointWest;
-            mesh.translateX(-ringRadius);
-            scope.groupControlRing.add( mesh );
-        };
-
-        // 构造Home模型
-        var createHome = function() {
-            // ------ 主视图图标 S ------ //
-
-            var houseVertices = [];
-            houseVertices.push(new THREE.Vector3(0, homeWallHeight + homeRoofHeight, 0));
-            houseVertices.push(new THREE.Vector3(-homeRoofWidth / 2, homeWallHeight, 0));
-            houseVertices.push(new THREE.Vector3(-homeWallWidth / 2, homeWallHeight, 0));
-            houseVertices.push(new THREE.Vector3(-homeWallWidth / 2, 0, 0));
-            houseVertices.push(new THREE.Vector3(-homeDoorWidth / 2, 0, 0));
-            houseVertices.push(new THREE.Vector3(-homeDoorWidth / 2, homeDoorHeight, 0));
-            houseVertices.push(new THREE.Vector3(homeDoorWidth / 2, homeDoorHeight, 0));
-            houseVertices.push(new THREE.Vector3(homeDoorWidth / 2, 0, 0));
-            houseVertices.push(new THREE.Vector3(homeWallWidth / 2, 0, 0));
-            houseVertices.push(new THREE.Vector3(homeWallWidth / 2, homeWallHeight, 0));
-            houseVertices.push(new THREE.Vector3(homeRoofWidth / 2, homeWallHeight, 0));
-            houseVertices.push(new THREE.Vector3(0, homeWallHeight + homeRoofHeight, 0));
-
-            // 轮廓线
-            var geometry = new THREE.Geometry();
-
-            for ( var i = 0; i < houseVertices.length; ++i) {
-                geometry.vertices.push( houseVertices[i].multiplyScalar(homeScaleCoe));
-            }
-
-            var mesh = new THREE.Line( geometry, new THREE.LineBasicMaterial( { color: homeWireFrameColor, linewidth: lineWidth } ));
-            mesh.position.x = - homeOffsetX;
-            mesh.position.y = homeOffsetZ;
-            scope.groupHome.add(mesh);
-
-            // 内部面
-            var houseShape = new THREE.Shape();
-            houseShape.moveTo( houseVertices[0].x, houseVertices[0].y );
-
-            for (var j = 1; j < houseVertices.length; ++j) {
-                houseShape.lineTo( houseVertices[j].x, houseVertices[j].y );
-            }
-
-            var geometry = new THREE.ShapeGeometry( houseShape );
-            var mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: homeWallColor, side: THREE.DoubleSide } ) );
-            mesh.position.x = - homeOffsetX;
-            mesh.position.y = homeOffsetZ;
-            mesh.name = scope.names.Home;
-            scope.groupHome.add(mesh);
-
-            // ------ 主视图图标 E ------ //
-        };
-
-        var createHighLightRing = function(){
-
-            // 选中高亮材质
-            var materialActiveParameter = { color: activeColor, side: THREE.DoubleSide/*, depthTest: false*/ };
-            //  旋转箭头
-            var materialArrowParameter = { color: activeEdgeColor, linewidth: lineWidth };
-            // 高亮区域圆环
-            var startAngle = Math.asin(ringPointRadius / ringRadius);
-            var endAngle = Math.PI / 2 - startAngle * 2;
-            var ringShape = new THREE.RingGeometry( ringRadius - ringPointRadius / 3, ringRadius + ringPointRadius / 3, 32, 5, startAngle, endAngle );
-
-            scope.ringRadius = ringRadius;
-
-            // ------------ 圆环 ------------ //
-            scope.meshHighlightRing = new THREE.Mesh(ringShape, new THREE.MeshBasicMaterial( materialActiveParameter ) );
-            scope.meshHighlightRing.translateZ(0.01);
-            scope.groupHightLight.add(scope.meshHighlightRing);
-
-            // 保存旋转量
-            scope.highlightRingQuat = new THREE.Quaternion();
-            scope.highlightRingQuat.copy(scope.meshHighlightRing.quaternion);
-            scope.highlightRingPos = new THREE.Vector3();
-            scope.highlightRingPos.copy(scope.meshHighlightRing.position);
-
-            // ------------ 高亮圆形控制点 ------------ //
-            var circleShape = new THREE.Shape();
-            circleShape.moveTo( ringPointRadius, 0);
-            circleShape.absarc( 0, 0, ringPointRadius, 0, Math.PI*2, false );
-            var geometry = new THREE.ShapeGeometry( circleShape);
-
-            scope.meshHighlightPoint = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( materialActiveParameter ) );
-            scope.meshHighlightPoint.translateZ(0.01);
-            scope.groupHightLight.add(scope.meshHighlightPoint);
-
-            // 保存旋转量
-            scope.highlightPointQuat = new THREE.Quaternion();
-            scope.highlightPointQuat.copy(scope.meshHighlightPoint.quaternion);
-            scope.highlightPointPos = new THREE.Vector3();
-            scope.highlightPointPos.copy(scope.meshHighlightPoint.position);
-
-            //  ------------ 旋转箭头 ------------ //
-            // ---------------------
-            //   0
-            //   |
-            //   |
-            //  1 ------- 2
-            // ---------------------
-            // 箭头点集
-            var baseEdge = ringPointRadius * 2 * 0.707;
-            var lineVertices = [
-                new THREE.Vector3(  baseEdge / 4,  baseEdge / 2, 0),
-                new THREE.Vector3( -baseEdge / 4,             0, 0),
-                new THREE.Vector3(  baseEdge / 4, -baseEdge / 2, 0)
-            ];
-            var geometry = new THREE.Geometry();
-            for ( var i = 0; i < lineVertices.length; ++i) {
-                geometry.vertices.push( lineVertices[i]);
-            }
-
-            scope.meshHighlightArrow = new THREE.Line( geometry, new THREE.LineBasicMaterial( materialArrowParameter ) );
-            scope.meshHighlightArrow.translateZ(0.015);
-            scope.groupHightLight.add( scope.meshHighlightArrow );
-
-            // 保持旋转量
-            scope.highlightArrowQuat = new THREE.Quaternion();
-            scope.highlightArrowQuat.copy(scope.meshHighlightArrow.quaternion);
-            scope.highlightArrowPos = new THREE.Vector3();
-            scope.highlightArrowPos.copy(scope.meshHighlightArrow.position);
-
-            // 不显示
-            scope.meshHighlightRing.visible = false;
-            scope.meshHighlightPoint.visible = false;
-            scope.meshHighlightArrow.visible = false;
-        };
+        var ringPointRadius = 10; // 圆环控制点半径
+        var ringRadius = 75; // 圆环半径
+
+        // 选中高亮材质
+        var materialActiveParameter = {color: activeColor, side: THREE.DoubleSide/*, depthTest: false*/};
+        //  旋转箭头
+        var materialArrowParameter = {color: activeEdgeColor, linewidth: lineWidth};
+        // 高亮区域圆环
+        var startAngle = Math.asin(ringPointRadius / ringRadius);
+        var endAngle = Math.PI / 2 - startAngle * 2;
+        var ringShape = new THREE.RingGeometry(ringRadius - ringPointRadius / 3, ringRadius + ringPointRadius / 3, 32, 5, startAngle, endAngle);
+
+        highLightRingRadius = ringRadius;
+
+        // ------------ 圆环 ------------ //
+        highlightRingMesh = new THREE.Mesh(ringShape, new THREE.MeshBasicMaterial(materialActiveParameter));
+        highlightRingMesh.translateZ(0.01);
+        groupHightLight.add(highlightRingMesh);
+
+        // 保存旋转量
+        highlightRingQuat = new THREE.Quaternion();
+        highlightRingQuat.copy(highlightRingMesh.quaternion);
+        highlightRingPos = new THREE.Vector3();
+        highlightRingPos.copy(highlightRingMesh.position);
+
+        // ------------ 高亮圆形控制点 ------------ //
+        var circleShape = new THREE.Shape();
+        circleShape.moveTo(ringPointRadius, 0);
+        circleShape.absarc(0, 0, ringPointRadius, 0, Math.PI * 2, false);
+        var geometry = new THREE.ShapeGeometry(circleShape);
+
+        highlightPointMesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial(materialActiveParameter));
+        highlightPointMesh.translateZ(0.01);
+        groupHightLight.add(highlightPointMesh);
+
+        // 保存旋转量
+        highlightPointQuat = new THREE.Quaternion();
+        highlightPointQuat.copy(highlightPointMesh.quaternion);
+        highlightPointPos = new THREE.Vector3();
+        highlightPointPos.copy(highlightPointMesh.position);
+
+        //  ------------ 旋转箭头 ------------ //
+        // ---------------------
+        //   0
+        //   |
+        //   |
+        //  1 ------- 2
+        // ---------------------
+        // 箭头点集
+        var baseEdge = ringPointRadius * 2 * 0.707;
+        var lineVertices = [
+            new THREE.Vector3(baseEdge / 4, baseEdge / 2, 0),
+            new THREE.Vector3(-baseEdge / 4, 0, 0),
+            new THREE.Vector3(baseEdge / 4, -baseEdge / 2, 0)
+        ];
+        var geometry = new THREE.Geometry();
+        for (var i = 0; i < lineVertices.length; ++i) {
+            geometry.vertices.push(lineVertices[i]);
+        }
+
+        highlightArrowMesh = new THREE.Line(geometry, new THREE.LineBasicMaterial(materialArrowParameter));
+        highlightArrowMesh.translateZ(0.015);
+        groupHightLight.add(highlightArrowMesh);
+
+        // 保持旋转量
+        highlightArrowQuat = new THREE.Quaternion();
+        highlightArrowQuat.copy(highlightArrowMesh.quaternion);
+        highlightArrowPos = new THREE.Vector3();
+        highlightArrowPos.copy(highlightArrowMesh.position);
+
+        // 不显示
+        highlightRingMesh.visible = false;
+        highlightPointMesh.visible = false;
+        highlightArrowMesh.visible = false;
+    };
+
+    var createViewHouse = function () {
 
         createCompass();
         createHouse();
@@ -7746,1053 +7799,888 @@ CLOUD.ViewHouse.prototype = {
         createHome();
         createHighLightRing();
 
-        this.scene.add(this.groupCompass);
-        this.scene.add(this.groupHouse);
+        // 指北针位置下移半个房屋高度
+        groupCompass.translateZ(-halfHeight);
 
-        this.groupPick.add(this.groupHome);
-        this.groupPick.add(this.groupControlRing);
+        houseScene.add(groupCompass);
+        houseScene.add(groupHouse);
 
-        this.groupControlRing.translateZ(30);
+        groupPick.add(groupHome);
+        groupPick.add(groupControlRing);
 
-        this.scene2.add(this.groupPick);
-        this.scene2.add(this.groupHightLight);
-    },
-    setViewport : function(x, y , width, height){
-        console.warn( 'CLOUD.ViewHouse.setViewport has been deprecated. ' );
-        this.viewPort.x = x;
-        this.viewPort.y = y;
-        this.viewPort.width = width;
-        this.viewPort.height = height;
-    },
-    setPosition : function(x, y) {
-        this.viewPort.x = x;
-        this.viewPort.y = y;
-    },
-    setSize : function(mode){
+        groupControlRing.translateZ(30);
+
+        homeScene.add(groupPick);
+        homeScene.add(groupHightLight);
+    };
+
+    var setSize = function (mode) {
         switch (mode) {
-            case this.enumSizeMode.Big:
-                this.viewPort.width = this.enumSize.Big;
-                this.viewPort.height = this.enumSize.Big;
+            case enumSizeMode.Big:
+                scope.width = enumSize.Big;
+                scope.height = enumSize.Big;
                 break;
-            case this.enumSizeMode.Medium:
-                this.viewPort.width = this.enumSize.Medium;
-                this.viewPort.height = this.enumSize.Medium;
+            case enumSizeMode.Medium:
+                scope.width = enumSize.Medium;
+                scope.height = enumSize.Medium;
                 break;
-            case this.enumSizeMode.Small:
-                this.viewPort.width = this.enumSize.Small;
-                this.viewPort.height = this.enumSize.Small;
+            case enumSizeMode.Small:
+                scope.width = enumSize.Small;
+                scope.height = enumSize.Small;
                 break;
             default :
-                this.viewPort.width = this.enumSize.Small;
-                this.viewPort.height = this.enumSize.Small;
+                scope.width = enumSize.Small;
+                scope.height = enumSize.Small;
                 break;
         }
 
-    },
-    isValidRange : function (mouse, domElement) {
+        houseContainer.style.width = scope.width + "px";
+        houseContainer.style.height = scope.height + "px";
+    };
+
+    var isValidRange = function (mouse) {
+
+        var domElement = houseContainer;
+
         if (domElement !== undefined) {
             var dim = CLOUD.DomUtil.getContainerOffsetToClient(domElement);
-            var mouse2 = new THREE.Vector2();
+            var relativeMouse = new THREE.Vector2();
 
             // 计算鼠标点相对于viewhouse所在视口的位置
-            mouse2.x = mouse.x - (dim.offset[0] + this.viewPort.x);
-            mouse2.y = mouse.y - (dim.offset[1] + dim.size[1] - this.viewPort.y - this.viewPort.height );
+            relativeMouse.x = mouse.x - dim.offset[0];
+            relativeMouse.y = mouse.y - dim.offset[1];
 
             // 规范化坐标系
-            if (mouse2.x > 0 && mouse2.x < this.viewPort.width && mouse2.y > 0 && mouse2.y < this.viewPort.height) {
-                this.mouse.x = mouse2.x / this.viewPort.width * 2 - 1;
-                this.mouse.y =  -mouse2.y / this.viewPort.height * 2 + 1;
+            if (relativeMouse.x > 0 && relativeMouse.x < scope.width && relativeMouse.y > 0 && relativeMouse.y < scope.height) {
+                mouseCoord.x = relativeMouse.x / scope.width * 2 - 1;
+                mouseCoord.y = -relativeMouse.y / scope.height * 2 + 1;
 
                 return true;
             }
         }
 
         return false;
-    },
-    showHome : function(isShow){
-        this.isShowHome = isShow;
+    };
+
+    var showHome = function (isShow) {
+        isShowHome = isShow;
 
         if (isShow) {
-            this.groupHome.visible = true;
-        }else {
-            this.groupHome.visible = false;
+            groupHome.visible = true;
+        } else {
+            groupHome.visible = false;
         }
 
-    },
-    enableTransparent : function(enable) {
-        this.isTransparent = enable;
+    };
+    var enableTransparent = function (enable) {
+        isTransparent = enable;
 
         if (enable) {
-            var houseObjects = this.groupHouse.children;
+            var houseObjects = groupHouse.children;
             for (var i = 0; i < houseObjects.length; i++) {
                 houseObjects[i].material.transparent = true;
-                houseObjects[i].material.opacity = this.opacityCoe;
+                houseObjects[i].material.opacity = opacityCoe;
             }
 
-            var ringObjects = this.groupControlRing.children;
+            var ringObjects = groupControlRing.children;
             for (var i = 0; i < ringObjects.length; i++) {
                 ringObjects[i].material.transparent = true;
-                ringObjects[i].material.opacity = this.opacityCoe;
+                ringObjects[i].material.opacity = opacityCoe;
             }
 
-            var compassObjects = this.groupCompass.children;
+            var compassObjects = groupCompass.children;
             for (var i = 0; i < compassObjects.length; i++) {
                 compassObjects[i].material.transparent = true;
-                compassObjects[i].material.opacity = this.opacityCoe;
+                compassObjects[i].material.opacity = opacityCoe;
             }
 
-            var homeObjects = this.groupHome.children;
+            var homeObjects = groupHome.children;
             for (var i = 0; i < homeObjects.length; i++) {
                 homeObjects[i].material.transparent = true;
-                homeObjects[i].material.opacity = this.opacityCoe;
+                homeObjects[i].material.opacity = opacityCoe;
             }
 
         } else {
-            var houseObjects = this.groupHouse.children;
+            var houseObjects = groupHouse.children;
             for (var i = 0; i < houseObjects.length; i++) {
                 houseObjects[i].material.transparent = false;
                 houseObjects[i].material.opacity = 1.0;
             }
 
-            var ringObjects = this.groupControlRing.children;
+            var ringObjects = groupControlRing.children;
             for (var i = 0; i < ringObjects.length; i++) {
                 ringObjects[i].material.transparent = false;
                 ringObjects[i].material.opacity = 1.0;
             }
 
-            var compassObjects = this.groupCompass.children;
+            var compassObjects = groupCompass.children;
             for (var i = 0; i < compassObjects.length; i++) {
                 compassObjects[i].material.transparent = false;
                 compassObjects[i].material.opacity = 1.0;
             }
 
-            var homeObjects = this.groupHome.children;
+            var homeObjects = groupHome.children;
             for (var i = 0; i < homeObjects.length; i++) {
                 homeObjects[i].material.transparent = false;
                 homeObjects[i].material.opacity = 1.0;
             }
         }
-    },
-    mouseUp : function (event, domElement, callback) {
+    };
 
-        //if (event.button === this.mouseButtons.RIGHT) {
-        //    this.isRotate = false;
-        //}
+    var switchView = function (name) {
 
-        this.isRotate = false;
-
-        var mouse = new THREE.Vector2(event.clientX, event.clientY);
-        var isInHouse = this.isValidRange(mouse, domElement);
-
-        //callback();
-        //if (this.isValidRange(mouse, domElement)) {
-        //    callback();
-        //}
-
-        return isInHouse;
-    },
-    mouseMove : function(event, domElement, callback) {
-
-        var change = false;
-        var mouse = new THREE.Vector2(event.clientX, event.clientY);
-        var mouseOverHouse = this.isValidRange(mouse, domElement);
-
-        // 左键选择，右键旋转
-
-        // 允许鼠标移出viewhouse区域
-        if (this.isRotate) {
-
-            this.rotateEnd.set(mouse.x, mouse.y);
-            this.rotateDelta.subVectors(this.rotateEnd, this.rotateStart);
-            callback(this.rotateDelta);
-            this.rotateStart.copy(this.rotateEnd);
-
-        } else {
-
-            if (mouseOverHouse) {
-
-                if (this.lastPickedObjectName === undefined) {
-                    this.lastPickedObjectName = "";
-                }
-
-                // 禁用透明
-                if (this.isTransparent) {
-                    this.enableTransparent(false);
-                    change = true;
-                }
-
-                // 显示home
-                if (this.isShowHome === false) {
-                    this.showHome(true);
-                    change = true;
-                }
-
-                this.picked();
-
-                // 存在选中的对象
-                if ( this.Intersected ) {
-
-                    if ( this.Intersected.name !== "" ) {
-
-                        // 处理联动状态：前墙与门，左墙与左窗，右墙与右窗存在联动
-                        var linkageName = this.Intersected.name;
-                        if ( linkageName === this.names.MiddleDoor ) {
-                            linkageName = this.names.MiddleSouth;
-                        } else if ( linkageName === this.names.MiddleLeftWindow ) {
-                            linkageName = this.names.MiddleWest;
-                        } else if ( linkageName === this.names.MiddleRightWindow ) {
-                            linkageName = this.names.MiddleEast;
-                        }
-
-                        if ( this.lastPickedObjectName !== linkageName ) {
-                            this.lastPickedObjectName = linkageName;
-                            this.hasPickedObject = true;
-                            change = true;
-                        }
-                    }
-
-                } else { // 不存在选中的对象
-
-                    // 判断上次是否有选中的对象，如果上次有选中的对象，则需要刷新
-                    if ( this.lastPickedObjectName !== "" ) {
-                        this.lastPickedObjectName = ""; // 置为空字符串
-                        this.hasPickedObject = false;
-                        change = true;
-                    }
-                }
-
-                // 不用每次刷新
-                if (change) {
-                    callback();
-                }
-
-            } else {
-
-                if (this.hasPickedObject) {
-                    this.clearObjectHighlight();
-                    this.hasPickedObject = false;
-                    change = true;
-                }
-
-                // 启用透明
-                if (this.isTransparent === false) {
-                    this.enableTransparent(true);
-                    change = true;
-                }
-
-                // 隐藏home
-                if (this.isShowHome) {
-                    this.showHome(false);
-                    change = true;
-                }
-
-                // 不用每次刷新
-                if (change) {
-                    callback();
-                }
-            }
-        }
-
-        return mouseOverHouse;
-    },
-    mouseDown : function(event, domElement, callback){
-
-        var mouse = new THREE.Vector2(event.clientX, event.clientY);
-        var mouseOverHouse = this.isValidRange(mouse, domElement);
-
-        if (mouseOverHouse) {
-
-            //this.picked();  // 不需再次选择
-
-            if (event.button === this.mouseButtons.LEFT) {
-
-                if (this.Intersected) {
-
-                    this.switchView(this.Intersected.name);
-
-                    if (this.currentViewMode !== -1) {
-                        // 反馈到主视图
-                        callback(this.currentViewMode);
-                    }
-                }
-
-            } else if (event.button === this.mouseButtons.RIGHT) {
-
-                // 右键启用旋转
-                this.isRotate = false;
-
-                if (this.Intersected) {
-                    var name = this.Intersected.name;
-
-                    if (name === this.names.Compass) {
-                        this.isRotate = true;
-                        this.rotateStart.set(mouse.x, mouse.y);
-                    }
-                }
-            }
-        }
-
-        return mouseOverHouse;
-    },
-    switchView : function(name) {
-
-        //var viewMode = this.enumView.ISO;
+        //var viewMode = enumView.ISO;
         var viewMode = -1;
 
         // 计算鼠标所在的象限
         var isClockWise = false;
-        if (this.mouse.x * this.mouse.y > 0) {
+        if (mouseCoord.x * mouseCoord.y > 0) {
             isClockWise = true;
         }
 
-        //console.log("[intersects][name = " + this.Intersected.name +",isClockWise = " + isClockWise + "]" );
+        //console.log("[intersects][name = " + Intersected.name +",isClockWise = " + isClockWise + "]" );
 
         switch (name) {
-            case this.names.Home:
-                viewMode = this.enumView.Home;
+            case componentNames.Home:
+                viewMode = enumViewMode.Home;
                 break;
-            case this.names.RoofCenter:
-                if (this.currentViewMode === this.enumView.RoofFront ||
-                    this.currentViewMode === this.enumView.RoofSouthEast||
-                    this.currentViewMode === this.enumView.RoofSouthWest) {
-                    viewMode = this.enumView.Top;
-                } else if (this.currentViewMode === this.enumView.RoofRight) {
-                    viewMode = this.enumView.TopTurnRight;
-                } else if (this.currentViewMode === this.enumView.RoofBack ||
-                    this.currentViewMode === this.enumView.RoofNorthEast ||
-                    this.currentViewMode === this.enumView.RoofNorthWest) {
-                    viewMode = this.enumView.TopTurnBack;
-                } else if (this.currentViewMode === this.enumView.RoofLeft) {
-                    viewMode = this.enumView.TopTurnLeft;
-                } else if (this.currentViewMode === this.enumView.TopTurnRight) {
-                    viewMode = this.enumView.TopTurnRight;
-                } else  if (this.currentViewMode === this.enumView.TopTurnBack ){
-                    viewMode = this.enumView.TopTurnBack;
-                } else  if ( this.currentViewMode === this.enumView.TopTurnLeft){
-                    viewMode = this.enumView.TopTurnLeft;
+            case componentNames.RoofCenter:
+                if (currentViewMode === enumViewMode.RoofFront ||
+                    currentViewMode === enumViewMode.RoofSouthEast ||
+                    currentViewMode === enumViewMode.RoofSouthWest) {
+                    viewMode = enumViewMode.Top;
+                } else if (currentViewMode === enumViewMode.RoofRight) {
+                    viewMode = enumViewMode.TopTurnRight;
+                } else if (currentViewMode === enumViewMode.RoofBack ||
+                    currentViewMode === enumViewMode.RoofNorthEast ||
+                    currentViewMode === enumViewMode.RoofNorthWest) {
+                    viewMode = enumViewMode.TopTurnBack;
+                } else if (currentViewMode === enumViewMode.RoofLeft) {
+                    viewMode = enumViewMode.TopTurnLeft;
+                } else if (currentViewMode === enumViewMode.TopTurnRight) {
+                    viewMode = enumViewMode.TopTurnRight;
+                } else if (currentViewMode === enumViewMode.TopTurnBack) {
+                    viewMode = enumViewMode.TopTurnBack;
+                } else if (currentViewMode === enumViewMode.TopTurnLeft) {
+                    viewMode = enumViewMode.TopTurnLeft;
                 } else {
-                    viewMode = this.enumView.Top; // 默认
+                    viewMode = enumViewMode.Top; // 默认
                 }
                 break;
-            case this.names.BottomFloor:
-                if (this.currentViewMode === this.enumView.BottomFront ||
-                    this.currentViewMode === this.enumView.BottomSouthEast||
-                    this.currentViewMode === this.enumView.BottomSouthWest) {
-                    viewMode = this.enumView.Bottom;
-                } else if (this.currentViewMode === this.enumView.BottomRight) {
-                    viewMode = this.enumView.BottomTurnLeft;
-                } else if (this.currentViewMode === this.enumView.BottomBack ||
-                    this.currentViewMode === this.enumView.BottomNorthEast ||
-                    this.currentViewMode === this.enumView.BottomNorthWest) {
-                    viewMode = this.enumView.BottomTurnBack;
-                } else if (this.currentViewMode === this.enumView.BottomLeft) {
-                    viewMode = this.enumView.BottomTurnRight;
-                } else if (this.currentViewMode === this.enumView.BottomTurnRight) {
-                    viewMode = this.enumView.BottomTurnRight;
-                } else  if (this.currentViewMode === this.enumView.BottomTurnBack ){
-                    viewMode = this.enumView.BottomTurnBack;
-                } else  if ( this.currentViewMode === this.enumView.BottomTurnLeft){
-                    viewMode = this.enumView.BottomTurnLeft;
+            case componentNames.BottomFloor:
+                if (currentViewMode === enumViewMode.BottomFront ||
+                    currentViewMode === enumViewMode.BottomSouthEast ||
+                    currentViewMode === enumViewMode.BottomSouthWest) {
+                    viewMode = enumViewMode.Bottom;
+                } else if (currentViewMode === enumViewMode.BottomRight) {
+                    viewMode = enumViewMode.BottomTurnLeft;
+                } else if (currentViewMode === enumViewMode.BottomBack ||
+                    currentViewMode === enumViewMode.BottomNorthEast ||
+                    currentViewMode === enumViewMode.BottomNorthWest) {
+                    viewMode = enumViewMode.BottomTurnBack;
+                } else if (currentViewMode === enumViewMode.BottomLeft) {
+                    viewMode = enumViewMode.BottomTurnRight;
+                } else if (currentViewMode === enumViewMode.BottomTurnRight) {
+                    viewMode = enumViewMode.BottomTurnRight;
+                } else if (currentViewMode === enumViewMode.BottomTurnBack) {
+                    viewMode = enumViewMode.BottomTurnBack;
+                } else if (currentViewMode === enumViewMode.BottomTurnLeft) {
+                    viewMode = enumViewMode.BottomTurnLeft;
                 } else {
-                    viewMode = this.enumView.Bottom; // 默认
+                    viewMode = enumViewMode.Bottom; // 默认
                 }
                 break;
-            case this.names.BottomSouth:
-                viewMode = this.enumView.BottomFront;
+            case componentNames.BottomSouth:
+                viewMode = enumViewMode.BottomFront;
                 break;
-            case this.names.BottomNorth:
-                viewMode = this.enumView.BottomBack;
+            case componentNames.BottomNorth:
+                viewMode = enumViewMode.BottomBack;
                 break;
-            case this.names.BottomEast:
-                viewMode = this.enumView.BottomRight;
+            case componentNames.BottomEast:
+                viewMode = enumViewMode.BottomRight;
                 break;
-            case this.names.BottomWest:
-                viewMode = this.enumView.BottomLeft;
+            case componentNames.BottomWest:
+                viewMode = enumViewMode.BottomLeft;
                 break;
-            case this.names.BottomSouthEast:
-                viewMode = this.enumView.BottomSouthEast;
+            case componentNames.BottomSouthEast:
+                viewMode = enumViewMode.BottomSouthEast;
                 break;
-            case this.names.BottomSouthWest:
-                viewMode = this.enumView.BottomSouthWest;
+            case componentNames.BottomSouthWest:
+                viewMode = enumViewMode.BottomSouthWest;
                 break;
-            case this.names.BottomNorthWest:
-                viewMode = this.enumView.BottomNorthWest;
+            case componentNames.BottomNorthWest:
+                viewMode = enumViewMode.BottomNorthWest;
                 break;
-            case this.names.BottomNorthEast:
-                viewMode = this.enumView.BottomNorthEast;
+            case componentNames.BottomNorthEast:
+                viewMode = enumViewMode.BottomNorthEast;
                 break;
-            case this.names.MiddleSouth:
-            case this.names.MiddleDoor:
-                viewMode = this.enumView.Front;
+            case componentNames.MiddleSouth:
+            case componentNames.MiddleDoor:
+                viewMode = enumViewMode.Front;
                 break;
-            case this.names.MiddleNorth:
-                viewMode = this.enumView.Back;
+            case componentNames.MiddleNorth:
+                viewMode = enumViewMode.Back;
                 break;
-            case this.names.MiddleRightWindow:
-            case this.names.MiddleEast:
-                viewMode = this.enumView.Right;
+            case componentNames.MiddleRightWindow:
+            case componentNames.MiddleEast:
+                viewMode = enumViewMode.Right;
                 break;
-            case this.names.MiddleWest:
-            case this.names.MiddleLeftWindow:
-                viewMode = this.enumView.Left;
+            case componentNames.MiddleWest:
+            case componentNames.MiddleLeftWindow:
+                viewMode = enumViewMode.Left;
                 break;
-            case this.names.MiddleSouthEast:
-                viewMode = this.enumView.SouthEast;
+            case componentNames.MiddleSouthEast:
+                viewMode = enumViewMode.SouthEast;
                 break;
-            case this.names.MiddleSouthWest:
-                viewMode = this.enumView.SouthWest;
+            case componentNames.MiddleSouthWest:
+                viewMode = enumViewMode.SouthWest;
                 break;
-            case this.names.MiddleNorthWest:
-                viewMode = this.enumView.NorthWest;
+            case componentNames.MiddleNorthWest:
+                viewMode = enumViewMode.NorthWest;
                 break;
-            case this.names.MiddleNorthEast:
-                viewMode = this.enumView.NorthEast;
+            case componentNames.MiddleNorthEast:
+                viewMode = enumViewMode.NorthEast;
                 break;
-            case this.names.RoofSouth:
-                viewMode = this.enumView.RoofFront;
+            case componentNames.RoofSouth:
+                viewMode = enumViewMode.RoofFront;
                 break;
-            case this.names.RoofNorth:
-                viewMode = this.enumView.RoofBack;
+            case componentNames.RoofNorth:
+                viewMode = enumViewMode.RoofBack;
                 break;
-            case this.names.RoofEast:
-                viewMode = this.enumView.RoofRight;
+            case componentNames.RoofEast:
+                viewMode = enumViewMode.RoofRight;
                 break;
-            case this.names.RoofWest:
-                viewMode = this.enumView.RoofLeft;
+            case componentNames.RoofWest:
+                viewMode = enumViewMode.RoofLeft;
                 break;
-            case this.names.RoofSouthEast:
-                viewMode = this.enumView.RoofSouthEast;
+            case componentNames.RoofSouthEast:
+                viewMode = enumViewMode.RoofSouthEast;
                 break;
-            case this.names.RoofSouthWest:
-                viewMode = this.enumView.RoofSouthWest;
+            case componentNames.RoofSouthWest:
+                viewMode = enumViewMode.RoofSouthWest;
                 break;
-            case this.names.RoofNorthWest:
-                viewMode = this.enumView.RoofNorthWest;
+            case componentNames.RoofNorthWest:
+                viewMode = enumViewMode.RoofNorthWest;
                 break;
-            case this.names.RoofNorthEast:
-                viewMode = this.enumView.RoofNorthEast;
+            case componentNames.RoofNorthEast:
+                viewMode = enumViewMode.RoofNorthEast;
                 break;
-            case this.names.ControlPointNorth: // 前 - 顶 - 后 - 后顶 - 前
-                if (this.currentViewMode === this.enumView.Front) {
-                    viewMode = this.enumView.Top;
-                }else if (this.currentViewMode === this.enumView.Top) {
-                    viewMode = this.enumView.Back;
-                } else if (this.currentViewMode === this.enumView.Back) {
-                    viewMode = this.enumView.TopTurnBack;
-                } else if (this.currentViewMode === this.enumView.TopTurnBack) {
-                    viewMode = this.enumView.Front;
-                } else if (this.currentViewMode === this.enumView.Right) {
-                    viewMode = this.enumView.TopTurnRight;
-                } else if (this.currentViewMode === this.enumView.TopTurnRight) {
-                    viewMode = this.enumView.Left;
-                } else if (this.currentViewMode === this.enumView.Left) {
-                    viewMode = this.enumView.TopTurnLeft;
-                } else if (this.currentViewMode === this.enumView.TopTurnLeft) {
-                    viewMode = this.enumView.Right;
-                } else if (this.currentViewMode === this.enumView.BackTurnRight) {
-                    viewMode = this.enumView.Left;
-                } else if (this.currentViewMode === this.enumView.BackTurnLeft) {
-                    viewMode = this.enumView.Right;
-                } else if (this.currentViewMode === this.enumView.BackTurnTop) {
-                    viewMode = this.enumView.Back;
-                } else if (this.currentViewMode === this.enumView.RightTurnFront) {
-                    viewMode = this.enumView.Back;
-                } else if (this.currentViewMode === this.enumView.RightTurnBack) {
-                    viewMode = this.enumView.Front;
-                } else if (this.currentViewMode === this.enumView.RightTurnTop) {
-                    viewMode = this.enumView.Bottom;
-                } else if (this.currentViewMode === this.enumView.LeftTurnFront) {
-                    viewMode = this.enumView.Back;
-                } else if (this.currentViewMode === this.enumView.LeftTurnBack) {
-                    viewMode = this.enumView.Front;
-                } else if (this.currentViewMode === this.enumView.LeftTurnTop) {
-                    viewMode = this.enumView.Bottom;
-                } else if (this.currentViewMode === this.enumView.BottomTurnRight) {
-                    viewMode = this.enumView.Left;
-                } else if (this.currentViewMode === this.enumView.BottomTurnLeft) {
-                    viewMode = this.enumView.Right;
-                } else if (this.currentViewMode === this.enumView.BottomTurnBack) {
-                    viewMode = this.enumView.Back;
-                } else if (this.currentViewMode === this.enumView.FrontTurnRight) {
-                    viewMode = this.enumView.Left;
-                } else if (this.currentViewMode === this.enumView.FrontTurnLeft) {
-                    viewMode = this.enumView.Right;
-                } else if (this.currentViewMode === this.enumView.FrontTurnTop) {
-                    viewMode = this.enumView.Bottom;
-                }  else {
-                    viewMode = this.enumView.Top; // 默认
+            case componentNames.ControlPointNorth: // 前 - 顶 - 后 - 后顶 - 前
+                if (currentViewMode === enumViewMode.Front) {
+                    viewMode = enumViewMode.Top;
+                } else if (currentViewMode === enumViewMode.Top) {
+                    viewMode = enumViewMode.Back;
+                } else if (currentViewMode === enumViewMode.Back) {
+                    viewMode = enumViewMode.TopTurnBack;
+                } else if (currentViewMode === enumViewMode.TopTurnBack) {
+                    viewMode = enumViewMode.Front;
+                } else if (currentViewMode === enumViewMode.Right) {
+                    viewMode = enumViewMode.TopTurnRight;
+                } else if (currentViewMode === enumViewMode.TopTurnRight) {
+                    viewMode = enumViewMode.Left;
+                } else if (currentViewMode === enumViewMode.Left) {
+                    viewMode = enumViewMode.TopTurnLeft;
+                } else if (currentViewMode === enumViewMode.TopTurnLeft) {
+                    viewMode = enumViewMode.Right;
+                } else if (currentViewMode === enumViewMode.BackTurnRight) {
+                    viewMode = enumViewMode.Left;
+                } else if (currentViewMode === enumViewMode.BackTurnLeft) {
+                    viewMode = enumViewMode.Right;
+                } else if (currentViewMode === enumViewMode.BackTurnTop) {
+                    viewMode = enumViewMode.Back;
+                } else if (currentViewMode === enumViewMode.RightTurnFront) {
+                    viewMode = enumViewMode.Back;
+                } else if (currentViewMode === enumViewMode.RightTurnBack) {
+                    viewMode = enumViewMode.Front;
+                } else if (currentViewMode === enumViewMode.RightTurnTop) {
+                    viewMode = enumViewMode.Bottom;
+                } else if (currentViewMode === enumViewMode.LeftTurnFront) {
+                    viewMode = enumViewMode.Back;
+                } else if (currentViewMode === enumViewMode.LeftTurnBack) {
+                    viewMode = enumViewMode.Front;
+                } else if (currentViewMode === enumViewMode.LeftTurnTop) {
+                    viewMode = enumViewMode.Bottom;
+                } else if (currentViewMode === enumViewMode.BottomTurnRight) {
+                    viewMode = enumViewMode.Left;
+                } else if (currentViewMode === enumViewMode.BottomTurnLeft) {
+                    viewMode = enumViewMode.Right;
+                } else if (currentViewMode === enumViewMode.BottomTurnBack) {
+                    viewMode = enumViewMode.Back;
+                } else if (currentViewMode === enumViewMode.FrontTurnRight) {
+                    viewMode = enumViewMode.Left;
+                } else if (currentViewMode === enumViewMode.FrontTurnLeft) {
+                    viewMode = enumViewMode.Right;
+                } else if (currentViewMode === enumViewMode.FrontTurnTop) {
+                    viewMode = enumViewMode.Bottom;
+                } else {
+                    viewMode = enumViewMode.Top; // 默认
                 }
                 break;
-            case this.names.ControlPointSouth: // 前 - 底 - 后 - 后底 - 前
-                if (this.currentViewMode === this.enumView.Front) {
-                    viewMode = this.enumView.Bottom;
-                }else if (this.currentViewMode === this.enumView.Bottom) {
-                    viewMode = this.enumView.Back;
-                } else if (this.currentViewMode === this.enumView.Back) {
-                    viewMode = this.enumView.BottomTurnBack;
-                } else if (this.currentViewMode === this.enumView.BottomTurnBack) {
-                    viewMode = this.enumView.Front;
-                } else if (this.currentViewMode === this.enumView.Right) {
-                    viewMode = this.enumView.BottomTurnRight;
-                } else if (this.currentViewMode === this.enumView.BottomTurnRight) {
-                    viewMode = this.enumView.Left;
-                } else if (this.currentViewMode === this.enumView.Left) {
-                    viewMode = this.enumView.BottomTurnLeft;
-                } else if (this.currentViewMode === this.enumView.BottomTurnLeft) {
-                    viewMode = this.enumView.Right;
-                } else if (this.currentViewMode === this.enumView.FrontTurnRight) {
-                    viewMode = this.enumView.Right;
-                } else if (this.currentViewMode === this.enumView.FrontTurnLeft) {
-                    viewMode = this.enumView.Left;
-                } else if (this.currentViewMode === this.enumView.FrontTurnTop) {
-                    viewMode = this.enumView.Top;
-                } else if (this.currentViewMode === this.enumView.RightTurnFront) {
-                    viewMode = this.enumView.Front;
-                } else if (this.currentViewMode === this.enumView.RightTurnBack) {
-                    viewMode = this.enumView.Back;
-                } else if (this.currentViewMode === this.enumView.RightTurnTop) {
-                    viewMode = this.enumView.Top;
-                }else if (this.currentViewMode === this.enumView.BackTurnRight) {
-                    viewMode = this.enumView.Right;
-                } else if (this.currentViewMode === this.enumView.BackTurnLeft) {
-                    viewMode = this.enumView.Left;
-                } else if (this.currentViewMode === this.enumView.BackTurnTop) {
-                    viewMode = this.enumView.Top;
-                }else if (this.currentViewMode === this.enumView.LeftTurnFront) {
-                    viewMode = this.enumView.Front;
-                } else if (this.currentViewMode === this.enumView.LeftTurnBack) {
-                    viewMode = this.enumView.Back;
-                } else if (this.currentViewMode === this.enumView.LeftTurnTop) {
-                    viewMode = this.enumView.Top;
-                }else if (this.currentViewMode === this.enumView.Top) {
-                    viewMode = this.enumView.Front;
-                } else if (this.currentViewMode === this.enumView.TopTurnRight) {
-                    viewMode = this.enumView.Right;
-                } else if (this.currentViewMode === this.enumView.TopTurnBack) {
-                    viewMode = this.enumView.Back;
-                } else if (this.currentViewMode === this.enumView.TopTurnLeft) {
-                    viewMode = this.enumView.Left;
+            case componentNames.ControlPointSouth: // 前 - 底 - 后 - 后底 - 前
+                if (currentViewMode === enumViewMode.Front) {
+                    viewMode = enumViewMode.Bottom;
+                } else if (currentViewMode === enumViewMode.Bottom) {
+                    viewMode = enumViewMode.Back;
+                } else if (currentViewMode === enumViewMode.Back) {
+                    viewMode = enumViewMode.BottomTurnBack;
+                } else if (currentViewMode === enumViewMode.BottomTurnBack) {
+                    viewMode = enumViewMode.Front;
+                } else if (currentViewMode === enumViewMode.Right) {
+                    viewMode = enumViewMode.BottomTurnRight;
+                } else if (currentViewMode === enumViewMode.BottomTurnRight) {
+                    viewMode = enumViewMode.Left;
+                } else if (currentViewMode === enumViewMode.Left) {
+                    viewMode = enumViewMode.BottomTurnLeft;
+                } else if (currentViewMode === enumViewMode.BottomTurnLeft) {
+                    viewMode = enumViewMode.Right;
+                } else if (currentViewMode === enumViewMode.FrontTurnRight) {
+                    viewMode = enumViewMode.Right;
+                } else if (currentViewMode === enumViewMode.FrontTurnLeft) {
+                    viewMode = enumViewMode.Left;
+                } else if (currentViewMode === enumViewMode.FrontTurnTop) {
+                    viewMode = enumViewMode.Top;
+                } else if (currentViewMode === enumViewMode.RightTurnFront) {
+                    viewMode = enumViewMode.Front;
+                } else if (currentViewMode === enumViewMode.RightTurnBack) {
+                    viewMode = enumViewMode.Back;
+                } else if (currentViewMode === enumViewMode.RightTurnTop) {
+                    viewMode = enumViewMode.Top;
+                } else if (currentViewMode === enumViewMode.BackTurnRight) {
+                    viewMode = enumViewMode.Right;
+                } else if (currentViewMode === enumViewMode.BackTurnLeft) {
+                    viewMode = enumViewMode.Left;
+                } else if (currentViewMode === enumViewMode.BackTurnTop) {
+                    viewMode = enumViewMode.Top;
+                } else if (currentViewMode === enumViewMode.LeftTurnFront) {
+                    viewMode = enumViewMode.Front;
+                } else if (currentViewMode === enumViewMode.LeftTurnBack) {
+                    viewMode = enumViewMode.Back;
+                } else if (currentViewMode === enumViewMode.LeftTurnTop) {
+                    viewMode = enumViewMode.Top;
+                } else if (currentViewMode === enumViewMode.Top) {
+                    viewMode = enumViewMode.Front;
+                } else if (currentViewMode === enumViewMode.TopTurnRight) {
+                    viewMode = enumViewMode.Right;
+                } else if (currentViewMode === enumViewMode.TopTurnBack) {
+                    viewMode = enumViewMode.Back;
+                } else if (currentViewMode === enumViewMode.TopTurnLeft) {
+                    viewMode = enumViewMode.Left;
                 }
                 else {
-                    viewMode = this.enumView.Bottom; // 默认
+                    viewMode = enumViewMode.Bottom; // 默认
                 }
                 break;
-            case this.names.ControlPointEast: // 前 - 右 - 后 - 左 - 前
-                if (this.currentViewMode === this.enumView.Front) {
-                    viewMode = this.enumView.Right;
-                } else if (this.currentViewMode === this.enumView.Right) {
-                    viewMode = this.enumView.Back;
-                } else if (this.currentViewMode === this.enumView.Back) {
-                    viewMode = this.enumView.Left;
-                } else if (this.currentViewMode === this.enumView.Left) {
-                    viewMode = this.enumView.Front;
-                } else if (this.currentViewMode === this.enumView.Top) {
-                    viewMode = this.enumView.Right;
-                } else if (this.currentViewMode === this.enumView.TopTurnRight) {
-                    viewMode = this.enumView.Back;
-                } else if (this.currentViewMode === this.enumView.TopTurnBack) {
-                    viewMode = this.enumView.Left;
-                } else if (this.currentViewMode === this.enumView.TopTurnLeft) {
-                    viewMode = this.enumView.Front;
-                } else if (this.currentViewMode === this.enumView.Bottom) {
-                    viewMode = this.enumView.Right;
-                } else if (this.currentViewMode === this.enumView.BottomTurnRight) {
-                    viewMode = this.enumView.Front;
-                } else if (this.currentViewMode === this.enumView.BottomTurnBack) {
-                    viewMode = this.enumView.Left;
-                } else if (this.currentViewMode === this.enumView.BottomTurnLeft) {
-                    viewMode = this.enumView.Back;
-                } else if (this.currentViewMode === this.enumView.FrontTurnRight) {
-                    viewMode = this.enumView.Top;
-                } else if (this.currentViewMode === this.enumView.FrontTurnLeft) {
-                    viewMode = this.enumView.Bottom;
-                } else if (this.currentViewMode === this.enumView.FrontTurnTop) {
-                    viewMode = this.enumView.Left;
-                } else if (this.currentViewMode === this.enumView.RightTurnFront) {
-                    viewMode = this.enumView.Back;
-                } else if (this.currentViewMode === this.enumView.RightTurnBack) {
-                    viewMode = this.enumView.Top;
-                } else if (this.currentViewMode === this.enumView.RightTurnTop) {
-                    viewMode = this.enumView.Front;
-                }else if (this.currentViewMode === this.enumView.BackTurnRight) {
-                    viewMode = this.enumView.Top;
-                } else if (this.currentViewMode === this.enumView.BackTurnLeft) {
-                    viewMode = this.enumView.Bottom;
-                } else if (this.currentViewMode === this.enumView.BackTurnTop) {
-                    viewMode = this.enumView.Left;
-                }else if (this.currentViewMode === this.enumView.LeftTurnFront) {
-                    viewMode = this.enumView.Top;
-                } else if (this.currentViewMode === this.enumView.LeftTurnBack) {
-                    viewMode = this.enumView.Bottom;
-                } else if (this.currentViewMode === this.enumView.LeftTurnTop) {
-                    viewMode = this.enumView.Back;
+            case componentNames.ControlPointEast: // 前 - 右 - 后 - 左 - 前
+                if (currentViewMode === enumViewMode.Front) {
+                    viewMode = enumViewMode.Right;
+                } else if (currentViewMode === enumViewMode.Right) {
+                    viewMode = enumViewMode.Back;
+                } else if (currentViewMode === enumViewMode.Back) {
+                    viewMode = enumViewMode.Left;
+                } else if (currentViewMode === enumViewMode.Left) {
+                    viewMode = enumViewMode.Front;
+                } else if (currentViewMode === enumViewMode.Top) {
+                    viewMode = enumViewMode.Right;
+                } else if (currentViewMode === enumViewMode.TopTurnRight) {
+                    viewMode = enumViewMode.Back;
+                } else if (currentViewMode === enumViewMode.TopTurnBack) {
+                    viewMode = enumViewMode.Left;
+                } else if (currentViewMode === enumViewMode.TopTurnLeft) {
+                    viewMode = enumViewMode.Front;
+                } else if (currentViewMode === enumViewMode.Bottom) {
+                    viewMode = enumViewMode.Right;
+                } else if (currentViewMode === enumViewMode.BottomTurnRight) {
+                    viewMode = enumViewMode.Front;
+                } else if (currentViewMode === enumViewMode.BottomTurnBack) {
+                    viewMode = enumViewMode.Left;
+                } else if (currentViewMode === enumViewMode.BottomTurnLeft) {
+                    viewMode = enumViewMode.Back;
+                } else if (currentViewMode === enumViewMode.FrontTurnRight) {
+                    viewMode = enumViewMode.Top;
+                } else if (currentViewMode === enumViewMode.FrontTurnLeft) {
+                    viewMode = enumViewMode.Bottom;
+                } else if (currentViewMode === enumViewMode.FrontTurnTop) {
+                    viewMode = enumViewMode.Left;
+                } else if (currentViewMode === enumViewMode.RightTurnFront) {
+                    viewMode = enumViewMode.Back;
+                } else if (currentViewMode === enumViewMode.RightTurnBack) {
+                    viewMode = enumViewMode.Top;
+                } else if (currentViewMode === enumViewMode.RightTurnTop) {
+                    viewMode = enumViewMode.Front;
+                } else if (currentViewMode === enumViewMode.BackTurnRight) {
+                    viewMode = enumViewMode.Top;
+                } else if (currentViewMode === enumViewMode.BackTurnLeft) {
+                    viewMode = enumViewMode.Bottom;
+                } else if (currentViewMode === enumViewMode.BackTurnTop) {
+                    viewMode = enumViewMode.Left;
+                } else if (currentViewMode === enumViewMode.LeftTurnFront) {
+                    viewMode = enumViewMode.Top;
+                } else if (currentViewMode === enumViewMode.LeftTurnBack) {
+                    viewMode = enumViewMode.Bottom;
+                } else if (currentViewMode === enumViewMode.LeftTurnTop) {
+                    viewMode = enumViewMode.Back;
                 } else {
-                    viewMode = this.enumView.Right; // 默认
+                    viewMode = enumViewMode.Right; // 默认
                 }
                 break;
-            case this.names.ControlPointWest: // 前 - 左 - 后 - 右 - 前
-                if (this.currentViewMode === this.enumView.Front) {
-                    viewMode = this.enumView.Left;
-                } else if (this.currentViewMode === this.enumView.Left) {
-                    viewMode = this.enumView.Back;
-                } else if (this.currentViewMode === this.enumView.Back) {
-                    viewMode = this.enumView.Right;
-                } else if (this.currentViewMode === this.enumView.Right) {
-                    viewMode = this.enumView.Front;
-                } else if (this.currentViewMode === this.enumView.Front) {
-                    viewMode = this.enumView.Left;
-                } else if (this.currentViewMode === this.enumView.Top) {
-                    viewMode = this.enumView.Left;
-                } else if (this.currentViewMode === this.enumView.TopTurnRight) {
-                    viewMode = this.enumView.Front;
-                } else if (this.currentViewMode === this.enumView.TopTurnBack) {
-                    viewMode = this.enumView.Right;
-                } else if (this.currentViewMode === this.enumView.TopTurnLeft) {
-                    viewMode = this.enumView.Back;
-                } else if (this.currentViewMode === this.enumView.Bottom) {
-                    viewMode = this.enumView.Left;
-                } else if (this.currentViewMode === this.enumView.BottomTurnRight) {
-                    viewMode = this.enumView.Back;
-                } else if (this.currentViewMode === this.enumView.BottomTurnBack) {
-                    viewMode = this.enumView.Right;
-                } else if (this.currentViewMode === this.enumView.BottomTurnLeft) {
-                    viewMode = this.enumView.Front;
-                } else if (this.currentViewMode === this.enumView.FrontTurnRight) {
-                    viewMode = this.enumView.Bottom;
-                } else if (this.currentViewMode === this.enumView.FrontTurnLeft) {
-                    viewMode = this.enumView.Top;
-                } else if (this.currentViewMode === this.enumView.FrontTurnTop) {
-                    viewMode = this.enumView.Right;
-                } else if (this.currentViewMode === this.enumView.RightTurnFront) {
-                    viewMode = this.enumView.Top;
-                } else if (this.currentViewMode === this.enumView.RightTurnBack) {
-                    viewMode = this.enumView.Bottom;
-                } else if (this.currentViewMode === this.enumView.RightTurnTop) {
-                    viewMode = this.enumView.Back;
-                }else if (this.currentViewMode === this.enumView.BackTurnRight) {
-                    viewMode = this.enumView.Top;
-                } else if (this.currentViewMode === this.enumView.BackTurnLeft) {
-                    viewMode = this.enumView.Bottom;
-                } else if (this.currentViewMode === this.enumView.BackTurnTop) {
-                    viewMode = this.enumView.Right;
-                }else if (this.currentViewMode === this.enumView.LeftTurnFront) {
-                    viewMode = this.enumView.Bottom;
-                } else if (this.currentViewMode === this.enumView.LeftTurnBack) {
-                    viewMode = this.enumView.Top;
-                } else if (this.currentViewMode === this.enumView.LeftTurnTop) {
-                    viewMode = this.enumView.Front;
+            case componentNames.ControlPointWest: // 前 - 左 - 后 - 右 - 前
+                if (currentViewMode === enumViewMode.Front) {
+                    viewMode = enumViewMode.Left;
+                } else if (currentViewMode === enumViewMode.Left) {
+                    viewMode = enumViewMode.Back;
+                } else if (currentViewMode === enumViewMode.Back) {
+                    viewMode = enumViewMode.Right;
+                } else if (currentViewMode === enumViewMode.Right) {
+                    viewMode = enumViewMode.Front;
+                } else if (currentViewMode === enumViewMode.Front) {
+                    viewMode = enumViewMode.Left;
+                } else if (currentViewMode === enumViewMode.Top) {
+                    viewMode = enumViewMode.Left;
+                } else if (currentViewMode === enumViewMode.TopTurnRight) {
+                    viewMode = enumViewMode.Front;
+                } else if (currentViewMode === enumViewMode.TopTurnBack) {
+                    viewMode = enumViewMode.Right;
+                } else if (currentViewMode === enumViewMode.TopTurnLeft) {
+                    viewMode = enumViewMode.Back;
+                } else if (currentViewMode === enumViewMode.Bottom) {
+                    viewMode = enumViewMode.Left;
+                } else if (currentViewMode === enumViewMode.BottomTurnRight) {
+                    viewMode = enumViewMode.Back;
+                } else if (currentViewMode === enumViewMode.BottomTurnBack) {
+                    viewMode = enumViewMode.Right;
+                } else if (currentViewMode === enumViewMode.BottomTurnLeft) {
+                    viewMode = enumViewMode.Front;
+                } else if (currentViewMode === enumViewMode.FrontTurnRight) {
+                    viewMode = enumViewMode.Bottom;
+                } else if (currentViewMode === enumViewMode.FrontTurnLeft) {
+                    viewMode = enumViewMode.Top;
+                } else if (currentViewMode === enumViewMode.FrontTurnTop) {
+                    viewMode = enumViewMode.Right;
+                } else if (currentViewMode === enumViewMode.RightTurnFront) {
+                    viewMode = enumViewMode.Top;
+                } else if (currentViewMode === enumViewMode.RightTurnBack) {
+                    viewMode = enumViewMode.Bottom;
+                } else if (currentViewMode === enumViewMode.RightTurnTop) {
+                    viewMode = enumViewMode.Back;
+                } else if (currentViewMode === enumViewMode.BackTurnRight) {
+                    viewMode = enumViewMode.Top;
+                } else if (currentViewMode === enumViewMode.BackTurnLeft) {
+                    viewMode = enumViewMode.Bottom;
+                } else if (currentViewMode === enumViewMode.BackTurnTop) {
+                    viewMode = enumViewMode.Right;
+                } else if (currentViewMode === enumViewMode.LeftTurnFront) {
+                    viewMode = enumViewMode.Bottom;
+                } else if (currentViewMode === enumViewMode.LeftTurnBack) {
+                    viewMode = enumViewMode.Top;
+                } else if (currentViewMode === enumViewMode.LeftTurnTop) {
+                    viewMode = enumViewMode.Front;
                 } else {
-                    viewMode = this.enumView.Left; // 默认
+                    viewMode = enumViewMode.Left; // 默认
                 }
                 break;
-            case this.names.ControlRingNorthEast:
-            case this.names.ControlRingSouthWest:
-            case this.names.ControlRingNorthWest:
-            case this.names.ControlRingSouthEast:
+            case componentNames.ControlRingNorthEast:
+            case componentNames.ControlRingSouthWest:
+            case componentNames.ControlRingNorthWest:
+            case componentNames.ControlRingSouthEast:
                 if (isClockWise) {// clockwise
-                    if (this.currentViewMode === this.enumView.Front) {
-                        viewMode = this.enumView.FrontTurnRight;
-                    } else if (this.currentViewMode === this.enumView.FrontTurnRight) {
-                        viewMode = this.enumView.FrontTurnTop;
-                    }else if (this.currentViewMode === this.enumView.FrontTurnTop) {
-                        viewMode = this.enumView.FrontTurnLeft;
-                    }else if (this.currentViewMode === this.enumView.FrontTurnLeft) {
-                        viewMode = this.enumView.Front;
-                    }else if (this.currentViewMode === this.enumView.Right) {
-                        viewMode = this.enumView.RightTurnBack;
-                    }else if (this.currentViewMode === this.enumView.RightTurnBack) {
-                        viewMode = this.enumView.RightTurnTop;
-                    }else if (this.currentViewMode === this.enumView.RightTurnTop) {
-                        viewMode = this.enumView.RightTurnFront;
-                    }else if (this.currentViewMode === this.enumView.RightTurnFront) {
-                        viewMode = this.enumView.Right;
-                    }else if (this.currentViewMode === this.enumView.Back) {
-                        viewMode = this.enumView.BackTurnRight;
-                    }else if (this.currentViewMode === this.enumView.BackTurnRight) {
-                        viewMode = this.enumView.BackTurnTop;
-                    }else if (this.currentViewMode === this.enumView.BackTurnTop) {
-                        viewMode = this.enumView.BackTurnLeft;
-                    }else if (this.currentViewMode === this.enumView.BackTurnLeft) {
-                        viewMode = this.enumView.Back;
-                    }else if (this.currentViewMode === this.enumView.Left) {
-                        viewMode = this.enumView.LeftTurnFront;
-                    }else if (this.currentViewMode === this.enumView.LeftTurnFront) {
-                        viewMode = this.enumView.LeftTurnTop;
-                    }else if (this.currentViewMode === this.enumView.LeftTurnTop) {
-                        viewMode = this.enumView.LeftTurnBack;
-                    }else if (this.currentViewMode === this.enumView.LeftTurnBack) {
-                        viewMode = this.enumView.Left;
-                    }else if (this.currentViewMode === this.enumView.Top) {
-                        viewMode = this.enumView.TopTurnRight;
-                    }else if (this.currentViewMode === this.enumView.TopTurnRight) {
-                        viewMode = this.enumView.TopTurnBack;
-                    }else if (this.currentViewMode === this.enumView.TopTurnBack) {
-                        viewMode = this.enumView.TopTurnLeft;
-                    }else if (this.currentViewMode === this.enumView.TopTurnLeft) {
-                        viewMode = this.enumView.Top;
-                    }else if (this.currentViewMode === this.enumView.Bottom) {
-                        viewMode = this.enumView.BottomTurnRight;
-                    }else if (this.currentViewMode === this.enumView.BottomTurnRight) {
-                        viewMode = this.enumView.BottomTurnBack;
-                    }else if (this.currentViewMode === this.enumView.BottomTurnBack) {
-                        viewMode = this.enumView.BottomTurnLeft;
-                    }else if (this.currentViewMode === this.enumView.BottomTurnLeft) {
-                        viewMode = this.enumView.Bottom;
-                    }else {
-                        viewMode = this.enumView.FrontTurnRight; // 默认
+                    if (currentViewMode === enumViewMode.Front) {
+                        viewMode = enumViewMode.FrontTurnRight;
+                    } else if (currentViewMode === enumViewMode.FrontTurnRight) {
+                        viewMode = enumViewMode.FrontTurnTop;
+                    } else if (currentViewMode === enumViewMode.FrontTurnTop) {
+                        viewMode = enumViewMode.FrontTurnLeft;
+                    } else if (currentViewMode === enumViewMode.FrontTurnLeft) {
+                        viewMode = enumViewMode.Front;
+                    } else if (currentViewMode === enumViewMode.Right) {
+                        viewMode = enumViewMode.RightTurnBack;
+                    } else if (currentViewMode === enumViewMode.RightTurnBack) {
+                        viewMode = enumViewMode.RightTurnTop;
+                    } else if (currentViewMode === enumViewMode.RightTurnTop) {
+                        viewMode = enumViewMode.RightTurnFront;
+                    } else if (currentViewMode === enumViewMode.RightTurnFront) {
+                        viewMode = enumViewMode.Right;
+                    } else if (currentViewMode === enumViewMode.Back) {
+                        viewMode = enumViewMode.BackTurnRight;
+                    } else if (currentViewMode === enumViewMode.BackTurnRight) {
+                        viewMode = enumViewMode.BackTurnTop;
+                    } else if (currentViewMode === enumViewMode.BackTurnTop) {
+                        viewMode = enumViewMode.BackTurnLeft;
+                    } else if (currentViewMode === enumViewMode.BackTurnLeft) {
+                        viewMode = enumViewMode.Back;
+                    } else if (currentViewMode === enumViewMode.Left) {
+                        viewMode = enumViewMode.LeftTurnFront;
+                    } else if (currentViewMode === enumViewMode.LeftTurnFront) {
+                        viewMode = enumViewMode.LeftTurnTop;
+                    } else if (currentViewMode === enumViewMode.LeftTurnTop) {
+                        viewMode = enumViewMode.LeftTurnBack;
+                    } else if (currentViewMode === enumViewMode.LeftTurnBack) {
+                        viewMode = enumViewMode.Left;
+                    } else if (currentViewMode === enumViewMode.Top) {
+                        viewMode = enumViewMode.TopTurnRight;
+                    } else if (currentViewMode === enumViewMode.TopTurnRight) {
+                        viewMode = enumViewMode.TopTurnBack;
+                    } else if (currentViewMode === enumViewMode.TopTurnBack) {
+                        viewMode = enumViewMode.TopTurnLeft;
+                    } else if (currentViewMode === enumViewMode.TopTurnLeft) {
+                        viewMode = enumViewMode.Top;
+                    } else if (currentViewMode === enumViewMode.Bottom) {
+                        viewMode = enumViewMode.BottomTurnRight;
+                    } else if (currentViewMode === enumViewMode.BottomTurnRight) {
+                        viewMode = enumViewMode.BottomTurnBack;
+                    } else if (currentViewMode === enumViewMode.BottomTurnBack) {
+                        viewMode = enumViewMode.BottomTurnLeft;
+                    } else if (currentViewMode === enumViewMode.BottomTurnLeft) {
+                        viewMode = enumViewMode.Bottom;
+                    } else {
+                        viewMode = enumViewMode.FrontTurnRight; // 默认
                     }
                 } else {
-                    if (this.currentViewMode === this.enumView.Front) {
-                        viewMode = this.enumView.FrontTurnLeft;
-                    } else if (this.currentViewMode === this.enumView.FrontTurnLeft) {
-                        viewMode = this.enumView.FrontTurnTop;
-                    }else if (this.currentViewMode === this.enumView.FrontTurnTop) {
-                        viewMode = this.enumView.FrontTurnRight;
-                    }else if (this.currentViewMode === this.enumView.FrontTurnRight) {
-                        viewMode = this.enumView.Front;
-                    }else if (this.currentViewMode === this.enumView.Right) {
-                        viewMode = this.enumView.RightTurnFront;
-                    }else if (this.currentViewMode === this.enumView.RightTurnFront) {
-                        viewMode = this.enumView.RightTurnTop;
-                    }else if (this.currentViewMode === this.enumView.RightTurnTop) {
-                        viewMode = this.enumView.RightTurnBack;
-                    }else if (this.currentViewMode === this.enumView.RightTurnBack) {
-                        viewMode = this.enumView.Right;
-                    }else if (this.currentViewMode === this.enumView.Back) {
-                        viewMode = this.enumView.BackTurnLeft;
-                    }else if (this.currentViewMode === this.enumView.BackTurnLeft) {
-                        viewMode = this.enumView.BackTurnTop;
-                    }else if (this.currentViewMode === this.enumView.BackTurnTop) {
-                        viewMode = this.enumView.BackTurnRight;
-                    }else if (this.currentViewMode === this.enumView.BackTurnRight) {
-                        viewMode = this.enumView.Back;
-                    }else if (this.currentViewMode === this.enumView.Left) {
-                        viewMode = this.enumView.LeftTurnBack;
-                    }else if (this.currentViewMode === this.enumView.LeftTurnBack) {
-                        viewMode = this.enumView.LeftTurnTop;
-                    }else if (this.currentViewMode === this.enumView.LeftTurnTop) {
-                        viewMode = this.enumView.LeftTurnFront;
-                    }else if (this.currentViewMode === this.enumView.LeftTurnFront) {
-                        viewMode = this.enumView.Left;
-                    }else if (this.currentViewMode === this.enumView.Top) {
-                        viewMode = this.enumView.TopTurnLeft;
-                    }else if (this.currentViewMode === this.enumView.TopTurnLeft) {
-                        viewMode = this.enumView.TopTurnBack;
-                    }else if (this.currentViewMode === this.enumView.TopTurnBack) {
-                        viewMode = this.enumView.TopTurnRight;
-                    }else if (this.currentViewMode === this.enumView.TopTurnRight) {
-                        viewMode = this.enumView.Top;
-                    }else if (this.currentViewMode === this.enumView.Bottom) {
-                        viewMode = this.enumView.BottomTurnLeft;
-                    }else if (this.currentViewMode === this.enumView.BottomTurnLeft) {
-                        viewMode = this.enumView.BottomTurnBack;
-                    }else if (this.currentViewMode === this.enumView.BottomTurnBack) {
-                        viewMode = this.enumView.BottomTurnRight;
-                    }else if (this.currentViewMode === this.enumView.BottomTurnRight) {
-                        viewMode = this.enumView.Bottom;
-                    }else {
-                        viewMode = this.enumView.FrontTurnLeft; // 默认
+                    if (currentViewMode === enumViewMode.Front) {
+                        viewMode = enumViewMode.FrontTurnLeft;
+                    } else if (currentViewMode === enumViewMode.FrontTurnLeft) {
+                        viewMode = enumViewMode.FrontTurnTop;
+                    } else if (currentViewMode === enumViewMode.FrontTurnTop) {
+                        viewMode = enumViewMode.FrontTurnRight;
+                    } else if (currentViewMode === enumViewMode.FrontTurnRight) {
+                        viewMode = enumViewMode.Front;
+                    } else if (currentViewMode === enumViewMode.Right) {
+                        viewMode = enumViewMode.RightTurnFront;
+                    } else if (currentViewMode === enumViewMode.RightTurnFront) {
+                        viewMode = enumViewMode.RightTurnTop;
+                    } else if (currentViewMode === enumViewMode.RightTurnTop) {
+                        viewMode = enumViewMode.RightTurnBack;
+                    } else if (currentViewMode === enumViewMode.RightTurnBack) {
+                        viewMode = enumViewMode.Right;
+                    } else if (currentViewMode === enumViewMode.Back) {
+                        viewMode = enumViewMode.BackTurnLeft;
+                    } else if (currentViewMode === enumViewMode.BackTurnLeft) {
+                        viewMode = enumViewMode.BackTurnTop;
+                    } else if (currentViewMode === enumViewMode.BackTurnTop) {
+                        viewMode = enumViewMode.BackTurnRight;
+                    } else if (currentViewMode === enumViewMode.BackTurnRight) {
+                        viewMode = enumViewMode.Back;
+                    } else if (currentViewMode === enumViewMode.Left) {
+                        viewMode = enumViewMode.LeftTurnBack;
+                    } else if (currentViewMode === enumViewMode.LeftTurnBack) {
+                        viewMode = enumViewMode.LeftTurnTop;
+                    } else if (currentViewMode === enumViewMode.LeftTurnTop) {
+                        viewMode = enumViewMode.LeftTurnFront;
+                    } else if (currentViewMode === enumViewMode.LeftTurnFront) {
+                        viewMode = enumViewMode.Left;
+                    } else if (currentViewMode === enumViewMode.Top) {
+                        viewMode = enumViewMode.TopTurnLeft;
+                    } else if (currentViewMode === enumViewMode.TopTurnLeft) {
+                        viewMode = enumViewMode.TopTurnBack;
+                    } else if (currentViewMode === enumViewMode.TopTurnBack) {
+                        viewMode = enumViewMode.TopTurnRight;
+                    } else if (currentViewMode === enumViewMode.TopTurnRight) {
+                        viewMode = enumViewMode.Top;
+                    } else if (currentViewMode === enumViewMode.Bottom) {
+                        viewMode = enumViewMode.BottomTurnLeft;
+                    } else if (currentViewMode === enumViewMode.BottomTurnLeft) {
+                        viewMode = enumViewMode.BottomTurnBack;
+                    } else if (currentViewMode === enumViewMode.BottomTurnBack) {
+                        viewMode = enumViewMode.BottomTurnRight;
+                    } else if (currentViewMode === enumViewMode.BottomTurnRight) {
+                        viewMode = enumViewMode.Bottom;
+                    } else {
+                        viewMode = enumViewMode.FrontTurnLeft; // 默认
                     }
                 }
 
                 break;
         }
 
-        this.currentViewMode = viewMode;
-    },
-
-    setHighlight : function(name, highlight) {
+        currentViewMode = viewMode;
+    };
+    var setHighlight = function (name, highlight) {
         if (highlight) {
 
             // 计算鼠标所在的象限
             var isClockWise = false;
-            if (this.mouse.x * this.mouse.y > 0) {
+            if (mouseCoord.x * mouseCoord.y > 0) {
                 isClockWise = true;
             }
 
             // ---------- 处理联动高亮 S ---------- //
-            if (name === this.names.MiddleDoor) {
+            if (name === componentNames.MiddleDoor) {
                 // 选中Door，前墙也高亮
-                this.meshHouseFront.material.color.setHex(  this.pickedColor );
+                houseFrontMesh.material.color.setHex(scope.pickedColor);
             } else {
-                if (name !== this.names.MiddleSouth) {
-                    this.meshHouseFront.material.color.setHex(  this.meshHouseFrontColor );
+                if (name !== componentNames.MiddleSouth) {
+                    houseFrontMesh.material.color.setHex(houseFrontColor);
                 }
             }
 
-            if (name === this.names.MiddleSouth) {
+            if (name === componentNames.MiddleSouth) {
                 // 选中前墙，Door也高亮
-                this.meshHouseDoor.material.color.setHex(  this.pickedColor );
+                houseDoorMesh.material.color.setHex(scope.pickedColor);
             } else {
-                if (name !== this.names.MiddleDoor) {
-                    this.meshHouseDoor.material.color.setHex(  this.meshHouseDoorColor );
+                if (name !== componentNames.MiddleDoor) {
+                    houseDoorMesh.material.color.setHex(houseDoorColor);
                 }
             }
 
-            if (name === this.names.MiddleWest) {
+            if (name === componentNames.MiddleWest) {
                 // 选中左墙，左窗也高亮
-                this.meshHouseLeftWindow.material.color.setHex(  this.pickedColor );
+                HouseLeftWindowMesh.material.color.setHex(scope.pickedColor);
             } else {
-                if (name !== this.names.MiddleLeftWindow) {
-                    this.meshHouseLeftWindow.material.color.setHex(  this.meshHouseLeftWindowColor );
+                if (name !== componentNames.MiddleLeftWindow) {
+                    HouseLeftWindowMesh.material.color.setHex(houseLeftWindowColor);
                 }
             }
 
-            if (name === this.names.MiddleLeftWindow) {
+            if (name === componentNames.MiddleLeftWindow) {
                 // 选中左窗，左墙也高亮
-                this.meshHouseLeft.material.color.setHex(  this.pickedColor );
+                houseLeftMesh.material.color.setHex(scope.pickedColor);
             } else {
-                if (name !== this.names.MiddleWest) {
-                    this.meshHouseLeft.material.color.setHex(  this.meshHouseLeftColor );
+                if (name !== componentNames.MiddleWest) {
+                    houseLeftMesh.material.color.setHex(houseLeftColor);
                 }
             }
 
-            if (name === this.names.MiddleEast) {
+            if (name === componentNames.MiddleEast) {
                 // 选中右窗，右墙也高亮
-                this.meshHouseRightWindow.material.color.setHex(  this.pickedColor );
+                houseRightWindowMesh.material.color.setHex(scope.pickedColor);
             } else {
-                if (name !== this.names.MiddleRightWindow) {
-                    this.meshHouseRightWindow.material.color.setHex(  this.meshHouseRightWindowColor );
+                if (name !== componentNames.MiddleRightWindow) {
+                    houseRightWindowMesh.material.color.setHex(houseRightWindowColor);
                 }
             }
 
-            if (name === this.names.MiddleRightWindow) {
+            if (name === componentNames.MiddleRightWindow) {
                 // 选中右墙，右窗也高亮
-                this.meshHouseRight.material.color.setHex(  this.pickedColor );
+                houseRightMesh.material.color.setHex(scope.pickedColor);
             } else {
-                if (name !== this.names.MiddleEast) {
-                    this.meshHouseRight.material.color.setHex(  this.meshHouseRightColor );
+                if (name !== componentNames.MiddleEast) {
+                    houseRightMesh.material.color.setHex(houseRightColor);
                 }
             }
 
             // ---------- 处理联动高亮 E ---------- //
 
             switch (name) {
-                case this.names.ControlRingNorthEast:
-                    this.meshHighlightRing.visible = true;
-                    this.meshHighlightRing.quaternion.copy(this.highlightRingQuat);
-                    this.meshHighlightRing.position.copy(this.highlightRingPos);
+                case componentNames.ControlRingNorthEast:
+                    highlightRingMesh.visible = true;
+                    highlightRingMesh.quaternion.copy(highlightRingQuat);
+                    highlightRingMesh.position.copy(highlightRingPos);
 
-                    this.meshHighlightPoint.visible = true;
-                    this.meshHighlightPoint.quaternion.copy(this.highlightPointQuat);
-                    this.meshHighlightPoint.position.copy(this.highlightPointPos);
-                    this.meshHighlightPoint.rotateZ(Math.PI / 4);
-                    this.meshHighlightPoint.translateX(this.ringRadius);
+                    highlightPointMesh.visible = true;
+                    highlightPointMesh.quaternion.copy(highlightPointQuat);
+                    highlightPointMesh.position.copy(highlightPointPos);
+                    highlightPointMesh.rotateZ(Math.PI / 4);
+                    highlightPointMesh.translateX(highLightRingRadius);
 
-                    this.meshHighlightArrow.visible = true;
-                    this.meshHighlightArrow.quaternion.copy(this.highlightArrowQuat);
-                    this.meshHighlightArrow.position.copy(this.highlightArrowPos);
-                    this.meshHighlightArrow.rotateZ(Math.PI / 4);
-                    this.meshHighlightArrow.translateX(this.ringRadius);
+                    highlightArrowMesh.visible = true;
+                    highlightArrowMesh.quaternion.copy(highlightArrowQuat);
+                    highlightArrowMesh.position.copy(highlightArrowPos);
+                    highlightArrowMesh.rotateZ(Math.PI / 4);
+                    highlightArrowMesh.translateX(highLightRingRadius);
                     if (isClockWise) {
                         // 箭头朝下
-                        this.meshHighlightArrow.rotateZ(Math.PI / 2);
-                    }else{
-                        this.meshHighlightArrow.rotateZ(-Math.PI / 2);
+                        highlightArrowMesh.rotateZ(Math.PI / 2);
+                    } else {
+                        highlightArrowMesh.rotateZ(-Math.PI / 2);
                     }
                     break;
-                case this.names.ControlRingNorthWest:
-                    this.meshHighlightRing.visible = true;
-                    this.meshHighlightRing.quaternion.copy(this.highlightRingQuat);
-                    this.meshHighlightRing.position.copy(this.highlightRingPos);
-                    this.meshHighlightRing.rotateZ(Math.PI / 2);
+                case componentNames.ControlRingNorthWest:
+                    highlightRingMesh.visible = true;
+                    highlightRingMesh.quaternion.copy(highlightRingQuat);
+                    highlightRingMesh.position.copy(highlightRingPos);
+                    highlightRingMesh.rotateZ(Math.PI / 2);
 
-                    this.meshHighlightPoint.visible = true;
-                    this.meshHighlightPoint.quaternion.copy(this.highlightPointQuat);
-                    this.meshHighlightPoint.position.copy(this.highlightPointPos);
-                    this.meshHighlightPoint.rotateZ(Math.PI *3 / 4);
-                    this.meshHighlightPoint.translateX(this.ringRadius);
+                    highlightPointMesh.visible = true;
+                    highlightPointMesh.quaternion.copy(highlightPointQuat);
+                    highlightPointMesh.position.copy(highlightPointPos);
+                    highlightPointMesh.rotateZ(Math.PI * 3 / 4);
+                    highlightPointMesh.translateX(highLightRingRadius);
 
-                    this.meshHighlightArrow.visible = true;
-                    this.meshHighlightArrow.quaternion.copy(this.highlightArrowQuat);
-                    this.meshHighlightArrow.position.copy(this.highlightArrowPos);
-                    this.meshHighlightArrow.rotateZ(Math.PI * 3 / 4);
-                    this.meshHighlightArrow.translateX(this.ringRadius);
+                    highlightArrowMesh.visible = true;
+                    highlightArrowMesh.quaternion.copy(highlightArrowQuat);
+                    highlightArrowMesh.position.copy(highlightArrowPos);
+                    highlightArrowMesh.rotateZ(Math.PI * 3 / 4);
+                    highlightArrowMesh.translateX(highLightRingRadius);
                     if (isClockWise) {
-                        this.meshHighlightArrow.rotateZ(Math.PI / 2);
-                    }else{
-                        this.meshHighlightArrow.rotateZ(-Math.PI / 2);
+                        highlightArrowMesh.rotateZ(Math.PI / 2);
+                    } else {
+                        highlightArrowMesh.rotateZ(-Math.PI / 2);
                     }
                     break;
-                case this.names.ControlRingSouthWest:
-                    this.meshHighlightRing.visible = true;
-                    this.meshHighlightRing.quaternion.copy(this.highlightRingQuat);
-                    this.meshHighlightRing.position.copy(this.highlightRingPos);
-                    this.meshHighlightRing.rotateZ(Math.PI);
+                case componentNames.ControlRingSouthWest:
+                    highlightRingMesh.visible = true;
+                    highlightRingMesh.quaternion.copy(highlightRingQuat);
+                    highlightRingMesh.position.copy(highlightRingPos);
+                    highlightRingMesh.rotateZ(Math.PI);
 
-                    this.meshHighlightPoint.visible = true;
-                    this.meshHighlightPoint.quaternion.copy(this.highlightPointQuat);
-                    this.meshHighlightPoint.position.copy(this.highlightPointPos);
-                    this.meshHighlightPoint.rotateZ(-Math.PI * 3 / 4);
-                    this.meshHighlightPoint.translateX(this.ringRadius);
+                    highlightPointMesh.visible = true;
+                    highlightPointMesh.quaternion.copy(highlightPointQuat);
+                    highlightPointMesh.position.copy(highlightPointPos);
+                    highlightPointMesh.rotateZ(-Math.PI * 3 / 4);
+                    highlightPointMesh.translateX(highLightRingRadius);
 
-                    this.meshHighlightArrow.visible = true;
-                    this.meshHighlightArrow.quaternion.copy(this.highlightArrowQuat);
-                    this.meshHighlightArrow.position.copy(this.highlightArrowPos);
-                    this.meshHighlightArrow.rotateZ(-Math.PI * 3 / 4);
-                    this.meshHighlightArrow.translateX(this.ringRadius);
+                    highlightArrowMesh.visible = true;
+                    highlightArrowMesh.quaternion.copy(highlightArrowQuat);
+                    highlightArrowMesh.position.copy(highlightArrowPos);
+                    highlightArrowMesh.rotateZ(-Math.PI * 3 / 4);
+                    highlightArrowMesh.translateX(highLightRingRadius);
                     if (isClockWise) {
-                        this.meshHighlightArrow.rotateZ(Math.PI / 2);
-                    }else{
-                        this.meshHighlightArrow.rotateZ(-Math.PI / 2);
+                        highlightArrowMesh.rotateZ(Math.PI / 2);
+                    } else {
+                        highlightArrowMesh.rotateZ(-Math.PI / 2);
                     }
                     break;
-                case this.names.ControlRingSouthEast:
-                    this.meshHighlightRing.visible = true;
-                    this.meshHighlightRing.quaternion.copy(this.highlightRingQuat);
-                    this.meshHighlightRing.position.copy(this.highlightRingPos);
-                    this.meshHighlightRing.rotateZ(-Math.PI / 2);
+                case componentNames.ControlRingSouthEast:
+                    highlightRingMesh.visible = true;
+                    highlightRingMesh.quaternion.copy(highlightRingQuat);
+                    highlightRingMesh.position.copy(highlightRingPos);
+                    highlightRingMesh.rotateZ(-Math.PI / 2);
 
-                    this.meshHighlightPoint.visible = true;
-                    this.meshHighlightPoint.quaternion.copy(this.highlightPointQuat);
-                    this.meshHighlightPoint.position.copy(this.highlightPointPos);
-                    this.meshHighlightPoint.rotateZ(- Math.PI / 4);
-                    this.meshHighlightPoint.translateX(this.ringRadius);
+                    highlightPointMesh.visible = true;
+                    highlightPointMesh.quaternion.copy(highlightPointQuat);
+                    highlightPointMesh.position.copy(highlightPointPos);
+                    highlightPointMesh.rotateZ(-Math.PI / 4);
+                    highlightPointMesh.translateX(highLightRingRadius);
 
-                    this.meshHighlightArrow.visible = true;
-                    this.meshHighlightArrow.quaternion.copy(this.highlightArrowQuat);
-                    this.meshHighlightArrow.position.copy(this.highlightArrowPos);
-                    this.meshHighlightArrow.rotateZ(-Math.PI / 4);
-                    this.meshHighlightArrow.translateX(this.ringRadius);
+                    highlightArrowMesh.visible = true;
+                    highlightArrowMesh.quaternion.copy(highlightArrowQuat);
+                    highlightArrowMesh.position.copy(highlightArrowPos);
+                    highlightArrowMesh.rotateZ(-Math.PI / 4);
+                    highlightArrowMesh.translateX(highLightRingRadius);
                     if (isClockWise) {
-                        this.meshHighlightArrow.rotateZ(Math.PI / 2);
-                    }else{
-                        this.meshHighlightArrow.rotateZ(-Math.PI / 2);
+                        highlightArrowMesh.rotateZ(Math.PI / 2);
+                    } else {
+                        highlightArrowMesh.rotateZ(-Math.PI / 2);
                     }
                     break;
-                case this.names.ControlPointNorth:
-                    this.meshHighlightRing.visible = false;
-                    this.meshHighlightPoint.visible = false;
+                case componentNames.ControlPointNorth:
+                    highlightRingMesh.visible = false;
+                    highlightPointMesh.visible = false;
 
-                    this.meshHighlightArrow.visible = true;
-                    this.meshHighlightArrow.quaternion.copy(this.highlightArrowQuat);
-                    this.meshHighlightArrow.position.copy(this.highlightArrowPos);
-                    this.meshHighlightArrow.rotateZ(Math.PI / 2);
-                    this.meshHighlightArrow.translateX(this.ringRadius);
+                    highlightArrowMesh.visible = true;
+                    highlightArrowMesh.quaternion.copy(highlightArrowQuat);
+                    highlightArrowMesh.position.copy(highlightArrowPos);
+                    highlightArrowMesh.rotateZ(Math.PI / 2);
+                    highlightArrowMesh.translateX(highLightRingRadius);
                     break;
-                case this.names.ControlPointSouth:
-                    this.meshHighlightRing.visible = false;
-                    this.meshHighlightPoint.visible = false;
+                case componentNames.ControlPointSouth:
+                    highlightRingMesh.visible = false;
+                    highlightPointMesh.visible = false;
 
-                    this.meshHighlightArrow.visible = true;
-                    this.meshHighlightArrow.quaternion.copy(this.highlightArrowQuat);
-                    this.meshHighlightArrow.position.copy(this.highlightArrowPos);
-                    this.meshHighlightArrow.rotateZ(-Math.PI / 2);
-                    this.meshHighlightArrow.translateX(this.ringRadius);
+                    highlightArrowMesh.visible = true;
+                    highlightArrowMesh.quaternion.copy(highlightArrowQuat);
+                    highlightArrowMesh.position.copy(highlightArrowPos);
+                    highlightArrowMesh.rotateZ(-Math.PI / 2);
+                    highlightArrowMesh.translateX(highLightRingRadius);
                     break;
-                case this.names.ControlPointEast:
-                    this.meshHighlightRing.visible = false;
-                    this.meshHighlightPoint.visible = false;
+                case componentNames.ControlPointEast:
+                    highlightRingMesh.visible = false;
+                    highlightPointMesh.visible = false;
 
-                    this.meshHighlightArrow.visible = true;
-                    this.meshHighlightArrow.quaternion.copy(this.highlightArrowQuat);
-                    this.meshHighlightArrow.position.copy(this.highlightArrowPos);
-                    this.meshHighlightArrow.translateX(this.ringRadius);
+                    highlightArrowMesh.visible = true;
+                    highlightArrowMesh.quaternion.copy(highlightArrowQuat);
+                    highlightArrowMesh.position.copy(highlightArrowPos);
+                    highlightArrowMesh.translateX(highLightRingRadius);
                     break;
-                case this.names.ControlPointWest:
-                    this.meshHighlightRing.visible = false;
-                    this.meshHighlightPoint.visible = false;
+                case componentNames.ControlPointWest:
+                    highlightRingMesh.visible = false;
+                    highlightPointMesh.visible = false;
 
-                    this.meshHighlightArrow.visible = true;
-                    this.meshHighlightArrow.quaternion.copy(this.highlightArrowQuat);
-                    this.meshHighlightArrow.position.copy(this.highlightArrowPos);
-                    this.meshHighlightArrow.rotateZ(Math.PI);
-                    this.meshHighlightArrow.translateX(this.ringRadius);
+                    highlightArrowMesh.visible = true;
+                    highlightArrowMesh.quaternion.copy(highlightArrowQuat);
+                    highlightArrowMesh.position.copy(highlightArrowPos);
+                    highlightArrowMesh.rotateZ(Math.PI);
+                    highlightArrowMesh.translateX(highLightRingRadius);
                     break;
                 default:
-                    this.meshHighlightRing.visible = false;
-                    this.meshHighlightPoint.visible = false;
-                    this.meshHighlightArrow.visible = false;
+                    highlightRingMesh.visible = false;
+                    highlightPointMesh.visible = false;
+                    highlightArrowMesh.visible = false;
                     break;
             }
 
         } else {
 
-            if (this.meshHighlightRing.visible){
-                this.meshHighlightRing.visible = false;
+            if (highlightRingMesh.visible) {
+                highlightRingMesh.visible = false;
             }
 
-            if (this.meshHighlightPoint.visible){
-                this.meshHighlightPoint.visible = false;
+            if (highlightPointMesh.visible) {
+                highlightPointMesh.visible = false;
             }
 
-            if (this.meshHighlightArrow.visible){
-                this.meshHighlightArrow.visible = false;
+            if (highlightArrowMesh.visible) {
+                highlightArrowMesh.visible = false;
             }
         }
-    },
-
-    setObjectHighlight : function(object) {
-        if ( this.Intersected != object ) {
-            if ( this.Intersected ){
-                this.Intersected.material.color.setHex( this.Intersected.currentHex );
+    };
+    var setObjectHighlight = function (object) {
+        if (Intersected != object) {
+            if (Intersected) {
+                Intersected.material.color.setHex(Intersected.currentHex);
             }
 
-            this.Intersected = object;
-            this.Intersected.currentHex = this.Intersected.material.color.getHex();
+            Intersected = object;
+            Intersected.currentHex = Intersected.material.color.getHex();
 
-            if (this.Intersected.name !== "") {
-                this.Intersected.material.color.setHex(  this.pickedColor );
+            if (Intersected.name !== "") {
+                Intersected.material.color.setHex(scope.pickedColor);
             }
 
-            this.setHighlight(this.Intersected.name, true);
+            setHighlight(Intersected.name, true);
 
-            //console.log("[intersects - 1][length = " + intersects.length + ",name = " + this.Intersected.name +"]");
+            //console.log("[intersects - 1][length = " + intersects.length + ",name = " + Intersected.name +"]");
         }
-    },
-    clearObjectHighlight : function() {
-        if ( this.Intersected ){
-            this.Intersected.material.color.setHex( this.Intersected.currentHex );
+    };
+    var clearObjectHighlight = function () {
+        if (Intersected) {
+            Intersected.material.color.setHex(Intersected.currentHex);
         }
 
-        this.setHighlight("", false);
+        setHighlight("", false);
 
-        this.Intersected = null;
-    },
-    picked : function () {
+        Intersected = null;
+    };
+    var picked = function () {
 
         // 优先选择控制圆环
-        this.raycaster2.setFromCamera( this.mouse, this.camera2 );
-        var intersects2 = this.raycaster2.intersectObjects( this.groupPick.children, true);
+        homeRaycaster.setFromCamera(mouseCoord, homeCamera);
+        var homeIntersects = homeRaycaster.intersectObjects(groupPick.children, true);
 
-        if ( intersects2.length > 0 ) {
+        if (homeIntersects.length > 0) {
 
-            this.setObjectHighlight(intersects2[ 0 ].object);
+            setObjectHighlight(homeIntersects[0].object);
 
         } else {
 
-            this.raycaster.setFromCamera( this.mouse, this.camera );
-            var intersects = this.raycaster.intersectObjects( this.scene.children, true );
+            houseRaycaster.setFromCamera(mouseCoord, houseCamera);
+            var houseIntersects = houseRaycaster.intersectObjects(houseScene.children, true);
 
-            if ( intersects.length > 0 ) {
-                this.setObjectHighlight(intersects[ 0 ].object);
+            if (houseIntersects.length > 0) {
+                setObjectHighlight(houseIntersects[0].object);
             } else {
-                this.clearObjectHighlight();
+                clearObjectHighlight();
             }
         }
-    },
-    // 是否禁用指北针转盘
-    enableCompass : function(enable){
-        this.isEnableCompass = enable;
-    },
+    };
+
     // 判断两个值是否在允许误差范围内
-    isEquals : function(value1, value2, epsilon){
-        return (value1 > value2) ? (value1 - value2 <= epsilon) :(value2 - value1 <= epsilon);
-    },
-    isCompassView : function(dir) {
+    var isEquals = function (value1, value2, epsilon) {
+        return (value1 > value2) ? (value1 - value2 <= epsilon) : (value2 - value1 <= epsilon);
+    };
+    var isCompassView = function (dir) {
 
         //  非标准视图及顶、底视图
         var dirNorm = dir.clone();
         dirNorm.normalize();
 
         // 当dirNorm.y为0时，指北针与视线平行
-        if ( this.isEquals(dirNorm.y, 0, this.threshold) ) {
+        if (isEquals(dirNorm.y, 0, threshold)) {
             return false;
         }
 
         return true;
-    },
-    isStandardView : function(dir) {
+    };
+    var isStandardView = function (dir) {
 
         // 标准视图：上、下、左、右、前、后
 
@@ -8807,31 +8695,31 @@ CLOUD.ViewHouse.prototype = {
         // Left (1, 0, 0)
 
         // 两个为0，即为标准视图
-        if  ( (this.isEquals(dirNorm.x, 0, this.threshold) &&
-            this.isEquals(dirNorm.y, 0, this.threshold)) ||
-            (this.isEquals(dirNorm.x, 0, this.threshold) &&
-            this.isEquals(dirNorm.z, 0, this.threshold)) ||
-            (this.isEquals(dirNorm.y, 0, this.threshold) &&
-            this.isEquals(dirNorm.z, 0, this.threshold)) ){
+        if ((isEquals(dirNorm.x, 0, threshold) &&
+            isEquals(dirNorm.y, 0, threshold)) ||
+            (isEquals(dirNorm.x, 0, threshold) &&
+            isEquals(dirNorm.z, 0, threshold)) ||
+            (isEquals(dirNorm.y, 0, threshold) &&
+            isEquals(dirNorm.z, 0, threshold))) {
             return true;
         }
 
         return false;
-    },
-    isBottomView : function(dir) {
+    };
+    var isBottomView = function (dir) {
         var dirNorm = dir.clone();
         dirNorm.normalize();
 
         // Bottom (0, 1, 0)
-        if ( this.isEquals(dirNorm.x, 0, this.threshold) &&
-            this.isEquals(dirNorm.y, 1, this.threshold) &&
-            this.isEquals(dirNorm.z, 0, this.threshold) ) {
+        if (isEquals(dirNorm.x, 0, threshold) &&
+            isEquals(dirNorm.y, 1, threshold) &&
+            isEquals(dirNorm.z, 0, threshold)) {
             return true;
         }
 
         return false;
-    },
-    getCurrentStandardView : function(dir, up) {
+    };
+    var getCurrentStandardView = function (dir, up) {
         var dirNorm = dir.clone();
         dirNorm.normalize();
 
@@ -8839,322 +8727,534 @@ CLOUD.ViewHouse.prototype = {
         upNorm.normalize();
 
         // Top - dir(0, -1, 0)
-        if ( this.isEquals(dirNorm.x, 0, this.threshold) &&
-            this.isEquals(dirNorm.y, -1, this.threshold) &&
-            this.isEquals(dirNorm.z, 0, this.threshold) ){
+        if (isEquals(dirNorm.x, 0, threshold) &&
+            isEquals(dirNorm.y, -1, threshold) &&
+            isEquals(dirNorm.z, 0, threshold)) {
 
             // Top - up(0, 0, -1)
-            if ( this.isEquals(upNorm.x, 0, this.threshold) &&
-                this.isEquals(upNorm.y, 0, this.threshold) &&
-                this.isEquals(upNorm.z, -1, this.threshold) ) {
-                return this.enumView.Top;
+            if (isEquals(upNorm.x, 0, threshold) &&
+                isEquals(upNorm.y, 0, threshold) &&
+                isEquals(upNorm.z, -1, threshold)) {
+                return enumViewMode.Top;
             }
 
             // TopTurnRight - up(-1, 0, 0)
-            if ( this.isEquals(upNorm.x, -1, this.threshold) &&
-                this.isEquals(upNorm.y, 0, this.threshold) &&
-                this.isEquals(upNorm.z, 0, this.threshold) ) {
-                return this.enumView.TopTurnRight;
+            if (isEquals(upNorm.x, -1, threshold) &&
+                isEquals(upNorm.y, 0, threshold) &&
+                isEquals(upNorm.z, 0, threshold)) {
+                return enumViewMode.TopTurnRight;
             }
 
             // TopTurnBack - up(0, 0, 1)
-            if ( this.isEquals(upNorm.x, 0, this.threshold) &&
-                this.isEquals(upNorm.y, 0, this.threshold) &&
-                this.isEquals(upNorm.z, 1, this.threshold) ) {
-                return this.enumView.TopTurnBack;
+            if (isEquals(upNorm.x, 0, threshold) &&
+                isEquals(upNorm.y, 0, threshold) &&
+                isEquals(upNorm.z, 1, threshold)) {
+                return enumViewMode.TopTurnBack;
             }
 
             // TopTurnLeft - up(1, 0, 0)
-            if ( this.isEquals(upNorm.x, 1, this.threshold) &&
-                this.isEquals(upNorm.y, 0, this.threshold) &&
-                this.isEquals(upNorm.z, 0, this.threshold) ) {
-                return this.enumView.TopTurnLeft;
+            if (isEquals(upNorm.x, 1, threshold) &&
+                isEquals(upNorm.y, 0, threshold) &&
+                isEquals(upNorm.z, 0, threshold)) {
+                return enumViewMode.TopTurnLeft;
             }
         }
 
         // Bottom - dir(0, 1, 0)
-        if ( this.isEquals(dirNorm.x, 0, this.threshold) &&
-            this.isEquals(dirNorm.y, 1, this.threshold) &&
-            this.isEquals(dirNorm.z, 0, this.threshold) ){
+        if (isEquals(dirNorm.x, 0, threshold) &&
+            isEquals(dirNorm.y, 1, threshold) &&
+            isEquals(dirNorm.z, 0, threshold)) {
 
             // Bottom - up(0, 0, 1)
-            if ( this.isEquals(upNorm.x, 0, this.threshold) &&
-                this.isEquals(upNorm.y, 0, this.threshold) &&
-                this.isEquals(upNorm.z, 1, this.threshold) ) {
-                return this.enumView.Bottom;
+            if (isEquals(upNorm.x, 0, threshold) &&
+                isEquals(upNorm.y, 0, threshold) &&
+                isEquals(upNorm.z, 1, threshold)) {
+                return enumViewMode.Bottom;
             }
 
             // BottomTurnRight - up(-1, 0, 0)
-            if ( this.isEquals(upNorm.x, -1, this.threshold) &&
-                this.isEquals(upNorm.y, 0, this.threshold) &&
-                this.isEquals(upNorm.z, 0, this.threshold) ) {
-                return this.enumView.BottomTurnRight;
+            if (isEquals(upNorm.x, -1, threshold) &&
+                isEquals(upNorm.y, 0, threshold) &&
+                isEquals(upNorm.z, 0, threshold)) {
+                return enumViewMode.BottomTurnRight;
             }
 
             // BottomTurnBack - up(0, 0, -1)
-            if ( this.isEquals(upNorm.x, 0, this.threshold) &&
-                this.isEquals(upNorm.y, 0, this.threshold) &&
-                this.isEquals(upNorm.z, -1, this.threshold) ) {
-                return this.enumView.BottomTurnBack;
+            if (isEquals(upNorm.x, 0, threshold) &&
+                isEquals(upNorm.y, 0, threshold) &&
+                isEquals(upNorm.z, -1, threshold)) {
+                return enumViewMode.BottomTurnBack;
             }
 
             // BottomTurnLeft - up(1, 0, 0)
-            if ( this.isEquals(upNorm.x, 1, this.threshold) &&
-                this.isEquals(upNorm.y, 0, this.threshold) &&
-                this.isEquals(upNorm.z, 0, this.threshold) ) {
-                return this.enumView.Bottom;
+            if (isEquals(upNorm.x, 1, threshold) &&
+                isEquals(upNorm.y, 0, threshold) &&
+                isEquals(upNorm.z, 0, threshold)) {
+                return enumViewMode.Bottom;
             }
         }
 
         // Front - dir(0, 0, -1)
-        if ( this.isEquals(dirNorm.x, 0, this.threshold) &&
-            this.isEquals(dirNorm.y, 0, this.threshold) &&
-            this.isEquals(dirNorm.z, -1, this.threshold) ) {
+        if (isEquals(dirNorm.x, 0, threshold) &&
+            isEquals(dirNorm.y, 0, threshold) &&
+            isEquals(dirNorm.z, -1, threshold)) {
 
             // Front - up(0, 1, 0)
-            if ( this.isEquals(upNorm.x, 0, this.threshold) &&
-                this.isEquals(upNorm.y, 1, this.threshold) &&
-                this.isEquals(upNorm.z, 0, this.threshold)){
-                return this.enumView.Front;
+            if (isEquals(upNorm.x, 0, threshold) &&
+                isEquals(upNorm.y, 1, threshold) &&
+                isEquals(upNorm.z, 0, threshold)) {
+                return enumViewMode.Front;
             }
 
             // FrontTurnTop - up(0, -1, 0)
-            if ( this.isEquals(upNorm.x, 0, this.threshold) &&
-                this.isEquals(upNorm.y, -1, this.threshold) &&
-                this.isEquals(upNorm.z, 0, this.threshold)){
-                return this.enumView.FrontTurnTop;
+            if (isEquals(upNorm.x, 0, threshold) &&
+                isEquals(upNorm.y, -1, threshold) &&
+                isEquals(upNorm.z, 0, threshold)) {
+                return enumViewMode.FrontTurnTop;
             }
 
             // FrontTurnLeft - up(1, 0, 0)
-            if ( this.isEquals(upNorm.x, 1, this.threshold) &&
-                this.isEquals(upNorm.y, 0, this.threshold) &&
-                this.isEquals(upNorm.z, 0, this.threshold)){
-                return this.enumView.FrontTurnLeft;
+            if (isEquals(upNorm.x, 1, threshold) &&
+                isEquals(upNorm.y, 0, threshold) &&
+                isEquals(upNorm.z, 0, threshold)) {
+                return enumViewMode.FrontTurnLeft;
             }
 
             // FrontTurnRight - up(-1, 0, 0)
-            if ( this.isEquals(upNorm.x, -1, this.threshold) &&
-                this.isEquals(upNorm.y, 0, this.threshold) &&
-                this.isEquals(upNorm.z, 0, this.threshold)){
-                return this.enumView.FrontTurnRight;
+            if (isEquals(upNorm.x, -1, threshold) &&
+                isEquals(upNorm.y, 0, threshold) &&
+                isEquals(upNorm.z, 0, threshold)) {
+                return enumViewMode.FrontTurnRight;
             }
         }
 
         // Back - dir(0, 0, 1)
-        if ( this.isEquals(dirNorm.x, 0, this.threshold) &&
-            this.isEquals(dirNorm.y, 0, this.threshold) &&
-            this.isEquals(dirNorm.z, 1, this.threshold) ) {
+        if (isEquals(dirNorm.x, 0, threshold) &&
+            isEquals(dirNorm.y, 0, threshold) &&
+            isEquals(dirNorm.z, 1, threshold)) {
 
             // Back - up(0, 1, 0)
-            if ( this.isEquals(upNorm.x, 0, this.threshold) &&
-                this.isEquals(upNorm.y, 1, this.threshold) &&
-                this.isEquals(upNorm.z, 0, this.threshold)){
-                return this.enumView.Back;
+            if (isEquals(upNorm.x, 0, threshold) &&
+                isEquals(upNorm.y, 1, threshold) &&
+                isEquals(upNorm.z, 0, threshold)) {
+                return enumViewMode.Back;
             }
 
             // BackTurnTop - up(0, -1, 0)
-            if ( this.isEquals(upNorm.x, 0, this.threshold) &&
-                this.isEquals(upNorm.y, -1, this.threshold) &&
-                this.isEquals(upNorm.z, 0, this.threshold)){
-                return this.enumView.BackTurnTop;
+            if (isEquals(upNorm.x, 0, threshold) &&
+                isEquals(upNorm.y, -1, threshold) &&
+                isEquals(upNorm.z, 0, threshold)) {
+                return enumViewMode.BackTurnTop;
             }
 
             // BackTurnLeft - up(-1, 0, 0)
-            if ( this.isEquals(upNorm.x, -1, this.threshold) &&
-                this.isEquals(upNorm.y, 0, this.threshold) &&
-                this.isEquals(upNorm.z, 0, this.threshold)){
-                return this.enumView.BackTurnLeft;
+            if (isEquals(upNorm.x, -1, threshold) &&
+                isEquals(upNorm.y, 0, threshold) &&
+                isEquals(upNorm.z, 0, threshold)) {
+                return enumViewMode.BackTurnLeft;
             }
 
             // BackTurnRight - up(1, 0, 0)
-            if ( this.isEquals(upNorm.x, 1, this.threshold) &&
-                this.isEquals(upNorm.y, 0, this.threshold) &&
-                this.isEquals(upNorm.z, 0, this.threshold)){
-                return this.enumView.BackTurnRight;
+            if (isEquals(upNorm.x, 1, threshold) &&
+                isEquals(upNorm.y, 0, threshold) &&
+                isEquals(upNorm.z, 0, threshold)) {
+                return enumViewMode.BackTurnRight;
             }
         }
 
         // Right - dir(-1, 0, 0)
-        if ( this.isEquals(dirNorm.x, -1, this.threshold) &&
-            this.isEquals(dirNorm.y, 0, this.threshold) &&
-            this.isEquals(dirNorm.z, 0, this.threshold) ) {
+        if (isEquals(dirNorm.x, -1, threshold) &&
+            isEquals(dirNorm.y, 0, threshold) &&
+            isEquals(dirNorm.z, 0, threshold)) {
 
             // Right - up(0, 1, 0)
-            if ( this.isEquals(upNorm.x, 0, this.threshold) &&
-                this.isEquals(upNorm.y, 1, this.threshold) &&
-                this.isEquals(upNorm.z, 0, this.threshold)){
-                return this.enumView.Right;
+            if (isEquals(upNorm.x, 0, threshold) &&
+                isEquals(upNorm.y, 1, threshold) &&
+                isEquals(upNorm.z, 0, threshold)) {
+                return enumViewMode.Right;
             }
 
             // RightTurnTop - up(0, -1, 0)
-            if ( this.isEquals(upNorm.x, 0, this.threshold) &&
-                this.isEquals(upNorm.y, -1, this.threshold) &&
-                this.isEquals(upNorm.z, 0, this.threshold)){
-                return this.enumView.RightTurnTop;
+            if (isEquals(upNorm.x, 0, threshold) &&
+                isEquals(upNorm.y, -1, threshold) &&
+                isEquals(upNorm.z, 0, threshold)) {
+                return enumViewMode.RightTurnTop;
             }
 
             // RightTurnFront - up(0, 0, -1)
-            if ( this.isEquals(upNorm.x, 0, this.threshold) &&
-                this.isEquals(upNorm.y, 0, this.threshold) &&
-                this.isEquals(upNorm.z, -1, this.threshold)){
-                return this.enumView.RightTurnFront;
+            if (isEquals(upNorm.x, 0, threshold) &&
+                isEquals(upNorm.y, 0, threshold) &&
+                isEquals(upNorm.z, -1, threshold)) {
+                return enumViewMode.RightTurnFront;
             }
 
             // RightTurnBack - up(0, 0, 1)
-            if ( this.isEquals(upNorm.x, 0, this.threshold) &&
-                this.isEquals(upNorm.y, 0, this.threshold) &&
-                this.isEquals(upNorm.z, 1, this.threshold)){
-                return this.enumView.RightTurnBack;
+            if (isEquals(upNorm.x, 0, threshold) &&
+                isEquals(upNorm.y, 0, threshold) &&
+                isEquals(upNorm.z, 1, threshold)) {
+                return enumViewMode.RightTurnBack;
             }
         }
 
         // Left - dir(1, 0, 0)
-        if ( this.isEquals(dirNorm.x, 1, this.threshold) &&
-            this.isEquals(dirNorm.y, 0, this.threshold) &&
-            this.isEquals(dirNorm.z, 0, this.threshold) ) {
+        if (isEquals(dirNorm.x, 1, threshold) &&
+            isEquals(dirNorm.y, 0, threshold) &&
+            isEquals(dirNorm.z, 0, threshold)) {
 
             // Left - up(0, 1, 0)
-            if ( this.isEquals(upNorm.x, 0, this.threshold) &&
-                this.isEquals(upNorm.y, 1, this.threshold) &&
-                this.isEquals(upNorm.z, 0, this.threshold)){
-                return this.enumView.Left;
+            if (isEquals(upNorm.x, 0, threshold) &&
+                isEquals(upNorm.y, 1, threshold) &&
+                isEquals(upNorm.z, 0, threshold)) {
+                return enumViewMode.Left;
             }
 
             // LeftTurnTop - up(0, -1, 0)
-            if ( this.isEquals(upNorm.x, 0, this.threshold) &&
-                this.isEquals(upNorm.y, -1, this.threshold) &&
-                this.isEquals(upNorm.z, 0, this.threshold)){
-                return this.enumView.LeftTurnTop;
+            if (isEquals(upNorm.x, 0, threshold) &&
+                isEquals(upNorm.y, -1, threshold) &&
+                isEquals(upNorm.z, 0, threshold)) {
+                return enumViewMode.LeftTurnTop;
             }
 
             // LeftTurnFront - up(0, 0, -1)
-            if ( this.isEquals(upNorm.x, 0, this.threshold) &&
-                this.isEquals(upNorm.y, 0, this.threshold) &&
-                this.isEquals(upNorm.z, -1, this.threshold)){
-                return this.enumView.LeftTurnFront;
+            if (isEquals(upNorm.x, 0, threshold) &&
+                isEquals(upNorm.y, 0, threshold) &&
+                isEquals(upNorm.z, -1, threshold)) {
+                return enumViewMode.LeftTurnFront;
             }
 
             // LeftTurnBack - up(0, 0, 1)
-            if ( this.isEquals(upNorm.x, 0, this.threshold) &&
-                this.isEquals(upNorm.y, 0, this.threshold) &&
-                this.isEquals(upNorm.z, 1, this.threshold)){
-                return this.enumView.LeftTurnBack;
+            if (isEquals(upNorm.x, 0, threshold) &&
+                isEquals(upNorm.y, 0, threshold) &&
+                isEquals(upNorm.z, 1, threshold)) {
+                return enumViewMode.LeftTurnBack;
             }
         }
 
         return -1;
-    },
+    };
 
-    render : function(renderer, camera, rotation){
+    // 设置容器元素style
+    var setContainerElementStyle = function (container) {
+        container.style.position = "absolute";
+        container.style.display = "block";
+        container.style.outline = "0";
+        container.style.right = "20px";
+        container.style.top = "20px";
+        container.style.opacity = ".6";
+        container.style.webkitTransition = "opacity .2s ease";
+        container.style.mozTransition = "opacity .2s ease";
+        container.style.msTransform = "opacity .2s ease";
+        container.style.oTransform = "opacity .2s ease";
+        container.style.transition = "opacity .2s ease";
+    };
+
+    this.init = function (container) {
+
+        houseContainer = document.createElement("div");
+        setContainerElementStyle(houseContainer);
+        container.appendChild(houseContainer);
+
+        renderer = new THREE.WebGLRenderer({antialias: true, alpha: true, preserveDrawingBuffer: true});
+
+        houseContainer.appendChild(renderer.domElement);
+
+        // 设置视口大小
+        this.resize(container.offsetWidth, container.offsetHeight, this.viewer.isMobile);
+    };
+
+    // 是否禁用指北针转盘
+    this.enableCompass = function (enable) {
+        isEnableCompass = enable;
+    };
+
+    this.mouseUp = function (event, callback) {
+
+        //if (event.button === mouseButtons.RIGHT) {
+        //    isRotate = false;
+        //}
+
+        isRotate = false;
+
+        var mouse = new THREE.Vector2(event.clientX, event.clientY);
+        var isInHouse = isValidRange(mouse);
+
+        //if (isInHouse) {
+        //    callback();
+        //}
+
+        return isInHouse;
+    };
+
+    this.mouseMove = function (event, callback) {
+
+        var change = false;
+        var mouse = new THREE.Vector2(event.clientX, event.clientY);
+        var mouseOverHouse = isValidRange(mouse);
+
+        // 左键选择，右键旋转
+
+        // 允许鼠标移出viewhouse区域
+        if (isRotate) {
+
+            rotateEnd.set(mouse.x, mouse.y);
+            rotateDelta.subVectors(rotateEnd, rotateStart);
+            callback(rotateDelta);
+            rotateStart.copy(rotateEnd);
+
+        } else {
+
+            if (mouseOverHouse) {
+
+                if (lastPickedObjectName === undefined) {
+                    lastPickedObjectName = "";
+                }
+
+                // 禁用透明
+                if (isTransparent) {
+                    enableTransparent(false);
+                    change = true;
+                }
+
+                // 显示home
+                if (isShowHome === false) {
+                    showHome(true);
+                    change = true;
+                }
+
+                picked();
+
+                // 存在选中的对象
+                if (Intersected) {
+
+                    if (Intersected.name !== "") {
+
+                        // 处理联动状态：前墙与门，左墙与左窗，右墙与右窗存在联动
+                        var linkageName = Intersected.name;
+                        if (linkageName === componentNames.MiddleDoor) {
+                            linkageName = componentNames.MiddleSouth;
+                        } else if (linkageName === componentNames.MiddleLeftWindow) {
+                            linkageName = componentNames.MiddleWest;
+                        } else if (linkageName === componentNames.MiddleRightWindow) {
+                            linkageName = componentNames.MiddleEast;
+                        }
+
+                        if (lastPickedObjectName !== linkageName) {
+                            lastPickedObjectName = linkageName;
+                            hasPickedObject = true;
+                            change = true;
+                        }
+                    }
+
+                } else { // 不存在选中的对象
+
+                    // 判断上次是否有选中的对象，如果上次有选中的对象，则需要刷新
+                    if (lastPickedObjectName !== "") {
+                        lastPickedObjectName = ""; // 置为空字符串
+                        hasPickedObject = false;
+                        change = true;
+                    }
+                }
+
+                // 不用每次刷新
+                if (change) {
+
+                    this.render();
+                    //callback();
+                }
+
+                lastMouseOverHouse = true;
+
+            } else {
+
+                if (lastMouseOverHouse) {
+
+                    lastMouseOverHouse = false;
+
+                    if (hasPickedObject) {
+                        clearObjectHighlight();
+                        hasPickedObject = false;
+                        change = true;
+                    }
+
+                    // 启用透明
+                    if (isTransparent === false) {
+                        enableTransparent(true);
+                        change = true;
+                    }
+
+                    // 隐藏home
+                    if (isShowHome) {
+                        showHome(false);
+                        change = true;
+                    }
+
+                    // 不用每次刷新
+                    if (change) {
+                        //callback();
+                        this.render();
+                    }
+
+                    //console.log("mouse out");
+                }
+            }
+        }
+
+        return mouseOverHouse;
+    };
+
+    this.mouseDown = function (event, callback) {
+
+        var mouse = new THREE.Vector2(event.clientX, event.clientY);
+        var mouseOverHouse = isValidRange(mouse);
+
+        if (mouseOverHouse) {
+
+            //picked();  // 不需再次选择
+
+            if (event.button === scope.mouseButtons.LEFT) {
+
+                if (Intersected) {
+
+                    switchView(Intersected.name);
+
+                    if (currentViewMode !== -1) {
+                        // 反馈到主视图
+                        callback(currentViewMode);
+                    }
+                }
+
+            } else if (event.button === scope.mouseButtons.RIGHT) {
+
+                // 右键启用旋转
+                isRotate = false;
+
+                if (Intersected) {
+                    var name = Intersected.name;
+
+                    if (name === componentNames.Compass) {
+                        isRotate = true;
+                        rotateStart.set(mouse.x, mouse.y);
+                    }
+                }
+            }
+        }
+
+        return mouseOverHouse;
+    };
+
+    this.render = function () {
 
         if (!this.visible)
             return;
 
+        if (!renderer) {
+            return;
+        }
+
+        var mainCamera = this.viewer.camera;
+        var mainScene = this.viewer.getScene();
+        var rotation = mainScene.rootNode.rotation;
+
         // 获得相机方向向量
-        var dir = camera.getWorldDirection();
+        var dir = mainCamera.getWorldDirection();
 
         // 获得主场景的旋转矩阵
         var rotMat = new THREE.Matrix4();
         rotMat.makeRotationFromEuler(rotation);
 
         // 设置坐标轴的旋转向量
-        this.scene.rotation.copy(rotation);
+        houseScene.rotation.copy(rotation);
 
-        this.camera.up.copy(camera.realUp || camera.up);
-        this.camera.lookAt(dir);
-        this.camera.updateMatrixWorld();
+        houseCamera.up.copy(mainCamera.realUp || mainCamera.up);
+        houseCamera.lookAt(dir);
+        houseCamera.updateMatrixWorld();
 
         // 获得当前标准视图
-        if (this.currentViewMode === -1) {
-            this.currentViewMode = this.getCurrentStandardView(dir, this.camera.up);
+        if (currentViewMode === -1) {
+            currentViewMode = getCurrentStandardView(dir, houseCamera.up);
         }
 
-        //renderer.autoClear = false;
-
-        var lastRenderSize = renderer.getSize(); //  记录上次的窗口大小
-
-        renderer.setViewport(this.viewPort.x, this.viewPort.y, this.viewPort.width, this.viewPort.height);
-
-        // 选中对象
-        //this.picked();
-
         // 判断是否标准视图
-        if (this.isStandardView(dir)) {
-            this.groupControlRing.visible = true;
+        if (isStandardView(dir)) {
+            groupControlRing.visible = true;
         } else {
-            this.groupControlRing.visible = false;
+            groupControlRing.visible = false;
         }
 
         // 动画过程中，不显示控制圆环
         // 动画为结束
         if (!this.isAnimationFinish) {
-            this.groupControlRing.visible = false;
+            groupControlRing.visible = false;
         }
 
         // 高亮圆环的显示控制
-        if (this.groupControlRing.visible === false){
-            this.meshHighlightRing.visible = false;
-            this.meshHighlightPoint.visible = false;
-            this.meshHighlightArrow.visible = false;
+        if (groupControlRing.visible === false) {
+            highlightRingMesh.visible = false;
+            highlightPointMesh.visible = false;
+            highlightArrowMesh.visible = false;
         }
 
-        this.groupControlRing.position.copy(this.groupControlRingPos);
-        this.groupHightLight.position.copy(this.groupHightLightPos);
+        groupControlRing.position.copy(groupControlRingPos);
+        groupHightLight.position.copy(groupHightLightPos);
 
-        if (this.groupControlRing.visible) {
+        if (groupControlRing.visible) {
             // 如果是底视图，让控制圆环显示
-            if (this.isBottomView(dir)) {
-                this.groupControlRing.translateZ(this.halfHeight + 1);
-                this.groupHightLight.translateZ(this.halfHeight + 1);
+            if (isBottomView(dir)) {
+                groupControlRing.translateZ(halfHeight + 1);
+                groupHightLight.translateZ(halfHeight + 1);
             }
         }
 
         // 是否禁用指北针
-        if (this.isEnableCompass) {
+        if (isEnableCompass) {
             // 是否显示指北针
-            if (this.isCompassView(dir)) {
-                this.groupCompass.visible = true;
-            }else{
-                this.groupCompass.visible = false;
+            if (isCompassView(dir)) {
+                groupCompass.visible = true;
+            } else {
+                groupCompass.visible = false;
             }
-        }else{
-            this.groupCompass.visible = false;
+        } else {
+            groupCompass.visible = false;
         }
 
-        renderer.render(this.scene, this.camera);
+        // 绘制house
+        renderer.autoClear = true;
+        renderer.render(houseScene, houseCamera);
 
+        // 绘制home
         renderer.autoClear = false;
-
-        renderer.render(this.scene2, this.camera2);
-
-        //renderer.autoClear = true;
-        //renderer.setSize( camera.right - camera.left, camera.top - camera.bottom );
-        // 恢复视口大小
-        renderer.setSize(lastRenderSize.width, lastRenderSize.height);
-    },
+        renderer.render(homeScene, homeCamera);
+        renderer.autoClear = true;
+    };
 
     // resize view house based on scene size
-    resize: function (width, height, bMobile) {
+    this.resize = function (width, height, bMobile) {
 
         var offset = 20;
         if (width < 400 || bMobile) {
-            this.setSize(this.enumSizeMode.Small);
-            offset = offset + this.enumSize.Small;
+            setSize(enumSizeMode.Small);
+            //offset = offset + enumSize.Small;
         }
         //else if (width < 800) {
-        //    this.setSize(this.enumSizeMode.Medium);
+        //    setSize(enumSizeMode.Medium);
         //}
         else {
-            this.setSize(this.enumSizeMode.Medium);
-            offset = offset + this.enumSize.Medium;
+            setSize(enumSizeMode.Medium);
+            //offset = offset + enumSize.Medium;
         }
 
-        this.setPosition(width - offset, height - offset);
-    }
+        renderer.setSize(this.width, this.height);
+    };
+
+    // 创建view house
+    createViewHouse();
+
+    // 设置透明
+    enableTransparent(true);
+
+    // 隐藏home
+    showHome(false);
 };
-
-
-
 CLOUD.Client = function (serverUrl, databagId, texturePath) {
     "use strict";
     //this.serverUrl = "http://172.16.244.67:9980/project/";
@@ -9169,6 +9269,8 @@ CLOUD.Client = function (serverUrl, databagId, texturePath) {
         textures: {},
         instancedMaterials: {}
     };
+
+    this.index = null;
 
     this.meshIds = {}; // dict for meshId -> mkpId
 
@@ -9271,10 +9373,7 @@ CLOUD.Scene = function () {
     this.type = 'Scene';
 
     this.raycaster = new CLOUD.Raycaster();
-    this.selectedNode = new THREE.Mesh();
-    this.selectedNode.matrixAutoUpdate = false;
 
-    this.selectedNode.material = CLOUD.MaterialUtil.createHilightMaterial();
     this.rootNode = new CLOUD.Group();
     this.rootNode.sceneRoot = true;
 
@@ -9283,6 +9382,10 @@ CLOUD.Scene = function () {
     this.clipWidget = null;
 
     this.filter = new CLOUD.Filter();
+
+    this.selectedIds = []; // 存一份是为了供鼠标pick使用
+
+    this.isEnableMultiSelect = false;
 };
 
 CLOUD.Scene.prototype = Object.create(THREE.Scene.prototype);
@@ -9300,14 +9403,13 @@ CLOUD.Scene.prototype.clone = function (object) {
 CLOUD.Scene.prototype.clearAll = function () {
     this.rootNode.children = [];
     this.rootNode.boundingBox = null;
-    this.selectedNode.visible = false;
 };
 
 CLOUD.Scene.prototype.selectionBox = function () {
-    if (this.selectedNode.visible && this.selectedNode.geometry.boundingBox !== null) {
+
+    if (!this.filter.isSelectionSetEmpty()) {
         var box = new THREE.Box3();
-        box.copy(this.selectedNode.geometry.boundingBox);
-        box.applyMatrix4(this.selectedNode.matrix);
+        box.copy(this.filter.getSelectionBox());
         box.applyMatrix4(this.rootNode.matrix);
         return box;
     }
@@ -9316,12 +9418,12 @@ CLOUD.Scene.prototype.selectionBox = function () {
 };
 
 CLOUD.Scene.prototype.updateSelection = function (trf) {
-    if (trf !== undefined) {
-        this.selectedNode.matrix = trf;
-        this.selectedNode.updateMatrixWorld(true);
-    }
-
-    this.rootNode.add(this.selectedNode);
+    //if (trf !== undefined) {
+    //    this.selectedNode.matrix = trf;
+    //    this.selectedNode.updateMatrixWorld(true);
+    //}
+    //
+    //this.rootNode.add(this.selectedNode);
 };
 
 CLOUD.Scene.prototype.worldBoundingBox = function () {
@@ -9374,9 +9476,6 @@ CLOUD.Scene.prototype.pick = function (mouse, camera, callback) {
     raycaster.setFromCamera(mouse, camera);
 
     var scope = this;
-    //scope.selectedNode.visible = false;
-    //
-    //scope.selectedIds = {};
 
     var intersects = this.hitTestClipPlane(raycaster.ray, raycaster.intersectObjects(scope.children, true));
 
@@ -9385,132 +9484,30 @@ CLOUD.Scene.prototype.pick = function (mouse, camera, callback) {
     });
 
     var length = intersects.length;
+
     if (length > 0) {
-        var intersect = intersects[0];
-        var meshNode = intersect.object;
-        var geometry = meshNode.geometry;
-        var cloudClient = intersect.cloudClient;
-        var material = this.selectedNode.material;
 
-        if (geometry instanceof THREE.InstancedBufferGeometry) {
+        for (var ii = 0; ii < length; ++ii) {
 
-            meshNode.userId = intersect.userId;
+            var intersect = intersects[ii];
+            var meshNode = intersect.object;
 
-            //// 取选中的实例对象
-            //var geo = CLOUD.GeomUtil.createBufferGeometry(geometry);
-            //geo.boundingBox = intersect.bbox; // 变换后的边框盒
-            //
-            //var transform = new THREE.Matrix4();
-            //transform.fromArray(intersect.transformMatrix);
-            //
-            //// 传入uniform值
-            //CLOUD.MaterialUtil.setMatrixUniform(transform);
-            //// 更新material
-            //CLOUD.MaterialUtil.updateBasicMaterial(material, true);
+            if (scope.filter.isVisible(meshNode)) {
 
-            //if (meshNode.userId && geo) {
-            //    //var node = scope.selectedNode;
-            //    //node.geometry = geo;
-            //    //node.geometry.boundingBox = geo.boundingBox;
-            //    //
-            //    //node.visible = true;
-            //    //// Force to update the node.
-            //    //scope.updateSelection(intersect.trf);
-            //
-            //    callback(meshNode.userId, cloudClient);
-            //    return;
-            //}
+                if (meshNode.userId && meshNode.geometry) {
 
-            callback(meshNode.userId, cloudClient);
-            return;
-        }
-        else {
-            CLOUD.MaterialUtil.updateBasicMaterial(material, false);
+                    intersect.userId = meshNode.userId;
+                    callback(intersect);
 
-            if (meshNode.userId && geometry) {
-
-                //var node = scope.selectedNode;
-                //node.geometry = geometry;
-                //node.geometry.boundingBox = geometry.boundingBox ? geometry.boundingBox : meshNode.boundingBox;
-                //
-                //node.visible = true;
-                //// Force to update the node.
-                //scope.updateSelection(intersect.trf);
-
-                //scope.selectedIds[meshNode.userId] = 1;
-                //scope.setIdsForSelectFilter(scope.selectedIds);
-
-                callback(meshNode.userId, cloudClient);
-                return;
-            }
-        }
-
-        var selectMesh = function (userId, meshId) {
-            var subGeometry = meshNode.findSubGeometry(meshId)
-            if (subGeometry !== null) {
-                //var node = scope.selectedNode;
-                //node.geometry = subGeometry;
-                //node.geometry.boundingBox = meshNode.findSubBBox(meshId);
-                //node.visible = true;
-                //// Force to update the node.
-                //scope.updateSelection( intersect.trf);
-
-                //scope.selectedIds[meshNode.userId] = 1;
-                //scope.setIdsForSelectFilter(scope.selectedIds);
-            }
-
-            callback(userId, cloudClient);
-        }
-
-        var hitTestSubMesh = function () {
-            var userId = intersect.userId;
-            var meshId = intersect.meshId;
-
-            if (userId === "" || userId === undefined) {
-                var subMeshes = meshNode.subMeshData.meshes;
-                // if submeshes is empty, subMeshData.userId is the id we need.
-                userId = meshNode.subMeshData.userId;
-                var faceIdx = intersect.faceIndex;
-                for (var subObj in subMeshes) {
-                    var subMesh = subMeshes[subObj];
-                    if (faceIdx >= subMesh.index[0] && faceIdx <= (subMesh.index[0] + subMesh.index[1])) {
-                        userId = subMesh.userId;
-                        meshId = subObj;
-                        break;
-                    }
+                    return;
                 }
-            }
 
-            selectMesh(userId, meshId);
-        };
-
-        // Load subMeshes
-        if (meshNode.subMeshData === null) {
-            if (geometry !== null) {
-                var loader = new THREE.XHRLoader();
-                var submeshUrl = cloudClient.submeshUrl(geometry.name);
-
-                loader.load(submeshUrl, function (text) {
-                    var subMeshData = JSON.parse(text);
-                    subMeshData.bbox = CLOUD.Utils.box3FromArray(subMeshData.bbox);
-                    var subMeshes = subMeshData.meshes;
-
-                    for (var subObj in subMeshes) {
-                        var subMesh = subMeshes[subObj];
-                        subMesh.boundingBox = CLOUD.Utils.box3FromArray(subMesh.boundingBox);;
-                    }
-
-                    meshNode.subMeshData = subMeshData;
-
-                    hitTestSubMesh();
-                });
             }
         }
-        else {
-            hitTestSubMesh();
-        }
-    } else {
-        callback("", null);
+
+    }
+    else {
+        callback(null);
     }
 };
 
@@ -9564,6 +9561,15 @@ CLOUD.Scene.prototype.findSceneNode = function (sceneId) {
     return null;
 };
 
+CLOUD.Scene.prototype.showSceneNodes = function (bVisible) {
+
+    var children = this.rootNode.children;
+    for (var i = 0, l = children.length; i < l; i++) {
+        var child = children[i];
+        child.visible = bVisible;
+    }
+}
+
 CLOUD.Scene.prototype.prepareScene = function () {
 
     var _frustum = new THREE.Frustum();
@@ -9574,6 +9580,7 @@ CLOUD.Scene.prototype.prepareScene = function () {
             camera.updateMatrixWorld();
 
         camera.matrixWorldInverse.getInverse(camera.matrixWorld);
+        camera.updatePositionPlane();
 
         _projScreenMatrix.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
 
@@ -9598,29 +9605,37 @@ CLOUD.Scene.prototype.prepareScene = function () {
     }
 }();
 
-
-CLOUD.Scene.prototype.addColorForOverrideFilter = function (color) {
-    this.filter.addColorForOverrideFilter(color);
+CLOUD.Scene.prototype.enableMulitSelect = function (isMultiSelect) {
+    this.isEnableMultiSelect = isMultiSelect;
 };
 
-CLOUD.Scene.prototype.setColorForOverrideFilter = function (index, color) {
-    this.filter.setColorForOverrideFilter(index, color);
+
+CLOUD.Scene.prototype.selectByUserIds = function (ids) {
+
+    this.filter.setSelectedIds(ids);
+
+    if (ids === null) {
+        this.selectedIds = [];
+        this.filter.resetSelectionBox();
+    }
 };
 
-CLOUD.Scene.prototype.setColorForSelectFilter = function (color) {
-    this.filter.setColorForSelectFilter(color);
-};
+CLOUD.Scene.prototype.setSelectedId = function (id) {
 
-CLOUD.Scene.prototype.setIdsForVisibilityFilter = function (ids) {
-    this.filter.setIds(this.filter.enumTypes.visibility, ids);
-};
+    if (this.isEnableMultiSelect) {
+        this.selectedIds.push(id);
+    } else {
+        this.selectedIds = [];
+        this.selectedIds.push(id);
+    }
 
-CLOUD.Scene.prototype.setIdsForOverrideFilter = function (ids) {
-    this.filter.setIds(this.filter.enumTypes.override, ids);
-};
-
-CLOUD.Scene.prototype.setIdsForSelectFilter = function (ids) {
-    this.filter.setIds(this.filter.enumTypes.select, ids);
+    //// 如果之前选中，则取消选中
+    //if (id in this.selectedIds) {
+    //    delete this.selectedIds[id];
+    //    this.filter.resetSelectionBox();
+    //} else {
+    //    this.selectedIds[id] = 1;
+    //}
 };
 
 CLOUD.Mesh = function (geometry, material, meshId) {
@@ -9645,6 +9660,10 @@ CLOUD.Mesh.prototype.updateGeometry = function (mesh) {
 }
 
 CLOUD.Mesh.prototype.unload = function () {
+
+    // parameter geometry
+    if (!this.meshId)
+        return;
 
     if (!this.geometry.refCount)
         return;
@@ -9725,13 +9744,51 @@ CLOUD.Mesh.prototype.findSubGeometry = function (meshId) {
 }
 
 CLOUD.Mesh.prototype.raycast = (function () {
+
     var inverseMatrix = new THREE.Matrix4();
     var ray = new THREE.Ray();
     var descSort = function (a, b) {
         return a.distance - b.distance;
     };
 
+    var intersectionPoint = new THREE.Vector3();
+    var intersectionPointWorld = new THREE.Vector3();
+
+    function checkIntersection(object, raycaster, ray, pA, pB, pC, point) {
+
+        var intersect;
+        var material = object.material;
+
+        if (material.side === THREE.BackSide) {
+
+            intersect = ray.intersectTriangle(pC, pB, pA, true, point);
+
+        } else {
+
+            intersect = ray.intersectTriangle(pA, pB, pC, material.side !== THREE.DoubleSide, point);
+
+        }
+
+        if (intersect === null) return null;
+
+        intersectionPointWorld.copy(point);
+        intersectionPointWorld.applyMatrix4(object.matrixWorld);
+
+        var distance = raycaster.ray.origin.distanceTo(intersectionPointWorld);
+
+        if (distance < raycaster.near || distance > raycaster.far) return null;
+
+        return {
+            distance: distance,
+            point: intersectionPointWorld.clone(),
+            object: object
+        };
+
+    }
+
+
     return function (raycaster, intersects) {
+
         var geometry = this.geometry;
         var boundingBox = this.boundingBox;
 
@@ -9769,8 +9826,44 @@ CLOUD.Mesh.prototype.raycast = (function () {
             }
         }
 
-        // We have to check the full mesh.
-        this.hitTestGeometry(raycaster, intersects, ray, userId, geometry.name);
+        if (geometry instanceof THREE.Geometry) {
+            var fvA, fvB, fvC;
+            var isFaceMaterial = material instanceof THREE.MeshFaceMaterial;
+            var materials = isFaceMaterial === true ? material.materials : null;
+
+            var vertices = geometry.vertices;
+            var faces = geometry.faces;
+            //var faceVertexUvs = geometry.faceVertexUvs[ 0 ];
+            //if ( faceVertexUvs.length > 0 ) uvs = faceVertexUvs;
+
+            for (var f = 0, fl = faces.length; f < fl; f++) {
+
+                var face = faces[f];
+                var faceMaterial = isFaceMaterial === true ? materials[face.materialIndex] : material;
+
+                if (faceMaterial === undefined) continue;
+
+                fvA = vertices[face.a];
+                fvB = vertices[face.b];
+                fvC = vertices[face.c];
+
+                var intersection = checkIntersection(this, raycaster, ray, fvA, fvB, fvC, intersectionPoint);
+
+                if (intersection) {
+
+                    intersection.face = face;
+                    intersection.faceIndex = f;
+                    intersection.sceneId = raycaster.sceneId;
+                    intersects.push(intersection);
+
+                }
+            }
+        }
+        else {
+            // We have to check the full mesh.
+            this.hitTestGeometry(raycaster, intersects, ray, userId, geometry.name);
+        }
+
     }
 }());
 
@@ -9796,6 +9889,8 @@ CLOUD.Mesh.prototype.computeGlobalMatrix = function()
 CLOUD.Mesh.prototype.hitTestGeometry = function (raycaster, intersects, ray, userId, meshId) {
     var geometry = this.geometry;
 
+
+
     if (geometry instanceof  THREE.InstancedBufferGeometry) {
 
         var material = this.material;
@@ -9820,7 +9915,6 @@ CLOUD.Mesh.prototype.hitTestGeometry = function (raycaster, intersects, ray, use
             if (distance < precision || distance < raycaster.near || distance > raycaster.far) continue;
 
             intersects.push({
-                userId : userId,
                 transformMatrix: transformMatrix,
                 bbox: bbox,
                 distance: distance,
@@ -9829,7 +9923,7 @@ CLOUD.Mesh.prototype.hitTestGeometry = function (raycaster, intersects, ray, use
                 faceIndex: null,
                 object: this,
                 ray: ray,
-                cloudClient: raycaster.cloudClient,
+                sceneId: raycaster.sceneId,
                 trf: this.computeGlobalMatrix()
             });
         }
@@ -9891,12 +9985,13 @@ CLOUD.Mesh.prototype.hitTestGeometry = function (raycaster, intersects, ray, use
                     faceIndex: null,
                     object: this,
                     ray: ray,
-                    cloudClient: raycaster.cloudClient,
+                    sceneId: raycaster.sceneId,
                     trf: this.computeGlobalMatrix()
                 });
             }
         }
     }
+
 };
 
 CLOUD.Mesh.prototype.hitTestSubMesh = function (offset, raycaster, intersects, ray, userId, meshId) {
@@ -9948,9 +10043,8 @@ CLOUD.Mesh.prototype.hitTestSubMesh = function (offset, raycaster, intersects, r
             faceIndex: i,
             object: this,
             ray: ray,
-            userId: userId,
             meshId: meshId,
-            cloudClient: raycaster.cloudClient,
+            sceneId: raycaster.sceneId,
             trf: this.computeGlobalMatrix()
         });
     }
@@ -9994,8 +10088,8 @@ CLOUD.Group.prototype.raycast = (function () {
             }
         }
 
-        if (this.cloudClient !== undefined) {
-            raycaster.cloudClient = this.cloudClient;
+        if (this.subSceneRoot && this.sceneId) {
+            raycaster.sceneId = this.sceneId;
         }
 
         return true;
@@ -10016,7 +10110,7 @@ CLOUD.Cell = function () {
     "use strict";
     CLOUD.Group.call(this);
 
-    this.type = 'Group';
+    this.type = 'Cell';
 
     this.worldBoundingBox = null;
 };
@@ -10036,18 +10130,21 @@ CLOUD.Cell.prototype.clone = function (object, recursive) {
 
 CLOUD.Cell.prototype.update = function () {
 
-    var v1 = new THREE.Vector3();
     var v2 = new THREE.Vector3();
 
     return function (camera) {
         var scope = this;
 
-        v1.setFromMatrixPosition(camera.matrixWorld);
         scope.worldBoundingBox.center(v2);
 
-        var distance = v1.distanceTo(v2);
+        var distance = camera.positionPlane.distanceToPoint(v2);
+        distance = distance * distance;
 
-        if (scope.level === undefined || (distance <  Math.min(scope.level * 500, 50) )) {
+        if (scope.level === undefined || (distance < scope.level * CLOUD.GlobalData.CellVisibleDistance)) {
+            //console.log(distance);
+            //if (scope.level !== undefined) {
+            //    console.log("xxx-" + scope.level * CLOUD.GlobalData.CellVisibleDistance);
+            //}
             this.visible = true;
         }
         else {
@@ -10064,7 +10161,7 @@ CLOUD.SubScene = function () {
     "use strict";
     CLOUD.Cell.call(this);
 
-    this.type = 'Group';
+    this.type = 'SubScene';
     this.sceneId = '';
     this.client = null;
     this.loaded = false;
@@ -10112,24 +10209,23 @@ CLOUD.SubScene.prototype.load = function () {
 
 CLOUD.SubScene.prototype.update = function () {
 
-    var v1 = new THREE.Vector3();
     var v2 = new THREE.Vector3();
 
     return function (camera) {
         var scope = this;
 
-        v1.setFromMatrixPosition(camera.matrixWorld);
         scope.worldBoundingBox.center(v2);
 
-        var distance = v1.distanceTo(v2);
+        var distance = camera.positionPlane.distanceToPoint(v2);
+        var distance = distance * distance;
 
-        if (scope.level === undefined || distance < scope.level * 50) {
+        if (scope.level === undefined || distance < scope.level * CLOUD.GlobalData.SubSceneVisibleDistance) {
             this.load();
         }
         else {
             this.visible = false;
 
-            if (CLOUD.GlobalData.DynamicRelease && scope.loaded && distance > scope.level * 100) {
+            if (CLOUD.GlobalData.DynamicRelease && scope.loaded && distance > (scope.level * CLOUD.GlobalData.SubSceneVisibleDistance * 2)) {
                 this.unload();
             }
         }
@@ -10703,8 +10799,20 @@ CLOUD.CameraEditor = function (camera, domElement, onChange) {
     };
 
     // 基于世界空间的漫游
-    this.fly2 = function () {
+    this.flyOnWorld = function () {
+
+        var up = this.object.up.clone();
+
+        if (this.object.realUp) {
+            this.object.up.copy(this.object.realUp);
+        }
+
+        // 使用realUp
         this.object.lookAt(this.target);
+
+        if (this.object.realUp) {
+            this.object.up.copy(up);
+        }
 
         // 调用Render刷新
         onChange();
@@ -11047,7 +11155,11 @@ CLOUD.PickEditor.prototype.onMouseDown = function (event) {
         var scope = this;
         var mouse = cameraEditor.mapWindowToViewport(event.clientX, event.clientY);
 
-        scope.scene.pick(mouse, cameraEditor.object, function (userId, cloudClient) {
+        scope.scene.pick(mouse, cameraEditor.object, function (intersect) {
+
+            var userId = "";
+            if (intersect)
+                userId = intersect.userId;
 
             // 不需要每次更新
             if ( ( scope.lastUserId !== undefined ) || ( userId !== "" ) ) {
@@ -11057,21 +11169,27 @@ CLOUD.PickEditor.prototype.onMouseDown = function (event) {
                     scope.lastUserId = userId;
 
                     if (userId === "") {
-                        scope.scene.setIdsForSelectFilter(null);
+                        scope.scene.selectByUserIds(null);
                     } else {
-                        var selectedIds = {};
-                        selectedIds[userId] = 1;
-                        scope.scene.setIdsForSelectFilter(selectedIds);
+                        scope.scene.setSelectedId(userId);
+                        scope.scene.selectByUserIds(scope.scene.selectedIds);
                     }
 
                     cameraEditor.updateView();
-                    scope.onObjectSelected(userId, cloudClient);
+
+                    scope.onObjectSelected(intersect);
                 }
+                //else { // 再次选中相同id的对象，取消选中
+                //    if (userId !== "" ) {
+                //        scope.scene.setSelectedId(userId);
+                //        scope.scene.selectByUserIds(scope.scene.selectedIds);
+                //
+                //        cameraEditor.updateView();
+                //
+                //        scope.onObjectSelected(null);
+                //    }
+                //}
             }
-
-            //cameraEditor.updateView();
-            //scope.onObjectSelected(userId, cloudClient);
-
         });
     }
 
@@ -11102,7 +11220,10 @@ CLOUD.FlyEditorUI = function (domElement, onChangeSpeed) {
     if (domElement) this.domElement.setAttribute('tabindex', -1);
 
     this.enableControlPanel = false;// 是否允许控制面板
-    this.isCrossTexture = false; // 是否采用贴图方式处理“方向控制器”
+
+    this.crossContainer = null; // 十字图标父容器
+    this.crossBoxWidth = 30; // 十字图标包围盒宽度
+    this.crossBoxHeight = 30;// 十字图标包围盒高度
 
     this.elementIds = {
         imgKeyQ: 'imgKeyQ',
@@ -11148,67 +11269,72 @@ CLOUD.FlyEditorUI = function (domElement, onChangeSpeed) {
 CLOUD.FlyEditorUI.prototype = {
 
     // 初始化方向控制器
-    initCross: function (scene, cameraEditor) {
-        // 采用贴图，可以灵活定义“方向控制器”
-        if (this.isCrossTexture) {
-            // 考虑允许中途切换状态,即外部再次调用initCross一次，可以实现连续切换
-            if (this.particles === undefined) {
-                var scope = this;
-                // 加入“方向控制器”图标
-                var sprite = THREE.ImageUtils.loadTexture(CloudViewerRes.flyCenterTexture, undefined, function () {
-                    var material = new THREE.PointCloudMaterial({
-                        size: 35,
-                        sizeAttenuation: false,
-                        map: sprite,
-                        transparent: true,
-                        depthTest: false
-                    });
-                    material.color.setHSL(1.0, 0.3, 0.7);
+    initCross: function () {
 
-                    var spriteGeom = new THREE.Geometry();
-                    var vertex = new THREE.Vector3();
-                    vertex.x = 0;
-                    vertex.y = 0;
-                    vertex.z = 0;
-                    spriteGeom.vertices.push(vertex);
+        if (!this.crossContainer) {
+            var container = this.domElement;
 
-                    scope.particles = new THREE.PointCloud(spriteGeom, material);
+            var xmlns = "http://www.w3.org/2000/svg";
+            var boxWidth = this.crossBoxWidth;
+            var boxHeight = this.crossBoxHeight;
 
-                    scene.add(scope.particles);
+            var dim = CLOUD.DomUtil.getContainerOffsetToClient(container);
+            var left = dim.size[0] / 2 - boxWidth / 2;
+            var top = dim.size[1] / 2 - boxHeight / 2;
 
-                    // 因为是异步加载图片，故加载完成还需render一次
-                    cameraEditor.fly2();
-                });
-            }
-        } else {
-            if (this.crossLine === undefined) {
-                // 绘制十字形
-                var crossGeom = new THREE.Geometry();
-                var points = [
-                    new THREE.Vector3(0, 0, 0),
-                    new THREE.Vector3(0.2, 0, 0),
-                    new THREE.Vector3(0, 0, 0),
-                    new THREE.Vector3(0, 0.2, 0),
-                    new THREE.Vector3(0, 0, 0),
-                    new THREE.Vector3(-0.2, 0, 0),
-                    new THREE.Vector3(0, 0, 0),
-                    new THREE.Vector3(0, -0.2, 0),
-                    new THREE.Vector3(0, 0, 0)
-                ];
+            var svgElem = document.createElementNS(xmlns, "svg");
+            svgElem.setAttributeNS(null, "viewBox", "0 0 " + boxWidth + " " + boxHeight);
+            svgElem.setAttributeNS(null, "width", boxWidth);
+            svgElem.setAttributeNS(null, "height", boxHeight);
 
-                for (i = 0; i < points.length; i++) {
-                    crossGeom.vertices.push(points[i]);
-                }
+            // 绘制十字形
+            //d="M 15, 15 l 15, 0 l -30, 0 l 15, 0 l 0, 15 l 0, -30 l 0, 15"
+            var coords = "M " + boxWidth / 2 + ", " + boxHeight / 2 + "";
+            coords += " l " + boxWidth / 2 + ", 0";
+            coords += " l -" + boxWidth + ", 0";
+            coords += " l " + boxWidth / 2 + ", 0";
+            coords += " l 0, " + boxHeight / 2 + "";
+            coords += " l 0, -" + boxHeight + "";
+            coords += " l 0, " + boxHeight / 2 + "";
 
-                this.crossLine = new THREE.Line(crossGeom, new THREE.LineBasicMaterial({
-                    color: 0xff0000,
-                    depthTest: false
-                    //opacity: 0.5
-                }));
+            var path = document.createElementNS(xmlns, "path");
+            path.setAttributeNS(null, 'stroke', "red");
+            path.setAttributeNS(null, 'stroke-width', 1);
+            path.setAttributeNS(null, 'd', coords);
+            path.setAttributeNS(null, 'opacity', 0.8);
+            svgElem.appendChild(path);
 
-                scene.add(this.crossLine);
-            }
+            var svgContainer = document.createElement("div");
+            svgContainer.style.position = "absolute";
+            svgContainer.style.display = "block";
+            svgContainer.style.outline = "0";
+            svgContainer.style.left = left + "px";
+            svgContainer.style.top = top + "px";
+            svgContainer.style.opacity = "1.0";
+            svgContainer.style.webkitTransition = "opacity .2s ease";
+            svgContainer.style.mozTransition = "opacity .2s ease";
+            svgContainer.style.msTransform = "opacity .2s ease";
+            svgContainer.style.oTransform = "opacity .2s ease";
+            svgContainer.style.transition = "opacity .2s ease";
+
+            svgContainer.appendChild(svgElem);
+            container.appendChild(svgContainer);
+
+            this.crossContainer = svgContainer;
         }
+    },
+    resize: function() {
+        var container = this.domElement;
+        var boxWidth = this.crossBoxWidth;
+        var boxHeight = this.crossBoxHeight;
+        var svgContainer = this.crossContainer;
+
+        var dim = CLOUD.DomUtil.getContainerOffsetToClient(container);
+        var left = dim.size[0] / 2 - boxWidth / 2;
+        var top = dim.size[1] / 2 - boxHeight / 2;
+
+        svgContainer.style.left = left + "px";
+        svgContainer.style.top = top + "px";
     },
     onKeyDown: function (moveState, MoveDirection) {
         if (!this.enableControlPanel)
@@ -11328,11 +11454,6 @@ CLOUD.FlyEditorUI.prototype = {
         return cur;
     },
 
-    // 启用或关闭“方向控制器”贴图方式
-    enableCrossTexture: function (enable) {
-        this.isCrossTexture = enable;
-    },
-
     // 启用或关闭控制面板
     enableFlyControlPanel: function (enable) {
         this.enableControlPanel = enable;
@@ -11357,41 +11478,14 @@ CLOUD.FlyEditorUI.prototype = {
         this.setCrossVisible(isShow);
     },
 
-
-
     // 设置方向控制器可见性
     setCrossVisible: function (visible) {
-        if (this.isCrossTexture) {
-            if (this.particles !== undefined) {
-                this.particles.visible = visible;
-            }
-        } else {
-            if (this.crossLine !== undefined) {
-                this.crossLine.visible = visible;
-            }
-        }
-    },
 
-    // 设置方向控制器位置
-    setCrossPosition: function (cameraEditor) {
-        if (this.isCrossTexture) {
-            if (this.particles !== undefined) {
-                this.particles.position.x = cameraEditor.target.x;
-                this.particles.position.y = cameraEditor.target.y;
-                this.particles.position.z = cameraEditor.target.z;
-            }
-        } else {
-            if (this.crossLine !== undefined) {
-                // 计算相机与目标点的角度
-                var rotation = cameraEditor.computeRotation();
-                this.crossLine.rotation.x = rotation.x;
-                this.crossLine.rotation.y = rotation.y;
-                this.crossLine.rotation.z = rotation.z;
-
-                // 设置位置
-                this.crossLine.position.x = cameraEditor.target.x;
-                this.crossLine.position.y = cameraEditor.target.y;
-                this.crossLine.position.z = cameraEditor.target.z;
+        if(this.crossContainer) {
+            if (visible) {
+                this.crossContainer.style.display = "";
+            } else {
+                this.crossContainer.style.display = "none";
             }
         }
     },
@@ -11572,7 +11666,7 @@ CLOUD.FlyEditor = function (cameraEditor, scene, domElement) {
         scope.movementSpeedMultiplier = speedMultiplier;
     });
     // 初始化方向控制器
-    this.ui.initCross(scene, cameraEditor);
+    this.ui.initCross();
 };
 
 CLOUD.FlyEditor.prototype = {
@@ -11752,7 +11846,7 @@ CLOUD.FlyEditor.prototype = {
         }
 
         // 刷新
-        this.cameraEditor.fly2();
+        this.cameraEditor.flyOnWorld();
     },
 
     // 前进
@@ -11867,9 +11961,11 @@ CLOUD.FlyEditor.prototype = {
         target.z = eye.z + percent * offsetZ;
     },
 
-    // 启用或关闭“方向控制器”贴图方式
-    enableCrossTexture: function (enable) {
-        this.ui.enableCrossTexture(enable);
+    resize: function() {
+        this.ui.resize();
+    },
+    setCrossVisible: function (visible) {
+        this.ui.setCrossVisible(visible);
     },
 
     // 启用或关闭控制面板
@@ -11877,11 +11973,6 @@ CLOUD.FlyEditor.prototype = {
         this.ui.enableFlyControlPanel(enable);
     },
 
-
-    // 设置方向控制器位置
-    setCrossPosition: function () {
-        this.ui.setCrossPosition(this.cameraEditor);
-    },
     showControlPanel: function (isShow) {
         this.ui.showControlPanel(isShow);
     }
@@ -12106,106 +12197,304 @@ CLOUD.CameraAnimator = function () {
 }
 
 
+CLOUD.Filter = function () {
 
-CLOUD.Filter = function() {
+    var createMaterial = function (color) {
+        var material = new THREE.MeshPhongMaterial({color: color});
 
-    this.enumTypes = {visibility: 0, override: 1, select: 2};
+        if (CloudShaderLib !== undefined) {
+            material.type = 'phong_cust_clip';
+            material.uniforms = CloudShaderLib.phong_cust_clip.uniforms;
+            material.vertexShader = CloudShaderLib.phong_cust_clip.vertexShader;
+            material.fragmentShader = CloudShaderLib.phong_cust_clip.fragmentShader;
+        }
 
-    this.materialIndex = 1;
+        return material;
+    };
 
-    var defaultMaterial = this.createMaterialByColor(0x2194CE);
-    var selectedMaterial = CLOUD.MaterialUtil.createHilightMaterial();
+    var visibilityFilter = {};
 
-    this.filters = {
-        visibilityFilter: {
-            //ids: {}
-        },
-        overrideFilter: {
-            0: defaultMaterial,
-            //1: material,
-            //2: material2,
-            //ids: {}
-        },
-        selectFilter: {
-            material: selectedMaterial,
-            //ids: {}
+    var overridedMaterials = {};
+    overridedMaterials.selection = CLOUD.MaterialUtil.createHilightMaterial();
+
+    var materialOverriderByUserId = {};
+
+    var materialOverriderByUserData = {};
+
+    var selectionSet = {
+        boundingBox: new THREE.Box3()
+    };
+
+    ////////////////////////////////////////////////////////////////////
+    // Visbililty Filter API
+    this.setFilterByUserIds = function (ids) {
+
+        if (ids) {
+            visibilityFilter.ids = {};
+            for (var ii = 0, len = ids.length; ii < len; ++ii) {
+                visibilityFilter.ids[ids[ii]] = true;
+            }
+        }
+        else {
+            delete visibilityFilter.ids;
+        }
+
+    };
+
+    this.addFilterByUserIds = function (ids) {
+
+        if (!ids)
+            return;
+
+        if (!visibilityFilter.ids)
+            visibilityFilter.ids = {};
+
+        for (var ii = 0, len = ids.length; ii < len; ++ii) {
+            visibilityFilter.ids[ids[ii]] = true;
         }
     };
-};
 
-CLOUD.Filter.prototype.applyFilter = function() {
+    this.addUserFilter = function (name, value) {
 
-};
+        if (visibilityFilter[name] === undefined)
+            visibilityFilter[name] = {};
 
-/**
- * 返回实例字符串
- * @return {String} 实例字符串
- **/
-CLOUD.Filter.prototype.toString = function() {
-    return "[Filter]";
-};
+        visibilityFilter[name][value] = true;
+    };
 
-CLOUD.Filter.prototype.createMaterialByColor = function(color) {
-
-    var material = new THREE.MeshPhongMaterial({color: color});
-
-    if (CloudShaderLib !== undefined) {
-        material.type = 'phong_cust_clip';
-        material.uniforms = CloudShaderLib.phong_cust_clip.uniforms;
-        material.vertexShader = CloudShaderLib.phong_cust_clip.vertexShader;
-        material.fragmentShader = CloudShaderLib.phong_cust_clip.fragmentShader;
+    this.getUserFilter = function (name) {
+        return visibilityFilter[name];
     }
 
-    return material;
-};
+    this.removeUserFilter = function (name, value) {
 
-CLOUD.Filter.prototype.addColorForOverrideFilter = function(color) {
-    this.filters.overrideFilter[this.materialIndex++] = this.createMaterialByColor(color);
-};
+        if(value === undefined){
+            delete visibilityFilter[name];
+        }
+        else {
+            delete visibilityFilter[name][value];
+
+            if (Object.getOwnPropertyNames(visibilityFilter[name]).length == 0) {
+                delete visibilityFilter[name];
+            }
+
+        }
+    }
+
+    this.clearUserFilters = function () {
+        visibilityFilter = {};
+    }
+
+    ////////////////////////////////////////////////////////////////////
+    // material overrider API
+    this.setOverriderMaterial = function (materialName, color) {
+        var material = overridedMaterials[materialName];
+        if (material) {
+            material.color = color;
+            return material;
+        }
+        else {
+            material = createMaterial(color);
+            overridedMaterials[materialName] = material;
+            return material;
+        }
+    };
+
+    this.setOverriderByUserIds = function (name, ids, materialName) {
+        if (name === undefined)
+            materialOverriderByUserId = {};
+
+        if (ids === undefined) {
+            delete materialOverriderByUserId[name];
+        }
+        else {
+
+            var material;
+            if (materialName) {
+                material = overridedMaterials[materialName];
+            }
+
+            var overrider = {};
+            overrider.material = material ? material : overridedMaterials.selection;
+
+            overrider.ids = {};
+            for (var ii = 0, len = ids.length; ii < len; ++ii) {
+                overrider.ids[ids[ii]] = true;
+            }
+
+            materialOverriderByUserId[name] = overrider;
+        }
+
+    };
+
+    this.setUserOverrider = function (name, value, materialName) {
+        if (name === undefined)
+            materialOverriderByUserData = {};
+
+        if (value === undefined) {
+            delete materialOverriderByUserData[name];
+        }
+        else {
+
+            var material;
+            if (materialName) {
+                material = overridedMaterials[materialName];
+            }
+
+            if (!materialOverriderByUserData[name])
+                materialOverriderByUserData[name] = {};
+
+            materialOverriderByUserData[name][value] = material || overridedMaterials.selection;
+        }
+    };
+
+    this.removeUserOverrider = function (name, value) {
+
+        if (name === undefined)
+            materialOverriderByUserData = {};
+
+        if (value === undefined) {
+            delete materialOverriderByUserData[name];
+        }
+        else {
+            delete materialOverriderByUserData[name][value];
+        }
+
+    };
 
 
-CLOUD.Filter.prototype.setColorForOverrideFilter = function(index, color) {
+    ////////////////////////////////////////////////////////////////
+    // 设置selectionSet的颜色
+    this.setSelectionMaterial = function (color) {
+        overridedMaterials.selection.color = color;
+    };
 
-    if (index in this.filters.overrideFilter) {
-        this.filters.overrideFilter[index].color = color;
+    this.setSelectedIds = function (ids) {
+
+        if (ids && ids.length > 0) {
+            selectionSet.ids = {};
+            for (var ii = 0, len = ids.length; ii < len; ++ii) {
+                selectionSet.ids[ids[ii]] = true;
+            }
+        }
+        else {
+            delete selectionSet.ids;
+        }
+    };
+
+    this.addSelectedIds = function (ids) {
+
+        if (!ids)
+            return;
+        if (selectionSet.ids === undefined){
+            selectionSet.ids = {};
+        }
+
+
+        for (var ii = 0, len = ids.length; ii < len; ++ii) {
+            selectionSet.ids[ids[ii]] = true;
+        }
+
+    };
+    ////////////////////////////////////////////////////////////////
+    // 判断是否可见
+    this.isVisible = function (node) {
+
+        var id = node.userId;
+        if (id && visibilityFilter.ids && (visibilityFilter.ids[id] === 0)) {
+            return false;
+        }
+
+        if (!node.userData)
+            return true;
+
+        for (var item in visibilityFilter) {
+
+            var userValue = node.userData[item];
+            if(userValue && visibilityFilter[item][userValue] !== undefined ){
+                return false;
+            }
+        }
+
+        return true;
+    };
+
+
+
+    // 判断是否选中
+    function isSelected (id) {
+
+        if (selectionSet.ids && selectionSet.ids[id]) {
+            return true;
+        }
+
+        return false;
+    };
+
+    // 计算选中对象的包围盒
+    this.computeSelectionBox = function (object) {
+        var box = object.boundingBox || (object.geometry && object.geometry.boundingBox);
+
+        // 计算boundingBox
+        if (box) {
+            var box2 = box.clone();
+
+            // 包围盒变换
+            if (object.matrix) {
+                box2.applyMatrix4(object.matrix);
+            }
+
+            selectionSet.boundingBox.expandByPoint(box2.min);
+            selectionSet.boundingBox.expandByPoint(box2.max);
+        }
+    };
+
+    // 切换材质
+    this.getOverridedMaterial = function (object) {
+
+        var id = object.userId;
+
+        if (!id) {
+            return null;
+        }
+
+        if (isSelected(id)) {
+            return overridedMaterials.selection;
+        }
+
+        for (var item in materialOverriderByUserId) {
+            var overrider = materialOverriderByUserId[item];
+            if (overrider.ids[id])
+                return overrider.material;
+        }
+
+        if (!object.userData)
+            return null;
+
+        for (var item in materialOverriderByUserData) {
+            var overrider = materialOverriderByUserData[item];
+            var material = overrider[object.userData[item]];
+            if (material)
+                return material;
+        }
+
+
+        return null;
+    };
+
+    // 重置包围盒
+    this.resetSelectionBox = function() {
+        selectionSet.boundingBox.makeEmpty();
+    };
+
+    this.getSelectionBox = function() {
+        return selectionSet.boundingBox;
+    };
+
+    this.isSelectionSetEmpty = function() {
+        return  !selectionSet.ids
     }
 };
-
-CLOUD.Filter.prototype.setColorForSelectFilter = function(color) {
-    this.filters.selectFilter.material.color = color;
-};
-
-// id使用属性存放，可以明显提高检索性能，
-// eg: ids = { 123 : 1, 124 : 1, 125 : 1}
-// visibilityFilter.ids: 属性值 1:可见，0: 不可见
-// overrideFilter.ids:属性值存储material索引
-// selectFilter.ids:属性值 1:启用overlay，0: 禁用overlay
-CLOUD.Filter.prototype.setIds = function(type, ids) {
-    switch (type) {
-        case this.enumTypes.visibility:
-            this.filters.visibilityFilter.ids = ids;
-            break;
-        case this.enumTypes.override:
-            this.filters.overrideFilter.ids = ids;
-            break;
-        case this.enumTypes.select:
-            this.filters.selectFilter.ids = ids;
-            break;
-    }
-};
-
-CLOUD.Filter.prototype.getFilterObject = function() {
-    return this.filters;
-};
-
-CLOUD.Filter.prototype.getTypes = function() {
-    return this.enumTypes;
-};
-
-CLOUD.Filter.prototype.getColorCountForOverrideFilter = function() {
-    return this.materialIndex;
-};
-
 /*global ArrayBuffer, Uint32Array, Int32Array, Float32Array, Int8Array, Uint8Array, window, performance, Console*/
 
 /*
@@ -16689,8 +16978,13 @@ CLOUD.SubSceneLoader.prototype = {
 
             for (var child in children) {
                 var meshNode = children[child];
+
                 if (meshNode instanceof CLOUD.Mesh) {
+
                     var meshId = meshNode.meshId;
+                    if (meshId === undefined)
+                        continue;
+
                     if (!meshNode.geometry || meshNode.geometry.refCount === undefined) {
                         var mesh = resource.geometries[meshId];
                         if (mesh) {
@@ -16722,7 +17016,7 @@ CLOUD.SubSceneLoader.prototype = {
         var client = subScene.client;
         var resource = client.cache;
 
-        function handle_children(parent, children, level, userId) {
+        function handle_children(parent, children, level, userId, userData, trf) {
 
             for (var nodeId in children) {
 
@@ -16732,21 +17026,15 @@ CLOUD.SubSceneLoader.prototype = {
                 if (userId !== undefined)
                     objJSON.userId = userId;
 
+                if (objJSON.userData)
+                    userData = objJSON.userData;
+
                 var object;
 
                 if (objJSON.nodeType == "MpkNode") {
 
                     handle_children(parent, objJSON.nodes, level);
 
-                }
-                else if (objJSON.nodeType == "GroupNode") {
-
-                    object = new CLOUD.Group();
-                    CLOUD.GeomUtil.parseNodeProperties(object, objJSON, nodeId);
-
-                    parent.add(object);
-
-                    handle_children(object, objJSON.children, level + 1, userId);
                 }
                 else if (objJSON.nodeType == "CellNode") {
 
@@ -16782,69 +17070,89 @@ CLOUD.SubSceneLoader.prototype = {
                         // Will not load.
                     }
                 }
+                else if (objJSON.nodeType == "GroupNode") {
+
+                    object = new CLOUD.Group();
+                    CLOUD.GeomUtil.parseNodeProperties(object, objJSON, nodeId, trf);
+
+                    handle_children(parent, objJSON.children, level + 1, userId, userData, object.matrix);
+
+                }
                 else if (objJSON.nodeType == "MeshNode") {
+
                     if (resource.bOutOfLimitation == true)
                         continue;
 
                     var matObj = client.findMaterial(objJSON.materialId, false);
 
-                    object = new CLOUD.Mesh(CLOUD.GlobalData.EmptyGeometry, matObj, objJSON.meshId);
-                    CLOUD.GeomUtil.parseNodeProperties(object, objJSON, nodeId);
+                    object = new CLOUD.Mesh(CLOUD.GeomUtil.EmptyGeometry, matObj, objJSON.meshId);
+                    CLOUD.GeomUtil.parseNodeProperties(object, objJSON, nodeId, trf);
+                    object.userData = userData;
+
                     // will not load the mesh.
 
                     parent.add(object);
                 }
                 else if (objJSON.nodeType == "PGeomNode") {
 
-
                     var matObj = client.findMaterial(objJSON.materialId, false);
-
-                    if (objJSON.geomType == "pipe") {
-
-                        var geometry = CLOUD.GeomUtil.UnitCylinderInstance;
-                        object = new THREE.Mesh(geometry, matObj);
-                        CLOUD.GeomUtil.parseCylinderNode(object, objJSON.params);
-
-                    }
-                    else if (objJSON.geomType == "box") {
-
-                        var geometry = CLOUD.GeomUtil.UnitBoxInstance;
-                        object = new THREE.Mesh(geometry, matObj);
-
-                        CLOUD.GeomUtil.parseBoxNode(object, objJSON);
-
-                    }
+                    object = object = CLOUD.GeomUtil.parsePGeomNodeInstance(objJSON, matObj, trf);
 
                     if (object) {
 
                         object.name = nodeId;
-                        if (objJSON.userId)
-                            object.userId = objJSON.userId;
+                        object.userId = objJSON.userId;
+                        object.userData = userData;
+
 
                         parent.add(object);
                     }
                 }
                 else if (objJSON.nodeType == "SymbolInstance") {
+
                     var symbolJSON = client.findSymbol(objJSON.symbolId);
+
                     if (symbolJSON) {
                         if (symbolJSON.nodeType === "GroupNode") {
 
                             object = new CLOUD.Group();
-                            CLOUD.GeomUtil.parseNodeProperties(object, objJSON, nodeId);
+                            CLOUD.GeomUtil.parseNodeProperties(object, objJSON, nodeId, trf);
 
-                            parent.add(object);
+                            handle_children(parent, symbolJSON.children, level + 1, objJSON.userId, userData, object.matrix);
 
-                            handle_children(object, symbolJSON.children, level + 1, objJSON.userId);
                         }
                         else if (symbolJSON.nodeType === "MeshNode") {
 
                             var matObj = client.findMaterial(symbolJSON.materialId, false);
 
-                            object = new CLOUD.Mesh(CLOUD.GlobalData.EmptyGeometry, matObj, symbolJSON.meshId);
-                            CLOUD.GeomUtil.parseNodeProperties(object, objJSON, nodeId);
-
+                            object = new CLOUD.Mesh(CLOUD.GeomUtil.EmptyGeometry, matObj, symbolJSON.meshId);
+                            CLOUD.GeomUtil.parseNodeProperties(object, objJSON, nodeId, trf);
+                            object.userData = userData;
                             parent.add(object);
 
+                        }
+                        else if (symbolJSON.nodeType === "PGeomNode") {
+
+                            var matObj = client.findMaterial(symbolJSON.materialId, false);
+
+                            var trfLocal = new THREE.Matrix4();
+                            if (objJSON.matrix) {
+                                trfLocal.fromArray(objJSON.matrix);
+                            }
+                            if (trf) {
+                                trfLocal.updateMatrixWorld(trf, trfLocal);
+                            }
+
+                            object = CLOUD.GeomUtil.parsePGeomNodeInstance(symbolJSON, matObj, trfLocal);
+
+                            if (object) {
+
+                                object.name = nodeId;
+                                object.userId = userId;
+                                object.userData = userData;
+
+                                parent.add(object);
+                            }
                         }
                     }
 
@@ -16923,6 +17231,8 @@ CLOUD.SceneLoader.prototype = {
 
         var localRoot = CLOUD.Utils.parseRootNode(group, data);
         localRoot.sceneId = sceneId;
+        localRoot.client = client;
+        localRoot.subSceneRoot = true;
 
         if (notifyProgress)
             scope.manager.dispatchEvent({ type: CLOUD.EVENTS.ON_LOAD_START, sceneId: sceneId });
@@ -16951,8 +17261,7 @@ CLOUD.SceneLoader.prototype = {
             }
         }
 
-
-        function handle_children(parent, children, level, userId) {
+        function handle_children(parent, children, level, userId, userData, trf) {
 
             for (var nodeId in children) {
 
@@ -16962,22 +17271,15 @@ CLOUD.SceneLoader.prototype = {
                 if (userId !== undefined)
                     objJSON.userId = userId;
 
+                if (objJSON.userData)
+                    userData = objJSON.userData;
+
                 var object;
 
                 if (objJSON.nodeType == "MpkNode") {
 
                     scope.manager.loadMpk(objJSON.mpkId, client, onload_mpk_complete(parent, objJSON, level + 1));
                     continue;
-                }
-                else if (objJSON.nodeType == "GroupNode") {
-
-                    object = new CLOUD.Group();
-                    CLOUD.GeomUtil.parseNodeProperties(object, objJSON, nodeId);
-
-                    parent.add(object);
-
-                    handle_children(object, objJSON.children, level + 1, userId);
-
                 }
                 else if (objJSON.nodeType == "CellNode") {
 
@@ -17023,14 +17325,23 @@ CLOUD.SceneLoader.prototype = {
                         // Will not load.
                     }
                 }
+                else if (objJSON.nodeType == "GroupNode") {
+
+                    object = new CLOUD.Group();
+                    CLOUD.GeomUtil.parseNodeProperties(object, objJSON, nodeId, trf);
+
+                    handle_children(parent, objJSON.children, level + 1, userId, userData, object.matrix);
+
+                }
                 else if (objJSON.nodeType == "MeshNode") {
                     if (resource.bOutOfLimitation == true)
                         continue;
 
                     var matObj = client.findMaterial(objJSON.materialId, false);
 
-                    object = new CLOUD.Mesh(CLOUD.GlobalData.EmptyGeometry, matObj, objJSON.meshId);
-                    CLOUD.GeomUtil.parseNodeProperties(object, objJSON, nodeId);
+                    object = new CLOUD.Mesh(CLOUD.GeomUtil.EmptyGeometry, matObj, objJSON.meshId);
+                    CLOUD.GeomUtil.parseNodeProperties(object, objJSON, nodeId, trf);
+                    object.userData = userData;
 
                     loadMeshNode(object, objJSON.meshId);
 
@@ -17039,28 +17350,15 @@ CLOUD.SceneLoader.prototype = {
                 else if (objJSON.nodeType == "PGeomNode") {
 
                     var matObj = client.findMaterial(objJSON.materialId, false);
-
-                    if (objJSON.geomType == "pipe") {
-
-                        var geometry = CLOUD.GeomUtil.UnitCylinderInstance;
-                        object = new THREE.Mesh(geometry, matObj);
-                        CLOUD.GeomUtil.parseCylinderNode(object, objJSON.params);
-
-                    }
-                    else if (objJSON.geomType == "box") {
-
-                        var geometry = CLOUD.GeomUtil.UnitBoxInstance;
-                        object = new THREE.Mesh(geometry, matObj);
-
-                        CLOUD.GeomUtil.parseBoxNode(object, objJSON);
-
-                    }
+                    object = object = CLOUD.GeomUtil.parsePGeomNodeInstance(objJSON, matObj, trf);
 
                     if (object) {
 
                         object.name = nodeId;
-                        if (objJSON.userId)
-                            object.userId = objJSON.userId;
+                        object.userId = objJSON.userId;
+                        object.userData = userData;
+
+                        //console.log(userData);
 
                         parent.add(object);
                     }
@@ -17069,14 +17367,13 @@ CLOUD.SceneLoader.prototype = {
 
                     var symbolJSON = client.findSymbol(objJSON.symbolId);
                     if (symbolJSON) {
+
                         if (symbolJSON.nodeType === "GroupNode") {
 
                             object = new CLOUD.Group();
-                            CLOUD.GeomUtil.parseNodeProperties(object, objJSON, nodeId);
+                            CLOUD.GeomUtil.parseNodeProperties(object, objJSON, nodeId, trf);
 
-                            parent.add(object);
-
-                            handle_children(object, symbolJSON.children, level + 1, objJSON.userId);
+                            handle_children(parent, symbolJSON.children, level + 1, objJSON.userId, userData, object.matrix);
 
                             // update child userId
                         }
@@ -17084,13 +17381,37 @@ CLOUD.SceneLoader.prototype = {
 
                             var matObj = client.findMaterial(symbolJSON.materialId, false);
 
-                            var object = new CLOUD.Mesh(CLOUD.GlobalData.EmptyGeometry, matObj, symbolJSON.meshId);
-                            CLOUD.GeomUtil.parseNodeProperties(object, objJSON, nodeId);
+                            object = new CLOUD.Mesh(CLOUD.GeomUtil.EmptyGeometry, matObj, symbolJSON.meshId);
+                            CLOUD.GeomUtil.parseNodeProperties(object, objJSON, nodeId, trf);
+                            object.userData = userData;
 
                             loadMeshNode(object, objJSON.meshId);
 
                             parent.add(object);
 
+                        }
+                        else if (symbolJSON.nodeType === "PGeomNode") {
+
+                            var matObj = client.findMaterial(symbolJSON.materialId, false);
+
+                            var trfLocal = new THREE.Matrix4();
+                            if (objJSON.matrix) {
+                                trfLocal.fromArray(objJSON.matrix);
+                            }
+                            if (trf) {
+                                trfLocal.multiplyMatrices(trf, trfLocal.clone());
+                            }
+
+                            object = CLOUD.GeomUtil.parsePGeomNodeInstance(symbolJSON, matObj, trfLocal);
+
+                            if (object) {
+
+                                object.name = nodeId;
+                                object.userId = userId;
+                                object.userData = userData;
+
+                                parent.add(object);
+                            }
                         }
                     }
 
@@ -17443,6 +17764,7 @@ CLOUD.ModelManager = function () {
     this.loading = false;
 
     this.delayLoadMeshItems = [];
+    this.loadedItemOffset = 0;
 };
 
 CLOUD.ModelManager.prototype = Object.create(THREE.LoadingManager.prototype);
@@ -17461,7 +17783,6 @@ CLOUD.ModelManager.prototype.prepareScene = function (camera) {
     this.assistLamp.position.copy(dir);
 
     // update scene
-    this.delayLoadMeshItems = [];
     this.scene.prepareScene(camera);
 
     this.prepareResource();
@@ -17493,19 +17814,43 @@ CLOUD.ModelManager.prototype.loadIndex = function (parameters, callback) {
 }
 
 // load one scene
-CLOUD.ModelManager.prototype.loadScene = function (databagId, sceneId) {
+CLOUD.ModelManager.prototype.showScene = function (databagId, sceneIds) {
 
     var scope = this;
+    var client = scope.clients[databagId];
 
-    var client = this.clients[databagId];
+    scope.scene.showSceneNodes(false);
 
-    scope.loading = true;
+    if (!sceneIds)
+        return;
 
-    this.sceneLoader.load(sceneId, scope.scene, client, true, function () {
+    function showSceneImpl(idx) {
 
-        scope.dispatchEvent({ type: CLOUD.EVENTS.ON_LOAD_COMPLETE });
-        scope.loading = false;
-    });
+        if (idx >= sceneIds.length) {
+            scope.dispatchEvent({ type: CLOUD.EVENTS.ON_LOAD_COMPLETE });
+            return;
+        }
+
+
+        var sceneId = sceneIds[idx];
+        var sceneNode = scope.scene.findSceneNode(sceneId);
+        if (sceneNode && sceneNode.client.databagId == databagId) {
+            sceneNode.visible = true;
+            showSceneImpl(idx+1);
+        }
+        else {
+
+            scope.loading = true;
+
+            scope.sceneLoader.load(sceneId, scope.scene, client, true, function () {
+
+                scope.loading = false;
+                showSceneImpl(idx+1);
+            });
+        }
+    }
+
+    showSceneImpl(0);
 }
 
 /**
@@ -17551,7 +17896,7 @@ CLOUD.ModelManager.prototype.loadLinks = function (result, client) {
 
         if (client.linkSceneIdx < linkScenes.length) {
             var sceneId = linkScenes[client.linkSceneIdx];
-            console.log("Linked scene: " + sceneId);
+            //console.log("Linked scene: " + sceneId);
             sceneLoader.load(sceneId, scope.scene, client, true, loadLinkedScenes);
         }
         else {
@@ -17577,7 +17922,7 @@ CLOUD.ModelManager.prototype.onLoadSubSceneEvent = function (evt) {
 
     if (subSceneNode.children.length == 0) {
         this.sceneLoader.load(subSceneNode.sceneId, subSceneNode, evt.client, false, function () {
-            console.log(subSceneNode.sceneId);
+            //console.log(subSceneNode.sceneId);
             subSceneNode.visible = true;
             //scope.dispatchEvent({ type: CLOUD.EVENTS.ON_LOAD_COMPLETE });
             //console.log({vertex: scope.vertexCount, triangle: scope.triangleCount});
@@ -17646,47 +17991,64 @@ CLOUD.ModelManager.prototype.prepareResource = function () {
     var scope = this;
 
     var delayLoadMeshItems = this.delayLoadMeshItems;
+    var itemCount = delayLoadMeshItems.length;
+    var startOffset = scope.loadedItemOffset;
+    scope.loadedItemOffset = itemCount;
 
-    var TASK_COUNT = 8;
+    if (startOffset < itemCount)
+    {
+        var TASK_COUNT = 4;
 
-    function on_load_mesh(item) {
+        function on_load_mesh(item) {
 
-        var mesh = item.client.cache.geometries[item.meshNode.meshId];
-        if (mesh) {
-            item.meshNode.updateGeometry(mesh);
-        }
-        else {
-            console.log("err: " + item + " may be in other mpk");
-        }
-    };
+            var mesh = item.client.cache.geometries[item.meshNode.meshId];
+            if (mesh) {
+                item.meshNode.updateGeometry(mesh);
+            }
+            else {
+                console.log("err: " + item + " may be in other mpk");
+            }
+        };
 
-    function processItem(i) {
+        function processItem(i) {
 
-        if (i >= delayLoadMeshItems.length)
-            return;
+            var idx = i + startOffset;
+            if (idx >= itemCount) {
+                //console.log(startOffset);
+                return;
+            }
 
-        var item = delayLoadMeshItems[i];
-        var client = item.client;
 
-        var meshId = item.meshNode.meshId;
-        var mesh = client.cache.geometries[meshId];
-        if (mesh) {
-            item.meshNode.updateGeometry(mesh);
-            processItem(i + TASK_COUNT);
-        }
-        else {
-            var mpkId = client.meshIds[meshId];
-            scope.loadMpk(mpkId, client, function () {
-                on_load_mesh(item);
+            var item = delayLoadMeshItems[idx];
+            var client = item.client;
+
+            var meshId = item.meshNode.meshId;
+            var mesh = client.cache.geometries[meshId];
+            if (mesh) {
+                item.meshNode.updateGeometry(mesh);
                 processItem(i + TASK_COUNT);
-            });
+            }
+            else {
+                var mpkId = client.meshIds[meshId];
+                scope.loadMpk(mpkId, client, function () {
+                    on_load_mesh(item);
+                    processItem(i + TASK_COUNT);
+                });
+            }
+
+        }
+
+
+        //console.log("start");
+        for (var ii = 0; ii < TASK_COUNT; ii++) {
+            processItem(ii);
         }
 
     }
-
-    for (var ii = 0; ii < TASK_COUNT; ii++) {
-        processItem(ii);
+    else {
+        //console.log("STOP");
     }
+
 
 
     if (!CLOUD.GlobalData.DynamicRelease || this.loading)
@@ -17842,8 +18204,8 @@ CLOUD.EditorManager.prototype = {
 
         if(this.pickEditor === undefined){
             var pickEditor = new CLOUD.PickEditor(viewer.cameraEditor, viewer.getScene(), viewer.domElement);
-            pickEditor.onObjectSelected = function (userId, client) {
-                viewer.modelManager.dispatchEvent({ type: CLOUD.EVENTS.ON_SELECTION_CHANGED, userId: userId, client: client })
+            pickEditor.onObjectSelected = function (intersect) {
+                viewer.modelManager.dispatchEvent({ type: CLOUD.EVENTS.ON_SELECTION_CHANGED, intersect: intersect })
             };
             this.pickEditor = pickEditor;
         }
@@ -17891,6 +18253,9 @@ CLOUD.EditorManager.prototype = {
             this.flyEditor.showControlPanel(bShowControlPanel);
         }
         scope.setEditor(this.flyEditor);
+
+        // 进入fly模式，视图设置为ISO
+        //scope.setStandardView(CLOUD.EnumStandardView.ISO, viewer);
     },
 
     zoomIn: function (factor, viewer) {
@@ -17984,13 +18349,6 @@ CLOUD.EditorManager.prototype = {
             camera.up.copy(THREE.Object3D.DefaultUp);// 渲染完成后才可以恢复相机up方向
         }
     },
-
-    // 设置方向控制器位置
-    setFlyCrossPosition: function() {
-        if (this.editor === this.flyEditor) {
-            this.flyEditor.setCrossPosition();
-        }
-    }
 };
 
 
@@ -18005,11 +18363,10 @@ CloudViewer = function () {
     this.renderer = null;
 
     this.incrementRenderEnabled = true; // 启用增量绘制
-    this.isViewHouseRender = false;
 
     this.modelManager = new CLOUD.ModelManager();
 
-    this.viewHouse = new CLOUD.ViewHouse();
+    this.viewHouse = new CLOUD.ViewHouse(this);
     this.viewHouse.visible = false;
     this.isMouseMove = false;
 
@@ -18031,12 +18388,12 @@ CloudViewer = function () {
 
         switch (type) {
             case "down":
-                isInHouse = scope.viewHouse.mouseDown(event, scope.domElement, function (view) {
+                isInHouse = scope.viewHouse.mouseDown(event, function (view) {
                     scope.setStandardView(view);
                 });
                 break;
             case "move":
-                isInHouse = scope.viewHouse.mouseMove(event, scope.domElement, function (delta) {
+                isInHouse = scope.viewHouse.mouseMove(event, function (delta) {
                     if (delta !== undefined) {
                         scope.cameraEditor.processRotate(delta);
                     }
@@ -18045,7 +18402,7 @@ CloudViewer = function () {
                 });
                 break;
             case "up":
-                isInHouse = scope.viewHouse.mouseUp(event, scope.domElement, function () {
+                isInHouse = scope.viewHouse.mouseUp(event, function () {
                     scope.cameraEditor.updateView();
                 });
                 break;
@@ -18071,7 +18428,6 @@ CloudViewer = function () {
 
     }
 };
-
 
 CloudViewer.prototype = {
 
@@ -18103,10 +18459,7 @@ CloudViewer.prototype = {
     },
 
     resetIncrementRender: function () {
-
         if (this.incrementRenderEnabled) {
-
-            this.isViewHouseRender = false;
             this.renderer.resetIncrementRender();
         }
     },
@@ -18122,14 +18475,9 @@ CloudViewer.prototype = {
         this.editorManager.updateEditor(camera);
         this.modelManager.prepareScene(camera);
 
-
-        // 设置“方向控制器”位置
-        this.setFlyCrossPosition();
-
         var scene = this.getScene();
-
         // 设置过滤对象
-        scope.renderer.setFilterObject(scene.filter.getFilterObject());
+        scope.renderer.setFilterObject(scene.filter);
 
         function incrementRender() {
 
@@ -18137,45 +18485,26 @@ CloudViewer.prototype = {
 
             var isRenderFinish = scope.renderer.IncrementRender(scene, camera);
 
-            //scope.stats.update();
-
             if (isRenderFinish) {
                 cancelAnimationFrame(scope.handleId);
-            }
-        }
-
-        function renderViewHouse() {
-
-            if (!scope.isViewHouseRender) {
-
-                scope.isViewHouseRender = true;
-
-                scope.renderer.autoClear = true;
-                scope.viewHouse.render(scope.renderer, camera, scene.rootNode.rotation);
-                scope.renderer.autoClear = false;
             }
         }
 
         // 增量绘制
         if (this.incrementRenderEnabled && this.renderer.IncrementRender) {
 
-            // 数据加载完成后才开启增量绘制，这时ViewHouse已经显示，可以先绘制ViewHouse
-            // 先后顺序是否存在影响？待验证!
-            renderViewHouse();
-
+            // 第一次需要清屏
+            scope.renderer.autoClear = true;
             incrementRender();
+            scope.renderer.autoClear = false;
 
         } else { // 正常绘制
 
+            scope.renderer.autoClear = true;
             this.renderer.render(scene, camera);
-
-            this.renderer.autoClear = false;
-            this.viewHouse.render(this.renderer, camera, scene.rootNode.rotation);
-            this.renderer.autoClear = true;
-
-            //this.stats.update();
         }
 
+        this.viewHouse.render();
     },
 
     setEditorDefault: function () {
@@ -18256,6 +18585,8 @@ CloudViewer.prototype = {
 
         this.viewHouse.resize(width, height, this.isMobile);
 
+        this.resizeFlyCross(); // 重设fly模式下十字光标位置
+
         this.render();
     },
 
@@ -18265,10 +18596,6 @@ CloudViewer.prototype = {
         // window.innerWidth, window.innerHeight
         var viewportWidth = domElement.offsetWidth;
         var viewportHeight = domElement.offsetHeight;
-
-        // 加入背景网格
-        //var backgroupGrids = new THREE.GridHelper( 80, 4 );
-        //scene.add( backgroupGrids );
 
         // Renderer
         this.renderer = new THREE.WebGLIncrementRenderer({antialias: true, alpha: true, preserveDrawingBuffer: true});
@@ -18285,15 +18612,8 @@ CloudViewer.prototype = {
             console.warn('THREE.WebGLIncrementRenderer.IncrementRender: undefined!');
         }
 
-        // -----------------------------
-        //this.stats = new Stats();
-        //this.stats.domElement.style.position = 'absolute';
-        //this.stats.domElement.style.top = '0px';
-        //domElement.appendChild( this.stats.domElement );
-        // -----------------------------
-
-        // 设置viewHouse
-        this.viewHouse.resize(viewportWidth, viewportHeight);
+        // 初始化viewHouse
+        this.viewHouse.init(domElement);
 
         // Camera
         var camera = new CLOUD.Camera(viewportWidth, viewportHeight, 45, 0.01, CLOUD.GlobalData.SceneSize * 20, -CLOUD.GlobalData.SceneSize, CLOUD.GlobalData.SceneSize);
@@ -18301,11 +18621,10 @@ CloudViewer.prototype = {
 
         var scope = this;
         this.cameraEditor = new CLOUD.CameraEditor(camera, domElement, function () {
-            //scope.resetIncrementRender();
             scope.render();
         });
 
-        this.lookAt(new THREE.Vector3(CLOUD.GlobalData.SceneSize, CLOUD.GlobalData.SceneSize, CLOUD.GlobalData.SceneSize), new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 1, 0));
+        this.lookAt(new THREE.Vector3(-CLOUD.GlobalData.SceneSize, CLOUD.GlobalData.SceneSize, CLOUD.GlobalData.SceneSize), new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 1, 0));
         this.setPickMode();
 
         // Register Events
@@ -18340,6 +18659,28 @@ CloudViewer.prototype = {
         scope.modelManager.load({databagId: databagId, serverUrl: serverUrl, debug: debug});
     },
 
+    /**
+     * Load databag index only
+     * callback is called when loading is finished.
+     */
+    loadIndex: function (databagId, serverUrl, debug, callback) {
+        var scope = this;
+        if (debug) {
+            CLOUD.GlobalData.ShowSubSceneBox = true;
+            CLOUD.GlobalData.ShowCellBox = true;
+        }
+
+        scope.modelManager.loadIndex({databagId: databagId, serverUrl: serverUrl, debug: debug}, callback);
+    },
+
+    /**
+     * show one scene.
+     * Event CLOUD.EVENTS.ON_LOAD_COMPLETE is raised when finished.
+     */
+    showScene: function (databagId, sceneIds) {
+        this.modelManager.showScene(databagId, sceneIds);
+    },
+
     setPickMode: function () {
         this.editorManager.setPickMode(this);
     },
@@ -18358,6 +18699,12 @@ CloudViewer.prototype = {
 
     setFlyMode: function (bShowControlPanel) {
         this.editorManager.setFlyMode(bShowControlPanel, this);
+    },
+
+    resizeFlyCross: function() {
+        if ( this.editorManager && this.editorManager.editor === this.editorManager.flyEditor) {
+            this.editorManager.flyEditor.resize();
+        }
     },
 
     zoomIn: function (factor) {
@@ -18391,7 +18738,7 @@ CloudViewer.prototype = {
 
     // transform
     transformCamera: function (camera) {
-        return CLOUD.CameraUtil.transformCamera(camera);
+        return CLOUD.CameraUtil.transformCamera(camera, this.modelManager.scene);
     },
 
     getCamera: function () {
@@ -18422,46 +18769,7 @@ CloudViewer.prototype = {
         this.editorManager.setFlyCrossPosition();
     },
 
-    // 过滤功能接口
-    addColorForOverrideFilter: function(color) {
-        this.getScene().addColorForOverrideFilter(color);
-    },
-
-    setColorForOverrideFilter: function(index, color) {
-        this.getScene().setColorForOverrideFilter(index, color);
-    },
-
-    setColorForSelectFilter: function(color) {
-        this.getScene().setColorForSelectFilter(color);
-    },
-
-    // id使用属性存放，可以明显提高检索性能，
-    // eg: ids = { 123 : 1, 124 : 1, 125 : 1}
-    // visibility.ids: 属性值 1:可见，0: 不可见
-    setIdsForVisibilityFilter: function(ids) {
-        this.getScene().setIdsForVisibilityFilter(ids);
-    },
-
-    // Override.ids:属性值存储material索引
-    setIdsForOverrideFilter: function(ids) {
-        this.getScene().setIdsForOverrideFilter(ids);
-    },
-
-    // Select.ids:属性值 1:选中，0: 未选中
-    setIdsForSelectFilter: function(ids) {
-        this.getScene().setIdsForSelectFilter(ids);
-    },
-
-    applyFilter : function() {
-
-        //this.filter.applyFilter();
-
-        var startTime = Date.now();
-
-        this.render();
-
-        var endTime = Date.now();
-        var elapseTime = endTime - startTime;
-        console.log("[applyFilter][elapse time : " + elapseTime + "]");
+    getFilters : function() {
+        return  this.getScene().filter;
     }
 };

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>module demo</title>
+  <script src="../js/libs/three.js"></script>
+  <script src="../js/libs/WebViewer.js"></script>
+  <script src="../js/libs/viewer.js"></script>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/tree.css">
+<style>
+body{
+  margin:0;
+}
+#viewport{
+  height:800px;
+}
+.main{
+  margin-left:200px;
+}
+#moduleTree{
+  float:left;
+  width:199px;
+  height:600px;
+  padding:15px 0;
+  border-right:1px solid #ccc;
+  border-bottom:1px solid #ccc;
+  overflow-y:auto;
+}
+</style>
+</head>
+<body>
+  <div class="content">
+    <div id="moduleTree">
+    </div>
+    <div class="main">
+      <div id="viewport">
+      </div>
+    </div>
+  </div>
+<script>
+window.onload = function(){
+  var moduleTree = document.getElementById('moduleTree');
+  viewer = new BIM({
+    element:'viewport',
+    projectId:'b7554b6591ff6381af854fa4efa41f81',
+    tools:true,
+    treeElement:moduleTree
+  });
+}
+</script>
+</body>
+</html>

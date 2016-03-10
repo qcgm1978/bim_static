@@ -6,6 +6,9 @@
   list-style:none;
   padding-left:15px;
   font-size:12px;
+  -webkit-user-select:none;
+  -moz-user-select:none;
+  user-select:none;
 }
 .tree-view .rootNode,
 .tree-view .tree-view .itemNode {
@@ -15,9 +18,12 @@
 .tree-view .item-content{
   padding:3px;
 }
-.tree-view .item-content:hover {
+/*.tree-view .item-content:hover {
   background-color: #06c;
   color:#fff;
+}*/
+.current{
+  background:#a8dbfd;
 }
 .tree-view .nodeSwitch {
   width:9px;
@@ -48,13 +54,18 @@
   display:inline-block;
   width:13px;
   height:13px;
+  margin-right:3px;
 }
 .checkbox input{
   display:none;
 }
+.text-field{
+  vertical-align:2px;
+  padding:2px 3px;
+  cursor:pointer;
+}
 .checkbox .box{
   display:inline-block;
-  vertical-align:-3px;
   width:13px;
   height:13px;
   background:url(../images/tree.png) no-repeat;
