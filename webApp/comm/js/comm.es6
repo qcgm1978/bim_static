@@ -1,7 +1,7 @@
 App.Comm = {
 
 	Settings: {
-		v: 20160311,
+		v: 20160312,
 		pageItemCount: Math.floor(($("body").height() + 60) / 70) > 10 && Math.floor(($("body").height() + 60) / 70) || 10
 	},
 

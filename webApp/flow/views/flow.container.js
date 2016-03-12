@@ -4,7 +4,7 @@ App.Flow=Backbone.View.extend({
 
 	tagName:"div",
 
-	id:"flowContainer",
+	className:"flowContainer",
 
 	template:_.templateUrl("/flow/tpls/flow.content.html",true),
 

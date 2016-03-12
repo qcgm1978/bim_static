@@ -2,7 +2,7 @@ App.Project.ProjectPlanProperty = Backbone.View.extend({
 
 	tagName: "div",
 
-	className: "ProjectPlanPropertyContainer projectNav",
+	className: "ProjectPlanPropertyContainer",
 
 	template: _.templateUrl("/projects/tpls/project/plan/project.plan.nav.html", true),
 

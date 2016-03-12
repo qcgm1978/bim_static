@@ -1,15 +1,12 @@
 
 <span data-fileversionid="<%=fileVersionId%>" class="filecKAll inlineBlock"><input type="checkbox" class="ckAll" /></span>
-<span class="fileBg inlineBlock"> 
-	<span class=" fileType <%= folder?'folder':'file' %>"></span>
-
-</span>
+ 
 <span class="fileName inlineBlock">
+<span class=" fileType <%= folder?'folder':'file' %>"></span>
 <% if(folder){%>
  <span data-id="<%=id%>" data-isfolder="<%=folder%>" class="text"><%=name%></span>
 <%}else{%>
- <a data-id="<%=id%>" href="/static/dist/app/project/filePreview.html?id=<%=id%>&model=<%=modelId%>&projectId=
- <%=App.Project.Settings.projectId%>&projectVersionId=<%=App.Project.Settings.CurrentVersion.id%>" target="_blank" data-isfolder="<%=folder%>" class="text"><%=name%></a>
+ <a data-id="<%=id%>" href="/static/dist/app/project/filePreview.html?id=<%=id%>&model=<%=modelId%>&projectId=<%=App.Project.Settings.projectId%>&projectVersionId=<%=App.Project.Settings.CurrentVersion.id%>" target="_blank" data-isfolder="<%=folder%>" class="text"><%=name%></a>
 <%}%>
 
 

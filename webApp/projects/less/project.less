@@ -1,4 +1,4 @@
-.projectHeader { height: 37px; background-color: #f5f5f5; border-bottom: 1px #ccc solid; position: relative; z-index: 5;
+.projectHeader { height: 37px; background-color: #f5f5f5; border-bottom: 1px #ccc solid; position: relative; z-index: 999;
 	.projectTab { float: right; height: 37px; position: relative; z-index: 3000;
 		.item { float: left; height: 100%; line-height: 37px; width: 35px; font-size: 16px; position: relative; text-align: center; margin-right: 40px; cursor: pointer;
 			.line { bottom: 0px; width: 100%; height: 3px; position: absolute; left: 0px; text-align: center; }
@@ -30,44 +30,46 @@
 			}
 			.projectVersionList { position: absolute; top: 32px; border: 1px #ccc solid; background-color: #fff; left: 0px; width: 288px; max-height: 378px;
 				.listContent { display: none;
-					.changeVersionBox{display: none;}
+					.changeVersionBox { display: none; }
 					.nav { border: 1px #ccc solid; border: 1px #ccc solid; margin: 0px 10px; background-color: #f5f5f5; font-size: 12px; margin-top: 5px;
 						.item { display: block; cursor: pointer; float: left; height: 24px; line-height: 24px; width: 132px; text-align: center;
 							&.selected { background-color: #dadada; color: #a9a9a9; }
-							
 						}
 					}
 					.txtSearch { margin: 5px 10px 1px 10px; width: 265px; }
 					.vName { width: 92px; margin-right: 8px; }
-							.vStatus { width: 60px; margin-right: 5px; }
-							.vDate { width: 76px; margin-left: 3px; }
+					.vStatus { width: 60px; margin-right: 5px; }
+					.vDate { width: 76px; margin-left: 3px; }
 				}
 			}
 		}
 		.allProject { cursor: pointer }
 	}
 }
-#projectContainer { .projectNav { background-color: #ddd; height: 30px; border-bottom: 1px #ccc solid;
-		.item { float: left; line-height: 24px; width: 88px; border: 1px #ddd solid; text-align: center; margin-top: 3px; cursor: pointer;
-			&:hover { }
-			&.selected { border: 1px #ccc solid; border-top-width: 2px; border-top-color: #006ECF; border-bottom-color: #fff; background-color: #fff; }
+#projectContainer { .projectNav { padding-left: 10px; background-color: #ddd; height: 40px; border-bottom: 1px #ccc solid; font-size: 12px; color: #666;
+		.item { float: left; line-height: 30px; height: 30px; margin-right: 10px; width: 80px; border: 1px #ddd solid; text-align: center; margin-top: 10px; cursor: pointer;
+			&:hover { border-color: #ccc; color: #333; }
+			&.selected { color: #333; border: 1px #ccc solid; border-top-width: 2px; border-top-color: #3e78e6; border-bottom-color: #fff; background-color: #fff; }
 		}
-		.projectPropetyHeader { padding-left: 24px; }
-		.projectNavContentBox { margin-top: 1px; position: absolute; top: 30px; width: 100%; bottom: 0px; overflow: auto;
+		.projectNavContentBox { margin-top: 1px; position: absolute; top: 40px; width: 100%; bottom: 0px; overflow: auto;
 
 			/* 设计 */
 			.designVerification, .designProperties { display: none; }
 		}
 	}
+	.ProjectPlanPropertyContainer { .projectNav { .item { width: 65px; }
+		}
+	}
+	.ProjectQualityNavContainer { .projectNav { .item { width: 54px; }
+		}
+	}
 }
 #projectDesignContent { margin-left: 240px; position: relative; height: 100%; }
-#projectContainer .projectNav .item { width: 66px; }
 .projectContainerApp { height: 100%;
 	.projectContent { height: 100%;
 		.leftNav { float: left; width: 238px; border: 1px #ccc solid; position: absolute; top: 40px; bottom: 0px; background-color: #fff;
 			.leftNavContent { height: 100%; }
-			.projectNav { padding-left: 24px; }
-			.projectNavContentBox { margin-top: 1px; position: absolute; top: 30px; width: 100%; bottom: 0px;
+			.projectNavContentBox { margin-top: 1px; position: absolute; top: 40px; width: 100%; bottom: 0px;
 				.projectModelNavContent { display: none; }
 				.mCSB_container { }
 			}
@@ -79,7 +81,7 @@
 		.projectCotent { position: relative; height: 100%; margin-left: 240px;
 			&.showPropety { margin-right: 398px; }
 			.fileContainer { padding: 10px; height: 100%; box-sizing: border-box;
-				.fileContainerScroll { position: absolute; top: 78px; bottom: 0px; left: 10px; right: 10px; }
+				.fileContainerScroll { position: absolute; top: 75px; bottom: 0px; left: 10px; right: 10px; }
 				.btnNormal { padding: 4px 12px; display: inline-block; border: 1px #ccc solid; cursor: pointer; margin-right: 3px;
 					i { color: #85B200; font-size: 20px; vertical-align: -3px; margin-right: 5px; }
 				}
@@ -87,12 +89,11 @@
 					&.zIndex { position: relative; z-index: 1; }
 					.inlineBlock { display: inline-block; }
 					.filecKAll { width: 5%; text-align: center; }
-					.fileBg { width: 7%;
-						.fileType { display: inline-block; margin-top: 5px; vertical-align: top; width: 35px; height: 30px; background: url('/projects/images/fileicon.png') no-repeat;
+					 
+					.fileName { width: 48%;
+						.fileType {margin-right: 10px; display: inline-block; margin-top: 5px; vertical-align: top; width: 35px; height: 30px; background: url('/projects/images/fileicon.png') no-repeat;
 							&.file { background-position: 0px -39px; }
 						}
-					}
-					.fileName { width: 42%;
 						.text { cursor: pointer;
 							&:hover { text-decoration: underline; }
 						}
@@ -124,7 +125,9 @@
 	}
 }
 .rightProperty { .designVerification { height: 100%; }
-	.modle { .modleShowHide { background: url(/comm/images/commIcon.png) no-repeat 0px -256px; float: right; margin-right: 12px; margin-top: 6px; height: 14px; width: 14px; cursor: pointer; }
+	.modle { .modleShowHide { transition: all .5s; background: url(/comm/images/commIcon.png) no-repeat 0px -256px; float: right; margin-right: 12px; margin-top: 6px; height: 14px; width: 14px; cursor: pointer;
+			&.down { transform: rotate(180deg); -ms-transform: rotate(180deg); -moz-transform: rotate(180deg); -webkit-transform: rotate(180deg); -o-transform: rotate(180deg); }
+		}
 		.modleName { font-weight: bold; height: 24px; line-height: 24px; padding-left: 12px; }
 		.modleList { background-color: #eee; border-top: 1px #ccc solid;
 			.modleItem { border-bottom: 1px #ccc solid;
@@ -200,4 +203,9 @@
 		}
 	}
 }
-.rightProperty { }
+.rightPropertyContentBox { .rightPropertyContent { height: 100%;
+		.designPropetyBox { height: 100%;
+			.projectNavContentBox { position: absolute; top: 40px; bottom: 0px; left: 0px; right: 0px; overflow: auto; }
+		}
+	}
+}

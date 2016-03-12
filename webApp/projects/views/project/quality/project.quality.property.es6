@@ -2,7 +2,7 @@ App.Project.ProjectQualityProperty=Backbone.View.extend({
 
 	tagName:"div",
 
-	className:"ProjectQualityNavContainer projectNav",
+	className:"ProjectQualityNavContainer",
 
 	template:_.templateUrl("/projects/tpls/project/quality/project.quality.property.html",true),
 

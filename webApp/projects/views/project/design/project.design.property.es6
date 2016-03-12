@@ -2,12 +2,13 @@ App.Project.ProjectDesignPropety = Backbone.View.extend({
 
 	tagName: "div",
 
-	className: "designPropetyBox projectNav",
+	className: "designPropetyBox",
 
 	template: _.templateUrl("/projects/tpls/project/design/project.design.propety.html"),
 
 	events: {
-		"click .projectPropetyHeader .item": "navItemClick"
+		"click .projectPropetyHeader .item": "navItemClick",
+		"click .modleShowHide":"slideUpAndDown"
 	},
 
 	render: function() {
@@ -23,7 +24,7 @@ App.Project.ProjectDesignPropety = Backbone.View.extend({
 		var $target = $(event.target),
 			type = $target.data("type");
 		$target.addClass('selected').siblings().removeClass('selected');
-		App.Project.Settings.property=type;
+		App.Project.Settings.property = type;
 
 
 		if (type == "collision") {
@@ -41,10 +42,38 @@ App.Project.ProjectDesignPropety = Backbone.View.extend({
 			//属性
 
 			this.$el.find(".designProperties").show().siblings().hide();
-			
+
+			var model;
+			if (App.Project.Settings.ModelObj) {
+				model = App.Project.Settings.ModelObj;
+			}else{
+				return;
+			}
+
+			App.Project.DesignAttr.PropertiesCollection.projectId = App.Project.Settings.projectId;
+			App.Project.DesignAttr.PropertiesCollection.projectVersionId = App.Project.Settings.CurrentVersion.id;
+			App.Project.DesignAttr.PropertiesCollection.fetch({
+				data: {
+					elementId: model.intersect.userId,
+					sceneId: model.intersect.object.userData.sceneId
+				}
+			});
+
 			//App.Project.DesignAttr.PropertiesCollection.fetch();
-		} 
-		 
+		}
+
+
+	},
+
+	//展开和收起
+	slideUpAndDown:function(event){
+		var $parent=$(event.target).parent(),$modleList=$parent.find(".modleList");
+		$(event.target).toggleClass("down");
+		if ($modleList.is(":hidden")) {
+			$modleList.slideDown();
+		}else{
+			$modleList.slideUp();
+		}
 
 	}
 

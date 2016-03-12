@@ -119,11 +119,12 @@ App.Project.leftNav = Backbone.View.extend({
 			});
 
 			viewer.on("click", function(model) {
-			 	
+			 	App.Project.Settings.ModelObj=null;
 				if (!model.intersect) {
 					return;
-				}
+				} 
 
+				App.Project.Settings.ModelObj=model;
 				//App.Project.Settings.modelId = model.userId;
 				//设计  
 				if (App.Project.Settings.projectNav == "design") {
@@ -134,7 +135,7 @@ App.Project.leftNav = Backbone.View.extend({
 						App.Project.DesignAttr.PropertiesCollection.projectVersionId=App.Project.Settings.CurrentVersion.id;
 						App.Project.DesignAttr.PropertiesCollection.fetch({
 							data: { 
-								elementId: model.intersect.object.userData.categoryId,
+								elementId: model.intersect.userId,
 								sceneId: model.intersect.object.userData.sceneId 
 							}
 						}); 
