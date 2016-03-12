@@ -60,7 +60,7 @@ var BIM = function(option){
     if(_opt.treeElement){
       var tree = new BIM.TREE();
     }
-    var viewBox = document.createElement('div');
+    var viewBox = self.viewBox = document.createElement('div');
     viewBox.className = "view";
     bimBox.appendChild(viewBox);
     _opt.element.appendChild(bimBox);
@@ -225,7 +225,7 @@ BIM.common = {
           </div>\
           <div class="slider-box last">\
             <span class="reset">恢复初始剖面</span>\
-            <label class="switch">启用剖面<input type="checkbox" class="input-checkbox" checked="checked" id="clip" /><span class="checkbox"></span></label>\
+            <label class="switch">启用剖面<input type="checkbox" class="input-checkbox" checked="checked" id="clip" /><span class="lbl"></span></label>\
           </div>\
         </div>\
       </div>'
@@ -448,6 +448,12 @@ BIM.util = {
     }
     return true;
   },
+  isEmptyObject: function(obj){
+    for (var name in obj) {
+      return false;
+    }
+  return true;
+  },
   toggleCameraToolsBar : function(type){
     var subBar = BIM.common.bimBox.getElementsByClassName('sub-bar camera-bar');
     if(type == 'hide'){
@@ -633,7 +639,10 @@ BIM.prototype = {
   },
   resize : function(width,height){
     BIM.util.pub('resize');
-    BIM.common.viewer.resize(width,height)
+    var _viewBox = BIM.common.self.viewBox,
+        _width = _viewBox.clientWidth,
+        _height = _viewBox.clientHeight;
+    BIM.common.viewer.resize(_width,_height);
   },
   front : function () {
     BIM.util.pub('front');
@@ -732,6 +741,7 @@ BIM.TREE = function(){
   var _self = this;
   _self.el = BIM.common._option.treeElement;
   _self.tree = BIM.util.createDom('ul','tree-view');
+  _self.el.innerHTML = '';
   _self.el.appendChild(_self.tree);
   _self.init();
 }
@@ -739,9 +749,9 @@ BIM.TREE.prototype = {
   createSpecialitys : function(data){
     var _self = this;
     var rootDom = BIM.util.createDom('li','itemNode');
-    var template = '<div class="item-content"> <i class="nodeSwitch"></i> <span class="checkbox"><input class="input" type="checkbox" checked="checked" data-type="sceneId"><span class="box"></span></span><span class="text-field">专业</span> </div><ul class="treeViewSub">';
+    var template = '<div class="item-content"> <i class="nodeSwitch"></i> <span class="tree-checkbox"><input class="input" type="checkbox" checked="checked" data-type="sceneId"><span class="box"></span></span><span class="tree-text">专业</span> </div><ul class="treeViewSub">';
     for(i in data){
-      template += '<li class="itemNode"> <div class="item-content"> <i class="nodeSwitch"></i> <span class="checkbox"><input class="input" type="checkbox" checked="checked" data-type="sceneId"><span class="box"></span></span><span class="text-field">'+ i +'</span> </div> <ul class="treeViewSub">'+ getSpeciality(data[i]) +'</ul></li>'
+      template += '<li class="itemNode"> <div class="item-content"> <i class="nodeSwitch"></i> <span class="tree-checkbox"><input class="input" type="checkbox" checked="checked" data-type="sceneId"><span class="box"></span></span><span class="tree-text">'+ i +'</span> </div> <ul class="treeViewSub">'+ getSpeciality(data[i]) +'</ul></li>'
     }
     template+="</ul>";
     rootDom.innerHTML = template;
@@ -749,7 +759,7 @@ BIM.TREE.prototype = {
     function getSpeciality(obj){
       var temp = '',len=obj.length;
       for(var i = 0;i<len;i++){
-        temp +='<li class="itemNode"> <div class="item-content"> <i class="noneSwitch"></i> <span class="checkbox"><input class="input" type="checkbox" checked="checked" data-files="'+obj[i].fileEtag+'" data-type="sceneId"><span class="box"></span></span><span class="text-field">'+obj[i].fileName+'</span> </div> </li>';
+        temp +='<li class="itemNode"> <div class="item-content"> <i class="noneSwitch"></i> <span class="tree-checkbox"><input class="input" type="checkbox" checked="checked" data-files="'+obj[i].fileEtag+'" data-type="sceneId"><span class="box"></span></span><span class="tree-text">'+obj[i].fileName+'</span> </div> </li>';
       }
       return temp;
     }
@@ -760,10 +770,10 @@ BIM.TREE.prototype = {
     var obj = data.sort(function(a,b){
       return a.index - b.index;
     });
-    var template = '<div class="item-content"> <i class="nodeSwitch"></i> <span class="checkbox"><input class="input" type="checkbox" checked="checked" data-type="sceneId"><span class="box"></span></span><span class="text-field">楼层</span> </div><ul class="treeViewSub">';
+    var template = '<div class="item-content"> <i class="nodeSwitch"></i> <span class="tree-checkbox"><input class="input" type="checkbox" checked="checked" data-type="sceneId"><span class="box"></span></span><span class="tree-text">楼层</span> </div><ul class="treeViewSub">';
     for(var i = 0,len=obj.length;i<len;i++){
       var dataFiles = obj[i].fileEtags.join(',');
-      template +='<li class="itemNode"> <div class="item-content"> <i class="noneSwitch"></i> <span  class="checkbox"><input class="input" type="checkbox" checked="checked" data-files="'+ dataFiles +'" data-type="sceneId"><span class="box"></span></span><span class="text-field">'+obj[i].floor+'</span> </div> </li>';
+      template +='<li class="itemNode"> <div class="item-content"> <i class="noneSwitch"></i> <span  class="tree-checkbox"><input class="input" type="checkbox" checked="checked" data-files="'+ dataFiles +'" data-type="sceneId"><span class="box"></span></span><span class="tree-text">'+obj[i].floor+'</span> </div> </li>';
     }
     template +='</ul>';
     rootDom.innerHTML = template;
@@ -772,9 +782,9 @@ BIM.TREE.prototype = {
   createCategory : function(data){
     var _self = this;
     var rootDom = BIM.util.createDom('li','itemNode');
-    var template = '<div class="item-content"> <i class="nodeSwitch"></i> <span class="checkbox"><input class="input" type="checkbox" checked="checked" data-type="categoryId"><span class="box"></span></span><span class="text-field">构件</span> </div><ul class="treeViewSub">';
+    var template = '<div class="item-content"> <i class="nodeSwitch"></i> <span class="tree-checkbox"><input class="input" type="checkbox" checked="checked" data-type="categoryId"><span class="box"></span></span><span class="tree-text">构件类型</span> </div><ul class="treeViewSub">';
     for(i in data){
-      template += '<li class="itemNode"> <div class="item-content"> <i class="nodeSwitch"></i> <span class="checkbox"><input class="input" type="checkbox" checked="checked" data-type="categoryId"><span class="box"></span></span><span class="text-field">'+ data[i].speciality +'</span> </div> <ul class="treeViewSub">'+ getCategory(data[i].categories) +'</ul></li>'
+      template += '<li class="itemNode"> <div class="item-content"> <i class="nodeSwitch"></i> <span class="tree-checkbox"><input class="input" type="checkbox" checked="checked" data-type="categoryId"><span class="box"></span></span><span class="tree-text">'+ data[i].speciality +'</span> </div> <ul class="treeViewSub">'+ getCategory(data[i].categories) +'</ul></li>'
     }
     template +="</ul>";
     rootDom.innerHTML = template;
@@ -782,7 +792,7 @@ BIM.TREE.prototype = {
     function getCategory(obj){
       var temp = '',len=obj.length;
       for(i in obj){
-        temp +='<li class="itemNode"> <div class="item-content"> <i class="noneSwitch"></i> <span class="checkbox"><input class="input" type="checkbox" checked="checked" data-files="'+i+'" data-type="categoryId"><span class="box"></span></span><span class="text-field">'+obj[i]+'</span> </div> </li>';
+        temp +='<li class="itemNode"> <div class="item-content"> <i class="noneSwitch"></i> <span class="tree-checkbox"><input class="input" type="checkbox" checked="checked" data-files="'+i+'" data-type="categoryId"><span class="box"></span></span><span class="tree-text">'+obj[i]+'</span> </div> </li>';
       }
       return temp;
     }
@@ -792,21 +802,21 @@ BIM.TREE.prototype = {
     BIM.util.listener(_self.tree,'click',function(){
       var e = event || event,
           that = e.target,
-          cl = that.getAttribute('class') || '';
+          cl = that.getAttribute('class') || '',
+          viewer = BIM.common.self;
       if('nodeSwitch' == cl){
         var parent = that.parentNode;
         BIM.util.toggleClass(parent,'open');
-      }else if(cl.indexOf('text-field') >=0){
+      }else if(cl.indexOf('tree-text') >=0){
         var parents = BIM.util.parents(that,'itemNode');
-        var flag = that.className == 'text-field';
-        BIM.util.selectAll(that,'itemNode','text-field',function(element){
-          var className = flag ? 'text-field current' : 'text-field';
+        var flag = that.className == 'tree-text';
+        BIM.util.selectAll(that,'itemNode','tree-text',function(element){
+          var className = flag ? 'tree-text current' : 'tree-text';
           element.className = className;
         });
         var result = BIM.util.getAttr(that,'itemNode','input','data-files');
         flag ? viewer.highlight(result) : viewer.downplay(result);
       }else if(cl == 'box'){
-        viewer = BIM.common.self;
         var flag = !BIM.util.prev(that).checked;
         BIM.util.selectAll(that,'itemNode','input',function(element){
           element.checked = flag;
@@ -815,6 +825,12 @@ BIM.TREE.prototype = {
         flag ? viewer.show(result) : viewer.hide(result);
       }
     })
+  },
+  errorMsg:function(msg){
+    var _self = this;
+    var rootDom = BIM.util.createDom('p','tips');
+    rootDom.innerHTML = msg;
+    _self.tree.appendChild(rootDom);
   },
   init:function(){
     var _opt = BIM.common._option,
@@ -826,8 +842,13 @@ BIM.TREE.prototype = {
     BIM.util.ajax({
       url:urlSF,
       success:function(res){
-        var data = JSON.parse(res).data;
-        var Sdata = data.specialitys;
+        var res = JSON.parse(res),
+            data = res.data;
+        if(!data){
+          _self.errorMsg(res.message);
+          return false;
+        }
+        var Sdata = data.specialties;
         var Fdata = data.floors;
         _self.createSpecialitys(Sdata);
         _self.createFloor(Fdata);
@@ -837,7 +858,11 @@ BIM.TREE.prototype = {
       url:urlC,
       success:function(res){
         var data = JSON.parse(res).data;
-        _self.createCategory(data);
+        if(BIM.util.isEmptyObject(data)){
+          _self.errorMsg('结构不存在');
+        }else{
+          _self.createCategory(data);
+        }
       }
     });
   }

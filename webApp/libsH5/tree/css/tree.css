@@ -50,27 +50,27 @@
 .treeViewSub{
   display:none;
 }
-.checkbox{
+.tree-checkbox{
   display:inline-block;
   width:13px;
   height:13px;
   margin-right:3px;
 }
-.checkbox input{
+.tree-checkbox input{
   display:none;
 }
-.text-field{
+.tree-text{
   vertical-align:2px;
   padding:2px 3px;
   cursor:pointer;
 }
-.checkbox .box{
+.tree-checkbox .box{
   display:inline-block;
   width:13px;
   height:13px;
   background:url(../images/tree.png) no-repeat;
   background-position:0 -60px;
 }
-.checkbox input:checked + .box{
+.tree-checkbox input:checked + .box{
   background-position:0 -40px;
 }
