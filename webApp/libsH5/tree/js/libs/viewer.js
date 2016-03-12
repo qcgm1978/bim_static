@@ -780,9 +780,16 @@ BIM.TREE.prototype = {
   createCategory : function(data){
     var _self = this;
     var rootDom = BIM.util.createDom('li','itemNode');
+    var data = data.sort(function(a,b){
+      return a.sort - b.sort;
+    });
     var template = '<div class="item-content"> <i class="nodeSwitch"></i> <span class="tree-checkbox"><input class="input" type="checkbox" checked="checked" data-type="categoryId"><span class="box"></span></span><span class="tree-text">构件类型</span> </div><ul class="treeViewSub">';
-    for(i in data){
-      template += '<li class="itemNode"> <div class="item-content"> <i class="nodeSwitch"></i> <span class="tree-checkbox"><input class="input" type="checkbox" checked="checked" data-type="categoryId"><span class="box"></span></span><span class="tree-text">'+ data[i].speciality +'</span> </div> <ul class="treeViewSub">'+ getCategory(data[i].categories) +'</ul></li>'
+    for(var j=0,len=data.length;j<len;j++){
+      if(data[j].specialty == '其他专业'){
+        template += getCategory(data[j].categories);
+      }else{
+        template += '<li class="itemNode"> <div class="item-content"> <i class="nodeSwitch"></i> <span class="tree-checkbox"><input class="input" type="checkbox" checked="checked" data-type="categoryId"><span class="box"></span></span><span class="tree-text">'+ data[j].specialty +'</span> </div> <ul class="treeViewSub">'+ getCategory(data[j].categories) +'</ul></li>'
+      }
     }
     template +="</ul>";
     rootDom.innerHTML = template;
