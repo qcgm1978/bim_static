@@ -30,8 +30,7 @@
   height: 9px;
   display:inline-block;
   cursor: pointer;
-  vertical-align:top;
-  margin-top: 2px;
+  vertical-align:2px;
   color:#333;
   background:url(../images/tree.png) no-repeat;
   background-position:0 0;

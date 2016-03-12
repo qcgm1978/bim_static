@@ -1,6 +1,6 @@
 /**
- * @require /libs/tree/js/libs/three.min.js
- */
+* @require /libs/tree/js/libs/three.min.js
+*/
 var CLOUD = CLOUD || {};
 CLOUD.Version = "v3.a";
 
