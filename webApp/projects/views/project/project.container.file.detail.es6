@@ -13,7 +13,9 @@ App.Project.FileContainerDetail=Backbone.View.extend({
 	},
 
 	//事件绑定
-	events:{ },
+	events:{
+		"click .fileName  .text":"fileClick"
+	},
 	
 	template:_.templateUrl("/projects/tpls/project/project.container.file.detail.html"),
 
@@ -22,6 +24,64 @@ App.Project.FileContainerDetail=Backbone.View.extend({
 		 
 		this.$el.html(this.template(this.model.toJSON()));
 		return this;
+	},
+
+	//文件或者文件夹点击
+	fileClick:function(event){
+
+		var $target=$(event.target),id=$target.data("id"),isFolder=$target.data("isfolder");
+		//文件夹
+		if (isFolder) {
+			
+			var $leftItem=$("#projectContainer .projectNavContentBox .treeViewMarUl span[data-id='"+id+"']");
+			
+			if ($leftItem.length>0) {
+
+				$nodeSwitch=$leftItem.parent().find(".nodeSwitch");
+
+				if ($nodeSwitch.length>0  && $nodeSwitch.text()=="+" ) {
+					$nodeSwitch.click();
+				}
+				$leftItem.click(); 
+			}
+
+		}else{
+
+			//this.fetchFileModelIdByFileVersionId(id,$target);
+
+		}
+
+
+	},
+
+	//获取文件模型id
+	fetchFileModelIdByFileVersionId:function(id,$target){
+
+		var data={
+			URLtype:"fetchFileModelIdByFileVersionId",
+			data:{
+				projectId:App.Project.Settings.projectId,
+				projectVersionId:App.Project.Settings.CurrentVersion.id,
+				fileVersionId:id,
+			}
+		};
+	 
+		App.Comm.ajax(data,function(data){
+			 if (data.message=="success") {
+
+			 	if (data.data.modelId) {
+
+			 	}else{
+			 		$target.prop("href","javascript:void(0);");
+			 		alert("模型转换中");
+			 	}
+
+			 }else{
+			 	alert(data.message);
+			 }
+		});
+
+
 	}
 
 });

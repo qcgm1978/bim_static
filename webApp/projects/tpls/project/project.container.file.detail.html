@@ -4,9 +4,18 @@
 	<span class=" fileType <%= folder?'folder':'file' %>"></span>
 
 </span>
-<span class="fileName inlineBlock"><%=name%></span> 
+<span class="fileName inlineBlock">
+<% if(folder){%>
+ <span data-id="<%=id%>" data-isfolder="<%=folder%>" class="text"><%=name%></span>
+<%}else{%>
+ <a data-id="<%=id%>" href="/static/dist/app/project/filePreview.html?id=<%=id%>&model=<%=modelId%>&projectId=
+ <%=App.Project.Settings.projectId%>&projectVersionId=<%=App.Project.Settings.CurrentVersion.id%>" target="_blank" data-isfolder="<%=folder%>" class="text"><%=name%></a>
+<%}%>
+
+
+  </span> 
 
 <span class="fileStatus inlineBlock"><%=  App.Project.convertStatus(status) %></span>
 <span class="fileOp inlineBlock"><%= creatorName %></span>
-<span class="fileSize inlineBlock"><%=digest%></span>
+<span class="fileSize inlineBlock"><%=App.Comm.formatSize(length)%></span>
 <span class="fileDate inlineBlock"><%= new Date(createTime).format("yyyy-MM-dd") %></span>

@@ -19,7 +19,7 @@
 			.projectList, .projectVersionList { display: none;
 				.container { width: 100%; padding: 10px; padding-top: 0px;
 					.header { margin-top: 5px; height: 26px; line-height: 26px; font-size: 12px; background-color: #f2f2f2; padding-left: 12px; }
-					.item { cursor: pointer; height: 26px; line-height: 26px; font-size: 12px; padding-left: 12px; color: #A599B2; margin-top: 5px;
+					.item { display: block; cursor: pointer; height: 26px; line-height: 26px; font-size: 12px; padding-left: 12px; color: #A599B2; margin-top: 5px;
 						&:hover { background-color: #A8DBFD; }
 					}
 				}
@@ -30,12 +30,17 @@
 			}
 			.projectVersionList { position: absolute; top: 32px; border: 1px #ccc solid; background-color: #fff; left: 0px; width: 288px; max-height: 378px;
 				.listContent { display: none;
+					.changeVersionBox{display: none;}
 					.nav { border: 1px #ccc solid; border: 1px #ccc solid; margin: 0px 10px; background-color: #f5f5f5; font-size: 12px; margin-top: 5px;
-						.item { cursor: pointer; float: left; height: 24px; line-height: 24px; width: 132px; text-align: center;
+						.item { display: block; cursor: pointer; float: left; height: 24px; line-height: 24px; width: 132px; text-align: center;
 							&.selected { background-color: #dadada; color: #a9a9a9; }
+							
 						}
 					}
 					.txtSearch { margin: 5px 10px 1px 10px; width: 265px; }
+					.vName { width: 92px; margin-right: 8px; }
+							.vStatus { width: 60px; margin-right: 5px; }
+							.vDate { width: 76px; margin-left: 3px; }
 				}
 			}
 		}
@@ -87,7 +92,11 @@
 							&.file { background-position: 0px -39px; }
 						}
 					}
-					.fileName { width: 42%; }
+					.fileName { width: 42%;
+						.text { cursor: pointer;
+							&:hover { text-decoration: underline; }
+						}
+					}
 					.fileStatus { width: 11%; }
 					.fileOp { width: 11%; }
 					.fileSize { width: 11%; }

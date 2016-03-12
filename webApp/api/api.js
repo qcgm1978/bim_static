@@ -18,16 +18,19 @@ App.API={
 
 		// 项目面包屑
 		fetchCrumbsProject:"platform/project/groupByProvince",   // 项目导航
-		fetchCrumbsProjectVersion:"platform/project/{projectId}/version", //项目面包屑版本
+		fetchCrumbsProjectVersion:"platform/project/{projectId}/version/groupBy", //项目面包屑版本  platform/project/{projectId}/version/orderBy
 		fetchProjectVersionInfo:"platform/project/{projectId}/version/{projectVersionId}", //项目版本信息
 
 
+		//模型
+		fetchModelIdByProject:"doc/{projectId}/{projectVersionId}/model",
+		fetchFileModelIdByFileVersionId:"doc/{projectId}/{projectVersionId}/file/meta",//?fileVersionId={fileVersionId}
 
 		uploadFile:"doc/{projectId}/{projectVersionId}/file/data", //上传文件  ?parentId={parentId}&fileName={fileName}&size={size}&digest={digest}&position={position} 
 		downLoad:"doc/{projectId}/{projectVersionId}/file/data", //文件下载  ?fileId={fileId}
 
 		//设计
-		fetchDesignProperties:"sixD/1/property", //设计属性  ?fileVersionId={fileVersionId}&elementId={elementId}
+		fetchDesignProperties:"sixD/{projectId}/{projectVersionId}/property", //设计属性 ?sceneId={sceneId}&elementId={elementId}
 		fetchDesignVerification:"",  // 设计 检测
 		fetchDesignCollision:"",    // 设计碰撞
 

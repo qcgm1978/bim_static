@@ -46,10 +46,11 @@
                 //获取上传url
                 getUploadUrl: function(file) {
                   
+               
                     var data = {
                         data: {
                             projectId: App.Project.Settings.projectId,
-                            projectVersionId: App.Project.Settings.projectVersionId
+                            projectVersionId: App.Project.Settings.CurrentVersion.id
                         }, 
                         URLtype: "uploadFile"
                     }; 
@@ -67,15 +68,15 @@
                 //上传成功
                 fileUploaded: function(response, file) {
 
-                    App.Project.FileCollection.push({
-                        "fileBg": "/projects/images/proDefault.png",
-                        "fileName": file.name,
-                        "fileStatus": "待上传",
-                        "fileOp": "赵子良",
-                        "fileSize": "302M",
-                        "fileDate": "2016-6-3 20:20:54"
-                    });
-                    console.log(file);
+                    // App.Project.FileCollection.push({
+                    //     "fileBg": "/projects/images/proDefault.png",
+                    //     "fileName": file.name,
+                    //     "fileStatus": "待上传",
+                    //     "fileOp": "赵子良",
+                    //     "fileSize": "302M",
+                    //     "fileDate": "2016-6-3 20:20:54"
+                    // });
+                    // console.log(file);
                     //$.jps.publish('add-upload-file', response, file)
                 },
 

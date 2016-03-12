@@ -9,7 +9,9 @@ App.Project.ProjectContainer = Backbone.View.extend({
 	events: {
 		"click .breadItem": "breadItemClick",
 		"click .slideBar": "navBarShowAndHide",
-		"mousedown .dragSize": "dragSize"
+		"mousedown .dragSize": "dragSize",
+		"click .projectVersionList .container .item": "changeVersion",
+		"click .projectVersionList .nav .item": "changeVersionTab"
 	},
 
 	render: function() {
@@ -63,8 +65,6 @@ App.Project.ProjectContainer = Backbone.View.extend({
 	//加载分组项目
 	loadProjectList: function() {
 
-
-
 		var data = {
 			URLtype: "fetchCrumbsProject",
 			data: {
@@ -87,6 +87,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 
 	},
 
+	//加载版本
 	loadProjectVersionList: function() {
 
 		App.Project.loadVersion(function(data) {
@@ -103,6 +104,48 @@ App.Project.ProjectContainer = Backbone.View.extend({
 
 		});
 
+	},
+
+	//版本切换
+	changeVersion: function(event) {
+		 
+		var $target = $(event.target).closest(".item"),
+			Version = $target.data("version");
+
+		App.Project.resetOptions();
+		App.Project.Settings.projectName = Version.projectName;
+		App.Project.Settings.CurrentVersion = Version;
+		App.Project.loadData();
+		$(".breadcrumbNav .projectVersionList").hide();
+		event.stopPropagation();
+	},
+
+	//版本tab 切换
+	changeVersionTab: function(event) {
+		
+		var $target = $(event.target),
+			type = $target.data("type");
+		$target.addClass("selected").siblings().removeClass("selected");
+
+		//发布版本
+		if (type == "release") {
+			var $releaseVersionBox = $target.closest(".listContent").find(".releaseVersionBox");
+			if ($releaseVersionBox.length<=0) {
+				$target.closest(".listContent").find(".container").append('<div class="releaseVersionBox">暂无版本</div>');
+
+			}
+			$target.closest(".listContent").find(".releaseVersionBox").show().siblings().hide(); 
+
+		}else{
+
+			var $changeVersionBox = $target.closest(".listContent").find(".changeVersionBox");
+			if ($changeVersionBox.length<=0) {
+				$target.closest(".listContent").find(".container").append('<div class="changeVersionBox">暂无版本</div>');
+
+			}
+			$target.closest(".listContent").find(".changeVersionBox").show().siblings().hide();
+			
+		}
 	},
 
 

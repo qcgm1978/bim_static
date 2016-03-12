@@ -22,7 +22,7 @@ App.Todo.NavView = Backbone.View.extend({
 		App.Todo.Settings.pageIndex=1;
 		//App.Todo.fetch();
 	 	App.Todo.loadData();
-		App.Todo.TodoCollection.fetch();
+		//App.Todo.TodoCollection.fetch();
 	},
 
 	already: function() {

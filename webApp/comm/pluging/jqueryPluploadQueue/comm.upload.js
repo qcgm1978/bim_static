@@ -36,7 +36,7 @@
         directory: true,
         draggable: true,
         dragAndDropUpload: true,
-        skipCheckSize: 7864320 // files below 7.5M not check size(get uploaded bytes) while upload
+        skipCheckSize: 78643200000000 // files below 7.5M not check size(get uploaded bytes) while upload
     }
 
     var upload = {
@@ -92,7 +92,7 @@
                             up.start()
                         })
                     } else {
-                        debugger;
+                      
                         var fn = file.name //file.fullPath || file.name
                         up.settings.multipart_params = {
                             fileId: file.parentId,

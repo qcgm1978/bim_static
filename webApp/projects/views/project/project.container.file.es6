@@ -26,7 +26,7 @@ App.Project.FileContainer=Backbone.View.extend({
 		var view=new App.Project.FileContainerDetail({
 			model:model
 		});
-		this.$el.find(".fileContent").prepend(view.render().el);
+		this.$el.find(".fileContent").append(view.render().el);
 
 		//判断滚动条是否绑定过 
 		if (!this.$el.find(".fileContainerScrollContent").hasClass('mCustomScrollbar')) {

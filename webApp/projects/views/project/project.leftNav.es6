@@ -43,7 +43,53 @@ App.Project.leftNav = Backbone.View.extend({
 
 
 		} else {
-			//切换导航tab
+
+			if (!typeof(Worker)) {
+				alert("请使用现代浏览器查看模型");
+				return;
+			}
+		 
+			this.fetchModelIdByProject(); 
+			// new BIM({
+			// 	element: $("#projectContainer .modelContainerContent")[0],
+			// 	projectId: 'n4',
+			// 	tools: true
+			// });
+		}
+
+	},
+
+	//获取项目版本Id
+	fetchModelIdByProject: function() {
+
+		var data={
+			URLtype:"fetchModelIdByProject",
+			data:{
+				projectId:App.Project.Settings.projectId,
+				projectVersionId:App.Project.Settings.CurrentVersion.id
+			}
+		}
+		var that=this;
+		App.Comm.ajax(data,function(data){
+
+			if (data.message=="success") {
+
+				if (data.data) {
+					App.Project.Settings.modelId=data.data;
+					that.renderModel();
+				}else{
+					alert("模型转换中");
+				}
+			}else{
+				alert(data.message);
+			}
+
+		});
+	},
+
+	//模型渲染
+	renderModel:function(){
+		//切换导航tab
 			$("#projectContainer").find(".projectFileNavContent").hide();
 			$("#projectContainer").find(".projectModelNavContent").show();
 			//导航内容
@@ -61,48 +107,42 @@ App.Project.leftNav = Backbone.View.extend({
 
 			$("#projectContainer").find(".projectModelNavContent .mCS_no_scrollbar_y").width(800);
 			//渲染模型属性
-			App.Project.renderModelContentByType();
+			App.Project.renderModelContentByType(); 
 
-			if (!typeof(Worker)) {
-				return;
-			} 
 
 			var viewer = new BIM({
 				element: $("#projectContainer .modelContainerContent")[0],
-				projectId: "b7554b6591ff6381af854fa4efa41f81",//App.Project.Settings.projectId,
+				projectId:App.Project.Settings.modelId, //"b7554b6591ff6381af854fa4efa41f81", //App.Project.Settings.projectId,
 				// projectId:'testrvt',
 				tools: true,
-				treeElement:$("#projectContainer .projectNavModelContainer")[0]
+				treeElement: $("#projectContainer .projectNavModelContainer")[0]
 			});
 
-			viewer.on("click",function(model){
-				App.Project.Settings.modelId=model.userId; 
-				//设计  
-				if (App.Project.Settings.projectNav=="design") {
-					//属性
-					if ( App.Project.Settings.property=="attr") {
-
-						App.Project.DesignAttr.PropertiesCollection.fetch({
-							data:{
-								elementId:"002e08e8-4a5f-4ee2-9d88-825c510c4c53",
-								fileVersionId:12345,
-								fileId:model.userId
-							}
-						});
-						console.log("哥要获取属性");
-					}
-					
+			viewer.on("click", function(model) {
+			 	
+				if (!model.intersect) {
+					return;
 				}
-				 
+
+				//App.Project.Settings.modelId = model.userId;
+				//设计  
+				if (App.Project.Settings.projectNav == "design") {
+					//属性
+					if (App.Project.Settings.property == "attr") {
+
+						App.Project.DesignAttr.PropertiesCollection.projectId=App.Project.Settings.projectId;
+						App.Project.DesignAttr.PropertiesCollection.projectVersionId=App.Project.Settings.CurrentVersion.id;
+						App.Project.DesignAttr.PropertiesCollection.fetch({
+							data: { 
+								elementId: model.intersect.object.userData.categoryId,
+								sceneId: model.intersect.object.userData.sceneId 
+							}
+						}); 
+					}
+
+				}
+
 			});
-
-			// new BIM({
-			// 	element: $("#projectContainer .modelContainerContent")[0],
-			// 	projectId: 'n4',
-			// 	tools: true
-			// });
-		}
-
 	}
 
 

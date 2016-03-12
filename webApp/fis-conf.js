@@ -26,7 +26,7 @@
 
  
 
-var v=20160307;
+var v=20160311;
 
  fis.set('project.md5Length', 7);
   fis.set('project.md5Connector ', '_');
@@ -167,7 +167,7 @@ fis.match('/router/**.{less,css}', {
 
 fis.match('/api/**.{es6,js}', {
   //useHash:true,
-  packTo: '/static/dist/$0'
+  packTo: '/static/dist/api/api_'+v+".js"
 });
 
 
@@ -192,6 +192,19 @@ fis.match('/flow/**.{less,css}', {
   //useHash:true,
   packTo: '/static/dist/flow/flow_'+v+'.css'
 });
+
+
+// 项目预览
+
+fis.match('/app/project/**.{js,es6}', { 
+  packTo: '/static/dist/app/project/project_'+v+'.js'
+});
+fis.match('/app/project/**.{css,less}', { 
+  packTo: '/static/dist/app/project/project_'+v+'.css'
+});
+
+
+
 
 // 清除其他配置，只保留如下配置
 fis.media("prod").match('*.{js,es6}', {

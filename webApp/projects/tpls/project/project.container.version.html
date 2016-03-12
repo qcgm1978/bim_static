@@ -1,12 +1,45 @@
-<div class="releaseVersionBox">
-    <div class="header">2016年一月</div>
-    <div class="item"> <span>版本名称</span>
-        <span>版本状态</span>
-        <span>版本时间</span></div>
-</div>
-<div class="changeVersionBox">
-    <div class="header">2016年一月</div>
-    <div class="item"> <span>版本名称</span>
-        <span>版本状态</span>
-        <span>版本时间</span></div>
-</div>
+ 
+<%
+	var VersionGroups = obj,
+				gCount = VersionGroups.length,
+				cVersionGroup;
+%>
+
+<% for (var i = 0; i < gCount; i++) { %>
+	
+	<% cVersionGroup = VersionGroups[i]; %>
+		 
+		<% if(cVersionGroup.versionType==2){%>
+			<div class="releaseVersionBox">
+		<%}else if(cVersionGroup.versionType==3){%> 
+			<div class="changeVersionBox">
+		<%}%>
+
+	<%	var cVersionDate, VersionsDates = cVersionGroup.item,
+					dateCount = VersionsDates.length; %> 
+
+		<%for (var j = 0; j < dateCount; j++) { %>		
+
+			<% cVersionDate = VersionsDates[j]; %>
+
+				<div class="header"><%= new Date(cVersionDate.date).shortFormat() %></div>
+
+			<%var Versions = cVersionDate.version,
+						vCount = Versions.length,
+						cVersion; %>
+				
+				<% for (var k = 0; k < vCount; k++) { %>
+					
+					<% cVersion = Versions[k]; %> 
+					 	<% var stringDate= JSON.stringify(cVersion); %>
+					 	 
+						  <div class="item" data-version="<%- stringDate %>">
+						      <span class="vName overflowEllipsis"><%=cVersion.name%></span>
+					          <span class="vStatus overflowEllipsis"><%= App.Project.convertStatus(cVersion.status) %></span>
+					          <span class="vDate overflowEllipsis"><%= new Date(cVersion.createTime).format("yyyy-MM-dd") %></span> 
+					        </div>
+
+		    	<% }%>
+		<% }%>
+		</div>
+<% }%>

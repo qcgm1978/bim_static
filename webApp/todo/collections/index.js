@@ -50,7 +50,7 @@ App.Todo = {
 		App.Todo.TodoCollection.fetch({
 
 			data: {
-				status: App.Todo.Settings.type == "commission" ? 0 : 1,
+				status: App.Todo.Settings.type == "commission" ?1 : 2,
 				pageIndex: App.Todo.Settings.pageIndex,
 				pageItemCount: App.Todo.Settings.pageItemCount
 			},

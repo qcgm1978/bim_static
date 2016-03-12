@@ -40,9 +40,23 @@ App.Project = {
 		//加载数据
 		//App.Project.loadData();
 
-		//加载 项目版本
-		App.Project.loadVersion(App.Project.renderVersion); 
+		//reset options
+		App.Project.resetOptions();
 
+
+		//加载 项目版本
+		App.Project.loadVersion(App.Project.renderVersion);
+
+	},
+
+	//初始化数据
+	resetOptions: function() {
+		App.Project.Settings.CurrentVersion = null;
+		App.Project.Settings.fetchNavType = 'file';
+		App.Project.Settings.projectNav = 'design';
+		App.Project.Settings.fileId = '';
+		App.Project.Settings.modelId = '';
+		App.Project.Settings.property = '';
 	},
 
 	//加载版本
@@ -74,20 +88,62 @@ App.Project = {
 
 	//渲染版本
 	renderVersion: function(data) {
-		 
+
 		//成功
 		if (data.message == "success") {
-			App.Project.Settings.projectName = "谁呀";
 
-			var Versions = data.data,
-				vCount = Versions.length,
-				cVersion;
-			for (var i = 0; i < vCount; i++) {
-				cVersion = Versions[i];
-				if (cVersion.lastest) {
-					App.Project.Settings.CurrentVersion = cVersion;
+
+			// 	var Versions = data.data,
+			// 		vCount = Versions.length,
+			// 		cVersion;
+			// 	for (var i = 0; i < vCount; i++) {
+			// 		cVersion = Versions[i];
+
+			// 		if (cVersion.lastest) {
+			// 			App.Project.Settings.CurrentVersion = cVersion;
+			// 			break;
+			// 	}
+			// }
+
+
+			var VersionGroups = data.data,
+				gCount = VersionGroups.length,
+				cVersionGroup;
+
+			for (var i = 0; i < gCount; i++) {
+
+				if (App.Project.Settings.CurrentVersion) {
 					break;
 				}
+
+				cVersionGroup = VersionGroups[i];
+
+				var cVersionDate, VersionsDates = cVersionGroup.item,
+					dateCount = VersionsDates.length;
+
+				for (var j = 0; j < dateCount; j++) {
+
+					if (App.Project.Settings.CurrentVersion) {
+						break;
+					}
+
+					cVersionDate = VersionsDates[j];
+
+					var Versions = cVersionDate.version,
+						vCount = Versions.length,
+						cVersion;
+					for (var k = 0; k < vCount; k++) {
+						cVersion = Versions[k];
+						if (cVersion.lastest) {
+							App.Project.Settings.projectName = cVersion.projectName;
+							App.Project.Settings.CurrentVersion = cVersion;
+							break;
+						}
+					}
+
+				}
+
+
 			}
 
 			//取到了当前版本
@@ -131,7 +187,7 @@ App.Project = {
 		});
 
 
-			//初始化滚动条
+		//初始化滚动条
 		App.Project.initScroll();
 
 		//事件初始化
@@ -338,7 +394,7 @@ App.Project = {
 	convertStatus: function(status) {
 
 		//1：待上传；2：上传中；3：已上传；4：待审核；5：审核通过；6：审核退回；7：待移交；8：移交退回；9：已发布
- 
+
 		var result = "";
 		if (status == 1) {
 			result = "待上传";

@@ -144,6 +144,14 @@ Date.prototype.format = function(fmt) { //author: meizz
 	return fmt;
 }
 
+Date.prototype.shortFormat=function(){
+
+	var CapitalMonth=['一','二','三','四','五','六','七','八','九','十','十一','十二'],month=CapitalMonth[this.getMonth()];
+
+
+	return this.getFullYear()+"年"+ month+"月";
+}
+
 //格式化字符串
 //两种调用方式
 // var template1="我是{0}，今年{1}了";
@@ -176,12 +184,10 @@ String.prototype.format = function(args) {
 
 var BackboneSync = Backbone.sync;
 //重写backbone 的 sync 
-Backbone.sync = function(method, model, options) {
-
+Backbone.sync = function(method, model, options) { 
 	 
-
 	// 在没有url 的情况下 取 api 的值 以防有特别的处理
-	//if (!model.url) {
+	//if (!model.url) 
 	//测试
 	if (App.API.Settings.debug) {
 		model.url = App.API.DEBUGURL[model.urlType];

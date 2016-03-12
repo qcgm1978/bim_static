@@ -8,7 +8,7 @@
 	   <% var provinces=project.project,provinceCount=provinces.length,province; %>
 	   <% for(var j=0;j<provinceCount;j++){%>
 	   		<% province=provinces[j]; %>
-	    	<div class="item"> <%= province.name%></div>
+	    	<a href="#projects/<%=province.id%>" class="item"> <%= province.name%></a>
 	    <% } %>
 	<% } %> 
 </div>

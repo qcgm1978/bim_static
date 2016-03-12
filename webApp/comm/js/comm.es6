@@ -1,7 +1,7 @@
 App.Comm = {
 
 	Settings: {
-		v: 20160307,
+		v: 20160311,
 		pageItemCount: Math.floor(($("body").height() + 60) / 70) > 10 && Math.floor(($("body").height() + 60) / 70) || 10
 	},
 
@@ -85,7 +85,22 @@ App.Comm = {
 		var cval = getCookie(name);
 		if (cval != null)
 			document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString();
-	}
+	},
+	formatSize:function (size) {
+        if (size === undefined || /\D/.test(size)) {
+            return '';
+        }
+        if (size >= 1073741824) {
+            return (size / 1073741824).toFixed(2) + 'GB';
+        }
+        if (size >= 1048576) {
+            return (size / 1048576).toFixed(2) + 'MB';
+        } else if (size >= 6) {
+            return (size / 1024).toFixed(2) + 'KB';
+        } else {
+            return size + 'b';
+        }
+    }
 
 };
 
