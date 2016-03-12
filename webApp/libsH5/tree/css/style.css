@@ -1,3 +1,4 @@
+
 .bim{
   position:relative;
   width:100%;
@@ -63,11 +64,11 @@
 }
 .sub-bar.camera-bar{
   left:62px;
-  top:202px;
+  top:192px;
 }
 .sub-bar.cross-panel{
   left:62px;
-  top:240px;
+  top:227px;
   width:220px;
   background-color:rgba(0,0,0,.8);
   z-index:2;
@@ -82,6 +83,7 @@
   padding: 0 20px;
   margin: 0;
   border-bottom: 1px solid #000;
+  box-sizing:content-box;
 }
 .cross-panel .close {
   position: absolute;
@@ -127,7 +129,7 @@
 .slider-box .switch .input-checkbox{
   display:none;
 }
-.slider-box .switch .checkbox{
+.slider-box .switch .lbl{
   display:inline-block;
   margin-left:3px;
   vertical-align:middle;
@@ -136,7 +138,7 @@
   background:url(../images/bar.png) no-repeat;
   background-position:-32px -1088px;
 }
-.slider-box .switch input:checked + .checkbox{
+.slider-box .switch input:checked + .lbl{
   background-position:0 -1088px;
 }
 .tab-content .slider{
