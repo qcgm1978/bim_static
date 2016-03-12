@@ -1,3 +1,6 @@
+/**
+ * @require /libs/tree/js/libs/three.min.js
+ */
 var CLOUD = CLOUD || {};
 CLOUD.Version = "v3.a";
 
@@ -470,7 +473,7 @@ CLOUD.GeomUtil = {
         object.level = objJSON.level;
 
         modelManager.listenSubScene(object);
-                        
+
         if (CLOUD.GlobalData.ShowSubSceneBox)
         {
             var clr = 0xff;
@@ -484,7 +487,7 @@ CLOUD.GeomUtil = {
 
     parseCylinderNode: function (geometryNode, params) {
         if (params instanceof Object) {
-            
+
         }
         else {
             var reg = new RegExp("'", "g");
@@ -510,7 +513,7 @@ CLOUD.GeomUtil = {
         geometryNode.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir);
         geometryNode.position.copy(startPt).addScaledVector(dir, len * 0.5);
         geometryNode.updateMatrix();
-        //geometryNode.boundingBox = 
+        //geometryNode.boundingBox =
         if (!geometryNode.geometry.boundingBox)
             geometryNode.geometry.computeBoundingBox();
     },
@@ -2627,7 +2630,7 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
 
                     break;
                 }
-            }      
+            }
         }
 
         if (i === l - 1) {
@@ -2763,7 +2766,7 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
                             }
 
                             _vector3.copy(object.modelCenter);
-                            
+
                             _vector3.applyProjection( _projScreenMatrix );
 
                             //console.log(_vector3.z);
@@ -6064,7 +6067,7 @@ CLOUD.Camera.prototype.setStandardView = function (stdView, bbox) {
             var position = new THREE.Vector3(-CLOUD.GlobalData.SceneSize, CLOUD.GlobalData.SceneSize, CLOUD.GlobalData.SceneSize);
             //target = new THREE.Vector3();
             var dir = new THREE.Vector3();
-            dir.subVectors(target, position);           
+            dir.subVectors(target, position);
             this.LookAt(target, dir, THREE.Object3D.DefaultUp);
             break;
         case CLOUD.EnumStandardView.Top:
@@ -9354,7 +9357,7 @@ CLOUD.Client = function (serverUrl, databagId, texturePath) {
 
     this.meshIds = {}; // dict for meshId -> mkpId
 
-    this.mkpIndex = null; // mpk index from file: mpk/index 
+    this.mkpIndex = null; // mpk index from file: mpk/index
 
     this.symbolIndex = null; // symbol index from file: symbol/index
 
@@ -9543,7 +9546,7 @@ CLOUD.Scene.prototype.hitTestPosition = function (mouse, camera, callback) {
         callback(null);
         return;
     }
-                
+
     intersects.sort(function (a, b) {
         return a.distance - b.distance;
     });
@@ -9581,10 +9584,10 @@ CLOUD.Scene.prototype.pick = function (mouse, camera, callback) {
 
                     return;
                 }
-              
+
             }
         }
-       
+
     }
     else {
         callback(null);
@@ -10075,7 +10078,7 @@ CLOUD.Mesh.prototype.hitTestGeometry = function (raycaster, intersects, ray, use
             }
         }
     }
-  
+
 };
 
 CLOUD.Mesh.prototype.hitTestSubMesh = function (offset, raycaster, intersects, ray, userId, meshId) {
@@ -10220,7 +10223,7 @@ CLOUD.Cell.prototype.update = function () {
         var scope = this;
 
         var shouldShow = scope.level === undefined;
-       
+
         if (!shouldShow) {
 
             if (scope.worldBoundingBox.containsBox(camera.position)) {
@@ -10267,7 +10270,7 @@ CLOUD.SubScene.prototype.unload = function () {
         var child = children[i];
         child.unload();
     }
-    
+
     if (this.embedded === undefined)
         this.children = [];
 
@@ -10305,7 +10308,7 @@ CLOUD.SubScene.prototype.update = function () {
         var scope = this;
 
         var needLoad = scope.level === undefined;
-       
+
         if (!needLoad) {
 
             var distance = 0;
@@ -10331,7 +10334,7 @@ CLOUD.SubScene.prototype.update = function () {
 
 
         if (needLoad) {
-            
+
             this.load();
         }
         else {
@@ -10462,7 +10465,7 @@ CLOUD.CameraEditor = function (camera, domElement, onChange) {
     // "target" sets the location of focus
     this.target = new THREE.Vector3();
     // the orbit center
-    this.pivot = null;     
+    this.pivot = null;
 
     // This option actually enables dollying in and out; left as "zoom" for
     // backwards compatibility
@@ -10682,7 +10685,7 @@ CLOUD.CameraEditor = function (camera, domElement, onChange) {
 
         var position = this.object.position;
         var pivot = this.pivot !== null ? this.pivot.clone() : this.target;
-       
+
         if(state == STATE.ROTATE){
 
             var viewVec = position.clone().sub(pivot);
@@ -10728,7 +10731,7 @@ CLOUD.CameraEditor = function (camera, domElement, onChange) {
                             if (phiDelta > 0)
                                 return true;
                             rightDir = camDir.clone().cross(realUp);
-                            
+
                             //console.log("BOTTOM");
                         }
 
@@ -10744,7 +10747,7 @@ CLOUD.CameraEditor = function (camera, domElement, onChange) {
                     }
                     abortRotation = shouldAbortRotation(this.object.realUp);
                 }
-                    
+
                 if (!abortRotation) {
                     viewTrf = new THREE.Quaternion().setFromAxisAngle(rightDir, phiDelta);
 
@@ -10764,7 +10767,7 @@ CLOUD.CameraEditor = function (camera, domElement, onChange) {
                 }
             }
         }
-     
+
         if (Math.abs(scale - 1) > 0.001) {
 
             var camVec = position.clone().sub(this.target);
@@ -11106,7 +11109,7 @@ CLOUD.OrbitEditor.prototype.processMouseDown = function (event) {
     if (event.button === scope.mouseButtons.ORBIT) {
         if (camera_scope.noRotate === true)
             return;
-        
+
         var mouse = camera_scope.mapWindowToViewport(event.clientX, event.clientY);
         scope.scene.hitTestPosition(mouse, camera_scope.object, function (pt) {
             camera_scope.pivot = pt;
@@ -11309,7 +11312,7 @@ CLOUD.PickEditor.prototype.onMouseDown = function (event) {
 };
 CLOUD.ZoomEditor = function ( object, scene, domElement ) {
 	CLOUD.OrbitEditor.call( this,  object, scene, domElement );
-	
+
 	this.mouseButtons = { ZOOM: THREE.MOUSE.LEFT, PAN: THREE.MOUSE.MIDDLE, ORBIT: THREE.MOUSE.RIGHT };
 };
 CLOUD.ZoomEditor.prototype = Object.create( CLOUD.OrbitEditor.prototype );
@@ -11479,7 +11482,7 @@ CLOUD.FlyEditorUI.prototype = {
             CLOUD.DomUtil.showOrHideElement(this.elementIds.imgTipD, true);
             CLOUD.DomUtil.showOrHideElement(this.elementIds.tipRemarkD, true);
         }
-   
+
 
         if (moveState & MoveDirection.UP) {
             CLOUD.DomUtil.showOrHideElement(this.elementIds.imgKeyQ, false);
@@ -11505,7 +11508,7 @@ CLOUD.FlyEditorUI.prototype = {
             CLOUD.DomUtil.showOrHideElement(this.elementIds.imgKeyW2, false);
             CLOUD.DomUtil.showOrHideElement(this.elementIds.imgTipW, false);
             CLOUD.DomUtil.showOrHideElement(this.elementIds.tipRemarkW, false);
-        } 
+        }
 
         if ( moveState & MoveDirection.BACK) {
             CLOUD.DomUtil.showOrHideElement(this.elementIds.imgKeyS, true);
@@ -11513,7 +11516,7 @@ CLOUD.FlyEditorUI.prototype = {
             CLOUD.DomUtil.showOrHideElement(this.elementIds.imgTipS, false);
             CLOUD.DomUtil.showOrHideElement(this.elementIds.tipRemarkS, false);
         }
- 
+
         if (moveState & MoveDirection.LEFT) {
             CLOUD.DomUtil.showOrHideElement(this.elementIds.imgKeyA, true);
             CLOUD.DomUtil.showOrHideElement(this.elementIds.imgKeyA2, false);
@@ -11856,7 +11859,7 @@ CLOUD.FlyEditor.prototype = {
                 moveDirection = this.MoveDirection.DOWN;
                 break;
         }
-        
+
         if (moveDirection !== this.MoveDirection.NONE) {
             this.ui.onKeyUp(moveDirection, this.MoveDirection);
             this.moveState &= ~moveDirection
@@ -11920,7 +11923,7 @@ CLOUD.FlyEditor.prototype = {
         var delta = 0 || event.wheelDelta || event.detail;
         delta = (Math.abs(delta) > 10 ? delta : -delta * 40);
         this.movementSpeedMultiplier = this.ui.changeMoveSpeed(delta, this.movementSpeedMultiplier);
-        
+
     },
 
     update: function (delta) {
@@ -12325,7 +12328,7 @@ CLOUD.Filter = function () {
     };
 
     var visibilityFilter = {};
-    
+
     var overridedMaterials = {};
     overridedMaterials.selection = CLOUD.MaterialUtil.createHilightMaterial();
 
@@ -12379,7 +12382,7 @@ CLOUD.Filter = function () {
     }
 
     this.removeUserFilter = function (name, value) {
-   
+
         if(value === undefined){
             delete visibilityFilter[name];
         }
@@ -12420,7 +12423,7 @@ CLOUD.Filter = function () {
             delete materialOverriderByUserId[name];
         }
         else {
-            
+
             var material;
             if (materialName) {
                 material = overridedMaterials[materialName];
@@ -12428,7 +12431,7 @@ CLOUD.Filter = function () {
 
             var overrider = {};
             overrider.material = material ? material : overridedMaterials.selection;
-            
+
             overrider.ids = {};
             for (var ii = 0, len = ids.length; ii < len; ++ii) {
                 overrider.ids[ids[ii]] = true;
@@ -12436,7 +12439,7 @@ CLOUD.Filter = function () {
 
             materialOverriderByUserId[name] = overrider;
         }
-        
+
     };
 
     this.setUserOverrider = function (name, value, materialName) {
@@ -12502,7 +12505,7 @@ CLOUD.Filter = function () {
             selectionSet.ids = {};
         }
 
-            
+
         for (var ii = 0, len = ids.length; ii < len; ++ii) {
             selectionSet.ids[ids[ii]] = true;
         }
@@ -12573,7 +12576,7 @@ CLOUD.Filter = function () {
         if (isSelected(id)) {
             return overridedMaterials.selection;
         }
-    
+
         for (var item in materialOverriderByUserId) {
             var overrider = materialOverriderByUserId[item];
             if (overrider.ids[id])
@@ -12589,7 +12592,7 @@ CLOUD.Filter = function () {
             if (material)
                 return material;
         }
-   
+
 
         return null;
     };
@@ -13050,14 +13053,14 @@ var o3dgc = (function () {
     local.O3DGC_AC_BM_MAX_COUNT = (1 << local.O3DGC_AC_BM_LENGTH_SHIFT) >>> 0;  // for adaptive models
     local.O3DGC_AC_DM_LENGTH_SHIFT = 15; // Maximum values for general models length bits discarded before mult.
     local.O3DGC_AC_DM_MAX_COUNT = (1 << local.O3DGC_AC_DM_LENGTH_SHIFT) >>> 0;  // for adaptive models
-    // StaticBitModel class 
+    // StaticBitModel class
     module.StaticBitModel = function () {
         this.m_bit0Prob = (1 << (local.O3DGC_AC_BM_LENGTH_SHIFT - 1)) >>> 0; // p0 = 0.5
     };
     module.StaticBitModel.prototype.SetProbability = function (p) {
         this.m_bit0Prob = Math.floor(p * ((1 << local.O3DGC_AC_BM_LENGTH_SHIFT) >>> 0));
     };
-    // AdaptiveBitModel class 
+    // AdaptiveBitModel class
     module.AdaptiveBitModel = function () {
         // initialization to equiprobable model
         this.m_updateCycle = 4;
@@ -13092,7 +13095,7 @@ var o3dgc = (function () {
         }
         this.m_bitsUntilUpdate = this.m_updateCycle;
     };
-    // AdaptiveDataModel class 
+    // AdaptiveDataModel class
     module.AdaptiveDataModel = function () {
         this.m_buffer = {};
         this.m_distribution = {};
@@ -13377,7 +13380,7 @@ var o3dgc = (function () {
         return uiValue;
     };
 
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // FIFO class
     module.FIFO = function () {
         this.m_data = {};
@@ -13742,7 +13745,7 @@ var o3dgc = (function () {
     module.AdjacencyInfo = function () {
         this.m_neighborsSize = 0;    // actual allocated size for m_neighbors
         this.m_numNeighborsSize = 0; // actual allocated size for m_numNeighbors
-        this.m_numElements = 0;      // number of elements 
+        this.m_numElements = 0;      // number of elements
         this.m_neighbors = {};
         this.m_numNeighbors = {};
     };
@@ -15609,7 +15612,7 @@ S3D.S3DLoader.prototype = {
    }
 };
 
-	
+
 
 var LZMA = LZMA || {};
 
@@ -15710,7 +15713,7 @@ LZMA.RangeDecoder.prototype.init = function(){
 
   this._code = 0;
   this._range = -1;
-  
+
   while(i --){
     this._code = (this._code << 8) | this._stream.readByte();
   }
@@ -16183,7 +16186,7 @@ CTM.File.prototype.load = function(stream){
   this.header = new CTM.FileHeader(stream);
 
   this.body = new CTM.FileBody(this.header);
-  
+
   this.getReader().read(stream, this.body);
 };
 
@@ -16206,7 +16209,7 @@ CTM.File.prototype.getReader = function(){
 };
 
 CTM.FileHeader = function(stream){
-  
+
 
   stream.readInt32(); //magic "OCTM"
   this.fileFormat = stream.readInt32();
@@ -16242,7 +16245,7 @@ CTM.FileBody = function(header){
   if ( header.hasNormals() ){
     this.normals = new Float32Array(data, (i + v) * 4, n);
   }
-  
+
   if (header.uvMapCount){
     this.uvMaps = [];
     for (j = 0; j < header.uvMapCount; ++ j){
@@ -16250,7 +16253,7 @@ CTM.FileBody = function(header){
         (i + v + n + (j * u) ) * 4, u) };
     }
   }
-  
+
   if (header.attrMapCount){
     this.attrMaps = [];
     for (j = 0; j < header.attrMapCount; ++ j){
@@ -16273,7 +16276,7 @@ CTM.FileMG2Header = function(stream){
   this.divx = stream.readInt32();
   this.divy = stream.readInt32();
   this.divz = stream.readInt32();
-  
+
   this.sizex = (this.higherBoundx - this.lowerBoundx) / this.divx;
   this.sizey = (this.higherBoundy - this.lowerBoundy) / this.divy;
   this.sizez = (this.higherBoundz - this.lowerBoundz) / this.divz;
@@ -16285,7 +16288,7 @@ CTM.ReaderRAW = function(){
 CTM.ReaderRAW.prototype.read = function(stream, body){
   this.readIndices(stream, body.indices);
   this.readVertices(stream, body.vertices);
-  
+
   if (body.normals){
     this.readNormals(stream, body.normals);
   }
@@ -16339,7 +16342,7 @@ CTM.ReaderMG1 = function(){
 CTM.ReaderMG1.prototype.read = function(stream, body){
   this.readIndices(stream, body.indices);
   this.readVertices(stream, body.vertices);
-  
+
   if (body.normals){
     this.readNormals(stream, body.normals);
   }
@@ -16354,7 +16357,7 @@ CTM.ReaderMG1.prototype.read = function(stream, body){
 CTM.ReaderMG1.prototype.readIndices = function(stream, indices){
   stream.readInt32(); //magic "INDX"
   stream.readInt32(); //packed size
-  
+
   var interleaved = new CTM.InterleavedStream(indices, 3);
   LZMA.decompress(stream, stream, interleaved, interleaved.data.length);
 
@@ -16364,7 +16367,7 @@ CTM.ReaderMG1.prototype.readIndices = function(stream, indices){
 CTM.ReaderMG1.prototype.readVertices = function(stream, vertices){
   stream.readInt32(); //magic "VERT"
   stream.readInt32(); //packed size
-  
+
   var interleaved = new CTM.InterleavedStream(vertices, 1);
   LZMA.decompress(stream, stream, interleaved, interleaved.data.length);
 };
@@ -16384,7 +16387,7 @@ CTM.ReaderMG1.prototype.readUVMaps = function(stream, uvMaps){
 
     uvMaps[i].name = stream.readString();
     uvMaps[i].filename = stream.readString();
-    
+
     stream.readInt32(); //packed size
 
     var interleaved = new CTM.InterleavedStream(uvMaps[i].uv, 2);
@@ -16398,7 +16401,7 @@ CTM.ReaderMG1.prototype.readAttrMaps = function(stream, attrMaps){
     stream.readInt32(); //magic "ATTR"
 
     attrMaps[i].name = stream.readString();
-    
+
     stream.readInt32(); //packed size
 
     var interleaved = new CTM.InterleavedStream(attrMaps[i].attr, 4);
@@ -16411,10 +16414,10 @@ CTM.ReaderMG2 = function(){
 
 CTM.ReaderMG2.prototype.read = function(stream, body){
   this.MG2Header = new CTM.FileMG2Header(stream);
-  
+
   this.readVertices(stream, body.vertices);
   this.readIndices(stream, body.indices);
-  
+
   if (body.normals){
     this.readNormals(stream, body);
   }
@@ -16432,23 +16435,23 @@ CTM.ReaderMG2.prototype.readVertices = function(stream, vertices){
 
   var interleaved = new CTM.InterleavedStream(vertices, 3);
   LZMA.decompress(stream, stream, interleaved, interleaved.data.length);
-  
+
   var gridIndices = this.readGridIndices(stream, vertices);
-  
+
   CTM.restoreVertices(vertices, this.MG2Header, gridIndices, this.MG2Header.vertexPrecision);
 };
 
 CTM.ReaderMG2.prototype.readGridIndices = function(stream, vertices){
   stream.readInt32(); //magic "GIDX"
   stream.readInt32(); //packed size
-  
+
   var gridIndices = new Uint32Array(vertices.length / 3);
-  
+
   var interleaved = new CTM.InterleavedStream(gridIndices, 1);
   LZMA.decompress(stream, stream, interleaved, interleaved.data.length);
-  
+
   CTM.restoreGridIndices(gridIndices, gridIndices.length);
-  
+
   return gridIndices;
 };
 
@@ -16481,14 +16484,14 @@ CTM.ReaderMG2.prototype.readUVMaps = function(stream, uvMaps){
 
     uvMaps[i].name = stream.readString();
     uvMaps[i].filename = stream.readString();
-    
+
     var precision = stream.readFloat32();
-    
+
     stream.readInt32(); //packed size
 
     var interleaved = new CTM.InterleavedStream(uvMaps[i].uv, 2);
     LZMA.decompress(stream, stream, interleaved, interleaved.data.length);
-    
+
     CTM.restoreMap(uvMaps[i].uv, 2, precision);
   }
 };
@@ -16499,14 +16502,14 @@ CTM.ReaderMG2.prototype.readAttrMaps = function(stream, attrMaps){
     stream.readInt32(); //magic "ATTR"
 
     attrMaps[i].name = stream.readString();
-    
+
     var precision = stream.readFloat32();
-    
+
     stream.readInt32(); //packed size
 
     var interleaved = new CTM.InterleavedStream(attrMaps[i].attr, 4);
     LZMA.decompress(stream, stream, interleaved, interleaved.data.length);
-    
+
     CTM.restoreMap(attrMaps[i].attr, 4, precision);
   }
 };
@@ -16519,7 +16522,7 @@ CTM.restoreIndices = function(indices, len){
   }
   for (; i < len; i += 3){
     indices[i] += indices[i - 3];
-    
+
     if (indices[i] === indices[i - 3]){
       indices[i + 1] += indices[i - 2];
     }else{
@@ -16546,7 +16549,7 @@ CTM.restoreVertices = function(vertices, grid, gridIndices, precision){
 
   for (; i < len; j += 3){
     x = gridIdx = gridIndices[i ++];
-    
+
     z = ~~(x / zdiv);
     x -= ~~(z * zdiv);
     y = ~~(x / ydiv);
@@ -16585,13 +16588,13 @@ CTM.restoreNormals = function(normals, smooth, precision){
       normals[i + 1] = smooth[i + 1] * ro;
       normals[i + 2] = smooth[i + 2] * ro;
     }else{
-      
+
       if (phi <= 4){
         theta = (intNormals[i + 2] - 2) * PI_DIV_2;
       }else{
         theta = ( (intNormals[i + 2] * 4 / phi) - 2) * PI_DIV_2;
       }
-      
+
       phi *= precision * PI_DIV_2;
       sinPhi = ro * Math.sin(phi);
 
@@ -16628,9 +16631,9 @@ CTM.restoreMap = function(map, count, precision){
 
     for (j = i; j < len; j += count){
       value = intMap[j];
-      
+
       delta += value & 1? -( (value + 1) >> 1): value >> 1;
-      
+
       map[j] = delta * precision;
     }
   }
@@ -16653,18 +16656,18 @@ CTM.calcSmoothNormals = function(indices, vertices){
     v2y = vertices[indz + 1] - vertices[indx + 1];
     v1z = vertices[indy + 2] - vertices[indx + 2];
     v2z = vertices[indz + 2] - vertices[indx + 2];
-    
+
     nx = v1y * v2z - v1z * v2y;
     ny = v1z * v2x - v1x * v2z;
     nz = v1x * v2y - v1y * v2x;
-    
+
     len = Math.sqrt(nx * nx + ny * ny + nz * nz);
     if (len > 1e-10){
       nx /= len;
       ny /= len;
       nz /= len;
     }
-    
+
     smooth[indx]     += nx;
     smooth[indx + 1] += ny;
     smooth[indx + 2] += nz;
@@ -16677,7 +16680,7 @@ CTM.calcSmoothNormals = function(indices, vertices){
   }
 
   for (i = 0, k = smooth.length; i < k; i += 3){
-    len = Math.sqrt(smooth[i] * smooth[i] + 
+    len = Math.sqrt(smooth[i] * smooth[i] +
       smooth[i + 1] * smooth[i + 1] +
       smooth[i + 2] * smooth[i + 2]);
 
@@ -16710,13 +16713,13 @@ CTM.InterleavedStream = function(data, count){
 
 CTM.InterleavedStream.prototype.writeByte = function(value){
   this.data[this.offset] = value;
-  
+
   this.offset += this.count;
   if (this.offset >= this.len){
-  
+
     this.offset -= this.len - 4;
     if (this.offset >= this.count){
-    
+
       this.offset -= this.count + (CTM.isLittleEndian? 1: -1);
     }
   }
@@ -16749,7 +16752,7 @@ CTM.Stream.prototype.readFloat32 = function(){
   var b1 = this.readByte();
   var b2 = this.readByte();
 
-  m += (b1 & 0x7f) << 16; 
+  m += (b1 & 0x7f) << 16;
   var e = ( (b2 & 0x7f) << 1) | ( (b1 & 0x80) >>> 7);
   var s = b2 & 0x80? -1: 1;
 
@@ -16775,7 +16778,7 @@ CTM.Stream.prototype.readString = function(){
 
 CTM.Stream.prototype.readArrayInt32 = function(array){
   var i = 0, len = array.length;
-  
+
   while(i < len){
     array[i ++] = this.readInt32();
   }
@@ -16953,7 +16956,7 @@ CLOUD.MpkLoader.prototype.load = function (url, parameters, client, callback, on
     xhr.onreadystatechange = function () {
         if (xhr.readyState === 4) {
             if (xhr.status === 200 || xhr.status === 0) {
-              
+
                 var format = client.mkpIndex.format;
                 if (format === undefined || format === 0) {
 
@@ -16981,7 +16984,7 @@ CLOUD.MpkLoader.prototype.load = function (url, parameters, client, callback, on
                         }
                         binaryData = new Uint8Array(arrayBuffers);
                     }
-                 
+
 
                     scope.parseCTM(binaryData, parameters, client, callback);
 
@@ -16989,7 +16992,7 @@ CLOUD.MpkLoader.prototype.load = function (url, parameters, client, callback, on
                 }
                 else {
                     scope.parseS3D(xhr.response, parameters, client, callback);
-                }              
+                }
 
                 onComplete();
             }
@@ -17142,7 +17145,7 @@ CLOUD.SubSceneLoader.prototype = {
                     userData = objJSON.userData;
 
                 var object;
-          
+
                 if (objJSON.nodeType == "MpkNode") {
 
                     handle_children(parent, objJSON.nodes, level);
@@ -17154,7 +17157,7 @@ CLOUD.SubSceneLoader.prototype = {
                     CLOUD.GeomUtil.parseNodeProperties(object, objJSON, nodeId);
 
                     // set world bbox
-                    object.worldBoundingBox = object.boundingBox.clone();                    
+                    object.worldBoundingBox = object.boundingBox.clone();
                     object.worldBoundingBox.applyMatrix4(scope.manager.getGlobalTransform());
                     object.level = objJSON.level;
 
@@ -17172,7 +17175,7 @@ CLOUD.SubSceneLoader.prototype = {
 
                         object.client = client;
 
-                        CLOUD.GeomUtil.parseSceneNode(object, objJSON, scope.manager, level);                        
+                        CLOUD.GeomUtil.parseSceneNode(object, objJSON, scope.manager, level);
 
                         parent.add(object);
 
@@ -17200,7 +17203,7 @@ CLOUD.SubSceneLoader.prototype = {
                     object = new CLOUD.Mesh(CLOUD.GeomUtil.EmptyGeometry, matObj, objJSON.meshId);
                     CLOUD.GeomUtil.parseNodeProperties(object, objJSON, nodeId, trf);
                     object.userData = userData;
-                    
+
                     // will not load the mesh.
 
                     parent.add(object);
@@ -17351,7 +17354,7 @@ CLOUD.SceneLoader.prototype = {
 
 
         function loadMeshNode(object, meshId) {
-          
+
             var mesh = resource.geometries[meshId];
             if (mesh) {
                 object.updateGeometry(mesh);
@@ -17373,7 +17376,7 @@ CLOUD.SceneLoader.prototype = {
                 delayLoadMeshNodes.push({ meshNode: object, isInstanced: true });
             }
         }
-       
+
         function handle_children(parent, children, level, userId, userData, trf) {
 
             for (var nodeId in children) {
@@ -17388,7 +17391,7 @@ CLOUD.SceneLoader.prototype = {
                     userData = objJSON.userData;
 
                 var object;
-          
+
                 if (objJSON.nodeType == "MpkNode") {
 
                     scope.manager.loadMpk(objJSON.mpkId, client, onload_mpk_complete(parent, objJSON, level + 1));
@@ -17400,7 +17403,7 @@ CLOUD.SceneLoader.prototype = {
                     CLOUD.GeomUtil.parseNodeProperties(object, objJSON, nodeId);
 
                     // set world bbox
-                    object.worldBoundingBox = object.boundingBox.clone();                    
+                    object.worldBoundingBox = object.boundingBox.clone();
                     object.worldBoundingBox.applyMatrix4(scope.manager.getGlobalTransform());
                     object.level = objJSON.level;
 
@@ -17413,7 +17416,7 @@ CLOUD.SceneLoader.prototype = {
                         object.add(boxNode);
                     }
 
-                    
+
 
                     handle_children(object, objJSON.children, level + 1);
                     parent.add(object);
@@ -17449,7 +17452,7 @@ CLOUD.SceneLoader.prototype = {
                 else if (objJSON.nodeType == "MeshNode") {
                     if (resource.bOutOfLimitation == true)
                         continue;
-                        
+
                     var matObj = client.findMaterial(objJSON.materialId, false);
 
                     object = new CLOUD.Mesh(CLOUD.GeomUtil.EmptyGeometry, matObj, objJSON.meshId);
@@ -17658,7 +17661,7 @@ CLOUD.IndexLoader.prototype = {
             else {
                 onTaskFinished();
             }
-            
+
         });
 
         // Material
@@ -17741,7 +17744,7 @@ CLOUD.SceneBoxLoader.prototype = {
         this.manager.dispatchEvent({ type: CLOUD.EVENTS.ON_LOAD_START, sceneId: sceneId });
 
         // handle all the children from the loaded json and attach them to given parent
-        
+
         var level = -1;
         function handle_children(parent, children) {
             level++;
@@ -17753,7 +17756,7 @@ CLOUD.SceneBoxLoader.prototype = {
                 var objJSON = children[nodeId];
 
                 var object;
-          
+
                 if (objJSON.nodeType == "MpkNode") {
                     handle_children(parent, objJSON.nodes);
                 }
@@ -17780,7 +17783,7 @@ CLOUD.SceneBoxLoader.prototype = {
 
                     localRoot.add(object);
                 }
-        
+
             }
             level--;
         };
@@ -17816,7 +17819,7 @@ CLOUD.TaskWorker = function (threadCount) {
 
     this.MaxThreadCount = threadCount || 6;
     this.activeTaskCount = 0;
-          
+
     var scope = this;
     function resetItems() {
 
@@ -17906,8 +17909,8 @@ CLOUD.TaskWorker = function (threadCount) {
             }
             resetItems();
         }
-  
-        
+
+
     }
 }
 
@@ -17988,7 +17991,7 @@ CLOUD.TaskManager.prototype = {
         scope.sceneWorker.runLimit(function (item, nextIdx, callback) {
 
             var sceneNode = item.sceneNode;
-          
+
             if(sceneNode.children.length == 0){
                 sceneNode.loaded = true;
                 sceneLoader.load(sceneNode.sceneId, sceneNode, item.client, false, function () {
@@ -18012,7 +18015,7 @@ CLOUD.TaskManager.prototype = {
  */
 
 CLOUD.ModelManager = function () {
-   
+
     THREE.LoadingManager.call(this);
     //this.onStart = function () { console.log("start"); };
     //this.onLoad = function () { console.log("load"); }
@@ -18112,7 +18115,7 @@ CLOUD.ModelManager.prototype.showScene = function (databagId, sceneIds) {
             scope.dispatchEvent({ type: CLOUD.EVENTS.ON_LOAD_COMPLETE });
             return;
         }
-            
+
 
         var sceneId = sceneIds[idx];
         var sceneNode = scope.scene.findSceneNode(sceneId);
@@ -18139,9 +18142,9 @@ CLOUD.ModelManager.prototype.showScene = function (databagId, sceneIds) {
 * @param parameters {databagId, serverUrl, debug}
 */
 CLOUD.ModelManager.prototype.load = function (parameters) {
-       
+
     var scope = this;
-   
+
     this.loadIndex(parameters, function (client) {
 
         scope.loading = true;
