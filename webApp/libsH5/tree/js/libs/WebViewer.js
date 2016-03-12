@@ -12383,11 +12383,17 @@ CLOUD.Filter = function () {
 
     this.removeUserFilter = function (name, value) {
 
+        if (!visibilityFilter[name])
+            return;
+
         if(value === undefined){
             delete visibilityFilter[name];
         }
         else {
-            delete visibilityFilter[name][value];
+
+            if (visibilityFilter[name][value]) {
+                delete visibilityFilter[name][value];
+            }
 
             if (Object.getOwnPropertyNames(visibilityFilter[name]).length == 0) {
                 delete visibilityFilter[name];
@@ -12420,7 +12426,11 @@ CLOUD.Filter = function () {
             materialOverriderByUserId = {};
 
         if (ids === undefined) {
-            delete materialOverriderByUserId[name];
+
+            if (materialOverriderByUserId[name]) {
+                delete materialOverriderByUserId[name];
+            }
+
         }
         else {
 
@@ -12443,11 +12453,18 @@ CLOUD.Filter = function () {
     };
 
     this.setUserOverrider = function (name, value, materialName) {
-        if (name === undefined)
+        if (name === undefined) {
             materialOverriderByUserData = {};
+            return;
+        }
+
 
         if (value === undefined) {
-            delete materialOverriderByUserData[name];
+
+            if (materialOverriderByUserData[name]) {
+                delete materialOverriderByUserData[name];
+            }
+
         }
         else {
 
@@ -12465,8 +12482,14 @@ CLOUD.Filter = function () {
 
     this.removeUserOverrider = function (name, value) {
 
-        if (name === undefined)
+        if (name === undefined) {
             materialOverriderByUserData = {};
+            return;
+        }
+
+
+        if (!materialOverriderByUserData[name])
+            return;
 
         if (value === undefined) {
             delete materialOverriderByUserData[name];
