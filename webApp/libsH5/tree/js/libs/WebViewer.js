@@ -507,8 +507,8 @@ CLOUD.GeomUtil = {
         dir.normalize();
 
         var radius = params.radius;
-        if(radius <= 0)
-            radius = 1000;
+        if(radius <= 1)
+            radius = 100;
         geometryNode.scale.set(radius, len, radius);
         geometryNode.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir);
         geometryNode.position.copy(startPt).addScaledVector(dir, len * 0.5);
@@ -18048,8 +18048,6 @@ CLOUD.ModelManager = function () {
     this.triangleCount = 0;
 
     this.loading = false;
-
-    this.delayLoadSubSceneItems = [];
 };
 
 CLOUD.ModelManager.prototype = Object.create(THREE.LoadingManager.prototype);
