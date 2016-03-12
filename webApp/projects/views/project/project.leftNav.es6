@@ -85,6 +85,7 @@ App.Project.leftNav = Backbone.View.extend({
 
 	//模型渲染
 	renderModel:function(){
+	 
 		//切换导航tab
 			$("#projectContainer").find(".projectFileNavContent").hide();
 			$("#projectContainer").find(".projectModelNavContent").show();
@@ -101,7 +102,10 @@ App.Project.leftNav = Backbone.View.extend({
 
 				$projectCotent.css("margin-right", mRight);
 			}else{
-				$projectCotent.css("margin-right","400px");
+				if (!mRight) {
+					$projectCotent.css("margin-right","400px");
+				}
+				
 			}
 
 			$("#projectContainer").find(".projectModelNavContent .mCS_no_scrollbar_y").width(800);
