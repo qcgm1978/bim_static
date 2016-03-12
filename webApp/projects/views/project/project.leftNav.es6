@@ -101,7 +101,7 @@ App.Project.leftNav = Backbone.View.extend({
 
 				$projectCotent.css("margin-right", mRight);
 			}else{
-				$projectCotent.removeAttr("style");
+				$projectCotent.css("margin-right","400px");
 			}
 
 			$("#projectContainer").find(".projectModelNavContent .mCS_no_scrollbar_y").width(800);
