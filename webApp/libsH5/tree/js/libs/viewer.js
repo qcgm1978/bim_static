@@ -372,20 +372,39 @@ BIM.util = {
       fn(children[i]);
     }
   },
-  getAttr:function(element,pClass,cClass,type){
-    var parents = BIM.util.parents(element,pClass);
+  getAttr:function(element,pClass,cClass,dataType){
+    var parents;
+    if(pClass){
+      parents = BIM.util.parents(element,pClass);
+    }else{
+      parents = element;
+    }
     var checkboxs = parents.getElementsByClassName(cClass);
     var obj = {
       type:checkboxs[0].getAttribute('data-type'),
       ids:[]
     };
     for(var i=0,len=checkboxs.length;i<len;i++){
-      var attr = checkboxs[i].getAttribute(type);
+      var attr = checkboxs[i].getAttribute(dataType);
       if(attr){
         obj.ids = obj.ids.concat(attr.split(','));
       }
     }
     return obj;
+  },
+  getFiles:function(element){
+    var checkboxs  = element.getElementsByClassName('input'),
+        files = []
+    for(var i=0,len=checkboxs.length;i<len;i++){
+      var that = checkboxs[i];
+      if(!that.checked){
+        var attr = checkboxs[i].getAttribute('data-files');
+        if(attr){
+          files = files.concat(attr.split(','));
+        }
+      }
+    }
+    return files;
   },
   getFilter:function(ids,fn){
     for(var i=0,len=ids.length;i<len;i++){
@@ -710,6 +729,15 @@ BIM.prototype = {
     });
     viewer.render();
   },
+  showScend:function(obj){
+    var viewer = BIM.common.viewer;
+    var filter = viewer.getFilters();
+    filter.removeUserFilter(obj.type);
+    BIM.util.getFilter(obj.ids,function(id){
+      filter.addUserFilter(obj.type,id);
+    });
+    viewer.render();
+  },
   show:function(obj){
     var viewer = BIM.common.viewer;
     var filter = viewer.getFilters();
@@ -739,6 +767,8 @@ BIM.TREE = function(){
   var _self = this;
   _self.el = BIM.common._option.treeElement;
   _self.tree = BIM.util.createDom('ul','tree-view');
+  _self.floor = BIM.util.createDom('li','itemNode');
+  _self.specialitys = BIM.util.createDom('li','itemNode');
   _self.el.innerHTML = '';
   _self.el.appendChild(_self.tree);
   _self.init();
@@ -746,14 +776,13 @@ BIM.TREE = function(){
 BIM.TREE.prototype = {
   createSpecialitys : function(data){
     var _self = this;
-    var rootDom = BIM.util.createDom('li','itemNode');
     var template = '<div class="item-content"> <i class="nodeSwitch"></i> <span class="tree-checkbox"><input class="input" type="checkbox" checked="checked" data-type="sceneId"><span class="box"></span></span><span class="tree-text">专业</span> </div><ul class="treeViewSub">';
     for(i in data){
       template += '<li class="itemNode"> <div class="item-content"> <i class="nodeSwitch"></i> <span class="tree-checkbox"><input class="input" type="checkbox" checked="checked" data-type="sceneId"><span class="box"></span></span><span class="tree-text">'+ i +'</span> </div> <ul class="treeViewSub">'+ getSpeciality(data[i]) +'</ul></li>'
     }
     template+="</ul>";
-    rootDom.innerHTML = template;
-    _self.tree.appendChild(rootDom);
+    _self.specialitys.innerHTML = template;
+    _self.tree.appendChild(_self.specialitys);
     function getSpeciality(obj){
       var temp = '',len=obj.length;
       for(var i = 0;i<len;i++){
@@ -764,7 +793,6 @@ BIM.TREE.prototype = {
   },
   createFloor : function(data){
     var _self = this;
-    var rootDom = BIM.util.createDom('li','itemNode');
     var obj = data.sort(function(a,b){
       return a.index - b.index;
     });
@@ -774,15 +802,22 @@ BIM.TREE.prototype = {
       template +='<li class="itemNode"> <div class="item-content"> <i class="noneSwitch"></i> <span  class="tree-checkbox"><input class="input" type="checkbox" checked="checked" data-files="'+ dataFiles +'" data-type="sceneId"><span class="box"></span></span><span class="tree-text">'+obj[i].floor+'</span> </div> </li>';
     }
     template +='</ul>';
-    rootDom.innerHTML = template;
-    _self.tree.appendChild(rootDom)
+    _self.floor.innerHTML = template;
+    _self.tree.appendChild(_self.floor);
   },
   createCategory : function(data){
     var _self = this;
     var rootDom = BIM.util.createDom('li','itemNode');
+    var data = data.sort(function(a,b){
+      return a.sort - b.sort;
+    });
     var template = '<div class="item-content"> <i class="nodeSwitch"></i> <span class="tree-checkbox"><input class="input" type="checkbox" checked="checked" data-type="categoryId"><span class="box"></span></span><span class="tree-text">构件类型</span> </div><ul class="treeViewSub">';
-    for(i in data){
-      template += '<li class="itemNode"> <div class="item-content"> <i class="nodeSwitch"></i> <span class="tree-checkbox"><input class="input" type="checkbox" checked="checked" data-type="categoryId"><span class="box"></span></span><span class="tree-text">'+ data[i].speciality +'</span> </div> <ul class="treeViewSub">'+ getCategory(data[i].categories) +'</ul></li>'
+    for(var j=0,len=data.length;j<len;j++){
+      if(data[j].specialty == '其他专业'){
+        template += getCategory(data[j].categories);
+      }else{
+        template += '<li class="itemNode"> <div class="item-content"> <i class="nodeSwitch"></i> <span class="tree-checkbox"><input class="input" type="checkbox" checked="checked" data-type="categoryId"><span class="box"></span></span><span class="tree-text">'+ data[j].specialty +'</span> </div> <ul class="treeViewSub">'+ getCategory(data[j].categories) +'</ul></li>'
+      }
     }
     template +="</ul>";
     rootDom.innerHTML = template;
@@ -801,7 +836,10 @@ BIM.TREE.prototype = {
       var e = event || event,
           that = e.target,
           cl = that.getAttribute('class') || '',
-          viewer = BIM.common.self;
+          viewer = BIM.common.self,
+          sFiles = BIM.util.getAttr(_self.specialitys,'','input','data-files',false).ids,
+          fFiles = BIM.util.getAttr(_self.specialitys,'','input','data-files',false),
+          allFiles = sFiles.concat(fFiles).unique();
       if('nodeSwitch' == cl){
         var parent = that.parentNode;
         BIM.util.toggleClass(parent,'open');
@@ -816,11 +854,24 @@ BIM.TREE.prototype = {
         flag ? viewer.highlight(result) : viewer.downplay(result);
       }else if(cl == 'box'){
         var flag = !BIM.util.prev(that).checked;
+        var type = BIM.util.prev(that).getAttribute('data-type');
         BIM.util.selectAll(that,'itemNode','input',function(element){
           element.checked = flag;
         });
         var result = BIM.util.getAttr(that,'itemNode','input','data-files');
-        flag ? viewer.show(result) : viewer.hide(result);
+        if(flag){
+          if(type == 'sceneId'){
+            result ={
+              type:'sceneId',
+              ids:BIM.util.getFiles(_self.floor).concat(BIM.util.getFiles(_self.specialitys)).unique()
+            }
+            viewer.showScend(result);
+          }else{
+            viewer.show(result);
+          }
+        }else{
+          viewer.hide(result);
+        }
       }
     })
   },

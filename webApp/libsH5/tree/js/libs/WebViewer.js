@@ -17278,7 +17278,7 @@ CLOUD.SubSceneLoader.prototype = {
                                 trfLocal.fromArray(objJSON.matrix);
                             }
                             if (trf) {
-                                trfLocal.updateMatrixWorld(trf, trfLocal);
+                                trfLocal.multiplyMatrices(trf, trfLocal.clone());
                             }
 
                             object = CLOUD.GeomUtil.parsePGeomNodeInstance(symbolJSON, matObj, trfLocal);
@@ -17410,8 +17410,14 @@ CLOUD.SceneLoader.prototype = {
                 if (userId !== undefined)
                     objJSON.userId = userId;
 
-                if (objJSON.userData)
+                if (objJSON.userData) {
                     userData = objJSON.userData;
+
+                    // TODO: REMOVE
+                    if (!userData.categoryId)
+                        userData.categoryId = "0";
+                }
+
 
                 var object;
 
@@ -17906,7 +17912,9 @@ CLOUD.TaskWorker = function (threadCount) {
 
         var items = this.items;
         var itemCount = items.length;
-        if (this.activeTaskCount == 0 && itemCount > 0) {
+
+
+        if (this.activeTaskCount <= 0 && itemCount > 0) {
 
             if (sorter) {
                 items.sort(sorter);
