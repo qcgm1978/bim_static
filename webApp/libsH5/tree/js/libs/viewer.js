@@ -1,5 +1,4 @@
 /**
- * @require /libs/tree/js/libs/inflate.min.js
   * @require /libs/tree/js/libs/three.min.js
    * @require /libs/tree/js/libs/WebViewer.min.js
  */
