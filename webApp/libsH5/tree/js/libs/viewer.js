@@ -729,14 +729,20 @@ BIM.prototype = {
     });
     viewer.render();
   },
-  show:function(obj){
+  showScend:function(obj){
     var viewer = BIM.common.viewer;
     var filter = viewer.getFilters();
-    // console.log(obj)
-    // filter.removeUserFilter(obj.ids,obj.ids[0]);
     filter.removeUserFilter(obj.type);
     BIM.util.getFilter(obj.ids,function(id){
       filter.addUserFilter(obj.type,id);
+    });
+    viewer.render();
+  },
+  show:function(obj){
+    var viewer = BIM.common.viewer;
+    var filter = viewer.getFilters();
+    BIM.util.getFilter(obj.ids,function(id){
+      filter.removeUserFilter(obj.type,id);
     });
     viewer.render();
   },
@@ -848,17 +854,22 @@ BIM.TREE.prototype = {
         flag ? viewer.highlight(result) : viewer.downplay(result);
       }else if(cl == 'box'){
         var flag = !BIM.util.prev(that).checked;
+        var type = BIM.util.prev(that).getAttribute('data-type');
         BIM.util.selectAll(that,'itemNode','input',function(element){
           element.checked = flag;
         });
+        var result = BIM.util.getAttr(that,'itemNode','input','data-files');
         if(flag){
-          var result ={
-            type:'sceneId',
-            ids:BIM.util.getFiles(_self.floor).concat(BIM.util.getFiles(_self.specialitys)).unique()
+          if(type == 'sceneId'){
+            result ={
+              type:'sceneId',
+              ids:BIM.util.getFiles(_self.floor).concat(BIM.util.getFiles(_self.specialitys)).unique()
+            }
+            viewer.showScend(result);
+          }else{
+            viewer.show(result);
           }
-          viewer.show(result);
         }else{
-          var result = BIM.util.getAttr(that,'itemNode','input','data-files');
           viewer.hide(result);
         }
       }
