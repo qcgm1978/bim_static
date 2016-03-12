@@ -50,11 +50,7 @@ App.Project.leftNav = Backbone.View.extend({
 			}
 		 
 			this.fetchModelIdByProject(); 
-			// new BIM({
-			// 	element: $("#projectContainer .modelContainerContent")[0],
-			// 	projectId: 'n4',
-			// 	tools: true
-			// });
+			 
 		}
 
 	},
@@ -117,6 +113,8 @@ App.Project.leftNav = Backbone.View.extend({
 				tools: true,
 				treeElement: $("#projectContainer .projectNavModelContainer")[0]
 			});
+
+			App.Project.Settings.Viewer=viewer;
 
 			viewer.on("click", function(model) {
 			 	App.Project.Settings.ModelObj=null;

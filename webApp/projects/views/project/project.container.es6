@@ -171,6 +171,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			}, 500, function() {
 				$leftNav.find(".dragSize").show().end().find(".slideBar i").toggleClass('icon-caret-left icon-caret-right');
 				$("#projectContainer .projectCotent").css("margin-left", $leftNav.width());
+				App.Project.Settings.Viewer.resize();
 			});
 
 		} else {
@@ -180,6 +181,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			}, 500, function() {
 				$leftNav.find(".dragSize").hide().end().find(".slideBar i").toggleClass('icon-caret-left icon-caret-right');
 				$("#projectContainer .projectCotent").css("margin-left", 0);
+				App.Project.Settings.Viewer.resize();
 			});
 
 		}
@@ -198,6 +200,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			}, 500, function() {
 				$rightProperty.find(".dragSize").show().end().find(".slideBar i").toggleClass('icon-caret-left icon-caret-right');
 				$("#projectContainer .projectCotent").css("margin-right", $rightProperty.width());
+				App.Project.Settings.Viewer.resize();
 			});
 
 		} else {
@@ -207,6 +210,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			}, 500, function() {
 				$rightProperty.find(".dragSize").hide().end().find(".slideBar i").toggleClass('icon-caret-left icon-caret-right');
 				$("#projectContainer .projectCotent").css("margin-right", 0);
+				App.Project.Settings.Viewer.resize();
 			});
 
 		}
@@ -263,6 +267,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			} else {
 				$("#projectContainer .projectCotent").css(mPos, leftNavWidth);
 			}
+			App.Project.Settings.Viewer.resize();
 		});
 
 		return false;
