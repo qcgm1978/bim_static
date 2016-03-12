@@ -94,20 +94,20 @@ BIM.common = {
         fn:'fit',
         key:'I'
       },
-      // {
-      //   id:'zoomIn',
-      //   icon:'bar-zoomIn',
-      //   title:'放大(X)',
-      //   fn:'zoomIn',
-      //   key:'X'
-      // },
-      // {
-      //   id:'zoomOut',
-      //   icon:'bar-zoomOut',
-      //   title:'缩小(Z)',
-      //   fn:'zoomOut',
-      //   key:'Z'
-      // },
+      {
+        id:'zoomIn',
+        icon:'bar-zoomIn',
+        title:'放大(X)',
+        fn:'zoomIn',
+        key:'X'
+      },
+      {
+        id:'zoomOut',
+        icon:'bar-zoomOut',
+        title:'缩小(Z)',
+        fn:'zoomOut',
+        key:'Z'
+      },
       {
         id:'divide'
       },
@@ -602,7 +602,6 @@ BIM.prototype = {
   home : function () {
     BIM.util.pub('home');
     BIM.common.viewer.setStandardView(CLOUD.EnumStandardView.ISO);
-    BIM.common.bimBox.className = 'bim normal';
   },
   select : function () {
     BIM.util.pub('select');

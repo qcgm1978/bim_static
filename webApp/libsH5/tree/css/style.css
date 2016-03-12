@@ -67,11 +67,11 @@
 }
 .sub-bar.camera-bar{
   left:62px;
-  top:199px;
+  top:276px;
 }
 .sub-bar.cross-panel{
   left:62px;
-  top:235px;
+  top:313px;
   width:220px;
   background-color:rgba(0,0,0,.8);
   z-index:2;
