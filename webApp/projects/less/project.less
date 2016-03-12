@@ -89,9 +89,8 @@
 					&.zIndex { position: relative; z-index: 1; }
 					.inlineBlock { display: inline-block; }
 					.filecKAll { width: 5%; text-align: center; }
-					 
 					.fileName { width: 48%;
-						.fileType {margin-right: 10px; display: inline-block; margin-top: 5px; vertical-align: top; width: 35px; height: 30px; background: url('/projects/images/fileicon.png') no-repeat;
+						.fileType { margin-right: 10px; display: inline-block; margin-top: 5px; vertical-align: top; width: 35px; height: 30px; background: url('/projects/images/fileicon.png') no-repeat;
 							&.file { background-position: 0px -39px; }
 						}
 						.text { cursor: pointer;
@@ -120,7 +119,7 @@
 		.dragSize { position: absolute; top: 0px; bottom: 0px; width: 10px; right: -6px; cursor: col-resize; z-index: 999; display: none; }
 		.slideBar { width: 15px; height: 32px; right: -15px; z-index: 99; position: absolute; display: none; background-color: #fff; border: 2px #ccc solid; line-height: 26px; box-sizing: border-box; padding-left: 2px; cursor: pointer; }
 		.rightPropertyContentBox { .dragSize { left: -5px; right: inherit; display: block; }
-			.slideBar { right: inherit; display: block; left: -15px; top:40px;}
+			.slideBar { right: inherit; display: block; left: -15px; top: 40px; }
 		}
 	}
 }
@@ -205,6 +204,9 @@
 }
 .rightPropertyContentBox { .rightPropertyContent { height: 100%;
 		.designPropetyBox { height: 100%;
+			.projectPropetyContainer { .designProperties { .nullTip { background: url(/projects/images/attrSel.png) no-repeat 50% 100%; padding-top: 200px; height: 50px; line-height: 50px; color: #ccc; font-size: 16px; text-align: center; }
+				}
+			}
 			.projectNavContentBox { position: absolute; top: 40px; bottom: 0px; left: 0px; right: 0px; overflow: auto; }
 		}
 	}

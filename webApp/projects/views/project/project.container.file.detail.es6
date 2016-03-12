@@ -39,7 +39,7 @@ App.Project.FileContainerDetail=Backbone.View.extend({
 
 				$nodeSwitch=$leftItem.parent().find(".nodeSwitch");
 
-				if ($nodeSwitch.length>0  && $nodeSwitch.text()=="+" ) {
+				if ($nodeSwitch.length>0  && !$nodeSwitch.hasClass('on') ) {
 					$nodeSwitch.click();
 				}
 				$leftItem.click(); 

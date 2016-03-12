@@ -45,9 +45,9 @@ App.Comm.TreeViewMar.prototype.TreeViewBuild = function() {
 			var $el = $(event.target),
 				switchStatus = $el.data('status');
 			if (switchStatus) {
-				$el.text("+").data("status", 0).closest("li").children("ul").hide();
+				$el.data("status", 0).removeClass('on').closest("li").children("ul").hide();
 			} else {
-				$el.text("-").data("status", 1).closest("li").children("ul").show();
+				$el.addClass('on').data("status", 1).closest("li").children("ul").show();
 			}
 		},
 		//点击单个
@@ -119,7 +119,7 @@ App.Comm.TreeViewMar.prototype.treeNode = function(item) {
 	sb.Append('<div class="item-content"> ');
 
 	if (item.children) {
-		sb.Append('<i class="nodeSwitch">+</i> ');
+		sb.Append('<i class="nodeSwitch"></i> ');
 	} else {
 		sb.Append('<i class="noneSwitch"></i> ');
 	}

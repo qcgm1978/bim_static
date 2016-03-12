@@ -13,7 +13,7 @@ App.Project.DesignCollision=Backbone.View.extend({
 	template:_.templateUrl("/projects/tpls/project/design/project.design.property.collision.html"),
 
 	render:function(){ 
-		this.$el.html("正在加载，请稍后……");
+		this.$el.html("");
 		return this;
 	},
 

@@ -13,7 +13,7 @@ App.Project.DesignProperties=Backbone.View.extend({
 	template:_.templateUrl("/projects/tpls/project/design/project.design.property.properties.html"),
 
 	render:function(){ 
-		this.$el.html("正在加载，请稍后……");
+		this.$el.html('<div class="nullTip">请选择构件</div>');
 		return this;
 	},
 

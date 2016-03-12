@@ -19,8 +19,11 @@
 	.noneSwitch{float:left;border-bottom:1px #ccc solid;width:13px;height:10px;}
 }
 .treeViewMar{margin-top:15px;margin-left:15px;
-	.nodeSwitch{border:1px #ccc solid;display:inline-block;width:12px;height:12px;line-height:8px;vertical-align:top;text-align:center;cursor:pointer;}
-	.noneSwitch{display:inline-block;width:12px;height:13px;}
+	.nodeSwitch{background: url(../images/comm/images/commIcon.png) no-repeat 0px -39px;margin-top: 1px;
+		display:inline-block;width:12px;height:10px;line-height:8px;vertical-align:top;text-align:center;cursor:pointer;
+		&.on{background-position: 0px -49px;}
+	}
+	 
 	.item-content{height:22px;position: relative;min-width: 236px;
 		.folderIcon{display:inline-block;width:23px;height:16px;background:url('/comm/images/folderIcon.png') no-repeat 2px -2px;vertical-align:top;}
 	}

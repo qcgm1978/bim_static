@@ -13,7 +13,7 @@ App.Project.DesignVerification=Backbone.View.extend({
 	template:_.templateUrl("/projects/tpls/project/design/project.design.property.verification.html"),
 
 	render:function(){
-		this.$el.html("正在加载，请稍候……");
+		this.$el.html("");
 		return this;
 	},
 

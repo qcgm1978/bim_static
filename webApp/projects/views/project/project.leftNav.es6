@@ -94,11 +94,14 @@ App.Project.leftNav = Backbone.View.extend({
 
 			//拖拽和收起
 			$("#projectContainer .leftNav").find(".slideBar").show().end().find(".dragSize").show();
-
 			var $projectCotent = $("#projectContainer .projectCotent"),
-				mRight = $projectCotent.data("mRight");
-			if (mRight) {
+				mRight = $projectCotent.data("mRight"); 
+
+			if (mRight && mRight!="0px") {
+
 				$projectCotent.css("margin-right", mRight);
+			}else{
+				$projectCotent.removeAttr("style");
 			}
 
 			$("#projectContainer").find(".projectModelNavContent .mCS_no_scrollbar_y").width(800);
