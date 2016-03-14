@@ -7,10 +7,12 @@ var AppRoute = Backbone.Router.extend({
 		'projects/:id': 'project',
 		'flow': 'flow',
 		'resources': 'resources',
+		'resources/:type':'resource',
 		'console': 'console',
 		'list/:id': 'list'
 	},
 
+	//待办
 	todo: function() {
 		//销毁上传
 		App.Comm.upload.destroy();
@@ -21,7 +23,7 @@ var AppRoute = Backbone.Router.extend({
 		App.Todo.init();
 	},
 
-
+	//项目
 	projects: function() {
 		//销毁上传
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".projects").addClass('selected');
@@ -33,7 +35,7 @@ var AppRoute = Backbone.Router.extend({
 
 	},
 
-
+	//单个项目
 	project: function(id) {
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".projects").addClass('selected');
 		_.require('/static/dist/projects/projects.css');
@@ -42,7 +44,7 @@ var AppRoute = Backbone.Router.extend({
 		App.Project.init();
 	},
 
-
+	//流程
 	flow: function() {
 		//销毁上传
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".flow").addClass('selected');
@@ -53,14 +55,28 @@ var AppRoute = Backbone.Router.extend({
 
 	},
 
+	//资源库
 	resources: function() {
 		//销毁上传
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".resources").addClass('selected');
-
-		$("#contains").html("resources");
+		_.require('/static/dist/resources/resources.css');
+		_.require('/static/dist/resources/resources.js');
+		App.Resources.init(); 
+		//$("#contains").html("resources");
 
 	},
 
+	//单个项目
+	resource:function(type){
+		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".resources").addClass('selected');
+		_.require('/static/dist/resources/resources.css');
+		_.require('/static/dist/resources/resources.js'); 
+		App.ResourcesNav.Settings.type=type;
+		App.ResourcesNav.init();
+	},
+
+
+	//貌似改掉了
 	console: function() {
 		//销毁上传
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".console").addClass('selected');

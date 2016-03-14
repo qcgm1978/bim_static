@@ -4,6 +4,7 @@
 .right { float: right; }
 .left { float: left; }
 .clear { clear: both; }
+.myHidden{display: none;}
 
 /* bootstrap  */
 .txtInput { height: 30px; padding: 6px 8px; outline: none; font-size: 14px; line-height: 1.2; color: #666; background-color: #fff; border: 1px solid #ccc; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box; }
@@ -38,3 +39,40 @@
 .myIcon-upload { display: inline-block; vertical-align: middle; width: 17px; height: 15px; background: url(../images/comm/images/commIcon.png) no-repeat 0px -280px; }
 .myIcon-download { display: inline-block; vertical-align: middle; width: 17px; height: 15px; background: url(../images/comm/images/commIcon.png) no-repeat 0px -299px; }
 .relative { position: relative; }
+/*  面包屑导航  */
+.breadcrumbNav { line-height: 37px; padding-left: 20px; font-size: 14px; position: relative;
+	.projectText, .breadItem { float: left; }
+	.breadItem { margin-left: 6px;
+		.icon-angle-right { font-size: 16px; margin-left: 6px; }
+		.breadItemText { margin-left: 6px; cursor: pointer;
+			.icon-sort-down { font-size: 16px; margin-left: 11px; vertical-align: 2px; }
+		}
+		.projectList, .projectVersionList { display: none;
+			.container { width: 100%; padding: 10px; padding-top: 0px;
+				.header { margin-top: 5px; height: 26px; line-height: 26px; font-size: 12px; background-color: #f2f2f2; padding-left: 12px; }
+				.item { display: block; cursor: pointer; height: 26px; line-height: 26px; font-size: 12px; padding-left: 12px; color: #A599B2; margin-top: 5px;
+					&:hover { background-color: #A8DBFD; }
+				}
+			}
+			.loading { text-align: center; color: #ccc; }
+		}
+		.projectList { position: absolute; width: 236px; background-color: #fff; max-height: 420px; overflow-y: auto; border: 1px #ccc solid; top: 32; left: 0px;
+			.txtSearch { margin: 5px 10px 1px 10px; width: 214px; }
+		}
+		.projectVersionList { position: absolute; top: 32px; border: 1px #ccc solid; background-color: #fff; left: 0px; width: 288px; max-height: 378px;
+			.listContent { display: none;
+				.changeVersionBox { display: none; }
+				.nav { border: 1px #ccc solid; border: 1px #ccc solid; margin: 0px 10px; background-color: #f5f5f5; font-size: 12px; margin-top: 5px;
+					.item { display: block; cursor: pointer; float: left; height: 24px; line-height: 24px; width: 132px; text-align: center;
+						&.selected { background-color: #dadada; color: #a9a9a9; }
+					}
+				}
+				.txtSearch { margin: 5px 10px 1px 10px; width: 265px; }
+				.vName { width: 92px; margin-right: 8px; }
+				.vStatus { width: 60px; margin-right: 5px; }
+				.vDate { width: 76px; margin-left: 3px; }
+			}
+		}
+	}
+	.allProject { cursor: pointer }
+}
