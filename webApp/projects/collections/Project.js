@@ -356,10 +356,11 @@ App.Project = {
 				//清空数据
 				App.Project.FileCollection.reset();
 				$(".fileContainerScroll .fileContent").empty();
-				App.Project.Settings.fileId = file.id;
+				App.Project.Settings.fileId = file.fileVersionId;
+				
 				App.Project.FileCollection.fetch({
 					data: {
-						parentId: file.id
+						parentId: file.fileVersionId
 					}
 				});
 			}
