@@ -81,7 +81,7 @@ var AppRoute = Backbone.Router.extend({
 		_.require('/static/dist/resources/resources.css');
 		_.require('/static/dist/resources/resources.js'); 
 		App.ResourcesNav.Settings.type=App.ResourceModel.Settings.type=type;
-		App.ResourceModel.Settings.id=id;
+		App.ResourceModel.Settings.id=id; 
 		App.ResourceModel.init();
 	},
 

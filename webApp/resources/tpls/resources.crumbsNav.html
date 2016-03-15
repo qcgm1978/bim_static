@@ -1,15 +1,16 @@
 <div class="breadcrumbNav">
     <span class="projectText"><a href="#resources">资源库</a></span>
     <span class="breadItem project relative"> <i class="icon-angle-right"></i> 
-           <span class="breadItemText"> <span class="text"><%= App.ResourcesNav.getNameByType() %></span> </span>
+            <% var obj=App.ResourcesNav.getNameByType(); %>
+           <span class="breadItemText"> <a href="<%=obj.href%>" class="text"><%= obj.name %></a> </span>
     <div class="projectList">
         <div class="loading">正在加载，请稍候……</div>
         <div class="listContent">
         </div>
     </div>
     </span>
-    <span class="breadItem projectVersion relative <%= App.ResourceModel.Settings.libsId ? '':'myHidden' %>"> <i class="icon-angle-right"></i> 
-           <span class="breadItemText"> <span class="text"><%=App.ResourceModel.Settings.libsName%></span> </i></span>
+    <span class="breadItem projectVersion relative <%= App.ResourceModel.Settings.CurrentVersion.projectId ? '':'myHidden' %>"> <i class="icon-angle-right"></i> 
+           <span class="breadItemText"> <span class="text"><%=App.ResourceModel.Settings.CurrentVersion.projectName%></span> </i></span>
     <div class="projectVersionList">
         <div class="listContent">
         </div>
@@ -17,8 +18,8 @@
     </span>
 
 
-     <span class="breadItem projectVersion relative <%= App.ResourceModel.Settings.libsVersionId ? '':'myHidden' %>"> <i class="icon-angle-right"></i> 
-           <span class="breadItemText"> <span class="text"><%=App.ResourceModel.Settings.libsVersionName%></span> </span>
+     <span class="breadItem projectVersion relative <%= App.ResourceModel.Settings.CurrentVersion.id ? '':'myHidden' %>"> <i class="icon-angle-right"></i> 
+           <span class="breadItemText"> <span class="text"><%=App.ResourceModel.Settings.CurrentVersion.name%></span> </span>
     <div class="projectVersionList">
         <div class="listContent">
         </div>

@@ -66,6 +66,7 @@ App.API = {
 		fetchStandardLibs: "platform/lib/standardModel", //获取 标准模型库
 		fetchFamLibs: "platform/lib/component", //获取族库
 		fetchStandardVersion:"platform/lib/standardModel/{standardModelId}/version",
+		fetchFileTree: "doc/{projectId}/{projectVersionId}/file/tree", //项目设计文件导航 
 
 
 
@@ -121,6 +122,7 @@ App.API = {
 		fetchStandardLibs: "/dataJson/resources/StandardLibs.json",//获取 标准模型库
 		fetchFamLibs: "/dataJson/resources/StandardLibs.json", //获取族库
 		fetchStandardVersion:"/dataJson/resources/fetchStandardVersion.json",
+		fetchFileTree: "/dataJson/project/project.design.file.json", //项目设计文件导航
 
 		test: ""
 

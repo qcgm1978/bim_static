@@ -4,15 +4,34 @@ App.ResourceModel = {
 		type: "", //模型类型
 		id: "", //模型id
 		pageIndex: 1,
-		CurrentVersion: null,
-		libsId: "",
-		libsName: "", //模型库的名称
-		libsVersionId: "",
-		libsVersionName: "", //模型版本名称
+		CurrentVersion: {}	 
 	},
+
+	// 文件 容器
+	FileCollection: new(Backbone.Collection.extend({
+
+
+		model: Backbone.Model.extend({
+			defaults: function() {
+				return {
+					title: ""
+				}
+			}
+		}),
+
+		urlType: "fetchFileList",
+
+		parse: function(responese) {
+			if (responese.message == "success") {
+				return responese.data;
+			}
+		}
+
+	})),
 
 	//初始化
 	init: function() {
+		 
 		App.ResourceModel.Settings.pageIndex = 1; 
 		App.ResourceModel.getVersion(); 
 	},
@@ -38,11 +57,7 @@ App.ResourceModel = {
 				for (var i = 0; i < vCount; i++) {
 					Version = Versions[i];
 					if (Version.lastest) {
-						App.ResourceModel.Settings.CurrentVersion = Version;
-						App.ResourceModel.Settings.libsId = Version.projectId;
-						App.ResourceModel.Settings.libsName = Version.projectName; //模型库的名称
-						App.ResourceModel.Settings.libsVersionId = Version.id;
-						App.ResourceModel.Settings.libsVersionName = Version.name; //模型版本名称
+						App.ResourceModel.Settings.CurrentVersion = Version; 
 					}
 				}
 
@@ -52,6 +67,9 @@ App.ResourceModel = {
 				}else{
 					//渲染数据
 					new App.ResourceModel.App().render();
+					App.ResourceModel.FileCollection.projectId=App.ResourceModel.Settings.CurrentVersion.projectId;
+					App.ResourceModel.FileCollection.projectVersionId=App.ResourceModel.Settings.CurrentVersion.id;
+					App.ResourceModel.FileCollection.fetch();
 				}
 
 

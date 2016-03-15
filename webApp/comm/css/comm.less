@@ -39,6 +39,9 @@
 .myIcon-upload { display: inline-block; vertical-align: middle; width: 17px; height: 15px; background: url(../images/comm/images/commIcon.png) no-repeat 0px -280px; }
 .myIcon-download { display: inline-block; vertical-align: middle; width: 17px; height: 15px; background: url(../images/comm/images/commIcon.png) no-repeat 0px -299px; }
 .relative { position: relative; }
+.btnNormal { padding: 4px 12px; display: inline-block; border: 1px #ccc solid; cursor: pointer; margin-right: 3px;
+	i { color: #85B200; font-size: 20px; vertical-align: -3px; margin-right: 5px; }
+}
 
 /*  面包屑导航  */
 .breadcrumbNav { line-height: 37px; padding-left: 20px; font-size: 14px; position: relative;
@@ -89,4 +92,25 @@
 		/* 设计 */
 		.designVerification, .designProperties { display: none; }
 	}
+}
+
+/* list */
+.fileContent, .fileContentHeader { border: 1px #ccc solid; margin-top: 10px; border-bottom: 0;
+	&.zIndex { position: relative; z-index: 1; }
+	.inlineBlock { display: inline-block; }
+	.filecKAll { width: 5%; text-align: center; }
+	.fileName { width: 48%;
+		.fileType { margin-right: 10px; display: inline-block; margin-top: 5px; vertical-align: top; width: 35px; height: 30px; background: url('/projects/images/fileicon.png') no-repeat;
+			&.file { background-position: 0px -39px; }
+		}
+		.text { cursor: pointer;
+			&:hover { text-decoration: underline; }
+		}
+	}
+	.fileStatus { width: 11%; }
+	.fileOp { width: 11%; }
+	.fileSize { width: 11%; }
+	.fileDate { width: 11%; }
+	.header, .item { height: 38px; line-height: 38px; border-bottom: 1px #ccc solid; }
+	.header { background-color: #eee; }
 }

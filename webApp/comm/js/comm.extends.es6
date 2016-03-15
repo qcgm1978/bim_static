@@ -52,7 +52,7 @@ _.require = function(url) {
 
 
 	if (type == "js") {
-		$("head").append('<script type="text/javascript" src="' + url + '" id="todoJs"></script>');
+		$("head").append('<script type="text/javascript" src="' + url + '"></script>');
 	} else if (type = "css") {
 		$("head").append('<link rel="styleSheet" href="' + url + '" />');
 	}
