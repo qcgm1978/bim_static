@@ -308,7 +308,7 @@
     background-position: 0 -224px;
 }
 
-.bar-walk.selected {
+.bar-fly.selected {
     background-position: -32px -224px;
 }
 
@@ -487,6 +487,13 @@
 }
 .bar-section-rotatey{
     background-position: 0 -992px;
+}
+
+.bar-viewpoint{
+  background-position:0 -1120px;
+}
+.bar-viewpoint.selected{
+  background-position:-32px -1120px;
 }
 
 #keyControlPanel{
