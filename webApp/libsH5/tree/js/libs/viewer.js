@@ -142,7 +142,7 @@ BIM.common = {
       {
         id:'section',
         icon:'bar-section',
-        title:'切面(P)',
+        title:'剖面(P)',
         fn:'section',
         key:'P'
       },
@@ -153,9 +153,15 @@ BIM.common = {
         fn:'fly',
         key:'F'
       },
-      /*{
+      {
         id:'divide'
-      },*/
+      },
+      {
+        id:'viewpoint',
+        icon:'bar-viewpoint',
+        title:'视点',
+        fn:'getCamera'
+      }
       /*{
         id:'fullScreen',
         icon:'bar-fullScreen',
