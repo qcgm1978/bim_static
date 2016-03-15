@@ -9,6 +9,7 @@ App.ResourceModel.ListNavDetail=Backbone.View.extend({
 	template:_.templateUrl("/resources/tpls/resourceModel/resource.model.list.nav.detail.html"),
 
 	render:function(){
+		 
 		this.$el.html(this.template(this.model.toJSON()));
 		return this;
 	}

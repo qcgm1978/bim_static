@@ -23,8 +23,13 @@ App.ResourceModel.ListNav=Backbone.View.extend({
 
 	//添加单个文件
 	addOneFile:function(model){
-		var data=model.toJSON();
-		this.$el.find(".fileListsUl").append(new App.ResourceModel.ListNavDetail(model).render().el);
+
+
+		var view=new App.ResourceModel.ListNavDetail({
+			model:model
+		});  
+		 
+		this.$el.find(".fileContent").append(view.render().el);
 	}
 
 });
