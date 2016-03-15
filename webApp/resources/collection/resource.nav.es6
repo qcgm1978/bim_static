@@ -3,7 +3,7 @@ App.ResourcesNav = {
 	Settings: {
 		pageIndex: 1,
 		type: "", // 库的类型 
-		
+
 	},
 
 	//标准模型库
@@ -48,10 +48,19 @@ App.ResourcesNav = {
 	},
 
 	init() {
-		App.ResourcesNav.Settings.pageIndex=1; 
+		App.ResourcesNav.reset();
 		new App.ResourcesNav.App().render();
-	}  
+	},
 
-
+	//重置数据
+	reset: function() {
+		App.ResourcesNav.Settings.pageIndex = 1;
+		if (App.ResourceModel) {
+			App.ResourceModel.Settings.CurrentVersion = null;
+			App.ResourceModel.Settings.libsId = null;
+			App.ResourceModel.Settings.libsName = null; //模型库的名称
+			App.ResourceModel.Settings.libsVersionId = null;
+			App.ResourceModel.Settings.libsVersionName = null; //模型版本名称} 
+		}
+	}
 }
- 

@@ -2,7 +2,7 @@ App.API = {
 
 	Settings: {
 		hostname: "http://bim.wanda.cn/",
-		debug: true
+		debug: false
 	},
 
 	URL: {
@@ -63,8 +63,9 @@ App.API = {
 
 
 		//资源
-		fetchStandardLibs: "", //获取 标准模型库
-		fetchFamLibs: "", //获取族库
+		fetchStandardLibs: "platform/lib/standardModel", //获取 标准模型库
+		fetchFamLibs: "platform/lib/component", //获取族库
+		fetchStandardVersion:"platform/lib/standardModel/{standardModelId}/version",
 
 
 
@@ -119,7 +120,7 @@ App.API = {
 		//资源
 		fetchStandardLibs: "/dataJson/resources/StandardLibs.json",//获取 标准模型库
 		fetchFamLibs: "/dataJson/resources/StandardLibs.json", //获取族库
-
+		fetchStandardVersion:"/dataJson/resources/fetchStandardVersion.json",
 
 		test: ""
 

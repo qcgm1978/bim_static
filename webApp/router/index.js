@@ -80,7 +80,7 @@ var AppRoute = Backbone.Router.extend({
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".resources").addClass('selected');
 		_.require('/static/dist/resources/resources.css');
 		_.require('/static/dist/resources/resources.js'); 
-		App.ResourceModel.Settings.type=type;
+		App.ResourcesNav.Settings.type=App.ResourceModel.Settings.type=type;
 		App.ResourceModel.Settings.id=id;
 		App.ResourceModel.init();
 	},

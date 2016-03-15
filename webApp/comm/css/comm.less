@@ -4,7 +4,7 @@
 .right { float: right; }
 .left { float: left; }
 .clear { clear: both; }
-.myHidden{display: none;}
+.myHidden { display: none; }
 
 /* bootstrap  */
 .txtInput { height: 30px; padding: 6px 8px; outline: none; font-size: 14px; line-height: 1.2; color: #666; background-color: #fff; border: 1px solid #ccc; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box; }
@@ -39,6 +39,7 @@
 .myIcon-upload { display: inline-block; vertical-align: middle; width: 17px; height: 15px; background: url(../images/comm/images/commIcon.png) no-repeat 0px -280px; }
 .myIcon-download { display: inline-block; vertical-align: middle; width: 17px; height: 15px; background: url(../images/comm/images/commIcon.png) no-repeat 0px -299px; }
 .relative { position: relative; }
+
 /*  面包屑导航  */
 .breadcrumbNav { line-height: 37px; padding-left: 20px; font-size: 14px; position: relative;
 	.projectText, .breadItem { float: left; }
@@ -75,4 +76,17 @@
 		}
 	}
 	.allProject { cursor: pointer }
+}
+
+/*  left nav */
+.projectNav { padding-left: 10px; background-color: #ddd; height: 40px; border-bottom: 1px #ccc solid; font-size: 12px; color: #666;
+	.item { float: left; line-height: 30px; height: 30px; margin-right: 10px; width: 80px; border: 1px #ddd solid; text-align: center; margin-top: 10px; cursor: pointer;
+		&:hover { border-color: #ccc; color: #333; }
+		&.selected { color: #333; border: 1px #ccc solid; border-top-width: 2px; border-top-color: #3e78e6; border-bottom-color: #fff; background-color: #fff; }
+	}
+	.projectNavContentBox { margin-top: 1px; position: absolute; top: 40px; width: 100%; bottom: 0px; overflow: auto;
+
+		/* 设计 */
+		.designVerification, .designProperties { display: none; }
+	}
 }
