@@ -8,6 +8,7 @@ var AppRoute = Backbone.Router.extend({
 		'flow': 'flow',
 		'resources': 'resources',
 		'resources/:type':'resource',
+		'resources/:type/:id':'resourceModel',
 		'console': 'console',
 		'list/:id': 'list'
 	},
@@ -73,6 +74,15 @@ var AppRoute = Backbone.Router.extend({
 		_.require('/static/dist/resources/resources.js'); 
 		App.ResourcesNav.Settings.type=type;
 		App.ResourcesNav.init();
+	},
+
+	resourceModel:function(type,id){
+		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".resources").addClass('selected');
+		_.require('/static/dist/resources/resources.css');
+		_.require('/static/dist/resources/resources.js'); 
+		App.ResourceModel.Settings.type=type;
+		App.ResourceModel.Settings.id=id;
+		App.ResourceModel.init();
 	},
 
 

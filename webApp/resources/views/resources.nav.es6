@@ -10,7 +10,7 @@ App.ResourcesNav.App = Backbone.View.extend({
 
 	render() {
 
-
+		 
 		this.$el.html(new App.ResourceCrumbsNav().render().el);
 
 		var type = App.ResourcesNav.Settings.type;
@@ -21,13 +21,36 @@ App.ResourcesNav.App = Backbone.View.extend({
 			//重置 和 加载数据
 			App.ResourcesNav.StandardLibsCollection.reset();
 
+			var that = this;
 			App.ResourcesNav.StandardLibsCollection.fetch({
-				data: { 
+				data: {
 					pageIndex: App.ResourcesNav.Settings.pageIndex,
 					pageItemCount: App.Comm.Settings.pageItemCount
 				},
 				success: function(collection, response, options) {
-					console.log(response);
+
+					var $standardLibs = $("#standardLibs"),
+						$standarPagination, pageCount = response.data.totalItemCount;
+					//todo 分页
+
+					$standarPagination = $standardLibs.find(".standarPagination");
+					$standardLibs.find(".sumDesc").html('共 ' + pageCount + ' 个标准模型');
+
+					$standarPagination.pagination(pageCount, {
+						items_per_page: response.data.pageItemCount,
+						current_page: response.data.pageIndex - 1,
+						num_edge_entries: 3, //边缘页数
+						num_display_entries: 5, //主体页数
+						link_to: 'javascript:void(0);',
+						itemCallback: function(pageIndex) {
+							//加载数据
+							App.ResourcesNav.Settings.pageIndex = pageIndex + 1;
+							that.onlyLoadStandardLibsData();
+						},
+						prev_text: "上一页",
+						next_text: "下一页"
+
+					});
 				}
 			});
 
@@ -51,21 +74,12 @@ App.ResourcesNav.App = Backbone.View.extend({
 	//只是加载数据
 	onlyLoadStandardLibsData: function() {
 
+		//$("#standardLibs").find(".standarBody .standar").empty();
 
-
-		App.Projects.ProjectCollection.fetch({
-
+		App.ResourcesNav.StandardLibsCollection.fetch({ 
 			data: {
-				projectType: 1,
-				name: "",
-				estateType: "",
-				province: "",
-				region: "",
-				complete: "",
-				open: "",
-				openTimeStart: "",
-				openTimEnd: ""
-
+				pageIndex: App.ResourcesNav.Settings.pageIndex,
+				pageItemCount: App.Comm.Settings.pageItemCount 
 			}
 		});
 	},

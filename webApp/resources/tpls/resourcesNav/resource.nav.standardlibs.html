@@ -8,29 +8,12 @@
 </ul>
 <div class="standarBody">
 
-<% var itemCount=obj.length,item; %>
+
 
     <ul class="standar">
-    <% if(itemCount>0){%>
-
-    	<% for(var i=0;i<itemCount;i++){%>
-    	  <li class="item">
-    		<% item=obj[i]; %>
-    		  <span class="title">
-    		  	<img src="/projects/images/proDefault.png" />
-    		  	<a href="###"><%= item.name%>	</a> 
-
-    		  </span>
-        <span class="designUnit"><%= item.designUnit%>	</span>
-        <span class="createDate"><%=  new Date(item.createTime).format("yyyy-MM-dd")%>	</span>
-        <span class="lastModifiedDate"><%=  new Date(item.updateTime).format("yyyy-MM-dd")%>	</span>
-        </li>
-    	<%}%>
-
-    <%}else{%>
-    	<li class="null">无数据</li>
-    <%}%>
+    <li class="loading">正在加载，请稍候……</li>
     </ul>
-    <div class="sumDesc"></div>
+   
     <div class="standarPagination"></div>
+     <div class="sumDesc"></div>
 </div>

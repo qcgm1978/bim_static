@@ -52,7 +52,7 @@ App.Todo = {
 			data: {
 				status: App.Todo.Settings.type == "commission" ?1 : 2,
 				pageIndex: App.Todo.Settings.pageIndex,
-				pageItemCount: App.Todo.Settings.pageItemCount
+				pageItemCount: App.Comm.Settings.pageItemCount
 			},
 			success: function(collection, response, options) {
 
@@ -93,7 +93,7 @@ App.Todo = {
 			data: {
 				status: App.Todo.Settings.type == "commission" ? 0 : 1,
 				pageIndex: App.Todo.Settings.pageIndex,
-				pageItemCount: App.Todo.Settings.pageItemCount
+				pageItemCount: App.Comm.Settings.pageItemCount
 			}
 		});
 	},

@@ -1,52 +1,57 @@
+App.ResourcesNav = {
 
-App.ResourcesNav={
-
-	Settings:{
-		pageIndex:1,
-		type:"", // 库的类型 
-		libsId:"",
-		libsName:"", //模型库的名称
-		libsVersionId:"",
-		libsVersionName:"", //模型版本名称
+	Settings: {
+		pageIndex: 1,
+		type: "", // 库的类型 
+		
 	},
 
 	//标准模型库
-	StandardLibsCollection:new(Backbone.Collection.extend({
-		
-		model:Backbone.Model.extend({
-			defaults:function(){
+	StandardLibsCollection: new(Backbone.Collection.extend({
+
+		model: Backbone.Model.extend({
+			defaults: function() {
 				return {
-					title:""
+					title: ""
 				}
 			}
 
 		}),
 
-		urlType:"fetchStandardLibs"
+		urlType: "fetchStandardLibs",
+
+		parse: function(responese) {
+			if (responese.message == "success") {
+				return responese.data.items;
+			}
+		}
 
 	})),
 
 
 	//获取名称更具类型
-	getNameByType(){
+	getNameByType() {
 
-		var name="",type=App.ResourcesNav.Settings.type;
-		if (type=="standardLibs") {
-			 name=" 标准模型库";
-		}else if (type=="famLibs") {
-			name="族库";
-		}else if (type=="qualityStandardLibs") {
-			name="质量标准库";
-		}else if (type=="manifestLibs") {
-			name=" 清单库";
+		var name = "",
+			type = App.ResourcesNav.Settings.type;
+		if (type == "standardLibs") {
+			name = " 标准模型库";
+		} else if (type == "famLibs") {
+			name = "族库";
+		} else if (type == "qualityStandardLibs") {
+			name = "质量标准库";
+		} else if (type == "manifestLibs") {
+			name = " 清单库";
 		}
 		return name;
 
-	},	
+	},
 
-	init(){
-
+	init() {
+		App.ResourcesNav.Settings.pageIndex=1; 
 		new App.ResourcesNav.App().render();
-	}
+	}  
+
 
 }
+ 

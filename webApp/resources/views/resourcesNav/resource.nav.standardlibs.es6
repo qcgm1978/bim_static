@@ -4,7 +4,7 @@ App.ResourcesNav.StandardLibs=Backbone.View.extend({
 
 	id:"standardLibs",
 
-	template:_.templateUrl("/resources/tpls/resourcesNav/resource.nav.standardlibs.html"),
+	template:_.templateUrl("/resources/tpls/resourcesNav/resource.nav.standardlibs.html",true),
 
 	//初始化
 	initialize(){
@@ -12,15 +12,26 @@ App.ResourcesNav.StandardLibs=Backbone.View.extend({
 	},
 
 	render:function(){
-		this.$el.html("正在加载，请稍候……");
+
+		this.$el.html(this.template);
 		return this;
 	},
 
+
+	templateDetail:_.templateUrl("/resources/tpls/resourcesNav/resource.nav.standardlibs.detail.html"),
+
 	//添加单个
 	addOne(model){ 
-		var data=model.toJSON().data.items;
-	 
-		this.$el.html(this.template(data));
+
+		var $standar=this.$el.find(".standarBody .standar"),$loading=$standar.find(".loading");
+
+		if ($loading.length>0) {
+			$loading.remove();
+		} 
+
+		var data=model.toJSON();
+	 	$standar.append(this.templateDetail(data));
+		 
 	}
 
 
