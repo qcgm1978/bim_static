@@ -29,7 +29,31 @@ App.ResourceModel.ListNav=Backbone.View.extend({
 			model:model
 		});  
 		 
-		this.$el.find(".fileContent").append(view.render().el);
+		 if (model.toJSON().isAdd) {
+		 	this.$el.find(".fileContent").prepend(view.render().el);
+		 }else{
+		 	this.$el.find(".fileContent").append(view.render().el);
+		 }
+		
+
+		this.bindScroll();
+	},
+
+	//绑定滚动条
+	bindScroll:function(){
+		var $fileLists=this.$el.find(".fileLists");
+		if (!$fileLists.hasClass('mCustomScrollbar')) {
+			$fileLists.mCustomScrollbar({
+				set_height: "100%",
+				set_width: "100%",
+				theme: 'minimal-dark',
+				axis: 'y',
+				keyboard: {
+					enable: true
+				},
+				scrollInertia: 0
+			});
+		}
 	}
 
 });

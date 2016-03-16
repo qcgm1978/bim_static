@@ -60,6 +60,16 @@
             var self = upload
             options.init = {
                 FilesAdded: function (up, files) {
+
+                    if (!options.canUploadFile()) { 
+                        //jquery.plupload.quere.js b绑定了 FilesAdded 这个时候文件已经存在了，所以 要删除
+                        App.isUploading=false;
+                        alert("请选择要上传的文件夹");
+                        return;
+                    }else{
+                          App.isUploading=true;
+                    }
+                    
                     // quota info in the right bottom corner
                     if (options.getQuotaInfo) {
                         self.container.find('.quota-tip-info').text(options.getQuotaInfo())
@@ -106,8 +116,8 @@
                         }
                     }
                 },
-                UploadFile: function (up, file) { 
-                    isUploading = true
+                UploadFile: function (up, file) {  
+                    isUploading = true;
                 },
                 FileUploaded: function (up, file, response) {
                     try {
@@ -216,7 +226,11 @@
                 var dragArea = $(document.body)
                 dragArea.bind('drop.upload', function (e) {
                     dragArea.removeClass('dragupload-drag-over')
-                    if (!options.canUploadFile()) return
+                    if (!options.canUploadFile()) {
+                        alert("请选择要上传的文件夹");
+                        return false;
+                    }
+                     App.isUploading=true;
                     if (!e.originalEvent.dataTransfer) return
                     var files = e.originalEvent.dataTransfer.files,
                         items = e.originalEvent.dataTransfer.items
@@ -258,10 +272,13 @@
                     return false
                 })
                 dragArea.bind('dragenter.upload dragover.upload', function (e) {
-                    if (dragArea.find(e.target).length === 1 && options.canUploadFile()) {
+                   
+                    if (dragArea.find(e.target).length === 1 ) { //&& options.canUploadFile()
                         dragArea.addClass('dragupload-drag-over')
                         return false
-                    }
+                    } 
+                    
+                     
                 })
                 dragArea.bind('dragleave.upload', function (e) {
                     dragArea.removeClass('dragupload-drag-over')
@@ -344,6 +361,7 @@
 
         //将文件添加到队列
         __addFiles: function (files) {
+
             upload.container.pluploadQueue().addFiles(files)
         },
 
@@ -358,7 +376,7 @@
             options.browse_button = 'html5-uploadfile-btn'
             options.browse_dir_button = 'html5-uploaddir-btn'
             $(uploadButtons).appendTo(document.body)
-            uploadButton.click(function (e) {
+            uploadButton.click(function (e) { 
                 var p = $(this).offset()
                 uploadButtons.css({
                     top: p.top + $(this).height() + 18,
@@ -388,7 +406,7 @@
         init: upload.init,
         setMaxSize: upload.setMaxSize,
         //获取上传实例
-        getUploadInstance: function () {
+        getUploadInstance: function () { 
             if(!upload.container) return {}
             return upload.container.pluploadQueue()
         },

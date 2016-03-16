@@ -15,8 +15,7 @@ var AppRoute = Backbone.Router.extend({
 
 	//待办
 	todo: function() {
-		//销毁上传
-		App.Comm.upload.destroy();
+		this.reset();
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".todo").addClass('selected');
 		//加载css js
 		_.require('/static/dist/todo/todo.css');
@@ -26,6 +25,7 @@ var AppRoute = Backbone.Router.extend({
 
 	//项目
 	projects: function() {
+		this.reset();
 		//销毁上传
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".projects").addClass('selected');
 		//加载css js
@@ -38,6 +38,7 @@ var AppRoute = Backbone.Router.extend({
 
 	//单个项目
 	project: function(id) {
+		this.reset();
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".projects").addClass('selected');
 		_.require('/static/dist/projects/projects.css');
 		_.require('/static/dist/projects/projects.js');
@@ -47,6 +48,7 @@ var AppRoute = Backbone.Router.extend({
 
 	//流程
 	flow: function() {
+		this.reset();
 		//销毁上传
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".flow").addClass('selected');
 		_.require('/static/dist/flow/flow.css');
@@ -58,6 +60,7 @@ var AppRoute = Backbone.Router.extend({
 
 	//资源库
 	resources: function() {
+		this.reset();
 		//销毁上传
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".resources").addClass('selected');
 		_.require('/static/dist/resources/resources.css');
@@ -69,6 +72,7 @@ var AppRoute = Backbone.Router.extend({
 
 	//单个项目
 	resource:function(type){
+		this.reset();
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".resources").addClass('selected');
 		_.require('/static/dist/resources/resources.css');
 		_.require('/static/dist/resources/resources.js'); 
@@ -77,6 +81,7 @@ var AppRoute = Backbone.Router.extend({
 	},
 
 	resourceModel:function(type,id){
+		this.reset();
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".resources").addClass('selected');
 		_.require('/static/dist/resources/resources.css');
 		_.require('/static/dist/resources/resources.js'); 
@@ -88,9 +93,16 @@ var AppRoute = Backbone.Router.extend({
 
 	//貌似改掉了
 	console: function() {
+		this.reset();
 		//销毁上传
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".console").addClass('selected');
 		$("#contains").html("console");
+	},
+
+	//重置数据
+	reset:function(){
+//销毁上传
+		App.Comm.upload.destroy();
 	}
 
 

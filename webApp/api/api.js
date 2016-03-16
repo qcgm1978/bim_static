@@ -67,6 +67,7 @@ App.API = {
 		fetchFamLibs: "platform/lib/component", //获取族库
 		fetchStandardVersion:"platform/lib/standardModel/{standardModelId}/version",
 		fetchFileTree: "doc/{projectId}/{projectVersionId}/file/tree", //项目设计文件导航 
+		deleteFile:"doc/{projectId}/{projectVersionId}/file", //删除文件  ?fileVersionId={fileVersionId}
 
 
 

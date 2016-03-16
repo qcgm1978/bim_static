@@ -33,7 +33,11 @@
                 //是否可以上传
                 canUploadFile: function() {
 
-                    return true;
+                    if (App.Project.Settings.fileId) {
+                        return true;
+                    }else{
+                        return false;
+                    }
                     //return App.Comm.modules.util.canUploadFile()
                 },
 

@@ -111,6 +111,20 @@
 	.fileOp { width: 11%; }
 	.fileSize { width: 11%; }
 	.fileDate { width: 11%; }
-	.header, .item { height: 38px; line-height: 38px; border-bottom: 1px #ccc solid; }
+	.header, .item { height: 38px; line-height: 38px; border-bottom: 1px #ccc solid;
+		&.selected { background-color: #A8DBFD; }
+	}
 	.header { background-color: #eee; }
+}
+.jqContextMenu { width: 100px; border: 1px #ccc solid; background-color: #fff; position: absolute; z-index: 500; 
+	li{height: 30px;line-height: 30px;padding-left: 8px;
+		a{
+			display:block;margin-left: -8px;padding-left: 8px;
+		}
+		&:hover{background-color: #A8DBFD;}
+		&.disable{
+			color:#999;
+			    opacity: .5;cursor: default;;
+		}
+	}
 }

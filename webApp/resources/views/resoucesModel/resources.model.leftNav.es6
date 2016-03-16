@@ -38,6 +38,7 @@ App.ResourceModel.LeftNav = Backbone.View.extend({
 				var file = $(event.target).data("file");
 				//清空数据
 				$("#resourceModelListNav .fileContent").empty();
+				App.ResourceModel.Settings.fileVersionId=file.fileVersionId;
 				App.ResourceModel.FileCollection.fetch({
 					data: {
 						parentId: file.fileVersionId

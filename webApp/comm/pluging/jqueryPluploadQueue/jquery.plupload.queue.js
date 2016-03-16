@@ -16,10 +16,11 @@
  */
 
 
-;(function ($) {
+;
+(function($) {
     var uploaders = {};
 
-    var formatSize = function (size) {
+    var formatSize = function(size) {
         if (size === undefined || /\D/.test(size)) {
             return 'N/A';
         }
@@ -41,7 +42,7 @@
 
     function renderUI(id, target) {
         // Remove all existing non plupload items
-        target.contents().each(function (i, node) {
+        target.contents().each(function(i, node) {
             node = $(node);
             if (!node.is('.plupload')) {
                 node.remove();
@@ -75,9 +76,9 @@
         );
     }
 
-    $.fn.pluploadQueue = function (settings) {
+    $.fn.pluploadQueue = function(settings) {
         if (settings) {
-            this.each(function () {
+            this.each(function() {
                 var uploader, target, id;
                 target = $(this);
                 id = target.attr('id');
@@ -89,6 +90,7 @@
                     dragdrop: true
                 }, settings));
                 uploaders[id] = uploader;
+
                 function handleStatus(file) {
                     var actionClass;
                     if (file.status == plupload.DONE) {
@@ -112,6 +114,7 @@
                         icon.attr('title', file.hint);
                     }
                 }
+
                 function changeStatus() {
                     var statusTitle,
                         statusText;
@@ -130,16 +133,17 @@
                     $('span.plupload_status_text', target).text(statusText).show();
                 }
                 //exports for custom use
-                uploader.reset = function () {
+                uploader.reset = function() {
                     for (i = 0; i < uploader.files.length; i++) {
                         $('#' + uploader.files[i].id).remove();
                     }
                     uploader.splice();
                 }
+
                 function updateList(files) {
                     var fileList = $('ul.plupload_filelist', target);
                     var htmlStr = '';
-                    $.each(files, function (i, file) {
+                    $.each(files, function(i, file) {
                         htmlStr += '<li id="' + file.id + '" class="clr pl_up">' +
                             '<div class="pl-na">' + file.name + '</div>' +
                             '<div class="pl-ac"><a title="取消" href="#"></a></div>' +
@@ -151,9 +155,10 @@
                     fileList[0].scrollTop = fileList[0].scrollHeight;
                     changeStatus();
                 }
-                function bindEvent () {
+
+                function bindEvent() {
                     //delegate event
-                    $('ul.plupload_filelist', target).delegate('.pl-ac a', 'click', function () {
+                    $('ul.plupload_filelist', target).delegate('.pl-ac a', 'click', function() {
                         var row = $(this).parent().parent();
                         if (row.is('.plupload_done') || row.is('.plupload_complete_handling')) {
                             return false;
@@ -169,22 +174,23 @@
                         return false;
                     });
                 }
-                uploader.bind("UploadFile", function (up, file) {
+                uploader.bind("UploadFile", function(up, file) {
                     $('#' + file.id).addClass('plupload_current_file');
                 });
-                uploader.bind("UploadComplete", function (up, file) {
+                uploader.bind("UploadComplete", function(up, file) {
                     if (up.runtime === 'flash') {
                         up.trigger('Refresh');
                     }
                     $('span.plupload_status_title', target).text(_("Upload Complete"));
                 });
-                uploader.bind('Init', function (up, res) {
+                uploader.bind('Init', function(up, res) {
                     renderUI(id, target);
                     bindEvent();
                 });
                 uploader.init();
-                uploader.bind("Error", function (up, err) {
-                    var file = err.file, message;
+                uploader.bind("Error", function(up, err) {
+                    var file = err.file,
+                        message;
                     if (file) {
                         message = err.message;
                         if (err.details) {
@@ -193,7 +199,7 @@
                         if (err.code == plupload.FILE_SIZE_ERROR) {
                             if (file.size > up.settings.max_file_size) {
                                 alert(_("Error: File too large: ") + file.name);
-                            } else{
+                            } else {
                                 alert(_("Quota exceed error"));
                             }
                         }
@@ -206,20 +212,29 @@
                         file.percent = 0;
                     }
                 });
-                uploader.bind('StateChanged', function () {
+                uploader.bind('StateChanged', function() {
+                    
                     if (uploader.state === plupload.STARTED) {
                         changeStatus();
                     }
                 });
-                uploader.bind('FilesAdded', function (up, files) {
-                    var d = new Date();
-                    updateList(files);
+                uploader.bind('FilesAdded', function(up, files) {
+                   
+                    //改参数在 com.upload.js 中
+                    if (App.isUploading) {
+                        var d = new Date();
+                        updateList(files);
+                    }else{
+                        //删除最后一个
+                        uploader.files.pop();
+                    }
+
                 });
-                uploader.bind('FileUploaded', function (up, file) {
+                uploader.bind('FileUploaded', function(up, file) {
                     file.hint = _('Upload Success');
                     handleStatus(file);
                 });
-                uploader.bind("UploadProgress", function (up, file) {
+                uploader.bind("UploadProgress", function(up, file) {
                     // Set file specific progress
                     $('#' + file.id + ' div.pl-st', target).text(file.percent + '%');
                     if (file.percent === 100) {

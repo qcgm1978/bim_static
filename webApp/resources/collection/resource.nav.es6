@@ -32,11 +32,12 @@ App.ResourcesNav = {
 	//获取名称更具类型
 	getNameByType() {
 
-		var name = "",href,
+		var name = "",
+			href,
 			type = App.ResourcesNav.Settings.type;
 		if (type == "standardLibs") {
 			name = " 标准模型库";
-			href="#resources/standardLibs";
+			href = "#resources/standardLibs";
 		} else if (type == "famLibs") {
 			name = "族库";
 		} else if (type == "qualityStandardLibs") {
@@ -44,7 +45,10 @@ App.ResourcesNav = {
 		} else if (type == "manifestLibs") {
 			name = " 清单库";
 		}
-		return {name:name,href:href};
+		return {
+			name: name,
+			href: href
+		};
 
 	},
 
@@ -57,7 +61,11 @@ App.ResourcesNav = {
 	reset: function() {
 		App.ResourcesNav.Settings.pageIndex = 1;
 		if (App.ResourceModel) {
-			App.ResourceModel.Settings.CurrentVersion = {}; 
+			App.ResourceModel.Settings.CurrentVersion = {};
+			App.ResourceModel.Settings.fileVersionId = "";
+			App.ResourceModel.Settings.type = "";
+			App.ResourceModel.Settings.id = "";
+			App.ResourceModel.Settings.pageIndex = 1; 
 		}
 	}
 }
