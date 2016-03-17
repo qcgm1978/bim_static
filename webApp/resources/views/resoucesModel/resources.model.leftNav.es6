@@ -6,7 +6,9 @@ App.ResourceModel.LeftNav = Backbone.View.extend({
 
 	template: _.templateUrl("/resources/tpls/resourceModel/resources.model.leftNav.html", true),
 
-	
+	events: {
+		"click .projectNav .item": "navClick"
+	},
 
 	//渲染
 	render: function(type) {
@@ -18,6 +20,24 @@ App.ResourceModel.LeftNav = Backbone.View.extend({
 			this.getModelTree();
 		}
 		return this;
+	},
+
+	//切换Tab
+	navClick: function(event) {
+		var type = $(event.target).addClass("selected").siblings().removeClass("selected").end().data("type"),
+			$resourceModelLeftNav = $("#resourceModelLeftNav");
+
+
+
+		if (type == "file") {
+			//文件
+			$resourceModelLeftNav.find(".fileTree").show().end().find(".modelTree").hide();
+
+		} else {
+
+			$resourceModelLeftNav.find(".fileTree").hide().end().find(".modelTree").show();
+
+		}
 	},
 
 	//文件浏览器
@@ -38,7 +58,9 @@ App.ResourceModel.LeftNav = Backbone.View.extend({
 				var file = $(event.target).data("file");
 				//清空数据
 				$("#resourceModelListNav .fileContent").empty();
-				App.ResourceModel.Settings.fileVersionId=file.fileVersionId;
+				App.ResourceModel.Settings.fileVersionId = file.fileVersionId;
+				App.ResourceModel.FileCollection.reset();
+
 				App.ResourceModel.FileCollection.fetch({
 					data: {
 						parentId: file.fileVersionId

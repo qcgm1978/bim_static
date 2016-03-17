@@ -8,13 +8,13 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 
 	initialize: function() {
 		this.listenTo(this.model, "change", this.render);
-		this.listenTo(this.model,"destroy",this.destroy);
+		this.listenTo(this.model, "destroy", this.destroy);
 	},
 
 	//事件绑定
 	events: {
 		"click .fileName  .text": "fileClick",
-		"click .btnEnter": "enterEditName",
+		"click .btnEnter": "enterEditNameOrCreateNew",
 		"click .btnCalcel": "calcelEditName"
 
 	},
@@ -55,7 +55,7 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 
 			//文件直接跳转 不做处理
 
-		} 
+		}
 	},
 
 	//绑定右键菜单
@@ -93,7 +93,7 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 					$("#previewModel").addClass("disable");
 					$("#previewModel").find("a").removeAttr("href");
 				} else {
-					 
+
 					$("#previewModel").removeClass("disable");
 					var href = $item.find(".fileName .text").prop("href");
 					$("#previewModel").find("a").prop("href", href);
@@ -158,7 +158,7 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 
 					var $prevEdit = $("#resourceModelListNav .fileContent .txtEdit");
 					if ($prevEdit.length > 0) {
-						that.cancelEdit($prevEdit); 
+						that.cancelEdit($prevEdit);
 					}
 
 					var $item = $(item),
@@ -169,7 +169,7 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 
 				}
 			}
-		}); 
+		});
 	},
 
 	//取消修改名称
@@ -178,17 +178,29 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 		var $prevEdit = $("#resourceModelListNav .fileContent .txtEdit");
 
 		if ($prevEdit.length > 0) {
-			this.cancelEdit($prevEdit); 
+			this.cancelEdit($prevEdit);
 		}
 	},
-	//修改名称
-	enterEditName: function(event) {
+	//修改名称 或者创建
+	enterEditNameOrCreateNew: function(event) { 
 
-		debugger;
-		var $item = $(event.target).closest(".item"),
+		var $item = $(event.target).closest(".item");
+
+		//创建
+		if ($item.hasClass('createNew')) {
+			this.createNewFolder($item);
+		} else {
+			this.editFolderName($item);
+		} 
+
+	},
+
+	//执行修改
+	editFolderName: function($item) {
+
+		var
 			fileVersionId = $item.find(".filecKAll").data("fileversionid"),
 			name = $item.find(".txtEdit").val().trim();
-
 		// //请求数据
 		var data = {
 			URLtype: "putFileReName",
@@ -204,17 +216,18 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 		App.Comm.ajax(data, function(data) {
 			if (data.message == "success") {
 
-				var models=App.ResourceModel.FileCollection.models,id=data.data.id;
-				
+				var models = App.ResourceModel.FileCollection.models,
+					id = data.data.id;
+
 				//修改数据
-				$.each(models,function(i,model){
-					if (model.toJSON().id==id) {
+				$.each(models, function(i, model) {
+					if (model.toJSON().id == id) {
 						model.set(data.data);
-					} 
+					}
 				});
 
-			//tree name
-			$("#resourceModelLeftNav .treeViewMarUl span[data-id='" + id + "']").text(name);
+				//tree name
+				$("#resourceModelLeftNav .treeViewMarUl span[data-id='" + id + "']").text(name);
 
 
 			} else {
@@ -227,34 +240,70 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 				}
 
 			}
-		}); 
+		});
+	},
+
+	//创建文件夹
+	createNewFolder: function($item) {
+
+		debugger;
+		var filePath = $item.find(".txtEdit").val().trim(), 
+			parentId = $("#resourceModelLeftNav .treeViewMarUl .selected").data("file").fileVersionId;
+		// //请求数据
+		var data = {
+			URLtype: "createNewFolder",
+			type: "POST",
+			data: {
+				projectId: App.ResourceModel.Settings.CurrentVersion.projectId,
+				projectVersionId: App.ResourceModel.Settings.CurrentVersion.id,
+				parentId: parentId ? parentId : "",
+				filePath: filePath
+			}
+		};
+
+		App.Comm.ajax(data, function(data) {
+			if (data.message == "success") {
+
+				var models = App.ResourceModel.FileCollection.models; 
+				//修改数据
+				App.ResourceModel.FileCollection.last().set(data.data);
+				 
+
+				//tree name
+				//$("#resourceModelLeftNav .treeViewMarUl span[data-id='" + id + "']").text(name);
+
+
+			} 
+		});
+
+
 	},
 
 	//取消修改
-	cancelEdit:function($prevEdit){
-		var $item=$prevEdit.closest(".item");
+	cancelEdit: function($prevEdit) {
+		var $item = $prevEdit.closest(".item");
 		if ($item.hasClass('createNew')) {
 			//取消监听 促发销毁
-		 	var model=App.ResourceModel.FileCollection.last();
-		 	 model.stopListening();
-		 	 model.trigger('destroy', model, model.collection);
+			var model = App.ResourceModel.FileCollection.last();
+			model.stopListening();
+			model.trigger('destroy', model, model.collection);
 			App.ResourceModel.FileCollection.models.pop();
 			//删除页面元素
 			$item.remove();
-		}else{
+		} else {
 			$prevEdit.prev().show().end().nextAll().remove().end().remove();
 		}
-		
+
 	},
 
 	//销毁
-	destroy:function(model){
-		 debugger;
+	destroy: function(model) {
+		 
 		//新建的  不用处理
-		if (model.toJSON().id!="createNew") { 
+		if (model.toJSON().id != "createNew") {
 			this.$el.remove();
 		}
-		 
+
 	}
 
 

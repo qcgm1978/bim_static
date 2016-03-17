@@ -130,6 +130,7 @@ App.API = {
 		fetchFileTree: "/dataJson/project/project.design.file.json", //项目设计文件导航
 		deleteFile:"",//删除文件
 		putFileReName:"", //重命名文件
+		createNewFolder:"",
 
 		test: ""
 
