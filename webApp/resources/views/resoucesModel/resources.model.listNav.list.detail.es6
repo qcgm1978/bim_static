@@ -156,7 +156,7 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 						return;
 					}
 
-					var $prevEdit = $("#resourceModelListNav .fileContent .txtEdit");
+					var $prevEdit = $("#resourceListContent .fileContent .txtEdit");
 					if ($prevEdit.length > 0) {
 						that.cancelEdit($prevEdit);
 					}
@@ -175,14 +175,14 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 	//取消修改名称
 	calcelEditName: function(event) {
 
-		var $prevEdit = $("#resourceModelListNav .fileContent .txtEdit");
+		var $prevEdit = $("#resourceListContent .fileContent .txtEdit");
 
 		if ($prevEdit.length > 0) {
 			this.cancelEdit($prevEdit);
 		}
 	},
 	//修改名称 或者创建
-	enterEditNameOrCreateNew: function(event) { 
+	enterEditNameOrCreateNew: function(event) {
 
 		var $item = $(event.target).closest(".item");
 
@@ -191,7 +191,7 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 			this.createNewFolder($item);
 		} else {
 			this.editFolderName($item);
-		} 
+		}
 
 	},
 
@@ -246,9 +246,13 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 	//创建文件夹
 	createNewFolder: function($item) {
 
-		debugger;
-		var filePath = $item.find(".txtEdit").val().trim(), 
-			parentId = $("#resourceModelLeftNav .treeViewMarUl .selected").data("file").fileVersionId;
+
+		var filePath = $item.find(".txtEdit").val().trim(),
+			$leftSel = $("#resourceModelLeftNav .treeViewMarUl .selected");
+		parentId = "";
+		if ($leftSel.length>0) {
+			parentId = $leftSel.data("file").fileVersionId;
+		}
 		// //请求数据
 		var data = {
 			URLtype: "createNewFolder",
@@ -256,7 +260,7 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 			data: {
 				projectId: App.ResourceModel.Settings.CurrentVersion.projectId,
 				projectVersionId: App.ResourceModel.Settings.CurrentVersion.id,
-				parentId: parentId ? parentId : "",
+				parentId: parentId,
 				filePath: filePath
 			}
 		};
@@ -264,18 +268,17 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 		App.Comm.ajax(data, function(data) {
 			if (data.message == "success") {
 
-				var models = App.ResourceModel.FileCollection.models; 
+				var models = App.ResourceModel.FileCollection.models;
 				//修改数据
 				App.ResourceModel.FileCollection.last().set(data.data);
-				 
+
 
 				//tree name
 				//$("#resourceModelLeftNav .treeViewMarUl span[data-id='" + id + "']").text(name);
 
 
-			} 
-		});
-
+			}
+		}); 
 
 	},
 
@@ -298,7 +301,7 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 
 	//销毁
 	destroy: function(model) {
-		 
+
 		//新建的  不用处理
 		if (model.toJSON().id != "createNew") {
 			this.$el.remove();

@@ -73,8 +73,7 @@ App.ResourceModel = {
 					App.ResourceModel.FileCollection.fetch();
 					//上传
 					App.ResourceUpload.init($(document.body));
-					//事件初始化
-					App.ResourceModel.initEvent();
+
 				}
 
 
@@ -83,74 +82,9 @@ App.ResourceModel = {
 			}
 
 		});
-	},
-
-	//事件初始化
-	initEvent: function() {
-
-		var $resourceModelListNav = $("#resourceModelListNav");
-		//下载
-		$resourceModelListNav.on("click", ".btnFileDownLoad", function() {
-
-			var $selFile = $resourceModelListNav.find(".fileContent :checkbox:checked");
-
-			if ($selFile.length > 1) {
-				alert("目前只支持单文件下载");
-				return;
-			}
-
-			if ($selFile.length < 1) {
-				alert("请选择需要下载的文件");
-				return;
-			}
-			var fileVersionId = $selFile.parent().data("fileversionid");
-
-			// //请求数据
-			var data = {
-				URLtype: "downLoad",
-				data: {
-					projectId: App.ResourceModel.Settings.CurrentVersion.projectId,
-					projectVersionId: App.ResourceModel.Settings.CurrentVersion.id
-				}
-			};
-
-			var data = App.Comm.getUrlByType(data);
-			var url = data.url + "?fileVersionId=" + fileVersionId;
-			window.location.href = url;
-
-			// App.Comm.ajax(data).done(function(){
-			// 	console.log("下载完成");
-			// });
-
-		});
-
-		//删除
-		$resourceModelListNav.on("click", ".btnFileDel", function() {
-			var $selFile = $resourceModelListNav.find(".fileContent :checkbox:checked");
-			if ($selFile.length > 1) {
-				alert("目前只支持单文件删除");
-				return;
-			}
-
-			if ($selFile.length < 1) {
-				alert("请选择需要删除的文件");
-				return;
-			}
-
-			var $item = $selFile.closest(".item");
-			//删除
-			App.ResourceModel.delFileDialog($item);
-
-		});
-
-
-		//新建项目文件夹
-		$resourceModelListNav.on("click", ".btnNewFolder", function() {
-			App.ResourceModel.createNewFolder();
-		});
-
-	},
-
+	}, 
+	 
+	//创建文件夹
 	createNewFolder: function() {
 
 		var virModel = {
@@ -222,9 +156,7 @@ App.ResourceModel = {
 			message: $item.find(".folder").length > 0 ? "确认要删除该文件夹么？" : "确认要删除该文件么？"
 
 
-		});
-
-
+		}); 
 
 	}
 
