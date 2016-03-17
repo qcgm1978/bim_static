@@ -56,6 +56,16 @@ App.Comm = {
 					data.url = data.url.replace(rex, val);
 				}
 			}
+		} 
+		 
+		//删除
+		if ((data.URLtype.indexOf("delete") > -1 || data.URLtype.indexOf("put") > -1) && data.data) {
+			if (data.url.indexOf("?") == -1) {
+				 data.url += "?1=1";
+			}   
+			for (var p in data.data) {
+				data.url+="&"+p+"="+data.data[p];
+			} 
 		}
 
 		return data;
@@ -87,24 +97,24 @@ App.Comm = {
 			document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString();
 	},
 	//格式化 文件大小
-	formatSize:function (size) {
-        if (size === undefined || /\D/.test(size)) {
-            return '';
-        }
-        if (size >= 1073741824) {
-            return (size / 1073741824).toFixed(2) + 'GB';
-        }
-        if (size >= 1048576) {
-            return (size / 1048576).toFixed(2) + 'MB';
-        } else if (size >= 6) {
-            return (size / 1024).toFixed(2) + 'KB';
-        } else {
-            return size + 'b';
-        }
-    },
-    //状态转换
-    convertStatus:function(status){
-    	//1：待上传；2：上传中；3：已上传；4：待审核；5：审核通过；6：审核退回；7：待移交；8：移交退回；9：已发布
+	formatSize: function(size) {
+		if (size === undefined || /\D/.test(size)) {
+			return '';
+		}
+		if (size >= 1073741824) {
+			return (size / 1073741824).toFixed(2) + 'GB';
+		}
+		if (size >= 1048576) {
+			return (size / 1048576).toFixed(2) + 'MB';
+		} else if (size >= 6) {
+			return (size / 1024).toFixed(2) + 'KB';
+		} else {
+			return size + 'b';
+		}
+	},
+	//状态转换
+	convertStatus: function(status) {
+		//1：待上传；2：上传中；3：已上传；4：待审核；5：审核通过；6：审核退回；7：待移交；8：移交退回；9：已发布
 
 		var result = "";
 		if (status == 1) {
@@ -128,7 +138,7 @@ App.Comm = {
 		}
 
 		return result;
-    }
+	}
 
 };
 

@@ -50,7 +50,7 @@
 	};
 
 	$.fn.contextMenu = function(id, options) {
-		
+		 
 		if (!menu) { // Create singleton menu
 			menu = $('<div class="jqContextMenu"></div>')
 				.hide()
@@ -95,7 +95,8 @@
 				options.onShowMenuCallback(e);
 			}
 			return false;
-		});
+		}); 
+
 		return this;
 	};
 
@@ -124,7 +125,7 @@
 		if (!!cur.onShowMenu) menu = cur.onShowMenu(e, menu);
 
 		$.each(cur.bindings, function(id, func) {
-			$('#' + id, menu).bind('click', function(e) {
+			$('#' + id, menu).unbind().bind('click', function(e) {
 				hide();
 				func(trigger, currentTarget);
 			});

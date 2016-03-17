@@ -1,17 +1,25 @@
-<span data-fileversionid="<%=fileVersionId%>" class="filecKAll inlineBlock"><input type="checkbox" class="ckAll" /></span>
- 
+<span data-fileversionid="<%=fileVersionId%>" class="filecKAll inlineBlock">
+<input type="checkbox" class="ckAll" /></span>
+
+
 <span class="fileName inlineBlock">
 <span class=" fileType <%= folder?'folder':'file' %>"></span>
 <% if(folder){%>
- <span data-id="<%=id%>" data-isfolder="<%=folder%>" class="text"><%=name%></span>
+    <span data-id="<%=id%>" data-isfolder="<%=folder%>" class="text <%= id=='createNew'?'hidden':'' %>"><%=name%></span>
+    <% if(id=='createNew'){%>
+    	<input type="text" value="<%=name%>" class="txtEdit txtInput" /> 
+    	<span class="btnEnter myIcon-enter"></span>
+    	<span class="btnCalcel pointer myIcon-cancel"></span>
+    <%}%>
 <%}else{%>
- <a data-id="<%=id%>" href="/static/dist/app/project/filePreview.html?id=<%=id%>&model=<%=modelId%>&projectId=<%=projectId%>&projectVersionId=<%=fileVersionId%>" target="_blank" data-isfolder="<%=folder%>" class="text"><%=name%></a>
+        <a data-id="<%=id%>" href="/static/dist/app/project/filePreview.html?id=<%=id%>&model=<%=modelId%>&projectId=<%=projectId%>&projectVersionId=<%=fileVersionId%>" target="_blank" data-isfolder="<%=folder%>" class="text">
+            <%=name%>
+        </a>
 <%}%>
+</span>
 
-
-  </span> 
 
 <span class="fileStatus inlineBlock"><%=  App.Comm.convertStatus(status) %></span>
 <span class="fileOp inlineBlock"><%= creatorName %></span>
-<span class="fileSize inlineBlock"><%=App.Comm.formatSize(length)%></span>
-<span class="fileDate inlineBlock"><%= new Date(createTime).format("yyyy-MM-dd") %></span>
+<span class="fileSize inlineBlock"><%=length?App.Comm.formatSize(length):""%></span>
+<span class="fileDate inlineBlock"><%= createTime?new Date(createTime).format("yyyy-MM-dd"):"" %></span>

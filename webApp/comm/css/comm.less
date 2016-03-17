@@ -5,6 +5,7 @@
 .left { float: left; }
 .clear { clear: both; }
 .myHidden { display: none; }
+.pointer{cursor: pointer;}
 
 /* bootstrap  */
 .txtInput { height: 30px; padding: 6px 8px; outline: none; font-size: 14px; line-height: 1.2; color: #666; background-color: #fff; border: 1px solid #ccc; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box; }
@@ -36,8 +37,6 @@
 	}
 	&.disable { background-position: 0px -200px; }
 }
-.myIcon-upload { display: inline-block; vertical-align: middle; width: 17px; height: 15px; background: url(../images/comm/images/commIcon.png) no-repeat 0px -280px; }
-.myIcon-download { display: inline-block; vertical-align: middle; width: 17px; height: 15px; background: url(../images/comm/images/commIcon.png) no-repeat 0px -299px; }
 .relative { position: relative; }
 .btnNormal { padding: 4px 12px; display: inline-block; border: 1px #ccc solid; cursor: pointer; margin-right: 3px;
 	i { color: #85B200; font-size: 20px; vertical-align: -3px; margin-right: 5px; }
@@ -127,4 +126,8 @@
 			    opacity: .5;cursor: default;;
 		}
 	}
+}
+
+.btnNormal {
+	.myIcon-upload,.myIcon-download,.myIcon-del{ width:17px;height: 15px; } 
 }

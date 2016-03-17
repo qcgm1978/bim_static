@@ -1,3 +1,6 @@
+
+// 注意  删除操作 参数需要在url 中 jq 不会 处理 所以 url 命名的时候 以 delete 开头，我会处理
+
 App.API = {
 
 	Settings: {
@@ -67,8 +70,9 @@ App.API = {
 		fetchFamLibs: "platform/lib/component", //获取族库
 		fetchStandardVersion:"platform/lib/standardModel/{standardModelId}/version",
 		fetchFileTree: "doc/{projectId}/{projectVersionId}/file/tree", //项目设计文件导航 
-		deleteFile:"doc/{projectId}/{projectVersionId}/file", //删除文件  ?fileVersionId={fileVersionId}
-
+		deleteFile:"doc/{projectId}/{projectVersionId}/file?fileVersionId={fileVersionId}", //删除文件  ?fileVersionId={fileVersionId}
+		putFileReName:"doc/{projectId}/{projectVersionId}/file/rename",// 重命名文件 ?fileVersionId={fileVersionId}&name={name}
+		createNewFolder:"doc/{projectId}/{projectVersionId}/file",// 创建新文件夹 ?parentId={parentId}&filePath={filePath}
 
 
 		test: ""
@@ -124,6 +128,8 @@ App.API = {
 		fetchFamLibs: "/dataJson/resources/StandardLibs.json", //获取族库
 		fetchStandardVersion:"/dataJson/resources/fetchStandardVersion.json",
 		fetchFileTree: "/dataJson/project/project.design.file.json", //项目设计文件导航
+		deleteFile:"",//删除文件
+		putFileReName:"", //重命名文件
 
 		test: ""
 
