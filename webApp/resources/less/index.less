@@ -25,18 +25,43 @@
 	.standarPagination { float: right; }
 	.sumDesc { margin-top: 20px; }
 }
-#resourceModelLeftNav { float: left; height: 100%; margin-top: -40px; padding-top: 40px; border: 1px #ccc solid; border-width: 0px 1px; width: 238px;
-	.projectNavFileContainer { height: 100%; margin-top: -56px; padding-top: 56px; }
+#resourceModelLeftNav { z-index: 99; background-color: #fff; position: absolute; top: 87px; bottom: 0px; left: 0px; border: 1px #ccc solid; border-width: 0px 1px; width: 238px;
+	.projectNavFileContainer { height: 100%; margin-top: -40px; padding-top: 40px; }
 	.modelTree { display: none; }
 }
 #resourceListContent { height: 100%; margin-top: -53px; padding-top: 53px;
-	.fileBody { margin-top: -50px; padding-top: 40px;height: 100%;
+	.fileBody { margin-top: -51px; padding-top: 40px; height: 100%;
 		.btnEnter { margin-left: 5px; margin-right: 5px; cursor: pointer; }
 	}
 }
-#navContainer { margin-left: 237px; height: 100%; margin-top: -40px; padding-top: 40px;
+#navContainer { margin-left: 237px;height: 100%; margin-top: -40px; padding-top: 40px;
 	.listContent { height: 100%; }
 	.topBar { padding: 15px; padding-bottom: 8px;
 		.btnNormal { margin-right: 15px; }
+	}
+	.modelContentBox { height: 100%; display: none;
+		.modelContent { height: 100%; overflow: hidden;
+			.mCSB_container { height: 100%; }
+		}
+	}
+	.modelAttr { display: none; width: 396px; border: 1px #ddd solid; position: absolute; right: 0px; top: 87px; bottom: 0px; background-color: #fff; z-index: 600;
+		.dragSize { left: -5px; display: block; }
+		.slideBar { display: block; left: -15px; top: 40px; }
+		.attrContentBox { height: 100%; margin-top: -40px; padding-top: 40px;
+			.attrContent { height: 100%; overflow: auto; min-width: 396px; }
+		}
+		.nullTip { background: url(/projects/images/attrSel.png) no-repeat 50% 100%; padding-top: 200px; height: 50px; line-height: 50px; color: #ccc; font-size: 16px; text-align: center; }
+		.modle { .modleShowHide { transition: all .5s; background: url(/comm/images/commIcon.png) no-repeat 0px -256px; float: right; margin-right: 12px; margin-top: 6px; height: 14px; width: 14px; cursor: pointer;
+				&.down { transform: rotate(180deg); -ms-transform: rotate(180deg); -moz-transform: rotate(180deg); -webkit-transform: rotate(180deg); -o-transform: rotate(180deg); }
+			}
+			.modleName { font-weight: bold; height: 24px; line-height: 24px; padding-left: 12px; }
+			.modleList { background-color: #eee; border-top: 1px #ccc solid;
+				.modleItem { border-bottom: 1px #ccc solid;
+					.modleName { width: 25%; display: inline-block; box-sizing: border-box; padding-left: 12px; border-right: 1px #ccc solid; }
+					.modleVal { display: inline-block; width: 72%; box-sizing: border-box; padding-left: 12px; margin-left: -3px; }
+					.modelLink { display: inline-block; padding-left: 12px; color: #3F8CDF; height: 24px; line-height: 24px; }
+				}
+			}
+		}
 	}
 }

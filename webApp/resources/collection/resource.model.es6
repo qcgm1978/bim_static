@@ -1,6 +1,8 @@
 App.ResourceModel = {
 
 	Settings: {
+		leftType:"file",
+		modelId:"", //模型id
 		fileVersionId: "",
 		type: "", //模型类型
 		id: "", //模型id
@@ -26,6 +28,27 @@ App.ResourceModel = {
 			if (responese.message == "success") {
 				return responese.data;
 			}
+		}
+
+	})),
+
+	PropertiesCollection: new(Backbone.Collection.extend({
+	 
+		model: Backbone.Model.extend({
+			defaults: function() {
+				return {
+					title: ""
+				}
+			}
+		}),
+
+		urlType:"fetchDesignProperties",
+
+		parse:function(response){
+
+			if (response.message == "success") {
+                 return response;
+             }
 		}
 
 	})),

@@ -66,6 +66,13 @@ App.Project.leftNav = Backbone.View.extend({
 			}
 		}
 		var that=this;
+
+		
+		// App.Project.Settings.modelId= "e0c63f125d3b5418530c78df2ba5aef1";
+		// this.renderModel();
+		// return;
+
+
 		App.Comm.ajax(data,function(data){
 
 			if (data.message=="success") {

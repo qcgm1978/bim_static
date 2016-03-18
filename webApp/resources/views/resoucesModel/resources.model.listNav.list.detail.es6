@@ -64,25 +64,6 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 
 		var that = this;
 		this.$el.contextMenu('listContext', {
-			//菜单样式
-			// menuStyle: {
-			// 	border: '1px solid #000'
-			// },
-			// //菜单项样式
-			// itemStyle: { 
-			// 	backgroundColor: 'green',
-			// 	color: 'white',
-			// 	border: 'none',
-			// 	padding: '1px'
-			// },
-			// //菜单项鼠标放在上面样式
-			// itemHoverStyle: {
-			// 	color: 'blue',
-			// 	backgroundColor: 'red',
-			// 	border: 'none'
-			// }, 
-			//事件    
-
 			//显示 回调
 			onShowMenuCallback: function(event) {
 
@@ -149,10 +130,11 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 
 				},
 				'reNameModel': function(item) {
+
 					//重命名
 					let $reNameModel = $("#reNameModel");
 					//不可重命名状态
-					if ($reNameModel.hasClass('desable')) {
+					if ($reNameModel.hasClass('disable')) {
 						return;
 					}
 
@@ -163,9 +145,10 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 
 					var $item = $(item),
 						$fileName = $item.find(".fileName"),
-						text = $fileName.find(".text").hide().text();
+						text = $fileName.find(".text").hide().text().trim();
 
 					$fileName.append('<input type="text" value="' + text + '" class="txtEdit txtInput" /> <span class="btnEnter myIcon-enter"></span><span class="btnCalcel pointer myIcon-cancel"></span>');
+
 
 				}
 			}
@@ -198,7 +181,7 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 	//执行修改
 	editFolderName: function($item) {
 
-		var
+		var that = this,
 			fileVersionId = $item.find(".filecKAll").data("fileversionid"),
 			name = $item.find(".txtEdit").val().trim();
 		// //请求数据
@@ -215,15 +198,21 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 
 		App.Comm.ajax(data, function(data) {
 			if (data.message == "success") {
-
 				var models = App.ResourceModel.FileCollection.models,
 					id = data.data.id;
+				$.each(models, (i, model) => {
+					var dataJson = model.toJSON();
+					if (dataJson.id == id) {
+						//backbone 中 数据相同不会修改
+						if (dataJson.name == data.data.name) {
+							that.cancelEdit($item.find(".txtEdit"));
+						} else {
+							model.set(data.data);
+						}
 
-				//修改数据
-				$.each(models, function(i, model) {
-					if (model.toJSON().id == id) {
-						model.set(data.data);
+						return false;
 					}
+
 				});
 
 				//tree name
@@ -250,7 +239,7 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 		var filePath = $item.find(".txtEdit").val().trim(),
 			$leftSel = $("#resourceModelLeftNav .treeViewMarUl .selected");
 		parentId = "";
-		if ($leftSel.length>0) {
+		if ($leftSel.length > 0) {
 			parentId = $leftSel.data("file").fileVersionId;
 		}
 		// //请求数据
@@ -278,7 +267,7 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 
 
 			}
-		}); 
+		});
 
 	},
 

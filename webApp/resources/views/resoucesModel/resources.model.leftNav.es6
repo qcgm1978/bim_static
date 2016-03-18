@@ -7,37 +7,19 @@ App.ResourceModel.LeftNav = Backbone.View.extend({
 	template: _.templateUrl("/resources/tpls/resourceModel/resources.model.leftNav.html", true),
 
 	events: {
-		"click .projectNav .item": "navClick"
+		"click .projectNav .item": "navClick",
+		"click .slideBar":"slideBarToggle",
+		"mousedown .dragSize":"dragSize"
 	},
 
 	//渲染
 	render: function(type) {
 
 		this.$el.html(this.template);
-		if (type == 1) {
-			this.getfileTree();
-		} else {
-			this.getModelTree();
-		}
+
+		this.getfileTree();
+
 		return this;
-	},
-
-	//切换Tab
-	navClick: function(event) {
-		var type = $(event.target).addClass("selected").siblings().removeClass("selected").end().data("type"),
-			$resourceModelLeftNav = $("#resourceModelLeftNav");
-
-
-
-		if (type == "file") {
-			//文件
-			$resourceModelLeftNav.find(".fileTree").show().end().find(".modelTree").hide();
-
-		} else {
-
-			$resourceModelLeftNav.find(".fileTree").hide().end().find(".modelTree").show();
-
-		}
 	},
 
 	//文件浏览器
@@ -94,9 +76,122 @@ App.ResourceModel.LeftNav = Backbone.View.extend({
 
 	},
 
-	//模型浏览器
-	getModelTree: function() {
+	//切换Tab
+	navClick: function(event) {
+		 
+		var type = $(event.target).addClass("selected").siblings().removeClass("selected").end().data("type"),
+			$resourceModelLeftNav = this.$el;
 
+			App.ResourceModel.Settings.leftType=type;
+
+		if (type == "file") {
+			//文件
+			$resourceModelLeftNav.find(".fileTree").show().end().find(".modelTree").hide();
+			$resourceModelLeftNav.find(".dragSize").hide().end().find(".slideBar").hide();
+
+			//触发内容部分的左侧导航事件
+			Backbone.trigger('navClickCB', type);
+
+		} else {
+
+			if (!typeof(Worker)) {
+				alert("请使用现代浏览器查看模型");
+				return;
+			}
+
+			$resourceModelLeftNav.find(".fileTree").hide().end().find(".modelTree").show();
+			$resourceModelLeftNav.find(".dragSize").show().end().find(".slideBar").show();
+
+			//获取模型id
+			this.fetchModelIdByResource(() => {
+				$("#resourceModelLeftNav .item:last").addClass("selected").siblings().removeClass("selected");
+				$resourceModelLeftNav.find(".fileTree").show().end().find(".modelTree").hide();
+				$resourceModelLeftNav.find(".dragSize").hide().end().find(".slideBar").hide();
+			});
+
+		}
+
+	},
+
+	//获取模型id
+	fetchModelIdByResource: function(errCb) {
+
+		var data = {
+			URLtype: "fetchModelIdByProject",
+			data: {
+				projectId: App.ResourceModel.Settings.CurrentVersion.projectId,
+				projectVersionId: App.ResourceModel.Settings.CurrentVersion.id
+			}
+		}
+
+		// App.ResourceModel.Settings.modelId = "e0c63f125d3b5418530c78df2ba5aef1";
+		// this.renderModel();
+		// return;
+
+		App.Comm.ajax(data, (data) => {
+
+			if (data.message == "success") {
+
+				if (data.data) {
+					App.ResourceModel.Settings.modelId = data.data;
+					//成功渲染
+					this.renderModel();
+				} else {
+					alert("模型转换中");
+					//回调处理 tab
+					if ($.isFunction(errCb)) {
+						errCb();
+					}
+				}
+			} else {
+				//回调处理 tab
+				if ($.isFunction(errCb)) {
+					errCb();
+				}
+				alert(data.message);
+			}
+
+		});
+	},
+
+	renderModel() {
+		this.bindTreeScroll();
+		this.$el.find(".modelTree .mCS_no_scrollbar_y").width(800);
+
+		//触发内容部分的左侧导航事件
+		Backbone.trigger('navClickCB', App.ResourceModel.Settings.leftType);
+	},
+
+	//文件浏览滚动条
+	bindTreeScroll: function() {
+		var $modelTree = this.$el.find(".modelTree");
+		if (!$modelTree.hasClass('mCustomScrollbar')) {
+			$modelTree.mCustomScrollbar({
+				set_height: "100%",
+				set_width: "100%",
+				theme: 'minimal-dark',
+				axis: 'xy',
+				keyboard: {
+					enable: true
+				},
+				scrollInertia: 0
+			});
+		}
+		
+	},
+
+	// 收起暂开
+	slideBarToggle:function(){
+		 
+		App.Comm.navBarToggle(this.$el,$("#navContainer"),"left",App.ResourceModel.Settings.Viewer);
+	}, 
+
+	//拖拽改变大小
+	dragSize: function(event) {
+
+		App.Comm.dragSize(event,$("#resourceModelLeftNav"),$("#navContainer"),"left",App.ResourceModel.Settings.Viewer);
+
+		return false;
 	}
 
 });

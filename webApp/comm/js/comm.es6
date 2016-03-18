@@ -56,16 +56,16 @@ App.Comm = {
 					data.url = data.url.replace(rex, val);
 				}
 			}
-		} 
-		 
+		}
+
 		//删除
 		if ((data.URLtype.indexOf("delete") > -1 || data.URLtype.indexOf("put") > -1) && data.data) {
 			if (data.url.indexOf("?") == -1) {
-				 data.url += "?1=1";
-			}   
+				data.url += "?1=1";
+			}
 			for (var p in data.data) {
-				data.url+="&"+p+"="+data.data[p];
-			} 
+				data.url += "&" + p + "=" + data.data[p];
+			}
 		}
 
 		return data;
@@ -138,6 +138,96 @@ App.Comm = {
 		}
 
 		return result;
+	},
+
+	//收起和暂开
+	navBarToggle: function($el, $content, dirc, Viewer) {
+
+		var dircWidth, mDirc;
+		if (dirc == "left") {
+			mDirc = "margin-left";
+		} else {
+			mDirc = "margin-right";
+		}
+
+		dircWidth = parseInt($el.css(mDirc));
+
+		if (dircWidth < 0) {
+
+			var ani = {}
+			ani[mDirc] = "0px";
+
+			$el.animate(ani, 500, function() {
+				$el.find(".dragSize").show().end().find(".slideBar i").toggleClass('icon-caret-left icon-caret-right');
+				$content.css(mDirc, $el.width());
+				if (Viewer) {
+					Viewer.resize();
+				}
+
+			});
+		} else {
+			var width = $el.width(),
+				ani = {};
+
+			ani[mDirc] = -width;
+			$el.animate(ani, 500, function() {
+				$el.find(".dragSize").hide().end().find(".slideBar i").toggleClass('icon-caret-left icon-caret-right');
+				$content.css(mDirc, 0);
+				if (Viewer) {
+					Viewer.resize();
+				}
+			});
+		}
+
+	},
+	//拖拽改变尺寸
+	dragSize: function(event, $el, $content, dirc,Viewer) {
+			 
+		var initX = event.pageX,
+			isLeft = dirc == "left" ? true : false,
+			initWidth = $el.width();
+
+		var $target = $(event.target);
+
+		$(document).on("mousemove.dragSize", function(event) {
+			var newWidth;
+			if (isLeft) {
+				newWidth = initWidth + event.pageX - initX;
+			} else {
+				newWidth = initWidth + initX - event.pageX;
+			}
+
+			$el.width(newWidth);
+		});
+
+		$(document).on("mouseup.dragSize", function() {
+
+			$(document).off("mouseup.dragSize");
+			$(document).off("mousemove.dragSize");
+
+			var contentWidth = $content.width(),
+				leftNavWidth = $el.width(),
+				gap = leftNavWidth - initWidth;
+
+			var mPos = "margin-right";
+			if (isLeft) {
+				mPos = "margin-left";
+			}
+
+			if (contentWidth - gap < 10) {
+				var maxWidth = initWidth + contentWidth - 10;
+				$el.width(maxWidth);
+				$content.css(mPos, maxWidth);
+			} else {
+				$content.css(mPos, leftNavWidth);
+			}
+			if (Viewer) {
+				Viewer.resize();
+			}
+		});
+
+		return false;
+
 	}
 
 };

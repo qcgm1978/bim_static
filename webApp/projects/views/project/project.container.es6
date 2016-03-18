@@ -160,7 +160,8 @@ App.Project.ProjectContainer = Backbone.View.extend({
 
 	},
 	//收起和暂开
-	navBarLeftShowAndHide: function() {
+	navBarLeftShowAndHide: function() { 
+
 		var $leftNav = $("#projectContainer .leftNav"),
 			mLeft = parseInt($leftNav.css("margin-left"));
 		//隐藏状态
