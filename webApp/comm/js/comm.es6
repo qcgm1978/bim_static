@@ -5,7 +5,7 @@ App.Comm = {
 		pageItemCount: Math.floor(($("body").height() + 60) / 70) > 10 && Math.floor(($("body").height() + 60) / 70) || 10
 	},
 
-	//·â×°ajax
+	//å°è£…ajax
 	ajax: function(data, callback) {
 
 		data = App.Comm.getUrlByType(data);
@@ -21,7 +21,7 @@ App.Comm = {
 					}
 				}
 
-				//»Øµ÷
+				//å›è°ƒ
 				callback(data);
 
 			});
@@ -33,19 +33,19 @@ App.Comm = {
 
 	getUrlByType: function(data) {
 
-		//ÊÇ·ñµ÷ÊÔ
+		//æ˜¯å¦è°ƒè¯•
 		if (App.API.Settings.debug) {
 			data.url = App.API.DEBUGURL[data.URLtype];
 		} else {
 			data.url = App.API.Settings.hostname + App.API.URL[data.URLtype];
 		}
 
-		//Ã»ÓĞµ÷ÊÔ½Ó¿Ú
+		//æ²¡æœ‰è°ƒè¯•æ¥å£
 		if (!data.url) {
 			data.url = App.API.Settings.hostname + App.API.URL[data.URLtype];
 		}
 
-		//url ÊÇ·ñÓĞ²ÎÊı
+		//url æ˜¯å¦æœ‰å‚æ•°
 		var urlPars = data.url.match(/\{([\s\S]+?(\}?)+)\}/g);
 		var temp = data.data;
 		if ((typeof temp) == 'string') {
@@ -63,7 +63,7 @@ App.Comm = {
 			}
 		}
 
-		//É¾³ı
+		//åˆ é™¤
 		if ((data.URLtype.indexOf("delete") > -1 || data.URLtype.indexOf("put") > -1) && data.data) {
 			if (data.url.indexOf("?") == -1) {
 				data.url += "?1=1";
@@ -81,15 +81,15 @@ App.Comm = {
 
 	},
 
-	//JS²Ù×÷cookies·½·¨!
-	//Ğ´cookies
+	//JSæ“ä½œcookiesæ–¹æ³•!
+	//å†™cookies
 	setCookie: function(name, value) {
 		var Days = 30;
 		var exp = new Date();
 		exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 1000);
 		document.cookie = name + "=" + escape(value) + ";expires=" + exp.toGMTString();
 	},
-	//»ñÈ¡cookie
+	//è·å–cookie
 	getCookie: function(name) {
 		var arr, reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)");
 		if (arr = document.cookie.match(reg))
@@ -97,7 +97,7 @@ App.Comm = {
 		else
 			return null;
 	},
-	//É¾³ıcookie
+	//åˆ é™¤cookie
 	delCookie: function(name) {
 		var exp = new Date();
 		exp.setTime(exp.getTime() - 1);
@@ -105,7 +105,7 @@ App.Comm = {
 		if (cval != null)
 			document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString();
 	},
-	//¸ñÊ½»¯ ÎÄ¼ş´óĞ¡
+	//æ ¼å¼åŒ– æ–‡ä»¶å¤§å°
 	formatSize: function(size) {
 		if (size === undefined || /\D/.test(size)) {
 			return '';
@@ -121,35 +121,35 @@ App.Comm = {
 			return size + 'b';
 		}
 	},
-	//×´Ì¬×ª»»
+	//çŠ¶æ€è½¬æ¢
 	convertStatus: function(status) {
-		//1£º´ıÉÏ´«£»2£ºÉÏ´«ÖĞ£»3£ºÒÑÉÏ´«£»4£º´ıÉóºË£»5£ºÉóºËÍ¨¹ı£»6£ºÉóºËÍË»Ø£»7£º´ıÒÆ½»£»8£ºÒÆ½»ÍË»Ø£»9£ºÒÑ·¢²¼
+		//1ï¼šå¾…ä¸Šä¼ ï¼›2ï¼šä¸Šä¼ ä¸­ï¼›3ï¼šå·²ä¸Šä¼ ï¼›4ï¼šå¾…å®¡æ ¸ï¼›5ï¼šå®¡æ ¸é€šè¿‡ï¼›6ï¼šå®¡æ ¸é€€å›ï¼›7ï¼šå¾…ç§»äº¤ï¼›8ï¼šç§»äº¤é€€å›ï¼›9ï¼šå·²å‘å¸ƒ
 
 		var result = "";
 		if (status == 1) {
-			result = "´ıÉÏ´«";
+			result = "å¾…ä¸Šä¼ ";
 		} else if (status == 2) {
-			result = "ÉÏ´«ÖĞ";
+			result = "ä¸Šä¼ ä¸­";
 		} else if (status == 3) {
-			result = "ÒÑÉÏ´«";
+			result = "å·²ä¸Šä¼ ";
 		} else if (status == 4) {
-			result = "´ıÉóºË";
+			result = "å¾…å®¡æ ¸";
 		} else if (status == 5) {
-			result = "ÉóºËÍ¨¹ı";
+			result = "å®¡æ ¸é€šè¿‡";
 		} else if (status == 6) {
-			result = "ÉóºËÍË»Ø";
+			result = "å®¡æ ¸é€€å›";
 		} else if (status == 7) {
-			result = "´ıÒÆ½»";
+			result = "å¾…ç§»äº¤";
 		} else if (status == 8) {
-			result = "ÒÆ½»ÍË»Ø";
+			result = "ç§»äº¤é€€å›";
 		} else if (status == 9) {
-			result = "ÒÑ·¢²¼";
+			result = "å·²å‘å¸ƒ";
 		}
 
 		return result;
 	},
 
-	//ÊÕÆğºÍÔİ¿ª
+	//æ”¶èµ·å’Œæš‚å¼€
 	navBarToggle: function($el, $content, dirc, Viewer) {
 
 		var dircWidth, mDirc;
@@ -189,7 +189,7 @@ App.Comm = {
 		}
 
 	},
-	//ÍÏ×§¸Ä±ä³ß´ç
+	//æ‹–æ‹½æ”¹å˜å°ºå¯¸
 	dragSize: function(event, $el, $content, dirc, Viewer) {
 
 		var initX = event.pageX,
@@ -243,5 +243,5 @@ App.Comm = {
 
 
 
-//Ä£¿é
+//æ¨¡å—
 App.Comm.modules = {};
