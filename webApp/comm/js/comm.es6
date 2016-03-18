@@ -5,7 +5,7 @@ App.Comm = {
 		pageItemCount: Math.floor(($("body").height() + 60) / 70) > 10 && Math.floor(($("body").height() + 60) / 70) || 10
 	},
 
-	//封装ajax 
+	//封装ajax
 	ajax: function(data, callback) {
 
 		data = App.Comm.getUrlByType(data);
@@ -49,23 +49,27 @@ App.Comm = {
 		var urlPars = data.url.match(/\{([\s\S]+?(\}?)+)\}/g);
 		if (urlPars) {
 			for (var i = 0; i < urlPars.length; i++) {
+				var temp = data.data;
+				if((typeof temp) == 'string'){
+					temp = JSON.parse(temp);
+				}
 				var rex = urlPars[i],
 					par = rex.replace(/[{|}]/g, ""),
-					val = data.data[par];
+					val = temp[par];
 				if (val) {
 					data.url = data.url.replace(rex, val);
 				}
 			}
-		} 
-		 
+		}
+
 		//删除
 		if ((data.URLtype.indexOf("delete") > -1 || data.URLtype.indexOf("put") > -1) && data.data) {
 			if (data.url.indexOf("?") == -1) {
 				 data.url += "?1=1";
-			}   
+			}
 			for (var p in data.data) {
 				data.url+="&"+p+"="+data.data[p];
-			} 
+			}
 		}
 
 		return data;

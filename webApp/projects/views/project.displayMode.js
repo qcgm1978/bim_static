@@ -5,13 +5,13 @@ App.Projects.DisplayMode=Backbone.View.extend({
 
 	className:'displayModeBox',
 
-	
+
 
 	events:{
 		"click .list":"projectList",
 		"click .map":"proMap"
 	},
-					
+
 	template:_.templateUrl("/projects/tpls/project.displayMode.html",true),
 
 	render:function(){
@@ -32,10 +32,10 @@ App.Projects.DisplayMode=Backbone.View.extend({
 	//切换为地图
 	proMap:function(){
 		App.Projects.Settings.type="map";
-		$("#projectModes").find(".proListBoxScroll").hide().end().find(".proMapBox").show(); 
+		$("#projectModes").find(".proListBoxScroll").hide().end().find(".proMapBox").show();
  		//初始化地图
  		App.Projects.BaiduMap.initMap();
 		//App.Projects.fetch();
-	} 
+	}
 
 });

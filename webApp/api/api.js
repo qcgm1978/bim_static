@@ -10,13 +10,13 @@ App.API = {
 
 	URL: {
 
-		//代办 
+		//代办
 		fetchTodoData: "platform/todo", //获取代办数据
 
-		//项目 
-		fetchProjects: "platform/project", //项目列表   
+		//项目
+		fetchProjects: "platform/project", //项目列表
 		fetchFileList: "doc/{projectId}/{projectVersionId}/file/children", //获取文件列表  ?fileId={parentId}
-		fetchDesignFileNav: "doc/{projectId}/{projectVersionId}/file/tree", //项目设计文件导航 
+		fetchDesignFileNav: "doc/{projectId}/{projectVersionId}/file/tree", //项目设计文件导航
 		fetchDesignModelNav: "dataJson/project/project.design.model.json", //项目设计模型导航
 
 		// 项目面包屑
@@ -29,15 +29,22 @@ App.API = {
 		fetchModelIdByProject: "doc/{projectId}/{projectVersionId}/model",
 		fetchFileModelIdByFileVersionId: "doc/{projectId}/{projectVersionId}/file/meta", //?fileVersionId={fileVersionId}
 
-		uploadFile: "doc/{projectId}/{projectVersionId}/file/data", //上传文件  ?parentId={parentId}&fileName={fileName}&size={size}&digest={digest}&position={position} 
+		uploadFile: "doc/{projectId}/{projectVersionId}/file/data", //上传文件  ?parentId={parentId}&fileName={fileName}&size={size}&digest={digest}&position={position}
 		downLoad: "doc/{projectId}/{projectVersionId}/file/data", //文件下载  ?fileId={fileId}
+
+		//视点
+    fetchModelViewpoint:'sixD/{projectId}/viewPoint',// 获取视点列表
+    createViewpointById:'sixD/{projectId}/viewPoint',// 创建视点
+    editViewpointById:'sixD/{projectId}/viewPoint/{viewPointId}',// 修改视点
+    deleteViewpointById:'sixD/{projectId}/viewPoint/{viewPointId}',// 删除视点
+
 
 		//设计
 		fetchDesignProperties: "sixD/{projectId}/{projectVersionId}/property", //设计属性 ?sceneId={sceneId}&elementId={elementId}
 		fetchDesignVerification: "", // 设计 检测
 		fetchDesignCollision: "", // 设计碰撞
 
-		//计划 
+		//计划
 		fetchPlanModel: "", //模型
 		fetchPlanAnalog: "", //模拟
 		fetchPlanPublicity: "", //关注
@@ -69,7 +76,7 @@ App.API = {
 		fetchStandardLibs: "platform/lib/standardModel", //获取 标准模型库
 		fetchFamLibs: "platform/lib/component", //获取族库
 		fetchStandardVersion:"platform/lib/standardModel/{standardModelId}/version",
-		fetchFileTree: "doc/{projectId}/{projectVersionId}/file/tree", //项目设计文件导航 
+		fetchFileTree: "doc/{projectId}/{projectVersionId}/file/tree", //项目设计文件导航
 		deleteFile:"doc/{projectId}/{projectVersionId}/file?fileVersionId={fileVersionId}", //删除文件  ?fileVersionId={fileVersionId}
 		putFileReName:"doc/{projectId}/{projectVersionId}/file/rename",// 重命名文件 ?fileVersionId={fileVersionId}&name={name}
 		createNewFolder:"doc/{projectId}/{projectVersionId}/file",// 创建新文件夹 ?parentId={parentId}&filePath={filePath}
@@ -80,7 +87,7 @@ App.API = {
 
 	DEBUGURL: {
 
-		//代办		
+		//代办
 		fetchTodoData: "/dataJson/todo/todo.json", //获取代办数据
 
 
@@ -100,7 +107,7 @@ App.API = {
 		fetchDesignVerification: "/dataJson/project/project.design.property.json", //设计检测
 		fetchDesignCollision: "/dataJson/project/project.design.property.json", //设计碰撞
 
-		//计划 
+		//计划
 		fetchPlanModel: "/dataJson/project/project.design.property.json", //模型
 		fetchPlanAnalog: "/dataJson/project/project.design.property.json", //模拟
 		fetchPlanPublicity: "/dataJson/project/project.design.property.json", //关注

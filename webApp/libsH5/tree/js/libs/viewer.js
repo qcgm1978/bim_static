@@ -160,7 +160,7 @@ BIM.common = {
         id:'viewpoint',
         icon:'bar-viewpoint',
         title:'视点',
-        fn:'getCamera'
+        fn:'viewpoint'
       }
       /*{
         id:'fullScreen',
@@ -609,8 +609,14 @@ BIM.util = {
   }
 }
 BIM.prototype = {
-  on:BIM.util.on,
-  off:BIM.util.off,
+  on:function(key,callback){
+    BIM.util.on(key,callback);
+    return this;
+  },
+  off:function(key,callback){
+    BIM.util.off(key,callback);
+    return this;
+  },
   subscribers:BIM.util.subscribers,
   zoomIn : function () {
     BIM.util.pub('zoomIn');
@@ -713,10 +719,14 @@ BIM.prototype = {
     BIM.util.changeClass('bar-camera','bar-item','selected');
   },
   getCamera : function(){
-    return BIM.common.viewer.getCamera();
+    return window.btoa(BIM.common.viewer.getCamera());
   },
   setCamera : function(json){
-    BIM.common.viewer.setCamera(json);
+    BIM.common.viewer.setCamera(window.atob(json));
+  },
+  viewpoint : function(){
+    var self = this;
+    BIM.util.pub('viewpoint',self.getCamera());
   },
   section : function(){
     BIM.util.toggleSectionBar();

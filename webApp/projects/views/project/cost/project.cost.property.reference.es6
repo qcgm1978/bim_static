@@ -19,7 +19,7 @@ App.Project.CostReference=Backbone.View.extend({
 	render:function(){
 
 		this.$el.html("正在加载，请稍候……");
-		
+
 		return this;
 	},
 

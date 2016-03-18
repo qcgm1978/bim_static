@@ -48,9 +48,9 @@ App.Project.leftNav = Backbone.View.extend({
 				alert("请使用现代浏览器查看模型");
 				return;
 			}
-		 
-			this.fetchModelIdByProject(); 
-			 
+
+			this.fetchModelIdByProject();
+
 		}
 
 	},
@@ -82,10 +82,9 @@ App.Project.leftNav = Backbone.View.extend({
 
 		});
 	},
-
 	//模型渲染
 	renderModel:function(){
-	 
+		var that = this;
 		//切换导航tab
 			$("#projectContainer").find(".projectFileNavContent").hide();
 			$("#projectContainer").find(".projectModelNavContent").show();
@@ -96,7 +95,7 @@ App.Project.leftNav = Backbone.View.extend({
 			//拖拽和收起
 			$("#projectContainer .leftNav").find(".slideBar").show().end().find(".dragSize").show();
 			var $projectCotent = $("#projectContainer .projectCotent"),
-				mRight = $projectCotent.data("mRight"); 
+				mRight = $projectCotent.data("mRight");
 
 			if (mRight && mRight!="0px") {
 
@@ -105,33 +104,42 @@ App.Project.leftNav = Backbone.View.extend({
 				if (!mRight) {
 					$projectCotent.css("margin-right","400px");
 				}
-				
+
 			}
 
 			$("#projectContainer").find(".projectModelNavContent .mCS_no_scrollbar_y").width(800);
 			//渲染模型属性
-			App.Project.renderModelContentByType(); 
+			App.Project.renderModelContentByType();
 
 
-			var viewer = new BIM({
+			var viewer = App.Project.Settings.Viewer = new BIM({
 				element: $("#projectContainer .modelContainerContent")[0],
 				projectId:App.Project.Settings.modelId, //"b7554b6591ff6381af854fa4efa41f81", //App.Project.Settings.projectId,
 				// projectId:'testrvt',
 				tools: true,
 				treeElement: $("#projectContainer .projectNavModelContainer")[0]
 			});
+			$("#projectContainer .projectNavModelContainer").append(new App.Project.viewpoint().render().el);
 
-			App.Project.Settings.Viewer=viewer;
+			viewer.on('viewpoint',function(point){
+				App.Project.ViewpointAttr.ListCollection.add({
+	        data:[{
+	          id:'',
+	          name:'新建视点',
+	          viewPoint:point
+	        }]
+				})
+			})
 
 			viewer.on("click", function(model) {
 			 	App.Project.Settings.ModelObj=null;
 				if (!model.intersect) {
 					return;
-				} 
+				}
 
 				App.Project.Settings.ModelObj=model;
 				//App.Project.Settings.modelId = model.userId;
-				//设计  
+				//设计
 				if (App.Project.Settings.projectNav == "design") {
 					//属性
 					if (App.Project.Settings.property == "attr") {
@@ -139,11 +147,11 @@ App.Project.leftNav = Backbone.View.extend({
 						App.Project.DesignAttr.PropertiesCollection.projectId=App.Project.Settings.projectId;
 						App.Project.DesignAttr.PropertiesCollection.projectVersionId=App.Project.Settings.CurrentVersion.id;
 						App.Project.DesignAttr.PropertiesCollection.fetch({
-							data: { 
+							data: {
 								elementId: model.intersect.userId,
-								sceneId: model.intersect.object.userData.sceneId 
+								sceneId: model.intersect.object.userData.sceneId
 							}
-						}); 
+						});
 					}
 
 				}

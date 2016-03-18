@@ -9,19 +9,19 @@ App.Project.FileContainerDetail=Backbone.View.extend({
 	//初始化
 	initialize:function(){
 		//this.listenTo(this.model, 'change', this.render);
-	   // this.listenTo(this.model, 'destroy', this.removeItem); 
+	   // this.listenTo(this.model, 'destroy', this.removeItem);
 	},
 
 	//事件绑定
 	events:{
 		"click .fileName  .text":"fileClick"
 	},
-	
+
 	template:_.templateUrl("/projects/tpls/project/project.container.file.detail.html"),
 
 	//渲染
 	render:function(){
-		 
+
 		this.$el.html(this.template(this.model.toJSON()));
 		return this;
 	},
@@ -32,9 +32,9 @@ App.Project.FileContainerDetail=Backbone.View.extend({
 		var $target=$(event.target),id=$target.data("id"),isFolder=$target.data("isfolder");
 		//文件夹
 		if (isFolder) {
-			
+
 			var $leftItem=$("#projectContainer .projectNavContentBox .treeViewMarUl span[data-id='"+id+"']");
-			
+
 			if ($leftItem.length>0) {
 
 				$nodeSwitch=$leftItem.parent().find(".nodeSwitch");
@@ -42,7 +42,7 @@ App.Project.FileContainerDetail=Backbone.View.extend({
 				if ($nodeSwitch.length>0  && !$nodeSwitch.hasClass('on') ) {
 					$nodeSwitch.click();
 				}
-				$leftItem.click(); 
+				$leftItem.click();
 			}
 
 		}else{
@@ -65,7 +65,7 @@ App.Project.FileContainerDetail=Backbone.View.extend({
 				fileVersionId:id,
 			}
 		};
-	 
+
 		App.Comm.ajax(data,function(data){
 			 if (data.message=="success") {
 

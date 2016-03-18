@@ -1,11 +1,15 @@
 /* treeView  */
 .tree-view{
-  padding:12px;
+  padding:12px 12px 0;
   list-style:none;
   font-size:12px;
   -webkit-user-select:none;
   -moz-user-select:none;
   user-select:none;
+  position:relative;
+}
+.tree-view + .tree-view{
+  padding:0 12px;
 }
 .tree-view ul{
   margin:0;
@@ -20,6 +24,30 @@
 }
 .tree-view .item-content{
   padding:3px;
+}
+.context-menu{
+  display:none;
+  position:absolute;
+  background:#fafafa;
+  border:1px solid #ccc;
+}
+.context-menu .item-menu{
+  display:block;
+  width:50px;
+  height:24px;
+  line-height:24px;
+  color:#000;
+  font-size:12px;
+  padding:0 5px;
+  border-bottom:1px solid #ccc;
+  cursor:pointer;
+}
+.context-menu .item-menu:last-child{
+  border:none;
+}
+.context-menu .item-menu:hover{
+  background:#f2f2f2;
+  text-decoration:none;
 }
 /*.tree-view .item-content:hover {
   background-color: #06c;
@@ -37,6 +65,14 @@
   color:#333;
   background:url(../images/tree.png) no-repeat;
   background-position:0 0;
+}
+.viewpoint{
+  display:inline-block;
+  width:12px;
+  height:11px;
+  margin:0 3px;
+  background:url(../images/tree.png) no-repeat;
+  background-position:0 -80px;
 }
 .tree-view .open .nodeSwitch{
   background-position:0 -20px;
