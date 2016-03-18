@@ -5,7 +5,7 @@ App.Comm = {
 		pageItemCount: Math.floor(($("body").height() + 60) / 70) > 10 && Math.floor(($("body").height() + 60) / 70) || 10
 	},
 
-	//å°è£…ajax 
+	//·â×°ajax
 	ajax: function(data, callback) {
 
 		data = App.Comm.getUrlByType(data);
@@ -21,7 +21,7 @@ App.Comm = {
 					}
 				}
 
-				//å›è°ƒ
+				//»Øµ÷
 				callback(data);
 
 			});
@@ -33,34 +33,43 @@ App.Comm = {
 
 	getUrlByType: function(data) {
 
-		//æ˜¯å¦è°ƒè¯•
+		//ÊÇ·ñµ÷ÊÔ
 		if (App.API.Settings.debug) {
 			data.url = App.API.DEBUGURL[data.URLtype];
 		} else {
 			data.url = App.API.Settings.hostname + App.API.URL[data.URLtype];
 		}
 
-		//æ²¡æœ‰è°ƒè¯•æ¥å£
+		//Ã»ÓĞµ÷ÊÔ½Ó¿Ú
 		if (!data.url) {
 			data.url = App.API.Settings.hostname + App.API.URL[data.URLtype];
 		}
 
-		//url æ˜¯å¦æœ‰å‚æ•°
+		//url ÊÇ·ñÓĞ²ÎÊı
 		var urlPars = data.url.match(/\{([\s\S]+?(\}?)+)\}/g);
+		var temp = data.data;
+		if ((typeof temp) == 'string') {
+			temp = JSON.parse(temp);
+		}
 		if (urlPars) {
 			for (var i = 0; i < urlPars.length; i++) {
+
 				var rex = urlPars[i],
 					par = rex.replace(/[{|}]/g, ""),
-					val = data.data[par];
+					val = temp[par];
 				if (val) {
 					data.url = data.url.replace(rex, val);
 				}
 			}
 		}
 
-		//åˆ é™¤
+		//É¾³ı
 		if ((data.URLtype.indexOf("delete") > -1 || data.URLtype.indexOf("put") > -1) && data.data) {
 			if (data.url.indexOf("?") == -1) {
+				data.url += "?1=1";
+			}
+			for (var p in data.data) {
+				data.url += "&" + p + "=" + data.data[p];
 				data.url += "?1=1";
 			}
 			for (var p in data.data) {
@@ -72,15 +81,15 @@ App.Comm = {
 
 	},
 
-	//JSæ“ä½œcookiesæ–¹æ³•!
-	//å†™cookies
+	//JS²Ù×÷cookies·½·¨!
+	//Ğ´cookies
 	setCookie: function(name, value) {
 		var Days = 30;
 		var exp = new Date();
 		exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 1000);
 		document.cookie = name + "=" + escape(value) + ";expires=" + exp.toGMTString();
 	},
-	//è·å–cookie
+	//»ñÈ¡cookie
 	getCookie: function(name) {
 		var arr, reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)");
 		if (arr = document.cookie.match(reg))
@@ -88,7 +97,7 @@ App.Comm = {
 		else
 			return null;
 	},
-	//åˆ é™¤cookie
+	//É¾³ıcookie
 	delCookie: function(name) {
 		var exp = new Date();
 		exp.setTime(exp.getTime() - 1);
@@ -96,7 +105,7 @@ App.Comm = {
 		if (cval != null)
 			document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString();
 	},
-	//æ ¼å¼åŒ– æ–‡ä»¶å¤§å°
+	//¸ñÊ½»¯ ÎÄ¼ş´óĞ¡
 	formatSize: function(size) {
 		if (size === undefined || /\D/.test(size)) {
 			return '';
@@ -112,35 +121,35 @@ App.Comm = {
 			return size + 'b';
 		}
 	},
-	//çŠ¶æ€è½¬æ¢
+	//×´Ì¬×ª»»
 	convertStatus: function(status) {
-		//1ï¼šå¾…ä¸Šä¼ ï¼›2ï¼šä¸Šä¼ ä¸­ï¼›3ï¼šå·²ä¸Šä¼ ï¼›4ï¼šå¾…å®¡æ ¸ï¼›5ï¼šå®¡æ ¸é€šè¿‡ï¼›6ï¼šå®¡æ ¸é€€å›ï¼›7ï¼šå¾…ç§»äº¤ï¼›8ï¼šç§»äº¤é€€å›ï¼›9ï¼šå·²å‘å¸ƒ
+		//1£º´ıÉÏ´«£»2£ºÉÏ´«ÖĞ£»3£ºÒÑÉÏ´«£»4£º´ıÉóºË£»5£ºÉóºËÍ¨¹ı£»6£ºÉóºËÍË»Ø£»7£º´ıÒÆ½»£»8£ºÒÆ½»ÍË»Ø£»9£ºÒÑ·¢²¼
 
 		var result = "";
 		if (status == 1) {
-			result = "å¾…ä¸Šä¼ ";
+			result = "´ıÉÏ´«";
 		} else if (status == 2) {
-			result = "ä¸Šä¼ ä¸­";
+			result = "ÉÏ´«ÖĞ";
 		} else if (status == 3) {
-			result = "å·²ä¸Šä¼ ";
+			result = "ÒÑÉÏ´«";
 		} else if (status == 4) {
-			result = "å¾…å®¡æ ¸";
+			result = "´ıÉóºË";
 		} else if (status == 5) {
-			result = "å®¡æ ¸é€šè¿‡";
+			result = "ÉóºËÍ¨¹ı";
 		} else if (status == 6) {
-			result = "å®¡æ ¸é€€å›";
+			result = "ÉóºËÍË»Ø";
 		} else if (status == 7) {
-			result = "å¾…ç§»äº¤";
+			result = "´ıÒÆ½»";
 		} else if (status == 8) {
-			result = "ç§»äº¤é€€å›";
+			result = "ÒÆ½»ÍË»Ø";
 		} else if (status == 9) {
-			result = "å·²å‘å¸ƒ";
+			result = "ÒÑ·¢²¼";
 		}
 
 		return result;
 	},
 
-	//æ”¶èµ·å’Œæš‚å¼€
+	//ÊÕÆğºÍÔİ¿ª
 	navBarToggle: function($el, $content, dirc, Viewer) {
 
 		var dircWidth, mDirc;
@@ -180,9 +189,9 @@ App.Comm = {
 		}
 
 	},
-	//æ‹–æ‹½æ”¹å˜å°ºå¯¸
-	dragSize: function(event, $el, $content, dirc,Viewer) {
-			 
+	//ÍÏ×§¸Ä±ä³ß´ç
+	dragSize: function(event, $el, $content, dirc, Viewer) {
+
 		var initX = event.pageX,
 			isLeft = dirc == "left" ? true : false,
 			initWidth = $el.width();
@@ -234,5 +243,5 @@ App.Comm = {
 
 
 
-//æ¨¡å—
+//Ä£¿é
 App.Comm.modules = {};
