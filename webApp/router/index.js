@@ -8,7 +8,7 @@ var AppRoute = Backbone.Router.extend({
 		'flow': 'flow',
 		'resources': 'resources',
 		'resources/:type':'resource',
-		'resources/:type/:id':'resourceModel',
+		'resources/:type/:projectId/:versionId':'resourceModel',
 		'console': 'console',
 		'list/:id': 'list'
 	},
@@ -60,6 +60,7 @@ var AppRoute = Backbone.Router.extend({
 
 	//资源库
 	resources: function() {
+		 
 		this.reset();
 		//销毁上传
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".resources").addClass('selected');
@@ -72,6 +73,7 @@ var AppRoute = Backbone.Router.extend({
 
 	//单个项目
 	resource:function(type){
+	 
 		this.reset();
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".resources").addClass('selected');
 		_.require('/static/dist/resources/resources.css');
@@ -80,13 +82,15 @@ var AppRoute = Backbone.Router.extend({
 		App.ResourcesNav.init();
 	},
 
-	resourceModel:function(type,id){
+	resourceModel:function(type,projectId,versionId){
+	 
 		this.reset();
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".resources").addClass('selected');
 		_.require('/static/dist/resources/resources.css');
 		_.require('/static/dist/resources/resources.js'); 
 		App.ResourcesNav.Settings.type=App.ResourceModel.Settings.type=type;
-		App.ResourceModel.Settings.id=id; 
+		App.ResourceModel.Settings.projectId=projectId; 
+		App.ResourceModel.Settings.versionId=versionId;
 		App.ResourceModel.init();
 	},
 

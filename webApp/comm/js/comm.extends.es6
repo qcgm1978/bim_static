@@ -4,16 +4,21 @@
 
 // underscore 扩展 
 
-//获取模板根据URL
-_.templateUrl = function(url, notCompile) {
 
-	if (url.substr(0,1)==".") {
-		url="/static/dist/tpls"+url.substr(1); 
-	}else if (url.substr(0,1)=="/") {
-		url="/static/dist/tpls"+url; 
+App.Comm.templateCache = [];
+
+//获取模板根据URL
+_.templateUrl = function(url, notCompile) { 
+	 
+	if (url.substr(0, 1) == ".") {
+		url = "/static/dist/tpls" + url.substr(1);
+	} else if (url.substr(0, 1) == "/") {
+		url = "/static/dist/tpls" + url;
 	}
 
- 
+	if (App.Comm.templateCache[url]) {
+		return App.Comm.templateCache[url];
+	} 
 
 	var result;
 	$.ajax({
@@ -23,11 +28,15 @@ _.templateUrl = function(url, notCompile) {
 	}).done(function(tpl) {
 		if (notCompile) {
 			result = tpl;
+
 		} else {
 			result = _.template(tpl);
 		}
 
-	});
+	}); 
+
+	App.Comm.templateCache[url] = result;
+
 	return result;
 }
 
@@ -36,11 +45,11 @@ App.Comm.requireCache = [];
 
 
 //按需加载 
-_.require = function(url) { 
+_.require = function(url) {
 
-	var index = url.lastIndexOf("."); 
+	var index = url.lastIndexOf(".");
 	var type = url.substring(index + 1);
-	
+
 	url = url.substring(0, index) + "_" + App.Comm.Settings.v + "." + type;
 
 	//加载过不再加载
@@ -129,7 +138,7 @@ String.prototype.trim = function() {
 // (new Date()).Format("yyyy-MM-dd hh:mm:ss.S") ==> 2006-07-02 08:09:04.423 
 // (new Date()).Format("yyyy-M-d h:m:s.S")      ==> 2006-7-2 8:9:4.18 
 Date.prototype.format = function(fmt) { //author: meizz  
-	 
+
 	var o = {
 		"M+": this.getMonth() + 1, //月份 
 		"d+": this.getDate(), //日 
@@ -145,12 +154,13 @@ Date.prototype.format = function(fmt) { //author: meizz
 	return fmt;
 }
 
-Date.prototype.shortFormat=function(){
+Date.prototype.shortFormat = function() {
 
-	var CapitalMonth=['一','二','三','四','五','六','七','八','九','十','十一','十二'],month=CapitalMonth[this.getMonth()];
+	var CapitalMonth = ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十', '十一', '十二'],
+		month = CapitalMonth[this.getMonth()];
 
 
-	return this.getFullYear()+"年"+ month+"月";
+	return this.getFullYear() + "年" + month + "月";
 }
 
 //格式化字符串
@@ -185,8 +195,8 @@ String.prototype.format = function(args) {
 
 var BackboneSync = Backbone.sync;
 //重写backbone 的 sync 
-Backbone.sync = function(method, model, options) { 
-	 
+Backbone.sync = function(method, model, options) {
+
 	// 在没有url 的情况下 取 api 的值 以防有特别的处理
 	//if (!model.url) 
 	//测试

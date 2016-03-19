@@ -168,7 +168,7 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 	enterEditNameOrCreateNew: function(event) {
 
 		var $item = $(event.target).closest(".item");
-
+		 
 		//创建
 		if ($item.hasClass('createNew')) {
 			this.createNewFolder($item);

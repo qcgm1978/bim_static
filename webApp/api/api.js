@@ -1,4 +1,3 @@
-
 // 注意  删除操作 参数需要在url 中 jq 不会 处理 所以 url 命名的时候 以 delete 开头，我会处理
 
 App.API = {
@@ -14,7 +13,7 @@ App.API = {
 		fetchTodoData: "platform/todo", //获取代办数据
 
 		//项目
-		fetchProjects: "platform/project", //项目列表
+		fetchProjects: "platform/project?type=3", //项目列表
 		fetchFileList: "doc/{projectId}/{projectVersionId}/file/children", //获取文件列表  ?fileId={parentId}
 		fetchDesignFileNav: "doc/{projectId}/{projectVersionId}/file/tree", //项目设计文件导航
 		fetchDesignModelNav: "dataJson/project/project.design.model.json", //项目设计模型导航
@@ -33,10 +32,10 @@ App.API = {
 		downLoad: "doc/{projectId}/{projectVersionId}/file/data", //文件下载  ?fileId={fileId}
 
 		//视点
-    fetchModelViewpoint:'sixD/{projectId}/viewPoint',// 获取视点列表
-    createViewpointById:'sixD/{projectId}/viewPoint',// 创建视点
-    editViewpointById:'sixD/{projectId}/viewPoint/{viewPointId}',// 修改视点
-    deleteViewpointById:'sixD/{projectId}/viewPoint/{viewPointId}',// 删除视点
+		fetchModelViewpoint: 'sixD/{projectId}/viewPoint', // 获取视点列表
+		createViewpointById: 'sixD/{projectId}/viewPoint', // 创建视点
+		editViewpointById: 'sixD/{projectId}/viewPoint/{viewPointId}', // 修改视点
+		deleteViewpointById: 'sixD/{projectId}/viewPoint/{viewPointId}', // 删除视点
 
 
 		//设计
@@ -73,13 +72,13 @@ App.API = {
 
 
 		//资源
-		fetchStandardLibs: "platform/lib/standardModel", //获取 标准模型库
-		fetchFamLibs: "platform/lib/component", //获取族库
-		fetchStandardVersion:"platform/lib/standardModel/{standardModelId}/version",
+		fetchStandardLibs: "platform/project?type=1", //获取 标准模型库
+		fetchFamLibs: "platform/project?type=2", //获取族库
+		fetchVersion: "platform/project/{projectId}/version/{versionId}",
 		fetchFileTree: "doc/{projectId}/{projectVersionId}/file/tree", //项目设计文件导航
-		deleteFile:"doc/{projectId}/{projectVersionId}/file?fileVersionId={fileVersionId}", //删除文件  ?fileVersionId={fileVersionId}
-		putFileReName:"doc/{projectId}/{projectVersionId}/file/rename",// 重命名文件 ?fileVersionId={fileVersionId}&name={name}
-		createNewFolder:"doc/{projectId}/{projectVersionId}/file",// 创建新文件夹 ?parentId={parentId}&filePath={filePath}
+		deleteFile: "doc/{projectId}/{projectVersionId}/file?fileVersionId={fileVersionId}", //删除文件  ?fileVersionId={fileVersionId}
+		putFileReName: "doc/{projectId}/{projectVersionId}/file/rename", // 重命名文件 ?fileVersionId={fileVersionId}&name={name}
+		createNewFolder: "doc/{projectId}/{projectVersionId}/file", // 创建新文件夹 ?parentId={parentId}&filePath={filePath}
 
 
 		test: ""
@@ -131,13 +130,13 @@ App.API = {
 
 
 		//资源
-		fetchStandardLibs: "/dataJson/resources/StandardLibs.json",//获取 标准模型库
+		fetchStandardLibs: "/dataJson/resources/StandardLibs.json", //获取 标准模型库
 		fetchFamLibs: "/dataJson/resources/StandardLibs.json", //获取族库
-		fetchStandardVersion:"/dataJson/resources/fetchStandardVersion.json",
+		fetchStandardVersion: "/dataJson/resources/fetchStandardVersion.json",
 		fetchFileTree: "/dataJson/project/project.design.file.json", //项目设计文件导航
-		deleteFile:"",//删除文件
-		putFileReName:"", //重命名文件
-		createNewFolder:"",
+		deleteFile: "", //删除文件
+		putFileReName: "", //重命名文件
+		createNewFolder: "",
 
 		test: ""
 

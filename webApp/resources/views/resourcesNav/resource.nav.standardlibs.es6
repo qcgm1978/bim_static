@@ -4,16 +4,20 @@ App.ResourcesNav.StandardLibs=Backbone.View.extend({
 
 	id:"standardLibs",
 
-	template:_.templateUrl("/resources/tpls/resourcesNav/resource.nav.standardlibs.html",true),
+	template:_.templateUrl("/resources/tpls/resourcesNav/resource.nav.standardlibs.html"),
 
 	//初始化
 	initialize(){
 		this.listenTo(App.ResourcesNav.StandardLibsCollection,"add",this.addOne);
 	},
 
+	events:{
+		"click .title .name":"setVersion"
+	},
+
 	render:function(){
 
-		this.$el.html(this.template);
+		this.$el.html(this.template());
 		return this;
 	},
 
@@ -24,14 +28,30 @@ App.ResourcesNav.StandardLibs=Backbone.View.extend({
 	addOne(model){ 
 
 		var $standar=this.$el.find(".standarBody .standar"),$loading=$standar.find(".loading");
-
+		
 		if ($loading.length>0) {
 			$loading.remove();
 		} 
-
-		var data=model.toJSON();
-	 	$standar.append(this.templateDetail(data));
 		 
+		var data=model.toJSON(),$el=$(this.templateDetail(data)).data("file",data);
+
+	 	$standar.append($el);
+		 
+	},
+	//设置版本
+	setVersion:function(event){
+
+		var $target=$(event.target),$item=$target.closest(".item"),data=$item.data("file");
+
+		if (data.version) {
+			App.ResourceModel.Settings.CurrentVersion=data.version;
+		}else{
+			alert("暂无版本");
+			$target.removeAttr("href");
+		}
+
+
+
 	}
 
 
