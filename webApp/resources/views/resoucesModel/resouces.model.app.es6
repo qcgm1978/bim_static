@@ -4,23 +4,17 @@
 
  	render: function() {
 
- 	 
+ 		this.$el.html(new App.ResourceCrumbsNav().render().el);
  		//标准模型库
  		if (App.ResourcesNav.Settings.type == "standardLibs") {
-
- 			this.$el.html(new App.ResourceCrumbsNav().render().el);
-
  			this.$el.append(new App.ResourceModel.LeftNav().render().el);
-
- 			this.$el.append(new App.ResourceModel.ListNav().render().el);
-
  		} else if (App.ResourcesNav.Settings.type == "famLibs") {
-
  			//族库
- 			this.$el.html(new App.ResourceCrumbsNav().render().el);
+ 			this.$el.append(new App.ResourceFamLibs.leftNav().render().el);
  		}
+ 		this.$el.append(new App.ResourceModel.ListNav().render().el);
 
-
+ 		
  		//右键菜单
  		if (!document.getElementById("listContext")) {
  			//右键菜单

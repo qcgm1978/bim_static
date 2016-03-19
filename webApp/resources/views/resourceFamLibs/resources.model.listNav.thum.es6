@@ -1,17 +1,17 @@
 //列表
-App.ResourceModel.ListContent = Backbone.View.extend({
+App.ResourceModel.ThumContent = Backbone.View.extend({
 
 	tagName: "div",
 
-	id: "resourceListContent",
+	id: "resourceThumContent",
 
 	//初始化
 	initialize: function() {
-		this.listenTo(App.ResourceModel.FileCollection, "add", this.addOneFile);
+		this.listenTo(App.ResourceModel.FileThumCollection, "add", this.addOneFile);
 	},
 
 
-	template: _.templateUrl("/resources/tpls/resourceModel/resources.model.listNav.list.html", true),
+	template: _.templateUrl("/resources/tpls/resourceFamLibs/resources.model.listNav.thum.html", true),
 
 	//渲染
 	render: function() {
@@ -23,15 +23,15 @@ App.ResourceModel.ListContent = Backbone.View.extend({
 	//添加单个文件
 	addOneFile: function(model) {
 
-
-		var view = new App.ResourceModel.ListNavDetail({
+		 
+		var view = new App.ResourceModel.ThumDetail({
 			model: model
 		});
 
 		if (model.toJSON().isAdd) {
-			this.$el.find(".fileContent").prepend(view.render().el);
+			this.$el.find(".thumContent").prepend(view.render().el);
 		} else {
-			this.$el.find(".fileContent").append(view.render().el);
+			this.$el.find(".thumContent").append(view.render().el);
 		}
 
 
@@ -40,7 +40,7 @@ App.ResourceModel.ListContent = Backbone.View.extend({
 
 	//绑定滚动条
 	bindScroll: function() {
-		var $fileLists = this.$el.find(".fileLists");
+		var $fileLists = this.$el.find(".thumLists");
 		if (!$fileLists.hasClass('mCustomScrollbar')) {
 			$fileLists.mCustomScrollbar({
 				set_height: "100%",

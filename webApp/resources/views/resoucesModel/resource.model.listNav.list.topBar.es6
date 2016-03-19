@@ -28,6 +28,11 @@
  		var $resourceListContent = $("#resourceListContent"),
  			$selFile = $resourceListContent.find(".fileContent :checkbox:checked");
 
+ 		if (App.ResourceModel.Settings.type == "famLibs") {
+ 			$resourceListContent = $("#resourceThumContent");
+ 			$selFile = $resourceListContent.find(".thumContent :checkbox:checked");
+ 		} 
+
  		if ($selFile.length > 1) {
  			alert("目前只支持单文件下载");
  			return;
@@ -44,7 +49,7 @@
  			URLtype: "downLoad",
  			data: {
  				projectId: App.ResourceModel.Settings.CurrentVersion.projectId,
- 				projectVersionId: App.ResourceModel.Settings.CurrentVersion.id
+ 				projectVersionId:App.ResourceModel.Settings.CurrentVersion.id
  			}
  		};
 
@@ -57,6 +62,12 @@
  	deleteFile: function() {
  		var $resourceListContent = $("#resourceListContent"),
  			$selFile = $resourceListContent.find(".fileContent :checkbox:checked");
+
+ 		if (App.ResourceModel.Settings.type == "famLibs") {
+ 			$resourceListContent = $("#resourceThumContent");
+ 			$selFile = $resourceListContent.find(".thumContent :checkbox:checked");
+ 		} 
+
  		if ($selFile.length > 1) {
  			alert("目前只支持单文件删除");
  			return;

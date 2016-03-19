@@ -1,0 +1,19 @@
+
+<span data-fileversionid="<%=fileVersionId%>" class="filecKAll"><input type="checkbox" class="ckMe" /></span>
+<div class="thumBg sourceFileType <%= folder?'thumFolder':'' %>"></div>
+
+<span class="fileName">
+<%if(folder){%>
+  <span data-id="<%=id%>" data-isfolder="<%=folder%>" class="text <%= id=='createNew'?'hidden':'' %>"><%=name%></span>
+    <% if(id=='createNew'){%>
+    	<input type="text" value="<%=name%>" class="txtEdit txtInput" /> 
+    	<span class="btnEnter myIcon-enter"></span>
+    	<span class="btnCalcel pointer myIcon-cancel"></span>
+    <%}%>
+<%}else{%>
+  <a data-id="<%=id%>" href="/static/dist/app/project/filePreview.html?id=<%=id%>&model=<%=modelId%>&projectId=<%=projectId%>&projectVersionId=<%=fileVersionId%>" target="_blank" data-isfolder="<%=folder%>" class="text">
+            <%=name%>
+        </a>
+<%}%>
+
+</span>

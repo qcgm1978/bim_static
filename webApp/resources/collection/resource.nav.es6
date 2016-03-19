@@ -88,10 +88,10 @@ App.ResourcesNav = {
 		App.ResourcesNav.Settings.pageIndex = 1;
 		 
 		if (App.ResourceModel) {
-
+			 
 			var settings = App.ResourceModel.Settings
 			for (var p in settings) {
-				p = "";
+				settings[p] = "";
 			}
 			App.ResourceModel.Settings.leftType = "file";
 			App.ResourceModel.Settings.pageIndex = 1;
