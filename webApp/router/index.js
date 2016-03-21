@@ -10,6 +10,7 @@ var AppRoute = Backbone.Router.extend({
 		'resources/:type': 'resource',
 		'resources/:type/:projectId/:versionId': 'resourceModel',
 		'console': 'console',
+		'console/:type/:step': 'console',
 		'list/:id': 'list'
 	},
 
@@ -96,11 +97,15 @@ var AppRoute = Backbone.Router.extend({
 
 
 	//貌似改掉了
-	console: function() {
+	console: function(type,step) {
 		this.reset();
 		//销毁上传
+		_.require('/static/dist/console/console.css');
+		_.require('/static/dist/console/console.js');
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".console").addClass('selected');
-		$("#contains").html("console");
+		App.Console.Settings.type=type;
+		App.Console.Settings.step=step;
+		App.Console.init();
 	},
 
 	//重置数据

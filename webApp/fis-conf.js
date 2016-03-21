@@ -67,6 +67,10 @@ fis.match('console/**.html', {
   //useHash:true,
   release: "/static/dist/tpls/$0"
 });
+
+
+
+
 fis.match('flow/**.html', {
   //useHash:true,
   release: "/static/dist/tpls/$0"
@@ -184,6 +188,16 @@ fis.match('/resources/**.{js,es6}', {
 fis.match('/resources/**.{less,css}', {
   //useHash:true,
   packTo: '/static/dist/resources/resources_' + v + '.css'
+});
+
+//合并裤文件
+fis.match('/console/**.{js,es6}', {
+  
+  packTo: '/static/dist/console/console_' + v + '.js'
+});
+fis.match('/console/**.{css,less}', {
+  
+  packTo: '/static/dist/console/console_' + v + '.css'
 });
 
 
