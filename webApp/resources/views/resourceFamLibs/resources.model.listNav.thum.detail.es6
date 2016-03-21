@@ -1,33 +1,48 @@
-App.ResourceModel.ListNavDetail = Backbone.View.extend({
+//列表
+App.ResourceModel.ThumDetail = Backbone.View.extend({
 
 	tagName: "li",
 
 	className: "item",
 
-	template: _.templateUrl("/resources/tpls/resourceModel/resource.model.list.nav.detail.html"),
+	//事件绑定
+	events: {
+		"click .text": "fileClick",
+		"click .btnEnter": "enterEditNameOrCreateNew",
+		"click .btnCalcel": "calcelEditName",
+		"click .ckMe":"itemSelected",
+		"keyup .txtEdit":"enterCreateNew"
+
+	},
 
 	initialize: function() {
 		this.listenTo(this.model, "change", this.render);
 		this.listenTo(this.model, "destroy", this.destroy);
 	},
 
-	//事件绑定
-	events: {
-		"click .fileName  .text": "fileClick",
-		"click .btnEnter": "enterEditNameOrCreateNew",
-		"click .btnCalcel": "calcelEditName"
 
-	},
+	template: _.templateUrl("/resources/tpls/resourceFamLibs/resources.model.listNav.thum.detail.html"),
 
+	//渲染
 	render: function() {
 
 		var data = this.model.toJSON();
+
 		this.$el.html(this.template(data)).data("status", data.status);
 		if (data.isAdd) {
 			this.$el.addClass('createNew')
 		}
 		this.bindContext();
 		return this;
+	}, 
+
+	itemSelected(event){
+
+		var $target=$(event.target); 
+
+		$target.closest(".item")[$target.prop("checked")?'addClass':'removeClass']('selected');
+
+		 
 	},
 
 	//文件或者文件夹点击
@@ -39,7 +54,7 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 		//文件夹
 		if (isFolder) {
 
-			var $leftItem = $("#resourceModelLeftNav .treeViewMarUl span[data-id='" + id + "']");
+			var $leftItem = $("#resourceFamlibsLeftNav .treeViewMarUl span[data-id='" + id + "']");
 
 			if ($leftItem.length > 0) {
 
@@ -51,10 +66,6 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 				$leftItem.click();
 			}
 
-		} else {
-
-			//文件直接跳转 不做处理
-
 		}
 	},
 
@@ -65,8 +76,8 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 		var that = this;
 		this.$el.contextMenu('listContext', {
 			//显示 回调
-			onShowMenuCallback: function(event) {
-
+			onShowMenuCallback: function(event) { 
+				 
 				var $item = $(event.target).closest(".item");
 				$("#reNameModel").removeClass('disable');
 				//预览
@@ -76,7 +87,7 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 				} else {
 
 					$("#previewModel").removeClass("disable");
-					var href = $item.find(".fileName .text").prop("href");
+					var href = $item.find(".text").prop("href");
 					$("#previewModel").find("a").prop("href", href);
 
 					//重命名 未上传
@@ -131,21 +142,22 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 				},
 				'reNameModel': function(item) {
 
+					 
 					//重命名
 					let $reNameModel = $("#reNameModel");
 					//不可重命名状态
-					if ($reNameModel.hasClass('disable')) {
+					if ($reNameModel.hasClass('disable')) { 
 						return;
 					}
 
-					var $prevEdit = $("#resourceListContent .fileContent .txtEdit");
+					var $prevEdit =  $("#resourceThumContent .thumContent .txtEdit");
 					if ($prevEdit.length > 0) {
 						that.cancelEdit($prevEdit);
 					}
 
 					var $item = $(item),
 						$fileName = $item.find(".fileName"),
-						text = $fileName.find(".text").hide().text().trim();
+						text = $item.find(".text").hide().text().trim();
 
 					$fileName.append('<input type="text" value="' + text + '" class="txtEdit txtInput" /> <span class="btnEnter myIcon-enter"></span><span class="btnCalcel pointer myIcon-cancel"></span>');
 
@@ -158,17 +170,25 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 	//取消修改名称
 	calcelEditName: function(event) {
 
-		var $prevEdit = $("#resourceListContent .fileContent .txtEdit");
-
+		var $prevEdit = this.$el.find(".txtEdit"); 
 		if ($prevEdit.length > 0) {
 			this.cancelEdit($prevEdit);
 		}
 	},
+
+	//回车创建
+	enterCreateNew(event){
+		if (event.keyCode==13) {
+			this.enterEditNameOrCreateNew(event);
+		}
+
+	},
+
 	//修改名称 或者创建
 	enterEditNameOrCreateNew: function(event) {
 
 		var $item = $(event.target).closest(".item");
-		 
+
 		//创建
 		if ($item.hasClass('createNew')) {
 			this.createNewFolder($item);
@@ -198,7 +218,7 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 
 		App.Comm.ajax(data, function(data) {
 			if (data.message == "success") {
-				var models = App.ResourceModel.FileCollection.models,
+				var models = App.ResourceModel.FileThumCollection.models,
 					id = data.data.id;
 				$.each(models, (i, model) => {
 					var dataJson = model.toJSON();
@@ -216,7 +236,7 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 				});
 
 				//tree name
-				$("#resourceModelLeftNav .treeViewMarUl span[data-id='" + id + "']").text(name);
+				$("#resourceFamlibsLeftNav .treeViewMarUl span[data-id='" + id + "']").text(name);
 
 
 			} else {
@@ -237,7 +257,7 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 
 
 		var filePath = $item.find(".txtEdit").val().trim(),
-			$leftSel = $("#resourceModelLeftNav .treeViewMarUl .selected");
+			$leftSel = $("#resourceFamlibsLeftNav .treeViewMarUl .selected");
 		parentId = "";
 		if ($leftSel.length > 0) {
 			parentId = $leftSel.data("file").fileVersionId;
@@ -255,17 +275,11 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 		};
 
 		App.Comm.ajax(data, function(data) {
-			if (data.message == "success") {
-
-				var models = App.ResourceModel.FileCollection.models;
+			if (data.message == "success") { 
 				//修改数据
-				App.ResourceModel.FileCollection.last().set(data.data);
-
-
+				App.ResourceModel.FileThumCollection.last().set(data.data); 
 				//tree name
-				//$("#resourceModelLeftNav .treeViewMarUl span[data-id='" + id + "']").text(name);
-
-
+				//$("#resourceModelLeftNav .treeViewMarUl span[data-id='" + id + "']").text(name); 
 			}
 		});
 
@@ -276,10 +290,10 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 		var $item = $prevEdit.closest(".item");
 		if ($item.hasClass('createNew')) {
 			//取消监听 促发销毁
-			var model = App.ResourceModel.FileCollection.last();
+			var model = App.ResourceModel.FileThumCollection.last();
 			model.stopListening();
 			model.trigger('destroy', model, model.collection);
-			App.ResourceModel.FileCollection.models.pop();
+			App.ResourceModel.FileThumCollection.models.pop();
 			//删除页面元素
 			$item.remove();
 		} else {

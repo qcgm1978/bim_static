@@ -1,11 +1,12 @@
 App.ResourceModel = {
 
 	Settings: {
-		leftType:"file",
-		modelId:"", //模型id
+		leftType: "file",
+		modelId: "", //模型id
 		fileVersionId: "",
 		type: "", //模型类型
-		id: "", //模型id
+		projectId: "", //项目id
+		versionId: "", // 版本id
 		pageIndex: 1,
 		CurrentVersion: {}
 	},
@@ -31,9 +32,10 @@ App.ResourceModel = {
 		}
 
 	})),
+	// 文件 容器
+	FileThumCollection: new(Backbone.Collection.extend({
 
-	PropertiesCollection: new(Backbone.Collection.extend({
-	 
+
 		model: Backbone.Model.extend({
 			defaults: function() {
 				return {
@@ -42,13 +44,33 @@ App.ResourceModel = {
 			}
 		}),
 
-		urlType:"fetchDesignProperties",
+		urlType: "fetchFileList",
 
-		parse:function(response){
+		parse: function(responese) {
+			if (responese.message == "success") {
+				return responese.data;
+			}
+		}
+
+	})),
+
+	PropertiesCollection: new(Backbone.Collection.extend({
+
+		model: Backbone.Model.extend({
+			defaults: function() {
+				return {
+					title: ""
+				}
+			}
+		}),
+
+		urlType: "fetchDesignProperties",
+
+		parse: function(response) {
 
 			if (response.message == "success") {
-                 return response;
-             }
+				return response;
+			}
 		}
 
 	})),
@@ -56,8 +78,38 @@ App.ResourceModel = {
 	//初始化
 	init: function() {
 
+		//释放上传
+		App.Comm.upload.destroy();
+
+
 		App.ResourceModel.Settings.pageIndex = 1;
-		App.ResourceModel.getVersion();
+
+		//存在直接渲染 否则 加载数据
+		if (App.ResourceModel.Settings.CurrentVersion && 　App.ResourceModel.Settings.CurrentVersion.id) {
+			App.ResourceModel.renderLibs();
+		} else {
+			App.ResourceModel.getVersion();
+		}
+
+
+		//标准模型库
+		// if (App.ResourcesNav.Settings.type == "standardLibs") {
+		// 	//存在直接渲染 否则 加载数据
+		// 	if (App.ResourceModel.Settings.CurrentVersion && 　App.ResourceModel.Settings.CurrentVersion.id) {
+		// 		App.ResourceModel.renderLibs();
+		// 	} else {
+		// 		App.ResourceModel.getVersion();
+		// 	} 
+		// } else if (App.ResourcesNav.Settings.type == "famLibs") { 
+		// 	//存在直接渲染 否则 加载数据
+		// 	if (App.ResourceModel.Settings.CurrentVersion && 　App.ResourceModel.Settings.CurrentVersion.id) {
+		// 		App.ResourceModel.renderLibs();
+		// 	} else {
+		// 		App.ResourceModel.getVersion();
+		// 	}
+		// }
+
+
 	},
 
 	//获取数据
@@ -65,9 +117,10 @@ App.ResourceModel = {
 
 
 		var data = {
-			URLtype: "fetchStandardVersion",
+			URLtype: "fetchVersion",
 			data: {
-				standardModelId: App.ResourceModel.Settings.id
+				projectId: App.ResourceModel.Settings.projectId,
+				versionId: App.ResourceModel.Settings.versionId
 			}
 		};
 
@@ -75,38 +128,52 @@ App.ResourceModel = {
 
 			if (data.message == "success") {
 
-				var Versions = data.data,
-					vCount = Versions.length,
-					Version;
-				for (var i = 0; i < vCount; i++) {
-					Version = Versions[i];
-					if (Version.lastest) {
-						App.ResourceModel.Settings.CurrentVersion = Version;
-					}
-				}
+				App.ResourceModel.Settings.CurrentVersion = data.data;
 
 				if (!App.ResourceModel.Settings.CurrentVersion) {
 					alert("无默认版本");
 					return;
 				} else {
 					//渲染数据
-					new App.ResourceModel.App().render();
-					App.ResourceModel.FileCollection.projectId = App.ResourceModel.Settings.CurrentVersion.projectId;
-					App.ResourceModel.FileCollection.projectVersionId = App.ResourceModel.Settings.CurrentVersion.id;
-					App.ResourceModel.FileCollection.fetch();
-					//上传
-					App.ResourceUpload.init($(document.body));
-
+					App.ResourceModel.renderLibs();
 				}
-
 
 			} else {
 				alert("获取版本失败");
 			}
 
 		});
-	}, 
-	 
+	},
+
+
+	//渲染标准模型库
+	renderLibs() {
+		if (!App.ResourceModel.Settings.CurrentVersion) {
+			alert("无默认版本");
+			return;
+		} else {
+			//渲染数据
+			new App.ResourceModel.App().render();
+			var type = App.ResourcesNav.Settings.type;
+			if (type == "standardLibs") {
+				App.ResourceModel.FileCollection.projectId = App.ResourceModel.Settings.CurrentVersion.projectId;
+				App.ResourceModel.FileCollection.projectVersionId = App.ResourceModel.Settings.CurrentVersion.id;
+				App.ResourceModel.FileCollection.reset();
+				App.ResourceModel.FileCollection.fetch();
+			} else if (type == "famLibs") {
+				App.ResourceModel.FileThumCollection.projectId = App.ResourceModel.Settings.CurrentVersion.projectId;
+				App.ResourceModel.FileThumCollection.projectVersionId = 100, //App.ResourceModel.Settings.CurrentVersion.id;
+					App.ResourceModel.FileThumCollection.reset();
+				App.ResourceModel.FileThumCollection.fetch();
+			}
+
+			//上传
+			App.ResourceUpload.init($(document.body));
+
+		}
+	},
+
+
 	//创建文件夹
 	createNewFolder: function() {
 
@@ -124,7 +191,13 @@ App.ResourceModel = {
 			floor: null
 		}
 
-		App.ResourceModel.FileCollection.push(virModel);
+		var type=App.ResourceModel.Settings.type;
+		if (type=="standardLibs") {
+			App.ResourceModel.FileCollection.push(virModel);
+		}else if(type=="famLibs"){
+			App.ResourceModel.FileThumCollection.push(virModel);
+		}
+		
 	},
 
 
@@ -141,24 +214,29 @@ App.ResourceModel = {
 			okText: '确&nbsp;&nbsp;认',
 			okCallback: function() {
 
-				var fileVersionId = $item.find(".filecKAll").data("fileversionid"),id=$item.find(".fileName .text").data("id"),
-				  models=App.ResourceModel.FileCollection.models;
-				
+				var fileVersionId = $item.find(".filecKAll").data("fileversionid"),
+					id = $item.find(".text").data("id"),
+					models = App.ResourceModel.FileCollection.models;
+
+				if (App.ResourceModel.Settings.type == "famLibs") {
+					models = App.ResourceModel.FileThumCollection.models;
+				}
+
 				//修改数据
-				$.each(models,function(i,model){
-					if (model.toJSON().id==id) {
-						
-						model.urlType="deleteFile";
-						model.projectId=App.ResourceModel.Settings.CurrentVersion.projectId;
-						model.projectVersionId=App.ResourceModel.Settings.CurrentVersion.id;
-						model.fileVersionId=fileVersionId;
+				$.each(models, function(i, model) {
+					if (model.toJSON().id == id) {
+
+						model.urlType = "deleteFile";
+						model.projectId = App.ResourceModel.Settings.CurrentVersion.projectId;
+						model.projectVersionId = App.ResourceModel.Settings.CurrentVersion.id;
+						model.fileVersionId = fileVersionId;
 						model.destroy();
 
 						return false;
-					} 
+					}
 				});
 
-				
+
 
 				// //请求数据
 				// var data = {
@@ -179,7 +257,7 @@ App.ResourceModel = {
 			message: $item.find(".folder").length > 0 ? "确认要删除该文件夹么？" : "确认要删除该文件么？"
 
 
-		}); 
+		});
 
 	}
 

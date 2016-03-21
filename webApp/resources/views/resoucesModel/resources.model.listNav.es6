@@ -24,8 +24,15 @@ App.ResourceModel.ListNav = Backbone.View.extend({
 
 		this.$el.find(".listContent").html(new App.ResourceModel.TopBar().render().el);
 
-		this.$el.find(".listContent").append(new App.ResourceModel.ListContent().render().el);
+		var type=App.ResourcesNav.Settings.type;
+		if (type == "standardLibs") {
+			//获取标准模型库数据
+			this.$el.find(".listContent").append(new App.ResourceModel.ListContent().render().el); 
 
+		} else if (type == "famLibs") {
+			this.$el.find(".listContent").append(new App.ResourceModel.ThumContent().render().el);
+		}
+ 
 
 		return this;
 	},

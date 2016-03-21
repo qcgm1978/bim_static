@@ -7,9 +7,10 @@ var AppRoute = Backbone.Router.extend({
 		'projects/:id': 'project',
 		'flow': 'flow',
 		'resources': 'resources',
-		'resources/:type':'resource',
-		'resources/:type/:id':'resourceModel',
+		'resources/:type': 'resource',
+		'resources/:type/:projectId/:versionId': 'resourceModel',
 		'console': 'console',
+		'console/:type/:step': 'console',
 		'list/:id': 'list'
 	},
 
@@ -42,7 +43,7 @@ var AppRoute = Backbone.Router.extend({
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".projects").addClass('selected');
 		_.require('/static/dist/projects/projects.css');
 		_.require('/static/dist/projects/projects.js');
-		App.Project.Settings.projectId=id;
+		App.Project.Settings.projectId = id;
 		App.Project.init();
 	},
 
@@ -60,48 +61,56 @@ var AppRoute = Backbone.Router.extend({
 
 	//资源库
 	resources: function() {
+
 		this.reset();
 		//销毁上传
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".resources").addClass('selected');
 		_.require('/static/dist/resources/resources.css');
 		_.require('/static/dist/resources/resources.js');
-		App.Resources.init(); 
+		App.Resources.init();
 		//$("#contains").html("resources");
 
 	},
 
 	//单个项目
-	resource:function(type){
+	resource: function(type) {
+
 		this.reset();
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".resources").addClass('selected');
 		_.require('/static/dist/resources/resources.css');
-		_.require('/static/dist/resources/resources.js'); 
-		App.ResourcesNav.Settings.type=type;
+		_.require('/static/dist/resources/resources.js');
+		App.ResourcesNav.Settings.type = type;
 		App.ResourcesNav.init();
 	},
 
-	resourceModel:function(type,id){
+	resourceModel: function(type, projectId, versionId) {
+
 		this.reset();
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".resources").addClass('selected');
 		_.require('/static/dist/resources/resources.css');
-		_.require('/static/dist/resources/resources.js'); 
-		App.ResourcesNav.Settings.type=App.ResourceModel.Settings.type=type;
-		App.ResourceModel.Settings.id=id; 
+		_.require('/static/dist/resources/resources.js');
+		App.ResourcesNav.Settings.type = App.ResourceModel.Settings.type = type;
+		App.ResourceModel.Settings.projectId = projectId;
+		App.ResourceModel.Settings.versionId = versionId;
 		App.ResourceModel.init();
 	},
 
 
 	//貌似改掉了
-	console: function() {
+	console: function(type,step) {
 		this.reset();
 		//销毁上传
+		_.require('/static/dist/console/console.css');
+		_.require('/static/dist/console/console.js');
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".console").addClass('selected');
-		$("#contains").html("console");
+		App.Console.Settings.type=type;
+		App.Console.Settings.step=step;
+		App.Console.init();
 	},
 
 	//重置数据
-	reset:function(){
-//销毁上传
+	reset: function() {
+		//销毁上传
 		App.Comm.upload.destroy();
 	}
 
