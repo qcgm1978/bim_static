@@ -792,9 +792,13 @@ BIM.TREE = function(){
 BIM.TREE.prototype = {
   createSpecialitys : function(data){
     var _self = this;
+    var data = data.sort(function(a,b){
+      return a.sort-b.sort;
+    })
     var template = '<div class="item-content"> <i class="nodeSwitch"></i> <span class="tree-checkbox"><input class="input" type="checkbox" checked="checked" data-type="sceneId"><span class="box"></span></span><span class="tree-text">专业</span> </div><ul class="treeViewSub">';
-    for(i in data){
-      template += '<li class="itemNode"> <div class="item-content"> <i class="nodeSwitch"></i> <span class="tree-checkbox"><input class="input" type="checkbox" checked="checked" data-type="sceneId"><span class="box"></span></span><span class="tree-text">'+ i +'</span> </div> <ul class="treeViewSub">'+ getSpeciality(data[i]) +'</ul></li>'
+    for(var i=0,len=data.length;i<len;i++){
+      console.log(data[i])
+      template += '<li class="itemNode"> <div class="item-content"> <i class="nodeSwitch"></i> <span class="tree-checkbox"><input class="input" type="checkbox" checked="checked" data-type="sceneId"><span class="box"></span></span><span class="tree-text">'+ data[i].specialty +'</span> </div> <ul class="treeViewSub">'+ getSpeciality(data[i].files) +'</ul></li>'
     }
     template+="</ul>";
     _self.specialitys.innerHTML = template;
@@ -810,7 +814,7 @@ BIM.TREE.prototype = {
   createFloor : function(data){
     var _self = this;
     var obj = data.sort(function(a,b){
-      return a.index - b.index;
+      return a.sort - b.sort;
     });
     var template = '<div class="item-content"> <i class="nodeSwitch"></i> <span class="tree-checkbox"><input class="input" type="checkbox" checked="checked" data-type="sceneId"><span class="box"></span></span><span class="tree-text">楼层</span> </div><ul class="treeViewSub">';
     for(var i = 0,len=obj.length;i<len;i++){
@@ -829,7 +833,7 @@ BIM.TREE.prototype = {
     });
     var template = '<div class="item-content"> <i class="nodeSwitch"></i> <span class="tree-checkbox"><input class="input" type="checkbox" checked="checked" data-type="categoryId"><span class="box"></span></span><span class="tree-text">构件类型</span> </div><ul class="treeViewSub">';
     for(var j=0,len=data.length;j<len;j++){
-      if(data[j].specialty == '其他专业'){
+      if(data[j].specialty == '其他'){
         template += getCategory(data[j].categories);
       }else{
         template += '<li class="itemNode"> <div class="item-content"> <i class="nodeSwitch"></i> <span class="tree-checkbox"><input class="input" type="checkbox" checked="checked" data-type="categoryId"><span class="box"></span></span><span class="tree-text">'+ data[j].specialty +'</span> </div> <ul class="treeViewSub">'+ getCategory(data[j].categories) +'</ul></li>'
