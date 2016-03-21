@@ -53,6 +53,98 @@ App.Console = {
 		});
 	},
 
+
+	//发起发版
+	versionComm(statusList, confirmStatus, refuseStatus, successText, refuseText) {
+
+		$.ajax({
+			url: "platform/project?type=2&versionStatus=" + statusList
+		}).done(function(data) {
+
+			var items = data.data.items;
+
+			$.each(items, function(i, item) {
+
+				$("#famVettedList").append('<option versionid="' + item.version.id + '" value="' + item.version.projectId + '">' + item.name + '</option>');
+			});
+
+		});
+
+		$("#submit").click(function() {
+
+
+			var $opt = $("#famVettedList option:selected"),
+				projectId = $opt.val(),
+				versionId = $opt.attr("versionid");
+
+			if (projectId == 0) {
+				alert("未选择")
+				return;
+			}
+
+			if (versionId == "null") {
+				alert("没有 verisonId");
+				return;
+			}
+
+			$.ajax({
+				url: "platform/project/" + projectId + "/version/" + versionId + "?status=" + confirmStatus,
+				type: "POST"
+			}).done(function(data) {
+				if (data.message == "success") {
+					alert(successText)
+					window.location.reload();
+				}
+			});
+
+		});
+
+
+		$("#refuse").click(function() {
+			var $opt = $("#famVettedList option:selected"),
+				projectId = $opt.val(),
+				versionId = $opt.attr("versionid");
+			if (projectId == 0) {
+				alert("未选择")
+				return;
+			}
+
+			if (versionId == "null") {
+				alert("没有 verisonId");
+				return;
+			}
+
+			$.ajax({
+				url: "platform/project/" + projectId + "/version/" + versionId + "?status=" + refuseStatus,
+				type: "POST"
+			}).done(function(data) {
+				if (data.message == "success") {
+					alert(refuseText ? refuseText : "回退成功")
+					window.location.reload();
+				}
+			});
+		});
+
+	},
+
+	//下拉绑定
+	bindSelect(type) {
+		$.ajax({
+			url: "platform/project?type=" + type + "&versionStatus=9"
+		}).done(function(data) {
+
+			var items = data.data.items;
+
+			$.each(items, function(i, item) {
+				if (item.version) {
+					$("#referenceResources").append('<option versionid="' + item.version.id + '" value="' + item.id + '">' + item.name + '</option>');
+				}
+
+			});
+
+		});
+	},
+
 	fam() {
 
 		var Settings = App.Console.Settings;
@@ -101,9 +193,9 @@ App.Console = {
 	//创建族库
 	bindFamCreateInit() {
 
+		App.Console.bindSelect(2);
+
 		$("#submit").click(function() {
-
-
 			var data = {
 				type: 2,
 				projectNo: $("#number").val().trim(),
@@ -141,16 +233,12 @@ App.Console = {
 
 		});
 
-
-		$.ajax({
-			url: "platform/project?type=2"
-		}).done(function(data) {
-
-		});
 	},
 
 	//族库初始化
 	bindFamInit() {
+
+
 
 		$.ajax({
 			url: "platform/project?type=2&versionStatus=1"
@@ -165,6 +253,7 @@ App.Console = {
 
 		});
 
+
 		$("#submit").click(function() {
 
 
@@ -176,56 +265,98 @@ App.Console = {
 				return;
 			}
 
-			var data = {
-				projectId: projectId
-			};
+		 
+			var pars="projectId="+projectId+"reject=false";
 
 			var referenceid = $opt.attr("referenceid");
 
-			if (referenceid != "null") {
-				data.referenceid = referenceid;
+			if (referenceid != "null") { 
+
+				pars+="referenceid="+referenceid;
 			}
 
 
 			var dataObj = {
-				data: data
+				data: {}
 			};
-			dataObj.url = "platform/project/" + projectId + "/init";
+			dataObj.url = "platform/project/" + projectId + "/init?"+pars;
 
 			App.Console.ajaxPost(dataObj, function(data) {
-				console.log(data);
-			});
-
-
+				if (data.message == "success") {
+					alert("初始化成功")
+					window.location.reload();
+				}
+			}); 
 
 		});
+
+
+
+		$("#refuse").click(function() {
+
+			var $opt = $("#famVettedList option:selected"),
+				projectId = $opt.val();
+
+			if (projectId == 0) {
+				alert("请选择要初始化的族库")
+				return;
+			} 
+		 
+			var pars="projectId="+projectId+"reject=true";
+
+			var referenceid = $opt.attr("referenceid");
+
+			if (referenceid != "null") { 
+
+				pars+="referenceid="+referenceid;
+			} 
+
+			var dataObj = {
+				data: {}
+			};
+			dataObj.url = "platform/project/" + projectId + "/init?"+pars;
+
+			App.Console.ajaxPost(dataObj, function(data) {
+				if (data.message == "success") {
+					alert("初始化成功")
+					window.location.reload();
+				}
+			}); 
+
+		});
+
 	},
 
 	//族库审核
 	bindFamVettedInit() {
 
-		$("#submit").click(function() {
+		App.Console.versionComm(4, 2, 4, "提交审核成功");
 
-		});
 	},
 	//审核批准
 	bindFamAppordInit() {
+
+		App.Console.versionComm(2, 5, 2, "审核成功");
 
 	},
 
 	//发起发版
 	bindFamSendVersionInit() {
 
+		App.Console.versionComm(5, 7, 5, "发版提交成功");
+
 	},
 	//族库发版批准
 	bindFamSendVersionVettedInit() {
 
+		App.Console.versionComm(7, 9, 7, "发版成功");
 	},
 
 
 
 	//标准模型库
 	standardModel() {
+
 		var Settings = App.Console.Settings;
 		//发起
 		if (Settings.step == 1) {
@@ -271,25 +402,29 @@ App.Console = {
 	//创建族库
 	bindstandardModelCreateInit() {
 
+		App.Console.bindSelect(1);
+
 		$("#submit").click(function() {
 
 
 			var data = {
-				type: 2,
+				type: 1,
 				projectNo: +new Date(),
-				name: $("#famTitle").text().trim(),
+				name: $("#famTitle").val().trim(),
 				projectType: 2,
 				estateType: 1,
 				province: "上海市",
 				region: "管理分区", //管理分区，最大长度32。非空 
-				openTime: $("#devDate").text().trim(), //开业时间  
-				//versionName: “2016 版”, //版本名称，适用于标准模型。非空字段
-				designUnit: $("#launchDepartment").text().trim(),
+				openTime: $("#devDate").val().trim(), //开业时间  
+				versionName: $("#versionName").val().trim(),
+				designUnit: $("#launchDepartment").val().trim(),
 			}
 
-			var refer = $("#referenceResources option:selected").val();
+			var $opt = $("#referenceResources option:selected"),
+				refer = $opt.val();
 			if (refer != 0) {
 				data.referenceId = refer;
+				data.referenceVersionId = $opt.attr("versionid");
 			}
 
 
@@ -303,17 +438,93 @@ App.Console = {
 
 		});
 
-
-		$.ajax({
-			url: "platform/project?type=2"
-		}).done(function(data) {
-
-		});
 	},
 
 	//族库初始化
 	bindstandardModelInit() {
+		
+		$.ajax({
+			url: "platform/project?type=1&versionStatus=1"
+		}).done(function(data) {
+
+			var items = data.data.items;
+
+			$.each(items, function(i, item) {
+				$("#famVettedList").append('<option referenceid="' + item.version.referenceId + '" value="' + item.version.projectId + '">' + item.name + '</option>');
+			});
+
+
+		});
+		
+
 		$("#submit").click(function() {
+
+
+			var $opt = $("#famVettedList option:selected"),
+				projectId = $opt.val();
+
+			if (projectId == 0) {
+				alert("请选择要初始化的族库")
+				return;
+			}
+
+		 
+			var pars="projectId="+projectId+"reject=false";
+
+			var referenceid = $opt.attr("referenceid");
+
+			if (referenceid != "null") { 
+
+				pars+="referenceid="+referenceid;
+			}
+
+
+			var dataObj = {
+				data: {}
+			};
+			dataObj.url = "platform/project/" + projectId + "/init?"+pars;
+
+			App.Console.ajaxPost(dataObj, function(data) {
+				if (data.message == "success") {
+					alert("初始化成功")
+					window.location.reload();
+				}
+			}); 
+
+		});
+
+
+
+		$("#refuse").click(function() {
+
+			var $opt = $("#famVettedList option:selected"),
+				projectId = $opt.val();
+
+			if (projectId == 0) {
+				alert("请选择要初始化的族库")
+				return;
+			} 
+		 
+			var pars="projectId="+projectId+"reject=true";
+
+			var referenceid = $opt.attr("referenceid");
+
+			if (referenceid != "null") { 
+
+				pars+="referenceid="+referenceid;
+			} 
+
+			var dataObj = {
+				data: {}
+			};
+			dataObj.url = "platform/project/" + projectId + "/init?"+pars;
+
+			App.Console.ajaxPost(dataObj, function(data) {
+				if (data.message == "success") {
+					alert("初始化成功")
+					window.location.reload();
+				}
+			}); 
 
 		});
 	},

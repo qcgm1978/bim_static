@@ -162,7 +162,7 @@ App.ResourceModel = {
 				App.ResourceModel.FileCollection.fetch();
 			} else if (type == "famLibs") {
 				App.ResourceModel.FileThumCollection.projectId = App.ResourceModel.Settings.CurrentVersion.projectId;
-				App.ResourceModel.FileThumCollection.projectVersionId = 100, //App.ResourceModel.Settings.CurrentVersion.id;
+				App.ResourceModel.FileThumCollection.projectVersionId =App.ResourceModel.Settings.CurrentVersion.id;
 					App.ResourceModel.FileThumCollection.reset();
 				App.ResourceModel.FileThumCollection.fetch();
 			}
