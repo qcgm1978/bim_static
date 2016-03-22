@@ -15,6 +15,7 @@ var BIM = function(option){
     resize:true,
     tools:false,
     toolsClass:'mod-bar',
+    single:false,
     treeElement:''
   };
   var _util = BIM.util;
@@ -27,6 +28,10 @@ var BIM = function(option){
     _opt.element = document.getElementById(_opt.element);
   }
   _opt.element.innerHTML = '';
+  if(_opt.single){
+    CLOUD.GlobalData.CellVisibleLOD= 0;
+    CLOUD.GlobalData.SubSceneVisibleLOD= 100;
+  }
   var start = function(res){
     BIM.util.pub('start',res)
   }
