@@ -91,6 +91,10 @@ App.ResourceModel = {
 			App.ResourceModel.getVersion();
 		}
 
+		if (!App.ResourceModel.Settings.bindGlobalEvent) {
+			App.ResourceModel.Settings.bindGlobalEvent = true;
+			App.ResourceModel.bindGlobalEvent();
+		}
 
 		//标准模型库
 		// if (App.ResourcesNav.Settings.type == "standardLibs") {
@@ -111,6 +115,27 @@ App.ResourceModel = {
 
 
 	},
+
+	//绑定全局的事件
+	bindGlobalEvent() {
+
+		$(document).click(function(event) {
+
+			var $target = $(event.target);
+
+			if ($target.closest('.thumContent .item').length <= 0) {
+				$('.thumContent .item').each(function(i, item) {
+					if ($(item).hasClass("selected")) {
+						if (!$(item).find(".filecKAll input").is(":checked")) {
+							$(item).removeClass("selected");
+						}
+					}
+
+				});
+			}
+		});
+	},
+
 
 	//获取数据
 	getVersion: function() {
@@ -162,8 +187,8 @@ App.ResourceModel = {
 				App.ResourceModel.FileCollection.fetch();
 			} else if (type == "famLibs") {
 				App.ResourceModel.FileThumCollection.projectId = App.ResourceModel.Settings.CurrentVersion.projectId;
-				App.ResourceModel.FileThumCollection.projectVersionId =App.ResourceModel.Settings.CurrentVersion.id;
-					App.ResourceModel.FileThumCollection.reset();
+				App.ResourceModel.FileThumCollection.projectVersionId = App.ResourceModel.Settings.CurrentVersion.id;
+				App.ResourceModel.FileThumCollection.reset();
 				App.ResourceModel.FileThumCollection.fetch();
 			}
 
@@ -191,13 +216,13 @@ App.ResourceModel = {
 			floor: null
 		}
 
-		var type=App.ResourceModel.Settings.type;
-		if (type=="standardLibs") {
+		var type = App.ResourceModel.Settings.type;
+		if (type == "standardLibs") {
 			App.ResourceModel.FileCollection.push(virModel);
-		}else if(type=="famLibs"){
+		} else if (type == "famLibs") {
 			App.ResourceModel.FileThumCollection.push(virModel);
 		}
-		
+
 	},
 
 

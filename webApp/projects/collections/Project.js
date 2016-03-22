@@ -134,7 +134,7 @@ App.Project = {
 						cVersion;
 					for (var k = 0; k < vCount; k++) {
 						cVersion = Versions[k];
-						if (cVersion.lastest) {
+						if (cVersion.latest) {
 							App.Project.Settings.projectName = cVersion.projectName;
 							App.Project.Settings.CurrentVersion = cVersion;
 							break;
