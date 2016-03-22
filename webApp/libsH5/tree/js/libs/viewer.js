@@ -391,6 +391,12 @@ BIM.util = {
       parents = element;
     }
     var checkboxs = parents.getElementsByClassName(cClass);
+    if(checkboxs.length==0){
+      return {
+        type:"",
+        ids:[]
+      };
+    }
     var obj = {
       type:checkboxs[0].getAttribute('data-type'),
       ids:[]
@@ -802,7 +808,6 @@ BIM.TREE.prototype = {
     })
     var template = '<div class="item-content"> <i class="nodeSwitch"></i> <span class="tree-checkbox"><input class="input" type="checkbox" checked="checked" data-type="sceneId"><span class="box"></span></span><span class="tree-text">专业</span> </div><ul class="treeViewSub">';
     for(var i=0,len=data.length;i<len;i++){
-      console.log(data[i])
       template += '<li class="itemNode"> <div class="item-content"> <i class="nodeSwitch"></i> <span class="tree-checkbox"><input class="input" type="checkbox" checked="checked" data-type="sceneId"><span class="box"></span></span><span class="tree-text">'+ data[i].specialty +'</span> </div> <ul class="treeViewSub">'+ getSpeciality(data[i].files) +'</ul></li>'
     }
     template+="</ul>";
@@ -919,7 +924,7 @@ BIM.TREE.prototype = {
         var res = JSON.parse(res),
             data = res.data;
         if(!data){
-          _self.errorMsg(res.message);
+          _self.errorMsg("");
           return false;
         }
         var Sdata = data.specialties;
