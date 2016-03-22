@@ -67,7 +67,7 @@ App.Project.leftNav = Backbone.View.extend({
 		}
 		var that=this;
 
-		
+
 		// App.Project.Settings.modelId= "e0c63f125d3b5418530c78df2ba5aef1";
 		// this.renderModel();
 		// return;
@@ -118,7 +118,7 @@ App.Project.leftNav = Backbone.View.extend({
 			//渲染模型属性
 			App.Project.renderModelContentByType();
 
-
+			return;// debugger 禁止渲染模型
 			var viewer = App.Project.Settings.Viewer = new BIM({
 				element: $("#projectContainer .modelContainerContent")[0],
 				projectId:App.Project.Settings.modelId, //"b7554b6591ff6381af854fa4efa41f81", //App.Project.Settings.projectId,

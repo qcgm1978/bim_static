@@ -5,7 +5,7 @@ App.Project.DesignAttr={
 
 		// 碰撞collection
 	CollisionCollection: new(Backbone.Collection.extend({
-	 
+
 		model: Backbone.Model.extend({
 			defaults: function() {
 				return {
@@ -19,9 +19,9 @@ App.Project.DesignAttr={
 
 	})),
 
-		// 设计检查 collection
-	VerificationCollection: new(Backbone.Collection.extend({
-	 
+	// 碰撞文件列表
+	CollisionFilesList: new(Backbone.Collection.extend({
+
 		model: Backbone.Model.extend({
 			defaults: function() {
 				return {
@@ -30,13 +30,58 @@ App.Project.DesignAttr={
 			}
 		}),
 
-		urlType:"fetchDesignVerification"
+		urlType:"fetchDesignFileList"
+
+
+	})),
+	// 碰撞任务列表
+	CollisionTaskList: new(Backbone.Collection.extend({
+
+		model: Backbone.Model.extend({
+			defaults: function() {
+				return {
+					title: ""
+				}
+			}
+		}),
+
+		urlType:"fetchDesignTaskList"
+
+
+	})),
+
+		// 设计检查 collection
+	CollisionList: new(Backbone.Collection.extend({
+
+		model: Backbone.Model.extend({
+			defaults: function() {
+				return {
+					title: ""
+				}
+			}
+		}),
+
+		urlType:"fetchDesignCollisionList"
+
+	})),
+		// 设计检查 collection
+	VerificationCollection: new(Backbone.Collection.extend({
+
+		model: Backbone.Model.extend({
+			defaults: function() {
+				return {
+					title: ""
+				}
+			}
+		}),
+
+		urlType:"fetchDesignFileList"
 
 	})),
 
 		// 属性 collection
 	PropertiesCollection: new(Backbone.Collection.extend({
-	 
+
 		model: Backbone.Model.extend({
 			defaults: function() {
 				return {

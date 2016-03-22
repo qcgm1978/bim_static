@@ -1,0 +1,13 @@
+<div class="itemContent">
+  <i class="nodeSwitch"></i><span class="treeText"><%= specialty %></span>
+</div>
+<ul class="subTree">
+  <% _.each(categories,function(value,key){ %>
+    <li class="itemNode">
+      <label class="itemContent">
+        <i class="fileIcon"></i><span class="treeText"><%= value %></span>
+        <input type="checkbox" class="inputCheckbox" data-id="<%= key %>" value="<%= value %>">
+      </label>
+    </li>
+  <% }); %>
+</ul>
