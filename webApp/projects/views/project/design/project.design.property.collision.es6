@@ -26,6 +26,8 @@ App.Project.DesignCollision=Backbone.View.extend({
 		var that = this;
 		var list = that.$el.find('.collSelect');
 		list.show();
+		App.Project.DesignAttr.CollisionTaskList.projectId = App.Project.Settings.CurrentVersion.projectId;
+		App.Project.DesignAttr.CollisionTaskList.projectVersionId = App.Project.Settings.CurrentVersion.id;
 		App.Project.DesignAttr.CollisionTaskList.fetch();
 		$(document).on('click',that.hideSelectList);
 	},
@@ -55,13 +57,58 @@ App.Project.DesignCollision=Backbone.View.extend({
 				App.Project.DesignAttr.CollisionFilesList.fetch();
 			},
 			okCallback:function(){
-				var data = {},
+				var formData = {},
 						taskName = $("#taskName").val(),
 						floor = $("#floor").val(),
 						treeA = $("#treeA"),
 						treeB = $("#treeB");
+				formData.name = taskName;
+				formData.floor = floor;
+				formData.chooseA = getSpecialty(treeA);
+				formData.chooseB = getSpecialty(treeB);
+				formData.projectId=App.Project.Settings.projectId;
+				formData.projectVersionId=App.Project.Settings.CurrentVersion.id;
+				data = {
+	        type:'post',
+	        URLtype:"creatCollisionTask",
+	        contentType:"application/json",
+	        data:formData
+	      }
+	      App.Comm.ajax(data,function(data){
+		      if (data.message=="success") {
+		        myModel.id = data.data.id;
+		        that.$el.replaceWith(new App.Project.viewpointDetail({
+		          model:myModel
+		        }).render().el);
+		        delete App.Project.Settings.viewPoint;
+		      }else{
+		        alert(data.message);
+		      }
+		    });
 			}
 		})
+		function getSpecialty(element){
+			var data = []
+			element.find(".subTree").each(function(){
+				var that = $(this),
+						specialty = that.data("type"),
+						categories = [];
+				that.find(".inputCheckbox").each(function(){
+					var _self = $(this),
+							code = _self.data("id");
+					if(_self.is(":checked")){
+						categories.push(code);
+					}
+				});
+				if(categories.length>0){
+					data.push({
+						"specialty":specialty,
+						"categories":categories
+					});
+				}
+			});
+			return data;
+		}
 	},
 
 	getDetail:function(event){

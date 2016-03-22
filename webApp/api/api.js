@@ -4,7 +4,7 @@ App.API = {
 
 	Settings: {
 		hostname: "http://bim.wanda.cn/",
-		debug: true
+		debug: false
 	},
 
 	URL: {
@@ -42,8 +42,11 @@ App.API = {
 		fetchDesignProperties: "sixD/{projectId}/{projectVersionId}/property", //设计属性 ?sceneId={sceneId}&elementId={elementId}
 		fetchDesignVerification: "", // 设计 检测
 		fetchDesignCollision: "", // 设计碰撞
+		// 碰撞
 		fetchDesignFileList:"view/api/{projectId}/categories",// 设计碰撞文件
-		fetchDesignTaskList:"",//碰撞任务列表
+		fetchDesignTaskList:"view/api/{projectId}/{projectVersionId}/collision/setting/list",//碰撞任务列表
+		fetchDesignTaskDetail:"view/api/{projectId}/{projectVersionId}/collision/setting?collisionId={collisionId}",//碰撞任务详情
+		creatCollisionTask:"view/api/{projectId}/{projectVersionId}/collision/setting",//碰撞任务详情
 
 		//计划
 		fetchPlanModel: "", //模型
@@ -109,6 +112,8 @@ App.API = {
 		fetchDesignCollision: "/dataJson/project/project.design.property.json", //设计碰撞
 		fetchDesignFileList:"/dataJson/project/project.design.filesList.json",// 设计碰撞文件
 		fetchDesignTaskList:"/dataJson/project/project.design.collision.taskList.json",//碰撞任务列表
+		fetchDesignTaskDetail:"/dataJson/project/project.design.task.detail.json",//碰撞任务详情
+		creatCollisionTask:"",
 
 
 		//计划

@@ -20,8 +20,12 @@ App.Project.DesignCollisionTaskList=Backbone.View.extend({
   addList:function(model){
     // 加载碰撞点列表
     var data=model.toJSON();
-    this.$el.html(this.template(data))
-    return this;
+    if(data.data.length == 0){
+      return false;
+    }else{
+      this.$el.html(this.template(data))
+      return this;
+    }
   }
 
 });

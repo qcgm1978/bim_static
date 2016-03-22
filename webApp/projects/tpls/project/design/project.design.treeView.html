@@ -1,7 +1,7 @@
 <div class="itemContent">
   <i class="nodeSwitch"></i><span class="treeText"><%= specialty %></span>
 </div>
-<ul class="subTree">
+<ul class="subTree" data-type="<%= specialty %>">
   <% _.each(categories,function(value,key){ %>
     <li class="itemNode">
       <label class="itemContent">

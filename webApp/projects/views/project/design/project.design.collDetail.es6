@@ -6,7 +6,7 @@ App.Project.DesignCollisionDetail=Backbone.View.extend({
 
 	className:"designCollision",
 
-	template:_.templateUrl("/projects/tpls/project/design/project.design.collDetail.html",true),
+	template:_.templateUrl("/projects/tpls/project/design/project.design.collision.detail.html"),
 
 	render:function(){
 		this.$el.html("");
@@ -20,7 +20,7 @@ App.Project.DesignCollisionDetail=Backbone.View.extend({
   addCollisionDetail:function(model){
     // 加载碰撞点列表
     var data=model.toJSON();
-    this.$el.html(this.template)
+    this.$el.html(this.template(data))
     return this;
   }
 });
