@@ -13,6 +13,8 @@
 			<div class="releaseVersionBox">
 		<%}else if(cVersionGroup.versionType==3){%> 
 			<div class="changeVersionBox">
+		<%}else{%>
+			<% continue; %>
 		<%}%>
 
 	<%	var cVersionDate, VersionsDates = cVersionGroup.item,
@@ -35,7 +37,7 @@
 					 	 
 						  <div class="item" data-version="<%- stringDate %>">
 						      <span class="vName overflowEllipsis"><%=cVersion.name%></span>
-					          <span class="vStatus overflowEllipsis"><%= App.Project.convertStatus(cVersion.status) %></span>
+					          <span class="vStatus overflowEllipsis"><%= App.Comm.convertStatus(cVersion.status) %></span>
 					          <span class="vDate overflowEllipsis"><%= new Date(cVersion.createTime).format("yyyy-MM-dd") %></span> 
 					        </div>
 

@@ -19,7 +19,7 @@
 
 
      <span class="breadItem projectVersion relative <%= App.ResourceModel.Settings.CurrentVersion.id ? '':'myHidden' %>"> <i class="icon-angle-right"></i> 
-           <span class="breadItemText"> <span class="text"><%=App.ResourceModel.Settings.CurrentVersion.name%></span> </span>
+           <span class="breadItemText"> <span class="text"><%=App.ResourceModel.Settings.CurrentVersion.name%>( <%=App.Comm.convertStatus(App.ResourceModel.Settings.CurrentVersion.status)%>) </span> </span>
     <div class="projectVersionList">
         <div class="listContent">
         </div>

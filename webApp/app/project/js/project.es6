@@ -82,6 +82,7 @@ App.Project = {
 					App.Project.Settings.Model=data;
 					if (data.data.modelId) {
 						var viewer = new BIM({
+							single:true,
 							element: $("#modelBox")[0],
 							projectId: data.data.modelId, //"b7554b6591ff6381af854fa4efa41f81", //App.Project.Settings.projectId,
 							// projectId:'testrvt',

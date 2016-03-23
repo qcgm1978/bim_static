@@ -63,7 +63,7 @@
          App.Projects.ProjectCollection.fetch({
 
              data: {
-                 projectType: 1,
+                // projectType: 1,
                  name: "",
                  estateType: "",
                  province: "",

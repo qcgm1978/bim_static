@@ -27,7 +27,7 @@ App.ResourceFamLibs.leftNav = Backbone.View.extend({
 			URLtype: "fetchFileTree",
 			data: {
 				projectId: App.ResourceModel.Settings.CurrentVersion.projectId,
-				projectVersionId:100, //App.ResourceModel.Settings.CurrentVersion.id
+				projectVersionId:App.ResourceModel.Settings.CurrentVersion.id
 			}
 		}
 		var that = this;
