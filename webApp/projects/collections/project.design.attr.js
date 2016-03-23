@@ -45,7 +45,7 @@ App.Project.DesignAttr={
 			}
 		}),
 
-		urlType:"fetchDesignFloor"
+		urlType:"fetchDesignCategory"
 
 	})),
 

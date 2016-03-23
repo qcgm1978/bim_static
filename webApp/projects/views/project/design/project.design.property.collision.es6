@@ -52,10 +52,7 @@ App.Project.DesignCollision=Backbone.View.extend({
 			cssClass: 'task-create-dialog',
 			message: "",
 			readyFn:function(){
-				this.element.find(".content").html(new App.Project.ProjectDesignSetting().render().el);
-				App.Project.DesignAttr.CollisionFloor.projectId = App.Project.Settings.projectId;
-				App.Project.DesignAttr.CollisionFloor.fetch();
-			},
+				this.element.find(".content").html(new App.Project.ProjectDesignSetting().render().el);			},
 			okCallback:function(){
 				var formData = {},
 						taskName = $("#taskName").val(),

@@ -9,7 +9,7 @@ App.Project.DesignCollisionDetail=Backbone.View.extend({
 	template:_.templateUrl("/projects/tpls/project/design/project.design.collision.detail.html"),
 
 	render:function(){
-		this.$el.html("");
+		this.$el.html(this.template({data:""}));
 		return this;
 	},
 

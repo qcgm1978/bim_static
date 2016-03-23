@@ -10,9 +10,14 @@ App.Project.ProjectDesignSetting= Backbone.View.extend({
 
   template:_.templateUrl("/projects/tpls/project/design/project.design.collision.setting.html",true),
 
+  initialize:function(){
+    this.listenTo(App.Project.DesignAttr.CollisionCategory,"add",this.addCategory);
+  },
+
   render:function(){
     this.$el.html(this.template);
     this.$el.find("#addFloor").append(new App.Project.CollisionFloor().render().el);
+    App.Project.DesignAttr.CollisionFloor.projectId = 793465949626592//App.Project.Settings.projectId;
     App.Project.DesignAttr.CollisionFloor.fetch();
     return this;
   },
