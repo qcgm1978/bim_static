@@ -57,7 +57,7 @@ App.Project = {
 					projectVersionId: Request.projectVersionId
 				}
 			}
-
+			 
 			var url = App.Project.getUrlByType(data).url;
 
 			$.ajax({
@@ -84,7 +84,7 @@ App.Project = {
 						var viewer = new BIM({
 							single:true,
 							element: $("#modelBox")[0],
-							projectId: data.data.modelId, //"b7554b6591ff6381af854fa4efa41f81", //App.Project.Settings.projectId,
+							etag: data.data.modelId, //"b7554b6591ff6381af854fa4efa41f81", //App.Project.Settings.projectId,
 							// projectId:'testrvt',
 							tools: true
 						});

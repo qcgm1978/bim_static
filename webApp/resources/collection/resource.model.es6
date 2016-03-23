@@ -94,7 +94,7 @@ App.ResourceModel = {
 		if (!App.ResourceModel.Settings.bindGlobalEvent) {
 			App.ResourceModel.Settings.bindGlobalEvent = true;
 			App.ResourceModel.bindGlobalEvent();
-		}
+		} 
 
 		//标准模型库
 		// if (App.ResourcesNav.Settings.type == "standardLibs") {
