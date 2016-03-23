@@ -846,7 +846,7 @@ App.Console = {
 
 			}
 		});
-	}, 
+	},
 
 	//发起审核
 	bindprojectVettedInit() {
@@ -963,7 +963,7 @@ App.Console = {
 		});
 
 
-		$("#famVettedListVsersion").change(function() { 
+		$("#famVettedListVsersion").change(function() {
 
 			var projectId = $("#famVettedList option:selected").val(),
 				versionId = $("#famVettedListVsersion option:selected").val();
@@ -973,9 +973,9 @@ App.Console = {
 			}).done(function(data) {
 
 				data.click = function(event) {
-					var file = $(event.target).data("file"); 
+					var file = $(event.target).data("file");
 
-					App.Console.getTreeContent(projectId, versionId, file.fileVersionId); 
+					App.Console.getTreeContent(projectId, versionId, file.fileVersionId);
 				}
 				data.iconType = 1;
 				var navHtml = new App.Comm.TreeViewMar(data);
@@ -986,39 +986,79 @@ App.Console = {
 
 		});
 
-		App.Console.Settings.ChangeFile=[];
+		App.Console.Settings.ChangeFile = [];
 		//选择需要更改的文件
-		$("#treeContainer").on("click",".item :checkbox",function(){
-			 
-			var id=$(this).closest(".item").data("id");
+		$("#treeContainer").on("click", ".item :checkbox", function() {
+
+			var id = $(this).closest(".item").data("id");
 			if ($(this).is(":checked")) {
 				App.Console.Settings.ChangeFile.push(id);
-			}else{
+			} else {
 				App.Console.Settings.ChangeFile.removeByItem(id);
 			}
 
 		});
 
+
+		//{projectId}/version/{versionId}/alter?versionName={versionName}&fileIds={fileIds}
+
+		$("#submit").click(function() {
+
+			var projectId = $("#famVettedList option:selected").val(),
+				versionId = $("#famVettedListVsersion option:selected").val(),
+				versionName=$("#versionName").val().trim();
+
+			if (projectId == 0 || versionId == 0) {
+				alert("请选择项目，版本")
+				return;
+			}
+
+			if (App.Console.Settings.ChangeFile.length < 1) {
+				alert("请选择需要修改的文件")
+				return;
+			}
+
+			if (!versionName) {
+				alert("请输入版本名称")
+				return;
+			}
+
+			var files=App.Console.Settings.ChangeFile.join(","), 
+			url="platform/project/"+projectId+"/version/"+versionId+"/alter?versionName="+versionName+"&fileIds="+files;
+
+			var dataobj={url:url};
+			App.Console.ajaxPost(dataobj,function(data){
+				if (data.message=="success") {
+					alert("变成成功")
+					window.location.reload();
+				}else{
+					alert("变成失败")
+				}
+			});
+
+		});
 	},
 
-	getTreeContent(projectId, versionId,fileVersionId) {
+	getTreeContent(projectId, versionId, fileVersionId) {
 
 		$.ajax({
-			url:"doc/"+projectId+"/"+versionId+"/file/children?parentId="+fileVersionId
+			url: "doc/" + projectId + "/" + versionId + "/file/children?parentId=" + fileVersionId
 		}).done(function(data) {
-			var list=data.data,count=list.length,item;
-			var str="<ul>";
-			for(var i=0;i<count;i++){
-				item=data.data[i];
-				str+='<li  class="item" data-id="'+item.fileVersionId+'"><label><input type="checkbox" class="ckChoose" /> '+item.name+'</label></li>';
+			var list = data.data,
+				count = list.length,
+				item;
+			var str = "<ul>";
+			for (var i = 0; i < count; i++) {
+				item = data.data[i];
+				str += '<li  class="item" data-id="' + item.fileVersionId + '"><label><input type="checkbox" class="ckChoose" /> ' + item.name + '</label></li>';
 			}
-			str+='</ul>';
+			str += '</ul>';
 
 			$("#treeContainer").html(str);
-			  
+
 		});
 
-	 
+
 	},
 
 	//项目变更初始化
