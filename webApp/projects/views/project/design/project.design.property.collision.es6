@@ -27,7 +27,7 @@ App.Project.DesignCollision=Backbone.View.extend({
 		var list = that.$el.find('.collSelect');
 		list.show();
 		App.Project.DesignAttr.CollisionTaskList.projectId = App.Project.Settings.CurrentVersion.projectId;
-		App.Project.DesignAttr.CollisionTaskList.projectVersionId = App.Project.Settings.CurrentVersion.id;
+		App.Project.DesignAttr.CollisionTaskList.projectVerionId = App.Project.Settings.CurrentVersion.id;
 		App.Project.DesignAttr.CollisionTaskList.fetch();
 		$(document).on('click',that.hideSelectList);
 	},
@@ -52,8 +52,8 @@ App.Project.DesignCollision=Backbone.View.extend({
 			cssClass: 'task-create-dialog',
 			message: "",
 			readyFn:function(){
-				this.element.find(".content").html(new App.Project.ProjectDesignSetting().render().el)
-				App.Project.DesignAttr.CollisionFilesList.projectId = "c9c468aee3cf0157a6010c7d8355d86e"; //App.Project.Settings.modelId
+				this.element.find(".content").html(new App.Project.ProjectDesignSetting().render().el);
+				App.Project.DesignAttr.CollisionFilesList.projectId = App.Project.Settings.projectId;
 				App.Project.DesignAttr.CollisionFilesList.fetch();
 			},
 			okCallback:function(){
