@@ -134,7 +134,7 @@ App.Project = {
 						cVersion;
 					for (var k = 0; k < vCount; k++) {
 						cVersion = Versions[k];
-						if (cVersion.lastest) {
+						if (cVersion.latest) {
 							App.Project.Settings.projectName = cVersion.projectName;
 							App.Project.Settings.CurrentVersion = cVersion;
 							break;
@@ -166,7 +166,7 @@ App.Project = {
 	// 加载数据
 	loadData: function() {
 
-		//var $contains = $("#contains"); 
+		//var $contains = $("#contains");
 		$("#contains").html(new App.Project.ProjectApp().render().el);
 		//上传
 		App.Project.upload = App.modules.docUpload.init($(document.body));
@@ -319,7 +319,7 @@ App.Project = {
 
 		}
 
-		//添加样式 弹出属性层 
+		//添加样式 弹出属性层
 		$("#projectContainer").find(".rightProperty").addClass("showPropety").end().find(".projectCotent").addClass("showPropety")
 
 		//触发数据加载
@@ -357,7 +357,7 @@ App.Project = {
 				App.Project.FileCollection.reset();
 				$(".fileContainerScroll .fileContent").empty();
 				App.Project.Settings.fileId = file.fileVersionId;
-				
+
 				App.Project.FileCollection.fetch({
 					data: {
 						parentId: file.fileVersionId
@@ -391,7 +391,7 @@ App.Project = {
 		});
 	}
 
-	 
+
 
 
 }

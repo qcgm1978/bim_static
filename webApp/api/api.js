@@ -44,9 +44,9 @@ App.API = {
 		fetchDesignCollision: "", // 设计碰撞
 		// 碰撞
 		fetchDesignFileList:"view/api/{projectId}/categories",// 设计碰撞文件
-		fetchDesignTaskList:"view/api/{projectId}/{projectVersionId}/collision/setting/list",//碰撞任务列表
+		fetchDesignTaskList:"view/api/{projectId}/{projectVerionId}/collision/setting/list",//碰撞任务列表
 		fetchDesignTaskDetail:"view/api/{projectId}/{projectVersionId}/collision/setting?collisionId={collisionId}",//碰撞任务详情
-		creatCollisionTask:"view/api/{projectId}/{projectVersionId}/collision/setting",//碰撞任务详情
+		creatCollisionTask:"view/api/{projectId}/{projectVerionId}/{collision}/setting",//碰撞任务详情
 
 		//计划
 		fetchPlanModel: "", //模型

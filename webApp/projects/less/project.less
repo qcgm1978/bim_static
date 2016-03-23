@@ -87,7 +87,7 @@
 			}
 		}
 	}
-	.collBox { height: 100%; overflow: auto;
+	.collBox { overflow: auto;
 		.collTips{text-align:center; padding-top:30px;
 			font-size:14px;
 			p{margin:1em 0;font-size:1em;}
@@ -111,7 +111,9 @@
 		&:after{content:''; display:table; clear:both; }
 		.filterBox{width:85%; float:left; padding:10px 80px 10px 10px; border-left:1px solid #ccc; border-right:1px solid #ccc; position:relative;
 			.currColl{width:100%; height:25px; outline:none; }
-			.addButton{position:absolute; right:10px; top:10px; width:60px; height:25px; text-align:center; line-height:25px; border:1px solid #ccc; cursor:pointer; .addIcon{
+			.addButton{position:absolute; right:10px; top:10px; width:60px; height:25px; text-align:center; line-height:25px; border:1px solid #ccc; cursor:pointer;
+				.addIcon{
+					display:inline-block;width:12px;height:12px;background:url(/project);
 				}
 			}
 			.collSelect{ display:none; position:absolute; z-index:2; left:10px; right:80px; top:35px; padding:10px 10px 0; border:1px solid #ccc; border-top:none; background:#fff;overflow:hidden;
@@ -141,6 +143,11 @@
 			}
 		}
 		.level{width:15%; padding:10px; line-height:25px; text-align:center; float:left; }
+	}
+	.collFooter{
+		position:absolute;
+		left:0;
+		bottom:0px;
 	}
 	.planBox { position: absolute; top: 62px; bottom: 0px; left: 0px; right: 0px;
 		.planContent { height: 100%;
@@ -185,7 +192,7 @@
 		}
 	}
 }
-
+.rightProperty .designCollision{height:100%;position:relative;}
 .designCollSetting{font-size:14px;
 	.collLabel{display:table;width:100%;margin-bottom:10px;
 		.labelName{width:1%;white-space:nowrap;display:table-cell;padding-right:5px;}

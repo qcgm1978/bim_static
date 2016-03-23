@@ -4,7 +4,7 @@ App.Project.DesignCollision=Backbone.View.extend({
 
 	tagName:"div",
 
-	className:"designCollision",
+	className:"detailList",
 
 	events: {
 		"click .selectBox .currColl":"showSelectList",
@@ -53,7 +53,7 @@ App.Project.DesignCollision=Backbone.View.extend({
 			message: "",
 			readyFn:function(){
 				this.element.find(".content").html(new App.Project.ProjectDesignSetting().render().el)
-				App.Project.DesignAttr.CollisionFilesList.projectId = App.Project.Settings.CurrentVersion.projectId
+				App.Project.DesignAttr.CollisionFilesList.projectId = "c9c468aee3cf0157a6010c7d8355d86e"; //App.Project.Settings.modelId
 				App.Project.DesignAttr.CollisionFilesList.fetch();
 			},
 			okCallback:function(){
