@@ -4,6 +4,8 @@ App.Project.CollisionFloor= Backbone.View.extend({
 
   className:"labelInput",
 
+  id:"floor",
+
   events: {
     "change":"getCategory"
   },
@@ -27,7 +29,7 @@ App.Project.CollisionFloor= Backbone.View.extend({
 
   getCategory:function(event){
     floor = $(event.target).val();
-    App.Project.DesignAttr.CollisionCategory.projectId = 793465949626592//App.Project.Settings.projectId;
+    App.Project.DesignAttr.CollisionCategory.projectId = 794144359637216//App.Project.Settings.projectId;
     App.Project.DesignAttr.CollisionCategory.floor = floor;
     App.Project.DesignAttr.CollisionCategory.fetch();
   }

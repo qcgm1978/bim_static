@@ -47,7 +47,7 @@ App.API = {
 		fetchDesignCategory:"view/api/{projectId}/{floor}/floor/categories",// 楼层信息
 		fetchDesignTaskList:"view/api/{projectId}/{projectVerionId}/collision/setting/list",//碰撞任务列表
 		fetchDesignTaskDetail:"view/api/{projectId}/{projectVersionId}/collision/setting?collisionId={collisionId}",//碰撞任务详情
-		creatCollisionTask:"view/api/{projectId}/{projectVerionId}/{collision}/setting",//碰撞任务详情
+		creatCollisionTask:"view/api/{projectId}/{projectVerionId}/collision/setting",//碰撞任务详情
 
 		//计划
 		fetchPlanModel: "", //模型

@@ -64,12 +64,12 @@ App.Project.DesignCollision=Backbone.View.extend({
 				formData.chooseA = getSpecialty(treeA);
 				formData.chooseB = getSpecialty(treeB);
 				formData.projectId=App.Project.Settings.projectId;
-				formData.projectVersionId=App.Project.Settings.CurrentVersion.id;
+				formData.projectVerionId=App.Project.Settings.CurrentVersion.id;
 				data = {
 	        type:'post',
 	        URLtype:"creatCollisionTask",
 	        contentType:"application/json",
-	        data:formData
+	        data:JSON.stringify(formData)
 	      }
 	      App.Comm.ajax(data,function(data){
 		      if (data.message=="success") {
