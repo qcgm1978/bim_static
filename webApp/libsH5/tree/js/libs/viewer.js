@@ -11,7 +11,8 @@ var BIM = function(option){
     element:'',
     cameraInfo:'',
     controll:true,
-    projectId:'',
+    sourceId:'',
+    etag:'',
     resize:true,
     tools:false,
     toolsClass:'mod-bar',
@@ -69,7 +70,7 @@ var BIM = function(option){
     bimBox.appendChild(viewBox);
     _opt.element.appendChild(bimBox);
     viewer.init(viewBox);
-    viewer.load(_opt.projectId,BIM.common.severModel);
+    viewer.load(_opt.etag,BIM.common.severModel);
     if(_opt.resize){
       _util.listener(window,'resize',function(){
         var _width = viewBox.clientWidth,
@@ -914,12 +915,13 @@ BIM.TREE.prototype = {
   init:function(){
     var _opt = BIM.common._option,
         _self = this,
-        projectId = _opt.projectId,
-        urlSF = BIM.common.severView + projectId + '/tree',
-        urlC = BIM.common.severView + projectId + '/categories';
+        etag = _opt.etag,
+        sourceId = _opt.sourceId,
+        treeUrl = BIM.common.severView + etag +"/"+ sourceId + '/tree',
+        urlC = BIM.common.severView + etag +"/"+ sourceId + '/categories';
     _self.controll();
     BIM.util.ajax({
-      url:urlSF,
+      url:treeUrl,
       success:function(res){
         var res = JSON.parse(res),
             data = res.data;
@@ -937,8 +939,8 @@ BIM.TREE.prototype = {
       url:urlC,
       success:function(res){
         var data = JSON.parse(res).data;
-        if(BIM.util.isEmptyObject(data)){
-          _self.errorMsg('结构不存在');
+        if(!data || data.length==0){
+          _self.errorMsg('');
         }else{
           _self.createCategory(data);
         }
