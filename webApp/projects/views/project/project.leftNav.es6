@@ -129,7 +129,7 @@ App.Project.leftNav = Backbone.View.extend({
 		this.typeContentChange();
 		//渲染模型属性
 		App.Project.renderModelContentByType(); 
-		 
+		 debugger;
 		var viewer = App.Project.Settings.Viewer = new BIM({
 			element: $("#projectContainer .modelContainerContent")[0],
 			sourceId: App.Project.Settings.DataModel.sourceId,

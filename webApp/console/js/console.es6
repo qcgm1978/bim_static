@@ -1056,9 +1056,7 @@ App.Console = {
 
 			$("#treeContainer").html(str);
 
-		});
-
-
+		}); 
 	},
 
 	//项目变更初始化
@@ -1068,20 +1066,20 @@ App.Console = {
 
 	//项目变更审核
 	bindprojectChangeVettedInit() {
-
+		App.Console.standardModeStatus(4, 2, 1, "发起成功",3);
 	},
 	//审核批准
 	bindprojectChangeAppordInit() {
-
+		App.Console.standardModeStatus(2, 5, 4, "审核成功",3);
 	},
 
 	//发起发版
 	bindprojectChangeSendVersionInit() {
-
+		App.Console.standardModeStatus(5, 7, 2, "发起成功",3);
 	},
 	//族库发版批准
 	bindprojectChangeSendVersionVettedInit() {
-
+		App.Console.standardModeStatus(7, 9, 5, "审核成功",3);
 	},
 
 
