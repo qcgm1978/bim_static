@@ -180,6 +180,8 @@ CLOUD.Utils = {
                     console.log(CLOUD.GlobalData.SubSceneVisibleDistance);
                 }
                 rootNode.updateMatrix();
+                rootNode.updateMatrixWorld(true);
+                rootNode.matrixAutoUpdate = false;
             }
         }
         else {
@@ -190,7 +192,8 @@ CLOUD.Utils = {
         var localRoot = new CLOUD.Group();
         localRoot.boundingBox = boundingBox;
         rootNode.add(localRoot);
-
+        localRoot.updateMatrixWorld(true);
+        localRoot.matrixAutoUpdate = false;
         return localRoot;
     }
 };
@@ -525,6 +528,7 @@ CLOUD.GeomUtil = {
         geometryNode.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir);
         geometryNode.position.copy(startPt).addScaledVector(dir, len * 0.5);
         geometryNode.updateMatrix();
+        geometryNode.matrixAutoUpdate = false;
         //geometryNode.boundingBox =
         if (!geometryNode.geometry.boundingBox)
             geometryNode.geometry.computeBoundingBox();
@@ -2250,6 +2254,28 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
 
     }
 
+    function painterByDistance(a, b) {
+
+        if (a.object.renderOrder !== b.object.renderOrder) {
+
+            return a.object.renderOrder - b.object.renderOrder;
+
+        } else if (a.z !== b.z) {
+
+            return a.z - b.z;
+
+        } else if (a.material.id !== b.material.id) {
+
+            return a.material.id - b.material.id;
+
+        } else {
+
+            return a.id - b.id;
+
+        }
+
+    }
+
     function painterSortStable ( a, b ) {
 
         if ( a.object.renderOrder !== b.object.renderOrder ) {
@@ -2340,7 +2366,6 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
             transparentObjects.length = transparentObjectsLastIndex + 1;
 
             if ( _this.sortObjects === true ) {
-
                 opaqueObjects.sort( painterSortStable );
                 transparentObjects.sort( reversePainterSortStable );
 
@@ -2592,7 +2617,6 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
             transparentObjects.length = transparentObjectsLastIndex + 1;
 
             if ( _this.sortObjects === true ) {
-
                 opaqueObjects.sort( painterSortStable );
                 transparentObjects.sort( reversePainterSortStable );
             }
@@ -2629,7 +2653,6 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
         startTime = Date.now();
 
         var l = renderList.length;
-
         //if (tansparent === undefined)
         //    l = Math.min(renderList.length, 20000);
 
@@ -2666,7 +2689,7 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
 
             }
 
-            if (i % 500 === 499) {
+            if (i % 1000 === 999) {
                 //endTime = window.performance.now();
                 endTime = Date.now();
 
@@ -2800,24 +2823,24 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
 
                         if ( _this.sortObjects === true ) {
 
-                            if (!object.modelCenter) {
+                            //if (!object.modelCenter) {
 
-                                object.modelCenter = new THREE.Vector3();
+                            //    object.modelCenter = new THREE.Vector3();
 
-                                if (object.boundingBox) {
+                            //    if (object.boundingBox) {
 
-                                    object.boundingBox.center(object.modelCenter);
-                                    object.modelCenter.applyMatrix4(object.matrixWorld);
-                                }
-                                else {
+                            //        object.boundingBox.center(object.modelCenter);
+                            //        object.modelCenter.applyMatrix4(object.matrixWorld);
+                            //    }
+                            //    else {
 
-                                    object.modelCenter.setFromMatrixPosition(object.matrixWorld);
-                                }
-                            }
+                            //        object.modelCenter.setFromMatrixPosition(object.matrixWorld);
+                            //    }
+                            //}
 
-                            _vector3.copy(object.modelCenter);
+                            //_vector3.copy(object.modelCenter);
 
-                            _vector3.applyProjection( _projScreenMatrix );
+                            //_vector3.applyProjection( _projScreenMatrix );
 
                             //console.log(_vector3.z);
                         }
@@ -6012,7 +6035,8 @@ CLOUD.MaterialUtil = {
 
     createHilightMaterial: function () {
 
-        var material = new THREE.MeshBasicMaterial({ color: 0x00ff00, opacity: 0.5, transparent: true, side: THREE.DoubleSide, polygonOffset: true, depthTest: true, polygonOffsetFactor: -2, polygonOffsetUnits: -1 });
+        var material = new THREE.MeshBasicMaterial({ color: 0x0000ff });
+        //var material = new THREE.MeshBasicMaterial({ color: 0x00ff00, opacity: 0.5, transparent: true, side: THREE.DoubleSide, polygonOffset: true, depthTest: true, polygonOffsetFactor: -2, polygonOffsetUnits: -1 });
         if (CloudShaderLib !== undefined) {
             material.type = 'base_cust_clip';
             material.uniforms = CloudShaderLib.base_cust_clip.uniforms;
@@ -9526,6 +9550,8 @@ CLOUD.Scene = function () {
     this.selectedIds = []; // 存一份是为了供鼠标pick使用
 
     this.isEnableMultiSelect = false;
+
+    this.autoUpdate = false;
 };
 
 CLOUD.Scene.prototype = Object.create(THREE.Scene.prototype);
@@ -11305,7 +11331,7 @@ CLOUD.OrbitEditor.prototype.onMouseMove = function (event) {
     camera_scope.process(event.clientX, event.clientY);
 };
 
-CLOUD.OrbitEditor.prototype.onMouseUp = function ( /* event */) {
+CLOUD.OrbitEditor.prototype.onMouseUp = function (event) {
     var camera_scope = this.cameraEditor;
     if (camera_scope.enabled === false) return false;
 
@@ -17250,6 +17276,7 @@ CLOUD.SubSceneLoader.prototype = {
         var scope = this;
 
         var resource = subScene.client.cache;
+        var client = subScene.client;
 
         function on_load_mesh(meshNode) {
             return function () {
@@ -17280,8 +17307,8 @@ CLOUD.SubSceneLoader.prototype = {
                             meshNode.updateGeometry(mesh);
                         }
                         else {
-
-                            scope.manager.addDelayLoadMesh({ meshNode: meshNode, client: subScene.client });
+                            var mpkId = client.meshIds[meshId];
+                            scope.manager.addDelayLoadMesh(mpkId, { meshNode: meshNode});
 
                         }
                     }
@@ -17293,7 +17320,7 @@ CLOUD.SubSceneLoader.prototype = {
         };
 
         update_children(subScene.children);
-        scope.manager.taskManager.processMpkTasks();
+        scope.manager.taskManager.processMpkTasks(client);
     },
 
     /**
@@ -17464,6 +17491,9 @@ CLOUD.SubSceneLoader.prototype = {
 
                     parent.add(object);
                 }
+
+                if (object)
+                    object.updateMatrixWorld(true);
             }
         };
 
@@ -17471,6 +17501,7 @@ CLOUD.SubSceneLoader.prototype = {
             subScene.embedded = true;
             handle_children(subScene, sceneJSON.children, 0);
         }
+
     }
 }
 /**
@@ -17541,7 +17572,8 @@ CLOUD.SceneLoader.prototype = {
             }
             else {
                 //delayLoadMeshNodes.push({ meshNode: object, isInstanced: false });
-                scope.manager.addDelayLoadMesh({ meshNode: object, client: client });
+                var mpkId = client.meshIds[meshId];
+                scope.manager.addDelayLoadMesh(mpkId, { meshNode: object});
             }
         }
 
@@ -17606,8 +17638,6 @@ CLOUD.SceneLoader.prototype = {
                         parent.add(boxNode);
 
                     }
-
-
 
                     handle_children(object, objJSON.children, level + 1);
                     parent.add(object);
@@ -17695,7 +17725,7 @@ CLOUD.SceneLoader.prototype = {
                             CLOUD.GeomUtil.parseNodeProperties(object, objJSON, nodeId, trf);
                             object.userData = userData;
 
-                            loadMeshNode(object, objJSON.meshId);
+                            loadMeshNode(object, symbolJSON.meshId);
 
                             parent.add(object);
 
@@ -17741,6 +17771,10 @@ CLOUD.SceneLoader.prototype = {
 
                     parent.add(object);
 
+                }
+
+                if (object) {
+                    object.updateMatrixWorld(true);
                 }
 
                 if (level == 0) {
@@ -17796,12 +17830,11 @@ CLOUD.SceneLoader.prototype = {
 
         function finalize() {
             // take care of targets which could be asynchronously loaded objects
-            scope.manager.taskManager.processMpkTasks();
+            scope.manager.taskManager.processMpkTasks(client);
         };
 
 
         handle_children(localRoot, data.objects, 0);
-
         // just in case there are no async elements
         async_callback_gate();
     }
@@ -17845,7 +17878,8 @@ CLOUD.IndexLoader.prototype = {
 
                 var rootNode = scope.manager.scene.rootNode;
                 CLOUD.Utils.parseTransform(rootNode, index.view);
-
+                rootNode.updateMatrixWorld(true);
+                rootNode.matrixAutoUpdate = false;
                 //rootNode.scale.multiplyScalar(CLOUD.GlobalData.SceneScale);
                 //CLOUD.GlobalData.MinBoxSize.x = 0.05 / rootNode.scale.x;
                 //CLOUD.GlobalData.MinBoxSize.y = 0.05 / rootNode.scale.y;
@@ -18038,53 +18072,7 @@ CLOUD.TaskWorker = function (threadCount) {
         this.items.push(item);
     };
 
-    this.run = function (loader) {
-
-        if (this.activeTaskCount != 0)
-            return;
-
-        var scope = this;
-
-        var items = this.items;
-        var itemCount = items.length;
-
-        if (this.lastItemLength < itemCount) {
-            var startOffset = this.lastItemLength;
-            this.lastItemLength = itemCount;
-
-            var TASK_COUNT = Math.min(this.MaxThreadCount, itemCount - startOffset);
-
-            function processItem(i) {
-
-                if (i >= itemCount) {
-                    scope.activeTaskCount -= 1;
-
-                    // next loop
-                    scope.run(loader);
-                    return;
-                }
-
-
-                if (i > scope.loadedItemCount)
-                    scope.loadedItemCount = i;
-
-                var item = items[i];
-
-                loader(item, i + TASK_COUNT, processItem);
-            };
-
-            this.activeTaskCount = TASK_COUNT;
-            for (var ii = 0; ii < TASK_COUNT; ++ii) {
-                processItem(ii + startOffset);
-            }
-        }
-        else {
-            resetItems();
-        }
-
-    };
-
-    this.runLimit = function (loader, sorter) {
+    this.run = function (loader, sorter) {
 
         var scope = this;
 
@@ -18123,11 +18111,83 @@ CLOUD.TaskWorker = function (threadCount) {
     }
 }
 
+CLOUD.MpkTaskWorker = function (threadCount) {
+
+    this.MaxThreadCount = threadCount || 6;
+
+    var scope = this;
+
+    this.todoList = {};
+    this.doingCount = 0;
+
+    this.addItem = function (mpkId, item) {
+
+        if (mpkId === undefined) {
+            console.log("undefined mpkId");
+            return;
+        }
+
+
+        if (this.todoList[mpkId] === undefined)
+            this.todoList[mpkId] = [];
+
+        this.todoList[mpkId].push(item);
+
+    };
+
+    this.run = function (loader) {
+
+        if (this.doingCount > 0)
+            return;
+
+        this.doingList = this.todoList;
+        this.todoList = {};
+
+        var items = [];
+
+        for (var item in this.doingList) {
+            items.push(item)
+        }
+
+        var scope = this;
+        scope.doingCount = items.length;
+
+        if (scope.doingCount == 0)
+            return;
+
+
+        var itemCount = items.length;
+
+        var TASK_COUNT = Math.min(this.MaxThreadCount, itemCount);
+
+        function processItem(i) {
+
+            if (i >= itemCount) {
+
+                // next loop
+                scope.run(loader);
+                return;
+            }
+
+            --scope.doingCount;
+
+            var mpkId = items[i];
+
+            loader(mpkId, scope.doingList[mpkId], i + TASK_COUNT, processItem);
+        };
+
+        for (var ii = 0; ii < TASK_COUNT; ++ii) {
+            processItem(ii);
+        }
+    };
+
+}
+
 CLOUD.TaskManager = function (manager) {
     this.manager = manager;
 
     // MPK
-    this.mpkWorker = new CLOUD.TaskWorker(8);
+    this.mpkWorker = new CLOUD.MpkTaskWorker(8);
 
     // SubScene
     this.sceneWorker = new CLOUD.TaskWorker(8);
@@ -18137,19 +18197,19 @@ CLOUD.TaskManager.prototype = {
 
     constructor: CLOUD.TaskManager,
 
-    addMpkTask: function(param) {
+    addMpkTask: function(mpkId, param) {
 
-        this.mpkWorker.addItem(param);
+        this.mpkWorker.addItem(mpkId, param);
 
     },
 
-    processMpkTasks: function () {
+    processMpkTasks: function (client) {
 
         var scope = this;
 
-        function on_load_mesh(item) {
+        function on_load_mesh(client, item) {
 
-            var mesh = item.client.cache.geometries[item.meshNode.meshId];
+            var mesh = client.cache.geometries[item.meshNode.meshId];
             if (mesh) {
                 item.meshNode.updateGeometry(mesh);
             }
@@ -18157,28 +18217,19 @@ CLOUD.TaskManager.prototype = {
                 console.log("err: " + item + " may be in other mpk");
             }
         };
+        this.mpkWorker.run(function (mpkId, items, nextIdx, callback) {
 
-        this.mpkWorker.run(function(item, nextIdx, callback){
+            scope.manager.loadMpk(mpkId, client, function () {
 
-            var client = item.client;
+                for (var ii = 0, len = items.length; ii < len; ++ii) {
+                    on_load_mesh(client, items[ii]);
+                }
 
-            var meshId = item.meshNode.meshId;
-            var mesh = client.cache.geometries[meshId];
-            if (mesh) {
-                item.meshNode.updateGeometry(mesh);
+                // next task
                 callback(nextIdx);
-            }
-            else {
-                var mpkId = client.meshIds[meshId];
-                scope.manager.loadMpk(mpkId, client, function () {
-                    on_load_mesh(item);
-
-                    // next task
-                    callback(nextIdx);
-                });
-            }
-
+            });
         });
+
     },
 
     addSceneTask: function (param) {
@@ -18197,7 +18248,7 @@ CLOUD.TaskManager.prototype = {
 
         var sceneLoader = scope.manager.sceneLoader;
 
-        scope.sceneWorker.runLimit(function (item, nextIdx, callback) {
+        scope.sceneWorker.run(function (item, nextIdx, callback) {
 
             var sceneNode = item.sceneNode;
 
@@ -18268,11 +18319,13 @@ CLOUD.ModelManager.prototype.prepareScene = function (camera) {
     dir.normalize();
     dir.multiplyScalar(-1);
     this.headLamp.position.copy(dir);
+    this.headLamp.updateMatrixWorld(true);
 
     var offset = new THREE.Vector3(-2.0, -1.5, -0.5);
     offset.normalize();
     dir.add(offset).normalize();
     this.assistLamp.position.copy(dir);
+    this.assistLamp.updateMatrixWorld();
 
     // update scene
     this.scene.prepareScene(camera);
@@ -18428,9 +18481,9 @@ CLOUD.ModelManager.prototype.onLoadSubSceneEvent = function (evt) {
     }
 }
 
-CLOUD.ModelManager.prototype.addDelayLoadMesh = function(item){
+CLOUD.ModelManager.prototype.addDelayLoadMesh = function(mpkId, item){
 
-    this.taskManager.addMpkTask(item);
+    this.taskManager.addMpkTask(mpkId, item);
 }
 
 CLOUD.ModelManager.prototype.loadMpk = function (mpkId, client, callback) {
