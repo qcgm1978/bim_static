@@ -25,7 +25,7 @@ App.API = {
 
 
 		//模型
-		fetchModelIdByProject: "doc/{projectId}/{projectVersionId}/model",
+		fetchModelIdByProject: "view/api/{projectId}/{projectVersionId}/init",
 		fetchFileModelIdByFileVersionId: "doc/{projectId}/{projectVersionId}/file/meta", //?fileVersionId={fileVersionId}
 
 		uploadFile: "doc/{projectId}/{projectVersionId}/file/data", //上传文件  ?parentId={parentId}&fileName={fileName}&size={size}&digest={digest}&position={position}

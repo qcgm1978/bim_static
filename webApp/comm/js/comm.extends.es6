@@ -8,8 +8,8 @@
 App.Comm.templateCache = [];
 
 //获取模板根据URL
-_.templateUrl = function(url, notCompile) { 
-	 
+_.templateUrl = function(url, notCompile) {
+
 	if (url.substr(0, 1) == ".") {
 		url = "/static/dist/tpls" + url.substr(1);
 	} else if (url.substr(0, 1) == "/") {
@@ -18,7 +18,7 @@ _.templateUrl = function(url, notCompile) {
 
 	if (App.Comm.templateCache[url]) {
 		return App.Comm.templateCache[url];
-	} 
+	}
 
 	var result;
 	$.ajax({
@@ -33,7 +33,7 @@ _.templateUrl = function(url, notCompile) {
 			result = _.template(tpl);
 		}
 
-	}); 
+	});
 
 	App.Comm.templateCache[url] = result;
 
@@ -79,6 +79,19 @@ function StringBuilder() {
 			this.Append(arguments[i]);
 		}
 	}
+}
+
+
+
+Array.prototype.removeByItem = function(item) {
+
+	var index = this.indexOf(item);
+	if (index >= 0) {
+		this.splice(index, 1);
+		return true;
+	}
+	return false; 
+
 }
 
 //向对象中添加字符串

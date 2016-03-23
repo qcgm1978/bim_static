@@ -8,8 +8,8 @@ App.ResourceModel.LeftNav = Backbone.View.extend({
 
 	events: {
 		"click .projectNav .item": "navClick",
-		"click .slideBar":"slideBarToggle",
-		"mousedown .dragSize":"dragSize"
+		"click .slideBar": "slideBarToggle",
+		"mousedown .dragSize": "dragSize"
 	},
 
 	//渲染
@@ -78,11 +78,11 @@ App.ResourceModel.LeftNav = Backbone.View.extend({
 
 	//切换Tab
 	navClick: function(event) {
-		 
+
 		var type = $(event.target).addClass("selected").siblings().removeClass("selected").end().data("type"),
 			$resourceModelLeftNav = this.$el;
 
-			App.ResourceModel.Settings.leftType=type;
+		App.ResourceModel.Settings.leftType = type;
 
 		if (type == "file") {
 			//文件
@@ -102,13 +102,16 @@ App.ResourceModel.LeftNav = Backbone.View.extend({
 			$resourceModelLeftNav.find(".fileTree").hide().end().find(".modelTree").show();
 			$resourceModelLeftNav.find(".dragSize").show().end().find(".slideBar").show();
 
-			//获取模型id
-			this.fetchModelIdByResource(() => {
-				$("#resourceModelLeftNav .item:last").addClass("selected").siblings().removeClass("selected");
-				$resourceModelLeftNav.find(".fileTree").show().end().find(".modelTree").hide();
-				$resourceModelLeftNav.find(".dragSize").hide().end().find(".slideBar").hide();
-			});
-
+			if (App.ResourceModel.Settings.DataModel && App.ResourceModel.Settings.DataModel.sourceId) {
+				this.renderModel();
+			} else {
+				//获取模型id
+				this.fetchModelIdByResource(() => {
+					$("#resourceModelLeftNav .item:last").addClass("selected").siblings().removeClass("selected");
+					$resourceModelLeftNav.find(".fileTree").show().end().find(".modelTree").hide();
+					$resourceModelLeftNav.find(".dragSize").hide().end().find(".slideBar").hide();
+				});
+			} 
 		}
 
 	},
@@ -133,7 +136,7 @@ App.ResourceModel.LeftNav = Backbone.View.extend({
 			if (data.message == "success") {
 
 				if (data.data) {
-					App.ResourceModel.Settings.modelId = data.data;
+					App.ResourceModel.Settings.DataModel = data.data;
 					//成功渲染
 					this.renderModel();
 				} else {
@@ -177,19 +180,19 @@ App.ResourceModel.LeftNav = Backbone.View.extend({
 				scrollInertia: 0
 			});
 		}
-		
+
 	},
 
 	// 收起暂开
-	slideBarToggle:function(){
-		 
-		App.Comm.navBarToggle(this.$el,$("#navContainer"),"left",App.ResourceModel.Settings.Viewer);
-	}, 
+	slideBarToggle: function() {
+
+		App.Comm.navBarToggle(this.$el, $("#navContainer"), "left", App.ResourceModel.Settings.Viewer);
+	},
 
 	//拖拽改变大小
 	dragSize: function(event) {
 
-		App.Comm.dragSize(event,$("#resourceModelLeftNav"),$("#navContainer"),"left",App.ResourceModel.Settings.Viewer);
+		App.Comm.dragSize(event, $("#resourceModelLeftNav"), $("#navContainer"), "left", App.ResourceModel.Settings.Viewer);
 
 		return false;
 	}

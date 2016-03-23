@@ -6,11 +6,15 @@
 <% if(folder){%>
  <span data-id="<%=id%>" data-isfolder="<%=folder%>" class="text"><%=name%></span>
 <%}else{%>
- <a data-id="<%=id%>" href="/static/dist/app/project/filePreview.html?id=<%=id%>&model=<%=modelId%>&projectId=<%=App.Project.Settings.projectId%>&projectVersionId=<%=App.Project.Settings.CurrentVersion.id%>" target="_blank" data-isfolder="<%=folder%>" class="text"><%=name%></a>
-<%}%>
-
+ <a data-id="<%=id%>" href="/static/dist/app/project/single/filePreview.html?id=<%=id%>&model=<%=modelId%>&projectId=<%=App.Project.Settings.projectId%>&projectVersionId=<%=App.Project.Settings.CurrentVersion.id%>" target="_blank" data-isfolder="<%=folder%>" class="text"><%=name%></a>
+<%}%> 
 
   </span> 
+
+<%if(!folder){%>
+ <a href="/static/dist/app/project/modelChange/index.html?id=<%=id%>&model=<%=modelId%>&projectId=<%=App.Project.Settings.projectId%>&projectVersionId=<%=App.Project.Settings.CurrentVersion.id%>" target="_blank" class="changeContrast inlineBlock">有</a> 
+<%}%>
+
 
 <span class="fileStatus inlineBlock"><%=  App.Comm.convertStatus(status) %></span>
 <span class="fileOp inlineBlock"><%= creatorName %></span>

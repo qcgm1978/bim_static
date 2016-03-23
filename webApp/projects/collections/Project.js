@@ -6,7 +6,8 @@ App.Project = {
 		property: "",
 		fileId: "",
 		projectId: 100,
-		modelId: ""
+		DataModel:null //渲染模型的数据
+		
 	},
 
 	// 文件 容器
@@ -54,9 +55,9 @@ App.Project = {
 		App.Project.Settings.CurrentVersion = null;
 		App.Project.Settings.fetchNavType = 'file';
 		App.Project.Settings.projectNav = 'design';
-		App.Project.Settings.fileId = '';
-		App.Project.Settings.modelId = '';
+		App.Project.Settings.fileId = ''; 
 		App.Project.Settings.property = '';
+		App.Project.Settings.property.DataModel=null;
 	},
 
 	//加载版本

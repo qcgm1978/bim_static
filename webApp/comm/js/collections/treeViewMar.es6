@@ -89,6 +89,7 @@ App.Comm.TreeViewMar.prototype.TreeViewBuild = function() {
 App.Comm.TreeViewMar.prototype.treeRoot = function(it) {
 
 	var sb = new StringBuilder();
+	if (!it.data) {return;}
 	var trees = it.data,
 		item,
 		treeCount = trees.length;
