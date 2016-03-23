@@ -32,6 +32,20 @@ App.Project.DesignAttr={
 
 		urlType:"fetchDesignFloor"
 
+	})),
+
+	// 碰撞构件列表
+	CollisionCategory: new(Backbone.Collection.extend({
+
+		model: Backbone.Model.extend({
+			defaults: function() {
+				return {
+					title: ""
+				}
+			}
+		}),
+
+		urlType:"fetchDesignFloor"
 
 	})),
 

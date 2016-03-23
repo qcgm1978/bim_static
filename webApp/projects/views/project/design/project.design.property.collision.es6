@@ -53,8 +53,8 @@ App.Project.DesignCollision=Backbone.View.extend({
 			message: "",
 			readyFn:function(){
 				this.element.find(".content").html(new App.Project.ProjectDesignSetting().render().el);
-				App.Project.DesignAttr.CollisionFilesList.projectId = App.Project.Settings.projectId;
-				App.Project.DesignAttr.CollisionFilesList.fetch();
+				App.Project.DesignAttr.CollisionFloor.projectId = App.Project.Settings.projectId;
+				App.Project.DesignAttr.CollisionFloor.fetch();
 			},
 			okCallback:function(){
 				var formData = {},

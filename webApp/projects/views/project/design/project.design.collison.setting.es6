@@ -8,18 +8,16 @@ App.Project.ProjectDesignSetting= Backbone.View.extend({
     "click .itemContent":"openTree"
   },
 
-  template:_.templateUrl("/projects/tpls/project/design/project.design.property.collSetting.html",true),
-
-  initialize:function(){
-    this.listenTo(App.Project.DesignAttr.CollisionFilesList,"add",this.addFilesList);
-  },
+  template:_.templateUrl("/projects/tpls/project/design/project.design.collision.setting.html",true),
 
   render:function(){
     this.$el.html(this.template);
+    this.$el.find("#addFloor").append(new App.Project.CollisionFloor().render().el);
+    App.Project.DesignAttr.CollisionFloor.fetch();
     return this;
   },
 
-  addFilesList:function(model){
+  addCategory:function(model){
     var that = this;
     var data = model.toJSON().data;
     var tree = this.$el.find(".treeView");
