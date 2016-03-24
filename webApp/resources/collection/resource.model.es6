@@ -94,7 +94,7 @@ App.ResourceModel = {
 		if (!App.ResourceModel.Settings.bindGlobalEvent) {
 			App.ResourceModel.Settings.bindGlobalEvent = true;
 			App.ResourceModel.bindGlobalEvent();
-		} 
+		}
 
 		//标准模型库
 		// if (App.ResourcesNav.Settings.type == "standardLibs") {
@@ -223,6 +223,108 @@ App.ResourceModel = {
 
 	},
 
+	//创建文件夹后处理
+	afterCreateNewFolder(file, parentId) {
+		var $treeViewMar = $(".projectNavFileContainer .treeViewMar"),
+			$treeViewMarUl = $treeViewMar.find(".treeViewMarUl");
+
+		var data = {
+			data: [file],
+			iconType: 1
+		};
+
+		//没有的时候绑定点击事件
+		if ($treeViewMarUl.length <= 0) {
+
+			data.click = function(event) {
+				var file = $(event.target).data("file");
+
+				if (type == "standardLibs") {
+					//清空数据
+					$("#resourceListContent .fileContent").empty();
+					App.ResourceModel.Settings.fileVersionId = file.fileVersionId;
+					App.ResourceModel.FileCollection.reset();
+
+					App.ResourceModel.FileCollection.fetch({
+						data: {
+							parentId: file.fileVersionId
+						}
+					});
+				} else if (type == "famLibs") {
+					var file = $(event.target).data("file");
+					//清空数据
+					$("#resourceThumContent .thumContent").empty();
+					App.ResourceModel.Settings.fileVersionId = file.fileVersionId;
+					App.ResourceModel.FileThumCollection.reset();
+
+					App.ResourceModel.FileThumCollection.fetch({
+						data: {
+							parentId: file.fileVersionId
+						}
+					});
+				}
+
+			}
+		}
+
+
+		var navHtml = new App.Comm.TreeViewMar(data);
+		//不存在创建
+		if ($treeViewMarUl.length <= 0) {
+			$treeViewMar.html($(navHtml).find(".treeViewMarUl"));
+		} else {
+
+			if (parentId) {
+
+				var $span = $treeViewMarUl.find("span[data-id='" + parentId + "']");
+				if ($span.length > 0) {
+					var $li = $span.closest('li');
+					if ($li.find(".treeViewSub").length <= 0) {
+						$li.append('<ul class="treeViewSub mIconOrCk" style="display:block;" />');
+					}
+
+					var $itemContent = $li.children('.item-content'),
+						$noneSwitch = $itemContent.find(".noneSwitch");
+
+					if ($noneSwitch.length > 0) {
+						$noneSwitch.toggleClass('noneSwitch nodeSwitch on');
+					}
+
+					var $newLi = $(navHtml).find(".treeViewMarUl li").removeClass("rootNode").addClass('itemNode');
+					$li.find(".treeViewSub").prepend($newLi);
+				}
+
+			} else {
+				$treeViewMarUl.prepend($(navHtml).find(".treeViewMarUl li"));
+			}
+		}
+
+	},
+
+	afterRemoveFolder(file) {
+
+		if (!file.folder) {
+			return;
+		}
+
+		var $treeViewMar = $(".projectNavFileContainer .treeViewMar"),
+			$treeViewMarUl = $treeViewMar.find(".treeViewMarUl");
+
+		if ($treeViewMarUl.length > 0) {
+			var $span = $treeViewMarUl.find("span[data-id='" + file.id + "']");
+			if ($span.length > 0) {
+				var $li = $span.closest('li'),$parent=$li.parent();
+				$li.remove();
+				//没有文件夹了
+				// if ($parent.find("li").length<=0) {
+
+				// }
+
+			} 
+
+		} 
+		 
+	},
 
 	//删除文件弹出层
 	delFileDialog: function($item) {

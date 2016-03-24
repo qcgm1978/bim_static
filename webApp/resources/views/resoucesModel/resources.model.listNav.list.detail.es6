@@ -259,9 +259,9 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 
 				var models = App.ResourceModel.FileCollection.models;
 				//修改数据
-				App.ResourceModel.FileCollection.last().set(data.data);
+				App.ResourceModel.FileCollection.last().set(data.data); 
 
-
+				App.ResourceModel.afterCreateNewFolder(data.data,parentId);
 				//tree name
 				//$("#resourceModelLeftNav .treeViewMarUl span[data-id='" + id + "']").text(name);
 
@@ -294,6 +294,7 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 		//新建的  不用处理
 		if (model.toJSON().id != "createNew") {
 			this.$el.remove();
+			App.ResourceModel.afterRemoveFolder(model.toJSON());
 		}
 
 	}

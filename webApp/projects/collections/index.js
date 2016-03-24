@@ -55,8 +55,9 @@
 
 
      //加载数据
-     loadData: function() {
+     loadData: function(projectName) {
 
+        $("#projectModes .proListBox").empty(); //清空数据
          App.Projects.ProjectCollection.reset();
          App.Projects.ProjectCollection.project = "project";
          //拉取数据
@@ -64,7 +65,7 @@
 
              data: {
                 // projectType: 1,
-                 name: "",
+                 name: projectName || "",
                  estateType: "",
                  province: "",
                  region: "",
@@ -82,7 +83,7 @@
 
                  $content.find(".sumDesc").html('共 ' + pageCount + ' 个项目');
 
-                 $content.find(".listPagination").pagination(pageCount, {
+                 $content.find(".listPagination").empty().pagination(pageCount, {
                      items_per_page: response.data.pageItemCount,
                      current_page: response.data.pageIndex - 1,
                      num_edge_entries: 3, //边缘页数
@@ -216,7 +217,7 @@
              $("#projectModes").find(".proListBox").hide().end().find(".proMapBox").show();
 
              //初始化地图
-             App.Projects.BaiduMap.initMap();
+             //App.Projects.BaiduMap.initMap();
 
              //map.centerAndZoom(point, 15);
          }

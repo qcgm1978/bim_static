@@ -6,7 +6,8 @@ App.Projects.searchView = Backbone.View.extend({
 
 	//
 	events: {
-		"click .seniorSearch": "seniorSearch"
+		"click .seniorSearch": "seniorSearch",
+		"click .btnSearch": "searchProject"
 	},
 
 	template: _.templateUrl("/projects/tpls/project.search.html", true),
@@ -22,7 +23,7 @@ App.Projects.searchView = Backbone.View.extend({
 
 	//显示隐藏高级收缩
 	seniorSearch: function() {
-		
+
 		var $advancedQueryConditions = this.$el.find(".advancedQueryConditions");
 		if ($advancedQueryConditions.is(":hidden")) {
 			this.$el.find(".quickSearch").hide();
@@ -30,7 +31,7 @@ App.Projects.searchView = Backbone.View.extend({
 			$("#projectModes").addClass("projectModesDown");
 			//当前按钮添加事件
 			this.$el.find(".seniorSearch").addClass('down');
-			
+
 		} else {
 			this.$el.find(".quickSearch").show();
 			this.$el.find(".advancedQueryConditions").hide();
@@ -39,6 +40,14 @@ App.Projects.searchView = Backbone.View.extend({
 			this.$el.find(".seniorSearch").removeClass('down');
 		}
 		this.$el.find(".seniorSearch i").toggleClass('icon-angle-down  icon-angle-up');
+
+	},
+	//搜索项目
+	searchProject: function() {
+
+		var searchText = $(".quickSearch .txtSearch").val().trim();
+ 		App.Projects.loadData(searchText);
+
 
 	}
 

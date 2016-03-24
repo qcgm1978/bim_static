@@ -277,7 +277,8 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 		App.Comm.ajax(data, function(data) {
 			if (data.message == "success") { 
 				//修改数据
-				App.ResourceModel.FileThumCollection.last().set(data.data); 
+				App.ResourceModel.FileThumCollection.last().set(data.data);
+				App.ResourceModel.afterCreateNewFolder(data.data,parentId); 
 				//tree name
 				//$("#resourceModelLeftNav .treeViewMarUl span[data-id='" + id + "']").text(name); 
 			}
@@ -308,6 +309,7 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 		//新建的  不用处理
 		if (model.toJSON().id != "createNew") {
 			this.$el.remove();
+			App.ResourceModel.afterRemoveFolder(model.toJSON());
 		}
 
 	}
