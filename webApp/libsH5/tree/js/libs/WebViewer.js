@@ -521,7 +521,7 @@ CLOUD.GeomUtil = {
         var len = dir.length();
         dir.normalize();
 
-        var radius = params.radius;
+        var radius = params.radius * 0.5;
         if(radius <= 1)
             radius = 100;
         geometryNode.scale.set(radius, len, radius);
@@ -9153,12 +9153,20 @@ CLOUD.ViewHouse = function (viewer) {
 
                     if (Intersected) {
 
-                        var viewMode = currentViewMode;
+                        //var viewMode = currentViewMode;
+                        //
+                        //// 切换新ViewMode
+                        //switchView(Intersected.name);
+                        //
+                        //if (currentViewMode !== -1 && viewMode !== currentViewMode) {
+                        //    // 反馈到主视图
+                        //    callback(currentViewMode);
+                        //}
 
                         // 切换新ViewMode
                         switchView(Intersected.name);
 
-                        if (currentViewMode !== -1 && viewMode !== currentViewMode) {
+                        if (currentViewMode !== -1) {
                             // 反馈到主视图
                             callback(currentViewMode);
                         }
@@ -18045,6 +18053,7 @@ CLOUD.SceneBoxLoader.prototype = {
 
         handle_children(localRoot, data.objects);
 
+        localRoot.updateMatrixWorld(true);
         // just in case there are no async elements
         async_callback_gate();
     }
@@ -18080,17 +18089,17 @@ CLOUD.TaskWorker = function (threadCount) {
         if (itemCount == 0)
             return;
 
-        scope.doingCount = itemCount;
+
 
         if (sorter) {
             items.sort(sorter);
         }
 
         var TASK_COUNT = Math.min(this.MaxThreadCount, itemCount);
-
+        scope.doingCount = TASK_COUNT;
         function processItem(i) {
 
-            if (i >= itemCount) {
+            if (scope.doingCount < 1) {
                 scope.run(loader, sorter);
                 return;
             }
@@ -18155,7 +18164,7 @@ CLOUD.MpkTaskWorker = function (threadCount) {
 
 
         var TASK_COUNT = Math.min(this.MaxThreadCount, itemCount);
-
+        scope.doingCount = TASK_COUNT;
         function processItem(i) {
 
             if (i >= itemCount) {
@@ -18186,7 +18195,7 @@ CLOUD.TaskManager = function (manager) {
     this.mpkWorker = new CLOUD.MpkTaskWorker(8);
 
     // SubScene
-    this.sceneWorker = new CLOUD.TaskWorker(8);
+    this.sceneWorker = new CLOUD.TaskWorker(4);
 };
 
 CLOUD.TaskManager.prototype = {
