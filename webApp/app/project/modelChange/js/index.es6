@@ -52,7 +52,7 @@ App.Project.Model = {
 	  template:_.templateUrl('/app/project/modelChange/tpls/changeList.html'),
 
 	  render: function(){
-	  	this.$el.html("");
+	  	this.$el.html("没有变更");
 	  	return this;
 	  },
 
@@ -99,7 +99,7 @@ App.Project.Model = {
 	  template:_.templateUrl('/app/project/modelChange/tpls/changeInfo.html'),
 
 	  render: function(){
-	  	this.$el.html("");
+	  	this.$el.html("没有变更");
 	  	return this;
 	  },
 
