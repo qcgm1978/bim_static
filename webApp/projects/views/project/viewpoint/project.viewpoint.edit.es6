@@ -32,11 +32,11 @@ App.Project.viewpointEdit = Backbone.View.extend({
         type:'put',
         URLtype:"editViewpointById",
         contentType:"application/json",
-        data:{
+        data:JSON.stringify({
           projectId:App.Project.Settings.projectId,
           viewPointId:App.Project.Settings.viewPoint.model.id,
           name:event.target.value
-        }
+        })
       }
     }else{
       data = {
