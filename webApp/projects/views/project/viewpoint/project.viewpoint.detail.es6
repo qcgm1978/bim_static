@@ -37,6 +37,6 @@ App.Project.viewpointDetail = Backbone.View.extend({
   setCamera:function(event){
     var that = $(event.target),
         point = that.data('viewpoint');
-    App.Project.Settings.Viewer.setCamera(point)
+    App.Project.Settings.Viewer.setCamera(point);
   }
 });
