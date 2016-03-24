@@ -11,7 +11,7 @@
 	<% for(var j=0;j<subCount;j++){ %>
 		<% subItem=subItems[j];  %>
 		<li class="modleItem">
-			<span class="modleName"><%=subItem.name%></span> <span class="modleVal"><%=subItem.value%></span>
+			<span class="modleName"><div class="modleNameText overflowEllipsis"><%=subItem.name%></div></span> <span class="modleVal"><%=subItem.value%><%=subItem.unit%></span>
 		</li>
 
 		<% } %> 

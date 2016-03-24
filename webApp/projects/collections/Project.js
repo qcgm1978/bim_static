@@ -324,7 +324,7 @@ App.Project = {
 		$("#projectContainer").find(".rightProperty").addClass("showPropety").end().find(".projectCotent").addClass("showPropety")
 
 		//触发数据加载
-		$("#projectContainer .rightPropertyContent .projectNav .item:last").click();
+		$("#projectContainer .rightPropertyContent .projectNav .item:first").click();
 
 	},
 
