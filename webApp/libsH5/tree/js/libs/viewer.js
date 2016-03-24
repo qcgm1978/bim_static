@@ -731,10 +731,10 @@ BIM.prototype = {
     BIM.util.changeClass('bar-camera','bar-item','selected');
   },
   getCamera : function(){
-    return window.btoa(BIM.common.viewer.getCamera());
+    return BIM.common.viewer.getCamera();
   },
   setCamera : function(json){
-    BIM.common.viewer.setCamera(window.atob(json));
+    BIM.common.viewer.setCamera(json);
   },
   viewpoint : function(){
     var self = this;
