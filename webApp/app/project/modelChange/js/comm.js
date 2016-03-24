@@ -1,32 +1,4 @@
 
-//重写backbone 的 sync
-var BackboneSync = Backbone.sync;
-Backbone.sync = function(method, model, options) {
-
-  // 在没有url 的情况下 取 api 的值 以防有特别的处理
-  //测试
-  if (App.API.Settings.debug) {
-    model.url = App.API.DEBUGURL[model.urlType];
-  } else {
-    model.url = App.API.Settings.hostname + App.API.URL[model.urlType];
-  }
-
-  //url 是否有参数
-  var urlPars = model.url.match(/\{([\s\S]+?(\}?)+)\}/g);
-  if (urlPars) {
-    for (var i = 0; i < urlPars.length; i++) {
-      var rex = urlPars[i],
-        par = rex.replace(/[{|}]/g, ""),
-        val = model[par];
-      if (val) {
-        model.url = model.url.replace(rex, val);
-      }
-    }
-  }
-
-  //调用backbone 原本的方法
-  return BackboneSync.apply(this, arguments);
-};
 App.Comm = {
   getUrlByType: function(data) {
 
@@ -73,4 +45,65 @@ App.Comm = {
     return data;
 
   },
+  templateCache:[]
+}
+
+//重写backbone 的 sync
+var BackboneSync = Backbone.sync;
+Backbone.sync = function(method, model, options) {
+
+  // 在没有url 的情况下 取 api 的值 以防有特别的处理
+  //测试
+  if (App.API.Settings.debug) {
+    model.url = App.API.DEBUGURL[model.urlType];
+  } else {
+    model.url = App.API.Settings.hostname + App.API.URL[model.urlType];
+  }
+
+  //url 是否有参数
+  var urlPars = model.url.match(/\{([\s\S]+?(\}?)+)\}/g);
+  if (urlPars) {
+    for (var i = 0; i < urlPars.length; i++) {
+      var rex = urlPars[i],
+        par = rex.replace(/[{|}]/g, ""),
+        val = model[par];
+      if (val) {
+        model.url = model.url.replace(rex, val);
+      }
+    }
+  }
+
+  //调用backbone 原本的方法
+  return BackboneSync.apply(this, arguments);
+};
+_.templateUrl = function(url, notCompile) {
+
+  if (url.substr(0, 1) == ".") {
+    url = "/static/dist/tpls" + url.substr(1);
+  } else if (url.substr(0, 1) == "/") {
+    url = "/static/dist/tpls" + url;
+  }
+
+  if (App.Comm.templateCache[url]) {
+    return App.Comm.templateCache[url];
+  }
+
+  var result;
+  $.ajax({
+    url: url,
+    type: 'GET',
+    async: false
+  }).done(function(tpl) {
+    if (notCompile) {
+      result = tpl;
+
+    } else {
+      result = _.template(tpl);
+    }
+
+  });
+
+  App.Comm.templateCache[url] = result;
+
+  return result;
 }
