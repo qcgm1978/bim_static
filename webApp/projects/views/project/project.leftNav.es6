@@ -49,7 +49,11 @@ App.Project.leftNav = Backbone.View.extend({
 				return;
 			}
 
-			this.fetchModelIdByProject();
+			if (App.Project.Settings.DataModel && App.Project.Settings.DataModel.sourceId) {
+				this.typeContentChange();
+			} else {
+				this.fetchModelIdByProject();
+			}
 
 		}
 
@@ -58,14 +62,14 @@ App.Project.leftNav = Backbone.View.extend({
 	//获取项目版本Id
 	fetchModelIdByProject: function() {
 
-		var data={
-			URLtype:"fetchModelIdByProject",
-			data:{
-				projectId:App.Project.Settings.projectId,
-				projectVersionId:App.Project.Settings.CurrentVersion.id
+		var data = {
+			URLtype: "fetchModelIdByProject",
+			data: {
+				projectId: App.Project.Settings.projectId,
+				projectVersionId: App.Project.Settings.CurrentVersion.id
 			}
 		}
-		var that=this;
+		var that = this;
 
 
 		// App.Project.Settings.modelId= "e0c63f125d3b5418530c78df2ba5aef1";
@@ -73,97 +77,105 @@ App.Project.leftNav = Backbone.View.extend({
 		// return;
 
 
-		App.Comm.ajax(data,function(data){
+		App.Comm.ajax(data, function(data) {
 
-			if (data.message=="success") {
+			if (data.message == "success") {
 
 				if (data.data) {
-					App.Project.Settings.modelId=data.data;
+					App.Project.Settings.DataModel = data.data;
 					that.renderModel();
-				}else{
+				} else {
 					alert("模型转换中");
 				}
-			}else{
+			} else {
 				alert(data.message);
 			}
 
 		});
 	},
-	//模型渲染
-	renderModel:function(){
-		var that = this;
+
+	typeContentChange() {
 		//切换导航tab
-			$("#projectContainer").find(".projectFileNavContent").hide();
-			$("#projectContainer").find(".projectModelNavContent").show();
-			//导航内容
-			$("#projectContainer .fileContainer").hide();
-			$("#projectContainer .modelContainer").show();
+		$("#projectContainer").find(".projectFileNavContent").hide();
+		$("#projectContainer").find(".projectModelNavContent").show();
+		//导航内容
+		$("#projectContainer .fileContainer").hide();
+		$("#projectContainer .modelContainer").show();
 
-			//拖拽和收起
-			$("#projectContainer .leftNav").find(".slideBar").show().end().find(".dragSize").show();
-			var $projectCotent = $("#projectContainer .projectCotent"),
-				mRight = $projectCotent.data("mRight");
+		//拖拽和收起
+		$("#projectContainer .leftNav").find(".slideBar").show().end().find(".dragSize").show();
+		var $projectCotent = $("#projectContainer .projectCotent"),
+			mRight = $projectCotent.data("mRight");
 
-			if (mRight && mRight!="0px") {
+		if (mRight && mRight != "0px") {
 
-				$projectCotent.css("margin-right", mRight);
-			}else{
-				if (!mRight) {
-					$projectCotent.css("margin-right","400px");
+			$projectCotent.css("margin-right", mRight);
+		} else {
+			if (!mRight) {
+				$projectCotent.css("margin-right", "400px");
+			}
+
+		}
+
+		$("#projectContainer").find(".projectModelNavContent .mCS_no_scrollbar_y").width(800);
+
+		//添加样式 弹出属性层
+		$("#projectContainer").find(".rightProperty").addClass("showPropety").end().find(".projectCotent").addClass("showPropety")
+	},
+
+	//模型渲染
+	renderModel: function() {
+		var that = this;
+		this.typeContentChange();
+		//渲染模型属性
+		App.Project.renderModelContentByType();
+
+		return;
+		var viewer = App.Project.Settings.Viewer = new BIM({
+			element: $("#projectContainer .modelContainerContent")[0],
+			sourceId: App.Project.Settings.DataModel.sourceId,
+			etag: App.Project.Settings.DataModel.etag,
+			tools: true,
+			treeElement: $("#projectContainer .projectNavModelContainer")[0]
+		});
+		$("#projectContainer .projectNavModelContainer").append(new App.Project.viewpoint().render().el);
+
+		viewer.on('viewpoint', function(point) {
+			App.Project.ViewpointAttr.ListCollection.add({
+				data: [{
+					id: '',
+					name: '新建视点',
+					viewPoint: point
+				}]
+			})
+		})
+
+		viewer.on("click", function(model) {
+			App.Project.Settings.ModelObj = null;
+			if (!model.intersect) {
+				return;
+			}
+
+			App.Project.Settings.ModelObj = model;
+			//App.Project.Settings.modelId = model.userId;
+			//设计
+			if (App.Project.Settings.projectNav == "design") {
+				//属性
+				if (App.Project.Settings.property == "attr") {
+
+					App.Project.DesignAttr.PropertiesCollection.projectId = App.Project.Settings.projectId;
+					App.Project.DesignAttr.PropertiesCollection.projectVersionId = App.Project.Settings.CurrentVersion.id;
+					App.Project.DesignAttr.PropertiesCollection.fetch({
+						data: {
+							elementId: model.intersect.userId,
+							sceneId: model.intersect.object.userData.sceneId
+						}
+					});
 				}
 
 			}
 
-			$("#projectContainer").find(".projectModelNavContent .mCS_no_scrollbar_y").width(800);
-			//渲染模型属性
-			App.Project.renderModelContentByType();
-
-			return;// debugger 禁止渲染模型
-			var viewer = App.Project.Settings.Viewer = new BIM({
-				element: $("#projectContainer .modelContainerContent")[0],
-				projectId:App.Project.Settings.modelId, //"b7554b6591ff6381af854fa4efa41f81", //App.Project.Settings.projectId,
-				// projectId:'testrvt',
-				tools: true,
-				treeElement: $("#projectContainer .projectNavModelContainer")[0]
-			});
-			$("#projectContainer .projectNavModelContainer").append(new App.Project.viewpoint().render().el);
-
-			viewer.on('viewpoint',function(point){
-				App.Project.ViewpointAttr.ListCollection.add({
-	        data:[{
-	          id:'',
-	          name:'新建视点',
-	          viewPoint:point
-	        }]
-				})
-			})
-
-			viewer.on("click", function(model) {
-			 	App.Project.Settings.ModelObj=null;
-				if (!model.intersect) {
-					return;
-				}
-
-				App.Project.Settings.ModelObj=model;
-				//App.Project.Settings.modelId = model.userId;
-				//设计
-				if (App.Project.Settings.projectNav == "design") {
-					//属性
-					if (App.Project.Settings.property == "attr") {
-
-						App.Project.DesignAttr.PropertiesCollection.projectId=App.Project.Settings.projectId;
-						App.Project.DesignAttr.PropertiesCollection.projectVersionId=App.Project.Settings.CurrentVersion.id;
-						App.Project.DesignAttr.PropertiesCollection.fetch({
-							data: {
-								elementId: model.intersect.userId,
-								sceneId: model.intersect.object.userData.sceneId
-							}
-						});
-					}
-
-				}
-
-			});
+		});
 	}
 
 

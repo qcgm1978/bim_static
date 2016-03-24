@@ -483,14 +483,14 @@ App.Console = {
 	},
 
 	//下拉绑定
-	bindSelect(status,listType) {
+	bindSelect(status, listType) {
 
 		if (!listType) {
-			listType=1;
+			listType = 1;
 		}
 		//App.Console.initialization();
 		$.ajax({
-			url: "platform/project?type="+listType+"&pageIndex=1&pageItemCount=100"
+			url: "platform/project?type=" + listType + "&pageIndex=1&pageItemCount=100&uninitializedVersionStatus=true"
 		}).done(function(data) {
 
 			var items = data.data.items;
@@ -527,10 +527,10 @@ App.Console = {
 	},
 
 	//标准模型状态
-	standardModeStatus(versionStatus, confirmStatus, refuseStatus, successText,listType) {
+	standardModeStatus(versionStatus, confirmStatus, refuseStatus, successText, listType) {
 
 
-		App.Console.bindSelect(versionStatus,listType);
+		App.Console.bindSelect(versionStatus, listType);
 
 
 		$("#submit").click(function() {
@@ -713,7 +713,7 @@ App.Console = {
 					alert("初始化成功")
 					window.location.reload();
 				}
-			}); 
+			});
 		});
 
 		$("#refuse").click(function() {
@@ -732,8 +732,8 @@ App.Console = {
 					alert("删除成功")
 					window.location.reload();
 				}
-			});  
-		}); 
+			});
+		});
 
 	},
 
@@ -766,9 +766,9 @@ App.Console = {
 		}
 
 		var url = "platform/project/";
-		url += projectId + "/init?"; 
-		url += "referenceId=" + referenceId; 
-		url += "&referenceVersionId=" + referenceVersionId; 
+		url += projectId + "/init?";
+		url += "referenceId=" + referenceId;
+		url += "&referenceVersionId=" + referenceVersionId;
 		url += "&versionId=" + versionId;
 
 		return url;
@@ -778,7 +778,7 @@ App.Console = {
 	bindProjectSelect(status) {
 		//App.Console.initialization();
 		$.ajax({
-			url: "platform/project?type=1&pageIndex=1&pageItemCount=100"
+			url: "platform/project?type=1&pageIndex=1&pageItemCount=100&uninitializedVersionStatus=true"
 		}).done(function(data) {
 			var items = data.data.items;
 			$.each(items, function(i, item) {
@@ -814,7 +814,7 @@ App.Console = {
 
 	bindProjectSelect2(status) {
 		$.ajax({
-			url: "platform/project?type=3&pageIndex=1&pageItemCount=100"
+			url: "platform/project?type=3&pageIndex=1&pageItemCount=100&uninitializedVersionStatus=true"
 		}).done(function(data) {
 			var items = data.data.items;
 			$.each(items, function(i, item) {
@@ -848,25 +848,23 @@ App.Console = {
 		});
 	},
 
-
-
 	//发起审核
 	bindprojectVettedInit() {
-		App.Console.standardModeStatus(4, 2, 1, "审核成功",3);
+		App.Console.standardModeStatus(4, 2, 1, "审核成功", 3);
 
 	},
 	//审核批准
 	bindprojectAppordInit() {
-		App.Console.standardModeStatus(2, 5, 4, "审核成功",3);
+		App.Console.standardModeStatus(2, 5, 4, "审核成功", 3);
 	},
 
 	//发起发版
 	bindprojectSendVersionInit() {
-		App.Console.standardModeStatus(5, 7, 2, "发起成功",3);
+		App.Console.standardModeStatus(5, 7, 2, "发起成功", 3);
 	},
 	//族库发版批准
 	bindprojectSendVersionVettedInit() {
-		App.Console.standardModeStatus(7, 9, 5, "审核成功",3);
+		App.Console.standardModeStatus(7, 9, 5, "审核成功", 3);
 	},
 
 
@@ -918,7 +916,147 @@ App.Console = {
 	//项目变更
 	bindprojectChangeCreateInit() {
 
+		App.Console.bindProjectChangeSelect(9, 3);
 
+	},
+
+	//下拉绑定
+	bindProjectChangeSelect(status, listType) {
+
+		if (!listType) {
+			listType = 1;
+		}
+		//App.Console.initialization();
+		$.ajax({
+			url: "platform/project?type=" + listType + "&pageIndex=1&pageItemCount=100"
+		}).done(function(data) {
+
+			var items = data.data.items;
+			$.each(items, function(i, item) {
+
+				$("#famVettedList").append('<option value="' + item.id + '">' + item.name + '</option>');
+
+			});
+		});
+
+		$("#famVettedList").change(function() {
+
+			var projectId = $("#famVettedList option:selected").val();
+
+			if (projectId != 0) {
+
+				$.ajax({
+					url: "platform/project/" + projectId + "/version?status=" + status
+				}).done(function(data) {
+
+					$("#famVettedListVsersion")[0].length = 1;
+
+					$.each(data.data, function(i, item) {
+
+						$("#famVettedListVsersion").append('<option referenceVersionid="' + item.referenceVersionId + '" referenceid="' + item.referenceId + '" value="' + item.id + '">' + item.name + '</option>');
+
+					});
+
+				});
+
+			}
+		});
+
+
+		$("#famVettedListVsersion").change(function() {
+
+			var projectId = $("#famVettedList option:selected").val(),
+				versionId = $("#famVettedListVsersion option:selected").val();
+
+			$.ajax({
+				url: "doc/" + projectId + "/" + versionId + "/file/tree?projectId=" + projectId + "&projectVersionId=" + versionId
+			}).done(function(data) {
+
+				data.click = function(event) {
+					var file = $(event.target).data("file");
+
+					App.Console.getTreeContent(projectId, versionId, file.fileVersionId);
+				}
+				data.iconType = 1;
+				var navHtml = new App.Comm.TreeViewMar(data);
+				$("#tree").html(navHtml);
+
+
+			});
+
+		});
+
+		App.Console.Settings.ChangeFile = [];
+		//选择需要更改的文件
+		$("#treeContainer").on("click", ".item :checkbox", function() {
+
+			var id = $(this).closest(".item").data("id");
+			if ($(this).is(":checked")) {
+				App.Console.Settings.ChangeFile.push(id);
+			} else {
+				App.Console.Settings.ChangeFile.removeByItem(id);
+			}
+
+		});
+
+
+		//{projectId}/version/{versionId}/alter?versionName={versionName}&fileIds={fileIds}
+
+		$("#submit").click(function() {
+
+			var projectId = $("#famVettedList option:selected").val(),
+				versionId = $("#famVettedListVsersion option:selected").val(),
+				versionName=$("#versionName").val().trim();
+
+			if (projectId == 0 || versionId == 0) {
+				alert("请选择项目，版本")
+				return;
+			}
+
+			if (App.Console.Settings.ChangeFile.length < 1) {
+				alert("请选择需要修改的文件")
+				return;
+			}
+
+			if (!versionName) {
+				alert("请输入版本名称")
+				return;
+			}
+
+			var files=App.Console.Settings.ChangeFile.join(","), 
+			url="platform/project/"+projectId+"/version/"+versionId+"/alter?versionName="+versionName+"&fileIds="+files;
+
+			var dataobj={url:url};
+			App.Console.ajaxPost(dataobj,function(data){
+				if (data.message=="success") {
+					alert("变成成功")
+					window.location.reload();
+				}else{
+					alert("变成失败")
+				}
+			});
+
+		});
+	},
+
+	getTreeContent(projectId, versionId, fileVersionId) {
+
+		$.ajax({
+			url: "doc/" + projectId + "/" + versionId + "/file/children?parentId=" + fileVersionId
+		}).done(function(data) {
+			var list = data.data,
+				count = list.length,
+				item;
+			var str = "<ul>";
+			for (var i = 0; i < count; i++) {
+				item = data.data[i];
+				str += '<li  class="item" data-id="' + item.fileVersionId + '"><label><input type="checkbox" class="ckChoose" /> ' + item.name + '</label></li>';
+			}
+			str += '</ul>';
+
+			$("#treeContainer").html(str);
+
+		}); 
 	},
 
 	//项目变更初始化
@@ -928,20 +1066,20 @@ App.Console = {
 
 	//项目变更审核
 	bindprojectChangeVettedInit() {
-
+		App.Console.standardModeStatus(4, 2, 1, "发起成功",3);
 	},
 	//审核批准
 	bindprojectChangeAppordInit() {
-
+		App.Console.standardModeStatus(2, 5, 4, "审核成功",3);
 	},
 
 	//发起发版
 	bindprojectChangeSendVersionInit() {
-
+		App.Console.standardModeStatus(5, 7, 2, "发起成功",3);
 	},
 	//族库发版批准
 	bindprojectChangeSendVersionVettedInit() {
-
+		App.Console.standardModeStatus(7, 9, 5, "审核成功",3);
 	},
 
 

@@ -7,14 +7,14 @@ App.ResourceModel.ListNav = Backbone.View.extend({
 	template: _.templateUrl("/resources/tpls/resourceModel/resource.model.listNav.html", true),
 
 	initialize: function(options) {
-		this.listenTo(App.ResourceModel.PropertiesCollection,"add",this.reRender);
+		this.listenTo(App.ResourceModel.PropertiesCollection, "add", this.reRender);
 		Backbone.on('navClickCB', this.navClickCB, this);
 	},
 
-	events:{
-		"click .modleShowHide":"slideUpAndDown",
-		"click .modelAttr .slideBar":"slideBarToggle",
-		"mousedown .modelAttr .dragSize":"dragSize"
+	events: {
+		"click .modleShowHide": "slideUpAndDown",
+		"click .modelAttr .slideBar": "slideBarToggle",
+		"mousedown .modelAttr .dragSize": "dragSize"
 	},
 
 	render: function() {
@@ -24,15 +24,15 @@ App.ResourceModel.ListNav = Backbone.View.extend({
 
 		this.$el.find(".listContent").html(new App.ResourceModel.TopBar().render().el);
 
-		var type=App.ResourcesNav.Settings.type;
+		var type = App.ResourcesNav.Settings.type;
 		if (type == "standardLibs") {
 			//获取标准模型库数据
-			this.$el.find(".listContent").append(new App.ResourceModel.ListContent().render().el); 
+			this.$el.find(".listContent").append(new App.ResourceModel.ListContent().render().el);
 
 		} else if (type == "famLibs") {
 			this.$el.find(".listContent").append(new App.ResourceModel.ThumContent().render().el);
 		}
- 
+
 
 		return this;
 	},
@@ -42,25 +42,30 @@ App.ResourceModel.ListNav = Backbone.View.extend({
 
 		if (type == "file") {
 
-			this.$el.find(".listContent").show().end().find(".modelContentBox").hide().end().find(".modelAttr").hide(); 
-			this.$el.css("margin-right",0);
+			this.$el.find(".listContent").show().end().find(".modelContentBox").hide().end().find(".modelAttr").hide();
+			this.$el.css("margin-right", 0);
 		} else {
 
 			this.$el.find(".listContent").hide().end().find(".modelContentBox").show().end().find(".modelAttr").show();
 
-			var $modelAttr=this.$el.find(".modelAttr"), mRight= parseInt($modelAttr.css("margin-right")) ;
+			var $modelAttr = this.$el.find(".modelAttr"),
+				mRight = parseInt($modelAttr.css("margin-right"));
 
-			if (mRight>=0) {
-				this.$el.css("margin-right",$modelAttr.width());
-			}else{
-				this.$el.css("margin-right",0);
-			} 
+			if (mRight >= 0) {
+				this.$el.css("margin-right", $modelAttr.width());
+			} else {
+				this.$el.css("margin-right", 0);
+			}
 
+			if (App.ResourceModel.Settings.DataModel.bind) {
+				return;
+			}
+			App.ResourceModel.Settings.DataModel.bind=true;
 
 			App.ResourceModel.Settings.Viewer = new BIM({
 				element: this.$el.find(".modelContent")[0],
-				projectId: App.ResourceModel.Settings.modelId, //"b7554b6591ff6381af854fa4efa41f81", //App.Project.Settings.projectId,
-				//projectId:'testrvt',
+				sourceId: App.ResourceModel.Settings.DataModel.sourceId,
+				etag: App.ResourceModel.Settings.DataModel.etag,
 				tools: true,
 				treeElement: $("#resourceModelLeftNav .modelTree")[0]
 			});
@@ -77,22 +82,22 @@ App.ResourceModel.ListNav = Backbone.View.extend({
 						elementId: model.intersect.userId,
 						sceneId: model.intersect.object.userData.sceneId
 					}
-				}); 
+				});
 
-			}); 
+			});
 		}
 		//this.bindTreeScroll();
 
 
 	},
 
-	reTemplate:_.templateUrl('/resources/tpls/resourceModel/resources.model.attr.detail.html'),
+	reTemplate: _.templateUrl('/resources/tpls/resourceModel/resources.model.attr.detail.html'),
 
 	//重新渲染苏醒
-	reRender:function(model){
-		
+	reRender: function(model) {
+
 		//渲染数据
-		var data=model.toJSON().data; 
+		var data = model.toJSON().data;
 		this.$el.find(".attrContentBox .attrContent").html(this.reTemplate(data));
 	},
 
@@ -110,30 +115,31 @@ App.ResourceModel.ListNav = Backbone.View.extend({
 				},
 				scrollInertia: 0
 			});
-		} 
+		}
 	},
 
 	//展开和收起
-	slideUpAndDown:function(event){
-		var $parent=$(event.target).parent(),$modleList=$parent.find(".modleList");
+	slideUpAndDown: function(event) {
+		var $parent = $(event.target).parent(),
+			$modleList = $parent.find(".modleList");
 		$(event.target).toggleClass("down");
 		if ($modleList.is(":hidden")) {
 			$modleList.slideDown();
-		}else{
+		} else {
 			$modleList.slideUp();
 		}
 
 	},
 
 	//收起展开
-	slideBarToggle:function(){
+	slideBarToggle: function() {
 
-		App.Comm.navBarToggle(this.$el.find(".modelAttr"),$("#navContainer"),"right",App.ResourceModel.Settings.Viewer);
+		App.Comm.navBarToggle(this.$el.find(".modelAttr"), $("#navContainer"), "right", App.ResourceModel.Settings.Viewer);
 	},
 
 	//拖拽改变大小
-	dragSize: function(event) { 
-		App.Comm.dragSize(event,this.$el.find(".modelAttr"),$("#navContainer"),"right",App.ResourceModel.Settings.Viewer);
+	dragSize: function(event) {
+		App.Comm.dragSize(event, this.$el.find(".modelAttr"), $("#navContainer"), "right", App.ResourceModel.Settings.Viewer);
 		return false;
 	}
 

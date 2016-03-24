@@ -2,7 +2,7 @@ App.ResourceModel = {
 
 	Settings: {
 		leftType: "file",
-		modelId: "", //模型id
+		DataModel: "", //模型id
 		fileVersionId: "",
 		type: "", //模型类型
 		projectId: "", //项目id
@@ -94,7 +94,7 @@ App.ResourceModel = {
 		if (!App.ResourceModel.Settings.bindGlobalEvent) {
 			App.ResourceModel.Settings.bindGlobalEvent = true;
 			App.ResourceModel.bindGlobalEvent();
-		}
+		} 
 
 		//标准模型库
 		// if (App.ResourcesNav.Settings.type == "standardLibs") {
@@ -111,9 +111,7 @@ App.ResourceModel = {
 		// 	} else {
 		// 		App.ResourceModel.getVersion();
 		// 	}
-		// }
-
-
+		// } 
 	},
 
 	//绑定全局的事件

@@ -939,8 +939,8 @@ BIM.TREE.prototype = {
       url:urlC,
       success:function(res){
         var data = JSON.parse(res).data;
-        if(BIM.util.isEmptyObject(data)){
-          _self.errorMsg('结构不存在');
+        if(!data || data.length==0){
+          _self.errorMsg('');
         }else{
           _self.createCategory(data);
         }

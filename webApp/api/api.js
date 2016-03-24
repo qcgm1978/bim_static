@@ -4,7 +4,7 @@ App.API = {
 
 	Settings: {
 		hostname: "http://bim.wanda.cn/",
-		debug: false
+		debug: true
 	},
 
 	URL: {
@@ -25,7 +25,7 @@ App.API = {
 
 
 		//模型
-		fetchModelIdByProject: "doc/{projectId}/{projectVersionId}/model",
+		fetchModelIdByProject: "view/api/{projectId}/{projectVersionId}/init",
 		fetchFileModelIdByFileVersionId: "doc/{projectId}/{projectVersionId}/file/meta", //?fileVersionId={fileVersionId}
 
 		uploadFile: "doc/{projectId}/{projectVersionId}/file/data", //上传文件  ?parentId={parentId}&fileName={fileName}&size={size}&digest={digest}&position={position}
@@ -48,6 +48,10 @@ App.API = {
 		fetchDesignTaskList:"view/api/{projectId}/{projectVerionId}/collision/setting/list",//碰撞任务列表
 		fetchDesignTaskDetail:"view/api/{projectId}/{projectVersionId}/collision/setting?collisionId={collisionId}",//碰撞任务详情
 		creatCollisionTask:"view/api/{projectId}/{projectVerionId}/collision/setting",//碰撞任务详情
+
+		// 模型对比
+		fetchDesignChange:"view/{projectId}/{projectVersionId}/comparison", // 获取模型对比列表
+		fetchDesignChangeInfo:"sixD/{projectId}/{projectVersionId}/comparison/result?comparisonId={comparisonId}", // 获取模型对比结果
 
 		//计划
 		fetchPlanModel: "", //模型
@@ -110,11 +114,17 @@ App.API = {
 		//设计
 		fetchDesignProperties: "/dataJson/project/project.design.property.json", //设计属性
 		fetchDesignVerification: "/dataJson/project/project.design.property.json", //设计检测
+
+		// 碰撞
 		fetchDesignCollision: "/dataJson/project/project.design.property.json", //设计碰撞
 		fetchDesignFileList:"/dataJson/project/project.design.filesList.json",// 设计碰撞文件
 		fetchDesignTaskList:"/dataJson/project/project.design.collision.taskList.json",//碰撞任务列表
 		fetchDesignTaskDetail:"/dataJson/project/project.design.task.detail.json",//碰撞任务详情
 		creatCollisionTask:"",
+
+		// 模型对比
+		fetchDesignChange:"/dataJson/project/fatchDesignChange.json", // 获取模型对比列表
+		fetchDesignChangeInfo:"/dataJson/project/fatchDesignChangeInfo.json", // 获取模型对比结果
 
 
 		//计划

@@ -1,0 +1,31 @@
+.projectHeader { height: 37px; background-color: #f5f5f5; border-bottom: 1px #ccc solid; position: relative; z-index: 999; }
+#projectContainer { height: 100%; margin-top: -37px; padding-top: 37px; position: relative;
+	.leftNav { float: left; width: 238px; border: 1px #ccc solid; position: absolute; top: 36px; bottom: 0px; background-color: #fff;
+		.leftNavContent { height: 100%; }
+		.projectNavContentBox { margin-top: 1px; position: absolute; top: 40px; width: 100%; bottom: 0px;
+			.projectModelNavContent { display: none; }
+		}
+		.projectNav .item { cursor: default; }
+		.projectNav .item:hover { border-color: #ddd; color: #666; }
+		.slideBar{ display: block; }
+			.dragSize {  display: block; }
+	}
+	.rightProperty { width: 398px; border: 1px #ddd solid; position: absolute; right: 0px; top: 36px; bottom: 0px; background-color: #fff; z-index: 600;
+		.rightPropertyContentBox { height: 100%; position: relative;
+			.slideBar { right: inherit; display: block; left: -15px; top: 40px; }
+			.dragSize { left: -5px; right: inherit; display: block; }
+		}
+	}
+	.projectCotent { position: relative; height: 100%; margin-left: 240px; margin-right: 398px;
+		.fileContainer { padding: 10px; height: 100%; box-sizing: border-box;
+			.fileContainerScroll { position: absolute; top: 75px; bottom: 0px; left: 10px; right: 10px; }
+			.modelContainer { height: 500px; position: relative; }
+		}
+		.modelContainer { height: 100%; display: none;
+			.modelContainerScroll { height: 100%;
+				.modelContainerContent { height: 100%; }
+			}
+			.move { height: 100%; }
+		}
+	}
+}

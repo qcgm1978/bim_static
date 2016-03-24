@@ -227,12 +227,20 @@ fis.match('/flow/**.{less,css}', {
 
 // 项目预览
 
-fis.match('/app/project/**.{js,es6}', {
-  packTo: '/static/dist/app/project/project_' + v + '.js'
+fis.match('/app/project/single/**.{js,es6}', {
+  packTo: '/static/dist/app/project/single/project_' + v + '.js'
 });
-fis.match('/app/project/**.{css,less}', {
-  packTo: '/static/dist/app/project/project_' + v + '.css'
+fis.match('/app/project/single/**.{css,less}', {
+  packTo: '/static/dist/app/project/single/project_' + v + '.css'
 });
+
+fis.match('/app/project/modelChange/**.{js,es6}', {
+  packTo: '/static/dist/app/project/modelChange/index_' + v + '.js'
+});
+fis.match('/app/project/modelChange/**.{css,less}', {
+  packTo: '/static/dist/app/project/modelChange/index_' + v + '.css'
+});
+
 
 
 

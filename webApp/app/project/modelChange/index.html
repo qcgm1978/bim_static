@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>模型变更对比</title>
+    <link rel="styleSheet" href="/topNav/css/topNav.less" />
+    <link rel="styleSheet" href="/comm/css/treeView.less" />
+    <link rel="styleSheet" href="./less/index.less" />
+</head>
+
+<body>
+    <div id="topBar">
+        <div class="logo"><span class="text">BIM信息化集成平台</span></div>
+    </div>
+    <div id="contains">
+        <div class="projectHeader">
+            <div class="breadcrumbNav">
+                <span class="projectText">项目</span>
+                <span class="breadItem project relative"> <i class="icon-angle-right"></i>
+           <span class="breadItemText"> <span class="text">周浦万达项目</span> </span>
+                </span>
+                <span class="breadItem projectVersion relative"> <i class="icon-angle-right"></i>
+           <span class="breadItemText"> <span class="text"> 初始版本 </span> </span>
+                </span>
+            </div>
+        </div>
+        <div id="projectContainer">
+            <div class="leftNav">
+                <div class="leftNavContent">
+                    <ul class="projectNav">
+                        <li class="item" data-type="model">模型浏览器</li>
+                    </ul>
+                    <div class="projectNavContentBox">
+                        <div class="projectModelContent"></div>
+                    </div>
+                    <div class="dragSize"></div>
+                    <div class="slideBar"><i class="icon-caret-left"></i></div>
+                </div>
+            </div>
+            <div class="rightProperty">
+                <div class="rightPropertyContentBox">
+                    <div class="rightPropertyContent">
+                        <div class="rightPropertyContent">
+                            <div class="designPropetyBox">
+
+                                <ul class="projectPropetyHeader projectNav">
+                                    <li data-type="chage" class="item selected">变更对比</li>
+                                    <li data-type="attr" class="item">属性</li>
+                                </ul>
+
+                                <div class="projectPropetyContainer projectNavContentBox">
+
+                                    <div class="designChange" > 变更</div>
+                                    <div class="designProperties" style="display: none;">
+                                     属性
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dragSize"></div>
+                    <div class="slideBar"><i class="icon-caret-right"></i></div>
+                </div>
+            </div>
+            <div class="projectCotent"></div>
+        </div>
+    </div>
+    <script type="text/javascript">
+    var App = {};
+    </script>
+    <script type="text/javascript" src="/libs/jquery/jquery-1.12.0.min.js"></script>
+    <script type="text/javascript" src="/libsH5/tree/js/libs/three.js"></script>
+    <link rel="styleSheet" href="/libsH5/tree/css/style.css" />
+    <script type="text/javascript" src="/api/api.js"></script>
+    <script type="text/javascript" src="./js/index.es6"></script>
+    <script type="text/javascript">App.Index.init();</script>
+</body>
+
+</html>

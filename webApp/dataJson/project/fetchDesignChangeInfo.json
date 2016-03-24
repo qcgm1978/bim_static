@@ -1,0 +1,17 @@
+{
+	"code": 0, //成功返回0
+	"message": "success",
+	"data": [{
+		"cateId": "-2008016", //构件类型Id
+		"cateName": "风管附件", //构件类型名称
+		"results": [{
+			"baseElementId": "79955c38-5ef2-42de-8c85-4075e42240db", //基础构件Id，新增时为空
+			"currentElementId": "79955c38-5ef2-42de-8c85-4075e42240db", //当前构件Id，删除时为空
+			"revitID": "2aabc263-8d86-4cb0-9d84-ca0a39497138-000ebf75", //构件revitId
+			"name": "风管软接", //构件名称
+			"cateId": "-2008016", //构件类型Id
+			"cateName": "风管附件", //构件类型名称
+			"changeType": "4" //更改类型：0x01新增，0x02删除，0x04属性修改，0x08几何修改
+		}]
+	}]
+}
