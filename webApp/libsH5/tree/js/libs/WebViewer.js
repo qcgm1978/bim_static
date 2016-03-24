@@ -18057,58 +18057,55 @@ CLOUD.SceneBoxLoader.prototype = {
 CLOUD.TaskWorker = function (threadCount) {
 
     this.MaxThreadCount = threadCount || 6;
-    this.activeTaskCount = 0;
 
     var scope = this;
-    function resetItems() {
+    scope.todoList = [];
+    scope.doingCount = 0;
 
-        scope.items = [];
-        scope.loadedItemCount = 0;
-        scope.lastItemLength = 0;
-    }
-    resetItems();
 
     this.addItem = function(item){
-        this.items.push(item);
+        this.todoList.push(item);
     };
 
     this.run = function (loader, sorter) {
 
         var scope = this;
+        if (scope.doingCount > 0)
+            return;
 
-        var items = this.items;
+        var items = scope.todoList;
+        scope.todoList = [];
+
         var itemCount = items.length;
+        if (itemCount == 0)
+            return;
 
+        scope.doingCount = itemCount;
 
-        if (this.activeTaskCount <= 0 && itemCount > 0) {
-
-            if (sorter) {
-                items.sort(sorter);
-            }
-
-            var TASK_COUNT = Math.min(this.MaxThreadCount, itemCount);
-
-            function processItem(i) {
-
-                if (i >= itemCount) {
-                    scope.activeTaskCount -= 1;
-                    return;
-                }
-
-                var item = items[i];
-
-                loader(item, i + TASK_COUNT, processItem);
-            };
-
-            this.activeTaskCount = TASK_COUNT;
-            for (var ii = 0; ii < TASK_COUNT; ++ii) {
-                processItem(ii);
-            }
-            resetItems();
+        if (sorter) {
+            items.sort(sorter);
         }
 
+        var TASK_COUNT = Math.min(this.MaxThreadCount, itemCount);
 
-    }
+        function processItem(i) {
+
+            if (i >= itemCount) {
+                scope.run(loader, sorter);
+                return;
+            }
+
+            --scope.doingCount;
+
+            var item = items[i];
+
+            loader(item, i + TASK_COUNT, processItem);
+        };
+
+        for (var ii = 0; ii < TASK_COUNT; ++ii) {
+            processItem(ii);
+        }
+    };
 }
 
 CLOUD.MpkTaskWorker = function (threadCount) {
@@ -18150,13 +18147,12 @@ CLOUD.MpkTaskWorker = function (threadCount) {
         }
 
         var scope = this;
-        scope.doingCount = items.length;
-
-        if (scope.doingCount == 0)
+        var itemCount = items.length;
+        if (itemCount == 0)
             return;
 
+        scope.doingCount = itemCount;
 
-        var itemCount = items.length;
 
         var TASK_COUNT = Math.min(this.MaxThreadCount, itemCount);
 
