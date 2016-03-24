@@ -1,6 +1,5 @@
 App.Index={
 
-
 	bindEvent(){
 
 		 $("#projectContainer").on("click",".projectPropetyHeader .item",function(){
@@ -10,7 +9,20 @@ App.Index={
 		 });
 	},
 
-	init(){ 
+	init(){
 		this.bindEvent();
 	}
+}
+
+App.Project.Model = {
+	ChangeList:Backbone.View.extend({
+		tagName: "div",
+
+	  className: "itemNode",
+	  events:{},
+	  template:_.templateUrl('/app/project/modelChange/tpls/changeList.html',true),
+	  render:function(){
+	  	this.$el.html(this.template)
+	  }
+	})
 }

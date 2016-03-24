@@ -47,7 +47,7 @@ App.Project.leftNav = Backbone.View.extend({
 			if (!typeof(Worker)) {
 				alert("请使用现代浏览器查看模型");
 				return;
-			} 
+			}
 
 			if (App.Project.Settings.DataModel && App.Project.Settings.DataModel.sourceId) {
 				this.typeContentChange();
@@ -119,7 +119,7 @@ App.Project.leftNav = Backbone.View.extend({
 
 		$("#projectContainer").find(".projectModelNavContent .mCS_no_scrollbar_y").width(800);
 
-		//添加样式 弹出属性层 
+		//添加样式 弹出属性层
 		$("#projectContainer").find(".rightProperty").addClass("showPropety").end().find(".projectCotent").addClass("showPropety")
 	},
 
@@ -128,8 +128,9 @@ App.Project.leftNav = Backbone.View.extend({
 		var that = this;
 		this.typeContentChange();
 		//渲染模型属性
-		App.Project.renderModelContentByType(); 
-		 
+		App.Project.renderModelContentByType();
+
+		return;
 		var viewer = App.Project.Settings.Viewer = new BIM({
 			element: $("#projectContainer .modelContainerContent")[0],
 			sourceId: App.Project.Settings.DataModel.sourceId,

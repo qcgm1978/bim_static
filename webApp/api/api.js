@@ -42,6 +42,16 @@ App.API = {
 		fetchDesignProperties: "sixD/{projectId}/{projectVersionId}/property", //设计属性 ?sceneId={sceneId}&elementId={elementId}
 		fetchDesignVerification: "", // 设计 检测
 		fetchDesignCollision: "", // 设计碰撞
+		// 碰撞
+		fetchDesignFloor:"view/api/{projectId}/floors",// 楼层信息
+		fetchDesignCategory:"view/api/{projectId}/{floor}/floor/categories",// 楼层信息
+		fetchDesignTaskList:"view/api/{projectId}/{projectVerionId}/collision/setting/list",//碰撞任务列表
+		fetchDesignTaskDetail:"sixD/{projectId}/{projectVersionId}/{collisionId}/point",//碰撞点列表
+		creatCollisionTask:"view/api/{projectId}/{projectVerionId}/collision/setting",//碰撞任务详情
+
+		// 模型对比
+		fetchDesignChange:"view/{projectId}/{projectVersionId}/comparison", // 获取模型对比列表
+		fetchDesignChangeInfo:"sixD/{projectId}/{projectVersionId}/comparison/result?comparisonId={comparisonId}", // 获取模型对比结果
 
 		//计划
 		fetchPlanModel: "", //模型
@@ -104,7 +114,18 @@ App.API = {
 		//设计
 		fetchDesignProperties: "/dataJson/project/project.design.property.json", //设计属性
 		fetchDesignVerification: "/dataJson/project/project.design.property.json", //设计检测
+
+		// 碰撞
 		fetchDesignCollision: "/dataJson/project/project.design.property.json", //设计碰撞
+		fetchDesignFileList:"/dataJson/project/project.design.filesList.json",// 设计碰撞文件
+		fetchDesignTaskList:"/dataJson/project/project.design.collision.taskList.json",//碰撞任务列表
+		fetchDesignTaskDetail:"/dataJson/project/project.design.task.detail.json",//碰撞任务详情
+		creatCollisionTask:"",
+
+		// 模型对比
+		fetchDesignChange:"/dataJson/project/fatchDesignChange.json", // 获取模型对比列表
+		fetchDesignChangeInfo:"/dataJson/project/fatchDesignChangeInfo.json", // 获取模型对比结果
+
 
 		//计划
 		fetchPlanModel: "/dataJson/project/project.design.property.json", //模型
