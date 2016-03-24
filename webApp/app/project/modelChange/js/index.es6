@@ -1,6 +1,5 @@
 App.Index={
 
-
 	bindEvent(){
 
 		 $("#projectContainer").on("click",".projectPropetyHeader .item",function(){
@@ -14,32 +13,5 @@ App.Index={
 		this.bindEvent();
 	}
 }
-App.Project = {
 
-	changeList: new(Backbone.Collection.extend({
-		model: Backbone.Model.extend({
-			defaults: function() {
-				return {
-					title: ""
-				}
-			}
-		}),
-
-		urlType:"fetchDesignChange"
-
-	})),
-
-	changeInfo: new(Backbone.Collection.extend({
-
-		model: Backbone.Model.extend({
-			defaults: function() {
-				return {
-					title: ""
-				}
-			}
-		}),
-
-		urlType:"fetchDesignChangeInfo"
-
-	})),
-};
+App.Project.Model = {}
