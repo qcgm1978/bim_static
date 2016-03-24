@@ -52,14 +52,16 @@ App.Project.Model = {
 	  template:_.templateUrl('/app/project/modelChange/tpls/changeList.html'),
 
 	  render: function(){
-	  	this.$el.html("");
+	  	this.$el.html("没有变更");
 	  	return this;
 	  },
 
 	  addList:function(model){
 	  	var data = model.toJSON()
-	  	this.$el.html(this.template(data));
-	  	return this;
+	  	if(data.message == 'success'){
+		  	this.$el.html(this.template(data));
+		  	return this;
+	  	}
 	  },
 
 	  openTree:function(event){
@@ -97,14 +99,16 @@ App.Project.Model = {
 	  template:_.templateUrl('/app/project/modelChange/tpls/changeInfo.html'),
 
 	  render: function(){
-	  	this.$el.html("");
+	  	this.$el.html("没有变更");
 	  	return this;
 	  },
 
 	  addDetail:function(model){
 	  	var data = model.toJSON();
-	  	this.$el.html(this.template(data));
-	  	return this;
+	  	if(data.message == 'success'){
+		  	this.$el.html(this.template(data));
+		  	return this;
+	  	}
 	  }
 
 	})

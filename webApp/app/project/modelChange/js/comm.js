@@ -79,9 +79,9 @@ Backbone.sync = function(method, model, options) {
 _.templateUrl = function(url, notCompile) {
 
   if (url.substr(0, 1) == ".") {
-    url = "/static/dist/tpls" + url.substr(1);
+    url = "/static/dist/" + url.substr(1);
   } else if (url.substr(0, 1) == "/") {
-    url = "/static/dist/tpls" + url;
+    url = "/static/dist/" + url;
   }
 
   if (App.Comm.templateCache[url]) {

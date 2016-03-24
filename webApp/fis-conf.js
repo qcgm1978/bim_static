@@ -101,11 +101,6 @@ fis.match('app/**.html', {
   release: "/static/dist/$0"
 });
 
-fis.match('app/**.html', {
-  //useHash:true,
-  release: "/static/dist/tpls/$0"
-});
-
 fis.match('resources/**.html', {
   //useHash:true,
   release: "/static/dist/tpls/$0"
