@@ -123,8 +123,8 @@ App.API = {
 		creatCollisionTask:"",
 
 		// 模型对比
-		fetchDesignChange:"/dataJson/project/fatchDesignChange.json", // 获取模型对比列表
-		fetchDesignChangeInfo:"/dataJson/project/fatchDesignChangeInfo.json", // 获取模型对比结果
+		fetchDesignChange:"/dataJson/project/fetchDesignChange.json", // 获取模型对比列表
+		fetchDesignChangeInfo:"/dataJson/project/fetchDesignChangeInfo.json", // 获取模型对比结果
 
 
 		//计划
