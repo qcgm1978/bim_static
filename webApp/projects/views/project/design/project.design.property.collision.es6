@@ -73,11 +73,7 @@ App.Project.DesignCollision=Backbone.View.extend({
 	      }
 	      App.Comm.ajax(data,function(data){
 		      if (data.message=="success") {
-		        myModel.id = data.data.id;
-		        that.$el.replaceWith(new App.Project.viewpointDetail({
-		          model:myModel
-		        }).render().el);
-		        delete App.Project.Settings.viewPoint;
+		      	console.log('')
 		      }else{
 		        alert(data.message);
 		      }
@@ -111,8 +107,12 @@ App.Project.DesignCollision=Backbone.View.extend({
 	getDetail:function(event){
 		var list = this.$el.find('.collSelect');
 		list.hide();
-		App.Project.DesignAttr.CollisionCollection.projectId = App.Project.Settings.CurrentVersion.projectId
-		App.Project.DesignAttr.CollisionCollection.fetch();
+		var that = $(event.target).closest('.collItem');
+		collisionId = that.data('id');
+		App.Project.DesignAttr.CollisionTaskDetail.projectId = App.Project.Settings.projectId
+		App.Project.DesignAttr.CollisionTaskDetail.projectVersionId = App.Project.Settings.CurrentVersion.id
+		App.Project.DesignAttr.CollisionTaskDetail.collisionId = collisionId
+		App.Project.DesignAttr.CollisionTaskDetail.fetch();
 	}
 
 });

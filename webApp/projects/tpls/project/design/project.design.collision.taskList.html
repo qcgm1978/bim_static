@@ -4,7 +4,7 @@
 </div> -->
 <ul class="collList">
   <% _.forEach(data,function(item){ %>
-    <li class="collItem" data-pId="<%=projectId%>" data-vId="<%=versionId%>" data-jobId="<%=jobId%>">
+    <li class="collItem" data-pId="<%=item.projectId%>" data-vId="<%=item.projectVersionId%>" data-id="<%=item.id%>">
       <span class="collStatus" data-id="<%= item.jobId %>">
         <% switch(item.status){case 0: %>
           [待碰撞]

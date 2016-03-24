@@ -14,4 +14,15 @@ App.Index={
 	}
 }
 
-App.Project.Model = {}
+App.Project.Model = {
+	ChangeList:Backbone.View.extend({
+		tagName: "div",
+
+	  className: "itemNode",
+	  events:{},
+	  template:_.templateUrl('/app/project/modelChange/tpls/changeList.html',true),
+	  render:function(){
+	  	this.$el.html(this.template)
+	  }
+	})
+}

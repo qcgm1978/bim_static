@@ -4,7 +4,7 @@ App.API = {
 
 	Settings: {
 		hostname: "http://bim.wanda.cn/",
-		debug: true
+		debug: false
 	},
 
 	URL: {
@@ -46,7 +46,7 @@ App.API = {
 		fetchDesignFloor:"view/api/{projectId}/floors",// 楼层信息
 		fetchDesignCategory:"view/api/{projectId}/{floor}/floor/categories",// 楼层信息
 		fetchDesignTaskList:"view/api/{projectId}/{projectVerionId}/collision/setting/list",//碰撞任务列表
-		fetchDesignTaskDetail:"view/api/{projectId}/{projectVersionId}/collision/setting?collisionId={collisionId}",//碰撞任务详情
+		fetchDesignTaskDetail:"sixD/{projectId}/{projectVersionId}/{collisionId}/point",//碰撞点列表
 		creatCollisionTask:"view/api/{projectId}/{projectVerionId}/collision/setting",//碰撞任务详情
 
 		// 模型对比
