@@ -50,7 +50,7 @@ App.API = {
 		creatCollisionTask:"view/api/{projectId}/{projectVerionId}/collision/setting",//碰撞任务详情
 
 		// 模型对比
-		fetchDesignChange:"view/{projectId}/{projectVersionId}/comparison", // 获取模型对比列表
+		fetchDesignChange:"view/api/{projectId}/{projectVersionId}/comparison", // 获取模型对比列表
 		fetchDesignChangeInfo:"sixD/{projectId}/{projectVersionId}/comparison/result?comparisonId={comparisonId}", // 获取模型对比结果
 
 		//计划

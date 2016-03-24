@@ -58,8 +58,10 @@ App.Project.Model = {
 
 	  addList:function(model){
 	  	var data = model.toJSON()
-	  	this.$el.html(this.template(data));
-	  	return this;
+	  	if(data.message == 'success'){
+		  	this.$el.html(this.template(data));
+		  	return this;
+	  	}
 	  },
 
 	  openTree:function(event){
@@ -103,8 +105,10 @@ App.Project.Model = {
 
 	  addDetail:function(model){
 	  	var data = model.toJSON();
-	  	this.$el.html(this.template(data));
-	  	return this;
+	  	if(data.message == 'success'){
+		  	this.$el.html(this.template(data));
+		  	return this;
+		  }
 	  }
 
 	})
