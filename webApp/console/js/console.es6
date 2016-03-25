@@ -987,7 +987,7 @@ App.Console = {
 			});
 
 			var name = $("#famVettedList option:selected").text() + "-" + $("#famVettedListVsersion option:selected").text();
-			name +="-"+ $("#versionNameNo").val().trim() + "-项目变更单";
+			name += "-" + $("#versionNameNo").val().trim() + "-项目变更单";
 			$("#versionNameNoTitle").val(name);
 
 		});
@@ -1012,7 +1012,10 @@ App.Console = {
 
 			var projectId = $("#famVettedList option:selected").val(),
 				versionId = $("#famVettedListVsersion option:selected").val(),
-				versionName = $("#versionName").val().trim();
+				versionName = $("#versionName").val().trim(),
+				versionNameNo = $("#versionNameNo").val().trim(),
+				versionNameNoTitle = $("#versionNameNoTitle").val().trim();
+
 
 			if (projectId == 0 || versionId == 0) {
 				alert("请选择项目，版本")
@@ -1029,9 +1032,20 @@ App.Console = {
 				return;
 			}
 
-			var files = App.Console.Settings.ChangeFile.join(","),
-				url = "platform/project/" + projectId + "/version/" + versionId + "/alter?versionName=" + versionName + "&fileIds=" + files;
+			if (!versionNameNo) {
+				alert("请输入审批单号")
+				return;
+			}
 
+			if (!versionNameNoTitle) {
+				alert("请输入审批单号名称")
+				return;
+			}
+
+			var files = App.Console.Settings.ChangeFile.join(","),
+				url = "platform/auditSheet/alterApprove??versionName=" + versionName + "&fileIds=" + files;
+			url += "&projectId=" + projectId + "&versionId=" + versionId + "&auditSheetNo=" + versionNameNo;
+			url += "&title=" + versionNameNoTitle;
 			var dataobj = {
 				url: url
 			};

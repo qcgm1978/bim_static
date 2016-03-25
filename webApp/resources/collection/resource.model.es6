@@ -359,9 +359,7 @@ App.ResourceModel = {
 
 						return false;
 					}
-				});
-
-
+				}); 
 
 				// //请求数据
 				// var data = {
