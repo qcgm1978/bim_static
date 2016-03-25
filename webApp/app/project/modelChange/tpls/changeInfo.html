@@ -1,0 +1,20 @@
+<ul class="rightTreeView">
+  <% _.each(data,function(item){ %>
+    <li class="itemNode">
+      <div class="item-content">
+        <i class="nodeSwitch"></i>
+        <span class="tree-text"><%= item.cateName %></span>
+      </div>
+      <ul class="treeViewSub">
+        <% _.each(item.results,function(category){ %>
+          <li class="itemNode" data-id="<%= category.cateId %>" data-baseId="<%= category.baseElementId %>">
+            <div class="item-content">
+              <i class="noneSwitch"></i>
+              <span class="tree-text"><%= category.cateName %></span>
+            </div>
+          </li>
+        <% }) %>
+      </ul>
+    </li>
+  <% }) %>
+</ul>

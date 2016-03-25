@@ -95,10 +95,12 @@ fis.match('todo/**.html', {
   //useHash:true,
   release: "/static/dist/tpls/$0"
 });
+
 fis.match('app/**.html', {
   //useHash:true,
   release: "/static/dist/$0"
 });
+
 fis.match('resources/**.html', {
   //useHash:true,
   release: "/static/dist/tpls/$0"
@@ -192,11 +194,11 @@ fis.match('/resources/**.{less,css}', {
 
 //合并裤文件
 fis.match('/console/**.{js,es6}', {
-  
+
   packTo: '/static/dist/console/console_' + v + '.js'
 });
 fis.match('/console/**.{css,less}', {
-  
+
   packTo: '/static/dist/console/console_' + v + '.css'
 });
 
@@ -272,5 +274,5 @@ fis.media('prod').match('*.{png,jpg,gif}', {
   useSprite: false,
   optimizer: null
 })
- 
+
 */

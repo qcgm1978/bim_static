@@ -84,7 +84,7 @@ var BIM = function(option){
 }
 BIM.common = {
   severModel:'http://bim.wanda.cn/model/',
-  severView:'http://bim.wanda.cn/view/api/',
+  severView:'http://bim.wanda.cn/view/',
   menu : {
     nav:[
       {
