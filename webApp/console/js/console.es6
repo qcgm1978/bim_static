@@ -708,6 +708,7 @@ App.Console = {
 			var dataObj = {
 				url: url
 			};
+			debugger
 			App.Console.ajaxPost(dataObj, function(data) {
 				if (data.message == "success") {
 					alert("初始化成功")
@@ -871,64 +872,10 @@ App.Console = {
 
 
 
-	//项目变更
-	projectChange() {
-		var Settings = App.Console.Settings;
-		//发起
-		if (Settings.step == 1) {
-			var tpl = _.templateUrl('/console/tpls/projectChange/create.html', true);
-			$("#contains").html(tpl);
-
-			//绑定族库第一步
-			App.Console.bindprojectChangeCreateInit();
-
-		} else if (Settings.step == 2) {
-			//初始化
-			var tpl = _.templateUrl('/console/tpls/projectChange/init.html', true);
-			$("#contains").html(tpl);
-			//绑定族库审核
-			App.Console.bindprojectChangeInit();
-		} else if (Settings.step == 3) {
-			//发起审核
-			var tpl = _.templateUrl('/console/tpls/projectChange/vetted.html', true);
-			$("#contains").html(tpl);
-			//绑定族库审核
-			App.Console.bindprojectChangeVettedInit();
-		} else if (Settings.step == 4) {
-			//审核批准
-			var tpl = _.templateUrl('/console/tpls/projectChange/approved.html', true);
-			$("#contains").html(tpl);
-			//绑定族库审核
-			App.Console.bindprojectChangeAppordInit();
-		} else if (Settings.step == 5) {
-			//审核批准
-			var tpl = _.templateUrl('/console/tpls/projectChange/sendVersion.html', true);
-			$("#contains").html(tpl);
-			//绑定族库审核
-			App.Console.bindprojectChangeSendVersionInit();
-		} else if (Settings.step == 6) {
-			//审核批准
-			var tpl = _.templateUrl('/console/tpls/projectChange/sendVersionVetted.html', true);
-			$("#contains").html(tpl);
-			//绑定族库审核
-			App.Console.bindprojectChangeSendVersionVettedInit();
-		}
-	},
-
-	//项目变更
-	bindprojectChangeCreateInit() {
-
-		App.Console.bindProjectChangeSelect(9, 3);
-		$("#versionNameNo").val(this.randomString(4));
-	},
-
 	//下拉绑定
 	bindProjectChangeSelect(status, listType) {
 
-		if (!listType) {
-			listType = 1;
-		}
-		//App.Console.initialization();
+
 		$.ajax({
 			url: "platform/project?type=" + listType + "&pageIndex=1&pageItemCount=100"
 		}).done(function(data) {
@@ -1043,7 +990,7 @@ App.Console = {
 			}
 
 			var files = App.Console.Settings.ChangeFile.join(","),
-				url = "platform/auditSheet/alterApprove??versionName=" + versionName + "&fileIds=" + files;
+				url = "platform/auditSheet/alterApprove?versionName=" + versionName + "&fileIds=" + files;
 			url += "&projectId=" + projectId + "&versionId=" + versionId + "&auditSheetNo=" + versionNameNo;
 			url += "&title=" + versionNameNoTitle;
 			var dataobj = {
@@ -1098,27 +1045,230 @@ App.Console = {
 		return pwd;
 	},
 
-	//项目变更初始化
-	bindprojectChangeInit() {
 
+	//下拉绑定
+	bindSelectprojectChange(type, status) {
+
+		$.ajax({
+			url: "/platform/auditSheet?type=" + type + "&auditResult=" + status
+		}).done(function(data) {
+
+			var items = data.data;
+			$.each(items, function(i, item) {
+
+				$("#famVettedList").append('<option value="' + item.no + '">' + item.title + '</option>');
+
+			});
+		});
 	},
 
-	//项目变更审核
+	//发起
+	getProjectChangeUrl(status) {
+
+		var url = "/platform/auditSheet/alterAudit?",
+			auditSheetNo = $("#titleNo").val().trim(),
+			title = $("#title").val().trim(),
+			childAuditSheetNo = $("#famVettedList").val();
+
+		//发起移交
+		if (status) {
+			url = "platform/auditSheet/alterTransferAudit?";
+		}
+
+		if (childAuditSheetNo == 0) {
+			alert("请选择")
+			return false;
+		}
+
+		if (!title) {
+			alert("请输入名称");
+			return false;
+		}
+
+		if (!auditSheetNo) {
+			alert("请输入单号");
+			return false;
+		}
+
+		url += "auditSheetNo=" + auditSheetNo + "&title=" + title + "&childAuditSheetNo=" + childAuditSheetNo;
+		console.log(url);
+
+		return url;
+	},
+
+	getProjectChangeUrl2(status) {
+		var url = "/platform/auditSheet/", //{auditSheet}/approve?approve={approve}
+			childAuditSheetNo = $("#famVettedList").val();
+
+		if (childAuditSheetNo == 0) {
+			alert("请选择审批单")
+			return false;
+		}
+
+		url += childAuditSheetNo + "/approve?approve=" + status;
+
+		return url;
+	},
+
+	//状态 opType 1 发起 2 审核
+	projectChangeStatus(type, status, opType, successText, subType) {
+
+
+		App.Console.bindSelectprojectChange(type, status);
+
+		$("#titleNo").val(App.Console.randomString(4));
+
+		$("#submit").click(function() {
+			var url = false;
+			//审核
+			if (opType == 2) {
+				url = App.Console.getProjectChangeUrl2(true);
+			} else {
+
+				url = App.Console.getProjectChangeUrl(subType);
+			}
+
+			if (url) {
+
+				if (opType == 1) {
+
+					App.Console.ajaxPost({
+						url: url
+					}, function(data) {
+						if (data.message == "success") {
+							alert(successText)
+						} else {
+							alert("审发起失败")
+						}
+					});
+
+				} else {
+					$.ajax({
+						url: url,
+						type: "PUT",
+						data: {
+							approve: true
+						}
+					}).done(function(data) {
+						if (data.message == "success") {
+							alert(successText)
+						} else {
+							alert("审批失败")
+						}
+					});
+				}
+			}
+		});
+
+
+		// $("#refuse").click(function() {
+
+		// 	var url = false;
+		// 	//发起
+		// 	if (opType == 2) {
+		// 		url = App.Console.getProjectChangeUrl2(false);
+		// 	} else {
+		// 		url = App.Console.getProjectChangeUrl();
+		// 	}
+
+
+		// 	if (url) {
+
+		// 		if (opType == 2) {
+		// 			$.ajax({
+		// 				url: url,
+		// 				type: "PUT",
+		// 				data: {
+		// 					approve: false
+		// 				}
+		// 			}).done(function(data) {
+		// 				if (data.message == "success") {
+		// 					alert("拒绝成功")
+		// 				} else {
+		// 					alert("拒绝失败")
+		// 				}
+		// 			});
+		// 		}
+		// 	}
+		// });
+	},
+
+
+	//项目变更
+	projectChange() {
+		var Settings = App.Console.Settings;
+		//发起
+		if (Settings.step == 1) {
+			var tpl = _.templateUrl('/console/tpls/projectChange/create.html', true);
+			$("#contains").html(tpl);
+
+			//绑定族库第一步
+			App.Console.bindprojectChangeCreateInit();
+
+		} else if (Settings.step == 2) {
+			//初始化
+			var tpl = _.templateUrl('/console/tpls/projectChange/init.html', true);
+			$("#contains").html(tpl);
+			//绑定族库审核
+			App.Console.bindprojectChangeInit();
+		} else if (Settings.step == 3) {
+			//发起审核
+			var tpl = _.templateUrl('/console/tpls/projectChange/vetted.html', true);
+			$("#contains").html(tpl);
+			//绑定族库审核
+			App.Console.bindprojectChangeVettedInit();
+		} else if (Settings.step == 4) {
+			//审核批准
+			var tpl = _.templateUrl('/console/tpls/projectChange/approved.html', true);
+			$("#contains").html(tpl);
+			//绑定族库审核
+			App.Console.bindprojectChangeAppordInit();
+		} else if (Settings.step == 5) {
+			//审核批准
+			var tpl = _.templateUrl('/console/tpls/projectChange/sendVersion.html', true);
+			$("#contains").html(tpl);
+			//绑定族库审核
+			App.Console.bindprojectChangeSendVersionInit();
+		} else if (Settings.step == 6) {
+			//审核批准
+			var tpl = _.templateUrl('/console/tpls/projectChange/sendVersionVetted.html', true);
+			$("#contains").html(tpl);
+			//绑定族库审核
+			App.Console.bindprojectChangeSendVersionVettedInit();
+		}
+	},
+
+
+
+	//发起变更
+	bindprojectChangeCreateInit() {
+
+		App.Console.bindProjectChangeSelect(9, 3);
+		$("#versionNameNo").val(this.randomString(4));
+	},
+
+
+	//变更批转
+	bindprojectChangeInit() {
+		App.Console.projectChangeStatus(9, 0, 2, "审批成功");
+	},
+
+	// 发起审核
 	bindprojectChangeVettedInit() {
-		App.Console.standardModeStatus(4, 2, 1, "发起成功", 3);
+		App.Console.projectChangeStatus(9, 1, 1, "发起成功");
 	},
 	//审核批准
 	bindprojectChangeAppordInit() {
-		App.Console.standardModeStatus(2, 5, 4, "审核成功", 3);
+		App.Console.projectChangeStatus(10, 0, 2, "审核成功");
 	},
 
 	//发起发版
 	bindprojectChangeSendVersionInit() {
-		App.Console.standardModeStatus(5, 7, 2, "发起成功", 3);
+		App.Console.projectChangeStatus(10, 1, 1, "发起成功", 1);
 	},
 	//族库发版批准
 	bindprojectChangeSendVersionVettedInit() {
-		App.Console.standardModeStatus(7, 9, 5, "审核成功", 3);
+		App.Console.projectChangeStatus(11, 0, 2, "发起成功");
 	},
 
 
