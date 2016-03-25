@@ -9,7 +9,7 @@ App.API = {
 
 	URL: {
 
-		//代办
+		//代办$chars
 		fetchTodoData: "platform/todo", //获取代办数据
 
 		//项目
@@ -25,7 +25,7 @@ App.API = {
 
 
 		//模型
-		fetchModelIdByProject: "view/api/{projectId}/{projectVersionId}/init",
+		fetchModelIdByProject: "view/{projectId}/{projectVersionId}/init",
 		fetchFileModelIdByFileVersionId: "doc/{projectId}/{projectVersionId}/file/meta", //?fileVersionId={fileVersionId}
 
 		uploadFile: "doc/{projectId}/{projectVersionId}/file/data", //上传文件  ?parentId={parentId}&fileName={fileName}&size={size}&digest={digest}&position={position}
@@ -43,11 +43,11 @@ App.API = {
 		fetchDesignVerification: "", // 设计 检测
 		fetchDesignCollision: "", // 设计碰撞
 		// 碰撞
-		fetchDesignFloor:"view/api/{projectId}/floors",// 楼层信息
-		fetchDesignCategory:"view/api/{projectId}/{floor}/floor/categories",// 楼层信息
-		fetchDesignTaskList:"view/api/{projectId}/{projectVerionId}/collision/setting/list",//碰撞任务列表
+		fetchDesignFloor:"view/{projectId}/floors",// 楼层信息
+		fetchDesignCategory:"view/{projectId}/{floor}/floor/categories",// 楼层信息
+		fetchDesignTaskList:"view/{projectId}/{projectVerionId}/collision/setting/list",//碰撞任务列表
 		fetchDesignTaskDetail:"sixD/{projectId}/{projectVersionId}/{collisionId}/point",//碰撞点列表
-		creatCollisionTask:"view/api/{projectId}/{projectVerionId}/collision/setting",//碰撞任务详情
+		creatCollisionTask:"view/{projectId}/{projectVerionId}/collision/setting",//碰撞任务详情
 
 		// 模型对比
 		fetchDesignChange:"view/{projectId}/{projectVersionId}/comparison", // 获取模型对比列表

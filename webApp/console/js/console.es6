@@ -848,6 +848,8 @@ App.Console = {
 		});
 	},
 
+
+
 	//发起审核
 	bindprojectVettedInit() {
 		App.Console.standardModeStatus(4, 2, 1, "审核成功", 3);
@@ -917,7 +919,7 @@ App.Console = {
 	bindprojectChangeCreateInit() {
 
 		App.Console.bindProjectChangeSelect(9, 3);
-
+		$("#versionNameNo").val(this.randomString(4));
 	},
 
 	//下拉绑定
@@ -984,6 +986,10 @@ App.Console = {
 
 			});
 
+			var name = $("#famVettedList option:selected").text() + "-" + $("#famVettedListVsersion option:selected").text();
+			name +="-"+ $("#versionNameNo").val().trim() + "-项目变更单";
+			$("#versionNameNoTitle").val(name);
+
 		});
 
 		App.Console.Settings.ChangeFile = [];
@@ -1006,7 +1012,7 @@ App.Console = {
 
 			var projectId = $("#famVettedList option:selected").val(),
 				versionId = $("#famVettedListVsersion option:selected").val(),
-				versionName=$("#versionName").val().trim();
+				versionName = $("#versionName").val().trim();
 
 			if (projectId == 0 || versionId == 0) {
 				alert("请选择项目，版本")
@@ -1023,15 +1029,17 @@ App.Console = {
 				return;
 			}
 
-			var files=App.Console.Settings.ChangeFile.join(","), 
-			url="platform/project/"+projectId+"/version/"+versionId+"/alter?versionName="+versionName+"&fileIds="+files;
+			var files = App.Console.Settings.ChangeFile.join(","),
+				url = "platform/project/" + projectId + "/version/" + versionId + "/alter?versionName=" + versionName + "&fileIds=" + files;
 
-			var dataobj={url:url};
-			App.Console.ajaxPost(dataobj,function(data){
-				if (data.message=="success") {
+			var dataobj = {
+				url: url
+			};
+			App.Console.ajaxPost(dataobj, function(data) {
+				if (data.message == "success") {
 					alert("变成成功")
 					window.location.reload();
-				}else{
+				} else {
 					alert("变成失败")
 				}
 			});
@@ -1056,7 +1064,24 @@ App.Console = {
 
 			$("#treeContainer").html(str);
 
-		}); 
+		});
+	},
+
+	randomString: function(len) {　　
+		len = len || 32;　　
+		var $chars = 'ABCDEFGHIJKLMLOPQRSTUVWXYZBBWWDD',
+			$chars2 = "23456789"; /****默认去掉了容易混淆的字符oOLl,9gq,Vv,Uu,I1****/ 　　
+		var maxPos = $chars.length;　　
+		var pwd = '';　　
+		for (i = 0; i < len; i++) {　　　　
+			pwd += $chars.charAt(Math.floor(Math.random() * maxPos));　　
+		}　
+
+		maxPos = 　$chars2.length;
+		for (i = 0; i < len; i++) {　　　　
+			pwd += $chars2.charAt(Math.floor(Math.random() * maxPos));　　
+		}　　
+		return pwd;
 	},
 
 	//项目变更初始化
@@ -1066,20 +1091,20 @@ App.Console = {
 
 	//项目变更审核
 	bindprojectChangeVettedInit() {
-		App.Console.standardModeStatus(4, 2, 1, "发起成功",3);
+		App.Console.standardModeStatus(4, 2, 1, "发起成功", 3);
 	},
 	//审核批准
 	bindprojectChangeAppordInit() {
-		App.Console.standardModeStatus(2, 5, 4, "审核成功",3);
+		App.Console.standardModeStatus(2, 5, 4, "审核成功", 3);
 	},
 
 	//发起发版
 	bindprojectChangeSendVersionInit() {
-		App.Console.standardModeStatus(5, 7, 2, "发起成功",3);
+		App.Console.standardModeStatus(5, 7, 2, "发起成功", 3);
 	},
 	//族库发版批准
 	bindprojectChangeSendVersionVettedInit() {
-		App.Console.standardModeStatus(7, 9, 5, "审核成功",3);
+		App.Console.standardModeStatus(7, 9, 5, "审核成功", 3);
 	},
 
 
