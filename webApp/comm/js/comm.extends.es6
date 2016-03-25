@@ -209,7 +209,7 @@ String.prototype.format = function(args) {
 var BackboneSync = Backbone.sync;
 //重写backbone 的 sync 
 Backbone.sync = function(method, model, options) {
-
+	 
 	// 在没有url 的情况下 取 api 的值 以防有特别的处理
 	//if (!model.url) 
 	//测试

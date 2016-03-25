@@ -96,10 +96,18 @@ fis.match('todo/**.html', {
   release: "/static/dist/tpls/$0"
 });
 
+
+
 fis.match('app/**.html', {
   //useHash:true,
   release: "/static/dist/$0"
 });
+
+fis.match('app/**/tpls/**.html', {
+  //useHash:true,
+  release: "/static/dist/tpls/$0"
+});
+
 
 fis.match('resources/**.html', {
   //useHash:true,

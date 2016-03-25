@@ -1,7 +1,7 @@
 /**
  * @require /app/project/modelChange/js/comm.js
  */
-App.Project={}
+App.Project = {}
 App.Project.Collection = {
   changeList: new(Backbone.Collection.extend({
     model: Backbone.Model.extend({
@@ -12,7 +12,7 @@ App.Project.Collection = {
       }
     }),
 
-    urlType:"fetchDesignChange"
+    urlType: "fetchDesignChange"
 
   })),
   changeInfo: new(Backbone.Collection.extend({
@@ -23,6 +23,6 @@ App.Project.Collection = {
         }
       }
     }),
-    urlType:"fetchDesignChangeInfo"
+    urlType: "fetchDesignChangeInfo"
   }))
 };

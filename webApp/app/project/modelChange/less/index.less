@@ -7,13 +7,35 @@
 		}
 		.projectNav .item { cursor: default; }
 		.projectNav .item:hover { border-color: #ddd; color: #666; }
-		.slideBar{ display: block; }
-			.dragSize {  display: block; }
+		.slideBar { display: block; }
+		.dragSize { display: block; }
 	}
 	.rightProperty { width: 398px; border: 1px #ddd solid; position: absolute; right: 0px; top: 36px; bottom: 0px; background-color: #fff; z-index: 600;
 		.rightPropertyContentBox { height: 100%; position: relative;
+			.rightPropertyContent { height: 100%;
+				.designPropetyBox { height: 100%;
+					.projectPropetyContainer { height: 100%; margin-top: -40px; padding-top: 40px; }
+				}
+			}
 			.slideBar { right: inherit; display: block; left: -15px; top: 40px; }
 			.dragSize { left: -5px; right: inherit; display: block; }
+		}
+		.designProperties { height: 100%; overflow: auto;
+			.nullTip { background: url(/projects/images/attrSel.png) no-repeat 50% 100%; padding-top: 200px; height: 50px; line-height: 50px; color: #ccc; font-size: 16px; text-align: center; }
+		}
+		.modle { .modleShowHide { transition: all .5s; background: url(/comm/images/commIcon.png) no-repeat 0px -256px; float: right; margin-right: 12px; margin-top: 6px; height: 14px; width: 14px; cursor: pointer;
+				&.down { transform: rotate(180deg); -ms-transform: rotate(180deg); -moz-transform: rotate(180deg); -webkit-transform: rotate(180deg); -o-transform: rotate(180deg); }
+			}
+			.modleName { font-weight: bold; height: 24px; line-height: 24px; padding-left: 12px;
+				.modleNameText { vertical-align: top; width: 95%; }
+			}
+			.modleList { background-color: #eee; border-top: 1px #ccc solid;
+				.modleItem { border-bottom: 1px #ccc solid;
+					.modleName { width: 25%; display: inline-block; box-sizing: border-box; padding-left: 12px; border-right: 1px #ccc solid; }
+					.modleVal { display: inline-block; width: 72%; box-sizing: border-box; padding-left: 12px; margin-left: -3px; }
+					.modelLink { display: inline-block; padding-left: 12px; color: #3F8CDF; height: 24px; line-height: 24px; }
+				}
+			}
 		}
 	}
 	.projectCotent { position: relative; height: 100%; margin-left: 240px; margin-right: 398px;
@@ -29,7 +51,6 @@
 		}
 	}
 }
-.rightTree{
-	padding:10px 8px;
-	.rightTreeView{padding-left:0;}
+.rightTree { padding: 10px 8px;
+	.rightTreeView { padding-left: 0; }
 }
