@@ -33,7 +33,7 @@ App.Comm = {
 
 	getUrlByType: function(data) {
 
-		 
+
 		//是否调试
 		if (App.API.Settings.debug) {
 			data.url = App.API.DEBUGURL[data.URLtype];
@@ -70,8 +70,8 @@ App.Comm = {
 				data.url += "?1=1";
 			}
 			for (var p in data.data) {
-				data.url += "&" + p + "=" + data.data[p]; 
-			} 
+				data.url += "&" + p + "=" + data.data[p];
+			}
 		}
 
 		return data;
@@ -234,6 +234,9 @@ App.Comm = {
 
 		return false;
 
+	},
+	managePoint:function(data){
+		App.Comm.viewpointView(data);
 	}
 
 };

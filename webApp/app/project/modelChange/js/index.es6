@@ -42,7 +42,7 @@ App.Index = {
 			App.Comm.navBarToggle($("#projectContainer .leftNav "), $("#projectContainer .projectCotent"), "left", App.Index.Settings.Viewer);
 		});
 		//拖拽 属性内容 左侧
-		$projectContainer.on("mousedown", ".leftNavContent .dragSize", function(event) { 
+		$projectContainer.on("mousedown", ".leftNavContent .dragSize", function(event) {
 			App.Comm.dragSize(event, $("#projectContainer .leftNav"), $("#projectContainer .projectCotent"), "left", App.Index.Settings.Viewer);
 		});
 
@@ -53,12 +53,11 @@ App.Index = {
 			App.Comm.navBarToggle($("#projectContainer .rightProperty"), $("#projectContainer .projectCotent"), "right", App.Index.Settings.Viewer);
 		});
 		//拖拽 属性内容 右侧
-		$projectContainer.on("mousedown", ".rightProperty .dragSize", function(event) { 
+		$projectContainer.on("mousedown", ".rightProperty .dragSize", function(event) {
 			App.Comm.dragSize(event, $("#projectContainer .rightProperty"), $("#projectContainer .projectCotent"), "right", App.Index.Settings.Viewer);
 		});
 
 		this.bindTreeScroll();
-
 
 	},
 
@@ -71,7 +70,7 @@ App.Index = {
 
 	//获取url 参数
 	GetRequest() {
-		var url = location.search; //获取url中"?"符后的字串 
+		var url = location.search; //获取url中"?"符后的字串
 		var theRequest = new Object();
 		if (url.indexOf("?") != -1) {
 			var str = url.substr(1);
@@ -104,6 +103,7 @@ App.Index = {
 
 
 		var that = this;
+		App.Index.Settings.Viewer = null;
 		this.getModelId(function(data) {
 
 			var Model = data.data;
@@ -133,10 +133,10 @@ App.Index = {
 				}
 
 			});
-
-
-
+			// 绑定视点功能
+			that.bindPoint(App.Index.Settings.Viewer);
 		});
+
 	},
 
 	//渲染属性
@@ -182,6 +182,22 @@ App.Index = {
 
 	},
 
+	bindPoint:function(viewer){
+		var element = $("#projectContainer .projectModelContent");
+		var data = {
+			element:element,
+			projectId:App.Index.Settings.projectId,
+			viewer:viewer
+		}
+		App.Comm.managePoint(data);
+	},
+
+	fetchChange:function(){
+		App.Project.Collection.changeList.projectId = App.Index.Settings.projectId;
+		App.Project.Collection.changeList.projectVersionId = App.Index.Settings.projectVersionId;
+		App.Project.Collection.changeList.fetch();
+		$(".rightPropertyContent .designChange").html(new App.Project.Model.changeList().render().el);
+	},
 
 
 	init() {
@@ -192,10 +208,7 @@ App.Index = {
 		//事件绑定
 		this.bindEvent();
 		//变更获取
-		App.Project.Collection.changeList.projectId = App.Index.Settings.projectId;
-		App.Project.Collection.changeList.projectVersionId = App.Index.Settings.projectVersionId;
-		App.Project.Collection.changeList.fetch();
-		$(".rightPropertyContent .designChange").html(new App.Project.Model.changeList().render().el);
+		this.fetchChange();
 	}
 }
 
@@ -238,9 +251,9 @@ App.Project.Model = {
 			that.toggleClass('open');
 			if (comparisonId && that.next().length == 0) {
 				that.after(new App.Project.Model.getInfo().render().el);
-				App.Project.Collection.changeInfo.projectId = App.Comm.projectId;
-				App.Project.Collection.changeInfo.projectVersionId = App.Comm.projectVersionId;
-				App.Project.Collection.changeInfo.comparisonId = App.Comm.comparisonId;
+				App.Project.Collection.changeInfo.projectId = App.Index.Settings.projectId;
+				App.Project.Collection.changeInfo.projectVersionId = App.Index.Settings.projectVersionId;
+				App.Project.Collection.changeInfo.comparisonId = comparisonId;
 				App.Project.Collection.changeInfo.fetch();
 			}
 		},
@@ -273,7 +286,7 @@ App.Project.Model = {
 
 		addDetail: function(model) {
 			var data = model.toJSON();
-			if (data.message == 'success') {
+			if (data.message == 'success' && data.data.length>0) {
 				this.$el.html(this.template(data));
 				return this;
 			}
