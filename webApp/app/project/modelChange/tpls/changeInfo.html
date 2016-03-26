@@ -3,14 +3,26 @@
     <li class="itemNode">
       <div class="item-content">
         <i class="nodeSwitch"></i>
-        <span class="tree-text"><%= item.cateName %></span>
+        <span class="tree-text">
+          <% if(item.cateName){ %>
+            <%= item.cateName %>
+          <% }else{ %>
+            未命名
+          <% } %>
+        </span>
       </div>
       <ul class="treeViewSub">
         <% _.each(item.results,function(category){ %>
           <li class="itemNode" data-id="<%= category.cateId %>" data-baseId="<%= category.baseElementId %>">
             <div class="item-content">
               <i class="noneSwitch"></i>
-              <span class="tree-text"><%= category.cateName %></span>
+              <span class="tree-text" data-id="<%= category.currentElementId %>" data-base="<%= category.baseElementId %>">
+                <% if(category.name){ %>
+                  <%= category.name %>
+                <% }else{ %>
+                  未命名
+                <% } %>
+              </span>
             </div>
           </li>
         <% }) %>

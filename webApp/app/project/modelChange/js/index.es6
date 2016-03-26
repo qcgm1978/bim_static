@@ -260,30 +260,33 @@ App.Project.Model = {
 
 		select: function() {
 			var that = $(event.target);
+			var current = $(".rightTreeView .current");
+			var elementId = that.data('id');
+			var baseId = that.data('base');
+			var curElementId = current.data('id');
+			var curBaseId = current.data('base');
 			if (that.prev('.noneSwitch').length > 0) {
-				$(event.target).toggleClass('current');
+				current.removeClass('current');
+				$(event.target).addClass('current');
+				App.Index.Settings.Viewer.downplay({type:'userId',ids:[curElementId,curBaseId]});
+				App.Index.Settings.Viewer.highlight({type:'userId',ids:[elementId,baseId]});
+				App.Index.Settings.Viewer.fit();
 			}
 		}
 
 	}),
 
 	getInfo: Backbone.View.extend({
-
 		tagName: "ul",
-
 		className: "treeViewSub",
-
 		initialize: function() {
 			this.listenTo(App.Project.Collection.changeInfo, "add", this.addDetail);
 		},
-
 		template: _.templateUrl('/app/project/modelChange/tpls/changeInfo.html'),
-
 		render: function() {
 			this.$el.html("没有变更");
 			return this;
 		},
-
 		addDetail: function(model) {
 			var data = model.toJSON();
 			if (data.message == 'success' && data.data.length>0) {
@@ -291,6 +294,5 @@ App.Project.Model = {
 				return this;
 			}
 		}
-
 	})
 }
