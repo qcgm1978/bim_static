@@ -73,6 +73,7 @@ App.ResourceModel.ListNav = Backbone.View.extend({
 			App.ResourceModel.Settings.Viewer.on("click", function(model) {
 
 				if (!model.intersect) {
+					$("#navContainer .attrContent").html('<div class="nullTip">请选择构件</div>');
 					return;
 				}
 				App.ResourceModel.PropertiesCollection.projectId = App.ResourceModel.Settings.CurrentVersion.projectId;

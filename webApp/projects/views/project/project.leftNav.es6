@@ -152,6 +152,7 @@ App.Project.leftNav = Backbone.View.extend({
 		viewer.on("click", function(model) {
 			App.Project.Settings.ModelObj = null;
 			if (!model.intersect) {
+				$("#projectContainer .designProperties").html('<div class="nullTip">请选择构件</div>');
 				return;
 			}
 

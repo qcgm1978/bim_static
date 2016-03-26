@@ -86,7 +86,7 @@ App.ResourceModel.LeftNav = Backbone.View.extend({
 
 		if (type == "file") {
 			//文件
-			$resourceModelLeftNav.find(".fileTree").show().end().find(".modelTree").hide();
+			$resourceModelLeftNav.find(".fileTree").show().end().find(".modelTreeBox").hide();
 			$resourceModelLeftNav.find(".dragSize").hide().end().find(".slideBar").hide();
 
 			//触发内容部分的左侧导航事件
@@ -99,7 +99,7 @@ App.ResourceModel.LeftNav = Backbone.View.extend({
 				return;
 			}
 
-			$resourceModelLeftNav.find(".fileTree").hide().end().find(".modelTree").show();
+			$resourceModelLeftNav.find(".fileTree").hide().end().find(".modelTreeBox").show();
 			$resourceModelLeftNav.find(".dragSize").show().end().find(".slideBar").show();
 
 			if (App.ResourceModel.Settings.DataModel && App.ResourceModel.Settings.DataModel.sourceId) {
@@ -108,7 +108,7 @@ App.ResourceModel.LeftNav = Backbone.View.extend({
 				//获取模型id
 				this.fetchModelIdByResource(() => {
 					$("#resourceModelLeftNav .item:last").addClass("selected").siblings().removeClass("selected");
-					$resourceModelLeftNav.find(".fileTree").show().end().find(".modelTree").hide();
+					$resourceModelLeftNav.find(".fileTree").show().end().find(".modelTreeBox").hide();
 					$resourceModelLeftNav.find(".dragSize").hide().end().find(".slideBar").hide();
 				});
 			} 
@@ -159,7 +159,7 @@ App.ResourceModel.LeftNav = Backbone.View.extend({
 
 	renderModel() {
 		this.bindTreeScroll();
-		this.$el.find(".modelTree .mCS_no_scrollbar_y").width(800);
+		this.$el.find(".modelTreeBox .mCS_no_scrollbar_y").width(800);
 
 		//触发内容部分的左侧导航事件
 		Backbone.trigger('navClickCB', App.ResourceModel.Settings.leftType);
@@ -167,7 +167,8 @@ App.ResourceModel.LeftNav = Backbone.View.extend({
 
 	//文件浏览滚动条
 	bindTreeScroll: function() {
-		var $modelTree = this.$el.find(".modelTree");
+		
+		var $modelTree = this.$el.find(".modelTreeBox");
 		if (!$modelTree.hasClass('mCustomScrollbar')) {
 			$modelTree.mCustomScrollbar({
 				set_height: "100%",
