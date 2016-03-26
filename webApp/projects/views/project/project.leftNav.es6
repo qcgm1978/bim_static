@@ -140,6 +140,7 @@ App.Project.leftNav = Backbone.View.extend({
 		$("#projectContainer .projectNavModelContainer").append(new App.Project.viewpoint().render().el);
 
 		viewer.on('viewpoint', function(point) {
+			$("#projectContainer .projectNavModelContainer .tree-view:eq(1) .item-content:eq(0)").addClass('open')
 			App.Project.ViewpointAttr.ListCollection.add({
 				data: [{
 					id: '',
