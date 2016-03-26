@@ -23,7 +23,7 @@
 			App.Comm.upload.init(upload, {
 
 				getParentId: function() {
-					 
+
 					return App.ResourceModel.Settings.fileVersionId;
 				},
 
@@ -35,11 +35,11 @@
 				canUploadFile: function() {
 					if (App.ResourceModel.Settings.fileVersionId) {
 						return true;
-					}else{
+					} else {
 						return false;
 					}
 
-					
+
 					//return App.Comm.modules.util.canUploadFile()
 				},
 
@@ -74,27 +74,35 @@
 				//上传成功
 				fileUploaded: function(response, file) {
 
-					 
+
 					var data = JSON.parse(response.response),
-						models = App.ResourceModel.FileCollection.models,has=false;
+						type = App.ResourceModel.Settings.type,
+						models = App.ResourceModel.FileCollection.models,
+						has = false;
+
+					if (type == "famLibs") {
+						models = App.ResourceModel.FileThumCollection.models;
+					}
+
 
 					$.each(models, function(index, model) {
-						 
-
 						if (model.toJSON().id == data.data.id) {
-							has=true;
+							has = true;
 							model.set(data.data);
 							return false;
-						} 
-						 
+						}
 					});
-
 					//新增
 					if (!has) {
-						data.data.isAdd=true;
-						 App.ResourceModel.FileCollection.add(data.data);
+						data.data.isAdd = true;
+						if (type == "famLibs") {
+							App.ResourceModel.FileThumCollection.add(data.data);
+						} else if (type == "standardLibs") {
+							App.ResourceModel.FileCollection.add(data.data);
+						}
+
 					}
-					 
+
 					//$.jps.publish('add-upload-file', response, file)
 				},
 

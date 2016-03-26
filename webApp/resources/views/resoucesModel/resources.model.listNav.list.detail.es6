@@ -25,6 +25,9 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 		this.$el.html(this.template(data)).data("status", data.status);
 		if (data.isAdd) {
 			this.$el.addClass('createNew')
+			if (data.folder) {
+				App.ResourceModel.afterCreateNewFolder(data,data.parentId);
+			}
 		}
 		this.bindContext();
 		return this;

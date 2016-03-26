@@ -225,13 +225,21 @@ App.ResourceModel = {
 
 	//创建文件夹后处理
 	afterCreateNewFolder(file, parentId) {
+
+
+
 		var $treeViewMar = $(".projectNavFileContainer .treeViewMar"),
 			$treeViewMarUl = $treeViewMar.find(".treeViewMarUl");
 
 		var data = {
 			data: [file],
 			iconType: 1
-		};
+		}; 
+		
+		//窜仔
+		if ($treeViewMar.find('span[data-id="'+file.id+'"]').length>0) {
+			return;
+		}
 
 		//没有的时候绑定点击事件
 		if ($treeViewMarUl.length <= 0) {

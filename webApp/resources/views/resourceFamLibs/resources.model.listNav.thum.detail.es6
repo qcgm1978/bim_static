@@ -25,7 +25,6 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 
 	//渲染
 	render: function() {
-
 		var data = this.model.toJSON();
 
 		this.$el.html(this.template(data)).data("status", data.status);
