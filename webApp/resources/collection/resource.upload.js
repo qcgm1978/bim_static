@@ -23,7 +23,7 @@
 			App.Comm.upload.init(upload, {
 
 				getParentId: function() {
-					debugger;
+					 
 					return App.ResourceModel.Settings.fileVersionId;
 				},
 

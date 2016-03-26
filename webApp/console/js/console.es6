@@ -707,8 +707,7 @@ App.Console = {
 			}
 			var dataObj = {
 				url: url
-			};
-			debugger
+			}; 
 			App.Console.ajaxPost(dataObj, function(data) {
 				if (data.message == "success") {
 					alert("初始化成功")
@@ -1137,6 +1136,7 @@ App.Console = {
 					}, function(data) {
 						if (data.message == "success") {
 							alert(successText)
+							window.location.reload();
 						} else {
 							alert("审发起失败")
 						}
@@ -1152,6 +1152,7 @@ App.Console = {
 					}).done(function(data) {
 						if (data.message == "success") {
 							alert(successText)
+							window.location.reload();
 						} else {
 							alert("审批失败")
 						}

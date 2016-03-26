@@ -66,10 +66,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 	loadProjectList: function() {
 
 		var data = {
-			URLtype: "fetchCrumbsProject",
-			data: {
-				projectId: App.Project.Settings.projectId
-			}
+			URLtype: "fetchCrumbsProject"			 
 		};
 
 		//渲染数据
