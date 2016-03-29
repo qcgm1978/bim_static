@@ -66,7 +66,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 	loadProjectList: function() {
 
 		var data = {
-			URLtype: "fetchCrumbsProject"			 
+			URLtype: "fetchCrumbsProject"
 		};
 
 		//渲染数据
@@ -105,7 +105,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 
 	//版本切换
 	changeVersion: function(event) {
-		 
+
 		var $target = $(event.target).closest(".item"),
 			Version = $target.data("version");
 
@@ -119,7 +119,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 
 	//版本tab 切换
 	changeVersionTab: function(event) {
-		
+
 		var $target = $(event.target),
 			type = $target.data("type");
 		$target.addClass("selected").siblings().removeClass("selected");
@@ -127,21 +127,21 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		//发布版本
 		if (type == "release") {
 			var $releaseVersionBox = $target.closest(".listContent").find(".releaseVersionBox");
-			if ($releaseVersionBox.length<=0) {
+			if ($releaseVersionBox.length <= 0) {
 				$target.closest(".listContent").find(".container").append('<div class="releaseVersionBox">暂无版本</div>');
 
 			}
-			$target.closest(".listContent").find(".releaseVersionBox").show().siblings().hide(); 
+			$target.closest(".listContent").find(".releaseVersionBox").show().siblings().hide();
 
-		}else{
+		} else {
 
 			var $changeVersionBox = $target.closest(".listContent").find(".changeVersionBox");
-			if ($changeVersionBox.length<=0) {
+			if ($changeVersionBox.length <= 0) {
 				$target.closest(".listContent").find(".container").append('<div class="changeVersionBox">暂无版本</div>');
 
 			}
 			$target.closest(".listContent").find(".changeVersionBox").show().siblings().hide();
-			
+
 		}
 	},
 
@@ -157,116 +157,33 @@ App.Project.ProjectContainer = Backbone.View.extend({
 
 	},
 	//收起和暂开
-	navBarLeftShowAndHide: function() { 
-
-		var $leftNav = $("#projectContainer .leftNav"),
-			mLeft = parseInt($leftNav.css("margin-left"));
-		//隐藏状态
-		if (mLeft < 0) {
-
-			$leftNav.animate({
-				"margin-left": "0px"
-			}, 500, function() {
-				$leftNav.find(".dragSize").show().end().find(".slideBar i").toggleClass('icon-caret-left icon-caret-right');
-				$("#projectContainer .projectCotent").css("margin-left", $leftNav.width());
-				App.Project.Settings.Viewer.resize();
-			});
-
-		} else {
-			var width = $leftNav.width();
-			$leftNav.animate({
-				"margin-left": -width
-			}, 500, function() {
-				$leftNav.find(".dragSize").hide().end().find(".slideBar i").toggleClass('icon-caret-left icon-caret-right');
-				$("#projectContainer .projectCotent").css("margin-left", 0);
-				App.Project.Settings.Viewer.resize();
-			});
-
-		}
+	navBarLeftShowAndHide: function() {
+		App.Comm.navBarToggle($("#projectContainer .leftNav"), $("#projectContainer .projectCotent"), "left", App.Project.Settings.Viewer);
 
 	},
 
 	//右侧收起和暂开
 	navBarRightShowAndHide: function() {
-		var $rightProperty = $("#projectContainer .rightProperty "),
-			mRight = parseInt($rightProperty.css("margin-right"));
-		//隐藏状态
-		if (mRight < 0) {
 
-			$rightProperty.animate({
-				"margin-right": "0px"
-			}, 500, function() {
-				$rightProperty.find(".dragSize").show().end().find(".slideBar i").toggleClass('icon-caret-left icon-caret-right');
-				$("#projectContainer .projectCotent").css("margin-right", $rightProperty.width());
-				App.Project.Settings.Viewer.resize();
-			});
+		App.Comm.navBarToggle($("#projectContainer .rightProperty "), $("#projectContainer .projectCotent"), "right", App.Project.Settings.Viewer);
 
-		} else {
-			var width = $rightProperty.width();
-			$rightProperty.animate({
-				"margin-right": -width
-			}, 500, function() {
-				$rightProperty.find(".dragSize").hide().end().find(".slideBar i").toggleClass('icon-caret-left icon-caret-right');
-				$("#projectContainer .projectCotent").css("margin-right", 0);
-				App.Project.Settings.Viewer.resize();
-			});
-
-		}
 	},
 
 	//拖拽改变尺寸
 	dragSize: function(event) {
 
-		var initX = event.pageX,
-			$el = $("#projectContainer .rightProperty"),
-			isLeftNav = false,
-			initWidth = $el.width();
-
-		var $target = $(event.target);
+		var $el = $("#projectContainer .rightProperty"),
+			dirc = "right",
+			$target = $(event.target);
 
 
 		if ($target.closest(".leftNav").length > 0) {
-			isLeftNav = true;
-			$el = $("#projectContainer .leftNav");
-			initWidth = $el.width();
+			dirc = "left";
+			$el = $("#projectContainer .leftNav"); 
 		}
 
 
-		$(document).on("mousemove.dragSize", function(event) {
-			var newWidth;
-			if (isLeftNav) {
-				newWidth = initWidth + event.pageX - initX;
-			} else {
-				newWidth = initWidth + initX - event.pageX;
-			}
-
-			$el.width(newWidth);
-		});
-
-		$(document).on("mouseup.dragSize", function() {
-
-			$(document).off("mouseup.dragSize");
-			$(document).off("mousemove.dragSize");
-
-			var contentWidth = $("#projectContainer .projectCotent").width(),
-				leftNavWidth = $el.width(),
-				gap = leftNavWidth - initWidth;
-
-			var mPos = "margin-right";
-			if (isLeftNav) {
-				mPos = "margin-left";
-			}
-
-			if (contentWidth - gap < 10) {
-				var maxWidth = initWidth + contentWidth - 10;
-				$el.width(maxWidth);
-				$("#projectContainer .projectCotent").css(mPos, maxWidth);
-
-			} else {
-				$("#projectContainer .projectCotent").css(mPos, leftNavWidth);
-			}
-			App.Project.Settings.Viewer.resize();
-		});
+		App.Comm.dragSize(event, $el, $("#projectContainer .projectCotent"), dirc, App.Project.Settings.Viewer); 
 
 		return false;
 

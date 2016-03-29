@@ -1,6 +1,13 @@
-<div class="planSearch">
-    <input type="text" placeholder="请选择开始时间" />
-    <input type="text" placeholder="请选择结束时间" />
+<div class="planSearch ">
+    <div class="firstDate dateBox" style="position: relative;">
+        <i class="iconCal add-on"></i>
+        <input readonly="true" placeholder="开始时间" id="dateStar" class="span2" type="text">
+    </div>
+    <span>--</span>
+    <div class="firstDate dateBox">
+        <i class="iconCal"></i>
+        <input readonly="true" placeholder="开始时间" id="dateEnd" class="span2" type="text">
+    </div>
 </div>
 <div class="planBox">
     <div class="planContent">
@@ -12,7 +19,6 @@
                     <th class="operationalMatters">业务事项</th>
                     <th class="start">计划开始</th>
                     <th class="end">计划结束</th>
-
                 </tr>
             </thead>
             <tbody>

@@ -19,7 +19,7 @@
               "creatorName": "创建者姓名",
               "type": 1,
               "status": 1,
-              "lastest": true,
+              "latest": true,
               "modelId": null,
               "modelStatus": -1
             }
@@ -44,7 +44,7 @@
               "creatorName": "创建者姓名",
               "type": 3,
               "status": 1,
-              "lastest": false,
+              "latest": false,
               "modelId": null,
               "modelStatus": -1
             },

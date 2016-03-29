@@ -111,6 +111,9 @@ App.API = {
 		fetchCrumbsProjectVersion: "/dataJson/project/fetchCrumbsProjectVersion.json", //项目面包屑版本
 		fetchProjectVersionInfo: "platform/project/{projectId}/version/{projectVersionId}", //项目版本信息
 
+		fetchModelIdByProject:"/dataJson/project/design/fetchModelIdByProject.json",
+
+
 		//设计
 		fetchDesignProperties: "/dataJson/project/project.design.property.json", //设计属性
 		fetchDesignVerification: "/dataJson/project/project.design.property.json", //设计检测

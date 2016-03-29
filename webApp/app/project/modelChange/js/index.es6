@@ -8,12 +8,13 @@ App.Index = {
 		projectId: "",
 		projectVersionId: "",
 		ModelObj: "",
-		Viewer:null
+		Viewer: null
 	},
 
 	bindEvent() {
 
-		var that = this,$projectContainer=$("#projectContainer");
+		var that = this,
+			$projectContainer = $("#projectContainer");
 
 		//切换属性tab
 		$projectContainer.on("click", ".projectPropetyHeader .item", function() {
@@ -108,6 +109,14 @@ App.Index = {
 
 			var Model = data.data;
 
+			if (data.data.modelStatus == 1) {
+				alert("模型转换中");
+				return;
+			} else if (data.data.modelStatus == 3) {
+				alert("转换失败");
+				return;
+			}
+
 			App.Index.Settings.Viewer = new BIM({
 				element: $("#contains .projectCotent")[0],
 				sourceId: Model.sourceId,
@@ -142,7 +151,7 @@ App.Index = {
 	//渲染属性
 	renderAttr() {
 
-		if (!App.Index.Settings.ModelObj||!App.Index.Settings.ModelObj.intersect) {
+		if (!App.Index.Settings.ModelObj || !App.Index.Settings.ModelObj.intersect) {
 			$("#projectContainer .designProperties").html(' <div class="nullTip">请选择构件</div>');
 			return;
 		}
@@ -182,17 +191,17 @@ App.Index = {
 
 	},
 
-	bindPoint:function(viewer){
+	bindPoint: function(viewer) {
 		var element = $("#projectContainer .projectModelContent");
 		var data = {
-			element:element,
-			projectId:App.Index.Settings.projectId,
-			viewer:viewer
+			element: element,
+			projectId: App.Index.Settings.projectId,
+			viewer: viewer
 		}
 		App.Comm.managePoint(data);
 	},
 
-	fetchChange:function(){
+	fetchChange: function() {
 		App.Project.Collection.changeList.projectId = App.Index.Settings.projectId;
 		App.Project.Collection.changeList.projectVersionId = App.Index.Settings.projectVersionId;
 		App.Project.Collection.changeList.fetch();
@@ -268,8 +277,14 @@ App.Project.Model = {
 			if (that.prev('.noneSwitch').length > 0) {
 				current.removeClass('current');
 				$(event.target).addClass('current');
-				App.Index.Settings.Viewer.downplay({type:'userId',ids:[curElementId,curBaseId]});
-				App.Index.Settings.Viewer.highlight({type:'userId',ids:[elementId,baseId]});
+				App.Index.Settings.Viewer.downplay({
+					type: 'userId',
+					ids: [curElementId, curBaseId]
+				});
+				App.Index.Settings.Viewer.highlight({
+					type: 'userId',
+					ids: [elementId, baseId]
+				});
 				App.Index.Settings.Viewer.fit();
 			}
 		}
@@ -289,7 +304,7 @@ App.Project.Model = {
 		},
 		addDetail: function(model) {
 			var data = model.toJSON();
-			if (data.message == 'success' && data.data.length>0) {
+			if (data.message == 'success' && data.data.length > 0) {
 				this.$el.html(this.template(data));
 				return this;
 			}

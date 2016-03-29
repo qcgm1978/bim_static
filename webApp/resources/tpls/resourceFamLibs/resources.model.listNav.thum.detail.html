@@ -1,6 +1,17 @@
 
 <span data-fileversionid="<%=fileVersionId%>" class="filecKAll"><input type="checkbox" class="ckMe" /></span>
-<div class="thumBg sourceFileType <%= folder?'thumFolder':'' %>"></div>
+
+<%if(folder){%>
+	<div class="thumBg sourceFileType thumFolder"></div> 
+<%}else{%>
+
+	<%if(thumbnail){%>
+	<img class="thumbnailImg" src="model/<%=modelId%>/<%=thumbnail%>" alt="" />
+	<%}else{%>
+	<div class="thumBg sourceFileType"></div>
+	<%}%>
+
+<%}%>
 
 <span class="fileName">
 <%if(folder){%>
@@ -11,7 +22,7 @@
     	<span class="btnCalcel pointer myIcon-cancel"></span>
     <%}%>
 <%}else{%>
-  <a data-id="<%=id%>" href="/static/dist/app/project/filePreview.html?id=<%=id%>&model=<%=modelId%>&projectId=<%=projectId%>&projectVersionId=<%=fileVersionId%>" target="_blank" data-isfolder="<%=folder%>" class="text">
+  <a data-id="<%=id%>" href="/static/dist/app/project/single/filePreview.html?id=<%=id%>&model=<%=modelId%>&projectId=<%=projectId%>&projectVersionId=<%=App.ResourceModel.Settings.CurrentVersion.id%>" target="_blank" data-isfolder="<%=folder%>" class="text">
             <%=name%>
         </a>
 <%}%>

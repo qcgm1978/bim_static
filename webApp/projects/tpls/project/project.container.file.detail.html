@@ -1,8 +1,18 @@
 
 <span data-fileversionid="<%=fileVersionId%>" class="filecKAll inlineBlock"><input type="checkbox" class="ckAll" /></span>
  
-<span class="fileName inlineBlock">
-<span class=" fileType <%= folder?'folder':'file' %>"></span>
+<span class="fileName inlineBlock"> 
+<%if(folder){%>
+   <span class=" fileType folder"></span> 
+<%}else{%> 
+	<%if(thumbnail){%>
+		<img class="fileTypeImg" src="model/<%=modelId%>/<%=thumbnail%>" alt="" />
+	<%}else{%>
+		<span class=" fileType file"></span> 
+	<%}%> 
+<%}%>
+
+
 <% if(folder){%>
  <span data-id="<%=id%>" data-isfolder="<%=folder%>" class="text"><%=name%></span>
 <%}else{%>
@@ -11,8 +21,8 @@
 
   </span> 
 
-<%if(!folder){%>
- <a href="/static/dist/app/project/modelChange/index.html?id=<%=id%>&projectId=<%=App.Project.Settings.projectId%>&projectVersionId=<%=App.Project.Settings.CurrentVersion.id%>" target="_blank" class="changeContrast inlineBlock">有</a> 
+<%if(!folder && modificationId){%>
+ <a href="/static/dist/app/project/modelChange/index.html?id=<%=id%>&projectId=<%=App.Project.Settings.projectId%>&projectVersionId=<%=App.Project.Settings.CurrentVersion.id%>&modificationId=<%=modificationId%>" target="_blank" class="changeContrast inlineBlock">有</a> 
 <%}%>
 
 

@@ -1018,7 +1018,7 @@ App.Console = {
 			var str = "<ul>";
 			for (var i = 0; i < count; i++) {
 				item = data.data[i];
-				str += '<li  class="item" data-id="' + item.fileVersionId + '"><label><input type="checkbox" class="ckChoose" /> ' + item.name + '</label></li>';
+				str += '<li  class="item" data-id="' + item.id + '"><label><input type="checkbox" class="ckChoose" /> ' + item.name + '</label></li>';
 			}
 			str += '</ul>';
 

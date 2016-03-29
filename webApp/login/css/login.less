@@ -1,108 +1,59 @@
-html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video {
-  margin: 0;
-  padding: 0;
-  border: 0;
-  font-size: 100%;
-  font: inherit;
-  vertical-align: baseline;
-  outline: none;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-}
-  
-body { font-size: 12px; line-height: 1; font-family: Arial, Tahoma, sans-serif; 
-font-family: "Lantinghei SC","Hiragino Sans GB","Microsoft Yahei", STHeiti,Verdana,Arial,sans-serif;
-
-}
-
+html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video { margin: 0; padding: 0; border: 0; font-size: 100%; font: inherit; vertical-align: baseline; outline: none; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box; }
+body { font-size: 12px; line-height: 1; font-family: Arial, Tahoma, sans-serif; font-family: "Lantinghei SC", "Hiragino Sans GB", "Microsoft Yahei", STHeiti, Verdana, Arial, sans-serif; }
 article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section { display: block; }
 ol, ul { list-style: none; }
-
 blockquote, q { quotes: none; }
 blockquote:before, blockquote:after, q:before, q:after { content: ''; content: none; }
-strong { font-weight: bold; } 
-
+strong { font-weight: bold; }
 table { border-collapse: collapse; border-spacing: 0; }
 img { border: 0; max-width: 100%; }
-
 p { font-size: 1.2em; line-height: 1.0em; color: #333; }
-
-
-a {
-  color: #fff;
-  text-decoration: none;
-}
-
-.relative{position: relative;}
-
-
+.clear { clear: both; }
+a { color: #fff; text-decoration: none; }
+.relative { position: relative; }
 @color: #4D926F;
-
-.rounded-corners (@radius: 4px) {
-    -webkit-border-radius: @radius;
-    -moz-border-radius: @radius;
-    -ms-border-radius: @radius;
-    -o-border-radius: @radius;
-    border-radius: @radius;
-}
-
-
-.loginDialogWidth(){
-   width:260px;box-sizing: border-box;display: block;margin:0 auto;margin-top: 10px;
- }
-
-
-
-  #mainBox{ position: relative;min-width: 1000px;height: 480px;background: url('/login/images/login-bg.jpg') no-repeat;background-size: cover;
-  filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/login/images/login-bg.jpg',sizingMethod='scale');
-
-    .login{margin:38px 0px 0px 50px;width:128px;height: 30px;background: url('/login/images/logo.png') no-repeat;float: left;}
-
-    .loginDialog{width:300px;height: 280px; background:#000;background-color: rgba(0,0,0,0.5);left:50%;position: absolute;margin-left: -150px;top:100px;color:#fff;
-
-
-      .header{ margin-top: 24px;font-size:20px;text-align: center;}
-
-      .errorMSG{border:1px solid #FFCF85;background-color:#FFFDEA;color:#FF6649;height: 28px;padding-left: 5px;line-height: 28px;.loginDialogWidth;.rounded-corners;visibility: hidden;
-        &.show{visibility: visible;}
-        .iconWarning{ display: inline-block;height: 16px; width:22px;  background: url('/login/images/icons.png') no-repeat;vertical-align: top;margin-top: 6px;}
-
+.rounded-corners (@radius:4px) { -webkit-border-radius: @radius; -moz-border-radius: @radius; -ms-border-radius: @radius; -o-border-radius: @radius; border-radius: @radius; }
+.loginDialogWidth() { width: 260px; box-sizing: border-box; display: block; margin: 0 auto; margin-top: 10px; }
+#mainBox { position: relative; min-width: 1000px; height: 550px; padding-top: 1px; background: url('/login/images/login-bg.jpg') no-repeat; background-size: cover; filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/login/images/login-bg.jpg', sizingMethod='scale');
+  .logo { margin: 38px 0px 0px 50px; width: 128px; height: 30px; background: url('/login/images/logo.png') no-repeat; float: left; }
+  .headTitle { width: 525px; margin: 0 auto; font-size: 40px; color: #fff; margin-top: 128px;
+    .introduction { margin-top: 15px; font-size: 26px; height: 30px;
+      .item { width: 125px; float: left; margin-left: 65px; padding-left: 20px;
+        &.first { margin-left: 0px; }
       }
-
-      .txtInput{height: 12px;border:0;outline: 0;padding-left: 42px;padding-right:5px;    padding-top: 15px; padding-bottom: 15px;
-                 width:213px;display: block;margin:0 auto;margin-top: 10px;.rounded-corners;}
-      .txtIcon{background: url('/login/images/icons.png') no-repeat 0px -17px; position: absolute; width:20px;height: 20px;top:11px;left:30px;
-        &.userPwd{background-position: 0px -37px;}
-      }
-
-      .loginHelper{.loginDialogWidth; 
-          .remember{background: url('/login/images/icons.png') no-repeat 0px -59px;padding: 1px 1px 1px 20px;cursor: pointer;width: 112px;
-            &.selected{background-position: 0px -75px;}
-        }
-          .forgotPwd{float: right;} 
-      }
-
-      .btnLogin{display: block;margin:0 auto;margin-top: 10px;text-align: center;width: 260px;height: 40px;.rounded-corners;border:0;background-color: #418CDF;color: #fff;font-size: 18px;}
-      .btnLogin:hover{background-color: #56A0E4;} 
-
     }
-
   }
-
-#loginBox {
-  .footer{
-      width:1100px;margin:0 auto;margin-top: 50px;
-      .item{margin-right: 30px;float: left;}
-      .iconBg{width:72px;height: 72px;float: left;background: url('/login/images/icons.png') no-repeat;}
-      .iconPlanning {background-position: 0px -88px;}
-      .iconPlan{background-position: 0px -160px;}
-      .iconCost{background-position: 0px -232px;}
-      .iconQuality{background-position: 0px -305px;}
-      .introduction{margin-left: 80px;width:170px;}
-      .title{font-size: 20px;color:#000;}
-      .desc{font-family: '微软雅黑';color:#999;margin-top: 10px;line-height: 20px;}
-      .last{margin-right: 0px;}
+  .loginDialog { padding-top: 1px; width: 300px; height: 280px; background: #000; background-color: rgba(0, 0, 0, 0.5); color: #fff; margin: 0 auto; margin-top: 34px;
+    .header { margin-top: 24px; font-size: 20px; text-align: center; }
+    .errorMSG { border: 1px solid #FFCF85; background-color: #FFFDEA; color: #FF6649; height: 28px; padding-left: 5px; line-height: 28px; .loginDialogWidth; .rounded-corners; visibility: hidden;
+      &.show { visibility: visible; }
+      .iconWarning { display: inline-block; height: 16px; width: 22px; background: url('/login/images/icons.png') no-repeat; vertical-align: top; margin-top: 6px; }
+    }
+    .txtInput { height: 12px; border: 0; outline: 0; padding-left: 42px; padding-right: 5px; padding-top: 15px; padding-bottom: 15px; width: 213px; display: block; margin: 0 auto; margin-top: 10px; .rounded-corners; }
+    .txtIcon { background: url('/login/images/icons.png') no-repeat 0px -17px; position: absolute; width: 20px; height: 20px; top: 11px; left: 30px;
+      &.userPwd { background-position: 0px -37px; }
+    }
+    .loginHelper { .loginDialogWidth;
+      .remember { background: url('/login/images/icons.png') no-repeat 0px -59px; padding: 1px 1px 1px 20px; cursor: pointer; width: 112px;
+        &.selected { background-position: 0px -75px; }
+      }
+      .forgotPwd { float: right; }
+    }
+    .btnLogin { display: block; margin: 0 auto; margin-top: 10px; text-align: center; width: 260px; height: 40px; .rounded-corners; border: 0; background-color: #418CDF; color: #fff; font-size: 18px; }
+    .btnLogin:hover { background-color: #56A0E4; }
   }
-   
+}
+#loginBox { .footer { width: 1100px; margin: 0 auto; margin-top: 50px;
+    .item { margin-right: 30px; float: left; }
+    .iconBg { width: 72px; height: 72px; float: left; background: url('/login/images/icons.png') no-repeat; }
+    .iconPlanning { background-position: 0px -88px; }
+    .iconPlan { background-position: 0px -160px; }
+    .iconCost { background-position: 0px -232px; }
+    .iconQuality { background-position: 0px -305px; }
+    .introduction { margin-left: 80px; width: 170px; }
+    .title { font-size: 20px; color: #000; }
+    .desc { font-family: '微软雅黑'; color: #999; margin-top: 10px; line-height: 20px; }
+    .last { margin-right: 0px; }
+  }
+  .copyrightBox{height: 36px;border-top:1px #ccc solid;text-align: center;margin-top: 54px;background-color: #eee;line-height: 36px;}
 }

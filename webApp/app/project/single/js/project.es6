@@ -89,6 +89,15 @@ App.Project = {
 				App.Project.Settings.Model = data;
 
 				if (data.data.modelId) {
+
+					if (data.data.modelStatus == 1) {
+						alert("模型转换中");
+						return;
+					} else if (data.data.modelStatus == 3) {
+						alert("转换失败");
+						return;
+					}
+
 					App.Project.Settings.Viewer = new BIM({
 						single: true,
 						element: $("#modelBox")[0],
@@ -109,7 +118,12 @@ App.Project = {
 
 
 				} else {
-					alert("模型转换中");
+					if (data.data.modelStatus == null) {
+						alert("模型未上传");
+					} else {
+						alert("模型转换中");
+					}
+
 				}
 			} else {
 				alert(data.message);
@@ -307,7 +321,7 @@ App.Project = {
 			that.navBarToggle($("#projectContainer .rightProperty"), $("#modelBox"), "right", App.Project.Settings.Viewer);
 		});
 		//拖拽 属性内容
-		$projectContainer.on("mousedown", ".dragSize", function(event) { 
+		$projectContainer.on("mousedown", ".dragSize", function(event) {
 			that.dragSize(event, $("#projectContainer .rightProperty"), $("#modelBox"), "right", App.Project.Settings.Viewer);
 		});
 
