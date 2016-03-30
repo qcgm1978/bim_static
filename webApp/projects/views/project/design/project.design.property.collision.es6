@@ -115,15 +115,16 @@ App.Project.DesignCollision=Backbone.View.extend({
 	getDetail:function(event){
 		var list = this.$el.find('.collSelect');
 		list.hide();
-		var that = $(event.target).closest('.collItem');
-		collisionId = that.data('id');
-		status = that.data('status');
+		var that = $(event.target).closest('.collItem'),
+				collisionId = that.data('id'),
+				status = that.data('status'),
+				len = parseInt(($(".detailList").height() -25)/59);
 		if(status == "2"){
 			App.Project.DesignAttr.CollisionTaskDetail.projectId = App.Project.Settings.projectId
 			App.Project.DesignAttr.CollisionTaskDetail.projectVersionId = App.Project.Settings.CurrentVersion.id
 			App.Project.DesignAttr.CollisionTaskDetail.collisionId = collisionId
 			App.Project.DesignAttr.CollisionTaskDetail.pageNo = 1
-			App.Project.DesignAttr.CollisionTaskDetail.pageSize = 15
+			App.Project.DesignAttr.CollisionTaskDetail.pageSize = len
 			App.Project.DesignAttr.CollisionTaskDetail.fetch();
 		}else if(status =="3"){
 			App.Project.DesignAttr.CollisionTaskDetail.add({message:"failed"})

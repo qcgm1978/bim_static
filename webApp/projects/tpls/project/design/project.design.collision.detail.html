@@ -20,8 +20,8 @@
                     <span class="pointTotal">碰撞点:<%= data.page.totalCount %></span>
                     <span class="cur"><%= data.page.pageNo %></span>
                     <span>/<%= data.page.totalPages %>页</span>
-                    <a href="javascript:;" class="subPage disabled">上一页</a>
-                    <a href="javascript:;" class="nextPage">下一页</a>
+                    <a href="javascript:;" class="prePage <% if(data.page.pageNo == 1){ %> disabled <% } %>">上一页</a>
+                    <a href="javascript:;" class="nextPage <% if(data.page.pageNo == data.page.totalPages){ %>disabled<% } %>"">下一页</a>
                 </th>
             </tr>
         </tfoot>
