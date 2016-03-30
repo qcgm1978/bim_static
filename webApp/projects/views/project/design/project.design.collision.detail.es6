@@ -33,7 +33,14 @@ App.Project.DesignCollisionDetail=Backbone.View.extend({
   },
 
   setCollisionPoint:function(event){
-    var that = $(event.target).closest("tr");
+    var that = $(event.target).closest("tr"),
+        element = that.find('.ckHeader'),
+        leftId = element.data("leftId"),
+        rightId = element.data("rightId");
+    App.Project.Settings.Viewer.highlight({
+      type:'userId',
+      ids:[leftId,rightId]
+    })
     that.toggleClass("selected").siblings().removeClass("selected");
   }
 });
