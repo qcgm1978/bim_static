@@ -298,6 +298,7 @@ App.Project = {
 	//根据类型渲染数据
 	renderModelContentByType: function() {
 
+		  
 		var type = App.Project.Settings.projectNav;
 		//设计
 		if (type == "design") {

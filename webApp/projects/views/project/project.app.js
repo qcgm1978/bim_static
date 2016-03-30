@@ -17,7 +17,7 @@ App.Project.ProjectApp = Backbone.View.extend({
 	
 
 	// 切换项目Tab
-	SwitchProjectNav: function() {
+	SwitchProjectNav: function(event) {
 
 		var $el = $(event.target);
 		//样式处理

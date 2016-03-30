@@ -4,7 +4,7 @@ App.API = {
 
 	Settings: {
 		hostname: "http://bim.wanda.cn/",
-		debug: false
+		debug: true
 	},
 
 	URL: {
@@ -139,9 +139,9 @@ App.API = {
 
 
 		//陈本
-		fetchCostReference: "/dataJson/project/project.design.property.json", // 清单
+		fetchCostReference: "/dataJson/project/cost/list.json", // 清单
 		fetchCostChange: "/dataJson/project/project.design.property.json", // 变更
-		fetchCostVerification: "/dataJson/project/project.design.property.json", // 效验
+		fetchCostVerification: "/dataJson/project/cost/list.json", // 效验
 		fetchCostProperties: "/dataJson/project/project.design.property.json", //属性
 
 		// 质量

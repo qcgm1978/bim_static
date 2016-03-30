@@ -28,8 +28,7 @@ App.Project.CostReference=Backbone.View.extend({
 	//获取数据后处理
 	addOne:function(model){
 		var data=model.toJSON();
-		this.$el.html(this.template(data));
-		console.log(1);
+		this.$el.html(this.template(data)); 
 	}
 
 

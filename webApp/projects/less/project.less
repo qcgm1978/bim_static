@@ -204,8 +204,43 @@
 		.listCount { width: 18%; }
 		tbody { td { height: 25px; line-height: 25px; padding-left: 5px; }
 		}
-		.nodeSwitch { background: url(../images/comm/images/commIcon.png) no-repeat 0px -39px; margin-top: 7px; display: inline-block; width: 12px; height: 10px; line-height: 8px; vertical-align: top; text-align: center; cursor: pointer;
-			&.on { background-position: 0px -49px; }
+	}
+}
+.rightProperty { .nodeSwitch { background: url(../images/comm/images/commIcon.png) no-repeat 0px -39px; margin-top: 7px; display: inline-block; width: 12px; height: 10px; line-height: 8px; vertical-align: top; text-align: center; cursor: pointer;
+		&.on { background-position: 0px -49px; }
+		&.none { background-position: 0px 100px; }
+	}
+	.step1 { margin-left: 7px; }
+	.step2 { margin-left: 14px; }
+	.step3 { margin-left: 21px; }
+	.code { box-sizing: border-box; display: inline-block; overflow: hidden; width: 100%; text-overflow: ellipsis; vertical-align: top; margin-left: -16px; padding-left: 16px; }
+	.code1 { margin-left: -24px; padding-left: 24px; }
+	.code2 { margin-left: -31px; padding-left: 31px; }
+	.code3 { margin-left: -40px; padding-left: 40px; }
+	.CostChange, .CostVerification { overflow: auto; position: absolute; top: 40px; bottom: 0px; left: 0px; right: 0px; }
+	.tbCostChange { width: 100%; min-width: 395px;
+		td, th { border: 1px #ccc solid; }
+		.name { width: 56%; }
+		.date, .diff { width: 18%; }
+		thead { th { text-align: center; height: 30px; line-height: 30px; }
+		}
+		tbody { td { height: 25px; line-height: 25px; padding-left: 8px;
+				&.diff { padding-left: 0px; text-align: center; }
+			}
+			tr { &.bg { background-color: #eee; }
+			}
+		}
+	}
+	.CostVerification { .title { height: 28px; line-height: 28px;    padding-left: 12px;   min-width: 395px;    width: 100%;  }
+	}
+	.tbVerification { width: 100%; min-width: 395px;
+		td, th { border: 1px #ccc solid; height: 25px; line-height: 25px; text-align: center; }
+		.listCode { width: 25%; }
+		.listName { width: 74%; }
+		td { padding-left: 7px; text-align: left; }
+		thead { tr { background-color: #eee; }
+		}
+		tbody { tr { background-color: #ddd; }
 		}
 	}
 }

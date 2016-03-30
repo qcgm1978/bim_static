@@ -23,6 +23,8 @@
 
 <%if(!folder && modificationId){%>
  <a href="/static/dist/app/project/modelChange/index.html?id=<%=id%>&projectId=<%=App.Project.Settings.projectId%>&projectVersionId=<%=App.Project.Settings.CurrentVersion.id%>&modificationId=<%=modificationId%>" target="_blank" class="changeContrast inlineBlock">有</a> 
+<%}else{%>
+	<span class="changeContrast inlineBlock"></span>
 <%}%>
 
 
