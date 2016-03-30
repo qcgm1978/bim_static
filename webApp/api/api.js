@@ -43,10 +43,10 @@ App.API = {
 		fetchDesignVerification: "", // 设计 检测
 		fetchDesignCollision: "", // 设计碰撞
 		// 碰撞
-		fetchDesignFloor:"view/{projectId}/floors",// 楼层信息
-		fetchDesignCategory:"view/{projectId}/{floor}/floor/categories",// 楼层信息
+		fetchDesignFiles:"view/{etag}/{sourceId}/collision/tree",// 碰撞文件列表
+		fetchDesignCategory:"view/{etag}/{sourceId}/collision/categories",// 构件列表
 		fetchDesignTaskList:"view/{projectId}/{projectVerionId}/collision/setting/list",//碰撞任务列表
-		fetchDesignTaskDetail:"sixD/{projectId}/{projectVersionId}/{collisionId}/point",//碰撞点列表
+		fetchDesignTaskDetail:"sixD/{projectId}/{projectVersionId}/{collisionId}/point?pageNo={pageNo}&pageSize={pageSize}",//碰撞点列表
 		creatCollisionTask:"view/{projectId}/{projectVerionId}/collision/setting",//碰撞任务详情
 
 		// 模型对比

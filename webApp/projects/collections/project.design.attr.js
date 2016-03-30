@@ -20,7 +20,7 @@ App.Project.DesignAttr={
 	})),
 
 	// 碰撞文件列表
-	CollisionFloor: new(Backbone.Collection.extend({
+	CollisionFiles: new(Backbone.Collection.extend({
 
 		model: Backbone.Model.extend({
 			defaults: function() {
@@ -30,7 +30,7 @@ App.Project.DesignAttr={
 			}
 		}),
 
-		urlType:"fetchDesignFloor"
+		urlType:"fetchDesignFiles"
 
 	})),
 

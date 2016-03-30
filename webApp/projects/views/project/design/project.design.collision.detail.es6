@@ -6,6 +6,10 @@ App.Project.DesignCollisionDetail=Backbone.View.extend({
 
 	className:"designCollision",
 
+  events:{
+    "click tr":"setCollisionPoint"
+  },
+
 	template:_.templateUrl("/projects/tpls/project/design/project.design.collision.detail.html"),
 
   initialize:function(){
@@ -18,11 +22,19 @@ App.Project.DesignCollisionDetail=Backbone.View.extend({
   },
 
   addCollisionDetail:function(model){
-    alert();
     // 加载碰撞点列表
     var data=model.toJSON();
+    if(data.message=="success"){
+      this.prePage = data.data.page.prePage;
+      this.next = data.data.page.nextPage;
+    }
     this.$el.html(this.template(data))
     return this;
+  },
+
+  setCollisionPoint:function(event){
+    var that = $(event.target).closest("tr");
+    that.toggleClass("selected").siblings().removeClass("selected");
   }
 });
 
