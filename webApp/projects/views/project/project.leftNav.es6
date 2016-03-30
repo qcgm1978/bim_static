@@ -50,8 +50,8 @@ App.Project.leftNav = Backbone.View.extend({
 			}
 			  
 			//test
-			this.typeContentChange();
-			return;
+			//this.typeContentChange();
+			//return;
 			//
 			if (App.Project.Settings.DataModel && App.Project.Settings.DataModel.sourceId) {
 				this.typeContentChange();
