@@ -18,6 +18,7 @@ App.Project.DesignCollision=Backbone.View.extend({
 		this.$el.html(this.template);
 		this.$el.find(".collBox").html(new App.Project.DesignCollisionDetail().render().el);
 		this.$el.find(".selectBox").append(new App.Project.DesignCollisionTaskList().render().el);
+		App.Project.DesignAttr.CollisionTaskDetail.add({message:"nothing"});
 		return this;
 	},
 
@@ -52,19 +53,26 @@ App.Project.DesignCollision=Backbone.View.extend({
 			cssClass: 'task-create-dialog',
 			message: "",
 			readyFn:function(){
-				this.element.find(".content").html(new App.Project.ProjectDesignSetting().render().el);			},
+				this.element.find(".content").html(new App.Project.ProjectDesignSetting().render().el);
+			},
 			okCallback:function(){
 				var formData = {},
 						taskName = $("#taskName").val(),
-						floor = $("#floor").val(),
 						treeA = $("#treeA"),
 						treeB = $("#treeB");
 				formData.name = taskName;
-				formData.floor = floor;
-				formData.chooseA = getSpecialty(treeA);
-				formData.chooseB = getSpecialty(treeB);
-				formData.projectId=App.Project.Settings.projectId;
-				formData.projectVerionId=App.Project.Settings.CurrentVersion.id;
+				formData.leftFiles = getSpecialty(treeA);
+				formData.rightFiles = getSpecialty(treeB);
+				formData.projectId = App.Project.Settings.projectId;
+				formData.projectVerionId = App.Project.Settings.CurrentVersion.id;
+				if(!formData.name){
+					alert("请输入任务名称");
+					return false;
+				}
+				if(formData.leftFiles.length==0&&formData.rightFiles.length==0){
+					alert("请选择碰撞文件");
+					return false;
+				}
 				data = {
 	        type:'post',
 	        URLtype:"creatCollisionTask",
@@ -82,9 +90,9 @@ App.Project.DesignCollision=Backbone.View.extend({
 		})
 		function getSpecialty(element){
 			var data = []
-			element.find(".subTree").each(function(){
+			element.find(".file").each(function(){
 				var that = $(this),
-						specialty = that.data("type"),
+						etag = that.children('.itemContent').data("etag"),
 						categories = [];
 				that.find(".inputCheckbox").each(function(){
 					var _self = $(this),
@@ -95,7 +103,7 @@ App.Project.DesignCollision=Backbone.View.extend({
 				});
 				if(categories.length>0){
 					data.push({
-						"specialty":specialty,
+						"file":etag,
 						"categories":categories
 					});
 				}
@@ -107,12 +115,22 @@ App.Project.DesignCollision=Backbone.View.extend({
 	getDetail:function(event){
 		var list = this.$el.find('.collSelect');
 		list.hide();
-		var that = $(event.target).closest('.collItem');
-		collisionId = that.data('id');
-		App.Project.DesignAttr.CollisionTaskDetail.projectId = App.Project.Settings.projectId
-		App.Project.DesignAttr.CollisionTaskDetail.projectVersionId = App.Project.Settings.CurrentVersion.id
-		App.Project.DesignAttr.CollisionTaskDetail.collisionId = collisionId
-		App.Project.DesignAttr.CollisionTaskDetail.fetch();
+		var that = $(event.target).closest('.collItem'),
+				collisionId = that.data('id'),
+				status = that.data('status'),
+				len = parseInt(($(".detailList").height() -25)/59);
+		if(status == "2"){
+			App.Project.DesignAttr.CollisionTaskDetail.projectId = App.Project.Settings.projectId
+			App.Project.DesignAttr.CollisionTaskDetail.projectVersionId = App.Project.Settings.CurrentVersion.id
+			App.Project.DesignAttr.CollisionTaskDetail.collisionId = collisionId
+			App.Project.DesignAttr.CollisionTaskDetail.pageNo = 1
+			App.Project.DesignAttr.CollisionTaskDetail.pageSize = len
+			App.Project.DesignAttr.CollisionTaskDetail.fetch();
+		}else if(status =="3"){
+			App.Project.DesignAttr.CollisionTaskDetail.add({message:"failed"})
+		}else if(status == "0" || status=="1"){
+			App.Project.DesignAttr.CollisionTaskDetail.add({message:"running"})
+		}
 	}
 
 });

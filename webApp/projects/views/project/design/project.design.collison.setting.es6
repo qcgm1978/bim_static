@@ -11,34 +11,43 @@ App.Project.ProjectDesignSetting= Backbone.View.extend({
   template:_.templateUrl("/projects/tpls/project/design/project.design.collision.setting.html",true),
 
   initialize:function(){
-    this.listenTo(App.Project.DesignAttr.CollisionCategory,"add",this.addCategory);
+    this.listenTo(App.Project.DesignAttr.CollisionFiles,"add",this.addFiles);
   },
 
   render:function(){
     this.$el.html(this.template);
-    this.$el.find("#addFloor").append(new App.Project.CollisionFloor().render().el);
-    App.Project.DesignAttr.CollisionFloor.projectId = 793465949626592//App.Project.Settings.projectId;
-    App.Project.DesignAttr.CollisionFloor.fetch();
+    App.Project.DesignAttr.CollisionFiles.sourceId = App.Project.Settings.DataModel.sourceId;
+    App.Project.DesignAttr.CollisionFiles.etag = App.Project.Settings.DataModel.etag;
+    App.Project.DesignAttr.CollisionFiles.fetch();
     return this;
   },
 
-  addCategory:function(model){
+  addFiles:function(model){
     var that = this;
-    var data = model.toJSON().data;
-    var tree = this.$el.find(".treeView");
-    that.renderModel(data,tree);
+    var data = model.toJSON();
+    this.$el.find(".tree").append(new App.Project.CollisionFiles({
+      model:data
+    }).render().el);
     return this;
   },
-  renderModel:function(data,element){
-    var that = this;
-    _.forEach(data,function(model){
-      var view = new App.Project.DesignTreeView({
-        model:model
-      });
-      element.append(view.render().el);
-    });
-  },
+
   openTree:function(event){
-    $(event.target).closest(".itemContent").toggleClass("open");
+    var self = this,
+        that = self.element = $(event.target).closest(".itemContent"),
+        etag = that.data('etag');
+
+    if(etag&&!that.hasClass('open')&&that.next('.subTree').length==0){
+      App.Project.DesignAttr.CollisionCategory.sourceId = App.Project.Settings.DataModel.sourceId;
+      App.Project.DesignAttr.CollisionCategory.etag = etag;
+      App.Project.DesignAttr.CollisionCategory.fetch();
+      this.listenTo(App.Project.DesignAttr.CollisionCategory,"add",this.addCategory);
+    }
+    that.toggleClass("open");
+  },
+  addCategory:function(model){
+    var data = model.toJSON();
+    this.element.after(new App.Project.DesignTreeView({
+      model:data
+    }).render().el)
   }
 });
