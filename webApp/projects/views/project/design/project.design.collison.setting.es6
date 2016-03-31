@@ -5,7 +5,8 @@ App.Project.ProjectDesignSetting= Backbone.View.extend({
   className:"designCollSetting",
 
   events: {
-    "click .itemContent":"openTree"
+    "click .itemContent":"openTree",
+    "blur .labelInput":"requireName"
   },
 
   template:_.templateUrl("/projects/tpls/project/design/project.design.collision.setting.html",true),
@@ -49,5 +50,14 @@ App.Project.ProjectDesignSetting= Backbone.View.extend({
     this.element.after(new App.Project.DesignTreeView({
       model:data
     }).render().el)
+  },
+
+  requireName:function(event){
+    var that = $(event.target);
+    if(that.val()){
+      that.removeClass("error");
+    }else{
+      that.addClass("error").trigger("focus");
+    }
   }
 });

@@ -1,3 +1,32 @@
+.designCollision{height:100%;}
+  .designCollSetting{font-size:14px;
+    .collLabel{display:table;width:100%;margin-bottom:10px;
+      .labelName{width:1%;white-space:nowrap;display:table-cell;padding-right:5px;}
+      .labelInput{width:100%;height:30px;padding:0 5px;border:1px solid #ccc;border-radius:0;outline:none;}
+      .error{border-color:#f00;}
+    }
+    .formTree{padding:10px;
+      &:after{content:'';display:table;clear:both;}
+      .panel{width:50%;float:left;height:270px;border:1px solid #ccc;margin-left:-10px;position:relative;
+        .panelHead{position:absolute;padding:5px;background:#fff;left:10px;top:-13px;color:#999;}
+      }
+      .panel + .panel{float:right;margin-right:-10px;}
+      .tree{margin:20px 0 10px;padding:0 10px;height:240px;overflow-x:hidden;overflow-y:auto;
+        .treeView{padding-left:10px;
+          .itemContent{display:block;padding:4px 0;
+            .nodeSwitch{display:inline-block;width:10px;height:10px;margin-right:5px;background:url(/comm/images/commIcon.png) no-repeat 0 -39px;}
+            .fileIcon{display:inline-block;width:16px;height:13px;margin-right:5px;background:url(/comm/images/commIcon.png) no-repeat 0 -500px;}
+            .inputCheckbox{float:right;}
+          }
+          .itemContent.open{
+            .nodeSwitch{background-position:0 -49px;}
+            &+.subTree{display:block;}
+          }
+          .subTree{padding-left:15px;display:none;}
+        }
+      }
+    }
+  }
 .rightProperty {
   .designVerification { height: 100%; }
   .modle {
@@ -67,13 +96,16 @@
   .collHead{position:absolute;border-bottom:1px solid #ccc;left:0;top:0;width:100%;background:#fff;z-index:2;
     &:after{content:''; display:table; clear:both; }
     .filterBox{width:85%; float:left; padding:10px 80px 10px 10px; border-left:1px solid #ccc; border-right:1px solid #ccc; position:relative;
+      .selectBox{position:relative;
+        &:after{width:8px;height:4px;content:'';display:block;background:url(/comm/images/commIcon.png) no-repeat;background-position:0 0;position:absolute;right:10px;top:10px;}
+      }
       .currColl{width:100%; height:25px; outline:none; }
       .addButton{position:absolute; right:10px; top:10px; width:60px; height:25px; text-align:center; line-height:25px; border:1px solid #ccc; cursor:pointer;
         .addIcon{
           display:inline-block;width:12px;height:12px;background:url(/comm/images/commIcon.png) no-repeat;background-position:0 -420px;vertical-align:text-top;
         }
       }
-      .collSelect{ display:none; position:absolute; z-index:2; left:10px; right:80px; top:35px; padding:10px 10px 0; border:1px solid #ccc; border-top:none; background:#fff;overflow:hidden;
+      .collSelect{ display:none;width:100%; position:absolute; z-index:2; left:0px; top:25px; padding:10px 10px 0; border:1px solid #ccc; border-top:none; background:#fff;overflow:hidden;
         .serch{
           input{width:100%; height:25px; outline:none; }
         }

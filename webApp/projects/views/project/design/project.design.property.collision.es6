@@ -22,14 +22,17 @@ App.Project.DesignCollision=Backbone.View.extend({
 		return this;
 	},
 
-	showSelectList:function(){
+	showSelectList:function(event){
 		// 显示碰撞任务列表
+		var $el = $(event.target);
 		var that = this;
 		var list = that.$el.find('.collSelect');
 		list.show();
-		App.Project.DesignAttr.CollisionTaskList.projectId = App.Project.Settings.CurrentVersion.projectId;
-		App.Project.DesignAttr.CollisionTaskList.projectVerionId = App.Project.Settings.CurrentVersion.id;
-		App.Project.DesignAttr.CollisionTaskList.fetch();
+		if($el.next(".collSelect").find("ul").length==0){
+			App.Project.DesignAttr.CollisionTaskList.projectId = App.Project.Settings.CurrentVersion.projectId;
+			App.Project.DesignAttr.CollisionTaskList.projectVerionId = App.Project.Settings.CurrentVersion.id;
+			App.Project.DesignAttr.CollisionTaskList.fetch();
+		}
 		$(document).on('click',that.hideSelectList);
 	},
 
@@ -52,6 +55,7 @@ App.Project.DesignCollision=Backbone.View.extend({
 			title: '碰撞检查设置',
 			cssClass: 'task-create-dialog',
 			message: "",
+			okText: '确&nbsp;&nbsp;认',
 			readyFn:function(){
 				this.element.find(".content").html(new App.Project.ProjectDesignSetting().render().el);
 			},
@@ -66,7 +70,7 @@ App.Project.DesignCollision=Backbone.View.extend({
 				formData.projectId = App.Project.Settings.projectId;
 				formData.projectVerionId = App.Project.Settings.CurrentVersion.id;
 				if(!formData.name){
-					alert("请输入任务名称");
+					$("#taskName").addClass("error");
 					return false;
 				}
 				if(formData.leftFiles.length==0&&formData.rightFiles.length==0){

@@ -13,7 +13,7 @@ App.Project.DesignCollisionTaskList=Backbone.View.extend({
   },
 
   render:function(){
-    this.$el.html('<p class="tips">没有碰撞任务</p>');
+    this.$el.html('<p class="tips">加载中...</p>');
     return this;
   },
 
