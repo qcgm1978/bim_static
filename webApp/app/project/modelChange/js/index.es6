@@ -242,16 +242,18 @@ App.Project.Model = {
 		template: _.templateUrl('/app/project/modelChange/tpls/changeList.html'),
 
 		render: function() {
-			this.$el.html("没有变更");
+			this.$el.html("加载中...");
 			return this;
 		},
 
 		addList: function(model) {
-			var data = model.toJSON()
+			var data = model.toJSON();
 			if (data.message == 'success') {
 				this.$el.html(this.template(data));
-				return this;
+			}else{
+				this.$el.html("没有变更")
 			}
+			return this;
 		},
 
 		openTree: function(event) {
@@ -299,15 +301,17 @@ App.Project.Model = {
 		},
 		template: _.templateUrl('/app/project/modelChange/tpls/changeInfo.html'),
 		render: function() {
-			this.$el.html("没有变更");
+			this.$el.html("加载中...");
 			return this;
 		},
 		addDetail: function(model) {
 			var data = model.toJSON();
 			if (data.message == 'success' && data.data.length > 0) {
 				this.$el.html(this.template(data));
-				return this;
+			}else{
+				this.$el.html("没有变更");
 			}
+			return this;
 		}
 	})
 }

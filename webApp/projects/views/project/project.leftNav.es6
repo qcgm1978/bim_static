@@ -48,7 +48,7 @@ App.Project.leftNav = Backbone.View.extend({
 				alert("请使用现代浏览器查看模型");
 				return;
 			}
-			  
+
 			//test
 			//this.typeContentChange();
 			//return;

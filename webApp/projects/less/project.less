@@ -10,7 +10,9 @@
 		}
 	}
 }
-#projectContainer { .ProjectPlanPropertyContainer { .projectNav { .item { width: 65px; }
+#projectContainer {
+
+	.ProjectPlanPropertyContainer { .projectNav { .item { width: 65px; }
 		}
 	}
 	.ProjectQualityNavContainer { .projectNav { .item { width: 54px; }
@@ -35,6 +37,7 @@
 			&.showPropety { margin-right: 398px; }
 			.fileContainer { padding: 10px; height: 100%; box-sizing: border-box;
 				.fileContainerScroll { position: absolute; top: 75px; bottom: 0px; left: 10px; right: 10px; }
+
 				.modelContainer { height: 500px; position: relative; }
 			}
 			.modelContainer { height: 100%; display: none;
@@ -58,9 +61,7 @@
 	.modle { .modleShowHide { transition: all .5s; background: url(/comm/images/commIcon.png) no-repeat 0px -256px; float: right; margin-right: 12px; margin-top: 6px; height: 14px; width: 14px; cursor: pointer;
 			&.down { transform: rotate(180deg); -ms-transform: rotate(180deg); -moz-transform: rotate(180deg); -webkit-transform: rotate(180deg); -o-transform: rotate(180deg); }
 		}
-		.modleName { font-weight: bold; height: 24px; line-height: 24px; padding-left: 12px;
-			.modleNameText { vertical-align: top; width: 95%; }
-		}
+		.modleName { font-weight: bold; height: 24px; line-height: 24px; padding-left: 12px;.modleNameText {    vertical-align: top;width: 95%;} }
 		.modleList { background-color: #eee; border-top: 1px #ccc solid;
 			.modleItem { border-bottom: 1px #ccc solid;
 				.modleName { width: 25%; display: inline-block; box-sizing: border-box; padding-left: 12px; border-right: 1px #ccc solid; }
@@ -81,64 +82,47 @@
 		}
 		tbody { td { padding-top: 10px; padding-bottom: 10px; vertical-align: middle; text-align: center; }
 			.issue { text-align: left;
-				.ckImg { float: left; width: 66px; height: 66px; margin-left: 10px; }
-				.ckHeader { margin-left: 82px; }
+				.ckImg { float: left; padding: 0px 10px; }
+				.ckHeader { margin-left: 84px; }
 			}
 		}
 	}
 	.collBox { overflow: auto;
-		.collTips { text-align: center; padding-top: 30px; font-size: 14px;
-			p { margin: 1em 0; font-size: 1em; }
-			a { color: #006ecf; }
+		.collTips{text-align:center; padding-top:50px; font-size:14px;
+			.nothingIcon{width:80px;height:80px;display:inline-block;background:url(../images/collision.png) no-repeat;background-position:0 0;}
+			.runningIcon{width:80px;height:80px;display:inline-block;background:url(../images/collision.png) no-repeat;background-position:0 -80px;}
+			.failedIcon{width:80px;height:80px;display:inline-block;background:url(../images/collision.png) no-repeat;background-position:0 -160px;}
+			p{margin:1em 0;color:#ccc;}
+			a{color:#006ecf;}
 		}
 		.ckTable { width: 100%; min-width: 390px;
 			th { height: 24px; line-height: 24px; text-align: center; }
 			td, th { border: 1px #ccc solid; }
 			.collList { width: 85%; }
 			.collLev { width: 15%; }
+			.selected{background:#cef0ff;}
 			tbody { td { padding-top: 10px; padding-bottom: 10px; vertical-align: middle; text-align: center; }
 				.collList { text-align: left;
 					.ckImg { float: left; padding: 0px 10px; }
-					.ckHeader { margin-left: 84px; }
-				}
-			}
-		}
-	}
-	.collHead { border-bottom: 1px solid #ccc; margin-bottom: -1px;
-		&:after { content: ''; display: table; clear: both; }
-		.filterBox { width: 85%; float: left; padding: 10px 80px 10px 10px; border-left: 1px solid #ccc; border-right: 1px solid #ccc; position: relative;
-			.currColl { width: 100%; height: 25px; outline: none; }
-			.addButton { position: absolute; right: 10px; top: 10px; width: 60px; height: 25px; text-align: center; line-height: 25px; border: 1px solid #ccc; cursor: pointer;
-				.addIcon { display: inline-block; width: 12px; height: 12px; background: url(/project); }
-			}
-			.collSelect { display: none; position: absolute; z-index: 2; left: 10px; right: 80px; top: 35px; padding: 10px 10px 0; border: 1px solid #ccc; border-top: none; background: #fff; overflow: hidden;
-				.serch { input { width: 100%; height: 25px; outline: none; }
-				}
-				.tips { padding-bottom: 10px; }
-				.collList { .collItem { padding: 5px 0; height: 24px; padding-right: 64px; overflow: hidden; cursor: pointer;
-						// &:hover { background-color: #cef0ff; }
-					}
-					.collName { display: block; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-					.collStatus { width: 64px; color: #b2b2b2; text-align: right; margin-right: -64px; float: right; }
-				}
-				.collPage { width: 100%; border-top: 1px solid #ccc; padding: 5px 0; display: table;
-					.totalNum { display: table-cell; width: 15%; }
-					.page { display: table-cell; width: 85%; text-align: right; }
-					.page { .currPage { margin: 0 5px;
-							.curr { color: #006dce; }
-						}
-						a { color: #006dce; margin: 0 5px;
-							&.disabled { color: #ccc; }
-						}
+					.ckHeader { margin-left: 84px;
+						.ckName{color:#000;}
+						.date{color:#ccc;margin-top:10px;}
 					}
 				}
 			}
+			tfoot{
+				th{padding:0 10px;background:#e4e4e4;text-align:right;}
+				.pointTotal{float:left;}
+				a{color:#006ecf;text-decoration:none;
+					&.disabled{color:#ccc;}
+				}
+				.cur{color:#006ecf;}
+			}
 		}
-		.level { width: 15%; padding: 10px; line-height: 25px; text-align: center; float: left; }
 	}
-	.collFooter { position: absolute; left: 0; bottom: 0px; }
-	.planBox { position: absolute; top: 92px; bottom: 0px; left: 0px; right: 0px;
-		.planContent { height: 100%; overflow: auto;
+	.detailList{height:100%;overflow-x:hidden;overflow-y:auto;padding:46px 0 40px;}
+	.planBox { position: absolute; top: 62px; bottom: 0px; left: 0px; right: 0px;
+		.planContent { height: 100%;
 			.tbPlan { border: 1px #ccc solid; width: 100%; min-width: 398px;
 				th, td { border: 1px #ccc solid; }
 				th { text-align: center; height: 28px; line-height: 28px; }
@@ -152,12 +136,6 @@
 			.operationalMatters { width: 40%; }
 			.start { width: 20%; }
 			.end { width: 20%; }
-		}
-	}
-	.planSearch { width: 100%; min-width: 398px; margin-top: 10px; margin-left: 15px;
-		.dateBox { display: inline-block; position: relative;
-			.iconCal { background: url(../comm/images/commIcon.png) no-repeat 6px -232px; position: absolute; right: 1px; width: 28px; height: 28px; top: 1px; background-color: #eee; border-left: 1px #ccc solid; }
-			input { height: 30px; line-height: 30px; padding-left: 8px; broder: 1px #ddd solid; width: 175px; padding-right: 30px; box-sizing: border-box; }
 		}
 	}
 }
@@ -178,9 +156,6 @@
 	}
 }
 .rightPropertyContentBox { .rightPropertyContent { height: 100%;
-		.ProjectPlanPropertyContainer { height: 100%;
-			.planContainer { height: 100%; margin-top: -50px; padding-top: 50px; }
-		}
 		.designPropetyBox { height: 100%;
 			.projectPropetyContainer { .designProperties { .nullTip { background: url(/projects/images/attrSel.png) no-repeat 50% 100%; padding-top: 200px; height: 50px; line-height: 50px; color: #ccc; font-size: 16px; text-align: center; }
 				}
@@ -189,85 +164,4 @@
 		}
 	}
 }
-.CostReference { .referenceContent { position: absolute; top: 93px; bottom: 0px; left: 0px; right: 0px; overflow: auto; }
-	.referenceSearch { position: relative; padding: 12px;
-		.btnSearch { position: absolute; top: 20px; font-size: 14px; color: #ccc; left: 20px; cursor: pointer; }
-		.txtSearch { min-width: 373px; padding-left: 30px; width: 100%; }
-	}
-	.tbReference { width: 100%; min-width: 398px; margin-left: -1px;
-		th, td { border: 1px #ccc solid; }
-		thead { height: 28px; line-height: 28px;
-			th { text-align: center; }
-		}
-		.listCode { width: 25%; }
-		.listName { width: 56%; }
-		.listCount { width: 18%; }
-		tbody { td { height: 25px; line-height: 25px; padding-left: 5px; }
-		}
-	}
-}
-.rightProperty { .nodeSwitch { background: url(../images/comm/images/commIcon.png) no-repeat 0px -39px; margin-top: 7px; display: inline-block; width: 12px; height: 10px; line-height: 8px; vertical-align: top; text-align: center; cursor: pointer;
-		&.on { background-position: 0px -49px; }
-		&.none { background-position: 0px 100px; }
-	}
-	.step1 { margin-left: 7px; }
-	.step2 { margin-left: 14px; }
-	.step3 { margin-left: 21px; }
-	.code { box-sizing: border-box; display: inline-block; overflow: hidden; width: 100%; text-overflow: ellipsis; vertical-align: top; margin-left: -16px; padding-left: 16px; }
-	.code1 { margin-left: -24px; padding-left: 24px; }
-	.code2 { margin-left: -31px; padding-left: 31px; }
-	.code3 { margin-left: -40px; padding-left: 40px; }
-	.CostChange, .CostVerification { overflow: auto; position: absolute; top: 40px; bottom: 0px; left: 0px; right: 0px; }
-	.tbCostChange { width: 100%; min-width: 395px;
-		td, th { border: 1px #ccc solid; }
-		.name { width: 56%; }
-		.date, .diff { width: 18%; }
-		thead { th { text-align: center; height: 30px; line-height: 30px; }
-		}
-		tbody { td { height: 25px; line-height: 25px; padding-left: 8px;
-				&.diff { padding-left: 0px; text-align: center; }
-			}
-			tr { &.bg { background-color: #eee; }
-			}
-		}
-	}
-	.CostVerification { .title { height: 28px; line-height: 28px; padding-left: 12px; min-width: 395px; width: 100%; }
-	}
-	.tbVerification { width: 100%; min-width: 395px;
-		td, th { border: 1px #ccc solid; height: 25px; line-height: 25px; text-align: center; }
-		.listCode { width: 25%; }
-		.listName { width: 74%; }
-		td { padding-left: 7px; text-align: left; }
-		thead { tr { background-color: #eee; }
-		}
-		tbody { tr { background-color: #ddd; }
-		}
-	}
-}
-.rightProperty .designCollision { height: 100%; position: relative; }
-.designCollSetting { font-size: 14px;
-	.collLabel { display: table; width: 100%; margin-bottom: 10px;
-		.labelName { width: 1%; white-space: nowrap; display: table-cell; padding-right: 5px; }
-		.labelInput { width: 100%; height: 30px; padding: 0 5px; border: 1px solid #ccc; border-radius: 0; outline: none; }
-	}
-	.formTree { padding: 10px;
-		&:after { content: ''; display: table; clear: both; }
-		.panel { width: 50%; float: left; height: 240px; border: 1px solid #ccc; margin-left: -10px; position: relative;
-			.panelHead { position: absolute; padding: 5px; background: #fff; left: 10px; top: -13px; color: #999; }
-		}
-		.panel + .panel { float: right; margin-right: -10px; }
-		.tree { margin: 20px 0 10px; padding: 0 10px; height: 210px; overflow-x: hidden; overflow-y: auto;
-			.treeView { padding-left: 10px;
-				.itemContent { display: block; padding: 4px 0;
-					.nodeSwitch { display: inline-block; width: 10px; height: 10px; margin-right: 5px; background: url(/comm/images/commIcon.png) no-repeat 0 -39px; }
-					.fileIcon { display: inline-block; width: 16px; height: 13px; margin-right: 5px; background: url(/comm/images/commIcon.png) no-repeat 0 -500px; }
-					.inputCheckbox { float: right; }
-				}
-				.itemContent.open { .nodeSwitch { background-position: 0 -49px; }
-					&+.subTree { display: block; }
-				}
-				.subTree { padding-left: 15px; display: none; }
-			}
-		}
-	}
-}
+
