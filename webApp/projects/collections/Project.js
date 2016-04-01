@@ -6,8 +6,8 @@ App.Project = {
 		property: "",
 		fileId: "",
 		projectId: 100,
-		DataModel:null //渲染模型的数据
-		
+		DataModel: null //渲染模型的数据
+
 	},
 
 	// 文件 容器
@@ -55,9 +55,9 @@ App.Project = {
 		App.Project.Settings.CurrentVersion = null;
 		App.Project.Settings.fetchNavType = 'file';
 		App.Project.Settings.projectNav = 'design';
-		App.Project.Settings.fileId = ''; 
+		App.Project.Settings.fileId = '';
 		App.Project.Settings.property = '';
-		App.Project.Settings.property.DataModel=null;
+		App.Project.Settings.property.DataModel = null;
 	},
 
 	//加载版本
@@ -245,18 +245,19 @@ App.Project = {
 		//下载
 		$("#projectContainer").on("click", ".btnFileDownLoad", function() {
 
-			var $selFile = $("#projectContainer .fileContent :checkbox:checked");
-
-			if ($selFile.length > 1) {
-				alert("目前只支持单文件下载");
-				return;
-			}
+			var $selFile = $("#projectContainer .fileContent :checkbox:checked").parent();
 
 			if ($selFile.length < 1) {
 				alert("请选择需要下载的文件");
 				return;
 			}
-			var fileVersionId = $selFile.parent().data("fileversionid");
+
+			var FileIdArr = [];
+			$selFile.each(function(i, item) {
+				FileIdArr.push($(this).data("fileversionid"));
+			});
+
+			var fileVersionId = FileIdArr.join(",");
 
 			// //请求数据
 			var data = {
@@ -298,7 +299,7 @@ App.Project = {
 	//根据类型渲染数据
 	renderModelContentByType: function() {
 
-		  
+
 		var type = App.Project.Settings.projectNav;
 		//设计
 		if (type == "design") {
@@ -392,7 +393,6 @@ App.Project = {
 			$("#projectContainer .projectNavModelContainer").html(navHtml);
 		});
 	}
-
 
 
 

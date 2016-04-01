@@ -19,15 +19,13 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 
 	},
 
-	render: function() {
-
+	render: function() { 
 		var data = this.model.toJSON();
 		this.$el.html(this.template(data)).data("status", data.status);
 		if (data.isAdd) {
-			this.$el.addClass('createNew')
-			if (data.folder) {
-				App.ResourceModel.afterCreateNewFolder(data,data.parentId);
-			}
+			this.$el.addClass('createNew');
+		} else{
+			this.$el.removeClass('createNew');
 		}
 		this.bindContext();
 		return this;
@@ -261,6 +259,7 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 			if (data.message == "success") {
 
 				var models = App.ResourceModel.FileCollection.models;
+				data.data.isAdd=false;
 				//修改数据
 				App.ResourceModel.FileCollection.last().set(data.data); 
 

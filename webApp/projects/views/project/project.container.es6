@@ -9,7 +9,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 	events: {
 		"click .breadItem": "breadItemClick",
 		"click .slideBar": "navBarShowAndHide",
-		"mousedown .dragSize": "dragSize",
+		"mousedown .dragSize": "dragSize", 
 		"click .projectVersionList .container .item": "changeVersion",
 		"click .projectVersionList .nav .item": "changeVersionTab"
 	},
