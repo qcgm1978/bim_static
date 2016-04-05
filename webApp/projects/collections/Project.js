@@ -392,6 +392,25 @@ App.Project = {
 			var navHtml = new App.Comm.TreeViewMar(data);
 			$("#projectContainer .projectNavModelContainer").html(navHtml);
 		});
+	},
+
+	//右侧属性是否渲染
+	renderProperty: function() {
+		var model;
+		if (App.Project.Settings.ModelObj) {
+			model = App.Project.Settings.ModelObj;
+		} else {
+			return;
+		}
+
+		App.Project.DesignAttr.PropertiesCollection.projectId = App.Project.Settings.projectId;
+		App.Project.DesignAttr.PropertiesCollection.projectVersionId = App.Project.Settings.CurrentVersion.id;
+		App.Project.DesignAttr.PropertiesCollection.fetch({
+			data: {
+				elementId: model.intersect.userId,
+				sceneId: model.intersect.object.userData.sceneId
+			}
+		});
 	}
 
 

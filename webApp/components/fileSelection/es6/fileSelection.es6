@@ -11,12 +11,20 @@
 		//默认参数
 		var defaults = {
 			btnText: "确&nbsp;定",
+			isEnable: true, // 是否启用  如果不启用 只可以查看 不能选择 
+			fileIds: "", // fileids 有值时，默认isEndable 为 false
 			mask: true,
+			http: "http://bim.wanda.cn",
 			callback: null
 		}
 
 		//合并参数
 		this.Settings = $.extend(defaults, options);
+
+		//查看时禁用
+		if (this.Settings.fileIds) {
+			this.Settings.isEnable = false;
+		}
 
 		if (!this.Settings.projectId) {
 			alert("缺少参数projectId");
@@ -26,10 +34,12 @@
 			alert("缺少参数projectVersionId");
 			return false;
 		}
-		var url = "http://bim.wanda.cn/doc/" + this.Settings.projectId + "/" + this.Settings.projectVersionId + "/file";
+		var url = this.Settings.http + "/doc/" + this.Settings.projectId + "/" + this.Settings.projectVersionId + "/file";
 		this.Settings.treeUrl = url + "/tree";
 		this.Settings.nodeUrl = url + "/children";
 		this.Settings.downLoadUrl = url + "/data";
+		this.Settings.reverseTree = url += "/select";
+		this.Settings.modelPrevView = this.Settings.http + "/static/dist/app/project/single/filePreview.html?projectId=" + this.Settings.projectId + "&projectVersionId=" + this.Settings.projectVersionId;
 		//初始化
 		this.init();
 
@@ -39,8 +49,6 @@
 			getFileId: this.getFileId
 		}
 
-
-
 	}
 
 	FileSelection.prototype = {
@@ -49,6 +57,9 @@
 		init() {
 				//生成Dialog
 				this.buildDialog();
+				if (this.Settings.fileIds) {
+					this.loadData(this.Settings.reverseTree + "?fileVersionId=" + this.Settings.fileIds, this.renderRightTree);
+				}
 				//加载数据
 				this.loadData(this.Settings.treeUrl, this.renderTree);
 				//事件初始化
@@ -59,6 +70,7 @@
 			buildDialog() {
 
 				var $dialog = this.$dialog = $('<div id="fileSelectionDialog"/>'),
+					Settings = this.Settings,
 					$header = $('<div class="header"/>').html('<i class="bg close" title="关闭"></i><h2>请选择申请变更的文件</h2> '),
 					$content = $('<div class="container" />').html(' <div class="loading">正在加载，请稍候……</div> <div class="leftFile"></div><div class="rightEnter"></div> <div class="contentBox"></div>  '),
 					$bottom = $('<div class="footer"/>').html('<input type="button" class="btnEnter myBtn myBtn-primary" value="' + this.Settings.btnText + '" />');
@@ -76,8 +88,16 @@
 				$content.find('.contentBox').html(sb);
 
 				var rightEnter = '<div class="title">';
-				rightEnter += '<button class="btnEnter myBtn myBtn-default"><i class="bg ckBg"></i> 选择文件</button> ';
-				rightEnter += '<span class="fileSelText">已选<span class="fileCount">0</span>文件</span>';
+
+				if (Settings.isEnable) {
+					rightEnter += '<button class="btnEnter myBtn myBtn-default"><i class="bg ckBg"></i> 选择文件</button> ';
+				}
+				var count = 0;
+				if (Settings.fileids) {
+					count = Settings.fileids.split(",").length;
+				}
+
+				rightEnter += '<span class="fileSelText">已选<span class="fileCount">' + count + '</span>文件</span>';
 				rightEnter += '</div>';
 				rightEnter += '<div class="fileEnterBox"> <div class="treeViewMar"><ul class="treeViewMarUl"><li class="null">未选择</li></ul>  </div>	 </div>';
 				$content.find('.rightEnter').html(rightEnter);
@@ -86,14 +106,14 @@
 				$dialog.append($content);
 				$dialog.append($bottom);
 
-				if (this.Settings.mask) {
+				if (Settings.mask) {
 					$("body").append('<div id="fileSelectionMask" />');
 				}
 				$("body").append($dialog);
-				if (this.Settings.isDrag) {
+				if (Settings.isDrag) {
 					$header.addClass("drag");
 				}
-				this.Settings.$dialog = $dialog;
+				Settings.$dialog = $dialog;
 
 			},
 
@@ -120,6 +140,13 @@
 
 				});
 
+			},
+
+			//生成左侧树
+			renderRightTree(data) {
+				var html = this.treeRoot(data);
+				$(".rightEnter .fileEnterBox").html(html);
+				console.log(data);
 			},
 
 			//渲染tree
@@ -162,8 +189,13 @@
 
 				var sb = "";
 
+				if (item.folder) {
+					sb += '<div class="item-content" >';
+				} else {
+					sb += '<div class="item-content file" >';
+				}
 				//内容
-				sb += '<div class="item-content">';
+
 
 				if (item.children) {
 					sb += '<i class="nodeSwitch bg"></i> ';
@@ -171,13 +203,13 @@
 					sb += '<i class="noneSwitch"></i> ';
 				}
 
-				sb += '<i class="folderIcon bg"></i>';
-
-
+				if (item.folder) {
+					sb += '<i class="folderIcon bg"></i>';
+				}
 
 				var dataItem = $.extend({}, item);
 				delete dataItem.children;
-				sb += '<span class="text-field overflowEllipsis" data-fileversionid="' + item.fileVersionId + '" data-id="' + item.id + '">' + item.name + '</span> ';
+				sb += '<span  class="text-field overflowEllipsis" data-fileversionid="' + item.fileVersionId + '" data-id="' + item.id + '">' + item.name + '</span> ';
 
 				sb += '</div>';
 
@@ -248,10 +280,10 @@
 
 					if ($this.hasClass('selected')) {
 						$this.removeClass('selected');
-						$dialog.find(".fileBody .ck").removeClass('selected');
+						$dialog.find(".fileBody .ck:not(.disable)").removeClass('selected');
 					} else {
 						$this.addClass('selected');
-						$dialog.find(".fileBody .ck").addClass('selected');
+						$dialog.find(".fileBody .ck:not(.disable)").addClass('selected');
 
 					}
 
@@ -259,7 +291,30 @@
 
 				//单选
 				$dialog.on("click", ".fileBody .ck", function() {
+					//禁用
+					if ($(this).hasClass('disable')) {
+						return;
+					}
 					$(this).toggleClass('selected');
+				});
+
+				//点击文件夹
+				$dialog.on("click", ".fileBody span.fileName", function() {
+
+					var id = $(this).closest('li').data("id");
+
+					var $leftItem = $dialog.find(".leftFile span[data-id='" + id + "']");
+
+					if ($leftItem.length > 0) {
+
+						$nodeSwitch = $leftItem.parent().find(".nodeSwitch");
+
+						if ($nodeSwitch.length > 0 && !$nodeSwitch.hasClass('on')) {
+							$nodeSwitch.click();
+						}
+						$leftItem.click();
+					}
+
 				});
 
 				//全选
@@ -325,13 +380,13 @@
 
 
 				//esc 
-				$(document).on("keyup.FileSelection",function(event){
-					if (event.keyCode==27) {
+				$(document).on("keyup.FileSelection", function(event) {
+					if (event.keyCode == 27) {
 						$dialog.find(".close").trigger('click');
 					}
 				});
 
-			 
+
 
 				//拖拽
 				// $dialog.on("mousedown",".header.drag",function(event){
@@ -343,11 +398,16 @@
 			//确认选择的文件
 			enterSelect() {
 
+
+
 				var $dialog = this.Settings.$dialog,
 					treeFolders = $dialog.find(".treeViewScroll .selected").parents("li"),
 					$content, folderId, $trees, $tree, $rightItem, isAppend = false,
-
 					$deep;
+
+				if ($dialog.find(".fileBody .selected").length <= 0) {
+					return;
+				}
 				//遍历所有父类
 				treeFolders.each(function(i, item) {
 
@@ -385,6 +445,7 @@
 
 				var $fileBody = $dialog.find(".fileBody .selected").parents("li"),
 					id, sb = '',
+					fileVersionId,
 					$item, bodyCount = $fileBody.length - 1;
 
 
@@ -392,6 +453,7 @@
 					$item = $($fileBody[i]);
 
 					id = $item.data("id");
+					fileVersionId = $item.data("fileversionid");
 
 					if (isAppend) {
 						$rightItem = $dialog.find(".rightEnter .text-field[data-id=" + id + "]");
@@ -405,7 +467,7 @@
 					if ($item.find(".folder").length > 0) {
 						sb += '<i class="nodeSwitch bg on"></i> <i class="folderIcon bg"></i>';
 					}
-					sb += '<span class="text-field overflowEllipsis "data-id="' + id + '">' + $item.find(".fileName").text() + '</span> ';
+					sb += '<span class="text-field overflowEllipsis " data-id="' + id + '" data-fileversionid="' + fileVersionId + '">' + $item.find(".fileName").text() + '</span> ';
 					sb += '<i class="bg delFile"></i></div></li>';
 				}
 
@@ -451,19 +513,32 @@
 						count = list.length,
 						trs = "",
 						op, folder,
-						item;
-					if (count > 0) { 
+						url = this.Settings.modelPrevView,
+						item, isLock,status;
+					if (count > 0) {
 						for (var i = 0; i < count; i++) {
 							item = list[i];
-							trs += '<li data-id="' + item.id + '">';
-							trs += ' <span class="ckAll"> <i class="ck bg" data-fileversionid="' + item.fileVersionId + '"></i> </span>';
+							trs += '<li data-id="' + item.id + '" data-fileversionid="' + item.fileVersionId + '">';
+							isLock = item.locked ? "disable" : "";
+							trs += ' <span class="ckAll"> <i class="ck bg ' + isLock + '" data-fileversionid="' + item.fileVersionId + '"></i> </span>';
 							trs += '<span class="name">';
 							folder = item.folder ? "folder" : "";
 							trs += '<i class="fileType bg ' + folder + '"></i>';
-							trs += '<span class="overflowEllipsis fileName">' + item.name + '</span>';
+							if (folder) {
+								trs += '<span class="overflowEllipsis fileName">' + item.name + '</span>';
+							} else {
+								trs += '<a target="_blank" href="' + url + "&id=" + item.id + '" class="overflowEllipsis fileName">' + item.name + '</a>';
+							}
+
 							trs += '</span>';
 
-							trs += '<span class="status">' + this.convertStatus(item.status) + '</span>';
+							if (item.locked) {
+								status="已锁定";
+							}else{
+								status=this.convertStatus(item.status);
+							} 
+
+							trs += '<span class="status">' + status + '</span>';
 							op = item.creatorName ? item.creatorName : "";
 							trs += '<span class="op"><span class="overflowEllipsis opName">' + op + '</span></span>';
 							trs += '<span class="size">' + this.formatSize(item.length) + '</span>';
@@ -539,6 +614,7 @@
 					$text = $(this).find(".text-field");
 					FileIdArr.push({
 						fileId: $text.data("id"),
+						fileVersionId: $text.data("fileversionid"),
 						fileName: $text.text()
 					});
 				});

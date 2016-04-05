@@ -107,23 +107,19 @@ App.Project = {
 
 					App.Project.Settings.modelId = data.data.modelId;
 					App.Project.Settings.Viewer.on("click", function(model) {
+						 
 						if (!model.intersect) {
 							return;
 						}
 
 						//渲染属性
-						App.Project.renderAttr(model.intersect.userId, model.intersect.object.userData.sceneId);
+						App.Project.renderAttr(model.intersect.userId);
 
 					});
 
 
-				} else {
-					if (data.data.modelStatus == null) {
-						alert("模型未上传");
-					} else {
-						alert("模型转换中");
-					}
-
+				} else { 
+					alert("模型转换中"); 
 				}
 			} else {
 				alert(data.message);

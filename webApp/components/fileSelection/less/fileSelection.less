@@ -15,7 +15,8 @@
 		.rightEnter { float: right; width: 220px;
 			.title { height: 50px; background-color: #ddd; line-height: 50px; }
 			.fileEnterBox { height: 450px; border-bottom: 1px #ccc solid; overflow: auto; }
-			.btnEnter { margin-left: 15px; margin-right: 10px; }
+			.btnEnter { margin-left: 15px;}
+			.fileSelText{margin-left: 12px;}
 			.fileCount { color: red; margin: 0px 2px; }
 			.null { font-size: 18px; padding-top: 100px; color: #ccc; text-align: center; }
 			.ckBg { display: inline-block; width: 14px; height: 14px; background-position: 0px -118px; vertical-align: -1px; }
@@ -35,6 +36,7 @@
 				.size { width: 82px; }
 				.ck { display: inline-block; width: 14px; height: 14px; background-position: 0px -46px;
 					&.selected { background-position: 0px -32px; }
+					&.disable{background-position: 0px -74px;}
 				}
 				.downBg { display: inline-block; width: 15px; height: 14px; background-position: 0px -88px; vertical-align: top; margin-top: 1px; }
 				li { height: 50px; background-color: #eee; line-height: 50px; }
@@ -49,6 +51,9 @@
 				.null { border-bottom: 0; font-size: 18px; color: #ccc; line-height: 150px; }
 				.error { color: red; }
 				span { &.ckAll, &.name, &.status, &.op, &.date, &.size { height: 38px; }
+				}
+				.fileName:hover{
+					text-decoration: underline;cursor: pointer;
 				}
 			}
 			.treeViewScroll { height: 100%; overflow: auto; }
@@ -96,3 +101,5 @@
 	}
 }
 .overflowEllipsis { display: inline-block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+ 
+ 

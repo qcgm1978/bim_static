@@ -14,10 +14,12 @@
 	<script type="text/javascript" src="./es6/fileSelection.es6"></script>
 
 	<script type="text/javascript">
+	var Files;
 		$("#show").click(function(){
-			FileSelection({
+			Files=FileSelection({
 				isDrag:true,
 				projectId:1,
+				//fileIds:"785840942391488",
 				callback:function(){
 
 				},
