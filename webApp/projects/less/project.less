@@ -20,7 +20,7 @@
 #projectDesignContent { margin-left: 240px; position: relative; height: 100%; }
 .projectContainerApp { height: 100%;
 	.projectContent { height: 100%;
-		.leftNav { float: left; width: 238px; border: 1px #ccc solid; position: absolute; top: 40px; bottom: 0px; background-color: #fff;
+		.leftNav { float: left; width: 238px; border: 1px #ccc solid; position: absolute; top: 0px; bottom: 0px; background-color: #fff;
 			.leftNavContent { height: 100%; }
 			.projectNavContentBox { margin-top: 1px; position: absolute; top: 40px; width: 100%; bottom: 0px;
 				.projectModelNavContent { display: none; }
@@ -29,7 +29,7 @@
 		}
 		.rightProperty { border: 1px #ddd solid; display: none; position: absolute; right: 0px; top: 40px; bottom: 0px; background-color: #fff; z-index: 600;
 			.rightPropertyContentBox { height: 100%; position: relative; }
-			&.showPropety { width: 398px; display: block; }
+			&.showPropety { display: block; }
 		}
 		.projectCotent { position: relative; height: 100%; margin-left: 240px;
 			&.showPropety { margin-right: 398px; }
@@ -157,5 +157,13 @@
 	.nullTip { background: url(/projects/images/attrSel.png) no-repeat 50% 100%; padding-top: 200px; height: 50px; line-height: 50px; color: #ccc; font-size: 16px; text-align: center; }
 	.rightPropertyContent { height: 100%;
 		.designPropetyBox { height: 100%; }
+	}
+}
+.breadcrumbNav { .fileModelList { display: none;    left: 12px; position: absolute; background-color: #fff; top: 32px; width: 126px; border: 1px #ccc solid;
+		.fileNavUl { padding: 6px 0px;
+			li { padding-left: 12px; cursor: pointer; color: #666; height: 26px; line-height: 26px; font-size: 12px;
+				&:hover { background-color: #A8DBFD; }
+			}
+		}
 	}
 }

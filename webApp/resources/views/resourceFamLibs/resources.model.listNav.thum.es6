@@ -22,21 +22,21 @@ App.ResourceModel.ThumContent = Backbone.View.extend({
 
 	//添加单个文件
 	addOneFile: function(model) {
-		
+
 		var view = new App.ResourceModel.ThumDetail({
 			model: model
 		});
 
-		var data=model.toJSON();
-		if (data.isAdd) {
-			this.$el.find(".thumContent").prepend(view.render().el);
-			if (data.folder) {
-				App.ResourceModel.afterCreateNewFolder(data,data.parentId);
-			}
-		} else {
-			this.$el.find(".thumContent").append(view.render().el);
-		} 
-
+		var data = model.toJSON();
+		// if (data.isAdd) {
+		// 	this.$el.find(".thumContent").prepend(view.render().el);
+		// 	if (data.folder) {
+		// 		App.ResourceModel.afterCreateNewFolder(data,data.parentId);
+		// 	}
+		// } else {
+		// 	this.$el.find(".thumContent").append(view.render().el);
+		// } 
+		this.$el.find(".thumContent").prepend(view.render().el);
 		this.bindScroll();
 	},
 

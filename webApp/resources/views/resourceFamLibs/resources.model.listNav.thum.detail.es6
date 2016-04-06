@@ -28,6 +28,7 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 		var data = this.model.toJSON();
 
 		this.$el.html(this.template(data)).data("status", data.status);
+		
 		if (data.isAdd) {
 			this.$el.addClass('createNew');
 		} else {
@@ -186,7 +187,7 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 	},
 
 	//修改名称 或者创建
-	enterEditNameOrCreateNew: function(event) {
+	enterEditNameOrCreateNew: function(event) { 
 
 		var $item = $(event.target).closest(".item");
 

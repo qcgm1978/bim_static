@@ -293,6 +293,11 @@ App.Project = {
 			if ($target.closest(".breadItem.projectVersion").length <= 0) {
 				$(".breadItem .projectVersionList").hide();
 			}
+
+			//面包屑 切换 文件 模型 浏览器 
+			if ($target.closest(".breadItem.fileModelNav").length <= 0) {
+				$(".breadItem .fileModelList").hide();
+			}
 		});
 	},
 
@@ -321,9 +326,6 @@ App.Project = {
 			$("#projectContainer .rightPropertyContent").html(new App.Project.ProjectQualityProperty().render().$el);
 
 		}
-
-		//添加样式 弹出属性层
-		$("#projectContainer").find(".rightProperty").addClass("showPropety").end().find(".projectCotent").addClass("showPropety")
 
 		//触发数据加载
 		$("#projectContainer .rightPropertyContent .projectNav .item:first").click();
