@@ -119,7 +119,7 @@ App.Comm.TreeViewMar.prototype.treeNode = function(item) {
 	//内容
 	sb.Append('<div class="item-content"> ');
 
-	if (item.children) {
+	if (item.children&&item.children.length>0) {
 		sb.Append('<i class="nodeSwitch"></i> ');
 	} else {
 		sb.Append('<i class="noneSwitch"></i> ');

@@ -15,7 +15,7 @@ App.ResourcesNav.App = Backbone.View.extend({
 
 		var type = App.ResourcesNav.Settings.type;
 
-	 
+
 		if (type == "standardLibs") {
 			//获取标准模型库数据
 			this.fetchStandardLibs();
@@ -33,7 +33,7 @@ App.ResourcesNav.App = Backbone.View.extend({
 			//清单库
 			this.$el.append(new App.ResourcesNav.ManifestLibs().render().el);
 		}
-
+		this.bindScroll();
 		return this;
 	},
 
@@ -79,10 +79,9 @@ App.ResourcesNav.App = Backbone.View.extend({
 	},
 
 	//只是加载数据
-	onlyLoadStandardLibsData: function() {
+	onlyLoadStandardLibsData: function() { 
 
-		//$("#standardLibs").find(".standarBody .standar").empty();
-
+		App.ResourcesNav.StandardLibsCollection.reset();
 		App.ResourcesNav.StandardLibsCollection.fetch({
 			data: {
 				pageIndex: App.ResourcesNav.Settings.pageIndex,
@@ -133,11 +132,25 @@ App.ResourcesNav.App = Backbone.View.extend({
 	},
 
 	onlyLoadFamLibsData: function() {
+		App.ResourcesNav.FamLibsCollection.reset();
 		App.ResourcesNav.FamLibsCollection.fetch({
 			data: {
 				pageIndex: App.ResourcesNav.Settings.pageIndex,
 				pageItemCount: App.Comm.Settings.pageItemCount
 			}
+		});
+	},
+
+	bindScroll() {
+		this.$el.find(".standarBodyScroll").mCustomScrollbar({
+			set_height: "100%",
+			set_width: "100%",
+			theme: 'minimal-dark',
+			axis: 'y',
+			keyboard: {
+				enable: true
+			},
+			scrollInertia: 0
 		});
 	}
 

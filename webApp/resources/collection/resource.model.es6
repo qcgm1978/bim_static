@@ -326,14 +326,14 @@ App.ResourceModel = {
 
 		if ($treeViewMarUl.length > 0) {
 			var $span = $treeViewMarUl.find("span[data-id='" + file.id + "']");
-			if ($span.length > 0) {
+			if ($span.length > 0) { 
 				var $li = $span.closest('li'),
 					$parent = $li.parent();
 				$li.remove();
 				//没有文件夹了
-				// if ($parent.find("li").length<=0) {
-
-				// }
+				if ($parent.find("li").length<=0) {
+					$parent.parent().children(".item-content").find(".nodeSwitch").removeClass().addClass("noneSwitch");
+				}
 
 			}
 
