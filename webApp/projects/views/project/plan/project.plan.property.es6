@@ -27,6 +27,8 @@ App.Project.ProjectPlanProperty = Backbone.View.extend({
 		var $target = $(event.target),
 			type = $target.data("type");
 		$target.addClass('selected').siblings().removeClass('selected');
+		
+		App.Project.Settings.property = type;
 
 		if (type == "model") {
 			//碰撞
@@ -52,11 +54,12 @@ App.Project.ProjectPlanProperty = Backbone.View.extend({
 			this.$el.find(".planInterest").show().siblings().hide();
 			App.Project.PlanAttr.PlanInspectionCollection.fetch();
 
-		} else if (type == "properties") {
+		} else if (type == "poperties") {
 			//属性
 
 			this.$el.find(".planProperties").show().siblings().hide();
-			App.Project.PlanAttr.PlanPropertiesCollection.fetch();
+		 	//属性渲染
+			App.Project.renderProperty();
 
 		}
 

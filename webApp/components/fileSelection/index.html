@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>组件</title>
+	<link rel="stylesheet" href="./less/fileSelection.less">
+</head>
+<body>
+	
+ <button id="show">show</button>
+
+	<script type="text/javascript" src="./libs/jquery/jquery-1.12.0.min.js"></script>
+	<script type="text/javascript" src="./es6/fileSelection.es6"></script>
+
+	<script type="text/javascript">
+	var Files;
+		$("#show").click(function(){
+			Files=FileSelection({
+				isDrag:true,
+				projectId:1,
+				//fileIds:"785840942391488",
+				callback:function(){
+
+				},
+				projectVersionId:784306105035931
+			});
+		});
+	</script>
+</body>
+</html>

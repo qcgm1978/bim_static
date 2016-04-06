@@ -235,6 +235,20 @@ fis.match('/flow/**.{less,css}', {
 });
 
 
+//文件选择组件 配置
+
+fis.match('/components/fileSelection/index.html',{
+     release: '/static/dist/components/fileSelection/index.html'
+}); 
+fis.match('/components/fileSelection/libs/**.{js,es6}',{
+     packTo: '/static/dist/components/fileSelection/libs/libs.js'
+});
+fis.match('/components/fileSelection/**.{less,css}',{
+     packTo: '/static/dist/components/fileSelection/css/fileSelection.css'
+});
+fis.match('/components/fileSelection/es6/**.{es6,js}',{
+     packTo: '/static/dist/components/fileSelection/js/fileSelection.js'
+});
 // 项目预览
 
 fis.match('/app/project/single/**.{js,es6}', {

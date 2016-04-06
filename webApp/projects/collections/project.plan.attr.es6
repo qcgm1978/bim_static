@@ -88,11 +88,11 @@ App.Project.PlanAttr={
 			}
 		}),
 
-		urlType:"fetchPlanProperties",
+		urlType:"fetchDesignProperties",
 
 		parse:function(response){
 			if (response.message == "success") {
-                 return response.data;
+                 return response;
              }
 		}
 

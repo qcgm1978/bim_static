@@ -11,6 +11,11 @@ App.Project.FileContainer=Backbone.View.extend({
 		this.listenTo(App.Project.FileCollection,"add",this.addOneFile); 
 	},
 
+	events:{
+		"click .header .ckAll":"ckAll"
+		 
+	},
+
 	template:_.templateUrl("/projects/tpls/project/project.container.file.html",true),
 
 	//渲染
@@ -18,6 +23,10 @@ App.Project.FileContainer=Backbone.View.extend({
 		this.$el.html(this.template);
 		return this;
 	},  
+
+	ckAll(event){ 
+		this.$el.find(".fileContent .ckAll").prop("checked",event.target.checked);
+	}, 
 
 
 	//添加单个li

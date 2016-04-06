@@ -26,6 +26,7 @@ App.Project.ProjectCostProperty=Backbone.View.extend({
 		var $target = $(event.target),
 			type = $target.data("type");
 		$target.addClass('selected').siblings().removeClass('selected'); 
+		App.Project.Settings.property = type;
 
 		if (type == "reference") {
 			//清单
@@ -46,7 +47,8 @@ App.Project.ProjectCostProperty=Backbone.View.extend({
 		}  else if (type == "poperties") {
 			//属性
 			this.$el.find(".CostProperties").show().siblings().hide();
-			App.Project.CostAttr.PropertiesCollection.fetch();
+			//属性渲染
+			App.Project.renderProperty();
 
 		}
 	}

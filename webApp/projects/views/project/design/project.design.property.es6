@@ -37,26 +37,13 @@ App.Project.ProjectDesignPropety = Backbone.View.extend({
 			this.$el.find(".designVerification").show().siblings().hide();
 			App.Project.DesignAttr.VerificationCollection.fetch();
 
-		} else if (type == "attr") {
+		} else if (type == "poperties") {
 			//属性
 
 			this.$el.find(".designProperties").show().siblings().hide();
 
-			var model;
-			if (App.Project.Settings.ModelObj) {
-				model = App.Project.Settings.ModelObj;
-			}else{
-				return;
-			}
-
-			App.Project.DesignAttr.PropertiesCollection.projectId = App.Project.Settings.projectId;
-			App.Project.DesignAttr.PropertiesCollection.projectVersionId = App.Project.Settings.CurrentVersion.id;
-			App.Project.DesignAttr.PropertiesCollection.fetch({
-				data: {
-					elementId: model.intersect.userId,
-					sceneId: model.intersect.object.userData.sceneId
-				}
-			});
+			//属性渲染
+			App.Project.renderProperty();
 
 		}
 

@@ -76,9 +76,9 @@ App.Project.leftNav = Backbone.View.extend({
 		var that = this;
 
 
-		// App.Project.Settings.modelId= "e0c63f125d3b5418530c78df2ba5aef1";
-		// this.renderModel();
-		// return;
+		//App.Project.Settings.modelId= "e0c63f125d3b5418530c78df2ba5aef1";
+		//this.renderModel();
+		//return;
 
 
 		App.Comm.ajax(data, function(data) {
@@ -157,31 +157,71 @@ App.Project.leftNav = Backbone.View.extend({
 
 		viewer.on("click", function(model) {
 			App.Project.Settings.ModelObj = null;
+
 			if (!model.intersect) {
-				$("#projectContainer .designProperties").html('<div class="nullTip">请选择构件</div>');
+				that.resetProperNull();
 				return;
-			}
+			};
 
 			App.Project.Settings.ModelObj = model;
 			//App.Project.Settings.modelId = model.userId;
-			//设计
-			if (App.Project.Settings.projectNav == "design") {
-				//属性
-				if (App.Project.Settings.property == "attr") {
-
-					App.Project.DesignAttr.PropertiesCollection.projectId = App.Project.Settings.projectId;
-					App.Project.DesignAttr.PropertiesCollection.projectVersionId = App.Project.Settings.CurrentVersion.id;
-					App.Project.DesignAttr.PropertiesCollection.fetch({
-						data: {
-							elementId: model.intersect.userId,
-							sceneId: model.intersect.object.userData.sceneId
-						}
-					});
-				}
-
-			}
+			that.viewerPropertyRender();
 
 		});
+	},
+
+	//重置 内容为空
+	resetProperNull() {
+
+		var projectNav = App.Project.Settings.projectNav,
+			property = App.Project.Settings.property,
+			$el;
+		if (property == "poperties") {
+			
+			if (projectNav == "design") {
+				//设计
+				$el = $(".rightPropertyContentBox .designProperties");
+
+			} else if (projectNav == "cost") {
+				//成本
+				$el = $(".rightPropertyContentBox .CostProperties");
+
+			} else if (projectNav == "quality") {
+				//质量
+				$el = $(".rightPropertyContentBox .QualityProperties");
+			} else if (projectNav == "plan") {
+				//计划
+				$el = $(".rightPropertyContentBox .planProperties");
+			}
+		}
+		if ($el) {
+			$el.html('<div class="nullTip">请选择构件</div>');
+		} 
+
+	},
+
+	//设置渲染
+	viewerPropertyRender() {
+
+
+		var projectNav = App.Project.Settings.projectNav,
+			property = App.Project.Settings.property,
+			Intersect = App.Project.Settings.ModelObj.intersect;
+
+		//属性，四个tab 都一样
+		if (((projectNav == "design" || projectNav == "cost" || projectNav == "quality" || projectNav == "plan") && property == "poperties")) {
+
+			App.Project.DesignAttr.PropertiesCollection.projectId = App.Project.Settings.projectId;
+			App.Project.DesignAttr.PropertiesCollection.projectVersionId = App.Project.Settings.CurrentVersion.id;
+			App.Project.DesignAttr.PropertiesCollection.fetch({
+				data: {
+					elementId: Intersect.userId,
+					sceneId: Intersect.object.userData.sceneId
+				}
+			});
+		}
+
+
 	}
 
 

@@ -10,8 +10,8 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 		"click .text": "fileClick",
 		"click .btnEnter": "enterEditNameOrCreateNew",
 		"click .btnCalcel": "calcelEditName",
-		"click .ckMe":"itemSelected",
-		"keyup .txtEdit":"enterCreateNew"
+		"click .ckMe": "itemSelected",
+		"keyup .txtEdit": "enterCreateNew"
 
 	},
 
@@ -29,19 +29,21 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 
 		this.$el.html(this.template(data)).data("status", data.status);
 		if (data.isAdd) {
-			this.$el.addClass('createNew')
+			this.$el.addClass('createNew');
+		} else {
+			this.$el.removeClass('createNew')
 		}
 		this.bindContext();
 		return this;
-	}, 
+	},
 
-	itemSelected(event){
+	itemSelected(event) {
 
-		var $target=$(event.target); 
+		var $target = $(event.target);
 
-		$target.closest(".item")[$target.prop("checked")?'addClass':'removeClass']('selected');
+		$target.closest(".item")[$target.prop("checked") ? 'addClass' : 'removeClass']('selected');
 
-		 
+
 	},
 
 	//文件或者文件夹点击
@@ -75,8 +77,8 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 		var that = this;
 		this.$el.contextMenu('listContext', {
 			//显示 回调
-			onShowMenuCallback: function(event) { 
-				 
+			onShowMenuCallback: function(event) {
+
 				var $item = $(event.target).closest(".item");
 				$("#reNameModel").removeClass('disable');
 				//预览
@@ -141,15 +143,15 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 				},
 				'reNameModel': function(item) {
 
-					 
+
 					//重命名
 					let $reNameModel = $("#reNameModel");
 					//不可重命名状态
-					if ($reNameModel.hasClass('disable')) { 
+					if ($reNameModel.hasClass('disable')) {
 						return;
 					}
 
-					var $prevEdit =  $("#resourceThumContent .thumContent .txtEdit");
+					var $prevEdit = $("#resourceThumContent .thumContent .txtEdit");
 					if ($prevEdit.length > 0) {
 						that.cancelEdit($prevEdit);
 					}
@@ -169,15 +171,15 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 	//取消修改名称
 	calcelEditName: function(event) {
 
-		var $prevEdit = this.$el.find(".txtEdit"); 
+		var $prevEdit = this.$el.find(".txtEdit");
 		if ($prevEdit.length > 0) {
 			this.cancelEdit($prevEdit);
 		}
 	},
 
 	//回车创建
-	enterCreateNew(event){
-		if (event.keyCode==13) {
+	enterCreateNew(event) {
+		if (event.keyCode == 13) {
 			this.enterEditNameOrCreateNew(event);
 		}
 
@@ -274,10 +276,10 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 		};
 
 		App.Comm.ajax(data, function(data) {
-			if (data.message == "success") { 
+			if (data.message == "success") {
 				//修改数据
 				App.ResourceModel.FileThumCollection.last().set(data.data);
-				App.ResourceModel.afterCreateNewFolder(data.data,parentId); 
+				App.ResourceModel.afterCreateNewFolder(data.data, parentId);
 				//tree name
 				//$("#resourceModelLeftNav .treeViewMarUl span[data-id='" + id + "']").text(name); 
 			}

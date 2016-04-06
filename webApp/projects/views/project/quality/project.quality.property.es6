@@ -29,6 +29,7 @@ App.Project.ProjectQualityProperty=Backbone.View.extend({
 		var $target = $(event.target),
 			type = $target.data("type");
 		$target.addClass('selected').siblings().removeClass('selected'); 
+			App.Project.Settings.property = type;
 
 		if (type == "materialequipment") {
 			//材料设备
@@ -56,10 +57,11 @@ App.Project.ProjectQualityProperty=Backbone.View.extend({
 			this.$el.find(".QualityConcerns").show().siblings().hide();
 			App.Project.QualityAttr.ConcernsCollection.fetch();
 
-		}else if (type == "properties") {
+		}else if (type == "poperties") {
 			//属性
 			this.$el.find(".QualityProperties").show().siblings().hide();
-			App.Project.QualityAttr.PropertiesCollection.fetch();
+			//属性渲染
+			App.Project.renderProperty();
 
 		}
 	}

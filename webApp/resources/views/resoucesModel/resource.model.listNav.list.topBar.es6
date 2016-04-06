@@ -26,30 +26,33 @@
  	fileDownLoad: function() {
 
  		var $resourceListContent = $("#resourceListContent"),
- 			$selFile = $resourceListContent.find(".fileContent :checkbox:checked");
+ 			$selFile = $resourceListContent.find(".fileContent :checkbox:checked").parent();
 
  		if (App.ResourceModel.Settings.type == "famLibs") {
  			$resourceListContent = $("#resourceThumContent");
- 			$selFile = $resourceListContent.find(".thumContent :checkbox:checked");
- 		} 
-
- 		if ($selFile.length > 1) {
- 			alert("目前只支持单文件下载");
- 			return;
+ 			$selFile = $resourceListContent.find(".thumContent :checkbox:checked").parent();
  		}
+
 
  		if ($selFile.length < 1) {
  			alert("请选择需要下载的文件");
  			return;
  		}
- 		var fileVersionId = $selFile.parent().data("fileversionid");
+
+
+ 		var FileIdArr = [];
+ 		$selFile.each(function(i, item) {
+ 			FileIdArr.push($(this).data("fileversionid"));
+ 		});
+
+ 		var fileVersionId = FileIdArr.join(","); 
 
  		// //请求数据
  		var data = {
  			URLtype: "downLoad",
  			data: {
  				projectId: App.ResourceModel.Settings.CurrentVersion.projectId,
- 				projectVersionId:App.ResourceModel.Settings.CurrentVersion.id
+ 				projectVersionId: App.ResourceModel.Settings.CurrentVersion.id
  			}
  		};
 
@@ -66,7 +69,7 @@
  		if (App.ResourceModel.Settings.type == "famLibs") {
  			$resourceListContent = $("#resourceThumContent");
  			$selFile = $resourceListContent.find(".thumContent :checkbox:checked");
- 		} 
+ 		}
 
  		if ($selFile.length > 1) {
  			alert("目前只支持单文件删除");

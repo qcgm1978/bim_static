@@ -13,12 +13,20 @@ App.ResourceModel.ListContent = Backbone.View.extend({
 
 	template: _.templateUrl("/resources/tpls/resourceModel/resources.model.listNav.list.html", true),
 
+	events:{
+		"click .header .ckAll":"ckAll"
+	},
+
 	//渲染
 	render: function() {
 
 		this.$el.html(this.template);
 		return this;
 	},
+
+	ckAll(event){ 
+		this.$el.find(".fileContent .ckAll").prop("checked",event.target.checked);
+	}, 
 
 	//添加单个文件
 	addOneFile: function(model) {
