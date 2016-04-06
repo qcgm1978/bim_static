@@ -283,18 +283,23 @@ CLOUD.DomUtil = {
             // 即 offsetX = clientX - offsetV.left, offsetY = clientY - offsetV.top
             var offsetV = getOffset(domElement);
 
+            // domElement.offsetLeft（offsetTop）是相对父容器的偏移量，如果用相对坐标表示，直接传回0
+            //offset	: [ domElement.offsetLeft,  domElement.offsetTop ]
             offsetObj = {
-                size: [domElement.offsetWidth, domElement.offsetHeight],
-                // domElement.offsetLeft（offsetTop）是相对父容器的偏移量，如果用相对坐标表示，直接传回0
-                //offset	: [ domElement.offsetLeft,  domElement.offsetTop ]
-                offset: [offsetV.left, offsetV.top]
+                width : domElement.offsetWidth,
+                height : domElement.offsetHeight,
+                left : offsetV.left,
+                top : offsetV.top
             }
 
         } else {
+
             offsetObj = {
-                size: [window.innerWidth, window.innerHeight],
-                offset: [0, 0]
-            };
+                width : window.innerWidth,
+                height : window.innerHeight,
+                left : 0,
+                top : 0
+            }
         }
 
         return offsetObj;
@@ -487,9 +492,7 @@ CLOUD.GeomUtil = {
         if (objJSON.order) {
             object.out = 1;
         }
-
-        modelManager.listenSubScene(object);
-                        
+          
         if (CLOUD.GlobalData.ShowSubSceneBox)
         {
             var clr = 0xff;
@@ -522,7 +525,7 @@ CLOUD.GeomUtil = {
         var len = dir.length();
         dir.normalize();
 
-        var radius = params.radius * 0.5;
+        var radius = params.radius;
         if(radius <= 1)
             radius = 100;
         geometryNode.scale.set(radius, len, radius);
@@ -5136,6 +5139,199 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
 };
 
 
+CLOUD.AxisGrid = function (viewer) {
+
+    this.viewer = viewer;
+    this.fillColor = 0xffaa00;
+    this.lineWidth = 2;
+    this.isDashedLine = false;
+    this.axisGroup = new THREE.Group();
+};
+
+CLOUD.AxisGrid.prototype = {
+    constructor: CLOUD.AxisGrid,
+    initGrid: function (grids, elevation) {
+
+        var len = grids.length;
+
+        if (len < 1) {
+            return;
+        }
+
+        var color = this.fillColor;
+        var linewidth = this.lineWidth;
+        var axisGroup = this.axisGroup;
+        var fontParameters = {
+            size: 8,
+            height: 1,
+            curveSegments: 2,
+            font: "helvetiker"
+        };
+
+        var fontSizeScalar = 100;
+        var innerRadius = 1000, outerRadius = 1100;
+        var materialGrid;
+        var meshMaterial = new THREE.MeshBasicMaterial({color: color, overdraw: 0.0/*, side: THREE.DoubleSide*/});
+        var geometryGrid = new THREE.Geometry();
+
+        for (var i = 0; i < len; i++) {
+
+            var name = grids[i].name;
+            var start = new THREE.Vector3(grids[i].start.X, grids[i].start.Y, elevation);
+            var end = new THREE.Vector3(grids[i].end.X, grids[i].end.Y, elevation);
+
+            // --------------- 网格顶点 --------------- //
+            geometryGrid.vertices.push(start.clone(), end.clone());
+
+            // --------------- 文字包围圆 --------------- //
+            var dir = new THREE.Vector3();
+            dir.subVectors(end, start);
+            dir.normalize();
+            dir.multiplyScalar(outerRadius);
+
+            var textStart = start.clone().sub(dir); // 开始点延伸
+            var textEnd = end.clone().add(dir); // 终点延伸
+
+            var geometryRing = new THREE.RingGeometry(innerRadius, outerRadius);
+            var meshS = new THREE.Mesh(geometryRing, meshMaterial);
+            //meshS.name = "ring-left-" + name;
+            meshS.translateX(textStart.x);
+            meshS.translateY(textStart.y);
+            meshS.translateZ(elevation);
+
+            var meshE = new THREE.Mesh(geometryRing, meshMaterial);
+            //meshE.name = "ring-right-" + name;
+            meshE.translateX(textEnd.x);
+            meshE.translateY(textEnd.y);
+            meshE.translateZ(elevation);
+
+            // 加入到容器
+            axisGroup.add(meshS);
+            axisGroup.add(meshE);
+
+            // --------------- 文字 --------------- //
+            var textGeo = new THREE.TextGeometry(grids[i].name, fontParameters);
+
+            for (var j = 0, size = textGeo.vertices.length; j < size; j++) {
+                textGeo.vertices[j].multiplyScalar(fontSizeScalar);
+            }
+
+            textGeo.computeBoundingBox();
+            var centerOffsetX = -0.5 * ( textGeo.boundingBox.max.x - textGeo.boundingBox.min.x );
+            var centerOffsetY = -0.5 * ( textGeo.boundingBox.max.y - textGeo.boundingBox.min.y );
+
+            var startMesh = new THREE.Mesh(textGeo, meshMaterial);
+            startMesh.name = name;
+            startMesh.position.x = textStart.x + centerOffsetX;
+            startMesh.position.y = textStart.y + centerOffsetY;
+            startMesh.position.z = elevation;
+
+            var endMesh = new THREE.Mesh(textGeo, meshMaterial);
+            endMesh.name = name;
+            endMesh.position.x = textEnd.x + centerOffsetX;
+            endMesh.position.y = textEnd.y + centerOffsetY;
+            endMesh.position.z = elevation;
+
+            axisGroup.add(startMesh);
+            axisGroup.add(endMesh);
+        }
+
+        if (this.isDashedLine) {
+            geometryGrid.computeLineDistances();
+            var dashSize = geometryGrid.lineDistances[1] - geometryGrid.lineDistances[0];
+            dashSize *= 0.02;
+            var gapSize = dashSize * 0.5;
+            materialGrid = new THREE.LineDashedMaterial({
+                color: color,
+                dashSize: dashSize,
+                gapSize: gapSize,
+                linewidth: linewidth
+            });
+        } else {
+            materialGrid = new THREE.LineBasicMaterial({
+                color: color,
+                linewidth: linewidth
+            });
+        }
+
+        // --------------- 网格 --------------- //
+        var grids = new THREE.LineSegments(geometryGrid, materialGrid);
+        grids.name = "grids";
+        axisGroup.add(grids);
+    },
+
+    addToScene: function () {
+        var scene = this.viewer.getScene();
+        var rootNode = scene.rootNode;
+        rootNode.updateMatrixWorld(true);
+        rootNode.matrixAutoUpdate = false;
+        rootNode.add(this.axisGroup);
+    },
+    removeFromScene: function () {
+        var scene = this.viewer.getScene();
+        var rootNode = scene.rootNode;
+        rootNode.remove(this.axisGroup);
+    },
+    setVisibility: function (visible) {
+        if (this.axisGroup.visible != visible) {
+            this.axisGroup.visible = visible;
+            this.refresh();
+        }
+    },
+    /**
+     * @brief 更新轴网
+     */
+    refresh: function () {
+        this.viewer.render(); // 刷新
+    },
+    clearData: function () {
+        //var start, end, elapse;
+        //start = Date.now();
+        //for (var i = 0, len = this.axisGroup.children.length; i < len; i++) {
+        //    this.axisGroup.children[i] = null;
+        //}
+        //
+        //end = Date.now();
+        //elapse = end - start;
+        //
+        //console.log("clearData elapsed time:" + elapse);
+
+        this.axisGroup.children = [];
+    },
+    setDataFromJsonString: function (jsonStr, level) {
+        var jsonObj = JSON.parse(jsonStr);
+        this.setDataFromJsonObject(jsonObj, level);
+    },
+    setDataFromJsonObject: function (jsonObj, level) {
+        if (level) {
+            this.setDataByLevel(jsonObj.Grids, jsonObj.Levels, level);
+        } else {
+            this.setData(jsonObj.Grids, jsonObj.Levels);
+        }
+    },
+    setDataByLevel: function (grids, levels, level) {
+        if (level > levels.length) {
+            level = levels.length - 1;
+        } else if (level < 0) {
+            level = 0;
+        }
+
+        this.setDataByElev(grids, levels[level].elevation);
+    },
+    setDataByElev:function(grids, elev) {
+        this.clearData();
+        this.initGrid(grids, elev);
+        this.addToScene();
+    },
+    setData: function (grids, levels) {
+        this.clearData();
+
+        for (var i = 0, len = levels.length; i < len; i++) {
+            this.initGrid(grids, levels[i].elevation);
+            this.addToScene();
+        }
+    }
+};
 var CloudTouch	= CloudTouch || {};
 
 (function() {
@@ -8013,8 +8209,8 @@ CLOUD.ViewHouse = function (viewer) {
             var relativeMouse = new THREE.Vector2();
 
             // 计算鼠标点相对于viewhouse所在视口的位置
-            relativeMouse.x = mouse.x - dim.offset[0];
-            relativeMouse.y = mouse.y - dim.offset[1];
+            relativeMouse.x = mouse.x - dim.left;
+            relativeMouse.y = mouse.y - dim.top;
 
             // 规范化坐标系
             if (relativeMouse.x > 0 && relativeMouse.x < scope.width && relativeMouse.y > 0 && relativeMouse.y < scope.height) {
@@ -9428,7 +9624,7 @@ CLOUD.ViewHouse = function (viewer) {
     // 隐藏home
     showHome(false);
 };
-CLOUD.Client = function (serverUrl, databagId, texturePath) {
+CLOUD.Client = function (modelManager, serverUrl, databagId, texturePath) {
     "use strict";
     //this.serverUrl = "http://172.16.244.67:9980/project/";
     this.serverUrl = serverUrl;
@@ -9456,6 +9652,9 @@ CLOUD.Client = function (serverUrl, databagId, texturePath) {
     this.defaultMaterial = defaultMaterial;
 
     this.geomCacheVer = 0;
+
+    this.modelManager = modelManager;
+    this.taskManager = new CLOUD.TaskManager(modelManager);
 };
 
 CLOUD.Client.prototype = {
@@ -9519,8 +9718,11 @@ CLOUD.Client.prototype = {
 
         var resource = this.cache;
         var matObj = resource.materials[materialId];
-        if (!matObj)
+        if (!matObj) {
             matObj = resource.defaultMaterial;
+            console.log("not found!" + materialId);
+        }
+           
 
         if (isInstanced) {
 
@@ -9538,6 +9740,32 @@ CLOUD.Client.prototype = {
     findSymbol: function (symbolId) {
 
         return this.symbolIndex.items[symbolId];
+    },
+
+    loadSubScene: function (subSceneNode) {
+        var scope = this;
+
+        if (subSceneNode.children.length == 0) {
+
+            scope.taskManager.addSceneTask(subSceneNode);
+        }
+        else {
+            scope.modelManager.subSceneLoader.update(subSceneNode);
+            subSceneNode.visible = true;
+        }
+    },
+
+    addDelayLoadMesh : function(mpkId, item){
+
+        this.taskManager.addMpkTask(mpkId, item);
+    },
+
+    processMpkTasks: function () {
+        this.taskManager.processMpkTasks(this);
+    },
+
+    processSceneTasks: function () {
+        this.taskManager.processSceneTasks(this);
     }
 }
 CLOUD.Scene = function () {
@@ -9638,11 +9866,37 @@ CLOUD.Scene.prototype.hitTestPosition = function (mouse, camera, callback) {
         callback(null);
         return;
     }
-                
+
     intersects.sort(function (a, b) {
         return a.distance - b.distance;
     });
     callback(intersects[0].point);
+
+};
+
+CLOUD.Scene.prototype.getHitPoint = function (x, y, camera) {
+    var raycaster = this.raycaster;
+    raycaster.setFromCamera(new THREE.Vector2(x, y), camera);
+    var intersects =  this.hitTestClipPlane(raycaster.ray, raycaster.intersectObjects(this.children, true));
+
+    if (intersects.length < 1) {
+        return null;
+    }
+
+    intersects.sort(function (a, b) {
+        return a.distance - b.distance;
+    });
+
+    for (var ii = 0, len = intersects.length; ii < len; ++ii) {
+
+        var intersect = intersects[ii];
+        if (intersect.distance <= camera.near)
+            continue;
+
+        return intersect.point;
+    }
+
+    return  null;
 
 };
 
@@ -9654,17 +9908,21 @@ CLOUD.Scene.prototype.pick = function (mouse, camera, callback) {
 
     var intersects = this.hitTestClipPlane(raycaster.ray, raycaster.intersectObjects(scope.children, true));
 
-    intersects.sort(function (a, b) {
-        return a.distance - b.distance;
-    });
-
     var length = intersects.length;
 
     if (length > 0) {
 
+        intersects.sort(function (a, b) {
+            return a.distance - b.distance;
+        });
+
         for (var ii = 0; ii < length; ++ii) {
 
             var intersect = intersects[ii];
+
+            if (intersect.distance <= camera.near)
+                continue;
+
             var meshNode = intersect.object;
 
             if (scope.filter.isVisible(meshNode)) {
@@ -9681,9 +9939,8 @@ CLOUD.Scene.prototype.pick = function (mouse, camera, callback) {
         }
        
     }
-    else {
-        callback(null);
-    }
+
+   callback(null);
 };
 
 CLOUD.Scene.prototype.getClipWidget = function(){
@@ -10079,21 +10336,9 @@ CLOUD.Mesh.prototype.clone = function (object, recursive) {
     return object;
 };
 
-CLOUD.Mesh.prototype.computeGlobalMatrix = function()
-{
-    var trf = this.matrix.clone();
-    var parent = this.parent
-    while (parent != null && parent.sceneRoot === undefined) {
-        trf.multiplyMatrices(parent.matrix, trf);
-        parent = parent.parent;
-    }
-    return trf;
-}
 
 CLOUD.Mesh.prototype.hitTestGeometry = function (raycaster, intersects, ray, userId, meshId) {
     var geometry = this.geometry;
-
-
 
     if (geometry instanceof  THREE.InstancedBufferGeometry) {
 
@@ -10126,8 +10371,7 @@ CLOUD.Mesh.prototype.hitTestGeometry = function (raycaster, intersects, ray, use
                 face: null,
                 faceIndex: null,
                 object: this,
-                ray: ray,
-                trf: this.computeGlobalMatrix()
+                ray: ray
             });
         }
     } else if (geometry instanceof THREE.BufferGeometry) {
@@ -10187,8 +10431,7 @@ CLOUD.Mesh.prototype.hitTestGeometry = function (raycaster, intersects, ray, use
                     face: new THREE.Face3(a, b, c, THREE.Triangle.normal(vA, vB, vC)),
                     faceIndex: null,
                     object: this,
-                    ray: ray,
-                    trf: this.computeGlobalMatrix()
+                    ray: ray
                 });
             }
         }
@@ -10245,8 +10488,7 @@ CLOUD.Mesh.prototype.hitTestSubMesh = function (offset, raycaster, intersects, r
             faceIndex: i,
             object: this,
             ray: ray,
-            meshId: meshId,
-            trf: this.computeGlobalMatrix()
+            meshId: meshId
         });
     }
 }
@@ -10419,7 +10661,7 @@ CLOUD.SubScene.prototype.load = function () {
 
     if (!this.loaded) {
         this.visible = false;
-        this.dispatchEvent({ type: CLOUD.EVENTS.ON_LOAD_SUBSCENE, sceneId: this.sceneId, client: this.client });
+        this.client.loadSubScene(this);        
     }
     else {
 
@@ -10582,10 +10824,11 @@ CLOUD.Raycaster.prototype = {
         return intersects;
     }
 };
-
-
-CLOUD.CameraEditor = function (camera, domElement, onChange) {
+CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
     "use strict";
+
+    this.viewer = viewer;
+
     this.object = camera;
     this.domElement = domElement;
 
@@ -10595,7 +10838,7 @@ CLOUD.CameraEditor = function (camera, domElement, onChange) {
     // "target" sets the location of focus
     this.target = new THREE.Vector3();
     // the orbit center
-    this.pivot = null;     
+    this.pivot = null;
 
     // This option actually enables dollying in and out; left as "zoom" for
     // backwards compatibility
@@ -10603,7 +10846,7 @@ CLOUD.CameraEditor = function (camera, domElement, onChange) {
     this.zoomSpeed = 0.2;
 
     // Limits to how far you can dolly in and out
-    this.minDistance = 0.1;
+    this.minDistance = 0.001; // 0.000001;
     //this.maxDistance = Infinity;
     this.maxDistance = camera.far - CLOUD.GlobalData.SceneSize * 2;//camera.far * 0.9
 
@@ -10629,14 +10872,15 @@ CLOUD.CameraEditor = function (camera, domElement, onChange) {
     this.minAzimuthAngle = -Infinity; // radians
     this.maxAzimuthAngle = Infinity; // radians
 
+    this.enablePassThrough = true; // 允许缩放穿透
+
     // Set to true to disable use of the keys
     this.noKeys = false;
 
     // The four arrow keys
-    this.keys = { LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40 };
+    this.keys = {LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40};
 
     var scope = this;
-
     var EPS = 0.000001;
 
     var rotateStart = new THREE.Vector2();
@@ -10647,6 +10891,9 @@ CLOUD.CameraEditor = function (camera, domElement, onChange) {
     var panEnd = new THREE.Vector2();
     var panDelta = new THREE.Vector2();
     var panOffset = new THREE.Vector3();
+    var pan = new THREE.Vector3();
+    var panDeltaBasedWorld = new THREE.Vector3();
+    var worldDimension = new THREE.Vector2();
 
     var dollyStart = new THREE.Vector2();
     var dollyEnd = new THREE.Vector2();
@@ -10657,16 +10904,17 @@ CLOUD.CameraEditor = function (camera, domElement, onChange) {
     var phiDelta = 0;
     var thetaDelta = 0;
     var scale = 1;
-    var pan = new THREE.Vector3();
 
     var lastPosition = new THREE.Vector3();
     var lastQuaternion = new THREE.Quaternion();
 
-    var STATE = { NONE: -1, ROTATE: 0, DOLLY: 1, PAN: 2};
+    var STATE = {NONE: -1, ROTATE: 0, DOLLY: 1, PAN: 2};
 
-    var isAtZoom = 0; // 指示是否处在滚动缩放状态
+    //var isAtZoom = 0; // 指示是否处在滚动缩放状态
     var state = STATE.NONE;
 
+    var lastCanvasX = -1;
+    var lastCanvasY = -1;
 
     this.IsIdle = function () {
         return state === STATE.NONE;
@@ -10744,57 +10992,34 @@ CLOUD.CameraEditor = function (camera, domElement, onChange) {
         }
     };
 
-    this.getPanCoefficient = function(distance) {
+    this.panOnWorld = function () {
+        var canvasContainer = this.getContainerDimensions();
+        var startPoint = new THREE.Vector3();
+        var endPoint = new THREE.Vector3();
+        var delta = new THREE.Vector3();
 
-        // 相机视角很近时，鼠标移动，场景变化太小。为了在相机近距离时，鼠标的移动能使场景变化更明显，加入一个缩放系数来进行控制偏移量。
-        // 进行缩放系数设定的情况：相机和目标点的距离小于某个阈值（CLOUD.GlobalData.SceneSize * 1/10），即表明需要进行缩放偏移量。
-        // 鼠标中键滚动包含了平移操作，缩放偏移量会造成平移后再移回来位置不正确，故鼠标滚动缩放不设定缩放系数。
+        // 规范化开始点
+        var canvasX = panStart.x - canvasContainer.left;
+        var canvasY = panStart.y - canvasContainer.top;
+        startPoint.x = canvasX / canvasContainer.width;
+        startPoint.y = canvasY / canvasContainer.height;
 
-        // 阈值设定
-        var threshold = CLOUD.GlobalData.SceneSize / 10.0;
-        // 缩放系数,以场景大小作为参照，缩放范围为：[1, CLOUD.GlobalData.SceneSize]
-        var coe = 1;
+        // 规范化结束点
+        canvasX = panEnd.x - canvasContainer.left;
+        canvasY = panEnd.y - canvasContainer.top;
+        endPoint.x = canvasX / canvasContainer.width;
+        endPoint.y = canvasY / canvasContainer.height;
 
-        if (distance < threshold) {
-            // 将[0, distance / threshold] 映射到 [1, CLOUD.GlobalData.SceneSize]
-            // 系数取整
-            coe = Math.ceil((1 - distance / threshold) * (CLOUD.GlobalData.SceneSize - 1) + 1);
-        }
+        delta.subVectors(endPoint, startPoint);
 
-        return coe;
-    };
+        var offsetX = -delta.x * worldDimension.x;
+        var offsetY = delta.y * worldDimension.y;
+        var deltaX = this.getWorldRight().multiplyScalar(offsetX);
+        var deltaY = this.getWorldUp().multiplyScalar(offsetY);
 
-    this.panByWorld = function () {
-        var dim = this.getContainerDimensions();
+        panDeltaBasedWorld.addVectors(deltaX, deltaY);
 
-        // 根据clientX,clientY,计算出相对父容器的offsetX,offsetY值: offsetX = clientX - dim.offset[0], offsetY = clientY - dim.offset[1]
-        var ray1 = scope.object.computeRay(panStart.x - dim.offset[0], panStart.y - dim.offset[1], scope.domElement);
-        var plane = new THREE.Plane();
-        plane.setFromNormalAndCoplanarPoint(scope.object.getWorldDirection(), scope.target);
-        var startPt = ray1.intersectPlane(plane);
-
-        var ray2 = scope.object.computeRay(panEnd.x - dim.offset[0], panEnd.y - dim.offset[1], scope.domElement);
-        var endPt = ray2.intersectPlane(plane);
-        //var startPt = scope.object.screenToWorld(panStart.x - dim.offset[0], panStart.y - dim.offset[1], scope.domElement, scope.target.clone());
-        //var endPt = scope.object.screenToWorld(panEnd.x - dim.offset[0], panEnd.y - dim.offset[1], scope.domElement, scope.target.clone());
-        var deltaPt = new THREE.Vector3();
-
-        deltaPt.subVectors(startPt, endPt);
-
-        // 鼠标滚轮缩放，存在平移过程，这种情况下不需要乘以缩放系数，排除这种情况。
-        if (isAtZoom === 0) {
-            var offset = scope.object.position.clone().sub(scope.target);
-            var radius = offset.length() * scale;
-            radius = Math.max(this.minDistance, Math.min(this.maxDistance, radius));
-
-            // 相机视角很近时时的处理
-            // 获得缩放系数
-            var coe = this.getPanCoefficient(radius);
-
-            deltaPt.multiplyScalar(coe);
-        }
-
-        pan.add(deltaPt);
+        pan.add(panDeltaBasedWorld);
     };
 
     this.dollyIn = function (dollyScale) {
@@ -10813,6 +11038,86 @@ CLOUD.CameraEditor = function (camera, domElement, onChange) {
         scale *= dollyScale;
     };
 
+    this.dollyByPoint = function (cx, cy) {
+
+        if (Math.abs(scale - 1.0) < EPS) {
+            return;
+        }
+
+        var canvasContainer = this.getContainerDimensions();
+
+        // 规范化开始点
+        var canvasX = cx - canvasContainer.left;
+        var canvasY = cy - canvasContainer.top;
+
+        if (lastCanvasX !== canvasX || lastCanvasY !== canvasY) {
+
+            // 规范化到[-1, 1]
+            var normalizedX = (canvasX / canvasContainer.width) * 2.0 - 1.0;
+            var normalizedY = ((canvasContainer.height - canvasY) / canvasContainer.height) * 2.0 - 1.0;
+
+            var hitPoint = this.getHitPoint(normalizedX, normalizedY);
+
+            if (hitPoint) {
+                //console.log("hitPoint");
+                this.dollyBasePoint = hitPoint;
+            } else {
+                //console.log("pointToWorld");
+                this.dollyBasePoint = this.pointToWorld(normalizedX, normalizedY);
+            }
+
+            lastCanvasX = canvasX;
+            lastCanvasY = canvasY;
+        }
+
+        var eye = this.getWorldEye();
+        var currCameraPos = new THREE.Vector3();
+        var dollyPoint = this.dollyBasePoint;
+        var position = this.object.position;
+        var dir = dollyPoint.clone().sub(position);
+        var distance = dir.length();
+        var minDistance = this.minDistance;
+        var factor = 2 - scale; // 1 - (scale - 1)
+
+        if (this.enablePassThrough && scale > 1.0 && distance < minDistance) {
+            // 以minDistance为步进穿透物体
+            var offsetVec = dir.clone();
+            offsetVec.normalize().multiplyScalar(minDistance);
+            currCameraPos = offsetVec.add(dollyPoint);
+
+            this.object.position.copy(currCameraPos);
+            this.target.copy(eye.add(currCameraPos));
+
+            lastCanvasX = -1;
+            lastCanvasY = -1;
+
+        } else {
+
+            dir.multiplyScalar(-factor);
+            currCameraPos.addVectors(dir, dollyPoint);
+
+            this.object.position.copy(currCameraPos);
+            this.target.copy(eye.add(currCameraPos));
+        }
+    };
+
+    this.dollyByCenter = function () {
+
+        if (Math.abs(scale - 1.0) < EPS) {
+            return;
+        }
+
+        var eye = this.getWorldEye();
+        var lastLength = eye.length();
+        var currLength = lastLength * scale;
+        var deltaStep = currLength - lastLength;
+        var dollyVec = eye.clone().normalize();
+
+        dollyVec.multiplyScalar(deltaStep);
+        this.object.position.add(dollyVec);
+        this.target.addVectors(this.object.position, eye);
+    };
+
     this.updateCamera = function (target) {
         lastPosition.copy(this.object.position);
         lastQuaternion.copy(this.object.quaternion);
@@ -10824,8 +11129,8 @@ CLOUD.CameraEditor = function (camera, domElement, onChange) {
 
         var position = this.object.position;
         var pivot = this.pivot !== null ? this.pivot.clone() : this.target;
-       
-        if(state == STATE.ROTATE){
+
+        if (state == STATE.ROTATE) {
 
             var viewVec = position.clone().sub(pivot);
             var viewLength = viewVec.length();
@@ -10864,13 +11169,12 @@ CLOUD.CameraEditor = function (camera, domElement, onChange) {
                 var rightDir = camDir.clone().cross(this.object.up);
                 if (rightDir.lengthSq() < 0.001) {
 
-                    var shouldAbortRotation = function (realUp)
-                    {
+                    var shouldAbortRotation = function (realUp) {
                         if (Math.abs(camDir.dot(new THREE.Vector3(0, 1, 0)) - 1) < 0.001) {
                             if (phiDelta > 0)
                                 return true;
                             rightDir = camDir.clone().cross(realUp);
-                            
+
                             //console.log("BOTTOM");
                         }
 
@@ -10886,7 +11190,7 @@ CLOUD.CameraEditor = function (camera, domElement, onChange) {
                     }
                     abortRotation = shouldAbortRotation(this.object.realUp);
                 }
-                    
+
                 if (!abortRotation) {
                     viewTrf = new THREE.Quaternion().setFromAxisAngle(rightDir, phiDelta);
 
@@ -10906,36 +11210,25 @@ CLOUD.CameraEditor = function (camera, domElement, onChange) {
                 }
             }
         }
-     
+
         if (Math.abs(scale - 1) > 0.001) {
 
-            var camVec = position.clone().sub(this.target);
-            var length = camVec.length() * scale;
-            camVec.normalize();
-
-            if (length < this.minDistance) {
-                // 相机离目标点较近时，直接往前推动相机
-                camVec.setLength(this.minDistance * 1.1);
-
-                if (scale < 1) {
-                    // dollyIn
-                    this.target.add(camVec.clone().multiplyScalar(-1));
-                } else {
-                    // dollyOut
-                    this.target.add(camVec);
-                }
-
-            } else {
-                camVec.setLength(length);
-            }
-
-            position.copy(this.target).add(camVec);
+            //var eye = this.target.clone().sub(position);
+            //var lastLength = eye.length();
+            //var currLength = lastLength * scale;
+            //var deltaStep = currLength - lastLength;
+            //var dollyVec = eye.clone().normalize();
+            //dollyVec.multiplyScalar(deltaStep);
+            //position.add(dollyVec);
+            //
+            //this.target.addVectors(position, eye);
         }
 
         if (state === STATE.PAN) {
-            var disOffset = this.target.clone().sub(this.object.position);
+            //var disOffset = this.target.clone().sub(this.object.position);
             this.target.add(pan);
-            this.object.position.copy(this.target).sub(disOffset);
+            this.object.position.add(pan);
+            //this.object.position.copy(this.target).sub(disOffset);
         }
 
         // lookAt使用realUp
@@ -11015,6 +11308,11 @@ CLOUD.CameraEditor = function (camera, domElement, onChange) {
         if (scope.noPan === true) return;
         state = STATE.PAN;
         panStart.set(cx, cy);
+
+        // 根据当前鼠标点获得世界坐标系中的宽高
+        worldDimension = this.getWorldDimension(cx, cy);
+        // 清零
+        panDeltaBasedWorld.set(0, 0, 0);
     };
 
     this.endOperation = function () {
@@ -11025,47 +11323,31 @@ CLOUD.CameraEditor = function (camera, domElement, onChange) {
     // factor: 正数 - 放大， 负数 - 缩小
     this.zoom = function (factor, cx, cy) {
 
+        //state = STATE.DOLLY;
+
         if (cx === undefined || cy === undefined) {
             if (factor > 0) {
-                this.dollyIn(1 + factor);
+                this.dollyIn(1 - factor);
             } else {
-                this.dollyOut(1 - factor);
+                this.dollyOut(1 + factor);
             }
+
+            this.dollyByCenter();
             this.update();
         }
         else {
-            isAtZoom = 1; // 进入滚动缩放 置1
-
-            // pan when zooming
-            var dim = this.getContainerDimensions();
-            //cx = cx - dim.offset[0];
-            //cy = cy - dim.offset[1];
-
-            //var halfWidth = dim.size[0] / 2;
-            //var halfHeight = dim.size[1] / 2;
-
-            var halfWidth = dim.offset[0] + dim.size[0] / 2;
-            var halfHeight = dim.offset[1] + dim.size[1] / 2;
-
-            state = STATE.PAN;
-
-            this.beginPan(cx, cy);
-            this.process(halfWidth, halfHeight);
 
             if (factor > 0) {
-                this.dollyIn(1 + factor);
+                this.dollyIn(1 - factor);
             } else {
-                this.dollyOut(1 - factor);
+                this.dollyOut(1 + factor);
             }
+
+            this.dollyByPoint(cx, cy);
             this.update();
-
-            this.beginPan(halfWidth, halfHeight);
-            this.process(cx, cy);
-
-            state = STATE.NONE;
-
-            isAtZoom = 0; // 离开滚动缩放 重置0
         }
+
+        //state = STATE.NONE;
     };
 
     // 基于相机空间的漫游
@@ -11103,7 +11385,7 @@ CLOUD.CameraEditor = function (camera, domElement, onChange) {
         // 调用Render刷新
         onChange();
     };
-    this.processRotate = function(delta){
+    this.processRotate = function (delta) {
 
         var currentState = state; // 保持状态
 
@@ -11120,7 +11402,7 @@ CLOUD.CameraEditor = function (camera, domElement, onChange) {
         scope.update();
 
         state = currentState; // 恢复状态
-    },
+    };
 
     this.process = function (cx, cy, forceRender) {
         var element = scope.domElement === document ? scope.domElement.body : scope.domElement;
@@ -11145,10 +11427,14 @@ CLOUD.CameraEditor = function (camera, domElement, onChange) {
             dollyDelta.subVectors(dollyEnd, dollyStart);
 
             if (dollyDelta.y > 0) {
+                //console.log("dollyOut");
                 scope.dollyOut();
             } else {
+                //console.log("dollyIn");
                 scope.dollyIn();
             }
+
+            scope.dollyByCenter();
 
             dollyStart.copy(dollyEnd);
         } else if (state === STATE.PAN) {
@@ -11157,8 +11443,8 @@ CLOUD.CameraEditor = function (camera, domElement, onChange) {
             panEnd.set(cx, cy);
             panDelta.subVectors(panEnd, panStart);
 
-            //scope.pan2();
-            scope.pan( panDelta.x, panDelta.y );
+            scope.panOnWorld();
+            //scope.pan( panDelta.x, panDelta.y );
 
             panStart.copy(panEnd);
         }
@@ -11177,7 +11463,7 @@ CLOUD.CameraEditor = function (camera, domElement, onChange) {
                 var element = scope.domElement === document ? scope.domElement.body : scope.domElement;
                 var thresholdAngle = 0.5 * Math.PI / 180; // 0.5度
 
-                if ( input.deltaAngle < thresholdAngle &&  input.deltaAngle > -thresholdAngle) {
+                if (input.deltaAngle < thresholdAngle && input.deltaAngle > -thresholdAngle) {
                     phiDelta += 2 * Math.PI * input.relativeDeltaY / element.clientWidth * scope.rotateSpeed;
                 } else {
                     thetaDelta += input.relativeRotation;
@@ -11196,7 +11482,7 @@ CLOUD.CameraEditor = function (camera, domElement, onChange) {
                 var deltaX = input.relativeDeltaX;
                 var deltaY = input.relativeDeltaY;
 
-                scope.pan( deltaX, deltaY);
+                scope.pan(deltaX, deltaY);
             }
         }
 
@@ -11211,8 +11497,8 @@ CLOUD.CameraEditor = function (camera, domElement, onChange) {
         var dim = this.getContainerDimensions();
         var mouse = new THREE.Vector2();
 
-        mouse.x = ((cx - dim.offset[0]) / dim.size[0]) * 2 - 1;
-        mouse.y = -((cy - dim.offset[1]) / dim.size[1]) * 2 + 1;
+        mouse.x = ((cx - dim.left) / dim.width) * 2 - 1;
+        mouse.y = -((cy - dim.top) / dim.height) * 2 + 1;
 
         return mouse;
     };
@@ -11260,7 +11546,104 @@ CLOUD.CameraEditor = function (camera, domElement, onChange) {
         rotation.setFromQuaternion(quat2, undefined, false);
 
         return rotation;
-    }
+    };
+
+    this.getWorldEye = function () {
+        return this.target.clone().sub(this.object.position);
+    };
+
+    this.getWorldRight = function () {
+        var right = new THREE.Vector3();
+        var up = this.object.up;
+        var eye = this.getWorldEye();
+        right.crossVectors(eye, up);
+
+        if (right.lengthSq() === 0) {
+            if (up.z > up.y)
+                eye.y -= 0.0001;
+            else
+                eye.z += 0.0001;
+
+            right.crossVectors(eye, up);
+        }
+
+        return right.normalize();
+    };
+
+    this.getWorldUp = function () {
+        var right = this.getWorldRight();
+        var eye = this.getWorldEye();
+        return right.cross(eye).normalize();
+    };
+
+    this.getWorldDimension = function (cx, cy) {
+
+        var camera = this.object;
+        var canvasContainer = this.getContainerDimensions();
+
+        // 规范化开始点
+        var canvasX = cx - canvasContainer.left;
+        var canvasY = cy - canvasContainer.top;
+
+        // 规范化到[-1, 1]
+        var normalizedX = (canvasX / canvasContainer.width) * 2.0 - 1.0;
+        var normalizedY = ((canvasContainer.height - canvasY) / canvasContainer.height) * 2.0 - 1.0;
+
+        // 计算跟踪距离
+        var distance = this.getTrackingDistance(normalizedX, normalizedY);
+
+        var aspect = canvasContainer.width / canvasContainer.height;
+        var height = 2.0 * distance * Math.tan(THREE.Math.degToRad(camera.fov * 0.5));
+        var width = height * aspect;
+
+        return new THREE.Vector2(width, height);
+    };
+
+    this.getTrackingDistance = function (cx, cy) {
+
+        var position = camera.position;
+        var eye = this.getWorldEye();
+        var distance = eye.length();
+
+        var hitPoint = this.getHitPoint(cx, cy);
+
+        if (hitPoint) {
+            var hitToEye = hitPoint.sub(position);
+            eye.normalize();
+            distance = Math.abs(eye.dot(hitToEye));
+        }
+
+        return distance;
+    };
+
+    this.getHitPoint = function (normalizedX, normalizedY) {
+
+        var scene = this.viewer.getScene();
+        var camera = this.object;
+        var hitPoint = scene.getHitPoint(normalizedX, normalizedY, camera);
+
+        if (hitPoint) {
+            return hitPoint.clone();
+        }
+
+        return null;
+    };
+
+    this.pointToWorld = function (normalizedX, normalizedY) {
+
+        var worldPoint = new THREE.Vector3(normalizedX, normalizedY, 1.0);
+        worldPoint = worldPoint.unproject(camera);
+
+        var eye = this.getWorldEye();
+        var position = camera.position;
+
+        // 计算新的点
+        worldPoint.sub(position).normalize();
+        var projectedLength = worldPoint.dot(eye);
+        worldPoint.multiplyScalar(projectedLength).add(position);
+
+        return worldPoint;
+    };
 };
 CLOUD.OrbitEditor = function (cameraEditor, scene, domElement) {
     "use strict";
@@ -17040,6 +17423,7 @@ CLOUD.MaterialLoader.prototype.load = function (materialUrl, callback, result) {
             material.fragmentShader = CloudShaderLib.phong_cust_clip.fragmentShader;
         }
 
+
         if ( json.parameters.mapDiffuse !== undefined ) {
             //material.map = THREE.ImageUtils.loadTexture( texturePath + "/" + json.parameters.mapDiffuse );
             material.map = scope.loadTexture( texturePath + "/" + json.parameters.mapDiffuse );
@@ -17317,7 +17701,7 @@ CLOUD.SubSceneLoader.prototype = {
                         }
                         else {
                             var mpkId = client.meshIds[meshId];
-                            scope.manager.addDelayLoadMesh(mpkId, { meshNode: meshNode});
+                            client.addDelayLoadMesh(mpkId, { meshNode: meshNode });
 
                         }
                     }
@@ -17329,7 +17713,7 @@ CLOUD.SubSceneLoader.prototype = {
         };
 
         update_children(subScene.children);
-        scope.manager.taskManager.processMpkTasks(client);
+        client.processMpkTasks();
     },
 
     /**
@@ -17582,7 +17966,7 @@ CLOUD.SceneLoader.prototype = {
             else {
                 //delayLoadMeshNodes.push({ meshNode: object, isInstanced: false });
                 var mpkId = client.meshIds[meshId];
-                scope.manager.addDelayLoadMesh(mpkId, { meshNode: object});
+                client.addDelayLoadMesh(mpkId, { meshNode: object });
             }
         }
 
@@ -17839,7 +18223,7 @@ CLOUD.SceneLoader.prototype = {
 
         function finalize() {
             // take care of targets which could be asynchronously loaded objects
-            scope.manager.taskManager.processMpkTasks(client);
+            client.processMpkTasks();
         };
 
 
@@ -18254,7 +18638,7 @@ CLOUD.TaskManager.prototype = {
         return a.distance - b.distance;
     },
 
-    processSceneTasks: function () {
+    processSceneTasks: function (client) {
 
         var scope = this;
 
@@ -18262,11 +18646,11 @@ CLOUD.TaskManager.prototype = {
 
         scope.sceneWorker.run(function (item, nextIdx, callback) {
 
-            var sceneNode = item.sceneNode;
+            var sceneNode = item;
           
             if(sceneNode.children.length == 0){
                 sceneNode.loaded = true;
-                sceneLoader.load(sceneNode.sceneId, sceneNode, item.client, false, function () {
+                sceneLoader.load(sceneNode.sceneId, sceneNode, client, false, function () {
                     sceneNode.visible = true;
                     callback(nextIdx);
                 });
@@ -18305,14 +18689,13 @@ CLOUD.ModelManager = function () {
     //hemiLight.position.set( 0, -500, -500 );
     this.scene.add(hemiLight);
     this.scene.add(this.headLamp);
-    this.scene.add(this.assistLamp);
+    //this.scene.add(this.assistLamp);
 
     // Loaders
     this.mpkLoader = new CLOUD.MpkLoader();
     this.sceneLoader = new CLOUD.SceneLoader(this, true);
     this.boxLoader = new CLOUD.SceneBoxLoader(this, true);
     this.subSceneLoader = new CLOUD.SubSceneLoader(this, true);
-    this.taskManager = new CLOUD.TaskManager(this);
 
     this.clients = {};
 
@@ -18326,7 +18709,8 @@ CLOUD.ModelManager.prototype = Object.create(THREE.LoadingManager.prototype);
 
 CLOUD.ModelManager.prototype.constructor = CLOUD.ModelManager;
 
-CLOUD.ModelManager.prototype.prepareScene = function (camera) {
+CLOUD.ModelManager.prototype.updateLights = function (camera) {
+
     var dir = camera.getWorldDirection().clone();
     dir.normalize();
     dir.multiplyScalar(-1);
@@ -18338,6 +18722,9 @@ CLOUD.ModelManager.prototype.prepareScene = function (camera) {
     dir.add(offset).normalize();
     this.assistLamp.position.copy(dir);
     this.assistLamp.updateMatrixWorld();
+};
+
+CLOUD.ModelManager.prototype.prepareScene = function (camera) {
 
     // update scene
     this.scene.prepareScene(camera);
@@ -18357,7 +18744,7 @@ CLOUD.ModelManager.prototype.loadIndex = function (parameters, callback) {
     // get from cache
     var client = this.clients[parameters.databagId];
     if (client === undefined) {
-        client = new CLOUD.Client(parameters.serverUrl, parameters.databagId);
+        client = new CLOUD.Client(this, parameters.serverUrl, parameters.databagId);
         this.clients[parameters.databagId] = client;
     }
 
@@ -18472,32 +18859,6 @@ CLOUD.ModelManager.prototype.loadLinks = function (result, client) {
     loadLinkedScenes(result);
 }
 
-CLOUD.ModelManager.prototype.listenSubScene = function(sceneNode){
-    var scope = this;
-    sceneNode.addEventListener(CLOUD.EVENTS.ON_LOAD_SUBSCENE, function (evt) {
-        scope.onLoadSubSceneEvent(evt);
-    });
-}
-
-CLOUD.ModelManager.prototype.onLoadSubSceneEvent = function (evt) {
-    var subSceneNode = evt.target;
-    var scope = this;
-
-    if (subSceneNode.children.length == 0) {
-
-        scope.taskManager.addSceneTask({ sceneNode: subSceneNode, client: evt.client });
-    }
-    else {
-        scope.subSceneLoader.update(subSceneNode);
-        subSceneNode.visible = true;
-    }
-}
-
-CLOUD.ModelManager.prototype.addDelayLoadMesh = function(mpkId, item){
-
-    this.taskManager.addMpkTask(mpkId, item);
-}
-
 CLOUD.ModelManager.prototype.loadMpk = function (mpkId, client, callback) {
     var mpkLoader = this.mpkLoader;
     var mpkIdx = client.mkpIndex.items[mpkId];
@@ -18549,19 +18910,14 @@ CLOUD.ModelManager.prototype.loadMpk = function (mpkId, client, callback) {
 
 CLOUD.ModelManager.prototype.prepareResource = function () {
 
-    var scope = this;
-
-    // sub scene
-    scope.taskManager.processSceneTasks();
-
-
     //if (!CLOUD.GlobalData.DynamicRelease || this.loading)
     //    return;
 
-    //for (var ii in this.clients) {
-    //    var client = this.clients[ii];
-    //    client.purgeUnusedResource();
-    //}
+    for (var ii in this.clients) {
+        var client = this.clients[ii];
+        client.processSceneTasks();
+        //client.purgeUnusedResource();
+    }
 }
 
 THREE.EventDispatcher.prototype.apply(CLOUD.ModelManager.prototype);
@@ -18898,6 +19254,8 @@ CloudViewer = function () {
     this.viewHouse = new CLOUD.ViewHouse(this);
     this.viewHouse.visible = false;
 
+    this.axisGrid = new CLOUD.AxisGrid(this);
+
     var scope = this;
 
     function initializeView() {
@@ -19008,6 +19366,7 @@ CloudViewer.prototype = {
         // 重置增量绘制状态
         this.resetIncrementRender();
         this.editorManager.updateEditor(camera);
+        this.modelManager.updateLights(camera);
 
         // 启用渲染队列更新
         if (scope.updateRenderListEnabled && !scope.editorManager.isFlyMode()) {
@@ -19025,22 +19384,21 @@ CloudViewer.prototype = {
         // 设置过滤对象
         scope.renderer.setFilterObject(scene.filter);
 
-
         function incrementRender() {
 
-            //scope.handleId = requestAnimationFrame(incrementRender);
-            //
-            //var isRenderFinish = scope.renderer.IncrementRender(scene, camera);
-            //
-            //if (isRenderFinish) {
-            //    cancelAnimationFrame(scope.handleId);
-            //}
+            scope.handleId = requestAnimationFrame(incrementRender);
 
             var isRenderFinish = scope.renderer.IncrementRender(scene, camera);
 
-            if (!isRenderFinish) {
-                requestAnimationFrame(incrementRender);
+            if (isRenderFinish) {
+                cancelAnimationFrame(scope.handleId);
             }
+
+            //var isRenderFinish = scope.renderer.IncrementRender(scene, camera);
+            //
+            //if (!isRenderFinish) {
+            //    requestAnimationFrame(incrementRender);
+            //}
         }
 
         // 增量绘制
@@ -19173,7 +19531,7 @@ CloudViewer.prototype = {
         this.camera = camera;
 
         var scope = this;
-        this.cameraEditor = new CLOUD.CameraEditor(camera, domElement, function () {
+        this.cameraEditor = new CLOUD.CameraEditor(this, camera, domElement, function () {
             scope.render();
         });
 
@@ -19182,6 +19540,7 @@ CloudViewer.prototype = {
 
         // Register Events
         this.editorManager.registerDomEventListeners(this.domElement);
+
     },
 
     registerEventListener: function (type, callback) {
@@ -19319,5 +19678,14 @@ CloudViewer.prototype = {
 
     getFilters : function() {
         return  this.getScene().filter;
+    },
+
+    setAxisGridData:function(jsonObj, level) {
+        this.axisGrid.setDataFromJsonObject(jsonObj, level);
+        this.axisGrid.refresh();
+    },
+
+    showAxisGrid:function(show) {
+        this.axisGrid.setVisibility(show);
     }
 };
