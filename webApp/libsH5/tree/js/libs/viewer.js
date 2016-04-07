@@ -752,7 +752,7 @@ BIM.prototype = {
     });
     viewer.render();
   },
-  showScend:function(obj){
+  showScene:function(obj){
     var viewer = BIM.common.viewer;
     var filter = viewer.getFilters();
     filter.removeUserFilter(obj.type);

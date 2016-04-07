@@ -1,0 +1,26 @@
+<% _.each(_.sortBy(data,function(num){return num.sort}),function(item){ %>
+<li class="itemNode">
+  <div class="item-content">
+    <i class="nodeSwitch"></i>
+    <label class="treeCheckbox">
+      <input type="checkbox" checked="checked" data-type="categoryId" />
+      <span class="lbl"></span>
+    </label>
+    <span class="tree-text"><%= item.specialty %></span>
+  </div>
+  <ul class="subTree">
+    <% _.each(item.categories,function(value,key){ %>
+      <li class="itemNode">
+        <div class="item-content">
+          <i class="noneSwitch"></i>
+          <label class="treeCheckbox">
+            <input type="checkbox" checked="checked" data-type="categoryId" data-etag="<%= key %>" />
+            <span class="lbl"></span>
+          </label>
+          <span class="tree-text"><%= value %></span>
+        </div>
+      </li>
+    <% }) %>
+  </ul>
+</li>
+<% }) %>
