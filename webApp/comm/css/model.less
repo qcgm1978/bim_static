@@ -1,0 +1,39 @@
+.model{width:100%;height:100%;}
+.modelView{width:100%;height:100%;position:relative;overflow:hidden;
+  .modelBar{width:328px;position:absolute;left:0;top:0;bottom:0;
+    .modelMap{position:absolute;left:0;bottom:0;width:100%;border:2px solid #333;border-top:none;height:220px;background:#979797;}
+    .modelTools{position:absolute;left:0;bottom:220px;height:40px;padding:0 2px;width:100%;background:#333;
+      .bar-item{display:block;float:left;width:34px;height:34px;cursor:pointer;border:1px solid #333;margin:3px;background:url(/comm/images/bar.png) no-repeat;
+        &:hover{border:1px solid #666;}
+        &.selected{background-color:#666;}
+      }
+      .bar-filter{background-position:0 -32px;
+        &.selected{background-position:-32px -32px;}
+      }
+      .bar-fit{background-position:0 -128px;
+        &.selected{background-position:-32px -128px;}
+      }
+      .bar-select{background-position:0 0;
+        &.selected{background-position:-32px 0;}
+      }
+      .bar-handle{background-position:0 -32px;
+        &.selected{background-position:-32px -32px;}
+      }
+      .bar-rotate{background-position:0 -160px;
+        &.selected{background-position:-32px -160px;}
+      }
+      .bar-fly{background-position:0 -224px;
+        &.selected{background-position:-32px -224px;}
+      }
+      .bar-viewpoint{background-position:0 -1120px;
+        &.selected{background-position:-32px -1120px;}
+      }
+      .bar-comment{background-position:0 -1120px;
+        &.selected{background-position:-32px -1120px;}
+      }
+    }
+    .modelTree{position:absolute;width:100%;top:0;bottom:260px;background-color:rgba(0,0,0,.8);overflow:auto;
+
+    }
+  }
+}
