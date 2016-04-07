@@ -15,16 +15,17 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 	events: {
 		"click .fileName  .text": "fileClick",
 		"click .btnEnter": "enterEditNameOrCreateNew",
-		"click .btnCalcel": "calcelEditName"
+		"click .btnCalcel": "calcelEditName",
+		"click .ckAll":"singleCheck"
 
 	},
 
-	render: function() { 
+	render: function() {
 		var data = this.model.toJSON();
 		this.$el.html(this.template(data)).data("status", data.status);
 		if (data.isAdd) {
 			this.$el.addClass('createNew');
-		} else{
+		} else {
 			this.$el.removeClass('createNew');
 		}
 		this.bindContext();
@@ -169,7 +170,7 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 	enterEditNameOrCreateNew: function(event) {
 
 		var $item = $(event.target).closest(".item");
-		 
+
 		//创建
 		if ($item.hasClass('createNew')) {
 			this.createNewFolder($item);
@@ -237,7 +238,7 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 	createNewFolder: function($item) {
 
 
-		var filePath = $item.find(".txtEdit").val().trim(),
+		var filePath = $item.find(".txtEdit").val().trim(),that=this;
 			$leftSel = $("#resourceModelLeftNav .treeViewMarUl .selected");
 		parentId = "";
 		if ($leftSel.length > 0) {
@@ -258,12 +259,30 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 		App.Comm.ajax(data, function(data) {
 			if (data.message == "success") {
 
-				var models = App.ResourceModel.FileCollection.models;
-				data.data.isAdd=false;
-				//修改数据
-				App.ResourceModel.FileCollection.last().set(data.data); 
+				var id = data.data.id,
+					isExists = false;
 
-				App.ResourceModel.afterCreateNewFolder(data.data,parentId);
+
+
+				$.each(App.ResourceModel.FileCollection.models, function(i, item) {
+					if (item.id == id) {
+						isExists = true;
+						return false;
+					}
+				});
+
+				//已存在的不在添加 返回
+				if (isExists) {
+				 	that.cancelEdit($item.find(".fileName"));
+					return;
+				}
+
+				var models = App.ResourceModel.FileCollection.models;
+				data.data.isAdd = false;
+				//修改数据
+				App.ResourceModel.FileCollection.last().set(data.data);
+
+				App.ResourceModel.afterCreateNewFolder(data.data, parentId);
 				//tree name
 				//$("#resourceModelLeftNav .treeViewMarUl span[data-id='" + id + "']").text(name);
 
@@ -299,6 +318,17 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 			App.ResourceModel.afterRemoveFolder(model.toJSON());
 		}
 
+	},
+
+	//是否全选
+	singleCheck(event){
+	 
+		if (this.$el.parent().find(".ckAll:not(:checked)").length>0) {
+			$("#resourceListContent .header .ckAll").prop("checked",false);
+			
+		}else{
+			$("#resourceListContent .header .ckAll").prop("checked",true);
+		}
 	}
 
 

@@ -28,7 +28,7 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 		var data = this.model.toJSON();
 
 		this.$el.html(this.template(data)).data("status", data.status);
-		
+
 		if (data.isAdd) {
 			this.$el.addClass('createNew');
 		} else {
@@ -187,7 +187,7 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 	},
 
 	//修改名称 或者创建
-	enterEditNameOrCreateNew: function(event) { 
+	enterEditNameOrCreateNew: function(event) {
 
 		var $item = $(event.target).closest(".item");
 
@@ -258,7 +258,7 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 	createNewFolder: function($item) {
 
 
-		var filePath = $item.find(".txtEdit").val().trim(),
+		var filePath = $item.find(".txtEdit").val().trim(),that=this, 
 			$leftSel = $("#resourceFamlibsLeftNav .treeViewMarUl .selected");
 		parentId = "";
 		if ($leftSel.length > 0) {
@@ -278,6 +278,22 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 
 		App.Comm.ajax(data, function(data) {
 			if (data.message == "success") {
+
+				var id=data.data.id,isExists=false;
+
+				$.each(App.ResourceModel.FileThumCollection.models, function(i, item) {
+					if (item.id == id) {
+						isExists = true;
+						return false;
+					}
+				});
+
+				//已存在的不在添加 返回
+				if (isExists) {
+					that.cancelEdit($item.find(".thumBg"));
+					return;
+				}
+
 				//修改数据
 				App.ResourceModel.FileThumCollection.last().set(data.data);
 				App.ResourceModel.afterCreateNewFolder(data.data, parentId);

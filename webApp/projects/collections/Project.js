@@ -56,8 +56,8 @@ App.Project = {
 		App.Project.Settings.fetchNavType = 'file';
 		App.Project.Settings.projectNav = 'design';
 		App.Project.Settings.fileId = '';
-		App.Project.Settings.property = '';
-		App.Project.Settings.property.DataModel = null;
+		App.Project.Settings.property = ''; 
+		App.Project.Settings.DataModel=null;
 	},
 
 	//加载版本

@@ -83,9 +83,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 
 			var $projectList = $(".breadItem .projectList");
 			var template = _.templateUrl("/projects/tpls/project/project.container.project.html");
-			$projectList.find(".container").html(template(data.data));
-			console.log(data);
-
+			$projectList.find(".container").html(template(data.data));  
 			$projectList.find(".loading").hide();
 			$projectList.find(".listContent").show();
 
@@ -101,10 +99,8 @@ App.Project.ProjectContainer = Backbone.View.extend({
 
 			var $projectVersionList = $(".breadItem .projectVersionList");
 			var template = _.templateUrl("/projects/tpls/project/project.container.version.html");
-			$projectVersionList.find(".container").html(template(data.data));
-
-			//显示
-
+			$projectVersionList.find(".container").html(template(data.data)); 
+			//显示 
 			$projectVersionList.find(".loading").hide();
 			$projectVersionList.find(".listContent").show();
 
@@ -319,8 +315,8 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			element: $("#projectContainer .modelContainerContent")[0],
 			sourceId: App.Project.Settings.DataModel.sourceId,
 			etag: App.Project.Settings.DataModel.etag,
-			tools: true,
-			treeElement: $("#projectContainer .projectNavModelContainer")[0]
+			tools: true
+		 
 		});
 
 		$("#projectContainer .projectNavModelContainer").append(new App.Project.viewpoint().render().el);

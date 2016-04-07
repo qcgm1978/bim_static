@@ -78,6 +78,7 @@ App.ResourceModel = {
 	//初始化
 	init: function() {
 
+		//this.reset();
 		//释放上传
 		App.Comm.upload.destroy();
 
@@ -95,30 +96,28 @@ App.ResourceModel = {
 			App.ResourceModel.Settings.bindGlobalEvent = true;
 			App.ResourceModel.bindGlobalEvent();
 		}
+	},
 
-		//标准模型库
-		// if (App.ResourcesNav.Settings.type == "standardLibs") {
-		// 	//存在直接渲染 否则 加载数据
-		// 	if (App.ResourceModel.Settings.CurrentVersion && 　App.ResourceModel.Settings.CurrentVersion.id) {
-		// 		App.ResourceModel.renderLibs();
-		// 	} else {
-		// 		App.ResourceModel.getVersion();
-		// 	} 
-		// } else if (App.ResourcesNav.Settings.type == "famLibs") { 
-		// 	//存在直接渲染 否则 加载数据
-		// 	if (App.ResourceModel.Settings.CurrentVersion && 　App.ResourceModel.Settings.CurrentVersion.id) {
-		// 		App.ResourceModel.renderLibs();
-		// 	} else {
-		// 		App.ResourceModel.getVersion();
-		// 	}
-		// } 
+	reset: function() {
+		App.ResourcesNav.Settings.pageIndex = 1;
+		 
+		if (App.ResourceModel) {
+			 
+			var settings = App.ResourceModel.Settings;
+			for (var p in settings) {
+				settings[p] = "";
+			}
+			App.ResourceModel.Settings.leftType = "file";
+			App.ResourceModel.Settings.pageIndex = 1;
+		}
 	},
 
 	//绑定全局的事件
 	bindGlobalEvent() {
 
-		$(document).click(function(event) {
 
+		$(document).on("click.resources", function(event) {
+			
 			var $target = $(event.target);
 
 			if ($target.closest('.thumContent .item').length <= 0) {
@@ -131,7 +130,14 @@ App.ResourceModel = {
 
 				});
 			}
+
+			//面包屑 切换 文件 模型 浏览器 
+			if ($target.closest(".breadItem.fileModelNav").length <= 0) {
+				$(".breadItem .fileModelList").hide();
+			}
 		});
+
+
 	},
 
 
@@ -234,10 +240,10 @@ App.ResourceModel = {
 		var data = {
 			data: [file],
 			iconType: 1
-		}; 
-		
+		};
+
 		//窜仔
-		if ($treeViewMar.find('span[data-id="'+file.id+'"]').length>0) {
+		if ($treeViewMar.find('span[data-id="' + file.id + '"]').length > 0) {
 			return;
 		}
 
@@ -320,18 +326,19 @@ App.ResourceModel = {
 
 		if ($treeViewMarUl.length > 0) {
 			var $span = $treeViewMarUl.find("span[data-id='" + file.id + "']");
-			if ($span.length > 0) {
-				var $li = $span.closest('li'),$parent=$li.parent();
+			if ($span.length > 0) { 
+				var $li = $span.closest('li'),
+					$parent = $li.parent();
 				$li.remove();
 				//没有文件夹了
-				// if ($parent.find("li").length<=0) {
+				if ($parent.find("li").length<=0) {
+					$parent.parent().children(".item-content").find(".nodeSwitch").removeClass().addClass("noneSwitch");
+				}
 
-				// }
+			}
 
-			} 
+		}
 
-		} 
-		 
 	},
 
 	//删除文件弹出层
@@ -367,7 +374,7 @@ App.ResourceModel = {
 
 						return false;
 					}
-				}); 
+				});
 
 				// //请求数据
 				// var data = {
