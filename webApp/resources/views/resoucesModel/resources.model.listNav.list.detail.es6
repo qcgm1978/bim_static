@@ -194,7 +194,7 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 				projectId: App.ResourceModel.Settings.CurrentVersion.projectId,
 				projectVersionId: App.ResourceModel.Settings.CurrentVersion.id,
 				fileVersionId: fileVersionId,
-				name: name
+				name: encodeURI(name)
 			}
 		};
 

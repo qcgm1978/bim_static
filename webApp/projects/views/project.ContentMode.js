@@ -7,6 +7,7 @@ App.Projects.ContentMode = Backbone.View.extend({
 	// 重写初始化
 	initialize: function() {
 		this.listenTo(App.Projects.ProjectCollection, "add", this.addOne);
+		this.listenTo(App.Projects.ProjectCollection, "reset", this.emptyContent);
 	},
 
 	template: _.templateUrl('/projects/tpls/project.ContentMode.html', true),
@@ -17,18 +18,21 @@ App.Projects.ContentMode = Backbone.View.extend({
 	},
 
 	//切换改变
-	addOne: function(model) {
-
+	addOne: function(model) { 
 		
 		var listView = new App.Projects.listView({
 			model: model
-		});
+		}),$proListBox=this.$el.find(".proListBox"); 
 
-		this.$el.find(".proListBox").append(listView.render().el);
-		//列表
-		//if (App.Projects.Settings.type == "list") { 
+		$proListBox.find(".loading").remove(); 
 
-		//}  
+		$proListBox.append(listView.render().el);
+	 
+	},
+
+	//清空内容
+	emptyContent:function(){
+		this.$el.find(".proListBox").html('<li class="loading">正在加载……</li>');
 	}
 
 });

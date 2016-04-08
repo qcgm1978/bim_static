@@ -22,9 +22,10 @@ App.ResourceCrumbsNav = Backbone.View.extend({
 	//点击
 	itemClick(event) {
 
-		var $projectVersionList = $(event.target).closest('.resourcesList').find(".projectVersionList");
+		var $projectVersionList = $(event.target).closest('.resourcesList').find(".projectVersionList"),
+		type=App.ResourceModel.Settings.type;
 		//标准模型
-		if (App.ResourceModel.Settings.type == "standardLibs") {
+		if (type == "standardLibs") {
 
 			App.Comm.ajax({
 				URLtype: "fetchStandardLibs"
@@ -34,6 +35,18 @@ App.ResourceCrumbsNav = Backbone.View.extend({
 				$projectVersionList.find(".listResource").html(detail(data));
 				$projectVersionList.show();
 			});
+		}else if (type=="famLibs") {
+			
+			App.Comm.ajax({
+				URLtype: "fetchFamLibs"
+			}, function(data) {
+
+				var detail = _.templateUrl("/resources/tpls/resources.crumbsNav.navDetail.html");
+				$projectVersionList.find(".listResource").html(detail(data));
+				$projectVersionList.show();
+			});
+
+
 		}
 	},
 
@@ -77,7 +90,7 @@ App.ResourceCrumbsNav = Backbone.View.extend({
 
 	}, 
 
-//获取模型id
+	//获取模型id
 	fetchModelIdByResource: function(errCb) {
 
 		var data = {

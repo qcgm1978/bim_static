@@ -6,6 +6,7 @@ App.Project = {
 		property: "",
 		fileId: "",
 		projectId: 100,
+		attrView: null,
 		DataModel: null //渲染模型的数据
 
 	},
@@ -56,8 +57,8 @@ App.Project = {
 		App.Project.Settings.fetchNavType = 'file';
 		App.Project.Settings.projectNav = 'design';
 		App.Project.Settings.fileId = '';
-		App.Project.Settings.property = ''; 
-		App.Project.Settings.DataModel=null;
+		App.Project.Settings.property = '';
+		App.Project.Settings.DataModel = null;
 	},
 
 	//加载版本
@@ -306,27 +307,42 @@ App.Project = {
 
 
 		var type = App.Project.Settings.projectNav;
+
+		// if (this.Settings.attrView && this.Settings.attrView.render) {
+		// 	this.Settings.attrViewthis.stopListening();
+		// }
+
+		//解绑属性
+		App.Project.DesignAttr.PropertiesCollection.unbind();
+
 		//设计
 		if (type == "design") {
 
+			//this.Settings.attrView = new App.Project.ProjectDesignPropety();
+			
 			$("#projectContainer .rightPropertyContent").html(new App.Project.ProjectDesignPropety().render().$el);
 
 		} else if (type == "plan") {
 			//计划
+			App.Project.DesignAttr.PropertiesCollection.unbind();
+			//this.Settings.attrView = new App.Project.ProjectPlanProperty();
 			$("#projectContainer .rightPropertyContent").html(new App.Project.ProjectPlanProperty().render().$el);
 
 
 		} else if (type == "cost") {
 			//成本
+			//this.Settings.attrView = new App.Project.ProjectCostProperty();
 			$("#projectContainer .rightPropertyContent").html(new App.Project.ProjectCostProperty().render().$el);
 
 
 		} else if (type == "quality") {
 			//质量
+			//this.Settings.attrView = new App.Project.ProjectQualityProperty();
 			$("#projectContainer .rightPropertyContent").html(new App.Project.ProjectQualityProperty().render().$el);
 
 		}
 
+		//$("#projectContainer .rightPropertyContent").html(this.Settings.attrView.render().$el);
 		//触发数据加载
 		$("#projectContainer .rightPropertyContent .projectNav .item:first").click();
 

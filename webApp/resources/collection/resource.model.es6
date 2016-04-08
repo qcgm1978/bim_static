@@ -135,6 +135,11 @@ App.ResourceModel = {
 			if ($target.closest(".breadItem.fileModelNav").length <= 0) {
 				$(".breadItem .fileModelList").hide();
 			}
+
+				//面包屑 切换 文件 模型 浏览器 
+			if ($target.closest(".breadItem.projectVersion").length <= 0) {
+				$(".breadItem .projectVersionList").hide();
+			}
 		});
 
 

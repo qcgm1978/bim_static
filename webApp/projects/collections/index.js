@@ -57,14 +57,14 @@
      //加载数据
      loadData: function(projectName) {
 
-        $("#projectModes .proListBox").empty(); //清空数据
+         $("#projectModes .proListBox").empty(); //清空数据
          App.Projects.ProjectCollection.reset();
          App.Projects.ProjectCollection.project = "project";
          //拉取数据
          App.Projects.ProjectCollection.fetch({
 
              data: {
-                // projectType: 1,
+                 // projectType: 1,
                  name: projectName || "",
                  estateType: "",
                  province: "",
@@ -72,7 +72,9 @@
                  complete: "",
                  open: "",
                  openTimeStart: "",
-                 openTimEnd: ""
+                 openTimEnd: "",
+                 pageIndex: App.Projects.Settings.pageIndex,
+                 pageItemCount: App.Comm.Settings.pageItemCount
 
              },
 
@@ -107,10 +109,12 @@
      onlyLoadData: function() {
 
 
-
+         App.Projects.ProjectCollection.reset();
          App.Projects.ProjectCollection.fetch({
 
              data: {
+                pageIndex: App.Projects.Settings.pageIndex,
+                pageItemCount: App.Comm.Settings.pageItemCount,
                  projectType: 1,
                  name: "",
                  estateType: "",

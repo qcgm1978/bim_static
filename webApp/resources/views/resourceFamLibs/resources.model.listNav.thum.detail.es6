@@ -7,11 +7,12 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 
 	//事件绑定
 	events: {
-		"click .text": "fileClick",
+		"click .boxText": "fileClick",
 		"click .btnEnter": "enterEditNameOrCreateNew",
 		"click .btnCalcel": "calcelEditName",
 		"click .ckMe": "itemSelected",
-		"keyup .txtEdit": "enterCreateNew"
+		"keyup .txtEdit": "enterCreateNew",
+		"click .txtEdit":"stopPop"
 
 	},
 
@@ -50,7 +51,7 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 	//文件或者文件夹点击
 	fileClick: function(event) {
 
-		var $target = $(event.target),
+		var $target = $(event.target).closest(".boxText"),
 			id = $target.data("id"),
 			isFolder = $target.data("isfolder");
 		//文件夹
@@ -176,6 +177,7 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 		if ($prevEdit.length > 0) {
 			this.cancelEdit($prevEdit);
 		}
+		return false;
 	},
 
 	//回车创建
@@ -198,6 +200,8 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 			this.editFolderName($item);
 		}
 
+		return false;
+
 	},
 
 	//执行修改
@@ -214,7 +218,7 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 				projectId: App.ResourceModel.Settings.CurrentVersion.projectId,
 				projectVersionId: App.ResourceModel.Settings.CurrentVersion.id,
 				fileVersionId: fileVersionId,
-				name: name
+				name: encodeURI(name)
 			}
 		};
 
@@ -330,6 +334,13 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 			App.ResourceModel.afterRemoveFolder(model.toJSON());
 		}
 
+	},
+
+	//禁止冒泡
+	stopPop(event){
+		event.stopPropagation();
+		$(event.target).focus();
+		return false;
 	}
 
 
