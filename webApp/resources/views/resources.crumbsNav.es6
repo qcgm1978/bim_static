@@ -75,7 +75,7 @@ App.ResourceCrumbsNav = Backbone.View.extend({
 				alert("请使用现代浏览器查看模型");
 				return;
 			} 
-
+			
 			if (App.ResourceModel.Settings.DataModel && App.ResourceModel.Settings.DataModel.sourceId) {
 				Backbone.trigger('navClickCB', App.ResourceModel.Settings.leftType);
 			} else {

@@ -12,7 +12,8 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 		"click .btnCalcel": "calcelEditName",
 		"click .ckMe": "itemSelected",
 		"keyup .txtEdit": "enterCreateNew",
-		"click .txtEdit":"stopPop"
+		"click .txtEdit": "returnPop",
+		"click .ckMe": "stopPop"
 
 	},
 
@@ -262,7 +263,8 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 	createNewFolder: function($item) {
 
 
-		var filePath = $item.find(".txtEdit").val().trim(),that=this, 
+		var filePath = $item.find(".txtEdit").val().trim(),
+			that = this,
 			$leftSel = $("#resourceFamlibsLeftNav .treeViewMarUl .selected");
 		parentId = "";
 		if ($leftSel.length > 0) {
@@ -283,7 +285,8 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 		App.Comm.ajax(data, function(data) {
 			if (data.message == "success") {
 
-				var id=data.data.id,isExists=false;
+				var id = data.data.id,
+					isExists = false;
 
 				$.each(App.ResourceModel.FileThumCollection.models, function(i, item) {
 					if (item.id == id) {
@@ -336,11 +339,16 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 
 	},
 
-	//禁止冒泡
-	stopPop(event){
+	//阻止浏览器默认行为
+	returnPop(event) {
 		event.stopPropagation();
 		$(event.target).focus();
 		return false;
+	},
+
+	//禁止冒泡
+	stopPop(event) {
+		event.stopPropagation();
 	}
 
 
