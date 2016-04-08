@@ -28,6 +28,9 @@ App.API = {
 		fetchModelIdByProject: "view/{projectId}/{projectVersionId}/init",
 		fetchFileModelIdByFileVersionId: "doc/{projectId}/{projectVersionId}/file/meta", //?fileVersionId={fileVersionId}
 
+		fetchScene:"view/{etag}/{sourceId}/tree",// 获取楼层,专业信息
+		fetchCategory:"view/{etag}/{sourceId}/categories",// 获取构件信息
+
 		uploadFile: "doc/{projectId}/{projectVersionId}/file/data", //上传文件  ?parentId={parentId}&fileName={fileName}&size={size}&digest={digest}&position={position}
 		downLoad: "doc/{projectId}/{projectVersionId}/file/data", //文件下载  ?fileId={fileId}
 

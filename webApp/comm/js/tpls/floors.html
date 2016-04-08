@@ -1,0 +1,12 @@
+<% _.forEach(_.sortBy(data,function(num){return num.sort}),function(item){ %>
+<li class="itemNode" id="floors">
+  <div class="item-content">
+    <i class="noneSwitch"></i>
+    <label class="treeCheckbox">
+      <input type="checkbox" checked="checked" data-type="sceneId" data-etag="<%= item.fileEtags %>" />
+      <span class="lbl"></span>
+    </label>
+    <span class="tree-text"><%= item.floor %></span>
+  </div>
+</li>
+<% }) %>

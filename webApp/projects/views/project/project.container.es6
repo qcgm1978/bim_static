@@ -67,7 +67,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			title: '新建任务',
 			cssClass: 'task-create-dialog',
 			okText: '添&nbsp;&nbsp;加',
-			message: "内容" 
+			message: "内容"
 		})*/
 	},
 
@@ -83,7 +83,9 @@ App.Project.ProjectContainer = Backbone.View.extend({
 
 			var $projectList = $(".breadItem .projectList");
 			var template = _.templateUrl("/projects/tpls/project/project.container.project.html");
-			$projectList.find(".container").html(template(data.data));  
+			$projectList.find(".container").html(template(data.data));
+			console.log(data);
+
 			$projectList.find(".loading").hide();
 			$projectList.find(".listContent").show();
 
@@ -99,8 +101,10 @@ App.Project.ProjectContainer = Backbone.View.extend({
 
 			var $projectVersionList = $(".breadItem .projectVersionList");
 			var template = _.templateUrl("/projects/tpls/project/project.container.version.html");
-			$projectVersionList.find(".container").html(template(data.data)); 
-			//显示 
+			$projectVersionList.find(".container").html(template(data.data));
+
+			//显示
+
 			$projectVersionList.find(".loading").hide();
 			$projectVersionList.find(".listContent").show();
 
@@ -310,17 +314,14 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		//渲染模型属性
 		App.Project.renderModelContentByType();
 
-
-		var viewer = App.Project.Settings.Viewer = new BIM({
-			element: $("#projectContainer .modelContainerContent")[0],
+		var viewer = App.Comm.createModel({
+			element: $("#projectContainer .modelContainerContent"),
 			sourceId: App.Project.Settings.DataModel.sourceId,
-			etag: App.Project.Settings.DataModel.etag,
-			tools: true
-		 
+			etag: App.Project.Settings.DataModel.etag
 		});
 
 		$("#projectContainer .projectNavModelContainer").append(new App.Project.viewpoint().render().el);
-
+		return false
 		viewer.on('viewpoint', function(point) {
 			$("#projectContainer .projectNavModelContainer .tree-view:eq(1) .item-content:eq(0)").addClass('open')
 			App.Project.ViewpointAttr.ListCollection.add({
