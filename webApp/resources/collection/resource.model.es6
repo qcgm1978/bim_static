@@ -82,8 +82,8 @@ App.ResourceModel = {
 		//释放上传
 		App.Comm.upload.destroy();
 
-
-		App.ResourceModel.Settings.pageIndex = 1;
+		//重置参数
+		this.reset();
 
 		//存在直接渲染 否则 加载数据
 		if (App.ResourceModel.Settings.CurrentVersion && 　App.ResourceModel.Settings.CurrentVersion.id) {
@@ -99,17 +99,13 @@ App.ResourceModel = {
 	},
 
 	reset: function() {
-		App.ResourcesNav.Settings.pageIndex = 1;
-		 
-		if (App.ResourceModel) {
-			 
-			var settings = App.ResourceModel.Settings;
-			for (var p in settings) {
-				settings[p] = "";
-			}
-			App.ResourceModel.Settings.leftType = "file";
-			App.ResourceModel.Settings.pageIndex = 1;
-		}
+
+
+		App.ResourceModel.Settings.leftType = "file";
+		App.ResourceModel.Settings.pageIndex = 1;
+		App.ResourceModel.Settings.DataModel = null;
+		App.ResourceModel.Settings.CurrentVersion={};
+
 	},
 
 	//绑定全局的事件
@@ -117,7 +113,7 @@ App.ResourceModel = {
 
 
 		$(document).on("click.resources", function(event) {
-			
+
 			var $target = $(event.target);
 
 			if ($target.closest('.thumContent .item').length <= 0) {
@@ -136,7 +132,7 @@ App.ResourceModel = {
 				$(".breadItem .fileModelList").hide();
 			}
 
-				//面包屑 切换 文件 模型 浏览器 
+			//面包屑 切换 文件 模型 浏览器 
 			if ($target.closest(".breadItem.projectVersion").length <= 0) {
 				$(".breadItem .projectVersionList").hide();
 			}
@@ -331,12 +327,12 @@ App.ResourceModel = {
 
 		if ($treeViewMarUl.length > 0) {
 			var $span = $treeViewMarUl.find("span[data-id='" + file.id + "']");
-			if ($span.length > 0) { 
+			if ($span.length > 0) {
 				var $li = $span.closest('li'),
 					$parent = $li.parent();
 				$li.remove();
 				//没有文件夹了
-				if ($parent.find("li").length<=0) {
+				if ($parent.find("li").length <= 0) {
 					$parent.parent().children(".item-content").find(".nodeSwitch").removeClass().addClass("noneSwitch");
 				}
 
