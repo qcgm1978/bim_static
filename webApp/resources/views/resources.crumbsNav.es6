@@ -68,6 +68,7 @@ App.ResourceCrumbsNav = Backbone.View.extend({
 		if (type == "file") {
 
 			Backbone.trigger('navClickCB', type);
+			this.$(".fileModelNav  .breadItemText .text").text("文件浏览器");
 
 		} else {
 
@@ -78,6 +79,7 @@ App.ResourceCrumbsNav = Backbone.View.extend({
 			
 			if (App.ResourceModel.Settings.DataModel && App.ResourceModel.Settings.DataModel.sourceId) {
 				Backbone.trigger('navClickCB', App.ResourceModel.Settings.leftType);
+				this.$(".fileModelNav  .breadItemText .text").text("模型浏览器");
 			} else {
 				//获取模型id
 				this.fetchModelIdByResource();
@@ -93,6 +95,7 @@ App.ResourceCrumbsNav = Backbone.View.extend({
 	//获取模型id
 	fetchModelIdByResource: function(errCb) {
 
+		var that=this;
 		var data = {
 			URLtype: "fetchModelIdByProject",
 			data: {
@@ -115,6 +118,7 @@ App.ResourceCrumbsNav = Backbone.View.extend({
 					App.ResourceModel.Settings.DataModel = data.data;
 					//成功渲染 在 resources.model.listNav.es6 中
 					Backbone.trigger('navClickCB', App.ResourceModel.Settings.leftType);
+					that.$(".fileModelNav  .breadItemText .text").text("模型浏览器");
 				} else {
 					alert("模型转换中"); 
 				}
