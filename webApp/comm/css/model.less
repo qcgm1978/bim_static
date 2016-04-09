@@ -12,7 +12,9 @@
             &.open:after{transform:rotate(-180deg);}
           }
           .selectFloor{display:none;position:absolute;width:100%;left:0;bottom:100%;background:#333;
-            li{height:20px;line-height:20px;padding:0 8px;}
+            li{height:20px;line-height:20px;padding:0 8px;
+              &:hover{background:#000;}
+            }
           }
           .open+.selectFloor{display:block;}
         }

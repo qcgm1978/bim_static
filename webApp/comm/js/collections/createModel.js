@@ -50,7 +50,7 @@ App.Comm.createModel = function(options){
       if(self.is(".bar-filter")){
         self.toggleClass('selected')
         that.filter();
-      }else if(self.is(".bar-viewpoint,.bar-comment")){
+      }else if(self.is(".bar-viewpoint,.bar-comment,.bar-fit")){
         viewer && viewer[fn]();
       }else{
         self.addClass('selected').siblings(":not('.bar-filter')").removeClass('selected');
@@ -437,6 +437,7 @@ App.Comm.createModel = function(options){
       var axis = res.axis,
           x = axis.infoX,
           y = axis.infoY;
+      console.log(res)
       if(x&&y){
         $('.grid-position').text(x+","+y);
       }
