@@ -47,18 +47,11 @@
 
  		var fileVersionId = FileIdArr.join(","); 
 
- 		// //请求数据
- 		var data = {
- 			URLtype: "downLoad",
- 			data: {
- 				projectId: App.ResourceModel.Settings.CurrentVersion.projectId,
- 				projectVersionId: App.ResourceModel.Settings.CurrentVersion.id
- 			}
- 		};
 
- 		var data = App.Comm.getUrlByType(data);
- 		var url = data.url + "?fileVersionId=" + fileVersionId;
- 		window.location.href = url;
+ 		//下载
+		App.Comm.checkDownLoad(App.ResourceModel.Settings.CurrentVersion.projectId,App.ResourceModel.Settings.CurrentVersion.id,fileVersionId);
+
+ 	 
  	},
 
  	//删除文件

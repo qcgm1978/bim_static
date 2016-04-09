@@ -57,14 +57,14 @@
      //加载数据
      loadData: function(projectName) {
 
-        $("#projectModes .proListBox").empty(); //清空数据
+         $("#projectModes .proListBox").empty(); //清空数据
          App.Projects.ProjectCollection.reset();
          App.Projects.ProjectCollection.project = "project";
          //拉取数据
          App.Projects.ProjectCollection.fetch({
 
              data: {
-                // projectType: 1,
+                 // projectType: 1,
                  name: projectName || "",
                  estateType: "",
                  province: "",
@@ -72,7 +72,9 @@
                  complete: "",
                  open: "",
                  openTimeStart: "",
-                 openTimEnd: ""
+                 openTimEnd: "",
+                 pageIndex: App.Projects.Settings.pageIndex,
+                 pageItemCount: 8
 
              },
 
@@ -92,7 +94,7 @@
                      itemCallback: function(pageIndex) {
                          //加载数据
                          App.Projects.Settings.pageIndex = pageIndex + 1;
-                         App.Projects.onlyLoadData();
+                         App.Projects.onlyLoadData(projectName);
                      },
                      prev_text: "上一页",
                      next_text: "下一页"
@@ -104,15 +106,17 @@
      },
 
      //只是加载数据
-     onlyLoadData: function() {
+     onlyLoadData: function(projectName) {
 
 
-
+         App.Projects.ProjectCollection.reset();
          App.Projects.ProjectCollection.fetch({
 
              data: {
-                 projectType: 1,
-                 name: "",
+                 pageIndex: App.Projects.Settings.pageIndex,
+                 pageItemCount: 8,
+                 //projectType: 1,
+                 name: projectName || "",
                  estateType: "",
                  province: "",
                  region: "",

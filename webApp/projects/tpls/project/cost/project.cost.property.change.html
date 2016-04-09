@@ -11,16 +11,18 @@
 
  <tbody>
  	
- <tr>
-   <td class="name">雅安万达广场地下结构变更</td>
-   <td class="date">2012-12-2</td>
-   <td class="diff"> <a href="">查看</a> </td> 
+ <%  var data=obj.data,count=data.length;%>
+
+ <%for(var i=0;i<count;i++){%>
+
+  <tr>
+	   <td class="name"><div class="nameText overflowEllipsis"><%=data[i].title%></div></td>
+	   <td class="date">2012-12-2</td>
+	   <td class="diff"> 
+ 			<a href="/static/dist/app/project/modelChange/index.html?projectId=<%=App.Project.Settings.projectId%>&projectVersionId=<%=App.Project.Settings.CurrentVersion.id%>" target="_blank">查看</a> 
+	    </td> 
  </tr>
- <tr class="bg">
-   <td class="name">雅安万达广场地下结构变更</td>
-   <td class="date">2012-12-2</td>
-   <td class="diff"> <a href="">查看</a> </td> 
- </tr>
+ <%}%> 
 
 
 </tbody>

@@ -22,9 +22,10 @@ App.ResourceCrumbsNav = Backbone.View.extend({
 	//点击
 	itemClick(event) {
 
-		var $projectVersionList = $(event.target).closest('.resourcesList').find(".projectVersionList");
+		var $projectVersionList = $(event.target).closest('.resourcesList').find(".projectVersionList"),
+		type=App.ResourceModel.Settings.type;
 		//标准模型
-		if (App.ResourceModel.Settings.type == "standardLibs") {
+		if (type == "standardLibs") {
 
 			App.Comm.ajax({
 				URLtype: "fetchStandardLibs"
@@ -34,6 +35,18 @@ App.ResourceCrumbsNav = Backbone.View.extend({
 				$projectVersionList.find(".listResource").html(detail(data));
 				$projectVersionList.show();
 			});
+		}else if (type=="famLibs") {
+			
+			App.Comm.ajax({
+				URLtype: "fetchFamLibs"
+			}, function(data) {
+
+				var detail = _.templateUrl("/resources/tpls/resources.crumbsNav.navDetail.html");
+				$projectVersionList.find(".listResource").html(detail(data));
+				$projectVersionList.show();
+			});
+
+
 		}
 	},
 
@@ -55,6 +68,7 @@ App.ResourceCrumbsNav = Backbone.View.extend({
 		if (type == "file") {
 
 			Backbone.trigger('navClickCB', type);
+			this.$(".fileModelNav  .breadItemText .text").text("文件浏览器");
 
 		} else {
 
@@ -62,9 +76,10 @@ App.ResourceCrumbsNav = Backbone.View.extend({
 				alert("请使用现代浏览器查看模型");
 				return;
 			} 
-
+			
 			if (App.ResourceModel.Settings.DataModel && App.ResourceModel.Settings.DataModel.sourceId) {
 				Backbone.trigger('navClickCB', App.ResourceModel.Settings.leftType);
+				this.$(".fileModelNav  .breadItemText .text").text("模型浏览器");
 			} else {
 				//获取模型id
 				this.fetchModelIdByResource();
@@ -77,9 +92,10 @@ App.ResourceCrumbsNav = Backbone.View.extend({
 
 	}, 
 
-//获取模型id
+	//获取模型id
 	fetchModelIdByResource: function(errCb) {
 
+		var that=this;
 		var data = {
 			URLtype: "fetchModelIdByProject",
 			data: {
@@ -102,6 +118,7 @@ App.ResourceCrumbsNav = Backbone.View.extend({
 					App.ResourceModel.Settings.DataModel = data.data;
 					//成功渲染 在 resources.model.listNav.es6 中
 					Backbone.trigger('navClickCB', App.ResourceModel.Settings.leftType);
+					that.$(".fileModelNav  .breadItemText .text").text("模型浏览器");
 				} else {
 					alert("模型转换中"); 
 				}

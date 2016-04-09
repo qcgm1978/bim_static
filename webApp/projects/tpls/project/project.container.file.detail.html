@@ -16,13 +16,13 @@
 <% if(folder){%>
  <span data-id="<%=id%>" data-isfolder="<%=folder%>" class="text"><%=name%></span>
 <%}else{%>
- <a data-id="<%=id%>" href="/static/dist/app/project/single/filePreview.html?id=<%=id%>&projectId=<%=App.Project.Settings.projectId%>&projectVersionId=<%=App.Project.Settings.CurrentVersion.id%>" target="_blank" data-isfolder="<%=folder%>" class="text"><%=name%></a>
+ <a data-id="<%=id%>" href="/static/dist/app/project/single/filePreview.html?id=<%=fileVersionId%>&projectId=<%=App.Project.Settings.projectId%>&projectVersionId=<%=App.Project.Settings.CurrentVersion.id%>" target="_blank" data-isfolder="<%=folder%>" class="text"><%=name%></a>
 <%}%> 
 
   </span> 
 
 <%if(!folder && modificationId){%>
- <a href="/static/dist/app/project/modelChange/index.html?id=<%=id%>&projectId=<%=App.Project.Settings.projectId%>&projectVersionId=<%=App.Project.Settings.CurrentVersion.id%>&modificationId=<%=modificationId%>" target="_blank" class="changeContrast inlineBlock">有</a> 
+ <a href="/static/dist/app/project/modelChange/index.html?id=<%=fileVersionId%>&projectId=<%=App.Project.Settings.projectId%>&projectVersionId=<%=App.Project.Settings.CurrentVersion.id%>&modificationId=<%=modificationId%>" target="_blank" class="changeContrast inlineBlock">有</a> 
 <%}else{%>
 	<span class="changeContrast inlineBlock"></span>
 <%}%>

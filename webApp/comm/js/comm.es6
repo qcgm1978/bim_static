@@ -21,6 +21,11 @@ App.Comm = {
 					}
 				}
 
+				//未登录
+				if (data.code==10004) {
+					debugger
+				}
+
 				//回调
 				callback(data);
 
@@ -235,8 +240,44 @@ App.Comm = {
 		return false;
 
 	},
-	managePoint:function(data){
+	managePoint: function(data) {
 		App.Comm.viewpointView(data);
+	},
+
+	//下载
+	checkDownLoad: function(projectId, projectVersionId, fileVersionId) {
+
+		 
+		var checkData = {
+			URLtype: "checkDownLoad",
+			data: {
+				projectId: projectId,
+				versionId: projectVersionId,
+				fileVersionId: fileVersionId
+			}
+		}
+
+		App.Comm.ajax(checkData, function(data) {
+			if (data.code == 0) {
+				// //请求数据
+				var data = {
+					URLtype: "downLoad",
+					data: {
+						projectId: projectId,
+						projectVersionId: projectVersionId
+					}
+				};
+
+				var data = App.Comm.getUrlByType(data);
+				var url = data.url + "?fileVersionId=" + fileVersionId;
+				window.location.href = url;
+			}else{
+				alert(data.message);
+			}
+
+		})
+
+
 	}
 
 };

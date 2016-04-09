@@ -31,13 +31,19 @@ App.Project.ProjectCostProperty=Backbone.View.extend({
 		if (type == "reference") {
 			//清单
 			this.$el.find(".CostReference").show().siblings().hide();
-			
+
+			App.Project.CostAttr.ReferenceCollection.projectId=App.Project.Settings.projectId;
+			App.Project.CostAttr.ReferenceCollection.projectVersionId=App.Project.Settings.CurrentVersion.id; 
 			App.Project.CostAttr.ReferenceCollection.fetch();
 
 		} else if (type == "change") {
 			//变更
 			this.$el.find(".CostChange").show().siblings().hide();
-			App.Project.CostAttr.ChangeCollection.fetch();
+			App.Project.CostAttr.ChangeCollection.fetch({
+				data:{
+					projectId:App.Project.Settings.projectId
+				}
+			});
 
 		} else if (type == "verification") {
 			//检查

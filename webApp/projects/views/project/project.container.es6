@@ -283,9 +283,9 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		var that = this;
 
 
-		//App.Project.Settings.modelId= "e0c63f125d3b5418530c78df2ba5aef1";
-		//this.renderModel();
-		//return;
+		// App.Project.Settings.modelId= "e0c63f125d3b5418530c78df2ba5aef1";
+		// this.renderModel();
+		// return;
 
 
 		App.Comm.ajax(data, function(data) {
@@ -321,7 +321,6 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			etag: App.Project.Settings.DataModel.etag
 		});
 
-		return false
 		viewer.on('viewpoint', function(point) {
 			$("#projectContainer .projectNavModelContainer .tree-view:eq(1) .item-content:eq(0)").addClass('open')
 			App.Project.ViewpointAttr.ListCollection.add({

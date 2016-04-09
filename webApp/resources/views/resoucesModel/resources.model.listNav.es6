@@ -40,12 +40,18 @@ App.ResourceModel.ListNav = Backbone.View.extend({
 	//左侧试图
 	navClickCB: function(type) {
 
+		if (this.$el.closest('body').length<=0) {
+			this.remove();
+			return;
+		}
+
 		if (type == "file") {
 			this.$el.removeClass('hideLeft');
 			this.$el.find(".listContent").show().end().find(".modelContentBox").hide().end().find(".modelAttr").hide();
 			this.$el.css("margin-right", 0);
 			$("#resourceModelLeftNav").show();
 		} else {
+
 
 			$("#resourceModelLeftNav").hide();
 
@@ -102,6 +108,10 @@ App.ResourceModel.ListNav = Backbone.View.extend({
 	//重新渲染苏醒
 	reRender: function(model) {
 
+		if (this.$el.closest('body').length<=0) {
+			this.remove();
+			return;
+		}
 		//渲染数据
 		var data = model.toJSON().data;
 		this.$el.find(".attrContentBox .attrContent").html(this.reTemplate(data));

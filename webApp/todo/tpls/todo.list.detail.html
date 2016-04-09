@@ -1,12 +1,17 @@
  
-
-<div class="todoInformatin"> 
-		<div> <span class="text"> <%= type=='commission'?'发起人：':'当前审批：' %>  </span> <span><%= operatorName %> </span>  </div>
-		<div> <span class="text receiveTime"><%= type=='commission'?'接收时间：':'更新时间：' %></span> <span><%= new Date(receivedTime).format("yyyy-MM-dd") %> </span>  </div> 
-</div>
+ 
 
 <div class="title"> <a href="/static/dist/app/todo/todo.html" target="_blank"> <%= desc %> </a> </div>
- 
+
+ <div class="operator">
+ 	 <span class="text"> <%= type=='commission'?'发起人：':'当前审批：' %>  </span>  <span><%= operatorName %> </span>
+ </div>
+
+<div class="date">
+	
+	<span class="text receiveTime"><%= type=='commission'?'接收时间：':'更新时间：' %></span> <span><%= new Date(receivedTime).format("yyyy-MM-dd") %> </span>  
+</div>
+
  <% if(status==1 &&  type=='commission' ){%>
  	<span class="newMsg"></span>
  <% } %>

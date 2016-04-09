@@ -216,18 +216,7 @@ Backbone.sync = function(method, model, options) {
 	if (App.API.Settings.debug) {
 		model.url = App.API.DEBUGURL[model.urlType];
 	} else {
-		model.url = App.API.Settings.hostname + App.API.URL[model.urlType];
-		//跨域
-		// if (!options.crossDomain) {
-		// 	options.crossDomain = true;
-		// }
-
-		// if (!options.xhrFields) {
-		// 	options.xhrFields = {
-		// 		withCredentials: true
-		// 	};
-		// }
-		// options.dataType = "jsonp"; 
+		model.url = App.API.Settings.hostname + App.API.URL[model.urlType]; 
 	}
 	//}
 
@@ -242,20 +231,14 @@ Backbone.sync = function(method, model, options) {
 				model.url = model.url.replace(rex, val);
 			}
 		}
-	}
-
-
-
-	// if (App.Comm.Settings.debug) {
-	// 	//调用backbone 原本的方法
-	// 	return BackboneSync.apply(this, arguments);
-	// } else {
-	// 	return $.ajax({
-	// 		url: "http://172.16.233.97:9090/platform/api/todo",
-	// 		dataType: "jsonp"
-	// 	});
-	// }
+	} 
+ 
 
 	//调用backbone 原本的方法
-	return BackboneSync.apply(this, arguments);
+	return BackboneSync.apply(this, arguments).done(function(data){
+			if (data.code==10004) {
+				debugger;
+				console.log("未登录");
+			}
+	});
 };
