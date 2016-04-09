@@ -455,6 +455,6 @@ App.Comm.createModel = function(options){
     })
     return viewer;
   }
-  init();
+  return init();
 }
 

@@ -320,18 +320,6 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			projectId: App.Project.Settings.projectId,
 			etag: App.Project.Settings.DataModel.etag
 		});
-
-		viewer.on('viewpoint', function(point) {
-			$("#projectContainer .projectNavModelContainer .tree-view:eq(1) .item-content:eq(0)").addClass('open')
-			App.Project.ViewpointAttr.ListCollection.add({
-				data: [{
-					id: '',
-					name: '新建视点',
-					viewPoint: point
-				}]
-			})
-		})
-
 		viewer.on("click", function(model) {
 			App.Project.Settings.ModelObj = null;
 
