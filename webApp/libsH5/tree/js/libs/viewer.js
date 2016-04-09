@@ -9,6 +9,7 @@ var BIM = function(option){
   var self = BIM.common.self = this;
   var defaults = {
     element:'',
+    mapElement:'',
     cameraInfo:'',
     controll:true,
     etag:'',
@@ -53,6 +54,20 @@ var BIM = function(option){
   var changed = function(res){
     BIM.util.pub('click',res);
   }
+  var changeAxisGrid = function(res){
+    BIM.util.pub('changeGrid',res);
+  }
+  var initMap = function(){
+    var _el = _opt.mapElement,
+        _width = _el.clientWidth,
+        _height = _el.clientHeight,
+        _css={
+          left:'0px',
+          bottom:'0px',
+          outline:'none'
+        };
+    viewer.initMiniMap(_el,_width,_height,_css,changeAxisGrid);
+  }
   var viewer = BIM.common.viewer = new CloudViewer();
   viewer.registerEventListener(CLOUD.EVENTS.ON_SELECTION_CHANGED, changed);
   viewer.registerEventListener(CLOUD.EVENTS.ON_LOAD_PROGRESS, loading);
@@ -64,6 +79,7 @@ var BIM = function(option){
     bimBox.appendChild(viewBox);
     _opt.element.appendChild(bimBox);
     viewer.init(viewBox);
+    initMap();
     viewer.load(_opt.etag,BIM.common.severModel);
     if(_opt.resize){
       _util.listener(window,'resize',function(){
@@ -784,6 +800,22 @@ BIM.prototype = {
       filter.removeUserOverrider(obj.type,id);
     });
     viewer.render();
+  },
+  setFloorMap:function(obj){
+    var viewer = BIM.common.viewer;
+    viewer.setFloorPlanData(obj);
+  },
+  setAxisGrid:function(obj){
+    var viewer = BIM.common.viewer;
+    viewer.setAxisGridData(obj);
+  },
+  showAxisGrid:function(){
+    var viewer = BIM.common.viewer;
+    viewer.showAxisGrid(true);
+  },
+  hideAxisGrid:function(){
+    var viewer = BIM.common.viewer;
+    viewer.showAxisGrid(false);
   }
 }
 Array.prototype.remove = function(item){

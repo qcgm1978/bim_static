@@ -1,0 +1,147 @@
+{
+	"Metadata": {
+		"ID": "WDGC-Q-SY-AR-B02",
+		"Name": "项目名称",
+		"Timestamp": "\/Date(1459834955638)\/",
+		"Seeds": [{
+			"Source": null,
+			"LocalID": null,
+			"Name": "WDGC-Q-SY-AR-B02.rvt",
+			"MIME": "application/rvt"
+		}],
+		"DefaultView": "9a00fab2-1912-48a5-9d0e-f3722a0a439a-0005e6cc",
+		"DefaultLayout": "1f3d16fe-667c-4268-afcc-54e3d8ead7c4",
+		"Properties": null,
+		"Categories": null,
+		"Version": 1
+	},
+	"Views": [{
+		"ID": "9a00fab2-1912-48a5-9d0e-f3722a0a439a-0005e6cc",
+		"Name": "{三维}",
+		"Representations": [{
+			"MIME": "image/png",
+			"Description": "图像文件(PNG)",
+			"Size": 28035,
+			"Path": "resource/thumbnails/9a00fab2-1912-48a5-9d0e-f3722a0a439a-0005e6cc/vvuffm3r.png",
+			"PathAccessMode": "normal",
+			"Downloadable": true,
+			"Attributes": {
+				"Category": "Preview",
+				"Width": "512",
+				"Height": "406"
+			}
+		}, {
+			"MIME": "image/png",
+			"Description": "图像文件(PNG)",
+			"Size": 8900,
+			"Path": "resource/thumbnails/9a00fab2-1912-48a5-9d0e-f3722a0a439a-0005e6cc/vvuffm3r.96x96.png",
+			"PathAccessMode": "normal",
+			"Downloadable": false,
+			"Attributes": {
+				"Category": "Thumbnail",
+				"Width": "96",
+				"Height": "96"
+			}
+		}, {
+			"MIME": "image/png",
+			"Description": "图像文件(PNG)",
+			"Size": 4668,
+			"Path": "resource/thumbnails/9a00fab2-1912-48a5-9d0e-f3722a0a439a-0005e6cc/vvuffm3r.64x64.png",
+			"PathAccessMode": "normal",
+			"Downloadable": false,
+			"Attributes": {
+				"Category": "Thumbnail",
+				"Width": "64",
+				"Height": "64"
+			}
+		}, {
+			"MIME": "image/png",
+			"Description": "图像文件(PNG)",
+			"Size": 1702,
+			"Path": "resource/thumbnails/9a00fab2-1912-48a5-9d0e-f3722a0a439a-0005e6cc/vvuffm3r.32x32.png",
+			"PathAccessMode": "normal",
+			"Downloadable": false,
+			"Attributes": {
+				"Category": "Thumbnail",
+				"Width": "32",
+				"Height": "32"
+			}
+		}]
+	}],
+	"Layouts": [{
+		"ID": "1f3d16fe-667c-4268-afcc-54e3d8ead7c4",
+		"Name": "Categories",
+		"Root": {
+			"ID": "6ac07f64-ab6b-4ddd-986d-c1bde3477fa2",
+			"Name": "Root",
+			"Folders": [{
+				"ID": "91bd720d-9d00-4656-805b-8d0af1911546",
+				"Name": "ThreeD",
+				"Folders": [],
+				"Views": ["9a00fab2-1912-48a5-9d0e-f3722a0a439a-0005e6cc"]
+			}],
+			"Views": []
+		}
+	}],
+	"Maps": [{
+		"Name": "B02_-8400",
+		"Path": "resource\\map\\B02_-8400.png",
+		"BoundingBox": {
+			"Min": {
+				"X": -18037.733283649533,
+				"Y": -41241.474527310849,
+				"Z": -9900.0000000000018
+			},
+			"Max": {
+				"X": 87574.266752164971,
+				"Y": 72720.525472275433,
+				"Z": -4679.9999999999991
+			}
+		}
+	}, {
+		"Name": "PLAN-B2",
+		"Path": "resource\\map\\PLAN-B2.png",
+		"BoundingBox": {
+			"Min": {
+				"X": -18037.733283649533,
+				"Y": -41241.474527310849,
+				"Z": -9900.0000000000018
+			},
+			"Max": {
+				"X": 87574.266752164971,
+				"Y": 72720.525472275433,
+				"Z": -4679.9999999999991
+			}
+		}
+	}, {
+		"Name": "PLAN-B2 建筑出图",
+		"Path": "resource\\map\\PLAN-B2 建筑出图.png",
+		"BoundingBox": {
+			"Min": {
+				"X": -18037.733283649533,
+				"Y": -41241.474527310849,
+				"Z": -9900.0000000000018
+			},
+			"Max": {
+				"X": 87574.266752164971,
+				"Y": 72720.525472275433,
+				"Z": -4679.9999999999991
+			}
+		}
+	}, {
+		"Name": "PLAN-B2-机电出图",
+		"Path": "resource\\map\\PLAN-B2-机电出图.png",
+		"BoundingBox": {
+			"Min": {
+				"X": -18037.733283649533,
+				"Y": -41241.474527310849,
+				"Z": -9900.0000000000018
+			},
+			"Max": {
+				"X": 87574.266752164971,
+				"Y": 72720.525472275433,
+				"Z": -4679.9999999999991
+			}
+		}
+	}]
+}
