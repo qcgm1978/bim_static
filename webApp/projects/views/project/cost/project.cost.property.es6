@@ -31,7 +31,9 @@ App.Project.ProjectCostProperty=Backbone.View.extend({
 		if (type == "reference") {
 			//清单
 			this.$el.find(".CostReference").show().siblings().hide();
-			
+
+			App.Project.CostAttr.ReferenceCollection.projectId=App.Project.Settings.projectId;
+			App.Project.CostAttr.ReferenceCollection.projectVersionId=App.Project.Settings.CurrentVersion.id; 
 			App.Project.CostAttr.ReferenceCollection.fetch();
 
 		} else if (type == "change") {

@@ -33,6 +33,7 @@ App.ResourceModel.LeftNav = Backbone.View.extend({
 			data.click = function(event) {
 				var file = $(event.target).data("file");
 				//清空数据
+				$("#navContainer .header .ckAll").prop("checked",false);
 				$("#resourceListContent .fileContent").empty();
 				App.ResourceModel.Settings.fileVersionId = file.fileVersionId;
 				App.ResourceModel.FileCollection.reset();

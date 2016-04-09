@@ -32,6 +32,7 @@ App.API = {
 		fetchCategory:"view/{etag}/{sourceId}/categories",// 获取构件信息
 
 		uploadFile: "doc/{projectId}/{projectVersionId}/file/data", //上传文件  ?parentId={parentId}&fileName={fileName}&size={size}&digest={digest}&position={position}
+		"checkDownLoad":"doc/{projectId}/{versionId}/file/size", // 下载确认 是否可以下载  ?fileVersionId={fileVersionId} 
 		downLoad: "doc/{projectId}/{projectVersionId}/file/data", //文件下载  ?fileId={fileId}
 
 		//视点
@@ -64,7 +65,7 @@ App.API = {
 		fetchPlanProperties: "", //属性
 
 		//陈本
-		fetchCostReference: "", // 清单
+		fetchCostReference: "sixD/{projectId}/{projectVersionId}/cost/summary", // 清单 
 		fetchCostChange: "", // 变更
 		fetchCostVerification: "", // 效验
 		fetchCostProperties: "", //属性

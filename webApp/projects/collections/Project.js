@@ -260,18 +260,9 @@ App.Project = {
 
 			var fileVersionId = FileIdArr.join(",");
 
-			// //请求数据
-			var data = {
-				URLtype: "downLoad",
-				data: {
-					projectId: App.Project.Settings.projectId,
-					projectVersionId: App.Project.Settings.CurrentVersion.id
-				}
-			};
-
-			var data = App.Comm.getUrlByType(data);
-			var url = data.url + "?fileVersionId=" + fileVersionId;
-			window.location.href = url;
+			//下载
+			App.Comm.checkDownLoad(App.Project.Settings.projectId,App.Project.Settings.CurrentVersion.id,fileVersionId);
+			
 
 			// App.Comm.ajax(data).done(function(){
 			// 	console.log("下载完成");
@@ -372,7 +363,10 @@ App.Project = {
 			}
 
 			data.click = function(event) {
+				 
 				var file = $(event.target).data("file");
+				// 
+				$("#projectContainer .header .ckAll").prop("checked",false);
 				//App.Project.FileCollection.parentId=file.id;
 				//清空数据
 				App.Project.FileCollection.reset();

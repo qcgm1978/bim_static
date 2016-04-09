@@ -2,7 +2,7 @@ App.Comm = {
 
 	Settings: {
 		v: 20160312,
-		pageItemCount:Math.floor(($("body").height() + 60) / 70) > 10 && Math.floor(($("body").height() + 60) / 70) || 10
+		pageItemCount: Math.floor(($("body").height() + 60) / 70) > 10 && Math.floor(($("body").height() + 60) / 70) || 10
 	},
 
 	//封装ajax
@@ -235,8 +235,44 @@ App.Comm = {
 		return false;
 
 	},
-	managePoint:function(data){
+	managePoint: function(data) {
 		App.Comm.viewpointView(data);
+	},
+
+	//下载
+	checkDownLoad: function(projectId, projectVersionId, fileVersionId) {
+
+		 
+		var checkData = {
+			URLtype: "checkDownLoad",
+			data: {
+				projectId: projectId,
+				versionId: projectVersionId,
+				fileVersionId: fileVersionId
+			}
+		}
+
+		App.Comm.ajax(checkData, function(data) {
+			if (data.code == 0) {
+				// //请求数据
+				var data = {
+					URLtype: "downLoad",
+					data: {
+						projectId: projectId,
+						projectVersionId: projectVersionId
+					}
+				};
+
+				var data = App.Comm.getUrlByType(data);
+				var url = data.url + "?fileVersionId=" + fileVersionId;
+				window.location.href = url;
+			}else{
+				alert(data.message);
+			}
+
+		})
+
+
 	}
 
 };
