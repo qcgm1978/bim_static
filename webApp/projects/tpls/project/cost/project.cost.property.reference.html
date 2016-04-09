@@ -31,7 +31,7 @@
                             <span class="code"><%=current.code%></span>
                         </td>
                         <td class="listName"><%=current.name%></td>
-                        <td class="listCount"><%=current.quantity%><%=current.unit%></td>  
+                        <td class="listCount"><%=current.totalQuantity%><%=current.unit%></td>  
                     </tr>
 
                      <% if(current.children){%>
@@ -52,7 +52,7 @@
                                             <span class="code code1"><%=current.code%></span>
                                     </td>
                                     <td class="listName"><%=current.name%></td>
-                                    <td class="listCount"><%=current.quantity%><%=current.unit%></td>  
+                                    <td class="listCount"><%=current.totalQuantity%><%=current.unit%></td>  
                                 </tr>
 
                                  <% if(current.children){%>
@@ -70,7 +70,7 @@
                                                 <span class="code code2"><%=current.code%></span>
                                             </td>
                                             <td class="listName"><%=current.name%></td>
-                                            <td class="listCount"><%=current.quantity%><%=current.unit%></td>  
+                                            <td class="listCount"><%=current.totalQuantity%><%=current.unit%></td>  
                                         </tr>
 
                                              <% if(current.children){%>
@@ -87,7 +87,7 @@
                                                             <span class="code code3"><%=current.code%></span>
                                                         </td>
                                                         <td class="listName"><%=current.name%></td>
-                                                        <td class="listCount"><%=current.quantity%><%=current.unit%></td>  
+                                                        <td class="listCount"><%=current.totalQuantity%><%=current.unit%></td>  
                                                     </tr>  
                                                  <%}%>
 

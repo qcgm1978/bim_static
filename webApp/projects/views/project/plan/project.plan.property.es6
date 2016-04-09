@@ -27,13 +27,14 @@ App.Project.ProjectPlanProperty = Backbone.View.extend({
 		var $target = $(event.target),
 			type = $target.data("type");
 		$target.addClass('selected').siblings().removeClass('selected');
-		
+		 
 		App.Project.Settings.property = type;
 
 		if (type == "model") {
 			//碰撞
 			this.$el.find(".planModel").show().siblings().hide();
-			
+			App.Project.PlanAttr.PlanModelCollection.projectId=App.Project.Settings.projectId;
+			App.Project.PlanAttr.PlanModelCollection.projectVersionId=App.Project.Settings.CurrentVersion.id; 
 			App.Project.PlanAttr.PlanModelCollection.fetch();
 
 		} else if (type == "analog") {

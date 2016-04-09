@@ -119,7 +119,7 @@
 		}
 	}
 	.detailList { height: 100%; overflow-x: hidden; overflow-y: auto; padding: 46px 0 40px; }
-	.planBox { position: absolute; top: 62px; bottom: 0px; left: 0px; right: 0px;
+	.planBox { position: absolute; top:52px; bottom: 0px; left: 0px; right: 0px;
 		.planContent { height: 100%;
 			.tbPlan { border: 1px #ccc solid; width: 100%; min-width: 398px;
 				th, td { border: 1px #ccc solid; }
@@ -164,13 +164,13 @@
 	.nullTip { background: url(/projects/images/attrSel.png) no-repeat 50% 100%; padding-top: 200px; height: 50px; line-height: 50px; color: #ccc; font-size: 16px; text-align: center; }
 	.rightPropertyContent { height: 100%;
 		.ProjectPlanPropertyContainer { height: 100%;
-			.planContainer { height: 100%; margin-top: -50px; padding-top: 50px; }
+			
 		}
 		.designPropetyBox { height: 100%; }
 	}
 }
 
-.CostReference { .referenceContent { position: absolute; top:50px; bottom: 3px; left: 0px; right: 0px; overflow: auto; }
+.CostReference { .referenceContent { position: absolute; top:50px; bottom: 3px; left: 0px; right: 0px;  }
 	.referenceSearch { position: relative; padding: 12px;
 		.btnSearch { position: absolute; top: 20px; font-size: 14px; color: #ccc; left: 20px; cursor: pointer; }
 		.txtSearch { min-width: 373px; padding-left: 30px; width: 100%; }
@@ -199,11 +199,11 @@
 	.code1 { margin-left: -24px; padding-left: 24px; }
 	.code2 { margin-left: -31px; padding-left: 31px; }
 	.code3 { margin-left: -40px; padding-left: 40px; }
-	.CostChange, .CostVerification { overflow: auto; position: absolute; top: 40px; bottom: 0px; left: 0px; right: 0px; }
+	.CostChange, .CostVerification { overflow: auto; position: absolute; top: 12px; bottom: 0px; left: 0px; right: 0px; }
 	.tbCostChange { width: 100%; min-width: 395px;
 		td, th { border: 1px #ccc solid; }
-		.name { width: 56%; }
-		.date, .diff { width: 18%; }
+		.name { width: 50%; .nameText{width:95%;}}
+		.date, .diff { width: 24%; text-align: center;padding-left: 0px;}
 		thead { th { text-align: center; height: 30px; line-height: 30px; }
 		}
 		tbody { td { height: 25px; line-height: 25px; padding-left: 8px;

@@ -58,7 +58,7 @@ App.API = {
 		fetchDesignChangeInfo:"sixD/{projectId}/{projectVersionId}/comparison/result?comparisonId={comparisonId}", // 获取模型对比结果
 
 		//计划
-		fetchPlanModel: "", //模型
+		fetchPlanModel: "sixD/{projectId}/{projectVersionId}/plan", //模型
 		fetchPlanAnalog: "", //模拟
 		fetchPlanPublicity: "", //关注
 		fetchPlanInspection: "", //检验
@@ -66,7 +66,7 @@ App.API = {
 
 		//陈本
 		fetchCostReference: "sixD/{projectId}/{projectVersionId}/cost/summary", // 清单 
-		fetchCostChange: "", // 变更
+		fetchCostChange: "platform/auditSheet?type=9", // 变更
 		fetchCostVerification: "", // 效验
 		fetchCostProperties: "", //属性
 
@@ -80,8 +80,7 @@ App.API = {
 		fetchQualityProperties: "", // 属性
 
 
-		//计划
-		fetchPlanModel: "",
+		 
 
 
 

@@ -314,8 +314,7 @@ App.Project = {
 			$("#projectContainer .rightPropertyContent").html(new App.Project.ProjectDesignPropety().render().$el);
 
 		} else if (type == "plan") {
-			//计划
-			App.Project.DesignAttr.PropertiesCollection.unbind();
+			//计划 
 			//this.Settings.attrView = new App.Project.ProjectPlanProperty();
 			$("#projectContainer .rightPropertyContent").html(new App.Project.ProjectPlanProperty().render().$el);
 

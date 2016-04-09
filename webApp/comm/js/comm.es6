@@ -21,6 +21,11 @@ App.Comm = {
 					}
 				}
 
+				//未登录
+				if (data.code==10004) {
+					debugger
+				}
+
 				//回调
 				callback(data);
 

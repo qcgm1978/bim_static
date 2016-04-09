@@ -39,7 +39,11 @@ App.Project.ProjectCostProperty=Backbone.View.extend({
 		} else if (type == "change") {
 			//变更
 			this.$el.find(".CostChange").show().siblings().hide();
-			App.Project.CostAttr.ChangeCollection.fetch();
+			App.Project.CostAttr.ChangeCollection.fetch({
+				data:{
+					projectId:App.Project.Settings.projectId
+				}
+			});
 
 		} else if (type == "verification") {
 			//检查
