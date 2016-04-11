@@ -31,11 +31,11 @@ App.API = {
 		fetchScene:"view/{etag}/{sourceId}/tree",// 获取楼层,专业信息
 		fetchCategory:"view/{etag}/{sourceId}/categories",// 获取构件信息
 
-		fetchFloors:'/datajson/map/map.json',//获取模型楼层信息
+		fetchFloors:'view/{etag}/{sourceId}/miniature/map',//获取模型楼层信息
 		fetchAxisGrid:'/datajson/map/gridAndLevel.json',//获取楼层地图,轴网信息
 
 		uploadFile: "doc/{projectId}/{projectVersionId}/file/data", //上传文件  ?parentId={parentId}&fileName={fileName}&size={size}&digest={digest}&position={position}
-		"checkDownLoad":"doc/{projectId}/{versionId}/file/size", // 下载确认 是否可以下载  ?fileVersionId={fileVersionId} 
+		"checkDownLoad":"doc/{projectId}/{versionId}/file/size", // 下载确认 是否可以下载  ?fileVersionId={fileVersionId}
 		downLoad: "doc/{projectId}/{projectVersionId}/file/data", //文件下载  ?fileId={fileId}
 
 		//视点
@@ -68,7 +68,7 @@ App.API = {
 		fetchPlanProperties: "", //属性
 
 		//陈本
-		fetchCostReference: "sixD/{projectId}/{projectVersionId}/cost/summary", // 清单 
+		fetchCostReference: "sixD/{projectId}/{projectVersionId}/cost/summary", // 清单
 		fetchCostChange: "platform/auditSheet?type=9", // 变更
 		fetchCostVerification: "", // 效验
 		fetchCostProperties: "", //属性
@@ -83,7 +83,7 @@ App.API = {
 		fetchQualityProperties: "", // 属性
 
 
-		 
+
 
 
 
@@ -119,6 +119,8 @@ App.API = {
 
 		fetchModelIdByProject:"/dataJson/project/design/fetchModelIdByProject.json",
 
+		fetchFloors:'/datajson/map/map.json',//获取模型楼层信息
+		fetchAxisGrid:'/datajson/map/gridAndLevel.json',//获取楼层地图,轴网信息
 
 		//设计
 		fetchDesignProperties: "/dataJson/project/project.design.property.json", //设计属性

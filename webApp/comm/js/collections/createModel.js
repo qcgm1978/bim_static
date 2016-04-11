@@ -3,6 +3,7 @@ App.Comm.createModel = function(options){
   var modelBox = $('<div class="modelView"></div>');
   var modelView = $('<div class="model"></div>');
   var modelMap = $('<div class="map"></div>');
+  var serverUrl = 'http://bim.wanda.cn'
   var viewer;
   var viewPoint;
   var floorMap;
@@ -40,6 +41,8 @@ App.Comm.createModel = function(options){
       this.$el.html(this.template);
       this.$el.find(".modelTree").html(new treeView().render().el);
       this.$el.find(".floors").append(new selectFloor().render().el);
+      modelCollection.floorsCollection.etag = opt.etag;
+      modelCollection.floorsCollection.sourceId = opt.sourceId;
       modelCollection.floorsCollection.fetch();
       return this;
     },
@@ -111,10 +114,18 @@ App.Comm.createModel = function(options){
       var that = this,
           self = $(event.target),
           val = self.text(),
-          index = self.index(),
-          cur = self.parent().prev();
+          sort = self.data("index"),
+          cur = self.parent().prev(),
+          mapData;
+      $.each(floorMap,function(index,item){
+        if(item.sort == sort){
+          item.Path=  serverUrl + "/model"+item.path;
+          item.BoundingBox = item.boundingBox;
+          mapData = item;
+        }
+      });
       cur.text(val).removeClass("open");
-      viewer.setFloorMap(floorMap[index])
+      viewer.setFloorMap(mapData);
     }
   });
   var treeView = Backbone.View.extend({
@@ -335,7 +346,7 @@ App.Comm.createModel = function(options){
     // 视点树
     tagName: "ul",
     className:'selectFloor',
-    template:'<% _.each(data,function(item){ %><li><%= item.name %></li><% }) %>',
+    template:'<% _.each(data,function(item){ %><li data-index="<%= item.sort %>"><%= item.name.substr(0,3) %></li><% }) %>',
     initialize:function(){
       this.listenTo(modelCollection.floorsCollection,"add",this.addFloors);
     },
@@ -345,10 +356,12 @@ App.Comm.createModel = function(options){
     },
     addFloors:function(model){
       var data = model.toJSON();
-      data.data = data.data.sort(function(){return true});
-      floorMap = data.data;
-      this.$el.html(_.template(this.template)(data));
-      this.$el.find("li:eq(0)").trigger("click");
+      if(data.message == "success"){
+        data.data = data.data.sort(function(a,b){return a.sort<b.sort})
+        floorMap = data.data;
+        this.$el.html(_.template(this.template)(data));
+        this.$el.find("li:eq(0)").trigger("click");
+      }
       return this;
     }
   });
