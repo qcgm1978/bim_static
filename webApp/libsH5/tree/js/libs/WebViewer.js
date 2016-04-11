@@ -103,6 +103,20 @@ CLOUD.Utils = {
         return null;
     },
 
+    computeBBox : function(minA, maxA, minB, maxB){
+        var bbox = new THREE.Box3();
+        bbox.min.fromArray(minA, 0);
+        bbox.max.fromArray(maxA, 0);
+
+        var v1 = new THREE.Vector3();
+        v1.fromArray(minB, 0);
+        bbox.expandByPoint(v1);
+        v1.fromArray(maxB, 0);
+        bbox.expandByPoint(v1);
+
+        return bbox;
+    },
+
     parseTransform: function (node, objJson, trf) {
 
         var updateMatrix = false;
@@ -492,7 +506,7 @@ CLOUD.GeomUtil = {
         if (objJSON.order) {
             object.out = 1;
         }
-          
+
         if (CLOUD.GlobalData.ShowSubSceneBox)
         {
             var clr = 0xff;
@@ -506,7 +520,7 @@ CLOUD.GeomUtil = {
 
     parseCylinderNode: function (geometryNode, params) {
         if (params instanceof Object) {
-            
+
         }
         else {
             var reg = new RegExp("'", "g");
@@ -533,7 +547,7 @@ CLOUD.GeomUtil = {
         geometryNode.position.copy(startPt).addScaledVector(dir, len * 0.5);
         geometryNode.updateMatrix();
         geometryNode.matrixAutoUpdate = false;
-        //geometryNode.boundingBox = 
+        //geometryNode.boundingBox =
         if (!geometryNode.geometry.boundingBox)
             geometryNode.geometry.computeBoundingBox();
     },
@@ -1846,6 +1860,32 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
 
     }
 
+    this.renderImmediate = function (geometry, program, material) {
+
+        state.initAttributes();
+
+        var attributes = program.getAttributes();
+
+        var position = geometry.attributes['position'];
+        if(position){
+            state.enableAttribute(attributes.position);
+            _gl.vertexAttribPointer(attributes.position, 3, _gl.FLOAT, false, 0, position.array);
+        }
+
+        var normal = geometry.attributes['normal'];
+        if (normal) {
+            state.enableAttribute(attributes.normal);
+            _gl.vertexAttribPointer(attributes.normal, 3, _gl.FLOAT, false, 0, normal.array);
+        }
+
+        state.disableUnusedAttributes();
+
+        var index = geometry.index;
+        if (index) {
+            _gl.drawElements(_gl.TRIANGLES, index.array.length, _gl.UNSIGNED_INT, index.array);
+        }
+
+    }
     // Buffer rendering
 
     this.renderBufferImmediate = function ( object, program, material ) {
@@ -2691,25 +2731,27 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
             object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
             object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
 
-            if ( object instanceof THREE.ImmediateRenderObject ) {
+            //if ( object instanceof THREE.Mesh ) {
 
-                setMaterial( material );
+            //    setMaterial( material );
 
-                var program = setProgram( camera, lights, fog, material, object );
+            //    var program = setProgram( camera, lights, fog, material, object );
 
-                _currentGeometryProgram = '';
+            //    _this.renderImmediate(geometry, program, material);
 
-                object.render( function ( object ) {
+            //    //_currentGeometryProgram = '';
 
-                    _this.renderBufferImmediate( object, program, material );
+            //    //object.render( function ( object ) {
 
-                } );
+            //    //    _this.renderBufferImmediate( object, program, material );
 
-            } else {
+            //    //} );
+
+            //} else {
 
                 _this.renderBufferDirect( camera, lights, fog, geometry, material, object, group );
 
-            }
+            //}
 
             if (i % 1000 === 999) {
                 //endTime = window.performance.now();
@@ -2725,7 +2767,7 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
 
                     break;
                 }
-            }      
+            }
         }
 
         if (i === l - 1) {
@@ -2867,7 +2909,7 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
                             //}
 
                             //_vector3.copy(object.modelCenter);
-                            
+
                             //_vector3.applyProjection( _projScreenMatrix );
 
                             //console.log(_vector3.z);
@@ -5403,6 +5445,8 @@ CLOUD.AxisGrid.prototype = {
 CLOUD.MiniMap = function (viewer, callback) {
     this.viewer = viewer;
     this.callbackFn = callback;
+    // this.callbackFn = function () {
+    // };
     this.visible = true;
     this.width = 0;
     this.height = 0;
@@ -5418,7 +5462,7 @@ CLOUD.MiniMap = function (viewer, callback) {
     var normalizedMouse = new THREE.Vector2();
 
     var _clearColor = new THREE.Color(), _clearAlpha = 1;
-    var _defaultClearColor = 0xadadad; // 缺省背景色
+    var _defaultClearColor = 0xffffff; // 0xadadad; // 缺省背景色ma
 
     var _xmlns = "http://www.w3.org/2000/svg";
     var _svg = document.createElementNS(_xmlns, 'svg');
@@ -5430,19 +5474,21 @@ CLOUD.MiniMap = function (viewer, callback) {
     var _clipBox = new THREE.Box2(), _elemBox = new THREE.Box2(), _axisGridBox = new THREE.Box2();
 
     var _axisGridElements = [];
+    var _axisGridIntersectionPoints = [];
     var _axisGridLevels = [];
     var _isInitializedAxisGird = false;
     var _isShowAxisGrid = false;
     var _isExistData = false;
     var _axisGridIntersectionInfo = {};
 
-    var _tipNode, _circleNode, _highlightHorizLineNode, _highlightVerticalLineNode;
+    var _tipNode, _circleNode, _highlightHorizLineNode, _highlightVerticalLineNode, _cameraNode;
     var _highlightColor = '#258ae3';
     var _highlightLineWidth = 1;
     var _circleNodeRadius = 3;
-    var _isHighlightInterPoint = false;
+    var _hasHighlightInterPoint = false;
 
     var _floorPlaneElevation = 0; // 平面图标高
+    var _floorPlaneBox;
 
     // ------------- 这些算法可以独立成文件 S ------------- //
 
@@ -5472,49 +5518,48 @@ CLOUD.MiniMap = function (viewer, callback) {
 
     // ------------- 这些算法可以独立成文件 E ------------- //
 
-    function normalizedScreenPoint(screen) {
+    // 正规化坐标转屏幕坐标
+    function normalizedPointToScreen(point) {
 
-        var point = new THREE.Vector2();
+        var retPoint = new THREE.Vector2();
 
-        point.x = screen.x / _svgHalfWidth;
-        point.y = -screen.y / _svgHalfHeight;
+        retPoint.x = point.x * _svgHalfWidth;
+        retPoint.y = -point.y * _svgHalfHeight;
 
-        return point;
+        return retPoint;
     }
 
-    function normalizedPointToScreen(screen) {
+    // 屏幕坐标转正规化坐标
+    function screenToNormalizedPoint(point) {
 
-        var point = new THREE.Vector2();
+        var retPoint = new THREE.Vector2();
 
-        point.x = screen.x * _svgHalfWidth;
-        point.y = -screen.y * _svgHalfHeight;
+        retPoint.x = point.x / _svgHalfWidth;
+        retPoint.y = -point.y / _svgHalfHeight;
 
-        return point;
+        return retPoint;
     }
 
     // 正规化屏幕坐标转世界坐标
-    function screenToWorld(point, box) {
+    function normalizedPointToWorld(point) {
 
-        var maxSize = box.size();
+        var boxSize = _axisGridBox.size();
         var retPoint = new THREE.Vector2();
 
-        retPoint.x = 0.5 * (point.x + 1) * maxSize.x + box.min.x;
-        retPoint.y = 0.5 * (point.y + 1) * maxSize.y + box.min.y;
+        retPoint.x = 0.5 * (point.x + 1) * boxSize.x + _axisGridBox.min.x;
+        retPoint.y = 0.5 * (point.y + 1) * boxSize.y + _axisGridBox.min.y;
 
         return retPoint;
     }
 
     // 世界坐标转正规化屏幕坐标 [-1, 1]
-    function worldToScreen(point, box) {
+    function worldToNormalizedPoint(point) {
 
-        var maxSize = box.size();
+        var boxSize = _axisGridBox.size();
         var retPoint = new THREE.Vector2();
 
-        retPoint.x = (point.x - box.min.x) / maxSize.x * 2 - 1;
-        retPoint.y = (point.y - box.min.y) / maxSize.y * 2 - 1;
-
-        //p.x *= _svgWidthHalf;
-        //p.y *= -_svgHeightHalf;
+        retPoint.x = (point.x - _axisGridBox.min.x) / boxSize.x * 2 - 1;
+        retPoint.y = (point.y - _axisGridBox.min.y) / boxSize.y * 2 - 1;
 
         return retPoint;
     }
@@ -5672,6 +5717,10 @@ CLOUD.MiniMap = function (viewer, callback) {
 
     this.mouseDown = function (event, callback) {
 
+        var mouse = new THREE.Vector2(event.clientX, event.clientY);
+        var isOverCanvas = this.isMouseOverCanvas(mouse);
+
+        return isOverCanvas;
     };
 
     this.mouseMove = function (event, callback) {
@@ -5679,53 +5728,22 @@ CLOUD.MiniMap = function (viewer, callback) {
         var mouse = new THREE.Vector2(event.clientX, event.clientY);
         var isOverCanvas = this.isMouseOverCanvas(mouse);
 
-        if (isOverCanvas) {
+        if (isOverCanvas && _isShowAxisGrid) {
 
-            this.computeHighlightNodePosition();
+            this.dealHighlightNode();
 
-            if (_isShowAxisGrid) {
-
-                if (_isHighlightInterPoint) {
-                    this.showTip();
-                } else {
-                    this.hideTip();
-                }
-
-                callback();
+            if (_hasHighlightInterPoint) {
+                this.showTip();
+            } else {
+                this.hideTip();
             }
 
-            if (this.callbackFn && _isExistData) {
-
-                // 计算选中点的坐标
-                var clickPoint2D = screenToWorld(normalizedMouse, _axisGridBox);
-                var clickPoint = new THREE.Vector3(clickPoint2D.x, clickPoint2D.y, _floorPlaneElevation);
-
-                // 计算轴信息
-                var axisInfoX = "";
-                var axisInfoY = "";
-
-                if (_isHighlightInterPoint) {
-                    axisInfoX = _axisGridIntersectionInfo.infoX;
-                    axisInfoY = _axisGridIntersectionInfo.infoY;
-                }
-
-                var jsonObj = {
-                    point: clickPoint,
-                    axis: {
-                        infoX: axisInfoX,
-                        infoY: axisInfoY
-                    }
-                };
-
-                //console.log(jsonObj);
-
-                this.callbackFn(jsonObj);
-            }
+            callback();
 
         } else {
             //this.hideTip();
             //callback();
-            _isHighlightInterPoint = false;
+            _hasHighlightInterPoint = false;
         }
 
         return isOverCanvas;
@@ -5738,10 +5756,29 @@ CLOUD.MiniMap = function (viewer, callback) {
 
         if (isOverCanvas && _isExistData) {
             // 计算选中点的坐标
-            var clickPoint2D = screenToWorld(normalizedMouse, _axisGridBox);
-            var clickPoint = new THREE.Vector3(clickPoint2D.x, clickPoint2D.y, _floorPlaneElevation);
+            var clickPoint2D = normalizedPointToWorld(normalizedMouse);
+            var clickPoint = new THREE.Vector3();
 
-            //console.log("clickPoint - 1", clickPoint);
+            // 如果靠近交点，使用交点会更好，不然感觉靠近交点高亮时，点击的位置不一致。
+            var screenPosition = normalizedPointToScreen(normalizedMouse);
+            // 获得最近的交点
+            var intersection = this.computeMinDistanceIntersection(screenPosition);
+
+            if (intersection) {
+                // 计算轴信息
+                var interPoint = new THREE.Vector2(intersection.intersectionPoint.x, intersection.intersectionPoint.y);
+                var offset = screenPosition.sub(interPoint);
+
+                if (offset.lengthSq() < _circleNodeRadius * _circleNodeRadius) {
+                    var interScreenPoint = screenToNormalizedPoint(interPoint);
+                    interScreenPoint = normalizedPointToWorld(interScreenPoint);
+                    clickPoint.set(interScreenPoint.x, interScreenPoint.y, _floorPlaneElevation);
+                } else {
+                    clickPoint.set(clickPoint2D.x, clickPoint2D.y, _floorPlaneElevation);
+                }
+            } else {
+                clickPoint.set(clickPoint2D.x, clickPoint2D.y, _floorPlaneElevation);
+            }
 
             transformWorldPoint(clickPoint);
 
@@ -5758,9 +5795,9 @@ CLOUD.MiniMap = function (viewer, callback) {
 
         // 初始化绘图面板
         this.initCanvasContainer(domContainer, styleOptions);
-
         // 初始化提示节点
         this.initTipNode();
+        this.initCameraNode();
         // 设置绘图面板大小
         this.setSize(width, height);
         // 设置绘图面板背景色
@@ -5827,30 +5864,31 @@ CLOUD.MiniMap = function (viewer, callback) {
 
         this.clear();
 
-        //if (!_isInitializedAxisGird)
-        //    return;
-
         renderFloorPlan();
 
         if (_isShowAxisGrid) {
             _svg.appendChild(_svgGroupForAxisGrid);
 
             for (var i = 0, len = _axisGridElements.length; i < len; i++) {
-                var element = _axisGridElements[i];
-                var v1 = element.v1.clone();
-                var v2 = element.v2.clone();
-                var material = element.material;
+                var lineElements = _axisGridElements[i];
 
-                //v1.x *= _svgHalfWidth;
-                //v1.y *= -_svgHalfHeight;
-                //v2.x *= _svgHalfWidth;
-                //v2.y *= -_svgHalfHeight;
+                for (var j = 0, len2 = lineElements.length; j < len2; j++) {
+                    var element = lineElements[j];
+                    var v1 = element.v1.clone();
+                    var v2 = element.v2.clone();
+                    var material = element.material;
 
-                _elemBox.makeEmpty();
-                _elemBox.setFromPoints([v1, v2]);
+                    //v1.x *= _svgHalfWidth;
+                    //v1.y *= -_svgHalfHeight;
+                    //v2.x *= _svgHalfWidth;
+                    //v2.y *= -_svgHalfHeight;
 
-                if (_clipBox.isIntersectionBox(_elemBox) === true) {
-                    renderLine(v1, v2, material);
+                    _elemBox.makeEmpty();
+                    _elemBox.setFromPoints([v1, v2]);
+
+                    if (_clipBox.isIntersectionBox(_elemBox) === true) {
+                        renderLine(v1, v2, material);
+                    }
                 }
             }
 
@@ -5859,6 +5897,9 @@ CLOUD.MiniMap = function (viewer, callback) {
             _svg.appendChild(_circleNode);
         }
 
+        this.resetCameraNode();
+
+        _svg.appendChild(_cameraNode);
     };
 
     this.getMainSceneMatrix = function () {
@@ -5878,6 +5919,19 @@ CLOUD.MiniMap = function (viewer, callback) {
             setContainerElementStyle(_mapContainer, styleOptions);
             domContainer.appendChild(_mapContainer);
             _mapContainer.appendChild(_svg);
+        }
+    };
+
+    this.initCameraNode = function () {
+
+        if (!_cameraNode) {
+            _cameraNode = document.createElementNS(_xmlns, 'path');
+            _cameraNode.setAttribute('d', 'M-2,-4 L6,0 L-2,4 L0,0 L-2,-4');
+            _cameraNode.setAttribute('fill', '#1b8cef');
+            _cameraNode.setAttribute('stroke', "#cbd7e1");
+            _cameraNode.setAttribute('stroke-width', '0.4');
+            _cameraNode.setAttribute('stroke-linejoin', "round");
+            _cameraNode.setAttribute('opacity', '0.0');
         }
     };
 
@@ -5992,8 +6046,12 @@ CLOUD.MiniMap = function (viewer, callback) {
     this.clearAxisGird = function () {
 
         if (_axisGridElements.length > 0) {
-            //_elements.splice(0,_elements.length);
+            //_axisGridElements.splice(0,_axisGridElements.length);
             _axisGridElements = [];
+        }
+
+        if (_axisGridIntersectionPoints.length > 0) {
+            _axisGridIntersectionPoints = [];
         }
 
         _axisGridBox.makeEmpty();
@@ -6002,22 +6060,18 @@ CLOUD.MiniMap = function (viewer, callback) {
 
     this.initAxisGird = function (grids) {
 
+        _isInitializedAxisGird = false;
+
         var len = grids.length;
 
-        if (len < 1) {
-            _isInitializedAxisGird = false;
-            return;
-        }
-
-        // 设置了数据
-        _isExistData = true;
+        if (len < 1) return;
 
         var materialGrid = new THREE.LineBasicMaterial({
-            color: 0xffffff,
-            linewidth: 1
+            color: 0x303030,//0x2c2255
+            linewidth: 0.5
         });
 
-        var i = 0;
+        var i = 0, j = 0;
 
         // 计算轴网包围盒
         for (i = 0; i < len; i++) {
@@ -6029,7 +6083,8 @@ CLOUD.MiniMap = function (viewer, callback) {
             _axisGridBox.expandByPoint(end);
         }
 
-        var maxSize = _axisGridBox.size();
+        var horizLineElements = []; // 水平线集合
+        var verticalLineElements = []; // 垂直线集合
 
         for (i = 0; i < len; i++) {
 
@@ -6037,21 +6092,58 @@ CLOUD.MiniMap = function (viewer, callback) {
             var start = new THREE.Vector2(grids[i].start.X, grids[i].start.Y);
             var end = new THREE.Vector2(grids[i].end.X, grids[i].end.Y);
 
-            start.x = (start.x - _axisGridBox.min.x) / maxSize.x * 2 - 1;
-            start.y = (start.y - _axisGridBox.min.y) / maxSize.y * 2 - 1;
+            start = worldToNormalizedPoint(start);
+            start = normalizedPointToScreen(start);
 
-            end.x = (end.x - _axisGridBox.min.x) / maxSize.x * 2 - 1;
-            end.y = (end.y - _axisGridBox.min.y) / maxSize.y * 2 - 1;
+            end = worldToNormalizedPoint(end);
+            end = normalizedPointToScreen(end);
 
-            start.x *= _svgHalfWidth;
-            start.y *= -_svgHalfHeight;
+            var dir = end.clone().sub(start).normalize();
 
-            end.x *= _svgHalfWidth;
-            end.y *= -_svgHalfHeight;
-
-            _axisGridElements.push({name: name, v1: start, v2: end, material: materialGrid});
+            if (Math.abs(dir.x) >= Math.abs(dir.y)) {
+                // 水平方向线条
+                horizLineElements.push({name: name, v1: start, v2: end, material: materialGrid});
+            } else {
+                // 垂直方向线条
+                verticalLineElements.push({name: name, v1: start, v2: end, material: materialGrid});
+            }
         }
 
+        _axisGridElements.push(horizLineElements);
+        _axisGridElements.push(verticalLineElements);
+
+        // 计算交点
+        var horizLineElementsLen = horizLineElements.length;
+        var verticalLineElementsLen = verticalLineElements.length;
+        var horizLine, verticalLine, numeralName, abcName;
+        var p1, p2, p3, p4;
+
+        for (i = 0; i < horizLineElementsLen; i++) {
+            horizLine = horizLineElements[i];
+            abcName = horizLine.name;
+            p1 = horizLine.v1.clone();
+            p2 = horizLine.v2.clone();
+
+            for (j = 0; j < verticalLineElementsLen; j++) {
+                verticalLine = verticalLineElements[j];
+                numeralName = verticalLine.name;
+                p3 = verticalLine.v1.clone();
+                p4 = verticalLine.v2.clone();
+
+                // 获得交点
+                var interPoint = getInterPoint(p1, p2, p3, p4);
+                _axisGridIntersectionPoints.push({
+                    intersectionPoint: interPoint,
+                    horizLine: [p1.clone(), p2.clone()],
+                    verticalLine: [p3.clone(), p4.clone()],
+                    abcName: abcName,
+                    numeralName: numeralName
+                });
+            }
+        }
+
+        // 设置了数据
+        _isExistData = true;
         _isInitializedAxisGird = true;
     };
 
@@ -6074,7 +6166,7 @@ CLOUD.MiniMap = function (viewer, callback) {
             //_svgGroupForAxisGrid.style.opacity = 1;
             _svgGroupForAxisGrid.style.display = "";
 
-            if (_isHighlightInterPoint) {
+            if (_hasHighlightInterPoint) {
                 this.showTip();
             }
 
@@ -6095,98 +6187,54 @@ CLOUD.MiniMap = function (viewer, callback) {
         }
     };
 
-    this.computeHighlightNodePosition = function () {
+    this.dealHighlightNode = function () {
 
-        _isHighlightInterPoint = false;
+        _hasHighlightInterPoint = false;
 
-        var intersections = [];
+        var intersection = null;
+        var _circleRadiusToSquared = _circleNodeRadius * _circleNodeRadius;
 
-        for (var i = 0, len = _axisGridElements.length; i < len; i++) {
-            var element = _axisGridElements[i];
-            var v1 = element.v1.clone();
-            var v2 = element.v2.clone();
+        for (var i = 0, len = _axisGridIntersectionPoints.length; i < len; i++) {
+            var interPoint = _axisGridIntersectionPoints[i].intersectionPoint;
+            var point = new THREE.Vector2(normalizedMouse.x, normalizedMouse.y);
+            point = normalizedPointToScreen(point);
 
-            //v1.x *= _svgHalfWidth;
-            //v1.y *= -_svgHalfHeight;
-            //v2.x *= _svgHalfWidth;
-            //v2.y *= -_svgHalfHeight;
+            var distanceSquared = interPoint.distanceToSquared(point);
 
-            var start = new THREE.Vector3(v1.x, v1.y, 0);
-            var end = new THREE.Vector3(v2.x, v2.y, 0);
-            var line = new THREE.Line3(start, end);
-            var point = new THREE.Vector3(normalizedMouse.x, normalizedMouse.y, 0);
-
-            // 转屏幕坐标
-            point.x *= _svgHalfWidth;
-            point.y *= -_svgHalfHeight;
-
-            var closestPoint = line.closestPointToPoint(point);
-            var distance = point.sub(closestPoint).length();
-
-            if (distance < _circleNodeRadius) {
-                intersections.push(i);
+            if (distanceSquared < _circleRadiusToSquared) {
+                intersection = _axisGridIntersectionPoints[i];
+                break;
             }
         }
 
-        if (intersections.length > 1) {
-            var tmp1 = _axisGridElements[intersections[0]];
-            var name1 = tmp1.name;
-            var p1 = tmp1.v1.clone();
-            var p2 = tmp1.v2.clone();
+        if (!intersection) return null;
 
-            //p1.x *= _svgHalfWidth;
-            //p1.y *= -_svgHalfHeight;
-            //p2.x *= _svgHalfWidth;
-            //p2.y *= -_svgHalfHeight;
-            _highlightHorizLineNode.setAttribute('x1', p1.x);
-            _highlightHorizLineNode.setAttribute('y1', p1.y);
-            _highlightHorizLineNode.setAttribute('x2', p2.x);
-            _highlightHorizLineNode.setAttribute('y2', p2.y);
+        // 高亮点的变换位置
+        _circleNode.setAttribute('transform', 'translate(' + intersection.intersectionPoint.x + ',' + intersection.intersectionPoint.y + ')');
 
-            var tmp2 = _axisGridElements[intersections[1]];
-            var name2 = tmp2.name;
-            var p3 = tmp2.v1.clone();
-            var p4 = tmp2.v2.clone();
+        // 提示文本
+        _tipNode.innerHTML = intersection.abcName + "-" + intersection.numeralName;
 
-            //p3.x *= _svgHalfWidth;
-            //p3.y *= -_svgHalfHeight;
-            //p4.x *= _svgHalfWidth;
-            //p4.y *= -_svgHalfHeight;
-            _highlightVerticalLineNode.setAttribute('x1', p3.x);
-            _highlightVerticalLineNode.setAttribute('y1', p3.y);
-            _highlightVerticalLineNode.setAttribute('x2', p4.x);
-            _highlightVerticalLineNode.setAttribute('y2', p4.y);
+        // 位置
+        var box = _tipNode.getBoundingClientRect();
 
-            // 获得交点
-            var interPoint = getInterPoint(p1, p2, p3, p4);
+        _tipNode.style.left = (_svgHalfWidth + intersection.intersectionPoint.x - 0.5 * box.width) + "px";
+        _tipNode.style.top = ( _svgHalfHeight + intersection.intersectionPoint.y - box.height - 12) + "px"; // 12 = fontsize(10px) + 2 * linewidth(1px)
 
-            // 高亮点的变换位置
-            _circleNode.setAttribute('transform', 'translate(' + interPoint.x + ',' + interPoint.y + ')');
+        // 水平线条
+        _highlightHorizLineNode.setAttribute('x1', intersection.horizLine[0].x);
+        _highlightHorizLineNode.setAttribute('y1', intersection.horizLine[0].y);
+        _highlightHorizLineNode.setAttribute('x2', intersection.horizLine[1].x);
+        _highlightHorizLineNode.setAttribute('y2', intersection.horizLine[1].y);
 
-            // 提示文本
-            _tipNode.innerHTML = name2 + "-" + name1;
+        // 垂直线条
+        _highlightVerticalLineNode.setAttribute('x1', intersection.verticalLine[0].x);
+        _highlightVerticalLineNode.setAttribute('y1', intersection.verticalLine[0].y);
+        _highlightVerticalLineNode.setAttribute('x2', intersection.verticalLine[1].x);
+        _highlightVerticalLineNode.setAttribute('y2', intersection.verticalLine[1].y);
 
-            // 位置
-            var box = _tipNode.getBoundingClientRect();
+        _hasHighlightInterPoint = true;
 
-            _tipNode.style.left = (_svgHalfWidth + interPoint.x - 0.5 * box.width) + "px";
-            _tipNode.style.top = ( _svgHalfHeight + interPoint.y - box.height - 12) + "px"; // 12 = fontsize(10px) + 2 * linewidth(1px)
-
-            // 保存轴网相交信息
-            // 将交点转成世界坐标
-            //var normalizedInterPoint = normalizedScreenPoint(interPoint);
-            //var worldInterPoint = screenToWorld(normalizedInterPoint, _axisGridBox);
-
-            _axisGridIntersectionInfo.infoX = "X(" + name2 + "," + interPoint.x + ")";
-            _axisGridIntersectionInfo.infoY = "Y(" + name1 + "," + interPoint.y + ")";
-
-            _isHighlightInterPoint = true;
-        }
-    };
-
-    this.holdAxisInfo = function(offset, horizName, verticalName) {
-        _axisGridIntersectionInfo.infoX = "X(" + horizName + "," + offset.x + ")";
-        _axisGridIntersectionInfo.infoY = "Y(" + verticalName + "," + offset.y + ")";
     };
 
     this.setFloorPlanFromJsonString = function (jsonStr) {
@@ -6199,28 +6247,34 @@ CLOUD.MiniMap = function (viewer, callback) {
         var url = jsonObj["Path"];
         var boundingBox = jsonObj["BoundingBox"];
 
+        _isExistData = false;
+
         if (!url || !boundingBox) {
-            _isExistData = false;
+            console.warn('floor-plan data is error!');
             return;
         }
 
         // 设置了数据
         _isExistData = true;
 
+        _floorPlaneBox = new THREE.Box3(new THREE.Vector3(boundingBox.Min.X, boundingBox.Min.Y, boundingBox.Min.Z), new THREE.Vector3(boundingBox.Max.X, boundingBox.Max.Y, boundingBox.Max.Z));
+
         // 平面图不需要使用Z坐标
-        var bBox = new THREE.Box2(new THREE.Vector2(boundingBox.Min.X, boundingBox.Min.Y), new THREE.Vector2(boundingBox.Max.X, boundingBox.Max.Y));
+        var bBox2D = new THREE.Box2(new THREE.Vector2(_floorPlaneBox.min.x, _floorPlaneBox.min.y), new THREE.Vector2(_floorPlaneBox.max.x, _floorPlaneBox.max.y));
 
         if (!_isInitializedAxisGird) {
             console.warn('axis-grid is not initialized!');
 
             // 没有设置轴网，取自己的包围盒
-            _axisGridBox.copy(bBox);
+            _axisGridBox.copy(bBox2D);
         }
 
-        this.initFloorPlane(url, bBox);
+        this.initFloorPlane(url, bBox2D);
 
-        var elevation = 0.5 * (boundingBox.Min.Z + boundingBox.Max.Z);
+        var elevation = 0.5 * (_floorPlaneBox.min.z + _floorPlaneBox.max.z);
         this.setFloorPlaneElevation(elevation);
+
+        this.resetCameraNode();
 
         this.render();
     };
@@ -6255,9 +6309,139 @@ CLOUD.MiniMap = function (viewer, callback) {
         _svgNode.setAttribute("transform", 'translate(' + offset.x + ',' + offset.y + ')');
     };
 
-    this.setFloorPlaneElevation = function(elevation){
+    this.setFloorPlaneElevation = function (elevation) {
         _floorPlaneElevation = elevation;
-    }
+    };
+
+    this.resetCameraNode = function () {
+
+        if (!_floorPlaneBox) return;
+
+        var camera = this.viewer.camera;
+        var cameraEditor = this.viewer.cameraEditor;
+
+        if (!camera || !cameraEditor) return;
+
+        var cameraPosition = camera.position;
+        var cameraTargetPosition = cameraEditor.target;
+        var sceneMatrix = this.getMainSceneMatrix();
+
+        //var box = bBox.clone();
+        //box.applyMatrix4(sceneMatrix);
+        //
+        //if (!box.containsPoint(camera.position)) {
+        //    return null;
+        //}
+
+        var inverseMatrix = new THREE.Matrix4();
+        inverseMatrix.getInverse(sceneMatrix);
+
+        var bBoxCenter = _floorPlaneBox.center();
+        var pointA = new THREE.Vector3(_floorPlaneBox.min.x, _floorPlaneBox.min.y, bBoxCenter.z).applyMatrix4(sceneMatrix);
+        var pointB = new THREE.Vector3(_floorPlaneBox.min.x, _floorPlaneBox.max.y, bBoxCenter.z).applyMatrix4(sceneMatrix);
+        var pointC = new THREE.Vector3(_floorPlaneBox.max.x, _floorPlaneBox.min.y, bBoxCenter.z).applyMatrix4(sceneMatrix);
+
+        var plane = new THREE.Plane();
+        plane.setFromCoplanarPoints(pointA, pointB, pointC);
+
+        // 计算相机投影
+        var projectedCameraPosition = plane.projectPoint(cameraPosition);
+        // 转回世界坐标
+        projectedCameraPosition.applyMatrix4(inverseMatrix);
+
+        // 计算相机LookAt投影
+        var projectedTargetPosition = plane.projectPoint(cameraTargetPosition);
+        // 转回世界坐标
+        projectedTargetPosition.applyMatrix4(inverseMatrix);
+
+        // 计算相机投影后的方向
+        var projectedEye = projectedTargetPosition.clone().sub(projectedCameraPosition);
+        projectedEye.z = 0;
+        projectedEye.normalize();
+
+        if (_floorPlaneBox.containsPoint(projectedCameraPosition)) {
+
+            // 计算相机位置
+            var offset = worldToNormalizedPoint(projectedCameraPosition);
+            var cameraScreenPosition = normalizedPointToScreen(offset);
+
+            offset.x = offset.x * _svgHalfWidth;
+            offset.y = -offset.y * _svgHalfHeight;
+
+            var axisX = new THREE.Vector3(1, 0, 0);
+            var angle = THREE.Math.radToDeg(projectedEye.angleTo(axisX));
+            angle *= -1; // 逆时针为正
+
+            _cameraNode.setAttribute('opacity', '1.0');
+            _cameraNode.setAttribute("transform", "translate(" + offset.x + "," + offset.y + ") rotate(" + angle + ") scale(3, 3) ");
+
+            if (this.callbackFn && _isExistData) {
+
+                // 计算选中点的坐标
+                //var clickPoint2D = screenToWorld(normalizedMouse, _axisGridBox);
+                //var clickPoint = new THREE.Vector3(clickPoint2D.x, clickPoint2D.y, _floorPlaneElevation);
+                var clickPoint = new THREE.Vector3(projectedCameraPosition.x, projectedCameraPosition.y, _floorPlaneElevation);
+                // 获得离相机最近的交点
+                var intersection = this.computeMinDistanceIntersection(cameraScreenPosition);
+
+                if (intersection) {
+                    // 计算轴信息
+                    var interPoint = new THREE.Vector2(intersection.intersectionPoint.x, intersection.intersectionPoint.y);
+                    interPoint = screenToNormalizedPoint(interPoint);
+                    interPoint = normalizedPointToWorld(interPoint);
+
+                    var offsetX = Math.round(projectedCameraPosition.x - interPoint.x);
+                    var offsetY = Math.round(projectedCameraPosition.y - interPoint.y);
+                    var axisInfoX = "X(" + intersection.abcName + "," + offsetX + ")";
+                    var axisInfoY = "Y(" + intersection.numeralName + "," + offsetY + ")";
+
+                    var jsonObj = {
+                        point: clickPoint,
+                        axis: {
+                            abcName: intersection.abcName,
+                            numeralName: intersection.numeralName,
+                            offsetX: offsetX,
+                            offsetY: offsetY,
+                            infoX: axisInfoX,
+                            infoY: axisInfoY
+                        }
+                    };
+
+                    //console.log(jsonObj.axis.infoX + "" + jsonObj.axis.infoY);
+
+                    this.callbackFn(jsonObj);
+                }
+            }
+        } else {
+            //console.log("the camera in the invalid region!");
+            _cameraNode.setAttribute('opacity', '0.0');
+        }
+    };
+
+    this.computeMinDistanceIntersection = function (screenPosition) {
+
+        if (_axisGridIntersectionPoints.length < 1) return null;
+
+        var minDistanceSquared = 0;
+        var idx = 0;
+
+        for (var i = 0, len = _axisGridIntersectionPoints.length; i < len; i++) {
+            var interObj = _axisGridIntersectionPoints[i];
+            var interPoint = new THREE.Vector2(interObj.intersectionPoint.x, interObj.intersectionPoint.y);
+            var distanceSquared = interPoint.distanceToSquared(screenPosition);
+
+            if (i == 0) {
+                minDistanceSquared = distanceSquared;
+            } else {
+                if (minDistanceSquared > distanceSquared) {
+                    minDistanceSquared = distanceSquared;
+                    idx = i;
+                }
+            }
+        }
+
+        return _axisGridIntersectionPoints[idx];
+    };
 };
 
 var CloudTouch	= CloudTouch || {};
@@ -7274,7 +7458,7 @@ CLOUD.Camera.prototype.setStandardView = function (stdView, bbox) {
             var position = new THREE.Vector3(-CLOUD.GlobalData.SceneSize, CLOUD.GlobalData.SceneSize, CLOUD.GlobalData.SceneSize);
             //target = new THREE.Vector3();
             var dir = new THREE.Vector3();
-            dir.subVectors(target, position);           
+            dir.subVectors(target, position);
             this.LookAt(target, dir, THREE.Object3D.DefaultUp);
             break;
         case CLOUD.EnumStandardView.Top:
@@ -10571,7 +10755,7 @@ CLOUD.Client = function (modelManager, serverUrl, databagId, texturePath) {
 
     this.meshIds = {}; // dict for meshId -> mkpId
 
-    this.mkpIndex = null; // mpk index from file: mpk/index 
+    this.mkpIndex = null; // mpk index from file: mpk/index
 
     this.symbolIndex = null; // symbol index from file: symbol/index
 
@@ -10650,7 +10834,7 @@ CLOUD.Client.prototype = {
             matObj = resource.defaultMaterial;
             console.log("not found!" + materialId);
         }
-           
+
 
         if (isInstanced) {
 
@@ -10844,10 +11028,10 @@ CLOUD.Scene.prototype.pick = function (mouse, camera, callback) {
 
                     return;
                 }
-              
+
             }
         }
-       
+
     }
 
    callback(null);
@@ -11096,7 +11280,7 @@ CLOUD.Mesh.prototype.load = function () {
         this.geometry.refCount += 1;
     }
 
-    this.loaded = 1; 
+    this.loaded = 1;
 }
 
 CLOUD.Mesh.prototype.findSubMeshData = function (meshId) {
@@ -11400,7 +11584,7 @@ CLOUD.Mesh.prototype.hitTestGeometry = function (raycaster, intersects, ray, use
             }
         }
     }
-  
+
 };
 
 CLOUD.Mesh.prototype.hitTestSubMesh = function (offset, raycaster, intersects, ray, userId, meshId) {
@@ -11548,10 +11732,10 @@ CLOUD.Cell.prototype.update = function () {
     var v1 = new THREE.Vector3();
 
     return function (camera) {
-        var scope = this;            
+        var scope = this;
 
         var shouldShow = scope.level === undefined;
-       
+
         if (!shouldShow) {
 
             shouldShow = scope.level > (CLOUD.GlobalData.SubSceneVisibleDistance * CLOUD.GlobalData.CellVisibleLOD);
@@ -11603,7 +11787,7 @@ CLOUD.SubScene.prototype.unload = function () {
         var child = children[i];
         child.unload();
     }
-    
+
     //if (this.embedded === undefined)
     //    this.children = [];
     //this.loaded = false;
@@ -11625,7 +11809,7 @@ CLOUD.SubScene.prototype.load = function () {
 
     if (!this.loaded) {
         this.visible = false;
-        this.client.loadSubScene(this);        
+        this.client.loadSubScene(this);
     }
     else {
 
@@ -11648,7 +11832,7 @@ CLOUD.SubScene.prototype.update = function () {
         scope.worldBoundingBox.center(v2);
 
         distance = camera.positionPlane.distanceToPoint(v2);
-        distance = distance * distance;           
+        distance = distance * distance;
 
         var level = scope.level * CLOUD.GlobalData.SubSceneVisibleDistance * CLOUD.GlobalData.SubSceneVisibleLOD;
 
@@ -11665,11 +11849,11 @@ CLOUD.SubScene.prototype.update = function () {
         }
 
         needLoad = distance < level;
-                
+
         scope.distance = distance;
- 
+
         if (needLoad) {
-            
+
             this.load();
         }
         else {
@@ -12682,58 +12866,39 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
 
     this.flyToPoint = function(point) {
 
-        //var canvasContainer = this.getContainerDimensions();
-        //var position = this.object.position;
-        //var eye = this.getWorldEye();
-        //eye.normalize();
-        //
-        //console.log("eye->", eye);
-        //
-        //var hitToEye = point.clone().sub(position);
-        //var distance = Math.abs(eye.dot(hitToEye));
-        //var aspect = canvasContainer.width / canvasContainer.height;
-        //var height = 2.0 * distance * Math.tan(THREE.Math.degToRad(this.object.fov * 0.5));
-        //var width = height * aspect;
-        //var worldDim = new THREE.Vector2(width, height);
-        //
-        //var startPoint = point.clone();
-        //var endPoint = new THREE.Vector3(0.5, 0.5, 0);
-        //var delta = new THREE.Vector3();
-        //
-        //startPoint.project(this.object);
-        ////startPoint.applyProjection(this.object.projectionMatrix);
-        //
-        //// 规范到[0, 1]
-        //startPoint.x = 0.5 * (startPoint.x + 1.0);
-        //startPoint.y = 0.5 * (startPoint.y + 1.0);
-        //startPoint.z = 0;
-        //
-        //// 偏移量
-        //delta.subVectors(endPoint, startPoint);
-        //
-        //var flyOffset = new THREE.Vector3();
-        //var offsetX = -delta.x * worldDim.x;
-        //var offsetY = delta.y * worldDim.y;
-        //var deltaX = this.getWorldRight().multiplyScalar(offsetX);
-        //var deltaY = this.getWorldUp().multiplyScalar(offsetY);
-        //
-        //flyOffset.addVectors(deltaX, deltaY);
-        //this.target.add(flyOffset);
-        //this.object.position.add(flyOffset);
+        // 将相机移动到指定的点
+        var eye = this.getWorldEye();
+        var distance = eye.length();
 
-        var canvasContainer = this.getContainerDimensions();
+        // 保持视角方向
+        //var dir = new THREE.Vector3(0, 0, -1);
+        var dir = eye.clone();
+        dir.y = 0;
+        dir.normalize();
+        dir.setLength(distance);
+
+        var up = new THREE.Vector3(0, 1, 0);
+
+        this.object.up = up;
+        this.object.realUp = up.clone();
+
+        this.object.position.copy(point);
+        this.target.addVectors(this.object.position, dir);
+
+        this.update(true);
+    };
+
+    this.flyToPoint2 = function(point) {
+
         var position = this.object.position;
         var eye = this.getWorldEye();
-        var eye2 = eye.clone();
-        eye.normalize();
-
+        var normalizedEye = eye.clone().normalize();
         var hitToEye = point.clone().sub(position);
-        var distance = Math.abs(eye.dot(hitToEye));
-
-        var flyOffset = eye.clone().multiplyScalar(distance);
+        var distance = Math.abs(normalizedEye.dot(hitToEye));
+        var flyOffset = normalizedEye.clone().multiplyScalar(distance);
 
         this.object.position.subVectors(point, flyOffset);
-        this.target.addVectors(this.object.position, eye2);
+        this.target.addVectors(this.object.position, eye);
 
         this.update(true);
     };
@@ -12769,7 +12934,7 @@ CLOUD.OrbitEditor.prototype.processMouseDown = function (event) {
     if (event.button === scope.mouseButtons.ORBIT) {
         if (camera_scope.noRotate === true)
             return;
-        
+
         var mouse = camera_scope.mapWindowToViewport(event.clientX, event.clientY);
         scope.scene.hitTestPosition(mouse, camera_scope.object, function (pt) {
             camera_scope.pivot = pt;
@@ -12975,7 +13140,7 @@ CLOUD.PickEditor.prototype.onMouseDown = function (event) {
 };
 CLOUD.ZoomEditor = function ( object, scene, domElement ) {
 	CLOUD.OrbitEditor.call( this,  object, scene, domElement );
-	
+
 	this.mouseButtons = { ZOOM: THREE.MOUSE.LEFT, PAN: THREE.MOUSE.MIDDLE, ORBIT: THREE.MOUSE.RIGHT };
 };
 CLOUD.ZoomEditor.prototype = Object.create( CLOUD.OrbitEditor.prototype );
@@ -13145,7 +13310,7 @@ CLOUD.FlyEditorUI.prototype = {
             CLOUD.DomUtil.showOrHideElement(this.elementIds.imgTipD, true);
             CLOUD.DomUtil.showOrHideElement(this.elementIds.tipRemarkD, true);
         }
-   
+
 
         if (moveState & MoveDirection.UP) {
             CLOUD.DomUtil.showOrHideElement(this.elementIds.imgKeyQ, false);
@@ -13171,7 +13336,7 @@ CLOUD.FlyEditorUI.prototype = {
             CLOUD.DomUtil.showOrHideElement(this.elementIds.imgKeyW2, false);
             CLOUD.DomUtil.showOrHideElement(this.elementIds.imgTipW, false);
             CLOUD.DomUtil.showOrHideElement(this.elementIds.tipRemarkW, false);
-        } 
+        }
 
         if ( moveState & MoveDirection.BACK) {
             CLOUD.DomUtil.showOrHideElement(this.elementIds.imgKeyS, true);
@@ -13179,7 +13344,7 @@ CLOUD.FlyEditorUI.prototype = {
             CLOUD.DomUtil.showOrHideElement(this.elementIds.imgTipS, false);
             CLOUD.DomUtil.showOrHideElement(this.elementIds.tipRemarkS, false);
         }
- 
+
         if (moveState & MoveDirection.LEFT) {
             CLOUD.DomUtil.showOrHideElement(this.elementIds.imgKeyA, true);
             CLOUD.DomUtil.showOrHideElement(this.elementIds.imgKeyA2, false);
@@ -13527,7 +13692,7 @@ CLOUD.FlyEditor.prototype = {
                 moveDirection = this.MoveDirection.DOWN;
                 break;
         }
-        
+
         if (moveDirection !== this.MoveDirection.NONE) {
             this.ui.onKeyUp(moveDirection, this.MoveDirection);
             this.moveState &= ~moveDirection
@@ -13591,7 +13756,7 @@ CLOUD.FlyEditor.prototype = {
         var delta = 0 || event.wheelDelta || event.detail;
         delta = (Math.abs(delta) > 10 ? delta : -delta * 40);
         this.movementSpeedMultiplier = this.ui.changeMoveSpeed(delta, this.movementSpeedMultiplier);
-        
+
     },
 
     update: function (delta) {
@@ -13994,7 +14159,7 @@ CLOUD.Filter = function () {
     };
 
     var visibilityFilter = {};
-    
+
     var overridedMaterials = {};
     overridedMaterials.selection = CLOUD.MaterialUtil.createHilightMaterial();
 
@@ -14048,7 +14213,7 @@ CLOUD.Filter = function () {
     }
 
     this.removeUserFilter = function (name, value) {
-   
+
         if (!visibilityFilter[name])
             return;
 
@@ -14096,10 +14261,10 @@ CLOUD.Filter = function () {
             if (materialOverriderByUserId[name]) {
                 delete materialOverriderByUserId[name];
             }
-           
+
         }
         else {
-            
+
             var material;
             if (materialName) {
                 material = overridedMaterials[materialName];
@@ -14107,7 +14272,7 @@ CLOUD.Filter = function () {
 
             var overrider = {};
             overrider.material = material ? material : overridedMaterials.selection;
-            
+
             overrider.ids = {};
             for (var ii = 0, len = ids.length; ii < len; ++ii) {
                 overrider.ids[ids[ii]] = true;
@@ -14115,7 +14280,7 @@ CLOUD.Filter = function () {
 
             materialOverriderByUserId[name] = overrider;
         }
-        
+
     };
 
     this.setUserOverrider = function (name, value, materialName) {
@@ -14123,7 +14288,7 @@ CLOUD.Filter = function () {
             materialOverriderByUserData = {};
             return;
         }
-          
+
 
         if (value === undefined) {
 
@@ -14152,7 +14317,7 @@ CLOUD.Filter = function () {
             materialOverriderByUserData = {};
             return;
         }
-            
+
 
         if (!materialOverriderByUserData[name])
             return;
@@ -14194,7 +14359,7 @@ CLOUD.Filter = function () {
             selectionSet.ids = {};
         }
 
-            
+
         for (var ii = 0, len = ids.length; ii < len; ++ii) {
             selectionSet.ids[ids[ii]] = true;
         }
@@ -14247,7 +14412,7 @@ CLOUD.Filter = function () {
 
     // 计算选中对象的包围盒
     this.computeSelectionBox = function (renderList) {
-        
+
         if (!hasSelection())
             return false;
 
@@ -14266,7 +14431,7 @@ CLOUD.Filter = function () {
                     object.geometry.computeBoundingBox();
                 }
                 var box =  object.geometry.boundingBox;
-                
+
                 if (box) {
                     var box2 = box.clone();
                     if (object.matrixWorld) {
@@ -14291,7 +14456,7 @@ CLOUD.Filter = function () {
         if (isSelected(id)) {
             return overridedMaterials.selection;
         }
-    
+
         for (var item in materialOverriderByUserId) {
             var overrider = materialOverriderByUserId[item];
             if (overrider.ids[id])
@@ -14307,7 +14472,7 @@ CLOUD.Filter = function () {
             if (material)
                 return material;
         }
-   
+
 
         return null;
     };
@@ -14768,14 +14933,14 @@ var o3dgc = (function () {
     local.O3DGC_AC_BM_MAX_COUNT = (1 << local.O3DGC_AC_BM_LENGTH_SHIFT) >>> 0;  // for adaptive models
     local.O3DGC_AC_DM_LENGTH_SHIFT = 15; // Maximum values for general models length bits discarded before mult.
     local.O3DGC_AC_DM_MAX_COUNT = (1 << local.O3DGC_AC_DM_LENGTH_SHIFT) >>> 0;  // for adaptive models
-    // StaticBitModel class 
+    // StaticBitModel class
     module.StaticBitModel = function () {
         this.m_bit0Prob = (1 << (local.O3DGC_AC_BM_LENGTH_SHIFT - 1)) >>> 0; // p0 = 0.5
     };
     module.StaticBitModel.prototype.SetProbability = function (p) {
         this.m_bit0Prob = Math.floor(p * ((1 << local.O3DGC_AC_BM_LENGTH_SHIFT) >>> 0));
     };
-    // AdaptiveBitModel class 
+    // AdaptiveBitModel class
     module.AdaptiveBitModel = function () {
         // initialization to equiprobable model
         this.m_updateCycle = 4;
@@ -14810,7 +14975,7 @@ var o3dgc = (function () {
         }
         this.m_bitsUntilUpdate = this.m_updateCycle;
     };
-    // AdaptiveDataModel class 
+    // AdaptiveDataModel class
     module.AdaptiveDataModel = function () {
         this.m_buffer = {};
         this.m_distribution = {};
@@ -15095,7 +15260,7 @@ var o3dgc = (function () {
         return uiValue;
     };
 
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // FIFO class
     module.FIFO = function () {
         this.m_data = {};
@@ -15460,7 +15625,7 @@ var o3dgc = (function () {
     module.AdjacencyInfo = function () {
         this.m_neighborsSize = 0;    // actual allocated size for m_neighbors
         this.m_numNeighborsSize = 0; // actual allocated size for m_numNeighbors
-        this.m_numElements = 0;      // number of elements 
+        this.m_numElements = 0;      // number of elements
         this.m_neighbors = {};
         this.m_numNeighbors = {};
     };
@@ -17327,7 +17492,7 @@ S3D.S3DLoader.prototype = {
    }
 };
 
-	
+
 
 var LZMA = LZMA || {};
 
@@ -17428,7 +17593,7 @@ LZMA.RangeDecoder.prototype.init = function(){
 
   this._code = 0;
   this._range = -1;
-  
+
   while(i --){
     this._code = (this._code << 8) | this._stream.readByte();
   }
@@ -17901,7 +18066,7 @@ CTM.File.prototype.load = function(stream){
   this.header = new CTM.FileHeader(stream);
 
   this.body = new CTM.FileBody(this.header);
-  
+
   this.getReader().read(stream, this.body);
 };
 
@@ -17924,7 +18089,7 @@ CTM.File.prototype.getReader = function(){
 };
 
 CTM.FileHeader = function(stream){
-  
+
 
   stream.readInt32(); //magic "OCTM"
   this.fileFormat = stream.readInt32();
@@ -17960,7 +18125,7 @@ CTM.FileBody = function(header){
   if ( header.hasNormals() ){
     this.normals = new Float32Array(data, (i + v) * 4, n);
   }
-  
+
   if (header.uvMapCount){
     this.uvMaps = [];
     for (j = 0; j < header.uvMapCount; ++ j){
@@ -17968,7 +18133,7 @@ CTM.FileBody = function(header){
         (i + v + n + (j * u) ) * 4, u) };
     }
   }
-  
+
   if (header.attrMapCount){
     this.attrMaps = [];
     for (j = 0; j < header.attrMapCount; ++ j){
@@ -17991,7 +18156,7 @@ CTM.FileMG2Header = function(stream){
   this.divx = stream.readInt32();
   this.divy = stream.readInt32();
   this.divz = stream.readInt32();
-  
+
   this.sizex = (this.higherBoundx - this.lowerBoundx) / this.divx;
   this.sizey = (this.higherBoundy - this.lowerBoundy) / this.divy;
   this.sizez = (this.higherBoundz - this.lowerBoundz) / this.divz;
@@ -18003,7 +18168,7 @@ CTM.ReaderRAW = function(){
 CTM.ReaderRAW.prototype.read = function(stream, body){
   this.readIndices(stream, body.indices);
   this.readVertices(stream, body.vertices);
-  
+
   if (body.normals){
     this.readNormals(stream, body.normals);
   }
@@ -18057,7 +18222,7 @@ CTM.ReaderMG1 = function(){
 CTM.ReaderMG1.prototype.read = function(stream, body){
   this.readIndices(stream, body.indices);
   this.readVertices(stream, body.vertices);
-  
+
   if (body.normals){
     this.readNormals(stream, body.normals);
   }
@@ -18072,7 +18237,7 @@ CTM.ReaderMG1.prototype.read = function(stream, body){
 CTM.ReaderMG1.prototype.readIndices = function(stream, indices){
   stream.readInt32(); //magic "INDX"
   stream.readInt32(); //packed size
-  
+
   var interleaved = new CTM.InterleavedStream(indices, 3);
   LZMA.decompress(stream, stream, interleaved, interleaved.data.length);
 
@@ -18082,7 +18247,7 @@ CTM.ReaderMG1.prototype.readIndices = function(stream, indices){
 CTM.ReaderMG1.prototype.readVertices = function(stream, vertices){
   stream.readInt32(); //magic "VERT"
   stream.readInt32(); //packed size
-  
+
   var interleaved = new CTM.InterleavedStream(vertices, 1);
   LZMA.decompress(stream, stream, interleaved, interleaved.data.length);
 };
@@ -18102,7 +18267,7 @@ CTM.ReaderMG1.prototype.readUVMaps = function(stream, uvMaps){
 
     uvMaps[i].name = stream.readString();
     uvMaps[i].filename = stream.readString();
-    
+
     stream.readInt32(); //packed size
 
     var interleaved = new CTM.InterleavedStream(uvMaps[i].uv, 2);
@@ -18116,7 +18281,7 @@ CTM.ReaderMG1.prototype.readAttrMaps = function(stream, attrMaps){
     stream.readInt32(); //magic "ATTR"
 
     attrMaps[i].name = stream.readString();
-    
+
     stream.readInt32(); //packed size
 
     var interleaved = new CTM.InterleavedStream(attrMaps[i].attr, 4);
@@ -18129,10 +18294,10 @@ CTM.ReaderMG2 = function(){
 
 CTM.ReaderMG2.prototype.read = function(stream, body){
   this.MG2Header = new CTM.FileMG2Header(stream);
-  
+
   this.readVertices(stream, body.vertices);
   this.readIndices(stream, body.indices);
-  
+
   if (body.normals){
     this.readNormals(stream, body);
   }
@@ -18150,23 +18315,23 @@ CTM.ReaderMG2.prototype.readVertices = function(stream, vertices){
 
   var interleaved = new CTM.InterleavedStream(vertices, 3);
   LZMA.decompress(stream, stream, interleaved, interleaved.data.length);
-  
+
   var gridIndices = this.readGridIndices(stream, vertices);
-  
+
   CTM.restoreVertices(vertices, this.MG2Header, gridIndices, this.MG2Header.vertexPrecision);
 };
 
 CTM.ReaderMG2.prototype.readGridIndices = function(stream, vertices){
   stream.readInt32(); //magic "GIDX"
   stream.readInt32(); //packed size
-  
+
   var gridIndices = new Uint32Array(vertices.length / 3);
-  
+
   var interleaved = new CTM.InterleavedStream(gridIndices, 1);
   LZMA.decompress(stream, stream, interleaved, interleaved.data.length);
-  
+
   CTM.restoreGridIndices(gridIndices, gridIndices.length);
-  
+
   return gridIndices;
 };
 
@@ -18199,14 +18364,14 @@ CTM.ReaderMG2.prototype.readUVMaps = function(stream, uvMaps){
 
     uvMaps[i].name = stream.readString();
     uvMaps[i].filename = stream.readString();
-    
+
     var precision = stream.readFloat32();
-    
+
     stream.readInt32(); //packed size
 
     var interleaved = new CTM.InterleavedStream(uvMaps[i].uv, 2);
     LZMA.decompress(stream, stream, interleaved, interleaved.data.length);
-    
+
     CTM.restoreMap(uvMaps[i].uv, 2, precision);
   }
 };
@@ -18217,14 +18382,14 @@ CTM.ReaderMG2.prototype.readAttrMaps = function(stream, attrMaps){
     stream.readInt32(); //magic "ATTR"
 
     attrMaps[i].name = stream.readString();
-    
+
     var precision = stream.readFloat32();
-    
+
     stream.readInt32(); //packed size
 
     var interleaved = new CTM.InterleavedStream(attrMaps[i].attr, 4);
     LZMA.decompress(stream, stream, interleaved, interleaved.data.length);
-    
+
     CTM.restoreMap(attrMaps[i].attr, 4, precision);
   }
 };
@@ -18237,7 +18402,7 @@ CTM.restoreIndices = function(indices, len){
   }
   for (; i < len; i += 3){
     indices[i] += indices[i - 3];
-    
+
     if (indices[i] === indices[i - 3]){
       indices[i + 1] += indices[i - 2];
     }else{
@@ -18264,7 +18429,7 @@ CTM.restoreVertices = function(vertices, grid, gridIndices, precision){
 
   for (; i < len; j += 3){
     x = gridIdx = gridIndices[i ++];
-    
+
     z = ~~(x / zdiv);
     x -= ~~(z * zdiv);
     y = ~~(x / ydiv);
@@ -18303,13 +18468,13 @@ CTM.restoreNormals = function(normals, smooth, precision){
       normals[i + 1] = smooth[i + 1] * ro;
       normals[i + 2] = smooth[i + 2] * ro;
     }else{
-      
+
       if (phi <= 4){
         theta = (intNormals[i + 2] - 2) * PI_DIV_2;
       }else{
         theta = ( (intNormals[i + 2] * 4 / phi) - 2) * PI_DIV_2;
       }
-      
+
       phi *= precision * PI_DIV_2;
       sinPhi = ro * Math.sin(phi);
 
@@ -18346,9 +18511,9 @@ CTM.restoreMap = function(map, count, precision){
 
     for (j = i; j < len; j += count){
       value = intMap[j];
-      
+
       delta += value & 1? -( (value + 1) >> 1): value >> 1;
-      
+
       map[j] = delta * precision;
     }
   }
@@ -18371,18 +18536,18 @@ CTM.calcSmoothNormals = function(indices, vertices){
     v2y = vertices[indz + 1] - vertices[indx + 1];
     v1z = vertices[indy + 2] - vertices[indx + 2];
     v2z = vertices[indz + 2] - vertices[indx + 2];
-    
+
     nx = v1y * v2z - v1z * v2y;
     ny = v1z * v2x - v1x * v2z;
     nz = v1x * v2y - v1y * v2x;
-    
+
     len = Math.sqrt(nx * nx + ny * ny + nz * nz);
     if (len > 1e-10){
       nx /= len;
       ny /= len;
       nz /= len;
     }
-    
+
     smooth[indx]     += nx;
     smooth[indx + 1] += ny;
     smooth[indx + 2] += nz;
@@ -18395,7 +18560,7 @@ CTM.calcSmoothNormals = function(indices, vertices){
   }
 
   for (i = 0, k = smooth.length; i < k; i += 3){
-    len = Math.sqrt(smooth[i] * smooth[i] + 
+    len = Math.sqrt(smooth[i] * smooth[i] +
       smooth[i + 1] * smooth[i + 1] +
       smooth[i + 2] * smooth[i + 2]);
 
@@ -18428,13 +18593,13 @@ CTM.InterleavedStream = function(data, count){
 
 CTM.InterleavedStream.prototype.writeByte = function(value){
   this.data[this.offset] = value;
-  
+
   this.offset += this.count;
   if (this.offset >= this.len){
-  
+
     this.offset -= this.len - 4;
     if (this.offset >= this.count){
-    
+
       this.offset -= this.count + (CTM.isLittleEndian? 1: -1);
     }
   }
@@ -18467,7 +18632,7 @@ CTM.Stream.prototype.readFloat32 = function(){
   var b1 = this.readByte();
   var b2 = this.readByte();
 
-  m += (b1 & 0x7f) << 16; 
+  m += (b1 & 0x7f) << 16;
   var e = ( (b2 & 0x7f) << 1) | ( (b1 & 0x80) >>> 7);
   var s = b2 & 0x80? -1: 1;
 
@@ -18493,7 +18658,7 @@ CTM.Stream.prototype.readString = function(){
 
 CTM.Stream.prototype.readArrayInt32 = function(array){
   var i = 0, len = array.length;
-  
+
   while(i < len){
     array[i ++] = this.readInt32();
   }
@@ -18672,7 +18837,7 @@ CLOUD.MpkLoader.prototype.load = function (url, parameters, client, callback, on
     xhr.onreadystatechange = function () {
         if (xhr.readyState === 4) {
             if (xhr.status === 200 || xhr.status === 0) {
-              
+
                 var format = client.mkpIndex.format;
                 if (format === undefined || format === 0) {
 
@@ -18700,7 +18865,7 @@ CLOUD.MpkLoader.prototype.load = function (url, parameters, client, callback, on
                         }
                         binaryData = new Uint8Array(arrayBuffers);
                     }
-                 
+
 
                     scope.parseCTM(binaryData, parameters, client, callback);
 
@@ -18708,7 +18873,7 @@ CLOUD.MpkLoader.prototype.load = function (url, parameters, client, callback, on
                 }
                 else {
                     scope.parseS3D(xhr.response, parameters, client, callback);
-                }              
+                }
 
                 onComplete();
             }
@@ -18766,10 +18931,16 @@ CLOUD.MpkLoader.prototype.createModel = function (indices, vertices, meshId, cal
     geometry.refCount = 0;
     geometry.name = meshId;
 
-    geometry.setIndex(new THREE.BufferAttribute(indices, 1));
+    var ib = new THREE.BufferAttribute(indices, 1);
+    ib.setDynamic(true);
+    geometry.setIndex(ib);
     geometry.addAttribute('position', new THREE.BufferAttribute(vertices, 3));
 
     geometry.computeVertexNormals();
+
+    for (var name in geometry.attributes) {
+        geometry.attributes[name].setDynamic(true);
+    }
 
     callback(geometry);
 };
@@ -18863,7 +19034,7 @@ CLOUD.SubSceneLoader.prototype = {
                     userData = objJSON.userData;
 
                 var object;
-          
+
                 if (objJSON.nodeType == "MpkNode") {
 
                     handle_children(parent, objJSON.nodes, level);
@@ -18875,7 +19046,7 @@ CLOUD.SubSceneLoader.prototype = {
                     CLOUD.GeomUtil.parseNodeProperties(object, objJSON, nodeId);
 
                     // set world bbox
-                    object.worldBoundingBox = object.boundingBox.clone();                    
+                    object.worldBoundingBox = object.boundingBox.clone();
                     object.worldBoundingBox.applyMatrix4(scope.manager.getGlobalTransform());
                     object.level = objJSON.level;
                     if (objJSON.order) {
@@ -18896,7 +19067,7 @@ CLOUD.SubSceneLoader.prototype = {
 
                         object.client = client;
 
-                        CLOUD.GeomUtil.parseSceneNode(object, objJSON, scope.manager, level);                        
+                        CLOUD.GeomUtil.parseSceneNode(object, objJSON, scope.manager, level);
 
                         parent.add(object);
 
@@ -18924,7 +19095,7 @@ CLOUD.SubSceneLoader.prototype = {
                     object = new CLOUD.Mesh(CLOUD.GeomUtil.EmptyGeometry, matObj, objJSON.meshId);
                     CLOUD.GeomUtil.parseNodeProperties(object, objJSON, nodeId, trf);
                     object.userData = userData;
-                    
+
                     // will not load the mesh.
 
                     parent.add(object);
@@ -19017,7 +19188,7 @@ CLOUD.SubSceneLoader.prototype = {
             subScene.embedded = true;
             handle_children(subScene, sceneJSON.children, 0);
         }
-        
+
     }
 }
 /**
@@ -19081,7 +19252,7 @@ CLOUD.SceneLoader.prototype = {
 
 
         function loadMeshNode(object, meshId) {
-          
+
             var mesh = resource.geometries[meshId];
             if (mesh) {
                 object.updateGeometry(mesh);
@@ -19104,7 +19275,7 @@ CLOUD.SceneLoader.prototype = {
                 delayLoadMeshNodes.push({ meshNode: object, isInstanced: true });
             }
         }
-       
+
         function handle_children(parent, children, level, userId, userData, trf) {
 
             for (var nodeId in children) {
@@ -19122,10 +19293,10 @@ CLOUD.SceneLoader.prototype = {
                     if (!userData.categoryId)
                         userData.categoryId = "0";
                 }
-                    
 
-                var object;               
-          
+
+                var object;
+
                 if (objJSON.nodeType == "MpkNode") {
 
                     scope.manager.loadMpk(objJSON.mpkId, client, onload_mpk_complete(parent, objJSON, level + 1));
@@ -19137,10 +19308,10 @@ CLOUD.SceneLoader.prototype = {
                     CLOUD.GeomUtil.parseNodeProperties(object, objJSON, nodeId);
 
                     // set world bbox
-                    object.worldBoundingBox = object.boundingBox.clone();                    
+                    object.worldBoundingBox = object.boundingBox.clone();
                     object.worldBoundingBox.applyMatrix4(scope.manager.getGlobalTransform());
                     object.level = objJSON.level;
-                    
+
                     if (objJSON.order) {
                         object.out = 1;
                     }
@@ -19157,9 +19328,9 @@ CLOUD.SceneLoader.prototype = {
                         var boxNode = new CLOUD.BBoxNode(object.boundingBox, clr);
                         CLOUD.Utils.parseTransform(boxNode, objJSON);
                         object.add(boxNode);
-                        
+
                     }
-                            
+
                     //if (object.out)
                     {
                         handle_children(object, objJSON.children, level + 1);
@@ -19199,7 +19370,7 @@ CLOUD.SceneLoader.prototype = {
                 else if (objJSON.nodeType == "MeshNode") {
                     if (resource.bOutOfLimitation == true)
                         continue;
-                        
+
                     var matObj = client.findMaterial(objJSON.materialId, false);
 
                     object = new CLOUD.Mesh(CLOUD.GeomUtil.EmptyGeometry, matObj, objJSON.meshId);
@@ -19303,7 +19474,7 @@ CLOUD.SceneLoader.prototype = {
 
                 if (level == 0) {
                     onload_node_complete();
-                } 
+                }
             }
         };
 
@@ -19422,7 +19593,7 @@ CLOUD.IndexLoader.prototype = {
             else {
                 onTaskFinished();
             }
-            
+
         });
 
         // Material
@@ -19439,7 +19610,7 @@ CLOUD.IndexLoader.prototype = {
 
             // build meshId to mpkIndex
             for (var mpkId in client.mkpIndex.items) {
-                
+
                 var meshIds = client.mkpIndex.items[mpkId].items;
                 for (var meshId in meshIds) {
                     client.meshIds[meshId] = mpkId;
@@ -19507,7 +19678,7 @@ CLOUD.SceneBoxLoader.prototype = {
         this.manager.dispatchEvent({ type: CLOUD.EVENTS.ON_LOAD_START, sceneId: sceneId });
 
         // handle all the children from the loaded json and attach them to given parent
-        
+
         var level = -1;
         function handle_children(parent, children) {
             level++;
@@ -19519,7 +19690,7 @@ CLOUD.SceneBoxLoader.prototype = {
                 var objJSON = children[nodeId];
 
                 var object;
-          
+
                 if (objJSON.nodeType == "MpkNode") {
                     handle_children(parent, objJSON.nodes);
                 }
@@ -19546,7 +19717,7 @@ CLOUD.SceneBoxLoader.prototype = {
 
                     localRoot.add(object);
                 }
-        
+
             }
             level--;
         };
@@ -19605,7 +19776,7 @@ CLOUD.TaskWorker = function (threadCount) {
         if (itemCount == 0)
             return;
 
-        
+
 
         if (sorter) {
             items.sort(sorter);
@@ -19643,12 +19814,12 @@ CLOUD.MpkTaskWorker = function (threadCount) {
     this.doingCount = 0;
 
     this.addItem = function (mpkId, item) {
-        
+
         if (mpkId === undefined) {
             console.log("undefined mpkId");
             return;
         }
-            
+
 
         if (this.todoList[mpkId] === undefined)
             this.todoList[mpkId] = [];
@@ -19677,7 +19848,7 @@ CLOUD.MpkTaskWorker = function (threadCount) {
             return;
 
         scope.doingCount = itemCount;
- 
+
 
         var TASK_COUNT = Math.min(this.MaxThreadCount, itemCount);
         scope.doingCount = TASK_COUNT;
@@ -19689,7 +19860,7 @@ CLOUD.MpkTaskWorker = function (threadCount) {
                     // next loop
                     scope.run(loader);
                 }
-                    
+
                 return;
             }
 
@@ -19751,7 +19922,7 @@ CLOUD.TaskManager.prototype = {
                 for (var ii = 0, len = items.length; ii < len; ++ii) {
                     on_load_mesh(client, items[ii]);
                 }
-                            
+
                 // next task
                 callback(nextIdx);
             });
@@ -19778,7 +19949,7 @@ CLOUD.TaskManager.prototype = {
         scope.sceneWorker.run(function (item, nextIdx, callback) {
 
             var sceneNode = item;
-          
+
             if(sceneNode.children.length == 0){
                 sceneNode.loaded = true;
                 sceneLoader.load(sceneNode.sceneId, sceneNode, client, false, function () {
@@ -19802,7 +19973,7 @@ CLOUD.TaskManager.prototype = {
  */
 
 CLOUD.ModelManager = function () {
-   
+
     THREE.LoadingManager.call(this);
     //this.onStart = function () { console.log("start"); };
     //this.onLoad = function () { console.log("load"); }
@@ -19905,7 +20076,7 @@ CLOUD.ModelManager.prototype.showScene = function (databagId, sceneIds) {
             scope.dispatchEvent({ type: CLOUD.EVENTS.ON_LOAD_COMPLETE });
             return;
         }
-            
+
 
         var sceneId = sceneIds[idx];
         var sceneNode = scope.scene.findSceneNode(sceneId);
@@ -19932,9 +20103,9 @@ CLOUD.ModelManager.prototype.showScene = function (databagId, sceneIds) {
 * @param parameters {databagId, serverUrl, debug}
 */
 CLOUD.ModelManager.prototype.load = function (parameters) {
-       
+
     var scope = this;
-   
+
     this.loadIndex(parameters, function (client) {
 
         scope.loading = true;
@@ -20089,50 +20260,46 @@ CLOUD.EditorManager = function (handleEvents) {
 
         var isAnimating = scope.isAnimating();
 
-        // 判断是否在动画中，如果在动画中，不响应
-        if (!isAnimating) {
+        // 判断是否在动画中, 若是动画中，不响应事件
+        if (isAnimating)
+            return;
+
+        // 其它交互
+        if (scope.canMouseMoveOperation) {
+            // 不更新渲染列表
+            scope.isUpdateRenderList = false;
+            scope.editor.onMouseMove(event);
+        } else {
             // viewHouse 交互
             handleViewHouseEvent("move", event);
-
+            // 子地图交互
             handleMiniMapEvent("move", event);
-
-            // 其它交互
-            if (scope.canMouseMoveOperation) {
-
-                // 不更新渲染列表
-                scope.isUpdateRenderList = false;
-
-                scope.editor.onMouseMove(event);
-            }
         }
     }
 
     function onMouseUp(event) {
 
         var isAnimating = scope.isAnimating();
-
-        scope.isUpdateRenderList = true;
-
-        // 判断是否在动画中，如果在动画中，不响应
-        if (!isAnimating) {
-            // viewHouse 交互
-            var isInHouse = handleViewHouseEvent("up", event);
-
-            // 鼠标点不在viewHouse区域，则允许主视图操作
-            if (!isInHouse) {
-
-                handleMiniMapEvent("up", event);
-
-                if (scope.canMouseMoveOperation) {
-                    //scope.canMouseMoveOperation = false;
-                    // 其它交互
-                    scope.editor.onMouseUp(event);
-                }
-            }
-        }
+        var isCanMouseMove = scope.canMouseMoveOperation;
 
         // 只要存在up事件，就将其置为false
         scope.canMouseMoveOperation = false;
+        // 只要存在up事件，允许更新渲染列表
+        scope.isUpdateRenderList = true;
+
+        // 判断是否在动画中, 若是动画中，不响应事件
+        if (isAnimating)
+            return;
+
+        if (isCanMouseMove) {
+            // 其它交互
+            scope.editor.onMouseUp(event);
+        } else {
+            // viewHouse 交互
+            handleViewHouseEvent("up", event);
+            // 子地图交互
+            handleMiniMapEvent("up", event);
+        }
     }
 
     function onMouseDown( event ) {
@@ -20142,24 +20309,22 @@ CLOUD.EditorManager = function (handleEvents) {
 
         var isAnimating = scope.isAnimating();
 
-        // 判断是否在动画中，如果在动画中，不响应
-        if (!isAnimating) {
-            // viewHouse 交互
-            var isInHouse = handleViewHouseEvent("down", event);
+        // 判断是否在动画中, 若是动画中，不响应事件
+        if (isAnimating)
+            return;
 
-            // 鼠标点不在viewHouse区域，则允许主视图操作
-            if (!isInHouse) {
+        // viewHouse 交互
+        var isInHouse = handleViewHouseEvent("down", event);
+        // 子地图 交互
+        var isOverMiniMap = handleMiniMapEvent("down", event);
 
-                handleMiniMapEvent("down", event);
-
-                scope.canMouseMoveOperation = true;
-
-                // 其它交互
-                scope.editor.onMouseDown(event);
-            }
+        // 鼠标点不在viewHouse区域和子地图区域
+        if (!isInHouse && !isOverMiniMap) {
+            scope.canMouseMoveOperation = true;
+            // 其它交互
+            scope.editor.onMouseDown(event);
         }
     }
-
 
     this.registerDomEventListeners = function (domElement) {
 
@@ -20592,6 +20757,10 @@ CloudViewer.prototype = {
         }
 
         scope.viewHouse.render();
+
+        if(this.miniMap) {
+            this.miniMap.render();
+        }
     },
 
     setEditorDefault: function () {
@@ -20826,7 +20995,7 @@ CloudViewer.prototype = {
         else {
             box.applyMatrix4(this.getScene().rootNode.matrix);
         }
-       
+
         var target = this.camera.zoomToBBox(box);
         this.cameraEditor.updateCamera(target);
         this.render();

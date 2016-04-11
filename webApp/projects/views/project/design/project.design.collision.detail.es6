@@ -26,6 +26,9 @@ App.Project.DesignCollisionDetail=Backbone.View.extend({
   addCollisionDetail:function(model){
     // 加载碰撞点列表
     var data=model.toJSON();
+    if(data.data){
+      this.list = data.data.list;
+    }
     if(data.message=="success"){
       this.prePage = data.data.page.prePage;
       this.nextPage = data.data.page.nextPage;
@@ -36,12 +39,11 @@ App.Project.DesignCollisionDetail=Backbone.View.extend({
 
   setCollisionPoint:function(event){
     var that = $(event.target).closest("tr"),
-        element = that.find('.ckHeader'),
-        leftId = element.data("leftId"),
-        rightId = element.data("rightId");
-    App.Project.Settings.Viewer.highlight({
-      type:'userId',
-      ids:[leftId,rightId]
+        name = that.find(".ckName").text();
+    $.each(this.list,function(index,item){
+      if(item.name == name){
+        App.Project.Settings.Viewer.collision(item);
+      }
     })
     that.toggleClass("selected").siblings().removeClass("selected");
   },

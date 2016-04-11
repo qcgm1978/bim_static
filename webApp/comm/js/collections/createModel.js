@@ -437,7 +437,6 @@ App.Comm.createModel = function(options){
       var axis = res.axis,
           x = axis.infoX,
           y = axis.infoY;
-      console.log(res)
       if(x&&y){
         $('.grid-position').text(x+","+y);
       }

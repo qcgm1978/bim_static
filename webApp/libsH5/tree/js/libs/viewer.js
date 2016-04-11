@@ -788,9 +788,13 @@ BIM.prototype = {
   highlight:function(obj){
     var viewer = BIM.common.viewer;
     var filter = viewer.getFilters();
-    BIM.util.getFilter(obj.ids,function(id){
-      filter.setUserOverrider(obj.type,id);
-    });
+    if(obj.type == "userId"){
+      filter.setSelectedIds(obj.ids);
+    }else{
+      BIM.util.getFilter(obj.ids,function(id){
+        filter.setUserOverrider(obj.type,id);
+      });
+    }
     viewer.render();
   },
   downplay:function(obj){
@@ -816,6 +820,14 @@ BIM.prototype = {
   hideAxisGrid:function(){
     var viewer = BIM.common.viewer;
     viewer.showAxisGrid(false);
+  },
+  collision:function(obj){
+    var viewer = BIM.common.viewer;
+    var filter = viewer.getFilters();
+    var bBox = CLOUD.Utils.computeBBox(obj.leftElementBoxMin,obj.leftElementBoxMax,obj.rightElementBoxMin,obj.rightElementBoxMax);
+    viewer.zoomToBBox(bBox);
+    filter.setSelectedIds([obj.leftId,obj.rightId]);
+    viewer.render();
   }
 }
 Array.prototype.remove = function(item){
