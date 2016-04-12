@@ -22,28 +22,16 @@ var dwgViewer = function(options){
     $.each(res,function(i,item){
       modelTab.push({
         name:item.Name,
-        id:item.ID
+        id:item.ID,
+        res:item.Representations
       });
-      if(item.Name == 'Model'){
-        $.each(item.Representations,function(ii,file){
-          if(file.MIME == "image/tiles"){
-            currentFile = file;
-          }
-        })
-      }
     });
-    dwgView.init(self._opt.container, {
-      lod: {
-        maxLevel: parseInt(currentFile.Attributes.DwgLevel, 10),
-        ext: currentFile.Attributes.DwgExt || 'jpg',
-        url: "/model/"+ self._opt.sourceId + '/' + currentFile.Path
-      }
-    })
+    self.render(modelTab[0].res);
   }
-  var addColltrol(){
+  var addColltrol = function(){
     var tmp = ''
   }
-  var dwgView = {
+  var dwgView = self.dwgView = {
 
     __container: null,
 
@@ -133,7 +121,6 @@ var dwgViewer = function(options){
       self.fit()
       self.__bindEvent()
 
-      //self.debugPanel = $('<div class="dwg-debug"></div>').appendTo(self.__panel.parent()).hide()
     },
 
     getPanel: function() {
@@ -169,15 +156,12 @@ var dwgViewer = function(options){
       self.__viewWidth = container.width()
       self.__viewHeight = container.height()
       self.zoom(self.__zoomScale)
-      /*$.jps.publish('window-resize', {
-        width: self.__viewWidth,
-        height: self.__viewHeight
-      })*/
     },
 
     //画缩放框
     drawRect: function(width, height) {
-      var self = this
+      var self = this;
+
       self.__rect.css({
         width: width,
         height: height
@@ -428,9 +412,10 @@ var dwgViewer = function(options){
         }
 
         if (state == 'rectzoom') {
+          var position = self.__container.offset();
           rect.css({
-            top: point.y,
-            left: point.x
+            top: point.y - position.top,
+            left: point.x - position.left
           }).show()
         }
         return false
@@ -799,4 +784,42 @@ var dwgViewer = function(options){
 
   dwgView.__tileTpl = '' +
     '<img class="tile" data-row="<%= tile.row %>" data-col="<%= tile.col %>" data-level="<%= tile.level %>" src="<%= tile.src %>" style="top:<%= tile.top %>px;left:<%= tile.left %>px;" />'
+}
+dwgViewer.prototype = {
+  render:function(model){
+    var self = this,
+        currentFile;
+    $.each(model,function(i,file){
+      if(file.MIME == "image/tiles"){
+        return currentFile = file;
+      }
+    })
+    self.dwgView.init(self._opt.container, {
+      lod: {
+        maxLevel: parseInt(currentFile.Attributes.DwgLevel, 10),
+        ext: currentFile.Attributes.DwgExt || 'jpg',
+        url: "/model/"+ self._opt.sourceId + '/' + currentFile.Path
+      }
+    })
+  },
+  fit:function(){
+    var self = this;
+    self.dwgView.fit();
+  },
+  zoom:function(){
+    var self = this;
+    self.dwgView.zoom();
+  },
+  zoomIn:function(){
+    var self = this;
+    self.dwgView.zoomIn();
+  },
+  zoomOut:function(){
+    var self = this;
+    self.dwgView.zoomOut();
+  },
+  rectZoom:function(){
+    var self = this;
+    self.dwgView.setState('rectzoom')
+  }
 }
