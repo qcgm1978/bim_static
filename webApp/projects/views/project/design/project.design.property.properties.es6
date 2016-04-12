@@ -18,8 +18,7 @@ App.Project.DesignProperties=Backbone.View.extend({
 	},
 
 	//添加
-	addOne:function(model){
-
+	addOne:function(model){ 
 		//渲染数据
 		var data=model.toJSON().data; 
 		this.$el.html(this.template(data));

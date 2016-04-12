@@ -1,646 +1,151 @@
+.bim { position: relative; width: 100%; height: 100%; overflow: hidden; }
+.bim .view { width: 100%; height: 100%; }
+.bim .view:focus, .bim .view canvas:focus { outline: none; }
+.bim.select { cursor: default; }
+.bim.move { cursor: -webkit-grab; }
+.bim.fly { cursor: crosshair; }
 
-.bim{
-  position:relative;
-  width:100%;
-  height:100%;
-  overflow:hidden;
-}
-.view{
-  width:100%;
-  height:100%;
-}
-.view:focus,
-.view canvas:focus{
-  outline:none;
-}
-.select{
-  cursor:default;
-}
-.move{
-  cursor:-webkit-grab;
-}
-.fly{
-  cursor:crosshair;
-}
 /**
   * @name zhangyy-g@grandsoft.com.cn
   * @description zhangyy's code
   * @markup
   *
   */
-.mod-bar {
-  position: absolute;
-  z-index: 20;
-  background: #333;
-  width: 40px;
-  left:20px;
-  top:10px;
-}
-.mod-bar .divide {
-  display: block;
-  border-top: 1px solid #666;
-  width: 32px;
-  margin-left: 4px;
-}
-.bar-item {
-  cursor: pointer;
-  border: 1px solid transparent;
-  margin: 3px;
-  box-sizing:content-box;
-}
-.bar-item.horizontal {
-  display: inline-block;
-}
-.bar-item:hover {
-  border: 1px solid #666;
-}
-.bar-item.open,
-.bar-item.selected {
-  border: 1px solid #666;
-  background-color: #666;
-}
-.sub-bar{
-  position: absolute;
-  z-index: 20;
-  background: #333;
-  width: 40px;
-}
-.sub-bar.camera-bar{
-  left:62px;
-  top:276px;
-}
-.sub-bar.cross-panel{
-  left:62px;
-  top:313px;
-  width:220px;
-  background-color:rgba(0,0,0,.8);
-  z-index:2;
-  cursor:default;
-}
-.cross-section-head {
-  height: 35px;
-  color: #fff;
-  position: relative;
-  width: 180px;
-  line-height: 2.5em;
-  padding: 0 20px;
-  margin: 0;
-  border-bottom: 1px solid #000;
-  box-sizing:content-box;
-}
-.cross-panel .close {
-  position: absolute;
-  cursor:pointer;
-  color: #fff;
-  font-size: 30px;
-  display: inline-block;
-  line-height: 0px;
-  padding:3px 5px;
-  right: 0px;
-  top: 0;
-}
-.cross-panel .close:before {
-  content: "×";
-  line-height:1;
-}
-.tab-content{
-  padding:10px 20px;
-}
-.tab-content .slider-box {
-  position: relative;
-  height: 50px;
-  border-bottom: 1px solid #000;
-}
-.slider-box .reset{
-  width:50%;
-  cursor:pointer;
-  font-size:12px;
-  display:block;
-  color:#ccc;
-  margin:16px 0;
-  float:left;
-}
-.slider-box .switch{
-  width:50%;
-  cursor:pointer;
-  font-size:12px;
-  margin:16px 0;
-  color:#ccc;
-  float:left;
-  text-align:right;
-}
-.slider-box .switch .input-checkbox{
-  display:none;
-}
-.slider-box .switch .lbl{
-  display:inline-block;
-  margin-left:3px;
-  vertical-align:middle;
-  width:15px;
-  height:15px;
-  background:url(../images/bar.png) no-repeat;
-  background-position:-32px -1088px;
-}
-.slider-box .switch input:checked + .lbl{
-  background-position:0 -1088px;
-}
-.tab-content .slider{
-  width:140px;
-  position:absolute;
-  left:40px;
-  margin:19px 0;
-  padding:0;
-}
-.tab-content .last {
-  border-bottom: none;
-}
+.bim .mod-bar { position: absolute; z-index: 20; background: #333; width: 40px; left: 20px; top: 10px; }
+.bim .mod-bar .divide { display: block; border-top: 1px solid #666; width: 32px; margin-left: 4px; }
+.bim .bar-item { cursor: pointer; border: 1px solid transparent; margin: 3px; box-sizing: content-box; }
+.bim .bar-item.horizontal { display: inline-block; }
+.bim .bar-item:hover { border: 1px solid #666; }
+.bim .bar-item.open, .bar-item.selected { border: 1px solid #666; background-color: #666; }
+.bim .sub-bar { position: absolute; z-index: 20; background: #333; width: 40px; }
+.bim .sub-bar.camera-bar { left: 62px; top: 276px; }
+.bim .sub-bar.cross-panel { left: 62px; top: 313px; width: 220px; background-color: rgba(0, 0, 0, .8); z-index: 2; cursor: default; }
+.bim .cross-section-head { height: 35px; color: #fff; position: relative; width: 180px; line-height: 2.5em; padding: 0 20px; margin: 0; border-bottom: 1px solid #000; box-sizing: content-box; }
+.bim .cross-panel .close { position: absolute; cursor: pointer; color: #fff; font-size: 30px; display: inline-block; line-height: 0px; padding: 3px 5px; right: 0px; top: 0; }
+.bim .cross-panel .close:before { content: "×"; line-height: 1; }
+.bim .tab-content { padding: 10px 20px; }
+.bim .tab-content .slider-box { position: relative; height: 50px; border-bottom: 1px solid #000; }
+.bim .slider-box .reset { width: 50%; cursor: pointer; font-size: 12px; display: block; color: #ccc; margin: 16px 0; float: left; }
+.bim .slider-box .switch { width: 50%; cursor: pointer; font-size: 12px; margin: 16px 0; color: #ccc; float: left; text-align: right; }
+.bim .slider-box .switch .input-checkbox { display: none; }
+.bim .slider-box .switch .lbl { display: inline-block; margin-left: 3px; vertical-align: middle; width: 15px; height: 15px; background: url(../images/bar.png) no-repeat; background-position: -32px -1088px; }
+.bim .slider-box .switch input:checked + .lbl { background-position: 0 -1088px; }
+.bim .tab-content .slider { width: 140px; position: absolute; left: 40px; margin: 19px 0; padding: 0; }
+.bim .tab-content .last { border-bottom: none; }
+.bim .tab-content i { position: absolute; left: 0; margin-top: -16px; top: 50%; background-image: url(../images/bar.png); background-repeat: no-repeat; display: block; width: 32px; height: 32px; vertical-align: middle; }
+.bim .bar-section-offset { background-position: 0 -1056px; }
+.bim .bar-section-rotatex { background-position: 0 -1025px; }
+.bim .bar-section-rotatey { background-position: 0 -992px; }
+.bim .slider-range { height: 100%; background: #eee; width: 50%; border-radius: 1000px; }
+.bim .slider-handle { position: absolute; height: 10px; border: 1px solid #aaa; cursor: pointer; z-index: 2; width: 10px; margin-left: -5px; border-radius: 3px; text-shadow: 0 0 0 rgba(195, 177, 177, 0.8); background-color: #aaa; top: -3px; left: 50%; font-weight: normal; }
+.bim .section-tabs { width: 180px; height: 30px; margin: 10px auto; line-height: 30px; border: 1px solid #666; border-radius: 3px; }
+.bim .section-tabs .section-tab-item { display: block; width: 50%; float: left; text-align: center; border-top-left-radius: 3px; border-bottom-left-radius: 3px; cursor: pointer; }
+.bim .section-tabs .section-tab-item i { position: relative; margin: 0 auto; top: 0; }
+.bim .section-tabs .section-tab-item.selected { height: 30px; background: #666; }
+.bim .section-tabs .section-tab-item:nth-child(2) { border-top-left-radius: 0; border-bottom-left-radius: 0; border-top-right-radius: 3px; border-bottom-right-radius: 3px; }
 
-.tab-content i {
-  position: absolute;
-  left: 0;
-  margin-top: -16px;
-  top: 50%;
-  background-image: url(../images/bar.png);
-  background-repeat:no-repeat;
-  display: block;
-  width: 32px;
-  height: 32px;
-  vertical-align: middle;
-}
-.bar-section-offset{
-  background-position: 0 -1056px;
-}
-.bar-section-rotatex{
-  background-position: 0 -1025px;
-}
-.bar-section-rotatey{
-  background-position: 0 -992px;
-}
-.slider-range{
-  height:100%;
-  background:#eee;
-  width:50%;
-  border-radius:1000px;
-}
-.slider-handle{
-  position: absolute;
-  height: 10px;
-  border: 1px solid #aaa;
-  cursor:pointer;
-  z-index: 2;
-  width: 10px;
-  margin-left: -5px;
-  border-radius: 3px;
-  text-shadow: 0 0 0 rgba(195,177,177,0.8);
-  background-color: #aaa;
-  top: -3px;
-  left:50%;
-  font-weight: normal;
-}
-.section-tabs {
-  width: 180px;
-  height: 30px;
-  margin: 10px auto;
-  line-height: 30px;
-  border: 1px solid #666;
-  border-radius: 3px;
-}
-.section-tabs .section-tab-item {
-  display: block;
-  width: 50%;
-  float: left;
-  text-align: center;
-  border-top-left-radius: 3px;
-  border-bottom-left-radius: 3px;
-  cursor:pointer;
-}
-.section-tabs .section-tab-item i {
-  position:relative;
-  margin:0 auto;
-  top:0;
-}
-.section-tabs .section-tab-item.selected {
-  height: 30px;
-  background: #666;
-}
-.section-tabs .section-tab-item:nth-child(2) {
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
-  border-top-right-radius: 3px;
-  border-bottom-right-radius: 3px;
-}
 /**
   * @name zhangyy-g@grandsoft.com.cn
   * @description zhangyy's code
   * @markup
   * 给bar设置背景ICON
   */
-.bar-item {
-    background: url(../images/bar.png) no-repeat;
-    display: block;
-    width: 32px;
-    height: 32px;
-    vertical-align: middle;
-}
-.bar-home {
-    background-position: 0 -896px;
-}
-.bar-home.selected {
-    background-position:  -32px -896px;
-}
-.bar-select {
-    background-position: 0 0;
-}
+.bim .bar-item { background: url(../images/bar.png) no-repeat; display: block; width: 32px; height: 32px; vertical-align: middle; }
+.bim .bar-home { background-position: 0 -896px; }
+.bim .bar-home.selected { background-position: -32px -896px; }
+.bim .bar-select { background-position: 0 0; }
+.bim .bar-select.selected { background-position: -32px 0; }
+.bim .bar-handle { background-position: 0 -32px; }
+.bim .bar-pan.selected { background-position: -32px -32px; }
+.bim .bar-zoomIn { background-position: 0 -64px; }
+.bim .bar-zoomin.selected { background-position: -32px -64px; }
+.bim .bar-zoomOut { background-position: 0 -96px; }
+.bim .bar-zoomout.selected { background-position: -32px -96px; }
+.bim .bar-fit { background-position: 0 -128px; }
+.bim .bar-fit.selected { background-position: -32px -128px; }
+.bim .bar-rotate { background-position: 0 -160px; }
+.bim .bar-rotate.selected { background-position: -32px -160px; }
+.bim .bar-section { background-position: 0 -192px; }
+.bim .bar-section.selected { background-position: -32px -192px; }
+.bim .bar-fly { background-position: 0 -224px; }
+.bim .bar-fly.selected { background-position: -32px -224px; }
+.bim .bar-camera { background-position: 0 -256px; }
+.bim .bar-camera.selected { background-position: -32px -256px; }
+.bim .bar-camera-southWest { background-position: 0 -288px; }
+.bim .bar-camera-southWest.selected { background-position: -32px -288px; }
+.bim .bar-camera-top { background-position: 0 -320px; }
+.bim .bar-camera-top.selected { background-position: -32px -320px; }
+.bim .bar-camera-bottom { background-position: 0 -352px; }
+.bim .bar-camera-bottom.selected { background-position: -32px -352px; }
+.bim .bar-camera-left { background-position: 0 -384px; }
+.bim .bar-camera-left.selected { background-position: -32px -384px; }
+.bim .bar-camera-right { background-position: 0 -416px; }
+.bim .bar-camera-right.selected { background-position: -32px -416px; }
+.bim .bar-camera-front { background-position: 0 -448px; }
+.bim .bar-camera-front.selected { background-position: -32px -448px; }
+.bim .bar-camera-behind { background-position: 0 -480px; }
+.bim .bar-camera-behind.selected { background-position: -32px -480px; }
+.bim .bar-fullScreen { background-position: 0 -512px; }
+.bim .bar-fullScreen.selected { background-position: -32px -512px; }
+.bim .bar-rotate-ni { background-position: 0 -544px; }
+.bim .bar-rotate-ni.selected { background-position: -32px -544px; }
+.bim .bar-rotate-shun { background-position: 0 -576px; }
+.bim .bar-rotate-shun.selected { background-position: -32px -576px; }
+.bim .bar-mark { background-position: 0 -608px; }
+.bim .bar-mark.selected { background-position: -32px -608px; }
+.bim .bar-mark-yun { background-position: 0 -640px; }
+.bim .bar-mark-yun.selected { background-position: -32px -640px; }
+.bim .bar-mark-arrow { background-position: 0 -672px; }
+.bim .bar-mark-arrow.selected { background-position: -32px -672px; }
+.bim .bar-mark-rect { background-position: 0 -704px; }
+.bim .bar-mark-rect.selected { background-position: -32px -704px; }
+.bim .bar-mark-circle { background-position: 0 -736px; }
+.bim .bar-mark-circle.selected { background-position: -32px -736px; }
+.bim .bar-mark-cross { background-position: 0 -768px; }
+.bim .bar-mark-cross.selected { background-position: -32px -768px; }
+.bim .bar-mark-text { background-position: 0 -800px; }
+.bim .bar-mark-text.selected { background-position: -32px -800px; }
+.bim .bar-mark-back { background-position: 0 -832px; }
+.bim .bar-mark-back.selected { background-position: -32px -832px; }
+.bim .bar-fullscreen { background-position: 0 -864px; }
+.bim .bar-fullscreen.selected { background-position: -32px -864px; }
+.bim .bar-section-horizontal { background-position: -32px -960px; }
+.bim .bar-section-vertical { background-position: -32px -930px; }
+.bim .bar-section-offset { background-position: 0 -1056px; }
+.bim .bar-section-rotatex { background-position: 0 -1025px; }
+.bim .bar-section-rotatey { background-position: 0 -992px; }
+.bim .bar-viewpoint { background-position: 0 -1120px; }
+.bim .bar-viewpoint.selected { background-position: -32px -1120px; }
+#keyControlPanel { position: absolute; left: 10px; opacity: 0.95; top: 0px }
+.bim .guide-list {    /*background-color:#005500;
+      border:#999999 1px dashed;*/
+margin: 0px; padding: 0px; width: 262px; height: 312px; list-style: none; }
+.bim .guide-list li { float: left; }
+.bim .key-panel { background: transparent; margin: 2px; width: 48px; height: 48px; text-align: center; position: relative }
+.bim .key-panel p { width: 48px; height: 18px; padding: 0px; margin: 0px; }
+.bim .key-panel p.tip-top { position: absolute; top: 0px; }
+.bim .key-panel p.tip-bottom { position: absolute; bottom: 0px; }
+.bim .key-panel p.tip-left { position: absolute; left: 0px; }
+.bim .key-panel p.tip-right { position: absolute; right: 0px; }
+.bim .key-selected { background-color: #0055ff; opacity: 0.65; }
 
-.bar-select.selected {
-    background-position: -32px 0;
-}
-
-.bar-handle {
-    background-position: 0 -32px;
-}
-
-.bar-pan.selected {
-    background-position: -32px -32px;
-}
-
-.bar-zoomIn {
-    background-position: 0 -64px;
-}
-
-.bar-zoomin.selected {
-    background-position: -32px -64px;
-}
-
-.bar-zoomOut {
-    background-position: 0 -96px;
-}
-
-.bar-zoomout.selected {
-    background-position: -32px -96px;
-}
-
-.bar-fit {
-    background-position: 0 -128px;
-}
-
-.bar-fit.selected {
-    background-position: -32px -128px;
-}
-
-.bar-rotate {
-    background-position: 0 -160px;
-}
-
-.bar-rotate.selected {
-    background-position: -32px -160px;
-}
-
-.bar-section {
-    background-position: 0 -192px;
-}
-
-.bar-section.selected {
-    background-position: -32px -192px;
-}
-
-.bar-fly {
-    background-position: 0 -224px;
-}
-
-.bar-fly.selected {
-    background-position: -32px -224px;
-}
-
-.bar-camera {
-    background-position: 0 -256px;
-}
-
-.bar-camera.selected {
-    background-position: -32px -256px;
-}
-
-.bar-camera-southWest {
-    background-position: 0 -288px;
-}
-
-.bar-camera-southWest.selected {
-    background-position: -32px -288px;
-}
-
-.bar-camera-top {
-    background-position: 0 -320px;
-}
-
-.bar-camera-top.selected {
-    background-position: -32px -320px;
-}
-
-.bar-camera-bottom {
-    background-position: 0 -352px;
-}
-
-.bar-camera-bottom.selected {
-    background-position: -32px -352px;
-}
-
-.bar-camera-left {
-    background-position: 0 -384px;
-}
-
-.bar-camera-left.selected {
-    background-position: -32px -384px;
-}
-
-.bar-camera-right {
-    background-position: 0 -416px;
-}
-
-.bar-camera-right.selected {
-    background-position: -32px -416px;
-}
-
-.bar-camera-front {
-    background-position: 0 -448px;
-}
-
-.bar-camera-front.selected {
-    background-position: -32px -448px;
-}
-
-.bar-camera-behind {
-    background-position: 0 -480px;
-}
-
-.bar-camera-behind.selected {
-    background-position: -32px -480px;
-}
-
-.bar-fullScreen {
-    background-position: 0 -512px;
-}
-
-.bar-fullScreen.selected {
-    background-position: -32px -512px;
-}
-
-.bar-rotate-ni {
-    background-position: 0 -544px;
-}
-
-.bar-rotate-ni.selected {
-    background-position: -32px -544px;
-}
-
-.bar-rotate-shun {
-    background-position: 0 -576px;
-}
-
-.bar-rotate-shun.selected {
-    background-position: -32px -576px;
-}
-
-.bar-mark {
-    background-position: 0 -608px;
-}
-
-.bar-mark.selected {
-    background-position: -32px -608px;
-}
-
-.bar-mark-yun {
-    background-position: 0 -640px;
-}
-
-.bar-mark-yun.selected {
-    background-position: -32px -640px;
-}
-
-.bar-mark-arrow {
-    background-position: 0 -672px;
-}
-
-.bar-mark-arrow.selected {
-    background-position: -32px -672px;
-}
-
-.bar-mark-rect {
-    background-position: 0 -704px;
-}
-
-.bar-mark-rect.selected {
-    background-position: -32px -704px;
-}
-
-.bar-mark-circle {
-    background-position: 0 -736px;
-}
-
-.bar-mark-circle.selected {
-    background-position: -32px -736px;
-}
-
-.bar-mark-cross {
-    background-position: 0 -768px;
-}
-
-.bar-mark-cross.selected {
-    background-position: -32px -768px;
-}
-
-.bar-mark-text {
-    background-position: 0 -800px;
-}
-
-.bar-mark-text.selected {
-    background-position: -32px -800px;
-}
-
-.bar-mark-back {
-    background-position: 0 -832px;
-}
-
-.bar-mark-back.selected {
-    background-position: -32px -832px;
-}
-
-.bar-fullscreen {
-    background-position: 0 -864px;
-}
-
-.bar-fullscreen.selected {
-    background-position: -32px -864px;
-}
-.bar-section-horizontal{
-    background-position: -32px -960px;
-}
-.bar-section-vertical{
-    background-position: -32px -930px;
-}
-
-.bar-section-offset{
-    background-position: 0 -1056px;
-
-}
-.bar-section-rotatex{
-    background-position: 0 -1025px;
-}
-.bar-section-rotatey{
-    background-position: 0 -992px;
-}
-
-.bar-viewpoint{
-  background-position:0 -1120px;
-}
-.bar-viewpoint.selected{
-  background-position:-32px -1120px;
-}
-
-#keyControlPanel{
-    position: absolute;
-    left: 10px;
-    opacity: 0.95;
-    top: 0px
-}
-
-.guide-list {
-    /*background-color:#005500;
-    border:#999999 1px dashed;*/
-    margin: 0px;
-    padding:0px;
-    width: 262px;
-    height: 312px;
-    list-style: none;
-}
-
-.guide-list li {
-    float:left;
-}
-
-.key-panel{
-    background:transparent;
-    margin: 2px;
-    width: 48px;
-    height: 48px;
-    text-align:center;
-    position:relative
-}
-
-.key-panel p{
-    width: 48px;
-    height: 18px;
-    padding:0px;
-    margin:0px;
-}
-
-.key-panel p.tip-top{
-    position:absolute;
-    top:0px;
-}
-
-.key-panel p.tip-bottom{
-    position:absolute;
-    bottom:0px;
-}
-
-.key-panel p.tip-left{
-    position:absolute;
-    left: 0px;
-}
-
-.key-panel p.tip-right{
-    position:absolute;
-    right: 0px;
-}
-
-.key-selected{
-    background-color:#0055ff;
-    opacity: 0.65;
-}
 /* slider */
+
 /*主体*/
-.slider{
-  width:100%;
-  -webkit-appearance: none;
-  height:12px;
-  background-color:transparent;
-}
-.slider::-ms-track{
-  width:100%;
-  cursor:pointer;
-  background:transparent;
-  border-color:transparent;
-  color:transparent;
-}
-.slider:focus{
-  outline:none;
-}
+.bim .slider { width: 100%; -webkit-appearance: none; height: 12px; background-color: transparent; }
+.bim .slider::-ms-track { width: 100%; cursor: pointer; background: transparent; border-color: transparent; color: transparent; }
+.bim .slider:focus { outline: none; }
 
 /*滑块*/
-.slider::-webkit-slider-thumb{
-  -webkit-appearance: none;
-  border: 1px solid #ccc;
-  height: 12px;
-  width: 8px;
-  border-radius: 1000px;
-  background: #ffffff;
-  cursor: pointer;
-  margin-top: -2px;
-  box-shadow: 1px 1px 1px #000, 0px 0px 1px #666;
-}
-.slider::-moz-range-thumb{
-  border: 1px solid #ccc;
-  height: 12px;
-  width: 8px;
-  border-radius: 1000px;
-  background: #ffffff;
-  cursor: pointer;
-  box-shadow: 1px 1px 1px #000, 0px 0px 1px #666;
-}
-.slider::-ms-thumb{
-  border: 1px solid #ccc;
-  height: 12px;
-  width: 8px;
-  border-radius: 100px;
-  background: #ffffff;
-  cursor: pointer;
-  box-shadow: 1px 1px 1px #000, 0px 0px 1px #666;
-}
+.bim .slider::-webkit-slider-thumb { -webkit-appearance: none; border: 1px solid #ccc; height: 12px; width: 8px; border-radius: 1000px; background: #ffffff; cursor: pointer; margin-top: -2px; box-shadow: 1px 1px 1px #000, 0px 0px 1px #666; }
+.bim .slider::-moz-range-thumb { border: 1px solid #ccc; height: 12px; width: 8px; border-radius: 1000px; background: #ffffff; cursor: pointer; box-shadow: 1px 1px 1px #000, 0px 0px 1px #666; }
+.bim .slider::-ms-thumb { border: 1px solid #ccc; height: 12px; width: 8px; border-radius: 100px; background: #ffffff; cursor: pointer; box-shadow: 1px 1px 1px #000, 0px 0px 1px #666; }
+
 /*轨道*/
-.slider::-webkit-slider-runnable-track {
-  width: 100%;
-  height: 8px;
-  cursor: pointer;
-  background: #666;
-  border-radius: 1000px;
-}
-.slider::-moz-range-track {
-  width: 100%;
-  height: 8px;
-  cursor: pointer;
-  background: #666;
-  border-radius: 1000px;
-}
-.slider::-ms-track { /*轨道底色*/
-  width: 100%;
-  height: 8px;
-  border-radius:1000px;
-  cursor: pointer;
-  background: #666;
-  border-width:0;
-  color: transparent;
-}
-.slider::-ms-fill-lower {/*轨道滑过颜色*/
-  background: #aaa;
-  border-radius:1000px;
-}
-.slider:focus::-ms-fill-lower {/*轨道选中滑过颜色*/
-  background: #aaa;
-}
-.slider::-ms-fill-upper {
-  background: #666;
-  border-radius: 1000px;
-}
-.slider:focus::-ms-fill-upper {
-  background: #666;
-}
+.bim .slider::-webkit-slider-runnable-track { width: 100%; height: 8px; cursor: pointer; background: #666; border-radius: 1000px; }
+.bim .slider::-moz-range-track { width: 100%; height: 8px; cursor: pointer; background: #666; border-radius: 1000px; }
+.bim .slider::-ms-track {width: 100%; height: 8px; border-radius: 1000px; cursor: pointer; background: #666; border-width: 0; color: transparent; }
+.bim .slider::-ms-fill-lower {background: #aaa; border-radius: 1000px; }
+.bim .slider:focus::-ms-fill-lower {background: #aaa; }
+.bim .slider::-ms-fill-upper { background: #666; border-radius: 1000px; }
+.bim .slider:focus::-ms-fill-upper { background: #666; }

@@ -1,28 +1,48 @@
 <div class="breadcrumbNav">
+
     <span class="projectText"><a href="#resources">资源库</a></span>
+
     <span class="breadItem project relative"> <i class="icon-angle-right"></i> 
             <% var obj=App.ResourcesNav.getNameByType(); %>
            <span class="breadItemText"> <a href="<%=obj.href%>" class="text"><%= obj.name %></a> </span>
-    <div class="projectList">
-        <div class="loading">正在加载，请稍候……</div>
-        <div class="listContent">
+        <div class="projectList">
+            <div class="loading">正在加载，请稍候……</div>
+            <div class="listContent">
+            </div>
         </div>
-    </div>
     </span>
+    
     <span class="breadItem projectVersion resourcesList relative <%= App.ResourceModel.Settings.CurrentVersion.projectId ? '':'myHidden' %>"> <i class="icon-angle-right"></i> 
-           <span class="breadItemText"> <span class="text"><%=App.ResourceModel.Settings.CurrentVersion.projectName%></span> </i></span>
-    <div class="projectVersionList">
-        <div class="listResource">
-        </div>
-    </div>
-    </span>
-
-
-     <span class="breadItem projectVersion relative <%= App.ResourceModel.Settings.CurrentVersion.id ? '':'myHidden' %>"> <i class="icon-angle-right"></i> 
+           <span class="breadItemText">
+            
+             <span class="text"><%=App.ResourceModel.Settings.CurrentVersion.projectName%></span>
+                    <%if(App.ResourceModel.Settings.type=='famLibs'){%>
+                        (
+                        <%=App.Comm.convertStatus(App.ResourceModel.Settings.CurrentVersion.status)%>)
+                    <%}%>
+                </span>
+                <div class="projectVersionList">
+                    <div class="listResource">
+                    </div>
+                </div>
+                </span>
+                <span class="breadItem projectVersion relative <%= App.ResourceModel.Settings.CurrentVersion.id &&App.ResourceModel.Settings.type!='famLibs'  ? '':'myHidden' %>"> <i class="icon-angle-right"></i> 
            <span class="breadItemText"> <span class="text"><%=App.ResourceModel.Settings.CurrentVersion.name%>( <%=App.Comm.convertStatus(App.ResourceModel.Settings.CurrentVersion.status)%>) </span> </span>
-    <div class="projectVersionList">
-        <div class="listContent">
-        </div>
-    </div>
-    </span>
+                <div class="projectVersionList">
+                    <div class="listContent">
+                    </div>
+                </div>
+                </span>
+
+    <span class="breadItem fileModelNav relative <%=App.ResourceModel.Settings.type=='famLibs'||App.ResourceModel.Settings.type==''  ? 'myHidden':'' %>"> 
+    <i class="icon-angle-right"></i> 
+           <span class="breadItemText"> <span class="text"> 文件浏览器 </span>
+                <i class="myIcon-slanting-right"></i></span>
+                <div class="fileModelList">
+                    <ul class="fileNavUl">
+                        <li data-type="file">文件浏览器</li>
+                        <li data-type="model">模型浏览器</li>
+                    </ul>
+                </div>
+                </span>
 </div>

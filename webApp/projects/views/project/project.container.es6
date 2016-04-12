@@ -9,9 +9,11 @@ App.Project.ProjectContainer = Backbone.View.extend({
 	events: {
 		"click .breadItem": "breadItemClick",
 		"click .slideBar": "navBarShowAndHide",
-		"mousedown .dragSize": "dragSize", 
+		"mousedown .dragSize": "dragSize",
 		"click .projectVersionList .container .item": "changeVersion",
-		"click .projectVersionList .nav .item": "changeVersionTab"
+		"click .projectVersionList .nav .item": "changeVersionTab",
+		"click .fileModelList li": "switchFileMoldel"
+
 	},
 
 	render: function() {
@@ -40,7 +42,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			$projectList.show();
 			this.loadProjectList();
 
-		} else {
+		} else if ($target.hasClass('projectVersion')) {
 			var $projectVersionList = $(".breadItem .projectVersionList");
 			if (!$projectVersionList.is(":hidden")) {
 				return;
@@ -49,6 +51,13 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			$projectVersionList.find(".listContent").hide();
 			$projectVersionList.show();
 			this.loadProjectVersionList();
+		} else if ($target.hasClass('fileModelNav')) {
+
+			var $fileModelList = $(".breadItem .fileModelList");
+			if (!$fileModelList.is(":hidden")) {
+				return;
+			}
+			$fileModelList.show();
 		}
 
 		/*var dialog = new App.Comm.modules.Dialog({
@@ -58,7 +67,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			title: '新建任务',
 			cssClass: 'task-create-dialog',
 			okText: '添&nbsp;&nbsp;加',
-			message: "内容" 
+			message: "内容"
 		})*/
 	},
 
@@ -171,23 +180,206 @@ App.Project.ProjectContainer = Backbone.View.extend({
 
 	//拖拽改变尺寸
 	dragSize: function(event) {
-
 		var $el = $("#projectContainer .rightProperty"),
 			dirc = "right",
 			$target = $(event.target);
-
-
 		if ($target.closest(".leftNav").length > 0) {
 			dirc = "left";
-			$el = $("#projectContainer .leftNav"); 
+			$el = $("#projectContainer .leftNav");
 		}
 
-
-		App.Comm.dragSize(event, $el, $("#projectContainer .projectCotent"), dirc, App.Project.Settings.Viewer); 
+		App.Comm.dragSize(event, $el, $("#projectContainer .projectCotent"), dirc, App.Project.Settings.Viewer);
 
 		return false;
 
-	}
+	},
 
+	//切换模型浏览器 和 文件浏览器
+	switchFileMoldel(event) {
+
+		var $target = $(event.target).closest("li"),
+			type = $target.data("type"),
+			$projectContainer = $("#projectContainer"),
+			$projectCotent = $projectContainer.find(".projectCotent");
+		App.Project.Settings.fetchNavType = type;
+
+		if (type == "file") {
+
+			//左右侧
+			$projectContainer.find(".rightProperty").removeClass("showPropety");
+			$projectContainer.find(".leftNav").show();
+
+			//切换时记录大小
+			var mRight = $projectCotent.css("margin-right");
+			$projectCotent.css({
+				"margin-right": "0px",
+				"margin-left": "240px"
+			});
+			$projectCotent.data("mRight", mRight);
+
+			//内容
+			$projectContainer.find(".fileContainer").show();
+			$projectContainer.find(".modelContainer").hide();
+
+			//tab 文字
+			$target.closest('.fileModelNav').find(".breadItemText .text").text($target.text());
+
+
+
+		} else {
+
+			if (!typeof(Worker)) {
+				alert("请使用现代浏览器查看模型");
+				return;
+			}
+			//加载过数据后 直接切换 否则 加载数据
+			if (App.Project.Settings.DataModel && App.Project.Settings.DataModel.sourceId) {
+				this.typeContentChange();
+			} else {
+				this.fetchModelIdByProject();
+			}
+			//tab 文字
+			$target.closest('.fileModelNav').find(".breadItemText .text").text($target.text());
+		}
+
+		//隐藏下拉
+		$(".breadcrumbNav .fileModelList").hide();
+
+		event.stopPropagation();
+
+	},
+
+	//切换
+	typeContentChange() {
+
+		var $projectContainer = $("#projectContainer"),
+			$projectCotent = $projectContainer.find(".projectCotent");
+		//左右侧
+		$projectContainer.find(".leftNav").hide();
+
+		var mRight = $projectCotent.data("mRight") || 398;
+		$projectCotent.css({
+			"margin-right": mRight,
+			"margin-left": "0px"
+		});
+		$projectContainer.find(".rightProperty").addClass("showPropety").width(mRight);
+
+		//内容
+		$projectContainer.find(".fileContainer").hide();
+		$projectContainer.find(".modelContainer").show();
+
+	},
+
+	//获取项目版本Id
+	fetchModelIdByProject: function() {
+
+		var data = {
+			URLtype: "fetchModelIdByProject",
+			data: {
+				projectId: App.Project.Settings.projectId,
+				projectVersionId: App.Project.Settings.CurrentVersion.id
+			}
+		}
+		var that = this;
+
+
+		// App.Project.Settings.modelId= "e0c63f125d3b5418530c78df2ba5aef1";
+		// this.renderModel();
+		// return;
+
+
+		App.Comm.ajax(data, function(data) {
+
+			if (data.message == "success") {
+
+				if (data.data) {
+					App.Project.Settings.DataModel = data.data;
+					that.renderModel();
+				} else {
+					alert("模型转换中");
+				}
+			} else {
+				alert(data.message);
+			}
+
+		});
+	},
+
+	//模型渲染
+	renderModel: function() {
+
+		var that = this;
+		this.typeContentChange();
+
+		//渲染模型属性
+		App.Project.renderModelContentByType();
+		var viewer = App.Project.Settings.Viewer = App.Comm.createModel({
+			element: $("#projectContainer .modelContainerContent"),
+			sourceId: App.Project.Settings.DataModel.sourceId,
+			projectId: App.Project.Settings.projectId,
+			etag: App.Project.Settings.DataModel.etag
+		});
+		viewer.on("click", function(model) {
+			App.Project.Settings.ModelObj = null;
+
+			if (!model.intersect) {
+				that.resetProperNull();
+				return;
+			};
+
+			App.Project.Settings.ModelObj = model;
+			//App.Project.Settings.modelId = model.userId;
+			that.viewerPropertyRender();
+
+		});
+	},
+	//重置 内容为空
+	resetProperNull() {
+
+		var projectNav = App.Project.Settings.projectNav,
+			property = App.Project.Settings.property,
+			$el;
+		if (property == "poperties") {
+
+			if (projectNav == "design") {
+				//设计
+				$el = $(".rightPropertyContentBox .designProperties");
+
+			} else if (projectNav == "cost") {
+				//成本
+				$el = $(".rightPropertyContentBox .CostProperties");
+
+			} else if (projectNav == "quality") {
+				//质量
+				$el = $(".rightPropertyContentBox .QualityProperties");
+			} else if (projectNav == "plan") {
+				//计划
+				$el = $(".rightPropertyContentBox .planProperties");
+			}
+		}
+		if ($el) {
+			$el.html('<div class="nullTip">请选择构件</div>');
+		}
+
+	},
+	//设置渲染
+	viewerPropertyRender() {
+		var projectNav = App.Project.Settings.projectNav,
+			property = App.Project.Settings.property,
+			Intersect = App.Project.Settings.ModelObj.intersect;
+
+		//属性，四个tab 都一样
+		if (((projectNav == "design" || projectNav == "cost" || projectNav == "quality" || projectNav == "plan") && property == "poperties")) {
+
+			App.Project.DesignAttr.PropertiesCollection.projectId = App.Project.Settings.projectId;
+			App.Project.DesignAttr.PropertiesCollection.projectVersionId = App.Project.Settings.CurrentVersion.id;
+			App.Project.DesignAttr.PropertiesCollection.fetch({
+				data: {
+					elementId: Intersect.userId,
+					sceneId: Intersect.object.userData.sceneId
+				}
+			});
+		}
+	}
 
 });

@@ -14,7 +14,8 @@ App.Project.FileContainerDetail=Backbone.View.extend({
 
 	//事件绑定
 	events:{
-		"click .fileName  .text":"fileClick"
+		"click .fileName  .text":"fileClick",
+		"click .ckAll":"singleCheck"
 	},
 
 	template:_.templateUrl("/projects/tpls/project/project.container.file.detail.html"),
@@ -49,9 +50,7 @@ App.Project.FileContainerDetail=Backbone.View.extend({
 
 			//this.fetchFileModelIdByFileVersionId(id,$target);
 
-		}
-
-
+		} 
 	},
 
 	//获取文件模型id
@@ -79,9 +78,18 @@ App.Project.FileContainerDetail=Backbone.View.extend({
 			 }else{
 			 	alert(data.message);
 			 }
-		});
+		});  
+	},
 
-
+	//是否全选
+	singleCheck(event){
+	 
+		if (this.$el.parent().find(".ckAll:not(:checked)").length>0) {
+			$(".fileContentHeader  .header .ckAll").prop("checked",false);
+			
+		}else{
+			$(".fileContentHeader  .header .ckAll").prop("checked",true);
+		}
 	}
 
 });

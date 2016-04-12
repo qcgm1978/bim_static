@@ -103,6 +103,18 @@ CLOUD.Utils = {
         return null;
     },
 
+    computeBBox : function(points){
+        var bbox = new THREE.Box3();
+
+        var v1 = new THREE.Vector3();
+        for (var ii = 0, len = points.length; ii < len; ++ii) {
+            v1.fromArray(points[ii], 0);
+            bbox.expandByPoint(v1);
+        }
+
+        return bbox;
+    },
+
     parseTransform: function (node, objJson, trf) {
 
         var updateMatrix = false;
@@ -1149,6 +1161,10 @@ CLOUD.BBoxNode = function (boundingBox, color) {
 CLOUD.BBoxNode.prototype = Object.create(THREE.LineSegments.prototype);
 CLOUD.BBoxNode.prototype.constructor = CLOUD.BBoxNode;
 
+CLOUD.BBoxNode.prototype.unload = function () {
+
+}
+
 CLOUD.BBoxNode.prototype.updateBBox = function (boundingBox) {
     var min = boundingBox.min;
     var max = boundingBox.max;
@@ -1378,7 +1394,8 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
         isIncrementalRenderFinish = false, // 是否绘制结束
         isOpaqueObjectsRenderFinish = false, // 不透明对象绘制结束
         isTransparentObjectsRenderFinish = false, // 透明对象绘制结束
-        isTransparentObjectsRenderStart = false;  // 透明对象绘制开始
+        isTransparentObjectsRenderStart = false,  // 透明对象绘制开始
+        incrementCullTag = 0;     //增量遍历
     // ------------------------------------------------------------------
 
     // initialize
@@ -2447,6 +2464,20 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
     };
 
 
+    this.computeSelectionBBox = function () {
+
+        if (_filterObject === null)
+            return null;
+
+        if (_filterObject.isSelectionSetEmpty())
+            return null;
+
+        _filterObject.resetSelectionBox();
+        _filterObject.computeSelectionBox(opaqueObjects);
+        _filterObject.computeSelectionBox(transparentObjects);
+
+        return _filterObject.getSelectionBox();
+    };
     // ------------------------------------------------------------------
     // 增加增量绘制支持
 
@@ -2469,7 +2500,7 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
             buildIncrementObjectList(scene, camera);
 
             //
-            shadowMap.render( scene );
+            // shadowMap.render( scene );
 
             //
             _infoRender.calls = 0;
@@ -2607,23 +2638,32 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
         // 增加是否更新对象列表的判断
 
         if (_isUpdateObjectList) {
-            lights.length = 0;
 
+            lights.length = 0;
             opaqueObjectsLastIndex = - 1;
             transparentObjectsLastIndex = - 1;
+
+            ++incrementCullTag;
+            if (incrementCullTag > 100000)
+                incrementCullTag = 0;
 
             sprites.length = 0;
             lensFlares.length = 0;
 
+            console.time("projectObject");
             projectObject( scene, camera );
+            console.timeEnd("projectObject");
 
             opaqueObjects.length = opaqueObjectsLastIndex + 1;
             transparentObjects.length = transparentObjectsLastIndex + 1;
 
+            console.log(opaqueObjects.length + transparentObjects.length);
+            console.time("sort");
             if ( _this.sortObjects === true ) {
                 opaqueObjects.sort( painterSortStable );
                 transparentObjects.sort( reversePainterSortStable );
             }
+            console.timeEnd("sort");
         }
     }
 
@@ -2673,26 +2713,9 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
             object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
             object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
 
-            if ( object instanceof THREE.ImmediateRenderObject ) {
+            _this.renderBufferDirect( camera, lights, fog, geometry, material, object, group );
 
-                setMaterial( material );
-
-                var program = setProgram( camera, lights, fog, material, object );
-
-                _currentGeometryProgram = '';
-
-                object.render( function ( object ) {
-
-                    _this.renderBufferImmediate( object, program, material );
-
-                } );
-
-            } else {
-
-                _this.renderBufferDirect( camera, lights, fog, geometry, material, object, group );
-
-            }
-
+        
             if (i % 1000 === 999) {
                 //endTime = window.performance.now();
                 endTime = Date.now();
@@ -2764,58 +2787,45 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
             };
 
             // assert( index === array.length );
-            array.push( renderItem );
-
+            //array.push( renderItem );
+            array[index] = renderItem;
         }
+
+
+        //if((transparentObjectsLastIndex + opaqueObjectsLastIndex)%10000)
 
     }
 
-    function projectObject( object, camera ) {
+    function projectObject(object, camera, inFrustum) {
 
         if (object.visible === false) return;
+
+        if (!inFrustum)
+            inFrustum = object.inFrustum;
 
         //Liwei: ignor groups
         var isGroup = object instanceof THREE.Group;
 
-        if (!isGroup && (object.channels.mask & camera.channels.mask) !== 0) {
+        if (!isGroup/*&& (object.channels.mask & camera.channels.mask) !== 0*/ && object.incrementCullTag != incrementCullTag) {
 
-            if ( object instanceof THREE.Light ) {
-
-                lights.push( object );
-
-            } else if ( object instanceof THREE.Sprite ) {
-
-                sprites.push( object );
-
-            } else if ( object instanceof THREE.LensFlare ) {
-
-                lensFlares.push( object );
-
-            } else if ( object instanceof THREE.ImmediateRenderObject ) {
-
-                if ( _this.sortObjects === true ) {
-
-                    _vector3.setFromMatrixPosition( object.matrixWorld );
-                    _vector3.applyProjection( _projScreenMatrix );
-
-                }
-
-                pushRenderItem( object, null, object.material, _vector3.z, null );
-
-            } else if ( object instanceof THREE.Mesh || object instanceof THREE.Line || object instanceof THREE.Points ) {
+            object.incrementCullTag = incrementCullTag;
+            if (object instanceof THREE.Mesh || object instanceof THREE.Line || object instanceof THREE.Points) {
 
                 // 元素可见性过滤
                 if (!isVisibleForFilter(object)) {
                     return;
                 }
 
-                if ( object instanceof THREE.SkinnedMesh ) {
+                //if ( object instanceof THREE.SkinnedMesh ) {
 
-                    object.skeleton.update();
+                //    object.skeleton.update();
 
-                }
+                //}
 
-                if ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) {
+                if (
+                    //object.frustumCulled === false
+                    inFrustum
+                    || _frustum.intersectsObject(object) === true) {
 
                     //var material = object.material;
 
@@ -2825,7 +2835,7 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
 
                     if ( material.visible === true ) {
 
-                        if ( _this.sortObjects === true ) {
+                       // if ( _this.sortObjects === true ) {
 
                             //if (!object.modelCenter) {
 
@@ -2847,7 +2857,7 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
                             //_vector3.applyProjection( _projScreenMatrix );
 
                             //console.log(_vector3.z);
-                        }
+                        //}
 
                         if (object.load)
                             object.load();
@@ -2883,14 +2893,38 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
                 }
 
             }
+            else if (object instanceof THREE.Light) {
 
+                lights.push(object);
+
+            }
+            //else if (object instanceof THREE.Sprite) {
+
+            //    sprites.push( object );
+
+            //} else if ( object instanceof THREE.LensFlare ) {
+
+            //    lensFlares.push( object );
+
+            //} else if ( object instanceof THREE.ImmediateRenderObject ) {
+
+            //    if ( _this.sortObjects === true ) {
+
+            //        _vector3.setFromMatrixPosition( object.matrixWorld );
+            //        _vector3.applyProjection( _projScreenMatrix );
+
+            //    }
+
+            //    pushRenderItem( object, null, object.material, _vector3.z, null );
+
+            //}
         }
 
         var children = object.children;
 
         for ( var i = 0, l = children.length; i < l; i ++ ) {
 
-            projectObject( children[ i ], camera );
+            projectObject(children[i], camera, inFrustum);
 
         }
 
@@ -5142,10 +5176,11 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
 CLOUD.AxisGrid = function (viewer) {
 
     this.viewer = viewer;
-    this.fillColor = 0xffaa00;
+    this.fillColor = 0xff0000;
     this.lineWidth = 2;
     this.isDashedLine = false;
     this.axisGroup = new THREE.Group();
+    this.scene = null;
 };
 
 CLOUD.AxisGrid.prototype = {
@@ -5255,22 +5290,65 @@ CLOUD.AxisGrid.prototype = {
         }
 
         // --------------- 网格 --------------- //
+
+        geometryGrid.computeBoundingBox();
+
         var grids = new THREE.LineSegments(geometryGrid, materialGrid);
+
         grids.name = "grids";
         axisGroup.add(grids);
     },
 
-    addToScene: function () {
+    setScene: function(scene) {
+        this.scene = scene;
+    },
+
+    getDefaultScene : function() {
         var scene = this.viewer.getScene();
         var rootNode = scene.rootNode;
         rootNode.updateMatrixWorld(true);
         rootNode.matrixAutoUpdate = false;
-        rootNode.add(this.axisGroup);
+
+        return rootNode;
+    },
+
+    getWorldBoundingBox: function () {
+        //var box = new THREE.Box3();
+        //var rootNode = this.getRootNode();
+        //
+        //if (rootNode.boundingBox) {
+        //    box.copy(rootNode.boundingBox);
+        //    box.applyMatrix4(rootNode.matrix);
+        //
+        //    return box;
+        //}
+
+        return null;
+    },
+
+    addToScene: function () {
+        //var scene = this.viewer.getScene();
+        //var rootNode = scene.rootNode;
+        //rootNode.updateMatrixWorld(true);
+        //rootNode.matrixAutoUpdate = false;
+
+        if (!this.scene) {
+            var rootNode = this.getDefaultScene();
+            rootNode.add(this.axisGroup);
+        } else {
+            this.scene.add(this.axisGroup);
+        }
+
     },
     removeFromScene: function () {
-        var scene = this.viewer.getScene();
-        var rootNode = scene.rootNode;
-        rootNode.remove(this.axisGroup);
+
+        if (!this.scene) {
+            var rootNode = this.getDefaultScene();
+            rootNode.remove(this.axisGroup);
+        } else {
+            this.scene.remove(this.axisGroup);
+        }
+
     },
     setVisibility: function (visible) {
         if (this.axisGroup.visible != visible) {
@@ -5332,6 +5410,978 @@ CLOUD.AxisGrid.prototype = {
         }
     }
 };
+CLOUD.MiniMap = function (viewer, callback) {
+    this.viewer = viewer;
+    this.callbackFn = callback;
+    this.visible = true;
+    this.width = 0;
+    this.height = 0;
+    this.mouseButtons = {LEFT: THREE.MOUSE.LEFT, RIGHT: THREE.MOUSE.RIGHT};
+
+    var scope = this;
+    var _mapContainer;
+    var normalizedMouse = new THREE.Vector2();
+
+    var _clearColor = new THREE.Color(), _clearAlpha = 1;
+    var _defaultClearColor = 0xffffff; // 0xadadad; // 缺省背景色ma
+
+    var _xmlns = "http://www.w3.org/2000/svg";
+    var _svg = document.createElementNS(_xmlns, 'svg');
+    var _svgGroupForAxisGrid = document.createElementNS(_xmlns, "g");
+    var _svgPathPool = [], _svgLinePool = [], _svgRectPool = [], _svgImagePool = [],
+        _pathCount = 0, _lineCount = 0, _rectCount = 0, _imageCount = 0, _quality = 1;
+    var _svgNode, _svgWidth, _svgHeight, _svgHalfWidth, _svgHalfHeight;
+
+    var _clipBox = new THREE.Box2(), _elemBox = new THREE.Box2(), _axisGridBox = new THREE.Box2();
+
+    var _axisGridElements = [], _axisGridIntersectionPoints = [], _axisGridLevels = [];
+    var _isInitializedAxisGird = false; // 用于轴网显示控制
+    var _isShowAxisGrid = false;
+    var _isExistData = false;
+
+    var _tipNode, _circleNode, _highlightHorizLineNode, _highlightVerticalLineNode, _cameraNode;
+    var _highlightColor = '#258ae3';
+    var _highlightLineWidth = 1;
+    var _circleNodeRadius = 3;
+    var _hasHighlightInterPoint = false;
+
+    var _floorPlaneElevation = 0; // 平面图标高
+    var _floorPlaneBox;
+
+    // ------------- 这些算法可以独立成文件 S ------------- //
+
+    function cross(p1, p2, p3, p4) {
+        return (p2.x - p1.x) * (p4.y - p3.y) - (p2.y - p1.y) * (p4.x - p3.x);
+    }
+
+    // 获得三角形面积(S = |AB * AC|)
+    function getArea(p1, p2, p3) {
+        return cross(p1, p2, p1, p3);
+    }
+
+    // 获得三角形面积
+    function getAbsArea(p1, p2, p3) {
+        return Math.abs(getArea(p1, p2, p3));
+    }
+
+    // 计算交点
+    function getInterPoint(p1, p2, p3, p4) {
+
+        var s1 = getAbsArea(p1, p2, p3);
+        var s2 = getAbsArea(p1, p2, p4);
+        var interPoint = new THREE.Vector2((p4.x * s1 + p3.x * s2) / (s1 + s2), (p4.y * s1 + p3.y * s2) / (s1 + s2));
+
+        return interPoint;
+    }
+
+    // ------------- 这些算法可以独立成文件 E ------------- //
+
+    // 正规化坐标转屏幕坐标
+    function normalizedPointToScreen(point) {
+
+        point.x = point.x * _svgHalfWidth;
+        point.y = -point.y * _svgHalfHeight;
+    }
+
+    // 屏幕坐标转正规化坐标
+    function screenToNormalizedPoint(point) {
+
+        point.x = point.x / _svgHalfWidth;
+        point.y = -point.y / _svgHalfHeight;
+    }
+
+    // 正规化屏幕坐标转世界坐标
+    function normalizedPointToWorld(point) {
+
+        var boxSize = _axisGridBox.size();
+
+        point.x = 0.5 * (point.x + 1) * boxSize.x + _axisGridBox.min.x;
+        point.y = 0.5 * (point.y + 1) * boxSize.y + _axisGridBox.min.y;
+    }
+
+    // 世界坐标转正规化屏幕坐标 [-1, 1]
+    function worldToNormalizedPoint(point) {
+
+        var boxSize = _axisGridBox.size();
+
+        point.x = (point.x - _axisGridBox.min.x) / boxSize.x * 2 - 1;
+        point.y = (point.y - _axisGridBox.min.y) / boxSize.y * 2 - 1;
+    }
+
+    function loadStyleString(css) {
+
+        var style = document.createElement("style");
+        style.type = "text/css";
+
+        try {
+            style.appendChild(document.createTextNode(css));
+        } catch (ex) {
+            style.styleSheet.cssText = css;
+        }
+
+        var head = document.getElementsByTagName('head')[0];
+        head.appendChild(style);
+    }
+
+    function getImageNode(id) {
+
+        if (_svgImagePool[id] == null) {
+            _svgImagePool[id] = document.createElementNS(_xmlns, 'image');
+            return _svgImagePool[id];
+        }
+
+        return _svgImagePool[id];
+    }
+
+    function getPathNode(id) {
+
+        if (_svgPathPool[id] == null) {
+            _svgPathPool[id] = document.createElementNS(_xmlns, 'path');
+
+            if (_quality == 0) {
+                _svgPathPool[id].setAttribute('shape-rendering', 'crispEdges'); //optimizeSpeed
+            }
+
+            return _svgPathPool[id];
+        }
+
+        return _svgPathPool[id];
+    }
+
+    function getLineNode(id) {
+
+        if (_svgLinePool[id] == null) {
+            _svgLinePool[id] = document.createElementNS(_xmlns, 'line');
+
+            if (_quality == 0) {
+                _svgLinePool[id].setAttribute('shape-rendering', 'crispEdges'); //optimizeSpeed
+            }
+
+            return _svgLinePool[id];
+        }
+
+        return _svgLinePool[id];
+    }
+
+    function getRectNode(id) {
+
+        if (_svgRectPool[id] == null) {
+            _svgRectPool[id] = document.createElementNS(_xmlns, 'rect');
+
+            if (_quality == 0) {
+                _svgRectPool[id].setAttribute('shape-rendering', 'crispEdges'); //optimizeSpeed
+            }
+
+            return _svgRectPool[id];
+        }
+
+        return _svgRectPool[id];
+    }
+
+    function renderLine(v1, v2, material) {
+
+        _svgNode = getLineNode(_lineCount++);
+        _svgNode.setAttribute('x1', v1.x);
+        _svgNode.setAttribute('y1', v1.y);
+        _svgNode.setAttribute('x2', v2.x);
+        _svgNode.setAttribute('y2', v2.y);
+
+        if (material instanceof THREE.LineBasicMaterial) {
+            _svgNode.setAttribute('style', 'fill: none; stroke: ' + material.color.getStyle() + '; stroke-width: ' + material.linewidth + '; stroke-opacity: ' + material.opacity + '; stroke-linecap: ' + material.linecap + '; stroke-linejoin: ' + material.linejoin);
+            _svgGroupForAxisGrid.appendChild(_svgNode);
+        }
+    }
+
+    function renderFloorPlan() {
+
+        _svgNode = getImageNode(0);
+        _svg.appendChild(_svgNode);
+    }
+
+    // 设置容器元素style
+    function setContainerElementStyle(container, styleOptions) {
+
+        var defaultStyle = {
+            position: "absolute",
+            display: "block",
+            left: "20px",
+            bottom: "20px",
+            outline: "#0000FF dotted thin"
+            //opacity: ".6",
+            //border: "red solid thin",
+            //webkitTransition: "opacity .2s ease",
+            //mozTransition: "opacity .2s ease",
+            //msTransform: "opacity .2s ease",
+            //oTransform: "opacity .2s ease",
+            //transition: "opacity .2s ease"
+        };
+
+        styleOptions = styleOptions || defaultStyle;
+
+        for (var attr in styleOptions) {
+            //console.log(attr);
+            container.style[attr] = styleOptions[attr];
+        }
+
+        //container.style.position = style.position;
+        //container.style.display = style.display;
+        //container.style.outline = style.outline;
+        //container.style.left = style.left;
+        //container.style.bottom = style.bottom;
+    }
+
+    function transformWorldPoint(point) {
+        var sceneMatrix = scope.getMainSceneMatrix();
+        point.applyMatrix4(sceneMatrix);
+    }
+
+    this.isMouseOverCanvas = function (mouse) {
+
+        var domElement = _mapContainer;
+
+        if (domElement !== undefined) {
+            var dim = CLOUD.DomUtil.getContainerOffsetToClient(domElement);
+            var canvasMouse = new THREE.Vector2();
+
+            // 计算鼠标点相对于viewhouse所在视口的位置
+            canvasMouse.x = mouse.x - dim.left;
+            canvasMouse.y = mouse.y - dim.top;
+
+            // 规范化坐标系[-1, 1]
+            if (canvasMouse.x > 0 && canvasMouse.x < this.width && canvasMouse.y > 0 && canvasMouse.y < this.height) {
+                normalizedMouse.x = canvasMouse.x / this.width * 2 - 1;
+                normalizedMouse.y = -canvasMouse.y / this.height * 2 + 1;
+
+                return true;
+            }
+        }
+
+        return false;
+    };
+
+    this.mouseDown = function (event, callback) {
+
+        var mouse = new THREE.Vector2(event.clientX, event.clientY);
+        var isOverCanvas = this.isMouseOverCanvas(mouse);
+
+        return isOverCanvas;
+    };
+
+    this.mouseMove = function (event, callback) {
+
+        var mouse = new THREE.Vector2(event.clientX, event.clientY);
+        var isOverCanvas = this.isMouseOverCanvas(mouse);
+
+        if (isOverCanvas && _isShowAxisGrid) {
+
+            this.dealHighlightNode();
+
+            if (_hasHighlightInterPoint) {
+                this.showTip();
+            } else {
+                this.hideTip();
+            }
+
+            callback();
+
+        } else {
+            //this.hideTip();
+            //callback();
+            _hasHighlightInterPoint = false;
+        }
+
+        return isOverCanvas;
+    };
+
+    this.mouseUp = function (event, callback) {
+
+        var mouse = new THREE.Vector2(event.clientX, event.clientY);
+        var isOverCanvas = this.isMouseOverCanvas(mouse);
+
+        if (isOverCanvas && _isExistData) {
+            // 计算选中点的坐标
+            var clickPoint = new THREE.Vector3();
+            var clickPoint2D = normalizedMouse.clone();
+            normalizedPointToWorld(clickPoint2D);
+
+            // 如果靠近交点，使用交点会更好，不然感觉靠近交点高亮时，点击的位置不一致。
+            var screenPosition = normalizedMouse.clone();
+            normalizedPointToScreen(screenPosition);
+
+            // 获得最近的交点
+            var intersection = this.computeMinDistanceIntersection(screenPosition);
+
+            if (intersection) {
+                // 计算轴信息
+                var interPoint = new THREE.Vector2(intersection.intersectionPoint.x, intersection.intersectionPoint.y);
+                var offset = screenPosition.sub(interPoint);
+
+                if (offset.lengthSq() < _circleNodeRadius * _circleNodeRadius) {
+                    var interScreenPoint = interPoint.clone();
+                    screenToNormalizedPoint(interScreenPoint);
+                    normalizedPointToWorld(interScreenPoint);
+                    clickPoint.set(interScreenPoint.x, interScreenPoint.y, _floorPlaneElevation);
+                } else {
+                    clickPoint.set(clickPoint2D.x, clickPoint2D.y, _floorPlaneElevation);
+                }
+            } else {
+                clickPoint.set(clickPoint2D.x, clickPoint2D.y, _floorPlaneElevation);
+            }
+
+            transformWorldPoint(clickPoint);
+
+            callback(clickPoint);
+        }
+
+        return isOverCanvas;
+    };
+
+    this.init = function (domContainer, width, height, styleOptions) {
+
+        width = width || 320;
+        height = height || 240;
+
+        // 初始化绘图面板
+        this.initCanvasContainer(domContainer, styleOptions);
+        // 初始化提示节点
+        this.initTipNode();
+        this.initCameraNode();
+        // 设置绘图面板大小
+        this.setSize(width, height);
+        // 设置绘图面板背景色
+        this.setClearColor(_defaultClearColor);
+        this.clear();
+    };
+
+    this.setSize = function (width, height) {
+
+        if (_mapContainer) {
+            this.width = width;
+            this.height = height;
+
+            _mapContainer.style.width = width + "px";
+            _mapContainer.style.height = height + "px";
+
+            _svgWidth = width;
+            _svgHeight = height;
+            _svgHalfWidth = _svgWidth / 2;
+            _svgHalfHeight = _svgHeight / 2;
+
+            _svg.setAttribute('viewBox', ( -_svgHalfWidth ) + ' ' + ( -_svgHalfHeight ) + ' ' + _svgWidth + ' ' + _svgHeight);
+            _svg.setAttribute('width', _svgWidth);
+            _svg.setAttribute('height', _svgHeight);
+
+            _clipBox.min.set(-_svgHalfWidth, -_svgHalfHeight);
+            _clipBox.max.set(_svgHalfWidth, _svgHalfHeight);
+
+            // redo init ???
+            //this.initAxisGird();
+            //this.initFloorPlane()
+        }
+    };
+
+    this.setClearColor = function (color, alpha) {
+
+        _clearColor.set(color);
+        _clearAlpha = alpha !== undefined ? alpha : 1;
+    };
+
+    this.clear = function () {
+
+        _pathCount = 0;
+        _lineCount = 0;
+        _rectCount = 0;
+        _imageCount = 0;
+
+        while (_svg.childNodes.length > 0) {
+
+            while (_svg.childNodes[0] > 0) {
+                _svg.childNodes[0].removeChild(_svg.childNodes[0].childNodes[0]);
+            }
+
+            _svg.removeChild(_svg.childNodes[0]);
+        }
+
+        _svg.style.backgroundColor = 'rgba(' + ( ( _clearColor.r * 255 ) | 0 ) + ',' + ( ( _clearColor.g * 255 ) | 0 ) + ',' + ( ( _clearColor.b * 255 ) | 0 ) + ',' + _clearAlpha + ')';
+    };
+
+    this.render = function () {
+
+        if (!this.visible)
+            return;
+
+        this.clear();
+
+        renderFloorPlan();
+
+        if (_isShowAxisGrid) {
+            _svg.appendChild(_svgGroupForAxisGrid);
+
+            for (var i = 0, len = _axisGridElements.length; i < len; i++) {
+                var lineElements = _axisGridElements[i];
+
+                for (var j = 0, len2 = lineElements.length; j < len2; j++) {
+                    var element = lineElements[j];
+                    var v1 = element.v1.clone();
+                    var v2 = element.v2.clone();
+                    var material = element.material;
+
+                    _elemBox.makeEmpty();
+                    _elemBox.setFromPoints([v1, v2]);
+
+                    if (_clipBox.isIntersectionBox(_elemBox) === true) {
+                        renderLine(v1, v2, material);
+                    }
+                }
+            }
+
+            _svg.appendChild(_highlightHorizLineNode);
+            _svg.appendChild(_highlightVerticalLineNode);
+            _svg.appendChild(_circleNode);
+        }
+
+        this.resetCameraNode();
+
+        _svg.appendChild(_cameraNode);
+    };
+
+    this.getMainSceneMatrix = function () {
+        var mainScene = this.viewer.getScene();
+        var rootNode = mainScene.rootNode;
+        //rootNode.updateMatrixWorld(true);
+        rootNode.updateMatrix();
+        //rootNode.matrixAutoUpdate = false;
+
+        return rootNode.matrix.clone();
+    };
+
+    this.initCanvasContainer = function (domContainer, styleOptions) {
+
+        if (!_mapContainer) {
+            _mapContainer = document.createElement("div");
+            setContainerElementStyle(_mapContainer, styleOptions);
+            domContainer.appendChild(_mapContainer);
+            _mapContainer.appendChild(_svg);
+        }
+    };
+
+    this.initCameraNode = function () {
+
+        if (!_cameraNode) {
+            _cameraNode = document.createElementNS(_xmlns, 'path');
+            _cameraNode.setAttribute('d', 'M-2,-4 L6,0 L-2,4 L0,0 L-2,-4');
+            _cameraNode.setAttribute('fill', '#1b8cef');
+            _cameraNode.setAttribute('stroke', "#cbd7e1");
+            _cameraNode.setAttribute('stroke-width', '0.4');
+            _cameraNode.setAttribute('stroke-linejoin', "round");
+            _cameraNode.setAttribute('opacity', '0.0');
+        }
+    };
+
+    this.initTipNode = function () {
+
+        if (!_tipNode) {
+            var css = "#cloud-tip:after { " +
+                "box-sizing: border-box;" +
+                "display: inline;" +
+                "font-size: 10px;" +
+                "width: 100%;" +
+                "line-height: 1;" +
+                "color: #333333;" +
+                "content: '\\25BC';" +
+                "position: absolute;" +
+                "text-align: center;" +
+                "margin: -2px 0 0 0;" +
+                "top: 100%;" +
+                "left: 0;" +
+                "}";
+
+            loadStyleString(css);
+
+            _tipNode = document.createElement('div');
+            _tipNode.id = "cloud-tip";
+            _tipNode.style.position = "absolute";
+            _tipNode.style.display = "block";
+            _tipNode.style.background = "#333333";
+            _tipNode.style.color = "#fff";
+            _tipNode.style.padding = "0 8px 0 8px";
+            _tipNode.style.borderRadius = "2px";
+            _tipNode.style.fontSize = "8px";
+            _tipNode.style.opacity = 0;
+
+            _mapContainer.appendChild(_tipNode);
+        }
+
+        if (!_circleNode) {
+            _circleNode = document.createElementNS(_xmlns, 'circle');
+            _circleNode.setAttribute('r', _circleNodeRadius + '');
+            _circleNode.setAttribute('fill', _highlightColor);
+            _circleNode.style.opacity = 0;
+        }
+
+        if (!_highlightHorizLineNode) {
+            _highlightHorizLineNode = document.createElementNS(_xmlns, 'line');
+            _highlightHorizLineNode.setAttribute('style', 'stroke:' + _highlightColor + ';stroke-width:' + _highlightLineWidth + '');
+            _highlightHorizLineNode.style.opacity = 0;
+        }
+
+        if (!_highlightVerticalLineNode) {
+            _highlightVerticalLineNode = document.createElementNS(_xmlns, 'line');
+            _highlightVerticalLineNode.setAttribute('style', 'stroke:' + _highlightColor + ';stroke-width:' + _highlightLineWidth + '');
+            _highlightVerticalLineNode.style.opacity = 0;
+        }
+    };
+
+    this.showTip = function () {
+
+        if (_tipNode) {
+            _tipNode.style.opacity = 1;
+        }
+
+        if (_circleNode) {
+            _circleNode.style.opacity = 1;
+        }
+
+        if (_highlightHorizLineNode) {
+            _highlightHorizLineNode.style.opacity = 1;
+        }
+
+        if (_highlightVerticalLineNode) {
+            _highlightVerticalLineNode.style.opacity = 1;
+        }
+    };
+
+    this.hideTip = function () {
+
+        if (_tipNode) {
+            _tipNode.style.opacity = 0;
+        }
+
+        if (_circleNode) {
+            _circleNode.style.opacity = 0;
+        }
+
+        if (_highlightHorizLineNode) {
+            _highlightHorizLineNode.style.opacity = 0;
+        }
+
+        if (_highlightVerticalLineNode) {
+            _highlightVerticalLineNode.style.opacity = 0;
+        }
+    };
+
+    this.setAxisGirdFromJsonString = function (jsonStr) {
+        var jsonObj = JSON.parse(jsonStr);
+        this.setDataFromJsonObject(jsonObj);
+    };
+
+    this.setAxisGirdFromJsonObject = function (jsonObj) {
+        var grids = jsonObj.Grids;
+        var levels = jsonObj.Levels;
+
+        this.clearAxisGird();
+        this.initAxisGird(grids);
+        this.initAxisGirdLevels(levels);
+
+        this.render();
+    };
+
+    this.clearAxisGird = function () {
+
+        if (_axisGridElements.length > 0) {
+            //_axisGridElements.splice(0,_axisGridElements.length);
+            _axisGridElements = [];
+        }
+
+        if (_axisGridIntersectionPoints.length > 0) {
+            _axisGridIntersectionPoints = [];
+        }
+
+        _axisGridBox.makeEmpty();
+        _isInitializedAxisGird = false;
+    };
+
+    this.initAxisGird = function (grids) {
+
+        _isInitializedAxisGird = false;
+
+        var len = grids.length;
+
+        if (len < 1) return;
+
+        var materialGrid = new THREE.LineBasicMaterial({
+            color: 0x303030,//0x2c2255
+            linewidth: 0.5
+        });
+
+        var i = 0, j = 0;
+
+        // 计算轴网包围盒
+        for (i = 0; i < len; i++) {
+
+            var start = new THREE.Vector2(grids[i].start.X, grids[i].start.Y);
+            var end = new THREE.Vector2(grids[i].end.X, grids[i].end.Y);
+
+            _axisGridBox.expandByPoint(start);
+            _axisGridBox.expandByPoint(end);
+        }
+
+        var horizLineElements = []; // 水平线集合
+        var verticalLineElements = []; // 垂直线集合
+
+        for (i = 0; i < len; i++) {
+
+            var name = grids[i].name;
+            var start = new THREE.Vector2(grids[i].start.X, grids[i].start.Y);
+            var end = new THREE.Vector2(grids[i].end.X, grids[i].end.Y);
+
+            worldToNormalizedPoint(start);
+            normalizedPointToScreen(start);
+
+            worldToNormalizedPoint(end);
+            normalizedPointToScreen(end);
+
+            var dir = end.clone().sub(start).normalize();
+
+            if (Math.abs(dir.x) >= Math.abs(dir.y)) {
+                // 水平方向线条
+                horizLineElements.push({name: name, v1: start, v2: end, material: materialGrid});
+            } else {
+                // 垂直方向线条
+                verticalLineElements.push({name: name, v1: start, v2: end, material: materialGrid});
+            }
+        }
+
+        _axisGridElements.push(horizLineElements);
+        _axisGridElements.push(verticalLineElements);
+
+        // 计算交点
+        var horizLineElementsLen = horizLineElements.length;
+        var verticalLineElementsLen = verticalLineElements.length;
+        var horizLine, verticalLine, numeralName, abcName;
+        var p1, p2, p3, p4;
+
+        for (i = 0; i < horizLineElementsLen; i++) {
+            horizLine = horizLineElements[i];
+            abcName = horizLine.name;
+            p1 = horizLine.v1.clone();
+            p2 = horizLine.v2.clone();
+
+            for (j = 0; j < verticalLineElementsLen; j++) {
+                verticalLine = verticalLineElements[j];
+                numeralName = verticalLine.name;
+                p3 = verticalLine.v1.clone();
+                p4 = verticalLine.v2.clone();
+
+                // 获得交点
+                var interPoint = getInterPoint(p1, p2, p3, p4);
+                _axisGridIntersectionPoints.push({
+                    intersectionPoint: interPoint,
+                    horizLine: [p1.clone(), p2.clone()],
+                    verticalLine: [p3.clone(), p4.clone()],
+                    abcName: abcName,
+                    numeralName: numeralName
+                });
+            }
+        }
+
+        // 设置了数据
+        _isExistData = true;
+        _isInitializedAxisGird = true;
+    };
+
+    this.initAxisGirdLevels = function (levels) {
+        //var len = levels.length;
+        //
+        //if (len < 1) {
+        //    return;
+        //}
+        //
+        //for (var i = 0; i < len; i++) {
+        //    _axisGridLevels.push(levels[i]);
+        //}
+    };
+
+    this.showAxisGird = function () {
+
+        if (_isInitializedAxisGird) {
+            _isShowAxisGrid = true;
+            //_svgGroupForAxisGrid.style.opacity = 1;
+            _svgGroupForAxisGrid.style.display = "";
+
+            if (_hasHighlightInterPoint) {
+                this.showTip();
+            }
+
+            this.render();
+        }
+    };
+
+    this.hideAxisGird = function () {
+
+        if (_isInitializedAxisGird) {
+            _isShowAxisGrid = false;
+            //_svgGroupForAxisGrid.style.opacity = 0;
+            _svgGroupForAxisGrid.style.display = "none";
+
+            this.hideTip();
+
+            this.render();
+        }
+    };
+
+    this.dealHighlightNode = function () {
+
+        _hasHighlightInterPoint = false;
+
+        var intersection = null;
+        var _circleRadiusToSquared = _circleNodeRadius * _circleNodeRadius;
+
+        for (var i = 0, len = _axisGridIntersectionPoints.length; i < len; i++) {
+            var interPoint = _axisGridIntersectionPoints[i].intersectionPoint;
+            var point = new THREE.Vector2(normalizedMouse.x, normalizedMouse.y);
+            normalizedPointToScreen(point);
+
+            var distanceSquared = interPoint.distanceToSquared(point);
+
+            if (distanceSquared < _circleRadiusToSquared) {
+                intersection = _axisGridIntersectionPoints[i];
+                break;
+            }
+        }
+
+        if (!intersection) return null;
+
+        // 高亮点的变换位置
+        _circleNode.setAttribute('transform', 'translate(' + intersection.intersectionPoint.x + ',' + intersection.intersectionPoint.y + ')');
+
+        // 提示文本
+        _tipNode.innerHTML = intersection.abcName + "-" + intersection.numeralName;
+
+        // 位置
+        var box = _tipNode.getBoundingClientRect();
+
+        _tipNode.style.left = (_svgHalfWidth + intersection.intersectionPoint.x - 0.5 * box.width) + "px";
+        _tipNode.style.top = ( _svgHalfHeight + intersection.intersectionPoint.y - box.height - 12) + "px"; // 12 = fontsize(10px) + 2 * linewidth(1px)
+
+        // 水平线条
+        _highlightHorizLineNode.setAttribute('x1', intersection.horizLine[0].x);
+        _highlightHorizLineNode.setAttribute('y1', intersection.horizLine[0].y);
+        _highlightHorizLineNode.setAttribute('x2', intersection.horizLine[1].x);
+        _highlightHorizLineNode.setAttribute('y2', intersection.horizLine[1].y);
+
+        // 垂直线条
+        _highlightVerticalLineNode.setAttribute('x1', intersection.verticalLine[0].x);
+        _highlightVerticalLineNode.setAttribute('y1', intersection.verticalLine[0].y);
+        _highlightVerticalLineNode.setAttribute('x2', intersection.verticalLine[1].x);
+        _highlightVerticalLineNode.setAttribute('y2', intersection.verticalLine[1].y);
+
+        _hasHighlightInterPoint = true;
+
+    };
+
+    this.setFloorPlanFromJsonString = function (jsonStr) {
+        var jsonObj = JSON.parse(jsonStr);
+        this.setFloorPlanFromJsonObject(jsonObj);
+    };
+
+    this.setFloorPlanFromJsonObject = function (jsonObj) {
+
+        var url = jsonObj["Path"];
+        var boundingBox = jsonObj["BoundingBox"];
+
+        _isExistData = false;
+
+        if (!url || !boundingBox) {
+            console.warn('floor-plan data is error!');
+            return;
+        }
+
+        // 设置了数据
+        _isExistData = true;
+
+        _floorPlaneBox = new THREE.Box3(new THREE.Vector3(boundingBox.Min.X, boundingBox.Min.Y, boundingBox.Min.Z), new THREE.Vector3(boundingBox.Max.X, boundingBox.Max.Y, boundingBox.Max.Z));
+
+        // 平面图不需要使用Z坐标
+        var bBox2D = new THREE.Box2(new THREE.Vector2(_floorPlaneBox.min.x, _floorPlaneBox.min.y), new THREE.Vector2(_floorPlaneBox.max.x, _floorPlaneBox.max.y));
+
+        if (!_isInitializedAxisGird) {
+            console.warn('axis-grid is not initialized!');
+
+            // 没有设置轴网，取自己的包围盒
+            _axisGridBox.copy(bBox2D);
+        }
+
+        this.initFloorPlane(url, bBox2D);
+
+        var elevation = 0.5 * (_floorPlaneBox.min.z + _floorPlaneBox.max.z);
+        this.setFloorPlaneElevation(elevation);
+
+        this.resetCameraNode();
+
+        this.render();
+    };
+
+    this.initFloorPlane = function (url, bBox) {
+
+        // 计算位置
+        var axisGridBoxSize = _axisGridBox.size();
+        var axisGridCenter = _axisGridBox.center();
+        var boxSize = bBox.size();
+        var boxCenter = bBox.center();
+        var scaleX = _svgWidth / axisGridBoxSize.x;
+        var scaleY = _svgHeight / axisGridBoxSize.y;
+        var width = boxSize.x * scaleX;
+        var height = boxSize.y * scaleY;
+        var offset = boxCenter.clone().sub(axisGridCenter);
+
+        offset.x *= scaleX;
+        offset.y *= -scaleY;
+
+        if (!_axisGridBox.containsBox(bBox)) {
+            console.warn('the bounding-box of floor-plane is not contains the bounding-box of axis-grid!');
+        }
+
+        _svgNode = getImageNode(0);
+        _svgNode.href.baseVal = url;
+        _svgNode.setAttribute("id", "Floor-" + _imageCount);
+        _svgNode.setAttribute("width", width + "");
+        _svgNode.setAttribute("height", height + "");
+        _svgNode.setAttribute("x", (-0.5 * width) + "");
+        _svgNode.setAttribute("y", (-0.5 * height) + "");
+        _svgNode.setAttribute("transform", 'translate(' + offset.x + ',' + offset.y + ')');
+    };
+
+    this.setFloorPlaneElevation = function (elevation) {
+        _floorPlaneElevation = elevation;
+    };
+
+    this.resetCameraNode = function () {
+
+        if (!_floorPlaneBox) return;
+
+        var camera = this.viewer.camera;
+        var cameraEditor = this.viewer.cameraEditor;
+
+        if (!camera || !cameraEditor) return;
+
+        var cameraPosition = camera.position;
+        var cameraTargetPosition = cameraEditor.target;
+        var sceneMatrix = this.getMainSceneMatrix();
+
+        //var box = bBox.clone();
+        //box.applyMatrix4(sceneMatrix);
+        //
+        //if (!box.containsPoint(camera.position)) {
+        //    return null;
+        //}
+
+        var inverseMatrix = new THREE.Matrix4();
+        inverseMatrix.getInverse(sceneMatrix);
+
+        var bBoxCenter = _floorPlaneBox.center();
+        var pointA = new THREE.Vector3(_floorPlaneBox.min.x, _floorPlaneBox.min.y, bBoxCenter.z).applyMatrix4(sceneMatrix);
+        var pointB = new THREE.Vector3(_floorPlaneBox.min.x, _floorPlaneBox.max.y, bBoxCenter.z).applyMatrix4(sceneMatrix);
+        var pointC = new THREE.Vector3(_floorPlaneBox.max.x, _floorPlaneBox.min.y, bBoxCenter.z).applyMatrix4(sceneMatrix);
+
+        var plane = new THREE.Plane();
+        plane.setFromCoplanarPoints(pointA, pointB, pointC);
+
+        // 计算相机投影
+        var projectedCameraPosition = plane.projectPoint(cameraPosition);
+        // 转回世界坐标
+        projectedCameraPosition.applyMatrix4(inverseMatrix);
+
+        // 计算相机LookAt投影
+        var projectedTargetPosition = plane.projectPoint(cameraTargetPosition);
+        // 转回世界坐标
+        projectedTargetPosition.applyMatrix4(inverseMatrix);
+
+        // 计算相机投影后的方向
+        var projectedEye = projectedTargetPosition.clone().sub(projectedCameraPosition);
+        projectedEye.z = 0;
+        projectedEye.normalize();
+
+        if (_floorPlaneBox.containsPoint(projectedCameraPosition)) {
+
+            // 计算相机位置
+            var cameraScreenPosition = projectedCameraPosition.clone();
+            worldToNormalizedPoint(cameraScreenPosition);
+            normalizedPointToScreen(cameraScreenPosition);
+
+            // 计算角度
+            var axisX = new THREE.Vector3(1, 0, 0);
+            var angle = THREE.Math.radToDeg(projectedEye.angleTo(axisX));
+            angle *= -1; // 逆时针为正
+
+            _cameraNode.setAttribute('opacity', '1.0');
+            _cameraNode.setAttribute("transform", "translate(" + cameraScreenPosition.x + "," + cameraScreenPosition.y + ") rotate(" + angle + ") scale(3, 3) ");
+
+            if (this.callbackFn && _isExistData) {
+
+                var cameraWorldPos = new THREE.Vector3(projectedCameraPosition.x, projectedCameraPosition.y, _floorPlaneElevation);
+                // 获得离相机最近的交点
+                var intersection = this.computeMinDistanceIntersection(cameraScreenPosition);
+
+                if (intersection) {
+                    // 计算轴信息
+                    var interPoint = new THREE.Vector2(intersection.intersectionPoint.x, intersection.intersectionPoint.y);
+                    screenToNormalizedPoint(interPoint);
+                    normalizedPointToWorld(interPoint);
+
+                    var offsetX = Math.round(projectedCameraPosition.x - interPoint.x);
+                    var offsetY = Math.round(projectedCameraPosition.y - interPoint.y);
+                    var axisInfoX = "X(" + intersection.abcName + "," + offsetX + ")";
+                    var axisInfoY = "Y(" + intersection.numeralName + "," + offsetY + ")";
+
+                    var jsonObj = {
+                        position: cameraWorldPos,
+                        axis: {
+                            abcName: intersection.abcName,
+                            numeralName: intersection.numeralName,
+                            offsetX: offsetX,
+                            offsetY: offsetY,
+                            infoX: axisInfoX,
+                            infoY: axisInfoY
+                        }
+                    };
+
+                    console.log(jsonObj.axis.infoX + "" + jsonObj.axis.infoY);
+
+                    this.callbackFn(jsonObj);
+                }
+            }
+        } else {
+            _cameraNode.setAttribute('opacity', '0.0');
+        }
+    };
+
+    this.computeMinDistanceIntersection = function (screenPosition) {
+
+        if (_axisGridIntersectionPoints.length < 1) return null;
+
+        var minDistanceSquared = 0;
+        var idx = 0;
+
+        for (var i = 0, len = _axisGridIntersectionPoints.length; i < len; i++) {
+            var interObj = _axisGridIntersectionPoints[i];
+            var interPoint = new THREE.Vector2(interObj.intersectionPoint.x, interObj.intersectionPoint.y);
+            var distanceSquared = interPoint.distanceToSquared(screenPosition);
+
+            if (i == 0) {
+                minDistanceSquared = distanceSquared;
+            } else {
+                if (minDistanceSquared > distanceSquared) {
+                    minDistanceSquared = distanceSquared;
+                    idx = i;
+                }
+            }
+        }
+
+        return _axisGridIntersectionPoints[idx];
+    };
+};
+
 var CloudTouch	= CloudTouch || {};
 
 (function() {
@@ -6232,14 +7282,19 @@ CLOUD.MaterialUtil = {
 
     createHilightMaterial: function () {
 
-        var material = new THREE.MeshBasicMaterial({ color: 0x0000ff });
+        var material = new THREE.MeshPhongMaterial({ color: 0x0000ff, opacity: 0.8, transparent: true });
+        material.type = 'phong_cust_clip';
+        material.uniforms = CloudShaderLib.phong_cust_clip.uniforms;
+        material.vertexShader = CloudShaderLib.phong_cust_clip.vertexShader;
+        material.fragmentShader = CloudShaderLib.phong_cust_clip.fragmentShader;
+
         //var material = new THREE.MeshBasicMaterial({ color: 0x00ff00, opacity: 0.5, transparent: true, side: THREE.DoubleSide, polygonOffset: true, depthTest: true, polygonOffsetFactor: -2, polygonOffsetUnits: -1 });
-        if (CloudShaderLib !== undefined) {
-            material.type = 'base_cust_clip';
-            material.uniforms = CloudShaderLib.base_cust_clip.uniforms;
-            material.vertexShader = CloudShaderLib.base_cust_clip.vertexShader;
-            material.fragmentShader = CloudShaderLib.base_cust_clip.fragmentShader;
-        }
+        //if (CloudShaderLib !== undefined) {
+        //    material.type = 'base_cust_clip';
+        //    material.uniforms = CloudShaderLib.base_cust_clip.uniforms;
+        //    material.vertexShader = CloudShaderLib.base_cust_clip.vertexShader;
+        //    material.fragmentShader = CloudShaderLib.base_cust_clip.fragmentShader;
+        //}
 
         return material;
     }
@@ -9789,6 +10844,9 @@ CLOUD.Scene = function () {
     this.isEnableMultiSelect = false;
 
     this.autoUpdate = false;
+
+    var len = CLOUD.GlobalData.SceneSize * 0.5;
+    this.innerBoundingBox = new THREE.Box3();
 };
 
 CLOUD.Scene.prototype = Object.create(THREE.Scene.prototype);
@@ -9806,27 +10864,6 @@ CLOUD.Scene.prototype.clone = function (object) {
 CLOUD.Scene.prototype.clearAll = function () {
     this.rootNode.children = [];
     this.rootNode.boundingBox = null;
-};
-
-CLOUD.Scene.prototype.selectionBox = function () {
-
-    //if (!this.filter.isSelectionSetEmpty()) {
-    //    var box = new THREE.Box3();
-    //    box.copy(this.filter.getSelectionBox());
-    //    box.applyMatrix4(this.rootNode.matrix);
-    //    return box;
-    //}
-
-    return this.worldBoundingBox();
-};
-
-CLOUD.Scene.prototype.updateSelection = function (trf) {
-    //if (trf !== undefined) {
-    //    this.selectedNode.matrix = trf;
-    //    this.selectedNode.updateMatrixWorld(true);
-    //}
-    //
-    //this.rootNode.add(this.selectedNode);
 };
 
 CLOUD.Scene.prototype.worldBoundingBox = function () {
@@ -9964,7 +11001,7 @@ CLOUD.Scene.prototype.traverseIf = function (callback) {
         var children = node.children;
         for (var i = 0, l = children.length; i < l; i++) {
             var child = children[i];
-            if (!callback(child)) {
+            if (!callback(child, node)) {
                 break;
             }
 
@@ -10002,6 +11039,44 @@ CLOUD.Scene.prototype.showSceneNodes = function (bVisible) {
     }
 }
 
+CLOUD.Scene.prototype.containsBoxInFrustum = function (frustum, box) {
+    var p1 = new THREE.Vector3(),
+    p2 = new THREE.Vector3();
+
+    return function (frustum, box) {
+
+        var planes = frustum.planes;
+
+        for (var i = 0; i < 6 ; i++) {
+
+            var plane = planes[i];
+
+            p1.x = plane.normal.x > 0 ? box.min.x : box.max.x;
+            p2.x = plane.normal.x > 0 ? box.max.x : box.min.x;
+            p1.y = plane.normal.y > 0 ? box.min.y : box.max.y;
+            p2.y = plane.normal.y > 0 ? box.max.y : box.min.y;
+            p1.z = plane.normal.z > 0 ? box.min.z : box.max.z;
+            p2.z = plane.normal.z > 0 ? box.max.z : box.min.z;
+
+            var d1 = plane.distanceToPoint(p1);
+            var d2 = plane.distanceToPoint(p2);
+
+            // if one outside plane, is not contained.
+
+            if (d1 < 0 || d2 < 0) {
+
+                return false;
+
+            }
+
+        }
+
+        return true;
+
+    };
+
+}();
+
 CLOUD.Scene.prototype.prepareScene = function () {
 
     var _frustum = new THREE.Frustum();
@@ -10018,18 +11093,34 @@ CLOUD.Scene.prototype.prepareScene = function () {
 
         _frustum.setFromMatrix(_projScreenMatrix);
 
+        camera.inside = this.innerBoundingBox.containsPoint(camera.position);
+
+        var scope = this;
+
+
         // Cell Cull and LoD
-        this.traverseIf(function (object) {
+        this.traverseIf(function (object, parent) {
 
             if (object instanceof CLOUD.Cell) {
 
                 var bVisible = object.visible;
-                if (_frustum.intersectsBox(object.worldBoundingBox)) {
+                if (parent.inFrustum) {
+                    object.update(camera);
+                }
+                else if (_frustum.intersectsBox(object.worldBoundingBox)) {
 
-                        object.update(camera);
+                    if (scope.containsBoxInFrustum(_frustum, object.worldBoundingBox)) {
+                        object.inFrustum = true;
+                    }
+                    else {
+                        if (object.inFrustum)
+                            delete object.inFrustum;
+                    }
+
+                    object.update(camera);
                 }
                 else {
-                        object.visible = false;
+                    object.visible = false;
                 }
 
 
@@ -10598,7 +11689,7 @@ CLOUD.Cell.prototype.update = function () {
                 var distance = camera.positionPlane.distanceToPoint(v2);
                 distance = distance * distance;
 
-                if (scope.out) {
+                if (scope.out && !camera.inside) {
                     distance = distance * 0.1;
                 }
 
@@ -10695,7 +11786,7 @@ CLOUD.SubScene.prototype.update = function () {
             level = level * 0.5;
         }
         else {
-            if (scope.out) {
+            if (scope.out && !camera.inside ) {
                 level = level * 5;
             }
         }
@@ -10915,6 +12006,11 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
 
     var lastCanvasX = -1;
     var lastCanvasY = -1;
+    var lastDollyBasePoint;
+    //var lastCameraView = {
+    //    dir: new THREE.Vector3(),
+    //    up: new THREE.Vector3()
+    //};
 
     this.IsIdle = function () {
         return state === STATE.NONE;
@@ -11044,60 +12140,45 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
             return;
         }
 
-        var canvasContainer = this.getContainerDimensions();
-
-        // 规范化开始点
-        var canvasX = cx - canvasContainer.left;
-        var canvasY = cy - canvasContainer.top;
-
-        if (lastCanvasX !== canvasX || lastCanvasY !== canvasY) {
-
-            // 规范化到[-1, 1]
-            var normalizedX = (canvasX / canvasContainer.width) * 2.0 - 1.0;
-            var normalizedY = ((canvasContainer.height - canvasY) / canvasContainer.height) * 2.0 - 1.0;
-
-            var hitPoint = this.getHitPoint(normalizedX, normalizedY);
-
-            if (hitPoint) {
-                //console.log("hitPoint");
-                this.dollyBasePoint = hitPoint;
-            } else {
-                //console.log("pointToWorld");
-                this.dollyBasePoint = this.pointToWorld(normalizedX, normalizedY);
-            }
-
-            lastCanvasX = canvasX;
-            lastCanvasY = canvasY;
-        }
-
-        var eye = this.getWorldEye();
-        var currCameraPos = new THREE.Vector3();
-        var dollyPoint = this.dollyBasePoint;
-        var position = this.object.position;
-        var dir = dollyPoint.clone().sub(position);
-        var distance = dir.length();
         var minDistance = this.minDistance;
         var factor = 2 - scale; // 1 - (scale - 1)
+
+        var eye = this.getWorldEye();
+        var dollyPoint = this.getDollyBasePoint(cx, cy);
+        var cameraPos = this.object.position;
+
+        var dir = new THREE.Vector3();
+        dir.subVectors(dollyPoint , cameraPos);
+
+        var distance = dir.length();
+        var newCameraPos = new THREE.Vector3();
 
         if (this.enablePassThrough && scale > 1.0 && distance < minDistance) {
             // 以minDistance为步进穿透物体
             var offsetVec = dir.clone();
-            offsetVec.normalize().multiplyScalar(minDistance);
-            currCameraPos = offsetVec.add(dollyPoint);
 
-            this.object.position.copy(currCameraPos);
-            this.target.copy(eye.add(currCameraPos));
+            offsetVec.normalize().multiplyScalar(minDistance);
+            newCameraPos.addVectors(offsetVec, cameraPos);
+
+            this.object.position.copy(newCameraPos);
+            this.target.copy(eye.add(newCameraPos));
 
             lastCanvasX = -1;
             lastCanvasY = -1;
+            // 更新缩放基准点
+            lastDollyBasePoint = dollyPoint.clone();
+            lastDollyBasePoint.add(offsetVec);
+
+            //lastCameraView.dir.set(0, 0, 0);
+            //lastCameraView.up.set(0, 0, 0);
 
         } else {
 
             dir.multiplyScalar(-factor);
-            currCameraPos.addVectors(dir, dollyPoint);
+            newCameraPos.addVectors(dir, dollyPoint);
 
-            this.object.position.copy(currCameraPos);
-            this.target.copy(eye.add(currCameraPos));
+            this.object.position.copy(newCameraPos);
+            this.target.copy(eye.add(newCameraPos));
         }
     };
 
@@ -11111,10 +12192,10 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
         var lastLength = eye.length();
         var currLength = lastLength * scale;
         var deltaStep = currLength - lastLength;
-        var dollyVec = eye.clone().normalize();
+        var dir = eye.clone().normalize();
 
-        dollyVec.multiplyScalar(deltaStep);
-        this.object.position.add(dollyVec);
+        dir.multiplyScalar(deltaStep);
+        this.object.position.add(dir);
         this.target.addVectors(this.object.position, eye);
     };
 
@@ -11631,6 +12712,7 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
 
     this.pointToWorld = function (normalizedX, normalizedY) {
 
+        var camera = this.object;
         var worldPoint = new THREE.Vector3(normalizedX, normalizedY, 1.0);
         worldPoint = worldPoint.unproject(camera);
 
@@ -11643,6 +12725,125 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
         worldPoint.multiplyScalar(projectedLength).add(position);
 
         return worldPoint;
+    };
+
+    this.getDollyBasePoint = function (cx, cy) {
+
+        //var isChangeView = function() {
+        //
+        //    var eye = scope.getWorldEye();
+        //    var up = scope.object.up.clone();
+        //
+        //    var deltaDir = lastCameraView.dir.clone().sub(eye);
+        //    var deltaUp = lastCameraView.up.clone().sub(up);
+        //
+        //    if (Math.abs(deltaDir.x) < EPS && Math.abs(deltaDir.y) < EPS && Math.abs(deltaDir.z) < EPS &&
+        //        Math.abs(deltaUp.x) < EPS && Math.abs(deltaUp.y) < EPS && Math.abs(deltaUp.z) < EPS) {
+        //
+        //        console.log("not change");
+        //
+        //        return false;
+        //    }
+        //
+        //    console.log("change");
+        //
+        //    return true;
+        //};
+
+        var dollyBasePoint;
+        var canvasContainer = this.getContainerDimensions();
+
+        // 规范化开始点
+        var canvasX = cx - canvasContainer.left;
+        var canvasY = cy - canvasContainer.top;
+
+        if (lastCanvasX !== canvasX || lastCanvasY !== canvasY) {
+
+            // 规范化到[-1, 1]
+            var normalizedX = (canvasX / canvasContainer.width) * 2.0 - 1.0;
+            var normalizedY = ((canvasContainer.height - canvasY) / canvasContainer.height) * 2.0 - 1.0;
+            var hitPoint = this.getHitPoint(normalizedX, normalizedY);
+
+            var eye = this.getWorldEye();
+
+            if (hitPoint) {
+                //console.log("hitPoint");
+                dollyBasePoint = hitPoint;
+
+            } else {
+                //console.log("pointToWorld");
+
+                if (!lastDollyBasePoint) {
+                    // 第一次进入即hit不到点
+                    dollyBasePoint = this.pointToWorld(normalizedX, normalizedY);
+                } else {
+                    // 保证前一次hit到图元，后一次hit不到图元，也能平滑缩放。
+                    // 上一次的基点和本次基点在同一平面内
+                    //var eye = this.getWorldEye();
+                    var cameraPos = this.object.position;
+                    var worldPoint = this.pointToWorld(normalizedX, normalizedY);
+
+                    var ray = new THREE.Ray();
+                    ray.origin.copy(cameraPos);
+                    ray.direction.copy(worldPoint.clone().sub(cameraPos).normalize());
+
+                    var plane = new THREE.Plane();
+                    plane.setFromNormalAndCoplanarPoint(eye, lastDollyBasePoint);
+
+                    dollyBasePoint = ray.intersectPlane(plane) || worldPoint;
+                }
+            }
+
+            //lastCameraView.dir.copy(eye);
+            //lastCameraView.up.copy(this.object.up);
+
+            lastCanvasX = canvasX;
+            lastCanvasY = canvasY;
+            lastDollyBasePoint = dollyBasePoint.clone();
+        } else {
+            dollyBasePoint = lastDollyBasePoint.clone();
+        }
+
+        return dollyBasePoint;
+    };
+
+    this.flyToPoint = function(point) {
+
+        // 将相机移动到指定的点
+        var eye = this.getWorldEye();
+        var distance = eye.length();
+
+        // 保持视角方向
+        //var dir = new THREE.Vector3(0, 0, -1);
+        var dir = eye.clone();
+        dir.y = 0;
+        dir.normalize();
+        dir.setLength(distance);
+
+        var up = new THREE.Vector3(0, 1, 0);
+
+        this.object.up = up;
+        this.object.realUp = up.clone();
+
+        this.object.position.copy(point);
+        this.target.addVectors(this.object.position, dir);
+
+        this.update(true);
+    };
+
+    this.flyToPoint2 = function(point) {
+
+        var position = this.object.position;
+        var eye = this.getWorldEye();
+        var normalizedEye = eye.clone().normalize();
+        var hitToEye = point.clone().sub(position);
+        var distance = Math.abs(normalizedEye.dot(hitToEye));
+        var flyOffset = normalizedEye.clone().multiplyScalar(distance);
+
+        this.object.position.subVectors(point, flyOffset);
+        this.target.addVectors(this.object.position, eye);
+
+        this.update(true);
     };
 };
 CLOUD.OrbitEditor = function (cameraEditor, scene, domElement) {
@@ -11964,8 +13165,8 @@ CLOUD.FlyEditorUI.prototype = {
             var boxHeight = this.crossBoxHeight;
 
             var dim = CLOUD.DomUtil.getContainerOffsetToClient(container);
-            var left = dim.size[0] / 2 - boxWidth / 2;
-            var top = dim.size[1] / 2 - boxHeight / 2;
+            var left = dim.width / 2 - boxWidth / 2;
+            var top = dim.height / 2 - boxHeight / 2;
 
             var svgElem = document.createElementNS(xmlns, "svg");
             svgElem.setAttributeNS(null, "viewBox", "0 0 " + boxWidth + " " + boxHeight);
@@ -12015,8 +13216,8 @@ CLOUD.FlyEditorUI.prototype = {
         var svgContainer = this.crossContainer;
 
         var dim = CLOUD.DomUtil.getContainerOffsetToClient(container);
-        var left = dim.size[0] / 2 - boxWidth / 2;
-        var top = dim.size[1] / 2 - boxHeight / 2;
+        var left = dim.width / 2 - boxWidth / 2;
+        var top = dim.height / 2 - boxHeight / 2;
 
         svgContainer.style.left = left + "px";
         svgContainer.style.top = top + "px";
@@ -12995,9 +14196,11 @@ CLOUD.Filter = function () {
     };
 
     this.setOverriderByUserIds = function (name, ids, materialName) {
-        if (name === undefined)
+        if (name === undefined) {
             materialOverriderByUserId = {};
-
+            return;
+        }
+           
         if (ids === undefined) {
 
             if (materialOverriderByUserId[name]) {
@@ -13131,6 +14334,16 @@ CLOUD.Filter = function () {
     };
 
 
+    function hasSelection() {
+        if (selectionSet.ids === undefined)
+            return false;
+
+        for (var ii in selectionSet.ids) {
+            return true;
+        }
+
+        return false;
+    };
 
     // 判断是否选中
     function isSelected (id) {
@@ -13143,21 +14356,41 @@ CLOUD.Filter = function () {
     };
 
     // 计算选中对象的包围盒
-    this.computeSelectionBox = function (object) {
-        var box = object.boundingBox || (object.geometry && object.geometry.boundingBox);
+    this.computeSelectionBox = function (renderList) {
+        
+        if (!hasSelection())
+            return false;
 
-        // 计算boundingBox
-        if (box) {
-            var box2 = box.clone();
+        for(var ii=0; ii<renderList.length; ++ii){
 
-            // 包围盒变换
-            if (object.matrix) {
-                box2.applyMatrix4(object.matrix);
+            var object = renderList[ii].object;
+
+            if(isSelected(object.name)){
+
+                if (!object.geometry) {
+                    console.log("empty geometry!");
+                    continue;
+                }
+
+                if (object.geometry.boundingBox == null) {
+                    object.geometry.computeBoundingBox();
+                }
+                var box =  object.geometry.boundingBox;
+                
+                if (box) {
+                    var box2 = box.clone();
+                    if (object.matrixWorld) {
+                        box2.applyMatrix4(object.matrixWorld);
+                    }
+
+                    selectionSet.boundingBox.expandByPoint(box2.min);
+                    selectionSet.boundingBox.expandByPoint(box2.max);
+                }
             }
 
-            selectionSet.boundingBox.expandByPoint(box2.min);
-            selectionSet.boundingBox.expandByPoint(box2.max);
         }
+
+        return true;
     };
 
     // 切换材质
@@ -13199,7 +14432,7 @@ CLOUD.Filter = function () {
     };
 
     this.isSelectionSetEmpty = function() {
-        return  !selectionSet.ids
+        return !hasSelection();
     }
 };
 /*global ArrayBuffer, Uint32Array, Int32Array, Float32Array, Int8Array, Uint8Array, window, performance, Console*/
@@ -17643,10 +18876,16 @@ CLOUD.MpkLoader.prototype.createModel = function (indices, vertices, meshId, cal
     geometry.refCount = 0;
     geometry.name = meshId;
 
-    geometry.setIndex(new THREE.BufferAttribute(indices, 1));
+    var ib = new THREE.BufferAttribute(indices, 1);
+    ib.setDynamic(true);
+    geometry.setIndex(ib);
     geometry.addAttribute('position', new THREE.BufferAttribute(vertices, 3));
 
     geometry.computeVertexNormals();
+
+    for (var name in geometry.attributes) {
+        geometry.attributes[name].setDynamic(true);
+    }
 
     callback(geometry);
 };
@@ -18022,18 +19261,26 @@ CLOUD.SceneLoader.prototype = {
                         object.out = 1;
                     }
 
+                    if (objJSON.deep === undefined &&  object.out ) {
+                        group.innerBoundingBox.expandByPoint(object.worldBoundingBox.min);
+                        group.innerBoundingBox.expandByPoint(object.worldBoundingBox.max);
+                    }
+
                     if (CLOUD.GlobalData.ShowCellBox) {
                         var clr = 0xff;
                         clr = clr << (level * 5);
 
                         var boxNode = new CLOUD.BBoxNode(object.boundingBox, clr);
                         CLOUD.Utils.parseTransform(boxNode, objJSON);
-                        parent.add(boxNode);
+                        object.add(boxNode);
                         
                     }
-                                      
-                    handle_children(object, objJSON.children, level + 1);
-                    parent.add(object);
+                            
+                    //if (object.out)
+                    {
+                        handle_children(object, objJSON.children, level + 1);
+                        parent.add(object);
+                    }
 
                 }
                 else if (objJSON.nodeType == "SceneNode") {
@@ -18921,7 +20168,8 @@ CLOUD.ModelManager.prototype.prepareResource = function () {
 }
 
 THREE.EventDispatcher.prototype.apply(CLOUD.ModelManager.prototype);
-CLOUD.EditorManager = function (handleViewHouseEvent) {
+// handleViewHouseEvent
+CLOUD.EditorManager = function (handleEvents) {
 
     var scope = this;
     this.editor = null;
@@ -18930,6 +20178,9 @@ CLOUD.EditorManager = function (handleViewHouseEvent) {
     this.enableAnimation = true; // 是否允许动画
     this.canMouseMoveOperation = false; // 是否可以进行mouseMove相关操作
     this.isUpdateRenderList = true; // 是否更新渲染列表
+
+    var handleViewHouseEvent = handleEvents.viewHouse;
+    var handleMiniMapEvent = handleEvents.miniMap;
 
     function touchmove( event ) {
         scope.editor.touchmove(event);
@@ -18954,46 +20205,46 @@ CLOUD.EditorManager = function (handleViewHouseEvent) {
 
         var isAnimating = scope.isAnimating();
 
-        // 判断是否在动画中，如果在动画中，不响应
-        if (!isAnimating) {
+        // 判断是否在动画中, 若是动画中，不响应事件
+        if (isAnimating)
+            return;
+
+        // 其它交互
+        if (scope.canMouseMoveOperation) {
+            // 不更新渲染列表
+            scope.isUpdateRenderList = false;
+            scope.editor.onMouseMove(event);
+        } else {
             // viewHouse 交互
             handleViewHouseEvent("move", event);
-
-            // 其它交互
-            if (scope.canMouseMoveOperation) {
-
-                // 不更新渲染列表
-                scope.isUpdateRenderList = false;
-
-                scope.editor.onMouseMove(event);
-            }
+            // 子地图交互
+            handleMiniMapEvent("move", event);
         }
     }
 
     function onMouseUp(event) {
 
         var isAnimating = scope.isAnimating();
-
-        scope.isUpdateRenderList = true;
-
-        // 判断是否在动画中，如果在动画中，不响应
-        if (!isAnimating) {
-            // viewHouse 交互
-            var isInHouse = handleViewHouseEvent("up", event);
-
-            // 鼠标点不在viewHouse区域，则允许主视图操作
-            if (!isInHouse) {
-
-                if (scope.canMouseMoveOperation) {
-                    //scope.canMouseMoveOperation = false;
-                    // 其它交互
-                    scope.editor.onMouseUp(event);
-                }
-            }
-        }
+        var isCanMouseMove = scope.canMouseMoveOperation;
 
         // 只要存在up事件，就将其置为false
         scope.canMouseMoveOperation = false;
+        // 只要存在up事件，允许更新渲染列表
+        scope.isUpdateRenderList = true;
+
+        // 判断是否在动画中, 若是动画中，不响应事件
+        if (isAnimating)
+            return;
+
+        if (isCanMouseMove) {
+            // 其它交互
+            scope.editor.onMouseUp(event);
+        } else {
+            // viewHouse 交互
+            handleViewHouseEvent("up", event);
+            // 子地图交互
+            handleMiniMapEvent("up", event);
+        }
     }
 
     function onMouseDown( event ) {
@@ -19003,21 +20254,22 @@ CLOUD.EditorManager = function (handleViewHouseEvent) {
 
         var isAnimating = scope.isAnimating();
 
-        // 判断是否在动画中，如果在动画中，不响应
-        if (!isAnimating) {
-            // viewHouse 交互
-            var isInHouse = handleViewHouseEvent("down", event);
+        // 判断是否在动画中, 若是动画中，不响应事件
+        if (isAnimating)
+            return;
 
-            // 鼠标点不在viewHouse区域，则允许主视图操作
-            if (!isInHouse) {
-                scope.canMouseMoveOperation = true;
+        // viewHouse 交互
+        var isInHouse = handleViewHouseEvent("down", event);
+        // 子地图 交互
+        var isOverMiniMap = handleMiniMapEvent("down", event);
 
-                // 其它交互
-                scope.editor.onMouseDown(event);
-            }
+        // 鼠标点不在viewHouse区域和子地图区域
+        if (!isInHouse && !isOverMiniMap) {
+            scope.canMouseMoveOperation = true;
+            // 其它交互
+            scope.editor.onMouseDown(event);
         }
     }
-
 
     this.registerDomEventListeners = function (domElement) {
 
@@ -19196,13 +20448,6 @@ CLOUD.EditorManager.prototype = {
         viewer.render();
     },
 
-    zoomToSelection: function (viewer) {
-        var box = viewer.getScene().selectionBox();
-        var target = viewer.camera.zoomToBBox(box);
-        viewer.cameraEditor.updateCamera(target);
-        viewer.render();
-    },
-
     isAnimating: function () {
         return (this.enableAnimation && this.animator && this.animator.isPlaying());
     },
@@ -19254,7 +20499,9 @@ CloudViewer = function () {
     this.viewHouse = new CLOUD.ViewHouse(this);
     this.viewHouse.visible = false;
 
-    this.axisGrid = new CLOUD.AxisGrid(this);
+    this.miniMap = null;
+    //this.axisGrid = new CLOUD.AxisGrid(this);
+    //this.miniMap.setAxisGrid(this.axisGrid);
 
     var scope = this;
 
@@ -19307,7 +20554,46 @@ CloudViewer = function () {
         return isInHouse;
     }
 
-    this.editorManager = new CLOUD.EditorManager(handleViewHouseEvent);
+    function handleMiniMapEvent(type, event) {
+
+        var isOverCanvas = false;
+
+        if (scope.miniMap) {
+            switch (type) {
+                case "down":
+                    isOverCanvas = scope.miniMap.mouseDown(event, function () {
+                        //
+                    });
+                    break;
+                case "move":
+                    isOverCanvas = scope.miniMap.mouseMove(event, function () {
+                        scope.miniMap.render();
+                    });
+                    break;
+                case "up":
+                    isOverCanvas = scope.miniMap.mouseUp(event, function (point) {
+                        // 飞到指定点
+                        //console.log("clickPoint", point);
+
+                        scope.cameraEditor.flyToPoint(point);
+                        //scope.cameraEditor.updateView();
+                    });
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        return isOverCanvas;
+    }
+
+    //this.editorManager = new CLOUD.EditorManager(handleViewHouseEvent);
+    var handleEvents = {
+        viewHouse: handleViewHouseEvent,
+        miniMap: handleMiniMapEvent
+    };
+
+    this.editorManager = new CLOUD.EditorManager(handleEvents);
 
     this.isMobile = 0;
     var u = navigator.userAgent;
@@ -19416,6 +20702,10 @@ CloudViewer.prototype = {
         }
 
         scope.viewHouse.render();
+
+        if(this.miniMap) {
+            this.miniMap.render();
+        }
     },
 
     setEditorDefault: function () {
@@ -19632,7 +20922,28 @@ CloudViewer.prototype = {
     },
 
     zoomToSelection: function () {
-        this.editorManager.zoomToSelection(this);
+
+        var box = this.renderer.computeSelectionBBox();
+        if (box == null) {
+            box = this.getScene().worldBoundingBox();
+        }
+
+        var target = this.camera.zoomToBBox(box);
+        this.cameraEditor.updateCamera(target);
+        this.render();
+    },
+
+    zoomToBBox: function (box) {
+        if (!box) {
+            box = this.getScene().worldBoundingBox();
+        }
+        else {
+            box.applyMatrix4(this.getScene().rootNode.matrix);
+        }
+       
+        var target = this.camera.zoomToBBox(box);
+        this.cameraEditor.updateCamera(target);
+        this.render();
     },
 
     setStandardView: function (stdView) {
@@ -19680,12 +20991,48 @@ CloudViewer.prototype = {
         return  this.getScene().filter;
     },
 
-    setAxisGridData:function(jsonObj, level) {
-        this.axisGrid.setDataFromJsonObject(jsonObj, level);
-        this.axisGrid.refresh();
+    // ------------------ 小地图API -- S ------------------ //
+    // 初始化小地图
+    initMiniMap: function(domElement, width, height, styleOptions, callback) {
+
+        if (!this.miniMap) {
+            this.miniMap = new CLOUD.MiniMap(this, callback);
+        }
+
+        domElement = domElement || this.domElement;
+
+        if (domElement) {
+            this.miniMap.init(domElement, width, height, styleOptions);
+        }
     },
 
+    // 设置平面图
+    setFloorPlanData: function(jsonObj) {
+
+        if (this.miniMap) {
+            this.miniMap.setFloorPlanFromJsonObject(jsonObj);
+        }
+    },
+
+    // 设置轴网数据
+    setAxisGridData:function(jsonObj, level) {
+
+        if (this.miniMap) {
+            this.miniMap.setAxisGirdFromJsonObject(jsonObj);
+        }
+    },
+
+    // 是否显示隐藏轴网
     showAxisGrid:function(show) {
-        this.axisGrid.setVisibility(show);
+
+        if (this.miniMap) {
+            if (show) {
+                this.miniMap.showAxisGird();
+            } else {
+                this.miniMap.hideAxisGird();
+            }
+        }
     }
+
+    // ------------------ 小地图API -- E ------------------ //
 };

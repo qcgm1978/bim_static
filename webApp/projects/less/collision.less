@@ -59,7 +59,7 @@
       }
     }
   }
-  .collBox { overflow: auto;
+  .collBox {height:100%;position:relative;padding-bottom:40px; overflow: auto;
     .collTips{text-align:center; padding-top:50px; font-size:14px;
       .nothingIcon{width:80px;height:80px;display:inline-block;background:url(../images/collision.png) no-repeat;background-position:0 0;}
       .runningIcon{width:80px;height:80px;display:inline-block;background:url(../images/collision.png) no-repeat;background-position:0 -80px;}
@@ -67,7 +67,7 @@
       p{margin:1em 0;color:#ccc;}
       a{color:#006ecf;}
     }
-    .ckTable { width: 100%; min-width: 390px;
+    .ckTable { width: 100%; min-width: 390px;margin-top:-1px;
       th { height: 24px; line-height: 24px; text-align: center; }
       td, th { border: 1px #ccc solid; }
       .collList { width: 85%; }
@@ -92,7 +92,7 @@
       }
     }
   }
-  .detailList{height:100%;overflow-x:hidden;overflow-y:auto;padding:46px 0 40px;}
+  .detailList{height:100%;overflow:hidden;padding:46px 0 0;}
   .collHead{position:absolute;border-bottom:1px solid #ccc;left:0;top:0;width:100%;background:#fff;z-index:2;
     &:after{content:''; display:table; clear:both; }
     .filterBox{width:85%; float:left; padding:10px 80px 10px 10px; border-left:1px solid #ccc; border-right:1px solid #ccc; position:relative;
@@ -133,7 +133,7 @@
     }
     .level{width:15%; padding:10px; line-height:25px; text-align:center; float:left; }
   }
-  .collFooter{position:absolute;height:40px;padding-top:5px; left:0; bottom:0px;background:#fff;z-index:2;width:100%;
+  .collFooter{position:absolute;height:40px;padding-top:5px; left:0; bottom:-40px;background:#fff;z-index:2;width:100%;
     .viewSetting,.export{height:30px;margin-left:10px;display:inline-block;padding:5px 10px;border:1px solid #ccc;line-height:18px;}
     .settingIcon,.exportIcon{display:inline-block;background:url(/comm/images/commIcon.png) no-repeat;vertical-align:text-bottom;}
     .settingIcon{width:12px;height:12px;background-position:0 -440px;}

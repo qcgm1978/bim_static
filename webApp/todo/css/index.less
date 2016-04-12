@@ -14,16 +14,12 @@
 	#todoContent { height: 100%; padding-bottom: 40px;
 		.alreadyBox { display: none; }
 	}
-	.todoDetailView { height: 48px; border: 1px #ccc solid; margin: 10px 25px 0px 12px;position: relative;
-		.title { line-height: 48px; padding-left: 15px;    padding-right: 240px; }
-		.todoInformatin { float: right; margin-right: 38px; margin-top: 8px;
-			div{line-height: 1.1;}
-			.text { width: 85px; text-align: right; display: inline-block;
-				&.receiveTime { margin-top: 5px; }
-			}
-		}
-		.newMsg{position: absolute;right: 0px; top: 0px; bottom: 0px;  width: 30px;background:url(/todo/images/new.png) no-repeat; }
+	.todoDetailView { height: 48px; line-height: 48px; border: 1px #ccc solid; margin: 10px 25px 0px 12px; position: relative;
+		.title { padding-left: 15px; width: 59%; float: left; }
+		.operator { float: left; width: 22%; }
+		.date { float: left; width: 18%; text-align: right; padding-right: 30px; }
+		.newMsg { position: absolute; right: 0px; top: 0px; bottom: 0px; width: 30px; background: url(/todo/images/new.png) no-repeat; }
 	}
-	.pagination{float: right;margin-right: 21px;}
-	.sumDesc{float: left; margin-top: 20px;margin-left: 13px;}
+	.pagination { float: right; margin-right: 21px; }
+	.sumDesc { float: left; margin-top: 20px; margin-left: 13px; }
 }

@@ -76,12 +76,19 @@
 				.vDate { width: 76px; margin-left: 3px; }
 			}
 		}
+		.fileModelList { display: none; left: 12px; position: absolute; background-color: #fff; top: 32px; width: 126px; border: 1px #ccc solid;
+			.fileNavUl { padding: 6px 0px;
+				li { padding-left: 12px; cursor: pointer; color: #666; height: 26px; line-height: 26px; font-size: 12px;
+					&:hover { background-color: #A8DBFD; }
+				}
+			}
+		}
 	}
 	.allProject { cursor: pointer }
 }
 
 /*  left nav */
-.projectNav {    min-width: 396px;    width: 100%; padding-left: 10px; background-color: #ddd; height: 40px; border-bottom: 1px #ccc solid; font-size: 12px; color: #666;
+.projectNav { min-width: 396px; width: 100%; padding-left: 10px; background-color: #ddd; height: 40px; border-bottom: 1px #ccc solid; font-size: 12px; color: #666;
 	.item { float: left; line-height: 30px; height: 30px; margin-right: 10px; width: 80px; border: 1px #ddd solid; text-align: center; margin-top: 10px; cursor: pointer;
 		&:hover { border-color: #ccc; color: #333; }
 		&.selected { color: #333; border: 1px #ccc solid; border-top-width: 2px; border-top-color: #3e78e6; border-bottom-color: #fff; background-color: #fff; }
@@ -92,10 +99,8 @@
 		.designVerification, .designProperties { display: none; }
 	}
 }
-.leftNavContent{overflow: hidden;
-	.projectNav{
-		    min-width: 198px;
-	}
+.leftNavContent { overflow: hidden;
+	.projectNav { min-width: 198px; }
 }
 
 /* list */
@@ -110,7 +115,7 @@
 		.text { cursor: pointer;
 			&:hover { text-decoration: underline; }
 		}
-		.fileTypeImg{height: 30px;width: 35px;vertical-align: top;margin-top: 3px;}
+		.fileTypeImg { height: 30px; width: 35px; vertical-align: top; margin-top: 3px; }
 	}
 	.fileStatus { width: 11%; }
 	.fileOp { width: 11%; }

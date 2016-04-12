@@ -1,0 +1,162 @@
+{
+	"Metadata": {
+		"ID": "WDGC-Q-SY-AR-F03",
+		"Name": "项目名称",
+		"Timestamp": "\/Date(1459835219093)\/",
+		"Seeds": [{
+			"Source": null,
+			"LocalID": null,
+			"Name": "WDGC-Q-SY-AR-F03.rvt",
+			"MIME": "application/rvt"
+		}],
+		"DefaultView": "6b93447d-27b5-477a-8839-475a8df23ef3-0010314a",
+		"DefaultLayout": "394db34b-2dab-4eac-b209-7f08dd185b6c",
+		"Properties": null,
+		"Categories": null,
+		"Version": 1
+	},
+	"Views": [{
+		"ID": "6b93447d-27b5-477a-8839-475a8df23ef3-0010314a",
+		"Name": "{三维}",
+		"Representations": [{
+			"MIME": "image/png",
+			"Description": "图像文件(PNG)",
+			"Size": 661,
+			"Path": "resource/thumbnails/6b93447d-27b5-477a-8839-475a8df23ef3-0010314a/0tm0wrjh.png",
+			"PathAccessMode": "normal",
+			"Downloadable": true,
+			"Attributes": {
+				"Category": "Preview",
+				"Width": "512",
+				"Height": "51"
+			}
+		}, {
+			"MIME": "image/png",
+			"Description": "图像文件(PNG)",
+			"Size": 1922,
+			"Path": "resource/thumbnails/6b93447d-27b5-477a-8839-475a8df23ef3-0010314a/0tm0wrjh.96x96.png",
+			"PathAccessMode": "normal",
+			"Downloadable": false,
+			"Attributes": {
+				"Category": "Thumbnail",
+				"Width": "96",
+				"Height": "96"
+			}
+		}, {
+			"MIME": "image/png",
+			"Description": "图像文件(PNG)",
+			"Size": 1030,
+			"Path": "resource/thumbnails/6b93447d-27b5-477a-8839-475a8df23ef3-0010314a/0tm0wrjh.64x64.png",
+			"PathAccessMode": "normal",
+			"Downloadable": false,
+			"Attributes": {
+				"Category": "Thumbnail",
+				"Width": "64",
+				"Height": "64"
+			}
+		}, {
+			"MIME": "image/png",
+			"Description": "图像文件(PNG)",
+			"Size": 533,
+			"Path": "resource/thumbnails/6b93447d-27b5-477a-8839-475a8df23ef3-0010314a/0tm0wrjh.32x32.png",
+			"PathAccessMode": "normal",
+			"Downloadable": false,
+			"Attributes": {
+				"Category": "Thumbnail",
+				"Width": "32",
+				"Height": "32"
+			}
+		}]
+	}],
+	"Layouts": [{
+		"ID": "394db34b-2dab-4eac-b209-7f08dd185b6c",
+		"Name": "Categories",
+		"Root": {
+			"ID": "b4aa0a82-04e5-4883-a106-c2e9808d95f5",
+			"Name": "Root",
+			"Folders": [{
+				"ID": "793384e3-20fb-449a-8ee0-642a7aebdc7e",
+				"Name": "ThreeD",
+				"Folders": [],
+				"Views": ["6b93447d-27b5-477a-8839-475a8df23ef3-0010314a"]
+			}],
+			"Views": []
+		}
+	}],
+	"Maps": [{
+		"Name": "F03_+10800",
+		"Path": "resource\\map\\F03_+10800.png",
+		"BoundingBox": {
+			"Min": {
+				"X": -127131.73324776463,
+				"Y": -43185.474527312275,
+				"Z": 10350.000000000002
+			},
+			"Max": {
+				"X": 125168.26676417685,
+				"Y": 74664.529378940613,
+				"Z": 16274.712824302411
+			}
+		}
+	}, {
+		"Name": "F04_+15900",
+		"Path": "resource\\map\\F04_+15900.png",
+		"BoundingBox": {
+			"Min": {
+				"X": -127131.73324776463,
+				"Y": -43185.474527312275,
+				"Z": 10350.000000000002
+			},
+			"Max": {
+				"X": 125168.26676417685,
+				"Y": 74664.529378940613,
+				"Z": 16981.593164637463
+			}
+		}
+	}, {
+		"Name": "F05_+21000",
+		"Path": "resource\\map\\F05_+21000.png",
+		"BoundingBox": {
+			"Min": {
+				"X": -127031.73324776147,
+				"Y": -34685.474551014231,
+				"Z": 10350.000000000002
+			},
+			"Max": {
+				"X": 125068.26675277107,
+				"Y": 72664.525472689566,
+				"Z": 16981.593164637463
+			}
+		}
+	}, {
+		"Name": "F03_+10800 建筑出图",
+		"Path": "resource\\map\\F03_+10800 建筑出图.png",
+		"BoundingBox": {
+			"Min": {
+				"X": -127131.73324776463,
+				"Y": -43185.474527312275,
+				"Z": 10350.000000000002
+			},
+			"Max": {
+				"X": 125168.26676417685,
+				"Y": 74664.529378940613,
+				"Z": 16231.593437349551
+			}
+		}
+	}, {
+		"Name": "F03_+10800提机电",
+		"Path": "resource\\map\\F03_+10800提机电.png",
+		"BoundingBox": {
+			"Min": {
+				"X": -127131.73324776463,
+				"Y": -43185.474527312275,
+				"Z": 10350.000000000002
+			},
+			"Max": {
+				"X": 125168.26676417685,
+				"Y": 74664.529378940613,
+				"Z": 16231.593437349551
+			}
+		}
+	}]
+}

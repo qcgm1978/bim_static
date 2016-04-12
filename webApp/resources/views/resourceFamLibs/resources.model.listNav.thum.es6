@@ -8,6 +8,7 @@ App.ResourceModel.ThumContent = Backbone.View.extend({
 	//初始化
 	initialize: function() {
 		this.listenTo(App.ResourceModel.FileThumCollection, "add", this.addOneFile);
+		
 	},
 
 
@@ -22,21 +23,14 @@ App.ResourceModel.ThumContent = Backbone.View.extend({
 
 	//添加单个文件
 	addOneFile: function(model) {
-		
+
 		var view = new App.ResourceModel.ThumDetail({
 			model: model
 		});
 
-		var data=model.toJSON();
-		if (data.isAdd) {
-			this.$el.find(".thumContent").prepend(view.render().el);
-			if (data.folder) {
-				App.ResourceModel.afterCreateNewFolder(data,data.parentId);
-			}
-		} else {
-			this.$el.find(".thumContent").append(view.render().el);
-		} 
-
+		var data = model.toJSON();
+	 
+		this.$el.find(".thumContent").prepend(view.render().el);
 		this.bindScroll();
 	},
 
@@ -55,7 +49,7 @@ App.ResourceModel.ThumContent = Backbone.View.extend({
 				scrollInertia: 0
 			});
 		}
-	}
+	} 
 
 
 

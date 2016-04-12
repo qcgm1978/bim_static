@@ -6,6 +6,7 @@ App.Project = {
 		property: "",
 		fileId: "",
 		projectId: 100,
+		attrView: null,
 		DataModel: null //渲染模型的数据
 
 	},
@@ -57,7 +58,7 @@ App.Project = {
 		App.Project.Settings.projectNav = 'design';
 		App.Project.Settings.fileId = '';
 		App.Project.Settings.property = '';
-		App.Project.Settings.property.DataModel = null;
+		App.Project.Settings.DataModel = null;
 	},
 
 	//加载版本
@@ -259,18 +260,9 @@ App.Project = {
 
 			var fileVersionId = FileIdArr.join(",");
 
-			// //请求数据
-			var data = {
-				URLtype: "downLoad",
-				data: {
-					projectId: App.Project.Settings.projectId,
-					projectVersionId: App.Project.Settings.CurrentVersion.id
-				}
-			};
-
-			var data = App.Comm.getUrlByType(data);
-			var url = data.url + "?fileVersionId=" + fileVersionId;
-			window.location.href = url;
+			//下载
+			App.Comm.checkDownLoad(App.Project.Settings.projectId,App.Project.Settings.CurrentVersion.id,fileVersionId);
+			
 
 			// App.Comm.ajax(data).done(function(){
 			// 	console.log("下载完成");
@@ -293,6 +285,11 @@ App.Project = {
 			if ($target.closest(".breadItem.projectVersion").length <= 0) {
 				$(".breadItem .projectVersionList").hide();
 			}
+
+			//面包屑 切换 文件 模型 浏览器 
+			if ($target.closest(".breadItem.fileModelNav").length <= 0) {
+				$(".breadItem .fileModelList").hide();
+			}
 		});
 	},
 
@@ -301,30 +298,41 @@ App.Project = {
 
 
 		var type = App.Project.Settings.projectNav;
+
+		// if (this.Settings.attrView && this.Settings.attrView.render) {
+		// 	this.Settings.attrViewthis.stopListening();
+		// }
+
+		//解绑属性
+		App.Project.DesignAttr.PropertiesCollection.unbind();
+
 		//设计
 		if (type == "design") {
 
+			//this.Settings.attrView = new App.Project.ProjectDesignPropety();
+			
 			$("#projectContainer .rightPropertyContent").html(new App.Project.ProjectDesignPropety().render().$el);
 
 		} else if (type == "plan") {
-			//计划
+			//计划 
+			//this.Settings.attrView = new App.Project.ProjectPlanProperty();
 			$("#projectContainer .rightPropertyContent").html(new App.Project.ProjectPlanProperty().render().$el);
 
 
 		} else if (type == "cost") {
 			//成本
+			//this.Settings.attrView = new App.Project.ProjectCostProperty();
 			$("#projectContainer .rightPropertyContent").html(new App.Project.ProjectCostProperty().render().$el);
 
 
 		} else if (type == "quality") {
 			//质量
+			//this.Settings.attrView = new App.Project.ProjectQualityProperty();
 			$("#projectContainer .rightPropertyContent").html(new App.Project.ProjectQualityProperty().render().$el);
 
 		}
 
-		//添加样式 弹出属性层
-		$("#projectContainer").find(".rightProperty").addClass("showPropety").end().find(".projectCotent").addClass("showPropety")
-
+		//$("#projectContainer .rightPropertyContent").html(this.Settings.attrView.render().$el);
 		//触发数据加载
 		$("#projectContainer .rightPropertyContent .projectNav .item:first").click();
 
@@ -354,7 +362,10 @@ App.Project = {
 			}
 
 			data.click = function(event) {
+				 
 				var file = $(event.target).data("file");
+				// 
+				$("#projectContainer .header .ckAll").prop("checked",false);
 				//App.Project.FileCollection.parentId=file.id;
 				//清空数据
 				App.Project.FileCollection.reset();
