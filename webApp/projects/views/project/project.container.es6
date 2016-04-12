@@ -320,10 +320,8 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			element: $("#projectContainer .modelContainerContent"),
 			sourceId: App.Project.Settings.DataModel.sourceId,
 			etag: App.Project.Settings.DataModel.etag
-		});
-
-		$("#projectContainer .projectNavModelContainer").append(new App.Project.viewpoint().render().el);
-		 
+		});  
+		  
 		viewer.on('viewpoint', function(point) {
 			$("#projectContainer .projectNavModelContainer .tree-view:eq(1) .item-content:eq(0)").addClass('open')
 			App.Project.ViewpointAttr.ListCollection.add({
@@ -336,6 +334,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		})
 
 		viewer.on("click", function(model) {
+		 
 			App.Project.Settings.ModelObj = null;
 
 			if (!model.intersect) {
