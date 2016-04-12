@@ -313,6 +313,11 @@ App.Project.ProjectContainer = Backbone.View.extend({
 
 		//渲染模型属性
 		App.Project.renderModelContentByType();
+		var dwg = new dwgViewer({
+		  container:$("#projectContainer .modelContainerContent"),
+		  sourceId:"beea5e402aaf38ceff7dd4dd315ebc05"
+		})
+		return false
 		var viewer = App.Project.Settings.Viewer = App.Comm.createModel({
 			element: $("#projectContainer .modelContainerContent"),
 			sourceId: App.Project.Settings.DataModel.sourceId,

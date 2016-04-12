@@ -1,0 +1,22 @@
+.mod-dwg {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: #000;
+  overflow: hidden;
+}
+.scene {
+  position:relative;
+}
+.view {
+  position:relative;
+}
+.tile {
+  position: absolute;
+  width: 512px;
+  height: 512px;
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  z-index: 2
+}

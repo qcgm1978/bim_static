@@ -13,15 +13,35 @@ var dwgViewer = function(options){
   $.ajax({
     url:serverUrl,
     success:function(res){
-      res.Views && getDwg(res.Views);
+      var data = JSON.parse(res);
+      data.Views && getDwg(data.Views);
     }
   });
   var getDwg = function(res){
-    $.each(res,function(item){
-      if(item.Representations.MIME == "image/tiles"){
-
+    var modelTab=[],currentFile;
+    $.each(res,function(i,item){
+      modelTab.push({
+        name:item.Name,
+        id:item.ID
+      });
+      if(item.Name == 'Model'){
+        $.each(item.Representations,function(ii,file){
+          if(file.MIME == "image/tiles"){
+            currentFile = file;
+          }
+        })
+      }
+    });
+    dwgView.init(self._opt.container, {
+      lod: {
+        maxLevel: parseInt(currentFile.Attributes.DwgLevel, 10),
+        ext: currentFile.Attributes.DwgExt || 'jpg',
+        url: "/model/"+ self._opt.sourceId + '/' + currentFile.Path
       }
     })
+  }
+  var addColltrol(){
+    var tmp = ''
   }
   var dwgView = {
 
@@ -110,14 +130,8 @@ var dwgViewer = function(options){
 
       var lod = self.__options.lod
       self.__firstImgUrl = lod.url + '/L1/Model_0_0.' + lod.ext,
-
-        self.fit()
-      self.__minisite = App.modules.util.MINISITE
-      if (self.__minisite) {
-        self.__bindMobileEvent()
-      } else {
-        self.__bindEvent()
-      }
+      self.fit()
+      self.__bindEvent()
 
       //self.debugPanel = $('<div class="dwg-debug"></div>').appendTo(self.__panel.parent()).hide()
     },
@@ -155,10 +169,10 @@ var dwgViewer = function(options){
       self.__viewWidth = container.width()
       self.__viewHeight = container.height()
       self.zoom(self.__zoomScale)
-      $.jps.publish('window-resize', {
+      /*$.jps.publish('window-resize', {
         width: self.__viewWidth,
         height: self.__viewHeight
-      })
+      })*/
     },
 
     //画缩放框
@@ -226,12 +240,12 @@ var dwgViewer = function(options){
       self.__resetSceneInViewPoint()
       self.__changeViewPos()
 
-      $.jps.publish('dwg-pan', {
+      /*$.jps.publish('dwg-pan', {
         width: self.__viewWidth,
         height: self.__viewHeight,
         top: self.__viewTop,
         left: self.__viewLeft
-      })
+      })*/
     },
 
     //放大
@@ -311,7 +325,7 @@ var dwgViewer = function(options){
 
       //如果是缩小则添加第一级的图片
       if (!minisite && zoomScale < self.__zoomScale) {
-        var tile = $(Mustache.render(self.__tileTpl, {
+        var tile = $(_.template(self.__tileTpl)({
           tile: {
             row: 0,
             col: 0,
@@ -370,7 +384,7 @@ var dwgViewer = function(options){
       }
 
       self.__zoomStart = zoomStart
-      $.jps.publish('dwg-zoom')
+      // $.jps.publish('dwg-zoom')
     },
 
     __zoomEvent: function() {
@@ -621,9 +635,7 @@ var dwgViewer = function(options){
           viewPanel.find('.tile.past').remove()
         }
 
-        var tile = $(Mustache.render(self.__tileTpl, {
-          tile: item
-        }))
+        var tile = $(_.template(self.__tileTpl)({tile: item}))
         viewPanel.append(tile)
           //加载完成需要根据zoomScale来计算当前显示的大小
         var unit = self.__unit
@@ -786,5 +798,5 @@ var dwgViewer = function(options){
     '</div>'
 
   dwgView.__tileTpl = '' +
-    '{{#tile}}<img class="tile" data-row={{row}} data-col={{col}} data-level={{level}} src="{{src}}" style="top:{{top}}px;left:{{left}}px;" />{{/tile}}'
+    '<img class="tile" data-row="<%= tile.row %>" data-col="<%= tile.col %>" data-level="<%= tile.level %>" src="<%= tile.src %>" style="top:<%= tile.top %>px;left:<%= tile.left %>px;" />'
 }
