@@ -42,7 +42,13 @@ App.Project.DesignCollisionDetail=Backbone.View.extend({
         name = that.find(".ckName").text();
     $.each(this.list,function(index,item){
       if(item.name == name){
-        App.Project.Settings.Viewer.collision(item);
+        var ids = {
+              type:"userId",
+              ids:[item.leftId,item.rightId]
+            },
+            box=[item.leftElementBoxMin,item.leftElementBoxMax,item.rightElementBoxMin,item.rightElementBoxMax];
+        App.Project.Settings.Viewer.highlight(ids);
+        App.Project.Settings.Viewer.zoomBox(box);
       }
     })
     that.toggleClass("selected").siblings().removeClass("selected");

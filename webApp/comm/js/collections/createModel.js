@@ -443,10 +443,10 @@ App.Comm.createModel = function(options){
     modelBox.append(modelView);
     opt.element.append(modelBox);
     modelBox.append(new modelBar().render().el);
-    viewer = App.Project.Settings.Viewer = new BIM({
+    viewer =  new BIM({
       element: modelView[0],
       mapElement:$('.modelMap .map')[0],
-      etag: App.Project.Settings.DataModel.etag
+      etag: opt.etag
     });
     getAxisGrid();
     viewer.on('changeGrid',function(res){
