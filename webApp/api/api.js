@@ -32,7 +32,7 @@ App.API = {
 		fetchCategory:"view/{etag}/{sourceId}/categories",// 获取构件信息
 
 		fetchFloors:'view/{etag}/{sourceId}/miniature/map',//获取模型楼层信息
-		fetchAxisGrid:'/datajson/map/gridAndLevel.json',//获取楼层地图,轴网信息
+		fetchAxisGrid:'model/{etag}/metadata/gridAndLevel.json',//获取楼层地图,轴网信息
 
 		uploadFile: "doc/{projectId}/{projectVersionId}/file/data", //上传文件  ?parentId={parentId}&fileName={fileName}&size={size}&digest={digest}&position={position}
 		"checkDownLoad":"doc/{projectId}/{versionId}/file/size", // 下载确认 是否可以下载  ?fileVersionId={fileVersionId}

@@ -430,7 +430,10 @@ App.Comm.createModel = function(options){
   }
   var getAxisGrid = function(){
     var data = {
-      URLtype:"fetchAxisGrid"
+      URLtype:"fetchAxisGrid",
+      data:{
+        etag:opt.etag
+      }
     }
     App.Comm.ajax(data,function(data){
       viewer.setAxisGrid(data)
