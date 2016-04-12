@@ -1,1 +1,82 @@
-project.quality.property.materialEquipment.html
+<div class="hedaerSearch">
+    <span class="searchToggle">选择筛选条件</span>
+    <span class="clearSearch">清除条件</span>
+</div>
+<div class="searchDetail">
+    <div class="searchOptons">
+        <div class="optonLine zIndex10">
+            <div class="myDropDown specialitiesOption optionComm">
+                <span class="myDropText">
+             <span>专业：</span> <span class="text">土建</span> <i class="myDropArrorw"></i> </span>
+                <ul class="myDropList">
+                    <li class="myItem">土建</li>
+                    <li class="myItem">通风空调</li>
+                </ul>
+            </div>
+            <div class="myDropDown categoryOption optionComm">
+                <span class="myDropText">
+             <span>列别：</span> <span class="text">钢筋</span> <i class="myDropArrorw"></i> </span>
+                <ul class="myDropList">
+                    <li class="myItem">钢筋</li>
+                    <li class="myItem">冷冻水</li>
+                    <li class="myItem">砌筑</li>
+                </ul>
+            </div>
+        </div>
+        <div class="optonLine">
+            <div class="myDropDown materialEquipment statusOption optionComm">
+                <span class="myDropText">
+             <span>状态：</span> <span class="text">全部</span> <i class="myDropArrorw"></i> </span>
+                <ul class="myDropList">
+                    <li class="myItem">全部</li>
+                    <li class="myItem">部分</li>
+                </ul>
+            </div>
+            <div class="searchName">
+                <span>名称：</span>
+                <input type="text" class="txtSearchName" placeholder="请输入名称关键字" />
+            </div>
+        </div>
+        <div class="optonLine">
+            <div class="firstDate dateBox" style="position: relative;">
+                <i class="iconCal add-on"></i>
+                <input readonly="true" placeholder="开始时间" id="dateStar" class="span2" type="text">
+            </div>
+            <span>-</span>
+            <div class="firstDate dateBox">
+                <i class="iconCal"></i>
+                <input readonly="true" placeholder="开始时间" id="dateEnd" class="span2" type="text">
+            </div>
+        </div>
+
+        <div class="optonLine btnOption">
+            <input type="button" class="myBtn myBtn-primary" value="筛选" />
+        </div>
+
+    </div>
+</div>
+<div class="tbContainer">
+    <table class="tbMaterialequipmentHeader tbComm">
+        <thead>
+            <tr>
+                <th class="manifestIcon"></th>
+                <th class="specialities">专业</th>
+                <th class="category">类别</th>
+                <th class="name">名称</th>
+                <th class="batches">批次</th>
+                <th class="status">状态</th>
+                <th class="hasBeenCount">已进场</th>
+                <th class="sumCount">总数量</th>
+                <th class="lastDate">最新进场时间</th>
+            </tr>
+        </thead>
+    </table>
+    <div class="materialequipmentList">
+        <div class="materialequipmentListScroll">
+            <table class="tbMaterialequipmentBody tbComm">
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

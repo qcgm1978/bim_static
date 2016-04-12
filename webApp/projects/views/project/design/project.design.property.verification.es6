@@ -13,14 +13,38 @@ App.Project.DesignVerification=Backbone.View.extend({
 	template:_.templateUrl("/projects/tpls/project/design/project.design.property.verification.html"),
 
 	render:function(){
-		this.$el.html("");
+		var template=_.templateUrl("/projects/tpls/project/design/project.design.property.verification.header.html",true);
+		this.$el.html(template);
 		return this;
 	},
 
+	bindScroll(){
+
+		this.$(".ckBodyScroll").mCustomScrollbar({
+             set_height: "100%",
+             theme: 'minimal-dark',
+             axis: 'y',
+             keyboard: {
+                 enable: true
+             },
+             scrollInertia: 0
+         });
+		
+	},
+
 	//数据返回
-	addOne:function(model){
+	addOne:function(model){ 
+		 
+		if (this.$el.closest('body').length<=0) {
+			this.remove();
+		}
          var data=model.toJSON();
-         this.$el.html(this.template(data));
+         this.$(".ckBox .ckBody tbody").html(this.template(data));
+
+         if (!this.$(".ckBodyScroll").hasClass('mCustomScrollbar ')) {
+         	this.bindScroll();
+         }
+          
 	}
 
 	 

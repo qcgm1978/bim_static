@@ -15,8 +15,7 @@ App.Project.ProjectQualityProperty=Backbone.View.extend({
 		this.$el.html(this.template);
 
 		this.$el.find(".qualityContainer").append(new App.Project.QualityMaterialEquipment().render().el); 
-		this.$el.find(".qualityContainer").append(new App.Project.QualityProcessAcceptance().render().el);
-		this.$el.find(".qualityContainer").append(new App.Project.QualityProcessCheck().render().el);
+		this.$el.find(".qualityContainer").append(new App.Project.QualityProcessAcceptance().render().el); 
 		this.$el.find(".qualityContainer").append(new App.Project.QualityOpeningAcceptance().render().el);
 		this.$el.find(".qualityContainer").append(new App.Project.QualityConcerns().render().el);
 		this.$el.find(".qualityContainer").append(new App.Project.QualityProperties().render().el);
@@ -42,12 +41,7 @@ App.Project.ProjectQualityProperty=Backbone.View.extend({
 			this.$el.find(".QualityProcessAcceptance").show().siblings().hide();
 			App.Project.QualityAttr.ProcessAcceptanceCollection.fetch();
 
-		} else if (type == "processcheck") {
-			//过程检查
-			this.$el.find(".QualityProcessCheck").show().siblings().hide();
-			App.Project.QualityAttr.ProcessCheckCollection.fetch();
-
-		}  else if (type == "openingacceptance") {
+		}   else if (type == "openingacceptance") {
 			//开业验收
 			this.$el.find(".QualityOpeningAcceptance").show().siblings().hide();
 			App.Project.QualityAttr.OpeningAcceptanceCollection.fetch();

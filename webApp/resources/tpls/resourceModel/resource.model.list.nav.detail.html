@@ -12,7 +12,8 @@
     	<span class="btnCalcel pointer myIcon-cancel"></span>
     <%}%>
 <%}else{%>
-        <a data-id="<%=id%>" href="/static/dist/app/project/single/filePreview.html?id=<%=fileVersionId%>&projectId=<%=projectId%>&projectVersionId=<%=fileVersionId%>" target="_blank" data-isfolder="<%=folder%>" class="text">
+ 
+        <a data-id="<%=id%>" href="/static/dist/app/project/single/filePreview.html?id=<%=fileVersionId%>&projectId=<%=projectId%>&projectVersionId=<%=App.ResourceModel.Settings.CurrentVersion.id%>" target="_blank" data-isfolder="<%=folder%>" class="text">
             <%=name%>
         </a>
 <%}%>

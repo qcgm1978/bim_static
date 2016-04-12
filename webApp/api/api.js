@@ -44,7 +44,7 @@ App.API = {
 
 		//设计
 		fetchDesignProperties: "sixD/{projectId}/{projectVersionId}/property", //设计属性 ?sceneId={sceneId}&elementId={elementId}
-		fetchDesignVerification: "", // 设计 检测
+		fetchDesignVerification: "/dataJson/project/project.design.property.json", // 设计 检测
 		fetchDesignCollision: "", // 设计碰撞
 		// 碰撞
 		fetchDesignFiles:"view/{etag}/{sourceId}/collision/tree",// 碰撞文件列表
@@ -59,25 +59,25 @@ App.API = {
 
 		//计划
 		fetchPlanModel: "sixD/{projectId}/{projectVersionId}/plan", //模型
-		fetchPlanAnalog: "", //模拟
-		fetchPlanPublicity: "", //关注
-		fetchPlanInspection: "", //检验
-		fetchPlanProperties: "", //属性
+		fetchPlanAnalog: "dataJson/project/project.design.property.json", //模拟
+		fetchPlanPublicity: "dataJson/project/project.design.property.json", //关注
+		fetchPlanInspection: "dataJson/project/project.design.property.json", //检验
+		fetchPlanProperties: "dataJson/project/project.design.property.json", //属性
 
 		//陈本
 		fetchCostReference: "sixD/{projectId}/{projectVersionId}/cost/summary", // 清单 
 		fetchCostChange: "platform/auditSheet?type=9", // 变更
-		fetchCostVerification: "", // 效验
-		fetchCostProperties: "", //属性
+		fetchCostVerification: "dataJson/project/project.design.property.json", // 效验
+		fetchCostProperties: "dataJson/project/project.design.property.json", //属性
 
 
 		// 质量
-		fetchQualityMaterialEquipment: "", //材料设备
-		fetchQualityProcessAcceptance: "", //过程验收
-		fetchQualityProcessCheck: "", //过程检查
-		fetchQualityOpeningAcceptance: "", //开业验收
-		fetchQualityConcerns: "", //隐患
-		fetchQualityProperties: "", // 属性
+		fetchQualityMaterialEquipment: "dataJson/project/project.design.property.json", //材料设备
+		fetchQualityProcessAcceptance: "dataJson/project/project.design.property.json", //过程验收
+		fetchQualityProcessCheck: "dataJson/project/project.design.property.json", //过程检查
+		fetchQualityOpeningAcceptance: "dataJson/project/project.design.property.json", //开业验收
+		fetchQualityConcerns: "dataJson/project/project.design.property.json", //隐患
+		fetchQualityProperties: "dataJson/project/project.design.property.json", // 属性
 
 
 		 

@@ -74,7 +74,7 @@
                  openTimeStart: "",
                  openTimEnd: "",
                  pageIndex: App.Projects.Settings.pageIndex,
-                 pageItemCount: 8
+                 pageItemCount: App.Comm.Settings.pageItemCount
 
              },
 
@@ -114,7 +114,7 @@
 
              data: {
                  pageIndex: App.Projects.Settings.pageIndex,
-                 pageItemCount: 8,
+                 pageItemCount: App.Comm.Settings.pageItemCount,
                  //projectType: 1,
                  name: projectName || "",
                  estateType: "",

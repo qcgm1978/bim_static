@@ -1,6 +1,6 @@
 
 
-
+//检查
 App.Project.PlanInspection = Backbone.View.extend({
 
 	tagName: "div",

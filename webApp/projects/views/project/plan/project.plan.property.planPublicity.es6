@@ -1,4 +1,6 @@
 
+
+//关注
 App.Project.PlanPublicity = Backbone.View.extend({
 
 	tagName: "div",
@@ -15,7 +17,7 @@ App.Project.PlanPublicity = Backbone.View.extend({
 		return this;
 	},
 
-	template:_.templateUrl("/projects/tpls/project/plan/project.plan.property.planModel.html"),
+	template:_.templateUrl("/projects/tpls/project/plan/project.plan.property.publicityCollection.html"),
 
 
 	addOne: function(model) {

@@ -1,5 +1,5 @@
  
-
+//模拟
 App.Project.PlanAnalog = Backbone.View.extend({
 
 	tagName: "div",
@@ -16,7 +16,7 @@ App.Project.PlanAnalog = Backbone.View.extend({
 		return this;
 	},
 
-	template:_.templateUrl("/projects/tpls/project/plan/project.plan.property.planModel.html"),
+	template:_.templateUrl("/projects/tpls/project/plan/project.plan.property.planAnalog.html"),
 
 
 	addOne: function(model) {

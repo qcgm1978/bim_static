@@ -91,3 +91,9 @@ router/index.js
 
 三：发布版本问题：
 1：fis-conf.js 修改 v 版本 同时 在 comm/js/comm.es6 的settings中 修改v 与 fis-conf.js中的一样
+
+四：当监听一个collection的时候，重复渲染，监听会一直存在，并不会，取消
+ 
+   解决方案：一：使用同一view，实例化成 全局的一个view，不用二次生成
+
+             二：在 addone 中 去判断，如果当前的view的closest body 不存在 则 移除当前的view

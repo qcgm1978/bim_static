@@ -106,7 +106,7 @@ App.Project.DesignAttr={
 			}
 		}),
 
-		urlType:"fetchDesignFileList"
+		urlType:"fetchDesignVerification"
 
 	})),
 

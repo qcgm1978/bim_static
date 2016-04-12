@@ -13,20 +13,32 @@
  		//z-index
  		$(this).css("z-index",this.settings.zIndex);
 
+ 	 
 
  		this.init=function(){
  			this.bindEvent();
  		}
 
  		this.bindEvent=function(){
- 			var $that=$(this);
+ 			var $that=$(this),that=this;
  			$that.on("click",".myDropText",function(){
- 			 
+ 			 	
  				$that.find(".myDropList").show().end().find(".myDropArrorw").addClass('down');
  			});
 
 
- 			$(document).on("click",function(event){
+ 			$that.on("click",".myDropList .myItem",function(){
+ 			 	 
+ 			 	$(this).closest(".myDropDown").find(".myDropText .text").text($(this).text());
+
+ 			 	if ($.isFunction(that.settings.click)) {
+ 			 		that.settings.click.call(that);
+ 			 	} 
+ 				 $(document).trigger('click.myDropDown');
+ 			});
+
+
+ 			$(document).on("click.myDropDown",function(event){
  				 
  				var $target=$(event.target);
  				if ($target.closest($that).length<=0) {

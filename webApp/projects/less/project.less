@@ -13,7 +13,7 @@
 #projectContainer { .ProjectPlanPropertyContainer { .projectNav { .item { width: 65px; }
 		}
 	}
-	.ProjectQualityNavContainer { .projectNav { .item { width: 54px; }
+	.ProjectQualityNavContainer { .projectNav { .item { width: 65px; }
 		}
 	}
 }
@@ -27,7 +27,7 @@
 				.mCSB_container { }
 			}
 		}
-		.rightProperty { border: 1px #ddd solid; display: none; position: absolute; right: 0px; top: 40px; bottom: 0px; background-color: #fff; z-index: 600;
+		.rightProperty { border: 1px #ddd solid; display: none; position: absolute; right: 0px; top: 37px; bottom: 0px; background-color: #fff; z-index: 600;
 			.rightPropertyContentBox { height: 100%; position: relative; }
 			&.showPropety { display: block; }
 		}
@@ -54,7 +54,8 @@
 		}
 	}
 }
-.rightProperty { .designVerification { height: 100%; }
+.rightProperty { .odd { background-color: #eee; }
+	.designVerification { height: 100%; }
 	.modle { .modleShowHide { transition: all .5s; background: url(/comm/images/commIcon.png) no-repeat 0px -256px; float: right; margin-right: 12px; margin-top: 6px; height: 14px; width: 14px; cursor: pointer;
 			&.down { transform: rotate(180deg); -ms-transform: rotate(180deg); -moz-transform: rotate(180deg); -webkit-transform: rotate(180deg); -o-transform: rotate(180deg); }
 		}
@@ -70,6 +71,7 @@
 		}
 	}
 	.ckBox { overflow: auto; height: 100%;
+		.ckBody { margin-top: -26px; padding-top: 25px; height: 100%; min-width: 500px; width: 100%; }
 		.ckTable { min-width: 500px; width: 100%;
 			th { height: 24px; line-height: 24px; text-align: center; }
 			td, th { border: 1px #ccc solid; }
@@ -119,13 +121,16 @@
 		}
 	}
 	.detailList { height: 100%; overflow-x: hidden; overflow-y: auto; padding: 46px 0 40px; }
-	.planBox { position: absolute; top:52px; bottom: 0px; left: 0px; right: 0px;
+	.planBox { position: absolute; top: 52px; bottom: 0px; left: 0px; right: 0px;
+		&.planAnalog { top: -1px; }
+		&.planPlanPublicity { top: 0px;
+			.selDate { margin-bottom: 7px; margin-top: 3px; }
+		}
 		.planContent { height: 100%;
 			.tbPlan { border: 1px #ccc solid; width: 100%; min-width: 398px;
 				th, td { border: 1px #ccc solid; }
 				th { text-align: center; height: 28px; line-height: 28px; }
 				td { height: 24px; line-height: 24px; }
-				tr.odd { background-color: #eee; }
 				tbody { td { box-sizing: border-box; padding-left: 8px; }
 				}
 			}
@@ -143,7 +148,12 @@
 		}
 	}
 }
-.planInterest { .contentBox { height: 100%; }
+.planInterest { .tbInspection { td { padding-left: 3px; }
+		.listCode { width: 25%; }
+		.listName { width: 56%; }
+		.listCount { width: 18%; }
+	}
+	.contentBox { height: 100%; }
 	.title { height: 28px; line-height: 28px; font-weight: bold; padding-left: 15px; }
 	.inspecId { width: 10%; text-align: center; }
 	.businessMatters { width: 88%; }
@@ -159,24 +169,19 @@
 		}
 	}
 }
-
 .rightPropertyContentBox { .planContainer, .projectNavContentBox { position: absolute; top: 40px; bottom: 0px; left: 0px; right: 0px; overflow: auto; }
 	.nullTip { background: url(/projects/images/attrSel.png) no-repeat 50% 100%; padding-top: 200px; height: 50px; line-height: 50px; color: #ccc; font-size: 16px; text-align: center; }
 	.rightPropertyContent { height: 100%;
-		.ProjectPlanPropertyContainer { height: 100%;
-			
-		}
+		.ProjectPlanPropertyContainer { height: 100%; }
 		.designPropetyBox { height: 100%; }
 	}
 }
-
-.CostReference { .referenceContent { position: absolute; top:50px; bottom: 3px; left: 0px; right: 0px;  }
+.CostReference { .referenceContent { position: absolute; top: 50px; bottom: 3px; left: 0px; right: 0px; }
 	.referenceSearch { position: relative; padding: 12px;
 		.btnSearch { position: absolute; top: 20px; font-size: 14px; color: #ccc; left: 20px; cursor: pointer; }
 		.txtSearch { min-width: 373px; padding-left: 30px; width: 100%; }
 	}
 	.tbReference { width: 100%; min-width: 398px; margin-left: -1px;
-		tr.odd{background-color: #ddd;}
 		th, td { border: 1px #ccc solid; }
 		thead { height: 28px; line-height: 28px;
 			th { text-align: center; }
@@ -202,8 +207,10 @@
 	.CostChange, .CostVerification { overflow: auto; position: absolute; top: 12px; bottom: 0px; left: 0px; right: 0px; }
 	.tbCostChange { width: 100%; min-width: 395px;
 		td, th { border: 1px #ccc solid; }
-		.name { width: 50%; .nameText{width:95%;}}
-		.date, .diff { width: 24%; text-align: center;padding-left: 0px;}
+		.name { width: 50%;
+			.nameText { width: 95%; }
+		}
+		.date, .diff { width: 24%; text-align: center; padding-left: 0px; }
 		thead { th { text-align: center; height: 30px; line-height: 30px; }
 		}
 		tbody { td { height: 25px; line-height: 25px; padding-left: 8px;
@@ -252,4 +259,92 @@
 			}
 		}
 	}
-} 
+}
+.designVerification { select { width: 98%; }
+}
+.projectPropetyContainer { .designProperties { min-width: 398px; width: 100%; }
+}
+
+/* 质量 */
+.qualityContainer { position: absolute; top: 40px; bottom: 0px; left: 0px; right: 0px;
+	.QualityProcessAcceptance, .QualityProcessCheck, .QualityOpeningAcceptance, .QualityConcerns, .QualityProperties { min-width: 398px; width: 100%; }
+}
+.rightProperty { .hedaerSearch { padding: 15px; min-width: 398px; width: 100%; overflow: hidden;
+		.searchToggle { cursor: pointer; background: url(/comm/images/commIcon.png) no-repeat right -253px; padding-right: 30px; }
+		.clearSearch { cursor: pointer; color: #006ECF; }
+		.groupRadio { float: right; }
+	}
+	.searchDetail { display: none; position: absolute; height: 182px; background-color: #fff; top: 38px; width: 100%; min-width: 398px; z-index: 1; border-bottom: 1px #ccc solid;
+		&.processAcceptance { height: 126px; }
+		&.openingacceptance { height: 142px; }
+		&.concernSearch { height: 204px; }
+		&.concernList { width: 540px; }
+		.searchOptons { border-top: 1px #ccc solid; margin: 0 5px; }
+		.optionComm { .myDropText { height: 24px; line-height: 21px; width: 178px; }
+			.myDropArrorw { margin-top: 10px; }
+			.myDropList { width: 100%; top: 25px; left: 0px; }
+		}
+		.optonLine { margin-top: 10px; padding-left: 5px; }
+		.materialEquipment.statusOption, .categoryOption, .specialitiesOption, .operatorOption, .typeOption, .firstDate { margin-left: 7px; }
+		.zIndex10 { position: relative; z-index: 10; }
+		.zIndex11 { position: relative; z-index: 10; }
+		.searchName { width: 176px; margin-left: 10px; display: inline-block; border: 1px #ccc solid; height: 24px; vertical-align: top; line-height: 20px; padding-left: 12px; outline: none;
+			.txtSearchName { width: 120px; border: 0; outline: none; }
+		}
+		.dateBox { display: inline-block; position: relative;
+			input { height: 24px; line-height: 24px; padding-left: 8px; border: 1px #ccc solid; width: 178px; padding-right: 30px; box-sizing: border-box; }
+			#dateEnd { width: 165px; }
+		}
+		.btnOption { padding-right: 5px; text-align: right;
+			input { margin-top: 10px; }
+		}
+		.iconCal { background: url(/static/dist/images/comm/images/commIcon.png) no-repeat 6px -236px; position: absolute; right: 1px; width: 28px; height: 22px; top: 1px; background-color: #eee; border-left: 1px #ccc solid; }
+	}
+	.tbMaterialequipmentBody, .tbMaterialequipmentHeader { width: 100%; min-width: 580px;
+		.manifestIcon { width: 5%; }
+		.specialities { width: 12%; }
+		.category { width: 12%; }
+		.name { width: 19%; }
+		.batches { width: 6%; }
+		.status { width: 7%; }
+		.hasBeenCount { width: 9%; }
+		.sumCount { width: 9%; }
+		.lastDate { width: 20%; }
+	}
+	.tbContainer { position: absolute; top: 45px; bottom: 0px; left: 0px; right: 0px; overflow: auto;
+		.materialequipmentList { margin-top: -31px; padding-top: 30px; height: 100%; min-width: 580px; width: 100%; }
+		.processAccessList, .openingacceptanceList { min-width: 398px; }
+		.concernList{min-width:540px;}
+	}
+	.tbComm { td, th { border: 1px #ccc solid; text-align: center; }
+		th { height: 28px; line-height: 28px; }
+		td { height: 25px; line-height: 25px; }
+	}
+	.tbProcessAccessHeader, .tbProcessAccessBody { width: 100%; min-width: 398px;
+		.manifestIcon { width: 5%; }
+		.category { width: 12%; }
+		.positon { width: 12%; }
+		.ckResult { width: 19%; }
+	}
+	.tbOpeningacceptanceHeader, .tbOpeningacceptanceBody { width: 100%; min-width: 398px;
+		.manifestIcon { width: 5%; }
+		.specialities { width: 21%; }
+		.category { width: 23%; }
+		.positon { width: 34%; }
+		.ckResult { width: 15%; }
+	}
+	.tbConcernsHeader, .tbConcernsBody { width: 100%; min-width: 540px;
+		.concernInfo { width: 44%; }
+		.category { width: 12%; }
+		.status { width: 10%; }
+		.grade { width: 8%; }
+		.operator { width: 14%; }
+		.type { width: 11%; }
+		td { height: 98px; line-height: 98px; }
+	}
+	.tbConcernsBody { .concernInfo { line-height: 1.5;    vertical-align: top;    padding: 10px 0 0 10px; }
+		.ckImg { float: left;width:68px;height: 68px; }
+		.ckHeader { margin-left: 80px; text-align: left; }
+		.ckName{margin-bottom: 6px;}
+	}
+}
