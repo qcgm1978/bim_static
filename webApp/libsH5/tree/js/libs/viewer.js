@@ -9,6 +9,7 @@ var BIM = function(option){
   var self = BIM.common.self = this;
   var defaults = {
     element:'',
+    mapElement:'',
     cameraInfo:'',
     controll:true,
     etag:'',
@@ -53,6 +54,20 @@ var BIM = function(option){
   var changed = function(res){
     BIM.util.pub('click',res);
   }
+  var changeAxisGrid = function(res){
+    BIM.util.pub('changeGrid',res);
+  }
+  var initMap = function(){
+    var _el = _opt.mapElement,
+        _width = _el.clientWidth,
+        _height = _el.clientHeight,
+        _css={
+          left:'0px',
+          bottom:'0px',
+          outline:'none'
+        };
+    viewer.initMiniMap(_el,_width,_height,_css,changeAxisGrid);
+  }
   var viewer = BIM.common.viewer = new CloudViewer();
   viewer.registerEventListener(CLOUD.EVENTS.ON_SELECTION_CHANGED, changed);
   viewer.registerEventListener(CLOUD.EVENTS.ON_LOAD_PROGRESS, loading);
@@ -64,6 +79,7 @@ var BIM = function(option){
     bimBox.appendChild(viewBox);
     _opt.element.appendChild(bimBox);
     viewer.init(viewBox);
+    initMap();
     viewer.load(_opt.etag,BIM.common.severModel);
     if(_opt.resize){
       _util.listener(window,'resize',function(){
@@ -772,9 +788,13 @@ BIM.prototype = {
   highlight:function(obj){
     var viewer = BIM.common.viewer;
     var filter = viewer.getFilters();
-    BIM.util.getFilter(obj.ids,function(id){
-      filter.setUserOverrider(obj.type,id);
-    });
+    if(obj.type == "userId"){
+      filter.setSelectedIds(obj.ids);
+    }else{
+      BIM.util.getFilter(obj.ids,function(id){
+        filter.setUserOverrider(obj.type,id);
+      });
+    }
     viewer.render();
   },
   downplay:function(obj){
@@ -784,53 +804,39 @@ BIM.prototype = {
       filter.removeUserOverrider(obj.type,id);
     });
     viewer.render();
+  },
+  setFloorMap:function(obj){
+    var viewer = BIM.common.viewer;
+    viewer.setFloorPlanData(obj);
+  },
+  setAxisGrid:function(obj){
+    var viewer = BIM.common.viewer;
+    viewer.setAxisGridData(obj);
+  },
+  showAxisGrid:function(){
+    var viewer = BIM.common.viewer;
+    viewer.showAxisGrid(true);
+  },
+  hideAxisGrid:function(){
+    var viewer = BIM.common.viewer;
+    viewer.showAxisGrid(false);
+  },
+  zoomBox:function(box){
+    var viewer = BIM.common.viewer;
+    viewer.zoomToBBox(CLOUD.Utils.computeBBox(box));
+    viewer.render();
+  },
+  collision:function(ids){
+    var viewer = BIM.common.viewer;
+    var filter = viewer.getFilters();
+    filter.setSelectedIds(ids);
+    viewer.render();
+  },
+  load:function(etag){
+    var viewer = BIM.common.viewer;
+    viewer.load(etag,BIM.common.severModel);
+    viewer.render();
   }
-}
-Array.prototype.remove = function(item){
-  var _self = this;
-  if((typeof item) == 'object'){
-    for(var i=0,len=item.length;i<len;i++){
-      remove(item[i]);
-    }
-  }else{
-    remove(item);
-  }
-  function remove(x){
-    var index = _self.indexOf(x);
-    if (index > -1) {
-      _self.splice(index, 1);
-    }
-  }
-}
-Array.prototype.indexOf = function(item) {
-  for (var i = 0; i < this.length; i++) {
-    if (this[i] == item || BIM.util.isEqual(this[i],item)){
-      return i;
-    }
-  }
-  return -1;
-}
-Array.prototype.intersect = function(x){
-  var arr = [];
-  var that = this;
-  var i=0;
-  var len = that.length;
-  for(;i<len;i++){
-    if(x.indexOf(that[i]) > -1){
-      arr.push(that[i]);
-    }
-  }
-  return arr;
-}
-Array.prototype.unique = function(){
-  var n = {},r=[];
-  for(var i = 0; i < this.length; i++){
-    if (!n[this[i]]){
-      n[this[i]] = true;
-      r.push(this[i]);
-    }
-  }
-  return r;
 }
 
 

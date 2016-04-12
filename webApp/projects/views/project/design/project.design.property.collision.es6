@@ -122,7 +122,7 @@ App.Project.DesignCollision=Backbone.View.extend({
 		var that = $(event.target).closest('.collItem'),
 				collisionId = that.data('id'),
 				status = that.data('status'),
-				len = parseInt(($(".detailList").height() -25)/59);
+				len = parseInt(($(".detailList").height() -65)/59);
 		if(status == "2"){
 			App.Project.DesignAttr.CollisionTaskDetail.projectId = App.Project.Settings.projectId
 			App.Project.DesignAttr.CollisionTaskDetail.projectVersionId = App.Project.Settings.CurrentVersion.id

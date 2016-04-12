@@ -1,9 +1,9 @@
 .bim { position: relative; width: 100%; height: 100%; overflow: hidden; }
 .bim .view { width: 100%; height: 100%; }
 .bim .view:focus, .bim .view canvas:focus { outline: none; }
-.bim .select { cursor: default; }
-.bim .move { cursor: -webkit-grab; }
-.bim .fly { cursor: crosshair; }
+.bim.select { cursor: default; }
+.bim.move { cursor: -webkit-grab; }
+.bim.fly { cursor: crosshair; }
 
 /**
   * @name zhangyy-g@grandsoft.com.cn
