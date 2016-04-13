@@ -20,8 +20,8 @@
                 <span class="myDropText">
              <span>有无隐患：</span> <span class="text">全部</span> <i class="myDropArrorw"></i> </span>
                 <ul class="myDropList">
-                    <li class="myItem">全部</li>
-                    <li class="myItem">部分</li> 
+                    <li data-status="" class="myItem">全部</li>
+                    <li data-status="1" class="myItem">有</li> 
                 </ul>
             </div>
         </div>
@@ -29,7 +29,7 @@
    
 
         <div class="optonLine btnOption">
-            <input type="button" class="myBtn myBtn-primary" value="筛选" />
+            <input type="button" class="myBtn myBtn-primary btnFilter" value="筛选" />
         </div>
 
     </div>
@@ -54,4 +54,12 @@
             </table>
         </div>
     </div>
+</div>
+<div class="paginationBottom">
+  <div class="pageInfo">
+        <span class="curr">1</span>/<span class="pageCount">123</span>页
+        <span class="prev">上一页</span> <span class="next">下一页</span>
+    </div>
+    <div class="sumCount">共<span class="count">1</span>条</div>
+  
 </div>

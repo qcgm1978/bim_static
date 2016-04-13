@@ -15,7 +15,7 @@
             </div>
             <div class="myDropDown categoryOption optionComm">
                 <span class="myDropText">
-             <span>列别：</span> <span class="text">钢筋</span> <i class="myDropArrorw"></i> </span>
+             <span>类别：</span> <span class="text">钢筋</span> <i class="myDropArrorw"></i> </span>
                 <ul class="myDropList">
                     <li class="myItem">钢筋</li>
                     <li class="myItem">冷冻水</li>
@@ -28,8 +28,8 @@
                 <span class="myDropText">
              <span>状态：</span> <span class="text">全部</span> <i class="myDropArrorw"></i> </span>
                 <ul class="myDropList">
-                    <li class="myItem">全部</li>
-                    <li class="myItem">部分</li>
+                    <li data-status="1" class="myItem">全部</li>
+                    <li data-status="2" class="myItem">部分</li>
                 </ul>
             </div>
             <div class="searchName">
@@ -48,11 +48,9 @@
                 <input readonly="true" placeholder="开始时间" id="dateEnd" class="span2" type="text">
             </div>
         </div>
-
         <div class="optonLine btnOption">
-            <input type="button" class="myBtn myBtn-primary" value="筛选" />
+            <input type="button" class="myBtn myBtn-primary btnFilter" value="筛选" />
         </div>
-
     </div>
 </div>
 <div class="tbContainer">
@@ -79,4 +77,12 @@
             </table>
         </div>
     </div>
+</div>
+<div class="paginationBottom">
+  <div class="pageInfo">
+        <span class="curr">1</span>/<span class="pageCount">123</span>页
+        <span class="prev">上一页</span> <span class="next">下一页</span>
+    </div>
+    <div class="sumCount">共<span class="count">1</span>条</div>
+  
 </div>

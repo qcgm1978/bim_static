@@ -1,4 +1,4 @@
-<%for(var i=0;i<100;i++){%>
+<% $.each(data.items,function(i,item){%> 
     <tr class="<%= i%2==0 && 'odd' %>">
 
         <td class="concernInfo">
@@ -6,24 +6,34 @@
             <img class="ckImg mCS_img_loaded" src="/static/dist/images/projects/images/proDefault.png" alt="">
 
             <div class="ckHeader">
-                <div class="ckName">墙面防水高度不够</div> 
+                <div class="ckName"><%=item.title%></div> 
                 <div class="date">
-                    <span>创建日期：</span><span>2016-6-3</span>
+                    <span>创建日期：</span><span><%= new Date(item.createDate).format('yyyy-MM-dd') %></span>
                 </div>
                 <div class="date">
-                    <span>整改日期：</span><span>2016-6-3</span>
+                    <span>整改日期：</span><span><%= new Date(item.rectifyDate).format('yyyy-MM-dd') %></span>
                 </div>
                 <div class="upCount">
-                    <span>整改次数：</span><span>4</span>
+                    <span>整改次数：</span><span><%=item.rectifyCount%></span>
                 </div>
             </div>
 
         </td>
 
-        <td class="category">过程验收</td>
-        <td class="status">待整改</td>
-        <td class="grade">一般</td>
-        <td class="operator">总包单位</td>
-        <td class="type">安全文明</td>
+        <td class="category"><%=item.category%></td>
+        <td class="status"><%=item.status==1 && '待整改' || item.status==2 && '已整改' || '已关闭'   %></td>
+        <td class="grade"><%= item.level==1 && '一般' ||item.level==2 && '较大' ||item.level==3 && '重大' || '特大'  %></td>
+        <td class="operator"><%=item.reporter%></td>
+        <td class="type"><%=item.type%></td>
     </tr>
-<% } %>
+<% }) %>  
+ 
+
+
+<% if(data.items.length<=0){%>
+    
+    <tr>
+        <td colspan="9" class="noDataTd">暂无数据</td>
+    </tr>
+    
+<%}%>

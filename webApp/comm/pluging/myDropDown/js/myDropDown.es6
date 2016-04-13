@@ -32,7 +32,7 @@
  			 	$(this).closest(".myDropDown").find(".myDropText .text").text($(this).text());
 
  			 	if ($.isFunction(that.settings.click)) {
- 			 		that.settings.click.call(that);
+ 			 		that.settings.click.call(that,$(this));
  			 	} 
  				 $(document).trigger('click.myDropDown');
  			});

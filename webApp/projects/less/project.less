@@ -87,7 +87,7 @@
 				.ckHeader { margin-left: 84px; }
 			}
 		}
-	} 
+	}
 	.planBox { position: absolute; top: 52px; bottom: 0px; left: 0px; right: 0px;
 		&.planAnalog { top: -1px; }
 		&.planPlanPublicity { top: 0px;
@@ -103,7 +103,9 @@
 			}
 			.ckItem { width: 7%; }
 			.planId { width: 9%; }
-			.operationalMatters { width: 40%; .overflowEllipsis{width:98%;vertical-align: top;} }
+			.operationalMatters { width: 40%;
+				.overflowEllipsis { width: 98%; vertical-align: top; }
+			}
 			.start { width: 20%; }
 			.end { width: 20%; }
 		}
@@ -199,8 +201,7 @@
 		tbody { tr { background-color: #ddd; }
 		}
 	}
-} 
- 
+}
 .designVerification { select { width: 98%; }
 }
 .projectPropetyContainer { .designProperties { min-width: 398px; width: 100%; }
@@ -252,10 +253,10 @@
 		.sumCount { width: 9%; }
 		.lastDate { width: 20%; }
 	}
-	.tbContainer { position: absolute; top: 45px; bottom: 0px; left: 0px; right: 0px; overflow: auto;
+	.tbContainer { position: absolute; top: 45px; bottom: 32px; left: 0px; right: 0px; overflow: auto;
 		.materialequipmentList { margin-top: -31px; padding-top: 30px; height: 100%; min-width: 580px; width: 100%; }
 		.processAccessList, .openingacceptanceList { min-width: 398px; }
-		.concernList{min-width:540px;}
+		.concernList { min-width: 540px; }
 	}
 	.tbComm { td, th { border: 1px #ccc solid; text-align: center; }
 		th { height: 28px; line-height: 28px; }
@@ -283,9 +284,23 @@
 		.type { width: 11%; }
 		td { height: 98px; line-height: 98px; }
 	}
-	.tbConcernsBody { .concernInfo { line-height: 1.5;    vertical-align: top;    padding: 10px 0 0 10px; }
-		.ckImg { float: left;width:68px;height: 68px; }
+	.tbConcernsBody { .concernInfo { line-height: 1.5; vertical-align: top; padding: 10px 0 0 10px; }
+		.ckImg { float: left; width: 68px; height: 68px; }
 		.ckHeader { margin-left: 80px; text-align: left; }
-		.ckName{margin-bottom: 6px;}
+		.ckName { margin-bottom: 6px; }
+	}
+	.tbComm {
+		.noDataTd,.loadingTd { height: 60px; line-height: 60px; text-align: center; color: #ccc; font-size: 16px; border:0;}
+	}
+	
+	.paginationBottom { position: absolute; bottom: 0px; height: 30px; left: 0px; right: 0px; line-height: 30px;
+		.pageInfo, .sumCount { float: right; }
+		.sumCount { margin-right: 15px; }
+		.prev { margin-left: 10px; }
+		.next { margin-right: 15px; margin-left: 6px; }
+		.prev,.next{    cursor: pointer;color: #006ECF;
+			&:hover{text-decoration: underline;}
+			&.disable{color:#ccc;text-decoration: none;cursor: default;}
+		}
 	}
 }

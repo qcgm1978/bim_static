@@ -9,6 +9,7 @@ App.Project.QualityProcessAcceptance = Backbone.View.extend({
 
 	initialize: function() {
 		this.listenTo(App.Project.QualityAttr.ProcessAcceptanceCollection, "add", this.addOne);
+		this.listenTo(App.Project.QualityAttr.ProcessAcceptanceCollection, "reset", this.loading);
 	},
 
 
@@ -19,7 +20,9 @@ App.Project.QualityProcessAcceptance = Backbone.View.extend({
 
 
 	//渲染
-	render: function() {
+	render: function(options) {
+
+		this.ProcessAcceptanceOptions=options.ProcessAcceptance;
 
 		var tpl = _.templateUrl("/projects/tpls/project/quality/project.quality.property.processAcceptance.html", true);
 		this.$el.html(tpl);
@@ -30,10 +33,15 @@ App.Project.QualityProcessAcceptance = Backbone.View.extend({
 
 	//事件初始化
 	bindEvent() {
+		var that=this;
 		//隐患
-		this.$(".riskOption").myDropDown();
+		this.$(".riskOption").myDropDown({click:function($item){
+			that.ProcessAcceptanceOptions.problemCount=$item.data("status");
+		}});
 		//列别
-		this.$(".categoryOption").myDropDown();
+		this.$(".categoryOption").myDropDown({click:function($item){
+			that.ProcessAcceptanceOptions.category=$item.text();
+		}});
 		//显示搜索结果对应位置
 		this.$(".groupRadio").myRadioCk();
 	},
@@ -79,6 +87,12 @@ App.Project.QualityProcessAcceptance = Backbone.View.extend({
 			},
 			scrollInertia: 0
 		});
+	},
+	//加载
+	loading(){
+
+		this.$(".tbProcessAccessBody tbody").html(App.Project.Settings.loadingTpl);
+		 
 	}
 
 

@@ -1,6 +1,7 @@
 App.Project = {
 
 	Settings: {
+		loadingTpl:'<td colspan="10" class="loadingTd">正在加载，请稍候……</td>',
 		fetchNavType: 'file', // model file
 		projectNav: "design",
 		property: "",

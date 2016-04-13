@@ -75,11 +75,10 @@ App.API = {
 
 
 		// 质量
-		fetchQualityMaterialEquipment: "dataJson/project/project.design.property.json", //材料设备
-		fetchQualityProcessAcceptance: "dataJson/project/project.design.property.json", //过程验收
-		fetchQualityProcessCheck: "dataJson/project/project.design.property.json", //过程检查
-		fetchQualityOpeningAcceptance: "dataJson/project/project.design.property.json", //开业验收
-		fetchQualityConcerns: "dataJson/project/project.design.property.json", //隐患
+		fetchQualityMaterialEquipment: "sixD/{projectId}/{projectVersionId}/device", //材料设备?specialty={specialty}&category={category}&status={status}&name={name}&startTime={startTime}&endTime={endTime}&pageIndex={pageIndex}&pageItemCount={pageItemCount}
+		fetchQualityProcessAcceptance: "sixD/{projectId}/{projectVersionId}/acceptance?type=1", //过程验收 
+		fetchQualityOpeningAcceptance: "sixD/{projectId}/{projectVersionId}/acceptance?type=2", //开业验收
+		fetchQualityConcerns: "sixD/{projectId}/{projectVersionId}/problem", //隐患
 		fetchQualityProperties: "dataJson/project/project.design.property.json", // 属性
 
 
@@ -153,8 +152,8 @@ App.API = {
 		fetchCostProperties: "/dataJson/project/project.design.property.json", //属性
 
 		// 质量
-		fetchQualityMaterialEquipment: "", //sixD/{projectId}/{projectVersionId}/device  //材料设备 ?specialty={specialty}&category={category}&status={status}&name={name}&startTime={startTime}&endTime={endTime}&pageIndex={pageIndex}&pageItemCount={pageItemCount}
-		fetchQualityProcessAcceptance: "sixD/{projectId}/{projectVersionId}/device?specialty={specialty}&category={category}&type={type}&problemCount={problemCount}&pageIndex={pageIndex}&pageItemCount={pageItemCount}", //过程验收
+		fetchQualityMaterialEquipment: "/dataJson/project/project.design.property.json",  //材料设备
+		fetchQualityProcessAcceptance: "/dataJson/project/project.design.property.json", //过程验收
 		fetchQualityProcessCheck: "/dataJson/project/project.design.property.json", //过程检查
 		fetchQualityOpeningAcceptance: "/dataJson/project/project.design.property.json", //开业验收
 		fetchQualityConcerns: "/dataJson/project/project.design.property.json", //隐患

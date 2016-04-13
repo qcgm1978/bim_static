@@ -9,6 +9,7 @@ App.Project.QualityOpeningAcceptance=Backbone.View.extend({
 
 	initialize:function(){
 		this.listenTo(App.Project.QualityAttr.OpeningAcceptanceCollection,"add",this.addOne);
+		this.listenTo(App.Project.QualityAttr.OpeningAcceptanceCollection,"reset",this.loading);
 	},
 
 
@@ -19,7 +20,9 @@ App.Project.QualityOpeningAcceptance=Backbone.View.extend({
 
 
 	//渲染
-	render:function(){
+	render:function(options){
+
+		this.OpeningAcceptanceOptions=options.OpeningAcceptance;
 
 		var tpl=_.templateUrl("/projects/tpls/project/quality/project.quality.property.openingAcceptance.html");
 		this.$el.html(tpl); 
@@ -30,13 +33,21 @@ App.Project.QualityOpeningAcceptance=Backbone.View.extend({
 
 	//事件初始化
 	bindEvent(){
+
+		var that=this;
 		//隐患
-		this.$(".riskOption").myDropDown();
+		this.$(".riskOption").myDropDown({click:function($item){
+			that.OpeningAcceptanceOptions.problemCount=$item.data("status");
+		}});
 		//列别
-		this.$(".categoryOption").myDropDown();
+		this.$(".categoryOption").myDropDown({click:function($item){
+			that.OpeningAcceptanceOptions.category=$item.text();
+		}});
 
 		//专业
-		this.$(".specialitiesOption").myDropDown();
+		this.$(".specialitiesOption").myDropDown({click:function($item){
+			that.OpeningAcceptanceOptions.specialty=$item.text();
+		}});
 		
 		//显示搜索结果对应位置
 		this.$(".groupRadio").myRadioCk();
@@ -82,7 +93,15 @@ App.Project.QualityOpeningAcceptance=Backbone.View.extend({
 			},
 			scrollInertia: 0
 		});
+	},
+		//加载
+	loading(){
+
+		this.$(".tbOpeningacceptanceBody tbody").html(App.Project.Settings.loadingTpl);
+		 
 	}
+
+
 
 
 });

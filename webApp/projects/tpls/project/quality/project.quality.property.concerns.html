@@ -20,8 +20,9 @@
                 <span class="myDropText">
              <span>状态：</span> <span class="text">待整改</span> <i class="myDropArrorw"></i> </span>
                 <ul class="myDropList">
-                    <li class="myItem">待整改</li>
-                    <li class="myItem">已关闭</li>
+                    <li data-status="1" class="myItem">待整改</li>
+                    <li data-status="2" class="myItem">已整改</li>
+                    <li data-status="3" class="myItem">已关闭</li>
                 </ul>
             </div>
         </div>
@@ -36,10 +37,13 @@
             </div>
             <div class="myDropDown gradeOption optionComm">
                 <span class="myDropText">
-             <span>等级：</span> <span class="text">全部</span> <i class="myDropArrorw"></i> </span>
+             <span>等级：</span> <span class="text">一般</span> <i class="myDropArrorw"></i> </span>
                 <ul class="myDropList">
-                    <li class="myItem">全部</li>
-                    <li class="myItem">部分</li>
+                    <li data-status="1" class="myItem">一般</li>
+                    <li data-status="2" class="myItem">较大</li>
+                     <li data-status="3" class="myItem">重大</li>
+                      <li data-status="4" class="myItem">特大</li>
+
                 </ul>
             </div>
         </div>
@@ -56,16 +60,16 @@
         <div class="optonLine">
             <div class="firstDate dateBox" style="position: relative;">
                 <i class="iconCal add-on"></i>
-                <input readonly="true" placeholder="开始时间" id="dateStar" class="span2" type="text">
+                <input readonly="true" placeholder="开始时间" id="dateStar2" class="span2" type="text">
             </div>
             <span>-</span>
             <div class="firstDate dateBox">
                 <i class="iconCal"></i>
-                <input readonly="true" placeholder="开始时间" id="dateEnd" class="span2" type="text">
+                <input readonly="true" placeholder="开始时间" id="dateEnd2" class="span2" type="text">
             </div>
         </div>
         <div class="optonLine btnOption">
-            <input type="button" class="myBtn myBtn-primary" value="筛选" />
+            <input type="button" class="myBtn myBtn-primary btnFilter" value="筛选" />
         </div>
     </div>
 </div>
@@ -93,4 +97,12 @@
             </table>
         </div>
     </div>
+</div>
+<div class="paginationBottom">
+  <div class="pageInfo">
+        <span class="curr">1</span>/<span class="pageCount">123</span>页
+        <span class="prev">上一页</span> <span class="next">下一页</span>
+    </div>
+    <div class="sumCount">共<span class="count">1</span>条</div>
+  
 </div>

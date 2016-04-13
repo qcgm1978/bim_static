@@ -1,8 +1,17 @@
-<%for(var i=0;i<100;i++){%>
+<% $.each(data.items,function(i,item){%> 
     <tr class="<%= i%2==0 && 'odd' %>">
         <td class="manifestIcon"></td>
-        <td class="category">类别</td>
-        <td class="positon">位置</td>
-        <td class="ckResult">检查结果</td>
+        <td class="category"><%=item.category%></td>
+        <td class="positon"><%=item.location%></td>
+        <td class="ckResult"><%=item.problemCount%>/<%=item.checkCount%></td>
     </tr>
-<% } %>
+<% }) %> 
+
+
+<% if(data.items.length<=0){%>
+    
+    <tr>
+        <td colspan="9" class="noDataTd">暂无数据</td>
+    </tr>
+    
+<%}%>

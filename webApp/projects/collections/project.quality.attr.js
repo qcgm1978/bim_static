@@ -45,13 +45,8 @@ App.Project.QualityAttr = {
 			}
 		}),
 
-		urlType: "fetchQualityProcessCheck",
+		urlType: "fetchQualityProcessCheck"
 
-		parse: function(response) {
-			if (response.message == "success") {
-				return response.data;
-			}
-		}
 
 	})),
 
@@ -66,13 +61,9 @@ App.Project.QualityAttr = {
 			}
 		}),
 
-		urlType: "fetchQualityOpeningAcceptance",
+		urlType: "fetchQualityOpeningAcceptance"
 
-		parse: function(response) {
-			if (response.message == "success") {
-				return response.data;
-			}
-		}
+	
 
 	})),
 
@@ -88,13 +79,9 @@ App.Project.QualityAttr = {
 			}
 		}),
 
-		urlType: "fetchQualityConcerns",
+		urlType: "fetchQualityConcerns"
 
-		parse: function(response) {
-			if (response.message == "success") {
-				return response.data;
-			}
-		}
+		
 
 	})),
 
@@ -109,14 +96,9 @@ App.Project.QualityAttr = {
 			}
 		}),
 
-		urlType: "fetchQualityProperties",
+		urlType: "fetchQualityProperties"
 
-		parse: function(response) {
-			if (response.message == "success") {
-				return response.data;
-			}
-		}
-
+		
 	}))
 
 
