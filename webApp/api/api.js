@@ -63,7 +63,7 @@ App.API = {
 		//计划
 		fetchPlanModel: "sixD/{projectId}/{projectVersionId}/plan", //模型
 		fetchPlanAnalog: "dataJson/project/project.design.property.json", //模拟
-		fetchPlanPublicity: "dataJson/project/project.design.property.json", //关注
+		fetchPlanPublicity: "sixD/{projectId}/{projectVersionId}/plan/concern", //关注 ?queryType={queryType}
 		fetchPlanInspection: "dataJson/project/project.design.property.json", //检验
 		fetchPlanProperties: "dataJson/project/project.design.property.json", //属性
 
@@ -141,7 +141,7 @@ App.API = {
 		//计划
 		fetchPlanModel: "/dataJson/project/project.design.property.json", //模型
 		fetchPlanAnalog: "/dataJson/project/project.design.property.json", //模拟
-		fetchPlanPublicity: "/dataJson/project/project.design.property.json", //关注
+		fetchPlanPublicity: "/dataJson/project/plan/publicity.json", //关注
 		fetchPlanInspection: "/dataJson/project/project.design.property.json", //检验
 		fetchPlanProperties: "/dataJson/project/project.design.property.json", //属性
 
@@ -153,8 +153,8 @@ App.API = {
 		fetchCostProperties: "/dataJson/project/project.design.property.json", //属性
 
 		// 质量
-		fetchQualityMaterialEquipment: "/dataJson/project/project.design.property.json", //材料设备
-		fetchQualityProcessAcceptance: "/dataJson/project/project.design.property.json", //过程验收
+		fetchQualityMaterialEquipment: "", //sixD/{projectId}/{projectVersionId}/device  //材料设备 ?specialty={specialty}&category={category}&status={status}&name={name}&startTime={startTime}&endTime={endTime}&pageIndex={pageIndex}&pageItemCount={pageItemCount}
+		fetchQualityProcessAcceptance: "sixD/{projectId}/{projectVersionId}/device?specialty={specialty}&category={category}&type={type}&problemCount={problemCount}&pageIndex={pageIndex}&pageItemCount={pageItemCount}", //过程验收
 		fetchQualityProcessCheck: "/dataJson/project/project.design.property.json", //过程检查
 		fetchQualityOpeningAcceptance: "/dataJson/project/project.design.property.json", //开业验收
 		fetchQualityConcerns: "/dataJson/project/project.design.property.json", //隐患

@@ -47,11 +47,22 @@ App.Project.PlanAttr={
 
 		urlType:"fetchPlanPublicity",
 
-		parse:function(response){
-			if (response.message == "success") {
-                 return response.data;
-             }
-		}
+		 
+	})),
+
+	  PlanPublicityCollectionMonth: new(Backbone.Collection.extend({
+	 
+		model: Backbone.Model.extend({
+			defaults: function() {
+				return {
+					title: ""
+				}
+			}
+		}),
+
+		urlType:"fetchPlanPublicity",
+
+		 
 
 	})),
 

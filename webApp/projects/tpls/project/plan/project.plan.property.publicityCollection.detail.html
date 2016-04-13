@@ -1,0 +1,12 @@
+<% $.each(data,function(i,item){%>
+<tr class="<%= i%2==0 && 'odd' || '' %>">
+    <td class="ckItem">o</td>
+    <td class="planId"><%= item.no %></td>
+    <td class="operationalMatters"> <div class="overflowEllipsis"> <%= item.businessItem %> </div> </td>
+    <td class="start"><%= new Date(item.planStartTime).format('yyyy-MM-dd') %></td>
+    <td class="end"><%= new Date(item.planEndTime).format('yyyy-MM-dd') %></td>
+</tr>
+
+<%})%>
+
+

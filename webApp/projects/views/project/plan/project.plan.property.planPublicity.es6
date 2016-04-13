@@ -1,28 +1,36 @@
-
-
 //关注
 App.Project.PlanPublicity = Backbone.View.extend({
 
 	tagName: "div",
 
-	className: "planPublicity",
+	className: "planPublicity",	 
 
 	initialize: function() {
 		this.listenTo(App.Project.PlanAttr.PlanPublicityCollection, "add", this.addOne);
+		this.listenTo(App.Project.PlanAttr.PlanPublicityCollectionMonth, "add", this.addOneMonth); 
 	},
 
 	render: function() {
-		 
-		this.$el.html("正在加载，请稍后……");
+		var tpl = _.templateUrl("/projects/tpls/project/plan/project.plan.property.publicityCollection.html");
+		this.$el.html(tpl);
 		return this;
 	},
 
-	template:_.templateUrl("/projects/tpls/project/plan/project.plan.property.publicityCollection.html"),
+	template: _.templateUrl("/projects/tpls/project/plan/project.plan.property.publicityCollection.detail.html"),
 
 
+
+	//周
 	addOne: function(model) {
-	 	var data=model.toJSON();
-		this.$el.html(this.template(data));
+
+		var data = model.toJSON();
+		this.$(".tbPlanWeek tbody").html(this.template(data));
+	},
+
+	//月份
+	addOneMonth: function(model) {
+		var data = model.toJSON();
+		this.$(".tbPlanMonth tbody").html(this.template(data));
 	}
 
 

@@ -87,40 +87,7 @@
 				.ckHeader { margin-left: 84px; }
 			}
 		}
-	}
-	.collBox { overflow: auto;
-		.collTips { text-align: center; padding-top: 50px; font-size: 14px;
-			.nothingIcon { width: 80px; height: 80px; display: inline-block; background: url(../images/collision.png) no-repeat; background-position: 0 0; }
-			.runningIcon { width: 80px; height: 80px; display: inline-block; background: url(../images/collision.png) no-repeat; background-position: 0 -80px; }
-			.failedIcon { width: 80px; height: 80px; display: inline-block; background: url(../images/collision.png) no-repeat; background-position: 0 -160px; }
-			p { margin: 1em 0; color: #ccc; }
-			a { color: #006ecf; }
-		}
-		.ckTable { width: 100%; min-width: 390px;
-			th { height: 24px; line-height: 24px; text-align: center; }
-			td, th { border: 1px #ccc solid; }
-			.collList { width: 85%; }
-			.collLev { width: 15%; }
-			.selected { background: #cef0ff; }
-			tbody { td { padding-top: 10px; padding-bottom: 10px; vertical-align: middle; text-align: center; }
-				.collList { text-align: left;
-					.ckImg { float: left; padding: 0px 10px; }
-					.ckHeader { margin-left: 84px;
-						.ckName { color: #000; }
-						.date { color: #ccc; margin-top: 10px; }
-					}
-				}
-			}
-			tfoot { th { padding: 0 10px; background: #e4e4e4; text-align: right; }
-				.pointTotal { float: left; }
-				a { color: #006ecf; text-decoration: none;
-					&.disabled { color: #ccc; }
-				}
-				.cur { color: #006ecf; }
-			}
-		}
-	}
-	.detailList { height: 100%; overflow-x: hidden; overflow-y: auto; padding: 46px 0 40px; }
+	} 
 	.planBox { position: absolute; top: 52px; bottom: 0px; left: 0px; right: 0px;
 		&.planAnalog { top: -1px; }
 		&.planPlanPublicity { top: 0px;
@@ -136,7 +103,7 @@
 			}
 			.ckItem { width: 7%; }
 			.planId { width: 9%; }
-			.operationalMatters { width: 40%; }
+			.operationalMatters { width: 40%; .overflowEllipsis{width:98%;vertical-align: top;} }
 			.start { width: 20%; }
 			.end { width: 20%; }
 		}
@@ -232,34 +199,8 @@
 		tbody { tr { background-color: #ddd; }
 		}
 	}
-}
-.rightProperty .designCollision { height: 100%; position: relative; }
-.designCollSetting { font-size: 14px;
-	.collLabel { display: table; width: 100%; margin-bottom: 10px;
-		.labelName { width: 1%; white-space: nowrap; display: table-cell; padding-right: 5px; }
-		.labelInput { width: 100%; height: 30px; padding: 0 5px; border: 1px solid #ccc; border-radius: 0; outline: none; }
-	}
-	.formTree { padding: 10px;
-		&:after { content: ''; display: table; clear: both; }
-		.panel { width: 50%; float: left; height: 240px; border: 1px solid #ccc; margin-left: -10px; position: relative;
-			.panelHead { position: absolute; padding: 5px; background: #fff; left: 10px; top: -13px; color: #999; }
-		}
-		.panel + .panel { float: right; margin-right: -10px; }
-		.tree { margin: 20px 0 10px; padding: 0 10px; height: 210px; overflow-x: hidden; overflow-y: auto;
-			.treeView { padding-left: 10px;
-				.itemContent { display: block; padding: 4px 0;
-					.nodeSwitch { display: inline-block; width: 10px; height: 10px; margin-right: 5px; background: url(/comm/images/commIcon.png) no-repeat 0 -39px; }
-					.fileIcon { display: inline-block; width: 16px; height: 13px; margin-right: 5px; background: url(/comm/images/commIcon.png) no-repeat 0 -500px; }
-					.inputCheckbox { float: right; }
-				}
-				.itemContent.open { .nodeSwitch { background-position: 0 -49px; }
-					&+.subTree { display: block; }
-				}
-				.subTree { padding-left: 15px; display: none; }
-			}
-		}
-	}
-}
+} 
+ 
 .designVerification { select { width: 98%; }
 }
 .projectPropetyContainer { .designProperties { min-width: 398px; width: 100%; }
