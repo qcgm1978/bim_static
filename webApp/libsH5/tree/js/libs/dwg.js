@@ -18,7 +18,8 @@ var dwgViewer = function(options){
     }
   });
   var getDwg = function(res){
-    var modelTab=[],currentFile;
+    var modelTab=[],currentFile,
+        container = $('<div class="mod-view"></div>');
     $.each(res,function(i,item){
       modelTab.push({
         name:item.Name,
@@ -26,10 +27,8 @@ var dwgViewer = function(options){
         res:item.Representations
       });
     });
-    self.render(modelTab[0].res);
-  }
-  var addColltrol = function(){
-    var tmp = ''
+    self._opt.container.append(container);
+    self.addControll(modelTab,container);
   }
   var dwgView = self.dwgView = {
 
@@ -174,7 +173,7 @@ var dwgViewer = function(options){
       var rect = self.__rect
 
       if (rect.is(':hidden')) return false
-      var offset = rect.offset()
+      var position = rect.position()
       var tw = self.__viewWidth
       var th = self.__viewHeight
       var w = rect.width()
@@ -197,10 +196,10 @@ var dwgViewer = function(options){
       }
 
       zoomScale = zoomScale * fact
-
+      var o
       var point = {
-        top: offset.top + h / 2,
-        left: offset.left + w / 2
+        top: position.top + h / 2,
+        left: position.left + w / 2
       }
 
 
@@ -775,40 +774,45 @@ var dwgViewer = function(options){
   }
 
   dwgView.__tpl = '' +
-    '<div class="mod-dwg">' +
-    '   <div class="scene">' +
-    '       <div class="view"></div>' +
-    '   </div>' +
-    '   <div class="rect"></div>' +
-    '</div>'
+    '<div class="mod-dwg">'+
+    '    <div class="scene">' +
+    '        <div class="view"></div>' +
+    '    </div>'+
+    '    <div class="rect"></div>' +
+    '</div>';
 
   dwgView.__tileTpl = '' +
     '<img class="tile" data-row="<%= tile.row %>" data-col="<%= tile.col %>" data-level="<%= tile.level %>" src="<%= tile.src %>" style="top:<%= tile.top %>px;left:<%= tile.left %>px;" />'
 }
 dwgViewer.prototype = {
-  render:function(model){
+  render:function(model,element){
     var self = this,
         currentFile;
     $.each(model,function(i,file){
       if(file.MIME == "image/tiles"){
         return currentFile = file;
       }
-    })
-    self.dwgView.init(self._opt.container, {
+    });
+    self.dwgView.init(element, {
       lod: {
         maxLevel: parseInt(currentFile.Attributes.DwgLevel, 10),
         ext: currentFile.Attributes.DwgExt || 'jpg',
         url: "/model/"+ self._opt.sourceId + '/' + currentFile.Path
       }
-    })
+    });
   },
   fit:function(){
     var self = this;
     self.dwgView.fit();
   },
+  pan:function(){
+    var self = this;
+    self.dwgView.setState('none');
+  },
   zoom:function(){
     var self = this;
-    self.dwgView.zoom();
+    // self.dwgView.zoom();
+    self.dwgView.setState('zoom');
   },
   zoomIn:function(){
     var self = this;
@@ -819,7 +823,46 @@ dwgViewer.prototype = {
     self.dwgView.zoomOut();
   },
   rectZoom:function(){
+    var self = this,
+        state = self.dwgView.__state;
+    self.dwgView.setState('rectzoom');
+  },
+  addControll:function(model,container){
     var self = this;
-    self.dwgView.setState('rectzoom')
+    var list = $('<ul class="mod-list"></ul>');
+    $.each(model,function(i,item){
+      var tmp = $("<li></li>").text(item.name).data(item.res);
+      list.append(tmp);
+      if(i == 0){
+        tmp.trigger('click');
+      }
+    });
+    var modBar = $('<div class="mod-bar">'+
+    '  <i class="bar-item bar-fit" data-fn="fit"></i>'+
+    '  <i class="bar-item bar-pan selected" data-fn="pan"></i>'+
+    '  <i class="bar-item bar-zoom" data-fn="zoom"></i>'+
+    '  <i class="bar-item bar-zoomRect" data-fn="rectZoom"></i>'+
+    '  <div class="mod-select">'+
+    '    <span class="cur"></span>'+
+    '  </div>'+
+    '</div>');
+    modBar.find('.mod-select').append(list);
+    container.append(modBar);
+    modBar.on("click",'.mod-select .cur',function(){
+      $(this).toggleClass('open');
+    }).on("click",'.mod-select li',function(){
+      var $this = $(this),
+          val  = $this.text(),
+          $cur = $this.parent().prev(),
+          data = $this.data();
+      self.render(data,container);
+      $cur.text(val).removeClass('open');
+    }).on('click',".bar-item",function(){
+      var $this = $(this),
+          fn = $this.data('fn');
+      $this.not('.bar-fit').addClass('selected').siblings(':not(.bar-fit)').removeClass('selected');
+      self[fn]();
+    });
+    modBar.find(".mod-list li:last").trigger("click");
   }
 }
