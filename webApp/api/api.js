@@ -54,7 +54,8 @@ App.API = {
 		fetchDesignCategory:"view/{etag}/{sourceId}/collision/categories",// 构件列表
 		fetchDesignTaskList:"view/{projectId}/{projectVerionId}/collision/setting/list",//碰撞任务列表
 		fetchDesignTaskDetail:"sixD/{projectId}/{projectVersionId}/{collisionId}/point?pageNo={pageNo}&pageSize={pageSize}",//碰撞点列表
-		creatCollisionTask:"view/{projectId}/{projectVerionId}/collision/setting",//碰撞任务详情
+		creatCollisionTask:"view/{projectId}/{projectVersionId}/collision/setting",//创建碰撞任务
+		fetchDesignSetting:"view/{projectId}/{projectVersionId}/{collision}/setting",//查看碰撞设置
 
 		// 模型对比
 		fetchDesignChange:"view/{projectId}/{projectVersionId}/comparison", // 获取模型对比列表

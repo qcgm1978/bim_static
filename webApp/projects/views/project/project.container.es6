@@ -27,7 +27,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		return this;
 	},
 
-	//点击面包靴
+	//点击面包�
 	breadItemClick: function(event) {
 
 		var $target = $(event.target).closest(".breadItem");
@@ -66,7 +66,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			limitHeight: false,
 			title: '新建任务',
 			cssClass: 'task-create-dialog',
-			okText: '添&nbsp;&nbsp;加',
+			okText: '�nbsp;&nbsp;�,
 			message: "内容"
 		})*/
 	},
@@ -155,7 +155,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 	},
 
 
-	//显示和隐藏
+	//显示和隐�
 	navBarShowAndHide: function(event) {
 		var $target = $(event.target);
 		if ($target.closest(".leftNav").length > 0) {
@@ -194,7 +194,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 
 	},
 
-	//切换模型浏览器 和 文件浏览器
+	//切换模型浏览��文件浏览�
 	switchFileMoldel(event) {
 
 		var $target = $(event.target).closest("li"),
@@ -205,11 +205,11 @@ App.Project.ProjectContainer = Backbone.View.extend({
 
 		if (type == "file") {
 
-			//左右侧
+			//左右�
 			$projectContainer.find(".rightProperty").removeClass("showPropety");
 			$projectContainer.find(".leftNav").show();
 
-			//切换时记录大小
+			//切换时记录大�
 			var mRight = $projectCotent.css("margin-right");
 			$projectCotent.css({
 				"margin-right": "0px",
@@ -254,7 +254,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 
 		var $projectContainer = $("#projectContainer"),
 			$projectCotent = $projectContainer.find(".projectCotent");
-		//左右侧
+		//左右�
 		$projectContainer.find(".leftNav").hide();
 
 		var mRight = $projectCotent.data("mRight") || 398;
@@ -296,7 +296,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 					App.Project.Settings.DataModel = data.data;
 					that.renderModel();
 				} else {
-					alert("模型转换中");
+					alert("模型转换�);
 				}
 			} else {
 				alert(data.message);
@@ -311,17 +311,18 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		var that = this;
 		this.typeContentChange();
 
-		//渲染模型属性
+		//渲染模型属�
 		App.Project.renderModelContentByType();
 
 		 return;
+		 
 
-		var viewer = App.Comm.createModel({
+		var viewer = App.Project.Settings.Viewer = App.Comm.createModel({
 			element: $("#projectContainer .modelContainerContent"),
 			sourceId: App.Project.Settings.DataModel.sourceId,
 			etag: App.Project.Settings.DataModel.etag
-		});  
-		  
+		});
+
 		viewer.on('viewpoint', function(point) {
 			$("#projectContainer .projectNavModelContainer .tree-view:eq(1) .item-content:eq(0)").addClass('open')
 			App.Project.ViewpointAttr.ListCollection.add({
@@ -334,7 +335,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		})
 
 		viewer.on("click", function(model) {
-		 
+
 			App.Project.Settings.ModelObj = null;
 
 			if (!model.intersect) {
@@ -383,7 +384,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			property = App.Project.Settings.property,
 			Intersect = App.Project.Settings.ModelObj.intersect;
 
-		//属性，四个tab 都一样
+		//属性，四个tab 都一�
 		if (((projectNav == "design" || projectNav == "cost" || projectNav == "quality" || projectNav == "plan") && property == "poperties")) {
 
 			App.Project.DesignAttr.PropertiesCollection.projectId = App.Project.Settings.projectId;

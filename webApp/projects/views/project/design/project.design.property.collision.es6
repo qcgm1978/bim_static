@@ -18,7 +18,7 @@ App.Project.DesignCollision=Backbone.View.extend({
 		this.$el.html(this.template);
 		this.$el.find(".collBox").html(new App.Project.DesignCollisionDetail().render().el);
 		this.$el.find(".selectBox").append(new App.Project.DesignCollisionTaskList().render().el);
-		App.Project.DesignAttr.CollisionTaskDetail.add({message:"nothing"});
+		App.Project.DesignAttr.CollisionTaskDetail.add({message:"none"});
 		return this;
 	},
 
@@ -68,7 +68,7 @@ App.Project.DesignCollision=Backbone.View.extend({
 				formData.leftFiles = getSpecialty(treeA);
 				formData.rightFiles = getSpecialty(treeB);
 				formData.projectId = App.Project.Settings.projectId;
-				formData.projectVerionId = App.Project.Settings.CurrentVersion.id;
+				formData.projectVersionId = App.Project.Settings.CurrentVersion.id;
 				if(!formData.name){
 					$("#taskName").addClass("error");
 					return false;
@@ -117,13 +117,17 @@ App.Project.DesignCollision=Backbone.View.extend({
 	},
 
 	getDetail:function(event){
-		var list = this.$el.find('.collSelect');
-		list.hide();
-		var that = $(event.target).closest('.collItem'),
+		var list = this.$el.find('.collSelect'),
+				self = $(event.target),
+				that = self.closest('.collItem'),
 				collisionId = that.data('id'),
 				status = that.data('status'),
-				len = parseInt(($(".detailList").height() -65)/59);
+				len = parseInt(($(".detailList").height() -65)/59),
+				currentInput = list.prev();
+		currentInput.val(self.text());
+		list.hide();
 		if(status == "2"){
+			App.Project.Settings.collisionId = collisionId;
 			App.Project.DesignAttr.CollisionTaskDetail.projectId = App.Project.Settings.projectId
 			App.Project.DesignAttr.CollisionTaskDetail.projectVersionId = App.Project.Settings.CurrentVersion.id
 			App.Project.DesignAttr.CollisionTaskDetail.collisionId = collisionId
