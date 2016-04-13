@@ -65,7 +65,7 @@ App.Project.DesignAttr={
 
 	})),
 
-	// 碰撞任务列表
+	// 碰撞点列表
 	CollisionTaskDetail: new(Backbone.Collection.extend({
 
 		model: Backbone.Model.extend({
@@ -78,6 +78,21 @@ App.Project.DesignAttr={
 
 		urlType:"fetchDesignTaskDetail"
 
+
+	})),
+
+	// 碰撞文件列表
+	CollisionSetting: new(Backbone.Collection.extend({
+
+		model: Backbone.Model.extend({
+			defaults: function() {
+				return {
+					title: ""
+				}
+			}
+		}),
+
+		urlType:"fetchDesignSetting"
 
 	})),
 

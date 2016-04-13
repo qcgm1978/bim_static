@@ -9,7 +9,8 @@ App.Project.DesignCollisionDetail=Backbone.View.extend({
   events:{
     "click tr":"setCollisionPoint",
     "click .prePage":"prePage",
-    "click .nextPage":"nextPage"
+    "click .nextPage":"nextPage",
+    "click .viewSetting":"showSetting"
   },
 
 	template:_.templateUrl("/projects/tpls/project/design/project.design.collision.detail.html"),
@@ -26,12 +27,12 @@ App.Project.DesignCollisionDetail=Backbone.View.extend({
   addCollisionDetail:function(model){
     // 加载碰撞点列表
     var data=model.toJSON();
-    if(data.data){
-      this.list = data.data.list;
-    }
     if(data.message=="success"){
-      this.prePage = data.data.page.prePage;
-      this.nextPage = data.data.page.nextPage;
+      var pageIndex = data.data.pageIndex,
+          pageCount = data.data.pageCount;
+      this.list = data.data.items;
+      this.prePage = pageIndex - 1
+      this.nextPage = pageIndex + 1;
     }
     this.$el.html(this.template(data))
     return this;
@@ -50,7 +51,7 @@ App.Project.DesignCollisionDetail=Backbone.View.extend({
         App.Project.Settings.Viewer.highlight(ids);
         App.Project.Settings.Viewer.zoomBox(box);
       }
-    })
+    });
     that.toggleClass("selected").siblings().removeClass("selected");
   },
 
@@ -72,6 +73,29 @@ App.Project.DesignCollisionDetail=Backbone.View.extend({
       App.Project.DesignAttr.CollisionTaskDetail.pageNo = this.nextPage;
       App.Project.DesignAttr.CollisionTaskDetail.fetch();
     }
+  },
+
+  showSetting:function(){
+    var that = this;
+    var dialog = new App.Comm.modules.Dialog({
+      width: 580,
+      height:360,
+      limitHeight: false,
+      title: '碰撞检查设置',
+      cssClass: 'task-create-dialog',
+      message: "",
+      okText: '确&nbsp;&nbsp;认',
+      readyFn:function(){
+        this.element.find(".content").html(new App.Project.ProjectViewSetting().render().el);
+        App.Project.DesignAttr.CollisionSetting.projectId = App.Project.Settings.projectId;
+        App.Project.DesignAttr.CollisionSetting.projectVersionId = App.Project.Settings.CurrentVersion.id;
+        App.Project.DesignAttr.CollisionSetting.collision = App.Project.Settings.collisionId;
+        App.Project.DesignAttr.CollisionSetting.fetch();
+      },
+      okCallback:function(){
+
+      }
+    })
   }
 });
 
