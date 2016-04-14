@@ -53,7 +53,6 @@ var BIM = function(option){
     if(_opt.tools){
       BIM.util.controll();
     }
-    self.handle();
     BIM.util.pub('loaded',res);
   }
   var changed = function(res){
@@ -662,7 +661,7 @@ BIM.prototype = {
   handle : function () {
     BIM.util.pub('handle');
     BIM.common.viewer.setPanMode();
-    BIM.common.bimBox.className = 'bim move';
+    BIM.common.bimBox.className = 'bim';
     BIM.util.changeClass('bar-handle','bar-item','selected');
     BIM.util.toggleSectionBar('hide');
     BIM.util.toggleCameraToolsBar('hide');

@@ -12244,6 +12244,8 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
     // the orbit center
     this.pivot = null;
 
+    this.movementSpeed = 0.05;
+
     // This option actually enables dollying in and out; left as "zoom" for
     // backwards compatibility
     this.noZoom = false;
@@ -12282,7 +12284,8 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
     this.noKeys = false;
 
     // The four arrow keys
-    this.keys = {LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40};
+    //this.keys = {LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40};
+    this.keys = {BACKSPACE: 8, LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40, A: 65, D: 68, E: 69, Q: 81, S: 83, W: 87};
 
     var scope = this;
     var EPS = 0.000001;
@@ -13158,6 +13161,28 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
 
         this.update(true);
     };
+
+    this.goBack = function(step) {
+
+        var position = this.object.position;
+        var target = this.target;
+
+        var eye = target.clone().sub(position);
+        this.object.translateZ( step );
+        target.addVectors(position, eye);
+    };
+
+    // 前进
+    this.goForward =  function (step) {
+
+        var position = this.object.position;
+        var target = this.target;
+
+        var eye = target.clone().sub(position);
+        this.object.translateZ( - step );
+        target.addVectors(position, eye);
+    };
+
 };
 CLOUD.OrbitEditor = function (cameraEditor, scene, domElement) {
     "use strict";
@@ -13297,23 +13322,42 @@ CLOUD.OrbitEditor.prototype.onKeyDown = function (event) {
 
     switch (event.keyCode) {
         case camera_scope.keys.UP:
+        case camera_scope.keys.Q:
+            camera_scope.beginPan();
             camera_scope.pan(0, -camera_scope.keyPanSpeed);
-            camera_scope.update();
+            camera_scope.update(true);
             break;
 
         case camera_scope.keys.BOTTOM:
+        case camera_scope.keys.E:
+            camera_scope.beginPan();
             camera_scope.pan(0, camera_scope.keyPanSpeed);
-            camera_scope.update();
+            camera_scope.update(true);
             break;
 
         case camera_scope.keys.LEFT:
+        case camera_scope.keys.A:
+            camera_scope.beginPan();
             camera_scope.pan(-camera_scope.keyPanSpeed, 0);
-            camera_scope.update();
+            camera_scope.update(true);
             break;
 
         case camera_scope.keys.RIGHT:
+        case camera_scope.keys.D:
+            camera_scope.beginPan();
             camera_scope.pan(camera_scope.keyPanSpeed, 0);
-            camera_scope.update();
+            camera_scope.update(true);
+            break;
+
+        case camera_scope.keys.W:
+            //camera_scope.beginPan();
+            camera_scope.goForward(camera_scope.movementSpeed);
+            camera_scope.update(true);
+            break;
+        case camera_scope.keys.S:
+            //camera_scope.beginPan();
+            camera_scope.goBack(camera_scope.movementSpeed);
+            camera_scope.update(true);
             break;
     }
 };
@@ -13882,6 +13926,8 @@ CLOUD.FlyEditor = function (cameraEditor, scene, domElement) {
     this.scene = scene;
     this.domElement = (domElement !== undefined) ? domElement : document;
 
+    this.isFirstPerson = true;
+
     // API
     this.movementSpeed = 0.005 * CLOUD.GlobalData.SceneScale; // 前后左右上下移动速度
     this.movementSpeedMultiplier = 1; // 速度放大器
@@ -14089,114 +14135,156 @@ CLOUD.FlyEditor.prototype = {
 
     // 前进
     goForward: function (step) {
-        var eye = this.cameraEditor.object.position;
+        var position = this.cameraEditor.object.position;
         var target = this.cameraEditor.target;
 
-        // 新的target和eye在Y轴上的坐标不变
-        var diff = new THREE.Vector3(target.x - eye.x, 0, target.z - eye.z);
-        var len = diff.length();
-        var coe = step / len;
-        var stepDiff = new THREE.Vector3(diff.x * coe, 0, diff.z * coe);
+        if (this.isFirstPerson) {
+            var eye = target.clone().sub(position);
+            this.cameraEditor.object.translateZ( - step );
+            target.addVectors(position, eye);
+        } else {
+            // 新的target和eye在Y轴上的坐标不变
+            var diff = new THREE.Vector3(target.x - position.x, 0, target.z - position.z);
+            var len = diff.length();
+            var coe = step / len;
+            var stepDiff = new THREE.Vector3(diff.x * coe, 0, diff.z * coe);
 
-        eye.add(stepDiff);
-        target.add(stepDiff);
+            position.add(stepDiff);
+            target.add(stepDiff);
+        }
+
     },
 
     // 后退
     goBack: function (step) {
-        var eye = this.cameraEditor.object.position;
+        var position = this.cameraEditor.object.position;
         var target = this.cameraEditor.target;
 
-        // 新的target和eye在Y轴上的坐标不变
-        var diff = new THREE.Vector3(target.x - eye.x, 0, target.z - eye.z);
-        var len = diff.length();
-        var coe = step / len;
-        var stepDiff = new THREE.Vector3(-diff.x * coe, 0, -diff.z * coe);
+        if (this.isFirstPerson) {
+            var eye = target.clone().sub(position);
+            this.cameraEditor.object.translateZ( step );
+            target.addVectors(position, eye);
+        } else {
 
-        eye.add(stepDiff);
-        target.add(stepDiff);
+            // 新的target和eye在Y轴上的坐标不变
+            var diff = new THREE.Vector3(target.x - position.x, 0, target.z - position.z);
+            var len = diff.length();
+            var coe = step / len;
+            var stepDiff = new THREE.Vector3(-diff.x * coe, 0, -diff.z * coe);
+
+            position.add(stepDiff);
+            target.add(stepDiff);
+        }
     },
 
     // 左移
     goLeft: function (step) {
-        var eye = this.cameraEditor.object.position;
+        var position = this.cameraEditor.object.position;
         var target = this.cameraEditor.target;
 
-        // 新的target和eye在Y轴上的坐标不变
-        var diff = new THREE.Vector3(target.x - eye.x, 0, target.z - eye.z);
-        var len = diff.length();
-        var coe = step / len;
-        var stepDiff = new THREE.Vector3(diff.z * coe, 0, -diff.x * coe);
+        if (this.isFirstPerson) {
+            var eye = target.clone().sub(position);
+            this.cameraEditor.object.translateX( - step );
+            target.addVectors(position, eye);
+        } else {
 
-        eye.add(stepDiff);
-        target.add(stepDiff);
+            // 新的target和eye在Y轴上的坐标不变
+            var diff = new THREE.Vector3(target.x - position.x, 0, target.z - position.z);
+            var len = diff.length();
+            var coe = step / len;
+            var stepDiff = new THREE.Vector3(diff.z * coe, 0, -diff.x * coe);
+
+            position.add(stepDiff);
+            target.add(stepDiff);
+        }
     },
 
     // 右移
     goRight: function (step) {
-        var eye = this.cameraEditor.object.position;
+        var position = this.cameraEditor.object.position;
         var target = this.cameraEditor.target;
 
-        // 新的target和eye在Y轴上的坐标不变
-        var diff = new THREE.Vector3(target.x - eye.x, 0, target.z - eye.z);
-        var len = diff.length();
-        var coe = step / len;
-        var stepDiff = new THREE.Vector3(-diff.z * coe, 0, diff.x * coe);
+        if (this.isFirstPerson) {
+            var eye = target.clone().sub(position);
+            this.cameraEditor.object.translateX( step );
+            target.addVectors(position, eye);
+        } else {
 
-        eye.add(stepDiff);
-        target.add(stepDiff);
+            // 新的target和eye在Y轴上的坐标不变
+            var diff = new THREE.Vector3(target.x - position.x, 0, target.z - position.z);
+            var len = diff.length();
+            var coe = step / len;
+            var stepDiff = new THREE.Vector3(-diff.z * coe, 0, diff.x * coe);
+
+            position.add(stepDiff);
+            target.add(stepDiff);
+        }
     },
 
     // 上移
     goUp: function (step) {
-        var eye = this.cameraEditor.object.position;
+        var position = this.cameraEditor.object.position;
         var target = this.cameraEditor.target;
 
-        // target和eye的Y轴上的坐标增加step
-        eye.y += step;
-        target.y += step;
+        if (this.isFirstPerson) {
+            var eye = target.clone().sub(position);
+            this.cameraEditor.object.translateY( step );
+            target.addVectors(position, eye);
+        } else {
+
+            // target和eye的Y轴上的坐标增加step
+            position.y += step;
+            target.y += step;
+        }
     },
 
     // 下移
     goDown: function (step) {
-        var eye = this.cameraEditor.object.position;
+        var position = this.cameraEditor.object.position;
         var target = this.cameraEditor.target;
 
-        eye.y -= step;
-        target.y -= step;
+        if (this.isFirstPerson) {
+            var eye = target.clone().sub(position);
+            this.cameraEditor.object.translateY( - step );
+            target.addVectors(position, eye);
+        } else {
+
+            position.y -= step;
+            target.y -= step;
+        }
     },
 
     //  右转：angle为正； 左转：angle为负
     goTurn: function (angle) {
-        var eye = this.cameraEditor.object.position;
+        var position = this.cameraEditor.object.position;
         var target = this.cameraEditor.target;
 
-        var diff = new THREE.Vector3(target.x - eye.x, 0, target.z - eye.z);
+        var diff = new THREE.Vector3(target.x - position.x, 0, target.z - position.z);
         var cosAngle = Math.cos(angle);
         var sinAngle = Math.sin(angle);
         var centerDiff = new THREE.Vector3(diff.x * cosAngle - diff.z * sinAngle, 0, diff.x * sinAngle + diff.z * cosAngle);
 
-        target.x = eye.x + centerDiff.x;
-        target.z = eye.z + centerDiff.z;
+        target.x = position.x + centerDiff.x;
+        target.z = position.z + centerDiff.z;
     },
 
     // 俯仰
     goPitch: function (angle) {
-        var eye = this.cameraEditor.object.position;
+        var position = this.cameraEditor.object.position;
         var target = this.cameraEditor.target;
 
-        var offsetX = target.x - eye.x;
-        var offsetZ = target.z - eye.z;
+        var offsetX = target.x - position.x;
+        var offsetZ = target.z - position.z;
         var distance = Math.sqrt(offsetX * offsetX + offsetZ * offsetZ);
-        var diff = new THREE.Vector3(distance, target.y - eye.y, 0);
+        var diff = new THREE.Vector3(distance, target.y - position.y, 0);
         var cosAngle = Math.cos(angle);
         var sinAngle = Math.sin(angle);
         var centerDiff = new THREE.Vector3(diff.x * cosAngle - diff.y * sinAngle, diff.x * sinAngle + diff.y * cosAngle, 0);
         var percent = centerDiff.x / distance;
 
-        target.x = eye.x + percent * offsetX;
-        target.y = eye.y + centerDiff.y;
-        target.z = eye.z + percent * offsetZ;
+        target.x = position.x + percent * offsetX;
+        target.y = position.y + centerDiff.y;
+        target.z = position.z + percent * offsetZ;
     },
 
     resize: function() {

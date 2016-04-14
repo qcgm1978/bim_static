@@ -2,23 +2,22 @@
 .modelView{width:100%;height:100%;position:relative;overflow:hidden;
   .modelBar{width:328px;position:absolute;left:0;bottom:0;
     &.open{top:0;}
-    .modelMap{position:absolute;left:0;bottom:0;width:100%;border:2px solid #333;border-top:none;height:220px;background:#979797;
+    .modelMap{position:absolute;left:0;bottom:0;width:100%;border:2px solid #333;border-top:none;height:220px;background:#333;
       .map{height:180px;background:#fff;}
       .bar{height:35px;padding:5px;color:#fff;
-        .floors{float:left;width:45px;height:25px;background:#333;position:relative;font-size:14px;padding:0 3px;cursor:pointer;
-          .current-floor{display:block;width:100%;height:100%;padding-left:5px;line-height:24px;position:relative;border-top:1px solid #333;
-            &.open{border-top:1px solid #fff;}
+        .floors{float:right;width:80px;height:25px;background:#333;position:relative;font-size:14px;cursor:pointer;
+          .current-floor{display:block;width:100%;height:100%;padding:0 5px;line-height:24px;position:relative;border:1px solid #979797;
             &:after{content:'';display:block;width:8px;height:4px;background:url(/comm/images/tree.png) no-repeat 0 -120px;position:absolute;top:10px;right:3px;transition:all .5s;}
             &.open:after{transform:rotate(-180deg);}
           }
-          .selectFloor{display:none;position:absolute;width:100%;left:0;bottom:100%;background:#333;
+          .selectFloor{display:none;position:absolute;width:100%;left:0;bottom:100%;background:#333;border:1px solid #979797;border-bottom:none;
             li{height:20px;line-height:20px;padding:0 8px;
               &:hover{background:#000;}
             }
           }
           .open+.selectFloor{display:block;}
         }
-        .axisGrid{float:right;width:200px;background:#333;height:25px;line-height:25px;padding:0 10px;
+        .axisGrid{float:left;width:200px;height:25px;line-height:25px;padding:0 10px;
           .gridIcon{display:inline-block;width:14px;height:14px;margin-right:5px;background:url(/comm/images/tree.png) no-repeat 0 -140px;vertical-align:text-bottom;}
         }
       }
@@ -99,7 +98,7 @@
     .modHeader{height:50px;padding:15px 24px;line-height:20px;position:relative;
       .modClose{position:absolute;width:30px;text-align:center;padding:5px;right:9px;top:10px;cursor:pointer;}
     }
-    .modBody{width:600px;height:300px;background:#fff;position:relative;}
+    .modBody{width:600px;height:300px;background:#fff;position:relative;border:4px solid #333;}
     .modFooter{text-align:right;padding:10px 13px 20px;box-shadow:0 3px 3px #666;
       .modLabel{margin-right:20px;}
       .modInput{height:30px;width:60px;background:#fff;border:1px solid #fff;text-align:center;color:#333;outline:none;

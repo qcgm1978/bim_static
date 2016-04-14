@@ -525,6 +525,8 @@ App.Comm.createModel = function(options){
           y = axis.infoY;
       if(x&&y){
         $('.grid-position').text(x+","+y);
+      }else{
+        $('.grid-position').text("--,--");
       }
       $('.modPop').hide();
     })

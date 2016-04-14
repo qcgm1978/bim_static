@@ -25377,7 +25377,10 @@ THREE.WebGLGeometries = function ( gl, properties, info ) {
 		var geometry = event.target;
 		var buffergeometry = geometries[ geometry.id ];
 
-		deleteAttributes( buffergeometry.attributes );
+		deleteAttributes(buffergeometry.attributes);
+		if (buffergeometry.index) {
+		    deleteAttribute(buffergeometry.index);
+		}
 
 		geometry.removeEventListener( 'dispose', onGeometryDispose );
 
