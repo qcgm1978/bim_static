@@ -1,7 +1,7 @@
 App.Project = {
 
 	Settings: {
-		loadingTpl:'<td colspan="10" class="loadingTd">正在加载，请稍候……</td>',
+		loadingTpl: '<td colspan="10" class="loadingTd">正在加载，请稍候……</td>',
 		fetchNavType: 'file', // model file
 		projectNav: "design",
 		property: "",
@@ -262,8 +262,8 @@ App.Project = {
 			var fileVersionId = FileIdArr.join(",");
 
 			//下载
-			App.Comm.checkDownLoad(App.Project.Settings.projectId,App.Project.Settings.CurrentVersion.id,fileVersionId);
-			
+			App.Comm.checkDownLoad(App.Project.Settings.projectId, App.Project.Settings.CurrentVersion.id, fileVersionId);
+
 
 			// App.Comm.ajax(data).done(function(){
 			// 	console.log("下载完成");
@@ -311,7 +311,7 @@ App.Project = {
 		if (type == "design") {
 
 			//this.Settings.attrView = new App.Project.ProjectDesignPropety();
-			
+
 			$("#projectContainer .rightPropertyContent").html(new App.Project.ProjectDesignPropety().render().$el);
 
 		} else if (type == "plan") {
@@ -363,10 +363,10 @@ App.Project = {
 			}
 
 			data.click = function(event) {
-				 
+
 				var file = $(event.target).data("file");
 				// 
-				$("#projectContainer .header .ckAll").prop("checked",false);
+				$("#projectContainer .header .ckAll").prop("checked", false);
 				//App.Project.FileCollection.parentId=file.id;
 				//清空数据
 				App.Project.FileCollection.reset();
@@ -423,6 +423,50 @@ App.Project = {
 				sceneId: model.intersect.object.userData.sceneId
 			}
 		});
+	},
+
+	//属性页 设计成本计划 type 加载的数据
+	propertiesOthers: function(type) {
+
+		debugger
+		if (type.indexOf("plan")!=-1) {
+			 App.Project.fetchPropertData("fetchDesignPropertiesPlan",function(data){
+			 	console.log(data);
+			 });
+		}
+
+		if (type.indexOf("cost")!=-1) {
+			 App.Project.fetchPropertData("fetchDesignPropertiesCost",function(data){
+			 	console.log(data);
+			 });
+		}
+
+		if (type.indexOf("quality")!=-1) {
+			 App.Project.fetchPropertData("fetchDesignPropertiesQuality",function(data){
+			 	console.log(data);
+			 });
+		}
+
+
+
+	},
+
+	//属性 数据获取
+	fetchPropertData: function(fetchType,callback) { 
+
+		var Intersect = App.Project.Settings.ModelObj.intersect; 
+
+		var data = {
+			URLtype: fetchType,
+			data: {
+				projectId: App.Project.Settings.projectId,
+				projectVersionId: App.Project.Settings.CurrentVersion.id,
+				elementId: Intersect.userId,
+				sceneId: Intersect.object.userData.sceneId
+			}
+		};
+
+		App.Comm.ajax(data,callback);
 	}
 
 

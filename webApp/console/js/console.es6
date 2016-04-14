@@ -22,6 +22,8 @@ App.Console = {
 			} else if (Settings.type == 4) {
 				//项目变更
 				App.Console.projectChange();
+			}else if (Settings.type==5) {
+				App.Console.CostAccounting();
 			}
 
 
@@ -1272,5 +1274,58 @@ App.Console = {
 		App.Console.projectChangeStatus(11, 0, 2, "发起成功");
 	},
 
+	//算量
+	CostAccounting(){
+		var Settings = App.Console.Settings;
+		//发起
+		if (Settings.step == 1) {
+			var tpl = _.templateUrl('/console/tpls/CostAccounting/create.html', true);
+			$("#contains").html(tpl); 
+			//绑定族库第一步
+			App.Console.fileUpload();
+
+		}  
+	},
+
+	fileUpload:function(){
+
+		$("#submit").click(function(){
+
+			var projectId=$("#projectId").val().trim(),
+			projectVersionId=$("#projectVersionId").val().trim(),
+			filesId=$("#filesId").val().trim();
+
+			if (!projectId) {
+				alert("请输入项目id");
+				return;
+			}
+			if (!projectVersionId) {
+				alert("请输入项目版本id");
+				return;
+			}
+			if (!filesId) {
+				alert("请输入文件id");
+				return;
+			}
+
+			var url="doc/"+projectId+"/"+projectVersionId+"/cost?files="+filesId;
+
+			$.ajax({
+				url:url,
+				type:"POST",
+				data:{
+					files:filesId
+				}
+			}).done(function(data){
+				if (data.message=="success") {
+					alert("success");
+				}
+			});
+
+
+		});
+
+
+	}
 
 }

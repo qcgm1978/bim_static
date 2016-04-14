@@ -47,6 +47,10 @@ App.API = {
 
 		//设计
 		fetchDesignProperties: "sixD/{projectId}/{projectVersionId}/property", //设计属性 ?sceneId={sceneId}&elementId={elementId}
+		fetchDesignPropertiesPlan:"sixD/{projectId}/{projectVersionId}/plan/edo",// 设计属性 计划  ?sceneId={sceneId}&elementId={elementId}
+		fetchDesignPropertiesCost:"sixD/{projectId}/{projectVersionId}/cost/edo",// 设计属性成本  ?sceneId={sceneId}&elementId={elementId}
+		fetchDesignPropertiesQuality:"sixD/{projectId}/{projectVersionId}/quality/standard",// 设计属性 质量 ?sceneId={sceneId}&elementId={elementId}
+
 		fetchDesignVerification: "/dataJson/project/project.design.property.json", // 设计 检测
 		fetchDesignCollision: "", // 设计碰撞
 		// 碰撞

@@ -314,11 +314,15 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		//渲染模型属性
 		App.Project.renderModelContentByType(); 
 
+		//;
+
 		var viewer = App.Project.Settings.Viewer = App.Comm.createModel({
 			element: $("#projectContainer .modelContainerContent"),
 			sourceId: App.Project.Settings.DataModel.sourceId,
 			etag: App.Project.Settings.DataModel.etag
 		});
+
+
 
 		viewer.on('viewpoint', function(point) {
 			$("#projectContainer .projectNavModelContainer .tree-view:eq(1) .item-content:eq(0)").addClass('open')

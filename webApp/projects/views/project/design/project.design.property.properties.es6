@@ -22,6 +22,8 @@ App.Project.DesignProperties=Backbone.View.extend({
 		//渲染数据
 		var data=model.toJSON().data; 
 		this.$el.html(this.template(data));
+		//其他属性
+		App.Project.propertiesOthers.call(this,"plan|cost|quality");
 	}
 
 });
