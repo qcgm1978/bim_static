@@ -34,6 +34,15 @@
       .bar-fit{background-position:0 -128px;
         &.selected{background-position:-32px -128px;}
       }
+      .bar-eye{background-position:0 -1184px;
+        &.selected{background-position:-32px -1184px;}
+      }
+      .bar-zoom{background-position:0 -1248px;
+        &.selected{background-position:-32px -1248px;}
+      }
+      .bar-grid{background-position:0 -1216px;
+        &.selected{background-position:-32px -1216px;}
+      }
       .bar-select{background-position:0 0;
         &.selected{background-position:-32px 0;}
       }
@@ -85,7 +94,21 @@
 .modelInput{width:100%;height:30px;font-size:14px;padding:0 5px;outline:none;border:1px solid #ccc;
   &.error{border-color:#f00;}
 }
-
+.modPop{display:none;position:fixed;left:0;top:0;right:0;bottom:0;background:rgba(0,0,0,0);z-index:999;
+  .modDialog{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:9;background:#333;color:#fff;font-size:12px;
+    .modHeader{height:50px;padding:15px 24px;line-height:20px;position:relative;
+      .modClose{position:absolute;width:30px;text-align:center;padding:5px;right:9px;top:10px;cursor:pointer;}
+    }
+    .modBody{width:600px;height:300px;background:#fff;position:relative;}
+    .modFooter{text-align:right;padding:10px 13px 20px;box-shadow:0 3px 3px #666;
+      .modLabel{margin-right:20px;}
+      .modInput{height:30px;width:60px;background:#fff;border:1px solid #fff;text-align:center;color:#333;outline:none;
+        &.error{border:1px solid #f00;}
+      }
+      .submit{width:80px;height:30px;text-align:center;border:1px solid #fff;background:#333;vertical-align:top;outline:none;}
+    }
+  }
+}
 
 
 

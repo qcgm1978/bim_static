@@ -17,8 +17,9 @@ CLOUD.GlobalData = {
     ShowCellBox: false,
     DynamicRelease: true,
     SubSceneVisibleDistance: 0.1,
-    CellVisibleLOD: 64,
-    SubSceneVisibleLOD: 4
+    CellVisibleLOD: 40,
+    SubSceneVisibleLOD: 50,
+    ScreenCullLOD: 0.0001,
 };
 
 CLOUD.EnumStandardView = {
@@ -1341,6 +1342,8 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
         _projScreenMatrix = new THREE.Matrix4(),
 
         _vector3 = new THREE.Vector3(),
+        _vector3End = new THREE.Vector3(),
+        _screenCullOffCount = 0,
 
     // light arrays cache
 
@@ -1395,7 +1398,10 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
         isOpaqueObjectsRenderFinish = false, // 不透明对象绘制结束
         isTransparentObjectsRenderFinish = false, // 透明对象绘制结束
         isTransparentObjectsRenderStart = false,  // 透明对象绘制开始
-        incrementCullTag = 0;     //增量遍历
+        incrementCullTag = 0,    //增量遍历
+        startCullTime = 0, //遍历计时
+        isIncrementalCullFinish = true,
+        cullingObjectCount = 0;
     // ------------------------------------------------------------------
 
     // initialize
@@ -2052,7 +2058,7 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
 
         if ( updateBuffers ) {
 
-            setupVertexAttributes( material, program, geometry );
+            setupVertexAttributes(material, program, geometry);
 
             if ( index !== null ) {
 
@@ -2109,7 +2115,7 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
 
             } else {
 
-                renderer.render( drawStart, drawCount );
+               renderer.render( drawStart, drawCount );
 
             }
 
@@ -2225,9 +2231,12 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
 
                         }
 
-                        _gl.bindBuffer( _gl.ARRAY_BUFFER, buffer );
-                        _gl.vertexAttribPointer( programAttribute, size, _gl.FLOAT, false, 0, startIndex * size * 4 ); // 4 bytes per Float32
-
+                        if (buffer!== undefined) {
+                            _gl.bindBuffer(_gl.ARRAY_BUFFER, buffer);
+                            _gl.vertexAttribPointer(programAttribute, size, _gl.FLOAT, false, 0, startIndex * size * 4); // 4 bytes per Float32                           
+                        }
+   
+ 
                     }
 
                 } else if ( materialDefaultAttributeValues !== undefined ) {
@@ -2264,7 +2273,7 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
         }
 
         state.disableUnusedAttributes();
-
+        return true;
     }
 
     // Sorting
@@ -2303,15 +2312,15 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
 
             return a.object.renderOrder - b.object.renderOrder;
 
-        } else if ( a.material.id !== b.material.id ) {
+        } else if (a.material.id !== b.material.id) {
 
             return a.material.id - b.material.id;
 
-        } else if ( a.z !== b.z ) {
+        } else if (a.z !== b.z) {
 
             return a.z - b.z;
 
-        } else {
+        }  else {
 
             return a.id - b.id;
 
@@ -2381,6 +2390,8 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
             sprites.length = 0;
             lensFlares.length = 0;
 
+
+            projectLights(scene);
             projectObject( scene, camera );
 
             opaqueObjects.length = opaqueObjectsLastIndex + 1;
@@ -2389,8 +2400,8 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
             if ( _this.sortObjects === true ) {
                 opaqueObjects.sort( painterSortStable );
                 transparentObjects.sort( reversePainterSortStable );
-
             }
+
         }
 
         //
@@ -2491,14 +2502,17 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
             return;
         }
 
-        var fog = scene.fog;
-
-        if (incrementListDirty) {
-
-            incrementListDirty = false;
+        if (incrementListDirty ) {
 
             buildIncrementObjectList(scene, camera);
 
+            if (!isIncrementalCullFinish)
+                return false;
+            else {
+                forceClear = true;
+                incrementListDirty = false;
+            }
+                
             //
             // shadowMap.render( scene );
 
@@ -2508,13 +2522,17 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
             _infoRender.faces = 0;
             _infoRender.points = 0;
 
-            this.setRenderTarget( renderTarget );
+            this.setRenderTarget(renderTarget);
         }
+
+
+        var fog = scene.fog;
 
         if ( this.autoClear || forceClear ) {
             this.clear( this.autoClearColor, this.autoClearDepth, this.autoClearStencil );
         }
 
+        //console.time("render");
         //
         if ( scene.overrideMaterial ) {
 
@@ -2556,6 +2574,8 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
             }
         }
 
+        //console.timeEnd("render");
+
         isIncrementalRenderFinish = (isOpaqueObjectsRenderFinish && isTransparentObjectsRenderFinish);
 
         if ( isIncrementalRenderFinish ) {
@@ -2572,6 +2592,7 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
         state.setDepthWrite( true );
         state.setColorWrite( true );
 
+        //console.log(this.info);
         // _gl.finish();
 
         return isIncrementalRenderFinish;
@@ -2586,6 +2607,7 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
         isTransparentObjectsRenderFinish = false;
         isTransparentObjectsRenderStart = false;
         currentIncrementalListIdx = 0;
+
     };
 
     // 限制帧率
@@ -2639,31 +2661,49 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
 
         if (_isUpdateObjectList) {
 
-            lights.length = 0;
-            opaqueObjectsLastIndex = - 1;
-            transparentObjectsLastIndex = - 1;
+            if (isIncrementalCullFinish) {
 
-            ++incrementCullTag;
-            if (incrementCullTag > 100000)
-                incrementCullTag = 0;
+                ++incrementCullTag;
+                if (incrementCullTag > 100000)
+                    incrementCullTag = 0;
+
+                lights.length = 0;
+                opaqueObjectsLastIndex = - 1;
+                transparentObjectsLastIndex = -1;
+
+                _screenCullOffCount = 0;
+
+                cullingObjectCount = 0;
+
+                projectLights(scene);
+            }
+            startCullTime = Date.now();
 
             sprites.length = 0;
-            lensFlares.length = 0;
+            lensFlares.length = 0;        
 
-            console.time("projectObject");
-            projectObject( scene, camera );
-            console.timeEnd("projectObject");
+                       
+            //console.time("projectObject");
+            isIncrementalCullFinish = projectObject(scene, camera);
+            //console.timeEnd("projectObject");
+            //console.log("screen cull off: " + _screenCullOffCount);
 
             opaqueObjects.length = opaqueObjectsLastIndex + 1;
             transparentObjects.length = transparentObjectsLastIndex + 1;
 
-            console.log(opaqueObjects.length + transparentObjects.length);
-            console.time("sort");
-            if ( _this.sortObjects === true ) {
+            //console.log(opaqueObjects.length + transparentObjects.length);
+
+            if (isIncrementalCullFinish && _this.sortObjects === true) {
+                //console.time("sort");
                 opaqueObjects.sort( painterSortStable );
-                transparentObjects.sort( reversePainterSortStable );
+                transparentObjects.sort(reversePainterSortStable);
+                //console.timeEnd("sort");
             }
-            console.timeEnd("sort");
+   
+        }
+        else {
+
+            isIncrementalCullFinish = true;
         }
     }
 
@@ -2790,15 +2830,28 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
             //array.push( renderItem );
             array[index] = renderItem;
         }
+    }
 
+    function projectLights(scene) {
 
-        //if((transparentObjectsLastIndex + opaqueObjectsLastIndex)%10000)
+        var children = scene.children;
+
+        for (var i = 0, l = children.length; i < l; i++) {
+
+            var object = children[i];
+            if (object instanceof THREE.Light) {
+
+                lights.push(object);
+
+            }
+
+        }
 
     }
 
     function projectObject(object, camera, inFrustum) {
 
-        if (object.visible === false) return;
+        if (object.visible === false) return true;
 
         if (!inFrustum)
             inFrustum = object.inFrustum;
@@ -2806,98 +2859,116 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
         //Liwei: ignor groups
         var isGroup = object instanceof THREE.Group;
 
-        if (!isGroup/*&& (object.channels.mask & camera.channels.mask) !== 0*/ && object.incrementCullTag != incrementCullTag) {
+        if (!isGroup && object.incrementCullTag != incrementCullTag /*&& (object.channels.mask & camera.channels.mask) !== 0*/) {
+
+            ++cullingObjectCount;
+            if (cullingObjectCount % 5000 == 4999) {
+
+                var diff = Date.now() - startCullTime
+                if (diff > 30)
+                    return false;
+            }
 
             object.incrementCullTag = incrementCullTag;
             if (object instanceof THREE.Mesh || object instanceof THREE.Line || object instanceof THREE.Points) {
 
-                // 元素可见性过滤
-                if (!isVisibleForFilter(object)) {
-                    return;
-                }
+                if (inFrustum || _frustum.intersectsObject(object) === true) {
 
-                //if ( object instanceof THREE.SkinnedMesh ) {
+                    if (!isVisibleForFilter(object)) {
+                        return true;
+                    }
 
-                //    object.skeleton.update();
+                    if ( object.level && _this.sortObjects === true ) {
 
-                //}
+                        if (!object.modelCenter) {
 
-                if (
-                    //object.frustumCulled === false
-                    inFrustum
-                    || _frustum.intersectsObject(object) === true) {
+                            object.modelCenter = new THREE.Vector3();
 
-                    //var material = object.material;
+                            if (object.boundingBox) {
 
+                                object.boundingBox.center(object.modelCenter);
+                                object.modelCenter.applyMatrix4(object.matrixWorld);
+
+                                _vector3.copy(object.boundingBox.min);
+                                _vector3.applyMatrix4(object.matrixWorld);
+
+                                object.radius = object.modelCenter.distanceTo(_vector3);
+
+    
+                            }
+                            else {
+
+                                object.modelCenter.setFromMatrixPosition(object.matrixWorld);
+
+                            }
+                        }
+
+                        if (object.radius !== undefined) {
+
+                            _vector3.copy(object.modelCenter);
+                            _vector3.applyProjection(_projScreenMatrix);
+                            _vector3End.copy(camera.realUp);
+                            _vector3End.multiplyScalar(object.radius).add(object.modelCenter);
+
+                            _vector3End.applyProjection(_projScreenMatrix);
+
+                            var sqrtDist = _vector3End.distanceTo(_vector3) * 10;
+                            if (sqrtDist < CLOUD.GlobalData.ScreenCullLOD) {
+                                ++_screenCullOffCount;
+                                return true;
+                            }
+
+                        }
+                        else {
+                            _vector3.copy(object.modelCenter);
+                            _vector3.applyProjection(_projScreenMatrix);
+                        }
+                    }
+ 
                     // 材质过滤
                     var material = getOverridedMaterial(object);
                     material = material || object.material;
 
-                    if ( material.visible === true ) {
+                    if (object.load)
+                        object.load();
 
-                       // if ( _this.sortObjects === true ) {
+                    var geometry = objects.update(object);
 
-                            //if (!object.modelCenter) {
+                    if (material instanceof THREE.MeshFaceMaterial) {
 
-                            //    object.modelCenter = new THREE.Vector3();
+                        var groups = geometry.groups;
+                        var materials = material.materials;
 
-                            //    if (object.boundingBox) {
+                        for (var i = 0, l = groups.length; i < l; i++) {
 
-                            //        object.boundingBox.center(object.modelCenter);
-                            //        object.modelCenter.applyMatrix4(object.matrixWorld);
-                            //    }
-                            //    else {
+                            var group = groups[i];
+                            var groupMaterial = materials[group.materialIndex];
 
-                            //        object.modelCenter.setFromMatrixPosition(object.matrixWorld);
-                            //    }
-                            //}
+                            if (groupMaterial.visible === true) {
 
-                            //_vector3.copy(object.modelCenter);
-                            
-                            //_vector3.applyProjection( _projScreenMatrix );
-
-                            //console.log(_vector3.z);
-                        //}
-
-                        if (object.load)
-                            object.load();
-
-                        var geometry = objects.update( object );
-
-                        if ( material instanceof THREE.MeshFaceMaterial ) {
-
-                            var groups = geometry.groups;
-                            var materials = material.materials;
-
-                            for ( var i = 0, l = groups.length; i < l; i ++ ) {
-
-                                var group = groups[ i ];
-                                var groupMaterial = materials[ group.materialIndex ];
-
-                                if ( groupMaterial.visible === true ) {
-
-                                    pushRenderItem( object, geometry, groupMaterial, _vector3.z, group );
-
-                                }
+                                pushRenderItem(object, geometry, groupMaterial, _vector3.z, group);
 
                             }
 
-                        } else {
-
-                            pushRenderItem( object, geometry, material, _vector3.z, null );
-
                         }
 
+                    } else {
+
+                        pushRenderItem(object, geometry, material, _vector3.z, null);
+
                     }
+     
 
                 }
 
-            }
-            else if (object instanceof THREE.Light) {
-
-                lights.push(object);
+       
 
             }
+            //else if (object instanceof THREE.Light) {
+
+            //    lights.push(object);
+
+            //}
             //else if (object instanceof THREE.Sprite) {
 
             //    sprites.push( object );
@@ -2924,10 +2995,12 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
 
         for ( var i = 0, l = children.length; i < l; i ++ ) {
 
-            projectObject(children[i], camera, inFrustum);
+            if (!projectObject(children[i], camera, inFrustum))
+                return false;
 
         }
 
+        return true;
     }
 
     function renderObjects( renderList, camera, lights, fog, overrideMaterial ) {
@@ -5411,11 +5484,14 @@ CLOUD.AxisGrid.prototype = {
     }
 };
 CLOUD.MiniMap = function (viewer, callback) {
+
     this.viewer = viewer;
     this.callbackFn = callback;
     this.visible = true;
     this.width = 0;
     this.height = 0;
+    this.domContainer = null;
+
     this.mouseButtons = {LEFT: THREE.MOUSE.LEFT, RIGHT: THREE.MOUSE.RIGHT};
 
     var scope = this;
@@ -5423,21 +5499,25 @@ CLOUD.MiniMap = function (viewer, callback) {
     var normalizedMouse = new THREE.Vector2();
 
     var _clearColor = new THREE.Color(), _clearAlpha = 1;
-    var _defaultClearColor = 0xffffff; // 0xadadad; // 缺省背景色ma
+    var _defaultClearColor = 0xffffff; // 0xadadad; // 缺省背景色
 
     var _xmlns = "http://www.w3.org/2000/svg";
     var _svg = document.createElementNS(_xmlns, 'svg');
     var _svgGroupForAxisGrid = document.createElementNS(_xmlns, "g");
-    var _svgPathPool = [], _svgLinePool = [], _svgRectPool = [], _svgImagePool = [],
-        _pathCount = 0, _lineCount = 0, _rectCount = 0, _imageCount = 0, _quality = 1;
+    var _svgPathPool = [], _svgLinePool = [], _svgTextPool = [], _svgImagePool = [],_svgCirclePool = [],
+        _pathCount = 0, _lineCount = 0, _textCount = 0, _imageCount = 0, _circleCount = 0, _quality = 1;
     var _svgNode, _svgWidth, _svgHeight, _svgHalfWidth, _svgHalfHeight;
 
     var _clipBox = new THREE.Box2(), _elemBox = new THREE.Box2(), _axisGridBox = new THREE.Box2();
 
     var _axisGridElements = [], _axisGridIntersectionPoints = [], _axisGridLevels = [];
-    var _isInitializedAxisGird = false; // 用于轴网显示控制
+    var _isShowAxisGridNumber = true;
+    var _axisGridNumberCircleRadius = 10;
+    var _axisGridNumberFontSize = 8;
+    var _axisGridNumberInterval = 3;
     var _isShowAxisGrid = false;
-    var _isExistData = false;
+    var _isExistAxisGridData = false, _isExistFloorPlaneData = false;
+    var _enableMouseEvent = true;
 
     var _tipNode, _circleNode, _highlightHorizLineNode, _highlightVerticalLineNode, _cameraNode;
     var _highlightColor = '#258ae3';
@@ -5447,8 +5527,9 @@ CLOUD.MiniMap = function (viewer, callback) {
 
     var _floorPlaneElevation = 0; // 平面图标高
     var _floorPlaneBox;
+    var _enableShowCamera = true;
 
-    // ------------- 这些算法可以独立成文件 S ------------- //
+    // ------------- 这些算法可以独立成单独文件 S ------------- //
 
     function cross(p1, p2, p3, p4) {
         return (p2.x - p1.x) * (p4.y - p3.y) - (p2.y - p1.y) * (p4.x - p3.x);
@@ -5474,7 +5555,7 @@ CLOUD.MiniMap = function (viewer, callback) {
         return interPoint;
     }
 
-    // ------------- 这些算法可以独立成文件 E ------------- //
+    // ------------- 这些算法可以独立成单独文件 E ------------- //
 
     // 正规化坐标转屏幕坐标
     function normalizedPointToScreen(point) {
@@ -5563,21 +5644,37 @@ CLOUD.MiniMap = function (viewer, callback) {
         return _svgLinePool[id];
     }
 
-    function getRectNode(id) {
+    function getCircleNode(id) {
 
-        if (_svgRectPool[id] == null) {
-            _svgRectPool[id] = document.createElementNS(_xmlns, 'rect');
+        if (_svgCirclePool[id] == null) {
+            _svgCirclePool[id] = document.createElementNS(_xmlns, 'circle');
 
             if (_quality == 0) {
-                _svgRectPool[id].setAttribute('shape-rendering', 'crispEdges'); //optimizeSpeed
+                _svgCirclePool[id].setAttribute('shape-rendering', 'crispEdges'); //optimizeSpeed
             }
 
-            return _svgRectPool[id];
+            return _svgCirclePool[id];
         }
 
-        return _svgRectPool[id];
+        return _svgCirclePool[id];
     }
 
+    function getTextNode(id) {
+
+        if (_svgTextPool[id] == null) {
+            _svgTextPool[id] = document.createElementNS(_xmlns, 'text');
+
+            if (_quality == 0) {
+                _svgTextPool[id].setAttribute('shape-rendering', 'crispEdges'); //optimizeSpeed
+            }
+
+            return _svgTextPool[id];
+        }
+
+        return _svgTextPool[id];
+    }
+
+    // 绘制线条
     function renderLine(v1, v2, material) {
 
         _svgNode = getLineNode(_lineCount++);
@@ -5592,10 +5689,94 @@ CLOUD.MiniMap = function (viewer, callback) {
         }
     }
 
+    // 绘制圆
+    function renderCircle(cx, cy, material) {
+
+        _svgNode = getCircleNode(_circleCount++);
+        _svgNode.setAttribute('r', _axisGridNumberCircleRadius + '');
+        _svgNode.setAttribute('transform', 'translate(' + cx + ',' + cy + ')');
+
+        if (material instanceof THREE.LineBasicMaterial) {
+            _svgNode.setAttribute('style', 'fill: none; stroke: ' + material.color.getStyle() + '; stroke-width: 1');
+            _svgGroupForAxisGrid.appendChild(_svgNode);
+        }
+    }
+
+    // 绘制文本
+    function renderText(cx, cy, literal, material) {
+
+        _svgNode = getTextNode(_textCount++);
+
+        if (material instanceof THREE.LineBasicMaterial) {
+            _svgNode.setAttribute('style', 'font-size:' +  _axisGridNumberFontSize + 'px; fill: none; stroke: ' + material.color.getStyle() + '; stroke-width: 1');
+            _svgGroupForAxisGrid.appendChild(_svgNode);
+        }
+
+        _svgNode.innerHTML = literal;
+
+        // 注意: 必须已加到document中才能求到getBoundingClientRect
+        var box = _svgNode.getBoundingClientRect();
+        var offsetX = cx - 0.5 * box.width;
+        var offsetY = cy + 0.25 * box.height;
+
+        _svgNode.setAttribute('transform', 'translate(' + offsetX + ',' + offsetY + ')');
+    }
+
+    // 绘制平面图
     function renderFloorPlan() {
 
-        _svgNode = getImageNode(0);
-        _svg.appendChild(_svgNode);
+        if (_isExistFloorPlaneData) {
+            _svgNode = getImageNode(0);
+            _svg.appendChild(_svgNode);
+        }
+    }
+
+    // 绘制高亮提示
+    function renderHighlightNode() {
+
+        _svg.appendChild(_highlightHorizLineNode);
+        _svg.appendChild(_highlightVerticalLineNode);
+        _svg.appendChild(_circleNode);
+    }
+
+    // 绘制轴网
+    function renderAxisGrid() {
+
+        _svg.appendChild(_svgGroupForAxisGrid);
+
+        for (var i = 0, len = _axisGridElements.length; i < len; i++) {
+            var lineElements = _axisGridElements[i];
+
+            for (var j = 0, len2 = lineElements.length; j < len2; j++) {
+                var element = lineElements[j];
+                var v1 = element.v1.clone();
+                var v2 = element.v2.clone();
+                var material = element.material;
+
+                _elemBox.makeEmpty();
+                _elemBox.setFromPoints([v1, v2]);
+
+                if (_clipBox.isIntersectionBox(_elemBox) === true) {
+                    renderLine(v1, v2, material);
+
+                    if (_isShowAxisGridNumber) {
+                        if (j % _axisGridNumberInterval == 0) {
+                            var dir = new THREE.Vector2();
+                            dir.subVectors(v2, v1).normalize().multiplyScalar(_axisGridNumberCircleRadius);
+
+                            var newV1 = v1.clone().sub(dir);
+                            var newV2 = v2.clone().add(dir);
+
+                            renderCircle(newV1.x, newV1.y, material);
+                            renderCircle(newV2.x, newV2.y, material);
+
+                            renderText(newV1.x, newV1.y, element.name, material);
+                            renderText(newV2.x, newV2.y, element.name, material);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     // 设置容器元素style
@@ -5635,6 +5816,32 @@ CLOUD.MiniMap = function (viewer, callback) {
         point.applyMatrix4(sceneMatrix);
     }
 
+    function computeAxisGridBox() {
+
+        var isExistData = (_isExistAxisGridData || _isExistFloorPlaneData);
+
+        if (_isShowAxisGridNumber && isExistData) {
+
+            var center = _axisGridBox.center();
+            var oldSize = _axisGridBox.size();
+            var newSize = new THREE.Vector2();
+            newSize.x = oldSize.x * _svgWidth / (_svgWidth - 4.0 * _axisGridNumberCircleRadius);
+            newSize.y = oldSize.y * _svgHeight / (_svgHeight - 4.0 * _axisGridNumberCircleRadius);
+
+            _axisGridBox.setFromCenterAndSize(center, newSize);
+        }
+    }
+
+    this.enableMouseEvent = function(enable) {
+
+        _enableMouseEvent = enable;
+        //this.render();
+    };
+
+    this.isEnableMouseEvent = function() {
+        return _enableMouseEvent;
+    }
+
     this.isMouseOverCanvas = function (mouse) {
 
         var domElement = _mapContainer;
@@ -5663,6 +5870,10 @@ CLOUD.MiniMap = function (viewer, callback) {
 
         var mouse = new THREE.Vector2(event.clientX, event.clientY);
         var isOverCanvas = this.isMouseOverCanvas(mouse);
+
+        if (isOverCanvas) {
+            callback();
+        }
 
         return isOverCanvas;
     };
@@ -5697,8 +5908,10 @@ CLOUD.MiniMap = function (viewer, callback) {
 
         var mouse = new THREE.Vector2(event.clientX, event.clientY);
         var isOverCanvas = this.isMouseOverCanvas(mouse);
+        var isExistData = _isExistAxisGridData || _isExistFloorPlaneData;
 
-        if (isOverCanvas && _isExistData) {
+        if (isOverCanvas && isExistData ) {
+
             // 计算选中点的坐标
             var clickPoint = new THREE.Vector3();
             var clickPoint2D = normalizedMouse.clone();
@@ -5738,8 +5951,11 @@ CLOUD.MiniMap = function (viewer, callback) {
 
     this.init = function (domContainer, width, height, styleOptions) {
 
-        width = width || 320;
-        height = height || 240;
+        //width = width || 320;
+        //height = height || 240;
+
+        width = width || 400;
+        height = height || 320;
 
         // 初始化绘图面板
         this.initCanvasContainer(domContainer, styleOptions);
@@ -5790,8 +6006,9 @@ CLOUD.MiniMap = function (viewer, callback) {
 
         _pathCount = 0;
         _lineCount = 0;
-        _rectCount = 0;
+        _textCount = 0;
         _imageCount = 0;
+        _circleCount = 0;
 
         while (_svg.childNodes.length > 0) {
 
@@ -5807,42 +6024,25 @@ CLOUD.MiniMap = function (viewer, callback) {
 
     this.render = function () {
 
-        if (!this.visible)
-            return;
+        if (!_isExistAxisGridData && !_isExistFloorPlaneData) return;
+
+        if (!this.visible) return;
 
         this.clear();
 
         renderFloorPlan();
 
         if (_isShowAxisGrid) {
-            _svg.appendChild(_svgGroupForAxisGrid);
-
-            for (var i = 0, len = _axisGridElements.length; i < len; i++) {
-                var lineElements = _axisGridElements[i];
-
-                for (var j = 0, len2 = lineElements.length; j < len2; j++) {
-                    var element = lineElements[j];
-                    var v1 = element.v1.clone();
-                    var v2 = element.v2.clone();
-                    var material = element.material;
-
-                    _elemBox.makeEmpty();
-                    _elemBox.setFromPoints([v1, v2]);
-
-                    if (_clipBox.isIntersectionBox(_elemBox) === true) {
-                        renderLine(v1, v2, material);
-                    }
-                }
-            }
-
-            _svg.appendChild(_highlightHorizLineNode);
-            _svg.appendChild(_highlightVerticalLineNode);
-            _svg.appendChild(_circleNode);
+            renderAxisGrid();
+            renderHighlightNode();
         }
 
-        this.resetCameraNode();
+        //this.resetCameraNode();
 
-        _svg.appendChild(_cameraNode);
+        if (_enableShowCamera) {
+            _svg.appendChild(_cameraNode);
+        }
+
     };
 
     this.getMainSceneMatrix = function () {
@@ -5856,6 +6056,8 @@ CLOUD.MiniMap = function (viewer, callback) {
     };
 
     this.initCanvasContainer = function (domContainer, styleOptions) {
+
+        this.domContainer = domContainer;
 
         if (!_mapContainer) {
             _mapContainer = document.createElement("div");
@@ -5881,7 +6083,7 @@ CLOUD.MiniMap = function (viewer, callback) {
     this.initTipNode = function () {
 
         if (!_tipNode) {
-            var css = "#cloud-tip:after { " +
+            var css = ".cloud-tip:after { " +
                 "box-sizing: border-box;" +
                 "display: inline;" +
                 "font-size: 10px;" +
@@ -5899,7 +6101,7 @@ CLOUD.MiniMap = function (viewer, callback) {
             loadStyleString(css);
 
             _tipNode = document.createElement('div');
-            _tipNode.id = "cloud-tip";
+            _tipNode.className = "cloud-tip";
             _tipNode.style.position = "absolute";
             _tipNode.style.display = "block";
             _tipNode.style.background = "#333333";
@@ -5970,19 +6172,34 @@ CLOUD.MiniMap = function (viewer, callback) {
         }
     };
 
-    this.setAxisGirdFromJsonString = function (jsonStr) {
-        var jsonObj = JSON.parse(jsonStr);
-        this.setDataFromJsonObject(jsonObj);
-    };
+    //this.setAxisGirdFromJsonString = function (jsonStr) {
+    //    var jsonObj = JSON.parse(jsonStr);
+    //    this.setDataFromJsonObject(jsonObj);
+    //};
+    //
+    //this.setAxisGirdFromJsonObject = function (jsonObj) {
+    //    var grids = jsonObj.Grids;
+    //    var levels = jsonObj.Levels;
+    //
+    //    this.clearAxisGird();
+    //    this.initAxisGird(grids);
+    //    this.initAxisGirdLevels(levels);
+    //
+    //    this.render();
+    //};
 
-    this.setAxisGirdFromJsonObject = function (jsonObj) {
+    this.generateAxisGrid = function() {
+
+        var jsonObj = CLOUD.MiniMap.axisGridData;
+
+        if (!jsonObj)  return;
+
         var grids = jsonObj.Grids;
         var levels = jsonObj.Levels;
 
         this.clearAxisGird();
         this.initAxisGird(grids);
         this.initAxisGirdLevels(levels);
-
         this.render();
     };
 
@@ -5998,16 +6215,16 @@ CLOUD.MiniMap = function (viewer, callback) {
         }
 
         _axisGridBox.makeEmpty();
-        _isInitializedAxisGird = false;
+        _isExistAxisGridData = false;
     };
 
     this.initAxisGird = function (grids) {
 
-        _isInitializedAxisGird = false;
-
         var len = grids.length;
 
         if (len < 1) return;
+
+        _isExistAxisGridData = true;
 
         var materialGrid = new THREE.LineBasicMaterial({
             color: 0x303030,//0x2c2255
@@ -6025,6 +6242,8 @@ CLOUD.MiniMap = function (viewer, callback) {
             _axisGridBox.expandByPoint(start);
             _axisGridBox.expandByPoint(end);
         }
+
+        computeAxisGridBox();
 
         var horizLineElements = []; // 水平线集合
         var verticalLineElements = []; // 垂直线集合
@@ -6084,10 +6303,6 @@ CLOUD.MiniMap = function (viewer, callback) {
                 });
             }
         }
-
-        // 设置了数据
-        _isExistData = true;
-        _isInitializedAxisGird = true;
     };
 
     this.initAxisGirdLevels = function (levels) {
@@ -6104,7 +6319,7 @@ CLOUD.MiniMap = function (viewer, callback) {
 
     this.showAxisGird = function () {
 
-        if (_isInitializedAxisGird) {
+        if (_isExistAxisGridData) {
             _isShowAxisGrid = true;
             //_svgGroupForAxisGrid.style.opacity = 1;
             _svgGroupForAxisGrid.style.display = "";
@@ -6119,7 +6334,7 @@ CLOUD.MiniMap = function (viewer, callback) {
 
     this.hideAxisGird = function () {
 
-        if (_isInitializedAxisGird) {
+        if (_isExistAxisGridData) {
             _isShowAxisGrid = false;
             //_svgGroupForAxisGrid.style.opacity = 0;
             _svgGroupForAxisGrid.style.display = "none";
@@ -6128,6 +6343,10 @@ CLOUD.MiniMap = function (viewer, callback) {
 
             this.render();
         }
+    };
+
+    this.showAxisGridNumber = function(show) {
+        _isShowAxisGridNumber = show;
     };
 
     this.dealHighlightNode = function () {
@@ -6180,36 +6399,76 @@ CLOUD.MiniMap = function (viewer, callback) {
 
     };
 
-    this.setFloorPlanFromJsonString = function (jsonStr) {
-        var jsonObj = JSON.parse(jsonStr);
-        this.setFloorPlanFromJsonObject(jsonObj);
-    };
+    //this.setFloorPlanFromJsonString = function (jsonStr) {
+    //    var jsonObj = JSON.parse(jsonStr);
+    //    this.setFloorPlanFromJsonObject(jsonObj);
+    //};
+    //
+    //this.setFloorPlanFromJsonObject = function (jsonObj) {
+    //
+    //    var url = jsonObj["Path"];
+    //    var boundingBox = jsonObj["BoundingBox"];
+    //
+    //    _isExistData = false;
+    //
+    //    if (!url || !boundingBox) {
+    //        console.warn('floor-plan data is error!');
+    //        return;
+    //    }
+    //
+    //    // 设置了数据
+    //    _isExistData = true;
+    //
+    //    _floorPlaneBox = new THREE.Box3(new THREE.Vector3(boundingBox.Min.X, boundingBox.Min.Y, boundingBox.Min.Z), new THREE.Vector3(boundingBox.Max.X, boundingBox.Max.Y, boundingBox.Max.Z));
+    //
+    //    // 平面图不需要使用Z坐标
+    //    var bBox2D = new THREE.Box2(new THREE.Vector2(_floorPlaneBox.min.x, _floorPlaneBox.min.y), new THREE.Vector2(_floorPlaneBox.max.x, _floorPlaneBox.max.y));
+    //
+    //    if (!_isInitializedAxisGird) {
+    //        console.warn('axis-grid is not initialized!');
+    //
+    //        // 没有设置轴网，取自己的包围盒
+    //        _axisGridBox.copy(bBox2D);
+    //
+    //        computeAxisGridBox();
+    //    }
+    //
+    //    this.initFloorPlane(url, bBox2D);
+    //
+    //    var elevation = 0.5 * (_floorPlaneBox.min.z + _floorPlaneBox.max.z);
+    //    this.setFloorPlaneElevation(elevation);
+    //
+    //    this.resetCameraNode();
+    //
+    //    this.render();
+    //};
 
-    this.setFloorPlanFromJsonObject = function (jsonObj) {
+    this.generateFloorPlane = function() {
+
+        var jsonObj = CLOUD.MiniMap.floorPlaneData;
+
+        if (!jsonObj) return;
 
         var url = jsonObj["Path"];
         var boundingBox = jsonObj["BoundingBox"];
-
-        _isExistData = false;
 
         if (!url || !boundingBox) {
             console.warn('floor-plan data is error!');
             return;
         }
 
-        // 设置了数据
-        _isExistData = true;
-
         _floorPlaneBox = new THREE.Box3(new THREE.Vector3(boundingBox.Min.X, boundingBox.Min.Y, boundingBox.Min.Z), new THREE.Vector3(boundingBox.Max.X, boundingBox.Max.Y, boundingBox.Max.Z));
 
         // 平面图不需要使用Z坐标
         var bBox2D = new THREE.Box2(new THREE.Vector2(_floorPlaneBox.min.x, _floorPlaneBox.min.y), new THREE.Vector2(_floorPlaneBox.max.x, _floorPlaneBox.max.y));
 
-        if (!_isInitializedAxisGird) {
+        if (!_isExistAxisGridData) {
             console.warn('axis-grid is not initialized!');
 
             // 没有设置轴网，取自己的包围盒
             _axisGridBox.copy(bBox2D);
+
+            computeAxisGridBox();
         }
 
         this.initFloorPlane(url, bBox2D);
@@ -6238,6 +6497,8 @@ CLOUD.MiniMap = function (viewer, callback) {
         offset.x *= scaleX;
         offset.y *= -scaleY;
 
+        _isExistFloorPlaneData = false;
+
         if (!_axisGridBox.containsBox(bBox)) {
             console.warn('the bounding-box of floor-plane is not contains the bounding-box of axis-grid!');
         }
@@ -6250,6 +6511,9 @@ CLOUD.MiniMap = function (viewer, callback) {
         _svgNode.setAttribute("x", (-0.5 * width) + "");
         _svgNode.setAttribute("y", (-0.5 * height) + "");
         _svgNode.setAttribute("transform", 'translate(' + offset.x + ',' + offset.y + ')');
+
+        // 设置了数据
+        _isExistFloorPlaneData = true;
     };
 
     this.setFloorPlaneElevation = function (elevation) {
@@ -6317,7 +6581,9 @@ CLOUD.MiniMap = function (viewer, callback) {
             _cameraNode.setAttribute('opacity', '1.0');
             _cameraNode.setAttribute("transform", "translate(" + cameraScreenPosition.x + "," + cameraScreenPosition.y + ") rotate(" + angle + ") scale(3, 3) ");
 
-            if (this.callbackFn && _isExistData) {
+            var isExistData = _isExistAxisGridData || _isExistFloorPlaneData;
+
+            if (this.callbackFn && isExistData) {
 
                 var cameraWorldPos = new THREE.Vector3(projectedCameraPosition.x, projectedCameraPosition.y, _floorPlaneElevation);
                 // 获得离相机最近的交点
@@ -6346,13 +6612,20 @@ CLOUD.MiniMap = function (viewer, callback) {
                         }
                     };
 
-                    console.log(jsonObj.axis.infoX + "" + jsonObj.axis.infoY);
+                    //console.log(jsonObj.axis.infoX + "" + jsonObj.axis.infoY);
 
                     this.callbackFn(jsonObj);
+                }
+            } else {
+                if (this.callbackFn) {
+                    this.callbackFn(null);
                 }
             }
         } else {
             _cameraNode.setAttribute('opacity', '0.0');
+            if (this.callbackFn) {
+                this.callbackFn(null);
+            }
         }
     };
 
@@ -6380,6 +6653,37 @@ CLOUD.MiniMap = function (viewer, callback) {
 
         return _axisGridIntersectionPoints[idx];
     };
+
+    this.enableCameraNode = function(enable) {
+
+        _enableShowCamera = enable;
+        this.render();
+    };
+
+    this.removeMiniMap = function() {
+
+        if (this.domContainer) {
+            this.domContainer.removeChild(_mapContainer);
+        }
+    };
+
+    this.appendMiniMap = function() {
+
+        if (this.domContainer) {
+            this.domContainer.appendChild(_mapContainer);
+        }
+    };
+
+};
+
+CLOUD.MiniMap.axisGridData = null;
+CLOUD.MiniMap.floorPlaneData = null;
+
+CLOUD.MiniMap.setAxisGridData = function(jsonObj){
+    CLOUD.MiniMap.axisGridData = jsonObj;
+};
+CLOUD.MiniMap.setFloorPlaneData = function(jsonObj){
+    CLOUD.MiniMap.floorPlaneData = jsonObj;
 };
 
 var CloudTouch	= CloudTouch || {};
@@ -10930,7 +11234,14 @@ CLOUD.Scene.prototype.getHitPoint = function (x, y, camera) {
         if (intersect.distance <= camera.near)
             continue;
 
-        return intersect.point;
+        var meshNode = intersect.object;
+
+        if (this.filter.isVisible(meshNode)) {
+
+             return intersect.point;
+
+        }
+
     }
 
     return  null;
@@ -11097,7 +11408,7 @@ CLOUD.Scene.prototype.prepareScene = function () {
 
         var scope = this;
 
-
+        //console.time("cull");
         // Cell Cull and LoD
         this.traverseIf(function (object, parent) {
 
@@ -11134,6 +11445,8 @@ CLOUD.Scene.prototype.prepareScene = function () {
 
             return false;
         });
+
+        //console.timeEnd("cull");
     }
 }();
 
@@ -12404,7 +12717,7 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
     // factor: 正数 - 放大， 负数 - 缩小
     this.zoom = function (factor, cx, cy) {
 
-        //state = STATE.DOLLY;
+        state = STATE.DOLLY;
 
         if (cx === undefined || cy === undefined) {
             if (factor > 0) {
@@ -12428,7 +12741,7 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
             this.update();
         }
 
-        //state = STATE.NONE;
+        state = STATE.NONE;
     };
 
     // 基于相机空间的漫游
@@ -12852,10 +13165,15 @@ CLOUD.OrbitEditor = function (cameraEditor, scene, domElement) {
     this.domElement = (domElement !== undefined) ? domElement : document;
 
     // Mouse buttons
-    this.mouseButtons = { ORBIT: THREE.MOUSE.LEFT, PAN: THREE.MOUSE.MIDDLE, ZOOM: THREE.MOUSE.RIGHT };
+    //this.mouseButtons = { ORBIT: THREE.MOUSE.LEFT, PAN: THREE.MOUSE.MIDDLE, ZOOM: THREE.MOUSE.RIGHT };
+    this.mouseButtons = { ORBIT: THREE.MOUSE.LEFT, ZOOM: THREE.MOUSE.MIDDLE, PAN: THREE.MOUSE.RIGHT };
 
     // camera state
     this.cameraEditor = cameraEditor;
+
+    this.isMouseClick = false;
+    this.oldMouseX = -1;
+    this.oldMouseY = -1;
 };
 
 CLOUD.OrbitEditor.prototype = Object.create(THREE.EventDispatcher.prototype);
@@ -12904,6 +13222,11 @@ CLOUD.OrbitEditor.prototype.processMouseDown = function (event) {
     return false;
 };
 CLOUD.OrbitEditor.prototype.onMouseDown = function (event) {
+
+    this.isMouseClick = false;
+    this.oldMouseX = event.clientX;
+    this.oldMouseY = event.clientY;
+
     return this.processMouseDown(event);
 };
 
@@ -12925,6 +13248,12 @@ CLOUD.OrbitEditor.prototype.onMouseMove = function (event) {
 };
 
 CLOUD.OrbitEditor.prototype.onMouseUp = function (event) {
+
+    // 直接使用up来模拟click
+    if (this.oldMouseX == event.clientX && this.oldMouseY == event.clientY) {
+        this.isMouseClick = true;
+    }
+
     var camera_scope = this.cameraEditor;
     if (camera_scope.enabled === false) return false;
 
@@ -12939,9 +13268,15 @@ CLOUD.OrbitEditor.prototype.onMouseUp = function (event) {
     return true;
 };
 
+CLOUD.OrbitEditor.prototype.onMouseClick = function (event) {
+    return true;
+};
+
 CLOUD.OrbitEditor.prototype.onMouseWheel = function (event) {
     var camera_scope = this.cameraEditor;
-    if (camera_scope.enabled === false || camera_scope.noZoom === true || camera_scope.IsIdle() !== true) return;
+    //if (camera_scope.enabled === false || camera_scope.noZoom === true || camera_scope.IsIdle() !== true) return;
+
+    if (camera_scope.enabled === false || camera_scope.noZoom === true) return;
 
     event.preventDefault();
     event.stopPropagation();
@@ -13024,20 +13359,33 @@ CLOUD.PickEditor = function (object, scene, domElement) {
     CLOUD.OrbitEditor.call(this, object, scene, domElement);
 
     // Customize the mouse buttons
-    this.mouseButtons = { ORBIT: THREE.MOUSE.RIGHT, PAN: THREE.MOUSE.MIDDLE, ZOOM: THREE.MOUSE.RIGHT };
+    //this.mouseButtons = { ORBIT: THREE.MOUSE.RIGHT, PAN: THREE.MOUSE.MIDDLE, ZOOM: THREE.MOUSE.RIGHT };
+    //this.mouseButtons = { ORBIT: THREE.MOUSE.LEFT, ZOOM: THREE.MOUSE.MIDDLE, PAN: THREE.MOUSE.RIGHT };
 };
 CLOUD.PickEditor.prototype = Object.create(CLOUD.OrbitEditor.prototype);
 CLOUD.PickEditor.prototype.constructor = CLOUD.PickEditor;
 
-CLOUD.PickEditor.prototype.onMouseDown = function (event) {
+//CLOUD.PickEditor.prototype.onMouseDown = function (event) {
+//    return true;
+//};
+
+//onMouseDown
+CLOUD.PickEditor.prototype.onMouseUp = function (event) {
     "use strict";
     var cameraEditor = this.cameraEditor;
     if (cameraEditor.enabled === false)
         return;
     event.preventDefault();
 
+    if (this.oldMouseX == event.clientX && this.oldMouseY == event.clientY) {
+        this.isMouseClick = true;
+    }
+
+    if (!this.isMouseClick) return;
+
     // Pick
-    if (event.button === THREE.MOUSE.LEFT && cameraEditor.IsIdle() === true) {
+    //if (event.button === THREE.MOUSE.LEFT && cameraEditor.IsIdle() === true)
+    if (event.button === THREE.MOUSE.LEFT) {
         var scope = this;
         var mouse = cameraEditor.mapWindowToViewport(event.clientX, event.clientY);
 
@@ -13084,7 +13432,8 @@ CLOUD.PickEditor.prototype.onMouseDown = function (event) {
 CLOUD.ZoomEditor = function ( object, scene, domElement ) {
 	CLOUD.OrbitEditor.call( this,  object, scene, domElement );
 	
-	this.mouseButtons = { ZOOM: THREE.MOUSE.LEFT, PAN: THREE.MOUSE.MIDDLE, ORBIT: THREE.MOUSE.RIGHT };
+	//this.mouseButtons = { ZOOM: THREE.MOUSE.LEFT, PAN: THREE.MOUSE.MIDDLE, ORBIT: THREE.MOUSE.RIGHT };
+	this.mouseButtons = { ZOOM: THREE.MOUSE.LEFT, PAN: THREE.MOUSE.MIDDLE, PAN: THREE.MOUSE.RIGHT };
 };
 CLOUD.ZoomEditor.prototype = Object.create( CLOUD.OrbitEditor.prototype );
 CLOUD.ZoomEditor.prototype.constructor = CLOUD.ZoomEditor;
@@ -13093,7 +13442,7 @@ CLOUD.PanEditor = function (object, scene, domElement) {
     "use strict";
     CLOUD.OrbitEditor.call(this, object, scene, domElement);
 
-    this.mouseButtons = { PAN: THREE.MOUSE.LEFT, ZOOM: THREE.MOUSE.MIDDLE, ORBIT: THREE.MOUSE.RIGHT };
+    //this.mouseButtons = { PAN: THREE.MOUSE.LEFT, ZOOM: THREE.MOUSE.MIDDLE, ORBIT: THREE.MOUSE.RIGHT };
 };
 
 CLOUD.PanEditor.prototype = Object.create(CLOUD.OrbitEditor.prototype);
@@ -13532,8 +13881,6 @@ CLOUD.FlyEditor = function (cameraEditor, scene, domElement) {
     this.cameraEditor = cameraEditor;
     this.scene = scene;
     this.domElement = (domElement !== undefined) ? domElement : document;
-
-
 
     // API
     this.movementSpeed = 0.005 * CLOUD.GlobalData.SceneScale; // 前后左右上下移动速度
@@ -14145,8 +14492,10 @@ CLOUD.Filter = function () {
 
     this.addUserFilter = function (name, value) {
 
-        if (visibilityFilter[name] === undefined)
+        if (visibilityFilter[name] === undefined) {
             visibilityFilter[name] = {};
+        }
+            
 
         visibilityFilter[name][value] = true;
     };
@@ -18964,8 +19313,9 @@ CLOUD.SubSceneLoader.prototype = {
 
         var client = subScene.client;
         var resource = client.cache;
+        var level = subScene.level;
 
-        function handle_children(parent, children, level, userId, userData, trf) {
+        function handle_children(parent, children, userId, userData, trf) {
 
             for (var nodeId in children) {
 
@@ -18982,52 +19332,54 @@ CLOUD.SubSceneLoader.prototype = {
           
                 if (objJSON.nodeType == "MpkNode") {
 
-                    handle_children(parent, objJSON.nodes, level);
+                    handle_children(parent, objJSON.nodes);
 
                 }
                 else if (objJSON.nodeType == "CellNode") {
 
-                    object = new CLOUD.Cell();
-                    CLOUD.GeomUtil.parseNodeProperties(object, objJSON, nodeId);
+                    console.log("Should not call here!");
+                    //object = new CLOUD.Cell();
+                    //CLOUD.GeomUtil.parseNodeProperties(object, objJSON, nodeId);
 
-                    // set world bbox
-                    object.worldBoundingBox = object.boundingBox.clone();                    
-                    object.worldBoundingBox.applyMatrix4(scope.manager.getGlobalTransform());
-                    object.level = objJSON.level;
-                    if (objJSON.order) {
-                        object.out = 1;
-                    }
+                    //// set world bbox
+                    //object.worldBoundingBox = object.boundingBox.clone();                    
+                    //object.worldBoundingBox.applyMatrix4(scope.manager.getGlobalTransform());
+                    //object.level = objJSON.level;
+                    //if (objJSON.order) {
+                    //    object.out = 1;
+                    //}
 
 
-                    parent.add(object);
+                    //parent.add(object);
 
-                    handle_children(object, objJSON.children, level + 1);
+                    //handle_children(object, objJSON.children);
                 }
                 else if (objJSON.nodeType == "SceneNode") {
 
-                    if (objJSON.sceneType == CLOUD.SCENETYPE.Child) {
+                    console.log("Should not call here!");
+                    //if (objJSON.sceneType == CLOUD.SCENETYPE.Child) {
 
-                        object = new CLOUD.SubScene();
-                        CLOUD.GeomUtil.parseNodeProperties(object, objJSON, nodeId);
+                    //    object = new CLOUD.SubScene();
+                    //    CLOUD.GeomUtil.parseNodeProperties(object, objJSON, nodeId);
 
-                        object.client = client;
+                    //    object.client = client;
 
-                        CLOUD.GeomUtil.parseSceneNode(object, objJSON, scope.manager, level);                        
+                    //    CLOUD.GeomUtil.parseSceneNode(object, objJSON, scope.manager);                        
 
-                        parent.add(object);
+                    //    parent.add(object);
 
-                        object.load();
-                    }
-                    else {
-                        // Will not load.
-                    }
+                    //    object.load();
+                    //}
+                    //else {
+                    //    // Will not load.
+                    //}
                 }
                 else if (objJSON.nodeType == "GroupNode") {
 
                     object = new CLOUD.Group();
                     CLOUD.GeomUtil.parseNodeProperties(object, objJSON, nodeId, trf);
 
-                    handle_children(parent, objJSON.children, level + 1, userId, userData, object.matrix);
+                    handle_children(parent, objJSON.children, userId, userData, object.matrix);
 
                 }
                 else if (objJSON.nodeType == "MeshNode") {
@@ -19070,7 +19422,7 @@ CLOUD.SubSceneLoader.prototype = {
                             object = new CLOUD.Group();
                             CLOUD.GeomUtil.parseNodeProperties(object, objJSON, nodeId, trf);
 
-                            handle_children(parent, symbolJSON.children, level + 1, objJSON.userId, userData, object.matrix);
+                            handle_children(parent, symbolJSON.children, objJSON.userId, userData, object.matrix);
 
                         }
                         else if (symbolJSON.nodeType === "MeshNode") {
@@ -19124,14 +19476,17 @@ CLOUD.SubSceneLoader.prototype = {
                     parent.add(object);
                 }
 
-                if (object)
+                if (object) {
                     object.updateMatrixWorld(true);
+                    object.level = level;
+                }                             
+                    
             }
         };
 
         if (sceneJSON.children) {
             subScene.embedded = true;
-            handle_children(subScene, sceneJSON.children, 0);
+            handle_children(subScene, sceneJSON.children);
         }
         
     }
@@ -19191,6 +19546,8 @@ CLOUD.SceneLoader.prototype = {
         localRoot.sceneId = sceneId;
         localRoot.client = client;
         localRoot.subSceneRoot = true;
+
+        var sceneLevel = group.level;
 
         if (notifyProgress)
             scope.manager.dispatchEvent({ type: CLOUD.EVENTS.ON_LOAD_START, sceneId: sceneId });
@@ -19415,6 +19772,10 @@ CLOUD.SceneLoader.prototype = {
 
                 if (object) {
                     object.updateMatrixWorld(true);
+
+                    if (object.level === undefined && sceneLevel !== undefined)
+                        object.level = sceneLevel;
+
                 }
 
                 if (level == 0) {
@@ -19512,7 +19873,7 @@ CLOUD.IndexLoader.prototype = {
         loader.load(client.projectUrl(), function (text) {
 
             var index = JSON.parse(text);
-            client.index = index;
+            client.index = index;            
 
             if (index.view) {
 
@@ -19936,7 +20297,7 @@ CLOUD.ModelManager = function () {
     //hemiLight.position.set( 0, -500, -500 );
     this.scene.add(hemiLight);
     this.scene.add(this.headLamp);
-    //this.scene.add(this.assistLamp);
+    this.scene.add(this.assistLamp);
 
     // Loaders
     this.mpkLoader = new CLOUD.MpkLoader();
@@ -20271,6 +20632,10 @@ CLOUD.EditorManager = function (handleEvents) {
         }
     }
 
+    function onMouseClick(event) {
+        //scope.editor.onMouseClick(event);
+    }
+
     this.registerDomEventListeners = function (domElement) {
 
         domElement.addEventListener( 'contextmenu', function ( event ) { event.preventDefault(); }, false );
@@ -20281,6 +20646,7 @@ CLOUD.EditorManager = function (handleEvents) {
         // 注册在document上会影响dbgUI的resize事件
         window.addEventListener('mousemove', onMouseMove, false);
         window.addEventListener('mouseup', onMouseUp, false);
+        window.addEventListener('click', onMouseClick, false);
 
         domElement.addEventListener( 'touchstart', touchstart, false );
         domElement.addEventListener( 'touchend', touchend, false );
@@ -20496,17 +20862,16 @@ CloudViewer = function () {
 
     this.modelManager = new CLOUD.ModelManager();
 
-    this.viewHouse = new CLOUD.ViewHouse(this);
-    this.viewHouse.visible = false;
+    this.viewHouse = null;
 
-    this.miniMap = null;
-    //this.axisGrid = new CLOUD.AxisGrid(this);
-    //this.miniMap.setAxisGrid(this.axisGrid);
+    this.miniMaps = {};
 
     var scope = this;
 
     function initializeView() {
-        scope.viewHouse.visible = true;
+
+        scope.setViewHouseVisibility(true);
+
         scope.zoomAll();
         // run once
         scope.modelManager.removeEventListener(CLOUD.EVENTS.ON_LOAD_START, initializeView);
@@ -20516,6 +20881,8 @@ CloudViewer = function () {
 
     // 处理ViewHouse交互
     function handleViewHouseEvent(type, event) {
+
+        if (!scope.viewHouse) return false;
 
         var isInHouse = false;
 
@@ -20558,29 +20925,39 @@ CloudViewer = function () {
 
         var isOverCanvas = false;
 
-        if (scope.miniMap) {
+        for (var name in scope.miniMaps) {
+            var miniMap = scope.miniMaps[name];
+
+            var overCanvas = false;
+
             switch (type) {
                 case "down":
-                    isOverCanvas = scope.miniMap.mouseDown(event, function () {
+                    overCanvas = miniMap.mouseDown(event, function () {
                         //
                     });
                     break;
                 case "move":
-                    isOverCanvas = scope.miniMap.mouseMove(event, function () {
-                        scope.miniMap.render();
+                    overCanvas = miniMap.mouseMove(event, function () {
+                        miniMap.render();
                     });
                     break;
                 case "up":
-                    isOverCanvas = scope.miniMap.mouseUp(event, function (point) {
+                    overCanvas = miniMap.mouseUp(event, function (point) {
                         // 飞到指定点
                         //console.log("clickPoint", point);
 
                         scope.cameraEditor.flyToPoint(point);
                         //scope.cameraEditor.updateView();
+
+                        miniMap.resetCameraNode();
                     });
                     break;
                 default:
                     break;
+            }
+
+            if (overCanvas) {
+                isOverCanvas = true;
             }
         }
 
@@ -20701,11 +21078,9 @@ CloudViewer.prototype = {
             scope.renderer.render(scene, camera);
         }
 
-        scope.viewHouse.render();
+        this.renderViewHouse();
 
-        if(this.miniMap) {
-            this.miniMap.render();
-        }
+        this.renderMiniMap();
     },
 
     setEditorDefault: function () {
@@ -20784,7 +21159,7 @@ CloudViewer.prototype = {
 
         this.renderer.setSize(width, height);
 
-        this.viewHouse.resize(width, height, this.isMobile);
+        this.resizeViewHouse(width, height, this.isMobile);
 
         this.resizeFlyCross(); // 重设fly模式下十字光标位置
 
@@ -20812,9 +21187,6 @@ CloudViewer.prototype = {
         if (this.renderer.IncrementRender === undefined) {
             console.warn('THREE.WebGLIncrementRenderer.IncrementRender: undefined!');
         }
-
-        // 初始化viewHouse
-        this.viewHouse.init(domElement);
 
         // Camera
         var camera = new CLOUD.Camera(viewportWidth, viewportHeight, 45, 0.001, CLOUD.GlobalData.SceneSize * 20, -CLOUD.GlobalData.SceneSize, CLOUD.GlobalData.SceneSize);
@@ -20991,46 +21363,201 @@ CloudViewer.prototype = {
         return  this.getScene().filter;
     },
 
-    // ------------------ 小地图API -- S ------------------ //
-    // 初始化小地图
-    initMiniMap: function(domElement, width, height, styleOptions, callback) {
+    adjustSceneLoD: function (sceneIds) {
+        var len = sceneIds.length;
+        var totalVisibleCount = 0;
 
-        if (!this.miniMap) {
-            this.miniMap = new CLOUD.MiniMap(this, callback);
+        var totalCount = 0;
+        if(len > 0){
+            var clients = this.modelManager.clients;
+            for (var name in clients) {
+                var nodeCounter = clients[name].sceneNodeCounter;
+                if (nodeCounter) {
+                    for (var ii = 0; ii < len; ++ii) {
+                        var count = nodeCounter[sceneIds[ii]];
+                        if (count !== undefined)
+                            totalCount = count;
+                    }
+                }
+            }
+        }
+
+        if (totalCount < 100000) {
+
+            CLOUD.GlobalData.SubSceneVisibleLOD = 210;
+            CLOUD.GlobalData.CellVisibleLOD = 2;
+        }
+        else {
+            CLOUD.GlobalData.SubSceneVisibleLOD = 50;
+            CLOUD.GlobalData.CellVisibleLOD = 40;
+        }
+    },
+
+    // ------------------ ViewHouse API -- S ------------------ //
+    // 外部初始化，由外部决定需不需要 ViewHouse 功能
+    initViewHouse: function(domElement) {
+
+        if (!this.viewHouse) {
+            this.viewHouse = new CLOUD.ViewHouse(this);
+        }
+
+        this.setViewHouseVisibility(false);
+
+        domElement = domElement || this.domElement;
+
+        if (domElement) {
+            // 初始化 ViewHouse
+            this.viewHouse.init(domElement);
+        }
+    },
+
+    // 设置 ViewHouse 可见性
+    setViewHouseVisibility: function(visible) {
+
+        if (this.viewHouse) {
+            this.viewHouse.visible = visible;
+        }
+    },
+
+    // 绘制 ViewHouse
+    renderViewHouse: function(){
+
+        if (this.viewHouse) {
+            this.viewHouse.render();
+        }
+    },
+
+    // 重设置viewhouse大小
+    resizeViewHouse: function(width, height, isMobile) {
+
+        if (this.viewHouse) {
+            this.viewHouse.resize(width, height, isMobile);
+        }
+    },
+    // ------------------ ViewHouse API -- E ------------------ //
+
+    // ------------------ 小地图API -- S ------------------ //
+    createMiniMap:function(name, domElement, width, height, styleOptions, callback){
+
+        var miniMap = this.miniMaps[name];
+
+        if (!miniMap) {
+            miniMap = this.miniMaps[name] = new CLOUD.MiniMap(this, callback);
         }
 
         domElement = domElement || this.domElement;
 
         if (domElement) {
-            this.miniMap.init(domElement, width, height, styleOptions);
+            // 初始化小地图
+            miniMap.init(domElement, width, height, styleOptions);
+        }
+
+        //return this.miniMaps[name];
+    },
+
+    removeMiniMap: function (name) {
+
+        var miniMap = this.miniMaps[name];
+
+        if (miniMap) {
+            miniMap.removeMiniMap();
+
+            //delete this.miniMaps[name];
+        }
+    },
+
+    appendMiniMap: function (name) {
+
+        var miniMap = this.miniMaps[name];
+
+        if (miniMap) {
+            miniMap.appendMiniMap();
+        }
+    },
+
+    getMiniMap: function(name) {
+
+        return this.miniMaps[name];
+    },
+
+    // 绘制小地图
+    renderMiniMap: function(){
+
+        for (var name in this.miniMaps) {
+            var miniMap = this.miniMaps[name];
+
+            if (miniMap) {
+                miniMap.render();
+            }
         }
     },
 
     // 设置平面图
-    setFloorPlanData: function(jsonObj) {
+    setFloorPlaneData: function(jsonObj) {
 
-        if (this.miniMap) {
-            this.miniMap.setFloorPlanFromJsonObject(jsonObj);
+        CLOUD.MiniMap.setFloorPlaneData(jsonObj);
+    },
+
+    generateFloorPlane: function(name) {
+        var miniMap = this.miniMaps[name];
+
+        if (miniMap) {
+            miniMap.generateFloorPlane();
         }
     },
 
     // 设置轴网数据
     setAxisGridData:function(jsonObj, level) {
 
-        if (this.miniMap) {
-            this.miniMap.setAxisGirdFromJsonObject(jsonObj);
+        CLOUD.MiniMap.setAxisGridData(jsonObj);
+    },
+
+    generateAxisGrid: function(name) {
+        var miniMap = this.miniMaps[name];
+
+        if (miniMap) {
+            miniMap.generateAxisGrid();
         }
     },
 
     // 是否显示隐藏轴网
-    showAxisGrid:function(show) {
+    showAxisGrid:function(name, show) {
 
-        if (this.miniMap) {
+        var miniMap = this.miniMaps[name];
+
+        if (miniMap) {
             if (show) {
-                this.miniMap.showAxisGird();
+                miniMap.showAxisGird();
             } else {
-                this.miniMap.hideAxisGird();
+                miniMap.hideAxisGird();
             }
+        }
+    },
+
+    showAxisGridNumber: function(name, show){
+
+        var miniMap = this.miniMaps[name];
+
+        if (miniMap) {
+            miniMap.showAxisGridNumber(show);
+        }
+    },
+
+    enableAxisGridEvent: function(name, enable){
+
+        var miniMap = this.miniMaps[name];
+
+        if (miniMap) {
+            miniMap.enableMouseEvent(enable);
+        }
+    },
+
+    enableMiniMapCameraNode:function(name, enable){
+
+        var miniMap = this.miniMaps[name];
+
+        if (miniMap) {
+            miniMap.enableCameraNode(enable);
         }
     }
 
