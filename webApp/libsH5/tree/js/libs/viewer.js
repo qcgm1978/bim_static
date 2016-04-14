@@ -631,6 +631,7 @@ BIM.prototype = {
   },
   subscribers:BIM.util.subscribers,
   zoom : function () {
+    BIM.common.bimBox.className = 'bim';
     BIM.util.pub('zoom');
     BIM.common.viewer.setZoomMode();
   },
@@ -683,6 +684,7 @@ BIM.prototype = {
     BIM.util.toggleCameraToolsBar('hide');
   },
   picker:function(){
+    BIM.common.bimBox.className = 'bim';
     BIM.common.viewer.setPickMode();
   },
   resize : function(width,height){

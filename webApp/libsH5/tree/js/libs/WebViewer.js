@@ -5910,7 +5910,7 @@ CLOUD.MiniMap = function (viewer, callback) {
         var isOverCanvas = this.isMouseOverCanvas(mouse);
         var isExistData = _isExistAxisGridData || _isExistFloorPlaneData;
 
-        if (isOverCanvas && isExistData ) {
+        if (isOverCanvas && isExistData && event.target.nodeName!= "LI" ) {
 
             // 计算选中点的坐标
             var clickPoint = new THREE.Vector3();
@@ -5944,6 +5944,8 @@ CLOUD.MiniMap = function (viewer, callback) {
             transformWorldPoint(clickPoint);
 
             callback(clickPoint);
+
+            this.resetCameraNode(false, true);
         }
 
         return isOverCanvas;
@@ -6037,7 +6039,7 @@ CLOUD.MiniMap = function (viewer, callback) {
             renderHighlightNode();
         }
 
-        //this.resetCameraNode();
+        this.resetCameraNode(false, false);
 
         if (_enableShowCamera) {
             _svg.appendChild(_cameraNode);
@@ -6476,7 +6478,7 @@ CLOUD.MiniMap = function (viewer, callback) {
         var elevation = 0.5 * (_floorPlaneBox.min.z + _floorPlaneBox.max.z);
         this.setFloorPlaneElevation(elevation);
 
-        this.resetCameraNode();
+        this.resetCameraNode(true, true);
 
         this.render();
     };
@@ -6520,7 +6522,116 @@ CLOUD.MiniMap = function (viewer, callback) {
         _floorPlaneElevation = elevation;
     };
 
-    this.resetCameraNode = function () {
+    //this.resetCameraNode = function () {
+    //
+    //    if (!_floorPlaneBox) return;
+    //
+    //    var camera = this.viewer.camera;
+    //    var cameraEditor = this.viewer.cameraEditor;
+    //
+    //    if (!camera || !cameraEditor) return;
+    //
+    //    var cameraPosition = camera.position;
+    //    var cameraTargetPosition = cameraEditor.target;
+    //    var sceneMatrix = this.getMainSceneMatrix();
+    //
+    //    //var box = bBox.clone();
+    //    //box.applyMatrix4(sceneMatrix);
+    //    //
+    //    //if (!box.containsPoint(camera.position)) {
+    //    //    return null;
+    //    //}
+    //
+    //    var inverseMatrix = new THREE.Matrix4();
+    //    inverseMatrix.getInverse(sceneMatrix);
+    //
+    //    var bBoxCenter = _floorPlaneBox.center();
+    //    var pointA = new THREE.Vector3(_floorPlaneBox.min.x, _floorPlaneBox.min.y, bBoxCenter.z).applyMatrix4(sceneMatrix);
+    //    var pointB = new THREE.Vector3(_floorPlaneBox.min.x, _floorPlaneBox.max.y, bBoxCenter.z).applyMatrix4(sceneMatrix);
+    //    var pointC = new THREE.Vector3(_floorPlaneBox.max.x, _floorPlaneBox.min.y, bBoxCenter.z).applyMatrix4(sceneMatrix);
+    //
+    //    var plane = new THREE.Plane();
+    //    plane.setFromCoplanarPoints(pointA, pointB, pointC);
+    //
+    //    // 计算相机投影
+    //    var projectedCameraPosition = plane.projectPoint(cameraPosition);
+    //    // 转回世界坐标
+    //    projectedCameraPosition.applyMatrix4(inverseMatrix);
+    //
+    //    // 计算相机LookAt投影
+    //    var projectedTargetPosition = plane.projectPoint(cameraTargetPosition);
+    //    // 转回世界坐标
+    //    projectedTargetPosition.applyMatrix4(inverseMatrix);
+    //
+    //    // 计算相机投影后的方向
+    //    var projectedEye = projectedTargetPosition.clone().sub(projectedCameraPosition);
+    //    projectedEye.z = 0;
+    //    projectedEye.normalize();
+    //
+    //    if (_floorPlaneBox.containsPoint(projectedCameraPosition)) {
+    //
+    //        // 计算相机位置
+    //        var cameraScreenPosition = projectedCameraPosition.clone();
+    //        worldToNormalizedPoint(cameraScreenPosition);
+    //        normalizedPointToScreen(cameraScreenPosition);
+    //
+    //        // 计算角度
+    //        var axisX = new THREE.Vector3(1, 0, 0);
+    //        var angle = THREE.Math.radToDeg(projectedEye.angleTo(axisX));
+    //        angle *= -1; // 逆时针为正
+    //
+    //        _cameraNode.setAttribute('opacity', '1.0');
+    //        _cameraNode.setAttribute("transform", "translate(" + cameraScreenPosition.x + "," + cameraScreenPosition.y + ") rotate(" + angle + ") scale(3, 3) ");
+    //
+    //        var isExistData = _isExistAxisGridData || _isExistFloorPlaneData;
+    //
+    //        if (this.callbackFn && isExistData) {
+    //
+    //            var cameraWorldPos = new THREE.Vector3(projectedCameraPosition.x, projectedCameraPosition.y, _floorPlaneElevation);
+    //            // 获得离相机最近的交点
+    //            var intersection = this.computeMinDistanceIntersection(cameraScreenPosition);
+    //
+    //            if (intersection) {
+    //                // 计算轴信息
+    //                var interPoint = new THREE.Vector2(intersection.intersectionPoint.x, intersection.intersectionPoint.y);
+    //                screenToNormalizedPoint(interPoint);
+    //                normalizedPointToWorld(interPoint);
+    //
+    //                var offsetX = Math.round(projectedCameraPosition.x - interPoint.x);
+    //                var offsetY = Math.round(projectedCameraPosition.y - interPoint.y);
+    //                var axisInfoX = "X(" + intersection.abcName + "," + offsetX + ")";
+    //                var axisInfoY = "Y(" + intersection.numeralName + "," + offsetY + ")";
+    //
+    //                var jsonObj = {
+    //                    position: cameraWorldPos,
+    //                    axis: {
+    //                        abcName: intersection.abcName,
+    //                        numeralName: intersection.numeralName,
+    //                        offsetX: offsetX,
+    //                        offsetY: offsetY,
+    //                        infoX: axisInfoX,
+    //                        infoY: axisInfoY
+    //                    }
+    //                };
+    //
+    //                //console.log(jsonObj.axis.infoX + "" + jsonObj.axis.infoY);
+    //
+    //                this.callbackFn(jsonObj);
+    //            }
+    //        } else {
+    //            if (this.callbackFn) {
+    //                this.callbackFn(null);
+    //            }
+    //        }
+    //    } else {
+    //        _cameraNode.setAttribute('opacity', '0.0');
+    //        if (this.callbackFn) {
+    //            this.callbackFn(null);
+    //        }
+    //    }
+    //};
+
+    this.resetCameraNode = function (fly , updateCameraInfo) {
 
         if (!_floorPlaneBox) return;
 
@@ -6566,68 +6677,127 @@ CLOUD.MiniMap = function (viewer, callback) {
         projectedEye.z = 0;
         projectedEye.normalize();
 
+        var newCameraPos;
+
         if (_floorPlaneBox.containsPoint(projectedCameraPosition)) {
+            newCameraPos = new THREE.Vector3(projectedCameraPosition.x, projectedCameraPosition.y, _floorPlaneElevation);
+        } else {
+            newCameraPos = new THREE.Vector3(bBoxCenter.x, bBoxCenter.y, _floorPlaneElevation);
+        }
 
-            // 计算相机位置
-            var cameraScreenPosition = projectedCameraPosition.clone();
-            worldToNormalizedPoint(cameraScreenPosition);
-            normalizedPointToScreen(cameraScreenPosition);
+        // 计算相机位置
+        var cameraScreenPosition = newCameraPos.clone();
+        //var cameraScreenPosition = newCameraPos.clone();
+        worldToNormalizedPoint(cameraScreenPosition);
+        normalizedPointToScreen(cameraScreenPosition);
 
-            // 计算角度
-            var axisX = new THREE.Vector3(1, 0, 0);
-            var angle = THREE.Math.radToDeg(projectedEye.angleTo(axisX));
-            angle *= -1; // 逆时针为正
+        // 计算角度
+        var axisX = new THREE.Vector3(1, 0, 0);
+        var angle = THREE.Math.radToDeg(projectedEye.angleTo(axisX));
+        angle *= -1; // 逆时针为正
 
-            _cameraNode.setAttribute('opacity', '1.0');
-            _cameraNode.setAttribute("transform", "translate(" + cameraScreenPosition.x + "," + cameraScreenPosition.y + ") rotate(" + angle + ") scale(3, 3) ");
+        _cameraNode.setAttribute('opacity', '1.0');
+        _cameraNode.setAttribute("transform", "translate(" + cameraScreenPosition.x + "," + cameraScreenPosition.y + ") rotate(" + angle + ") scale(3, 3) ");
 
-            var isExistData = _isExistAxisGridData || _isExistFloorPlaneData;
+        // 飞到指定点
+        if (fly) {
+            var pos = newCameraPos.clone();
+            transformWorldPoint(pos);
+            this.viewer.cameraEditor.flyToPoint(pos);
+        }
 
-            if (this.callbackFn && isExistData) {
+        if (updateCameraInfo) {
+            this.setCameraInfo(newCameraPos, cameraScreenPosition);
+        }
 
-                var cameraWorldPos = new THREE.Vector3(projectedCameraPosition.x, projectedCameraPosition.y, _floorPlaneElevation);
-                // 获得离相机最近的交点
-                var intersection = this.computeMinDistanceIntersection(cameraScreenPosition);
+        // 返回相机信息
+        //var isExistData = _isExistAxisGridData || _isExistFloorPlaneData;
+        //
+        //if (this.callbackFn && isExistData) {
+        //
+        //    var cameraWorldPos = new THREE.Vector3(projectedCameraPosition.x, projectedCameraPosition.y, _floorPlaneElevation);
+        //    // 获得离相机最近的交点
+        //    var intersection = this.computeMinDistanceIntersection(cameraScreenPosition);
+        //
+        //    if (intersection) {
+        //        // 计算轴信息
+        //        var interPoint = new THREE.Vector2(intersection.intersectionPoint.x, intersection.intersectionPoint.y);
+        //        screenToNormalizedPoint(interPoint);
+        //        normalizedPointToWorld(interPoint);
+        //
+        //        var offsetX = Math.round(projectedCameraPosition.x - interPoint.x);
+        //        var offsetY = Math.round(projectedCameraPosition.y - interPoint.y);
+        //        var axisInfoX = "X(" + intersection.abcName + "," + offsetX + ")";
+        //        var axisInfoY = "Y(" + intersection.numeralName + "," + offsetY + ")";
+        //
+        //        var jsonObj = {
+        //            position: cameraWorldPos,
+        //            axis: {
+        //                abcName: intersection.abcName,
+        //                numeralName: intersection.numeralName,
+        //                offsetX: offsetX,
+        //                offsetY: offsetY,
+        //                infoX: axisInfoX,
+        //                infoY: axisInfoY
+        //            }
+        //        };
+        //
+        //        //console.log(jsonObj.axis.infoX + "" + jsonObj.axis.infoY);
+        //
+        //        this.callbackFn(jsonObj);
+        //    }
+        //} else {
+        //    if (this.callbackFn) {
+        //        this.callbackFn(null);
+        //    }
+        //}
+    };
 
-                if (intersection) {
-                    // 计算轴信息
-                    var interPoint = new THREE.Vector2(intersection.intersectionPoint.x, intersection.intersectionPoint.y);
-                    screenToNormalizedPoint(interPoint);
-                    normalizedPointToWorld(interPoint);
 
-                    var offsetX = Math.round(projectedCameraPosition.x - interPoint.x);
-                    var offsetY = Math.round(projectedCameraPosition.y - interPoint.y);
-                    var axisInfoX = "X(" + intersection.abcName + "," + offsetX + ")";
-                    var axisInfoY = "Y(" + intersection.numeralName + "," + offsetY + ")";
+    this.setCameraInfo = function(cameraWorldPosition, cameraScreenPosition) {
+        // 返回相机信息
+        var isExistData = _isExistAxisGridData || _isExistFloorPlaneData;
 
-                    var jsonObj = {
-                        position: cameraWorldPos,
-                        axis: {
-                            abcName: intersection.abcName,
-                            numeralName: intersection.numeralName,
-                            offsetX: offsetX,
-                            offsetY: offsetY,
-                            infoX: axisInfoX,
-                            infoY: axisInfoY
-                        }
-                    };
+        if (this.callbackFn && isExistData) {
 
-                    //console.log(jsonObj.axis.infoX + "" + jsonObj.axis.infoY);
+            var cameraWorldPos = new THREE.Vector3(cameraWorldPosition.x, cameraWorldPosition.y, _floorPlaneElevation);
+            // 获得离相机最近的交点
+            var intersection = this.computeMinDistanceIntersection(cameraScreenPosition);
 
-                    this.callbackFn(jsonObj);
-                }
-            } else {
-                if (this.callbackFn) {
-                    this.callbackFn(null);
-                }
+            if (intersection) {
+                // 计算轴信息
+                var interPoint = new THREE.Vector2(intersection.intersectionPoint.x, intersection.intersectionPoint.y);
+                screenToNormalizedPoint(interPoint);
+                normalizedPointToWorld(interPoint);
+
+                var offsetX = Math.round(cameraWorldPosition.x - interPoint.x);
+                var offsetY = Math.round(cameraWorldPosition.y - interPoint.y);
+                var axisInfoX = "X(" + intersection.abcName + "," + offsetX + ")";
+                var axisInfoY = "Y(" + intersection.numeralName + "," + offsetY + ")";
+
+                var jsonObj = {
+                    position: cameraWorldPos,
+                    axis: {
+                        abcName: intersection.abcName,
+                        numeralName: intersection.numeralName,
+                        offsetX: offsetX,
+                        offsetY: offsetY,
+                        infoX: axisInfoX,
+                        infoY: axisInfoY
+                    }
+                };
+
+                //console.log(jsonObj.axis.infoX + "" + jsonObj.axis.infoY);
+
+                this.callbackFn(jsonObj);
             }
         } else {
-            _cameraNode.setAttribute('opacity', '0.0');
             if (this.callbackFn) {
                 this.callbackFn(null);
             }
         }
     };
+
 
     this.computeMinDistanceIntersection = function (screenPosition) {
 
@@ -13321,14 +13491,13 @@ CLOUD.OrbitEditor.prototype.onKeyDown = function (event) {
     if (camera_scope.enabled === false || camera_scope.noKeys === true || camera_scope.noPan === true) return;
 
     switch (event.keyCode) {
-        case camera_scope.keys.UP:
+
         case camera_scope.keys.Q:
             camera_scope.beginPan();
             camera_scope.pan(0, -camera_scope.keyPanSpeed);
             camera_scope.update(true);
             break;
 
-        case camera_scope.keys.BOTTOM:
         case camera_scope.keys.E:
             camera_scope.beginPan();
             camera_scope.pan(0, camera_scope.keyPanSpeed);
@@ -13338,22 +13507,24 @@ CLOUD.OrbitEditor.prototype.onKeyDown = function (event) {
         case camera_scope.keys.LEFT:
         case camera_scope.keys.A:
             camera_scope.beginPan();
-            camera_scope.pan(-camera_scope.keyPanSpeed, 0);
+            camera_scope.pan(camera_scope.keyPanSpeed, 0);
             camera_scope.update(true);
             break;
 
         case camera_scope.keys.RIGHT:
         case camera_scope.keys.D:
             camera_scope.beginPan();
-            camera_scope.pan(camera_scope.keyPanSpeed, 0);
+            camera_scope.pan(-camera_scope.keyPanSpeed, 0);
             camera_scope.update(true);
             break;
 
+        case camera_scope.keys.UP:
         case camera_scope.keys.W:
             //camera_scope.beginPan();
             camera_scope.goForward(camera_scope.movementSpeed);
             camera_scope.update(true);
             break;
+        case camera_scope.keys.BOTTOM:
         case camera_scope.keys.S:
             //camera_scope.beginPan();
             camera_scope.goBack(camera_scope.movementSpeed);
@@ -21037,7 +21208,6 @@ CloudViewer = function () {
                         scope.cameraEditor.flyToPoint(point);
                         //scope.cameraEditor.updateView();
 
-                        miniMap.resetCameraNode();
                     });
                     break;
                 default:

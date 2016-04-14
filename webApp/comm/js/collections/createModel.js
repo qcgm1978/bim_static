@@ -34,7 +34,7 @@ App.Comm.createModel = function(options){
       "click .delete":"delete",
       "click .edit":"edit",
       "click .current-floor":"openFloors",
-      "click .selectFloor":"selectFloor"
+      "click .selectFloor li":"selectFloor"
     },
     template:_.templateUrl('/comm/js/tpls/modelBar.html',true),
     initialize:function(){
