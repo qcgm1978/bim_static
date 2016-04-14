@@ -1,24 +1,33 @@
-<% for(var i=0;i<10;i++){ %>
-<tr>
+
+
+
+<% $.each(items,function(i,item){ %>
+<tr class="<%= i%2==0 && 'odd' || '' %>">
     <td class="issue">
         <img class="ckImg" src="/projects/images/proDefault.png" alt="" />
-        <div class="ckHeader">
-            <div class="ckName">SJJC-YH-001</div>
-            <div class="ckDesc">后砌建筑墙体未按设计要求...</div>
+        <div class="ckHeader"> 
+            <div class="ckDesc"><%= item.title %></div>
             <div class="date">
-                <span>创建日期：</span><span>2016-6-3</span>
+                <span>创建日期：</span><span><%= item.createDate?new Date(item.createDate).format('yyyy-MM-dd'):'' %></span>
             </div>
             <div class="date">
-                <span>整改日期：</span><span>2016-6-3</span>
+                <span>整改日期：</span><span><%= item.rectifyDate?new Date(item.rectifyDate).format('yyyy-MM-dd'):''  %></span>
             </div>
             <div class="upCount">
-                <span>整改次数：</span><span>4</span>
+                <span>整改次数：</span><span><%= item.rectifyCount %></span>
             </div>
         </div>
     </td>
-    <td class="status"> <span class="status red">待整改</span> </td>
-    <td class="category"> <span class="security">安全</span> </td>
-    <td class="specialty"> <span>结构</span> </td>
-    <td class="professional"><span>设计总包</span></td>
+    <td class="status"> <span class="status red"><%=item.status==1 && '待整改' ||item.status==2 && '已整改' || '已关闭' %>
+     </span> </td>
+    <td class="category"> <span class="security"><%=item.type==1 && '安全' ||item.type==2 && '功能' || '品质' %></span> </td>
+    <td class="specialty"> <span><%= item.specialty %></span> </td>
+    <td class="professional"><span><%= item.reporter==1 && '设计总包' || '第三方' %></span></td> 
 </tr>
+<% }) %>
+
+<%if(items.length<=0){%> 
+    <tr>
+        <td colspan="5" class="noDataTd">暂无数据</td>
+    </tr>
 <%}%>

@@ -51,7 +51,7 @@ App.API = {
 		fetchDesignPropertiesCost:"sixD/{projectId}/{projectVersionId}/cost/edo",// 设计属性成本  ?sceneId={sceneId}&elementId={elementId}
 		fetchDesignPropertiesQuality:"sixD/{projectId}/{projectVersionId}/quality/standard",// 设计属性 质量 ?sceneId={sceneId}&elementId={elementId}
 
-		fetchDesignVerification: "/dataJson/project/project.design.property.json", // 设计 检测
+		fetchDesignVerification: "sixD/{projectId}/{versionId}/design/check", // 设计 检测  ?status={status}&type={type}&specialty={specialty}&reporter={reporter}&pageIndex={pageIndex}&pageItemCount={pageItemCount}
 		fetchDesignCollision: "", // 设计碰撞
 		// 碰撞
 		fetchDesignFiles:"view/{etag}/{sourceId}/collision/tree",// 碰撞文件列表
@@ -67,7 +67,7 @@ App.API = {
 
 		//计划
 		fetchPlanModel: "sixD/{projectId}/{projectVersionId}/plan", //模型
-		fetchPlanAnalog: "dataJson/project/project.design.property.json", //模拟
+		fetchPlanAnalog: "sixD/{projectId}/{projectVersionId}/plan?noElement=true", //模拟
 		fetchPlanPublicity: "sixD/{projectId}/{projectVersionId}/plan/concern", //关注 ?queryType={queryType}
 		fetchPlanInspection: "dataJson/project/project.design.property.json", //检验
 		fetchPlanProperties: "dataJson/project/project.design.property.json", //属性

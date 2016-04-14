@@ -36,6 +36,7 @@ App.Project.ProjectPlanProperty = Backbone.View.extend({
 		if (type == "model") {
 			//碰撞
 			this.$el.find(".planModel").show().siblings().hide();
+			App.Project.PlanAttr.PlanModelCollection.reset();
 			App.Project.PlanAttr.PlanModelCollection.projectId=projectId;
 			App.Project.PlanAttr.PlanModelCollection.projectVersionId=projectVersionId; 
 			App.Project.PlanAttr.PlanModelCollection.fetch();
@@ -44,7 +45,13 @@ App.Project.ProjectPlanProperty = Backbone.View.extend({
 			//设计检查
 
 			this.$el.find(".planAnalog").show().siblings().hide();
+
+			App.Project.PlanAttr.PlanAnalogCollection.reset();
+			App.Project.PlanAttr.PlanAnalogCollection.projectId=projectId;
+			App.Project.PlanAttr.PlanAnalogCollection.projectVersionId=projectVersionId; 
 			App.Project.PlanAttr.PlanAnalogCollection.fetch();
+
+			 
 
 		} else if (type == "publicity") {
 			//属性

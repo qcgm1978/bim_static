@@ -237,7 +237,7 @@ Backbone.sync = function(method, model, options) {
 	//调用backbone 原本的方法
 	return BackboneSync.apply(this, arguments).done(function(data){
 			if (data.code==10004) {
-				debugger;
+				 window.location.href=data.data;
 				console.log("未登录");
 			}
 	});

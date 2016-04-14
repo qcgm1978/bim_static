@@ -11,17 +11,17 @@ App.Project.PlanAnalog = Backbone.View.extend({
 	},
 
 	render: function() {
-		 
-		this.$el.html("正在加载，请稍后……");
+		 var html=_.templateUrl("/projects/tpls/project/plan/project.plan.property.planAnalog.html",true);
+		this.$el.html(html);
 		return this;
 	},
 
-	template:_.templateUrl("/projects/tpls/project/plan/project.plan.property.planAnalog.html"),
+	template:_.templateUrl("/projects/tpls/project/plan/project.plan.property.planAnalog.detail.html"),
 
 
 	addOne: function(model) {
 	 	var data=model.toJSON();
-		this.$el.html(this.template(data));
+		this.$(".tbPlan tbody").html(this.template(data));
 	}
 
 

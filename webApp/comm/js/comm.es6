@@ -2,7 +2,7 @@ App.Comm = {
 
 	Settings: {
 		v: 20160312,
-		pageItemCount:30 //Math.floor(($("body").height() + 60) / 70) > 10 && Math.floor(($("body").height() + 60) / 70) || 10
+		pageItemCount: 30 //Math.floor(($("body").height() + 60) / 70) > 10 && Math.floor(($("body").height() + 60) / 70) || 10
 	},
 
 	//封装ajax
@@ -10,29 +10,31 @@ App.Comm = {
 
 		data = App.Comm.getUrlByType(data);
 
-		if ($.isFunction(callback)) {
-			$.ajax(data).done(function(data) {
-				if (_.isString(data)) {
-					// to json
-					if (JSON && JSON.parse) {
-						data = JSON.parse(data);
-					} else {
-						data = $.parseJSON(data);
-					}
-				}
 
-				//未登录
-				if (data.code==10004) {
-					debugger
-				}
+		 return $.ajax(data).done(function(data) { 
 
+			if (_.isString(data)) {
+				// to json
+				if (JSON && JSON.parse) {
+					data = JSON.parse(data);
+				} else {
+					data = $.parseJSON(data);
+				}
+			}
+
+			//未登录
+			if (data.code == 10004) {
+				window.location.href = data.data;
+			}
+
+			if ($.isFunction(callback)) {
 				//回调
 				callback(data);
+			} 
 
-			});
-		} else {
-			return $.ajax(data);
-		}
+		});
+
+
 
 	},
 
@@ -247,7 +249,7 @@ App.Comm = {
 	//下载
 	checkDownLoad: function(projectId, projectVersionId, fileVersionId) {
 
-		 
+
 		var checkData = {
 			URLtype: "checkDownLoad",
 			data: {
@@ -271,7 +273,7 @@ App.Comm = {
 				var data = App.Comm.getUrlByType(data);
 				var url = data.url + "?fileVersionId=" + fileVersionId;
 				window.location.href = url;
-			}else{
+			} else {
 				alert(data.message);
 			}
 

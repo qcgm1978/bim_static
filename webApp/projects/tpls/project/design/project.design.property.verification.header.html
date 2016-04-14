@@ -1,61 +1,98 @@
+<div class="hedaerSearch">
+    <span class="searchToggle">选择筛选条件</span>
+    <span class="clearSearch">清除条件</span>
+    <span class="groupRadio">
+            <label class="btnCk">显示搜索结果对应位置</label> 
+        </span>
+</div>
+<div class="searchDetail">
+    <div class="searchOptons">
+        <div class="optonLine zIndex10">
+            <div class="myDropDown specialitiesOption optionComm">
+                <span class="myDropText">
+             <span>专业：</span> <span class="text">土建</span> <i class="myDropArrorw"></i> </span>
+                <ul class="myDropList">
+                    <li class="myItem">建筑</li>
+                    <li class="myItem">结构</li>
+                    <li class="myItem">设备</li>
+                    <li class="myItem">电气</li>
+                    <li class="myItem">景观</li>
+                    <li class="myItem">导视</li>
+                    <li class="myItem">照明</li>
+                </ul>
+            </div>
+            <div class="myDropDown categoryOption optionComm">
+                <span class="myDropText">
+             <span>类别：</span> <span class="text">安全</span> <i class="myDropArrorw"></i> </span>
+                <ul class="myDropList">
+                    <li class="myItem">安全</li>
+                    <li class="myItem">功能</li>
+                    <li class="myItem">品质</li>
+                </ul>
+            </div>
+        </div>
+        <div class="optonLine">
+            <div class="myDropDown materialEquipment statusOption optionComm">
+                <span class="myDropText">
+             <span>状态：</span> <span class="text">全部</span> <i class="myDropArrorw"></i> </span>
+                <ul class="myDropList">
+                    <li data-status="" class="myItem">全部</li>
+                    <li data-status="1" class="myItem">待整改</li>
+                    <li data-status="2" class="myItem">已整改</li>
+                    <li data-status="3" class="myItem">已关闭</li>
+                </ul>
+            </div>
+            <div class="myDropDown materialEquipment inspectionUnitOption optionComm">
+                <span class="myDropText">
+             <span>检查单位：</span> <span class="text">设计总包</span> <i class="myDropArrorw"></i> </span>
+                <ul class="myDropList">
+                    <li class="myItem">设计总包</li>
+                    <li class="myItem">第三方</li>
+                </ul>
+            </div>
+        </div>
+        <div class="optonLine">
+            <div class="firstDate dateBox" style="position: relative;">
+                <i class="iconCal add-on"></i>
+                <input readonly="true" placeholder="开始时间" id="dateStar" class="span2" type="text">
+            </div>
+            <span>-</span>
+            <div class="firstDate dateBox">
+                <i class="iconCal"></i>
+                <input readonly="true" placeholder="开始时间" id="dateEnd" class="span2" type="text">
+            </div>
+        </div>
+        <div class="optonLine btnOption">
+            <input type="button" class="myBtn myBtn-primary btnFilter" value="筛选" />
+        </div>
+    </div>
+</div>
 <div class="ckBox">
     <table class="ckTable" cellpadding="0" cellspacing="0">
         <thead class="ckHeader">
             <tr>
                 <th class="issue">问题</th>
                 <th class="status">
-                    <select name="">
-                        <option value="">状态</option>
-                        <option value="">待整改</option>
-                        <option value="">已整改</option>
-                        <option value="">已关闭</option>
-                    </select>
+                    状态
                 </th>
                 <th class="category">
-                    <select name="">
-                        <option value="">类别</option>
-                        <option value="">安全</option>
-                        <option value="">功能</option>
-                        <option value="">品质</option>
-                    </select>
+                    类别
                 </th>
                 <th class="specialty">
-                    <select>
-                        <option value="">专业</option>
-                        <option value="">建筑</option>
-                        <option value="">结构</option>
-                        <option value="">设备</option>
-                        <option value="">电气</option>
-                        <option value="">景观</option>
-                        <option value="">导视</option>
-                        <option value="">照明</option>
-                    </select>
+                    专业
                 </th>
                 <th class="professional">
-                    <select>
-                        <option value="">检查单位</option>
-                        <option value="">设计总包</option>
-                        <option value="">第三方</option>
-                    </select>
+                    检查单位
                 </th>
             </tr>
         </thead>
     </table>
-
-
     <div class="ckBody">
-     
-       <div class="ckBodyScroll">
-
-      
-
+        <div class="ckBodyScroll">
             <table class="ckTable" cellpadding="0" cellspacing="0">
                 <tbody>
                 </tbody>
             </table>
         </div>
-    
     </div>
-
 </div>
-

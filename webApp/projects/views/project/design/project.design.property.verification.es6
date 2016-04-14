@@ -1,53 +1,144 @@
- 
-//设计属性 检查
-App.Project.DesignVerification=Backbone.View.extend({
+ //设计属性 检查
+ App.Project.DesignVerification = Backbone.View.extend({
 
-	tagName:"div",
+ 	tagName: "div",
 
-	className:"designVerification",
+ 	className: "designVerification",
 
-	initialize:function(){
-		this.listenTo(App.Project.DesignAttr.VerificationCollection,"add",this.addOne);
-	},
+ 	initialize: function() {
+ 		this.listenTo(App.Project.DesignAttr.VerificationCollection, "add", this.addOne);
+ 		this.listenTo(App.Project.DesignAttr.VerificationCollection, "reset", this.reset);
+ 	},
 
-	template:_.templateUrl("/projects/tpls/project/design/project.design.property.verification.html"),
+ 	events: {
+ 		"click .searchToggle": "searchToggle"
+ 		
+ 	},
 
-	render:function(){
-		var template=_.templateUrl("/projects/tpls/project/design/project.design.property.verification.header.html",true);
-		this.$el.html(template);
-		return this;
-	},
+ 	template: _.templateUrl("/projects/tpls/project/design/project.design.property.verification.html"),
 
-	bindScroll(){
+ 	render: function(opts) {
 
-		this.$(".ckBodyScroll").mCustomScrollbar({
-             set_height: "100%",
-             theme: 'minimal-dark',
-             axis: 'y',
-             keyboard: {
-                 enable: true
-             },
-             scrollInertia: 0
-         });
-		
-	},
+ 		this.VerificationOptions=opts.verOpts;
 
-	//数据返回
-	addOne:function(model){ 
-		 
-		if (this.$el.closest('body').length<=0) {
-			this.remove();
-		}
-         var data=model.toJSON();
-         this.$(".ckBox .ckBody tbody").html(this.template(data));
+ 		var template = _.templateUrl("/projects/tpls/project/design/project.design.property.verification.header.html", true);
+ 		this.$el.html(template);
+ 		this.initEvent();
+ 		return this;
+ 	},
 
-         if (!this.$(".ckBodyScroll").hasClass('mCustomScrollbar ')) {
-         	this.bindScroll();
-         }
-          
-	}
+ 	//显示隐藏搜索
+ 	searchToggle() {
+ 		var $searchDetail = this.$(".searchDetail");
+ 		if ($searchDetail.is(":animated")) {
+ 			return;
+ 		}
+ 		$searchDetail.slideToggle();
+ 	},
 
-	 
+ 	//初始化事件
+ 	initEvent() {
 
-});
 
+ 		var that = this;
+ 		//专业
+ 		this.$(".specialitiesOption").myDropDown({
+ 			click: function($item) {
+
+ 				that.VerificationOptions.specialty = $item.text();
+ 			}
+ 		});
+
+ 		//类别
+ 		this.$(".categoryOption").myDropDown({
+ 			click: function($item) {
+
+ 				that.VerificationOptions.type = $item.text();
+ 			}
+ 		});
+
+ 		//状态
+ 		this.$(".statusOption").myDropDown({
+ 			click: function($item) {
+
+ 				that.VerificationOptions.status = $item.data("status");
+ 			}
+ 		});
+
+ 		//检查单位
+ 		this.$(".inspectionUnitOption").myDropDown({
+ 			click: function($item) {
+
+ 				that.VerificationOptions.reporter = $item.text();
+ 			}
+ 		});
+
+
+ 		this.$("#dateStar").one("mousedown", function() {
+ 			//日期控件初始化
+ 			$('#dateStar').datetimepicker({
+ 				language: 'zh-CN',
+ 				autoclose: true,
+ 				format: 'yyyy-mm-dd',
+ 				minView: 'month',
+ 				endDate: new Date()
+
+ 			}).on("changeDate", function(ev) {
+ 				that.VerificationOptions.startTime = ev.date.format("yyyy-MM-dd");
+ 			});
+ 		});
+
+ 		this.$("#dateEnd").one("mousedown", function() {
+ 			//日期控件初始化
+ 			$('#dateEnd').datetimepicker({
+ 				language: 'zh-CN',
+ 				autoclose: true,
+ 				format: 'yyyy-mm-dd',
+ 				minView: 'month',
+ 				endDate: new Date()
+
+ 			}).on("changeDate", function(ev) {
+ 				that.VerificationOptions.endTime = ev.date.format("yyyy-MM-dd");
+ 			});
+ 		});
+
+ 	},
+
+ 	bindScroll() {
+
+ 		this.$(".ckBodyScroll").mCustomScrollbar({
+ 			set_height: "100%",
+ 			theme: 'minimal-dark',
+ 			axis: 'y',
+ 			keyboard: {
+ 				enable: true
+ 			},
+ 			scrollInertia: 0
+ 		});
+
+ 	},
+
+ 	//数据返回
+ 	addOne: function(model) {
+
+ 		if (this.$el.closest('body').length <= 0) {
+ 			this.remove();
+ 		} 
+ 		var data = model.toJSON();
+ 		this.$(".ckBox .ckBody tbody").html(this.template(data.data));
+
+ 		if (!this.$(".ckBodyScroll").hasClass('mCustomScrollbar ')) {
+ 			this.bindScroll();
+ 		}
+
+ 	},
+
+ 	reset:function(){
+ 		this.$(".ckBox .ckBody tbody").html(App.Project.Settings.loadingTpl);
+ 	}
+
+
+
+
+
+ });
