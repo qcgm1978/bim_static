@@ -4,7 +4,8 @@
 .bim.select { cursor: default; }
 .bim.move { cursor: -webkit-grab; }
 .bim.fly { cursor: crosshair; }
-
+.bim .bim-loading{position:absolute;width:300px;height:16px;left:50%;top:50%;margin-left:-150px;border-radius:1000px;overflow:hidden;}
+.bim .bim-progress{display:block;background:#408cdf;height:16px;width:0;}
 /**
   * @name zhangyy-g@grandsoft.com.cn
   * @description zhangyy's code
