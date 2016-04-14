@@ -7,8 +7,8 @@ App.Project.ProjectDesignPropety = Backbone.View.extend({
 	template: _.templateUrl("/projects/tpls/project/design/project.design.propety.html"),
 
 	events: {
-		"click .projectPropetyHeader .item": "navItemClick",
-		"click .modleShowHide":"slideUpAndDown"
+		"click .projectPropetyHeader .item": "navItemClick"
+		
 	},
 
 	render: function() {
@@ -48,19 +48,9 @@ App.Project.ProjectDesignPropety = Backbone.View.extend({
 		}
 
 
-	},
-
-	//展开和收起
-	slideUpAndDown:function(event){
-		var $parent=$(event.target).parent(),$modleList=$parent.find(".modleList");
-		$(event.target).toggleClass("down");
-		if ($modleList.is(":hidden")) {
-			$modleList.slideDown();
-		}else{
-			$modleList.slideUp();
-		}
-
 	}
+
+	
 
 
 });

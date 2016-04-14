@@ -55,6 +55,7 @@
 	}
 }
 .rightProperty { .odd { background-color: #eee; }
+	.attrPlanBox, .attrCostBox, .attrQualityBox { display: none; }
 	.designVerification { height: 100%; }
 	.modle { .modleShowHide { transition: all .5s; background: url(/comm/images/commIcon.png) no-repeat 0px -256px; float: right; margin-right: 12px; margin-top: 6px; height: 14px; width: 14px; cursor: pointer;
 			&.down { transform: rotate(180deg); -ms-transform: rotate(180deg); -moz-transform: rotate(180deg); -webkit-transform: rotate(180deg); -o-transform: rotate(180deg); }
@@ -64,6 +65,7 @@
 		}
 		.modleList { background-color: #eee; border-top: 1px #ccc solid;
 			.modleItem { border-bottom: 1px #ccc solid;
+				.modleName2 { height: 25px; line-height: 28px; padding-left: 12px; width: 95%; }
 				.modleName { width: 25%; display: inline-block; box-sizing: border-box; padding-left: 12px; border-right: 1px #ccc solid; }
 				.modleVal { display: inline-block; width: 72%; box-sizing: border-box; padding-left: 12px; margin-left: -3px; }
 				.modelLink { display: inline-block; padding-left: 12px; color: #3F8CDF; height: 24px; line-height: 24px; }
@@ -162,7 +164,8 @@
 		}
 	}
 }
-.rightProperty { .nodeSwitch { background: url(../images/comm/images/commIcon.png) no-repeat 0px -39px; margin-top: 7px; display: inline-block; width: 12px; height: 10px; line-height: 8px; vertical-align: top; text-align: center; cursor: pointer;
+.rightProperty { .noneSwitch { display: inline-block; }
+	.nodeSwitch { background: url(../images/comm/images/commIcon.png) no-repeat 0px -39px; margin-top: 7px; display: inline-block; width: 12px; height: 10px; line-height: 8px; vertical-align: top; text-align: center; cursor: pointer;
 		&.on { background-position: 0px -49px; }
 		&.none { background-position: 0px 100px; }
 	}
@@ -209,7 +212,7 @@
 
 /* 质量 */
 .qualityContainer { position: absolute; top: 40px; bottom: 0px; left: 0px; right: 0px;
-	.QualityProcessAcceptance, .QualityProcessCheck, .QualityOpeningAcceptance, .QualityConcerns, .QualityProperties { min-width: 398px; width: 100%; }
+	.QualityProcessAcceptance, .QualityProcessCheck, .QualityOpeningAcceptance, .QualityConcerns, .QualityProperties { min-width: 398px; width: 100%; height: 100%; overflow: auto; }
 }
 .rightProperty { .hedaerSearch { padding: 15px; min-width: 398px; width: 100%; overflow: hidden;
 		.searchToggle { cursor: pointer; background: url(/comm/images/commIcon.png) no-repeat right -253px; padding-right: 30px; }
@@ -289,18 +292,16 @@
 		.ckHeader { margin-left: 80px; text-align: left; }
 		.ckName { margin-bottom: 6px; }
 	}
-	.tbComm {
-		.noDataTd,.loadingTd { height: 60px; line-height: 60px; text-align: center; color: #ccc; font-size: 16px; border:0;}
+	.tbComm { .noDataTd, .loadingTd { height: 60px; line-height: 60px; text-align: center; color: #ccc; font-size: 16px; border: 0; }
 	}
-	
 	.paginationBottom { position: absolute; bottom: 0px; height: 30px; left: 0px; right: 0px; line-height: 30px;
 		.pageInfo, .sumCount { float: right; }
 		.sumCount { margin-right: 15px; }
 		.prev { margin-left: 10px; }
 		.next { margin-right: 15px; margin-left: 6px; }
-		.prev,.next{    cursor: pointer;color: #006ECF;
-			&:hover{text-decoration: underline;}
-			&.disable{color:#ccc;text-decoration: none;cursor: default;}
+		.prev, .next { cursor: pointer; color: #006ECF;
+			&:hover { text-decoration: underline; }
+			&.disable { color: #ccc; text-decoration: none; cursor: default; }
 		}
 	}
 }

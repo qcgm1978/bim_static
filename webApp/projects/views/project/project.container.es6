@@ -12,7 +12,8 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		"mousedown .dragSize": "dragSize",
 		"click .projectVersionList .container .item": "changeVersion",
 		"click .projectVersionList .nav .item": "changeVersionTab",
-		"click .fileModelList li": "switchFileMoldel"
+		"click .fileModelList li": "switchFileMoldel",
+		"click .modleShowHide":"slideUpAndDown"
 
 	},
 
@@ -25,6 +26,18 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		this.$el.find(".projectCotent").append(new App.Project.FileContainer().render().el);
 		this.$el.find(".projectCotent").append('<div class="modelContainer"> <div class="modelContainerScroll"><div class="modelContainerContent"></div></div> </div>');
 		return this;
+	},
+
+	//展开和收起
+	slideUpAndDown:function(event){
+		var $parent=$(event.target).parent(),$modleList=$parent.find(".modleList");
+		$(event.target).toggleClass("down");
+		if ($modleList.is(":hidden")) {
+			$modleList.slideDown();
+		}else{
+			$modleList.slideUp();
+		}
+
 	},
 
 	//点击面包靴

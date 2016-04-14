@@ -1,85 +1,56 @@
 <% var count=obj.length,item; %>
-
-<% for(var i=0;i<count;i++){ %>
-	<% item=obj[i]; %>
-<div class="modle">
-	<i class="modleShowHide"></i> <h1 class="modleName"><%= item.group%></h1>
-	<ul class="modleList">
-
-	<% var subItems=item.items,subCount=subItems.length,subItem %>
-
-	<% for(var j=0;j<subCount;j++){ %>
-		<% subItem=subItems[j];  %>
-		<li class="modleItem">
-			<span class="modleName"><div class="modleNameText overflowEllipsis"><%=subItem.name%></div></span> <span class="modleVal"><%=subItem.value%><%=subItem.unit%></span>
-		</li>
-
-		<% } %> 
-
-	</ul>
-
-</div>
-
-<% } %>
-
-
+    <% for(var i=0;i<count;i++){ %>
+        <% item=obj[i]; %>
+            <div class="modle">
+                <i class="modleShowHide"></i>
+                <h1 class="modleName"><%= item.group%></h1>
+                <ul class="modleList">
+                    <% var subItems=item.items,subCount=subItems.length,subItem %>
+                        <% for(var j=0;j<subCount;j++){ %>
+                            <% subItem=subItems[j];  %>
+                                <li class="modleItem">
+                                    <span class="modleName"><div class="modleNameText overflowEllipsis"><%=subItem.name%></div></span> <span class="modleVal"><%=subItem.value%><%=subItem.unit%></span>
+                                </li>
+                        <% } %>
+                </ul>
+            </div>
+    <% } %>
 <div class="attrPlanBox">
-	
+    <div class="modle">
+        <i class="modleShowHide"></i>
+        <h1 class="modleName">计划</h1>
+        <ul class="modleList">
+            <li class="modleItem">
+                <span class="modleName"><div class="modleNameText overflowEllipsis">业务事项</div></span> <span class="modleVal name"> </span>
+            </li>
+            <li class="modleItem">
+                <span class="modleName"><div class="modleNameText overflowEllipsis">计划开始</div></span> <span class="modleVal strat"></span>
+            </li>
+            <li class="modleItem">
+                <span class="modleName"><div class="modleNameText overflowEllipsis">计划结束</div></span> <span class="modleVal end"></span>
+            </li>
+            <li class="modleItem">
+                <span class="modleName"><div class="modleNameText overflowEllipsis">实际结束</div></span> <span class="modleVal rEnd"></span>
+            </li>
+        </ul>
+    </div>
 </div>
-
-
 <div class="attrCostBox">
-	
+	<div class="modle">
+		<i class="modleShowHide"></i>
+    	<h1 class="modleName">成本</h1>
+	</div>
+ 
 </div>
-
 <div class="attrQualityBox">
-	
+    <div class="modle">
+        <i class="modleShowHide"></i>
+        <h1 class="modleName">质检标准</h1>
+        <ul class="modleList">
+        </ul>
+    </div>
 </div>
-
-<!-- <div class="modle">
-	<i class="modleShowHide"></i> <h1 class="modleName">尺寸标注</h1>
-	<ul class="modleList">
-		<li class="modleItem">
-			<span class="modleName">周长</span> <span class="modleVal">453700.000 m</span>
-		</li>
-
-		<li class="modleItem">
-			<span class="modleName">面积</span> <span class="modleVal">6297.575 ㎡</span>
-		</li>
-
-		<li class="modleItem">
-			<span class="modleName">体积</span> <span class="modleVal">629.575 ㎥</span>
-		</li>
-
-		<li class="modleItem">
-			<span class="modleName">厚度</span> <span class="modleVal">100.00 mm</span>
-		</li> 
-	</ul>
-
-</div>
-
-<div class="modle">
-	<i class="modleShowHide"></i> <h1 class="modleName">计划</h1>
-	<ul class="modleList">
-		<li class="modleItem">
-			<span class="modleName">业务事项</span> <span class="modleVal">C30现浇有梁板（泵送商品）</span>
-		</li>
-
-		<li class="modleItem">
-			<span class="modleName">计划开始</span> <span class="modleVal">2016-03-10</span>
-		</li>
-
-		<li class="modleItem">
-			<span class="modleName">计划结束</span> <span class="modleVal">2016-03-10</span>
-		</li>
-
-		<li class="modleItem">
-			<span class="modleName">实际结束</span> <span class="modleVal"></span>
-		</li> 
-	</ul>
-
-</div>
-
+                <!--
 <div class="modle">
 	<i class="modleShowHide"></i> <h1 class="modleName">成本</h1>
 	<ul class="modleList">

@@ -428,23 +428,47 @@ App.Project = {
 	//属性页 设计成本计划 type 加载的数据
 	propertiesOthers: function(type) {
 
-		debugger
-		if (type.indexOf("plan")!=-1) {
-			 App.Project.fetchPropertData("fetchDesignPropertiesPlan",function(data){
-			 	console.log(data);
-			 });
+		var that = this; 
+		 //计划
+		if (type.indexOf("plan") != -1) {
+			App.Project.fetchPropertData("fetchDesignPropertiesPlan", function(data) {
+				if (data.code == 0) {
+					 
+					data = data.data;
+					that.$el.find(".attrPlanBox").find(".name").text(data.businessItem).end().find(".start").
+					text(data.planStartTime && new Date(data.planStartTime).format("yyyy-MM-dd") || "").end().
+					find(".end").text(data.planStartTime && new Date(data.planEndTime).format("yyyy-MM-dd") || "").end().
+					find(".rEnd").text(data.planStartTime && new Date(data.endTime).format("yyyy-MM-dd") || "").end().show();
+
+				}
+			});
+		}
+		//成本
+		if (type.indexOf("cost") != -1) {
+			App.Project.fetchPropertData("fetchDesignPropertiesCost", function(data) {
+				if (data.code == 0) {
+					var html = App.Project.properCostTree(data.data);
+					that.$el.find(".attrCostBox").show().find(".modle").append(html);
+				}
+			});
 		}
 
-		if (type.indexOf("cost")!=-1) {
-			 App.Project.fetchPropertData("fetchDesignPropertiesCost",function(data){
-			 	console.log(data);
-			 });
-		}
+		//质监标准
+		if (type.indexOf("quality") != -1) {
 
-		if (type.indexOf("quality")!=-1) {
-			 App.Project.fetchPropertData("fetchDesignPropertiesQuality",function(data){
-			 	console.log(data);
-			 });
+			var liTpl = '<li class="modleItem"><div class="modleNameText overflowEllipsis modleName2">varName</div></li>';
+
+			App.Project.fetchPropertData("fetchDesignPropertiesQuality", function(data) {
+
+				if (data.code == 0) {
+
+					var lis = '';
+					$.each(data.data, function(i, item) {
+						lis += liTpl.replace("varName", item.name);
+					});
+					that.$el.find(".attrQualityBox").show().find(".modleList").html(lis);
+				}
+			});
 		}
 
 
@@ -452,9 +476,9 @@ App.Project = {
 	},
 
 	//属性 数据获取
-	fetchPropertData: function(fetchType,callback) { 
+	fetchPropertData: function(fetchType, callback) {
 
-		var Intersect = App.Project.Settings.ModelObj.intersect; 
+		var Intersect = App.Project.Settings.ModelObj.intersect;
 
 		var data = {
 			URLtype: fetchType,
@@ -466,7 +490,69 @@ App.Project = {
 			}
 		};
 
-		App.Comm.ajax(data,callback);
+		App.Comm.ajax(data, callback);
+	},
+
+	//成本树
+	properCostTree: function(data) {
+		var sb = new StringBuilder(),
+			item,
+			treeCount = data.length;
+
+		sb.Append('<ul class="modleList">');
+
+		for (var i = 0; i < treeCount; i++) {
+
+			sb.Append('<li class="modleItem" >');
+			item = data[i];
+			sb.Append(App.Project.properCostTreeItem(item,i));
+			sb.Append('</li>');
+		}
+		sb.Append('</ul>');
+		return sb.toString();
+	},
+
+	//tree 节点
+	properCostTreeItem: function(item,i) {
+		 
+		var sb = new StringBuilder(),w=(i+1)*12;
+
+		//内容
+	 
+		sb.Append('<span class="modleName"><div class="modleNameText overflowEllipsis">');
+		if (item.children && item.children.length > 0) {
+			sb.Append('<i class="nodeSwitch on" style="width:'+w+'px;"></i>');
+		} else {
+			sb.Append('<i class="noneSwitch" style="width:'+w+'px;"></i> ');
+		}
+		sb.Append(item.code);
+		sb.Append('</div></span>');
+		sb.Append(' <span class="modleVal"> ' + item.name + '</span> '); 
+
+		//递归
+		if (item.children && item.children.length > 0) {
+
+			sb.Append('<ul class="modleList">');
+
+			var treeSub = item.children,
+				treeSubCount = treeSub.length,
+				subItem;
+
+			for (var j = 0; j < treeSubCount; j++) {
+
+				sb.Append('<li class="modleItem" > ');
+				subItem = treeSub[j];
+				sb.Append(App.Project.properCostTreeItem(subItem,i));
+				sb.Append('</li>');
+			}
+
+
+			sb.Append('</ul>');
+		}
+
+		return sb.toString();
+
+
 	}
 
 
