@@ -4,7 +4,9 @@
             <% _.each(data.items,function(item){ %>
             <tr>
                 <td class="collList">
-                    <img class="ckImg" src="<%= item.image %>" alt="" width="74" height="38" />
+                    <div class="ckImg">
+                        <img src="<%= item.image %>" alt="" />
+                    </div>
                     <div class="ckHeader">
                         <div class="ckName"><%= item.name %></div>
                         <div class="date"><%= item.createTime %></div>
@@ -42,10 +44,30 @@
         <p>碰撞检测失败,请重试</p>
         <a href="javascript:;" class="newColl">点此重新碰撞</a>
     </div>
+    <div class="collFooter">
+        <a href="javascript:;" class="viewSetting">
+            <i class="settingIcon"></i>
+            <span>查看碰撞设置</span>
+        </a>
+        <!-- <a href="javascript:;" class="export disabled">
+            <i class="exportIcon"></i>
+            <span>导出报表</span>
+        </a> -->
+    </div>
 <% }else if(message == "running"){ %>
     <div class="collTips">
         <i class="runningIcon"></i>
         <p>碰撞检测进行中,请稍候...</p>
+    </div>
+    <div class="collFooter">
+        <a href="javascript:;" class="viewSetting">
+            <i class="settingIcon"></i>
+            <span>查看碰撞设置</span>
+        </a>
+        <!-- <a href="javascript:;" class="export disabled">
+            <i class="exportIcon"></i>
+            <span>导出报表</span>
+        </a> -->
     </div>
 <% }else if(message == "none"){ %>
     <div class="collTips">
@@ -57,5 +79,15 @@
     <div class="collTips">
         <i class="nothingIcon"></i>
         <p>没有碰撞点</p>
+    </div>
+    <div class="collFooter">
+        <a href="javascript:;" class="viewSetting">
+            <i class="settingIcon"></i>
+            <span>查看碰撞设置</span>
+        </a>
+        <!-- <a href="javascript:;" class="export disabled">
+            <i class="exportIcon"></i>
+            <span>导出报表</span>
+        </a> -->
     </div>
 <% } %>

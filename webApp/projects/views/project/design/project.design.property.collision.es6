@@ -118,13 +118,13 @@ App.Project.DesignCollision=Backbone.View.extend({
 
 	getDetail:function(event){
 		var list = this.$el.find('.collSelect'),
-				self = $(event.target),
-				that = self.closest('.collItem'),
+				that = $(event.target).parent(),
+				name = that.find('.collName').text(),
 				collisionId = that.data('id'),
 				status = that.data('status'),
-				len = parseInt(($(".detailList").height() -65)/59),
-				currentInput = list.prev();
-		currentInput.val(self.text());
+				len = parseInt(($(".detailList").height() -65)/77),
+				currentInput = list.prev().find("input");
+		currentInput.val(name);
 		list.hide();
 		if(status == "2"){
 			App.Project.Settings.collisionId = collisionId;
