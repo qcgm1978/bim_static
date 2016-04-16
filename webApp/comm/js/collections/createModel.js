@@ -34,43 +34,85 @@ App.Comm.createModel = function(options){
       "click .delete":"delete",
       "click .edit":"edit",
       "click .current-floor":"openFloors",
-      "click .selectFloor":"selectFloor"
+      "click .selectFloor li":"selectFloor"
     },
     template:_.templateUrl('/comm/js/tpls/modelBar.html',true),
+    initialize:function(){
+      this.listenTo(modelCollection.viewpointCollection,"add",this.addViewpoint);
+    },
     render: function() {
       this.$el.html(this.template);
-      this.$el.find(".modelTree").html(new treeView().render().el);
-      this.$el.find(".floors").append(new selectFloor().render().el);
+      this.$el.find(".modelTree .modelFilter").html(new treeView().render().el);
       modelCollection.floorsCollection.etag = opt.etag;
       modelCollection.floorsCollection.sourceId = opt.sourceId;
       modelCollection.floorsCollection.fetch();
       return this;
     },
+    addViewpoint:function(model){
+      var data = model.toJSON().data,
+          that = this;
+      _.forEach(data,function(obj){
+        var view = new vView({
+          model:obj
+        });
+        that.$el.find('.modelTree .modelEye .tree').append(view.render().el);
+      });
+      return that;
+    },
     select:function(event){
       var that = this,
           self = $(event.target),
-          fn = self.data('id');
-      if(self.is(".bar-filter")){
-        self.toggleClass('selected')
-        that.filter();
-      }else if(self.is(".bar-viewpoint,.bar-comment,.bar-fit")){
-        viewer && viewer[fn]();
+          fn = self.data('id'),
+          type = self.data('type');
+      if(type == 'filter'){
+        self.toggleClass('selected').siblings().removeClass('selected');
+        that.filter(fn,self.is('.selected'));
+      }else if(type == "change"){
+        self.toggleClass('selected').siblings().removeClass('selected');
+        if(self.is(".selected")){
+          viewer && viewer[fn]();
+        }else{
+          viewer.picker();
+        }
+      }else if(type == "map"){
+        if(modelBox.find('.modPop').length==0){
+          modelBox.append(new modDialog().render().el);
+          $(".modPop").show();
+          viewer.initMap('bigMap',$("#map")[0]);
+          viewer.showAxisGrid("bigMap");
+        }else{
+          $(".modPop").show();
+        }
       }else{
-        self.addClass('selected').siblings(":not('.bar-filter')").removeClass('selected');
         viewer && viewer[fn]();
       }
     },
-    filter:function(){
+    filter:function(type,isShow){
       // 加载构件树
       var that = this,
           tree = that.$el.find(".modelTree");
       modelCollection.sceneCollection.etag = modelCollection.categoryCollection.etag = opt.etag;
       modelCollection.sceneCollection.sourceId = modelCollection.categoryCollection.sourceId = opt.sourceId;
       modelCollection.viewpointCollection.projectId = opt.projectId;
-      modelCollection.sceneCollection.fetch();
-      modelCollection.categoryCollection.fetch();
-      modelCollection.viewpointCollection.fetch();
-      tree.toggle().parent().toggleClass('open');
+      if(type == "filter"){
+        if(!that.filter.fetchTree){
+          modelCollection.sceneCollection.fetch();
+          modelCollection.categoryCollection.fetch();
+          that.filter.fetchTree = true;
+        }
+        tree.find('.modelFilter').show().siblings().hide();
+      }else{
+        if(!that.filter.fetchPoint){
+          modelCollection.viewpointCollection.fetch();
+          that.filter.fetchPoint = true;
+        }
+        tree.find('.modelEye').show().siblings().hide();
+      }
+      if(isShow){
+        tree.show().parent().addClass('open');
+      }else{
+        tree.hide().parent().removeClass('open');
+      }
     },
     delete:function(){
       new App.Comm.modules.Dialog({
@@ -125,7 +167,7 @@ App.Comm.createModel = function(options){
         }
       });
       cur.text(val).removeClass("open");
-      viewer.setFloorMap(mapData);
+      viewer.setFloorMap(mapData,"initMap");
     }
   });
   var treeView = Backbone.View.extend({
@@ -137,25 +179,11 @@ App.Comm.createModel = function(options){
       "change input":"filter"
     },
     template:_.templateUrl('/comm/js/tpls/modelTree.html',true),
-    initialize:function(){
-      this.listenTo(modelCollection.viewpointCollection,"add",this.addViewpoint);
-    },
     render:function(){
       this.$el.html(this.template);
       this.$el.find("#specialitys").append(new sView().render().el);
       this.$el.find("#floors").append(new fView().render().el);
       this.$el.find("#categorys").append(new cView().render().el);
-      return this;
-    },
-    addViewpoint:function(model){
-      var data = model.toJSON().data,
-          that = this;
-      _.forEach(data,function(obj){
-        var view = new vView({
-          model:obj
-        });
-        that.$el.find('#viewpoints ul').append(view.render().el);
-      });
       return this;
     },
     toggleTree:function(event){
@@ -365,6 +393,40 @@ App.Comm.createModel = function(options){
       return this;
     }
   });
+  var modDialog = Backbone.View.extend({
+    // 视点树
+    tagName: "div",
+    className:'modPop',
+    events:{
+      "click .modClose":"hideMode",
+      "click .submit":"submit",
+      "input .modInput":"reset"
+    },
+    template:_.templateUrl('/comm/js/tpls/modDialog.html',true),
+    render:function(){
+      this.$el.html(this.template);
+      return this;
+    },
+    hideMode:function(event){
+      $(event.target).closest(".modPop").hide();
+    },
+    submit:function(event){
+      var that = this,
+          self = $(event.target),
+          parent = that.$el,
+          x = parent.find("#x").val(),
+          y = parent.find("#y").val();
+      if(x&&y){
+        parent.hide();
+      }else{
+        !x&&parent.find("#x").addClass('error');
+        !y&&parent.find("#y").addClass('error');
+      }
+    },
+    reset:function(event){
+      $(event.target).removeClass('error');
+    }
+  });
   var viewpointDialog = function(option){
    new App.Comm.modules.Dialog({
       width:280,
@@ -436,29 +498,40 @@ App.Comm.createModel = function(options){
       }
     }
     App.Comm.ajax(data,function(data){
-      viewer.setAxisGrid(data)
+      viewer.setAxisGrid(data,"initMap")
     });
   }
   var init = function(){
     modelBox.append(modelView);
     opt.element.append(modelBox);
     modelBox.append(new modelBar().render().el);
-    viewer =  new BIM({
+    $('body').on("keypress",function(event){
+      var event = event || window.event;
+      if(event.keyCode==32){
+        $(".bar-fly").trigger('click');
+      }
+    })
+    viewer = new BIM({
       element: modelView[0],
-      mapElement:$('.modelMap .map')[0],
       etag: opt.etag
     });
+    $(".modelMap .floors").append(new selectFloor().render().el);
     getAxisGrid();
+    viewer.initMap('initMap',$('.modelMap .map')[0]);
     viewer.on('changeGrid',function(res){
+      if(!res) return false;
       var axis = res.axis,
           x = axis.infoX,
           y = axis.infoY;
       if(x&&y){
         $('.grid-position').text(x+","+y);
+      }else{
+        $('.grid-position').text("--,--");
       }
+      $('.modPop').hide();
     })
     viewer.on("viewpoint",function(point){
-      $('.modelView .bar-filter').not('.selected').trigger('click');
+      $('.modelView .bar-eye').not('.selected').trigger('click');
       $('.modelView #viewpoints>.item-content').addClass("open");
       viewpointDialog({
         type:"new",

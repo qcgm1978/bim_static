@@ -1,15 +1,26 @@
 <div class="modelTree">
-
+  <div class="modelFilter"></div>
+  <div class="modelEye">
+    <ul class="tree">
+    </ul>
+  </div>
 </div>
 <div class="modelTools">
-  <i class="bar-item bar-filter" data-id="filter" title="树"></i>
-  <i class="bar-item bar-fit" data-id="fit" title="适应窗口"></i>
-  <i class="bar-item bar-select" data-id="select" title="选择"></i>
-  <i class="bar-item bar-handle selected" data-id="handle" title="平移"></i>
-  <i class="bar-item bar-rotate" data-id="rotate" title="旋转(R)"></i>
-  <i class="bar-item bar-fly" data-id="fly" title="漫游"></i>
-  <i class="bar-item bar-viewpoint" data-id="viewpoint" title="视点"></i>
-  <i class="bar-item bar-comment" data-id="comment" title="批注"></i>
+  <div class="bar-group">
+    <i class="bar-item bar-filter" data-id="filter" data-type="filter" title="树"></i>
+    <i class="bar-item bar-eye" data-id="eye" data-type="filter" title="视点"></i>
+  </div>
+  <div class="bar-group">
+    <i class="bar-item bar-viewpoint" data-type="none" data-id="viewpoint" title="快照"></i>
+    <i class="bar-item bar-fit" data-type="none" data-id="fit" title="适应窗口"></i>
+  </div>
+  <div class="bar-group">
+    <i class="bar-item bar-zoom" data-type="change" data-id="zoom" title="缩放"></i>
+    <i class="bar-item bar-fly" data-type="change" data-id="fly" title="漫游"></i>
+  </div>
+  <div class="bar-group">
+    <i class="bar-item bar-grid" data-type="map" data-id="showMap" title="轴网"></i>
+  </div>
 </div>
 <div class="modelMap">
   <div class="map"></div>
@@ -19,8 +30,8 @@
     </div>
     <div class="axisGrid">
       <i class="gridIcon"></i>
-      <span>轴：</span>
-      <span class="grid-position"></span>
+      <span>轴网：</span>
+      <span class="grid-position">--,--</span>
     </div>
   </div>
 </div>

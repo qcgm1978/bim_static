@@ -9,7 +9,6 @@ var BIM = function(option){
   var self = BIM.common.self = this;
   var defaults = {
     element:'',
-    mapElement:'',
     cameraInfo:'',
     controll:true,
     etag:'',
@@ -33,40 +32,31 @@ var BIM = function(option){
     CLOUD.GlobalData.SubSceneVisibleLOD= 100;
   }
   var start = function(res){
-    BIM.util.pub('start',res)
+    BIM.util.pub('start',res);
+    _opt.loading = BIM.util.createDom('div','bim-loading');
+    _opt.progress = BIM.util.createDom('div','bim-progress');
+    _opt.loading.appendChild(_opt.progress);
+    bimBox.appendChild(_opt.loading);
   }
   var loading = function(res){
-    var total = res.totalModels,
-        loaded = res.loadedModels,
-        progress = loaded/total*100
+    var total = res.progress.total,
+        loaded = res.progress.loaded,
+        progress = loaded/total*100;
+    _opt.progress.style.width = progress+'%';
     if(progress == 100){
+      bimBox.removeChild(_opt.loading);
     }
     BIM.util.pub('loading',progress)
   }
   var loaded = function(res){
     viewer.render();
     if(_opt.tools){
-      BIM.util.controll()
+      BIM.util.controll();
     }
-    self.handle();
     BIM.util.pub('loaded',res);
   }
   var changed = function(res){
     BIM.util.pub('click',res);
-  }
-  var changeAxisGrid = function(res){
-    BIM.util.pub('changeGrid',res);
-  }
-  var initMap = function(){
-    var _el = _opt.mapElement,
-        _width = _el.clientWidth,
-        _height = _el.clientHeight,
-        _css={
-          left:'0px',
-          bottom:'0px',
-          outline:'none'
-        };
-    viewer.initMiniMap(_el,_width,_height,_css,changeAxisGrid);
   }
   var viewer = BIM.common.viewer = new CloudViewer();
   viewer.registerEventListener(CLOUD.EVENTS.ON_SELECTION_CHANGED, changed);
@@ -79,7 +69,6 @@ var BIM = function(option){
     bimBox.appendChild(viewBox);
     _opt.element.appendChild(bimBox);
     viewer.init(viewBox);
-    initMap();
     viewer.load(_opt.etag,BIM.common.severModel);
     if(_opt.resize){
       _util.listener(window,'resize',function(){
@@ -98,12 +87,6 @@ BIM.common = {
   menu : {
     nav:[
       {
-        id:'home',
-        icon:'bar-home',
-        title:'初始',
-        fn:'home'
-      },
-      {
         id:'fit',
         icon:'bar-fit',
         title:'适应窗口(I)',
@@ -111,79 +94,26 @@ BIM.common = {
         key:'I'
       },
       {
-        id:'zoomIn',
-        icon:'bar-zoomIn',
-        title:'放大(X)',
-        fn:'zoomIn',
-        key:'X'
-      },
-      {
-        id:'zoomOut',
-        icon:'bar-zoomOut',
-        title:'缩小(Z)',
-        fn:'zoomOut',
-        key:'Z'
-      },
-      {
-        id:'divide'
-      },
-      {
         id:'select',
         icon:'bar-select',
         title:'选择(V)',
-        fn:'select',
+        fn:'picker',
         key:'V'
       },
       {
-        id:'handle',
-        icon:'bar-handle',
-        title:'平移(H)',
-        fn:'handle',
-        key:'H'
-      },
-      {
-        id:'rotate',
-        icon:'bar-rotate',
-        title:'旋转(R)',
-        fn:'rotate',
-        key:'R'
-      },
-      {
-        id:'camera',
-        icon:'bar-camera',
-        title:'视角(C)',
-        fn:'camera',
-        key:'C'
-      },
-      {
-        id:'section',
-        icon:'bar-section',
-        title:'剖面(P)',
-        fn:'section',
-        key:'P'
+        id:'zoom',
+        icon:'bar-zoom',
+        title:'缩放(Z)',
+        fn:'zoom',
+        key:'Z'
       },
       {
         id:'fly',
         icon:'bar-fly',
-        title:'漫游(F)',
+        title:'漫游(Space)',
         fn:'fly',
-        key:'F'
-      },
-      {
-        id:'divide'
-      },
-      {
-        id:'viewpoint',
-        icon:'bar-viewpoint',
-        title:'视点',
-        fn:'viewpoint'
+        key:' '
       }
-      /*{
-        id:'fullScreen',
-        icon:'bar-fullScreen',
-        title:'全屏',
-        fn:'fullScreen'
-      },*/
     ],
     camera:[
       {
@@ -641,6 +571,12 @@ BIM.prototype = {
     return this;
   },
   subscribers:BIM.util.subscribers,
+  zoom : function () {
+    BIM.common.bimBox.className = 'bim';
+    BIM.util.pub('zoom');
+    BIM.common.viewer.setZoomMode();
+    BIM.util.changeClass('bar-zoom','bar-item','selected');
+  },
   zoomIn : function () {
     BIM.util.pub('zoomIn');
     BIM.common.viewer.zoomIn();
@@ -668,7 +604,7 @@ BIM.prototype = {
   handle : function () {
     BIM.util.pub('handle');
     BIM.common.viewer.setPanMode();
-    BIM.common.bimBox.className = 'bim move';
+    BIM.common.bimBox.className = 'bim';
     BIM.util.changeClass('bar-handle','bar-item','selected');
     BIM.util.toggleSectionBar('hide');
     BIM.util.toggleCameraToolsBar('hide');
@@ -688,6 +624,11 @@ BIM.prototype = {
     BIM.util.changeClass('bar-fly','bar-item','selected');
     BIM.util.toggleSectionBar('hide');
     BIM.util.toggleCameraToolsBar('hide');
+  },
+  picker:function(){
+    BIM.common.bimBox.className = 'bim';
+    BIM.common.viewer.setPickMode();
+    BIM.util.changeClass('bar-select','bar-item','selected');
   },
   resize : function(width,height){
     BIM.util.pub('resize');
@@ -805,21 +746,34 @@ BIM.prototype = {
     });
     viewer.render();
   },
-  setFloorMap:function(obj){
+  setFloorMap:function(obj,name){
     var viewer = BIM.common.viewer;
-    viewer.setFloorPlanData(obj);
+    viewer.setFloorPlaneData(obj);
+    viewer.generateFloorPlane(name);
   },
-  setAxisGrid:function(obj){
+  setAxisGrid:function(obj,name){
     var viewer = BIM.common.viewer;
     viewer.setAxisGridData(obj);
+    viewer.generateAxisGrid(name);
   },
-  showAxisGrid:function(){
-    var viewer = BIM.common.viewer;
-    viewer.showAxisGrid(true);
+  toggleAxisGrid:function(){
+    var that = this,
+        self = BIM.common.self;
+    if(that.axisGrid){
+      self.hideAxisGrid();
+      that.axisGrid = false;
+    }else{
+      self.showAxisGrid();
+      that.axisGrid = true;
+    }
   },
-  hideAxisGrid:function(){
+  showAxisGrid:function(name){
     var viewer = BIM.common.viewer;
-    viewer.showAxisGrid(false);
+    viewer.showAxisGrid(name,true);
+  },
+  hideAxisGrid:function(name){
+    var viewer = BIM.common.viewer;
+    viewer.showAxisGrid(name,false);
   },
   zoomBox:function(box){
     var viewer = BIM.common.viewer;
@@ -836,6 +790,22 @@ BIM.prototype = {
     var viewer = BIM.common.viewer;
     viewer.load(etag,BIM.common.severModel);
     viewer.render();
+  },
+  initMap:function(name,element){
+    var viewer = BIM.common.viewer,
+        _el = element,
+        _width = _el.clientWidth,
+        _height = _el.clientHeight,
+        _css={
+          left:'0px',
+          bottom:'0px',
+          outline:'none'
+        };
+    viewer.createMiniMap(name,_el,_width,_height,_css,function(res){
+      BIM.util.pub('changeGrid',res);
+    });
+    viewer.generateFloorPlane(name);
+    viewer.generateAxisGrid(name);
   }
 }
 
