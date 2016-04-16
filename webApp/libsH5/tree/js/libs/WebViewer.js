@@ -18,8 +18,8 @@ CLOUD.GlobalData = {
     DynamicRelease: true,
     SubSceneVisibleDistance: 0.1,
     CellVisibleLOD: 40,
-    SubSceneVisibleLOD: 50,
-    ScreenCullLOD: 0.0001,
+    SubSceneVisibleLOD: 60,
+    ScreenCullLOD: 0.0002,
 };
 
 CLOUD.EnumStandardView = {
@@ -2231,10 +2231,9 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
 
                         }
 
-                        if (buffer!== undefined) {
+                        
                             _gl.bindBuffer(_gl.ARRAY_BUFFER, buffer);
                             _gl.vertexAttribPointer(programAttribute, size, _gl.FLOAT, false, 0, startIndex * size * 4); // 4 bytes per Float32                           
-                        }
    
  
                     }
@@ -2273,7 +2272,6 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
         }
 
         state.disableUnusedAttributes();
-        return true;
     }
 
     // Sorting
@@ -2310,7 +2308,7 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
 
         if ( a.object.renderOrder !== b.object.renderOrder ) {
 
-            return a.object.renderOrder - b.object.renderOrder;
+            return b.object.renderOrder - a.object.renderOrder;
 
         } else if (a.material.id !== b.material.id) {
 
@@ -2332,7 +2330,7 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
 
         if ( a.object.renderOrder !== b.object.renderOrder ) {
 
-            return a.object.renderOrder - b.object.renderOrder;
+            return b.object.renderOrder - a.object.renderOrder;
 
         } if ( a.z !== b.z ) {
 
@@ -2390,8 +2388,6 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
             sprites.length = 0;
             lensFlares.length = 0;
 
-
-            projectLights(scene);
             projectObject( scene, camera );
 
             opaqueObjects.length = opaqueObjectsLastIndex + 1;
@@ -2675,7 +2671,7 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
 
                 cullingObjectCount = 0;
 
-                projectLights(scene);
+                projectIncrementLights(scene);
             }
             startCullTime = Date.now();
 
@@ -2684,7 +2680,7 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
 
                        
             //console.time("projectObject");
-            isIncrementalCullFinish = projectObject(scene, camera);
+            isIncrementalCullFinish = projectIncrementObject(scene, camera);
             //console.timeEnd("projectObject");
             //console.log("screen cull off: " + _screenCullOffCount);
 
@@ -2746,15 +2742,15 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
             var renderItem = renderList[ i ];
 
             var object = renderItem.object;
-            var geometry = renderItem.geometry;
+            //var geometry = renderItem.geometry;
             var material = overrideMaterial === undefined ? renderItem.material : overrideMaterial;
             var group = renderItem.group;
 
             object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
             object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
 
+            var geometry = objects.update(object);
             _this.renderBufferDirect( camera, lights, fog, geometry, material, object, group );
-
         
             if (i % 1000 === 999) {
                 //endTime = window.performance.now();
@@ -2784,29 +2780,29 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
     // ------------------------------------------------------------------
 
 
-    function pushRenderItem( object, geometry, material, z, group ) {
+    function pushIncrementRenderItem(object, geometry, material, z, group) {
 
         var array, index;
 
         // allocate the next position in the appropriate array
 
-        if ( material.transparent ) {
+        if (material.transparent) {
 
             array = transparentObjects;
-            index = ++ transparentObjectsLastIndex;
+            index = ++transparentObjectsLastIndex;
 
         } else {
 
             array = opaqueObjects;
-            index = ++ opaqueObjectsLastIndex;
+            index = ++opaqueObjectsLastIndex;
 
         }
 
         // recycle existing render item or grow the array
 
-        var renderItem = array[ index ];
+        var renderItem = array[index];
 
-        if ( renderItem !== undefined ) {
+        if (renderItem !== undefined) {
 
             renderItem.id = object.id;
             renderItem.object = object;
@@ -2832,7 +2828,7 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
         }
     }
 
-    function projectLights(scene) {
+    function projectIncrementLights(scene) {
 
         var children = scene.children;
 
@@ -2849,14 +2845,13 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
 
     }
 
-    function projectObject(object, camera, inFrustum) {
+    function projectIncrementObject(object, camera, inFrustum) {
 
         if (object.visible === false) return true;
 
         if (!inFrustum)
             inFrustum = object.inFrustum;
 
-        //Liwei: ignor groups
         var isGroup = object instanceof THREE.Group;
 
         if (!isGroup && object.incrementCullTag != incrementCullTag /*&& (object.channels.mask & camera.channels.mask) !== 0*/) {
@@ -2878,7 +2873,7 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
                         return true;
                     }
 
-                    if ( object.level && _this.sortObjects === true ) {
+                    if (object.renderOrder < 10 && _this.sortObjects === true) {
 
                         if (!object.modelCenter) {
 
@@ -2893,8 +2888,6 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
                                 _vector3.applyMatrix4(object.matrixWorld);
 
                                 object.radius = object.modelCenter.distanceTo(_vector3);
-
-    
                             }
                             else {
 
@@ -2924,7 +2917,7 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
                             _vector3.applyProjection(_projScreenMatrix);
                         }
                     }
- 
+
                     // 材质过滤
                     var material = getOverridedMaterial(object);
                     material = material || object.material;
@@ -2932,75 +2925,167 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
                     if (object.load)
                         object.load();
 
-                    var geometry = objects.update(object);
-
-                    if (material instanceof THREE.MeshFaceMaterial) {
-
-                        var groups = geometry.groups;
-                        var materials = material.materials;
-
-                        for (var i = 0, l = groups.length; i < l; i++) {
-
-                            var group = groups[i];
-                            var groupMaterial = materials[group.materialIndex];
-
-                            if (groupMaterial.visible === true) {
-
-                                pushRenderItem(object, geometry, groupMaterial, _vector3.z, group);
-
-                            }
-
-                        }
-
-                    } else {
-
-                        pushRenderItem(object, geometry, material, _vector3.z, null);
-
-                    }
-     
+                    //var geometry = objects.update(object);
+                    var geometry = object.geometry;
+                    
+                    pushIncrementRenderItem(object, geometry, material, _vector3.z, null);
 
                 }
-
-       
-
             }
-            //else if (object instanceof THREE.Light) {
-
-            //    lights.push(object);
-
-            //}
-            //else if (object instanceof THREE.Sprite) {
-
-            //    sprites.push( object );
-
-            //} else if ( object instanceof THREE.LensFlare ) {
-
-            //    lensFlares.push( object );
-
-            //} else if ( object instanceof THREE.ImmediateRenderObject ) {
-
-            //    if ( _this.sortObjects === true ) {
-
-            //        _vector3.setFromMatrixPosition( object.matrixWorld );
-            //        _vector3.applyProjection( _projScreenMatrix );
-
-            //    }
-
-            //    pushRenderItem( object, null, object.material, _vector3.z, null );
-
-            //}
         }
 
         var children = object.children;
 
-        for ( var i = 0, l = children.length; i < l; i ++ ) {
+        for (var i = 0, l = children.length; i < l; i++) {
 
-            if (!projectObject(children[i], camera, inFrustum))
+            if (!projectIncrementObject(children[i], camera, inFrustum))
                 return false;
 
         }
 
         return true;
+    }
+
+
+    function pushRenderItem(object, geometry, material, z, group) {
+
+        var array, index;
+
+        // allocate the next position in the appropriate array
+
+        if (material.transparent) {
+
+            array = transparentObjects;
+            index = ++transparentObjectsLastIndex;
+
+        } else {
+
+            array = opaqueObjects;
+            index = ++opaqueObjectsLastIndex;
+
+        }
+
+        // recycle existing render item or grow the array
+
+        var renderItem = array[index];
+
+        if (renderItem !== undefined) {
+
+            renderItem.id = object.id;
+            renderItem.object = object;
+            renderItem.geometry = geometry;
+            renderItem.material = material;
+            renderItem.z = _vector3.z;
+            renderItem.group = group;
+
+        } else {
+
+            renderItem = {
+                id: object.id,
+                object: object,
+                geometry: geometry,
+                material: material,
+                z: _vector3.z,
+                group: group
+            };
+
+            // assert( index === array.length );
+            //array.push( renderItem );
+            array[index] = renderItem;
+        }
+    }
+
+    function projectObject(object, camera) {
+
+        if (object.visible === false) return;
+
+        if ((object.channels.mask & camera.channels.mask) !== 0) {
+
+            if (object instanceof THREE.Light) {
+
+                lights.push(object);
+
+            } else if (object instanceof THREE.Sprite) {
+
+                sprites.push(object);
+
+            } else if (object instanceof THREE.LensFlare) {
+
+                lensFlares.push(object);
+
+            } else if (object instanceof THREE.ImmediateRenderObject) {
+
+                if (_this.sortObjects === true) {
+
+                    _vector3.setFromMatrixPosition(object.matrixWorld);
+                    _vector3.applyProjection(_projScreenMatrix);
+
+                }
+
+                pushRenderItem(object, null, object.material, _vector3.z, null);
+
+            } else if (object instanceof THREE.Mesh || object instanceof THREE.Line || object instanceof THREE.Points) {
+
+                if (object instanceof THREE.SkinnedMesh) {
+
+                    object.skeleton.update();
+
+                }
+
+                if (object.frustumCulled === false || _frustum.intersectsObject(object) === true) {
+
+                    var material = object.material;
+
+                    if (material.visible === true) {
+
+                        if (_this.sortObjects === true) {
+
+                            _vector3.setFromMatrixPosition(object.matrixWorld);
+                            _vector3.applyProjection(_projScreenMatrix);
+
+                        }
+
+                        var geometry = objects.update(object);
+
+                        if (material instanceof THREE.MeshFaceMaterial) {
+
+                            var groups = geometry.groups;
+                            var materials = material.materials;
+
+                            for (var i = 0, l = groups.length; i < l; i++) {
+
+                                var group = groups[i];
+                                var groupMaterial = materials[group.materialIndex];
+
+                                if (groupMaterial.visible === true) {
+
+                                    pushRenderItem(object, geometry, groupMaterial, _vector3.z, group);
+
+                                }
+
+                            }
+
+                        } else {
+
+                            pushRenderItem(object, geometry, material, _vector3.z, null);
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+
+        var children = object.children;
+
+        for (var i = 0, l = children.length; i < l; i++) {
+
+            projectObject(children[i], camera);
+
+        }
     }
 
     function renderObjects( renderList, camera, lights, fog, overrideMaterial ) {
@@ -5818,6 +5903,7 @@ CLOUD.MiniMap = function (viewer, callback) {
 
     function computeAxisGridBox() {
 
+        var offset = 4;
         var isExistData = (_isExistAxisGridData || _isExistFloorPlaneData);
 
         if (_isShowAxisGridNumber && isExistData) {
@@ -5825,8 +5911,8 @@ CLOUD.MiniMap = function (viewer, callback) {
             var center = _axisGridBox.center();
             var oldSize = _axisGridBox.size();
             var newSize = new THREE.Vector2();
-            newSize.x = oldSize.x * _svgWidth / (_svgWidth - 4.0 * _axisGridNumberCircleRadius);
-            newSize.y = oldSize.y * _svgHeight / (_svgHeight - 4.0 * _axisGridNumberCircleRadius);
+            newSize.x = oldSize.x * _svgWidth / (_svgWidth - 4.0 * (_axisGridNumberCircleRadius + offset));
+            newSize.y = oldSize.y * _svgHeight / (_svgHeight - 4.0 * (_axisGridNumberCircleRadius + offset));
 
             _axisGridBox.setFromCenterAndSize(center, newSize);
         }
@@ -13589,14 +13675,20 @@ CLOUD.PickEditor.prototype.onMouseUp = function (event) {
     "use strict";
     var cameraEditor = this.cameraEditor;
     if (cameraEditor.enabled === false)
-        return;
+        return false;
     event.preventDefault();
 
     if (this.oldMouseX == event.clientX && this.oldMouseY == event.clientY) {
         this.isMouseClick = true;
     }
 
-    if (!this.isMouseClick) return;
+    if (!this.isMouseClick) {
+        
+        // update view
+        this.cameraEditor.update(true);
+        return true;
+    }
+        
 
     // Pick
     //if (event.button === THREE.MOUSE.LEFT && cameraEditor.IsIdle() === true)
@@ -13642,7 +13734,7 @@ CLOUD.PickEditor.prototype.onMouseUp = function (event) {
         });
     }
 
-    return this.processMouseDown(event);
+    //return this.processMouseDown(event);
 };
 CLOUD.ZoomEditor = function ( object, scene, domElement ) {
 	CLOUD.OrbitEditor.call( this,  object, scene, domElement );
@@ -14267,7 +14359,8 @@ CLOUD.FlyEditor.prototype = {
     },
 
     update: function (delta) {
-        var moveMultiplier = this.movementSpeedMultiplier * this.speedUpCoe; // 将增速率限制在[0.1, 10]内
+        //var moveMultiplier = this.movementSpeedMultiplier * this.speedUpCoe; // 将增速率限制在[0.1, 10]内
+        var moveMultiplier = 6; // 将增速率限制在[0.1, 10]内
         var moveStep = delta * this.movementSpeed * moveMultiplier;
 
         // 前进
@@ -19378,9 +19471,17 @@ CLOUD.MpkLoader = function ( showStatus ) {
 CLOUD.MpkLoader.prototype = Object.create( THREE.Loader.prototype );
 CLOUD.MpkLoader.prototype.constructor = CLOUD.MpkLoader;
 
-CLOUD.MpkLoader.prototype.load = function (url, parameters, client, callback, onComplete) {
+CLOUD.MpkLoader.prototype.load = function (mpkId, parameters, client, callback, onComplete) {
 
+    var url = client.mpkUrl(mpkId);
     var scope = this;
+    if (parameters.binaryData) {
+        scope.parseS3D(parameters.binaryData, parameters, client, callback);
+        onComplete();
+        parameters.binaryData = null;
+        return;
+    }
+   
     var useArraybuffer = CLOUD.GlobalData.UseArrayBuffer;
 
     var xhr = new XMLHttpRequest();
@@ -19766,6 +19867,15 @@ CLOUD.SceneLoader.prototype = {
     load: function (sceneId, group, client, notifyProgress, callbackFinished) {
         var scope = this;
 
+        if (client.subSceneItems) {
+            var jsonData = client.subSceneItems[sceneId];
+            if (jsonData) {
+                scope.parse(jsonData, sceneId, group, client, notifyProgress, callbackFinished);
+                delete client.subSceneItems[sceneId];
+                return;
+            }
+        }
+
         var loader = new THREE.XHRLoader(scope.manager);
         loader.setCrossOrigin(this.crossOrigin);
 
@@ -19807,6 +19917,8 @@ CLOUD.SceneLoader.prototype = {
         localRoot.subSceneRoot = true;
 
         var sceneLevel = group.level;
+        if (sceneLevel === undefined)
+            sceneLevel = 10;
 
         if (notifyProgress)
             scope.manager.dispatchEvent({ type: CLOUD.EVENTS.ON_LOAD_START, sceneId: sceneId });
@@ -19845,7 +19957,7 @@ CLOUD.SceneLoader.prototype = {
 
                 // override userId
                 if (userId !== undefined)
-                    objJSON.userId = userId;
+                    objJSON.userId = userId;                
 
                 if (objJSON.userData) {
                     userData = objJSON.userData;
@@ -19925,7 +20037,9 @@ CLOUD.SceneLoader.prototype = {
                     object = new CLOUD.Group();
                     CLOUD.GeomUtil.parseNodeProperties(object, objJSON, nodeId, trf);
 
-                    handle_children(parent, objJSON.children, level + 1, userId, userData, object.matrix);
+                    var localUserId = userId || objJSON.userId
+     
+                    handle_children(parent, objJSON.children, level + 1, localUserId, userData, object.matrix);
 
                 }
                 else if (objJSON.nodeType == "MeshNode") {
@@ -20032,8 +20146,7 @@ CLOUD.SceneLoader.prototype = {
                 if (object) {
                     object.updateMatrixWorld(true);
 
-                    if (object.level === undefined && sceneLevel !== undefined)
-                        object.level = sceneLevel;
+                    object.renderOrder = sceneLevel;
 
                 }
 
@@ -20183,7 +20296,9 @@ CLOUD.IndexLoader.prototype = {
 
             }
 
-            onTaskFinished();
+           // client.taskManager.loadSceneFiles(client, function () { });
+           // client.taskManager.loadMpkFiles(client, onTaskFinished);
+           onTaskFinished();
         });
 
 
@@ -20339,9 +20454,7 @@ CLOUD.TaskWorker = function (threadCount) {
 
         var itemCount = items.length;
         if (itemCount == 0)
-            return;
-
-        
+            return;       
 
         if (sorter) {
             items.sort(sorter);
@@ -20351,12 +20464,13 @@ CLOUD.TaskWorker = function (threadCount) {
         scope.doingCount = TASK_COUNT;
         function processItem(i) {
 
-            if (scope.doingCount < 1) {
-                scope.run(loader, sorter);
+            if (i >= itemCount) {
+                if (scope.doingCount < 1) {
+                    scope.run(loader, sorter);
+                }
                 return;
             }
-
-            --scope.doingCount;
+                
 
             var item = items[i];
 
@@ -20369,7 +20483,56 @@ CLOUD.TaskWorker = function (threadCount) {
     };
 }
 
-CLOUD.MpkTaskWorker = function (threadCount) {
+CLOUD.FileTaskWorker = function (threadCount) {
+
+    this.MaxThreadCount = threadCount || 6;
+
+    var scope = this;
+
+    this.doingCount = 0;
+
+    this.run = function (fileItems, loader, onFinished) {
+        
+        var items = [];
+        var itemCount = 0;
+        for (var item in fileItems) {
+            items[itemCount] = item;
+            ++itemCount;
+        }
+      
+        if (itemCount == 0)
+            return;
+
+        var scope = this;
+        scope.doingCount = itemCount;
+
+        var TASK_COUNT = Math.min(this.MaxThreadCount, itemCount);
+        scope.doingCount = itemCount;
+        function processItem(i) {
+
+            if (i >= itemCount) {
+
+                if (scope.doingCount < 1) {
+                    //finished
+                    onFinished();
+                }
+
+                return;
+            }   
+
+            var mpkId = items[i];
+
+            loader(mpkId, i + TASK_COUNT, processItem);
+        };
+
+        for (var ii = 0; ii < TASK_COUNT; ++ii) {
+            processItem(ii);
+        }
+    };
+
+}
+
+CLOUD.MpkNodeTaskWorker = function (threadCount) {
 
     this.MaxThreadCount = threadCount || 6;
 
@@ -20429,7 +20592,7 @@ CLOUD.MpkTaskWorker = function (threadCount) {
                 return;
             }
 
-            --scope.doingCount;
+            
 
             var mpkId = items[i];
 
@@ -20447,7 +20610,7 @@ CLOUD.TaskManager = function (manager) {
     this.manager = manager;
 
     // MPK
-    this.mpkWorker = new CLOUD.MpkTaskWorker(8);
+    this.mpkWorker = new CLOUD.MpkNodeTaskWorker(8);
 
     // SubScene
     this.sceneWorker = new CLOUD.TaskWorker(4);
@@ -20461,6 +20624,71 @@ CLOUD.TaskManager.prototype = {
 
         this.mpkWorker.addItem(mpkId, param);
 
+    },
+
+    loadSceneFiles: function(client, onFinished){
+       
+        var subScenes = client.index.metadata.subScenes;
+        if (subScenes == undefined)
+            return;
+
+        client.subSceneItems = {};
+        var sceneItems = client.subSceneItems;
+        for (var ii = 0, len = subScenes.length; ii < len; ++ii) {
+            sceneItems[subScenes[ii]] = null;
+        }
+        
+        var worker = new CLOUD.FileTaskWorker(8);
+
+        function loadScene(sceneId, nextIdx, processNextItem) {
+            var url = client.sceneUrl(sceneId);
+            var loader = new THREE.XHRLoader();
+            loader.setCrossOrigin(true);
+
+            loader.load(url, function (data) {
+                --worker.doingCount;
+                sceneItems[sceneId] = JSON.parse(data);
+                processNextItem(nextIdx);
+            });
+        };
+        worker.run(sceneItems, loadScene, onFinished);
+    },
+
+    loadMpkFiles: function (client, onFinished) {
+
+        var mpkItems = client.mkpIndex.items;
+
+        var useArraybuffer = true;
+
+        //this.fileWorker = 
+        var worker = new CLOUD.FileTaskWorker(8);
+        function loadRawData(mpkId, nextIdx, processNextItem) {
+            var url = client.mpkUrl(mpkId);
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200 || xhr.status === 0) {
+                        --worker.doingCount;
+
+                        mpkItems[mpkId].binaryData = xhr.response;
+                        processNextItem(nextIdx);
+                    }
+                }
+
+
+            };
+            xhr.open("GET", url, true);
+            if (useArraybuffer) {
+                xhr.responseType = "arraybuffer";
+            }
+            else {
+                xhr.setRequestHeader("Content-Type", "text/plain; charset=x-user-defined");
+                xhr.overrideMimeType('text/plain; charset=x-user-defined');
+            }
+            xhr.send(null);
+        };
+
+        worker.run(mpkItems, loadRawData, onFinished);
     },
 
     processMpkTasks: function (client) {
@@ -20484,10 +20712,12 @@ CLOUD.TaskManager.prototype = {
                 if (items == undefined)
                     console.log("error");
 
+
                 for (var ii = 0, len = items.length; ii < len; ++ii) {
                     on_load_mesh(client, items[ii]);
                 }
                             
+                --scope.mpkWorker.doingCount;
                 // next task
                 callback(nextIdx);
             });
@@ -20514,10 +20744,21 @@ CLOUD.TaskManager.prototype = {
         scope.sceneWorker.run(function (item, nextIdx, callback) {
 
             var sceneNode = item;
-          
-            if(sceneNode.children.length == 0){
+            if (sceneNode === undefined)
+                console.warn("err");
+
+            if (sceneNode.loaded) {
+                --scope.sceneWorker.doingCount;
+                callback(nextIdx);
+                return;
+            }
+
+            if (sceneNode.children.length == 0) {
+
                 sceneNode.loaded = true;
                 sceneLoader.load(sceneNode.sceneId, sceneNode, client, false, function () {
+
+                    --scope.sceneWorker.doingCount;
                     sceneNode.visible = true;
                     callback(nextIdx);
                 });
@@ -20525,6 +20766,7 @@ CLOUD.TaskManager.prototype = {
             else {
                 scope.manager.subSceneLoader.update(sceneNode);
                 sceneNode.visible = true;
+                --scope.sceneWorker.doingCount;
                 callback(nextIdx);
             }
 
@@ -20754,7 +20996,7 @@ CLOUD.ModelManager.prototype.loadMpk = function (mpkId, client, callback) {
 
     var scope = this;
 
-    mpkLoader.load(client.mpkUrl(mpkId), mpkIdx, client,
+    mpkLoader.load(mpkId, mpkIdx, client,
         function (mesh) {
 
             scope.vertexCount += mesh.getAttribute("position").count;
@@ -21629,25 +21871,40 @@ CloudViewer.prototype = {
         if(len > 0){
             var clients = this.modelManager.clients;
             for (var name in clients) {
-                var nodeCounter = clients[name].sceneNodeCounter;
+                var nodeCounter = clients[name].index.sceneNodeCounter;
                 if (nodeCounter) {
                     for (var ii = 0; ii < len; ++ii) {
                         var count = nodeCounter[sceneIds[ii]];
                         if (count !== undefined)
-                            totalCount = count;
+                            totalCount += count;
                     }
                 }
             }
         }
 
-        if (totalCount < 100000) {
-
+        if (totalCount == 0) {
+            CLOUD.GlobalData.SubSceneVisibleLOD = 60;
+            CLOUD.GlobalData.CellVisibleLOD = 40;
+        }
+        else if (totalCount < 10000) {
+            CLOUD.GlobalData.SubSceneVisibleLOD = 1000;
+            CLOUD.GlobalData.CellVisibleLOD = 0;
+            CLOUD.GlobalData.ScreenCullLOD = 0.0001;
+        }
+        else if (totalCount < 100000) {
             CLOUD.GlobalData.SubSceneVisibleLOD = 210;
             CLOUD.GlobalData.CellVisibleLOD = 2;
+            CLOUD.GlobalData.ScreenCullLOD = 0.0001;
+        }
+        else if (totalCount < 200000) {
+            CLOUD.GlobalData.SubSceneVisibleLOD = 100;
+            CLOUD.GlobalData.CellVisibleLOD = 10;
+            CLOUD.GlobalData.ScreenCullLOD = 0.0002;
         }
         else {
-            CLOUD.GlobalData.SubSceneVisibleLOD = 50;
+            CLOUD.GlobalData.SubSceneVisibleLOD = 60;
             CLOUD.GlobalData.CellVisibleLOD = 40;
+            CLOUD.GlobalData.ScreenCullLOD = 0.0002;
         }
     },
 

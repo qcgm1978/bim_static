@@ -87,12 +87,6 @@ BIM.common = {
   menu : {
     nav:[
       {
-        id:'home',
-        icon:'bar-home',
-        title:'初始',
-        fn:'home'
-      },
-      {
         id:'fit',
         icon:'bar-fit',
         title:'适应窗口(I)',
@@ -100,79 +94,26 @@ BIM.common = {
         key:'I'
       },
       {
-        id:'zoomIn',
-        icon:'bar-zoomIn',
-        title:'放大(X)',
-        fn:'zoomIn',
-        key:'X'
-      },
-      {
-        id:'zoomOut',
-        icon:'bar-zoomOut',
-        title:'缩小(Z)',
-        fn:'zoomOut',
-        key:'Z'
-      },
-      {
-        id:'divide'
-      },
-      {
         id:'select',
         icon:'bar-select',
         title:'选择(V)',
-        fn:'select',
+        fn:'picker',
         key:'V'
       },
       {
-        id:'handle',
-        icon:'bar-handle',
-        title:'平移(H)',
-        fn:'handle',
-        key:'H'
-      },
-      {
-        id:'rotate',
-        icon:'bar-rotate',
-        title:'旋转(R)',
-        fn:'rotate',
-        key:'R'
-      },
-      {
-        id:'camera',
-        icon:'bar-camera',
-        title:'视角(C)',
-        fn:'camera',
-        key:'C'
-      },
-      {
-        id:'section',
-        icon:'bar-section',
-        title:'剖面(P)',
-        fn:'section',
-        key:'P'
+        id:'zoom',
+        icon:'bar-zoom',
+        title:'缩放(Z)',
+        fn:'zoom',
+        key:'Z'
       },
       {
         id:'fly',
         icon:'bar-fly',
-        title:'漫游(F)',
+        title:'漫游(Space)',
         fn:'fly',
-        key:'F'
-      },
-      {
-        id:'divide'
-      },
-      {
-        id:'viewpoint',
-        icon:'bar-viewpoint',
-        title:'视点',
-        fn:'viewpoint'
+        key:' '
       }
-      /*{
-        id:'fullScreen',
-        icon:'bar-fullScreen',
-        title:'全屏',
-        fn:'fullScreen'
-      },*/
     ],
     camera:[
       {
@@ -634,6 +575,7 @@ BIM.prototype = {
     BIM.common.bimBox.className = 'bim';
     BIM.util.pub('zoom');
     BIM.common.viewer.setZoomMode();
+    BIM.util.changeClass('bar-zoom','bar-item','selected');
   },
   zoomIn : function () {
     BIM.util.pub('zoomIn');
@@ -686,6 +628,7 @@ BIM.prototype = {
   picker:function(){
     BIM.common.bimBox.className = 'bim';
     BIM.common.viewer.setPickMode();
+    BIM.util.changeClass('bar-select','bar-item','selected');
   },
   resize : function(width,height){
     BIM.util.pub('resize');

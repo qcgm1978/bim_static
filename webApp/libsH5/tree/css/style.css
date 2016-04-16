@@ -17,7 +17,7 @@
 .bim .bar-item { cursor: pointer; border: 1px solid transparent; margin: 3px; box-sizing: content-box; }
 .bim .bar-item.horizontal { display: inline-block; }
 .bim .bar-item:hover { border: 1px solid #666; }
-.bim .bar-item.open, .bar-item.selected { border: 1px solid #666; background-color: #666; }
+.bim .bar-item.open,.bim .bar-item.selected { border: 1px solid #000; background-color: #000; }
 .bim .sub-bar { position: absolute; z-index: 20; background: #333; width: 40px; }
 .bim .sub-bar.camera-bar { left: 62px; top: 276px; }
 .bim .sub-bar.cross-panel { left: 62px; top: 313px; width: 220px; background-color: rgba(0, 0, 0, .8); z-index: 2; cursor: default; }
@@ -58,10 +58,12 @@
 .bim .bar-select.selected { background-position: -32px 0; }
 .bim .bar-handle { background-position: 0 -32px; }
 .bim .bar-pan.selected { background-position: -32px -32px; }
+.bim .bar-zoom { background-position: 0 -1248px; }
+.bim .bar-zoom.selected { background-position: -32px -1248px; }
 .bim .bar-zoomIn { background-position: 0 -64px; }
-.bim .bar-zoomin.selected { background-position: -32px -64px; }
+.bim .bar-zoomIn.selected { background-position: -32px -64px; }
 .bim .bar-zoomOut { background-position: 0 -96px; }
-.bim .bar-zoomout.selected { background-position: -32px -96px; }
+.bim .bar-zoomOut.selected { background-position: -32px -96px; }
 .bim .bar-fit { background-position: 0 -128px; }
 .bim .bar-fit.selected { background-position: -32px -128px; }
 .bim .bar-rotate { background-position: 0 -160px; }
