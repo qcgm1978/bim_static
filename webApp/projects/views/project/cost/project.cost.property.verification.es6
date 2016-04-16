@@ -11,6 +11,10 @@ App.Project.CostVerification=Backbone.View.extend({
 
 	initialize:function(){
 		this.listenTo(App.Project.CostAttr.VerificationCollection,"add",this.addOne);
+		this.listenTo(App.Project.CostAttr.VerificationCollection,"reset",this.reset);
+
+		this.listenTo(App.Project.CostAttr.VerificationCollectionCate,"add",this.addOneCate);
+		this.listenTo(App.Project.CostAttr.VerificationCollectionCate,"reset",this.resetCate);
 	},
 
 
@@ -19,19 +23,31 @@ App.Project.CostVerification=Backbone.View.extend({
 
 	//渲染
 	render:function(){
-
-		this.$el.html("正在加载，请稍候……");
-
+		var page=_.templateUrl("/projects/tpls/project/cost/project.cost.property.verification.html",true);
+		this.$el.html(page); 
 		return this;
 
-	},
-
-	template:_.templateUrl("/projects/tpls/project/cost/project.cost.property.verification.html"),
+	}, 
 
 	//获取数据后处理
 	addOne:function(model){
-		var data=model.toJSON();
-		this.$el.html(this.template(data));
+		var template=_.templateUrl("/projects/tpls/project/cost/project.cost.property.verification.detail.html"),
+		 data=model.toJSON();
+		this.$el.html(template(data));
+	},
+
+	addOneCate(){
+		var template=_.templateUrl("/projects/tpls/project/cost/project.cost.property.verification.detail.cate.html"),
+		 data=model.toJSON();
+		this.$el.html(template(data));
+	},
+
+	resetCate(){
+		this.$(".tbVerificationCate tbody").html(App.Project.Settings.loadingTpl);
+	},
+
+	reset(){
+		this.$(".tbTop tbody").html(App.Project.Settings.loadingTpl);
 	}
 
 

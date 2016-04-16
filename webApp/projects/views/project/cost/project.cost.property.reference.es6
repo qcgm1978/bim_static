@@ -9,6 +9,7 @@ App.Project.CostReference=Backbone.View.extend({
 
 	initialize:function(){
 		this.listenTo(App.Project.CostAttr.ReferenceCollection,"add",this.addOne);
+		this.listenTo(App.Project.CostAttr.ReferenceCollection,"reset",this.reset);
 	},
 
 
@@ -17,18 +18,21 @@ App.Project.CostReference=Backbone.View.extend({
 
 	//渲染
 	render:function(){
-
-		this.$el.html("正在加载，请稍候……");
-
+		var page=_.templateUrl("/projects/tpls/project/cost/project.cost.property.reference.html",true);
+		this.$el.html(page); 
 		return this;
 	},
 
-	template:_.templateUrl("/projects/tpls/project/cost/project.cost.property.reference.html"),
+	template:_.templateUrl("/projects/tpls/project/cost/project.cost.property.reference.detail.html"),
 
 	//获取数据后处理
 	addOne:function(model){
 		var data=model.toJSON();
-		this.$el.html(this.template(data)); 
+		this.$(".tbReference tbody").html(this.template(data)); 
+	},
+
+	reset(){
+		this.$(".tbReference tbody").html(App.Project.Settings.loadingTpl); 
 	}
 
 

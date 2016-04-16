@@ -24,6 +24,7 @@ App.Comm = {
 
 			//未登录
 			if (data.code == 10004) {
+				debugger
 				window.location.href = data.data;
 			}
 

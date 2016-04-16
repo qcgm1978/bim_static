@@ -28,14 +28,14 @@ App.API = {
 		fetchModelIdByProject: "view/{projectId}/{projectVersionId}/init",
 		fetchFileModelIdByFileVersionId: "doc/{projectId}/{projectVersionId}/file/meta", //?fileVersionId={fileVersionId}
 
-		fetchScene:"view/{etag}/{sourceId}/tree",// 获取楼层,专业信息
-		fetchCategory:"view/{etag}/{sourceId}/categories",// 获取构件信息
+		fetchScene: "view/{etag}/{sourceId}/tree", // 获取楼层,专业信息
+		fetchCategory: "view/{etag}/{sourceId}/categories", // 获取构件信息
 
-		fetchFloors:'view/{etag}/{sourceId}/miniature/map',//获取模型楼层信息
-		fetchAxisGrid:'model/{etag}/metadata/gridAndLevel.json',//获取楼层地图,轴网信息
+		fetchFloors: 'view/{etag}/{sourceId}/miniature/map', //获取模型楼层信息
+		fetchAxisGrid: 'model/{etag}/metadata/gridAndLevel.json', //获取楼层地图,轴网信息
 
 		uploadFile: "doc/{projectId}/{projectVersionId}/file/data", //上传文件  ?parentId={parentId}&fileName={fileName}&size={size}&digest={digest}&position={position}
-		"checkDownLoad":"doc/{projectId}/{versionId}/file/size", // 下载确认 是否可以下载  ?fileVersionId={fileVersionId}
+		"checkDownLoad": "doc/{projectId}/{versionId}/file/size", // 下载确认 是否可以下载  ?fileVersionId={fileVersionId}
 		downLoad: "doc/{projectId}/{projectVersionId}/file/data", //文件下载  ?fileId={fileId}
 
 		//视点
@@ -47,35 +47,41 @@ App.API = {
 
 		//设计
 		fetchDesignProperties: "sixD/{projectId}/{projectVersionId}/property", //设计属性 ?sceneId={sceneId}&elementId={elementId}
-		fetchDesignPropertiesPlan:"sixD/{projectId}/{projectVersionId}/plan/edo",// 设计属性 计划  ?sceneId={sceneId}&elementId={elementId}
-		fetchDesignPropertiesCost:"sixD/{projectId}/{projectVersionId}/cost/edo",// 设计属性成本  ?sceneId={sceneId}&elementId={elementId}
-		fetchDesignPropertiesQuality:"sixD/{projectId}/{projectVersionId}/quality/standard",// 设计属性 质量 ?sceneId={sceneId}&elementId={elementId}
+		fetchDesignPropertiesPlan: "sixD/{projectId}/{projectVersionId}/plan/edo", // 设计属性 计划  ?sceneId={sceneId}&elementId={elementId}
+		fetchDesignPropertiesCost: "sixD/{projectId}/{projectVersionId}/cost/edo", // 设计属性成本  ?sceneId={sceneId}&elementId={elementId}
+		fetchDesignPropertiesQuality: "sixD/{projectId}/{projectVersionId}/quality/standard", // 设计属性 质量 ?sceneId={sceneId}&elementId={elementId}
 
 		fetchDesignVerification: "sixD/{projectId}/{versionId}/design/check", // 设计 检测  ?status={status}&type={type}&specialty={specialty}&reporter={reporter}&pageIndex={pageIndex}&pageItemCount={pageItemCount}
 		fetchDesignCollision: "", // 设计碰撞
 		// 碰撞
-		fetchDesignFiles:"view/{etag}/{sourceId}/collision/tree",// 碰撞文件列表
-		fetchDesignCategory:"view/{etag}/{sourceId}/collision/categories",// 构件列表
-		fetchDesignTaskList:"view/{projectId}/{projectVerionId}/collision/setting/list",//碰撞任务列表
-		fetchDesignTaskDetail:"sixD/{projectId}/{projectVersionId}/{collisionId}/point?pageNo={pageNo}&pageSize={pageSize}",//碰撞点列表
-		creatCollisionTask:"view/{projectId}/{projectVersionId}/collision/setting",//创建碰撞任务
-		fetchDesignSetting:"view/{projectId}/{projectVersionId}/{collision}/setting",//查看碰撞设置
+		fetchDesignFiles: "view/{etag}/{sourceId}/collision/tree", // 碰撞文件列表
+		fetchDesignCategory: "view/{etag}/{sourceId}/collision/categories", // 构件列表
+		fetchDesignTaskList: "view/{projectId}/{projectVerionId}/collision/setting/list", //碰撞任务列表
+		fetchDesignTaskDetail: "sixD/{projectId}/{projectVersionId}/{collisionId}/point?pageNo={pageNo}&pageSize={pageSize}", //碰撞点列表
+		creatCollisionTask: "view/{projectId}/{projectVersionId}/collision/setting", //创建碰撞任务
+		fetchDesignSetting: "view/{projectId}/{projectVersionId}/{collision}/setting", //查看碰撞设置
 
 		// 模型对比
-		fetchDesignChange:"view/{projectId}/{projectVersionId}/comparison", // 获取模型对比列表
-		fetchDesignChangeInfo:"sixD/{projectId}/{projectVersionId}/comparison/result?comparisonId={comparisonId}", // 获取模型对比结果
+		fetchDesignChange: "view/{projectId}/{projectVersionId}/comparison", // 获取模型对比列表
+		fetchDesignChangeInfo: "sixD/{projectId}/{projectVersionId}/comparison/result?comparisonId={comparisonId}", // 获取模型对比结果
 
 		//计划
 		fetchPlanModel: "sixD/{projectId}/{projectVersionId}/plan", //模型
-		fetchPlanAnalog: "sixD/{projectId}/{projectVersionId}/plan?noElement=true", //模拟
+		fetchPlanAnalog: "sixD/{projectId}/{projectVersionId}/plan?relateModel=true", //模拟
 		fetchPlanPublicity: "sixD/{projectId}/{projectVersionId}/plan/concern", //关注 ?queryType={queryType}
-		fetchPlanInspection: "dataJson/project/project.design.property.json", //检验
-		fetchPlanProperties: "dataJson/project/project.design.property.json", //属性
+		fetchPlanInspection: "sixD/{projectId}/{projectVersionId}/plan?noElement=true", //检验 计划节点未关联图元 startTime=1398145297000&endTime=1398145297000&relateModel={true|false}&
+		fetchPlanInspectionCate: "sixD/{projectId}/{projectVersionId}/plan/noplan/cate", // 图元未关联计划节点
+		fetchPlanInspectionCateDetail: "sixD/{projectId}/{projectVersionId}/plan/noplan/element", // 图元未关联计划节点 ?cateId={cateId} 暂开详情
+
+		fetchPlanProperties: "", //属性
 
 		//陈本
 		fetchCostReference: "sixD/{projectId}/{projectVersionId}/cost/summary", // 清单
 		fetchCostChange: "platform/auditSheet?type=9", // 变更
-		fetchCostVerification: "dataJson/project/project.design.property.json", // 效验
+		fetchCostVerification: "sixD/{projectId}/{projectVersionId}/cost/summary?noElement=true", // 效验
+		fetchCostVerificationCate: "sixD/{projectId}/{projectVersionId}/cost/nocost/cate", // 效验 图元未关联清单 类型
+		fetchCostVerificationCateDetail: "sixD/{projectId}/{projectVersionId}/cost/nocost/element?cateId={cateId}", // 图元未关联清单 详情
+
 		fetchCostProperties: "dataJson/project/project.design.property.json", //属性
 
 
@@ -85,9 +91,6 @@ App.API = {
 		fetchQualityOpeningAcceptance: "sixD/{projectId}/{projectVersionId}/acceptance?type=2", //开业验收
 		fetchQualityConcerns: "sixD/{projectId}/{projectVersionId}/problem", //隐患
 		fetchQualityProperties: "dataJson/project/project.design.property.json", // 属性
-
-
-
 
 
 
@@ -121,10 +124,10 @@ App.API = {
 		fetchCrumbsProjectVersion: "/dataJson/project/fetchCrumbsProjectVersion.json", //项目面包屑版本
 		fetchProjectVersionInfo: "platform/project/{projectId}/version/{projectVersionId}", //项目版本信息
 
-		fetchModelIdByProject:"/dataJson/project/design/fetchModelIdByProject.json",
+		fetchModelIdByProject: "/dataJson/project/design/fetchModelIdByProject.json",
 
-		fetchFloors:'/datajson/map/map.json',//获取模型楼层信息
-		fetchAxisGrid:'/datajson/map/gridAndLevel.json',//获取楼层地图,轴网信息
+		fetchFloors: '/datajson/map/map.json', //获取模型楼层信息
+		fetchAxisGrid: '/datajson/map/gridAndLevel.json', //获取楼层地图,轴网信息
 
 		//设计
 		fetchDesignProperties: "/dataJson/project/project.design.property.json", //设计属性
@@ -132,14 +135,14 @@ App.API = {
 
 		// 碰撞
 		fetchDesignCollision: "/dataJson/project/project.design.property.json", //设计碰撞
-		fetchDesignFileList:"/dataJson/project/project.design.filesList.json",// 设计碰撞文件
-		fetchDesignTaskList:"/dataJson/project/project.design.collision.taskList.json",//碰撞任务列表
-		fetchDesignTaskDetail:"/dataJson/project/project.design.task.detail.json",//碰撞任务详情
-		creatCollisionTask:"",
+		fetchDesignFileList: "/dataJson/project/project.design.filesList.json", // 设计碰撞文件
+		fetchDesignTaskList: "/dataJson/project/project.design.collision.taskList.json", //碰撞任务列表
+		fetchDesignTaskDetail: "/dataJson/project/project.design.task.detail.json", //碰撞任务详情
+		creatCollisionTask: "",
 
 		// 模型对比
-		fetchDesignChange:"/dataJson/project/fetchDesignChange.json", // 获取模型对比列表
-		fetchDesignChangeInfo:"/dataJson/project/fetchDesignChangeInfo.json", // 获取模型对比结果
+		fetchDesignChange: "/dataJson/project/fetchDesignChange.json", // 获取模型对比列表
+		fetchDesignChangeInfo: "/dataJson/project/fetchDesignChangeInfo.json", // 获取模型对比结果
 
 
 		//计划
@@ -157,7 +160,7 @@ App.API = {
 		fetchCostProperties: "/dataJson/project/project.design.property.json", //属性
 
 		// 质量
-		fetchQualityMaterialEquipment: "/dataJson/project/project.design.property.json",  //材料设备
+		fetchQualityMaterialEquipment: "/dataJson/project/project.design.property.json", //材料设备
 		fetchQualityProcessAcceptance: "/dataJson/project/project.design.property.json", //过程验收
 		fetchQualityProcessCheck: "/dataJson/project/project.design.property.json", //过程检查
 		fetchQualityOpeningAcceptance: "/dataJson/project/project.design.property.json", //开业验收

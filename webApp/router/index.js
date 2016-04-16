@@ -113,6 +113,7 @@ var AppRoute = Backbone.Router.extend({
 	reset: function() {
 		//销毁上传
 		App.Comm.upload.destroy();
+		App.Comm.getCookie("OUTSSO_LoginId") && $("#topBar .userName .text").text(App.Comm.getCookie("OUTSSO_LoginId"));
 	}
 
 

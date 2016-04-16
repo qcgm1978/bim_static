@@ -1,7 +1,7 @@
 
  
 
-<% $.each(data,function(i,item){%>
+<% obj.data && $.each(data,function(i,item){%>
            
     <tr class="<%= i%2==0 &&'odd' || '' %>">
         <td class="ckItem">o</td>
@@ -13,7 +13,7 @@
 <% }) %>
                
 
-<% if(data.length<=0){%>
+<% if(!obj.data || data.length<=0){%>
     
     <tr>
         <td colspan="5" class="noDataTd">暂无数据</td>

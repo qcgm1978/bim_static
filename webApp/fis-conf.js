@@ -265,6 +265,13 @@ fis.match('/app/project/modelChange/**.{css,less}', {
   packTo: '/static/dist/app/project/modelChange/index_' + v + '.css'
 });
 
+fis.match('/app/project/projectChange/**.{js,es6}', {
+  packTo: '/static/dist/app/project/projectChange/index_' + v + '.js'
+});
+fis.match('/app/project/projectChange/**.{css,less}', {
+  packTo: '/static/dist/app/project/projectChange/index_' + v + '.css'
+});
+
 
 
 

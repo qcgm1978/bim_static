@@ -72,7 +72,7 @@
 			}
 		}
 	}
-	.ckBox { overflow: auto; height: 100%;    margin-top: -50px;    padding-top: 50px;
+	.ckBox { overflow: auto; height: 100%; margin-top: -50px; padding-top: 50px;
 		.ckBody { margin-top: -26px; padding-top: 25px; height: 100%; min-width: 500px; width: 100%; }
 		.ckTable { min-width: 500px; width: 100%;
 			th { height: 24px; line-height: 24px; text-align: center; }
@@ -96,12 +96,13 @@
 			.selDate { margin-bottom: 7px; margin-top: 3px; }
 		}
 		.planContent { height: 100%;
-			.tbPlan { border: 1px #ccc solid; width: 100%; min-width: 398px;
+			.tbPlan { width: 100%; min-width: 398px;
 				th, td { border: 1px #ccc solid; }
 				th { text-align: center; height: 28px; line-height: 28px; }
 				td { height: 24px; line-height: 24px; }
 				tbody { td { box-sizing: border-box; padding-left: 8px; }
 				}
+				.noDataTd, .loadingTd { height: 60px; line-height: 60px; text-align: center; color: #ccc; font-size: 16px; border: 0; }
 			}
 			.ckItem { width: 7%; }
 			.planId { width: 9%; }
@@ -112,7 +113,7 @@
 			.end { width: 20%; }
 		}
 	}
-	.planSearch { width: 100%; min-width: 398px; margin-top: 10px; margin-left: 15px;
+	.planSearch { width: 100%; min-width: 398px; margin-top: 10px; padding-left: 15px;
 		.dateBox { display: inline-block; position: relative;
 			.iconCal { background: url(../comm/images/commIcon.png) no-repeat 6px -232px; position: absolute; right: 1px; width: 28px; height: 28px; top: 1px; background-color: #eee; border-left: 1px #ccc solid; }
 			input { height: 30px; line-height: 30px; padding-left: 8px; broder: 1px #ddd solid; width: 175px; padding-right: 30px; box-sizing: border-box; }
@@ -179,10 +180,6 @@
 	.CostChange, .CostVerification { overflow: auto; position: absolute; top: 12px; bottom: 0px; left: 0px; right: 0px; }
 	.tbCostChange { width: 100%; min-width: 395px;
 		td, th { border: 1px #ccc solid; }
-		.name { width: 50%;
-			.nameText { width: 95%; }
-		}
-		.date, .diff { width: 24%; text-align: center; padding-left: 0px; }
 		thead { th { text-align: center; height: 30px; line-height: 30px; }
 		}
 		tbody { td { height: 25px; line-height: 25px; padding-left: 8px;
@@ -191,6 +188,11 @@
 			tr { &.bg { background-color: #eee; }
 			}
 		}
+		.name { width: 50%;
+			.nameText { width: 95%; vertical-align: middle; text-align: left; }
+		}
+		.date, .diff { width: 24%; text-align: center; padding-left: 0px; }
+		.diff { width: 24%; }
 	}
 	.CostVerification { .title { height: 28px; line-height: 28px; padding-left: 12px; min-width: 395px; width: 100%; }
 	}

@@ -45,14 +45,36 @@ App.Project.CostAttr={
 			}
 		}),
 
-		urlType:"fetchCostVerification",
+		urlType:"fetchCostVerification"
 
-		parse:function(response){
+	
+	})),
 
-			if (response.message == "success") {
-                 return response;
-             }
-		}
+	VerificationCollectionCate: new(Backbone.Collection.extend({
+	 
+		model: Backbone.Model.extend({
+			defaults: function() {
+				return {
+					title: ""
+				}
+			}
+		}),
+
+		urlType:"fetchCostVerificationCate" 
+
+	})),
+
+	VerificationCollectionCateDetail: new(Backbone.Collection.extend({
+	 
+		model: Backbone.Model.extend({
+			defaults: function() {
+				return {
+					title: ""
+				}
+			}
+		}),
+
+		urlType:"fetchCostVerificationCateDetail" 
 
 	})),
 

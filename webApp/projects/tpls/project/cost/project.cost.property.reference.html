@@ -3,7 +3,7 @@
     <input class="txtInput txtSearch" placeholder="请输入搜索内容" />
 </div>
 <div class="referenceContent">
-    <table class="tbReference">
+    <table class="tbReference tbComm">
         <thead>
             <tr>
                 <th class="listCode">清单编码</th>
@@ -13,98 +13,7 @@
         </thead>
         <tbody>
 
-             <% var lists=obj.data, count=lists.length,current,odd=0; %> 
-
-               <%for(var i=0;i<count;i++){%>
-
-                    <tr class=" <%=odd%2==0?'odd':'' %> "> 
-                    <%current=lists[i],odd+=1;%>
-                       
-                        <td class="listCode">
-
-                            <%if(current.children){%>
-                                 <i class="nodeSwitch on"></i>
-                            <%}else{%>
-                                 <i class="nodeSwitch none"></i>
-                            <%}%>
-
-                            <span class="code"><%=current.code%></span>
-                        </td>
-                        <td class="listName"><%=current.name%></td>
-                        <td class="listCount"><%=current.totalQuantity%><%=current.unit%></td>  
-                    </tr>
-
-                     <% if(current.children){%>
-                         <% var lists2=current.children; count2=lists2.length; %>
-
-                          <%for(var j=0;j<count2;j++){%>
-
-                                
-
-                                  <tr class=" <%=odd%2==0?'odd':'' %> "> 
-                                    <%current=lists2[j],odd+=1;%>
-                                    <td class="listCode">
-                                          <%if(current.children){%>
-                                                 <i class="nodeSwitch on step1"></i>
-                                            <%}else{%>
-                                                 <i class="nodeSwitch none step1"></i>
-                                            <%}%>
-                                            <span class="code code1"><%=current.code%></span>
-                                    </td>
-                                    <td class="listName"><%=current.name%></td>
-                                    <td class="listCount"><%=current.totalQuantity%><%=current.unit%></td>  
-                                </tr>
-
-                                 <% if(current.children){%>
-                                     <% var lists3=current.children; count3=lists3.length; %>
-                                     <%for(var k=0;k<count3;k++){%>
-                                      
-                                       <tr class=" <%=odd%2==0?'odd':'' %> "> 
-                                        <%current=lists3[k],odd+=1;%>
-                                            <td class="listCode">
-                                                <%if(current.children){%>
-                                                     <i class="nodeSwitch on step2"></i>
-                                                <%}else{%>
-                                                     <i class="nodeSwitch none step2"></i>
-                                                <%}%>
-                                                <span class="code code2"><%=current.code%></span>
-                                            </td>
-                                            <td class="listName"><%=current.name%></td>
-                                            <td class="listCount"><%=current.totalQuantity%><%=current.unit%></td>  
-                                        </tr>
-
-                                             <% if(current.children){%>
-                                                 <% var lists4=current.children; count4=lists4.length; %>
-                                                 <%for(var n=0;n<count4;n++){%> 
-                                                      <tr class=" <%=odd%2==0?'odd':'' %> "> 
-                                                        <%current=lists4[n],odd+=1;%> 
-                                                        <td class="listCode">
-                                                             <%if(current.children){%>
-                                                                 <i class="nodeSwitch on step3"></i>
-                                                            <%}else{%>
-                                                                 <i class="nodeSwitch none step3"></i>
-                                                            <%}%>
-                                                            <span class="code code3"><%=current.code%></span>
-                                                        </td>
-                                                        <td class="listName"><%=current.name%></td>
-                                                        <td class="listCount"><%=current.totalQuantity%><%=current.unit%></td>  
-                                                    </tr>  
-                                                 <%}%>
-
-                                             <%}%>
-
-
-                                     <%}%>
-
-                                 <%}%>
-
-
-                          <%}%>
-                          
-                    <%}%>
-
-                <%}%> 
-
+            
         </tbody>
     </table>
 </div>
