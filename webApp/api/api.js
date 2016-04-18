@@ -3,7 +3,7 @@
 App.API = {
 
 	Settings: {
-		hostname: "http://bim.wanda.cn/",
+		hostname: "http://bim.wanda-dev.cn/",
 		debug: false
 	},
 
@@ -30,6 +30,7 @@ App.API = {
 
 		fetchScene: "view/{etag}/{sourceId}/tree", // 获取楼层,专业信息
 		fetchCategory: "view/{etag}/{sourceId}/categories", // 获取构件信息
+		fetchCoding: 'view/category/coding', //获取构件编码信息
 
 		fetchFloors: 'view/{etag}/{sourceId}/miniature/map', //获取模型楼层信息
 		fetchAxisGrid: 'model/{etag}/metadata/gridAndLevel.json', //获取楼层地图,轴网信息
@@ -87,7 +88,7 @@ App.API = {
 
 		// 质量
 		fetchQualityMaterialEquipment: "sixD/{projectId}/{projectVersionId}/device", //材料设备?specialty={specialty}&category={category}&status={status}&name={name}&startTime={startTime}&endTime={endTime}&pageIndex={pageIndex}&pageItemCount={pageItemCount}
-		fetchQualityProcessAcceptance: "sixD/{projectId}/{projectVersionId}/acceptance?type=1", //过程验收 
+		fetchQualityProcessAcceptance: "sixD/{projectId}/{projectVersionId}/acceptance?type=1", //过程验收
 		fetchQualityOpeningAcceptance: "sixD/{projectId}/{projectVersionId}/acceptance?type=2", //开业验收
 		fetchQualityConcerns: "sixD/{projectId}/{projectVersionId}/problem", //隐患
 		fetchQualityProperties: "dataJson/project/project.design.property.json", // 属性
