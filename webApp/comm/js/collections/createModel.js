@@ -23,6 +23,10 @@ App.Comm.createModel = function(options){
     floorsCollection: new(Backbone.Collection.extend({
       model: Backbone.Model.extend(),
       urlType:"fetchFloors"
+    })),
+    classCodeCollection: new(Backbone.Collection.extend({
+      model: Backbone.Model.extend(),
+      urlType:"fetchCoding"
     }))
   };
   var modelBar = Backbone.View.extend({
@@ -98,6 +102,7 @@ App.Comm.createModel = function(options){
         if(!that.filter.fetchTree){
           modelCollection.sceneCollection.fetch();
           modelCollection.categoryCollection.fetch();
+          modelCollection.classCodeCollection.fetch();
           that.filter.fetchTree = true;
         }
         tree.find('.modelFilter').show().siblings().hide();
@@ -179,6 +184,9 @@ App.Comm.createModel = function(options){
       "change input":"filter"
     },
     template:_.templateUrl('/comm/js/tpls/modelTree.html',true),
+    initialize:function(){
+      this.listenTo(modelCollection.classCodeCollection,"add",this.addClassCode);
+    },
     render:function(){
       this.$el.html(this.template);
       this.$el.find("#specialitys").append(new sView().render().el);
@@ -190,6 +198,32 @@ App.Comm.createModel = function(options){
       var that = this,
           self = $(event.target).closest(".item-content");
       self.toggleClass("open");
+      if(self.parents("#classCode")){
+        var flag = self.next(".subTree").length;
+        if(flag == 0){
+          var data = that.classCodeData,
+              isChecked = self.find("input").prop("checked"),
+              parentCode = self.data("parent") || null,
+              tmpData = {
+                defaultType:isChecked,
+                data:[]
+              }
+          $.each(data,function(i,item){
+            if(item.parentCode == parentCode){
+              tmpData.data.push(item);
+            }
+          });
+          self.after(new classView({
+            model:tmpData
+          }).render().el);
+        }
+      }
+    },
+    addClassCode:function(model){
+      var data = model.toJSON();
+      if(data.message == "success"){
+        this.classCodeData = data.data;
+      }
     },
     selectTree:function(event){
       var that = this,
@@ -368,6 +402,16 @@ App.Comm.createModel = function(options){
         pointId = '';
       })
       event.preventDefault();
+    }
+  });
+  var classView = Backbone.View.extend({
+    // 分类构件编码
+    tagName: "ul",
+    className: "subTree",
+    template:_.templateUrl('/comm/js/tpls/classCode.html'),
+    render:function(){
+      this.$el.html(this.template(this.model));
+      return this;
     }
   });
   var selectFloor = Backbone.View.extend({

@@ -91,9 +91,6 @@ App.Project.DesignCollisionDetail=Backbone.View.extend({
         App.Project.DesignAttr.CollisionSetting.projectVersionId = App.Project.Settings.CurrentVersion.id;
         App.Project.DesignAttr.CollisionSetting.collision = App.Project.Settings.collisionId;
         App.Project.DesignAttr.CollisionSetting.fetch();
-      },
-      okCallback:function(){
-
       }
     })
   }

@@ -1,18 +1,8 @@
-<% _.forEach(data,function(item){ %>
-  <li>
-    <div class="itemContent">
-      <i class="nodeSwitch"></i>
-      <span class="tree-text"><%= item.specialty %></span>
-    </div>
-    <ul class="subTree">
-      <% _.each(item.categories,function(value,key){ %>
-        <li class="itemNode">
-          <label class="itemContent">
-            <i class="fileIcon"></i><span class="treeText"><%= value %></span>
-            <input type="checkbox" class="inputCheckbox" data-id="<%= key %>" value="<%= value %>">
-          </label>
-        </li>
-      <% }); %>
-    </ul>
+<% _.each(data[0].categories,function(value,key){ %>
+  <li class="itemNode">
+    <label class="itemContent">
+      <i class="fileIcon"></i><span class="treeText"><%= value %></span>
+      <input type="checkbox" class="inputCheckbox" data-id="<%= key %>" value="<%= value %>">
+    </label>
   </li>
-<% }) %>
+<% }); %>
