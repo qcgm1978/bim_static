@@ -232,12 +232,15 @@ Backbone.sync = function(method, model, options) {
 			}
 		}
 	} 
- 
 
+	//设置header
+	options.headers={
+		ReturnUrl:location.href
+	} 
+	 
 	//调用backbone 原本的方法
 	return BackboneSync.apply(this, arguments).done(function(data){
-			if (data.code==10004) {
-				debugger
+			if (data.code==10004) { 
 				 window.location.href=data.data;
 				  
 				console.log("未登录");

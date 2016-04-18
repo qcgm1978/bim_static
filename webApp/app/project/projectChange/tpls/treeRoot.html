@@ -1,0 +1,8 @@
+<ul class="contrastTree treeContent">
+<% $.each(data,function(i,item){%> 
+		<li class="rootNode node">
+		  <% item.deep=1; %> 
+		  <%= treeNode(item) %> 
+		</li> 
+<% }) %>
+	</ul>

@@ -1,12 +1,13 @@
 /**
- * @require /app/project/modelChange/js/comm.js
- * @require /app/project/modelChange/js/collection.js
+ * @require /app/project/modelChange/js/collection.es6
  */
 App.Index = {
 
 	Settings: {
 		projectId: "",
 		projectVersionId: "",
+		referenceId:"",
+		referenceVersionId:"",
 		ModelObj: "",
 		Viewer: null
 	},
@@ -67,6 +68,9 @@ App.Index = {
 		var Request = App.Index.GetRequest();
 		App.Index.Settings.projectId = Request.projectId;
 		App.Index.Settings.projectVersionId = Request.projectVersionId;
+		App.Index.Settings.referenceId=Request.referenceId;
+		App.Index.Settings.referenceVersionId=Request.referenceVersionId;
+
 	},
 
 	//获取url 参数
@@ -117,12 +121,13 @@ App.Index = {
 				return;
 			}
 
+			//return;	
+
 			App.Index.Settings.Viewer = new BIM({
 				element: $("#contains .projectCotent")[0],
 				sourceId: Model.sourceId,
 				etag: Model.etag,
-				tools: true,
-				treeElement: $("#projectContainer  .projectModelContent")[0]
+				tools: true			 
 			});
 
 
@@ -142,8 +147,7 @@ App.Index = {
 				}
 
 			});
-			// 绑定视点功能
-			that.bindPoint(App.Index.Settings.Viewer);
+			 
 		});
 
 	},
@@ -189,27 +193,29 @@ App.Index = {
 
 		$modelTree.find(".mCS_no_scrollbar_y").width(800);
 
-	},
-
-	bindPoint: function(viewer) {
-		var element = $("#projectContainer .projectModelContent");
-		var data = {
-			element: element,
-			projectId: App.Index.Settings.projectId,
-			viewer: viewer
-		}
-		App.Comm.managePoint(data);
-	},
+	}, 
+ 
 
 	fetchChange: function() {
-		App.Project.Collection.changeList.projectId = App.Index.Settings.projectId;
-		App.Project.Collection.changeList.projectVersionId = App.Index.Settings.projectVersionId;
-		App.Project.Collection.changeList.fetch();
-		$(".rightPropertyContent .designChange").html(new App.Project.Model.changeList().render().el);
+
+		App.Collections.changeListCollection.projectId = App.Index.Settings.projectId;
+		App.Collections.changeListCollection.projectVersionId = App.Index.Settings.projectVersionId;
+		 
+		App.Collections.changeListCollection.reset();
+		App.Collections.changeListCollection.fetch({
+			data:{
+				baseProjectVerionId:App.Index.Settings.referenceVersionId
+			}
+		});
+		
+
+		$("#treeContainerBody").html(new  App.Views.projectChangeListView().render().el);
+	 
 	},
 
 
-	init() {
+	init() { 
+	 
 		//初始化参数
 		this.initPars();
 		//渲染模型
@@ -217,8 +223,9 @@ App.Index = {
 		//事件绑定
 		this.bindEvent();
 		//变更获取
-		this.fetchChange();
-	}
-}
+		this.fetchChange();  
 
- 
+	} 
+
+
+}

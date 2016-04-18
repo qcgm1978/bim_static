@@ -15,7 +15,7 @@
 			.rightPropertyContent { height: 100%;
 				.designPropetyBox { height: 100%;
 					.projectPropetyContainer { height: 100%; margin-top: -40px; padding-top: 40px; }
-					.designChange{height:100%;overflow-x:hidden;overflow-y:auto;}
+					.designChange { height: 100%; overflow-x: hidden; overflow-y: auto; }
 				}
 			}
 			.slideBar { right: inherit; display: block; left: -15px; top: 40px; }
@@ -54,4 +54,36 @@
 }
 .rightTree { padding: 10px 8px;
 	.rightTreeView { padding-left: 0; }
+}
+#treeContainerBody{
+	position: absolute; top: 122px; left: 0px; right: 0px; bottom: 50px;
+}
+.changeListBox { 
+	.loadings { height: 300px; line-height: 300px; text-align: center; font-size: 16px; color: #ccc; }
+}
+.projectChangeListBox { .referenceSearch { padding: 12px; position: relative; }
+	.loading { padding-top: 150px; font-size: 16px; text-align: center; color: #ccc; }
+	.txtSearch { width: 100%; min-width: 376px; padding-left: 30px; }
+	.btnSearch { position: absolute; top: 21px; left: 20px; }
+	.contrastTree { .nodeSwitch { background: url(/comm/images/commIcon.png) no-repeat 0px -39px; display: inline-block; width: 12px; height: 10px; line-height: 8px; vertical-align: top; text-align: center; cursor: pointer; margin-top: 8px; margin-right: 2px; 
+		&.on{    background-position: 0px -49px;}
+	}
+		.odd { background-color: #eee; }
+		.noneSwitch { display: inline-block; width: 11px; }
+		.node { .itemContent { height: 28px; border: 1px #ccc solid; line-height: 26px; }
+			.comm { float: left; text-align: center; position: relative;
+				.text { left: 6px; position: absolute; right: 2px; display: inline-block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+			}
+			.repertoireCode { width: 25%; border-right: 1px #ccc solid; }
+			.repertoireName { width: 42%; border-right: 1px #ccc solid; }
+			.beforeChange { width: 16%; border-right: 1px #ccc solid; }
+			.afterChange { width: 16%; }
+		}
+	}
+	.contrastTreeSub{display: none;}
+	.treeContent { .node { .itemContent { border-top: 0px; }
+			.comm { text-align: left; height: 25px; }
+		}
+	}
+	.showChange { position: absolute; left: 0px; right: 0px; bottom: 0px; height: 50px; line-height: 48px; background-color: #ddd; padding-left: 20px; }
 }

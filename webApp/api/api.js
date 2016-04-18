@@ -3,7 +3,7 @@
 App.API = {
 
 	Settings: {
-		hostname: "http://bim.wanda.cn/",
+		hostname: "http://bim.wanda-dev.cn/",
 		debug: false
 	},
 
@@ -103,6 +103,9 @@ App.API = {
 		putFileReName: "doc/{projectId}/{projectVersionId}/file/rename", // 重命名文件 ?fileVersionId={fileVersionId}&name={name}
 		createNewFolder: "doc/{projectId}/{projectVersionId}/file", // 创建新文件夹 ?parentId={parentId}&filePath={filePath}
 
+		//项目 变更 列表
+
+		projectChangeList:"/dataJson/project/projectChange/list.json",//  sixD/{projectId}/{projectVersionId}/cost/summary/comparison  sixD/{projectId}/{projectVersionId}/cost/summary/comparison?baseProjectVerionId={baseProjectVerionId}
 
 		test: ""
 	},

@@ -9,9 +9,12 @@ App.Comm = {
 	ajax: function(data, callback) {
 
 		data = App.Comm.getUrlByType(data);
+		//登录时要用
+		data.headers = {
+			ReturnUrl: location.href
+		}
 
-
-		 return $.ajax(data).done(function(data) { 
+		return $.ajax(data).done(function(data) {
 
 			if (_.isString(data)) {
 				// to json
@@ -31,7 +34,7 @@ App.Comm = {
 			if ($.isFunction(callback)) {
 				//回调
 				callback(data);
-			} 
+			}
 
 		});
 

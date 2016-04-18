@@ -43,19 +43,39 @@
                 <div class="rightPropertyContentBox">
                     <div class="rightPropertyContent">
                         <div class="designPropetyBox">
-
                             <ul class="projectPropetyHeader projectNav">
                                 <li data-type="chage" class="item selected">清单</li>
                                 <li data-type="attr" class="item">属性</li>
                             </ul>
-
                             <div class="projectPropetyContainer projectNavContentBox">
-                                <div class="designChange" ></div>
+                                <div class="designChange projectChangeListBox">
+                                    <div class="referenceSearch">
+                                        <i class=" btnSearch myIcon-search"></i>
+                                        <input class="txtInput txtSearch" placeholder="请输入搜索内容">
+                                    </div>
+                                    <ul class="contrastTree">
+                                        <li class="node">
+                                            <div class="itemContent">
+                                                <div class="repertoireCode comm">清单编码</div>
+                                                <div class="repertoireName comm">清单名称</div>
+                                                <div class="beforeChange comm">变更前</div>
+                                                <div class="afterChange comm">变更后</div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                    <div id="treeContainerBody">
+                                        <div class="loading">正在加载，请稍候……</div>
+                                    </div>
+                                    <div class="showChange">
+                                        <span class="groupRadio">
+                                            <label class="btnCk">显示搜索结果对应位置</label> 
+                                        </span>
+                                    </div>
+                                </div>
                                 <div class="designProperties" style="display: none;">
-                                   <div class="nullTip">请选择构件</div>
+                                    <div class="nullTip">请选择构件</div>
                                 </div>
                             </div>
-
                         </div>
                     </div>
                     <div class="dragSize"></div>
@@ -74,7 +94,9 @@
     <link rel="styleSheet" href="/libsH5/tree/css/style.css" />
     <script type="text/javascript" src="/api/api.js"></script>
     <script type="text/javascript" src="./es6/index.es6"></script>
-    <script type="text/javascript">App.Index.init();</script>
+    <script type="text/javascript">
+    App.Index.init();
+    </script>
 </body>
 
 </html>
