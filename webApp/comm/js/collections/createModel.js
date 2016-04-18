@@ -202,8 +202,10 @@ App.Comm.createModel = function(options){
         var flag = self.next(".subTree").length;
         if(flag == 0){
           var data = that.classCodeData,
+              isChecked = self.find("input").prop("checked"),
               parentCode = self.data("parent") || null,
               tmpData = {
+                defaultType:isChecked,
                 data:[]
               }
           $.each(data,function(i,item){

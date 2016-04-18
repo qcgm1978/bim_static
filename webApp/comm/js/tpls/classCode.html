@@ -7,7 +7,7 @@
         <i class="noneSwitch"></i>
       <% } %>
       <label class="treeCheckbox">
-        <input type="checkbox" checked="checked" data-type="classCode" data-etag="<%= item.code %>" />
+        <input type="checkbox" <% if(defaultType){ %>checked="checked"<% } %> data-type="classCode" data-etag="<%= item.code %>" />
         <span class="lbl"></span>
       </label>
       <span class="tree-text"><%= item.name %></span>
