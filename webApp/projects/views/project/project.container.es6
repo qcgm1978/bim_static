@@ -28,7 +28,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		return this;
 	},
 
-	//展开和收�
+	//展开和收起
 	slideUpAndDown:function(event){
 		var $parent=$(event.target).parent(),$modleList=$parent.find(".modleList");
 		$(event.target).toggleClass("down");
@@ -40,7 +40,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 
 	},
 
-	//点击面包�
+	//点击面包靴
 	breadItemClick: function(event) {
 
 		var $target = $(event.target).closest(".breadItem");
@@ -79,7 +79,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			limitHeight: false,
 			title: '新建任务',
 			cssClass: 'task-create-dialog',
-			okText: '�nbsp;&nbsp;�,
+			okText: '添&nbsp;&nbsp;加',
 			message: "内容"
 		})*/
 	},
@@ -168,7 +168,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 	},
 
 
-	//显示和隐�
+	//显示和隐藏
 	navBarShowAndHide: function(event) {
 		var $target = $(event.target);
 		if ($target.closest(".leftNav").length > 0) {
@@ -207,7 +207,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 
 	},
 
-	//切换模型浏览��文件浏览�
+	//切换模型浏览器 和 文件浏览器
 	switchFileMoldel(event) {
 
 		var $target = $(event.target).closest("li"),
@@ -218,11 +218,11 @@ App.Project.ProjectContainer = Backbone.View.extend({
 
 		if (type == "file") {
 
-			//左右�
+			//左右侧
 			$projectContainer.find(".rightProperty").removeClass("showPropety");
 			$projectContainer.find(".leftNav").show();
 
-			//切换时记录大�
+			//切换时记录大小
 			var mRight = $projectCotent.css("margin-right");
 			$projectCotent.css({
 				"margin-right": "0px",
@@ -267,7 +267,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 
 		var $projectContainer = $("#projectContainer"),
 			$projectCotent = $projectContainer.find(".projectCotent");
-		//左右�
+		//左右侧
 		$projectContainer.find(".leftNav").hide();
 
 		var mRight = $projectCotent.data("mRight") || 398;
@@ -309,7 +309,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 					App.Project.Settings.DataModel = data.data;
 					that.renderModel();
 				} else {
-					alert("模型转换�);
+					alert("模型转换中");
 				}
 			} else {
 				alert(data.message);
@@ -324,7 +324,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		var that = this;
 		this.typeContentChange();
 
-		//渲染模型属�
+		//渲染模型属性
 		App.Project.renderModelContentByType();
 
 		//return;
@@ -399,7 +399,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			property = App.Project.Settings.property,
 			Intersect = App.Project.Settings.ModelObj.intersect;
 
-		//属性，四个tab 都一�
+		//属性，四个tab 都一样
 		if (((projectNav == "design" || projectNav == "cost" || projectNav == "quality" || projectNav == "plan") && property == "poperties")) {
 
 			App.Project.DesignAttr.PropertiesCollection.projectId = App.Project.Settings.projectId;
