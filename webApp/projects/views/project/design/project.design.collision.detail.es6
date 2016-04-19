@@ -10,7 +10,8 @@ App.Project.DesignCollisionDetail=Backbone.View.extend({
     "click tr":"setCollisionPoint",
     "click .prePage":"prePage",
     "click .nextPage":"nextPage",
-    "click .viewSetting":"showSetting"
+    "click .viewSetting":"showSetting",
+    "click .export":"download"
   },
 
 	template:_.templateUrl("/projects/tpls/project/design/project.design.collision.detail.html"),
@@ -93,6 +94,9 @@ App.Project.DesignCollisionDetail=Backbone.View.extend({
         App.Project.DesignAttr.CollisionSetting.fetch();
       }
     })
+  },
+  download:function(){
+    window.open("/model/"+App.Project.Settings.collisionId+"/"+App.Project.Settings.collisionId+"_ClashReport.xls","下载")
   }
 });
 
