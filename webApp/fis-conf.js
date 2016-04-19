@@ -67,10 +67,15 @@ fis.match('console/**.html', {
   //useHash:true,
   release: "/static/dist/tpls/$0"
 });
-
-
-
-
+//首页主体
+fis.match('bodyContent/tpls/**.html', {
+  //useHash:true,
+  release: "/static/dist/tpls/$0"
+});
+fis.match('service/**.html', {
+  //useHash:true,
+  release: "/static/dist/tpls/$0"
+});
 fis.match('flow/**.html', {
   //useHash:true,
   release: "/static/dist/tpls/$0"
@@ -95,20 +100,14 @@ fis.match('todo/**.html', {
   //useHash:true,
   release: "/static/dist/tpls/$0"
 });
-
-
-
 fis.match('app/**.html', {
   //useHash:true,
   release: "/static/dist/$0"
 });
-
 fis.match('app/**/tpls/**.html', {
   //useHash:true,
   release: "/static/dist/tpls/$0"
 });
-
-
 fis.match('resources/**.html', {
   //useHash:true,
   release: "/static/dist/tpls/$0"
@@ -150,7 +149,15 @@ fis.match('/comm/**.{js,es6}', {
   packTo: '/static/dist/comm/comm_' + v + '.js'
 });
 
-
+//bodyContent
+fis.match('/bodyContent/**.{less,css}', {
+  //useHash: false,
+  packTo: '/static/dist/bodyContent/bodyContent_' + v + '.css'
+});
+fis.match('/bodyContent/js/**.{js,es6}', {
+  //useHash:true,
+  packTo: '/static/dist/bodyContent/bodyContent_' + v + '.js'
+});
 // 代办
 fis.match('/login/**.{js,es6}', {
   //useHash:true,
@@ -161,7 +168,15 @@ fis.match('/login/**.{less,css}', {
   //useHash:true,
   packTo: '/static/dist/login/login_' + v + '.css'
 });
-
+// service
+fis.match('/service/**.{less,css}', {
+  //useHash:true,
+  packTo: '/static/dist/service/service_' + v + '.css'
+});
+fis.match('/service/**.{js,es6}', {
+  //useHash:true,
+  packTo: '/static/dist/service/service_' + v + '.js'
+});
 
 // 代办
 fis.match('/todo/**.{js,es6}', {

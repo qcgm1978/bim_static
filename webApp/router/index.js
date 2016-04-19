@@ -1,7 +1,7 @@
 var AppRoute = Backbone.Router.extend({
 
 	routes: {
-		'': 'todo',
+		'': 'bodyContent',
 		'todo': 'todo',
 		'projects': 'projects',
 		'projects/:id': 'project',
@@ -11,9 +11,19 @@ var AppRoute = Backbone.Router.extend({
 		'resources/:type/:projectId/:versionId': 'resourceModel',
 		'console': 'console',
 		'console/:type/:step': 'console',
-		'list/:id': 'list'
+		'service': 'service',
+		'list/:id': 'list',
+		'bodyContent':'bodyContent'
 	},
+    //首页主体展示
 
+	bodyContent :function(){
+		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".bodyContent").addClass('selected');
+		_.require('/static/dist/bodyContent/bodyContent.css');
+		//_.require('/static/dist/bodyContent/bodyContent_ie8.css');
+		_.require('/static/dist/bodyContent/bodyContent.js');
+		App.BodyContent.control.init();
+	},
 	//待办
 	todo: function() {
 		this.reset();
@@ -107,6 +117,14 @@ var AppRoute = Backbone.Router.extend({
 		App.Console.Settings.type=type;
 		App.Console.Settings.step=step;
 		App.Console.init();
+	},
+
+
+	service: function() {
+		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".service").addClass('selected');
+		_.require('/static/dist/service/service.css');
+		_.require('/static/dist/service/service.js');
+		App.Service.control.init();
 	},
 
 	//重置数据

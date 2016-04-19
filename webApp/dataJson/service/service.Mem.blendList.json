@@ -1,0 +1,376 @@
+{
+  "code": 0,
+  "message": "success",
+  "data": {
+    "org": [
+      {
+        "ozId": 181211,
+        "username": "lujia5",
+        "name": "组织部",
+        "position": "中控员",
+        "orgName": "工程部",
+        "orgNamePath": "商管公司-各区域公司-南京区域-江阴万达广场-工程部",
+        "orgIdPath": "/1/32784/66166/69267925/69174737/67077/67083/",
+        "isAdmin": false,
+        "isKeyUser": false,
+        "org": {
+          "orgId": 67083,
+          "name": "工程部",
+          "parent": null,
+          "namePath": "商管公司-各区域公司-南京区域-江阴万达广场-工程部",
+          "idPath": "/1/32784/66166/69267925/69174737/67077/67083/",
+          "role": null,
+          "privilege": null
+        },
+        "privilege": [],
+        "role": [
+          {
+            "id": 1,
+            "name": "设计",
+            "code": "design"
+          },
+          {
+            "id": 3,
+            "name": "成本",
+            "code": "cost"
+          },
+          {
+            "id": 2,
+            "name": "模块化",
+            "code": "module"
+          }
+        ]
+      },
+      {
+        "ozId": 181212,
+        "username": "lujia5",
+        "name": "技术部",
+        "position": "中控员",
+        "orgName": "工程部",
+        "orgNamePath": "商管公司-各区域公司-南京区域-江阴万达广场-工程部",
+        "orgIdPath": "/1/32784/66166/69267925/69174737/67077/67083/",
+        "isAdmin": false,
+        "isKeyUser": false,
+        "org": {
+          "orgId": 67083,
+          "name": "工程部",
+          "parent": null,
+          "namePath": "商管公司-各区域公司-南京区域-江阴万达广场-工程部",
+          "idPath": "/1/32784/66166/69267925/69174737/67077/67083/",
+          "role": null,
+          "privilege": null
+        },
+        "privilege": [],
+        "role": [
+          {
+            "id": 1,
+            "name": "设计",
+            "code": "design"
+          },
+          {
+            "id": 3,
+            "name": "成本",
+            "code": "cost"
+          },
+          {
+            "id": 2,
+            "name": "模块化",
+            "code": "module"
+          }
+        ]
+      }
+    ],
+    "user": [
+      {
+        "userId": 181211860,
+        "username": "lujia5",
+        "name": "陆佳",
+        "position": "中控员",
+        "orgName": "工程部",
+        "orgNamePath": "商管公司-各区域公司-南京区域-江阴万达广场-工程部",
+        "orgIdPath": "/1/32784/66166/69267925/69174737/67077/67083/",
+        "isAdmin": false,
+        "isKeyUser": false,
+        "org": {
+          "orgId": 67083,
+          "name": "工程部",
+          "parent": null,
+          "namePath": "商管公司-各区域公司-南京区域-江阴万达广场-工程部",
+          "idPath": "/1/32784/66166/69267925/69174737/67077/67083/",
+          "role": null,
+          "privilege": null
+        },
+        "privilege": [],
+        "role": [
+          {
+            "id": 1,
+            "name": "设计",
+            "code": "design"
+          },
+          {
+            "id": 3,
+            "name": "成本",
+            "code": "cost"
+          },
+          {
+            "id": 2,
+            "name": "模块化",
+            "code": "module"
+          }
+        ]
+      },
+      {
+        "userId": 1392610225,
+        "username": "xuchanghe",
+        "name": "许昌合",
+        "position": "综合维修主管",
+        "orgName": "工程部",
+        "orgNamePath": "商管公司-各区域公司-南京区域-江阴万达广场-工程部",
+        "orgIdPath": "/1/32784/66166/69267925/69174737/67077/67083/",
+        "isAdmin": false,
+        "isKeyUser": false,
+        "org": {
+          "orgId": 67083,
+          "name": "工程部",
+          "parent": null,
+          "namePath": "商管公司-各区域公司-南京区域-江阴万达广场-工程部",
+          "idPath": "/1/32784/66166/69267925/69174737/67077/67083/",
+          "role": null,
+          "privilege": null
+        },
+        "privilege": [],
+        "role": [
+          {
+            "id": 1,
+            "name": "设计",
+            "code": "design"
+          }
+        ]
+      },
+      {
+        "userId": 457691193,
+        "username": "wuajian",
+        "name": "吴阿建",
+        "position": "暖通技工",
+        "orgName": "工程部",
+        "orgNamePath": "商管公司-各区域公司-南京区域-江阴万达广场-工程部",
+        "orgIdPath": "/1/32784/66166/69267925/69174737/67077/67083/",
+        "isAdmin": false,
+        "isKeyUser": false,
+        "org": {
+          "orgId": 67083,
+          "name": "工程部",
+          "parent": null,
+          "namePath": "商管公司-各区域公司-南京区域-江阴万达广场-工程部",
+          "idPath": "/1/32784/66166/69267925/69174737/67077/67083/",
+          "role": null,
+          "privilege": null
+        },
+        "privilege": [],
+        "role": [
+          {
+            "id": 1,
+            "name": "设计",
+            "code": "design"
+          }
+        ]
+      },
+      {
+        "userId": 1270578242,
+        "username": "hugang10",
+        "name": "胡刚",
+        "position": "慧云助理工程师",
+        "orgName": "工程部",
+        "orgNamePath": "商管公司-各区域公司-南京区域-江阴万达广场-工程部",
+        "orgIdPath": "/1/32784/66166/69267925/69174737/67077/67083/",
+        "isAdmin": false,
+        "isKeyUser": false,
+        "org": {
+          "orgId": 67083,
+          "name": "工程部",
+          "parent": null,
+          "namePath": "商管公司-各区域公司-南京区域-江阴万达广场-工程部",
+          "idPath": "/1/32784/66166/69267925/69174737/67077/67083/",
+          "role": null,
+          "privilege": null
+        },
+        "privilege": [],
+        "role": [
+          {
+            "id": 1,
+            "name": "设计",
+            "code": "design"
+          }
+        ]
+      },
+      {
+        "userId": 154920219,
+        "username": "yinmingjie",
+        "name": "殷明杰",
+        "position": "暖通技工",
+        "orgName": "工程部",
+        "orgNamePath": "商管公司-各区域公司-南京区域-江阴万达广场-工程部",
+        "orgIdPath": "/1/32784/66166/69267925/69174737/67077/67083/",
+        "isAdmin": false,
+        "isKeyUser": false,
+        "org": {
+          "orgId": 67083,
+          "name": "工程部",
+          "parent": null,
+          "namePath": "商管公司-各区域公司-南京区域-江阴万达广场-工程部",
+          "idPath": "/1/32784/66166/69267925/69174737/67077/67083/",
+          "role": null,
+          "privilege": null
+        },
+        "privilege": [],
+        "role": [
+          {
+            "id": 1,
+            "name": "设计",
+            "code": "design"
+          }
+        ]
+      },
+      {
+        "userId": 152067370,
+        "username": "wuyuliang3",
+        "name": "吴玉良",
+        "position": "暖通技工",
+        "orgName": "工程部",
+        "orgNamePath": "商管公司-各区域公司-南京区域-江阴万达广场-工程部",
+        "orgIdPath": "/1/32784/66166/69267925/69174737/67077/67083/",
+        "isAdmin": false,
+        "isKeyUser": false,
+        "org": {
+          "orgId": 67083,
+          "name": "工程部",
+          "parent": null,
+          "namePath": "商管公司-各区域公司-南京区域-江阴万达广场-工程部",
+          "idPath": "/1/32784/66166/69267925/69174737/67077/67083/",
+          "role": null,
+          "privilege": null
+        },
+        "privilege": [],
+        "role": [
+          {
+            "id": 1,
+            "name": "设计",
+            "code": "design"
+          }
+        ]
+      },
+      {
+        "userId": 638162,
+        "username": "qianjun1",
+        "name": "钱俊",
+        "position": "综合维修主管",
+        "orgName": "工程部",
+        "orgNamePath": "商管公司-各区域公司-南京区域-江阴万达广场-工程部",
+        "orgIdPath": "/1/32784/66166/69267925/69174737/67077/67083/",
+        "isAdmin": false,
+        "isKeyUser": false,
+        "org": {
+          "orgId": 67083,
+          "name": "工程部",
+          "parent": null,
+          "namePath": "商管公司-各区域公司-南京区域-江阴万达广场-工程部",
+          "idPath": "/1/32784/66166/69267925/69174737/67077/67083/",
+          "role": null,
+          "privilege": null
+        },
+        "privilege": [],
+        "role": [
+          {
+            "id": 1,
+            "name": "设计",
+            "code": "design"
+          }
+        ]
+      },
+      {
+        "userId": 184032470,
+        "username": "zhouguoping",
+        "name": "周国平",
+        "position": "暖通技工",
+        "orgName": "工程部",
+        "orgNamePath": "商管公司-各区域公司-南京区域-江阴万达广场-工程部",
+        "orgIdPath": "/1/32784/66166/69267925/69174737/67077/67083/",
+        "isAdmin": false,
+        "isKeyUser": false,
+        "org": {
+          "orgId": 67083,
+          "name": "工程部",
+          "parent": null,
+          "namePath": "商管公司-各区域公司-南京区域-江阴万达广场-工程部",
+          "idPath": "/1/32784/66166/69267925/69174737/67077/67083/",
+          "role": null,
+          "privilege": null
+        },
+        "privilege": [],
+        "role": [
+          {
+            "id": 1,
+            "name": "设计",
+            "code": "design"
+          }
+        ]
+      },
+      {
+        "userId": 37510535,
+        "username": "zhushuai",
+        "name": "朱帅",
+        "position": "强电技工",
+        "orgName": "工程部",
+        "orgNamePath": "商管公司-各区域公司-南京区域-江阴万达广场-工程部",
+        "orgIdPath": "/1/32784/66166/69267925/69174737/67077/67083/",
+        "isAdmin": false,
+        "isKeyUser": false,
+        "org": {
+          "orgId": 67083,
+          "name": "工程部",
+          "parent": null,
+          "namePath": "商管公司-各区域公司-南京区域-江阴万达广场-工程部",
+          "idPath": "/1/32784/66166/69267925/69174737/67077/67083/",
+          "role": null,
+          "privilege": null
+        },
+        "privilege": [],
+        "role": [
+          {
+            "id": 1,
+            "name": "设计",
+            "code": "design"
+          }
+        ]
+      },
+      {
+        "userId": 821227997,
+        "username": "zhangyili",
+        "name": "张宜利",
+        "position": "暖通主管",
+        "orgName": "工程部",
+        "orgNamePath": "商管公司-各区域公司-南京区域-江阴万达广场-工程部",
+        "orgIdPath": "/1/32784/66166/69267925/69174737/67077/67083/",
+        "isAdmin": false,
+        "isKeyUser": false,
+        "org": {
+          "orgId": 67083,
+          "name": "工程部",
+          "parent": null,
+          "namePath": "商管公司-各区域公司-南京区域-江阴万达广场-工程部",
+          "idPath": "/1/32784/66166/69267925/69174737/67077/67083/",
+          "role": null,
+          "privilege": null
+        },
+        "privilege": [],
+        "role": [
+          {
+            "id": 1,
+            "name": "设计",
+            "code": "design"
+          }
+        ]
+      }
+    ]
+  }
+}

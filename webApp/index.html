@@ -13,17 +13,19 @@
 <body>
     <div id="topBar">
         <ul class="navHeader">
-            <li class="item todo"> <a href="#todo">首页</a></li>
+            <li class="item bodyConMenu"> <a href="#bodyContent">首页</a></li>
+            <li class="item todo"> <a href="#todo">待办</a></li>
             <li class="item projects"> <a href="#projects">项目模型</a></li>
             <li class="item flow"> <a href="#flow">业务流程</a></li>
             <li class="item resources"> <a href="#resources">资源库</a></li>
-            <li class="item console"> <a href="#console">服务</a></li>
+            <li class="item service"> <a href="#service">服务</a></li>
             <li class="user">
                 <div class="userBg"></div> <span>您好，</span> <span class="userName"> <span class="text">zhongping</span> <i class="icon-angle-down"></i></span> </li>
         </ul>
         <div class="logo"><span class="text">BIM信息化集成平台</span></div>
     </div>
     <div id="contains"></div>
+    <div id="mask"></div><!--注意因为#contains的relative-->
 </body>
 <script type="text/javascript">
 var App = {};
