@@ -5,7 +5,7 @@ var App = App || {};
 App.Service.nav = Backbone.View.extend({
 
     el:$("#contains"),
-    template:_.templateUrl("/Service/tpls/service.Nav.html",true),
+    template:_.templateUrl("/service/tpls/service.Nav.html",true),
 
     events:{
         "click .memCtrl" : "memCtrl",

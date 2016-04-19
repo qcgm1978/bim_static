@@ -6,7 +6,7 @@ App.Service.MemCtrlChildList=Backbone.View.extend({
 
     tagName :'div',
 
-    template:_.templateUrl("/Service/tpls/mem/service.memCtrl.oz.childList.html"),
+    template:_.templateUrl("/service/tpls/mem/service.memCtrl.oz.childList.html"),
     events:{
     },
 

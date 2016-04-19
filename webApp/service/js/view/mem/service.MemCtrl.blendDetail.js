@@ -5,7 +5,7 @@ var App = App || {};
 App.Service.MemCtrlBlendDetail=Backbone.View.extend({
     tagName:'li',
 
-    template:_.templateUrl("/Service/tpls/mem/service.MemCtrl.blendDetail.html"),
+    template:_.templateUrl("/service/tpls/mem/service.MemCtrl.blendDetail.html"),
     events:{
         "click .pers":"spread",
         "click input":"select"

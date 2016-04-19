@@ -12,7 +12,7 @@ App.Service.MemCtrlBlendList=Backbone.View.extend({
         "click .selectAll":"selectAll"//全选
     },
 
-    template:_.templateUrl("/Service/tpls/mem/service.MemCtrl.blendList.html"),
+    template:_.templateUrl("/service/tpls/mem/service.MemCtrl.blendList.html"),
 
     render:function(){
         this.$el.html(this.template);

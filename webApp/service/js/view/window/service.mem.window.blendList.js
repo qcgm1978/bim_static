@@ -8,7 +8,7 @@ App.Service.window.blendList=Backbone.View.extend({
 
     events:{},
 
-    template:_.templateUrl("/Service/tpls/mem/service.MemCtrl.blendList.html"),
+    template:_.templateUrl("/service/tpls/mem/service.MemCtrl.blendList.html"),
 
     render:function(){
         this.$el.html(this.template);

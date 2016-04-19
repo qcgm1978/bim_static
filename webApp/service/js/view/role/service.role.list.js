@@ -13,7 +13,7 @@ App.Service.roleList=Backbone.View.extend({
         "click .newRole": "createRole"
     },
 
-    template:_.templateUrl("/Service/tpls/role/service.role.list.html"),
+    template:_.templateUrl("/service/tpls/role/service.role.list.html"),
 
     render:function(){
         this.$el.html(this.template);

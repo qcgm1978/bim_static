@@ -11,11 +11,11 @@ App.API = {
 
 		//首页bodyContent数据
 		// fetchBodyContentData :'platform/bodyContent',
-		fetchBodyContentTodos :'/dataJson/bodyContent/bodyContent.todos.json',
-		fetchBodyContentMonthEnd :'/dataJson/bodyContent/bodyContent.monthEnd.json',
-		fetchBodyContentMonthStart :'/dataJson/bodyContent/bodyContent.monthStart.json',
-		fetchBodyContentSlide :'/dataJson/bodyContent/bodyContent.slide.json',
-		fetchBodyContentProclamation :'/dataJson/bodyContent/bodyContent.proclamation.json',
+		fetchBodyContentTodos :'dataJson/bodyContent/bodyContent.todos.json',
+		fetchBodyContentMonthEnd :'dataJson/bodyContent/bodyContent.monthEnd.json',
+		fetchBodyContentMonthStart :'dataJson/bodyContent/bodyContent.monthStart.json',
+		fetchBodyContentSlide :'dataJson/bodyContent/bodyContent.slide.json',
+		fetchBodyContentProclamation :'dataJson/bodyContent/bodyContent.proclamation.json',
 
 		//Service
 		fetchServiceMCOuterList:'platform/auth/org?outer=true',//外部组织-用户列表
