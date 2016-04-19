@@ -4,17 +4,17 @@
 .bim.select { cursor: default; }
 .bim.move { cursor: -webkit-grab; }
 .bim.fly { cursor: crosshair; }
-.bim .bim-loading{position:absolute;width:300px;height:16px;left:50%;top:50%;margin-left:-150px;border-radius:1000px;overflow:hidden;}
-.bim .bim-progress{display:block;background:#408cdf;height:16px;width:0;}
+.bim .bim-loading{position:absolute;width:100%;height:6px;left:0;top:0;background:#ccc;overflow:hidden;}
+.bim .bim-progress{display:block;background:#358BD4;height:6px;width:0;}
 /**
   * @name zhangyy-g@grandsoft.com.cn
   * @description zhangyy's code
   * @markup
   *
   */
-.bim .mod-bar { position: absolute; z-index: 20; background: #333; width: 40px; left: 20px; top: 10px; }
+.bim .mod-bar { position: absolute; z-index: 20; background: #333;  left: 50%; bottom:10px;transform:translate(-50%,0) }
 .bim .mod-bar .divide { display: block; border-top: 1px solid #666; width: 32px; margin-left: 4px; }
-.bim .bar-item { cursor: pointer; border: 1px solid transparent; margin: 3px; box-sizing: content-box; }
+.bim .bar-item { cursor: pointer; border: 1px solid transparent; margin: 3px; box-sizing: content-box;float:left; }
 .bim .bar-item.horizontal { display: inline-block; }
 .bim .bar-item:hover { border: 1px solid #666; }
 .bim .bar-item.open,.bim .bar-item.selected { border: 1px solid #000; background-color: #000; }
