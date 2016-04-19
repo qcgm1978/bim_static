@@ -6,11 +6,35 @@ App.Index = {
 	Settings: {
 		projectId: "",
 		projectVersionId: "",
-		referenceId:"",
-		referenceVersionId:"",
+		referenceId: "",
+		referenceVersionId: "",
 		ModelObj: "",
-		Viewer: null
+		Viewer: null,
+		FileType: {
+			AR: "建筑",
+			ST: "结构",
+			AC: "暖通",
+			EL: "电气",
+			TE: "智能化",
+			PL: "给排水",
+			CI: "市政",
+			FP: "消防",
+			TP: "动力",
+			IN: "内装",
+			DS: "导向标识",
+			LC: "景观",
+			CW: "幕墙",
+			LI: "照明",
+			LR: "采光顶",
+			FL: "泛光",
+			"IN&DS": "内装&标识",
+			"LC&CI": "景观&小市政",
+			"CW&FL": "幕墙&泛光",
+			OT: "其他专业"
+		}
 	},
+
+
 
 	bindEvent() {
 
@@ -25,10 +49,12 @@ App.Index = {
 				that.renderAttr(App.Index.Settings.ModelObj);
 			}
 
+			that.renderAttr(App.Index.Settings.ModelObj);
 			var index = $(this).index();
 			$(this).addClass("selected").siblings().removeClass("selected");
 			$(this).closest(".designPropetyBox").find(".projectPropetyContainer").children('div').eq(index).show().siblings().hide();
 		});
+
 
 
 		//收起 暂开 属性内容
@@ -37,17 +63,6 @@ App.Index = {
 			var $modleList = $(this).parent().find(".modleList");
 			$modleList.slideToggle();
 		});
-
-		//收起 暂开 属性 左侧
-		$projectContainer.on("click", ".leftNavContent .slideBar", function() {
-
-			App.Comm.navBarToggle($("#projectContainer .leftNav "), $("#projectContainer .projectCotent"), "left", App.Index.Settings.Viewer);
-		});
-		//拖拽 属性内容 左侧
-		$projectContainer.on("mousedown", ".leftNavContent .dragSize", function(event) {
-			App.Comm.dragSize(event, $("#projectContainer .leftNav"), $("#projectContainer .projectCotent"), "left", App.Index.Settings.Viewer);
-		});
-
 
 		//收起 暂开 属性 右侧
 		$projectContainer.on("click", ".rightProperty .slideBar", function() {
@@ -59,6 +74,20 @@ App.Index = {
 			App.Comm.dragSize(event, $("#projectContainer .rightProperty"), $("#projectContainer .projectCotent"), "right", App.Index.Settings.Viewer);
 		});
 
+		//tree toggle show  hide
+		$projectContainer.on("click", ".nodeSwitch", function(event) {
+			var $target = $(this);
+
+			if ($target.hasClass("on")) {
+				$target.closest("li").children("ul").hide();
+				$target.removeClass("on");
+			} else {
+				$target.closest("li").children("ul").show();
+				$target.addClass("on");
+			}
+		})
+
+
 		this.bindTreeScroll();
 
 	},
@@ -68,8 +97,8 @@ App.Index = {
 		var Request = App.Index.GetRequest();
 		App.Index.Settings.projectId = Request.projectId;
 		App.Index.Settings.projectVersionId = Request.projectVersionId;
-		App.Index.Settings.referenceId=Request.referenceId;
-		App.Index.Settings.referenceVersionId=Request.referenceVersionId;
+		App.Index.Settings.referenceId = Request.referenceId;
+		App.Index.Settings.referenceVersionId = Request.referenceVersionId;
 
 	},
 
@@ -89,13 +118,14 @@ App.Index = {
 
 
 	//获取模型id 渲染模型
-	getModelId(callback) {
+	getModelId(alterationVersionId, callback) {
 
 		var dataObj = {
-			URLtype: "fetchModelIdByProject",
+			URLtype: "fetchFileModelIdByFileVersionId",
 			data: {
 				projectId: App.Index.Settings.projectId,
-				projectVersionId: App.Index.Settings.projectVersionId
+				projectVersionId: App.Index.Settings.projectVersionId,
+				fileVersionId: 811409467293920 || alterationVersionId
 			}
 		}
 
@@ -104,13 +134,19 @@ App.Index = {
 	},
 
 	//渲染模型
-	renderModel() {
+	renderModel(alterationVersionId) {
 
 
 		var that = this;
 		App.Index.Settings.Viewer = null;
-		this.getModelId(function(data) {
+		this.getModelId(alterationVersionId, function(data) {
 
+			if (data.message != "success") {
+				alert("转换失败");
+				return;
+			}
+
+			debugger
 			var Model = data.data;
 
 			if (data.data.modelStatus == 1) {
@@ -121,33 +157,28 @@ App.Index = {
 				return;
 			}
 
-			//return;	
-
 			App.Index.Settings.Viewer = new BIM({
+				single: true,
 				element: $("#contains .projectCotent")[0],
-				sourceId: Model.sourceId,
-				etag: Model.etag,
-				tools: true			 
+				etag: data.data.modelId,
+				tools: true
 			});
+
 
 
 			App.Index.Settings.Viewer.on("click", function(model) {
 				App.Index.Settings.ModelObj = null;
 				if (!model.intersect) {
 					return;
-				}
-
-				App.Index.Settings.ModelObj = model;
-				//App.Project.Settings.modelId = model.userId;
-				//设计
-
+				} 
+				App.Index.Settings.ModelObj = model; 
 				//属性
 				if (App.Index.Settings.property == "attr") {
 					that.renderAttr(App.Index.Settings.ModelObj);
 				}
 
 			});
-			 
+
 		});
 
 	},
@@ -158,20 +189,47 @@ App.Index = {
 		if (!App.Index.Settings.ModelObj || !App.Index.Settings.ModelObj.intersect) {
 			$("#projectContainer .designProperties").html(' <div class="nullTip">请选择构件</div>');
 			return;
-		}
+		}  
 
-		var url = "/sixD/" + App.Index.Settings.projectId + "/" + App.Index.Settings.projectVersionId + "/property";
-		$.ajax({
-			url: url,
+		var data = {
+			URLtype: "projectDesinProperties",
 			data: {
-				elementId: App.Index.Settings.ModelObj.intersect.userId,
-				sceneId: App.Index.Settings.ModelObj.intersect.object.userData.sceneId
+				projectId: App.Index.Settings.projectId,
+				projectVersionId: App.Index.Settings.projectVersionId,
+				elementId: 2 || App.Index.Settings.ModelObj.intersect.userId,
+				sceneId: 2 || App.Index.Settings.ModelObj.intersect.object.userData.sceneId
 			}
-		}).done(function(data) {
-			var template = _.templateUrl("/projects/tpls/project/design/project.design.property.properties.html");
+		};
+
+		App.Comm.ajax(data, function(data) {
+			var template = _.templateUrl("/app/project/projectChange/tpls/proterties.html");
 			$("#projectContainer .designProperties").html(template(data.data));
+			//获取构建成本
+			App.Index.getAcquisitionCost();
 		});
 
+	},
+
+	//获取构建成本
+	getAcquisitionCost() {
+
+		var data = {
+			URLtype: "projectChangeListTest", //projectChangeList
+			data: {
+				projectId: App.Index.Settings.projectId,
+				projectVersionId: App.Index.Settings.projectVersionId,
+				elementId: 2 || App.Index.Settings.ModelObj.intersect.userId,
+				sceneId: 2 || App.Index.Settings.ModelObj.intersect.object.userData.sceneId
+			}
+		};
+
+		App.Comm.ajax(data, function(data) {
+			var treeRoot = _.templateUrl('/app/project/projectChange/tpls/treeRoot.html');
+			var treeNode = _.templateUrl('/app/project/projectChange/tpls/treeNode.html');
+			data.treeNode = treeNode;
+			$(".designProperties .attrCostBox").append(treeRoot(data));
+			$(".attrCostBox li .itemContent").addClass("odd");
+		});
 	},
 
 	//树形的滚动条
@@ -192,40 +250,109 @@ App.Index = {
 		}
 
 		$modelTree.find(".mCS_no_scrollbar_y").width(800);
+	},
 
-	}, 
- 
+	//获取变更文件
+	fetchFileType() {
 
-	fetchChange: function() {
+		var data = {
+				URLtype: "fileList",
+				data: {
+					projectId: App.Index.Settings.projectId,
+					versionId: App.Index.Settings.projectVersionId
+				}
+			},
+			that = this;
+
+
+
+		App.Comm.ajax(data, function(data) {
+
+			var list = data.data,
+				lists = [],
+				items;
+
+			//生成 二级 目录
+			$.each(list, function(i, item) {
+
+				item.specialty = App.Index.Settings.FileType[item.specialty];
+
+				items = _.findWhere(lists, {
+					"specialty": item.specialty
+				});
+				if (items) {
+					items.data.push(item);
+				} else {
+					lists.push({
+						"specialty": item.specialty,
+						data: [item]
+					});
+				}
+
+			});
+
+			var firstData = lists[0].data[0];
+
+			//渲染模型
+			that.renderModel(firstData.alterationVersionId);
+
+			//变更获取
+			that.fetchChangeList(firstData.baseFileVersionId, firstData.alterationVersionId);
+
+			var template = _.templateUrl("/app/project/projectChange/tpls/fileList.html");
+
+			var c = template(lists);
+
+
+
+			$(".projectNavContentBox .projectChangeListBox:first").prepend(c);
+			//下拉 事件绑定
+			$(".projectNavContentBox .projectChangeListBox:first .specialitiesOption").myDropDown({
+				click: function($item) {
+					var groupText = $item.closest(".groups").prev().text() + "：";
+					$(".specialitiesOption .myDropText span:first").text(groupText);
+					var baseFileVersionId = $item.data("basefileversionid"),
+						alterationVersionId = $item.data("alterationversionid");
+					that.fetchChangeList(baseFileVersionId, alterationVersionId);
+
+				}
+			});
+
+		});
+
+	},
+
+	//获取更改清单
+	fetchChangeList: function(baseFileVersionId, alterationVersionId) {
 
 		App.Collections.changeListCollection.projectId = App.Index.Settings.projectId;
 		App.Collections.changeListCollection.projectVersionId = App.Index.Settings.projectVersionId;
-		 
+
 		App.Collections.changeListCollection.reset();
 		App.Collections.changeListCollection.fetch({
-			data:{
-				baseProjectVerionId:App.Index.Settings.referenceVersionId
+			data: {
+				baseFileVerionId: baseFileVersionId,
+				fileVerionId: alterationVersionId
 			}
 		});
-		
 
-		$("#treeContainerBody").html(new  App.Views.projectChangeListView().render().el);
-	 
+
+		$("#treeContainerBody").html(new App.Views.projectChangeListView().render().el);
+
 	},
 
 
-	init() { 
-	 
+	init() {
+
 		//初始化参数
 		this.initPars();
-		//渲染模型
-		this.renderModel();
 		//事件绑定
 		this.bindEvent();
-		//变更获取
-		this.fetchChange();  
+		//获取文件裂隙
+		this.fetchFileType();
 
-	} 
+
+	}
 
 
 }

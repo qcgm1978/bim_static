@@ -3,7 +3,7 @@
  
 
 
-
+ 
 <div class="itemContent">  
      <div class="repertoireCode comm">
      <% var mLeft=deep*6;%>
@@ -16,8 +16,8 @@
      	
      </i> <span class="text" style="left:<%=mLeft+11%>px;"><%= code %></span> </div>
      <div class="repertoireName comm"><span class="text"><%= name %></span></div>
-     <div class="beforeChange comm"><span class="text"><%= baseTotalQuantity %><%= baseUnit %></span></div>
-     <div class="afterChange comm"><span class="text"><%= totalQuantity %><%= unit %></span></div> 
+     <div class="beforeChange comm"><span class="text"><%= obj.baseTotalQuantity %><%= obj.baseUnit %></span></div>
+     <div class="afterChange comm <%= obj.baseTotalQuantity && obj.baseTotalQuantity!=obj.totalQuantity ?'changeColor':''%>"><span class="text"><%= totalQuantity %><%= unit %></span></div> 
 </div>
 
  
