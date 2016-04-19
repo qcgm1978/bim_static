@@ -282,10 +282,11 @@ BIM.util = {
     var reg = new RegExp('[ ]*'+className,'g');
     for(var i = 0,len = element.length;i<len;i++){
       var _self = element[i]
-      if(exclude && _self == exclude) return false;
-      var _className = _self.className;
-      _className = _className.replace(reg,"");
-      _self.className = _className;
+      if(!exclude || _self != exclude){
+        var _className = _self.className;
+        _className = _className.replace(reg,"");
+        _self.className = _className;
+      }
     }
   },
   listener : function(element,type,fn){
