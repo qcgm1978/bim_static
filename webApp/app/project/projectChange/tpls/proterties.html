@@ -1,0 +1,79 @@
+<% var count=obj.length,item; %>
+    <% for(var i=0;i<count;i++){ %>
+        <% item=obj[i]; %>
+            <div class="modle">
+                <i class="modleShowHide"></i>
+                <h1 class="modleName"><%= item.group%></h1>
+                <ul class="modleList
+">
+                 <li class="modleItem">
+                                    <span class="modleName"> <div class="modleNameText overflowEllipsis">
+                                       </div></span> 
+
+
+
+                                    <span class="changeValue beforeChange">
+
+                                    <div class="modleNameText overflowEllipsis">
+                                      变更前</div></span>
+
+                                     <span class="changeValue afterChange">
+                                     	 <div class="modleNameText overflowEllipsis">
+                                    变更后</div>
+                                     </span>
+                                </li>
+                    <% var subItems=item.items,subCount=subItems.length,subItem %>
+                        <% for(var j=0;j<subCount;j++){ %>
+                            <% subItem=subItems[j];  %>
+                                <li class="modleItem">
+                                    <span class="modleName"><div class="modleNameText overflowEllipsis"><%=subItem.name%></div></span> 
+
+
+
+                                    <span class="changeValue beforeChange">
+
+                                    <div class="modleNameText overflowEllipsis">
+                                    <%=subItem.baseValue%><%=subItem.baseUnit%></div></span>
+
+                                     <span class="changeValue afterChange">
+                                     	 <div class="modleNameText overflowEllipsis <%= subItem.baaseValue!=subItem.value ? 'changeColor':'' %>">
+                                    <%=subItem.value%><%=subItem.unit%></div>
+                                     </span>
+                                </li>
+                        <% } %>
+                </ul>
+            </div>
+    <% } %>
+
+    <div class="attrCostBox projectChangeListBox">
+		<div class="modle">
+			<i class="modleShowHide"></i>
+	    	<h1 class="modleName">成本</h1>
+		</div>
+		<ul class="contrastTree">
+            <li class="node">
+                <div class="itemContent">
+                    <div class="repertoireCode comm">清单编码</div>
+                    <div class="repertoireName comm">清单名称</div>
+                    <div class="beforeChange comm">变更前</div>
+                    <div class="afterChange comm">变更后</div>
+                </div>
+            </li>
+        </ul>
+
+</div>
+
+<div class="modle">
+	<i class="modleShowHide"></i> <h1 class="modleName">图纸</h1>
+	<ul class="modleList">
+		<li class="modleItem">
+			 <a class="modelLink" href="javascript:void(0);">CBS-WP-RIDE-WWI-GroupI.dwg</a>
+		</li> 
+		<li class="modleItem">
+			 <a class="modelLink" href="javascript:void(0);">CBS-WP-RIDE-WWI-GroupII.dwg</a>
+		</li> 
+	</ul>
+
+</div> 
+
+ 
