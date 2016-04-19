@@ -1,0 +1,16 @@
+<div class="pers">角色授权</div>
+<div class="sele">
+    <div class="left">
+            <input type="checkbox">
+            <i class=""></i>
+            <span><%= username %></span>
+    </div>
+    <div class="roles">
+        <% if(role.length) {for (var i = 0 ; i < role.length ; i++){  %><!--怎么判断是管理员？？？-->
+        <span><%= role[i].name %></span>
+        <%}}else{%>
+        <span>0</span>
+        <%}%>
+    </div>
+</div>
+

@@ -1,0 +1,74 @@
+@lineHeight50: 50px ; /*标准行高*/
+.fTitle {font-size:  14px;}
+.fComm{font-size:  12px};
+@fontColorWhite :  #ffffff;
+@fontColorGray :  #999999;
+@fontColorBlack :  #333333;
+@fontColorLink :  #408CDF;
+@wp100:100%;
+i,em{font-style: normal;font-weight: normal;}
+.block{display: block;}
+.left{float: left;}
+.right{float: right;}
+a{text-decoration: none;color:@fontColorLink; }
+a:hover{text-decoration: underline;}
+.clear{margin: 0;padding: 0;}
+body,ul,table,tr,td,input{.clear;}
+.bdrComm{border-radius: 5px;}
+.bdrTComm{border-radius: 5px 5px 0 0;}
+.bdrBComm{border-radius:  0 0 5px 5px;}
+.pdT10{padding-top: 10px;}
+.pdX10{padding: 0 10px;}
+.ellipsis{overflow: hidden;white-space: nowrap;text-overflow: ellipsis;}
+.con{/*filter: progid:DXImageTransform.Microsoft.Glow(color=#999999,strength=3);*/box-shadow: 0 0 10px 0  #666666;/*-webkit-filter: drop-shadow(0,0,5,rgba(0, 0, 0, 0.5));background-color: #ffffff; */.bdrComm;}
+/*用filter不是个好方式,IE渲染包含在box模型内，会偏移设置背景色将使ie的滤镜不继承*/
+img{border: none;outline: none;}
+.headIcon{position: absolute;width: 35px;height: 40px;left: 0;top: 0;background: transparent url("../images/con_tab_default.png") center center no-repeat;}
+
+table{border-collapse: collapse;border: none;}
+.clearBoth { clear: both;}
+.clearfix:after{ clear: both; content: "\200B"; display: block; height: 0px;}
+.clearfix{ *zoom: 1;}
+
+.bodyContent{width: 980px;margin: 0 auto;padding: 0;}
+.bodyContent li{.ellipsis;}
+.bodyContent  .article{.pdX10;.bdrBComm;}
+
+.conTodo,.conSlide,.conMonth,.conPro{.con;.fComm;}
+.conHeader span{display: block;.fTitle;padding:0 30px 0 35px; line-height: @lineHeight50 * 0.8;font-weight: 600;border-radius: 5px 0 0 0;cursor: pointer ;}
+.conHeader a{float: right;line-height:@lineHeight50 * 0.8; font-size: 10px;color:@fontColorWhite;padding-right: 20px;position: relative;z-index: 10;}
+.conHeader a:hover{text-decoration: none;}
+.conMonth .conHeader span{float: left;position: relative;}
+.conMonth .conHeader i{.headIcon;background-image:  url("../images/con_tab_default.png") ;}
+.conMonth .conHeader span.active i{background: #ffffff url("../images/con_tab_active.png") center center no-repeat;border-radius: 5px 0 0 0;}
+.conMonth .conHeader span.active{background:#ffffff url("../images/contabx.gif") right top no-repeat;color:@fontColorBlack ;}
+.conMonth td{overflow: hidden;text-overflow: ellipsis;white-space: nowrap;}
+.conTodo ,.conMonth{.left;width: 600px;}
+.conTodo li:not(:last-child){border-bottom: 1px solid #dddddd;}
+.conSlide,.conPro{.right;width: 360px;}
+.conTodo .conHeader span{position: relative;}
+.conTodo .conHeader i{.headIcon;background-image:  url("../images/con_todo_ico.png");}
+.conSlide .conHeader i{.headIcon;background-image:  url("../images/slide_ico.png");}
+.conPro .conHeader i{.headIcon;background-image:  url("../images/pron_ico.png");}
+
+.conMonth table{width:@wp100;line-height: @lineHeight50 * 0.6;}
+.conMonth thead{color: @fontColorGray;border-bottom: 1px solid #dddddd;}
+#monthStart{display: none;}
+.bodyContent .conHeader{ background-color: #3c7ab9; height: @lineHeight50 * 0.8; color: @fontColorWhite;.bdrTComm ;line-height: 0;position: relative;}
+.conInfo{float: right;width: 195px;line-height: @lineHeight50 * 0.49;text-align: right;color: @fontColorGray;}
+.conInfo span{float: right;width: 110px;text-align: left;color: @fontColorBlack;}
+.conBody li{.fComm;}
+.conTodo .conBody li{line-height: @lineHeight50 * 0.98; }
+.conBody li a{color: #408CDF;}
+.conBody table{width:@wp100;}
+.conBody.pro .time,.conBody.pro li,.conBody.moth li{line-height: @lineHeight50 * 0.6;}
+/*轮播*/
+.conSlide .presentShow{display: inline-block;*display:inline;line-height: 50px;vertical-align: top;width: 115px;color: #999999;font-size: 12px;}
+.conSlide .presentShow em{color: #0081dd;font-size: 14px;}
+.conSlide .article ul {height: 250px;}
+.conSlide .article li {position: absolute;left: 0;top: 0;width: 100%;height: 250px;}
+.conSlide .article{.bdrBComm;height: 300px;overflow: hidden;position: relative;clear: both;}
+.conSlide  .imgContainer {position: absolute;left: 0;top: 0;width: 100%;height: 300px;}
+.conSlide  .slideProcess {height: 50px; line-height: 0;text-align: center;}
+.conSlide  .slideProcess span{display: inline-block;*display:inline;width: 30px;height: 50px;line-height: 50px;cursor: pointer;}
+.conSlide  .slideProcess span img{margin-top: 10px;}

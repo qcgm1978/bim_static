@@ -1,0 +1,61 @@
+{
+  "code": 0,
+  "message": "success",
+  "data": {
+    "role": [
+      {
+        "roleId": 181211860,
+        "name": "矮人",
+        "functions": [
+          {
+            "id": 1,
+            "name": "设计",
+            "code": "design"
+          },
+          {
+            "id": 2,
+            "name": "模块化",
+            "code": "module"
+          },
+          {
+            "id": 7,
+            "name": "新星",
+            "code": "newStar"
+          }
+        ]
+      },
+      {
+        "roleId": 1,
+        "name": "亡灵",
+        "functions": [
+          {
+            "id": 3,
+            "name": "成本",
+            "code": "cost"
+          },
+          {
+            "id": 6,
+            "name": "冲锋",
+            "code": "rush"
+          }
+        ]
+      },
+      {
+        "roleId": 2655,
+        "name": "侏儒",
+        "functions": [
+          {
+            "id": 4,
+            "name": "监制",
+            "code": "quality"
+          },
+          {
+            "id": 5,
+            "name": "背刺",
+            "code": "back"
+          }
+        ]
+      }
+    ]
+  }
+}

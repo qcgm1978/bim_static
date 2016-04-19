@@ -9,6 +9,14 @@ App.API = {
 
 	URL: {
 
+		//首页bodyContent数据
+		// fetchBodyContentData :'platform/bodyContent',
+
+		//Service
+		fetchServiceMCOuterList:'platform/auth/org?outer=true',//外部组织-用户列表
+		fetchServiceFunList: 'platform/auth/function',//功能列表
+		fetchServiceMCInnerList:'platform/auth/org?outer=false&includeUsers=true',//内部-混合列表
+
 		//代办$chars
 		fetchTodoData: "platform/todo", //获取代办数据
 
@@ -113,6 +121,18 @@ App.API = {
 
 	DEBUGURL: {
 
+		//首页bodyContent数据
+		fetchBodyContentTodos :'/dataJson/bodyContent/bodyContent.todos.json',
+		fetchBodyContentMonthEnd :'/dataJson/bodyContent/bodyContent.monthEnd.json',
+		fetchBodyContentMonthStart :'/dataJson/bodyContent/bodyContent.monthStart.json',
+		fetchBodyContentSlide :'/dataJson/bodyContent/bodyContent.slide.json',
+		fetchBodyContentProclamation :'/dataJson/bodyContent/bodyContent.proclamation.json',
+
+		//console
+		fetchServiceMCBlendList:'/dataJson/service/service.Mem.blendList.json',//组织-混合列表
+		fetchServiceRolesList:'/dataJson/service/service.Mem.rolesList.json',//角色-功能列表
+		fetchServiceFunList: '/dataJson/service/service.fun.list.json',//功能列表
+
 		//代办
 		fetchTodoData: "/dataJson/todo/todo.json", //获取代办数据
 
@@ -188,4 +208,4 @@ App.API = {
 	}
 
 
-}
+};
