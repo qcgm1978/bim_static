@@ -4,13 +4,13 @@ App.API = {
 
 	Settings: {
 		hostname: "http://bim.wanda-dev.cn/",
-		debug: false
+		debug: true
 	},
 
 	URL: {
 
 		//首页bodyContent数据
-		// fetchBodyContentData :'platform/bodyContent',
+		 fetchBodyContentData :'platform/bodyContent',
 
 		//Service
 		fetchServiceMCOuterList:'platform/auth/org?outer=true',//外部组织-用户列表
