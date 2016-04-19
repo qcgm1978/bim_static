@@ -710,11 +710,12 @@ BIM.prototype = {
     viewer.render();
   },
   showScene:function(obj){
+    debugger
     var viewer = BIM.common.viewer;
     var filter = viewer.getFilters();
-    filter.removeUserFilter(obj.type);
-    BIM.util.getFilter(obj.ids,function(id){
-      filter.addUserFilter(obj.type,id);
+    filter.removeUserFilter("sceneId");
+    BIM.util.getFilter(obj,function(id){
+      filter.addUserFilter("sceneId",id);
     });
     viewer.render();
   },

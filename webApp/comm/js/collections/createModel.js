@@ -3,7 +3,7 @@ App.Comm.createModel = function(options){
   var modelBox = $('<div class="modelView"></div>');
   var modelView = $('<div class="model"></div>');
   var modelMap = $('<div class="map"></div>');
-  var serverUrl = 'http://bim.wanda.cn'
+  var serverUrl = 'http://bim.wanda-dev.cn'
   var viewer;
   var viewPoint;
   var floorMap;
@@ -203,9 +203,11 @@ App.Comm.createModel = function(options){
         if(flag == 0){
           var data = that.classCodeData,
               isChecked = self.find("input").prop("checked"),
+              isSelected = self.find(".tree-text").is(".selected"),
               parentCode = self.data("parent") || null,
               tmpData = {
-                defaultType:isChecked,
+                isChecked:isChecked,
+                isSelected:isSelected,
                 data:[]
               }
           $.each(data,function(i,item){
@@ -229,21 +231,16 @@ App.Comm.createModel = function(options){
       var that = this,
           self = $(event.target),
           parent = self.closest(".item-content"),
-          flag = self.is(".selected");
-      var data = that.getData(parent);
-      if(self.is(".J-viewpoint")){
-        var viewpoint = self.data("viewpoint");
-        viewer.setCamera(viewpoint);
+          flag = self.is(".selected"),
+          data = that.getData(parent);
+      self.toggleClass("selected");
+      parent = parent.next(".subTree").length>0 ? parent.next(".subTree") : parent;
+      if(flag){
+        parent.find(".tree-text").removeClass("selected");
+        viewer.downplay(data);
       }else{
-        self.toggleClass("selected");
-        parent = parent.next(".subTree").length>0 ? parent.next(".subTree") : parent;
-        if(flag){
-          parent.find(".tree-text").removeClass("selected");
-          viewer.downplay(data);
-        }else{
-          parent.find(".tree-text").addClass("selected");
-          viewer.highlight(data);
-        }
+        parent.find(".tree-text").addClass("selected");
+        viewer.highlight(data);
       }
     },
     filter:function(event){
@@ -251,34 +248,45 @@ App.Comm.createModel = function(options){
           self = $(event.target),
           parent = self.closest(".item-content"),
           flag = self.is(":checked"),
-          type = self.data("type"),
+          type = parent.data("type"),
           data= {
             type:type,
             ids:[]
-          }
+          };
       parent = parent.next(".subTree").length>0 ? parent.next(".subTree") : parent;
       parent.find("input").prop("checked",flag);
       if(type == "sceneId"){
-        data.ids = that.getFilter();
-        viewer.showScene(data);
+        viewer.showScene(that.getFilter());
       }else{
         data = that.getData(parent);
         flag?viewer.show(data):viewer.hide(data);
       }
     },
-    getData:function(element){
+    getData:function (element){
+      var type = element.data("type");
       var data = {
-            type:'',
-            ids:[]
-          },
-          input = element.find("input");
-      data.type = input.eq(0).data("type");
-      $.each(input,function(index,item){
-        var $item = $(item),
-            etag = $item.data('etag');
-        etag = etag?etag.toString().split(","):[];
-        data.ids = data.ids.concat(etag);
-      });
+        type:type,
+        ids:[]
+      }
+      if(type != "classCode"){
+        var element = element.next(".subTree").length>0 ? element.next(".subTree") : element;
+        var input = element.find("input");
+        $.each(input,function(index,item){
+          var $item = $(item),
+              etag = $item.data('etag');
+          etag = etag?etag.toString().split(","):[];
+          data.ids = data.ids.concat(etag);
+        });
+      }else{
+        var codeData = this.classCodeData;
+        var code = element.data('parent');
+        var reg = new RegExp("^"+code);
+        $.each(codeData,function(i,item){
+          if(reg.test(item.code)){
+            data.ids.push(item.code);
+          }
+        });
+      }
       return data;
     },
     getFilter:function(){

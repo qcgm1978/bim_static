@@ -20,7 +20,26 @@ CLOUD.GlobalData = {
     CellVisibleLOD: 40,
     SubSceneVisibleLOD: 60,
     ScreenCullLOD: 0.0002,
+    LimitFrameTime: 30
 };
+
+CLOUD.EnumObjectLevel = {
+    Default: 0,
+    Tiny: 1,
+    Small: 2,
+    Medium: 5,
+    Large: 6
+}
+
+CLOUD.ObjectLevelLoD = {
+    0: 0.1,
+    1: 1,
+    2: 2,
+    3: 5,
+    4: 6,
+    5: 5, // will remove
+    6: 6  // 
+}
 
 CLOUD.EnumStandardView = {
     ISO: 0,
@@ -1234,6 +1253,515 @@ CLOUD.BBoxNode.prototype.updateBBox = function (boundingBox) {
     this.matrixAutoUpdate = false;
 };
 
+CLOUD.RenderGroup = function () {
+
+    var opaqueObjects = [];
+    var transparentObjects = [];
+
+    var opaqueObjectsLastIndex = -1;
+    var transparentObjectsLastIndex = -1;
+
+    var renderingIdx = 0;
+    var opaqueFinished = false;
+    var transparentFinished = false;
+    var startTime = 0;
+
+    this.getOpaqueObjects = function () {
+        return opaqueObjects;
+    };
+
+    this.getTransparentObjects = function () {
+        return transparentObjects;
+    };
+
+    function painterSortStable(a, b) {
+        if (a.material.id !== b.material.id) {
+            return a.material.id - b.material.id;
+        } else if (a.z !== b.z) {
+            return a.z - b.z;
+        } else {
+            return a.id - b.id;
+        }
+    }
+
+    function reversePainterSortStable(a, b) {
+        if(a.z !== b.z) {
+            return b.z - a.z;
+        } else {
+            return a.id - b.id;
+        }
+    }
+
+    this.restart = function () {
+        renderingIdx = 0;
+        opaqueFinished = false;
+        transparentFinished = false;
+    };
+
+    this.prepare = function () {
+        this.restart();
+        opaqueObjectsLastIndex = -1;
+        transparentObjectsLastIndex = -1;
+    };
+
+    function isFinished () {
+        return opaqueFinished && transparentFinished;
+    };
+
+    this.pushRenderItem = function (object, geometry, material, z, group) {
+
+        var array, index;
+        if (material.transparent) {
+            array = transparentObjects;
+            index = ++transparentObjectsLastIndex;
+
+        } else {
+            array = opaqueObjects;
+            index = ++opaqueObjectsLastIndex;
+        }
+
+        // recycle existing render item or grow the array
+        var renderItem = array[index];
+        if (renderItem !== undefined) {
+
+            renderItem.id = object.id;
+            renderItem.object = object;
+            renderItem.geometry = geometry;
+            renderItem.material = material;
+            renderItem.z = z;
+            renderItem.group = group;
+
+        } else {
+            renderItem = {
+                id: object.id,
+                object: object,
+                geometry: geometry,
+                material: material,
+                z: z,
+                group: group
+            };
+            // assert( index === array.length );
+            //array.push( renderItem );
+            array[index] = renderItem;
+        }
+
+    };
+
+    this.sortRenderList = function (cullEnd) {
+
+        opaqueObjects.length = opaqueObjectsLastIndex + 1;
+        transparentObjects.length = transparentObjectsLastIndex + 1;
+
+        //console.log(opaqueObjects.length + transparentObjects.length);
+
+        if (cullEnd) {
+            //console.time("sort");
+            opaqueObjects.sort(painterSortStable);
+            transparentObjects.sort(reversePainterSortStable);
+            //console.timeEnd("sort");
+        }
+    };
+
+    function renderObjects(renderer, renderList, camera, lights, fog) {
+
+        startTime = Date.now();
+
+        var l = renderList.length;
+
+        var i = renderingIdx;
+        for (; i < l; i++) {
+
+            var renderItem = renderList[i];
+
+            var object = renderItem.object;
+            var material = renderItem.material;
+            var group = renderItem.group;
+
+            object.modelViewMatrix.multiplyMatrices(camera.matrixWorldInverse, object.matrixWorld);
+            object.normalMatrix.getNormalMatrix(object.modelViewMatrix);
+
+            //var geometry = renderItem.geometry;
+            //if (geometry.renderTicket !== renderer.renderTicket) {
+            //    geometry.renderTicket = renderer.renderTicket;
+            //    geometry = null; // var geometry = objects.update(object);
+            //}
+            var geometry = null;
+           
+            renderer.renderBufferDirect(camera, lights, fog, geometry, material, object, group);
+
+            if (i % 1000 === 999) {
+                //endTime = window.performance.now();
+                endTime = Date.now();
+
+                elapseTime = endTime - startTime;
+
+                if (elapseTime > CLOUD.GlobalData.LimitFrameTime) {
+
+                    renderingIdx = i + 1;
+
+                    return false;
+                }
+            }
+        }
+
+        renderingIdx = 0;
+        return true;
+    }
+
+    this.renderOpaqueObjects = function (renderer, camera, lights, fog) {
+
+        if (!opaqueFinished) {
+            opaqueFinished = renderObjects(renderer, opaqueObjects, camera, lights, fog);
+        }
+
+        return opaqueFinished;
+    };
+
+    this.renderTransparentObjects = function (renderer, camera, lights, fog) {
+
+        if (!transparentFinished) {
+            transparentFinished = renderObjects(renderer, transparentObjects, camera, lights, fog);
+        }
+
+        return transparentFinished;
+    };
+}
+
+CLOUD.OrderedRenderer = function () {
+
+    // increment culling
+    var _cullTicket = 0;
+    var isIncrementalCullFinish = false,
+        isIncrementalRenderFinish = false;
+    var cullingObjectCount = 0;
+    var _screenCullOffCount = 0;
+    var startCullTime = 0;
+    
+    var _renderTicket = 0;
+
+    var renderGroups = [];
+
+    var _frustum = null;
+    var _projScreenMatrix = null;
+
+    var _vector3 = new THREE.Vector3(),
+        _vector3End = new THREE.Vector3();
+
+    var _isUpdateObjectList = true;
+    var incrementListDirty = true;
+
+    var _filterObject = null;
+
+    this.updateObjectList = function (isUpdate) {
+        _isUpdateObjectList = isUpdate;
+    };
+
+    this.restart  = function() {
+
+        for (var ii = 0, len = renderGroups.length; ii < len; ++ii) {
+            var group = renderGroups[ii];
+            if (group !== undefined) {
+                group.restart();
+            }
+        }
+
+        cullingObjectCount = 0;
+        _screenCullOffCount = 0;
+        incrementListDirty = true;
+    };
+
+    this.setFilter = function(filter){
+        _filterObject = filter;
+    }
+
+    function isVisibleForFilter(object) {
+
+        return _filterObject && _filterObject.isVisible(object);
+    }
+
+    function getOverridedMaterial(object) {
+
+        if (_filterObject) {
+            return _filterObject.getOverridedMaterial(object);
+        }
+
+        return null;
+    }
+
+    function prepareNewFrame() {
+
+        ++_cullTicket;
+        if (_cullTicket > 100000)
+            _cullTicket = 0;
+
+        for (var ii = 0, len = renderGroups.length; ii < len; ++ii) {
+            var group = renderGroups[ii];
+            if (group !== undefined) {
+                group.prepare();
+            }
+        }
+    };
+
+    function pushRenderItem(object, geometry, material, z) {
+
+        var renderGroup = renderGroups[object.renderOrder];
+        if (renderGroup === undefined) {
+            renderGroup = new CLOUD.RenderGroup();
+            renderGroups[object.renderOrder] = renderGroup;
+        }
+
+        renderGroup.pushRenderItem(object, geometry, material, z, null);
+    };
+
+
+    function computeObjectCenter(object) {
+
+        object.modelCenter = new THREE.Vector3();
+
+        if (object.boundingBox) {
+
+            object.boundingBox.center(object.modelCenter);
+            object.modelCenter.applyMatrix4(object.matrixWorld);
+
+            _vector3.copy(object.boundingBox.min);
+            _vector3.applyMatrix4(object.matrixWorld);
+
+            object.radius = object.modelCenter.distanceTo(_vector3);
+        }
+        else {
+
+            object.modelCenter.setFromMatrixPosition(object.matrixWorld);
+
+        }
+    }
+
+    function sortRenderList() {
+
+        for (var ii = 0, len = renderGroups.length; ii < len; ++ii) {
+            var group = renderGroups[ii];
+            if (group !== undefined) {
+                group.sortRenderList(isIncrementalCullFinish);
+            }
+
+        }
+    }
+
+    function projectObject(object, camera, inFrustum) {
+
+        if (object.visible === false) return true;
+
+        if (!inFrustum)
+            inFrustum = object.inFrustum;
+
+        if (object instanceof THREE.Group) {
+            
+            if (_filterObject && object.fileId) {
+                if (_filterObject.hasFileFilter(object.fileId))
+                    return true;
+            }
+        }
+        else if (object._cullTicket != _cullTicket /*&& (object.channels.mask & camera.channels.mask) !== 0*/) {
+
+            ++cullingObjectCount;
+            if (cullingObjectCount % 5000 == 4999) {
+
+                var diff = Date.now() - startCullTime
+                if (diff > 30)
+                    return false;
+            }
+
+            object._cullTicket = _cullTicket;
+            if (object instanceof THREE.Mesh || object instanceof THREE.Line || object instanceof THREE.Points) {
+
+                if (inFrustum || _frustum.intersectsObject(object) === true) {
+
+                    if (!isVisibleForFilter(object)) {
+                        return true;
+                    }
+
+                    if (object.renderOrder <= 5) {
+
+                        if (!object.modelCenter) {
+                            computeObjectCenter(object);
+                        }
+
+                        if (object.radius !== undefined) {
+
+                            _vector3.copy(object.modelCenter);
+                            _vector3.applyProjection(_projScreenMatrix);
+                            _vector3End.copy(camera.realUp);
+                            _vector3End.multiplyScalar(object.radius).add(object.modelCenter);
+
+                            _vector3End.applyProjection(_projScreenMatrix);
+
+                            var sqrtDist = _vector3End.distanceTo(_vector3) * 10;
+                            if (sqrtDist < CLOUD.GlobalData.ScreenCullLOD) {
+                                ++_screenCullOffCount;
+                                return true;
+                            }
+
+                        }
+                        else {
+                            _vector3.copy(object.modelCenter);
+                            _vector3.applyProjection(_projScreenMatrix);
+                        }
+                    }
+
+                    // ���ʹ���
+                    var material = getOverridedMaterial(object);
+                    material = material || object.material;
+
+                    if (object.load)
+                        object.load();
+
+                    //var geometry = objects.update(object);
+                    var geometry = object.geometry;
+
+                    pushRenderItem(object, geometry, material, _vector3.z);
+
+                }
+            }
+        }
+
+        var children = object.children;
+
+        for (var i = 0, l = children.length; i < l; i++) {
+
+            if (!projectObject(children[i], camera, inFrustum))
+                return false;
+
+        }
+
+        return true;
+    }
+
+    function projectLights(scene, lights) {
+
+        lights.length = 0;
+
+        var children = scene.children;
+
+        for (var i = 0, l = children.length; i < l; i++) {
+
+            var object = children[i];
+            if (object instanceof THREE.Light) {
+
+                lights.push(object);
+
+            }
+
+        }
+    }
+
+    function buildObjectList(scene, camera, lights) {
+
+        if (!_isUpdateObjectList) {
+            isIncrementalCullFinish = true;
+            return;
+        }
+
+        if (isIncrementalCullFinish) {
+
+            prepareNewFrame();
+            projectLights(scene, lights);
+        }
+
+        startCullTime = Date.now();
+
+        //console.time("projectObject");
+        isIncrementalCullFinish = projectObject(scene, camera);
+        //console.timeEnd("projectObject");
+        //console.log("screen cull off: " + _screenCullOffCount);
+        sortRenderList();
+    };
+
+    this.update = function (frustum, projScreenMatrix) {
+        _projScreenMatrix = projScreenMatrix;
+        _frustum = frustum;
+    }
+
+    this.render = function (renderer, scene, camera, lights, renderTarget, forceClear, state) {
+
+        if (incrementListDirty) {
+
+            buildObjectList(scene, camera, lights);
+
+            if (!isIncrementalCullFinish)
+                return false;
+            else {
+                forceClear = true;
+                incrementListDirty = false;
+            }
+
+            renderer.setRenderTarget(renderTarget);
+        }
+
+
+        if (renderer.autoClear || forceClear) {
+            renderer.clear(renderer.autoClearColor, renderer.autoClearDepth, renderer.autoClearStencil);
+        }
+
+        var fog = scene.fog;
+
+        ++_renderTicket;
+        if (_renderTicket > 10000)
+            _renderTicket = 0;
+        renderer.renderTicket = _renderTicket;
+
+        state.setBlending(THREE.NoBlending);
+
+        for (var ii = renderGroups.length - 1; ii >= 0; --ii) {
+            var group = renderGroups[ii];
+            if (group !== undefined) {
+                isIncrementalRenderFinish = group.renderOpaqueObjects(renderer, camera, lights, fog);
+                if (!isIncrementalRenderFinish)
+                    break;
+            }
+        }
+
+        if (isIncrementalRenderFinish) {
+
+            for (var ii = renderGroups.length - 1; ii >= 0; --ii) {
+                var group = renderGroups[ii];
+                if (group !== undefined) {
+                    isIncrementalRenderFinish = group.renderTransparentObjects(renderer, camera, lights, fog);
+                    if (!isIncrementalRenderFinish)
+                        break;
+                }
+            }
+        }
+
+        // Ensure depth buffer writing is enabled so it can be cleared on next render
+        state.setDepthTest(true);
+        state.setDepthWrite(true);
+        state.setColorWrite(true);
+
+        return isIncrementalRenderFinish;
+
+    };
+
+    this.computeSelectionBBox = function () {
+
+        if (_filterObject === null)
+            return null;
+
+        if (_filterObject.isSelectionSetEmpty())
+            return null;
+
+        _filterObject.resetSelectionBox();
+
+        for (var ii = renderGroups.length - 1; ii >= 0; --ii) {
+            var group = renderGroups[ii];
+            if (group !== undefined) {
+                _filterObject.computeSelectionBox(group.getOpaqueObjects());
+                _filterObject.computeSelectionBox(group.getTransparentObjects());
+            }
+        }
+
+        return _filterObject.getSelectionBox();
+    }
+}
+
 /**
  * @author supereggbert / http://www.paulbrunt.co.uk/
  * @author mrdoob / http://mrdoob.com/
@@ -1330,9 +1858,6 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
         _currentWidth = 0,
         _currentHeight = 0,
 
-        _filterObject = null, // add for filter
-        _isUpdateObjectList = true; // add for build ObjectList
-
     // frustum
 
         _frustum = new THREE.Frustum(),
@@ -1342,8 +1867,6 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
         _projScreenMatrix = new THREE.Matrix4(),
 
         _vector3 = new THREE.Vector3(),
-        _vector3End = new THREE.Vector3(),
-        _screenCullOffCount = 0,
 
     // light arrays cache
 
@@ -1387,22 +1910,6 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
 
     };
 
-    // ------------------------------------------------------------------
-    // 增加增量绘制支持
-    var startTime, endTime, elapseTime, // 用于绘制计时
-        limitFrameTime = 30, // 每帧的绘制的临界时间(单位 ms)
-        currentIncrementalListIdx = 0, // 保存索引
-        incrementListDirty = true, // 是否更新数据
-        incrementPluginDirty = true, // 是否重绘插件对象
-        isIncrementalRenderFinish = false, // 是否绘制结束
-        isOpaqueObjectsRenderFinish = false, // 不透明对象绘制结束
-        isTransparentObjectsRenderFinish = false, // 透明对象绘制结束
-        isTransparentObjectsRenderStart = false,  // 透明对象绘制开始
-        incrementCullTag = 0,    //增量遍历
-        startCullTime = 0, //遍历计时
-        isIncrementalCullFinish = true,
-        cullingObjectCount = 0;
-    // ------------------------------------------------------------------
 
     // initialize
 
@@ -1439,7 +1946,7 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
 
     } catch ( error ) {
 
-        console.error( 'THREE.WebGLIncrementRenderer: ' + error );
+		console.error( 'THREE.WebGLRenderer: ' + error );
 
     }
 
@@ -1960,6 +2467,9 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
 
     this.renderBufferDirect = function ( camera, lights, fog, geometry, material, object, group ) {
 
+        if (!geometry)
+            geometry = objects.update(object);
+
         setMaterial( material );
 
         var program = setProgram( camera, lights, fog, material, object );
@@ -2158,7 +2668,7 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
 
             if ( extension === null ) {
 
-                console.error( 'THREE.WebGLIncrementRenderer.setupVertexAttributes: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
+				console.error( 'THREE.WebGLRenderer.setupVertexAttributes: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
                 return;
 
             }
@@ -2231,11 +2741,9 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
 
                         }
 
-                        
-                            _gl.bindBuffer(_gl.ARRAY_BUFFER, buffer);
-                            _gl.vertexAttribPointer(programAttribute, size, _gl.FLOAT, false, 0, startIndex * size * 4); // 4 bytes per Float32                           
-   
- 
+						_gl.bindBuffer( _gl.ARRAY_BUFFER, buffer );
+						_gl.vertexAttribPointer( programAttribute, size, _gl.FLOAT, false, 0, startIndex * size * 4 ); // 4 bytes per Float32
+
                     }
 
                 } else if ( materialDefaultAttributeValues !== undefined ) {
@@ -2272,6 +2780,7 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
         }
 
         state.disableUnusedAttributes();
+
     }
 
     // Sorting
@@ -2282,43 +2791,21 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
 
     }
 
-    function painterByDistance(a, b) {
-
-        if (a.object.renderOrder !== b.object.renderOrder) {
-
-            return a.object.renderOrder - b.object.renderOrder;
-
-        } else if (a.z !== b.z) {
-
-            return a.z - b.z;
-
-        } else if (a.material.id !== b.material.id) {
-
-            return a.material.id - b.material.id;
-
-        } else {
-
-            return a.id - b.id;
-
-        }
-
-    }
-
     function painterSortStable ( a, b ) {
 
         if ( a.object.renderOrder !== b.object.renderOrder ) {
 
-            return b.object.renderOrder - a.object.renderOrder;
+			return a.object.renderOrder - b.object.renderOrder;
 
-        } else if (a.material.id !== b.material.id) {
+		} else if ( a.material.id !== b.material.id ) {
 
             return a.material.id - b.material.id;
 
-        } else if (a.z !== b.z) {
+		} else if ( a.z !== b.z ) {
 
             return a.z - b.z;
 
-        }  else {
+		} else {
 
             return a.id - b.id;
 
@@ -2330,7 +2817,7 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
 
         if ( a.object.renderOrder !== b.object.renderOrder ) {
 
-            return b.object.renderOrder - a.object.renderOrder;
+			return a.object.renderOrder - b.object.renderOrder;
 
         } if ( a.z !== b.z ) {
 
@@ -2350,7 +2837,7 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
 
         if ( camera instanceof THREE.Camera === false ) {
 
-            console.error( 'THREE.WebGLIncrementRenderer.render: camera is not an instance of THREE.Camera.' );
+			console.error( 'THREE.WebGLRenderer.render: camera is not an instance of THREE.Camera.' );
             return;
 
         }
@@ -2377,9 +2864,6 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
         _projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
         _frustum.setFromMatrix( _projScreenMatrix );
 
-        // 增加是否更新对象列表的判断
-        if (_isUpdateObjectList) {
-
             lights.length = 0;
 
             opaqueObjectsLastIndex = - 1;
@@ -2394,9 +2878,9 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
             transparentObjects.length = transparentObjectsLastIndex + 1;
 
             if ( _this.sortObjects === true ) {
+
                 opaqueObjects.sort( painterSortStable );
                 transparentObjects.sort( reversePainterSortStable );
-            }
 
         }
 
@@ -2470,339 +2954,29 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
 
     };
 
-
-    this.computeSelectionBBox = function () {
-
-        if (_filterObject === null)
-            return null;
-
-        if (_filterObject.isSelectionSetEmpty())
-            return null;
-
-        _filterObject.resetSelectionBox();
-        _filterObject.computeSelectionBox(opaqueObjects);
-        _filterObject.computeSelectionBox(transparentObjects);
-
-        return _filterObject.getSelectionBox();
-    };
-    // ------------------------------------------------------------------
-    // 增加增量绘制支持
-
-    // Rendering
-
-    this.IncrementRender = function ( scene, camera, renderTarget, forceClear ) {
-
-        if ( camera instanceof THREE.Camera === false ) {
-
-            console.error( 'THREE.WebGLIncrementRenderer.IncrementRender: camera is not an instance of THREE.Camera.' );
-            return;
-        }
-
-        if (incrementListDirty ) {
-
-            buildIncrementObjectList(scene, camera);
-
-            if (!isIncrementalCullFinish)
-                return false;
-            else {
-                forceClear = true;
-                incrementListDirty = false;
-            }
-                
-            //
-            // shadowMap.render( scene );
-
-            //
-            _infoRender.calls = 0;
-            _infoRender.vertices = 0;
-            _infoRender.faces = 0;
-            _infoRender.points = 0;
-
-            this.setRenderTarget(renderTarget);
-        }
-
-
-        var fog = scene.fog;
-
-        if ( this.autoClear || forceClear ) {
-            this.clear( this.autoClearColor, this.autoClearDepth, this.autoClearStencil );
-        }
-
-        //console.time("render");
-        //
-        if ( scene.overrideMaterial ) {
-
-            var overrideMaterial = scene.overrideMaterial;
-
-            isOpaqueObjectsRenderFinish = renderIncrementObjects( opaqueObjects, camera, lights, fog, overrideMaterial );
-
-            if ( isOpaqueObjectsRenderFinish ) {
-
-                if ( !isTransparentObjectsRenderStart ) {
-                    isTransparentObjectsRenderStart = true;
-                    currentIncrementalListIdx = 0;
-                }
-
-                isTransparentObjectsRenderFinish = renderIncrementObjects( transparentObjects, camera, lights, fog, overrideMaterial, true);
-            }
-
-
-        } else {
-
-            // opaque pass (front-to-back order)
-
-            state.setBlending( THREE.NoBlending );
-
-            if ( !isOpaqueObjectsRenderFinish ) {
-                isOpaqueObjectsRenderFinish = renderIncrementObjects( opaqueObjects, camera, lights, fog );
-            }
-
-            // transparent pass (back-to-front order)
-
-            if ( isOpaqueObjectsRenderFinish ) {
-
-                if ( !isTransparentObjectsRenderStart ) {
-                    isTransparentObjectsRenderStart = true;
-                    currentIncrementalListIdx = 0;
-                }
-
-                isTransparentObjectsRenderFinish = renderIncrementObjects( transparentObjects, camera, lights, fog,  undefined,true );
-            }
-        }
-
-        //console.timeEnd("render");
-
-        isIncrementalRenderFinish = (isOpaqueObjectsRenderFinish && isTransparentObjectsRenderFinish);
-
-        if ( isIncrementalRenderFinish ) {
-
-            if ( incrementPluginDirty ) {
-
-                incrementPluginDirty = false;
-                renderIncrementPluginObjects(scene, camera, renderTarget);
-            }
-        }
-
-        // Ensure depth buffer writing is enabled so it can be cleared on next render
-        state.setDepthTest( true );
-        state.setDepthWrite( true );
-        state.setColorWrite( true );
-
-        //console.log(this.info);
-        // _gl.finish();
-
-        return isIncrementalRenderFinish;
-
-    };
-
-    // 重置增量绘制状态
-    this.resetIncrementRender = function() {
-        incrementListDirty = true;
-        incrementPluginDirty = true;
-        isOpaqueObjectsRenderFinish = false;
-        isTransparentObjectsRenderFinish = false;
-        isTransparentObjectsRenderStart = false;
-        currentIncrementalListIdx = 0;
-
-    };
-
-    // 限制帧率
-    this.setLimitFrameTime = function( limitTime ) {
-        limitFrameTime = limitTime;
-    };
-
-    // 设置过滤对象
-    this.setFilterObject = function(filterObject) {
-        _filterObject = filterObject;
-    };
-
-    // 设置是否更新对象列表
-    this.setObjectListUpdateState = function(isUpdate){
-        _isUpdateObjectList = isUpdate;
-    };
-
-    function isVisibleForFilter(node) {
-
-        return _filterObject && _filterObject.isVisible(node);
-    }
-
-    function getOverridedMaterial(object) {
-
-        if (_filterObject) {
-            return _filterObject.getOverridedMaterial(object);
-        }
-
-        return null;
-    }
-
-    function buildIncrementObjectList( scene, camera) {
-
-        _currentGeometryProgram = '';
-        _currentMaterialId = - 1;
-        _currentCamera = null;
-        _lightsNeedUpdate = true;
-
-        if ( scene.autoUpdate === true ) scene.updateMatrixWorld();
-
-        // update camera matrices and frustum
-
-        if ( camera.parent === null ) camera.updateMatrixWorld();
-
-        camera.matrixWorldInverse.getInverse( camera.matrixWorld );
-
-        _projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
-        _frustum.setFromMatrix( _projScreenMatrix );
-
-        // 增加是否更新对象列表的判断
-
-        if (_isUpdateObjectList) {
-
-            if (isIncrementalCullFinish) {
-
-                ++incrementCullTag;
-                if (incrementCullTag > 100000)
-                    incrementCullTag = 0;
-
-                lights.length = 0;
-                opaqueObjectsLastIndex = - 1;
-                transparentObjectsLastIndex = -1;
-
-                _screenCullOffCount = 0;
-
-                cullingObjectCount = 0;
-
-                projectIncrementLights(scene);
-            }
-            startCullTime = Date.now();
-
-            sprites.length = 0;
-            lensFlares.length = 0;        
-
-                       
-            //console.time("projectObject");
-            isIncrementalCullFinish = projectIncrementObject(scene, camera);
-            //console.timeEnd("projectObject");
-            //console.log("screen cull off: " + _screenCullOffCount);
-
-            opaqueObjects.length = opaqueObjectsLastIndex + 1;
-            transparentObjects.length = transparentObjectsLastIndex + 1;
-
-            //console.log(opaqueObjects.length + transparentObjects.length);
-
-            if (isIncrementalCullFinish && _this.sortObjects === true) {
-                //console.time("sort");
-                opaqueObjects.sort( painterSortStable );
-                transparentObjects.sort(reversePainterSortStable);
-                //console.timeEnd("sort");
-            }
-   
-        }
-        else {
-
-            isIncrementalCullFinish = true;
-        }
-    }
-
-
-    function renderIncrementPluginObjects(scene, camera, renderTarget) {
-
-        spritePlugin.render(scene, camera);
-        lensFlarePlugin.render(scene, camera, _currentWidth, _currentHeight);
-
-        // Generate mipmap if we're using any kind of mipmap filtering
-
-        if (renderTarget) {
-
-            var texture = renderTarget.texture;
-            var isTargetPowerOfTwo = isPowerOfTwo(renderTarget);
-            if (texture.generateMipmaps && isTargetPowerOfTwo && texture.minFilter !== THREE.NearestFilter && texture.minFilter !== THREE.LinearFilter) {
-
-                updateRenderTargetMipmap(renderTarget);
-
-            }
-        }
-    }
-
-    function renderIncrementObjects( renderList, camera, lights, fog, overrideMaterial, tansparent ) {
-
-        var isRenderFinish = true;
-
-        // 经过测试，Date.now() 比 performance.now() 快
-        // 不过 Date.now() 会受系统程序执行阻塞
-        //startTime = window.performance.now();
-        startTime = Date.now();
-
-        var l = renderList.length;
-        //if (tansparent === undefined)
-        //    l = Math.min(renderList.length, 20000);
-
-        var i = currentIncrementalListIdx;
-        for (; i < l; i++) {
-
-            var renderItem = renderList[ i ];
-
-            var object = renderItem.object;
-            //var geometry = renderItem.geometry;
-            var material = overrideMaterial === undefined ? renderItem.material : overrideMaterial;
-            var group = renderItem.group;
-
-            object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
-            object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
-
-            var geometry = objects.update(object);
-            _this.renderBufferDirect( camera, lights, fog, geometry, material, object, group );
-        
-            if (i % 1000 === 999) {
-                //endTime = window.performance.now();
-                endTime = Date.now();
-
-                elapseTime = endTime - startTime;
-
-                if (elapseTime > limitFrameTime) {
-
-                    isRenderFinish = false;
-                    currentIncrementalListIdx = i + 1;
-                    //console.log("elapse time : " + elapseTime + ",my_idx = " + currentIncrementalListIdx);
-
-                    break;
-                }
-            }      
-        }
-
-        if (i === l - 1) {
-
-            currentIncrementalListIdx = i + 1;
-            isRenderFinish = true;
-        }
-
-        return isRenderFinish;
-    }
-    // ------------------------------------------------------------------
-
-
-    function pushIncrementRenderItem(object, geometry, material, z, group) {
+	function pushRenderItem( object, geometry, material, z, group ) {
 
         var array, index;
 
         // allocate the next position in the appropriate array
 
-        if (material.transparent) {
+		if ( material.transparent ) {
 
             array = transparentObjects;
-            index = ++transparentObjectsLastIndex;
+			index = ++ transparentObjectsLastIndex;
 
         } else {
 
             array = opaqueObjects;
-            index = ++opaqueObjectsLastIndex;
+			index = ++ opaqueObjectsLastIndex;
 
         }
 
         // recycle existing render item or grow the array
 
-        var renderItem = array[index];
+		var renderItem = array[ index ];
 
-        if (renderItem !== undefined) {
+		if ( renderItem !== undefined ) {
 
             renderItem.id = object.id;
             renderItem.object = object;
@@ -2826,240 +3000,74 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
             //array.push( renderItem );
             array[index] = renderItem;
         }
-    }
-
-    function projectIncrementLights(scene) {
-
-        var children = scene.children;
-
-        for (var i = 0, l = children.length; i < l; i++) {
-
-            var object = children[i];
-            if (object instanceof THREE.Light) {
-
-                lights.push(object);
-
-            }
-
-        }
 
     }
 
-    function projectIncrementObject(object, camera, inFrustum) {
+	function projectObject( object, camera ) {
 
-        if (object.visible === false) return true;
+		if ( object.visible === false ) return;
 
-        if (!inFrustum)
-            inFrustum = object.inFrustum;
+		if ( ( object.channels.mask & camera.channels.mask ) !== 0 ) {
 
-        var isGroup = object instanceof THREE.Group;
+			if ( object instanceof THREE.Light ) {
 
-        if (!isGroup && object.incrementCullTag != incrementCullTag /*&& (object.channels.mask & camera.channels.mask) !== 0*/) {
+				lights.push( object );
 
-            ++cullingObjectCount;
-            if (cullingObjectCount % 5000 == 4999) {
+			} else if ( object instanceof THREE.Sprite ) {
 
-                var diff = Date.now() - startCullTime
-                if (diff > 30)
-                    return false;
-            }
+				sprites.push( object );
 
-            object.incrementCullTag = incrementCullTag;
-            if (object instanceof THREE.Mesh || object instanceof THREE.Line || object instanceof THREE.Points) {
+			} else if ( object instanceof THREE.LensFlare ) {
 
-                if (inFrustum || _frustum.intersectsObject(object) === true) {
+				lensFlares.push( object );
 
-                    if (!isVisibleForFilter(object)) {
-                        return true;
-                    }
+			} else if ( object instanceof THREE.ImmediateRenderObject ) {
 
-                    if (object.renderOrder < 10 && _this.sortObjects === true) {
+				if ( _this.sortObjects === true ) {
 
-                        if (!object.modelCenter) {
-
-                            object.modelCenter = new THREE.Vector3();
-
-                            if (object.boundingBox) {
-
-                                object.boundingBox.center(object.modelCenter);
-                                object.modelCenter.applyMatrix4(object.matrixWorld);
-
-                                _vector3.copy(object.boundingBox.min);
-                                _vector3.applyMatrix4(object.matrixWorld);
-
-                                object.radius = object.modelCenter.distanceTo(_vector3);
-                            }
-                            else {
-
-                                object.modelCenter.setFromMatrixPosition(object.matrixWorld);
-
-                            }
-                        }
-
-                        if (object.radius !== undefined) {
-
-                            _vector3.copy(object.modelCenter);
-                            _vector3.applyProjection(_projScreenMatrix);
-                            _vector3End.copy(camera.realUp);
-                            _vector3End.multiplyScalar(object.radius).add(object.modelCenter);
-
-                            _vector3End.applyProjection(_projScreenMatrix);
-
-                            var sqrtDist = _vector3End.distanceTo(_vector3) * 10;
-                            if (sqrtDist < CLOUD.GlobalData.ScreenCullLOD) {
-                                ++_screenCullOffCount;
-                                return true;
-                            }
-
-                        }
-                        else {
-                            _vector3.copy(object.modelCenter);
-                            _vector3.applyProjection(_projScreenMatrix);
-                        }
-                    }
-
-                    // 材质过滤
-                    var material = getOverridedMaterial(object);
-                    material = material || object.material;
-
-                    if (object.load)
-                        object.load();
-
-                    //var geometry = objects.update(object);
-                    var geometry = object.geometry;
-                    
-                    pushIncrementRenderItem(object, geometry, material, _vector3.z, null);
-
-                }
-            }
-        }
-
-        var children = object.children;
-
-        for (var i = 0, l = children.length; i < l; i++) {
-
-            if (!projectIncrementObject(children[i], camera, inFrustum))
-                return false;
-
-        }
-
-        return true;
-    }
-
-
-    function pushRenderItem(object, geometry, material, z, group) {
-
-        var array, index;
-
-        // allocate the next position in the appropriate array
-
-        if (material.transparent) {
-
-            array = transparentObjects;
-            index = ++transparentObjectsLastIndex;
-
-        } else {
-
-            array = opaqueObjects;
-            index = ++opaqueObjectsLastIndex;
-
-        }
-
-        // recycle existing render item or grow the array
-
-        var renderItem = array[index];
-
-        if (renderItem !== undefined) {
-
-            renderItem.id = object.id;
-            renderItem.object = object;
-            renderItem.geometry = geometry;
-            renderItem.material = material;
-            renderItem.z = _vector3.z;
-            renderItem.group = group;
-
-        } else {
-
-            renderItem = {
-                id: object.id,
-                object: object,
-                geometry: geometry,
-                material: material,
-                z: _vector3.z,
-                group: group
-            };
-
-            // assert( index === array.length );
-            //array.push( renderItem );
-            array[index] = renderItem;
-        }
-    }
-
-    function projectObject(object, camera) {
-
-        if (object.visible === false) return;
-
-        if ((object.channels.mask & camera.channels.mask) !== 0) {
-
-            if (object instanceof THREE.Light) {
-
-                lights.push(object);
-
-            } else if (object instanceof THREE.Sprite) {
-
-                sprites.push(object);
-
-            } else if (object instanceof THREE.LensFlare) {
-
-                lensFlares.push(object);
-
-            } else if (object instanceof THREE.ImmediateRenderObject) {
-
-                if (_this.sortObjects === true) {
-
-                    _vector3.setFromMatrixPosition(object.matrixWorld);
-                    _vector3.applyProjection(_projScreenMatrix);
+					_vector3.setFromMatrixPosition( object.matrixWorld );
+					_vector3.applyProjection( _projScreenMatrix );
 
                 }
 
-                pushRenderItem(object, null, object.material, _vector3.z, null);
+				pushRenderItem( object, null, object.material, _vector3.z, null );
 
-            } else if (object instanceof THREE.Mesh || object instanceof THREE.Line || object instanceof THREE.Points) {
+			} else if ( object instanceof THREE.Mesh || object instanceof THREE.Line || object instanceof THREE.Points ) {
 
-                if (object instanceof THREE.SkinnedMesh) {
+				if ( object instanceof THREE.SkinnedMesh ) {
 
                     object.skeleton.update();
 
                 }
 
-                if (object.frustumCulled === false || _frustum.intersectsObject(object) === true) {
+				if ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) {
 
                     var material = object.material;
 
-                    if (material.visible === true) {
+					if ( material.visible === true ) {
 
-                        if (_this.sortObjects === true) {
+						if ( _this.sortObjects === true ) {
 
-                            _vector3.setFromMatrixPosition(object.matrixWorld);
-                            _vector3.applyProjection(_projScreenMatrix);
+							_vector3.setFromMatrixPosition( object.matrixWorld );
+							_vector3.applyProjection( _projScreenMatrix );
 
                         }
 
-                        var geometry = objects.update(object);
+						var geometry = objects.update( object );
 
-                        if (material instanceof THREE.MeshFaceMaterial) {
+						if ( material instanceof THREE.MeshFaceMaterial ) {
 
                             var groups = geometry.groups;
                             var materials = material.materials;
 
-                            for (var i = 0, l = groups.length; i < l; i++) {
+							for ( var i = 0, l = groups.length; i < l; i ++ ) {
 
-                                var group = groups[i];
-                                var groupMaterial = materials[group.materialIndex];
+								var group = groups[ i ];
+								var groupMaterial = materials[ group.materialIndex ];
 
-                                if (groupMaterial.visible === true) {
+								if ( groupMaterial.visible === true ) {
 
-                                    pushRenderItem(object, geometry, groupMaterial, _vector3.z, group);
+									pushRenderItem( object, geometry, groupMaterial, _vector3.z, group );
 
                                 }
 
@@ -3067,7 +3075,7 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
 
                         } else {
 
-                            pushRenderItem(object, geometry, material, _vector3.z, null);
+							pushRenderItem( object, geometry, material, _vector3.z, null );
 
                         }
 
@@ -3081,11 +3089,12 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
 
         var children = object.children;
 
-        for (var i = 0, l = children.length; i < l; i++) {
+		for ( var i = 0, l = children.length; i < l; i ++ ) {
 
-            projectObject(children[i], camera);
+			projectObject( children[ i ], camera );
 
         }
+
     }
 
     function renderObjects( renderList, camera, lights, fog, overrideMaterial ) {
@@ -3121,7 +3130,9 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
                 _this.renderBufferDirect( camera, lights, fog, geometry, material, object, group );
 
             }
+
         }
+
     }
 
     function initMaterial( material, lights, fog, object ) {
@@ -3807,7 +3818,7 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
 
         if ( textureUnit >= capabilities.maxTextures ) {
 
-            console.warn( 'WebGLIncrementRenderer: trying to use ' + textureUnit + ' texture units while this GPU supports only ' + capabilities.maxTextures );
+			console.warn( 'WebGLRenderer: trying to use ' + textureUnit + ' texture units while this GPU supports only ' + capabilities.maxTextures );
 
         }
 
@@ -4164,7 +4175,7 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
 
                 default:
 
-                    console.warn( 'THREE.WebGLIncrementRenderer: Unknown uniform type: ' + type );
+					console.warn( 'THREE.WebGLRenderer: Unknown uniform type: ' + type );
 
             }
 
@@ -4428,7 +4439,7 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
 
             if ( texture.wrapS !== THREE.ClampToEdgeWrapping || texture.wrapT !== THREE.ClampToEdgeWrapping ) {
 
-                console.warn( 'THREE.WebGLIncrementRenderer: Texture is not power of two. Texture.wrapS and Texture.wrapT should be set to THREE.ClampToEdgeWrapping.', texture );
+				console.warn( 'THREE.WebGLRenderer: Texture is not power of two. Texture.wrapS and Texture.wrapT should be set to THREE.ClampToEdgeWrapping.', texture );
 
             }
 
@@ -4437,7 +4448,7 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
 
             if ( texture.minFilter !== THREE.NearestFilter && texture.minFilter !== THREE.LinearFilter ) {
 
-                console.warn( 'THREE.WebGLIncrementRenderer: Texture is not power of two. Texture.minFilter should be set to THREE.NearestFilter or THREE.LinearFilter.', texture );
+				console.warn( 'THREE.WebGLRenderer: Texture is not power of two. Texture.minFilter should be set to THREE.NearestFilter or THREE.LinearFilter.', texture );
 
             }
 
@@ -4536,7 +4547,7 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
 
                     } else {
 
-                        console.warn( "THREE.WebGLIncrementRenderer: Attempt to load unsupported compressed texture format in .uploadTexture()" );
+						console.warn( "THREE.WebGLRenderer: Attempt to load unsupported compressed texture format in .uploadTexture()" );
 
                     }
 
@@ -4593,14 +4604,14 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
 
             if ( image === undefined ) {
 
-                console.warn( 'THREE.WebGLIncrementRenderer: Texture marked for update but image is undefined', texture );
+				console.warn( 'THREE.WebGLRenderer: Texture marked for update but image is undefined', texture );
                 return;
 
             }
 
             if ( image.complete === false ) {
 
-                console.warn( 'THREE.WebGLIncrementRenderer: Texture marked for update but image is incomplete', texture );
+				console.warn( 'THREE.WebGLRenderer: Texture marked for update but image is incomplete', texture );
                 return;
 
             }
@@ -4632,7 +4643,7 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
             var context = canvas.getContext( '2d' );
             context.drawImage( image, 0, 0, image.width, image.height, 0, 0, canvas.width, canvas.height );
 
-            console.warn( 'THREE.WebGLIncrementRenderer: image is too big (' + image.width + 'x' + image.height + '). Resized to ' + canvas.width + 'x' + canvas.height, image );
+			console.warn( 'THREE.WebGLRenderer: image is too big (' + image.width + 'x' + image.height + '). Resized to ' + canvas.width + 'x' + canvas.height, image );
 
             return canvas;
 
@@ -4668,7 +4679,7 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
             var context = canvas.getContext( '2d' );
             context.drawImage( image, 0, 0, canvas.width, canvas.height );
 
-            console.warn( 'THREE.WebGLIncrementRenderer: image is not power of two (' + image.width + 'x' + image.height + '). Resized to ' + canvas.width + 'x' + canvas.height, image );
+			console.warn( 'THREE.WebGLRenderer: image is not power of two (' + image.width + 'x' + image.height + '). Resized to ' + canvas.width + 'x' + canvas.height, image );
 
             return canvas;
 
@@ -4757,7 +4768,7 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
 
                                 } else {
 
-                                    console.warn( "THREE.WebGLIncrementRenderer: Attempt to load unsupported compressed texture format in .setCubeTexture()" );
+									console.warn( "THREE.WebGLRenderer: Attempt to load unsupported compressed texture format in .setCubeTexture()" );
 
                                 }
 
@@ -5004,7 +5015,7 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
 
         if ( renderTarget instanceof THREE.WebGLRenderTarget === false ) {
 
-            console.error( 'THREE.WebGLIncrementRenderer.readRenderTargetPixels: renderTarget is not THREE.WebGLRenderTarget.' );
+			console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not THREE.WebGLRenderTarget.' );
             return;
 
         }
@@ -5030,7 +5041,7 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
                 if ( texture.format !== THREE.RGBAFormat
                     && paramThreeToGL( texture.format ) !== _gl.getParameter( _gl.IMPLEMENTATION_COLOR_READ_FORMAT ) ) {
 
-                    console.error( 'THREE.WebGLIncrementRenderer.readRenderTargetPixels: renderTarget is not in RGBA or implementation defined format.' );
+					console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not in RGBA or implementation defined format.' );
                     return;
 
                 }
@@ -5040,7 +5051,7 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
                     && ! ( texture.type === THREE.FloatType && extensions.get( 'WEBGL_color_buffer_float' ) )
                     && ! ( texture.type === THREE.HalfFloatType && extensions.get( 'EXT_color_buffer_half_float' ) ) ) {
 
-                    console.error( 'THREE.WebGLIncrementRenderer.readRenderTargetPixels: renderTarget is not in UnsignedByteType or implementation defined type.' );
+					console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not in UnsignedByteType or implementation defined type.' );
                     return;
 
                 }
@@ -5051,7 +5062,7 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
 
                 } else {
 
-                    console.error( 'THREE.WebGLIncrementRenderer.readRenderTargetPixels: readPixels from renderTarget failed. Framebuffer not complete.' );
+					console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: readPixels from renderTarget failed. Framebuffer not complete.' );
 
                 }
 
@@ -5194,42 +5205,42 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
 
     this.supportsFloatTextures = function () {
 
-        console.warn( 'THREE.WebGLIncrementRenderer: .supportsFloatTextures() is now .extensions.get( \'OES_texture_float\' ).' );
+		console.warn( 'THREE.WebGLRenderer: .supportsFloatTextures() is now .extensions.get( \'OES_texture_float\' ).' );
         return extensions.get( 'OES_texture_float' );
 
     };
 
     this.supportsHalfFloatTextures = function () {
 
-        console.warn( 'THREE.WebGLIncrementRenderer: .supportsHalfFloatTextures() is now .extensions.get( \'OES_texture_half_float\' ).' );
+		console.warn( 'THREE.WebGLRenderer: .supportsHalfFloatTextures() is now .extensions.get( \'OES_texture_half_float\' ).' );
         return extensions.get( 'OES_texture_half_float' );
 
     };
 
     this.supportsStandardDerivatives = function () {
 
-        console.warn( 'THREE.WebGLIncrementRenderer: .supportsStandardDerivatives() is now .extensions.get( \'OES_standard_derivatives\' ).' );
+		console.warn( 'THREE.WebGLRenderer: .supportsStandardDerivatives() is now .extensions.get( \'OES_standard_derivatives\' ).' );
         return extensions.get( 'OES_standard_derivatives' );
 
     };
 
     this.supportsCompressedTextureS3TC = function () {
 
-        console.warn( 'THREE.WebGLIncrementRenderer: .supportsCompressedTextureS3TC() is now .extensions.get( \'WEBGL_compressed_texture_s3tc\' ).' );
+		console.warn( 'THREE.WebGLRenderer: .supportsCompressedTextureS3TC() is now .extensions.get( \'WEBGL_compressed_texture_s3tc\' ).' );
         return extensions.get( 'WEBGL_compressed_texture_s3tc' );
 
     };
 
     this.supportsCompressedTexturePVRTC = function () {
 
-        console.warn( 'THREE.WebGLIncrementRenderer: .supportsCompressedTexturePVRTC() is now .extensions.get( \'WEBGL_compressed_texture_pvrtc\' ).' );
+		console.warn( 'THREE.WebGLRenderer: .supportsCompressedTexturePVRTC() is now .extensions.get( \'WEBGL_compressed_texture_pvrtc\' ).' );
         return extensions.get( 'WEBGL_compressed_texture_pvrtc' );
 
     };
 
     this.supportsBlendMinMax = function () {
 
-        console.warn( 'THREE.WebGLIncrementRenderer: .supportsBlendMinMax() is now .extensions.get( \'EXT_blend_minmax\' ).' );
+		console.warn( 'THREE.WebGLRenderer: .supportsBlendMinMax() is now .extensions.get( \'EXT_blend_minmax\' ).' );
         return extensions.get( 'EXT_blend_minmax' );
 
     };
@@ -5242,7 +5253,7 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
 
     this.supportsInstancedArrays = function () {
 
-        console.warn( 'THREE.WebGLIncrementRenderer: .supportsInstancedArrays() is now .extensions.get( \'ANGLE_instanced_arrays\' ).' );
+		console.warn( 'THREE.WebGLRenderer: .supportsInstancedArrays() is now .extensions.get( \'ANGLE_instanced_arrays\' ).' );
         return extensions.get( 'ANGLE_instanced_arrays' );
 
     };
@@ -5251,25 +5262,25 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
 
     this.initMaterial = function () {
 
-        console.warn( 'THREE.WebGLIncrementRenderer: .initMaterial() has been removed.' );
+		console.warn( 'THREE.WebGLRenderer: .initMaterial() has been removed.' );
 
     };
 
     this.addPrePlugin = function () {
 
-        console.warn( 'THREE.WebGLIncrementRenderer: .addPrePlugin() has been removed.' );
+		console.warn( 'THREE.WebGLRenderer: .addPrePlugin() has been removed.' );
 
     };
 
     this.addPostPlugin = function () {
 
-        console.warn( 'THREE.WebGLIncrementRenderer: .addPostPlugin() has been removed.' );
+		console.warn( 'THREE.WebGLRenderer: .addPostPlugin() has been removed.' );
 
     };
 
     this.updateShadowMap = function () {
 
-        console.warn( 'THREE.WebGLIncrementRenderer: .updateShadowMap() has been removed.' );
+		console.warn( 'THREE.WebGLRenderer: .updateShadowMap() has been removed.' );
 
     };
 
@@ -5282,7 +5293,7 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
             },
             set: function ( value ) {
 
-                console.warn( 'THREE.WebGLIncrementRenderer: .shadowMapEnabled is now .shadowMap.enabled.' );
+				console.warn( 'THREE.WebGLRenderer: .shadowMapEnabled is now .shadowMap.enabled.' );
                 shadowMap.enabled = value;
 
             }
@@ -5295,7 +5306,7 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
             },
             set: function ( value ) {
 
-                console.warn( 'THREE.WebGLIncrementRenderer: .shadowMapType is now .shadowMap.type.' );
+				console.warn( 'THREE.WebGLRenderer: .shadowMapType is now .shadowMap.type.' );
                 shadowMap.type = value;
 
             }
@@ -5308,7 +5319,7 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
             },
             set: function ( value ) {
 
-                console.warn( 'THREE.WebGLIncrementRenderer: .shadowMapCullFace is now .shadowMap.cullFace.' );
+				console.warn( 'THREE.WebGLRenderer: .shadowMapCullFace is now .shadowMap.cullFace.' );
                 shadowMap.cullFace = value;
 
             }
@@ -5321,13 +5332,80 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
             },
             set: function ( value ) {
 
-                console.warn( 'THREE.WebGLIncrementRenderer: .shadowMapDebug is now .shadowMap.debug.' );
+				console.warn( 'THREE.WebGLRenderer: .shadowMapDebug is now .shadowMap.debug.' );
                 shadowMap.debug = value;
 
             }
         }
     } );
 
+
+    // ------------------------------------------------------------------
+    // 增加增量绘制支持
+
+    // Rendering
+    var _orderedRenderer = new CLOUD.OrderedRenderer();
+
+    this.IncrementRender = function ( scene, camera, renderTarget, forceClear ) {
+
+        if ( camera instanceof THREE.Camera === false ) {
+
+            console.error( 'THREE.WebGLIncrementRenderer.IncrementRender: camera is not an instance of THREE.Camera.' );
+            return;
+        }
+
+        // reset caching for this frame
+
+        _currentGeometryProgram = '';
+        _currentMaterialId = -1;
+        _currentCamera = null;
+        _lightsNeedUpdate = true;
+
+        // update scene graph
+
+        if (scene.autoUpdate === true) scene.updateMatrixWorld();
+
+        // update camera matrices and frustum
+
+        if (camera.parent === null) camera.updateMatrixWorld();
+
+        camera.matrixWorldInverse.getInverse(camera.matrixWorld);
+
+        _projScreenMatrix.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
+        _frustum.setFromMatrix(_projScreenMatrix);
+
+        _infoRender.calls = 0;
+        _infoRender.vertices = 0;
+        _infoRender.faces = 0;
+        _infoRender.points = 0;
+
+        _orderedRenderer.update(_frustum, _projScreenMatrix);
+
+        return _orderedRenderer.render(this, scene, camera, lights, renderTarget, forceClear, state);
+    };
+
+        // 重置增量绘制状态
+    this.resetIncrementRender = function() {
+        _orderedRenderer.restart();
+
+    };
+
+        // 设置过滤对象
+    this.setFilterObject = function(filterObject) {
+
+        _orderedRenderer.setFilter(filterObject);
+
+    };
+
+        // 设置是否更新对象列表
+    this.setObjectListUpdateState = function(isUpdate){
+        _orderedRenderer.updateObjectList(isUpdate);
+    };
+
+    this.computeSelectionBBox = function () {
+
+        return _orderedRenderer.computeSelectionBBox();
+    };
 };
 
 
@@ -7840,23 +7918,18 @@ CLOUD.MaterialUtil = {
         CloudShaderLib.base_cust_clip.uniforms.transformMatrix.value = transform;
     },
 
-    createHilightMaterial: function () {
-
-        var material = new THREE.MeshPhongMaterial({ color: 0x0000ff, opacity: 0.8, transparent: true });
+    createPhongMaterial: function(obj){
+        var material = new THREE.MeshPhongMaterial(obj);
         material.type = 'phong_cust_clip';
         material.uniforms = CloudShaderLib.phong_cust_clip.uniforms;
         material.vertexShader = CloudShaderLib.phong_cust_clip.vertexShader;
         material.fragmentShader = CloudShaderLib.phong_cust_clip.fragmentShader;
-
-        //var material = new THREE.MeshBasicMaterial({ color: 0x00ff00, opacity: 0.5, transparent: true, side: THREE.DoubleSide, polygonOffset: true, depthTest: true, polygonOffsetFactor: -2, polygonOffsetUnits: -1 });
-        //if (CloudShaderLib !== undefined) {
-        //    material.type = 'base_cust_clip';
-        //    material.uniforms = CloudShaderLib.base_cust_clip.uniforms;
-        //    material.vertexShader = CloudShaderLib.base_cust_clip.vertexShader;
-        //    material.fragmentShader = CloudShaderLib.base_cust_clip.fragmentShader;
-        //}
-
         return material;
+    },
+
+    createHilightMaterial: function () {
+
+        return this.createPhongMaterial({ color: 0x0000ff, opacity: 0.8, transparent: true });
     }
 };
 
@@ -11381,14 +11454,24 @@ CLOUD.Client.prototype = {
 
     processSceneTasks: function () {
         this.taskManager.processSceneTasks(this);
-    }
+    },
+
+    needGroupBySceneId : function(){
+        var fileCount = this.index.statics.files;
+        if (fileCount === undefined)
+            return false;
+
+        return fileCount > 1;
+    },
 }
 CLOUD.Scene = function () {
     THREE.Scene.call(this);
 
     this.type = 'Scene';
 
+    this.filter = new CLOUD.Filter();
     this.raycaster = new CLOUD.Raycaster();
+    this.raycaster.setFilter(this.filter);
 
     this.rootNode = new CLOUD.Group();
     this.rootNode.sceneRoot = true;
@@ -11397,7 +11480,7 @@ CLOUD.Scene = function () {
 
     this.clipWidget = null;
 
-    this.filter = new CLOUD.Filter();
+    
 
     this.selectedIds = []; // 存一份是为了供鼠标pick使用
 
@@ -11457,6 +11540,7 @@ CLOUD.Scene.prototype.hitTestClipPlane = function (ray, intersects) {
 CLOUD.Scene.prototype.hitTestPosition = function (mouse, camera, callback) {
     var raycaster = this.raycaster;
     raycaster.setFromCamera(mouse, camera);
+
     var intersects =  this.hitTestClipPlane(raycaster.ray, raycaster.intersectObjects(this.children, true));
 
     if (intersects.length < 1) {
@@ -12346,12 +12430,19 @@ CLOUD.SubScene.prototype.update = function () {
         distance = camera.positionPlane.distanceToPoint(v2);
         distance = distance * distance;           
 
-        var level = scope.level * CLOUD.GlobalData.SubSceneVisibleDistance * CLOUD.GlobalData.SubSceneVisibleLOD;
+        var lodValue = CLOUD.ObjectLevelLoD[scope.level];
+        if (!lodValue) {
+            console.warn("invalid lod!");
+            lodValue = 5;
+        }
+            
 
-        if (scope.level < 2) {
+        var level = lodValue * CLOUD.GlobalData.SubSceneVisibleDistance * CLOUD.GlobalData.SubSceneVisibleLOD;
+
+        if (scope.level == CLOUD.EnumObjectLevel.Tiny) {
             level = level  * 0.2;
         }
-        else if (scope.level < 5) {
+        else if (scope.level == CLOUD.EnumObjectLevel.Small) {
             level = level * 0.5;
         }
         else {
@@ -12399,9 +12490,14 @@ CLOUD.Raycaster = function (origin, direction, near, far) {
 };
 
 //
-function intersectObject(object, raycaster, intersects, recursive) {
+function intersectObject(object, raycaster, intersects, recursive, filter) {
     if (!object.visible) {
         return;
+    }
+
+    if (object instanceof CLOUD.Group) {
+        if (object.fileId && filter.hasFileFilter(object.fileId))
+            return;
     }
 
     var hit = object.raycast(raycaster, intersects);
@@ -12413,7 +12509,7 @@ function intersectObject(object, raycaster, intersects, recursive) {
             return;
 
         for (var i = 0, l = children.length; i < l; i++) {
-            intersectObject(children[i], raycaster, intersects, true);
+            intersectObject(children[i], raycaster, intersects, true, filter);
         }
     }
 };
@@ -12432,6 +12528,10 @@ CLOUD.Raycaster.prototype = {
         // direction is assumed to be normalized (for accurate distance calculations)
 
         this.ray.set(origin, direction);
+    },
+
+    setFilter: function (filter) {
+        this.filter = filter;
     },
 
     setFromCamera: function (coords, camera) {
@@ -12460,7 +12560,7 @@ CLOUD.Raycaster.prototype = {
     intersectObject: function (object, recursive) {
         var intersects = [];
 
-        intersectObject(object, this, intersects, recursive);
+        intersectObject(object, this, intersects, recursive, this.filter);
 
         //intersects.sort( descSort );
 
@@ -12476,7 +12576,7 @@ CLOUD.Raycaster.prototype = {
         }
 
         for (var i = 0, l = objects.length; i < l; i++) {
-            intersectObject(objects[i], this, intersects, recursive);
+            intersectObject(objects[i], this, intersects, recursive, this.filter);
         }
 
         //intersects.sort( descSort );
@@ -13447,7 +13547,7 @@ CLOUD.OrbitEditor = function (cameraEditor, scene, domElement) {
 
     // Mouse buttons
     //this.mouseButtons = { ORBIT: THREE.MOUSE.LEFT, PAN: THREE.MOUSE.MIDDLE, ZOOM: THREE.MOUSE.RIGHT };
-    this.mouseButtons = { ORBIT: THREE.MOUSE.LEFT, ZOOM: THREE.MOUSE.MIDDLE, PAN: THREE.MOUSE.RIGHT };
+    this.mouseButtons = { ORBIT: THREE.MOUSE.LEFT, PAN2: THREE.MOUSE.MIDDLE, PAN: THREE.MOUSE.RIGHT };
 
     // camera state
     this.cameraEditor = cameraEditor;
@@ -13489,7 +13589,7 @@ CLOUD.OrbitEditor.prototype.processMouseDown = function (event) {
             return;
 
         camera_scope.beginZoom(event.clientX, event.clientY);
-    } else if (event.button === scope.mouseButtons.PAN) {
+    } else if (event.button === scope.mouseButtons.PAN || event.button === scope.mouseButtons.PAN2) {
         if (camera_scope.noPan === true) return;
 
         camera_scope.beginPan(event.clientX, event.clientY);
@@ -13546,10 +13646,6 @@ CLOUD.OrbitEditor.prototype.onMouseUp = function (event) {
     camera_scope.process(event.clientX, event.clientY, true);
 
     camera_scope.endOperation();
-    return true;
-};
-
-CLOUD.OrbitEditor.prototype.onMouseClick = function (event) {
     return true;
 };
 
@@ -13661,14 +13757,9 @@ CLOUD.PickEditor = function (object, scene, domElement) {
 
     // Customize the mouse buttons
     //this.mouseButtons = { ORBIT: THREE.MOUSE.RIGHT, PAN: THREE.MOUSE.MIDDLE, ZOOM: THREE.MOUSE.RIGHT };
-    //this.mouseButtons = { ORBIT: THREE.MOUSE.LEFT, ZOOM: THREE.MOUSE.MIDDLE, PAN: THREE.MOUSE.RIGHT };
 };
 CLOUD.PickEditor.prototype = Object.create(CLOUD.OrbitEditor.prototype);
 CLOUD.PickEditor.prototype.constructor = CLOUD.PickEditor;
-
-//CLOUD.PickEditor.prototype.onMouseDown = function (event) {
-//    return true;
-//};
 
 //onMouseDown
 CLOUD.PickEditor.prototype.onMouseUp = function (event) {
@@ -13740,7 +13831,7 @@ CLOUD.ZoomEditor = function ( object, scene, domElement ) {
 	CLOUD.OrbitEditor.call( this,  object, scene, domElement );
 	
 	//this.mouseButtons = { ZOOM: THREE.MOUSE.LEFT, PAN: THREE.MOUSE.MIDDLE, ORBIT: THREE.MOUSE.RIGHT };
-	this.mouseButtons = { ZOOM: THREE.MOUSE.LEFT, PAN: THREE.MOUSE.MIDDLE, PAN: THREE.MOUSE.RIGHT };
+	this.mouseButtons = { ZOOM: THREE.MOUSE.LEFT, PAN2: THREE.MOUSE.MIDDLE, PAN: THREE.MOUSE.RIGHT };
 };
 CLOUD.ZoomEditor.prototype = Object.create( CLOUD.OrbitEditor.prototype );
 CLOUD.ZoomEditor.prototype.constructor = CLOUD.ZoomEditor;
@@ -14787,23 +14878,15 @@ CLOUD.CameraAnimator = function () {
 
 CLOUD.Filter = function () {
 
-    var createMaterial = function (color) {
-        var material = new THREE.MeshPhongMaterial({color: color});
-
-        if (CloudShaderLib !== undefined) {
-            material.type = 'phong_cust_clip';
-            material.uniforms = CloudShaderLib.phong_cust_clip.uniforms;
-            material.vertexShader = CloudShaderLib.phong_cust_clip.vertexShader;
-            material.fragmentShader = CloudShaderLib.phong_cust_clip.fragmentShader;
-        }
-
-        return material;
-    };
-
     var visibilityFilter = {};
-    
+
+    var fileFilter = {};
+
+    var _sceneOverriderState = false;
+
     var overridedMaterials = {};
     overridedMaterials.selection = CLOUD.MaterialUtil.createHilightMaterial();
+    overridedMaterials.scene = CLOUD.MaterialUtil.createPhongMaterial({ color: 0x888888, opacity: 0.3, transparent: true });
 
     var materialOverriderByUserId = {};
 
@@ -14881,8 +14964,34 @@ CLOUD.Filter = function () {
         visibilityFilter = {};
     }
 
+    this.addFileFilter = function (fileId) {
+        fileFilter[fileId] = 0;
+    }
+
+    this.removeFileFilter = function (fileId) {
+        if (fileId === undefined) {
+            fileFilter = {};
+        }
+        else {
+            if (fileFilter[fileId] !== undefined) {
+                delete fileFilter[fileId];
+            }
+        }
+    }
+
+    this.hasFileFilter = function (fileId) {
+        return fileFilter[fileId] !== undefined;
+    }
     ////////////////////////////////////////////////////////////////////
     // material overrider API
+    this.enableSceneOverrider = function (enable) {
+        _sceneOverriderState = enable;
+    };
+
+    this.isSceneOverriderEnabled = function () {
+        return _sceneOverriderState;
+    };
+
     this.setOverriderMaterial = function (materialName, color) {
         var material = overridedMaterials[materialName];
         if (material) {
@@ -14890,7 +14999,7 @@ CLOUD.Filter = function () {
             return material;
         }
         else {
-            material = createMaterial(color);
+            material = CLOUD.MaterialUtil.createHilightMaterial({color: color});
             overridedMaterials[materialName] = material;
             return material;
         }
@@ -15119,6 +15228,9 @@ CLOUD.Filter = function () {
                 return material;
         }
    
+        if (_sceneOverriderState) {
+            return overridedMaterials.scene;
+        }
 
         return null;
     };
@@ -19696,43 +19808,10 @@ CLOUD.SubSceneLoader.prototype = {
 
                 }
                 else if (objJSON.nodeType == "CellNode") {
-
                     console.log("Should not call here!");
-                    //object = new CLOUD.Cell();
-                    //CLOUD.GeomUtil.parseNodeProperties(object, objJSON, nodeId);
-
-                    //// set world bbox
-                    //object.worldBoundingBox = object.boundingBox.clone();                    
-                    //object.worldBoundingBox.applyMatrix4(scope.manager.getGlobalTransform());
-                    //object.level = objJSON.level;
-                    //if (objJSON.order) {
-                    //    object.out = 1;
-                    //}
-
-
-                    //parent.add(object);
-
-                    //handle_children(object, objJSON.children);
                 }
                 else if (objJSON.nodeType == "SceneNode") {
-
                     console.log("Should not call here!");
-                    //if (objJSON.sceneType == CLOUD.SCENETYPE.Child) {
-
-                    //    object = new CLOUD.SubScene();
-                    //    CLOUD.GeomUtil.parseNodeProperties(object, objJSON, nodeId);
-
-                    //    object.client = client;
-
-                    //    CLOUD.GeomUtil.parseSceneNode(object, objJSON, scope.manager);                        
-
-                    //    parent.add(object);
-
-                    //    object.load();
-                    //}
-                    //else {
-                    //    // Will not load.
-                    //}
                 }
                 else if (objJSON.nodeType == "GroupNode") {
 
@@ -19918,7 +19997,7 @@ CLOUD.SceneLoader.prototype = {
 
         var sceneLevel = group.level;
         if (sceneLevel === undefined)
-            sceneLevel = 10;
+            sceneLevel = CLOUD.EnumObjectLevel.Large;
 
         if (notifyProgress)
             scope.manager.dispatchEvent({ type: CLOUD.EVENTS.ON_LOAD_START, sceneId: sceneId });
@@ -19978,6 +20057,9 @@ CLOUD.SceneLoader.prototype = {
                 else if (objJSON.nodeType == "CellNode") {
 
                     object = new CLOUD.Cell();
+                    if(objJSON.leaf){
+                        object.leaf = true;
+                    }
                     CLOUD.GeomUtil.parseNodeProperties(object, objJSON, nodeId);
 
                     // set world bbox
@@ -20017,6 +20099,9 @@ CLOUD.SceneLoader.prototype = {
 
                         object = new CLOUD.SubScene();
                         CLOUD.GeomUtil.parseNodeProperties(object, objJSON, nodeId);
+                        object.leaf = true;
+
+                        object.client = client;
 
                         object.client = client;
 
@@ -20201,9 +20286,61 @@ CLOUD.SceneLoader.prototype = {
             }
         };
 
+
         function finalize() {
             // take care of targets which could be asynchronously loaded objects
             client.processMpkTasks();
+
+            
+
+            if (client.needGroupBySceneId()) {
+
+                function groupBySceneId(node) {
+
+                    if (node instanceof CLOUD.Cell) {
+
+                        if (node.leaf) {
+
+                            var groups = {};
+                            var children = node.children;
+                            for(var ii=0, len = children.length; ii<len; ++ii){
+                                var object = children[ii];
+                                var fileId = object.userData.sceneId;
+                                if (fileId === undefined) {
+                                    console.warn("no scene id!");
+                                }
+                                else {
+                                    var group = groups[fileId];
+                                    if (group === undefined) {
+                                        group = new CLOUD.Group();
+                                        group.fileId = fileId;
+                                        groups[fileId] = group;
+                                    }
+                                    else {
+                                        group.children.push(object);
+                                        //delete object.userData.sceneId;
+                                    }
+                                }
+                            }
+
+                            var sceneGroup = [];
+                            for (var name in groups) {
+                                sceneGroup.push(groups[name]);
+                            }
+                            node.children = sceneGroup;
+                            return;
+                        }
+                    }
+
+                    var children = node.children;
+                    for (var ii = 0, len = children.length; ii < len; ++ii) {
+                        groupBySceneId(children[ii]);
+                    }
+                }
+
+                groupBySceneId(localRoot);
+     
+            }
         };
 
 
@@ -20465,9 +20602,9 @@ CLOUD.TaskWorker = function (threadCount) {
         function processItem(i) {
 
             if (i >= itemCount) {
-                if (scope.doingCount < 1) {
-                    scope.run(loader, sorter);
-                }
+                //if (scope.doingCount < 1) {
+                //    scope.run(loader, sorter);
+                //}
                 return;
             }
                 
@@ -21511,7 +21648,7 @@ CloudViewer.prototype = {
                 limitTime = 30;
             }
 
-            this.renderer.setLimitFrameTime(limitTime);
+            CLOUD.GlobalData.LimitFrameTime = limitTime;
         }
     },
 
