@@ -248,17 +248,13 @@ App.Comm.createModel = function(options){
           self = $(event.target),
           parent = self.closest(".item-content"),
           flag = self.is(":checked"),
-          type = parent.data("type"),
-          data= {
-            type:type,
-            ids:[]
-          };
+          type = parent.data("type");
       parent = parent.next(".subTree").length>0 ? parent.next(".subTree") : parent;
       parent.find("input").prop("checked",flag);
       if(type == "sceneId"){
         viewer.showScene(that.getFilter());
       }else{
-        data = that.getData(parent);
+        var data = that.getData(parent);
         flag?viewer.show(data):viewer.hide(data);
       }
     },
