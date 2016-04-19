@@ -35,7 +35,7 @@ App.Index = {
 	},
 
 
-
+	//事件绑定
 	bindEvent() {
 
 		var that = this,
@@ -85,7 +85,29 @@ App.Index = {
 				$target.closest("li").children("ul").show();
 				$target.addClass("on");
 			}
+			event.stopPropagation();
 		})
+
+		//列表点击
+		$projectContainer.on("click", ".itemContent", function() {
+
+
+
+			$(this).toggleClass("selected");
+
+			if ($(this).hasClass("selected")) {
+				App.Index.Settings.Viewer.highlight({
+					type: "userId",
+					ids: ["73354c0f530daa5f25774a37425b1f37.661192"]
+				})
+			} else {
+				App.Index.Settings.Viewer.highlight({
+					type: "userId",
+					ids: []
+				})
+			}
+
+		});
 
 
 		this.bindTreeScroll();
@@ -170,8 +192,8 @@ App.Index = {
 				App.Index.Settings.ModelObj = null;
 				if (!model.intersect) {
 					return;
-				} 
-				App.Index.Settings.ModelObj = model; 
+				}
+				App.Index.Settings.ModelObj = model;
 				//属性
 				if (App.Index.Settings.property == "attr") {
 					that.renderAttr(App.Index.Settings.ModelObj);
@@ -189,7 +211,7 @@ App.Index = {
 		if (!App.Index.Settings.ModelObj || !App.Index.Settings.ModelObj.intersect) {
 			$("#projectContainer .designProperties").html(' <div class="nullTip">请选择构件</div>');
 			return;
-		}  
+		}
 
 		var data = {
 			URLtype: "projectDesinProperties",

@@ -107,7 +107,7 @@ App.Project = {
 
 					App.Project.Settings.modelId = data.data.modelId;
 					App.Project.Settings.Viewer.on("click", function(model) {
-						 
+						  
 						if (!model.intersect) {
 							return;
 						}
