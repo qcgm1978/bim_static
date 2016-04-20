@@ -270,7 +270,11 @@ App.Comm.createModel = function(options){
         $.each(input,function(index,item){
           var $item = $(item),
               etag = $item.data('etag');
-          etag = etag?etag.toString().split(","):[];
+          if(!etag && etag !==0){
+            etag = []
+          }else{
+            etag = etag.toString().split(",")
+          }
           data.ids = data.ids.concat(etag);
         });
       }else{
@@ -435,9 +439,8 @@ App.Comm.createModel = function(options){
     addFloors:function(model){
       var data = model.toJSON();
       if(data.message == "success"){
-        data.data = data.data.sort(function(a,b){return a.sort<b.sort})
+        data.data = _.sortBy(data.data,function(num){return -num.sort})
         floorMap = data.data;
-        console.log(data);
         this.$el.html(_.template(this.template)(data));
         this.$el.find("li:eq(0)").trigger("click");
       }
