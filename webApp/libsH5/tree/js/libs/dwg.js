@@ -390,6 +390,7 @@ var dwgViewer = function(options){
       var self = this
       var panel = self.__panel
       var rect = self.__rect
+      var scale = self.__zoomScale
 
       $(window).resize(function() {
         self.windowResize()
@@ -398,6 +399,7 @@ var dwgViewer = function(options){
       //point是外面触发了mousedown传给该事件的值
       panel.mousedown(function(evt, point) {
         var state = self.__state
+        scale = self.__zoomScale
         evt = point || evt
         self.__canMove = true
         panel.css({
@@ -458,8 +460,7 @@ var dwgViewer = function(options){
               break
             case 'zoom':
               if(h>20||h<-20){
-                var currScale = self.__zoomScale;
-                var newScale = (1+h/500)*currScale
+                var newScale = -h/200+scale
                 newScale = newScale<1 ? 1 : newScale;
                 self.zoom(newScale);
               }

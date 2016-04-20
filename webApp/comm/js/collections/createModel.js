@@ -249,8 +249,8 @@ App.Comm.createModel = function(options){
           parent = self.closest(".item-content"),
           flag = self.is(":checked"),
           type = parent.data("type");
-      parent = parent.next(".subTree").length>0 ? parent.next(".subTree") : parent;
-      parent.find("input").prop("checked",flag);
+      parents = parent.next(".subTree").length>0 ? parent.next(".subTree") : parent;
+      parents.find("input").prop("checked",flag);
       if(type == "sceneId"){
         viewer.showScene(that.getFilter());
       }else{
@@ -278,7 +278,9 @@ App.Comm.createModel = function(options){
         var code = element.data('parent');
         var reg = new RegExp("^"+code);
         $.each(codeData,function(i,item){
-          if(reg.test(item.code)){
+          if(!code){
+            data.ids.push(item.code);
+          }else if(reg.test(item.code)){
             data.ids.push(item.code);
           }
         });
@@ -435,6 +437,7 @@ App.Comm.createModel = function(options){
       if(data.message == "success"){
         data.data = data.data.sort(function(a,b){return a.sort<b.sort})
         floorMap = data.data;
+        console.log(data);
         this.$el.html(_.template(this.template)(data));
         this.$el.find("li:eq(0)").trigger("click");
       }
