@@ -98,7 +98,7 @@ App.Project = {
 						return;
 					}
 
-					debugger
+					 
 					//dwg 格式
 					if (data.data.suffix=="dwg") {
 						App.Project.renderDwg(data.data.modelId);
@@ -118,6 +118,8 @@ App.Project = {
 
 	// 除 dwg以外的格式
 	renderOther(modelId) {
+
+		$(".rightProperty").show();
 
 		App.Project.Settings.Viewer = new BIM({
 			single: true,
@@ -140,10 +142,16 @@ App.Project = {
 
 	//渲染dwg 文件
 	renderDwg(modelId) {
+		
+		
+		$("#modelBox").addClass("dwg");
+
 		var viewer = new dwgViewer({
-			container: $("#modelBox"),
+			element: $("#modelBox"),
 			sourceId: modelId
-		})
+		});
+
+
 	},
 
 
