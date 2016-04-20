@@ -89,7 +89,7 @@ App.Index = {
 		})
 
 		//列表点击
-		$projectContainer.on("click", ".itemContent", function() {
+		$projectContainer.on("click", ".designChange .itemContent", function() {
 
 
 
@@ -166,9 +166,8 @@ App.Index = {
 			if (data.message != "success") {
 				alert("转换失败");
 				return;
-			}
-
-			debugger
+			} 
+			 
 			var Model = data.data;
 
 			if (data.data.modelStatus == 1) {

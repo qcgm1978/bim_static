@@ -98,34 +98,54 @@ App.Project = {
 						return;
 					}
 
-					App.Project.Settings.Viewer = new BIM({
-						single: true,
-						element: $("#modelBox")[0],
-						etag: data.data.modelId,
-						tools: true
-					});
-
-					App.Project.Settings.modelId = data.data.modelId;
-					App.Project.Settings.Viewer.on("click", function(model) {
-						  
-						if (!model.intersect) {
-							return;
-						}
-
-						//渲染属性
-						App.Project.renderAttr(model.intersect.userId);
-
-					});
+					debugger
+					//dwg 格式
+					if (data.data.suffix=="dwg") {
+						App.Project.renderDwg(data.data.modelId);
+					}else{
+						App.Project.renderOther(data.data.modelId);
+					}
 
 
-				} else { 
-					alert("模型转换中"); 
+				} else {
+					alert("模型转换中");
 				}
 			} else {
 				alert(data.message);
 			}
 		});
 	},
+
+	// 除 dwg以外的格式
+	renderOther(modelId) {
+
+		App.Project.Settings.Viewer = new BIM({
+			single: true,
+			element: $("#modelBox")[0],
+			etag: modelId,
+			tools: true
+		});
+
+		App.Project.Settings.modelId = modelId;
+		App.Project.Settings.Viewer.on("click", function(model) {
+
+			if (!model.intersect) {
+				return;
+			} 
+			//渲染属性
+			App.Project.renderAttr(model.intersect.userId);
+
+		});
+	},
+
+	//渲染dwg 文件
+	renderDwg(modelId) {
+		var viewer = new dwgViewer({
+			container: $("#modelBox"),
+			sourceId: modelId
+		})
+	},
+
 
 	templateCache: [],
 
