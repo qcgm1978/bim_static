@@ -10,7 +10,12 @@ App.API = {
 	URL: {
 
 		//首页bodyContent数据
-		 fetchBodyContentData :'platform/bodyContent',
+		// fetchBodyContentData :'platform/bodyContent',
+		fetchBodyContentTodos :'dataJson/bodyContent/bodyContent.todos.json',
+		fetchBodyContentMonthEnd :'dataJson/bodyContent/bodyContent.monthEnd.json',
+		fetchBodyContentMonthStart :'dataJson/bodyContent/bodyContent.monthStart.json',
+		fetchBodyContentSlide :'dataJson/bodyContent/bodyContent.slide.json',
+		fetchBodyContentProclamation :'dataJson/bodyContent/bodyContent.proclamation.json',
 
 		//Service
 		fetchServiceMCOuterList:'platform/auth/org?outer=true',//外部组织-用户列表
@@ -113,8 +118,10 @@ App.API = {
 		createNewFolder: "doc/{projectId}/{projectVersionId}/file", // 创建新文件夹 ?parentId={parentId}&filePath={filePath}
 
 		//项目 变更 列表
-
-		projectChangeList:"/dataJson/project/projectChange/list.json",//  sixD/{projectId}/{projectVersionId}/cost/summary/comparison  sixD/{projectId}/{projectVersionId}/cost/summary/comparison?baseProjectVerionId={baseProjectVerionId}
+		fileList:"/dataJson/project/projectChange/changeFile.json", //doc/internal/{projectId}/{versionId}/alteration
+		projectDesinProperties:"/dataJson/project/projectChange/comparisonAttr.json",//sixD/{projectId}/{projectVersionId}/property/comparison //?baseProjectVerionId={baseProjectVerionId}&sceneId={sceneId}&elementId={elementId}
+		projectChangeList:"sixD/{projectId}/{projectVersionId}/cost/comparison",// ?fileVerionId={fileVerionId}&baseFileVerionId={baseFileVerionId}
+		projectChangeListTest:"/dataJson/project/projectChange/list.json",
 
 		test: ""
 	},

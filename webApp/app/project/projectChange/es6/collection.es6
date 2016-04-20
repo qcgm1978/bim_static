@@ -29,12 +29,8 @@ App.Views = {
 		initialize() {
 			this.listenTo(App.Collections.changeListCollection, "add", this.addOne);
 
-		},
-
-
-		events: {
-			"click .nodeSwitch": "switchToggle"
-		},
+		}, 
+		 
 
 		//渲染
 		render() {
@@ -76,23 +72,8 @@ App.Views = {
 				},
 				scrollInertia: 0
 			});
-		},
-
-		//暂开收起
-		switchToggle(event) {
-
-			var $target = $(event.target);
-
-			if ($target.hasClass("on")) {
-				$target.closest("li").children("ul").hide();
-				$target.removeClass("on");
-			} else {
-				$target.closest("li").children("ul").show();
-				$target.addClass("on");
-			}
-
 		}
-
+ 
 
 	})
 

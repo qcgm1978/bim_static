@@ -5,7 +5,7 @@ var App = App || {};
 App.Service.roleDetail=Backbone.View.extend({
     tagName:'li',
 
-    template:_.templateUrl("/Service/tpls/role/service.role.detail.html"),
+    template:_.templateUrl("/service/tpls/role/service.role.detail.html"),
     events:{
         //"click .explorer":"explorer",
         "click .modify":"modify",

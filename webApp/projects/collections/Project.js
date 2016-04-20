@@ -60,6 +60,8 @@ App.Project = {
 		App.Project.Settings.fileId = '';
 		App.Project.Settings.property = '';
 		App.Project.Settings.DataModel = null;
+		//上传取消
+		App.Comm.upload.destroy();
 	},
 
 	//加载版本
@@ -167,12 +169,17 @@ App.Project = {
 
 
 	// 加载数据
-	loadData: function() {
-
+	loadData: function() { 
 		//var $contains = $("#contains");
 		$("#contains").html(new App.Project.ProjectApp().render().el);
-		//上传
-		App.Project.upload = App.modules.docUpload.init($(document.body));
+		if (App.Project.Settings.CurrentVersion.status!=9) {
+			$(".fileContainer .btnFileUpload").show();
+			//上传
+			App.Project.upload = App.modules.docUpload.init($(document.body));
+		}else{
+			$(".fileContainer .btnFileUpload").hide();
+		}
+		
 
 		// 导航文件
 		App.Project.fetchFileNav();

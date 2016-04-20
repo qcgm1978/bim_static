@@ -91,28 +91,24 @@ BIM.common = {
         icon:'bar-fit',
         title:'适应窗口(I)',
         fn:'fit',
-        key:'I'
-      },
-      {
-        id:'select',
-        icon:'bar-select',
-        title:'选择(V)',
-        fn:'picker',
-        key:'V'
+        key:'I',
+        type:'click'
       },
       {
         id:'zoom',
         icon:'bar-zoom',
         title:'缩放(Z)',
         fn:'zoom',
-        key:'Z'
+        key:'Z',
+        type:'selected'
       },
       {
         id:'fly',
         icon:'bar-fly',
         title:'漫游(Space)',
         fn:'fly',
-        key:' '
+        key:' ',
+        type:'selected'
       }
     ],
     camera:[
@@ -273,13 +269,24 @@ BIM.util = {
     }else{
       el = element;
     }
-    var _class = el.getAttribute('class');
+    var _class = el.className;
     var reg = new RegExp('[ ]*'+curr,'g');
     if(_class.indexOf(curr)>=0){
       _class = _class.replace(reg,'');
       el.className = _class;
     }else{
       el.className = _class+" "+curr;
+    }
+  },
+  removeClass:function(element,className,exclude){
+    var reg = new RegExp('[ ]*'+className,'g');
+    for(var i = 0,len = element.length;i<len;i++){
+      var _self = element[i]
+      if(!exclude || _self != exclude){
+        var _className = _self.className;
+        _className = _className.replace(reg,"");
+        _self.className = _className;
+      }
     }
   },
   listener : function(element,type,fn){
@@ -543,7 +550,7 @@ BIM.util = {
         if(item.id == 'divide'){
           html+='<span class="'+item.id+'"></span>'
         }else{
-          html+='<i class="bar-item '+item.icon+'" data-id="'+ item.fn +'" title="'+item.title+'"></i>';
+          html+='<i class="bar-item '+item.icon+'" data-type="'+item.type+'" data-id="'+ item.fn +'" title="'+item.title+'"></i>';
         }
         if(item.key){
           BIM.util.bindKeyboard.on(item.key,BIM.common.self[item.fn]);
@@ -554,8 +561,18 @@ BIM.util = {
       var barItem = bar.getElementsByClassName('bar-item');
       for(var i = 0,len = barItem.length;i<len;i++){
         barItem[i].onclick = function(){
-          var fn = this.getAttribute('data-id');
-          BIM.common.self[fn]();
+          var fn = this.getAttribute('data-id'),
+              type = this.getAttribute('data-type'),
+              _className = this.className;
+          if(type == "selected"){
+            BIM.util.removeClass(barItem,"selected",this);
+            BIM.util.toggleClass(this,"selected");
+          }
+          if(_className.indexOf("selected") ==-1){
+            BIM.common.self[fn]();
+          }else{
+            BIM.common.self.picker();
+          }
         }
       }
     }
@@ -575,7 +592,6 @@ BIM.prototype = {
     BIM.common.bimBox.className = 'bim';
     BIM.util.pub('zoom');
     BIM.common.viewer.setZoomMode();
-    BIM.util.changeClass('bar-zoom','bar-item','selected');
   },
   zoomIn : function () {
     BIM.util.pub('zoomIn');
@@ -597,7 +613,6 @@ BIM.prototype = {
     BIM.util.pub('select');
     BIM.common.viewer.setPickMode();
     BIM.common.bimBox.className = 'bim select';
-    BIM.util.changeClass('bar-select','bar-item','selected');
     BIM.util.toggleSectionBar('hide');
     BIM.util.toggleCameraToolsBar('hide');
   },
@@ -605,7 +620,6 @@ BIM.prototype = {
     BIM.util.pub('handle');
     BIM.common.viewer.setPanMode();
     BIM.common.bimBox.className = 'bim';
-    BIM.util.changeClass('bar-handle','bar-item','selected');
     BIM.util.toggleSectionBar('hide');
     BIM.util.toggleCameraToolsBar('hide');
   },
@@ -613,7 +627,6 @@ BIM.prototype = {
     BIM.util.pub('rotate');
     BIM.common.viewer.setOrbitMode();
     BIM.common.bimBox.className = 'bim normal';
-    BIM.util.changeClass('bar-rotate','bar-item','selected');
     BIM.util.toggleSectionBar('hide');
     BIM.util.toggleCameraToolsBar('hide');
   },
@@ -621,14 +634,12 @@ BIM.prototype = {
     BIM.util.pub('fly');
     BIM.common.viewer.setFlyMode();
     BIM.common.bimBox.className = 'bim fly';
-    BIM.util.changeClass('bar-fly','bar-item','selected');
     BIM.util.toggleSectionBar('hide');
     BIM.util.toggleCameraToolsBar('hide');
   },
   picker:function(){
     BIM.common.bimBox.className = 'bim';
     BIM.common.viewer.setPickMode();
-    BIM.util.changeClass('bar-select','bar-item','selected');
   },
   resize : function(width,height){
     BIM.util.pub('resize');
@@ -680,7 +691,6 @@ BIM.prototype = {
   camera : function(){
     BIM.util.toggleCameraToolsBar();
     BIM.util.toggleSectionBar('hide');
-    BIM.util.changeClass('bar-camera','bar-item','selected');
   },
   getCamera : function(){
     return window.btoa(BIM.common.viewer.getCamera());
@@ -695,11 +705,9 @@ BIM.prototype = {
   section : function(){
     BIM.util.toggleSectionBar();
     BIM.util.toggleCameraToolsBar('hide');
-    BIM.util.changeClass('bar-section','bar-item','selected');
   },
   fullScreen : function(){
     BIM.util.fullScreen(BIM.common.bimBox);
-    BIM.util.toggleClass('bar-fullScreen','bar-exit');
   },
   hide:function(obj){
     var viewer = BIM.common.viewer;
@@ -712,9 +720,9 @@ BIM.prototype = {
   showScene:function(obj){
     var viewer = BIM.common.viewer;
     var filter = viewer.getFilters();
-    filter.removeUserFilter(obj.type);
-    BIM.util.getFilter(obj.ids,function(id){
-      filter.addUserFilter(obj.type,id);
+    filter.removeUserFilter("sceneId");
+    BIM.util.getFilter(obj,function(id){
+      filter.addUserFilter("sceneId",id);
     });
     viewer.render();
   },

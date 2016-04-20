@@ -36,7 +36,7 @@ App.Project.CostVerification=Backbone.View.extend({
 		this.$el.html(template(data));
 	},
 
-	addOneCate(){
+	addOneCate(model){
 		var template=_.templateUrl("/projects/tpls/project/cost/project.cost.property.verification.detail.cate.html"),
 		 data=model.toJSON();
 		this.$el.html(template(data));

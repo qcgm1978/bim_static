@@ -1312,10 +1312,7 @@ App.Console = {
 
 			$.ajax({
 				url:url,
-				type:"POST",
-				data:{
-					files:filesId
-				}
+				type:"POST" 
 			}).done(function(data){
 				if (data.message=="success") {
 					alert("success");

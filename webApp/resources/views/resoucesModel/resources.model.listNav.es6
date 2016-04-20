@@ -40,7 +40,7 @@ App.ResourceModel.ListNav = Backbone.View.extend({
 	//左侧试图
 	navClickCB: function(type) {
 
-		if (this.$el.closest('body').length<=0) {
+		if (this.$el.closest('body').length <= 0) {
 			this.remove();
 			return;
 		}
@@ -74,12 +74,20 @@ App.ResourceModel.ListNav = Backbone.View.extend({
 
 			App.ResourceModel.Settings.DataModel.bind = true;
 
-			App.ResourceModel.Settings.Viewer = new BIM({
-				element: this.$el.find(".modelContent")[0],
+			App.ResourceModel.Settings.Viewer = App.Comm.createModel({
+				element: this.$el.find(".modelContent"),
 				sourceId: App.ResourceModel.Settings.DataModel.sourceId,
 				etag: App.ResourceModel.Settings.DataModel.etag,
-				tools: true
+				projectId: App.ResourceModel.Settings.CurrentVersion.projectId
 			});
+
+
+			// App.ResourceModel.Settings.Viewer = new BIM({
+			// 	element: this.$el.find(".modelContent")[0],
+			// 	sourceId: App.ResourceModel.Settings.DataModel.sourceId,
+			// 	etag: App.ResourceModel.Settings.DataModel.etag,
+			// 	tools: true
+			// });
 
 			App.ResourceModel.Settings.Viewer.on("click", function(model) {
 
@@ -99,7 +107,7 @@ App.ResourceModel.ListNav = Backbone.View.extend({
 			});
 		}
 		//this.bindTreeScroll();
-		
+
 
 	},
 
@@ -108,7 +116,7 @@ App.ResourceModel.ListNav = Backbone.View.extend({
 	//重新渲染苏醒
 	reRender: function(model) {
 
-		if (this.$el.closest('body').length<=0) {
+		if (this.$el.closest('body').length <= 0) {
 			this.remove();
 			return;
 		}

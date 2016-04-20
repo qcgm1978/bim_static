@@ -3,7 +3,7 @@
 var dwgViewer = function(options){
   var self = this;
   var defaults = {
-    container:'',
+    element:'',
     maxLevel: 11,
     ext: 'jpg',
     sourceId: ''
@@ -27,7 +27,7 @@ var dwgViewer = function(options){
         res:item.Representations
       });
     });
-    self._opt.container.append(container);
+    self._opt.element.append(container);
     self.addControll(modelTab,container);
   }
   var dwgView = self.dwgView = {
@@ -390,6 +390,7 @@ var dwgViewer = function(options){
       var self = this
       var panel = self.__panel
       var rect = self.__rect
+      var scale = self.__zoomScale
 
       $(window).resize(function() {
         self.windowResize()
@@ -398,6 +399,7 @@ var dwgViewer = function(options){
       //point是外面触发了mousedown传给该事件的值
       panel.mousedown(function(evt, point) {
         var state = self.__state
+        scale = self.__zoomScale
         evt = point || evt
         self.__canMove = true
         panel.css({
@@ -436,7 +438,7 @@ var dwgViewer = function(options){
             break
           case 'rectzoom':
             self.rectZoom()
-            break
+            break;
         }
         return false
       }).mouseleave(function(evt) {
@@ -455,6 +457,13 @@ var dwgViewer = function(options){
               break
             case 'rectzoom':
               self.drawRect(w, h)
+              break
+            case 'zoom':
+              if(h>20||h<-20){
+                var newScale = -h/200+scale
+                newScale = newScale<1 ? 1 : newScale;
+                self.zoom(newScale);
+              }
               break
           }
 

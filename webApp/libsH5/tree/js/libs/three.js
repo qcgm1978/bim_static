@@ -25462,7 +25462,11 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 		// TODO: Avoid updating twice (when using shadowMap). Maybe add frame counter.
 
-		var geometry = geometries.get( object );
+	    var geometry = geometries.get(object);
+
+	    if (geometry.ticket === this.renderTicket)
+	        return geometry;
+	    geometry.ticket = this.renderTicket;
 
 		if ( object.geometry instanceof THREE.Geometry ) {
 

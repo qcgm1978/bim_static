@@ -55,22 +55,21 @@
 .rightTree { padding: 10px 8px;
 	.rightTreeView { padding-left: 0; }
 }
-#treeContainerBody{
-	position: absolute; top: 122px; left: 0px; right: 0px; bottom: 50px;
+#treeContainerBody { position: absolute; top: 171px; left: 0px; right: 0px; bottom: 50px; }
+.changeListBox { .loadings { height: 300px; line-height: 300px; text-align: center; font-size: 16px; color: #ccc; }
 }
-.changeListBox { 
-	.loadings { height: 300px; line-height: 300px; text-align: center; font-size: 16px; color: #ccc; }
-}
-.projectChangeListBox { .referenceSearch { padding: 12px; position: relative; }
+.projectChangeListBox { .referenceSearch { padding: 11px; position: relative;    padding-right: 8px; }
 	.loading { padding-top: 150px; font-size: 16px; text-align: center; color: #ccc; }
 	.txtSearch { width: 100%; min-width: 376px; padding-left: 30px; }
 	.btnSearch { position: absolute; top: 21px; left: 20px; }
-	.contrastTree { .nodeSwitch { background: url(/comm/images/commIcon.png) no-repeat 0px -39px; display: inline-block; width: 12px; height: 10px; line-height: 8px; vertical-align: top; text-align: center; cursor: pointer; margin-top: 8px; margin-right: 2px; 
-		&.on{    background-position: 0px -49px;}
-	}
+	.contrastTree { .nodeSwitch { background: url(/comm/images/commIcon.png) no-repeat 0px -39px; display: inline-block; width: 12px; height: 10px; line-height: 8px; vertical-align: top; text-align: center; cursor: pointer; margin-top: 8px; margin-right: 2px;
+			&.on { background-position: 0px -49px; }
+		}
 		.odd { background-color: #eee; }
 		.noneSwitch { display: inline-block; width: 11px; }
-		.node { .itemContent { height: 28px; border: 1px #ccc solid; line-height: 26px; }
+		.node { .itemContent { height: 28px; border: 1px #ccc solid; line-height: 26px;
+			 &.selected{    background-color: #A8DBFD;}
+		 }
 			.comm { float: left; text-align: center; position: relative;
 				.text { left: 6px; position: absolute; right: 2px; display: inline-block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 			}
@@ -80,10 +79,24 @@
 			.afterChange { width: 16%; }
 		}
 	}
-	.contrastTreeSub{display: none;}
+	.contrastTreeSub { display: none; }
 	.treeContent { .node { .itemContent { border-top: 0px; }
 			.comm { text-align: left; height: 25px; }
 		}
 	}
 	.showChange { position: absolute; left: 0px; right: 0px; bottom: 0px; height: 50px; line-height: 48px; background-color: #ddd; padding-left: 20px; }
+}
+#projectContainer .rightProperty .modleItem { .changeValue { height: 24px; line-height: 24px; display: inline-block; box-sizing: border-box; padding-left: 12px; margin-left: -3px;
+		.modleNameText { vertical-align: top; }
+	}
+	.beforeChange { width: 40%; border-right: 1px #ccc solid; }
+	.afterChange { width: 34%; }
+}
+#projectContainer .rightProperty  .changeColor { color: #CE566F; }
+.projectChangeListBox { .specialitiesOption { width: 100%; min-width: 398px; padding: 10px;    border-bottom: 1px #ccc solid;
+		.myDropText { width: 100%; }
+		.myDropList { display: block; width: auto; left: 10px; right: 10px; 
+			.myItem{height: 28px;line-height: 28px;}
+		}
+	}
 }
