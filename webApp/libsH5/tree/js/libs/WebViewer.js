@@ -1680,7 +1680,21 @@ CLOUD.OrderedRenderer = function () {
         _frustum = frustum;
     }
 
+    function updateRenderTicket() {
+
+        if (!_isUpdateObjectList || incrementListDirty) {
+            ++_renderTicket;
+        }
+        //else {
+        //    console.log(_renderTicket);
+        //}
+        if (_renderTicket > 10000)
+            _renderTicket = 0;
+    }
+
     this.render = function (renderer, scene, camera, lights, renderTarget, forceClear, state) {
+
+        updateRenderTicket();
 
         if (incrementListDirty) {
 
@@ -1703,10 +1717,7 @@ CLOUD.OrderedRenderer = function () {
 
         var fog = scene.fog;
 
-        ++_renderTicket;
-        if (_renderTicket > 10000)
-            _renderTicket = 0;
-        renderer.renderTicket = _renderTicket;
+        renderer.setRenderTicket(_renderTicket);
 
         state.setBlending(THREE.NoBlending);
 
@@ -5406,6 +5417,10 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
 
         return _orderedRenderer.computeSelectionBBox();
     };
+
+    this.setRenderTicket = function (ticket) {        
+        objects.renderTicket = ticket;
+    };
 };
 
 
@@ -6117,11 +6132,8 @@ CLOUD.MiniMap = function (viewer, callback) {
 
     this.init = function (domContainer, width, height, styleOptions) {
 
-        //width = width || 320;
-        //height = height || 240;
-
-        width = width || 400;
-        height = height || 320;
+        width = width || 320;
+        height = height || 240;
 
         // 初始化绘图面板
         this.initCanvasContainer(domContainer, styleOptions);
@@ -6874,50 +6886,9 @@ CLOUD.MiniMap = function (viewer, callback) {
             this.setCameraInfo(newCameraPos, cameraScreenPosition);
         }
 
-        // 返回相机信息
-        //var isExistData = _isExistAxisGridData || _isExistFloorPlaneData;
-        //
-        //if (this.callbackFn && isExistData) {
-        //
-        //    var cameraWorldPos = new THREE.Vector3(projectedCameraPosition.x, projectedCameraPosition.y, _floorPlaneElevation);
-        //    // 获得离相机最近的交点
-        //    var intersection = this.computeMinDistanceIntersection(cameraScreenPosition);
-        //
-        //    if (intersection) {
-        //        // 计算轴信息
-        //        var interPoint = new THREE.Vector2(intersection.intersectionPoint.x, intersection.intersectionPoint.y);
-        //        screenToNormalizedPoint(interPoint);
-        //        normalizedPointToWorld(interPoint);
-        //
-        //        var offsetX = Math.round(projectedCameraPosition.x - interPoint.x);
-        //        var offsetY = Math.round(projectedCameraPosition.y - interPoint.y);
-        //        var axisInfoX = "X(" + intersection.abcName + "," + offsetX + ")";
-        //        var axisInfoY = "Y(" + intersection.numeralName + "," + offsetY + ")";
-        //
-        //        var jsonObj = {
-        //            position: cameraWorldPos,
-        //            axis: {
-        //                abcName: intersection.abcName,
-        //                numeralName: intersection.numeralName,
-        //                offsetX: offsetX,
-        //                offsetY: offsetY,
-        //                infoX: axisInfoX,
-        //                infoY: axisInfoY
-        //            }
-        //        };
-        //
-        //        //console.log(jsonObj.axis.infoX + "" + jsonObj.axis.infoY);
-        //
-        //        this.callbackFn(jsonObj);
-        //    }
-        //} else {
-        //    if (this.callbackFn) {
-        //        this.callbackFn(null);
-        //    }
-        //}
     };
 
-
+    // 返回相机信息
     this.setCameraInfo = function(cameraWorldPosition, cameraScreenPosition) {
         // 返回相机信息
         var isExistData = _isExistAxisGridData || _isExistFloorPlaneData;
@@ -7929,7 +7900,7 @@ CLOUD.MaterialUtil = {
 
     createHilightMaterial: function () {
 
-        return this.createPhongMaterial({ color: 0x0000ff, opacity: 0.8, transparent: true });
+        return this.createPhongMaterial({ color: 0x000088, opacity: 0.8, transparent: false });
     }
 };
 
@@ -11807,11 +11778,36 @@ CLOUD.Scene.prototype.selectByUserIds = function (ids) {
 
 CLOUD.Scene.prototype.setSelectedId = function (id) {
 
-    if (this.isEnableMultiSelect) {
-        this.selectedIds.push(id);
+    //if (this.isEnableMultiSelect) {
+    //    this.selectedIds.push(id);
+    //} else {
+    //    this.selectedIds = [];
+    //    this.selectedIds.push(id);
+    //}
+
+    // 如果之前选中，则取消选中
+    var idx = -1;
+
+    for(var i = 0, len = this.selectedIds.length; i < len; i++) {
+        if (id  === this.selectedIds[i]) {
+            idx = i;
+            break;
+        }
+    }
+
+    if (idx != -1) {
+
+        this.selectedIds.splice(idx, 1);
+        this.filter.resetSelectionBox();
+
     } else {
-        this.selectedIds = [];
-        this.selectedIds.push(id);
+
+        if (this.isEnableMultiSelect) {
+            this.selectedIds.push(id);
+        } else {
+            this.selectedIds = [];
+            this.selectedIds.push(id);
+        }
     }
 
     //// 如果之前选中，则取消选中
@@ -13034,7 +13030,6 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
         this.update();
     };
 
-
     function getAutoRotationAngle() {
         return 2 * Math.PI / 60 / 60 * scope.autoRotateSpeed;
     }
@@ -13138,6 +13133,7 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
         // 调用Render刷新
         onChange();
     };
+
     this.processRotate = function (delta) {
 
         var currentState = state; // 保持状态
@@ -13811,16 +13807,16 @@ CLOUD.PickEditor.prototype.onMouseUp = function (event) {
 
                     scope.onObjectSelected(intersect);
                 }
-                //else { // 再次选中相同id的对象，取消选中
-                //    if (userId !== "" ) {
-                //        scope.scene.setSelectedId(userId);
-                //        scope.scene.selectByUserIds(scope.scene.selectedIds);
-                //
-                //        cameraEditor.updateView();
-                //
-                //        scope.onObjectSelected(null);
-                //    }
-                //}
+                else { // 再次选中相同id的对象，取消选中
+                    if (userId !== "" ) {
+                        scope.scene.setSelectedId(userId);
+                        scope.scene.selectByUserIds(scope.scene.selectedIds);
+
+                        cameraEditor.updateView();
+
+                        scope.onObjectSelected(null);
+                    }
+                }
             }
         });
     }
@@ -14280,26 +14276,42 @@ CLOUD.FlyEditor = function (cameraEditor, scene, domElement) {
     this.scene = scene;
     this.domElement = (domElement !== undefined) ? domElement : document;
 
-    this.isFirstPerson = true;
-
     // API
     this.movementSpeed = 0.005 * CLOUD.GlobalData.SceneScale; // 前后左右上下移动速度
     this.movementSpeedMultiplier = 1; // 速度放大器
-    this.speedUpCoe = 0.1; // 放大因子
+    //this.speedUpCoe = 0.1; // 放大因子
     this.lookSpeed = 0.001; // 相机观察速度
     this.constrainPitch = true; // 是否限制仰角
-    this.pitchMin = -Math.PI * 0.25; // 仰角最小值
-    this.pitchMax = Math.PI * 0.25; // 仰角最大值
+    // 仰角范围[-85, 175]
+    this.pitchMin = THREE.Math.degToRad(5) - 0.5 * Math.PI; // 仰角最小值
+    this.pitchMax = 0.5 * Math.PI - this.pitchMin; // 仰角最大值
+
     this.pitchDeltaTotal = 0;
-    this.MoveDirection = {NONE:0,UP:0x0001, DOWN:0x0002, LEFT:0x0004, RIGHT:0x0008, FORWARD:0x0010, BACK:0x0020};
+    this.MoveDirection = {
+        NONE: 0,
+        UP: 0x0001,
+        DOWN: 0x0002,
+        LEFT: 0x0004,
+        RIGHT: 0x0008,
+        FORWARD: 0x0010,
+        BACK: 0x0020
+    };
+
     this.moveState = this.MoveDirection.NONE;
+
+    this.isFirstPerson = true; // 第一人称视角
+    this.deltaYaw = 0.0;
+    this.deltaPitch = 0.0;
 
     // 保存旋转点
     this.rotateStart = new THREE.Vector2();
     this.rotateEnd = new THREE.Vector2();
     this.rotateDelta = new THREE.Vector2();
 
+    this.clock = new THREE.Clock();
+
     var scope = this;
+
     this.ui = new CLOUD.FlyEditorUI(this.domElement, function (speedMultiplier) {
         scope.movementSpeedMultiplier = speedMultiplier;
     });
@@ -14308,12 +14320,20 @@ CLOUD.FlyEditor = function (cameraEditor, scene, domElement) {
 };
 
 CLOUD.FlyEditor.prototype = {
+    constructor: CLOUD.FlyEditor,
     handleEvent: function (event) {
         if (typeof this[event.type] == 'function') {
             this[event.type](event);
         }
     },
+    activate: function () {
+        this.clock.start();
+    },
+    deactivate: function () {
+        this.clock.stop();
+    },
     onExistEditor: function () {
+        this.deactivate();
         this.ui.showControlPanel(false);
     },
     onKeyDown: function (event) {
@@ -14325,25 +14345,25 @@ CLOUD.FlyEditor.prototype = {
         switch (event.keyCode) {
             case 38: /*up - 前进*/
             case 87: /*W - 前进*/
-                moveDirection= this.MoveDirection.FORWARD;
+                moveDirection = this.MoveDirection.FORWARD;
                 break;
             case 40: /*down - 后退 */
             case 83: /*S - 后退*/
-                moveDirection= this.MoveDirection.BACK;
+                moveDirection = this.MoveDirection.BACK;
                 break;
             case 37: /*left - 左移 */
             case 65: /*A - 左移*/
-                moveDirection= this.MoveDirection.LEFT;
+                moveDirection = this.MoveDirection.LEFT;
                 break;
             case 39: /*right - 右移*/
             case 68: /*D - 右移*/
-                moveDirection= this.MoveDirection.RIGHT;
+                moveDirection = this.MoveDirection.RIGHT;
                 break;
             case 81: /*Q - 上移*/
-                moveDirection= this.MoveDirection.UP;
+                moveDirection = this.MoveDirection.UP;
                 break;
             case 69: /*E - 下移*/
-                moveDirection= this.MoveDirection.DOWN;
+                moveDirection = this.MoveDirection.DOWN;
                 break;
             default:
                 needUpdateUI = true;
@@ -14353,7 +14373,7 @@ CLOUD.FlyEditor.prototype = {
             this.ui.onKeyDown(moveDirection, this.MoveDirection);
         }
 
-        this.update(1);
+        this.update();
     },
 
     onKeyUp: function (event) {
@@ -14361,28 +14381,28 @@ CLOUD.FlyEditor.prototype = {
         switch (event.keyCode) {
             case 38: /*up - 前进*/
             case 87: /*W - 前进 */
-                moveDirection  = this.MoveDirection.FORWARD;
+                moveDirection = this.MoveDirection.FORWARD;
                 break;
             case 40: /*down - 后退 */
             case 83: /*S - 后退 */
-                moveDirection  = this.MoveDirection.BACK;
+                moveDirection = this.MoveDirection.BACK;
                 break;
             case 37: /*left - 左移 */
             case 65: /*A - 左移 */
-                moveDirection  = this.MoveDirection.LEFT;
+                moveDirection = this.MoveDirection.LEFT;
                 break;
             case 39: /*right - 右移*/
             case 68: /*D - 右移 */
-                moveDirection  = this.MoveDirection.RIGHT;
+                moveDirection = this.MoveDirection.RIGHT;
                 break;
             case 81: /*Q - 上移 */
-                moveDirection  = this.MoveDirection.UP;
+                moveDirection = this.MoveDirection.UP;
                 break;
             case 69: /*E - 下移 */
                 moveDirection = this.MoveDirection.DOWN;
                 break;
         }
-        
+
         if (moveDirection !== this.MoveDirection.NONE) {
             this.ui.onKeyUp(moveDirection, this.MoveDirection);
             this.moveState &= ~moveDirection
@@ -14404,39 +14424,29 @@ CLOUD.FlyEditor.prototype = {
     },
 
     onMouseMove: function (event) {
+
         this.rotateEnd.set(event.clientX, event.clientY);
         this.rotateDelta.subVectors(this.rotateEnd, this.rotateStart);
         this.rotateStart.copy(this.rotateEnd);
 
-        var turnAngle = this.rotateDelta.x * this.lookSpeed;
-        var pitchAngle = -this.rotateDelta.y * this.lookSpeed;
+        if (this.rotateDelta.x != 0 || this.rotateDelta.y != 0) {
 
-        // 记录总仰角
-        this.pitchDeltaTotal += pitchAngle;
+            this.deltaYaw += this.rotateDelta.x * this.lookSpeed;
+            this.deltaPitch += this.rotateDelta.y * this.lookSpeed;
 
-        // 左右旋转
-        this.goTurn(turnAngle);
-
-        // 俯仰
-        if (this.constrainPitch) {
-            if (this.pitchDeltaTotal < this.pitchMax && this.pitchDeltaTotal > this.pitchMin) {
-                this.goPitch(pitchAngle);
-            }
-        } else {
-            this.goPitch(pitchAngle);
+            this.update();
         }
-
-        // 钳制总仰角
-        this.pitchDeltaTotal = THREE.Math.clamp(this.pitchDeltaTotal, this.pitchMin, this.pitchMax);
-
-        this.update(1)
     },
 
     onMouseUp: function (event) {
         event.preventDefault();
         event.stopPropagation();
 
-        this.update(1);
+        this.rotateDelta.set(0, 0);
+        this.deltaYaw = 0;
+        this.deltaPitch = 0;
+
+        this.update();
         return true;
     },
 
@@ -14446,13 +14456,29 @@ CLOUD.FlyEditor.prototype = {
         var delta = 0 || event.wheelDelta || event.detail;
         delta = (Math.abs(delta) > 10 ? delta : -delta * 40);
         this.movementSpeedMultiplier = this.ui.changeMoveSpeed(delta, this.movementSpeedMultiplier);
-        
     },
 
-    update: function (delta) {
+    update: function () {
+
+        //var delta = 1;
+        var delta = this.clock.getDelta();
+
+        //console.log("delta", delta);
+
+        if (delta > 1) {
+            delta = 1;
+            this.clock.stop();
+            this.clock.start();
+        }
+
         //var moveMultiplier = this.movementSpeedMultiplier * this.speedUpCoe; // 将增速率限制在[0.1, 10]内
-        var moveMultiplier = 6; // 将增速率限制在[0.1, 10]内
+        var moveMultiplier = 100;
         var moveStep = delta * this.movementSpeed * moveMultiplier;
+
+        var camera = this.cameraEditor.object;
+        var position = camera.position;
+        var target = this.cameraEditor.target;
+        var eye = target.clone().sub(position);
 
         // 前进
         if (this.moveState & this.MoveDirection.FORWARD) {
@@ -14460,7 +14486,7 @@ CLOUD.FlyEditor.prototype = {
         }
 
         // 后退
-        if (this.moveState  & this.MoveDirection.BACK) {
+        if (this.moveState & this.MoveDirection.BACK) {
             this.goBack(moveStep);
         }
 
@@ -14484,20 +14510,76 @@ CLOUD.FlyEditor.prototype = {
             this.goDown(moveStep);
         }
 
+        if (this.isFirstPerson) {
+
+            var worldUp = new THREE.Vector3(0, 1, 0);
+            var upDir = camera.realUp || camera.up;
+            var rightDir = eye.clone().cross(upDir).normalize();
+
+            if (this.deltaPitch != 0) {
+                var pitchTransform = new THREE.Quaternion().setFromAxisAngle(rightDir, -this.deltaPitch);
+                var tmp = eye.clone();
+
+                tmp.applyQuaternion(pitchTransform);
+
+                var angle = tmp.angleTo(worldUp);
+                // 钳制到[-PI/2, PI/2]
+                angle = angle - 0.5 * Math.PI;
+
+                // 限制角度
+                if (angle >= this.pitchMin && angle <= this.pitchMax) {
+                    eye.applyQuaternion(pitchTransform);
+                }
+
+                this.deltaPitch = 0.0;
+            }
+
+            if (this.deltaYaw != 0) {
+                var yawTransform = new THREE.Quaternion().setFromAxisAngle(worldUp, -this.deltaYaw);
+
+                eye.applyQuaternion(yawTransform);
+                this.deltaYaw = 0.0;
+            }
+
+            target.addVectors(position, eye);
+        } else {
+            // 记录总仰角
+            this.pitchDeltaTotal += this.deltaPitch;
+
+            console.log(this.pitchDeltaTotal);
+
+            // 左右旋转
+            this.goTurn(this.deltaYaw);
+            this.deltaYaw = 0.0;
+
+            // 俯仰
+            if (this.constrainPitch) {
+                if (this.pitchDeltaTotal < this.pitchMax && this.pitchDeltaTotal > this.pitchMin) {
+                    this.goPitch(-this.deltaPitch);
+                    this.deltaPitch = 0.0;
+                }
+            } else {
+                this.goPitch(-this.deltaPitch);
+                this.deltaPitch = 0.0;
+            }
+
+            // 钳制总仰角
+            this.pitchDeltaTotal = THREE.Math.clamp(this.pitchDeltaTotal, this.pitchMin, this.pitchMax);
+        }
+
         // 刷新
         this.cameraEditor.flyOnWorld();
     },
 
     // 前进
     goForward: function (step) {
-        var position = this.cameraEditor.object.position;
-        var target = this.cameraEditor.target;
 
         if (this.isFirstPerson) {
-            var eye = target.clone().sub(position);
-            this.cameraEditor.object.translateZ( - step );
-            target.addVectors(position, eye);
+            this.cameraEditor.object.translateZ(-step);
         } else {
+
+            var position = this.cameraEditor.object.position;
+            var target = this.cameraEditor.target;
             // 新的target和eye在Y轴上的坐标不变
             var diff = new THREE.Vector3(target.x - position.x, 0, target.z - position.z);
             var len = diff.length();
@@ -14507,19 +14589,19 @@ CLOUD.FlyEditor.prototype = {
             position.add(stepDiff);
             target.add(stepDiff);
         }
-
     },
 
     // 后退
     goBack: function (step) {
-        var position = this.cameraEditor.object.position;
-        var target = this.cameraEditor.target;
 
         if (this.isFirstPerson) {
-            var eye = target.clone().sub(position);
-            this.cameraEditor.object.translateZ( step );
-            target.addVectors(position, eye);
+
+            this.cameraEditor.object.translateZ(step);
+
         } else {
+
+            var position = this.cameraEditor.object.position;
+            var target = this.cameraEditor.target;
 
             // 新的target和eye在Y轴上的坐标不变
             var diff = new THREE.Vector3(target.x - position.x, 0, target.z - position.z);
@@ -14534,14 +14616,15 @@ CLOUD.FlyEditor.prototype = {
 
     // 左移
     goLeft: function (step) {
-        var position = this.cameraEditor.object.position;
-        var target = this.cameraEditor.target;
 
         if (this.isFirstPerson) {
-            var eye = target.clone().sub(position);
-            this.cameraEditor.object.translateX( - step );
-            target.addVectors(position, eye);
+
+            this.cameraEditor.object.translateX(-step);
+
         } else {
+
+            var position = this.cameraEditor.object.position;
+            var target = this.cameraEditor.target;
 
             // 新的target和eye在Y轴上的坐标不变
             var diff = new THREE.Vector3(target.x - position.x, 0, target.z - position.z);
@@ -14556,14 +14639,16 @@ CLOUD.FlyEditor.prototype = {
 
     // 右移
     goRight: function (step) {
-        var position = this.cameraEditor.object.position;
-        var target = this.cameraEditor.target;
+
 
         if (this.isFirstPerson) {
-            var eye = target.clone().sub(position);
-            this.cameraEditor.object.translateX( step );
-            target.addVectors(position, eye);
+
+            this.cameraEditor.object.translateX(step);
+
         } else {
+
+            var position = this.cameraEditor.object.position;
+            var target = this.cameraEditor.target;
 
             // 新的target和eye在Y轴上的坐标不变
             var diff = new THREE.Vector3(target.x - position.x, 0, target.z - position.z);
@@ -14578,14 +14663,16 @@ CLOUD.FlyEditor.prototype = {
 
     // 上移
     goUp: function (step) {
-        var position = this.cameraEditor.object.position;
-        var target = this.cameraEditor.target;
+
 
         if (this.isFirstPerson) {
-            var eye = target.clone().sub(position);
-            this.cameraEditor.object.translateY( step );
-            target.addVectors(position, eye);
+
+            this.cameraEditor.object.translateY(step);
+
         } else {
+
+            var position = this.cameraEditor.object.position;
+            var target = this.cameraEditor.target;
 
             // target和eye的Y轴上的坐标增加step
             position.y += step;
@@ -14595,14 +14682,15 @@ CLOUD.FlyEditor.prototype = {
 
     // 下移
     goDown: function (step) {
-        var position = this.cameraEditor.object.position;
-        var target = this.cameraEditor.target;
 
         if (this.isFirstPerson) {
-            var eye = target.clone().sub(position);
-            this.cameraEditor.object.translateY( - step );
-            target.addVectors(position, eye);
+
+            this.cameraEditor.object.translateY(-step);
+
         } else {
+
+            var position = this.cameraEditor.object.position;
+            var target = this.cameraEditor.target;
 
             position.y -= step;
             target.y -= step;
@@ -14642,7 +14730,7 @@ CLOUD.FlyEditor.prototype = {
         target.z = position.z + percent * offsetZ;
     },
 
-    resize: function() {
+    resize: function () {
         this.ui.resize();
     },
     setCrossVisible: function (visible) {
@@ -14657,7 +14745,7 @@ CLOUD.FlyEditor.prototype = {
     showControlPanel: function (isShow) {
         this.ui.showControlPanel(isShow);
     }
-}
+};
 
 
 CLOUD.ClipEditor = function (object, scene, domElement) {
@@ -21381,6 +21469,8 @@ CLOUD.EditorManager.prototype = {
 
         this.flyEditor.showControlPanel(bShowControlPanel);
 
+        this.flyEditor.activate();
+
         scope.setEditor(this.flyEditor);
 
         // 进入fly模式，视图设置为ISO
@@ -21494,6 +21584,9 @@ CloudViewer = function () {
     this.domElement = null;
     this.camera = null;
     this.renderer = null;
+
+    this.requestRenderCount = 0;
+    this.rendering = false;
 
     this.incrementRenderEnabled = true; // 启用增量绘制
     this.updateRenderListEnabled = true; // 是否启用渲染队列更新
@@ -21659,6 +21752,10 @@ CloudViewer.prototype = {
     },
 
     render: function () {
+        ++this.requestRenderCount;
+        if (this.requestRenderCount > 10000)
+            this.requestRenderCount = 0;
+            
 
         var scope = this;
         var camera = this.camera;
@@ -21684,21 +21781,31 @@ CloudViewer.prototype = {
         // 设置过滤对象
         scope.renderer.setFilterObject(scene.filter);
 
-        function incrementRender() {
+        if (this.rendering) {
+            return;
+        }
+        this.rendering = true;
 
-            scope.handleId = requestAnimationFrame(incrementRender);
+        function incrementRender(callId) {
+           
+            var renderId = callId;
 
-            var isRenderFinish = scope.renderer.IncrementRender(scene, camera);
+            return function () {
 
-            if (isRenderFinish) {
-                cancelAnimationFrame(scope.handleId);
+                var isRenderFinish = scope.renderer.IncrementRender(scene, camera);
+
+                if (!isRenderFinish && renderId == scope.requestRenderCount) {
+
+                    scope.renderer.autoClear = false;
+                    requestAnimationFrame(incrementRender(renderId));    
+                }
+                else {
+                    scope.rendering = false;
+
+                    if (renderId != scope.requestRenderCount)
+                        scope.render();
+                }
             }
-
-            //var isRenderFinish = scope.renderer.IncrementRender(scene, camera);
-            //
-            //if (!isRenderFinish) {
-            //    requestAnimationFrame(incrementRender);
-            //}
         }
 
         // 增量绘制
@@ -21706,13 +21813,13 @@ CloudViewer.prototype = {
 
             // 第一次需要清屏
             scope.renderer.autoClear = true;
-            incrementRender();
-            scope.renderer.autoClear = false;
-
+            requestAnimationFrame(incrementRender(scope.requestRenderCount));
+            
         } else { // 正常绘制
 
             scope.renderer.autoClear = true;
             scope.renderer.render(scene, camera);
+            scope.rendering = false;
         }
 
         this.renderViewHouse();
@@ -21813,6 +21920,7 @@ CloudViewer.prototype = {
         // Renderer
         this.renderer = new THREE.WebGLIncrementRenderer({antialias: true, alpha: true, preserveDrawingBuffer: true});
         var renderer = this.renderer;
+        renderer.setRenderTicket(0);
 
         renderer.setClearColor(0x000000, 0);
         renderer.setPixelRatio(window.devicePixelRatio);
