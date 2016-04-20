@@ -1,5 +1,5 @@
 /*
- * @require  /service/js/view/mem/service.MemCtrl.ozDetail.js
+ * @require  /service/js/view/mem/service.MemCtrlChildList.js
  * */
 var App = App || {};
 App.Service.MemCtrl=Backbone.View.extend({
@@ -23,19 +23,45 @@ App.Service.MemCtrl=Backbone.View.extend({
 
     //外部用户
     outer:function(){
-        //清空右面视图
-        //reset数据
-        //App.Service.memCtrlBlend.collection.reset();
-        //获取 人员数据，如果无人员return，添加到collection，设置类型为员工
-        //获取 组织数据，如果无组织return，添加到collection，设置类型为组织
-        App.Comm.ajax({urlType:"fetchServiceMCBlendList",outer:true},function(response){
-
-            console.log(response);
-        });
-        //App.Service.memCtrlBlend.loadData(App.Service.memCtrlBlend.collection,{outer:true})
+        this.loadData(true,"outer");
     },
     //内部用户
     inner:function(){
-        //App.Service.memCtrlBlend.loadData(App.Service.memCtrlBlend.collection,{outer:false})
+        this.loadData(false,"inner");
+    },
+
+
+    loadData:function(options,self){
+        var dataObj = {
+            URLtype: "fetchServiceMCBlendList",
+            data: {
+                outer: options,//是否外部
+                parentId: ""//父项ID
+            }
+        };
+        App.Service.memCtrlBlend.collection.reset();
+        //设置类型为员工
+        //设置类型为组织
+        App.Comm.ajax(dataObj,function(response){
+            if(response.message == "success") {
+                $("#blendList").empty();
+                //reset数据
+                if (response.data.user.length) {
+                    App.Service.memCtrlBlend.collection.add(response.data.user);//员工
+                }
+                if (response.data.org.length) {
+                    //样式处理
+                    this.$("div").remove("active");
+                    $("." + self).addClass("active");
+                    $(".serviceOgList span").removeClass("active");//唯一选项
+                    $("." + self + " > span").addClass("active");//选中状态
+                    //状态清空
+                    this.$(".childOz").empty();
+                    //数据和渲染
+                    App.Service.memCtrlBlend.collection.add(response.data.org);//组织
+                    this.$("." + self +"+ .childOz").html(new App.Service.MemCtrlChildList(response.data.org).render().el);
+                }
+            }
+        });
     }
 });

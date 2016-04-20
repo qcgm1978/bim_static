@@ -62,23 +62,15 @@ App.Service.memCtrlBlend ={
         });
     },*/
 
-    outerCollection:new(Backbone.Collection.extend({
+    outerCollection:Backbone.Collection.extend({
         model: Backbone.Model.extend({
             defaults: function() {
                 return {
                     url: ''
                 }
             }
-        }),
-        urlType: "fetchServiceMCBlendList",
-
-
-        parse: function (response) {
-            if (response.message == "success") {
-                return response.data.org;
-            }
-        }
-    })),
+        })
+    }),
 
 
 
@@ -92,7 +84,6 @@ App.Service.memCtrlBlend ={
             data:data,
                 //https://bim.wanda.cn/platform/auth/org?outer={outer}&parentId={parentId}&includeUsers={includeUsers}
             success: function(collection, response, options) {
-                console.log(response);
             }
         });
     },

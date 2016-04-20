@@ -32,7 +32,7 @@ App.Service.windowRole=Backbone.View.extend({
 
     //提交表单，完毕会触发重新获取列表，列表为memBlend所属列表
     serviceSubmit:function(){
-
+        $("#mask").hide().empty();//外层
 
         //获取选中的功能，将功能id加入数组
         //选中时将数组写入functionId

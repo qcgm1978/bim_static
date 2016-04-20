@@ -20,7 +20,7 @@ App.BodyContent.control= {
         this.loadData(this.monthStartCollection);
         this.loadData(this.proCollection);
 
-        slide.initialize({element:".imgContainer", slideTime : 5000, tagTime : 500});
+        slide.initialize({element:".imgContainer", slideTime : 4000, tagTime : 500});
 
 
         $(".conMonth .conHeader span").on("click",function(){
@@ -95,6 +95,7 @@ App.BodyContent.control= {
                 if(collection ==App.BodyContent.control.slideCollection){
                     slide.count(response.data.length);
                     slide.length = response.data.length;
+                    slide.windowFront();
                     slide.play();
                 }
             }

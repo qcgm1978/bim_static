@@ -20,7 +20,7 @@ App.Service.role ={
         }
     })),
 
-    loadData : function() {
+    loadData : function(func) {
         //数据重置
         App.Service.role.collection.reset();
         // load list
@@ -28,7 +28,9 @@ App.Service.role ={
             data: {
             },
             success: function(collection, response, options) {
-
+                if(func && typeof  func == "function"){
+                    func();
+                }
             }
         });
     },

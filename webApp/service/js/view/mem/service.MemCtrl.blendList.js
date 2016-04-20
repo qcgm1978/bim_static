@@ -21,6 +21,7 @@ App.Service.MemCtrlBlendList=Backbone.View.extend({
 
     initialize:function(){
        this.listenTo(App.Service.memCtrlBlend.collection,"add",this.addOne);
+       this.listenTo(App.Service.memCtrlBlend.collection,"reset",this.render);
         //$el为包含模板的元素，el为元素节点
     },
     //数据加载
@@ -48,7 +49,8 @@ App.Service.MemCtrlBlendList=Backbone.View.extend({
     batchAward:function(){
         $("#mask").empty();
         App.Service.window.init();
-        $(".serviceWindow").append(new App.Service.windowMem().render().$el);//外框
+        console.log(new App.Service.windowMem().render().el);
+        $(".serviceWindow").append(new App.Service.windowMem().render().el);//外框
         $(".serviceWindow h1").html("角色授权");
 
         //已选列表

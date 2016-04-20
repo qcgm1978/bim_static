@@ -130,6 +130,7 @@ App.API = {
 
 		//console
 		fetchServiceMCBlendList:'/dataJson/service/service.Mem.blendList.json',//组织-混合列表
+		fetchServiceMCBlendListMn:'/dataJson/service/service.Mem.blendList_mn.json',//组织-混合列表
 		fetchServiceRolesList:'/dataJson/service/service.Mem.rolesList.json',//角色-功能列表
 		fetchServiceFunList: '/dataJson/service/service.fun.list.json',//功能列表
 

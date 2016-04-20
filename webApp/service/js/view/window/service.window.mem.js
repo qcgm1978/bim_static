@@ -6,9 +6,9 @@ App.Service.windowMem=Backbone.View.extend({
 
     tagName:"div",
 
-    className:"con",
+    className:"seWinBody",
 
-    template:_.templateUrl("/service/tpls/window/service.window.mem.html",true),
+    template:_.templateUrl("/service/tpls/window/service.window.mem.html"),
 
     events:{
         "click .ServiceSubmit":"serviceSubmit"
@@ -20,6 +20,7 @@ App.Service.windowMem=Backbone.View.extend({
 
     //提交表单，完毕会触发重新获取列表，列表为memBlend所属列表
     serviceSubmit:function(){
+        $("#mask").hide().empty();//外层
         //需要获取的数据
         //已选成员
         //已选角色
