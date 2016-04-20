@@ -229,7 +229,7 @@
                     if (!options.canUploadFile()) {
                         alert("请选择要上传的文件夹");
                         return false;
-                    }
+                    } 
                     App.isUploading = true;
                    
                     if (!e.originalEvent.dataTransfer) return
