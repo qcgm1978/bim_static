@@ -1,0 +1,30 @@
+{
+  "code": 0,
+  "message": "success",
+  "data": [
+    {
+      "roleId": 1,
+      "name": "测试角色1",
+      "inherit": false,
+      "functions": null
+    },
+    {
+      "roleId": 2,
+      "name": "测试角色2",
+      "inherit": false,
+      "functions": null
+    },
+    {
+      "roleId": 3,
+      "name": "测试角色3",
+      "inherit": false,
+      "functions": null
+    },
+    {
+      "roleId": 4,
+      "name": "测试角色4",
+      "inherit": false,
+      "functions": null
+    }
+  ]
+}

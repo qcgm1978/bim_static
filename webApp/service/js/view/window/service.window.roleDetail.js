@@ -16,24 +16,23 @@ App.Service.window.roleDetail=Backbone.View.extend({
     },
     initialize:function(){
         this.listenTo(this.model,"change:checked",this.checked);
-        this.checked();
     },
 
     //加载判断
     checked:function(){
         if(this.model.get("checked")){
-            this.$(".memCheck").addClass("checked");
+            this.$el.addClass("active");
         }
     },
     //点选
     memCheck:function(){
-        var checkEle = this.$(".memCheck");
-        if(checkEle.hasClass("checked")){
-            checkEle.removeClass("checked");
-            this.model.unset("checked");
-        }else{
-            checkEle.addClass("checked");
+        var checkEle = this.model.get("checked");
+        if(!checkEle){
+            this.$el.addClass("active");
             this.model.set({"checked":true});
+        }else{
+            this.$el.removeClass("active");
+            this.model.unset("checked");
         }
     }
 });

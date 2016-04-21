@@ -1,14 +1,12 @@
 /*
  * @require  /service/js/view//window/service.window.roleDetail.js
  */
-
 var App = App || {};
 App.Service.windowRoleList=Backbone.View.extend({
 
     tagName:"ul",
 
     events:{
-        "click .newRole": "createRole"
     },
 
     template:_.templateUrl("/service/tpls/window/service.window.roleList.html"),
@@ -22,11 +20,6 @@ App.Service.windowRoleList=Backbone.View.extend({
     addOne:function(model){
         var newView = new App.Service.window.roleDetail({model:model});
         this.$el.append(newView.render().el);
-    },
-
-    //选择事件
-    createRole:function(){
-
     },
 
     //排序

@@ -74,25 +74,24 @@ ul,li{list-style: none outside none;}
 .serviceWindow h1{height: 50px;line-height: 49px;border-bottom: 1px solid #e6e6e6;font-size: 16px;padding-left: 24px;color: #333333;}
 .serviceWindow h2{height: 45px;line-height: 45px;font-size: 14px;padding: 0 10px;}
 .serviceWindow h2 span{color: #9f9f9f;}
-.serviceWindow .title{font-size: 12px;color: #9f9f9f;line-height: 23px;}
-.serviceWindow .name{float: left;width: 175px;}
+.serviceWindow .title{font-size: 12px;color: #9f9f9f;line-height: 23px;height: 24px;}
+.serviceWindow .name,.serviceWindow .funName{float: left;width: 175px;}
 .serviceWindow li{padding: 0 10px;line-height: 30px;border-bottom: 1px solid #cccccc;height: 30px;}
 .serviceWindow .aim,.serviceWindow .memRoleList,.serviceWindow .func{padding: 8px 20px 0 20px;}
 .serviceWindow ul{border:1px solid #cccccc;  height: 150px;overflow: auto;}
 .serviceSubmit {position: absolute;right: 20px;bottom: 20px;background-color: #0572d0;color: #ffffff;width: 80px;height: 30px;line-height: 30px;text-align: center;cursor: pointer;}
 .serviceSubmit:hover{background-color: #1584e3;}
 .serviceWindow .func ul{height: 260px;}
-.serviceWindow .func li.active{background-color: #a8dbfd;}
+.serviceWindow .func li.active,.memRoleList li.active{background-color: #a8dbfd;}
 .serviceWindow .func li .name span{position: relative;padding-left: 20px;margin-left: 8px;}
 .serviceWindow .func li .name span:before{content: "";position: absolute;width: 11px;height: 11px;left: 0;top: 3px;background: transparent url("../images/service_ico.png") 0 -200px no-repeat;}
-.serviceWindow .func li input{vertical-align: middle;margin-right: 8px;.serviceInput}
-.serviceWindow .func li input:checked{background-position: 0 -420px}
+
 .serviceWindow .aim input{height: 30px;width: 100%;color: #cccccc;outline: none;border: 1px solid #cccccc;padding: 0 8px;line-height: 30px;}
 .serviceWindow .aim input:focus{color: #333333;}
 .serviceWindow .aim .name i{display: inline-block;width: 16px;height: 16px;line-height: 0;background: transparent url("../images/service_ico.png") 0 -20px no-repeat;background-size: 20px auto;vertical-align: middle;margin: 0 6px 0 5px;}
 .serviceWindow .aim .name i.oz{background-position: 0 0;}
 
 .memCheck{display: inline-block;.serviceInput;}
-.memCheck.checked{background-position: 0 -420px;}
+.active .memCheck{background-position: 0 -420px;}
 /*提示信息*/
 .serviceAlert{position: absolute;width: 280px;height: 180px;background-color: #ffffff;}

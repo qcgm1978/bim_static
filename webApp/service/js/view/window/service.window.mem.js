@@ -11,7 +11,7 @@ App.Service.windowMem=Backbone.View.extend({
     template:_.templateUrl("/service/tpls/window/service.window.mem.html"),
 
     events:{
-        "click .ServiceSubmit":"serviceSubmit"
+        "click .serviceSubmit":"serviceSubmit"
     },
     render:function(){
         this.$el.html(this.template);

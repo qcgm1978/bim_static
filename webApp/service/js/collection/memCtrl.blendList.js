@@ -1,5 +1,5 @@
 /*
-* @require  /service/js/view/mem/Service.MemCtrl.ozList.js
+* @require  /service/js/view/mem/service.memCtrl.blendList.js
 * */
 var App = App || {};
 //组织部分
