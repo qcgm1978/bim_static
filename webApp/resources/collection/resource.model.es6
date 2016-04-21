@@ -133,8 +133,11 @@ App.ResourceModel = {
 			}
 
 			//面包屑 切换 文件 模型 浏览器 
-			if ($target.closest(".breadItem.projectVersion").length <= 0) {
-				$(".breadItem .projectVersionList").hide();
+			if ($target.closest(".breadItem.resourcesList").length <= 0) {
+				$(".breadItem.resourcesList .projectVersionList").hide();
+			}
+			if ($target.closest(".breadItem.standardLibsVersion ").length <= 0) {
+				$(".breadItem.standardLibsVersion  .projectVersionList").hide();
 			}
 		});
 

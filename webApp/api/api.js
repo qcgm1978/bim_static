@@ -4,7 +4,7 @@ App.API = {
 
 	Settings: {
 		hostname: "http://bim.wanda-dev.cn/",
-		debug: true
+		debug: false
 	},
 
 	URL: {
@@ -110,6 +110,7 @@ App.API = {
 
 		//资源
 		fetchStandardLibs: "platform/project?type=1", //获取 标准模型库
+		fetchStandardVersion:"platform/project/{projectId}/version", //获取标准模型库版本
 		fetchFamLibs: "platform/project?type=2", //获取族库
 		fetchVersion: "platform/project/{projectId}/version/{versionId}",
 		fetchFileTree: "doc/{projectId}/{projectVersionId}/file/tree", //项目设计文件导航
