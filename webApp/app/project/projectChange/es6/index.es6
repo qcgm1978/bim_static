@@ -89,9 +89,7 @@ App.Index = {
 		})
 
 		//列表点击
-		$projectContainer.on("click", ".designChange .itemContent", function() {
-
-
+		$projectContainer.on("click", ".designChange .itemContent", function() { 
 
 			$(this).toggleClass("selected");
 
@@ -140,14 +138,14 @@ App.Index = {
 
 
 	//获取模型id 渲染模型
-	getModelId(alterationVersionId, callback) {
+	getModelId(differFileVersionId, callback) {
 
 		var dataObj = {
 			URLtype: "fetchFileModelIdByFileVersionId",
 			data: {
 				projectId: App.Index.Settings.projectId,
 				projectVersionId: App.Index.Settings.projectVersionId,
-				fileVersionId: 811409467293920 || alterationVersionId
+				fileVersionId: differFileVersionId
 			}
 		}
 
@@ -156,12 +154,12 @@ App.Index = {
 	},
 
 	//渲染模型
-	renderModel(alterationVersionId) {
+	renderModel(differFileVersionId) {
 
 
 		var that = this;
 		App.Index.Settings.Viewer = null;
-		this.getModelId(alterationVersionId, function(data) {
+		this.getModelId(differFileVersionId, function(data) {
 
 			if (data.message != "success") {
 				alert("转换失败");
@@ -312,13 +310,13 @@ App.Index = {
 
 			});
 
-			var firstData = lists[0].data[0];
+			var firstData = lists[0].data[0]; 
 
 			//渲染模型
-			that.renderModel(firstData.alterationVersionId);
+			that.renderModel(firstData.differFileVersionId);
 
 			//变更获取
-			that.fetchChangeList(firstData.baseFileVersionId, firstData.alterationVersionId);
+			that.fetchChangeList(firstData.baseFileVersionId, firstData.differFileVersionId);
 
 			var template = _.templateUrl("/app/project/projectChange/tpls/fileList.html");
 
@@ -333,8 +331,10 @@ App.Index = {
 					var groupText = $item.closest(".groups").prev().text() + "：";
 					$(".specialitiesOption .myDropText span:first").text(groupText);
 					var baseFileVersionId = $item.data("basefileversionid"),
-						alterationVersionId = $item.data("alterationversionid");
-					that.fetchChangeList(baseFileVersionId, alterationVersionId);
+						differFileVersionId = $item.data("differfileversionid");
+						 
+					that.renderModel(differFileVersionId);
+					that.fetchChangeList(baseFileVersionId, differFileVersionId);
 
 				}
 			});
@@ -344,7 +344,7 @@ App.Index = {
 	},
 
 	//获取更改清单
-	fetchChangeList: function(baseFileVersionId, alterationVersionId) {
+	fetchChangeList: function(baseFileVersionId, differFileVersionId) {
 
 		App.Collections.changeListCollection.projectId = App.Index.Settings.projectId;
 		App.Collections.changeListCollection.projectVersionId = App.Index.Settings.projectVersionId;
@@ -353,7 +353,7 @@ App.Index = {
 		App.Collections.changeListCollection.fetch({
 			data: {
 				baseFileVerionId: baseFileVersionId,
-				fileVerionId: alterationVersionId
+				fileVerionId: differFileVersionId
 			}
 		});
 

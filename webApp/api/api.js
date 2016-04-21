@@ -89,8 +89,8 @@ App.API = {
 
 		fetchPlanProperties: "", //属性
 
-		//陈本
-		fetchCostReference: "sixD/{projectId}/{projectVersionId}/cost/summary", // 清单
+		//陈本 
+		fetchCostReference: "sixD/{projectId}/{projectVersionId}/cost/summary", // 清单 
 		fetchCostChange: "platform/auditSheet?type=9", // 变更
 		fetchCostVerification: "sixD/{projectId}/{projectVersionId}/cost/summary?noElement=true", // 效验
 		fetchCostVerificationCate: "sixD/{projectId}/{projectVersionId}/cost/nocost/cate", // 效验 图元未关联清单 类型
@@ -119,7 +119,8 @@ App.API = {
 		createNewFolder: "doc/{projectId}/{projectVersionId}/file", // 创建新文件夹 ?parentId={parentId}&filePath={filePath}
 
 		//项目 变更 列表
-		fileList:"/dataJson/project/projectChange/changeFile.json", //doc/internal/{projectId}/{versionId}/alteration
+		fileList:"doc/internal/{projectId}/{versionId}/differ", //变更列表
+		fileListTest:"/dataJson/project/projectChange/changeFile.json", //doc/internal/{projectId}/{versionId}/alteration
 		projectDesinProperties:"/dataJson/project/projectChange/comparisonAttr.json",//sixD/{projectId}/{projectVersionId}/property/comparison //?baseProjectVerionId={baseProjectVerionId}&sceneId={sceneId}&elementId={elementId}
 		projectChangeList:"sixD/{projectId}/{projectVersionId}/cost/comparison",// ?fileVerionId={fileVerionId}&baseFileVerionId={baseFileVerionId}
 		projectChangeListTest:"/dataJson/project/projectChange/list.json",
