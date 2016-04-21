@@ -482,20 +482,8 @@ var dwgViewer = function(options){
       var self = this
       var offsetX = evt.offsetX
       var offsetY = evt.offsetY
-
-      if (evt.deltaY > 0) {
-        //放大
-        self.zoomIn({
-          left: offsetX,
-          top: offsetY
-        })
-      } else {
-        //缩小
-        self.zoomOut({
-          left: offsetX,
-          top: offsetY
-        })
-      }
+      var scale = self.__zoomScale;
+      self.zoom(scale + evt.deltaY);
     },
 
     /**
