@@ -1,22 +1,30 @@
 /*
- * @require  /service/js/collection/model.js
+ * @require  /service/js/view/mem/service.MemCtrl.ozDetail.js
  * */
 var App = App || {};
 App.Service.MemCtrlChildList=Backbone.View.extend({
 
-    tagName :'div',
+    tagName :'ul',
 
     template:_.templateUrl("/service/tpls/mem/service.memCtrl.oz.childList.html"),
     events:{
+
     },
 
     render:function(){
-        this.$el.html(this.template);
+        this.collection.each(function(item){
+            this.renderOg(item);
+        },this);
         return this;
     },
 
-    initialize:function(){
-        //默认根据角色权限加载  adm用户加载全部，keyMem用户只显示项目管理
+    renderOg :function(item){
+        var view = new App.Service.MemCtrlozDetail({model:item});
+        this.$el.append(view.render().el);
+    },
+
+    initialize:function(models){
+        this.collection = new App.Service.memCtrlBlend.outerCollection(models);
     }
 });
 

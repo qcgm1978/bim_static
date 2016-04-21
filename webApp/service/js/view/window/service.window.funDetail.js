@@ -8,13 +8,11 @@ App.Service.windowFunDetail=Backbone.View.extend({
 
     template:_.templateUrl("/service/tpls/window/service.window.detail.html"),
     events:{
-        "click .name":"select",
+        "click .name":"select"
     },
 
     render:function(){
         this.$el.html(this.template(this.model.toJSON()));
-        //Service.log( this.model.get("selected"));
-        //Service.log( this.$("input")[0].checked);
         this.$("input")[0].checked = this.model.get("selected");//加载完毕之后
         return this;
     },

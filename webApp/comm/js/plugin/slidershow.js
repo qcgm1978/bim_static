@@ -162,6 +162,10 @@ var slide = {
                 }
             };
             document.addEventListener(visibilityChangeEvent, onVisibilityChange);
+        }else{
+            //兼容旧版
+            window.onfocus = function(){slide.play(); };
+            window.onblur = function(){slide.stop(); };
         }
     },
     count:function(length){
@@ -176,6 +180,5 @@ var slide = {
         this.obj = obj;
         slide.relate();
 
-        slide.windowFront();
     }
 };

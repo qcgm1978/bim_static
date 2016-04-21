@@ -22,6 +22,7 @@ var AppRoute = Backbone.Router.extend({
 		_.require('/static/dist/bodyContent/bodyContent.css');
 		//_.require('/static/dist/bodyContent/bodyContent_ie8.css');
 		_.require('/static/dist/bodyContent/bodyContent.js');
+		slide.stop();
 		App.BodyContent.control.init();
 	},
 	//待办
@@ -71,7 +72,6 @@ var AppRoute = Backbone.Router.extend({
 
 	//资源库
 	resources: function() {
-
 		this.reset();
 		//销毁上传
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".resources").addClass('selected');
@@ -84,7 +84,6 @@ var AppRoute = Backbone.Router.extend({
 
 	//单个项目
 	resource: function(type) {
-
 		this.reset();
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".resources").addClass('selected');
 		_.require('/static/dist/resources/resources.css');
@@ -94,7 +93,6 @@ var AppRoute = Backbone.Router.extend({
 	},
 
 	resourceModel: function(type, projectId, versionId) {
-
 		this.reset();
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".resources").addClass('selected');
 		_.require('/static/dist/resources/resources.css');

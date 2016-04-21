@@ -4,7 +4,7 @@ App.API = {
 
 	Settings: {
 		hostname: "http://bim.wanda-dev.cn/",
-		debug: false
+		debug: true
 	},
 
 	URL: {
@@ -20,7 +20,7 @@ App.API = {
 		//Service
 		fetchServiceMCOuterList:'platform/auth/org?outer=true',//外部组织-用户列表
 		fetchServiceFunList: 'platform/auth/function',//功能列表
-		fetchServiceMCInnerList:'platform/auth/org?outer=false&includeUsers=true',//内部-混合列表
+		fetchServiceMCInnerList:'platform/auth/org?outer=false&parentId={parentId}',//内部-混合列表
 
 		//代办$chars
 		fetchTodoData: "platform/todo", //获取代办数据
@@ -137,6 +137,7 @@ App.API = {
 
 		//console
 		fetchServiceMCBlendList:'/dataJson/service/service.Mem.blendList.json',//组织-混合列表
+		fetchServiceMCBlendListMn:'/dataJson/service/service.Mem.blendList_mn.json',//组织-混合列表
 		fetchServiceRolesList:'/dataJson/service/service.Mem.rolesList.json',//角色-功能列表
 		fetchServiceFunList: '/dataJson/service/service.fun.list.json',//功能列表
 

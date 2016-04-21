@@ -3,17 +3,10 @@
     <div class="serviceOgList">
         <div id="ozList">
             <ul>
-                <li><div><span class="inner">内部用户</span></div></li>
-                <li><div><span class="outer">外部用户</span></div></li>
+                <li ><div class="inner"><span>内部用户</span></div><div class="childOz"></div></li>
+                <li><div class="outer"><span>外部用户</span></div><div class="childOz"></div></li>
             </ul>
         </div>
     </div>
 </div>
 <div class="content"></div>
-
-<!--
-GET  https://bim.wanda.cn/platform/auth/org?outer={outer}&includeUsers={includeUsers}&parentId={parentId}
-outer	是	boolean	true：网外;false:网内
- parentId否	long	父部门ID，为null则查询一级机构
-includeUsers	否	boolean	返回结果是否包含该parentId一级的员工信息列表
--->

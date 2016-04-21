@@ -249,8 +249,8 @@ App.Comm.createModel = function(options){
           parent = self.closest(".item-content"),
           flag = self.is(":checked"),
           type = parent.data("type");
-      parent = parent.next(".subTree").length>0 ? parent.next(".subTree") : parent;
-      parent.find("input").prop("checked",flag);
+      parents = parent.next(".subTree").length>0 ? parent.next(".subTree") : parent;
+      parents.find("input").prop("checked",flag);
       if(type == "sceneId"){
         viewer.showScene(that.getFilter());
       }else{
@@ -270,7 +270,11 @@ App.Comm.createModel = function(options){
         $.each(input,function(index,item){
           var $item = $(item),
               etag = $item.data('etag');
-          etag = etag?etag.toString().split(","):[];
+          if(!etag && etag !==0){
+            etag = []
+          }else{
+            etag = etag.toString().split(",")
+          }
           data.ids = data.ids.concat(etag);
         });
       }else{
@@ -278,7 +282,9 @@ App.Comm.createModel = function(options){
         var code = element.data('parent');
         var reg = new RegExp("^"+code);
         $.each(codeData,function(i,item){
-          if(reg.test(item.code)){
+          if(!code){
+            data.ids.push(item.code);
+          }else if(reg.test(item.code)){
             data.ids.push(item.code);
           }
         });
@@ -433,7 +439,7 @@ App.Comm.createModel = function(options){
     addFloors:function(model){
       var data = model.toJSON();
       if(data.message == "success"){
-        data.data = data.data.sort(function(a,b){return a.sort<b.sort})
+        data.data = _.sortBy(data.data,function(num){return -num.sort})
         floorMap = data.data;
         this.$el.html(_.template(this.template)(data));
         this.$el.find("li:eq(0)").trigger("click");
