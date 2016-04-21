@@ -21,7 +21,7 @@ App.Project.DesignCollisionTaskList=Backbone.View.extend({
     // 加载碰撞点列表
     var data=model.toJSON();
     if(data.data.length == 0){
-      return false;
+      return this.$el.html('<p class="tips">没有碰撞</p>');;
     }else{
       this.$el.html(this.template(data))
       return this;
