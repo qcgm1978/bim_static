@@ -1,4 +1,14 @@
+<% $.each(data,function(i,item){ %>
   <tr>
-                <td class="inspecId">1</td>
-                <td class="businessMatters">土方工程（含桩基）</td>
+                <td class="inspecId"><%=i+1%></td>
+                <td class="businessMatters"><%=item.businessItem%></td>
             </tr>
+
+<% }) %>
+
+<% if(data.length<=0){%> 
+    <tr>
+        <td colspan="2" class="noDataTd">暂无数据</td>
+    </tr>
+    
+<%}%>
