@@ -5733,6 +5733,23 @@ CLOUD.MiniMap = function (viewer, callback) {
         return interPoint;
     }
 
+    //判断两向量角度是否大于180°，大于180°返回真，否则返回假
+    function isAngleGreaterThanPi(start, end, up){
+
+        // 根据混合积来判断角度
+        var dir = new THREE.Vector3();
+        dir.crossVectors(start, end);
+
+        var volume = dir.dot(up);
+
+        //dir 与 up 同向 - 小于 180°
+        if (volume >= 0) {
+            return false;
+        }
+
+        return true;
+    }
+
     // ------------- 这些算法可以独立成单独文件 E ------------- //
 
     // 正规化坐标转屏幕坐标
@@ -6248,13 +6265,30 @@ CLOUD.MiniMap = function (viewer, callback) {
     this.initCameraNode = function () {
 
         if (!_cameraNode) {
-            _cameraNode = document.createElementNS(_xmlns, 'path');
-            _cameraNode.setAttribute('d', 'M-2,-4 L6,0 L-2,4 L0,0 L-2,-4');
+            //_cameraNode = document.createElementNS(_xmlns, 'path');
+            //_cameraNode.setAttribute('d', 'M-2,-4 L6,0 L-2,4 L0,0 L-2,-4');
+            //_cameraNode.setAttribute('fill', '#1b8cef');
+            //_cameraNode.setAttribute('stroke', "#cbd7e1");
+            //_cameraNode.setAttribute('stroke-width', '0.4');
+            //_cameraNode.setAttribute('stroke-linejoin', "round");
+            //_cameraNode.setAttribute('opacity', '0.0');
+
+            _cameraNode = document.createElementNS (_xmlns, 'g');
             _cameraNode.setAttribute('fill', '#1b8cef');
-            _cameraNode.setAttribute('stroke', "#cbd7e1");
-            _cameraNode.setAttribute('stroke-width', '0.4');
-            _cameraNode.setAttribute('stroke-linejoin', "round");
+            _cameraNode.setAttribute('stroke', '#cbd7e1');
+            _cameraNode.setAttribute('stroke-width', '1');
+            _cameraNode.setAttribute('stroke-linejoin', 'round');
             _cameraNode.setAttribute('opacity', '0.0');
+
+            // 尺寸大小 直径 12px
+            var circle = document.createElementNS (_xmlns, 'circle');
+            circle.setAttribute('r', '6');
+
+            var path = document.createElementNS (_xmlns, 'path');
+            path.setAttribute('d', 'M 7 6 Q 10 0, 7 -6 L 19 0 Z');
+
+            _cameraNode.appendChild (circle);
+            _cameraNode.appendChild (path);
         }
     };
 
@@ -6698,115 +6732,6 @@ CLOUD.MiniMap = function (viewer, callback) {
         _floorPlaneElevation = elevation;
     };
 
-    //this.resetCameraNode = function () {
-    //
-    //    if (!_floorPlaneBox) return;
-    //
-    //    var camera = this.viewer.camera;
-    //    var cameraEditor = this.viewer.cameraEditor;
-    //
-    //    if (!camera || !cameraEditor) return;
-    //
-    //    var cameraPosition = camera.position;
-    //    var cameraTargetPosition = cameraEditor.target;
-    //    var sceneMatrix = this.getMainSceneMatrix();
-    //
-    //    //var box = bBox.clone();
-    //    //box.applyMatrix4(sceneMatrix);
-    //    //
-    //    //if (!box.containsPoint(camera.position)) {
-    //    //    return null;
-    //    //}
-    //
-    //    var inverseMatrix = new THREE.Matrix4();
-    //    inverseMatrix.getInverse(sceneMatrix);
-    //
-    //    var bBoxCenter = _floorPlaneBox.center();
-    //    var pointA = new THREE.Vector3(_floorPlaneBox.min.x, _floorPlaneBox.min.y, bBoxCenter.z).applyMatrix4(sceneMatrix);
-    //    var pointB = new THREE.Vector3(_floorPlaneBox.min.x, _floorPlaneBox.max.y, bBoxCenter.z).applyMatrix4(sceneMatrix);
-    //    var pointC = new THREE.Vector3(_floorPlaneBox.max.x, _floorPlaneBox.min.y, bBoxCenter.z).applyMatrix4(sceneMatrix);
-    //
-    //    var plane = new THREE.Plane();
-    //    plane.setFromCoplanarPoints(pointA, pointB, pointC);
-    //
-    //    // 计算相机投影
-    //    var projectedCameraPosition = plane.projectPoint(cameraPosition);
-    //    // 转回世界坐标
-    //    projectedCameraPosition.applyMatrix4(inverseMatrix);
-    //
-    //    // 计算相机LookAt投影
-    //    var projectedTargetPosition = plane.projectPoint(cameraTargetPosition);
-    //    // 转回世界坐标
-    //    projectedTargetPosition.applyMatrix4(inverseMatrix);
-    //
-    //    // 计算相机投影后的方向
-    //    var projectedEye = projectedTargetPosition.clone().sub(projectedCameraPosition);
-    //    projectedEye.z = 0;
-    //    projectedEye.normalize();
-    //
-    //    if (_floorPlaneBox.containsPoint(projectedCameraPosition)) {
-    //
-    //        // 计算相机位置
-    //        var cameraScreenPosition = projectedCameraPosition.clone();
-    //        worldToNormalizedPoint(cameraScreenPosition);
-    //        normalizedPointToScreen(cameraScreenPosition);
-    //
-    //        // 计算角度
-    //        var axisX = new THREE.Vector3(1, 0, 0);
-    //        var angle = THREE.Math.radToDeg(projectedEye.angleTo(axisX));
-    //        angle *= -1; // 逆时针为正
-    //
-    //        _cameraNode.setAttribute('opacity', '1.0');
-    //        _cameraNode.setAttribute("transform", "translate(" + cameraScreenPosition.x + "," + cameraScreenPosition.y + ") rotate(" + angle + ") scale(3, 3) ");
-    //
-    //        var isExistData = _isExistAxisGridData || _isExistFloorPlaneData;
-    //
-    //        if (this.callbackFn && isExistData) {
-    //
-    //            var cameraWorldPos = new THREE.Vector3(projectedCameraPosition.x, projectedCameraPosition.y, _floorPlaneElevation);
-    //            // 获得离相机最近的交点
-    //            var intersection = this.computeMinDistanceIntersection(cameraScreenPosition);
-    //
-    //            if (intersection) {
-    //                // 计算轴信息
-    //                var interPoint = new THREE.Vector2(intersection.intersectionPoint.x, intersection.intersectionPoint.y);
-    //                screenToNormalizedPoint(interPoint);
-    //                normalizedPointToWorld(interPoint);
-    //
-    //                var offsetX = Math.round(projectedCameraPosition.x - interPoint.x);
-    //                var offsetY = Math.round(projectedCameraPosition.y - interPoint.y);
-    //                var axisInfoX = "X(" + intersection.abcName + "," + offsetX + ")";
-    //                var axisInfoY = "Y(" + intersection.numeralName + "," + offsetY + ")";
-    //
-    //                var jsonObj = {
-    //                    position: cameraWorldPos,
-    //                    axis: {
-    //                        abcName: intersection.abcName,
-    //                        numeralName: intersection.numeralName,
-    //                        offsetX: offsetX,
-    //                        offsetY: offsetY,
-    //                        infoX: axisInfoX,
-    //                        infoY: axisInfoY
-    //                    }
-    //                };
-    //
-    //                //console.log(jsonObj.axis.infoX + "" + jsonObj.axis.infoY);
-    //
-    //                this.callbackFn(jsonObj);
-    //            }
-    //        } else {
-    //            if (this.callbackFn) {
-    //                this.callbackFn(null);
-    //            }
-    //        }
-    //    } else {
-    //        _cameraNode.setAttribute('opacity', '0.0');
-    //        if (this.callbackFn) {
-    //            this.callbackFn(null);
-    //        }
-    //    }
-    //};
-
     this.resetCameraNode = function (fly , updateCameraInfo) {
 
         if (!_floorPlaneBox) return;
@@ -6868,12 +6793,20 @@ CLOUD.MiniMap = function (viewer, callback) {
         normalizedPointToScreen(cameraScreenPosition);
 
         // 计算角度
+        var up = new THREE.Vector3(0, 0, 1);
         var axisX = new THREE.Vector3(1, 0, 0);
-        var angle = THREE.Math.radToDeg(projectedEye.angleTo(axisX));
-        angle *= -1; // 逆时针为正
+        var isGreaterThanPi = isAngleGreaterThanPi(axisX, projectedEye, up);
+
+        // [0, PI]
+        var angle = THREE.Math.radToDeg(axisX.angleTo(projectedEye));
+
+        // 注意：svg顺时针时针为正
+        if (!isGreaterThanPi) {
+            angle *= -1;
+        }
 
         _cameraNode.setAttribute('opacity', '1.0');
-        _cameraNode.setAttribute("transform", "translate(" + cameraScreenPosition.x + "," + cameraScreenPosition.y + ") rotate(" + angle + ") scale(3, 3) ");
+        _cameraNode.setAttribute("transform", "translate(" + cameraScreenPosition.x + "," + cameraScreenPosition.y + ") rotate(" + angle + ")");
 
         // 飞到指定点
         if (fly) {
@@ -12672,9 +12605,8 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
     //var isAtZoom = 0; // 指示是否处在滚动缩放状态
     var state = STATE.NONE;
 
-    var lastCanvasX = -1;
-    var lastCanvasY = -1;
-    var lastDollyBasePoint;
+    var lastTrackingPoint;
+
     //var lastCameraView = {
     //    dir: new THREE.Vector3(),
     //    up: new THREE.Vector3()
@@ -12812,11 +12744,11 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
         var factor = 2 - scale; // 1 - (scale - 1)
 
         var eye = this.getWorldEye();
-        var dollyPoint = this.getDollyBasePoint(cx, cy);
+        var dollyPoint = this.getTrackingPoint(cx, cy);
         var cameraPos = this.object.position;
 
         var dir = new THREE.Vector3();
-        dir.subVectors(dollyPoint , cameraPos);
+        dir.subVectors(dollyPoint, cameraPos);
 
         var distance = dir.length();
         var newCameraPos = new THREE.Vector3();
@@ -12831,14 +12763,9 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
             this.object.position.copy(newCameraPos);
             this.target.copy(eye.add(newCameraPos));
 
-            lastCanvasX = -1;
-            lastCanvasY = -1;
-            // 更新缩放基准点
-            lastDollyBasePoint = dollyPoint.clone();
-            lastDollyBasePoint.add(offsetVec);
-
-            //lastCameraView.dir.set(0, 0, 0);
-            //lastCameraView.up.set(0, 0, 0);
+            // 更新追踪点
+            lastTrackingPoint = dollyPoint.clone();
+            lastTrackingPoint.add(offsetVec);
 
         } else {
 
@@ -12881,6 +12808,9 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
 
         if (state == STATE.ROTATE) {
 
+            var eye = this.target.clone().sub(position);
+            var eyeDistance = eye.length();
+
             var viewVec = position.clone().sub(pivot);
             var viewLength = viewVec.length();
             viewVec.normalize();
@@ -12899,15 +12829,15 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
 
                     position.copy(pivot).add(newViewDir.multiplyScalar(viewLength));
 
-
                     camDir.applyQuaternion(viewTrf);
                     camDir.normalize();
 
+                    // 保持相机到目标点的距离不变
                     var newTarget = new THREE.Vector3();
-                    newTarget.copy(position).add(camDir.multiplyScalar(viewLength));
+                    //newTarget.copy(position).add(camDir.multiplyScalar(viewLength));
+                    newTarget.copy(position).add(camDir.multiplyScalar(eyeDistance));
 
                     this.target.copy(newTarget);
-
                     this.object.realUp.copy(rightDir).cross(camDir);
                 }
 
@@ -12950,11 +12880,13 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
 
                     camDir.applyQuaternion(viewTrf);
                     camDir.normalize();
+
+                    // 保持相机到目标点的距离不变
                     var newTarget = new THREE.Vector3();
-                    newTarget.copy(position).add(camDir.multiplyScalar(viewLength));
+                    //newTarget.copy(position).add(camDir.multiplyScalar(viewLength));
+                    newTarget.copy(position).add(camDir.multiplyScalar(eyeDistance));
 
                     this.object.realUp.copy(rightDir).cross(camDir);
-
                     this.target.copy(newTarget);
                 }
             }
@@ -13043,6 +12975,9 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
 
         state = STATE.ROTATE;
         rotateStart.set(cx, cy);
+
+        // 获得追踪点
+        var trackingPoint = this.getTrackingPoint(cx, cy);
     };
 
     this.beginZoom = function (cx, cy) {
@@ -13327,42 +13262,20 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
 
     this.getWorldDimension = function (cx, cy) {
 
-        var camera = this.object;
-        var canvasContainer = this.getContainerDimensions();
-
-        // 规范化开始点
-        var canvasX = cx - canvasContainer.left;
-        var canvasY = cy - canvasContainer.top;
-
-        // 规范化到[-1, 1]
-        var normalizedX = (canvasX / canvasContainer.width) * 2.0 - 1.0;
-        var normalizedY = ((canvasContainer.height - canvasY) / canvasContainer.height) * 2.0 - 1.0;
+        var position = this.object.position;
+        var eye = this.getWorldEye().normalize();
 
         // 计算跟踪距离
-        var distance = this.getTrackingDistance(normalizedX, normalizedY);
+        var trackingPoint = this.getTrackingPoint(cx, cy);
+        var trackingDir = trackingPoint.clone().sub(position);
+        var distance = Math.abs(eye.dot(trackingDir));
 
+        var canvasContainer = this.getContainerDimensions();
         var aspect = canvasContainer.width / canvasContainer.height;
-        var height = 2.0 * distance * Math.tan(THREE.Math.degToRad(camera.fov * 0.5));
+        var height = 2.0 * distance * Math.tan(THREE.Math.degToRad(this.object.fov * 0.5));
         var width = height * aspect;
 
         return new THREE.Vector2(width, height);
-    };
-
-    this.getTrackingDistance = function (cx, cy) {
-
-        var position = camera.position;
-        var eye = this.getWorldEye();
-        var distance = eye.length();
-
-        var hitPoint = this.getHitPoint(cx, cy);
-
-        if (hitPoint) {
-            var hitToEye = hitPoint.sub(position);
-            eye.normalize();
-            distance = Math.abs(eye.dot(hitToEye));
-        }
-
-        return distance;
     };
 
     this.getHitPoint = function (normalizedX, normalizedY) {
@@ -13395,87 +13308,54 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
         return worldPoint;
     };
 
-    this.getDollyBasePoint = function (cx, cy) {
+    this.getTrackingPoint = function (cx, cy) {
 
-        //var isChangeView = function() {
-        //
-        //    var eye = scope.getWorldEye();
-        //    var up = scope.object.up.clone();
-        //
-        //    var deltaDir = lastCameraView.dir.clone().sub(eye);
-        //    var deltaUp = lastCameraView.up.clone().sub(up);
-        //
-        //    if (Math.abs(deltaDir.x) < EPS && Math.abs(deltaDir.y) < EPS && Math.abs(deltaDir.z) < EPS &&
-        //        Math.abs(deltaUp.x) < EPS && Math.abs(deltaUp.y) < EPS && Math.abs(deltaUp.z) < EPS) {
-        //
-        //        console.log("not change");
-        //
-        //        return false;
-        //    }
-        //
-        //    console.log("change");
-        //
-        //    return true;
-        //};
-
-        var dollyBasePoint;
+        var trackingPoint;
         var canvasContainer = this.getContainerDimensions();
 
         // 规范化开始点
         var canvasX = cx - canvasContainer.left;
         var canvasY = cy - canvasContainer.top;
+        // 规范化到[-1, 1]
+        var normalizedX = (canvasX / canvasContainer.width) * 2.0 - 1.0;
+        var normalizedY = ((canvasContainer.height - canvasY) / canvasContainer.height) * 2.0 - 1.0;
 
-        if (lastCanvasX !== canvasX || lastCanvasY !== canvasY) {
+        trackingPoint = this.getHitPoint(normalizedX, normalizedY);
 
-            // 规范化到[-1, 1]
-            var normalizedX = (canvasX / canvasContainer.width) * 2.0 - 1.0;
-            var normalizedY = ((canvasContainer.height - canvasY) / canvasContainer.height) * 2.0 - 1.0;
-            var hitPoint = this.getHitPoint(normalizedX, normalizedY);
+        if (!trackingPoint) {
 
-            var eye = this.getWorldEye();
+            var worldPoint = this.pointToWorld(normalizedX, normalizedY);
 
-            if (hitPoint) {
-                //console.log("hitPoint");
-                dollyBasePoint = hitPoint;
+            if (!lastTrackingPoint) {
+
+                trackingPoint = worldPoint;
 
             } else {
-                //console.log("pointToWorld");
 
-                if (!lastDollyBasePoint) {
-                    // 第一次进入即hit不到点
-                    dollyBasePoint = this.pointToWorld(normalizedX, normalizedY);
-                } else {
-                    // 保证前一次hit到图元，后一次hit不到图元，也能平滑缩放。
-                    // 上一次的基点和本次基点在同一平面内
-                    //var eye = this.getWorldEye();
-                    var cameraPos = this.object.position;
-                    var worldPoint = this.pointToWorld(normalizedX, normalizedY);
+                // 上一次的基点和本次基点在同一平面内
+                var position = this.object.position;
+                var eye = this.getWorldEye();
+                eye.normalize();
 
-                    var ray = new THREE.Ray();
-                    ray.origin.copy(cameraPos);
-                    ray.direction.copy(worldPoint.clone().sub(cameraPos).normalize());
+                var ray = new THREE.Ray();
+                ray.origin.copy(position);
+                ray.direction.copy(worldPoint.clone().sub(position).normalize());
 
-                    var plane = new THREE.Plane();
-                    plane.setFromNormalAndCoplanarPoint(eye, lastDollyBasePoint);
+                var plane = new THREE.Plane();
+                plane.setFromNormalAndCoplanarPoint(eye, lastTrackingPoint);
 
-                    dollyBasePoint = ray.intersectPlane(plane) || worldPoint;
-                }
+                trackingPoint = ray.intersectPlane(plane) || worldPoint;
             }
-
-            //lastCameraView.dir.copy(eye);
-            //lastCameraView.up.copy(this.object.up);
-
-            lastCanvasX = canvasX;
-            lastCanvasY = canvasY;
-            lastDollyBasePoint = dollyBasePoint.clone();
-        } else {
-            dollyBasePoint = lastDollyBasePoint.clone();
         }
 
-        return dollyBasePoint;
+        // 保存状态
+        lastTrackingPoint = trackingPoint.clone();
+
+        return trackingPoint;
     };
 
-    this.flyToPoint = function(point) {
+    // 飞到指定点（平行视角）
+    this.flyToPointWithParallelEye = function (point) {
 
         // 将相机移动到指定的点
         var eye = this.getWorldEye();
@@ -13499,13 +13379,14 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
         this.update(true);
     };
 
-    this.flyToPoint2 = function(point) {
+    // 飞到指定点（保持视角）
+    this.flyToPoint = function (point) {
 
         var position = this.object.position;
         var eye = this.getWorldEye();
         var normalizedEye = eye.clone().normalize();
-        var hitToEye = point.clone().sub(position);
-        var distance = Math.abs(normalizedEye.dot(hitToEye));
+        var trackingEye = point.clone().sub(position);
+        var distance = Math.abs(normalizedEye.dot(trackingEye));
         var flyOffset = normalizedEye.clone().multiplyScalar(distance);
 
         this.object.position.subVectors(point, flyOffset);
@@ -13514,24 +13395,25 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
         this.update(true);
     };
 
-    this.goBack = function(step) {
+    // 后退
+    this.moveBackward = function (step) {
 
         var position = this.object.position;
         var target = this.target;
-
         var eye = target.clone().sub(position);
-        this.object.translateZ( step );
+
+        this.object.translateZ(step);
         target.addVectors(position, eye);
     };
 
     // 前进
-    this.goForward =  function (step) {
+    this.moveForward = function (step) {
 
         var position = this.object.position;
         var target = this.target;
-
         var eye = target.clone().sub(position);
-        this.object.translateZ( - step );
+
+        this.object.translateZ(-step);
         target.addVectors(position, eye);
     };
 
@@ -13621,7 +13503,7 @@ CLOUD.OrbitEditor.prototype.onMouseMove = function (event) {
     // 会造成模型跳变，所以传入event.clientX, event.clientY，根据当前父元素节点位置计算鼠标的真实偏移量
     //camera_scope.process(event.offsetX, event.offsetY);
 
-    camera_scope.process(event.clientX, event.clientY);
+    camera_scope.process(event.clientX, event.clientY, true);
 };
 
 CLOUD.OrbitEditor.prototype.onMouseUp = function (event) {
@@ -13699,13 +13581,13 @@ CLOUD.OrbitEditor.prototype.onKeyDown = function (event) {
         case camera_scope.keys.UP:
         case camera_scope.keys.W:
             //camera_scope.beginPan();
-            camera_scope.goForward(camera_scope.movementSpeed);
+            camera_scope.moveForward(camera_scope.movementSpeed);
             camera_scope.update(true);
             break;
         case camera_scope.keys.BOTTOM:
         case camera_scope.keys.S:
             //camera_scope.beginPan();
-            camera_scope.goBack(camera_scope.movementSpeed);
+            camera_scope.moveBackward(camera_scope.movementSpeed);
             camera_scope.update(true);
             break;
     }
@@ -21675,11 +21557,7 @@ CloudViewer = function () {
                 case "up":
                     overCanvas = miniMap.mouseUp(event, function (point) {
                         // 飞到指定点
-                        //console.log("clickPoint", point);
-
-                        scope.cameraEditor.flyToPoint(point);
-                        //scope.cameraEditor.updateView();
-
+                        scope.cameraEditor.flyToPointWithParallelEye(point);
                     });
                     break;
                 default:
@@ -21932,6 +21810,8 @@ CloudViewer.prototype = {
         if (this.renderer.IncrementRender === undefined) {
             console.warn('THREE.WebGLIncrementRenderer.IncrementRender: undefined!');
         }
+
+        //this.initViewHouse(domElement);
 
         // Camera
         var camera = new CLOUD.Camera(viewportWidth, viewportHeight, 45, 0.001, CLOUD.GlobalData.SceneSize * 20, -CLOUD.GlobalData.SceneSize, CLOUD.GlobalData.SceneSize);
