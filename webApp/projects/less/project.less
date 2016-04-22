@@ -55,6 +55,7 @@
 	}
 }
 .rightProperty { .odd { background-color: #eee; }
+    .selected{background-color: #A8DBFD;}
 	.attrPlanBox, .attrCostBox, .attrQualityBox { display: none; }
 	.designVerification { height: 100%; }
 	.modle { .modleShowHide { transition: all .5s; background: url(/comm/images/commIcon.png) no-repeat 0px -256px; float: right; margin-right: 12px; margin-top: 6px; height: 14px; width: 14px; cursor: pointer;
@@ -97,11 +98,13 @@
 		}
 		.planContent { height: 100%;
 			.tbPlan { width: 100%; min-width: 398px;
+				tr{cursor: pointer;}
 				th, td { border: 1px #ccc solid; }
 				th { text-align: center; height: 28px; line-height: 28px; }
 				td { height: 24px; line-height: 24px; }
 				tbody { td { box-sizing: border-box; padding-left: 8px; }
 				}
+				 .selected{background-color: #A8DBFD;}
 				.noDataTd, .loadingTd { height: 60px; line-height: 60px; text-align: center; color: #ccc; font-size: 16px; border: 0; }
 			}
 			.ckItem { width: 7%; }
