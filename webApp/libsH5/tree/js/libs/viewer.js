@@ -718,20 +718,20 @@ BIM.prototype = {
     });
     viewer.render();
   },
-  showScene:function(obj){
-    var viewer = BIM.common.viewer;
-    var filter = viewer.getFilters();
-    filter.removeUserFilter("sceneId");
-    BIM.util.getFilter(obj,function(id){
-      filter.addUserFilter("sceneId",id);
-    });
-    viewer.render();
-  },
   show:function(obj){
     var viewer = BIM.common.viewer;
     var filter = viewer.getFilters();
     BIM.util.getFilter(obj.ids,function(id){
       filter.removeUserFilter(obj.type,id);
+    });
+    viewer.render();
+  },
+  hideScene:function(obj){
+    var viewer = BIM.common.viewer;
+    var filter = viewer.getFilters();
+    filter.removeUserFilter(obj.type);
+    BIM.util.getFilter(obj.ids,function(id){
+      filter.addUserFilter(obj.type,id);
     });
     viewer.render();
   },
