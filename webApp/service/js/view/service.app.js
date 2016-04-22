@@ -9,7 +9,7 @@ App.Service.control={
         //弹窗
 
         //组织结构内容
-        App.Service.memCtrlBlend.init();
+        //App.Service.memCtrlBlend.init();
 
         //App.Service.memCtrloz .loadData();//加载组织列表
         //App.Service.memCtrlBlend.loadData();//加载成员列表
@@ -44,7 +44,7 @@ App.Service.control={
 
 
         //弹窗
-        App.Service.window.init();//基础弹窗
+        //App.Service.window.init();//基础弹窗
 
 
     },

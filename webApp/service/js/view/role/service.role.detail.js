@@ -27,15 +27,15 @@ App.Service.roleDetail=Backbone.View.extend({
         App.Service.window.init();
 
         $(".serviceWindow").append( new App.Service.windowRole().render().el);
-        console.log(new App.Service.windowRole().render().el);
+
         //没起作用
         var $this =this;
-
         //值
         var func= this.model.get("functions");
         App.Service.fun.loadData(function(){
 
             $("#selectedRoleName").val($this.model.get("name")).attr("disabled","disabled"); //暂时写入
+            console.log($("#selectedRoleName").val());
 
             App.Service.fun.collection.each(function(item){
                 for(var i = 0 ; i < func.length ; i ++){

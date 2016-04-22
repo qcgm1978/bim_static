@@ -9,7 +9,7 @@ App.Service.nav = Backbone.View.extend({
 
     events:{
         "click .memCtrl" : "memCtrl",
-        "click .roleCtrl" : "roleCtrl",
+        "click .roleManager" : "roleManager",
         "click .keyUser" : "keyUser",
         "click .memProject" : "memProject"
     },
@@ -32,21 +32,20 @@ App.Service.nav = Backbone.View.extend({
     },
 
 
-
-    memCtrl : function(e){
+    memCtrl : function(){
         $(".serviceBody").empty();
         this.breadCrumb(this.$el.find(".memCtrl"));
         App.Service.memCtrlBlend.init();
 
         //load模板  主模板  //弹窗模板  //弹窗模板为公共
     },
-    roleCtrl : function(e){
+    roleManager : function(){
         $(".serviceBody").empty();
-        this.breadCrumb(this.$el.find(".roleCtrl"));
+        this.breadCrumb(this.$el.find(".roleManager"));
         App.Service.role.init();
         //主模板   角色列表      角色修改和删除（删除配置？？？删除的弹窗提示）      //弹窗模板  列表  ，input角色名和选择角色功能。
     },
-    keyUser : function(e){
+    keyUser : function(){
         $(".serviceBody").empty();
         this.breadCrumb(this.$el.find(".keyUser"));
         //主模板  四个列表：  关键用户列表 （默认第一个？）  关键要用户基本信息  项目权限   部门权限
@@ -56,8 +55,8 @@ App.Service.nav = Backbone.View.extend({
         //部门授权
         //弹窗主模板相同，名称可能不同，需要主模板管理器（标题，副标题，内容刷新底下按钮）
     },
-    memProject : function(e){
-        $(".SserviceBody").empty();
+    memProject : function(){
+        $(".serviceBody").empty();
         this.breadCrumb(this.$el.find(".memProject"));
         //项目成员主模板
         //添加成员可与上面模板相同
