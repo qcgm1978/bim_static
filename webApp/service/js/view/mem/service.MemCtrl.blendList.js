@@ -61,30 +61,35 @@ App.Service.MemCtrlBlendList=Backbone.View.extend({
                 return item.get("checked");
             }
         });
+
         if(!seleUser.length){alert("您没有选择任何成员或组织，无法设置角色！");return}
 
         //写入已选用户和组织
         $(".memRoleList").append(new App.Service.windowRoleList().render().el);
 
-        //$(".serviceWindow .aim ul").append( new App.Service.window.BlendDetail({model}).render().el);
+        //将每项插入到角色列表中
         _.each(seleUser,function(item){
             $(".serviceWindow .aim ul").append( new App.Service.window.BlendDetail({model:item}).render().el);
         });
-        //已选组织的父项
-        var roleList = seleUser[0].get("role");
 
-        //处理角色列表已选部分
-        App.Service.role.loadData(function(){
+        var data = {
+
+        };
+
+
+        App.Service.ozRole.loadData(data,function(){
             //获取父项id的model，这个model在左侧点击时获取数据，目前左侧不点击，无法获取数据，待解决，或许自定义事件触发解决
-            //什么时候重置collection？
-            App.Service.role.collection.each(function(item){
+
+
+            //无需选择了,多选选父项
+            /*App.Service.role.collection.each(function(item){
                 item.unset("checked");//清除痕迹
                 for(var i = 0 ; i < roleList.length ; i++){
                     if(item.get("roleId") == roleList[i]["roleId"]){
                         item.set({"checked":true});
                     }
                 }
-            });
+            });*/
             //
 
             $("#mask").show();

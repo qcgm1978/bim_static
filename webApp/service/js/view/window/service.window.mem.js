@@ -11,7 +11,7 @@ App.Service.windowMem=Backbone.View.extend({
     template:_.templateUrl("/service/tpls/window/service.window.mem.html"),
 
     events:{
-        "click .serviceSubmit":"serviceSubmit"
+        "click .windowSubmit":"windowSubmit"
     },
     render:function(){
         this.$el.html(this.template);
@@ -19,7 +19,7 @@ App.Service.windowMem=Backbone.View.extend({
     },
 
     //提交表单，完毕会触发重新获取列表，列表为memBlend所属列表
-    serviceSubmit:function(){
+    windowSubmit:function(){
         $("#mask").hide().empty();//外层
         //需要获取的数据
         //已选成员

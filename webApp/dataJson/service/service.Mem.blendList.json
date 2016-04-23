@@ -5,7 +5,6 @@
     "org": [
       {
         "ozId": 181211,
-        "username": "lujia5",
         "name": "组织部",
         "position": "中控员",
         "orgName": "工程部",
@@ -23,27 +22,10 @@
           "privilege": null
         },
         "privilege": [],
-        "role": [
-          {
-            "roleId": 10086,
-            "name": "设计",
-            "code": "design"
-          },
-          {
-            "roleId": 3,
-            "name": "成本",
-            "code": "cost"
-          },
-          {
-            "roleId": 2,
-            "name": "模块化",
-            "code": "module"
-          }
-        ]
+        "role": []
       },
       {
         "ozId": 181212,
-        "username": "lujia5",
         "name": "技术部",
         "position": "中控员",
         "orgName": "工程部",
@@ -61,28 +43,12 @@
           "privilege": null
         },
         "privilege": [],
-        "role": [
-          {
-            "roleId": 1,
-            "name": "设计",
-            "code": "design"
-          },
-          {
-            "roleId": 3,
-            "name": "成本",
-            "code": "cost"
-          },
-          {
-            "roleId": 2,
-            "name": "模块化",
-            "code": "module"
-          }
-        ]
+        "role": []
       }
     ],
     "user": [
       {
-        "userId": 181211860,
+        "userId": 45678122,
         "username": "lujia5",
         "name": "陆佳",
         "position": "中控员",
@@ -103,19 +69,22 @@
         "privilege": [],
         "role": [
           {
-            "roleId": 10086,
-            "name": "设计",
-            "code": "design"
+            "roleId": 999999,
+            "name": "管理员",
+            "code": "design",
+            "inherit":false
           },
           {
             "roleId": 3,
             "name": "成本",
-            "code": "cost"
+            "code": "cost",
+            "inherit":true
           },
           {
             "roleId": 2,
             "name": "模块化",
-            "code": "module"
+            "code": "module",
+            "inherit":false
           }
         ]
       },
@@ -143,7 +112,8 @@
           {
             "roleId": 1,
             "name": "设计",
-            "code": "design"
+            "code": "design",
+            "inherit":true
           }
         ]
       },
@@ -171,7 +141,8 @@
           {
             "roleId": 1,
             "name": "设计",
-            "code": "design"
+            "code": "design",
+            "inherit":false
           }
         ]
       },
@@ -199,7 +170,8 @@
           {
             "roleId": 1,
             "name": "设计",
-            "code": "design"
+            "code": "design",
+            "inherit":true
           }
         ]
       },
@@ -227,7 +199,8 @@
           {
             "roleId": 1,
             "name": "设计",
-            "code": "design"
+            "code": "design",
+            "inherit":true
           }
         ]
       },
@@ -255,7 +228,8 @@
           {
             "roleId": 1,
             "name": "设计",
-            "code": "design"
+            "code": "design",
+            "inherit":false
           }
         ]
       },

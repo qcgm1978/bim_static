@@ -15,7 +15,7 @@ App.Service.windowRoleList=Backbone.View.extend({
         return this;
     },
     initialize:function(){
-       this.listenTo(App.Service.role.collection,"add",this.addOne);
+       this.listenTo(App.Service.ozRole.collection,"add",this.addOne);
     },
     addOne:function(model){
         var newView = new App.Service.window.roleDetail({model:model});

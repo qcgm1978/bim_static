@@ -1,5 +1,5 @@
 /*
- * @require  /Service/js/collection/memCtrl.blendList.js
+ * @require  /service/js/view/keyUser/service.keyUser.js
  * */
 var App = App || {};
 App.Service.nav = Backbone.View.extend({
@@ -48,6 +48,7 @@ App.Service.nav = Backbone.View.extend({
     keyUser : function(){
         $(".serviceBody").empty();
         this.breadCrumb(this.$el.find(".keyUser"));
+        $(".serviceBody").html(new App.Service.keyUserFrame().render().el); //框架
         //主模板  四个列表：  关键用户列表 （默认第一个？）  关键要用户基本信息  项目权限   部门权限
         //新增关键用户，注意步骤，关联性
         //删除关键用户弹窗

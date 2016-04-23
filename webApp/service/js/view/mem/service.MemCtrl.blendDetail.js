@@ -21,37 +21,27 @@ App.Service.MemCtrlBlendDetail=Backbone.View.extend({
         this.listenTo(this.model, 'change', this.render);
     },
 
-    //向点击的部分传递ID,请求数据
+    //刷新右面操作
     spread:function(){
-
-
+        var $this = this;
         $("#mask").empty();
-
         //外壳及相关信息
         App.Service.window.init();
         $(".serviceWindow").append(new App.Service.windowMem().render().el);//外框
         $(".serviceWindow h1").html("角色授权");
 
         //写入当前用户
-        var $this = this;
         $(".serviceWindow .aim ul").append(new App.Service.window.BlendDetail({model:$this.model}).render().el);
         $(".memRoleList").append(new App.Service.windowRoleList().render().el);
 
-        //当选择其他时候，点击当前会将提示信息和选择信息设置为当前这个
-        $("#blendList li").removeClass("active");
-        App.Service.memCtrlBlend.collection.each(function(item){
-            item.unset("checked");
-        });
-        this.$el.addClass("active");
-        this.model.set("checked",true);
 
-
+        this.chooseSelf();//清理旧的和选中新的
 
         //处理角色列表已选部分
-        App.Service.role.loadData(function(){
+        App.Service.ozRole.loadData({},function(){
             var preSelected = $this.model.get("role");//已选角色
             //没效果，collection异步所以异步执行无数据
-            App.Service.role.collection.each(function(item){
+            App.Service.ozRole.collection.each(function(item){
                 item.unset("checked");//清除痕迹
                 for(var i = 0 ; i < preSelected.length ; i++){
                     if(item.get("roleId") == preSelected[i]["roleId"]){
@@ -60,11 +50,24 @@ App.Service.MemCtrlBlendDetail=Backbone.View.extend({
                     }
                 }
             });
-            //获取角色列表
             $("#mask").show();
         });
 
     },
+
+
+    chooseSelf:function(){
+        //当选择其他时候，点击当前会将提示信息和选择信息设置为当前这个
+        $("#blendList li").removeClass("active");
+        App.Service.memCtrlBlend.collection.each(function(item){
+            item.unset("checked");
+        });
+        //选中当前
+        this.$el.addClass("active");
+        this.model.set("checked",true);
+    },
+
+
 
     choose:function(){
         var boolean = this.model.get("checked");
