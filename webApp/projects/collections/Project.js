@@ -442,6 +442,9 @@ App.Project = {
 				if (data.code == 0) {
 					 
 					data = data.data;
+					if (!data) {
+						return;
+					}
 					that.$el.find(".attrPlanBox").find(".name").text(data.businessItem).end().find(".start").
 					text(data.planStartTime && new Date(data.planStartTime).format("yyyy-MM-dd") || "").end().
 					find(".end").text(data.planStartTime && new Date(data.planEndTime).format("yyyy-MM-dd") || "").end().
@@ -512,7 +515,7 @@ App.Project = {
 
 			sb.Append('<li class="modleItem" >');
 			item = data[i];
-			sb.Append(App.Project.properCostTreeItem(item,i));
+			sb.Append(App.Project.properCostTreeItem(item,0));
 			sb.Append('</li>');
 		}
 		sb.Append('</ul>');
@@ -522,15 +525,15 @@ App.Project = {
 	//tree 节点
 	properCostTreeItem: function(item,i) {
 		 
-		var sb = new StringBuilder(),w=(i+1)*12;
+		var sb = new StringBuilder(),w=i*12;
 
 		//内容
 	 
 		sb.Append('<span class="modleName"><div class="modleNameText overflowEllipsis">');
 		if (item.children && item.children.length > 0) {
-			sb.Append('<i class="nodeSwitch on" style="width:'+w+'px;"></i>');
+			sb.Append('<i class="nodeSwitch on" style="margin-left:'+w+'px;"></i>');
 		} else {
-			sb.Append('<i class="noneSwitch" style="width:'+w+'px;"></i> ');
+			sb.Append('<i class="noneSwitch" style="margin-left:'+w+'px;"></i> ');
 		}
 		sb.Append(item.code);
 		sb.Append('</div></span>');
@@ -549,7 +552,7 @@ App.Project = {
 
 				sb.Append('<li class="modleItem" > ');
 				subItem = treeSub[j];
-				sb.Append(App.Project.properCostTreeItem(subItem,i));
+				sb.Append(App.Project.properCostTreeItem(subItem,i+1));
 				sb.Append('</li>');
 			}
 

@@ -8,34 +8,34 @@ App.Service.windowFunDetail=Backbone.View.extend({
 
     template:_.templateUrl("/service/tpls/window/service.window.detail.html"),
     events:{
-        "click .name":"select"
+        "click .funName":"choose"
     },
 
     render:function(){
         this.$el.html(this.template(this.model.toJSON()));
-        this.$("input")[0].checked = this.model.get("selected");//加载完毕之后
         return this;
     },
 
     initialize:function(){
-        this.model.set("selected",false);
-        this.listenTo(this.model, 'change', this.render);
+        this.listenTo(this.model,"change:checked",this.checked);
     },
-
-    //change事件
-    spread:function(){
-
-    },
-
-    select:function() {
-        var preV = this.$("input")[0].checked;
-        if (preV) {
+    checked:function(){
+        if(this.model.get("checked")){
             this.$el.addClass("active");
+        }
+    },
+
+
+    choose:function() {
+        var preV = this.model.get("checked");
+        if (!preV) {
+            this.$el.addClass("active");
+            this.$(".memCheck").addClass("checked");
         } else {
             this.$el.removeClass("active");
+            this.$(".memCheck").removeClass("checked");
         }
-        //var status = this.$(":checked")[0].checked ? this.$(":checked")[0].checked : false;
-        this.model.set("selected",true);
+        this.model.set("checked",!preV);
     }
 });
 

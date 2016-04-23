@@ -8,6 +8,8 @@ App.Index = {
 		projectVersionId: "",
 		referenceId: "",
 		referenceVersionId: "",
+		baseFileVersionId: "",
+		differFileVersionId: "",
 		ModelObj: "",
 		Viewer: null,
 		FileType: {
@@ -89,21 +91,58 @@ App.Index = {
 		})
 
 		//列表点击
-		$projectContainer.on("click", ".designChange .itemContent", function() { 
+		$projectContainer.on("click", ".designChange .itemContent", function() {
 
-			$(this).toggleClass("selected");
 
-			if ($(this).hasClass("selected")) {
-				App.Index.Settings.Viewer.highlight({
-					type: "userId",
-					ids: ["73354c0f530daa5f25774a37425b1f37.661192"]
-				})
+			var $target = $(this);
+
+
+			if ($target.hasClass("selected")) {
+				$target.removeClass("selected");
 			} else {
+				$target.addClass("selected");
+			}
+
+			var Ids = [];
+
+			if ($target.data("cate")) {
+
+				$target.parent().find(".selected").each(function() {
+					Ids = $.merge(Ids, $(this).data("cate"))
+				});
 				App.Index.Settings.Viewer.highlight({
 					type: "userId",
-					ids: []
+					ids: Ids
 				})
+
+				return;
 			}
+
+
+			var data = {
+				URLtype: "fetchModleIdByCode",
+				data: {
+					projectId: App.Index.Settings.projectId,
+					projectVersionId: App.Index.Settings.projectVersionId,
+					planCode: $target.data("code")
+				}
+			};
+
+			App.Comm.ajax(data, function(data) {
+				if (data.code == 0) {
+
+					$target.data("cate", data.data);
+
+					$target.parent().find(".selected").each(function() {
+						Ids = $.merge(Ids, $(this).data("cate"))
+					});
+
+					App.Index.Settings.Viewer.highlight({
+						type: "userId",
+						ids: Ids
+					})
+				}
+			}); 
 
 		});
 
@@ -164,8 +203,8 @@ App.Index = {
 			if (data.message != "success") {
 				alert("转换失败");
 				return;
-			} 
-			 
+			}
+
 			var Model = data.data;
 
 			if (data.data.modelStatus == 1) {
@@ -186,6 +225,7 @@ App.Index = {
 
 
 			App.Index.Settings.Viewer.on("click", function(model) {
+
 				App.Index.Settings.ModelObj = null;
 				if (!model.intersect) {
 					return;
@@ -205,6 +245,7 @@ App.Index = {
 	//渲染属性
 	renderAttr() {
 
+
 		if (!App.Index.Settings.ModelObj || !App.Index.Settings.ModelObj.intersect) {
 			$("#projectContainer .designProperties").html(' <div class="nullTip">请选择构件</div>');
 			return;
@@ -215,8 +256,10 @@ App.Index = {
 			data: {
 				projectId: App.Index.Settings.projectId,
 				projectVersionId: App.Index.Settings.projectVersionId,
-				elementId: 2 || App.Index.Settings.ModelObj.intersect.userId,
-				sceneId: 2 || App.Index.Settings.ModelObj.intersect.object.userData.sceneId
+				elementId: App.Index.Settings.ModelObj.intersect.userId,
+				baseFileVerionId: App.Index.Settings.baseFileVersionId,
+				fileVerionId: App.Index.Settings.differFileVersionId,
+				sceneId: App.Index.Settings.ModelObj.intersect.object.userData.sceneId || ""
 			}
 		};
 
@@ -233,12 +276,14 @@ App.Index = {
 	getAcquisitionCost() {
 
 		var data = {
-			URLtype: "projectChangeListTest", //projectChangeList
+			URLtype: "projectDesinPropertiesCost", //projectChangeList
 			data: {
 				projectId: App.Index.Settings.projectId,
 				projectVersionId: App.Index.Settings.projectVersionId,
-				elementId: 2 || App.Index.Settings.ModelObj.intersect.userId,
-				sceneId: 2 || App.Index.Settings.ModelObj.intersect.object.userData.sceneId
+				elementId: App.Index.Settings.ModelObj.intersect.userId,
+				baseFileVerionId: App.Index.Settings.baseFileVersionId,
+				fileVerionId: App.Index.Settings.differFileVersionId,
+				sceneId: App.Index.Settings.ModelObj.intersect.object.userData.sceneId || ""
 			}
 		};
 
@@ -310,7 +355,7 @@ App.Index = {
 
 			});
 
-			var firstData = lists[0].data[0]; 
+			var firstData = lists[0].data[0];
 
 			//渲染模型
 			that.renderModel(firstData.differFileVersionId);
@@ -332,7 +377,7 @@ App.Index = {
 					$(".specialitiesOption .myDropText span:first").text(groupText);
 					var baseFileVersionId = $item.data("basefileversionid"),
 						differFileVersionId = $item.data("differfileversionid");
-						 
+
 					that.renderModel(differFileVersionId);
 					that.fetchChangeList(baseFileVersionId, differFileVersionId);
 
@@ -348,6 +393,9 @@ App.Index = {
 
 		App.Collections.changeListCollection.projectId = App.Index.Settings.projectId;
 		App.Collections.changeListCollection.projectVersionId = App.Index.Settings.projectVersionId;
+
+		App.Index.Settings.baseFileVersionId = baseFileVersionId;
+		App.Index.Settings.differFileVersionId = differFileVersionId;
 
 		App.Collections.changeListCollection.reset();
 		App.Collections.changeListCollection.fetch({

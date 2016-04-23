@@ -44,7 +44,7 @@ App.Service.control={
 
 
         //弹窗
-        App.Service.window.init();//基础弹窗
+        //App.Service.window.init();//基础弹窗
 
 
     },

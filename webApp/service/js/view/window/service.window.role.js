@@ -11,7 +11,7 @@ App.Service.windowRole=Backbone.View.extend({
     template:_.templateUrl("/service/tpls/window/service.window.role.html"),
 
     events:{
-        "click .serviceSubmit":"serviceSubmit"
+        "click .windowSubmit":"windowSubmit"
     },
     render:function(){
         this.$el.html(this.template());
@@ -31,7 +31,7 @@ App.Service.windowRole=Backbone.View.extend({
 
 
     //提交表单，完毕会触发重新获取列表，列表为memBlend所属列表
-    serviceSubmit:function(){
+    windowSubmit:function(){
         $("#mask").hide().empty();//外层
 
         //获取选中的功能，将功能id加入数组

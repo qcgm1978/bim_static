@@ -3,7 +3,7 @@
 
 <% obj.data && $.each(data,function(i,item){%>
            
-    <tr class="<%= i%2==0 &&'odd' || '' %>">
+    <tr class="<%= i%2==0 &&'odd' || '' %>" data-code="<%=item.code%>">
         <td class="ckItem">o</td>
         <td class="planId"><%= item.no %></td>
         <td class="operationalMatters"><%= item.businessItem %></td>

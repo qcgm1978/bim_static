@@ -65,7 +65,7 @@ App.Project.ProjectPlanProperty = Backbone.View.extend({
 
 			this.$el.find(".planInterest").show().siblings().hide();
 
-			this.loadPlanInspection(projectId,projectVersionId);
+			this.loadPlanInspection(projectId,projectVersionId+1);
 
 			
 

@@ -14,7 +14,7 @@ App.Service.fun ={
         }
     })),
 
-    loadData : function(selected) {
+    loadData : function(fn) {
         //数据重置
         App.Service.fun.collection.reset();
         // load list
@@ -22,11 +22,9 @@ App.Service.fun ={
             data: {
             },
             success: function(collection, response, options) {
-
-                var func = collection.models;
-                collection.reset();
-                collection.add(selected);
-                collection.add(func);
+                if(fn && typeof  fn == "function"){
+                    fn();
+                }
             }
         });
     }

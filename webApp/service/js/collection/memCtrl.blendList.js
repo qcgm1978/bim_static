@@ -1,5 +1,5 @@
 /*
-* @require  /service/js/view/mem/Service.MemCtrl.ozList.js
+* @require  /service/js/view/mem/service.memCtrl.blendList.js
 * */
 var App = App || {};
 //组织部分
@@ -46,10 +46,9 @@ App.Service.memCtrlBlend ={
         }),
         urlType: "fetchServiceMCBlendList",
 
-
-
         parse: function (response) {
             if (response.message == "success") {
+                App.Service.memCtrlBlend.setter(response);//设定特征
                 return response.data.user;
             }
         }
@@ -71,6 +70,16 @@ App.Service.memCtrlBlend ={
             }
         })
     }),
+
+
+    setter:function(response){
+        for(var i = 0; i < response.data.user.length; i++){
+            response.data.user[i]["oz"] = false;
+        }
+        for(var j = 0; j < response.data.org.length; j++){
+            response.data.org[j]["oz"] = true;
+        }
+    },
 
 
 
