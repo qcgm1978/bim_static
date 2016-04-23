@@ -43,8 +43,10 @@ App.Project.CostReference=Backbone.View.extend({
 
 
 		if ($target.hasClass("selected")) {
-			$target.removeClass("selected");
+			$target.parent().find(".selected").removeClass("selected");
+			//$target.removeClass("selected");
 		} else {
+			$target.parent().find(".selected").removeClass("selected");
 			$target.addClass("selected");
 		}
 

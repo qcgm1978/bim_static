@@ -11,6 +11,8 @@ App.Index = {
 		baseFileVersionId: "",
 		differFileVersionId: "",
 		ModelObj: "",
+		modelId: "",
+		diffModleId: "",
 		Viewer: null,
 		FileType: {
 			AR: "建筑",
@@ -98,8 +100,10 @@ App.Index = {
 
 
 			if ($target.hasClass("selected")) {
-				$target.removeClass("selected");
+				$target.closest(".treeRoot").find(".selected").removeClass("selected");
+				//$target.removeClass("selected");
 			} else {
+				$target.closest(".treeRoot").find(".selected").removeClass("selected");
 				$target.addClass("selected");
 			}
 
@@ -107,7 +111,7 @@ App.Index = {
 
 			if ($target.data("cate")) {
 
-				$target.parent().find(".selected").each(function() {
+				$target.closest(".treeRoot").find(".selected").each(function() {
 					Ids = $.merge(Ids, $(this).data("cate"))
 				});
 				App.Index.Settings.Viewer.highlight({
@@ -120,11 +124,11 @@ App.Index = {
 
 
 			var data = {
-				URLtype: "fetchModleIdByCode",
+				URLtype: "fetchCostModleIdByCode",
 				data: {
 					projectId: App.Index.Settings.projectId,
 					projectVersionId: App.Index.Settings.projectVersionId,
-					planCode: $target.data("code")
+					costCode: $target.data("code")
 				}
 			};
 
@@ -133,7 +137,7 @@ App.Index = {
 
 					$target.data("cate", data.data);
 
-					$target.parent().find(".selected").each(function() {
+					$target.closest(".treeRoot").find(".selected").each(function() {
 						Ids = $.merge(Ids, $(this).data("cate"))
 					});
 
@@ -142,10 +146,28 @@ App.Index = {
 						ids: Ids
 					})
 				}
-			}); 
+			});
 
 		});
 
+		$(".showChange .groupRadio").myRadioCk({
+			click: function(argument) {
+				if ($(this).find(".selected").length > 0) {
+					var diff=App.Index.Settings.differFileVersionId;
+					if (diff) {
+						App.Index.getModelId(diff, function(data) {
+							if (data.code==0) { 
+								App.Index.Settings.Viewer.load(App.Index.Settings.modelId,data.data.modelId);
+							}
+						});
+					}
+
+
+				}else{
+					App.Index.Settings.Viewer.load(App.Index.Settings.modelId);
+				}
+			}
+		});
 
 		this.bindTreeScroll();
 
@@ -204,6 +226,8 @@ App.Index = {
 				alert("转换失败");
 				return;
 			}
+
+			App.Index.Settings.modelId = data.data.modelId;
 
 			var Model = data.data;
 
