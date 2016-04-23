@@ -19,13 +19,14 @@ body,ul,table,tr,td,input{.clear;}
 .bdrB5{border-radius:  0 0 5px 5px;}
 .pdT10{padding-top: 10px;}
 .pdX10{padding: 0 10px;}
+.pdX17{padding: 0 17px;}
 .ellipsis{overflow: hidden;white-space: nowrap;text-overflow: ellipsis;}
 .frontCon{box-shadow: 0 0 10px 0  #666666;}
 /*用filter不是个好方式,IE渲染包含在box模型内，会偏移设置背景色将使ie的滤镜不继承*/
 /*-webkit-filter: drop-shadow(0,0,5,rgba(0, 0, 0, 0.5));background-color: #ffffff; */
 /*filter: progid:DXImageTransform.Microsoft.Glow(color=#999999,strength=3);*/
 img{border: none;outline: none;}
-.headIcon{position: absolute;width: 20px;height: 20px;left: 7px;top: 10px;background: transparent url("../images/dashboard.png") 0 0 no-repeat;}
+.headIcon{position: absolute;width: 20px;height: 20px;background: transparent url("../images/dashboard.png") 0 0 no-repeat;}
 
 table{border-collapse: collapse;border: none;}
 .clearBoth { clear: both;}
@@ -34,33 +35,35 @@ table{border-collapse: collapse;border: none;}
 
 .bodyContent{width: 980px;margin: 0 auto;padding: 20px 0 0 0;}
 .bodyContent li{.ellipsis;}
-.bodyContent  .article{.pdX10;.bdrB5;}
+.bodyContent .article{.pdX17;.bdrB5;}
 
 .conTodo,.conSlide,.conMonth,.conPro{.frontCon;.f12;.bdr5;border: none;}
-.conHeader span{display: block;.fTitle;padding:0 30px 0 35px; line-height: @lineHeight50 * 0.8;border-radius: 5px 0 0 0;cursor: pointer ;}
+.conHeader span{display: block;.fTitle;padding:0 30px 0 44px; line-height: @lineHeight50 * 0.8;border-radius: 5px 0 0 0;cursor: pointer ;}
 .conHeader a{float: right;width: 44px; padding-right: 20px;position: relative;z-index: 10;height: 40px;}
-.conHeader a:before{content: '';.headIcon;background-position: 0 -360px;width: 13px;height: 3px;right: 20px;top: 18px;}
+.conHeader a:before{content: '';.headIcon;background-position: 0 -360px;width: 13px;height: 3px;right: 17px !important;top: 18px;}
 .conHeader a:hover{text-decoration: none;}
 .conMonth .conHeader span{float: left;position: relative;}
-.conMonth .conHeader i{.headIcon;width: 11px;height: 14px;background-position: 0 -240px;left: 15px;top: 13px;}
+.conMonth .conHeader i{.headIcon;width: 11px;height: 14px;background-position: 0 -240px;left: 17px;top: 13px;}
 .conMonth .conHeader span.active i{.headIcon;width: 11px;height: 14px;background-position: 0 -200px;left: 15px;top: 13px;}
 .conMonth .conHeader span.active i{}
 .conMonth .conHeader span.active{background:#ffffff url("../images/contabx.gif") right top no-repeat;color:@fontColorBlack ;}
 .conMonth td{overflow: hidden;text-overflow: ellipsis;white-space: nowrap;}
+.conMonth td.time{text-align: right;}
+.conMonth td.lev{text-align: center;}
 .conTodo ,.conMonth{.left;width: 600px;}
 .conTodo li:not(:last-child){border-bottom: 1px solid #dddddd;}
 .conSlide,.conPro{.right;width: 360px;}
 .conTodo .conHeader span{position: relative;}
-.conTodo .conHeader i{.headIcon;}
-.conSlide .conHeader i{.headIcon;background-position: 0 -80px;}
-.conPro .conHeader i{.headIcon;background-position: 0 -320px;}
+.conTodo .conHeader i{.headIcon;left: 15px;top:10px;}
+.conSlide .conHeader i{.headIcon;left: 18px;top:10px;background-position: 0 -80px;}
+.conPro .conHeader i{.headIcon;left: 17px;top:10px;background-position: 0 -320px;}
 
 .conMonth table{width:@wp100;line-height: @lineHeight50 * 0.6;}
 .conMonth thead{color: @fontColorGray;border-bottom: 1px solid #dddddd;}
 #monthStart{display: none;}
 .bodyContent .conHeader{ background-color: #3c7ab9; height: @lineHeight50 * 0.8; color: @fontColorWhite;.bdrT5 ;line-height: 0;position: relative;}
 .conInfo{float: right;width: 195px;line-height: @lineHeight50 * 0.49;text-align: right;color: @fontColorGray;}
-.conInfo span{float: right;width: 110px;text-align: left;color: @fontColorBlack;}
+.conInfo span{float: right;width: 110px;text-align: right;color: @fontColorBlack;}
 .conBody li{.f12;}
 .conTodo .conBody li{line-height: @lineHeight50 * 0.98; }
 .conBody li a{color: #408CDF;}
