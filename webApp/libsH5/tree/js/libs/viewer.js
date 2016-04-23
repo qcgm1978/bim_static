@@ -602,6 +602,9 @@ BIM.prototype = {
     BIM.util.pub('zoomOut');
     BIM.common.viewer.zoomOut();
   },
+  zoomSelected : function () {
+    BIM.common.viewer.zoomToSelection();
+  },
   fit : function (id) {
     BIM.util.pub('fit');
     BIM.common.viewer.zoomToSelection(id);
@@ -754,6 +757,10 @@ BIM.prototype = {
       filter.removeUserOverrider(obj.type,id);
     });
     viewer.render();
+  },
+  selectIds:function(ids){
+    var viewer = BIM.common.viewer;
+    viewer.setSelectedIds(ids);
   },
   setFloorMap:function(obj,name){
     var viewer = BIM.common.viewer;
