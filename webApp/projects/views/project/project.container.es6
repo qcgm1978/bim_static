@@ -330,9 +330,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		// var viewer = new dwgViewer({
 		// 	element:$("#projectContainer .modelContainerContent"),
 		// 	sourceId:'beea5e402aaf38ceff7dd4dd315ebc05'
-		// })
-		 	
-		 
+		// }) 
 
 		var viewer = App.Project.Settings.Viewer = App.Comm.createModel({
 			element: $("#projectContainer .modelContainerContent"),
