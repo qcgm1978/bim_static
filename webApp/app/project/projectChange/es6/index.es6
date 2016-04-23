@@ -93,19 +93,56 @@ App.Index = {
 		//列表点击
 		$projectContainer.on("click", ".designChange .itemContent", function() {
 
-			$(this).toggleClass("selected");
 
-			if ($(this).hasClass("selected")) {
-				App.Index.Settings.Viewer.highlight({
-					type: "userId",
-					ids: ["73354c0f530daa5f25774a37425b1f37.661192"]
-				})
+			var $target = $(this);
+
+
+			if ($target.hasClass("selected")) {
+				$target.removeClass("selected");
 			} else {
+				$target.addClass("selected");
+			}
+
+			var Ids = [];
+
+			if ($target.data("cate")) {
+
+				$target.parent().find(".selected").each(function() {
+					Ids = $.merge(Ids, $(this).data("cate"))
+				});
 				App.Index.Settings.Viewer.highlight({
 					type: "userId",
-					ids: []
+					ids: Ids
 				})
+
+				return;
 			}
+
+
+			var data = {
+				URLtype: "fetchModleIdByCode",
+				data: {
+					projectId: App.Index.Settings.projectId,
+					projectVersionId: App.Index.Settings.projectVersionId,
+					planCode: $target.data("code")
+				}
+			};
+
+			App.Comm.ajax(data, function(data) {
+				if (data.code == 0) {
+
+					$target.data("cate", data.data);
+
+					$target.parent().find(".selected").each(function() {
+						Ids = $.merge(Ids, $(this).data("cate"))
+					});
+
+					App.Index.Settings.Viewer.highlight({
+						type: "userId",
+						ids: Ids
+					})
+				}
+			}); 
 
 		});
 
@@ -220,8 +257,8 @@ App.Index = {
 				projectId: App.Index.Settings.projectId,
 				projectVersionId: App.Index.Settings.projectVersionId,
 				elementId: App.Index.Settings.ModelObj.intersect.userId,
-				baseFileVerionId:App.Index.Settings.baseFileVersionId,
-				fileVerionId:App.Index.Settings.differFileVersionId,
+				baseFileVerionId: App.Index.Settings.baseFileVersionId,
+				fileVerionId: App.Index.Settings.differFileVersionId,
 				sceneId: App.Index.Settings.ModelObj.intersect.object.userData.sceneId || ""
 			}
 		};
@@ -243,7 +280,7 @@ App.Index = {
 			data: {
 				projectId: App.Index.Settings.projectId,
 				projectVersionId: App.Index.Settings.projectVersionId,
-				elementId:App.Index.Settings.ModelObj.intersect.userId,
+				elementId: App.Index.Settings.ModelObj.intersect.userId,
 				baseFileVerionId: App.Index.Settings.baseFileVersionId,
 				fileVerionId: App.Index.Settings.differFileVersionId,
 				sceneId: App.Index.Settings.ModelObj.intersect.object.userData.sceneId || ""
