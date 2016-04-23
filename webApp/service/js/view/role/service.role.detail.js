@@ -20,29 +20,32 @@ App.Service.roleDetail=Backbone.View.extend({
     initialize:function(){
         this.listenTo(this.model, 'change', this.render);
         this.$el.hover(function(){$(this).addClass("active");},function(){$(this).removeClass("active")});
-       // this.listenTo(this.model, 'destroy', this.removeItem);
     },
-
-
 
 
     modify:function(){
         App.Service.window.init();
-        this.model.set("selected",true);
 
-        var funView = new App.Service.windowRole().render().$el;
-        $(".serviceWindow").append(funView);//外框
-        $(".serviceWindow .aim input").val(this.model.get("name")).attr("disabled","disabled"); //暂时写入
+        $(".serviceWindow").append( new App.Service.windowRole().render().el);
 
-        var $this = this;
-        var coll = Backbone.Collection.extend({model:App.Service.funModel});//此处模型需要重新定义
-        var selected = new coll($this.model.get("functions"));
-        //App.Service.fun.collection.add(newColl.models);  //data需要排序，将已选的放到前面
+        //没起作用
+        var $this =this;
+        //值
+        var func= this.model.get("functions");
+        App.Service.fun.loadData(function(){
 
-        App.Service.fun.loadData(selected.models);//异步获取功能数据
+            $("#selectedRoleName").val($this.model.get("name")).attr("disabled","disabled"); //暂时写入
+            console.log($("#selectedRoleName").val());
 
-
-
+            App.Service.fun.collection.each(function(item){
+                for(var i = 0 ; i < func.length ; i ++){
+                    if(item.get("id") == func[i]["id"]){
+                        item.set({"checked":true});
+                        return
+                    }
+                }
+            });
+        });//异步获取功能数据
 
 
         $("#mask").show();

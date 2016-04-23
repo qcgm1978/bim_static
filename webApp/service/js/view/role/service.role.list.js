@@ -10,7 +10,7 @@ App.Service.roleList=Backbone.View.extend({
     className:"roleCtrl",
 
     events:{
-        "click .newRole": "createRole"
+        "click .newRole": "newRole"
     },
 
     template:_.templateUrl("/service/tpls/role/service.role.list.html"),
@@ -22,25 +22,19 @@ App.Service.roleList=Backbone.View.extend({
 
     initialize:function(){
        this.listenTo(App.Service.role.collection,"add",this.addOne);
-
-        //$el为包含模板的元素，el为元素节点
     },
     //数据加载
     addOne:function(model){
         var newView = new App.Service.roleDetail({model:model});
         this.$("#roleList").append(newView.render().el);
     },
-
-
     //创建新角色
-    createRole:function(){
-
+    newRole:function(){
         //前期菜单准备
-        App.Service.window.init();
+        App.Service.window.init();//窗口
         $(".serviceWindow").append(new App.Service.windowRole().render().$el);//外框
-        $("#mask").show();
         App.Service.fun.loadData();
-
+        $("#mask").show();
 
     },
 
