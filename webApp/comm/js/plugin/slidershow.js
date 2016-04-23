@@ -48,7 +48,7 @@ var slide = {
 
         var n = eleList.length,s  = n ;
         eleList.eq(present).css("z-index","1");
-        $(slide.obj.element ).find(" .conHeader span").text( eleList.eq(forward).find("a").attr("title"));
+        $(".conSlide .conHeader span").html(eleList.eq(forward).find("a").data("desc"));
        if(!($.isNumeric(forward)) ){slide.present = forward = 0;}
         $(slide.obj.element ).find("em").text(forward + 1);
         for(var  i = 0 ; i < n  ; i ++){
