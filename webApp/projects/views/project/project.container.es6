@@ -332,7 +332,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		// 	sourceId:'beea5e402aaf38ceff7dd4dd315ebc05'
 		// })
 		 	
-		 return;
+		 
 
 		var viewer = App.Project.Settings.Viewer = App.Comm.createModel({
 			element: $("#projectContainer .modelContainerContent"),

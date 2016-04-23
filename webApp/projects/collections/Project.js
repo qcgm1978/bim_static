@@ -442,6 +442,9 @@ App.Project = {
 				if (data.code == 0) {
 					 
 					data = data.data;
+					if (!data) {
+						return;
+					}
 					that.$el.find(".attrPlanBox").find(".name").text(data.businessItem).end().find(".start").
 					text(data.planStartTime && new Date(data.planStartTime).format("yyyy-MM-dd") || "").end().
 					find(".end").text(data.planStartTime && new Date(data.planEndTime).format("yyyy-MM-dd") || "").end().

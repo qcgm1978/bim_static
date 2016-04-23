@@ -8,7 +8,7 @@
 	   <td class="name">  <span class="nameText overflowEllipsis"><%=data[i].title%></span></td>
 	   <td class="date"><%= new Date(data[i].applyTime).format('yyyy-MM-dd') %></td>
 	   <td class="diff"> 
- 			<a href="/static/dist/app/project/projectChange/index.html?projectId=<%=App.Project.Settings.projectId%>&projectVersionId=<%=App.Project.Settings.CurrentVersion.id%>&referenceId=<%=data[i].referenceId%>&referenceVersionId=<%=data[i].referenceVersionId%>" target="_blank">查看</a> 
+ 			<a href="/static/dist/app/project/projectChange/index.html?projectId=<%=data[i].projectId%>&projectVersionId=<%=data[i].projectVersionId%>&referenceId=<%=data[i].referenceId%>&referenceVersionId=<%=data[i].referenceVersionId%>" target="_blank">查看</a> 
 	    </td> 
  </tr>
  <%}%> 

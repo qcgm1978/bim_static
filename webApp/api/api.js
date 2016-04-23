@@ -87,6 +87,7 @@ App.API = {
 		fetchPlanInspectionCate: "sixD/{projectId}/{projectVersionId}/plan/noplan/cate", // 图元未关联计划节点
 		fetchPlanInspectionCateDetail: "sixD/{projectId}/{projectVersionId}/plan/noplan/element", // 图元未关联计划节点 ?cateId={cateId} 暂开详情
 		fetchModleIdByCode:"sixD/{projectId}/{projectVersionId}/plan/element", //获取构建的模型id
+		fetchComponentByCateId:"sixD/{projectId}/{projectVersionId}/plan/noplan/element",//更具类型获取构建  ? cateId={cateId}
 
 		fetchPlanProperties: "", //属性
 
@@ -106,7 +107,7 @@ App.API = {
 		fetchQualityOpeningAcceptance: "sixD/{projectId}/{projectVersionId}/acceptance?type=2", //开业验收
 		fetchQualityConcerns: "sixD/{projectId}/{projectVersionId}/problem", //隐患
 		fetchQualityProperties: "dataJson/project/project.design.property.json", // 属性
-
+		fetchQualityModelById:"sixD/{projectId}/{versionId}/quality/element", //开业验收 过程 验收 获取构建id  ?acceptanceId={acceptanceId}
 
 
 		//资源

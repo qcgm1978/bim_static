@@ -15,7 +15,8 @@ App.Project.QualityProcessAcceptance = Backbone.View.extend({
 
 	events: {
 		"click .searchToggle": "searchToggle",
-		"click .clearSearch": "clearSearch"
+		"click .clearSearch": "clearSearch",
+		"click .tbProcessAccessBody tr":"showInModel"
 	},
 
 
@@ -93,6 +94,61 @@ App.Project.QualityProcessAcceptance = Backbone.View.extend({
 
 		this.$(".tbProcessAccessBody tbody").html(App.Project.Settings.loadingTpl);
 		 
+	},
+
+	//模型中显示
+	showInModel(event){ 
+
+		var $target = $(event.target).closest("tr");
+
+
+		if ($target.hasClass("selected")) {
+			$target.removeClass("selected");
+		} else {
+			$target.addClass("selected");
+		}
+
+		var Ids = [];
+			 
+		if ($target.data("cate")) {
+
+			$target.parent().find(".selected").each(function() {
+				Ids.push($(this).data("cate")); 
+			}); 
+			App.Project.Settings.Viewer.highlight({
+				type: "userId",
+				ids: Ids
+			}) 
+
+			return;
+		}
+
+		 
+		var data = {
+			URLtype: "fetchQualityModelById",
+			data: {
+				projectId: App.Project.Settings.CurrentVersion.projectId,
+				versionId: App.Project.Settings.CurrentVersion.id,
+				acceptanceId: $target.data("id")
+			}
+		};
+
+		App.Comm.ajax(data, function(data) {
+			if (data.code == 0) {
+				$target.data("cate",data.data);
+
+				$target.parent().find(".selected").each(function() {
+					Ids.push($(this).data("cate")); 
+				});
+				  
+				App.Project.Settings.Viewer.highlight({
+					type: "userId",
+					ids: Ids
+				})
+			}
+		});
+
+
 	}
 
 

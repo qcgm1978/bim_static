@@ -1,54 +1,102 @@
 //project.cost.property.verification.es6
 
- 
+
 
 //陈本清单
-App.Project.CostVerification=Backbone.View.extend({
+App.Project.CostVerification = Backbone.View.extend({
 
-	tagName:"div",
+	tagName: "div",
 
-	className:"CostVerification",
+	className: "CostVerification",
 
-	initialize:function(){
-		this.listenTo(App.Project.CostAttr.VerificationCollection,"add",this.addOne);
-		this.listenTo(App.Project.CostAttr.VerificationCollection,"reset",this.reset);
+	initialize: function() {
+		this.listenTo(App.Project.CostAttr.VerificationCollection, "add", this.addOne);
+		this.listenTo(App.Project.CostAttr.VerificationCollection, "reset", this.reset);
 
-		this.listenTo(App.Project.CostAttr.VerificationCollectionCate,"add",this.addOneCate);
-		this.listenTo(App.Project.CostAttr.VerificationCollectionCate,"reset",this.resetCate);
+		this.listenTo(App.Project.CostAttr.VerificationCollectionCate, "add", this.addOneCate);
+		this.listenTo(App.Project.CostAttr.VerificationCollectionCate, "reset", this.resetCate);
 	},
 
 
-	events:{},
+	events:{
+		"click .tbVerificationCate .nodeSwitch":"showNode"
+	},
 
 
 	//渲染
-	render:function(){
-		var page=_.templateUrl("/projects/tpls/project/cost/project.cost.property.verification.html",true);
-		this.$el.html(page); 
+	render: function() {
+		var page = _.templateUrl("/projects/tpls/project/cost/project.cost.property.verification.html", true);
+		this.$el.html(page);
 		return this;
 
-	}, 
+	},
 
 	//获取数据后处理
-	addOne:function(model){
-		var template=_.templateUrl("/projects/tpls/project/cost/project.cost.property.verification.detail.html"),
-		 data=model.toJSON();
-		this.$el.html(template(data));
+	addOne: function(model) {
+		var template = _.templateUrl("/projects/tpls/project/cost/project.cost.property.verification.detail.html"),
+			data = model.toJSON(),
+			$tbTop = this.$(".tbTop");
+
+		$tbTop.find("tbody").html(template(data));
+		$tbTop.prev().find(".count").text(data.data.length);
+
 	},
 
-	addOneCate(model){
-		var template=_.templateUrl("/projects/tpls/project/cost/project.cost.property.verification.detail.cate.html"),
-		 data=model.toJSON();
-		this.$el.html(template(data));
+	addOneCate(model) {
+		var template = _.templateUrl("/projects/tpls/project/plan/project.plan.property.inspection.detail.cate.html"),
+			data = model.toJSON(),
+			$tbBottom = this.$(".tbVerificationCate");
+
+		$tbBottom.find("tbody").html(template(data));
+		$tbBottom.prev().find(".count").text(data.data.length);
 	},
 
-	resetCate(){
+	resetCate() {
 		this.$(".tbVerificationCate tbody").html(App.Project.Settings.loadingTpl);
 	},
 
-	reset(){
+	reset() {
 		this.$(".tbTop tbody").html(App.Project.Settings.loadingTpl);
+	},
+	//图元未关联计划节点 暂开
+	showNode(event){
+
+		var $target=$(event.target),$tr=$target.closest("tr");
+		//展开
+		if ($target.hasClass("on")) {
+			$target.removeClass("on");
+			$tr.nextUntil(".odd").hide();
+			return;
+		}
+
+		//加载过
+		if (!$tr.next().hasClass("odd")) {
+			$target.addClass("on");
+			$tr.nextUntil(".odd").show();
+			return;
+		} 
+		 //未加载过
+		var data={
+			URLtype:"fetchComponentByCateId",
+			data:{
+				projectId:App.Project.Settings.projectId,
+				projectVersionId: App.Project.Settings.CurrentVersion.id+1,
+				cateId:$target.data("cateid")+1
+			}
+		}
+
+		App.Comm.ajax(data,function(data){
+
+			if (data.code==0) { 
+				var tpl= _.templateUrl("/projects/tpls/project/plan/project.plan.property.inspection.detail.cate.detail.html");
+				$tr.after(tpl(data));
+				$target.addClass("on");
+			}
+
+		});
+
 	}
+
 
 
 });

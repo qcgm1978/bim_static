@@ -1,5 +1,5 @@
 <% $.each(data.items,function(i,item){%> 
-    <tr class="<%= i%2==0 && 'odd' %>">
+    <tr class="<%= i%2==0 && 'odd' %>" data-id="<%=item.id%>">
         <td class="manifestIcon"></td>
         <td class="category"><%=item.category%></td>
         <td class="positon"><%=item.location%></td>
