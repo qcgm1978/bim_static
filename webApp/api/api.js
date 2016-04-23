@@ -18,10 +18,16 @@ App.API = {
 		fetchBodyContentProclamation :'dataJson/bodyContent/bodyContent.proclamation.json',
 
 		//Service
-		fetchServiceMCOuterList:'platform/auth/org?outer=true',//外部组织-用户列表
-		fetchServiceFunList: 'platform/auth/function',//功能列表
-		fetchServiceMCInnerList:'platform/auth/org?outer=false&parentId={parentId}',//内部-混合列表
-		fetchServiceOzRoleList:'/platform/org/{orgId}/role?outer={outer}',//机构角色列表
+		//console
+		fetchServiceMCBlendList:'/dataJson/service/service.Mem.blendList.json',//组织-混合列表
+		fetchServiceMCBlendListMn:'/dataJson/service/service.Mem.blendList_mn.json',//组织-混合列表
+		fetchServiceRolesList:'/dataJson/service/service.Mem.rolesList.json',//角色-功能列表
+		fetchServiceFunList: '/dataJson/service/service.fun.list.json',//功能列表
+		fetchServiceOzRoleList:'/dataJson/service/service.oz.roleList.json',
+		// fetchServiceMCOuterList:'platform/auth/org?outer=true',//外部组织-用户列表
+		// fetchServiceFunList: 'platform/auth/function',//功能列表
+		// fetchServiceMCInnerList:'platform/auth/org?outer=false&parentId={parentId}',//内部-混合列表
+		// fetchServiceOzRoleList:'/platform/org/{orgId}/role?outer={outer}',//机构角色列表
 
 
 
