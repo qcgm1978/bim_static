@@ -186,6 +186,7 @@ App.Index = {
 
 
 			App.Index.Settings.Viewer.on("click", function(model) {
+				debugger
 				App.Index.Settings.ModelObj = null;
 				if (!model.intersect) {
 					return;

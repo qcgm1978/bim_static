@@ -15,8 +15,8 @@
 
                             <span class="code"><%=current.code%></span>
                         </td>
-                        <td class="listName"><%=current.name%></td>
-                        <td class="listCount"><%=current.totalQuantity%><%=current.unit%></td>  
+                        <td class="listName"> <div class="overflowEllipsis overWidth"> <%=current.name%> </div> </td>
+                        <td class="listCount"><div class="overflowEllipsis overWidth"><%=current.totalQuantity%><%=current.unit%></div></td>  
                     </tr>
 
                      <% if(current.children){%>
@@ -36,8 +36,10 @@
                                             <%}%>
                                             <span class="code code1"><%=current.code%></span>
                                     </td>
-                                    <td class="listName"><%=current.name%></td>
-                                    <td class="listCount"><%=current.totalQuantity%><%=current.unit%></td>  
+                                    <td class="listName"><div class="overflowEllipsis overWidth">
+                                    <%=current.name%></div></td>
+                                    <td class="listCount"><div class="overflowEllipsis overWidth">
+                                    <%=current.totalQuantity%><%=current.unit%></div></td>  
                                 </tr>
 
                                  <% if(current.children){%>
@@ -54,8 +56,10 @@
                                                 <%}%>
                                                 <span class="code code2"><%=current.code%></span>
                                             </td>
-                                            <td class="listName"><%=current.name%></td>
-                                            <td class="listCount"><%=current.totalQuantity%><%=current.unit%></td>  
+                                            <td class="listName"><div class="overflowEllipsis overWidth">
+                                            <%=current.name%></div></td>
+                                            <td class="listCount"><div class="overflowEllipsis overWidth">
+                                            <%=current.totalQuantity%><%=current.unit%></div></td>  
                                         </tr>
 
                                              <% if(current.children){%>
@@ -71,8 +75,10 @@
                                                             <%}%>
                                                             <span class="code code3"><%=current.code%></span>
                                                         </td>
-                                                        <td class="listName"><%=current.name%></td>
-                                                        <td class="listCount"><%=current.totalQuantity%><%=current.unit%></td>  
+                                                        <td class="listName"><div class="overflowEllipsis overWidth">
+                                                        <%=current.name%></div></td>
+                                                        <td class="listCount">
+                                                        <div class="overflowEllipsis overWidth"><%=current.totalQuantity%><%=current.unit%></div></td>  
                                                     </tr>  
                                                  <%}%>
 
