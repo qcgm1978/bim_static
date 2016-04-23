@@ -2,8 +2,9 @@
 <input type="checkbox" class="ckAll" /></span>
 
 
-<span class="fileName inlineBlock">
-<span class=" fileType <%= folder?'folder':'file' %>"></span>
+<span class="fileName inlineBlock"> 
+
+<span class=" fileType <%= folder?'folder':App.Comm.fileSuffix(suffix)%>"></span>
 <% if(folder){%>
     <span data-id="<%=id%>" data-isfolder="<%=folder%>" class="text <%= id=='createNew'?'hidden':'' %>"><%=name%></span>
     <% if(id=='createNew'){%>

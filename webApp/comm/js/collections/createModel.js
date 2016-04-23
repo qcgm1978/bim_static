@@ -141,7 +141,7 @@ App.Comm.createModel = function(options){
             }
           });
         }
-      })
+      });
     },
     edit:function(){
       viewpointDialog({
@@ -251,29 +251,31 @@ App.Comm.createModel = function(options){
           type = parent.data("type");
       parents = parent.next(".subTree").length>0 ? parent.next(".subTree") : parent;
       parents.find("input").prop("checked",flag);
-      if(type == "sceneId"){
-        viewer.showScene(that.getFilter());
-      }else{
-        var data = that.getData(parent);
-        flag?viewer.show(data):viewer.hide(data);
-      }
+      viewer.hideScene(that.getFilter(type));
     },
     getData:function (element){
       var type = element.data("type");
       var data = {
-        type:type,
+        type:'',
         ids:[]
       }
       if(type != "classCode"){
-        var element = element.next(".subTree").length>0 ? element.next(".subTree") : element;
+        var element = $("#classCode");
+        data.type = element.data('type');
         var input = element.find("input");
         $.each(input,function(index,item){
           var $item = $(item),
               etag = $item.data('etag');
-          etag = etag?etag.toString().split(","):[];
+          if(!etag && etag !==0){
+            etag = []
+          }else{
+            etag = etag.toString().split(",")
+          }
           data.ids = data.ids.concat(etag);
         });
       }else{
+        var element = $("#classCode");
+        data.type = element.data('type');
         var codeData = this.classCodeData;
         var code = element.data('parent');
         var reg = new RegExp("^"+code);
@@ -287,23 +289,73 @@ App.Comm.createModel = function(options){
       }
       return data;
     },
-    getFilter:function(){
-      var sp = getHideEetag("#specialitys");
-      var fl = getHideEetag("#floors");
+    getFilter:function(type){
+      var that = this;
+      var data = {
+        type:type,
+        ids:[]
+      }
+      switch(type){
+        case "sceneId":
+          var sp = getHideEetag("#specialitys");
+          var fl = getHideEetag("#floors");
+          data.ids = _.uniq(sp.concat(fl));
+          break;
+        case "categoryId":
+          data.ids = getHideEetag("#categorys");
+          break;
+        case "classCode":
+          data.ids = getHideClassCode("#classCode");
+          break;
+      }
+      return data;
       function getHideEetag(element){
         var data = [];
-        $.each($(element).find("input"),function(index,item){
+        var input = $(element).find("input");
+        $.each(input,function(index,item){
           var $item = $(item),
-              flag = $item.is(":checked"),
+              flag = $item.prop("checked"),
               etag = $item.data('etag');
-          etag = etag?etag.split(","):[];
+          if(etag || etag == 0 || etag == -1){
+            etag = typeof etag == "number" ? [etag]:etag.split(",");
+          }
           if(!flag){
             data = data.concat(etag);
           }
         });
         return data;
       }
-      return _.uniq(sp.concat(fl));
+      function getHideClassCode(element){
+        var element = $(element);
+        var codeData = that.classCodeData;
+        var input = element.find("input");
+        var data = []
+        var regData = [];
+        $.each(input,function(index,item){
+          var $item = $(item),
+              etag = $item.data('etag'),
+              isChecked = $item.prop('checked'),
+              hasChildren = $item.closest(".item-content").next(".subTree").length;
+          if(!isChecked){
+            if(hasChildren){
+              data.push(etag);
+            }else{
+              if(etag == undefined){
+                regData = "all";
+              }else{
+                regData.push(etag);
+              }
+            }
+          }
+        });
+        var reg = new RegExp("^["+regData.toString()+"]");
+        $.each(codeData,function(i,item){
+          if(regData == "all" || reg.test(item.code)){
+            data.push(item.code);
+          }
+        });
+        return data;
+      }
     }
   });
   var sView = Backbone.View.extend({
@@ -435,9 +487,8 @@ App.Comm.createModel = function(options){
     addFloors:function(model){
       var data = model.toJSON();
       if(data.message == "success"){
-        data.data = data.data.sort(function(a,b){return a.sort<b.sort})
+        data.data = _.sortBy(data.data,function(num){return -num.sort})
         floorMap = data.data;
-        console.log(data);
         this.$el.html(_.template(this.template)(data));
         this.$el.find("li:eq(0)").trigger("click");
       }

@@ -25,8 +25,7 @@ App.Project.PlanInspection = Backbone.View.extend({
 	//计划节点未关联图元
 	addOne: function(model) {
 		var template = _.templateUrl("/projects/tpls/project/plan/project.plan.property.inspection.detail.html");
-		var data = model.toJSON();
-		
+		var data = model.toJSON(); 
 		this.$(".tbTop tbody").html(template(data));
 	},
 

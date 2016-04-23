@@ -7,8 +7,8 @@
 <%}else{%> 
 	<%if(thumbnail){%>
 		<img class="fileTypeImg" src="model/<%=modelId%>/<%=thumbnail%>" alt="" />
-	<%}else{%>
-		<span class=" fileType file"></span> 
+	<%}else{%> 
+		<span class=" fileType <%=App.Comm.fileSuffix(suffix)%>"></span> 
 	<%}%> 
 <%}%>
 

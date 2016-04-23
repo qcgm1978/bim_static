@@ -5,4 +5,8 @@
 		  <%= treeNode(item) %> 
 		</li> 
 <% }) %>
-	</ul>
+<% if(data.length<=0){%>
+	<li class="nullChange">无变更文件</li>
+<% } %>
+</ul>
+

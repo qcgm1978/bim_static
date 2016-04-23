@@ -85,8 +85,9 @@ App.Project.DesignCollision=Backbone.View.extend({
 	      }
 	      App.Comm.ajax(data,function(data){
 		      if (data.message=="success") {
-		      	console.log('')
+		      	App.Project.DesignAttr.CollisionTaskDetail.add({message:"running"});
 		      }else{
+		      	App.Project.DesignAttr.CollisionTaskDetail.add({message:"failed"});
 		        alert(data.message);
 		      }
 		    });

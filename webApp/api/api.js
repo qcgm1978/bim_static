@@ -4,7 +4,7 @@ App.API = {
 
 	Settings: {
 		hostname: "http://bim.wanda-dev.cn/",
-		debug: true
+		debug: false
 	},
 
 	URL: {
@@ -89,11 +89,12 @@ App.API = {
 		fetchPlanInspection: "sixD/{projectId}/{projectVersionId}/plan?noElement=true", //检验 计划节点未关联图元 startTime=1398145297000&endTime=1398145297000&relateModel={true|false}&
 		fetchPlanInspectionCate: "sixD/{projectId}/{projectVersionId}/plan/noplan/cate", // 图元未关联计划节点
 		fetchPlanInspectionCateDetail: "sixD/{projectId}/{projectVersionId}/plan/noplan/element", // 图元未关联计划节点 ?cateId={cateId} 暂开详情
+		fetchModleIdByCode:"sixD/{projectId}/{projectVersionId}/plan/element", //获取构建的模型id
 
 		fetchPlanProperties: "", //属性
 
-		//陈本
-		fetchCostReference: "sixD/{projectId}/{projectVersionId}/cost/summary", // 清单
+		//陈本 
+		fetchCostReference: "sixD/{projectId}/{projectVersionId}/cost/summary", // 清单 
 		fetchCostChange: "platform/auditSheet?type=9", // 变更
 		fetchCostVerification: "sixD/{projectId}/{projectVersionId}/cost/summary?noElement=true", // 效验
 		fetchCostVerificationCate: "sixD/{projectId}/{projectVersionId}/cost/nocost/cate", // 效验 图元未关联清单 类型
@@ -113,6 +114,7 @@ App.API = {
 
 		//资源
 		fetchStandardLibs: "platform/project?type=1", //获取 标准模型库
+		fetchStandardVersion:"platform/project/{projectId}/version", //获取标准模型库版本
 		fetchFamLibs: "platform/project?type=2", //获取族库
 		fetchVersion: "platform/project/{projectId}/version/{versionId}",
 		fetchFileTree: "doc/{projectId}/{projectVersionId}/file/tree", //项目设计文件导航
@@ -121,7 +123,8 @@ App.API = {
 		createNewFolder: "doc/{projectId}/{projectVersionId}/file", // 创建新文件夹 ?parentId={parentId}&filePath={filePath}
 
 		//项目 变更 列表
-		fileList:"/dataJson/project/projectChange/changeFile.json", //doc/internal/{projectId}/{versionId}/alteration
+		fileList:"doc/internal/{projectId}/{versionId}/differ", //变更列表
+		fileListTest:"/dataJson/project/projectChange/changeFile.json", //doc/internal/{projectId}/{versionId}/alteration
 		projectDesinProperties:"/dataJson/project/projectChange/comparisonAttr.json",//sixD/{projectId}/{projectVersionId}/property/comparison //?baseProjectVerionId={baseProjectVerionId}&sceneId={sceneId}&elementId={elementId}
 		projectChangeList:"sixD/{projectId}/{projectVersionId}/cost/comparison",// ?fileVerionId={fileVerionId}&baseFileVerionId={baseFileVerionId}
 		projectChangeListTest:"/dataJson/project/projectChange/list.json",
