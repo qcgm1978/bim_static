@@ -114,10 +114,14 @@ App.Index = {
 				$target.closest(".treeRoot").find(".selected").each(function() {
 					Ids = $.merge(Ids, $(this).data("cate"))
 				});
-				App.Index.Settings.Viewer.highlight({
-					type: "userId",
-					ids: Ids
-				})
+
+				App.Index.Settings.Viewer.selectIds(Ids);
+				App.Index.Settings.Viewer.zoomSelected();
+
+				// App.Index.Settings.Viewer.highlight({
+				// 	type: "userId",
+				// 	ids: Ids
+				// })
 
 				return;
 			}
@@ -141,10 +145,13 @@ App.Index = {
 						Ids = $.merge(Ids, $(this).data("cate"))
 					});
 
-					App.Index.Settings.Viewer.highlight({
-						type: "userId",
-						ids: Ids
-					})
+					App.Index.Settings.Viewer.selectIds(Ids);
+					App.Index.Settings.Viewer.zoomSelected();
+
+					// App.Index.Settings.Viewer.highlight({
+					// 	type: "userId",
+					// 	ids: Ids
+					// })
 				}
 			});
 
@@ -153,17 +160,17 @@ App.Index = {
 		$(".showChange .groupRadio").myRadioCk({
 			click: function(argument) {
 				if ($(this).find(".selected").length > 0) {
-					var diff=App.Index.Settings.differFileVersionId;
+					var diff = App.Index.Settings.differFileVersionId;
 					if (diff) {
 						App.Index.getModelId(diff, function(data) {
-							if (data.code==0) { 
-								App.Index.Settings.Viewer.load(App.Index.Settings.modelId,data.data.modelId);
+							if (data.code == 0) {
+								App.Index.Settings.Viewer.load(App.Index.Settings.modelId, data.data.modelId);
 							}
 						});
 					}
 
 
-				}else{
+				} else {
 					App.Index.Settings.Viewer.load(App.Index.Settings.modelId);
 				}
 			}
@@ -254,6 +261,8 @@ App.Index = {
 				if (!model.intersect) {
 					return;
 				}
+
+
 				App.Index.Settings.ModelObj = model;
 				//属性
 				if (App.Index.Settings.property == "attr") {

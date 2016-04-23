@@ -760,7 +760,8 @@ BIM.prototype = {
   },
   selectIds:function(ids){
     var viewer = BIM.common.viewer;
-    viewer.setSelectedIds(ids);
+    var filter = viewer.getFilters();
+    filter.setSelectedIds(ids);
   },
   setFloorMap:function(obj,name){
     var viewer = BIM.common.viewer;

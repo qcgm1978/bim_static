@@ -106,7 +106,7 @@ App.API = {
 		fetchCostVerification: "sixD/{projectId}/{projectVersionId}/cost/summary?noElement=true", // 效验
 		fetchCostVerificationCate: "sixD/{projectId}/{projectVersionId}/cost/nocost/cate", // 效验 图元未关联清单 类型
 		fetchCostVerificationCateDetail: "sixD/{projectId}/{projectVersionId}/cost/nocost/element", // ?cateId={cateId}图元未关联清单 详情
-		fetchCostModleIdByCode:"sixD/{projectId}/{projectVersionId}/cost/element", // ?costCode={costCode}
+		fetchCostModleIdByCode:"sixD/{projectId}/{projectVersionId}/cost/nocost/element", // ?costCode={costCode}
 		fetchCostProperties: "dataJson/project/project.design.property.json", //属性
 
 

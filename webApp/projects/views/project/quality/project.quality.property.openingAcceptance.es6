@@ -1,55 +1,61 @@
 // 开业验收 project.quality.property.openingAcceptance.es6
 
 //开业验收
-App.Project.QualityOpeningAcceptance=Backbone.View.extend({
+App.Project.QualityOpeningAcceptance = Backbone.View.extend({
 
-	tagName:"div",
+	tagName: "div",
 
-	className:"QualityOpeningAcceptance",
+	className: "QualityOpeningAcceptance",
 
-	initialize:function(){
-		this.listenTo(App.Project.QualityAttr.OpeningAcceptanceCollection,"add",this.addOne);
-		this.listenTo(App.Project.QualityAttr.OpeningAcceptanceCollection,"reset",this.loading);
+	initialize: function() {
+		this.listenTo(App.Project.QualityAttr.OpeningAcceptanceCollection, "add", this.addOne);
+		this.listenTo(App.Project.QualityAttr.OpeningAcceptanceCollection, "reset", this.loading);
 	},
 
 
 	events: {
 		"click .searchToggle": "searchToggle",
 		"click .clearSearch": "clearSearch",
-		"click .tbOpeningacceptanceBody tr":"showInModel"
+		"click .tbOpeningacceptanceBody tr": "showInModel"
 	},
 
 
 	//渲染
-	render:function(options){
+	render: function(options) {
 
-		this.OpeningAcceptanceOptions=options.OpeningAcceptance;
+		this.OpeningAcceptanceOptions = options.OpeningAcceptance;
 
-		var tpl=_.templateUrl("/projects/tpls/project/quality/project.quality.property.openingAcceptance.html");
-		this.$el.html(tpl); 
+		var tpl = _.templateUrl("/projects/tpls/project/quality/project.quality.property.openingAcceptance.html");
+		this.$el.html(tpl);
 		this.bindEvent();
 		return this;
 
 	},
 
 	//事件初始化
-	bindEvent(){
+	bindEvent() {
 
-		var that=this;
+		var that = this;
 		//隐患
-		this.$(".riskOption").myDropDown({click:function($item){
-			that.OpeningAcceptanceOptions.problemCount=$item.data("status");
-		}});
+		this.$(".riskOption").myDropDown({
+			click: function($item) {
+				that.OpeningAcceptanceOptions.problemCount = $item.data("status");
+			}
+		});
 		//列别
-		this.$(".categoryOption").myDropDown({click:function($item){
-			that.OpeningAcceptanceOptions.category=$item.text();
-		}});
+		this.$(".categoryOption").myDropDown({
+			click: function($item) {
+				that.OpeningAcceptanceOptions.category = $item.text();
+			}
+		});
 
 		//专业
-		this.$(".specialitiesOption").myDropDown({click:function($item){
-			that.OpeningAcceptanceOptions.specialty=$item.text();
-		}});
-		
+		this.$(".specialitiesOption").myDropDown({
+			click: function($item) {
+				that.OpeningAcceptanceOptions.specialty = $item.text();
+			}
+		});
+
 		//显示搜索结果对应位置
 		this.$(".groupRadio").myRadioCk();
 	},
@@ -68,11 +74,11 @@ App.Project.QualityOpeningAcceptance=Backbone.View.extend({
 
 	},
 
-	template:_.templateUrl("/projects/tpls/project/quality/project.quality.property.openingAcceptance.body.html"),
+	template: _.templateUrl("/projects/tpls/project/quality/project.quality.property.openingAcceptance.body.html"),
 
 	//获取数据后处理
-	addOne:function(model){
-		var data=model.toJSON();
+	addOne: function(model) {
+		var data = model.toJSON();
 		this.$(".tbOpeningacceptanceBody tbody").html(this.template(data));
 		this.bindScroll();
 	},
@@ -95,15 +101,15 @@ App.Project.QualityOpeningAcceptance=Backbone.View.extend({
 			scrollInertia: 0
 		});
 	},
-		//加载
-	loading(){
+	//加载
+	loading() {
 
 		this.$(".tbOpeningacceptanceBody tbody").html(App.Project.Settings.loadingTpl);
-		 
+
 	},
 
 	//模型中显示
-	showInModel(event){ 
+	showInModel(event) {
 
 		var $target = $(event.target).closest("tr");
 
@@ -117,21 +123,23 @@ App.Project.QualityOpeningAcceptance=Backbone.View.extend({
 		}
 
 		var Ids = [];
-			 
+
 		if ($target.data("cate")) {
 
 			$target.parent().find(".selected").each(function() {
 				Ids = $.merge(Ids, $(this).data("cate"))
-			}); 
-			App.Project.Settings.Viewer.highlight({
-				type: "userId",
-				ids: Ids
-			}) 
+			});
+			App.Project.Settings.Viewer.selectIds(Ids);
+			App.Project.Settings.Viewer.zoomSelected();
+			// App.Project.Settings.Viewer.highlight({
+			// 	type: "userId",
+			// 	ids: Ids
+			// }) 
 
 			return;
 		}
 
-		 
+
 		var data = {
 			URLtype: "fetchQualityModelById",
 			data: {
@@ -143,21 +151,21 @@ App.Project.QualityOpeningAcceptance=Backbone.View.extend({
 
 		App.Comm.ajax(data, function(data) {
 			if (data.code == 0) {
-				$target.data("cate",data.data);
+				$target.data("cate", data.data);
 				$target.parent().find(".selected").each(function() {
 					Ids = $.merge(Ids, $(this).data("cate"))
 				});
-				  
-				App.Project.Settings.Viewer.highlight({
-					type: "userId",
-					ids: Ids
-				})
+				App.Project.Settings.Viewer.selectIds(Ids);
+				App.Project.Settings.Viewer.zoomSelected();
+				// App.Project.Settings.Viewer.highlight({
+				// 	type: "userId",
+				// 	ids: Ids
+				// })
 			}
 		});
 
 
 	}
-
 
 
 

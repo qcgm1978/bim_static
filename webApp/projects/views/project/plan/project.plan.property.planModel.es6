@@ -42,21 +42,23 @@ App.Project.PlanModel = Backbone.View.extend({
 		}
 
 		var Ids = [];
-			 
+
 		if ($target.data("cate")) {
 
 			$target.parent().find(".selected").each(function() {
 				Ids = $.merge(Ids, $(this).data("cate"))
-			}); 
-			App.Project.Settings.Viewer.highlight({
-				type: "userId",
-				ids: Ids
-			}) 
+			});
+			App.Project.Settings.Viewer.selectIds(Ids);
+			App.Project.Settings.Viewer.zoomSelected();
+			// App.Project.Settings.Viewer.highlight({
+			// 	type: "userId",
+			// 	ids: Ids
+			// }) 
 
 			return;
 		}
 
-		 
+
 		var data = {
 			URLtype: "fetchModleIdByCode",
 			data: {
@@ -68,15 +70,16 @@ App.Project.PlanModel = Backbone.View.extend({
 
 		App.Comm.ajax(data, function(data) {
 			if (data.code == 0) {
-				$target.data("cate",data.data);
+				$target.data("cate", data.data);
 				$target.parent().find(".selected").each(function() {
 					Ids = $.merge(Ids, $(this).data("cate"))
 				});
-				  
-				App.Project.Settings.Viewer.highlight({
-					type: "userId",
-					ids: Ids
-				})
+				App.Project.Settings.Viewer.selectIds(Ids);
+				App.Project.Settings.Viewer.zoomSelected();
+				// App.Project.Settings.Viewer.highlight({
+				// 	type: "userId",
+				// 	ids: Ids
+				// })
 			}
 		});
 
