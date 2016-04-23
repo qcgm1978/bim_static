@@ -8,7 +8,7 @@ App.Service.MemCtrlozDetail=Backbone.View.extend({
 
     tagName :'li',
 
-    template:_.templateUrl("/service/tpls/mem/service.MemCtrl.ozDetail.html"),
+    template:_.templateUrl("/service/tpls/mem/service.memCtrl.ozDetail.html"),
     events:{
         "click .ozName":"unfold"
     },

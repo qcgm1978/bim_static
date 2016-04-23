@@ -6,7 +6,7 @@ App.Service.MemCtrl=Backbone.View.extend({
 
     tagName :'div',
 
-    template:_.templateUrl("/service/tpls/mem/service.MemCtrl.html"),
+    template:_.templateUrl("/service/tpls/mem/service.memCtrl.html"),
     events:{
         "click .outer":'outer',
         "click .inner":'inner'
