@@ -56,6 +56,7 @@
 }
 .rightProperty { .odd { background-color: #eee; }
 	.selected { background-color: #A8DBFD; }
+	.btnCk.selected{background-color: #fff;}
 	.attrPlanBox, .attrCostBox, .attrQualityBox { display: none; }
 	.designVerification { height: 100%; }
 	.modle { .modleShowHide { transition: all .5s; background: url(/comm/images/commIcon.png) no-repeat 0px -256px; float: right; margin-right: 12px; margin-top: 6px; height: 14px; width: 14px; cursor: pointer;
@@ -91,8 +92,13 @@
 			}
 		}
 	}
+	.actionAnalog{position: absolute;bottom:0px;width:100%;min-width: 398px;height: 80px;background-color: #eee;
+		.progressAnalog{height: 50px;}
+		.desctionAnalog{height: 30px;background-color: #ddd;line-height: 33px;padding-left: 15px;}
+	}
 	.planBox { position: absolute; top: 52px; bottom: 0px; left: 0px; right: 0px;
-		&.planAnalog { top: -1px; }
+		&.planAnalogContent { top: -1px;bottom:80px; }
+
 		&.planPlanPublicity { top: 0px;
 			.selDate { margin-bottom: 7px; margin-top: 3px; }
 		}
@@ -127,9 +133,8 @@
 		.listCode { width: 25%; }
 		.listName { width: 56%; }
 		.listCount { width: 18%; }
-		.nodeSwitch{position: relative;z-index: 1;}
-		td.subData{padding-left: 30px;}
-		
+		.nodeSwitch { position: relative; z-index: 1; }
+		td.subData { padding-left: 30px; }
 	}
 	.contentBox { height: 100%; }
 	.title { height: 28px; line-height: 28px; font-weight: bold; padding-left: 15px; }
@@ -211,14 +216,12 @@
 		td { padding-left: 7px; text-align: left; }
 		thead { tr { background-color: #eee; }
 		}
-		tbody { 
-			tr { background-color: #ddd; 
-				&.odd{background-color: #eee;}
+		tbody { tr { background-color: #ddd;
+				&.odd { background-color: #eee; }
 			}
-			td.listName{text-align: left;}
+			td.listName { text-align: left; }
 		}
-
-		.nodeSwitch{position: relative;z-index: 1;}
+		.nodeSwitch { position: relative; z-index: 1; }
 	}
 }
 .designVerification { select { width: 98%; }
@@ -319,5 +322,8 @@
 			&:hover { text-decoration: underline; }
 			&.disable { color: #ccc; text-decoration: none; cursor: default; }
 		}
+	}
+}
+#projectContainer { .containerHeader { .myBtn em { margin-top: 1px; vertical-align: top; }
 	}
 }

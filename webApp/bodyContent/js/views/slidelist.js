@@ -1,7 +1,6 @@
 /**
  * @require /bodyContent/js/view/slide.js
  */
-var app = app || {};
 App.BodyContent.slideList = Backbone.View.extend({
 
 

@@ -42,8 +42,7 @@ App.Project.ProjectPlanProperty = Backbone.View.extend({
 			App.Project.PlanAttr.PlanModelCollection.fetch();
 
 		} else if (type == "analog") {
-			//设计检查
-
+			//设计检查 
 			this.$el.find(".planAnalog").show().siblings().hide();
 
 			App.Project.PlanAttr.PlanAnalogCollection.reset();
