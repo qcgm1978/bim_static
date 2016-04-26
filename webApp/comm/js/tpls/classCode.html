@@ -1,6 +1,6 @@
 <% _.forEach(data,function(item){ %>
   <li class="itemNode">
-    <div class="item-content" data-type="classCode">
+    <div class="item-content" data-type="classCode" data-parent="<%= item.code %>">
       <% if(item.isChild){ %>
         <i class="nodeSwitch"></i>
       <% }else{ %>
