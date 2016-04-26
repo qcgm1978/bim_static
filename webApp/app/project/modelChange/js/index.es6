@@ -37,16 +37,6 @@ App.Index = {
 			$modleList.slideToggle();
 		});
 
-		//收起 暂开 属性 左侧
-		$projectContainer.on("click", ".leftNavContent .slideBar", function() {
-
-			App.Comm.navBarToggle($("#projectContainer .leftNav "), $("#projectContainer .projectCotent"), "left", App.Index.Settings.Viewer);
-		});
-		//拖拽 属性内容 左侧
-		$projectContainer.on("mousedown", ".leftNavContent .dragSize", function(event) {
-			App.Comm.dragSize(event, $("#projectContainer .leftNav"), $("#projectContainer .projectCotent"), "left", App.Index.Settings.Viewer);
-		});
-
 
 		//收起 暂开 属性 右侧
 		$projectContainer.on("click", ".rightProperty .slideBar", function() {
@@ -67,6 +57,7 @@ App.Index = {
 		var Request = App.Index.GetRequest();
 		App.Index.Settings.projectId = Request.projectId;
 		App.Index.Settings.projectVersionId = Request.projectVersionId;
+		App.Index.Settings.referenceId = Request.id;
 	},
 
 	//获取url 参数
@@ -85,13 +76,14 @@ App.Index = {
 
 
 	//获取模型id 渲染模型
-	getModelId(callback) {
+	getModelId(differFileVersionId, callback) {
 
 		var dataObj = {
-			URLtype: "fetchModelIdByProject",
+			URLtype: "fetchFileModelIdByFileVersionId",
 			data: {
 				projectId: App.Index.Settings.projectId,
-				projectVersionId: App.Index.Settings.projectVersionId
+				projectVersionId: App.Index.Settings.projectVersionId,
+				fileVersionId: differFileVersionId
 			}
 		}
 
@@ -100,52 +92,13 @@ App.Index = {
 	},
 
 	//渲染模型
-	renderModel() {
-
-
-		var that = this;
-		App.Index.Settings.Viewer = null;
-		this.getModelId(function(data) {
-
-			var Model = data.data;
-
-			if (data.data.modelStatus == 1) {
-				alert("模型转换中");
-				return;
-			} else if (data.data.modelStatus == 3) {
-				alert("转换失败");
-				return;
-			}
-
-			App.Index.Settings.Viewer = new BIM({
+	renderModel(modelId) {
+		App.Index.Settings.Viewer = new BIM({
+				single: true,
 				element: $("#contains .projectCotent")[0],
-				sourceId: Model.sourceId,
-				etag: Model.etag,
-				tools: true,
-				treeElement: $("#projectContainer  .projectModelContent")[0]
+				etag: modelId,
+				tools: true
 			});
-
-
-			App.Index.Settings.Viewer.on("click", function(model) {
-				App.Index.Settings.ModelObj = null;
-				if (!model.intersect) {
-					return;
-				}
-
-				App.Index.Settings.ModelObj = model;
-				//App.Project.Settings.modelId = model.userId;
-				//设计
-
-				//属性
-				if (App.Index.Settings.property == "attr") {
-					that.renderAttr(App.Index.Settings.ModelObj);
-				}
-
-			});
-			// 绑定视点功能
-			that.bindPoint(App.Index.Settings.Viewer);
-		});
-
 	},
 
 	//渲染属性
@@ -165,7 +118,7 @@ App.Index = {
 			}
 		}).done(function(data) {
 			var template = _.templateUrl("/projects/tpls/project/design/project.design.property.properties.html");
-			$("#projectContainer .designProperties").html(template(data.data));
+			$("#projectContainer .dropList").html(template(data.data));
 		});
 
 	},
@@ -202,10 +155,30 @@ App.Index = {
 	},
 
 	fetchChange: function() {
+		var that = this;
 		App.Project.Collection.changeList.projectId = App.Index.Settings.projectId;
 		App.Project.Collection.changeList.projectVersionId = App.Index.Settings.projectVersionId;
 		App.Project.Collection.changeList.fetch();
-		$(".rightPropertyContent .designChange").html(new App.Project.Model.changeList().render().el);
+		$(".rightPropertyContent .dropList").html(new App.Project.Model.changeList().render().el);
+		//下拉 事件绑定
+		$('.myDropDown').myDropDown({
+			click: function($item) {
+				var groupText = $item.closest(".groups").prev().text() + "：";
+				$(".myDropDown .myDropText span:first").text(groupText);
+				var currentModel = $item.data("currentmodel"),
+					baseModel = $item.data("basemodel"),
+					comparisonId = $item.data('id');
+				that.renderModel(currentModel);
+				that.getDetail(comparisonId);
+			}
+		});
+
+	},
+	getDetail:function(comparisonId){
+		App.Project.Collection.changeInfo.projectId = App.Index.Settings.projectId;
+		App.Project.Collection.changeInfo.projectVersionId = App.Index.Settings.projectVersionId;
+		App.Project.Collection.changeInfo.comparisonId = comparisonId;
+		App.Project.Collection.changeInfo.fetch();
 	},
 
 
@@ -213,7 +186,6 @@ App.Index = {
 		//初始化参数
 		this.initPars();
 		//渲染模型
-		this.renderModel();
 		//事件绑定
 		this.bindEvent();
 		//变更获取
@@ -228,18 +200,19 @@ App.Project.Model = {
 
 		tagName: "div",
 
-		className: "tree-view rightTree",
+		className: "myDropDown optionComm",
 
 		events: {
 			"click .item-content": "openTree",
-			"click .tree-text": "select"
+			"click .tree-text": "select",
+			"click .myDropText": "openList",
 		},
 
 		initialize: function() {
 			this.listenTo(App.Project.Collection.changeList, "add", this.addList);
 		},
 
-		template: _.templateUrl('/app/project/modelChange/tpls/changeList.html'),
+		template: _.templateUrl('/app/project/modelChange/tpls/fileList.html'),
 
 		render: function() {
 			this.$el.html("加载中...");
@@ -248,27 +221,50 @@ App.Project.Model = {
 
 		addList: function(model) {
 			var data = model.toJSON();
+			var comparisonId = App.Index.Settings.referenceId;
+			$.each(data.data,function(i,item){
+				$.each(item.comparisons,function(j,file){
+					if(file.currentVersion == comparisonId){
+						$(".rightPropertyContent .listDetail").html(new App.Project.Model.getInfo().render().el);
+						App.Index.Settings.baseModel = file.baseModel
+						App.Index.getDetail(comparisonId);
+						App.Index.renderModel(file.currentModel);
+					}
+				});
+			})
 			if (data.message == 'success') {
 				this.$el.html(this.template(data));
 			}else{
 				this.$el.html("没有变更")
 			}
 			return this;
-		},
+		}
 
-		openTree: function(event) {
-			var that = $(event.target).closest('.item-content')
-			comparisonId = that.data('id');
-			that.toggleClass('open');
-			if (comparisonId && that.next().length == 0) {
-				that.after(new App.Project.Model.getInfo().render().el);
-				App.Project.Collection.changeInfo.projectId = App.Index.Settings.projectId;
-				App.Project.Collection.changeInfo.projectVersionId = App.Index.Settings.projectVersionId;
-				App.Project.Collection.changeInfo.comparisonId = comparisonId;
-				App.Project.Collection.changeInfo.fetch();
+	}),
+
+	getInfo: Backbone.View.extend({
+		tagName: "ul",
+		className: "rightTree",
+		events:{
+			"click .tree-text": "select",
+		},
+		initialize: function() {
+			this.listenTo(App.Project.Collection.changeInfo, "add", this.addDetail);
+		},
+		template: _.templateUrl('/app/project/modelChange/tpls/changeInfo.html'),
+		render: function() {
+			this.$el.html("加载中...");
+			return this;
+		},
+		addDetail: function(model) {
+			var data = model.toJSON();
+			if (data.message == 'success' && data.data.length > 0) {
+				this.$el.html(this.template(data));
+			}else{
+				this.$el.html("没有变更");
 			}
+			return this;
 		},
-
 		select: function() {
 			var that = $(event.target);
 			var current = $(".rightTreeView .current");
@@ -289,29 +285,6 @@ App.Project.Model = {
 				});
 				App.Index.Settings.Viewer.fit();
 			}
-		}
-
-	}),
-
-	getInfo: Backbone.View.extend({
-		tagName: "ul",
-		className: "treeViewSub",
-		initialize: function() {
-			this.listenTo(App.Project.Collection.changeInfo, "add", this.addDetail);
-		},
-		template: _.templateUrl('/app/project/modelChange/tpls/changeInfo.html'),
-		render: function() {
-			this.$el.html("加载中...");
-			return this;
-		},
-		addDetail: function(model) {
-			var data = model.toJSON();
-			if (data.message == 'success' && data.data.length > 0) {
-				this.$el.html(this.template(data));
-			}else{
-				this.$el.html("没有变更");
-			}
-			return this;
 		}
 	})
 }
