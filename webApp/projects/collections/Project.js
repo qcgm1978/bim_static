@@ -389,6 +389,8 @@ App.Project = {
 			data.iconType = 1;
 			var navHtml = new App.Comm.TreeViewMar(data);
 			$("#projectContainer .projectNavFileContainer").html(navHtml);
+
+			$("#pageLoading").hide();
 		});
 
 	},
