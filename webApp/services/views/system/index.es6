@@ -1,4 +1,5 @@
 
+
 //系统 管理入口
 App.Services.System=Backbone.View.extend({
 
@@ -24,7 +25,7 @@ App.Services.System=Backbone.View.extend({
 		var $target=$(event.target),type=$target.data("type"),viewer;
 		$target.addClass("selected").siblings().removeClass("selected");
 
-		if (type=="category") {
+		if (type=="category") { 
 			//业务类别
 			viewer=new App.Services.System.CategoryManager();
 
