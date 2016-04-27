@@ -24,13 +24,31 @@ body,ul,table,tr,td,input{.clear;}
 /*用filter不是个好方式,IE渲染包含在box模型内，会偏移设置背景色将使ie的滤镜不继承*/
 img{border: none;outline: none;}
 .headIcon{position: absolute;width: 35px;height: 40px;left: 0;top: 0;background: transparent url("../images/con_tab_default.png") center center no-repeat;}
-
+.linkBarIcon{
+    background: url('../images/dashboard.png');
+    width: 24px;
+    height: 24px;
+    display: inline-block;
+    vertical-align: -7px;
+}
+.ico {background-position:0 240px;}
+.module {background-position:0 200px;}
+.book {background-position:0 160px;}
+.money {background-position:0 120px;}
+.check {background-position:0 80px;}
+.plat {background-position:0 40px;}
 table{border-collapse: collapse;border: none;}
 .clearBoth { clear: both;}
 .clearfix:after{ clear: both; content: "\200B"; display: block; height: 0px;}
 .clearfix{ *zoom: 1;}
 
-.bodyContent{width: 980px;margin: 0 auto;padding: 20px 0 0 0;}
+.bodyContent{
+    position: fixed;
+    top:80px;
+    left: 20px;
+    right: 20px;
+    bottom: 110px;
+}
 .bodyContent li{.ellipsis;}
 .bodyContent  .article{.pdX10;.bdrBComm;}
 
@@ -43,9 +61,9 @@ table{border-collapse: collapse;border: none;}
 .conMonth .conHeader span.active i{background: #ffffff url("../images/con_tab_active.png") center center no-repeat;border-radius: 5px 0 0 0;}
 .conMonth .conHeader span.active{background:#ffffff url("../images/contabx.gif") right top no-repeat;color:@fontColorBlack ;}
 .conMonth td{overflow: hidden;text-overflow: ellipsis;white-space: nowrap;}
-.conTodo ,.conMonth{.left;width: 600px;}
+.conTodo ,.conMonth{.left;width: 60%;}
 .conTodo li:not(:last-child){border-bottom: 1px solid #dddddd;}
-.conSlide,.conPro{.right;width: 360px;}
+.conSlide,.conPro{.right;width: 37%;}
 .conTodo .conHeader span{position: relative;}
 .conTodo .conHeader i{.headIcon;background-image:  url("../images/con_todo_ico.png");}
 .conSlide .conHeader i{.headIcon;background-image:  url("../images/slide_ico.png");}
@@ -72,3 +90,72 @@ table{border-collapse: collapse;border: none;}
 .conSlide  .slideProcess {height: 50px; line-height: 0;text-align: center;}
 .conSlide  .slideProcess span{display: inline-block;*display:inline;width: 30px;height: 50px;line-height: 50px;cursor: pointer;}
 .conSlide  .slideProcess span img{margin-top: 10px;}
+
+#slideBox img{
+    width: 100%;
+    height: 100%;
+}
+
+body{
+    min-height: 700px;
+}
+
+@media screen and (min-height:700px){
+    table tbody tr{
+        height: 36px;
+    }
+    #proclamation li{
+        height: 34px;
+        line-height: 34px;
+    }
+}
+
+@media screen and (min-height:800px){
+    table tbody tr{
+        height: 42px;
+    }
+    #proclamation li{
+        height: 40px;
+        line-height: 40px;
+    }
+}
+
+@media screen and (min-height:1200px){
+    table tbody tr{
+        height: 55px;
+    }
+    #proclamation li{
+        height: 50px;
+        line-height: 51px;
+    }
+}
+
+.indexLayout{
+    float: left;
+    position: relative;
+    margin:0 10px 10px 10px;
+    & > div{
+        width: 100%;
+        height: 100%;
+    }
+}
+
+#layoutTodo{
+    height: 53%;
+    width: 58%;
+    min-height: 340px;
+}
+#layoutMonth{
+    height: 45%;
+    width: 58%;
+}
+#layoutSlide{
+    height: 53%;
+    width: 39%;
+    min-height: 340px;
+}
+#layoutPost{
+    height: 45%;
+    width: 39%;
+}
+

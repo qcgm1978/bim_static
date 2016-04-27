@@ -7,7 +7,7 @@ App.BodyContent.control= {
     init : function(){
 
         $("#contains").empty();
-        new App.BodyContent.App().render(); //äÖÈ¾¿ò¼Ü
+        new App.BodyContent.App().render(); //æ¸²æŸ“æ¡†æ¶
         $("#todos").html(new App.BodyContent.todosList().render().el);
         $("#slideBox").html(new App.BodyContent.slideList().render().el);
         $(".conMonth .article table").append(new App.BodyContent.monthEndList().render().el);
@@ -85,13 +85,13 @@ App.BodyContent.control= {
     })),
 
     loadData : function(collection) {
-        //Êı¾İÖØÖÃ
+        //æ•°æ®é‡ç½®
         collection.reset();
         // load list
         collection.fetch({
             data: {},
             success: function(collection, response, options) {
-                //Èç¹ûÊÇslideÄÚÈİ£¬Ğ´ÈëÊıÖµ
+                //å¦‚æœæ˜¯slideå†…å®¹ï¼Œå†™å…¥æ•°å€¼
                 if(collection ==App.BodyContent.control.slideCollection){
                     slide.count(response.data.length);
                     slide.length = response.data.length;

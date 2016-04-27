@@ -1,24 +1,27 @@
 <div class="bodyContent">
-   <!-- 代办-->
-    <div class="conTodo">
-        <div class="conHeader"><a href="#todo">●●●</a><i></i><span>待办（6）</span></div><!--数量需写入-->
-        <div class="article">
-            <ul class="conBody" id="todos"></ul>
-        </div>
-    </div>
-    <!--轮播-->
-    <div class="conSlide">
-        <div class="conHeader"><i></i><span>雅安万达广场（四川、雅安）</span></div><!--轮播名称写入-->
-        <div class="article">
-            <div class="imgContainer">
-                <div id="slideBox"></div>
-                <div class="slideProcess"><span class="prev"><img src="../images/slider_previous.png"></span><div class="presentShow"><em >0</em>/<i>0</i></div><span class="next"><img src="../images/slider_next.png"></span></div>
-            </div>
-        </div>
-    </div>
-    <div class="clearBoth pdT10">
-<!--本月到期/本月开始-->
-        <div class="conMonth">
+	
+	<div id="layoutTodo" class="indexLayout">
+		<!-- 代办-->
+	    <div class="conTodo">
+	        <div class="conHeader"><a href="#todo" target="_blank">●●●</a><i></i><span>待办（6）</span></div><!--数量需写入-->
+	        <div class="article">
+	            <ul class="conBody" id="todos"></ul>
+	        </div>
+	    </div>
+	</div>
+	<div id="layoutSlide" class="indexLayout">
+		<div class="conSlide">
+	        <div class="conHeader"><i></i><span>雅安万达广场（四川、雅安）</span></div><!--轮播名称写入-->
+	        <div class="article">
+	            <div class="imgContainer">
+	                <div id="slideBox"></div>
+	                <div class="slideProcess"><span class="prev"><img src="../images/slider_previous.png"></span><div class="presentShow"><em >0</em>/<i>0</i></div><span class="next"><img src="../images/slider_next.png"></span></div>
+	            </div>
+	        </div>
+	    </div>
+	</div>
+	<div id="layoutMonth" class="indexLayout">
+		<div class="conMonth">
             <div class="conHeader">
                 <a href="#">●●●</a>
                 <span class="active"><i></i>本月到期</span>
@@ -37,7 +40,9 @@
                 </table>
             </div>
         </div>
-        <!--公告-->
+	</div>
+	<div id="layoutPost" class="indexLayout">
+		 <!--公告-->
         <div class="conPro">
             <div class="conHeader">
                 <a href="#">●●●</a>
@@ -48,6 +53,6 @@
                 <ul class="conBody pro" id="proclamation"></ul>
             </div>
         </div>
-    </div>
+	</div>
 </div>
 
