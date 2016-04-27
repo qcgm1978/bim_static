@@ -3,7 +3,7 @@
 */
 
 var CLOUD = CLOUD || {};
-CLOUD.Version = "v3.a";
+CLOUD.Version = "20160426";
 
 CLOUD.GlobalData = {
     SceneSize: 10,
@@ -1304,6 +1304,10 @@ CLOUD.RenderGroup = function () {
         transparentObjectsLastIndex = -1;
     };
 
+    this.renderableCount = function(){
+        return  opaqueObjectsLastIndex +   transparentObjectsLastIndex;
+    }
+
     function isFinished () {
         return opaqueFinished && transparentFinished;
     };
@@ -1500,6 +1504,18 @@ CLOUD.OrderedRenderer = function () {
                 group.prepare();
             }
         }
+    };
+
+    function computeRenderableCount() {
+
+        var totalCount = 0;
+        for (var ii = 0, len = renderGroups.length; ii < len; ++ii) {
+            var group = renderGroups[ii];
+            if (group !== undefined) {
+                totalCount += group.renderableCount();
+            }
+        }
+        return totalCount;
     };
 
     function pushRenderItem(object, geometry, material, z) {
@@ -1705,6 +1721,9 @@ CLOUD.OrderedRenderer = function () {
             else {
                 forceClear = true;
                 incrementListDirty = false;
+
+                //var count = computeRenderableCount();
+                //console.log("renderable " + count);
             }
 
             renderer.setRenderTarget(renderTarget);
@@ -5669,6 +5688,7 @@ CLOUD.MiniMap = function (viewer, callback) {
     this.width = 0;
     this.height = 0;
     this.domContainer = null;
+    this.autoClear = true;
 
     this.mouseButtons = {LEFT: THREE.MOUSE.LEFT, RIGHT: THREE.MOUSE.RIGHT};
 
@@ -5686,26 +5706,25 @@ CLOUD.MiniMap = function (viewer, callback) {
         _pathCount = 0, _lineCount = 0, _textCount = 0, _imageCount = 0, _circleCount = 0, _quality = 1;
     var _svgNode, _svgWidth, _svgHeight, _svgHalfWidth, _svgHalfHeight;
 
-    var _clipBox = new THREE.Box2(), _elemBox = new THREE.Box2(), _axisGridBox = new THREE.Box2();
+    var _clipBox2D = new THREE.Box2(), _elemBox2D = new THREE.Box2(), _axisGridBox2D = new THREE.Box2();
 
     var _axisGridElements = [], _axisGridIntersectionPoints = [], _axisGridLevels = [];
-    var _isShowAxisGridNumber = true;
-    var _axisGridNumberCircleRadius = 10;
-    var _axisGridNumberFontSize = 8;
-    var _axisGridNumberInterval = 3;
-    var _isShowAxisGrid = false;
-    var _isExistAxisGridData = false, _isExistFloorPlaneData = false;
+    var _axisGridNumberCircleRadius = 10, _axisGridNumberFontSize = 8, _axisGridNumberInterval = 3; // 轴号间隔
+    var _isShowAxisGridNumber = true, _isShowAxisGrid = false, _isInitializedAxisGrid = false, _isInitializedFloorPlane = false;
+
     var _enableMouseEvent = true;
 
     var _tipNode, _circleNode, _highlightHorizLineNode, _highlightVerticalLineNode, _cameraNode;
     var _highlightColor = '#258ae3';
-    var _highlightLineWidth = 1;
-    var _circleNodeRadius = 3;
+    var _highlightLineWidth = 1, _circleNodeRadius = 3;
     var _hasHighlightInterPoint = false;
 
     var _floorPlaneElevation = 0; // 平面图标高
-    var _floorPlaneBox;
+    var _floorPlaneBox, _floorPlaneUrl;
+
     var _enableShowCamera = true;
+    var _lastCameraWorldPosition;
+    var _isFlyToPoint = false;
 
     // ------------- 这些算法可以独立成单独文件 S ------------- //
 
@@ -5769,19 +5788,19 @@ CLOUD.MiniMap = function (viewer, callback) {
     // 正规化屏幕坐标转世界坐标
     function normalizedPointToWorld(point) {
 
-        var boxSize = _axisGridBox.size();
+        var boxSize = _axisGridBox2D.size();
 
-        point.x = 0.5 * (point.x + 1) * boxSize.x + _axisGridBox.min.x;
-        point.y = 0.5 * (point.y + 1) * boxSize.y + _axisGridBox.min.y;
+        point.x = 0.5 * (point.x + 1) * boxSize.x + _axisGridBox2D.min.x;
+        point.y = 0.5 * (point.y + 1) * boxSize.y + _axisGridBox2D.min.y;
     }
 
     // 世界坐标转正规化屏幕坐标 [-1, 1]
     function worldToNormalizedPoint(point) {
 
-        var boxSize = _axisGridBox.size();
+        var boxSize = _axisGridBox2D.size();
 
-        point.x = (point.x - _axisGridBox.min.x) / boxSize.x * 2 - 1;
-        point.y = (point.y - _axisGridBox.min.y) / boxSize.y * 2 - 1;
+        point.x = (point.x - _axisGridBox2D.min.x) / boxSize.x * 2 - 1;
+        point.y = (point.y - _axisGridBox2D.min.y) / boxSize.y * 2 - 1;
     }
 
     function loadStyleString(css) {
@@ -5920,7 +5939,7 @@ CLOUD.MiniMap = function (viewer, callback) {
     // 绘制平面图
     function renderFloorPlan() {
 
-        if (_isExistFloorPlaneData) {
+        if (_isInitializedFloorPlane) {
             _svgNode = getImageNode(0);
             _svg.appendChild(_svgNode);
         }
@@ -5948,10 +5967,10 @@ CLOUD.MiniMap = function (viewer, callback) {
                 var v2 = element.v2.clone();
                 var material = element.material;
 
-                _elemBox.makeEmpty();
-                _elemBox.setFromPoints([v1, v2]);
+                _elemBox2D.makeEmpty();
+                _elemBox2D.setFromPoints([v1, v2]);
 
-                if (_clipBox.isIntersectionBox(_elemBox) === true) {
+                if (_clipBox2D.isIntersectionBox(_elemBox2D) === true) {
                     renderLine(v1, v2, material);
 
                     if (_isShowAxisGridNumber) {
@@ -6011,20 +6030,20 @@ CLOUD.MiniMap = function (viewer, callback) {
         point.applyMatrix4(sceneMatrix);
     }
 
-    function computeAxisGridBox() {
+    function calculateAxisGridBox() {
 
         var offset = 4;
-        var isExistData = (_isExistAxisGridData || _isExistFloorPlaneData);
+        var isExistData = (_isInitializedAxisGrid || _isInitializedFloorPlane);
 
         if (_isShowAxisGridNumber && isExistData) {
 
-            var center = _axisGridBox.center();
-            var oldSize = _axisGridBox.size();
+            var center = _axisGridBox2D.center();
+            var oldSize = _axisGridBox2D.size();
             var newSize = new THREE.Vector2();
             newSize.x = oldSize.x * _svgWidth / (_svgWidth - 4.0 * (_axisGridNumberCircleRadius + offset));
             newSize.y = oldSize.y * _svgHeight / (_svgHeight - 4.0 * (_axisGridNumberCircleRadius + offset));
 
-            _axisGridBox.setFromCenterAndSize(center, newSize);
+            _axisGridBox2D.setFromCenterAndSize(center, newSize);
         }
     }
 
@@ -6104,7 +6123,7 @@ CLOUD.MiniMap = function (viewer, callback) {
 
         var mouse = new THREE.Vector2(event.clientX, event.clientY);
         var isOverCanvas = this.isMouseOverCanvas(mouse);
-        var isExistData = _isExistAxisGridData || _isExistFloorPlaneData;
+        var isExistData = _isInitializedAxisGrid || _isInitializedFloorPlane;
 
         if (isOverCanvas && isExistData && event.target.nodeName!= "LI" ) {
 
@@ -6140,8 +6159,6 @@ CLOUD.MiniMap = function (viewer, callback) {
             transformWorldPoint(clickPoint);
 
             callback(clickPoint);
-
-            this.resetCameraNode(false, true);
         }
 
         return isOverCanvas;
@@ -6182,8 +6199,8 @@ CLOUD.MiniMap = function (viewer, callback) {
             _svg.setAttribute('width', _svgWidth);
             _svg.setAttribute('height', _svgHeight);
 
-            _clipBox.min.set(-_svgHalfWidth, -_svgHalfHeight);
-            _clipBox.max.set(_svgHalfWidth, _svgHalfHeight);
+            _clipBox2D.min.set(-_svgHalfWidth, -_svgHalfHeight);
+            _clipBox2D.max.set(_svgHalfWidth, _svgHalfHeight);
 
             // redo init ???
             //this.initAxisGird();
@@ -6219,11 +6236,11 @@ CLOUD.MiniMap = function (viewer, callback) {
 
     this.render = function () {
 
-        if (!_isExistAxisGridData && !_isExistFloorPlaneData) return;
+        if (!_isInitializedAxisGrid) return;
+
+        if (this.autoClear) this.clear();
 
         if (!this.visible) return;
-
-        this.clear();
 
         renderFloorPlan();
 
@@ -6232,7 +6249,7 @@ CLOUD.MiniMap = function (viewer, callback) {
             renderHighlightNode();
         }
 
-        this.resetCameraNode(false, false);
+        this.calculateCameraPosition();
 
         if (_enableShowCamera) {
             _svg.appendChild(_cameraNode);
@@ -6384,22 +6401,6 @@ CLOUD.MiniMap = function (viewer, callback) {
         }
     };
 
-    //this.setAxisGirdFromJsonString = function (jsonStr) {
-    //    var jsonObj = JSON.parse(jsonStr);
-    //    this.setDataFromJsonObject(jsonObj);
-    //};
-    //
-    //this.setAxisGirdFromJsonObject = function (jsonObj) {
-    //    var grids = jsonObj.Grids;
-    //    var levels = jsonObj.Levels;
-    //
-    //    this.clearAxisGird();
-    //    this.initAxisGird(grids);
-    //    this.initAxisGirdLevels(levels);
-    //
-    //    this.render();
-    //};
-
     this.generateAxisGrid = function() {
 
         var jsonObj = CLOUD.MiniMap.axisGridData;
@@ -6426,8 +6427,8 @@ CLOUD.MiniMap = function (viewer, callback) {
             _axisGridIntersectionPoints = [];
         }
 
-        _axisGridBox.makeEmpty();
-        _isExistAxisGridData = false;
+        _axisGridBox2D.makeEmpty();
+        _isInitializedAxisGrid = false;
     };
 
     this.initAxisGird = function (grids) {
@@ -6435,8 +6436,6 @@ CLOUD.MiniMap = function (viewer, callback) {
         var len = grids.length;
 
         if (len < 1) return;
-
-        _isExistAxisGridData = true;
 
         var materialGrid = new THREE.LineBasicMaterial({
             color: 0x303030,//0x2c2255
@@ -6451,11 +6450,11 @@ CLOUD.MiniMap = function (viewer, callback) {
             var start = new THREE.Vector2(grids[i].start.X, grids[i].start.Y);
             var end = new THREE.Vector2(grids[i].end.X, grids[i].end.Y);
 
-            _axisGridBox.expandByPoint(start);
-            _axisGridBox.expandByPoint(end);
+            _axisGridBox2D.expandByPoint(start);
+            _axisGridBox2D.expandByPoint(end);
         }
 
-        computeAxisGridBox();
+        calculateAxisGridBox();
 
         var horizLineElements = []; // 水平线集合
         var verticalLineElements = []; // 垂直线集合
@@ -6515,6 +6514,13 @@ CLOUD.MiniMap = function (viewer, callback) {
                 });
             }
         }
+
+        if (_isInitializedFloorPlane && !_isInitializedAxisGrid) {
+            console.log("_isInitializedFloorPlane && !_isInitializedAxisGrid");
+            this.initFloorPlane();
+        }
+
+        _isInitializedAxisGrid = true;
     };
 
     this.initAxisGirdLevels = function (levels) {
@@ -6531,7 +6537,7 @@ CLOUD.MiniMap = function (viewer, callback) {
 
     this.showAxisGird = function () {
 
-        if (_isExistAxisGridData) {
+        if (_isInitializedAxisGrid) {
             _isShowAxisGrid = true;
             //_svgGroupForAxisGrid.style.opacity = 1;
             _svgGroupForAxisGrid.style.display = "";
@@ -6546,7 +6552,7 @@ CLOUD.MiniMap = function (viewer, callback) {
 
     this.hideAxisGird = function () {
 
-        if (_isExistAxisGridData) {
+        if (_isInitializedAxisGrid) {
             _isShowAxisGrid = false;
             //_svgGroupForAxisGrid.style.opacity = 0;
             _svgGroupForAxisGrid.style.display = "none";
@@ -6611,51 +6617,9 @@ CLOUD.MiniMap = function (viewer, callback) {
 
     };
 
-    //this.setFloorPlanFromJsonString = function (jsonStr) {
-    //    var jsonObj = JSON.parse(jsonStr);
-    //    this.setFloorPlanFromJsonObject(jsonObj);
-    //};
-    //
-    //this.setFloorPlanFromJsonObject = function (jsonObj) {
-    //
-    //    var url = jsonObj["Path"];
-    //    var boundingBox = jsonObj["BoundingBox"];
-    //
-    //    _isExistData = false;
-    //
-    //    if (!url || !boundingBox) {
-    //        console.warn('floor-plan data is error!');
-    //        return;
-    //    }
-    //
-    //    // 设置了数据
-    //    _isExistData = true;
-    //
-    //    _floorPlaneBox = new THREE.Box3(new THREE.Vector3(boundingBox.Min.X, boundingBox.Min.Y, boundingBox.Min.Z), new THREE.Vector3(boundingBox.Max.X, boundingBox.Max.Y, boundingBox.Max.Z));
-    //
-    //    // 平面图不需要使用Z坐标
-    //    var bBox2D = new THREE.Box2(new THREE.Vector2(_floorPlaneBox.min.x, _floorPlaneBox.min.y), new THREE.Vector2(_floorPlaneBox.max.x, _floorPlaneBox.max.y));
-    //
-    //    if (!_isInitializedAxisGird) {
-    //        console.warn('axis-grid is not initialized!');
-    //
-    //        // 没有设置轴网，取自己的包围盒
-    //        _axisGridBox.copy(bBox2D);
-    //
-    //        computeAxisGridBox();
-    //    }
-    //
-    //    this.initFloorPlane(url, bBox2D);
-    //
-    //    var elevation = 0.5 * (_floorPlaneBox.min.z + _floorPlaneBox.max.z);
-    //    this.setFloorPlaneElevation(elevation);
-    //
-    //    this.resetCameraNode();
-    //
-    //    this.render();
-    //};
-
     this.generateFloorPlane = function() {
+
+        _isInitializedFloorPlane = false;
 
         var jsonObj = CLOUD.MiniMap.floorPlaneData;
 
@@ -6669,37 +6633,40 @@ CLOUD.MiniMap = function (viewer, callback) {
             return;
         }
 
+        _isInitializedFloorPlane = true;
+
+        _floorPlaneUrl = url;
         _floorPlaneBox = new THREE.Box3(new THREE.Vector3(boundingBox.Min.X, boundingBox.Min.Y, boundingBox.Min.Z), new THREE.Vector3(boundingBox.Max.X, boundingBox.Max.Y, boundingBox.Max.Z));
-
-        // 平面图不需要使用Z坐标
-        var bBox2D = new THREE.Box2(new THREE.Vector2(_floorPlaneBox.min.x, _floorPlaneBox.min.y), new THREE.Vector2(_floorPlaneBox.max.x, _floorPlaneBox.max.y));
-
-        if (!_isExistAxisGridData) {
-            console.warn('axis-grid is not initialized!');
-
-            // 没有设置轴网，取自己的包围盒
-            _axisGridBox.copy(bBox2D);
-
-            computeAxisGridBox();
-        }
-
-        this.initFloorPlane(url, bBox2D);
 
         var elevation = 0.5 * (_floorPlaneBox.min.z + _floorPlaneBox.max.z);
         this.setFloorPlaneElevation(elevation);
 
-        this.resetCameraNode(true, true);
+        if (!_isInitializedAxisGrid) {
+            console.warn('axis-grid is not initialized!');
+
+            return;
+
+            // 没有设置轴网，取自己的包围盒
+            //_axisGridBox.copy(bBox2D);
+            //
+            //computeAxisGridBox();
+        }
+
+        this.initFloorPlane();
 
         this.render();
     };
 
-    this.initFloorPlane = function (url, bBox) {
+    this.initFloorPlane = function () {
 
+        var url = _floorPlaneUrl;
+        // 平面图不需要使用Z坐标
+        var bBox2D = new THREE.Box2(new THREE.Vector2(_floorPlaneBox.min.x, _floorPlaneBox.min.y), new THREE.Vector2(_floorPlaneBox.max.x, _floorPlaneBox.max.y));
         // 计算位置
-        var axisGridBoxSize = _axisGridBox.size();
-        var axisGridCenter = _axisGridBox.center();
-        var boxSize = bBox.size();
-        var boxCenter = bBox.center();
+        var axisGridBoxSize = _axisGridBox2D.size();
+        var axisGridCenter = _axisGridBox2D.center();
+        var boxSize = bBox2D.size();
+        var boxCenter = bBox2D.center();
         var scaleX = _svgWidth / axisGridBoxSize.x;
         var scaleY = _svgHeight / axisGridBoxSize.y;
         var width = boxSize.x * scaleX;
@@ -6709,10 +6676,8 @@ CLOUD.MiniMap = function (viewer, callback) {
         offset.x *= scaleX;
         offset.y *= -scaleY;
 
-        _isExistFloorPlaneData = false;
-
-        if (!_axisGridBox.containsBox(bBox)) {
-            console.warn('the bounding-box of floor-plane is not contains the bounding-box of axis-grid!');
+        if (!_axisGridBox2D.containsBox(bBox2D)) {
+            console.warn('the bounding-box of axis-grid is not contains the bounding-box of floor-plane!');
         }
 
         _svgNode = getImageNode(0);
@@ -6724,17 +6689,17 @@ CLOUD.MiniMap = function (viewer, callback) {
         _svgNode.setAttribute("y", (-0.5 * height) + "");
         _svgNode.setAttribute("transform", 'translate(' + offset.x + ',' + offset.y + ')');
 
-        // 设置了数据
-        _isExistFloorPlaneData = true;
+        // 切换楼层，置为true
+        _isFlyToPoint = true;
     };
 
     this.setFloorPlaneElevation = function (elevation) {
         _floorPlaneElevation = elevation;
     };
 
-    this.resetCameraNode = function (fly , updateCameraInfo) {
+    this.calculateCameraPosition = function () {
 
-        if (!_floorPlaneBox) return;
+        if (!_isInitializedFloorPlane) return;
 
         var camera = this.viewer.camera;
         var cameraEditor = this.viewer.cameraEditor;
@@ -6765,12 +6730,12 @@ CLOUD.MiniMap = function (viewer, callback) {
 
         // 计算相机投影
         var projectedCameraPosition = plane.projectPoint(cameraPosition);
-        // 转回世界坐标
+        // 相机投影点世界坐标
         projectedCameraPosition.applyMatrix4(inverseMatrix);
 
         // 计算相机LookAt投影
         var projectedTargetPosition = plane.projectPoint(cameraTargetPosition);
-        // 转回世界坐标
+        // 相机LookAt投影点世界坐标
         projectedTargetPosition.applyMatrix4(inverseMatrix);
 
         // 计算相机投影后的方向
@@ -6778,17 +6743,19 @@ CLOUD.MiniMap = function (viewer, callback) {
         projectedEye.z = 0;
         projectedEye.normalize();
 
-        var newCameraPos;
+        //var worldProjectedCameraPosition = new THREE.Vector3();
+        //
+        //if (_floorPlaneBox.containsPoint(projectedCameraPosition)) {
+        //    worldProjectedCameraPosition.set(projectedCameraPosition.x, projectedCameraPosition.y, _floorPlaneElevation);
+        //} else {
+        //    console.log("camera out");
+        //    worldProjectedCameraPosition.set(bBoxCenter.x, bBoxCenter.y, _floorPlaneElevation);
+        //}
 
-        if (_floorPlaneBox.containsPoint(projectedCameraPosition)) {
-            newCameraPos = new THREE.Vector3(projectedCameraPosition.x, projectedCameraPosition.y, _floorPlaneElevation);
-        } else {
-            newCameraPos = new THREE.Vector3(bBoxCenter.x, bBoxCenter.y, _floorPlaneElevation);
-        }
+        var worldProjectedCameraPosition = new THREE.Vector3(projectedCameraPosition.x, projectedCameraPosition.y, _floorPlaneElevation);
 
-        // 计算相机位置
-        var cameraScreenPosition = newCameraPos.clone();
-        //var cameraScreenPosition = newCameraPos.clone();
+        // 相机屏幕坐标
+        var cameraScreenPosition = worldProjectedCameraPosition.clone();
         worldToNormalizedPoint(cameraScreenPosition);
         normalizedPointToScreen(cameraScreenPosition);
 
@@ -6808,29 +6775,36 @@ CLOUD.MiniMap = function (viewer, callback) {
         _cameraNode.setAttribute('opacity', '1.0');
         _cameraNode.setAttribute("transform", "translate(" + cameraScreenPosition.x + "," + cameraScreenPosition.y + ") rotate(" + angle + ")");
 
-        // 飞到指定点
-        if (fly) {
-            var pos = newCameraPos.clone();
+        this.setCallbackCameraInfo(worldProjectedCameraPosition, cameraScreenPosition);
+
+        _lastCameraWorldPosition = worldProjectedCameraPosition.clone();
+
+        // 切换楼层时飞到指定点，切换楼层需设置 _isFlyToPoint状态
+        if (_isFlyToPoint) {
+
+            _isFlyToPoint = false;
+
+            var pos = worldProjectedCameraPosition.clone();
+
             transformWorldPoint(pos);
-            this.viewer.cameraEditor.flyToPoint(pos);
+            this.viewer.cameraEditor.flyToPointWithParallelEye(pos);
         }
-
-        if (updateCameraInfo) {
-            this.setCameraInfo(newCameraPos, cameraScreenPosition);
-        }
-
     };
 
     // 返回相机信息
-    this.setCameraInfo = function(cameraWorldPosition, cameraScreenPosition) {
-        // 返回相机信息
-        var isExistData = _isExistAxisGridData || _isExistFloorPlaneData;
+    this.setCallbackCameraInfo = function(worldPosition, screenPosition) {
 
-        if (this.callbackFn && isExistData) {
+        var posChanged = true;
 
-            var cameraWorldPos = new THREE.Vector3(cameraWorldPosition.x, cameraWorldPosition.y, _floorPlaneElevation);
+        if (_lastCameraWorldPosition){
+            posChanged = (worldPosition.distanceToSquared(_lastCameraWorldPosition) !== 0);
+        }
+
+        if (this.callbackFn && posChanged) {
+
+            var cameraWorldPos = worldPosition.clone();
             // 获得离相机最近的交点
-            var intersection = this.computeMinDistanceIntersection(cameraScreenPosition);
+            var intersection = this.computeMinDistanceIntersection(screenPosition);
 
             if (intersection) {
                 // 计算轴信息
@@ -6838,8 +6812,8 @@ CLOUD.MiniMap = function (viewer, callback) {
                 screenToNormalizedPoint(interPoint);
                 normalizedPointToWorld(interPoint);
 
-                var offsetX = Math.round(cameraWorldPosition.x - interPoint.x);
-                var offsetY = Math.round(cameraWorldPosition.y - interPoint.y);
+                var offsetX = Math.round(worldPosition.x - interPoint.x);
+                var offsetY = Math.round(worldPosition.y - interPoint.y);
                 var axisInfoX = "X(" + intersection.abcName + "," + offsetX + ")";
                 var axisInfoY = "Y(" + intersection.numeralName + "," + offsetY + ")";
 
@@ -6858,15 +6832,13 @@ CLOUD.MiniMap = function (viewer, callback) {
                 //console.log(jsonObj.axis.infoX + "" + jsonObj.axis.infoY);
 
                 this.callbackFn(jsonObj);
-            }
-        } else {
-            if (this.callbackFn) {
+            } else {
                 this.callbackFn(null);
             }
         }
     };
 
-
+    // 计算离相机最近的交点
     this.computeMinDistanceIntersection = function (screenPosition) {
 
         if (_axisGridIntersectionPoints.length < 1) return null;
@@ -7833,7 +7805,7 @@ CLOUD.MaterialUtil = {
 
     createHilightMaterial: function () {
 
-        return this.createPhongMaterial({ color: 0x000088, opacity: 0.8, transparent: false });
+        return this.createPhongMaterial({ color: 0x000088, opacity: 0.8, side:THREE.DoubleSide, transparent: false });
     }
 };
 
@@ -11782,7 +11754,7 @@ CLOUD.Mesh.prototype.unload = function () {
     if (this.loaded == 0)
         return;
 
-    this.loaded == 0;
+    this.loaded = 0;
     this.geometry.refCount -= 1;
 
     if (this.geometry.refCount <= 0) {
@@ -12251,6 +12223,16 @@ CLOUD.Cell.prototype.clone = function (object, recursive) {
     return object;
 };
 
+CLOUD.Cell.prototype.load = function () {
+    if (this.leaf)
+        return;
+
+    var children = this.children;
+    for (var ii = 0, len = children.length; ii < len; ++ii) {
+        children[ii].load();
+    }
+};
+
 CLOUD.Cell.prototype.update = function () {
 
     var v2 = new THREE.Vector3();
@@ -12265,7 +12247,8 @@ CLOUD.Cell.prototype.update = function () {
 
             shouldShow = scope.level > (CLOUD.GlobalData.SubSceneVisibleDistance * CLOUD.GlobalData.CellVisibleLOD);
 
-            if (!shouldShow) {
+            if (!shouldShow)
+            {
 
                 scope.worldBoundingBox.center(v2);
                 var distance = camera.positionPlane.distanceToPoint(v2);
@@ -12277,11 +12260,6 @@ CLOUD.Cell.prototype.update = function () {
 
                 var target = scope.level + CLOUD.GlobalData.SubSceneVisibleDistance;// * CLOUD.GlobalData.SubSceneVisibleLOD;
                 shouldShow = distance < target;
-
-                //if (scope.name == "nd4f3c9128-93ea-40b4-bf40-c85b3cebfae5") {
-                //    shouldShow = true;
-                //    console.log(distance + " " + target);
-                //}
             }
         }
 
@@ -13554,13 +13532,13 @@ CLOUD.OrbitEditor.prototype.onKeyDown = function (event) {
 
         case camera_scope.keys.Q:
             camera_scope.beginPan();
-            camera_scope.pan(0, -camera_scope.keyPanSpeed);
+            camera_scope.pan(0, camera_scope.keyPanSpeed);
             camera_scope.update(true);
             break;
 
         case camera_scope.keys.E:
             camera_scope.beginPan();
-            camera_scope.pan(0, camera_scope.keyPanSpeed);
+            camera_scope.pan(0, -camera_scope.keyPanSpeed);
             camera_scope.update(true);
             break;
 
@@ -20483,20 +20461,25 @@ CLOUD.SceneBoxLoader.prototype = {
                 }
                 else if(objJSON.nodeType == "CellNode") {
 
-                    //var clr = 0xff;
-                    //clr = clr << (level * 5);
+                    var clr = 0xff;                   
+                    if (objJSON.leaf) {
+                        clr = 0x00ff00;
+                    }
+     
 
-                    //var bbox = CLOUD.Utils.box3FromArray(objJSON.bbox);
-                    //object = new CLOUD.BBoxNode(bbox, clr);
-                    //CLOUD.Utils.parseTransform(object, objJSON);
+                    var bbox = CLOUD.Utils.box3FromArray(objJSON.bbox);
+                    object = new CLOUD.BBoxNode(bbox, clr);
+                    CLOUD.Utils.parseTransform(object, objJSON);
 
-                    //parent.add(object);
+                    if (objJSON.leaf) {
+                        localRoot.add(object);
+                    }
+                    
 
                     handle_children(object, objJSON.children);
                 }
                 else if(objJSON.nodeType == "SceneNode"){
-                    var clr = 0xff;
-                    clr = clr << (level * 5);
+                    var clr = 0xff0000;
 
                     var bbox = CLOUD.Utils.box3FromArray(objJSON.bbox);
                     object = new CLOUD.BBoxNode(bbox, clr);
@@ -20571,7 +20554,7 @@ CLOUD.TaskWorker = function (threadCount) {
         scope.doingCount = TASK_COUNT;
         function processItem(i) {
 
-            if (i >= itemCount) {
+            if (i >= TASK_COUNT) {
                 //if (scope.doingCount < 1) {
                 //    scope.run(loader, sorter);
                 //}
@@ -21634,6 +21617,11 @@ CloudViewer.prototype = {
         if (this.requestRenderCount > 10000)
             this.requestRenderCount = 0;
             
+        if (this.rendering) {
+            return;
+        }
+        this.rendering = true;
+        //console.log(this.requestRenderCount);
 
         var scope = this;
         var camera = this.camera;
@@ -21658,11 +21646,6 @@ CloudViewer.prototype = {
         var scene = this.getScene();
         // 设置过滤对象
         scope.renderer.setFilterObject(scene.filter);
-
-        if (this.rendering) {
-            return;
-        }
-        this.rendering = true;
 
         function incrementRender(callId) {
            
@@ -21921,7 +21904,7 @@ CloudViewer.prototype = {
     zoomToSelection: function () {
 
         var box = this.renderer.computeSelectionBBox();
-        if (box == null) {
+        if (box == null || box.empty()) {
             box = this.getScene().worldBoundingBox();
         }
 

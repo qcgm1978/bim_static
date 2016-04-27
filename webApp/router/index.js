@@ -18,12 +18,14 @@ var AppRoute = Backbone.Router.extend({
     //首页主体展示
 
 	bodyContent :function(){
+			this.reset();
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".bodyConMenu").addClass('selected');
 		_.require('/static/dist/bodyContent/bodyContent.css');
 		//_.require('/static/dist/bodyContent/bodyContent_ie8.css');
 		_.require('/static/dist/bodyContent/bodyContent.js');
 		slide.stop();
 		App.BodyContent.control.init();
+		$("#pageLoading").hide();
 	},
 	//待办
 	todo: function() {
@@ -64,9 +66,10 @@ var AppRoute = Backbone.Router.extend({
 		//销毁上传
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".flow").addClass('selected');
 		_.require('/static/dist/flow/flow.css');
-		_.require('/static/dist/flow/flow.js');
-
+		_.require('/static/dist/flow/flow.js'); 
 		$("#contains").html(new App.Flow().render().el);
+
+		$("#pageLoading").hide();
 
 	},
 
@@ -78,6 +81,7 @@ var AppRoute = Backbone.Router.extend({
 		_.require('/static/dist/resources/resources.css');
 		_.require('/static/dist/resources/resources.js');
 		App.Resources.init();
+		$("#pageLoading").hide();
 		//$("#contains").html("resources");
 
 	},
@@ -115,18 +119,22 @@ var AppRoute = Backbone.Router.extend({
 		App.Console.Settings.type=type;
 		App.Console.Settings.step=step;
 		App.Console.init();
+		$("#pageLoading").hide();
 	},
 
 
 	service: function() {
+		this.reset();
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".service").addClass('selected');
 		_.require('/static/dist/service/service.css');
 		_.require('/static/dist/service/service.js');
 		App.Service.control.init();
+		$("#pageLoading").hide();
 	},
 
 	//重置数据
 	reset: function() {
+		$("#pageLoading").show();
 		//销毁上传
 		App.Comm.upload.destroy();
 		App.Comm.getCookie("OUTSSO_LoginId") && $("#topBar .userName .text").text(App.Comm.getCookie("OUTSSO_LoginId"));

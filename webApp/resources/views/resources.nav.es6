@@ -51,7 +51,7 @@ App.ResourcesNav.App = Backbone.View.extend({
 				pageItemCount: App.Comm.Settings.pageItemCount
 			},
 			success: function(collection, response, options) {
-
+				$("#pageLoading").hide();
 				var $standardLibs = $("#standardLibs"),
 					$standarPagination, pageCount = response.data.totalItemCount;
 				//todo 分页
@@ -104,7 +104,7 @@ App.ResourcesNav.App = Backbone.View.extend({
 				pageItemCount: App.Comm.Settings.pageItemCount
 			},
 			success: function(collection, response, options) {
-
+				$("#pageLoading").hide();
 				var $standardLibs = $("#famLibs"),
 					$standarPagination, pageCount = response.data.totalItemCount;
 				//todo 分页

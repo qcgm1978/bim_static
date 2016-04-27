@@ -56,6 +56,9 @@ App.Todo = {
 			},
 			success: function(collection, response, options) {
 
+				//隐藏加载
+				$("#pageLoading").hide();
+
 				var $content = $("#todoContent"),
 					$el,pageCount=response.data.totalItemCount;
 				//todo 分页
@@ -66,6 +69,7 @@ App.Todo = {
 					$el = $content.find(".alreadyListPagination");
 					$content.find(".sumDesc").html('共 '+pageCount+' 条已办事项');
 				}
+
 
 				$el.pagination(pageCount, {
 					items_per_page: response.data.pageItemCount,

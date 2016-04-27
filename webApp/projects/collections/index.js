@@ -79,7 +79,7 @@
              },
 
              success: function(collection, response, options) {
-
+                $("#pageLoading").hide();
                  var $content = $("#projectModes"),
                      pageCount = response.data.totalItemCount;
 

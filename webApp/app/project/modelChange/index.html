@@ -27,30 +27,26 @@
             </div>
         </div>
         <div id="projectContainer">
-            <div class="leftNav">
-                <div class="leftNavContent">
-                    <ul class="projectNav">
-                        <li class="item" data-type="model">模型浏览器</li>
-                    </ul>
-                    <div class="projectNavContentBox">
-                        <div class="projectModelContent"></div>
-                    </div>
-                    <div class="dragSize"></div>
-                    <div class="slideBar"><i class="icon-caret-left"></i></div>
-                </div>
-            </div>
             <div class="rightProperty">
                 <div class="rightPropertyContentBox">
                     <div class="rightPropertyContent">
                         <div class="designPropetyBox">
 
                             <ul class="projectPropetyHeader projectNav">
-                                <li data-type="chage" class="item selected">变更对比</li>
+                                <li data-type="chage" class="item selected">差异构件</li>
                                 <li data-type="attr" class="item">属性</li>
                             </ul>
 
                             <div class="projectPropetyContainer projectNavContentBox">
-                                <div class="designChange" ></div>
+                                <div class="designChange" >
+                                    <div class="dropList"></div>
+                                    <div class="listDetail"></div>
+                                    <div class="showChange">
+                                        <span class="groupRadio">
+                                            <label class="btnCk">显示变更前模型</label>
+                                        </span>
+                                    </div>
+                                </div>
                                 <div class="designProperties" style="display: none;">
                                    <div class="nullTip">请选择构件</div>
                                 </div>
