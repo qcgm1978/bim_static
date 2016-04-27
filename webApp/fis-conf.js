@@ -72,10 +72,6 @@ fis.match('bodyContent/tpls/**.html', {
   //useHash:true,
   release: "/static/dist/tpls/$0"
 });
-fis.match('service/**.html', {
-  //useHash:true,
-  release: "/static/dist/tpls/$0"
-});
 fis.match('flow/**.html', {
   //useHash:true,
   release: "/static/dist/tpls/$0"
@@ -173,15 +169,7 @@ fis.match('/login/**.{less,css}', {
   //useHash:true,
   packTo: '/static/dist/login/login_' + v + '.css'
 });
-// service
-fis.match('/service/**.{less,css}', {
-  //useHash:true,
-  packTo: '/static/dist/service/service_' + v + '.css'
-});
-fis.match('/service/**.{js,es6}', {
-  //useHash:true,
-  packTo: '/static/dist/service/service_' + v + '.js'
-});
+
 
 // 代办
 fis.match('/todo/**.{js,es6}', {

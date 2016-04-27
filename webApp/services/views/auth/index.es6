@@ -1,3 +1,6 @@
+/*
+ * @require  /services/views/auth/index.nav.es6
+ * */
 
 //权限管理入口
 App.Services.Auth=Backbone.View.extend({
@@ -6,8 +9,12 @@ App.Services.Auth=Backbone.View.extend({
 
 
 	render(){
-		this.$el.html('auth manager');
+		this.$el.html(new App.Services.AuthNav().render().el);
 		return this;
+	},
+
+	initialize:function(){
+		this.render();
 	}
 
 

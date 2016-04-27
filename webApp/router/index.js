@@ -11,7 +11,6 @@ var AppRoute = Backbone.Router.extend({
 		'resources/:type/:projectId/:versionId': 'resourceModel',
 		'console': 'console',
 		'console/:type/:step': 'console',
-		'service': 'service',
 		'services': 'services',
 		'services/:type': 'services',
 		'services/:type/:tab': 'services',
@@ -126,17 +125,10 @@ var AppRoute = Backbone.Router.extend({
 	},
 
 
-	service: function() {
-		this.reset();
-		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".service").addClass('selected');
-		_.require('/static/dist/service/service.css');
-		_.require('/static/dist/service/service.js');
-		App.Service.control.init();
-		$("#pageLoading").hide();
-	},
 
 	services:function(type,tab){
 		this.reset();
+		$("#pageLoading").hide();
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".service").addClass('selected');
 		_.require('/static/dist/services/services.css');
 		_.require('/static/dist/services/services.js'); 
