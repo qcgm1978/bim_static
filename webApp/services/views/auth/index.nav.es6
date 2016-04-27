@@ -30,7 +30,6 @@ App.Services.AuthNav = Backbone.View.extend({
 
 	initialize:function(){
 
-
 		$(".serviceBody").empty();
 		this.breadCrumb(this.$el.find(".memCtrl"));
 		//App.Services.init({type : "auth",tab:"memCtrl"});
@@ -42,16 +41,13 @@ App.Services.AuthNav = Backbone.View.extend({
 		$(".serviceBody").empty();
 		this.breadCrumb(this.$el.find(".memCtrl"));
 		App.Services.init({type : "auth",tab:"memCtrl"});
-		App.Service.memCtrlBlend.init();
-
-		//load模板  主模板  //弹窗模板  //弹窗模板为公共
+		App.Services.memCtrlBlend.init();
 	},
 	roleManager : function(){
 		$(".serviceBody").empty();
 		this.breadCrumb(this.$el.find(".roleManager"));
 		App.Services.init({type : "auth",tab:"roleManager"});
 		App.Service.role.init();
-		//主模板   角色列表      角色修改和删除（删除配置？？？删除的弹窗提示）      //弹窗模板  列表  ，input角色名和选择角色功能。
 	},
 	keyUser : function(){
 		$(".serviceBody").empty();

@@ -9,7 +9,7 @@ App.Services.Auth=Backbone.View.extend({
 
 
 	render(){
-		this.$el.html(new App.Services.AuthNav().render().el);
+		this.$el.html(new App.Services.AuthNav().render().el);//菜单
 		return this;
 	},
 

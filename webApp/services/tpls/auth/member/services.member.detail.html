@@ -1,0 +1,14 @@
+<div class="pers">角色授权</div>
+<div class="sele">
+    <div class="left">
+            <i class="memCheck"></i>
+            <span class="ushead <%= oz ? 'oz' : ''%>"></span>
+            <span><%= name %></span>
+    </div>
+    <div class="roles">
+        <% if(role && role.length) {for (var i = 0 ; i < role.length ; i++){  %><!--怎么判断是管理员？？？-->
+        <span class="<%= role[i].roleId == 999999 ? 'adm' : ( role[i].inherit ? 'inherit' : '') %>"><%= role[i].name %></span>
+        <%}}%>
+    </div>
+</div>
+
