@@ -15,6 +15,7 @@ App.API = {
 		fetchBodyContentMonthEnd :'dataJson/bodyContent/bodyContent.monthEnd.json',
 		fetchBodyContentMonthStart :'dataJson/bodyContent/bodyContent.monthStart.json',
 		fetchBodyContentSlide :'dataJson/bodyContent/bodyContent.slide.json',
+		fetchBodyContentMmhSlide :'dataJson/bodyContent/bodyContent.mmhSlider.json',
 		fetchBodyContentProclamation :'dataJson/bodyContent/bodyContent.proclamation.json',
 
 		//Service
@@ -135,6 +136,7 @@ App.API = {
 		fetchBodyContentMonthEnd :'/dataJson/bodyContent/bodyContent.monthEnd.json',
 		fetchBodyContentMonthStart :'/dataJson/bodyContent/bodyContent.monthStart.json',
 		fetchBodyContentSlide :'/dataJson/bodyContent/bodyContent.slide.json',
+		fetchBodyContentMmhSlide :'dataJson/bodyContent/bodyContent.mmhSlider.json',
 		fetchBodyContentProclamation :'/dataJson/bodyContent/bodyContent.proclamation.json',
 
 		//console

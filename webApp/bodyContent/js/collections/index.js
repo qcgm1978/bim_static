@@ -9,19 +9,20 @@ App.BodyContent.control= {
         $("#contains").empty();
         new App.BodyContent.App().render(); //渲染框架
         $("#todos").html(new App.BodyContent.todosList().render().el);
-        $("#slideBox").html(new App.BodyContent.slideList().render().el);
+       // $("#slideBox").html(new App.BodyContent.slideList().render().el);
         $(".conMonth .article table").append(new App.BodyContent.monthEndList().render().el);
         $(".conMonth .article table").append(new App.BodyContent.monthStartList().render().el);
         $("#proclamation").html(new App.BodyContent.proclamationList().render().el);
-
+		
         this.loadData(this.todoCollection);
         this.loadData(this.slideCollection);
         this.loadData(this.monthEndCollection);
         this.loadData(this.monthStartCollection);
         this.loadData(this.proCollection);
 
-        slide.initialize({element:".imgContainer", slideTime : 4000, tagTime : 500});
-
+      //  slide.initialize({element:".imgContainer", slideTime : 4000, tagTime : 500});
+		
+		
 
         $(".conMonth .conHeader span").on("click",function(){
             if($(this).hasClass("active"))return;
@@ -46,7 +47,7 @@ App.BodyContent.control= {
 
     slideCollection:new (Backbone.Collection.extend({
         model:App.BodyContent.model,
-        urlType:"fetchBodyContentSlide",
+        urlType:"fetchBodyContentMmhSlide",
         parse: function (response) {
             if (response.message == "success") {
                 return response.data;
@@ -93,10 +94,13 @@ App.BodyContent.control= {
             success: function(collection, response, options) {
                 //如果是slide内容，写入数值
                 if(collection ==App.BodyContent.control.slideCollection){
-                    slide.count(response.data.length);
-                    slide.length = response.data.length;
-                    slide.windowFront();
-                    slide.play();
+                    $(".mmhSlider").mmhSlider({
+						delay:5000,
+						data:response.data,
+						onChange:function(d){
+							$("#slideTitle").html(d.title);
+						}
+					})
                 }
             }
         });
