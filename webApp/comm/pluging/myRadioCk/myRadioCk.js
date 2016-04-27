@@ -16,7 +16,7 @@
 			var that = this;
 			$that.on("click", ".btnRadio,.btnCk", function() {
 				//禁用不可选中
-				if ($that.hasClass(".disable")) return;
+				if ($(this).hasClass("disable") ||$that.hasClass("disable")) return;
 
 				if ($(this).is(".btnCk")) {
 					//选中样式

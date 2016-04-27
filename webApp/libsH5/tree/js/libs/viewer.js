@@ -244,9 +244,7 @@ BIM.util = {
     pub:function(key,args){
       if(this.sub[key]){
         for (var i in this.sub[key]) {
-          if(typeof(this.sub[key][i]) === 'function'){
-            this.sub[key][i](args);
-          }
+          this.sub[key][i].click();
           return this;
         }
         return false;
@@ -544,19 +542,22 @@ BIM.util = {
       var bar = document.createElement('div');
       bar.className = BIM.common._option.toolsClass;
       BIM.util.pub('controll');
-      var html =''
       for(var i=0,len=toolsBar.length;i<len;i++){
         var item = toolsBar[i];
+        var tmp
         if(item.id == 'divide'){
-          html+='<span class="'+item.id+'"></span>'
+          tmp = BIM.util.createDom('span',"bar-item "+item.icon);
         }else{
-          html+='<i class="bar-item '+item.icon+'" data-type="'+item.type+'" data-id="'+ item.fn +'" title="'+item.title+'"></i>';
+          tmp = BIM.util.createDom('i',"bar-item "+item.icon);
+          tmp.title = item.title;
+          tmp.setAttribute('data-id',item.fn);
+          tmp.setAttribute('data-type',item.type)
         }
+        bar.appendChild(tmp);
         if(item.key){
-          BIM.util.bindKeyboard.on(item.key,BIM.common.self[item.fn]);
+          BIM.util.bindKeyboard.on(item.key,tmp);
         }
       }
-      bar.innerHTML = html;
       BIM.common.bimBox.appendChild(bar);
       var barItem = bar.getElementsByClassName('bar-item');
       for(var i = 0,len = barItem.length;i<len;i++){
@@ -600,6 +601,9 @@ BIM.prototype = {
   zoomOut : function () {
     BIM.util.pub('zoomOut');
     BIM.common.viewer.zoomOut();
+  },
+  zoomSelected : function () {
+    BIM.common.viewer.zoomToSelection();
   },
   fit : function (id) {
     BIM.util.pub('fit');
@@ -717,20 +721,20 @@ BIM.prototype = {
     });
     viewer.render();
   },
-  showScene:function(obj){
-    var viewer = BIM.common.viewer;
-    var filter = viewer.getFilters();
-    filter.removeUserFilter("sceneId");
-    BIM.util.getFilter(obj,function(id){
-      filter.addUserFilter("sceneId",id);
-    });
-    viewer.render();
-  },
   show:function(obj){
     var viewer = BIM.common.viewer;
     var filter = viewer.getFilters();
     BIM.util.getFilter(obj.ids,function(id){
       filter.removeUserFilter(obj.type,id);
+    });
+    viewer.render();
+  },
+  hideScene:function(obj){
+    var viewer = BIM.common.viewer;
+    var filter = viewer.getFilters();
+    filter.removeUserFilter(obj.type);
+    BIM.util.getFilter(obj.ids,function(id){
+      filter.addUserFilter(obj.type,id);
     });
     viewer.render();
   },
@@ -753,6 +757,11 @@ BIM.prototype = {
       filter.removeUserOverrider(obj.type,id);
     });
     viewer.render();
+  },
+  selectIds:function(ids){
+    var viewer = BIM.common.viewer;
+    var filter = viewer.getFilters();
+    filter.setSelectedIds(ids);
   },
   setFloorMap:function(obj,name){
     var viewer = BIM.common.viewer;

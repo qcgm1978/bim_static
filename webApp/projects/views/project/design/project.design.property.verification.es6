@@ -74,6 +74,9 @@
  		});
 
 
+ 		//显示搜索结果对应位置
+ 		this.$(".groupRadio").myRadioCk();
+
  		this.$("#dateStar").one("mousedown", function() {
  			//日期控件初始化
  			$('#dateStar').datetimepicker({

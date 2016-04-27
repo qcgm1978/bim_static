@@ -7,7 +7,10 @@ App.ResourceCrumbsNav = Backbone.View.extend({
 	events: {
 		"click .resourcesList": "itemClick",
 		"click .fileModelNav": "toggleSwitchFileModel",
-		"click .fileModelList li": "switchFileMoldel"
+		"click .fileModelList li": "switchFileMoldel",
+		"click .standardLibsVersion": "standardLibsVersion",
+		"click .itemA":"stopPropagation"
+
 	},
 
 	template: _.templateUrl('/resources/tpls/resources.crumbsNav.html'),
@@ -23,7 +26,7 @@ App.ResourceCrumbsNav = Backbone.View.extend({
 	itemClick(event) {
 
 		var $projectVersionList = $(event.target).closest('.resourcesList').find(".projectVersionList"),
-		type=App.ResourceModel.Settings.type;
+			type = App.ResourceModel.Settings.type;
 		//标准模型
 		if (type == "standardLibs") {
 
@@ -35,8 +38,8 @@ App.ResourceCrumbsNav = Backbone.View.extend({
 				$projectVersionList.find(".listResource").html(detail(data));
 				$projectVersionList.show();
 			});
-		}else if (type=="famLibs") {
-			
+		} else if (type == "famLibs") {
+
 			App.Comm.ajax({
 				URLtype: "fetchFamLibs"
 			}, function(data) {
@@ -45,9 +48,31 @@ App.ResourceCrumbsNav = Backbone.View.extend({
 				$projectVersionList.find(".listResource").html(detail(data));
 				$projectVersionList.show();
 			});
+		} 
 
+	},
 
-		}
+	//切换项目版本
+	standardLibsVersion(event) {
+
+		App.Comm.ajax({
+			URLtype: "fetchStandardVersion",
+			data: {
+				projectId: App.ResourceModel.Settings.CurrentVersion.projectId
+			}
+		}, function(data) {
+
+			var detail = _.templateUrl("/resources/tpls/resources.crumbsNav.nav.version.Detail.html");
+			var $
+			this.$(".standardLibsVersion .projectVersionList").html(detail(data)).show();
+
+		});
+
+	},
+
+	stopPropagation(event){
+		//this.$(".projectVersionList").hide();
+		event.stopPropagation();
 	},
 
 
@@ -75,8 +100,8 @@ App.ResourceCrumbsNav = Backbone.View.extend({
 			if (!typeof(Worker)) {
 				alert("请使用现代浏览器查看模型");
 				return;
-			} 
-			
+			}
+
 			if (App.ResourceModel.Settings.DataModel && App.ResourceModel.Settings.DataModel.sourceId) {
 				Backbone.trigger('navClickCB', App.ResourceModel.Settings.leftType);
 				this.$(".fileModelNav  .breadItemText .text").text("模型浏览器");
@@ -86,16 +111,16 @@ App.ResourceCrumbsNav = Backbone.View.extend({
 			}
 
 		}
-		
+
 		$(".breadcrumbNav .fileModelList").hide();
 		event.stopPropagation();
 
-	}, 
+	},
 
 	//获取模型id
 	fetchModelIdByResource: function(errCb) {
 
-		var that=this;
+		var that = this;
 		var data = {
 			URLtype: "fetchModelIdByProject",
 			data: {
@@ -111,7 +136,7 @@ App.ResourceCrumbsNav = Backbone.View.extend({
 		//获取模型
 		App.Comm.ajax(data, (data) => {
 
-			if (data.message == "success") { 
+			if (data.message == "success") {
 
 				if (data.data) {
 
@@ -120,9 +145,9 @@ App.ResourceCrumbsNav = Backbone.View.extend({
 					Backbone.trigger('navClickCB', App.ResourceModel.Settings.leftType);
 					that.$(".fileModelNav  .breadItemText .text").text("模型浏览器");
 				} else {
-					alert("模型转换中"); 
+					alert("模型转换中");
 				}
-			} else { 
+			} else {
 				alert(data.message);
 			}
 

@@ -1,4 +1,4 @@
 <td width="186"><span class="title"><%= title %></span></td>
 <td  width="196"><a href="#<%= targetUrl %>" class="desc"><%= desc %></a></td>
-<td  width="122"><span class="level"><%= level %></span></td>
-<td><span class="startTime"><%= receivedTime %></span></td>
+<td class="lev"  width="25"><span class="level"><%= level %></span></td>
+<td class="time"><span class="startTime"><%= new Date(receivedTime).format("yyyy-MM-dd") %></span></td>

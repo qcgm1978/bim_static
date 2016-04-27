@@ -1,7 +1,6 @@
 /*
  * @require /bodyContent/js/view/todos.js
  */
-var App = App || {};
 App.BodyContent.todosList = Backbone.View.extend({
 
     events:{

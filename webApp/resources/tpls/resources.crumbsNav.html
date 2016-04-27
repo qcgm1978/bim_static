@@ -20,14 +20,14 @@
                         (
                         <%=App.Comm.convertStatus(App.ResourceModel.Settings.CurrentVersion.status)%>)
                     <%}%>
-                </span>
+                </span><i class="myIcon-slanting-right"></i>
                 <div class="projectVersionList">
                     <div class="listResource">
                     </div>
                 </div>
                 </span>
-                <span class="breadItem projectVersion relative <%= App.ResourceModel.Settings.CurrentVersion.id &&App.ResourceModel.Settings.type!='famLibs'  ? '':'myHidden' %>"> <i class="icon-angle-right"></i> 
-           <span class="breadItemText"> <span class="text"><%=App.ResourceModel.Settings.CurrentVersion.name%>( <%=App.Comm.convertStatus(App.ResourceModel.Settings.CurrentVersion.status)%>) </span> </span>
+                <span class="breadItem projectVersion standardLibsVersion relative <%= App.ResourceModel.Settings.CurrentVersion.id &&App.ResourceModel.Settings.type!='famLibs'  ? '':'myHidden' %>"> <i class="icon-angle-right"></i> 
+           <span class="breadItemText"> <span class="text"><%=App.ResourceModel.Settings.CurrentVersion.name%>( <%=App.Comm.convertStatus(App.ResourceModel.Settings.CurrentVersion.status)%>) </span><i class="myIcon-slanting-right"></i> </span>
                 <div class="projectVersionList">
                     <div class="listContent">
                     </div>

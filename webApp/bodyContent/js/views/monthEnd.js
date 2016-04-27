@@ -1,7 +1,6 @@
 /**
  * @require /bodyContent/js/model/model.js
  */
-var App = App || {};
 
 App.BodyContent.monthEndView = Backbone .View.extend({
 

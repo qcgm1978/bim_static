@@ -1,7 +1,6 @@
 /**
  * @require /bodyContent/js/view/proclamation.js
  */
-var App = App || {};
 App.BodyContent.proclamationList = Backbone.View.extend({
 
     events:{

@@ -104,7 +104,7 @@ App.ResourceModel = {
 		App.ResourceModel.Settings.leftType = "file";
 		App.ResourceModel.Settings.pageIndex = 1;
 		App.ResourceModel.Settings.DataModel = null;
-		App.ResourceModel.Settings.CurrentVersion={};
+		App.ResourceModel.Settings.CurrentVersion = {};
 
 	},
 
@@ -133,8 +133,11 @@ App.ResourceModel = {
 			}
 
 			//面包屑 切换 文件 模型 浏览器 
-			if ($target.closest(".breadItem.projectVersion").length <= 0) {
-				$(".breadItem .projectVersionList").hide();
+			if ($target.closest(".breadItem.resourcesList").length <= 0) {
+				$(".breadItem.resourcesList .projectVersionList").hide();
+			}
+			if ($target.closest(".breadItem.standardLibsVersion ").length <= 0) {
+				$(".breadItem.standardLibsVersion  .projectVersionList").hide();
 			}
 		});
 
@@ -189,12 +192,22 @@ App.ResourceModel = {
 				App.ResourceModel.FileCollection.projectId = App.ResourceModel.Settings.CurrentVersion.projectId;
 				App.ResourceModel.FileCollection.projectVersionId = App.ResourceModel.Settings.CurrentVersion.id;
 				App.ResourceModel.FileCollection.reset();
-				App.ResourceModel.FileCollection.fetch();
+				App.ResourceModel.FileCollection.fetch({
+					success: function() {
+						 
+						$("#pageLoading").hide();
+					}
+				});
 			} else if (type == "famLibs") {
 				App.ResourceModel.FileThumCollection.projectId = App.ResourceModel.Settings.CurrentVersion.projectId;
 				App.ResourceModel.FileThumCollection.projectVersionId = App.ResourceModel.Settings.CurrentVersion.id;
 				App.ResourceModel.FileThumCollection.reset();
-				App.ResourceModel.FileThumCollection.fetch();
+				App.ResourceModel.FileThumCollection.fetch({
+					success: function() {
+						 
+						$("#pageLoading").hide();
+					}
+				});
 			}
 
 			//上传

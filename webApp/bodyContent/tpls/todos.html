@@ -1,5 +1,6 @@
 <div class="conInfo">
          <div>发起人：<span class="name"><%= initiatorName %></span></div>
-         <div>接收时间：<span class="time"><%= receivedTime %></span></div>
+         <div>接收时间：<span class="time"><%= new Date(receivedTime).format("yyyy-MM-dd") %></span></div>
 </div>
 <a href="<%= targetUrl %>" title="<%= desc %>"><%= desc %></a>
+<% if(status == 1){%><span class="new"></span><%}%>

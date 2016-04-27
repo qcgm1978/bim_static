@@ -8,7 +8,11 @@ App.Index = {
 		projectVersionId: "",
 		referenceId: "",
 		referenceVersionId: "",
+		baseFileVersionId: "",
+		differFileVersionId: "",
 		ModelObj: "",
+		modelId: "",
+		diffModleId: "",
 		Viewer: null,
 		FileType: {
 			AR: "建筑",
@@ -92,23 +96,85 @@ App.Index = {
 		$projectContainer.on("click", ".designChange .itemContent", function() {
 
 
+			var $target = $(this);
 
-			$(this).toggleClass("selected");
 
-			if ($(this).hasClass("selected")) {
-				App.Index.Settings.Viewer.highlight({
-					type: "userId",
-					ids: ["73354c0f530daa5f25774a37425b1f37.661192"]
-				})
+			if ($target.hasClass("selected")) {
+				$target.closest(".treeRoot").find(".selected").removeClass("selected");
+				//$target.removeClass("selected");
 			} else {
-				App.Index.Settings.Viewer.highlight({
-					type: "userId",
-					ids: []
-				})
+				$target.closest(".treeRoot").find(".selected").removeClass("selected");
+				$target.addClass("selected");
 			}
+
+			var Ids = [];
+
+			if ($target.data("cate")) {
+
+				$target.closest(".treeRoot").find(".selected").each(function() {
+					Ids = $.merge(Ids, $(this).data("cate"))
+				});
+
+				App.Index.Settings.Viewer.selectIds(Ids);
+				App.Index.Settings.Viewer.zoomSelected();
+
+				// App.Index.Settings.Viewer.highlight({
+				// 	type: "userId",
+				// 	ids: Ids
+				// })
+
+				return;
+			}
+
+
+			var data = {
+				URLtype: "fetchCostModleIdByCode",
+				data: {
+					projectId: App.Index.Settings.projectId,
+					projectVersionId: App.Index.Settings.projectVersionId,
+					costCode: $target.data("code")
+				}
+			};
+
+			App.Comm.ajax(data, function(data) {
+				if (data.code == 0) {
+
+					$target.data("cate", data.data);
+
+					$target.closest(".treeRoot").find(".selected").each(function() {
+						Ids = $.merge(Ids, $(this).data("cate"))
+					});
+
+					App.Index.Settings.Viewer.selectIds(Ids);
+					App.Index.Settings.Viewer.zoomSelected();
+
+					// App.Index.Settings.Viewer.highlight({
+					// 	type: "userId",
+					// 	ids: Ids
+					// })
+				}
+			});
 
 		});
 
+		$(".showChange .groupRadio").myRadioCk({
+			click: function(argument) {
+				if ($(this).find(".selected").length > 0) {
+					var diff = App.Index.Settings.differFileVersionId;
+					if (diff) {
+						App.Index.getModelId(diff, function(data) {
+							if (data.code == 0) {
+								App.Index.Settings.Viewer.load(App.Index.Settings.modelId, data.data.modelId);
+							}
+						});
+					}
+
+
+				} else {
+					App.Index.Settings.Viewer.load(App.Index.Settings.modelId);
+				}
+			}
+		});
 
 		this.bindTreeScroll();
 
@@ -140,14 +206,14 @@ App.Index = {
 
 
 	//获取模型id 渲染模型
-	getModelId(alterationVersionId, callback) {
+	getModelId(differFileVersionId, callback) {
 
 		var dataObj = {
 			URLtype: "fetchFileModelIdByFileVersionId",
 			data: {
 				projectId: App.Index.Settings.projectId,
 				projectVersionId: App.Index.Settings.projectVersionId,
-				fileVersionId: 811409467293920 || alterationVersionId
+				fileVersionId: differFileVersionId
 			}
 		}
 
@@ -156,18 +222,20 @@ App.Index = {
 	},
 
 	//渲染模型
-	renderModel(alterationVersionId) {
+	renderModel(differFileVersionId) {
 
 
 		var that = this;
 		App.Index.Settings.Viewer = null;
-		this.getModelId(alterationVersionId, function(data) {
+		this.getModelId(differFileVersionId, function(data) {
 
 			if (data.message != "success") {
 				alert("转换失败");
 				return;
-			} 
-			 
+			}
+
+			App.Index.Settings.modelId = data.data.modelId;
+
 			var Model = data.data;
 
 			if (data.data.modelStatus == 1) {
@@ -188,10 +256,13 @@ App.Index = {
 
 
 			App.Index.Settings.Viewer.on("click", function(model) {
+
 				App.Index.Settings.ModelObj = null;
 				if (!model.intersect) {
 					return;
 				}
+
+
 				App.Index.Settings.ModelObj = model;
 				//属性
 				if (App.Index.Settings.property == "attr") {
@@ -207,6 +278,7 @@ App.Index = {
 	//渲染属性
 	renderAttr() {
 
+
 		if (!App.Index.Settings.ModelObj || !App.Index.Settings.ModelObj.intersect) {
 			$("#projectContainer .designProperties").html(' <div class="nullTip">请选择构件</div>');
 			return;
@@ -217,8 +289,10 @@ App.Index = {
 			data: {
 				projectId: App.Index.Settings.projectId,
 				projectVersionId: App.Index.Settings.projectVersionId,
-				elementId: 2 || App.Index.Settings.ModelObj.intersect.userId,
-				sceneId: 2 || App.Index.Settings.ModelObj.intersect.object.userData.sceneId
+				elementId: App.Index.Settings.ModelObj.intersect.userId,
+				baseFileVerionId: App.Index.Settings.baseFileVersionId,
+				fileVerionId: App.Index.Settings.differFileVersionId,
+				sceneId: App.Index.Settings.ModelObj.intersect.object.userData.sceneId || ""
 			}
 		};
 
@@ -235,12 +309,14 @@ App.Index = {
 	getAcquisitionCost() {
 
 		var data = {
-			URLtype: "projectChangeListTest", //projectChangeList
+			URLtype: "projectDesinPropertiesCost", //projectChangeList
 			data: {
 				projectId: App.Index.Settings.projectId,
 				projectVersionId: App.Index.Settings.projectVersionId,
-				elementId: 2 || App.Index.Settings.ModelObj.intersect.userId,
-				sceneId: 2 || App.Index.Settings.ModelObj.intersect.object.userData.sceneId
+				elementId: App.Index.Settings.ModelObj.intersect.userId,
+				baseFileVerionId: App.Index.Settings.baseFileVersionId,
+				fileVerionId: App.Index.Settings.differFileVersionId,
+				sceneId: App.Index.Settings.ModelObj.intersect.object.userData.sceneId || ""
 			}
 		};
 
@@ -315,10 +391,10 @@ App.Index = {
 			var firstData = lists[0].data[0];
 
 			//渲染模型
-			that.renderModel(firstData.alterationVersionId);
+			that.renderModel(firstData.differFileVersionId);
 
 			//变更获取
-			that.fetchChangeList(firstData.baseFileVersionId, firstData.alterationVersionId);
+			that.fetchChangeList(firstData.baseFileVersionId, firstData.differFileVersionId);
 
 			var template = _.templateUrl("/app/project/projectChange/tpls/fileList.html");
 
@@ -333,8 +409,10 @@ App.Index = {
 					var groupText = $item.closest(".groups").prev().text() + "：";
 					$(".specialitiesOption .myDropText span:first").text(groupText);
 					var baseFileVersionId = $item.data("basefileversionid"),
-						alterationVersionId = $item.data("alterationversionid");
-					that.fetchChangeList(baseFileVersionId, alterationVersionId);
+						differFileVersionId = $item.data("differfileversionid");
+
+					that.renderModel(differFileVersionId);
+					that.fetchChangeList(baseFileVersionId, differFileVersionId);
 
 				}
 			});
@@ -344,16 +422,19 @@ App.Index = {
 	},
 
 	//获取更改清单
-	fetchChangeList: function(baseFileVersionId, alterationVersionId) {
+	fetchChangeList: function(baseFileVersionId, differFileVersionId) {
 
 		App.Collections.changeListCollection.projectId = App.Index.Settings.projectId;
 		App.Collections.changeListCollection.projectVersionId = App.Index.Settings.projectVersionId;
+
+		App.Index.Settings.baseFileVersionId = baseFileVersionId;
+		App.Index.Settings.differFileVersionId = differFileVersionId;
 
 		App.Collections.changeListCollection.reset();
 		App.Collections.changeListCollection.fetch({
 			data: {
 				baseFileVerionId: baseFileVersionId,
-				fileVerionId: alterationVersionId
+				fileVerionId: differFileVersionId
 			}
 		});
 

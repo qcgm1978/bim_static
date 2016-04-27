@@ -36,9 +36,7 @@ App.Comm = {
 				callback(data);
 			}
 
-		});
-
-
+		}); 
 
 	},
 
@@ -281,8 +279,18 @@ App.Comm = {
 				alert(data.message);
 			}
 
-		})
+		}) 
 
+	},
+
+	//文件后缀
+	fileSuffix(type){
+		 
+		if (type=="rvt" ||type=="dwg" ||type=="folder"  ) {
+			return type;
+		}else{
+			return "other";
+		}
 
 	}
 

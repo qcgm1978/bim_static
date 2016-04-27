@@ -10,15 +10,15 @@
 
 
 <span data-fileversionid="<%=fileVersionId%>" class="filecKAll"><input type="checkbox" class="ckMe" /></span>
-
+ 
 <%if(folder){%>
-	<div class="thumBg sourceFileType thumFolder"></div> 
+	<div class="thumBg sourceFileType folder"></div> 
 <%}else{%>
-
+ 
 	<%if(thumbnail){%>
 	<img class="thumbnailImg" src="model/<%=modelId%>/<%=thumbnail%>" alt="" />
 	<%}else{%>
-	<div class="thumBg sourceFileType"></div>
+	<div class="thumBg sourceFileType <%=App.Comm.fileSuffix(suffix)%> "></div>
 	<%}%>
 
 <%}%>

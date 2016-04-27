@@ -4,7 +4,7 @@ App.API = {
 
 	Settings: {
 		hostname: "http://bim.wanda-dev.cn/",
-		debug: true
+		debug: false
 	},
 
 	URL: {
@@ -18,10 +18,16 @@ App.API = {
 		fetchBodyContentProclamation :'dataJson/bodyContent/bodyContent.proclamation.json',
 
 		//Service
-		fetchServiceMCOuterList:'platform/auth/org?outer=true',//外部组织-用户列表
-		fetchServiceFunList: 'platform/auth/function',//功能列表
-		fetchServiceMCInnerList:'platform/auth/org?outer=false&parentId={parentId}',//内部-混合列表
-		fetchServiceOzRoleList:'/platform/org/{orgId}/role',
+		fetchServiceMCBlendList:'/dataJson/service/service.Mem.blendList.json',//组织-混合列表
+		fetchServiceMCBlendListMn:'/dataJson/service/service.Mem.blendList_mn.json',//组织-混合列表
+		fetchServiceRolesList:'/dataJson/service/service.Mem.rolesList.json',//角色-功能列表
+		fetchServiceFunList: '/dataJson/service/service.fun.list.json',//功能列表
+		fetchServiceOzRoleList:'/dataJson/service/service.oz.roleList.json',
+		// fetchServiceMCOuterList:'platform/auth/org?outer=true',//外部组织-用户列表
+		// fetchServiceFunList: 'platform/auth/function',//功能列表
+		// fetchServiceMCInnerList:'platform/auth/org?outer=false&parentId={parentId}',//内部-混合列表
+		// fetchServiceOzRoleList:'/platform/org/{orgId}/role?outer={outer}',//机构角色列表
+
 
 
 		//代办$chars
@@ -88,16 +94,18 @@ App.API = {
 		fetchPlanInspection: "sixD/{projectId}/{projectVersionId}/plan?noElement=true", //检验 计划节点未关联图元 startTime=1398145297000&endTime=1398145297000&relateModel={true|false}&
 		fetchPlanInspectionCate: "sixD/{projectId}/{projectVersionId}/plan/noplan/cate", // 图元未关联计划节点
 		fetchPlanInspectionCateDetail: "sixD/{projectId}/{projectVersionId}/plan/noplan/element", // 图元未关联计划节点 ?cateId={cateId} 暂开详情
+		fetchModleIdByCode:"sixD/{projectId}/{projectVersionId}/plan/element", //获取构建的模型id
+		fetchComponentByCateId:"sixD/{projectId}/{projectVersionId}/plan/noplan/element",//更具类型获取构建  ? cateId={cateId}
 
 		fetchPlanProperties: "", //属性
 
-		//陈本
-		fetchCostReference: "sixD/{projectId}/{projectVersionId}/cost/summary", // 清单
+		//陈本 
+		fetchCostReference: "sixD/{projectId}/{projectVersionId}/cost/summary", // 清单 
 		fetchCostChange: "platform/auditSheet?type=9", // 变更
 		fetchCostVerification: "sixD/{projectId}/{projectVersionId}/cost/summary?noElement=true", // 效验
 		fetchCostVerificationCate: "sixD/{projectId}/{projectVersionId}/cost/nocost/cate", // 效验 图元未关联清单 类型
-		fetchCostVerificationCateDetail: "sixD/{projectId}/{projectVersionId}/cost/nocost/element?cateId={cateId}", // 图元未关联清单 详情
-
+		fetchCostVerificationCateDetail: "sixD/{projectId}/{projectVersionId}/cost/nocost/element", // ?cateId={cateId}图元未关联清单 详情
+		fetchCostModleIdByCode:"sixD/{projectId}/{projectVersionId}/cost/nocost/element", // ?costCode={costCode}
 		fetchCostProperties: "dataJson/project/project.design.property.json", //属性
 
 
@@ -107,11 +115,12 @@ App.API = {
 		fetchQualityOpeningAcceptance: "sixD/{projectId}/{projectVersionId}/acceptance?type=2", //开业验收
 		fetchQualityConcerns: "sixD/{projectId}/{projectVersionId}/problem", //隐患
 		fetchQualityProperties: "dataJson/project/project.design.property.json", // 属性
-
+		fetchQualityModelById:"sixD/{projectId}/{versionId}/quality/element", //开业验收 过程 验收 获取构建id  ?acceptanceId={acceptanceId}
 
 
 		//资源
 		fetchStandardLibs: "platform/project?type=1", //获取 标准模型库
+		fetchStandardVersion:"platform/project/{projectId}/version", //获取标准模型库版本
 		fetchFamLibs: "platform/project?type=2", //获取族库
 		fetchVersion: "platform/project/{projectId}/version/{versionId}",
 		fetchFileTree: "doc/{projectId}/{projectVersionId}/file/tree", //项目设计文件导航
@@ -120,10 +129,15 @@ App.API = {
 		createNewFolder: "doc/{projectId}/{projectVersionId}/file", // 创建新文件夹 ?parentId={parentId}&filePath={filePath}
 
 		//项目 变更 列表
-		fileList:"/dataJson/project/projectChange/changeFile.json", //doc/internal/{projectId}/{versionId}/alteration
-		projectDesinProperties:"/dataJson/project/projectChange/comparisonAttr.json",//sixD/{projectId}/{projectVersionId}/property/comparison //?baseProjectVerionId={baseProjectVerionId}&sceneId={sceneId}&elementId={elementId}
+		fileList:"doc/internal/{projectId}/{versionId}/differ", //变更列表 		
 		projectChangeList:"sixD/{projectId}/{projectVersionId}/cost/comparison",// ?fileVerionId={fileVerionId}&baseFileVerionId={baseFileVerionId}
+
+		projectDesinProperties:"sixD/{projectId}/{projectVersionId}/property/comparison",//?baseFileVerionId={baseFileVerionId}&fileVerionId={fileVerionId}&sceneId={sceneId}&elementId={elementId}		
+		projectDesinPropertiesCost:"sixD/{projectId}/{projectVersionId}/cost/edo/comparison", //属性成本 ?baseProjectVerionId={baseProjectVerionId}&sceneId={sceneId}&elementId={elementId}
+		//TEST
 		projectChangeListTest:"/dataJson/project/projectChange/list.json",
+		projectDesinPropertiesTest:"/dataJson/project/projectChange/comparisonAttr.json",//sixD/{projectId}/{projectVersionId}/property/comparison //?baseProjectVerionId={baseProjectVerionId}&sceneId={sceneId}&elementId={elementId}
+		fileListTest:"/dataJson/project/projectChange/changeFile.json", //doc/internal/{projectId}/{versionId}/alteration
 
 		test: ""
 	},
@@ -143,6 +157,7 @@ App.API = {
 		fetchServiceRolesList:'/dataJson/service/service.Mem.rolesList.json',//角色-功能列表
 		fetchServiceFunList: '/dataJson/service/service.fun.list.json',//功能列表
 		fetchServiceOzRoleList:'/dataJson/service/service.oz.roleList.json',
+
 
 		//代办
 		fetchTodoData: "/dataJson/todo/todo.json", //获取代办数据

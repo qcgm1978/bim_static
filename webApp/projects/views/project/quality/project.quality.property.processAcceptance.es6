@@ -15,14 +15,15 @@ App.Project.QualityProcessAcceptance = Backbone.View.extend({
 
 	events: {
 		"click .searchToggle": "searchToggle",
-		"click .clearSearch": "clearSearch"
+		"click .clearSearch": "clearSearch",
+		"click .tbProcessAccessBody tr": "showInModel"
 	},
 
 
 	//渲染
 	render: function(options) {
 
-		this.ProcessAcceptanceOptions=options.ProcessAcceptance;
+		this.ProcessAcceptanceOptions = options.ProcessAcceptance;
 
 		var tpl = _.templateUrl("/projects/tpls/project/quality/project.quality.property.processAcceptance.html", true);
 		this.$el.html(tpl);
@@ -33,15 +34,19 @@ App.Project.QualityProcessAcceptance = Backbone.View.extend({
 
 	//事件初始化
 	bindEvent() {
-		var that=this;
+		var that = this;
 		//隐患
-		this.$(".riskOption").myDropDown({click:function($item){
-			that.ProcessAcceptanceOptions.problemCount=$item.data("status");
-		}});
+		this.$(".riskOption").myDropDown({
+			click: function($item) {
+				that.ProcessAcceptanceOptions.problemCount = $item.data("status");
+			}
+		});
 		//列别
-		this.$(".categoryOption").myDropDown({click:function($item){
-			that.ProcessAcceptanceOptions.category=$item.text();
-		}});
+		this.$(".categoryOption").myDropDown({
+			click: function($item) {
+				that.ProcessAcceptanceOptions.category = $item.text();
+			}
+		});
 		//显示搜索结果对应位置
 		this.$(".groupRadio").myRadioCk();
 	},
@@ -89,10 +94,71 @@ App.Project.QualityProcessAcceptance = Backbone.View.extend({
 		});
 	},
 	//加载
-	loading(){
+	loading() {
 
 		this.$(".tbProcessAccessBody tbody").html(App.Project.Settings.loadingTpl);
-		 
+
+	},
+
+	//模型中显示
+	showInModel(event) {
+
+		var $target = $(event.target).closest("tr");
+
+
+		if ($target.hasClass("selected")) {
+			$target.parent().find(".selected").removeClass("selected");
+			//$target.removeClass("selected");
+		} else {
+			$target.parent().find(".selected").removeClass("selected");
+			$target.addClass("selected");
+		}
+
+		var Ids = [];
+
+		if ($target.data("cate")) {
+
+			$target.parent().find(".selected").each(function() {
+				Ids.push($(this).data("cate"));
+			});
+			App.Project.Settings.Viewer.selectIds(Ids);
+			App.Project.Settings.Viewer.zoomSelected();
+			// App.Project.Settings.Viewer.highlight({
+			// 	type: "userId",
+			// 	ids: Ids
+			// }) 
+
+			return;
+		}
+
+
+		var data = {
+			URLtype: "fetchQualityModelById",
+			data: {
+				projectId: App.Project.Settings.CurrentVersion.projectId,
+				versionId: App.Project.Settings.CurrentVersion.id,
+				acceptanceId: $target.data("id")
+			}
+		};
+
+		App.Comm.ajax(data, function(data) {
+			if (data.code == 0) {
+				$target.data("cate", data.data);
+
+				$target.parent().find(".selected").each(function() {
+					Ids.push($(this).data("cate"));
+				});
+				App.Project.Settings.Viewer.selectIds(Ids);
+				App.Project.Settings.Viewer.zoomSelected();
+
+				// App.Project.Settings.Viewer.highlight({
+				// 	type: "userId",
+				// 	ids: Ids
+				// })
+			}
+		});
+
+
 	}
 
 

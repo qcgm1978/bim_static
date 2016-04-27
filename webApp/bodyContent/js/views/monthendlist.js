@@ -1,7 +1,6 @@
 /**
  * @require /bodyContent/js/view/monthEnd.js
  */
-var App = App || {};
 App.BodyContent.monthEndList = Backbone.View.extend({
 
     tagName:'tbody',
