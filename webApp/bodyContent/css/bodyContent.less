@@ -1,6 +1,6 @@
 @lineHeight50: 50px ; /*标准行高*/
 .fTitle {font-size:  14px;}
-.f12{font-size:  12px};
+.fComm{font-size:  12px};
 @fontColorWhite :  #ffffff;
 @fontColorGray :  #999999;
 @fontColorBlack :  #333333;
@@ -14,73 +14,134 @@ a{text-decoration: none;color:@fontColorLink; }
 a:hover{text-decoration: underline;}
 .clear{margin: 0;padding: 0;}
 body,ul,table,tr,td,input{.clear;}
-.bdr5{border-radius: 5px;}
-.bdrT5{border-radius: 5px 5px 0 0;}
-.bdrB5{border-radius:  0 0 5px 5px;}
+.bdrComm{border-radius: 5px;}
+.bdrTComm{border-radius: 5px 5px 0 0;}
+.bdrBComm{border-radius:  0 0 5px 5px;}
 .pdT10{padding-top: 10px;}
 .pdX10{padding: 0 10px;}
-.pdX17{padding: 0 17px;}
 .ellipsis{overflow: hidden;white-space: nowrap;text-overflow: ellipsis;}
-.frontCon{box-shadow: 0 0 10px 0  #666666;}
+.con{/*filter: progid:DXImageTransform.Microsoft.Glow(color=#999999,strength=3);*/box-shadow: 0 0 10px 0  #666666;/*-webkit-filter: drop-shadow(0,0,5,rgba(0, 0, 0, 0.5));background-color: #ffffff; */.bdrComm;}
 /*用filter不是个好方式,IE渲染包含在box模型内，会偏移设置背景色将使ie的滤镜不继承*/
-/*-webkit-filter: drop-shadow(0,0,5,rgba(0, 0, 0, 0.5));background-color: #ffffff; */
-/*filter: progid:DXImageTransform.Microsoft.Glow(color=#999999,strength=3);*/
 img{border: none;outline: none;}
-.headIcon{position: absolute;width: 20px;height: 20px;background: transparent url("../images/dashboard.png") 0 0 no-repeat;}
-
+.headIcon{position: absolute;width: 35px;height: 40px;left: 0;top: 0;background: transparent url("../images/con_tab_default.png") center center no-repeat;}
+.linkBarIcon{
+    background: url('../images/dashboard.png');
+    width: 24px;
+    height: 24px;
+    display: inline-block;
+    vertical-align: -7px;
+}
+.ico {background-position:0 240px;}
+.module {background-position:0 200px;}
+.book {background-position:0 160px;}
+.money {background-position:0 120px;}
+.check {background-position:0 80px;}
+.plat {background-position:0 40px;}
 table{border-collapse: collapse;border: none;}
 .clearBoth { clear: both;}
-.clearfix:after{ clear: both; content: "\200B"; display: block; height: 0;}
+.clearfix:after{ clear: both; content: "\200B"; display: block; height: 0px;}
 .clearfix{ *zoom: 1;}
 
-.bodyContent{width: 980px;margin: 0 auto;padding: 20px 0 0 0;}
+.bodyContent{
+    position: fixed;
+    top:80px;
+    left: 20px;
+    right: 20px;
+    bottom: 110px;
+}
 .bodyContent li{.ellipsis;}
-.bodyContent .article{.pdX17;.bdrB5;}
+.bodyContent  .article{.pdX10;.bdrBComm;}
+.conTodo,.conSlide,.conMonth,.conPro{.con;.fComm;}
 
-.conTodo,.conSlide{height: 340px;overflow: hidden;}
-.conMonth,.conPro{height: 220px;overflow: hidden;}
-.conTodo,.conSlide,.conMonth,.conPro{.frontCon;.f12;.bdr5;border: none;}
-.conHeader span{display: block;.fTitle;padding:0 30px 0 44px; line-height: @lineHeight50 * 0.8;border-radius: 5px 0 0 0;cursor: pointer ;}
-.conHeader a{float: right;width: 44px; padding-right: 20px;position: relative;z-index: 10;height: 40px;}
-.conHeader a:before{content: '';.headIcon;background-position: 0 -360px;width: 13px;height: 3px;right: 17px !important;top: 18px;}
+.conHeader span{display: block;.fTitle;padding:0 30px 0 35px; line-height: @lineHeight50 * 0.8;font-weight: 600;border-radius: 5px 0 0 0;cursor: pointer ;}
+.conHeader a{float: right;line-height:@lineHeight50 * 0.8; font-size: 10px;color:@fontColorWhite;padding-right: 20px;position: relative;z-index: 10;}
 .conHeader a:hover{text-decoration: none;}
 .conMonth .conHeader span{float: left;position: relative;}
-.conMonth .conHeader i{.headIcon;width: 11px;height: 14px;background-position: 0 -240px;left: 17px;top: 13px;}
-.conMonth .conHeader span.active i{.headIcon;width: 11px;height: 14px;background-position: 0 -200px;left: 15px;top: 13px;}
-.conMonth .conHeader span.active i{}
+.conMonth .conHeader i{.headIcon;background-image:  url("../images/con_tab_default.png") ;}
+.conMonth .conHeader span.active i{background: #ffffff url("../images/con_tab_active.png") center center no-repeat;border-radius: 5px 0 0 0;}
 .conMonth .conHeader span.active{background:#ffffff url("../images/contabx.gif") right top no-repeat;color:@fontColorBlack ;}
 .conMonth td{overflow: hidden;text-overflow: ellipsis;white-space: nowrap;}
-.conMonth td.time{text-align: right;}
-.conMonth td.lev{text-align: center;}
-.conTodo ,.conMonth{.left;width: 600px;}
-.conTodo li{border-bottom: 1px solid #dddddd;}
-.conSlide,.conPro{.right;width: 360px;}
+.conTodo ,.conMonth{.left;width: 60%;}
+.conTodo li:not(:last-child){border-bottom: 1px solid #dddddd;}
+.conSlide,.conPro{.right;width: 37%;}
 .conTodo .conHeader span{position: relative;}
-.conTodo .conHeader i{.headIcon;left: 15px;top:10px;}
-.conSlide .conHeader i{.headIcon;left: 18px;top:10px;background-position: 0 -80px;}
-.conPro .conHeader i{.headIcon;left: 17px;top:10px;background-position: 0 -320px;}
+.conTodo .conHeader i{.headIcon;background-image:  url("../images/con_todo_ico.png");}
+.conSlide .conHeader i{.headIcon;background-image:  url("../images/slide_ico.png");}
+.conPro .conHeader i{.headIcon;background-image:  url("../images/pron_ico.png");}
 
 .conMonth table{width:@wp100;line-height: @lineHeight50 * 0.6;}
 .conMonth thead{color: @fontColorGray;border-bottom: 1px solid #dddddd;}
 #monthStart{display: none;}
-.bodyContent .conHeader{ background-color: #3c7ab9; height: @lineHeight50 * 0.8; color: @fontColorWhite;.bdrT5 ;line-height: 0;position: relative;}
+.bodyContent .conHeader{ background-color: #3c7ab9; height: @lineHeight50 * 0.8; color: @fontColorWhite;.bdrTComm ;line-height: 0;position: relative;}
 .conInfo{float: right;width: 195px;line-height: @lineHeight50 * 0.49;text-align: right;color: @fontColorGray;}
-.conInfo span{float: right;width: 110px;text-align: right;color: @fontColorBlack;}
-.conBody li{.f12;}
+.conInfo span{float: right;width: 110px;text-align: left;color: @fontColorBlack;}
+.conBody li{.fComm;}
 .conTodo .conBody li{line-height: @lineHeight50 * 0.98; }
 .conBody li a{color: #408CDF;}
 .conBody table{width:@wp100;}
 .conBody.pro .time,.conBody.pro li,.conBody.moth li{line-height: @lineHeight50 * 0.6;}
-.conBody li .new{display: inline-block;.headIcon;position: static;margin-left: 10px;width: 20px;height: 11px;vertical-align: middle;background-position: 0 -41px;}
-/*轮播*/
-.conSlide .presentShow{display: inline-block;*display:inline;line-height: 50px;vertical-align: top;width: 115px;color: #999999;font-size: 12px;}
-.conSlide .presentShow em{color: #0081dd;font-size: 14px;}
-.conSlide .article ul {height: 250px;}
-.conSlide .article li {position: absolute;left: 0;top: 0;width: 100%;height: 250px;}
-.conSlide .article{.bdrB5;height: 300px;overflow: hidden;position: relative;clear: both;}
-.conSlide  .imgContainer {position: absolute;left: 0;top: 0;width: 100%;height: 300px;}
-.conSlide  .slideProcess {height: 50px; line-height: 0;text-align: center;}
-.conSlide  .slideProcess span{position: relative;display: inline-block;*display:inline;cursor: pointer;width: 30px;height: 50px;line-height: 50px;}
-.conSlide  .slideProcess span:before{content:'';.headIcon; width: 30px;height: 30px;top: 10px;left: 0;}
-.conSlide  .slideProcess span.prev:before{background-position: 0 -120px;}
-.conSlide  .slideProcess span.next:before{background-position: 0 -160px;}
+
+body{
+    min-height: 700px;
+}
+
+@media screen and (min-height:700px){
+    table tbody tr{
+        height: 36px;
+    }
+    #proclamation li{
+        height: 34px;
+        line-height: 34px;
+    }
+}
+
+@media screen and (min-height:800px){
+    table tbody tr{
+        height: 42px;
+    }
+    #proclamation li{
+        height: 40px;
+        line-height: 40px;
+    }
+}
+
+@media screen and (min-height:1200px){
+    table tbody tr{
+        height: 55px;
+    }
+    #proclamation li{
+        height: 50px;
+        line-height: 51px;
+    }
+}
+
+.indexLayout{
+    float: left;
+    position: relative;
+    margin:0 10px 10px 10px;
+    & > div:nth-child(1) {
+        width: 100%;
+        height: 100%;
+    }
+}
+
+#layoutTodo{
+    height: 53%;
+    width: 58%;
+    min-height: 340px;
+}
+#layoutMonth{
+    height: 45%;
+    width: 58%;
+}
+#layoutSlide{
+    height: 53%;
+    width: 39%;
+    min-height: 340px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px 0  #666666;
+}
+#layoutPost{
+    height: 45%;
+    width: 39%;
+}

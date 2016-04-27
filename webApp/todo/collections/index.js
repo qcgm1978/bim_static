@@ -27,6 +27,8 @@ App.Todo = {
 
 	init: function() {
 
+		//独立todo页面、隐藏头部
+		$("#topBar li").hide();
 
 		//nav
 		$("#contains").html(new App.Todo.NavView().render().$el);
