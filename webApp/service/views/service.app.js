@@ -6,7 +6,6 @@ App.Service.control={
 
     init:function(){
         $("#contain").html( new App.Service.nav().render().$el);//基础框架
-        //弹窗
 
         //组织结构内容
         App.Service.memCtrlBlend.init();

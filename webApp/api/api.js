@@ -4,7 +4,7 @@ App.API = {
 
 	Settings: {
 		hostname: "http://bim.wanda-dev.cn/",
-		debug: false
+		debug: true
 	},
 
 	URL: {
@@ -15,9 +15,11 @@ App.API = {
 		fetchBodyContentMonthEnd :'dataJson/bodyContent/bodyContent.monthEnd.json',
 		fetchBodyContentMonthStart :'dataJson/bodyContent/bodyContent.monthStart.json',
 		fetchBodyContentSlide :'dataJson/bodyContent/bodyContent.slide.json',
+		fetchBodyContentMmhSlide :'dataJson/bodyContent/bodyContent.mmhSlider.json',
 		fetchBodyContentProclamation :'dataJson/bodyContent/bodyContent.proclamation.json',
 
 		//Service
+		//console
 		fetchServiceMCBlendList:'/dataJson/service/service.Mem.blendList.json',//组织-混合列表
 		fetchServiceMCBlendListMn:'/dataJson/service/service.Mem.blendList_mn.json',//组织-混合列表
 		fetchServiceRolesList:'/dataJson/service/service.Mem.rolesList.json',//角色-功能列表
@@ -158,6 +160,7 @@ App.API = {
 		fetchBodyContentMonthEnd :'/dataJson/bodyContent/bodyContent.monthEnd.json',
 		fetchBodyContentMonthStart :'/dataJson/bodyContent/bodyContent.monthStart.json',
 		fetchBodyContentSlide :'/dataJson/bodyContent/bodyContent.slide.json',
+		fetchBodyContentMmhSlide :'dataJson/bodyContent/bodyContent.mmhSlider.json',
 		fetchBodyContentProclamation :'/dataJson/bodyContent/bodyContent.proclamation.json',
 
 		//console

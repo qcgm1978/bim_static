@@ -17,12 +17,23 @@ App.Service.MemCtrlBlendDetail=Backbone.View.extend({
     },
 
     initialize:function(){
-        this.model.set({"selected":false});
+        this.model.set({"selected":false});//预先设置属性
         this.listenTo(this.model, 'change', this.render);
     },
 
-    //刷新右面操作
+    //弹窗
     spread:function(){
+
+        //需要将弹窗对象作为固定的设置
+        //App.Service.windowBase ＝ {
+        // width:,height:,cancelText:"",};
+
+        var window = new App.Comm.modules.Dialog({
+            width:600,
+            height:500,
+            cancelText:""
+        });
+        console.log(window);
         var $this = this;
         $("#mask").empty();
         //外壳及相关信息
@@ -55,7 +66,7 @@ App.Service.MemCtrlBlendDetail=Backbone.View.extend({
 
     },
 
-
+    //已选部分，当弹窗加载时使用当前成员的角色列表，将弹窗的父角色内与当前成员角色重叠的部分设置为已选
     chooseSelf:function(){
         //当选择其他时候，点击当前会将提示信息和选择信息设置为当前这个
         $("#blendList li").removeClass("active");
@@ -67,8 +78,7 @@ App.Service.MemCtrlBlendDetail=Backbone.View.extend({
         this.model.set("checked",true);
     },
 
-
-
+   //选择选项时作饿的操作。
     choose:function(){
         var boolean = this.model.get("checked");
         if(!boolean){
@@ -79,7 +89,3 @@ App.Service.MemCtrlBlendDetail=Backbone.View.extend({
         this.model.set({"checked": !boolean});
     }
 });
-
-
-
-
