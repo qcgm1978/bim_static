@@ -203,8 +203,6 @@ App.Project.Model = {
 		className: "myDropDown optionComm",
 
 		events: {
-			"click .item-content": "openTree",
-			"click .tree-text": "select",
 			"click .myDropText": "openList",
 		},
 
@@ -244,9 +242,10 @@ App.Project.Model = {
 
 	getInfo: Backbone.View.extend({
 		tagName: "ul",
-		className: "rightTree",
+		className: "tree-view rightTreeView",
 		events:{
 			"click .tree-text": "select",
+			"click .item-content": "openTree",
 		},
 		initialize: function() {
 			this.listenTo(App.Project.Collection.changeInfo, "add", this.addDetail);
@@ -265,6 +264,10 @@ App.Project.Model = {
 			}
 			return this;
 		},
+		openTree: function(event) {
+      var that = $(event.target).closest('.item-content')
+      that.toggleClass('open');
+    },
 		select: function() {
 			var that = $(event.target);
 			var current = $(".rightTreeView .current");
