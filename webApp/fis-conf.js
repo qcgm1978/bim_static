@@ -113,6 +113,11 @@ fis.match('resources/**.html', {
   release: "/static/dist/tpls/$0"
 });
 
+fis.match('services/**.html', {
+  //useHash:true,
+  release: "/static/dist/tpls/$0"
+});
+
 fis.match('**.{otf,eot,svg,ttf,woff}', {
   //useHash:true,
   release: "/static/dist/comm/$0"
@@ -249,6 +254,17 @@ fis.match('/flow/**.{less,css}', {
   packTo: '/static/dist/flow/flow_' + v + '.css'
 });
 
+
+// 服务
+fis.match('/services/**.{js,es6}', {
+  //useHash:true,
+  packTo: '/static/dist/services/services_' + v + '.js'
+});
+
+fis.match('/services/**.{less,css}', {
+  //useHash:true,
+  packTo: '/static/dist/services/services_' + v + '.css'
+});
 
 //文件选择组件 配置
 

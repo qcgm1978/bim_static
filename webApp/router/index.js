@@ -12,6 +12,9 @@ var AppRoute = Backbone.Router.extend({
 		'console': 'console',
 		'console/:type/:step': 'console',
 		'service': 'service',
+		'services': 'services',
+		'services/:type': 'services',
+		'services/:type/:tab': 'services',
 		'list/:id': 'list',
 		'bodyContent':'bodyContent'
 	},
@@ -130,6 +133,15 @@ var AppRoute = Backbone.Router.extend({
 		_.require('/static/dist/service/service.js');
 		App.Service.control.init();
 		$("#pageLoading").hide();
+	},
+
+	services:function(type,tab){
+		this.reset();
+		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".service").addClass('selected');
+		_.require('/static/dist/services/services.css');
+		_.require('/static/dist/services/services.js'); 
+		App.Services.init(type,tab);
+		
 	},
 
 	//重置数据
