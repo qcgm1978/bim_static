@@ -8,7 +8,7 @@
     <li class="myItemGroup"><span><%=item.specialtyName%></span></li>
     <ul class="groups">
       <% $.each(item.comparisons,function(i,item){  %>
-        <li class="myItem" data-id="<%= item.comparisonId %>" data-currentmodel="<%=item.currentModel%>" data-basemodel="<%=item.baseModel%>">
+        <li class="myItem" data-id="<%= item.comparisonId %>" data-currentmodel="<%=item.currentModel%>" data-change="<%=item.output%>">
 		      <%=item.fileName%>
 	      </li>
       <% }) %>
