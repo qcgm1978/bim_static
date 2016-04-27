@@ -1,0 +1,18 @@
+<div class="name">
+    成员一/角色
+    <img src="<%= function ||   mem  || oz || adm || role %>">
+    <!--注意，model内部添加识别    ：   功能 || 成员 || 组织 || 管理员 || 角色-->
+    <!--name-->
+</div>
+<div class="aside">
+    <!--以下内容在viewDetail中写入-->
+    <% if (type) {%><!--成员还是组织？-->
+    <span class="<%= type==1 ? 'adm' : 'block'%>">所属部门</span>
+    <%}%>
+    <% if (function) {%><!--功能点？-->
+    <span class="<%= function==1 ? 'adm' : 'block'%>">功能点</span>
+    <%}%>
+    <% if (dec) {%><!--功能描述？-->
+    <span class="<%= function==1 ? 'adm' : 'block'%>">功能点</span>
+    <%}%>
+</div>
