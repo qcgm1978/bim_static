@@ -69,7 +69,7 @@ var BIM = function(option){
     bimBox.appendChild(viewBox);
     _opt.element.appendChild(bimBox);
     viewer.init(viewBox);
-    viewer.load(_opt.etag,BIM.common.severModel);
+    self.client = viewer.load(_opt.etag,BIM.common.severModel);
     if(_opt.resize){
       _util.listener(window,'resize',function(){
         var _width = viewBox.clientWidth,
@@ -738,6 +738,11 @@ BIM.prototype = {
     });
     viewer.render();
   },
+  showScene:function(client,flag){
+    var viewer = BIM.common.viewer;
+    viewer.showScene(client,flag);
+    viewer.render();
+  },
   highlight:function(obj){
     var viewer = BIM.common.viewer;
     var filter = viewer.getFilters();
@@ -805,8 +810,9 @@ BIM.prototype = {
   },
   load:function(etag){
     var viewer = BIM.common.viewer;
-    viewer.load(etag,BIM.common.severModel);
+    var client = viewer.load(etag,BIM.common.severModel);
     viewer.render();
+    return client;
   },
   initMap:function(name,element){
     var viewer = BIM.common.viewer,

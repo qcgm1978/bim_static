@@ -50,6 +50,18 @@ App.Index = {
 
 		this.bindTreeScroll();
 
+		// 加载变更模型
+		$(".showChange .checkboxGroup input:checkbox").on("change",function(){
+			var model = App.Index.Settings.baseModel;
+			var viewer = App.Index.Settings.Viewer;
+			var flag = $(this).prop("checked");
+			if(App.Index.Settings.loadedModel){
+				viewer.showScene(App.Index.Settings.loadedModel,flag);
+			}else{
+				App.Index.Settings.loadedModel = viewer.load(model);
+			}
+		})
+
 	},
 
 	initPars: function() {
@@ -94,11 +106,11 @@ App.Index = {
 	//渲染模型
 	renderModel(modelId) {
 		App.Index.Settings.Viewer = new BIM({
-				single: true,
-				element: $("#contains .projectCotent")[0],
-				etag: modelId,
-				tools: true
-			});
+			single: true,
+			element: $("#contains .projectCotent")[0],
+			etag: modelId,
+			tools: true
+		});
 	},
 
 	//渲染属性
@@ -168,7 +180,9 @@ App.Index = {
 				var currentModel = $item.data("currentmodel"),
 					baseModel = $item.data("basemodel"),
 					comparisonId = $item.data('id');
+				App.Index.Settings.baseModel = baseModel;
 				that.renderModel(currentModel);
+				$(".rightPropertyContent .listDetail").html(new App.Project.Model.getInfo().render().el);
 				that.getDetail(comparisonId);
 			}
 		});
@@ -226,6 +240,7 @@ App.Project.Model = {
 						$(".rightPropertyContent .listDetail").html(new App.Project.Model.getInfo().render().el);
 						App.Index.Settings.baseModel = file.baseModel
 						App.Index.getDetail(comparisonId);
+						App.Index.Settings.baseModel = file.baseModel;
 						App.Index.renderModel(file.currentModel);
 					}
 				});
