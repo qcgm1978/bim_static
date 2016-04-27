@@ -25,7 +25,7 @@ App.Services.memberDetail=Backbone.View.extend({
     spread:function(){
 
         //需要将弹窗对象作为固定的设置
-        //App.Service.windowBase ＝ {
+        //App.Services.windowBase ＝ {
         // width:,height:,cancelText:"",};
 
         var window = new App.Comm.modules.Dialog({
@@ -37,22 +37,22 @@ App.Services.memberDetail=Backbone.View.extend({
         var $this = this;
         $("#mask").empty();
         //外壳及相关信息
-        App.Service.window.init();
-        $(".serviceWindow").append(new App.Service.windowMem().render().el);//外框
+        App.Services.window.init();
+        $(".serviceWindow").append(new App.Services.windowMem().render().el);//外框
         $(".serviceWindow h1").html("角色授权");
 
         //写入当前用户
-        $(".serviceWindow .aim ul").append(new App.Service.window.BlendDetail({model:$this.model}).render().el);
-        $(".memRoleList").append(new App.Service.windowRoleList().render().el);
+        $(".serviceWindow .aim ul").append(new App.Services.window.BlendDetail({model:$this.model}).render().el);
+        $(".memRoleList").append(new App.Services.windowRoleList().render().el);
 
 
         this.chooseSelf();//清理旧的和选中新的
 
         //处理角色列表已选部分
-        App.Service.ozRole.loadData({},function(){
+        App.Services.ozRole.loadData({},function(){
             var preSelected = $this.model.get("role");//已选角色
             //没效果，collection异步所以异步执行无数据
-            App.Service.ozRole.collection.each(function(item){
+            App.Services.ozRole.collection.each(function(item){
                 item.unset("checked");//清除痕迹
                 for(var i = 0 ; i < preSelected.length ; i++){
                     if(item.get("roleId") == preSelected[i]["roleId"]){
@@ -70,7 +70,7 @@ App.Services.memberDetail=Backbone.View.extend({
     chooseSelf:function(){
         //当选择其他时候，点击当前会将提示信息和选择信息设置为当前这个
         $("#blendList li").removeClass("active");
-        App.Service.memCtrlBlend.collection.each(function(item){
+        App.Services.Member.collection.each(function(item){
             item.unset("checked");
         });
         //选中当前

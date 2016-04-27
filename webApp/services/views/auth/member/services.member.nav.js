@@ -1,12 +1,12 @@
 /*
- * @require  /service/views/mem/service.MemCtrlChildList.js
+ * @require  /service/views/mem/Services.MemCtrlChildList.js
  * */
 var App = App || {};
-App.Services.MemCtrl=Backbone.View.extend({
+App.Services.MemberNav=Backbone.View.extend({
 
     tagName :'div',
 
-    template:_.templateUrl("/service/tpls/mem/service.memCtrl.html"),
+    template:_.templateUrl("/services/tpls/auth/member/services.member.nav.html"),
     events:{
         "click .outer":'outer',
         "click .inner":'inner'
@@ -24,12 +24,12 @@ App.Services.MemCtrl=Backbone.View.extend({
     //外部用户
     outer:function(){
         this.loadData(true,"outer");
-        //App.Service.ozRole.loadData();//获取父项数据
+        //App.Services.ozRole.loadData();//获取父项数据
     },
     //内部用户
     inner:function(){
         this.loadData(false,"inner");
-        //App.Service.ozRole.loadData();//获取父项数据
+        //App.Services.ozRole.loadData();//获取父项数据
     },
 
 
@@ -41,7 +41,7 @@ App.Services.MemCtrl=Backbone.View.extend({
                 //parentId: ""//父项ID
             }
         };
-        App.Service.memCtrlBlend.collection.reset();
+        App.Services.Member.collection.reset();
 
         App.Comm.ajax(dataObj,function(response){
 
@@ -49,14 +49,10 @@ App.Services.MemCtrl=Backbone.View.extend({
             if(response.message == "success") {
 
 
-                App.Service.memCtrlBlend.setter(response);//设定特征
+                App.Services.Member.setter(response);//设定特征
 
 
                 $("#blendList").empty();
-                //无员工
-                /*if (response.data.user.length) {
-                    App.Service.memCtrlBlend.collection.add(response.data.user);
-                }*/
                 //组织
                 if (response.data.org.length) {
                     //样式处理
@@ -72,9 +68,9 @@ App.Services.MemCtrl=Backbone.View.extend({
                         response.data.org[z].type = options;         //设定类型,内部还是外部
                     }
                     //数据和渲染
-                    App.Service.memCtrlBlend.collection.reset();
-                    App.Service.memCtrlBlend.collection.add(response.data.org);
-                    this.$("." + self +"+ .childOz").html(new App.Service.MemCtrlChildList(response.data.org).render().el);
+                    App.Services.Member.collection.reset();
+                    App.Services.Member.collection.add(response.data.org);
+                    this.$("." + self +"+ .childOz").html(new App.Services.MemberozList(response.data.org).render().el);
                 }
             }
         });

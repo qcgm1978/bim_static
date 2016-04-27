@@ -4,11 +4,11 @@
 var App = App || {};
 
 
-App.Service.MemCtrlozDetail=Backbone.View.extend({
+App.Services.MemberozDetail=Backbone.View.extend({
 
     tagName :'li',
 
-    template:_.templateUrl("/service/tpls/mem/service.memCtrl.ozDetail.html"),
+    template:_.templateUrl("/services/tpls/auth/member/services.member.ozDetail.html"),
     events:{
         "click .ozName":"unfold"
     },
@@ -50,16 +50,16 @@ App.Service.MemCtrlozDetail=Backbone.View.extend({
                 $(".childOz" +$thisData).empty();
                 //获取组织
 
-                App.Service.memCtrlBlend.collection.reset();
+                App.Services.Member.collection.reset();
                 $("#blendList").empty();
 
-                //App.Service.parentOz = $this.model;  //缓存父组织模型在service.MemCtrl.bledList.js使用
+                //App.Services.parentOz = $this.model;  //缓存父组织模型在Services.MemCtrl.bledList.js使用
 
-                App.Service.memCtrlBlend.setter(response);//设定特征
+                App.Services.Member.setter(response);//设定特征
 
                 //reset数据
                 if(response.data.user.length){
-                    App.Service.memCtrlBlend.collection.add(response.data.user);//员工
+                    App.Services.Member.collection.add(response.data.user);//员工
                 }
                 if(response.data.org.length){
                     //左面删除已选
@@ -70,9 +70,9 @@ App.Service.MemCtrlozDetail=Backbone.View.extend({
                     $this.$(".ozName").addClass("active");
                     $this.$(".ozName span").addClass("active");//选中状态
 
-                    $(".childOz" + $thisData).html(new App.Service.MemCtrlChildList(response.data.org).render().el);
+                    $(".childOz" + $thisData).html(new App.Services.MemCtrlChildList(response.data.org).render().el);
 
-                    App.Service.memCtrlBlend.collection.add(response.data.org);//组织
+                    App.Services.Member.collection.add(response.data.org);//组织
                 }
             });
         }

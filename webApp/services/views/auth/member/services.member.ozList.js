@@ -1,12 +1,12 @@
 /*
- * @require  /service/views/mem/service.MemCtrl.ozDetail.js
+ * @require  /service/views/mem/Services.MemCtrl.ozDetail.js
  * */
 var App = App || {};
-App.Service.MemCtrlChildList=Backbone.View.extend({
+App.Services.MemberozList=Backbone.View.extend({
 
     tagName :'ul',
 
-    template:_.templateUrl("/service/tpls/mem/service.memCtrl.oz.childList.html"),
+    template:_.templateUrl("/services/tpls/auth/member/services.member.ozList.html"),
     events:{
 
     },
@@ -19,12 +19,12 @@ App.Service.MemCtrlChildList=Backbone.View.extend({
     },
 
     renderOg :function(item){
-        var view = new App.Service.MemCtrlozDetail({model:item});
+        var view = new App.Services.MemberozDetail({model:item});
         this.$el.append(view.render().el);
     },
 
     initialize:function(models){
-        this.collection = new App.Service.memCtrlBlend.outerCollection(models);
+        this.collection = new App.Services.Member.outerCollection(models);
     }
 });
 
