@@ -255,14 +255,13 @@ App.Comm.createModel = function(options){
     },
     getData:function (element){
       var type = element.data("type");
+      var parent = element.next(".subTree").length>0 ? element.next(".subTree") : element;
       var data = {
-        type:'',
+        type:type,
         ids:[]
       }
       if(type != "classCode"){
-        var element = $("#classCode");
-        data.type = element.data('type');
-        var input = element.find("input");
+        var input = parent.find("input");
         $.each(input,function(index,item){
           var $item = $(item),
               etag = $item.data('etag');
@@ -274,10 +273,8 @@ App.Comm.createModel = function(options){
           data.ids = data.ids.concat(etag);
         });
       }else{
-        var element = $("#classCode");
-        data.type = element.data('type');
         var codeData = this.classCodeData;
-        var code = element.data('parent');
+        var code = parent.data('parent');
         var reg = new RegExp("^"+code);
         $.each(codeData,function(i,item){
           if(!code){
