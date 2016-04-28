@@ -1,5 +1,5 @@
 /*
-* @require  /services/views/auth/services.member.list.js
+* @require  /services/collections/index.es6
 */
 App.Services.Member ={
 

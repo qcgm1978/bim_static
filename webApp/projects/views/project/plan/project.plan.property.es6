@@ -80,9 +80,8 @@ App.Project.ProjectPlanProperty = Backbone.View.extend({
 	},
 
 	//改变时间 
-	changeDate(event) {
-
-		debugger
+	changeDate(event) { 
+		 
 		var $target = $(event.target),
 			isEnd = $target.val() != 1 && $target.val() != 3 &&  true || false;
 
@@ -106,22 +105,24 @@ App.Project.ProjectPlanProperty = Backbone.View.extend({
 		}
 
 		App.Project.PlanAttr.PlanPublicityCollection.reset();
-		App.Project.PlanAttr.PlanPublicityCollection.projectId = projectId;
-		App.Project.PlanAttr.PlanPublicityCollection.projectVersionId = projectVersionId;
+		//App.Project.PlanAttr.PlanPublicityCollection.projectId = projectId;
+		//App.Project.PlanAttr.PlanPublicityCollection.projectVersionId = projectVersionId;
 
 		App.Project.PlanAttr.PlanPublicityCollection.fetch({
 			data: {
-				queryType: weekType
+				projectId:projectId,
+				type: monthType
 			}
 		});
 
 		App.Project.PlanAttr.PlanPublicityCollectionMonth.reset();
-		App.Project.PlanAttr.PlanPublicityCollectionMonth.projectId = projectId;
-		App.Project.PlanAttr.PlanPublicityCollectionMonth.projectVersionId = projectVersionId;
+		//App.Project.PlanAttr.PlanPublicityCollectionMonth.projectId = projectId;
+		//App.Project.PlanAttr.PlanPublicityCollectionMonth.projectVersionId = projectVersionId;
 
 		App.Project.PlanAttr.PlanPublicityCollectionMonth.fetch({
 			data: {
-				queryType: monthType
+				projectId:projectId,
+				type: monthType
 			}
 		});
 	},

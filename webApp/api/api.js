@@ -4,7 +4,7 @@ App.API = {
 
 	Settings: {
 		hostname: "http://bim.wanda-dev.cn/",
-		debug: true
+		debug: false
 	},
 
 	URL: {
@@ -86,7 +86,7 @@ App.API = {
 		//计划
 		fetchPlanModel: "sixD/{projectId}/{projectVersionId}/plan", //模型
 		fetchPlanAnalog: "sixD/{projectId}/{projectVersionId}/plan?relateModel=true", //模拟
-		fetchPlanPublicity: "sixD/{projectId}/{projectVersionId}/plan/concern", //关注 ?queryType={queryType}
+		fetchPlanPublicity: "sixD/plan/concern", //关注 ?queryType={queryType}
 		fetchPlanInspection: "sixD/{projectId}/{projectVersionId}/plan?noElement=true", //检验 计划节点未关联图元 startTime=1398145297000&endTime=1398145297000&relateModel={true|false}&
 		fetchPlanInspectionCate: "sixD/{projectId}/{projectVersionId}/plan/noplan/cate", // 图元未关联计划节点
 		fetchPlanInspectionCateDetail: "sixD/{projectId}/{projectVersionId}/plan/noplan/element", // 图元未关联计划节点 ?cateId={cateId} 暂开详情
@@ -143,6 +143,13 @@ App.API = {
 		"servicesCategoryList":"platform/set/category", //分类 列表
 		"servicesCategoryUpdate":"platform/set/category/update",// 更新类别
 		"servicesCategoryDel":"platform/set/category/del",// 删除 ?id={id}
+
+		//流程
+		"servicesFlowAdd":"platform/set/flow/add",// 新增分类
+		"servicesFlowList":"platform/set/flow", // 列表 ?categoryId={categoryId}
+		"servicesFlowUpdate":"platform/set/flow/update",// 更新类别
+		"servicesFlowDel":"platform/set/flow/del",// 删除 ?id={id}
+		"servicesFlowIndex":"platform/set/flow/serial", // 改变位置 ?id={id} 
 
 		test: ""
 	},

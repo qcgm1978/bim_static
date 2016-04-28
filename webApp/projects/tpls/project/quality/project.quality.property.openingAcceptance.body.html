@@ -1,8 +1,8 @@
 <% $.each(data.items,function(i,item){%> 
     <tr class="<%= i%2==0 && 'odd' %>"  data-id="<%=item.id%>">
         <td class="manifestIcon"></td>
-        <td class="specialities"><%=item.specialty%></td>
-        <td class="category"><%=item.category%></td>
+        <td class="specialities"><%=item.specialtyName%></td>
+        <td class="category"><%=item.categoryName%></td>
         <td class="positon"><%=item.location%></td>
         <td class="ckResult"><%=item.problemCount%>/<%=item.checkCount%></td>
     </tr>

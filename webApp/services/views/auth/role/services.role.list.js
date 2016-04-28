@@ -1,5 +1,5 @@
 /*
- * @require  /services/collections/auth/member/services.role.detail.js
+ * @require  /services/views/auth/member/services.role.detail.js
  */
 
 var App = App || {};
