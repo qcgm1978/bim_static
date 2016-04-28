@@ -5,10 +5,10 @@ var App = App || {};
 App.Services.control={
 
     init:function(){
-        $("#contain").html( new App.Services.nav().render().$el);//基础框架
+        $("#contain").html( new App.Services.nav().render().el);//基础框架
 
         //组织结构内容
-        App.Services.Member.init();
+        //App.Services.Member.init();
 
         //App.Service.memCtrloz .loadData();//加载组织列表
         //App.Service.memCtrlBlend.loadData();//加载成员列表

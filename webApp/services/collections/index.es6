@@ -43,4 +43,4 @@ App.Services = {
 			$("#pageLoading").hide();
 		}
 	}
-}
+};

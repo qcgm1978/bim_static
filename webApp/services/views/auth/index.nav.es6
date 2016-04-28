@@ -3,7 +3,6 @@
  * */
 App.Services.AuthNav = Backbone.View.extend({
 
-
 	tagName:"div",
 
 	template:_.templateUrl("/services/tpls/auth/auth.nav.html",true),
