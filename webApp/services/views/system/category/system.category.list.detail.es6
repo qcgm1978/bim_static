@@ -13,6 +13,7 @@ App.Services.System.CategoryListDetail = Backbone.View.extend({
 	initialize() {
 		//this.listenTo(this, "remove", this.removeModel);
 		this.listenTo(this.model, "destroy", this.removeModel);
+		this.listenTo(this.model, "change", this.render);
 	},
 
 	template: _.templateUrl('/services/tpls/system/category/system.category.list.detail.html'),
@@ -96,7 +97,7 @@ App.Services.System.CategoryListDetail = Backbone.View.extend({
 
 		var $target = $(event.target),
 			$item = $target.closest(".item"),
-			that=this,
+			that = this,
 			data = {
 				isEdit: true,
 				code: $item.find(".code").text().trim(),
@@ -114,21 +115,30 @@ App.Services.System.CategoryListDetail = Backbone.View.extend({
 			cssClass: "addNewCategoryDialog",
 			message: dialogHtml,
 			okCallback: () => {
+
+				if (dialog.isSubmit) {
+					return;
+				}
+
 				var data = {
 					URLtype: "servicesCategoryUpdate",
-					type:"POST",
+					type: "POST",
 					data: {
+						id: $target.data("id"),
 						busCode: dialog.element.find(".txtCategoryCode").val().trim(),
 						busName: dialog.element.find(".txtCategoryTitle").val().trim(),
 						busDesc: dialog.element.find(".txtCategoryDesc").val().trim()
-					} 
+					}
 				}
-				 
+				dialog.isSubmit = true;
 				App.Comm.ajax(data, function(data) {
-					if (data.code==0) {
-						 that.model.set(data.data);
+
+					if (data.code == 0) {
+						that.model.set(data.data);
+						dialog.close();
 					}
 				});
+
 
 				return false;
 
@@ -139,15 +149,15 @@ App.Services.System.CategoryListDetail = Backbone.View.extend({
 	},
 
 	//移除
-	removeModel() { 
+	removeModel() {
 		//最后一条
-		var $parent=this.$el.parent();
-		if ($parent.find("li").length<=1) {
+		var $parent = this.$el.parent();
+		if ($parent.find("li").length <= 1) {
 			$parent.append('<li class="loading">无数据</li>');
 		}
 		this.remove();
 
-		
+
 
 	}
 

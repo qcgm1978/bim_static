@@ -15,7 +15,7 @@ App.Services.System=Backbone.View.extend({
 
 		this.$el.html(new App.Services.System.topBar().render().el);
 
-		this.$(".serviceNav .item:first").trigger("click");
+		this.$(".serviceNav .item").eq(1).trigger("click");
 
 		return this;
 	},
@@ -31,6 +31,7 @@ App.Services.System=Backbone.View.extend({
 
 		}else if (type=="flow") {
 			//流程
+			viewer=new App.Services.System.FolwManager();
 
 		}else if (type=="extend") {
 			//扩展

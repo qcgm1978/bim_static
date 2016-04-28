@@ -148,6 +148,13 @@ App.API = {
 		"servicesCategoryUpdate":"platform/set/category/update",// 更新类别
 		"servicesCategoryDel":"platform/set/category/del",// 删除 ?id={id}
 
+		//流程
+		"servicesFlowAdd":"platform/set/flow/add",// 新增分类
+		"servicesFlowList":"platform/set/flow", // 列表 ?categoryId={categoryId}
+		"servicesFlowUpdate":"platform/set/flow/update",// 更新类别
+		"servicesFlowDel":"platform/set/flow/del",// 删除 ?id={id}
+		"servicesFlowIndex":"platform/set/flow/serial", // 改变位置 ?id={id} 
+
 		test: ""
 	},
 
