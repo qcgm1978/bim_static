@@ -5,6 +5,8 @@ App.Services.AuthNav = Backbone.View.extend({
 
 	tagName:"div",
 
+	className:"mgXD20",
+
 	template:_.templateUrl("/services/tpls/auth/auth.nav.html",true),
 
 	events:{
@@ -38,7 +40,7 @@ App.Services.AuthNav = Backbone.View.extend({
 	memCtrl : function(){
 		$(".serviceBody").empty();
 		this.breadCrumb(this.$el.find(".memCtrl"));
-		//App.Services.init({type : "auth",tab:"memCtrl"});
+		App.Services.init({type : "auth",tab:"memCtrl"});
 		App.Services.Member.init();
 	},
 	roleManager : function(){

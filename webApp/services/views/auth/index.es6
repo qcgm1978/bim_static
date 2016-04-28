@@ -3,7 +3,7 @@
  * */
 
 //权限管理入口
-App.Services.AuthNav = Backbone.View.extend({
+App.Services.Auth = Backbone.View.extend({
 
 	tagName:"div",
 
