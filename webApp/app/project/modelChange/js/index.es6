@@ -52,13 +52,13 @@ App.Index = {
 
 		// 加载变更模型
 		$(".showChange .checkboxGroup input:checkbox").on("change",function(){
-			var model = App.Index.Settings.baseModel;
+			var changeModel = App.Index.Settings.changeModel;
 			var viewer = App.Index.Settings.Viewer;
 			var flag = $(this).prop("checked");
 			if(App.Index.Settings.loadedModel){
 				viewer.showScene(App.Index.Settings.loadedModel,flag);
 			}else{
-				App.Index.Settings.loadedModel = viewer.load(model);
+				App.Index.Settings.loadedModel = viewer.load(changeModel);
 			}
 		})
 
@@ -178,9 +178,9 @@ App.Index = {
 				var groupText = $item.closest(".groups").prev().text() + "：";
 				$(".myDropDown .myDropText span:first").text(groupText);
 				var currentModel = $item.data("currentmodel"),
-					baseModel = $item.data("basemodel"),
+					changeModel = $item.data("change").replace("_output",""),
 					comparisonId = $item.data('id');
-				App.Index.Settings.baseModel = baseModel;
+				App.Index.Settings.changeModel = changeModel;
 				that.renderModel(currentModel);
 				$(".rightPropertyContent .listDetail").html(new App.Project.Model.getInfo().render().el);
 				that.getDetail(comparisonId);
@@ -234,17 +234,25 @@ App.Project.Model = {
 		addList: function(model) {
 			var data = model.toJSON();
 			var comparisonId = App.Index.Settings.referenceId;
+			var isload = false;
 			$.each(data.data,function(i,item){
 				$.each(item.comparisons,function(j,file){
 					if(file.currentVersion == comparisonId){
+						isload = true;
 						$(".rightPropertyContent .listDetail").html(new App.Project.Model.getInfo().render().el);
-						App.Index.Settings.baseModel = file.baseModel
 						App.Index.getDetail(comparisonId);
-						App.Index.Settings.baseModel = file.baseModel;
+						App.Index.Settings.changeModel = file.output.replace("_output","");
 						App.Index.renderModel(file.currentModel);
 					}
 				});
-			})
+			});
+			// 没有找到当前文件,默认加载第一个
+			if(!isload){
+				var file = data.data[0].comparisons[0];
+				App.Index.getDetail(file.comparisonId);
+				App.Index.Settings.changeModel = file.output.replace("_output","");
+				App.Index.renderModel(file.currentModel);
+			}
 			if (data.message == 'success') {
 				this.$el.html(this.template(data));
 			}else{
@@ -284,22 +292,24 @@ App.Project.Model = {
       that.toggleClass('open');
     },
 		select: function() {
-			var that = $(event.target);
+			var that = $(event.target).closest(".tree-text");
 			var current = $(".rightTreeView .current");
 			var elementId = that.data('id');
 			var baseId = that.data('base');
 			var curElementId = current.data('id');
 			var curBaseId = current.data('base');
 			if (that.prev('.noneSwitch').length > 0) {
-				current.removeClass('current');
-				$(event.target).addClass('current');
+				if(current[0] != that[0]){
+					current.removeClass('current');
+					App.Index.Settings.Viewer.highlight({
+						type: 'userId',
+						ids: [elementId, baseId]
+					});
+				}
+				that.toggleClass('current');
 				App.Index.Settings.Viewer.downplay({
 					type: 'userId',
 					ids: [curElementId, curBaseId]
-				});
-				App.Index.Settings.Viewer.highlight({
-					type: 'userId',
-					ids: [elementId, baseId]
 				});
 				App.Index.Settings.Viewer.fit();
 			}

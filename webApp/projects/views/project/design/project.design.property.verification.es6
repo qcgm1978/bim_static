@@ -123,7 +123,7 @@
 
  	//数据返回
  	addOne: function(model) {
-
+ 		 
  		if (this.$el.closest('body').length <= 0) {
  			this.remove();
  		} 

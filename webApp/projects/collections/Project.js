@@ -447,10 +447,10 @@ App.Project = {
 					if (!data) {
 						return;
 					}
-					that.$el.find(".attrPlanBox").find(".name").text(data.businessItem).end().find(".start").
-					text(data.planStartTime && new Date(data.planStartTime).format("yyyy-MM-dd") || "").end().
-					find(".end").text(data.planStartTime && new Date(data.planEndTime).format("yyyy-MM-dd") || "").end().
-					find(".rEnd").text(data.planStartTime && new Date(data.endTime).format("yyyy-MM-dd") || "").end().show();
+					that.$el.find(".attrPlanBox").find(".name").text(data.taskName).end().find(".start").
+					text(data.planStartDate && new Date(data.planStartDate).format("yyyy-MM-dd") || "").end().
+					find(".end").text(data.planFinishDate && new Date(data.planFinishDate).format("yyyy-MM-dd") || "").end().
+					find(".rEnd").text(data.planFinishDate && new Date(data.planFinishDate).format("yyyy-MM-dd") || "").end().show();
 
 				}
 			});
