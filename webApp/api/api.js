@@ -4,22 +4,21 @@ App.API = {
 
 	Settings: {
 		hostname: "http://bim.wanda-dev.cn/",
-		debug: true
+		debug: false
 	},
 
 	URL: {
 
 		//首页bodyContent数据
-		// fetchBodyContentData :'platform/bodyContent',
 		fetchBodyContentTodos :'dataJson/bodyContent/bodyContent.todos.json',
 		fetchBodyContentMonthEnd :'dataJson/bodyContent/bodyContent.monthEnd.json',
 		fetchBodyContentMonthStart :'dataJson/bodyContent/bodyContent.monthStart.json',
 		fetchBodyContentSlide :'dataJson/bodyContent/bodyContent.slide.json',
+		fetchBodyContentMmhSlide :'dataJson/bodyContent/bodyContent.mmhSlider.json',
 		fetchBodyContentProclamation :'dataJson/bodyContent/bodyContent.proclamation.json',
 
-		//Service
-		//console
-		fetchServiceMCBlendList:'/dataJson/service/service.Mem.blendList.json',//组织-混合列表
+		//Services
+		fetchServiceMemberList:'dataJson/service/service.Mem.blendList.json',//组织-混合列表
 		fetchServiceMCBlendListMn:'/dataJson/service/service.Mem.blendList_mn.json',//组织-混合列表
 		fetchServiceRolesList:'/dataJson/service/service.Mem.rolesList.json',//角色-功能列表
 		fetchServiceFunList: '/dataJson/service/service.fun.list.json',//功能列表
@@ -140,6 +139,15 @@ App.API = {
 		projectDesinPropertiesTest:"/dataJson/project/projectChange/comparisonAttr.json",//sixD/{projectId}/{projectVersionId}/property/comparison //?baseProjectVerionId={baseProjectVerionId}&sceneId={sceneId}&elementId={elementId}
 		fileListTest:"/dataJson/project/projectChange/changeFile.json", //doc/internal/{projectId}/{versionId}/alteration
 
+		//服务
+
+		//系统设置
+
+		"servicesAddCategory":"platform/set/category/add",// 新增分类
+		"servicesCategoryList":"platform/set/category", //分类 列表
+		"servicesCategoryUpdate":"platform/set/category/update",// 更新类别
+		"servicesCategoryDel":"platform/set/category/del",// 删除 ?id={id}
+
 		test: ""
 	},
 
@@ -150,6 +158,7 @@ App.API = {
 		fetchBodyContentMonthEnd :'/dataJson/bodyContent/bodyContent.monthEnd.json',
 		fetchBodyContentMonthStart :'/dataJson/bodyContent/bodyContent.monthStart.json',
 		fetchBodyContentSlide :'/dataJson/bodyContent/bodyContent.slide.json',
+		fetchBodyContentMmhSlide :'dataJson/bodyContent/bodyContent.mmhSlider.json',
 		fetchBodyContentProclamation :'/dataJson/bodyContent/bodyContent.proclamation.json',
 
 		//console

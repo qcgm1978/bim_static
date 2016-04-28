@@ -31,6 +31,7 @@ var AppRoute = Backbone.Router.extend({
 	},
 	//待办
 	todo: function() {
+		
 		this.reset();
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".todo").addClass('selected');
 		//加载css js

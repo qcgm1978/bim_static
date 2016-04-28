@@ -1,12 +1,11 @@
-
-/**
- * @require /services/collections/index.es6
- */
+/*
+ * @require  /services/views/auth/index.es6
+ * */
 App.Services.AuthNav = Backbone.View.extend({
 
-	//el:$("#contains"),
-
 	tagName:"div",
+
+	className:"mgXD20",
 
 	template:_.templateUrl("/services/tpls/auth/auth.nav.html",true),
 
@@ -34,27 +33,27 @@ App.Services.AuthNav = Backbone.View.extend({
 		$(".serviceBody").empty();
 		this.breadCrumb(this.$el.find(".memCtrl"));
 		//App.Services.init({type : "auth",tab:"memCtrl"});
-		//App.Service.memCtrlBlend.init();
+		//App.Services.Member.init();
 	},
 
 
 	memCtrl : function(){
 		$(".serviceBody").empty();
 		this.breadCrumb(this.$el.find(".memCtrl"));
-		//App.Services.init({type : "auth",tab:"memCtrl"});
-		//App.Services.memCtrlBlend.init();
+		App.Services.init({type : "auth",tab:"memCtrl"});
+		App.Services.Member.init();
 	},
 	roleManager : function(){
 		$(".serviceBody").empty();
 		this.breadCrumb(this.$el.find(".roleManager"));
 		//App.Services.init({type : "auth",tab:"roleManager"});
-		//App.Service.role.init();
+		//App.Services.role.init();
 	},
 	keyUser : function(){
 		$(".serviceBody").empty();
 		this.breadCrumb(this.$el.find(".keyUser"));
 		//App.Services.init({type : "auth",tab:"keyUser"});
-		//$(".serviceBody").html(new App.Service.keyUserFrame().render().el); //框架
+		//$(".serviceBody").html(new App.Services.keyUserFrame().render().el); //框架
 		//主模板  四个列表：  关键用户列表 （默认第一个？）  关键要用户基本信息  项目权限   部门权限
 		//新增关键用户，注意步骤，关联性
 		//删除关键用户弹窗
@@ -65,8 +64,7 @@ App.Services.AuthNav = Backbone.View.extend({
 	projectMember : function(){
 		$(".serviceBody").empty();
 		this.breadCrumb(this.$el.find(".projectMember"));
-		//App.Services.init({type : "auth",tab:"projectMember"});
-		App.Services.projectMember.init();
+		//App.Services.Settings = {type : "auth",tab:"keyUser"};
 		//项目成员主模板
 		//添加成员可与上面模板相同
 		//删除提示

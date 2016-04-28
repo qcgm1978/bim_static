@@ -1,5 +1,5 @@
 .overflowEllipsis { display: inline-block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-#contains { min-width: 1000px; margin: 0 auto; height: 100%; position: relative; box-sizing: border-box; margin-top: -50px; padding-top: 50px; }
+#contains { min-width: 1000px; margin: -50px 20px -90px 20px; height: 100%; box-sizing: border-box;  padding-top: 50px; }
 .hidden { display: none; }
 .right { float: right; }
 .left { float: left; }
@@ -7,8 +7,9 @@
 .myHidden { display: none; }
 .pointer { cursor: pointer; }
 #pageLoading { position: fixed; top: 50px; width: 100%; bottom: 0px; z-index: 9999;
-	background:#fff url('/comm/images/pageLoading.gif') no-repeat center;
+    background:#fff url('/comm/images/pageLoading.gif') no-repeat center;
  }
+
 
 /* bootstrap  */
 .txtInput { height: 30px; padding: 6px 8px; outline: none; font-size: 14px; line-height: 1.2; color: #666; background-color: #fff; border: 1px solid #ccc; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box; }
@@ -113,9 +114,7 @@
 	.filecKAll { width: 5%; text-align: center; }
 	.fileName { width: 48%;
 		.fileType { margin-right: 10px; display: inline-block; margin-top: 5px; vertical-align: top; width: 35px; height: 30px; background: url('/projects/images/fileicon.png') no-repeat;
-			&.rvt { background-position: 0px -39px; }
-			&.dwg { background-position: 0px -79px; }
-			&.other { background-position: 0px -439px; }
+			&.file { background-position: 0px -39px; }
 		}
 		.text { cursor: pointer;
 			&:hover { text-decoration: underline; }
@@ -131,7 +130,7 @@
 	}
 	.header { background-color: #eee; }
 	&.changeContrastBox { .fileName { width: 42%; }
-		.changeContrast { width: 7%; text-align: center; }
+		.changeContrast { width: 5%; text-align: center; }
 		.fileStatus { width: 10%; }
 		.fileOp { width: 10%; }
 		.fileDate { width: 10%; }
@@ -149,7 +148,8 @@
 .dragSize { position: absolute; top: 0px; bottom: 0px; width: 10px; right: -6px; cursor: col-resize; z-index: 999; display: none; }
 .slideBar { top: 40px; width: 15px; height: 32px; right: -15px; z-index: 99; position: absolute; display: none; background-color: #fff; border: 2px #ccc solid; line-height: 26px; box-sizing: border-box; padding-left: 2px; cursor: pointer; }
 .sourceFileType { background: url('/projects/images/fileicon.png') no-repeat 0px -200px; width: 105px; height: 80px;
-	&.folder { background-position: 0px -120px; }
-	&.dwg { background-position: 0px -276px; }
-	&.other { background-position: 0px -359px; }
+	&.thumFolder { background-position: 0px -120px; }
+    &.folder { background-position: 0px -120px; }
+    &.dwg { background-position: 0px -276px; }
+    &.other { background-position: 0px -359px; }
 }

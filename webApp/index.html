@@ -8,6 +8,7 @@
     <link rel="styleSheet" href="./libs/jquery/jquery.mCustomScrollbar.css" />
     <link rel="styleSheet" href="./comm/css/treeView.less" />
     <link rel="styleSheet" href="./topNav/css/topNav.less" />
+    <link rel="stylesheet" href="./bodyContent/css/bottomBar.less"/>
 </head>
 
 <body>
@@ -18,15 +19,47 @@
             <li class="item projects"> <a href="#projects">项目模型</a></li>
             <li class="item flow"> <a href="#flow">业务流程</a></li>
             <li class="item resources"> <a href="#resources">资源库</a></li>
-            <li class="item service"> <a href="#services">服务</a></li>
+            <li class="item services"> <a href="#services">服务</a></li>
             <li class="user">
                 <div class="userBg"></div> <span>您好，</span> <span class="userName"> <span class="text">zhongping</span> <i class="icon-angle-down"></i></span> </li>
         </ul>
         <div class="logo"><span class="text">BIM信息化集成平台</span></div>
     </div>
     <div id="contains"></div>
-    <div id="pageLoading"></div>
     <div id="mask"></div><!--注意因为#contains的relative-->
+    <div id="bottomBar">
+    	<div class="linkBar">
+    		<ul>
+    			<li>
+    				<i class="linkBarIcon ico"></i>
+    				<a href="#" class="link">集团官网</a>
+    			</li>
+    			<li>
+    				<i class="linkBarIcon module"></i>
+    				<a href="#" class="link">计划模块化</a>
+    			</li>
+    			<li>
+    				<i class="linkBarIcon book"></i>
+    				<a href="#" class="link">图文档系统</a>
+    			</li>
+    			<li>
+    				<i class="linkBarIcon money"></i>
+    				<a href="#" class="link">成本管理系统</a>
+    			</li>
+    			<li>
+    				<i class="linkBarIcon check"></i>
+    				<a href="#" class="link">质量管理系统</a>
+    			</li>
+    			<li>
+    				<i class="linkBarIcon plat"></i>
+    				<a href="#" class="link">招采平台</a>
+    			</li>
+    		</ul>
+    	</div>
+    	<div class="info">
+    		大连万达商业地产股份有限公司 2016 WANDA版权所有
+    	</div>
+    </div>
 </body>
 <script type="text/javascript">
 var App = {};
