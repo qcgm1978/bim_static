@@ -66,7 +66,7 @@ App.Services.AuthNav = Backbone.View.extend({
 		$(".serviceBody").empty();
 		this.breadCrumb(this.$el.find(".projectMember"));
 		//App.Services.init({type : "auth",tab:"projectMember"});
-		//App.Service.projectMember.init();
+		App.Services.projectMember.init();
 		//项目成员主模板
 		//添加成员可与上面模板相同
 		//删除提示

@@ -5,7 +5,7 @@
 App.Services.projectMember={
   //初始化
   init  : function(){
-    alert('gg')
+
   },
 
 }
