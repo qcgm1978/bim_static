@@ -1,7 +1,6 @@
 /*
-* @require  /services/views/auth/role/Services.role.list.js
-* */
-var App = App || {};
+* @require  /services/views/auth/role/services.role.list.js
+*/
 App.Services.role ={
 
     collection:new(Backbone.Collection.extend({
@@ -12,10 +11,10 @@ App.Services.role ={
                 }
             }
         }),
-        urlType: "fetchServiceRolesList",
+        urlType: "fetchServicesRolesList",
         parse: function (response) {
             if (response.message == "success") {
-                return response.data.role;
+                return response.data;
             }
         }
     })),
@@ -41,7 +40,7 @@ App.Services.role ={
 };
 
 
-
+//组织角色
 App.Services.ozRole ={
 
     collection:new(Backbone.Collection.extend({
@@ -52,7 +51,7 @@ App.Services.ozRole ={
                 }
             }
         }),
-        urlType: "fetchServiceOzRoleList",
+        urlType: "fetchServicesSubRoleList",
         parse: function (response) {
             if (response.message == "success") {
                 return response.data;
@@ -62,13 +61,12 @@ App.Services.ozRole ={
 
     loadData : function(data,func) {
         //数据重置
-        App.Services.role.collection.reset();
+        App.Services.ozRole.collection.reset();
         // load list
-        App.Services.role.collection.fetch({
+        App.Services.ozRole.collection.fetch({
             data:data,
             success: function(collection, response, options) {
                 if(func && typeof  func == "function"){
-                    App.Service.memCtrlBlend.setter(response);//设定特征
                     func();
                 }
             }

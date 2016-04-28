@@ -23,7 +23,6 @@ var AppRoute = Backbone.Router.extend({
 			this.reset();
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".bodyConMenu").addClass('selected');
 		_.require('/static/dist/bodyContent/bodyContent.css');
-		//_.require('/static/dist/bodyContent/bodyContent_ie8.css');
 		_.require('/static/dist/bodyContent/bodyContent.js');
 		slide.stop();
 		App.BodyContent.control.init();
@@ -132,7 +131,8 @@ var AppRoute = Backbone.Router.extend({
 		$("#pageLoading").hide();
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".service").addClass('selected');
 		_.require('/static/dist/services/services.css');
-		_.require('/static/dist/services/services.js'); 
+		_.require('/static/dist/services/services.js');
+		$("#bottomBar").hide();//隐藏脚部
 		App.Services.init(type,tab);
 		
 	},

@@ -1,9 +1,8 @@
 /*
- * @require  /service/views/mem/Services.memCtrl.blendDetail.js
+ * @require  /services/views/auth/member/services.member.detail.js
  */
 
-var App = App || {};
-App.Services.memberList=Backbone.View.extend({
+App.Services.MemberList=Backbone.View.extend({
 
     tagName:"div",
 
@@ -20,8 +19,8 @@ App.Services.memberList=Backbone.View.extend({
     },
 
     initialize:function(){
-       this.listenTo(App.Services.Member.collection,"add",this.addOne);
-       this.listenTo(App.Services.Member.collection,"reset",this.render);
+       this.listenTo(App.Services.Member[App.Services.MemberType + "Collection"],"add",this.addOne);
+       this.listenTo(App.Services.Member[App.Services.MemberType + "Collection"],"reset",this.render);
         //$el为包含模板的元素，el为元素节点
     },
     //数据加载
@@ -38,10 +37,10 @@ App.Services.memberList=Backbone.View.extend({
             this.checked = preS;
             if(preS){
                 $this.$("li").addClass("active");
-                App.Services.Member.collection.each(function(item){item.set({"checked":true})})
+                App.Services.Member.innerCollection.each(function(item){item.set({"checked":true})})
             }else{
                 $this.$("li").removeClass("active");
-                App.Services.Member.collection.each(function(item){item.set({"checked":false})})
+                App.Services.Member.innerCollection.each(function(item){item.set({"checked":false})})
             }
         })
     },
@@ -54,7 +53,7 @@ App.Services.memberList=Backbone.View.extend({
 
 
         //获取所选项
-        var seleUser = App.Services.Member.collection.filter(function(item){
+        var seleUser = App.Services.Member.innerCollection.filter(function(item){
             if(item.get("checked")){
                 return item.get("checked");
             }

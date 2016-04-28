@@ -1,9 +1,6 @@
 /*
- * @require  /service/collection/model.js
+ * @require  /services/views/auth/member/services.member.list.js
  * */
-var App = App || {};
-
-
 App.Services.MemberozDetail=Backbone.View.extend({
 
     tagName :'li',
@@ -31,51 +28,36 @@ App.Services.MemberozDetail=Backbone.View.extend({
     },
 
     unfold:function(){
-        var $this =this;
-        var $thisData = this.$(".ozName").data("id");
+        var _this =this;
+        var _thisId = this.$(".ozName").data("id");
+        _thisId = _thisId ? _thisId : "";//父项ID
+        var _thisTpye = this.$(".ozName").data("type");//内部还是外部用户
 
         this.model.set({"active":true});//模型状态
 
-        if($thisData){
-            var dataObj = {
-                URLtype: "fetchServiceMCBlendListMn",//去掉mn正确
-                data: {
-                    outer: true,
-                    parentId: $thisData//父项ID
-                }
-            };
 
-            App.Comm.ajax(dataObj,function(response){
+        var data = {
+            outer: _thisTpye,
+            parentId: _thisId//父项ID
+        };
 
-                $(".childOz" +$thisData).empty();
-                //获取组织
+        App.Services.Member.loadData(App.Services.Member[_thisTpye + "Collection"],data,function(response){
+            //如果已有则重置并重新获取数据
+            $(".childOz" +_thisId).empty();
 
-                App.Services.Member.collection.reset();
-                $("#blendList").empty();
+            //左面删除已选
+            $(".serviceOgList div").removeClass("active");
+            $(".serviceOgList span").removeClass("active");//唯一选项
 
-                //App.Services.parentOz = $this.model;  //缓存父组织模型在Services.MemCtrl.bledList.js使用
+            //选中状态
+            _this.$(".ozName").addClass("active");
+            _this.$(".ozName span").addClass("active");//选中状态
 
-                App.Services.Member.setter(response);//设定特征
-
-                //reset数据
-                if(response.data.user.length){
-                    App.Services.Member.collection.add(response.data.user);//员工
-                }
-                if(response.data.org.length){
-                    //左面删除已选
-                    $(".serviceOgList div").removeClass("active");
-                    $(".serviceOgList span").removeClass("active");//唯一选项
-                    //将collection内容设置为未选
-
-                    $this.$(".ozName").addClass("active");
-                    $this.$(".ozName span").addClass("active");//选中状态
-
-                    $(".childOz" + $thisData).html(new App.Services.MemCtrlChildList(response.data.org).render().el);
-
-                    App.Services.Member.collection.add(response.data.org);//组织
-                }
-            });
-        }
+            //添加子菜单
+            if(response.data.org.length) {
+                $(".childOz" + _thisId).html(new App.Services.MemberozList(response.data.org).render().el);
+            }
+        });
     }
 });
 

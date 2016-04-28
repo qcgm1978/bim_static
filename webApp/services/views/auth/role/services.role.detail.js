@@ -1,13 +1,11 @@
 /*
- * @require  /service/collection/role.list.js
- * */
-var App = App || {};
+ * @require  /services/collections/auth/member/role.list.js
+ */
 App.Services.roleDetail=Backbone.View.extend({
     tagName:'li',
 
     template:_.templateUrl("/services/tpls/auth/role/services.role.detail.html"),
     events:{
-        //"click .explorer":"explorer",
         "click .modify":"modify",
         "click .delete":"delete"
     },
@@ -22,22 +20,21 @@ App.Services.roleDetail=Backbone.View.extend({
         this.$el.hover(function(){$(this).addClass("active");},function(){$(this).removeClass("active")});
     },
 
-
     modify:function(){
-        App.Service.window.init();
+        App.Services.window.init();
 
-        $(".serviceWindow").append( new App.Service.windowRole().render().el);
+        $(".serviceWindow").append( new App.Services.windowRole().render().el);
 
         //没起作用
         var $this =this;
         //值
         var func= this.model.get("functions");
-        App.Service.fun.loadData(function(){
+        App.Services.fun.loadData(function(){
 
             $("#selectedRoleName").val($this.model.get("name")).attr("disabled","disabled"); //暂时写入
             console.log($("#selectedRoleName").val());
 
-            App.Service.fun.collection.each(function(item){
+            App.Services.fun.collection.each(function(item){
                 for(var i = 0 ; i < func.length ; i ++){
                     if(item.get("id") == func[i]["id"]){
                         item.set({"checked":true});
@@ -55,7 +52,8 @@ App.Services.roleDetail=Backbone.View.extend({
 
     delete:function(){
         //删除需判断状态，由什么来判断？
-        App.Service.role.collection.remove(this.model);
+        App.Services.role.collection.remove(this.model);
+        App.Services.role.collection.save();
     }
 });
 
