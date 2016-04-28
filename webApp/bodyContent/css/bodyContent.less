@@ -48,6 +48,7 @@ table{border-collapse: collapse;border: none;}
     left: 20px;
     right: 20px;
     bottom: 110px;
+    min-width: 1100px;
 }
 .bodyContent li{.ellipsis;}
 .bodyContent  .article{.pdX10;.bdrBComm;}
@@ -66,7 +67,7 @@ table{border-collapse: collapse;border: none;}
 .conSlide,.conPro{.right;width: 37%;}
 .conTodo .conHeader span{position: relative;}
 .conTodo .conHeader i{.headIcon;background-image:  url("../images/con_todo_ico.png");}
-.conSlide .conHeader i{.headIcon;background-image:  url("../images/slide_ico.png");}
+#layoutSlide .conHeader i{.headIcon;background-image:  url("../images/slide_ico.png");}
 .conPro .conHeader i{.headIcon;background-image:  url("../images/pron_ico.png");}
 
 .conMonth table{width:@wp100;line-height: @lineHeight50 * 0.6;}
@@ -118,7 +119,6 @@ body{
 .indexLayout{
     float: left;
     position: relative;
-    margin:0 10px 10px 10px;
     & > div:nth-child(1) {
         width: 100%;
         height: 100%;
@@ -127,21 +127,25 @@ body{
 
 #layoutTodo{
     height: 53%;
-    width: 58%;
+    width: 56%;
     min-height: 340px;
+    margin: 0 10px 10px 20px;
 }
 #layoutMonth{
     height: 45%;
-    width: 58%;
+    width: 56%;
+    margin: 10px 10px 10px 20px;
 }
 #layoutSlide{
     height: 53%;
-    width: 39%;
+    width: 40%;
     min-height: 340px;
     border-radius: 5px;
     box-shadow: 0 0 10px 0  #666666;
+    margin: 0 0 10px 10px;
 }
 #layoutPost{
     height: 45%;
-    width: 39%;
+    width: 40%;
+    margin: 10px 0 10px 10px;
 }
