@@ -1,10 +1,10 @@
 .systemContainerBox, .systemContaine { height: 100%; }
 .systemContainer { height: 100%; }
-#systemContainer { height: 100%; margin-top: -80px; padding-top: 80px; position: relative; }
+#systemContainer { height: 100%; margin-top: -80px; padding-top: 80px; position: relative;}
 .categoryManager { height: 100%; padding: 20px;
 	.servicesCateBox { border: 1px #ccc solid; height: 100%; position: relative; }
-	.topBar { height: 38px; line-height: 38px; font-size: 14px; padding-left: 15px; 
-		.create{margin-left: 25px;}
+	.topBar { height: 38px; line-height: 38px; font-size: 14px; padding-left: 15px;
+		.create { margin-left: 25px; }
 	}
 	.categoryList { .item { height: 28px; line-height: 27px; border: 1px #ccc solid; border-width: 1px 0px;
 			div { float: left; padding-left: 15px; }
@@ -14,18 +14,21 @@
 			.op { width: 10%; }
 		}
 	}
-	.categoryListHeader { .item { background-color: #eee; }
+	.categoryListHeader { .item { background-color: #eee; color: #ccc; }
 	}
 	.categoryListBodybox { position: absolute; top: 65px; width: 100%; bottom: 0px;
-		.loading{text-align: center;color:#ccc;font-size: 14px;height: 50px;line-height: 50px;}
-	 }
-}
-.addNewCategoryDialog{
-	.txtCategoryTitle,.txtCategoryDesc{
-		width:558px;
-		margin:10px 0px 20px 0px;
+		.item { border-top: 0; height: 38px; line-height: 37px; }
+		.loading { text-align: center; color: #ccc; font-size: 14px; height: 50px; line-height: 50px; }
+		.btnDel { margin-left: 5px; }
 	}
-	.txtCategoryDesc{ 
-		height: 158px;
+}
+.addNewCategoryDialog { .txtCategoryTitle, .txtCategoryDesc,.txtCategoryCode { width: 558px; margin: 10px 0px 20px 0px; }
+	.txtCategoryDesc { height: 158px; }
+}
+.delConfirm { .delContainer { margin-top: 25px; }
+	.iconTip { float: left; width: 35px; height: 35px; margin-top: 3px;}
+	.tipText { margin-left: 50px; font-size: 16px; width: 172px; }
+	.bottomOp { margin-top: 40px; text-align: center;
+		.btnCanel { margin-left: 8px; }
 	}
 }

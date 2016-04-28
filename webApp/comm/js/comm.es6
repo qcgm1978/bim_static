@@ -27,7 +27,7 @@ App.Comm = {
 
 			//未登录
 			if (data.code == 10004) {
-				debugger
+
 				window.location.href = data.data;
 			}
 
@@ -36,7 +36,7 @@ App.Comm = {
 				callback(data);
 			}
 
-		}); 
+		});
 
 	},
 
@@ -279,19 +279,46 @@ App.Comm = {
 				alert(data.message);
 			}
 
-		}) 
+		})
 
 	},
 
 	//文件后缀
-	fileSuffix(type){
-		 
-		if (type=="rvt" ||type=="dwg" ||type=="folder"  ) {
+	fileSuffix(type) {
+
+		if (type == "rvt" || type == "dwg" || type == "folder") {
 			return type;
-		}else{
+		} else {
 			return "other";
 		}
 
+	},
+
+	//初始化滚动条
+	initScroll($target, axis) {
+
+		//绑定过
+		if ($target.hasClass("mCustomScrollbar")) {
+			return;
+		}
+
+		var opts = {
+			theme: 'minimal-dark',
+			axis: axis,
+			keyboard: {
+				enable: true
+			},
+			scrollInertia: 0
+		}
+
+		if (axis.indexOf("x") > -1) {
+			opts["set_width"] = "100%";
+		}
+		if (axis.indexOf("y") > -1) {
+			opts["set_height"] = "100%";
+		}
+
+		$target.mCustomScrollbar(opts);
 	}
 
 };
