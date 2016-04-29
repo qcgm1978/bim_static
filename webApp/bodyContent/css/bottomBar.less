@@ -10,38 +10,39 @@
     right: 0;
     text-align: center;
     & .linkBar {
-      height: 59px;
-      line-height: 59px;
-      width: 98%;
-      margin: 0 1%;
-      border-bottom: 1px solid #CCC;
-      & a {
-          color: #666;
-          font-size: 16px;
-          padding: 3px 5px;
-          &:hover{
-              color:#FFF;
-          }
-      }
-    }
-    
-    & ul {
-        text-align: center;
-        & li{
-            margin: 0 20px;
-            display: inline;
+        height: 59px;
+        line-height: 59px;
+        width: 98%;
+        margin: 0 1%;
+        border-bottom: 1px solid #CCC;
+        & a {
+            color: #666;
+            font-size: 14px;
+            padding: 3px 5px;
+            &:hover {
+                background: #AAAAAA;
+            }
         }
     }
-    
+    & ul {
+        text-align: center;
+        & li {
+            margin: 0 10px;
+            display: inline;
+            &:nth-child(1) a {
+                background: #AAAAAA;
+                color: #FFF;
+                border-radius: 3px;
+            }
+        }
+    }
     & .info {
         color: #666;
         width: 100%;
         height: 30px;
         line-height: 30px;
     }
-    
-    & .myIcon{
-        background: ;
+    & .myIcon {
+        background:;
     }
 }
-

@@ -10,7 +10,7 @@ App.API = {
 	URL: {
 
 		//首页bodyContent数据
-		fetchBodyContentTodos :'dataJson/bodyContent/bodyContent.todos.json',
+		fetchBodyContentTodos :'platform/todo?status=1&pageIndex=1&pageItemCount=6',
 		fetchBodyContentMonthEnd :'dataJson/bodyContent/bodyContent.monthEnd.json',
 		fetchBodyContentMonthStart :'dataJson/bodyContent/bodyContent.monthStart.json',
 		fetchBodyContentSlide :'dataJson/bodyContent/bodyContent.slide.json',
@@ -157,7 +157,7 @@ App.API = {
 	DEBUGURL: {
 
 		//首页bodyContent数据
-		fetchBodyContentTodos :'/dataJson/bodyContent/bodyContent.todos.json',
+		fetchBodyContentTodos :'platform/todo?status=1&pageIndex=1&pageItemCount=30',
 		fetchBodyContentMonthEnd :'/dataJson/bodyContent/bodyContent.monthEnd.json',
 		fetchBodyContentMonthStart :'/dataJson/bodyContent/bodyContent.monthStart.json',
 		fetchBodyContentSlide :'/dataJson/bodyContent/bodyContent.slide.json',

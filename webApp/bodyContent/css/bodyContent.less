@@ -30,25 +30,32 @@ img{border: none;outline: none;}
     height: 24px;
     display: inline-block;
     vertical-align: -7px;
+    &:hover{
+    }
 }
-.ico {background-position:0 240px;}
-.module {background-position:0 200px;}
-.book {background-position:0 160px;}
-.money {background-position:0 120px;}
-.check {background-position:0 80px;}
-.plat {background-position:0 40px;}
+.linkBarIcon.ico {background-position:0 240px;}
+.linkBarIcon.module {background-position:0 200px;}
+.linkBarIcon.book {background-position:0 160px;}
+.linkBarIcon.money {background-position:0 120px;}
+.linkBarIcon.check {background-position:0 80px;}
+.linkBarIcon.plat {background-position:0 40px;}
+.linkBarIcon.more {background-position:0 286px;margin-top: 9px;}
 table{border-collapse: collapse;border: none;}
 .clearBoth { clear: both;}
 .clearfix:after{ clear: both; content: "\200B"; display: block; height: 0px;}
 .clearfix{ *zoom: 1;}
-
+#contains{
+    min-width: 960px;
+}
+body,html{
+}
 .bodyContent{
     position: fixed;
-    top:80px;
+    top:60px;
     left: 20px;
     right: 20px;
     bottom: 110px;
-    min-width: 1100px;
+    min-width: 960px;
 }
 .bodyContent li{.ellipsis;}
 .bodyContent  .article{.pdX10;.bdrBComm;}
@@ -62,9 +69,9 @@ table{border-collapse: collapse;border: none;}
 .conMonth .conHeader span.active i{background: #ffffff url("../images/con_tab_active.png") center center no-repeat;border-radius: 5px 0 0 0;}
 .conMonth .conHeader span.active{background:#ffffff url("../images/contabx.gif") right top no-repeat;color:@fontColorBlack ;}
 .conMonth td{overflow: hidden;text-overflow: ellipsis;white-space: nowrap;}
-.conTodo ,.conMonth{.left;width: 60%;}
+.conTodo ,.conMonth{.left;width: 60%;overflow: hidden;}
 .conTodo li:not(:last-child){border-bottom: 1px solid #dddddd;}
-.conSlide,.conPro{.right;width: 37%;}
+.conSlide,.conPro{.right;width: 37%;overflow: hidden;}
 .conTodo .conHeader span{position: relative;}
 .conTodo .conHeader i{.headIcon;background-image:  url("../images/con_todo_ico.png");}
 #layoutSlide .conHeader i{.headIcon;background-image:  url("../images/slide_ico.png");}
@@ -82,67 +89,51 @@ table{border-collapse: collapse;border: none;}
 .conBody table{width:@wp100;}
 .conBody.pro .time,.conBody.pro li,.conBody.moth li{line-height: @lineHeight50 * 0.6;}
 
- 
-@media screen and (min-height:700px){
-    table tbody tr{
+table tbody tr{
+
         height: 36px;
     }
     #proclamation li{
         height: 34px;
         line-height: 34px;
     }
-}
 
-@media screen and (min-height:800px){
-    table tbody tr{
-        height: 42px;
-    }
-    #proclamation li{
-        height: 40px;
-        line-height: 40px;
-    }
-}
-
-@media screen and (min-height:1200px){
-    table tbody tr{
-        height: 55px;
-    }
-    #proclamation li{
-        height: 50px;
-        line-height: 51px;
-    }
-}
-
-.indexLayout{
-    float: left;
-    position: relative;
+.bodyContent .indexLayout{
+    position: absolute;
+    margin: 10px;
     & > div:nth-child(1) {
         width: 100%;
         height: 100%;
     }
+    
+    & .iconMore{
+        
+    }
 }
 
-#layoutTodo{
-    height: 53%;
-    width: 56%;
-    min-height: 340px;
-    margin: 0 10px 10px 20px;
+.bodyContent #layoutTodo{
+    top: 0;
+    left: 0;
+    right: 40%;
+    bottom:44%;
 }
-#layoutMonth{
-    height: 45%;
-    width: 56%;
-    margin: 10px 10px 10px 20px;
+.bodyContent #layoutMonth{
+    top: 56%;
+    left: 0;
+    right: 40%;
+    bottom:0;
 }
-#layoutSlide{
-    height: 53%;
-    width: 40%;
-    min-height: 340px;
+.bodyContent #layoutSlide{
+    top: 0;
+    left: 60%;
+    right: 0;
+    bottom:44%;
     border-radius: 5px;
     box-shadow: 0 0 10px 0  #666666;
-    margin: 0 0 10px 10px;
 }
-#layoutPost{
-    height: 45%;
-    width: 40%;
-    margin: 10px 0 10px 10px;
+.bodyContent #layoutPost{
+    top: 56%;
+    left: 60%;
+    right: 0;
+    bottom:0;
 }
