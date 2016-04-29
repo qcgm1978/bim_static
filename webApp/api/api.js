@@ -150,6 +150,7 @@ App.API = {
 		"servicesFlowUpdate":"platform/set/flow/update",// 更新类别
 		"servicesFlowDel":"platform/set/flow/del",// 删除 ?id={id}
 		"servicesFlowIndex":"platform/set/flow/serial", // 改变位置 ?id={id} 
+		"servicesFolwMove":"platform/set/flow/serial", // ?id={id} move up  or down
 
 		test: ""
 	},

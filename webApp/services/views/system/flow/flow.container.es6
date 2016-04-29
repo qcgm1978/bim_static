@@ -25,9 +25,9 @@ App.Services.System.FolwContainer = Backbone.View.extend({
 
 		var view = new App.Services.System.FolwContainerListDetail({
 			model: model
-		});
+		}); 
 
-		debugger
+		this.$(".flowListBody .loading").remove();
 
 		this.$(".flowListBody").append(view.render().el);
 
@@ -123,8 +123,10 @@ App.Services.System.FolwContainer = Backbone.View.extend({
 		//新增
 		App.Comm.ajax(data,function(data){
 			if (data.code==0) {
-				debugger
-				data
+				$(".folwContainer .flowListBody li:last").find(".myIcon-down-disable").toggleClass("myIcon-down-disable myIcon-down");
+				 App.Services.SystemCollection.FlowCollection.push(data.data);
+				 $(".folwContainer .flowListBody li:last").find(".myIcon-down").toggleClass("myIcon-down-disable myIcon-down");
+				 dialog.close();
 			}
 		});
 

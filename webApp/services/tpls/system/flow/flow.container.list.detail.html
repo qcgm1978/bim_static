@@ -1,14 +1,21 @@
 <div class="code left">
-    index
+    <%=index%>
 </div>
 <div class="name left">
-    业务名
+     <%=busName%>
 </div>
-<div class="performance left">
-    功能：URL
+<div class="performance left  <%= busViewUrl && busSendUrl && 'lineH121' %> ">
+
+	<%if(busViewUrl){%>
+		 <div>查看： <a href="<%=busViewUrl%>" class="aCk" target="_blank"><%=busViewUrl%></a>  </div>
+	<%}%>
+	<%if(busSendUrl){%>
+		<div>发起： <a href="<%=busSendUrl%>" class="aStar" target="_blank"><%=busSendUrl%></a></div>
+	<%}%>   
+    
 </div>
 <div class="op left">
-    <i class="myIcon-up" title="上移"></i>
+    <i class="<%=index!=1?'myIcon-up':'myIcon-up-disable'%>" title="上移"></i>
     <i class="myIcon-down" title="下移"></i>
     <i class="myIcon-update" title="更新"></i>
     <i class="myIcon-del-blue" title="删除"></i>

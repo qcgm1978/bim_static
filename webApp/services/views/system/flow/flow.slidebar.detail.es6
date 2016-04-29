@@ -32,7 +32,11 @@
  		App.Services.SystemCollection.FlowCollection.reset();
 
  		App.Services.SystemCollection.FlowCollection.fetch({
- 			data:{categoryId:id}
+ 			data:{categoryId:id},
+ 			success:function() {
+ 				 
+ 				 $(".folwContainer .flowListBody li:last").find(".myIcon-down").toggleClass("myIcon-down-disable myIcon-down");
+ 			}
  		});
  	}
 
