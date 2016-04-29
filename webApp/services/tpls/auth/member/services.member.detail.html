@@ -2,13 +2,10 @@
 <div class="sele">
     <div class="left">
             <i class="memCheck"></i>
-            <span class="ushead"></span>
+            <span class="ushead<%= obj.orgId ? ' oz' : '' %>"></span>
             <span><%= name %></span>
     </div>
     <div class="roles">
-        <% if(role && role.length) {for (var i = 0 ; i < role.length ; i++){  %><!--判断是管理员roleId 999999 999998-->
-        <span class="<%= role[i].roleId == 999999 ? 'adm' : ( role[i].inherit ? 'inherit' : '') %>"><%= role[i].name %></span>
-        <%}}%>
     </div>
 </div>
 

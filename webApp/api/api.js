@@ -165,12 +165,12 @@ App.API = {
 		fetchBodyContentProclamation :'/dataJson/bodyContent/bodyContent.proclamation.json',
 
 		//services
-		fetchServicesMemberList:'/dataJson/services/services.member.list.json',//组织-混合列表
-		fetchServicesRolesList:'/dataJson/services/services.member.roles.json',//角色-功能列表
-		fetchServiceFunList: '/dataJson/services/services.role.fun.json',//功能列表
-		fetchServicesSubRoleList:'/dataJson/services/services.sub.role.json',
-		fetchServicesMemberOuterList:'/dataJson/services/services.member.list.json',//外部组织-品牌／公司／成员列表
-		fetchServicesMemberInnerList:'/dataJson/services/services.member.list.json',//内部-组织／成员列表
+		fetchServicesMemberList:'/dataJson/services/member/services.member.list.json',//组织-混合列表
+		fetchServicesRolesList:'/dataJson/services/member/services.member.roles.json',//角色-功能列表
+		fetchServiceFunList: '/dataJson/services/member/services.role.fun.json',//功能列表
+		fetchServicesSubRoleList:'/dataJson/services/member/services.sub.role.json',
+		fetchServicesMemberOuterList:'/dataJson/services/member/services.member.list.json',//外部组织-品牌／公司／成员列表
+		fetchServicesMemberInnerList:'/dataJson/services/member/services.member.list.json',//内部-组织／成员列表
 
 
 		//代办
