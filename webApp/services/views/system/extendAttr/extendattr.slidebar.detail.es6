@@ -20,6 +20,8 @@
  		this.$el.html(html).data("id",data.id);
 
  		return this;
+
+ 		
  	},
 
  	//点击单个

@@ -59,6 +59,8 @@ App.Services.System.ExtendAttrContainer = Backbone.View.extend({
 		}
 
 		var dialog = new App.Comm.modules.Dialog(opts); 
+
+		return;
 		
 	},
 
