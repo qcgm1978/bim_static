@@ -30,6 +30,8 @@ img{border: none;outline: none;}
     height: 24px;
     display: inline-block;
     vertical-align: -7px;
+    &:hover{
+    }
 }
 .linkBarIcon.ico {background-position:0 240px;}
 .linkBarIcon.module {background-position:0 200px;}
@@ -37,6 +39,7 @@ img{border: none;outline: none;}
 .linkBarIcon.money {background-position:0 120px;}
 .linkBarIcon.check {background-position:0 80px;}
 .linkBarIcon.plat {background-position:0 40px;}
+.linkBarIcon.more {background-position:0 286px;margin-top: 9px;}
 table{border-collapse: collapse;border: none;}
 .clearBoth { clear: both;}
 .clearfix:after{ clear: both; content: "\200B"; display: block; height: 0px;}
@@ -66,9 +69,9 @@ body,html{
 .conMonth .conHeader span.active i{background: #ffffff url("../images/con_tab_active.png") center center no-repeat;border-radius: 5px 0 0 0;}
 .conMonth .conHeader span.active{background:#ffffff url("../images/contabx.gif") right top no-repeat;color:@fontColorBlack ;}
 .conMonth td{overflow: hidden;text-overflow: ellipsis;white-space: nowrap;}
-.conTodo ,.conMonth{.left;width: 60%;}
+.conTodo ,.conMonth{.left;width: 60%;overflow: hidden;}
 .conTodo li:not(:last-child){border-bottom: 1px solid #dddddd;}
-.conSlide,.conPro{.right;width: 37%;}
+.conSlide,.conPro{.right;width: 37%;overflow: hidden;}
 .conTodo .conHeader span{position: relative;}
 .conTodo .conHeader i{.headIcon;background-image:  url("../images/con_todo_ico.png");}
 #layoutSlide .conHeader i{.headIcon;background-image:  url("../images/slide_ico.png");}
@@ -101,6 +104,10 @@ table tbody tr{
     & > div:nth-child(1) {
         width: 100%;
         height: 100%;
+    }
+    
+    & .iconMore{
+        
     }
 }
 
