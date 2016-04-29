@@ -8,7 +8,7 @@
             <div class="ckHeader">
                 <div class="ckName"><%=item.title%></div> 
                 <div class="date">
-                    <span>创建日期：</span><span><%= new Date(item.createDate).format('yyyy-MM-dd') %></span>
+                    <span>创建日期：</span><span><%= new Date(item.discoveryDate).format('yyyy-MM-dd') %></span>
                 </div>
                 <div class="date">
                     <span>整改日期：</span><span><%= new Date(item.rectifyDate).format('yyyy-MM-dd') %></span>
@@ -20,11 +20,11 @@
 
         </td>
 
-        <td class="category"><%=item.category%></td>
+        <td class="category"><%=item.acceptanceType%></td>
         <td class="status"><%=item.status==1 && '待整改' || item.status==2 && '已整改' || '已关闭'   %></td>
         <td class="grade"><%= item.level==1 && '一般' ||item.level==2 && '较大' ||item.level==3 && '重大' || '特大'  %></td>
-        <td class="operator"><%=item.reporter%></td>
-        <td class="type"><%=item.type%></td>
+        <td class="operator"><%=item.organizationTypeId%></td>
+        <td class="type"><%=item.ratingCategoryId%></td>
     </tr>
 <% }) %>  
  

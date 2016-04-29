@@ -11,15 +11,17 @@
 }
 
 .mmhSlider {
-	position: relative;
-	width: 100%;
-	height: 315px;
+    position: absolute;
+    bottom: 50px;
+    left: 0;
+    right: 0;
+    top: 40px;
 }
 
 .mmhSlider ul,
 .mmhSlider li {
-	width: inherit;
-	height: inherit;
+	width: 100%;
+	height: 100%;
 }
 
 .mmhSlider li img {
@@ -28,29 +30,31 @@
 }
 
 .mmhSlider ul li {
-	width: 100%;
-	height: 100%;
 	float: left;
+	background-size: 100% auto;
+	cursor: pointer;
 }
 
-.remove {
+.mmhSlider .remove {
 	display: none;
 }
 
-.selected {
+.mmhSlider .selected {
 	display: block;
 	animation: fadeIn 1s 1;
 }
 
-.toolbar {
+.mmhSlider .toolbar {
 	text-align: center;
 }
 
-.toolbar label {
+.mmhSlider .toolbar label {
 	font-size: 40px;
+	cursor: pointer;
 }
 
-.slideTitle {
+
+.mmhSlider .slideTitle {
 	position: absolute;
 	height: 28px;
 	left: 0;
@@ -64,6 +68,9 @@
 	font-family: "microsoft yahei";
 }
 
-.flag {
-	color: #339933;
+.mmhSlider .nonFlag{
+	color: #DDDDDD;
+}
+.mmhSlider .flag {
+	color: #005BAC;
 }

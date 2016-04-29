@@ -17,17 +17,13 @@ App.API = {
 		fetchBodyContentMmhSlide :'dataJson/bodyContent/bodyContent.mmhSlider.json',
 		fetchBodyContentProclamation :'dataJson/bodyContent/bodyContent.proclamation.json',
 
-		//Services
-		fetchServiceMemberList:'dataJson/service/service.Mem.blendList.json',//组织-混合列表
-		fetchServiceMCBlendListMn:'/dataJson/service/service.Mem.blendList_mn.json',//组织-混合列表
-		fetchServiceRolesList:'/dataJson/service/service.Mem.rolesList.json',//角色-功能列表
-		fetchServiceFunList: '/dataJson/service/service.fun.list.json',//功能列表
-		fetchServiceOzRoleList:'/dataJson/service/service.oz.roleList.json',
-		// fetchServiceMCOuterList:'platform/auth/org?outer=true',//外部组织-用户列表
-		// fetchServiceFunList: 'platform/auth/function',//功能列表
-		// fetchServiceMCInnerList:'platform/auth/org?outer=false&parentId={parentId}',//内部-混合列表
-		// fetchServiceOzRoleList:'/platform/org/{orgId}/role?outer={outer}',//机构角色列表
-
+		//services
+		fetchServiceMCBlendList:'platform/auth/org?outer=false&parentId=&includeUsers=',//组织-混合列表
+		fetchServiceRolesList:'platform/auth/role',//角色-功能列表
+		fetchServiceFunList: 'platform/auth/function',//功能列表
+		fetchServiceOzRoleList:'platform/org/{orgId}/role?outer={outer}',//机构角色列表
+		fetchServiceMemberOuterList:'platform/auth/org?outer=true',//外部组织-品牌／公司／成员列表
+		fetchServiceMemberInnerList:'platform/auth/org?outer=false&parentId=&includeUsers=',//内部-组织／成员列表
 
 
 		//代办$chars
@@ -90,7 +86,7 @@ App.API = {
 		//计划
 		fetchPlanModel: "sixD/{projectId}/{projectVersionId}/plan", //模型
 		fetchPlanAnalog: "sixD/{projectId}/{projectVersionId}/plan?relateModel=true", //模拟
-		fetchPlanPublicity: "sixD/{projectId}/{projectVersionId}/plan/concern", //关注 ?queryType={queryType}
+		fetchPlanPublicity: "sixD/plan/concern", //关注 ?queryType={queryType}
 		fetchPlanInspection: "sixD/{projectId}/{projectVersionId}/plan?noElement=true", //检验 计划节点未关联图元 startTime=1398145297000&endTime=1398145297000&relateModel={true|false}&
 		fetchPlanInspectionCate: "sixD/{projectId}/{projectVersionId}/plan/noplan/cate", // 图元未关联计划节点
 		fetchPlanInspectionCateDetail: "sixD/{projectId}/{projectVersionId}/plan/noplan/element", // 图元未关联计划节点 ?cateId={cateId} 暂开详情
@@ -148,6 +144,13 @@ App.API = {
 		"servicesCategoryUpdate":"platform/set/category/update",// 更新类别
 		"servicesCategoryDel":"platform/set/category/del",// 删除 ?id={id}
 
+		//流程
+		"servicesFlowAdd":"platform/set/flow/add",// 新增分类
+		"servicesFlowList":"platform/set/flow", // 列表 ?categoryId={categoryId}
+		"servicesFlowUpdate":"platform/set/flow/update",// 更新类别
+		"servicesFlowDel":"platform/set/flow/del",// 删除 ?id={id}
+		"servicesFlowIndex":"platform/set/flow/serial", // 改变位置 ?id={id} 
+
 		test: ""
 	},
 
@@ -161,12 +164,13 @@ App.API = {
 		fetchBodyContentMmhSlide :'dataJson/bodyContent/bodyContent.mmhSlider.json',
 		fetchBodyContentProclamation :'/dataJson/bodyContent/bodyContent.proclamation.json',
 
-		//console
-		fetchServiceMCBlendList:'/dataJson/service/service.Mem.blendList.json',//组织-混合列表
-		fetchServiceMCBlendListMn:'/dataJson/service/service.Mem.blendList_mn.json',//组织-混合列表
-		fetchServiceRolesList:'/dataJson/service/service.Mem.rolesList.json',//角色-功能列表
-		fetchServiceFunList: '/dataJson/service/service.fun.list.json',//功能列表
-		fetchServiceOzRoleList:'/dataJson/service/service.oz.roleList.json',
+		//services
+		fetchServicesMemberList:'/dataJson/services/services.member.list.json',//组织-混合列表
+		fetchServicesRolesList:'/dataJson/services/services.member.roles.json',//角色-功能列表
+		fetchServiceFunList: '/dataJson/services/services.role.fun.json',//功能列表
+		fetchServicesSubRoleList:'/dataJson/services/services.sub.role.json',
+		fetchServicesMemberOuterList:'/dataJson/services/services.member.list.json',//外部组织-品牌／公司／成员列表
+		fetchServicesMemberInnerList:'/dataJson/services/services.member.list.json',//内部-组织／成员列表
 
 
 		//代办

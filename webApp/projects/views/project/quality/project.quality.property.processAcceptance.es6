@@ -142,14 +142,26 @@ App.Project.QualityProcessAcceptance = Backbone.View.extend({
 		};
 
 		App.Comm.ajax(data, function(data) {
-			if (data.code == 0) {
-				$target.data("cate", data.data);
 
-				$target.parent().find(".selected").each(function() {
-					Ids.push($(this).data("cate"));
-				});
-				App.Project.Settings.Viewer.selectIds(Ids);
-				App.Project.Settings.Viewer.zoomSelected();
+			if (data.code == 0) {
+
+				if (data.data) {
+
+					$target.data("cate", data.data.componentId);
+					//无构建id 返回
+					if (!data.data.componentId) {
+						return;
+					}
+
+					$target.parent().find(".selected").each(function() {
+						Ids.push($(this).data("cate"));
+					});
+					
+					App.Project.Settings.Viewer.selectIds(Ids);
+
+					App.Project.Settings.Viewer.zoomSelected();
+
+				}
 
 				// App.Project.Settings.Viewer.highlight({
 				// 	type: "userId",
