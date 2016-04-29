@@ -14,7 +14,7 @@
         <div class="item-content" data-type="categoryId">
           <i class="noneSwitch"></i>
           <label class="treeCheckbox">
-            <input type="checkbox" checked="checked" data-etag="<%= key %>" />
+            <input type="checkbox" checked="checked" data-etag="<% if(item.specialtyCode){ %><%= item.specialtyCode +'_'+key %><% }else{ %><%= key %><% } %>" />
             <span class="lbl"></span>
           </label>
           <span class="tree-text"><%= value %></span>
