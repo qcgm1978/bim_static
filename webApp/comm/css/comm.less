@@ -6,9 +6,7 @@
 .clear { clear: both; }
 .myHidden { display: none; }
 .pointer { cursor: pointer; }
-#pageLoading { position: fixed; top: 50px; width: 100%; bottom: 0px; z-index: 9999;
-	background:#fff url('/comm/images/pageLoading.gif') no-repeat center;
- }
+#pageLoading { position: fixed; top: 50px; width: 100%; bottom: 0px; z-index: 9999; background: #fff url('/comm/images/pageLoading.gif') no-repeat center; }
 
 /* bootstrap  */
 .txtInput { height: 30px; padding: 6px 8px; outline: none; font-size: 14px; line-height: 1.2; color: #666; background-color: #fff; border: 1px solid #ccc; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box; }
@@ -28,17 +26,23 @@
 .myBtn-primary:hover { background-color: #51a6f2; color: #fff; }
 .myBtn-primary:active, .myBtn-primary.active { color: #fff; background-color: #106bbe; }
 .myBtn-primary.disabled { background-color: #bcdcfa; color: #fff; }
-.btnRadio { cursor: pointer; margin-right: 5px; padding-left: 20px; display: inline-block; vertical-align: middle; padding-right: 15px; line-height: 1.2; height: 15px; background: url(../images/comm/images/commIcon.png) no-repeat 0px -80px;
-	&.selected { background-position: 0px -60px;
-		&.disable { background-position: 0px -100px; }
+.btnRadio { cursor: pointer; margin-right: 5px; display: inline-block; vertical-align: middle; padding-right: 15px; line-height: 1.2; height: 15px;
+	.iconPic { background: url(../images/comm/images/commIcon.png) no-repeat 0px -80px; display: inline-block; width: 15px; height: 15px; vertical-align: top; }
+	&.selected { .iconPic { background-position: 0px -60px; }
+		&.disable { .iconPic { background-position: 0px -100px; }
+		}
 	}
-	&.disable { background-position: 0px -120px; }
+	&.disable { .iconPic { background-position: 0px -120px; }
+	}
 }
-.btnCk { cursor: pointer; margin-right: 5px; padding-left: 20px; display: inline-block; vertical-align: middle; padding-right: 15px; line-height: 1.2; height: 15px; background: url(../images/comm/images/commIcon.png) no-repeat 0px -160px;
-	&.selected { background-position: 0px -140px;
-		&.disable { background-position: 0px -180px; }
+.btnCk { cursor: pointer; margin-right: 5px; display: inline-block; vertical-align: middle; padding-right: 15px; line-height: 1.2; height: 15px;
+	.iconPic { background: url(../images/comm/images/commIcon.png) no-repeat 0px -160px; display: inline-block; width: 18px; height: 15px; vertical-align: -4px; }
+	&.selected { .iconPic { background-position: 0px -140px; }
+		&.disable { .iconPic { background-position: 0px -180px; }
+		}
 	}
-	&.disable { background-position: 0px -200px; }
+	&.disable { .iconPic { background-position: 0px -200px; }
+	}
 }
 .relative { position: relative; }
 .btnNormal { padding: 4px 12px; display: inline-block; border: 1px #ccc solid; cursor: pointer; margin-right: 3px;
@@ -62,8 +66,8 @@
 			}
 			.loading { text-align: center; color: #ccc; }
 		}
-		.projectList { position: absolute; width: 236px; background-color: #fff; max-height: 420px; overflow-y: auto; border: 1px #ccc solid; top: 32; left: 0px;
-			.txtSearch { margin: 5px 10px 1px 10px; width: 214px; }
+		.projectList { position: absolute; width: 248px; background-color: #fff; max-height: 420px; overflow-y: auto; border: 1px #ccc solid; top: 32; left: 0px;
+			.txtSearch { margin: 5px 10px 1px 10px; width: 214px; margin-right: 0px;}
 		}
 		.projectVersionList { position: absolute; top: 32px; border: 1px #ccc solid; background-color: #fff; left: 0px; width: 288px; max-height: 378px;
 			.listContent { display: none;
