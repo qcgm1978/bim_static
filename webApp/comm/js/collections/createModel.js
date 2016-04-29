@@ -38,7 +38,9 @@ App.Comm.createModel = function(options){
       "click .delete":"delete",
       "click .edit":"edit",
       "click .current-floor":"openFloors",
-      "click .selectFloor li":"selectFloor"
+      "click .selectFloor li":"selectFloor",
+      "click .modelTabItem":"modelTab",
+      "click .modelTabBtn":"modelComment"
     },
     template:_.templateUrl('/comm/js/tpls/modelBar.html',true),
     initialize:function(){
@@ -59,7 +61,7 @@ App.Comm.createModel = function(options){
         var view = new vView({
           model:obj
         });
-        that.$el.find('.modelTree .modelEye .tree').append(view.render().el);
+        that.$el.find('#public ul').html(view.render().el);
       });
       return that;
     },
@@ -71,6 +73,8 @@ App.Comm.createModel = function(options){
       if(type == 'filter'){
         self.toggleClass('selected').siblings().removeClass('selected');
         that.filter(fn,self.is('.selected'));
+      }else if(type == "more"){
+        self.toggleClass('selected').siblings().removeClass('selected');
       }else if(type == "change"){
         self.toggleClass('selected').siblings().removeClass('selected');
         if(self.is(".selected")){
@@ -98,6 +102,7 @@ App.Comm.createModel = function(options){
       modelCollection.sceneCollection.etag = modelCollection.categoryCollection.etag = opt.etag;
       modelCollection.sceneCollection.sourceId = modelCollection.categoryCollection.sourceId = opt.sourceId;
       modelCollection.viewpointCollection.projectId = opt.projectId;
+      modelCollection.classCodeCollection.etag = opt.etag;
       if(type == "filter"){
         if(!that.filter.fetchTree){
           modelCollection.sceneCollection.fetch();
@@ -111,7 +116,7 @@ App.Comm.createModel = function(options){
           modelCollection.viewpointCollection.fetch();
           that.filter.fetchPoint = true;
         }
-        tree.find('.modelEye').show().siblings().hide();
+        tree.find('.modeSnapshot').show().siblings().hide();
       }
       if(isShow){
         tree.show().parent().addClass('open');
@@ -173,6 +178,17 @@ App.Comm.createModel = function(options){
       });
       cur.text(val).removeClass("open");
       viewer.setFloorMap(mapData,"initMap");
+    },
+    modelTab:function(event){
+      var self = $(event.target),
+          target = self.data('target');
+      $(target).show().siblings().hide();
+    },
+    modelComment:function(){
+      $(".modelBar").hide();
+      var comment = new App.Comm.modules.Comment({
+        element:$('.modelContainerContent')
+      });
     }
   });
   var treeView = Backbone.View.extend({
