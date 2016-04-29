@@ -31,8 +31,9 @@
 
 .mmhSlider ul li {
 	float: left;
-	background-size: 100% 120%;
+	background-size:cover;
 	cursor: pointer;
+	background-position: center;
 }
 
 .mmhSlider .remove {

@@ -95,7 +95,7 @@
 				$.fn.mmhSlider.defaults._pause=true;
 				setTimeout(function(){
 					$.fn.mmhSlider.defaults._pause=false;
-				},setting.delay)
+				},5000)
 				$.fn.mmhSlider.methods.random($dom,setting,data);
 			})
 		},
