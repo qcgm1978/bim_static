@@ -1,5 +1,5 @@
 /*
- * @require  /services/auth/collection/role.list.js
+ * @require  /services/views/auth/member/services.role.detail.js
  */
 
 var App = App || {};
@@ -31,9 +31,9 @@ App.Services.roleList=Backbone.View.extend({
     //创建新角色
     newRole:function(){
         //前期菜单准备
-        App.Service.window.init();//窗口
-        $(".serviceWindow").append(new App.Service.windowRole().render().$el);//外框
-        App.Service.fun.loadData();
+        App.Services.window.init();//窗口
+        $(".serviceWindow").append(new App.Services.windowRole().render().$el);//外框
+        App.Services.fun.loadData();
         $("#mask").show();
 
     },

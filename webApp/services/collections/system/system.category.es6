@@ -15,6 +15,26 @@ App.Services.SystemCollection = {
                  return response.data.items;
              }
 		}
+	})),
+
+	//流程列表
+	FlowCollection: new(Backbone.Collection.extend({
+		model: Backbone.Model.extend({
+			defaults: function() {
+				return {
+					title: ""
+				}
+			}
+		}),
+		urlType: "servicesFlowList",
+		parse(response) {
+			if (response.code == 0) { 
+				if (response.data.length<=0) {
+					$("#systemContainer .flowListBody").html('<li class="loading">无数据</li>');
+				}
+                 return response.data;
+             }
+		}
 	}))
 
 }

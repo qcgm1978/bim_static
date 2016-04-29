@@ -41,7 +41,7 @@ App.Services.System.CategoryManager = Backbone.View.extend({
 	//新增分类 弹出层
 	addNewCategoryDialog() { 
 
-		var dialogHtml = _.templateUrl('/services/tpls/system/category/system.add.category.html', true);
+		var dialogHtml = _.templateUrl('/services/tpls/system/category/system.add.category.html')({});
 
 		var opts = {
 			title: "新增业务类别",
@@ -49,21 +49,24 @@ App.Services.System.CategoryManager = Backbone.View.extend({
 			cssClass: "addNewCategoryDialog",
 			message: dialogHtml,
 			okCallback: () => {
-				if (this.addNewCategory()==false) {
-					return false;
-				};
+				this.addNewCategory(dialog);
+				return false;
 			}
 
 		}
 
-		new App.Comm.modules.Dialog(opts);
+		 var dialog=new App.Comm.modules.Dialog(opts);
 	},
 
 	//新增分类
-	addNewCategory() {
+	addNewCategory(dialog) {
 		var $addNewCategoryDialog = $(".addNewCategoryDialog"),
 			title = $addNewCategoryDialog.find(".txtCategoryTitle").val().trim(),
 			desc = $addNewCategoryDialog.find(".txtCategoryDesc").val().trim();
+
+		if (dialog.isSub) {
+			return;
+		}
 
 		if (!title) {
 			alert("请输入分类名称");
@@ -80,18 +83,30 @@ App.Services.System.CategoryManager = Backbone.View.extend({
 			type:"POST",
 			data:{
 				busName:title,
-				busDescdesc:desc
+				busDesc:desc
 			}
 		}
 
+		dialog.isSub=true;
+
 		//新增
 		App.Comm.ajax(data,function(data){
-			console.log(data);
+			if (data.code==0) {
+				data.data.isAdd=true;
+				App.Services.SystemCollection.CategoryCollection.push(data.data);
+				dialog.close();
+			}
+			
 		}) 
 	}, 
 
 	//新增后处理
 	addOne(model) {
+
+		if (this.$el.closest("body").length<=0) {
+			this.remove();
+			return;
+		}
 		 
 		//
 		var viewr=new App.Services.System.CategoryListDetail({
@@ -100,9 +115,19 @@ App.Services.System.CategoryManager = Backbone.View.extend({
 
 		this.$(".categoryListBody").find(".loading").remove();
 
-		this.$(".categoryListBody").append(viewr.render().el);
+		if (model.toJSON().isAdd) {
+			this.$(".categoryListBody").prepend(viewr.render().el);
+		}else{
+			this.$(".categoryListBody").append(viewr.render().el);
+		}
+		
+
+		//绑定滚动条		
+		App.Comm.initScroll(this.$(".categoryListBodScroll"),"y");
 
 	},
+
+
 
 	//重置加载
 	resetList(){

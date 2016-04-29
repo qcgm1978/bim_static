@@ -7,7 +7,6 @@ App.Services.Auth = Backbone.View.extend({
 
 	tagName:"div",
 
-
 	render(){
 		this.$el.html(new App.Services.AuthNav().render().el);//菜单
 		return this;
@@ -15,8 +14,7 @@ App.Services.Auth = Backbone.View.extend({
 
 	initialize:function(){
 		this.render();
+		App.Services.Member.init();
 	}
-
-
 
 });

@@ -1,15 +1,13 @@
 /*
- * @require  /service/views/mem/Services.MemCtrl.ozDetail.js
+ * @require  /services/views/auth/member/services.member.ozDetail.js
  * */
-var App = App || {};
+App.Services.MemberType = "inner";//默认加载类型
 App.Services.MemberozList=Backbone.View.extend({
 
     tagName :'ul',
 
     template:_.templateUrl("/services/tpls/auth/member/services.member.ozList.html"),
-    events:{
-
-    },
+    events:{},
 
     render:function(){
         this.collection.each(function(item){
@@ -24,7 +22,7 @@ App.Services.MemberozList=Backbone.View.extend({
     },
 
     initialize:function(models){
-        this.collection = new App.Services.Member.outerCollection(models);
+        this.collection = new App.Services.Member[App.Services.MemberType + "Collection"](models);//根据状态设置内部/外部  用户
     }
 });
 
