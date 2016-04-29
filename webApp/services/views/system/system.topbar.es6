@@ -9,7 +9,7 @@ App.Services.System.topBar=Backbone.View.extend({
 
 	className:"systemContainer",
 
-	template:_.templateUrl('/services/tpls/system/system.topbar.html',true),
+	template:_.templateUrl('/services/tpls/system/system.topbars.html',true),
 
 	render(){
 		
