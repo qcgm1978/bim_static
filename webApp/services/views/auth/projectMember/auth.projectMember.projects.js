@@ -1,29 +1,32 @@
 //我管理的项目列表view
 App.Services.projectMember.projects = Backbone.View.extend({
 	
-  // 重写初始化
-  initialize: function() {
-		this.listenTo(App.Services.projectMember.projectMemberProjectCollection,'reset',this.loadData);
-		this.listenTo(App.Services.projectMember.projectMemberProjectCollection,'add',this.addOne);
-  },
+	template: _.templateUrl('/services/tpls/auth/projectMember/projects.html'),
+
 	
-	render:function(){
+	// 重写初始化
+	initialize: function() {
+		this.listenTo(App.Services.projectMember.projectMemberProjectCollection, 'reset', this.render);
+	},
+
+	render: function(items) {
+		var _this=this;
+		var data = App.Services.projectMember.method.model2JSON(items.models);
+		data={data:data};
+		$("#projectList").html(this.template(data));
+		$("#projectList").children().on("click",function(e){
+			_this.selectProject(e);
+		})
 		return this;
 	},
 	
-	
-	loadData:function(){
-		$("#projectMember .project").remove();
-		_.each(App.Services.projectMember.projectMemberProjectCollection.models,function(model){
-			var view=new App.Services.projectMember.projects.view({model:model});
-  		$("#projectMember .projects").append(view.render().el);
-		})
-		$("#projectMember .projects").find("li:nth-child(2)").addClass("active");
+	initDom:function(){
+		
 	},
-	
-  addOne:function(item){
-  	var view=new App.Services.projectMember.projects.view({model:item});
-  	$("#projectMember .projects").append(view.render().el);
-  	$("#projectMember .projects").find("li:nth-child(2)").addClass("active");
-  }
+
+	selectProject:function(event){
+		$("#projectList .project").removeClass("active");
+		$(event.target).addClass("active");
+	},
+
 });

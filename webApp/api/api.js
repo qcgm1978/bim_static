@@ -4,7 +4,7 @@ App.API = {
 
 	Settings: {
 		hostname: "http://bim.wanda-dev.cn/",
-		debug: false
+		debug: true
 	},
 
 	URL: {
@@ -173,6 +173,7 @@ App.API = {
 		fetchServicesMemberOuterList:'/dataJson/services/services.member.list.json',//外部组织-品牌／公司／成员列表
 		fetchServicesMemberInnerList:'/dataJson/services/services.member.list.json',//内部-组织／成员列表
 		fetchServicesProjectMemberProjectList:'/dataJson/services/services.project.member.projects.json',//项目成员/项目管理
+		fetchServicesProjectMemberMemberList:'/dataJson/services/services.project.member.members.json',//项目成员/项目管理
 
 
 		//代办

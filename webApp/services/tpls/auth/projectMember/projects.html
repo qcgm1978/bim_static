@@ -1,9 +1,14 @@
-<div><img src="<%= image %>"></div>
-<div>
-	<h4><%= name %></h4>
-	<p>
-		<%= address %>
-			<%= startTime %>—
-				<%= endTime %>
-	</p>
-</div>
+<li>项目管理（<%=data.length%>）</li>
+<% _.each(data,function(item,index){ %>
+	<li class="project<% if(index==0) { %> active <% } %>">
+		<div><img src="<%= item.image %>"></div>
+		<div>
+			<h4><%= item.name %></h4>
+			<p>
+				<%= item.address %>
+					<%= item.startTime %>—
+						<%= item.endTime %>
+			</p>
+		</div>
+	</li>
+<% }) %>
