@@ -4,7 +4,7 @@ App.API = {
 
 	Settings: {
 		hostname: "http://bim.wanda-dev.cn/",
-		debug: true
+		debug: false
 	},
 
 	URL: {
@@ -47,7 +47,7 @@ App.API = {
 
 		fetchScene: "view/{etag}/{sourceId}/tree", // 获取楼层,专业信息
 		fetchCategory: "view/{etag}/{sourceId}/categories", // 获取构件信息
-		fetchCoding: 'view/category/coding', //获取构件编码信息
+		fetchCoding: 'view/category/coding/{etag}', //获取构件编码信息
 
 		fetchFloors: 'view/{etag}/{sourceId}/miniature/map', //获取模型楼层信息
 		fetchAxisGrid: 'model/{etag}/metadata/gridAndLevel.json', //获取楼层地图,轴网信息
@@ -95,8 +95,8 @@ App.API = {
 
 		fetchPlanProperties: "", //属性
 
-		//陈本 
-		fetchCostReference: "sixD/{projectId}/{projectVersionId}/cost/summary", // 清单 
+		//陈本
+		fetchCostReference: "sixD/{projectId}/{projectVersionId}/cost/summary", // 清单
 		fetchCostChange: "platform/auditSheet?type=9", // 变更
 		fetchCostVerification: "sixD/{projectId}/{projectVersionId}/cost/summary?noElement=true", // 效验
 		fetchCostVerificationCate: "sixD/{projectId}/{projectVersionId}/cost/nocost/cate", // 效验 图元未关联清单 类型
@@ -125,10 +125,10 @@ App.API = {
 		createNewFolder: "doc/{projectId}/{projectVersionId}/file", // 创建新文件夹 ?parentId={parentId}&filePath={filePath}
 
 		//项目 变更 列表
-		fileList:"doc/internal/{projectId}/{versionId}/differ", //变更列表 		
+		fileList:"doc/internal/{projectId}/{versionId}/differ", //变更列表
 		projectChangeList:"sixD/{projectId}/{projectVersionId}/cost/comparison",// ?fileVerionId={fileVerionId}&baseFileVerionId={baseFileVerionId}
 
-		projectDesinProperties:"sixD/{projectId}/{projectVersionId}/property/comparison",//?baseFileVerionId={baseFileVerionId}&fileVerionId={fileVerionId}&sceneId={sceneId}&elementId={elementId}		
+		projectDesinProperties:"sixD/{projectId}/{projectVersionId}/property/comparison",//?baseFileVerionId={baseFileVerionId}&fileVerionId={fileVerionId}&sceneId={sceneId}&elementId={elementId}
 		projectDesinPropertiesCost:"sixD/{projectId}/{projectVersionId}/cost/edo/comparison", //属性成本 ?baseProjectVerionId={baseProjectVerionId}&sceneId={sceneId}&elementId={elementId}
 		//TEST
 		projectChangeListTest:"/dataJson/project/projectChange/list.json",
@@ -149,7 +149,8 @@ App.API = {
 		"servicesFlowList":"platform/set/flow", // 列表 ?categoryId={categoryId}
 		"servicesFlowUpdate":"platform/set/flow/update",// 更新类别
 		"servicesFlowDel":"platform/set/flow/del",// 删除 ?id={id}
-		"servicesFlowIndex":"platform/set/flow/serial", // 改变位置 ?id={id} 
+		"servicesFlowIndex":"platform/set/flow/serial", // 改变位置 ?id={id}
+		"servicesFolwMove":"platform/set/flow/serial", // ?id={id} move up  or down
 
 		test: ""
 	},

@@ -3,6 +3,21 @@
 */
 App.Services.Member ={
 
+    collection:Backbone.Collection.extend({
+        model: Backbone.Model.extend({
+            defaults: function() {
+                return {
+                    url: ''
+                }
+            }
+        }),
+        parse: function (response) {
+            if (response.message == "success") {
+                return response.data.org;
+            }
+        }
+    }),
+
     innerCollection:new(Backbone.Collection.extend({
         model: Backbone.Model.extend({
             defaults: function() {
@@ -19,7 +34,7 @@ App.Services.Member ={
         }
     })),
 
-    outerCollection:Backbone.Collection.extend({
+    outerCollection:new(Backbone.Collection.extend({
         model: Backbone.Model.extend({
             defaults: function() {
                 return {
@@ -34,7 +49,7 @@ App.Services.Member ={
                 return App.Services.Member.list(response);
             }
         }
-    }),
+    })),
 
     //创建组织／成员混合列表
     list:function(response){
@@ -69,7 +84,7 @@ App.Services.Member ={
         collection.fetch({
             data:data,
             success: function(collection, response, options) {
-                if(fn || typeof fn == "function"){
+                if(fn && typeof fn == "function"){
 
                     fn(response);
                 }

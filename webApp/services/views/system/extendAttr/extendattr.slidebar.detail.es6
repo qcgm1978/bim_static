@@ -1,6 +1,6 @@
  
  //slideBar 详情
- App.Services.System.FolwSlideBarDetail=Backbone.View.extend({
+ App.Services.System.extendAttrSlideBarDetail=Backbone.View.extend({
 
  	tagName:"li",
 
@@ -20,6 +20,8 @@
  		this.$el.html(html).data("id",data.id);
 
  		return this;
+
+ 		
  	},
 
  	//点击单个
@@ -29,15 +31,11 @@
 
  		$target.addClass("selected").siblings().removeClass("selected");
 
- 		App.Services.SystemCollection.FlowCollection.reset();
+ 		// App.Services.SystemCollection.FlowCollection.reset();
 
- 		App.Services.SystemCollection.FlowCollection.fetch({
- 			data:{categoryId:id},
- 			success:function() {
- 				 
- 				 $(".folwContainer .flowListBody li:last").find(".myIcon-down").toggleClass("myIcon-down-disable myIcon-down");
- 			}
- 		});
+ 		// App.Services.SystemCollection.FlowCollection.fetch({
+ 		// 	data:{categoryId:id}
+ 		// });
  	}
 
 

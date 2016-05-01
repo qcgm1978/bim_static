@@ -86,11 +86,11 @@
             }
 
             if (this.options.isAlert) {
-                element.find('.wrapper').append('<div class="footer clr"><button class="ok button ' + this.options.okClass + ' button-small">' + this.options.okText + '</button></div>')
+                element.find('.wrapper').append('<div class="footer clr"><button class="ok myBtn myBtn-primary ' + this.options.okClass + ' ">' + this.options.okText + '</button></div>')
             }
             if (this.options.isConfirm) {
-                element.find('.wrapper').append('<div class="footer clr"><button class="ok button ' + this.options.okClass + ' button-small">' + this.options.okText + '</button></div>')
-                var cancelBtn = $('<button class="cancel button button-small"></button>').html(this.options.cancelText).addClass(this.options.cancelClass)
+                element.find('.wrapper').append('<div class="footer clr"><button class="ok myBtn myBtn-primary  ' + this.options.okClass + '">' + this.options.okText + '</button></div>')
+                var cancelBtn = $('<button class="cancel myBtn myBtn-default"></button>').html(this.options.cancelText).addClass(this.options.cancelClass)
                 element.find('.footer').append(cancelBtn)
             }
             //是否显示头部

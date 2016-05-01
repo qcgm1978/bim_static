@@ -30,11 +30,18 @@ App.Services.roleList=Backbone.View.extend({
     },
     //创建新角色
     newRole:function(){
-        //前期菜单准备
-        App.Services.window.init();//窗口
-        $(".serviceWindow").append(new App.Services.windowRole().render().$el);//外框
-        App.Services.fun.loadData();
-        $("#mask").show();
+        //初始化窗口
+        App.Services.batchAwardWindow = new App.Comm.modules.Dialog({
+            title:"角色授权",
+            width:600,
+            height:500,
+            isConfirm:false,
+            isAlert:false,
+            okCallback:function(){},
+            cancelCallback:function(){},
+            closeCallback:function(){},
+            message:"新建角色"
+        });
 
     },
 

@@ -23,48 +23,59 @@ App.Services.memberDetail=Backbone.View.extend({
     //弹窗
     spread:function(){
 
-        //需要将弹窗对象作为固定的设置
-        //App.Services.windowBase ＝ {
-        // width:,height:,cancelText:"",};
-        var window = new App.Comm.modules.Dialog({
+        var type =  App.Services.MemberType;
+        //获取所选项
+        //var seleUser = App.Services.Member[type + "Collection"].filter(function(item){
+        //    if(item.get("checked")){
+        //        return item.get("checked");
+        //    }
+        //});
+
+        //获取单选所选项的角色列表
+        var userId = this.model.get("userId");
+        var orgId  = this.model.get("orgId");
+
+        var frame = new App.Services.MemberWindowIndex().render();
+
+        //初始化窗口
+        App.Services.batchAwardWindow = new App.Comm.modules.Dialog({
+            title:"角色授权",
             width:600,
             height:500,
-            cancelText:""
+            isConfirm:false,
+            isAlert:false,
+            okCallback:function(){},
+            cancelCallback:function(){},
+            closeCallback:function(){},
+            message:frame.el
         });
+
+
+        //comm/js/modules/modules.dialog.js
         //$(".serviceWindow").append(new App.Services.windowMem().render().el);//外框
-
-        console.log(window);
-
 
         var $this = this;
         $("#mask").empty();
         //外壳及相关信息
-        App.Services.window.init();
-
-        $(".serviceWindow h1").html("角色授权");
-
-        //写入当前用户
-        $(".serviceWindow .aim ul").append(new App.Services.window.BlendDetail({model:$this.model}).render().el);
-        $(".memRoleList").append(new App.Services.windowRoleList().render().el);
-
-
+        ////写入当前用户
+        //$(".serviceWindow .aim ul").append(new App.Services.window.BlendDetail({model:$this.model}).render().el);
+        //$(".memRoleList").append(new App.Services.windowRoleList().render().el);
         this.chooseSelf();//清理旧的和选中新的
-
-        //处理角色列表已选部分
-        App.Services.ozRole.loadData({},function(){
-            var preSelected = $this.model.get("role");//已选角色
-            //没效果，collection异步所以异步执行无数据
-            App.Services.ozRole.collection.each(function(item){
-                item.unset("checked");//清除痕迹
-                for(var i = 0 ; i < preSelected.length ; i++){
-                    if(item.get("roleId") == preSelected[i]["roleId"]){
-                        item.set({"checked":true});
-                        return
-                    }
-                }
-            });
-            $("#mask").show();
-        });
+        ////处理角色列表已选部分
+        //App.Services.ozRole.loadData({},function(){
+        //    var preSelected = $this.model.get("role");//已选角色
+        //    //没效果，collection异步所以异步执行无数据
+        //    App.Services.ozRole.collection.each(function(item){
+        //        item.unset("checked");//清除痕迹
+        //        for(var i = 0 ; i < preSelected.length ; i++){
+        //            if(item.get("roleId") == preSelected[i]["roleId"]){
+        //                item.set({"checked":true});
+        //                return
+        //            }
+        //        }
+        //    });
+        //    $("#mask").show();
+        //});
 
     },
 
@@ -72,9 +83,9 @@ App.Services.memberDetail=Backbone.View.extend({
     chooseSelf:function(){
         //当选择其他时候，点击当前会将提示信息和选择信息设置为当前这个
         $("#blendList li").removeClass("active");
-        App.Services.Member[+"Collection"].each(function(item){
-            item.unset("checked");
-        });
+        //App.Services.Member[+"Collection"].each(function(item){
+        //    item.unset("checked");
+        //});
         //选中当前
         this.$el.addClass("active");
         this.model.set("checked",true);

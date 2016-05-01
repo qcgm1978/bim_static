@@ -2,11 +2,12 @@
  * @require  /services/views/auth/member/services.member.ozDetail.js
  * */
 App.Services.MemberType = "inner";//默认加载类型
-App.Services.MemberozList=Backbone.View.extend({
+App.Services.MemberozList = Backbone.View.extend({
 
     tagName :'ul',
 
     template:_.templateUrl("/services/tpls/auth/member/services.member.ozList.html"),
+
     events:{},
 
     render:function(){
@@ -22,7 +23,8 @@ App.Services.MemberozList=Backbone.View.extend({
     },
 
     initialize:function(models){
-        this.collection = new App.Services.Member[App.Services.MemberType + "Collection"](models);//根据状态设置内部/外部  用户
+
+        this.collection = new App.Services.Member.collection(models);
     }
 });
 

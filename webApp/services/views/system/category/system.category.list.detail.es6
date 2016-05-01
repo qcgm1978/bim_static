@@ -38,9 +38,12 @@ App.Services.System.CategoryListDetail = Backbone.View.extend({
 				showClose: false,
 				isAlert: false,
 				isConfirm: false
-			};
+			},
+		msg = "确认要删除" + $target.closest(".item").find(".name").text().trim() + "业务类别吗？";
 
-		opts.message = text.replace('#title', $target.closest(".item").find(".name").text().trim());
+
+			 
+		opts.message =text.replace('#title', msg);
 		var confirmDialog = new App.Comm.modules.Dialog(opts);
 		this.delCategoryEvent(confirmDialog, $target);
 
@@ -69,15 +72,8 @@ App.Services.System.CategoryListDetail = Backbone.View.extend({
 				};
 
 			App.Comm.ajax(data, (data) => {
-				if (data.code == 0) {
-
-					$.each(App.Services.SystemCollection.CategoryCollection.models, function(i, item) {
-						if (item == that.model) {
-							//销毁model
-							item.destroy();
-							return false;
-						}
-					});
+				if (data.code == 0) { 
+					that.model.destroy();
 					confirmDialog.close();
 				}
 

@@ -60,9 +60,7 @@ App.Services.ozRole ={
     })),
 
     loadData : function(data,func) {
-        //数据重置
         App.Services.ozRole.collection.reset();
-        // load list
         App.Services.ozRole.collection.fetch({
             data:data,
             success: function(collection, response, options) {

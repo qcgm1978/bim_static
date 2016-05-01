@@ -1,11 +1,11 @@
 /*
- * @require  /service/collection/role.list.js
- * */
-App.Service.window.roleDetail=Backbone.View.extend({
+ * @require  /services/views/auth/index.es6
+ */
+App.Services.windowRoleDetail=Backbone.View.extend({
 
     tagName:'li',
 
-    template:_.templateUrl("/service/tpls/window/service.window.roleDetail.html"),
+    template:_.templateUrl("/services/tpls/auth/windows/services.member.window.detail.html"),
     events:{
         "click .name":"memCheck"
     },

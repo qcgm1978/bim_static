@@ -46,14 +46,10 @@ App.Services.MemberList=Backbone.View.extend({
     },
 
     batchAward:function(){
-        $("#mask").empty();
-        App.Services.window.init();
-        $(".serviceWindow").append(new App.Services.windowMem().render().el);//外框
-        $(".serviceWindow h1").html("角色授权");
 
-
+        var type =  App.Services.MemberType;
         //获取所选项
-        var seleUser = App.Services.Member.innerCollection.filter(function(item){
+        var seleUser = App.Services.Member[type + "Collection"].filter(function(item){
             if(item.get("checked")){
                 return item.get("checked");
             }
@@ -61,32 +57,40 @@ App.Services.MemberList=Backbone.View.extend({
 
         if(!seleUser.length){alert("您没有选择任何成员或组织，无法设置角色！");return}
 
+        var frame = new App.Services.MemberWindowIndex().render();
+
+
+        //初始化窗口
+        App.Services.batchAwardWindow = new App.Comm.modules.Dialog({
+            title:"角色授权",
+            width:600,
+            height:500,
+            isConfirm:false,
+            isAlert:false,
+            okCallback:function(){},
+            cancelCallback:function(){},
+            closeCallback:function(){},
+            message:frame.el
+        });
+
+
         //写入已选用户和组织
-        $(".memRoleList").append(new App.Services.windowRoleList().render().el);
-
-        //将每项插入到角色列表中
         _.each(seleUser,function(item){
-            $(".serviceWindow .aim ul").append( new App.Services.window.BlendDetail({model:item}).render().el);
+            $(".seWinBody .aim ul").append(new App.Services.MemberWindowDetail({model:item}).render().el);
         });
 
-        var data = {
+        //已选组织的父项的角色列表
+        //$(".memRoleList").append(new App.Services.windowRoleList().render().el);
 
-        };
-
-
-        App.Services.ozRole.loadData(data,function(){
-
-            $("#mask").show();
-        });
+        var data = {};
+        App.Services.ozRole.loadData(data,function(){});
 
     },
-
 
     //排序
     comparator:function(){
 
     }
-
 
 });
 

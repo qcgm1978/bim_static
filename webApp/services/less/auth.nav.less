@@ -14,6 +14,7 @@ ul,li{list-style: none outside none;}
 .serviceHeader .serviceNav{background-color: #eeeeee;border-top: 1px solid #cccccc;padding-top: 9px;height: 38px;border-bottom: 1px solid #cccccc;padding-left: 20px;clear: both;}
 .serviceHeader .serviceNav li{border-top: 2px solid #eeeeee;float: left;line-height: 27px;height: 29px;width: 98px;text-align: center;margin-bottom: -1px;cursor: pointer;}
 .serviceHeader .serviceNav li.active{border-top: 2px solid #006ecf;border-left: 1px solid #cccccc;border-right: 1px solid #cccccc;border-bottom: 1px solid #eeeeee;background-color: #ffffff;}
+.serviceNav a:link,.serviceNav a:hover,.serviceNav a:visited,.serviceNav a:active{color: #333333;text-decoration: none;}
 /*��Ա����*/
 #blendList{height: 500px;overflow: auto;}/*��Ҫ��̬�趨�߶�*/
 .serviceBody{position: relative;}
@@ -40,12 +41,13 @@ ul,li{list-style: none outside none;}
 .batchAward:before{content: '';position: absolute;width: 16px;height: 16px;left: 10px;top: 7px;background: transparent url("../images/service_ico.png") 0 -120px no-repeat;}
 .serviceBody .content li{line-height: 49px;clear: left;border-bottom: 1px solid #dddddd;height: 50px;}
 .serviceBody .content li.active{background-color: #a8dbfd;}
-.serviceBody .content li .pers{float: right;position: relative;z-index: 3;padding: 0 15px 0 20px;color: #016ecf;cursor: pointer;}
+.serviceBody .content li .pers{float: right;display: none;position: relative;z-index: 3;padding: 0 15px 0 20px;color: #016ecf;cursor: pointer;}
+.serviceBody .content li:hover .pers{display: block;}
 .serviceBody .content li .pers:before{content: "";position: absolute;width: 16px;height: 16px;left: 0;top: 16px;background: url("../images/service_ico.png") 0 -140px no-repeat;}
 .serviceBody .content li .sele{padding:  0 25px;}
 .serviceBody .content li .ushead{display: inline-block;width: 32px;height: 32px;line-height: 0;background: transparent url("../images/service_ico.png") 0 -40px no-repeat;vertical-align: middle;margin: 0 13px 0 10px;}
 .serviceBody .content li.active .memCheck{background-position: 0 -420px;}
-.serviceBody .content li .ushead.oz{background-position: 0 0;}/*��֯*/
+.serviceBody .content li .ushead.oz{background-position: 0 0;}/*机构*/
 .serviceBody .content li .sele .left{float: left;width: 200px;}
 .serviceBody .content li .sele .roles{text-align: center;}
 .serviceBody  li .sele .roles span{position: relative;display: inline-block;padding-left: 20px;margin-left: 14px;}
@@ -73,22 +75,19 @@ ul,li{list-style: none outside none;}
 .roleCtrl .roleEdit span.edit:before{background-position: 0 -260px ;}
 .roleCtrl .roleEdit span.delete:before{background-position: 0 -280px ;}
 /*����*/
-#mask{position: fixed;left: 0;top: 0;width: 100%;height: 100%;background: rgba(0,0,0,.5);z-index: 999;display: none;}
-.windowClose{position: relative;float: right;width: 49px;height: 49px;z-index: 10;cursor: pointer;}
-.windowClose:before{content: "";top: 17px;left: 17px;width: 15px;height: 15px;background: url("../images/service_ico.png") 0 -360px no-repeat;position: absolute;}
-.serviceWindow{position: absolute;width: 600px;height: 500px;left: 50%;top: 50%;margin-left: -300px;margin-top: -250px;background-color: #ffffff;}
-.serviceWindow h1{height: 50px;line-height: 49px;border-bottom: 1px solid #e6e6e6;font-size: 16px;padding-left: 24px;color: #333333;}
-.serviceWindow h2{height: 45px;line-height: 45px;font-size: 14px;padding: 0 10px;}
-.serviceWindow h2 span{color: #9f9f9f;}
-.serviceWindow .title{font-size: 12px;color: #9f9f9f;line-height: 23px;height: 24px;}
-.serviceWindow .name,.serviceWindow .funName{float: left;width: 175px;}
-.serviceWindow li{padding: 0 10px;line-height: 30px;border-bottom: 1px solid #cccccc;height: 30px;}
-.serviceWindow .aim,.serviceWindow .memRoleList,.serviceWindow .func{padding: 8px 20px 0 20px;}
-.serviceWindow ul{border:1px solid #cccccc;  height: 150px;overflow: auto;}
+.seWinBody{margin: -20px;}
+.seWinBody h1{height: 50px;line-height: 49px;border-bottom: 1px solid #e6e6e6;font-size: 16px;padding-left: 24px;color: #333333;}
+.seWinBody h2{height: 45px;line-height: 45px;font-size: 14px;padding: 0 10px;}
+.seWinBody h2 span{color: #9f9f9f;}
+.seWinBody .title{font-size: 12px;color: #9f9f9f;line-height: 23px;height: 24px;}
+.seWinBody .name,.serviceWindow .funName{float: left;width: 175px;}
+.seWinBody li{padding: 0 10px;line-height: 30px;border-bottom: 1px solid #cccccc;height: 30px;}
+.seWinBody .aim,.serviceWindow .memRoleList,.serviceWindow .func{padding: 8px 20px 0 20px;}
+.seWinBody ul{border:1px solid #cccccc;  height: 150px;overflow: auto;}
 .windowSubmit {position: absolute;right: 20px;bottom: 20px;background-color: #0572d0;color: #ffffff;width: 80px;height: 30px;line-height: 30px;text-align: center;cursor: pointer;}
 .windowSubmit:hover{background-color: #1584e3;}
-.serviceWindow .func ul{height: 260px;}
-.serviceWindow .func li.active,.memRoleList li.active{background-color: #a8dbfd;}
+.seWinBody .func ul{height: 260px;}
+.seWinBody .func li.active,.memRoleList li.active{background-color: #a8dbfd;}
 
 .memRoleList li{position: relative;}
 .memRoleList li .fun {overflow: hidden;text-overflow: ellipsis;white-space: nowrap;width: 360px;}
@@ -99,13 +98,13 @@ ul,li{list-style: none outside none;}
 .memRoleList .fun span.adm:before{background-position: 0  -162px;width: 14px;height: 14px;}
 .memRoleList li .rohead{.background-ioc;display: inline-block;width: 15px;height: 15px;vertical-align: middle;background-position: 0 -180px;margin: 0 5px 0 10px;}
 .memRoleList li .rohead.adm{background-position: 0  -162px;width: 14px;height: 14px;}
-.serviceWindow .func li .name span{position: relative;padding-left: 20px;margin-left: 8px;}
-.serviceWindow .func li .name span:before{content: "";position: absolute;width: 11px;height: 11px;left: 0;top: 3px;background: transparent url("../images/service_ico.png") 0 -200px no-repeat;}
+.seWinBody .func li .name span{position: relative;padding-left: 20px;margin-left: 8px;}
+.seWinBody .func li .name span:before{content: "";position: absolute;width: 11px;height: 11px;left: 0;top: 3px;background: transparent url("../images/service_ico.png") 0 -200px no-repeat;}
 
-.serviceWindow .aim input{height: 30px;width: 100%;color: #cccccc;outline: none;border: 1px solid #cccccc;padding: 0 8px;line-height: 30px;}
-.serviceWindow .aim input:focus{color: #333333;}
-.serviceWindow .aim .name i{display: inline-block;width: 16px;height: 16px;line-height: 0;background: transparent url("../images/service_ico.png") 0 -20px no-repeat;background-size: 20px auto;vertical-align: middle;margin: 0 6px 0 5px;}
-.serviceWindow .aim .name i.oz{background-position: 0 0;}
+.seWinBody .aim input{height: 30px;width: 100%;color: #cccccc;outline: none;border: 1px solid #cccccc;padding: 0 8px;line-height: 30px;}
+.seWinBody .aim input:focus{color: #333333;}
+.seWinBody .aim .name i{display: inline-block;width: 16px;height: 16px;line-height: 0;background: transparent url("../images/service_ico.png") 0 -20px no-repeat;background-size: 20px auto;vertical-align: middle;margin: 0 6px 0 5px;}
+.seWinBody .aim .name i.oz{background-position: 0 0;}
 /*checkbox*/
 .memCheck{display: inline-block;.serviceInput;}
 .active .memCheck{background-position: 0 -420px;}

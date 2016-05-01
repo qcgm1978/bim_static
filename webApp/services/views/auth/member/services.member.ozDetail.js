@@ -28,36 +28,74 @@ App.Services.MemberozDetail=Backbone.View.extend({
     },
 
     unfold:function(){
-        var _this =this;
+        //如果已选则返回
+        if(this.$(".ozName span").hasClass("active")){
+            return
+        }
+
+        var _this = this;
+        var _thisType = App.Services.MemberType;
         var _thisId = this.$(".ozName").data("id");
-        _thisId = _thisId ? _thisId : "";//父项ID
-        var _thisTpye = this.$(".ozName").data("type");//内部还是外部用户
-
-        this.model.set({"active":true});//模型状态
-
+        var collection = App.Services.Member[_thisType + "Collection"];
+        $("#blendList").empty();//刷新右侧数据
 
         var data = {
-            outer: _thisTpye,
-            parentId: _thisId//父项ID
+            outer:  !(_thisType == "inner"),
+            parentId:_thisId,
+            includeUsers:false
         };
 
-        App.Services.Member.loadData(App.Services.Member[_thisTpye + "Collection"],data,function(response){
-            //如果已有则重置并重新获取数据
-            $(".childOz" +_thisId).empty();
+        //获取数据，将会刷新右侧视图
+        App.Services.Member.loadData(collection,data,function(response){
 
-            //左面删除已选
-            $(".serviceOgList div").removeClass("active");
-            $(".serviceOgList span").removeClass("active");//唯一选项
-
-            //选中状态
-            _this.$(".ozName").addClass("active");
-            _this.$(".ozName span").addClass("active");//选中状态
-
-            //添加子菜单
-            if(response.data.org.length) {
-                $(".childOz" + _thisId).html(new App.Services.MemberozList(response.data.org).render().el);
+            //菜单
+            if (response.data.org.length) {
+                //样式处理
+                _this.$("div").remove("active");
+                $(".ozName").addClass("active");
+                $(".serviceOgList span").removeClass("active");//唯一选项
+                _this.$(".ozName > span").addClass("active");//选中状态
+                //如果有则清空直接子列表？？结构不正确
+                //菜单渲染
+                _this.$(".childOz" + _thisId).html(new App.Services.MemberozList(response.data.org).render().el);
             }
         });
+
+
+
+
+
+
+
+
+        ////不刷新
+        //var _this =this;
+        //var _thisId = this.$(".ozName").data("id");
+        //var _thisTpye = this.$(".ozName").data("type");//内部还是外部用户
+        //_thisId = _thisId ? _thisId : "";//没有则显示根
+        //
+        //var data = {
+        //    outer: _thisTpye,
+        //    parentId: _thisId//父项ID
+        //};
+        //
+        //App.Services.Member.loadData(App.Services.Member[_thisTpye + "Collection"],data,function(response){
+        //    //如果已有则重置并重新获取数据
+        //    $(".childOz" +_thisId).empty();
+        //
+        //    //左面删除已选
+        //    $(".serviceOgList div").removeClass("active");
+        //    $(".serviceOgList span").removeClass("active");//唯一选项
+        //
+        //    //选中状态
+        //    _this.$(".ozName").addClass("active");
+        //    _this.$(".ozName span").addClass("active");//选中状态
+        //
+        //    //添加子菜单
+        //    if(response.data.org.length) {
+        //        $(".childOz" + _thisId).html(new App.Services.MemberozList(response.data.org).render().el);
+        //    }
+        //});
     }
 });
 
