@@ -18,6 +18,7 @@ App.Services.projectMember.mainView = Backbone.View.extend({
 		return this;
 	},
 	
+	//打开成员部门管理视图窗口
 	openMemberManagerModal:function(){
 		(new ViewComp.Modal).render({title:"添加成员/部门"}).append(new ViewComp.MemberManager);
 	}

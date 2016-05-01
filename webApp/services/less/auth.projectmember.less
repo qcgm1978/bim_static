@@ -163,7 +163,7 @@
 
 @moduleWindowBorderColor:#CCC;
 @memberManagerHeight:380px;
-.moduleWindow {
+.moduleWindow,.module {
     position: relative;
     top: auto;
     left: auto;
@@ -198,6 +198,10 @@
         vertical-align: middle;
         text-align: right;
         padding-right: 10px;
+        & .modalBtn:last-child{
+        	display: none;
+        	border: 1px solid @moduleWindowBorderColor;
+        }
     }
     & .modalBtn {
         display: inline-block;
@@ -215,6 +219,53 @@
             background: #FFFFFF;
             border: 1px solid @moduleWindowBorderColor;
         }
+    }
+    
+    &.moduleDialog{
+    	width:360px;
+    	min-width: auto;
+    	height: 200px;
+    	border:none;
+		left: 50%;
+		top: 50%;
+		margin-left: -180px;
+		margin-top: -100px;
+    	background: #FFF;
+    	position: absolute;
+    	box-shadow: 0 0 3px 2px #CFCFCF;
+    	& .mwin-header{
+    		border: none;
+    	}
+    	& .mwin-body{
+    		min-height: 96px;
+    		font-family: "microsoft yahei";
+    		font-size: 16px;
+    		color: #333;
+    		& .delTip{
+    			 padding-left:40px;
+    			 height: 32px;
+    			 line-height: 32px;
+    			 display: block;
+    			background: url(../../service/images/service_ico.png) no-repeat 0 -300px;
+    		}
+    	}
+    	& .mwin-foot{
+    		padding-right: 0;
+    		text-align: center;
+    		& .modalBtn{
+    			width: 80px;
+    			height: 32px;
+    			line-height: 1.6;
+    		}
+    		& .modalBtn:last-child{
+    			background: #FFF;
+    			color: #333;
+    			display: inline-block;
+    		}
+    	}
+    	& .closeIcon{
+    		display: none;
+    	}
     }
 }
 

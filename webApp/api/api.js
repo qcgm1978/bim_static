@@ -10,9 +10,11 @@ App.API = {
 	URL: {
 
 		//首页bodyContent数据
-		fetchBodyContentTodos :'platform/todoss',
+		fetchBodyContentTodos :'platform/todo',
+		//本月开始、到期接口
 		fetchBodyContentMonthEnd :'sixD/plan/concern/index',//?type={type}&userId={userId}
 		fetchBodyContentMonthStart :'sixD/plan/concern/index',
+		
 		fetchBodyContentSlide :'dataJson/bodyContent/bodyContent.slide.json',
 		fetchBodyContentMmhSlide :'dataJson/bodyContent/bodyContent.mmhSlider.json',
 		fetchBodyContentProclamation :'dataJson/bodyContent/bodyContent.proclamation.json',
@@ -158,7 +160,7 @@ App.API = {
 	DEBUGURL: {
 
 		//首页bodyContent数据
-		fetchBodyContentTodos :'platform/todo',
+		fetchBodyContentTodos :'/dataJson/bodyContent/bodyContent.todos.json',
 		fetchBodyContentMonthEnd :'sixD/plan/concern/index',
 		fetchBodyContentMonthStart :'sixD/plan/concern/index',
 		fetchBodyContentSlide :'/dataJson/bodyContent/bodyContent.slide.json',
