@@ -5,6 +5,8 @@ var App = App || {};
 App.BodyContent.control= {
 
     init : function(){
+		
+
 
         $("#contains").empty();
         new App.BodyContent.App().render(); //渲染框架
@@ -14,10 +16,10 @@ App.BodyContent.control= {
         $(".conMonth .article table").append(new App.BodyContent.monthStartList().render().el);
         $("#proclamation").html(new App.BodyContent.proclamationList().render().el);
 		
-        this.loadData(this.todoCollection);
+        this.loadData(this.todoCollection,{});
         this.loadData(this.slideCollection);
-        this.loadData(this.monthEndCollection);
-        this.loadData(this.monthStartCollection);
+        this.loadData(this.monthEndCollection,{type:2,useId:'wb'});
+        this.loadData(this.monthStartCollection,{type:1,useId:'wb'});
         this.loadData(this.proCollection);
 
       //  slide.initialize({element:".imgContainer", slideTime : 4000, tagTime : 500});
@@ -85,12 +87,14 @@ App.BodyContent.control= {
         }
     })),
 
-    loadData : function(collection) {
+    loadData : function(collection,data) {
+    	
         //数据重置
         collection.reset();
         // load list
+        data=data||{};
         collection.fetch({
-            data: {},
+            data: data,
             success: function(collection, response, options) {
                 //如果是slide内容，写入数值
                 if(collection ==App.BodyContent.control.slideCollection){
@@ -102,6 +106,7 @@ App.BodyContent.control= {
 						}
 					})
                 }
+              	//(".article").eq(0).html("<span class='noDataTip'>暂无内容</span>")
             }
         });
     }

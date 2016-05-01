@@ -1,19 +1,12 @@
-
 //主容器
 App.Services.projectMember.mainView = Backbone.View.extend({
-
-  tagName: 'div',
-
-  id: 'projectMember',
-
-  // 重写初始化
-  initialize: function() {
-
-  },
-
-  render: function() {
-    this.$el.append(new App.Services.projectMember.projects().render().el);
-    this.$el.append(new App.Services.projectMember.members().render().el);
-    return this;
-  }
+	
+	
+	template: _.templateUrl('/services/tpls/auth/projectMember/tplProjectMember.html'),
+	
+	render: function() {
+		this.$el.html(this.template());
+		new App.Services.projectMember.projects();
+		return this;
+	}
 });

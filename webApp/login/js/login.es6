@@ -45,17 +45,21 @@ var Login = {
 				$("#mainBox .errorMSG").addClass('show').find(".tip").text("请输入密码");
 				return false;
 			};
-
-
-			window.location.href="index.html";
-			// $.ajax({
-			// 	url: '',
-			// 	type: 'POST',
-			// 	data: {}
-			// }).done((data) => {
-
-			// });
-
+			
+			$.ajax({
+				url:'/platform/login',
+				type:'post',
+				data:{
+					userid:userName,
+					password:userPwd
+				}
+			}).done(function(data){
+				if(data.code==0){
+					window.location.href="index.html";
+				}else{
+					$("#mainBox .errorMSG").addClass('show').find(".tip").text("登录失败:"+data.message);
+				}
+			})
 
 		},
 

@@ -10,9 +10,9 @@ App.API = {
 	URL: {
 
 		//首页bodyContent数据
-		fetchBodyContentTodos :'platform/todo?status=1&pageIndex=1&pageItemCount=6',
-		fetchBodyContentMonthEnd :'dataJson/bodyContent/bodyContent.monthEnd.json',
-		fetchBodyContentMonthStart :'dataJson/bodyContent/bodyContent.monthStart.json',
+		fetchBodyContentTodos :'platform/todoss',
+		fetchBodyContentMonthEnd :'sixD/plan/concern/index',//?type={type}&userId={userId}
+		fetchBodyContentMonthStart :'sixD/plan/concern/index',
 		fetchBodyContentSlide :'dataJson/bodyContent/bodyContent.slide.json',
 		fetchBodyContentMmhSlide :'dataJson/bodyContent/bodyContent.mmhSlider.json',
 		fetchBodyContentProclamation :'dataJson/bodyContent/bodyContent.proclamation.json',
@@ -157,9 +157,9 @@ App.API = {
 	DEBUGURL: {
 
 		//首页bodyContent数据
-		fetchBodyContentTodos :'platform/todo?status=1&pageIndex=1&pageItemCount=30',
-		fetchBodyContentMonthEnd :'/dataJson/bodyContent/bodyContent.monthEnd.json',
-		fetchBodyContentMonthStart :'/dataJson/bodyContent/bodyContent.monthStart.json',
+		fetchBodyContentTodos :'platform/todo',
+		fetchBodyContentMonthEnd :'sixD/plan/concern/index',
+		fetchBodyContentMonthStart :'sixD/plan/concern/index',
 		fetchBodyContentSlide :'/dataJson/bodyContent/bodyContent.slide.json',
 		fetchBodyContentMmhSlide :'dataJson/bodyContent/bodyContent.mmhSlider.json',
 		fetchBodyContentProclamation :'/dataJson/bodyContent/bodyContent.proclamation.json',
@@ -171,6 +171,7 @@ App.API = {
 		fetchServicesSubRoleList:'/dataJson/services/services.sub.role.json',
 		fetchServicesMemberOuterList:'/dataJson/services/services.member.list.json',//外部组织-品牌／公司／成员列表
 		fetchServicesMemberInnerList:'/dataJson/services/services.member.list.json',//内部-组织／成员列表
+		fetchServicesProjectMemberProjectList:'/dataJson/services/services.project.member.projects.json',//项目成员/项目管理
 
 
 		//代办
