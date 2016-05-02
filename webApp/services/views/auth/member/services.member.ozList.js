@@ -23,7 +23,6 @@ App.Services.MemberozList = Backbone.View.extend({
     },
 
     initialize:function(models){
-
         this.collection = new App.Services.Member.collection(models);
     }
 });

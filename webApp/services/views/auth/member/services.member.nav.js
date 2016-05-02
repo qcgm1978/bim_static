@@ -35,6 +35,7 @@ App.Services.MemberNav=Backbone.View.extend({
 
         //this.loadData("inner");
         App.Services.MemberType = "inner";
+
         //App.Services.Member.loadData(App.Services.Member.innerCollection);
         this.loadData();
     },
@@ -44,14 +45,13 @@ App.Services.MemberNav=Backbone.View.extend({
     loadData:function(){
 
         var _thisType = App.Services.MemberType;
-
         var collection = App.Services.Member[_thisType + "Collection"];
 
-        $("#blendList").empty();//刷新右侧数据
+        $("#blendList").empty();//清空右侧列表
+        //输入数据
 
         //获取数据，将会刷新右侧视图
         App.Services.Member.loadData(collection,{},function(response){
-
             //菜单
             if (response.data.org.length) {
                 //样式处理

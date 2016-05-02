@@ -1,8 +1,6 @@
 <div class="name">
-    <i class=""></i>
+    <i class="memCheck"></i>
+    <i class="rohead <%= obj.orgId ? 'oz' : '' %>"></i>
     <span><%= name %></span>
 </div>
-<%= obj.orgId ? obj.orgId : obj.userId %>
-
-<%= obj%>
-<!--预编译模版 obj-->
+<%= obj.orgId ? obj.orgId : obj.userId %><%= obj%>
