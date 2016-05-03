@@ -14,7 +14,6 @@ App.Services.Auth = Backbone.View.extend({
 
 	initialize:function(){
 		this.render();
-		App.Services.Member.init();
 	}
 
 });

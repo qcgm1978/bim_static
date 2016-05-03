@@ -3,6 +3,7 @@
 */
 App.Services.Member ={
 
+    //组织
     collection:Backbone.Collection.extend({
         model: Backbone.Model.extend({
             defaults: function() {
@@ -18,6 +19,7 @@ App.Services.Member ={
         }
     }),
 
+    //内部用户
     innerCollection:new(Backbone.Collection.extend({
         model: Backbone.Model.extend({
             defaults: function() {
@@ -34,6 +36,8 @@ App.Services.Member ={
         }
     })),
 
+
+    //外部用户
     outerCollection:new(Backbone.Collection.extend({
         model: Backbone.Model.extend({
             defaults: function() {
@@ -58,8 +62,9 @@ App.Services.Member ={
             for (var i = 0; i < response.data.user.length; i++) {
                 blendList.push(response.data.user[i])
             }
-        }else if(response.data.org){
-            for(var j = 0 ; j < response.data.org.length ;j++ ){
+        }
+        if(response.data.org){
+            for(var j = 0 ; j < response.data.org.length ; j++ ){
                 blendList.push(response.data.org[j])
             }
         }
@@ -85,7 +90,6 @@ App.Services.Member ={
             data:data,
             success: function(collection, response, options) {
                 if(fn && typeof fn == "function"){
-
                     fn(response);
                 }
             }
@@ -95,7 +99,6 @@ App.Services.Member ={
 
 
     init :function(){
-
         $(".serviceBody").empty().html( new App.Services.MemberNav().render().el);
         $(".content").html(new App.Services.MemberList().render().el);
         App.Services.Member.loadData(App.Services.Member.innerCollection);//默认加载内部列表

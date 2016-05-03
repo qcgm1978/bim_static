@@ -14,13 +14,16 @@ App.Services.MemberList=Backbone.View.extend({
     template:_.templateUrl("/services/tpls/auth/member/services.member.list.html"),
 
     render:function(){
+        this.$el.empty();
         this.$el.html(this.template);
         return this;
     },
 
     initialize:function(){
-       this.listenTo(App.Services.Member[App.Services.MemberType + "Collection"],"add",this.addOne);
-       this.listenTo(App.Services.Member[App.Services.MemberType + "Collection"],"reset",this.render);
+       this.listenTo(App.Services.Member.innerCollection,"add",this.addOne);
+       this.listenTo(App.Services.Member.outerCollection,"add",this.addOne);
+       this.listenTo(App.Services.Member.innerCollection,"reset",this.render);
+       this.listenTo(App.Services.Member.outerCollection,"reset",this.render);
         //$el为包含模板的元素，el为元素节点
     },
     //数据加载
@@ -31,22 +34,22 @@ App.Services.MemberList=Backbone.View.extend({
 
     //选中事件
     selectAll:function(){
+        var type =  App.Services.MemberType;
         var $this = this;
         var preS= this.$(".head input")[0].checked;
-        this.$(":checkbox").each(function(){
-            this.checked = preS;
+        this.$(":checkbox").each(function(checkbox){
+            checkbox.checked = preS;
             if(preS){
                 $this.$("li").addClass("active");
-                App.Services.Member.innerCollection.each(function(item){item.set({"checked":true})})
+                App.Services.Member[type + "Collection"].each(function(item){item.set({"checked":true})})
             }else{
                 $this.$("li").removeClass("active");
-                App.Services.Member.innerCollection.each(function(item){item.set({"checked":false})})
+                App.Services.Member[type + "Collection"].each(function(item){item.set({"checked":false})})
             }
         })
     },
 
     batchAward:function(){
-
         var type =  App.Services.MemberType;
         //获取所选项
         var seleUser = App.Services.Member[type + "Collection"].filter(function(item){
@@ -55,10 +58,13 @@ App.Services.MemberList=Backbone.View.extend({
             }
         });
 
-        if(!seleUser.length){alert("您没有选择任何成员或组织，无法设置角色！");return}
+        //是否选择
+        if(!seleUser.length){
+            alert("您没有选择任何成员或组织，无法设置角色！");return
+        }
 
-        var frame = new App.Services.MemberWindowIndex().render();
-
+        //渲染框架
+        var frame = new App.Services.MemberWindowIndex().render().el;
 
         //初始化窗口
         App.Services.batchAwardWindow = new App.Comm.modules.Dialog({
@@ -70,7 +76,7 @@ App.Services.MemberList=Backbone.View.extend({
             okCallback:function(){},
             cancelCallback:function(){},
             closeCallback:function(){},
-            message:frame.el
+            message:frame
         });
 
 
@@ -79,21 +85,38 @@ App.Services.MemberList=Backbone.View.extend({
             $(".seWinBody .aim ul").append(new App.Services.MemberWindowDetail({model:item}).render().el);
         });
 
-        //已选组织的父项的角色列表
-        //$(".memRoleList").append(new App.Services.windowRoleList().render().el);
 
+
+        //角色列表
+        $(".memRoleList").append(new App.Services.windowRoleList().render().el);
+
+        //无父项时获取缺省角色列表
+        App.Services.role.loadData();
+        //数据
         var data = {};
-        App.Services.ozRole.loadData(data,function(){});
-
+        //单选取得角色列表
+        if(seleUser.length == 1){
+            var getRole = this.getRole(seleUser[0]);
+            data = {
+                outer :  !(type == "inner"),
+                orgId : getRole.id
+            };
+            //getRole.collection.loadData(data);
+            return
+        }
+        //多选取得父项机构的角色列表
+        //App.Services.ozRole.loadData(data);//此处需要判断父项id，父项id如何写入？
     },
 
+    //返回机构/成员的url和id
+    getRole:function(model){
+        var id = model.get("userId");
+        if(id){
+            return {collection:App.Services.userRole,id:id};//返回指定用户的角色列表，使用不同的collection,使用同一view，父项只能是组织
+        }else if(model.get("orgId")){
+            return {collection:App.Services.ozRole,id:id};//返回指定机构的角色列表
+        }
+    },
     //排序
-    comparator:function(){
-
-    }
-
+    comparator:function(){}
 });
-
-
-
-

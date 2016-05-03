@@ -1,22 +1,22 @@
 /*
- * @require  /services/views/auth/index.es6
+ * @require  /services/views/auth/member/services.member.detail.js
  */
 App.Services.windowRoleList=Backbone.View.extend({
 
-    tagName:"ul",
+    tagName:"div",
     events:{},
 
-    template:_.templateUrl("/services/tpls/auth/windows/services.member.window.detail.html"),
+    template:_.templateUrl("/services/tpls/auth/member/services.member.ozlist.html"),
     render:function(){
         this.$el.html(this.template);
         return this;
     },
     initialize:function(){
-       this.listenTo(App.Services.ozRole.collection,"add",this.addOne);
+       this.listenTo(App.Services.role.collection,"add",this.addOne);
     },
     addOne:function(model){
         var newView = new App.Services.windowRoleDetail({model:model});
-        this.$el.append(newView.render().el);
+        this.$("ul").append(newView.render().el);
     },
 
     //排序
