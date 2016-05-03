@@ -23,6 +23,8 @@ App.Services.roleDetail=Backbone.View.extend({
     modify:function(){
         //框架
         var frame = new App.Services.roleWindowIndex().render().el;
+        $(".mod-dialog-masklayer").hide();
+
         //初始化窗口
         App.Services.batchAwardWindow = new App.Comm.modules.Dialog({
             title:"新建角色",
@@ -39,17 +41,25 @@ App.Services.roleDetail=Backbone.View.extend({
 
         //加载功能，给已角色有的功能选择状态
         var _this = this;
-        App.Services.roleFun.loadData({},function(){
+        var data = {};
+        App.Services.roleFun.loadData(data,function(){
             $("#selectedRoleName").val(_this.model.get("name")).attr("disabled","disabled"); //暂时写入
             var func = _this.model.get("functions");
+            //为当前角色在父项功能列表中功能设置选择状态
             App.Services.roleFun.collection.each(function(item){
+                if(func && func.length){
                     for(var i = 0 ; i < func.length ; i ++){
                         if(item.get("id") == func[i]["id"]){
                             item.set({"checked":true});
                             return
                         }
                     }
-                });
+                }
+            });
+
+            $(".mod-dialog-masklayer").show();
+
+
         });
     },
 
