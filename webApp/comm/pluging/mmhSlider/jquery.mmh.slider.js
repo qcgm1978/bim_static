@@ -17,9 +17,9 @@
 	}
 	$.fn.mmhSlider.methods = {
 		init: function($dom, setting) {
+			var _def=$.fn.mmhSlider.defaults;
 			var delay = setting.delay,
-				_index = 0,
-				_pause=$.fn.mmhSlider.defaults._pause;
+				_pause=_def._pause;
 			$.fn.mmhSlider.methods.render($dom, setting, function(data) {
 				//定时器任务
 				setInterval(function() {
@@ -38,27 +38,29 @@
 
 		},
 		
+		cache:function(i){
+			var a=[1,2,3,4,0]
+			return a[i];
+		},
+		
 		next:function($dom,setting,data){
+			var _this=this;
+			var _index=$.fn.mmhSlider.defaults._index;
 			var $current = $dom.find("li.selected"),
-				$next = $current.next(),
-				_index=$.fn.mmhSlider.defaults._index;
-			if ($next.length === 0) {
-				$next = $dom.find('li').first();
-				_index = 0;
-				$dom.find("label").last().toggleClass('flag');
-			} else {
-				$dom.find("label").eq(_index).toggleClass('flag');
-				_index++;
-			}
+				$currentLabel = $dom.find("label").eq(_index),
+				$nextItem = $dom.find("li").eq(_this.cache(_index)),
+				$nextLable=$dom.find("label").eq(_this.cache(_index));
+			
 			$current.removeClass('selected').addClass('remove');
-			$next.removeClass('remove').addClass('selected');
-			$dom.find("label").eq(_index).toggleClass('flag');
-			setting.onChange(data[_index]);
-			$dom.find(".slideTitle").html(data[_index].title)
+			$nextItem.removeClass('remove').addClass('selected');
+			$currentLabel.toggleClass('flag');
+			$nextLable.toggleClass('flag');
+			$.fn.mmhSlider.defaults._index=_this.cache(_index);
+			setting.onChange(data[_this.cache(_index)]);
 		},
 		
 		random:function($dom,setting,data){
-			var $current = $dom.find("li.selected");
+			var $current = $dom.find("li.selected"),
 				_index=$.fn.mmhSlider.defaults._index;
 			$current.removeClass('selected').addClass('remove');
 			$dom.find("label").eq($current.index()).toggleClass('flag');

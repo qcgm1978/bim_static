@@ -1,0 +1,48 @@
+<div class="keyUserMain">
+        <div class="keyUserList">
+            <div class="keyul-title">
+                <span class="newKeyUsers"><i style="background:url('/static/dist/images/services/images/service_ico.png')no-repeat 0 -220px"></i>新增</span>
+                关键用户（<span><%= keyUser.length %></span>）
+            </div>
+            <ul>
+                <% _.each(keyUser,function(user){ %>
+                <li>
+                    <span class="delete"></span>
+                    <i class="keyListHead"></i><%= user.orgId %>
+                </li>
+                <% })%>
+                <% console.log(keyUser); %>
+
+
+            </ul>
+        </div>
+        <div class="keyBody">
+            <div class="bdB-c">
+                <h2>基本信息</h2>
+                <div class="head" style="background-image: url('/static/dist/images/service/images/keyUserHead.gif') ;"></div>
+                <ul class="baseInfo">
+                    <li><span>姓名：</span>艾馨强</li>
+                    <li><span>账号：</span>aixinqiang</li>
+                    <li><span>职务：</span>主任工程师</li>
+                    <li><span>部门：</span>大连万达集团股份有限公司大连万达集团股份有限公司大连万达集团股份有限公司大连万达集团股份有限公司大连万达集团股份有限公司大连万达集团股份有限公司大连万达集团股份有限公司大连万达集团股份有限公司大连万达集团股份有限公司大连万达集团股份有限公司大连万达集团股份有限公司大连万达集团股份有限公司大连万达集团股份有限公司大连万达集团股份有限公司大连万达集团股份有限公司大连万达集团股份有限公司大连万达集团股份有限公司大连万达集团股份有限公司大连万达集团股份有限公司</li>
+                </ul>
+            </div>
+            <div class="bdB-c proe">
+                <h2>项目权限（<span>3</span>）<span class="edit"></span></h2>
+                <ul>
+                    <li><div class="name"><span class="proImg"><img src="/static/dist/images/service/images/keyUser_proImg.gif" width="100%"></span><a href="#">雅安万达广场</a></div><div class="time">2016-02-13----2017-07-21</div><div>四川-雅安</div></li>
+                    <li><div class="name"><span class="proImg"><img src="/static/dist/images/service/images/keyUser_proImg.gif" width="100%"></span><a href="#">雅安万达广场</a></div><div class="time">2016-02-13----2017-07-21</div><div>四川-雅安</div></li>
+                    <li><div class="name"><span class="proImg"><img src="/static/dist/images/service/images/keyUser_proImg.gif" width="100%"></span><a href="#">雅安万达广场</a></div><div class="time">2016-02-13----2017-07-21</div><div>四川-雅安</div></li>
+                </ul>
+            </div>
+            <div class="bdB-c oz">
+                <h2>部门权限（<span>3</span>）<span class="edit"></span></h2>
+                <div class="keyHead"></div>
+                <ul>
+                    <li><div class="name">研发一部</div><div>大连万达集团有限公司/信息管理中心/研发一部</div></li>
+                    <li><div class="name">研发一部</div><div>大连万达集团有限公司/信息管理中心/研发一部</div></li>
+                    <li><div class="name">研发一部</div><div>大连万达集团有限公司/信息管理中心/研发一部</div></li>
+                </ul>
+            </div>
+        </div>
+    </div>

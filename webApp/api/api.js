@@ -27,6 +27,9 @@ App.API = {
 		fetchServicesUserRoleList:'https://bim.wanda.cn/platform/user/{userId}/role',
 		fetchServiceMemberOuterList:'platform/auth/org?outer=true',//外部组织-品牌／公司／成员列表
 		fetchServiceMemberInnerList:'platform/auth/org?outer=false&parentId=&includeUsers=',//内部-组织／成员列表
+		fetchServiceKeyUserList:'platform/auth/org?outer=false&parentId=&includeUsers=',//关键用户列表
+		fetchServiceStep1:'platform/auth/org?outer=false&parentId=&includeUsers=',//项目列表
+
 
 
 		//代办$chars
@@ -169,6 +172,7 @@ App.API = {
 		fetchBodyContentProclamation :'/dataJson/bodyContent/bodyContent.proclamation.json',
 
 		//services
+
 		fetchServicesMemberList:'/dataJson/services/member/services.member.list.json',//组织-混合列表
 		fetchServicesRolesList:'/dataJson/services/member/services.member.roles.json',//角色-功能列表
 		fetchServiceFunList: '/dataJson/services/member/services.role.fun.json',//功能列表
@@ -178,6 +182,9 @@ App.API = {
 		fetchServicesMemberInnerList:'/dataJson/services/member/services.member.list.json',//内部-组织／成员列表
 		fetchServicesProjectMemberProjectList:'/dataJson/services/member/services.project.member.projects.json',//项目成员/项目管理
 		fetchServicesProjectMemberMemberList:'/dataJson/services/member/services.project.member.members.json',//项目成员/项目管理
+	  fetchServiceKeyUserList:'/dataJson/services/services.KeyUser.json',//关键用户列表
+	  fetchServiceStep1:'/dataJson/services/services.step1.json',//项目列表
+
 
 
 		//代办
