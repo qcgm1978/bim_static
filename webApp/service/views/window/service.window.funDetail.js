@@ -6,7 +6,7 @@ App.Service.windowFunDetail=Backbone.View.extend({
 
     tagName:'li',
 
-    template:_.templateUrl("/service/tpls/window/service.window.detail.html"),
+    template:_.templateUrl("/service/tpls/auth/windows/services.role.window.detail.html"),
     events:{
         "click .funName":"choose"
     },

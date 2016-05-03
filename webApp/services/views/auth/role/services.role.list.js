@@ -1,8 +1,6 @@
 /*
- * @require  /services/views/auth/member/services.role.detail.js
+ * @require  /services/views/auth/role/services.role.window.index.js
  */
-
-var App = App || {};
 App.Services.roleList=Backbone.View.extend({
 
     tagName:"div",
@@ -28,13 +26,29 @@ App.Services.roleList=Backbone.View.extend({
         var newView = new App.Services.roleDetail({model:model});
         this.$("#roleList").append(newView.render().el);
     },
+
+
     //创建新角色
     newRole:function(){
-        //前期菜单准备
-        App.Services.window.init();//窗口
-        $(".serviceWindow").append(new App.Services.windowRole().render().$el);//外框
-        App.Services.fun.loadData();
-        $("#mask").show();
+        //框架
+        var frame = new App.Services.roleWindowIndex().render().el;
+
+        //初始化窗口
+        App.Services.batchAwardWindow = new App.Comm.modules.Dialog({
+            title:"新建角色",
+            width:600,
+            height:500,
+            isConfirm:false,
+            isAlert:false,
+            okCallback:function(){},
+            cancelCallback:function(){},
+            closeCallback:function(){},
+            message:frame
+        });
+
+        App.Services.roleFun.loadData({},function(){
+
+        });
 
     },
 

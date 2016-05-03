@@ -5,24 +5,22 @@ var App = App || {};
 App.BodyContent.control= {
 
     init : function(){
+		
+
 
         $("#contains").empty();
         new App.BodyContent.App().render(); //渲染框架
         $("#todos").html(new App.BodyContent.todosList().render().el);
-       // $("#slideBox").html(new App.BodyContent.slideList().render().el);
         $(".conMonth .article table").append(new App.BodyContent.monthEndList().render().el);
         $(".conMonth .article table").append(new App.BodyContent.monthStartList().render().el);
         $("#proclamation").html(new App.BodyContent.proclamationList().render().el);
 		
-        this.loadData(this.todoCollection);
+        this.loadData(this.todoCollection,{});
         this.loadData(this.slideCollection);
-        this.loadData(this.monthEndCollection);
-        this.loadData(this.monthStartCollection);
+        this.loadData(this.monthEndCollection,{type:2,useId:'wb'});
+        this.loadData(this.monthStartCollection,{type:1,useId:'wb'});
         this.loadData(this.proCollection);
 
-      //  slide.initialize({element:".imgContainer", slideTime : 4000, tagTime : 500});
-		
-		
 
         $(".conMonth .conHeader span").on("click",function(){
             if($(this).hasClass("active"))return;
@@ -85,14 +83,17 @@ App.BodyContent.control= {
         }
     })),
 
-    loadData : function(collection) {
+    loadData : function(collection,data) {
+    	
         //数据重置
         collection.reset();
         // load list
+        data=data||{};
         collection.fetch({
-            data: {},
+            data: data,
             success: function(collection, response, options) {
-                //如果是slide内容，写入数值
+            	var _$container=null;
+                //轮播插件是jquery对象、所以直接加载显示、不经过Backbone
                 if(collection ==App.BodyContent.control.slideCollection){
                     $(".mmhSlider").mmhSlider({
 						delay:5000,
@@ -101,6 +102,19 @@ App.BodyContent.control= {
 							$("#slideTitle").html(d.title);
 						}
 					})
+                }
+                //空数据提示视图
+                if(!collection.models.length){
+	                if(collection ==App.BodyContent.control.todoCollection){
+	                	_$container=$("#todoContainer");
+	                }
+	                if(collection ==App.BodyContent.control.monthEndCollection){
+	                	_$container=$("#endTaskContainer");
+	                }
+	                if(collection ==App.BodyContent.control.proCollection){
+	                	_$container=$("#postContainer");
+	                }
+	                _$container && _$container.html("<span class='noDataTip'>暂无内容</span>")
                 }
             }
         });

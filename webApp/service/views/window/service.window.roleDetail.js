@@ -1,7 +1,6 @@
 /*
  * @require  /service/collection/role.list.js
  * */
-var App = App || {};
 App.Service.window.roleDetail=Backbone.View.extend({
 
     tagName:'li',

@@ -35,7 +35,7 @@ App.Services.System=Backbone.View.extend({
 
 		}else if (type=="extend") {
 			//扩展
-
+			viewer=new App.Services.System.ExtendAttrManager();
 		} 
 
 		this.$("#systemContainer").html(viewer.render().el);

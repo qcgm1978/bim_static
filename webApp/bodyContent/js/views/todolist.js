@@ -8,6 +8,7 @@ App.BodyContent.todosList = Backbone.View.extend({
     },
     render:function(){
         this.$el.html(this.template);
+        this.$el.find(".article").html("<span class='noDataTip'>暂无内容</span>")
         return this;
     },
 

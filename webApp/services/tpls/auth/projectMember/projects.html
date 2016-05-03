@@ -1,16 +1,14 @@
-
-  <li>我管理的项目 ( 3 )</li>
-  <li class="project active">
-    <div><img src="/static/dist/images/services/images/demoProject.png"></div>
-    <div>
-      <h4>雅安万达广场</h4>
-      <p>四川 雅安       2016-02-13—2017-07-21</p>
-    </div>
-  </li>
-  <li class="project">
-    <div><img src="/static/dist/images/services/images/demoProject.png"></div>
-    <div>
-      <h4>雅安万达广场</h4>
-      <p>四川 雅安       2016-02-13—2017-07-21</p>
-    </div>
-  </li>
+<li>项目管理（<%=data.length%>）</li>
+<% _.each(data,function(item,index){ %>
+	<li class="project<% if(index==0) { %> active <% } %>">
+		<div><img src="<%= item.image %>"></div>
+		<div>
+			<h4><%= item.name %></h4>
+			<p>
+				<%= item.address %>
+					<%= item.startTime %>—
+						<%= item.endTime %>
+			</p>
+		</div>
+	</li>
+<% }) %>

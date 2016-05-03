@@ -4,15 +4,17 @@ App.API = {
 
 	Settings: {
 		hostname: "http://bim.wanda-dev.cn/",
-		debug: true
+		debug: false
 	},
 
 	URL: {
 
 		//首页bodyContent数据
-		fetchBodyContentTodos :'platform/todo?status=1&pageIndex=1&pageItemCount=6',
-		fetchBodyContentMonthEnd :'dataJson/bodyContent/bodyContent.monthEnd.json',
-		fetchBodyContentMonthStart :'dataJson/bodyContent/bodyContent.monthStart.json',
+		fetchBodyContentTodos :'platform/todo',
+		//本月开始、到期接口
+		fetchBodyContentMonthEnd :'sixD/plan/concern/index',//?type={type}&userId={userId}
+		fetchBodyContentMonthStart :'sixD/plan/concern/index',
+		
 		fetchBodyContentSlide :'dataJson/bodyContent/bodyContent.slide.json',
 		fetchBodyContentMmhSlide :'dataJson/bodyContent/bodyContent.mmhSlider.json',
 		fetchBodyContentProclamation :'dataJson/bodyContent/bodyContent.proclamation.json',
@@ -22,6 +24,7 @@ App.API = {
 		fetchServiceRolesList:'platform/auth/role',//角色-功能列表
 		fetchServiceFunList: 'platform/auth/function',//功能列表
 		fetchServiceOzRoleList:'platform/org/{orgId}/role?outer={outer}',//机构角色列表
+		fetchServicesUserRoleList:'https://bim.wanda.cn/platform/user/{userId}/role',
 		fetchServiceMemberOuterList:'platform/auth/org?outer=true',//外部组织-品牌／公司／成员列表
 		fetchServiceMemberInnerList:'platform/auth/org?outer=false&parentId=&includeUsers=',//内部-组织／成员列表
 		fetchServiceKeyUserList:'platform/auth/org?outer=false&parentId=&includeUsers=',//关键用户列表
@@ -50,7 +53,7 @@ App.API = {
 
 		fetchScene: "view/{etag}/{sourceId}/tree", // 获取楼层,专业信息
 		fetchCategory: "view/{etag}/{sourceId}/categories", // 获取构件信息
-		fetchCoding: 'view/category/coding', //获取构件编码信息
+		fetchCoding: 'view/category/coding/{etag}', //获取构件编码信息
 
 		fetchFloors: 'view/{etag}/{sourceId}/miniature/map', //获取模型楼层信息
 		fetchAxisGrid: 'model/{etag}/metadata/gridAndLevel.json', //获取楼层地图,轴网信息
@@ -98,8 +101,8 @@ App.API = {
 
 		fetchPlanProperties: "", //属性
 
-		//陈本 
-		fetchCostReference: "sixD/{projectId}/{projectVersionId}/cost/summary", // 清单 
+		//陈本
+		fetchCostReference: "sixD/{projectId}/{projectVersionId}/cost/summary", // 清单
 		fetchCostChange: "platform/auditSheet?type=9", // 变更
 		fetchCostVerification: "sixD/{projectId}/{projectVersionId}/cost/summary?noElement=true", // 效验
 		fetchCostVerificationCate: "sixD/{projectId}/{projectVersionId}/cost/nocost/cate", // 效验 图元未关联清单 类型
@@ -128,10 +131,10 @@ App.API = {
 		createNewFolder: "doc/{projectId}/{projectVersionId}/file", // 创建新文件夹 ?parentId={parentId}&filePath={filePath}
 
 		//项目 变更 列表
-		fileList:"doc/internal/{projectId}/{versionId}/differ", //变更列表 		
+		fileList:"doc/internal/{projectId}/{versionId}/differ", //变更列表
 		projectChangeList:"sixD/{projectId}/{projectVersionId}/cost/comparison",// ?fileVerionId={fileVerionId}&baseFileVerionId={baseFileVerionId}
 
-		projectDesinProperties:"sixD/{projectId}/{projectVersionId}/property/comparison",//?baseFileVerionId={baseFileVerionId}&fileVerionId={fileVerionId}&sceneId={sceneId}&elementId={elementId}		
+		projectDesinProperties:"sixD/{projectId}/{projectVersionId}/property/comparison",//?baseFileVerionId={baseFileVerionId}&fileVerionId={fileVerionId}&sceneId={sceneId}&elementId={elementId}
 		projectDesinPropertiesCost:"sixD/{projectId}/{projectVersionId}/cost/edo/comparison", //属性成本 ?baseProjectVerionId={baseProjectVerionId}&sceneId={sceneId}&elementId={elementId}
 		//TEST
 		projectChangeListTest:"/dataJson/project/projectChange/list.json",
@@ -152,7 +155,8 @@ App.API = {
 		"servicesFlowList":"platform/set/flow", // 列表 ?categoryId={categoryId}
 		"servicesFlowUpdate":"platform/set/flow/update",// 更新类别
 		"servicesFlowDel":"platform/set/flow/del",// 删除 ?id={id}
-		"servicesFlowIndex":"platform/set/flow/serial", // 改变位置 ?id={id} 
+		"servicesFlowIndex":"platform/set/flow/serial", // 改变位置 ?id={id}
+		"servicesFolwMove":"platform/set/flow/serial", // ?id={id} move up  or down
 
 		test: ""
 	},
@@ -160,22 +164,27 @@ App.API = {
 	DEBUGURL: {
 
 		//首页bodyContent数据
-		fetchBodyContentTodos :'platform/todo?status=1&pageIndex=1&pageItemCount=30',
-		fetchBodyContentMonthEnd :'/dataJson/bodyContent/bodyContent.monthEnd.json',
-		fetchBodyContentMonthStart :'/dataJson/bodyContent/bodyContent.monthStart.json',
+		fetchBodyContentTodos :'/dataJson/bodyContent/bodyContent.todos.json',
+		fetchBodyContentMonthEnd :'sixD/plan/concern/index',
+		fetchBodyContentMonthStart :'sixD/plan/concern/index',
 		fetchBodyContentSlide :'/dataJson/bodyContent/bodyContent.slide.json',
 		fetchBodyContentMmhSlide :'dataJson/bodyContent/bodyContent.mmhSlider.json',
 		fetchBodyContentProclamation :'/dataJson/bodyContent/bodyContent.proclamation.json',
 
 		//services
-		fetchServicesMemberList:'/dataJson/services/services.member.list.json',//组织-混合列表
-		fetchServicesRolesList:'/dataJson/services/services.member.roles.json',//角色-功能列表
-		fetchServiceFunList: '/dataJson/services/services.role.fun.json',//功能列表
-		fetchServicesSubRoleList:'/dataJson/services/services.sub.role.json',
-		fetchServicesMemberOuterList:'/dataJson/services/services.member.list.json',//外部组织-品牌／公司／成员列表
-		fetchServicesMemberInnerList:'/dataJson/services/services.member.list.json',//内部-组织／成员列表
-		fetchServiceKeyUserList:'/dataJson/services/services.KeyUser.json',//关键用户列表
-		fetchServiceStep1:'/dataJson/services/services.step1.json',//项目列表
+
+		fetchServicesMemberList:'/dataJson/services/member/services.member.list.json',//组织-混合列表
+		fetchServicesRolesList:'/dataJson/services/member/services.member.roles.json',//角色-功能列表
+		fetchServiceFunList: '/dataJson/services/member/services.role.fun.json',//功能列表
+		fetchServicesOzRoleList:'/dataJson/services/member/services.oz.role.json',
+		fetchServicesUserRoleList:'/dataJson/services/member/services.user.role.json',
+		fetchServicesMemberOuterList:'/dataJson/services/member/services.member.list.json',//外部组织-品牌／公司／成员列表
+		fetchServicesMemberInnerList:'/dataJson/services/member/services.member.list.json',//内部-组织／成员列表
+		fetchServicesProjectMemberProjectList:'/dataJson/services/member/services.project.member.projects.json',//项目成员/项目管理
+		fetchServicesProjectMemberMemberList:'/dataJson/services/member/services.project.member.members.json',//项目成员/项目管理
+	  fetchServiceKeyUserList:'/dataJson/services/services.KeyUser.json',//关键用户列表
+	  fetchServiceStep1:'/dataJson/services/services.step1.json',//项目列表
+
 
 
 		//代办

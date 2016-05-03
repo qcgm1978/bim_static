@@ -46,6 +46,8 @@ App.Services.System.CategoryManager = Backbone.View.extend({
 		var opts = {
 			title: "新增业务类别",
 			width: 601,
+			isConfirm:false,
+			isAlert:true,
 			cssClass: "addNewCategoryDialog",
 			message: dialogHtml,
 			okCallback: () => {

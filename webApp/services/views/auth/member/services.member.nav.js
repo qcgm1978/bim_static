@@ -25,45 +25,45 @@ App.Services.MemberNav=Backbone.View.extend({
     //外部用户
     outer:function(){
 
-        this.loadData("outer");
+        //this.loadData("outer");
         App.Services.MemberType = "outer";
-        console.log(App.Services.Member.innerCollection);
-        App.Services.Member.loadData(App.Services.Member.innerCollection);
-        //App.Services.ozRole.loadData();//获取父项数据
+        this.loadData();
+        //App.Services.Member.loadData(App.Services.Member.outerCollection);
     },
     //内部用户
     inner:function(){
 
-        this.loadData("inner");
+        //this.loadData("inner");
         App.Services.MemberType = "inner";
-        App.Services.Member.loadData(App.Services.Member.outerCollection);
-        //App.Services.ozRole.loadData();//获取父项数据
+
+        //App.Services.Member.loadData(App.Services.Member.innerCollection);
+        this.loadData();
     },
 
 
     //加载子组织，刷新右侧组织和员工列表
-    loadData:function(self){
+    loadData:function(){
 
-        var collection = App.Services.Member[App.Services.MemberType + "Collection"];
+        var _thisType = App.Services.MemberType;
+        var collection = App.Services.Member[_thisType + "Collection"];
+
+        $("#blendList").empty();//清空右侧列表
+        //输入数据
+
         //获取数据，将会刷新右侧视图
         App.Services.Member.loadData(collection,{},function(response){
-            $("#blendList").empty();
+            //菜单
             if (response.data.org.length) {
                 //样式处理
                 this.$("div").remove("active");
-                $("." + self).addClass("active");
+                $("#" + _thisType).addClass("active");
                 $(".serviceOgList span").removeClass("active");//唯一选项
-                $("." + self + " > span").addClass("active");//选中状态
-                //状态清空
+                $("#" + _thisType + " > span").addClass("active");//选中状态
+                //如果有则清空直接子列表？？结构不正确
                 this.$(".childOz").empty();
-                for(var z = 0 ;z < response.data.org.length ; z++){
-                    response.data.org[z].type = options;     //设定类型,内部还是外部
-                }
-
                 //菜单渲染
-                this.$("." + self +"+ .childOz").html(new App.Services.MemberozList(response.data.org).render().el);
+                this.$("#" + _thisType +"+ .childOz").html(new App.Services.MemberozList(response.data.org).render().el);
             }
-
         });
     }
 });

@@ -1,4 +1,4 @@
-<td><span class="title"><%= title %></span></td>
-<td><a href="<%= targetUrl %>" class="desc"><%= desc %></a></td>
-<td class="lev"><span class="level"><%= level %></span></td>
-<td class="time"><span class="receivedTime"><%= new Date(receivedTime).format("yyyy-MM-dd") %></span></td>
+<td><span class="title"><%= planName||"--" %></span></td>
+<td><a href="blank" class="desc"><%= taskName||"--" %></a></td>
+<td class="lev"><span class="level"><%= taskLevel||"0" %></span></td>
+<td class="time"><span class="receivedTime"><%= new Date(planStartDate).format("yyyy-MM-dd") %></span></td>

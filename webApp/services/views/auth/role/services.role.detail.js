@@ -21,33 +21,36 @@ App.Services.roleDetail=Backbone.View.extend({
     },
 
     modify:function(){
-        App.Services.window.init();
+        //框架
+        var frame = new App.Services.roleWindowIndex().render().el;
+        //初始化窗口
+        App.Services.batchAwardWindow = new App.Comm.modules.Dialog({
+            title:"新建角色",
+            width:600,
+            height:500,
+            isConfirm:false,
+            isAlert:false,
+            okCallback:function(){},
+            cancelCallback:function(){},
+            closeCallback:function(){},
+            message:frame
+        });
 
-        $(".serviceWindow").append( new App.Services.windowRole().render().el);
 
-        //没起作用
-        var $this =this;
-        //值
-        var func= this.model.get("functions");
-        App.Services.fun.loadData(function(){
-
-            $("#selectedRoleName").val($this.model.get("name")).attr("disabled","disabled"); //暂时写入
-            console.log($("#selectedRoleName").val());
-
-            App.Services.fun.collection.each(function(item){
-                for(var i = 0 ; i < func.length ; i ++){
-                    if(item.get("id") == func[i]["id"]){
-                        item.set({"checked":true});
-                        return
+        //加载功能，给已角色有的功能选择状态
+        var _this = this;
+        App.Services.roleFun.loadData({},function(){
+            $("#selectedRoleName").val(_this.model.get("name")).attr("disabled","disabled"); //暂时写入
+            var func = _this.model.get("functions");
+            App.Services.roleFun.collection.each(function(item){
+                    for(var i = 0 ; i < func.length ; i ++){
+                        if(item.get("id") == func[i]["id"]){
+                            item.set({"checked":true});
+                            return
+                        }
                     }
-                }
-            });
-        });//异步获取功能数据
-
-
-        $("#mask").show();
-        //请求个人角色列表设置,
-        //获取数据轮询，如果与角色列表相同则勾选选项
+                });
+        });
     },
 
     delete:function(){

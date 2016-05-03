@@ -6,7 +6,6 @@ App.Services.AuthNav = Backbone.View.extend({
 
 	tagName:"div",
 
-	className:"mgXD20",
 
 	template:_.templateUrl("/services/tpls/auth/auth.nav.html",true),
 
@@ -23,7 +22,7 @@ App.Services.AuthNav = Backbone.View.extend({
 	},
 //面包屑
 	breadCrumb : function(ele){
-		//console.log(ele);
+
 		$(ele).addClass("active").siblings("li").removeClass("active");
 		var n = $(ele).index();
 		var text = this.$el.find("li").eq(n).text();
@@ -48,6 +47,7 @@ App.Services.AuthNav = Backbone.View.extend({
 	roleManager : function(){
 		$(".serviceBody").empty();
 		this.breadCrumb(this.$el.find(".roleManager"));
+		this.$el.find(".roleManager").addClass("active").siblings("li").removeClass("active");
 		App.Services.init("auth","roleManager");
 		App.Services.role.init();
 	},

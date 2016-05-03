@@ -27,14 +27,14 @@
 				}
 
 				if ($.isFunction(that.settings.click)) {
-					that.settings.click.call(that);
+					that.settings.click.call(that,$(this).hasClass('selected'));
 				}
 			});
 		}
 
 		this.init = function() {
 			this.bindEvent();
-		}
+		}  
 
 		this.init();
 
