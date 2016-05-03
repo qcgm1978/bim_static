@@ -16,7 +16,7 @@ App.API = {
 		fetchBodyContentMonthStart :'sixD/plan/concern/index',
 		
 		fetchBodyContentSlide :'dataJson/bodyContent/bodyContent.slide.json',
-		fetchBodyContentMmhSlide :'dataJson/bodyContent/bodyContent.mmhSlider.json',
+		fetchBodyContentMmhSlide :'platform/project',
 		fetchBodyContentProclamation :'dataJson/bodyContent/bodyContent.proclamation.json',
 
 		//services
@@ -26,9 +26,12 @@ App.API = {
 		fetchServiceOzRoleList:'platform/org/{orgId}/role?outer={outer}',//机构角色列表
 		fetchServicesUserRoleList:'https://bim.wanda.cn/platform/user/{userId}/role',
 		fetchServiceMemberOuterList:'platform/auth/org?outer=true',//外部组织-品牌／公司／成员列表
-		fetchServiceMemberInnerList:'platform/auth/org?outer=false&parentId=&includeUsers=',//内部-组织／成员列表
+		fetchServiceMemberInnerList:'platform/auth/org?outer=false',//内部-组织／成员列表
+		fetchServiceMemberList:'platform/auth/org',//内部-组织／成员列表
 		fetchServiceKeyUserList:'platform/auth/org?outer=false&parentId=&includeUsers=',//关键用户列表
 		fetchServiceStep1:'platform/auth/org?outer=false&parentId=&includeUsers=',//项目列表
+		fetchServicesProjectMemberProjectList:'platform/auth/user/{userId}/dataPrivilege/project',//项目成员/项目管理
+		fetchServicesProjectMemberMemberList:'platform/auth/{dataPrivilegeId}/member',//项目成员/项目管理
 
 
 

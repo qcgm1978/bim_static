@@ -20,6 +20,8 @@
 			var _def=$.fn.mmhSlider.defaults;
 			var delay = setting.delay,
 				_pause=_def._pause;
+				
+			this.cacheArray(setting.data.length);
 			$.fn.mmhSlider.methods.render($dom, setting, function(data) {
 				//定时器任务
 				setInterval(function() {
@@ -37,9 +39,16 @@
 			})
 
 		},
-		
+		cacheArray:function(size){
+			var a=[];
+			for(var i=1;i<size;i++){
+				a.push(i);
+			}
+			a.push(0);
+			$.fn.mmhSlider.methods.caches=a;
+		},
 		cache:function(i){
-			var a=[1,2,3,4,0]
+			var a=$.fn.mmhSlider.methods.caches;
 			return a[i];
 		},
 		
@@ -67,7 +76,7 @@
 			$dom.find("label").eq(_index).toggleClass('flag');
 			$dom.find("li").eq(_index).removeClass('remove').addClass('selected');
 			setting.onChange(data[_index]);
-			$dom.find(".slideTitle").html(data[_index].title)
+			$dom.find(".slideTitle").html(data[_index].title||data[_index].name)
 		},
 
 		render: function($dom, setting, callback) {
@@ -79,14 +88,14 @@
 					__ = toolTpl;
 				_ = _.replace('{class}', i == 0 ? 'selected' : 'remove');
 				__ = __.replace('{class}', i == 0 ? 'nonFlag flag' : 'nonFlag');
-				_ = _.replace('{src}', data[i].image);
+				_ = _.replace('{src}', data[i].image||data[i].logo||'/static/dist/images/bodyContent/images/1683103954.jpg');
 				result.push(_);
 				tools.push(__);
 			}
 			tools.push("</div>");
 			result.push("</ul>");
 			result = result.concat(tools);
-			result.push('<div class="slideTitle">' + data[0].title + '</div>');
+			result.push('<div class="slideTitle">' + (data[0].title || data[0].name)+ '</div>');
 			$dom.prepend(result.join(""));
 			
 			setting.onChange(data[0]);
