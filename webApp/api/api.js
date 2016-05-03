@@ -24,6 +24,9 @@ App.API = {
 		fetchServiceOzRoleList:'platform/org/{orgId}/role?outer={outer}',//机构角色列表
 		fetchServiceMemberOuterList:'platform/auth/org?outer=true',//外部组织-品牌／公司／成员列表
 		fetchServiceMemberInnerList:'platform/auth/org?outer=false&parentId=&includeUsers=',//内部-组织／成员列表
+		fetchServiceKeyUserList:'platform/auth/org?outer=false&parentId=&includeUsers=',//关键用户列表
+		fetchServiceStep1:'platform/auth/org?outer=false&parentId=&includeUsers=',//项目列表
+
 
 
 		//代办$chars
@@ -171,6 +174,8 @@ App.API = {
 		fetchServicesSubRoleList:'/dataJson/services/services.sub.role.json',
 		fetchServicesMemberOuterList:'/dataJson/services/services.member.list.json',//外部组织-品牌／公司／成员列表
 		fetchServicesMemberInnerList:'/dataJson/services/services.member.list.json',//内部-组织／成员列表
+		fetchServiceKeyUserList:'/dataJson/services/services.KeyUser.json',//关键用户列表
+		fetchServiceStep1:'/dataJson/services/services.step1.json',//项目列表
 
 
 		//代办
