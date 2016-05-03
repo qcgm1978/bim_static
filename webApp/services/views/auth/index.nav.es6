@@ -1,6 +1,7 @@
-/*
- * @require  /services/collections/index.es6
- * */
+/**
+ * @require /services/collections/auth/keyUser/keyUser.js
+ */
+
 App.Services.AuthNav = Backbone.View.extend({
 
 	tagName:"div",
@@ -21,6 +22,7 @@ App.Services.AuthNav = Backbone.View.extend({
 	},
 //面包屑
 	breadCrumb : function(ele){
+
 		$(ele).addClass("active").siblings("li").removeClass("active");
 		var n = $(ele).index();
 		var text = this.$el.find("li").eq(n).text();
@@ -52,8 +54,17 @@ App.Services.AuthNav = Backbone.View.extend({
 	keyUser : function(){
 		$(".serviceBody").empty();
 		this.breadCrumb(this.$el.find(".keyUser"));
-		//App.Services.init("auth","keyUser");
-		//$(".serviceBody").html(new App.Services.keyUserFrame().render().el); //框架
+		$(".serviceBody").html(new App.Services.keyUserFrame().render().el); //框架
+		$("#mask").html(new App.Services.addKeyUser().render().el); //框架
+		$("#mask").show();
+
+		App.Services.KeyUser.loadData(App.Services.KeyUser.KeyUserList,'',function(r){
+			console.log( r)
+
+			if(r && !r.code && r.data){
+				App.Services.KeyUser.KeyUserList.set(r.data);
+			}
+		});
 		//主模板  四个列表：  关键用户列表 （默认第一个？）  关键要用户基本信息  项目权限   部门权限
 		//新增关键用户，注意步骤，关联性
 		//删除关键用户弹窗

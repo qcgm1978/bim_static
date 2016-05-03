@@ -50,12 +50,20 @@ App.Services.System.FolwContainerListDetail = Backbone.View.extend({
 
 	//移动
 	listMove($target, dirc) {
+
+		var nextId;
+		if (dirc=="up") {
+			nextId=$target.prev().data("id");
+		}else{
+			nextId=$target.next().data("id");
+		}
+
 		var id = $target.data("id"),
 			that = this,
 			data = {
 				URLtype: "servicesFolwMove",
 				data: {
-					id: id,
+					ids: id+","+nextId,
 					type: dirc == 'up' ? 0 : 1
 				}
 			}
@@ -104,8 +112,15 @@ App.Services.System.FolwContainerListDetail = Backbone.View.extend({
 
 	//移动完成之后
 	afterMove() {
-		$("#systemContainer .flowListBody li").find(".myIcon-up-disable").toggleClass("myIcon-up myIcon-up-disable").end().find(".myIcon-down-disable").toggleClass("myIcon-down myIcon-down-disable").end().
+
+		var $flowListBodyLi=$("#systemContainer .flowListBody li");
+		$flowListBodyLi.find(".myIcon-up-disable").toggleClass("myIcon-up myIcon-up-disable").end().find(".myIcon-down-disable").toggleClass("myIcon-down myIcon-down-disable").end().
 		first().find(".myIcon-up").toggleClass("myIcon-up myIcon-up-disable").end().end().last().find(".myIcon-down").toggleClass("myIcon-down myIcon-down-disable");
+		//重新生成 索引
+		$flowListBodyLi.each(function(i, item) {
+			$(this).find(".code").text(i + 1)
+		});
+
 	},
 
 	//更新流程
