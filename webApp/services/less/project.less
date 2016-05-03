@@ -1,0 +1,39 @@
+#projectManger { height: 100%;
+	.serviceHeader { border-bottom: 1px #ccc solid; padding-bottom: 5px; }
+	#systemContainer { margin-top: -40px; padding-top: 40px; }
+	.serviceNav { height: 38px; background-color: #eee; border-bottom: 1px #ccc solid; padding-left: 20px; position: relative; z-index: 1;
+		.item { cursor: pointer; float: left; height: 38px; line-height: 38px; width: 118px; text-align: center; border-top: 2px transparent solid;
+			&.selected { border: 1px #ccc solid; border-top: 2px solid #006ecf; border-bottom-color: #fff; background-color: #fff; }
+		}
+	}
+	.projectContainer { height: 100%; margin-top: -40px; padding-top: 40px;
+		.projectBase, .projectMapping, .projectDetail { display: none; }
+	}
+	.folwSlideBar { .header { height: 38px; line-height: 38px; padding-left: 15px; font-size: 16px; border-bottom: 1px #ccc solid; }
+		.slideBarContainer { height: 100%; margin-top: -39px; padding-top: 39px; }
+	}
+	#systemContainer .folwManager .flowSliderUl .item { height: 48px; line-height: 1.2; color: #999;
+		&.selected { .name { color: #999; }
+		}
+		.name { font-size: 14px; margin-top: 6px; margin-bottom: 2px; width: 95%; }
+		.date { margin-top: 5px; margin-left: 30px; }
+		.content { margin-left: 15px; }
+	}
+	.projectBase { margin-left: 20px;
+		.projectBg { margin: 20px 0px; border-bottom: 1px #ccc solid; padding-bottom: 20px;
+			img { height: 118px; }
+		}
+		.item { font-size: 14px; margin-bottom: 2px; }
+		.key { color: #a0a0a0; }
+		.value { color: #333; }
+	}
+	.projectMapping { .list { height: 38px; border-bottom: 1px #ccc solid; line-height: 38px;
+			.modules { width: 21%; padding-left: 15px; }
+			.name { width: 35%; }
+			.code { width: 31%; }
+			.op { width: 12%; }
+		}
+		.listHeader{    color: #ccc;}
+		.listBody{font-size: 14px;}
+	}
+}
