@@ -9,7 +9,7 @@ App.Services.ApplicationListDetail = Backbone.View.extend({
 		"click  .reset": "resetKey",
 		"click  .myIcon-update": "updateAppDialog",
 		"click  .myIcon-del-blue": "delAppDialog",
-		"click .myIcon-status-disable":"switchStatus"
+		"click .myIcon-status-disable": "switchStatus"
 	},
 
 	initialize() {
@@ -168,8 +168,24 @@ App.Services.ApplicationListDetail = Backbone.View.extend({
 	},
 
 	//修改状态
-	switchStatus(event){
-		console.log(1);
+	switchStatus(event) {
+
+		var $item = $(event.target).closest(".item"),
+			data = {
+				URLtype: "appSwitchStatus",
+				type:"PUT", 
+				data: {
+					id: $item.data("id"),
+					status: $item.hasClass("disabled")?1:2
+				}
+			}; 
+
+		App.Comm.ajax(data, (data) => {
+			if (data.code == 0) {
+				this.model.set(data.data);
+			}
+		});
+
 	}
 
 });
