@@ -175,6 +175,14 @@ App.API = {
 		appDel:"platform/app/{id}",//删除应用
 		appResetSecret:"platform/app/{id}",//重新生成 Secret
 		appUpdate:"platform/app",//更新 id, name desc
+		appSwitchStatus:"platform/app/{id}/disable?status={status}",//应用状态修改
+
+		//扩展属性
+		extendAttrList:"platform/setting/extensions/property/{classKey}", // 扩展列表
+		extendAttrInsert:"platform/setting/extensions/property",//新增
+		extendAttrUpdate:"platform/setting/extensions/property",//更新扩展属性
+		extendAttrDel:"platform/setting/extensions/property/{classKey}?property={property}",//删除扩展属性 
+		extendAttrGetReferene:"platform/setting/extensions/property/reference",// 获取引用扩展属性
 
 		test: ""
 	},
@@ -281,6 +289,16 @@ App.API = {
 		deleteFile: "", //删除文件
 		putFileReName: "", //重命名文件
 		createNewFolder: "",
+
+
+
+		//app
+		appList:"platform/app",//应用列表
+		fetchAppListById:"platform/app/{id}",//根据id获取列表
+		appInsert:"platform/app/",//创建应用 name desc
+		appDel:"platform/app/{id}",//删除应用
+		appResetSecret:"platform/app/{id}",//重新生成 Secret
+		appUpdate:"platform/app",//更新 id, name desc
 
 		test: ""
 
