@@ -7,15 +7,16 @@ App.Services.projectMember = {
 	
 	//初始化
 	init: function() {
+		$("#dataLoading").show();
 		$('.serviceBody').html(new App.Services.projectMember.mainView().render().el);
 		this.loadData(this.projectMemberProjectCollection,{
-			outer:false
+			outer:App.Comm.getCookie("isOuter")
 		},{
 			userId:App.Comm.getCookie("userId")
 		});
-		this.loadData(this.projectMemberMemberCollection,{outer:true},{
+		/*this.loadData(this.projectMemberMemberCollection,{outer:true},{
 			dataPrivilegeId:"1"
-		});
+		});*/
 	},
 
 	method:{
@@ -47,7 +48,7 @@ App.Services.projectMember = {
 				      "endTime": 0,
 				      "province": "上海市",
 				      "city": null,
-				      "image":'/static/dist/services/images/demoProject.png'
+				      "image":''
 				    }];
 					_.each(data,function(item){
 						result.push({

@@ -69,5 +69,6 @@ ViewComp.Modal= Backbone.View.extend({
 	
 	confirm: function(){
 		this.confirmCallback();
+		this.$el.find(".mwin-foot").hide();
 	}
 })

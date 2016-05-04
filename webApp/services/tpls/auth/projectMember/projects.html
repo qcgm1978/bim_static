@@ -1,13 +1,13 @@
 <li>项目管理（<%=data.length%>）</li>
 <% _.each(data,function(item,index){ %>
-	<li class="project<% if(index==0) { %> active <% } %>">
-		<div><img src="<%= item.image|| '../services/images/demoProject.png' %>"></div>
+	<li class="project<% if(index==0) { %> active <% } %>" data-pid="<%= item.id %>">
+		<div><img src="<%= item.image|| '/static/dist/images/service/images/demoProject.png' %>"></div>
 		<div>
 			<h4><%= item.name %></h4>
 			<p>
 				<%= item.province %><%= item.city %>
-					<%= item.startTime %>—
-						<%= item.endTime %>
+					<%= new Date(item.startTime).format("yyyy-MM-dd") %>—
+						<%= new Date(item.endTime).format("yyyy-MM-dd") %>
 			</p>
 		</div>
 	</li>
