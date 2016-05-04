@@ -186,9 +186,12 @@ App.Comm.createModel = function(options){
     },
     modelComment:function(){
       $(".modelBar").hide();
-      var comment = new App.Comm.modules.Comment({
-        element:$('.modelContainerContent')
-      });
+      App.Comm.navBarToggle($(".rightProperty"),$(".projectCotent"),"right",App.Project.Settings.Viewer);
+      setTimeout(function(){
+        var comment = new App.Comm.modules.Comment({
+          element:$('.modelContainerContent')
+        });
+      },600)
     }
   });
   var treeView = Backbone.View.extend({
@@ -348,9 +351,10 @@ App.Comm.createModel = function(options){
           var $item = $(item),
               etag = $item.data('etag'),
               isChecked = $item.prop('checked'),
-              hasChildren = $item.closest(".item-content").next(".subTree").length;
+              hasChildren = $item.closest(".item-content").find(".noneSwitch").length;
+              isOpen = $item.closest(".item-content").next(".subTree").length;
           if(!isChecked){
-            if(hasChildren){
+            if(hasChildren || isOpen){
               data.push(etag);
             }else{
               if(etag == undefined){
@@ -361,8 +365,10 @@ App.Comm.createModel = function(options){
             }
           }
         });
-        var reg = new RegExp("^["+regData.toString()+"]");
+        var str = regData.toString().replace(/,/g,"|");
+        var reg = new RegExp("^("+str+")");
         $.each(codeData,function(i,item){
+          if(!str) return;
           if(regData == "all" || reg.test(item.code)){
             data.push(item.code);
           }

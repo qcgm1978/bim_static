@@ -22,19 +22,26 @@
  		this.bindEvent=function(){
  			var $that=$(this),that=this;
  			$that.on("click",".myDropText",function(){
- 			 	
+ 				//禁用
+ 			 	if ($(this).hasClass("disabled")) {
+ 			 		return;
+ 			 	}
  				$that.find(".myDropList").show().end().find(".myDropArrorw").addClass('down');
  			});
 
 
  			$that.on("click",".myDropList .myItem",function(){
- 			 	 
+ 			 	  
  			 	$(this).closest(".myDropDown").find(".myDropText .text").text($(this).text());
+
+ 			 	$(this).closest(".myDropList").hide();
 
  			 	if ($.isFunction(that.settings.click)) {
  			 		that.settings.click.call(that,$(this));
- 			 	} 
- 				 $(document).trigger('click.myDropDown');
+ 			 	}   
+ 			 	
+ 			 	return false;
+ 				 //$(document).trigger('click.myDropDown');
  			});
 
 

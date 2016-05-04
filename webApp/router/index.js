@@ -130,7 +130,7 @@ var AppRoute = Backbone.Router.extend({
 	services:function(type,tab){
 		this.reset();
 		$("#pageLoading").hide();
-		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".service").addClass('selected');
+		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".services").addClass('selected');
 		_.require('/static/dist/services/services.css');
 		_.require('/static/dist/services/services.js');
 		$("#bottomBar").hide();//隐藏脚部
