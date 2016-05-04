@@ -1,3 +1,7 @@
+/**
+ * @require /services/collections/index.es6
+ */
+
 App.Services.AppCollection = {
 
 	//分类列表
