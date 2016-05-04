@@ -8,7 +8,7 @@ App.Services.MemberList=Backbone.View.extend({
 
     events:{
         "click .batchAward":"batchAward",//批量授权
-        "click .selectAll":"selectAll"//全选
+        "click .selectAll":"selectAll",//全选
     },
 
     template:_.templateUrl("/services/tpls/auth/member/services.member.list.html"),
@@ -67,7 +67,7 @@ App.Services.MemberList=Backbone.View.extend({
         var frame = new App.Services.MemberWindowIndex().render().el;
 
         //初始化窗口
-        App.Services.batchAwardWindow = new App.Comm.modules.Dialog({
+        App.Services.maskWindow = new App.Comm.modules.Dialog({
             title:"角色授权",
             width:600,
             height:500,
@@ -79,20 +79,19 @@ App.Services.MemberList=Backbone.View.extend({
             message:frame
         });
 
-
         //写入已选用户和组织
         _.each(seleUser,function(item){
             $(".seWinBody .aim ul").append(new App.Services.MemberWindowDetail({model:item}).render().el);
         });
 
-
+        this.saveData(seleUser); //保存弹窗数据相关数据便提交
 
         //角色列表
         $(".memRoleList").append(new App.Services.windowRoleList().render().el);
 
         //无父项时获取缺省角色列表
         App.Services.role.loadData();
-        //数据
+        //获取数据
         var data = {};
         //单选取得角色列表
         if(seleUser.length == 1){
@@ -106,6 +105,24 @@ App.Services.MemberList=Backbone.View.extend({
         }
         //多选取得父项机构的角色列表
         //App.Services.ozRole.loadData(data);//此处需要判断父项id，父项id如何写入？
+    },
+
+    //保存要提交的数据模块，将数据混编成可提交形式
+    saveData:function(seleUser){
+        var saveType =  App.Services.MemberType;
+        //userId和orgId
+        _.each(seleUser,function(item){
+            var userId = item.get("userId");
+            var orgId = item.get("orgId");
+            if(saveType){
+                if(userId){
+                    App.Services.memberWindowData[saveType].orgId.push(userId);
+                }
+                if(orgId){
+                    App.Services.memberWindowData[saveType].orgId.push(orgId);
+                }
+            }
+        });
     },
 
     //返回机构/成员的url和id

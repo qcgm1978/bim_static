@@ -35,5 +35,48 @@ App.Services.roleWindowIndex = Backbone.View.extend({
         };
         //发送个人id，加载模块
         //弹出window，获取并插入功能列表数据
+
+
+    //如何判断新增角色还是修改角色？
+      this.newRole();
+    },
+
+    //新增角色
+    newRole :function(){
+        //新增角色  fetchServicesNewRole
+        var name  = $("#selectedRoleName").val();
+        if(!name){alert("请填写角色名！");return;}
+        var newRole = {"name":name, "functionId":[]};
+        //已选功能列表
+        var seleFun = App.Services.roleFun.collection.filter(function(item){
+            return item.has("checked");
+        });
+
+        if(!seleFun.length){alert("请选择功能");return}
+        _.each(seleFun,function(item){
+            newRole.functionId.push(item.get("id"));
+        });
+
+        //保存数据
+        var roleModel = Backbone.Model.extend({
+            default:{},
+            urlType: "fetchServicesNewRole"
+        });
+        App.Services.newRoleModel =  new roleModel(newRole);
+
+        App.Services.newRoleModel.save("create",{
+            success:function(collection, response, options){
+                //成功创建的的角色添加的collection中
+                App.Services.role.collection.add(response.data);
+                //关闭窗口
+                App.Services.maskWindow.close();
+            },
+            //错误处理
+            error:function(){
+
+            }
+
+        });
+
     }
 });

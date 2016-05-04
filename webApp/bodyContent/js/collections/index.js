@@ -9,6 +9,7 @@ App.BodyContent.control= {
 
     init : function(){
 		
+		$("#loginName").html(App.Comm.getCookie('OUTSSO_LoginId'));
 
         $("#contains").empty();
         new App.BodyContent.App().render(); //渲染框架
@@ -45,7 +46,12 @@ App.BodyContent.control= {
         urlType:"fetchBodyContentTodos",
         parse: function (response) {
             if (response.message == "success") {
-                return response.data.items;
+            	var _data=response.data.items;
+            	try{
+	            	$("#todoCounter").text(_data.length);
+            	}catch(e){
+            	}
+                return _data;
             }
         }
     })),

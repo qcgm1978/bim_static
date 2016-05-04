@@ -14,16 +14,14 @@ App.Services.projectMember.projects = Backbone.View.extend({
 		var data = App.Services.projectMember.method.model2JSON(items.models);
 		data={data:data};
 		$("#projectList").html(this.template(data));
-		$("#projectList").children().on("click",function(e){
+		$("#projectList .project").on("click",function(e){
 			_this.selectProject(e);
 		})
-		
 		if(data.data.length>0){
 			var id=data.data[0].id;
-			App.Services.projectMember.loadData(App.Services.projectMember.projectMemberMemberCollection,{outer:false},{
+			App.Services.projectMember.loadData(App.Services.projectMember.projectMemberMemberCollection,{outer:App.Comm.getCookie("isOuter")},{
 				dataPrivilegeId:id
 			});
-			$("#windowMask").remove();
 			App.Comm.setCookie("currentPid",id);
 		}
 		
@@ -35,8 +33,15 @@ App.Services.projectMember.projects = Backbone.View.extend({
 	},
 
 	selectProject:function(event){
+		$("#dataLoading").show();
+		var $li=$(event.currentTarget),
+			pid=$li.attr("data-pid");//权限ID
 		$("#projectList .project").removeClass("active");
-		$(event.target).addClass("active");
+		$li.addClass("active");
+		App.Comm.setCookie("currentPid",pid);
+		App.Services.projectMember.loadData(App.Services.projectMember.projectMemberMemberCollection,{outer:App.Comm.getCookie("isOuter")},{
+				dataPrivilegeId:pid
+			});
 	},
 
 });

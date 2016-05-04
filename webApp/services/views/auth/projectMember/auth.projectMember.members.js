@@ -8,12 +8,15 @@ App.Services.projectMember.members = Backbone.View.extend({
 		this.listenTo(App.Services.projectMember.projectMemberMemberCollection,'reset',this.render);
   },
 
+  /**
+   * 项目成员列表删除事件
+   * @param {Object} event
+   */
   del:function(event){
   		var _userId=event.currentTarget.getAttribute("data-user");
   		var _userName=event.currentTarget.getAttribute("data-userName");
   		var _model=new ViewComp.Modal;
   		_model.render({title:"",dialog:true,confirm:function(){
-    		//TODO 调用删除接口
     		_model.html("<img src='/static/dist/images/services/images/load.gif'>正在删除、请稍等...")
     		var url="/platform/auth/user/"+_userId+"/dataPrivilege?outer=true&privilegeId="+App.Comm.getCookie("currentPid");
     		$.ajax({
@@ -27,7 +30,7 @@ App.Services.projectMember.members = Backbone.View.extend({
 					});
 					setTimeout(function(){
 						$("#windowMask").hide();
-					},2000)
+					},1000)
     			}else{
     				//TODO 临时方案
     				_model.html("删除失败");
@@ -44,6 +47,7 @@ App.Services.projectMember.members = Backbone.View.extend({
     $(".remove").on("click",function(e){
     	_this.del(e);
     })
+    $("#dataLoading").hide();
     return this;
   }
 });

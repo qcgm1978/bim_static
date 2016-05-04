@@ -11,20 +11,15 @@ App.Services.MemberNav=Backbone.View.extend({
         "click #outer":'outer',
         "click #inner":'inner'
     },
-
     render:function(){
         this.$el.html(this.template);
         return this;
     },
-
     initialize:function(){
-
         //默认根据角色权限加载  adm用户加载全部，keyMem用户只显示项目管理
     },
-
     //外部用户
     outer:function(){
-
         //this.loadData("outer");
         App.Services.MemberType = "outer";
         this.loadData();
@@ -32,26 +27,22 @@ App.Services.MemberNav=Backbone.View.extend({
     },
     //内部用户
     inner:function(){
-
         //this.loadData("inner");
         App.Services.MemberType = "inner";
 
         //App.Services.Member.loadData(App.Services.Member.innerCollection);
         this.loadData();
     },
-
-
     //加载子组织，刷新右侧组织和员工列表
     loadData:function(){
-
         var _thisType = App.Services.MemberType;
         var collection = App.Services.Member[_thisType + "Collection"];
-
-        $("#blendList").empty();//清空右侧列表
-        //输入数据
-
+        $("#pageLoading").show();
         //获取数据，将会刷新右侧视图
         App.Services.Member.loadData(collection,{},function(response){
+            $("#pageLoading").hide();
+            $("#blendList").empty();//清空右侧列表
+            //加载右侧数据
             //菜单
             if (response.data.org && response.data.org.length) {
                 //样式处理
