@@ -47,7 +47,7 @@ alert('gg')
   //关闭窗口
   close : function(){
 
-    $('#mask').hide();
+    $('.mod-dialog,.mod-dialog-masklayer').hide();
 
   },
 

@@ -14,7 +14,7 @@ App.API = {
 		//本月开始、到期接口
 		fetchBodyContentMonthEnd :'sixD/plan/concern/index',//?type={type}&userId={userId}
 		fetchBodyContentMonthStart :'sixD/plan/concern/index',
-		
+
 		fetchBodyContentSlide :'dataJson/bodyContent/bodyContent.slide.json',
 		fetchBodyContentMmhSlide :'platform/project',
 		fetchBodyContentProclamation :'dataJson/bodyContent/bodyContent.proclamation.json',
@@ -217,6 +217,12 @@ App.API = {
 
 		fetchFloors: '/datajson/map/map.json', //获取模型楼层信息
 		fetchAxisGrid: '/datajson/map/gridAndLevel.json', //获取楼层地图,轴网信息
+
+		//视点
+		fetchModelViewpoint: '/datajson/project/project.viewpoint.property.json', // 获取视点列表
+		createViewpointById: '', // 创建视点
+		editViewpointById: '', // 修改视点
+		deleteViewpointById: '', // 删除视点
 
 		//设计
 		fetchDesignProperties: "/dataJson/project/project.design.property.json", //设计属性
