@@ -13,8 +13,8 @@ App.Services.projectMember = {
 		},{
 			userId:App.Comm.getCookie("userId")
 		});
-		this.loadData(this.projectMemberMemberCollection,{outer:false},{
-			dataPrivilegeId:"784306105035936"
+		this.loadData(this.projectMemberMemberCollection,{outer:true},{
+			dataPrivilegeId:"1"
 		});
 	},
 
@@ -29,21 +29,35 @@ App.Services.projectMember = {
 	},
 
 	projectMemberProjectCollection: new(Backbone.Collection.extend({
-		model: App.Services.model,
+		model: Backbone.Model.extend({
+			   defaults:function(){
+			   		return {
+			   			title:''
+			   		}
+			   } 
+		}),
 		urlType: "fetchServicesProjectMemberProjectList",
 		parse: function(response) {
 			if (response.message == "success") {
-				var data=response.data.items,
-					result=[];
-				_.each(data,function(item){
-					result.push({
-						image:item.image||'../services/images/demoProject.png',
-						startTime:item.startTime||new Date(),
-						endTime:item.startTime||new Date(),
-						name:item.name,
-						address:item.address||'测试地址',
+				var data=response.data,
+					result=[{
+				      "id": 1, 
+				      "name": "周浦万达项目",
+				      "startTime": 1457536342000,
+				      "endTime": 0,
+				      "province": "上海市",
+				      "city": null,
+				      "image":'/static/dist/services/images/demoProject.png'
+				    }];
+					_.each(data,function(item){
+						result.push({
+							image:item.image||'/static/dist/services/images/demoProject.png',
+							startTime:item.startTime||new Date(),
+							endTime:item.startTime||new Date(),
+							name:item.name,
+							address:item.address||'测试地址',
+						})
 					})
-				})
 				return result;
 			}else{
 				return [];
@@ -52,7 +66,13 @@ App.Services.projectMember = {
 	})),
 	
 	projectMemberMemberCollection: new(Backbone.Collection.extend({
-		model: App.Services.model,
+		model:  Backbone.Model.extend({
+			   defaults:function(){
+			   		return {
+			   			title:''
+			   		}
+			   } 
+		}),
 		urlType: "fetchServicesProjectMemberMemberList",
 		parse: function(response) {
 			if (response.message == "success") {
@@ -61,13 +81,17 @@ App.Services.projectMember = {
 				_member=_.map(_member,function(item){
 					return item={
 						name:item.name,
-						project:item.org.name
+						project:item.org.name,
+						id:item.id, //成员ID
+						outer:item.outer
 					}
 				})
 				_org=_.map(_org,function(item){
 					return item={
 						name:item.name,
-						project:""
+						project:"",
+						id:item.id, //成员ID
+						outer:item.outer
 					}
 				})
 				return _member.concat(_org);

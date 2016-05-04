@@ -12,22 +12,21 @@
 
 var ViewComp=ViewComp||{};
 ViewComp.MemberManager = Backbone.View.extend({
-	tagName: "table",
-	className: "userSelecter",
 	template: _.templateUrl('/services/tpls/auth/projectMember/projectMemberManager.html'),
 	selectTree: null,
 	selectedTree: null,
 	events: {
 		"click a[name='selectBtn']": "addOption",
 		"mouseover .ztree li a": "showDelete",
-		"mouseout .ztree li a": "hideDelete"
+		"mouseout .ztree li a": "hideDelete",
+		'click #grandBtn':'grand'
 	},
 	initialize:function(){
 		
 	//	this.listenTo(App.Services.projectMember.projectMemberOrgCollection,'reset',this.initView)
 		
 	},
-	render: function() {
+	render: function(data) {
 		this.$el.append(this.template());
 		return this;
 	},
@@ -38,24 +37,7 @@ ViewComp.MemberManager = Backbone.View.extend({
 		var _view = this;
 		//树插件初始化配置
 			_view.loadChildren(_view,false,null);
-			
-		/*$.ajax({
-			url:App.API.Settings.hostname+App.API.URL.fetchServiceMemberList+"?outer=true",
-			type:"get"
-		}).done(function(res){
-			if(res.message==="success"){
-				var _org=res.data.org||[],
-					_user=res.data.user||[],
-					_newOrg=[];
-				
-				_org.forEach(function(i){
-					i.iconSkin='business';
-					_newOrg.push(i);
-				})
-				zNodes=_newOrg.concat(_user);
-				_view.selectTree = $.fn.zTree.init($("#selectTree"), setting, zNodes);
-			}
-		})*/
+		
 		this.selectedTree = $.fn.zTree.init($("#selectedTree"), {
 			view: {
 				showLine: false
@@ -100,7 +82,9 @@ ViewComp.MemberManager = Backbone.View.extend({
 		var setting = {
 				callback: {
 					onDblClick: function(event, treeId, treeNode) {
-						_this.loadChildren(_this,false,treeNode.orgId,treeNode);
+						if(!treeNode.userId && !treeNode.isParent){
+							_this.loadChildren(_this,false,treeNode.orgId,treeNode);
+						}
 					}
 				},
 				view: {
@@ -110,7 +94,7 @@ ViewComp.MemberManager = Backbone.View.extend({
 				}
 		};
 		
-		var _url=App.API.Settings.hostname+App.API.URL.fetchServiceMemberList+"?outer="+outer;
+		var _url=App.API.Settings.hostname+App.API.URL.fetchServiceMemberList+"?outer="+outer+"&includeUsers=true";
 		if(parentId){
 			_url=_url+"&parentId="+parentId;
 		}
@@ -133,6 +117,57 @@ ViewComp.MemberManager = Backbone.View.extend({
 				}else{
 					_this.selectTree.addNodes(treeNode,zNodes);
 				}
+			}
+		})
+	},
+	
+	grand:function(){
+		
+		var pid=App.Comm.getCookie('currentPid');
+		var url="/platform/auth/dataPrivilege/grant";
+		var data={
+		    "privilegeId":[pid],
+		    "outer":{
+		        "orgId":[],
+		        "userId":[]
+		    },
+		    "inner":{
+		        "orgId":[],
+		        "userId":[]
+		    }
+		}
+		
+		var nodes=this.selectedTree.getNodes();
+		
+		_.each(nodes,function(n){
+			if(n.outer){
+				if(n.orgId){
+					data.outer.orgId.push(n.orgId)
+				}else{
+					data.outer.userId.push(n.userId)
+				}
+			}else{
+				if(n.orgId){
+					data.inner.orgId.push(n.orgId)
+				}else{
+					data.inner.userId.push(n.userId)
+				}
+			}
+			
+		})
+		$.ajax({
+			type:"post",
+			url:url,
+			data:JSON.stringify(data),
+			contentType:"application/json",
+		}).done(function(d){
+			if(d.message=="success"){
+				App.Services.projectMember.loadData(App.Services.projectMember.projectMemberMemberCollection,{outer:false},{
+					dataPrivilegeId:App.Comm.getCookie("currentPid")
+				});
+				$("#windowMask").remove();
+			}else{
+				alert("添加失败");
 			}
 		})
 	}

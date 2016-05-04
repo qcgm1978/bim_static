@@ -191,8 +191,8 @@ App.API = {
 		fetchServicesUserRoleList:'/dataJson/services/member/services.user.role.json',//用户角色列表
 		fetchServicesMemberOuterList:'/dataJson/services/member/services.member.list.json',//外部组织-品牌／公司／成员列表
 		fetchServicesMemberInnerList:'/dataJson/services/member/services.member.list.json',//内部-组织／成员列表
-		fetchServicesProjectMemberProjectList:'/dataJson/services/member/services.project.member.projects.json',//项目成员/项目管理
-		fetchServicesProjectMemberMemberList:'/dataJson/services/member/services.project.member.members.json',//项目成员/项目管理
+		fetchServicesProjectMemberProjectList:'/dataJson/services/services.project.member.projects.json',//项目成员/项目管理
+		fetchServicesProjectMemberMemberList:'/dataJson/services/services.project.member.members.json',//项目成员/项目管理
 	  fetchServiceKeyUserList:'/dataJson/services/services.KeyUser.json',//关键用户列表
 	  fetchServiceStep1:'/dataJson/services/services.step1.json',//项目列表
 
