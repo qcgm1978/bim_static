@@ -92,7 +92,8 @@ App.Services.projectMember = {
 						name:item.name,
 						project:"",
 						id:item.id, //成员ID
-						outer:item.outer
+						outer:item.outer,
+						org:true
 					}
 				})
 				return _member.concat(_org);
