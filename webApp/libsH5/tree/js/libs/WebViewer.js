@@ -11496,12 +11496,12 @@ CLOUD.Scene = function () {
 
     this.clipWidget = null;
 
-    this.selectedIds = []; // 存一份是为了供鼠标pick使用
-
-    this.autoUpdate = false;
+   this.autoUpdate = false;
 
     var len = CLOUD.GlobalData.SceneSize * 0.5;
     this.innerBoundingBox = new THREE.Box3();
+
+    this.releaseList = [];
 };
 
 CLOUD.Scene.prototype = Object.create(THREE.Scene.prototype);
@@ -11556,7 +11556,21 @@ CLOUD.Scene.prototype.hitTestPosition = function (mouse, camera, callback) {
     var intersects =  this.hitTestClipPlane(raycaster.ray, raycaster.intersectObjects(this.children, true));
 
     if (intersects.length < 1) {
-        callback(null);
+
+        // modified 2016-5-3  begin
+        // 如果没有选中构件，绕场景中心旋转
+        if (this.rootNode.boundingBox ) {
+            var bBox = this.worldBoundingBox();
+            var pivot = bBox.center();
+
+            // 如果没有选中构件，绕场景中心旋转
+            callback(pivot);
+        } else {
+            callback(null);
+        }
+
+        //callback(null);
+        // modified 2016-5-3  end
         return;
     }
 
@@ -11842,7 +11856,7 @@ CLOUD.Scene.prototype.prepareSceneBox = function () {
     };
 }();
 
-CLOUD.Scene.prototype.prepareScene = function () {
+CLOUD.Scene.prototype.prepareScene2 = function () {
 
     var _frustum = new THREE.Frustum();
     var _projScreenMatrix = new THREE.Matrix4();
@@ -11982,7 +11996,7 @@ CLOUD.Scene.prototype.prepareScene = function () {
     }
 }();
 
-CLOUD.Scene.prototype.prepareScene2 = function () {
+CLOUD.Scene.prototype.prepareScene = function () {
 
     var _frustum = new THREE.Frustum();
     var _projScreenMatrix = new THREE.Matrix4();
@@ -12031,7 +12045,7 @@ CLOUD.Scene.prototype.prepareScene2 = function () {
 
                 if (bVisible && !object.visible) {
 
-                    object.unload();
+                    scope.releaseList.push(object);
                 }
 
                 return true;
@@ -12044,53 +12058,16 @@ CLOUD.Scene.prototype.prepareScene2 = function () {
     }
 }();
 
-CLOUD.Scene.prototype.clearAllSelectedIds = function () {
 
-    this.selectedIds = [];
-};
 
-// 将选中构件ID集合传入过滤器
-CLOUD.Scene.prototype.putSelectedIdsIntoFilter = function () {
-
-    this.filter.setSelectedIds(this.selectedIds);
-    this.filter.resetSelectionBox();
-};
-
-// 是否存在构件id： -1 不存在， 否则 存在
-CLOUD.Scene.prototype.existSelectedId = function (id) {
-
-    var idx = -1;
-
-    for(var i = 0, len = this.selectedIds.length; i < len; i++) {
-        if (id  === this.selectedIds[i]) {
-            idx = i;
-            break;
-        }
+CLOUD.Scene.prototype.collectionGarbage = function () {
+    var releaseList = this.releaseList;
+    for (var ii = 0, len = releaseList.length; ii < len; ++ii) {
+        var object = releaseList[ii];
+        object.unload();
     }
-
-    return idx;
-};
-
-// 删除选中构件id
-CLOUD.Scene.prototype.removeSelectedId = function (id) {
-
-    // 如果之前选中，则取消选中
-    var idx = this.existSelectedId(id);
-
-    if (idx != -1) {
-        this.selectedIds.splice(idx, 1);
-    }
-};
-
-// 增加选中构件id
-CLOUD.Scene.prototype.addSelectedId = function (id) {
-
-    var idx = this.existSelectedId(id);
-
-    if (idx === -1) {
-        this.selectedIds.push(id);
-    }
-};
+    this.releaseList = [];
+}
 
 CLOUD.Mesh = function (geometry, material, meshId) {
     THREE.Mesh.call(this, geometry, material);
@@ -12128,7 +12105,8 @@ CLOUD.Mesh.prototype.unload = function () {
     if (this.geometry.refCount <= 0) {
 
         this.geometry.refCount = 0;
-        this.geometry.dispose();
+        if(this.geometry.symbol === undefined)
+            this.geometry.dispose();
     }
 
 }
@@ -13152,12 +13130,12 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
         var position = this.object.position;
         var pivot = this.pivot !== null ? this.pivot.clone() : this.target;
 
-        // 绕场景中心旋转
+        //// 绕场景中心旋转
         //var target = this.target;
         //
         //if (this.viewer.getScene().rootNode.boundingBox ) {
-        //    var bbox = this.viewer.getScene().worldBoundingBox();
-        //    target = bbox.center();
+        //    var bBox = this.viewer.getScene().worldBoundingBox();
+        //    target = bBox.center();
         //}
         //
         //var pivot = this.pivot !== null ? this.pivot.clone() : target;
@@ -13791,7 +13769,7 @@ CLOUD.OrbitEditor = function (cameraEditor, scene, domElement) {
     this.isMouseClick = false;
     this.oldMouseX = -1;
     this.oldMouseY = -1;
-    //this.timeoutId = null;
+    this.timeoutId = null;
 };
 
 CLOUD.OrbitEditor.prototype = Object.create(THREE.EventDispatcher.prototype);
@@ -13799,6 +13777,24 @@ CLOUD.OrbitEditor.prototype.constructor = CLOUD.OrbitEditor;
 
 CLOUD.OrbitEditor.prototype.onExistEditor = function () {
 };
+
+CLOUD.OrbitEditor.prototype.delayHandle = function () {
+    var camera_scope = this.cameraEditor;
+
+    function handle() {
+        camera_scope.viewer.editorManager.isUpdateRenderList = true;
+        camera_scope.update(true);
+    }
+
+    if (this.timeoutId) {
+        clearTimeout(this.timeoutId);
+    }
+
+    // 延迟300ms以判断是否单击
+    this.timeoutId = setTimeout(handle, 200);
+    camera_scope.viewer.editorManager.isUpdateRenderList = false;
+};
+
 
 CLOUD.OrbitEditor.prototype.processMouseDown = function (event) {
     var scope = this;
@@ -13890,15 +13886,6 @@ CLOUD.OrbitEditor.prototype.onMouseWheel = function (event) {
     var camera_scope = this.cameraEditor;
     //if (camera_scope.enabled === false || camera_scope.noZoom === true || camera_scope.IsIdle() !== true) return;
 
-    //function handleMouseWheel() {
-    //    camera_scope.viewer.editorManager.isUpdateRenderList = true;
-    //    //camera_scope.zoom(0, event.clientX, event.clientY);
-    //
-    //    camera_scope.update(true);
-    //
-    //    console.log("handleMouseWheel");
-    //}
-
     if (camera_scope.enabled === false || camera_scope.noZoom === true) return;
 
     event.preventDefault();
@@ -13911,14 +13898,8 @@ CLOUD.OrbitEditor.prototype.onMouseWheel = function (event) {
     delta = (Math.abs(delta) > 10 ? delta : -delta * 40);
     delta *= 0.0005;
 
-    //if (this.timeoutId) {
-    //    clearTimeout(this.timeoutId);
-    //}
-    //
-    //// 延迟300ms以判断是否单击
-    //this.timeoutId = setTimeout(handleMouseWheel, 100);
-    //
-    //camera_scope.viewer.editorManager.isUpdateRenderList = false;
+    this.delayHandle();
+
     camera_scope.zoom(delta, event.clientX, event.clientY);
 };
 
@@ -13929,23 +13910,9 @@ CLOUD.OrbitEditor.prototype.onMouseDoubleClick = function (event) {
 CLOUD.OrbitEditor.prototype.onKeyDown = function (event) {
     var camera_scope = this.cameraEditor;
 
-    //function handleKeyDown() {
-    //    camera_scope.viewer.editorManager.isUpdateRenderList = true;
-    //    camera_scope.update(true);
-    //
-    //    console.log("handleKeyDown");
-    //}
-
     if (camera_scope.enabled === false || camera_scope.noKeys === true || camera_scope.noPan === true) return;
 
-    //camera_scope.viewer.editorManager.isUpdateRenderList = true;
-    //
-    //if (this.timeoutId) {
-    //    clearTimeout(this.timeoutId);
-    //}
-    //
-    //// 延迟300ms以判断是否单击
-    //this.timeoutId = setTimeout(handleKeyDown, 100);
+    this.delayHandle();
 
     switch (event.keyCode) {
         case camera_scope.keys.ALT:
@@ -14049,9 +14016,16 @@ CLOUD.PickEditor = function (object, scene, domElement) {
     this.lastDblUserId = null;
     this.lastUserId = null;
 
+    this.semitransparentIds = []; // 半透明id集合
+    this.selectedIds = []; // 鼠标pick集合
+
+    this.filter = scene.filter;
+
+    // debug 用
     this.debugInfoDiv = null;
     this.lastDebugInfoDivShow = false;
 };
+
 CLOUD.PickEditor.prototype = Object.create(CLOUD.OrbitEditor.prototype);
 CLOUD.PickEditor.prototype.constructor = CLOUD.PickEditor;
 
@@ -14093,6 +14067,12 @@ CLOUD.PickEditor.prototype.handleMousePick = function (event, isDoubleClick) {
 
     event.preventDefault();
 
+    //var toleration = 1;  // 容错1个像素
+    //
+    //if (Math.abs(this.oldMouseX - event.clientX) <= toleration && Math.abs(this.oldMouseY - event.clientY) <= toleration) {
+    //    this.isMouseClick = true;
+    //}
+
     if (this.oldMouseX == event.clientX && this.oldMouseY == event.clientY) {
         this.isMouseClick = true;
     }
@@ -14130,16 +14110,35 @@ CLOUD.PickEditor.prototype.handleMousePick = function (event, isDoubleClick) {
                 //     2. 前后都有构件选中，且构件ID不同；
                 // 取消选中条件：
                 //      1. 前后都有构件选中且构件ID相同；
-                //      2. 前有构件选中，后无构件选中；
                 if (scope.lastDblUserId !== userId && userId !== "") {
                     // 选中
                     scope.lastDblUserId = userId;
-                    scope.scene.filter.setOverriderByUserIds("dblClick", [userId], "scene");
+                    scope.addSemitransparentId(userId);
+                    scope.putSemitransparentIdsIntoFilter();
+
+                    // 如果上一次存在单击选中构件
+                    for (var i = 0, len = scope.selectedIds.length; i < len; i++) {
+                        if (scope.selectedIds[i] === userId) {
+                            scope.setSelectedState(userId, false);
+                            break;
+                        }
+                    }
+
                     cameraEditor.updateView();
 
-                } else if (scope.lastDblUserId && (scope.lastDblUserId === userId || userId === "")) {
+                } else if (scope.lastDblUserId && scope.lastDblUserId === userId) {
                     // 取消选中
-                    scope.scene.filter.setOverriderByUserIds("dblClick");
+                    scope.removeSemitransparentId(scope.lastDblUserId);
+                    scope.putSemitransparentIdsIntoFilter();
+
+                    // 如果上一次存在单击选中构件
+                    for (var i = 0, len = scope.selectedIds.length; i < len; i++) {
+                        if (scope.selectedIds[i] === userId) {
+                            scope.setSelectedState(userId, true);
+                            break;
+                        }
+                    }
+
                     cameraEditor.updateView();
                     scope.lastDblUserId = null;
                 }
@@ -14156,9 +14155,9 @@ CLOUD.PickEditor.prototype.handleMousePick = function (event, isDoubleClick) {
                     // 选中
                     scope.lastUserId = userId;
                     // 先清除，这样处理即只支持单选
-                    scope.scene.clearAllSelectedIds();
-                    scope.scene.addSelectedId(userId);
-                    scope.scene.putSelectedIdsIntoFilter();
+                    scope.clearSelectedIds();
+                    scope.addSelectedId(userId);
+                    scope.putSelectedIdsIntoFilter();
                     cameraEditor.updateView();
                     scope.onObjectSelected(intersect);
 
@@ -14170,15 +14169,12 @@ CLOUD.PickEditor.prototype.handleMousePick = function (event, isDoubleClick) {
 
                 } else if (scope.lastUserId && (scope.lastUserId === userId || userId === "")) {
                     // 取消选中
-                    scope.scene.removeSelectedId(scope.lastUserId);
-                    scope.scene.putSelectedIdsIntoFilter();
+                    scope.removeSelectedId(scope.lastUserId);
+                    scope.putSelectedIdsIntoFilter();
+
                     cameraEditor.updateView();
                     scope.onObjectSelected(null);
                     scope.lastUserId = null;
-
-                    //if (scope.altHotKey) {
-                    //    scope.showPickedInformation(null);
-                    //}
 
                     scope.showPickedInformation(null);
                 }
@@ -14338,6 +14334,110 @@ CLOUD.PickEditor.prototype.showPickedInformation = function (intersect, cx, cy) 
 
     adjustLocation(this.debugInfoDiv, cx, cy);
 };
+
+CLOUD.PickEditor.prototype.clearSemitransparentIds = function () {
+    this.semitransparentIds = [];
+};
+
+// 将选中半透明构件ID集合传入过滤器
+CLOUD.PickEditor.prototype.putSemitransparentIdsIntoFilter = function () {
+    this.filter.setOverriderByUserIds("dblClick", this.semitransparentIds, "scene");
+};
+
+// 是否存在半透明构件id： -1 不存在， 否则 存在
+CLOUD.PickEditor.prototype.existSemitransparentId = function (id) {
+
+    var idx = -1;
+
+    for(var i = 0, len = this.semitransparentIds.length; i < len; i++) {
+        if (id  === this.semitransparentIds[i]) {
+            idx = i;
+            break;
+        }
+    }
+
+    return idx;
+};
+
+// 删除选中半透明构件id
+CLOUD.PickEditor.prototype.removeSemitransparentId = function (id) {
+
+    // 如果之前选中，则取消选中
+    var idx = this.existSemitransparentId(id);
+
+    if (idx != -1) {
+        this.semitransparentIds.splice(idx, 1);
+    }
+};
+
+// 增加选中半透明构件id
+CLOUD.PickEditor.prototype.addSemitransparentId = function (id) {
+
+    var idx = this.existSemitransparentId(id);
+
+    if (idx === -1) {
+        this.semitransparentIds.push(id);
+    }
+};
+
+CLOUD.PickEditor.prototype.clearSelectedIds = function () {
+
+    this.selectedIds = [];
+};
+
+// 将选中构件ID集合传入过滤器
+CLOUD.PickEditor.prototype.putSelectedIdsIntoFilter = function () {
+
+    this.filter.setSelectedIds(this.selectedIds);
+    this.filter.resetSelectionBox();
+};
+
+// 是否存在构件id： -1 不存在， 否则 存在
+CLOUD.PickEditor.prototype.existSelectedId = function (id) {
+
+    var idx = -1;
+
+    for(var i = 0, len = this.selectedIds.length; i < len; i++) {
+        if (id  === this.selectedIds[i]) {
+            idx = i;
+            break;
+        }
+    }
+
+    return idx;
+};
+
+// 删除选中构件id
+CLOUD.PickEditor.prototype.removeSelectedId = function (id) {
+
+    // 如果之前选中，则取消选中
+    var idx = this.existSelectedId(id);
+
+    if (idx != -1) {
+        this.selectedIds.splice(idx, 1);
+    }
+};
+
+// 增加选中构件id
+CLOUD.PickEditor.prototype.addSelectedId = function (id) {
+
+    var idx = this.existSelectedId(id);
+
+    if (idx === -1) {
+        this.selectedIds.push(id);
+    }
+};
+
+CLOUD.PickEditor.prototype.setSelectedState = function (id, state) {
+
+    var idx = this.existSelectedId(id);
+
+    if (idx !== -1) {
+        this.filter.setSelectedState(id, state);
+    }
+};
+
+
 CLOUD.ZoomEditor = function ( object, scene, domElement ) {
 	CLOUD.OrbitEditor.call( this,  object, scene, domElement );
 	
@@ -14822,6 +14922,8 @@ CLOUD.FlyEditor = function (cameraEditor, scene, domElement) {
     this.rotateEnd = new THREE.Vector2();
     this.rotateDelta = new THREE.Vector2();
 
+    this.timeoutId = null;
+
     //this.clock = new THREE.Clock();
 
     var scope = this;
@@ -14839,6 +14941,23 @@ CLOUD.FlyEditor.prototype = {
         if (typeof this[event.type] == 'function') {
             this[event.type](event);
         }
+    },
+
+    delayHandle: function() {
+        var scope = this;
+
+        function handle() {
+            scope.cameraEditor.viewer.editorManager.isUpdateRenderList = true;
+            scope.update();
+        }
+
+        if (this.timeoutId) {
+            clearTimeout(this.timeoutId);
+        }
+
+        // 延迟300ms以判断是否单击
+        this.timeoutId = setTimeout(handle, 200);
+        this.cameraEditor.viewer.editorManager.isUpdateRenderList = false;
     },
     activate: function () {
         //this.clock.start();
@@ -14882,10 +15001,13 @@ CLOUD.FlyEditor.prototype = {
             default:
                 needUpdateUI = true;
         }
+
         if (moveDirection !== this.MoveDirection.NONE) {
             this.moveState |= moveDirection;
             this.ui.onKeyDown(moveDirection, this.MoveDirection);
         }
+
+        this.delayHandle();
 
         this.update();
     },
@@ -15059,7 +15181,7 @@ CLOUD.FlyEditor.prototype = {
             // 记录总仰角
             this.pitchDeltaTotal += this.deltaPitch;
 
-            console.log(this.pitchDeltaTotal);
+            //console.log(this.pitchDeltaTotal);
 
             // 左右旋转
             this.goTurn(this.deltaYaw);
@@ -15501,6 +15623,27 @@ CLOUD.Filter = function () {
         boundingBox: new THREE.Box3()
     };
 
+    //DEBUG API
+    this.getVisibleFilter = function () {
+        return visibilityFilter;
+    };
+
+    this.getFileFilter = function () {
+        return fileFilter;
+    };
+
+    this.getOverriderByUserId = function () {
+        return materialOverriderByUserId;
+    };
+
+    this.getOverriderByUserData = function () {
+        return materialOverriderByUserData;
+    };
+
+    this.getSelectionSet = function () {
+        return selectionSet;
+    };
+
     ////////////////////////////////////////////////////////////////////
     // Visbililty Filter API
     this.setFilterByUserIds = function (ids) {
@@ -15696,6 +15839,13 @@ CLOUD.Filter = function () {
     // 设置selectionSet的颜色
     this.setSelectionMaterial = function (color) {
         overridedMaterials.selection.color = color;
+    };
+
+    this.setSelectedState = function(id, state) {
+
+        if (selectionSet.ids && (id in selectionSet.ids)) {
+            selectionSet.ids[id] = state;
+        }
     };
 
     this.setSelectedIds = function (ids) {
@@ -20265,6 +20415,8 @@ CLOUD.MpkLoader.prototype.load = function (mpkId, parameters, client, callback, 
 
 CLOUD.MpkLoader.prototype.parseS3D = function (arrayBuffer, parameters, client, callback) {
 
+    var symbol = parameters.symbol;
+
     for (var meshId in parameters.items) {
 
         if (client.cache.geometries[meshId])
@@ -20273,7 +20425,7 @@ CLOUD.MpkLoader.prototype.parseS3D = function (arrayBuffer, parameters, client, 
         var offset = parameters.items[meshId];
         var s3dFile = new S3D.S3DLoader();
         s3dFile.parse(arrayBuffer.slice(offset.offset, offset.offset + offset.size));
-        this.createModel(s3dFile.index(), s3dFile.position(), meshId, callback);
+        this.createModel(s3dFile.index(), s3dFile.position(), meshId, symbol, callback);
     }
 
 }
@@ -20289,18 +20441,20 @@ CLOUD.MpkLoader.prototype.parseCTM = function (binaryData, parameters, client, c
         var offset = parameters.items[meshId];
         stream.offset = offset.offset;
         var ctmFile = new CTM.File(stream);
-        this.createModel(ctmFile.body.indices, ctmFile.body.vertices, meshId, callback);
+        this.createModel(ctmFile.body.indices, ctmFile.body.vertices, meshId, undefined, callback);
         ctmFile = null;
     }
 
     stream = null;
 };
 
-CLOUD.MpkLoader.prototype.createModel = function (indices, vertices, meshId, callback) {
+CLOUD.MpkLoader.prototype.createModel = function (indices, vertices, meshId, symbol, callback) {
 
     var geometry = new THREE.BufferGeometry();
     geometry.refCount = 0;
     geometry.name = meshId;
+    if(symbol)
+        geometry.symobl = symbol;
 
     var ib = new THREE.BufferAttribute(indices, 1);
     ib.setDynamic(true);
@@ -20663,7 +20817,7 @@ CLOUD.SceneLoader.prototype = {
 
                     object = new CLOUD.Cell();
                     if(objJSON.leaf){
-                        object.leaf = true;
+                        object.leaf = objJSON.leaf;
                     }
                     CLOUD.GeomUtil.parseNodeProperties(object, objJSON, nodeId);
 
@@ -20704,7 +20858,7 @@ CLOUD.SceneLoader.prototype = {
 
                         object = new CLOUD.SubScene();
                         CLOUD.GeomUtil.parseNodeProperties(object, objJSON, nodeId);
-                        object.leaf = true;
+                        object.leaf = 1;
 
                         object.client = client;
 
@@ -20904,7 +21058,7 @@ CLOUD.SceneLoader.prototype = {
 
                     if (node instanceof CLOUD.Cell) {
 
-                        if (node.leaf) {
+                        if (node.leaf === true || node.leaf === 1) {
 
                             var groups = {};
                             var children = node.children;
@@ -21127,9 +21281,9 @@ CLOUD.SceneBoxLoader.prototype = {
                     object = new CLOUD.BBoxNode(bbox, clr);
                     CLOUD.Utils.parseTransform(object, objJSON);
 
-                    if (objJSON.leaf) {
+                    //if (objJSON.leaf) {
                         localRoot.add(object);
-                    }
+                    //}
                     object.worldBoundingBox = bbox.clone();
                     object.worldBoundingBox.applyMatrix4(scope.manager.getGlobalTransform());
 
@@ -21210,10 +21364,10 @@ CLOUD.TaskWorker = function (threadCount) {
         }
 
         var TASK_COUNT = Math.min(this.MaxThreadCount, itemCount);
-        scope.doingCount = TASK_COUNT;
+        scope.doingCount = itemCount;
         function processItem(i) {
 
-            if (i >= TASK_COUNT) {
+            if (i >= itemCount) {
                 //if (scope.doingCount < 1) {
                 //    scope.run(loader, sorter);
                 //}
@@ -21362,7 +21516,7 @@ CLOUD.TaskManager = function (manager) {
     this.mpkWorker = new CLOUD.MpkNodeTaskWorker(8);
 
     // SubScene
-    this.sceneWorker = new CLOUD.TaskWorker(4);
+    this.sceneWorker = new CLOUD.TaskWorker(8);
 };
 
 CLOUD.TaskManager.prototype = {
@@ -21589,6 +21743,10 @@ CLOUD.ModelManager.prototype.prepareScene = function (camera) {
     this.scene.prepareScene(camera);
     this.prepareResource();
 };
+
+CLOUD.ModelManager.prototype.collectionGarbage = function () {
+    this.scene.collectionGarbage();
+}
 
 CLOUD.ModelManager.prototype.getGlobalTransform = function(){
     return this.scene.rootNode.matrix;
@@ -22292,8 +22450,10 @@ CloudViewer.prototype = {
                     requestAnimationFrame(incrementRender(renderId));
                 }
                 else {
-                    scope.rendering = false;
 
+                    scope.modelManager.collectionGarbage();
+                    scope.rendering = false;
+                    
                     if (renderId != scope.requestRenderCount)
                         scope.render();
                 }
@@ -22317,6 +22477,8 @@ CloudViewer.prototype = {
         this.renderViewHouse();
 
         this.renderMiniMap();
+
+        
     },
 
     setEditorDefault: function () {

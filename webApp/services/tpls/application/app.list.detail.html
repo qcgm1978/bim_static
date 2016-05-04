@@ -1,0 +1,18 @@
+<div class="left name overflowEllipsis">
+    <%=appName%>
+</div>
+<div class="left desc overflowEllipsis">
+    <%=appDesc%>
+</div>
+<div class="left appKey">
+    <%=appKey%>
+</div>
+<div class="left appSecret"> <span class="text"><%=appSecret%></span> <a class="reset" href="javascript:void(0);">重新生成</a></div>
+<div class="left status">
+    <%=status==1?'已启用':'已禁用'%>
+</div>
+<div class="left op">
+    <i class="myIcon-status-disable" title="<%=status==1?'禁用':'启用'%>"></i>
+    <i class="myIcon-update" title="更新"></i>
+    <i class="myIcon-del-blue" title="删除"></i>
+</div>

@@ -57,6 +57,11 @@ ul,li{list-style: none outside none;}
   }
 }
 .serviceWindow{
+  .toselected{
+    span{
+      background: #A8DBFD;
+    }
+  }
   .icon-person{
     display: inline-block;
     width: 15px;
@@ -109,17 +114,52 @@ ul,li{list-style: none outside none;}
       }
     }
   }
-  .leftWindow{
+  .leftWindow,.rightWindow{
 
     ul.shut{
       display: none;
     }
+    p.shut{
+      i{
+        display: inline-block;
+        width: 20px;
+        height: 18px;
+        background:url("/static/dist/images/services/images/service_ico.png") 0 -99px no-repeat;
+      }
+    }
+    p.person{
+      i{
+        position: relative;
+        left: -4px;
+        top: 4px;
+        display: inline-block;
+        width: 17px;
+        height: 17px;
+        background:url("/static/dist/images/services/images/service_ico.png") 0 -620px no-repeat;
+      }
+    }
+    p.open{
+      i{
+        display: inline-block;
+        left: -3px;
+        width: 20px;
+        height: 18px;
+        background:url("/static/dist/images/services/images/service_ico.png") 0 -79px no-repeat;
+      }
+    }
     p{
+      word-break: keep-all;
+      white-space: nowrap;
       font-size: 12px;
       color: #999;
       background: #ffffff;
       height: 25px;
       padding-bottom: 4px;
+      cursor: pointer;
+      i{
+        position: relative;
+        top: 6px;
+      }
     }
     &>div>li{
       padding-left: 12px;
@@ -139,8 +179,41 @@ ul,li{list-style: none outside none;}
 
     }
   }
+  .rightWindow{
+    li{
+      position: relative;
+      &:hover{
+        background: #A8DBFD;
+
+      }
+      p{
+        cursor: auto;
+      }
+      &:hover{
+        .delete{
+          display: block;
+        }
+
+      }
+      .delete{
+        position: absolute;
+        top: 0 ;
+        right: 0 ;
+        height: 100%;
+        width: 50px;
+        z-index: 2;
+        display: none;
+        &:hover{
+          cursor: pointer;
+        }
+        &:after{
+          content: "";position: absolute;width: 17px ;height: 13px;right: 10px;top: 5px;background: transparent url("../images/service_ico.png") 0 -280px no-repeat;
+        }
+      }
+    }
+  }
 }
-#mask a:hover{text-decoration: none; cursor: pointer;}
+.serviceWindow a:hover{text-decoration: none; cursor: pointer;}
 .windowSubmit{
   font-size: 14px;
   .myh;

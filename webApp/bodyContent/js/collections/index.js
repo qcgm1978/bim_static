@@ -2,11 +2,13 @@
  * @require /bodyContent/js/views/todolist.js
  */
 var App = App || {};
+
 App.BodyContent.control= {
+	
+	
 
     init : function(){
 		
-
 
         $("#contains").empty();
         new App.BodyContent.App().render(); //渲染框架
@@ -16,9 +18,13 @@ App.BodyContent.control= {
         $("#proclamation").html(new App.BodyContent.proclamationList().render().el);
 		
         this.loadData(this.todoCollection,{});
-        this.loadData(this.slideCollection);
-        this.loadData(this.monthEndCollection,{type:2,useId:'wb'});
-        this.loadData(this.monthStartCollection,{type:1,useId:'wb'});
+        this.loadData(this.slideCollection,{
+        	type:3,
+        	pageIndex:1,
+        	pageItemCount:30
+        });
+        this.loadData(this.monthEndCollection,{type:2,useId:App.Comm.getCookie('userId')});
+        this.loadData(this.monthStartCollection,{type:1,useId:App.Comm.getCookie('userId')});
         this.loadData(this.proCollection);
 
 
@@ -32,6 +38,7 @@ App.BodyContent.control= {
             }
         });
     },
+    
 
     todoCollection:new (Backbone.Collection.extend({
         model:App.BodyContent.model,
@@ -83,7 +90,7 @@ App.BodyContent.control= {
         }
     })),
 
-    loadData : function(collection,data) {
+    loadData : function(collection,data,urlParam) {
     	
         //数据重置
         collection.reset();
@@ -94,12 +101,14 @@ App.BodyContent.control= {
             success: function(collection, response, options) {
             	var _$container=null;
                 //轮播插件是jquery对象、所以直接加载显示、不经过Backbone
-                if(collection ==App.BodyContent.control.slideCollection){
+                if(collection ==App.BodyContent.control.slideCollection && response.message=="success"){
+                	var _datas=response.data.items;
+                	_datas.length>=5? _datas.length = 5:"";
                     $(".mmhSlider").mmhSlider({
 						delay:5000,
-						data:response.data,
+						data:_datas,
 						onChange:function(d){
-							$("#slideTitle").html(d.title);
+							$("#slideTitle").html(d.name);
 						}
 					})
                 }

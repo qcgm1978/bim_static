@@ -1,13 +1,19 @@
+/* 公用 抽取 */
+.bRight { border-right: 1px #ccc solid; }
+.headerListComm { height: 28px; line-height: 27px; border: 1px #ccc solid; border-width: 1px 0px; }
+.headerListCommBg { background-color: #eee; .headerListComm; }
+
+/* 样式 */
 .systemContainerBox, .systemContaine { height: 100%; }
 .systemContainer { height: 100%; }
 #systemContainer { height: 100%; margin-top: -80px; padding-top: 80px; position: relative; }
 .categoryManager { height: 100%; padding: 20px;
 	.servicesCateBox { border: 1px #ccc solid; height: 100%; position: relative; }
-	.categoryList { .item { height: 28px; line-height: 27px; border: 1px #ccc solid; border-width: 1px 0px;
+	.categoryList { .item { .headerListComm;
 			div { float: left; padding-left: 15px; }
-			.code { width: 22%; border-right: 1px #ccc solid; }
-			.name { width: 22%; border-right: 1px #ccc solid; }
-			.desc { width: 45%; border-right: 1px #ccc solid; }
+			.code { width: 22%; .bRight; }
+			.name { width: 22%; .bRight; }
+			.desc { width: 45%; .bRight; }
 			.op { width: 10%; }
 		}
 	}
@@ -38,9 +44,7 @@
 	}
 	.folwManager { height: 100%; padding: 20px;
 		.folwSlideBar { width: 282px; float: left; border: 1px #ccc solid; height: 100%; background-color: #eee; }
-		.flowSliderUl { .item { height: 38px; border-bottom: 1px #ccc solid; line-height: 38px; cursor: pointer;    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;padding-right: 8px;
+		.flowSliderUl { .item { height: 38px; border-bottom: 1px #ccc solid; line-height: 38px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 8px;
 				.border { border-left: 4px solid transparent; margin-right: 12px; float: left; height: 100%; }
 				&.selected { background-color: #fff;
 					.border { border-left-color: #006ecf; }
@@ -48,19 +52,19 @@
 			}
 		}
 		.folwContainer { margin-left: 306px; height: 100%; border: 1px #ccc solid; }
-		.flowList { .code { width: 6%; border-right: 1px #ccc solid; }
-			.name { width: 21%; border-right: 1px #ccc solid; }
-			.performance { width: 52%; border-right: 1px #ccc solid;
-				&.lineH121 { line-height: 21px; padding-top: 8px;    height: 58px; }
+		.flowList { .code { width: 6%; .bRight; }
+			.name { width: 21%; .bRight; }
+			.performance { width: 52%; .bRight;
+				&.lineH121 { line-height: 21px; padding-top: 8px; height: 58px; }
 			}
 			.op { width: 20%; }
 			.left { padding-left: 15px; }
 		}
-		.flowListHeader { .item { height: 28px; line-height: 27px; background-color: #eee; border: 1px #ccc solid; border-width: 1px 0px; }
+		.flowListHeader { .item { .headerListCommBg; }
 			.code { text-indent: -9999px; }
 		}
-		.flowListBody {
-			.item { height: 58px; line-height: 57px; border-bottom: 1px #ccc solid; .code { padding-left: 0px; text-align: center; }
+		.flowListBody { .item { height: 58px; line-height: 57px; border-bottom: 1px #ccc solid;
+				.code { padding-left: 0px; text-align: center; }
 				.op { i { vertical-align: top; margin-top: 24px; cursor: pointer; }
 				}
 			}
@@ -71,3 +75,19 @@
 }
 
 /* 扩展属性 */
+.extendAttrContainer { .extendAttrList { .left { padding-left: 12px; }
+		.key { width: 14%; .bRight; }
+		.attr { width: 30%; .bRight; }
+		.type { width: 12%; .bRight; }
+		.linkAttr { width: 31%; .bRight; }
+		.op { width: 12%; }
+	}
+	.extendAttrListHeader { .headerListCommBg; }
+	.extendAttrListBodybox { height: 100%; margin-top: -66px; padding-top: 66px; }
+	.extendAttrListBody { .item { height: 48px; line-height: 47px; border-bottom: 1px #ccc solid; }
+	}
+}
+.extendAttrAddDialog { .txtAttrTitle, .linkAttrOption .myDropText,.attrTypeOption .myDropText { width: 558px; margin: 10px 0px 20px 0px; }
+	.linkAttrOption .myDropList,.attrTypeOption .myDropList{ width: 558px; left: 0px; height: 142px;}
+	.attrTypeOption .myDropList{height: 60px;}
+}

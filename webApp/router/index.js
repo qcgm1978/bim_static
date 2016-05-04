@@ -17,10 +17,12 @@ var AppRoute = Backbone.Router.extend({
 		'list/:id': 'list',
 		'bodyContent':'bodyContent'
 	},
+	
     //首页主体展示
 
 	bodyContent :function(){
-			this.reset();
+		
+		this.reset();
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".bodyConMenu").addClass('selected');
 		_.require('/static/dist/bodyContent/bodyContent.css');
 		_.require('/static/dist/bodyContent/bodyContent.js');
@@ -128,7 +130,7 @@ var AppRoute = Backbone.Router.extend({
 	services:function(type,tab){
 		this.reset();
 		$("#pageLoading").hide();
-		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".service").addClass('selected');
+		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".services").addClass('selected');
 		_.require('/static/dist/services/services.css');
 		_.require('/static/dist/services/services.js');
 		$("#bottomBar").hide();//隐藏脚部

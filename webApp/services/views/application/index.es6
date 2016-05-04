@@ -8,16 +8,29 @@ App.Services.Application = Backbone.View.extend({
 	template: _.templateUrl('/services/tpls/application/index.html', true),
 
 	events: {
-		"click .topBar .create": "appAddDialog",
-		"click .item .reset": "resetKey",
-		"click .item .myIcon-update": "updateAppDialog",
-		"click .item .myIcon-del-blue": "delAppDialog"
+		"click .topBar .create": "appAddDialog"
+	},
 
+	initialize() {
+		this.listenTo(App.Services.AppCollection.AppListCollection, "add", this.addOne);
+		this.listenTo(App.Services.AppCollection.AppListCollection, "reset", this.reset);
 	},
 
 	render() {
 		this.$el.html(this.template);
+		//获取数据
+		this.fetchData();
 		return this;
+	},
+
+	//获取数据
+	fetchData() {
+		App.Services.AppCollection.AppListCollection.reset();
+		App.Services.AppCollection.AppListCollection.fetch({
+			success(model, response, options) {
+				 this.$(".appContent .textSum .count").text(response.data.length);
+			}
+		});
 	},
 
 	//新增应用 弹出层
@@ -35,8 +48,7 @@ App.Services.Application = Backbone.View.extend({
 			okCallback: () => {
 				this.appAdd(dialog);
 				return false;
-			}
-
+			} 
 		}
 
 		var dialog = new App.Comm.modules.Dialog(opts);
@@ -45,62 +57,54 @@ App.Services.Application = Backbone.View.extend({
 	//新增应用
 	appAdd(dialog) {
 
-	},
-
-	//重新生成 appsecret
-	resetKey(event) {
-
-		var name = $(event.target).closest(".item").find(".name").text(),
-			msg = "确认重新生成“" + name + "”的appsecret？";
-
-		App.Services.Dialog.alert(msg, (dialog) => {
-
-		}, "生成中");
-	},
-
-	//更新 app、
-	updateAppDialog(event) {
-
-		var $item = $(event.target).closest(".item"),
-			data = {
-				isEdit: true,
-				name: $item.find(".name").text(),
-				desc: $item.find(".desc").text(),
-				appKey: $item.find(".appKey").text(),
-				appSecret: $item.find(".appSecret .text").text()
-			},
-			dialogHtml = _.templateUrl('/services/tpls/application/index.add.html')(data);
-
-		var opts = {
-			title: "编辑应用",
-			width: 601,
-			isConfirm: false,
-			isAlert: true,
-			cssClass: "addNewApp",
-			message: dialogHtml,
-			okCallback: () => {
-				this.updateApp(dialog);
-				return false;
-			}
-
+		var data={
+			URLtype:"appInsert",
+			type:"POST",
+			data:{
+				name:dialog.element.find(".txtAppTitle").val().trim(),
+				desc:dialog.element.find(".txtAppDesc").val().trim()
+			} 
 		}
 
-		var dialog = new App.Comm.modules.Dialog(opts);
-	},
+		if (!data.data.name) {
+			alert("请输入应用名称");
+			return;
+		}
 
-	//更新app
-	updateApp(){
+		if (!data.data.desc) {
+			alert("请输入应用详情");
+			return;
+		}
 
-	},
 
-	//删除 app
-	delAppDialog() {
-		var name = $(event.target).closest(".item").find(".name").text(),
-			msg = "确认删除“" + name + "”的appsecret？";
-
-		App.Services.Dialog.alert(msg, (dialog) => {
-
+		App.Comm.ajax(data,function(data){
+			if (data.code==0) {
+				App.Services.AppCollection.AppListCollection.push(data.data);
+				dialog.close();
+			}
+			
 		});
+
+	}, 
+
+	//加载
+	reset() {
+		this.$(".appListScroll .listBody").html('<li class="loading">正在加载，请稍候……</li>');
+	},
+
+	//新增
+	addOne(model) {
+
+		var $listBody = this.$(".appListScroll .listBody");
+		//移除loading
+		$listBody.find(".loading").remove();
+		//绑定滚动条
+		App.Comm.initScroll(this.$(".appListScroll"), "y");
+		//添加数据
+		$listBody.append(new App.Services.ApplicationListDetail({
+			model: model
+		}).render().el);
+
 	}
 
 

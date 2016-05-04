@@ -75,6 +75,7 @@
     width: 100%;
     height: 100%;
     float: left;
+    overflow-y: scroll;
     & ul{
         border: 1px solid #ccc; 
     }
@@ -127,7 +128,6 @@
         border-radius: 4px;
       }
       p{
-        float: left;
         color: #666;
         margin-left: 12px;
         line-height: 32px;
@@ -147,7 +147,7 @@
         width: 50px;
         height: 16px;
         float: right;
-        margin: 5px 10px 0 0;
+        margin: -23px 10px 0 0;
         i{
           display: inline-block;
           width: 14px;
@@ -164,17 +164,8 @@
 @moduleWindowBorderColor:#CCC;
 @memberManagerHeight:380px;
 .moduleWindow,.module {
-    position: relative;
-    top: auto;
-    left: auto;
-    right: auto;
-    bottom: auto;
-    border: 1px solid @moduleWindowBorderColor;
     color: #484848;
     background: #FAFAFA;
-    min-width: 600px;
-    max-width: 800px;
-    margin: 10% auto;
     & .mwin-header {
         height: 50px;
         line-height: 50px;
@@ -183,6 +174,15 @@
         border-bottom: 1px solid @moduleWindowBorderColor;
         & a{
             float: right;
+        }
+        
+        & i.closeIcon{
+        	background: url(../images/service_ico.png) 0 -360px;
+        	width: 20px;
+        	height: 20px;
+        	display: inline-block;
+			    float: right;
+			    margin-top: 15px
         }
     }
     & .mwin-body {
@@ -193,6 +193,7 @@
         margin: 0 auto;
     }
     & .mwin-foot {
+    		display: none;
         height: 50px;
         line-height: 50px;
         vertical-align: middle;
@@ -206,7 +207,7 @@
     & .modalBtn {
         display: inline-block;
         vertical-align: middle;
-        padding: 6px 12px;
+        padding: 10px 20px;
         background: #117EE1;
         text-align: center;
         color: #FFF;
@@ -214,6 +215,9 @@
         font-family: "microsoft yahei";
         line-height: 1.2;
         white-space: nowrap;
+        &:hover{
+        	background: rgba(17,126,225,0.8);
+        }
         &.icon{
             color: #333;
             background: #FFFFFF;
@@ -241,21 +245,24 @@
     		font-family: "microsoft yahei";
     		font-size: 16px;
     		color: #333;
+    		width: 100%;
+    		text-align: center;
     		& .delTip{
     			 padding-left:40px;
     			 height: 32px;
     			 line-height: 32px;
-    			 display: block;
-    			background: url(../../service/images/service_ico.png) no-repeat 0 -300px;
+    			 display: inline-block;
+    			background: url(../images/service_ico.png) no-repeat 0 -300px;
     		}
     	}
     	& .mwin-foot{
     		padding-right: 0;
     		text-align: center;
+    		display: block;
     		& .modalBtn{
     			width: 80px;
     			height: 32px;
-    			line-height: 1.6;
+    			line-height: 1;
     		}
     		& .modalBtn:last-child{
     			background: #FFF;
@@ -344,21 +351,26 @@
     width: 20px;
     height: 20px;
 }
-.ztree li span.button.ico_docu{
+.ztree li span.button.ico_docu,
+.ztree li span.button.user_ico_docu{
     background: url(../images/service_ico.png);
-    background-position: 0 -40px;
+    background-position: 0 20px;
     vertical-align: -8px;
 }
-.ztree li span.button.ico_open{
+.ztree li span.button.ico_open,
+.ztree li span.button.business_ico_open{
     vertical-align: -8px;
     background: url(../images/service_ico.png);
     background-position: 0 -80px;
 }
-.ztree li span.button.ico_close{
+.ztree li span.button.ico_close,
+.ztree li span.button.business_ico_close,
+.ztree li span.button.business_ico_docu{
     vertical-align: -8px;
     background: url(../images/service_ico.png);
     background-position: 0 -100px;
 }
+
 
 #selectedTree {
     padding: 0;
