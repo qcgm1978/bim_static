@@ -34,13 +34,9 @@ App.Services.keyUserFrame = Backbone.View.extend({
 
     //提交表单，完毕会触发重新获取列表，列表为memBlend所属列表
     newKeyUser:function(){
-
-        $("#mask").html(new App.Services.addKeyUser().render().el);
-        //需要获取的数据
-        //已选成员
-        //已选角色
-        //这里情况比较多，单个时候列表显示读取的个人角色？？？
-        $("#mask").show();
+        App.Services.maskWindow=new App.Comm.modules.Dialog({title:'新增关键用户',width:600,height:500,isConfirm:false})
+        $('.mod-dialog .wrapper').html(new App.Services.addKeyUser().render().el);
+        console.log($('.mod-dialog .content'))
     },
 
     add:function(){

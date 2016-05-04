@@ -1,3 +1,6 @@
+/**
+ * @require /services/collections/auth/projectMember/services.auth.projectMember.js
+ */
 //主容器
 App.Services.projectMember.mainView = Backbone.View.extend({
 	
