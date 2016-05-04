@@ -8,7 +8,8 @@ App.Services.ApplicationListDetail = Backbone.View.extend({
 	events: {
 		"click  .reset": "resetKey",
 		"click  .myIcon-update": "updateAppDialog",
-		"click  .myIcon-del-blue": "delAppDialog"
+		"click  .myIcon-del-blue": "delAppDialog",
+		"click .myIcon-status-disable":"switchStatus"
 	},
 
 	initialize() {
@@ -164,6 +165,11 @@ App.Services.ApplicationListDetail = Backbone.View.extend({
 			$parent.append('<li class="loading">无数据</li>');
 		}
 		this.remove();
+	},
+
+	//修改状态
+	switchStatus(event){
+		console.log(1);
 	}
 
 });
