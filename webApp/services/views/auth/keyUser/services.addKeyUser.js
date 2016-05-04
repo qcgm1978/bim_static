@@ -8,7 +8,7 @@ App.Services.addKeyUser = Backbone.View.extend({
 
   events:{
     "click .windowClose":"close",
-    "click .keyUserList li":'toggleClass'
+    "click .up,.next":'changeStep'
   },
 
   render:function(step){
@@ -18,19 +18,30 @@ App.Services.addKeyUser = Backbone.View.extend({
     if(step){
 
     }else{
-
+      this.$el.find('.up').hide();
+      this.$el.find('.confirm').hide();
       this.$el.find('.leftWindow').html(new App.Services.step1().render().el);
 
       App.Services.KeyUser.loadData(App.Services.KeyUser.Step1,'',function(r){
         console.log(r)
 
         if(r && !r.code && r.data){
-          App.Services.KeyUser.Step1.set(r.data);
+          _.each(r.data.org,function(data,index){
+            data.shut = true;
+            data.canLoad = true;
+          });
+          App.Services.KeyUser.org[0]=r.data.org;
+          App.Services.KeyUser.Step1.set(r.data.org);
           console.log(r.data)
         }
       });
     }
     return this;
+  },
+
+  //切换步骤页
+  changeStep  : function(){
+alert('gg')
   },
 
   //关闭窗口

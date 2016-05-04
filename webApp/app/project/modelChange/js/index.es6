@@ -249,6 +249,7 @@ App.Project.Model = {
 			// 没有找到当前文件,默认加载第一个
 			if(!isload){
 				var file = data.data[0].comparisons[0];
+				$(".rightPropertyContent .listDetail").html(new App.Project.Model.getInfo().render().el);
 				App.Index.getDetail(file.comparisonId);
 				App.Index.Settings.changeModel = file.output.replace("_output","");
 				App.Index.renderModel(file.currentModel);
@@ -299,18 +300,12 @@ App.Project.Model = {
 			var curElementId = current.data('id');
 			var curBaseId = current.data('base');
 			if (that.prev('.noneSwitch').length > 0) {
+				App.Index.Settings.Viewer.unSelected();
 				if(current[0] != that[0]){
 					current.removeClass('current');
-					App.Index.Settings.Viewer.highlight({
-						type: 'userId',
-						ids: [elementId, baseId]
-					});
+					App.Index.Settings.Viewer.selectIds([elementId, baseId]);
 				}
 				that.toggleClass('current');
-				App.Index.Settings.Viewer.downplay({
-					type: 'userId',
-					ids: [curElementId, curBaseId]
-				});
 				App.Index.Settings.Viewer.fit();
 			}
 		}

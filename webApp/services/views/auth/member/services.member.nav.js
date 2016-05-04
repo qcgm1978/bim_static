@@ -53,7 +53,7 @@ App.Services.MemberNav=Backbone.View.extend({
         //获取数据，将会刷新右侧视图
         App.Services.Member.loadData(collection,{},function(response){
             //菜单
-            if (response.data.org.length) {
+            if (response.data.org && response.data.org.length) {
                 //样式处理
                 this.$("div").remove("active");
                 $("#" + _thisType).addClass("active");

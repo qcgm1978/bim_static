@@ -17,10 +17,12 @@ var AppRoute = Backbone.Router.extend({
 		'list/:id': 'list',
 		'bodyContent':'bodyContent'
 	},
+	
     //首页主体展示
 
 	bodyContent :function(){
-			this.reset();
+		
+		this.reset();
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".bodyConMenu").addClass('selected');
 		_.require('/static/dist/bodyContent/bodyContent.css');
 		_.require('/static/dist/bodyContent/bodyContent.js');

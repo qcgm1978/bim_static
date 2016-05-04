@@ -11842,7 +11842,7 @@ CLOUD.Scene.prototype.prepareSceneBox = function () {
     };
 }();
 
-CLOUD.Scene.prototype.prepareScene = function () {
+CLOUD.Scene.prototype.prepareScene2 = function () {
 
     var _frustum = new THREE.Frustum();
     var _projScreenMatrix = new THREE.Matrix4();
@@ -11982,7 +11982,7 @@ CLOUD.Scene.prototype.prepareScene = function () {
     }
 }();
 
-CLOUD.Scene.prototype.prepareScene2 = function () {
+CLOUD.Scene.prototype.prepareScene = function () {
 
     var _frustum = new THREE.Frustum();
     var _projScreenMatrix = new THREE.Matrix4();
@@ -13791,7 +13791,7 @@ CLOUD.OrbitEditor = function (cameraEditor, scene, domElement) {
     this.isMouseClick = false;
     this.oldMouseX = -1;
     this.oldMouseY = -1;
-    //this.timeoutId = null;
+    this.timeoutId = null;
 };
 
 CLOUD.OrbitEditor.prototype = Object.create(THREE.EventDispatcher.prototype);
@@ -13890,14 +13890,12 @@ CLOUD.OrbitEditor.prototype.onMouseWheel = function (event) {
     var camera_scope = this.cameraEditor;
     //if (camera_scope.enabled === false || camera_scope.noZoom === true || camera_scope.IsIdle() !== true) return;
 
-    //function handleMouseWheel() {
-    //    camera_scope.viewer.editorManager.isUpdateRenderList = true;
-    //    //camera_scope.zoom(0, event.clientX, event.clientY);
-    //
-    //    camera_scope.update(true);
-    //
-    //    console.log("handleMouseWheel");
-    //}
+    function handleMouseWheel() {
+        camera_scope.viewer.editorManager.isUpdateRenderList = true;
+        //camera_scope.zoom(0, event.clientX, event.clientY);
+        camera_scope.update(true);
+        //console.log("handleMouseWheel");
+    }
 
     if (camera_scope.enabled === false || camera_scope.noZoom === true) return;
 
@@ -13911,14 +13909,14 @@ CLOUD.OrbitEditor.prototype.onMouseWheel = function (event) {
     delta = (Math.abs(delta) > 10 ? delta : -delta * 40);
     delta *= 0.0005;
 
-    //if (this.timeoutId) {
-    //    clearTimeout(this.timeoutId);
-    //}
-    //
-    //// 延迟300ms以判断是否单击
-    //this.timeoutId = setTimeout(handleMouseWheel, 100);
-    //
-    //camera_scope.viewer.editorManager.isUpdateRenderList = false;
+    if (this.timeoutId) {
+        clearTimeout(this.timeoutId);
+    }
+
+    // 延迟300ms以判断是否单击
+    this.timeoutId = setTimeout(handleMouseWheel, 200);
+
+    camera_scope.viewer.editorManager.isUpdateRenderList = false;
     camera_scope.zoom(delta, event.clientX, event.clientY);
 };
 
@@ -13929,23 +13927,22 @@ CLOUD.OrbitEditor.prototype.onMouseDoubleClick = function (event) {
 CLOUD.OrbitEditor.prototype.onKeyDown = function (event) {
     var camera_scope = this.cameraEditor;
 
-    //function handleKeyDown() {
-    //    camera_scope.viewer.editorManager.isUpdateRenderList = true;
-    //    camera_scope.update(true);
-    //
-    //    console.log("handleKeyDown");
-    //}
+    function handleKeyDown() {
+        camera_scope.viewer.editorManager.isUpdateRenderList = true;
+        camera_scope.update(true);
+        //console.log("handleKeyDown");
+    }
 
     if (camera_scope.enabled === false || camera_scope.noKeys === true || camera_scope.noPan === true) return;
 
-    //camera_scope.viewer.editorManager.isUpdateRenderList = true;
-    //
-    //if (this.timeoutId) {
-    //    clearTimeout(this.timeoutId);
-    //}
-    //
-    //// 延迟300ms以判断是否单击
-    //this.timeoutId = setTimeout(handleKeyDown, 100);
+    if (this.timeoutId) {
+        clearTimeout(this.timeoutId);
+    }
+
+    // 延迟300ms以判断是否单击
+    this.timeoutId = setTimeout(handleKeyDown, 200);
+
+    camera_scope.viewer.editorManager.isUpdateRenderList = false;
 
     switch (event.keyCode) {
         case camera_scope.keys.ALT:
@@ -15499,6 +15496,27 @@ CLOUD.Filter = function () {
 
     var selectionSet = {
         boundingBox: new THREE.Box3()
+    };
+
+    //DEBUG API
+    this.getVisibleFilter = function () {
+        return visibilityFilter;
+    };
+
+    this.getFileFilter = function () {
+        return fileFilter;
+    };
+
+    this.getOverriderByUserId = function () {
+        return materialOverriderByUserId;
+    };
+
+    this.getOverriderByUserData = function () {
+        return materialOverriderByUserData;
+    };
+
+    this.getSelectionSet = function () {
+        return selectionSet;
     };
 
     ////////////////////////////////////////////////////////////////////
@@ -21127,9 +21145,9 @@ CLOUD.SceneBoxLoader.prototype = {
                     object = new CLOUD.BBoxNode(bbox, clr);
                     CLOUD.Utils.parseTransform(object, objJSON);
 
-                    if (objJSON.leaf) {
+                    //if (objJSON.leaf) {
                         localRoot.add(object);
-                    }
+                    //}
                     object.worldBoundingBox = bbox.clone();
                     object.worldBoundingBox.applyMatrix4(scope.manager.getGlobalTransform());
 
@@ -21362,7 +21380,7 @@ CLOUD.TaskManager = function (manager) {
     this.mpkWorker = new CLOUD.MpkNodeTaskWorker(8);
 
     // SubScene
-    this.sceneWorker = new CLOUD.TaskWorker(4);
+    this.sceneWorker = new CLOUD.TaskWorker(8);
 };
 
 CLOUD.TaskManager.prototype = {

@@ -1,11 +1,16 @@
 /*
  * @require  services/collections/index.es6
  */
-
 App.Services.roleFun = {
     collection: new (Backbone.Collection.extend({
-        model: App.Services.model,
-        urlType: "fetchServiceFunList",
+        model: Backbone.Model.extend({
+            defaults: function() {
+                return {
+                    url: ''
+                }
+            }
+        }),
+        urlType: "fetchServicesFunList",
         parse: function (response) {
             if (response.message == "success") {
                 return response.data;
@@ -13,7 +18,7 @@ App.Services.roleFun = {
         }
     })),
     loadData: function (data,fn) {
-        var data = data || {};
+        data = data || {};
         //数据重置
         App.Services.roleFun.collection.reset();
         // load list
