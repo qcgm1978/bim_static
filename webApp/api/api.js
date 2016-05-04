@@ -26,9 +26,9 @@ App.API = {
 		fetchServiceOzRoleList:'platform/org/{orgId}/role?outer={outer}',//机构角色列表
 		fetchServicesUserRoleList:'https://bim.wanda.cn/platform/user/{userId}/role',
 		fetchServiceMemberOuterList:'platform/auth/org?outer=true',//外部组织-品牌／公司／成员列表
-		fetchServiceMemberInnerList:'platform/auth/org?outer=false&parentId=&includeUsers=',//内部-组织／成员列表
-		fetchServiceKeyUserList:'platform/auth/org?outer=false&parentId=&includeUsers=',//关键用户列表
-		fetchServiceStep1:'platform/auth/org?outer=false&parentId=&includeUsers=',//项目列表
+		fetchServiceMemberInnerList:'platform/auth/org?outer=false',//内部-组织／成员列表
+		fetchServiceKeyUserList:'platform/auth/keyUser',//关键用户列表
+		fetchServiceStep1:"outer={outer}&includeUsers={includeUsers}&parentId={parentId}", //项目列表,//项目列表
 
 
 

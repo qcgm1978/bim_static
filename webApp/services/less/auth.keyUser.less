@@ -114,12 +114,34 @@ ul,li{list-style: none outside none;}
     ul.shut{
       display: none;
     }
+    p.shut{
+      i{
+        display: inline-block;
+        width: 20px;
+        height: 18px;
+        background:url("/static/dist/images/services/images/service_ico.png") 0 -99px no-repeat;
+      }
+    }
+    p.open{
+      i{
+        display: inline-block;
+        left: -3px;
+        width: 20px;
+        height: 18px;
+        background:url("/static/dist/images/services/images/service_ico.png") 0 -79px no-repeat;
+      }
+    }
     p{
       font-size: 12px;
       color: #999;
       background: #ffffff;
       height: 25px;
       padding-bottom: 4px;
+      cursor: pointer;
+      i{
+        position: relative;
+        top: 6px;
+      }
     }
     &>div>li{
       padding-left: 12px;
