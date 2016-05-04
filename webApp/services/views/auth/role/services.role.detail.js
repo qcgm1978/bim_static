@@ -7,7 +7,8 @@ App.Services.roleDetail=Backbone.View.extend({
     template:_.templateUrl("/services/tpls/auth/role/services.role.detail.html"),
     events:{
         "click .modify":"modify",
-        "click .delete":"delete"
+        "click .delete":"delete",
+        "click .explorer":"explorer"
     },
 
     render:function(){
@@ -21,25 +22,17 @@ App.Services.roleDetail=Backbone.View.extend({
     },
 
     modify:function(){
-        //框架
-        var frame = new App.Services.roleWindowIndex().render().el;
-        $(".mod-dialog-masklayer").hide();
 
-        //初始化窗口
-        App.Services.batchAwardWindow = new App.Comm.modules.Dialog({
-            title:"新建角色",
-            width:600,
-            height:500,
-            isConfirm:false,
-            isAlert:false,
-            okCallback:function(){},
-            cancelCallback:function(){},
-            closeCallback:function(){},
-            message:frame
-        });
+        App.Services.roleModify = true;
 
-
+        this.window();
+        this.recognize();
         //加载功能，给已角色有的功能选择状态
+
+    },
+
+    //区分修改与浏览
+    recognize:function( fn){
         var _this = this;
         var data = {};
         App.Services.roleFun.loadData(data,function(){
@@ -56,17 +49,66 @@ App.Services.roleDetail=Backbone.View.extend({
                     }
                 }
             });
-
             $(".mod-dialog-masklayer").show();
+            if(fn && typeof  fn == "function"){
+                fn()
+            }
+        });
+    },
 
 
+    explorer:function(){
+        this.window();
+        this.recognize(function(){
+            //隐藏可选项
+            $(".memCheck").hide();
+            $(".seWinBody .func li .name span.rohead ").hide();
+        });
+
+    },
+
+
+    //弹窗
+    window:function(){
+        var frame = new App.Services.roleWindowIndex().render().el;
+        //初始化窗口
+        App.Services.maskWindow = new App.Comm.modules.Dialog({
+            title:"新建角色",
+            width:600,
+            height:500,
+            isConfirm:false,
+            isAlert:false,
+            okCallback:function(){},
+            cancelCallback:function(){},
+            closeCallback:function(){},
+            message:frame
         });
     },
 
     delete:function(){
         //删除需判断状态，由什么来判断？
-        App.Services.role.collection.remove(this.model);
-        App.Services.role.collection.save();
+
+        var frame = new App.Services.windowAlert().render().el;
+
+        App.Services.deleteRoleInfo = this.model;
+
+        App.Services.alertWindow = new App.Comm.modules.Dialog({
+            title:"",
+            width:280,
+            height:180,
+            isConfirm:false,
+            isAlert:false,
+            message:frame
+        });
+        $(".mod-dialog .wrapper .header").hide();
+
+
+    },
+
+    alertWindow:function(){
+
+
+
     }
 });
 

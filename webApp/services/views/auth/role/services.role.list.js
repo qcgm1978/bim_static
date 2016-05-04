@@ -34,7 +34,7 @@ App.Services.roleList=Backbone.View.extend({
         var frame = new App.Services.roleWindowIndex().render().el;
 
         //初始化窗口
-        App.Services.batchAwardWindow = new App.Comm.modules.Dialog({
+        App.Services.maskWindow = new App.Comm.modules.Dialog({
             title:"新建角色",
             width:600,
             height:500,
