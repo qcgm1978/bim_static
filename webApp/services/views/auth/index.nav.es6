@@ -7,7 +7,7 @@ App.Services.AuthNav = Backbone.View.extend({
 	tagName:"div",
 
 
-	template:_.templateUrl("/services/tpls/auth/auth.nav.html",true),
+	template:_.templateUrl("/services/tpls/auth/auth.nav.html"),
 
 	events:{
 		"click .memCtrl" : "memCtrl",
@@ -29,14 +29,7 @@ App.Services.AuthNav = Backbone.View.extend({
 		this.$el.find(".bcService span").eq(2).text(text);
 	},
 
-	initialize:function(){
-
-		//$(".serviceBody").empty();
-		//this.breadCrumb(this.$el.find(".memCtrl"));
-		//App.Services.init({type : "auth",tab:"memCtrl"});
-		//App.Services.Member.init();
-	},
-
+	initialize:function(){},
 
 	memCtrl : function(){
 		$(".serviceBody").empty();
@@ -46,8 +39,7 @@ App.Services.AuthNav = Backbone.View.extend({
 	},
 	roleManager : function(){
 		$(".serviceBody").empty();
-		this.breadCrumb(this.$el.find(".roleManager"));
-		this.$el.find(".roleManager").addClass("active").siblings("li").removeClass("active");
+		this.breadCrumb($(".roleManager"));
 		App.Services.init("auth","roleManager");
 		App.Services.role.init();
 	},

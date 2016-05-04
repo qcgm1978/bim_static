@@ -1,6 +1,7 @@
 /*
  * @require  /services/collections/auth/member/member.list.js
  * */
+App.Services.memberWindowData = {"roleId":[], "outer":{"orgId":[],"userId":[]},"inner":{"orgId":[], "userId":[]}};//提交数据
 App.Services.memberDetail=Backbone.View.extend({
     tagName:'li',
 
@@ -43,7 +44,7 @@ App.Services.memberDetail=Backbone.View.extend({
         var frame = new App.Services.MemberWindowIndex().render().el;//外框
 
         //初始化窗口
-        App.Services.batchAwardWindow = new App.Comm.modules.Dialog({
+        App.Services.maskWindow = new App.Comm.modules.Dialog({
             title:"角色授权",
             width:600,
             height:500,
@@ -55,9 +56,19 @@ App.Services.memberDetail=Backbone.View.extend({
             message:frame
         });
 
+
         //当前用户
         $(".seWinBody .aim ul").append(new App.Services.MemberWindowDetail({model:this.model}).render().el);
 
+        //保存弹窗数据方便提交
+        var saveType =  App.Services.MemberType;
+        if(saveType){
+            if(userId){
+                App.Services.memberWindowData[saveType].orgId.push(userId);
+            }else if(orgId){
+                App.Services.memberWindowData[saveType].orgId.push(orgId);
+            }
+        }
 
         //有父项时，取得父项机构的角色列表,无父项时获取缺省角色列表
         $(".memRoleList").append(new App.Services.windowRoleList().render().el);
