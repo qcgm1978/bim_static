@@ -17,9 +17,11 @@
 	}
 	$.fn.mmhSlider.methods = {
 		init: function($dom, setting) {
+			var _def=$.fn.mmhSlider.defaults;
 			var delay = setting.delay,
-				_index = 0,
-				_pause=$.fn.mmhSlider.defaults._pause;
+				_pause=_def._pause;
+				
+			this.cacheArray(setting.data.length);
 			$.fn.mmhSlider.methods.render($dom, setting, function(data) {
 				//定时器任务
 				setInterval(function() {
@@ -37,35 +39,44 @@
 			})
 
 		},
+		cacheArray:function(size){
+			var a=[];
+			for(var i=1;i<size;i++){
+				a.push(i);
+			}
+			a.push(0);
+			$.fn.mmhSlider.methods.caches=a;
+		},
+		cache:function(i){
+			var a=$.fn.mmhSlider.methods.caches;
+			return a[i];
+		},
 		
 		next:function($dom,setting,data){
+			var _this=this;
+			var _index=$.fn.mmhSlider.defaults._index;
 			var $current = $dom.find("li.selected"),
-				$next = $current.next(),
-				_index=$.fn.mmhSlider.defaults._index;
-			if ($next.length === 0) {
-				$next = $dom.find('li').first();
-				_index = 0;
-				$dom.find("label").last().toggleClass('flag');
-			} else {
-				$dom.find("label").eq(_index).toggleClass('flag');
-				_index++;
-			}
+				$currentLabel = $dom.find("label").eq(_index),
+				$nextItem = $dom.find("li").eq(_this.cache(_index)),
+				$nextLable=$dom.find("label").eq(_this.cache(_index));
+			
 			$current.removeClass('selected').addClass('remove');
-			$next.removeClass('remove').addClass('selected');
-			$dom.find("label").eq(_index).toggleClass('flag');
-			setting.onChange(data[_index]);
-			$dom.find(".slideTitle").html(data[_index].title)
+			$nextItem.removeClass('remove').addClass('selected');
+			$currentLabel.toggleClass('flag');
+			$nextLable.toggleClass('flag');
+			$.fn.mmhSlider.defaults._index=_this.cache(_index);
+			setting.onChange(data[_this.cache(_index)]);
 		},
 		
 		random:function($dom,setting,data){
-			var $current = $dom.find("li.selected");
+			var $current = $dom.find("li.selected"),
 				_index=$.fn.mmhSlider.defaults._index;
 			$current.removeClass('selected').addClass('remove');
 			$dom.find("label").eq($current.index()).toggleClass('flag');
 			$dom.find("label").eq(_index).toggleClass('flag');
 			$dom.find("li").eq(_index).removeClass('remove').addClass('selected');
 			setting.onChange(data[_index]);
-			$dom.find(".slideTitle").html(data[_index].title)
+			$dom.find(".slideTitle").html(data[_index].title||data[_index].name)
 		},
 
 		render: function($dom, setting, callback) {
@@ -77,14 +88,14 @@
 					__ = toolTpl;
 				_ = _.replace('{class}', i == 0 ? 'selected' : 'remove');
 				__ = __.replace('{class}', i == 0 ? 'nonFlag flag' : 'nonFlag');
-				_ = _.replace('{src}', data[i].image);
+				_ = _.replace('{src}', data[i].image||data[i].logo||'/static/dist/images/bodyContent/images/1683103954.jpg');
 				result.push(_);
 				tools.push(__);
 			}
 			tools.push("</div>");
 			result.push("</ul>");
 			result = result.concat(tools);
-			result.push('<div class="slideTitle">' + data[0].title + '</div>');
+			result.push('<div class="slideTitle">' + (data[0].title || data[0].name)+ '</div>');
 			$dom.prepend(result.join(""));
 			
 			setting.onChange(data[0]);

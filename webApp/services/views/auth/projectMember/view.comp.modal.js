@@ -19,11 +19,15 @@ ViewComp.Modal= Backbone.View.extend({
 	
 	el: "#modalWrapper",
 	
+	
+	confirmCallback:null,
+	
 	//modal 视图模块
 	template: _.templateUrl('/services/tpls/auth/projectMember/modal.html'),
 	
 	events: {
-		'click .closeIcon': 'closeView'
+		'click .closeIcon': 'closeView',
+		'click .submit':'confirm'
 	},
 	
 	/**
@@ -38,8 +42,8 @@ ViewComp.Modal= Backbone.View.extend({
 	 */
 	render: function(data) {
 		
-		var _data=$.extend({},{title:'标题',dialog:false,width:0,height:0},data)
-		
+		var _data=$.extend({},{title:'标题',dialog:false,width:0,height:0,confirm:function(){}},data)
+		this.confirmCallback=_data.confirm;
 		this.$el.append(this.template(_data))
 		return this;
 	},
@@ -52,9 +56,14 @@ ViewComp.Modal= Backbone.View.extend({
 		}else{
 			this.$el.find(".mwin-body").append(view);
 		}
+		return this;
 	},
 	//关闭Modal视图
 	closeView: function() {
 		this.$el.html("");
+	},
+	
+	confirm: function(){
+		this.confirmCallback();
 	}
 })

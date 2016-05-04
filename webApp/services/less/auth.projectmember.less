@@ -184,6 +184,15 @@
         & a{
             float: right;
         }
+        
+        & i.closeIcon{
+        	background: url(../images/service_ico.png) 0 -360px;
+        	width: 20px;
+        	height: 20px;
+        	display: inline-block;
+			    float: right;
+			    margin-top: 15px
+        }
     }
     & .mwin-body {
         display: inline-block;
@@ -344,21 +353,26 @@
     width: 20px;
     height: 20px;
 }
-.ztree li span.button.ico_docu{
+.ztree li span.button.ico_docu,
+.ztree li span.button.user_ico_docu{
     background: url(../images/service_ico.png);
-    background-position: 0 -40px;
+    background-position: 0 20px;
     vertical-align: -8px;
 }
-.ztree li span.button.ico_open{
+.ztree li span.button.ico_open,
+.ztree li span.button.business_ico_open{
     vertical-align: -8px;
     background: url(../images/service_ico.png);
     background-position: 0 -80px;
 }
-.ztree li span.button.ico_close{
+.ztree li span.button.ico_close,
+.ztree li span.button.business_ico_close,
+.ztree li span.button.business_ico_docu{
     vertical-align: -8px;
     background: url(../images/service_ico.png);
     background-position: 0 -100px;
 }
+
 
 #selectedTree {
     padding: 0;

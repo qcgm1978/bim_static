@@ -16,19 +16,21 @@ App.API = {
 		fetchBodyContentMonthStart :'sixD/plan/concern/index',
 		
 		fetchBodyContentSlide :'dataJson/bodyContent/bodyContent.slide.json',
-		fetchBodyContentMmhSlide :'dataJson/bodyContent/bodyContent.mmhSlider.json',
+		fetchBodyContentMmhSlide :'platform/project',
 		fetchBodyContentProclamation :'dataJson/bodyContent/bodyContent.proclamation.json',
 
 		//services
-		fetchServiceMCBlendList:'platform/auth/org?outer=false&parentId=&includeUsers=',//组织-混合列表
-		fetchServiceRolesList:'platform/auth/role',//角色-功能列表
-		fetchServiceFunList: 'platform/auth/function',//功能列表
-		fetchServiceOzRoleList:'platform/org/{orgId}/role?outer={outer}',//机构角色列表
+		fetchServicesRolesList:'platform/auth/role',//角色列表
+		fetchServicesFunList: 'platform/auth/function',//功能列表
+		fetchServicesOzRoleList:'platform/org/{orgId}/role?outer={outer}',//机构角色列表
 		fetchServicesUserRoleList:'https://bim.wanda.cn/platform/user/{userId}/role',
 		fetchServiceMemberOuterList:'platform/auth/org?outer=true',//外部组织-品牌／公司／成员列表
 		fetchServiceMemberInnerList:'platform/auth/org?outer=false',//内部-组织／成员列表
 		fetchServiceKeyUserList:'platform/auth/keyUser',//关键用户列表
 		fetchServiceStep1:"outer={outer}&includeUsers={includeUsers}&parentId={parentId}", //项目列表,//项目列表
+		fetchServiceMemberList:'platform/auth/org',//内部-组织／成员列表
+		fetchServicesProjectMemberProjectList:'platform/auth/user/{userId}/dataPrivilege/project',//项目成员/项目管理
+		fetchServicesProjectMemberMemberList:'platform/auth/{dataPrivilegeId}/member',//项目成员/项目管理
 
 
 
@@ -175,9 +177,9 @@ App.API = {
 
 		fetchServicesMemberList:'/dataJson/services/member/services.member.list.json',//组织-混合列表
 		fetchServicesRolesList:'/dataJson/services/member/services.member.roles.json',//角色-功能列表
-		fetchServiceFunList: '/dataJson/services/member/services.role.fun.json',//功能列表
-		fetchServicesOzRoleList:'/dataJson/services/member/services.oz.role.json',
-		fetchServicesUserRoleList:'/dataJson/services/member/services.user.role.json',
+		fetchServicesFunList: '/dataJson/services/member/services.role.fun.json',//功能列表
+		fetchServicesOzRoleList:'/dataJson/services/member/services.oz.role.json',//组织角色列表
+		fetchServicesUserRoleList:'/dataJson/services/member/services.user.role.json',//用户角色列表
 		fetchServicesMemberOuterList:'/dataJson/services/member/services.member.list.json',//外部组织-品牌／公司／成员列表
 		fetchServicesMemberInnerList:'/dataJson/services/member/services.member.list.json',//内部-组织／成员列表
 		fetchServicesProjectMemberProjectList:'/dataJson/services/member/services.project.member.projects.json',//项目成员/项目管理

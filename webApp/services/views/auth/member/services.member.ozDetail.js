@@ -49,7 +49,7 @@ App.Services.MemberozDetail=Backbone.View.extend({
         App.Services.Member.loadData(collection,data,function(response){
 
             //菜单
-            if (response.data.org.length) {
+            if (response.data.org && response.data.org.length) {
                 //样式处理
                 _this.$("div").remove("active");
                 $(".ozName").addClass("active");

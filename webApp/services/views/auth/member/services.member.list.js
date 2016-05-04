@@ -59,7 +59,7 @@ App.Services.MemberList=Backbone.View.extend({
         });
 
         //是否选择
-        if(!seleUser.length){
+        if(seleUser && !seleUser.length){
             alert("您没有选择任何成员或组织，无法设置角色！");return
         }
 
