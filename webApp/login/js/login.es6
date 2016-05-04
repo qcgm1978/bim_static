@@ -1,4 +1,11 @@
 var Login = {
+	
+	setCookie(name, value) {
+		var Days = 30;
+		var exp = new Date();
+		exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 1000);
+		document.cookie = name + "=" + escape(value) + ";expires=" + exp.toGMTString()+";domain=.wanda-dev.cn";
+	},
 
 	//事件绑定
 	bindEvent() {
@@ -46,6 +53,7 @@ var Login = {
 				return false;
 			};
 			
+			
 			$.ajax({
 				url:'/platform/login',
 				type:'post',
@@ -54,12 +62,20 @@ var Login = {
 					password:userPwd
 				}
 			}).done(function(data){
+				debugger
+				if(data.data){
+					for(var p in data.data){
+						Login.setCookie(p,data.data[p]);
+					}
+				}
+				Login.setCookie('userId','1028846079');
 				if(data.code==0){
-					window.location.href="index.html";
+					window.location.href="/index.html";
 				}else{
 					$("#mainBox .errorMSG").addClass('show').find(".tip").text("登录失败:"+data.message);
 				}
 			})
+			
 
 		},
 

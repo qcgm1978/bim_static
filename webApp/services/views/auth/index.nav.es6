@@ -1,5 +1,5 @@
 /**
- * @require /services/collections/auth/keyUser/keyUser.js
+ * @require /services/collections/auth/keyuser/keyuser.js
  */
 
 App.Services.AuthNav = Backbone.View.extend({

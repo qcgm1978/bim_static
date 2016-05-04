@@ -1,11 +1,11 @@
 <li>项目管理（<%=data.length%>）</li>
 <% _.each(data,function(item,index){ %>
 	<li class="project<% if(index==0) { %> active <% } %>">
-		<div><img src="<%= item.image %>"></div>
+		<div><img src="<%= item.image|| '../services/images/demoProject.png' %>"></div>
 		<div>
 			<h4><%= item.name %></h4>
 			<p>
-				<%= item.address %>
+				<%= item.province %><%= item.city %>
 					<%= item.startTime %>—
 						<%= item.endTime %>
 			</p>

@@ -9,10 +9,16 @@ App.Comm = {
 	ajax: function(data, callback) {
 
 		data = App.Comm.getUrlByType(data);
-		//登录时要用
-		data.headers = {
-			ReturnUrl: location.href
-		}
+
+
+		if (data.headers) {
+			data.headers.ReturnUrl = location.href;
+		} else {
+			//登录时要用
+			data.headers = {
+				ReturnUrl: location.href
+			}
+		} 
 
 		return $.ajax(data).done(function(data) {
 
