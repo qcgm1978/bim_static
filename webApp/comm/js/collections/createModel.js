@@ -365,8 +365,10 @@ App.Comm.createModel = function(options){
             }
           }
         });
-        var reg = new RegExp("^["+regData.toString()+"]");
+        var str = regData.toString().replace(/,/g,"|");
+        var reg = new RegExp("^("+str+")");
         $.each(codeData,function(i,item){
+          if(!str) return;
           if(regData == "all" || reg.test(item.code)){
             data.push(item.code);
           }
