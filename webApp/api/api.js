@@ -160,6 +160,15 @@ App.API = {
 		"servicesFlowIndex":"platform/set/flow/serial", // 改变位置 ?id={id}
 		"servicesFolwMove":"platform/set/flow/serial", // ?id={id} move up  or down
 
+
+		//app
+		appList:"platform/app",//应用列表
+		fetchAppListById:"platform/app/{id}",//根据id获取列表
+		appInsert:"platform/app/",//创建应用 name desc
+		appDel:"platform/app/{id}",//删除应用
+		appResetSecret:"platform/app/{id}",//重新生成 Secret
+		appUpdate:"platform/app",//更新 id, name desc
+
 		test: ""
 	},
 

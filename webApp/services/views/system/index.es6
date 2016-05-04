@@ -15,7 +15,7 @@ App.Services.System=Backbone.View.extend({
 
 		this.$el.html(new App.Services.System.topBar().render().el);
 
-		this.$(".serviceNav .item").eq(1).trigger("click");
+		this.$(".serviceNav .item").eq(2).trigger("click");
 
 		return this;
 	},
