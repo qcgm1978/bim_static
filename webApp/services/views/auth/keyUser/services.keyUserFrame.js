@@ -34,7 +34,7 @@ App.Services.keyUserFrame = Backbone.View.extend({
 
     //提交表单，完毕会触发重新获取列表，列表为memBlend所属列表
     newKeyUser:function(){
-        App.Services.maskWindow=new App.Comm.modules.Dialog({title:'新增关键用户',width:600,height:500,isConfirm:false})
+        App.Services.maskWindow=new App.Comm.modules.Dialog({title:'新增关键用户',width:600,height:500,isConfirm:false});
         $('.mod-dialog .wrapper').html(new App.Services.addKeyUser().render().el);
         console.log($('.mod-dialog .content'))
     },

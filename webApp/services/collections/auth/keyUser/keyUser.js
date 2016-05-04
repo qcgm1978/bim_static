@@ -4,8 +4,9 @@
 
 App.Services.KeyUser = {
 
-  //暂存机构自定义数据的目录数组
-  org:[],
+  //暂存已被选关键用户的uid数组
+  uid : [],
+
 
 
   loadData : function(collection,data,fn) {
