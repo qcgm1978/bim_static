@@ -47,6 +47,10 @@ ViewComp.Modal= Backbone.View.extend({
 		this.$el.append(this.template(_data))
 		return this;
 	},
+	
+	html:function(data){
+		this.$el.find(".mwin-body").html(data);
+	},
 	//向Modal视图嵌套视图
 	append: function(view) {
 		if (view instanceof Backbone.View) {

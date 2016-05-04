@@ -17,6 +17,16 @@ App.Services.projectMember.projects = Backbone.View.extend({
 		$("#projectList").children().on("click",function(e){
 			_this.selectProject(e);
 		})
+		
+		if(data.data.length>0){
+			var id=data.data[0].id;
+			App.Services.projectMember.loadData(App.Services.projectMember.projectMemberMemberCollection,{outer:false},{
+				dataPrivilegeId:id
+			});
+			$("#windowMask").remove();
+			App.Comm.setCookie("currentPid",id);
+		}
+		
 		return this;
 	},
 	
