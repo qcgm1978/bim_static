@@ -69,7 +69,7 @@ var BIM = function(option){
     bimBox.appendChild(viewBox);
     _opt.element.appendChild(bimBox);
     viewer.init(viewBox);
-    self.client = viewer.load(_opt.etag,BIM.common.severModel);
+    // self.client = viewer.load(_opt.etag,BIM.common.severModel);
     if(_opt.resize){
       _util.listener(window,'resize',function(){
         var _width = viewBox.clientWidth,
@@ -645,7 +645,7 @@ BIM.prototype = {
     BIM.common.bimBox.className = 'bim';
     BIM.common.viewer.setPickMode();
   },
-  resize : function(width,height){
+  resize : function(){
     BIM.util.pub('resize');
     var _viewBox = BIM.common.self.viewBox,
         _width = _viewBox.clientWidth,
@@ -746,13 +746,9 @@ BIM.prototype = {
   highlight:function(obj){
     var viewer = BIM.common.viewer;
     var filter = viewer.getFilters();
-    if(obj.type == "userId"){
-      filter.setSelectedIds(obj.ids);
-    }else{
-      BIM.util.getFilter(obj.ids,function(id){
-        filter.setUserOverrider(obj.type,id);
-      });
-    }
+    BIM.util.getFilter(obj.ids,function(id){
+      filter.setUserOverrider(obj.type,id);
+    });
     viewer.render();
   },
   downplay:function(obj){
@@ -767,6 +763,11 @@ BIM.prototype = {
     var viewer = BIM.common.viewer;
     var filter = viewer.getFilters();
     filter.setSelectedIds(ids);
+  },
+  unSelected:function(){
+    var viewer = BIM.common.viewer;
+    var filter = viewer.getFilters();
+    filter.setSelectedIds();
   },
   setFloorMap:function(obj,name){
     var viewer = BIM.common.viewer;
