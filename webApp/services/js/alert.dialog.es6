@@ -1,6 +1,6 @@
 App.Services.Dialog = {
 
-	alert: function(msg, callabck,btnText) {
+	alert: function(msg, callback,btnText) {
 
 
 		var text = _.templateUrl('/services/tpls/system/category/system.category.del.html', true),
@@ -29,7 +29,7 @@ App.Services.Dialog = {
 
 			$this.addClass("disabled").val(btnText?btnText:"删除中");
 
-			if ($.isFunction(callabck)) {
+			if ($.isFunction(callback)) {
 				callback(confirmDialog);
 			} else {
 				confirmDialog.close();

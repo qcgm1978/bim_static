@@ -15,7 +15,7 @@ App.Services.System.ExtendAttrContainer = Backbone.View.extend({
 
 	render() {
 
-		var template = _.templateUrl('/services/tpls/system/flow/flow.container.html');
+		var template = _.templateUrl('/services/tpls/system/extendAttr/extend.attr.container.html');
 		this.$el.html(template);
 		return this;
 	},
@@ -27,7 +27,7 @@ App.Services.System.ExtendAttrContainer = Backbone.View.extend({
 			model: model
 		});
 
-		 
+
 
 		this.$(".extendAttrListBody").append(view.render().el);
 
@@ -40,15 +40,16 @@ App.Services.System.ExtendAttrContainer = Backbone.View.extend({
 	},
 
 	//新增流程
-	flowAddDialog() {
+	extendAttrAddDialog() {
 
-		var dialogHtml = _.templateUrl('/services/tpls/system/flow/system.add.flow.html')({});
+		var dialogHtml = _.templateUrl('/services/tpls/system/extendAttr/extend.attr.add.html')({});
 
 		var opts = {
-			title: "新增流程",
+			title: "新增属性",
 			width: 601,
-			isConfirm:false,
-			isAlert:true,
+			height: 400,
+			isConfirm: false,
+			isAlert: true,
 			cssClass: "extendAttrAddDialog",
 			message: dialogHtml,
 			okCallback: () => {
@@ -58,15 +59,39 @@ App.Services.System.ExtendAttrContainer = Backbone.View.extend({
 
 		}
 
-		var dialog = new App.Comm.modules.Dialog(opts); 
+		var dialog = new App.Comm.modules.Dialog(opts);
 
-		return;
-		
+		dialog.element.find(".linkAttrOption").myDropDown({
+			zIndex: 10,
+			click: function($item) {
+				alert($item.text());
+			}
+		});
+
+		dialog.element.find(".attrTypeOption").myDropDown({
+
+			click: function($item) {
+				alert($item.text());
+			}
+		});
+
+		dialog.element.find(".linkAttr").myRadioCk({
+			click: function(selected) {
+				if (!selected) {
+					dialog.element.find(".linkAttrOption .myDropText").addClass("disabled");
+					dialog.element.find(".attrTypeOption .myDropText").removeClass("disabled");
+				}else{
+					dialog.element.find(".linkAttrOption .myDropText").removeClass("disabled");
+					dialog.element.find(".attrTypeOption .myDropText").addClass("disabled");
+				}
+			}
+		});
+
 	},
 
 
-	extendAttrAdd(dialog) { 
-	 
+	extendAttrAdd(dialog) {
+
 
 	}
 

@@ -14,7 +14,7 @@ App.API = {
 		//本月开始、到期接口
 		fetchBodyContentMonthEnd :'sixD/plan/concern/index',//?type={type}&userId={userId}
 		fetchBodyContentMonthStart :'sixD/plan/concern/index',
-		
+
 		fetchBodyContentSlide :'dataJson/bodyContent/bodyContent.slide.json',
 		fetchBodyContentMmhSlide :'platform/project',
 		fetchBodyContentProclamation :'dataJson/bodyContent/bodyContent.proclamation.json',
@@ -160,6 +160,15 @@ App.API = {
 		"servicesFlowIndex":"platform/set/flow/serial", // 改变位置 ?id={id}
 		"servicesFolwMove":"platform/set/flow/serial", // ?id={id} move up  or down
 
+
+		//app
+		appList:"platform/app",//应用列表
+		fetchAppListById:"platform/app/{id}",//根据id获取列表
+		appInsert:"platform/app/",//创建应用 name desc
+		appDel:"platform/app/{id}",//删除应用
+		appResetSecret:"platform/app/{id}",//重新生成 Secret
+		appUpdate:"platform/app",//更新 id, name desc
+
 		test: ""
 	},
 
@@ -208,6 +217,12 @@ App.API = {
 
 		fetchFloors: '/datajson/map/map.json', //获取模型楼层信息
 		fetchAxisGrid: '/datajson/map/gridAndLevel.json', //获取楼层地图,轴网信息
+
+		//视点
+		fetchModelViewpoint: '/datajson/project/project.viewpoint.property.json', // 获取视点列表
+		createViewpointById: '', // 创建视点
+		editViewpointById: '', // 修改视点
+		deleteViewpointById: '', // 删除视点
 
 		//设计
 		fetchDesignProperties: "/dataJson/project/project.design.property.json", //设计属性
