@@ -21,10 +21,11 @@
 
  	render() {
  		this.$el.html(this.template);
+		new App.Services.ProjectBase();
+		new App.Services.ProjectMapping();
+ 		//this.$(".projectContainer .projectBase").html(new App.Services.ProjectBase().render().el);
 
- 		this.$(".projectContainer .projectBase").html(new App.Services.ProjectBase().render().el);
-
- 		this.$(".projectContainer .projectMapping").html(new App.Services.ProjectMapping().render().el);
+ 		//this.$(".projectContainer .projectMapping").html(new App.Services.ProjectMapping().render().el);
 
  		this.$(".projectContainer .projectDetail").html(new App.Services.ProjectDetail().render().el);
 
@@ -56,8 +57,28 @@
 
  	//左侧点击
  	slideBarClick(event){
- 		var $item=$(event.target).closest(".item");
+ 		var $item=$(event.target).closest(".item"),
+ 			_collection=App.Services.ProjectCollection.ProjectBaseInfoCollection;
+ 		let _projectId=$item.attr('data-projectId');
  		$item.addClass("selected").siblings().removeClass("selected");
+ 		//加载项目基本信息数据
+ 		_collection.projectId=_projectId;
+ 		_collection.fetch({
+ 			reset:true,
+ 			success(child, data) {
+ 			}
+ 		});
+ 		
+ 		//加载映射信息
+ 		
+ 		let collectionMap=App.Services.ProjectCollection.ProjecMappingCollection;
+ 		collectionMap.projectId=_projectId;
+ 		collectionMap.fetch({
+ 			reset:true,
+ 			success(child, data) {
+ 			}
+ 		});
+ 		
  	},
 
  	templateDetail: _.templateUrl('/services/tpls/project/slidebar/list.detail.html'),

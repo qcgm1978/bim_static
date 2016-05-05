@@ -26,10 +26,10 @@ App.API = {
 		fetchServicesUserRoleList:'platform/user/{userId}/role',//用户角色
 		fetchServicesSaveRole:'platform/auth/user/role',//保存用户角色
 		fetchServicesNewRole:'platform/auth/role',//新增角色
+		fetchServiceMemberList:'platform/auth/org',
 		fetchServicesMemberOuterList:'platform/auth/org?outer=true',//外部组织-品牌／公司／成员列表
 		fetchServicesMemberInnerList:'platform/auth/org?outer=false',//内部-组织／成员列表
 		deleteServicesRoleSingle:"platform/role?roleId={roleId}",//删除角色
-
 
 		fetchServiceKeyUserList:'platform/auth/org?outer=false&parentId=&includeUsers=',//关键用户列表
 		fetchServiceStep1:'platform/auth/org?outer=false&parentId=&includeUsers=',//项目列表
@@ -46,6 +46,7 @@ App.API = {
 
 		//项目
 		fetchProjects: "platform/project?type=3", //项目列表
+		fetchProjectBaseInfo: "platform/project/{projectId}", //项目列表
 		fetchFileList: "doc/{projectId}/{projectVersionId}/file/children", //获取文件列表  ?fileId={parentId}
 		fetchDesignFileNav: "doc/{projectId}/{projectVersionId}/file/tree", //项目设计文件导航
 		fetchDesignModelNav: "dataJson/project/project.design.model.json", //项目设计模型导航
@@ -184,6 +185,8 @@ App.API = {
 		extendAttrDel:"platform/setting/extensions/property/{classKey}?property={property}",//删除扩展属性 
 		extendAttrGetReferene:"platform/setting/extensions/property/reference",// 获取引用扩展属性
 
+		projectCodeMapping:"platform/mapping/{projectId}",
+		
 		test: ""
 	},
 

@@ -51,6 +51,9 @@ App.Services.projectMember = {
 				      "city": null,
 				      "image":''
 				    }];
+				    if(data.length>0){
+				    	result=[];
+				    }
 					_.each(data,function(item){
 						item.image=item.image||'/static/dist/services/images/demoProject.png';
 						result.push(item)
