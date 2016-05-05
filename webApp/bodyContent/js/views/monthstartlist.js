@@ -15,10 +15,12 @@ App.BodyContent.monthStartList = Backbone.View.extend({
     },
 
     initialize : function(){
+    	debugger
         this.listenTo(App.BodyContent.control.monthStartCollection,"add",this.addOne);
     },
     //数据加载
     addOne:function(item){
+    	debugger
         var newView = new App.BodyContent.monthStartView({model : item});
         this.$el.append(newView.render().el);
     }

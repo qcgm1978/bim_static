@@ -41,6 +41,7 @@ App.Services.projectMember = {
 		parse: function(response) {
 			if (response.message == "success") {
 				var data=response.data,
+					//TODO 测试数据、需要删除的
 					result=[{
 				      "id": 1, 
 				      "name": "周浦万达项目",
@@ -51,13 +52,8 @@ App.Services.projectMember = {
 				      "image":''
 				    }];
 					_.each(data,function(item){
-						result.push({
-							image:item.image||'/static/dist/services/images/demoProject.png',
-							startTime:item.startTime||new Date(),
-							endTime:item.startTime||new Date(),
-							name:item.name,
-							address:item.address||'测试地址',
-						})
+						item.image=item.image||'/static/dist/services/images/demoProject.png';
+						result.push(item)
 					})
 				return result;
 			}else{
@@ -92,7 +88,8 @@ App.Services.projectMember = {
 						name:item.name,
 						project:"",
 						id:item.id, //成员ID
-						outer:item.outer
+						outer:item.outer,
+						org:true
 					}
 				})
 				return _member.concat(_org);
