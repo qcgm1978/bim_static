@@ -1,38 +1,40 @@
 <div class="projectBg">
-	<img src="/projects/images/proDefault.png" /> 
+	<div class="projectLogo">
+		<label>修改图片</label>
+	</div>
 </div>
 
 <div class="item"> 
-	<span class="key">项目名称：</span><span class="value">雅安万达广告</span>
+	<span class="key">项目名称：</span><span class="value"><%= name %></span>
 </div>
 
 <div class="item"> 
-	<span class="key">项目代码：</span><span class="value"></span>
+	<span class="key">项目代码：</span><span class="value"><%= projectNo %></span>
 </div>
 
 <div class="item"> 
-	<span class="key">项目模式：</span><span class="value"></span>
+	<span class="key">项目模式：</span><span class="value"><%= App.Services.ProjectCollection.methods.projectMode(estateType) %></span>
 </div>
 
 <div class="item"> 
-	<span class="key">项目类型：</span><span class="value"></span>
-</div>
-
-
-<div class="item"> 
-	<span class="key">省份：</span><span class="value"></span>
+	<span class="key">项目类型：</span><span class="value"><%= App.Services.ProjectCollection.methods.projectType(projectType) %></span>
 </div>
 
 
 <div class="item"> 
-	<span class="key">城市：</span><span class="value"></span>
+	<span class="key">省份：</span><span class="value"><%= province %></span>
 </div>
 
 
 <div class="item"> 
-	<span class="key">摘牌日：</span><span class="value"></span>
+	<span class="key">城市：</span><span class="value"><%= region %></span>
+</div>
+
+
+<div class="item"> 
+	<span class="key">摘牌日：</span><span class="value"><%= createTime %></span>
 </div>
 
 <div class="item"> 
-	<span class="key">开业日：</span><span class="value"></span>
+	<span class="key">开业日：</span><span class="value"><%= openTime %></span>
 </div>
