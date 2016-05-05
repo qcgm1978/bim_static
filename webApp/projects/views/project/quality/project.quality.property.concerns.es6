@@ -16,7 +16,8 @@ App.Project.QualityConcerns=Backbone.View.extend({
 
 
 	events:{
-		"click .searchToggle":"searchToggle"
+		"click .searchToggle":"searchToggle",
+		"click .tbConcernsBody tr": "showInModel"
 	 
 	},
 
@@ -144,6 +145,11 @@ App.Project.QualityConcerns=Backbone.View.extend({
 
 		this.$(".tbConcernsBody tbody").html(App.Project.Settings.loadingTpl);
 		 
+	},
+
+	//在模型中显示
+	showInModel(){
+		App.Project.showInModel($(event.target).closest("tr"),2);  
 	}
 
 

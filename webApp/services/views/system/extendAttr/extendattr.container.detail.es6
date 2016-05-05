@@ -83,6 +83,17 @@ App.Services.System.ExtendAttrContainerListDetail = Backbone.View.extend({
 				}
 			}
 		});
+		var data = {
+			URLtype: "extendAttrGetReferene"
+		}
+			//扩展属性
+		App.Comm.ajax(data, (data) => {
+			if (data.code == 0) {
+				var template = _.templateUrl('/services/tpls/system/extendAttr/extend.attr.add.droplist.html');
+				dialog.element.find(".linkAttrOption .myDropList").html(template(data));
+
+			} 
+		})
 	},
 
 	//修改

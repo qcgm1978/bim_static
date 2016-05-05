@@ -184,6 +184,8 @@ App.API = {
 		extendAttrDel:"platform/setting/extensions/property/{classKey}?property={property}",//删除扩展属性 
 		extendAttrGetReferene:"platform/setting/extensions/property/reference",// 获取引用扩展属性
 
+		getBoundingBox:"sixD/{projectId}/{projectVersionId}/bounding/box",//获取构建的 box id ?sceneId={sceneId}&elementId={elementId}
+
 		test: ""
 	},
 
