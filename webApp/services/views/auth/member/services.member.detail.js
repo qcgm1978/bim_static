@@ -58,19 +58,6 @@ App.Services.memberDetail=Backbone.View.extend({
 
         var frame = new App.Services.MemberWindowIndex().render().el;//外框
 
-        //初始化窗口
-        App.Services.maskWindow = new App.Comm.modules.Dialog({
-            title:"角色授权",
-            width:600,
-            height:500,
-            isConfirm:false,
-            isAlert:false,
-            okCallback:function(){},
-            cancelCallback:function(){},
-            closeCallback:function(){},
-            message:frame
-        });
-
 
         //当前用户
         $(".seWinBody .aim ul").append(new App.Services.MemberWindowDetail({model:this.model}).render().el);
@@ -85,11 +72,18 @@ App.Services.memberDetail=Backbone.View.extend({
             }
         }
 
+        $("#dataLoading").show();
+
         //有父项时，取得父项机构的角色列表,无父项时获取缺省角色列表
         $(".memRoleList").append(new App.Services.windowRoleList().render().el);
-        App.Services.role.loadData();
-        var data = {outer:!(type =="inner"),id :"id"};//id值需考虑左面菜单，注意
-        App.Services.roleType.loadData(App.Services.roleType.orgCollection,data);
+        //App.Services.role.loadData();
+
+        var parentId = $("#ozList").find("span.active").parent(".ozName").data("id") || 1;
+
+        var url = "https://bim.wanda.cn/platform/auth/org/"+ parentId  +"/role?outer=" +  App.Services.MemberType;
+        this.ajaxRole(url,frame);
+        //var data = {outer:!(type =="inner"),id :"id"};//id值需考虑左面菜单，注意
+       // App.Services.roleType.loadData(App.Services.roleType.orgCollection,data);
     },
 
     //已选部分，当弹窗加载时使用当前成员的角色列表，将弹窗的父角色内与当前成员角色重叠的部分设置为已选
@@ -111,5 +105,41 @@ App.Services.memberDetail=Backbone.View.extend({
             this.$el.removeClass("active");
         }
         this.model.set({"checked": !boolean});
+    },
+
+    window:function(frame){
+        //初始化窗口
+        App.Services.maskWindow = new App.Comm.modules.Dialog({
+            title:"角色授权",
+            width:600,
+            height:500,
+            isConfirm:false,
+            isAlert:false,
+            okCallback:function(){},
+            cancelCallback:function(){},
+            closeCallback:function(){},
+            message:frame
+        });
+    },
+
+    ajaxRole:function(url,frame){
+        $.ajax({
+            type:"GET",
+            url: url,
+            success:function(response){
+                if(response.message=="success"){
+                    App.Services.ozRole.collection.reset();
+                    _.each(response.data,function(item){
+                        App.Services.ozRole.collection.add(item);
+                    });
+                    $("#dataLoading").hide();
+                    this.window(frame);
+                }
+            },
+            error:function(error){
+                alert("无法取得角色列表,错误号 " +error.status );
+                $("#dataLoading").hide();
+            }
+        });
     }
 });

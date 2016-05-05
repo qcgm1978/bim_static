@@ -51,7 +51,7 @@ App.Services.MemberList=Backbone.View.extend({
 
     //批量授权
     batchAward:function(){
-        var _this =this;
+        var _this =this , url;
 
         var type =  App.Services.MemberType;
         //获取所选项
@@ -77,12 +77,9 @@ App.Services.MemberList=Backbone.View.extend({
 
         //角色列表
         $(".memRoleList").append(new App.Services.windowRoleList().render().el);
-
-
-        var fatherId = $("#ozList").find("span.active").parent(".ozName").data("id");
-
-        //无父项时获取缺省角色列表
-        if(!fatherId){
+        var parentId = $("#ozList").find("span.active").parent(".ozName").data("id") || 1;
+        //无父项时获取缺省角色列表，此处可能出错
+        if(!parentId){
             App.Services.role.loadData(function(){
                 $("#dataLoading").show();
                 _this.window(frame);
@@ -96,86 +93,20 @@ App.Services.MemberList=Backbone.View.extend({
                 outer:!(type == "inner")
             }
         };
-
         //单选取得角色列表
         if(seleUser.length == 1) {
             var getRole = this.getRole(seleUser[0]);
             if (getRole.userId) {
                 roleData.data.userId = getRole.userId;
-                //roleData.URLtype = "fetchServicesUserRoleList";
-
+               url = "https://bim.wanda.cn/platform/auth/user/"+ getRole.userId  +"/role";
                 //用户
-                $.ajax({
-                    type:"GET",
-                    url:"https://bim.wanda.cn/platform/auth/user/"+ getRole.userId  +"/role",
-                    success:function(response){
-                        if(response.message=="success"){
-                            App.Services.ozRole.collection.reset();
-                            _.each(response.data,function(item){
-                                App.Services.ozRole.collection.add(item);
-                            });
-                            $("#dataLoading").hide();
-                            _this.window(frame);
-                        }
-                    },
-                    error:function(){
-                        alert("无法取得角色列表");
-                        $("#dataLoading").hide();
-                        _this.window(frame);
-                    }
-                });
-
-                //组织
-            }else if(getRole.orgId){
-                roleData.data.orgId = getRole.orgId;
-                roleData.data.outer = !type;
-                //roleData.URLtype = "fetchServicesOzRoleList";
-                $.ajax({
-                    type:"GET",
-                    url:"https://bim.wanda.cn/platform/auth/org/"+ getRole.orgId  +"/role?outer=" + roleData.data.outer ,
-                    success:function(response){
-                        if(response.message=="success"){
-                            App.Services.ozRole.collection.reset();
-                            _.each(response.data,function(item){
-                                App.Services.ozRole.collection.add(item);
-                            });
-                            $("#dataLoading").hide();
-                            _this.window(frame);
-                        }
-                    },
-                    error:function(){
-                        alert("无法取得角色列表");
-                        $("#dataLoading").hide();
-                        _this.window(frame);
-                    }
-                });
-            }
+                this.ajaxRole(url,frame);
                 return
-        }
-
-        //多选取得父项机构的角色列表
-        roleData.data.orgId = fatherId;
-       // roleData.URLtype = "fetchServicesOzRoleList";
-        $.ajax({
-            type:"GET",
-            url:"https://bim.wanda.cn/platform/auth/org/"+ fatherId  +"/role?outer=" +  roleData.data.outer ,
-            success:function(response){
-                if(response.message=="success"){
-                    App.Services.ozRole.collection.reset();
-                    _.each(response.data,function(item){
-                        App.Services.ozRole.collection.add(item);
-                    });
-                    $("#dataLoading").hide();
-                    _this.window(frame);
-                }
-            },
-            error:function(){
-                alert("无法取得角色列表");
-                $("#dataLoading").hide();
-                _this.window(frame);
             }
-        });
-
+        }
+        //多选取得父项机构的角色列表
+        url = "https://bim.wanda.cn/platform/auth/org/"+ parentId  +"/role?outer=" +  roleData.data.outer;
+        this.ajaxRole(url,frame);
     },
 
     //保存要提交的数据模块，将数据混编成可提交形式
@@ -219,6 +150,26 @@ App.Services.MemberList=Backbone.View.extend({
             cancelCallback:function(){},
             closeCallback:function(){},
             message:frame
+        });
+    },
+    ajaxRole:function(url,frame){
+        $.ajax({
+            type:"GET",
+            url: url,
+            success:function(response){
+                if(response.message=="success"){
+                    App.Services.ozRole.collection.reset();
+                    _.each(response.data,function(item){
+                        App.Services.ozRole.collection.add(item);
+                    });
+                    $("#dataLoading").hide();
+                    this.window(frame);
+                }
+            },
+            error:function(error){
+                alert("无法取得角色列表,错误号 " +error.status );
+                $("#dataLoading").hide();
+            }
         });
     },
     //排序
