@@ -94,7 +94,7 @@ ViewComp.MemberManager = Backbone.View.extend({
 				}
 		};
 		
-		var _url=App.API.Settings.hostname+App.API.URL.fetchServiceMemberList+"?outer="+outer+"&includeUsers=true";
+		var _url="/"+App.API.URL.fetchServiceMemberList+"?outer="+outer+"&includeUsers=true";
 		if(parentId){
 			_url=_url+"&parentId="+parentId;
 		}

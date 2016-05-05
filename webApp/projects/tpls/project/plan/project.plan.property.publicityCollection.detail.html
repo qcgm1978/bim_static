@@ -4,7 +4,7 @@
 <tr class="<%= i%2==0 && 'odd' || '' %>">
     <td class="ckItem"><i class="myIcon-circle-green"></i></td>
     <td class="planId"><%= item.serialNo %></td>
-    <td class="operationalMatters"> <div class="overflowEllipsis"> <%= item.planName %> </div> </td>
+    <td class="operationalMatters"> <div class="overflowEllipsis"> <%= item.taskName %> </div> </td>
     <td class="start"><%= new Date(item.planStartDate).format('yyyy-MM-dd') %></td>
     <td class="end"><%= new Date(item.planFinishDate).format('yyyy-MM-dd') %></td>
 </tr>
