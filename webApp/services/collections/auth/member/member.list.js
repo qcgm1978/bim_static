@@ -116,7 +116,7 @@ App.Services.Member ={
         });
     },
     init :function(){
-        $(".serviceBody").empty().html( new App.Services.MemberNav().render().el);
+        $(".serviceBody").html( new App.Services.MemberNav().render().el);
         $(".serviceBody .content").html(new App.Services.MemberList().render().el);
         App.Services.Member.loadData(App.Services.Member.innerCollection);//默认加载内部列表
     }

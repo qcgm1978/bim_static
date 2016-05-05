@@ -31,9 +31,9 @@ App.Services.role ={
             }
         });
     },
-    init :function(){
+    init :function(func){
         $(".serviceBody").empty().html( new App.Services.roleList().render().el);
-        App.Services.role.loadData();//加载成员列表
+        App.Services.role.loadData(func);//加载成员列表
     }
 };
 //组织角色

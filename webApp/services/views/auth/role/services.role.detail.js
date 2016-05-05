@@ -23,7 +23,7 @@ App.Services.roleDetail=Backbone.View.extend({
 
     modify:function(){
 
-        App.Services.roleModify = true;
+        App.Services.roleModify = this.model;
 
         this.window();
         this.recognize();
@@ -86,11 +86,12 @@ App.Services.roleDetail=Backbone.View.extend({
     },
 
     delete:function(){
-        //删除需判断状态，由什么来判断？
+
+
 
         var frame = new App.Services.windowAlert().render().el;
 
-        App.Services.deleteRoleInfo = this.model;
+        App.Services.deleteRoleInfo = this.model;//将model携带至弹窗view
 
         App.Services.alertWindow = new App.Comm.modules.Dialog({
             title:"",

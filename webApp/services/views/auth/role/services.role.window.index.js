@@ -25,20 +25,45 @@ App.Services.roleWindowIndex = Backbone.View.extend({
 
     //提交表单，完毕会触发角色列表的更新change
     windowSubmit:function(){
-        //获取选中的功能，将功能id加入数组
-        //选中时将数组写入functionId
-        //POST  https://bim.wanda.cn/platform/auth/role
-        var funArray = [];
-        var data = {
-                "name": "角色名",//角色名称
-                "functionId": funArray//功能ID数组
-        };
-        //发送个人id，加载模块
-        //弹出window，获取并插入功能列表数据
 
+        //判断新增角色还是修改角色
+        if(!App.Services.roleModify){
+            this.newRole();
+        }else{
+            this.modify();
+        }
+    },
+    //修改角色
+    modify:function(){
+        var seleFun = this.filterChecked();
+        if(!seleFun.length){alert("请选择功能");return}
 
-    //如何判断新增角色还是修改角色？
-      this.newRole();
+        var roleId =App.Services.roleModify.get("roleId");
+        var cid = App.Services.roleModify.get("cid");
+
+        var url = "https://bim.wanda.cn/platform/auth/role/"+ roleId +"/function?functionId=";
+
+        for(var i = 0 ; i < seleFun.length ; i++){
+            if(i !== seleFun.length -1){
+                url = url + seleFun[i].get("id") + ",";
+            }else{
+                url = url + seleFun[i].get("id");
+            }
+        }
+        $.ajax({
+            type:"POST",
+            url:url,
+            success:function(response){
+                App.Services.roleModify.reset();
+                App.Services.roleModify.save (response.data);
+                App.Services.maskWindow.close();
+            },
+            error:function(type){
+                alert(type.statusText + "： " +type.status  );
+                App.Services.maskWindow.close();
+            }
+        });
+
     },
 
     //新增角色
@@ -47,12 +72,11 @@ App.Services.roleWindowIndex = Backbone.View.extend({
         var name  = $("#selectedRoleName").val();
         if(!name){alert("请填写角色名！");return;}
         var newRole = {"name":name, "functionId":[]};
-        //已选功能列表
-        var seleFun = App.Services.roleFun.collection.filter(function(item){
-            return item.has("checked");
-        });
 
+        //已选功能列表
+        var seleFun = this.filterChecked();
         if(!seleFun.length){alert("请选择功能");return}
+
         _.each(seleFun,function(item){
             newRole.functionId.push(item.get("id"));
         });
@@ -75,8 +99,12 @@ App.Services.roleWindowIndex = Backbone.View.extend({
             error:function(){
 
             }
-
         });
-
+    },
+    //过滤和辨别功能列表项
+    filterChecked:function(){
+        return App.Services.roleFun.collection.filter(function(item){
+            return item.has("checked");
+        });
     }
 });
