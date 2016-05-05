@@ -7,7 +7,7 @@ App.Services.MemberList=Backbone.View.extend({
     tagName:"div",
 
     events:{
-        "click .batchAward":"batchAward",//批量授权
+        "click .batchAward":"batchAward",
         "click .selectAll":"selectAll"//全选
     },
 
@@ -49,7 +49,10 @@ App.Services.MemberList=Backbone.View.extend({
         })
     },
 
+    //批量授权
     batchAward:function(){
+        var _this =this;
+
         var type =  App.Services.MemberType;
         //获取所选项
         var seleUser = App.Services.Member[type + "Collection"].filter(function(item){
@@ -57,54 +60,122 @@ App.Services.MemberList=Backbone.View.extend({
                 return item.get("checked");
             }
         });
-
         //是否选择
         if(seleUser && !seleUser.length){
             alert("您没有选择任何成员或组织，无法设置角色！");return
         }
 
+        $("#dataLoading").show();
         //渲染框架
         var frame = new App.Services.MemberWindowIndex().render().el;
-
-        //初始化窗口
-        App.Services.maskWindow = new App.Comm.modules.Dialog({
-            title:"角色授权",
-            width:600,
-            height:500,
-            isConfirm:false,
-            isAlert:false,
-            okCallback:function(){},
-            cancelCallback:function(){},
-            closeCallback:function(){},
-            message:frame
-        });
-
         //写入已选用户和组织
         _.each(seleUser,function(item){
             $(".seWinBody .aim ul").append(new App.Services.MemberWindowDetail({model:item}).render().el);
         });
 
-        this.saveData(seleUser); //保存弹窗数据相关数据便提交
+        this.saveData(seleUser); //缓存弹窗数据相关数据便提交
 
         //角色列表
         $(".memRoleList").append(new App.Services.windowRoleList().render().el);
 
+
+        var fatherId = $("#ozList").find("span.active").parent(".ozName").data("id");
+
         //无父项时获取缺省角色列表
-        App.Services.role.loadData();
-        //获取数据
-        var data = {};
-        //单选取得角色列表
-        if(seleUser.length == 1){
-            var getRole = this.getRole(seleUser[0]);
-            data = {
-                outer :  !(type == "inner"),
-                orgId : getRole.id
-            };
-            //getRole.collection.loadData(data);
-            return
+        if(!fatherId){
+            App.Services.role.loadData(function(){
+                $("#dataLoading").show();
+                _this.window(frame);
+            });
+            return;
         }
+
+    //数据
+        var roleData = {
+            data: {
+                outer:!(type == "inner")
+            }
+        };
+
+        //单选取得角色列表
+        if(seleUser.length == 1) {
+            var getRole = this.getRole(seleUser[0]);
+            if (getRole.userId) {
+                roleData.data.userId = getRole.userId;
+                //roleData.URLtype = "fetchServicesUserRoleList";
+
+                //用户
+                $.ajax({
+                    type:"GET",
+                    url:"https://bim.wanda.cn/platform/auth/user/"+ getRole.userId  +"/role",
+                    success:function(response){
+                        if(response.message=="success"){
+                            App.Services.ozRole.collection.reset();
+                            _.each(response.data,function(item){
+                                App.Services.ozRole.collection.add(item);
+                            });
+                            $("#dataLoading").hide();
+                            _this.window(frame);
+                        }
+                    },
+                    error:function(){
+                        alert("无法取得角色列表");
+                        $("#dataLoading").hide();
+                        _this.window(frame);
+                    }
+                });
+
+                //组织
+            }else if(getRole.orgId){
+                roleData.data.orgId = getRole.orgId;
+                roleData.data.outer = !type;
+                //roleData.URLtype = "fetchServicesOzRoleList";
+                $.ajax({
+                    type:"GET",
+                    url:"https://bim.wanda.cn/platform/auth/org/"+ getRole.orgId  +"/role?outer=" + roleData.data.outer ,
+                    success:function(response){
+                        if(response.message=="success"){
+                            App.Services.ozRole.collection.reset();
+                            _.each(response.data,function(item){
+                                App.Services.ozRole.collection.add(item);
+                            });
+                            $("#dataLoading").hide();
+                            _this.window(frame);
+                        }
+                    },
+                    error:function(){
+                        alert("无法取得角色列表");
+                        $("#dataLoading").hide();
+                        _this.window(frame);
+                    }
+                });
+            }
+                return
+        }
+
         //多选取得父项机构的角色列表
-        //App.Services.ozRole.loadData(data);//此处需要判断父项id，父项id如何写入？
+        roleData.data.orgId = fatherId;
+       // roleData.URLtype = "fetchServicesOzRoleList";
+        $.ajax({
+            type:"GET",
+            url:"https://bim.wanda.cn/platform/auth/org/"+ fatherId  +"/role?outer=" +  roleData.data.outer ,
+            success:function(response){
+                if(response.message=="success"){
+                    App.Services.ozRole.collection.reset();
+                    _.each(response.data,function(item){
+                        App.Services.ozRole.collection.add(item);
+                    });
+                    $("#dataLoading").hide();
+                    _this.window(frame);
+                }
+            },
+            error:function(){
+                alert("无法取得角色列表");
+                $("#dataLoading").hide();
+                _this.window(frame);
+            }
+        });
+
     },
 
     //保存要提交的数据模块，将数据混编成可提交形式
@@ -129,10 +200,26 @@ App.Services.MemberList=Backbone.View.extend({
     getRole:function(model){
         var id = model.get("userId");
         if(id){
-            return {collection:App.Services.userRole,id:id};//返回指定用户的角色列表，使用不同的collection,使用同一view，父项只能是组织
+            return {userId:id};//返回指定用户的角色列表，使用不同的collection,使用同一view，父项只能是组织
         }else if(model.get("orgId")){
-            return {collection:App.Services.ozRole,id:id};//返回指定机构的角色列表
+            return {orgId:id};//返回指定机构的角色列表
         }
+    },
+
+    //弹窗管理
+    window:function(frame){
+        //初始化窗口
+        App.Services.maskWindow = new App.Comm.modules.Dialog({
+            title:"角色授权",
+            width:600,
+            height:500,
+            isConfirm:false,
+            isAlert:false,
+            okCallback:function(){},
+            cancelCallback:function(){},
+            closeCallback:function(){},
+            message:frame
+        });
     },
     //排序
     comparator:function(){}

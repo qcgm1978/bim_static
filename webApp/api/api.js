@@ -25,7 +25,7 @@ App.API = {
 		fetchServicesOzRoleList:'platform/org/{orgId}/role?outer={outer}',//机构角色列表
 		fetchServicesUserRoleList:'platform/user/{userId}/role',//用户角色
 		putServicesSaveRole:'platform/auth/user/role',//保存用户角色
-		putServicesRoleFun:'platform/auth/role/{roleId}/function?functionId=111,222,333',//保存角色功能
+		putServicesRoleFun:'platform/auth/role/{roleId}/function?functionId=111,222,333',//保存角色功能，未用
 		fetchServicesNewRole:'platform/auth/role',//新增角色
 		fetchServicesMemberOuterList:'platform/auth/org?outer=true',//外部组织-品牌／公司／成员列表
 		fetchServicesMemberInnerList:'platform/auth/org?outer=false',//内部-组织／成员列表

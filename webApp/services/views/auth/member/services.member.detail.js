@@ -13,13 +13,28 @@ App.Services.memberDetail=Backbone.View.extend({
 
     render:function(){
         this.$el.html(this.template(this.model.toJSON()));
+        //写入角色
+        this.getRole();
         return this;
+    },
+
+    //返回机构/成员的url和id
+    getRole:function(){
+        var userId = this.model.get("userId");
+        var orgId = this.model.get("orgId");
+        if(userId){
+                //获取成员角色
+        }
+        if(orgId){
+            //获取机构角色
+        }
     },
 
     initialize:function(){
         this.model.set({"selected":false});//预先设置属性
         this.listenTo(this.model, 'change', this.render);
     },
+
 
     //弹窗
     spread:function(){
@@ -74,7 +89,7 @@ App.Services.memberDetail=Backbone.View.extend({
         $(".memRoleList").append(new App.Services.windowRoleList().render().el);
         App.Services.role.loadData();
         var data = {outer:!(type =="inner"),id :"id"};//id值需考虑左面菜单，注意
-        App.Services.ozRole.loadData(data);
+        App.Services.roleType.loadData(App.Services.roleType.orgCollection,data);
     },
 
     //已选部分，当弹窗加载时使用当前成员的角色列表，将弹窗的父角色内与当前成员角色重叠的部分设置为已选
@@ -96,15 +111,5 @@ App.Services.memberDetail=Backbone.View.extend({
             this.$el.removeClass("active");
         }
         this.model.set({"checked": !boolean});
-    },
-
-    //返回机构/成员的url和id
-    getRole:function(model){
-        var id = model.get("userId");
-        if(id){
-            return {collection:App.Services.userRole,id:id};//返回指定用户的角色列表，使用不同的collection,使用同一view，父项只能是组织
-        }else if(model.get("orgId")){
-            return {collection:App.Services.ozRole,id:id};//返回指定机构的角色列表
-        }
     }
 });

@@ -67,8 +67,8 @@ App.Services.ozRole ={
     }
 };
 //成员角色
-App.Services.userRole ={
-    collection:new(Backbone.Collection.extend({
+App.Services.roleType ={
+    userCollection:new(Backbone.Collection.extend({
         model: Backbone.Model.extend({
             defaults: function() {
                 return {
@@ -83,14 +83,30 @@ App.Services.userRole ={
             }
         }
     })),
+    //组织角色
+    orgCollection:new(Backbone.Collection.extend({
+        model: Backbone.Model.extend({
+            defaults: function() {
+                return {
+                    url: ''
+                }
+            }
+        }),
+        urlType: "fetchServicesOzRoleList",
+        parse: function (response) {
+            if (response.message == "success") {
+                return response.data;
+            }
+        }
+    })),
 
-    loadData : function(data,func) {
-        App.Services.userRole.collection.reset();
-        App.Services.userRole.collection.fetch({
+    loadData : function(collection,data,func) {
+        collection.reset();
+        collection.fetch({
             data:data,
             success: function(collection, response, options) {
                 if(func && typeof  func == "function"){
-                    func();
+                    func(response);
                 }
             }
         });

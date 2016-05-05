@@ -33,6 +33,7 @@ App.Services.AuthNav = Backbone.View.extend({
 	memCtrl : function(){
 		this.breadCrumb(this.$el.find(".memCtrl"));
 		App.Services.init("auth","memCtrl");
+		$("#dataLoading").show();
 		App.Services.Member.loadData(App.Services.Member.innerCollection,{},function(){
 			//两个不可控异步，已知顺序为加载-点击，只好先清空再添加
 			App.Services.Member.innerCollection.each(function(item){
@@ -40,16 +41,19 @@ App.Services.AuthNav = Backbone.View.extend({
 				item.set("checked",false);
 				var newView = new App.Services.memberDetail({model:item});
 				this.$("#blendList").append(newView.render().el);
+				$("#dataLoading").hide();
 			});
 		});//默认加载内部列表
 
 	},
 	roleManager : function(){
 		$(".serviceBody").empty();
+		$("#dataLoading").show();
 		this.breadCrumb($(".roleManager"));
 		App.Services.init("auth","roleManager");
 		App.Services.role.init(function(){
 			$(".roleManager").addClass("active").siblings("li").removeClass("active");
+			$("#dataLoading").hide();
 		});
 	},
 	keyUser : function(){

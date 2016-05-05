@@ -35,6 +35,7 @@ App.Services.MemberozDetail=Backbone.View.extend({
         var _thisId = this.$(".ozName").data("id");
         var collection = App.Services.Member[_thisType + "Collection"];
         $("#blendList").empty();//刷新右侧数据
+        $("#dataLoading").show();
 
         var data = {
             outer:  !(_thisType == "inner"),
@@ -58,6 +59,7 @@ App.Services.MemberozDetail=Backbone.View.extend({
             if(!response.data.org.length && !response.data.user ){
                 $("#blendList").html("<li>暂无数据</li>");
             }
+            $("#dataLoading").hide();
         });
 
 
