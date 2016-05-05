@@ -28,7 +28,7 @@ App.Services.System.ExtendAttrContainer = Backbone.View.extend({
 		var view = new App.Services.System.ExtendAttrContainerListDetail({
 				model: model
 			}),
-			$extendAttrListBody = this.$(".extendAttrListBody"); 
+			$extendAttrListBody = this.$(".extendAttrListBody");
 
 		$extendAttrListBody.find(".loading").remove();
 		//数据
@@ -89,11 +89,26 @@ App.Services.System.ExtendAttrContainer = Backbone.View.extend({
 			}
 		});
 
+
+		var data = {
+			URLtype: "extendAttrGetReferene"
+		}
+
+		//扩展属性
+		App.Comm.ajax(data, (data) => {
+			if (data.code == 0) {
+				var template = _.templateUrl('/services/tpls/system/extendAttr/extend.attr.add.droplist.html');
+				dialog.element.find(".linkAttrOption .myDropList").html(template(data));
+
+			} 
+		})
+
 	},
 
 
 	extendAttrAdd(dialog) {
 
+		debugger
 		var data = {
 				URLtype: "extendAttrInsert",
 				type: "POST",
@@ -112,7 +127,7 @@ App.Services.System.ExtendAttrContainer = Backbone.View.extend({
 			return;
 		}
 
-		if (this.$(".btnCk").hasClass("selected")) {
+		if (dialog.element.find(".btnCk").hasClass("selected")) {
 			pars.pushType = 0;
 			pars.reference = this.$(".linkAttrOption .myDropText .text").text();
 		} else {

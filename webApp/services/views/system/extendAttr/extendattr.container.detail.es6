@@ -50,13 +50,16 @@ App.Services.System.ExtendAttrContainerListDetail = Backbone.View.extend({
 			cssClass: "extendAttrAddDialog",
 			message: dialogHtml,
 			okCallback: () => {
-				this.extendAttrAdd(dialog);
+				this.extendAttrUpdate(dialog);
 				return false;
 			}
 
 		}
 
 		var dialog = new App.Comm.modules.Dialog(opts);
+
+		dialog.classKey=$item.data("classKey");
+		dialog.property=$item.data("property");
 
 		dialog.element.find(".linkAttrOption").myDropDown({
 			zIndex: 10
@@ -78,6 +81,57 @@ App.Services.System.ExtendAttrContainerListDetail = Backbone.View.extend({
 					dialog.element.find(".linkAttrOption .myDropText").removeClass("disabled");
 					dialog.element.find(".attrTypeOption .myDropText").addClass("disabled");
 				}
+			}
+		});
+		var data = {
+			URLtype: "extendAttrGetReferene"
+		}
+			//扩展属性
+		App.Comm.ajax(data, (data) => {
+			if (data.code == 0) {
+				var template = _.templateUrl('/services/tpls/system/extendAttr/extend.attr.add.droplist.html');
+				dialog.element.find(".linkAttrOption .myDropList").html(template(data));
+
+			} 
+		})
+	},
+
+	//修改
+	extendAttrUpdate(dialog){
+		
+		var data = {
+				URLtype: "extendAttrUpdate",
+				type: "PUT",
+				headers: {
+					"Content-Type": "application/json"
+				}
+
+			},
+			pars = {
+				propertyName: dialog.element.find(".txtAttrTitle").val().trim(),
+				classKey: dialog.classKey,
+				property:dialog.property
+
+			}
+
+		if (!pars.propertyName) {
+			alert("请输入属性名称");
+			return;
+		}
+
+		if (dialog.element.find(".btnCk").hasClass("selected")) {
+			pars.pushType = 0;
+			pars.reference = this.$(".linkAttrOption .myDropText .text").text();
+		} else {
+			//pars.reference = "";
+			pars.pushType = dialog.element.find(".attrTypeOption").data("type");
+		}
+
+		data.data = JSON.stringify(pars);
+
+		App.Comm.ajax(data, (data) => {
+			if (data.code == 0) {
+				this.model.set(data.data);
 			}
 		});
 	},

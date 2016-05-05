@@ -25,7 +25,7 @@ App.BodyContent.control= {
         	pageItemCount:30
         });
         this.loadData(this.monthEndCollection,{type:2,useId:App.Comm.getCookie('userId')});
-        this.loadData(this.monthStartCollection,{type:1,useId:App.Comm.getCookie('userId')});
+        this.loadData(this.monthStartCollection,{type:4,useId:App.Comm.getCookie('userId')});
         this.loadData(this.proCollection);
 
 

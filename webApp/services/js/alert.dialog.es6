@@ -6,8 +6,7 @@ App.Services.Dialog = {
 		var text = _.templateUrl('/services/tpls/system/category/system.category.del.html', true),
 
 			opts = {
-				width: 284,
-				height: 180,
+				width: 284, 
 				showTitle: false,
 				cssClass: "delConfirm",
 				showClose: false,

@@ -8,7 +8,7 @@ App.Services.MemberList=Backbone.View.extend({
 
     events:{
         "click .batchAward":"batchAward",//批量授权
-        "click .selectAll":"selectAll",//全选
+        "click .selectAll":"selectAll"//全选
     },
 
     template:_.templateUrl("/services/tpls/auth/member/services.member.list.html"),
@@ -24,10 +24,10 @@ App.Services.MemberList=Backbone.View.extend({
        this.listenTo(App.Services.Member.outerCollection,"add",this.addOne);
        this.listenTo(App.Services.Member.innerCollection,"reset",this.render);
        this.listenTo(App.Services.Member.outerCollection,"reset",this.render);
-        //$el为包含模板的元素，el为元素节点
     },
     //数据加载
     addOne:function(model){
+
         var newView = new App.Services.memberDetail({model:model});
         this.$("#blendList").append(newView.render().el);
     },

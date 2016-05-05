@@ -35,14 +35,32 @@ App.Services.MemberWindowIndex = Backbone.View.extend({
             });
         }
 
-        //添加角色列表并提交数据
-        var subCollection = App.Services.Member.SubRole;
-        subCollection.add(submitData);
-        subCollection.sync("POST",{
-            success:function(collection,response,options){
-                console.log(1);
+        //根用户无法赋予权限
+        //if(){}
+
+
+        //提交 角色变更
+      /*  App.Comm.ajax({
+            URLtype:"putServicesSaveRole",
+            data:submitData
+        },function(response){
+            console.log(response);
+        });
+*/
+
+        $.ajax({
+            type:"POST",
+            url:"platform/auth/user/role",
+            data:submitData,
+            dataType:"json",
+            success:function(response){
+                console.log(response);
+                //返回重新获取成员角色列表
+            },
+            error:function(){
+                //错误提示
             }
-        });//保存
+        });
 
         //刷新选项的角色列表
 
