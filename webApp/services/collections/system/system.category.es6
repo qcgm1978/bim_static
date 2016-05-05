@@ -45,11 +45,11 @@ App.Services.SystemCollection = {
 				}
 			}
 		}),
-		urlType: "servicesFlowList",
+		urlType: "extendAttrList",
 		parse(response) {
 			if (response.code == 0) { 
 				if (response.data.length<=0) {
-					$("#systemContainer .flowListBody").html('<li class="loading">无数据</li>');
+					$("#systemContainer .extendAttrListBody").html('<li class="loading">无数据</li>');
 				}
                  return response.data;
              }

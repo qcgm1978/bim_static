@@ -101,76 +101,8 @@ App.Project.QualityProcessAcceptance = Backbone.View.extend({
 	},
 
 	//模型中显示
-	showInModel(event) {
-
-		var $target = $(event.target).closest("tr");
-
-
-		if ($target.hasClass("selected")) {
-			$target.parent().find(".selected").removeClass("selected");
-			//$target.removeClass("selected");
-		} else {
-			$target.parent().find(".selected").removeClass("selected");
-			$target.addClass("selected");
-		}
-
-		var Ids = [];
-
-		if ($target.data("cate")) {
-
-			$target.parent().find(".selected").each(function() {
-				Ids.push($(this).data("cate"));
-			});
-			App.Project.Settings.Viewer.selectIds(Ids);
-			App.Project.Settings.Viewer.zoomSelected();
-			// App.Project.Settings.Viewer.highlight({
-			// 	type: "userId",
-			// 	ids: Ids
-			// }) 
-
-			return;
-		}
-
-
-		var data = {
-			URLtype: "fetchQualityModelById",
-			data: {
-				projectId: App.Project.Settings.CurrentVersion.projectId,
-				versionId: App.Project.Settings.CurrentVersion.id,
-				acceptanceId: $target.data("id")
-			}
-		};
-
-		App.Comm.ajax(data, function(data) {
-
-			if (data.code == 0) {
-
-				if (data.data) {
-
-					$target.data("cate", data.data.componentId);
-					//无构建id 返回
-					if (!data.data.componentId) {
-						return;
-					}
-
-					$target.parent().find(".selected").each(function() {
-						Ids.push($(this).data("cate"));
-					});
-					
-					App.Project.Settings.Viewer.selectIds(Ids);
-
-					App.Project.Settings.Viewer.zoomSelected();
-
-				}
-
-				// App.Project.Settings.Viewer.highlight({
-				// 	type: "userId",
-				// 	ids: Ids
-				// })
-			}
-		});
-
-
+	showInModel(event) {  
+		App.Project.showInModel($(event.target).closest("tr"),1);  
 	}
 
 

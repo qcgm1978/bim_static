@@ -7,15 +7,16 @@ App.Services.projectMember = {
 	
 	//初始化
 	init: function() {
+		$("#dataLoading").show();
 		$('.serviceBody').html(new App.Services.projectMember.mainView().render().el);
 		this.loadData(this.projectMemberProjectCollection,{
-			outer:false
+			outer:App.Comm.getCookie("isOuter")
 		},{
 			userId:App.Comm.getCookie("userId")
 		});
-		this.loadData(this.projectMemberMemberCollection,{outer:true},{
+		/*this.loadData(this.projectMemberMemberCollection,{outer:true},{
 			dataPrivilegeId:"1"
-		});
+		});*/
 	},
 
 	method:{
@@ -40,6 +41,7 @@ App.Services.projectMember = {
 		parse: function(response) {
 			if (response.message == "success") {
 				var data=response.data,
+					//TODO 测试数据、需要删除的
 					result=[{
 				      "id": 1, 
 				      "name": "周浦万达项目",
@@ -47,16 +49,11 @@ App.Services.projectMember = {
 				      "endTime": 0,
 				      "province": "上海市",
 				      "city": null,
-				      "image":'/static/dist/services/images/demoProject.png'
+				      "image":''
 				    }];
 					_.each(data,function(item){
-						result.push({
-							image:item.image||'/static/dist/services/images/demoProject.png',
-							startTime:item.startTime||new Date(),
-							endTime:item.startTime||new Date(),
-							name:item.name,
-							address:item.address||'测试地址',
-						})
+						item.image=item.image||'/static/dist/services/images/demoProject.png';
+						result.push(item)
 					})
 				return result;
 			}else{
@@ -91,7 +88,8 @@ App.Services.projectMember = {
 						name:item.name,
 						project:"",
 						id:item.id, //成员ID
-						outer:item.outer
+						outer:item.outer,
+						org:true
 					}
 				})
 				return _member.concat(_org);

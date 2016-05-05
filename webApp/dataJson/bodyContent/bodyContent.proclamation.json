@@ -2,11 +2,8 @@
   "code":0,
   "message": "success",
   "data": [
-      {"id":1, "desc":"������Ｏ��2016��3�·�", "initiatorName":"system", "receivedTime":1137859200000, "status":"normal", "targetUrl" :"blank","readTime":null,"status": 1},
-      {"id":2, "desc":"1", "initiatorName":"system", "receivedTime":1137859200000, "status":"normal", "targetUrl" :"blank","readTime":null,"status": 1},
-      {"id":3, "desc":"2", "initiatorName":"system", "receivedTime":1137859200000, "status":"normal", "targetUrl" :"blank","readTime":null,"status": 0},
-      {"id":4, "desc":"3", "initiatorName":"system", "receivedTime":1137859205400, "status":"normal", "targetUrl" :"blank","readTime":null,"status": 1},
-      {"id":5, "desc":"4", "initiatorName":"system", "receivedTime":1137859200000, "status":"normal", "targetUrl" :"blank","readTime":null,"status": 0},
-      {"id":6, "desc":"5", "initiatorName":"system", "receivedTime":1137859200000, "status":"normal", "targetUrl" :"blank","readTime":null,"status": 0}
+      {"id":1, "desc":"万达集团2016年1月份财务报表", "initiatorName":"system", "receivedTime":1137859200000, "status":"normal", "targetUrl" :"blank","readTime":null,"status": 1},
+      {"id":2, "desc":"万达集团2016年2月份财务报表", "initiatorName":"system", "receivedTime":1137859200000, "status":"normal", "targetUrl" :"blank","readTime":null,"status": 1},
+      {"id":3, "desc":"万达集团2016年3月份财务报表", "initiatorName":"system", "receivedTime":1137859200000, "status":"normal", "targetUrl" :"blank","readTime":null,"status": 1}
     ]
 }

@@ -20,16 +20,21 @@ App.Services.System.ExtendAttrContainer = Backbone.View.extend({
 		return this;
 	},
 
+
+
 	//新增
 	addOne(model) {
 
 		var view = new App.Services.System.ExtendAttrContainerListDetail({
-			model: model
-		});
+				model: model
+			}),
+			$extendAttrListBody = this.$(".extendAttrListBody");
 
-
-
-		this.$(".extendAttrListBody").append(view.render().el);
+		$extendAttrListBody.find(".loading").remove();
+		//数据
+		$extendAttrListBody.append(view.render().el);
+		//滚动条
+		App.Comm.initScroll(this.$(".extendAttrListBodScroll"), "y");
 
 
 	},
@@ -62,16 +67,13 @@ App.Services.System.ExtendAttrContainer = Backbone.View.extend({
 		var dialog = new App.Comm.modules.Dialog(opts);
 
 		dialog.element.find(".linkAttrOption").myDropDown({
-			zIndex: 10,
-			click: function($item) {
-				alert($item.text());
-			}
+			zIndex: 10
 		});
 
 		dialog.element.find(".attrTypeOption").myDropDown({
 
 			click: function($item) {
-				alert($item.text());
+				dialog.element.find(".attrTypeOption").data("type", $item.data("type"));
 			}
 		});
 
@@ -80,18 +82,66 @@ App.Services.System.ExtendAttrContainer = Backbone.View.extend({
 				if (!selected) {
 					dialog.element.find(".linkAttrOption .myDropText").addClass("disabled");
 					dialog.element.find(".attrTypeOption .myDropText").removeClass("disabled");
-				}else{
+				} else {
 					dialog.element.find(".linkAttrOption .myDropText").removeClass("disabled");
 					dialog.element.find(".attrTypeOption .myDropText").addClass("disabled");
 				}
 			}
 		});
 
+
+		var data = {
+			URLtype: "extendAttrGetReferene"
+		}
+
+		//扩展属性
+		App.Comm.ajax(data, (data) => {
+			if (data.code == 0) {
+				var template = _.templateUrl('/services/tpls/system/extendAttr/extend.attr.add.droplist.html');
+				dialog.element.find(".linkAttrOption .myDropList").html(template(data));
+
+			} 
+		})
+
 	},
 
 
 	extendAttrAdd(dialog) {
 
+		debugger
+		var data = {
+				URLtype: "extendAttrInsert",
+				type: "POST",
+				headers: {
+					"Content-Type": "application/json"
+				}
+
+			},
+			pars = {
+				propertyName: dialog.element.find(".txtAttrTitle").val().trim(),
+				classKey: $(".extendAttrSliderUl  .item.selected").data("id")
+			}
+
+		if (!pars.propertyName) {
+			alert("请输入属性名称");
+			return;
+		}
+
+		if (dialog.element.find(".btnCk").hasClass("selected")) {
+			pars.pushType = 0;
+			pars.reference = this.$(".linkAttrOption .myDropText .text").text();
+		} else {
+			//pars.reference = "";
+			pars.pushType = dialog.element.find(".attrTypeOption").data("type");
+		}
+
+		data.data = JSON.stringify(pars);
+
+		App.Comm.ajax(data, (data) => {
+			if (data.code == 0) {
+				App.Services.SystemCollection.ExtendAttrCollection.push(data.data);
+			}
+		});
 
 	}
 

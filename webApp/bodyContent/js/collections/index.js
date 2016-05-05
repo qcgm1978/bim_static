@@ -9,6 +9,7 @@ App.BodyContent.control= {
 
     init : function(){
 		
+		$("#loginName").html(App.Comm.getCookie('OUTSSO_LoginId'));
 
         $("#contains").empty();
         new App.BodyContent.App().render(); //渲染框架
@@ -24,7 +25,7 @@ App.BodyContent.control= {
         	pageItemCount:30
         });
         this.loadData(this.monthEndCollection,{type:2,useId:App.Comm.getCookie('userId')});
-        this.loadData(this.monthStartCollection,{type:1,useId:App.Comm.getCookie('userId')});
+        this.loadData(this.monthStartCollection,{type:4,useId:App.Comm.getCookie('userId')});
         this.loadData(this.proCollection);
 
 
@@ -45,7 +46,12 @@ App.BodyContent.control= {
         urlType:"fetchBodyContentTodos",
         parse: function (response) {
             if (response.message == "success") {
-                return response.data.items;
+            	var _data=response.data.items;
+            	try{
+	            	$("#todoCounter").text(_data.length);
+            	}catch(e){
+            	}
+                return _data;
             }
         }
     })),

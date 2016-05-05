@@ -88,7 +88,7 @@
 					__ = toolTpl;
 				_ = _.replace('{class}', i == 0 ? 'selected' : 'remove');
 				__ = __.replace('{class}', i == 0 ? 'nonFlag flag' : 'nonFlag');
-				_ = _.replace('{src}', data[i].image||data[i].logo||'/static/dist/images/bodyContent/images/1683103954.jpg');
+				_ = _.replace('{src}', data[i].image||data[i].logo["600x450"]||'/static/dist/images/bodyContent/images/1683103954.jpg');
 				result.push(_);
 				tools.push(__);
 			}

@@ -8,7 +8,8 @@ App.Services.ApplicationListDetail = Backbone.View.extend({
 	events: {
 		"click  .reset": "resetKey",
 		"click  .myIcon-update": "updateAppDialog",
-		"click  .myIcon-del-blue": "delAppDialog"
+		"click  .myIcon-del-blue": "delAppDialog",
+		"click .myIcon-status-disable": "switchStatus"
 	},
 
 	initialize() {
@@ -24,6 +25,8 @@ App.Services.ApplicationListDetail = Backbone.View.extend({
 		this.$el.html(this.template(data)).data("id", data.id);
 		if (data.status != 1) {
 			this.$el.addClass("disabled");
+		}else{
+			this.$el.removeClass("disabled");
 		}
 		return this;
 	},
@@ -164,6 +167,27 @@ App.Services.ApplicationListDetail = Backbone.View.extend({
 			$parent.append('<li class="loading">无数据</li>');
 		}
 		this.remove();
+	},
+
+	//修改状态
+	switchStatus(event) {
+
+		var $item = $(event.target).closest(".item"),
+			data = {
+				URLtype: "appSwitchStatus",
+				type:"PUT", 
+				data: {
+					id: $item.data("id"),
+					status: $item.hasClass("disabled")?1:2
+				}
+			}; 
+
+		App.Comm.ajax(data, (data) => {
+			if (data.code == 0) {
+				this.model.set(data.data);
+			}
+		});
+
 	}
 
 });
