@@ -25,6 +25,8 @@ App.Services.ApplicationListDetail = Backbone.View.extend({
 		this.$el.html(this.template(data)).data("id", data.id);
 		if (data.status != 1) {
 			this.$el.addClass("disabled");
+		}else{
+			this.$el.removeClass("disabled");
 		}
 		return this;
 	},
