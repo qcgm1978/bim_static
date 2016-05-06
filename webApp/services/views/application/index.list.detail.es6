@@ -9,7 +9,7 @@ App.Services.ApplicationListDetail = Backbone.View.extend({
 		"click  .reset": "resetKey",
 		"click  .myIcon-update": "updateAppDialog",
 		"click  .myIcon-del-blue": "delAppDialog",
-		"click .myIcon-status-disable": "switchStatus"
+		"click .switchStatus": "switchStatus"
 	},
 
 	initialize() {
