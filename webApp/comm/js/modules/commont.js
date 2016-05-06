@@ -81,7 +81,6 @@
       self._footBar();
       self._bindEvent();
       self.consotroll();
-      self._opt.model.unregisterEvent();
       return self;
     },
     render:function(data){
@@ -92,6 +91,7 @@
       self._opt.element.append(self._opt.$el);
       canvas.width = self._opt.$el.width();
       canvas.height = self._opt.$el.height();
+      ctx.clearRect(0,0,canvas.width,canvas.height);
       self._opt.$canvas.append(canvas);
       self.on("start",function(data){
         self._destroy();
@@ -122,7 +122,8 @@
             });
             break;
         }
-      })
+      });
+      return self;
     },
     resize:function(el,w,h){
       var self = this;
@@ -137,6 +138,7 @@
       bar.on("click",".saveBtn",function(){
         self._save();
       }).on("click",'.cancelBtn',function(){
+        if(self._opt.cancelCallback)self._opt.cancelCallback();
         self._destroy();
       })
     },
@@ -162,9 +164,6 @@
       var self = this;
       self._opt.$el.remove();
       $('.commentDialog').remove();
-      $(".modelBar").show();
-      App.Comm.navBarToggle($(".rightProperty"),$(".projectCotent"),"right",App.Project.Settings.Viewer);
-      self._opt.model.registerEvent();
       self._opt.$el.off();
     },
     consotroll:function(){
