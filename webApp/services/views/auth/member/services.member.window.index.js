@@ -54,7 +54,6 @@ App.Services.MemberWindowIndex = Backbone.View.extend({
             data:submitData,
             dataType:"json",
             success:function(response){
-                console.log(response);
                 //返回重新获取成员角色列表
             },
             error:function(){
