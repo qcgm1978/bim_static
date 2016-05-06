@@ -127,8 +127,10 @@
     },
     resize:function(el,w,h){
       var self = this;
-      el.width = w || self._opt.$el.width();
-      el.height = w || self._opt.$el.height();
+      if(el && el.width){
+        el.width = w || self._opt.$el.width();
+        el.height = w || self._opt.$el.height();
+      }
     },
     _topBar:function(){
       var self = this;
@@ -267,7 +269,7 @@
         viewPoint:point,
         description:'',
         name:'',
-        type:1,
+        type:0,
         data:self.canvasData
       }
       if(self._opt.okCallback) self._opt.okCallback(data);
@@ -280,6 +282,7 @@
       if(self._opt.autoResize) self.resize(self.canvas);
       $(window).on('resize',function(){
         self.resize(self.canvas);
+        self.resize(self.viewCanvas);
       })
       $el.on("mousedown",function(e){
         var event = e || event;
