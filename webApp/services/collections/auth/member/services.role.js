@@ -26,7 +26,7 @@ App.Services.role ={
             data:{},
             success: function(collection, response, options) {
                 if(func && typeof  func == "function"){
-                    func();
+                    func(response);
                 }
             }
         });

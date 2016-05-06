@@ -21,6 +21,7 @@ App.Services.MemberNav=Backbone.View.extend({
     //外部用户
     outer:function(){
         App.Services.MemberType = "outer";
+        $("#dataLoading").show();
         this.loadData();
     },
     //内部用户

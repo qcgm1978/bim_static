@@ -41,7 +41,13 @@ App.Services.roleWindowIndex = Backbone.View.extend({
         var roleId =App.Services.roleModify.get("roleId");
         var cid = App.Services.roleModify.get("cid");
 
-        var url = "https://bim.wanda.cn/platform/auth/role/"+ roleId +"/function?functionId=";
+        var checked = App.Services.roleFun.collection.filter(function(item){
+            return item.get("checked");
+        });
+
+        var url = "http://bim.wanda-dev.cn/platform/auth/role/"+ roleId +"/function?functionId=";
+
+
 
         for(var i = 0 ; i < seleFun.length ; i++){
             if(i !== seleFun.length -1){
@@ -54,8 +60,7 @@ App.Services.roleWindowIndex = Backbone.View.extend({
             type:"POST",
             url:url,
             success:function(response){
-                App.Services.roleModify.reset();
-                App.Services.roleModify.save (response.data);
+                App.Services.roleModify.save (response.data.function);
                 App.Services.maskWindow.close();
             },
             error:function(type){
