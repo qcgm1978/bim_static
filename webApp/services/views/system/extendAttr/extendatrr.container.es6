@@ -108,7 +108,7 @@ App.Services.System.ExtendAttrContainer = Backbone.View.extend({
 
 	extendAttrAdd(dialog) {
 
-		debugger
+		 
 		var data = {
 				URLtype: "extendAttrInsert",
 				type: "POST",
@@ -129,7 +129,7 @@ App.Services.System.ExtendAttrContainer = Backbone.View.extend({
 
 		if (dialog.element.find(".btnCk").hasClass("selected")) {
 			pars.pushType = 0;
-			pars.reference = this.$(".linkAttrOption .myDropText .text").text();
+			pars.reference = dialog.element.find(".linkAttrOption .myDropText .text").text();
 		} else {
 			//pars.reference = "";
 			pars.pushType = dialog.element.find(".attrTypeOption").data("type");
@@ -140,6 +140,7 @@ App.Services.System.ExtendAttrContainer = Backbone.View.extend({
 		App.Comm.ajax(data, (data) => {
 			if (data.code == 0) {
 				App.Services.SystemCollection.ExtendAttrCollection.push(data.data);
+				dialog.close();
 			}
 		});
 

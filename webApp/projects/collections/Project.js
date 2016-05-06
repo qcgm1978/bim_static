@@ -444,10 +444,11 @@ App.Project = {
 					if (!data) {
 						return;
 					}
-					that.$el.find(".attrPlanBox").find(".name").text(data.taskName).end().find(".start").
-					text(data.planStartDate && new Date(data.planStartDate).format("yyyy-MM-dd") || "").end().
-					find(".end").text(data.planFinishDate && new Date(data.planFinishDate).format("yyyy-MM-dd") || "").end().
-					find(".rEnd").text(data.planFinishDate && new Date(data.planFinishDate).format("yyyy-MM-dd") || "").end().show();
+
+					that.$el.find(".attrPlanBox").find(".name").text(data.businessItem).end().find(".start").
+					text(data.planStartTime && new Date(data.planStartTime).format("yyyy-MM-dd") || "").end().
+					find(".end").text(data.planEndTime && new Date(data.planEndTime).format("yyyy-MM-dd") || "").end().show();
+					//.find(".rEnd").text(data.planFinishDate && new Date(data.planFinishDate).format("yyyy-MM-dd") || "").end().show();
 
 				}
 			});
@@ -456,8 +457,10 @@ App.Project = {
 		if (type.indexOf("cost") != -1) {
 			App.Project.fetchPropertData("fetchDesignPropertiesCost", function(data) {
 				if (data.code == 0) {
-					var html = App.Project.properCostTree(data.data);
-					that.$el.find(".attrCostBox").show().find(".modle").append(html);
+					if (data.data.length > 0) {
+						var html = App.Project.properCostTree(data.data);
+						that.$el.find(".attrCostBox").show().find(".modle").append(html);
+					}
 				}
 			});
 		}
@@ -469,13 +472,16 @@ App.Project = {
 
 			App.Project.fetchPropertData("fetchDesignPropertiesQuality", function(data) {
 
-				if (data.code == 0) {
+				if (data.code == 0) {  
 
-					var lis = '';
-					$.each(data.data, function(i, item) {
-						lis += liTpl.replace("varName", item.name);
-					});
-					that.$el.find(".attrQualityBox").show().find(".modleList").html(lis);
+					if (data.data.length > 0) {
+						var lis = '';
+						$.each(data.data, function(i, item) {
+							lis += liTpl.replace("varName", item.name);
+						});
+						that.$el.find(".attrQualityBox").show().find(".modleList").html(lis);
+					} 
+
 				}
 			});
 		}
@@ -526,7 +532,7 @@ App.Project = {
 
 		//内容
 
-		sb.Append('<span class="modleName"><div class="modleNameText overflowEllipsis">');
+		sb.Append('<span class="modleName overflowEllipsis"><div class="modleNameText overflowEllipsis">');
 		if (item.children && item.children.length > 0) {
 			sb.Append('<i class="nodeSwitch on" style="margin-left:' + w + 'px;"></i>');
 		} else {
@@ -534,7 +540,7 @@ App.Project = {
 		}
 		sb.Append(item.code);
 		sb.Append('</div></span>');
-		sb.Append(' <span class="modleVal"> ' + item.name + '</span> ');
+		sb.Append(' <span class="modleVal overflowEllipsis" title="' + item.name + '"> ' + item.name + '</span> ');
 
 		//递归
 		if (item.children && item.children.length > 0) {
@@ -569,12 +575,12 @@ App.Project = {
 		} else {
 			$target.parent().find(".selected").removeClass("selected");
 			$target.addClass("selected");
-		} 
+		}
 
-		if ($target.data("box")) { 
+		if ($target.data("box")) {
 			this.zommBox($target);
 			return;
-		} 
+		}
 
 		var data = {
 			URLtype: "fetchQualityModelById",
@@ -642,9 +648,9 @@ App.Project = {
 		$target.parent().find(".selected").each(function() {
 
 			Ids.push($(this).data("elem"));
-			boxArr=boxArr.concat($(this).data("box"));
+			boxArr = boxArr.concat($(this).data("box"));
 
-		}); 
+		});
 
 		App.Project.Settings.Viewer.selectIds(Ids);
 		App.Project.Settings.Viewer.zoomBox(boxArr)
