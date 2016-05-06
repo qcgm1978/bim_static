@@ -1,9 +1,9 @@
 <div class="imageJcrop">
 	<div class="previewImage">
 		<img id="tempImage" src=""/>
-		<input id="selectBtn" type="button" value="选择文件" class="myBtn">
 		<form id="uploadImageForm" action="/platform/project/1/logo" method="post" target="upload-iframe" enctype="multipart/form-data" encoding="multipart/form-data">
-			<input id="inputFile" type="file" style="display: none;"/>
+			<input id="selectBtn" type="button" value="选择文件" class="myBtn">
+			<input id="inputFile" name="fileField" type="file"/>
 		</form>
 		<iframe id="uploadIframe" name="upload-iframe" border="0" width="0" height="0" style="width: 0;height: 0; display: none;"></iframe>
 		<p> 支持jpg,jpeg,gif,png,bmp图片文件，大小限制2M以内</p>

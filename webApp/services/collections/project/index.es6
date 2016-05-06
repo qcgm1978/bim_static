@@ -42,7 +42,7 @@ App.Services.ProjectCollection = {
 		parse(response) {
 			if (response.code == 0) {
 				var data=response.data;
-				data.logo=data.logo['200x150'];
+				data.logo=data.logo ? data.logo['200x150']:"";
                 return data;
             }
 		}
@@ -60,7 +60,7 @@ App.Services.ProjectCollection = {
 		parse(response) {
 			if (response.code == 0) {
 				var data=response.data;
-				data.logo=data.logo['200x150'];
+				data.logo=data.logo ? data.logo['200x150']:"";
                 return data;
             }
 		}

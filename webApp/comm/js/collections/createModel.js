@@ -7,6 +7,7 @@ App.Comm.createModel = function(options){
   var viewer;
   var viewPoint;
   var floorMap;
+  var comment;
   var viewpointDialog = function(option,callback){
     var html = new viewpointView({
       model:option
@@ -39,7 +40,7 @@ App.Comm.createModel = function(options){
       if(callback && name) html.remove();callback(data);
     });
   }
-  var modelCollection = {
+  modelCollection = {
     sceneCollection:new(Backbone.Collection.extend({
       model: Backbone.Model.extend(),
       urlType:"fetchScene"
@@ -103,10 +104,10 @@ App.Comm.createModel = function(options){
         var view = new vView({
           model:obj
         });
-        if(obj.type == 1){
-          that.$el.find('#private ul').append(view.render().el);
+        if(obj.type == 0){
+          that.$el.find('#private ul').prepend(view.render().el);
         }else{
-          that.$el.find('#public ul').append(view.render().el);
+          that.$el.find('#public ul').prepend(view.render().el);
         }
       });
       return that;
@@ -244,16 +245,26 @@ App.Comm.createModel = function(options){
     modelComment:function(){
       var that = this;
       $(".modelBar").hide();
+      viewer.unregisterEvent();
       App.Comm.navBarToggle($(".rightProperty"),$(".projectCotent"),"right",App.Project.Settings.Viewer);
       setTimeout(function(){
         var comment = new App.Comm.modules.Comment({
           element:$('.modelContainerContent'),
           model:viewer,
+          cancelCallback:function(){
+            $(".modelBar").show();
+            viewer.registerEvent();
+            App.Comm.navBarToggle($(".rightProperty"),$(".projectCotent"),"right",App.Project.Settings.Viewer);
+          },
           okCallback:function(data){
             var viewPoint = data.viewPoint;
             var image = data.pic.substr(22);
             var canvasData = data.data;
             viewpointDialog(data,function(res){
+              $(".modelBar").show();
+              viewer.registerEvent();
+              comment._destroy();
+              App.Comm.navBarToggle($(".rightProperty"),$(".projectCotent"),"right",App.Project.Settings.Viewer);
               var data = {
                 name:res.name,
                 description:res.summary,
@@ -271,7 +282,6 @@ App.Comm.createModel = function(options){
                 if (data.message=="success") {
                   that.saveImage(image,data.data);
                   that.saveCanvasData(canvasData,data.data);
-                  comment._destroy();
                 }else{
                   alert(data.message);
                 }
@@ -286,7 +296,7 @@ App.Comm.createModel = function(options){
       formdata.append("fileName",data.id+".png");
       formdata.append("size",image.length);
       formdata.append("file",image);
-      var url = '/sixD/'+data.projectId+'/viewPoint/'+data.id+'/pic'
+      var url = '/sixD/'+data.projectId+'/viewPoint/'+data.id+'/pic';
       $.ajax({
         url:url,
         type:"post",
@@ -294,11 +304,15 @@ App.Comm.createModel = function(options){
         processData : false,
         contentType : false,
         success:function(res){
-          console.log(res);
+          var data = {
+            data:[res.data]
+          }
+          modelCollection.viewpointCollection.add(data);
         }
       })
     },
     saveCanvasData:function(canvasData,data){
+      if(!canvasData)return;
       var data = {
         type:'post',
         URLtype:"addViewpointData",
@@ -351,6 +365,7 @@ App.Comm.createModel = function(options){
           self = $(event.target).closest(".item-content");
       self.toggleClass("open");
       if(self.parents("#classCode")){
+        debugger
         var flag = self.next(".subTree").length;
         if(flag == 0){
           var data = that.classCodeData,
@@ -604,7 +619,7 @@ App.Comm.createModel = function(options){
           top:top
         }).show();
       }else{
-        var html = '<div class="menu"><span class="item edit">重命名</span><span class="item delete">删除</span><span class="item addComment">批注</span></div>'
+        var html = '<div class="menu"><a href="'+that.model.pic+'" target="_blank" class="item download">下载</a><span class="item edit">修改</span><span class="item delete">删除</span></div>'
         $(html).css({
           left:left,
           top:top
@@ -618,7 +633,10 @@ App.Comm.createModel = function(options){
       event.preventDefault();
     },
     setPoint:function(){
-      var model = this.model
+      if(comment){
+        comment._destroy();
+      }
+      var model = this.model;
       var data = {
         type:'get',
         URLtype:"fetacCanvasData",
@@ -631,7 +649,7 @@ App.Comm.createModel = function(options){
       App.Comm.ajax(data,function(data){
         if(data.message == "success"){
           var canvasData = data.data.comments;
-          new App.Comm.modules.Comment({
+          comment = new App.Comm.modules.Comment({
             element:$('.modelContainerContent .model')
           }).render(canvasData);
         }

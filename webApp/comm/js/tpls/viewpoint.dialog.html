@@ -11,15 +11,15 @@
         <div class="input"><textarea class="summary" placeholder="请输入快照描述"><%= description %></textarea></div>
         <div class="type">
           <div class="cur" data-type="<%= type %>">
-            <% if(type==1){ %>
+            <% if(type==0){ %>
               <i class="iconUser"></i><span>个人快照</span>
             <% }else{ %>
               <i class="iconPublic"></i><span>项目快照</span>
             <% } %>
           </div>
           <ul class="typeList">
-            <li value="1"><i class="iconUser"></i><span>个人快照</span></li>
-            <li value="2"><i class="iconPublic"></i><span>项目快照</span></li>
+            <li value="0"><i class="iconUser"></i><span>个人快照</span></li>
+            <li value="1"><i class="iconPublic"></i><span>项目快照</span></li>
           </ul>
         </div>
       </div>

@@ -20,6 +20,7 @@ App.Project.CostVerification = Backbone.View.extend({
 
 	events: {
 		"click .tbVerificationCate .nodeSwitch": "showNode",
+		"click .tbVerification .nodeSwitch":"nodeSwitch",
 		"click .subData .code": "showInModel"
 	},
 
@@ -79,7 +80,7 @@ App.Project.CostVerification = Backbone.View.extend({
 		}
 		//未加载过
 		var data = {
-			URLtype: "fetchCostModleIdByCode",
+			URLtype: "fetchNoCostCate",
 			data: {
 				projectId: App.Project.Settings.projectId,
 				projectVersionId: App.Project.Settings.CurrentVersion.id,
@@ -112,6 +113,64 @@ App.Project.CostVerification = Backbone.View.extend({
 			App.Project.Settings.Viewer.selectIds([modelId]);
 		}
 		App.Project.Settings.Viewer.zoomSelected();
+	},
+
+	//收起展开
+	nodeSwitch(event) {
+		 
+		var $target = $(event.target),
+
+			$tr = $target.closest("tr"),
+			isOpen = $target.hasClass("on");
+
+		if ($tr.hasClass("stepOne")) {
+			//展开
+			if (isOpen) {
+				$tr.nextUntil(".stepOne").hide();
+				$target.removeClass("on");
+			} else {
+				$tr.nextUntil(".stepOne").show();
+				$target.addClass("on");
+			}
+		}
+
+		if ($tr.hasClass("stepTwo")) {
+
+			var nextUntilStepOne = $tr.nextUntil(".stepTwo"),
+				isExists = false;
+
+			nextUntilStepOne.each(function() {
+				if ($(this).hasClass(".stepOne")) {
+					isExists = true;
+					return false;
+				}
+			}); 
+
+			if (isExists) {
+				//展开
+				if (isOpen) {
+					$tr.nextUntil(".stepOne").hide();
+				} else {
+					$tr.nextUntil(".stepOne").show();
+				}
+			} else {
+				nextUntilStepOne.splice(-1);
+				if (isOpen) {
+					nextUntilStepOne.hide();
+				}else{
+					nextUntilStepOne.show();
+				} 
+			} 
+		} 
+
+		if (isOpen) {
+			$target.removeClass("on");
+		} else {
+			$target.addClass("on");
+		}
+
+		event.stopPropagation();
+
 	}
 
 

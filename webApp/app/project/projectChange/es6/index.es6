@@ -324,7 +324,7 @@ App.Index = {
 			var treeRoot = _.templateUrl('/app/project/projectChange/tpls/treeRoot.html');
 			var treeNode = _.templateUrl('/app/project/projectChange/tpls/treeNode.html');
 			data.treeNode = treeNode;
-			$(".designProperties .attrCostBox").append(treeRoot(data));
+			$(".designProperties .attrCostBox .modleList").append(treeRoot(data));
 			$(".attrCostBox li .itemContent").addClass("odd");
 		});
 	},

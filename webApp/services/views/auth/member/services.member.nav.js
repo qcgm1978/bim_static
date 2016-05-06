@@ -21,33 +21,32 @@ App.Services.MemberNav=Backbone.View.extend({
     //外部用户
     outer:function(){
         App.Services.MemberType = "outer";
-        this.loadData();
+        $("#dataLoading").show();
+        this.init();
     },
     //内部用户
     inner:function(){
         App.Services.MemberType = "inner";
         $("#dataLoading").show();
-        this.loadData();
+        this.init();
     },
     //加载子组织，刷新右侧组织和员工列表
-    loadData:function(){
-        var _thisType = App.Services.MemberType;
+    init:function(){
+        var _thisType = App.Services.MemberType,_this =this;
         var collection = App.Services.Member[_thisType + "Collection"];
         //获取数据，将会刷新右侧视图
         App.Services.Member.loadData(collection,{},function(response){
-            $("#blendList").empty();//清空右侧列表
-            //加载右侧数据
             //菜单
             if (response.data.org && response.data.org.length) {
                 //样式处理
-                this.$("div").remove("active");
+                _this.$("div").removeClass("active");
                 $("#" + _thisType).addClass("active");
                 $(".serviceOgList span").removeClass("active");//唯一选项
                 $("#" + _thisType + " > span").addClass("active");//选中状态
-                //如果有则清空直接子列表？？结构不正确
-                this.$(".childOz").empty();
+                //如果有则清空直接子列表
+                _this.$(".childOz").empty();
                 //菜单渲染
-                this.$("#" + _thisType +"+ .childOz").html(new App.Services.MemberozList(response.data.org).render().el);
+                $("#" + _thisType +"+ .childOz").html(new App.Services.MemberozList(response.data.org).render().el);
                 $("#dataLoading").hide();
             }
         });

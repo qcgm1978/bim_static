@@ -20,12 +20,12 @@
  	template: _.templateUrl('/services/tpls/project/index.html', true),
 
  	render() {
+ 	
  		this.$el.html(this.template);
+ 		
 		new App.Services.ProjectBase();
-		new App.Services.ProjectMapping();
- 		//this.$(".projectContainer .projectBase").html(new App.Services.ProjectBase().render().el);
-
- 		//this.$(".projectContainer .projectMapping").html(new App.Services.ProjectMapping().render().el);
+		
+		this.viewProjectMapping = new App.Services.ProjectMapping();
 
  		this.$(".projectContainer .projectDetail").html(new App.Services.ProjectDetail().render().el);
 
@@ -69,8 +69,11 @@
  			}
  		});
  		
- 		//加载映射信息
  		
+ 		//参数传递
+ 		this.viewProjectMapping.setUserData({
+ 			projectId:_projectId
+ 		});
  		let collectionMap=App.Services.ProjectCollection.ProjecMappingCollection;
  		collectionMap.projectId=_projectId;
  		collectionMap.fetch({
