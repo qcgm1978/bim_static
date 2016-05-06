@@ -1,27 +1,23 @@
 
 
 var App = App || {};
-App.Services.step1 = Backbone.View.extend({
+App.Services.step3 = Backbone.View.extend({
 
   tagName:'div',
 
-  className:'step1',
+  className:'step3',
 
-  template:_.templateUrl("/services/tpls/auth/keyUser/services.addKeyUser.step1.html"),
+  template:_.templateUrl("/services/tpls/auth/keyUser/services.addKeyUser.step3.html"),
 
   events:{
     "click  p":"changeStatus",
     //"click .keyUserList li":'toggleClass'
   },
 
-  render:function(name){
-
-    if(name && name=='step3'){
-      this.$el.addClass('step1in3');
-    }
+  render:function(){
     //准备Collection的MODELS
     var datas={
-      direction : App.Services.KeyUser.Step1.toJSON() || [],
+      direction : App.Services.KeyUser.Step3.toJSON() || [],
 
     };
     this.$el.html(this.template(datas));
@@ -30,13 +26,13 @@ App.Services.step1 = Backbone.View.extend({
 
 
   initialize:function(){
-    this.listenTo(App.Services.KeyUser.Step1,'add',this.render)
+    this.listenTo(App.Services.KeyUser.Step3,'add',this.render)
   },
 
   //打开或关闭目录
   changeStatus:function(e){
 
-    var $p,instep3,target,el=this.$el;
+    var $p,target,el=this.$el;
     if($(e.target).hasClass('person') || $(e.target).hasClass('mulu') ){
       $p = $(e.target);
       target = 'p';
@@ -51,8 +47,7 @@ App.Services.step1 = Backbone.View.extend({
       }
     }
     var $ul=$p.siblings('ul');
-    //判断是否是step3里加载的step1
-    instep3 = this.$el.hasClass('step1in3');
+
     var func = function(isstep3){
       //是否需要加载子目录
       var canLoad=$p.attr('data-canLoad');
@@ -65,31 +60,20 @@ App.Services.step1 = Backbone.View.extend({
 
           if(canLoad=='true'){
             $ul.removeClass('shut').addClass('open');
-            App.Comm.ajax({URLtype:'fetchServiceMemberInnerList',data:{parentId:orgId,includeUsers:true}},function(r){
+            App.Comm.ajax({URLtype:'fetchServiceMemberOuterList',data:{parentId:orgId,includeUsers:false}},function(r){
               console.log(r)
 
               if(r && !r.code && r.data){
                 var str = '';
-                if(isstep3 != "isstep3"){
-                  _.each(r.data.user,function(data){
-                    data.canLoad = false;
-                    //<%= data[i]['child'] && data[i]['child'][0]=='string'?'lastLayer':''%>
-                    str+="<li>"+
-                      "<p class='person "+"' data-uid='"+data['userId']+ "' data-canLoad='true' ><i ></i><span class='isspan'>"+ data['name']+"</span></p>"+
-                      "</li>";
-                  });
-                }
 
                 _.each(r.data.org,function(data){
                   data.shut = true;
                   data.canLoad = true;
-                  //<%= data[i]['child'] && data[i]['child'][0]=='string'?'lastLayer':''%>
                   str+="<li>"+
                     "<p class='shut mulu"+"' data-id='"+data['orgId']+ "' data-canLoad='"+(data['hasChildren']||data['hasUser']?true:false)+ "'><i ></i><span class='isspan'>"+ data['name']+"</span></p>"+
                     "<ul class='shut'></ul>"+
                     "</li>";
                 });
-                //$ul[0].innerHTML = str;
                 $p.siblings('ul').html(str);
 
 
@@ -114,17 +98,14 @@ App.Services.step1 = Backbone.View.extend({
 
       }
     }
-    if(instep3){
+
       //点击的是文件夹ICON
       if(target == 'i'){
-        func('isstep3')
+        func()
       }else{
         $('.leftWindow').find('.toselected').removeClass('toselected');
         $p.parent().addClass('toselected');
       }
-    }else{
-      func()
-    }
 
 
 
