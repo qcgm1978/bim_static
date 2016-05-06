@@ -31,7 +31,6 @@ App.API = {
 		fetchServicesMemberOuterList:'platform/auth/org?outer=true',//外部组织-品牌／公司／成员列表
 		fetchServicesMemberInnerList:'platform/auth/org?outer=false',//内部-组织／成员列表
 		deleteServicesRoleSingle:"platform/role?",//删除角色
-
 		fetchServiceKeyUserList:'platform/auth/org?outer=false&parentId=&includeUsers=',//关键用户列表
 		fetchServiceStep1:'platform/auth/org?outer=false&parentId=&includeUsers=',//项目列表
 

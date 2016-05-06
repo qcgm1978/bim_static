@@ -97,18 +97,30 @@ App.Services.addKeyUser = Backbone.View.extend({
       this.$el.find('.up').hide();
       this.$el.find('.confirm').hide();
       this.$el.find('.leftWindow').html(new App.Services.step1().render().el);
-
-      App.Services.KeyUser.loadData(App.Services.KeyUser.Step1,'',function(r){
+console.log('step1')
+      App.Comm.ajax({URLtype:'fetchServicesMemberInnerList'},function(r){
         console.log(r)
 
         if(r && !r.code && r.data){
-          _.each(r.data.org,function(data,index){
-            data.shut = true;
+          _.each(r.data.org, function(data, index){
+            data.shut    = true;
             data.canLoad = true;
-          });
+          })
           App.Services.KeyUser.Step1.set(r.data.org);
         }
       });
+
+      //App.Services.KeyUser.loadData(App.Services.KeyUser.Step1,'',function(r){
+      //  console.log(r)
+      //
+      //  if(r && !r.code && r.data){
+      //    _.each(r.data.org,function(data,index){
+      //      data.shut = true;
+      //      data.canLoad = true;
+      //    });
+      //    App.Services.KeyUser.Step1.set(r.data.org);
+      //  }
+      //});
     }
     return this;
   },
