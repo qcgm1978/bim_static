@@ -18,7 +18,11 @@ App.BodyContent.control= {
         $(".conMonth .article table").append(new App.BodyContent.monthStartList().render().el);
         $("#proclamation").html(new App.BodyContent.proclamationList().render().el);
 		
-        this.loadData(this.todoCollection,{});
+        this.loadData(this.todoCollection,{
+        	status:1,
+        	pageIndex:1,
+        	pageItemCount:6
+        });
         this.loadData(this.slideCollection,{
         	type:3,
         	pageIndex:1,

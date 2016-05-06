@@ -13,20 +13,28 @@ App.Services.ProjectBase=Backbone.View.extend({
 
 	render(data){
 		var _html=_.template(this.template);
-		this.$el.html(_html(data.toJSON()[0]));   
+		var _data=data.toJSON()[0];
+		this.$el.html(_html(_data));   
 		$(".projectContainer .projectBase").html(this.$el);
 		
 		$(".projectLogo").hover(function(){
-			$(this).find("label").animate({
+			var _$label=$(this).find("label");
+			_$label.stop(true);
+			_$label.animate({
 				bottom:'0'
 			},500)
 		},function(){
-			$(this).find("label").animate({
+			var _$label=$(this).find("label");
+			_$label.stop(true);
+			_$label.animate({
 				bottom:'-26px'
 			},500)
-		}).on("click",function(){
+		})
+		
+		this.$el.find("label").on("click",function(e){
+			var imageUrl=$(this).attr("data-image");
 			var view=new App.Services.ImageJcrop();
-			App.Services.maskWindow=new App.Comm.modules.Dialog({title:'修改图片',width:600,height:500,isConfirm:false,message:view.render().el});
+			App.Services.maskWindow=new App.Comm.modules.Dialog({title:'修改图片',width:600,height:500,isConfirm:false,message:view.render(imageUrl,_data.id).el});
 		})
 		
 		return this;
