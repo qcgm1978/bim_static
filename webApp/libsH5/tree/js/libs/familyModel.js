@@ -62,7 +62,7 @@ familyModel.prototype = {
       $(this).toggleClass('open');
     }).on("click",'.mod-select li',function(){
       var id = $(this).data('id'),
-          $cur = $this.parent().prev(),
+          $cur = $(this).parent().prev();
       $cur.text(val).removeClass('open');
       self.model.hideScene({
         type:'typeId',
