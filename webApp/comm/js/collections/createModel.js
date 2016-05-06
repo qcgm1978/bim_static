@@ -40,7 +40,7 @@ App.Comm.createModel = function(options){
       if(callback && name) html.remove();callback(data);
     });
   }
-  var modelCollection = {
+  modelCollection = {
     sceneCollection:new(Backbone.Collection.extend({
       model: Backbone.Model.extend(),
       urlType:"fetchScene"
@@ -104,10 +104,10 @@ App.Comm.createModel = function(options){
         var view = new vView({
           model:obj
         });
-        if(obj.type == 1){
-          that.$el.find('#private ul').append(view.render().el);
+        if(obj.type == 0){
+          that.$el.find('#private ul').prepend(view.render().el);
         }else{
-          that.$el.find('#public ul').append(view.render().el);
+          that.$el.find('#public ul').prepend(view.render().el);
         }
       });
       return that;
@@ -260,10 +260,11 @@ App.Comm.createModel = function(options){
             var viewPoint = data.viewPoint;
             var image = data.pic.substr(22);
             var canvasData = data.data;
-            $(".modelBar").show();
-            viewer.registerEvent();
-            App.Comm.navBarToggle($(".rightProperty"),$(".projectCotent"),"right",App.Project.Settings.Viewer);
             viewpointDialog(data,function(res){
+              $(".modelBar").show();
+              viewer.registerEvent();
+              comment._destroy();
+              App.Comm.navBarToggle($(".rightProperty"),$(".projectCotent"),"right",App.Project.Settings.Viewer);
               var data = {
                 name:res.name,
                 description:res.summary,
@@ -281,7 +282,6 @@ App.Comm.createModel = function(options){
                 if (data.message=="success") {
                   that.saveImage(image,data.data);
                   that.saveCanvasData(canvasData,data.data);
-                  comment._destroy();
                 }else{
                   alert(data.message);
                 }
@@ -296,7 +296,7 @@ App.Comm.createModel = function(options){
       formdata.append("fileName",data.id+".png");
       formdata.append("size",image.length);
       formdata.append("file",image);
-      var url = '/sixD/'+data.projectId+'/viewPoint/'+data.id+'/pic'
+      var url = '/sixD/'+data.projectId+'/viewPoint/'+data.id+'/pic';
       $.ajax({
         url:url,
         type:"post",
@@ -304,7 +304,10 @@ App.Comm.createModel = function(options){
         processData : false,
         contentType : false,
         success:function(res){
-          console.log(res);
+          var data = {
+            data:[res.data]
+          }
+          modelCollection.viewpointCollection.add(data);
         }
       })
     },
@@ -362,6 +365,7 @@ App.Comm.createModel = function(options){
           self = $(event.target).closest(".item-content");
       self.toggleClass("open");
       if(self.parents("#classCode")){
+        debugger
         var flag = self.next(".subTree").length;
         if(flag == 0){
           var data = that.classCodeData,
