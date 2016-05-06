@@ -763,11 +763,13 @@ BIM.prototype = {
     var viewer = BIM.common.viewer;
     var filter = viewer.getFilters();
     filter.setSelectedIds(ids);
+    viewer.render();
   },
   unSelected:function(){
     var viewer = BIM.common.viewer;
     var filter = viewer.getFilters();
     filter.setSelectedIds();
+    viewer.render();
   },
   setFloorMap:function(obj,name){
     var viewer = BIM.common.viewer;
@@ -807,6 +809,13 @@ BIM.prototype = {
     var viewer = BIM.common.viewer;
     var filter = viewer.getFilters();
     filter.setSelectedIds(ids);
+    filter.enableSceneOverrider(true);
+    viewer.render();
+  },
+  setGlobalTransparent:function(flag){
+    var viewer = BIM.common.viewer;
+    var filter = viewer.getFilters();
+    filter.enableSceneOverrider(flag);
     viewer.render();
   },
   load:function(etag){
@@ -830,6 +839,18 @@ BIM.prototype = {
     });
     viewer.generateFloorPlane(name);
     viewer.generateAxisGrid(name);
+  },
+  getImage:function(){
+    var viewer = BIM.common.viewer;
+    return viewer.canvas2image();
+  },
+  registerEvent:function(){
+    var viewer = BIM.common.viewer;
+    viewer.registerDomEventListeners();
+  },
+  unregisterEvent:function(){
+    var viewer = BIM.common.viewer;
+    viewer.unregisterDomEventListeners();
   }
 }
 

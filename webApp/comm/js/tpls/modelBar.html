@@ -11,9 +11,11 @@
     </div>
     <div class="modelTabBox">
       <div class="mobelTabContainer selected" id="public">
-        <ul class="tree"></ul>
+        <ul class="viewpointList"></ul>
       </div>
-      <div class="mobelTabContainer" id="private"></div>
+      <div class="mobelTabContainer" id="private">
+        <ul class="viewpointList"></ul>
+      </div>
     </div>
   </div>
 </div>
@@ -32,9 +34,9 @@
     <i class="bar-item bar-fly" data-type="change" data-id="fly" title="漫游"></i>
   </div>
   <div class="bar-group">
-    <i class="bar-item bar-more" data-type="change" data-id="more" title="更多"></i>
+    <i class="bar-item bar-more" data-type="more" data-id="more" title="更多"></i>
     <div class="subBar">
-      <i class="bar-item bar-opacity" data-type="change" data-id="opacity" title="透明"></i>
+      <i class="bar-item bar-opacity" data-type="change" data-id="setGlobalTransparent" title="透明"></i>
     </div>
   </div>
 </div>
@@ -45,8 +47,6 @@
       <span class="current-floor"></span>
     </div>
     <div class="axisGrid">
-      <i class="gridIcon"></i>
-      <span>轴网：</span>
       <span class="grid-position">--,--</span>
     </div>
   </div>
