@@ -14,7 +14,8 @@ App.Services.keyUserFrame = Backbone.View.extend({
     events:{
         "click .newKeyUsers":"newKeyUser",
         "click .keyUserList li":'toggleClass',
-        "click .proe .edit":'projedit'
+        "click .keyUserList .delete":'delete'
+
 
     },
 
@@ -31,22 +32,67 @@ App.Services.keyUserFrame = Backbone.View.extend({
 
     //切换active状态
     toggleClass:function(e){
+        if($(e.target).hasClass('delete')){
+            return
+        }
+        var uuid = App.Services.KeyUser.uuid = $(e.target).attr('data-uid');
+
         $(e.target).toggleClass('active').siblings().removeClass('active');
-        new App.Services.userinfo().render();
-        //App.Services.KeyUser.userinfo.set(App.Services.KeyUser.fakedata);
+        var datas = {
+            uid : uuid
+        };
+        var data={
+            URLtype :"fetchServiceKeyUserInfo",
+            type:"GET",
+            //contentType:"application/json",
+            data:JSON.stringify(datas)
+        };
+        App.Comm.ajax(data,function(data){
+            if (data.code==0) {
+                console.log(data)
+                App.Services.KeyUser.fakedata=data.data;
+                new App.Services.userinfo().render();
+
+            }
+
+        });
+
     },
 
     //提交表单，完毕会触发重新获取列表，列表为memBlend所属列表
     newKeyUser:function(){
+        App.Services.KeyUser.uid=[];
+        App.Services.KeyUser.pid=[];
+        App.Services.KeyUser.orgId=[];
+        App.Services.KeyUser.html=[];
+        App.Services.KeyUser.html2=[];
+        App.Services.KeyUser.html3=[];
         App.Services.maskWindow=new App.Comm.modules.Dialog({title:'新增关键用户',width:600,height:500,isConfirm:false});
         $('.mod-dialog .wrapper').html(new App.Services.addKeyUser().render().el);
-        console.log($('.mod-dialog .content'))
+
     },
 
-    //编辑项目权限
-    projedit:function(){
-        alert('gg')
+    //delete
+    delete : function(e){
+        var uid = $(e.target).attr('data-uid');
+
+
+        var data={
+            URLtype :"fetchServiceKeyUserDelete",
+            type:"DELETE",
+            data:JSON.stringify({uid : uid})
+
+            //contentType:"application/json"
+        };
+        App.Comm.ajax(data,function(data){
+            if (data.code==0) {
+                console.log(data)
+            }
+
+        });
     },
+
+
 
     add:function(){
        this.render()
@@ -58,16 +104,15 @@ App.Services.keyUserFrame = Backbone.View.extend({
     },
 
     initialize:function(){
-        App.Comm.ajax({URLtype:'fetchProjects'},function(r){
+        App.Services.KeyUser.loadData(App.Services.KeyUser.Step2,'',function(r){
             console.log(r)
 
             if(r && !r.code && r.data){
-                _.each(r.data.items,function(data,index){
-
-                });
                 App.Services.KeyUser.projects=r.data.items;
+
             }
         });
+
 
         this.listenTo(App.Services.KeyUser.KeyUserList,'add',this.add);
         this.listenTo(App.Services.KeyUser.userinfo,'add',this.userinfo);

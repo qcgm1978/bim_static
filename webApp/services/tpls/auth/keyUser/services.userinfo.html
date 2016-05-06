@@ -4,33 +4,31 @@
                 <h2>基本信息</h2>
                 <div class="head" style="background-image: url('/static/dist/images/service/images/keyUserHead.gif') ;"></div>
                 <ul class="baseInfo">
-                    <li><span>姓名：</span><%= info.name %></li>
-                    <li><span>账号：</span><%= info.name %></li>
-                    <li><span>职务：</span><%= info.position %></li>
-                    <li><span>部门：</span><%= info.name %></li>
+                    <li><span>姓名：</span><%= info.user.name %></li>
+                    <li><span>账号：</span><%= info.user.loginName %></li>
+                    <li><span>职务：</span><%= info.user.position %></li>
+                    <li><span>部门：</span><%= info.user.org[0]['name'] %></li>
                 </ul>
             </div>
             <div class="bdB-c proe">
-                <h2>项目权限（<span><%= info.privilege.length %></span>）<span class="edit"></span></h2>
+                <h2>项目权限（<span><%= info.project.length %></span>）<span class="edit"></span></h2>
                 <ul>
-                    <% var projs=App.Services.KeyUser.projects; %>
-                    <% _.each(info.privilege,function(proj){ %>
-                    <% for(var i=0;i<projs.length;i++){ %>
-                    <% if(projs[i]['id'] && proj['id'] && projs[i]['id']==proj['id']){ %>
-                    <li><div class="name"><span class="proImg"><img src="/static/dist/images/service/images/keyUser_proImg.gif" width="100%"></span><a href="#"><%= proj.name %></a></div><div class="time">2016-02-13----2017-07-21</div><div>四川-雅安</div></li>
-                    <% return %>
+
+                    <% for(var i=0;i<info.project.length;i++){ %>
+                    <li><div class="name"><span class="proImg"><img src="/static/dist/images/service/images/keyUser_proImg.gif" width="100%"></span><a href="#"><%= info.project[i]['name'] %></a></div><div class="time"><%= new Date(info.project[i]['createTime'] || 0).Format("yyyy-MM-dd")%><%= info.project[i]['openTime']?"--"+new Date(info.project[i]['openTime']).Format("yyyy-MM-dd"):''%></div><div><%= info.project[i]['province'] %></div></li>
+
                     <% } %>
-                    <% } %>
-                    <% }) %>
+
                 </ul>
             </div>
             <div class="bdB-c oz">
-                <h2>部门权限（<span>3</span>）<span class="edit"></span></h2>
+                <h2>部门权限（<span><%= info.org.length %></span>）<span class="edit"></span></h2>
                 <div class="keyHead"></div>
                 <ul>
-                    <li><div class="name">研发一部</div><div>大连万达集团有限公司/信息管理中心/研发一部</div></li>
-                    <li><div class="name">研发一部</div><div>大连万达集团有限公司/信息管理中心/研发一部</div></li>
-                    <li><div class="name">研发一部</div><div>大连万达集团有限公司/信息管理中心/研发一部</div></li>
+                    <% _.each(info.org,function(org){ %>
+                    <li><div class="name"><%= org.name %></div><div><%= org.namePath %></div></li>
+                    <% }) %>
+
                 </ul>
             </div>
 

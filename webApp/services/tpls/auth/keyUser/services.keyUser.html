@@ -5,10 +5,10 @@
                 关键用户（<span><%= keyUser.length %></span>）
             </div>
             <ul>
-                <% _.each(keyUser,function(user){ %>
-                <li>
-                    <span class="delete"></span>
-                    <i class="keyListHead"></i><%= user.orgId %>
+                <% _.each(keyUser,function(user,index){ %>
+                <li data-index="<%= index %>"data-uid="<%= user.userId %>">
+                    <span data-uid=<%= user.userId %> class="delete"></span>
+                    <i class="keyListHead"></i><%= user.name %>
                 </li>
                 <% })%>
                 <% console.log(keyUser); %>
