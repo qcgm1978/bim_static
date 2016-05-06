@@ -58,7 +58,7 @@ ul,li{list-style: none outside none;}
 }
 .serviceWindow{
   .toselected{
-    span{
+    &>p>span{
       background: #A8DBFD;
     }
   }
@@ -89,7 +89,7 @@ ul,li{list-style: none outside none;}
       }
       &>ul{
         height: 270px;
-        overflow-y: scroll;
+        overflow-y: auto;
       }
     }
     div:first-child{
@@ -115,7 +115,72 @@ ul,li{list-style: none outside none;}
     }
   }
   .leftWindow,.rightWindow{
+    .proj-right{
+      padding: 5px 0px 5px 10px;
+      height: 50px;
+      border-bottom: 1px solid #CCC;
+      h3{
+        font-size: 14px;
+        .myh;
+        color: #333;
+        height: 18px;
+        line-height: 18px;
+        border: none;
+      }
+      &:hover{
+        i{
+          display: block;
+          cursor: pointer;
+        }
+      }
+      i{
+        background: url("../images/service_ico.png") 0 -280px no-repeat;
+        display: none;
+        position: absolute;
+        width: 14px;
+        height: 14px;
+        right: 9px;
+      }
+      p{
+        background: transparent;
+        color: #999;
+        font-size: 12px;
+        line-height: 20px;
+        span{
+          margin-left: 15px;
 
+        }
+      }
+    }
+    .step2{
+      .selected-proj{
+        background: #A8DBFD;
+      }
+
+      li{
+        padding: 5px 0px 5px 10px;
+        height: 50px;
+        border-bottom: 1px solid #CCC;
+        h3{
+          font-size: 14px;
+          .myh;
+          color: #333;
+          height: 18px;
+          line-height: 18px;
+          border: none;
+        }
+        p{
+          background: transparent;
+          color: #999;
+          font-size: 12px;
+          line-height: 20px;
+          span{
+            margin-left: 15px;
+
+          }
+        }
+      }
+    }
     ul.shut{
       display: none;
     }
@@ -187,6 +252,7 @@ ul,li{list-style: none outside none;}
 
       }
       p{
+        background: transparent;
         cursor: auto;
       }
       &:hover{

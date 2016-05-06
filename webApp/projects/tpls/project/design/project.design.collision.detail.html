@@ -12,13 +12,12 @@
                         <div class="date"><%= item.createTime %></div>
                     </div>
                 </td>
-                <td class="collLev"> <span class="security"><%= item.depth %></span> </td>
             </tr>
             <% }) %>
         </tbody>
         <tfoot>
             <tr>
-                <th colspan="2">
+                <th>
                     <span class="pointTotal">碰撞点:<%= data.totalItemCount %></span>
                     <span class="cur"><%= data.pageIndex %></span>
                     <span>/<%= data.pageCount %>页</span>

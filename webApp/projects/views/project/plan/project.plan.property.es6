@@ -111,7 +111,7 @@ App.Project.ProjectPlanProperty = Backbone.View.extend({
 		App.Project.PlanAttr.PlanPublicityCollection.fetch({
 			data: {
 				projectId:projectId,
-				type: weekType
+				type: monthType
 			}
 		});
 
@@ -122,7 +122,7 @@ App.Project.ProjectPlanProperty = Backbone.View.extend({
 		App.Project.PlanAttr.PlanPublicityCollectionMonth.fetch({
 			data: {
 				projectId:projectId,
-				type: monthType
+				type: weekType
 			}
 		});
 	},
