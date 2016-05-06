@@ -14,7 +14,6 @@ App.Services.MemberList=Backbone.View.extend({
     template:_.templateUrl("/services/tpls/auth/member/services.member.list.html"),
 
     render:function(){
-        this.$el.empty();
         this.$el.html(this.template);
         return this;
     },
@@ -157,12 +156,12 @@ App.Services.MemberList=Backbone.View.extend({
             url: url,
             success:function(response){
                 if(response.message=="success"){
+                    if(response.data.length){$(".seWinBody .memRoleList  ul").append("<li>没有相关数据</li>");}
                     App.Services.ozRole.collection.reset();
                     _.each(response.data,function(item){
                         App.Services.ozRole.collection.add(item);
                     });
                     $("#dataLoading").hide();
-                    _this.window(frame);
                 }
             },
             error:function(error){

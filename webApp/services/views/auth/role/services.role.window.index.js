@@ -26,28 +26,24 @@ App.Services.roleWindowIndex = Backbone.View.extend({
     //提交表单，完毕会触发角色列表的更新change
     windowSubmit:function(){
 
-        //判断新增角色还是修改角色
-        if(!App.Services.roleModify){
+        if(!App.Services.roleModify){ //新增
             this.newRole();
         }else{
-            this.modify();
+            this.modify();//修改
         }
     },
-    //修改角色
+    //修改
     modify:function(){
         var seleFun = this.filterChecked();
         if(!seleFun.length){alert("请选择功能");return}
 
         var roleId =App.Services.roleModify.get("roleId");
         var cid = App.Services.roleModify.get("cid");
-
         var checked = App.Services.roleFun.collection.filter(function(item){
             return item.get("checked");
         });
 
         var url = "http://bim.wanda-dev.cn/platform/auth/role/"+ roleId +"/function?functionId=";
-
-
 
         for(var i = 0 ; i < seleFun.length ; i++){
             if(i !== seleFun.length -1){
@@ -56,11 +52,15 @@ App.Services.roleWindowIndex = Backbone.View.extend({
                 url = url + seleFun[i].get("id");
             }
         }
+
         $.ajax({
             type:"POST",
             url:url,
             success:function(response){
-                App.Services.roleModify.save (response.data.function);
+                var cid = App.Services.roleModify.cid;
+                App.Services.role.collection.get(cid).set(response.data);
+                //查找collection，更新
+
                 App.Services.maskWindow.close();
             },
             error:function(type){
@@ -71,7 +71,7 @@ App.Services.roleWindowIndex = Backbone.View.extend({
 
     },
 
-    //新增角色
+    //新增
     newRole :function(){
         //新增角色  fetchServicesNewRole
         var name  = $("#selectedRoleName").val();
@@ -109,7 +109,7 @@ App.Services.roleWindowIndex = Backbone.View.extend({
     //过滤和辨别功能列表项
     filterChecked:function(){
         return App.Services.roleFun.collection.filter(function(item){
-            return item.has("checked");
+            return item.get("checked");
         });
     }
 });
