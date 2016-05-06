@@ -8,7 +8,7 @@ App.Services.ImageJcrop=Backbone.View.extend({
 	_projectId:'',
 	
 	events:{
-		'click #selectBtn':'selectPic'
+		'change #inputFile':'initDom'
 	},
 	
 	initialize(){
@@ -18,14 +18,10 @@ App.Services.ImageJcrop=Backbone.View.extend({
 		var _this=this,
 			boundx,boundy,
 			x,y,w,h;
-		$("#inputFile").trigger('click');
-		$("#inputFile").on('change',function(e){
-			$("#uploadImageForm").submit();
-		})
 		$("#uploadIframe").on("load",function(){
 			var data=JSON.parse(this.contentDocument.body.innerText);
-			var tempUrl='http://h.hiphotos.baidu.com/exp/w=480/sign=663ce568d12a60595210e0121835342d/adaf2edda3cc7cd9ba233d783f01213fb80e9100.jpg';
-			//var tempUrl=data.data.logoUrl;
+			//var tempUrl='http://h.hiphotos.baidu.com/exp/w=480/sign=663ce568d12a60595210e0121835342d/adaf2edda3cc7cd9ba233d783f01213fb80e9100.jpg';
+			var tempUrl=data.code==0?data.data.logoUrl:'';
 			$("#tempImage").attr("src",tempUrl).show();
 			$("#preImage").attr("src",tempUrl).show();
 			$("#tempImage").Jcrop({
@@ -39,10 +35,10 @@ App.Services.ImageJcrop=Backbone.View.extend({
 							x=Math.round(rx * c.x);
 							y=Math.round(ry * c.y);
 							$("#preImage").css({
-								width: Math.round(rx * boundx) + 'px',
-								height: Math.round(ry * boundy) + 'px',
-								marginLeft: '-' + Math.round(rx * c.x) + 'px',
-								marginTop: '-' + Math.round(ry * c.y) + 'px'
+								width: w + 'px',
+								height: h + 'px',
+								marginLeft: '-' + x + 'px',
+								marginTop: '-' + y + 'px'
 							});
 						}
 				}
@@ -54,9 +50,25 @@ App.Services.ImageJcrop=Backbone.View.extend({
 		})
 		
 		$("#cutImageBtn").on('click',function(){
+			var j=$("#tempImage").data().Jcrop.tellSelect();
+			$("#dataLoading").show();
 			$.ajax({
-				url:'/platform/project/'+_this._projectId+'/logo/cut?x='+x+'&y='+y+'&w='+w+'&h='+h
-			}).done(function(){
+				type:"post",
+				url:'/platform/project/'+_this._projectId+'/logo/cut?x='+x+'&y='+y+'&w='+(boundx/326)*w+'&h='+(boundy/235)*h
+			}).done(function(data){
+				$("#dataLoading").hide();
+				if(data.message=='success'){
+					App.Services.maskWindow.close();
+					var _collection=App.Services.ProjectCollection.ProjectBaseInfoCollection;
+					_collection.projectId=_this._projectId;
+			 		_collection.fetch({
+			 			reset:true,
+			 			success(child, data) {
+			 			}
+			 		});
+				}
+			}).fail(function(){
+				$("#dataLoading").hide();
 			})
 		})
 	},
@@ -67,21 +79,12 @@ App.Services.ImageJcrop=Backbone.View.extend({
 		}
 		this._projectId=projectId;
 		this.$el.html(_.template(this.template)(data));   
+		
 		return this;
 	},
 	
 	initDom(){
-		$("#inputFile").on('change',function(e){
-			var _files=e.target.files;
-			if(_files.length){
-				var _file=_files[0];
-				var URL = window.URL || window.webkitURL;
-				var _image= URL.createObjectURL(_file);
-				$("#tempImage").attr("src",_image).show();
-				$("#tempImage").Jcrop();
-			}
-		})
-		
+		this.selectPic();
+		$("#uploadImageForm").submit();
 	}
-
 });

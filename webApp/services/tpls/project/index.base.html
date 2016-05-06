@@ -32,9 +32,9 @@
 
 
 <div class="item"> 
-	<span class="key">摘牌日：</span><span class="value"><%= createTime %></span>
+	<span class="key">摘牌日：</span><span class="value"><%= createTime?new Date(createTime).format("yyyy-MM-dd"):'--' %></span>
 </div>
 
 <div class="item"> 
-	<span class="key">开业日：</span><span class="value"><%= openTime %></span>
+	<span class="key">开业日：</span><span class="value"><%=  openTime?new Date(openTime).format("yyyy-MM-dd"):'--' %></span>
 </div>

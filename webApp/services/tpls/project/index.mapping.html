@@ -12,9 +12,9 @@
             <% _.each(items,function(i){ %>
             	<li class="item">
 	                <div class="modules left"><%= i.module %></div>
-	                <div class="name left"><%= i.projectName %></div>
-	                <div class="code left"><%= i.code %></div>
-	                <div class="op left">--</div>
+	                <div class="name left"><%= i.projectName||'--' %></div>
+	                <div class="code left"><%= i.code||'--' %></div>
+	                <div class="op left"><%=i.op||'--' %></div>
 	            </li>
             <% }) %>
         </ul>
