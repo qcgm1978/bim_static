@@ -7,7 +7,39 @@ App.Comm.createModel = function(options){
   var viewer;
   var viewPoint;
   var floorMap;
-  modelCollection = {
+  var viewpointDialog = function(option,callback){
+    var html = new viewpointView({
+      model:option
+    }).render().$el;
+    $('body').append(html);
+    html.on('click','.cur',function(){
+      var $this = $(this);
+      $this.toggleClass('open');
+    }).on('click','li',function(){
+      var $this = $(this),
+          innerHtml = $this.html(),
+          type = $this.val(),
+          cur = $this.parent().prev();
+      cur.removeClass('open').html(innerHtml).data('type',type);
+    }).on('click','.dialogClose',function(){
+      html.remove();
+    }).on('click','.saveBtn',function(){
+      var name =html.find('.name').val(),
+          summary = html.find('.summary').val(),
+          type = html.find('.cur').data('type'),
+          data = {
+            name:name,
+            summary:summary,
+            type:type
+          }
+      if(!name){
+        html.find('.name').addClass('error');
+        return false;
+      }
+      if(callback && name) html.remove();callback(data);
+    });
+  }
+  var modelCollection = {
     sceneCollection:new(Backbone.Collection.extend({
       model: Backbone.Model.extend(),
       urlType:"fetchScene"
@@ -29,6 +61,15 @@ App.Comm.createModel = function(options){
       urlType:"fetchCoding"
     }))
   };
+  var viewpointView = Backbone.View.extend({
+    tagName: "div",
+    template:_.templateUrl('/comm/js/tpls/viewpoint.dialog.html'),
+    events:{},
+    render:function(){
+      this.$el.html(this.template(this.model));
+      return this;
+    }
+  })
   var modelBar = Backbone.View.extend({
     // 加载模型浏览器
     tagName: "div",
@@ -40,7 +81,8 @@ App.Comm.createModel = function(options){
       "click .current-floor":"openFloors",
       "click .selectFloor li":"selectFloor",
       "click .modelTabItem":"modelTab",
-      "click .modelTabBtn":"modelComment"
+      "click .modelTabBtn":"modelComment",
+      "click .axisGrid":"showAxisGrid"
     },
     template:_.templateUrl('/comm/js/tpls/modelBar.html',true),
     initialize:function(){
@@ -61,7 +103,11 @@ App.Comm.createModel = function(options){
         var view = new vView({
           model:obj
         });
-        that.$el.find('#public ul').html(view.render().el);
+        if(obj.type == 1){
+          that.$el.find('#private ul').append(view.render().el);
+        }else{
+          that.$el.find('#public ul').append(view.render().el);
+        }
       });
       return that;
     },
@@ -77,19 +123,14 @@ App.Comm.createModel = function(options){
         self.toggleClass('selected').siblings().removeClass('selected');
       }else if(type == "change"){
         self.toggleClass('selected').siblings().removeClass('selected');
-        if(self.is(".selected")){
-          viewer && viewer[fn]();
+        if(fn == "setGlobalTransparent"){
+          viewer && viewer[fn](self.is(".selected"));
         }else{
-          viewer.picker();
-        }
-      }else if(type == "map"){
-        if(modelBox.find('.modPop').length==0){
-          modelBox.append(new modDialog().render().el);
-          $(".modPop").show();
-          viewer.initMap('bigMap',$("#map")[0]);
-          viewer.showAxisGrid("bigMap");
-        }else{
-          $(".modPop").show();
+          if(self.is(".selected")){
+            viewer && viewer[fn]();
+          }else{
+            viewer.picker();
+          }
         }
       }else{
         viewer && viewer[fn]();
@@ -149,12 +190,27 @@ App.Comm.createModel = function(options){
       });
     },
     edit:function(){
-      viewpointDialog({
-        title:"将当前窗口保存为视点",
-        okText:"保存",
-        message:"",
-        html:'<input type="text" class="modelInput" id="viewpointName" placeholder="请输入视点名称" value="'+viewPoint.model.name+'" />',
-        type:"edit"
+      viewpointDialog(viewPoint.model,function(res){
+        var data = {
+          name:res.name,
+          description:res.summary,
+          type:res.type,
+          projectId:viewPoint.model.projectId,
+          viewPointId:viewPoint.model.id
+        }
+        var createViewpoint = {
+          type:'put',
+          URLtype:"editViewpointById",
+          contentType:"application/json",
+          data:JSON.stringify(data)
+        }
+        App.Comm.ajax(createViewpoint,function(data){
+          if (data.message=="success") {
+            console.log('success');
+          }else{
+            alert(data.message);
+          }
+        });
       })
     },
     openFloors:function(event){
@@ -182,16 +238,93 @@ App.Comm.createModel = function(options){
     modelTab:function(event){
       var self = $(event.target),
           target = self.data('target');
+      self.addClass('selected').siblings().removeClass('selected');
       $(target).show().siblings().hide();
     },
     modelComment:function(){
+      var that = this;
       $(".modelBar").hide();
       App.Comm.navBarToggle($(".rightProperty"),$(".projectCotent"),"right",App.Project.Settings.Viewer);
       setTimeout(function(){
         var comment = new App.Comm.modules.Comment({
-          element:$('.modelContainerContent')
-        });
-      },600)
+          element:$('.modelContainerContent'),
+          model:viewer,
+          okCallback:function(data){
+            var viewPoint = data.viewPoint;
+            var image = data.pic.substr(22);
+            var canvasData = data.data;
+            viewpointDialog(data,function(res){
+              var data = {
+                name:res.name,
+                description:res.summary,
+                type:res.type,
+                projectId:opt.projectId,
+                viewPoint:viewPoint
+              }
+              var createViewpoint = {
+                type:'post',
+                URLtype:"createViewpointById",
+                contentType:"application/json",
+                data:JSON.stringify(data)
+              }
+              App.Comm.ajax(createViewpoint,function(data){
+                if (data.message=="success") {
+                  that.saveImage(image,data.data);
+                  that.saveCanvasData(canvasData,data.data);
+                  comment._destroy();
+                }else{
+                  alert(data.message);
+                }
+              });
+            });
+          }
+        }).init();
+      },600);
+    },
+    saveImage:function(image,data){
+      var formdata = new FormData();
+      formdata.append("fileName",data.id+".png");
+      formdata.append("size",image.length);
+      formdata.append("file",image);
+      var url = '/sixD/'+data.projectId+'/viewPoint/'+data.id+'/pic'
+      $.ajax({
+        url:url,
+        type:"post",
+        data:formdata,
+        processData : false,
+        contentType : false,
+        success:function(res){
+          console.log(res);
+        }
+      })
+    },
+    saveCanvasData:function(canvasData,data){
+      var data = {
+        type:'post',
+        URLtype:"addViewpointData",
+        contentType:"application/json",
+        data:JSON.stringify({
+          projectId:opt.projectId,
+          viewPointId:data.id,
+          comments:canvasData
+        })
+      }
+      App.Comm.ajax(data,function(data){
+        if (data.message=="success") {
+        }else{
+          alert(data.message);
+        }
+      });
+    },
+    showAxisGrid:function(){
+      if(modelBox.find('.modPop').length==0){
+        modelBox.append(new modDialog().render().el);
+        $(".modPop").show();
+        viewer.initMap('bigMap',$("#map")[0]);
+        viewer.showAxisGrid("bigMap");
+      }else{
+        $(".modPop").show();
+      }
     }
   });
   var treeView = Backbone.View.extend({
@@ -369,6 +502,9 @@ App.Comm.createModel = function(options){
         var reg = new RegExp("^("+str+")");
         $.each(codeData,function(i,item){
           if(!str) return;
+          if(regData.indexOf(-1) != -1 && item.parentCode == -1){
+            data.push(item.code);
+          }
           if(regData == "all" || reg.test(item.code)){
             data.push(item.code);
           }
@@ -445,9 +581,10 @@ App.Comm.createModel = function(options){
   var vView = Backbone.View.extend({
     // 视点树
     tagName: "li",
-    className: "itemNode",
+    className: "listItem",
     events:{
-      "contextmenu .item-content":"menu"
+      "contextmenu .itemContent":"menu",
+      "click .itemContent":'setPoint'
     },
     template:_.templateUrl('/comm/js/tpls/viewpoint.html'),
     render:function(){
@@ -471,7 +608,7 @@ App.Comm.createModel = function(options){
         $(html).css({
           left:left,
           top:top
-        }).addClass("in").appendTo($(".modelTree"));
+        }).addClass("in").appendTo(self.parents('.modelTabBox'));
       }
       viewPoint=this;
       $(document).one("click",function(){
@@ -479,6 +616,27 @@ App.Comm.createModel = function(options){
         pointId = '';
       })
       event.preventDefault();
+    },
+    setPoint:function(){
+      var model = this.model
+      var data = {
+        type:'get',
+        URLtype:"fetacCanvasData",
+        contentType:"application/json",
+        data:{
+          projectId:model.projectId,
+          viewPointId:model.id
+        }
+      }
+      App.Comm.ajax(data,function(data){
+        if(data.message == "success"){
+          var canvasData = data.data.comments;
+          new App.Comm.modules.Comment({
+            element:$('.modelContainerContent .model')
+          }).render(canvasData);
+        }
+        viewer.setCamera(model.viewPoint);
+      });
     }
   });
   var classView = Backbone.View.extend({
@@ -548,69 +706,6 @@ App.Comm.createModel = function(options){
       $(event.target).removeClass('error');
     }
   });
-  var viewpointDialog = function(option){
-   new App.Comm.modules.Dialog({
-      width:280,
-      title:option.title,
-      message:option.message,
-      okText:option.okText,
-      readyFn:function(){
-        this.element.find(".content").html(option.html);
-      },
-      okCallback:function(){
-        var viewpointName = $("#viewpointName"),
-            val = viewpointName.val();
-        if(val){
-          if(option.type == "new"){
-            var data = {
-              type:'post',
-              URLtype:"createViewpointById",
-              contentType:"application/json",
-              data:JSON.stringify({
-                "projectId":opt.sourceId,
-                "name": viewpointName.val(),
-                "viewPoint": option.point
-              })
-            }
-            App.Comm.ajax(data,function(data){
-              if (data.message=="success") {
-                var result = data;
-                result.data=[result.data];
-                modelCollection.viewpointCollection.add(result)
-              }else{
-                alert(data.message);
-              }
-            });
-          }else{
-            var data = {
-              type:'put',
-              URLtype:"editViewpointById",
-              contentType:"application/json",
-              data:JSON.stringify({
-                "projectId":opt.sourceId,
-                "name": viewpointName.val(),
-                "viewPointId":viewPoint.model.id
-              })
-            }
-            App.Comm.ajax(data,function(data){
-              if (data.message=="success") {
-                viewPoint.model.name = data.data.name;
-                viewPoint.render();
-              }else{
-                alert(data.message);
-              }
-            });
-          }
-        }else{
-          viewpointName.addClass("error");
-          viewpointName.on("input",function(){
-            $(this).removeClass('error');
-          })
-          return false;
-        }
-      }
-    })
-  }
   var getAxisGrid = function(){
     var data = {
       URLtype:"fetchAxisGrid",
@@ -650,18 +745,6 @@ App.Comm.createModel = function(options){
         $('.grid-position').text("--,--");
       }
       $('.modPop').hide();
-    })
-    viewer.on("viewpoint",function(point){
-      $('.modelView .bar-eye').not('.selected').trigger('click');
-      $('.modelView #viewpoints>.item-content').addClass("open");
-      viewpointDialog({
-        type:"new",
-        title:"将当前窗口保存为视点",
-        okText:"保存",
-        message:"",
-        html:'<input type="text" class="modelInput" id="viewpointName" placeholder="请输入视点名称" />',
-        point:point
-      })
     })
     return viewer;
   }

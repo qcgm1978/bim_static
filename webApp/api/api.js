@@ -73,11 +73,14 @@ App.API = {
 		"checkDownLoad": "doc/{projectId}/{versionId}/file/size", // 下载确认 是否可以下载  ?fileVersionId={fileVersionId}
 		downLoad: "doc/{projectId}/{projectVersionId}/file/data", //文件下载  ?fileId={fileId}
 
-		//视点
-		fetchModelViewpoint: 'sixD/{projectId}/viewPoint', // 获取视点列表
-		createViewpointById: 'sixD/{projectId}/viewPoint', // 创建视点
-		editViewpointById: 'sixD/{projectId}/viewPoint/{viewPointId}', // 修改视点
-		deleteViewpointById: 'sixD/{projectId}/viewPoint/{viewPointId}', // 删除视点
+		//快照
+    fetchModelViewpoint: 'sixD/{projectId}/viewPoint', // 获取快照列表
+    fetacCanvasData: 'sixD/{projectId}/viewPoint/{viewPointId}/comment', // 获取批注信息
+    createViewpointById: 'sixD/{projectId}/viewPoint', // 创建快照
+    addViewpointImg: 'sixD/{projectId}/viewPoint/{viewPointId}/pic', // 添加快照图片
+    addViewpointData: 'sixD/{projectId}/viewPoint/{viewPointId}/comment', // 添加几何数据
+    editViewpointById: 'sixD/{projectId}/viewPoint/{viewPointId}', // 修改快照
+    deleteViewpointById: 'sixD/{projectId}/viewPoint/{viewPointId}', // 删除快照
 
 
 		//设计
@@ -183,7 +186,7 @@ App.API = {
 		extendAttrList:"platform/setting/extensions/property/{classKey}", // 扩展列表
 		extendAttrInsert:"platform/setting/extensions/property",//新增
 		extendAttrUpdate:"platform/setting/extensions/property",//更新扩展属性
-		extendAttrDel:"platform/setting/extensions/property/{classKey}?property={property}",//删除扩展属性 
+		extendAttrDel:"platform/setting/extensions/property/{classKey}?property={property}",//删除扩展属性
 		extendAttrGetReferene:"platform/setting/extensions/property/reference",// 获取引用扩展属性
 		projectCodeMapping:"platform/mapping/{projectId}",
 		getBoundingBox:"sixD/{projectId}/{projectVersionId}/bounding/box",//获取构建的 box id ?sceneId={sceneId}&elementId={elementId}
@@ -239,11 +242,12 @@ App.API = {
 		fetchFloors: '/datajson/map/map.json', //获取模型楼层信息
 		fetchAxisGrid: '/datajson/map/gridAndLevel.json', //获取楼层地图,轴网信息
 
-		//视点
-		fetchModelViewpoint: '/datajson/project/project.viewpoint.property.json', // 获取视点列表
-		createViewpointById: '', // 创建视点
-		editViewpointById: '', // 修改视点
-		deleteViewpointById: '', // 删除视点
+		//快照
+    fetchModelViewpoint: '/datajson/project/project.viewpoint.property.json', // 获取快照列表
+    fetacCanvasData: '/datajson/project/project.viewpoint.comments.json', // 获取批注信息
+    createViewpointById: '', // 创建快照
+    editViewpointById: '', // 修改快照
+    deleteViewpointById: '', // 删除快照
 
 		//设计
 		fetchDesignProperties: "/dataJson/project/project.design.property.json", //设计属性

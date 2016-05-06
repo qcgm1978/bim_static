@@ -14,7 +14,8 @@
       lineWidth:2,
       fontSize:14,
       callback:null,
-      autoResize:true
+      autoResize:true,
+      model:''
     };
     self._opt = $.extend({},defaults,options);
     self._opt.$el = $('<div class="comment"></div>');
@@ -22,7 +23,8 @@
     self._opt.$el.append(self._opt.$canvas);
     self.type = 'rect';
     self._opt.debugger = true;
-    self.init();
+    self.canvasData =[];
+    self.sub = {};
   }
   comment.prototype = {
     _debug:function(){
@@ -36,7 +38,6 @@
         }
       }
     },
-    sub:{},
     on:function(key,fn){
       var self = this;
       self.sub[key]?self.sub[key].push(fn):(self.sub[key] = [])&&self.sub[key].push(fn);
@@ -69,31 +70,80 @@
       self._opt.$canvas.append(canvas);
       self._debug();
       if(self._opt.width && self._opt.height){
-        self.resize(self._opt.width,self._opt.height);
+        self.resize(canvas,self._opt.width,self._opt.height);
+        self.resize(viewCanvas,self._opt.width,self._opt.height);
         self._opt.autoResize = false;
       }else{
-        self.resize();
+        self.resize(canvas);
+        self.resize(viewCanvas);
       }
       self._topBar();
       self._footBar();
       self._bindEvent();
       self.consotroll();
+      self._opt.model.unregisterEvent();
+      return self;
     },
-    resize:function(w,h){
+    render:function(data){
       var self = this;
-      self.canvas.width = self.viewCanvas.width = w || self._opt.$el.width();
-      self.canvas.height = self.viewCanvas.height = h || self._opt.$el.height();
+      var canvas = self.canvas = document.createElement("canvas");
+      var ctx = canvas.getContext('2d');
+      self._bindEvent();
+      self._opt.element.append(self._opt.$el);
+      canvas.width = self._opt.$el.width();
+      canvas.height = self._opt.$el.height();
+      self._opt.$canvas.append(canvas);
+      self.on("start",function(data){
+        self._destroy();
+      });
+      $.each(data,function(i,item){
+        var temp = JSON.parse(item);
+        switch(temp.type){
+          case "rect":
+          case "ellipse":
+          case "arrow":
+          case "mark":
+            self._canvas({
+              context:ctx,
+              type:temp.type,
+              startX:temp.startX,
+              startY:temp.startY,
+              endX:temp.endX,
+              endY:temp.endY
+            });
+            break;
+          case "text":
+            self._canvas({
+              context:ctx,
+              type:temp.type,
+              startX:temp.startX,
+              startY:temp.startY,
+              text:temp.text
+            });
+            break;
+        }
+      })
+    },
+    resize:function(el,w,h){
+      var self = this;
+      el.width = w || self._opt.$el.width();
+      el.height = w || self._opt.$el.height();
     },
     _topBar:function(){
       var self = this;
       var $el = self._opt.$el;
       var bar = $('<div class="topBar"><div class="context">请添加批注或直接保存快照<span class="saveBtn"><i class="iconOk"></i>保存</span><span class="cancelBtn">取消</span></div></div>');
       $el.append(bar);
+      bar.on("click",".saveBtn",function(){
+        self._save();
+      }).on("click",'.cancelBtn',function(){
+        self._destroy();
+      })
     },
     _footBar:function(){
       var self = this;
       var $el = self._opt.$el;
-      var bar = $('<div class="footBar"><i class="iconArrow" data-fn="arrow"></i><i class="iconRect selected" data-fn="rect"></i><i class="iconEllipse" data-fn="ellipse"></i><i class="iconMark" data-fn="mark"></i><i class="iconText" data-fn="text"></i><div class="fontSize"><select id="fontSize"><option value="12">12</option><option value="14">14</option><option value="16">16</option></select></div></div>');
+      var bar = $('<div class="footBar"><i class="iconArrow" data-fn="arrow"></i><i class="iconRect selected" data-fn="rect"></i><i class="iconEllipse" data-fn="ellipse"></i><i class="iconMark" data-fn="mark"></i><i class="iconText" data-fn="text"></i><div class="fontSize"><select id="fontSize"><option value="12">12</option><option value="14" selected>14</option><option value="16">16</option><option value="18">18</option><option value="20">20</option><option value="24">24</option></select></div></div>');
       bar.on('click','i',function(){
         var $this = $(this),
             fn = $this.data('fn');
@@ -103,9 +153,19 @@
       }).on("change",'#fontSize',function(){
         var $this = $(this),
             fontSize = $this.val();
-        console.log(fontSize);
+        self._opt.fontSize = fontSize;
+        $(".textView").css({fontSize:fontSize+"px"});
       })
       $el.append(bar);
+    },
+    _destroy:function(){
+      var self = this;
+      self._opt.$el.remove();
+      $('.commentDialog').remove();
+      $(".modelBar").show();
+      App.Comm.navBarToggle($(".rightProperty"),$(".projectCotent"),"right",App.Project.Settings.Viewer);
+      self._opt.model.registerEvent();
+      self._opt.$el.off();
     },
     consotroll:function(){
       var self = this;
@@ -116,17 +176,44 @@
           var $el = self._opt.$el
           var _width = $el.width() - data.x;
           var _height = $el.height() - data.y;
-          var textView = $('<div class="textView" style="left:'+data.x+'px;top:'+data.y+'px;"><div class="textContext"></div><textarea autofocus="true" style="width:'+_width+'px;height:'+_height+'px;"></textarea></div>');
-          if($('.textView').length==0){
+          var textView = $('<div class="textView"><div class="textContext"></div><div class="input" style="width:'+_width+'px;height:'+_height+'px;"><textarea autofocus="true"></textarea></div></div>');
+          if(self._opt.$el.find('.textView').length==0){
             $el.append(textView);
           }
+          textView.css({
+            fontSize:self._opt.fontSize+"px",
+            left:data.x - 6,
+            top:data.y - 10
+          })
           textView.on('input','textarea',function(){
             var $this = $(this),
                 context = $('.textContext'),
+                text = $this.val(),
+                html = text.replace(/\n/g,'<br />');
+            textView.scrollTop(0);
+            context.html(html);
+          }).on("blur",'textarea',function(){
+            var $this = $(this),
                 text = $this.val();
-            text = text.replace(/\n/g,'<br />');
-            console.log(text)
-            context.html(text);
+            textView.remove();
+            self._canvas({
+              context:context,
+              type:self.type,
+              startX:data.x,
+              startY:data.y,
+              fontSize:self.fontSize,
+              text:text
+            });
+            self.canvasData.push(JSON.stringify({
+              type:self.type,
+              startX:data.x,
+              startY:data.y,
+              text:text,
+              fontSize:self._opt.fontSize
+            }));
+          })
+          textView.on('scroll',function(event){
+            textView.scrollTop(0);
           })
         }else{
           self._opt.$el.append(self.viewCanvas);
@@ -154,14 +241,47 @@
           endX:data.endX,
           endY:data.endY
         });
+        self.canvasData.push(JSON.stringify({
+          type:self.type,
+          startX:data.startX,
+          startY:data.startY,
+          endX:data.endX,
+          endY:data.endY
+        }));
       })
+    },
+    _save:function(){
+      var self = this;
+      var $el = self._opt.$el;
+      var dataCanvas = document.createElement('canvas');
+      var ctx = dataCanvas.getContext('2d');
+      var img = new Image();
+      var point = self._opt.model.getCamera();
+      dataCanvas.width = self._opt.$el.width();
+      dataCanvas.height = self._opt.$el.height();
+      img.src = self._opt.model.getImage();
+      ctx.drawImage(img,0,0);
+      img.src = self.canvas.toDataURL();
+      ctx.drawImage(img,0,0);
+      var data = {
+        pic:dataCanvas.toDataURL(),
+        viewPoint:point,
+        description:'',
+        name:'',
+        type:1,
+        data:self.canvasData
+      }
+      if(self._opt.okCallback) self._opt.okCallback(data);
     },
     _bindEvent:function(){
       var self = this;
       var $el = self._opt.$canvas;
       var topBar = $el.find("topBar");
       var footBar = $el.find("footBar");
-      if(self._opt.autoResize) self.resize();
+      if(self._opt.autoResize) self.resize(self.canvas);
+      $(window).on('resize',function(){
+        self.resize(self.canvas);
+      })
       $el.on("mousedown",function(e){
         var event = e || event;
         var deviation = self._opt.$el.offset();
@@ -243,7 +363,7 @@
             b = Math.abs(startY - endY)/2 + self._opt.lineWidth,
             x = (startX + endX)/2 - self._opt.lineWidth*2,
             y = (startY + endY)/2 - self._opt.lineWidth*2;
-        var step = (a > b) ? 1 / a : 1 / b;
+        var step = 1/36;
         ctx.beginPath();
         for (var i = 0; i < 2 * Math.PI; i += step) {
           ctx.lineTo(x + a * Math.cos(i), y + b * Math.sin(i));
@@ -284,14 +404,14 @@
         ctx.closePath();
         ctx.stroke();
       }
-      function text(startX,startY,endX,endY,isText){
-        var x = startX > endX ? endX : startX + self._opt.lineWidth,
-            y = startY > endY ? endY : startY + self._opt.lineWidth,
-            w = Math.abs(startX - endX) - self._opt.lineWidth*2,
-            h = Math.abs(startY - endY) - self._opt.lineWidth*2
-        // 画矩形
+      function text(ctx,startX,startY,text){
+        var text = text.split("\n");
+        _opt.context.lineWidth = 1;
+        ctx.font= self._opt.fontSize + "px Georgia";
         ctx.beginPath();
-        ctx.strokeRect(x,y,w,h);
+        $.each(text,function(i,item){
+          ctx.fillText(item,startX,startY + i*self._opt.fontSize*1.5);
+        })
         ctx.closePath();
       }
     }

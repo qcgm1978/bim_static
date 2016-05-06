@@ -181,6 +181,8 @@ App.Index = {
 					changeModel = $item.data("change").replace("_output",""),
 					comparisonId = $item.data('id');
 				App.Index.Settings.changeModel = changeModel;
+				$('.checkboxGroup input').prop('checked',false);
+				App.Index.Settings.loadedModel = null;
 				that.renderModel(currentModel);
 				$(".rightPropertyContent .listDetail").html(new App.Project.Model.getInfo().render().el);
 				that.getDetail(comparisonId);
@@ -241,7 +243,7 @@ App.Project.Model = {
 						isload = true;
 						$(".rightPropertyContent .listDetail").html(new App.Project.Model.getInfo().render().el);
 						App.Index.getDetail(comparisonId);
-						App.Index.Settings.changeModel = file.output.replace("_output","");
+						App.Index.Settings.changeModel = file.comparisonId;
 						App.Index.renderModel(file.currentModel);
 					}
 				});
@@ -251,7 +253,7 @@ App.Project.Model = {
 				var file = data.data[0].comparisons[0];
 				$(".rightPropertyContent .listDetail").html(new App.Project.Model.getInfo().render().el);
 				App.Index.getDetail(file.comparisonId);
-				App.Index.Settings.changeModel = file.output.replace("_output","");
+				App.Index.Settings.changeModel = file.comparisonId;
 				App.Index.renderModel(file.currentModel);
 			}
 			if (data.message == 'success') {
