@@ -6,7 +6,7 @@ var CLOUD = CLOUD || {};
 CLOUD.Version = "20160426";
 
 CLOUD.GlobalData = {
-    SceneSize: 10,
+    SceneSize: 1000,
     SceneScale: 2,
     MinBoxSize : new THREE.Vector3(500, 500, 500),
     MaxTriangle: 40000000,
@@ -6271,8 +6271,12 @@ CLOUD.MiniMap = function (viewer, callback) {
 
     this.containsPointInMainScene = function(point) {
         var mainScene = this.viewer.getScene();
-        var bBox = mainScene.rootNode.boundingBox.clone();
-        return bBox.containsPoint(point);
+
+        if (mainScene.rootNode.boundingBox) {
+            return mainScene.rootNode.boundingBox.containsPoint(point);
+        }
+
+        return false;
     };
 
     this.initCanvasContainer = function (domContainer, styleOptions) {
@@ -22254,6 +22258,16 @@ CLOUD.EditorManager.prototype = {
         return false;
     },
 
+    //setMarkerMode: function (viewer) {
+    //    var scope = this;
+    //
+    //    if(this.markerEditor === undefined){
+    //        this.markerEditor = new CLOUD.MarkerEditor(viewer.cameraEditor, viewer.getScene(), viewer.domElement);
+    //    }
+    //
+    //    scope.setEditor(this.markerEditor);
+    //},
+
     zoomIn: function (factor, viewer) {
         //if(factor === undefined){
         //    factor = viewer.camera.zoom * 1.1;
@@ -22517,6 +22531,31 @@ CloudViewer.prototype = {
         }
     },
 
+    calculateNearFar: function () {
+
+        var scene = this.getScene();
+
+        // reducing z-fighting by dynamically adjust near/far
+        if (scene.rootNode.boundingBox != null) {
+
+            var box = new THREE.Box3();
+            box.copy(scene.rootNode.boundingBox);
+            box.applyMatrix4(scene.rootNode.matrix);
+
+            var target = box.center();
+            var position = this.camera.position;
+
+            var newPos = position.clone().sub(target);
+            var length = newPos.length();
+            var delta = 0.001;
+            var Znear = (length * length + length * delta) / ((1 << 24) * delta);
+
+            this.camera.cameraP.near = Znear;
+            this.camera.cameraP.far = length + CLOUD.GlobalData.SceneSize * 0.5;
+            this.camera.cameraP.updateProjectionMatrix();
+        }
+    },
+
     render: function () {
         ++this.requestRenderCount;
         if (this.requestRenderCount > 10000)
@@ -22532,6 +22571,8 @@ CloudViewer.prototype = {
 
         var scope = this;
         var camera = this.camera;
+
+        this.calculateNearFar();
 
         // 重置增量绘制状态
         this.resetIncrementRender();
@@ -22715,8 +22756,8 @@ CloudViewer.prototype = {
         //this.initViewHouse(domElement);
 
         // Camera
-        //var camera = new CLOUD.Camera(viewportWidth, viewportHeight, 45, 0.001, CLOUD.GlobalData.SceneSize * 20, -CLOUD.GlobalData.SceneSize, CLOUD.GlobalData.SceneSize);
-        var camera = new CLOUD.Camera(viewportWidth, viewportHeight, 45, 0.01, CLOUD.GlobalData.SceneSize * 20, -CLOUD.GlobalData.SceneSize, CLOUD.GlobalData.SceneSize);
+        //var camera = new CLOUD.Camera(viewportWidth, viewportHeight, 45, 0.01, CLOUD.GlobalData.SceneSize * 20, -CLOUD.GlobalData.SceneSize, CLOUD.GlobalData.SceneSize);
+        var camera = new CLOUD.Camera(viewportWidth, viewportHeight, 45, 1.0, CLOUD.GlobalData.SceneSize * 3.0, -CLOUD.GlobalData.SceneSize, CLOUD.GlobalData.SceneSize);
         this.camera = camera;
 
         var scope = this;
@@ -22818,6 +22859,10 @@ CloudViewer.prototype = {
             this.editorManager.flyEditor.resize();
         }
     },
+
+    //setMarkerMode: function () {
+    //    this.editorManager.setMarkerMode(this);
+    //},
 
     zoomIn: function (factor) {
         this.editorManager.zoomIn(factor, this);

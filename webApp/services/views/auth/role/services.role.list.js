@@ -17,9 +17,7 @@ App.Services.roleList=Backbone.View.extend({
     },
     initialize:function(){
        this.listenTo(App.Services.role.collection,"add",this.addOne);
-       this.listenTo(App.Services.role.collection,"remove",this.render());
-        var height = document.body.clientHeight;
-
+       this.listenTo(App.Services.role.collection,"remove",this.render);
     },
     //数据加载
     addOne:function(model){

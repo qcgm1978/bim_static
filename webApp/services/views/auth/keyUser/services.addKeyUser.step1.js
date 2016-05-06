@@ -65,7 +65,7 @@ App.Services.step1 = Backbone.View.extend({
 
           if(canLoad=='true'){
             $ul.removeClass('shut').addClass('open');
-            App.Comm.ajax({URLtype:'fetchServiceMemberInnerList',data:{parentId:orgId,includeUsers:true}},function(r){
+            App.Comm.ajax({URLtype:'fetchServicesMemberInnerList',data:{parentId:orgId,includeUsers:true}},function(r){
               console.log(r)
 
               if(r && !r.code && r.data){

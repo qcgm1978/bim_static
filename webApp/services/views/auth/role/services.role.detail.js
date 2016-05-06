@@ -23,6 +23,7 @@ App.Services.roleDetail=Backbone.View.extend({
 
     modify:function(){
         App.Services.roleModify = this.model;
+        console.log(App.Services.roleModify);
         this.window("修改角色");
         this.recognize();
     },

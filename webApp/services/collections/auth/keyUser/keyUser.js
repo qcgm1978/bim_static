@@ -129,7 +129,7 @@ App.Services.KeyUser = {
     }),
 
 
-    urlType: "fetchServiceMemberInnerList"
+    urlType: "fetchServicesMemberInnerList"
 
   })),
 
@@ -143,7 +143,7 @@ App.Services.KeyUser = {
     }),
 
 
-    urlType: "fetchServiceMemberOuterList"
+    urlType: "fetchServicesMemberOuterList"
 
   })),
 

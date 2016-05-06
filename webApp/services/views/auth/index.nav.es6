@@ -34,6 +34,7 @@ App.Services.AuthNav = Backbone.View.extend({
 		this.breadCrumb(this.$el.find(".memCtrl"));
 		App.Services.init("auth","memCtrl");
 		$("#dataLoading").show();
+
 		App.Services.Member.loadData(App.Services.Member.innerCollection,{},function(){
 			//两个不可控异步，已知顺序为加载-点击，只好先清空再添加
 			App.Services.Member.innerCollection.each(function(item){
@@ -51,6 +52,7 @@ App.Services.AuthNav = Backbone.View.extend({
 		$("#dataLoading").show();
 		this.breadCrumb($(".roleManager"));
 		App.Services.init("auth","roleManager");
+
 		App.Services.role.init(function(){
 			$(".roleManager").addClass("active").siblings("li").removeClass("active");
 			$("#dataLoading").hide();
@@ -61,16 +63,15 @@ App.Services.AuthNav = Backbone.View.extend({
 		this.breadCrumb(this.$el.find(".keyUser"));
 		App.Services.KeyUser.init();
 		$(".serviceBody").html(new App.Services.keyUserFrame().render().el); //框架
-		$("#mask").html(new App.Services.addKeyUser().render().el); //框架
-		$("#mask").show();
 
-		App.Services.KeyUser.loadData(App.Services.KeyUser.KeyUserList,{type:'get'},function(r){
-			console.log("gg",r)
 
-			if(r && !r.code && r.data){
-				App.Services.KeyUser.KeyUserList.set(r.data);
-			}
-		});
+		//App.Services.KeyUser.loadData(App.Services.KeyUser.KeyUserList,{type:'get'},function(r){
+		//	console.log("gg",r)
+    //
+		//	if(r && !r.code && r.data){
+		//		App.Services.KeyUser.KeyUserList.set(r.data);
+		//	}
+		//});
 		//主模板  四个列表：  关键用户列表 （默认第一个？）  关键要用户基本信息  项目权限   部门权限
 		//新增关键用户，注意步骤，关联性
 		//删除关键用户弹窗

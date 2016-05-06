@@ -2,7 +2,7 @@
 
                <%for(var i=0;i<count;i++){%>
 
-                    <tr class=" <%=odd%2==0?'odd':'' %> "  data-code="<%=lists[i].code%>"> 
+                    <tr class=" <%=odd%2==0?'odd':'' %>  stepOne"  data-code="<%=lists[i].code%>"> 
                     <%current=lists[i],odd+=1;%>
                        
                         <td class="listCode">
@@ -15,7 +15,8 @@
 
                             <span class="code"><%=current.code%></span>
                         </td>
-                        <td class="listName"> <div class="overflowEllipsis overWidth"> <%=current.name%> </div> </td>
+                        <td class="listName"> <div class=" overWidth"> <%=current.name%> </div>
+                             </td>
                         <td class="listCount"><div class="overflowEllipsis overWidth"><%=current.totalQuantity%><%=current.unit%></div></td>  
                     </tr>
 
@@ -26,7 +27,7 @@
 
                                 
 
-                                  <tr class=" <%=odd%2==0?'odd':'' %> " data-code="<%=lists2[j].code%>"> 
+                                  <tr class=" <%=odd%2==0?'odd':'' %> stepTwo" data-code="<%=lists2[j].code%>"> 
                                     <%current=lists2[j],odd+=1;%>
                                     <td class="listCode">
                                           <%if(current.children){%>
@@ -36,7 +37,7 @@
                                             <%}%>
                                             <span class="code code1"><%=current.code%></span>
                                     </td>
-                                    <td class="listName"><div class="overflowEllipsis overWidth">
+                                    <td class="listName"><div class=" overWidth">
                                     <%=current.name%></div></td>
                                     <td class="listCount"><div class="overflowEllipsis overWidth">
                                     <%=current.totalQuantity%><%=current.unit%></div></td>  
@@ -46,7 +47,7 @@
                                      <% var lists3=current.children; count3=lists3.length; %>
                                      <%for(var k=0;k<count3;k++){%>
                                       
-                                       <tr class=" <%=odd%2==0?'odd':'' %> " data-code="<%=lists3[k].code%>"> 
+                                       <tr class=" <%=odd%2==0?'odd':'' %> stepThree" data-code="<%=lists3[k].code%>"> 
                                         <%current=lists3[k],odd+=1;%>
                                             <td class="listCode">
                                                 <%if(current.children){%>
@@ -56,7 +57,7 @@
                                                 <%}%>
                                                 <span class="code code2"><%=current.code%></span>
                                             </td>
-                                            <td class="listName"><div class="overflowEllipsis overWidth">
+                                            <td class="listName"><div class=" overWidth">
                                             <%=current.name%></div></td>
                                             <td class="listCount"><div class="overflowEllipsis overWidth">
                                             <%=current.totalQuantity%><%=current.unit%></div></td>  
@@ -65,7 +66,7 @@
                                              <% if(current.children){%>
                                                  <% var lists4=current.children; count4=lists4.length; %>
                                                  <%for(var n=0;n<count4;n++){%> 
-                                                      <tr class=" <%=odd%2==0?'odd':'' %> " data-code="<%=lists4[n].code%>"> 
+                                                      <tr class=" <%=odd%2==0?'odd':'' %> stepFour" data-code="<%=lists4[n].code%>"> 
                                                         <%current=lists4[n],odd+=1;%> 
                                                         <td class="listCode">
                                                              <%if(current.children){%>
@@ -75,7 +76,7 @@
                                                             <%}%>
                                                             <span class="code code3"><%=current.code%></span>
                                                         </td>
-                                                        <td class="listName"><div class="overflowEllipsis overWidth">
+                                                        <td class="listName"><div class=" overWidth">
                                                         <%=current.name%></div></td>
                                                         <td class="listCount">
                                                         <div class="overflowEllipsis overWidth"><%=current.totalQuantity%><%=current.unit%></div></td>  

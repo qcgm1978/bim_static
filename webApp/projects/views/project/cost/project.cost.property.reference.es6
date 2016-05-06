@@ -14,7 +14,8 @@ App.Project.CostReference = Backbone.View.extend({
 
 
 	events: {
-		"click .tbReference  tr": "showInModle"
+		"click .tbReference  tr": "showInModle",
+		"click tr .nodeSwitch": "nodeSwitch"
 	},
 
 
@@ -93,6 +94,64 @@ App.Project.CostReference = Backbone.View.extend({
 		});
 
 
+
+	},
+
+	//收起展开
+	nodeSwitch(event) {
+		 
+		var $target = $(event.target),
+
+			$tr = $target.closest("tr"),
+			isOpen = $target.hasClass("on");
+
+		if ($tr.hasClass("stepOne")) {
+			//展开
+			if (isOpen) {
+				$tr.nextUntil(".stepOne").hide();
+				$target.removeClass("on");
+			} else {
+				$tr.nextUntil(".stepOne").show();
+				$target.addClass("on");
+			}
+		}
+
+		if ($tr.hasClass("stepTwo")) {
+
+			var nextUntilStepOne = $tr.nextUntil(".stepTwo"),
+				isExists = false;
+
+			nextUntilStepOne.each(function() {
+				if ($(this).hasClass(".stepOne")) {
+					isExists = true;
+					return false;
+				}
+			}); 
+
+			if (isExists) {
+				//展开
+				if (isOpen) {
+					$tr.nextUntil(".stepOne").hide();
+				} else {
+					$tr.nextUntil(".stepOne").show();
+				}
+			} else {
+				nextUntilStepOne.splice(-1);
+				if (isOpen) {
+					nextUntilStepOne.hide();
+				}else{
+					nextUntilStepOne.show();
+				} 
+			} 
+		} 
+
+		if (isOpen) {
+			$target.removeClass("on");
+		} else {
+			$target.addClass("on");
+		}
+
+		event.stopPropagation();
 
 	}
 

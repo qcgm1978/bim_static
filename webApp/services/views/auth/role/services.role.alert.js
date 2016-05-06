@@ -30,8 +30,7 @@ App.Services.windowAlert = Backbone.View.extend({
 
         $.ajax({
             url:"http://bim.wanda-dev.cn/platform/role?roleId=" +roleId,
-            dataType:"json",
-            type:"POST",
+            type:"DELETE",
             success:function(response){
                 $("#dataLoading").hide();
                 if(response.code==18005){

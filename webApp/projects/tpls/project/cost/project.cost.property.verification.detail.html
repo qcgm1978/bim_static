@@ -3,7 +3,7 @@
                <%for(var i=0;i<count;i++){%>
 
                     <%current=lists[i];%>
-                    <tr>    
+                    <tr class="stepOne">    
                         <td class="listCode">
 
                             <%if(current.children){%>
@@ -25,7 +25,7 @@
 
                                  <%current=lists2[j];%>
 
-                                <tr>    
+                                <tr  class="stepTwo">    
                                     <td class="listCode">
                                           <%if(current.children){%>
                                                  <i class="nodeSwitch on step1"></i>
@@ -42,7 +42,7 @@
                                      <% var lists3=current.children; count3=lists3.length; %>
                                      <%for(var k=0;k<count3;k++){%>
                                         <%current=lists3[k];%>
-                                        <tr>    
+                                        <tr  class="stepThree">    
                                             <td class="listCode">
                                                 <%if(current.children){%>
                                                      <i class="nodeSwitch on step2"></i>
@@ -59,7 +59,7 @@
                                                  <% var lists4=current.children; count4=lists4.length; %>
                                                  <%for(var n=0;n<count4;n++){%>
                                                     <%current=lists4[n];%>
-                                                    <tr>    
+                                                    <tr  class="stepFour">    
                                                         <td class="listCode">
                                                              <%if(current.children){%>
                                                                  <i class="nodeSwitch on step3"></i>

@@ -7,7 +7,7 @@ App.Services.System.ExtendAttrContainerListDetail = Backbone.View.extend({
 
 	//初始化
 	initialize() {
-		this.listenTo(this.model, "change", this.update);
+		this.listenTo(this.model, "change", this.render);
 		this.listenTo(this.model, "destroy", this.removeModel);
 	},
 
@@ -121,7 +121,7 @@ App.Services.System.ExtendAttrContainerListDetail = Backbone.View.extend({
 
 		if (dialog.element.find(".btnCk").hasClass("selected")) {
 			pars.pushType = 0;
-			pars.reference = this.$(".linkAttrOption .myDropText .text").text();
+			pars.reference = dialog.element.find(".linkAttrOption .myDropText .text").text();
 		} else {
 			//pars.reference = "";
 			pars.pushType = dialog.element.find(".attrTypeOption").data("type");
@@ -130,8 +130,9 @@ App.Services.System.ExtendAttrContainerListDetail = Backbone.View.extend({
 		data.data = JSON.stringify(pars);
 
 		App.Comm.ajax(data, (data) => {
-			if (data.code == 0) {
+			if (data.code == 0) { 
 				this.model.set(data.data);
+				dialog.close();
 			}
 		});
 	},

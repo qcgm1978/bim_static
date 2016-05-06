@@ -31,7 +31,6 @@ App.API = {
 		fetchServicesMemberOuterList:'platform/auth/org?outer=true',//外部组织-品牌／公司／成员列表
 		fetchServicesMemberInnerList:'platform/auth/org?outer=false',//内部-组织／成员列表
 		deleteServicesRoleSingle:"platform/role?",//删除角色
-
 		fetchServiceKeyUserList:'platform/auth/org?outer=false&parentId=&includeUsers=',//关键用户列表
 		fetchServiceStep1:'platform/auth/org?outer=false&parentId=&includeUsers=',//项目列表
 
@@ -107,7 +106,7 @@ App.API = {
 		fetchPlanModel: "sixD/{projectId}/{projectVersionId}/plan", //模型
 		fetchPlanAnalog: "sixD/{projectId}/{projectVersionId}/plan?relateModel=true", //模拟
 		fetchPlanPublicity: "sixD/plan/concern", //关注 ?queryType={queryType}
-		fetchPlanInspection: "sixD/{projectId}/{projectVersionId}/plan?noElement=true", //检验 计划节点未关联图元 startTime=1398145297000&endTime=1398145297000&relateModel={true|false}&
+		fetchPlanInspection: "sixD/{projectId}/{projectVersionId}/plan?noElement=true&relateModel=true", //检验 计划节点未关联图元 startTime=1398145297000&endTime=1398145297000&relateModel={true|false}&
 		fetchPlanInspectionCate: "sixD/{projectId}/{projectVersionId}/plan/noplan/cate", // 图元未关联计划节点
 		fetchPlanInspectionCateDetail: "sixD/{projectId}/{projectVersionId}/plan/noplan/element", // 图元未关联计划节点 ?cateId={cateId} 暂开详情
 		fetchModleIdByCode:"sixD/{projectId}/{projectVersionId}/plan/element", //获取构建的模型id
@@ -121,8 +120,8 @@ App.API = {
 		fetchCostVerification: "sixD/{projectId}/{projectVersionId}/cost/summary?noElement=true", // 效验
 		fetchCostVerificationCate: "sixD/{projectId}/{projectVersionId}/cost/nocost/cate", // 效验 图元未关联清单 类型
 		fetchCostVerificationCateDetail: "sixD/{projectId}/{projectVersionId}/cost/nocost/element", // ?cateId={cateId}图元未关联清单 详情
-		fetchCostModleIdByCode:"sixD/{projectId}/{projectVersionId}/cost/nocost/element", // ?costCode={costCode}
-		fetchCostProperties: "dataJson/project/project.design.property.json", //属性
+		fetchCostModleIdByCode:"sixD/{projectId}/{projectVersionId}/cost/element", // ?costCode={costCode}
+		fetchNoCostCate:"sixD/{projectId}/{projectVersionId}/cost/nocost/element",//获取未关联成本的构件 ?cateId={cateId}
 
 
 		// 质量
