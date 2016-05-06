@@ -588,6 +588,10 @@ BIM.prototype = {
     BIM.util.off(key,callback);
     return this;
   },
+  pub:function(key,args){
+    BIM.util.pub(key,args);
+    return this;
+  },
   subscribers:BIM.util.subscribers,
   zoom : function () {
     BIM.common.bimBox.className = 'bim';

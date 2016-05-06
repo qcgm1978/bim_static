@@ -124,7 +124,11 @@ App.Project = {
 			element: $("#modelBox"),
 			etag: modelId
 		});
-		return
+
+		// 获取familyType
+		App.Project.Settings.Viewer.on("changType",function(id){
+			console.log(id)
+		})
 
 		App.Project.Settings.modelId = modelId;
 		App.Project.Settings.Viewer.on("click", function(model) {
