@@ -7,6 +7,7 @@ App.Comm.createModel = function(options){
   var viewer;
   var viewPoint;
   var floorMap;
+  var comment;
   var viewpointDialog = function(option,callback){
     var html = new viewpointView({
       model:option
@@ -244,15 +245,24 @@ App.Comm.createModel = function(options){
     modelComment:function(){
       var that = this;
       $(".modelBar").hide();
+      viewer.unregisterEvent();
       App.Comm.navBarToggle($(".rightProperty"),$(".projectCotent"),"right",App.Project.Settings.Viewer);
       setTimeout(function(){
         var comment = new App.Comm.modules.Comment({
           element:$('.modelContainerContent'),
           model:viewer,
+          cancelCallback:function(){
+            $(".modelBar").show();
+            viewer.registerEvent();
+            App.Comm.navBarToggle($(".rightProperty"),$(".projectCotent"),"right",App.Project.Settings.Viewer);
+          },
           okCallback:function(data){
             var viewPoint = data.viewPoint;
             var image = data.pic.substr(22);
             var canvasData = data.data;
+            $(".modelBar").show();
+            viewer.registerEvent();
+            App.Comm.navBarToggle($(".rightProperty"),$(".projectCotent"),"right",App.Project.Settings.Viewer);
             viewpointDialog(data,function(res){
               var data = {
                 name:res.name,
@@ -299,6 +309,7 @@ App.Comm.createModel = function(options){
       })
     },
     saveCanvasData:function(canvasData,data){
+      if(!canvasData)return;
       var data = {
         type:'post',
         URLtype:"addViewpointData",
@@ -604,7 +615,7 @@ App.Comm.createModel = function(options){
           top:top
         }).show();
       }else{
-        var html = '<div class="menu"><span class="item edit">重命名</span><span class="item delete">删除</span><span class="item addComment">批注</span></div>'
+        var html = '<div class="menu"><a href="'+that.model.pic+'" target="_blank" class="item download">下载</a><span class="item edit">修改</span><span class="item delete">删除</span></div>'
         $(html).css({
           left:left,
           top:top
@@ -618,7 +629,10 @@ App.Comm.createModel = function(options){
       event.preventDefault();
     },
     setPoint:function(){
-      var model = this.model
+      if(comment){
+        comment._destroy();
+      }
+      var model = this.model;
       var data = {
         type:'get',
         URLtype:"fetacCanvasData",
@@ -631,7 +645,7 @@ App.Comm.createModel = function(options){
       App.Comm.ajax(data,function(data){
         if(data.message == "success"){
           var canvasData = data.data.comments;
-          new App.Comm.modules.Comment({
+          comment = new App.Comm.modules.Comment({
             element:$('.modelContainerContent .model')
           }).render(canvasData);
         }
