@@ -25,6 +25,7 @@ App.Services.role ={
         App.Services.role.collection.fetch({
             data:{},
             success: function(collection, response, options) {
+
                 if(func && typeof  func == "function"){
                     func(response);
                 }

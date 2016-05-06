@@ -36,11 +36,28 @@ App.Services.memberDetail=Backbone.View.extend({
 
     //写入角色
     writeRole:function(response){
-        var data = response.data;
+
+        var data = response.data,x=0;
         if(data && data.length){
+            this.$(".roles").empty();
+
+            for(var i = 0 ; i < data.length ; i++){
+                if(data[i]["roleId"] == 999999){
+                    this.$(".roles").append("<span class='" + "adm" +"'>" + data[i].name + "</span>" );
+                }
+            }
             //只写入5个
-            for(var i = 0 ; i < 5 ; i++){
-                this.$(".roles").append("<span>" + data[i].name + "</span>" );
+            for(var j = 0 ; j < data.length ; j++){
+                var className = '';
+                if(data[j]["inherit"]){className = "inherit"}
+                if(data[j]["roleId"] == 999999){
+                    j++;
+                    continue
+                }
+                x = x+1;
+                if(x >4){return}
+                this.$(".roles").append("<span class='" + className +"'>" + data[j].name + "</span>" );
+
             }
         }
     },
@@ -153,7 +170,7 @@ App.Services.memberDetail=Backbone.View.extend({
             url: url,
             success:function(response){
                 if(response.message=="success"){
-                    _this.function = response.data;//当前用户功能列表
+                    _this.function = response.data;//当前用户功能列表,不生效
                     if(fn && typeof fn == "function"){
                         fn(response);
                     }
