@@ -70,8 +70,16 @@ familyModel.prototype = {
     }).on('click',".bar-item",function(){
       var $this = $(this),
           fn = $this.data('fn');
-      $this.not('.bar-fit').addClass('selected').siblings().removeClass('selected');
-      self.model[fn]();
+      if($this.is(".bar-fit")){
+        self.model[fn]();
+      }else{
+        $this.toggleClass('selected').siblings().removeClass('selected');
+        if(!$this.is('.selected')){
+          self.model.picker();
+        }else{
+          self.model[fn]();
+        }
+      }
     });
     modBar.find(".mod-list li:last").trigger("click");
   },

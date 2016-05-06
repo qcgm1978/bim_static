@@ -609,9 +609,9 @@ BIM.prototype = {
   zoomSelected : function () {
     BIM.common.viewer.zoomToSelection();
   },
-  fit : function (id) {
+  fit : function () {
     BIM.util.pub('fit');
-    BIM.common.viewer.zoomToSelection(id);
+    BIM.common.viewer.zoomToSelection();
   },
   home : function () {
     BIM.util.pub('home');
