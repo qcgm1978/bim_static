@@ -56,7 +56,7 @@
 }
 .rightProperty { .odd { background-color: #eee; }
 	.selected { background-color: #A8DBFD; }
-	.btnCk.selected{background-color: #fff;}
+	.btnCk.selected { background-color: #fff; }
 	.attrPlanBox, .attrCostBox, .attrQualityBox { display: none; }
 	.designVerification { height: 100%; }
 	.modle { .modleShowHide { transition: all .5s; background: url(/comm/images/commIcon.png) no-repeat 0px -256px; float: right; margin-right: 12px; margin-top: 6px; height: 14px; width: 14px; cursor: pointer;
@@ -92,17 +92,24 @@
 			}
 		}
 	}
-	.actionAnalog{position: absolute;bottom:0px;width:100%;min-width: 398px;height: 80px;background-color: #eee;
-		.progressAnalog{height: 50px;}
-		.desctionAnalog{height: 30px;background-color: #ddd;line-height: 33px;padding-left: 15px;}
+	.actionAnalog { position: absolute; bottom: 0px; width: 100%; min-width: 398px; height: 80px; background-color: #eee;
+		.progressAnalog { height: 50px; line-height: 55px; vertical-align: top; padding-left: 15px;
+			i{cursor: pointer;}
+			.process { position: absolute; top: 23px; height: 30px; left: 45px; right: 0px;
+
+				.processPos { position: absolute; top: -3px; left: 0px; }
+				.processBg { height: 8px; width: 0px; background-color: #36D900; margin-top: -8px; }
+				.bg { height: 8px; width: 97%; background-color: #ccc; }
+			}
+		}
+		.desctionAnalog { height: 30px; background-color: #ddd; line-height: 33px; padding-left: 15px; }
 	}
 	.planBox { position: absolute; top: 52px; bottom: 0px; left: 0px; right: 0px;
-		&.planAnalogContent { top: -1px;bottom:80px; }
-
+		&.planAnalogContent { top: -1px; bottom: 80px; }
 		&.planPlanPublicity { top: 0px;
 			.selDate { margin-bottom: 7px; margin-top: 3px; }
 		}
-		.planContent { height: 100%;
+		.planContent { height: 100%; overflow-y: auto;
 			.tbPlan { width: 100%; min-width: 398px;
 				tr { cursor: pointer; }
 				th, td { border: 1px #ccc solid; }
@@ -282,7 +289,7 @@
 	}
 	.tbComm { td, th { border: 1px #ccc solid; text-align: center; }
 		th { height: 28px; line-height: 28px; }
-		td { height: 25px; line-height: 25px; }
+		td { height: 25px; line-height: 25px; word-wrap: break-word; word-break: break-all; }
 	}
 	.tbProcessAccessHeader, .tbProcessAccessBody { width: 100%; min-width: 398px;
 		.manifestIcon { width: 5%; }

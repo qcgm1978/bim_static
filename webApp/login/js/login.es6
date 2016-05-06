@@ -12,12 +12,16 @@ var Login = {
 
 			//登录
 			$("#btnLogin").on("click", function() {
-
 				Login.signIn();
 			});
 
 			// 隐藏警告
-			$("#userName,#userPwd").keyup(function(){
+			$("#userName,#userPwd").keyup(function(e){
+			
+				if(e.keyCode==13){
+					Login.signIn();
+				}
+			
 				var $errorMSG=$("#mainBox .errorMSG");
 				 if ($errorMSG.hasClass('show')) {
 				 	if ($(this).val().trim()) {
@@ -62,15 +66,20 @@ var Login = {
 					password:userPwd
 				}
 			}).done(function(data){
-				debugger
-				if(data.data){
+				if(data.data && typeof data.data==='object'){
 					for(var p in data.data){
 						Login.setCookie(p,data.data[p]);
 					}
 				}
-				Login.setCookie('userId','1028846079');
+				
 				if(data.code==0){
-					window.location.href="/index.html";
+					$.ajax({
+						url:'/platform/user/current'
+					}).done(function(data){
+						Login.setCookie('userId',data.data.userId);
+						Login.setCookie('isOuter',data.data.outer);
+						window.location.href="/index.html";
+					})
 				}else{
 					$("#mainBox .errorMSG").addClass('show').find(".tip").text("登录失败:"+data.message);
 				}

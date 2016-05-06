@@ -89,8 +89,6 @@ App.Project = {
 		});
 	},
 
-
-
 	//渲染版本
 	renderVersion: function(data) {
 
@@ -167,19 +165,18 @@ App.Project = {
 
 	},
 
-
 	// 加载数据
-	loadData: function() { 
+	loadData: function() {
 		//var $contains = $("#contains");
 		$("#contains").html(new App.Project.ProjectApp().render().el);
-		if (App.Project.Settings.CurrentVersion.status!=9) {
+		if (App.Project.Settings.CurrentVersion.status != 9) {
 			$(".fileContainer .btnFileUpload").show();
 			//上传
 			App.Project.upload = App.modules.docUpload.init($(document.body));
-		}else{
+		} else {
 			$(".fileContainer .btnFileUpload").hide();
 		}
-		
+
 
 		// 导航文件
 		App.Project.fetchFileNav();
@@ -437,12 +434,12 @@ App.Project = {
 	//属性页 设计成本计划 type 加载的数据
 	propertiesOthers: function(type) {
 
-		var that = this; 
-		 //计划
+		var that = this;
+		//计划
 		if (type.indexOf("plan") != -1) {
 			App.Project.fetchPropertData("fetchDesignPropertiesPlan", function(data) {
 				if (data.code == 0) {
-					 
+
 					data = data.data;
 					if (!data) {
 						return;
@@ -482,9 +479,6 @@ App.Project = {
 				}
 			});
 		}
-
-
-
 	},
 
 	//属性 数据获取
@@ -517,7 +511,7 @@ App.Project = {
 
 			sb.Append('<li class="modleItem" >');
 			item = data[i];
-			sb.Append(App.Project.properCostTreeItem(item,0));
+			sb.Append(App.Project.properCostTreeItem(item, 0));
 			sb.Append('</li>');
 		}
 		sb.Append('</ul>');
@@ -525,21 +519,22 @@ App.Project = {
 	},
 
 	//tree 节点
-	properCostTreeItem: function(item,i) {
-		 
-		var sb = new StringBuilder(),w=i*12;
+	properCostTreeItem: function(item, i) {
+
+		var sb = new StringBuilder(),
+			w = i * 12;
 
 		//内容
-	 
+
 		sb.Append('<span class="modleName"><div class="modleNameText overflowEllipsis">');
 		if (item.children && item.children.length > 0) {
-			sb.Append('<i class="nodeSwitch on" style="margin-left:'+w+'px;"></i>');
+			sb.Append('<i class="nodeSwitch on" style="margin-left:' + w + 'px;"></i>');
 		} else {
-			sb.Append('<i class="noneSwitch" style="margin-left:'+w+'px;"></i> ');
+			sb.Append('<i class="noneSwitch" style="margin-left:' + w + 'px;"></i> ');
 		}
 		sb.Append(item.code);
 		sb.Append('</div></span>');
-		sb.Append(' <span class="modleVal"> ' + item.name + '</span> '); 
+		sb.Append(' <span class="modleVal"> ' + item.name + '</span> ');
 
 		//递归
 		if (item.children && item.children.length > 0) {
@@ -554,7 +549,7 @@ App.Project = {
 
 				sb.Append('<li class="modleItem" > ');
 				subItem = treeSub[j];
-				sb.Append(App.Project.properCostTreeItem(subItem,i+1));
+				sb.Append(App.Project.properCostTreeItem(subItem, i + 1));
 				sb.Append('</li>');
 			}
 
@@ -563,8 +558,96 @@ App.Project = {
 		}
 
 		return sb.toString();
+	},
+
+	//在模型中显示
+	showInModel: function($target, type) {
+
+		if ($target.hasClass("selected")) {
+			$target.parent().find(".selected").removeClass("selected");
+			//$target.removeClass("selected");
+		} else {
+			$target.parent().find(".selected").removeClass("selected");
+			$target.addClass("selected");
+		} 
+
+		if ($target.data("box")) { 
+			this.zommBox($target);
+			return;
+		} 
+
+		var data = {
+			URLtype: "fetchQualityModelById",
+			data: {
+				type: type,
+				projectId: App.Project.Settings.CurrentVersion.projectId,
+				versionId: App.Project.Settings.CurrentVersion.id,
+				acceptanceId: $target.data("id")
+			}
+		};
+
+		App.Comm.ajax(data, function(data) {
+
+			if (data.code == 0) {
+
+				if (data.data) {
+
+					var pars = {
+						URLtype: "getBoundingBox",
+						data: {
+							projectId: App.Project.Settings.CurrentVersion.projectId,
+							projectVersionId: App.Project.Settings.CurrentVersion.id,
+							sceneId: data.data.sceneId,
+							elementId: data.data.componentId
+						}
+					}
+
+					//构建id
+					$target.data("elem", data.data.componentId);
+
+					App.Comm.ajax(pars, function(data) {
+
+						if (data.code == 0 && data.data) {
+
+							var box = [],
+								min = data.data.min,
+								minArr = [min.x, min.y, min.z],
+								max = data.data.max,
+								maxArr = [max.x, max.y, max.z];
+
+							box.push(minArr);
+							box.push(maxArr);
+							//box id
+							$target.data("box", box);
+							App.Project.zommBox($target);
+
+						}
+					});
 
 
+
+				}
+			}
+		});
+
+
+	},
+
+	//定位到模型
+	zommBox: function($target) {
+
+		var Ids = [],
+			boxArr = [];
+
+		$target.parent().find(".selected").each(function() {
+
+			Ids.push($(this).data("elem"));
+			boxArr=boxArr.concat($(this).data("box"));
+
+		}); 
+
+		App.Project.Settings.Viewer.selectIds(Ids);
+		App.Project.Settings.Viewer.zoomBox(boxArr)
 	}
 
 

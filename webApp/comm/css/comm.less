@@ -7,7 +7,21 @@
 .clear { clear: both; }
 .myHidden { display: none; }
 .pointer { cursor: pointer; }
-#pageLoading { position: fixed; top: 50px; width: 100%; bottom: 0px; z-index: 9999; background: #fff url('/comm/images/pageLoading.gif') no-repeat center; }
+#pageLoading,#dataLoading { position: fixed; top: 50px; width: 100%; bottom: 0px; z-index: 9999; background: #fff url('/comm/images/pageLoading.gif') no-repeat center; }
+#dataLoading{
+	background: rgba(00,00,00,0.3);
+	display: none;
+	& img {
+		width: 124px;
+		height: 124px;
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		margin-left: -62px;
+		margin-top: -112px;
+	}
+}
+
 
 /* bootstrap  */
 .txtInput { height: 30px; padding: 6px 8px; outline: none; font-size: 14px; line-height: 1.2; color: #666; background-color: #fff; border: 1px solid #ccc; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box; }

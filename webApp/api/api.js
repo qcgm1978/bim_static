@@ -23,14 +23,22 @@ App.API = {
 		fetchServicesRolesList:'platform/auth/role',//角色列表
 		fetchServicesFunList: 'platform/auth/function',//功能列表
 		fetchServicesOzRoleList:'platform/org/{orgId}/role?outer={outer}',//机构角色列表
-		fetchServicesUserRoleList:'https://bim.wanda.cn/platform/user/{userId}/role',
-		fetchServiceMemberOuterList:'platform/auth/org?outer=true',//外部组织-品牌／公司／成员列表
-		fetchServiceMemberInnerList:'platform/auth/org?outer=false',//内部-组织／成员列表
-		fetchServiceKeyUserList:'platform/auth/keyUser',//关键用户列表
-		fetchServiceStep1:"outer={outer}&includeUsers={includeUsers}&parentId={parentId}", //项目列表,//项目列表
-		fetchServiceMemberList:'platform/auth/org',//内部-组织／成员列表
+		fetchServicesUserRoleList:'platform/user/{userId}/role',//用户角色
+		putServicesSaveRole:'platform/auth/user/role',//保存用户角色
+		putServicesRoleFun:'platform/auth/role/{roleId}/function?functionId=111,222,333',//保存角色功能，未用
+		fetchServicesNewRole:'platform/auth/role',//新增角色
+		fetchServiceMemberList:'platform/auth/org',
+		fetchServicesMemberOuterList:'platform/auth/org?outer=true',//外部组织-品牌／公司／成员列表
+		fetchServicesMemberInnerList:'platform/auth/org?outer=false',//内部-组织／成员列表
+		deleteServicesRoleSingle:"platform/role?",//删除角色
+
+		fetchServiceKeyUserList:'platform/auth/org?outer=false&parentId=&includeUsers=',//关键用户列表
+		fetchServiceStep1:'platform/auth/org?outer=false&parentId=&includeUsers=',//项目列表
+
+
 		fetchServicesProjectMemberProjectList:'platform/auth/user/{userId}/dataPrivilege/project',//项目成员/项目管理
 		fetchServicesProjectMemberMemberList:'platform/auth/{dataPrivilegeId}/member',//项目成员/项目管理
+
 
 
 
@@ -39,6 +47,7 @@ App.API = {
 
 		//项目
 		fetchProjects: "platform/project?type=3", //项目列表
+		fetchProjectBaseInfo: "platform/project/{projectId}", //项目列表
 		fetchFileList: "doc/{projectId}/{projectVersionId}/file/children", //获取文件列表  ?fileId={parentId}
 		fetchDesignFileNav: "doc/{projectId}/{projectVersionId}/file/tree", //项目设计文件导航
 		fetchDesignModelNav: "dataJson/project/project.design.model.json", //项目设计模型导航
@@ -168,7 +177,16 @@ App.API = {
 		appDel:"platform/app/{id}",//删除应用
 		appResetSecret:"platform/app/{id}",//重新生成 Secret
 		appUpdate:"platform/app",//更新 id, name desc
+		appSwitchStatus:"platform/app/{id}/disable?status={status}",//应用状态修改
 
+		//扩展属性
+		extendAttrList:"platform/setting/extensions/property/{classKey}", // 扩展列表
+		extendAttrInsert:"platform/setting/extensions/property",//新增
+		extendAttrUpdate:"platform/setting/extensions/property",//更新扩展属性
+		extendAttrDel:"platform/setting/extensions/property/{classKey}?property={property}",//删除扩展属性 
+		extendAttrGetReferene:"platform/setting/extensions/property/reference",// 获取引用扩展属性
+		projectCodeMapping:"platform/mapping/{projectId}",
+		getBoundingBox:"sixD/{projectId}/{projectVersionId}/bounding/box",//获取构建的 box id ?sceneId={sceneId}&elementId={elementId}
 		test: ""
 	},
 
@@ -182,19 +200,22 @@ App.API = {
 		fetchBodyContentMmhSlide :'dataJson/bodyContent/bodyContent.mmhSlider.json',
 		fetchBodyContentProclamation :'/dataJson/bodyContent/bodyContent.proclamation.json',
 
-		//services
-
+		//services-member
 		fetchServicesMemberList:'/dataJson/services/member/services.member.list.json',//组织-混合列表
 		fetchServicesRolesList:'/dataJson/services/member/services.member.roles.json',//角色-功能列表
 		fetchServicesFunList: '/dataJson/services/member/services.role.fun.json',//功能列表
 		fetchServicesOzRoleList:'/dataJson/services/member/services.oz.role.json',//组织角色列表
+		fetchServicesNewRole:'platform/auth/role',//新增角色
 		fetchServicesUserRoleList:'/dataJson/services/member/services.user.role.json',//用户角色列表
 		fetchServicesMemberOuterList:'/dataJson/services/member/services.member.list.json',//外部组织-品牌／公司／成员列表
 		fetchServicesMemberInnerList:'/dataJson/services/member/services.member.list.json',//内部-组织／成员列表
-		fetchServicesProjectMemberProjectList:'/dataJson/services/services.project.member.projects.json',//项目成员/项目管理
-		fetchServicesProjectMemberMemberList:'/dataJson/services/services.project.member.members.json',//项目成员/项目管理
-	  fetchServiceKeyUserList:'/dataJson/services/services.KeyUser.json',//关键用户列表
-	  fetchServiceStep1:'/dataJson/services/services.step1.json',//项目列表
+
+		//
+		fetchServicesProjectMemberProjectList:'/dataJson/services/member/services.project.member.projects.json',//项目成员/项目管理
+		fetchServicesProjectMemberMemberList:'/dataJson/services/member/services.project.member.members.json',//项目成员/项目管理
+	  	fetchServiceKeyUserList:'/dataJson/services/services.KeyUser.json',//关键用户列表
+	  	fetchServiceStep1:'/dataJson/services/services.step1.json',//项目列表
+
 
 
 
@@ -271,6 +292,16 @@ App.API = {
 		deleteFile: "", //删除文件
 		putFileReName: "", //重命名文件
 		createNewFolder: "",
+
+
+
+		//app
+		appList:"platform/app",//应用列表
+		fetchAppListById:"platform/app/{id}",//根据id获取列表
+		appInsert:"platform/app/",//创建应用 name desc
+		appDel:"platform/app/{id}",//删除应用
+		appResetSecret:"platform/app/{id}",//重新生成 Secret
+		appUpdate:"platform/app",//更新 id, name desc
 
 		test: ""
 

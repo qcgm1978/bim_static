@@ -9,12 +9,14 @@
 <div class="mappingContainer">
     <div class="mappingScroll">
         <ul class="list listBody">
-            <li class="item">
-                <div class="modules left">模块化</div>
-                <div class="name left">雅安万达广场</div>
-                <div class="code left">001007458</div>
-                <div class="op left">--</div>
-            </li>
+            <% _.each(items,function(i){ %>
+            	<li class="item">
+	                <div class="modules left"><%= i.module %></div>
+	                <div class="name left"><%= i.projectName %></div>
+	                <div class="code left"><%= i.code %></div>
+	                <div class="op left">--</div>
+	            </li>
+            <% }) %>
         </ul>
     </div>
 </div>

@@ -31,11 +31,11 @@
 
  		$target.addClass("selected").siblings().removeClass("selected");
 
- 		// App.Services.SystemCollection.FlowCollection.reset();
+ 		App.Services.SystemCollection.ExtendAttrCollection.reset();
 
- 		// App.Services.SystemCollection.FlowCollection.fetch({
- 		// 	data:{categoryId:id}
- 		// });
+ 		App.Services.SystemCollection.ExtendAttrCollection.classKey=id;
+
+ 		App.Services.SystemCollection.ExtendAttrCollection.fetch();
  	}
 
 

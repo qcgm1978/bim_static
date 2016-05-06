@@ -1,5 +1,5 @@
 <div class="roleEdit">
-    <a  class="explorer">查看</a>
+    <span  class="explorer">查看</span>
     <span  class="modify">修改</span>
     <span  class="delete">删除</span>
 </div>
@@ -11,7 +11,7 @@
     <div class="fun">
         <% if (obj.functions ) { for( var i = 0 ; i < obj.functions.length ; i++) {%>
         <span class="<%= obj.functions[i].id==1 ?  'adm' : '' %>"><%= obj.functions[i].name %></span>
-        <% } }%>
+        <% } } else{ %>暂无数据<%}%>
     </div>
 </div>
 

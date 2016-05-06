@@ -151,9 +151,7 @@ App.Services.System.CategoryListDetail = Backbone.View.extend({
 		if ($parent.find("li").length <= 1) {
 			$parent.append('<li class="loading">无数据</li>');
 		}
-		this.remove();
-
-
+		this.remove(); 
 
 	}
 

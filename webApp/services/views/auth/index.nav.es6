@@ -7,7 +7,7 @@ App.Services.AuthNav = Backbone.View.extend({
 	tagName:"div",
 
 
-	template:_.templateUrl("/services/tpls/auth/auth.nav.html",true),
+	template:_.templateUrl("/services/tpls/auth/auth.nav.html"),
 
 	events:{
 		"click .memCtrl" : "memCtrl",
@@ -22,34 +22,39 @@ App.Services.AuthNav = Backbone.View.extend({
 	},
 //面包屑
 	breadCrumb : function(ele){
-
 		$(ele).addClass("active").siblings("li").removeClass("active");
 		var n = $(ele).index();
 		var text = this.$el.find("li").eq(n).text();
 		this.$el.find(".bcService span").eq(2).text(text);
 	},
 
-	initialize:function(){
-
-		//$(".serviceBody").empty();
-		//this.breadCrumb(this.$el.find(".memCtrl"));
-		//App.Services.init({type : "auth",tab:"memCtrl"});
-		//App.Services.Member.init();
-	},
-
+	initialize:function(){},
 
 	memCtrl : function(){
-		$(".serviceBody").empty();
 		this.breadCrumb(this.$el.find(".memCtrl"));
 		App.Services.init("auth","memCtrl");
-		App.Services.Member.init();
+		$("#dataLoading").show();
+		App.Services.Member.loadData(App.Services.Member.innerCollection,{},function(){
+			//两个不可控异步，已知顺序为加载-点击，只好先清空再添加
+			App.Services.Member.innerCollection.each(function(item){
+				$("#blendList").html("");
+				item.set("checked",false);
+				var newView = new App.Services.memberDetail({model:item});
+				this.$("#blendList").append(newView.render().el);
+				$("#dataLoading").hide();
+			});
+		});//默认加载内部列表
+
 	},
 	roleManager : function(){
 		$(".serviceBody").empty();
-		this.breadCrumb(this.$el.find(".roleManager"));
-		this.$el.find(".roleManager").addClass("active").siblings("li").removeClass("active");
+		$("#dataLoading").show();
+		this.breadCrumb($(".roleManager"));
 		App.Services.init("auth","roleManager");
-		App.Services.role.init();
+		App.Services.role.init(function(){
+			$(".roleManager").addClass("active").siblings("li").removeClass("active");
+			$("#dataLoading").hide();
+		});
 	},
 	keyUser : function(){
 		$(".serviceBody").empty();

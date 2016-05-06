@@ -98,9 +98,9 @@ App.Project.ProjectPlanProperty = Backbone.View.extend({
 	loadPublicityData(projectId, projectVersionId, isEnd) {
 
 		var weekType = 1,
-			monthType = 2;
+			monthType = 3;
 		if (isEnd) {
-			weekType = 3;
+			weekType = 2;
 			monthType = 4;
 		}
 
@@ -111,7 +111,7 @@ App.Project.ProjectPlanProperty = Backbone.View.extend({
 		App.Project.PlanAttr.PlanPublicityCollection.fetch({
 			data: {
 				projectId:projectId,
-				type: monthType
+				type: weekType
 			}
 		});
 

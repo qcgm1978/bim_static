@@ -55,24 +55,55 @@ App.Services.Member ={
         }
     })),
 
+    //存储角色
+    SubRole : new(Backbone.Collection.extend({
+        model: Backbone.Model.extend({
+            defaults: function() {
+                return {
+                    url: ''
+                }
+            }
+        }),
+        urlType: "fetchServicesSaveRole",
+        parse: function (response) {
+            if (response.message == "success") {
+                return response.success;
+            }
+        }
+    })),
+
     //创建组织／成员混合列表
     list:function(response){
-        var blendList = [];
+        var a = [],blendList = [];
         if(response.data.user && response.data.user.length) {
             for (var i = 0; i < response.data.user.length; i++) {
-                blendList.push(response.data.user[i])
+                a.push(response.data.user[i])
             }
         }
         if(response.data.org && response.data.org.length){
             for(var j = 0 ; j < response.data.org.length ; j++ ){
-                blendList.push(response.data.org[j])
+                a.push(response.data.org[j])
             }
         }
+
+        blendList = a;
         return blendList;
     },
 
-    loadData : function(collectionType,data,fn) {
+//延迟加载
+    lazyLoad:function(a,s){
+        var n = a/ s, n2 = a%s;
+        if(n > 1){
+            setTimeout(function(){
+                this.lazyLoad();
+            },0);
+        }else{
 
+            //return blendList;
+        }
+    },
+
+    loadData : function(collectionType,data,fn) {
         data = data || {};
         collectionType.reset();
         collectionType.fetch({
@@ -84,16 +115,12 @@ App.Services.Member ={
             }
         });
     },
-
-
-
     init :function(){
-        $(".serviceBody").empty().html( new App.Services.MemberNav().render().el);
-        $(".content").html(new App.Services.MemberList().render().el);
+        $(".serviceBody").html( new App.Services.MemberNav().render().el);
+        $(".serviceBody .content").html(new App.Services.MemberList().render().el);
         App.Services.Member.loadData(App.Services.Member.innerCollection);//默认加载内部列表
     }
 };
-
 
 
 
