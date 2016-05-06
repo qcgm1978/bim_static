@@ -50,6 +50,9 @@
 		.value { color: #333; }
 	}
 	.projectMapping { .list { height: 38px; border-bottom: 1px #ccc solid; line-height: 38px;
+			.item{
+				height: 40px;
+			}
 			.modules { width: 21%; padding-left: 15px; }
 			.name { width: 35%; }
 			.code { width: 31%; }
@@ -57,6 +60,66 @@
 		}
 		.listHeader{    color: #ccc;}
 		.listBody{font-size: 14px;}
+	}
+}
+
+.projectLinkList{
+	margin: 0 20px;
+	height: 86%;
+	position: relative;
+	& > div:first-child {
+		width: 100%;
+		height: 40px;
+		& input{
+			height: 28px;
+		    border: 1px solid #CCC;
+		    width: 240px;
+		    float: right;
+		}
+	}
+	& > div:last-child {
+		margin-top: 10px;
+    	float: right;
+	}
+	& > div:nth-child(2) {
+		height: 362px;
+		overflow: auto;
+		border: 1px solid #CCC;
+	}
+	
+	& table{
+		width: 100%;
+	}
+	& tr{
+		width: 100%;
+		&:hover{
+			background: #A8DBFD;
+		}
+		& td{
+			vertical-align: middle;
+			height: 32px;
+			color: #666;
+		}
+		& td:first-child{
+			& .checkClass{
+				width: 20px;
+			    height: 27px;
+			    display: none;
+			    margin-left: 16px;
+			    background: url(/static/dist/images/comm/images/commIcon.png) no-repeat -40px -13px;
+			}
+			& .unCheckClass{
+			    display: block;
+			}
+		}
+		& td:nth-child(2){
+			width: 45%;
+		}
+		& td:last-child{
+			width: 45%;
+		}
+		&.selected {
+		}
 	}
 }
 
@@ -82,6 +145,16 @@
 			margin-top: 100px;
 			margin-bottom: 20px;
 		}
+		
+		& input[type='file']{
+			    position: absolute;
+			    top: 186px;
+			    left: 160px;
+			    height: 40px;
+			    width: 80px;
+			    opacity: 0;
+		}
+		
 	}
 	& .cutImage{
 		width: 200px;

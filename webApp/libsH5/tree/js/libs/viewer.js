@@ -69,7 +69,7 @@ var BIM = function(option){
     bimBox.appendChild(viewBox);
     _opt.element.appendChild(bimBox);
     viewer.init(viewBox);
-    // self.client = viewer.load(_opt.etag,BIM.common.severModel);
+    self.client = viewer.load(_opt.etag,BIM.common.severModel);
     if(_opt.resize){
       _util.listener(window,'resize',function(){
         var _width = viewBox.clientWidth,
@@ -588,6 +588,10 @@ BIM.prototype = {
     BIM.util.off(key,callback);
     return this;
   },
+  pub:function(key,args){
+    BIM.util.pub(key,args);
+    return this;
+  },
   subscribers:BIM.util.subscribers,
   zoom : function () {
     BIM.common.bimBox.className = 'bim';
@@ -605,9 +609,9 @@ BIM.prototype = {
   zoomSelected : function () {
     BIM.common.viewer.zoomToSelection();
   },
-  fit : function (id) {
+  fit : function () {
     BIM.util.pub('fit');
-    BIM.common.viewer.zoomToSelection(id);
+    BIM.common.viewer.zoomToSelection();
   },
   home : function () {
     BIM.util.pub('home');

@@ -7,7 +7,7 @@ App.Project = {
 	},
 
 	GetRequest() {
-		var url = location.search; //获取url中"?"符后的字串 
+		var url = location.search; //获取url中"?"符后的字串
 		var theRequest = new Object();
 		if (url.indexOf("?") != -1) {
 			var str = url.substr(1);
@@ -98,7 +98,7 @@ App.Project = {
 						return;
 					}
 
-					 
+
 					//dwg 格式
 					if (data.data.suffix=="dwg") {
 						App.Project.renderDwg(data.data.modelId);
@@ -120,20 +120,22 @@ App.Project = {
 	renderOther(modelId) {
 
 		$(".rightProperty").show();
-
-		App.Project.Settings.Viewer = new BIM({
-			single: true,
-			element: $("#modelBox")[0],
-			etag: modelId,
-			tools: true
+		App.Project.Settings.Viewer = new familyModel({
+			element: $("#modelBox"),
+			etag: modelId
 		});
+
+		// 获取familyType
+		App.Project.Settings.Viewer.on("changType",function(id){
+			console.log(id)
+		})
 
 		App.Project.Settings.modelId = modelId;
 		App.Project.Settings.Viewer.on("click", function(model) {
 
 			if (!model.intersect) {
 				return;
-			} 
+			}
 			//渲染属性
 			App.Project.renderAttr(model.intersect.userId);
 
@@ -142,8 +144,8 @@ App.Project = {
 
 	//渲染dwg 文件
 	renderDwg(modelId) {
-		
-		
+
+
 		$("#modelBox").addClass("dwg");
 
 		var viewer = new dwgViewer({
