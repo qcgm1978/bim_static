@@ -22,13 +22,9 @@ App.Services.roleDetail=Backbone.View.extend({
     },
 
     modify:function(){
-
         App.Services.roleModify = this.model;
-
-        this.window();
+        this.window("修改角色");
         this.recognize();
-        //加载功能，给已角色有的功能选择状态
-
     },
 
     //区分修改与浏览
@@ -56,9 +52,9 @@ App.Services.roleDetail=Backbone.View.extend({
         });
     },
 
-
+    //查看
     explorer:function(){
-        this.window();
+        this.window("查看角色");
         this.recognize(function(){
             //隐藏可选项
             $(".memCheck").hide();
@@ -67,13 +63,12 @@ App.Services.roleDetail=Backbone.View.extend({
 
     },
 
-
     //弹窗
-    window:function(){
+    window:function(title){
         var frame = new App.Services.roleWindowIndex().render().el;
         //初始化窗口
         App.Services.maskWindow = new App.Comm.modules.Dialog({
-            title:"新建角色",
+            title:title,
             width:600,
             height:500,
             isConfirm:false,
@@ -85,31 +80,20 @@ App.Services.roleDetail=Backbone.View.extend({
         });
     },
 
-    delete:function(){
-
-
-
-        var frame = new App.Services.windowAlert().render().el;
-
+    //删除角色
+    delete:function() {
+        var frame = new App.Services.windowAlert().render().el,alertInfo = "确认删除角色 " + (this.model.get("name") ||  "未知")+"<br> id为"+this.model.get("roleId")  +"么？";
         App.Services.deleteRoleInfo = this.model;//将model携带至弹窗view
-
         App.Services.alertWindow = new App.Comm.modules.Dialog({
-            title:"",
-            width:280,
-            height:180,
-            isConfirm:false,
-            isAlert:false,
-            message:frame
+            title: "",
+            width: 280,
+            height: 180,
+            isConfirm: false,
+            isAlert: false,
+            message: frame
         });
-        $(".mod-dialog .wrapper .header").hide();
-
-
-    },
-
-    alertWindow:function(){
-
-
-
+        $(".mod-dialog .wrapper .header").hide();//隐藏头部
+        $(".alertInfo").html(alertInfo);
     }
 });
 

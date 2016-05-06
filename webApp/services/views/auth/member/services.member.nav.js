@@ -20,27 +20,21 @@ App.Services.MemberNav=Backbone.View.extend({
     },
     //外部用户
     outer:function(){
-        //this.loadData("outer");
         App.Services.MemberType = "outer";
         this.loadData();
-        //App.Services.Member.loadData(App.Services.Member.outerCollection);
     },
     //内部用户
     inner:function(){
-        //this.loadData("inner");
         App.Services.MemberType = "inner";
-
-        //App.Services.Member.loadData(App.Services.Member.innerCollection);
+        $("#dataLoading").show();
         this.loadData();
     },
     //加载子组织，刷新右侧组织和员工列表
     loadData:function(){
         var _thisType = App.Services.MemberType;
         var collection = App.Services.Member[_thisType + "Collection"];
-        $("#pageLoading").show();
         //获取数据，将会刷新右侧视图
         App.Services.Member.loadData(collection,{},function(response){
-            $("#pageLoading").hide();
             $("#blendList").empty();//清空右侧列表
             //加载右侧数据
             //菜单
@@ -54,6 +48,7 @@ App.Services.MemberNav=Backbone.View.extend({
                 this.$(".childOz").empty();
                 //菜单渲染
                 this.$("#" + _thisType +"+ .childOz").html(new App.Services.MemberozList(response.data.org).render().el);
+                $("#dataLoading").hide();
             }
         });
     }

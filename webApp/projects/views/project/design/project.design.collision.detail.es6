@@ -49,7 +49,9 @@ App.Project.DesignCollisionDetail=Backbone.View.extend({
               ids:[item.leftId,item.rightId]
             },
             box=[item.leftElementBoxMin,item.leftElementBoxMax,item.rightElementBoxMin,item.rightElementBoxMax];
-        App.Project.Settings.Viewer.highlight(ids);
+        App.Project.Settings.Viewer.selectIds(ids);
+        App.Project.Settings.Viewer.setGlobalTransparent(true);
+        $(".bar-opacity").addClass('selected');
         App.Project.Settings.Viewer.zoomBox(box);
       }
     });
