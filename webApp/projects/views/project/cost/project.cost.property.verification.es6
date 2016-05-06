@@ -79,7 +79,7 @@ App.Project.CostVerification = Backbone.View.extend({
 		}
 		//未加载过
 		var data = {
-			URLtype: "fetchCostModleIdByCode",
+			URLtype: "fetchNoCostCate",
 			data: {
 				projectId: App.Project.Settings.projectId,
 				projectVersionId: App.Project.Settings.CurrentVersion.id,
