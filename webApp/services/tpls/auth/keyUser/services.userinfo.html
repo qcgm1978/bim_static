@@ -15,7 +15,7 @@
                 <ul>
 
                     <% for(var i=0;i<info.project.length;i++){ %>
-                    <li><div class="name"><span class="proImg"><img src="/static/dist/images/service/images/keyUser_proImg.gif" width="100%"></span><a href="#"><%= info.project[i]['name'] %></a></div><div class="time"><%= new Date(info.project[i]['createTime'] || 0).Format("yyyy-MM-dd")%><%= info.project[i]['openTime']?"--"+new Date(info.project[i]['openTime']).Format("yyyy-MM-dd"):''%></div><div><%= info.project[i]['province'] %></div></li>
+                    <li><div class="name"><span class="proImg"><img src="/static/dist/images/service/images/keyUser_proImg.gif" width="100%"></span><a href="#"><%= info.project[i]['name'] %></a></div><div class="time"><%= new Date(info.project[i]['createTime'] || 0).Format("yyyy-MM-dd")%><%= info.project[i]['openTime']?"--"+new Date(info.project[i]['openTime']).Format("yyyy-MM-dd"):''%></div><div><%= info.project[i]['province']||'   ' %></div></li>
 
                     <% } %>
 
