@@ -84,6 +84,7 @@ App.Services.ImageJcrop=Backbone.View.extend({
 		})
 		
 		$("#cutImageBtn").on('click',function(){
+			debugger
 			var j=_$timg.data().Jcrop.tellSelect();
 			$("#dataLoading").show();
 			$.ajax({
@@ -111,7 +112,8 @@ App.Services.ImageJcrop=Backbone.View.extend({
 	render(imagePath,projectId){
 		var _this=this;
 		var data={
-			oldImage:imagePath
+			oldImage:imagePath,
+			projectId:projectId
 		}
 		this._projectId=projectId;
 		this.$el.html(_.template(this.template)(data));   

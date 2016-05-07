@@ -67,6 +67,14 @@ App.Services.ProjectLink=Backbone.View.extend({
 			}).done(function(data){
 				$("#dataLoading").hide();
 				App.Global.module.close();
+				
+				let collectionMap=App.Services.ProjectCollection.ProjecMappingCollection;
+		 		collectionMap.projectId=projectId;
+		 		collectionMap.fetch({
+		 			reset:true,
+		 			success(child, data) {}
+		 		});
+				
 			})
 		}
 	},

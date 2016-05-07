@@ -18,6 +18,9 @@ App.Services.ProjectMapping=Backbone.View.extend({
 	},
 
 	render(data){
+		if(!data){
+			return this;
+		}
 		data=data.toJSON()[0];
 		var _array=[];
 		if(data){
@@ -42,8 +45,7 @@ App.Services.ProjectMapping=Backbone.View.extend({
     	
     	var _html=_.template(this.template);
 		this.$el.html(_html({items:_array}));  
-		$(".projectContainer .projectMapping").html(this.$el);
-		
+	//	$(".projectContainer .projectMapping").html(this.$el);		
 		return this;
 	},
 	

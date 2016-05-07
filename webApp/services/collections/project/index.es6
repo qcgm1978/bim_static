@@ -43,6 +43,7 @@ App.Services.ProjectCollection = {
 			if (response.code == 0) {
 				var data=response.data;
 				data.logo=data.logo ? data.logo['200x150']:"";
+				data.logo=data.logo+'?t='+new Date().getTime();
                 return data;
             }
 		}
@@ -61,6 +62,7 @@ App.Services.ProjectCollection = {
 			if (response.code == 0) {
 				var data=response.data;
 				data.logo=data.logo ? data.logo['200x150']:"";
+				data.logo=data.logo+'?t='+new Date().getTime();
                 return data;
             }
 		}
