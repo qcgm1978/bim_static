@@ -64,11 +64,14 @@ App.Services.ImageJcrop=Backbone.View.extend({
 						}
 				},
 				onSelect:function(c){
-					 
-					w= c.w;
-							h=c.h;
-							x=c.x;
-							y=c.y;
+					var sourceWidth=$('#preImageSource').width(),
+						sourceHeight=$('#preImageSource').height(),
+						px=sourceWidth/boundx,
+						py=sourceHeight/boundy;
+					w= Math.round(c.w*px);
+					h= Math.round(c.h*py);
+					x= Math.round(c.x*px);
+					y= Math.round(c.y*py);
 				}
 			},function(){
 				 
@@ -87,9 +90,7 @@ App.Services.ImageJcrop=Backbone.View.extend({
 				type:"post",
 				url:'/platform/project/'+_this._projectId+'/logo/cut?x='+x+'&y='+y+'&w='+w+'&h='+h
 			}).done(function(data){
-
 				$("#preImageSource").remove();
-
 				$("#dataLoading").hide();
 				if(data.message=='success'){
 					App.Services.maskWindow.close();
