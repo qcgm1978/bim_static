@@ -8,7 +8,7 @@
 	<li class="member">
 	  <span class="<% if(item.org){ %>iconFile<% }else{ %>iconUser<% } %>"></span>
 	  <p><span class="name"><%= item.name %></span>  <span class="direction"><%= item.project %></span></p>
-	  <div class="remove" data-type="<% if(item.org){ %>org<% }else{ %>user<% } %>" data-user="<%= item.id %>" data-userName="<%= item.name %>"><i style="background:url('/static/dist/images/services/images/service_ico.png')no-repeat 0 -280px"></i>移除</div>
+	  <div class="remove" data-outer="<%= item.outer %>" data-type="<% if(item.org){ %>org<% }else{ %>user<% } %>" data-user="<%= item.id %>" data-userName="<%= item.name %>"><i style="background:url('/static/dist/images/services/images/service_ico.png')no-repeat 0 -280px"></i>移除</div>
 	</li>
 <% }) %>
 

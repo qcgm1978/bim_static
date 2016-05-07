@@ -78,7 +78,7 @@ ViewComp.MemberManager = Backbone.View.extend({
 	},
 	
 	loadChildren:function(_this,outer,parentId,treeNode){
-		
+		$('#dataLoading').show();
 		var setting = {
 				callback: {
 					onDblClick: function(event, treeId, treeNode) {
@@ -118,6 +118,9 @@ ViewComp.MemberManager = Backbone.View.extend({
 					_this.selectTree.addNodes(treeNode,zNodes);
 				}
 			}
+			$('#dataLoading').hide();
+		}).fail(function(){
+			$('#dataLoading').hide();
 		})
 	},
 	
