@@ -43,6 +43,7 @@ App.Services.ApplicationListDetail = Backbone.View.extend({
 
 			var data = {
 				URLtype: "appResetSecret",
+				type:"PUT",
 				data: {
 					id: id
 				}
