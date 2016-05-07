@@ -70,23 +70,14 @@
                 },
 
                 //上传成功
-                fileUploaded: function(response, file) {
-
-                    // App.Project.FileCollection.push({
-                    //     "fileBg": "/projects/images/proDefault.png",
-                    //     "fileName": file.name,
-                    //     "fileStatus": "待上传",
-                    //     "fileOp": "赵子良",
-                    //     "fileSize": "302M",
-                    //     "fileDate": "2016-6-3 20:20:54"
-                    // });
-                    // console.log(file);
-                    //$.jps.publish('add-upload-file', response, file)
+                fileUploaded: function(response, file) {  
+                     var data=JSON.parse(response.response);
+                     App.Project.FileCollection.push(data.data); 
                 },
 
                 //上传失败
                 uploadError: function(file) {
-                    //App.Comm.modules.util.actionTip('上传失败:' + file.message + '。文件：' + file.file.name)
+                    alert('上传失败:' + file.message + '。文件：' + file.file.name)
                 }
             })
             self.updateQuotaInfo()
