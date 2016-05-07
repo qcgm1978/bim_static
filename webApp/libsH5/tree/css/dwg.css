@@ -40,6 +40,9 @@
 .mod-bar .bar-zoomRect{
   background-position:0 -864px;
 }
+.mod-bar .bar-fly{
+  background-position:0 -224px
+}
 .mod-bar .bar-fit.selected{
   background-position:-32px -128px;
 }
@@ -51,6 +54,9 @@
 }
 .mod-bar .bar-zoomRect.selected{
   background-position:-32px -864px;
+}
+.mod-bar .bar-fly.selected{
+  background-position:-32px -224px;
 }
 .mod-bar .mod-select{
   float:left;
@@ -96,7 +102,6 @@
   border-bottom:none;
 }
 .mod-bar .mod-select .mod-list li{
-  height:25px;
   line-height:25px;
   padding: 5px;
   white-space:nowrap;

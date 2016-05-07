@@ -31,7 +31,10 @@ App.API = {
 		fetchServicesMemberOuterList:'platform/auth/org?outer=true',//外部组织-品牌／公司／成员列表
 		fetchServicesMemberInnerList:'platform/auth/org?outer=false',//内部-组织／成员列表
 		deleteServicesRoleSingle:"platform/role?",//删除角色
-		fetchServiceKeyUserList:'platform/auth/org?outer=false&parentId=&includeUsers=',//关键用户列表
+		fetchServiceKeyUserList:'platform/auth/keyUser',//关键用户列表
+		fetchServiceKeyUserEdit:'platform/auth/keyUser/{uid}',//修改关键用户
+		fetchServiceKeyUserInfo:'platform/auth/keyUser/{uid}',//获取个别关键用户信息
+		fetchServiceKeyUserDelete:'platform/auth/keyUser/{uid}',//删除关键用户
 		fetchServiceStep1:'platform/auth/org?outer=false&parentId=&includeUsers=',//项目列表
 
 
@@ -211,6 +214,8 @@ App.API = {
 		fetchServicesUserRoleList:'/dataJson/services/member/services.user.role.json',//用户角色列表
 		fetchServicesMemberOuterList:'/dataJson/services/member/services.member.list.json',//外部组织-品牌／公司／成员列表
 		fetchServicesMemberInnerList:'/dataJson/services/member/services.member.list.json',//内部-组织／成员列表
+		fetchServiceKeyUserEdit:'platform/auth/keyUser/{uid}',//修改关键用户
+		fetchServiceKeyUserDelete:'platform/auth/keyUser/{uid}',//删除关键用户
 
 		//
 		fetchServicesProjectMemberProjectList:'/dataJson/services/member/services.project.member.projects.json',//项目成员/项目管理

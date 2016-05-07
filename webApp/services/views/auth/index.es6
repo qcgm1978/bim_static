@@ -18,6 +18,32 @@ App.Services.Auth = Backbone.View.extend({
 		this.$(".serviceBody .content").html(new App.Services.MemberList().render().el);//主体列表
 		$("#dataLoading").show();
 		App.Services.MemberType = "inner";//设置默认类型
+
+		//内部用户
+	/*	var innerCollection = new(Backbone.Collection.extend({
+			model:Backbone.Model({
+				defaults:""
+			}),
+			urlType: "fetchServicesMemberInnerList",
+			parse: function (response) {
+				if (response.message == "success") {
+					return App.Services.Member.list(response);
+				}
+			}
+		}));*/
+
+		//App.Services.Member.loadData(innerCollection,{},function(response){
+		//	if (response.data.org && response.data.org.length) {
+		//		//样式处理
+		//		$("#inner").addClass("active");
+		//		$("#inner span").addClass("active");//唯一选项
+		//		//菜单渲染
+		//		$("#inner + .childOz").html(new App.Services.MemberozList(response.data.org).render().el);
+		//		$("#dataLoading").hide();
+		//	}
+		//});
+
+
 		App.Services.Member.loadData(App.Services.Member.innerCollection,{},function(response){
 			if (response.data.org && response.data.org.length) {
 				//样式处理
