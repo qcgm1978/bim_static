@@ -12,18 +12,15 @@ App.Services.windowRoleList=Backbone.View.extend({
         return this;
     },
     initialize:function(){
-       this.listenTo(App.Services.role.collection,"add",this.addOne);
-       this.listenTo(App.Services.role.collection,"reset",this.render);
+       this.listenTo(App.Services.Member.SubRoleCollection,"add",this.addOne);
+       this.listenTo(App.Services.Member.SubRoleCollection,"reset",this.render);
     },
     addOne:function(model){
         var newView = new App.Services.windowRoleDetail({model:model});
         this.$("ul").append(newView.render().el);
     },
-
     //排序
-    comparator:function(){
-
-    }
+    comparator:function(){}
 });
 
 

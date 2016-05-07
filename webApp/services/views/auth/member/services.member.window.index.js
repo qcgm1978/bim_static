@@ -35,18 +35,7 @@ App.Services.MemberWindowIndex = Backbone.View.extend({
             });
         }
 
-        //根用户无法赋予权限
-        //if(){}
-
-
-        //提交 角色变更
-      /*  App.Comm.ajax({
-            URLtype:"putServicesSaveRole",
-            data:submitData
-        },function(response){
-            console.log(response);
-        });
-*/
+   
 
         $.ajax({
             type:"POST",

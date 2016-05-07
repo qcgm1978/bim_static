@@ -56,7 +56,7 @@ App.Services.Member ={
     })),
 
     //存储角色
-    SubRole : new(Backbone.Collection.extend({
+    SubRoleCollection : new(Backbone.Collection.extend({
         model: Backbone.Model.extend({
             defaults: function() {
                 return {
@@ -67,7 +67,7 @@ App.Services.Member ={
         urlType: "fetchServicesSaveRole",
         parse: function (response) {
             if (response.message == "success") {
-                return response.success;
+                return response.data;
             }
         }
     })),

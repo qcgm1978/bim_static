@@ -13,8 +13,6 @@ App.Services.memberDetail=Backbone.View.extend({
 
     render:function(){
         this.$el.html(this.template(this.model.toJSON()));
-        console.log(this.model);
-        this.getRole();//写入角色
         return this;
     },
 
@@ -26,10 +24,6 @@ App.Services.memberDetail=Backbone.View.extend({
             var userUrl ="http://bim.wanda-dev.cn/platform/auth/user/"+ userId  +"/role?outer=" +  !(App.Services.MemberType == "inner");
             this.blendRole(userUrl,this.writeRole);
         }else if(orgId){
-            if(orgId ==1){//根用户
-                App.Services.role.loadData(this.writeRole);
-                return
-            }
             var orgUrl ="http://bim.wanda-dev.cn/platform/auth/org/"+ orgId  +"/role?outer=" +  !(App.Services.MemberType == "inner");
             this.blendRole(orgUrl,this.writeRole);
         }
@@ -63,31 +57,33 @@ App.Services.memberDetail=Backbone.View.extend({
     initialize:function(){
         this.model.set({"checked":false});//预先设置属性
         this.listenTo(this.model, 'checked:change', this.render);
+        this.getRole();//写入角色
     },
 
     //弹窗
     spread:function(){
+        var url;
         $("#dataLoading").show();
         var type =  App.Services.MemberType,_this =this;
         var frame = new App.Services.MemberWindowIndex().render().el;//外框
         //获取单选所选项的角色列表
         var userId = this.model.get("userId");
         var orgId  = this.model.get("orgId");
-        var parentId = $("#ozList").find("span.active").parent(".ozName").data("id") || 1;//父项id
+        var parent = $("#ozList").find("span.active").parent(".ozName");//父项id
         //窗口及数据
         _this.window(frame);
         $(".seWinBody .aim ul").append(new App.Services.MemberWindowDetail({model:_this.model}).render().el);//当前用户
         $(".memRoleList").append(new App.Services.windowRoleList().render().el);//角色列表
         //根用户
-        if(orgId ==1 || parentId ==1){
-            App.Services.role.loadData(function(){
+        if(!parent.data("id")){
+            App.Services.Member.loadData(App.Services.Member.SubRoleCollection,{},function(response){
                 $("#dataLoading").hide();
             });
             return
         }
 
         //单选是清空数据选项，清空已选数据（包括列表数据和弹窗数据）
-        App.Services.ozRole.collection.each(function(item){
+        App.Services.Member.SubRoleCollection.each(function(item){
             item.set("checked",false);
         });
         App.Services.Member[type + "Collection"].each(function(item){
@@ -96,17 +92,16 @@ App.Services.memberDetail=Backbone.View.extend({
         this.chooseSelf();//处理选中状态
 
         //保存弹窗数据方便提交
-        var saveType =  App.Services.MemberType;
-        if(saveType){
+        if(type){
             if(userId){
-                App.Services.memberWindowData[saveType].orgId.push(userId);
+                App.Services.memberWindowData[type].orgId.push(userId);
             }else if(orgId){
-                App.Services.memberWindowData[saveType].orgId.push(orgId);
+                App.Services.memberWindowData[type].orgId.push(orgId);
             }
         }
 
         //获取父项数据
-        var url = "http://bim.wanda-dev.cn/platform/auth/org/"+ parentId  +"/role?outer=" +  !(App.Services.MemberType == "inner");
+        url = "http://bim.wanda-dev.cn/platform/auth/org/"+ parent.data("id")   +"/role?outer=" +  !(type == "inner");
         this.ajaxRole(url,frame,function(response){
             //获取自身数据
             //因为接口无法设置角色，所以此处暂停
@@ -191,9 +186,6 @@ App.Services.memberDetail=Backbone.View.extend({
                         App.Services.ozRole.collection.add(item);
                     });
                     $("#dataLoading").hide();
-                    if(frame){
-                        _this.window(frame);
-                    }
                     if(fn && typeof fn =="function"){
                         fn(response);
                     }

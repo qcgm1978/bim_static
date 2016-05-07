@@ -93,15 +93,14 @@ App.Services.MemberList=Backbone.View.extend({
         this.saveData(seleUser); //缓存已选数据相关数据方便提交
 
         //取得父项的角色列表
-        var parentId = $("#ozList").find("span.active").parent(".ozName").data("id");
+        var parentId = $("#ozList").find("span.active").parent(".ozName").data("id") ;
         //无父项时获取缺省角色列表，此处为可能出错解释
-        if(!parentId || parentId ==1){
-            App.Services.role.loadData(function(){
+        if(!parentId){
+            App.Services.Member.loadData(App.Services.Member.SubRoleCollection,{},function(response){
                 $("#dataLoading").hide();
             });
-            return;
+            return
         }
-        //多选取得父项机构的角色列表
         url = "http://bim.wanda-dev.cn/platform/auth/org/"+ parentId  +"/role?outer=" +  !(type == "inner");
         this.ajaxRole(url,frame);
     },

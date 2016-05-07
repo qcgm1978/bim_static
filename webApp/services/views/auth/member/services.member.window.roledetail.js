@@ -16,7 +16,6 @@ App.Services.windowRoleDetail=Backbone.View.extend({
     initialize:function(){
         this.listenTo(this.model,"change:checked",this.checked);
     },
-
     //加载判断
     checked:function(){
         if(this.model.get("checked")){

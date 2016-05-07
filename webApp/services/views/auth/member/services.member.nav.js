@@ -47,8 +47,11 @@ App.Services.MemberNav=Backbone.View.extend({
                 _this.$(".childOz").empty();
                 //菜单渲染
                 $("#" + _thisType +"+ .childOz").html(new App.Services.MemberozList(response.data.org).render().el);
-                $("#dataLoading").hide();
             }
+            if(!response.data.org.length){
+                $("#blendList").html("<li>&nbsp;&nbsp;&nbsp;&nbsp;暂无数据!</li>");
+            }
+            $("#dataLoading").hide();
         });
     }
 });

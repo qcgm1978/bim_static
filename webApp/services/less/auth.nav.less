@@ -18,7 +18,7 @@ ul,li{list-style: none outside none;}
 /*???????*/
 #blendList{height: 500px;overflow: auto;}/*???????�????*/
 .serviceBody{position: absolute;top:129px;left:0;right:0;bottom:0;}
-.serviceBody .menu{ bottom: 0px; position: absolute;left: 0;top: 0;width: 270px;border: 1px solid #ccc;border-top: none;background-color: #ffffff;}
+.serviceBody .menu{ bottom: 0px; position: absolute;left: 0;top: 0;width: 270px;border: 1px solid #ccc;border-top: none;background-color: #ffffff;;height: 100%;overflow: auto;}
 .serviceBody .menu li{line-height: 25px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;}
 .serviceBody .menu li span{padding: 2px 3px;cursor: pointer;}
 .serviceBody .menu li span.active{background-color: #a8dbfd;}
@@ -57,6 +57,8 @@ ul,li{list-style: none outside none;}
 .serviceBody li .roles span.inherit:before{background-position:  0 -560px;}
 .serviceBody  .rohead{display: inline-block;width: 23px;height: 15px;vertical-align: middle; background: url("../images/service_ico.png") 0 -500px no-repeat;margin-right: 10px;}
 
+.serviceBody .roleCtrl{height: 100%;}
+#roleList{overflow: auto;position: absolute;top: 50px;left: 0;right: 0;bottom: 0;}
 .roleCtrl li{clear: both;line-height: 50px;padding:0 22px;height: 50px;}
 .roleCtrl .roleHead{padding:0 22px;line-height: 50px;font-size: 12px;color: #a7a7a7;}
 .roleCtrl .roleHead .newRole{position: relative;cursor: pointer;display: inline-block;line-height: 28px;height: 30px;vertical-align: middle;padding: 0 8px 0 32px;border: 1px solid #cccccc;margin-left: 24px;}
@@ -106,6 +108,7 @@ ul,li{list-style: none outside none;}
 //弹窗角色列表
 .memRoleList li{position: relative;}
 .memRoleList li .fun {overflow: hidden;text-overflow: ellipsis;white-space: nowrap;border: 1px solid #ffffff;}
+.memRoleList li.active .fun{border-color:#a8dbfd; }
 .memRoleList li .fun:hover {width: 327px;z-index: 10;line-height: 24px;;position: absolute;border: 1px solid #eeeeee;background-color: #ffffff;left: 170px;top: 1px;overflow: auto;word-break: keep-all;white-space: normal;padding-left: 15px;border-radius: 3px;box-shadow: 1px 1px 3px #333333;}
 .memRoleList .fun span{padding-left: 16px;position: relative;white-space: nowrap;}
 .memRoleList .fun span:before{.background-ioc;content: "";position: absolute;width: 11px;height: 11px;top: 3px;left: 0;background-position: 0 -200px}
@@ -142,4 +145,3 @@ ul,li{list-style: none outside none;}
 .servicesAlert .alert{text-align: center;display: none;}
 .servicesAlert .confirm input{outline: none;}
 
-#roleList{overflow: auto;height: 766px;}
