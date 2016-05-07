@@ -8,7 +8,8 @@ App.Services.ProjectLink=Backbone.View.extend({
 	
 	events:{
 		'click tr':'selectProject',
-		'click #linkBtn':'linkProject'
+		'click #linkBtn':'linkProject',
+		'keydown #inputProjectSerach':'updateList'
 	},
 
 	template:_.templateUrl('/services/tpls/project/project.list.html',true),
@@ -20,6 +21,9 @@ App.Services.ProjectLink=Backbone.View.extend({
 	render(){
 		var _this=this;
 		_this.loadData(function(data){
+			
+			_this.projectData=data;
+		
 			var _tpl=_.template(_this.template);
 			_this.$el.html(_tpl(data));
 		});
@@ -64,6 +68,20 @@ App.Services.ProjectLink=Backbone.View.extend({
 				App.Global.module.close();
 			})
 		}
+	},
+	
+	updateList(e){
+		if(e.keyCode!='13'){
+			return
+		}
+		
+		var t=$(e.currentTarget).val();
+		var d=this.projectData.data||[];
+		var r=d.filter(function(i){
+			return i.projectName.indexOf(t)!==-1;
+		})
+		var _tpl=_.template(this.template);
+		this.$el.html(_tpl({data:r}));
 	}
 
 });

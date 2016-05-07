@@ -27,6 +27,7 @@
 				height: 150px;
 				position: relative;
 				overflow-y: hidden;
+				background-size: cover;
 				& label{
 					position: absolute;
 					bottom: -26px;
@@ -142,8 +143,11 @@
 			display: none;
 		}
 		& input[type='button']{
-			margin-top: 100px;
-			margin-bottom: 20px;
+			position: absolute;
+		    top: 186px;
+		    left: 160px;
+		    height: 40px;
+		    width: 80px;
 		}
 		
 		& input[type='file']{
@@ -153,6 +157,13 @@
 			    height: 40px;
 			    width: 80px;
 			    opacity: 0;
+		}
+		
+		& p {
+			 position: absolute;
+			    top: 246px;
+			    height: 40px;
+			    left: 52px;
 		}
 		
 	}

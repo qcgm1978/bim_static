@@ -1,6 +1,5 @@
 <div class="imageJcrop">
 	<div class="previewImage">
-		<img id="tempImage" src=""/>
 		<form id="uploadImageForm" action="/platform/project/1/logo" method="post" target="upload-iframe" enctype="multipart/form-data" encoding="multipart/form-data">
 			<input id="selectBtn" type="button" value="选择文件" class="myBtn">
 			<input id="inputFile" name="fileField" type="file"/>
@@ -9,7 +8,7 @@
 		<p> 支持jpg,jpeg,gif,png,bmp图片文件，大小限制2M以内</p>
 	</div>
 	<div class="cutImage">
-		<img id="preImage" class="jcrop-preview" src="<%= oldImage %>"/>
+
 	</div>
 	<input id="cutImageBtn" type="button" value="确定" class="myBtn myBtn-primary">
 </div>

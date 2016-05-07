@@ -15,6 +15,11 @@ App.Services.KeyUser = {
   //暂存已被选关键用户的orgId数组
   orgId : [],
 
+  //暂存被编辑的关键用户的项目ID数组
+  editpid : [],
+
+  //暂存被编辑的关键用户的orgId数组
+  editorgId : [],
   //暂存已被选关键用户step1的html
   html : [],
 
@@ -25,6 +30,16 @@ App.Services.KeyUser = {
   html3 : [],
 
   userList:[],
+
+  //清空暂存的数据
+  clearAll: function(){
+    this.uid   = [];
+    this.pid   = [];
+    this.orgId = [];
+    this.html  = [];
+    this.html2 = [];
+    this.html3 = [];
+  },
 
   loadData : function(collection,data,fn) {
 

@@ -30,7 +30,7 @@ App.Services.keyUserFrame = Backbone.View.extend({
         return this;
     },
 
-    //切换active状态
+    //切换active状态并且初始化右边的userinfo VIEW
     toggleClass:function(e){
         if($(e.target).hasClass('delete')){
             return
@@ -51,6 +51,8 @@ App.Services.keyUserFrame = Backbone.View.extend({
             if (data.code==0) {
                 console.log(data)
                 App.Services.KeyUser.fakedata=data.data;
+                App.Services.KeyUser.editpid=_.pluck(data.data.project,'id');
+                App.Services.KeyUser.editorgId=_.pluck(data.data.org,'orgId');
                 new App.Services.userinfo().render();
 
             }
@@ -61,12 +63,7 @@ App.Services.keyUserFrame = Backbone.View.extend({
 
     //提交表单，完毕会触发重新获取列表，列表为memBlend所属列表
     newKeyUser:function(){
-        App.Services.KeyUser.uid=[];
-        App.Services.KeyUser.pid=[];
-        App.Services.KeyUser.orgId=[];
-        App.Services.KeyUser.html=[];
-        App.Services.KeyUser.html2=[];
-        App.Services.KeyUser.html3=[];
+        App.Services.KeyUser.clearAll();
         App.Services.maskWindow=new App.Comm.modules.Dialog({title:'新增关键用户',width:600,height:500,isConfirm:false});
         $('.mod-dialog .wrapper').html(new App.Services.addKeyUser().render().el);
 
@@ -75,28 +72,43 @@ App.Services.keyUserFrame = Backbone.View.extend({
     //delete
     delete : function(e){
         var uid = $(e.target).attr('data-uid');
+        var $li = $(e.target).parent();
+        var username = $(e.target).attr('data-name');
+        var $usernum = this.$el.find('.usernum');
 
+        App.Services.maskWindow=new App.Comm.modules.Dialog({
+            title:'确认要删除关键用户“'+username+'”？',
+            width:280,
+            message:'删除该关键用户后，该用户将不能继续管理项目',
+            height:180,
+            isConfirm:true,
+            okCallback:function(){
+                var data={
+                    URLtype :"fetchServiceKeyUserDelete",
+                    type:"DELETE",
+                    data:JSON.stringify({uid : uid})
 
-        var data={
-            URLtype :"fetchServiceKeyUserDelete",
-            type:"DELETE",
-            data:JSON.stringify({uid : uid})
+                    //contentType:"application/json"
+                };
+                App.Comm.ajax(data,function(data){
+                    if (data.code==0) {
+                        $li.remove();
+                        $('.mod-dialog,.mod-dialog-masklayer').hide();
+                        $usernum.text($usernum.text()-1);
+                    }
 
-            //contentType:"application/json"
-        };
-        App.Comm.ajax(data,function(data){
-            if (data.code==0) {
-                console.log(data)
+                });
+            },
+            cancelCallback:function(){
+                $('.mod-dialog,.mod-dialog-masklayer').hide();
             }
 
         });
+
+
     },
 
 
-
-    add:function(){
-       this.render()
-    },
 
     //userinfo
     userinfo:function(){
@@ -104,17 +116,9 @@ App.Services.keyUserFrame = Backbone.View.extend({
     },
 
     initialize:function(){
-        App.Services.KeyUser.loadData(App.Services.KeyUser.Step2,'',function(r){
-            console.log(r)
-
-            if(r && !r.code && r.data){
-                App.Services.KeyUser.projects=r.data.items;
-
-            }
-        });
 
 
-        this.listenTo(App.Services.KeyUser.KeyUserList,'add',this.add);
+        this.listenTo(App.Services.KeyUser.KeyUserList,'add',this.render);
         this.listenTo(App.Services.KeyUser.userinfo,'add',this.userinfo);
     }
 });
