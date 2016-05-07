@@ -51,8 +51,8 @@ App.Services.keyUserFrame = Backbone.View.extend({
             if (data.code==0) {
                 console.log(data)
                 App.Services.KeyUser.fakedata=data.data;
-                App.Services.KeyUser.editpid=_.pluck(data.data.project,'id');
-                App.Services.KeyUser.editorgId=_.pluck(data.data.org,'orgId');
+                //App.Services.KeyUser.editpid=_.pluck(data.data.project,'id');
+                //App.Services.KeyUser.editorgId=_.pluck(data.data.org,'orgId');
                 new App.Services.userinfo().render();
 
             }
