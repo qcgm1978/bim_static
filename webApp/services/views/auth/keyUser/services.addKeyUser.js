@@ -46,7 +46,7 @@ App.Services.addKeyUser = Backbone.View.extend({
         //遍历本身存在的项目数据添加到右边窗口
         var str = '',projs=App.Services.KeyUser.fakedata.project,pid=App.Services.KeyUser.editpid=[];
         for(var i=0;i<projs.length;i++){
-          var p = porjs[i];
+          var p = projs[i];
           pid.push(p['id']);
           str += "<li class='proj-right' data-id="+p['id']+"><i class='proj-remove'></i>"+
             "<h3 data-id="+p['id']+">"+p['name']+"</h3>"+
