@@ -2,12 +2,12 @@
         <div class="keyUserList">
             <div class="keyul-title">
                 <span class="newKeyUsers"><i style="background:url('/static/dist/images/services/images/service_ico.png')no-repeat 0 -220px"></i>新增</span>
-                关键用户（<span><%= keyUser.length %></span>）
+                关键用户（<span class="usernum"><%= keyUser.length %></span>）
             </div>
             <ul>
                 <% _.each(keyUser,function(user,index){ %>
                 <li data-index="<%= index %>"data-uid="<%= user.userId %>">
-                    <span data-uid=<%= user.userId %> class="delete"></span>
+                    <span data-uid=<%= user.userId %> data-name=<%= user.name %>  class="delete"></span>
                     <i class="keyListHead"></i><%= user.name %>
                 </li>
                 <% })%>
