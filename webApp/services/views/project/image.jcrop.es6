@@ -28,9 +28,16 @@ App.Services.ImageJcrop=Backbone.View.extend({
 			}
 			var data=JSON.parse(this.contentDocument.body.innerText);
 			var tempUrl=data.code==0?data.data.logoUrl:'';
+
 			var _timestamp=tempUrl+"?t="+new Date().getTime();
+
 			_$timg=$("<img id='tempImage' src='"+_timestamp+"' style='width:100%;height:100%;'/>");
+
 			_$preImg=$("<img id='preImage' src='"+_timestamp+"' class='jcrop-preview'/>");
+
+
+			$("body").append('<img id="preImageSource"  style="display:none;" src="'+_timestamp+'" />');
+
 			$('.previewImage').prepend(_$timg)
 			$('.previewImage input').css({
 				    top: '304px',
@@ -43,6 +50,7 @@ App.Services.ImageJcrop=Backbone.View.extend({
 			
 			_$timg.Jcrop({
 				onChange:function(c){
+
 					currentSize=c;
 					if (parseInt(c.w) > 0) {
 							var rx = 200 / c.w;
@@ -56,12 +64,17 @@ App.Services.ImageJcrop=Backbone.View.extend({
 						}
 				},
 				onSelect:function(c){
-					w= c.w;
-							h=c.h;
-							x=c.x;
-							y=c.y;
+					var sourceWidth=$('#preImageSource').width(),
+						sourceHeight=$('#preImageSource').height(),
+						px=sourceWidth/boundx,
+						py=sourceHeight/boundy;
+					w= Math.round(c.w*px);
+					h= Math.round(c.h*py);
+					x= Math.round(c.x*px);
+					y= Math.round(c.y*py);
 				}
 			},function(){
+				 
 				var bounds = this.getBounds();
 					boundx = bounds[0];
 					boundy = bounds[1];
@@ -77,6 +90,7 @@ App.Services.ImageJcrop=Backbone.View.extend({
 				type:"post",
 				url:'/platform/project/'+_this._projectId+'/logo/cut?x='+x+'&y='+y+'&w='+w+'&h='+h
 			}).done(function(data){
+				$("#preImageSource").remove();
 				$("#dataLoading").hide();
 				if(data.message=='success'){
 					App.Services.maskWindow.close();

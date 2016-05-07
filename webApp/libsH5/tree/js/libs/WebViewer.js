@@ -6,7 +6,7 @@ var CLOUD = CLOUD || {};
 CLOUD.Version = "20160426";
 
 CLOUD.GlobalData = {
-    SceneSize: 1000,
+    SceneSize: 10,
     SceneScale: 2,
     MinBoxSize : new THREE.Vector3(500, 500, 500),
     MaxTriangle: 40000000,
@@ -11879,8 +11879,11 @@ CLOUD.Scene.prototype.prepareScene2 = function () {
 
     var _frustum = new THREE.Frustum();
     var _projScreenMatrix = new THREE.Matrix4();
+    var ray = new THREE.Ray();
 
     return function (camera) {
+
+        console.time("rt");
 
         if (camera.parent === null)
             camera.updateMatrixWorld();
@@ -11958,11 +11961,11 @@ CLOUD.Scene.prototype.prepareScene2 = function () {
             cullByFrustum(child, scope.rootNode);
         }
 
-        console.time("rt");
+       
 
         var traceResult = {};
 
-        var ray = new THREE.Ray();
+       
         //
         for (var ii = 0, len = cullList.length; ii < len; ++ii) {
 
@@ -11972,7 +11975,7 @@ CLOUD.Scene.prototype.prepareScene2 = function () {
 
             object.worldBoundingBox.center(ray.origin);
             ray.direction.copy(camera.position).sub(ray.origin).normalize();
-            var maxDistance = ray.origin.length(camera.position);
+            var maxDistance = ray.origin.distanceTo(camera.position);
 
             var nHitCount = 0;
             for (var jj = 0; jj < len; ++jj) {
@@ -11996,7 +11999,7 @@ CLOUD.Scene.prototype.prepareScene2 = function () {
             var object = cullList[name];
             var visible = object.visible;
                        
-            if (traceResult[name] <= CLOUD.GlobalData.RayTracingDeep) {
+            if (traceResult[name] < CLOUD.GlobalData.RayTracingDeep) {
 
                 if (object.leaf === 2) {
                     object.visible = true;
@@ -12024,9 +12027,9 @@ CLOUD.Scene.prototype.prepareScene2 = function () {
             }
 
         }
-        console.log("rt " + cullList.length + "/" + cullCount);
+        
         console.timeEnd("rt");
-
+        console.log("rt " + cullList.length + "/" + cullCount);
     }
 }();
 
@@ -20928,7 +20931,8 @@ CLOUD.SceneLoader.prototype = {
                     object.worldBoundingBox = object.boundingBox.clone();                    
                     object.worldBoundingBox.applyMatrix4(scope.manager.getGlobalTransform());
                     object.level = objJSON.level;
-                    
+                    object.deep = objJSON.deep;
+
                     if (objJSON.order) {
                         object.out = 1;
                     }
@@ -20948,7 +20952,7 @@ CLOUD.SceneLoader.prototype = {
                         
                     }
                             
-                    //if (object.out)
+                    //if (object.deep < 4)
                     {
                         handle_children(object, objJSON.children, level + 1);
                         parent.add(object);
@@ -21245,7 +21249,7 @@ CLOUD.IndexLoader.prototype = {
             var index = JSON.parse(text);
             client.index = index;            
 
-            if (index.view) {
+            if (client.slave === undefined && index.view) {
 
                 var rootNode = scope.manager.scene.rootNode;
                 CLOUD.Utils.parseTransform(rootNode, index.view);
@@ -21384,9 +21388,13 @@ CLOUD.SceneBoxLoader.prototype = {
                     object = new CLOUD.BBoxNode(bbox, clr);
                     CLOUD.Utils.parseTransform(object, objJSON);
 
-                    if (objJSON.leaf) {
+                    //if (objJSON.leaf) {
+                    //    localRoot.add(object);
+                    //}
+                    if (objJSON.deep == 2 && objJSON.leaf) {
                         localRoot.add(object);
                     }
+
                     object.worldBoundingBox = bbox.clone();
                     object.worldBoundingBox.applyMatrix4(scope.manager.getGlobalTransform());
 
@@ -21872,6 +21880,12 @@ CLOUD.ModelManager.prototype.loadIndex = function (parameters, callback) {
         return client;
     }
 
+    var count = 0;
+    for (var name in this.clients) {
+        count++;
+    }
+    client.slave = count > 1;
+
     var sceneLoader = this.sceneLoader;
 
     var idxLoader = new CLOUD.IndexLoader(true, this);
@@ -21899,6 +21913,7 @@ CLOUD.ModelManager.prototype.load = function (parameters) {
             });
         }
         else {
+
             scope.sceneLoader.load(defaultSceneId, scope.scene, client, true, function (result) {
 
                 scope.loadLinks(result, client);
@@ -22257,16 +22272,6 @@ CLOUD.EditorManager.prototype = {
 
         return false;
     },
-
-    //setMarkerMode: function (viewer) {
-    //    var scope = this;
-    //
-    //    if(this.markerEditor === undefined){
-    //        this.markerEditor = new CLOUD.MarkerEditor(viewer.cameraEditor, viewer.getScene(), viewer.domElement);
-    //    }
-    //
-    //    scope.setEditor(this.markerEditor);
-    //},
 
     zoomIn: function (factor, viewer) {
         //if(factor === undefined){
@@ -22859,10 +22864,6 @@ CloudViewer.prototype = {
             this.editorManager.flyEditor.resize();
         }
     },
-
-    //setMarkerMode: function () {
-    //    this.editorManager.setMarkerMode(this);
-    //},
 
     zoomIn: function (factor) {
         this.editorManager.zoomIn(factor, this);

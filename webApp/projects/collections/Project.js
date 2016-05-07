@@ -443,9 +443,9 @@ App.Project = {
 					data = data.data;
 					if (!data) {
 						return;
-					}
+					} 
 
-					that.$el.find(".attrPlanBox").find(".name").text(data.businessItem).end().find(".start").
+					that.$el.find(".attrPlanBox").find(".name").text(data.businessItem).end().find(".strat").
 					text(data.planStartTime && new Date(data.planStartTime).format("yyyy-MM-dd") || "").end().
 					find(".end").text(data.planEndTime && new Date(data.planEndTime).format("yyyy-MM-dd") || "").end().show();
 					//.find(".rEnd").text(data.planFinishDate && new Date(data.planFinishDate).format("yyyy-MM-dd") || "").end().show();
