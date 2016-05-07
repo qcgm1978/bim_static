@@ -138,8 +138,9 @@ ViewComp.MemberManager = Backbone.View.extend({
 		}
 		
 		var nodes=this.selectedTree.getNodes();
-		
+		debugger
 		_.each(nodes,function(n){
+			debugger
 			if(n.outer){
 				if(n.orgId){
 					data.outer.orgId.push(n.orgId)
