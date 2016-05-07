@@ -31,8 +31,9 @@ App.Services.ProjectLink=Backbone.View.extend({
 	},
 	
 	loadData:function(callback){
+		var _this=this;
 		$.ajax({
-			url:'/platform/mapping/project?type=1'
+			url:'/platform/mapping/project?type='+(_this.userData.type=='qualityProjectCode'?3:2)
 		}).done(function(data){
 			callback(data);
 		})

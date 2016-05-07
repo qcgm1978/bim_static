@@ -26,6 +26,7 @@ App.Services.addKeyUser = Backbone.View.extend({
       if(step == 'edit'){
         //编辑项目
         this.$el.find('.maintitle').text('项目授权');
+        this.$el.find('.rightWindow').siblings('p').text("已选项目（0个）");
         this.$el.find('.up').hide();
         this.$el.find('.steps').hide();
         this.$el.find('.confirm').show();
@@ -53,7 +54,7 @@ App.Services.addKeyUser = Backbone.View.extend({
         this.$el.find('.next').hide();
         this.$el.find('.leftWindow').html(new App.Services.step3().render().el);
 
-        $('.rightWindow').siblings('p').text("已选部门");
+        this.$el.find('.rightWindow').siblings('p').text("已选部门");
 
         this.$el.find('.leftWindow').html(new App.Services.step1().render('step3').el);
         this.$el.find('.leftWindow').append(new App.Services.step3().render().el);
@@ -234,7 +235,7 @@ App.Services.addKeyUser = Backbone.View.extend({
         }
       })
       this.$el.find('.rightWindow div').append(str);
-      $('.rightWindow').siblings('p').text("已选成员 ( " + $(".rightWindow li").length + "个 )");
+      $('.rightWindow').siblings('p').text("已选项目 ( " + $(".rightWindow li").length + "个 )");
 
     }
     else if(stepNum == 3 || this.$el.find('.maintitle').text() == '部门授权'){
@@ -384,7 +385,7 @@ App.Services.addKeyUser = Backbone.View.extend({
       }
       var datas = {
         "userId"         : App.Services.KeyUser.uid,
-        "dataPrivilegeId": App.Services.KeyUser.pid || [],
+        "projectId": App.Services.KeyUser.pid || [],
         "orgId"          : App.Services.KeyUser.orgId || [],
       };
       var data  = {
