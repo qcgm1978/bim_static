@@ -122,11 +122,11 @@ ViewComp.MemberManager = Backbone.View.extend({
 	},
 	
 	grand:function(){
-		
+		$("#dataLoading").show();
 		var pid=App.Comm.getCookie('currentPid');
 		var url="/platform/auth/dataPrivilege/grant";
 		var data={
-		    "privilegeId":[pid],
+		    "projectId":[pid],
 		    "outer":{
 		        "orgId":[],
 		        "userId":[]
@@ -138,9 +138,7 @@ ViewComp.MemberManager = Backbone.View.extend({
 		}
 		
 		var nodes=this.selectedTree.getNodes();
-		debugger
 		_.each(nodes,function(n){
-			debugger
 			if(n.outer){
 				if(n.orgId){
 					data.outer.orgId.push(n.orgId)
@@ -162,11 +160,12 @@ ViewComp.MemberManager = Backbone.View.extend({
 			data:JSON.stringify(data),
 			contentType:"application/json",
 		}).done(function(d){
+			$("#dataLoading").show();
 			if(d.message=="success"){
 				App.Services.projectMember.loadData(App.Services.projectMember.projectMemberMemberCollection,{outer:false},{
 					dataPrivilegeId:App.Comm.getCookie("currentPid")
 				});
-				$("#windowMask").remove();
+				App.Services.maskWindow.close();
 			}else{
 				alert("添加失败");
 			}
