@@ -123,11 +123,13 @@ App.Project = {
 		App.Project.Settings.Viewer = new familyModel({
 			element: $("#modelBox"),
 			etag: modelId
-		});
-
+		}); 
+ 
 		// 获取familyType
-		App.Project.Settings.Viewer.on("changType",function(id){
-			console.log(id)
+		App.Project.Settings.Viewer.on("changType",function(id){ 
+			if (id) {
+				App.Project.renderAttr(id);
+			} 
 		})
 
 		App.Project.Settings.modelId = modelId;
