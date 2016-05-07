@@ -5,8 +5,6 @@
 App.Services.AuthNav = Backbone.View.extend({
 
 	tagName:"div",
-
-
 	template:_.templateUrl("/services/tpls/auth/auth.nav.html"),
 
 	events:{
@@ -15,7 +13,6 @@ App.Services.AuthNav = Backbone.View.extend({
 		"click .keyUser" : "keyUser",
 		"click .projectMember" : "projectMember"
 	},
-
 	render:function(){
 		this.$el.html(this.template);
 		return this;
@@ -29,17 +26,16 @@ App.Services.AuthNav = Backbone.View.extend({
 	},
 
 	initialize:function(){},
-
 	memCtrl : function(){
 		this.breadCrumb(this.$el.find(".memCtrl"));
 		App.Services.init("auth","memCtrl");
 		$("#dataLoading").show();
 
 		App.Services.Member.loadData(App.Services.Member.innerCollection,{},function(){
-			//两个不可控异步，已知顺序为加载-点击，只好先清空再添加
+			//两个不可控异步，已知顺序为加载-点击，只好先清空再添加,这个导致了角色刷新的频繁，解决方案，
+			//在页面加载时静态单独写入内容？？？？
 			App.Services.Member.innerCollection.each(function(item){
 				$("#blendList").html("");
-				item.set("checked",false);
 				var newView = new App.Services.memberDetail({model:item});
 				this.$("#blendList").append(newView.render().el);
 				$("#dataLoading").hide();
@@ -85,7 +81,6 @@ App.Services.AuthNav = Backbone.View.extend({
 		this.breadCrumb(this.$el.find(".projectMember"));
 		App.Services.projectMember.init({type : "auth",tab:"projectMember"});
 		//App.Services.Settings = {type : "auth",tab:"keyUser"};
-
 		//项目成员主模板
 		//添加成员可与上面模板相同
 		//删除提示

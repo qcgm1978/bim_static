@@ -13,7 +13,8 @@ App.Services.memberDetail=Backbone.View.extend({
 
     render:function(){
         this.$el.html(this.template(this.model.toJSON()));
-        this.getRole();
+        console.log(this.model);
+        this.getRole();//写入角色
         return this;
     },
 
@@ -36,11 +37,9 @@ App.Services.memberDetail=Backbone.View.extend({
 
     //写入角色
     writeRole:function(response){
-
         var data = response.data,x=0;
         if(data && data.length){
             this.$(".roles").empty();
-
             for(var i = 0 ; i < data.length ; i++){
                 if(data[i]["roleId"] == 999999){
                     this.$(".roles").append("<span class='" + "adm" +"'>" + data[i].name + "</span>" );
@@ -57,16 +56,13 @@ App.Services.memberDetail=Backbone.View.extend({
                 x = x+1;
                 if(x >4){return}
                 this.$(".roles").append("<span class='" + className +"'>" + data[j].name + "</span>" );
-
             }
         }
     },
 
     initialize:function(){
-        this.model.set({"selected":false});//预先设置属性
+        this.model.set({"checked":false});//预先设置属性
         this.listenTo(this.model, 'checked:change', this.render);
-        //写入角色
-
     },
 
     //弹窗
@@ -78,7 +74,6 @@ App.Services.memberDetail=Backbone.View.extend({
         var userId = this.model.get("userId");
         var orgId  = this.model.get("orgId");
         var parentId = $("#ozList").find("span.active").parent(".ozName").data("id") || 1;//父项id
-
         //窗口及数据
         _this.window(frame);
         $(".seWinBody .aim ul").append(new App.Services.MemberWindowDetail({model:_this.model}).render().el);//当前用户
@@ -133,7 +128,6 @@ App.Services.memberDetail=Backbone.View.extend({
         //选中当前
         this.$el.addClass("active");
         this.model.set("checked",true);
-
     },
 
    //选择选项时作的操作。
@@ -177,11 +171,7 @@ App.Services.memberDetail=Backbone.View.extend({
                 }
             },
             error:function(error){
-                var s= "";
-                if(error.status ==0){
-                    s = "ERR_CONNECTION_TIMED_OUT"
-                }
-                _this.$(".roles").addClass("error").html(_this.model.get("name")+"无法取得角色列表,错误： " + s);
+                _this.$(".roles").addClass("error").html(_this.model.get("name")+"无法取得角色列表,错误： " + error.status);
             }
         });
     },

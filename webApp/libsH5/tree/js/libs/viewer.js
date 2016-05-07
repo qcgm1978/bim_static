@@ -588,6 +588,10 @@ BIM.prototype = {
     BIM.util.off(key,callback);
     return this;
   },
+  pub:function(key,args){
+    BIM.util.pub(key,args);
+    return this;
+  },
   subscribers:BIM.util.subscribers,
   zoom : function () {
     BIM.common.bimBox.className = 'bim';
@@ -605,9 +609,9 @@ BIM.prototype = {
   zoomSelected : function () {
     BIM.common.viewer.zoomToSelection();
   },
-  fit : function (id) {
+  fit : function () {
     BIM.util.pub('fit');
-    BIM.common.viewer.zoomToSelection(id);
+    BIM.common.viewer.zoomToSelection();
   },
   home : function () {
     BIM.util.pub('home');

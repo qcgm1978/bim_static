@@ -25,7 +25,6 @@ App.Services.roleWindowIndex = Backbone.View.extend({
 
     //提交表单，完毕会触发角色列表的更新change
     windowSubmit:function(){
-
         if(!App.Services.roleModify){ //新增
             this.newRole();
         }else{
@@ -60,7 +59,6 @@ App.Services.roleWindowIndex = Backbone.View.extend({
                 var cid = App.Services.roleModify.cid;
                 App.Services.role.collection.get(cid).set(response.data);
                 //查找collection，更新
-
                 App.Services.maskWindow.close();
             },
             error:function(type){
