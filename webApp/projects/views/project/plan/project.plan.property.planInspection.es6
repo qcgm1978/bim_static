@@ -96,19 +96,10 @@ App.Project.PlanInspection = Backbone.View.extend({
 	},
 
 	//在模型中显示
-	showInModel(event) {
-		
-		var $target= $(event.target), modelId =$target.data("id"),$parent=$target.parent();
-		if ($parent.hasClass("selected")) {
-			$target.closest("table").find(".selected").removeClass("selected");
-			App.Project.Settings.Viewer.selectIds();
-		}else{
-			$target.closest("table").find(".selected").removeClass("selected");
-			$target.parent().addClass("selected");
-			App.Project.Settings.Viewer.selectIds([modelId]);
-		} 
-		App.Project.Settings.Viewer.zoomSelected();
-	}
+	showInModel(event) { 
+		App.Project.planCostShowInModel(event); 
+	},
+	 
 
 
 });

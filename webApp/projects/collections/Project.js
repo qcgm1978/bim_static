@@ -443,7 +443,7 @@ App.Project = {
 					data = data.data;
 					if (!data) {
 						return;
-					} 
+					}
 
 					that.$el.find(".attrPlanBox").find(".name").text(data.businessItem).end().find(".strat").
 					text(data.planStartTime && new Date(data.planStartTime).format("yyyy-MM-dd") || "").end().
@@ -472,7 +472,7 @@ App.Project = {
 
 			App.Project.fetchPropertData("fetchDesignPropertiesQuality", function(data) {
 
-				if (data.code == 0) {  
+				if (data.code == 0) {
 
 					if (data.data.length > 0) {
 						var lis = '';
@@ -480,7 +480,7 @@ App.Project = {
 							lis += liTpl.replace("varName", item.name);
 						});
 						that.$el.find(".attrQualityBox").show().find(".modleList").html(lis);
-					} 
+					}
 
 				}
 			});
@@ -653,7 +653,86 @@ App.Project = {
 		});
 
 		App.Project.Settings.Viewer.selectIds(Ids);
-		App.Project.Settings.Viewer.zoomBox(boxArr)
+		App.Project.Settings.Viewer.zoomBox(boxArr);
+	},
+
+
+	//计划成本 校验 在模型中 显示
+	planCostShowInModel: function(event) {
+
+		var $target = $(event.target),
+			$parent = $target.parent(); 
+
+		if ($target.data("box")) {
+
+			if ($parent.hasClass("selected")) {
+				$target.closest("table").find(".selected").removeClass("selected");
+			} else {
+				$target.closest("table").find(".selected").removeClass("selected");
+				$target.parent().addClass("selected");
+			}
+			App.Project.planCostzommBox($target);
+		} else {
+
+			if ($parent.hasClass("selected")) {
+				$target.closest("table").find(".selected").removeClass("selected");
+				App.Project.planCostzommBox($target);
+				return;
+			}else {
+				$target.closest("table").find(".selected").removeClass("selected");
+				$target.parent().addClass("selected");
+			}
+
+			var elementId = $target.data("id"),
+				sceneId = elementId.split(".")[0],
+				that = this;
+
+
+			var pars = {
+				URLtype: "getBoundingBox",
+				data: {
+					projectId: App.Project.Settings.CurrentVersion.projectId,
+					projectVersionId: App.Project.Settings.CurrentVersion.id,
+					sceneId: sceneId,
+					elementId: elementId
+				}
+			}
+
+
+			App.Comm.ajax(pars, function(data) {
+				if (data.code == 0 && data.data) {
+
+					var box = [],
+						min = data.data.min,
+						minArr = [min.x, min.y, min.z],
+						max = data.data.max,
+						maxArr = [max.x, max.y, max.z];
+
+					box.push(minArr);
+					box.push(maxArr);
+					//box id
+					$target.data("box", box);
+					App.Project.planCostzommBox($target);
+
+				}
+			});
+
+		}
+
+	},
+
+	planCostzommBox: function($target) {
+		var Ids = [],
+			boxArr = [],$code;
+			 
+		$target.closest("table").find(".selected").each(function() { 
+			$code=$(this).find(".code");
+			Ids.push($code.data("id"));
+			boxArr = boxArr.concat($code.data("box")); 
+		});
+		 
+		App.Project.Settings.Viewer.selectIds(Ids);
+		App.Project.Settings.Viewer.zoomBox(boxArr);
 	}
 
 
