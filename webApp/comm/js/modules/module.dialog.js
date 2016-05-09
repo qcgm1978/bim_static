@@ -90,10 +90,8 @@
             }
             if (this.options.isConfirm) {
                 element.find('.wrapper').append('<div class="footer clr"><button class="ok myBtn myBtn-primary  ' + this.options.okClass + '">' + this.options.okText + '</button></div>')
-                if(this.options.cancelText){
-                    var cancelBtn = $('<button class="cancel myBtn myBtn-default"></button>').html(this.options.cancelText).addClass(this.options.cancelClass)
-                    element.find('.footer').append(cancelBtn)
-                }
+                var cancelBtn = $('<button class="cancel myBtn myBtn-default"></button>').html(this.options.cancelText).addClass(this.options.cancelClass)
+                element.find('.footer').append(cancelBtn)
             }
             //是否显示头部
             if (!this.options.showTitle) {
