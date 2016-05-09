@@ -15,11 +15,13 @@ App.Services.projectMember.members = Backbone.View.extend({
   del:function(event){
   		var _userId=event.currentTarget.getAttribute("data-user");
   		var _userName=event.currentTarget.getAttribute("data-userName");
-  		this.delModal=this.delModal||new ViewComp.Modal;
-  		var _model=this.delModal
+  		var _opType=event.currentTarget.getAttribute("data-type");//对象类型：org,user
+  		var _outer=event.currentTarget.getAttribute("data-outer");//对象类型：org,user
+  		this.delModal=this.delModal || new ViewComp.Modal;
+  		var _model=this.delModal;
   		_model.render({title:"",dialog:true,confirm:function(){
     		_model.html("<img src='/static/dist/images/services/images/load.gif'>正在删除、请稍等...")
-    		var url="/platform/auth/user/"+_userId+"/dataPrivilege?outer="+App.Comm.getCookie("isOuter")+"&privilegeId="+App.Comm.getCookie("currentPid");
+    		var url="/platform/auth/"+_opType+"/"+_userId+"/dataPrivilege?outer="+_outer+"&privilegeId="+App.Comm.getCookie("currentPid");
     		$.ajax({
     			type:"DELETE",
     			url:url
