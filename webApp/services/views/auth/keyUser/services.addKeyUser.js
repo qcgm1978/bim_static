@@ -32,7 +32,6 @@ App.Services.addKeyUser = Backbone.View.extend({
         this.$el.find('.leftWindow').html(new App.Services.step2().render().el);
 
         App.Services.KeyUser.loadData(App.Services.KeyUser.Step2, '', function(r){
-          console.log(r)
 
           if(r && !r.code && r.data){
             _.each(r.data.items, function(data, index){
@@ -50,10 +49,10 @@ App.Services.addKeyUser = Backbone.View.extend({
           pid.push(p['id']);
           str += "<li class='proj-right' data-id="+p['id']+"><i class='proj-remove'></i>"+
             "<h3 data-id="+p['id']+">"+p['name']+"</h3>"+
-            "<p>"+p['province']+"<span></span></p>"+
+            "<p>"+(p['province']||'')+"<span></span></p>"+
           "</li>";
         }
-
+        App.Services.KeyUser.pid=pid;
         this.$el.find('.rightWindow').html('<div>'+str+'</div>').siblings('p').text("已选项目（"+pid.length+"个）");
 
       }
@@ -71,7 +70,6 @@ App.Services.addKeyUser = Backbone.View.extend({
         this.$el.find('.leftWindow').append(new App.Services.step3().render().el);
 
         App.Services.KeyUser.loadData(App.Services.KeyUser.Step1, '', function(r){
-          console.log(r)
 
           if(r && !r.code && r.data){
             _.each(r.data.org, function(data, index){
@@ -82,7 +80,6 @@ App.Services.addKeyUser = Backbone.View.extend({
           }
         });
         App.Services.KeyUser.loadData(App.Services.KeyUser.Step3, '', function(r){
-          console.log(r)
 
           if(r && !r.code && r.data){
             _.each(r.data.org, function(data, index){
@@ -106,6 +103,7 @@ App.Services.addKeyUser = Backbone.View.extend({
           "</li>";
 
         }
+        App.Services.KeyUser.orgId=orgid;
 
         this.$el.find('.rightWindow').html('<div>'+str+'</div>').siblings('p').text("已选部门");
 
@@ -126,7 +124,6 @@ App.Services.addKeyUser = Backbone.View.extend({
         this.$el.find('.leftWindow').html(new App.Services.step2().render().el);
 
         App.Services.KeyUser.loadData(App.Services.KeyUser.Step2, '', function(r){
-          console.log(r)
 
           if(r && !r.code && r.data){
             _.each(r.data.items, function(data, index){
@@ -154,7 +151,6 @@ App.Services.addKeyUser = Backbone.View.extend({
         this.$el.find('.leftWindow').append(new App.Services.step3().render().el);
 
         App.Services.KeyUser.loadData(App.Services.KeyUser.Step1, '', function(r){
-          console.log(r)
 
           if(r && !r.code && r.data){
             _.each(r.data.org, function(data, index){
@@ -165,7 +161,6 @@ App.Services.addKeyUser = Backbone.View.extend({
           }
         });
         App.Services.KeyUser.loadData(App.Services.KeyUser.Step3, '', function(r){
-          console.log(r)
 
           if(r && !r.code && r.data){
             _.each(r.data.org, function(data, index){
@@ -192,7 +187,6 @@ App.Services.addKeyUser = Backbone.View.extend({
       this.$el.find('.confirm').hide();
       this.$el.find('.leftWindow').html(new App.Services.step1().render().el);
       App.Comm.ajax({URLtype: 'fetchServicesMemberInnerList'}, function(r){
-        console.log(r)
 
         if(r && !r.code && r.data){
           _.each(r.data.org, function(data, index){
@@ -210,26 +204,35 @@ App.Services.addKeyUser = Backbone.View.extend({
   //移除已选中的名单
   remove: function(e){
 
-    var stepNum = $('.steps .active').find('span').text();
+    var $li                    = $(e.target).parents('li');
 
-    if(stepNum == 3){
+    var stepNum = $('.steps .active').find('span').text();
+    if(this.$el.find('.maintitle').text() == '部门授权'){
+      //部门授权移除已选中的名单
+      var orgId                  = $li.find('p').attr('data-id');
+      App.Services.KeyUser.editorgId = _.without(App.Services.KeyUser.editorgId,parseInt(orgId));
+      App.Services.KeyUser.editorgId = _.without(App.Services.KeyUser.editorgId, orgId.toString());
+
+      App.Services.KeyUser.orgId = App.Services.KeyUser.editorgId;
+
+    }else if(stepNum == 3){
       //step3移除已选中的名单
 
-      var $li                    = $(e.target).parents('li');
       var orgId                  = $li.find('p').attr('data-id');
-      App.Services.KeyUser.orgId = _.without(App.Services.KeyUser.orgId, orgId);
-      $li.remove();
+      App.Services.KeyUser.orgId = _.without(App.Services.KeyUser.orgId, parseInt(orgId));
+      App.Services.KeyUser.orgId = _.without(App.Services.KeyUser.orgId, orgId.toString());
 
     }
     else{
       //step1移除已选中的名单
 
-      var $li                  = $(e.target).parents('li');
       var uid                  = $li.find('p').attr('data-uid');
-      App.Services.KeyUser.uid = _.without(App.Services.KeyUser.uid, uid);
-      $li.remove();
+      App.Services.KeyUser.uid = _.without(App.Services.KeyUser.uid, parseInt(uid));
+      App.Services.KeyUser.uid = _.without(App.Services.KeyUser.uid, uid.toString());
+
       $('.rightWindow').siblings('p').text("已选成员 ( " + App.Services.KeyUser.uid.length + "个 )");
     }
+    $li.remove();
 
   },
 
@@ -238,9 +241,17 @@ App.Services.addKeyUser = Backbone.View.extend({
     var $li                  = $(e.target).parent();
     var pid                  = $li.attr('data-id');
     $('.leftWindow').find('li[data-id=' + pid + ']').removeClass('selected-proj');
-    App.Services.KeyUser.pid = _.without(App.Services.KeyUser.pid, pid);
     $li.remove();
-    $('.rightWindow').siblings('p').text("已选项目 ( " + $(".rightWindow li").length + "个 )");
+    //if(this.$el.find('.maintitle').text() == '项目授权'){
+    //  //项目授权移除已选中的名单
+    //  App.Services.KeyUser.editpid = _.without(App.Services.KeyUser.editpid, pid-1+1);
+    //
+    //}else{
+
+    App.Services.KeyUser.pid = _.without(App.Services.KeyUser.pid, parseInt(pid));
+    App.Services.KeyUser.pid = _.without(App.Services.KeyUser.pid, pid.toString());
+    //}
+      $('.rightWindow').siblings('p').text("已选项目 ( " + $(".rightWindow li").length + "个 )");
   },
 
   //选择人到右边窗口
@@ -275,7 +286,6 @@ App.Services.addKeyUser = Backbone.View.extend({
         App.Services.KeyUser.orgId.push(orgId);
         var person = $selected.html();
         $selected.removeClass('toselected');
-        console.log(person)
         this.$el.find('.rightWindow div').append($('<li><span class="delete"></span>' + person + '</li>'));
       }
 
@@ -290,7 +300,6 @@ App.Services.addKeyUser = Backbone.View.extend({
         App.Services.KeyUser.uid.push(uid);
         var person = $selected.html();
         $selected.removeClass('toselected');
-        console.log(person)
         this.$el.find('.rightWindow div').append($('<li><span class="delete"></span>' + person + '</li>')).parent().siblings('p').text("已选成员 ( " + App.Services.KeyUser.uid.length + "个 )");
       }
     }
@@ -340,7 +349,6 @@ App.Services.addKeyUser = Backbone.View.extend({
     };
     App.Comm.ajax(data, function(data){
       if(data.code == 0){
-        console.log(data)
         App.Services.KeyUser.fakedata = data.data;
         new App.Services.userinfo().render();
 
@@ -370,7 +378,6 @@ App.Services.addKeyUser = Backbone.View.extend({
       var self = this;
       App.Comm.ajax(data, function(data){
         if(data.code == 0){
-          console.log(data)
           $('.mod-dialog,.mod-dialog-masklayer').hide();
           self.refresh();
         }
@@ -395,7 +402,6 @@ App.Services.addKeyUser = Backbone.View.extend({
       var self = this;
       App.Comm.ajax(data, function(data){
         if(data.code == 0){
-          console.log(data)
           $('.mod-dialog,.mod-dialog-masklayer').hide();
           self.refresh();
 
@@ -423,11 +429,9 @@ App.Services.addKeyUser = Backbone.View.extend({
       };
       App.Comm.ajax(data, function(data){
         if(data.code == 0){
-          console.log(data)
           $('.mod-dialog,.mod-dialog-masklayer').hide();
           //刷新关键用户列表
           App.Services.KeyUser.loadData(App.Services.KeyUser.KeyUserList, '', function(r){
-            console.log("gg", r)
             if(r && !r.code && r.data){
               App.Services.KeyUser.KeyUserList.set(r.data);
               App.Services.KeyUser.userList = r.data;
@@ -437,6 +441,7 @@ App.Services.addKeyUser = Backbone.View.extend({
         }
 
       });
+      $(this).html('提交中...');
     }
 
   }, //关闭窗口

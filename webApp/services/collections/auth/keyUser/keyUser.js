@@ -282,4 +282,14 @@ App.Services.KeyUser = {
     ],
     "function": null
   },
+  createTips: function (con, bool) {
+    var tips = '<div class="tips"><div class="tipscon"style="font-size:0.18rem;">' + con + '</div></div>';
+    $("body").append(tips);
+    if (!bool) {
+      setTimeout(function () {
+        $(".tips").remove();
+      }, 2000);
+    }
+
+  },
 };

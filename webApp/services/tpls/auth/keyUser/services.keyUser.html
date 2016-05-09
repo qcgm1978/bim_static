@@ -4,19 +4,19 @@
                 <span class="newKeyUsers"><i style="background:url('/static/dist/images/services/images/service_ico.png')no-repeat 0 -220px"></i>新增</span>
                 关键用户（<span class="usernum"><%= keyUser.length %></span>）
             </div>
-            <ul>
-                <% _.each(keyUser,function(user,index){ %>
-                <li data-index="<%= index %>"data-uid="<%= user.userId %>">
+            <ul class="needloading">
+
+              <% _.each(keyUser,function(user,index){ %>
+                <li data-index=<%= index %> data-uid=<%= user.userId %>>
                     <span data-uid=<%= user.userId %> data-name=<%= user.name %>  class="delete"></span>
                     <i class="keyListHead"></i><%= user.name %>
                 </li>
                 <% })%>
-                <% console.log(keyUser); %>
 
 
             </ul>
         </div>
-        <div class="keyBody">
-
+        <div class="keyBody" >
+              <h1 style="text-align:center;margin-top:100px;font-size:20px;">暂无信息,请点击选择左侧的关键用户!</h1>
         </div>
     </div>

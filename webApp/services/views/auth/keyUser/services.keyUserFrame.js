@@ -23,7 +23,7 @@ App.Services.keyUserFrame = Backbone.View.extend({
 
         //准备多个Collection的MODELS
         var datas={
-            keyUser : App.Services.KeyUser.KeyUserList.toJSON() || [],
+            keyUser : App.Services.KeyUser.KeyUserList.toJSON() || []
 
         };
         this.$el.html(this.template(datas));
@@ -49,10 +49,9 @@ App.Services.keyUserFrame = Backbone.View.extend({
         };
         App.Comm.ajax(data,function(data){
             if (data.code==0) {
-                console.log(data)
                 App.Services.KeyUser.fakedata=data.data;
-                //App.Services.KeyUser.editpid=_.pluck(data.data.project,'id');
-                //App.Services.KeyUser.editorgId=_.pluck(data.data.org,'orgId');
+                App.Services.KeyUser.editpid=_.pluck(data.data.project,'id');
+                App.Services.KeyUser.editorgId=_.pluck(data.data.org,'orgId');
                 new App.Services.userinfo().render();
 
             }
