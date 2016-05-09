@@ -27,11 +27,10 @@ App.Services.windowRoleDetail=Backbone.View.extend({
         var checkEle = this.model.get("checked");
         if(!checkEle){
             this.$el.addClass("active");
-            this.model.set({"checked":true});
         }else{
             this.$el.removeClass("active");
-            this.model.unset("checked");
         }
+        this.model.set("checked",!checkEle);
     }
 });
 

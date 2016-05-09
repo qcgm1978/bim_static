@@ -19,8 +19,6 @@ App.Services.Auth = Backbone.View.extend({
 		//$("#dataLoading").show();
 		App.Services.MemberType = "inner";//设置默认类型
 
-
-
 		App.Services.Member.loadData(App.Services.Member.innerCollection,{},function(response){
 			if (response.data.org && response.data.org.length) {
 				//样式处理
@@ -30,12 +28,7 @@ App.Services.Auth = Backbone.View.extend({
 				$("#inner + .childOz").html(new App.Services.MemberozList(response.data.org).render().el);
 				$("#dataLoading").hide();
 			}
-
-			App.Services.Member.roleList();
 		});
-
-
-
 
 		/*var innerCollection = new(Backbone.Collection.extend({
 			model: Backbone.Model.extend({

@@ -15,8 +15,8 @@ ul,li{list-style: none outside none;}
 .serviceHeader .serviceNav li{border-top: 2px solid #eeeeee;float: left;line-height: 27px;height: 29px;width: 98px;text-align: center;margin-bottom: -1px;cursor: pointer;}
 .serviceHeader .serviceNav li.active{border-top: 2px solid #006ecf;border-left: 1px solid #cccccc;border-right: 1px solid #cccccc;border-bottom: 1px solid #eeeeee;background-color: #ffffff;}
 .serviceNav a:link,.serviceNav a:hover,.serviceNav a:visited,.serviceNav a:active{color: #333333;text-decoration: none;}
-/*???????*/
-#blendList{height: 500px;overflow: auto;}/*???????è¶????*/
+
+#blendList{overflow: auto;}
 .serviceBody{position: absolute;top:129px;left:0;right:0;bottom:0;}
 .serviceBody .menu{ bottom: 0px; position: absolute;left: 0;top: 0;width: 270px;border: 1px solid #ccc;border-top: none;background-color: #ffffff;;height: 100%;overflow: auto;}
 .serviceBody .menu li{line-height: 25px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;}
@@ -29,7 +29,7 @@ ul,li{list-style: none outside none;}
 /*.serviceBody .menu ul{padding-left: 22px;}*/
 .serviceBody .body li{border-bottom: 1px solid #cccccc;padding-left: 20px;}
 .serviceBody .body li div{.ellipsis}
-.serviceBody .content{margin-left: 270px;height: 100%;}
+.serviceBody .content{left: 270px;position: absolute;width: 100%;height: 100%;overflow: auto;}
 .serviceBody .content input{.serviceInput;}
 .serviceBody .content input:checked{background-position: 0 -420px}
 /*????checkbox????????????*/

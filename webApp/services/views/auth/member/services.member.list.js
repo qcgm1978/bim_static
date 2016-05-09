@@ -114,7 +114,7 @@ App.Services.MemberList=Backbone.View.extend({
             var orgId = item.get("orgId");
             if(saveType){
                 if(userId){
-                    App.Services.memberWindowData[saveType].orgId.push(userId);
+                    App.Services.memberWindowData[saveType].userId.push(userId);
                 }
                 if(orgId){
                     App.Services.memberWindowData[saveType].orgId.push(orgId);
