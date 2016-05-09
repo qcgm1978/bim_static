@@ -1,15 +1,21 @@
 <div id="flowContainer">
 	
-	<%  _.each(data,function(item){%>
+	<%  _.each(data,function(item){ %>
 		
 		<div class="classify">
 			<div class="leftRadius flowBg"></div>
 			<div class="rightRadius flowBg"></div>
-			<div class="title">设计管理</div>
+			<div class="title"><%=item.title%></div>
 			<ul>
-				<%  _.each(item.items,function(i){%>
-					<li class="item"> <i class="flowBg commIcon modelTrial"></i> <span class="text">模型报审</span>
-						<a href="###" class="right">发起</a> <a href="###" class="right mRightCK">查看</a>
+				<%  _.each(item.items,function(i){ %>
+					<li class="item"> <span class="text"><%=i.name%></span>
+						<% if(i.sendUrl){ %>
+							<a href="<%=i.sendUrl%>" target="_blank" class="right">发起</a>
+						<% } %>
+						<% if(i.viewUrl){ %>
+							 <a href="<%=i.viewUrl%>" target="_blank" class="right mRightCK">查看</a>
+						<% } %>
+						
 					</li>
 				<% }) %>
 			</ul>

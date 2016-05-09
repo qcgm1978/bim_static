@@ -49,6 +49,7 @@ App.Services.ImageJcrop=Backbone.View.extend({
 			$('.cutImage').html(_$preImg);
 			
 			_$timg.Jcrop({
+				aspectRatio:1.33,
 				onChange:function(c){
 
 					currentSize=c;
@@ -79,6 +80,7 @@ App.Services.ImageJcrop=Backbone.View.extend({
 					boundx = bounds[0];
 					boundy = bounds[1];
 				_jcrop=this;
+				_jcrop.setSelect([60,40,260,190]);
 			});
 			
 		})
