@@ -210,8 +210,7 @@ App.Services.addKeyUser = Backbone.View.extend({
     if(this.$el.find('.maintitle').text() == '部门授权'){
       //部门授权移除已选中的名单
       var orgId                  = $li.find('p').attr('data-id');
-      App.Services.KeyUser.editorgId = _.without(App.Services.KeyUser.editorgId,parseInt(orgId));
-      App.Services.KeyUser.editorgId = _.without(App.Services.KeyUser.editorgId, orgId.toString());
+      App.Services.KeyUser.editorgId = _.without(App.Services.KeyUser.editorgId,parseInt(orgId),orgId.toString());
 
       App.Services.KeyUser.orgId = App.Services.KeyUser.editorgId;
 
@@ -219,16 +218,14 @@ App.Services.addKeyUser = Backbone.View.extend({
       //step3移除已选中的名单
 
       var orgId                  = $li.find('p').attr('data-id');
-      App.Services.KeyUser.orgId = _.without(App.Services.KeyUser.orgId, parseInt(orgId));
-      App.Services.KeyUser.orgId = _.without(App.Services.KeyUser.orgId, orgId.toString());
+      App.Services.KeyUser.orgId = _.without(App.Services.KeyUser.orgId,parseInt(orgId),orgId.toString());
 
     }
     else{
       //step1移除已选中的名单
 
       var uid                  = $li.find('p').attr('data-uid');
-      App.Services.KeyUser.uid = _.without(App.Services.KeyUser.uid, parseInt(uid));
-      App.Services.KeyUser.uid = _.without(App.Services.KeyUser.uid, uid.toString());
+      App.Services.KeyUser.uid = _.without(App.Services.KeyUser.uid, parseInt(uid), uid.toString());
 
       $('.rightWindow').siblings('p').text("已选成员 ( " + App.Services.KeyUser.uid.length + "个 )");
     }
@@ -359,7 +356,6 @@ App.Services.addKeyUser = Backbone.View.extend({
 
   //切换步骤页
   confirm: function(){
-
     //编辑项目提交
     if($('.maintitle').text() == '项目授权'){
       App.Services.KeyUser.editpid = App.Services.KeyUser.pid;
@@ -376,7 +372,11 @@ App.Services.addKeyUser = Backbone.View.extend({
       };
 
       var self = this;
+      $('#dataLoading').show();
+
       App.Comm.ajax(data, function(data){
+        $('#dataLoading').hide();
+
         if(data.code == 0){
           $('.mod-dialog,.mod-dialog-masklayer').hide();
           self.refresh();
@@ -400,7 +400,11 @@ App.Services.addKeyUser = Backbone.View.extend({
         data       : JSON.stringify(datas)
       };
       var self = this;
+      $('#dataLoading').show();
+
       App.Comm.ajax(data, function(data){
+        $('#dataLoading').hide();
+
         if(data.code == 0){
           $('.mod-dialog,.mod-dialog-masklayer').hide();
           self.refresh();
@@ -427,7 +431,11 @@ App.Services.addKeyUser = Backbone.View.extend({
         contentType: "application/json", //'Content-Type':"application/json",
         data       : JSON.stringify(datas)
       };
+      $('#dataLoading').show();
+
       App.Comm.ajax(data, function(data){
+        $('#dataLoading').hide();
+
         if(data.code == 0){
           $('.mod-dialog,.mod-dialog-masklayer').hide();
           //刷新关键用户列表
@@ -438,6 +446,8 @@ App.Services.addKeyUser = Backbone.View.extend({
             }
           });
           App.Services.KeyUser.clearAll();
+        }else{
+          alert('不能选择已是关键用户的用户')
         }
 
       });

@@ -56,7 +56,7 @@ App.Services.Member ={
     })),
 
     //存储角色
-    SubRole : new(Backbone.Collection.extend({
+    SubRoleCollection : new(Backbone.Collection.extend({
         model: Backbone.Model.extend({
             defaults: function() {
                 return {
@@ -67,7 +67,7 @@ App.Services.Member ={
         urlType: "fetchServicesSaveRole",
         parse: function (response) {
             if (response.message == "success") {
-                return response.success;
+                return response.data;
             }
         }
     })),
@@ -85,22 +85,8 @@ App.Services.Member ={
                 a.push(response.data.org[j])
             }
         }
-
         blendList = a;
         return blendList;
-    },
-
-//延迟加载
-    lazyLoad:function(a,s){
-        var n = a/ s, n2 = a%s;
-        if(n > 1){
-            setTimeout(function(){
-                this.lazyLoad();
-            },0);
-        }else{
-
-            //return blendList;
-        }
     },
 
     loadData : function(collectionType,data,fn) {

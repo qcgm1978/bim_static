@@ -73,9 +73,7 @@ App.Comm = {
 				var rex = urlPars[i],
 					par = rex.replace(/[{|}]/g, ""),
 					val = temp[par];
-				if (val) {
 					data.url = data.url.replace(rex, val);
-				}
 			}
 		}
 
