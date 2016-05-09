@@ -16,48 +16,48 @@ App.Services.memberDetail=Backbone.View.extend({
         return this;
     },
 
-    //取得成员和组织的角色列表
-    getRole:function(){
-        var userId = this.model.get("userId");
-        var orgId = this.model.get("orgId");
-        if(userId){
-            var userUrl ="http://bim.wanda-dev.cn/platform/auth/user/"+ userId  +"/role?outer=" +  !(App.Services.MemberType == "inner");
-            this.blendRole(userUrl,this.writeRole);
-        }else if(orgId){
-            var orgUrl ="http://bim.wanda-dev.cn/platform/auth/org/"+ orgId  +"/role?outer=" +  !(App.Services.MemberType == "inner");
-            this.blendRole(orgUrl,this.writeRole);
-        }
-    },
-
-    //写入角色
-    writeRole:function(response){
-        var data = response.data,x=0;
-        if(data && data.length){
-            this.$(".roles").empty();
-            for(var i = 0 ; i < data.length ; i++){
-                if(data[i]["roleId"] == 999999){
-                    this.$(".roles").append("<span class='" + "adm" +"'>" + data[i].name + "</span>" );
-                }
-            }
-            //只写入5个
-            for(var j = 0 ; j < data.length ; j++){
-                var className = '';
-                if(data[j]["inherit"]){className = "inherit"}
-                if(data[j]["roleId"] == 999999){
-                    j++;
-                    continue
-                }
-                x = x+1;
-                if(x >4){return}
-                this.$(".roles").append("<span class='" + className +"'>" + data[j].name + "</span>" );
-            }
-        }
-    },
+    ////取得成员和组织的角色列表
+    //getRole:function(){
+    //    var userId = this.model.get("userId");
+    //    var orgId = this.model.get("orgId");
+    //    if(userId){
+    //        var userUrl ="http://bim.wanda-dev.cn/platform/auth/user/"+ userId  +"/role?outer=" +  !(App.Services.MemberType == "inner");
+    //        this.blendRole(userUrl,this.writeRole);
+    //    }else if(orgId){
+    //        var orgUrl ="http://bim.wanda-dev.cn/platform/auth/org/"+ orgId  +"/role?outer=" +  !(App.Services.MemberType == "inner");
+    //        this.blendRole(orgUrl,this.writeRole);
+    //    }
+    //},
+    //
+    ////写入角色
+    //writeRole:function(response){
+    //    var data = response.data,x=0;
+    //    if(data && data.length){
+    //        this.$(".roles").empty();
+    //        for(var i = 0 ; i < data.length ; i++){
+    //            if(data[i]["roleId"] == 999999){
+    //                this.$(".roles").append("<span class='" + "adm" +"'>" + data[i].name + "</span>" );
+    //            }
+    //        }
+    //        //只写入5个
+    //        for(var j = 0 ; j < data.length ; j++){
+    //            var className = '';
+    //            if(data[j]["inherit"]){className = "inherit"}
+    //            if(data[j]["roleId"] == 999999){
+    //                j++;
+    //                continue
+    //            }
+    //            x = x+1;
+    //            if(x >4){return}
+    //            this.$(".roles").append("<span class='" + className +"'>" + data[j].name + "</span>" );
+    //        }
+    //    }
+    //},
 
     initialize:function(){
         this.model.set({"checked":false});//预先设置属性
         this.listenTo(this.model, 'checked:change', this.render);
-        this.getRole();//写入角色
+        //this.getRole();//写入角色
     },
 
     //弹窗

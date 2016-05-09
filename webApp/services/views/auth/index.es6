@@ -21,8 +21,23 @@ App.Services.Auth = Backbone.View.extend({
 
 
 
+		App.Services.Member.loadData(App.Services.Member.innerCollection,{},function(response){
+			if (response.data.org && response.data.org.length) {
+				//样式处理
+				$("#inner").addClass("active");
+				$("#inner span").addClass("active");//唯一选项
+				//菜单渲染
+				$("#inner + .childOz").html(new App.Services.MemberozList(response.data.org).render().el);
+				$("#dataLoading").hide();
+			}
 
-		var innerCollection = new(Backbone.Collection.extend({
+			App.Services.Member.roleList();
+		});
+
+
+
+
+		/*var innerCollection = new(Backbone.Collection.extend({
 			model: Backbone.Model.extend({
 				defaults: function() {
 					return {
@@ -44,22 +59,13 @@ App.Services.Auth = Backbone.View.extend({
 				$("#inner + .childOz").html(new App.Services.MemberozList(response.data.org).render().el);
 
 				$("#blendList").append(new App.Services.memberDetail({model:innerCollection.models[0]}));
-				console.log($("#blendList"));
-				$("#dataLoading").hide();
-			}
-		});
 
-
-		/*App.Services.Member.loadData(App.Services.Member.innerCollection,{},function(response){
-			if (response.data.org && response.data.org.length) {
-				//样式处理
-				$("#inner").addClass("active");
-				$("#inner span").addClass("active");//唯一选项
-				//菜单渲染
-				$("#inner + .childOz").html(new App.Services.MemberozList(response.data.org).render().el);
 				$("#dataLoading").hide();
 			}
 		});*/
+
+
+
 	}
 
 });

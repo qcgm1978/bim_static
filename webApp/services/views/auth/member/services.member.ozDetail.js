@@ -60,6 +60,9 @@ App.Services.MemberozDetail=Backbone.View.extend({
                 $("#blendList").html("<li>暂无数据</li>");
             }
             $("#dataLoading").hide();
+
+
+            App.Services.Member.roleList();//角色列表
         });
 
 
