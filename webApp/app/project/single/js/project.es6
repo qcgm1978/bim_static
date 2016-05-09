@@ -100,9 +100,9 @@ App.Project = {
 
 
 					//dwg 格式
-					if (data.data.suffix=="dwg") {
+					if (data.data.suffix == "dwg") {
 						App.Project.renderDwg(data.data.modelId);
-					}else{
+					} else {
 						App.Project.renderOther(data.data.modelId);
 					}
 
@@ -126,14 +126,18 @@ App.Project = {
 		});
 
 		// 获取familyType
-		App.Project.Settings.Viewer.on("changType",function(id){
-			console.log(id)
+		App.Project.Settings.Viewer.on("changType", function(id) {
+			if (id) {
+				App.Project.Settings.typeId = id;
+				App.Project.renderAttr(id);
+			}
 		})
 
 		App.Project.Settings.modelId = modelId;
 		App.Project.Settings.Viewer.on("click", function(model) {
 
-			if (!model.intersect) {
+			if (!model.intersect) { 
+				App.Project.renderAttr(App.Project.Settings.typeId); 
 				return;
 			}
 			//渲染属性
@@ -143,16 +147,14 @@ App.Project = {
 	},
 
 	//渲染dwg 文件
-	renderDwg(modelId) {
-
+	renderDwg(modelId) { 
 
 		$("#modelBox").addClass("dwg");
 
 		var viewer = new dwgViewer({
 			element: $("#modelBox"),
 			sourceId: modelId
-		});
-
+		}); 
 
 	},
 

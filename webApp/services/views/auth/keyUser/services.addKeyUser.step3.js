@@ -61,7 +61,6 @@ App.Services.step3 = Backbone.View.extend({
           if(canLoad=='true'){
             $ul.removeClass('shut').addClass('open');
             App.Comm.ajax({URLtype:'fetchServicesMemberOuterList',data:{parentId:orgId,includeUsers:false}},function(r){
-              console.log(r)
 
               if(r && !r.code && r.data){
                 var str = '';

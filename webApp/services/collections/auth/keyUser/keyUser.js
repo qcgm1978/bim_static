@@ -15,6 +15,11 @@ App.Services.KeyUser = {
   //暂存已被选关键用户的orgId数组
   orgId : [],
 
+  //暂存被编辑的关键用户的项目ID数组
+  editpid : [],
+
+  //暂存被编辑的关键用户的orgId数组
+  editorgId : [],
   //暂存已被选关键用户step1的html
   html : [],
 
@@ -25,6 +30,16 @@ App.Services.KeyUser = {
   html3 : [],
 
   userList:[],
+
+  //清空暂存的数据
+  clearAll: function(){
+    this.uid   = [];
+    this.pid   = [];
+    this.orgId = [];
+    this.html  = [];
+    this.html2 = [];
+    this.html3 = [];
+  },
 
   loadData : function(collection,data,fn) {
 
@@ -182,89 +197,5 @@ App.Services.KeyUser = {
     }
   },
 
-  fakedata:{
-    "userId": "1018561804",
-    "name": "杨俊",
-    "position": "操作",
-    "org": [
-      {
-        "orgId": "782132832",
-        "name": "旅游控股公司-万达旅业-各地公司-深圳万达国旅",
-        "namePath": "旅游控股公司-万达旅业-各地公司-深圳万达国旅",
-        "outer": false,
-        "parent": null,
-        "parentId": "619673733",
-        "role": null,
-        "privilege": null
-      }
-    ],
-    "isAdmin": false,
-    "isKeyUser": true,
-    "outer": false,
-    "privilege": [
-      {
-        "id": 1,
-        "type": "1",
-        "value": "784306105035936"
-      },
-      {
-        "id": 2,
-        "type": "1",
-        "value": "1"
-      },
-      {
-        "id": 3,
-        "type": "1",
-        "value": "2"
-      }
-    ],
-    "role": [
-      {
-        "roleId": 999998,
-        "name": "关键用户",
-        "inherit": false,
-        "functions": null
-      },
-      {
-        "roleId": 1,
-        "name": "测试角色",
-        "inherit": true,
-        "functions": [
-          {
-            "id": 4,
-            "name": "质监",
-            "code": "quality"
-          },
-          {
-            "id": 2,
-            "name": "模块化",
-            "code": "module"
-          },
-          {
-            "id": 3,
-            "name": "成本",
-            "code": "cost"
-          },
-          {
-            "id": 1,
-            "name": "设计",
-            "code": "design"
-          }
-        ]
-      },
-      {
-        "roleId": 10,
-        "name": "测试继承",
-        "inherit": true,
-        "functions": null
-      },
-      {
-        "roleId": 999999,
-        "name": "超级管理员",
-        "inherit": false,
-        "functions": null
-      }
-    ],
-    "function": null
-  },
+  fakedata:{}
 };

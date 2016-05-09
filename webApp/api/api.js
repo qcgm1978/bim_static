@@ -193,6 +193,10 @@ App.API = {
 		extendAttrGetReferene:"platform/setting/extensions/property/reference",// 获取引用扩展属性
 		projectCodeMapping:"platform/mapping/{projectId}",
 		getBoundingBox:"sixD/{projectId}/{projectVersionId}/bounding/box",//获取构建的 box id ?sceneId={sceneId}&elementId={elementId}
+		
+		//业务流程
+		fetchFlow:'platform/flow',
+		
 		test: ""
 	},
 

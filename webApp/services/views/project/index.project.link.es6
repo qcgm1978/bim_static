@@ -8,7 +8,8 @@ App.Services.ProjectLink=Backbone.View.extend({
 	
 	events:{
 		'click tr':'selectProject',
-		'click #linkBtn':'linkProject'
+		'click #linkBtn':'linkProject',
+		'keydown #inputProjectSerach':'updateList'
 	},
 
 	template:_.templateUrl('/services/tpls/project/project.list.html',true),
@@ -20,6 +21,9 @@ App.Services.ProjectLink=Backbone.View.extend({
 	render(){
 		var _this=this;
 		_this.loadData(function(data){
+			
+			_this.projectData=data;
+		
 			var _tpl=_.template(_this.template);
 			_this.$el.html(_tpl(data));
 		});
@@ -27,8 +31,9 @@ App.Services.ProjectLink=Backbone.View.extend({
 	},
 	
 	loadData:function(callback){
+		var _this=this;
 		$.ajax({
-			url:'/platform/mapping/project?type=1'
+			url:'/platform/mapping/project?type='+(_this.userData.type=='qualityProjectCode'?3:2)
 		}).done(function(data){
 			callback(data);
 		})
@@ -62,8 +67,30 @@ App.Services.ProjectLink=Backbone.View.extend({
 			}).done(function(data){
 				$("#dataLoading").hide();
 				App.Global.module.close();
+				
+				let collectionMap=App.Services.ProjectCollection.ProjecMappingCollection;
+		 		collectionMap.projectId=projectId;
+		 		collectionMap.fetch({
+		 			reset:true,
+		 			success(child, data) {}
+		 		});
+				
 			})
 		}
+	},
+	
+	updateList(e){
+		if(e.keyCode!='13'){
+			return
+		}
+		
+		var t=$(e.currentTarget).val();
+		var d=this.projectData.data||[];
+		var r=d.filter(function(i){
+			return i.projectName.indexOf(t)!==-1;
+		})
+		var _tpl=_.template(this.template);
+		this.$el.html(_tpl({data:r}));
 	}
 
 });

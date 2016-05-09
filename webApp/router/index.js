@@ -15,7 +15,8 @@ var AppRoute = Backbone.Router.extend({
 		'services/:type': 'services',
 		'services/:type/:tab': 'services',
 		'list/:id': 'list',
-		'bodyContent':'bodyContent'
+		'bodyContent':'bodyContent',
+		'logout':'logout'
 	},
 	
     //首页主体展示
@@ -28,6 +29,17 @@ var AppRoute = Backbone.Router.extend({
 		_.require('/static/dist/bodyContent/bodyContent.js');
 		App.BodyContent.control.init();
 		$("#pageLoading").hide();
+	},
+	
+	logout:function(){
+		
+		App.Comm.setCookie('OUTSSO_AuthToken','');
+		App.Comm.setCookie('AuthUser_AuthNum','');
+		App.Comm.setCookie('AuthUser_AuthMAC','');
+		App.Comm.setCookie('OUTSSO_AuthNum','');
+		App.Comm.setCookie('OUTSSO_AuthMAC','');
+		
+		window.location.href="/login.html";
 	},
 	//待办
 	todo: function() {
@@ -70,10 +82,7 @@ var AppRoute = Backbone.Router.extend({
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".flow").addClass('selected');
 		_.require('/static/dist/flow/flow.css');
 		_.require('/static/dist/flow/flow.js'); 
-		$("#contains").html(new App.Flow().render().el);
-
-		$("#pageLoading").hide();
-
+		App.Flow.Controller.init();
 	},
 
 	//资源库

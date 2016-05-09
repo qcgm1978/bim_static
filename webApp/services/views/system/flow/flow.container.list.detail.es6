@@ -139,7 +139,7 @@ App.Services.System.FolwContainerListDetail = Backbone.View.extend({
 			dialogHtml = _.templateUrl('/services/tpls/system/flow/system.add.flow.html')(data),
 
 			opts = {
-				title: "新增流程",
+				title: "编辑流程",
 				width: 601,
 				isConfirm: false,
 				isAlert: true,

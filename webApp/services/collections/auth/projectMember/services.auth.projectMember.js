@@ -55,7 +55,7 @@ App.Services.projectMember = {
 				    	result=[];
 				    }
 					_.each(data,function(item){
-						item.image=item.image||'/static/dist/services/images/demoProject.png';
+						item.image=item.image||'/static/dist/images/projects/images/proDefault.png';
 						result.push(item)
 					})
 				return result;

@@ -18,6 +18,9 @@ App.Services.ProjectMapping=Backbone.View.extend({
 	},
 
 	render(data){
+		if(!data){
+			return this;
+		}
 		data=data.toJSON()[0];
 		var _array=[];
 		if(data){
@@ -30,20 +33,19 @@ App.Services.ProjectMapping=Backbone.View.extend({
 	    		module:'成本',
 	    		projectName:data.costProjectName,
 	    		code:data.costProjectCode,
-	    		op:"<a class='aedit' href='javascript:;'>修改</a>"
+	    		op:"<a class='aedit' href='javascript:;'>"+(data.costProjectCode?'修改':'关联')+"</a>"
 	    	},{
 	    		module:'质监',
 	    		projectName:data.qualityProjectName,
 	    		code:data.qualityProjectCode,
-	    		op:"<a class='alink' href='javascript:;'>关联</a>"
+	    		op:"<a class='alink' href='javascript:;'>"+(data.qualityProjectCode?'修改':'关联')+"</a>"
 	    	}];
 		}
     	
     	
     	var _html=_.template(this.template);
 		this.$el.html(_html({items:_array}));  
-		$(".projectContainer .projectMapping").html(this.$el);
-		
+	//	$(".projectContainer .projectMapping").html(this.$el);		
 		return this;
 	},
 	
@@ -52,15 +54,18 @@ App.Services.ProjectMapping=Backbone.View.extend({
 	},
 	
 	linkList(event){
-		debugger
+		var type=$(event.currentTarget).attr('class')=='alink'?'qualityProjectCode':'costProjectCode';
+		var title=$(event.currentTarget).attr('class')=='alink'?'质监项目映射':'成本项目映射';
 		var _userData=this.userData;
 		var el=new App.Services.ProjectLink({
 			userData:{
 				projectId:_userData.projectId,
-				type:$(event.currentTarget).attr('class')=='alink'?'qualityProjectCode':'costProjectCode'
+				type:type
 			}
 		}).render().el;
-		App.Global.module=new App.Comm.modules.Dialog({title:'成本项目映射',width:600,height:500,isConfirm:false,message:el})
+		App.Global.module=new App.Comm.modules.Dialog({title:title,width:600,height:500,isConfirm:true,okCallback:function(){
+			$("#linkBtn").trigger('click');
+		},message:el})
 	}
 
 });

@@ -8,9 +8,9 @@ ul,li{list-style: none outside none;}
 .right{float: right;}
 .myh{font-family: "Microsoft Yahei"}
 .pdX20{padding-left: 20px;padding-right: 20px;}
-.keyUserMain {padding: 20px;}
-.keyUserList{position: absolute;left: 20px;right: 20px;width: 286px;border: 1px solid #cccccc;height: 562px;overflow: auto;background-color: #eeeeee;}
-.keyBody{margin-left: 306px;border: solid #cccccc;border-width: 1px 1px 0 1px;position: relative;}
+.keyUserMain {padding: 20px;height: 100%;}
+.keyUserList{position: absolute;left: 20px;right: 20px;width: 286px;border: 1px solid #cccccc;background-color: #eeeeee;height:95%;}
+.keyBody{margin-left: 306px;border:1px solid #cccccc;position: relative;overflow: auto; height: 100%;}
 .keyul-title{line-height: 50px;height: 51px;padding: 0 0 0 20px;font-size: 14px;color: #333333;border-bottom: 1px solid  #cccccc;}
 .keyUserList li{line-height: 50px;height: 51px;border-left: 3px solid #eeeeee;padding: 0 20px;position: relative;border-bottom: 1px solid #cccccc;cursor: pointer; }
 .keyUserList li.active{border-left-color:  #006ecf;background-color: #ffffff;}
@@ -289,5 +289,21 @@ ul,li{list-style: none outside none;}
     background: #fff;
     color: #666;
     border: 1px solid #CCCCCC;
+  }
+}
+.keyUserBody{
+  height: 100%;
+  .needloading{
+    overflow: auto; height: 100%;
+  }
+}
+.smallLoading{
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  padding-top: 60px;
+  img{
+    width: 20px;
+    height: 20px;
   }
 }

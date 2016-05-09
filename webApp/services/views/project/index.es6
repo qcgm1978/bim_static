@@ -26,6 +26,8 @@
 		new App.Services.ProjectBase();
 		
 		this.viewProjectMapping = new App.Services.ProjectMapping();
+		
+		this.$(".projectContainer .projectMapping").html(this.viewProjectMapping.render().el);
 
  		this.$(".projectContainer .projectDetail").html(new App.Services.ProjectDetail().render().el);
 
@@ -74,6 +76,8 @@
  		this.viewProjectMapping.setUserData({
  			projectId:_projectId
  		});
+ 		
+ 		//加载项目映射数据
  		let collectionMap=App.Services.ProjectCollection.ProjecMappingCollection;
  		collectionMap.projectId=_projectId;
  		collectionMap.fetch({

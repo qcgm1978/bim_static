@@ -44,10 +44,7 @@ App.Project.DesignCollisionDetail=Backbone.View.extend({
         name = that.find(".ckName").text();
     $.each(this.list,function(index,item){
       if(item.name == name){
-        var ids = {
-              type:"userId",
-              ids:[item.leftId,item.rightId]
-            },
+        var ids=[item.leftId,item.rightId],
             box=[item.leftElementBoxMin,item.leftElementBoxMax,item.rightElementBoxMin,item.rightElementBoxMax];
         App.Project.Settings.Viewer.selectIds(ids);
         App.Project.Settings.Viewer.setGlobalTransparent(true);
@@ -87,7 +84,9 @@ App.Project.DesignCollisionDetail=Backbone.View.extend({
       title: '碰撞检查设置',
       cssClass: 'task-create-dialog',
       message: "",
-      okText: '确&nbsp;&nbsp;认',
+      isAlert: true,
+      isConfirm: false,
+      okText: '关&nbsp;&nbsp;闭',
       readyFn:function(){
         this.element.find(".content").html(new App.Project.ProjectViewSetting().render().el);
         App.Project.DesignAttr.CollisionSetting.projectId = App.Project.Settings.projectId;
