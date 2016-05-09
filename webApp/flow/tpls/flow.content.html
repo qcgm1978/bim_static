@@ -1,11 +1,7 @@
 <div id="flowContainer">
-	
 	<%  _.each(data,function(item){ %>
-		
-		<div class="classify">
-			<div class="leftRadius flowBg"></div>
-			<div class="rightRadius flowBg"></div>
-			<div class="title"><%=item.title%></div>
+		<fieldset class="classify">
+			<legend><%=item.title%></legend>
 			<ul>
 				<%  _.each(item.items,function(i){ %>
 					<li class="item"> <span class="text"><%=i.name%></span>
@@ -15,12 +11,9 @@
 						<% if(i.viewUrl){ %>
 							 <a href="<%=i.viewUrl%>" target="_blank" class="right mRightCK">查看</a>
 						<% } %>
-						
 					</li>
 				<% }) %>
 			</ul>
-		</div>
-		<div class="clear"></div>
+		</fieldset>
 	<% }) %>
-	
 </div>
