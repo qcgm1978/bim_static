@@ -17,6 +17,14 @@ App.Services.projectMember.members = Backbone.View.extend({
   		var _userName=event.currentTarget.getAttribute("data-userName");
   		var _opType=event.currentTarget.getAttribute("data-type");//对象类型：org,user
   		var _outer=event.currentTarget.getAttribute("data-outer");//对象类型：org,user
+  		
+  		
+  		App.Services.Dialog.alert("<span class='delTip'>是否将用户'"+_userName+"'删除？</span>",function(_this){
+  			_this.close();
+  		});
+  		
+  		return 
+  		
   		this.delModal=this.delModal || new ViewComp.Modal;
   		var _model=this.delModal;
   		_model.render({title:"",dialog:true,confirm:function(){
