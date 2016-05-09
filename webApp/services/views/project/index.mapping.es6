@@ -63,7 +63,9 @@ App.Services.ProjectMapping=Backbone.View.extend({
 				type:type
 			}
 		}).render().el;
-		App.Global.module=new App.Comm.modules.Dialog({title:title,width:600,height:500,isConfirm:false,message:el})
+		App.Global.module=new App.Comm.modules.Dialog({title:title,width:600,height:500,isConfirm:true,okCallback:function(){
+			$("#linkBtn").trigger('click');
+		},message:el})
 	}
 
 });

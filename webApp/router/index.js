@@ -82,10 +82,7 @@ var AppRoute = Backbone.Router.extend({
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".flow").addClass('selected');
 		_.require('/static/dist/flow/flow.css');
 		_.require('/static/dist/flow/flow.js'); 
-		$("#contains").html(new App.Flow().render().el);
-
-		$("#pageLoading").hide();
-
+		App.Flow.Controller.init();
 	},
 
 	//资源库

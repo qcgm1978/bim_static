@@ -17,16 +17,14 @@ App.Services.projectMember.members = Backbone.View.extend({
   		var _userName=event.currentTarget.getAttribute("data-userName");
   		var _opType=event.currentTarget.getAttribute("data-type");//对象类型：org,user
   		var _outer=event.currentTarget.getAttribute("data-outer");//对象类型：org,user
-  		this.delModal=this.delModal || new ViewComp.Modal;
-  		var _model=this.delModal;
-  		_model.render({title:"",dialog:true,confirm:function(){
-    		_model.html("<img src='/static/dist/images/services/images/load.gif'>正在删除、请稍等...")
-    		var url="/platform/auth/"+_opType+"/"+_userId+"/dataPrivilege?outer="+_outer+"&privilegeId="+App.Comm.getCookie("currentPid");
+  		
+  		
+  		App.Services.Dialog.alert("<span class='delTip'>是否将用户'"+_userName+"'删除？</span>",function(_this){
+  			var url="/platform/auth/"+_opType+"/"+_userId+"/dataPrivilege?outer="+_outer+"&privilegeId="+App.Comm.getCookie("currentPid");
     		$.ajax({
     			type:"DELETE",
     			url:url
     		}).done(function(data){
-    			_model.html("删除成功");
     			if(data.message=="success"){
     				$('#dataLoading').show();
     				App.Services.projectMember.loadData(App.Services.projectMember.projectMemberMemberCollection,{outer:App.Comm.getCookie("isOuter")},{
@@ -35,12 +33,10 @@ App.Services.projectMember.members = Backbone.View.extend({
 					setTimeout(function(){
 						_model.closeView();
 					},100)
-    			}else{
-    				//TODO 临时方案
-    				_model.html("删除失败");
     			}
     		})
-    	}}).append("<span class='delTip'>是否将用户'"+_userName+"'删除？</span>");
+  			_this.close();
+  		});
   },
 
   render: function(items) {
