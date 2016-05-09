@@ -110,14 +110,14 @@
           display:inline-block;width:12px;height:12px;background:url(/comm/images/commIcon.png) no-repeat;background-position:0 -420px;vertical-align:text-top;
         }
       }
-      .collSelect{ display:none;width:100%; position:absolute; z-index:2; left:0px; top:25px; padding:10px 10px 0; border:1px solid #ccc; border-top:none; background:#fff;overflow:hidden;
+      .collSelect{ display:none;width:100%; position:absolute; z-index:2; left:0px; top:25px; padding-top:10px; border:1px solid #ccc; border-top:none; background:#fff;overflow:hidden;
         .serch{
           input{width:100%; height:25px; outline:none; }
         }
         .tips{padding-bottom:10px;}
         .collList{
-          .collItem{padding:5px 0; height:24px; padding-right:64px; overflow:hidden; cursor:pointer;
-            // &:hover{background-color:#cef0ff;}
+          .collItem{ height:24px; padding:5px 74px 5px 10px; overflow:hidden; cursor:pointer;
+            &.selected{background-color:#cef0ff;}
           }
           .collName{display:block; width:100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
           .collStatus{width:64px; color:#b2b2b2; text-align:right; margin-right:-64px; float:right; }

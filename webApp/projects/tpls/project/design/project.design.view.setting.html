@@ -10,21 +10,21 @@
         <% _.each(_.sortBy(data.chooseA,"sort"),function(item){ %>
           <ul class="treeView">
             <li class="itemNode">
-              <div class="itemContent">
+              <div class="itemContent open">
                 <i class="nodeSwitch"></i>
                 <span class="tree-text"><%= item.specialty %></span>
               </div>
               <ul class="subTree">
                 <% _.each(item.files,function(file){ %>
                   <li class="itemNode">
-                    <div class="itemContent">
+                    <div class="itemContent open">
                       <i class="nodeSwitch"></i>
                       <span class="tree-text"><%= file.fileName %></span>
                     </div>
                     <ul class="subTree">
                       <% _.each(file.categories,function(value){ %>
                         <li class="itemNode">
-                          <div class="itemContent">
+                          <div class="itemContent open">
                             <i class="fileIcon"></i>
                             <span class="tree-text"><%= value %></span>
                           </div>
@@ -45,21 +45,21 @@
         <% _.each(_.sortBy(data.chooseB,"sort"),function(item){ %>
           <ul class="treeView">
             <li class="itemNode">
-              <div class="itemContent">
+              <div class="itemContent open">
                 <i class="nodeSwitch"></i>
                 <span class="tree-text"><%= item.specialty %></span>
               </div>
               <ul class="subTree">
                 <% _.each(item.files,function(file){ %>
                   <li class="itemNode">
-                    <div class="itemContent">
+                    <div class="itemContent open">
                       <i class="nodeSwitch"></i>
                       <span class="tree-text"><%= file.fileName %></span>
                     </div>
                     <ul class="subTree">
                       <% _.each(file.categories,function(value){ %>
                         <li class="itemNode">
-                          <div class="itemContent">
+                          <div class="itemContent open">
                             <i class="fileIcon"></i>
                             <span class="tree-text"><%= value %></span>
                           </div>

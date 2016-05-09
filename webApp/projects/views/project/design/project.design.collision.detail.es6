@@ -84,7 +84,8 @@ App.Project.DesignCollisionDetail=Backbone.View.extend({
       title: '碰撞检查设置',
       cssClass: 'task-create-dialog',
       message: "",
-      okText: '确&nbsp;&nbsp;认',
+      cancelText:false,
+      okText: '关&nbsp;&nbsp;闭',
       readyFn:function(){
         this.element.find(".content").html(new App.Project.ProjectViewSetting().render().el);
         App.Project.DesignAttr.CollisionSetting.projectId = App.Project.Settings.projectId;

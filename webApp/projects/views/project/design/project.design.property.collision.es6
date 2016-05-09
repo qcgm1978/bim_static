@@ -24,7 +24,7 @@ App.Project.DesignCollision=Backbone.View.extend({
 
 	showSelectList:function(event){
 		// 显示碰撞任务列表
-		var $el = $(event.target);
+		var $el = $(event.target).closest(".inputBox");
 		var that = this;
 		var list = that.$el.find('.collSelect');
 		list.show();
@@ -55,6 +55,7 @@ App.Project.DesignCollision=Backbone.View.extend({
 			title: '碰撞检查设置',
 			cssClass: 'task-create-dialog',
 			message: "",
+			cancelText:"取&nbsp;&nbsp;消",
 			okText: '确&nbsp;&nbsp;认',
 			readyFn:function(){
 				this.element.find(".content").html(new App.Project.ProjectDesignSetting().render().el);
@@ -119,13 +120,14 @@ App.Project.DesignCollision=Backbone.View.extend({
 
 	getDetail:function(event){
 		var list = this.$el.find('.collSelect'),
-				that = $(event.target).parent(),
+				that = $(event.target).closest(".collItem"),
 				name = that.find('.collName').text(),
 				collisionId = that.data('id'),
 				status = that.data('status'),
 				len = parseInt(($(".detailList").height() -65)/77),
 				currentInput = list.prev().find("input");
 		currentInput.val(name);
+		that.addClass("selected").siblings().removeClass("selected");
 		list.hide();
 		if(status == "2"){
 			App.Project.Settings.collisionId = collisionId;
