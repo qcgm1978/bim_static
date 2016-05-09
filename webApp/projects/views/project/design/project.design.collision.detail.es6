@@ -44,10 +44,7 @@ App.Project.DesignCollisionDetail=Backbone.View.extend({
         name = that.find(".ckName").text();
     $.each(this.list,function(index,item){
       if(item.name == name){
-        var ids = {
-              type:"userId",
-              ids:[item.leftId,item.rightId]
-            },
+        var ids=[item.leftId,item.rightId],
             box=[item.leftElementBoxMin,item.leftElementBoxMax,item.rightElementBoxMin,item.rightElementBoxMax];
         App.Project.Settings.Viewer.selectIds(ids);
         App.Project.Settings.Viewer.setGlobalTransparent(true);
