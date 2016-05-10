@@ -33,6 +33,7 @@ App.Services.windowAlert = Backbone.View.extend({
             type:"DELETE",
             success:function(response){
                 $("#dataLoading").hide();
+                console.log(response);
                 if(response.code==18005){
                     $(".servicesAlert .confirm").hide();
                     $(".servicesAlert .alert").show();
@@ -46,7 +47,7 @@ App.Services.windowAlert = Backbone.View.extend({
                     App.Services.role.collection.remove(_thisModel);
                     App.Services.alertWindow.close();
                 }else if(response.data.failure[0] ==roleId){
-                    alert("删除失败,请联系管理员");
+                    alert("删除失败，类型未判定");
                     App.Services.alertWindow.close();
                 }
                 App.Services.deleteRoleInfo ="";//清理
