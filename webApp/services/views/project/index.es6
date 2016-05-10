@@ -30,6 +30,12 @@
 		this.$(".projectContainer .projectMapping").html(this.viewProjectMapping.render().el);
 
  		this.$(".projectContainer .projectFloor").html(new App.Services.ProjectDetail.Floor().render().el);
+ 		
+ 		this.$(".projectContainer .projectBaseHole").html(new App.Services.ProjectDetail.BaseHole().render().el);
+ 		
+ 		this.$(".projectContainer .projectSection").html(new App.Services.ProjectDetail.Section().render().el);
+ 		
+ 		this.$(".projectContainer .projectPile").html(new App.Services.ProjectDetail.Pile().render().el);
 
  		this.fetchData();
 
