@@ -58,9 +58,9 @@ App.Services.roleDetail=Backbone.View.extend({
         this.recognize(function(){
             //隐藏可选项
             $(".memCheck").hide();
+            $(".windowSubmit").hide();
             $(".seWinBody .func li .name span.rohead ").hide();
         });
-
     },
 
     //弹窗
@@ -73,9 +73,6 @@ App.Services.roleDetail=Backbone.View.extend({
             height:500,
             isConfirm:false,
             isAlert:false,
-            okCallback:function(){},
-            cancelCallback:function(){},
-            closeCallback:function(){},
             message:frame
         });
     },
