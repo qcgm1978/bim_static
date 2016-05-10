@@ -21,38 +21,25 @@ App.Services.MemberWindowIndex = Backbone.View.extend({
 
     //提交表单，完毕会触发重新获取列表，列表为memBlend所属列表
     windowSubmit:function(){
-        //获取要提交的成员/组织相关信息
-        var submitData  = App.Services.memberWindowData;
+        var submitData  = App.Services.memberWindowData;//获取要提交的成员/组织相关信息
         if(submitData){
             //获取已选角色,并添加角色ID
             var selectRole = App.Services.role.collection.filter(function(item){
                 return item.get("checked");
             });
 
-            if(!selectRole.length){alert("请至少选择一个角色");return;}
+
+            //if(!selectRole.length){alert("请至少选择一个角色");return;}
             _.each(selectRole,function(item){
                 submitData.roleId.push(item.get("roleId"));
             });
         }
 
-        //根用户无法赋予权限
-        //if(){}
-
-
-        //提交 角色变更
-      /*  App.Comm.ajax({
-            URLtype:"putServicesSaveRole",
-            data:submitData
-        },function(response){
-            console.log(response);
-        });
-*/
-
         $.ajax({
             type:"POST",
-            url:"platform/auth/user/role",
+            url:"http://bim.wanda-dev.cn/platform/auth/role/grant",
             data:submitData,
-            dataType:"json",
+            contentType: "application/json",
             success:function(response){
                 //返回重新获取成员角色列表
             },

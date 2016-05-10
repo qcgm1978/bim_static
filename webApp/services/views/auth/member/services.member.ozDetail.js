@@ -55,14 +55,12 @@ App.Services.MemberozDetail=Backbone.View.extend({
                 //菜单渲染
                 _this.$("#childOz" + _thisId).html(new App.Services.MemberozList(response.data.org).render().el);
             }
-
-            if(!response.data.org.length && !response.data.user ){
-                $("#blendList").html("<li>暂无数据</li>");
+            if(!response.data.org.length && !response.data.user.length ){
+                console.log("无数据");
+                $("#blendList").html("<li><span class='sele'>暂无数据</span></li>");
             }
             $("#dataLoading").hide();
         });
-
-
     }
 });
 

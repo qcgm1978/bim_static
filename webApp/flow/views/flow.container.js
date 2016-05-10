@@ -22,7 +22,6 @@ App.Flow.View=Backbone.View.extend({
 	load:function(m){
 		var data=m.toJSON()[0];
 		var _html=_.template(this.template);
-		debugger
 		$("#contains").html(_html(data));
 		return this;
 	}

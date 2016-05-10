@@ -7,7 +7,7 @@
 		}
 	}
 	.projectContainer { height: 100%; margin-top: -40px; padding-top: 40px;
-		.projectBase, .projectMapping, .projectDetail { display: none; }
+		.projectBase, .projectMapping, .projectFloor { display: none; }
 	}
 	.folwSlideBar { .header { height: 38px; line-height: 38px; padding-left: 15px; font-size: 16px; border-bottom: 1px #ccc solid; }
 		.slideBarContainer { height: 100%; margin-top: -39px; padding-top: 39px; }
@@ -63,6 +63,67 @@
 		}
 		.listHeader{    color: #ccc;}
 		.listBody{font-size: 14px;}
+	}
+	
+	
+	.projectDetail{
+		width: 100%;
+		height: 100%;
+		font-family: "microsoft yahei";
+		font-size: 14px;
+		
+		& .header,dt{
+			border:1px solid #ccc;
+			border-bottom: none;
+			height: 40px;
+			line-height:40px;
+			padding-left: 10px;
+		}
+		
+		& .header{
+				border-top: none;
+				color: #666;
+			}
+		& dt{
+				color: #333;
+				&:last-of-type{
+					border-bottom: 1px solid #ccc;
+				}
+				& .accordionDatail{
+					float: right;
+					margin-right: 10px;
+				}
+			}
+		& dd{
+				background: #EEE;
+				width: 100%;
+				border: 1px solid #ccc;
+				border-top: none;
+				margin-left: 0;
+				box-sizing: border-box;
+				padding: 10px;
+				height: 100%;
+				height: auto;
+				clear: both;
+				display: inline-block;
+		}
+		& .formColumn{
+				width: 50%;
+				float: left;
+				& label{
+					height: 40px;
+					width: 120px;
+					display: inline-block;
+					text-align: right;
+					margin-right: 5px;
+					font-size: 12px;
+					color: #666666;
+				}
+				
+				& input{
+					width: inherit;
+				}
+			}
 	}
 }
 
