@@ -349,6 +349,11 @@
     background: url('../img/delete.gif');
 }
 
+.plupload_filelist .plupload_failed .pl-ac {
+    background: none;
+}
+
+
 .pl-ac a {
     display: block;
     width: 16px;

@@ -3,6 +3,8 @@ App.Project = {
 	Settings: {
 		projectId: "",
 		projectVersionId: "",
+		famHtml: "",
+		axisHtm:"",
 		modelId: ""
 	},
 
@@ -122,22 +124,25 @@ App.Project = {
 		$(".rightProperty").show();
 		App.Project.Settings.Viewer = new familyModel({
 			element: $("#modelBox"),
-			etag: modelId
+			etag: modelId,
+			callback: function(id) {
+				App.Project.renderAttr(id,1);
+			}
 		});
 
 		// 获取familyType
 		App.Project.Settings.Viewer.on("changType", function(id) {
 			if (id) {
 				App.Project.Settings.typeId = id;
-				App.Project.renderAttr(id);
+				App.Project.renderAttr(id,2);
 			}
 		})
 
 		App.Project.Settings.modelId = modelId;
 		App.Project.Settings.Viewer.on("click", function(model) {
 
-			if (!model.intersect) { 
-				App.Project.renderAttr(App.Project.Settings.typeId); 
+			if (!model.intersect) {
+				App.Project.renderAttr(App.Project.Settings.typeId,2);
 				return;
 			}
 			//渲染属性
@@ -147,14 +152,14 @@ App.Project = {
 	},
 
 	//渲染dwg 文件
-	renderDwg(modelId) { 
+	renderDwg(modelId) {
 
 		$("#modelBox").addClass("dwg");
 
 		var viewer = new dwgViewer({
 			element: $("#modelBox"),
 			sourceId: modelId
-		}); 
+		});
 
 	},
 
@@ -194,7 +199,8 @@ App.Project = {
 		return result;
 	},
 
-	renderAttr(elementId) {
+	//type 1 轴 其他属性 2 changeType
+	renderAttr(elementId, type) {
 
 
 		var url = "/sixD/" + App.Project.Settings.projectId + "/" + App.Project.Settings.projectVersionId + "/property";
@@ -205,10 +211,53 @@ App.Project = {
 				sceneId: App.Project.Settings.modelId
 			}
 		}).done(function(data) {
-			var template = App.Project.templateUrl("/projects/tpls/project/design/project.design.property.properties.html");
-			$("#projectContainer .designProperties").html(template(data.data));
+			var template = App.Project.templateUrl("/projects/tpls/project/design/project.design.property.properties.html"),
+				html = template(data.data);
+
+
+			if (type == 1) {
+				App.Project.Settings.famHtml = html;
+			} else {
+				if (type == 2) {
+
+					if (App.Project.Settings.famHtml) {
+						$("#projectContainer .designProperties").html(App.Project.Settings.famHtml);
+						$("#projectContainer .designProperties").append(html);
+
+					} else {
+						App.Project.Settings.axisHtm=html;
+						App.Project.renderAxisComm(); 
+					} 
+					
+
+				} else {
+					$("#projectContainer .designProperties").html(html);
+				}
+
+			}
+
 		});
 
+	},
+
+	//渲染轴公共
+	renderAxisComm() {
+		 
+		//定时监听 是否返回
+		App.Project.Settings.timer = setTimeout(function() {
+
+			clearTimeout(App.Project.Settings.timer);
+			if (App.Project.Settings.famHtml) {
+				//公共信息
+				$("#projectContainer .designProperties").html(App.Project.Settings.famHtml);
+				//本身信息
+				$("#projectContainer .designProperties").append(App.Project.Settings.axisHtm);
+				
+			} else {
+				App.Project.renderAxisComm();
+			}
+
+		}, 200);
 	},
 
 	//渲染模型

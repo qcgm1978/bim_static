@@ -1,22 +1,29 @@
+  
 ;
 (function($) {
 
-	// 单选，多选
 	$.fn.myRadioCk = function(opts) {
+		$(this).each(function() {
+			new myRadioCk($(this), opts);
+		});
+	}
+
+	// 单选，多选
+	function myRadioCk($el, opts) {
 
 		var settings = {
-			click: null		 
+			click: null
 		}
 
 		this.settings = $.extend(settings, opts);
 
-		var $that = $(this);
+
 		//事件绑定
 		this.bindEvent = function() {
 			var that = this;
-			$that.on("click", ".btnRadio,.btnCk", function() {
+			$el.on("click", ".btnRadio,.btnCk", function() {
 				//禁用不可选中
-				if ($(this).hasClass("disable") ||$that.hasClass("disable")) return;
+				if ($(this).hasClass("disable") || $el.hasClass("disable")) return;
 
 				if ($(this).is(".btnCk")) {
 					//选中样式
@@ -27,14 +34,14 @@
 				}
 
 				if ($.isFunction(that.settings.click)) {
-					that.settings.click.call(that,$(this).hasClass('selected'));
+					that.settings.click.call(that, $(this).hasClass('selected'));
 				}
 			});
 		}
 
 		this.init = function() {
 			this.bindEvent();
-		}  
+		}
 
 		this.init();
 

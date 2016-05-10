@@ -158,20 +158,24 @@ App.Index = {
 		});
 
 		$(".showChange .groupRadio").myRadioCk({
-			click: function(argument) {
-				if ($(this).find(".selected").length > 0) {
-					var diff = App.Index.Settings.differFileVersionId;
+			click: function(isSelected) {
+
+				//显示 不显示 差异
+				if (App.Index.Settings.changeModel) {
+					App.Index.Settings.Viewer.showScene(App.Index.Settings.changeModel, isSelected);
+					return;
+				}
+
+				if (isSelected) {
+					var diff = App.Index.Settings.baseFileVersionId;
 					if (diff) {
 						App.Index.getModelId(diff, function(data) {
 							if (data.code == 0) {
-								App.Index.Settings.Viewer.load(App.Index.Settings.modelId, data.data.modelId);
+								//加载差异模型
+								App.Index.Settings.changeModel = App.Index.Settings.Viewer.load(data.data.modelId);
 							}
 						});
 					}
-
-
-				} else {
-					App.Index.Settings.Viewer.load(App.Index.Settings.modelId);
 				}
 			}
 		});
@@ -406,10 +410,19 @@ App.Index = {
 			//下拉 事件绑定
 			$(".projectNavContentBox .projectChangeListBox:first .specialitiesOption").myDropDown({
 				click: function($item) {
+
 					var groupText = $item.closest(".groups").prev().text() + "：";
+
 					$(".specialitiesOption .myDropText span:first").text(groupText);
+
 					var baseFileVersionId = $item.data("basefileversionid"),
+
 						differFileVersionId = $item.data("differfileversionid");
+
+						//重置数据
+					$(".showChange .groupRadio .selected").removeClass('selected');
+					App.Index.Settings.changeModel = null;
+					App.Index.Settings.baseFileVersionId = baseFileVersionId;
 
 					that.renderModel(differFileVersionId);
 					that.fetchChangeList(baseFileVersionId, differFileVersionId);

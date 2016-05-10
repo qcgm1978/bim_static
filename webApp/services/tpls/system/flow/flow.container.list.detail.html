@@ -12,6 +12,10 @@
 	<%if(busSendUrl){%>
 		<div>发起： <a href="<%=busSendUrl%>" class="aStar" target="_blank"><%=busSendUrl%></a></div>
 	<%}%>   
+
+	<%if(!busViewUrl && !busSendUrl ){%>
+			---
+	<%}%>
     
 </div>
 <div class="op left">

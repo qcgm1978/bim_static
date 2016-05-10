@@ -1,5 +1,5 @@
 .overflowEllipsis {vertical-align: middle; display: inline-block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-#contains { min-width: 1000px; margin: 0 auto; height: 100%; position: relative; box-sizing: border-box; margin-top: -50px; padding-top: 50px; }
+#contains { min-width: 1100px; margin: 0 auto; height: 100%; position: relative; box-sizing: border-box; margin-top: -50px; padding-top: 50px; }
 .hidden { display: none; }
 .right { float: right; }
 .relative{position: relative;}
@@ -133,14 +133,14 @@
 	.filecKAll { width: 5%; text-align: center; }
 	.fileName { width: 48%;
 		.fileType { margin-right: 10px; display: inline-block; margin-top: 5px; vertical-align: top; width: 35px; height: 30px; background: url('/projects/images/fileicon.png') no-repeat;
-			&.rvt { background-position: 0px -39px;margin-right: 0px; }
+			&.rvt { background-position: 0px -39px;}
 			&.dwg { background-position: 0px -79px; }
 			&.other { background-position: 0px -439px; }
 		}
 		.text { cursor: pointer;
 			&:hover { text-decoration: underline; }
 		}
-		.fileTypeImg { height: 30px; width: 35px; vertical-align: top; margin-top: 3px; }
+		.fileTypeImg { height: 30px; width: 35px; vertical-align: top; margin-top: 3px;margin-right: 10px; }
 	}
 	.fileStatus { width: 11%; }
 	.fileOp { width: 11%; }
@@ -173,3 +173,5 @@
 	&.dwg { background-position: 0px -276px; }
 	&.other { background-position: 0px -359px; }
 }
+
+ul li.loading{text-align: center;font-size: 14px;padding-top: 30px;color:#ccc;}

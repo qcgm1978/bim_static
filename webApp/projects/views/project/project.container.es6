@@ -13,7 +13,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		"click .projectVersionList .container .item": "changeVersion",
 		"click .projectVersionList .nav .item": "changeVersionTab",
 		"click .fileModelList li": "switchFileMoldel",
-		"click .modleShowHide":"slideUpAndDown"
+		"click .modleShowHide": "slideUpAndDown"
 
 	},
 
@@ -29,12 +29,13 @@ App.Project.ProjectContainer = Backbone.View.extend({
 	},
 
 	//展开和收起
-	slideUpAndDown:function(event){
-		var $parent=$(event.target).parent(),$modleList=$parent.find(".modleList");
+	slideUpAndDown: function(event) {
+		var $parent = $(event.target).parent(),
+			$modleList = $parent.find(".modleList");
 		$(event.target).toggleClass("down");
 		if ($modleList.is(":hidden")) {
 			$modleList.slideDown();
-		}else{
+		} else {
 			$modleList.slideUp();
 		}
 
@@ -237,7 +238,14 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			//tab 文字
 			$target.closest('.fileModelNav').find(".breadItemText .text").text($target.text());
 
-
+			//绑定上传
+			if (App.Project.Settings.CurrentVersion.status != 9) {
+				$(".fileContainer .btnFileUpload").show();
+				//上传
+				App.Project.upload = App.modules.docUpload.init($(document.body));
+			} else {
+				$(".fileContainer .btnFileUpload").hide();
+			}
 
 		} else {
 
@@ -253,6 +261,8 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			}
 			//tab 文字
 			$target.closest('.fileModelNav').find(".breadItemText .text").text($target.text());
+
+			
 		}
 
 		//隐藏下拉
@@ -280,6 +290,9 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		//内容
 		$projectContainer.find(".fileContainer").hide();
 		$projectContainer.find(".modelContainer").show();
+
+		//销毁上传
+		App.Comm.upload.destroy();
 
 	},
 
@@ -321,18 +334,19 @@ App.Project.ProjectContainer = Backbone.View.extend({
 	//模型渲染
 	renderModel: function() {
 
-		var that = this;
+		var that = this; 
+
 		this.typeContentChange();
 
 		//渲染模型属性
-		App.Project.renderModelContentByType();  
+		App.Project.renderModelContentByType();
 
 
 		// var viewer = new dwgViewer({
 		// 	element:$("#projectContainer .modelContainerContent"),
 		// 	sourceId:'beea5e402aaf38ceff7dd4dd315ebc05'
 		// })  
-		    
+
 		var viewer = App.Project.Settings.Viewer = App.Comm.createModel({
 			element: $("#projectContainer .modelContainerContent"),
 			sourceId: App.Project.Settings.DataModel.sourceId,

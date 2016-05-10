@@ -247,7 +247,7 @@
 				uploader.bind("Flash:UploadChunkComplete", function(up, info) {
 					var chunkArgs, file = up.getFile(lookup[info.id]);
                     var infoText = $.parseJSON(info.text);
-                    if(infoText.result === 'fail'){
+                    if(infoText.result === 'fail' || response.code!=0){
                         uploader.trigger('Error', {
                             code : plupload.FAILED,
                             message : infoText.message,

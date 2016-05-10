@@ -71,8 +71,15 @@
 
                 //上传成功
                 fileUploaded: function(response, file) {  
+
+
                      var data=JSON.parse(response.response);
-                     App.Project.FileCollection.push(data.data); 
+                     //上传成功 且 是在当前文件夹下 才显示 上传的文件
+                     if (App.Project.Settings.fileId && data.code==0) {
+                        if (App.Project.Settings.fileId==data.data.parentId) {
+                            App.Project.FileCollection.push(data.data); 
+                        }
+                     }                     
                 },
 
                 //上传失败
@@ -86,7 +93,7 @@
         //获取上传容量
         getQuotaInfo: function() {
             var quota = this.quota;
-            return "共 20GB，已用 564.2MB"; //App.Comm.modules.util.format('共 $0，已用 $1', [App.common.modules.util.formatSize(quota.total), App.common.modules.util.formatSize(quota.used)])
+            return ""; //App.Comm.modules.util.format('共 $0，已用 $1', [App.common.modules.util.formatSize(quota.total), App.common.modules.util.formatSize(quota.used)])
         },
 
         //更新上传容量

@@ -52,7 +52,6 @@ App.Services.MemberList=Backbone.View.extend({
         var _this =this , url;//提交地址
         var type =  App.Services.MemberType;//组织类型
 
-
         //获取所选项
         var seleUser = App.Services.Member[type + "Collection"].filter(function(item){
             if(item.get("checked")){
@@ -156,9 +155,9 @@ App.Services.MemberList=Backbone.View.extend({
             success:function(response){
                 if(response.message=="success"){
                     if(response.data.length){$(".seWinBody .memRoleList  ul").append("<li>没有相关数据</li>");}
-                    App.Services.ozRole.collection.reset();
+                    App.Services.Member.SubRoleCollection.reset();
                     _.each(response.data,function(item){
-                        App.Services.ozRole.collection.add(item);
+                        App.Services.Member.SubRoleCollection.add(item);
                     });
                     $("#dataLoading").hide();
                 }

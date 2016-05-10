@@ -1,6 +1,7 @@
 /*
  * @require  /services/collections/auth/member/role.list.js
  */
+App.Services.roleAddStatus = 0;
 App.Services.roleWindowIndex = Backbone.View.extend({
 
     tagName:"div",
@@ -71,10 +72,18 @@ App.Services.roleWindowIndex = Backbone.View.extend({
 
     //新增
     newRole :function(){
+
+        if(App.Services.roleAddStatus){alert("已在提交中，请等待！");App.Services.maskWindow.close();return}
+        App.Services.roleAddStatus = 1;
+
+
         //新增角色  fetchServicesNewRole
         var name  = $("#selectedRoleName").val();
         if(!name){alert("请填写角色名！");return;}
-        var newRole = {"name":name, "functionId":[]};
+        var newRole = {
+            "name": name,//角色名称
+            "functionId":[] //功能ID数组
+        };
 
         //已选功能列表
         var seleFun = this.filterChecked();
@@ -86,24 +95,32 @@ App.Services.roleWindowIndex = Backbone.View.extend({
 
         //保存数据
         var roleModel = Backbone.Model.extend({
-            default:{},
+            defaults:{},
             urlType: "fetchServicesNewRole"
         });
-        App.Services.newRoleModel =  new roleModel(newRole);
 
-        App.Services.newRoleModel.save("create",{
+        var data = {
+            type:"create"
+        };
+        App.Services.newRoleModel =  new roleModel(newRole);
+        App.Services.newRoleModel.save(data,{
             success:function(collection, response, options){
-                //成功创建的的角色添加的collection中
-                App.Services.role.collection.add(response.data);
-                //关闭窗口
+                if(response.message == "success"){
+                    App.Services.role.collection.add(response.data);
+                }
+                setTimeout(function(){
+                    App.Services.roleAddStatus = 0;
+                    //其他判断条件
+
+                },500);
                 App.Services.maskWindow.close();
             },
             //错误处理
-            error:function(){
-
-            }
+            error:function(){}
         });
+
     },
+
     //过滤和辨别功能列表项
     filterChecked:function(){
         return App.Services.roleFun.collection.filter(function(item){
