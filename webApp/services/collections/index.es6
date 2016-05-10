@@ -36,6 +36,10 @@ App.Services = {
 
 			$("#contains").html(viewer.render().el);
 			$("#pageLoading").hide();
+			if (type == "project") {
+			 	App.Comm.initScroll($('#contains .scrollWrap'),"y");
+			}
+			
 
 		} else {
 			var indexTpl = _.templateUrl('/services/tpls/index.html');

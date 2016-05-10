@@ -1,16 +1,16 @@
 App.Services.ProjectDetail=App.Services.ProjectDetail||{};
 
-App.Services.ProjectDetail.Floor=Backbone.View.extend({
+App.Services.ProjectDetail.BaseHole=Backbone.View.extend({
 	
 	tagName:'div',
 	
 	className:'projectDetail',
 	
 	events:{
-		'click .createFloor':'createFloor'
+		'click .createBaseHole':'createBaseHole'
 	},
 	
-	template:_.templateUrl('/services/tpls/project/project.detail.floor.html',true),
+	template:_.templateUrl('/services/tpls/project/project.detail.basehole.html',true),
 	
 	initialize(){
 	},
@@ -24,11 +24,11 @@ App.Services.ProjectDetail.Floor=Backbone.View.extend({
 	
 	load(){
 	},
-
-	createFloor(){
+	
+	createBaseHole(){
 		this.$('dd').slideUp();
 		this.$('dt span').addClass('accordOpen');
-		var view=new App.Services.DetailView.Floor();
+		var view=new App.Services.DetailView.BaseHole();
 		this.$('.detailContainer .scrollWrapContent').prepend(view.render().el);
 	}
 	

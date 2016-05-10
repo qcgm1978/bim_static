@@ -44,7 +44,7 @@ ViewComp.MemberManager = Backbone.View.extend({
 			}
 		}, []);
 		
-		App.Comm.initScroll(this.$('.userSelecter .scrollWrap>ul'),"y");
+	//	App.Comm.initScroll(this.$('.userSelecter .scrollWrap>ul'),"y");
 	},
 
 	//选择节点
@@ -85,7 +85,7 @@ ViewComp.MemberManager = Backbone.View.extend({
 	},
 	
 	loadChildren:function(_this,outer,parentId,treeNode){
-		$('#loadwait').show();
+		_this.$(".scrollWrap").mmhMask();
 		var setting = {
 				callback: {
 					beforeClick:function(){
@@ -130,9 +130,9 @@ ViewComp.MemberManager = Backbone.View.extend({
 					_this.selectTree.addNodes(treeNode,zNodes);
 				}
 			}
-			$('#loadwait').hide();
+			clearMask();
 		}).fail(function(){
-			$('#loadwait').hide();
+			clearMask();
 		})
 	},
 	

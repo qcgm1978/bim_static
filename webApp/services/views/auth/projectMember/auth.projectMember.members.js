@@ -47,7 +47,7 @@ App.Services.projectMember.members = Backbone.View.extend({
     $(".remove").on("click",function(e){
     	_this.del(e);
     })
-    $("#dataLoading").hide();
+    clearMask();
     return this;
   }
 });

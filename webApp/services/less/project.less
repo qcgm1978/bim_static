@@ -7,7 +7,7 @@
 		}
 	}
 	.projectContainer { height: 100%; margin-top: -40px; padding-top: 40px;
-		.projectBase, .projectMapping, .projectFloor { display: none; }
+		.projectBase, .projectMapping, .projectFloor,.projectBaseHole,.projectSection,.projectPile { display: none; height: 100%;}
 	}
 	.folwSlideBar { .header { height: 38px; line-height: 38px; padding-left: 15px; font-size: 16px; border-bottom: 1px #ccc solid; }
 		.slideBarContainer { height: 100%; margin-top: -39px; padding-top: 39px; }
@@ -69,36 +69,62 @@
 	.projectDetail{
 		width: 100%;
 		height: 100%;
-		font-family: "microsoft yahei";
 		font-size: 14px;
-		
+		position: relative;
 		& .header,dt{
 			border:1px solid #ccc;
 			border-bottom: none;
+			border-left: none;
 			height: 40px;
 			line-height:40px;
 			padding-left: 10px;
+			
+			& i{
+				display: inline-block;
+				width: 20px;
+				height: 20px;
+				background: url(../../comm/images/commIcon.png) no-repeat 0 -260px;
+				vertical-align: -12px;
+			}
 		}
 		
+		
 		& .header{
+				border-bottom: 1px solid #ccc;
 				border-top: none;
 				color: #666;
 			}
+		& .detailContainer{
+			position: absolute;
+			top: 40px;
+			left: 0;
+			right: 0;
+			bottom: 0;
+		}
 		& dt{
 				color: #333;
+				&:nth-of-type(1){
+					border-top: none;
+					border-bottom: none;
+				}
 				&:last-of-type{
 					border-bottom: 1px solid #ccc;
 				}
 				& .accordionDatail{
 					float: right;
-					margin-right: 10px;
+					margin-right: 20px;
+					color:#005BAC;
+					&:hover{
+						cursor: pointer;
+						text-decoration: underline;
+					}
 				}
 			}
 		& dd{
 				background: #EEE;
 				width: 100%;
-				border: 1px solid #ccc;
-				border-top: none;
+				border-bottom: 1px solid #ccc;
+				border-right: 1px solid #ccc;
 				margin-left: 0;
 				box-sizing: border-box;
 				padding: 10px;
@@ -106,8 +132,17 @@
 				height: auto;
 				clear: both;
 				display: inline-block;
+			&:nth-of-type(1){
+				border-top: 1px solid #ccc;
+			}
+		}
+		
+		& form{
+			width: 680px;
 		}
 		& .formColumn{
+				height: 40px;
+				line-height: 40px;
 				width: 50%;
 				float: left;
 				& label{
@@ -121,9 +156,44 @@
 				}
 				
 				& input{
-					width: inherit;
+					width: 210px;
+				}
+				
+				& .myDropDown{
+					height: 30px;
+    				line-height: 30px;
+					width: 210px;
+					margin-left: -4px;
+					& .myDropList{
+						left: 0;
+						top: 31px;
+						width: 210px;
+					}
+					& .myDropText{
+						width: 210px;
+					}
+				}
+				
+				& button {
+					margin: 5px;
+					border:1px solid #ccc; 
+				}
+				& .myBtn-primary{
+					border: none;
+				}
+		}
+		
+		& .pileContainer{
+			padding-top: 20px;
+			border: none;
+			& .formColumn{
+				width:80%;
+				
+				& label{
+					width: 160px;
 				}
 			}
+		}
 	}
 }
 
