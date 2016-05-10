@@ -373,8 +373,7 @@ App.Project = {
 				$("#projectContainer .header .ckAll").prop("checked", false);
 				//App.Project.FileCollection.parentId=file.id;
 				//清空数据
-				App.Project.FileCollection.reset();
-				$(".fileContainerScroll .fileContent").empty();
+				App.Project.FileCollection.reset(); 
 				App.Project.Settings.fileId = file.fileVersionId;
 
 				App.Project.FileCollection.fetch({

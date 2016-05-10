@@ -8,6 +8,7 @@ App.Project.FileContainer=Backbone.View.extend({
 
 	//初始化
 	initialize: function() {
+		this.listenTo(App.Project.FileCollection,"reset",this.reset); 
 		this.listenTo(App.Project.FileCollection,"add",this.addOneFile); 
 	},
 
@@ -35,30 +36,24 @@ App.Project.FileContainer=Backbone.View.extend({
 		var view=new App.Project.FileContainerDetail({
 			model:model
 		});
+
+		this.$el.find(".fileContent .loading").remove();
+
 		this.$el.find(".fileContent").append(view.render().el);
 
-		//判断滚动条是否绑定过 
-		if (!this.$el.find(".fileContainerScrollContent").hasClass('mCustomScrollbar')) {
-			this.initDesignScroll(); 
-		}
+		//绑定滚动条
+		App.Comm.initScroll(this.$el.find(".fileContainerScrollContent"),"y");
+		 
 
 	},
 
-	//初始化滚动条
-	initDesignScroll: function() { 
+	//重置加载
+	reset(){
 
-		this.$el.find(".fileContainerScrollContent").mCustomScrollbar({
-			set_height: "100%",
-			theme: 'minimal-dark',
-			axis: 'y',
-			keyboard: {
-				enable: true
-			},
-			scrollInertia: 0
-		});
+		this.$el.find(".fileContent").html('<li class="loading">正在加载，请稍候……</li>');
+	}
 
-
-	},
+ 
 
 
 

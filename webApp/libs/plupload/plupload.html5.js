@@ -565,7 +565,8 @@
 								var httpStatus, chunkArgs;
 								if(xhr.readyState === 3){
 								    var response = $.parseJSON(xhr.response);
-                                    if(response.result === 'fail'){
+								    //上传失败
+                                    if(response.result === 'fail' || response.code!=0){
                                     	file.status = plupload.FAILED;
                                         up.trigger('Error', {
                                             code : plupload.FAILED,
