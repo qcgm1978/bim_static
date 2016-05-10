@@ -2,6 +2,10 @@
  * @require  /services/collections/auth/member/member.list.js
  * */
 App.Services.memberWindowData = {"roleId":[], "outer":{"orgId":[],"userId":[]},"inner":{"orgId":[], "userId":[]}};//提交数据
+App.Services.memberWindowData ={"roleId":[], "outer":{"orgId":[], "userId":[]},"inner":{"orgId":[], "userId":[]}};
+
+
+
 App.Services.memberDetail=Backbone.View.extend({
     tagName:'li',
 
@@ -18,14 +22,15 @@ App.Services.memberDetail=Backbone.View.extend({
 
     initialize:function(){
         this.model.set({"checked":false});//预先设置属性
-        this.listenTo(this.model, 'checked:change', this.render);
+        this.listenTo(this.model, 'change:checked', this.render);
+        this.listenTo(this.model, 'change:role', this.render);
     },
 
     //弹窗
     spread:function(){
-        var url;
+        var url,_this =this;
         $("#dataLoading").show();
-        var type =  App.Services.MemberType,_this =this;
+        var type =  App.Services.MemberType;
         var frame = new App.Services.MemberWindowIndex().render().el;//外框
         //获取单选所选项的角色列表
         var userId = this.model.get("userId");

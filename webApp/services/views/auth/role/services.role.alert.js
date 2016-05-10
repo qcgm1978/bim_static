@@ -26,10 +26,10 @@ App.Services.windowAlert = Backbone.View.extend({
     //确定
     sure : function(){
         $("#dataLoading").show();
-        var _thisModel = App.Services.deleteRoleInfo,roleId = _thisModel.get("roleId");
+        var _thisModel = App.Services.deleteRoleInfo,roleId = _thisModel.get("roleId")+'';
 
         $.ajax({
-            url:"http://bim.wanda-dev.cn/platform/role?roleId=" +roleId,
+            url:"http://bim.wanda-dev.cn/platform/auth/role?roleId=" +roleId,
             type:"DELETE",
             success:function(response){
                 $("#dataLoading").hide();
@@ -41,9 +41,12 @@ App.Services.windowAlert = Backbone.View.extend({
                 }else if(response.code==18006){
                     $(".alertInfo").html("权限无法删除");
                     //权限无法删除，如管理员、关键用户(隐藏角色)
-                }else if(response.code==0 && response.data.success[0] == id){
+                }else if(response.code==0 && response.data.success[0] == roleId){
                     //删除成功不提示,，但有删除状态
                     App.Services.role.collection.remove(_thisModel);
+                    App.Services.alertWindow.close();
+                }else if(response.data.failure[0] ==roleId){
+                    alert("删除失败,请联系管理员");
                     App.Services.alertWindow.close();
                 }
                 App.Services.deleteRoleInfo ="";//清理

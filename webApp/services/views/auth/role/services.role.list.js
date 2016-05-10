@@ -17,13 +17,23 @@ App.Services.roleList=Backbone.View.extend({
     },
     initialize:function(){
        this.listenTo(App.Services.role.collection,"add",this.addOne);
-       this.listenTo(App.Services.role.collection,"remove",this.render);
+       this.listenTo(App.Services.role.collection,"remove",this.addAll);
     },
     //数据加载
     addOne:function(model){
         var newView = new App.Services.roleDetail({model:model});
         this.$("#roleList").append(newView.render().el);
     },
+
+    //添加
+    addAll:function(){
+        var _this = this;
+        this.$("#roleList").empty();
+        App.Services.role.collection.each(function(item){
+            _this.addOne(item);
+        });
+    },
+
     //创建新角色
     newRole:function(){
         App.Services.roleModify = false;
@@ -41,9 +51,10 @@ App.Services.roleList=Backbone.View.extend({
             closeCallback:function(){},
             message:frame
         });
+
+
         //角色信息
-        App.Services.roleFun.loadData({},function(){
-        });
+        App.Services.roleFun.loadData({},function(){});
     },
     //排序
     comparator:function(){
