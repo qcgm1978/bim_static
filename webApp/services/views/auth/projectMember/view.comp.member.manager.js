@@ -43,12 +43,19 @@ ViewComp.MemberManager = Backbone.View.extend({
 				showLine: false
 			}
 		}, []);
+		
+	//	App.Comm.initScroll(this.$('.userSelecter .scrollWrap>ul'),"y");
 	},
 
 	//选择节点
 	addOption: function() {
 		var _this=this;
 		var nodes= _this.selectTree.getSelectedNodes();
+			
+		_.each(nodes,function(n){
+			n.children=[];
+		})
+		
 		var newNodes=_this.selectedTree.addNodes(null,nodes);
 		
 		//自定义渲染树节点
@@ -78,12 +85,17 @@ ViewComp.MemberManager = Backbone.View.extend({
 	},
 	
 	loadChildren:function(_this,outer,parentId,treeNode){
-		$('#dataLoading').show();
+		_this.$(".scrollWrap").mmhMask();
 		var setting = {
 				callback: {
-					onDblClick: function(event, treeId, treeNode) {
-						if(!treeNode.userId && !treeNode.isParent){
-							_this.loadChildren(_this,false,treeNode.orgId,treeNode);
+					beforeClick:function(){
+					},
+					onClick: function(event, treeId, treeNode) {
+						if(event.target.className.indexOf("button business_ico")!=-1){
+							if(!treeNode.userId && !treeNode.isParent){
+								_this.loadChildren(_this,false,treeNode.orgId,treeNode);
+							}
+							_this.selectTree.cancelSelectedNode(treeNode);
 						}
 					}
 				},
@@ -118,9 +130,9 @@ ViewComp.MemberManager = Backbone.View.extend({
 					_this.selectTree.addNodes(treeNode,zNodes);
 				}
 			}
-			$('#dataLoading').hide();
+			clearMask();
 		}).fail(function(){
-			$('#dataLoading').hide();
+			clearMask();
 		})
 	},
 	

@@ -29,7 +29,13 @@
 		
 		this.$(".projectContainer .projectMapping").html(this.viewProjectMapping.render().el);
 
- 		this.$(".projectContainer .projectDetail").html(new App.Services.ProjectDetail().render().el);
+ 		this.$(".projectContainer .projectFloor").html(new App.Services.ProjectDetail.Floor().render().el);
+ 		
+ 		this.$(".projectContainer .projectBaseHole").html(new App.Services.ProjectDetail.BaseHole().render().el);
+ 		
+ 		this.$(".projectContainer .projectSection").html(new App.Services.ProjectDetail.Section().render().el);
+ 		
+ 		this.$(".projectContainer .projectPile").html(new App.Services.ProjectDetail.Pile().render().el);
 
  		this.fetchData();
 
@@ -116,16 +122,18 @@
  			type = $target.data("type");
 
  		$target.addClass("selected").siblings().removeClass("selected");
-
  		if (type == "base") {
  			this.$(".projectContainer .projectBase").show().siblings().hide();
-
  		} else if (type == "mapping") {
- 			//映射
  			this.$(".projectContainer .projectMapping").show().siblings().hide();
-
- 		} else if (type == "detail") {
- 			this.$(".projectContainer .projectDetail").show().siblings().hide();
+ 		} else if (type == "floor") {//楼
+ 			this.$(".projectContainer .projectFloor").show().siblings().hide();
+ 		} else if (type == "basehole") {//基坑
+ 			this.$(".projectContainer .projectBaseHole").show().siblings().hide();
+ 		} else if (type == "section") {//剖面
+ 			this.$(".projectContainer .projectSection").show().siblings().hide();
+ 		} else if (type == "pile") {//桩
+ 			this.$(".projectContainer .projectPile").show().siblings().hide();
  		}
 
  	}

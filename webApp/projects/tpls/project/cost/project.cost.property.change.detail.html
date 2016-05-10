@@ -6,7 +6,7 @@
 
   <tr class="<%= i%2==0 ?'odd' : '' %>">
 	   <td class="name">  <span class="nameText overflowEllipsis"><%=data[i].title%></span></td>
-	   <td class="date"><%= new Date(data[i].applyTime).format('yyyy-MM-dd') %></td>
+	   <td class="date"><%=data[i].applyTime && new Date(data[i].applyTime).format('yyyy-MM-dd') || '--' %></td>
 	   <td class="diff"> 
  			<a href="/static/dist/app/project/projectChange/index.html?projectId=<%=App.Project.Settings.CurrentVersion.projectId%>&projectVersionId=<%=App.Project.Settings.CurrentVersion.id%>&referenceId=<%=data[i].referenceId%>&referenceVersionId=<%=data[i].referenceVersionId%>" target="_blank">查看</a> 
 

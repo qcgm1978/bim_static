@@ -4,21 +4,21 @@ ul,li{list-style: none outside none;}
 .serviceInput{outline: none;border: none;-webkit-appearance: none;width: 13px;height: 13px;background: transparent url("../images/service_ico.png") 0 -380px no-repeat;vertical-align: middle;margin: 0;}
 .background-ioc{background: transparent url("../images/service_ico.png") 0 0 no-repeat;vertical-align: middle;}
 .bdB-c{border-bottom: 1px solid #cccccc;}
-.left{float: left;}
 .right{float: right;}
 .pdX20{padding-left: 20px;padding-right: 20px;}
 .mgXD20{margin: 0 -20px;}
 /*???*/
 .serviceHeader .bcService{line-height: 39px;border-top: 1px solid #cccccc;padding-left: 20px;}
 .serviceHeader .bcService span{float: left;width: 58px;line-height: 40px;height: 40px;}
+.serviceHeader .bcService span a{color: #333333;text-underline: none;}
 .serviceHeader .serviceNav{background-color: #eeeeee;border-top: 1px solid #cccccc;padding-top: 9px;height: 38px;border-bottom: 1px solid #cccccc;padding-left: 20px;clear: both;}
 .serviceHeader .serviceNav li{border-top: 2px solid #eeeeee;float: left;line-height: 27px;height: 29px;width: 98px;text-align: center;margin-bottom: -1px;cursor: pointer;}
 .serviceHeader .serviceNav li.active{border-top: 2px solid #006ecf;border-left: 1px solid #cccccc;border-right: 1px solid #cccccc;border-bottom: 1px solid #eeeeee;background-color: #ffffff;}
 .serviceNav a:link,.serviceNav a:hover,.serviceNav a:visited,.serviceNav a:active{color: #333333;text-decoration: none;}
-/*???????*/
-#blendList{height: 500px;overflow: auto;}/*???????�????*/
+
+#blendList{overflow: auto;}
 .serviceBody{position: absolute;top:129px;left:0;right:0;bottom:0;}
-.serviceBody .menu{ bottom: 0px; position: absolute;left: 0;top: 0;width: 270px;border: 1px solid #ccc;border-top: none;background-color: #ffffff;}
+.serviceBody .menu{ bottom: 0px; position: absolute;left: 0;top: 0;width: 270px;border: 1px solid #ccc;border-top: none;background-color: #ffffff;;height: 100%;overflow: auto;}
 .serviceBody .menu li{line-height: 25px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;}
 .serviceBody .menu li span{padding: 2px 3px;cursor: pointer;}
 .serviceBody .menu li span.active{background-color: #a8dbfd;}
@@ -29,7 +29,7 @@ ul,li{list-style: none outside none;}
 /*.serviceBody .menu ul{padding-left: 22px;}*/
 .serviceBody .body li{border-bottom: 1px solid #cccccc;padding-left: 20px;}
 .serviceBody .body li div{.ellipsis}
-.serviceBody .content{margin-left: 270px;height: 100%;}
+.serviceBody .content{left: 270px;position: absolute;width: 100%;height: 100%;overflow: auto;}
 .serviceBody .content input{.serviceInput;}
 .serviceBody .content input:checked{background-position: 0 -420px}
 /*????checkbox????????????*/
@@ -38,17 +38,22 @@ ul,li{list-style: none outside none;}
 .serviceBody .content .head .selectAll{cursor: pointer;}
 .batchAward{position: relative;display: inline-block;margin-left: 16px;height: 30px;line-height: 28px;width: 90px;border: 1px solid #cccccc;padding-left: 32px;cursor: pointer;}
 .batchAward:before{content: '';position: absolute;width: 16px;height: 16px;left: 10px;top: 7px;background: transparent url("../images/service_ico.png") 0 -120px no-repeat;}
-.serviceBody .content li{line-height: 49px;clear: left;border-bottom: 1px solid #dddddd;height: 50px;}
+.serviceBody .content li{line-height: 49px;border-bottom: 1px solid #dddddd;height: 50px;position: relative;}
 .serviceBody .content li.active{background-color: #a8dbfd;}
-.serviceBody .content li .pers{float: right;display: none;position: relative;z-index: 3;padding: 0 15px 0 20px;color: #016ecf;cursor: pointer;}
-.serviceBody .content li:hover .pers{display: block;}
+.serviceBody .content li .pers{float: right;position: relative;z-index: 3;padding: 0 15px 0 20px;color: #016ecf;cursor: pointer;height: 50px;}
+
+
+/*.serviceBody .content li:hover .pers{float: left;}*/
+#blendList li .pers{;position: absolute;z-index: 3;padding: 0 15px 0 20px;color: #016ecf;cursor: pointer;height: 50px;right:0;top: 0;}
+#blendList li:hover .pers{display: block;}
+#blendList li .left{float: left;width: 300px;.ellipsis;}
+
 .serviceBody .content li .pers:before{content: "";position: absolute;width: 16px;height: 16px;left: 0;top: 16px;background: url("../images/service_ico.png") 0 -140px no-repeat;}
 .serviceBody .content li .sele{padding:  0 25px;}
 .serviceBody .content li .ushead{display: inline-block;width: 32px;height: 32px;line-height: 0;background: transparent url("../images/service_ico.png") 0 -40px no-repeat;vertical-align: middle;margin: 0 13px 0 10px;}
 .serviceBody .content li.active .memCheck{background-position: 0 -420px;}
 .serviceBody .content li .ushead.oz{background-position: 0 0;}/*机构*/
-.serviceBody .content li .sele .left{float: left;width: 300px;.ellipsis;}
-.serviceBody .content li .sele .roles{text-align: center;margin-right: 83px;}
+.serviceBody .content li .sele .roles{text-align: center;margin-right: 84px;}
 .serviceBody .content li .sele .roles.error{color: #999999;}
 .serviceBody  li .sele .roles span{position: relative;display: inline-block;padding-left: 20px;margin-left: 14px;}
 .serviceBody  li .sele .roles span:before{position: absolute;content:"";left: 0;top: 18px;height: 15px;width: 14px;background: transparent url("../images/service_ico.png") 0 -180px  no-repeat;}
@@ -57,6 +62,8 @@ ul,li{list-style: none outside none;}
 .serviceBody li .roles span.inherit:before{background-position:  0 -560px;}
 .serviceBody  .rohead{display: inline-block;width: 23px;height: 15px;vertical-align: middle; background: url("../images/service_ico.png") 0 -500px no-repeat;margin-right: 10px;}
 
+.serviceBody .roleCtrl{height: 100%;}
+#roleList{overflow: auto;position: absolute;top: 50px;left: 0;right: 0;bottom: 0;}
 .roleCtrl li{clear: both;line-height: 50px;padding:0 22px;height: 50px;}
 .roleCtrl .roleHead{padding:0 22px;line-height: 50px;font-size: 12px;color: #a7a7a7;}
 .roleCtrl .roleHead .newRole{position: relative;cursor: pointer;display: inline-block;line-height: 28px;height: 30px;vertical-align: middle;padding: 0 8px 0 32px;border: 1px solid #cccccc;margin-left: 24px;}
@@ -93,7 +100,9 @@ ul,li{list-style: none outside none;}
 .seWinBody h2 span{color: #9f9f9f;}
 .seWinBody .title{font-size: 12px;color: #9f9f9f;line-height: 23px;height: 24px;}
 .seWinBody .name,.seWinBody .funName{float: left;width: 175px;.ellipsis;}
-.seWinBody li{padding: 0 10px;line-height: 30px;border-bottom: 1px solid #cccccc;height: 30px;.ellipsis;}
+.seWinBody li{padding: 0 10px;line-height: 30px;height: 30px;.ellipsis;}
+.seWinBody li:not(:last-child){border-bottom: 1px solid #cccccc;}
+.seWinBody li:first-child{border-bottom: 1px solid #cccccc;}
 .seWinBody .aim,.seWinBody .memRoleList,.seWinBody .func{padding: 8px 20px 0 20px;}
 .seWinBody .aim .memCheck{display: none;}
 .seWinBody ul{border:1px solid #cccccc;  height: 150px;overflow: auto;}
@@ -106,6 +115,7 @@ ul,li{list-style: none outside none;}
 //弹窗角色列表
 .memRoleList li{position: relative;}
 .memRoleList li .fun {overflow: hidden;text-overflow: ellipsis;white-space: nowrap;border: 1px solid #ffffff;}
+.memRoleList li.active .fun{border-color:#a8dbfd; }
 .memRoleList li .fun:hover {width: 327px;z-index: 10;line-height: 24px;;position: absolute;border: 1px solid #eeeeee;background-color: #ffffff;left: 170px;top: 1px;overflow: auto;word-break: keep-all;white-space: normal;padding-left: 15px;border-radius: 3px;box-shadow: 1px 1px 3px #333333;}
 .memRoleList .fun span{padding-left: 16px;position: relative;white-space: nowrap;}
 .memRoleList .fun span:before{.background-ioc;content: "";position: absolute;width: 11px;height: 11px;top: 3px;left: 0;background-position: 0 -200px}
@@ -142,4 +152,3 @@ ul,li{list-style: none outside none;}
 .servicesAlert .alert{text-align: center;display: none;}
 .servicesAlert .confirm input{outline: none;}
 
-#roleList{overflow: auto;height: 766px;}

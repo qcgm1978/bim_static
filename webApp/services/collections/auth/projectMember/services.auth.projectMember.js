@@ -7,8 +7,10 @@ App.Services.projectMember = {
 	
 	//初始化
 	init: function() {
-		$("#dataLoading").show();
 		$('.serviceBody').html(new App.Services.projectMember.mainView().render().el);
+		
+		$("#projectMember").mmhMask();
+		
 		this.loadData(this.projectMemberProjectCollection,{
 			outer:App.Comm.getCookie("isOuter")
 		},{

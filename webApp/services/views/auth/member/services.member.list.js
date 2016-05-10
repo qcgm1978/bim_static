@@ -52,7 +52,6 @@ App.Services.MemberList=Backbone.View.extend({
         var _this =this , url;//提交地址
         var type =  App.Services.MemberType;//组织类型
 
-
         //获取所选项
         var seleUser = App.Services.Member[type + "Collection"].filter(function(item){
             if(item.get("checked")){
@@ -93,15 +92,14 @@ App.Services.MemberList=Backbone.View.extend({
         this.saveData(seleUser); //缓存已选数据相关数据方便提交
 
         //取得父项的角色列表
-        var parentId = $("#ozList").find("span.active").parent(".ozName").data("id");
+        var parentId = $("#ozList").find("span.active").parent(".ozName").data("id") ;
         //无父项时获取缺省角色列表，此处为可能出错解释
-        if(!parentId || parentId ==1){
-            App.Services.role.loadData(function(){
+        if(!parentId){
+            App.Services.Member.loadData(App.Services.Member.SubRoleCollection,{},function(response){
                 $("#dataLoading").hide();
             });
-            return;
+            return
         }
-        //多选取得父项机构的角色列表
         url = "http://bim.wanda-dev.cn/platform/auth/org/"+ parentId  +"/role?outer=" +  !(type == "inner");
         this.ajaxRole(url,frame);
     },
@@ -115,7 +113,7 @@ App.Services.MemberList=Backbone.View.extend({
             var orgId = item.get("orgId");
             if(saveType){
                 if(userId){
-                    App.Services.memberWindowData[saveType].orgId.push(userId);
+                    App.Services.memberWindowData[saveType].userId.push(userId);
                 }
                 if(orgId){
                     App.Services.memberWindowData[saveType].orgId.push(orgId);
@@ -157,9 +155,9 @@ App.Services.MemberList=Backbone.View.extend({
             success:function(response){
                 if(response.message=="success"){
                     if(response.data.length){$(".seWinBody .memRoleList  ul").append("<li>没有相关数据</li>");}
-                    App.Services.ozRole.collection.reset();
+                    App.Services.Member.SubRoleCollection.reset();
                     _.each(response.data,function(item){
-                        App.Services.ozRole.collection.add(item);
+                        App.Services.Member.SubRoleCollection.add(item);
                     });
                     $("#dataLoading").hide();
                 }

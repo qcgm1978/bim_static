@@ -21,52 +21,48 @@ App.Services.MemberWindowIndex = Backbone.View.extend({
 
     //提交表单，完毕会触发重新获取列表，列表为memBlend所属列表
     windowSubmit:function(){
-        //获取要提交的成员/组织相关信息
-        var submitData  = App.Services.memberWindowData;
+        var submitData  = App.Services.memberWindowData;//获取要提交的成员/组织相关信息
+        var data;//实际的提交信息
         if(submitData){
             //获取已选角色,并添加角色ID
-            var selectRole = App.Services.role.collection.filter(function(item){
+            var selectRole = App.Services.Member.SubRoleCollection.filter(function(item){
                 return item.get("checked");
             });
 
-            if(!selectRole.length){alert("请至少选择一个角色");return;}
+           // if(!selectRole.length){alert("请至少选择一个角色");return;}
             _.each(selectRole,function(item){
                 submitData.roleId.push(item.get("roleId"));
             });
         }
 
-        //根用户无法赋予权限
-        //if(){}
 
-
-        //提交 角色变更
-      /*  App.Comm.ajax({
+        data = {
             URLtype:"putServicesSaveRole",
-            data:submitData
-        },function(response){
-            console.log(response);
-        });
-*/
-
-        $.ajax({
+            data:JSON.stringify(submitData),
             type:"POST",
-            url:"platform/auth/user/role",
-            data:submitData,
-            dataType:"json",
-            success:function(response){
-                //返回重新获取成员角色列表
-            },
-            error:function(){
-                //错误提示
+            contentType: "application/json"
+        };
+
+
+
+        App.Comm.ajax(data,function(response){
+            if(response.message == "success"){
+                var s = App.Services.Member[App.Services.MemberType + "Collection"],proto = [];
+                _.each(selectRole,function(item){
+                    item.set("functions",null);
+                    item.unset("checked");
+                    proto.push(item.toJSON());
+                });
+
+                s.each(function(item){
+                   item.set({"role":proto});//如何放在内部
+                    console.log(item);
+                });
             }
+            //提交成功关闭窗口，否则显示提交失败
+            App.Services.maskWindow.close();
         });
 
-        //刷新选项的角色列表
-
-        //提交提示，需要回调函数
-        //进度窗口
-        //提交成功关闭窗口，否则显示提交失败
-        App.Services.maskWindow.close();
     },
 
     initialize:function(){
