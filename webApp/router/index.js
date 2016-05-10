@@ -11,6 +11,8 @@ var AppRoute = Backbone.Router.extend({
 		'resources/:type/:projectId/:versionId': 'resourceModel',
 		'console': 'console',
 		'console/:type/:step': 'console',
+		'console1': 'console1',
+		'console1/:type/:step': 'console1',
 		'services': 'services',
 		'services/:type': 'services',
 		'services/:type/:tab': 'services',
@@ -133,7 +135,18 @@ var AppRoute = Backbone.Router.extend({
 		App.Console.init();
 		$("#pageLoading").hide();
 	},
-
+	//by zzx
+	console1: function(type,step) {
+		this.reset();
+		//销毁上传
+		_.require('/static/dist/console1/console.css');
+		_.require('/static/dist/console1/console.js');
+		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".console").addClass('selected');
+		App.Console.Settings.type=type;
+		App.Console.Settings.step=step;
+		App.Console.init();
+		$("#pageLoading").hide();
+	},
 
 
 	services:function(type,tab){

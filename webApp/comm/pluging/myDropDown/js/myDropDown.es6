@@ -1,11 +1,19 @@
 ;(function($){
 
+ //自增z-index
+ var zindex=(function(){
+ 	var i=9;
+ 	return function(){
+ 		i++;
+ 		return i;
+ 	}
+ }())
 
  $.fn.myDropDown=function(opts){
 
  		var settings={
  			click:null, //点击事件
- 			zIndex:9
+ 			zIndex:zindex()
  		}
  	 
  		this.settings=$.extend(settings,opts);

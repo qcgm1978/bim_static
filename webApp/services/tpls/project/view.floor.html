@@ -1,0 +1,128 @@
+<dt>
+	新建楼栋<span class="accordionDatail">详情<i></i></span>
+</dt>
+<dd>
+	<form>
+		<div>
+			<div class="formColumn">
+				<label>楼号名称 : </label><input type="text" name="" id="" value="" class="txtInput" />
+			</div>
+			<div class="formColumn"><label>高度(m):</label><input type="text" name="" id="" value="" class="txtInput" /></div>
+		</div>
+		<div>
+			<div class="formColumn">
+				<label>面积(m<sup>3</sup>):</label><input type="text" name="" id="" value="" class="txtInput" />
+			</div>
+			<div class="formColumn"><label>地上层数:</label><input type="text" name="" id="" value="" class="txtInput" /></div>
+		</div>
+		<div>
+			<div class="formColumn">
+				<label>层高(m):</label><input type="text" name="" id="" value="" class="txtInput" />
+			</div>
+			<div class="formColumn"><label>地下层数:</label><input type="text" name="" id="" value="" class="txtInput" /></div>
+		</div>
+		<div>
+			<div class="formColumn">
+				<label>抗震设防烈度:</label>
+				<div class="myDropDown intensity">
+					<span class="myDropText">  <span class="text">请选择</span> <i class="myDropArrorw"></i> </span>
+					<ul class="myDropList" style="display: none;">
+						<% _.each(App.Services.ProjectCollection.datas.intensity,function(i){%>
+						<li class="myItem"><%= i %></li>
+						<% }) %>
+					</ul>
+				</div>
+			</div>
+			<div class="formColumn">
+				<label>抗震等级:</label>
+				<div class="myDropDown seiGrade">
+					<span class="myDropText">  <span class="text">请选择</span> <i class="myDropArrorw"></i> </span>
+					<ul class="myDropList" style="display: none;">
+						<% _.each(App.Services.ProjectCollection.datas.seiGrade,function(i){%>
+						<li class="myItem"><%= i %></li>
+						<% }) %>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div>
+			<div class="formColumn">
+				<label>屋面保温:</label><input type="text" name="" id="" value="" class="txtInput" placeholder="请输入描述" />
+			</div>
+			<div class="formColumn">
+				<label>屋面保温防火等级:</label>
+				<div class="myDropDown inDoorFireLevel">
+					<span class="myDropText">  <span class="text">请选择</span> <i class="myDropArrorw"></i> </span>
+					<ul class="myDropList" style="display: none;">
+						<% _.each(App.Services.ProjectCollection.datas.doorFireLevel,function(i){%>
+						<li class="myItem"><%= i %></li>
+						<% }) %>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div>
+			<div class="formColumn">
+				<label>外墙保温:</label><input type="text" name="" id="" value="" class="txtInput" placeholder="请输入描述" />
+			</div>
+			<div class="formColumn">
+				<label>外墙保温防火等级:</label>
+				<div class="myDropDown outDoorFireLevel">
+					<span class="myDropText">  <span class="text">请选择</span> <i class="myDropArrorw"></i> </span>
+					<ul class="myDropList" style="display: none;">
+						<% _.each(App.Services.ProjectCollection.datas.doorFireLevel,function(i){%>
+						<li class="myItem"><%= i %></li>
+						<% }) %>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div>
+			<div class="formColumn">
+				<label>低应变检测百分比:</label><input type="text" name="" id="" value="" class="txtInput" placeholder="请输入描述" />
+			</div>
+			<div class="formColumn"><label>高应变检测百分比:</label><input type="text" name="" id="" value="" class="txtInput" placeholder="请输入描述" /></div>
+		</div>
+		<div>
+			<div class="formColumn">
+				<label>超声波检测百分比:</label><input type="text" name="" id="" value="" class="txtInput" placeholder="请输入描述" />
+			</div>
+			<div class="formColumn"><label>钻心检测百分比:</label><input type="text" name="" id="" value="" class="txtInput" placeholder="请输入描述" /></div>
+		</div>
+		<div>
+			<div class="formColumn">
+				<label>外装方式:</label>
+				<div class="myDropDown outerInstall">
+					<span class="myDropText">  <span class="text">请选择</span> <i class="myDropArrorw"></i> </span>
+					<ul class="myDropList" style="display: none;">
+						<% _.each(App.Services.ProjectCollection.datas.installType,function(i){%>
+						<li class="myItem"><%= i %></li>
+						<% }) %>
+					</ul>
+				</div>
+			</div>
+			<div class="formColumn"><label>结构形式:</label>
+				<div class="myDropDown structure">
+					<span class="myDropText">  <span class="text">请选择</span> <i class="myDropArrorw"></i> </span>
+					<ul class="myDropList" style="display: none;">
+						<% _.each(App.Services.ProjectCollection.datas.orgType,function(i){%>
+						<li class="myItem"><%= i %></li>
+						<% }) %>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div>
+			<div class="formColumn">
+				<label>所属基坑:</label><input type="text" name="" id="" value="" class="txtInput" />
+			</div>
+			<div class="formColumn"></div>
+		</div>
+		<div>
+			<div class="formColumn" style="padding-left: 120px;">
+				<button class="myBtn myBtn-primary">保存</button><button class="myBtn myBtn-default">删除</button>
+			</div>
+			<div class="formColumn"></div>
+		</div>
+	</form>
+</dd>
