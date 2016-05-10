@@ -11,6 +11,7 @@ App.Services.Dialog = {
 				cssClass: "delConfirm",
 				showClose: false,
 				isAlert: false, 
+				limitHeight:false,
 				isConfirm: false
 			};
 
