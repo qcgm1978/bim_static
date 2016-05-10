@@ -122,7 +122,10 @@ App.Project = {
 		$(".rightProperty").show();
 		App.Project.Settings.Viewer = new familyModel({
 			element: $("#modelBox"),
-			etag: modelId
+			etag: modelId,
+			callback:function(id){
+				console.log(id);
+			}
 		});
 
 		// 获取familyType
@@ -136,8 +139,8 @@ App.Project = {
 		App.Project.Settings.modelId = modelId;
 		App.Project.Settings.Viewer.on("click", function(model) {
 
-			if (!model.intersect) { 
-				App.Project.renderAttr(App.Project.Settings.typeId); 
+			if (!model.intersect) {
+				App.Project.renderAttr(App.Project.Settings.typeId);
 				return;
 			}
 			//渲染属性
@@ -147,14 +150,14 @@ App.Project = {
 	},
 
 	//渲染dwg 文件
-	renderDwg(modelId) { 
+	renderDwg(modelId) {
 
 		$("#modelBox").addClass("dwg");
 
 		var viewer = new dwgViewer({
 			element: $("#modelBox"),
 			sourceId: modelId
-		}); 
+		});
 
 	},
 

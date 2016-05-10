@@ -19,6 +19,9 @@ familyModel.prototype = {
       success:function(res){
         var data = JSON.parse(res);
         self.addControll(data.types,self._opt.element);
+        if(self._opt.callback){
+          self._opt.callback(data.id);
+        }
       }
     });
   },
