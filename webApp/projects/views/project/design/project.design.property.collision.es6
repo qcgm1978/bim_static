@@ -74,7 +74,7 @@ App.Project.DesignCollision=Backbone.View.extend({
 					$("#taskName").addClass("error");
 					return false;
 				}
-				if(formData.leftFiles.length==0&&formData.rightFiles.length==0){
+				if(formData.leftFiles.length==0 || formData.rightFiles.length==0){
 					alert("请选择碰撞文件");
 					return false;
 				}

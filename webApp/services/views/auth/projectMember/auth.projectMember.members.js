@@ -43,7 +43,7 @@ App.Services.projectMember.members = Backbone.View.extend({
   	var _this=this;
   	var data=App.Services.projectMember.method.model2JSON(items.models);
   	data={data:data};
-    $("#memberList").html(this.template(data));
+    $("#memberlistWrap").html(this.template(data));
     $(".remove").on("click",function(e){
     	_this.del(e);
     })

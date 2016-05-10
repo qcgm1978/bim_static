@@ -120,6 +120,7 @@
                     isUploading = true;
                 },
                 FileUploaded: function(up, file, response) {
+                     
                     try {
                         options.fileUploaded(response, file)
                     } catch (e) {
@@ -127,6 +128,7 @@
                     }
                 },
                 UploadComplete: function(up, file) {
+                     
                     isUploading = false
                     self.container.addClass('uploaded-completed')
                     if (options.fileUploadCompleted) {
@@ -140,6 +142,7 @@
                     }
                 },
                 Error: function(up, file) {
+
                     if (file.code === -500) {
                         //upload initialize error, todo
                         return

@@ -52,6 +52,8 @@ App.ResourceModel.ListNav = Backbone.View.extend({
 			$("#resourceModelLeftNav").show();
 		} else {
 
+			//销毁上传
+			App.Comm.upload.destroy();
 
 			$("#resourceModelLeftNav").hide();
 
@@ -70,7 +72,7 @@ App.ResourceModel.ListNav = Backbone.View.extend({
 
 			if (App.ResourceModel.Settings.DataModel.bind) {
 				return;
-			}
+			} 
 
 			App.ResourceModel.Settings.DataModel.bind = true;
 
@@ -79,15 +81,7 @@ App.ResourceModel.ListNav = Backbone.View.extend({
 				sourceId: App.ResourceModel.Settings.DataModel.sourceId,
 				etag: App.ResourceModel.Settings.DataModel.etag,
 				projectId: App.ResourceModel.Settings.CurrentVersion.projectId
-			});
-
-
-			// App.ResourceModel.Settings.Viewer = new BIM({
-			// 	element: this.$el.find(".modelContent")[0],
-			// 	sourceId: App.ResourceModel.Settings.DataModel.sourceId,
-			// 	etag: App.ResourceModel.Settings.DataModel.etag,
-			// 	tools: true
-			// });
+			}); 
 
 			App.ResourceModel.Settings.Viewer.on("click", function(model) {
 

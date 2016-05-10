@@ -365,7 +365,6 @@ App.Comm.createModel = function(options){
           self = $(event.target).closest(".item-content");
       self.toggleClass("open");
       if(self.parents("#classCode")){
-        debugger
         var flag = self.next(".subTree").length;
         if(flag == 0){
           var data = that.classCodeData,
