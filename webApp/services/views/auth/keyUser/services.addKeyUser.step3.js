@@ -10,8 +10,7 @@ App.Services.step3 = Backbone.View.extend({
   template:_.templateUrl("/services/tpls/auth/keyUser/services.addKeyUser.step3.html"),
 
   events:{
-    "click  p":"changeStatus",
-    //"click .keyUserList li":'toggleClass'
+    "click  p":"changeStatus"
   },
 
   render:function(){
@@ -96,7 +95,7 @@ App.Services.step3 = Backbone.View.extend({
         $p.parent().addClass('toselected');
 
       }
-    }
+    };
 
       //点击的是文件夹ICON
       if(target == 'i'){
