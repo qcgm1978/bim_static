@@ -71,7 +71,12 @@
 
                 //上传成功
                 fileUploaded: function(response, file) {  
+
+
                      var data=JSON.parse(response.response);
+
+                    debugger
+
                      App.Project.FileCollection.push(data.data); 
                 },
 
