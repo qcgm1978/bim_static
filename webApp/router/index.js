@@ -161,7 +161,9 @@ var AppRoute = Backbone.Router.extend({
 	},
 
 	//重置数据
-	reset: function() {
+	reset: function() { 
+		//用户信息
+		App.Global.User=JSON.parse(localStorage.getItem("user")); 
 		$("#pageLoading").show();
 		//销毁上传
 		App.Comm.upload.destroy();

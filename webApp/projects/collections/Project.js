@@ -1,6 +1,10 @@
 App.Project = {
 
 	Settings: {
+		designTab: '<li data-type="design" class="item design">设计<i class="line"></i></li>',
+		planTab: '<li data-type="plan" class="item plan">计划<i class="line"></i></li>',
+		costTab: '<li data-type="cost" class="item cost">成本<i class="line"></i></li>',
+		qualityTab: '<li data-type="quality" class="item quality">质量<i class="line"></i></li>',
 		loadingTpl: '<td colspan="10" class="loadingTd">正在加载，请稍候……</td>',
 		fetchNavType: 'file', // model file
 		projectNav: "design",
@@ -94,20 +98,6 @@ App.Project = {
 
 		//成功
 		if (data.message == "success") {
-
-
-			// 	var Versions = data.data,
-			// 		vCount = Versions.length,
-			// 		cVersion;
-			// 	for (var i = 0; i < vCount; i++) {
-			// 		cVersion = Versions[i];
-
-			// 		if (cVersion.lastest) {
-			// 			App.Project.Settings.CurrentVersion = cVersion;
-			// 			break;
-			// 	}
-			// }
-
 
 			var VersionGroups = data.data,
 				gCount = VersionGroups.length,
@@ -205,6 +195,37 @@ App.Project = {
 			App.Project.Settings.initGlobalEvent = true;
 			App.Project.initGlobalEvent();
 		}
+
+
+		//设置项目可查看的属性
+		this.setPropertyByAuth();
+
+
+	},
+
+	//设置 可以查看的属性
+	setPropertyByAuth: function() { 
+
+		var Autharr = App.Global.User.function,
+			$projectTab = $(".projectContainerApp .projectHeader .projectTab"); 
+
+		//遍历权限
+		$.each(Autharr, function(i, item) {
+
+			if (item.code == 'quality') {
+				$projectTab.append(App.Project.Settings.qualityTab);
+			} else if (item.code == 'design') {
+				$projectTab.append(App.Project.Settings.designTab);
+			} else if (item.code == 'plan') {
+				$projectTab.append(App.Project.Settings.planTab);
+			} else if (item.code == 'cost') {
+				$projectTab.append(App.Project.Settings.costTab);
+			}
+
+		});
+
+		$projectTab.find(".item:last").addClass('last');
+		
 
 	},
 
@@ -373,7 +394,7 @@ App.Project = {
 				$("#projectContainer .header .ckAll").prop("checked", false);
 				//App.Project.FileCollection.parentId=file.id;
 				//清空数据
-				App.Project.FileCollection.reset(); 
+				App.Project.FileCollection.reset();
 				App.Project.Settings.fileId = file.fileVersionId;
 
 				App.Project.FileCollection.fetch({
@@ -660,7 +681,7 @@ App.Project = {
 	planCostShowInModel: function(event) {
 
 		var $target = $(event.target),
-			$parent = $target.parent(); 
+			$parent = $target.parent();
 
 		if ($target.data("box")) {
 
@@ -677,7 +698,7 @@ App.Project = {
 				$target.closest("table").find(".selected").removeClass("selected");
 				App.Project.planCostzommBox($target);
 				return;
-			}else {
+			} else {
 				$target.closest("table").find(".selected").removeClass("selected");
 				$target.parent().addClass("selected");
 			}
@@ -722,14 +743,15 @@ App.Project = {
 
 	planCostzommBox: function($target) {
 		var Ids = [],
-			boxArr = [],$code;
-			 
-		$target.closest("table").find(".selected").each(function() { 
-			$code=$(this).find(".code");
+			boxArr = [],
+			$code;
+
+		$target.closest("table").find(".selected").each(function() {
+			$code = $(this).find(".code");
 			Ids.push($code.data("id"));
-			boxArr = boxArr.concat($code.data("box")); 
+			boxArr = boxArr.concat($code.data("box"));
 		});
-		 
+
 		App.Project.Settings.Viewer.selectIds(Ids);
 		App.Project.Settings.Viewer.zoomBox(boxArr);
 	}
