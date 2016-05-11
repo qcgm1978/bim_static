@@ -40,31 +40,62 @@ App.Project.ProjectQualityProperty = Backbone.View.extend({
 		var $target = $(event.target),
 			type = $target.data("type");
 		$target.addClass('selected').siblings().removeClass('selected');
-		App.Project.Settings.property = type;
+		App.Project.Settings.property = type, isLoadData = false;
 
 		if (type == "materialequipment") {
 			//材料设备
-			this.$el.find(".QualityMaterialEquipment").show().siblings().hide();
+			var $QualityMaterialEquipment = this.$el.find(".QualityMaterialEquipment");
+
+			$QualityMaterialEquipment.show().siblings().hide();
+
+			if ($QualityMaterialEquipment.find(".noLoading").length > 0) {
+				isLoadData = true;
+			}
 
 		} else if (type == "processacceptance") {
 			//过程验收
-			this.$el.find(".QualityProcessAcceptance").show().siblings().hide();
+			var $QualityProcessAcceptance = this.$el.find(".QualityProcessAcceptance");
+
+			$QualityProcessAcceptance.show().siblings().hide();
+
+			if ($QualityProcessAcceptance.find(".noLoading").length > 0) {
+				isLoadData = true;
+			}
 
 		} else if (type == "openingacceptance") {
 			//开业验收
-			this.$el.find(".QualityOpeningAcceptance").show().siblings().hide();
+
+			var $QualityOpeningAcceptance = this.$el.find(".QualityOpeningAcceptance");
+
+			$QualityOpeningAcceptance.show().siblings().hide();
+
+			if ($QualityOpeningAcceptance.find(".noLoading").length > 0) {
+				isLoadData = true;
+			}
 
 
 		} else if (type == "concerns") {
 			//隐患
-			this.$el.find(".QualityConcerns").show().siblings().hide();
+
+			var $QualityConcerns= this.$el.find(".QualityConcerns");
+
+			$QualityConcerns.show().siblings().hide();
+
+			if ($QualityConcerns.find(".noLoading").length > 0) {
+				isLoadData = true;
+			}
+
+
 		} else if (type == "poperties") {
 			//属性
 			this.$el.find(".QualityProperties").show().siblings().hide();
 		}
 
-		if (type !== "poperties") {
-			this.getData(1);
+		if (type !== "poperties") { 
+			if (isLoadData) {
+				this.getData(1);
+			}
+			 
 		} else {
 			App.Project.renderProperty();
 		}

@@ -35,38 +35,53 @@ App.Project.ProjectPlanProperty = Backbone.View.extend({
 
 		if (type == "model") {
 			//碰撞
-			this.$el.find(".planModel").show().siblings().hide();
-			App.Project.PlanAttr.PlanModelCollection.reset();
-			App.Project.PlanAttr.PlanModelCollection.projectId = projectId;
-			App.Project.PlanAttr.PlanModelCollection.projectVersionId = projectVersionId;
-			App.Project.PlanAttr.PlanModelCollection.fetch();
+
+			var $planModel = this.$el.find(".planModel");
+
+			$planModel.show().siblings().hide();
+
+			if ($planModel.find(".noLoading").length > 0) {
+				App.Project.PlanAttr.PlanModelCollection.reset();
+				App.Project.PlanAttr.PlanModelCollection.projectId = projectId;
+				App.Project.PlanAttr.PlanModelCollection.projectVersionId = projectVersionId;
+				App.Project.PlanAttr.PlanModelCollection.fetch();
+			}
 
 		} else if (type == "analog") {
 			//设计检查 
-			this.$el.find(".planAnalog").show().siblings().hide();
 
-			App.Project.PlanAttr.PlanAnalogCollection.reset();
-			App.Project.PlanAttr.PlanAnalogCollection.projectId = projectId;
-			App.Project.PlanAttr.PlanAnalogCollection.projectVersionId = projectVersionId;
-			App.Project.PlanAttr.PlanAnalogCollection.fetch();
+			var $planAnalog = this.$el.find(".planAnalog");
 
+			$planAnalog.show().siblings().hide();
+
+			if ($planAnalog.find(".noLoading").length > 0) {
+				App.Project.PlanAttr.PlanAnalogCollection.reset();
+				App.Project.PlanAttr.PlanAnalogCollection.projectId = projectId;
+				App.Project.PlanAttr.PlanAnalogCollection.projectVersionId = projectVersionId;
+				App.Project.PlanAttr.PlanAnalogCollection.fetch();
+			}
 
 
 		} else if (type == "publicity") {
-			//属性
 
-			this.$el.find(".planPublicity").show().siblings().hide();
-			//计划关注列表
-			this.loadPublicityData(projectId, projectVersionId);
+			var $planPublicity = this.$el.find(".planPublicity");
+			//关注
+			$planPublicity.show().siblings().hide();
+
+			if ($planPublicity.find(".noLoading").length > 0) {
+				//计划关注列表
+				this.loadPublicityData(projectId, projectVersionId);
+			} 
 
 		} else if (type == "inspection") {
 			//设计检查
 
-			this.$el.find(".planInterest").show().siblings().hide();
+			var $planInterest=this.$el.find(".planInterest");
+			$planInterest.show().siblings().hide();
 
-			this.loadPlanInspection(projectId,projectVersionId);
-
-			
+			if ($planInterest.find(".noLoading").length > 0) {
+				this.loadPlanInspection(projectId, projectVersionId);
+			} 
 
 		} else if (type == "poperties") {
 			//属性
@@ -80,16 +95,16 @@ App.Project.ProjectPlanProperty = Backbone.View.extend({
 	},
 
 	//改变时间 
-	changeDate(event) { 
-		 
-		var $target = $(event.target),
-			isEnd = $target.val() != 1 && $target.val() != 3 &&  true || false;
+	changeDate(event) {
 
-		if ($target.val()==1 || $target.val()==2 ) {
-			this.$(".selDate:last")[0].selectedIndex=$target[0].selectedIndex;
-		}else  {
-			 this.$(".selDate:first")[0].selectedIndex=$target[0].selectedIndex;
-		} 
+		var $target = $(event.target),
+			isEnd = $target.val() != 1 && $target.val() != 3 && true || false;
+
+		if ($target.val() == 1 || $target.val() == 2) {
+			this.$(".selDate:last")[0].selectedIndex = $target[0].selectedIndex;
+		} else {
+			this.$(".selDate:first")[0].selectedIndex = $target[0].selectedIndex;
+		}
 
 		this.loadPublicityData(App.Project.Settings.projectId, App.Project.Settings.CurrentVersion.id, isEnd);
 	},
@@ -110,7 +125,7 @@ App.Project.ProjectPlanProperty = Backbone.View.extend({
 
 		App.Project.PlanAttr.PlanPublicityCollection.fetch({
 			data: {
-				projectId:projectId,
+				projectId: projectId,
 				type: monthType
 			}
 		});
@@ -121,25 +136,25 @@ App.Project.ProjectPlanProperty = Backbone.View.extend({
 
 		App.Project.PlanAttr.PlanPublicityCollectionMonth.fetch({
 			data: {
-				projectId:projectId,
+				projectId: projectId,
 				type: weekType
 			}
 		});
 	},
 
 	//加载设计检查
-	loadPlanInspection(projectId,projectVersionId){
+	loadPlanInspection(projectId, projectVersionId) {
 
 		App.Project.PlanAttr.PlanInspectionCollection.reset();
-		App.Project.PlanAttr.PlanInspectionCollection.projectVersionId=projectVersionId;
-		App.Project.PlanAttr.PlanInspectionCollection.projectId=projectId;
+		App.Project.PlanAttr.PlanInspectionCollection.projectVersionId = projectVersionId;
+		App.Project.PlanAttr.PlanInspectionCollection.projectId = projectId;
 		App.Project.PlanAttr.PlanInspectionCollection.fetch();
 
 		App.Project.PlanAttr.fetchPlanInspectionCate.reset();
-		App.Project.PlanAttr.fetchPlanInspectionCate.projectVersionId=projectVersionId;
-		App.Project.PlanAttr.fetchPlanInspectionCate.projectId=projectId;
-		App.Project.PlanAttr.fetchPlanInspectionCate.fetch(); 
-		 
+		App.Project.PlanAttr.fetchPlanInspectionCate.projectVersionId = projectVersionId;
+		App.Project.PlanAttr.fetchPlanInspectionCate.projectId = projectId;
+		App.Project.PlanAttr.fetchPlanInspectionCate.fetch();
+
 	}
 
 

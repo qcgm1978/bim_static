@@ -53,9 +53,17 @@ App.Project.ProjectDesignPropety = Backbone.View.extend({
 			this.$el.find(".detailList").show().siblings().hide();
 
 		} else if (type == "verifi") {
-			//设计检查 
-			this.$el.find(".designVerification").show().siblings().hide();
-			this.getVerificationData();
+			
+			//设计检查  
+
+			var $designVerification=this.$el.find(".designVerification");
+
+			$designVerification.show().siblings().hide();
+
+			if ($designVerification.find(".noLoading").length>0) {
+				this.getVerificationData();
+			} 
+			
 
 		} else if (type == "poperties") {
 

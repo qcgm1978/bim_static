@@ -6,6 +6,11 @@ App.Project.ProjectContainer = Backbone.View.extend({
 
 	template: _.templateUrl('/projects/tpls/project/project.container.html'),
 
+	initialize() {
+		this.listenTo(App.Project.DesignAttr.PropertiesCollection, "add", this.renderProperties);
+	},
+
+
 	events: {
 		"click .breadItem": "breadItemClick",
 		"click .slideBar": "navBarShowAndHide",
@@ -73,16 +78,6 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			}
 			$fileModelList.show();
 		}
-
-		/*var dialog = new App.Comm.modules.Dialog({
-			width: 580,
-			height: 268,
-			limitHeight: false,
-			title: '新建任务',
-			cssClass: 'task-create-dialog',
-			okText: '添&nbsp;&nbsp;加',
-			message: "内容"
-		})*/
 	},
 
 	//加载分组项目
@@ -123,7 +118,6 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			$projectVersionList.find(".listContent").show();
 
 		});
-
 	},
 
 	//版本切换
@@ -177,8 +171,8 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		} else {
 			this.navBarRightShowAndHide();
 		}
-
 	},
+
 	//收起和暂开
 	navBarLeftShowAndHide: function() {
 		App.Comm.navBarToggle($("#projectContainer .leftNav"), $("#projectContainer .projectCotent"), "left", App.Project.Settings.Viewer);
@@ -315,12 +309,6 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		}
 		var that = this;
 
-
-		// App.Project.Settings.modelId= "e0c63f125d3b5418530c78df2ba5aef1";
-		// this.renderModel();
-		// return;
-
-
 		App.Comm.ajax(data, function(data) {
 
 			if (data.message == "success") {
@@ -346,7 +334,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		this.typeContentChange();
 
 		//渲染模型属性
-		App.Project.renderModelContentByType();
+		//App.Project.renderModelContentByType();
 
 
 		// var viewer = new dwgViewer({
@@ -389,6 +377,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 
 		});
 	},
+
 	//重置 内容为空
 	resetProperNull() {
 
@@ -418,6 +407,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		}
 
 	},
+
 	//设置渲染
 	viewerPropertyRender() {
 		var projectNav = App.Project.Settings.projectNav,
@@ -425,7 +415,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			Intersect = App.Project.Settings.ModelObj.intersect;
 
 		//属性，四个tab 都一样
-		if (((projectNav == "design" || projectNav == "cost" || projectNav == "quality" || projectNav == "plan") && property == "poperties")) {
+		if (((projectNav == "design" || projectNav == "cost" || projectNav == "quality" || projectNav == "plan" || projectNav == '') && property == "poperties")) {
 
 			App.Project.DesignAttr.PropertiesCollection.projectId = App.Project.Settings.projectId;
 			App.Project.DesignAttr.PropertiesCollection.projectVersionId = App.Project.Settings.CurrentVersion.id;
@@ -436,6 +426,22 @@ App.Project.ProjectContainer = Backbone.View.extend({
 				}
 			});
 		}
+	},
+
+
+	//渲染属性
+	renderProperties(model) {
+
+		var data = model.toJSON().data,
+			templateProperties = _.templateUrl("/projects/tpls/project/design/project.design.property.properties.html"),
+			$designProperties = this.$el.find(".singlePropetyBox .designProperties");
+
+		$designProperties.html(templateProperties(data));
+		//其他属性
+		App.Project.propertiesOthers.call({
+			$el: $designProperties
+		}, "plan|cost|quality");  
+		 
 	}
 
 });
