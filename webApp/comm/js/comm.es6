@@ -63,7 +63,9 @@ App.Comm = {
 
 		//url 是否有参数
 		var urlPars = data.url.match(/\{([\s\S]+?(\}?)+)\}/g);
-		var temp = data.data;
+		
+		var temp =data.data;
+		
 		if ((typeof temp) == 'string') {
 			temp = JSON.parse(temp);
 		}

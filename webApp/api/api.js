@@ -32,6 +32,16 @@ App.API = {
 		fetchServicesMemberOuterList:'platform/auth/org?outer=true',//外部组织-品牌／公司／成员列表
 		fetchServicesMemberInnerList:'platform/auth/org?outer=false',//内部-组织／成员列表
 		deleteServicesRoleSingle:"platform/role?",//删除角色
+		putServicesProjectMembers:"platform/auth/dataPrivilege/grant",//添加项目成员
+		deleteServicesProjectMembers:"platform/auth/{memberType}/{userId}/dataPrivilege",//删除项目成员
+		
+		fetchProjectCreateBaseHole:'platform/pit/createPit',
+		fetchProjectDetailBaseholeList:'platform/pit/{projectId}',
+		removeProjectDetailBasehole:'platform/pit/{pitId}',
+		putProjectLink:'platform/mapping/{projectId}',//项目关联
+		fetchProjectManagerProjectList:'platform/mapping/project',//项目管理-项目列表
+		fetchProjectManagerProjectLogo:'platform/project/{projectId}/logo/cut',//项目管理-项目logo裁剪
+		
 
 
 		fetchServiceKeyUserList:'platform/auth/keyUser',//关键用户列表

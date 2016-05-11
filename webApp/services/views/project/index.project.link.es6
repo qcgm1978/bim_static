@@ -32,9 +32,13 @@ App.Services.ProjectLink=Backbone.View.extend({
 	
 	loadData:function(callback){
 		var _this=this;
-		$.ajax({
-			url:'/platform/mapping/project?type='+(_this.userData.type=='qualityProjectCode'?3:2)
-		}).done(function(data){
+		App.Comm.ajax({
+			URLtype:'fetchProjectManagerProjectList',
+			type:'get',
+			data:{
+				type:_this.userData.type=='qualityProjectCode'?3:2
+			}
+		},function(data){
 			callback(data);
 		})
 	},
@@ -52,29 +56,29 @@ App.Services.ProjectLink=Backbone.View.extend({
 		var projectId=_this.userData.projectId,
 			type=_this.userData.type;
 		var _result={
-				    "modularizeProjectCode": "",
-				    "costProjectCode":"",
-				    "qualityProjectCode": ""
+				    'modularizeProjectCode': '',
+				    'costProjectCode':'',
+				    'qualityProjectCode': '',
+				    'projectId':projectId
 				}
-		_result[type]=$li.first().attr('data-code');
-		
 		if($li.length>0){
-			$.ajax({
-				url:'/platform/mapping/'+projectId,
+			_result[type]=$li.first().attr('data-code');
+			App.Comm.ajax({
+				URLtype:'putProjectLink',
 				type:'PUT',
 				contentType:'application/json',
 				data:JSON.stringify(_result)
-			}).done(function(data){
+			},function(data){
 				$("#dataLoading").hide();
 				App.Global.module.close();
-				
 				let collectionMap=App.Services.ProjectCollection.ProjecMappingCollection;
 		 		collectionMap.projectId=projectId;
 		 		collectionMap.fetch({
 		 			reset:true,
 		 			success(child, data) {}
 		 		});
-				
+			}).fail(function(){
+				$("#dataLoading").hide();
 			})
 		}
 	},

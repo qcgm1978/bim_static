@@ -86,15 +86,22 @@ App.Services.ImageJcrop=Backbone.View.extend({
 		})
 		
 		$("#cutImageBtn").on('click',function(){
-			debugger
 			var j=_$timg.data().Jcrop.tellSelect();
-			$("#dataLoading").show();
-			$.ajax({
-				type:"post",
-				url:'/platform/project/'+_this._projectId+'/logo/cut?x='+x+'&y='+y+'&w='+w+'&h='+h
-			}).done(function(data){
+			$("#pageLoading").show();
+			
+			App.Comm.ajax({
+				URLtype:'fetchProjectManagerProjectLogo',
+				type:'post',
+				data:{
+					x:x,
+					y:y,
+					w:w,
+					h:h,
+					projectId:_this._projectId
+				}
+			},function(data){
 				$("#preImageSource").remove();
-				$("#dataLoading").hide();
+				$("#pageLoading").hide();
 				if(data.message=='success'){
 					App.Services.maskWindow.close();
 					var _collection=App.Services.ProjectCollection.ProjectBaseInfoCollection;
@@ -106,7 +113,7 @@ App.Services.ImageJcrop=Backbone.View.extend({
 			 		});
 				}
 			}).fail(function(){
-				$("#dataLoading").hide();
+				$("#pageLoading").hide();
 			})
 		})
 	},

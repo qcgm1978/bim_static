@@ -72,13 +72,10 @@
 		font-size: 14px;
 		position: relative;
 		& .header,dt{
-			border:1px solid #ccc;
-			border-bottom: none;
-			border-left: none;
+			border-bottom:1px solid #ccc;
 			height: 40px;
 			line-height:40px;
 			padding-left: 10px;
-			
 			& i{
 				display: inline-block;
 				width: 20px;
@@ -88,12 +85,9 @@
 			}
 		}
 		
-		
 		& .header{
-				border-bottom: 1px solid #ccc;
-				border-top: none;
-				color: #666;
-			}
+			color: #666;
+		}
 		& .detailContainer{
 			position: absolute;
 			top: 40px;
@@ -102,39 +96,28 @@
 			bottom: 0;
 		}
 		& dt{
-				color: #333;
-				&:nth-of-type(1){
-					border-top: none;
-					border-bottom: none;
-				}
-				&:last-of-type{
-					border-bottom: 1px solid #ccc;
-				}
-				& .accordionDatail{
-					float: right;
-					margin-right: 20px;
-					color:#005BAC;
-					&:hover{
-						cursor: pointer;
-						text-decoration: underline;
-					}
+			color: #333;
+			& .accordionDatail{
+				float: right;
+				margin-right: 20px;
+				color:#005BAC;
+				&:hover{
+					cursor: pointer;
+					text-decoration: underline;
 				}
 			}
+		}
 		& dd{
-				background: #EEE;
-				width: 100%;
-				border-bottom: 1px solid #ccc;
-				border-right: 1px solid #ccc;
-				margin-left: 0;
-				box-sizing: border-box;
-				padding: 10px;
-				height: 100%;
-				height: auto;
-				clear: both;
-				display: inline-block;
-			&:nth-of-type(1){
-				border-top: 1px solid #ccc;
-			}
+			background: #EEE;
+			width: 100%;
+			border-bottom: 1px solid #ccc;
+			margin-left: 0;
+			box-sizing: border-box;
+			padding: 10px;
+			height: 100%;
+			height: auto;
+			clear: both;
+			display: inline-block;
 		}
 		
 		& form{
@@ -174,9 +157,10 @@
 					}
 				}
 				
-				& button {
+				& .myBtn {
 					margin: 5px;
 					border:1px solid #ccc; 
+					width: 80px;
 				}
 				& .myBtn-primary{
 					border: none;
