@@ -67,6 +67,10 @@ fis.match('console/**.html', {
   //useHash:true,
   release: "/static/dist/tpls/$0"
 });
+fis.match('console1/**.html', {
+  //useHash:true,
+  release: "/static/dist/tpls/$0"
+});
 //首页主体
 fis.match('bodyContent/tpls/**.html', {
   //useHash:true,
@@ -218,7 +222,14 @@ fis.match('/console/**.{css,less}', {
   packTo: '/static/dist/console/console_' + v + '.css'
 });
 
+fis.match('/console1/**.{js,es6}', {
 
+  packTo: '/static/dist/console1/console_' + v + '.js'
+});
+fis.match('/console1/**.{css,less}', {
+
+  packTo: '/static/dist/console1/console_' + v + '.css'
+});
 
 //项目
 fis.match('/projects/**.{less,css}', {

@@ -223,17 +223,20 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			$projectContainer.find(".rightProperty").removeClass("showPropety");
 			$projectContainer.find(".leftNav").show();
 
+			$projectCotent.removeClass("showPropety");
 			//切换时记录大小
-			var mRight = $projectCotent.css("margin-right");
-			$projectCotent.css({
-				"margin-right": "0px",
-				"margin-left": "240px"
-			});
-			$projectCotent.data("mRight", mRight);
+			//var mRight = $projectCotent.css("margin-right");
+			//$projectCotent.css({
+			//"margin-right": "0px",
+			//"margin-left": "240px"
+			//});
+			// $projectCotent.data("mRight", mRight);
 
 			//内容
 			$projectContainer.find(".fileContainer").show();
 			$projectContainer.find(".modelContainer").hide();
+			//模型tab
+			$(".projectContainerApp .projectHeader .projectTab").hide();
 
 			//tab 文字
 			$target.closest('.fileModelNav').find(".breadItemText .text").text($target.text());
@@ -262,7 +265,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			//tab 文字
 			$target.closest('.fileModelNav').find(".breadItemText .text").text($target.text());
 
-			
+
 		}
 
 		//隐藏下拉
@@ -276,20 +279,24 @@ App.Project.ProjectContainer = Backbone.View.extend({
 	typeContentChange() {
 
 		var $projectContainer = $("#projectContainer"),
-			$projectCotent = $projectContainer.find(".projectCotent");
+			$projectCotent = $projectContainer.find(".projectCotent"),
+			mRight = $projectCotent.data("mRight") || 398;
+
 		//左右侧
 		$projectContainer.find(".leftNav").hide();
 
-		var mRight = $projectCotent.data("mRight") || 398;
-		$projectCotent.css({
-			"margin-right": mRight,
-			"margin-left": "0px"
-		});
+		//$projectCotent.css({
+		//"margin-right": mRight,
+		//"margin-left": "0px"
+		//});
+		$projectCotent.addClass("showPropety");
 		$projectContainer.find(".rightProperty").addClass("showPropety").width(mRight);
 
 		//内容
 		$projectContainer.find(".fileContainer").hide();
 		$projectContainer.find(".modelContainer").show();
+		//模型tab
+		$(".projectContainerApp .projectHeader .projectTab").show();
 
 		//销毁上传
 		App.Comm.upload.destroy();
@@ -334,7 +341,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 	//模型渲染
 	renderModel: function() {
 
-		var that = this; 
+		var that = this;
 
 		this.typeContentChange();
 
@@ -346,7 +353,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		// 	element:$("#projectContainer .modelContainerContent"),
 		// 	sourceId:'beea5e402aaf38ceff7dd4dd315ebc05'
 		// })  
-
+		//return;
 		var viewer = App.Project.Settings.Viewer = App.Comm.createModel({
 			element: $("#projectContainer .modelContainerContent"),
 			sourceId: App.Project.Settings.DataModel.sourceId,
