@@ -23,8 +23,7 @@ App.Services.ProjectDetail.BaseHole=Backbone.View.extend({
 		this.on('read',function(){
 			_this.status='read';
 		})
-		this.listenTo(App.Services.ProjectCollection.ProjecDetailBaseHoleCollection,'add',this.addView)
-		
+		this.listenTo(App.Services.ProjectCollection.ProjecDetailBaseHoleCollection,'reset',this.resetView)
 	},
 	
 	render(){
@@ -34,12 +33,17 @@ App.Services.ProjectDetail.BaseHole=Backbone.View.extend({
 		return this;
 	},
 	
-	addView(items){
-		var view=new App.Services.DetailView.BaseHole({
-			projectId:this.userData.projectId
-		});
-		this.$('.detailContainer .scrollWrapContent').append(view.render(items.toJSON()).el);
-		view.toggleProFrom('.accordionDatail');
+	resetView(items){
+		var _this=this;
+		var $container=this.$('.detailContainer .scrollWrapContent');
+		$container.html("");
+		items.models.forEach(function(model){
+			var view=new App.Services.DetailView.BaseHole({
+				projectId:_this.userData.projectId
+			});
+			$container.append(view.render(model.toJSON()).el);
+			view.toggleProFrom('.accordionDatail');
+		})
 	},
 	
 	createBaseHole(){

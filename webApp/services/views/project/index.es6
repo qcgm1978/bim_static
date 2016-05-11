@@ -105,6 +105,7 @@
  		let collectionBasehole=App.Services.ProjectCollection.ProjecDetailBaseHoleCollection;
  		collectionBasehole.projectId=_projectId;
  		collectionBasehole.fetch({
+ 			reset:true,
  			success(child, data) {
  			}
  		});
