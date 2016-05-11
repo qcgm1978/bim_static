@@ -94,6 +94,22 @@ App.Services.ProjectCollection = {
 				return  response.data.pits;
             }
 		}
+	})),
+	
+	ProjecDetailFloorCollection: new(Backbone.Collection.extend({
+		model: Backbone.Model.extend({
+			defaults: function() {
+				return {
+					title: ""
+				}
+			}
+		}),
+		urlType: "fetchProjectDetailBaseholeList",
+		parse(response) {
+			if (response.code == 0) {
+				return  response.data.pits;
+            }
+		}
 	}))
  
 
