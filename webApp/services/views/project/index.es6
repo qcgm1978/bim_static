@@ -26,12 +26,13 @@
 		new App.Services.ProjectBase();
 		
 		this.viewProjectMapping = new App.Services.ProjectMapping();
+		this.viewProjectBaseHole = new App.Services.ProjectDetail.BaseHole();
 		
 		this.$(".projectContainer .projectMapping").html(this.viewProjectMapping.render().el);
 
  		this.$(".projectContainer .projectFloor").html(new App.Services.ProjectDetail.Floor().render().el);
  		
- 		this.$(".projectContainer .projectBaseHole").html(new App.Services.ProjectDetail.BaseHole().render().el);
+ 		this.$(".projectContainer .projectBaseHole").html(this.viewProjectBaseHole.render().el);
  		
  		this.$(".projectContainer .projectSection").html(new App.Services.ProjectDetail.Section().render().el);
  		
@@ -68,6 +69,7 @@
  		var $item=$(event.target).closest(".item"),
  			_collection=App.Services.ProjectCollection.ProjectBaseInfoCollection;
  		let _projectId=$item.attr('data-projectId');
+ 		
  		$item.addClass("selected").siblings().removeClass("selected");
  		//加载项目基本信息数据
  		_collection.projectId=_projectId;
@@ -88,6 +90,17 @@
  		collectionMap.projectId=_projectId;
  		collectionMap.fetch({
  			reset:true,
+ 			success(child, data) {
+ 			}
+ 		});
+ 		
+ 		//加载基坑数据
+ 		this.viewProjectBaseHole.setUserData({
+ 			projectId:_projectId
+ 		});
+ 		let collectionBasehole=App.Services.ProjectCollection.ProjecDetailBaseHoleCollection;
+ 		collectionBasehole.projectId=_projectId;
+ 		collectionBasehole.fetch({
  			success(child, data) {
  			}
  		});

@@ -21,6 +21,7 @@ App.Services.ProjectCollection = {
 		doorFireLevel:['A','B1'],//防火等级
 		installType:['无','铝板幕墙','玻璃幕墙','涂料','GRC板','石材幕墙'],
 		orgType:['剪力墙结构','钢结构','框架剪力墙结构','框架结构','劲性混凝土结构','框筒结构'],
+		baseholeLv:['一级','二级','三级']
 	
 	},
 
@@ -75,6 +76,22 @@ App.Services.ProjectCollection = {
 				data.logo=data.logo ? data.logo['200x150']:"";
 				data.logo=data.logo+'?t='+new Date().getTime();
                 return data;
+            }
+		}
+	})),
+	
+	ProjecDetailBaseHoleCollection: new(Backbone.Collection.extend({
+		model: Backbone.Model.extend({
+			defaults: function() {
+				return {
+					title: ""
+				}
+			}
+		}),
+		urlType: "fetchProjectDetailBaseholeList",
+		parse(response) {
+			if (response.code == 0) {
+				return  response.data.pits;
             }
 		}
 	}))

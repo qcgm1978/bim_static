@@ -9,7 +9,9 @@ App.Services.projectMember = {
 	init: function() {
 		$('.serviceBody').html(new App.Services.projectMember.mainView().render().el);
 		
-		$("#projectMember").mmhMask();
+		//$("#projectMember").mmhMask();
+		
+		$("#dataLoading").show();
 		
 		this.loadData(this.projectMemberProjectCollection,{
 			outer:App.Comm.getCookie("isOuter")
@@ -44,15 +46,7 @@ App.Services.projectMember = {
 			if (response.message == "success") {
 				var data=response.data,
 					//TODO 测试数据、需要删除的
-					result=[{
-				      "id": 1, 
-				      "name": "周浦万达项目",
-				      "startTime": 1457536342000,
-				      "endTime": 0,
-				      "province": "上海市",
-				      "city": null,
-				      "image":''
-				    }];
+					result=[];
 				    if(data.length>0){
 				    	result=[];
 				    }

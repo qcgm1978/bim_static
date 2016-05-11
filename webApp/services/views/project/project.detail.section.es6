@@ -6,6 +6,8 @@ App.Services.ProjectDetail.Section=Backbone.View.extend({
 	
 	className:'projectDetail',
 	
+	status:'read',
+	
 	events:{
 		'click .createSection':'createSection'
 	},
@@ -25,10 +27,16 @@ App.Services.ProjectDetail.Section=Backbone.View.extend({
 	load(){
 	},
 	createSection(){
-		this.$('dd').slideUp();
-		this.$('dt span').addClass('accordOpen');
-		var view=new App.Services.DetailView.Section();
-		this.$('.detailContainer .scrollWrapContent').prepend(view.render().el);
+		if(this.status !=='create'){
+			this.$('dd').slideUp();
+			this.$('dt span').addClass('accordOpen');
+			var view=new App.Services.DetailView.Section();
+			this.$('.detailContainer .scrollWrapContent').prepend(view.render().el);
+			this.status='create';
+		}else{
+			App.Services.Dialog.alert('请先完成当前新增操作...');
+		}
+		
 	}
 	
 })

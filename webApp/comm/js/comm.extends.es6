@@ -219,7 +219,6 @@ Backbone.sync = function(method, model, options) {
 		model.url = App.API.Settings.hostname + App.API.URL[model.urlType]; 
 	}
 	//}
-
 	//url 是否有参数
 	var urlPars = model.url.match(/\{([\s\S]+?(\}?)+)\}/g);
 	if (urlPars) {

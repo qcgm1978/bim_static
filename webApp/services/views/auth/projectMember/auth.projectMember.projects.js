@@ -3,7 +3,9 @@ App.Services.projectMember.projects = Backbone.View.extend({
 	
 	template: _.templateUrl('/services/tpls/auth/projectMember/projects.html'),
 
-	
+	events:{
+		'click .project':'selectProject'
+	},
 	// 重写初始化
 	initialize: function() {
 		this.listenTo(App.Services.projectMember.projectMemberProjectCollection, 'reset', this.render);
@@ -13,10 +15,7 @@ App.Services.projectMember.projects = Backbone.View.extend({
 		var _this=this;
 		var data = App.Services.projectMember.method.model2JSON(items.models);
 		data={data:data};
-		$("#projectList").html(this.template(data));
-		$("#projectList .project").on("click",function(e){
-			_this.selectProject(e);
-		})
+		$("#projectList").html(this.$el.html(this.template(data)));
 		if(data.data.length>0){
 			var id=data.data[0].id;
 			App.Services.projectMember.loadData(App.Services.projectMember.projectMemberMemberCollection,{outer:App.Comm.getCookie("isOuter")},{
@@ -24,14 +23,9 @@ App.Services.projectMember.projects = Backbone.View.extend({
 			});
 			App.Comm.setCookie("currentPid",id);
 		}
-		
 		return this;
 	},
 	
-	initDom:function(){
-		
-	},
-
 	selectProject:function(event){
 		$("#dataLoading").show();
 		var $li=$(event.currentTarget),
@@ -40,8 +34,8 @@ App.Services.projectMember.projects = Backbone.View.extend({
 		$li.addClass("active");
 		App.Comm.setCookie("currentPid",pid);
 		App.Services.projectMember.loadData(App.Services.projectMember.projectMemberMemberCollection,{outer:App.Comm.getCookie("isOuter")},{
-				dataPrivilegeId:pid
-			});
+			dataPrivilegeId:pid
+		});
 	},
 
 });
