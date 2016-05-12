@@ -142,8 +142,6 @@ App.Services.MemberList=Backbone.View.extend({
                 }
             }
         });
-
-        console.log(App.Services.memberWindowData);
     },
 
     //返回机构/成员的url和id

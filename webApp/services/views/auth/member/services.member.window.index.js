@@ -71,8 +71,6 @@ App.Services.MemberWindowIndex = Backbone.View.extend({
                     if(l2.length && userId){
                         for(var j = 0 ; j < l2.length ;j++){
                             if(userId == l2[j] ){
-                                console.log(userId);
-
                                 item.set({"role":proto});
                                 return
                             }

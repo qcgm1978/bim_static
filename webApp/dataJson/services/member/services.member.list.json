@@ -1,79 +1,94 @@
 {
+  "messageId": "864b9bc728324b33ab0a2a5ef6944cbb",
+  "messageType": null,
+  "timestamp": 1463023407442,
   "code": 0,
   "message": "success",
-  "data": {
-    "org": [
-      {
-        "orgId": "936399432",
-        "name": "旅游控股公司-万达旅业-各地公司-深圳万达国旅-市场发展总部",
-        "namePath": "旅游控股公司-万达旅业-各地公司-深圳万达国旅-市场发展总部",
-        "outer": false,
-        "parent": null,
-        "parentId": "782132832",
-        "brand": false,
-        "role": [
-          {
-            "roleId": 10,
-            "name": "测试继承",
-            "inherit": false,
-            "functions": null
-          },
-          {
-            "roleId": 1,
-            "name": "测试角色",
-            "inherit": true,
-            "functions": null
-          },
-          {
-            "roleId": 10,
-            "name": "测试继承",
-            "inherit": true,
-            "functions": null
-          }
-        ],
-        "privilege": null,
-        "hasChildren": true,
-        "hasUser": false
-      }
-    ],
-    "user": [
-      {
-        "userId": "1018561804",
-        "name": "杨俊",
-        "loginName": "yangjun65",
-        "position": "操作",
-        "org": null,
-        "isAdmin": true,
-        "isKeyUser": false,
-        "outer": false,
-        "privilege": [],
-        "role": [
-          {
-            "roleId": 999999,
-            "name": "超级管理员",
-            "inherit": false,
-            "functions": null
-          },
-          {
-            "roleId": 999998,
-            "name": "关键用户",
-            "inherit": false,
-            "functions": null
-          },
-          {
-            "roleId": 1,
-            "name": "测试角色",
-            "inherit": true,
-            "functions": null
-          },
-          {
-            "roleId": 10,
-            "name": "测试继承",
-            "inherit": true,
-            "functions": null
-          }
-        ]
-      }
-    ]
-  }
+  "data": [
+    {
+      "roleId": 828369428340928,
+      "name": "4",
+      "inherit": false,
+      "functions": [
+        {
+          "id": 2,
+          "name": "模块化",
+          "code": "plan"
+        },
+        {
+          "id": 3,
+          "name": "成本",
+          "code": "cost"
+        }
+      ]
+    },
+    {
+      "roleId": 828363166630080,
+      "name": "3",
+      "inherit": false,
+      "functions": [
+        {
+          "id": 4,
+          "name": "质监",
+          "code": "quality"
+        },
+        {
+          "id": 3,
+          "name": "成本",
+          "code": "cost"
+        }
+      ]
+    },
+    {
+      "roleId": 828362618699968,
+      "name": "1",
+      "inherit": false,
+      "functions": [
+        {
+          "id": 4,
+          "name": "质监",
+          "code": "quality"
+        }
+      ]
+    },
+    {
+      "roleId": 999999,
+      "name": "总包",
+      "inherit": false,
+      "functions": [
+        {
+          "id": 3,
+          "name": "成本",
+          "code": "cost"
+        },
+        {
+          "id": 4,
+          "name": "质监",
+          "code": "quality"
+        },
+        {
+          "id": 1,
+          "name": "设计",
+          "code": "design"
+        },
+        {
+          "id": 2,
+          "name": "模块化",
+          "code": "plan"
+        }
+      ]
+    },
+    {
+      "roleId": 829522567954624,
+      "name": "2",
+      "inherit": false,
+      "functions": [
+        {
+          "id": 1,
+          "name": "设计",
+          "code": "design"
+        }
+      ]
+    }
+  ]
 }
