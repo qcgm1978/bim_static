@@ -37,27 +37,50 @@ App.Services.MemberWindowIndex = Backbone.View.extend({
 
 
         data = {
-            URLtype:"putServicesSaveRole",
-            data:JSON.stringify(submitData),
+            URLtype:"saveServicesRole",
+            data : JSON.stringify(submitData),
             type:"POST",
             contentType: "application/json"
         };
 
-
-
         App.Comm.ajax(data,function(response){
+            var type = App.Services.MemberType || "inner";
             if(response.message == "success"){
-                var s = App.Services.Member[App.Services.MemberType + "Collection"],proto = [];
+                var s = App.Services.Member[type + "Collection"],proto = [];
                 _.each(selectRole,function(item){
                     item.set("functions",null);
                     item.unset("checked");
                     proto.push(item.toJSON());
                 });
 
+
+
                 s.each(function(item){
-                   item.set({"role":proto});//如何放在内部
-                    console.log(item);
+                    var l1 = submitData[type]["orgId"];
+                    var l2 = submitData[type]["userId"];
+                    var orgId = item.get("orgId");
+                    var userId = item.get("userId");
+                    if(l1.length && orgId){
+                        for(var i  = 0 ;  i< l1.length ; i ++){
+                            if(orgId == l1[i]){
+                                item.set({"role":proto});//如何放在内部
+                                return
+                            }
+                        }
+                    }
+                    if(l2.length && userId){
+                        for(var j = 0 ; j < l2.length ;j++){
+                            if(userId == l2[j] ){
+                                console.log(userId);
+
+                                item.set({"role":proto});
+                                return
+                            }
+                        }
+                    }
                 });
+
+                App.Services.memberWindowData = {"roleId":[], "outer":{"orgId":[],"userId":[]},"inner":{"orgId":[], "userId":[]}};;
             }
             //提交成功关闭窗口，否则显示提交失败
             App.Services.maskWindow.close();

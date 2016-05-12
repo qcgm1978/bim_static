@@ -100,13 +100,35 @@ App.Services.MemberList=Backbone.View.extend({
             });
             return
         }
+
+        /*var data = {
+            URLtype:"fetchServicesOzRoleList",
+            type:"POST",
+            data: JSON.stringify({ parentId:parentId, outer:!(type == "inner")})
+        };
+
+        App.Comm.ajax(data,{
+            success:function(response){
+                if(response.message=="success"){
+                    if(response.data.length){$(".seWinBody .memRoleList  ul").append("<li>没有相关数据</li>");}
+                    App.Services.Member.SubRoleCollection.reset();
+                    _.each(response.data,function(item){
+                        App.Services.Member.SubRoleCollection.add(item);
+                    });
+                    $("#dataLoading").hide();
+                }
+            },
+            error:function(error){
+                alert("无法取得角色列表,错误号 " +error.status );
+                $("#dataLoading").hide();
+            }});*/
         url = "http://bim.wanda-dev.cn/platform/auth/org/"+ parentId  +"/role?outer=" +  !(type == "inner");
         this.ajaxRole(url,frame);
     },
 
     //保存要提交的数据模块，将数据混编成可提交形式
     saveData:function(seleUser){
-        var saveType =  App.Services.MemberType;
+        var saveType =  App.Services.MemberType || "inner";
         //userId和orgId
         _.each(seleUser,function(item){
             var userId = item.get("userId");
@@ -120,6 +142,8 @@ App.Services.MemberList=Backbone.View.extend({
                 }
             }
         });
+
+        console.log(App.Services.memberWindowData);
     },
 
     //返回机构/成员的url和id
@@ -152,6 +176,7 @@ App.Services.MemberList=Backbone.View.extend({
         $.ajax({
             type:"GET",
             url: url,
+
             success:function(response){
                 if(response.message=="success"){
                     if(response.data.length){$(".seWinBody .memRoleList  ul").append("<li>没有相关数据</li>");}
