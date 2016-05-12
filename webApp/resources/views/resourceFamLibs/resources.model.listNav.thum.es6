@@ -8,6 +8,7 @@ App.ResourceModel.ThumContent = Backbone.View.extend({
 	//初始化
 	initialize: function() {
 		this.listenTo(App.ResourceModel.FileThumCollection, "add", this.addOneFile);
+		this.listenTo(App.ResourceModel.FileThumCollection, "reset", this.reset);
 		
 	},
 
@@ -29,27 +30,21 @@ App.ResourceModel.ThumContent = Backbone.View.extend({
 		});
 
 		var data = model.toJSON();
+
+		this.$el.find(".thumContent .loading").remove();
 	 
 		this.$el.find(".thumContent").prepend(view.render().el);
-		this.bindScroll();
+
+		App.Comm.initScroll(this.$el.find(".thumLists"),'y'); 
+		 
 	},
 
-	//绑定滚动条
-	bindScroll: function() {
-		var $fileLists = this.$el.find(".thumLists");
-		if (!$fileLists.hasClass('mCustomScrollbar')) {
-			$fileLists.mCustomScrollbar({
-				set_height: "100%",
-				set_width: "100%",
-				theme: 'minimal-dark',
-				axis: 'y',
-				keyboard: {
-					enable: true
-				},
-				scrollInertia: 0
-			});
-		}
-	} 
+	//加载
+	reset(){
+		this.$el.find(".thumContent").html('<li class="loading">正在加载，请稍候…</li>');
+	}
+
+ 
 
 
 

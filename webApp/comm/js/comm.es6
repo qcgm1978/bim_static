@@ -304,7 +304,7 @@ App.Comm = {
 	initScroll($target, axis) {
 
 		//绑定过
-		if ($target.hasClass("mCustomScrollbar")) {
+		if (!$target || $target.hasClass("mCustomScrollbar")) {
 			return;
 		}
 

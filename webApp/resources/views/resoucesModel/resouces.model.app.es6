@@ -20,11 +20,6 @@
  			//右键菜单
  			var contextHtml = _.templateUrl("/resources/tpls/context/listContext.html", true);
  			$("body").append(contextHtml);
- 		}
-
-
- 	}
-
-
-
+ 		}  
+ 	} 
  });

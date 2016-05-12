@@ -1,7 +1,8 @@
  
 
 <span class="proImg"><img src="/projects/images/proDefault.png" /></span>
-<span class="proName"><a class="aProName" href="/#projects/<%=id %>" data-id="<%=id %>"><%=name%></a></span>
+ 
+<span class="proName"><a class="aProName" href="/#projects/<%=id %>/<%= version && version.id || 'noVersion'  %>" data-id="<%=id %>"><%=name%></a></span>
 <span class="proType"><%=estateType==1?"轻资产":"重资产"%></span>
      <span class="proProvince"><%=province%></span>
             <span class="proCity"><%=province%></span> 

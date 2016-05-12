@@ -10,13 +10,7 @@ App.Projects.listView=Backbone.View.extend({
 		"click .aProName":"beforeBreak"
 	},
 
-	template:_.templateUrl("/projects/tpls/project.list.html"),
-
-	// 重写初始化
-	// initialize:function(){
-	// 	this.listenTo(this.model, 'change', this.render);
-	//     this.listenTo(this.model, 'destroy', this.removeItem);
-	// },
+	template:_.templateUrl("/projects/tpls/project.list.detail.html"), 
 
 	render:function(){
 		//渲染数据
@@ -27,8 +21,13 @@ App.Projects.listView=Backbone.View.extend({
 
 	//跳转之前
 	beforeBreak:function(event){
+		
 		var $target=$(event.target);
-	 	App.Comm.setCookie("projectName",$target.text());
+
+		if ($target.prop("href").indexOf("noVersion")>-1) {
+			alert('暂无版本'); 
+			return false;
+		} 
 
 	}
 

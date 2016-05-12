@@ -5,11 +5,7 @@ App.ResourceFamLibs.leftNav = Backbone.View.extend({
 	id: "resourceFamlibsLeftNav",
 
 	template: _.templateUrl("/resources/tpls/resourceFamLibs/resource.famlibs.leftNav.html", true),
-
-	events: {
-
-	},
-
+ 
 	//渲染
 	render: function(type) {
 
@@ -20,14 +16,13 @@ App.ResourceFamLibs.leftNav = Backbone.View.extend({
 		return this;
 	},
 
-	getfileTree: function() {
-
+	getfileTree: function() { 
 
 		var data = {
 			URLtype: "fetchFileTree",
 			data: {
 				projectId: App.ResourceModel.Settings.CurrentVersion.projectId,
-				projectVersionId:App.ResourceModel.Settings.CurrentVersion.id
+				projectVersionId: App.ResourceModel.Settings.CurrentVersion.id
 			}
 		}
 		var that = this;
@@ -48,30 +43,18 @@ App.ResourceFamLibs.leftNav = Backbone.View.extend({
 				});
 			}
 			data.iconType = 1;
-			var navHtml = new App.Comm.TreeViewMar(data);
-			that.$el.find(".fileTree").html(navHtml);
-			that.fileScroll();
+			if (data.data) {
+				var navHtml = new App.Comm.TreeViewMar(data);
+				that.$el.find(".fileTree").html(navHtml);
+				App.Comm.initScroll(this.$el.find(".fileTree"), "y"); 
+			} else { 
+				that.$el.find(".fileTree").html('<div class="loading">无数据</div>'); 
+			} 
+
+			$("#pageLoading").hide();
 
 		});
-	},
-
-	//文件浏览滚动条
-	fileScroll: function() {
-		var $fileTree = this.$el.find(".fileTree");
-		if (!$fileTree.hasClass('mCustomScrollbar')) {
-			$fileTree.mCustomScrollbar({
-				set_height: "100%",
-				set_width: "100%",
-				theme: 'minimal-dark',
-				axis: 'y',
-				keyboard: {
-					enable: true
-				},
-				scrollInertia: 0
-			});
-		}
-
-	},
+	}
 
 
 

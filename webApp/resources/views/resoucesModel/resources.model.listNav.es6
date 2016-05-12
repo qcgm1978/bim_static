@@ -48,7 +48,7 @@ App.ResourceModel.ListNav = Backbone.View.extend({
 		if (type == "file") {
 			this.$el.removeClass('hideLeft');
 			this.$el.find(".listContent").show().end().find(".modelContentBox").hide().end().find(".modelAttr").hide();
-			this.$el.css("margin-right", 0);
+		 
 			$("#resourceModelLeftNav").show();
 		} else {
 
@@ -60,15 +60,7 @@ App.ResourceModel.ListNav = Backbone.View.extend({
 			this.$el.addClass('hideLeft');
 
 			this.$el.find(".listContent").hide().end().find(".modelContentBox").show().end().find(".modelAttr").show();
-
-			var $modelAttr = this.$el.find(".modelAttr"),
-				mRight = parseInt($modelAttr.css("margin-right"));
-
-			if (mRight >= 0) {
-				this.$el.css("margin-right", $modelAttr.width());
-			} else {
-				this.$el.css("margin-right", 0);
-			}
+ 
 
 			if (App.ResourceModel.Settings.DataModel.bind) {
 				return;
@@ -100,9 +92,7 @@ App.ResourceModel.ListNav = Backbone.View.extend({
 
 			});
 		}
-		//this.bindTreeScroll();
-
-
+		
 	},
 
 	reTemplate: _.templateUrl('/resources/tpls/resourceModel/resources.model.attr.detail.html'),
@@ -117,23 +107,6 @@ App.ResourceModel.ListNav = Backbone.View.extend({
 		//渲染数据
 		var data = model.toJSON().data;
 		this.$el.find(".attrContentBox .attrContent").html(this.reTemplate(data));
-	},
-
-	//文件浏览滚动条
-	bindTreeScroll: function() {
-		var $modelContent = this.$el.find(".modelContent");
-		if (!$modelContent.hasClass('mCustomScrollbar')) {
-			$modelContent.mCustomScrollbar({
-				set_height: "100%",
-				set_width: "100%",
-				theme: 'minimal-dark',
-				axis: 'y',
-				keyboard: {
-					enable: true
-				},
-				scrollInertia: 0
-			});
-		}
 	},
 
 	//展开和收起

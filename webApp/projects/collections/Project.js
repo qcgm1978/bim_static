@@ -1,20 +1,23 @@
 App.Project = {
 
-	Settings: {
+	//默认参数
+	Defaults: {
+		
 		designTab: '<li data-type="design" class="item design">设计<i class="line"></i></li>',
 		planTab: '<li data-type="plan" class="item plan">计划<i class="line"></i></li>',
 		costTab: '<li data-type="cost" class="item cost">成本<i class="line"></i></li>',
 		qualityTab: '<li data-type="quality" class="item quality">质量<i class="line"></i></li>',
 		loadingTpl: '<td colspan="10" class="loadingTd">正在加载，请稍候……</td>',
-		fetchNavType: 'file', // model file
-		projectNav: "",
-		property: "",
+		fetchNavType: 'file', // 默认加载的类型
+		projectNav: "", //项目导航 计划 成本 设计 质量
+		property: "poperties", // 项目导航 下的 tab  如：检查 属性
 		fileId: "",
-		projectId: 100,
+		projectId: "", //项目id
+		versionId:"",	//版本id
 		attrView: null,
+		CurrentVersion: null, //当前版本信息
 		DataModel: null //渲染模型的数据
-
-	},
+	}, 
 
 	// 文件 容器
 	FileCollection: new(Backbone.Collection.extend({
@@ -31,36 +34,52 @@ App.Project = {
 		urlType: "fetchFileList",
 
 		parse: function(responese) {
-			if (responese.message == "success") {
-				return responese.data;
+
+			if (responese.code == 0) {
+				if (responese.data.length > 0) {
+					return responese.data;
+				} else {
+					$("#projectContainer .fileContainerScroll .changeContrastBox").html('<li class="loading">无数据</li>');
+				}
+
 			}
 		}
 
 	})),
 
 	//初始化
-	init: function() { 
-		 
-		//reset options
-		App.Project.resetOptions();
+	init: function() {
 
-
-		//加载 项目版本
-		App.Project.loadVersion(App.Project.renderVersion);
+		//加载项目
+		this.fetchProjectDetail();
 
 	},
 
-	//初始化数据
-	resetOptions: function() {
-		App.Project.Settings.CurrentVersion = null;
-		App.Project.Settings.fetchNavType = 'file';
-		App.Project.Settings.projectNav = '';
-		App.Project.Settings.fileId = '';
-		App.Project.Settings.property = 'poperties';
-		App.Project.Settings.DataModel = null;
-		//上传取消
-		App.Comm.upload.destroy();
+	//获取项目信息信息
+	fetchProjectDetail: function() {
+
+		var data = {
+			URLtype: "fetchProjectDetail",
+			data: {
+				projectId: App.Project.Settings.projectId,
+				versionId:App.Project.Settings.versionId
+			}
+		};
+
+		App.Comm.ajax(data, function(data) {
+			if (data.code == 0) { 
+				
+				data = data.data;
+				App.Project.Settings.projectName = data.projectName;
+				App.Project.Settings.CurrentVersion = data;
+				//加载数据
+				App.Project.loadData();
+			}
+		});
+
 	},
+
+
 
 	//加载版本
 	loadVersion: function(callback) {
@@ -146,7 +165,6 @@ App.Project = {
 		} else {
 			alert("版本获取错误");
 		}
-
 	},
 
 	// 加载数据
@@ -325,17 +343,17 @@ App.Project = {
 	},
 
 	//根据类型渲染数据
-	renderModelContentByType: function() { 
+	renderModelContentByType: function() {
 
 		var type = App.Project.Settings.projectNav,
 			$rightPropertyContent = $("#projectContainer .rightPropertyContent");
-		 
+
 
 		$rightPropertyContent.children('div').hide()
 			//设计
-		if (type == "design") { 
+		if (type == "design") {
 
-			$rightPropertyContent.find(".singlePropetyBox").remove();			
+			$rightPropertyContent.find(".singlePropetyBox").remove();
 
 			var $designPropetyBox = $rightPropertyContent.find(".designPropetyBox");
 			if ($designPropetyBox.length > 0) {
@@ -380,8 +398,8 @@ App.Project = {
 				$("#projectContainer .ProjectQualityNavContainer .projectNav .item:first").click();
 			}
 
-		} 
-		 
+		}
+
 
 
 	},
@@ -426,8 +444,15 @@ App.Project = {
 				});
 			}
 			data.iconType = 1;
-			var navHtml = new App.Comm.TreeViewMar(data);
-			$("#projectContainer .projectNavFileContainer").html(navHtml);
+
+			if (data.data.length > 0) {
+				var navHtml = new App.Comm.TreeViewMar(data);
+				$("#projectContainer .projectNavFileContainer").html(navHtml);
+			} else {
+				$("#projectContainer .projectNavFileContainer").html('<div class="loading">无文件</div>');
+			}
+
+
 
 			$("#pageLoading").hide();
 		});
@@ -676,7 +701,7 @@ App.Project = {
 
 				}
 			}
-		}); 
+		});
 	},
 
 	//定位到模型
