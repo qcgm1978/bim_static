@@ -1,6 +1,8 @@
 /*
 * @require  /services/collections/index.es6
 */
+
+App.Services.memberWindowData = {"roleId":[], "outer":{"orgId":[],"userId":[]},"inner":{"orgId":[], "userId":[]}};
 App.Services.Member ={
 
     //组织
@@ -105,10 +107,19 @@ App.Services.Member ={
         $(".serviceBody").html( new App.Services.MemberNav().render().el);
         $(".serviceBody .content").html(new App.Services.MemberList().render().el);
         App.Services.Member.loadData(App.Services.Member.innerCollection);//默认加载内部列表
+    },
+
+
+    //以下缓存和重置POST的数据
+    saveMemData:function(obj){
+        App.Services.memberWindowData = obj;
+    },
+    resetMemData:function(){
+        App.Services.memberWindowData = {"roleId":[], "outer":{"orgId":[],"userId":[]},"inner":{"orgId":[], "userId":[]}};
+    },
+    resetRoleData:function(){
+        App.Services.memberWindowData = {};
     }
 };
-
-
-
 
 

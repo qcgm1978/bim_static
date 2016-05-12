@@ -22,7 +22,7 @@ App.Services.AuthNav = Backbone.View.extend({
 		$(ele).addClass("active").siblings("li").removeClass("active");
 		var n = $(ele).index();
 		var text = this.$el.find("li").eq(n).text();
-		this.$el.find(".bcService span").eq(2).text(text);
+		this.$el.find(".bcService span").eq(1).text(text);
 	},
 
 	initialize:function(){},
@@ -34,8 +34,6 @@ App.Services.AuthNav = Backbone.View.extend({
 		$("#dataLoading").show();
 
 		App.Services.Member.loadData(App.Services.Member.innerCollection,{},function(){
-
-
 
 			//两个不可控异步，已知顺序为加载-点击，只好先清空再添加,这个导致了角色刷新的频繁，解决方案，
 			//在页面加载时静态单独写入内容？？？？
