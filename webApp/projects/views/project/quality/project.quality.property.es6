@@ -312,7 +312,7 @@ App.Project.ProjectQualityProperty = Backbone.View.extend({
 			$el.find(".paginationBottom .pageInfo .prev").removeClass('disable');
 		}
 
-		if (data.pageIndex == data.pageCount) {
+		if (data.pageIndex >= data.pageCount) {
 			$el.find(".paginationBottom .pageInfo .next").addClass('disable');
 		} else {
 			$el.find(".paginationBottom .pageInfo .next").removeClass('disable');
