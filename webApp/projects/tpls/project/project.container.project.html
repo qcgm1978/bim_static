@@ -3,12 +3,12 @@
 <div class="projectBox">
 	<% for(var i=0;i<projectCount;i++){ %>
 		<% project=obj[i]; %>
-	   <div class="header"> <%= project.province %> </div>
-
+	   <div class="header"> <%= project.province %> </div> 
 	   <% var provinces=project.project,provinceCount=provinces.length,province; %>
 	   <% for(var j=0;j<provinceCount;j++){%>
 	   		<% province=provinces[j]; %>
-	    	<a href="#projects/<%=province.id%>" class="item"> <%= province.name%></a>
+
+	    	<a href="#projects/<%=province.id%>/<%=province.version && province.version.id || 'noVersion' %>" class="item"> <%= province.name%></a>
 	    <% } %>
 	<% } %> 
 </div>

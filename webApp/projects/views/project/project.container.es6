@@ -12,10 +12,10 @@ App.Project.ProjectContainer = Backbone.View.extend({
 
 
 	events: {
-		"click .breadItem": "breadItemClick",
+		"click .breadItem": "breadItemClick", //点击头部导航  项目  版本  列表 模型
+		"click .projectList .projectBox .item": "beforeChangeProject", //切换项目 之前 处理
 		"click .slideBar": "navBarShowAndHide",
 		"mousedown .dragSize": "dragSize",
-		"click .projectVersionList .container .item": "changeVersion",
 		"click .projectVersionList .nav .item": "changeVersionTab",
 		"click .fileModelList li": "switchFileMoldel",
 		"click .modleShowHide": "slideUpAndDown"
@@ -49,6 +49,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 	//点击面包靴
 	breadItemClick: function(event) {
 
+
 		var $target = $(event.target).closest(".breadItem");
 
 		if ($target.hasClass('project')) {
@@ -80,6 +81,18 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		}
 	},
 
+	//跳转之前
+	beforeChangeProject(event) {
+		var $target = $(event.target).closest(".item"),
+			href = $target.prop("href");
+
+		if ($target.prop("href").indexOf("noVersion")>-1) {
+			alert('暂无版本'); 
+			return false;
+		}  
+
+	},
+
 	//加载分组项目
 	loadProjectList: function() {
 
@@ -93,8 +106,6 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			var $projectList = $(".breadItem .projectList");
 			var template = _.templateUrl("/projects/tpls/project/project.container.project.html");
 			$projectList.find(".container").html(template(data.data));
-			console.log(data);
-
 			$projectList.find(".loading").hide();
 			$projectList.find(".listContent").show();
 
@@ -118,20 +129,6 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			$projectVersionList.find(".listContent").show();
 
 		});
-	},
-
-	//版本切换
-	changeVersion: function(event) {
-
-		var $target = $(event.target).closest(".item"),
-			Version = $target.data("version");
-
-		App.Project.resetOptions();
-		App.Project.Settings.projectName = Version.projectName;
-		App.Project.Settings.CurrentVersion = Version;
-		App.Project.loadData();
-		$(".breadcrumbNav .projectVersionList").hide();
-		event.stopPropagation();
 	},
 
 	//版本tab 切换
@@ -440,8 +437,8 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		//其他属性
 		App.Project.propertiesOthers.call({
 			$el: $designProperties
-		}, "plan|cost|quality");  
-		 
+		}, "plan|cost|quality");
+
 	}
 
 });
