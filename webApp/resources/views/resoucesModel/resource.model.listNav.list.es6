@@ -8,6 +8,7 @@ App.ResourceModel.ListContent = Backbone.View.extend({
 	//初始化
 	initialize: function() {
 		this.listenTo(App.ResourceModel.FileCollection, "add", this.addOneFile);
+		this.listenTo(App.ResourceModel.FileCollection, "reset", this.reset);
 	},
 
 
@@ -31,10 +32,11 @@ App.ResourceModel.ListContent = Backbone.View.extend({
 	//添加单个文件
 	addOneFile: function(model) {
 
-
 		var view = new App.ResourceModel.ListNavDetail({
 			model: model
 		});
+
+		this.$el.find(".fileContent .loading").remove();
 
 		if (model.toJSON().isAdd) {
 			this.$el.find(".fileContent").prepend(view.render().el);
@@ -42,26 +44,14 @@ App.ResourceModel.ListContent = Backbone.View.extend({
 			this.$el.find(".fileContent").append(view.render().el);
 		}
 
-
-		this.bindScroll();
+		App.Comm.initScroll(this.$el.find(".fileLists"),"y"); 
+		 
 	},
 
-	//绑定滚动条
-	bindScroll: function() {
-		var $fileLists = this.$el.find(".fileLists");
-		if (!$fileLists.hasClass('mCustomScrollbar')) {
-			$fileLists.mCustomScrollbar({
-				set_height: "100%",
-				set_width: "100%",
-				theme: 'minimal-dark',
-				axis: 'y',
-				keyboard: {
-					enable: true
-				},
-				scrollInertia: 0
-			});
-		}
+	reset(){
+		this.$el.find(".fileContent").html('<li class="loading">正在加载，请稍候…</li>');
 	}
+ 
 
 
 

@@ -41,7 +41,7 @@
 }
 #resourceModelLeftNav { z-index: 99; background-color: #fff; position: absolute; top: 87px; bottom: 0px; left: 0px; border: 1px #ccc solid; border-width: 0px 1px; width: 238px;
 	.projectNavFileContainer { height: 100%; margin-top: -40px; padding-top: 40px; 
-		 
+		 .loading{color: #ccc;font-size: 14px;margin-top: 30px;text-align: center;}
 	}
 	.modelTreeBox{display: none;height: 100%;}
  
@@ -65,7 +65,7 @@
 			.mCSB_container { height: 100%; }
 		}
 	}
-	.modelAttr { display: none; width: 396px; border: 1px #ddd solid; position: absolute; right: 0px; top: 87px; bottom: 0px; background-color: #fff; z-index: 600;
+	.modelAttr { display: none; width: 396px; border: 1px #ddd solid; position: fixed; right: 0px; top: 87px; bottom: 0px; background-color: #fff; z-index: 600;
 		.dragSize { left: -5px; display: block; }
 		.slideBar { display: block; left: -15px; top: 40px; }
 		.attrContentBox { height: 100%; margin-top: -40px; padding-top: 40px;
@@ -95,3 +95,5 @@
 	}
 	.text-field{max-width:135px;}
 }
+#listContext{display: none;}
+.jqContextMenu #listContext{display: block;}

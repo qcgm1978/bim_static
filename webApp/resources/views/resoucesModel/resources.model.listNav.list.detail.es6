@@ -16,7 +16,7 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 		"click .fileName  .text": "fileClick",
 		"click .btnEnter": "enterEditNameOrCreateNew",
 		"click .btnCalcel": "calcelEditName",
-		"click .ckAll":"singleCheck"
+		"click .ckAll": "singleCheck"
 
 	},
 
@@ -160,11 +160,19 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 	//取消修改名称
 	calcelEditName: function(event) {
 
-		var $prevEdit = $("#resourceListContent .fileContent .txtEdit");
+		var $fileContent = $("#resourceListContent .fileContent"),
+			$prevEdit = $fileContent.find(".txtEdit");
 
 		if ($prevEdit.length > 0) {
-			this.cancelEdit($prevEdit);
+			this.cancelEdit($prevEdit); 
 		}
+
+		var $fileContent = $("#resourceListContent .fileContent");
+
+		if ($fileContent.find("li").length <= 0) {
+			$fileContent.html('<li class="loading">无数据</li>');
+		}
+
 	},
 	//修改名称 或者创建
 	enterEditNameOrCreateNew: function(event) {
@@ -238,8 +246,9 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 	createNewFolder: function($item) {
 
 
-		var filePath = $item.find(".txtEdit").val().trim(),that=this;
-			$leftSel = $("#resourceModelLeftNav .treeViewMarUl .selected");
+		var filePath = $item.find(".txtEdit").val().trim(),
+			that = this;
+		$leftSel = $("#resourceModelLeftNav .treeViewMarUl .selected");
 		parentId = "";
 		if ($leftSel.length > 0) {
 			parentId = $leftSel.data("file").fileVersionId;
@@ -273,7 +282,7 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 
 				//已存在的不在添加 返回
 				if (isExists) {
-				 	that.cancelEdit($item.find(".fileName"));
+					that.cancelEdit($item.find(".fileName"));
 					return;
 				}
 
@@ -305,6 +314,7 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 			$item.remove();
 		} else {
 			$prevEdit.prev().show().end().nextAll().remove().end().remove();
+
 		}
 
 	},
@@ -321,13 +331,13 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 	},
 
 	//是否全选
-	singleCheck(event){
-	 
-		if (this.$el.parent().find(".ckAll:not(:checked)").length>0) {
-			$("#resourceListContent .header .ckAll").prop("checked",false);
-			
-		}else{
-			$("#resourceListContent .header .ckAll").prop("checked",true);
+	singleCheck(event) {
+
+		if (this.$el.parent().find(".ckAll:not(:checked)").length > 0) {
+			$("#resourceListContent .header .ckAll").prop("checked", false);
+
+		} else {
+			$("#resourceListContent .header .ckAll").prop("checked", true);
 		}
 	}
 
