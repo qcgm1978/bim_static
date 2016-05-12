@@ -50,9 +50,7 @@ App.ResourceModel.LeftNav = Backbone.View.extend({
 				var navHtml = new App.Comm.TreeViewMar(data);
 				that.$el.find(".fileTree").html(navHtml);
 
-				App.Comm.initScroll();
-
-				that.fileScroll(this.$el.find(".fileTree"),"y");
+				App.Comm.initScroll(that.$el.find(".fileTree"),"y"); 
 			} else {
 				that.$el.find(".fileTree").html('<div class="loading">无数据</div>');
 			} 
