@@ -50,8 +50,10 @@ App.ResourceModel = {
 		urlType: "fetchFileList",
 
 		parse: function(responese) {
-			if (responese.message == "success") {
+			if (responese.code==0 && responese.data.length>0) {
 				return responese.data;
+			}else{
+				$("#resourceThumContent .thumContent").html('<li class="loading">无数据</li>');
 			}
 		}
 
