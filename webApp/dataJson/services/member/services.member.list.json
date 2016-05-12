@@ -4,36 +4,75 @@
   "data": {
     "org": [
       {
-        "orgId": "786714377",
-        "name": "万达旅业-各地公司-深圳国旅-信息中心",
-        "namePath": null,
+        "orgId": "936399432",
+        "name": "旅游控股公司-万达旅业-各地公司-深圳万达国旅-市场发展总部",
+        "namePath": "旅游控股公司-万达旅业-各地公司-深圳万达国旅-市场发展总部",
         "outer": false,
-        "parentId": "782132832"
-      },
-      {
-        "orgId": "936401373",
-        "name": "旅游控股公司-万达旅业-各地公司-深圳万达国旅-深圳新景界航空服务有限公司",
-        "namePath": null,
-        "outer": false,
-        "parentId": "782132832"
+        "parent": null,
+        "parentId": "782132832",
+        "brand": false,
+        "role": [
+          {
+            "roleId": 10,
+            "name": "测试继承",
+            "inherit": false,
+            "functions": null
+          },
+          {
+            "roleId": 1,
+            "name": "测试角色",
+            "inherit": true,
+            "functions": null
+          },
+          {
+            "roleId": 10,
+            "name": "测试继承",
+            "inherit": true,
+            "functions": null
+          }
+        ],
+        "privilege": null,
+        "hasChildren": true,
+        "hasUser": false
       }
     ],
     "user": [
       {
         "userId": "1018561804",
         "name": "杨俊",
+        "loginName": "yangjun65",
         "position": "操作",
-        "isAdmin": false,
-        "isKeyUser": true,
-        "outer": false
-      },
-      {
-        "userId": "963837517",
-        "name": "赵灿波",
-        "position": "主管",
+        "org": null,
         "isAdmin": true,
         "isKeyUser": false,
-        "outer": false
+        "outer": false,
+        "privilege": [],
+        "role": [
+          {
+            "roleId": 999999,
+            "name": "超级管理员",
+            "inherit": false,
+            "functions": null
+          },
+          {
+            "roleId": 999998,
+            "name": "关键用户",
+            "inherit": false,
+            "functions": null
+          },
+          {
+            "roleId": 1,
+            "name": "测试角色",
+            "inherit": true,
+            "functions": null
+          },
+          {
+            "roleId": 10,
+            "name": "测试继承",
+            "inherit": true,
+            "functions": null
+          }
+        ]
       }
     ]
   }
