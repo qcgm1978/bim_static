@@ -3,21 +3,31 @@ App.Services.DetailView=App.Services.DetailView||{};
 App.Services.DetailView.Section=Backbone.View.extend({
 	
 	events:{
-		'click .accordionDatail':'toggleProFrom'
+		'click .accordionDatail':'toggleProFrom',
+		'click .save':'saveSection',
+		'click .update':'updateSection',
+		'click .delete':'deleteSection',
+		'click .cancel':'cancelSection'
 	},
 	
 	template:_.templateUrl('/services/tpls/project/view.section.html',true),
 	
-	initialize(){
+	initialize(data){
+		this.formData.projectID=data.projectId;
+		this._parentView=data._parentView;
 	},
 	
-	render(){
+	formData:{},
+	
+	render(data){
+	
+		if(data){
+			this.formData=data;
+		}
+		
 		this.$el.html(this.template);
 		this.$(".supportType").myDropDown();
 		return this;
-	},
-	
-	load(){
 	},
 	
 	toggleProFrom(e){
@@ -30,6 +40,13 @@ App.Services.DetailView.Section=Backbone.View.extend({
 			$accord.slideUp();
 		}
 		$this.toggleClass('accordOpen');
+	},
+	saveSection(){},
+	updateSection(){},
+	deleteSection(){},
+	cancelSection(){
+		this.$el.remove();
+		this._parentView.trigger('read');
 	}
 	
 })

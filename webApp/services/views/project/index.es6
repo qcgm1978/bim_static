@@ -27,14 +27,16 @@
 		
 		this.viewProjectMapping = new App.Services.ProjectMapping();
 		this.viewProjectBaseHole = new App.Services.ProjectDetail.BaseHole();
+		this.viewProjectFloor = new App.Services.ProjectDetail.Floor();
+		this.viewProjectSection = new App.Services.ProjectDetail.Section()
 		
 		this.$(".projectContainer .projectMapping").html(this.viewProjectMapping.render().el);
 
- 		this.$(".projectContainer .projectFloor").html(new App.Services.ProjectDetail.Floor().render().el);
+ 		this.$(".projectContainer .projectFloor").html(this.viewProjectFloor.render().el);
  		
  		this.$(".projectContainer .projectBaseHole").html(this.viewProjectBaseHole.render().el);
  		
- 		this.$(".projectContainer .projectSection").html(new App.Services.ProjectDetail.Section().render().el);
+ 		this.$(".projectContainer .projectSection").html(this.viewProjectSection.render().el);
  		
  		this.$(".projectContainer .projectPile").html(new App.Services.ProjectDetail.Pile().render().el);
 
@@ -45,6 +47,8 @@
 
  	//获取数据	
  	fetchData() {
+ 	
+ 		$('#pageLoading').show();
  		var that = this;
  		this.$(".serviceNav .item:first").click();
 
@@ -101,9 +105,34 @@
  		let collectionBasehole=App.Services.ProjectCollection.ProjecDetailBaseHoleCollection;
  		collectionBasehole.projectId=_projectId;
  		collectionBasehole.fetch({
+ 			reset:true,
  			success(child, data) {
  			}
  		});
+ 		
+ 		//加载楼层信息数据
+ 		this.viewProjectFloor.setUserData({
+ 			projectId:_projectId
+ 		});
+ 		let collectionFloor=App.Services.ProjectCollection.ProjecDetailFloorCollection;
+ 		collectionFloor.projectId=_projectId;
+ 		collectionFloor.fetch({
+ 			success(child, data) {
+ 			}
+ 		});
+ 		
+ 		//加载剖面信息
+ 		this.viewProjectSection.setUserData({
+ 			projectId:_projectId
+ 		});
+ 		let collectionSection=App.Services.ProjectCollection.ProjecDetailFloorCollection;
+ 		collectionSection.projectId=_projectId;
+ 		collectionSection.fetch({
+ 			success(child, data) {
+ 			}
+ 		});
+ 		
+ 		$('#pageLoading').hide();
  		
  	},
 
