@@ -35,6 +35,7 @@ App.Services.MemberWindowIndex = Backbone.View.extend({
             });
         }
 
+        App.Services.Member.saveMemData(submitData);
 
         data = {
             URLtype:"saveServicesRole",
@@ -46,16 +47,14 @@ App.Services.MemberWindowIndex = Backbone.View.extend({
         App.Comm.ajax(data,function(response){
             var type = App.Services.MemberType || "inner";
             if(response.message == "success"){
-                var s = App.Services.Member[type + "Collection"],proto = [];
+                var collection = App.Services.Member[type + "Collection"],proto = [];
                 _.each(selectRole,function(item){
                     item.set("functions",null);
                     item.unset("checked");
                     proto.push(item.toJSON());
                 });
 
-
-
-                s.each(function(item){
+                collection.each(function(item){
                     var l1 = submitData[type]["orgId"];
                     var l2 = submitData[type]["userId"];
                     var orgId = item.get("orgId");
@@ -77,13 +76,12 @@ App.Services.MemberWindowIndex = Backbone.View.extend({
                         }
                     }
                 });
-
-                App.Services.memberWindowData = {"roleId":[], "outer":{"orgId":[],"userId":[]},"inner":{"orgId":[], "userId":[]}};;
             }
-            //提交成功关闭窗口，否则显示提交失败
+            App.Services.Member.resetMemData();
             App.Services.maskWindow.close();
         });
 
+        App.Services.Member.resetMemData();
     },
 
     initialize:function(){
