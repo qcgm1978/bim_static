@@ -36,6 +36,9 @@ App.Services.ProjectDetail.BaseHole=Backbone.View.extend({
 	resetView(items){
 		var _this=this;
 		var $container=this.$('.detailContainer .scrollWrapContent');
+		
+		this.status='read';
+		
 		$container.html("");
 		items.models.forEach(function(model){
 			var view=new App.Services.DetailView.BaseHole({

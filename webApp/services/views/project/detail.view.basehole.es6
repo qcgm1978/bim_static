@@ -121,6 +121,7 @@ App.Services.DetailView.BaseHole=Backbone.View.extend({
 		let collectionBasehole=App.Services.ProjectCollection.ProjecDetailBaseHoleCollection;
  		collectionBasehole.projectId=_this.formData.projectID;
  		collectionBasehole.fetch({
+ 			reset:true,
  			success(child, data) {
  				_this.remove();
  				clearMask();

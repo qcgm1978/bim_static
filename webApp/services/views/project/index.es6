@@ -70,7 +70,8 @@
 
  	//左侧点击
  	slideBarClick(event){
- 		var $item=$(event.target).closest(".item"),
+ 		var _this=this,
+ 			$item=$(event.target).closest(".item"),
  			_collection=App.Services.ProjectCollection.ProjectBaseInfoCollection;
  		let _projectId=$item.attr('data-projectId');
  		
@@ -107,30 +108,36 @@
  		collectionBasehole.fetch({
  			reset:true,
  			success(child, data) {
+ 				
+ 				App.Services.ProjectCollection.datas.pitData=data.data.pits;
+ 				//加载楼层信息数据
+		 		_this.viewProjectFloor.setUserData({
+		 			projectId:_projectId
+		 		});
+		 		let collectionFloor=App.Services.ProjectCollection.ProjecDetailFloorCollection;
+		 		collectionFloor.projectId=_projectId;
+		 		collectionFloor.fetch({
+		 			reset:true,
+		 			success(child, data) {
+		 			}
+		 		});
+		 		
+		 		//加载剖面信息
+		 		_this.viewProjectSection.setUserData({
+		 			projectId:_projectId
+		 		});
+		 		let collectionSection=App.Services.ProjectCollection.ProjecDetailFloorCollection;
+		 		collectionSection.projectId=_projectId;
+		 		collectionSection.fetch({
+		 			reset:true,
+		 			success(child, data) {
+		 			}
+		 		});
+ 				
  			}
  		});
  		
- 		//加载楼层信息数据
- 		this.viewProjectFloor.setUserData({
- 			projectId:_projectId
- 		});
- 		let collectionFloor=App.Services.ProjectCollection.ProjecDetailFloorCollection;
- 		collectionFloor.projectId=_projectId;
- 		collectionFloor.fetch({
- 			success(child, data) {
- 			}
- 		});
  		
- 		//加载剖面信息
- 		this.viewProjectSection.setUserData({
- 			projectId:_projectId
- 		});
- 		let collectionSection=App.Services.ProjectCollection.ProjecDetailFloorCollection;
- 		collectionSection.projectId=_projectId;
- 		collectionSection.fetch({
- 			success(child, data) {
- 			}
- 		});
  		
  		$('#pageLoading').hide();
  		

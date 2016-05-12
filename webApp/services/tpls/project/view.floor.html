@@ -19,12 +19,12 @@
 			<div class="formColumn">
 				<label>层高(m):</label><input type="number" name="layerHeight" id="" value="<%= layerHeight|| 0 %>" class="txtInput" />
 			</div>
-			<div class="formColumn"><label>地下层数:</label><input type="number" name="undergroundlayers" id="" value="<%= undergroundlayers|| 0 %>" class="txtInput" /></div>
+			<div class="formColumn"><label>地下层数:</label><input type="number" name="undergroundLayers" id="" value="<%= undergroundLayers || 0 %>" class="txtInput" /></div>
 		</div>
 		<div>
 			<div class="formColumn">
 				<label>抗震设防烈度:</label>
-				<div class="myDropDown intensity">
+				<div class="myDropDown intensity" name="seismicIntensityId">
 					<span class="myDropText">  <span class="text"><%= seismicIntensityId|| '请选择' %></span> <i class="myDropArrorw"></i> </span>
 					<ul class="myDropList" style="display: none;">
 						<% _.each(App.Services.ProjectCollection.datas.intensity,function(i){%>
@@ -35,7 +35,7 @@
 			</div>
 			<div class="formColumn">
 				<label>抗震等级:</label>
-				<div class="myDropDown seiGrade">
+				<div class="myDropDown seiGrade" name="seismicLevelId">
 					<span class="myDropText">  <span class="text"><%= seismicLevelId|| '请选择' %></span> <i class="myDropArrorw"></i> </span>
 					<ul class="myDropList" style="display: none;">
 						<% _.each(App.Services.ProjectCollection.datas.seiGrade,function(i){%>
@@ -51,7 +51,7 @@
 			</div>
 			<div class="formColumn">
 				<label>屋面保温防火等级:</label>
-				<div class="myDropDown inDoorFireLevel">
+				<div class="myDropDown inDoorFireLevel" name="roofStayWarmLev">
 					<span class="myDropText">  <span class="text"><%= roofStayWarmLev|| '请选择' %></span> <i class="myDropArrorw"></i> </span>
 					<ul class="myDropList" style="display: none;">
 						<% _.each(App.Services.ProjectCollection.datas.doorFireLevel,function(i){%>
@@ -67,7 +67,7 @@
 			</div>
 			<div class="formColumn">
 				<label>外墙保温防火等级:</label>
-				<div class="myDropDown outDoorFireLevel">
+				<div class="myDropDown outDoorFireLevel" name="outWallStayWarmLev">
 					<span class="myDropText">  <span class="text"><%= outWallStayWarmLev|| '请选择' %></span> <i class="myDropArrorw"></i> </span>
 					<ul class="myDropList" style="display: none;">
 						<% _.each(App.Services.ProjectCollection.datas.doorFireLevel,function(i){%>
@@ -92,8 +92,8 @@
 		<div>
 			<div class="formColumn">
 				<label>外装方式:</label>
-				<div class="myDropDown outerInstall">
-					<span class="myDropText">  <span class="text"><%= outsideDecorationType|| '请选择' %></span> <i class="myDropArrorw"></i> </span>
+				<div class="myDropDown outerInstall"  name="outSidedecorationType">
+					<span class="myDropText">  <span class="text"><%= outSidedecorationType|| '请选择' %></span> <i class="myDropArrorw"></i> </span>
 					<ul class="myDropList" style="display: none;">
 						<% _.each(App.Services.ProjectCollection.datas.installType,function(i){%>
 						<li class="myItem"><%= i %></li>
@@ -102,7 +102,7 @@
 				</div>
 			</div>
 			<div class="formColumn"><label>结构形式:</label>
-				<div class="myDropDown structure">
+				<div class="myDropDown structure" name="structureType">
 					<span class="myDropText">  <span class="text"><%= structureType|| '请选择' %></span> <i class="myDropArrorw"></i> </span>
 					<ul class="myDropList" style="display: none;">
 						<% _.each(App.Services.ProjectCollection.datas.orgType,function(i){%>
@@ -115,12 +115,14 @@
 		<div>
 			<div class="formColumn">
 				<label>所属基坑:</label>
+				<div class="myDropDown pit" name="pitId">
 				<span class="myDropText">  <span class="text"><%= pitId|| '请选择' %></span> <i class="myDropArrorw"></i> </span>
 					<ul class="myDropList" style="display: none;">
-						<% _.each(App.Services.ProjectCollection.datas.orgType,function(i){%>
-						<li class="myItem"><%= i %></li>
+						<% _.each(App.Services.ProjectCollection.datas.pitData,function(i){%>
+						<li class="myItem" data-pitId="<%= i.id %>"><%= i.pitName %></li>
 						<% }) %>
 					</ul>
+				</div>
 			</div>
 			<div class="formColumn"></div>
 		</div>
