@@ -61,7 +61,7 @@ var BIM = function(option){
   viewer.registerEventListener(CLOUD.EVENTS.ON_LOAD_START, start);
   var init = function(){
     if(_opt.single){
-      viewer.disabledLoD();
+      viewer.disableLoD();
     }
     var viewBox = self.viewBox = document.createElement('div');
     viewBox.className = "view";
