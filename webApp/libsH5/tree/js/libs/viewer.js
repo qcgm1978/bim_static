@@ -27,10 +27,6 @@ var BIM = function(option){
     _opt.element = document.getElementById(_opt.element);
   }
   _opt.element.innerHTML = '';
-  if(_opt.single){
-    CLOUD.GlobalData.CellVisibleLOD= 0;
-    CLOUD.GlobalData.SubSceneVisibleLOD= 100;
-  }
   var start = function(res){
     BIM.util.pub('start',res);
     _opt.loading = BIM.util.createDom('div','bim-loading');
@@ -64,6 +60,9 @@ var BIM = function(option){
   viewer.registerEventListener(CLOUD.EVENTS.ON_LOAD_COMPLETE, loaded);
   viewer.registerEventListener(CLOUD.EVENTS.ON_LOAD_START, start);
   var init = function(){
+    if(_opt.single){
+      viewer.disabledLod();
+    }
     var viewBox = self.viewBox = document.createElement('div');
     viewBox.className = "view";
     bimBox.appendChild(viewBox);
