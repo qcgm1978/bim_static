@@ -1,72 +1,157 @@
 <div class="consoleBox">
   <div class="consoleHeader">
-    质量验收列表</div>
+    2.2	过程验收</div>
   <div class="consoleContainer">
     <form class="form-horizontal">
 
       <div class="form-group">
-        <label for="inputPassword3" class="col-sm-2 control-label">项目</label>
+        <!--<label for="inputPassword3" class="col-sm-2 control-label"></label>-->
         <div class="col-sm-10">
-          <input type="text" class="form-control" id="" value="周浦万达">
-        </div>
-      </div>
-      <div class="form-group">
-        <label for="inputPassword3" class="col-sm-2 control-label">选择版本</label>
-        <div class="col-sm-10">
-          <select class="form-control" id="versionList">
-            <option value="0">请选择</option>
-          </select>
-        </div>
-      </div>
-      <div class="form-group">
-        <label for="inputPassword3" class="col-sm-2 control-label">专业</label>
-        <div class="col-sm-10">
-          <input type="text" class="form-control" id="p1" value="默认专业">
-        </div>
-      </div>
-      <div class="form-group">
-        <label for="inputPassword3" class="col-sm-2 control-label">类别</label>
-        <div class="col-sm-10">
-          <input type="text" class="form-control" id="p2" value="2016版">
-        </div>
-      </div>
+                    <textarea name="" id="data" cols="40" rows="40">
+        [{
+        "id": 1,
+        "projectCode": "12345",
+        "categoryId": "1001",
+        "categoryName": "钢筋",
+        "componentId": "be9bf30f15eb677b705b61c1b90599d2.997d11b5b901ef4e47e15fb095fcd948",
+        "location": {
+            "x": 1000,
+            "y": 2000,
+            "z": 3000
+        },
+        "locationName":"桩1,(B2;A/3轴)",
+        "axis": {
+            "left ": "A",
+            "leftOffset": 200,
+            "right": "B",
+            "rightOffset": -310,
+            "front": "3",
+            "frontOffset": 300,
+            "back ": "4",
+            "backOffset": -300,
+            "top": "F03",
+            "topOffset": -3000,
+            "bottom": "F02",
+            "bottomOffset": 1200
+        },
+        "checkCount": 4
+       }]
+                    </textarea>
+                     <textarea name="" id="" cols="40" rows="40">
+            [{
+id	验收Id	Long	质监系统提供的唯一ID
+projectCode	项目ID	guid	质监系统里的项目ID，同步之前需与BIM平台建立映射关系
+categoryId	类别Id	string
+categoryName	类别名称	String
+location	位置	Location	结构化位置信息
+locationName	位置名称	String	例如：桩1,(B2;A/3轴)
+axis	轴网	Axis	结构化轴网信息
+componentId	构件ID	String	验收关联的BIM平台模型构件ID，表格为“模型ID.构件GUID”
+checkCount	检查点数	int	数据来源待定？
 
-      <div class="form-group">
-        <label for="inputPassword3" class="col-sm-2 control-label">类型</label>
-        <div class="col-sm-10">
-          <select class="form-control" id="p3">
-            <option value="1">过程验收</option>
-            <option value="2">开业验收</option>
-          </select>
+Location实体
+参数	参数说明	类型	备注
+x	模型中检查点X轴	Decimal
+y	模型中检查点Y轴	Decimal
+z	模型中检查点Z轴	Decimal
+AXIS实体
+参数
+left
+leftOffset
+right
+rightOffset
+front
+frontOffset
+back
+backOffset
+top
+topOffset
+bottom
+bottomOffset
 
-        </div>
-      </div>
-      <div class="form-group">
-        <label for="inputPassword3" class="col-sm-2 control-label">有无隐患</label>
-        <div class="col-sm-10">
-          <select class="form-control" id="p4">
-            <option value=''>无隐患</option>
-            <option value="1">有隐患</option>
-          </select>
-        </div>
-      </div>
+            }]
+                    </textarea>
+                                        <textarea name="" id="result" cols="30" rows="30">
 
-      <div class="form-group">
-        <label for="inputPassword3" class="col-sm-2 control-label">第几页，默认第一页</label>
-        <div class="col-sm-10">
-          <input type="text" class="form-control" id="p5" value="1">
-        </div>
-      </div>
-      <div class="form-group">
-        <label for="inputPassword3" class="col-sm-2 control-label">页大小</label>
-        <div class="col-sm-10">
-          <input type="text" class="form-control" id="p6" value="100">
+                    </textarea>
         </div>
       </div>
       <div class="form-group">
         <div class="col-sm-offset-2 col-sm-10">
           <button type="button" id="submit" class="btn btn-primary">提交</button>
-          <button type="button" id="save" class="btn btn-primary">保存</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="consoleBox">
+  <div class="consoleHeader">
+    2.3	开业验收</div>
+  <div class="consoleContainer">
+    <form class="form-horizontal">
+
+      <div class="form-group">
+        <!--<label for="inputPassword3" class="col-sm-2 control-label"></label>-->
+        <div class="col-sm-10">
+                    <textarea name="" id="data1" cols="40" rows="40">
+        [{
+        "id": 1,
+        "projectCode": "12345",
+        "specialtyId": "1003",
+        "specialtyName": "土建",
+        "categoryId": "1001",
+        "categoryName": "钢筋",
+        "componentId": "be9bf30f15eb677b705b61c1b90599d2.997d11b5b901ef4e47e15fb095fcd948",
+        "location": {
+            "x": 1000,
+            "y": 2000,
+            "z": 3000
+        },
+        "locationName":"桩1,(B2;A/3轴)",
+        "axis": {
+            "left ": "A",
+            "leftOffset": 200,
+            "right": "B",
+            "rightOffset": -310,
+            "front": "3",
+            "frontOffset": 300,
+            "back ": "4",
+            "backOffset": -300,
+            "top": "F03",
+            "topOffset": -3000,
+            "bottom": "F02",
+            "bottomOffset": 1200
+        },
+        "checkCount": 4
+    }]
+
+                    </textarea>
+                     <textarea name="" id="" cols="40" rows="40">
+            [{
+id	验收Id
+projectCode	项目ID
+specialtyId	专业Id
+specialtyName	专业名称
+categoryId	类别Id
+categoryName	类别名称
+location	位置
+locationName	位置名称
+axis	轴网
+componentId	构件ID
+checkCount	检查点数
+
+
+            }]
+                    </textarea>
+                                        <textarea name="" id="result1" cols="30" rows="30">
+
+                    </textarea>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+          <button type="button" id="submit1" class="btn btn-primary">提交</button>
         </div>
       </div>
     </form>

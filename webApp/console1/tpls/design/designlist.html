@@ -1,85 +1,80 @@
 <div class="consoleBox">
     <div class="consoleHeader">
-        质量材料设备列表</div>
+        3.1	设计检查</div>
     <div class="consoleContainer">
         <form class="form-horizontal">
 
             <div class="form-group">
-                <label for="inputPassword3" class="col-sm-2 control-label">项目</label>
+                <!--<label for="inputPassword3" class="col-sm-2 control-label"></label>-->
                 <div class="col-sm-10">
-                    <input type="text" class="form-control" id="" value="周浦万达">
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="inputPassword3" class="col-sm-2 control-label">选择版本</label>
-                <div class="col-sm-10">
-                    <select class="form-control" id="versionList">
-                        <option value="0">请选择</option>
-                    </select>
-                </div>
-            </div>
+                    <textarea name="" id="data" cols="40" rows="40">
+        [{
+        "id": 1,
+        "projectCode": "12345",
+        "specialtyId": "1003",
+        "specialtyName": "土建",
+        "name": "土建",
+        "discoverDate": 1398854587000,
+        "rectifyDate": 1398854587000,
+        "rectifyCount": 12,
+        "category": "钢筋",
+        "status": 1,
+        "organizationTypeId": 1,
+        "dangerImageId": "9816a",
+        "ratingCategoryID": 1,
+        "presetPointComponentID": "be9bf30f15eb677b705b61c1b90599d2.997d11b5b901ef4e47e15fb095fcd948",
+        "componentId": "be9bf30f15eb677b705b61c1b90599d2.997d11b5b901ef4e47e15fb095fcd948",
+        "location": {
+            "x": 1000,
+            "y": 2000,
+            "z": 3000
+        },
+        "axis": {
+            "left ": "A",
+            "leftOffset": 200,
+            "right": "B",
+            "rightOffset": -310,
+            "front": "3",
+            "frontOffset": 300,
+            "back ": "4",
+            "backOffset": -300,
+            "top": "F03",
+            "topOffset": -3000,
+            "bottom": "F02",
+            "bottomOffset": 1200
+        }
+    }]
 
-            <div class="form-group">
-                <label for="inputPassword3" class="col-sm-2 control-label">状态</label>
-                <div class="col-sm-10">
-                    <select class="form-control" id="p1">
-                        <option value="1">待整改</option>
-                        <option value="2">已整改</option>
-                        <option value="3">已关闭</option>
-                    </select>
+                    </textarea>
+                     <textarea name="" id="" cols="40" rows="40">
+            [{
+id	检查Id	String	唯一ID
+projectCode	项目代码	String	质监系统里的项目ID，同步之前需与BIM平台建立映射关系
+name	隐患名称	String
+specialtyId	专业Id	String
+specialtyName	专业名称	String
+discoverDate	发现时间	Long	距离GMT 1970-01-01的毫秒数；
+rectifyDate	要求整改完成时间	Long	距离GMT 1970-01-01的毫秒数；
+rectifyCount	整改次数	int
+status	隐患状态	int	1：待整改；2：已解决；3：已关闭
+organizationTypeID	隐患提出方编码	Int	1质监 2第三方 3项目公司 4.监理单位
+dangerImageID	隐患图片编码	String
+ratingCategoryID	打分类别	Int	1实测实量,2防水工程,3施工质量,4安全文明,5总包内业资料,6材料设备
+presetPointComponentID	预设点构件ID	String
+componentID	隐患构件ID	String
+location	位置	Location
+axis	轴网	Axis
 
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="inputPassword3" class="col-sm-2 control-label">专业</label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control" id="p2" value="">
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="inputPassword3" class="col-sm-2 control-label">type</label>
-                <div class="col-sm-10">
-                    <select class="form-control" id="p3">
-                        <option value="1">实测实量</option>
-                        <option value="2">防水工程</option>
-                        <option value="3">施工质量</option>
-                        <option value="4">安全文明</option>
-                        <option value="5">总包内业资料</option>
-                        <option value="6">材料设备</option>
-                    </select>
+            }]
+                    </textarea>
+                                        <textarea name="" id="result" cols="30" rows="30">
 
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label for="inputPassword3" class="col-sm-2 control-label">reporter	</label>
-                <div class="col-sm-10">
-                    <select class="form-control" id="p4">
-                        <option value="1">质监</option>
-                        <option value="2">第三方</option>
-                        <option value="3">项目公司</option>
-                        <option value="4">监理单位</option>
-                    </select>
-
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label for="inputPassword3" class="col-sm-2 control-label">第几页，默认第一页</label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control" id="p5" value="1">
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="inputPassword3" class="col-sm-2 control-label">页大小</label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control" id="p6" value="100">
+                    </textarea>
                 </div>
             </div>
             <div class="form-group">
                 <div class="col-sm-offset-2 col-sm-10">
                     <button type="button" id="submit" class="btn btn-primary">提交</button>
-                    <button type="button" id="save" class="btn btn-primary">保存</button>
                 </div>
             </div>
         </form>

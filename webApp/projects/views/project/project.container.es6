@@ -277,6 +277,8 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		$projectContainer.find(".modelContainer").show();
 		//模型tab
 		$(".projectContainerApp .projectHeader .projectTab").show();
+		
+		$(".projectContainerApp .projectHeader .projectTab li:first-child").trigger('click');
 
 		//销毁上传
 		App.Comm.upload.destroy();
