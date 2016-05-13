@@ -4,7 +4,6 @@
 
 App.Services.memberWindowData = {"roleId":[], "outer":{"orgId":[],"userId":[]},"inner":{"orgId":[], "userId":[]}};
 App.Services.Member ={
-
     //组织
     collection:Backbone.Collection.extend({
         model: Backbone.Model.extend({
@@ -37,7 +36,6 @@ App.Services.Member ={
             }
         }
     })),
-
 
     //外部用户
     outerCollection:new(Backbone.Collection.extend({
@@ -103,12 +101,6 @@ App.Services.Member ={
             }
         });
     },
-    init :function(){
-        $(".serviceBody").html( new App.Services.MemberNav().render().el);
-        $(".serviceBody .content").html(new App.Services.MemberList().render().el);
-        App.Services.Member.loadData(App.Services.Member.innerCollection);//默认加载内部列表
-    },
-
 
     //以下缓存和重置POST的数据
     saveMemData:function(obj){
@@ -121,5 +113,3 @@ App.Services.Member ={
         App.Services.memberWindowData = {};
     }
 };
-
-

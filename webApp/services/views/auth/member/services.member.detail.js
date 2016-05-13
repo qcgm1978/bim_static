@@ -12,6 +12,7 @@ App.Services.memberDetail=Backbone.View.extend({
 
     render:function(){
         this.$el.html(this.template(this.model.toJSON()));
+        this.delegateEvents();
         return this;
     },
 
@@ -19,6 +20,7 @@ App.Services.memberDetail=Backbone.View.extend({
         this.model.set({"checked":false});//预设选择状态
         this.listenTo(this.model, 'change:checked', this.render);
         this.listenTo(this.model, 'change:role', this.render);
+
     },
 
     //单个修改
@@ -85,10 +87,10 @@ App.Services.memberDetail=Backbone.View.extend({
 
     //保存数据到全局变量
     save:function(){
-        var type =  App.Services.MemberType || "inner";
-        var data =  App.Services.memberWindowData;
-        var userId = this.model.get("userId");
-        var orgId  = this.model.get("orgId");
+        var type =  App.Services.MemberType || "inner",
+            data =  App.Services.memberWindowData,
+            userId = this.model.get("userId"),
+            orgId  = this.model.get("orgId");
         if(userId){
             data[type].userId.push(userId);
         }else if(orgId){
