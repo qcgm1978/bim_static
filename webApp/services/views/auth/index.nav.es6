@@ -18,15 +18,18 @@ App.Services.AuthNav = Backbone.View.extend({
 		return this;
 	},
 //面包屑
-	breadCrumb : function(ele){
-		$(ele).addClass("active").siblings("li").removeClass("active");
-		var n = $(ele).index();
-		var text = this.$el.find("li").eq(n).text();
-		this.$el.find(".bcService span").eq(2).text(text);
-	},
+	breadCrumb : function(el){
+		debugger
 
-	initialize:function(){},
+		var $el=$(el); 
+		$el.addClass("active").siblings("li").removeClass("active"); 
+		this.$el.find(".bcService span:last").text($el.text().trim());
 
+		// $(ele).addClass("active").siblings("li").removeClass("active");
+		// var n = $(ele).index();
+		// var text = this.$el.find("li").eq(n).text();
+		// this.$el.find(".bcService span").eq(1).text(text);
+	}, 
 
 	memCtrl : function(){
 		this.breadCrumb(this.$el.find(".memCtrl"));
@@ -34,8 +37,6 @@ App.Services.AuthNav = Backbone.View.extend({
 		$("#dataLoading").show();
 
 		App.Services.Member.loadData(App.Services.Member.innerCollection,{},function(){
-
-
 
 			//两个不可控异步，已知顺序为加载-点击，只好先清空再添加,这个导致了角色刷新的频繁，解决方案，
 			//在页面加载时静态单独写入内容？？？？
@@ -47,7 +48,7 @@ App.Services.AuthNav = Backbone.View.extend({
 		});//默认加载内部列表
 
 	},
-	roleManager : function(){
+	roleManager : function(){ 
 		$(".serviceBody").empty();
 		$("#dataLoading").show();
 		App.Services.init("auth","roleManager");

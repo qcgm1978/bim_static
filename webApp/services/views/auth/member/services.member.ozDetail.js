@@ -49,14 +49,13 @@ App.Services.MemberozDetail=Backbone.View.extend({
                 //样式处理
                 _this.$("div").remove("active");
                 $(".ozName").addClass("active");
-                $(".serviceOgList span").removeClass("active");//唯一选项
-                _this.$(".ozName > span").addClass("active");//选中状态
-                //如果有则清空直接子列表？？结构不正确
+                $(".serviceOgList span").removeClass("active");
+                _this.$(".ozName > span").addClass("active");
+
                 //菜单渲染
                 _this.$("#childOz" + _thisId).html(new App.Services.MemberozList(response.data.org).render().el);
             }
             if(!response.data.org.length && !response.data.user.length ){
-                console.log("无数据");
                 $("#blendList").html("<li><span class='sele'>暂无数据</span></li>");
             }
             $("#dataLoading").hide();

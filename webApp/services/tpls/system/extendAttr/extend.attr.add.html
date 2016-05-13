@@ -8,7 +8,7 @@
     </label>
 </div>
 <div class="myDropDown linkAttrOption">
-    <span class="myDropText disabled">
+    <span class="myDropText <%=obj.reference ?'' : 'disabled' %>">
     <span> 
 
     <span class="text"><%=obj.reference ? obj.reference : '无'  %></span>
@@ -21,7 +21,7 @@
     请选择属性的类型
 </div>
 <div class="myDropDown attrTypeOption" data-type="<%= obj.type=='字符' && 1 || obj.type=='链接' && 2　|| 3 %>">
-    <span class="myDropText">
+    <span class="myDropText <%=obj.reference ?'disabled' : '' %>" >
         <span> 
          <span class="text"><%=obj.type ? obj.type : '字符'  %></span>
     <i class="myDropArrorw"> </i></span>

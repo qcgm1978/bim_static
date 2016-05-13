@@ -72,13 +72,11 @@ App.Services.roleWindowIndex = Backbone.View.extend({
 
     //新增
     newRole :function(){
-
         if(App.Services.roleAddStatus){alert("已在提交中，请等待！");App.Services.maskWindow.close();return}
         App.Services.roleAddStatus = 1;
 
-
         //新增角色  fetchServicesNewRole
-        var name  = $("#selectedRoleName").val();
+        var name  = $("#selectedRoleName").val(),seleFun,roleModel;
         if(!name){alert("请填写角色名！");return;}
         var newRole = {
             "name": name,//角色名称
@@ -86,7 +84,7 @@ App.Services.roleWindowIndex = Backbone.View.extend({
         };
 
         //已选功能列表
-        var seleFun = this.filterChecked();
+        seleFun = this.filterChecked();
         if(!seleFun.length){alert("请选择功能");return}
 
         _.each(seleFun,function(item){
@@ -94,7 +92,7 @@ App.Services.roleWindowIndex = Backbone.View.extend({
         });
 
         //保存数据
-        var roleModel = Backbone.Model.extend({
+        roleModel = Backbone.Model.extend({
             defaults:{},
             urlType: "fetchServicesNewRole"
         });
@@ -111,8 +109,7 @@ App.Services.roleWindowIndex = Backbone.View.extend({
                 setTimeout(function(){
                     App.Services.roleAddStatus = 0;
                     //其他判断条件
-
-                },500);
+                },200);
                 App.Services.maskWindow.close();
             },
             //错误处理

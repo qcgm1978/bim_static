@@ -178,6 +178,13 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 		if ($prevEdit.length > 0) {
 			this.cancelEdit($prevEdit);
 		}
+
+		var $fileContent = $("#resourceThumContent .thumContent");
+
+		if ($fileContent.find("li").length <= 0) {
+			$fileContent.html('<li class="loading">无数据</li>');
+		}
+
 		return false;
 	},
 

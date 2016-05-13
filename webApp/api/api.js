@@ -26,7 +26,7 @@ App.API = {
 		fetchServicesOzRoleList:'platform/auth/org/{orgId}/role?outer={outer}',//机构角色
 		fetchServicesUserRoleList:'platform/auth/user/{userId}/role?outer={outer}',//用户角色
 		putServicesRoleFun:'platform/auth/role/{roleId}/function?functionId=111,222,333',//保存角色功能，未用
-		fetchServicesNewRole:'platform/auth/role/grant',//新增角色
+		fetchServicesNewRole:'platform/auth/role',//新增角色
 		fetchServiceMemberList:'platform/auth/org',
 		saveServicesRole:'platform/auth/role/grant',//赋予角色
 		fetchServicesMemberOuterList:'platform/auth/org?outer=true',//外部组织-品牌／公司／成员列表
@@ -80,6 +80,7 @@ App.API = {
 		fetchFileList: "doc/{projectId}/{projectVersionId}/file/children", //获取文件列表  ?fileId={parentId}
 		fetchDesignFileNav: "doc/{projectId}/{projectVersionId}/file/tree", //项目设计文件导航
 		fetchDesignModelNav: "dataJson/project/project.design.model.json", //项目设计模型导航
+		fetchProjectDetail: 'platform/project/{projectId}/version/{versionId}', //获取项目 详细信息  包含最新版本
 
 		// 项目面包屑
 		fetchCrumbsProject: "platform/project/groupByProvince", // 项目导航
