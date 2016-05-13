@@ -30,19 +30,35 @@ App.Services.memberDetail=Backbone.View.extend({
         _this.window(frame);
         _this.chooseSelf();
         _this.save();
+
         //根用户
         if(!parent.data("id")){
             App.Services.Member.loadData(App.Services.Member.SubRoleCollection,{},function(response){
                 $("#dataLoading").hide();
+                var role = _this.model.get("role");
+                if(role && role.length) {
+                    _this.selected(role);
+                }
             });
             return
         }
         _this.getData(parent);
     },
 
+    //已选状态
+    selected:function(arr){
+        App.Services.Member.SubRoleCollection.each(function(item){
+            for(var i = 0 ; i< arr.length ; i++){
+                if(item.get("roleId") == arr[i]["roleId"]){
+                    item.set("checked", true);
+                }
+            }
+        });
+    },
+
     //加载数据
     getData:function(parent){
-        var type =  App.Services.MemberType || "inner";
+        var _this =this,type =  App.Services.MemberType || "inner";
         var datas  ={
             URLtype:"fetchServicesOzRoleList",
             data:{
@@ -53,24 +69,16 @@ App.Services.memberDetail=Backbone.View.extend({
         };
         App.Comm.ajax(datas,function(response){
             if(response.message=="success"){
+                $("#dataLoading").hide();
+                var role = _this.model.get("role");
                 if(!response.data.length){$(".seWinBody .memRoleList ul").append("<li>没有相关数据!</li>");}
                 App.Services.Member.SubRoleCollection.reset();
                 _.each(response.data,function(item){
                     App.Services.Member.SubRoleCollection.add(item);
                 });
-
-
-                App.Services.Member.SubRoleCollection.each(function(item){
-                    for(var i = 0 ; i< response.data.length ; i++){
-                        if(item["roleId"] == response.data[i]["roleId"]){
-                            response.data[i]["checked"] = true;
-                        }
-                    }
-                });
-
-
-
-                $("#dataLoading").hide();
+                if(role && role.length) {
+                    _this.selected(role);
+                }
             }
         });
     },
