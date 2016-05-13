@@ -14,7 +14,7 @@ App.Services.Member ={
             }
         }),
         parse: function (response) {
-            if (response.message == "success") {
+            if (response.code == 0) {
                 return response.data.org;
             }
         }
@@ -31,7 +31,7 @@ App.Services.Member ={
         }),
         urlType: "fetchServicesMemberInnerList",
         parse: function (response) {
-            if (response.message == "success") {
+            if (response.code == 0) {
                 return App.Services.Member.list(response);
             }
         }
@@ -49,7 +49,7 @@ App.Services.Member ={
         urlType: "fetchServicesMemberOuterList",
         //返回品牌或者公司或者成员
         parse: function (response) {
-            if (response.message == "success") {
+            if (response.code == 0) {
                 return App.Services.Member.list(response);
             }
         }
@@ -66,7 +66,7 @@ App.Services.Member ={
         }),
         urlType: "fetchServicesSaveRole",
         parse: function (response) {
-            if (response.message == "success") {
+            if (response.code == 0) {
                 return response.data;
             }
         }

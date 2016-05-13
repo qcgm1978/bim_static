@@ -13,7 +13,7 @@ App.Services.role ={
         }),
         urlType: "fetchServicesRolesList",
         parse: function (response) {
-            if (response.message == "success") {
+            if (response.code == 0) {
                 return response.data;
             }
         }
@@ -49,7 +49,7 @@ App.Services.ozRole ={
         }),
         urlType: "fetchServicesOzRoleList",
         parse: function (response) {
-            if (response.message == "success") {
+            if (response.code == 0) {
                 return response.data;
             }
         }
@@ -79,7 +79,7 @@ App.Services.roleType ={
         }),
         urlType: "fetchServicesUserRoleList",
         parse: function (response) {
-            if (response.message == "success") {
+            if (response.code == 0) {
                 return response.data;
             }
         }
@@ -95,7 +95,7 @@ App.Services.roleType ={
         }),
         urlType: "fetchServicesOzRoleList",
         parse: function (response) {
-            if (response.message == "success") {
+            if (response.code == 0) {
                 return response.data;
             }
         }

@@ -43,7 +43,7 @@ App.Services.projectMember = {
 		}),
 		urlType: "fetchServicesProjectMemberProjectList",
 		parse: function(response) {
-			if (response.message == "success") {
+			if (response.code == 0) {
 				var data=response.data,
 					//TODO 测试数据、需要删除的
 					result=[];
@@ -71,7 +71,7 @@ App.Services.projectMember = {
 		}),
 		urlType: "fetchServicesProjectMemberMemberList",
 		parse: function(response) {
-			if (response.message == "success") {
+			if (response.code == 0) {
 				var _member=response.data.member||[],
 					_org=response.data.org||[],
 				_member=_.map(_member,function(item){
@@ -102,7 +102,7 @@ App.Services.projectMember = {
 		model: App.Services.model,
 		urlType: "fetchServicesProjectMemberMemberList",
 		parse: function(response) {
-			if (response.message == "success") {
+			if (response.code == 0) {
 				return response.data;
 			}
 		}

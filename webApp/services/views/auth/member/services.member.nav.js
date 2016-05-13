@@ -44,8 +44,8 @@ App.Services.MemberNav=Backbone.View.extend({
                 $("#" + _thisType).addClass("active");
                 $(".serviceOgList span").removeClass("active");//唯一选项
                 $("#" + _thisType + " > span").addClass("active");//选中状态
-                //如果有则清空直接子列表
-                //_this.$(".childOz").empty();
+                //外部和内部单选
+                _this.$(".childOz").empty();
                 //菜单渲染
                 $("#" + _thisType +"+ .childOz").html(new App.Services.MemberozList(response.data.org).render().el);
             }
