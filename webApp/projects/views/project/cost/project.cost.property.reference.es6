@@ -28,6 +28,10 @@ App.Project.CostReference = Backbone.View.extend({
 
 	template: _.templateUrl("/projects/tpls/project/cost/project.cost.property.reference.detail.html"),
 
+	rootTemplate: _.templateUrl("/projects/tpls/project/cost/project.cost.property.reference.detail.root.html"),
+
+	itemTemplate: _.templateUrl("/projects/tpls/project/cost/project.cost.property.reference.detail.root.item.html"),
+
 	//获取数据后处理
 	addOne: function(model) {
 		var data = model.toJSON();
