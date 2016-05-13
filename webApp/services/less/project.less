@@ -1,7 +1,7 @@
 #projectManger { height: 100%;
 	.serviceHeader { border-bottom: 1px #ccc solid; padding-bottom: 5px; }
 	#systemContainer { margin-top: -40px; padding-top: 40px; }
-	.serviceNav { height: 30px; background-color: #eee; border-bottom: 1px #ccc solid; padding-left: 20px; position: relative; z-index: 1;
+	.serviceNav { height: 40px; background-color: #eee; border-bottom: 1px #ccc solid; padding-left: 20px; position: relative; z-index: 1;padding-top: 10px;
 		.item { cursor: pointer; float: left; height: 30px; line-height: 30px; width: 100px; text-align: center; border-top: 2px transparent solid;
 			&.selected { border: 1px #ccc solid; border-top: 2px solid #006ecf; border-bottom-color: #fff; background-color: #fff; }
 		}
@@ -71,6 +71,11 @@
 		height: 100%;
 		font-size: 14px;
 		position: relative;
+		
+		& .myDropList{
+			max-height: 120px;
+		}
+		
 		& .header,dt{
 			border-bottom:1px solid #ccc;
 			height: 40px;
@@ -113,7 +118,7 @@
 			border-bottom: 1px solid #ccc;
 			margin-left: 0;
 			box-sizing: border-box;
-			padding: 10px;
+			padding: 10px 10px 50px;
 			height: 100%;
 			height: auto;
 			clear: both;

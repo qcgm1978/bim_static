@@ -95,7 +95,7 @@ App.Services.roleType ={
         }),
         urlType: "fetchServicesOzRoleList",
         parse: function (response) {
-            if (response.code == 0) {
+            if (response.message == "success") {
                 return response.data;
             }
         }

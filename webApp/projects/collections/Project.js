@@ -401,6 +401,10 @@ App.Project = {
 		}
 
 
+		var $slideBar= $("#projectContainer .rightProperty .slideBar");
+		if ($slideBar.find(".icon-caret-left").length>0) {
+			$slideBar.click();
+		}
 
 	},
 
@@ -445,7 +449,7 @@ App.Project = {
 			}
 			data.iconType = 1;
 
-			if (data.data.length > 0) {
+			if ((data.data||[]).length > 0) {
 				var navHtml = new App.Comm.TreeViewMar(data);
 				$("#projectContainer .projectNavFileContainer").html(navHtml);
 			} else {

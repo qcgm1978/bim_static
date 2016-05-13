@@ -11,11 +11,6 @@ App.Services.DetailView.BaseHole=Backbone.View.extend({
 	},
 	
 	formData:{
-		pitID:'',
-		projectID:''
-	},
-	
-	defaultData:{
 		"id" : '',
 		"projectId" : '',
 		"pitName" : '',
@@ -33,31 +28,32 @@ App.Services.DetailView.BaseHole=Backbone.View.extend({
 	
 	initialize(data){
 		//设置projectId 默认传递
-		this.formData.projectID=data.projectId;
+		this.formData.projectId=data.projectId;
 		this._parentView=data._parentView;
 	},
 	
 	render(data){
 		var _this=this;
 		if(data){
-			_this.formData.pitID=data.id;
-		}else{
-			data=_this.defaultData;
+			_this.formData=data;
 		}
-		_this.$el.html(_this.template(data));
+		_this.$el.html(_this.template(_this.formData));
 		_this.$(".isAnchor").myDropDown({
+			zIndex:App.Services.ProjectCollection.methods.zIndex(),
 			click:function($item){
-				_this.formData.isAnchorRodSoilNail=$item.text();
+				_this.formData.isAnchorrodSoilnail=$item.text();
 			}
 		});
 		_this.$(".isSupport").myDropDown({
+			zIndex:App.Services.ProjectCollection.methods.zIndex(),
 			click:function($item){
 				_this.formData.isHaveBracingType=$item.text();
 			}
 		});
 		_this.$(".baseholeLevel").myDropDown({
+			zIndex:App.Services.ProjectCollection.methods.zIndex(),
 			click:function($item){
-				_this.formData.pitLevels=$item.text();
+				_this.formData.pitLevel=$item.text();
 			}
 		});
 		return _this;
@@ -77,16 +73,21 @@ App.Services.DetailView.BaseHole=Backbone.View.extend({
 		$this.toggleClass('accordOpen');
 	},
 	
-	saveBasehole(){
+	saveBasehole(args,type){
 		$('.projectBaseHole').mmhMask();	
 		var _this=this;
 		_this.$('input').each(function(){
 			var _=$(this);
 			_this.formData[_.attr('name')]=_.val();
 		})
+		args= typeof args === 'string' ? args:'fetchProjectCreateBaseHole';
+		_this.formData.soldierPilePercentage=(_this.formData.soldierPilePercentage||0)/100;
+		_this.formData.anchorCablePercentage=(_this.formData.anchorCablePercentage||0)/100;
+		_this.formData.soilNailWallPercentage=(_this.formData.soilNailWallPercentage||0)/100;
+		
 		App.Comm.ajax({
-			URLtype:'fetchProjectCreateBaseHole',
-			type:'post',
+			URLtype:args,
+			type:type||'post',
 			data:JSON.stringify(_this.formData),
 			contentType:'application/json'
 		},function(){
@@ -97,13 +98,17 @@ App.Services.DetailView.BaseHole=Backbone.View.extend({
 		})
 	},
 	
+	updateBasehole(){
+		this.saveBasehole('fetchProjectUpdateBaseHole','put');
+	},
+	
 	deleteBasehole(){
 		var _this=this;
 		App.Comm.ajax({
 			URLtype:'removeProjectDetailBasehole',
 			type:'delete',
 			data:{
-				pitId:_this.formData.pitID
+				pitId:_this.formData.id
 			}
 		},function(){
 			_this.reloadView();
@@ -119,8 +124,9 @@ App.Services.DetailView.BaseHole=Backbone.View.extend({
 	reloadView(){
 		var _this=this;
 		let collectionBasehole=App.Services.ProjectCollection.ProjecDetailBaseHoleCollection;
- 		collectionBasehole.projectId=_this.formData.projectID;
+ 		collectionBasehole.projectId=_this.formData.projectId;
  		collectionBasehole.fetch({
+ 			reset:true,
  			success(child, data) {
  				_this.remove();
  				clearMask();

@@ -35,9 +35,25 @@ App.API = {
 		putServicesProjectMembers:"platform/auth/dataPrivilege/grant",//添加项目成员
 		deleteServicesProjectMembers:"platform/auth/{memberType}/{userId}/dataPrivilege",//删除项目成员
 		
+		//项目详细信息-创建
 		fetchProjectCreateBaseHole:'platform/pit/createPit',
+		fetchProjectCreateFloor:'platform/building/createBuilding',
+		fetchProjectCreateSection:'platform/profile/createProfile',
+		//项目详细信息-读取
 		fetchProjectDetailBaseholeList:'platform/pit/{projectId}',
+		fetchProjectDetailFloorList:'platform/building/{projectId}',
+		fetchProjectDetailSectionList:'platform/profile/{projectId}',
+		fetchProjectDetailPileList:'platform/pile/{projectId}',
+		
+		//项目详细信息-更新
+		fetchProjectUpdateBaseHole:'platform/pit/updatePit',
+		fetchProjectUpdateFloor:'platform/building/updateBuilding',
+		fetchProjectUpdateSection:'platform/profile/updateProfile',
+		//项目详细信息-删除
 		removeProjectDetailBasehole:'platform/pit/{pitId}',
+		removeProjectDetailFloor:'platform/building/{floorId}',
+		removeProjectDetailSection:'platform/profile/{sectionId}',
+		
 		putProjectLink:'platform/mapping/{projectId}',//项目关联
 		fetchProjectManagerProjectList:'platform/mapping/project',//项目管理-项目列表
 		fetchProjectManagerProjectLogo:'platform/project/{projectId}/logo/cut',//项目管理-项目logo裁剪

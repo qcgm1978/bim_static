@@ -5,7 +5,7 @@
 //权限管理入口
 App.Services.Auth = Backbone.View.extend({
 
-	tagName:"div",
+	tagName: "div",
 
 	render(){
 		App.Services.MemberType = "inner";//默认加载类型
@@ -24,4 +24,5 @@ App.Services.Auth = Backbone.View.extend({
 			$("#inner").siblings(".childOz").html(new App.Services.MemberozList(App.Services.Member.innerCollection.models).render().el);
 		});
 	}
+
 });

@@ -21,7 +21,7 @@ App.Services.ProjectDetail.Floor=Backbone.View.extend({
 			_this.status='read';
 		})
 		
-		this.listenTo(App.Services.ProjectCollection.ProjecDetailFloorCollection,'add',this.addView);
+		this.listenTo(App.Services.ProjectCollection.ProjecDetailFloorCollection,'reset',this.resetView);
 	},
 	
 	setUserData(data){
@@ -34,13 +34,26 @@ App.Services.ProjectDetail.Floor=Backbone.View.extend({
 	},
 	
 	addView(items){
-		return
 		var _this=this;
 		var view=new App.Services.DetailView.Floor({
 			projectId:_this.userData.projectId
 		});
 		_this.$('.detailContainer .scrollWrapContent').append(view.render(items.toJSON()).el);
 		view.toggleProFrom('.accordionDatail');
+	},
+	
+	resetView(items){
+		var _this=this;
+		var $container=this.$('.detailContainer .scrollWrapContent');
+		this.status='read';
+		$container.html("");
+		items.models.forEach(function(model){
+			var view=new App.Services.DetailView.Floor({
+				projectId:_this.userData.projectId
+			});
+			$container.append(view.render(model.toJSON()).el);
+			//view.toggleProFrom('.accordionDatail');
+		})
 	},
 
 	createFloor(){

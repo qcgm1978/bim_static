@@ -1,5 +1,5 @@
 .projectHeader { height: 37px; background-color: #f5f5f5; border-bottom: 1px #ccc solid; position: relative; z-index: 999;
-	.projectTab { float: right; height: 37px; position: relative; z-index: 3000;display: none;
+	.projectTab { float: right; height: 37px; position: relative; z-index: 3000; display: none;
 		.item { float: left; height: 100%; line-height: 37px; width: 35px; font-size: 16px; position: relative; text-align: center; margin-right: 40px; cursor: pointer;
 			.line { bottom: 0px; width: 100%; height: 3px; position: absolute; left: 0px; text-align: center; }
 			&.last { margin-right: 20px }
@@ -27,16 +27,16 @@
 				.mCSB_container { }
 			}
 		}
-		.rightProperty { border: 1px #ddd solid; display: none; position: fixed; right: 0px; top: 87px; bottom: 0px; background-color: #fff; z-index: 600;
+		.rightProperty { margin-right: -398px; border: 1px #ddd solid; display: none; position: fixed; right: 0px; top: 87px; bottom: 0px; background-color: #fff; z-index: 600;
 			.rightPropertyContentBox { height: 100%; position: relative; }
 			&.showPropety { display: block; }
 		}
-		.projectCotent { position: relative; height: 100%; margin-left: 240px; 
-			&.showPropety {margin-left: 0px; }
+		.projectCotent { position: relative; height: 100%; margin-left: 240px;
+			&.showPropety { margin-left: 0px; }
 			.fileContainer { padding: 10px; height: 100%; box-sizing: border-box;
 				.fileContainerScroll { position: absolute; top: 75px; bottom: 0px; left: 10px; right: 10px; }
 				.modelContainer { height: 500px; position: relative; }
-				.loading{margin:0px -1px;background-color: #fff;}
+				.loading { margin: 0px -1px; background-color: #fff; }
 			}
 			.modelContainer { height: 100%; display: none;
 				.modelContainerScroll { height: 100%;
@@ -95,9 +95,8 @@
 	}
 	.actionAnalog { position: absolute; bottom: 0px; width: 100%; min-width: 398px; height: 80px; background-color: #eee;
 		.progressAnalog { height: 50px; line-height: 55px; vertical-align: top; padding-left: 15px;
-			i{cursor: pointer;}
+			i { cursor: pointer; }
 			.process { position: absolute; top: 23px; height: 30px; left: 45px; right: 0px;
-
 				.processPos { position: absolute; top: -3px; left: 0px; }
 				.processBg { height: 8px; width: 0px; background-color: #36D900; margin-top: -8px; }
 				.bg { height: 8px; width: 97%; background-color: #ccc; }
@@ -185,6 +184,7 @@
 		tbody { td { height: 25px; line-height: 25px; padding-left: 5px; }
 		}
 	}
+	.tbBody { height: 100%; margin-top: -28px; padding-top: 28px; }
 }
 .rightProperty { .noneSwitch { display: inline-block; }
 	.nodeSwitch { background: url(../images/comm/images/commIcon.png) no-repeat 0px -39px; margin-top: 7px; display: inline-block; width: 12px; height: 10px; line-height: 8px; vertical-align: top; text-align: center; cursor: pointer;
@@ -195,7 +195,7 @@
 	.step2 { margin-left: 14px; }
 	.step3 { margin-left: 21px; }
 	.nodeSwitch { position: relative; z-index: 1; }
-	.code {text-align: left; box-sizing: border-box; display: inline-block; overflow: hidden; width: 100%; text-overflow: ellipsis; vertical-align: top; margin-left: -16px; padding-left: 16px;white-space: nowrap; }
+	.code { text-align: left; box-sizing: border-box; display: inline-block; overflow: hidden; width: 100%; text-overflow: ellipsis; vertical-align: top; margin-left: -16px; padding-left: 16px; white-space: nowrap; }
 	.code1 { margin-left: -24px; padding-left: 24px; }
 	.code2 { margin-left: -31px; padding-left: 31px; }
 	.code3 { margin-left: -40px; padding-left: 40px; }
@@ -230,7 +230,6 @@
 			}
 			td.listName { text-align: left; }
 		}
-		
 	}
 }
 .designVerification { select { width: 98%; }
@@ -274,7 +273,9 @@
 		.iconCal { background: url(/static/dist/images/comm/images/commIcon.png) no-repeat 6px -236px; position: absolute; right: 1px; width: 28px; height: 22px; top: 1px; background-color: #eee; border-left: 1px #ccc solid; }
 	}
 	.tbMaterialequipmentBody, .tbMaterialequipmentHeader { width: 100%; min-width: 580px;
-		.manifestIcon { width: 5%;text-align: center; .myIcon-inventory{    display: inline-block;width: 11px;} }
+		.manifestIcon { width: 5%; text-align: center;
+			.myIcon-inventory { display: inline-block; width: 11px; }
+		}
 		.specialities { width: 12%; }
 		.category { width: 12%; }
 		.name { width: 19%; }

@@ -21,7 +21,7 @@ App.Services.ProjectDetail.Section=Backbone.View.extend({
 			_this.status='read';
 		})
 		
-		this.listenTo(App.Services.ProjectCollection.ProjecDetailFloorCollection,'add',this.addView);
+		this.listenTo(App.Services.ProjectCollection.ProjecDetailSectionCollection,'reset',this.resetView);
 	
 	},
 	
@@ -31,9 +31,20 @@ App.Services.ProjectDetail.Section=Backbone.View.extend({
 	
 	render(){
 		this.$el.html(this.template);   
-		this.$(".outerInstall").myDropDown();
-		this.$(".structure").myDropDown();
 		return this;
+	},
+	
+	resetView(items){
+		var _this=this;
+		var $container=this.$('.detailContainer .scrollWrapContent');
+		this.status='read';
+		$container.html("");
+		items.models.forEach(function(model){
+			var view=new App.Services.DetailView.Section({
+				projectId:_this.userData.projectId
+			});
+			$container.append(view.render(model.toJSON()).el);
+		})
 	},
 	
 	createSection(){

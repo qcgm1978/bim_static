@@ -51,7 +51,7 @@ App.Services.projectMember = {
 				    	result=[];
 				    }
 					_.each(data,function(item){
-						item.image=item.image||'/static/dist/images/projects/images/proDefault.png';
+						item.image=item.logoUrl['small']||'/static/dist/images/projects/images/proDefault.png';
 						result.push(item)
 					})
 				return result;
