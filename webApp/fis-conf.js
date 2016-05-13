@@ -137,7 +137,7 @@ fis.match('/libsH5/**.js', {
   packTo: '/static/dist/libs/libsH5_' + v + '.js'
 });
 
-fis.match('/libsH5/**.css', {
+fis.match('/libsH5/**.{less,css}', {
   packTo: '/static/dist/libs/libsH5_' + v + '.css'
 });
 
@@ -269,7 +269,7 @@ fis.match('/services/**.{less,css}', {
 
 fis.match('/components/fileSelection/index.html',{
      release: '/static/dist/components/fileSelection/index.html'
-}); 
+});
 fis.match('/components/fileSelection/libs/**.{js,es6}',{
      packTo: '/static/dist/components/fileSelection/libs/libs.js'
 });
