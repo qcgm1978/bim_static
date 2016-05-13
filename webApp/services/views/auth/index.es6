@@ -21,7 +21,6 @@ App.Services.Auth = Backbone.View.extend({
 		this.render();
 		App.Services.Member.loadData(App.Services.Member.innerCollection,{},function(){
 			$("#inner span").addClass("active");
-			console.log(App.Services.Member.innerCollection.models);
 			$("#inner").siblings(".childOz").html(new App.Services.MemberozList(App.Services.Member.innerCollection.models).render().el);
 		});
 	}

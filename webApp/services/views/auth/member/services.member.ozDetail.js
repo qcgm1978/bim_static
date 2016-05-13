@@ -10,7 +10,7 @@ App.Services.MemberozDetail=Backbone.View.extend({
         "click .ozName":"unfold"
     },
 
-    render:function(){
+    render:function(){0
         this.$el.html(this.template(this.model.toJSON()));
         return this;
     },

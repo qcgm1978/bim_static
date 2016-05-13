@@ -32,9 +32,12 @@ App.Services.AuthNav = Backbone.View.extend({
 	memCtrl : function(){
 		$(".serviceBody").empty();
 		this.breadCrumb(this.$el.find(".memCtrl"));
-		this.$(".serviceBody").html(new App.Services.MemberNav().render().el);//组织菜单
-		this.$(".serviceBody .content").html(new App.Services.MemberList().render().el);//主体列表
-		App.Services.Member.loadData(App.Services.Member.innerCollection,{},function(){});//加载数据
+		this.$(".serviceBody").html(new App.Services.MemberNav().render().el);
+		this.$(".serviceBody .content").html(new App.Services.MemberList().render().el);
+		App.Services.Member.loadData(App.Services.Member.innerCollection,{},function(){
+			$("#inner span").addClass("active");
+			$("#inner").siblings(".childOz").html(new App.Services.MemberozList(App.Services.Member.innerCollection.models).render().el);
+		});
 		//App.Services.init("auth","memCtrl");
 	},
 	roleManager : function(){
