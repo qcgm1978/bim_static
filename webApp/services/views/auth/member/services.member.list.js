@@ -92,7 +92,7 @@ App.Services.MemberList=Backbone.View.extend({
     //获取父项数据
     getFatherData:function(getRole){
         //取得父项的角色列表
-        var parentId = $("#ozList").find("span.active").parent(".ozName").data("id") ;
+        var parentId = $("#ozList").find("span.active").parent(".ozName").data("id"),_this =this ;
         //无父项时获取缺省角色列表，此处为可能出错解释
         if(!parentId){
             App.Services.Member.loadData(App.Services.Member.SubRoleCollection,{},function(response){
@@ -117,15 +117,20 @@ App.Services.MemberList=Backbone.View.extend({
                     App.Services.Member.SubRoleCollection.add(item);
                 });
                 if(getRole && getRole.length) {
-                    App.Services.Member.SubRoleCollection.each(function (item) {
-                            for(var i  = 0 ; i < getRole.length ; i++){
-                                if(getRole[i]["roleId"] ==item.get("roleId")){
-                                    item.set("checked",true);
-                                }
-                            }
-                    });
+                    _this.selected(getRole);
                 }
                 $("#dataLoading").hide();
+            }
+        });
+    },
+
+    //已选状态
+    selected:function(arr){
+        App.Services.Member.SubRoleCollection.each(function(item){
+            for(var i = 0 ; i< arr.length ; i++){
+                if(item.get("roleId") == arr[i]["roleId"]){
+                    item.set("checked", true);
+                }
             }
         });
     },
@@ -166,28 +171,6 @@ App.Services.MemberList=Backbone.View.extend({
                 App.Services.Member.resetMemData();
             },
             message:frame
-        });
-    },
-    ajaxRole:function(url,frame){
-        var _this =this;
-        $.ajax({
-            type:"GET",
-            url: url,
-
-            success:function(response){
-                if(response.message=="success"){
-                    if(response.data.length){$(".seWinBody .memRoleList  ul").append("<li>没有相关数据</li>");}
-                    App.Services.Member.SubRoleCollection.reset();
-                    _.each(response.data,function(item){
-                        App.Services.Member.SubRoleCollection.add(item);
-                    });
-                    $("#dataLoading").hide();
-                }
-            },
-            error:function(error){
-                alert("无法取得角色列表,错误号 " +error.status );
-                $("#dataLoading").hide();
-            }
         });
     },
     //排序
