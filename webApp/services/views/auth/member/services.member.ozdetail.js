@@ -5,7 +5,7 @@ App.Services.MemberozDetail=Backbone.View.extend({
 
     tagName :'li',
 
-    template:_.templateUrl("/services/tpls/auth/member/services.member.ozDetail.html"),
+    template:_.templateUrl("/services/tpls/auth/member/services.member.ozdetail.html"),
     events:{
         "click .ozName":"unfold"
     },
@@ -28,11 +28,10 @@ App.Services.MemberozDetail=Backbone.View.extend({
     },
 
     unfold:function(){
-        //如果已选则返回
-        if(this.$(".ozName span").hasClass("active")){return}
         var _this = this;
         var _thisType = App.Services.MemberType;
         var _thisId = this.$(".ozName").data("id");
+        if($("#childOz" + _thisId).siblings(".ozName").find("span").hasClass("active")){return}
         var collection = App.Services.Member[_thisType + "Collection"];
         $("#blendList").empty();//刷新右侧数据
         $("#dataLoading").show();
@@ -51,9 +50,10 @@ App.Services.MemberozDetail=Backbone.View.extend({
                 $(".ozName").addClass("active");
                 $(".serviceOgList span").removeClass("active");
                 _this.$(".ozName > span").addClass("active");
+                _this.$(".childOz").empty();
 
                 //菜单渲染
-                _this.$("#childOz" + _thisId).html(new App.Services.MemberozList(response.data.org).render().el);
+                $("#childOz" + _thisId).html(new App.Services.MemberozList(response.data.org).render().el);
             }
             if(!response.data.org.length && !response.data.user.length ){
                 $("#blendList").html("<li><span class='sele'>暂无数据</span></li>");
