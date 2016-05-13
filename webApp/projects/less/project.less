@@ -184,7 +184,26 @@
 		tbody { td { height: 25px; line-height: 25px; padding-left: 5px; }
 		}
 	}
-	.tbBody { height: 100%; margin-top: -28px; padding-top: 28px; }
+	.tbBodyContent { text-align: center;
+		.item { height: 26px; line-height: 25px; border: 1px #ccc solid; border-width: 1px 0px;
+			.commItem { float: left; }
+			.listCode { width: 25%; border-right: 1px #ccc solid; position: relative; }
+			.listName { width: 56%; border-right: 1px #ccc solid;
+				.text { padding-left: 5px; }
+			}
+			.listCount { width: 19%; border-right: 1px #ccc solid;
+				.text { padding-left: 5px; }
+			}
+		}
+	}
+	.tbBody { height: 100%; margin-top: -28px; padding-top: 28px;
+		.tbBodyContent { text-align: left;
+			.item { border-top: 0;
+				.listCode { .text { position: absolute; right: 3px; }
+				}
+			}
+		}
+	}
 }
 .rightProperty { .noneSwitch { display: inline-block; }
 	.nodeSwitch { background: url(../images/comm/images/commIcon.png) no-repeat 0px -39px; margin-top: 7px; display: inline-block; width: 12px; height: 10px; line-height: 8px; vertical-align: top; text-align: center; cursor: pointer;

@@ -38,7 +38,9 @@ App.Project.ProjectCostProperty = Backbone.View.extend({
 				App.Project.CostAttr.ReferenceCollection.reset();
 				App.Project.CostAttr.ReferenceCollection.projectId = App.Project.Settings.projectId;
 				App.Project.CostAttr.ReferenceCollection.projectVersionId = App.Project.Settings.CurrentVersion.id;
-				App.Project.CostAttr.ReferenceCollection.fetch();
+				App.Project.CostAttr.ReferenceCollection.fetch({success:function(){
+					//this.$(".tbBodyScroll .tbBodyContent li:visible:odd").addClass("odd");
+				}});
 			}
 
 		} else if (type == "change") {

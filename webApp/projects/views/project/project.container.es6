@@ -276,9 +276,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		$projectContainer.find(".fileContainer").hide();
 		$projectContainer.find(".modelContainer").show();
 		//模型tab
-		$(".projectContainerApp .projectHeader .projectTab").show();
-		
-		$(".projectContainerApp .projectHeader .projectTab li:first-child").trigger('click');
+		$(".projectContainerApp .projectHeader .projectTab").show(); 
 
 		//销毁上传
 		App.Comm.upload.destroy();
@@ -322,9 +320,8 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		this.typeContentChange();
 
 		//渲染模型属性
-		//App.Project.renderModelContentByType(); 
- 
-		//return;
+		//App.Project.renderModelContentByType();  
+		 
 		var viewer = App.Project.Settings.Viewer = App.Comm.createModel({
 			element: $("#projectContainer .modelContainerContent"),
 			sourceId: App.Project.Settings.DataModel.sourceId,
