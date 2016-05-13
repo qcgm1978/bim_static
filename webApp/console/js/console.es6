@@ -194,7 +194,7 @@ App.Console = {
 
 				if (data.message == "success") {
 					alert("成功");
-					window.location.reload();
+					//window.location.reload();
 				}
 
 			});

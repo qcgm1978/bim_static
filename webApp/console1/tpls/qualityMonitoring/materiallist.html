@@ -1,81 +1,56 @@
 <div class="consoleBox">
     <div class="consoleHeader">
-        质量材料设备列表</div>
+        2.1	材料设备</div>
     <div class="consoleContainer">
         <form class="form-horizontal">
 
+
             <div class="form-group">
-                <label for="inputPassword3" class="col-sm-2 control-label">项目</label>
+                <label for="inputPassword3" class="col-sm-2 control-label"></label>
                 <div class="col-sm-10">
-                    <input type="text" class="form-control" id="" value="周浦万达">
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="inputPassword3" class="col-sm-2 control-label">选择版本</label>
-                <div class="col-sm-10">
-                    <select class="form-control" id="versionList">
-                        <option value="0">请选择</option>
-                    </select>
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="inputPassword3" class="col-sm-2 control-label">专业</label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control" id="p1" value="默认专业">
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="inputPassword3" class="col-sm-2 control-label">类别</label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control" id="p2" value="2016版">
+                    <textarea name="" id="data" cols="30" rows="30">
+            [{
+            "id": "13432",
+            "projectCode": "12345",
+            "specialtyId": "abc",
+            "specialtyName": "土建",
+            "categoryId": "",
+            "categoryName": "钢筋",
+            "name": "aa",
+            "batch": "1",
+            "status": "1",
+            "arrival": "12",
+            "total": "100",
+            "latestArrivalTime": 1398854587000,
+            "edoId": "0871340"
+            }]
+                    </textarea>
+                     <textarea name="" id="" cols="30" rows="30">
+            [{
+            id	设备Id
+            projectCode	项目代码
+            specialtyId	专业Id
+            specialtyName	专业名称
+            categoryId	类别Id
+            categoryName	类别名称
+            name	名称
+            batch	批次
+            status	状态
+            arrival	已进场数
+            total	总数量
+            latestArrivalTime	最后进场时间
+            edoId	材料设备对应的清单项id
+            }]
+                    </textarea>
+                                        <textarea name="" id="result" cols="30" rows="30">
+
+                    </textarea>
                 </div>
             </div>
 
-            <div class="form-group">
-                <label for="inputPassword3" class="col-sm-2 control-label">状态</label>
-                <div class="col-sm-10">
-                    <select class="form-control" id="p3">
-                        <option value="1">合格</option>
-                        <option value="2">不合格</option>
-                    </select>
-
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="inputPassword3" class="col-sm-2 control-label">名称</label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control" id="p4" value="hhhhh">
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="inputPassword3" class="col-sm-2 control-label">查询时间范围：开始</label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control" id="p5" value="2016-4-6">
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label for="inputPassword3" class="col-sm-2 control-label">查询时间范围：结束</label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control" id="p6" value="2016-6-6">
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="inputPassword3" class="col-sm-2 control-label">第几页，默认第一页</label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control" id="p7" value="1">
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="inputPassword3" class="col-sm-2 control-label">页大小</label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control" id="p8" value="100">
-                </div>
-            </div>
             <div class="form-group">
                 <div class="col-sm-offset-2 col-sm-10">
                     <button type="button" id="submit" class="btn btn-primary">提交</button>
-                    <button type="button" id="save" class="btn btn-primary">保存</button>
                 </div>
             </div>
         </form>
