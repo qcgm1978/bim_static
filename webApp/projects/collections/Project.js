@@ -401,6 +401,10 @@ App.Project = {
 		}
 
 
+		var $slideBar= $("#projectContainer .rightProperty .slideBar");
+		if ($slideBar.find(".icon-caret-left").length>0) {
+			$slideBar.click();
+		}
 
 	},
 

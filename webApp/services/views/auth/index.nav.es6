@@ -18,15 +18,18 @@ App.Services.AuthNav = Backbone.View.extend({
 		return this;
 	},
 //面包屑
-	breadCrumb : function(ele){
-		$(ele).addClass("active").siblings("li").removeClass("active");
-		var n = $(ele).index();
-		var text = this.$el.find("li").eq(n).text();
-		this.$el.find(".bcService span").eq(1).text(text);
-	},
+	breadCrumb : function(el){
+		debugger
 
-	initialize:function(){},
+		var $el=$(el); 
+		$el.addClass("active").siblings("li").removeClass("active"); 
+		this.$el.find(".bcService span:last").text($el.text().trim());
 
+		// $(ele).addClass("active").siblings("li").removeClass("active");
+		// var n = $(ele).index();
+		// var text = this.$el.find("li").eq(n).text();
+		// this.$el.find(".bcService span").eq(1).text(text);
+	}, 
 
 	memCtrl : function(){
 		this.breadCrumb(this.$el.find(".memCtrl"));
@@ -45,7 +48,7 @@ App.Services.AuthNav = Backbone.View.extend({
 		});//默认加载内部列表
 
 	},
-	roleManager : function(){
+	roleManager : function(){ 
 		$(".serviceBody").empty();
 		$("#dataLoading").show();
 		App.Services.init("auth","roleManager");
