@@ -4,7 +4,7 @@ var AppRoute = Backbone.Router.extend({
 		'': 'bodyContent',
 		'todo': 'todo',
 		'projects': 'projects',
-		'projects/:id': 'project',
+		'projects/:id/:versionId': 'project',
 		'flow': 'flow',
 		'resources': 'resources',
 		'resources/:type': 'resource',
@@ -68,12 +68,20 @@ var AppRoute = Backbone.Router.extend({
 	},
 
 	//单个项目
-	project: function(id) {
+	project: function(id,versionId) { 
+	 
 		this.reset();
+
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".projects").addClass('selected');
 		_.require('/static/dist/projects/projects.css');
 		_.require('/static/dist/projects/projects.js');
-		App.Project.Settings.projectId = id;
+
+		App.Project.Settings=$.extend({},App.Project.Defaults);
+
+		App.Project.Settings.projectId = id; 
+
+		App.Project.Settings.versionId=versionId;
+
 		App.Project.init();
 	},
 
@@ -161,7 +169,9 @@ var AppRoute = Backbone.Router.extend({
 	},
 
 	//重置数据
-	reset: function() {
+	reset: function() { 
+		//用户信息
+		App.Global.User=JSON.parse(localStorage.getItem("user")); 
 		$("#pageLoading").show();
 		//销毁上传
 		App.Comm.upload.destroy();

@@ -86,7 +86,11 @@ ViewComp.MemberManager = Backbone.View.extend({
 	
 	loadChildren:function(_this,outer,parentId,treeNode){
 		_this.$(".scrollWrap").mmhMask();
-		var setting = {
+		var _getData={
+				outer:outer,
+				includeUsers:true
+			},
+			setting = {
 				callback: {
 					beforeClick:function(){
 					},
@@ -105,20 +109,20 @@ ViewComp.MemberManager = Backbone.View.extend({
 					showLine: false
 				}
 		};
-		
-		var _url="/"+App.API.URL.fetchServiceMemberList+"?outer="+outer+"&includeUsers=true";
 		if(parentId){
-			_url=_url+"&parentId="+parentId;
+			_getData.parentId=parentId;
 		}
-		$.ajax({
-			url:_url,
-			type:"get"
-		}).done(function(res){
+		
+		App.Comm.ajax({
+			URLtype:'fetchServiceMemberList',
+			type:"get",
+			data:_getData
+		},function(res){
+			//success callback
 			if(res.message==="success"){
 				var _org=res.data.org||[],
 					_user=res.data.user||[],
 					_newOrg=[];
-				
 				_org.forEach(function(i){
 					i.iconSkin='business';
 					_newOrg.push(i);
@@ -132,14 +136,18 @@ ViewComp.MemberManager = Backbone.View.extend({
 			}
 			clearMask();
 		}).fail(function(){
+			//失败回调
 			clearMask();
 		})
 	},
 	
+	/**
+	 * 添加项目成员
+	 */
 	grand:function(){
 		$("#dataLoading").show();
 		var pid=App.Comm.getCookie('currentPid');
-		var url="/platform/auth/dataPrivilege/grant";
+		var url=App.API.URL.putServicesProjectMembers;
 		var data={
 		    "projectId":[pid],
 		    "outer":{
@@ -169,21 +177,26 @@ ViewComp.MemberManager = Backbone.View.extend({
 			}
 			
 		})
-		$.ajax({
+		
+		App.Comm.ajax({
+			URLtype:'putServicesProjectMembers',
 			type:"post",
-			url:url,
 			data:JSON.stringify(data),
-			contentType:"application/json",
-		}).done(function(d){
+			contentType:"application/json"
+		},function(res){
 			$("#dataLoading").show();
-			if(d.message=="success"){
+			if(res.message=="success"){
 				App.Services.projectMember.loadData(App.Services.projectMember.projectMemberMemberCollection,{outer:false},{
 					dataPrivilegeId:App.Comm.getCookie("currentPid")
 				});
 				App.Services.maskWindow.close();
 			}else{
 				alert("添加失败");
+				$("#dataLoading").hide();
 			}
+		}).fail(function(){
+			$("#dataLoading").hide();
 		})
+
 	}
 })

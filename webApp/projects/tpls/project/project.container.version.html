@@ -32,14 +32,12 @@
 				
 				<% for (var k = 0; k < vCount; k++) { %>
 					
-					<% cVersion = Versions[k]; %> 
-					 	<% var stringDate= JSON.stringify(cVersion); %>
-					 	 
-						  <div class="item" data-version="<%- stringDate %>">
+					<% cVersion = Versions[k]; %>  
+						  <a class="item" href="/#projects/<%= cVersion.projectId %>/<%= cVersion.id %>" projectId >
 						      <span class="vName overflowEllipsis"><%=cVersion.name%></span>
 					          <span class="vStatus overflowEllipsis"><%= App.Comm.convertStatus(cVersion.status) %></span>
 					          <span class="vDate overflowEllipsis"><%= new Date(cVersion.createTime).format("yyyy-MM-dd") %></span> 
-					        </div>
+					        </a>
 
 		    	<% }%>
 		<% }%>

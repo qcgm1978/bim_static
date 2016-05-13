@@ -33,7 +33,6 @@ App.Services.windowAlert = Backbone.View.extend({
             type:"DELETE",
             success:function(response){
                 $("#dataLoading").hide();
-                console.log(response);
                 if(response.code==18005){
                     $(".servicesAlert .confirm").hide();
                     $(".servicesAlert .alert").show();

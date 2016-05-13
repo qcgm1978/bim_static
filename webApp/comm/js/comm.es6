@@ -63,7 +63,9 @@ App.Comm = {
 
 		//url 是否有参数
 		var urlPars = data.url.match(/\{([\s\S]+?(\}?)+)\}/g);
-		var temp = data.data;
+		
+		var temp =data.data;
+		
 		if ((typeof temp) == 'string') {
 			temp = JSON.parse(temp);
 		}
@@ -178,7 +180,7 @@ App.Comm = {
 
 			$el.animate(ani, 500, function() {
 				$el.find(".dragSize").show().end().find(".slideBar i").toggleClass('icon-caret-left icon-caret-right');
-				$content.css(mDirc, $el.width());
+				//$content.css(mDirc, $el.width());
 				if (Viewer) {
 					Viewer.resize();
 				}
@@ -191,7 +193,7 @@ App.Comm = {
 			ani[mDirc] = -width;
 			$el.animate(ani, 500, function() {
 				$el.find(".dragSize").hide().end().find(".slideBar i").toggleClass('icon-caret-left icon-caret-right');
-				$content.css(mDirc, 0);
+				//$content.css(mDirc, 0);
 				if (Viewer) {
 					Viewer.resize();
 				}
@@ -236,9 +238,9 @@ App.Comm = {
 			if (contentWidth - gap < 10) {
 				var maxWidth = initWidth + contentWidth - 10;
 				$el.width(maxWidth);
-				$content.css(mPos, maxWidth);
+				//$content.css(mPos, maxWidth);
 			} else {
-				$content.css(mPos, leftNavWidth);
+				//$content.css(mPos, leftNavWidth);
 			}
 			if (Viewer) {
 				Viewer.resize();
@@ -302,7 +304,7 @@ App.Comm = {
 	initScroll($target, axis) {
 
 		//绑定过
-		if ($target.hasClass("mCustomScrollbar")) {
+		if (!$target || $target.hasClass("mCustomScrollbar")) {
 			return;
 		}
 

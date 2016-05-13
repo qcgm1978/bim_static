@@ -2,12 +2,17 @@
 App.Services.projectMember.members = Backbone.View.extend({
 	
   template: _.templateUrl('/services/tpls/auth/projectMember/members.html'),
+  
+  events:{
+  	
+  	'click .remove':'del'
+  	
+  },
 
   // 重写初始化
   initialize: function() {
 		this.listenTo(App.Services.projectMember.projectMemberMemberCollection,'reset',this.render);
   },
-  delModal:'',
   /**
    * 项目成员列表删除事件
    * @param {Object} event
@@ -18,24 +23,30 @@ App.Services.projectMember.members = Backbone.View.extend({
   		var _opType=event.currentTarget.getAttribute("data-type");//对象类型：org,user
   		var _outer=event.currentTarget.getAttribute("data-outer");//对象类型：org,user
   		
-  		
   		App.Services.Dialog.alert("<span class='delTip'>是否将用户'"+_userName+"'删除？</span>",function(_this){
-  			var url="/platform/auth/"+_opType+"/"+_userId+"/dataPrivilege?outer="+_outer+"&privilegeId="+App.Comm.getCookie("currentPid");
-    		$.ajax({
-    			type:"DELETE",
-    			url:url
-    		}).done(function(data){
-    			if(data.message=="success"){
+  			App.Comm.ajax({
+  				URLtype:'deleteServicesProjectMembers',
+  				data:{
+  					memberType:_opType,
+  					userId:_userId,
+  					outer:_outer,
+  					privilegeId:App.Comm.getCookie('currentPid')
+  				},
+  				type:'delete'
+  			},function(res){
+  				_this.close();
+    			if(res.message=="success"){
     				$('#dataLoading').show();
     				App.Services.projectMember.loadData(App.Services.projectMember.projectMemberMemberCollection,{outer:App.Comm.getCookie("isOuter")},{
 						dataPrivilegeId:App.Comm.getCookie("currentPid")
 					});
-					setTimeout(function(){
-						_model.closeView();
-					},100)
     			}
-    		})
-  			_this.close();
+  			}).fail(function(){
+  				//$('#dataLoading').hide();
+  				alert('添加失败')
+  			})
+  			
+    		
   		});
   },
 
@@ -43,11 +54,9 @@ App.Services.projectMember.members = Backbone.View.extend({
   	var _this=this;
   	var data=App.Services.projectMember.method.model2JSON(items.models);
   	data={data:data};
-    $("#memberlistWrap").html(this.template(data));
-    $(".remove").on("click",function(e){
-    	_this.del(e);
-    })
-    clearMask();
+    $("#memberlistWrap").html(this.$el.html(this.template(data)));
+    //clearMask();
+    $('#dataLoading').hide();
     return this;
   }
 });

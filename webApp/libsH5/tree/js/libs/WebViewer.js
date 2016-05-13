@@ -6,8 +6,9 @@ var CLOUD = CLOUD || {};
 CLOUD.Version = "20160426";
 
 CLOUD.GlobalData = {
-    SceneSize: 10,
+    SceneSize: 1000,
     SceneScale: 2,
+    LengthUnitScale : 1000,
     MinBoxSize : new THREE.Vector3(500, 500, 500),
     MaxTriangle: 40000000,
     MaxVertex: 35000000,
@@ -17,9 +18,9 @@ CLOUD.GlobalData = {
     ShowCellBox: false,
     DynamicRelease: true,
     SubSceneVisibleDistance: 0.1,
-    CellVisibleLOD: 40,
+    CellVisibleLOD: 15,
     RayTracingDeep: 10,
-    SubSceneVisibleLOD: 60,
+    SubSceneVisibleLOD: 10,
     ScreenCullLOD: 0.0002,
     LimitFrameTime: 30
 };
@@ -210,7 +211,7 @@ CLOUD.Utils = {
                     //CLOUD.GlobalData.MinBoxSize.x = 0.05 / rootNode.scale.x;
                     //CLOUD.GlobalData.MinBoxSize.y = 0.05 / rootNode.scale.y;
                     //CLOUD.GlobalData.MinBoxSize.z = 0.05 / rootNode.scale.z;
-                    CLOUD.GlobalData.SubSceneVisibleDistance = 1000 * rootNode.scale.x;
+                    CLOUD.GlobalData.SubSceneVisibleDistance = CLOUD.GlobalData.LengthUnitScale * rootNode.scale.x;
                     console.log(CLOUD.GlobalData.SubSceneVisibleDistance);
                 }
                 rootNode.updateMatrix();
@@ -1276,11 +1277,25 @@ CLOUD.RenderGroup = function () {
     };
 
     function painterSortStable(a, b) {
+
         if (a.material.id !== b.material.id) {
             return a.material.id - b.material.id;
         } else if (a.z !== b.z) {
             return a.z - b.z;
         } else {
+            return a.id - b.id;
+        }
+    }
+
+    function painterSortStableZ(a, b) {
+
+        if (a.z !== b.z) {
+            return a.z - b.z;
+        }
+        else if (a.material.id !== b.material.id) {
+            return a.material.id - b.material.id;
+        }
+        else {
             return a.id - b.id;
         }
     }
@@ -1394,7 +1409,7 @@ CLOUD.RenderGroup = function () {
            
             renderer.renderBufferDirect(camera, lights, fog, geometry, material, object, group);
 
-            if (i % 1000 === 999) {
+            if (i % 5000 === 4999) {
                 //endTime = window.performance.now();
                 endTime = Date.now();
 
@@ -11468,8 +11483,8 @@ CLOUD.Client.prototype = {
         this.taskManager.addMpkTask(mpkId, item);
     },
 
-    processMpkTasks: function () {
-        this.taskManager.processMpkTasks(this);
+    processMpkTasks: function (onFinished) {
+        this.taskManager.processMpkTasks(this, onFinished);
     },
 
     processSceneTasks: function (renderId) {
@@ -11505,9 +11520,9 @@ CLOUD.Scene = function () {
     var len = CLOUD.GlobalData.SceneSize * 0.5;
     this.innerBoundingBox = new THREE.Box3();
 
-    this.releaseList = [];
-
     this.autoUpdate = false;
+
+    this.garbageCount = 0;
 };
 
 CLOUD.Scene.prototype = Object.create(THREE.Scene.prototype);
@@ -11898,6 +11913,7 @@ CLOUD.Scene.prototype.prepareScene2 = function () {
         camera.inside = this.innerBoundingBox.containsPoint(camera.position);
 
         var scope = this;
+        scope.garbageCount = 0;
 
         function visibleInFrustum(object) {
 
@@ -11937,9 +11953,10 @@ CLOUD.Scene.prototype.prepareScene2 = function () {
                 }
                 else {
 
-                    if (object.visible) {
-                        //scope.releaseList.push(object);
+                    if (object.visible) {                        
                         object.visible = false;
+                        //++scope.garbageCount;
+                        //object.isGarbage = true;
                     }
                 }
             }       
@@ -12022,7 +12039,8 @@ CLOUD.Scene.prototype.prepareScene2 = function () {
                 ++cullCount;
 
                 if (visible) {
-                   // scope.releaseList.push(object);
+                    //object.isGarbage = true;
+                    //++scope.garbageCount;
                 }
             }
 
@@ -12053,7 +12071,8 @@ CLOUD.Scene.prototype.prepareScene = function () {
 
         var scope = this;
 
-        scope.releaseList = [];
+        scope.garbageCount = 0;
+
         //console.time("cull");
         // Cell Cull and LoD
         this.traverseIf(function (object, parent) {
@@ -12070,8 +12089,7 @@ CLOUD.Scene.prototype.prepareScene = function () {
                         object.inFrustum = true;
                     }
                     else {
-                        if (object.inFrustum)
-                            delete object.inFrustum;
+                        object.inFrustum = false;
                     }
 
                     object.update(camera);
@@ -12082,8 +12100,11 @@ CLOUD.Scene.prototype.prepareScene = function () {
 
 
                 if (bVisible && !object.visible) {
-
-                    scope.releaseList.push(object);
+                    object.isGarbage = true;
+                    ++scope.garbageCount;
+                }
+                else {
+                    object.isGarbage = false;
                 }
 
                 return true;
@@ -12098,12 +12119,26 @@ CLOUD.Scene.prototype.prepareScene = function () {
 
 
 CLOUD.Scene.prototype.collectionGarbage = function () {
-    var releaseList = this.releaseList;
-    for (var ii = 0, len = releaseList.length; ii < len; ++ii) {
-        var object = releaseList[ii];
-        object.unload();
-    }
-    this.releaseList = [];
+
+    if (this.garbageCount < 10)
+        return;
+
+    this.traverseIf(function (object, parent) {
+
+        if (object.isGarbage !== undefined) {
+
+            if (object.isGarbage) {
+                object.unload();
+                object.isGarbage = false;
+            }
+
+            return true;
+        }
+
+        return false;
+    });
+
+    this.garbageCount = 0;
 }
 
 CLOUD.Scene.prototype.clearAllSelectedIds = function () {
@@ -12680,21 +12715,25 @@ CLOUD.Cell.prototype.update = function () {
 
         if (!shouldShow) {
             
-            shouldShow = scope.level > (CLOUD.GlobalData.SubSceneVisibleDistance * CLOUD.GlobalData.CellVisibleLOD);
+            //shouldShow = scope.level > (CLOUD.GlobalData.SubSceneVisibleDistance * CLOUD.GlobalData.CellVisibleLOD);
 
-            if (!shouldShow)
+            //if (!shouldShow)
             {
 
                 scope.worldBoundingBox.center(v2);
-                var distance = camera.positionPlane.distanceToPoint(v2);
-                distance = distance * distance;
+                //var distance = camera.positionPlane.distanceToPoint(v2);
+                //distance = distance * distance;
+                var distance = camera.position.distanceToSquared(v2);
+                distance = Math.min(distance * 2, 250000) * 0.001;
 
                 //if (scope.out && !camera.inside) {
                 //    distance = distance * 0.1;
                 //}
 
-                var target = scope.level + CLOUD.GlobalData.SubSceneVisibleDistance;// * CLOUD.GlobalData.SubSceneVisibleLOD;
+                var target = CLOUD.GlobalData.CellVisibleLOD * CLOUD.GlobalData.SubSceneVisibleDistance;
                 shouldShow = distance < target;
+                //if(!shouldShow)
+                //    console.log(distance + " " + target);
             }
         }
 
@@ -12773,8 +12812,10 @@ CLOUD.SubScene.prototype.update = function () {
 
         scope.worldBoundingBox.center(v2);
 
-        distance = camera.positionPlane.distanceToPoint(v2);
-        distance = distance * distance;           
+        var distance = camera.position.distanceToSquared(v2);
+        distance = Math.min(distance * 2, 250000) * 0.001;
+        //distance = camera.positionPlane.distanceToPoint(v2);
+        //distance = distance * distance;           
 
         var lodValue = CLOUD.ObjectLevelLoD[scope.level];
         if (!lodValue) {
@@ -12783,21 +12824,22 @@ CLOUD.SubScene.prototype.update = function () {
         }
             
 
-        var level = lodValue * CLOUD.GlobalData.SubSceneVisibleDistance * CLOUD.GlobalData.SubSceneVisibleLOD;
+        var target = lodValue * CLOUD.GlobalData.SubSceneVisibleDistance * CLOUD.GlobalData.SubSceneVisibleLOD;
 
         if (scope.level == CLOUD.EnumObjectLevel.Tiny) {
-            level = level  * 0.2;
+            target = target * 0.2;
         }
         else if (scope.level == CLOUD.EnumObjectLevel.Small) {
-            level = level * 0.5;
+            target = target * 0.5;
         }
         else {
             //if (scope.out && !camera.inside ) {
             //    level = level * 5;
             //}
+            target = target * 0.8;
         }
 
-        needLoad = distance < level;
+        needLoad = distance < target;
                 
         scope.distance = distance;
  
@@ -12808,7 +12850,7 @@ CLOUD.SubScene.prototype.update = function () {
         else {
 
             this.visible = false;
-
+            //console.log(distance + " " + target);
             //if (CLOUD.GlobalData.DynamicRelease && scope.loaded && distance < scope.level * CLOUD.GlobalData.SubSceneVisibleDistance  * 2) {
             //    this.unload();
             //}
@@ -12947,6 +12989,8 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
     this.pivot = null;
 
     this.movementSpeed = 0.005 * CLOUD.GlobalData.SceneSize; // 移动速度
+    this.defaultMovementSpeed = this.movementSpeed;
+    this.minMovementSpeed = 0.01;
 
     // This option actually enables dollying in and out; left as "zoom" for
     // backwards compatibility
@@ -12965,6 +13009,9 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
     // Set to true to disable this control
     this.noPan = false;
     this.keyPanSpeed = 7.0;	// pixels moved per arrow key push
+    this.defaultKeyPanSpeed = this.keyPanSpeed;
+    this.minKeyPanSpeed = 0.01;
+    //this.movementSpeedMultiplier = 1.0;
 
     // Set to true to automatically rotate around the target
     this.autoRotate = false;
@@ -12987,7 +13034,7 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
 
     // The four arrow keys
     //this.keys = {LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40};
-    this.keys = {ALT:18, BACKSPACE: 8, LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40, A: 65, D: 68, E: 69, Q: 81, S: 83, W: 87};
+    this.keys = {ALT:18, BACKSPACE: 8, LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40, A: 65, D: 68, E: 69, Q: 81, S: 83, W: 87, PLUS: 187, SUB: 189, ZERO:48 };
 
     var scope = this;
     var EPS = 0.000001;
@@ -13890,6 +13937,11 @@ CLOUD.OrbitEditor.prototype.constructor = CLOUD.OrbitEditor;
 CLOUD.OrbitEditor.prototype.onExistEditor = function () {
 };
 
+// 稍后考虑将延迟处理功能移到EditorManager
+//CLOUD.OrbitEditor.prototype.update = function () {
+//    this.cameraEditor.update(true, true);
+//};
+
 CLOUD.OrbitEditor.prototype.delayHandle = function () {
     var camera_scope = this.cameraEditor;
 
@@ -14029,7 +14081,27 @@ CLOUD.OrbitEditor.prototype.onKeyDown = function (event) {
         case camera_scope.keys.ALT:
             this.altHotKey = true;
             break;
+        case camera_scope.keys.ZERO:
+            camera_scope.keyPanSpeed = camera_scope.defaultKeyPanSpeed;
+            camera_scope.movementSpeed = camera_scope.defaultMovementSpeed;
+            break;
+        case camera_scope.keys.PLUS:
+            camera_scope.keyPanSpeed *= 1.1;
+            camera_scope.movementSpeed *= 1.1;
+            break;
+        case camera_scope.keys.SUB:
+            camera_scope.keyPanSpeed *= 0.9;
 
+            if (camera_scope.keyPanSpeed < camera_scope.minKeyPanSpeed) {
+                camera_scope.keyPanSpeed = this.minKeyPanSpeed;
+            }
+
+            camera_scope.movementSpeed *= 0.9;
+
+            if (camera_scope.movementSpeed < camera_scope.minMovementSpeed) {
+                camera_scope.movementSpeed = this.minMovementSpeed;
+            }
+            break;
         case camera_scope.keys.Q:
             camera_scope.beginPan();
             camera_scope.pan(0, camera_scope.keyPanSpeed);
@@ -14999,14 +15071,18 @@ CLOUD.FlyEditor = function (cameraEditor, scene, domElement) {
 
     // API
     this.movementSpeed = 0.005 * CLOUD.GlobalData.SceneSize; // 移动速度
+    this.defaultMovementSpeed = this.movementSpeed;
+    this.minMovementSpeed = 0.001;
     this.movementSpeedMultiplier = 1; // 速度放大器
+
     this.lookSpeed = 0.001; // 相机观察速度
+
     this.constrainPitch = true; // 是否限制仰角
     // 仰角范围[-85, 175]
     this.pitchMin = THREE.Math.degToRad(5) - 0.5 * Math.PI; // 仰角最小值
     this.pitchMax = 0.5 * Math.PI - this.pitchMin; // 仰角最大值
-
     this.pitchDeltaTotal = 0;
+
     this.MoveDirection = {
         NONE: 0,
         UP: 0x0001,
@@ -15016,12 +15092,12 @@ CLOUD.FlyEditor = function (cameraEditor, scene, domElement) {
         FORWARD: 0x0010,
         BACK: 0x0020
     };
-
     this.moveState = this.MoveDirection.NONE;
 
     this.isFirstPerson = true; // 第一人称视角
     this.deltaYaw = 0.0;
     this.deltaPitch = 0.0;
+    this.deltaWheel = 0;
 
     // 保存旋转点
     this.rotateStart = new THREE.Vector2();
@@ -15030,12 +15106,15 @@ CLOUD.FlyEditor = function (cameraEditor, scene, domElement) {
 
     this.timeoutId = null;
 
+    this.isLockCameraHeight = true;
+    this.lockCameraHeight = 0;
+
     //this.clock = new THREE.Clock();
 
     var scope = this;
 
     this.ui = new CLOUD.FlyEditorUI(this.domElement, function (speedMultiplier) {
-        scope.movementSpeedMultiplier = speedMultiplier;
+        //scope.movementSpeedMultiplier = speedMultiplier;
     });
     // 初始化方向控制器
     this.ui.initCross();
@@ -15048,13 +15127,14 @@ CLOUD.FlyEditor.prototype = {
             this[event.type](event);
         }
     },
-
-    delayHandle: function() {
+    delayHandle: function () {
         var scope = this;
 
         function handle() {
             scope.cameraEditor.viewer.editorManager.isUpdateRenderList = true;
-            scope.update();
+            //scope.update();
+            // 最后一帧只需刷新数据
+            scope.cameraEditor.flyOnWorld();
         }
 
         if (this.timeoutId) {
@@ -15082,6 +15162,18 @@ CLOUD.FlyEditor.prototype = {
 
         var moveDirection = this.MoveDirection.NONE;
         switch (event.keyCode) {
+            case 48: /* 0 - 恢复速度 */
+                this.movementSpeed = this.defaultMovementSpeed;
+                break;
+            case 187: /* 等号&加号 - 加速*/
+                this.movementSpeed *= 1.1;
+                break;
+            case 189: /* 破折号&减号 - 减速*/
+                this.movementSpeed *= 0.9;
+                if (this.movementSpeed < this.minMovementSpeed){
+                    this.movementSpeed = this.minMovementSpeed;
+                }
+                break;
             case 38: /*up - 前进*/
             case 87: /*W - 前进*/
                 moveDirection = this.MoveDirection.FORWARD;
@@ -15152,6 +15244,7 @@ CLOUD.FlyEditor.prototype = {
     },
 
     onMouseDown: function (event) {
+
         if (this.domElement !== document) {
             this.domElement.focus();
         }
@@ -15159,24 +15252,44 @@ CLOUD.FlyEditor.prototype = {
         event.preventDefault();
         event.stopPropagation();
 
-        // 设置旋转起点
-        this.rotateStart.set(event.clientX, event.clientY);
+        if (event.button === THREE.MOUSE.LEFT) {
+            // 设置旋转起点
+            this.rotateStart.set(event.clientX, event.clientY);
+
+        } else if (event.button === THREE.MOUSE.RIGHT) {
+            //this.cameraEditor.beginPan(event.clientX, event.clientY);
+            this.cameraEditor.beginPan(event.clientX, event.clientY);
+
+            if (this.isLockCameraHeight) {
+                this.lockCameraHeight = event.clientY;
+            }
+        }
 
         return true;
     },
 
     onMouseMove: function (event) {
 
-        this.rotateEnd.set(event.clientX, event.clientY);
-        this.rotateDelta.subVectors(this.rotateEnd, this.rotateStart);
-        this.rotateStart.copy(this.rotateEnd);
+        if (event.button === THREE.MOUSE.LEFT) {
 
-        if (this.rotateDelta.x != 0 || this.rotateDelta.y != 0) {
+            this.rotateEnd.set(event.clientX, event.clientY);
+            this.rotateDelta.subVectors(this.rotateEnd, this.rotateStart);
+            this.rotateStart.copy(this.rotateEnd);
 
-            this.deltaYaw += this.rotateDelta.x * this.lookSpeed;
-            this.deltaPitch += this.rotateDelta.y * this.lookSpeed;
+            if (this.rotateDelta.x != 0 || this.rotateDelta.y != 0) {
 
-            this.update();
+                this.deltaYaw += this.rotateDelta.x * this.lookSpeed;
+                this.deltaPitch += this.rotateDelta.y * this.lookSpeed;
+
+                this.update();
+            }
+        } else if (event.button === THREE.MOUSE.RIGHT) {
+
+            if (this.isLockCameraHeight) {
+                this.cameraEditor.process(event.clientX, this.lockCameraHeight, true);
+            } else {
+                this.cameraEditor.process(event.clientX, event.clientY, true);
+            }
         }
     },
 
@@ -15184,20 +15297,39 @@ CLOUD.FlyEditor.prototype = {
         event.preventDefault();
         event.stopPropagation();
 
-        this.rotateDelta.set(0, 0);
-        this.deltaYaw = 0;
-        this.deltaPitch = 0;
+        if (event.button === THREE.MOUSE.LEFT) {
 
-        this.update();
+            this.rotateDelta.set(0, 0);
+            this.deltaYaw = 0;
+            this.deltaPitch = 0;
+            this.update();
+
+        } else if (event.button === THREE.MOUSE.RIGHT) {
+
+            if (this.isLockCameraHeight) {
+                this.cameraEditor.process(event.clientX, this.lockCameraHeight, true);
+            } else {
+                this.cameraEditor.process(event.clientX, event.clientY, true);
+            }
+
+            this.cameraEditor.endOperation();
+        }
+
         return true;
     },
 
     onMouseWheel: function (event) {
         // 鼠标滚轮控制运动速度
 
+        //滚轮操作在浏览器中要考虑兼容性
+        // 五大浏览器（IE、Opera、Safari、Firefox、Chrome）中Firefox 使用detail，其余四类使用wheelDelta；
+        //两者只在取值上不一致，代表含义一致，detail与wheelDelta只各取两个值，detail只取±3，wheelDelta只取±120，其中正数表示为向上，负数表示向下。
         var delta = 0 || event.wheelDelta || event.detail;
-        delta = (Math.abs(delta) > 10 ? delta : -delta * 40);
-        this.movementSpeedMultiplier = this.ui.changeMoveSpeed(delta, this.movementSpeedMultiplier);
+        delta = Math.abs(delta) > 10 ? delta : -delta * 40;
+        this.deltaWheel = delta / 40;
+
+        this.delayHandle();
+        this.update();
     },
 
     update: function () {
@@ -15219,6 +15351,13 @@ CLOUD.FlyEditor.prototype = {
         var position = camera.position;
         var target = this.cameraEditor.target;
         var eye = target.clone().sub(position);
+
+        // 滚轮缩放
+        if (this.deltaWheel) {
+            var wheelMoveSpeed = this.defaultMovementSpeed * this.deltaWheel;
+            this.goForward(wheelMoveSpeed);
+            this.deltaWheel = 0;
+        }
 
         // 前进
         if (this.moveState & this.MoveDirection.FORWARD) {
@@ -15719,7 +15858,10 @@ CLOUD.Filter = function () {
 
     var overridedMaterials = {};
     overridedMaterials.selection = CLOUD.MaterialUtil.createHilightMaterial();
-    overridedMaterials.scene = CLOUD.MaterialUtil.createPhongMaterial({ color: 0x888888, opacity: 0.3, transparent: true, side:THREE.DoubleSide });
+    overridedMaterials.scene = CLOUD.MaterialUtil.createPhongMaterial({ color: 0x888888, opacity: 0.3, transparent: true, side: THREE.DoubleSide });
+    overridedMaterials.darkRed = CLOUD.MaterialUtil.createPhongMaterial({color: 0xA02828, opacity: 1, transparent: false, side: THREE.DoubleSide });
+    overridedMaterials.lightBlue = CLOUD.MaterialUtil.createPhongMaterial({ color: 0x1377C0, opacity: 1, transparent: false, side: THREE.DoubleSide });
+    overridedMaterials.black = CLOUD.MaterialUtil.createPhongMaterial({ color: 0x0, opacity: 0.3, transparent: true, side: THREE.DoubleSide });
 
     var materialOverriderByUserId = {};
 
@@ -16109,6 +16251,583 @@ CLOUD.Filter = function () {
         return !hasSelection();
     }
 };
+
+/**
+ * 暂时用于处理检查点
+ *
+ */
+CLOUD.Marker = function (id, editor) {
+
+    this.id = id;
+    this.editor = editor;
+    this.worldPosition = new THREE.Vector3();
+    this.worldBoundingBox = new THREE.Box3();
+    this.clientPosition = new THREE.Vector2();
+    this.size = new THREE.Vector2();
+    this.selected = false;
+    this.userId = "";
+    this.borderColor = "#fffaff";
+    this.svgShape = null;
+    this.shapeTypes = {pin: 0, bubble: 1};
+    this.state = 0;
+    this.shapeOriOffset = {offsetX : 0, offsetY: 0}; // 屏幕坐标顶点在左上角
+};
+
+CLOUD.Marker.prototype = {
+    constructor: CLOUD.Marker,
+    onMouseDown: function () {
+
+    },
+    destroy:function() {
+        this.setParent(null);
+    },
+    setUserId: function(id) {
+        this.userId = id;
+    },
+    setParent: function (parent) {
+
+        if (this.svgShape) {
+            var element = this.svgShape;
+
+            if(element.parentNode){
+                element.parentNode.removeChild(element);
+            }
+
+            if(parent){
+                parent.appendChild(element);
+            }
+        }
+    },
+    setWorldPosition: function (pos) {
+        this.worldPosition.set(pos.x, pos.y, pos.z);
+    },
+    setClientPostion: function (pos) {
+        this.clientPosition.set(pos.x, pos.y);
+    },
+    setWorldBoundingBox:function(box) {
+        this.worldBoundingBox.copy(box);
+    },
+    getWorldBoundingBox: function(){
+        return this.worldBoundingBox;
+    },
+    setState:function(state) {
+      this.state = state;
+    },
+    setSize: function ( width, height) {
+        this.size.set(width, height);
+    },
+    createPinShape: function(fillColor, strokeColor) {
+
+        //var path = "m21.13861,6.59583c0.12562,-0.43852 0.13677,-1.15678 0.0254,-1.59779l-0.36852,-1.45603c-0.11135,-0.441 -0.60654,-0.86506 -1.10105,-0.94223l-3.39636,-0.52882c-0.49415,-0.07717 -1.30358,-0.07465 -1.79704,0.00563l-3.67894,0.59721c-0.49451,0.08029 -1.30357,0.08844 -1.79981,0.01882l-3.59961,-0.50564c0.00452,0.01568 0.01253,0.0295 0.01636,0.04519l2.46376,10.55033l1.1275,0.17563c0.49449,0.07718 1.30286,0.07403 1.79737,-0.00562l3.67789,-0.59784c0.49346,-0.07966 1.30358,-0.08781 1.79982,-0.0182l3.94932,0.5552c0.49624,0.06961 0.8265,-0.23653 0.736,-0.68191l-0.44228,-2.15799c-0.09118,-0.44479 -0.06301,-1.16683 0.06193,-1.60535l0.52826,-1.85059l0,0zm-17.67267,-4.82849c-0.49379,0.09408 -0.80942,0.52881 -0.70537,0.97296l5.25743,22.51152l1.86349,0l-5.33469,-22.84839c-0.10579,-0.44604 -0.58845,-0.73021 -1.08086,-0.63609l0,0z";
+        var path = "M0 0 L0 -25 L20 -16 L4 -8.8 L4 0Z";
+
+        var shape = this.editor.makeSVG("path", {
+            x: "0",
+            y: "0",
+            d: path,
+            fill: fillColor,
+            stroke: strokeColor,
+            "stroke-width": "2"
+        });
+
+        shape.setAttribute('transform', 'translate(0, 32)');
+
+        // 以图形左下角点为基准，则需要移动元素，移动偏移量
+        this.shapeOriOffset.offsetX = 0;
+        this.shapeOriOffset.offsetY = -32;
+
+        return shape;
+    },
+    createBubbleShape: function(fillColor, strokeColor) {
+
+        //var path = "m12.25,0.75c-5.7988,0 -10.5,3.80087 -10.5,8.48913c0,4.6894 10.5,20.51087 10.5,20.51087s10.5,-15.82148 10.5,-20.51087c0,-4.68826 -4.6998,-8.48913 -10.5,-8.48913z";
+        var path = "m-3.74999,-31.25c-6.35107,0 -11.50001,4.06299 -11.50001,9.07458c0,5.0128 11.50001,21.9254 11.50001,21.9254s11.50001,-16.9126 11.50001,-21.9254c0,-5.01159 -5.1474,-9.07458 -11.50001,-9.07458z";
+        var shape = this.editor.makeSVG("path", {
+            x: "0",
+            y: "0",
+            d: path,
+            fill: fillColor,
+            stroke: strokeColor,
+            "stroke-width": "2"
+        });
+
+        shape.setAttribute('transform', 'translate(16, 32)');
+
+        this.shapeOriOffset.offsetX = -16;
+        this.shapeOriOffset.offsetY = -32;
+
+        return shape;
+    },
+    createSVGShape: function (sharpData, svgContainer) {
+
+        var svgElem = this.svgShape = this.editor.makeSVG("svg", {viewBox: "0 0 32 32", width: "32", height: "32"});
+        svgElem.style.position = "absolute";
+        svgElem.style.display = "block";
+
+        //var group = this.makeSVG("g", {x: "0", y: "0", transform: "translate("+sharpData.left+", "+sharpData.top+")"});
+        //var group = this.editor.makeSVG("g", {x: "0", y: "0"});
+
+        var fillColor = sharpData.fillColor;
+        var strokeColor = this.borderColor;
+
+        var shape;
+        if (sharpData.type === this.shapeTypes.pin) {
+            shape = this.createPinShape(fillColor, strokeColor);
+        }else {
+            shape = this.createBubbleShape(fillColor, strokeColor);
+        }
+
+        //this.svgShape = shape;
+        //group.appendChild(shape);
+
+        svgElem.appendChild(shape);
+
+        svgContainer.appendChild(svgElem);
+    },
+    updateTransformMatrix: function () {
+
+    },
+
+    updateStyle: function () {
+
+        //this.svgShape.style.left = this.clientPosition.x - 15;
+        //this.svgShape.style.top = this.clientPosition.y - 30;
+
+        this.svgShape.style.left = this.clientPosition.x + this.shapeOriOffset.offsetX;
+        this.svgShape.style.top = this.clientPosition.y + this.shapeOriOffset.offsetY;
+    }
+};
+
+CLOUD.MarkerEditor = function (cameraEditor, scene, domElement) {
+    "use strict";
+
+    CLOUD.OrbitEditor.call(this, cameraEditor, scene, domElement);
+
+    this.markers = [];
+
+    //this.selectedMarker = null;
+    //this.bounds = {x: 0, y: 0, width: 0, height: 0};
+
+    // 隐患待整改：红色
+    // 隐患已整改：黄色
+    // 隐患已关闭：绿色
+    // size: 22 * 27
+    this.pinColorSelector = {red: "#ff2129", green: "#85af03", yellow:"#fe9829"};
+    // 有隐患：红色
+    // 无隐患：绿色
+    // 过程验收点、开业验收点的未检出：灰色
+    this.bubbleColorSelector = {red: "#f92a24", green: "#86b507", gray:"#fffaff"};
+    this.markerType = 0;
+    this.markerColor = this.pinColorSelector.red;
+    this.markerState = 0;
+    this.isEditing = false;
+};
+
+CLOUD.MarkerEditor.prototype = Object.create(CLOUD.OrbitEditor.prototype);
+CLOUD.MarkerEditor.prototype.constructor = CLOUD.MarkerEditor;
+
+CLOUD.MarkerEditor.prototype.init = function() {
+
+    //if (!this.svg) {
+    //    this.svg = this.createSvgElement('svg');
+    //    this.svg.style.position = "absolute";
+    //    this.svg.style.display = "block";
+    //
+    //    var dim = CLOUD.DomUtil.getContainerOffsetToClient(this.domElement);
+    //
+    //    var svgContainer = document.body;
+    //    //var rect = svgContainer.getBoundingClientRect();
+    //
+    //    var svgWidth = dim.width;
+    //    var svgHeight = dim.height;
+    //    this.svg.setAttribute('viewBox', '0 0 ' + svgWidth + ' ' + svgHeight);
+    //    this.svg.setAttribute('width', svgWidth);
+    //    this.svg.setAttribute('height', svgHeight);
+    //
+    //    svgContainer.appendChild(this.svg);
+    //}
+};
+
+CLOUD.MarkerEditor.prototype.uninit = function() {
+
+    //if (!this.svg) return;
+    //
+    //var svg = this.svg;
+    //
+    //if (svg.parentNode) {
+    //    svg.parentNode.removeChild(svg);
+    //}
+    //
+    //this.svgGroup = null;
+    //this.svg = null;
+};
+
+CLOUD.MarkerEditor.prototype.onExistEditor = function () {
+
+    this.uninit();
+};
+
+CLOUD.MarkerEditor.prototype.onMouseUp = function(event) {
+    var cameraEditor = this.cameraEditor;
+
+    if (cameraEditor.enabled === false)
+        return;
+
+    event.preventDefault();
+
+    if (this.oldMouseX == event.clientX && this.oldMouseY == event.clientY) {
+
+        this.isMouseClick = true;
+
+        if (event.button === THREE.MOUSE.LEFT) {
+            var scope = this;
+            var normalizedVec = cameraEditor.mapWindowToViewport(event.clientX, event.clientY);
+            var dim = CLOUD.DomUtil.getContainerOffsetToClient(this.domElement);
+
+            scope.scene.pick(normalizedVec, cameraEditor.object, function (intersect) {
+
+                if (intersect) {
+
+                    var userId = "";
+                    userId = intersect.userId || userId;
+
+                    if (userId === "") return;
+
+                    var svgContainer = scope.domElement;
+                    var shapeData = {
+                        x: "0",
+                        y: "0",
+                        //label: "",
+                        type : scope.markerType,
+                        fillColor: scope.markerColor
+                    };
+
+                    var bBox = intersect.object.boundingBox;
+
+                    if (!bBox) {
+                        intersect.object.geometry.computeBoundingBox();
+                        bBox = intersect.object.geometry.boundingBox;
+                    }
+
+                    var markerId = scope.generateMarkerId();
+
+                    //console.log(markerId);
+                    var marker = new CLOUD.Marker(markerId, scope);
+
+                    marker.createSVGShape(shapeData, svgContainer);
+                    marker.setWorldPosition(intersect.point);
+                    marker.setWorldBoundingBox(bBox);
+                    marker.setUserId(userId);
+                    marker.setState(scope.markerState);
+                    marker.setClientPostion({x: event.clientX - dim.left, y: event.clientY - dim.top});
+                    marker.updateStyle();
+                    //marker.setParent(scope.svgGroup);
+                    scope.addMarker(marker);
+                }
+            });
+        }
+    }
+};
+
+CLOUD.MarkerEditor.prototype.onMouseMove = function(event) {
+
+    CLOUD.OrbitEditor.prototype.onMouseMove.call(this, event);
+
+    this.update();
+};
+
+CLOUD.MarkerEditor.prototype.onMouseWheel = function (event) {
+
+    CLOUD.OrbitEditor.prototype.onMouseWheel.call(this, event);
+    this.update();
+};
+
+CLOUD.MarkerEditor.prototype.update = function() {
+
+    for (var i = 0, len = this.markers.length; i < len; i++) {
+        var marker = this.markers[i];
+        var pos = this.worldToClient(marker.worldPosition);
+        marker.setClientPostion(pos);
+        marker.updateStyle();
+    }
+};
+
+CLOUD.MarkerEditor.prototype.beginEdit = function() {
+
+    if (this.isEditing) {
+        return true;
+    }
+
+    //if (!this.svgGroup) {
+    //    this.svgGroup = this.createSvgElement('g');
+    //}
+    //
+    //this.svg.insertBefore(this.svgGroup, this.svg.firstChild);
+
+    this.clear();
+
+    this.isEditing = true;
+};
+
+CLOUD.MarkerEditor.prototype.endEdit = function() {
+    this.isEditing = false;
+
+    //this.svg.removeChild(this.svgGroup);
+};
+
+//CLOUD.MarkerEditor.prototype.generateMarkerId = (function () {
+//
+//    var value = 0;
+//
+//    return function () {
+//        return ++value;
+//    };
+//})();
+
+CLOUD.MarkerEditor.prototype.generateMarkerId = function () {
+
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+    });
+};
+
+CLOUD.MarkerEditor.prototype.clear = function() {
+
+    var markers = this.markers;
+
+    while (markers.length) {
+        var marker = markers[0];
+        this.removeMarker(marker);
+        marker.destroy();
+    }
+
+    //var svg = this.svgGroup;
+    //if (svg && svg.childNodes.length > 0) {
+    //    while (svg.childNodes.length) {
+    //        svg.removeChild(svg.childNodes[0]);
+    //    }
+    //}
+};
+
+CLOUD.MarkerEditor.prototype.getMarker = function (id) {
+
+    for (var i = 0, len = this.markers.length; i < len; ++i) {
+        if (this.markers[i].id == id) {
+            return this.markers[i];
+        }
+    }
+
+    return null;
+};
+
+CLOUD.MarkerEditor.prototype.addMarker = function(marker) {
+    this.markers.push(marker);
+};
+
+CLOUD.MarkerEditor.prototype.removeMarker = function(marker) {
+
+    var idx = this.markers.indexOf(marker);
+
+    if (idx !== -1) {
+        this.markers.splice(idx, 1);
+    }
+};
+
+CLOUD.MarkerEditor.prototype.loadMarkers = function(markerInfoList) {
+
+    this.clear();
+
+    var svgContainer = this.domElement;
+
+    var currMarkerState = this.markerState;
+
+    for (var i = 0, len = markerInfoList.length; i < len; i++) {
+        var info = markerInfoList[i];
+
+        var markerState = info.state;
+
+        this.setMarkerState(markerState);
+
+        var shapeData = {
+            x: "0",
+            y: "0",
+            //label: "",
+            type : this.markerType,
+            fillColor: this.markerColor
+        };
+
+        var markerId = info.id;
+        var marker = new CLOUD.Marker(markerId, this);
+
+        marker.createSVGShape(shapeData, svgContainer);
+        marker.setWorldPosition(info.position);
+        marker.setWorldBoundingBox(info.bBox);
+        marker.setUserId(info.userId);
+        marker.setState(info.state);
+
+        var pos = this.worldToClient(info.position);
+        marker.setClientPostion(pos);
+        marker.updateStyle();
+        //marker.setParent(scope.svgGroup);
+        this.addMarker(marker);
+    }
+
+    this.markerState = currMarkerState;
+    this.setMarkerState(currMarkerState);
+};
+
+CLOUD.MarkerEditor.prototype.getMarkerInfoList = function() {
+
+    var markerInfoList = [];
+
+    for (var i = 0, len = this.markers.length; i < len; i++) {
+        var marker = this.markers[i];
+
+        var info = {
+            id: marker.id,
+            userId: marker.userId,
+            state : marker.state,
+            position: marker.worldPosition.clone(),
+            bBox: marker.worldBoundingBox.clone()
+        };
+
+        markerInfoList.push(info);
+    }
+
+    return markerInfoList;
+};
+
+CLOUD.MarkerEditor.prototype.worldToClient = function(point) {
+
+    var dim = CLOUD.DomUtil.getContainerOffsetToClient(this.domElement);
+    var camera = this.cameraEditor.object;
+    var result = new THREE.Vector3();
+
+    result.set(point.x, point.y, point.z);
+    result.project(camera);
+
+    //result.x =  Math.round(0.5 * (result.x + 1) * dim.width + dim.left);
+    //result.y =  Math.round(-0.5 * (result.y - 1) * dim.height + dim.top);
+    result.x =  Math.round(0.5 * (result.x + 1) * dim.width);
+    result.y =  Math.round(-0.5 * (result.y - 1) * dim.height);
+    result.z = 0;
+
+    return result;
+};
+
+CLOUD.MarkerEditor.prototype.clientToWorld = function(point, depth) {
+
+    var dim = CLOUD.DomUtil.getContainerOffsetToClient(this.domElement);
+    var camera = this.cameraEditor.object;
+    var result = new THREE.Vector3();
+
+    //result.x = (point.x - dim.left) / dim.width * 2 - 1;
+    //result.y = -((point.y - dim.top) / dim.height) * 2 + 1;
+    result.x = (point.x) / dim.width * 2 - 1;
+    result.y = -((point.y) / dim.height) * 2 + 1;
+    result.z = depth;
+
+    result.unproject(camera);
+
+    return result;
+};
+
+CLOUD.MarkerEditor.prototype.makeSVG = function() {
+    var xmlns = "http://www.w3.org/2000/svg";
+    var xlinkns = "http://www.w3.org/1999/xlink";
+    var attrMap = {
+        "className": "class",
+        "svgHref": "href"
+    };
+    var nsMap = {
+        "svgHref": xlinkns
+    };
+
+    return function (tag, attributes) {
+
+        var elem = document.createElementNS(xmlns, tag);
+
+        for (var attribute in attributes) {
+
+            var name = (attribute in attrMap ? attrMap[attribute] : attribute);
+            var value = attributes[attribute];
+
+            if (attribute in nsMap)
+                elem.setAttributeNS(nsMap[attribute], name, value);
+            else
+                elem.setAttribute(name, value);
+        }
+
+        return elem;
+    }
+}();
+
+CLOUD.MarkerEditor.prototype.createSvgElement = function(type) {
+
+    var xmlns = 'http://www.w3.org/2000/svg';
+    var svg = document.createElementNS(xmlns, type);
+    svg.setAttribute('pointer-events', 'inherit');
+
+    return svg;
+};
+
+CLOUD.MarkerEditor.prototype.calcBoundingBox = function() {
+
+    if (this.markers.length < 1) return null;
+
+    var bBox = new THREE.Box3();
+
+    for (var i = 0, len = this.markers.length; i < len; i++) {
+        var marker = this.markers[i];
+        bBox.union(marker.getWorldBoundingBox());
+    }
+
+    return bBox;
+};
+
+CLOUD.MarkerEditor.prototype.setMarkerState = function(state) {
+
+    if (state < 0 && state > 5) {
+        state = 0;
+    }
+
+    switch (state) {
+        case 0:
+            this.markerType = 0;
+            this.markerColor = this.pinColorSelector.red;
+            break;
+        case 1:
+            this.markerType = 0;
+            this.markerColor = this.pinColorSelector.green;
+            break;
+        case 2:
+            this.markerType = 0;
+            this.markerColor = this.pinColorSelector.yellow;
+            break;
+        case 3:
+            this.markerType = 1;
+            this.markerColor = this.bubbleColorSelector.red;
+            break;
+        case 4:
+            this.markerType = 1;
+            this.markerColor = this.bubbleColorSelector.green;
+            break;
+        case 5:
+            this.markerType = 1;
+            this.markerColor = this.bubbleColorSelector.gray;
+            break;
+        default:
+            this.markerType = 0;
+            this.markerColor = this.pinColorSelector.red;
+            break;
+    }
+
+    this.markerState = state;
+};
+
+
+
 /*global ArrayBuffer, Uint32Array, Int32Array, Float32Array, Int8Array, Uint8Array, window, performance, Console*/
 
 /*
@@ -21208,10 +21927,51 @@ CLOUD.SceneLoader.prototype = {
             }
         };
 
+       
+        // load mpks
+        if (data.mpks) {
 
-        handle_children(localRoot, data.objects, 0);
-        // just in case there are no async elements
-        async_callback_gate();
+            var len = data.mpks.length;
+            for (var ii = 0, len = data.mpks.length; ii < len; ++ii) {
+                client.addDelayLoadMesh(data.mpks[ii], null);
+            }
+            
+
+            var loaded = false;
+            total_models += len;
+            client.processMpkTasks(function (curIdx, allCount) {
+
+                if (curIdx !== undefined && notifyProgress) {
+
+                    var loadedCount = allCount - curIdx;
+                    var progress = {
+                        total: total_models,
+                        loaded: loadedCount
+                    };
+
+                    scope.manager.dispatchEvent({ type: CLOUD.EVENTS.ON_LOAD_PROGRESS, progress: progress });
+                }
+
+                if (curIdx === 0) {
+
+                    if (!loaded) {
+                        counter_models = total_models;
+                        counter_models -= len;
+                        loaded = true;
+                        handle_children(localRoot, data.objects, 0);
+                        async_callback_gate();
+                    }
+                }
+
+            });
+  
+        }
+        else {
+            handle_children(localRoot, data.objects, 0);
+            async_callback_gate();
+        }
+
+
     }
 }
 /**
@@ -21259,7 +22019,7 @@ CLOUD.IndexLoader.prototype = {
                 //CLOUD.GlobalData.MinBoxSize.x = 0.05 / rootNode.scale.x;
                 //CLOUD.GlobalData.MinBoxSize.y = 0.05 / rootNode.scale.y;
                 //CLOUD.GlobalData.MinBoxSize.z = 0.05 / rootNode.scale.z;
-                CLOUD.GlobalData.SubSceneVisibleDistance = 1000 * rootNode.scale.x;
+                CLOUD.GlobalData.SubSceneVisibleDistance = CLOUD.GlobalData.LengthUnitScale * rootNode.scale.x;
                 console.log(CLOUD.GlobalData.SubSceneVisibleDistance);
             }
 
@@ -21558,6 +22318,8 @@ CLOUD.MpkNodeTaskWorker = function (threadCount) {
     this.todoList = {};
     this.doingCount = 0;
 
+    this.listners = [];
+
     this.addItem = function (mpkId, item) {
         
         if (mpkId === undefined) {
@@ -21573,10 +22335,13 @@ CLOUD.MpkNodeTaskWorker = function (threadCount) {
 
     };
 
-    this.run = function (loader) {
+    this.run = function (loader, onFinished) {
 
-        if (this.doingCount > 0)
+        if (this.doingCount > 0) {            
+            this.listners.push(onFinished);
             return;
+        }
+            
 
         var doingList = this.todoList;
         this.todoList = {};
@@ -21589,30 +22354,45 @@ CLOUD.MpkNodeTaskWorker = function (threadCount) {
 
         var scope = this;
         var itemCount = items.length;
-        if (itemCount == 0)
+        if (itemCount == 0) {
+            onFinished();
             return;
+        }
+            
+        var doingListners = this.listners;
+        this.listners = [];
 
         scope.doingCount = itemCount;
  
 
         var TASK_COUNT = Math.min(this.MaxThreadCount, itemCount);
-        scope.doingCount = TASK_COUNT;
+        scope.doingCount = itemCount;
         function processItem(i) {
 
             if (i >= itemCount) {
-
+                
                 if (scope.doingCount < 1) {
                     // next loop
-                    scope.run(loader);
+                    onFinished(0, itemCount);
+
+                    for (var ii = 0, len = doingListners.length; ii < len; ++ii) {
+                        doingListners[ii](0, itemCount);
+                    }
+
+                    scope.run(loader, function () { });                   
+                }
+                else {
+                    onFinished(scope.doingCount, itemCount);
                 }
                     
                 return;
             }
 
-            
+            if (i >= TASK_COUNT)
+                onFinished(scope.doingCount, itemCount);
 
             var mpkId = items[i];
-
+            //console.log(mpkId);
             loader(mpkId, doingList[mpkId], i + TASK_COUNT, processItem);
         };
 
@@ -21708,11 +22488,14 @@ CLOUD.TaskManager.prototype = {
         worker.run(mpkItems, loadRawData, onFinished);
     },
 
-    processMpkTasks: function (client) {
+    processMpkTasks: function (client, finishCallback) {
 
         var scope = this;
 
         function on_load_mesh(client, item) {
+
+            if (item === null)
+                return;
 
             var mesh = client.cache.geometries[item.meshNode.meshId];
             if (mesh) {
@@ -21722,23 +22505,25 @@ CLOUD.TaskManager.prototype = {
                 console.log("err: " + item + " may be in other mpk");
             }
         };
-        this.mpkWorker.run(function (mpkId, items, nextIdx, callback) {
+
+        function loader(mpkId, items, nextIdx, callback) {
 
             scope.manager.loadMpk(mpkId, client, function () {
-
                 if (items == undefined)
                     console.log("error");
-
-
+     
                 for (var ii = 0, len = items.length; ii < len; ++ii) {
                     on_load_mesh(client, items[ii]);
                 }
-                            
+    
+                           
                 --scope.mpkWorker.doingCount;
                 // next task
                 callback(nextIdx);
             });
-        });
+        }
+
+        this.mpkWorker.run(loader, finishCallback || function () { });
 
     },
 
@@ -21828,6 +22613,9 @@ CLOUD.ModelManager = function () {
     this.triangleCount = 0;
 
     this.loading = false;
+
+    this.lightOffset = new THREE.Vector3(-1, -1, -1);
+    this.lightOffset.normalize();
 };
 
 CLOUD.ModelManager.prototype = Object.create(THREE.LoadingManager.prototype);
@@ -21836,17 +22624,13 @@ CLOUD.ModelManager.prototype.constructor = CLOUD.ModelManager;
 
 CLOUD.ModelManager.prototype.updateLights = function (camera) {
 
-    var dir = camera.getWorldDirection().clone();
-    dir.normalize();
-    dir.multiplyScalar(-1);
-    this.headLamp.position.copy(dir);
-    this.headLamp.updateMatrixWorld(true);
+    var headLamp = this.headLamp;
+    headLamp.position.copy(camera.getWorldDirection()).multiplyScalar(-1);
+    headLamp.updateMatrixWorld(true);
 
-    var offset = new THREE.Vector3(-2.0, -1.5, -0.5);
-    offset.normalize();
-    dir.add(offset).normalize();
-    this.assistLamp.position.copy(dir);
-    this.assistLamp.updateMatrixWorld();
+    var assistLamp = this.assistLamp;
+    assistLamp.position.copy(headLamp.position).add(this.lightOffset).normalize();
+    assistLamp.updateMatrixWorld();
 };
 
 CLOUD.ModelManager.prototype.prepareScene = function (camera, renderId) {
@@ -22273,6 +23057,18 @@ CLOUD.EditorManager.prototype = {
         return false;
     },
 
+    setMarkerMode: function (viewer) {
+        var scope = this;
+
+        if(this.markerEditor === undefined){
+            this.markerEditor = new CLOUD.MarkerEditor(viewer.cameraEditor, viewer.getScene(), viewer.domElement);
+        }
+
+        this.markerEditor.init();
+
+        scope.setEditor(this.markerEditor);
+    },
+
     zoomIn: function (factor, viewer) {
         //if(factor === undefined){
         //    factor = viewer.camera.zoom * 1.1;
@@ -22386,6 +23182,7 @@ CloudViewer = function () {
     this.miniMaps = {};
     this.defaultMiniMap = null;
 
+    this.tmpBox = new THREE.Box3();
     var scope = this;
 
     function initializeView() {
@@ -22543,7 +23340,7 @@ CloudViewer.prototype = {
         // reducing z-fighting by dynamically adjust near/far
         if (scene.rootNode.boundingBox != null) {
 
-            var box = new THREE.Box3();
+            var box = this.tmpBox;
             box.copy(scene.rootNode.boundingBox);
             box.applyMatrix4(scene.rootNode.matrix);
 
@@ -22552,12 +23349,22 @@ CloudViewer.prototype = {
 
             var newPos = position.clone().sub(target);
             var length = newPos.length();
-            var delta = 0.001;
-            var Znear = (length * length + length * delta) / ((1 << 24) * delta);
-
-            this.camera.cameraP.near = Znear;
-            this.camera.cameraP.far = length + CLOUD.GlobalData.SceneSize * 0.5;
+            if (length > 200.0) {
+                var delta = 0.001;
+                var Znear = (length * length + length * delta) / ((1 << 24) * delta);
+                this.camera.cameraP.near = Znear;
+                //CLOUD.GlobalData.SceneSize * 10.0
+                this.camera.cameraP.far = length + 10000.0;
+            }
+            else {
+                this.camera.cameraP.near = 1.0;
+                //CLOUD.GlobalData.SceneSize * 20.0
+                this.camera.cameraP.far = 20000.0;
+            }
             this.camera.cameraP.updateProjectionMatrix();
+            //console.log("near: ", this.camera.cameraP.near);
+            //console.log("far: ", this.camera.cameraP.far);
+            //console.log("length: ", length);
         }
     },
 
@@ -22732,6 +23539,8 @@ CloudViewer.prototype = {
 
         this.resizeFlyCross(); // 重设fly模式下十字光标位置
 
+        this.resizeMarkerContainer();
+
         this.render();
     },
 
@@ -22762,7 +23571,7 @@ CloudViewer.prototype = {
 
         // Camera
         //var camera = new CLOUD.Camera(viewportWidth, viewportHeight, 45, 0.01, CLOUD.GlobalData.SceneSize * 20, -CLOUD.GlobalData.SceneSize, CLOUD.GlobalData.SceneSize);
-        var camera = new CLOUD.Camera(viewportWidth, viewportHeight, 45, 1.0, CLOUD.GlobalData.SceneSize * 3.0, -CLOUD.GlobalData.SceneSize, CLOUD.GlobalData.SceneSize);
+        var camera = new CLOUD.Camera(viewportWidth, viewportHeight, 45, 1, CLOUD.GlobalData.SceneSize * 20.0, -CLOUD.GlobalData.SceneSize, CLOUD.GlobalData.SceneSize);
         this.camera = camera;
 
         var scope = this;
@@ -22865,6 +23674,10 @@ CloudViewer.prototype = {
         }
     },
 
+    setMarkerMode: function () {
+        this.editorManager.setMarkerMode(this);
+    },
+
     zoomIn: function (factor) {
         this.editorManager.zoomIn(factor, this);
     },
@@ -22947,6 +23760,11 @@ CloudViewer.prototype = {
         return  this.getScene().filter;
     },
 
+    disableLoD : function(){
+        CLOUD.GlobalData.SubSceneVisibleLOD = 1000;
+        CLOUD.GlobalData.CellVisibleLOD = 1000;
+    },
+
     adjustSceneLoD: function (sceneIds) {
         var len = sceneIds.length;
         var totalVisibleCount = 0;
@@ -22967,27 +23785,27 @@ CloudViewer.prototype = {
         }
 
         if (totalCount == 0) {
-            CLOUD.GlobalData.SubSceneVisibleLOD = 60;
-            CLOUD.GlobalData.CellVisibleLOD = 40;
+            CLOUD.GlobalData.SubSceneVisibleLOD = 10;
+            CLOUD.GlobalData.CellVisibleLOD = 15;
         }
         else if (totalCount < 10000) {
-            CLOUD.GlobalData.SubSceneVisibleLOD = 1000;
-            CLOUD.GlobalData.CellVisibleLOD = 0;
+            CLOUD.GlobalData.SubSceneVisibleLOD = 500;
+            CLOUD.GlobalData.CellVisibleLOD = 1000;
             CLOUD.GlobalData.ScreenCullLOD = 0.0001;
         }
         else if (totalCount < 100000) {
-            CLOUD.GlobalData.SubSceneVisibleLOD = 210;
-            CLOUD.GlobalData.CellVisibleLOD = 2;
+            CLOUD.GlobalData.SubSceneVisibleLOD = 100;
+            CLOUD.GlobalData.CellVisibleLOD = 500;
             CLOUD.GlobalData.ScreenCullLOD = 0.0001;
         }
         else if (totalCount < 200000) {
-            CLOUD.GlobalData.SubSceneVisibleLOD = 100;
-            CLOUD.GlobalData.CellVisibleLOD = 10;
+            CLOUD.GlobalData.SubSceneVisibleLOD = 50;
+            CLOUD.GlobalData.CellVisibleLOD = 100;
             CLOUD.GlobalData.ScreenCullLOD = 0.0002;
         }
         else {
-            CLOUD.GlobalData.SubSceneVisibleLOD = 60;
-            CLOUD.GlobalData.CellVisibleLOD = 40;
+            CLOUD.GlobalData.SubSceneVisibleLOD = 10;
+            CLOUD.GlobalData.CellVisibleLOD = 15;
             CLOUD.GlobalData.ScreenCullLOD = 0.0002;
         }
     },
@@ -23162,7 +23980,63 @@ CloudViewer.prototype = {
         if (miniMap) {
             miniMap.enableCameraNode(enable);
         }
-    }
+    },
 
     // ------------------ 小地图API -- E ------------------ //
+
+    // ------------------ 标记 API -- S ------------------ //
+    // 用于检查点、隐患点
+    zoomToSelectedMarkers: function(){
+        if ( this.editorManager.markerEditor && this.editorManager.editor === this.editorManager.markerEditor) {
+            var bBox = this.editorManager.markerEditor.calcBoundingBox();
+
+            if (bBox) {
+                this.zoomToBBox(bBox);
+            }
+
+            this.editorManager.markerEditor.update();
+        }
+    },
+
+    beginMarkerEdit: function() {
+        if ( this.editorManager.markerEditor && this.editorManager.editor === this.editorManager.markerEditor) {
+            this.editorManager.markerEditor.beginEdit();
+        }
+    },
+
+    endMarkerEdit: function() {
+        if ( this.editorManager.markerEditor && this.editorManager.editor === this.editorManager.markerEditor) {
+            this.editorManager.markerEditor.endEdit();
+        }
+    },
+
+    setMarkerState: function(state) {
+        if ( this.editorManager.markerEditor && this.editorManager.editor === this.editorManager.markerEditor) {
+            this.editorManager.markerEditor.setMarkerState(state);
+        }
+    },
+
+    loadMarkers: function(markerInfoList) {
+        if ( this.editorManager.markerEditor && this.editorManager.editor === this.editorManager.markerEditor) {
+            this.editorManager.markerEditor.loadMarkers(markerInfoList);
+        }
+    },
+
+    getMarkerInfoList: function() {
+        if ( this.editorManager.markerEditor && this.editorManager.editor === this.editorManager.markerEditor) {
+             return this.editorManager.markerEditor.getMarkerInfoList();
+        }
+
+        return null;
+    },
+
+    resizeMarkerContainer: function() {
+        if ( this.editorManager.markerEditor && this.editorManager.editor === this.editorManager.markerEditor) {
+            return this.editorManager.markerEditor.update();
+        }
+
+        return null;
+    }
+
+    // ------------------ 标记 API -- E ------------------ //
 };

@@ -97,3 +97,9 @@ router/index.js
    解决方案：一：使用同一view，实例化成 全局的一个view，不用二次生成
 
              二：在 addone 中 去判断，如果当前的view的closest body 不存在 则 移除当前的view
+
+四：模板中绑定data
+	
+	<% var stringDate= JSON.stringify(cVersion); %>
+					 	 
+	 <div class="item" data-version="<%- stringDate %>">

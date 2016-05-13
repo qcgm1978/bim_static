@@ -1,16 +1,23 @@
 App.Project = {
 
-	Settings: {
+	//默认参数
+	Defaults: {
+		
+		designTab: '<li data-type="design" class="item design">设计<i class="line"></i></li>',
+		planTab: '<li data-type="plan" class="item plan">计划<i class="line"></i></li>',
+		costTab: '<li data-type="cost" class="item cost">成本<i class="line"></i></li>',
+		qualityTab: '<li data-type="quality" class="item quality">质量<i class="line"></i></li>',
 		loadingTpl: '<td colspan="10" class="loadingTd">正在加载，请稍候……</td>',
-		fetchNavType: 'file', // model file
-		projectNav: "design",
-		property: "",
+		fetchNavType: 'file', // 默认加载的类型
+		projectNav: "", //项目导航 计划 成本 设计 质量
+		property: "poperties", // 项目导航 下的 tab  如：检查 属性
 		fileId: "",
-		projectId: 100,
+		projectId: "", //项目id
+		versionId:"",	//版本id
 		attrView: null,
+		CurrentVersion: null, //当前版本信息
 		DataModel: null //渲染模型的数据
-
-	},
+	}, 
 
 	// 文件 容器
 	FileCollection: new(Backbone.Collection.extend({
@@ -27,8 +34,14 @@ App.Project = {
 		urlType: "fetchFileList",
 
 		parse: function(responese) {
-			if (responese.message == "success") {
-				return responese.data;
+
+			if (responese.code == 0) {
+				if (responese.data.length > 0) {
+					return responese.data;
+				} else {
+					$("#projectContainer .fileContainerScroll .changeContrastBox").html('<li class="loading">无数据</li>');
+				}
+
 			}
 		}
 
@@ -37,32 +50,36 @@ App.Project = {
 	//初始化
 	init: function() {
 
-
-		//App.Project.fetchDesign();
-
-		//加载数据
-		//App.Project.loadData();
-
-		//reset options
-		App.Project.resetOptions();
-
-
-		//加载 项目版本
-		App.Project.loadVersion(App.Project.renderVersion);
+		//加载项目
+		this.fetchProjectDetail();
 
 	},
 
-	//初始化数据
-	resetOptions: function() {
-		App.Project.Settings.CurrentVersion = null;
-		App.Project.Settings.fetchNavType = 'file';
-		App.Project.Settings.projectNav = 'design';
-		App.Project.Settings.fileId = '';
-		App.Project.Settings.property = '';
-		App.Project.Settings.DataModel = null;
-		//上传取消
-		App.Comm.upload.destroy();
+	//获取项目信息信息
+	fetchProjectDetail: function() {
+
+		var data = {
+			URLtype: "fetchProjectDetail",
+			data: {
+				projectId: App.Project.Settings.projectId,
+				versionId:App.Project.Settings.versionId
+			}
+		};
+
+		App.Comm.ajax(data, function(data) {
+			if (data.code == 0) { 
+				
+				data = data.data;
+				App.Project.Settings.projectName = data.projectName;
+				App.Project.Settings.CurrentVersion = data;
+				//加载数据
+				App.Project.loadData();
+			}
+		});
+
 	},
+
+
 
 	//加载版本
 	loadVersion: function(callback) {
@@ -94,20 +111,6 @@ App.Project = {
 
 		//成功
 		if (data.message == "success") {
-
-
-			// 	var Versions = data.data,
-			// 		vCount = Versions.length,
-			// 		cVersion;
-			// 	for (var i = 0; i < vCount; i++) {
-			// 		cVersion = Versions[i];
-
-			// 		if (cVersion.lastest) {
-			// 			App.Project.Settings.CurrentVersion = cVersion;
-			// 			break;
-			// 	}
-			// }
-
 
 			var VersionGroups = data.data,
 				gCount = VersionGroups.length,
@@ -162,11 +165,11 @@ App.Project = {
 		} else {
 			alert("版本获取错误");
 		}
-
 	},
 
 	// 加载数据
 	loadData: function() {
+
 		//var $contains = $("#contains");
 		$("#contains").html(new App.Project.ProjectApp().render().el);
 		if (App.Project.Settings.CurrentVersion.status != 9) {
@@ -206,6 +209,47 @@ App.Project = {
 			App.Project.initGlobalEvent();
 		}
 
+
+		//设置项目可查看的属性
+		this.setPropertyByAuth();
+
+
+	},
+
+	//设置 可以查看的属性
+	setPropertyByAuth: function() {
+
+		var Autharr = App.Global.User.function,
+			$projectTab = $(".projectContainerApp .projectHeader .projectTab"),
+			AuthObj = {};
+
+		//遍历权限
+		$.each(Autharr, function(i, item) {
+			AuthObj[item.code] = true;
+		});
+
+
+		//设计
+		if (AuthObj.design) {
+			$projectTab.append(App.Project.Settings.designTab);
+		}
+
+		//计划
+		if (AuthObj.plan) {
+			$projectTab.append(App.Project.Settings.planTab);
+		}
+
+		//成本
+		if (AuthObj.cost) {
+			$projectTab.append(App.Project.Settings.costTab);
+		}
+
+		//质量
+		if (AuthObj.quality) {
+			$projectTab.append(App.Project.Settings.qualityTab);
+		}
+
+		$projectTab.find(".item:last").addClass('last');
 	},
 
 	//初始化滚动条
@@ -301,45 +345,66 @@ App.Project = {
 	//根据类型渲染数据
 	renderModelContentByType: function() {
 
+		var type = App.Project.Settings.projectNav,
+			$rightPropertyContent = $("#projectContainer .rightPropertyContent");
 
-		var type = App.Project.Settings.projectNav;
 
-		// if (this.Settings.attrView && this.Settings.attrView.render) {
-		// 	this.Settings.attrViewthis.stopListening();
-		// }
-
-		//解绑属性
-		App.Project.DesignAttr.PropertiesCollection.unbind();
-
-		//设计
+		$rightPropertyContent.children('div').hide()
+			//设计
 		if (type == "design") {
 
-			//this.Settings.attrView = new App.Project.ProjectDesignPropety();
+			$rightPropertyContent.find(".singlePropetyBox").remove();
 
-			$("#projectContainer .rightPropertyContent").html(new App.Project.ProjectDesignPropety().render().$el);
+			var $designPropetyBox = $rightPropertyContent.find(".designPropetyBox");
+			if ($designPropetyBox.length > 0) {
+				$designPropetyBox.show();
+			} else {
+				$rightPropertyContent.append(new App.Project.ProjectDesignPropety().render().$el);
+				$("#projectContainer .designPropetyBox .projectNav .item:first").click();
+			}
 
 		} else if (type == "plan") {
-			//计划 
-			//this.Settings.attrView = new App.Project.ProjectPlanProperty();
-			$("#projectContainer .rightPropertyContent").html(new App.Project.ProjectPlanProperty().render().$el);
+
+			//计划  
+			var $ProjectPlanPropertyContainer = $rightPropertyContent.find(".ProjectPlanPropertyContainer");
+			if ($ProjectPlanPropertyContainer.length > 0) {
+				$ProjectPlanPropertyContainer.show();
+			} else {
+				$rightPropertyContent.append(new App.Project.ProjectPlanProperty().render().$el);
+				$("#projectContainer .ProjectPlanPropertyContainer .projectNav .item:first").click();
+			}
 
 
 		} else if (type == "cost") {
-			//成本
-			//this.Settings.attrView = new App.Project.ProjectCostProperty();
-			$("#projectContainer .rightPropertyContent").html(new App.Project.ProjectCostProperty().render().$el);
+
+			//成本  
+			var $ProjectCostPropetyContainer = $rightPropertyContent.find(".ProjectCostPropetyContainer");
+			if ($ProjectCostPropetyContainer.length > 0) {
+				$ProjectCostPropetyContainer.show();
+			} else {
+				$rightPropertyContent.append(new App.Project.ProjectCostProperty().render().$el);
+				$("#projectContainer .ProjectCostPropetyContainer .projectNav .item:first").click();
+			}
 
 
 		} else if (type == "quality") {
+
 			//质量
-			//this.Settings.attrView = new App.Project.ProjectQualityProperty();
-			$("#projectContainer .rightPropertyContent").html(new App.Project.ProjectQualityProperty().render().$el);
+			var $ProjectQualityNavContainer = $rightPropertyContent.find(".ProjectQualityNavContainer");
+			if ($ProjectQualityNavContainer.length > 0) {
+				$ProjectQualityNavContainer.show();
+			} else {
+				$rightPropertyContent.append(new App.Project.ProjectQualityProperty().render().$el);
+				$("#projectContainer .ProjectQualityNavContainer .projectNav .item:first").click();
+			}
 
 		}
 
-		//$("#projectContainer .rightPropertyContent").html(this.Settings.attrView.render().$el);
-		//触发数据加载
-		$("#projectContainer .rightPropertyContent .projectNav .item:first").click();
+
+		var $slideBar= $("#projectContainer .rightProperty .slideBar");
+		if ($slideBar.find(".icon-caret-left").length>0) {
+			$slideBar.click();
+		}
 
 	},
 
@@ -373,7 +438,7 @@ App.Project = {
 				$("#projectContainer .header .ckAll").prop("checked", false);
 				//App.Project.FileCollection.parentId=file.id;
 				//清空数据
-				App.Project.FileCollection.reset(); 
+				App.Project.FileCollection.reset();
 				App.Project.Settings.fileId = file.fileVersionId;
 
 				App.Project.FileCollection.fetch({
@@ -383,8 +448,15 @@ App.Project = {
 				});
 			}
 			data.iconType = 1;
-			var navHtml = new App.Comm.TreeViewMar(data);
-			$("#projectContainer .projectNavFileContainer").html(navHtml);
+
+			if (data.data.length > 0) {
+				var navHtml = new App.Comm.TreeViewMar(data);
+				$("#projectContainer .projectNavFileContainer").html(navHtml);
+			} else {
+				$("#projectContainer .projectNavFileContainer").html('<div class="loading">无文件</div>');
+			}
+
+
 
 			$("#pageLoading").hide();
 		});
@@ -634,8 +706,6 @@ App.Project = {
 				}
 			}
 		});
-
-
 	},
 
 	//定位到模型
@@ -660,7 +730,7 @@ App.Project = {
 	planCostShowInModel: function(event) {
 
 		var $target = $(event.target),
-			$parent = $target.parent(); 
+			$parent = $target.parent();
 
 		if ($target.data("box")) {
 
@@ -677,7 +747,7 @@ App.Project = {
 				$target.closest("table").find(".selected").removeClass("selected");
 				App.Project.planCostzommBox($target);
 				return;
-			}else {
+			} else {
 				$target.closest("table").find(".selected").removeClass("selected");
 				$target.parent().addClass("selected");
 			}
@@ -722,14 +792,15 @@ App.Project = {
 
 	planCostzommBox: function($target) {
 		var Ids = [],
-			boxArr = [],$code;
-			 
-		$target.closest("table").find(".selected").each(function() { 
-			$code=$(this).find(".code");
+			boxArr = [],
+			$code;
+
+		$target.closest("table").find(".selected").each(function() {
+			$code = $(this).find(".code");
 			Ids.push($code.data("id"));
-			boxArr = boxArr.concat($code.data("box")); 
+			boxArr = boxArr.concat($code.data("box"));
 		});
-		 
+
 		App.Project.Settings.Viewer.selectIds(Ids);
 		App.Project.Settings.Viewer.zoomBox(boxArr);
 	}

@@ -25,13 +25,39 @@ App.API = {
 		fetchServicesFunList: 'platform/auth/function',//功能列表
 		fetchServicesOzRoleList:'platform/auth/org/{orgId}/role?outer={outer}',//机构角色
 		fetchServicesUserRoleList:'platform/auth/user/{userId}/role?outer={outer}',//用户角色
-		putServicesSaveRole:'platform/auth/role/grant',//保存用户角色
 		putServicesRoleFun:'platform/auth/role/{roleId}/function?functionId=111,222,333',//保存角色功能，未用
 		fetchServicesNewRole:'platform/auth/role',//新增角色
 		fetchServiceMemberList:'platform/auth/org',
+		saveServicesRole:'platform/auth/role/grant',//赋予角色
 		fetchServicesMemberOuterList:'platform/auth/org?outer=true',//外部组织-品牌／公司／成员列表
 		fetchServicesMemberInnerList:'platform/auth/org?outer=false',//内部-组织／成员列表
 		deleteServicesRoleSingle:"platform/role?",//删除角色
+		putServicesProjectMembers:"platform/auth/dataPrivilege/grant",//添加项目成员
+		deleteServicesProjectMembers:"platform/auth/{memberType}/{userId}/dataPrivilege",//删除项目成员
+		
+		//项目详细信息-创建
+		fetchProjectCreateBaseHole:'platform/pit/createPit',
+		fetchProjectCreateFloor:'platform/building/createBuilding',
+		fetchProjectCreateSection:'platform/profile/createProfile',
+		//项目详细信息-读取
+		fetchProjectDetailBaseholeList:'platform/pit/{projectId}',
+		fetchProjectDetailFloorList:'platform/building/{projectId}',
+		fetchProjectDetailSectionList:'platform/profile/{projectId}',
+		fetchProjectDetailPileList:'platform/pile/{projectId}',
+		
+		//项目详细信息-更新
+		fetchProjectUpdateBaseHole:'platform/pit/updatePit',
+		fetchProjectUpdateFloor:'platform/building/updateBuilding',
+		fetchProjectUpdateSection:'platform/profile/updateProfile',
+		//项目详细信息-删除
+		removeProjectDetailBasehole:'platform/pit/{pitId}',
+		removeProjectDetailFloor:'platform/building/{floorId}',
+		removeProjectDetailSection:'platform/profile/{sectionId}',
+		
+		putProjectLink:'platform/mapping/{projectId}',//项目关联
+		fetchProjectManagerProjectList:'platform/mapping/project',//项目管理-项目列表
+		fetchProjectManagerProjectLogo:'platform/project/{projectId}/logo/cut',//项目管理-项目logo裁剪
+		
 
 
 		fetchServiceKeyUserList:'platform/auth/keyUser',//关键用户列表
@@ -54,6 +80,7 @@ App.API = {
 		fetchFileList: "doc/{projectId}/{projectVersionId}/file/children", //获取文件列表  ?fileId={parentId}
 		fetchDesignFileNav: "doc/{projectId}/{projectVersionId}/file/tree", //项目设计文件导航
 		fetchDesignModelNav: "dataJson/project/project.design.model.json", //项目设计模型导航
+		fetchProjectDetail: 'platform/project/{projectId}/version/{versionId}', //获取项目 详细信息  包含最新版本
 
 		// 项目面包屑
 		fetchCrumbsProject: "platform/project/groupByProvince", // 项目导航
