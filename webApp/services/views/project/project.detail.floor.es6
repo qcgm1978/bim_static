@@ -43,7 +43,6 @@ App.Services.ProjectDetail.Floor=Backbone.View.extend({
 	},
 	
 	resetView(items){
-		debugger
 		var _this=this;
 		var $container=this.$('.detailContainer .scrollWrapContent');
 		this.status='read';
@@ -53,7 +52,7 @@ App.Services.ProjectDetail.Floor=Backbone.View.extend({
 				projectId:_this.userData.projectId
 			});
 			$container.append(view.render(model.toJSON()).el);
-			view.toggleProFrom('.accordionDatail');
+			//view.toggleProFrom('.accordionDatail');
 		})
 	},
 

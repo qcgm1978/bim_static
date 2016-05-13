@@ -118,6 +118,7 @@ App.BodyContent.control= {
 						delay:5000,
 						data:_datas,
 						onChange:function(d){
+							
 							$("#slideTitle").html(d.name);
 						}
 					})

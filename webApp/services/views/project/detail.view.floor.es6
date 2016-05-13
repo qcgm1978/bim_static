@@ -51,45 +51,52 @@ App.Services.DetailView.Floor=Backbone.View.extend({
 		this.$el.html(this.template(this.formData));
 		
 		this.$(".structure").myDropDown({
+			zIndex:App.Services.ProjectCollection.methods.zIndex(),
 			click:function($item){
 				var _=$(this);
 				_this.formData[_.attr('name')]=_.val();
 			}
 		});
 		this.$(".outerInstall").myDropDown({
+			zIndex:App.Services.ProjectCollection.methods.zIndex(),
 			click:function($item){
 				var _=$(this);
 				_this.formData[_.attr('name')]=_.val();
 			}
 		});
 		this.$(".outDoorFireLevel").myDropDown({
+			zIndex:App.Services.ProjectCollection.methods.zIndex(),
 			click:function($item){
 				var _=$(this);
 				_this.formData[_.attr('name')]=_.val();
 			}
 		});
 		this.$(".inDoorFireLevel").myDropDown({
+			zIndex:App.Services.ProjectCollection.methods.zIndex(),
 			click:function($item){
 				var _=$(this);
 				_this.formData[_.attr('name')]=_.val();
 			}
 		});
 		this.$(".seiGrade").myDropDown({
+			zIndex:App.Services.ProjectCollection.methods.zIndex(),
 			click:function($item){
 				var _=$(this);
 				_this.formData[_.attr('name')]=_.val();
 			}
 		});
 		this.$(".intensity").myDropDown({
+			zIndex:App.Services.ProjectCollection.methods.zIndex(),
 			click:function($item){
 				var _=$(this);
 				_this.formData[_.attr('name')]=_.val();
 			}
 		});
 		this.$(".pit").myDropDown({
+			zIndex:App.Services.ProjectCollection.methods.zIndex(),
 			click:function($item){
 				var _=$(this);
-				_this.formData[_.attr('name')]=_.attr('data-pitId');
+				_this.formData[_.attr('name')]=$item.attr('data-pitId');
 			}
 		});
 		return this;
@@ -109,16 +116,23 @@ App.Services.DetailView.Floor=Backbone.View.extend({
 		$this.toggleClass('accordOpen');
 	},
 	
-	saveFloor(){
+	saveFloor(args,type){
 		$('.projectBaseHole').mmhMask();	
 		var _this=this;
 		_this.$('input').each(function(){
 			var _=$(this);
 			_this.formData[_.attr('name')]=_.val();
 		})
+		args= typeof args === 'string'? args : 'fetchProjectCreateFloor';
+		//百分比数值转换
+		_this.formData.lowStrainPercentage=(_this.formData.lowStrainPercentage||0)/100;
+		_this.formData.highStrainPercentage=(_this.formData.highStrainPercentage||0)/100;
+		_this.formData.ultrasonicPercentage=(_this.formData.ultrasonicPercentage||0)/100;
+		_this.formData.corebitPercentage=(_this.formData.corebitPercentage||0)/100;
+		
 		App.Comm.ajax({
-			URLtype:'fetchProjectCreateFloor',
-			type:'post',
+			URLtype:args,
+			type:type||'post',
 			data:JSON.stringify(_this.formData),
 			contentType:'application/json'
 		},function(){
@@ -128,8 +142,22 @@ App.Services.DetailView.Floor=Backbone.View.extend({
 			clearMask();
 		})
 	},
-	updateFloor(){},
-	deleteFloor(){},
+	updateFloor(){
+		this.saveFloor('fetchProjectUpdateFloor','put');
+	},
+	deleteFloor(){
+		var _this=this;
+		App.Comm.ajax({
+			URLtype:'removeProjectDetailFloor',
+			type:'delete',
+			data:{
+				floorId:_this.formData.id
+			}
+		},function(){
+			_this.reloadView();
+		}).fail(function(){
+		})
+	},
 	cancelFloor(){
 		this.$el.remove();
 		this._parentView.trigger('read');

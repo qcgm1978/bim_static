@@ -45,7 +45,6 @@ App.Services.ProjectDetail.BaseHole=Backbone.View.extend({
 				projectId:_this.userData.projectId
 			});
 			$container.append(view.render(model.toJSON()).el);
-			view.toggleProFrom('.accordionDatail');
 		})
 	},
 	

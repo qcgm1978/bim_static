@@ -1,7 +1,7 @@
 <li>项目管理（<%=data.length%>）</li>
 <% _.each(data,function(item,index){ %>
 	<li class="project<% if(index==0) { %> active <% } %>" data-pid="<%= item.id %>">
-		<div><img src="<%= item.image|| '/static/dist/images/service/images/demoProject.png' %>"></div>
+		<div><img src="<%= item.image %>"></div>
 		<div>
 			<h4><%= item.name %></h4>
 			<p>
