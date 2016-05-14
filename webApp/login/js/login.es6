@@ -80,10 +80,7 @@ var Login = {
 			}
 		}).done(function(data) {
 
-			if (data.code == 0) {
-
-				//获取用户信息
-				Login.getUserInfo();
+			if (data.code == 0) { 
 
 				//写cookie
 				if (data.data && typeof data.data === 'object') {
@@ -91,6 +88,9 @@ var Login = {
 						Login.setCookie(p, data.data[p]);
 					}
 				}
+
+				//获取用户信息
+				Login.getUserInfo();
 
 			} else {
 

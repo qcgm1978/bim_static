@@ -46,7 +46,7 @@ App.Services.MemberWindowIndex = Backbone.View.extend({
 
         App.Comm.ajax(data,function(response){
             var type = App.Services.MemberType || "inner";
-            if(response.message == "success"){
+            if(response.code == 0){
                 var collection = App.Services.Member[type + "Collection"],proto = [];
                 _.each(selectRole,function(item){
                     item.set("functions",null);

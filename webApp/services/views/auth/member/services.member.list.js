@@ -19,10 +19,10 @@ App.Services.MemberList=Backbone.View.extend({
     },
 
     initialize:function(){
-       this.listenTo(App.Services.Member.innerCollection,"add",this.addOne);
+        this.listenTo(App.Services.Member.innerCollection,"add",this.addOne);
         this.listenTo(App.Services.Member.innerCollection,"reset",this.render);
-       this.listenTo(App.Services.Member.outerCollection,"add",this.addOne);
-       this.listenTo(App.Services.Member.outerCollection,"reset",this.render);
+        this.listenTo(App.Services.Member.outerCollection,"add",this.addOne);
+        this.listenTo(App.Services.Member.outerCollection,"reset",this.render);
     },
     //数据加载
     addOne:function(model){
@@ -32,17 +32,18 @@ App.Services.MemberList=Backbone.View.extend({
 
     //选中事件
     selectAll:function(){
-        var type =  App.Services.MemberType;
-        var $this = this;
-        var preS= this.$(".head input")[0].checked;
+        var type =  App.Services.MemberType,
+            $this = this,
+            preSele= this.$(".head input")[0].checked,
+            collection = App.Services.Member[type + "Collection"];
         this.$(":checkbox").each(function(checkbox){
-            checkbox.checked = preS;
-            if(preS){
+            checkbox.checked = preSele;
+            if(preSele){
                 $this.$("li").addClass("active");
-                App.Services.Member[type + "Collection"].each(function(item){item.set({"checked":true})})
+                collection.each(function(item){item.set({"checked":true})})
             }else{
                 $this.$("li").removeClass("active");
-                App.Services.Member[type + "Collection"].each(function(item){item.set({"checked":false})})
+                collection.each(function(item){item.set({"checked":false})})
             }
         })
     },
@@ -50,13 +51,13 @@ App.Services.MemberList=Backbone.View.extend({
     //批量授权
     batchAward:function(){
         App.Services.Member.resetMemData();
-        var data =App.Services.memberWindowData;
-        var _this =this , url;//提交地址
-        var type =  App.Services.MemberType;//组织类型
-        var getRole;
+        var  _this =this,//提交地址
+            type =  App.Services.MemberType,//组织类型
+            getRole,
+            seleUser;
 
         //获取所选项
-        var seleUser = App.Services.Member[type + "Collection"].filter(function(item){
+        seleUser = App.Services.Member[type + "Collection"].filter(function(item){
             if(item.get("checked")){
                 return item.get("checked");
             }
@@ -65,35 +66,26 @@ App.Services.MemberList=Backbone.View.extend({
         if(seleUser && !seleUser.length){
             alert("您没有选择任何成员或组织，无法设置角色！");return
         }
-
         //弹窗框架
-        var frame = new App.Services.MemberWindowIndex().render().el; //渲染框架
-        _this.window(frame);
-        $(".memRoleList").append(new App.Services.windowRoleList().render().el);//角色列表框架
-
-        $("#dataLoading").show();//状态
+        _this.window();
 
         //取得单选子项的角色列表
         if(seleUser.length == 1) {
             getRole = this.getRole(seleUser[0]);
-            //
         }
-
         //多选，写入已选用户和组织
         _.each(seleUser,function(item){
             $(".seWinBody .aim ul").append(new App.Services.MemberWindowDetail({model:item}).render().el);
         });
         this.saveData(seleUser); //缓存已选数据相关数据方便提交
-
-
         this.getFatherData(getRole);
     },
 
     //获取父项数据
     getFatherData:function(getRole){
-        //取得父项的角色列表
-        var parentId = $("#ozList").find("span.active").parent(".ozName").data("id"),_this =this ;
-        //无父项时获取缺省角色列表，此处为可能出错解释
+        var parentId = $("#ozList").find("span.active").parent(".ozName").data("id"),
+            _this =this ;
+        //无父项时获取缺省角色列表，此处为可能出错
         if(!parentId){
             App.Services.Member.loadData(App.Services.Member.SubRoleCollection,{},function(response){
                 $("#dataLoading").hide();
@@ -137,11 +129,14 @@ App.Services.MemberList=Backbone.View.extend({
 
     //保存要提交的数据模块，将数据混编成可提交形式
     saveData:function(seleUser){
-        var saveType =  App.Services.MemberType || "inner",data= App.Services.memberWindowData;
+        var saveType =  App.Services.MemberType || "inner",
+            data= App.Services.memberWindowData,
+            userId,
+            orgId;
         //userId和orgId
         _.each(seleUser,function(item){
-            var userId = item.get("userId");
-            var orgId = item.get("orgId");
+            userId = item.get("userId");
+            orgId = item.get("orgId");
             if(saveType){
                 if(userId){
                     data[saveType].userId.push(userId);
@@ -160,7 +155,8 @@ App.Services.MemberList=Backbone.View.extend({
     },
 
     //弹窗管理
-    window:function(frame){
+    window:function(){
+        var frame = new App.Services.MemberWindowIndex().render().el; //渲染框架
         App.Services.maskWindow = new App.Comm.modules.Dialog({
             title:"角色授权",
             width:600,
@@ -172,6 +168,9 @@ App.Services.MemberList=Backbone.View.extend({
             },
             message:frame
         });
+
+        $(".memRoleList").append(new App.Services.windowRoleList().render().el);//角色列表框架
+        $("#dataLoading").show();//状态
     },
     //排序
     comparator:function(){}

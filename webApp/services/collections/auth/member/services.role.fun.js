@@ -12,7 +12,7 @@ App.Services.roleFun = {
         }),
         urlType: "fetchServicesFunList",
         parse: function (response) {
-            if (response.message == "success") {
+            if (response.code == 0) {
                 return response.data;
             }
         }
