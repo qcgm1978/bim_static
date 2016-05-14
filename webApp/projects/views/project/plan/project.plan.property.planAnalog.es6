@@ -37,7 +37,7 @@
  		PlayArr.push(-1);
 
  		this.SourcePlay = PlayArr;
- 		this.analogCount = this.SourcePlay.length;
+ 		this.analogCount = this.SourcePlay.length; 
  	},
 
 
@@ -58,7 +58,7 @@
 
 
  	//开始模拟
- 	playAnalog(event) {
+ 	playAnalog(event) { 
 
  		var $target = $(event.target);
 
@@ -112,18 +112,18 @@
  					sourceWidth = this.$(".progressAnalog .bg").width(),
  					width = sourceWidth * processAnalog,
  					$planContent = this.$(".planContent");
-
+ 					 
  				//不可以超过最大
  				if (width > sourceWidth) {
  					width = sourceWidth;
  				}
 
  				this.$(".progressAnalog .processBg").width(width);
- 				this.$(".progressAnalog .processPos").css("left", width);
+ 				this.$(".progressAnalog .processPos").css("left", width-10);
  				$tr.addClass("selected");
-
+ 				 
  				//滚动条位置 
- 				$planContent.scrollTop($tr.offset().top - 200);
+ 				$planContent.scrollTop($tr.index()*36);
  				//底部文字
  				this.$(".desctionAnalog .analogDate").text($tr.find(".start").text());
  				this.$(".desctionAnalog .analogTitle").text($tr.find(".operationalMatters").text());
