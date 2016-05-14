@@ -4,8 +4,9 @@
  
 <span class="proName"><a class="aProName" href="/#projects/<%=id %>/<%= version && version.id || 'noVersion'  %>" data-id="<%=id %>"><%=name%></a></span>
 <span class="proType"><%=estateType==1?"轻资产":"重资产"%></span>
-     <span class="proProvince"><%=province%></span>
-            <span class="proCity"><%=province%></span> 
+<span class="proRetailing"><%=App.Projects.projectType[projectType] || '其他'%></span>
+<span class="proProvince"><%=province%></span>
+<span class="proCity"><%=province%></span> 
 <span class="proStar"><%= new Date(createTime).format("yyyy-MM-dd")%></span>
 <span class="proEnd"><%= openTime ? new Date(openTime).format("yyyy-MM-dd"):"" %></span>
  
