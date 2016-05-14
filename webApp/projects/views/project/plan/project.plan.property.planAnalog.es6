@@ -29,28 +29,30 @@
  		this.$(".tbPlan tbody").html(this.template(data));
 
  		var OrderArr = _.sortBy(data.data, "planStartTime"),
- 			PlayArr = [];
+ 			PlayArr = []; 
 
  		$.each(OrderArr, function(i, item) {
  			PlayArr.push(item.code);
  		});
- 		PlayArr.push(-1);
 
+ 		if (PlayArr.length>0) {
+ 			PlayArr.push(-1);
+ 		} 
  		this.SourcePlay = PlayArr;
  		this.analogCount = this.SourcePlay.length; 
  	},
 
 
  	//挑选播放
- 	pickPlayAnalog(event) {
-
-
+ 	pickPlayAnalog(event) { 
+ 		 
  		//进度模拟中 不做操作
  		if (this.timer) {
  			return;
  		}
 
- 		var index = $(event.target).closest("tr").addClass("selected").siblings().removeClass("selected").end().index();
+ 		var code = $(event.target).closest("tr").addClass("selected").siblings().removeClass("selected").end().data("code"),
+ 		index=this.SourcePlay.indexOf(code);
 
  		this.PlayArr = this.SourcePlay.slice(index);
 
@@ -58,7 +60,7 @@
 
 
  	//开始模拟
- 	playAnalog(event) { 
+ 	playAnalog(event) {  
 
  		var $target = $(event.target);
 
