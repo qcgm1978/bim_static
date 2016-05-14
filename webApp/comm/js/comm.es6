@@ -325,8 +325,37 @@ App.Comm = {
 		}
 
 		$target.mCustomScrollbar(opts);
-	}
-
+	},
+	
+	//tip组件，使用示例
+	// new App.Comm.Tip({message:'',type:'success',timeout:3000}).render().show();
+	// 参数说明:message 显示的内容
+	// 		 type 样式，三种可选success,common,alarm
+	//		 timeout 自动关闭时间 默认2000,选填
+	
+	Tip:Backbone.View.extend({
+		tagName:'div',
+		className:'mmhTip',
+		template:'<div class="content <%=type%>"><i></i><%=message%></div>',
+		initialize:function(data){
+			this._userData=data;
+		},
+		render:function(){
+			var _tpl=_.template(this.template);
+			this.$el.html(_tpl(this._userData));
+			return this;
+		},
+		show:function(){
+			var _this=this;
+			$('body').append(this.$el);
+			this.$el.animate({
+				top:'40px',
+			},1000)
+			setTimeout(function(){
+				_this.$el.remove();
+			},_this._userData.timeout||2000)
+		}
+	})
 };
 
 
