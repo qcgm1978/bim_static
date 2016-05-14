@@ -15,6 +15,7 @@ App.Services.windowRoleDetail=Backbone.View.extend({
     },
     initialize:function(){
         this.listenTo(this.model,"change:checked",this.checked);
+        this.listenTo(this.model,"change:inherit",this.inherit);
     },
     //加载判断
     checked:function(){
@@ -22,13 +23,23 @@ App.Services.windowRoleDetail=Backbone.View.extend({
             this.$el.addClass("active");
         }
     },
+
+    //继承属性不可修改
+    inherit:function() {
+        this.$el.addClass("inherit");
+    },
     //点选
     memCheck:function(){
+        var window= App.Services.maskWindow.find(".memRoleList h2 i");
+        count = parseInt(window.html());
+        if(this.model.get("inherit")){return;}
         var checkEle = this.model.get("checked");
         if(!checkEle){
             this.$el.addClass("active");
+            window.html(count + 1);
         }else{
             this.$el.removeClass("active");
+            window.html(count - 1);
         }
         this.model.set("checked",!checkEle);
     }

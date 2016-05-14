@@ -33,33 +33,41 @@ App.Services.memberDetail=Backbone.View.extend({
         _this.chooseSelf();
         _this.save();
 
-        //根用户
-        if(!parent.data("id")){
-            App.Services.Member.loadData(App.Services.Member.SubRoleCollection,{},function(response){
-                $("#dataLoading").hide();
-                var role = _this.model.get("role");
-                if(role && role.length) {
-                    _this.selected(role);
-                }
-            });
-            return
-        }
-        _this.getData(parent);
+        //获取所有列表，就可以了，继承项设置不可修改
+
+
+        App.Services.Member.loadData(App.Services.Member.SubRoleCollection,{},function(response){
+            $("#dataLoading").hide();
+            var role = _this.model.get("role");
+            if(role && role.length) {
+                _this.selected(role);
+            }
+            App.Services.maskWindow.find(".memRoleList h2 i").text(role.length);
+        });
+
+        //if(!parent.data("id")){}
+
     },
 
     //已选状态
     selected:function(arr){
+        var n = 0;//统计
         App.Services.Member.SubRoleCollection.each(function(item){
             for(var i = 0 ; i< arr.length ; i++){
                 if(item.get("roleId") == arr[i]["roleId"]){
+                    if(arr[i]["inherit"]){
+                        item.set("inherit", true);
+                        return
+                    }
                     item.set("checked", true);
                 }
             }
         });
+        return n;
     },
 
-    //加载数据
-    getData:function(parent){
+    //加载父项数据
+   /* getData:function(parent){
         var _this =this,type =  App.Services.MemberType || "inner";
         var datas  ={
             URLtype:"fetchServicesOzRoleList",
@@ -83,7 +91,7 @@ App.Services.memberDetail=Backbone.View.extend({
                 }
             }
         });
-    },
+    },*/
 
     //保存数据到全局变量
     save:function(){
