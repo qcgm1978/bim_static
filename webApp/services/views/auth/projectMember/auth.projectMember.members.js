@@ -32,7 +32,8 @@ App.Services.projectMember.members = Backbone.View.extend({
   				type:'delete'
   			},function(res){
   				_this.close();
-  				new App.Comm.Tip({message:'删除成功',type:'success'}).render().show();
+  				//new App.Comm.Tip({message:'删除成功',type:'success'}).render().show();
+  				$.tip({message:'删除成功',type:'success'});
     			if(res.message=="success"){
     				//$('#dataLoading').show();
     				App.Services.projectMember.loadData(App.Services.projectMember.projectMemberMemberCollection,{outer:App.Comm.getCookie("isOuter")},{
