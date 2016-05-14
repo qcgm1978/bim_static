@@ -35,7 +35,9 @@ App.Services.System.CategoryManager = Backbone.View.extend({
 		//重置
 		App.Services.SystemCollection.CategoryCollection.reset();
 		//获取数据
-		App.Services.SystemCollection.CategoryCollection.fetch();
+		App.Services.SystemCollection.CategoryCollection.fetch({success:function(models,data){
+				this.$(".textSum .count").text(data.data.items.length);
+		}});
 	},
 
 	//新增分类 弹出层
@@ -62,7 +64,7 @@ App.Services.System.CategoryManager = Backbone.View.extend({
 
 	//新增分类
 	addNewCategory(dialog) {
-		var $addNewCategoryDialog = $(".addNewCategoryDialog"),
+		var $addNewCategoryDialog = $(".addNewCategoryDialog"),that=this,
 			title = $addNewCategoryDialog.find(".txtCategoryTitle").val().trim(),
 			desc = $addNewCategoryDialog.find(".txtCategoryDesc").val().trim();
 
@@ -97,6 +99,8 @@ App.Services.System.CategoryManager = Backbone.View.extend({
 				data.data.isAdd=true;
 				App.Services.SystemCollection.CategoryCollection.push(data.data);
 				dialog.close();
+				var $count=that.$(".textSum .count");
+				$count.text(+$count.text()+1);
 			}
 			
 		}) 
