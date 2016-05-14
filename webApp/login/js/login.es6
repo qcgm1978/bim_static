@@ -109,6 +109,14 @@ var Login = {
 		$.ajax({
 			url: '/platform/user/current'
 		}).done(function(data) {
+
+			//失败
+			if (data.code!=0) {
+				alert("获取用户信息失败");
+				$("#btnLogin").val("立即登录").data("islogin", false);
+				return;
+			}
+
 			localStorage.setItem("user", JSON.stringify(data.data))
 			Login.setCookie('userId', data.data.userId);
 			Login.setCookie('isOuter', data.data.outer);
