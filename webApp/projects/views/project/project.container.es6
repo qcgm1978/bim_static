@@ -320,7 +320,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		this.typeContentChange();
 
 		//渲染模型属性
-		//App.Project.renderModelContentByType();  
+		//App.Project.renderModelContentByType();   
 		 
 		var viewer = App.Project.Settings.Viewer = App.Comm.createModel({
 			element: $("#projectContainer .modelContainerContent"),

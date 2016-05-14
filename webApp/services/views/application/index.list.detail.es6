@@ -68,10 +68,10 @@ App.Services.ApplicationListDetail = Backbone.View.extend({
 		var $item = $(event.target).closest(".item"),
 			data = {
 				isEdit: true,
-				name: $item.find(".name").text(),
-				desc: $item.find(".desc").text(),
-				appKey: $item.find(".appKey").text(),
-				appSecret: $item.find(".appSecret .text").text()
+				name: $item.find(".name").text().trim(),
+				desc: $item.find(".desc").text().trim(),
+				appKey: $item.find(".appKey").text().trim(),
+				appSecret: $item.find(".appSecret .text").text().trim()
 			},
 			dialogHtml = _.templateUrl('/services/tpls/application/index.add.html')(data);
 

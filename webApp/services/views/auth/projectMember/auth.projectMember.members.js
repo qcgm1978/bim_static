@@ -4,9 +4,6 @@ App.Services.projectMember.members = Backbone.View.extend({
   template: _.templateUrl('/services/tpls/auth/projectMember/members.html'),
   
   events:{
-  	
-  	'click .remove':'del'
-  	
   },
 
   // 重写初始化
@@ -35,15 +32,16 @@ App.Services.projectMember.members = Backbone.View.extend({
   				type:'delete'
   			},function(res){
   				_this.close();
+  				//new App.Comm.Tip({message:'删除成功',type:'success'}).render().show();
+  				$.tip({message:'删除成功',type:'success'});
     			if(res.message=="success"){
-    				$('#dataLoading').show();
+    				//$('#dataLoading').show();
     				App.Services.projectMember.loadData(App.Services.projectMember.projectMemberMemberCollection,{outer:App.Comm.getCookie("isOuter")},{
 						dataPrivilegeId:App.Comm.getCookie("currentPid")
 					});
     			}
   			}).fail(function(){
-  				//$('#dataLoading').hide();
-  				alert('添加失败')
+  				
   			})
   			
     		
@@ -55,7 +53,11 @@ App.Services.projectMember.members = Backbone.View.extend({
   	var data=App.Services.projectMember.method.model2JSON(items.models);
   	data={data:data};
     $("#memberlistWrap").html(this.$el.html(this.template(data)));
-    //clearMask();
+    this.$('.remove').on('click',function(e){
+    	
+    	_this.del(e);
+    	
+    })
     $('#dataLoading').hide();
     return this;
   }

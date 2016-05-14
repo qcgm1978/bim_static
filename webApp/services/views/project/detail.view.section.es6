@@ -46,7 +46,7 @@ App.Services.DetailView.Section=Backbone.View.extend({
 			zIndex:App.Services.ProjectCollection.methods.zIndex(),
 			click:function($item){
 				var _=$(this);
-				_this.formData[_.attr('name')]=_.val();
+				_this.formData[_.attr('name')]=$item.text();
 			}
 		});
 		

@@ -121,17 +121,41 @@ App.Services.DetailView.BaseHole=Backbone.View.extend({
 		this._parentView.trigger('read');
 	},
 	
+	//刷新基坑页面、同时刷新楼层、剖面视图，保证数据一致性
 	reloadView(){
-		var _this=this;
-		let collectionBasehole=App.Services.ProjectCollection.ProjecDetailBaseHoleCollection;
- 		collectionBasehole.projectId=_this.formData.projectId;
+	
+		var _this=this,
+			_proId=_this.formData.projectId,
+			AppCollection=App.Services.ProjectCollection,
+			collectionBasehole=AppCollection.ProjecDetailBaseHoleCollection,
+			collectionFloor=AppCollection.ProjecDetailFloorCollection,
+			collectionSection=AppCollection.ProjecDetailSectionCollection,
+			fecthOpts=function(){
+				return {
+		 			reset:true,
+		 			success(child, data) {}
+		 		}
+			};
+		
+ 		collectionBasehole.projectId=_proId;
+ 		collectionFloor.projectId=_proId;
+ 		collectionSection.projectId_proId;
+ 		
  		collectionBasehole.fetch({
  			reset:true,
  			success(child, data) {
+ 			
+ 				//刷新基坑信息缓存数据
+ 				AppCollection.datas.pitData=data.data.pits;
+ 					
+ 				collectionFloor.fetch(fecthOpts());
+		 		collectionSection.fetch(fecthOpts());
+		 		
  				_this.remove();
  				clearMask();
  			}
  		});
+ 		
 	}
 	
 })
