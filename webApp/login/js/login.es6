@@ -109,7 +109,7 @@ var Login = {
 		$.ajax({
 			url: '/platform/user/current'
 		}).done(function(data) {
-			localStorage.setItem("user", JSON.stringify(data.data))
+			localStorage.setItem("user", JSON.stringify(data.data));
 			Login.setCookie('userId', data.data.userId);
 			Login.setCookie('isOuter', data.data.outer);
 

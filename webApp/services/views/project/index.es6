@@ -136,7 +136,7 @@
 		 			}
 		 		});
 		 		
-		 		//加载剖面信息
+		 		//加载桩信息
 		 		_this.viewProjectPile.setUserData({
 		 			projectId:_projectId
 		 		});

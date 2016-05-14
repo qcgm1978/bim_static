@@ -34,51 +34,54 @@ App.Services.ProjectDetail.Pile=Backbone.View.extend({
 	resetView(items){
 		var data=items.data,
 			$container=this.$('.detailContainer .scrollWrapContent');
-		debugger
 		this.$el.html(this.template(data));
 		$container.html('').append(this.$el);
 	},
 	
-	savePile(){
+	savePile(args,type){
 		var _this=this,
 			_data=[];
 		this.$('.txtInput').each(function(){
 			var __=$(this);
-			_data.push({
-				projectId:_this.userData.projectId,
-				pileName:__.attr('data-label'),
-				pileNumber:__.val()
-			})
+			if(type){
+				_data.push({
+					id:__.attr('data-id'),
+					pileNumber:__.val()
+				})
+			}else{
+				_data.push({
+					projectId:_this.userData.projectId,
+					pileName:__.attr('data-label'),
+					pileNumber:__.val()
+				})
+			}
+			
 		})
-		
-		debugger
-		return
+		args=typeof args === 'string' ?args:'fetchProjectCreatePile'
 		App.Comm.ajax({
-			URLtype:'fetchProjectCreatePile',
-			type:'post',
-			data:'',
+			URLtype:args,
+			type:type||'post',
+			data:JSON.stringify(_data),
 			contentType:'application/json'
 		},function(){
 			_this.reloadView();
 		}).fail(function(){
+			//失败提示
 		})
 	},
 	
 	updatePile(){
-		var _this=this;
-		App.Comm.ajax({
-			URLtype:'fetchProjectCreatePile',
-			type:'put',
-			data:{
-				pitId:_this.formData.id
-			}
-		},function(){
-			_this.reloadView();
-		}).fail(function(){
-		})
+		this.savePile('fetchProjectUpdatePile','put');
 	},
 	
 	reloadView(){
-	
+		var _this=this;
+		let collectionPile=App.Services.ProjectCollection.ProjecDetailPileCollection;
+ 		collectionPile.projectId=_this.userData.projectId;
+ 		collectionPile.fetch({
+ 			reset:true,
+ 			success(child, data) {
+ 			}
+ 		});
 	}
 })
