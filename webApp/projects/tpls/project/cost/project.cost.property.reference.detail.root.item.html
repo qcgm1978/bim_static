@@ -16,7 +16,7 @@
 
        <span class="listName commItem overflowEllipsis"> <span title="<%= name %>" class="text"><%= name %></span></span> 
 
-      <span class="listCount commItem overflowEllipsis"><span class="text"><%=totalQuantity || '--'%><%=unit%></span></span> 
+      <span class="listCount commItem overflowEllipsis"><span class="text"><%=totalQuantity && totalQuantity.toFixed(4) || '--'%><%=unit%></span></span> 
     
 
 </div>
