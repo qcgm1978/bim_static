@@ -165,24 +165,28 @@ App.Services.ProjectCollection = {
 				      {
 				        "id": 829748817994080,
 				        "projectId": 825572711509152,
+				        "pileCode": "PILE-0001",
 				        "pileName": "人工挖孔桩",
 				        "pileNumber": 0
 				      },
 				      {
 				        "id": 829748818280800,
 				        "projectId": 825572711509152,
+				        "pileCode": "PILE-0002",
 				        "pileName": "钻孔灌注桩",
 				        "pileNumber": 0
 				      },
 				      {
 				        "id": 829748818534752,
 				        "projectId": 825572711509152,
+				        "pileCode": "PILE-0003",
 				        "pileName": "钻孔灌注桩(后注浆)",
 				        "pileNumber": 0
 				      },
 				      {
 				        "id": 829748818796896,
 				        "projectId": 825572711509152,
+				        "pileCode": "PILE-0004",
 				        "pileName": "管桩",
 				        "pileNumber": 0
 				      }

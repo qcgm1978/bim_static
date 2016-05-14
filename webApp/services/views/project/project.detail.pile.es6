@@ -51,7 +51,7 @@ App.Services.ProjectDetail.Pile=Backbone.View.extend({
 			}else{
 				_data.push({
 					projectId:_this.userData.projectId,
-					pileName:__.attr('data-label'),
+					pileCode:__.attr('data-code'),
 					pileNumber:__.val()
 				})
 			}
