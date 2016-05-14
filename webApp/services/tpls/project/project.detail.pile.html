@@ -4,7 +4,7 @@
 		<% _.each(soilNails,function(pile){ %>
 			<div>
 				<div class="formColumn">
-					<label><%=pile.pileName%>: </label><input type="number" name="" id="" value="<%=pile.pileNumber%>" class="txtInput userPile" />
+					<label><%=pile.pileName%>: </label><input type="number" data-label="<%=pile.pileName%>" data-id="<%=pile.id%>" name="" id="" value="<%=pile.pileNumber%>" class="txtInput userPile" />
 				</div>
 			</div>
 		<% }) %>
@@ -31,7 +31,11 @@
 		
 		<div>
 			<div class="formColumn" style="padding-left: 160px;">
-				<button class="myBtn myBtn-primary">保存</button><button class="myBtn myBtn-default">删除</button>
+				<% if(isCreate) { %>
+					<input type="button" class="myBtn myBtn-primary save"  value="保存"/>
+				<% }else{ %>
+					<input type="button" class="myBtn myBtn-primary update"  value="保存"/>
+				<% } %>
 			</div>
 			<div class="formColumn"></div>
 		</div>
