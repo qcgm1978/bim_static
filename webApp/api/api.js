@@ -164,6 +164,7 @@ App.API = {
 		fetchQualityConcerns: "sixD/{projectId}/{projectVersionId}/problem", //隐患
 		fetchQualityProperties: "dataJson/project/project.design.property.json", // 属性
 		fetchQualityModelById:"sixD/{projectId}/{versionId}/quality/element", //开业验收 过程 验收 获取构建id  ?acceptanceId={acceptanceId}
+		fetchQualityProcessDisease:'sixD/{projectId}/{versionId}/problem/list',
 
 
 		//资源

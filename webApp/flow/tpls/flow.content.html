@@ -1,5 +1,6 @@
 <div id="flowContainer">
 	<%  _.each(data,function(item){ %>
+		<% if(item.items.length) {%>
 		<fieldset class="classify">
 			<legend><%=item.title%></legend>
 			<ul>
@@ -15,5 +16,6 @@
 				<% }) %>
 			</ul>
 		</fieldset>
+		<% } %>
 	<% }) %>
 </div>
