@@ -202,7 +202,7 @@ App.ResourceModel = {
 						$("#pageLoading").hide();
 					}
 				});
-			} else if (type == "famLibs") {
+			} else if (type == "family") {
 				App.ResourceModel.FileThumCollection.projectId = App.ResourceModel.Settings.CurrentVersion.projectId;
 				App.ResourceModel.FileThumCollection.projectVersionId = App.ResourceModel.Settings.CurrentVersion.id;
 				App.ResourceModel.FileThumCollection.reset();
