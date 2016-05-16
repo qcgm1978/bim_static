@@ -33,22 +33,24 @@ App.Services.MemberList=Backbone.View.extend({
     //选中事件
     selectAll:function(){
         var type =  App.Services.MemberType,
-            $this = this,
+            _this = this,
             preSele= this.$(".head input")[0].checked,
             collection = App.Services.Member[type + "Collection"];
+        console.log(this.$(":checkbox").find(".memCheck"));
+        if(this.$(":checkbox").length ==1  && !(this.$(":checkbox").find(".memCheck").length)){
+            return
+        }
         this.$(":checkbox").each(function(checkbox){
             checkbox.checked = preSele;
             if(preSele){
-                $this.$("li").addClass("active");
+                _this.$("li").addClass("active");
                 collection.each(function(item){item.set({"checked":true})})
             }else{
-                $this.$("li").removeClass("active");
+                _this.$("li").removeClass("active");
                 collection.each(function(item){item.set({"checked":false})})
             }
         })
     },
-
-
 
     //批量授权
     batchAward:function(){
@@ -76,7 +78,6 @@ App.Services.MemberList=Backbone.View.extend({
         //单选
         if(seleUser.length == 1) {
             singleModel = seleUser[0];
-            //取得总体角色与个人角色联系，比较并
             //角色数据
             App.Services.Member.loadData(App.Services.Member.SubRoleCollection,{},function(response){
                 $(".seWinBody .aim ul").append(new App.Services.MemberWindowDetail({model:seleUser[0]}).render().el);
@@ -97,7 +98,6 @@ App.Services.MemberList=Backbone.View.extend({
             return
         }
 
-
         //多选，写入已选用户和组织
         _.each(seleUser,function(item){
             $(".seWinBody .aim ul").append(new App.Services.MemberWindowDetail({model:item}).render().el);
@@ -113,7 +113,6 @@ App.Services.MemberList=Backbone.View.extend({
     //获取父项数据
     getFatherData:function(){
         var parentId = App.Services.memFatherId,
-            disable,
             _this =this ;
         //无父项时获取缺省角色列表，此处为可能出错
         if(!parentId){
@@ -137,15 +136,12 @@ App.Services.MemberList=Backbone.View.extend({
 
                 var role = response.data;
 
-
                 if(role && role.length) {
                     _this.disable( role);
                     App.Services.maskWindow.find(".memRoleList h2 i").text(role.length);
                 }
 
-
                 $(".serviceBody .content").removeClass("services_loading");
-
             }
         });
     },
@@ -159,7 +155,6 @@ App.Services.MemberList=Backbone.View.extend({
             }
         });
     },
-
 
     //已选状态
     selected:function(arr){
@@ -197,8 +192,6 @@ App.Services.MemberList=Backbone.View.extend({
             App.Services.Member.saveMemData(data);
         });
     },
-
-
 
     //弹窗管理
     window:function(){
