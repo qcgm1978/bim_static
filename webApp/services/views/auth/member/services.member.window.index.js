@@ -19,13 +19,14 @@ App.Services.MemberWindowIndex = Backbone.View.extend({
         return this;
     },
 
-    //提交表单，完毕会触发重新获取列表，列表为memBlend所属列表
+    //提交表单，完毕会触发列表更新，列表为memBlend所属列表
     windowSubmit:function(){
         var submitData  = App.Services.memberWindowData;//获取要提交的成员/组织相关信息
-        var data;//实际的提交信息
+        var data,
+            selectRole;//实际的提交信息
         if(submitData){
             //获取已选角色,并添加角色ID
-            var selectRole = App.Services.Member.SubRoleCollection.filter(function(item){
+            selectRole = App.Services.Member.SubRoleCollection.filter(function(item){
                 return item.get("checked");
             });
 
@@ -46,23 +47,22 @@ App.Services.MemberWindowIndex = Backbone.View.extend({
 
         App.Comm.ajax(data,function(response){
             var type = App.Services.MemberType || "inner";
+            var collection = App.Services.Member[type + "Collection"],proto = [];
             if(response.code == 0){
-                var collection = App.Services.Member[type + "Collection"],proto = [];
                 _.each(selectRole,function(item){
                     item.set("functions",null);
                     item.unset("checked");
-                    proto.push(item.toJSON());
+                    proto.push(item.toJSON());//因为不返回继承角色，因此需要存储继承角色再定
                 });
-
                 collection.each(function(item){
-                    var l1 = submitData[type]["orgId"];
-                    var l2 = submitData[type]["userId"];
-                    var orgId = item.get("orgId");
-                    var userId = item.get("userId");
+                    var l1 = submitData[type]["orgId"],
+                        l2 = submitData[type]["userId"],
+                        orgId = item.get("orgId"),
+                        userId = item.get("userId");
                     if(l1.length && orgId){
                         for(var i  = 0 ;  i< l1.length ; i ++){
                             if(orgId == l1[i]){
-                                item.set({"role":proto});//如何放在内部
+                                item.set({"role":proto});
                                 return
                             }
                         }
@@ -80,7 +80,6 @@ App.Services.MemberWindowIndex = Backbone.View.extend({
             App.Services.Member.resetMemData();
             App.Services.maskWindow.close();
         });
-
         App.Services.Member.resetMemData();
     },
 

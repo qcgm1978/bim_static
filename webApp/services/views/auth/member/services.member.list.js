@@ -56,6 +56,8 @@ App.Services.MemberList=Backbone.View.extend({
         var  _this =this,//提交地址
             type =  App.Services.MemberType,//组织类型
             seleUser,
+            selected,
+            disable,
             singleModel; //单选模型
 
         //获取所选项
@@ -71,18 +73,25 @@ App.Services.MemberList=Backbone.View.extend({
         //弹窗框架
         _this.window();
 
-
         //单选
         if(seleUser.length == 1) {
             singleModel = seleUser[0];
-            getRole = singleModel.get("role");
             //取得总体角色与个人角色联系，比较并
             //角色数据
             App.Services.Member.loadData(App.Services.Member.SubRoleCollection,{},function(response){
+                $(".seWinBody .aim ul").append(new App.Services.MemberWindowDetail({model:seleUser[0]}).render().el);
                 $(".serviceBody .content").removeClass("services_loading");
                 var role = singleModel.get("role");
                 if(role && role.length) {
-                    _this.selected(role);
+                    App.Services.maskWindow.find(".memRoleList h2 i").text(role.length);
+                    selected =  _.filter(role,function(item){
+                        return !item.inherit
+                    });
+                    _this.selected(selected);
+                    disable = _.filter(role,function(item){
+                        return item.inherit
+                    });
+                    _this.disable(disable);
                 }
             });
             return
@@ -103,7 +112,8 @@ App.Services.MemberList=Backbone.View.extend({
 
     //获取父项数据
     getFatherData:function(){
-        var parentId = App.Services.memFatherId,//不靠谱
+        var parentId = App.Services.memFatherId,
+            disable,
             _this =this ;
         //无父项时获取缺省角色列表，此处为可能出错
         if(!parentId){
@@ -127,11 +137,15 @@ App.Services.MemberList=Backbone.View.extend({
 
                 var role = response.data;
 
+
                 if(role && role.length) {
-                    _this.disable(role);
+                    _this.disable( role);
+                    App.Services.maskWindow.find(".memRoleList h2 i").text(role.length);
                 }
 
+
                 $(".serviceBody .content").removeClass("services_loading");
+
             }
         });
     },
@@ -152,11 +166,11 @@ App.Services.MemberList=Backbone.View.extend({
         App.Services.Member.SubRoleCollection.each(function(item){
             for(var i = 0 ; i< arr.length ; i++){
                 if(item.get("roleId") == arr[i]["roleId"]){
+                    item.set("checked", true);
                     if(arr[i]["inherit"]){
                         item.set("inherit", true);
-                        return
+                        item.set("checked", false);
                     }
-                    item.set("checked", true);
                 }
             }
         });
