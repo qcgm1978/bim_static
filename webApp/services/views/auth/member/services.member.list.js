@@ -79,7 +79,7 @@ App.Services.MemberList=Backbone.View.extend({
             //取得总体角色与个人角色联系，比较并
             //角色数据
             App.Services.Member.loadData(App.Services.Member.SubRoleCollection,{},function(response){
-                $("#dataLoading").hide();
+                $(".serviceBody .content").removeClass("services_loading");
                 var role = singleModel.get("role");
                 if(role && role.length) {
                     _this.selected(role);
@@ -108,7 +108,7 @@ App.Services.MemberList=Backbone.View.extend({
         //无父项时获取缺省角色列表，此处为可能出错
         if(!parentId){
             App.Services.Member.loadData(App.Services.Member.SubRoleCollection,{},function(response){
-                $("#dataLoading").hide();
+                $(".serviceBody .content").removeClass("services_loading");
             });
             return
         }
@@ -131,7 +131,7 @@ App.Services.MemberList=Backbone.View.extend({
                     _this.disable(role);
                 }
 
-                $("#dataLoading").hide();
+                $(".serviceBody .content").removeClass("services_loading");
             }
         });
     },
@@ -202,7 +202,7 @@ App.Services.MemberList=Backbone.View.extend({
         });
 
         $(".memRoleList").append(new App.Services.windowRoleList().render().el);//角色列表框架
-        $("#dataLoading").show();//状态
+        $(".serviceBody .content").addClass("services_loading");//状态
     },
     //排序
     comparator:function(){}
