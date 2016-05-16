@@ -1,10 +1,38 @@
 var AppRoute = Backbone.Router.extend({
 
 	routes: {
-		'family/:libId': 'family',
-		'model/:modelCode/version/:versionId': 'standardLibs'
+		'family/:libId': 'family', //族库
+		'model/:modelCode/version/:versionId': 'standardLibs', //标准模型库
+		'project/:projectCode/version/:versionId': 'project', //项目
 
 	},
+
+	//项目
+	project(projectCode, versionId) {
+		//验证登录
+		this.checkLogin((isLogin) => {
+
+			if (!isLogin) {
+				return;
+			}
+
+			this.reset();
+
+			$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".projects").addClass('selected');
+			_.require('/static/dist/projects/projects.css');
+			_.require('/static/dist/projects/projects.js');
+
+			App.Project.Settings = $.extend({}, App.Project.Defaults);
+
+			App.Project.Settings.projectId = projectCode;
+
+			App.Project.Settings.versionId = versionId;
+
+			App.Project.init();
+
+		});
+	},
+
 
 	//族库
 	family(libIid) {
@@ -53,6 +81,7 @@ var AppRoute = Backbone.Router.extend({
 	},
 
 
+
 	//资源库
 	resourceModel: function(type, projectId) {
 
@@ -92,7 +121,7 @@ var AppRoute = Backbone.Router.extend({
 
 		$("#pageLoading").show();
 
-		$("#topBar .bodyConMenu").remove().end().find(".flow").remove().end().find(".services").remove();
+		$("#topBar .navHeader").remove();
 		App.Comm.Settings.loginType = "token";
 
 		var that = this;
