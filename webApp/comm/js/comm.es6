@@ -2,6 +2,7 @@ App.Comm = {
 
 	Settings: {
 		v: 20160312,
+		loginType: "user", // 登录状态 user token
 		pageItemCount: 30 //Math.floor(($("body").height() + 60) / 70) > 10 && Math.floor(($("body").height() + 60) / 70) || 10
 	},
 
@@ -18,7 +19,7 @@ App.Comm = {
 			data.headers = {
 				ReturnUrl: location.href
 			}
-		} 
+		}
 
 		return $.ajax(data).done(function(data) {
 
@@ -63,9 +64,9 @@ App.Comm = {
 
 		//url 是否有参数
 		var urlPars = data.url.match(/\{([\s\S]+?(\}?)+)\}/g);
-		
-		var temp =data.data;
-		
+
+		var temp = data.data;
+
 		if ((typeof temp) == 'string') {
 			temp = JSON.parse(temp);
 		}
@@ -75,7 +76,7 @@ App.Comm = {
 				var rex = urlPars[i],
 					par = rex.replace(/[{|}]/g, ""),
 					val = temp[par];
-					data.url = data.url.replace(rex, val);
+				data.url = data.url.replace(rex, val);
 			}
 		}
 
@@ -96,10 +97,10 @@ App.Comm = {
 	//JS操作cookies方法!
 	//写cookies
 	setCookie: function(name, value) {
-		var Days = 30;
-		var exp = new Date();
+		var Days = 30,
+			exp = new Date();
 		exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 1000);
-		document.cookie = name + "=" + escape(value) + ";expires=" + exp.toGMTString();
+		document.cookie = name + "=" + escape(value) + ";expires=" + exp.toGMTString() + ";domain=.wanda-dev.cn;path=/";
 	},
 	//获取cookie
 	getCookie: function(name) {
@@ -325,8 +326,51 @@ App.Comm = {
 		}
 
 		$target.mCustomScrollbar(opts);
-	}
+	},
 
+	//获取url 参数
+	GetRequest() {
+		var url = location.search || location.href.substr(location.href.indexOf('?')); //获取url中"?"符后的字串
+		var theRequest = new Object();
+		if (url.indexOf("?") != -1) {
+			var str = url.substr(1);
+			strs = str.split("&");
+			for (var i = 0; i < strs.length; i++) {
+				theRequest[strs[i].split("=")[0]] = unescape(strs[i].split("=")[1]);
+			}
+		}
+		return theRequest;
+	},
+
+	//tip组件，使用示例
+	// new App.Comm.Tip({message:'',type:'success',timeout:3000}).render().show();
+	// 参数说明:message 显示的内容
+	// 		 type 样式，三种可选success,common,alarm
+	//		 timeout 自动关闭时间 默认2000,选填
+
+	Tip: Backbone.View.extend({
+		tagName: 'div',
+		className: 'mmhTip',
+		template: '<div class="content <%=type%>"><i></i><%=message%></div>',
+		initialize: function(data) {
+			this._userData = data;
+		},
+		render: function() {
+			var _tpl = _.template(this.template);
+			this.$el.html(_tpl(this._userData));
+			return this;
+		},
+		show: function() {
+			var _this = this;
+			$('body').append(this.$el);
+			this.$el.animate({
+				top: '40px',
+			}, 1000)
+			setTimeout(function() {
+				_this.$el.remove();
+			}, _this._userData.timeout || 2000)
+		}
+	})
 };
 
 

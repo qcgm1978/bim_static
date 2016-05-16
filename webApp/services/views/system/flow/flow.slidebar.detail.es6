@@ -33,8 +33,9 @@
 
  		App.Services.SystemCollection.FlowCollection.fetch({
  			data:{categoryId:id},
- 			success:function() {
- 				 
+ 			success:function(models,data) {
+
+ 				 $(".systemContainer .folwContainer .textSum .count").text(data.data.length);
  				 $(".folwContainer .flowListBody li:last").find(".myIcon-down").toggleClass("myIcon-down-disable myIcon-down");
  			}
  		});

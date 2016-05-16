@@ -6,7 +6,7 @@ App.Services.windowRoleList=Backbone.View.extend({
     tagName:"div",
     events:{},
 
-    template:_.templateUrl("/services/tpls/auth/member/services.member.ozlist.html"),
+    template:_.templateUrl("/services/tpls/auth/member/services.member.orglist.html"),
     render:function(){
         this.$el.html(this.template);
         return this;

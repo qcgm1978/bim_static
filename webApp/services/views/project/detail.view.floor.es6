@@ -54,42 +54,43 @@ App.Services.DetailView.Floor=Backbone.View.extend({
 			zIndex:App.Services.ProjectCollection.methods.zIndex(),
 			click:function($item){
 				var _=$(this);
-				_this.formData[_.attr('name')]=_.val();
+				_this.formData[_.attr('name')]=$item.text();
 			}
 		});
 		this.$(".outerInstall").myDropDown({
 			zIndex:App.Services.ProjectCollection.methods.zIndex(),
 			click:function($item){
 				var _=$(this);
-				_this.formData[_.attr('name')]=_.val();
+				_this.formData[_.attr('name')]=$item.text();
 			}
 		});
 		this.$(".outDoorFireLevel").myDropDown({
 			zIndex:App.Services.ProjectCollection.methods.zIndex(),
 			click:function($item){
 				var _=$(this);
-				_this.formData[_.attr('name')]=_.val();
+				_this.formData[_.attr('name')]=$item.text();
 			}
 		});
 		this.$(".inDoorFireLevel").myDropDown({
 			zIndex:App.Services.ProjectCollection.methods.zIndex(),
 			click:function($item){
 				var _=$(this);
-				_this.formData[_.attr('name')]=_.val();
+				_this.formData[_.attr('name')]=$item.text();
 			}
 		});
 		this.$(".seiGrade").myDropDown({
 			zIndex:App.Services.ProjectCollection.methods.zIndex(),
 			click:function($item){
+				debugger
 				var _=$(this);
-				_this.formData[_.attr('name')]=_.val();
+				_this.formData[_.attr('name')]=$item.text();
 			}
 		});
 		this.$(".intensity").myDropDown({
 			zIndex:App.Services.ProjectCollection.methods.zIndex(),
 			click:function($item){
 				var _=$(this);
-				_this.formData[_.attr('name')]=_.val();
+				_this.formData[_.attr('name')]=$item.text();
 			}
 		});
 		this.$(".pit").myDropDown({

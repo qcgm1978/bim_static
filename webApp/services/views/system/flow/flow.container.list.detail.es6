@@ -131,9 +131,9 @@ App.Services.System.FolwContainerListDetail = Backbone.View.extend({
 			that = this,
 			data = {
 				id: id,
-				busName: $item.find(".name").text(),
-				busSendUrl: $item.find(".aStar").text(),
-				busViewUrl: $item.find(".aCk").text()
+				busName: $item.find(".name").text().trim(),
+				busSendUrl: $item.find(".aStar").text().trim(),
+				busViewUrl: $item.find(".aCk").text().trim()
 			},
 
 			dialogHtml = _.templateUrl('/services/tpls/system/flow/system.add.flow.html')(data),

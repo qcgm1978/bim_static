@@ -141,6 +141,8 @@ App.Services.System.ExtendAttrContainer = Backbone.View.extend({
 			if (data.code == 0) {
 				App.Services.SystemCollection.ExtendAttrCollection.push(data.data);
 				dialog.close();
+				var $count=$(".systemContainer .folwContainer .textSum .count");
+				  $count.text(+$count.text()+1);
 			}
 		});
 

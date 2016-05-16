@@ -164,3 +164,56 @@
 }
 
 ul li.loading{text-align: center;font-size: 14px;padding-top: 30px;color:#ccc;}
+
+/**mmh tip**/
+.mmhTip{
+	position: fixed;
+	left: 0;
+	top: -100px;
+	right: 0;
+	text-align: center;
+	z-index: 999999;
+	& .content{
+		display: inline-block;
+		height: 40px;
+		line-height: 40px;
+		font-size: 14px;
+		color: #666;
+		box-sizing: border-box;
+		position: relative;
+		padding-left: 46px;
+		padding-right: 20px;
+		background: #FFFFFF;
+		& i{
+			position: absolute;
+			left: 20px;
+			top: 12px;
+			width: 16px;
+			height: 16px;
+			background: url(../images/icon.png) no-repeat;
+		}
+		
+		&.success{
+			border:1px solid #80C729;
+			& i{
+				background-position: -0px -0px;
+			}
+		}
+		&.common{
+			border:1px solid #2DB7F5;
+			& i{
+				background-position: -18px -0px;
+			}
+		}
+		&.alarm{
+			border:1px solid #ffaa00;
+			& i{
+				background-position: -36px -0px;
+			}
+		}
+	}
+	
+	
+}
+			
+			

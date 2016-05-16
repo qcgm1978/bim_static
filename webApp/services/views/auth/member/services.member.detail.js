@@ -12,6 +12,7 @@ App.Services.memberDetail=Backbone.View.extend({
 
     render:function(){
         this.$el.html(this.template(this.model.toJSON()));
+        this.delegateEvents();
         return this;
     },
 
@@ -19,45 +20,54 @@ App.Services.memberDetail=Backbone.View.extend({
         this.model.set({"checked":false});//预设选择状态
         this.listenTo(this.model, 'change:checked', this.render);
         this.listenTo(this.model, 'change:role', this.render);
+
     },
 
     //单个修改
     modify:function(){
         var _this =this;
-        $("#dataLoading").show();
+        $(".serviceBody .content").addClass("services_loading");
         var frame = new App.Services.MemberWindowIndex().render().el;//外框
         var parent = $("#ozList").find("span.active").parent(".ozName");//父项id
         _this.window(frame);
         _this.chooseSelf();
         _this.save();
 
-        //根用户
-        if(!parent.data("id")){
-            App.Services.Member.loadData(App.Services.Member.SubRoleCollection,{},function(response){
-                $("#dataLoading").hide();
-                var role = _this.model.get("role");
-                if(role && role.length) {
-                    _this.selected(role);
-                }
-            });
-            return
-        }
-        _this.getData(parent);
+        //获取所有列表，就可以了，继承项设置不可修改
+
+
+        App.Services.Member.loadData(App.Services.Member.SubRoleCollection,{},function(response){
+            $(".serviceBody .content").removeClass("services_loading");
+            var role = _this.model.get("role");
+            if(role && role.length) {
+                _this.selected(role);
+            }
+            App.Services.maskWindow.find(".memRoleList h2 i").text(role.length);
+        });
+
+        //if(!parent.data("id")){}
+
     },
 
     //已选状态
     selected:function(arr){
+        var n = 0;//统计
         App.Services.Member.SubRoleCollection.each(function(item){
             for(var i = 0 ; i< arr.length ; i++){
                 if(item.get("roleId") == arr[i]["roleId"]){
+                    if(arr[i]["inherit"]){
+                        item.set("inherit", true);
+                        return
+                    }
                     item.set("checked", true);
                 }
             }
         });
+        return n;
     },
 
-    //加载数据
-    getData:function(parent){
+    //加载父项数据
+   /* getData:function(parent){
         var _this =this,type =  App.Services.MemberType || "inner";
         var datas  ={
             URLtype:"fetchServicesOzRoleList",
@@ -81,14 +91,14 @@ App.Services.memberDetail=Backbone.View.extend({
                 }
             }
         });
-    },
+    },*/
 
     //保存数据到全局变量
     save:function(){
-        var type =  App.Services.MemberType || "inner";
-        var data =  App.Services.memberWindowData;
-        var userId = this.model.get("userId");
-        var orgId  = this.model.get("orgId");
+        var type =  App.Services.MemberType || "inner",
+            data =  App.Services.memberWindowData,
+            userId = this.model.get("userId"),
+            orgId  = this.model.get("orgId");
         if(userId){
             data[type].userId.push(userId);
         }else if(orgId){

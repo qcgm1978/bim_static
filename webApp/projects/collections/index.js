@@ -1,5 +1,14 @@
  App.Projects = {
 
+    //项目业态
+    projectType:{
+        '':'其他',
+        "1":'综合体',
+        "2":'文化旅游',
+        "3":'境外',
+        '4':'其他'
+    },
+
      ProjectCollection: new(Backbone.Collection.extend({
          model: Backbone.Model.extend({
              defaults: function() {
@@ -227,6 +236,7 @@
          }
 
      }
+
 
 
 

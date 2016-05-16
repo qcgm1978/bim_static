@@ -9,7 +9,9 @@ App.Services.ApplicationListDetail = Backbone.View.extend({
 		"click  .reset": "resetKey",
 		"click  .myIcon-update": "updateAppDialog",
 		"click  .myIcon-del-blue": "delAppDialog",
-		"click .switchStatus": "switchStatus"
+		"click .switchStatus": "switchStatus",
+		'mouseover .desc':'showTip',
+		'mouseout .desc':'hideTip'
 	},
 
 	initialize() {
@@ -66,10 +68,10 @@ App.Services.ApplicationListDetail = Backbone.View.extend({
 		var $item = $(event.target).closest(".item"),
 			data = {
 				isEdit: true,
-				name: $item.find(".name").text(),
-				desc: $item.find(".desc").text(),
-				appKey: $item.find(".appKey").text(),
-				appSecret: $item.find(".appSecret .text").text()
+				name: $item.find(".name").text().trim(),
+				desc: $item.find(".desc").text().trim(),
+				appKey: $item.find(".appKey").text().trim(),
+				appSecret: $item.find(".appSecret .text").text().trim()
 			},
 			dialogHtml = _.templateUrl('/services/tpls/application/index.add.html')(data);
 
@@ -189,6 +191,33 @@ App.Services.ApplicationListDetail = Backbone.View.extend({
 			}
 		});
 
+	},
+	
+	showTip(e){
+		var $target=$(e.currentTarget),
+			top=e.pageY,
+			left=e.pageX;
+		var $div=$('<div/>').css({
+			position:'fixed',
+			top:top+'px',
+			left:left+'px',
+			zIndex:9999,
+			border:'1px solid #000',
+			background:'#FFF',
+			borderRadius:'5px',
+		    padding: '3px',
+		    maxWidth: '500px',
+		    wordBreak: 'break-all',
+		    wordWrap: 'break-word'
+		    
+		});
+		this.currentTip=$div;
+		
+		$div.html($target.html()).appendTo($('body'));
+	},
+	
+	hideTip(e){
+		this.currentTip.remove();
 	}
 
 });

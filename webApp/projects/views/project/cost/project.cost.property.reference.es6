@@ -14,8 +14,8 @@ App.Project.CostReference = Backbone.View.extend({
 
 
 	events: {
-		"click .tbReference  tr": "showInModle",
-		"click tr .nodeSwitch": "nodeSwitch"
+		"click .tbBodyContent": "showInModle",
+		"click .tbBodyContent .nodeSwitch": "nodeSwitch"
 	},
 
 
@@ -28,26 +28,33 @@ App.Project.CostReference = Backbone.View.extend({
 
 	template: _.templateUrl("/projects/tpls/project/cost/project.cost.property.reference.detail.html"),
 
+	rootTemplate: _.templateUrl("/projects/tpls/project/cost/project.cost.property.reference.detail.root.html"),
+
+	itemTemplate: _.templateUrl("/projects/tpls/project/cost/project.cost.property.reference.detail.root.item.html"),
+
 	//获取数据后处理
 	addOne: function(model) {
 		var data = model.toJSON();
-		this.$(".tbReference tbody").html(this.template(data));
+		data.treeNode = this.itemTemplate;
+		this.$(".tbBody .tbBodyContent").html(this.rootTemplate(data));
+
+		App.Comm.initScroll(this.$(".tbBodyScroll"),"y");
 	},
 
 	reset() {
-		this.$(".tbReference tbody").html(App.Project.Settings.loadingTpl);
+		this.$(".tbBody .tbBodyContent").html(App.Project.Settings.loadingTpl);
 	},
 	//模型中显示
 	showInModle(event) {
 
-		var $target = $(event.target).closest("tr");
+		var $target = $(event.target).closest(".item");
 
 
 		if ($target.hasClass("selected")) {
-			$target.parent().find(".selected").removeClass("selected");
+			this.$(".tbBodyScroll").find(".selected").removeClass("selected");
 			//$target.removeClass("selected");
 		} else {
-			$target.parent().find(".selected").removeClass("selected");
+			this.$(".tbBodyScroll").find(".selected").removeClass("selected");
 			$target.addClass("selected");
 		}
 
@@ -55,7 +62,7 @@ App.Project.CostReference = Backbone.View.extend({
 
 		if ($target.data("cate")) {
 
-			$target.parent().find(".selected").each(function() {
+			this.$(".tbBodyScroll").find(".selected").each(function() {
 				Ids = $.merge(Ids, $(this).data("cate"))
 			});
 			App.Project.Settings.Viewer.selectIds(Ids);
@@ -85,11 +92,7 @@ App.Project.CostReference = Backbone.View.extend({
 					Ids = $.merge(Ids, $(this).data("cate"))
 				});
 				App.Project.Settings.Viewer.selectIds(Ids);
-				App.Project.Settings.Viewer.zoomSelected();
-				// App.Project.Settings.Viewer.highlight({
-				// 	type: "userId",
-				// 	ids: Ids
-				// })
+				App.Project.Settings.Viewer.zoomSelected(); 
 			}
 		});
 
@@ -98,60 +101,22 @@ App.Project.CostReference = Backbone.View.extend({
 	},
 
 	//收起展开
-	nodeSwitch(event) {
-		 
+	nodeSwitch(event) { 
+
 		var $target = $(event.target),
+			$node = $target.closest(".node");
 
-			$tr = $target.closest("tr"),
-			isOpen = $target.hasClass("on");
-
-		if ($tr.hasClass("stepOne")) {
-			//展开
-			if (isOpen) {
-				$tr.nextUntil(".stepOne").hide();
-				$target.removeClass("on");
-			} else {
-				$tr.nextUntil(".stepOne").show();
-				$target.addClass("on");
-			}
-		}
-
-		if ($tr.hasClass("stepTwo")) {
-
-			var nextUntilStepOne = $tr.nextUntil(".stepTwo"),
-				isExists = false;
-
-			nextUntilStepOne.each(function() {
-				if ($(this).hasClass(".stepOne")) {
-					isExists = true;
-					return false;
-				}
-			}); 
-
-			if (isExists) {
-				//展开
-				if (isOpen) {
-					$tr.nextUntil(".stepOne").hide();
-				} else {
-					$tr.nextUntil(".stepOne").show();
-				}
-			} else {
-				nextUntilStepOne.splice(-1);
-				if (isOpen) {
-					nextUntilStepOne.hide();
-				}else{
-					nextUntilStepOne.show();
-				} 
-			} 
-		} 
-
-		if (isOpen) {
+		if ($target.hasClass("on")) {
 			$target.removeClass("on");
+			$node.children("ul").hide();
 		} else {
 			$target.addClass("on");
-		}
+			$node.children("ul").show();
+		} 
 
-		event.stopPropagation();
+		//this.$(".tbBodyScroll .tbBodyContent li:visible:odd").addClass("odd");
+
+		event.stopPropagation(); 
 
 	}
 

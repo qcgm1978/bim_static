@@ -39,6 +39,7 @@ App.API = {
 		fetchProjectCreateBaseHole:'platform/pit/createPit',
 		fetchProjectCreateFloor:'platform/building/createBuilding',
 		fetchProjectCreateSection:'platform/profile/createProfile',
+		fetchProjectCreatePile:'platform/pile/createPile',
 		//项目详细信息-读取
 		fetchProjectDetailBaseholeList:'platform/pit/{projectId}',
 		fetchProjectDetailFloorList:'platform/building/{projectId}',
@@ -49,6 +50,7 @@ App.API = {
 		fetchProjectUpdateBaseHole:'platform/pit/updatePit',
 		fetchProjectUpdateFloor:'platform/building/updateBuilding',
 		fetchProjectUpdateSection:'platform/profile/updateProfile',
+		fetchProjectUpdatePile:'platform/pile/updatePile',
 		//项目详细信息-删除
 		removeProjectDetailBasehole:'platform/pit/{pitId}',
 		removeProjectDetailFloor:'platform/building/{floorId}',
@@ -221,6 +223,9 @@ App.API = {
 		projectCodeMapping:"platform/mapping/{projectId}",
 		getBoundingBox:"sixD/{projectId}/{projectVersionId}/bounding/box",//获取构建的 box id ?sceneId={sceneId}&elementId={elementId}
 		
+
+		appToken:"platform/token", //获取app token
+
 		//业务流程
 		fetchFlow:'platform/flow',
 		

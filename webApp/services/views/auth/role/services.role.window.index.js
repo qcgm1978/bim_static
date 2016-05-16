@@ -103,7 +103,7 @@ App.Services.roleWindowIndex = Backbone.View.extend({
         App.Services.newRoleModel =  new roleModel(newRole);
         App.Services.newRoleModel.save(data,{
             success:function(collection, response, options){
-                if(response.message == "success"){
+                if(response.code == 0){
                     App.Services.role.collection.add(response.data);
                 }
                 setTimeout(function(){
