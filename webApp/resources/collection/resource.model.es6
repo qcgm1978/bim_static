@@ -26,10 +26,10 @@ App.ResourceModel = {
 		urlType: "fetchFileList",
 
 		parse: function(responese) {
-			 
-			if (responese.code==0 && responese.data.length>0) {
+
+			if (responese.code == 0 && responese.data.length > 0) {
 				return responese.data;
-			}else{
+			} else {
 				$("#resourceListContent .fileContent").html('<li class="loading">无数据</li>');
 			}
 		}
@@ -50,9 +50,9 @@ App.ResourceModel = {
 		urlType: "fetchFileList",
 
 		parse: function(responese) {
-			if (responese.code==0 && responese.data.length>0) {
+			if (responese.code == 0 && responese.data.length > 0) {
 				return responese.data;
-			}else{
+			} else {
 				$("#resourceThumContent .thumContent").html('<li class="loading">无数据</li>');
 			}
 		}
@@ -81,8 +81,8 @@ App.ResourceModel = {
 	})),
 
 	//初始化
-	init: function() { 
-		 
+	init: function() {
+
 		//释放上传
 		App.Comm.upload.destroy();
 
@@ -94,6 +94,27 @@ App.ResourceModel = {
 			App.ResourceModel.renderLibs();
 		} else {
 			App.ResourceModel.getVersion();
+		}
+
+		if (!App.ResourceModel.Settings.bindGlobalEvent) {
+			App.ResourceModel.Settings.bindGlobalEvent = true;
+			App.ResourceModel.bindGlobalEvent();
+		}
+	},
+
+	//token 初始化
+	initToken() {
+		//释放上传
+		App.Comm.upload.destroy();
+
+		//重置参数
+		this.reset();
+
+		//存在直接渲染 否则 加载数据
+		if (App.ResourceModel.Settings.CurrentVersion && 　App.ResourceModel.Settings.CurrentVersion.id) {
+			App.ResourceModel.renderLibs();
+		} else {
+			App.ResourceModel.getVersionByToken();
 		}
 
 		if (!App.ResourceModel.Settings.bindGlobalEvent) {
@@ -182,6 +203,41 @@ App.ResourceModel = {
 		});
 	},
 
+	//根据token获取版本
+	getVersionByToken() {
+
+
+
+		var data = {
+			URLtype: "fetchProjectBaseInfo",
+			data: {
+				projectId: App.ResourceModel.Settings.projectId
+
+			}
+		};
+
+		App.Comm.ajax(data, function(data) { 
+			if (data.code == 0) { 
+
+				App.ResourceModel.Settings.CurrentVersion = data.data.version;
+
+				if (!App.ResourceModel.Settings.CurrentVersion) {
+					alert("无默认版本");
+					return;
+				} else {
+					//渲染数据
+					App.ResourceModel.renderLibs();
+				}
+
+			} else {
+				alert("获取版本失败");
+			}
+
+		});
+
+
+	},
+
 
 	//渲染标准模型库
 	renderLibs() {
@@ -198,17 +254,17 @@ App.ResourceModel = {
 				App.ResourceModel.FileCollection.reset();
 				App.ResourceModel.FileCollection.fetch({
 					success: function() {
-						 
+
 						$("#pageLoading").hide();
 					}
 				});
-			} else if (type == "family") {
+			} else if (type == "famLibs") {
 				App.ResourceModel.FileThumCollection.projectId = App.ResourceModel.Settings.CurrentVersion.projectId;
 				App.ResourceModel.FileThumCollection.projectVersionId = App.ResourceModel.Settings.CurrentVersion.id;
 				App.ResourceModel.FileThumCollection.reset();
 				App.ResourceModel.FileThumCollection.fetch({
 					success: function() {
-						 
+
 						$("#pageLoading").hide();
 					}
 				});

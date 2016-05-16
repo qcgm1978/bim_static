@@ -164,6 +164,7 @@ App.API = {
 		fetchQualityConcerns: "sixD/{projectId}/{projectVersionId}/problem", //隐患
 		fetchQualityProperties: "dataJson/project/project.design.property.json", // 属性
 		fetchQualityModelById:"sixD/{projectId}/{versionId}/quality/element", //开业验收 过程 验收 获取构建id  ?acceptanceId={acceptanceId}
+		fetchQualityProcessDisease:'sixD/{projectId}/{versionId}/problem/list',
 
 
 		//资源
@@ -223,6 +224,9 @@ App.API = {
 		projectCodeMapping:"platform/mapping/{projectId}",
 		getBoundingBox:"sixD/{projectId}/{projectVersionId}/bounding/box",//获取构建的 box id ?sceneId={sceneId}&elementId={elementId}
 		
+
+		appToken:"platform/token", //获取app token
+
 		//业务流程
 		fetchFlow:'platform/flow',
 		

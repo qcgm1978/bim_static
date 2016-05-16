@@ -19,6 +19,13 @@ App.Project = {
 		DataModel: null //渲染模型的数据
 	}, 
 
+	//客户化数据映射字典
+	mapData:{
+		organizationTypeId:['','质监','第三方','项目公司','监理单位'],
+		status:['','待整改','已整改','已关闭'],
+		statusColor:['','#FF2500','#FFAD25','#00A648']
+	},
+
 	// 文件 容器
 	FileCollection: new(Backbone.Collection.extend({
 
