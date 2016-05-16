@@ -22,10 +22,12 @@ ul,li{list-style: none outside none;}
 #blendList{overflow: auto;}
 .serviceBody{position: absolute;top:129px;left:0;right:0;bottom:0;}
 .serviceBody .menu{ bottom: 0px; position: absolute;left: 0;top: 0;width: 270px;border: 1px solid #ccc;border-top: none;background-color: #ffffff;;height: 100%;overflow: auto;}
-.serviceBody .menu li{line-height: 25px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;}
+.serviceBody .menu li{line-height: 25px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;position: relative;}
 .serviceBody .menu li span{padding: 2px 3px;cursor: pointer;}
 .serviceBody .menu li span.active{background-color: #a8dbfd;}
-.serviceBody .menu li div{position: relative;padding-left: 22px;}
+
+.serviceBody .menu li .childOz,.inner,.outer{padding-left: 22px;}
+.serviceBody .menu li div.ozName{position: relative;padding-left: 22px;}
 .serviceBody .menu li div.ozName:before,.serviceBody .menu li div.inner:before,.serviceBody .menu li div.outer:before{content: '';position: absolute;width: 20px;height: 14px;top: 4px;left: 0;background: transparent url('../images/service_ico.png') 0 -100px no-repeat;}
 .serviceBody .menu li div.ozName.active:before,.serviceBody .menu li div.inner.active:before,.serviceBody .menu li div.outer.active:before{background-position: 0 -80px ;}
 .serviceBody .menu h3{line-height: 50px;padding-left: 22px;font-size: 14px;color: #686868;border-bottom: 1px solid #cccccc;}
@@ -132,7 +134,6 @@ ul,li{list-style: none outside none;}
 .seWinBody .aim input:focus{color: #333333;}
 .seWinBody .aim .name i{display: inline-block;width: 17px;height: 16px;.background-ioc;background-position: 0 -20px;background-size: 20px auto;margin: 0 6px 0 5px;}
 .seWinBody .aim .name i.oz{background-position: 0 -100px;background-size: 40px auto;}
-
 /*checkbox*/
 .memCheck{display: inline-block;.serviceInput;}
 .active .memCheck{background-position: 0 -420px;}
@@ -146,11 +147,12 @@ ul,li{list-style: none outside none;}
 .selectMem{}
 .keyU h3{line-height: 28px;height: 29px;border-bottom: 1px solid #cccccc;color: #cccccc;font-size: 14px;}
 
-
-
 .servicesAlert .alertInfo{height: 110px;line-height: 22px;padding: 20px 0 20px 60px;position: relative;}
 .servicesAlert .alertInfo:before{content: '';position: absolute;.background-ioc;width:32px;height: 32px; background-position: 0 -300px;left: 10px;top: 20px;}
 .servicesAlert .confirm{text-align: center;}
 .servicesAlert .alert{text-align: center;display: none;}
 .servicesAlert .confirm input{outline: none;}
 
+/*узуж*/
+.services_loading{position: relative;}
+.services_loading:after{content: '';position: absolute;left: 0;top: 0;width: 100%;height: 100%;background: rgba(255,255,255,.3) url('../../comm/images/load.gif') center center no-repeat;background-size: 48px 48px;}

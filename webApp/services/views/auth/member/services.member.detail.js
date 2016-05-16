@@ -26,7 +26,7 @@ App.Services.memberDetail=Backbone.View.extend({
     //单个修改
     modify:function(){
         var _this =this;
-        $("#dataLoading").show();
+        $(".serviceBody .content").addClass("services_loading");
         var frame = new App.Services.MemberWindowIndex().render().el;//外框
         var parent = $("#ozList").find("span.active").parent(".ozName");//父项id
         _this.window(frame);
@@ -37,7 +37,7 @@ App.Services.memberDetail=Backbone.View.extend({
 
 
         App.Services.Member.loadData(App.Services.Member.SubRoleCollection,{},function(response){
-            $("#dataLoading").hide();
+            $(".serviceBody .content").removeClass("services_loading");
             var role = _this.model.get("role");
             if(role && role.length) {
                 _this.selected(role);

@@ -35,9 +35,9 @@ App.Services.AuthNav = Backbone.View.extend({
 		this.breadCrumb(this.$el.find(".memCtrl"));
 		this.$(".serviceBody").html(new App.Services.MemberNav().render().el);
 		this.$(".serviceBody .content").html(new App.Services.MemberList().render().el);
-		App.Services.Member.loadData(App.Services.Member.innerCollection,{},function(){
+		App.Services.Member.loadData(App.Services.Member.innerCollection,{},function(response){
 			$("#inner span").addClass("active");
-			$("#inner").siblings(".childOz").html(new App.Services.MemberozList(App.Services.Member.innerCollection.models).render().el);
+			$("#inner").siblings(".childOz").html(App.Services.tree(response));
 		});
 		//App.Services.init("auth","memCtrl");
 	},
