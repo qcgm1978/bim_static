@@ -16663,6 +16663,7 @@ CLOUD.ModelManager.prototype.loadMpk = function (mpkId, client, callback) {
 
     if (!mpkIdx) {
         console.log("missing mpk " + mpkId);
+        callback();
         return;
     }
     // Reuse if possible.

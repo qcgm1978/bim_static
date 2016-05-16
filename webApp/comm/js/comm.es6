@@ -111,12 +111,12 @@ App.Comm = {
 			return null;
 	},
 	//删除cookie
-	delCookie: function(name) {
+	delCookie: function(name) { 
 		var exp = new Date();
-		exp.setTime(exp.getTime() - 1);
-		var cval = getCookie(name);
+		exp.setTime(exp.getTime() - 31*24*60*60*1000);
+		var cval = this.getCookie(name);
 		if (cval != null)
-			document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString();
+			document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString()+";domain=.wanda-dev.cn;path=/";
 	},
 	//格式化 文件大小
 	formatSize: function(size) {

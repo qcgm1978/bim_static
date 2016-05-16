@@ -1,32 +1,36 @@
 var AppRoute = Backbone.Router.extend({
 
 	routes: {
-		'family/:libId': 'resourceModel',
+		'family/:libId': 'family',
+		'model/:modelCode/version/:versionId': 'standardLibs'
 
 	},
 
+	//族库
+	family(libIid) {
 
-
-	//单个项目
-	resource: function(type, id) { 
-
-		this.reset();
-		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".resources").addClass('selected');
-		_.require('/static/dist/resources/resources.css');
-		_.require('/static/dist/resources/resources.js');
-		App.ResourcesNav.Settings.type = type;
-		App.ResourcesNav.init();
-	},
-
-	resourceModel: function(type, projectId) {
-
-
-		this.checkLogin((isLogin)=>{
+		//验证登录
+		this.checkLogin((isLogin) => {
 
 			if (!isLogin) {
 				return;
 			}
 
+			this.resourceModel("famLibs", libIid);
+
+		});
+
+	},
+
+	//标准模型库
+	standardLibs(modelCode, versionId) {
+
+		//验证登录
+		this.checkLogin((isLogin) => {
+
+			if (!isLogin) {
+				return;
+			}
 
 			this.reset();
 
@@ -36,12 +40,37 @@ var AppRoute = Backbone.Router.extend({
 
 			_.require('/static/dist/resources/resources.js');
 
-			App.ResourcesNav.Settings.type = App.ResourceModel.Settings.type = type;
+			App.ResourcesNav.Settings.type = App.ResourceModel.Settings.type = "standardLibs";
 			App.ResourceModel.Settings.CurrentVersion = {};
-			App.ResourceModel.Settings.projectId = projectId;
-
+			App.ResourceModel.Settings.projectId = modelCode;
+			App.ResourceModel.Settings.versionId = versionId;
 			App.ResourceModel.init();
+
+
 		});
+
+
+	},
+
+
+	//资源库
+	resourceModel: function(type, projectId) {
+
+
+		this.reset();
+
+		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".resources").addClass('selected');
+
+		_.require('/static/dist/resources/resources.css');
+
+		_.require('/static/dist/resources/resources.js');
+
+		App.ResourcesNav.Settings.type = App.ResourceModel.Settings.type = type;
+		App.ResourceModel.Settings.CurrentVersion = {};
+		App.ResourceModel.Settings.projectId = projectId;
+
+		App.ResourceModel.initToken();
+
 
 
 	},
@@ -60,11 +89,12 @@ var AppRoute = Backbone.Router.extend({
 
 	//检查登录
 	checkLogin(fn) {
-		debugger
+
 		$("#pageLoading").show();
 
 		$("#topBar .bodyConMenu").remove().end().find(".flow").remove().end().find(".services").remove();
 		App.Comm.Settings.loginType = "token";
+
 		var that = this;
 		//是否登录了
 		if (!App.Comm.getCookie("token_cookie")) {
@@ -84,7 +114,7 @@ var AppRoute = Backbone.Router.extend({
 				if (data.code == 0) {
 
 					App.Comm.setCookie("token_cookie", data.data);
-
+					//获取用户信息
 					that.getUserInfo(fn);
 
 				} else {
@@ -101,11 +131,14 @@ var AppRoute = Backbone.Router.extend({
 		} else {
 			fn(true);
 		}
-
+		this.cleanCookie();
 	},
 
 	//获取用户信息
 	getUserInfo(fn) {
+
+
+		var that = this;
 
 		$.ajax({
 			url: '/platform/user/current'
@@ -120,8 +153,18 @@ var AppRoute = Backbone.Router.extend({
 			localStorage.setItem("user", JSON.stringify(data.data));
 			fn(true);
 
+
+
 		});
 	},
+
+	//退出清除cookie
+	cleanCookie() {
+		//绑定beforeunload事件
+		$(window).on('beforeunload', function() {
+			App.Comm.delCookie("token_cookie")
+		});
+	}
 
 
 
