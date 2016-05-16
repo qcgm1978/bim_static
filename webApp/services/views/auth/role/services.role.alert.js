@@ -49,6 +49,8 @@ App.Services.windowAlert = Backbone.View.extend({
                     alert("删除失败，类型未判定");
                     App.Services.alertWindow.close();
                 }
+
+                $(".serviceBody .roleCtrl").removeClass("services_loading");
                 App.Services.deleteRoleInfo ="";//清理
             },
             error:function(error){

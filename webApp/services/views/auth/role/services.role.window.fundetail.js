@@ -25,13 +25,17 @@ App.Services.roleWindowFunDetail = Backbone.View.extend({
     },
 
     choose:function() {
+        var window= App.Services.maskWindow.find(".seWinBody .func h2 i");
+        count = parseInt(window.html());
         var preV = this.model.get("checked");
         if (!preV) {
             this.$el.addClass("active");
             this.$(".memCheck").addClass("checked");
+            window.html(count + 1);
         } else {
             this.$el.removeClass("active");
             this.$(".memCheck").removeClass("checked");
+            window.html(count - 1);
         }
         this.model.set("checked",!preV);
     }
