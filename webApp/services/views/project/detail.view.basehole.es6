@@ -67,6 +67,15 @@ App.Services.DetailView.BaseHole=Backbone.View.extend({
 			$accord=$this.parent().next();
 		if($this.hasClass('accordOpen')){
 			$accord.slideDown();
+			
+			var $all=this._parentView.$('.accordionDatail');
+			$all.each(function(){
+				if(!$(this).hasClass('accordOpen')){
+					$(this).addClass('accordOpen');
+					$(this).parent().next().slideUp();
+				}
+			})
+			
 		}else{
 			$accord.slideUp();
 		}

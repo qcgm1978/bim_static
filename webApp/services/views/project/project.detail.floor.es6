@@ -49,7 +49,8 @@ App.Services.ProjectDetail.Floor=Backbone.View.extend({
 		$container.html("");
 		items.models.forEach(function(model){
 			var view=new App.Services.DetailView.Floor({
-				projectId:_this.userData.projectId
+				projectId:_this.userData.projectId,
+				_parentView:_this
 			});
 			$container.append(view.render(model.toJSON()).el);
 			//view.toggleProFrom('.accordionDatail');
