@@ -918,7 +918,7 @@ CLOUD.MiniMap = function (viewer, callback) {
         var mainScene = this.viewer.getScene();
         var rootNode = mainScene.rootNode;
         //rootNode.updateMatrixWorld(true);
-        rootNode.updateMatrix();
+        //rootNode.updateMatrix();
         //rootNode.matrixAutoUpdate = false;
 
         return rootNode.matrix.clone();
@@ -1319,8 +1319,8 @@ CLOUD.MiniMap = function (viewer, callback) {
 
         if (!jsonObj) return;
 
-        var url = jsonObj["Path"];
-        var boundingBox = jsonObj["BoundingBox"];
+        var url = jsonObj["Path"] || jsonObj["path"];
+        var boundingBox = jsonObj["BoundingBox"] || jsonObj["boundingBox"];
 
         if (!url || !boundingBox) {
             console.warn('floor-plan data is error!');

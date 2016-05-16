@@ -3,7 +3,7 @@
 */
 
 var CLOUD = CLOUD || {};
-CLOUD.Version = "20160513";
+CLOUD.Version = "20160426";
 
 CLOUD.GlobalData = {
     SceneSize: 1000,
@@ -22,7 +22,7 @@ CLOUD.GlobalData = {
     RayTracingDeep: 10,
     SubSceneVisibleLOD: 10,
     ScreenCullLOD: 0.0002,
-    LimitFrameTime: 30
+    LimitFrameTime: 60
 };
 
 CLOUD.EnumObjectLevel = {
@@ -1087,7 +1087,7 @@ CLOUD.RenderGroup = function () {
            
             renderer.renderBufferDirect(camera, lights, fog, geometry, material, object, group);
 
-            if (i % 5000 === 4999) {
+            if ( (i % 5000) === 4999) {
                 //endTime = window.performance.now();
                 endTime = Date.now();
 
