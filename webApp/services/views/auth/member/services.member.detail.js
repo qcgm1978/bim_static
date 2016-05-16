@@ -25,28 +25,40 @@ App.Services.memberDetail=Backbone.View.extend({
 
     //单个修改
     modify:function(){
-        var _this =this;
+        var _this =this,disable,selected;
         $(".serviceBody .content").addClass("services_loading");
         var frame = new App.Services.MemberWindowIndex().render().el;//外框
-        var parent = $("#ozList").find("span.active").parent(".ozName");//父项id
         _this.window(frame);
         _this.chooseSelf();
         _this.save();
 
         //获取所有列表，就可以了，继承项设置不可修改
-
-
         App.Services.Member.loadData(App.Services.Member.SubRoleCollection,{},function(response){
             $(".serviceBody .content").removeClass("services_loading");
             var role = _this.model.get("role");
             if(role && role.length) {
-                _this.selected(role);
+                selected  = _.filter(role,function(item){
+                    return !item.inherit
+                });
+                _this.selected(selected);
+                disable = _.filter(role,function(item){
+                    return item.inherit
+                });
+                _this.disable(disable);
             }
             App.Services.maskWindow.find(".memRoleList h2 i").text(role.length);
         });
 
-        //if(!parent.data("id")){}
+    },
 
+    disable:function(arr){
+        App.Services.Member.SubRoleCollection.each(function(item){
+            for(var i = 0 ; i< arr.length ; i++){
+                if(item.get("roleId") == arr[i]["roleId"]){
+                    item.set("inherit", true);
+                }
+            }
+        });
     },
 
     //已选状态

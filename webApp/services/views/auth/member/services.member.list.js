@@ -33,22 +33,24 @@ App.Services.MemberList=Backbone.View.extend({
     //选中事件
     selectAll:function(){
         var type =  App.Services.MemberType,
-            $this = this,
+            _this = this,
             preSele= this.$(".head input")[0].checked,
             collection = App.Services.Member[type + "Collection"];
+        console.log(this.$(":checkbox").find(".memCheck"));
+        if(this.$(":checkbox").length ==1  && !(this.$(":checkbox").find(".memCheck").length)){
+            return
+        }
         this.$(":checkbox").each(function(checkbox){
             checkbox.checked = preSele;
             if(preSele){
-                $this.$("li").addClass("active");
+                _this.$("li").addClass("active");
                 collection.each(function(item){item.set({"checked":true})})
             }else{
-                $this.$("li").removeClass("active");
+                _this.$("li").removeClass("active");
                 collection.each(function(item){item.set({"checked":false})})
             }
         })
     },
-
-
 
     //批量授权
     batchAward:function(){
@@ -56,6 +58,8 @@ App.Services.MemberList=Backbone.View.extend({
         var  _this =this,//提交地址
             type =  App.Services.MemberType,//组织类型
             seleUser,
+            selected,
+            disable,
             singleModel; //单选模型
 
         //获取所选项
@@ -71,23 +75,28 @@ App.Services.MemberList=Backbone.View.extend({
         //弹窗框架
         _this.window();
 
-
         //单选
         if(seleUser.length == 1) {
             singleModel = seleUser[0];
-            getRole = singleModel.get("role");
-            //取得总体角色与个人角色联系，比较并
             //角色数据
             App.Services.Member.loadData(App.Services.Member.SubRoleCollection,{},function(response){
+                $(".seWinBody .aim ul").append(new App.Services.MemberWindowDetail({model:seleUser[0]}).render().el);
                 $(".serviceBody .content").removeClass("services_loading");
                 var role = singleModel.get("role");
                 if(role && role.length) {
-                    _this.selected(role);
+                    App.Services.maskWindow.find(".memRoleList h2 i").text(role.length);
+                    selected =  _.filter(role,function(item){
+                        return !item.inherit
+                    });
+                    _this.selected(selected);
+                    disable = _.filter(role,function(item){
+                        return item.inherit
+                    });
+                    _this.disable(disable);
                 }
             });
             return
         }
-
 
         //多选，写入已选用户和组织
         _.each(seleUser,function(item){
@@ -103,7 +112,7 @@ App.Services.MemberList=Backbone.View.extend({
 
     //获取父项数据
     getFatherData:function(){
-        var parentId = App.Services.memFatherId,//不靠谱
+        var parentId = App.Services.memFatherId,
             _this =this ;
         //无父项时获取缺省角色列表，此处为可能出错
         if(!parentId){
@@ -128,7 +137,8 @@ App.Services.MemberList=Backbone.View.extend({
                 var role = response.data;
 
                 if(role && role.length) {
-                    _this.disable(role);
+                    _this.disable( role);
+                    App.Services.maskWindow.find(".memRoleList h2 i").text(role.length);
                 }
 
                 $(".serviceBody .content").removeClass("services_loading");
@@ -146,17 +156,16 @@ App.Services.MemberList=Backbone.View.extend({
         });
     },
 
-
     //已选状态
     selected:function(arr){
         App.Services.Member.SubRoleCollection.each(function(item){
             for(var i = 0 ; i< arr.length ; i++){
                 if(item.get("roleId") == arr[i]["roleId"]){
+                    item.set("checked", true);
                     if(arr[i]["inherit"]){
                         item.set("inherit", true);
-                        return
+                        item.set("checked", false);
                     }
-                    item.set("checked", true);
                 }
             }
         });
@@ -183,8 +192,6 @@ App.Services.MemberList=Backbone.View.extend({
             App.Services.Member.saveMemData(data);
         });
     },
-
-
 
     //弹窗管理
     window:function(){
