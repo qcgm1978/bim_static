@@ -106,7 +106,8 @@ ViewComp.MemberManager = Backbone.View.extend({
 				view: {
 					selectedMulti: true,
 					nameIsHTML:true,
-					showLine: false
+					showLine: false,
+					showTitle:false
 				}
 		};
 		if(parentId){
@@ -129,6 +130,7 @@ ViewComp.MemberManager = Backbone.View.extend({
 					zNodes=res.data.org;
 					zNodes.forEach(function(i){
 						i.iconSkin='business';
+						i.name=i.name+'<label style="margin-left:40px;color:#ccc;">('+i.namePath+')</label>';
 					})
 				}else{
 					var _org=res.data.org||[],

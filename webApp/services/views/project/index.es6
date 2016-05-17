@@ -108,7 +108,6 @@
  		let collectionBasehole=App.Services.ProjectCollection.ProjecDetailBaseHoleCollection;
  		collectionBasehole.projectId=_projectId;
  		collectionBasehole.fetch({
- 			reset:true,
  			success(child, data) {
  				
  				App.Services.ProjectCollection.datas.pitData=data.data.pits;
@@ -118,11 +117,7 @@
 		 		});
 		 		let collectionFloor=App.Services.ProjectCollection.ProjecDetailFloorCollection;
 		 		collectionFloor.projectId=_projectId;
-		 		collectionFloor.fetch({
-		 			reset:true,
-		 			success(child, data) {
-		 			}
-		 		});
+		 		collectionFloor.fetch();
 		 		
 		 		//加载剖面信息
 		 		_this.viewProjectSection.setUserData({
@@ -130,11 +125,7 @@
 		 		});
 		 		let collectionSection=App.Services.ProjectCollection.ProjecDetailSectionCollection;
 		 		collectionSection.projectId=_projectId;
-		 		collectionSection.fetch({
-		 			reset:true,
-		 			success(child, data) {
-		 			}
-		 		});
+		 		collectionSection.fetch();
 		 		
 		 		//加载桩信息
 		 		_this.viewProjectPile.setUserData({
@@ -143,9 +134,7 @@
 		 		let collectionPile=App.Services.ProjectCollection.ProjecDetailPileCollection;
 		 		collectionPile.projectId=_projectId;
 		 		collectionPile.fetch({
-		 			reset:true,
-		 			success(child, data) {
-		 			}
+		 			reset:true
 		 		});
  				
  			}

@@ -17,7 +17,7 @@ App.Project = {
 		attrView: null,
 		CurrentVersion: null, //当前版本信息
 		DataModel: null //渲染模型的数据
-	}, 
+	},  
 
 	//客户化数据映射字典
 	mapData:{
@@ -811,6 +811,7 @@ App.Project = {
 		App.Project.Settings.Viewer.selectIds(Ids);
 		App.Project.Settings.Viewer.zoomBox(boxArr);
 	}
+
 
 
 
