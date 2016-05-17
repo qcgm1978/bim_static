@@ -155,6 +155,7 @@ App.Project.QualityProcessAcceptance = Backbone.View.extend({
 			_parent:$target,
 			_flag:_flag
 		})
-
+		event.preventdefault();
+		event.stopPropagation();
 	}
 });
