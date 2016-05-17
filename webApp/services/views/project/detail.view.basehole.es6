@@ -32,12 +32,11 @@ App.Services.DetailView.BaseHole=Backbone.View.extend({
 		this._parentView=data._parentView;
 	},
 	
-	render(data){
-		var _this=this;
-		if(data){
-			_this.formData=data;
-		}
-		_this.$el.html(_this.template(_this.formData));
+	render(){
+		var _this=this,
+			data=this.model.toJSON();
+		this.formData=data;
+		_this.$el.html(_this.template(data));
 		_this.$(".isAnchor").myDropDown({
 			zIndex:App.Services.ProjectCollection.methods.zIndex(),
 			click:function($item){
@@ -59,8 +58,6 @@ App.Services.DetailView.BaseHole=Backbone.View.extend({
 		return _this;
 	},
 	
-	load(){
-	},
 	
 	toggleProFrom(e){
 		var $this=typeof e ==='string'?this.$(e):this.$(e.target),
@@ -68,7 +65,7 @@ App.Services.DetailView.BaseHole=Backbone.View.extend({
 		if($this.hasClass('accordOpen')){
 			$accord.slideDown();
 			
-			var $all=this._parentView.$('.accordionDatail');
+			var $all=$('.projectBaseHole .accordionDatail');
 			$all.each(function(){
 				if(!$(this).hasClass('accordOpen')){
 					$(this).addClass('accordOpen');
@@ -83,7 +80,6 @@ App.Services.DetailView.BaseHole=Backbone.View.extend({
 	},
 	
 	saveBasehole(args,type){
-		$('.projectBaseHole').mmhMask();	
 		var _this=this;
 		_this.$('input').each(function(){
 			var _=$(this);
@@ -99,9 +95,16 @@ App.Services.DetailView.BaseHole=Backbone.View.extend({
 			type:type||'post',
 			data:JSON.stringify(_this.formData),
 			contentType:'application/json'
-		},function(){
+		},function(res){
+			$.tip({message:'新增成功'});
+	 		Backbone.trigger('baseholeUserStatus','read');
+	 		_this.formData.id=res.data.pitId;
+	 		if(type){
+	 			_this.formData=res.data;
+	 		}
+	 		_this.model.set(_this.formData);
+	 		_this.$('.accordionDatail').trigger('click');
 	 		_this.reloadView();
-	 		_this._parentView.trigger('read');
 		}).fail(function(){
 			clearMask();
 		})
@@ -132,36 +135,25 @@ App.Services.DetailView.BaseHole=Backbone.View.extend({
 	
 	//刷新基坑页面、同时刷新楼层、剖面视图，保证数据一致性
 	reloadView(){
-	
 		var _this=this,
 			_proId=_this.formData.projectId,
 			AppCollection=App.Services.ProjectCollection,
 			collectionBasehole=AppCollection.ProjecDetailBaseHoleCollection,
 			collectionFloor=AppCollection.ProjecDetailFloorCollection,
-			collectionSection=AppCollection.ProjecDetailSectionCollection,
-			fecthOpts=function(){
-				return {
-		 			reset:true,
-		 			success(child, data) {}
-		 		}
-			};
+			collectionSection=AppCollection.ProjecDetailSectionCollection;
 		
  		collectionBasehole.projectId=_proId;
  		collectionFloor.projectId=_proId;
- 		collectionSection.projectId_proId;
- 		
+ 		collectionSection.projectId=_proId;
+
+ 		collectionBasehole.reset();
  		collectionBasehole.fetch({
- 			reset:true,
  			success(child, data) {
- 			
- 				//刷新基坑信息缓存数据
  				AppCollection.datas.pitData=data.data.pits;
- 					
- 				collectionFloor.fetch(fecthOpts());
-		 		collectionSection.fetch(fecthOpts());
-		 		
- 				_this.remove();
- 				clearMask();
+ 				collectionFloor.reset();	
+ 				collectionFloor.fetch();
+ 				collectionSection.reset();
+		 		collectionSection.fetch();
  			}
  		});
  		
