@@ -3,7 +3,7 @@
 
 <% obj.data && $.each(data,function(i,item){%>
            
-    <tr class="<%= i%2==0 &&'odd' || '' %>" data-code="<%=item.code%>">
+    <tr class="itemClick" class="<%= i%2==0 &&'odd' || '' %>" data-code="<%=item.code%>">
         <td class="ckItem"><i class="myIcon-circle-green"></i></td>
         <td class="planId"><%= item.no %></td>
         <td class="operationalMatters">  <%= item.businessItem %>  </td>
@@ -14,9 +14,9 @@
                
 
 <% if(!obj.data || data.length<=0){%>
-    
+    <tr><td colspan="8" style="border:0;">
+    <%= App.Project.NullPage.planModel %>
+    </td>
     <tr>
-        <td colspan="5" class="noDataTd">暂无数据</td>
-    </tr>
     
 <%}%>
