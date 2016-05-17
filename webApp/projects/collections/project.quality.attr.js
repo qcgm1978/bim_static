@@ -3,6 +3,52 @@
  */
 App.Project.QualityAttr = {
 
+	zindex:(function(){
+		var i=90000;
+		return function(){
+			return i++;
+		}
+	}()),
+
+	showDisease:function(event,_this,type){
+		_this.currentDiseaseView && _this.currentDiseaseView.$el.remove();
+		var 
+			$target=$(event.currentTarget),
+			id=$target.attr('data-id'),
+			isShow=$target.attr('data-total'),
+			_top=0,
+			_flag='up',
+			projectId = App.Project.Settings.projectId,
+			projectVersionId = App.Project.Settings.CurrentVersion.id;
+			
+		//没有隐患数据,则不打开数据
+		if(Number(isShow)<=0){
+			
+			return 
+		}
+		if(($('body').height()-$target.offset().top)>=302){
+			_top=$target.offset().top-175+24;
+		}else{
+			_top=$target.offset().top-300-175+24;
+			_flag='down';
+		}
+		var p={
+				top:_top+'px',
+				zIndex:this.zindex()
+			};
+		_this.currentDiseaseView=new App.Project.ProcessDisease({
+			params:{
+				projectId:projectId,
+				versionId:projectVersionId,
+				acceptanceId:id
+			},
+			viewConfig:p,
+			_parent:$target,
+			_flag:_flag,
+			type:type
+		})
+	},
+
 	// 材料设备  collection
 	MaterialEquipmentCollection: new(Backbone.Collection.extend({
 

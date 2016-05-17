@@ -7,6 +7,8 @@ App.Project.QualityOpeningAcceptance = Backbone.View.extend({
 
 	className: "QualityOpeningAcceptance",
 
+	currentDiseaseView:null,
+
 	initialize: function() {
 		this.listenTo(App.Project.QualityAttr.OpeningAcceptanceCollection, "add", this.addOne);
 		this.listenTo(App.Project.QualityAttr.OpeningAcceptanceCollection, "reset", this.loading);
@@ -16,7 +18,8 @@ App.Project.QualityOpeningAcceptance = Backbone.View.extend({
 	events: {
 		"click .searchToggle": "searchToggle",
 		"click .clearSearch": "clearSearch",
-		"click .tbOpeningacceptanceBody tr": "showInModel"
+		"click .tbOpeningacceptanceBody tr": "showInModel",
+		'click .resultStatusIcon':'showDiseaseList'
 	},
 
 
@@ -111,8 +114,10 @@ App.Project.QualityOpeningAcceptance = Backbone.View.extend({
 	//模型中显示
 	showInModel(event) { 
  		App.Project.showInModel($(event.target).closest("tr"),0);   
+	},
+
+	showDiseaseList(event){
+		App.Project.QualityAttr.showDisease(event,this,'open');// showDiseaseList
+		event.stopPropagation();
 	}
-
-
-
 });
