@@ -24,13 +24,15 @@ App.Project.PlanPublicity = Backbone.View.extend({
 	addOne: function(model) {
 
 		var data = model.toJSON();
-		this.$(".tbPlanWeek tbody").html(this.template(data));
+		this.$(".tbTop tbody").html(this.template(data));
+		App.Comm.initScroll(this.$(".tbTopScroll"),"y");
 	},
 
 	//月份
 	addOneMonth: function(model) {
 		var data = model.toJSON();
-		this.$(".tbPlanMonth tbody").html(this.template(data));
+		this.$(".tbBottom tbody").html(this.template(data));
+		App.Comm.initScroll(this.$(".tbBottomScroll"),"y");
 	}
 
 

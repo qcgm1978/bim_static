@@ -127,6 +127,8 @@
 			}
 			.start { width: 20%; }
 			.end { width: 20%; }
+			.planGroup { height: 49%; overflow-y: hidden; position: relative; }
+			.planBody { position: absolute; left: 0px; right: 0px; top: 59px; bottom: 0px; }
 		}
 	}
 	.planSearch { width: 100%; min-width: 398px; margin-top: 10px; padding-left: 15px;
@@ -306,7 +308,7 @@
 	}
 	.tbContainer { position: absolute; top: 45px; bottom: 32px; left: 0px; right: 0px; overflow: auto;
 		.materialequipmentList { margin-top: -31px; padding-top: 30px; height: 100%; min-width: 580px; width: 100%; }
-		.processAccessList, .openingacceptanceList { min-width: 398px; position: relative;}
+		.processAccessList, .openingacceptanceList { min-width: 398px; position: relative; }
 		.concernList { min-width: 540px; }
 	}
 	.tbComm { td, th { border: 1px #ccc solid; text-align: center; }
@@ -356,144 +358,29 @@
 #projectContainer { .containerHeader { .myBtn em { margin-top: 1px; vertical-align: top; }
 	}
 }
-
-.disease {
-	height: 270px;
-	min-width: 390px;
-	font-family: "microsoft yahei";
-	border: 1px solid #CCCCCC;
-	position:absolute;
-	right: 4px;
-	left: 4px;
-	background: #FFF;
-	box-shadow: 3px 3px 2px #555555;
-	
-	& .scrollWrap {
-		height: 240px;
+.disease { height: 270px; min-width: 390px; font-family: "microsoft yahei"; border: 1px solid #CCCCCC; position: absolute; right: 4px; left: 4px; background: #FFF; box-shadow: 3px 3px 2px #555555;
+	& .scrollWrap { height: 240px; }
+	& .safter, & .sbefore { width: 0; height: 0; border-bottom: 7px solid #CCC; border-right: 7px solid transparent; border-left: 7px solid transparent; content: ""; position: absolute; top: -8px; display: block; }
+	& .dafter, & .dbefore { width: 0; height: 0; border-top: 7px solid #CCC; border-right: 7px solid transparent; border-left: 7px solid transparent; content: ""; position: absolute; bottom: -8px; display: block; }
+	& .dbefore { border-top: 7px solid #FFF; bottom: -6px; }
+	& .safter { border-bottom: 7px solid #FFF; top: -6px; }
+	& span { display: block; }
+	& .header { color: #666; height: 30px; border-bottom: 1px solid #CCC; line-height: 30px; padding-left: 10px;
+		& .closeBtn { width: 20px; height: 20px; display: inline-block; background: url('../../comm/images/commIcon.png') no-repeat -40px -40px; margin-top: 7px; margin-right: 7px; float: right }
 	}
-	
-	& .safter,& .sbefore{
-		width: 0;
-	    height: 0;
-	    border-bottom: 7px solid #CCC;
-	    border-right: 7px solid transparent;
-	    border-left: 7px solid transparent;
-	    content: "";
-	    position: absolute;
-	    top: -8px;
-	    display: block;
+	& ul { }
+	& li { padding: 8px; height: 80px; border-bottom: 1px solid #CCCCCC;
+		&:hover { background: #B4E2FD; cursor: pointer; }
 	}
-	
-	& .dafter,& .dbefore{
-		width: 0;
-	    height: 0;
-	    border-top: 7px solid #CCC;
-	    border-right: 7px solid transparent;
-	    border-left: 7px solid transparent;
-	    content: "";
-	    position: absolute;
-	    bottom: -8px;
-	    display: block;
-	}
-	
-	& .dbefore{
-		border-top: 7px solid #FFF;
-		bottom: -6px;
-	}
-	
-	& .safter{
-		border-bottom: 7px solid #FFF;
-		top: -6px;
-	}
-	& span {
-		display: block;
-	}
-	& .header {
-		color: #666;
-		height: 30px;
-		border-bottom: 1px solid #CCC;
-		line-height: 30px;
-		padding-left: 10px;
-		
-		& .closeBtn {
-				width: 20px;
-				height: 20px;
-				display: inline-block;
-				background: url('../../comm/images/commIcon.png') no-repeat -40px -40px;
-				margin-top: 7px;
-    			margin-right: 7px;
-    			float: right
-			}
-	}
-	
-	& ul{
-	}
-	
-	& li {
-		padding: 8px;
-		height: 80px;
-		border-bottom: 1px solid #CCCCCC;
-		&:hover {
-			background: #B4E2FD;
-			cursor: pointer;
+	& .content > div { float: left; font-size: 14px; }
+	& .content { & .logo { width: 70px; height: 60px; }
+		& .descr { color: #333; width: 140px; height: 60px; padding-left: 8px; }
+		& .option { width: 140px; height: 60px; padding-left: 5px; }
+		& .title { height: 29px; line-height: 29px; display: inline-block; white-space: nowrap; text-overflow: ellipsis; width: 200px; overflow: hidden;
+			& i { width: 18px; height: 18px; display: inline-block; background: url('../../comm/images/commIcon.png') no-repeat 0 -658px; vertical-align: -5px; }
 		}
-	}
-	& .content > div {
-		float: left;
-		font-size: 14px;
-	}
-	& .content {
-		& .logo {
-			width: 70px;
-			height: 60px;
-		}
-		& .descr {
-			color: #333;
-			width: 140px;
-			height: 60px;
-			padding-left: 8px;
-		}
-		& .option {
-			width: 140px;
-			height: 60px;
-			padding-left: 5px;
-		}
-		& .title {
-			height: 29px;
-			line-height: 29px;
-			display: inline-block;
-		    white-space: nowrap;
-		    text-overflow: ellipsis;
-		    width: 200px;
-		    overflow: hidden;
-			& i {
-				width: 18px;
-				height: 18px;
-				display: inline-block;
-				background: url('../../comm/images/commIcon.png') no-repeat 0 -658px;
-				vertical-align: -5px;
-			}
-		}
-		& .time {
-			color: #666;
-			font-size: 12px;
-		}
-		& .status {
-			margin-top: 29px;
-			font-size: 12px;
-		}
-		& .from {
-			color: #333;
-			font-size: 12px;
-		}
+		& .time { color: #666; font-size: 12px; }
+		& .status { margin-top: 29px; font-size: 12px; }
+		& .from { color: #333; font-size: 12px; }
 	}
 }
-
-
-			
-			
-			
-			
-			
-			
-			

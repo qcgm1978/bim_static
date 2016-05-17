@@ -45,7 +45,6 @@ App.Services.ProjectDetail.Floor=Backbone.View.extend({
 	},
 	
 	addOne(model){
-		debugger
 		var $container=this.$('.detailContainer .scrollWrapContent');
 		var view=new App.Services.DetailView.Floor({
 			model:model
