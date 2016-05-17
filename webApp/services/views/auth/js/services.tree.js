@@ -19,3 +19,49 @@ App.Services.tree = function(data){
     }
     return ele;
 };
+
+App.Services.queue = [];
+
+
+
+//同级队列，注意不能响应非同级，会造成页面混乱
+/*
+App.Services.queue = {
+    queue:[],
+
+    running: false,
+
+    present:0,
+
+    promise: 200,
+
+    //添加运行
+    join:function(ev){
+        if(this.queue.length == 1){
+            this.run(this.end);
+            return
+        }
+        if(this.queue.length == 2){
+            this.queue.pop(1);
+        }
+        this.queue.push(ev);
+    },
+
+    run:function(callback){
+        this.queue[0](callback);
+        this.present = this.present + 1;
+    },
+
+    //运行结束
+    end:function(){
+        App.Services.queue.queue.shift(0);
+},
+    //运行停止
+    stop:function(){
+
+    },
+    //运行取消，点击第三个，第二个将不再执行
+    cancel:function(){
+        this.queue.pop(-1);
+    }
+};*/
