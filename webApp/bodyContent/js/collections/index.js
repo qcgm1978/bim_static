@@ -8,9 +8,14 @@ App.BodyContent.control= {
 	
 
     init : function(){
-		
-		$("#loginName").html(App.Comm.getCookie('OUTSSO_LoginId'));
 
+        var _userInfo=JSON.parse(localStorage.getItem("user"));
+
+        $("#loginName").html(App.Comm.getCookie('OUTSSO_LoginId'));
+		$("#uiAccount").html(App.Comm.getCookie('OUTSSO_LoginId'));
+        $("#uiPosition").html(_userInfo.position);
+        $("#uiPartment").html();
+        $("#uiLogo").attr('src',_userInfo.photoUrl);
         $("#contains").empty();
         new App.BodyContent.App().render(); //渲染框架
         $("#todos").html(new App.BodyContent.todosList().render().el);
@@ -42,6 +47,15 @@ App.BodyContent.control= {
                 $(this).css({"border-radius":"0px"});
             }
         });
+
+        $("#loginName").click(function(e){
+            $('.userinfo').show();
+            e.stopPropagation();
+        })
+
+        $(document).on('click',function(e){
+            $('.userinfo').hide();
+        })
     },
     
 

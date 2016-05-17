@@ -19,11 +19,15 @@ App.Services.ProjectDetail.BaseHole=Backbone.View.extend({
 	},
 	
 	initialize(){
+
 		var _this=this;
-		this.on('read',function(){
-			_this.status='read';
-		})
-		this.listenTo(App.Services.ProjectCollection.ProjecDetailBaseHoleCollection,'reset',this.resetView)
+		this.listenTo(App.Services.ProjectCollection.ProjecDetailBaseHoleCollection,'add',this.addOne);
+		this.listenTo(App.Services.ProjectCollection.ProjecDetailBaseHoleCollection,'reset',this.resetView);
+	
+		Backbone.on('baseholeUserStatus',function(status){
+			_this.status=status
+		},this)
+
 	},
 	
 	render(){
@@ -33,20 +37,16 @@ App.Services.ProjectDetail.BaseHole=Backbone.View.extend({
 		return this;
 	},
 	
-	resetView(items){
-		var _this=this;
+	resetView(){
+		this.$('.detailContainer .scrollWrapContent').html("");
+	},
+
+	addOne(model){
 		var $container=this.$('.detailContainer .scrollWrapContent');
-		
-		this.status='read';
-		
-		$container.html("");
-		items.models.forEach(function(model){
-			var view=new App.Services.DetailView.BaseHole({
-				projectId:_this.userData.projectId,
-				_parentView:_this
-			});
-			$container.append(view.render(model.toJSON()).el);
-		})
+		var view=new App.Services.DetailView.BaseHole({
+			model:model
+		});
+		$container.append(view.render().el);
 	},
 	
 	createBaseHole(){
@@ -54,11 +54,23 @@ App.Services.ProjectDetail.BaseHole=Backbone.View.extend({
 		if(_this.status !=='create'){
 			this.$('dd').slideUp();
 			this.$('dt span').addClass('accordOpen');
-			var view=new App.Services.DetailView.BaseHole({
-				projectId:_this.userData.projectId,
-				_parentView:_this
-			});
-			this.$('.detailContainer .scrollWrapContent').prepend(view.render().el);
+
+			var model={
+				"id" : '',
+				"projectId" : _this.userData.projectId,
+				"pitName" : '',
+				"pitDepth" : 0,
+				"pitLevel" : '',
+				"pitLevelRemark" : '',
+				"soldierPilePercentage" : 0,
+				"anchorCablePercentage" : 0,
+				"soilnailwallPercentage" : 0,
+				"isHaveBracingType" : '',
+				"isAnchorrodSoilnail" : ''
+			}
+
+			App.Services.ProjectCollection.ProjecDetailBaseHoleCollection.push(model);
+
 			_this.status='create';
 		}else{
 			App.Services.Dialog.alert('请先完成当前新增操作...');
