@@ -37,18 +37,14 @@ App.Services.DetailView.Floor=Backbone.View.extend({
 	},
 	
 	initialize(data){
-		this.formData.projectId=data.projectId;
-		this._parentView=data._parentView;
+		this.listenTo(this.model,'change',this.render);
 	},
 	
-	render(data){
-		var _this=this;
-		//判断是否是新增
-		if(data){
-			this.formData=data;
-		}
-		
-		this.$el.html(this.template(this.formData));
+	render(){
+		var _this=this,
+			data=this.model.toJSON();
+		this.formData=data;
+		this.$el.html(this.template(data));
 		
 		this.$(".structure").myDropDown({
 			zIndex:App.Services.ProjectCollection.methods.zIndex(),
@@ -81,7 +77,6 @@ App.Services.DetailView.Floor=Backbone.View.extend({
 		this.$(".seiGrade").myDropDown({
 			zIndex:App.Services.ProjectCollection.methods.zIndex(),
 			click:function($item){
-				debugger
 				var _=$(this);
 				_this.formData[_.attr('name')]=$item.text();
 			}
@@ -111,8 +106,7 @@ App.Services.DetailView.Floor=Backbone.View.extend({
 		
 		if($this.hasClass('accordOpen')){
 			$accord.slideDown();
-			
-			var $all=this._parentView.$('.accordionDatail');
+			var $all=$('.projectFloor .accordionDatail');
 			$all.each(function(){
 				if(!$(this).hasClass('accordOpen')){
 					$(this).addClass('accordOpen');
@@ -145,9 +139,16 @@ App.Services.DetailView.Floor=Backbone.View.extend({
 			type:type||'post',
 			data:JSON.stringify(_this.formData),
 			contentType:'application/json'
-		},function(){
-	 		_this.reloadView();
-	 		_this._parentView.trigger('read');
+		},function(res){
+			$.tip({message:'新增成功'});
+	 		Backbone.trigger('floorUserStatus','read');
+	 		_this.formData.id=res.data.buildingId;
+	 		if(type){
+	 			_this.formData=res.data;
+	 		}
+	 		_this.model.set(_this.formData);
+	 		_this.$('.accordionDatail').trigger('click');
+
 		}).fail(function(){
 			clearMask();
 		})
@@ -176,10 +177,9 @@ App.Services.DetailView.Floor=Backbone.View.extend({
 		var _this=this;
 		let _collection=App.Services.ProjectCollection.ProjecDetailFloorCollection;
  		_collection.projectId=_this.formData.projectId;
+ 		_collection.reset();
  		_collection.fetch({
- 			reset:true,
  			success(child, data) {
- 				_this.remove();
  				clearMask();
  			}
  		});

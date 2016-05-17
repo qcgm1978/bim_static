@@ -21,19 +21,14 @@ App.Services.DetailView.Section=Backbone.View.extend({
 	},
 	
 	initialize(data){
-		this.formData.projectId=data.projectId;
-		this._parentView=data._parentView;
+		this.listenTo(this.model,'change',this.render);
 	},
 	
-	render(data){
-		var _this=this;
-		//判断是否是新增
-		if(data){
-			this.formData=data;
-		}
-		
-		this.$el.html(this.template(this.formData));
-		
+	render(){
+		var _this=this,
+			data=this.model.toJSON();
+		this.formData= data;
+		this.$el.html(this.template(data));
 		this.$(".pit").myDropDown({
 			zIndex:App.Services.ProjectCollection.methods.zIndex(),
 			click:function($item){
@@ -41,7 +36,6 @@ App.Services.DetailView.Section=Backbone.View.extend({
 				_this.formData.pitId=$item.attr('data-pitId');
 			}
 		});
-		
 		this.$(".supportType").myDropDown({
 			zIndex:App.Services.ProjectCollection.methods.zIndex(),
 			click:function($item){
@@ -61,8 +55,8 @@ App.Services.DetailView.Section=Backbone.View.extend({
 		
 		if($this.hasClass('accordOpen')){
 			$accord.slideDown();
-			
-			var $all=this._parentView.$('.accordionDatail');
+			//互斥操作
+			var $all=$('.projectSection .accordionDatail');
 			$all.each(function(){
 				if(!$(this).hasClass('accordOpen')){
 					$(this).addClass('accordOpen');
@@ -92,10 +86,12 @@ App.Services.DetailView.Section=Backbone.View.extend({
 			type:type||'post',
 			data:JSON.stringify(_this.formData),
 			contentType:'application/json'
-		},function(){
-	 		_this.reloadView();
-	 		_this._parentView.trigger('read');
-	 		_this.remove();
+		},function(res){
+			$.tip({message:'新增成功'});
+	 		Backbone.trigger('sectionUserStatus','read');
+	 		_this.formData.id=res.data.profileId;
+	 		_this.model.set(_this.formData);
+	 		_this.$('.accordionDatail').trigger('click');
 		}).fail(function(){
 			clearMask();
 		})
@@ -124,12 +120,8 @@ App.Services.DetailView.Section=Backbone.View.extend({
 		var _this=this;
 		let _collection=App.Services.ProjectCollection.ProjecDetailSectionCollection;
  		_collection.projectId=_this.formData.projectId;
- 		_collection.fetch({
- 			reset:true,
- 			success(child, data) {
- 				clearMask();
- 			}
- 		});
+ 		_collection.reset();
+ 		_collection.fetch();
 	}
 	
 })

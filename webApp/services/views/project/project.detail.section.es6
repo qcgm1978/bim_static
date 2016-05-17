@@ -15,14 +15,13 @@ App.Services.ProjectDetail.Section=Backbone.View.extend({
 	template:_.templateUrl('/services/tpls/project/project.detail.section.html',true),
 	
 	initialize(){
-	
 		var _this=this;
-		this.on('read',function(){
-			_this.status='read';
-		})
-		
+		this.listenTo(App.Services.ProjectCollection.ProjecDetailSectionCollection,'add',this.addOne);
 		this.listenTo(App.Services.ProjectCollection.ProjecDetailSectionCollection,'reset',this.resetView);
 	
+		Backbone.on('sectionUserStatus',function(status){
+			_this.status=status
+		},this)
 	},
 	
 	setUserData(data){
@@ -34,30 +33,32 @@ App.Services.ProjectDetail.Section=Backbone.View.extend({
 		return this;
 	},
 	
-	resetView(items){
-		var _this=this;
+	addOne(model){
 		var $container=this.$('.detailContainer .scrollWrapContent');
-		this.status='read';
-		$container.html("");
-		items.models.forEach(function(model){
-			var view=new App.Services.DetailView.Section({
-				projectId:_this.userData.projectId,
-				_parentView:_this
-			});
-			$container.append(view.render(model.toJSON()).el);
-		})
+		var view=new App.Services.DetailView.Section({
+			model:model
+		});
+		$container.append(view.render().el);
 	},
-	
+
+	resetView(){
+		this.$('.detailContainer .scrollWrapContent').html("");
+	},
+
 	createSection(){
 		var _this=this;
 		if(this.status !=='create'){
 			this.$('dd').slideUp();
 			this.$('dt span').addClass('accordOpen');
-			var view=new App.Services.DetailView.Section({
-				projectId:_this.userData.projectId,
-				_parentView:_this
-			});
-			this.$('.detailContainer .scrollWrapContent').prepend(view.render().el);
+			var data={
+				"id":"", //剖面ID
+		        "pitId":"",//    基坑编码
+		        "projectId":_this.userData.projectId,//    项目编码
+		        "profileName":"",//  剖面
+		        "bracingType":0 ,//支护类型
+				"isAdd":true
+			}
+			App.Services.ProjectCollection.ProjecDetailSectionCollection.push(data);
 			this.status='create';
 		}else{
 			App.Services.Dialog.alert('请先完成当前新增操作...');

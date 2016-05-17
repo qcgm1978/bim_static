@@ -45,9 +45,8 @@ App.Projects.searchView = Backbone.View.extend({
 	//搜索项目
 	searchProject: function() {
 
-		var searchText = $(".quickSearch .txtSearch").val().trim();
- 		App.Projects.loadData(searchText);
-
+		var searchText =encodeURI($(".quickSearch .txtSearch").val().trim());
+ 		App.Projects.loadData(searchText); 
 
 	}
 

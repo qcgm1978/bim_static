@@ -17,7 +17,17 @@ App.Project = {
 		attrView: null,
 		CurrentVersion: null, //当前版本信息
 		DataModel: null //渲染模型的数据
-	}, 
+	},  
+
+	//空页面
+	NullPage:{
+		designVerification:'<div class="nullPage concerns"><i class="bg"></i>暂无隐患</div>',//设计检查 质量 隐患
+		planModel:'<div class="nullPage noPlan"><i class="bg"></i>暂无计划节点</div>', //计划 模块化 模拟
+		planPublicity:'<div class="nullPage publicity"><i class="bg"></i>暂无内容</div>', //计划 关注
+		costList:'<div class="nullPage costList"><i class="bg"></i>暂无清单项</div>', //成本 清单
+		costChange:'<div class="nullPage costChange"><i class="bg"></i>暂无变更单</div>', //成本 变更
+		planVerification:'<div class="nullPage planVerification"><i class="bg"></i> <div>您还没有关联校验</div>  <span>点此进行关联校验</span> </div>', //计划成本 关联校验
+	},
 
 	//客户化数据映射字典
 	mapData:{
@@ -811,6 +821,7 @@ App.Project = {
 		App.Project.Settings.Viewer.selectIds(Ids);
 		App.Project.Settings.Viewer.zoomBox(boxArr);
 	}
+
 
 
 

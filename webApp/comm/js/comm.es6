@@ -293,7 +293,7 @@ App.Comm = {
 	//文件后缀
 	fileSuffix(type) {
 
-		if (type == "rvt" || type == "dwg" || type == "folder") {
+		if (type == "rvt" || type == "dwg" || type == "folder" || type =='rfa') {
 			return type;
 		} else {
 			return "other";

@@ -9,7 +9,7 @@ App.Project.PlanModel = Backbone.View.extend({
 	},
 
 	events: {
-		"click .tbPlan tr": "showInModle"
+		"click .tbPlan tr.itemClick": "showInModle"
 	},
 
 	render: function() {

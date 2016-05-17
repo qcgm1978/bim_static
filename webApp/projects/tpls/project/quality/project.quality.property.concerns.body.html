@@ -21,7 +21,9 @@
         </td>
 
         <td class="category"><%=item.acceptanceType%></td>
-        <td class="status"><%=item.status==1 && '待整改' || item.status==2 && '已整改' || '已关闭'   %></td>
+        <td class="status"><span class="status" style="color:<%=App.Project.mapData.statusColor[item.status]%>">
+        <%=App.Project.mapData.status[item.status]%>
+     </span> </td>
         <td class="grade"><%= item.level==1 && '一般' ||item.level==2 && '较大' ||item.level==3 && '重大' || '特大'  %></td>
         <td class="operator"><%=item.organizationTypeId%></td>
         <td class="type"><%=item.ratingCategoryId%></td>
@@ -32,8 +34,6 @@
 
 <% if(data.items.length<=0){%>
     
-    <tr>
-        <td colspan="9" class="noDataTd">暂无数据</td>
-    </tr>
+   <%=App.Project.NullPage.designVerification%>  
     
 <%}%>

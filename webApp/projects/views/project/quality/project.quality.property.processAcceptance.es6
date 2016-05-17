@@ -18,16 +18,9 @@ App.Project.QualityProcessAcceptance = Backbone.View.extend({
 	events: {
 		"click .searchToggle": "searchToggle",
 		"click .clearSearch": "clearSearch",
-		"click .tbProcessAccessBody tr": "showInModel",
-		'click .resultStatusIcon':'showDiseaseList'
+		'click .resultStatusIcon':'showDiseaseList',
+		"click .tbProcessAccessBody tr": "showInModel"
 	},
-
-	zindex:(function(){
-		var i=90000;
-		return function(){
-			return i++;
-		}
-	}()),
 
 	//渲染
 	render: function(options) {
@@ -116,46 +109,7 @@ App.Project.QualityProcessAcceptance = Backbone.View.extend({
 	
 	//显示隐患列表
 	showDiseaseList(event){
-		this.currentDiseaseView && this.currentDiseaseView.$el.remove();
-		var _this=this,
-			$target=$(event.currentTarget),
-			id=$target.attr('data-id'),
-			isShow=$target.attr('data-total'),
-			_top=0,
-			_flag='up',
-			projectId = App.Project.Settings.projectId,
-			projectVersionId = App.Project.Settings.CurrentVersion.id;
-			
-		//没有隐患数据,则不打开数据
-		if(Number(isShow)<=0){
-			$.tip({
-				message:'暂无隐患',
-				type:'alarm'
-			})
-			return 
-		}
-		$('#projectContainer').mmhMask();
-		if(($('body').height()-$target.offset().top)>=302){
-			_top=$target.offset().top-175+24;
-		}else{
-			_top=$target.offset().top-300-175+24;
-			_flag='down';
-		}
-		var p={
-				top:_top+'px',
-				zIndex:_this.zindex()
-			};
-		this.currentDiseaseView=new App.Project.ProcessDisease({
-			params:{
-				projectId:projectId,
-				versionId:projectVersionId,
-				acceptanceId:id
-			},
-			viewConfig:p,
-			_parent:$target,
-			_flag:_flag
-		})
-		event.preventdefault();
+		App.Project.QualityAttr.showDisease(event,this,'pro');// showDiseaseList
 		event.stopPropagation();
 	}
 });

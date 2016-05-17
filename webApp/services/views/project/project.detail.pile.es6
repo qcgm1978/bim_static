@@ -9,7 +9,8 @@ App.Services.ProjectDetail.Pile=Backbone.View.extend({
 	events:{
 		
 		'click .save':'savePile',
-		'click .update':'updatePile'
+		'click .update':'updatePile',
+		'change .userPile':'checkValue'
 	
 	},
 	
@@ -38,6 +39,15 @@ App.Services.ProjectDetail.Pile=Backbone.View.extend({
 		$container.html('').append(this.$el);
 	},
 	
+	checkValue(e){
+		var _$dom=$(e.currentTarget),
+			r=/^[1-9]\d*$/;
+		if(!(r.test(_$dom.val()))){
+			$.tip({message:'请输入有效值',type:'alarm'});
+			_$dom.val(0);
+		}
+	},
+
 	savePile(args,type){
 		var _this=this,
 			_data=[];

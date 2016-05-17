@@ -7,7 +7,7 @@
 
  	events: {
  		"click .playOrPause": "playAnalog",
- 		"click .tbPlan tr": "pickPlayAnalog"
+ 		"click .tbPlan tr.itemClick": "pickPlayAnalog"
  	},
 
  	initialize: function() {

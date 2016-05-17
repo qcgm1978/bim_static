@@ -72,9 +72,11 @@ App.Project.ProcessDisease=Backbone.View.extend({
 				border:'none'
 			})
 		}
-		
-		$('.processAccessList').append(this.$el);
-		
+		if(options.type=='open'){
+			$('.openingacceptanceList').append(this.$el);
+		}else{
+			$('.processAccessList').append(this.$el);
+		}
 		App.Comm.initScroll(this.$('.scrollWrap'),"y");
 		
 		clearMask();
