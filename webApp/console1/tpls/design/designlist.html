@@ -3,12 +3,81 @@
         3.1	设计检查</div>
     <div class="consoleContainer">
         <form class="form-horizontal">
+            <div class="form-group">
+                <label for="inputPassword3" class="col-sm-2 control-label">检查Id</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" id="p11" value="">
+                </div>
+            </div>
+
+
+            <div class="form-group">
+                <label for="inputPassword3" class="col-sm-2 control-label">项目</label>
+                <div class="col-sm-10">
+                    <select class="form-control referenceResources" id="s11">
+                        <option value="0">请选择</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="inputPassword3" class="col-sm-2 control-label">隐患名称</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" id="p12" value="">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="inputPassword3" class="col-sm-2 control-label">专业名称</label>
+                <div class="col-sm-10">
+                    <select class="form-control referenceResources" id="s12">
+                        <option value="0">请选择</option>
+                        <option value="abc">土建</option>
+                        <option value="def">炼钢</option>
+                        <option value="ghi">计价</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="inputPassword3" class="col-sm-2 control-label">隐患状态</label>
+                <div class="col-sm-10">
+                    <select class="form-control referenceResources" id="s13">
+                        <option value="1">待整改</option>
+                        <option value="2">已解决</option>
+                        <option value="3">已关闭</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="inputPassword3" class="col-sm-2 control-label">隐患提出方编码</label>
+                <div class="col-sm-10">
+                    <select class="form-control referenceResources" id="s14">
+                        <option value="1">质监</option>
+                        <option value="2">第三方</option>
+                        <option value="3">项目公司</option>
+                        <option value="4">监理单位</option>
+
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="inputPassword3" class="col-sm-2 control-label">打分类别</label>
+                <div class="col-sm-10">
+                    <select class="form-control referenceResources" id="s15">
+                        <option value="1">实测实量</option>
+                        <option value="2">防水工程</option>
+                        <option value="3">施工质量</option>
+                        <option value="4">安全文明</option>
+                        <option value="5">总包内页资料</option>
+                        <option value="6">材料设备</option>
+
+                    </select>
+                </div>
+            </div>
 
             <div class="form-group">
                 <!--<label for="inputPassword3" class="col-sm-2 control-label"></label>-->
                 <div class="col-sm-10">
-                    <textarea name="" id="data" cols="40" rows="40">
-        [{
+                    <textarea name="" id="data" cols="30" rows="30">
+        {
         "id": 1,
         "projectCode": "12345",
         "specialtyId": "1003",
@@ -43,10 +112,10 @@
             "bottom": "F02",
             "bottomOffset": 1200
         }
-    }]
+    }
 
                     </textarea>
-                     <textarea name="" id="" cols="40" rows="40">
+                     <textarea name="" id="" cols="30" rows="30">
             [{
 id	检查Id	String	唯一ID
 projectCode	项目代码	String	质监系统里的项目ID，同步之前需与BIM平台建立映射关系
