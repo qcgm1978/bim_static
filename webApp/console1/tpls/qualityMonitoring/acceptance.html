@@ -3,15 +3,42 @@
     2.2	过程验收</div>
   <div class="consoleContainer">
     <form class="form-horizontal">
+      <div class="form-group">
+        <label for="inputPassword3" class="col-sm-2 control-label">验收Id</label>
+        <div class="col-sm-10">
+          <input type="text" class="form-control" id="p11" value="">
+        </div>
+      </div>
 
+
+      <div class="form-group">
+        <label for="inputPassword3" class="col-sm-2 control-label">项目</label>
+        <div class="col-sm-10">
+          <select class="form-control referenceResources" id="s11">
+            <option value="0">请选择</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="inputPassword3" class="col-sm-2 control-label">类别</label>
+        <div class="col-sm-10">
+          <select class="form-control referenceResources" id="s12">
+            <option value="0">请选择</option>
+            <option value="100">钢筋</option>
+            <option value="101">水泥</option>
+            <option value="102">管道</option>
+          </select>
+        </div>
+      </div>
       <div class="form-group">
         <!--<label for="inputPassword3" class="col-sm-2 control-label"></label>-->
         <div class="col-sm-10">
                     <textarea name="" id="data" cols="40" rows="40">
-        [{
+        {
         "id": 1,
         "projectCode": "12345",
-        "categoryId": "1001",
+        "categoryId": "1002",
         "categoryName": "钢筋",
         "componentId": "be9bf30f15eb677b705b61c1b90599d2.997d11b5b901ef4e47e15fb095fcd948",
         "location": {
@@ -35,7 +62,7 @@
             "bottomOffset": 1200
         },
         "checkCount": 4
-       }]
+       }
                     </textarea>
                      <textarea name="" id="" cols="40" rows="40">
             [{
@@ -90,12 +117,47 @@ bottomOffset
     2.3	开业验收</div>
   <div class="consoleContainer">
     <form class="form-horizontal">
-
+      <div class="form-group">
+        <label for="inputPassword3" class="col-sm-2 control-label">验收ID</label>
+        <div class="col-sm-10">
+          <input type="text" class="form-control" id="p21" value="">
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="inputPassword3" class="col-sm-2 control-label">项目</label>
+        <div class="col-sm-10">
+          <select class="form-control referenceResources" id="s21">
+            <option value="0">请选择</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="inputPassword3" class="col-sm-2 control-label">专业名称</label>
+        <div class="col-sm-10">
+          <select class="form-control referenceResources" id="s22">
+            <option value="0">请选择</option>
+            <option value="abc">土建</option>
+            <option value="def">炼钢</option>
+            <option value="ghi">计价</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="inputPassword3" class="col-sm-2 control-label">类别</label>
+        <div class="col-sm-10">
+          <select class="form-control referenceResources" id="s23">
+            <option value="0">请选择</option>
+            <option value="100">钢筋</option>
+            <option value="101">水泥</option>
+            <option value="102">管道</option>
+          </select>
+        </div>
+      </div>
       <div class="form-group">
         <!--<label for="inputPassword3" class="col-sm-2 control-label"></label>-->
         <div class="col-sm-10">
                     <textarea name="" id="data1" cols="40" rows="40">
-        [{
+        {
         "id": 1,
         "projectCode": "12345",
         "specialtyId": "1003",
@@ -124,7 +186,7 @@ bottomOffset
             "bottomOffset": 1200
         },
         "checkCount": 4
-    }]
+    }
 
                     </textarea>
                      <textarea name="" id="" cols="40" rows="40">

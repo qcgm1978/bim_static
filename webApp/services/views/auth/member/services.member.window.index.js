@@ -51,9 +51,13 @@ App.Services.MemberWindowIndex = Backbone.View.extend({
             if(response.code == 0){
                 _.each(selectRole,function(item){
                     item.set("functions",null);
-                    item.unset("checked");
+                    item.set("checked",false);
                     proto.push(item.toJSON());//因为不返回继承角色，因此需要存储继承角色再定
                 });
+
+                var inherit = collection.models[0].get("role");
+                inherit = _.filter(inherit,function(item){return item["inherit"]});
+                _.each(inherit,function(item){proto.push(item);});
                 collection.each(function(item){
                     var l1 = submitData[type]["orgId"],
                         l2 = submitData[type]["userId"],

@@ -36,8 +36,7 @@ App.Services.MemberList=Backbone.View.extend({
             _this = this,
             preSele= this.$(".head input")[0].checked,
             collection = App.Services.Member[type + "Collection"];
-        console.log(this.$(":checkbox").find(".memCheck"));
-        if(this.$(":checkbox").length ==1  && !(this.$(":checkbox").find(".memCheck").length)){
+        if(!$("#blendList li .memCheck").length){
             return
         }
         this.$(":checkbox").each(function(checkbox){
