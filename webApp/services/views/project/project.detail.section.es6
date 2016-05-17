@@ -42,7 +42,7 @@ App.Services.ProjectDetail.Section=Backbone.View.extend({
 	},
 
 	resetView(){
-		this.$el.html("");
+		this.$('.detailContainer .scrollWrapContent').html("");
 	},
 
 	createSection(){
