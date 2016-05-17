@@ -32,6 +32,12 @@ App.Services = {
 			} else if (type == "log") {
 				// 日志管理
 				viewer = new App.Services.Log();
+			}else if(type=="workbook"){
+				//操作手册
+				viewer=new App.Services.WorkBook();
+			}else if(type=="issue"){
+				//问题反馈
+				viewer=new App.Services.Issue();
 			}
 
 			$("#contains").html(viewer.render().el);
