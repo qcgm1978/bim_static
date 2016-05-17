@@ -13,7 +13,6 @@ ul,li{list-style: none outside none;}
 .serviceHeader .bcService span a{color: #333333;text-underline: none;}
 .serviceHeader .bcService span.arr-r:before{content: '';position: absolute;width: 4px;height: 7px;top: 17px;right:12px;.background-ioc;background-position: 0 -640px;}
 
-
 .serviceHeader .serviceNav{background-color: #eeeeee;border-top: 1px solid #cccccc;padding-top: 9px;height: 38px;border-bottom: 1px solid #cccccc;padding-left: 20px;clear: both;}
 .serviceHeader .serviceNav li{border-top: 2px solid #eeeeee;float: left;line-height: 27px;height: 29px;width: 98px;text-align: center;margin-bottom: -1px;cursor: pointer;}
 .serviceHeader .serviceNav li.active{border-top: 2px solid #006ecf;border-left: 1px solid #cccccc;border-right: 1px solid #cccccc;border-bottom: 1px solid #eeeeee;background-color: #ffffff;}
@@ -22,10 +21,12 @@ ul,li{list-style: none outside none;}
 #blendList{overflow: auto;}
 .serviceBody{position: absolute;top:129px;left:0;right:0;bottom:0;}
 .serviceBody .menu{ bottom: 0px; position: absolute;left: 0;top: 0;width: 270px;border: 1px solid #ccc;border-top: none;background-color: #ffffff;;height: 100%;overflow: auto;}
-.serviceBody .menu li{line-height: 25px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;}
+.serviceBody .menu li{line-height: 25px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;position: relative;}
 .serviceBody .menu li span{padding: 2px 3px;cursor: pointer;}
 .serviceBody .menu li span.active{background-color: #a8dbfd;}
-.serviceBody .menu li div{position: relative;padding-left: 22px;}
+
+.serviceBody .menu li .childOz,.inner,.outer{padding-left: 22px;}
+.serviceBody .menu li div.ozName{position: relative;padding-left: 22px;}
 .serviceBody .menu li div.ozName:before,.serviceBody .menu li div.inner:before,.serviceBody .menu li div.outer:before{content: '';position: absolute;width: 20px;height: 14px;top: 4px;left: 0;background: transparent url('../images/service_ico.png') 0 -100px no-repeat;}
 .serviceBody .menu li div.ozName.active:before,.serviceBody .menu li div.inner.active:before,.serviceBody .menu li div.outer.active:before{background-position: 0 -80px ;}
 .serviceBody .menu h3{line-height: 50px;padding-left: 22px;font-size: 14px;color: #686868;border-bottom: 1px solid #cccccc;}
@@ -53,7 +54,7 @@ ul,li{list-style: none outside none;}
 .serviceBody .content li .ushead{display: inline-block;width: 32px;height: 32px;line-height: 0;background: transparent url('../images/service_ico.png') 0 -40px no-repeat;vertical-align: middle;margin: 0 13px 0 10px;}
 .serviceBody .content li.active .memCheck{background-position: 0 -420px;}
 .serviceBody .content li .ushead.oz{background-position: 0 0;}/*机构*/
-.serviceBody .content li .sele .roles{text-align: center;margin-right: 84px;}
+.serviceBody .content li .sele .roles{margin-right: 100px;margin-left: 320px;padding-left: 30%;overflow: hidden;text-overflow: ellipsis;white-space: nowrap;}
 .serviceBody .content li .sele .roles.error{color: #999999;}
 .serviceBody  li .sele .roles span{position: relative;display: inline-block;padding-left: 20px;margin-left: 14px;}
 .serviceBody  li .sele .roles span:before{position: absolute;content:'';left: 0;top: 18px;height: 15px;width: 14px;background: transparent url('../images/service_ico.png') 0 -180px  no-repeat;}
@@ -65,7 +66,7 @@ ul,li{list-style: none outside none;}
 .serviceBody .roleCtrl{height: 100%;}
 #roleList{overflow: auto;position: absolute;top: 50px;left: 0;right: 0;bottom: 0;}
 .roleCtrl li{clear: both;line-height: 50px;padding:0 22px;height: 50px;}
-.roleCtrl .roleHead{padding:0 22px;line-height: 50px;font-size: 12px;color: #a7a7a7;}
+.roleCtrl .roleHead{padding:0 22px;line-height: 50px;font-size: 12px;color: #a7a7a7;border-bottom: 1px solid #cccccc;}
 .roleCtrl .roleHead .newRole{position: relative;cursor: pointer;display: inline-block;line-height: 28px;height: 30px;vertical-align: middle;padding: 0 8px 0 32px;border: 1px solid #cccccc;margin-left: 24px;}
 .roleCtrl .roleHead .newRole:before{position: absolute;content:'';left: 9px;top: 7px;height: 14px;width: 14px;background: transparent url('../images/service_ico.png') 0 -220px  no-repeat;}
 .roleCtrl .roleHead .left,.roleCtrl li .left{float: left;width: 268px;}
@@ -80,7 +81,7 @@ ul,li{list-style: none outside none;}
 .roleCtrl .roleEdit span{position: relative;display: inline-block;padding-left: 16px;margin-right: 22px;line-height: 13px;font-size: 12px;color: #0572d0;cursor: pointer;}
 .roleCtrl .roleEdit span:before{content: '';position: absolute;left: 0;top: 0;height: 13px;width: 13px;background: transparent url('../images/service_ico.png') 20px 20px  no-repeat;}
 .roleCtrl .roleEdit span.explorer:before{background-position:0 -240px ; top: 2px;}
-.roleCtrl .roleEdit span.edit:before{background-position: 0 -260px ;}
+.roleCtrl .roleEdit span.modify:before{background-position: 0 -260px ;}
 .roleCtrl .roleEdit span.delete:before{background-position: 0 -280px ;}
 /*????*/
 #mask{position: fixed;left: 0;top: 0;width: 100%;height: 100%;background: rgba(0,0,0,.5);z-index: 999;display: none;}
@@ -98,7 +99,8 @@ ul,li{list-style: none outside none;}
 .seWinBody h1{height: 50px;line-height: 49px;border-bottom: 1px solid #e6e6e6;font-size: 16px;padding-left: 24px;color: #333333;}
 .seWinBody h2{height: 45px;line-height: 45px;font-size: 14px;padding: 0 10px;}
 .seWinBody h2 span{color: #9f9f9f;}
-.seWinBody .title{font-size: 12px;color: #9f9f9f;line-height: 23px;height: 24px;}
+.seWinBody .title{font-size: 12px;color: #9f9f9f;line-height: 23px;height: 24px;padding-left: 34px;}
+.seWinBody .title .name{width: 149px;}
 .seWinBody .name,.seWinBody .funName{float: left;width: 175px;.ellipsis;}
 .seWinBody li{padding: 0 10px;line-height: 30px;height: 30px;.ellipsis;}
 .seWinBody li:not(:last-child){border-bottom: 1px solid #cccccc;}
@@ -113,10 +115,13 @@ ul,li{list-style: none outside none;}
 .seWinBody .func li.active,.memRoleList li.active{background-color: #a8dbfd;}
 
 //弹窗角色列表
-.memRoleList li{position: relative;}
-.memRoleList li .fun {overflow: hidden;text-overflow: ellipsis;white-space: nowrap;border: 1px solid #ffffff;}
+.memRoleList li{position: relative;overflow: visible;}
+.memRoleList li.inherit{color: #cccccc;}
+.memRoleList li.inherit .memCheck{background-position: 0 -440px;}
+.memRoleList li.inherit .rohead{background-position: 0 -560px;}
+.memRoleList li .fun {overflow: hidden;}
 .memRoleList li.active .fun{border-color:#a8dbfd; }
-.memRoleList li .fun:hover {width: 327px;z-index: 10;line-height: 24px;;position: absolute;border: 1px solid #eeeeee;background-color: #ffffff;left: 170px;top: 1px;overflow: auto;word-break: keep-all;white-space: normal;padding-left: 15px;border-radius: 3px;box-shadow: 1px 1px 3px #333333;}
+.memRoleList li .fun:hover {width: 330px;z-index: 10;line-height: 24px;position: absolute;border: 1px solid #eeeeee;height: auto;overflow: auto;background-color: #ffffff;left: 170px;top: 1px;overflow: auto;word-break: keep-all;white-space: normal;padding-left: 15px;border-radius: 3px;box-shadow: 1px 1px 3px #333333;}
 .memRoleList .fun span{padding-left: 16px;position: relative;white-space: nowrap;}
 .memRoleList .fun span:before{.background-ioc;content: '';position: absolute;width: 11px;height: 11px;top: 3px;left: 0;background-position: 0 -200px}
 .memRoleList .fun span.adm:before{background-position: 0  -162px;width: 14px;height: 14px;}
@@ -130,7 +135,6 @@ ul,li{list-style: none outside none;}
 .seWinBody .aim input:focus{color: #333333;}
 .seWinBody .aim .name i{display: inline-block;width: 17px;height: 16px;.background-ioc;background-position: 0 -20px;background-size: 20px auto;margin: 0 6px 0 5px;}
 .seWinBody .aim .name i.oz{background-position: 0 -100px;background-size: 40px auto;}
-
 /*checkbox*/
 .memCheck{display: inline-block;.serviceInput;}
 .active .memCheck{background-position: 0 -420px;}
@@ -144,11 +148,12 @@ ul,li{list-style: none outside none;}
 .selectMem{}
 .keyU h3{line-height: 28px;height: 29px;border-bottom: 1px solid #cccccc;color: #cccccc;font-size: 14px;}
 
-
-
 .servicesAlert .alertInfo{height: 110px;line-height: 22px;padding: 20px 0 20px 60px;position: relative;}
 .servicesAlert .alertInfo:before{content: '';position: absolute;.background-ioc;width:32px;height: 32px; background-position: 0 -300px;left: 10px;top: 20px;}
 .servicesAlert .confirm{text-align: center;}
 .servicesAlert .alert{text-align: center;display: none;}
 .servicesAlert .confirm input{outline: none;}
 
+/*����*/
+.services_loading{position: relative;}
+.services_loading:after{content: '';position: absolute;left: 0;top: 0;width: 100%;height: 100%;background: rgba(255,255,255,.3) url('../../comm/images/load.gif') center center no-repeat;background-size: 48px 48px;}

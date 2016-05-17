@@ -29,10 +29,12 @@ App.Services.projectMember.projects = Backbone.View.extend({
 	selectProject:function(event){
 		$("#dataLoading").show();
 		var $li=$(event.currentTarget),
-			pid=$li.attr("data-pid");//权限ID
+			pid=$li.attr("data-pid"),
+			name=$li.find('h4').text();//权限ID
 		$("#projectList .project").removeClass("active");
 		$li.addClass("active");
 		App.Comm.setCookie("currentPid",pid);
+		App.Comm.setCookie("currentProjectName",name);
 		App.Services.projectMember.loadData(App.Services.projectMember.projectMemberMemberCollection,{outer:App.Comm.getCookie("isOuter")},{
 			dataPrivilegeId:pid
 		});

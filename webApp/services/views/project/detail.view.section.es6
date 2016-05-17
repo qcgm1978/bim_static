@@ -46,7 +46,7 @@ App.Services.DetailView.Section=Backbone.View.extend({
 			zIndex:App.Services.ProjectCollection.methods.zIndex(),
 			click:function($item){
 				var _=$(this);
-				_this.formData[_.attr('name')]=_.val();
+				_this.formData[_.attr('name')]=$item.text();
 			}
 		});
 		
@@ -55,16 +55,28 @@ App.Services.DetailView.Section=Backbone.View.extend({
 	
 	
 	toggleProFrom(e){
-	
+		
 		var $this=this.$(e.target),
 			$accord=$this.parent().next();
 		
 		if($this.hasClass('accordOpen')){
 			$accord.slideDown();
+			
+			var $all=this._parentView.$('.accordionDatail');
+			$all.each(function(){
+				if(!$(this).hasClass('accordOpen')){
+					$(this).addClass('accordOpen');
+					$(this).parent().next().slideUp();
+				}
+			})
+			
 		}else{
 			$accord.slideUp();
 		}
+		
 		$this.toggleClass('accordOpen');
+		
+		
 	},
 	
 	saveSection(args,type){
@@ -83,6 +95,7 @@ App.Services.DetailView.Section=Backbone.View.extend({
 		},function(){
 	 		_this.reloadView();
 	 		_this._parentView.trigger('read');
+	 		_this.remove();
 		}).fail(function(){
 			clearMask();
 		})
@@ -114,7 +127,6 @@ App.Services.DetailView.Section=Backbone.View.extend({
  		_collection.fetch({
  			reset:true,
  			success(child, data) {
- 				_this.remove();
  				clearMask();
  			}
  		});

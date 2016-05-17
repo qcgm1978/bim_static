@@ -86,9 +86,9 @@ ViewComp.MemberManager = Backbone.View.extend({
 	
 	loadChildren:function(_this,outer,parentId,treeNode){
 		_this.$(".scrollWrap").mmhMask();
-		var _getData={
-				outer:outer,
-				includeUsers:true
+		var url="fetchServiceKeyUserInfo",
+			_getData={
+				uid:App.Comm.getCookie('userId')
 			},
 			setting = {
 				callback: {
@@ -110,24 +110,38 @@ ViewComp.MemberManager = Backbone.View.extend({
 				}
 		};
 		if(parentId){
-			_getData.parentId=parentId;
+			_getData={
+				outer:outer,
+				includeUsers:true,
+				parentId:parentId
+			}
+			url='fetchServiceMemberList';
 		}
 		
 		App.Comm.ajax({
-			URLtype:'fetchServiceMemberList',
+			URLtype:url,
 			type:"get",
 			data:_getData
 		},function(res){
-			//success callback
 			if(res.message==="success"){
-				var _org=res.data.org||[],
-					_user=res.data.user||[],
-					_newOrg=[];
-				_org.forEach(function(i){
-					i.iconSkin='business';
-					_newOrg.push(i);
-				})
-				var zNodes=_newOrg.concat(_user);
+				var zNodes=[]
+				if(url=='fetchServiceKeyUserInfo'){
+					zNodes=res.data.org;
+					zNodes.forEach(function(i){
+						i.iconSkin='business';
+					})
+				}else{
+					var _org=res.data.org||[],
+						_user=res.data.user||[],
+						_newOrg=[];
+					_org.forEach(function(i){
+						i.iconSkin='business';
+						_newOrg.push(i);
+					})
+					zNodes=_newOrg.concat(_user);
+				}
+				
+				
 				if(!treeNode){
 					_this.selectTree = $.fn.zTree.init($("#selectTree"), setting, zNodes);
 				}else{

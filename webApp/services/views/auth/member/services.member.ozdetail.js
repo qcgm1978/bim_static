@@ -3,9 +3,9 @@
  * */
 App.Services.MemberozDetail=Backbone.View.extend({
 
-    tagName :'li',
+    tagName :'div',
 
-    template:_.templateUrl("/services/tpls/auth/member/services.member.ozDetail.html"),
+    template:_.templateUrl("/services/tpls/auth/member/services.member.orgdetail.html"),
     events:{
         "click .ozName":"unfold"
     },
@@ -16,26 +16,28 @@ App.Services.MemberozDetail=Backbone.View.extend({
     },
 
     initialize:function(){
-        //默认根据角色权限加载  adm用户加载全部，keyMem用户只显示项目管理
         this.listenTo(this.model,"change:active",this.sele)
     },
 
     sele:function(){
         if(this.model.get("active")){
             this.$(".ozName").addClass("active");
-            this.$(".ozName span").addClass("active");//选中状态
+            this.$(".ozName span").addClass("active");
         }
     },
 
     unfold:function(){
-        //如果已选则返回
-        if(this.$(".ozName span").hasClass("active")){return}
         var _this = this;
         var _thisType = App.Services.MemberType;
-        var _thisId = this.$(".ozName").data("id");
+        var _thisId = App.Services.memFatherId =  this.$(".ozName").data("id") ;
+
         var collection = App.Services.Member[_thisType + "Collection"];
+
+        $(".serviceOgList span").removeClass("active");
+        _this.$(".ozName > span").addClass("active");
+
         $("#blendList").empty();//刷新右侧数据
-        $("#dataLoading").show();
+        $(".serviceBody .content").addClass("services_loading");
 
         var data = {
             outer:  !(_thisType == "inner"),
@@ -46,19 +48,14 @@ App.Services.MemberozDetail=Backbone.View.extend({
         App.Services.Member.loadData(collection,data,function(response){
             //菜单
             if (response.data.org && response.data.org.length) {
-                //样式处理
-                _this.$("div").remove("active");
-                $(".ozName").addClass("active");
-                $(".serviceOgList span").removeClass("active");
-                _this.$(".ozName > span").addClass("active");
 
                 //菜单渲染
-                _this.$("#childOz" + _thisId).html(new App.Services.MemberozList(response.data.org).render().el);
+                $("#childOz" + _this.model.cid).html(App.Services.tree(response));
             }
             if(!response.data.org.length && !response.data.user.length ){
                 $("#blendList").html("<li><span class='sele'>暂无数据</span></li>");
             }
-            $("#dataLoading").hide();
+            $(".serviceBody .content").removeClass("services_loading");
         });
     }
 });

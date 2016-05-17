@@ -35,7 +35,11 @@
 
  		App.Services.SystemCollection.ExtendAttrCollection.classKey=id;
 
- 		App.Services.SystemCollection.ExtendAttrCollection.fetch();
+ 		App.Services.SystemCollection.ExtendAttrCollection.fetch({
+ 			success:function(models,data) {
+ 				 $(".systemContainer .folwContainer .textSum .count").text(data.data.length);
+ 			}
+ 		});
  	}
 
 

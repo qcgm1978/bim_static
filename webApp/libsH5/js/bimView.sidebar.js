@@ -13,7 +13,7 @@
       var self = this;
       self._opt = options;
       self.obj = obj;
-      var bimBox = self._opt._dom.bimBox
+      var bimBox = self._opt._dom.bimBox;
       $.each(bimView.model.modelBar,function(i,item){
         var tmpHtml = $('<i class="bar-item '+item.icon+'" title="'+item.title+'" data-id="'+item.fn+'" data-type="'+item.type+'" data-group="'+item.group+'"></i>');
         bimView.comm.bindEvent.on(item.keyCode,tmpHtml);
@@ -85,8 +85,8 @@
       function renderMap(){
         var floorSelect = self._dom.mapBar.find('.modelList');
         $.each(floorsData,function(i,item){
-          item.Path=  serverUrl + "/model"+item.path;
-          var tmp = $('<li class="modelItem"></li>').text(item.name).data(item);
+          item.Path=  bimView.API.baseUrl + "/model"+item.path;
+          var tmp = $('<li class="modelItem" data-type="miniMap"></li>').text(item.name).data(item);
           floorSelect.append(tmp);
         });
         self.obj.initMap('nimiMap',self._dom.sidebar.find('.map'),axisGridData,floorsData[0]);

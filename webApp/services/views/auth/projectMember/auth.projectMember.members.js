@@ -4,9 +4,6 @@ App.Services.projectMember.members = Backbone.View.extend({
   template: _.templateUrl('/services/tpls/auth/projectMember/members.html'),
   
   events:{
-  	
-  	'click .remove':'del'
-  	
   },
 
   // 重写初始化
@@ -23,7 +20,7 @@ App.Services.projectMember.members = Backbone.View.extend({
   		var _opType=event.currentTarget.getAttribute("data-type");//对象类型：org,user
   		var _outer=event.currentTarget.getAttribute("data-outer");//对象类型：org,user
   		
-  		App.Services.Dialog.alert("<span class='delTip'>是否将用户'"+_userName+"'删除？</span>",function(_this){
+  		App.Services.Dialog.alert("<span class='delTip'>确认要将'"+_userName+"'从"+App.Comm.getCookie("currentProjectName")+"删除？</span>",function(_this){
   			App.Comm.ajax({
   				URLtype:'deleteServicesProjectMembers',
   				data:{
@@ -35,15 +32,15 @@ App.Services.projectMember.members = Backbone.View.extend({
   				type:'delete'
   			},function(res){
   				_this.close();
+  				$.tip({message:'删除成功',type:'success'});
     			if(res.message=="success"){
-    				$('#dataLoading').show();
+    				//$('#dataLoading').show();
     				App.Services.projectMember.loadData(App.Services.projectMember.projectMemberMemberCollection,{outer:App.Comm.getCookie("isOuter")},{
 						dataPrivilegeId:App.Comm.getCookie("currentPid")
 					});
     			}
   			}).fail(function(){
-  				//$('#dataLoading').hide();
-  				alert('添加失败')
+  				
   			})
   			
     		
@@ -55,7 +52,11 @@ App.Services.projectMember.members = Backbone.View.extend({
   	var data=App.Services.projectMember.method.model2JSON(items.models);
   	data={data:data};
     $("#memberlistWrap").html(this.$el.html(this.template(data)));
-    //clearMask();
+    this.$('.remove').on('click',function(e){
+    	
+    	_this.del(e);
+    	
+    })
     $('#dataLoading').hide();
     return this;
   }

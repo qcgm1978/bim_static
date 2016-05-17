@@ -72,8 +72,8 @@ App.Services.roleWindowIndex = Backbone.View.extend({
 
     //新增
     newRole :function(){
-        if(App.Services.roleAddStatus){alert("已在提交中，请等待！");App.Services.maskWindow.close();return}
-        App.Services.roleAddStatus = 1;
+        if(App.Services.roleAddStatus){alert("已在提交中，请等待！");App.Services.maskWindow.close();App.Services.roleAddStatus = 1;return}
+
 
         //新增角色  fetchServicesNewRole
         var name  = $("#selectedRoleName").val(),seleFun,roleModel;
@@ -103,7 +103,7 @@ App.Services.roleWindowIndex = Backbone.View.extend({
         App.Services.newRoleModel =  new roleModel(newRole);
         App.Services.newRoleModel.save(data,{
             success:function(collection, response, options){
-                if(response.message == "success"){
+                if(response.code == 0){
                     App.Services.role.collection.add(response.data);
                 }
                 setTimeout(function(){

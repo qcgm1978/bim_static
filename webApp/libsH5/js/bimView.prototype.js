@@ -32,7 +32,7 @@
       _opt.element.append(_opt._dom.bimBox);
       switch(_opt.type){// 判断类型
         case "model":
-          self.viewer = bimView.model.model(_opt);
+          self.viewer = bimView.model.model(_opt,self);
           break;
         case 'singleModel':
           self.viewer = bimView.model.singleModel(_opt);
@@ -108,14 +108,18 @@
         var filterData = bimView.comm.filterData;
         var $this = $(this),
             $list = $this.parent(),
-            id = $this.data('id'),
+            data = $this.data(),
             text = $this.text(),
             $cur = $list.prev('.cur');
         $cur.removeClass('open').text(text);
-        self.filter({
-          type:'typeId',
-          ids:bimView.comm.getFilter(filterData,id)
-        })
+        if(data.type == 'familyType'){
+          self.filter({
+            type:'typeId',
+            ids:bimView.comm.getFilter(filterData,data.id)
+          })
+        }else{
+
+        }
       });
       $(window).on('resize',function(){
         self.resize();
@@ -165,6 +169,25 @@
         filter.addUserFilter(obj.type,id);
       })
       viewer.render();
+    },
+    initMap:function(name,element,axisGrid,floorPlane){
+      var self = this,
+          viewer = self.viewer,
+          _el = element,
+          _width = _el.width(),
+          _height = _el.height(),
+          _css={
+            left:'0px',
+            bottom:'0px',
+            outline:'none'
+          };
+    viewer.setAxisGridData(axisGrid)
+    viewer.setFloorPlaneData(floorPlane);
+    viewer.createMiniMap(name,_el[0],_width,_height,_css,function(res){
+      BIM.util.pub('changeGrid',res);
+    });
+    viewer.generateFloorPlane(name);
+    viewer.generateAxisGrid(name);
     }
   }
 })($);

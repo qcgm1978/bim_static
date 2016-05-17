@@ -4,11 +4,11 @@
 'use strict'
 ;(function($){
   bimView.model = {
-    model:function(options){
+    model:function(options,obj){
       var self = this;
       var _opt = options;
       var viewer = new self.BIM(_opt);
-      bimView.sidebar(_opt,viewer);
+      bimView.sidebar.init(_opt,obj);
       return viewer;
     },
     singleModel:function(options){
@@ -38,7 +38,7 @@
         if(_opt.callback)_opt.callback(data.id);
         bimView.comm.filterData = [];
         $.each(data.types,function(i,item){
-          var itemHtml = $('<li class="modelItem" data-id="'+item.id+'">'+item.name+'</li>');
+          var itemHtml = $('<li class="modelItem" data-id="'+item.id+'" data-type="familyType">'+item.name+'</li>');
           modelList.append(itemHtml);
           bimView.comm.filterData.push(item.id);
         });
@@ -120,14 +120,6 @@
       type:'click'
     },
     {
-      id:'zoom',
-      icon:'bar-zoom',
-      title:'缩放(Z)',
-      fn:'zoom',
-      keyCode:'122',
-      type:'selected'
-    },
-    {
       id:'fly',
       icon:'bar-fly',
       title:'漫游(Space)',
@@ -151,8 +143,15 @@
         type:'selected'
       },
       ]
-    }
-    ]
+    },
+    {
+      id:'hideMap',
+      icon:'bar-hideMap',
+      title:'漫游(Space)',
+      fn:'fly',
+      keyCode:'32',
+      type:'change'
+    }]
   }
   bimView.model.BIM.prototype = {
     init:function(options){
@@ -161,7 +160,7 @@
       var viewBox = $('<div class="view"></div>');
       _opt._dom.bimBox.append(viewBox);
       viewer.init(viewBox[0]);
-      viewer.load(_opt.etag,bimView.API.baseUrl + bimView.API.fetchModel);
+      // viewer.load(_opt.etag,bimView.API.baseUrl + bimView.API.fetchModel);
       return viewer;
     }
   }

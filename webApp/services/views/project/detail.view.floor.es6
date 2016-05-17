@@ -54,42 +54,43 @@ App.Services.DetailView.Floor=Backbone.View.extend({
 			zIndex:App.Services.ProjectCollection.methods.zIndex(),
 			click:function($item){
 				var _=$(this);
-				_this.formData[_.attr('name')]=_.val();
+				_this.formData[_.attr('name')]=$item.text();
 			}
 		});
 		this.$(".outerInstall").myDropDown({
 			zIndex:App.Services.ProjectCollection.methods.zIndex(),
 			click:function($item){
 				var _=$(this);
-				_this.formData[_.attr('name')]=_.val();
+				_this.formData[_.attr('name')]=$item.text();
 			}
 		});
 		this.$(".outDoorFireLevel").myDropDown({
 			zIndex:App.Services.ProjectCollection.methods.zIndex(),
 			click:function($item){
 				var _=$(this);
-				_this.formData[_.attr('name')]=_.val();
+				_this.formData[_.attr('name')]=$item.text();
 			}
 		});
 		this.$(".inDoorFireLevel").myDropDown({
 			zIndex:App.Services.ProjectCollection.methods.zIndex(),
 			click:function($item){
 				var _=$(this);
-				_this.formData[_.attr('name')]=_.val();
+				_this.formData[_.attr('name')]=$item.text();
 			}
 		});
 		this.$(".seiGrade").myDropDown({
 			zIndex:App.Services.ProjectCollection.methods.zIndex(),
 			click:function($item){
+				debugger
 				var _=$(this);
-				_this.formData[_.attr('name')]=_.val();
+				_this.formData[_.attr('name')]=$item.text();
 			}
 		});
 		this.$(".intensity").myDropDown({
 			zIndex:App.Services.ProjectCollection.methods.zIndex(),
 			click:function($item){
 				var _=$(this);
-				_this.formData[_.attr('name')]=_.val();
+				_this.formData[_.attr('name')]=$item.text();
 			}
 		});
 		this.$(".pit").myDropDown({
@@ -110,6 +111,15 @@ App.Services.DetailView.Floor=Backbone.View.extend({
 		
 		if($this.hasClass('accordOpen')){
 			$accord.slideDown();
+			
+			var $all=this._parentView.$('.accordionDatail');
+			$all.each(function(){
+				if(!$(this).hasClass('accordOpen')){
+					$(this).addClass('accordOpen');
+					$(this).parent().next().slideUp();
+				}
+			})
+			
 		}else{
 			$accord.slideUp();
 		}

@@ -25,14 +25,14 @@ App.Services.windowAlert = Backbone.View.extend({
 
     //确定
     sure : function(){
-        $("#dataLoading").show();
+        $(".serviceBody .roleCtrl").addClass("services_loading");
         var _thisModel = App.Services.deleteRoleInfo,roleId = _thisModel.get("roleId")+'';
 
         $.ajax({
             url:"http://bim.wanda-dev.cn/platform/auth/role?roleId=" +roleId,
             type:"DELETE",
             success:function(response){
-                $("#dataLoading").hide();
+                $(".serviceBody .roleCtrl").addClass("services_loading");
                 if(response.code==18005){
                     $(".servicesAlert .confirm").hide();
                     $(".servicesAlert .alert").show();
@@ -49,10 +49,12 @@ App.Services.windowAlert = Backbone.View.extend({
                     alert("删除失败，类型未判定");
                     App.Services.alertWindow.close();
                 }
+
+                $(".serviceBody .roleCtrl").removeClass("services_loading");
                 App.Services.deleteRoleInfo ="";//清理
             },
             error:function(error){
-                $("#dataLoading").hide();
+                $(".serviceBody .roleCtrl").removeClass("services_loading");
                 alert("错误类型"+ error.status +"，无法成功删除!");
                 App.Services.alertWindow.close();
             }

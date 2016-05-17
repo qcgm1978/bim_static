@@ -46,8 +46,6 @@ App.Services.roleList=Backbone.View.extend({
             height:500,
             isConfirm:false,
             isAlert:false,
-            okCallback:function(){},
-            cancelCallback:function(){},
             closeCallback:function(){},
             message:frame
         });

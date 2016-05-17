@@ -61,7 +61,7 @@ App.Services.System.FolwContainer = Backbone.View.extend({
 		var dialog = new App.Comm.modules.Dialog(opts);
 
 		dialog.element.find(".ckUrl").myRadioCk({
-			click: function(isCk) {
+			click: function(isCk) { 
 				if (isCk) {
 					$(this).next().removeAttr("readonly").removeClass("disabled");
 				}else{
@@ -78,10 +78,7 @@ App.Services.System.FolwContainer = Backbone.View.extend({
 					$(this).next().attr("readonly",true).addClass("disabled");
 				}
 			}
-		});
-
-
-		
+		});  
 	},
 
 
@@ -127,6 +124,8 @@ App.Services.System.FolwContainer = Backbone.View.extend({
 				 App.Services.SystemCollection.FlowCollection.push(data.data);
 				 $(".folwContainer .flowListBody li:last").find(".myIcon-down").toggleClass("myIcon-down-disable myIcon-down");
 				 dialog.close();
+				 var $count=$(".systemContainer .folwContainer .textSum .count");
+				  $count.text(+$count.text()+1);
 			}
 		});
 

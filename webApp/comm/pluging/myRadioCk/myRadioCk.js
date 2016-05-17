@@ -33,8 +33,8 @@
 					$(this).addClass('selected').siblings().removeClass('selected');
 				}
 
-				if ($.isFunction(that.settings.click)) {
-					that.settings.click.call(that, $(this).hasClass('selected'));
+				if ($.isFunction(that.settings.click)) { 
+					that.settings.click.call($el,$(this).hasClass('selected'));
 				}
 			});
 		}

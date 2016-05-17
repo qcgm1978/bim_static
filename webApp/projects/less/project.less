@@ -184,7 +184,26 @@
 		tbody { td { height: 25px; line-height: 25px; padding-left: 5px; }
 		}
 	}
-	.tbBody { height: 100%; margin-top: -28px; padding-top: 28px; }
+	.tbBodyContent { text-align: center;
+		.item { height: 26px; line-height: 25px; border: 1px #ccc solid; border-width: 1px 0px;
+			.commItem { float: left; }
+			.listCode { width: 25%; border-right: 1px #ccc solid; position: relative; }
+			.listName { width: 56%; border-right: 1px #ccc solid;
+				.text { padding-left: 5px; }
+			}
+			.listCount { width: 19%; border-right: 1px #ccc solid;
+				.text { padding-left: 5px; }
+			}
+		}
+	}
+	.tbBody { height: 100%; margin-top: -28px; padding-top: 28px;
+		.tbBodyContent { text-align: left;
+			.item { border-top: 0;
+				.listCode { .text { position: absolute; right: 3px; }
+				}
+			}
+		}
+	}
 }
 .rightProperty { .noneSwitch { display: inline-block; }
 	.nodeSwitch { background: url(../images/comm/images/commIcon.png) no-repeat 0px -39px; margin-top: 7px; display: inline-block; width: 12px; height: 10px; line-height: 8px; vertical-align: top; text-align: center; cursor: pointer;
@@ -287,7 +306,7 @@
 	}
 	.tbContainer { position: absolute; top: 45px; bottom: 32px; left: 0px; right: 0px; overflow: auto;
 		.materialequipmentList { margin-top: -31px; padding-top: 30px; height: 100%; min-width: 580px; width: 100%; }
-		.processAccessList, .openingacceptanceList { min-width: 398px; }
+		.processAccessList, .openingacceptanceList { min-width: 398px; position: relative;}
 		.concernList { min-width: 540px; }
 	}
 	.tbComm { td, th { border: 1px #ccc solid; text-align: center; }
@@ -337,3 +356,144 @@
 #projectContainer { .containerHeader { .myBtn em { margin-top: 1px; vertical-align: top; }
 	}
 }
+
+.disease {
+	height: 270px;
+	min-width: 390px;
+	font-family: "microsoft yahei";
+	border: 1px solid #CCCCCC;
+	position:absolute;
+	right: 4px;
+	left: 4px;
+	background: #FFF;
+	box-shadow: 3px 3px 2px #555555;
+	
+	& .scrollWrap {
+		height: 240px;
+	}
+	
+	& .safter,& .sbefore{
+		width: 0;
+	    height: 0;
+	    border-bottom: 7px solid #CCC;
+	    border-right: 7px solid transparent;
+	    border-left: 7px solid transparent;
+	    content: "";
+	    position: absolute;
+	    top: -8px;
+	    display: block;
+	}
+	
+	& .dafter,& .dbefore{
+		width: 0;
+	    height: 0;
+	    border-top: 7px solid #CCC;
+	    border-right: 7px solid transparent;
+	    border-left: 7px solid transparent;
+	    content: "";
+	    position: absolute;
+	    bottom: -8px;
+	    display: block;
+	}
+	
+	& .dbefore{
+		border-top: 7px solid #FFF;
+		bottom: -6px;
+	}
+	
+	& .safter{
+		border-bottom: 7px solid #FFF;
+		top: -6px;
+	}
+	& span {
+		display: block;
+	}
+	& .header {
+		color: #666;
+		height: 30px;
+		border-bottom: 1px solid #CCC;
+		line-height: 30px;
+		padding-left: 10px;
+		
+		& .closeBtn {
+				width: 20px;
+				height: 20px;
+				display: inline-block;
+				background: url('../../comm/images/commIcon.png') no-repeat -40px -40px;
+				margin-top: 7px;
+    			margin-right: 7px;
+    			float: right
+			}
+	}
+	
+	& ul{
+	}
+	
+	& li {
+		padding: 8px;
+		height: 80px;
+		border-bottom: 1px solid #CCCCCC;
+		&:hover {
+			background: #B4E2FD;
+			cursor: pointer;
+		}
+	}
+	& .content > div {
+		float: left;
+		font-size: 14px;
+	}
+	& .content {
+		& .logo {
+			width: 70px;
+			height: 60px;
+		}
+		& .descr {
+			color: #333;
+			width: 140px;
+			height: 60px;
+			padding-left: 8px;
+		}
+		& .option {
+			width: 140px;
+			height: 60px;
+			padding-left: 5px;
+		}
+		& .title {
+			height: 29px;
+			line-height: 29px;
+			display: inline-block;
+		    white-space: nowrap;
+		    text-overflow: ellipsis;
+		    width: 200px;
+		    overflow: hidden;
+			& i {
+				width: 18px;
+				height: 18px;
+				display: inline-block;
+				background: url('../../comm/images/commIcon.png') no-repeat 0 -658px;
+				vertical-align: -5px;
+			}
+		}
+		& .time {
+			color: #666;
+			font-size: 12px;
+		}
+		& .status {
+			margin-top: 29px;
+			font-size: 12px;
+		}
+		& .from {
+			color: #333;
+			font-size: 12px;
+		}
+	}
+}
+
+
+			
+			
+			
+			
+			
+			
+			

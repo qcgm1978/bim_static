@@ -77,7 +77,49 @@ App.Console = {
 
       $.each(items, function(i, item) {
         if (item.version) {
-          $(".referenceResources").append('<option versionid="' + item.version.id + '" value="' + item.id + '">' + item.name + '</option>');
+          $("#p11").append('<option versionid="' + item.version.id + '" value="' + item.id + '">' + item.name + '</option>');
+        }
+
+      });
+    });
+    //获取族库研发指令表单
+    $.ajax({
+      url: "platform/auditSheet?type=1"
+    }).done(function(data) {
+      console.log("1",data);
+      var items = data.data;
+
+      $.each(items, function(i, item) {
+        if (item.title) {
+          $("#s21").append('<option  value="' + item.no + '">' + item.title + '</option>');
+        }
+
+      });
+    });
+    //获取族库审核审批单
+    $.ajax({
+      url: "platform/auditSheet?type=2"
+    }).done(function(data) {
+      console.log("2",data);
+      var items = data.data;
+
+      $.each(items, function(i, item) {
+        if (item.title) {
+          $("#s31,#s41").append('<option  value="' + item.no + '">' + item.title + '</option>');
+        }
+
+      });
+    });
+    //获取族库发版审批单
+    $.ajax({
+      url: "platform/auditSheet?type=3"
+    }).done(function(data) {
+      console.log("3",data);
+      var items = data.data;
+
+      $.each(items, function(i, item) {
+        if (item.title) {
+          $("#s51").append('<option  value="' + item.no + '">' + item.title + '</option>');
         }
 
       });
@@ -86,7 +128,7 @@ App.Console = {
       var data       = {
         "msgContent":JSON.stringify({
           "messageId":"411a109141d6473c83a86aa0480d6610",
-          "messageType":"MODULARIZE-1002",
+          "messageType":"PLAN-1002",
           "timestamp":1461142526786,
           "code":0,
           "data":{
@@ -98,15 +140,15 @@ App.Console = {
             "familyCode": $("#p13").val().trim(),
             "familyName": $("#p12").val().trim(),
             "refFalimyCode": $("#p11").val().trim(),
-            "status": 8,
-            "workflowId": "96fcdc6f4c6141a7971e34e2fe3d9e8b",
-            "title": "族库研发指令表单"
+            "status": 16,
+            "workflowId": parseInt(9999999*Math.random()),
+            "title": $("#p12").val().trim()
           }
         }),
         "msgCreateTime": 1461727280227,
         "msgId": "b2e5b467ef214f6196ac3f826017806e",
         "msgSendTime": 0,
-        "srcMsgType": "MODULARIZE-1002",
+        "srcMsgType": "PLAN-1002",
         "retryTimes": 0,
         "status": 0,
         "sysCode": "1"
@@ -118,98 +160,310 @@ App.Console = {
 
 
     $("#submit2").click(function(){
-      var data       = {
-        "msgContent":JSON.stringify({
-          "messageId":"411a109141d6473c83a86aa0480d6610",
-          "messageType":"MODULARIZE-1003",
-          "timestamp":(new Date).getTime(),
-          "code":0,
-          "data":{
-            "createTime": 1461140797286,
-            "description": "描述",
-            "familyDevelopWorkflowId": "3b617942-0c1e-458e-922a-9b1c85294f0e",
-            "status": 8,
-            "workflowId": "a57b543d-81da-4721-8a34-6e5dbecef4b7",
-            "title": "族库报审表单"
-          }
-        }),
-        "msgCreateTime": 1461727280227,
-        "msgId": "b2e5b467ef214f6196ac3f826017806e",
-        "msgSendTime": 0,
-        "srcMsgType": "MODULARIZE-1003",
-        "retryTimes": 0,
-        "status": 0,
-        "sysCode": "1"
+      var data = {
+            workflowId:parseInt(9999999*Math.random()),
+            familyDevelopWorkflowId:$('#s21').val().trim()
       };
-      var stringData = JSON.stringify(data);
-      App.Console.post(stringData);
-
+      App.Console.apply(1,1003,data);
     });
 
     $("#submit3").click(function(){
-      var data       = {
-        "msgContent":JSON.stringify({
-          "messageId":"411a109141d6473c83a86aa0480d6610",
-          "messageType":"MODULARIZE-1004",
-          "timestamp":(new Date).getTime(),
-          "code":0,
-          "data":{
-            "auditFinishTime": 1461140797765,
-            "description": "描述",
-            "status": 16,
-            "workflowId": "32f221e0-be3e-4ce1-ba5b-7cbed4f6e1f1",
-            "title": "族库报审表单"
-          }
-        }),
-        "msgCreateTime": 1461727280227,
-        "msgId": "b2e5b467ef214f6196ac3f826017806e",
-        "msgSendTime": 0,
-        "srcMsgType": "MODULARIZE-1004",
-        "retryTimes": 0,
-        "status": 0,
-        "sysCode": "1"
+      var data = {
+        workflowId:$('#s31').val().trim()
       };
-      var stringData = JSON.stringify(data);
-      App.Console.post(stringData);
+      App.Console.apply(2,1004,data);
 
     });
-
-    $("#submit4").click(function(){
-      var data       = {
-        "msgContent":JSON.stringify({
-          "messageId":"411a109141d6473c83a86aa0480d6610",
-          "messageType":"MODULARIZE-1005",
-          "timestamp":(new Date).getTime(),
-          "code":0,
-          "data":{
-            "createTime": 1461140797779,
-            "description": "描述",
-            "familyAprovalWorkflowId": "7730d3f4-2efe-4e6f-9b13-b5caed740cdc",
-            "status": 8,
-            "workflowId": "89de41ec-c988-4aa1-82ed-aeb8b047d3bc",
-            "title": "族库发布表单"
-          }
-        }),
-        "msgCreateTime": 1461727280227,
-        "msgId": "b2e5b467ef214f6196ac3f826017806e",
-        "msgSendTime": 0,
-        "srcMsgType": "MODULARIZE-1005",
-        "retryTimes": 0,
-        "status": 0,
-        "sysCode": "1"
+    $("#submit33").click(function(){
+      var data = {
+        workflowId:$('#s31').val().trim(),
+        status:4
       };
-      var stringData = JSON.stringify(data);
-      App.Console.post(stringData);
+      App.Console.apply(2,1004,data);
+
+    });
+    $("#submit4").click(function(){
+      var data = {
+        workflowId:parseInt(9999999*Math.random()),
+        familyAprovalWorkflowId:$('#s41').val().trim()
+      };
+      App.Console.apply(3,1005,data);
+
+    });
+    $("#submit5").click(function(){
+      var data = {
+        workflowId:$('#s51').val().trim()
+      };
+      App.Console.apply(4,1006,data);
+
+    });
+    $("#submit55").click(function(){
+      var data = {
+        workflowId:$('#s51').val().trim(),
+        status:4
+
+      };
+      App.Console.apply(4,1006,data);
 
     });
   },
   standardModel(){
     var tpl        = _.templateUrl('/console1/tpls/standardModel/standardmodel.html', true);
     $("#contains").html(tpl);
+    $.ajax({
+      url: "platform/project?type=1"
+    }).done(function(data) {
+
+      var items = data.data.items;
+
+      $.each(items, function(i, item) {
+        if (item.version) {
+          $("#s11").append('<option versionid="' + item.version.id + '" value="' + item.id + '">' + item.name + '</option>');
+        }
+
+      });
+    });
+    //获取研发标准模型指令审批单
+    $.ajax({
+      url: "platform/auditSheet?type=4"
+    }).done(function(data) {
+      console.log("1",data);
+      var items = data.data;
+
+      $.each(items, function(i, item) {
+        if (item.title) {
+          $("#s21").append('<option  value="' + item.no + '">' + item.title + '</option>');
+        }
+
+      });
+    });
+    //获取标准模型报审表单
+    $.ajax({
+      url: "platform/auditSheet?type=5"
+    }).done(function(data) {
+      console.log("2",data);
+      var items = data.data;
+
+      $.each(items, function(i, item) {
+        if (item.title) {
+          $("#s31,#s41").append('<option  value="' + item.no + '">' + item.title + '</option>');
+        }
+
+      });
+    });
+    //获取标准模型发布表单
+    $.ajax({
+      url: "platform/auditSheet?type=6"
+    }).done(function(data) {
+      console.log("3",data);
+      var items = data.data;
+
+      $.each(items, function(i, item) {
+        if (item.title) {
+          $("#s51").append('<option  value="' + item.no + '">' + item.title + '</option>');
+        }
+
+      });
+    });
+    $('#s11').change(function(){
+      $("#p14").val($(this).children('option:selected').attr("versionid"));
+    });
+
+    $("#submit1").click(function(){
+      var data = {
+       workflowId:parseInt(9999999*Math.random()),
+        refModelCode:$('#s11').val().trim(),
+        refModelVersionId:$('#p14').val().trim(),
+        modelCode:$('#p11').val().trim(),
+        modelName:$('#p12').val().trim(),
+        modelVersionName:$('#p13').val().trim()
+      };
+      App.Console.apply(1,1007,data);
+
+    });
+
+
+    $("#submit2").click(function(){
+      var data = {
+        workflowId:parseInt(9999999*Math.random()),
+        standardModelDevelopWorkflowId:$('#s21').val().trim()
+      };
+      App.Console.apply(2,1008,data);
+    });
+
+    $("#submit3").click(function(){
+      var data = {
+        //workflowId:parseInt(9999999*Math.random()),
+        workflowId:$('#s31').val().trim()
+      };
+      App.Console.apply(3,1009,data);
+
+    });
+    $("#submit33").click(function(){
+      var data = {
+        status:4,
+        workflowId:$('#s31').val().trim()
+      };
+      App.Console.apply(3,1009,data);
+
+    });
+
+    $("#submit4").click(function(){
+      var data = {
+        workflowId:parseInt(9999999*Math.random()),
+        standardModelAprovalWorkflowId:$('#s41').val().trim()
+      };
+      App.Console.apply(4,1010,data);
+
+    });
+    $("#submit5").click(function(){
+      var data = {
+        //workflowId:parseInt(9999999*Math.random()),
+        workflowId:$('#s51').val().trim()
+      };
+      App.Console.apply(5,1011,data);
+
+    });
+    $("#submit55").click(function(){
+      var data = {
+        status:4,
+        workflowId:$('#s51').val().trim()
+      };
+      App.Console.apply(5,1011,data);
+
+    });
   },
   project(){
     var tpl        = _.templateUrl('/console1/tpls/project/project.html', true);
     $("#contains").html(tpl);
+    $.ajax({
+      url: "platform/project?type=1"
+    }).done(function(data) {
+
+      var items = data.data.items;
+
+      $.each(items, function(i, item) {
+        if (item.version) {
+          $("#s11").append('<option versionid="' + item.version.id + '" value="' + item.id + '">' + item.name + '</option>');
+        }
+
+      });
+    });
+    $('#s11').change(function(){
+      $("#p13").val($(this).children('option:selected').attr("versionid"));
+    });
+
+    //7获取
+    $.ajax({
+      url: "platform/auditSheet?type=20"
+    }).done(function(data) {
+      console.log("1",data);
+      var items = data.data;
+
+      $.each(items, function(i, item) {
+        if (item.title) {
+          $("#s21").append('<option  value="' + item.no + '">' + item.title + '</option>');
+        }
+
+      });
+    });
+    //8获取
+    $.ajax({
+      url: "platform/auditSheet?type=7"
+    }).done(function(data) {
+      console.log("2",data);
+      var items = data.data;
+
+      $.each(items, function(i, item) {
+        if (item.title) {
+          $("#s31,#s41").append('<option  value="' + item.no + '">' + item.title + '</option>');
+        }
+
+      });
+    });
+    //9获取
+    $.ajax({
+      url: "platform/auditSheet?type=8"
+    }).done(function(data) {
+      console.log("3",data);
+      var items = data.data;
+
+      $.each(items, function(i, item) {
+        if (item.title) {
+          $("#s51").append('<option  value="' + item.no + '">' + item.title + '</option>');
+        }
+
+      });
+    });
+
+    $("#submit1").click(function(){
+      var data = {
+        workflowId:parseInt(9999999*Math.random()),
+        projectCode:$('#p11').val().trim(),
+        projectName:$('#p12').val().trim()
+        //modelCode:$('#p11').val().trim(),
+        //modelName:$('#s11').val().trim(),
+        //modelVersionName:$('#p13').val().trim()
+      };
+      App.Console.apply(1,1012,data);
+
+    });
+
+
+    $("#submit2").click(function(){
+      var data = {
+        workflowId:parseInt(9999999*Math.random()),
+        projectModelInstructionsWorkflowId:$('#s21').val().trim()
+
+      };
+      App.Console.apply(2,1013,data);
+    });
+
+    $("#submit3").click(function(){
+      var data = {
+        //workflowId:parseInt(9999999*Math.random()),
+        workflowId:$('#s31').val().trim()
+
+      };
+      App.Console.apply(3,1014,data);
+
+    });
+    $("#submit33").click(function(){
+      var data = {
+        status:4,
+        workflowId:$('#s31').val().trim()
+
+      };
+      App.Console.apply(3,1014,data);
+
+    });
+    $("#submit4").click(function(){
+      var data = {
+        workflowId:parseInt(9999999*Math.random()),
+        projectModelAprovalWorkflowId:$('#s41').val().trim()
+
+      };
+      App.Console.apply(4,1015,data);
+
+    });
+    $("#submit5").click(function(){
+      var data = {
+        //workflowId:parseInt(9999999*Math.random()),
+        workflowId:$('#s51').val().trim()
+
+      };
+      App.Console.apply(5,1016,data);
+
+    });
+    $("#submit55").click(function(){
+      var data = {
+        status:4,
+        workflowId:$('#s51').val().trim()
+
+      };
+      App.Console.apply(5,1016,data);
+
+    });
   },
 
   //质量监测
@@ -255,69 +509,34 @@ App.Console = {
   }, //获取项目质量材料设备列表
   qm1(){
     $.ajax({
-      url: "/platform/project/1/version"
+      url: "/platform/mapping/project?type=3"
     }).done(function(data){
       var str = '', datas = data.data;
 
       $.each(datas, function(index, data){
         console.log(data)
-        str += "<option value=" + data.id + ">" + data.name + "</option>";
+        str += "<option value=" + data.projectCode + ">" + data.projectName + "</option>";
       });
 
-      $('#versionList').append(str)
+      $('#s11').append(str)
 
     });
 
     $("#submit").click(function(){
-      var data       = {
-        "msgContent":JSON.stringify({
-          "messageId":"411a109141d6473c83a86aa0480d6610",
-          "messageType":"QUALIFY-1001",
-          "timestamp":(new Date).getTime(),
-          "code":0,
-          "data":JSON.parse($('#data').val())
+      var data = {
+        "id"           : $('#p11').val().trim(),
+        "projectCode"  : $('#s11').val().trim(),
+        "specialtyName": $('#s12 option:selected').text().trim(),
+        "specialtyId"  : $('#s12').val().trim(),
+        "categoryId"   : $('#s13').val().trim(),
+        "categoryName" : $('#s13 option:selected').text().trim(),
+        "name"         : $('#p12').val().trim()
 
-        }),
-        "msgCreateTime": 1461727280227,
-        "msgId": "b2e5b467ef214f6196ac3f826017806e",
-        "msgSendTime": 0,
-        "srcMsgType": "QUALIFY-1001",
-        "retryTimes": 0,
-        "status": 0,
-        "sysCode": "1"
       };
-      var stringData = JSON.stringify(data);
-      $.ajax({
-        url    : "sixD/internal/message",
-        data   : stringData,
-        headers: {
-          "Content-Type": "application/json"
-        },
-        type   : "POST"
-      }).done(function(data){
-        console.log(data);
-        $("#result").val(JSON.stringify(data))
-
-        if(data.message == "success"){
-          alert("成功");
-        }
-
-      });
-      //$.ajax({
-      //  url : "sixD/1/" + data.projectVersionId + "/device" + App.Console.param(param), //data: stringData,
-      //  //headers: {
-      //  //	"Content-Type": "application/json"
-      //  //},
-      //  type: "GET"
-      //}).done(function(data){
-      //  console.log(data);
-      //  if(data.message == "success"){
-      //    alert("成功");
-      //    window.location.reload();
-      //  }
-      //
-      //});
+      App.Console.apply(1, 1001, data, 1);
     });
+
+
   },
 
   //获取项目质量验收列表
@@ -634,58 +853,65 @@ App.Console = {
 
       $('#p21').append(str)
     },0);
-    function apply(index,num){
-      var data       = {
-        "msgContent":JSON.stringify({
-          "messageId":"411a109141d6473c83a86aa0480d6610",
-          "messageType":"MODULARIZE-"+num,
-          "timestamp":(new Date).getTime(),
-          "code":0,
-          "data":JSON.parse($('#data'+index).val())
+
+    $("#submit4").click(function(){
+     App.Console.apply(1,1019);
+    });
+    $("#submit5").click(function(){
+      App.Console.apply(2,1020);
+    });
+    $("#submit6").click(function(){
+      App.Console.apply(3,1021);
+    });
+    $("#submit7").click(function(){
+      App.Console.apply(4,1022);
+    });
+    $("#submit8").click(function(){
+      App.Console.apply(5,1023);
+    });
+    $("#submit9").click(function(){
+      App.Console.apply(6,1024);
+    });
+  },
+  apply(index, num, obj, type){
+    var datainit = JSON.parse($('#data' + index).val());
+    if(typeof obj != 'undefined'){
+      console.log(datainit)
+      for(var g in obj){
+        datainit[g] = obj[g];
+
+      }
+      var data = {
+        "msgContent"   : JSON.stringify({
+          "messageId"  : "411a109141d6473c83a86aa0480d6610",
+          "messageType": (type == '1' ? "QUALIFY-" : "PLAN-") + num,
+          "timestamp"  : (new Date).getTime(),
+          "code"       : 0,
+          "data"       : type == 1 ? new Array(datainit) : datainit
 
         }),
         "msgCreateTime": 1461727280227,
-        "msgId": "b2e5b467ef214f6196ac3f826017806e",
-        "msgSendTime": 0,
-        "srcMsgType": "MODULARIZE-"+num,
-        "retryTimes": 0,
-        "status": 0,
-        "sysCode": "1"
+        "msgId"        : "b2e5b467ef214f6196ac3f826017806e",
+        "msgSendTime"  : 0,
+        "srcMsgType"   : "PLAN-" + num,
+        "retryTimes"   : 0,
+        "status"       : 0,
+        "sysCode"      : "1"
       };
-      var stringData = JSON.stringify(data);
-      $.ajax({
-        url    : "platform/internal/message",
-        data   : stringData,
-        headers: {
-          "Content-Type": "application/json"
-        },
-        type   : "POST"
-      }).done(function(data){
-        $("#result"+index).val(JSON.stringify(data))
-        console.log(data)
-        if(data.message == "success"){
-          alert("成功");
-        }
-
-      });
     }
-    $("#submit4").click(function(){
-     apply(1,1019);
-    });
-    $("#submit5").click(function(){
-      apply(2,1020);
-    });
-    $("#submit6").click(function(){
-      apply(3,1021);
-    });
-    $("#submit7").click(function(){
-      apply(4,1022);
-    });
-    $("#submit8").click(function(){
-      apply(5,1023);
-    });
-    $("#submit9").click(function(){
-      apply(6,1024);
+
+
+    $.ajax({
+      url    : type == 1 ? "sixD/internal/message" : "platform/internal/message",
+      data   : JSON.stringify(data),
+      headers: {
+        "Content-Type": "application/json"
+      },
+      type   : "POST"
+    }).done(function(data){
+      $("#result" + index).val(JSON.stringify(data))
+      console.log(data)
+
     });
   },
   //2016-1-1转成时间戳

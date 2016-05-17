@@ -34,10 +34,10 @@ App.Services.System.ExtendAttrContainerListDetail = Backbone.View.extend({
 		var $item = $(event.target).closest(".item"),
 			data = {
 				isEdit: true,
-				property: $item.find(".key").text(),
+				property: $item.find(".key").text().trim(),
 				reference: $item.find(".linkAttr").text().replace("--", "").trim(),
-				type: $item.find(".type").text(),
-				propertyName: $item.find(".attr").text()
+				type: $item.find(".type").text().trim(),
+				propertyName: $item.find(".attr").text().trim()
 			};
 
 		var dialogHtml = _.templateUrl('/services/tpls/system/extendAttr/extend.attr.add.html')(data);

@@ -6,7 +6,7 @@
     <td class="issue">
         <img class="ckImg" src="/projects/images/proDefault.png" alt="" />
         <div class="ckHeader"> 
-            <div class="ckDesc"><%= item.title %></div>
+            <div class="ckDesc" title="<%= item.name %>"><%= item.name %></div>
             <div class="date">
                 <span>创建日期：</span><span><%= item.discoverDate?new Date(item.discoverDate).format('yyyy-MM-dd'):'' %></span>
             </div>
@@ -21,7 +21,7 @@
     <td class="status"> <span class="status red"><%=item.status==1 && '待整改' ||item.status==2 && '已整改' || '已关闭' %>
      </span> </td>
     <td class="category"> <span class="security"><%=item.ratingCategoryId==1 && '安全' ||item.ratingCategoryId==2 && '功能' || '品质' %></span> </td>
-    <td class="specialty"> <span><%= item.specialty %></span> </td>
+    <td class="specialty"> <span><%= item.specialtyName %></span> </td>
     <td class="professional"><span><%= item.organizationTypeId==1 && '设计总包' || '第三方' %></span></td> 
 </tr>
 <% }) %>
