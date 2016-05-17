@@ -13,7 +13,6 @@ ul,li{list-style: none outside none;}
 .serviceHeader .bcService span a{color: #333333;text-underline: none;}
 .serviceHeader .bcService span.arr-r:before{content: '';position: absolute;width: 4px;height: 7px;top: 17px;right:12px;.background-ioc;background-position: 0 -640px;}
 
-
 .serviceHeader .serviceNav{background-color: #eeeeee;border-top: 1px solid #cccccc;padding-top: 9px;height: 38px;border-bottom: 1px solid #cccccc;padding-left: 20px;clear: both;}
 .serviceHeader .serviceNav li{border-top: 2px solid #eeeeee;float: left;line-height: 27px;height: 29px;width: 98px;text-align: center;margin-bottom: -1px;cursor: pointer;}
 .serviceHeader .serviceNav li.active{border-top: 2px solid #006ecf;border-left: 1px solid #cccccc;border-right: 1px solid #cccccc;border-bottom: 1px solid #eeeeee;background-color: #ffffff;}
@@ -55,7 +54,7 @@ ul,li{list-style: none outside none;}
 .serviceBody .content li .ushead{display: inline-block;width: 32px;height: 32px;line-height: 0;background: transparent url('../images/service_ico.png') 0 -40px no-repeat;vertical-align: middle;margin: 0 13px 0 10px;}
 .serviceBody .content li.active .memCheck{background-position: 0 -420px;}
 .serviceBody .content li .ushead.oz{background-position: 0 0;}/*机构*/
-.serviceBody .content li .sele .roles{text-align: center;margin-right: 84px;}
+.serviceBody .content li .sele .roles{margin-right: 100px;margin-left: 320px;padding-left: 30%;overflow: hidden;text-overflow: ellipsis;white-space: nowrap;}
 .serviceBody .content li .sele .roles.error{color: #999999;}
 .serviceBody  li .sele .roles span{position: relative;display: inline-block;padding-left: 20px;margin-left: 14px;}
 .serviceBody  li .sele .roles span:before{position: absolute;content:'';left: 0;top: 18px;height: 15px;width: 14px;background: transparent url('../images/service_ico.png') 0 -180px  no-repeat;}
@@ -67,7 +66,7 @@ ul,li{list-style: none outside none;}
 .serviceBody .roleCtrl{height: 100%;}
 #roleList{overflow: auto;position: absolute;top: 50px;left: 0;right: 0;bottom: 0;}
 .roleCtrl li{clear: both;line-height: 50px;padding:0 22px;height: 50px;}
-.roleCtrl .roleHead{padding:0 22px;line-height: 50px;font-size: 12px;color: #a7a7a7;}
+.roleCtrl .roleHead{padding:0 22px;line-height: 50px;font-size: 12px;color: #a7a7a7;border-bottom: 1px solid #cccccc;}
 .roleCtrl .roleHead .newRole{position: relative;cursor: pointer;display: inline-block;line-height: 28px;height: 30px;vertical-align: middle;padding: 0 8px 0 32px;border: 1px solid #cccccc;margin-left: 24px;}
 .roleCtrl .roleHead .newRole:before{position: absolute;content:'';left: 9px;top: 7px;height: 14px;width: 14px;background: transparent url('../images/service_ico.png') 0 -220px  no-repeat;}
 .roleCtrl .roleHead .left,.roleCtrl li .left{float: left;width: 268px;}
@@ -82,7 +81,7 @@ ul,li{list-style: none outside none;}
 .roleCtrl .roleEdit span{position: relative;display: inline-block;padding-left: 16px;margin-right: 22px;line-height: 13px;font-size: 12px;color: #0572d0;cursor: pointer;}
 .roleCtrl .roleEdit span:before{content: '';position: absolute;left: 0;top: 0;height: 13px;width: 13px;background: transparent url('../images/service_ico.png') 20px 20px  no-repeat;}
 .roleCtrl .roleEdit span.explorer:before{background-position:0 -240px ; top: 2px;}
-.roleCtrl .roleEdit span.edit:before{background-position: 0 -260px ;}
+.roleCtrl .roleEdit span.modify:before{background-position: 0 -260px ;}
 .roleCtrl .roleEdit span.delete:before{background-position: 0 -280px ;}
 /*????*/
 #mask{position: fixed;left: 0;top: 0;width: 100%;height: 100%;background: rgba(0,0,0,.5);z-index: 999;display: none;}
@@ -100,7 +99,8 @@ ul,li{list-style: none outside none;}
 .seWinBody h1{height: 50px;line-height: 49px;border-bottom: 1px solid #e6e6e6;font-size: 16px;padding-left: 24px;color: #333333;}
 .seWinBody h2{height: 45px;line-height: 45px;font-size: 14px;padding: 0 10px;}
 .seWinBody h2 span{color: #9f9f9f;}
-.seWinBody .title{font-size: 12px;color: #9f9f9f;line-height: 23px;height: 24px;}
+.seWinBody .title{font-size: 12px;color: #9f9f9f;line-height: 23px;height: 24px;padding-left: 34px;}
+.seWinBody .title .name{width: 149px;}
 .seWinBody .name,.seWinBody .funName{float: left;width: 175px;.ellipsis;}
 .seWinBody li{padding: 0 10px;line-height: 30px;height: 30px;.ellipsis;}
 .seWinBody li:not(:last-child){border-bottom: 1px solid #cccccc;}
@@ -117,6 +117,7 @@ ul,li{list-style: none outside none;}
 //弹窗角色列表
 .memRoleList li{position: relative;overflow: visible;}
 .memRoleList li.inherit{color: #cccccc;}
+.memRoleList li.inherit .memCheck{background-position: 0 -440px;}
 .memRoleList li.inherit .rohead{background-position: 0 -560px;}
 .memRoleList li .fun {overflow: hidden;}
 .memRoleList li.active .fun{border-color:#a8dbfd; }

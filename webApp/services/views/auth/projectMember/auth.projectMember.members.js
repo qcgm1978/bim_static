@@ -20,7 +20,7 @@ App.Services.projectMember.members = Backbone.View.extend({
   		var _opType=event.currentTarget.getAttribute("data-type");//对象类型：org,user
   		var _outer=event.currentTarget.getAttribute("data-outer");//对象类型：org,user
   		
-  		App.Services.Dialog.alert("<span class='delTip'>是否将用户'"+_userName+"'删除？</span>",function(_this){
+  		App.Services.Dialog.alert("<span class='delTip'>确认要将'"+_userName+"'从"+App.Comm.getCookie("currentProjectName")+"删除？</span>",function(_this){
   			App.Comm.ajax({
   				URLtype:'deleteServicesProjectMembers',
   				data:{
@@ -32,7 +32,6 @@ App.Services.projectMember.members = Backbone.View.extend({
   				type:'delete'
   			},function(res){
   				_this.close();
-  				//new App.Comm.Tip({message:'删除成功',type:'success'}).render().show();
   				$.tip({message:'删除成功',type:'success'});
     			if(res.message=="success"){
     				//$('#dataLoading').show();

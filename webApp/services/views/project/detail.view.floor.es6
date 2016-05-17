@@ -111,6 +111,15 @@ App.Services.DetailView.Floor=Backbone.View.extend({
 		
 		if($this.hasClass('accordOpen')){
 			$accord.slideDown();
+			
+			var $all=this._parentView.$('.accordionDatail');
+			$all.each(function(){
+				if(!$(this).hasClass('accordOpen')){
+					$(this).addClass('accordOpen');
+					$(this).parent().next().slideUp();
+				}
+			})
+			
 		}else{
 			$accord.slideUp();
 		}

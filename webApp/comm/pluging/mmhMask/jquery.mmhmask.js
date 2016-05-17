@@ -26,7 +26,7 @@
 	}
 	
 	win.clearMask=function(){
-		_mmhMask.remove();
+		_mmhMask&&_mmhMask.remove();
 	}
 
 	function createMask() {

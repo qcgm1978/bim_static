@@ -29,7 +29,6 @@ App.Services.AuthNav = Backbone.View.extend({
 		this.$el.find(".bcService span:last").text($el.text().trim());
 	}, 
 
-
 	memCtrl : function(){
 		$(".serviceBody").empty();
 		this.breadCrumb(this.$el.find(".memCtrl"));
