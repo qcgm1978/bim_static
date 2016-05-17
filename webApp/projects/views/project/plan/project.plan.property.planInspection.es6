@@ -35,6 +35,7 @@ App.Project.PlanInspection = Backbone.View.extend({
 		var $tbTop = this.$(".tbTop");
 		$tbTop.find("tbody").html(template(data));
 		$tbTop.prev().find(".count").text(data.data.length);
+		this.$('.nullLinkData').hide();
 	},
 
 	//图元未关联计划节点
@@ -46,6 +47,8 @@ App.Project.PlanInspection = Backbone.View.extend({
 		$tbBottom.find("tbody").html(template(data));
 
 		$tbBottom.prev().find(".count").text(count);
+		this.$('.nullLinkData').hide();
+		this.$('.exportList').show();
 	},
 
 	reset() {

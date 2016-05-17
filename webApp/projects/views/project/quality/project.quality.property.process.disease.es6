@@ -27,7 +27,6 @@ App.Project.ProcessDisease=Backbone.View.extend({
 	},
 	
 	loadData(data){
-		debugger
 		var _this=this,
 			url='fetchQualityProcessDisease';
 		App.Comm.ajax({
