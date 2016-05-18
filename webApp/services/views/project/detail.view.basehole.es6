@@ -130,6 +130,7 @@ App.Services.DetailView.BaseHole=Backbone.View.extend({
 	
 	cancelBasehole(){
 		this.$el.remove();
+		App.Services.ProjectCollection.ProjecDetailBaseHoleCollection.pop();
 		Backbone.trigger('baseholeUserStatus','read');
 	},
 	

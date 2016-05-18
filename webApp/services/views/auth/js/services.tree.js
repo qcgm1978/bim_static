@@ -20,8 +20,46 @@ App.Services.tree = function(data){
     return ele;
 };
 
-App.Services.queue = [];
+//队列管理
+App.Services.queue = {
+    que : [],
+    permit : true,
+    present : [],
+    //许可证发放，300ms后发放一个许可证，避免点击过快
+    certificates:function(){
+        this.permit = false;
+        setTimeout(function(){
+            App.Services.queue.permit = true;
+        },100);
+    },
+    //验证并向队列添加执行函数
+    promise:function(fn,_this){
+        if(!this.permit){ return;}
+        if(!this.que.length){//没有直接添加
+            this.que.push(fn);
+            this.present.push(_this);
+            this.que[0]();
+            this.certificates();
+            return;
+        }
 
+        if(this.que.length > 1){
+            this.que.pop();
+            this.present.pop();
+        }
+        this.present.push(_this);
+        this.que.push(fn);
+        this.certificates();
+    },
+    //执行完毕，刷新队列，执行下一个
+    next:function(){
+        this.que.shift();
+        this.present.shift();
+        if(this.que.length){
+            this.que[0]();
+        }
+    }
+};
 
 
 //同级队列，注意不能响应非同级，会造成页面混乱
