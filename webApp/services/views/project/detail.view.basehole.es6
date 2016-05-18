@@ -130,7 +130,7 @@ App.Services.DetailView.BaseHole=Backbone.View.extend({
 	
 	cancelBasehole(){
 		this.$el.remove();
-		this._parentView.trigger('read');
+		Backbone.trigger('baseholeUserStatus','read');
 	},
 	
 	//刷新基坑页面、同时刷新楼层、剖面视图，保证数据一致性
