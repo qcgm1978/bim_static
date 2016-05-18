@@ -45,7 +45,13 @@ App.Services.DetailView.Floor=Backbone.View.extend({
 			data=this.model.toJSON();
 		this.formData=data;
 		this.$el.html(this.template(data));
-		
+		this.$(".pit").myDropDown({
+			zIndex:App.Services.ProjectCollection.methods.zIndex(),
+			click:function($item){
+				var _=$(this);
+				_this.formData[_.attr('name')]=$item.attr('data-pitId');
+			}
+		});
 		this.$(".structure").myDropDown({
 			zIndex:App.Services.ProjectCollection.methods.zIndex(),
 			click:function($item){
@@ -86,13 +92,6 @@ App.Services.DetailView.Floor=Backbone.View.extend({
 			click:function($item){
 				var _=$(this);
 				_this.formData[_.attr('name')]=$item.text();
-			}
-		});
-		this.$(".pit").myDropDown({
-			zIndex:App.Services.ProjectCollection.methods.zIndex(),
-			click:function($item){
-				var _=$(this);
-				_this.formData[_.attr('name')]=$item.attr('data-pitId');
 			}
 		});
 		return this;
