@@ -20,8 +20,10 @@ App.Services.tree = function(data){
     return ele;
 };
 
-App.Services.queue = [];
-
+App.Services.queue = {
+    que : [],
+    permit : true
+};
 
 
 //同级队列，注意不能响应非同级，会造成页面混乱

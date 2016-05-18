@@ -29,19 +29,28 @@ App.Services.MemberozDetail=Backbone.View.extend({
     unfold:function(){
         var _this = this;
 
+        //如果是已有元素，并快速点击，属于误操作，跳过
+        if(this.$(".ozName span").hasClass("active") && !App.Services.queue.permit){return;}
+
         //队列机制，尚未完成
-        if(App.Services.queue.length){
-            if(App.Services.queue.length > 2){
-                App.Services.queue.pop(-1);
-                App.Services.queue.push(this.promise);
+        if(!App.Services.queue.permit){
+            if(App.Services.queue.que.length > 1){
+                App.Services.queue.que.splice(1);
             }
+            App.Services.queue.que.push(this.promise);
+            return
         }
 
+        //许可证相关
+        App.Services.queue.permit = false;
+        this.permit(); //200ms后发放一个许可证，避免点击过快
+
+        //样式操作
         $(".serviceOgList span").removeClass("active");
         _this.$(".ozName > span").addClass("active");
-
         $("#blendList").empty();//刷新右侧数据
         $(".serviceBody .content").addClass("services_loading");
+        
 
         this.promise();
         //获取数据，将会刷新右侧视图
@@ -59,7 +68,7 @@ App.Services.MemberozDetail=Backbone.View.extend({
         });*/
     },
 
-    //请求
+    //队列请求
     promise:function(){
         var _this = this;
         var _thisType = App.Services.MemberType;
@@ -80,6 +89,7 @@ App.Services.MemberozDetail=Backbone.View.extend({
         App.Comm.ajax(cdata,function(response){
             if(!response.data.org.length && !response.data.user.length ){
                 $("#blendList").html("<li><span class='sele'>暂无数据</span></li>");
+                $(".serviceBody .content").removeClass("services_loading");
                 return
             }
             collection.reset();
@@ -94,13 +104,17 @@ App.Services.MemberozDetail=Backbone.View.extend({
             $(".serviceBody .content").removeClass("services_loading");
         }).done(function(){
             //添加执行队列
-            if(App.Services.queue){
-                App.Services.queue.shift(0);
-                if(App.Services.queue[0]){
-                    App.Services.queue[0]();
-                }
+             App.Services.queue.que.splice(0,0);
+            if(App.Services.queue.que.length){
+                App.Services.queue.que[0]();
             }
         });
+    },
+
+    permit:function(){
+        setTimeout(function(){
+            App.Services.queue.permit = true;
+        },1000);
     }
 });
 
