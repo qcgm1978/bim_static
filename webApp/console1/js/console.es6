@@ -131,14 +131,17 @@ App.Console = {
     $("#submit2").click(function(){
       var data = {
             workflowId:parseInt(9999999*Math.random()),
-            familyDevelopWorkflowId:$('#s21').val().trim()
+            familyDevelopWorkflowId:$('#s21').val().trim(),
+            title: $("#p21").val().trim()
       };
       App.Console.apply(1,1003,data);
     });
 
     $("#submit3").click(function(){
       var data = {
-        workflowId:$('#s31').val().trim()
+        workflowId:$('#s31').val().trim(),
+        title: $("#p31").val().trim()
+
       };
       App.Console.apply(2,1004,data);
 
@@ -146,7 +149,9 @@ App.Console = {
     $("#submit33").click(function(){
       var data = {
         workflowId:$('#s31').val().trim(),
-        status:4
+        status:4,
+        title: $("#p31").val().trim()
+
       };
       App.Console.apply(2,1004,data);
 
@@ -154,7 +159,9 @@ App.Console = {
     $("#submit4").click(function(){
       var data = {
         workflowId:parseInt(9999999*Math.random()),
-        familyAprovalWorkflowId:$('#s41').val().trim()
+        familyAprovalWorkflowId:$('#s41').val().trim(),
+        title: $("#p41").val().trim()
+
       };
       App.Console.apply(3,1005,data);
 
@@ -231,7 +238,9 @@ App.Console = {
         refModelName:$('#s11 option:selected').text(),
         modelCode:$('#p11').val().trim(),
         modelName:$('#p12').val().trim(),
-        modelVersionName:$('#p13').val().trim()
+        modelVersionName:$('#p13').val().trim(),
+        title: $("#p10").val().trim()
+
       };
       App.Console.apply(1,1007,data);
 
@@ -241,7 +250,9 @@ App.Console = {
     $("#submit2").click(function(){
       var data = {
         workflowId:parseInt(9999999*Math.random()),
-        standardModelDevelopWorkflowId:$('#s21').val().trim()
+        standardModelDevelopWorkflowId:$('#s21').val().trim(),
+        title: $("#p21").val().trim()
+
       };
       App.Console.apply(2,1008,data);
     });
@@ -249,7 +260,9 @@ App.Console = {
     $("#submit3").click(function(){
       var data = {
         //workflowId:parseInt(9999999*Math.random()),
-        workflowId:$('#s31').val().trim()
+        workflowId:$('#s31').val().trim(),
+        title: $("#p31").val().trim()
+
       };
       App.Console.apply(3,1009,data);
 
@@ -257,7 +270,9 @@ App.Console = {
     $("#submit33").click(function(){
       var data = {
         status:4,
-        workflowId:$('#s31').val().trim()
+        workflowId:$('#s31').val().trim(),
+        title: $("#p31").val().trim()
+
       };
       App.Console.apply(3,1009,data);
 
@@ -266,7 +281,8 @@ App.Console = {
     $("#submit4").click(function(){
       var data = {
         workflowId:parseInt(9999999*Math.random()),
-        standardModelAprovalWorkflowId:$('#s41').val().trim()
+        standardModelAprovalWorkflowId:$('#s41').val().trim(),
+        title: $("#p41").val().trim()
       };
       App.Console.apply(4,1010,data);
 
@@ -320,7 +336,8 @@ App.Console = {
       var data = {
         workflowId:parseInt(9999999*Math.random()),
         projectCode:$('#p11').val().trim(),
-        projectName:$('#p12').val().trim()
+        projectName:$('#p12').val().trim(),
+        title: $("#p13").val().trim()
         //modelCode:$('#p11').val().trim(),
         //modelName:$('#s11').val().trim(),
         //modelVersionName:$('#p13').val().trim()
@@ -333,7 +350,9 @@ App.Console = {
     $("#submit2").click(function(){
       var data = {
         workflowId:parseInt(9999999*Math.random()),
-        projectModelInstructionsWorkflowId:$('#s21').val().trim()
+        projectModelInstructionsWorkflowId:$('#s21').val().trim(),
+        title: $("#p21").val().trim()
+
 
       };
       App.Console.apply(2,1013,data);
@@ -342,8 +361,8 @@ App.Console = {
     $("#submit3").click(function(){
       var data = {
         //workflowId:parseInt(9999999*Math.random()),
-        workflowId:$('#s31').val().trim()
-
+        workflowId:$('#s31').val().trim(),
+        title: $("#p31").val().trim()
       };
       App.Console.apply(3,1014,data);
 
@@ -351,7 +370,8 @@ App.Console = {
     $("#submit33").click(function(){
       var data = {
         status:4,
-        workflowId:$('#s31').val().trim()
+        workflowId:$('#s31').val().trim(),
+        title: $("#p31").val().trim()
 
       };
       App.Console.apply(3,1014,data);
@@ -360,7 +380,8 @@ App.Console = {
     $("#submit4").click(function(){
       var data = {
         workflowId:parseInt(9999999*Math.random()),
-        projectModelAprovalWorkflowId:$('#s41').val().trim()
+        projectModelAprovalWorkflowId:$('#s41').val().trim(),
+        title: $("#p41").val().trim()
 
       };
       App.Console.apply(4,1015,data);
@@ -753,14 +774,16 @@ App.Console = {
     $("#submit5").click(function(){
       data = {
         workflowId:$('#s21').val().trim(),
-        status:16
+        status:16,
+        title:$('#p21').val().trim()
       };
       App.Console.apply(2,1018,data);
     });
     $("#submit55").click(function(){
       data = {
         workflowId:$('#s21').val().trim(),
-        status:4
+        status:4,
+        title:$('#p21').val().trim()
       };
       App.Console.apply(2,1018,data);
     });
@@ -768,21 +791,24 @@ App.Console = {
       data = {
         workflowId:parseInt(9999999*Math.random()),
         projectModelChangeApplyWorkflowId:$('#s31').val().trim(),
-        status:8
+        status:8,
+        title:$('#p31').val().trim()
       };
       App.Console.apply(3,1019,data);
     });
     $("#submit7").click(function(){
       data = {
         workflowId:$('#s41').val().trim(),
-        status:16
+        status:16,
+        title:$('#p41').val().trim()
       };
       App.Console.apply(4,1020,data);
     });
     $("#submit77").click(function(){
       data = {
         workflowId:$('#s41').val().trim(),
-        status:4
+        status:4,
+        title:$('#p41').val().trim()
       };
       App.Console.apply(4,1020,data);
     });
@@ -790,7 +816,8 @@ App.Console = {
       data = {
         workflowId:parseInt(9999999*Math.random()),
         projectModelChangeAprovalWorkflowId:$('#s51').val().trim(),
-        status:8
+        status:8,
+        title:$('#p51').val().trim()
       };
       App.Console.apply(5,1021,data);
     });
