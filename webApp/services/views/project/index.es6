@@ -107,6 +107,7 @@
  		});
  		let collectionBasehole=App.Services.ProjectCollection.ProjecDetailBaseHoleCollection;
  		collectionBasehole.projectId=_projectId;
+ 		collectionBasehole.reset();
  		collectionBasehole.fetch({
  			success(child, data) {
  				
@@ -117,6 +118,7 @@
 		 		});
 		 		let collectionFloor=App.Services.ProjectCollection.ProjecDetailFloorCollection;
 		 		collectionFloor.projectId=_projectId;
+		 		collectionFloor.reset();
 		 		collectionFloor.fetch();
 		 		
 		 		//加载剖面信息
@@ -125,6 +127,7 @@
 		 		});
 		 		let collectionSection=App.Services.ProjectCollection.ProjecDetailSectionCollection;
 		 		collectionSection.projectId=_projectId;
+		 		collectionSection.reset();
 		 		collectionSection.fetch();
 		 		
 		 		//加载桩信息
