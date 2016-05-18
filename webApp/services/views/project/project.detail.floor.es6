@@ -85,7 +85,6 @@ App.Services.ProjectDetail.Floor=Backbone.View.extend({
 		        "outSidedecorationType":"0",//   外装方式
 		        "structureType":""
 			}
-
 			App.Services.ProjectCollection.ProjecDetailFloorCollection.push(model);
 
 			this.status='create';

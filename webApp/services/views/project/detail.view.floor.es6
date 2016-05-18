@@ -170,6 +170,7 @@ App.Services.DetailView.Floor=Backbone.View.extend({
 	},
 	cancelFloor(){
 		this.$el.remove();
+		App.Services.ProjectCollection.ProjecDetailFloorCollection.pop();
 		Backbone.trigger('floorUserStatus','read');
 	},
 	reloadView(){
