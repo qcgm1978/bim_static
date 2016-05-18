@@ -73,64 +73,25 @@ App.Console = {
       url: "platform/project?type=2&versionStatus=9"
     }).done(function(data) {
 
-      var items = data.data.items;
+      var items = data.data.items,str='';
 
       $.each(items, function(i, item) {
         if (item.version) {
-          $("#p11").append('<option versionid="' + item.version.id + '" value="' + item.id + '">' + item.name + '</option>');
+         str+='<option versionid="' + item.version.id + '" value="' + item.projectNo + '">' + item.name + '</option>';
         }
 
       });
+      $("#p11").append(str);
     });
     //获取族库研发指令表单
-    App.Console.auditSheet(1,function(data) {
-      console.log("1",data);
-      var items = data.data;
-
-      $.each(items, function(i, item) {
-        if (item.title) {
-          $("#s21").append('<option  value="' + item.no + '">' + item.title + '</option>');
-        }
-
-      });
-    },16);
+    App.Console.auditSheet1(1,"#s21",16);
 
     //获取族库审核审批单
-    App.Console.auditSheet(2,function(data) {
-      console.log("2",data);
-      var items = data.data;
-
-      $.each(items, function(i, item) {
-        if (item.title) {
-          $("#s31").append('<option  value="' + item.no + '">' + item.title + '</option>');
-        }
-
-      });
-    },8);
-    App.Console.auditSheet(2,function(data) {
-      console.log("2",data);
-      var items = data.data;
-
-      $.each(items, function(i, item) {
-        if (item.title) {
-          $("#s41").append('<option  value="' + item.no + '">' + item.title + '</option>');
-        }
-
-      });
-    },16);
+    App.Console.auditSheet1(2,"#s31",8);
+    App.Console.auditSheet1(2,"#s41",16);
 
     //获取族库发版审批单
-    App.Console.auditSheet(3,function(data) {
-      console.log("3",data);
-      var items = data.data;
-
-      $.each(items, function(i, item) {
-        if (item.title) {
-          $("#s51").append('<option  value="' + item.no + '">' + item.title + '</option>');
-        }
-
-      });
-    },8);
+    App.Console.auditSheet1(3,"#s51",8);
 
     $("#submit1").click(function(){
       var data       = {
@@ -222,70 +183,42 @@ App.Console = {
       url: "platform/project?type=1"
     }).done(function(data) {
 
-      var items = data.data.items;
+      var items = data.data.items,str='';
 
       $.each(items, function(i, item) {
         if (item.version) {
-          $("#s11").append('<option versionid="' + item.version.id + '" value="' + item.id + '">' + item.name + '</option>');
+          str+='<option versionid="' + item.version.id + '" value="' + item.projectNo + '">' + item.name + '</option>';
         }
 
+      });
+
+      $("#s11").append(str).change(function(){
+        $.ajax({
+          url: "platform/project/"+$(this).val()+"/version"
+        }).done(function(data) {
+
+          var items = data.data,str='';
+
+          $.each(items, function(i, item) {
+            if (item.id) {
+
+              str+='<option  value="' + item.id + '">' + item.name + '</option>';
+            }
+
+          });
+          $("#p14").append(str);
+
+        });
       });
     });
     //获取研发标准模型指令审批单
-    $.ajax({
-      url: "platform/auditSheet?type=4&auditResult=16"
-    }).done(function(data) {
-      console.log("1",data);
-      var items = data.data;
-
-      $.each(items, function(i, item) {
-        if (item.title) {
-          $("#s21").append('<option  value="' + item.no + '">' + item.title + '</option>');
-        }
-
-      });
-    });
+    App.Console.auditSheet1(4,"#s21",16);
     //获取标准模型报审表单
-    $.ajax({
-      url: "platform/auditSheet?type=5&auditResult=8"
-    }).done(function(data) {
-      console.log("2",data);
-      var items = data.data;
-
-      $.each(items, function(i, item) {
-        if (item.title) {
-          $("#s31").append('<option  value="' + item.no + '">' + item.title + '</option>');
-        }
-
-      });
-    });
-    $.ajax({
-      url: "platform/auditSheet?type=5&auditResult=16"
-    }).done(function(data) {
-      console.log("2",data);
-      var items = data.data;
-
-      $.each(items, function(i, item) {
-        if (item.title) {
-          $("#s41").append('<option  value="' + item.no + '">' + item.title + '</option>');
-        }
-
-      });
-    });
+    App.Console.auditSheet1(5,"#s31",8);
+    App.Console.auditSheet1(5,"#s41",16);
     //获取标准模型发布表单
-    $.ajax({
-      url: "platform/auditSheet?type=6&auditResult=8"
-    }).done(function(data) {
-      console.log("3",data);
-      var items = data.data;
+    App.Console.auditSheet1(6,"#s51",8);
 
-      $.each(items, function(i, item) {
-        if (item.title) {
-          $("#s51").append('<option  value="' + item.no + '">' + item.title + '</option>');
-        }
-
-      });
-    });
     $('#s11').change(function(){
       $("#p14").val($(this).children('option:selected').attr("versionid"));
     });
@@ -293,8 +226,9 @@ App.Console = {
     $("#submit1").click(function(){
       var data = {
        workflowId:parseInt(9999999*Math.random()),
-        refModelCode:$('#s11').val().trim(),
-        refModelVersionId:$('#p14').val().trim(),
+        refModelCode:$('#s11').val(),
+        refModelVersionId:$('#p14').val(),
+        refModelName:$('#s11 option:selected').text(),
         modelCode:$('#p11').val().trim(),
         modelName:$('#p12').val().trim(),
         modelVersionName:$('#p13').val().trim()
@@ -365,7 +299,7 @@ App.Console = {
 
       $.each(items, function(i, item) {
         if (item.version) {
-          $("#s11").append('<option versionid="' + item.version.id + '" value="' + item.id + '">' + item.name + '</option>');
+          $("#s11").append('<option versionid="' + item.version.id + '" value="' + item.projectNo + '">' + item.name + '</option>');
         }
 
       });
@@ -375,60 +309,12 @@ App.Console = {
     });
 
     //20获取
-    $.ajax({
-      url: "platform/auditSheet?type=20&auditResult=16"
-    }).done(function(data) {
-      console.log("1",data);
-      var items = data.data;
-
-      $.each(items, function(i, item) {
-        if (item.title) {
-          $("#s21").append('<option  value="' + item.no + '">' + item.title + '</option>');
-        }
-
-      });
-    });
+    App.Console.auditSheet1(20,"#s21",16);
     //8获取
-    $.ajax({
-      url: "platform/auditSheet?type=7&auditResult=8"
-    }).done(function(data) {
-      console.log("2",data);
-      var items = data.data;
-
-      $.each(items, function(i, item) {
-        if (item.title) {
-          $("#s31").append('<option  value="' + item.no + '">' + item.title + '</option>');
-        }
-
-      });
-    });
-    $.ajax({
-      url: "platform/auditSheet?type=7&auditResult=16"
-    }).done(function(data) {
-      console.log("2",data);
-      var items = data.data;
-
-      $.each(items, function(i, item) {
-        if (item.title) {
-          $("#s41").append('<option  value="' + item.no + '">' + item.title + '</option>');
-        }
-
-      });
-    });
+    App.Console.auditSheet1(7,"#s31",8);
+    App.Console.auditSheet1(7,"#s41",16);
     //9获取
-    $.ajax({
-      url: "platform/auditSheet?type=8&auditResult=8"
-    }).done(function(data) {
-      console.log("3",data);
-      var items = data.data;
-
-      $.each(items, function(i, item) {
-        if (item.title) {
-          $("#s51").append('<option  value="' + item.no + '">' + item.title + '</option>');
-        }
-
-      });
-    });
+    App.Console.auditSheet1(8,"#s51",8);
 
     $("#submit1").click(function(){
       var data = {
@@ -668,11 +554,7 @@ App.Console = {
         "id"                : $('#p11').val().trim(),
         "projectCode"       : $('#s11').val().trim(),
         "acceptanceId"      : $('#p12').val().trim(),
-        "name"              : $('#p13').val().trim(),
-        "status"            : $('#s12').val().trim(),
-        "levelId"           : $('#s13').val().trim(),
-        "organizationTypeID": $('#s14').val().trim(),
-        "ratingCategoryID"  : $('#s15').val().trim()
+        "acceptanceType"              : $('#s12').val().trim()
       };
       App.Console.apply('', 1005, data, 1);
 
@@ -692,42 +574,35 @@ App.Console = {
     }
   }, //获取设计检查列表
   ds1(){
-
     //3.1	设计检查
-    $("#submit").click(function(){
-      var data       = {
-        "msgContent":JSON.stringify({
-          "messageId":"411a109141d6473c83a86aa0480d6610",
-          "messageType":"QUALIFY-1006",
-          "timestamp":(new Date).getTime(),
-          "code":0,
-          "data":JSON.parse($('#data').val())
 
-        }),
-        "msgCreateTime": 1461727280227,
-        "msgId": "b2e5b467ef214f6196ac3f826017806e",
-        "msgSendTime": 0,
-        "srcMsgType": "QUALIFY-1006",
-        "retryTimes": 0,
-        "status": 0,
-        "sysCode": "1"
-      };
-      var stringData = JSON.stringify(data);
-      $.ajax({
-        url    : "sixD/internal/message",
-        data   : stringData,
-        headers: {
-          "Content-Type": "application/json"
-        },
-        type   : "POST"
-      }).done(function(data){
-        $("#result").val(JSON.stringify(data))
-        console.log(data)
-        if(data.message == "success"){
-          alert("成功");
-        }
+    $.ajax({
+      url: "/platform/mapping/project?type=3"
+    }).done(function(data){
+      var str = '', datas = data.data;
 
+      $.each(datas, function(index, data){
+        console.log(data);
+        str += "<option value=" + data.projectCode + ">" + data.projectName + "</option>";
       });
+
+      $('#s11').append(str)
+
+    });
+    $("#submit").click(function(){
+      var data = {
+        "id"                : $('#p11').val().trim(),
+        "projectCode"       : $('#s11').val().trim(),
+        "name"              : $('#p12').val().trim(),
+        "status"            : $('#s13').val().trim(),
+        "specialtyName": $('#s12 option:selected').text().trim(),
+        "specialtyId"  : $('#s12').val().trim(),
+        "organizationTypeID": $('#s14').val().trim(),
+        "ratingCategoryID"  : $('#s15').val().trim()
+      };
+      App.Console.apply('', 1006, data, 1);
+
+
     })
   },
 
@@ -832,7 +707,7 @@ App.Console = {
       $.each(items, function(i, item) {
         if (item.version) {
 
-          str+='<option versionid="' + item.version.id + '" value="' + item.id + '">' + item.name + '</option>';
+          str+='<option versionid="' + item.version.id + '" value="' + item.projectNo + '">' + item.name + '</option>';
         }
 
       });
@@ -855,61 +730,11 @@ App.Console = {
         });
       });
     });
-    App.Console.auditSheet(9,function(datas){
-      var str = '';
-      console.log(datas)
-
-      $.each(datas.data, function(index, data){
-        console.log(data)
-        str += "<option value=" + data.no + ">" + data.title + "</option>";
-      });
-
-      $('#s21').append(str)
-    },8);
-    App.Console.auditSheet(9,function(datas){
-      var str = '';
-      console.log(datas)
-
-      $.each(datas.data, function(index, data){
-        console.log(data)
-        str += "<option value=" + data.no + ">" + data.title + "</option>";
-      });
-
-      $('#s31').append(str)
-    },16);
-    App.Console.auditSheet(10,function(datas){
-      var str = '';
-      console.log(datas)
-
-      $.each(datas.data, function(index, data){
-        console.log(data)
-        str += "<option value=" + data.no + ">" + data.title + "</option>";
-      });
-
-      $('#s41').append(str)
-    },8);
-    App.Console.auditSheet(10,function(datas){
-      var str = '';
-      console.log(datas)
-
-      $.each(datas.data, function(index, data){
-        console.log(data)
-        str += "<option value=" + data.no + ">" + data.title + "</option>";
-      });
-
-      $('#s51').append(str)
-    },16);
-    App.Console.auditSheet(11,function(datas){
-      var str = '';
-      console.log(datas)
-
-      $.each(datas.data, function(index, data){
-        console.log(data)
-        str += "<option value=" + data.no + ">" + data.title + "</option>";
-      });
-
-      $('#s51').append(str)
-    },8);
+    App.Console.auditSheet1(9,'#s21',8);
+    App.Console.auditSheet1(9,'#s31',16);
+    App.Console.auditSheet1(10,'#s41',8);
+    App.Console.auditSheet1(10,'#s51',16);
+    App.Console.auditSheet1(11,'#s51',8);
     var data;
     $("#submit4").click(function(){
       data = {
@@ -1096,16 +921,21 @@ App.Console = {
     });
   },
 
-  auditSheet(type,cb,result,id){
+  auditSheet1(type,selector,result){
     $.ajax({
-      url    : "platform/auditSheet?type="+type+"&auditResult="+result+(id?("&projectId="+id):"")
-      //headers: {
-      //  "Content-Type": "application/json"
-      //},
+      url    : "platform/auditSheet?type="+type+"&auditResult="+result
     }).done(function(data){
       console.log(data)
       if(data.message == "success"){
-        cb && cb(data);
+        var items = data.data,str="";
+
+        $.each(items, function(i, item) {
+          if (item.title) {
+            str+='<option  value="' + item.no + '">' + item.title + '</option>';
+          }
+
+        });
+        $(selector).append(str);
       }
     });
   }
