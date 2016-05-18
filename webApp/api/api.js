@@ -21,7 +21,7 @@ App.API = {
 
 		//services
 		fetchServicesRolesList:'platform/auth/role',//角色列表
-		fetchServicesSaveRole:'platform/auth/role',//角色列表
+		fetchServicesSaveRole:'platform/auth/role',//保存角色列表
 		fetchServicesFunList: 'platform/auth/function',//功能列表
 		fetchServicesOzRoleList:'platform/auth/org/{orgId}/role?outer={outer}',//机构角色
 		fetchServicesUserRoleList:'platform/auth/user/{userId}/role?outer={outer}',//用户角色
@@ -29,6 +29,7 @@ App.API = {
 		fetchServicesNewRole:'platform/auth/role',//新增角色
 		fetchServiceMemberList:'platform/auth/org',
 		saveServicesRole:'platform/auth/role/grant',//赋予角色
+		fetchServicesMemberList:'platform/auth/org?outer={outer}',//外部组织-品牌／公司／成员列表
 		fetchServicesMemberOuterList:'platform/auth/org?outer=true',//外部组织-品牌／公司／成员列表
 		fetchServicesMemberInnerList:'platform/auth/org?outer=false',//内部-组织／成员列表
 		deleteServicesRoleSingle:"platform/role?",//删除角色

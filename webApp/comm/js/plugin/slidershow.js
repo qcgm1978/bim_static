@@ -45,7 +45,6 @@ var slide = {
     animationStatus : true,
     action:"next",
     sort :function(present,forward,eleList){//当前    转向目标    列表
-
         var n = eleList.length,s  = n ;
         eleList.eq(present).css("z-index","1");
         $(".conSlide .conHeader span").html(eleList.eq(forward).find("a").data("desc"));
