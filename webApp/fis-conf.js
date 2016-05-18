@@ -118,6 +118,11 @@ fis.match('services/**.html', {
   release: "/static/dist/tpls/$0"
 });
 
+fis.match('page/tpls/**.html', {
+  //useHash:true,
+  release: "/static/dist/tpls/$0"
+});
+
 fis.match('**.{otf,eot,svg,ttf,woff}', {
   //useHash:true,
   release: "/static/dist/comm/$0"
