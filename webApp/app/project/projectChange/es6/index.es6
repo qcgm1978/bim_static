@@ -117,13 +117,7 @@ App.Index = {
 				});
 
 				App.Index.Settings.Viewer.selectIds(Ids);
-				App.Index.Settings.Viewer.zoomSelected();
-
-				// App.Index.Settings.Viewer.highlight({
-				// 	type: "userId",
-				// 	ids: Ids
-				// })
-
+				App.Index.Settings.Viewer.zoomSelected();  
 				return;
 			}
 
@@ -168,6 +162,12 @@ App.Index = {
 				}
 
 				if (isSelected) {
+
+					if (App.Index.Settings.type=="api") { 
+						App.Index.Settings.changeModel = App.Index.Settings.Viewer.load(App.Index.Settings.diffModleId);
+						return;
+					}
+
 					var diff = App.Index.Settings.baseFileVersionId;
 					if (diff) {
 						App.Index.getModelId(diff, function(data) {
@@ -254,7 +254,7 @@ App.Index = {
 	},
 
 	//渲染模型根据id
-	renderModelById(modelId) {
+	renderModelById() {
 
 		App.Index.Settings.Viewer = new BIM({
 			single: true,
@@ -455,16 +455,17 @@ App.Index = {
 				//有数据
 				if (data.length > 0) {
 
-
-					App.Index.Settings.modelId = data[0].comparisons[0].currentModel;
+					var firstData = data[0].comparisons[0];
+					App.Index.Settings.modelId = firstData.currentModel;
+					App.Index.Settings.diffModleId=firstData.baseModel;
 
 					//渲染 下拉
 					var template = _.templateUrl("/app/project/projectChange/tpls/file.list.api.html"),
-						dropHtml = template(data); 
-						 
+						dropHtml = template(data);
+
 					$(".projectNavContentBox .projectChangeListBox:first").prepend(dropHtml);
-					 
-					var firstData= data[0].comparisons[0];
+
+					
 					//变更获取
 					that.fetchChangeList(firstData.baseVersion, firstData.currentVersion);
 					//渲染模型
@@ -486,29 +487,25 @@ App.Index = {
 	},
 
 	//下拉事件绑定
-	bindDropEvent(){
-		
+	bindDropEvent() {
+
 		$(".projectNavContentBox .projectChangeListBox:first .specialitiesOption").myDropDown({
-				click: function($item) {
+			click: function($item) {
 
-					var groupText = $item.closest(".groups").prev().text() + "：";
+				var groupText = $item.closest(".groups").prev().text() + "：";
 
-					$(".specialitiesOption .myDropText span:first").text(groupText);
+				$(".specialitiesOption .myDropText span:first").text(groupText); 
 
-					var baseFileVersionId = $item.data("basefileversionid"),
+				App.Index.Settings.diffModleId = $item.data("basemodel");
+				App.Index.Settings.modelId = $item.data('currentmodel');
 
-						differFileVersionId = $item.data("differfileversionid");
-
-					//重置数据
-					$(".showChange .groupRadio .selected").removeClass('selected');
-					App.Index.Settings.changeModel = null;
-					App.Index.Settings.baseFileVersionId = baseFileVersionId;
-
-					that.renderModel(differFileVersionId);
-					that.fetchChangeList(baseFileVersionId, differFileVersionId);
-
-				}
-			});
+				//重置数据
+				$(".showChange .groupRadio .selected").removeClass('selected');
+				App.Index.Settings.changeModel = null;
+				App.Index.renderModelById();
+				App.Index.fetchChangeList($item.data("basefile"), $item.data("currentfile"));
+			}
+		});
 	},
 
 	//获取更改清单
