@@ -10,7 +10,7 @@ App.Services.ProjectDetail.Pile=Backbone.View.extend({
 		
 		'click .save':'savePile',
 		'click .update':'updatePile',
-		'change .userPile':'checkValue'
+		'keydown .userPile':'checkValue'
 	
 	},
 	
@@ -42,9 +42,9 @@ App.Services.ProjectDetail.Pile=Backbone.View.extend({
 	checkValue(e){
 		var _$dom=$(e.currentTarget),
 			r=/^[1-9]\d*$/;
-		if(!(r.test(_$dom.val()))){
-			$.tip({message:'请输入有效值',type:'alarm'});
-			_$dom.val(0);
+		if(e.keyCode==190){
+			e.preventDefault();
+			return false;
 		}
 	},
 
@@ -75,6 +75,7 @@ App.Services.ProjectDetail.Pile=Backbone.View.extend({
 			contentType:'application/json'
 		},function(){
 			_this.reloadView();
+			$.tip({message:'新增成功'});
 		}).fail(function(){
 			//失败提示
 		})
