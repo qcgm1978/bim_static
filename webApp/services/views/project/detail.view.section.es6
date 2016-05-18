@@ -114,7 +114,7 @@ App.Services.DetailView.Section=Backbone.View.extend({
 	},
 	cancelSection(){
 		this.$el.remove();
-		this._parentView.trigger('read');
+		Backbone.trigger('sectionUserStatus','read');
 	},
 	reloadView(){
 		var _this=this;
