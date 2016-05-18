@@ -120,7 +120,6 @@ App.Services.DetailView.Floor=Backbone.View.extend({
 	},
 	
 	saveFloor(args,type){
-		$('.projectBaseHole').mmhMask();	
 		var _this=this;
 		_this.$('input').each(function(){
 			var _=$(this);
@@ -147,7 +146,7 @@ App.Services.DetailView.Floor=Backbone.View.extend({
 	 		}
 	 		_this.model.set(_this.formData);
 	 		_this.$('.accordionDatail').trigger('click');
-
+	 		clearMask();
 		}).fail(function(){
 			clearMask();
 		})
