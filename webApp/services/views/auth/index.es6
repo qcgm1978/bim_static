@@ -14,6 +14,7 @@ App.Services.Auth = Backbone.View.extend({
 		this.$el.html(new App.Services.AuthNav().render().el);//菜单
 		this.$(".serviceBody").html(menu.el);//组织菜单
 		this.$(".serviceBody .content").html(content.el);//主体列表
+		$("#blendList").addClass("services_loading");
 		return this;
 	},
 
@@ -22,6 +23,7 @@ App.Services.Auth = Backbone.View.extend({
 		App.Services.Member.loadData(App.Services.Member.innerCollection,{},function(response){
 			$("#inner span").addClass("active");
 			$("#inner").siblings(".childOz").html(App.Services.tree(response));
+			$("#blendList").removeClass("services_loading");
 		});
 	}
 
