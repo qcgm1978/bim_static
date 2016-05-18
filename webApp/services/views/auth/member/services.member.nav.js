@@ -39,6 +39,10 @@ App.Services.MemberNav=Backbone.View.extend({
             _this = App.Services.queue.present[0],
             collection = App.Services.Member[_thisType + "Collection"];
 
+        _this.$("div").removeClass("active");
+        $("#" + _thisType).addClass("active");
+        $(".serviceOgList span").removeClass("active");//唯一选项
+        $("#" + _thisType + " > span").addClass("active");//选中状态
 
         $("#blendList").empty();
 
@@ -55,10 +59,7 @@ App.Services.MemberNav=Backbone.View.extend({
         App.Comm.ajax(cdata,function(response){
 
             //样式处理
-            _this.$("div").removeClass("active");
-            $("#" + _thisType).addClass("active");
-            $(".serviceOgList span").removeClass("active");//唯一选项
-            $("#" + _thisType + " > span").addClass("active");//选中状态
+
             $(".serviceBody .content").removeClass("services_loading");
             if(!response.data.org.length && !response.data.user.length ){
                 $("#blendList").html("<li><span class='sele'>暂无数据</span></li>");
