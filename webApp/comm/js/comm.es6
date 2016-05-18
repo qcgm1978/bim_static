@@ -6,6 +6,18 @@ App.Comm = {
 		pageItemCount: 30 //Math.floor(($("body").height() + 60) / 70) > 10 && Math.floor(($("body").height() + 60) / 70) || 10
 	},
 
+	//版本状态
+	versionStatus: {
+		"1": "未初始化",
+		"3": "审核中",
+		"4": "待审核",
+		"5": "审批通过",
+		"6": "审批退回",
+		"7": "待移交",
+		"8": "移交退回",
+		"9": "已发布"
+	},
+
 	//封装ajax
 	ajax: function(data, callback) {
 
@@ -111,12 +123,12 @@ App.Comm = {
 			return null;
 	},
 	//删除cookie
-	delCookie: function(name) { 
+	delCookie: function(name) {
 		var exp = new Date();
-		exp.setTime(exp.getTime() - 31*24*60*60*1000);
+		exp.setTime(exp.getTime() - 31 * 24 * 60 * 60 * 1000);
 		var cval = this.getCookie(name);
 		if (cval != null)
-			document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString()+";domain=.wanda-dev.cn;path=/";
+			document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString() + ";domain=.wanda-dev.cn;path=/";
 	},
 	//格式化 文件大小
 	formatSize: function(size) {
@@ -293,7 +305,7 @@ App.Comm = {
 	//文件后缀
 	fileSuffix(type) {
 
-		if (type == "rvt" || type == "dwg" || type == "folder" || type =='rfa') {
+		if (type == "rvt" || type == "dwg" || type == "folder" || type == 'rfa') {
 			return type;
 		} else {
 			return "other";
@@ -371,6 +383,9 @@ App.Comm = {
 			}, _this._userData.timeout || 2000)
 		}
 	})
+
+
+
 };
 
 
