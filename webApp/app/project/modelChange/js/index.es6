@@ -5,6 +5,7 @@
 App.Index = {
 
 	Settings: {
+		type: "user",
 		projectId: "",
 		projectVersionId: "",
 		ModelObj: "",
@@ -51,13 +52,13 @@ App.Index = {
 		this.bindTreeScroll();
 
 		// 加载变更模型
-		$(".showChange .checkboxGroup input:checkbox").on("change",function(){
+		$(".showChange .checkboxGroup input:checkbox").on("change", function() {
 			var changeModel = App.Index.Settings.changeModel;
 			var viewer = App.Index.Settings.Viewer;
 			var flag = $(this).prop("checked");
-			if(App.Index.Settings.loadedModel){
-				viewer.showScene(App.Index.Settings.loadedModel,flag);
-			}else{
+			if (App.Index.Settings.loadedModel) {
+				viewer.showScene(App.Index.Settings.loadedModel, flag);
+			} else {
 				App.Index.Settings.loadedModel = viewer.load(changeModel);
 			}
 		})
@@ -166,7 +167,7 @@ App.Index = {
 		App.Comm.managePoint(data);
 	},
 
-	fetchChange: function() {
+	fetchChange: function() { 
 		var that = this;
 		App.Project.Collection.changeList.projectId = App.Index.Settings.projectId;
 		App.Project.Collection.changeList.projectVersionId = App.Index.Settings.projectVersionId;
@@ -178,10 +179,10 @@ App.Index = {
 				var groupText = $item.closest(".groups").prev().text() + "：";
 				$(".myDropDown .myDropText span:first").text(groupText);
 				var currentModel = $item.data("currentmodel"),
-					changeModel = $item.data("change").replace("_output",""),
+					changeModel = $item.data("change").replace("_output", ""),
 					comparisonId = $item.data('id');
 				App.Index.Settings.changeModel = changeModel;
-				$('.checkboxGroup input').prop('checked',false);
+				$('.checkboxGroup input').prop('checked', false);
 				App.Index.Settings.loadedModel = null;
 				that.renderModel(currentModel);
 				$(".rightPropertyContent .listDetail").html(new App.Project.Model.getInfo().render().el);
@@ -190,17 +191,36 @@ App.Index = {
 		});
 
 	},
-	getDetail:function(comparisonId){
+	getDetail: function(comparisonId) {
 		App.Project.Collection.changeInfo.projectId = App.Index.Settings.projectId;
 		App.Project.Collection.changeInfo.projectVersionId = App.Index.Settings.projectVersionId;
 		App.Project.Collection.changeInfo.comparisonId = comparisonId;
 		App.Project.Collection.changeInfo.fetch();
 	},
 
+	//api 接口 初始化
+	initApi(projectId, projectVersionId) { 
+		 
+		this.Settings.projectId = projectId;
+		this.Settings.projectVersionId = projectVersionId;
+
+		App.Project.Collection.changeList.urlType = "modelStd";
+
+		this.Settings.type = "api";
+
+		//初始化
+		this.init();
+	},
+
 
 	init() {
-		//初始化参数
-		this.initPars();
+
+		//非api 调用
+		if (this.Settings.type != 'api') {
+			//初始化参数
+			this.initPars();
+		}
+
 		//渲染模型
 		//事件绑定
 		this.bindEvent();
@@ -233,13 +253,13 @@ App.Project.Model = {
 			return this;
 		},
 
-		addList: function(model) {
+		addList: function(model) { 
 			var data = model.toJSON();
 			var comparisonId = App.Index.Settings.referenceId;
 			var isload = false;
-			$.each(data.data,function(i,item){
-				$.each(item.comparisons,function(j,file){
-					if(file.currentVersion == comparisonId){
+			$.each(data.data, function(i, item) {
+				$.each(item.comparisons, function(j, file) {
+					if (file.currentVersion == comparisonId) {
 						isload = true;
 						$(".rightPropertyContent .listDetail").html(new App.Project.Model.getInfo().render().el);
 						App.Index.getDetail(comparisonId);
@@ -249,16 +269,16 @@ App.Project.Model = {
 				});
 			});
 			// 没有找到当前文件,默认加载第一个
-			if(!isload){
+			if (!isload && data.data.length>0) {
 				var file = data.data[0].comparisons[0];
 				$(".rightPropertyContent .listDetail").html(new App.Project.Model.getInfo().render().el);
 				App.Index.getDetail(file.comparisonId);
 				App.Index.Settings.changeModel = file.comparisonId;
 				App.Index.renderModel(file.currentModel);
 			}
-			if (data.message == 'success') {
+			if (data.data.length>0) {
 				this.$el.html(this.template(data));
-			}else{
+			} else {
 				this.$el.html("没有变更")
 			}
 			return this;
@@ -269,7 +289,7 @@ App.Project.Model = {
 	getInfo: Backbone.View.extend({
 		tagName: "ul",
 		className: "tree-view rightTreeView",
-		events:{
+		events: {
 			"click .tree-text": "select",
 			"click .item-content": "openTree",
 		},
@@ -285,15 +305,15 @@ App.Project.Model = {
 			var data = model.toJSON();
 			if (data.message == 'success' && data.data.length > 0) {
 				this.$el.html(this.template(data));
-			}else{
+			} else {
 				this.$el.html("没有变更");
 			}
 			return this;
 		},
 		openTree: function(event) {
-      var that = $(event.target).closest('.item-content')
-      that.toggleClass('open');
-    },
+			var that = $(event.target).closest('.item-content')
+			that.toggleClass('open');
+		},
 		select: function() {
 			var that = $(event.target).closest(".tree-text");
 			var current = $(".rightTreeView .current");
@@ -303,7 +323,7 @@ App.Project.Model = {
 			var curBaseId = current.data('base');
 			if (that.prev('.noneSwitch').length > 0) {
 				App.Index.Settings.Viewer.unSelected();
-				if(current[0] != that[0]){
+				if (current[0] != that[0]) {
 					current.removeClass('current');
 					App.Index.Settings.Viewer.selectIds([elementId, baseId]);
 				}

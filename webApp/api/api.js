@@ -227,6 +227,7 @@ App.API = {
 		
 
 		appToken:"platform/token", //获取app token
+		modelStd:'view/{projectId}/{projectVersionId}/comparison?type=std', // 与标准模型对比
 
 		//业务流程
 		fetchFlow:'platform/flow',
