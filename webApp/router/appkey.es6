@@ -5,8 +5,22 @@ var AppRoute = Backbone.Router.extend({
 		'model/:modelCode/version/:versionId': 'standardLibs', //标准模型库
 		'project/:projectCode/version/:versionId': 'project', //项目
 		'project/:projectCode/version/:versionId/differ/std': 'projectDifferStd', // 浏览项目模型与标准模型差异
+		'project/:projectCode/version/:versionId/differ/base': 'projectDifferBase' //浏览变更模型与变更基准模型差异
+ 
+	},
 
+	// 浏览变更模型与变更基准模型差异
+	projectDifferBase(projectCode, versionId){
+		//初始化之前 验证
+		this.beforeInit(() => { 
 
+			_.require('/static/dist/app/project/projectChange/index.css');
+			_.require('/static/dist/app/project/projectChange/index.js');
+			var temp = _.templateUrl('/page/tpls/project.change.html', true);
+			$("body").html(temp);
+			App.Index.initApi(projectCode, versionId); 
+
+		});
 	},
 
 	//浏览项目模型与标准模型差异
@@ -20,9 +34,7 @@ var AppRoute = Backbone.Router.extend({
 			var temp = _.templateUrl('/page/tpls/model.change.html', true);
 			$("body").html(temp);
 
-			App.Index.initApi(projectCode, versionId);
-
-			debugger
+			App.Index.initApi(projectCode, versionId,"std"); 
 
 		});
 

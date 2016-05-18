@@ -4,6 +4,7 @@
 App.Index = {
 
 	Settings: {
+		type: "user",
 		projectId: "",
 		projectVersionId: "",
 		referenceId: "",
@@ -191,7 +192,6 @@ App.Index = {
 		App.Index.Settings.projectVersionId = Request.projectVersionId;
 		App.Index.Settings.referenceId = Request.referenceId;
 		App.Index.Settings.referenceVersionId = Request.referenceVersionId;
-
 	},
 
 	//获取url 参数
@@ -222,12 +222,10 @@ App.Index = {
 		}
 
 		App.Comm.ajax(dataObj, callback);
-
 	},
 
 	//渲染模型
 	renderModel(differFileVersionId) {
-
 
 		var that = this;
 		App.Index.Settings.Viewer = null;
@@ -249,34 +247,38 @@ App.Index = {
 				alert("转换失败");
 				return;
 			}
-
-			App.Index.Settings.Viewer = new BIM({
-				single: true,
-				element: $("#contains .projectCotent")[0],
-				etag: data.data.modelId,
-				tools: true
-			});
-
-
-
-			App.Index.Settings.Viewer.on("click", function(model) {
-
-				App.Index.Settings.ModelObj = null;
-				if (!model.intersect) {
-					return;
-				}
-
-
-				App.Index.Settings.ModelObj = model;
-				//属性
-				if (App.Index.Settings.property == "attr") {
-					that.renderAttr(App.Index.Settings.ModelObj);
-				}
-
-			});
-
+			//渲染模型根据id
+			App.Index.renderModelById(data.data.modelId);
 		});
 
+	},
+
+	//渲染模型根据id
+	renderModelById(modelId) {
+
+		App.Index.Settings.Viewer = new BIM({
+			single: true,
+			element: $("#contains .projectCotent")[0],
+			etag: App.Index.Settings.modelId,
+			tools: true
+		});
+
+
+		App.Index.Settings.Viewer.on("click", function(model) {
+
+			App.Index.Settings.ModelObj = null;
+			if (!model.intersect) {
+				return;
+			}
+
+
+			App.Index.Settings.ModelObj = model;
+			//属性
+			if (App.Index.Settings.property == "attr") {
+				App.Index.renderAttr(App.Index.Settings.ModelObj);
+			}
+
+		});
 	},
 
 	//渲染属性
@@ -419,7 +421,7 @@ App.Index = {
 
 						differFileVersionId = $item.data("differfileversionid");
 
-						//重置数据
+					//重置数据
 					$(".showChange .groupRadio .selected").removeClass('selected');
 					App.Index.Settings.changeModel = null;
 					App.Index.Settings.baseFileVersionId = baseFileVersionId;
@@ -432,6 +434,81 @@ App.Index = {
 
 		});
 
+	},
+
+	//项目模型与变更基准模型的差异
+	fetchFileTypeApi() {
+
+		var data = {
+				URLtype: "modelBase",
+				data: {
+					projectId: App.Index.Settings.projectId,
+					projectVersionId: App.Index.Settings.projectVersionId
+				}
+			},
+			that = this;
+
+		App.Comm.ajax(data, function(data) {
+
+			if (data.code == 0) {
+				data = data.data;
+				//有数据
+				if (data.length > 0) {
+
+
+					App.Index.Settings.modelId = data[0].comparisons[0].currentModel;
+
+					//渲染 下拉
+					var template = _.templateUrl("/app/project/projectChange/tpls/file.list.api.html"),
+						dropHtml = template(data); 
+						 
+					$(".projectNavContentBox .projectChangeListBox:first").prepend(dropHtml);
+					 
+					var firstData= data[0].comparisons[0];
+					//变更获取
+					that.fetchChangeList(firstData.baseVersion, firstData.currentVersion);
+					//渲染模型
+					that.renderModelById();
+					//事件绑定
+					that.bindDropEvent();
+
+
+				} else {
+					$("#treeContainerBody .loading").text('无变更');
+				}
+
+
+			} else {
+				alert('获取数据错误');
+			}
+
+		});
+	},
+
+	//下拉事件绑定
+	bindDropEvent(){
+		
+		$(".projectNavContentBox .projectChangeListBox:first .specialitiesOption").myDropDown({
+				click: function($item) {
+
+					var groupText = $item.closest(".groups").prev().text() + "：";
+
+					$(".specialitiesOption .myDropText span:first").text(groupText);
+
+					var baseFileVersionId = $item.data("basefileversionid"),
+
+						differFileVersionId = $item.data("differfileversionid");
+
+					//重置数据
+					$(".showChange .groupRadio .selected").removeClass('selected');
+					App.Index.Settings.changeModel = null;
+					App.Index.Settings.baseFileVersionId = baseFileVersionId;
+
+					that.renderModel(differFileVersionId);
+					that.fetchChangeList(baseFileVersionId, differFileVersionId);
+
+				}
+			});
 	},
 
 	//获取更改清单
@@ -453,6 +530,18 @@ App.Index = {
 
 
 		$("#treeContainerBody").html(new App.Views.projectChangeListView().render().el);
+
+	},
+
+	//初始化 api
+	initApi(projectId, projectVersionId) {
+		this.Settings.type = "api";
+		this.Settings.projectId = projectId;
+		this.Settings.projectVersionId = projectVersionId;
+		//事件绑定
+		this.bindEvent();
+		//获取文件裂隙
+		this.fetchFileTypeApi();
 
 	},
 
