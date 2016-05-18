@@ -114,6 +114,7 @@ App.Services.DetailView.Section=Backbone.View.extend({
 	},
 	cancelSection(){
 		this.$el.remove();
+		App.Services.ProjectCollection.ProjecDetailSectionCollection.pop();
 		Backbone.trigger('sectionUserStatus','read');
 	},
 	reloadView(){
