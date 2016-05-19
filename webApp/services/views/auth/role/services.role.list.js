@@ -23,7 +23,7 @@ App.Services.roleList=Backbone.View.extend({
     addOne:function(model){
         var newView = new App.Services.roleDetail({model:model});
         this.$("#roleList ul").append(newView.render().el);
-        App.Comm.initScroll(this.$el.find("#roleList"),"y");
+        App.Comm.initScroll(this.$el.find(".roleScroll"),"y");
     },
 
     //添加
