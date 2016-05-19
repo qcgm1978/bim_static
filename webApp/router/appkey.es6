@@ -56,6 +56,8 @@ var AppRoute = Backbone.Router.extend({
 
 			App.Project.Settings.versionId = versionId;
 
+			App.Project.Settings.type="token";
+			 
 			App.Project.init();
 
 

@@ -7,7 +7,9 @@
 		left: 0,
 		right: 0,
 		bottom: 0,
-		zIndex:99999
+		zIndex:99999,
+		filter:'alpha(opacity=80)',
+		opacity:0.8
 	}
 
 	var _imgStyle = {

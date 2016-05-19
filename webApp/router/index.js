@@ -175,7 +175,9 @@ var AppRoute = Backbone.Router.extend({
 		$("#pageLoading").show();
 		//销毁上传
 		App.Comm.upload.destroy();
-		App.Comm.getCookie("OUTSSO_LoginId") && $("#topBar .userName .text").text(App.Comm.getCookie("OUTSSO_LoginId"));
+		var user=JSON.parse(localStorage.getItem("user"));
+		user && $("#topBar .userName .text").text(user.name);
+		//App.Comm.getCookie("OUTSSO_LoginId") && $("#topBar .userName .text").text(App.Comm.getCookie("OUTSSO_LoginId"));
 	}
 
 
