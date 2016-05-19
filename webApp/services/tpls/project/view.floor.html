@@ -79,21 +79,21 @@
 		</div>
 		<div>
 			<div class="formColumn">
-				<label>低应变检测百分比:</label><input type="number" name="lowStrainPercentage" id="" value="<%= (lowStrainPercentage*100).toFixed(2) || 0 %>" class="txtInput" placeholder="请输入描述" />
+				<label>低应变检测百分比(%):</label><input type="number" name="lowStrainPercentage" id="" value="<%= (lowStrainPercentage*100).toFixed(2) || 0 %>" class="txtInput" placeholder="请输入描述" />
 			</div>
-			<div class="formColumn"><label>高应变检测百分比:</label><input type="number" name="highStrainPercentage" id="" value="<%= (highStrainPercentage*100).toFixed(2) || 0 %>" class="txtInput" placeholder="请输入描述" /></div>
+			<div class="formColumn"><label>高应变检测百分比(%):</label><input type="number" name="highStrainPercentage" id="" value="<%= (highStrainPercentage*100).toFixed(2) || 0 %>" class="txtInput" placeholder="请输入描述" /></div>
 		</div>
 		<div>
 			<div class="formColumn">
-				<label>超声波检测百分比:</label><input type="number" name="ultrasonicPercentage" id="" value="<%= (ultrasonicPercentage*100).toFixed(2) || 0 %>" class="txtInput" placeholder="请输入描述" />
+				<label>超声波检测百分比(%):</label><input type="number" name="ultrasonicPercentage" id="" value="<%= (ultrasonicPercentage*100).toFixed(2) || 0 %>" class="txtInput" placeholder="请输入描述" />
 			</div>
-			<div class="formColumn"><label>钻心检测百分比:</label><input type="number" name="corebitPercentage" id="" value="<%= (corebitPercentage*100).toFixed(2) || 0 %>" class="txtInput" placeholder="请输入描述" /></div>
+			<div class="formColumn"><label>钻心检测百分比(%):</label><input type="number" name="corebitPercentage" id="" value="<%= (corebitPercentage*100).toFixed(2) || 0 %>" class="txtInput" placeholder="请输入描述" /></div>
 		</div>
 		<div>
 			<div class="formColumn">
 				<label>外装方式:</label>
 				<div class="myDropDown outerInstall"  name="outSidedecorationType">
-					<span class="myDropText">  <span class="text"><%= outSidedecorationType|| '请选择' %></span> <i class="myDropArrorw"></i> </span>
+					<span class="myDropText">  <span class="text"><%= (outSidedecorationType && outSidedecorationType!=0)|| '请选择' %></span> <i class="myDropArrorw"></i> </span>
 					<ul class="myDropList" style="display: none;">
 						<% _.each(App.Services.ProjectCollection.datas.installType,function(i){%>
 						<li class="myItem"><%= i %></li>
@@ -103,7 +103,7 @@
 			</div>
 			<div class="formColumn"><label>结构形式:</label>
 				<div class="myDropDown structure" name="structureType">
-					<span class="myDropText">  <span class="text"><%= structureType|| '请选择' %></span> <i class="myDropArrorw"></i> </span>
+					<span class="myDropText">  <span class="text"><%=  (structureType && structureType!=0)|| '请选择' %></span> <i class="myDropArrorw"></i> </span>
 					<ul class="myDropList" style="display: none;">
 						<% _.each(App.Services.ProjectCollection.datas.orgType,function(i){%>
 						<li class="myItem"><%= i %></li>
