@@ -34,8 +34,8 @@ App.Project.PlanInspection = Backbone.View.extend({
 		var data = model.toJSON();
 		var $tbTop = this.$(".tbTop");
 		$tbTop.find("tbody").html(template(data));
-		$tbTop.prev().find(".count").text(data.data.length);
-		this.$('.nullLinkData').hide();
+		$tbTop.prev().find(".count").text(data.data.length); 
+		this.bindScroll();
 	},
 
 	//图元未关联计划节点
@@ -44,11 +44,15 @@ App.Project.PlanInspection = Backbone.View.extend({
 		var data = model.toJSON();
 		var $tbBottom = this.$(".tbBottom"),
 			count = data.data && data.data.length || 0;
-		$tbBottom.find("tbody").html(template(data));
+		$tbBottom.find("tbody").html(template(data)); 
+		$tbBottom.prev().find(".count").text(count);  
+		this.bindScroll();
+	},
 
-		$tbBottom.prev().find(".count").text(count);
+	bindScroll(){
 		this.$('.nullLinkData').hide();
 		this.$('.exportList').show();
+		App.Comm.initScroll(this.$(".contentBody .contentScroll"),"y");
 	},
 
 	reset() {
@@ -86,10 +90,12 @@ App.Project.PlanInspection = Backbone.View.extend({
 			}
 		}
 
+		$tr.after('<tr><td class="subData loading">正在加载，请稍候……</td></tr>');
 		App.Comm.ajax(data, function(data) {
 
 			if (data.code == 0) {
 				var tpl = _.templateUrl("/projects/tpls/project/plan/project.plan.property.inspection.detail.cate.detail.html");
+				$tr.next().remove();
 				$tr.after(tpl(data));
 				$target.addClass("on");
 			}
