@@ -655,8 +655,8 @@ App.Console = {
       var data  = {
         //projectCode       : $('#s11').val().trim(),
         workflowCode: parseInt(9999999 * Math.random()),
-        title:$('#p11').val().trim(),
-        type:$('#s12').val().trim(),
+        title:$('#p11').val().trim()
+        //type:$('#s12').val().trim(),
 
       };
       App.Console.apply(1,"BIM", data,2);
