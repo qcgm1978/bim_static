@@ -22,13 +22,14 @@ App.Services.roleList=Backbone.View.extend({
     //数据加载
     addOne:function(model){
         var newView = new App.Services.roleDetail({model:model});
-        this.$("#roleList").append(newView.render().el);
+        this.$("#roleList ul").append(newView.render().el);
+        App.Comm.initScroll(this.$el.find("#roleList"),"y");
     },
 
     //添加
     addAll:function(){
         var _this = this;
-        this.$("#roleList").empty();
+        this.$("#roleList ul").empty();
         App.Services.role.collection.each(function(item){
             _this.addOne(item);
         });

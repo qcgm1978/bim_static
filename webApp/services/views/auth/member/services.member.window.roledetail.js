@@ -30,7 +30,7 @@ App.Services.windowRoleDetail=Backbone.View.extend({
     },
     //点选
     memCheck:function(){
-        var window= App.Services.maskWindow.find(".memRoleList h2 i");
+        var window= App.Services.maskWindow.find(".memRoleList h2 i"),
         count = parseInt(window.html());
         if(this.model.get("inherit")){return;}
         var checkEle = this.model.get("checked");
