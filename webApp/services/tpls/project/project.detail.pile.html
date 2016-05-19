@@ -3,7 +3,7 @@
 		<% _.each(soilNails,function(pile){ %>
 			<div>
 				<div class="formColumn">
-					<label><%=pile.pileName%>: </label><input type="number" min=0 data-code="<%=pile.pileCode%>" data-label="<%=pile.pileName%>" data-id="<%=pile.id%>" name="" id="" value="<%=pile.pileNumber%>" class="txtInput userPile" />
+					<label><%=pile.pileName%>: </label><input type="number" min=0 data-code="<%=pile.pileCode%>" data-label="<%=pile.pileName%>" data-id="<%=pile.id%>" name="" id="" value="<%=pile.pileNumber%>" class="txtInput userPile intInput" />
 				</div>
 			</div>
 		<% }) %>

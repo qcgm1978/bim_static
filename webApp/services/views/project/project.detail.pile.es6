@@ -10,8 +10,7 @@ App.Services.ProjectDetail.Pile=Backbone.View.extend({
 		
 		'click .save':'savePile',
 		'click .update':'updatePile',
-		'keydown .userPile':'checkValue',
-		'change .userPile':'formatValue'
+		'change .txtInput':'formatValue'
 	
 	},
 	
@@ -40,19 +39,24 @@ App.Services.ProjectDetail.Pile=Backbone.View.extend({
 		$container.html('').append(this.$el);
 	},
 	
-	checkValue(e){
-		if(e.keyCode==190){
-			e.preventDefault();
-			return false;
-		}
-	},
-
 	formatValue(e){
 		var _$dom=$(e.currentTarget),
-			r=/^[1-9]\d*$/;
-		if(!(r.test(_$dom.val()))){
-			_$dom.val(0);
-			return false;
+			zeroReg=/^0{1,1}$/,
+			intReg=/^[1-9]\d*$/,
+			floatReg=/^[1-9]\d*\.\d*|0\.\d*[1-9]\d*$/,
+			val=_$dom.val(),
+			r=false;
+		if(_$dom.hasClass('floatInput')){
+			r=zeroReg.test(val)||intReg.test(val)||floatReg.test(val);
+		}else if(_$dom.hasClass('intInput')){
+			r=zeroReg.test(val)||intReg.test(val);
+		}else{
+			return 
+		}
+		if(r){
+			_$dom.css('border','1px solid #ccc');
+		}else{
+			_$dom.css('border','1px solid #FF0000');
 		}
 	},
 

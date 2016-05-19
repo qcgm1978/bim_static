@@ -1,4 +1,5 @@
 #projectManger { height: 100%;
+	& .txtInput { padding: 6px 13px; }
 	.serviceHeader { border-bottom: 1px #ccc solid; padding-bottom: 5px; }
 	#systemContainer { margin-top: -40px; padding-top: 40px; }
 	.serviceNav { height: 40px; background-color: #eee; border-bottom: 1px #ccc solid; padding-left: 20px; position: relative; z-index: 1;padding-top: 10px;
@@ -12,12 +13,13 @@
 	.folwSlideBar { .header { height: 38px; line-height: 38px; padding-left: 15px; font-size: 16px; border-bottom: 1px #ccc solid; }
 		.slideBarContainer { height: 100%; margin-top: -39px; padding-top: 39px; }
 	}
-	#systemContainer .folwManager .flowSliderUl .item { height: 48px; line-height: 1.2; color: #999;
-		&.selected { .name { color: #999; }
+	#systemContainer .folwManager .flowSliderUl .item { height: 60px; line-height: 1.2; color: #999;
+		&.selected { .name { color: #333; }
 		}
-		.name { font-size: 14px; margin-top: 6px; margin-bottom: 2px; width: 95%; }
-		.date { margin-top: 5px; margin-left: 30px; }
-		.content { margin-left: 15px; }
+		.name { font-size: 14px; margin-top: 6px; margin-bottom: 9px; width: 95%; }
+		.address{width: 60px;display: inline-block;}
+		.date { margin-top: 5px; margin-left: 20px; }
+		.content { margin-left: 15px; margin-top: 5px;}
 	}
 	.projectBase { margin-left: 20px;
 		.projectBg { margin: 20px 0px; border-bottom: 1px #ccc solid; padding-bottom: 20px;
@@ -52,9 +54,10 @@
 		.key { color: #a0a0a0; }
 		.value { color: #333; }
 	}
-	.projectMapping { .list { height: 38px; border-bottom: 1px #ccc solid; line-height: 38px;
+	.projectMapping { .list { height: 38px; line-height: 38px;
 			.item{
 				height: 40px;
+				border-bottom: 1px #ccc solid;
 			}
 			.modules { width: 21%; padding-left: 15px; }
 			.name { width: 35%; }

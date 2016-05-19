@@ -80,6 +80,9 @@ App.Services.ProjectLink=Backbone.View.extend({
 			}).fail(function(){
 				$("#dataLoading").hide();
 			})
+		}else{
+			$("#dataLoading").hide();
+			App.Global.module.close();
 		}
 	},
 	
