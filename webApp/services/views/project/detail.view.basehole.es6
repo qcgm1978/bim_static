@@ -48,9 +48,9 @@ App.Services.DetailView.BaseHole=Backbone.View.extend({
 			return 
 		}
 		if(r){
-			_$dom.css('border','1px solid #ccc');
+			_$dom.removeClass('errorInput');
 		}else{
-			_$dom.css('border','1px solid #FF0000');
+			_$dom.addClass('errorInput');
 		}
 	},
 
