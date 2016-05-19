@@ -7,19 +7,19 @@
 			<div class="formColumn">
 				<label>楼号名称 : </label><input type="text" name="buildingName" id="" value="<%= buildingName|| '' %>" class="txtInput" />
 			</div>
-			<div class="formColumn"><label>高度(m):</label><input type="number" name="height" id="" value="<%= height|| 0 %>" class="txtInput" /></div>
+			<div class="formColumn"><label>高度(m):</label><input type="number" name="height" id="" value="<%= height|| 0 %>" class="txtInput floatInput" /></div>
 		</div>
 		<div>
 			<div class="formColumn">
-				<label>面积(m<sup>3</sup>):</label><input type="number" name=""area id="" value="<%= area|| 0 %>" class="txtInput" />
+				<label>面积(m<sup>3</sup>):</label><input type="number" name=""area id="" value="<%= area|| 0 %>" class="txtInput floatInput" />
 			</div>
-			<div class="formColumn"><label>地上层数:</label><input type="number" name="groundLayers" id="" value="<%= groundLayers|| 0 %>" class="txtInput" /></div>
+			<div class="formColumn"><label>地上层数:</label><input type="number" name="groundLayers" id="" value="<%= groundLayers|| 0 %>" class="txtInput intInput" /></div>
 		</div>
 		<div>
 			<div class="formColumn">
-				<label>层高(m):</label><input type="number" name="layerHeight" id="" value="<%= layerHeight|| 0 %>" class="txtInput" />
+				<label>层高(m):</label><input type="number" name="layerHeight" id="" value="<%= layerHeight|| 0 %>" class="txtInput floatInput" />
 			</div>
-			<div class="formColumn"><label>地下层数:</label><input type="number" name="undergroundLayers" id="" value="<%= undergroundLayers || 0 %>" class="txtInput" /></div>
+			<div class="formColumn"><label>地下层数:</label><input type="number" name="undergroundLayers" id="" value="<%= undergroundLayers || 0 %>" class="txtInput intInput" /></div>
 		</div>
 		<div>
 			<div class="formColumn">
@@ -79,15 +79,15 @@
 		</div>
 		<div>
 			<div class="formColumn">
-				<label>低应变检测百分比(%):</label><input type="number" name="lowStrainPercentage" id="" value="<%= (lowStrainPercentage*100).toFixed(2) || 0 %>" class="txtInput" placeholder="请输入描述" />
+				<label>低应变检测百分比(%):</label><input type="number" name="lowStrainPercentage" id="" value="<%= (lowStrainPercentage*100).toFixed(2) || 0 %>" class="txtInput floatInput" placeholder="请输入描述" />
 			</div>
-			<div class="formColumn"><label>高应变检测百分比(%):</label><input type="number" name="highStrainPercentage" id="" value="<%= (highStrainPercentage*100).toFixed(2) || 0 %>" class="txtInput" placeholder="请输入描述" /></div>
+			<div class="formColumn"><label>高应变检测百分比(%):</label><input type="number" name="highStrainPercentage" id="" value="<%= (highStrainPercentage*100).toFixed(2) || 0 %>" class="txtInput floatInput" placeholder="请输入描述" /></div>
 		</div>
 		<div>
 			<div class="formColumn">
-				<label>超声波检测百分比(%):</label><input type="number" name="ultrasonicPercentage" id="" value="<%= (ultrasonicPercentage*100).toFixed(2) || 0 %>" class="txtInput" placeholder="请输入描述" />
+				<label>超声波检测百分比(%):</label><input type="number" name="ultrasonicPercentage" id="" value="<%= (ultrasonicPercentage*100).toFixed(2) || 0 %>" class="txtInput floatInput" placeholder="请输入描述" />
 			</div>
-			<div class="formColumn"><label>钻心检测百分比(%):</label><input type="number" name="corebitPercentage" id="" value="<%= (corebitPercentage*100).toFixed(2) || 0 %>" class="txtInput" placeholder="请输入描述" /></div>
+			<div class="formColumn"><label>钻心检测百分比(%):</label><input type="number" name="corebitPercentage" id="" value="<%= (corebitPercentage*100).toFixed(2) || 0 %>" class="txtInput floatInput" placeholder="请输入描述" /></div>
 		</div>
 		<div>
 			<div class="formColumn">

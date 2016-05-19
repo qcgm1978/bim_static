@@ -8,7 +8,7 @@ App.Services.DetailView.BaseHole=Backbone.View.extend({
 		'click .update':'updateBasehole',
 		'click .delete':'deleteBasehole',
 		'click .cancel':'cancelBasehole',
-		'change input[type=number]':'formatValue'
+		'change .txtInput':'formatValue'
 	},
 	
 	formData:{
@@ -35,10 +35,22 @@ App.Services.DetailView.BaseHole=Backbone.View.extend({
 	
 	formatValue(e){
 		var _$dom=$(e.currentTarget),
-			r=/^[1-9]\d*$/;
-		if(!(r.test(_$dom.val()))){
-			_$dom.val(0);
-			return false;
+			zeroReg=/^0{1,1}$/,
+			intReg=/^[1-9]\d*$/,
+			floatReg=/^[1-9]\d*\.\d*|0\.\d*[1-9]\d*$/,
+			val=_$dom.val(),
+			r=false;
+		if(_$dom.hasClass('floatInput')){
+			r=zeroReg.test(val)||intReg.test(val)||floatReg.test(val);
+		}else if(_$dom.hasClass('intInput')){
+			r=zeroReg.test(val)||intReg.test(val);
+		}else{
+			return 
+		}
+		if(r){
+			_$dom.removeClass('errorInput');
+		}else{
+			_$dom.addClass('errorInput');
 		}
 	},
 
@@ -90,11 +102,23 @@ App.Services.DetailView.BaseHole=Backbone.View.extend({
 	},
 	
 	saveBasehole(args,type){
-		var _this=this;
+		if(this.$('.errorInput').length>0){
+			return 
+		}
+		var _this=this,_objName='';
 		_this.$('input').each(function(){
 			var _=$(this);
 			_this.formData[_.attr('name')]=_.val();
 		})
+
+		_objName=_this.formData['pitNamepitName'];
+		_objName=_objName.replace(/\s/g,'');
+		if(_objName.length<1){
+			_this.$('input[name=pitName]').css('border','1px solid #FF0000');
+			return
+		}
+		_this.$('input[name=pitName]').css('border','1px solid #CCC');
+
 		args= typeof args === 'string' ? args:'fetchProjectCreateBaseHole';
 		_this.formData.soldierPilePercentage=(_this.formData.soldierPilePercentage||0)/100;
 		_this.formData.anchorCablePercentage=(_this.formData.anchorCablePercentage||0)/100;
@@ -106,7 +130,7 @@ App.Services.DetailView.BaseHole=Backbone.View.extend({
 			data:JSON.stringify(_this.formData),
 			contentType:'application/json'
 		},function(res){
-			$.tip({message:'新增成功'});
+			$.tip({message:type?'修改成功':'新增成功'});
 	 		Backbone.trigger('baseholeUserStatus','read');
 	 		_this.formData.id=res.data.pitId;
 	 		if(type){

@@ -15,6 +15,7 @@ App.Services.MemberList=Backbone.View.extend({
 
     render:function(){
         this.$el.html(this.template);
+
         return this;
     },
 
@@ -28,6 +29,7 @@ App.Services.MemberList=Backbone.View.extend({
     addOne:function(model){
         var newView = new App.Services.memberDetail({model:model});
         this.$("#blendList").append(newView.render().el);
+        App.Comm.initScroll(this.$el.find(".servicesMemScrollContent"),"y");
     },
 
     //选中事件
@@ -100,6 +102,7 @@ App.Services.MemberList=Backbone.View.extend({
         //多选，写入已选用户和组织
         _.each(seleUser,function(item){
             $(".seWinBody .aim ul").append(new App.Services.MemberWindowDetail({model:item}).render().el);
+            App.Comm.initScroll(App.Services.maskWindow.find(".selec"),"y");
         });
         this.saveData(seleUser); //缓存已选数据相关数据方便提交
 

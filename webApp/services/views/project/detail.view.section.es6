@@ -7,8 +7,7 @@ App.Services.DetailView.Section=Backbone.View.extend({
 		'click .save':'saveSection',
 		'click .update':'updateSection',
 		'click .delete':'deleteSection',
-		'click .cancel':'cancelSection',
-		'change input[type=number]':'formatValue'
+		'click .cancel':'cancelSection'
 	},
 	
 	template:_.templateUrl('/services/tpls/project/view.section.html'),
@@ -25,15 +24,6 @@ App.Services.DetailView.Section=Backbone.View.extend({
 		this.listenTo(this.model,'change',this.render);
 	},
 
-	formatValue(e){
-		var _$dom=$(e.currentTarget),
-			r=/^[1-9]\d*$/;
-		if(!(r.test(_$dom.val()))){
-			_$dom.val(0);
-			return false;
-		}
-	},
-	
 	render(){
 		var _this=this,
 			data=this.model.toJSON();
@@ -84,11 +74,18 @@ App.Services.DetailView.Section=Backbone.View.extend({
 	},
 	
 	saveSection(args,type){
-		var _this=this;
+		var _this=this,_objName='';
 		_this.$('input').each(function(){
 			var _=$(this);
 			_this.formData[_.attr('name')]=_.val();
 		})
+		_objName=_this.formData['profileName'];
+		_objName=_objName.replace(/\s/g,'');
+		if(_objName.length<1){
+			_this.$('input[name=profileName]').css('border','1px solid #FF0000');
+			return
+		}
+		_this.$('input[name=profileName]').css('border','1px solid #CCC');
 		args= typeof args === 'string'? args : 'fetchProjectCreateSection';
 		
 		App.Comm.ajax({
@@ -97,7 +94,7 @@ App.Services.DetailView.Section=Backbone.View.extend({
 			data:JSON.stringify(_this.formData),
 			contentType:'application/json'
 		},function(res){
-			$.tip({message:'新增成功'});
+			$.tip({message:type?'修改成功':'新增成功'});
 	 		Backbone.trigger('sectionUserStatus','read');
 	 		_this.formData.id=res.data.profileId;
 	 		_this.model.set(_this.formData);

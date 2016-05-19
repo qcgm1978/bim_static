@@ -9,7 +9,7 @@ App.Services.DetailView.Floor=Backbone.View.extend({
 		'click .update':'updateFloor',
 		'click .delete':'deleteFloor',
 		'click .cancel':'cancelFloor',
-		'change input[type=number]':'formatValue'
+		'change .txtInput':'formatValue'
 	},
 	
 	template:_.templateUrl('/services/tpls/project/view.floor.html'),
@@ -44,10 +44,22 @@ App.Services.DetailView.Floor=Backbone.View.extend({
 	
 	formatValue(e){
 		var _$dom=$(e.currentTarget),
-			r=/^[1-9]\d*$/;
-		if(!(r.test(_$dom.val()))){
-			_$dom.val(0);
-			return false;
+			zeroReg=/^0{1,1}$/,
+			intReg=/^[1-9]\d*$/,
+			floatReg=/^[1-9]\d*\.\d*|0\.\d*[1-9]\d*$/,
+			val=_$dom.val(),
+			r=false;
+		if(_$dom.hasClass('floatInput')){
+			r=zeroReg.test(val)||intReg.test(val)||floatReg.test(val);
+		}else if(_$dom.hasClass('intInput')){
+			r=zeroReg.test(val)||intReg.test(val);
+		}else{
+			return 
+		}
+		if(r){
+			_$dom.removeClass('errorInput');
+		}else{
+			_$dom.addClass('errorInput');
 		}
 	},
 
@@ -129,11 +141,23 @@ App.Services.DetailView.Floor=Backbone.View.extend({
 	},
 	
 	saveFloor(args,type){
-		var _this=this;
+
+		if(this.$('.errorInput').length>0){
+			return 
+		}
+		var _this=this,_objName=null;
 		_this.$('input').each(function(){
 			var _=$(this);
 			_this.formData[_.attr('name')]=_.val();
 		})
+		_objName=_this.formData['buildingName'];
+		_objName=_objName.replace(/\s/g,'');
+		if(_objName.length<1){
+			_this.$('input[name=buildingName]').css('border','1px solid #FF0000');
+			return
+		}
+		_this.$('input[name=buildingName]').css('border','1px solid #CCC');
+
 		args= typeof args === 'string'? args : 'fetchProjectCreateFloor';
 		//百分比数值转换
 		_this.formData.lowStrainPercentage=(_this.formData.lowStrainPercentage||0)/100;
@@ -147,7 +171,7 @@ App.Services.DetailView.Floor=Backbone.View.extend({
 			data:JSON.stringify(_this.formData),
 			contentType:'application/json'
 		},function(res){
-			$.tip({message:'新增成功'});
+			$.tip({message:type?'修改成功':'新增成功'});
 	 		Backbone.trigger('floorUserStatus','read');
 	 		_this.formData.id=res.data.buildingId;
 	 		if(type){
