@@ -18,9 +18,9 @@ App.Services.step2 = Backbone.View.extend({
     var index=$('.partition .active').attr('data-index');
     //准备Collection的MODELS
     if(index==2){
-      var str='<li class="project partition"  data-id=><h3  data-id=  >中区</h3></li>'+
-        '<li class="project partition"  data-id=><h3  data-id=  >南区</h3></li>'+
-        '<li class="project partition"  data-id=><h3  data-id=  >北区</h3></li>';
+      var str='<li class="project list"  data-id=9991><h3  data-id=9991  >中区</h3></li>'+
+        '<li class="project list"  data-id=9992><h3  data-id=9992  >南区</h3></li>'+
+        '<li class="project list"  data-id=9993><h3  data-id=9993  >北区</h3></li>';
       this.$el.html(str);
 
     }else{

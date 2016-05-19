@@ -810,7 +810,7 @@ App.Console = {
       var data = {
         "msgContent"   : JSON.stringify({
           "messageId"  : "411a109141d6473c83a86aa0480d6610",
-          "messageType": (type == '1' ? "QUALIFY-" :(type=='2'?"COST-": "PLAN-")) + num,
+          "messageType": (type == '1' ? "QUALITY-" :(type=='2'?"COST-": "PLAN-")) + num,
           "timestamp"  : (new Date).getTime(),
           "code"       : 0,
           "data"       : type == 1 ? new Array(datainit) : datainit
@@ -819,7 +819,7 @@ App.Console = {
         "msgCreateTime": 1461727280227,
         "msgId"        : "b2e5b467ef214f6196ac3f826017806e",
         "msgSendTime"  : 0,
-        "srcMsgType"   : (type == '1' ? "QUALIFY-" :(type=='2'?"COST-": "PLAN-")) + num,
+        "srcMsgType"   : (type == '1' ? "QUALITY-" :(type=='2'?"COST-": "PLAN-")) + num,
         "retryTimes"   : 0,
         "status"       : 0,
         "sysCode"      : "1"

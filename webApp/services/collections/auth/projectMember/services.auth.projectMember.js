@@ -9,9 +9,9 @@ App.Services.projectMember = {
 	init: function() {
 		$('.serviceBody').html(new App.Services.projectMember.mainView().render().el);
 		
-		//$("#projectMember").mmhMask();
 		
-		$("#dataLoading").show();
+	//	$("#dataLoading").show();
+		$('#projectList').mmhMask();
 		
 		this.loadData(this.projectMemberProjectCollection,{
 			outer:App.Comm.getCookie("isOuter")
@@ -55,6 +55,7 @@ App.Services.projectMember = {
 						item.image=item.logoUrl['small']||'/static/dist/images/projects/images/proDefault.png';
 						result.push(item)
 					})
+				clearMask();
 				return result;
 			}else{
 				return [];
