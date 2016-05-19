@@ -25,12 +25,12 @@ App.Services.queue = {
     que : [],
     permit : true,
     present : [],
-    //许可证发放，300ms后发放一个许可证，避免点击过快
+    //许可证发放，400ms后发放一个许可证，避免点击过快
     certificates:function(){
         this.permit = false;
         setTimeout(function(){
             App.Services.queue.permit = true;
-        },100);
+        },400);
     },
     //验证并向队列添加执行函数
     promise:function(fn,_this){

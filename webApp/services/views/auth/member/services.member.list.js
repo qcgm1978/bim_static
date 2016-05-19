@@ -133,7 +133,6 @@ App.Services.MemberList=Backbone.View.extend({
         App.Comm.ajax(cdata,function(response){
             if(response.message=="success"){
                 if(!response.data.length){
-                    $(".seWinBody .memRoleList  ul").append("<li>没有相关数据</li>");
                     $(".serviceBody .content").removeClass("services_loading");
                     return;}
 
