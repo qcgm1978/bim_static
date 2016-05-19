@@ -73,6 +73,10 @@ App.Services.ProjectDetail.BaseHole=Backbone.View.extend({
 
 			_this.status='create';
 		}else{
+			var $tar=$('.projectBaseHole .accordionDatail').last();
+			if($tar.hasClass('accordOpen')){
+				$tar.click()
+			}
 			App.Services.Dialog.alert('请先完成当前新增操作...');
 		}
 	}

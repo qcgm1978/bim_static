@@ -61,6 +61,10 @@ App.Services.ProjectDetail.Section=Backbone.View.extend({
 			App.Services.ProjectCollection.ProjecDetailSectionCollection.push(data);
 			this.status='create';
 		}else{
+			var $tar=$('.projectSection .accordionDatail').last();
+			if($tar.hasClass('accordOpen')){
+				$tar.click()
+			}
 			App.Services.Dialog.alert('请先完成当前新增操作...');
 		}
 		

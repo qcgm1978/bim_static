@@ -89,6 +89,10 @@ App.Services.ProjectDetail.Floor=Backbone.View.extend({
 
 			this.status='create';
 		}else{
+			var $tar=$('.projectFloor .accordionDatail').last();
+			if($tar.hasClass('accordOpen')){
+				$tar.click()
+			}
 			App.Services.Dialog.alert('请先完成当前新增操作...');
 		}
 		
