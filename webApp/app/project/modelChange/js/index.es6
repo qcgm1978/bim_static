@@ -106,11 +106,10 @@ App.Index = {
 
 	//渲染模型
 	renderModel(modelId) {
-		App.Index.Settings.Viewer = new BIM({
-			single: true,
-			element: $("#contains .projectCotent")[0],
-			etag: modelId,
-			tools: true
+		App.Index.Settings.Viewer = new bimView({
+			type:'singleModel',
+			element: $("#contains .projectCotent"),
+			etag: modelId
 		});
 	},
 
@@ -167,7 +166,7 @@ App.Index = {
 		App.Comm.managePoint(data);
 	},
 
-	fetchChange: function() { 
+	fetchChange: function() {
 		var that = this;
 		App.Project.Collection.changeList.projectId = App.Index.Settings.projectId;
 		App.Project.Collection.changeList.projectVersionId = App.Index.Settings.projectVersionId;
@@ -199,8 +198,8 @@ App.Index = {
 	},
 
 	//api 接口 初始化
-	initApi(projectId, projectVersionId) { 
-		 
+	initApi(projectId, projectVersionId) {
+
 		this.Settings.projectId = projectId;
 		this.Settings.projectVersionId = projectVersionId;
 
@@ -253,7 +252,7 @@ App.Project.Model = {
 			return this;
 		},
 
-		addList: function(model) { 
+		addList: function(model) {
 			var data = model.toJSON();
 			var comparisonId = App.Index.Settings.referenceId;
 			var isload = false;

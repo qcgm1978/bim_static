@@ -117,7 +117,7 @@ App.Index = {
 				});
 
 				App.Index.Settings.Viewer.selectIds(Ids);
-				App.Index.Settings.Viewer.zoomSelected();  
+				App.Index.Settings.Viewer.zoomSelected();
 				return;
 			}
 
@@ -163,7 +163,7 @@ App.Index = {
 
 				if (isSelected) {
 
-					if (App.Index.Settings.type=="api") { 
+					if (App.Index.Settings.type=="api") {
 						App.Index.Settings.changeModel = App.Index.Settings.Viewer.load(App.Index.Settings.diffModleId);
 						return;
 					}
@@ -256,11 +256,10 @@ App.Index = {
 	//渲染模型根据id
 	renderModelById() {
 
-		App.Index.Settings.Viewer = new BIM({
-			single: true,
-			element: $("#contains .projectCotent")[0],
+		App.Index.Settings.Viewer = new bimView({
+			type:'singleModel',
+			element: $("#contains .projectCotent"),
 			etag: App.Index.Settings.modelId,
-			tools: true
 		});
 
 
@@ -465,7 +464,7 @@ App.Index = {
 
 					$(".projectNavContentBox .projectChangeListBox:first").prepend(dropHtml);
 
-					
+
 					//变更获取
 					that.fetchChangeList(firstData.baseVersion, firstData.currentVersion);
 					//渲染模型
@@ -494,7 +493,7 @@ App.Index = {
 
 				var groupText = $item.closest(".groups").prev().text() + "：";
 
-				$(".specialitiesOption .myDropText span:first").text(groupText); 
+				$(".specialitiesOption .myDropText span:first").text(groupText);
 
 				App.Index.Settings.diffModleId = $item.data("basemodel");
 				App.Index.Settings.modelId = $item.data('currentmodel');

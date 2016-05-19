@@ -105,7 +105,7 @@ App.Project = {
 					if (data.data.suffix == "dwg") {
 						App.Project.renderDwg(data.data.modelId);
 					} else {
-						App.Project.renderOther(data.data.modelId);
+						App.Project.renderOther(data.data.modelId,data.data.suffix);
 					}
 
 
@@ -119,12 +119,16 @@ App.Project = {
 	},
 
 	// 除 dwg以外的格式
-	renderOther(modelId) {
-
+	renderOther(modelId,type) {
+		var typeMap = {
+			rvt:'singleModel',
+			rfa:'familyModel'
+		}
 		$(".rightProperty").show();
-		App.Project.Settings.Viewer = new familyModel({
+		App.Project.Settings.Viewer = new bimView({
 			element: $("#modelBox"),
 			etag: modelId,
+			type:typeMap[type],
 			callback: function(id) {
 				App.Project.renderAttr(id,1);
 			}
@@ -226,9 +230,9 @@ App.Project = {
 
 					} else {
 						App.Project.Settings.axisHtm=html;
-						App.Project.renderAxisComm(); 
-					} 
-					
+						App.Project.renderAxisComm();
+					}
+
 
 				} else {
 					$("#projectContainer .designProperties").html(html);
@@ -242,7 +246,7 @@ App.Project = {
 
 	//渲染轴公共
 	renderAxisComm() {
-		 
+
 		//定时监听 是否返回
 		App.Project.Settings.timer = setTimeout(function() {
 
@@ -252,7 +256,7 @@ App.Project = {
 				$("#projectContainer .designProperties").html(App.Project.Settings.famHtml);
 				//本身信息
 				$("#projectContainer .designProperties").append(App.Project.Settings.axisHtm);
-				
+
 			} else {
 				App.Project.renderAxisComm();
 			}
