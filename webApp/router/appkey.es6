@@ -161,6 +161,7 @@ var AppRoute = Backbone.Router.extend({
 		var that = this;
 		//是否登录了
 		//if (!App.Comm.getCookie("token_cookie")) {
+
 		var Request = App.Comm.GetRequest(),
 			appKey = Request.appKey,
 			token = Request.token;
@@ -169,7 +170,7 @@ var AppRoute = Backbone.Router.extend({
 			URLtype: "appToken",
 			data: {
 				appKey: appKey,
-				token: 123 || token
+				token: token
 			}
 		}
 
