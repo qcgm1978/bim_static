@@ -50,7 +50,7 @@ App.Services.memberDetail=Backbone.View.extend({
         });
 
     },
-
+//不可选状态
     disable:function(arr){
         App.Services.Member.SubRoleCollection.each(function(item){
             for(var i = 0 ; i< arr.length ; i++){

@@ -13,10 +13,11 @@ App.Services.MemberNav=Backbone.View.extend({
     },
     render:function(){
         this.$el.html(this.template);
+
         return this;
     },
     initialize:function(){
-        //默认根据角色权限加载  adm用户加载全部，keyMem用户只显示项目管理
+        //默认根据角色权限加载  adm用户加载全部，keyMem用户只显示项目管理.
     },
     //外部用户
     outer:function(){
@@ -77,6 +78,7 @@ App.Services.MemberNav=Backbone.View.extend({
 
                 //菜单渲染
                 $("#" + _thisType +"+ .childOz").html(App.Services.tree(response));
+                App.Comm.initScroll(_this.$el.find(".serviceOgList"),"y");
             }
         }).done(function(){
             App.Services.queue.next();

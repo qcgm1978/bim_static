@@ -18,6 +18,7 @@ App.Services.windowRoleList=Backbone.View.extend({
     addOne:function(model){
         var newView = new App.Services.windowRoleDetail({model:model});
         this.$("ul").append(newView.render().el);
+        App.Comm.initScroll(this.$el.find(".setter"),"y");
     },
     //排序
     comparator:function(){}

@@ -21,7 +21,8 @@ App.Services.roleWindowIndex = Backbone.View.extend({
     },
     addOne:function(item){
         var newView = new App.Services.roleWindowFunDetail({model:item});
-        this.$("#funList").append(newView.render().el);
+        this.$("#funList ul").append(newView.render().el);
+        App.Comm.initScroll(App.Services.maskWindow.find(".conc"),"y");
     },
 
     //提交表单，完毕会触发角色列表的更新change

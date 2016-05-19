@@ -1,6 +1,6 @@
 .ellipsis{overflow: hidden;white-space: nowrap;text-overflow: ellipsis;}
 ul,li{list-style: none outside none;}
-.serviceOgList{padding-top: 10px;padding-left: 22px;}
+.serviceOgList{padding-top: 10px;padding-left: 22px;position: absolute;top: 51px;left: 0;right: 0;bottom: 0;}
 .serviceInput{outline: none;border: none;-webkit-appearance: none;width: 13px;height: 13px;background: transparent url('../images/service_ico.png') 0 -380px no-repeat;vertical-align: middle;margin: 0;}
 .background-ioc{background: transparent url('../images/service_ico.png') 0 0 no-repeat;vertical-align: middle;}
 .bdB-c{border-bottom: 1px solid #cccccc;}
@@ -18,9 +18,9 @@ ul,li{list-style: none outside none;}
 .serviceHeader .serviceNav li.active{border-top: 2px solid #006ecf;border-left: 1px solid #cccccc;border-right: 1px solid #cccccc;border-bottom: 1px solid #eeeeee;background-color: #ffffff;}
 .serviceNav a:link,.serviceNav a:hover,.serviceNav a:visited,.serviceNav a:active{color: #333333;text-decoration: none;}
 
-#blendList{overflow: auto;}
+
 .serviceBody{position: absolute;top:129px;left:0;right:0;bottom:0;}
-.serviceBody .menu{ bottom: 0px; position: absolute;left: 0;top: 0;width: 20%;min-width: 80px;border: 1px solid #ccc;border-top: none;background-color: #ffffff;;height: 100%;overflow: auto;}
+.serviceBody .menu{ bottom: 0px; position: absolute;left: 0;top: 0;width: 20%;min-width: 80px;border: 1px solid #ccc;border-top: none;background-color: #ffffff;;height: 100%;overflow: hidden;}
 .serviceBody .menu li{line-height: 25px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;position: relative;}
 .serviceBody .menu li span{padding: 2px 3px;cursor: pointer;}
 .serviceBody .menu li span.active{background-color: #a8dbfd;}
@@ -33,7 +33,7 @@ ul,li{list-style: none outside none;}
 /*.serviceBody .menu ul{padding-left: 22px;}*/
 .serviceBody .body li{border-bottom: 1px solid #cccccc;padding-left: 20px;}
 .serviceBody .body li div{.ellipsis}
-.serviceBody .content{left: 20%;position: absolute;right:0;height: 100%;overflow: auto;}
+.serviceBody .content{left: 20%;position: absolute;right:0;height: 100%;overflow: hidden;}
 .serviceBody .content input{.serviceInput;}
 .serviceBody .content input:checked{background-position: 0 -420px}
 /*????checkbox????????????*/
@@ -42,19 +42,23 @@ ul,li{list-style: none outside none;}
 .serviceBody .content .head .selectAll{cursor: pointer;}
 .batchAward{position: relative;display: inline-block;margin-left: 16px;height: 30px;line-height: 28px;width: 90px;border: 1px solid #cccccc;padding-left: 32px;cursor: pointer;}
 .batchAward:before{content: '';position: absolute;width: 16px;height: 16px;left: 10px;top: 7px;background: transparent url('../images/service_ico.png') 0 -120px no-repeat;}
-.serviceBody .content li{line-height: 49px;border-bottom: 1px solid #dddddd;height: 50px;position: relative;}
+.serviceBody .content li{line-height: 49px;border-bottom: 1px solid #dddddd;height: 50px;position: relative;padding-right: 20px;}
 .serviceBody .content li.active{background-color: #a8dbfd;}
 .serviceBody .content li .pers{display: none;float: right;position: relative;z-index: 10;padding: 0 15px 0 20px;color: #016ecf;cursor: pointer;height: 50px;width: 84px;}
 
+.servicesMemScrollContent{position: absolute;top: 51px;left: 0;right: 0;bottom: 0;}
+#blendList{overflow: visible;}
 #blendList li:hover .pers{display: block;}
 #blendList li .left{float: left;width: 300px;.ellipsis;}
+
+#ozList{overflow: visible;}
 
 .serviceBody .content li .pers:before{content: '';position: absolute;width: 16px;height: 16px;left: 0;top: 16px;background: url('../images/service_ico.png') 0 -140px no-repeat;}
 .serviceBody .content li .sele{padding:  0 25px;}
 .serviceBody .content li .ushead{display: inline-block;overflow: hidden;width: 32px;height: 32px;line-height: 0;background: transparent url('../images/service_ico.png') 0 -40px no-repeat;vertical-align: middle;margin: 0 13px 0 10px;}
 .serviceBody .content li.active .memCheck{background-position: 0 -420px;}
 .serviceBody .content li .ushead.oz{background-position: 0 0;}/*机构*/
-.serviceBody .content li .sele .roles{margin-right: 100px;margin-left: 320px;padding-left: 30%;overflow: hidden;text-overflow: ellipsis;white-space: nowrap;}
+.serviceBody .content li .sele .roles{margin-right: 120px;margin-left: 320px;padding-left: 30%;overflow: hidden;text-overflow: ellipsis;white-space: nowrap;}
 .serviceBody .content li .sele .roles.error{color: #999999;}
 .serviceBody  li .sele .roles span{position: relative;display: inline-block;padding-left: 20px;margin-left: 14px;}
 .serviceBody  li .sele .roles span:before{position: absolute;content:'';left: 0;top: 18px;height: 15px;width: 14px;background: transparent url('../images/service_ico.png') 0 -180px  no-repeat;}
@@ -64,7 +68,7 @@ ul,li{list-style: none outside none;}
 .serviceBody  .rohead{display: inline-block;width: 23px;height: 15px;vertical-align: middle; background: url('../images/service_ico.png') 0 -500px no-repeat;margin-right: 10px;}
 
 .serviceBody .roleCtrl{height: 100%;}
-#roleList{overflow: auto;position: absolute;top: 50px;left: 0;right: 0;bottom: 0;}
+#roleList{overflow: auto;position: absolute;top: 51px;left: 0;right: 0;bottom: 0;}
 .roleCtrl li{clear: both;line-height: 50px;padding:0 22px;height: 50px;}
 .roleCtrl .roleHead{padding:0 22px;line-height: 50px;font-size: 12px;color: #a7a7a7;border-bottom: 1px solid #cccccc;}
 .roleCtrl .roleHead .newRole{position: relative;cursor: pointer;display: inline-block;line-height: 28px;height: 30px;vertical-align: middle;padding: 0 8px 0 32px;border: 1px solid #cccccc;margin-left: 24px;}
@@ -95,26 +99,33 @@ ul,li{list-style: none outside none;}
 .serviceWindow .name,.serviceWindow .funName{float: left;width: 175px;}
 .serviceWindow .aim,.serviceWindow .memRoleList,.serviceWindow .func{padding: 8px 20px 0 20px;}
 
-.seWinBody{margin: -20px -20px 0 -20px;padding-bottom: 40px;}
+.seWinBody{margin: -20px -20px 0 -20px;}
 .seWinBody h1{height: 50px;line-height: 49px;border-bottom: 1px solid #e6e6e6;font-size: 16px;padding-left: 24px;color: #333333;}
 .seWinBody h2{height: 45px;line-height: 45px;font-size: 14px;padding: 0 10px;}
 .seWinBody h2 span{color: #9f9f9f;}
-.seWinBody .title{font-size: 12px;color: #9f9f9f;line-height: 23px;height: 24px;padding-left: 34px;}
+.seWinBody .title{font-size: 12px;color: #9f9f9f;line-height: 23px;height: 24px;padding-left: 34px;margin:  8px  20px 0 20px;border:  solid #cccccc;border-width: 1px 1px 0 1px}
 .seWinBody .title .name{width: 149px;}
 .seWinBody .name,.seWinBody .funName{float: left;width: 175px;.ellipsis;}
 .seWinBody li{padding: 0 10px;line-height: 30px;height: 30px;.ellipsis;}
 .seWinBody li:not(:last-child){border-bottom: 1px solid #cccccc;}
 .seWinBody li:first-child{border-bottom: 1px solid #cccccc;}
-.seWinBody .aim,.seWinBody .memRoleList,.seWinBody .func{padding: 8px 20px 0 20px;}
+.seWinBody .aim,.seWinBody .memRoleList,.seWinBody .func{padding: 0;margin: 0 20px;position: relative;}
 .seWinBody .aim .memCheck{display: none;}
-.seWinBody ul{border:1px solid #cccccc;  height: 150px;overflow: auto;}
+.seWinBody .aim .selec{position: absolute;width: 100%;height: 100%;left: 0;right: 0;top: 0;bottom: 0;overflow: hidden;}
+
+.seWinBody ul{}
+.seWinBody .aim{border:1px solid #cccccc;  height: 160px;overflow: hidden;}
+.seWinBody .setter{border:1px solid #cccccc;  height: 160px;overflow: hidden;position: absolute;width: 100%;left: 0;top: 69px;bottom: 0;}
 
 .windowSubmit {position: absolute;right: 20px;bottom: 20px;background-color: #0572d0;color: #ffffff;width: 80px;height: 30px;line-height: 30px;text-align: center;cursor: pointer;}
 .windowSubmit:hover{background-color: #1584e3;}
-.seWinBody .func ul{height: 260px;}
+.seWinBody .func ul{}
 .seWinBody .func li.active,.memRoleList li.active{background-color: #a8dbfd;}
-
-//弹窗角色列表
+#funList{border: 1px solid #cccccc;height: 290px;overflow: hidden;position: relative;}
+#funList .conc{position: absolute;left: 0;top: 0;right: 0;bottom: 0;width: 100%;overflow: hidden;}
+//
+.memRoleList{height: 170px;}
+.memRoleList .title{margin: 0;}
 .memRoleList li{position: relative;overflow: visible;}
 .memRoleList li.inherit{color: #cccccc;}
 .memRoleList li.inherit .memCheck{background-position: 0 -440px;}
@@ -128,11 +139,16 @@ ul,li{list-style: none outside none;}
 .memRoleList li .rohead{.background-ioc;display: inline-block;width: 15px;height: 15px;vertical-align: middle;background-position: 0 -180px;margin: 0 5px 0 5px;}
 .memRoleList li .rohead.adm{background-position: 0  -162px;width: 14px;height: 14px;}
 
-//角色功能列表
+//
+
+.seWinBody .inputName{margin: 0 20px;}
+.seWinBody .inputName input{height: 30px;width: 100%;color: #cccccc;outline: none;border: 1px solid #cccccc;padding: 0 8px;line-height: 30px;}
+.seWinBody .inputName input:focus{color: #333333;}
+
+
+.seWinBody .func .title{margin: 0;}
 .seWinBody .func li .name span{position: relative;padding-left: 20px;margin-left: 8px;}
 .seWinBody .func li .name span:before{content: '';position: absolute;width: 11px;height: 11px;left: 0;top: 3px;background: transparent url('../images/service_ico.png') 0 -200px no-repeat;}
-.seWinBody .aim input{height: 30px;width: 100%;color: #cccccc;outline: none;border: 1px solid #cccccc;padding: 0 8px;line-height: 30px;}
-.seWinBody .aim input:focus{color: #333333;}
 .seWinBody .aim .name i{display: inline-block;width: 17px;height: 16px;.background-ioc;background-position: 0 -20px;background-size: 20px auto;margin: 0 6px 0 5px;}
 .seWinBody .aim .name i.oz{background-position: 0 -100px;background-size: 40px auto;}
 /*checkbox*/
@@ -157,3 +173,6 @@ ul,li{list-style: none outside none;}
 /*����*/
 .services_loading{position: relative;}
 .services_loading:after{content: '';position: absolute;left: 0;top: 0;width: 100%;height: 100%;background: rgba(255,255,255,.3) url('../../comm/images/load.gif') center center no-repeat;background-size: 48px 48px;z-index: 99999;}
+
+.mod-dialog{min-height: 545px;}
+.mod-dialog .wrapper .content{min-height: 500px;}

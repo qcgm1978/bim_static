@@ -3,7 +3,8 @@
  */
 
 App.Services.KeyUser = {
-
+  //暂存step2里选择的模式
+  mode :1,
   //暂存被点击的关键用户信息的uid
   uuid : '',
   //暂存已被选关键用户的uid数组

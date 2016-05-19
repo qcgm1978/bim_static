@@ -65,6 +65,7 @@ App.Services.step1 = Backbone.View.extend({
 
           if(canLoad=='true'){
             $ul.removeClass('shut').addClass('open');
+
             App.Comm.ajax({URLtype:'fetchServicesMemberInnerList',data:{parentId:orgId,includeUsers:true}},function(r){
 
               if(r && !r.code && r.data){
@@ -112,7 +113,7 @@ App.Services.step1 = Backbone.View.extend({
         $p.parent().addClass('toselected');
 
       }
-    }
+    };
     if(instep3){
       //点击的是文件夹ICON
       if(target == 'i'){
