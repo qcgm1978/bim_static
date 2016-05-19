@@ -481,7 +481,7 @@ App.Services.addKeyUser = Backbone.View.extend({
     }
   },
   initialize: function(){
-    //this.listenTo(App.Services.KeyUser.KeyUserList,'add',this.add)
+
   }
 
 });
