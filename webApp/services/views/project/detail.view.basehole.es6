@@ -102,6 +102,9 @@ App.Services.DetailView.BaseHole=Backbone.View.extend({
 	},
 	
 	saveBasehole(args,type){
+		if(this.$('.errorInput').length>0){
+			return 
+		}
 		var _this=this,_objName='';
 		_this.$('input').each(function(){
 			var _=$(this);
