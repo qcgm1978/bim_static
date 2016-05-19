@@ -95,7 +95,6 @@
       keyPress:function(e){
         var e = e || event,
             currKey = e.keyCode || e.which || e.charCode;
-        console.log(currKey)
         bimView.comm.bindEvent.pub(currKey);
       },
       keyboardEvent:function(){

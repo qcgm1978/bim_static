@@ -29,7 +29,7 @@
     init:function(options){
       var self = this;
       var _opt = options;
-      _opt.element.append(_opt._dom.bimBox);
+      _opt.element.html(_opt._dom.bimBox);
       switch(_opt.type){// 判断类型
         case "model":
           self.viewer = bimView.model.model(_opt,self);
@@ -96,7 +96,8 @@
             self[fn]();
             break;
           case "pattern":
-            $this.toggleClass('selected').siblings('[data-group='+group+']').removeClass('selected');
+            $this.toggleClass('selected');
+            $this.closest('.toolsBar').find('[data-group='+group+']').not($this).removeClass('selected');
             if(isSelected){
               self.picker();
             }else{
@@ -114,6 +115,10 @@
           case "filter":
             $this.toggleClass('selected').siblings('[data-group='+group+']').removeClass('selected');
             bimView.sidebar[fn](!isSelected);
+            break;
+          case "more":
+            $this.toggleClass('selected');
+            bimView.sidebar[fn](self);
             break;
           case "change":
             $this.toggleClass('bar-hideMap bar-showMap')
@@ -214,6 +219,12 @@
       self.pub('zoom');
       self.viewer.setZoomMode();
     },
+    zoomToBox:function(box){
+      var self = this;
+      var viewer = self.viewer;
+      viewer.zoomToBBox(CLOUD.Utils.computeBBox(box));
+      viewer.render();
+    },
     fly : function () {
       // 漫游模式
       var self = this;
@@ -231,6 +242,28 @@
       var self = this;
       self.pub('home');
       self.viewer.setStandardView(CLOUD.EnumStandardView.ISO);
+    },
+    // 模型显示
+    markers:function(){
+      var self = this;
+      var viewer = self.viewer;
+      viewer.setMarkerMode();
+      viewer.editMarkerBegin();
+    },
+    markerEnd : function() {
+      var self = this;
+      var viewer = self.viewer;
+      viewer.editMarkerEnd();
+    },
+    saveMarkers : function() {
+      var self = this;
+      var viewer = self.viewer;
+      return viewer.getMarkerInfoList();
+    },
+    loadMarkers:function(list){
+      var self = this;
+      var viewer = self.viewer;
+      viewer.loadMarkers(list);
     },
     // 模型过滤器
     filter:function(obj){
@@ -253,13 +286,14 @@
       });
       viewer.render();
     },
-    collision:function(idA,idB){
+    collision:function(idA,idB,box){
       // 碰撞
       var self = this;
       var viewer = self.viewer;
       var filter = viewer.getFilters();
       filter.setOverriderByUserIds('collisionA',[idA],'lightBlue');
       filter.setOverriderByUserIds('collisionB',[idB],'darkRed');
+      self.zoomToBox(box);
       viewer.render();
     },
     translucent:function(flag){
@@ -268,6 +302,12 @@
       var filter = viewer.getFilters();
       filter.enableSceneOverrider(flag);
       viewer.render();
+    },
+    getTranslucentStatus:function(){
+      var self = this;
+      var viewer = self.viewer;
+      var filter = viewer.getFilters();
+      return filter.isSceneOverriderEnabled();
     },
     initMap:function(name,element,axisGrid,floorPlane){
       var self = this,
@@ -282,6 +322,7 @@
           };
     viewer.setAxisGridData(axisGrid)
     viewer.createMiniMap(name,_el[0],_width,_height,_css,function(res){
+      console.log(res)
       self.pub('changeGrid',res);
     });
     viewer.generateAxisGrid(name);

@@ -139,7 +139,7 @@
       title:'更多',
       fn:'more',
       keyCode:'',
-      type:'filter',
+      type:'more',
       group:'0',
       subBar:[{
         id:'color',
@@ -175,7 +175,7 @@
       icon:'bar-hideMap',
       title:'漫游(Space)',
       fn:'fly',
-      keyCode:'32',
+      keyCode:'',
       type:'change'
     }]
   }

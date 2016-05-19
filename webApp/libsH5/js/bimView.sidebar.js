@@ -16,13 +16,13 @@
       var bimBox = self._opt._dom.bimBox;
       $.each(bimView.model.modelBar,function(i,item){
         var tmpHtml = $('<i class="bar-item '+item.icon+'" title="'+item.title+'" data-id="'+item.fn+'" data-type="'+item.type+'" data-group="'+item.group+'"></i>');
-        bimView.comm.bindEvent.on(item.keyCode,tmpHtml);
+        item.keyCode&&bimView.comm.bindEvent.on(item.keyCode,tmpHtml);
         self._dom.modelBar.append(tmpHtml);
         if(item.subBar&&item.subBar.length>0){
           var subBar = $('<div class="subBar"></div>')
           $.each(item.subBar,function(index,barItem){
-            var subItem = $('<i class="bar-item '+barItem.icon+'" title="'+barItem.title+'" data-id="'+barItem.fn+'" data-type="'+barItem.type+'" data-group="'+item.group+'"></i>');
-            bimView.comm.bindEvent.on(barItem.keyCode,tmpHtml);
+            var subItem = $('<i class="bar-item '+barItem.icon+'" title="'+barItem.title+'" data-id="'+barItem.fn+'" data-type="'+barItem.type+'" data-group="'+barItem.group+'"></i>');
+            barItem.keyCode&&bimView.comm.bindEvent.on(barItem.keyCode,subItem);
             subBar.append(subItem);
           });
           self._dom.modelBar.append(subBar);
@@ -92,7 +92,7 @@
           etag:self._opt.etag,
           sourceId:self._opt.sourceId
         },function(data){
-          self.categoryStatue = true;
+          self.classCodeStatue = true;
           self.classCodeData = data.data;
           var classCode = self.viewTree({
             type:'classCode',
@@ -112,12 +112,12 @@
       isSelected ? self._dom.sidebar.addClass('open') : self._dom.sidebar.removeClass('open');
       self._dom.sidebar.find('#selected').show().siblings().hide();
     },
-    more:function(){
-      setTimeout(function(){
-        $(document).one('click',function(){
-          bimView.sidebar._dom.sidebar.find('.bar-more').removeClass('selected');
-        });
-      },10);
+    more:function(viewer){
+      var status = viewer.getTranslucentStatus();
+      bimView.sidebar._dom.sidebar.find('.bar-translucent').toggleClass('selected',status);
+      bimView.sidebar._dom.sidebar.find('.subBar').on('click',function(){
+        bimView.sidebar._dom.sidebar.find('.bar-more').removeClass('selected');
+      });
     },
     toggleMap:function(el){
       var self = this;
