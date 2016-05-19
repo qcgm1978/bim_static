@@ -3,11 +3,13 @@ App.Services.DetailView=App.Services.DetailView||{};
 App.Services.DetailView.Floor=Backbone.View.extend({
 	
 	events:{
+		'click dt':'headerToggle',
 		'click .accordionDatail':'toggleProFrom',
 		'click .save':'saveFloor',
 		'click .update':'updateFloor',
 		'click .delete':'deleteFloor',
-		'click .cancel':'cancelFloor'
+		'click .cancel':'cancelFloor',
+		'change input[type=number]':'formatValue'
 	},
 	
 	template:_.templateUrl('/services/tpls/project/view.floor.html'),
@@ -40,6 +42,15 @@ App.Services.DetailView.Floor=Backbone.View.extend({
 		this.listenTo(this.model,'change',this.render);
 	},
 	
+	formatValue(e){
+		var _$dom=$(e.currentTarget),
+			r=/^[1-9]\d*$/;
+		if(!(r.test(_$dom.val()))){
+			_$dom.val(0);
+			return false;
+		}
+	},
+
 	render(){
 		var _this=this,
 			data=this.model.toJSON();
@@ -96,8 +107,6 @@ App.Services.DetailView.Floor=Backbone.View.extend({
 		});
 		return this;
 	},
-	
-	
 	toggleProFrom(e){
 	
 		var $this=this.$(e.target),

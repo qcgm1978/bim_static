@@ -50,7 +50,7 @@ App.BodyContent.control= {
             }
         });
 
-        $("#loginName").click(function(e){
+        $(".user > span").click(function(e){
             $('.userinfo').show();
             e.stopPropagation();
         })

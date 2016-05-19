@@ -10,7 +10,8 @@ App.Services.ProjectDetail.Pile=Backbone.View.extend({
 		
 		'click .save':'savePile',
 		'click .update':'updatePile',
-		'keydown .userPile':'checkValue'
+		'keydown .userPile':'checkValue',
+		'change .userPile':'formatValue'
 	
 	},
 	
@@ -40,10 +41,17 @@ App.Services.ProjectDetail.Pile=Backbone.View.extend({
 	},
 	
 	checkValue(e){
-		var _$dom=$(e.currentTarget),
-			r=/^[1-9]\d*$/;
 		if(e.keyCode==190){
 			e.preventDefault();
+			return false;
+		}
+	},
+
+	formatValue(e){
+		var _$dom=$(e.currentTarget),
+			r=/^[1-9]\d*$/;
+		if(!(r.test(_$dom.val()))){
+			_$dom.val(0);
 			return false;
 		}
 	},

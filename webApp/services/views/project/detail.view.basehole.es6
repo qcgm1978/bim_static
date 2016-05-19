@@ -7,7 +7,8 @@ App.Services.DetailView.BaseHole=Backbone.View.extend({
 		'click .save':'saveBasehole',
 		'click .update':'updateBasehole',
 		'click .delete':'deleteBasehole',
-		'click .cancel':'cancelBasehole'
+		'click .cancel':'cancelBasehole',
+		'change input[type=number]':'formatValue'
 	},
 	
 	formData:{
@@ -32,6 +33,15 @@ App.Services.DetailView.BaseHole=Backbone.View.extend({
 		this._parentView=data._parentView;
 	},
 	
+	formatValue(e){
+		var _$dom=$(e.currentTarget),
+			r=/^[1-9]\d*$/;
+		if(!(r.test(_$dom.val()))){
+			_$dom.val(0);
+			return false;
+		}
+	},
+
 	render(){
 		var _this=this,
 			data=this.model.toJSON();
