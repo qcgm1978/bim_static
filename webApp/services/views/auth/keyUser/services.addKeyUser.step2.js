@@ -10,17 +10,28 @@ App.Services.step2 = Backbone.View.extend({
   template:_.templateUrl("/services/tpls/auth/keyUser/services.addKeyUser.step2.html"),
 
   events:{
-    "click li":"changeStatus",
+    "click li":"changeStatus"
     //"click .keyUserList li":'toggleClass'
   },
 
   render:function(){
+    var index=$('.partition .active').attr('data-index');
     //准备Collection的MODELS
-    var datas={
-      direction : App.Services.KeyUser.Step2.toJSON() || [],
+    if(index==2){
+      var str='<li class="project partition"  data-id=><h3  data-id=  >中区</h3></li>'+
+        '<li class="project partition"  data-id=><h3  data-id=  >南区</h3></li>'+
+        '<li class="project partition"  data-id=><h3  data-id=  >北区</h3></li>';
+      this.$el.html(str);
 
-    };
-    this.$el.html(this.template(datas));
+    }else{
+      var datas={
+        direction : App.Services.KeyUser.Step2.toJSON() || [],
+
+      };
+      this.$el.html(this.template(datas));
+    }
+    $(".serviceWindow .keyU > div").css({height:"260px"});
+    $('.partition').show();
     return this;
   },
 

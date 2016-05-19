@@ -14,6 +14,7 @@ App.Services.addKeyUser = Backbone.View.extend({
     "click .confirm"                 : 'confirm',
     "click .rightWindow .delete"     : 'remove',
     "click .rightWindow .proj-remove": 'remove2',
+    "click .partition a"               : 'partition'
 
   },
 
@@ -312,7 +313,6 @@ App.Services.addKeyUser = Backbone.View.extend({
     }
     else{
       App.Services.KeyUser.html2[0] = $('.rightWindow').html();
-
     }
     this.render(++stepNum);
   },
@@ -460,7 +460,26 @@ App.Services.addKeyUser = Backbone.View.extend({
     $('.mod-dialog,.mod-dialog-masklayer').hide();
     App.Services.KeyUser.clearAll();
   },
+  //step2 里的选择模式
+  partition:function(event){
+    var $a = $(event.currentTarget);
+    if($a.hasClass('active')){
+      return ''
+    }else{
+      var index = $a.attr('data-index');
+      $a.addClass('active').siblings().removeClass('active');
+      App.Services.KeyUser.mode=index;
+      if(index==1){
+        //普通模式
+      }else if(index==2){
+        //分区模式
 
+      }else{
+        //全选模式
+
+      }
+    }
+  },
   initialize: function(){
     //this.listenTo(App.Services.KeyUser.KeyUserList,'add',this.add)
   }
