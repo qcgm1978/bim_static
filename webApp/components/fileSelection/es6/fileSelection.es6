@@ -14,7 +14,7 @@
 			isEnable: true, // 是否启用  如果不启用 只可以查看 不能选择 
 			fileIds: "", // fileids 有值时，默认isEndable 为 false
 			mask: true,
-			http: "http://bim.wanda.cn",
+			http: "http://bim.wanda-dev.cn",
 			callback: null
 		}
 
@@ -46,7 +46,9 @@
 		var that = this;
 
 		return {
-			getFileId: this.getFileId
+			getFileId: function(){ 
+				return that.getFileId();
+			}
 		}
 
 	}
@@ -602,10 +604,11 @@
 				}
 			},
 
-			getFileId() {
+			getFileId() { 
+
 				var FileIdArr = [],
 					$item, $text;
-				$("#fileSelectionDialog .rightEnter .file").each(function(i, item) {
+				this.$dialog.find(".rightEnter .file").each(function(i, item) {
 
 					$item = $(this);
 					if ($item.find(".folder").length > 0) {
