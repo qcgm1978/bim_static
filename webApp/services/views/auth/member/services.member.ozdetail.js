@@ -72,6 +72,8 @@ App.Services.MemberozDetail=Backbone.View.extend({
         };
         //此处为延迟
         App.Comm.ajax(cdata,function(response){
+            var alreadyCon,alreadyMenu = $("#childOz" + _this.model.cid);//已加载菜单将不再加载
+
             $(".serviceBody .content").removeClass("services_loading");
             if(!response.data.org.length && !response.data.user.length ){
                 $("#blendList").html("<li><span class='sele'>暂无数据</span></li>");
@@ -81,10 +83,17 @@ App.Services.MemberozDetail=Backbone.View.extend({
             if(response.data.user && response.data.user.length){
                 collection.add(response.data.user);
             }
+            if(!response.data.org.length){
+                if(!alreadyMenu.hasClass("alreadyGet")){
+                    alreadyMenu.addClass("alreadyGet");
+                }
+            }
             if (response.data.org && response.data.org.length) {
                 collection.add(response.data.org);
                 //菜单渲染
-                $("#childOz" + _this.model.cid).html(App.Services.tree(response));
+                alreadyCon =  alreadyMenu.html();
+                if(alreadyCon || alreadyMenu.hasClass("alreadyGet")){return;}
+                alreadyMenu.html(App.Services.tree(response));
             }
         }).done(function(){
             //删除执行完毕的 ，添加执行新的
