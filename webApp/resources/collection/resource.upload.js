@@ -78,8 +78,9 @@
 					var data = JSON.parse(response.response),
 						type = App.ResourceModel.Settings.type,
 						models = App.ResourceModel.FileCollection.models,
+						$leftSel=$("#resourceFamlibsLeftNav .treeViewMarUl .selected"),
+						parentId="",
 						has = false;
-
 					if (type == "famLibs") {
 						models = App.ResourceModel.FileThumCollection.models;
 					}
@@ -103,6 +104,10 @@
 
 					}
 
+					if ($leftSel.length > 0) {
+						parentId = $leftSel.data("file").fileVersionId;
+					}
+					App.ResourceModel.afterCreateNewFolder(data.data, parentId);
 					//$.jps.publish('add-upload-file', response, file)
 				},
 

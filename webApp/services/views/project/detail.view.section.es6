@@ -7,7 +7,8 @@ App.Services.DetailView.Section=Backbone.View.extend({
 		'click .save':'saveSection',
 		'click .update':'updateSection',
 		'click .delete':'deleteSection',
-		'click .cancel':'cancelSection'
+		'click .cancel':'cancelSection',
+		'change input[type=number]':'formatValue'
 	},
 	
 	template:_.templateUrl('/services/tpls/project/view.section.html'),
@@ -22,6 +23,15 @@ App.Services.DetailView.Section=Backbone.View.extend({
 	
 	initialize(data){
 		this.listenTo(this.model,'change',this.render);
+	},
+
+	formatValue(e){
+		var _$dom=$(e.currentTarget),
+			r=/^[1-9]\d*$/;
+		if(!(r.test(_$dom.val()))){
+			_$dom.val(0);
+			return false;
+		}
 	},
 	
 	render(){
@@ -114,7 +124,8 @@ App.Services.DetailView.Section=Backbone.View.extend({
 	},
 	cancelSection(){
 		this.$el.remove();
-		this._parentView.trigger('read');
+		App.Services.ProjectCollection.ProjecDetailSectionCollection.pop();
+		Backbone.trigger('sectionUserStatus','read');
 	},
 	reloadView(){
 		var _this=this;

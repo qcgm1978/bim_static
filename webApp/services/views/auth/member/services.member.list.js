@@ -104,6 +104,7 @@ App.Services.MemberList=Backbone.View.extend({
         this.saveData(seleUser); //缓存已选数据相关数据方便提交
 
         App.Services.Member.loadData(App.Services.Member.SubRoleCollection,{},function(response){
+
             _this.getFatherData();//父项
         });
 
@@ -131,7 +132,9 @@ App.Services.MemberList=Backbone.View.extend({
 
         App.Comm.ajax(cdata,function(response){
             if(response.message=="success"){
-                if(!response.data.length){$(".seWinBody .memRoleList  ul").append("<li>没有相关数据</li>");return;}
+                if(!response.data.length){
+                    $(".serviceBody .content").removeClass("services_loading");
+                    return;}
 
                 var role = response.data;
 

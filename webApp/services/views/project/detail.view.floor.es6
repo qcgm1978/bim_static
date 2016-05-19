@@ -3,11 +3,13 @@ App.Services.DetailView=App.Services.DetailView||{};
 App.Services.DetailView.Floor=Backbone.View.extend({
 	
 	events:{
+		'click dt':'headerToggle',
 		'click .accordionDatail':'toggleProFrom',
 		'click .save':'saveFloor',
 		'click .update':'updateFloor',
 		'click .delete':'deleteFloor',
-		'click .cancel':'cancelFloor'
+		'click .cancel':'cancelFloor',
+		'change input[type=number]':'formatValue'
 	},
 	
 	template:_.templateUrl('/services/tpls/project/view.floor.html'),
@@ -40,12 +42,27 @@ App.Services.DetailView.Floor=Backbone.View.extend({
 		this.listenTo(this.model,'change',this.render);
 	},
 	
+	formatValue(e){
+		var _$dom=$(e.currentTarget),
+			r=/^[1-9]\d*$/;
+		if(!(r.test(_$dom.val()))){
+			_$dom.val(0);
+			return false;
+		}
+	},
+
 	render(){
 		var _this=this,
 			data=this.model.toJSON();
 		this.formData=data;
 		this.$el.html(this.template(data));
-		
+		this.$(".pit").myDropDown({
+			zIndex:App.Services.ProjectCollection.methods.zIndex(),
+			click:function($item){
+				var _=$(this);
+				_this.formData[_.attr('name')]=$item.attr('data-pitId');
+			}
+		});
 		this.$(".structure").myDropDown({
 			zIndex:App.Services.ProjectCollection.methods.zIndex(),
 			click:function($item){
@@ -88,17 +105,8 @@ App.Services.DetailView.Floor=Backbone.View.extend({
 				_this.formData[_.attr('name')]=$item.text();
 			}
 		});
-		this.$(".pit").myDropDown({
-			zIndex:App.Services.ProjectCollection.methods.zIndex(),
-			click:function($item){
-				var _=$(this);
-				_this.formData[_.attr('name')]=$item.attr('data-pitId');
-			}
-		});
 		return this;
 	},
-	
-	
 	toggleProFrom(e){
 	
 		var $this=this.$(e.target),
@@ -121,7 +129,6 @@ App.Services.DetailView.Floor=Backbone.View.extend({
 	},
 	
 	saveFloor(args,type){
-		$('.projectBaseHole').mmhMask();	
 		var _this=this;
 		_this.$('input').each(function(){
 			var _=$(this);
@@ -148,7 +155,7 @@ App.Services.DetailView.Floor=Backbone.View.extend({
 	 		}
 	 		_this.model.set(_this.formData);
 	 		_this.$('.accordionDatail').trigger('click');
-
+	 		clearMask();
 		}).fail(function(){
 			clearMask();
 		})
@@ -171,7 +178,8 @@ App.Services.DetailView.Floor=Backbone.View.extend({
 	},
 	cancelFloor(){
 		this.$el.remove();
-		this._parentView.trigger('read');
+		App.Services.ProjectCollection.ProjecDetailFloorCollection.pop();
+		Backbone.trigger('floorUserStatus','read');
 	},
 	reloadView(){
 		var _this=this;

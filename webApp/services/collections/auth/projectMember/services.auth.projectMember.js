@@ -43,6 +43,7 @@ App.Services.projectMember = {
 		}),
 		urlType: "fetchServicesProjectMemberProjectList",
 		parse: function(response) {
+			$("#dataLoading").hide();
 			if (response.code == 0) {
 				var data=response.data,
 					//TODO 测试数据、需要删除的

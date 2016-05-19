@@ -29,7 +29,7 @@ App.API = {
 		fetchServicesNewRole:'platform/auth/role',//新增角色
 		fetchServiceMemberList:'platform/auth/org',
 		saveServicesRole:'platform/auth/role/grant',//赋予角色
-		fetchServicesMemberList:'platform/auth/org?outer={outer}',//外部组织-品牌／公司／成员列表
+		fetchServicesMemberList:'platform/auth/org?outer={outer}',//组织-品牌／公司／成员列表
 		fetchServicesMemberOuterList:'platform/auth/org?outer=true',//外部组织-品牌／公司／成员列表
 		fetchServicesMemberInnerList:'platform/auth/org?outer=false',//内部-组织／成员列表
 		deleteServicesRoleSingle:"platform/role?",//删除角色
@@ -227,6 +227,8 @@ App.API = {
 		
 
 		appToken:"platform/token", //获取app token
+		modelStd:'view/{projectId}/{projectVersionId}/comparison?type=std', // 与标准模型对比
+		modelBase:'view/{projectId}/{projectVersionId}/comparison?type=base', // 与标准模型对比
 
 		//业务流程
 		fetchFlow:'platform/flow',

@@ -7,7 +7,8 @@ App.Services.DetailView.BaseHole=Backbone.View.extend({
 		'click .save':'saveBasehole',
 		'click .update':'updateBasehole',
 		'click .delete':'deleteBasehole',
-		'click .cancel':'cancelBasehole'
+		'click .cancel':'cancelBasehole',
+		'change input[type=number]':'formatValue'
 	},
 	
 	formData:{
@@ -32,6 +33,15 @@ App.Services.DetailView.BaseHole=Backbone.View.extend({
 		this._parentView=data._parentView;
 	},
 	
+	formatValue(e){
+		var _$dom=$(e.currentTarget),
+			r=/^[1-9]\d*$/;
+		if(!(r.test(_$dom.val()))){
+			_$dom.val(0);
+			return false;
+		}
+	},
+
 	render(){
 		var _this=this,
 			data=this.model.toJSON();
@@ -130,7 +140,8 @@ App.Services.DetailView.BaseHole=Backbone.View.extend({
 	
 	cancelBasehole(){
 		this.$el.remove();
-		this._parentView.trigger('read');
+		App.Services.ProjectCollection.ProjecDetailBaseHoleCollection.pop();
+		Backbone.trigger('baseholeUserStatus','read');
 	},
 	
 	//刷新基坑页面、同时刷新楼层、剖面视图，保证数据一致性
