@@ -88,18 +88,36 @@
       self._dom.bimBox.on('click','.bar-item',function(){
         var $this = $(this),
             fn = $this.data('id'),
+            group = $this.data('group'),
+            isSelected = $this.is('.selected'),
             type = $this.data('type');
         switch(type){
-          case "click":
+          case "viewer":
             self[fn]();
             break;
-          case "selected":
-            $this.toggleClass('selected').siblings().removeClass('selected');
-            if($this.is('.selected')){
-              self[fn]();
-            }else{
+          case "pattern":
+            $this.toggleClass('selected').siblings('[data-group='+group+']').removeClass('selected');
+            if(isSelected){
               self.picker();
+            }else{
+              self[fn]();
             }
+            break;
+          case "status":
+            $this.toggleClass('selected');
+            self[fn](!isSelected);
+            break;
+          case "selected":
+            $this.toggleClass('selected').siblings('[data-group='+group+']').removeClass('selected');
+            if(fn)self[fn]();
+            break;
+          case "filter":
+            $this.toggleClass('selected').siblings('[data-group='+group+']').removeClass('selected');
+            bimView.sidebar[fn](!isSelected);
+            break;
+          case "change":
+            $this.toggleClass('bar-hideMap bar-showMap')
+            $(bimView.sidebar._dom.sidebar).toggleClass("hideMap");
         }
       }).on('click','.modelSelect .cur',function(){
         var $this = $(this);
@@ -115,14 +133,63 @@
         if(data.type == 'familyType'){
           self.filter({
             type:'typeId',
-            ids:bimView.comm.getFilter(filterData,data.id)
+            ids:bimView.comm.removeById(filterData,data.id)
           })
         }else{
-
+          self.setFloorMap(data,"miniMap");
         }
+      }).on('click','.m-openTree,.m-closeTree',function(){
+        var $this = $(this),
+            data = bimView.sidebar.classCodeData,
+            $li = $this.closest('.itemNode'),
+            type = $li.data('type'),
+            flag = $this.next().find('input').prop('checked');
+        $this.toggleClass('m-closeTree m-openTree')
+        $li.toggleClass('open');
+        if(type == 'classCode' && $li.has(".tree").length ==0){
+          var parent = $li.data();
+          if(!parent.userData) parent.userData = null;
+          var tmpArr = [];
+          $.each(data,function(i,item){
+            if(item.parentCode == parent.userData){
+              tmpArr.push(item);
+            }
+          });
+          var children = bimView.sidebar.viewTree({
+            arr:tmpArr,
+            type:'classCode',
+            name:'name',
+            data:'code',
+            children:'isChild',
+            isChecked:flag
+          });
+          $li.append(children);
+        }
+      }).on('change','input',function(){
+        var $this = $(this),
+            $li = $this.closest('.itemNode'),
+            parents = $this.parents('.itemNode'),
+            flag = $this.prop('checked');
+        $li.find("input").prop("checked",flag);
+        var filter = bimView.comm.getFilters(parents,'ckecked');
+        self.filter(filter);
+      }).on('click','.treeText',function(){
+        var $this = $(this),
+            $li = $this.closest('.itemNode'),
+            flag = $this.is('.selected'),
+            data = $li.data();
+        $li.find('.treeText').toggleClass('selected',!flag);
+        var filter = bimView.comm.getFilters($li,'all');
+        self.highlight(filter);
       });
       $(window).on('resize',function(){
         self.resize();
+      });
+      self.on('changeGrid',function(res){
+        bimView.sidebar._dom.mapBar.find(".axisGrid").text(res.axis.offsetX+","+res.axis.offsetY+","+res.axis.offsetZ)
+      })
+      self.on('click',function(res){
+        console.log(res)
       })
     },
     // 以下是对模型操作
@@ -156,7 +223,14 @@
     picker:function(){
       // 普通模式
       var self = this;
+      self.pub('picker');
       self.viewer.setPickMode();
+    },
+    home:function(){
+      // 普通模式
+      var self = this;
+      self.pub('home');
+      self.viewer.setStandardView(CLOUD.EnumStandardView.ISO);
     },
     // 模型过滤器
     filter:function(obj){
@@ -168,6 +242,31 @@
       $.each(obj.ids,function(i,id){
         filter.addUserFilter(obj.type,id);
       })
+      viewer.render();
+    },
+    highlight:function(obj){
+      var self = this;
+      var viewer = self.viewer;
+      var filter = viewer.getFilters();
+      $.each(obj.ids,function(i,id){
+        filter.setUserOverrider(obj.type,id);
+      });
+      viewer.render();
+    },
+    collision:function(idA,idB){
+      // 碰撞
+      var self = this;
+      var viewer = self.viewer;
+      var filter = viewer.getFilters();
+      filter.setOverriderByUserIds('collisionA',[idA],'lightBlue');
+      filter.setOverriderByUserIds('collisionB',[idB],'darkRed');
+      viewer.render();
+    },
+    translucent:function(flag){
+      var self = this;
+      var viewer = self.viewer;
+      var filter = viewer.getFilters();
+      filter.enableSceneOverrider(flag);
       viewer.render();
     },
     initMap:function(name,element,axisGrid,floorPlane){
@@ -182,12 +281,15 @@
             outline:'none'
           };
     viewer.setAxisGridData(axisGrid)
-    viewer.setFloorPlaneData(floorPlane);
     viewer.createMiniMap(name,_el[0],_width,_height,_css,function(res){
-      BIM.util.pub('changeGrid',res);
+      self.pub('changeGrid',res);
     });
-    viewer.generateFloorPlane(name);
     viewer.generateAxisGrid(name);
+    },
+    setFloorMap:function(obj,name){
+      var viewer = this.viewer;
+      viewer.setFloorPlaneData(obj);
+      viewer.generateFloorPlane(name);
     }
   }
 })($);

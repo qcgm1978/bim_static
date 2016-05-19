@@ -611,7 +611,7 @@ CLOUD.GeomUtil = {
 
         var object;
 
-        if (objJSON.geomType == "pipe") {
+        if (objJSON.geomType == "pipe" || objJSON.geomType == "tube") {
 
             var geometry = CLOUD.GeomUtil.UnitCylinderInstance;
             object = new THREE.Mesh(geometry, matObj);
@@ -642,7 +642,7 @@ CLOUD.GeomUtil = {
     },
 
     EmptyGeometry: new THREE.Geometry(),
-    UnitCylinderInstance: new THREE.CylinderGeometry(1, 1, 1),
+    UnitCylinderInstance: new THREE.CylinderGeometry(1, 1, 1, 8, 1, false),
     UnitBoxInstance : new THREE.BoxGeometry(1, 1, 1)
 };
 
@@ -1060,7 +1060,7 @@ CLOUD.RenderGroup = function () {
         }
     };
 
-    function renderObjects(renderer, renderList, camera, lights, fog) {
+    function renderObjects(renderer, renderList, camera, lights, fog, update) {
 
         startTime = Date.now();
 
@@ -1078,12 +1078,19 @@ CLOUD.RenderGroup = function () {
             object.modelViewMatrix.multiplyMatrices(camera.matrixWorldInverse, object.matrixWorld);
             object.normalMatrix.getNormalMatrix(object.modelViewMatrix);
 
-            //var geometry = renderItem.geometry;
-            //if (geometry.renderTicket !== renderer.renderTicket) {
-            //    geometry.renderTicket = renderer.renderTicket;
-            //    geometry = null; // var geometry = objects.update(object);
-            //}
-            var geometry = null;
+            var geometry = renderItem.geometry;
+            if (geometry && geometry._listeners) {
+                if (geometry.refCount === 0) {
+                    geometry = null;
+                }
+            }
+            else {
+                geometry = null;
+            }
+            if (object.loaded === 0) {
+                object.load();
+            }
+            // var geometry = objects.update(object);           
            
             renderer.renderBufferDirect(camera, lights, fog, geometry, material, object, group);
 
@@ -1106,19 +1113,19 @@ CLOUD.RenderGroup = function () {
         return true;
     }
 
-    this.renderOpaqueObjects = function (renderer, camera, lights, fog) {
+    this.renderOpaqueObjects = function (renderer, camera, lights, fog, update) {
 
         if (!opaqueFinished) {
-            opaqueFinished = renderObjects(renderer, opaqueObjects, camera, lights, fog);
+            opaqueFinished = renderObjects(renderer, opaqueObjects, camera, lights, fog, update);
         }
 
         return opaqueFinished;
     };
 
-    this.renderTransparentObjects = function (renderer, camera, lights, fog) {
+    this.renderTransparentObjects = function (renderer, camera, lights, fog, update) {
 
         if (!transparentFinished) {
-            transparentFinished = renderObjects(renderer, transparentObjects, camera, lights, fog);
+            transparentFinished = renderObjects(renderer, transparentObjects, camera, lights, fog, update);
         }
 
         return transparentFinished;
@@ -1320,12 +1327,13 @@ CLOUD.OrderedRenderer = function () {
                     // ���ʹ���
                     var material = getOverridedMaterial(object);
                     material = material || object.material;
-
-                    if (object.load)
-                        object.load();
+                    
 
                     //var geometry = objects.update(object);
                     var geometry = object.geometry;
+                    if (geometry instanceof THREE.Geometry) {
+                        geometry = geometry._bufferGeometry;
+                    }
 
                     pushRenderItem(object, geometry, material, _vector3.z);
 
@@ -1410,6 +1418,7 @@ CLOUD.OrderedRenderer = function () {
 
         if (incrementListDirty) {
 
+           // console.log("  build");
             buildObjectList(scene, camera, lights);
 
             if (!isIncrementalCullFinish)
@@ -1425,9 +1434,9 @@ CLOUD.OrderedRenderer = function () {
             renderer.setRenderTarget(renderTarget);
         }
 
-
+        //console.log("  render");
         if (renderer.autoClear || forceClear) {
-            renderer.clear(renderer.autoClearColor, renderer.autoClearDepth, renderer.autoClearStencil);
+            renderer.clear(renderer.autoClearColor, renderer.autoClearDepth, renderer.autoClearStencil, _isUpdateObjectList);
         }
 
         var fog = scene.fog;
@@ -1439,7 +1448,7 @@ CLOUD.OrderedRenderer = function () {
         for (var ii = renderGroups.length - 1; ii >= 0; --ii) {
             var group = renderGroups[ii];
             if (group !== undefined) {
-                isIncrementalRenderFinish = group.renderOpaqueObjects(renderer, camera, lights, fog);
+                isIncrementalRenderFinish = group.renderOpaqueObjects(renderer, camera, lights, fog, _isUpdateObjectList);
                 if (!isIncrementalRenderFinish)
                     break;
             }
@@ -11047,31 +11056,31 @@ CLOUD.FlyEditor.prototype = {
     },
 
     onMouseWheel: function (event) {
-        // 鼠标滚轮控制运动速度
+
+        // 鼠标滚轮缩放
+
+        var cameraEditor = this.cameraEditor;
+
+        if (cameraEditor.enabled === false || cameraEditor.noZoom === true) return;
 
         //滚轮操作在浏览器中要考虑兼容性
         // 五大浏览器（IE、Opera、Safari、Firefox、Chrome）中Firefox 使用detail，其余四类使用wheelDelta；
         //两者只在取值上不一致，代表含义一致，detail与wheelDelta只各取两个值，detail只取±3，wheelDelta只取±120，其中正数表示为向上，负数表示向下。
         var delta = 0 || event.wheelDelta || event.detail;
         delta = Math.abs(delta) > 10 ? delta : -delta * 40;
-        this.deltaWheel = delta / 40;
+        delta *= 0.0005;
 
         this.delayHandle();
-        this.update();
+
+        // 以中心为基准缩放
+        var rect = cameraEditor.getContainerDimensions();
+        var clientX = rect.left + 0.5 * rect.width;
+        var clientY = rect.top + 0.5 * rect.height;
+
+        cameraEditor.zoom(delta, clientX, clientY);
     },
 
     update: function () {
-
-        //var delta = 1;
-        //var delta = this.clock.getDelta();
-        //
-        //console.log("delta", delta);
-        //
-        //if (delta > 1) {
-        //    delta = 1;
-        //    this.clock.stop();
-        //    this.clock.start();
-        //}
 
         //var moveStep = delta * this.movementSpeed * this.movementSpeedMultiplier;
         var moveStep = this.movementSpeed;
@@ -11079,13 +11088,6 @@ CLOUD.FlyEditor.prototype = {
         var position = camera.position;
         var target = this.cameraEditor.target;
         var eye = target.clone().sub(position);
-
-        // 滚轮缩放
-        if (this.deltaWheel) {
-            var wheelMoveSpeed = this.defaultMovementSpeed * this.deltaWheel;
-            this.goForward(wheelMoveSpeed);
-            this.deltaWheel = 0;
-        }
 
         // 前进
         if (this.moveState & this.MoveDirection.FORWARD) {
@@ -15436,6 +15438,7 @@ CLOUD.SubSceneLoader.prototype = {
 CLOUD.SceneLoader = function (manager, crossOrigin) {
     this.manager = manager;
     this.crossOrigin = crossOrigin;
+    this.loader = new THREE.XHRLoader(manager);
 };
 
 CLOUD.SceneLoader.prototype = {
@@ -15454,7 +15457,7 @@ CLOUD.SceneLoader.prototype = {
             }
         }
 
-        var loader = new THREE.XHRLoader(scope.manager);
+        var loader = this.loader;//new THREE.XHRLoader(scope.manager);
         loader.setCrossOrigin(this.crossOrigin);
 
         loader.load(client.sceneUrl(sceneId), function (data) {
@@ -16125,22 +16128,37 @@ CLOUD.TaskWorker = function (threadCount) {
     this.MaxThreadCount = threadCount || 6;
 
     var scope = this;
-    scope.todoList = [];
+    scope.todoList = {};
+    scope.todoCount = 0;
     scope.doingCount = 0;
 
+    this.hasTask = function () {
+        return scope.todoCount > 0;
+    }
 
-    this.addItem = function(item){
-        this.todoList.push(item);
+    this.addItem = function(id, item){
+        scope.todoList[id] = item;
+        scope.todoCount++;
     };
 
     this.run = function (renderId, loader, sorter) {
 
         var scope = this;
-        if (scope.doingCount > 0)
+        if (scope.doingCount > 0) {
+            //console.log("busy");
             return;
+        }
+            
 
-        var items = scope.todoList;
-        scope.todoList = [];
+        var items = [];
+
+        var todoList = scope.todoList;
+        for (var name in todoList) {
+            items.push(todoList[name]);
+        }
+        //console.log(scope.todoCount + "/" + items.length);
+        scope.todoList = {};
+        scope.todoCount = 0;
 
         var itemCount = items.length;
         if (itemCount == 0)
@@ -16442,9 +16460,9 @@ CLOUD.TaskManager.prototype = {
 
     },
 
-    addSceneTask: function (param) {
+    addSceneTask: function (sceneNode) {
 
-        this.sceneWorker.addItem(param);
+        this.sceneWorker.addItem(sceneNode.sceneId, sceneNode);
 
     },
 
@@ -16455,6 +16473,9 @@ CLOUD.TaskManager.prototype = {
     processSceneTasks: function (client, renderId) {
 
         var scope = this;
+
+        if (!scope.sceneWorker.hasTask())
+            return;
 
         var sceneLoader = scope.manager.sceneLoader;
 
@@ -16724,14 +16745,15 @@ THREE.EventDispatcher.prototype.apply(CLOUD.ModelManager.prototype);
 // handleViewHouseEvent
 CLOUD.EditorManager = function (handleEvents) {
 
-    var scope = this;
     this.editor = null;
     this.animationDuration = 500;// 500毫秒
     this.animationFrameTime = 13; // 周期性执行或调用函数之间的时间间隔，以毫秒计
     this.enableAnimation = true; // 是否允许动画
-    this.canMouseMoveOperation = false; // 是否可以进行mouseMove相关操作
     this.isUpdateRenderList = true; // 是否更新渲染列表
 
+    var scope = this;
+    var _canMouseMoveOperation = false; // 是否可以进行mouseMove相关操作
+    var _mouseDownOnDomContainer = false; // mouse move 和 mouse up 注册到 window上，判断下dom元素上是否有down
     var handleViewHouseEvent = handleEvents.viewHouse;
     var handleMiniMapEvent = handleEvents.miniMap;
 
@@ -16763,7 +16785,7 @@ CLOUD.EditorManager = function (handleEvents) {
             return;
 
         // 其它交互
-        if (scope.canMouseMoveOperation) {
+        if (_canMouseMoveOperation) {
             // 不更新渲染列表
             scope.isUpdateRenderList = false;
             scope.editor.onMouseMove(event);
@@ -16778,12 +16800,16 @@ CLOUD.EditorManager = function (handleEvents) {
     function onMouseUp(event) {
 
         var isAnimating = scope.isAnimating();
-        var isCanMouseMove = scope.canMouseMoveOperation;
 
-        // 只要存在up事件，就将其置为false
-        scope.canMouseMoveOperation = false;
         // 只要存在up事件，允许更新渲染列表
         scope.isUpdateRenderList = true;
+
+        var isCanMouseMove = _canMouseMoveOperation;
+        // 只要存在up事件，就将其置为false
+        _canMouseMoveOperation = false;
+
+        var mouseOnDomContainer = _mouseDownOnDomContainer;
+        _mouseDownOnDomContainer = false;
 
         // 判断是否在动画中, 若是动画中，不响应事件
         if (isAnimating)
@@ -16793,17 +16819,25 @@ CLOUD.EditorManager = function (handleEvents) {
             // 其它交互
             scope.editor.onMouseUp(event);
         } else {
-            // viewHouse 交互
-            handleViewHouseEvent("up", event);
-            // 子地图交互
-            handleMiniMapEvent("up", event);
+
+            if (mouseOnDomContainer) {
+                // viewHouse 交互
+                handleViewHouseEvent("up", event);
+                // 子地图交互
+                handleMiniMapEvent("up", event);
+            }
         }
     }
 
     function onMouseDown( event ) {
 
+        // 每次按下鼠标激活canvas
+        var canvas = scope.editor.domElement.querySelector("#cloud-main-canvas");
+        if (canvas) canvas.focus();
+
+        _mouseDownOnDomContainer = true;
+        _canMouseMoveOperation = false;
         scope.isUpdateRenderList = false;
-        scope.canMouseMoveOperation = false;
 
         var isAnimating = scope.isAnimating();
 
@@ -16818,7 +16852,7 @@ CLOUD.EditorManager = function (handleEvents) {
 
         // 鼠标点不在viewHouse区域和子地图区域
         if (!isInHouse && !isOverMiniMap) {
-            scope.canMouseMoveOperation = true;
+            _canMouseMoveOperation = true;
             // 其它交互
             scope.editor.onMouseDown(event);
         }
@@ -16845,8 +16879,14 @@ CLOUD.EditorManager = function (handleEvents) {
         domElement.addEventListener( 'touchend', touchend, false );
         domElement.addEventListener( 'touchmove', touchmove, false );
 
-        window.addEventListener( 'keydown', onKeyDown, false );
-        window.addEventListener( 'keyup', onKeyUp, false );
+        //window.addEventListener( 'keydown', onKeyDown, false );
+        //window.addEventListener( 'keyup', onKeyUp, false );
+        domElement.addEventListener( 'keydown', onKeyDown, false );
+        domElement.addEventListener( 'keyup', onKeyUp, false );
+
+        // 设置焦点
+        var canvas = scope.editor.domElement.querySelector("#cloud-main-canvas");
+        if (canvas) canvas.focus();
     };
 
     this.unregisterDomEventListeners = function (domElement) {
@@ -16866,8 +16906,10 @@ CLOUD.EditorManager = function (handleEvents) {
         domElement.removeEventListener( 'touchend', touchend, false );
         domElement.removeEventListener( 'touchmove', touchmove, false );
 
-        window.removeEventListener( 'keydown', onKeyDown, false );
-        window.removeEventListener( 'keyup', onKeyUp, false );
+        //window.removeEventListener( 'keydown', onKeyDown, false );
+        //window.removeEventListener( 'keyup', onKeyUp, false );
+        domElement.removeEventListener( 'keydown', onKeyDown, false );
+        domElement.removeEventListener( 'keyup', onKeyUp, false );
     };
 
 };
@@ -16994,7 +17036,7 @@ CLOUD.EditorManager.prototype = {
 
         this.commentEditor.init();
 
-        //this.registerDomEventListeners(this.commentEditor.svg);
+        this.registerDomEventListeners(this.commentEditor.svg);
 
         scope.setEditor(this.commentEditor);
     },
@@ -17325,6 +17367,7 @@ CloudViewer.prototype = {
             // 设置更新状态
             scope.renderer.setObjectListUpdateState(scope.editorManager.isUpdateRenderList);
             if (scope.editorManager.isUpdateRenderList) {
+               
                 this.modelManager.prepareScene(camera, this.requestRenderCount);
                 this.calculateNearFar();
             }
@@ -17351,13 +17394,13 @@ CloudViewer.prototype = {
 
                 if (!isRenderFinish && renderId == scope.requestRenderCount) {
                    
+                    //console.log("  :" + renderId);
                     requestAnimationFrame(incrementRender(renderId, false));
                 }
                 else {
    
                     scope.rendering = false;
                     
-                    //console.log(" done: " + renderId);
                     if (renderId != scope.requestRenderCount) {
                          scope.render();                       
                     }
@@ -17490,6 +17533,13 @@ CloudViewer.prototype = {
         renderer.setPixelRatio(window.devicePixelRatio);
         renderer.setSize(viewportWidth, viewportHeight);
 
+        // Added by xmh begin 允许获得焦点，
+        // 将键盘事件注册到父容器（之前注册到window上会存在各种联动问题），鼠标点击父容器，激活canvas
+        //renderer.domElement.tabIndex = 0;
+        renderer.domElement.setAttribute('tabindex','0');
+        renderer.domElement.setAttribute('id','cloud-main-canvas');
+        // Added by xmh end
+
         domElement.appendChild(renderer.domElement);
 
         // 判断是否定义了IncrementRender
@@ -17515,6 +17565,8 @@ CloudViewer.prototype = {
         // Register Events
         this.editorManager.registerDomEventListeners(this.domElement);
 
+
+        //this.editorManager.registerDomEventListeners(canvas);
     },
 
     registerDomEventListeners : function() {
@@ -18000,9 +18052,9 @@ CloudViewer.prototype = {
         }
     },
 
-    setCommentState: function(state) {
+    setCommentType: function(type) {
         if ( this.editorManager.commentEditor && this.editorManager.editor === this.editorManager.commentEditor) {
-            this.editorManager.commentEditor.setCommentState(state);
+            this.editorManager.commentEditor.setCommentType(type);
         }
     },
 

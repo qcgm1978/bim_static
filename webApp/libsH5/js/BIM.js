@@ -86,7 +86,8 @@
       title:'选择器',
       fn:'filter',
       keyCode:'',
-      type:'selected'
+      type:'filter',
+      group:'1'
     },
     {
       id:'comment',
@@ -94,7 +95,8 @@
       title:'快照',
       fn:'comment',
       keyCode:'',
-      type:'selected'
+      type:'filter',
+      group:'1'
     },
     {
       id:'selected',
@@ -102,7 +104,8 @@
       title:'已选构件',
       fn:'selected',
       keyCode:'',
-      type:'selected'
+      type:'filter',
+      group:'1'
     },
     {
       id:'home',
@@ -110,14 +113,16 @@
       title:'Home(I)',
       fn:'home',
       keyCode:'72',
-      type:'click'
+      type:'viewer',
+      group:'2'
     },{
       id:'fit',
       icon:'bar-fit',
       title:'适应窗口(I)',
       fn:'fit',
       keyCode:'105',
-      type:'click'
+      type:'viewer',
+      group:'2'
     },
     {
       id:'fly',
@@ -125,7 +130,8 @@
       title:'漫游(Space)',
       fn:'fly',
       keyCode:'32',
-      type:'selected'
+      type:'pattern',
+      group:'3'
     },
     {
       id:'more',
@@ -133,14 +139,34 @@
       title:'更多',
       fn:'more',
       keyCode:'',
-      type:'selected',
+      type:'filter',
+      group:'0',
       subBar:[{
-        id:'fly',
-        icon:'bar-fly',
-        title:'漫游(Space)',
-        fn:'fly',
-        keyCode:'32',
-        type:'selected'
+        id:'color',
+        icon:'bar-color',
+        title:'颜色',
+        fn:'color',
+        keyCode:'',
+        type:'color',
+        group:'0'
+      },
+      {
+        id:'zoom',
+        icon:'bar-zoom',
+        title:'缩放(Z)',
+        fn:'zoom',
+        keyCode:'122',
+        type:'pattern',
+        group:'3'
+      },
+      {
+        id:'translucent',
+        icon:'bar-translucent',
+        title:'半透明',
+        fn:'translucent',
+        keyCode:'',
+        type:'status',
+        group:'0'
       },
       ]
     },
@@ -160,7 +186,7 @@
       var viewBox = $('<div class="view"></div>');
       _opt._dom.bimBox.append(viewBox);
       viewer.init(viewBox[0]);
-      // viewer.load(_opt.etag,bimView.API.baseUrl + bimView.API.fetchModel);
+      viewer.load(_opt.etag,bimView.API.baseUrl + bimView.API.fetchModel);
       return viewer;
     }
   }

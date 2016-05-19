@@ -31,11 +31,54 @@
       result.url = bimView.API.baseUrl + result.url
       return result;
     },
-    getFilter:function(arr,id){
+    removeById:function(arr,id){
       var tmpArr = arr.concat();
       var index = tmpArr.indexOf(id);
       tmpArr.splice(index,1);
       return tmpArr
+    },
+    getFilters:function(element,select){
+      var type = element.data('type'),
+          list = element.find('.itemNode').length==0 ? element:element.find('.itemNode'),
+          result = {
+            type:type,
+            ids:[]
+          };
+      if(type == 'classCode'){
+        var regData = [],
+            classCodeData = bimView.sidebar.classCodeData;
+        $.each(list,function(i,item){
+          var $item = $(item),
+              isChecked = $item.find('input').prop('checked'),
+              userData = $item.data('userData')?$item.data('userData').toString():'';
+          if(select == 'ckecked' && !isChecked || select == 'all'){
+            regData.push(userData);
+          }
+        });
+        var str = regData.toString().replace(/,/g,"|");
+        var reg = new RegExp("^("+str+")");
+        $.each(classCodeData,function(i,item){
+          if(regData.length == 0)return
+          if(item.parentCode == -1){
+            if(regData.indexOf("-1")!=-1){
+              result.ids.push(item.code);
+            }
+          }
+          if(reg.test(item.code)){
+            result.ids.push(item.code);
+          }
+        });
+      }else{
+        $.each(list,function(i,item){
+          var $item = $(item),
+              isChecked = $item.find('input').prop('checked'),
+              userData = $item.data('userData').toString().split(",");
+          if(select == 'ckecked' && !isChecked || select == 'all'){
+            result.ids = result.ids.concat(userData);
+          }
+        });
+      }
+      return result;
     },
     bindEvent:{// 绑定事件
       sub:{},
@@ -52,6 +95,7 @@
       keyPress:function(e){
         var e = e || event,
             currKey = e.keyCode || e.which || e.charCode;
+        console.log(currKey)
         bimView.comm.bindEvent.pub(currKey);
       },
       keyboardEvent:function(){
