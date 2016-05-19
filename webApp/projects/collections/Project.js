@@ -2,7 +2,7 @@ App.Project = {
 
 	//默认参数
 	Defaults: {
-		
+		type:"user",
 		designTab: '<li data-type="design" class="item design">设计<i class="line"></i></li>',
 		planTab: '<li data-type="plan" class="item plan">计划<i class="line"></i></li>',
 		costTab: '<li data-type="cost" class="item cost">成本<i class="line"></i></li>',
@@ -229,6 +229,11 @@ App.Project = {
 
 		//设置项目可查看的属性
 		this.setPropertyByAuth();
+
+		//api 页面 默认加载模型
+		if (App.Project.Settings.type=="token") {
+			$(".breadcrumbNav .fileModelNav li:last").click();
+		}
 
 
 	},
