@@ -107,6 +107,8 @@ App.ResourceModel = {
 		//释放上传
 		App.Comm.upload.destroy();
 
+		 
+
 		//重置参数
 		this.reset();
 
@@ -272,6 +274,11 @@ App.ResourceModel = {
 
 			//上传
 			App.ResourceUpload.init($(document.body));
+
+			if (App.ResourceModel.Settings.CurrentVersion.status==9) {
+				 $("#navContainer .topBar").find(".btnNewFolder,.btnFileUpload,.btnFileDel").remove();
+			}
+			 
 
 		}
 	},
