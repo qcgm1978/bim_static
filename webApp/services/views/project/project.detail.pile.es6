@@ -40,24 +40,7 @@ App.Services.ProjectDetail.Pile=Backbone.View.extend({
 	},
 	
 	formatValue(e){
-		var _$dom=$(e.currentTarget),
-			zeroReg=/^0{1,1}$/,
-			intReg=/^[1-9]\d*$/,
-			floatReg=/^[1-9]\d*\.\d*|0\.\d*[1-9]\d*$/,
-			val=_$dom.val(),
-			r=false;
-		if(_$dom.hasClass('floatInput')){
-			r=zeroReg.test(val)||intReg.test(val)||floatReg.test(val);
-		}else if(_$dom.hasClass('intInput')){
-			r=zeroReg.test(val)||intReg.test(val);
-		}else{
-			return 
-		}
-		if(r){
-			_$dom.removeClass('errorInput');
-		}else{
-			_$dom.addClass('errorInput');
-		}
+		App.Services.ProjectCollection.methods.dataVal(e);
 	},
 
 	savePile(args,type){

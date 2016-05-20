@@ -66,7 +66,7 @@ App.Services.MemberNav=Backbone.View.extend({
         };
 
         App.Comm.ajax(cdata,function(response){
-            //样式处理
+            var already = $("#" + App.Services.MemberType).siblings(".childOz").html();
 
             $(".serviceBody .content").removeClass("services_loading");
             if(!response.data.org.length && !response.data.user.length ){
@@ -82,6 +82,7 @@ App.Services.MemberNav=Backbone.View.extend({
                 collection.add(response.data.org);
                 //外部和内部单选
                 $("#" + _thisType +"+ .childOz").show();
+                if(already){return}
                 //菜单渲染
                 $("#" + _thisType +"+ .childOz").html(App.Services.tree(response));
                 App.Comm.initScroll(_this.$el.find(".serviceOgList"),"y");

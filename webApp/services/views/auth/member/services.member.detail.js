@@ -2,18 +2,19 @@
  * @require  /services/collections/auth/member/member.list.js
  * */
 App.Services.memberDetail=Backbone.View.extend({
-    tagName:'li',
+    tagName : 'li',
+    className : 'choose',
 
     template:_.templateUrl("/services/tpls/auth/member/services.member.detail.html"),
     events:{
         "click .pers":"modify",
-        "click .memCheck":"choose",
+        "click .sele":"choose",
         "click .name":"loadMenu"
     },
 
     render:function(){
         this.$el.html(this.template(this.model.toJSON()));
-        this.delegateEvents();
+        //this.delegateEvents();
         return this;
     },
 
@@ -21,7 +22,6 @@ App.Services.memberDetail=Backbone.View.extend({
         this.model.set({"checked":false});//预设选择状态
         this.listenTo(this.model, 'change:checked', this.render);
         this.listenTo(this.model, 'change:role', this.render);
-
     },
 
     //查找当前元素
@@ -36,8 +36,16 @@ App.Services.memberDetail=Backbone.View.extend({
         });
         return parent
     },
+    cancelBubble:function(event){
+        if(event.stopPropagation){
+            event.stopPropagation();
+        }else{
+            window.cancelBubble = true;
+        }
+    },
 
-    loadMenu:function(){
+    loadMenu:function(e){
+        this.cancelBubble(e);
         if(this.model.get("userId")){return}//用户，可能需要另行处理
         var findSelf = this.findSelf(),
             _thisType = App.Services.MemberType,
@@ -88,7 +96,8 @@ App.Services.memberDetail=Backbone.View.extend({
     },
 
     //单个修改
-    modify:function(){
+    modify:function(e){
+        this.cancelBubble(e);
         var _this =this,disable,selected;
         $(".serviceBody .content").addClass("services_loading");
         var frame = new App.Services.MemberWindowIndex().render().el;//外框
@@ -141,35 +150,6 @@ App.Services.memberDetail=Backbone.View.extend({
         });
         return n;
     },
-
-
-
-    //加载父项数据
-   /* getData:function(parent){
-        var _this =this,type =  App.Services.MemberType || "inner";
-        var datas  ={
-            URLtype:"fetchServicesOzRoleList",
-            data:{
-                orgId:parent.data("id"),
-                outer:!(type == "inner")
-            },
-            type:"GET"
-        };
-        App.Comm.ajax(datas,function(response){
-            if(response.message=="success"){
-                $("#dataLoading").hide();
-                var role = _this.model.get("role");
-                if(!response.data.length){$(".seWinBody .memRoleList ul").append("<li>没有相关数据!</li>");}
-                App.Services.Member.SubRoleCollection.reset();
-                _.each(response.data,function(item){
-                    App.Services.Member.SubRoleCollection.add(item);
-                });
-                if(role && role.length) {
-                    _this.selected(role);
-                }
-            }
-        });
-    },*/
 
     //保存数据到全局变量
     save:function(){
