@@ -70,7 +70,7 @@ App.Console = {
     var tpl = _.templateUrl('/console1/tpls/fam/fam.html', true);
     $("#contains").html(tpl);
     $.ajax({
-      url: "platform/project?type=2&versionStatus=9"
+      url: "platform/project?type=2&versionStatus=9&pageItemCount=100000"
     }).done(function(data){
 
       var items = data.data.items, str = '';
@@ -186,7 +186,7 @@ App.Console = {
     var tpl = _.templateUrl('/console1/tpls/standardModel/standardmodel.html', true);
     $("#contains").html(tpl);
     $.ajax({
-      url: "platform/project?type=1"
+      url: "platform/project?type=1&pageItemCount=100000"
     }).done(function(data){
 
       var items = data.data.items, str = '';
@@ -657,7 +657,7 @@ App.Console = {
         //type:$('#s12').val().trim(),
 
       };
-      App.Console.apply(1,"BIM", data,2);
+      App.Console.apply(1,1001, data,2);
 
 
     });
@@ -671,7 +671,7 @@ App.Console = {
         //type:$('#s22').val().trim()
 
       };
-      App.Console.apply(2,"BIM", data,2);
+      App.Console.apply(2,1003, data,2);
 
     });
 
@@ -680,7 +680,7 @@ App.Console = {
     var tpl = _.templateUrl('/console1/tpls/projectChange/projectchange.html', true);
     $("#contains").html(tpl);
     $.ajax({
-      url: "platform/project?type=3"
+      url: "platform/project?type=3&pageItemCount=100000"
     }).done(function(data){
 
       var items = data.data.items, str = '';
