@@ -17,20 +17,59 @@ App.Project.ProjectQualityProperty = Backbone.View.extend({
 	render: function() {
 
 		this.$el.html(this.template);
+
+
+
+		if (App.AuthObj.project && App.AuthObj.project.quality) {
+
+			var Auth = App.AuthObj.project.quality,
+				$projectNav = this.$(".projectQualityNav"),
+				CostTpl = App.Comm.AuthConfig.Project.QualityTab,
+				$container = this.$(".qualityContainer"); 
+
+			//材料设备
+			if (Auth.material) {
+				$projectNav.append(CostTpl.material);
+				$container.append(new App.Project.QualityMaterialEquipment().render({
+					MaterialEquipmentOptions: this.MaterialEquipmentOptions
+				}).el);
+			}
+
+			//过程验收
+			if (Auth.processAcceptanc) {
+				$projectNav.append(CostTpl.processAcceptanc);
+				$container.append(new App.Project.QualityProcessAcceptance().render({
+					ProcessAcceptance: this.ProcessAcceptanceOptions
+				}).el);
+			}
+
+			//开业验收
+			if (Auth.openAcceptance) {
+				$projectNav.append(CostTpl.openAcceptance);
+				$container.append(new App.Project.QualityOpeningAcceptance().render({
+					OpeningAcceptance: this.OpeningAcceptanceOptions
+				}).el);
+			} 
+
+			//隐患
+			if (Auth.latentDanger) {
+				$projectNav.append(CostTpl.latentDanger);
+				$container.append(new App.Project.QualityConcerns().render({
+					Concerns: this.ConcernsOptions
+				}).el);
+			}
+
+			//属性
+			if (Auth.prop) {
+				$projectNav.append(CostTpl.prop);
+				$container.append(new App.Project.QualityProperties().render().el);
+			}
+		}
+
+
+
 		this.initOptions();
-		this.$el.find(".qualityContainer").append(new App.Project.QualityMaterialEquipment().render({
-			MaterialEquipmentOptions: this.MaterialEquipmentOptions
-		}).el);
-		this.$el.find(".qualityContainer").append(new App.Project.QualityProcessAcceptance().render({
-			ProcessAcceptance: this.ProcessAcceptanceOptions
-		}).el);
-		this.$el.find(".qualityContainer").append(new App.Project.QualityOpeningAcceptance().render({
-			OpeningAcceptance: this.OpeningAcceptanceOptions
-		}).el);
-		this.$el.find(".qualityContainer").append(new App.Project.QualityConcerns().render({
-			Concerns: this.ConcernsOptions
-		}).el);
-		this.$el.find(".qualityContainer").append(new App.Project.QualityProperties().render().el);
+
 
 		return this;
 	},
@@ -77,7 +116,7 @@ App.Project.ProjectQualityProperty = Backbone.View.extend({
 		} else if (type == "concerns") {
 			//隐患
 
-			var $QualityConcerns= this.$el.find(".QualityConcerns");
+			var $QualityConcerns = this.$el.find(".QualityConcerns");
 
 			$QualityConcerns.show().siblings().hide();
 
@@ -91,11 +130,11 @@ App.Project.ProjectQualityProperty = Backbone.View.extend({
 			this.$el.find(".QualityProperties").show().siblings().hide();
 		}
 
-		if (type !== "poperties") { 
+		if (type !== "poperties") {
 			if (isLoadData) {
 				this.getData(1);
 			}
-			 
+
 		} else {
 			App.Project.renderProperty();
 		}

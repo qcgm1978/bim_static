@@ -13,10 +13,41 @@ App.Project.ProjectCostProperty = Backbone.View.extend({
 	render: function() {
 
 		this.$el.html(this.template);
-		this.$el.find(".planContainer").append(new App.Project.CostReference().render().el);
-		this.$el.find(".planContainer").append(new App.Project.CostVerification().render().el);
-		this.$el.find(".planContainer").append(new App.Project.CostChange().render().el);
-		this.$el.find(".planContainer").append(new App.Project.CostProperties().render().el);
+
+		 
+		if (App.AuthObj.project && App.AuthObj.project.cost) {
+
+			var AuthCost = App.AuthObj.project.cost,
+				$projectCostNav = this.$(".projectCostNav"),
+				CostTpl = App.Comm.AuthConfig.Project.CostTab,
+				$planContainer = this.$(".planContainer");
+
+
+			//清单
+			if (AuthCost.list) {
+				$projectCostNav.append(CostTpl.list);
+				$planContainer.append(new App.Project.CostReference().render().el);
+			}
+
+			//变更
+			if (AuthCost.change) {
+				$projectCostNav.append(CostTpl.change);
+				$planContainer.append(new App.Project.CostVerification().render().el);
+			}
+
+			//校验
+			if (AuthCost.proof) {
+				$projectCostNav.append(CostTpl.proof);
+				$planContainer.append(new App.Project.CostChange().render().el);
+			}
+
+			//属性
+			if (AuthCost.prop) {
+				$projectCostNav.append(CostTpl.prop);
+				$planContainer.append(new App.Project.CostProperties().render().el);
+			}
+
+		}
 
 		return this;
 	},
@@ -38,9 +69,11 @@ App.Project.ProjectCostProperty = Backbone.View.extend({
 				App.Project.CostAttr.ReferenceCollection.reset();
 				App.Project.CostAttr.ReferenceCollection.projectId = App.Project.Settings.projectId;
 				App.Project.CostAttr.ReferenceCollection.projectVersionId = App.Project.Settings.CurrentVersion.id;
-				App.Project.CostAttr.ReferenceCollection.fetch({success:function(){
-					//this.$(".tbBodyScroll .tbBodyContent li:visible:odd").addClass("odd");
-				}});
+				App.Project.CostAttr.ReferenceCollection.fetch({
+					success: function() {
+						//this.$(".tbBodyScroll .tbBodyContent li:visible:odd").addClass("odd");
+					}
+				});
 			}
 
 		} else if (type == "change") {
@@ -62,13 +95,13 @@ App.Project.ProjectCostProperty = Backbone.View.extend({
 		} else if (type == "verification") {
 			//检查
 
-			var $CostVerification=this.$el.find(".CostVerification");
+			var $CostVerification = this.$el.find(".CostVerification");
 
 			$CostVerification.show().siblings().hide();
 
 			if ($CostVerification.find(".noLoading").length > 0) {
 				this.loadVerificationCollection();
-			}  
+			}
 
 		} else if (type == "poperties") {
 			//属性

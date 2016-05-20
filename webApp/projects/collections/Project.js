@@ -2,38 +2,34 @@ App.Project = {
 
 	//默认参数
 	Defaults: {
-		type:"user",
-		designTab: '<li data-type="design" class="item design">设计<i class="line"></i></li>',
-		planTab: '<li data-type="plan" class="item plan">计划<i class="line"></i></li>',
-		costTab: '<li data-type="cost" class="item cost">成本<i class="line"></i></li>',
-		qualityTab: '<li data-type="quality" class="item quality">质量<i class="line"></i></li>',
+		type: "user",
 		loadingTpl: '<td colspan="10" class="loadingTd">正在加载，请稍候……</td>',
 		fetchNavType: 'file', // 默认加载的类型
 		projectNav: "", //项目导航 计划 成本 设计 质量
 		property: "poperties", // 项目导航 下的 tab  如：检查 属性
 		fileId: "",
 		projectId: "", //项目id
-		versionId:"",	//版本id
+		versionId: "", //版本id
 		attrView: null,
 		CurrentVersion: null, //当前版本信息
 		DataModel: null //渲染模型的数据
-	},  
+	},
 
 	//空页面
-	NullPage:{
-		designVerification:'<div class="nullPage concerns"><i class="bg"></i>暂无隐患</div>',//设计检查 质量 隐患
-		planModel:'<div class="nullPage noPlan"><i class="bg"></i>暂无计划节点</div>', //计划 模块化 模拟
-		planPublicity:'<div class="nullPage publicity"><i class="bg"></i>暂无内容</div>', //计划 关注
-		costList:'<div class="nullPage costList"><i class="bg"></i>暂无清单项</div>', //成本 清单
-		costChange:'<div class="nullPage costChange"><i class="bg"></i>暂无变更单</div>', //成本 变更
-		planVerification:'<div class="nullPage planVerification"><i class="bg"></i> <div>您还没有关联校验</div>  <span>点此进行关联校验</span> </div>', //计划成本 关联校验
+	NullPage: {
+		designVerification: '<div class="nullPage concerns"><i class="bg"></i>暂无隐患</div>', //设计检查 质量 隐患
+		planModel: '<div class="nullPage noPlan"><i class="bg"></i>暂无计划节点</div>', //计划 模块化 模拟
+		planPublicity: '<div class="nullPage publicity"><i class="bg"></i>暂无内容</div>', //计划 关注
+		costList: '<div class="nullPage costList"><i class="bg"></i>暂无清单项</div>', //成本 清单
+		costChange: '<div class="nullPage costChange"><i class="bg"></i>暂无变更单</div>', //成本 变更
+		planVerification: '<div class="nullPage planVerification"><i class="bg"></i> <div>您还没有关联校验</div>  <span>点此进行关联校验</span> </div>', //计划成本 关联校验
 	},
 
 	//客户化数据映射字典
-	mapData:{
-		organizationTypeId:['','质监','第三方','项目公司','监理单位'],
-		status:['','待整改','已整改','已关闭'],
-		statusColor:['','#FF2500','#FFAD25','#00A648']
+	mapData: {
+		organizationTypeId: ['', '质监', '第三方', '项目公司', '监理单位'],
+		status: ['', '待整改', '已整改', '已关闭'],
+		statusColor: ['', '#FF2500', '#FFAD25', '#00A648']
 	},
 
 	// 文件 容器
@@ -79,13 +75,13 @@ App.Project = {
 			URLtype: "fetchProjectDetail",
 			data: {
 				projectId: App.Project.Settings.projectId,
-				versionId:App.Project.Settings.versionId
+				versionId: App.Project.Settings.versionId
 			}
 		};
 
 		App.Comm.ajax(data, function(data) {
-			if (data.code == 0) { 
-				
+			if (data.code == 0) {
+
 				data = data.data;
 				App.Project.Settings.projectName = data.projectName;
 				App.Project.Settings.CurrentVersion = data;
@@ -231,7 +227,7 @@ App.Project = {
 		this.setPropertyByAuth();
 
 		//api 页面 默认加载模型
-		if (App.Project.Settings.type=="token") {
+		if (App.Project.Settings.type == "token") {
 			$(".breadcrumbNav .fileModelNav li:last").click();
 		}
 
@@ -241,37 +237,41 @@ App.Project = {
 	//设置 可以查看的属性
 	setPropertyByAuth: function() {
 
-		var Autharr = App.Global.User.function,
-			$projectTab = $(".projectContainerApp .projectHeader .projectTab"),
-			AuthObj = {};
+		var projectAuth = App.AuthObj.project;
 
-		//遍历权限
-		$.each(Autharr, function(i, item) {
-			AuthObj[item.code] = true;
-		});
+		if (projectAuth) {
 
+			var ProjectTab = App.Comm.AuthConfig.Project,
+				$projectTab = $(".projectContainerApp .projectHeader .projectTab");
 
-		//设计
-		if (AuthObj.design) {
-			$projectTab.append(App.Project.Settings.designTab);
+			//设计
+			if (projectAuth.design) {
+				$projectTab.append(ProjectTab.DesignTab.tab);
+			}
+
+			//计划
+			if (projectAuth.plan) {
+				$projectTab.append(ProjectTab.PlanTab.tab);
+			}
+
+			//成本
+			if (projectAuth.cost) {
+				$projectTab.append(ProjectTab.CostTab.tab);
+			}
+
+			//质量
+			if (projectAuth.quality) {
+				$projectTab.append(ProjectTab.QualityTab.tab);
+			}
+
+			$projectTab.find(".item:last").addClass('last');
+
+			// if (!App.AuthObj.project || !App.AuthObj.project.list) {
+				
+			// }
 		}
 
-		//计划
-		if (AuthObj.plan) {
-			$projectTab.append(App.Project.Settings.planTab);
-		}
 
-		//成本
-		if (AuthObj.cost) {
-			$projectTab.append(App.Project.Settings.costTab);
-		}
-
-		//质量
-		if (AuthObj.quality) {
-			$projectTab.append(App.Project.Settings.qualityTab);
-		}
-
-		$projectTab.find(".item:last").addClass('last');
 	},
 
 	//初始化滚动条
@@ -423,8 +423,8 @@ App.Project = {
 		}
 
 
-		var $slideBar= $("#projectContainer .rightProperty .slideBar");
-		if ($slideBar.find(".icon-caret-left").length>0) {
+		var $slideBar = $("#projectContainer .rightProperty .slideBar");
+		if ($slideBar.find(".icon-caret-left").length > 0) {
 			$slideBar.click();
 		}
 
@@ -471,7 +471,7 @@ App.Project = {
 			}
 			data.iconType = 1;
 
-			if ((data.data||[]).length > 0) {
+			if ((data.data || []).length > 0) {
 				var navHtml = new App.Comm.TreeViewMar(data);
 				$("#projectContainer .projectNavFileContainer").html(navHtml);
 			} else {
@@ -826,7 +826,6 @@ App.Project = {
 		App.Project.Settings.Viewer.selectIds(Ids);
 		App.Project.Settings.Viewer.zoomBox(boxArr);
 	}
-
 
 
 
