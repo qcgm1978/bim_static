@@ -50,6 +50,9 @@ App.Services.AuthNav = Backbone.View.extend({
 		App.Services.role.init(function(){$("#blendList").removeClass("services_loading");});
 	},
 	keyUser : function(){
+		if(location.port==81){
+			App.API.Settings.hostname="http://bim.wanda-dev.cn:81/";
+		}
 		$(".serviceBody").empty();
 		this.breadCrumb(this.$el.find(".keyUser"));
 		App.Services.KeyUser.init();

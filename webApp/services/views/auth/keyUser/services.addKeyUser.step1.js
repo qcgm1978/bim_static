@@ -21,7 +21,7 @@ App.Services.step1 = Backbone.View.extend({
     }
     //准备Collection的MODELS
     var datas={
-      direction : App.Services.KeyUser.Step1.toJSON() || [],
+      direction : App.Services.KeyUser.Step1.toJSON() || []
 
     };
     this.$el.html(this.template(datas));

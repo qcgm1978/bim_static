@@ -30,7 +30,7 @@ App.Services.step2 = Backbone.View.extend({
       };
       this.$el.html(this.template(datas));
     }
-    $(".serviceWindow .keyU > div").css({height:"260px"});
+    //$(".serviceWindow .keyU > div").css({height:"260px"});
     $('.partition').show();
     return this;
   },
@@ -40,18 +40,14 @@ App.Services.step2 = Backbone.View.extend({
     this.listenTo(App.Services.KeyUser.Step2,'add',this.render)
   },
 
-  //打开或关闭目录
+  //选定项目
   changeStatus:function(e){
-      var $li;
-      //选定项目
-      if($(e.target).parent().hasClass('project')){
-        $li = $(e.target).parent();
-      }else{
-        $li = $(e.target).parent().parent();
-      }
+    if(App.Services.KeyUser.mode==3){
+      return ''
+    }
+      var $li=$(e.currentTarget);
+
       $li.toggleClass('selected-proj');
-
-
 
   }
 });

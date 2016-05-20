@@ -3,7 +3,7 @@ var familyModel = function(options){
   self._opt = options;
   self.model = null;
   self.init();
-  self.model = self.render()
+  self.model = self.render();
   return self.model;
 }
 familyModel.prototype = {

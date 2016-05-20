@@ -41,17 +41,20 @@ App.Project.DesignCollisionDetail=Backbone.View.extend({
 
   setCollisionPoint:function(event){
     var that = $(event.target).closest("tr"),
+        flag = that.is('.selected'),
         name = that.find(".ckName").text();
-    $.each(this.list,function(index,item){
-      if(item.name == name){
-        var ids=[item.leftId,item.rightId],
-            box=[item.leftElementBoxMin,item.leftElementBoxMax,item.rightElementBoxMin,item.rightElementBoxMax];
-        App.Project.Settings.Viewer.selectIds(ids);
-        App.Project.Settings.Viewer.setGlobalTransparent(true);
-        $(".bar-opacity").addClass('selected');
-        App.Project.Settings.Viewer.zoomBox(box);
-      }
-    });
+    if(flag){
+      App.Project.Settings.Viewer.collision("","");
+    }else{
+      $.each(this.list,function(index,item){
+        if(item.name == name){
+          var box=[item.leftElementBoxMin,item.leftElementBoxMax,item.rightElementBoxMin,item.rightElementBoxMax];
+          App.Project.Settings.Viewer.collision(item.leftId,item.rightId);
+          App.Project.Settings.Viewer.translucent(true);
+          App.Project.Settings.Viewer.zoomToBox(box);
+        }
+      });
+    }
     that.toggleClass("selected").siblings().removeClass("selected");
   },
 
