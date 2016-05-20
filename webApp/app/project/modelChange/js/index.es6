@@ -315,20 +315,20 @@ App.Project.Model = {
 		},
 		select: function() {
 			var that = $(event.target).closest(".tree-text");
-			var current = $(".rightTreeView .current");
-			var elementId = that.data('id');
-			var baseId = that.data('base');
-			var curElementId = current.data('id');
-			var curBaseId = current.data('base');
-			if (that.prev('.noneSwitch').length > 0) {
-				App.Index.Settings.Viewer.unSelected();
-				if (current[0] != that[0]) {
-					current.removeClass('current');
-					App.Index.Settings.Viewer.selectIds([elementId, baseId]);
-				}
-				that.toggleClass('current');
-				App.Index.Settings.Viewer.fit();
-			}
+			var parent = $(".rightTreeView");
+      var elementId = that.data('id');
+      var baseId = that.data('base');
+      if (that.prev('.noneSwitch').length > 0) {
+        if (that.is('.current')) {
+          that.removeClass('current');
+          App.Index.Settings.Viewer.highlight({type:"userId",ids:[]});
+        }else{
+        	parent.find('.current').removeClass('current');
+          that.addClass('current');
+          App.Index.Settings.Viewer.highlight({type:"userId",ids:[elementId,baseId]});
+        }
+        App.Index.Settings.Viewer.fit();
+      }
 		}
 	})
 }

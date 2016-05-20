@@ -3,7 +3,7 @@
     <div class="left">
             <i class="memCheck"></i>
             <span class="ushead<%= obj.orgId ? ' oz' : '' %>"><img src="<%= obj.photoUrl %>" width="100%"></span>
-            <span><%= obj.name %></span>
+            <span class="name"><%= obj.name %></span>
     </div>
     <div class="roles">
         <% if(obj.role && obj.role.length) { for(var i  =0 ; i< obj.role.length;i++){ if( i > 4) {return}%>

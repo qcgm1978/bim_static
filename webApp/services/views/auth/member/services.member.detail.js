@@ -7,7 +7,8 @@ App.Services.memberDetail=Backbone.View.extend({
     template:_.templateUrl("/services/tpls/auth/member/services.member.detail.html"),
     events:{
         "click .pers":"modify",
-        "click .left":"choose"
+        "click .memCheck":"choose",
+        "click .name":"loadMenu"
     },
 
     render:function(){
@@ -21,6 +22,69 @@ App.Services.memberDetail=Backbone.View.extend({
         this.listenTo(this.model, 'change:checked', this.render);
         this.listenTo(this.model, 'change:role', this.render);
 
+    },
+
+    //查找当前元素
+    findSelf:function() {
+        var _this =this;
+        var parent = '';
+        _.each($(".ozName"),function (item) {
+            var id = $(item).data("id");
+            if (id == _this.model.get("orgId")) {
+                parent = $(item).parent("div").parent("li");
+            }
+        });
+        return parent
+    },
+
+    loadMenu:function(){
+        if(this.model.get("userId")){return}//用户，可能需要另行处理
+        var findSelf = this.findSelf(),
+            _thisType = App.Services.MemberType,
+            _thisId = App.Services.memFatherId =  this.model.get("orgId"),
+            collection = App.Services.Member[_thisType + "Collection"];
+        //样式操作
+        $(".serviceOgList span").removeClass("active");
+        findSelf.find(".ozName > span").addClass("active"); //this偏差导致选择不正确
+        $("#blendList").empty();
+        $(".serviceBody .content").addClass("services_loading");
+        var cdata = {
+            URLtype: "fetchServicesMemberList",
+            type:"GET",
+            data:{
+                parentId:_thisId,
+                outer:  !(_thisType == "inner"),
+                includeUsers:true
+            }
+        };
+        //此处为延迟
+        App.Comm.ajax(cdata,function(response){
+            var alreadyCon,alreadyMenu = findSelf.find(".childOz");//已加载菜单将不再加载
+
+            $(".serviceBody .content").removeClass("services_loading");
+            if(!response.data.org.length && !response.data.user.length ){
+                $("#blendList").html("<li><span class='sele'>暂无数据</span></li>");
+                return
+            }
+            collection.reset();
+            if(response.data.user && response.data.user.length){
+                collection.add(response.data.user);
+            }
+            if(!response.data.org.length){
+                if(!alreadyMenu.hasClass("alreadyGet")){
+                    alreadyMenu.addClass("alreadyGet");
+                }
+            }
+            if (response.data.org && response.data.org.length) {
+                collection.add(response.data.org);
+                //菜单渲染
+                alreadyCon =  alreadyMenu.html();
+                if(alreadyCon || alreadyMenu.hasClass("alreadyGet")){return;}
+                alreadyMenu.html(App.Services.tree(response));
+            }
+        }).done(function(){
+            App.Services.queue.next();
+        });
     },
 
     //单个修改
@@ -77,6 +141,8 @@ App.Services.memberDetail=Backbone.View.extend({
         });
         return n;
     },
+
+
 
     //加载父项数据
    /* getData:function(parent){

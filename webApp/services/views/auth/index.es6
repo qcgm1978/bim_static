@@ -22,7 +22,7 @@ App.Services.Auth = Backbone.View.extend({
 		this.render();
 		App.Services.Member.loadData(App.Services.Member.innerCollection,{},function(response){
 			$("#inner span").addClass("active");
-			$("#inner").siblings(".childOz").html(App.Services.tree(response));
+			$("#inner").addClass("active").siblings(".childOz").html(App.Services.tree(response));
 			$("#blendList").removeClass("services_loading");
 		});
 	}
