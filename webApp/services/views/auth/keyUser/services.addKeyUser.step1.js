@@ -21,7 +21,7 @@ App.Services.step1 = Backbone.View.extend({
     }
     //准备Collection的MODELS
     var datas={
-      direction : App.Services.KeyUser.Step1.toJSON() || [],
+      direction : App.Services.KeyUser.Step1.toJSON() || []
 
     };
     this.$el.html(this.template(datas));
@@ -65,8 +65,10 @@ App.Services.step1 = Backbone.View.extend({
 
           if(canLoad=='true'){
             $ul.removeClass('shut').addClass('open');
+            $('#dataLoading').show();
 
             App.Comm.ajax({URLtype:'fetchServicesMemberInnerList',data:{parentId:orgId,includeUsers:true}},function(r){
+              $('#dataLoading').hide();
 
               if(r && !r.code && r.data){
                 var str = '';

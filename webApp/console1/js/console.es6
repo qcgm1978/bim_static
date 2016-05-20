@@ -70,7 +70,7 @@ App.Console = {
     var tpl = _.templateUrl('/console1/tpls/fam/fam.html', true);
     $("#contains").html(tpl);
     $.ajax({
-      url: "platform/project?type=2&versionStatus=9"
+      url: "platform/project?type=2&versionStatus=9&pageItemCount=100000"
     }).done(function(data){
 
       var items = data.data.items, str = '';
@@ -186,21 +186,21 @@ App.Console = {
     var tpl = _.templateUrl('/console1/tpls/standardModel/standardmodel.html', true);
     $("#contains").html(tpl);
     $.ajax({
-      url: "platform/project?type=1"
+      url: "platform/project?type=1&pageItemCount=100000"
     }).done(function(data){
 
       var items = data.data.items, str = '';
 
       $.each(items, function(i, item){
-        if(item.version){
-          str += '<option versionid="' + item.version.id + '" value="' + item.projectNo + '">' + item.name + '</option>';
+        if(item.id){
+          str += '<option id="' + item.id + '" value="' + item.projectNo + '">' + item.name + '</option>';
         }
 
       });
 
-      $("#s11").html(str).change(function(){
+      $("#s11").html("<option value=null>请选择</option>"+str).change(function(){
         $.ajax({
-          url: "platform/project/" + $(this).val() + "/version"
+          url: "platform/project/" + $(this).find('option:selected').attr('id') + "/version"
         }).done(function(data){
 
           var items = data.data, str = '';
@@ -212,7 +212,7 @@ App.Console = {
             }
 
           });
-          $("#p14").append(str);
+          $("#p14").html(str);
 
         });
       });
@@ -225,9 +225,7 @@ App.Console = {
     //获取标准模型发布表单
     App.Console.auditSheet1(6, "#s51", 8);
 
-    $('#s11').change(function(){
-      $("#p14").val($(this).children('option:selected').attr("versionid"));
-    });
+
 
     $("#submit1").click(function(){
       var data = {
@@ -317,7 +315,7 @@ App.Console = {
         }
 
       });
-      $('#s11').html(str).change(function(){
+      $('#s11').html("<option value=null>请选择</option>"+str).change(function(){
         $("#p13").val($(this).children('option:selected').attr("versionid"));
       });
 
@@ -659,7 +657,7 @@ App.Console = {
         //type:$('#s12').val().trim(),
 
       };
-      App.Console.apply(1,"BIM", data,2);
+      App.Console.apply(1,1001, data,2);
 
 
     });
@@ -673,7 +671,7 @@ App.Console = {
         //type:$('#s22').val().trim()
 
       };
-      App.Console.apply(2,"BIM", data,2);
+      App.Console.apply(2,1003, data,2);
 
     });
 
@@ -682,21 +680,21 @@ App.Console = {
     var tpl = _.templateUrl('/console1/tpls/projectChange/projectchange.html', true);
     $("#contains").html(tpl);
     $.ajax({
-      url: "platform/project?type=3"
+      url: "platform/project?type=3&pageItemCount=100000"
     }).done(function(data){
 
       var items = data.data.items, str = '';
 
       $.each(items, function(i, item){
-        if(item.version){
+        if(item.id){
 
-          str += '<option versionid="' + item.version.id + '" value="' + item.projectNo + '">' + item.name + '</option>';
+          str += '<option id="' + item.id + '" value="' + item.projectNo + '">' + item.name + '</option>';
         }
 
       });
-      $("#s11").append(str).change(function(){
+      $("#s11").html("<option value=null>请选择</option>"+str).change(function(){
         $.ajax({
-          url: "platform/project/" + $(this).val() + "/version"
+          url: "platform/project/" + $(this).find('option:selected').attr('id') + "/version"
         }).done(function(data){
 
           var items = data.data, str = '';

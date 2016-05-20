@@ -26,7 +26,30 @@ App.Services.ProjectCollection = {
 			return function(){
 				return i++;
 			}
-		}())
+		}()),
+
+		//直接监听.txtInput  change事件 根据class判断校验类型
+		//已知类型：intInput floatInput
+		dataVal(e){
+			var _$dom=$(e.currentTarget),
+				zeroReg=/^0{1,1}$/,
+				intReg=/^[1-9]\d*$/,
+				floatReg=/^[1-9]\d*\.\d*|0\.\d*[1-9]\d*$/,
+				val=_$dom.val(),
+				r=false;
+			if(_$dom.hasClass('floatInput')){
+				r=zeroReg.test(val)||intReg.test(val)||floatReg.test(val);
+			}else if(_$dom.hasClass('intInput')){
+				r=zeroReg.test(val)||intReg.test(val);
+			}else{
+				return 
+			}
+			if(r){
+				_$dom.removeClass('errorInput');
+			}else{
+				_$dom.addClass('errorInput');
+			}
+		}
 	},
 
 	
