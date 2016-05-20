@@ -38,13 +38,13 @@
       isSelected ? self.el._dom.sidebar.addClass('open') : self.el._dom.sidebar.removeClass('open');
       self.el._dom.sidebar.find('#filter').show().siblings().hide();
       if(!self.sceneStatue){
+        self.sceneStatue = true;
         bimView.comm.ajax({
           type:'get',
           url:bimView.API.fetchScene,
           etag:self._opt.etag,
           sourceId:self._opt.sourceId
         },function(data){
-          self.sceneStatue = true;
           var data = data.data;
           var floors = self.viewTree({
             arr:data.floors,
@@ -66,13 +66,13 @@
         });
       }
       if(!self.categoryStatue){
+        self.categoryStatue = true;
         bimView.comm.ajax({
           type:'get',
           url:bimView.API.fetchCategory,
           etag:self._opt.etag,
           sourceId:self._opt.sourceId
         },function(data){
-          self.categoryStatue = true;
           var data = data.data;
           var category = self.viewTree({
             arr:data,
@@ -87,13 +87,13 @@
         });
       }
       if(!self.classCodeStatue){
+        self.classCodeStatue = true;
         bimView.comm.ajax({
           type:'get',
           url:bimView.API.fetchCoding,
           etag:self._opt.etag,
           sourceId:self._opt.sourceId
         },function(data){
-          self.classCodeStatue = true;
           self.classCodeData = data.data;
           var classCode = self.viewTree({
             type:'classCode',

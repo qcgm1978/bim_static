@@ -175,7 +175,7 @@
     {
       id:'hideMap',
       icon:'bar-hideMap',
-      title:'漫游(Space)',
+      title:'',
       fn:'fly',
       keyCode:'',
       type:'change'
