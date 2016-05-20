@@ -4,16 +4,17 @@
 'use strict'
 ;(function($){
   bimView.sidebar = {
-    _dom:{
-      sidebar : $('<div class="modelSidebar"><div class="modelMap"><div class="map"></div></div><div class="modelFilter"><div id="filter" class="modelTab"><div class="tree"></div></div><div id="comment" class="modelTab">comment</div><div id="selected" class="modelTab">selected</div></div></div>'),
-      modelBar : $('<div class="toolsBar"></div>'),
-      mapBar:$('<div class="footBar"><div class="modelSelect"><span class="cur"></span><div class="modelList"></div></div><div class="axisGrid"></div></div>')
-    },
     init:function(options,obj){
       var self = this;
-      self._opt = options;
-      self.obj = obj;
-      var bimBox = self._opt._dom.bimBox;
+      self._dom={
+        sidebar : $('<div class="modelSidebar"><div class="modelMap"><div class="map"></div></div><div class="modelFilter"><div id="filter" class="modelTab"><div class="tree"></div></div><div id="comment" class="modelTab">comment</div><div id="selected" class="modelTab">selected</div></div></div>'),
+        modelBar : $('<div class="toolsBar"></div>'),
+        mapBar:$('<div class="footBar"><div class="modelSelect"><span class="cur"></span><div class="modelList"></div></div><div class="axisGrid"></div></div>')
+      }
+      bimView.sidebar._opt = options;
+      bimView.sidebar.obj = obj;
+      bimView.sidebar.el = self;
+      var bimBox = bimView.sidebar._opt._dom.bimBox;
       $.each(bimView.model.modelBar,function(i,item){
         var tmpHtml = $('<i class="bar-item '+item.icon+'" title="'+item.title+'" data-id="'+item.fn+'" data-type="'+item.type+'" data-group="'+item.group+'"></i>');
         item.keyCode&&bimView.comm.bindEvent.on(item.keyCode,tmpHtml);
@@ -30,12 +31,12 @@
       });
       self._dom.sidebar.find('.modelMap').prepend(self._dom.modelBar);
       bimBox.append(self._dom.sidebar);
-      self.loadMap();
+      bimView.sidebar.loadMap();
     },
     filter:function(isSelected){
       var self = this;
-      isSelected ? self._dom.sidebar.addClass('open') : self._dom.sidebar.removeClass('open');
-      self._dom.sidebar.find('#filter').show().siblings().hide();
+      isSelected ? self.el._dom.sidebar.addClass('open') : self.el._dom.sidebar.removeClass('open');
+      self.el._dom.sidebar.find('#filter').show().siblings().hide();
       if(!self.sceneStatue){
         bimView.comm.ajax({
           type:'get',
@@ -104,13 +105,13 @@
     },
     comment:function(isSelected){
       var self = this;
-      isSelected ? self._dom.sidebar.addClass('open') : self._dom.sidebar.removeClass('open');
-      self._dom.sidebar.find('#comment').show().siblings().hide();
+      isSelected ? self.el._dom.sidebar.addClass('open') : self.el._dom.sidebar.removeClass('open');
+      self.el._dom.sidebar.find('#comment').show().siblings().hide();
     },
     selected:function(isSelected){
       var self = this;
-      isSelected ? self._dom.sidebar.addClass('open') : self._dom.sidebar.removeClass('open');
-      self._dom.sidebar.find('#selected').show().siblings().hide();
+      isSelected ? self.el._dom.sidebar.addClass('open') : self.el._dom.sidebar.removeClass('open');
+      self.el._dom.sidebar.find('#selected').show().siblings().hide();
     },
     more:function(viewer){
       var status = viewer.getTranslucentStatus();
@@ -155,16 +156,16 @@
         }
       });
       function renderMap(){
-        var floorSelect = self._dom.mapBar.find('.modelList');
+        var floorSelect = self.el._dom.mapBar.find('.modelList');
         $.each(floorsData,function(i,item){
           item.Path=  bimView.API.baseUrl + "/model"+item.path;
           item.BoundingBox = item.boundingBox;
           var tmp = $('<li class="modelItem" data-type="miniMap"></li>').text(item.name).data(item);
           floorSelect.append(tmp);
         });
-        self.obj.initMap('miniMap',self._dom.sidebar.find('.map'),axisGridData);
-        self._dom.sidebar.find('.modelMap').append(self._dom.mapBar);
-        self._dom.sidebar.find(".modelItem:eq(0)").trigger('click');
+        self.obj.initMap('miniMap',self.el._dom.sidebar.find('.map'),axisGridData);
+        self.el._dom.sidebar.find('.modelMap').append(self.el._dom.mapBar);
+        self.el._dom.sidebar.find(".modelItem:eq(0)").trigger('click');
       }
     },
     viewTree:function(options){

@@ -123,7 +123,7 @@
             break;
           case "change":
             $this.toggleClass('bar-hideMap bar-showMap')
-            $(bimView.sidebar._dom.sidebar).toggleClass("hideMap");
+            $(bimView.sidebar.el._dom.sidebar).toggleClass("hideMap");
         }
       }).on('click','.modelSelect .cur',function(){
         // 点击下拉
@@ -197,7 +197,7 @@
         self.resize();
       });
       self.on('changeGrid',function(res){
-        bimView.sidebar._dom.mapBar.find(".axisGrid").text(res.axis.offsetX+","+res.axis.offsetY+","+res.axis.offsetZ)
+        bimView.sidebar.el._dom.mapBar.find(".axisGrid").text(res.axis.offsetX+","+res.axis.offsetY+","+res.axis.offsetZ)
       })
     },
     // 以下是对模型操作
@@ -219,6 +219,7 @@
     zoom:function () {
       // 缩放模式
       var self = this;
+      self._dom.bimBox.attr('class','bim zoom');
       self.pub('zoom');
       self.viewer.setZoomMode();
     },
@@ -232,12 +233,14 @@
     fly : function () {
       // 漫游模式
       var self = this;
+      self._dom.bimBox.attr('class','bim fly');
       self.pub('fly');
       self.viewer.setFlyMode();
     },
     picker:function(){
       // 普通模式
       var self = this;
+      self._dom.bimBox.attr('class','bim');
       self.pub('picker');
       self.viewer.setPickMode();
     },
@@ -285,29 +288,45 @@
     },
     // 批注
     comment:function(){
-      // 进入添加检查点模式
+      // 进入批注模式
       var self = this;
       var viewer = self.viewer;
-      viewer.setcommentMode();
-      viewer.editcommentBegin();
+      self._dom.bimBox.attr('class','bim comment');
+      viewer.setCommentMode();
+      viewer.editCommentBegin();
     },
     commentEnd : function() {
-      // 退出检查点模式
+      // 退出批注模式
       var self = this;
       var viewer = self.viewer;
-      viewer.editcommentEnd();
+      viewer.editCommentEnd();
+    },
+    setCommentType:function(type){
+      var self = this;
+      var viewer = self.viewer;
+      viewer.setCommentType(type);
     },
     saveComment : function() {
-      // 保存检查点
+      // 保存批注
       var self = this;
       var viewer = self.viewer;
-      return viewer.getCommentInfoList();
+      var list = viewer.getCommentInfoList();
+      var newList = [];
+      $.each(list,function(i,item){
+        newList.push(window.btoa(JSON.stringify(item)));
+      });
+      return newList;
     },
     loadComment:function(list){
-      // 加载检查点
+      // 加载批注
       var self = this;
       var viewer = self.viewer;
-      viewer.loadComment(list);
+      var newList = [];
+      $.each(list,function(i,item){
+        newList.push(JSON.parse(window.atob(item)));
+      });
+      viewer.setCommentMode();
+      viewer.loadComments(newList);
     },
     // 模型过滤器
     filter:function(obj){

@@ -8,7 +8,7 @@
       var self = this;
       var _opt = options;
       var viewer = new self.BIM(_opt);
-      bimView.sidebar.init(_opt,obj);
+      new bimView.sidebar.init(_opt,obj);
       return viewer;
     },
     singleModel:function(options){
