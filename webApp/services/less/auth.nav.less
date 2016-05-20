@@ -50,7 +50,7 @@ ul,li{list-style: none outside none;}
 #blendList{overflow: visible;}
 #blendList li:hover .pers{display: block;}
 #blendList li .left{float: left;width: 300px;.ellipsis;}
-
+#blendList .sele .left .name{cursor: pointer;}
 #ozList{overflow: visible;}
 
 .serviceBody .content li .pers:before{content: '';position: absolute;width: 16px;height: 16px;left: 0;top: 16px;background: url('../images/service_ico.png') 0 -140px no-repeat;}
@@ -69,7 +69,7 @@ ul,li{list-style: none outside none;}
 
 .serviceBody .roleCtrl{height: 100%;}
 #roleList{overflow: auto;position: absolute;top: 51px;left: 0;right: 0;bottom: 0;}
-.roleCtrl li{clear: both;line-height: 50px;padding:0 22px;height: 50px;}
+.roleCtrl li{clear: both;line-height: 50px;padding:0 22px;height: 50px;border-bottom: 1px solid #cccccc;}
 .roleCtrl .roleHead{padding:0 22px;line-height: 50px;font-size: 12px;color: #a7a7a7;border-bottom: 1px solid #cccccc;}
 .roleCtrl .roleHead .newRole{position: relative;cursor: pointer;display: inline-block;line-height: 28px;height: 30px;vertical-align: middle;padding: 0 8px 0 32px;border: 1px solid #cccccc;margin-left: 24px;}
 .roleCtrl .roleHead .newRole:before{position: absolute;content:'';left: 9px;top: 7px;height: 14px;width: 14px;background: transparent url('../images/service_ico.png') 0 -220px  no-repeat;}
@@ -78,7 +78,7 @@ ul,li{list-style: none outside none;}
 .roleCtrl li:hover{background-color: #a8dbfd;}
 .roleCtrl li .roleEdit{display: none;}
 .roleCtrl li:hover .roleEdit{display: block;}
-.roleCtrl .fun span{position: relative;background-color: #ffffff;display: inline-block;padding-left: 35px;width: 78px;height: 24px; line-height: 22px;border: 1px solid #cccccc;margin-right: 10px;}
+.roleCtrl .fun span{position: relative;background-color: #ffffff;display: inline-block;white-space: nowrap;padding:0 10px 0 35px;;height: 24px; line-height: 22px;border: 1px solid #cccccc;margin-right: 10px;}
 .roleCtrl .fun span:before{position: absolute;content:'';left: 11px;top: 5px;height: 14px;width: 14px;background: transparent url('../images/service_ico.png') 0 -200px  no-repeat;}
 .roleCtrl .fun span.adm:before{background-position: 0 -160px;top: 3px;left: 9px;}
 .roleCtrl .roleEdit{float: right;}
@@ -105,7 +105,7 @@ ul,li{list-style: none outside none;}
 .seWinBody h2 span{color: #9f9f9f;}
 .seWinBody .title{font-size: 12px;color: #9f9f9f;line-height: 23px;height: 24px;padding-left: 34px;margin:  8px  20px 0 20px;border:  solid #cccccc;border-width: 1px 1px 0 1px}
 .seWinBody .title .name{width: 149px;}
-.seWinBody .name,.seWinBody .funName{float: left;width: 175px;.ellipsis;}
+.seWinBody .name,.seWinBody .funName{float: left;width: 170px;.ellipsis;margin-right: 5px;}
 .seWinBody li{padding: 0 10px;line-height: 30px;height: 30px;.ellipsis;}
 .seWinBody li:not(:last-child){border-bottom: 1px solid #cccccc;}
 .seWinBody li:first-child{border-bottom: 1px solid #cccccc;}

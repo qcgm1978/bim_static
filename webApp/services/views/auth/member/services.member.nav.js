@@ -21,15 +21,28 @@ App.Services.MemberNav=Backbone.View.extend({
     },
     //外部用户
     outer:function(){
-        var _this =this;
         App.Services.MemberType = "outer";
-        $(".serviceBody .content").addClass("services_loading");
-        App.Services.queue.promise(_this.pull,_this);
+        this.nav();
     },
     //内部用户
     inner:function(){
-        var _this =this;
         App.Services.MemberType = "inner";
+        this.nav();
+    },
+    //菜单切换
+    nav:function(){
+        var _this =this,$tab = $("#" + App.Services.MemberType),already = $tab.siblings(".childOz").html();
+        $("#ozList div").removeClass("active");
+        $("#ozList span").removeClass("active");
+        if(already){
+            if($tab.hasClass("active")){
+                $tab.removeClass("active").find("span").removeClass("active").end().siblings(".childOz").hide();
+            }else if(!$tab.hasClass("active")){
+                $(".childOz").hide();
+                $tab.siblings(".childOz").show();
+            }
+        }
+        $tab.addClass("active").find("span").addClass("active");
         $(".serviceBody .content").addClass("services_loading");
         App.Services.queue.promise(_this.pull,_this);
     },
@@ -39,14 +52,9 @@ App.Services.MemberNav=Backbone.View.extend({
             cdata,
             _this = App.Services.queue.present[0],
             collection = App.Services.Member[_thisType + "Collection"];
-
-        _this.$("div").removeClass("active");
-        $("#" + _thisType).addClass("active");
-        $(".serviceOgList span").removeClass("active");//唯一选项
-        $("#" + _thisType + " > span").addClass("active");//选中状态
+        $(".childOz").hide();
 
         $("#blendList").empty();
-
 
         cdata = {
             URLtype: "fetchServicesMemberList",
@@ -58,7 +66,6 @@ App.Services.MemberNav=Backbone.View.extend({
         };
 
         App.Comm.ajax(cdata,function(response){
-
             //样式处理
 
             $(".serviceBody .content").removeClass("services_loading");
@@ -72,10 +79,9 @@ App.Services.MemberNav=Backbone.View.extend({
                 collection.add(response.data.user);
             }
             if (response.data.org && response.data.org.length) {
-                _this.$(".childOz").empty();
                 collection.add(response.data.org);
                 //外部和内部单选
-
+                $("#" + _thisType +"+ .childOz").show();
                 //菜单渲染
                 $("#" + _thisType +"+ .childOz").html(App.Services.tree(response));
                 App.Comm.initScroll(_this.$el.find(".serviceOgList"),"y");
@@ -83,7 +89,6 @@ App.Services.MemberNav=Backbone.View.extend({
         }).done(function(){
             App.Services.queue.next();
         });
-
 
         //获取数据，将会刷新右侧视图
         /*App.Services.Member.loadData(collection,{},function(response){
