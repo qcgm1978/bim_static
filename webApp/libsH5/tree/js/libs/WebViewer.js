@@ -8737,11 +8737,6 @@ CLOUD.Raycaster.prototype = {
     intersectObjects: function (objects, recursive) {
         var intersects = [];
 
-        if (objects instanceof Array === false) {
-            console.log('CLOUD.Raycaster.intersectObjects: objects is not an Array.');
-            return intersects;
-        }
-
         for (var i = 0, l = objects.length; i < l; i++) {
             intersectObject(objects[i], this, intersects, recursive, this.filter);
         }
@@ -16930,7 +16925,8 @@ CLOUD.EditorManager = function (handleEvents) {
             scope.editor.onMouseUp(event);
         } else {
 
-            if (mouseOnDomContainer) {
+            //if (mouseOnDomContainer)
+            if (!mouseOnDomContainer) {
                 // viewHouse 交互
                 handleViewHouseEvent("up", event);
                 // 子地图交互
@@ -17146,7 +17142,7 @@ CLOUD.EditorManager.prototype = {
 
         this.commentEditor.init();
 
-        this.registerDomEventListeners(this.commentEditor.svg);
+        //this.registerDomEventListeners(this.commentEditor.svg);
 
         scope.setEditor(this.commentEditor);
     },
@@ -17771,10 +17767,6 @@ CloudViewer.prototype = {
         }
     },
 
-    setMarkerMode: function () {
-        this.editorManager.setMarkerMode(this);
-    },
-
     zoomIn: function (factor) {
         this.editorManager.zoomIn(factor, this);
     },
@@ -18086,6 +18078,10 @@ CloudViewer.prototype = {
     // ------------------ 小地图API -- E ------------------ //
 
     // ------------------ 标记 API -- S ------------------ //
+    setMarkerMode: function () {
+        this.editorManager.setMarkerMode(this);
+    },
+
     // 用于检查点、隐患点
     zoomToSelectedMarkers: function(){
         if ( this.editorManager.markerEditor && this.editorManager.editor === this.editorManager.markerEditor) {

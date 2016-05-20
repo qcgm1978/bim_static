@@ -1950,13 +1950,17 @@ CLOUD.MarkerEditor.prototype.onMouseUp = function(event) {
                         bBox = intersect.object.geometry.boundingBox;
                     }
 
+                    var worldPoint = intersect.point.clone();
+                    var inverseMatrix = scope.getInverseSceneMatrix();
+                    worldPoint.applyMatrix4(inverseMatrix);
+
                     var markerId = scope.generateMarkerId();
 
                     //console.log(markerId);
                     var marker = new CLOUD.Marker(markerId, scope);
 
                     marker.createSVGShape(shapeData, svgContainer);
-                    marker.setWorldPosition(intersect.point);
+                    marker.setWorldPosition(worldPoint);
                     marker.setWorldBoundingBox(bBox);
                     marker.setUserId(userId);
                     marker.setState(scope.markerState);
@@ -2139,13 +2143,33 @@ CLOUD.MarkerEditor.prototype.getMarkerInfoList = function() {
     return markerInfoList;
 };
 
+CLOUD.MarkerEditor.prototype.getInverseSceneMatrix = function() {
+
+    var sceneMatrix = this.scene.rootNode.matrix;
+    var inverseMatrix = new THREE.Matrix4();
+    inverseMatrix.getInverse(sceneMatrix);
+
+    return inverseMatrix;
+};
+
+CLOUD.MarkerEditor.prototype.getSceneMatrix = function() {
+
+    var sceneMatrix = this.scene.rootNode.matrix;
+
+    return sceneMatrix;
+};
+
 CLOUD.MarkerEditor.prototype.worldToClient = function(point) {
 
     var dim = CLOUD.DomUtil.getContainerOffsetToClient(this.domElement);
     var camera = this.cameraEditor.object;
     var result = new THREE.Vector3();
+    var sceneMatrix = this.getSceneMatrix();
 
-    result.set(point.x, point.y, point.z);
+    var worldPoint = point.clone();
+    worldPoint.applyMatrix4(sceneMatrix);
+
+    result.set(worldPoint.x, worldPoint.y, worldPoint.z);
     result.project(camera);
 
     //result.x =  Math.round(0.5 * (result.x + 1) * dim.width + dim.left);
@@ -2170,6 +2194,9 @@ CLOUD.MarkerEditor.prototype.clientToWorld = function(point, depth) {
     result.z = depth;
 
     result.unproject(camera);
+
+    //var inverseMatrix = this.getInverseSceneMatrix();
+    //result.applyMatrix4(inverseMatrix);
 
     return result;
 };
@@ -2358,11 +2385,11 @@ CLOUD.Extensions.Comment.prototype = {
         this.highlighted = true;
         this.updateStyle();
 
-        this.editor.setSelection(this);
+        this.editor.select(this);
     },
     unselect: function () {
         this.selected = false;
-        this.editor.setSelection(null);
+        this.editor.select(null);
     },
     highlight: function (isHighlight) {
         this.highlighted = isHighlight;
@@ -2466,7 +2493,6 @@ CLOUD.Extensions.CommentArrow.prototype.set = function (sx, sy, ex, ey) {
     this.head.set(sx, sy, 0);
     this.tail.set(ex, ey, 0);
 
-    this.updateTransformMatrix();
     this.updateStyle();
 };
 
@@ -2487,7 +2513,6 @@ CLOUD.Extensions.CommentArrow.prototype.setSize = function (width, height, posit
     this.position.y = position.y;
     this.size.x = width;
 
-    this.updateTransformMatrix();
     this.updateStyle();
 };
 
@@ -2508,7 +2533,6 @@ CLOUD.Extensions.CommentArrow.prototype.setPosition = function (x, y) {
     tail.x = x0 + dx;
     tail.y = y0 + dy;
 
-    this.updateTransformMatrix();
     this.updateStyle();
 };
 
@@ -2761,8 +2785,6 @@ CLOUD.Extensions.CommentCloud.prototype.set = function(position, width, height){
     this.size.x = width;
     this.size.y = height;
 
-    this.addToPath(position);
-
     this.updateStyle();
 };
 
@@ -2782,6 +2804,7 @@ CLOUD.Extensions.CommentCloud.prototype.updateStyle = function () {
 
    //this.updateTransformMatrix();
 
+    var shapePathStr = this.getPathString();
     var strokeWidth = this.style['stroke-width'];
     //var strokeLineJoin = this.style['stroke-linejoin'];
     var strokeColor = this.highlighted ? this.highlightColor : this.style['stroke-color'];
@@ -2795,12 +2818,17 @@ CLOUD.Extensions.CommentCloud.prototype.updateStyle = function () {
     this.shape.setAttribute('fill', fillColor);
     this.shape.setAttribute('fill-opacity', '0.0');
     //this.shape.setAttribute('stroke-linejoin', strokeLineJoin);
-    this.shape.setAttribute('d', this.getPath().join(' '));
+    this.shape.setAttribute('d', shapePathStr);
 };
 
-CLOUD.Extensions.CommentCloud.prototype.getPath = function() {
+CLOUD.Extensions.CommentCloud.prototype.setPath = function(pathStr) {
 
-    return this.shapePath;
+    this.shapePath = pathStr.split(' ');
+};
+
+CLOUD.Extensions.CommentCloud.prototype.getPathString = function() {
+
+    return this.shapePath.join(' ');
 };
 
 CLOUD.Extensions.CommentCloud.prototype.addToPath = function(point) {
@@ -2824,6 +2852,8 @@ CLOUD.Extensions.CommentCloud.prototype.addToPath = function(point) {
 
     this.lastShapePoint.x = point.x;
     this.lastShapePoint.y = point.y;
+
+    this.updateStyle();
 };
 
 // 计算控制点
@@ -3210,50 +3240,49 @@ CLOUD.Extensions.CommentEditor = function (cameraEditor, scene, domElement) {
     this.isCreating = false;
     this.isDragging = false;
 
-    this.commentType = "ARROW";
+    this.commentType = CLOUD.Extensions.Comment.shapeTypes.ARROW;
 };
 
-CLOUD.Extensions.CommentEditor.prototype.init = function() {
+CLOUD.Extensions.CommentEditor.prototype.registerDomEventListeners = function () {
 
-    if (!this.svg) {
+    if (this.svg) {
+        this.svg.addEventListener( 'mousedown', this.onMouseDown.bind(this), false );
+        this.svg.addEventListener( 'mousewheel', this.onMouseWheel.bind(this), false );
 
-        var svgWidth = this.domElement.offsetWidth;
-        var svgHeight = this.domElement.offsetHeight;
-        //var viewBox = this.getViewBox(svgWidth, svgHeight);
+        // 注册在document上会影响dbgUI的resize事件
+        window.addEventListener('mousemove', this.onMouseMove.bind(this), false);
+        window.addEventListener('mouseup', this.onMouseUp.bind(this), false);
 
-        this.svg = CLOUD.Extensions.Shape2D.createSvgElement('svg');
-        this.svg.style.position = "absolute";
-        this.svg.style.display = "block";
-        this.svg.style.left = "0";
-        this.svg.style.top = "0";
-        //this.svg.setAttribute('viewBox', viewBox);
-        this.svg.setAttribute('width', svgWidth + '');
-        this.svg.setAttribute('height', svgHeight + '');
+        this.svg.addEventListener( 'touchstart', this.touchstart.bind(this), false );
+        this.svg.addEventListener( 'touchend', this.touchend.bind(this), false );
+        this.svg.addEventListener( 'touchmove', this.touchmove.bind(this), false );
 
-        this.domElement.appendChild(this.svg);
+        this.svg.addEventListener( 'keydown', this.onKeyDown.bind(this), false );
+        this.svg.addEventListener( 'keyup', this.onKeyUp.bind(this), false );
 
-        this.bounds.width = svgWidth;
-        this.bounds.height = svgHeight;
-    }
-};
-
-CLOUD.Extensions.CommentEditor.prototype.uninit = function() {
-
-    if (!this.svg) return;
-
-    var svg = this.svg;
-
-    if (svg.parentNode) {
-        svg.parentNode.removeChild(svg);
+        this.svg.focus();
     }
 
-    this.svgGroup = null;
-    this.svg = null;
 };
 
-CLOUD.Extensions.CommentEditor.prototype.onExistEditor = function () {
+CLOUD.Extensions.CommentEditor.prototype.unregisterDomEventListeners = function () {
 
-    this.uninit();
+    if (this.svg) {
+        this.svg.removeEventListener( 'mousedown', this.onMouseDown.bind(this), false );
+        this.svg.removeEventListener( 'mousewheel', this.onMouseWheel.bind(this), false );
+
+        // 注册在document上会影响dbgUI的resize事件
+        window.removeEventListener('mousemove', this.onMouseMove.bind(this), false);
+        window.removeEventListener('mouseup', this.onMouseUp.bind(this), false);
+
+        this.svg.removeEventListener( 'touchstart', this.touchstart.bind(this), false );
+        this.svg.removeEventListener( 'touchend', this.touchend.bind(this), false );
+        this.svg.removeEventListener( 'touchmove', this.touchmove.bind(this), false );
+
+        this.svg.removeEventListener( 'keydown', this.onKeyDown.bind(this), false );
+        this.svg.removeEventListener( 'keyup', this.onKeyUp.bind(this), false );
+    }
+
 };
 
 CLOUD.Extensions.CommentEditor.prototype.onMouseDown = function(event) {
@@ -3261,7 +3290,7 @@ CLOUD.Extensions.CommentEditor.prototype.onMouseDown = function(event) {
     //event.preventDefault();
     //event.stopPropagation();
 
-    if (this.commentType !== "CLOUD") {
+    if (this.commentType !== CLOUD.Extensions.Comment.shapeTypes.CLOUD) {
         if (this.selectedComment) return;
     }
 
@@ -3281,7 +3310,7 @@ CLOUD.Extensions.CommentEditor.prototype.onMouseMove = function(event) {
         return;
     }
 
-    if (this.commentType !== "CLOUD") {
+    if (this.commentType !== CLOUD.Extensions.Comment.shapeTypes.CLOUD) {
         this.handleComment(event, "move");
     }
 };
@@ -3291,7 +3320,7 @@ CLOUD.Extensions.CommentEditor.prototype.onMouseUp = function(event) {
     //event.preventDefault();
     //event.stopPropagation();
 
-    if (this.commentType !== "CLOUD") {
+    if (this.commentType !== CLOUD.Extensions.Comment.shapeTypes.CLOUD) {
         if (this.selectedComment && this.isCreating) {
 
             this.selectedComment.created();
@@ -3327,7 +3356,7 @@ CLOUD.Extensions.CommentEditor.prototype.onKeyUp = function(event) {
             break;
         case this.keys.ESC: // 结束云图绘制
 
-            if (this.commentType === "CLOUD") {
+            if (this.commentType === CLOUD.Extensions.Comment.shapeTypes.CLOUD) {
                 if (this.selectedComment && this.isCreating) {
 
                     this.selectedComment.created();
@@ -3344,6 +3373,23 @@ CLOUD.Extensions.CommentEditor.prototype.onKeyUp = function(event) {
     }
 };
 
+CLOUD.Extensions.CommentEditor.prototype.onResize = function (event) {
+
+    var bounds = CLOUD.DomUtil.getContainerOffsetToClient(this.domElement);
+
+    this.bounds.x = 0;
+    this.bounds.y = 0;
+    this.bounds.width = bounds.width;
+    this.bounds.height = bounds.height;
+
+    var viewBox = this.getViewBox(this.bounds.width, this.bounds.height);
+
+    //this.svg.setAttribute('viewBox', viewBox);
+    this.svg.setAttribute('width', this.bounds.width + '');
+    this.svg.setAttribute('height', this.bounds.height + '');
+
+};
+
 CLOUD.Extensions.CommentEditor.prototype.touchstart = function(event) {
 
 };
@@ -3356,14 +3402,71 @@ CLOUD.Extensions.CommentEditor.prototype.touchend = function(event) {
 
 };
 
+CLOUD.Extensions.CommentEditor.prototype.init = function() {
+
+    if (!this.svg) {
+
+        var svgWidth = this.domElement.offsetWidth;
+        var svgHeight = this.domElement.offsetHeight;
+        //var viewBox = this.getViewBox(svgWidth, svgHeight);
+
+        this.svg = CLOUD.Extensions.Shape2D.createSvgElement('svg');
+        this.svg.style.position = "absolute";
+        this.svg.style.display = "block";
+        this.svg.style.left = "0";
+        this.svg.style.top = "0";
+        //this.svg.setAttribute('viewBox', viewBox);
+        this.svg.setAttribute('width', svgWidth + '');
+        this.svg.setAttribute('height', svgHeight + '');
+
+        this.domElement.appendChild(this.svg);
+
+        this.bounds.width = svgWidth;
+        this.bounds.height = svgHeight;
+
+        this.registerDomEventListeners();
+    }
+};
+
+CLOUD.Extensions.CommentEditor.prototype.uninit = function() {
+
+    if (!this.svg) return;
+
+    var svg = this.svg;
+
+    this.unregisterDomEventListeners();
+
+    if (svg.parentNode) {
+        svg.parentNode.removeChild(svg);
+    }
+
+    this.svgGroup = null;
+    this.svg = null;
+};
+
+CLOUD.Extensions.CommentEditor.prototype.generateCommentId = function () {
+
+    //return ++this.nextCommentId;
+
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+    });
+};
+
+CLOUD.Extensions.CommentEditor.prototype.onExistEditor = function () {
+
+    this.uninit();
+};
+
 CLOUD.Extensions.CommentEditor.prototype.update = function() {
 
-    for (var i = 0, len = this.comments.length; i < len; i++) {
-        var comment = this.comments[i];
-        var pos = this.worldToClient(comment.worldPosition);
-        comment.setClientPostion(pos);
-        comment.updateStyle();
-    }
+    //for (var i = 0, len = this.comments.length; i < len; i++) {
+    //    var comment = this.comments[i];
+    //    var pos = this.worldToClient(comment.worldPosition);
+    //    comment.setClientPostion(pos);
+    //    comment.updateStyle();
+    //}
 };
 
 CLOUD.Extensions.CommentEditor.prototype.editBegin = function() {
@@ -3388,20 +3491,26 @@ CLOUD.Extensions.CommentEditor.prototype.editBegin = function() {
 };
 
 CLOUD.Extensions.CommentEditor.prototype.editEnd = function() {
+
     this.isEditing = false;
 
-    this.svg.removeChild(this.svgGroup);
+    if (this.svgGroup.parentNode) {
+        this.svgGroup.parentNode.removeChild(this.svgGroup);
+    }
+
+    //this.svg.removeChild(this.svgGroup);
 };
 
-CLOUD.Extensions.CommentEditor.prototype.generateCommentId = function () {
-
-    //return ++this.nextCommentId;
-
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-        return v.toString(16);
-    });
+CLOUD.Extensions.CommentEditor.prototype.dragBegin = function (event) {
+    if (this.selectedComment) {
+        this.dragging = true;
+    }
 };
+
+CLOUD.Extensions.CommentEditor.prototype.dragEnd = function (event) {
+    this.isDragging = false;
+};
+
 CLOUD.Extensions.CommentEditor.prototype.clear = function() {
 
     var comments = this.comments;
@@ -3438,6 +3547,14 @@ CLOUD.Extensions.CommentEditor.prototype.addComment = function(comment) {
     this.comments.push(comment);
 };
 
+CLOUD.Extensions.CommentEditor.prototype.deleteComment = function(comment) {
+
+    if (comment) {
+        this.removeComment(comment);
+        comment.destroy();
+    }
+};
+
 CLOUD.Extensions.CommentEditor.prototype.removeComment = function(comment) {
 
     var idx = this.comments.indexOf(comment);
@@ -3448,6 +3565,8 @@ CLOUD.Extensions.CommentEditor.prototype.removeComment = function(comment) {
 };
 
 CLOUD.Extensions.CommentEditor.prototype.loadComments = function(commentInfoList) {
+
+    this.isEditing = false;
 
     if (!this.svgGroup) {
         this.svgGroup = CLOUD.Extensions.Shape2D.createSvgElement('g');
@@ -3468,14 +3587,18 @@ CLOUD.Extensions.CommentEditor.prototype.loadComments = function(commentInfoList
         var shapeType = info.shapeType;
         var position = info.position;
         var size = info.size;
+        var shapePathStr = info.shapePath;
+        var text = info.text;
+        var arrowHead = info.arrowHead;
+        var arrowTail = info.arrowTail;
 
         switch (shapeType) {
 
             case CLOUD.Extensions.Comment.shapeTypes.ARROW:
-                //var arrow = new CLOUD.Extensions.CommentArrow(this, arrowId);
-                //arrow.set(head.x, head.y, tail.x, tail.y);
-                //this.addComment(arrow);
-                //arrow.created();
+                var arrow = new CLOUD.Extensions.CommentArrow(this, id);
+                arrow.set(arrowHead.x, arrowHead.y, arrowTail.x, arrowTail.y);
+                this.addComment(arrow);
+                arrow.created();
                 break;
             case  CLOUD.Extensions.Comment.shapeTypes.RECTANGLE:
                 var rectangle = new CLOUD.Extensions.CommentRectangle(this, id);
@@ -3496,10 +3619,11 @@ CLOUD.Extensions.CommentEditor.prototype.loadComments = function(commentInfoList
                 cross.created();
                 break;
             case CLOUD.Extensions.Comment.shapeTypes.CLOUD:
-                //var cloud = new CLOUD.Extensions.CommentCloud(this, id);
-                //cloud.set(position, size.x, size.y);
-                //this.addComment(cloud);
-                //cloud.created();
+                var cloud = new CLOUD.Extensions.CommentCloud(this, id);
+                cloud.setPath(shapePathStr);
+                cloud.set(position, size.x, size.y);
+                this.addComment(cloud);
+                cloud.created();
                 break;
             case  CLOUD.Extensions.Comment.shapeTypes.TEXT:
                 //var text = new CLOUD.Extensions.CommentText(this, id);
@@ -3521,11 +3645,33 @@ CLOUD.Extensions.CommentEditor.prototype.getCommentInfoList = function() {
     for (var i = 0, len = this.comments.length; i < len; i++) {
         var comment = this.comments[i];
 
+        var text = "";
+        if (comment.shapeType === CLOUD.Extensions.Comment.shapeTypes.TEXT) {
+            text = comment.currText;
+        }
+
+        var path = "";
+        if (comment.shapeType === CLOUD.Extensions.Comment.shapeTypes.CLOUD) {
+            path = comment.getPathString();
+        }
+
+        var arrowHead = null;
+        var arrowTail = null;
+
+        if (comment.shapeType === CLOUD.Extensions.Comment.shapeTypes.ARROW) {
+            arrowHead = comment.head;
+            arrowTail = comment.tail;
+        }
+
         var info = {
             id: comment.id,
             shapeType : comment.shapeType,
             position: comment.position,
-            size: comment.size
+            size: comment.size,
+            shapePath: path,
+            arrowHead: arrowHead,
+            arrowTail: arrowTail,
+            text: text
         };
 
         commentInfoList.push(info);
@@ -3606,14 +3752,6 @@ CLOUD.Extensions.CommentEditor.prototype.getPointOnSvgContainer = function (clie
     return new THREE.Vector2(clientX - rect.left, clientY - rect.top);
 };
 
-CLOUD.Extensions.CommentEditor.prototype.unselect = function () {
-
-    if (this.selectedComment) {
-        this.selectedComment.unselect();
-        this.selectedComment = null;
-    }
-};
-
 CLOUD.Extensions.CommentEditor.prototype.getViewBox = function (clientWidth, clientHeight) {
 
     var lt = this.clientToWorld(0, 0);
@@ -3627,34 +3765,7 @@ CLOUD.Extensions.CommentEditor.prototype.getViewBox = function (clientWidth, cli
     return [l, t, r - l, b - t].join(' ');
 };
 
-CLOUD.Extensions.CommentEditor.prototype.onResize = function (event) {
-
-    var bounds = CLOUD.DomUtil.getContainerOffsetToClient(this.domElement);
-
-    this.bounds.x = 0;
-    this.bounds.y = 0;
-    this.bounds.width = bounds.width;
-    this.bounds.height = bounds.height;
-
-    var viewBox = this.getViewBox(this.bounds.width, this.bounds.height);
-
-    //this.svg.setAttribute('viewBox', viewBox);
-    this.svg.setAttribute('width', this.bounds.width + '');
-    this.svg.setAttribute('height', this.bounds.height + '');
-
-};
-
-CLOUD.Extensions.CommentEditor.prototype.dragBegin = function (event) {
-    if (this.selectedComment) {
-        this.dragging = true;
-    }
-};
-
-CLOUD.Extensions.CommentEditor.prototype.dragEnd = function (event) {
-    this.isDragging = false;
-};
-
-CLOUD.Extensions.CommentEditor.prototype.setSelection = function (comment) {
+CLOUD.Extensions.CommentEditor.prototype.select = function (comment) {
 
     //if (this.selectedComment !== comment) {
     //
@@ -3668,16 +3779,25 @@ CLOUD.Extensions.CommentEditor.prototype.setSelection = function (comment) {
     this.selectedComment = comment;
 };
 
-CLOUD.Extensions.CommentEditor.prototype.deleteComment = function(comment) {
+CLOUD.Extensions.CommentEditor.prototype.unselect = function () {
 
-    if (comment) {
-        this.removeComment(comment);
-        comment.destroy();
+    if (this.selectedComment) {
+        this.selectedComment.unselect();
+        this.selectedComment = null;
     }
 };
 
 CLOUD.Extensions.CommentEditor.prototype.setCommentType = function(type) {
-     this.commentType = type;
+
+    this.commentType = type;
+
+    if (this.selectedComment && this.isCreating) {
+
+        this.selectedComment.created();
+        this.isCreating = false;
+    }
+
+    this.unselect();
 };
 
 CLOUD.Extensions.CommentEditor.prototype.handleComment = function(event , type) {
@@ -3686,28 +3806,28 @@ CLOUD.Extensions.CommentEditor.prototype.handleComment = function(event , type) 
 
     switch (mode) {
 
-        case "RECTANGLE":
+        case CLOUD.Extensions.Comment.shapeTypes.RECTANGLE:
             if (type === "down") {
                 this.createCommentRectangle(event);
             } else if (type === "move") {
                 this.moveCommentRectangle(event);
             }
             break;
-        case "CIRCLE":
+        case CLOUD.Extensions.Comment.shapeTypes.CIRCLE:
             if (type === "down") {
                 this.createCommentCircle(event);
             } else if (type === "move") {
                 this.moveCommentCircle(event);
             }
             break;
-        case "CROSS":
+        case CLOUD.Extensions.Comment.shapeTypes.CROSS:
             if (type === "down") {
                 this.createCommentCross(event);
             } else if (type === "move") {
                 this.moveCommentCross(event);
             }
             break;
-        case "CLOUD":
+        case CLOUD.Extensions.Comment.shapeTypes.CLOUD:
             if (type === "down") {
                 if (this.selectedComment && this.isCreating) {
                     this.moveCommentCloud(event);
@@ -3715,18 +3835,15 @@ CLOUD.Extensions.CommentEditor.prototype.handleComment = function(event , type) 
                     this.createCommentCloud(event);
                 }
             }
-            //else if (type === "move") {
-            //    this.moveCommentCloud(event);
-            //}
             break;
-        case "TEXT":
+        case CLOUD.Extensions.Comment.shapeTypes.TEXT:
             if (type === "down") {
                 this.createCommentText(event);
             } else if (type === "move") {
                 this.moveCommentText(event);
             }
             break;
-        case "ARROW":
+        case CLOUD.Extensions.Comment.shapeTypes.ARROW:
         default :
             if (type === "down") {
                 this.createCommentArrow(event);
@@ -3995,7 +4112,8 @@ CLOUD.Extensions.CommentEditor.prototype.moveCommentCloud = function(event) {
     var size = {x: 10, y: 10};
     var cloud = this.selectedComment;
     var position = this.getPointOnSvgContainer(event.clientX, event.clientY);
-    cloud.set(position, size.x, size.y);
+    cloud.addToPath(position);
+    //cloud.set(position, size.x, size.y);
 
 };
 
