@@ -86,6 +86,7 @@
     controll:function(){
       var self = this;
       self._dom.bimBox.on('click','.bar-item',function(){
+        // 工具条对应功能
         var $this = $(this),
             fn = $this.data('id'),
             group = $this.data('group'),
@@ -125,9 +126,11 @@
             $(bimView.sidebar._dom.sidebar).toggleClass("hideMap");
         }
       }).on('click','.modelSelect .cur',function(){
+        // 点击下拉
         var $this = $(this);
         $this.toggleClass('open');
       }).on('click','.modelItem',function(){
+        // 点击下拉框选择
         var filterData = bimView.comm.filterData;
         var $this = $(this),
             $list = $this.parent(),
@@ -144,6 +147,7 @@
           self.setFloorMap(data,"miniMap");
         }
       }).on('click','.m-openTree,.m-closeTree',function(){
+        // 展开关闭树
         var $this = $(this),
             data = bimView.sidebar.classCodeData,
             $li = $this.closest('.itemNode'),
@@ -171,6 +175,7 @@
           $li.append(children);
         }
       }).on('change','input',function(){
+        //filter变化
         var $this = $(this),
             $li = $this.closest('.itemNode'),
             parents = $this.parents('.itemNode'),
@@ -179,6 +184,7 @@
         var filter = bimView.comm.getFilters(parents,'ckecked');
         self.filter(filter);
       }).on('click','.treeText',function(){
+        // 选中高亮
         var $this = $(this),
             $li = $this.closest('.itemNode'),
             flag = $this.is('.selected'),
@@ -193,9 +199,6 @@
       self.on('changeGrid',function(res){
         bimView.sidebar._dom.mapBar.find(".axisGrid").text(res.axis.offsetX+","+res.axis.offsetY+","+res.axis.offsetZ)
       })
-      self.on('click',function(res){
-        console.log(res)
-      })
     },
     // 以下是对模型操作
     resize:function(width,height){
@@ -207,7 +210,7 @@
       self.viewer.resize(_width,_height);
     },
     fit : function () {
-      // 适应窗口
+      // 缩放到选择构件
       var self = this;
       self.pub('fit');
       self.viewer.zoomToSelection();
@@ -220,6 +223,7 @@
       self.viewer.setZoomMode();
     },
     zoomToBox:function(box){
+      // 缩放到指定位置
       var self = this;
       var viewer = self.viewer;
       viewer.zoomToBBox(CLOUD.Utils.computeBBox(box));
@@ -243,24 +247,28 @@
       self.pub('home');
       self.viewer.setStandardView(CLOUD.EnumStandardView.ISO);
     },
-    // 模型显示
+    // 模型检查点
     markers:function(){
+      // 进入添加检查点模式
       var self = this;
       var viewer = self.viewer;
       viewer.setMarkerMode();
       viewer.editMarkerBegin();
     },
     markerEnd : function() {
+      // 退出检查点模式
       var self = this;
       var viewer = self.viewer;
       viewer.editMarkerEnd();
     },
     saveMarkers : function() {
+      // 保存检查点
       var self = this;
       var viewer = self.viewer;
       return viewer.getMarkerInfoList();
     },
     loadMarkers:function(list){
+      // 加载检查点
       var self = this;
       var viewer = self.viewer;
       viewer.loadMarkers(list);
@@ -278,25 +286,30 @@
       viewer.render();
     },
     highlight:function(obj){
+      // 高亮
       var self = this;
       var viewer = self.viewer;
       var filter = viewer.getFilters();
-      $.each(obj.ids,function(i,id){
-        filter.setUserOverrider(obj.type,id);
-      });
+      if(obj.type == "userId"){
+        filter.setOverriderByUserIds('highlight',obj.ids);
+      }else{
+        $.each(obj.ids,function(i,id){
+          filter.setUserOverrider(obj.type,id);
+        });
+      }
       viewer.render();
     },
-    collision:function(idA,idB,box){
+    collision:function(idA,idB){
       // 碰撞
       var self = this;
       var viewer = self.viewer;
       var filter = viewer.getFilters();
       filter.setOverriderByUserIds('collisionA',[idA],'lightBlue');
       filter.setOverriderByUserIds('collisionB',[idB],'darkRed');
-      self.zoomToBox(box);
       viewer.render();
     },
     translucent:function(flag){
+      // 半透明
       var self = this;
       var viewer = self.viewer;
       var filter = viewer.getFilters();
@@ -304,12 +317,14 @@
       viewer.render();
     },
     getTranslucentStatus:function(){
+      // 获取半透明状态
       var self = this;
       var viewer = self.viewer;
       var filter = viewer.getFilters();
       return filter.isSceneOverriderEnabled();
     },
     initMap:function(name,element,axisGrid,floorPlane){
+      // 初始化小地图
       var self = this,
           viewer = self.viewer,
           _el = element,
@@ -320,23 +335,32 @@
             bottom:'0px',
             outline:'none'
           };
-    viewer.setAxisGridData(axisGrid)
-    viewer.createMiniMap(name,_el[0],_width,_height,_css,function(res){
-      console.log(res)
-      self.pub('changeGrid',res);
-    });
-    viewer.generateAxisGrid(name);
+      viewer.setAxisGridData(axisGrid)
+      viewer.createMiniMap(name,_el[0],_width,_height,_css,function(res){
+        self.pub('changeGrid',res);
+      });
+      viewer.generateAxisGrid(name);
     },
     setFloorMap:function(obj,name){
+      // 设置小地图
       var viewer = this.viewer;
       viewer.setFloorPlaneData(obj);
       viewer.generateFloorPlane(name);
     },
     load:function(etag){
+      // 加载场景
       var viewer = this.viewer;
       var client = viewer.load(etag,bimView.API.baseUrl + bimView.API.fetchModel);
       viewer.render();
       return client;
+    },
+    showScene:function(client,flag){
+      // 显示隐藏场景
+      var viewer = BIM.common.viewer;
+      if(viewer && viewer.showScene){
+        viewer.showScene(client,flag);
+        viewer.render();
+      }
     }
   }
 })($);
