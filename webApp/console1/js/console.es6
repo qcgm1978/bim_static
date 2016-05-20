@@ -192,15 +192,15 @@ App.Console = {
       var items = data.data.items, str = '';
 
       $.each(items, function(i, item){
-        if(item.version){
-          str += '<option versionid="' + item.version.id + '" value="' + item.projectNo + '">' + item.name + '</option>';
+        if(item.id){
+          str += '<option id="' + item.id + '" value="' + item.projectNo + '">' + item.name + '</option>';
         }
 
       });
 
-      $("#s11").html(str).change(function(){
+      $("#s11").html("<option value=null>请选择</option>"+str).change(function(){
         $.ajax({
-          url: "platform/project/" + $(this).val() + "/version"
+          url: "platform/project/" + $(this).find('option:selected').attr('id') + "/version"
         }).done(function(data){
 
           var items = data.data, str = '';
@@ -212,7 +212,7 @@ App.Console = {
             }
 
           });
-          $("#p14").append(str);
+          $("#p14").html(str);
 
         });
       });
@@ -225,9 +225,7 @@ App.Console = {
     //获取标准模型发布表单
     App.Console.auditSheet1(6, "#s51", 8);
 
-    $('#s11').change(function(){
-      $("#p14").val($(this).children('option:selected').attr("versionid"));
-    });
+
 
     $("#submit1").click(function(){
       var data = {
@@ -317,7 +315,7 @@ App.Console = {
         }
 
       });
-      $('#s11').html(str).change(function(){
+      $('#s11').html("<option value=null>请选择</option>"+str).change(function(){
         $("#p13").val($(this).children('option:selected').attr("versionid"));
       });
 
@@ -688,15 +686,15 @@ App.Console = {
       var items = data.data.items, str = '';
 
       $.each(items, function(i, item){
-        if(item.version){
+        if(item.id){
 
-          str += '<option versionid="' + item.version.id + '" value="' + item.projectNo + '">' + item.name + '</option>';
+          str += '<option id="' + item.id + '" value="' + item.projectNo + '">' + item.name + '</option>';
         }
 
       });
-      $("#s11").append(str).change(function(){
+      $("#s11").html("<option value=null>请选择</option>"+str).change(function(){
         $.ajax({
-          url: "platform/project/" + $(this).val() + "/version"
+          url: "platform/project/" + $(this).find('option:selected').attr('id') + "/version"
         }).done(function(data){
 
           var items = data.data, str = '';
