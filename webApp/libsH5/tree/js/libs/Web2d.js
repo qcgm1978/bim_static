@@ -1436,13 +1436,16 @@ CLOUD.MiniMap = function (viewer, callback) {
 
         if (!_isInitializedFloorPlane) return null;
 
-        // 获得最近的轴网交点
-        var intersection = this.computeMinDistanceIntersection(point);
-
         // 世界坐标
         var pointWorldPosition = normalizedPoint.clone();
         screenToNormalizedPoint(pointWorldPosition);
         normalizedPointToWorld(pointWorldPosition);
+
+        var screenPosition = normalizedPoint.clone();
+        normalizedPointToScreen(screenPosition);
+
+        // 获得最近的轴网交点
+        var intersection = this.computeMinDistanceIntersection(screenPosition);
 
         if (intersection) {
             // 计算轴信息
@@ -2266,7 +2269,6 @@ CLOUD.MarkerEditor.prototype.setMarkerState = function(state) {
 
 
 
-
 var CLOUD = CLOUD || {};
 CLOUD.Extensions = CLOUD.Extensions || {};
 
@@ -2281,27 +2283,70 @@ CLOUD.Extensions.Comment = function (editor, id) {
 
     this.style = this.createStyle();
 
-    this.worldPosition = new THREE.Vector3();
-    this.worldBoundingBox = new THREE.Box3();
-    this.clientPosition = new THREE.Vector2();
-    this.size = new THREE.Vector2();
+    this.size = {x: 0, y: 0};
+    this.position = {x: 0, y: 0};
+    this.rotation = 0;
+    this.shape = null;
 
-    this.borderColor = "#FFFAFF";
-    this.svgShape = null;
-
-    this.state = 0;
-    this.shapeOriOffset = {offsetX : 0, offsetY: 0}; // 屏幕坐标顶点在左上角
     this.startX = 0;
     this.startY = 0;
 };
 
 CLOUD.Extensions.Comment.prototype = {
     constructor: CLOUD.Extensions.Comment,
-    onMouseDown: function () {
 
+    created:function(){
     },
-    destroy:function() {
+    destroy: function () {
+        this.unselect();
         this.setParent(null);
+    },
+    onMouseDown: function (event) {
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        this.select();
+        this.editor.dragBegin();
+    },
+    set:function(position, width, height){
+        this.rotation = 0;
+        this.position.x = position.x;
+        this.position.y = position.y;
+        this.size.x = width;
+        this.size.y = height;
+
+        this.updateStyle();
+    },
+    setRotation: function(angle) {
+        this.rotation = angle;
+        this.updateStyle();
+    },
+    setPosition: function (x, y){
+        this.position.x = x;
+        this.position.y = y;
+        this.updateStyle();
+    },
+    setSize: function (width, height, position) {
+        this.position.x = position.x;
+        this.position.y = position.y;
+        this.size.x = width;
+        this.size.y = height;
+
+        this.updateStyle();
+    },
+    setParent: function (parent) {
+        var shapeEl = this.shape;
+        if(shapeEl.parentNode){
+            shapeEl.parentNode.removeChild(shapeEl);
+        }
+        if(parent){
+            parent.appendChild(shapeEl);
+        }
+    },
+    updateTransformMatrix: function () {
+    },
+    updateStyle: function () {
     },
     select: function () {
         if (this.selected) {
@@ -2309,63 +2354,38 @@ CLOUD.Extensions.Comment.prototype = {
         }
 
         this.selected = true;
-        this.highlighted = false;
+        //this.highlighted = false;
+        this.highlighted = true;
+        this.updateStyle();
+
+        this.editor.setSelection(this);
+    },
+    unselect: function () {
+        this.selected = false;
+        this.editor.setSelection(null);
+    },
+    highlight: function (isHighlight) {
+        this.highlighted = isHighlight;
         this.updateStyle();
     },
-    unselect:function(){
-        this.selected = false;
-    },
-    setParent: function (parent) {
-
-        if (this.svgShape) {
-            var element = this.svgShape;
-
-            if(element.parentNode){
-                element.parentNode.removeChild(element);
-            }
-
-            if(parent){
-                parent.appendChild(element);
-            }
-        }
-    },
-    setWorldPosition: function (pos) {
-        this.worldPosition.set(pos.x, pos.y, pos.z);
-    },
-    setClientPostion: function (pos) {
-        this.clientPosition.set(pos.x, pos.y);
-    },
-    setWorldBoundingBox:function(box) {
-        this.worldBoundingBox.copy(box);
-    },
-    getWorldBoundingBox: function(){
-        return this.worldBoundingBox;
-    },
-    setState:function(state) {
-      this.state = state;
-    },
-    setSize: function (width, height, position) {
-        //this.size.set(width, height);
-    },
-    updateTransformMatrix: function () {
-
-    },
-    updateStyle: function () {
-
-    },
-    createStyle: function(){
-
+    createStyle: function () {
         var style = {};
 
-        style['stroke-width'] = 1;
+        style['stroke-width'] = 3;
         style['stroke-color'] = '#ff0000';
         style['stroke-opacity'] = '1.0';
+        style['fill-color'] = '#ff0000';
+        style['fill-opacity'] = '0.25';
+        style['font-family'] = 'Arial';
+        style['font-size'] = '20';
+        style['font-style'] = 'Normal';
+        style['font-weight'] = 'Normal';
 
         return style;
     },
-    getDefaultStyles: function() {
+    getDefaultStyles: function () {
         return {
-            'stroke-width':  {
+            'stroke-width': {
                 values: [
                     {name: 'Thin', value: 1},
                     {name: 'Normal', value: 3},
@@ -2381,7 +2401,7 @@ CLOUD.Extensions.Comment.prototype = {
                     {name: 'black', value: '#000000'}],
                 default: 0
             },
-            'stroke-opacity':{
+            'stroke-opacity': {
                 values: [
                     {name: '100%', value: 1.00},
                     {name: '75%', value: 0.75},
@@ -2391,18 +2411,10 @@ CLOUD.Extensions.Comment.prototype = {
                 default: 4
             }
         };
-    },
-    highlight:function(isHighlight) {
-        this.highlighted = isHighlight;
-        this.updateStyle();
     }
 };
 
-CLOUD.Extensions.Comment.shapeTypes = {ARROW: 1, RECTANGLE: 2, CIRCLE: 3, CROSS: 4, CLOUD: 5 };
-
-
-var CLOUD = CLOUD || {};
-CLOUD.Extensions = CLOUD.Extensions || {};
+CLOUD.Extensions.Comment.shapeTypes = {ARROW: 1, RECTANGLE: 2, CIRCLE: 3, CROSS: 4, CLOUD: 5, TEXT: 6};
 
 CLOUD.Extensions.CommentArrow = function (editor, id) {
 
@@ -2411,8 +2423,6 @@ CLOUD.Extensions.CommentArrow = function (editor, id) {
     this.shapeType = CLOUD.Extensions.Comment.shapeTypes.ARROW;
     this.head = new THREE.Vector3();
     this.tail = new THREE.Vector3();
-
-    this.position = {x: 0, y: 0};
 
     this.size.y = this.style['stroke-width'] * 2;
 
@@ -2423,11 +2433,11 @@ CLOUD.Extensions.CommentArrow = function (editor, id) {
 CLOUD.Extensions.CommentArrow.prototype = Object.create(CLOUD.Extensions.Comment.prototype);
 CLOUD.Extensions.CommentArrow.prototype.constructor = CLOUD.Extensions.CommentArrow;
 
-CLOUD.Extensions.CommentArrow.prototype.onMouseDown = function() {
+CLOUD.Extensions.CommentArrow.prototype.addDomEventListener = function () {
 
-};
-
-CLOUD.Extensions.CommentArrow.prototype.onMouseMove = function() {
+    this.shape.addEventListener("mousedown", this.onMouseDown.bind(this), true);
+    this.shape.addEventListener("mouseout", this.onMouseOut.bind(this));
+    this.shape.addEventListener("mouseover",this.onMouseOver.bind(this));
 
 };
 
@@ -2439,63 +2449,64 @@ CLOUD.Extensions.CommentArrow.prototype.onMouseOver = function() {
     this.highlight(true);
 };
 
-CLOUD.Extensions.CommentArrow.prototype.updateStyle = function() {
-    this.svgShape.style.left = this.clientPosition.x + this.shapeOriOffset.offsetX;
-    this.svgShape.style.top = this.clientPosition.y + this.shapeOriOffset.offsetY;
-};
-
 CLOUD.Extensions.CommentArrow.prototype.createShape = function() {
     this.shape = CLOUD.Extensions.Shape2D.createSvgElement('polygon');
 };
 
-CLOUD.Extensions.CommentArrow.prototype.addDomEventListener = function () {
+CLOUD.Extensions.CommentArrow.prototype.set = function (sx, sy, ex, ey) {
 
-    this.shape.addEventListener("mousedown", this.onMouseDown.bind(this), true);
-    this.shape.addEventListener("mouseout", this.onMouseOut.bind(this));
-    this.shape.addEventListener("mouseover",this.onMouseOver.bind(this));
+    var v0 = new THREE.Vector2(sx, sy);
+    var v1 = new THREE.Vector2(ex, ey);
+    var vDir = v1.clone().sub(v0).normalize();
 
-};
-
-CLOUD.Extensions.CommentArrow.prototype.set = function (xO, yO, xF, yF) {
-
-    var vO = new THREE.Vector2(xO, yO);
-    var vF = new THREE.Vector2(xF, yF);
-    var vDir = vF.clone().sub(vO).normalize();
-
-    this.size.x = vO.distanceTo(vF);
+    this.size.x = v0.distanceTo(v1);
     this.rotation = Math.acos(vDir.dot(new THREE.Vector2(1, 0)));
-    this.rotation = yF > yO ? (Math.PI * 2) - this.rotation : this.rotation;
+    this.rotation = ey > sy ? (Math.PI * 2) - this.rotation : this.rotation;
 
-    this.head.set(xO, yO, 0);
-    this.tail.set(xF, yF, 0);
+    this.head.set(sx, sy, 0);
+    this.tail.set(ex, ey, 0);
 
-    this.updateTransformMatrix();
-    this.updateStyle();
-};
-
-CLOUD.Extensions.CommentArrow.prototype.setRotation = function (angle) {
-
-    this.rotation = angle;
     this.updateTransformMatrix();
     this.updateStyle();
 };
 
 CLOUD.Extensions.CommentArrow.prototype.setSize = function (width, height, position) {
 
-    var xF = Math.cos(this.rotation);
-    var yF = Math.sin(this.rotation);
-    var vFDir = new THREE.Vector2(xF, yF); // already normalized
-    vFDir.multiplyScalar(width * 0.5);
+    var endX = Math.cos(this.rotation);
+    var endY = Math.sin(this.rotation);
+    var endDir = new THREE.Vector2(endX, endY);
+    endDir.multiplyScalar(width * 0.5);
 
     var vCenter = new THREE.Vector2(position.x, position.y);
-    var vO = vCenter.clone().add(vFDir);
-    var vF = vCenter.clone().sub(vFDir);
+    var v0 = vCenter.clone().add(endDir);
+    var v1 = vCenter.clone().sub(endDir);
 
-    this.head.set(vF.x, vF.y, 0);
-    this.tail.set(vO.x, vO.y, 0);
+    this.head.set(v1.x, v1.y, 0);
+    this.tail.set(v0.x, v0.y, 0);
     this.position.x = position.x;
     this.position.y = position.y;
     this.size.x = width;
+
+    this.updateTransformMatrix();
+    this.updateStyle();
+};
+
+CLOUD.Extensions.CommentArrow.prototype.setPosition = function (x, y) {
+
+    var head = this.head;
+    var tail = this.tail;
+
+    var dx = head.x - tail.x;
+    var dy = head.y - tail.y;
+
+    var x0 = x - dx * 0.5;
+    var y0 = y - dy * 0.5;
+
+    head.x = x0;
+    head.y = y0;
+
+    tail.x = x0 + dx;
+    tail.y = y0 + dy;
 
     this.updateTransformMatrix();
     this.updateStyle();
@@ -2510,7 +2521,7 @@ CLOUD.Extensions.CommentArrow.prototype.updateTransformMatrix = function () {
     var posX = (head.x + tail.x) * 0.5;
     var posY = (head.y + tail.y) * 0.5;
 
-    this.transformSvg = [
+    this.transformShape = [
         'translate(', posX, ',', posY, ') ',
         'rotate(', THREE.Math.radToDeg(-this.rotation), ') ',
         'translate(', -midX, ',', -midY, ') '
@@ -2522,109 +2533,645 @@ CLOUD.Extensions.CommentArrow.prototype.updateTransformMatrix = function () {
 };
 
 CLOUD.Extensions.CommentArrow.prototype.updateStyle = function () {
-    this.size.y = this.style['stroke-width'] * 2;
+
+    //this.size.y = this.style['stroke-width'] * 2;
     this.updateTransformMatrix();
 
-    // Update style.
     var strokeColor = this.highlighted ? this.highlightColor : this.style['stroke-color'];
-
     var shapePoints = this.getShapePoints();
-    // Transform points into SVG compliant format
-    // Meaning: 'x1,y1 x2,y2 ... x8,y8 x9,y9'
     var mappedPoints = shapePoints.map(function (point) {
         return point[0] + ',' + point[1];
     });
 
-    var polygonStr = mappedPoints.join(' '); // Leave a space between points
+    var pointsStr = mappedPoints.join(' ');
 
-    this.shape.setAttribute('points', polygonStr);
-    this.shape.setAttribute("transform", this.transformSvg);
+    this.shape.setAttribute('points', pointsStr);
+    this.shape.setAttribute("transform", this.transformShape);
     this.shape.setAttribute('fill', strokeColor);
     this.shape.setAttribute('opacity', this.style['stroke-opacity']);
 };
 
 CLOUD.Extensions.CommentArrow.prototype.getShapePoints = function () {
 
-    var strokeWidth = this.style['stroke-width'];
-    var half_len = this.size.x * 0.5;
+    var strokeWidth = this.style['stroke-width'] * 2;//
+    var halfLen = this.size.x * 0.5;
     var thickness = strokeWidth;
-    var half_thickness = strokeWidth * 0.5;
-    var head_len = half_len - (1.2 * thickness);
+    var halfThickness = strokeWidth * 0.5;
+    var headLen = halfLen - (1.2 * thickness);
 
-    // Left side points
-    var p1 = [-half_len, -half_thickness];
-    var p7 = [-half_len, half_thickness];
-
-    // The tip
-    var p4 = [half_len, 0];
-
-    // Right side points (from top to bottom)
-    var p3 = [head_len, -thickness];
-    var p2 = [head_len, -half_thickness];
-    var p6 = [head_len, half_thickness];
-    var p5 = [head_len, thickness];
+    var p1 = [-halfLen, -halfThickness];
+    var p7 = [-halfLen, halfThickness];
+    var p4 = [halfLen, 0];
+    var p3 = [headLen, -thickness];
+    var p2 = [headLen, -halfThickness];
+    var p6 = [headLen, halfThickness];
+    var p5 = [headLen, thickness];
 
     var points = [p1, p2, p3, p4, p5, p6, p7];
 
-    // TODO: The created arrow should have its (0,0) on the top left
-    // TODO: This was an oversight, and for now we fix it by offsetting before returning.
     points.forEach(function (point) {
-        point[0] += half_len;
+        point[0] += halfLen;
         point[1] += thickness;
     });
 
     return points;
 };
 
-/**
- * Specifies the parent layer which will contain the markup.
- * @param {HTMLElement} parent
- */
-CLOUD.Extensions.CommentArrow.prototype.setParent = function (parent) {
 
-    var div = this.shape;
-    if(div.parentNode){
-        div.parentNode.removeChild(div);
-    }
-    if(parent){
-        parent.appendChild(div);
-    }
+
+CLOUD.Extensions.CommentRectangle = function (editor, id) {
+
+    CLOUD.Extensions.Comment.call(this, editor, id);
+
+    this.shapeType = CLOUD.Extensions.Comment.shapeTypes.RECTANGLE;
+
+    this.createShape();
+    this.addDomEventListener();
 };
 
-/**
- * Used by the EditFrame to move the markup in Client Space coordinates
- * @param {Number} x - New X location for the markup. Notice that markups are centered on this value.
- * @param {Number} y - New Y location for the markup. Notice that markups are centered on this value.
- */
-CLOUD.Extensions.CommentArrow.prototype.setPosition = function (x, y) {
+CLOUD.Extensions.CommentRectangle.prototype = Object.create(CLOUD.Extensions.Comment.prototype);
+CLOUD.Extensions.CommentRectangle.prototype.constructor = CLOUD.Extensions.CommentRectangle;
 
-    var head = this.head;
-    var tail = this.tail;
+CLOUD.Extensions.CommentRectangle.prototype.addDomEventListener = function () {
 
-    var dx = head.x - tail.x;
-    var dy = head.y - tail.y;
+    this.shape.addEventListener("mousedown", this.onMouseDown.bind(this), true);
+    this.shape.addEventListener("mouseout", this.onMouseOut.bind(this));
+    this.shape.addEventListener("mouseover",this.onMouseOver.bind(this));
 
-    var xo = x - dx * 0.5;
-    var yo = y - dy * 0.5;
+};
 
-    head.x = xo;
-    head.y = yo;
+CLOUD.Extensions.CommentRectangle.prototype.onMouseOut = function() {
+    this.highlight(false);
+};
 
-    tail.x = xo + dx;
-    tail.y = yo + dy;
+CLOUD.Extensions.CommentRectangle.prototype.onMouseOver = function() {
+    this.highlight(true);
+};
+
+CLOUD.Extensions.CommentRectangle.prototype.createShape = function() {
+    this.shape = CLOUD.Extensions.Shape2D.createSvgElement('rect');
+};
+
+CLOUD.Extensions.CommentRectangle.prototype.updateTransformMatrix = function () {
+
+    var strokeWidth = this.style['stroke-width'];
+
+    var originX = Math.max(this.size.x - strokeWidth, 0) * 0.5;
+    var originY = Math.max(this.size.y - strokeWidth, 0) * 0.5;
+
+    this.transformShape = [
+        'translate(', this.position.x, ',', this.position.y, ') ',
+        'rotate(', THREE.Math.radToDeg(-this.rotation), ') ',
+        'translate(', -originX, ',', -originY, ') '
+    ].join('');
+};
+
+CLOUD.Extensions.CommentRectangle.prototype.updateStyle = function () {
 
     this.updateTransformMatrix();
+
+    var strokeWidth = this.style['stroke-width'];
+    var strokeColor = this.highlighted ? this.highlightColor : this.style['stroke-color'];
+    //var strokeOpacity = this.style['stroke-opacity'];
+    var fillColor = this.style['fill-color'];
+    var fillOpacity = this.style['fill-opacity'];
+
+    this.shape.setAttribute('transform', this.transformShape);
+    this.shape.setAttribute('stroke-width', strokeWidth);
+    this.shape.setAttribute('stroke',strokeColor);
+    this.shape.setAttribute('fill', fillColor);
+    this.shape.setAttribute('fill-opacity', 0.0 + '');
+    this.shape.setAttribute('width', Math.max(this.size.x - strokeWidth, 0) + '');
+    this.shape.setAttribute('height', Math.max(this.size.y - strokeWidth, 0) + '');
+};
+
+
+CLOUD.Extensions.CommentCircle = function (editor, id) {
+
+    CLOUD.Extensions.Comment.call(this, editor, id);
+
+    this.shapeType = CLOUD.Extensions.Comment.shapeTypes.CIRCLE;
+
+    this.createShape();
+    this.addDomEventListener();
+};
+
+CLOUD.Extensions.CommentCircle.prototype = Object.create(CLOUD.Extensions.Comment.prototype);
+CLOUD.Extensions.CommentCircle.prototype.constructor = CLOUD.Extensions.CommentCircle;
+
+CLOUD.Extensions.CommentCircle.prototype.addDomEventListener = function () {
+
+    this.shape.addEventListener("mousedown", this.onMouseDown.bind(this), true);
+    this.shape.addEventListener("mouseout", this.onMouseOut.bind(this));
+    this.shape.addEventListener("mouseover",this.onMouseOver.bind(this));
+
+};
+
+CLOUD.Extensions.CommentCircle.prototype.onMouseOut = function() {
+    this.highlight(false);
+};
+
+CLOUD.Extensions.CommentCircle.prototype.onMouseOver = function() {
+    this.highlight(true);
+};
+
+CLOUD.Extensions.CommentCircle.prototype.createShape = function() {
+    this.shape = CLOUD.Extensions.Shape2D.createSvgElement('ellipse');
+};
+
+CLOUD.Extensions.CommentCircle.prototype.updateTransformMatrix = function () {
+
+    var strokeWidth = this.style['stroke-width'];
+
+    var originX = Math.max(this.size.x - strokeWidth, 0) * 0.5;
+    var originY = Math.max(this.size.y - strokeWidth, 0) * 0.5;
+
+    this.transformShape = [
+        'translate(', this.position.x, ',', this.position.y, ') ',
+        'rotate(', THREE.Math.radToDeg(-this.rotation), ') ',
+        'translate(', -originX, ',', -originY, ') '
+    ].join('');
+};
+
+CLOUD.Extensions.CommentCircle.prototype.updateStyle = function () {
+
+    this.updateTransformMatrix();
+
+    var strokeWidth = this.style['stroke-width'];
+    var strokeColor = this.highlighted ? this.highlightColor : this.style['stroke-color'];
+    var strokeOpacity = this.style['stroke-opacity'];
+    var fillColor = this.style['fill-color'];
+    var fillOpacity = this.style['fill-opacity'];
+
+    var radX = Math.max(this.size.x - strokeWidth, 0) * 0.5;
+    var radY = Math.max(this.size.y - strokeWidth, 0) * 0.5;
+
+    this.shape.setAttribute("transform", this.transformShape);
+    this.shape.setAttribute("stroke-width", strokeWidth);
+    this.shape.setAttribute("stroke", strokeColor);
+    this.shape.setAttribute('fill', fillColor);
+    this.shape.setAttribute('fill-opacity', '0.0');
+    this.shape.setAttribute('cx', radX);
+    this.shape.setAttribute('cy', radY);
+    this.shape.setAttribute('rx', radX);
+    this.shape.setAttribute('ry', radY);
+};
+
+
+CLOUD.Extensions.CommentCloud = function (editor, id) {
+
+    CLOUD.Extensions.Comment.call(this, editor, id);
+
+    this.shapeType = CLOUD.Extensions.Comment.shapeTypes.CLOUD;
+
+    this.shapePath = [];
+
+    this.lastShapePoint = {x:0, y:0};
+
+    this.createShape();
+    this.addDomEventListener();
+};
+
+CLOUD.Extensions.CommentCloud.prototype = Object.create(CLOUD.Extensions.Comment.prototype);
+CLOUD.Extensions.CommentCloud.prototype.constructor = CLOUD.Extensions.CommentCloud;
+
+CLOUD.Extensions.CommentCloud.prototype.addDomEventListener = function () {
+
+    this.shape.addEventListener("mousedown", this.onMouseDown.bind(this), true);
+    this.shape.addEventListener("mouseout", this.onMouseOut.bind(this));
+    this.shape.addEventListener("mouseover",this.onMouseOver.bind(this));
+};
+
+CLOUD.Extensions.CommentCloud.prototype.onMouseOut = function() {
+    this.highlight(false);
+};
+
+CLOUD.Extensions.CommentCloud.prototype.onMouseOver = function() {
+    this.highlight(true);
+};
+
+CLOUD.Extensions.CommentCloud.prototype.createShape = function() {
+    this.shape = CLOUD.Extensions.Shape2D.createSvgElement('path');
+};
+
+CLOUD.Extensions.CommentCloud.prototype.set = function(position, width, height){
+    this.rotation = 0;
+    this.position.x = position.x;
+    this.position.y = position.y;
+    this.size.x = width;
+    this.size.y = height;
+
+    this.addToPath(position);
+
     this.updateStyle();
 };
 
-CLOUD.Extensions.CommentArrow.prototype.created = function () {
+CLOUD.Extensions.CommentCloud.prototype.updateTransformMatrix = function () {
+
+    var originX = (this.size.x) * 0.5;
+    var originY = (this.size.y) * 0.5;
+
+    this.transformShape = [
+        'translate(', this.position.x, ',', this.position.y, ') ',
+        'rotate(', THREE.Math.radToDeg(-this.rotation), ') ',
+        'translate(', -originX, ',', -originY, ') '
+    ].join('');
 };
 
-CLOUD.Extensions.CommentArrow.prototype.destroy = function () {
+CLOUD.Extensions.CommentCloud.prototype.updateStyle = function () {
 
-    this.unselect();
-    this.setParent(null);
+   //this.updateTransformMatrix();
+
+    var strokeWidth = this.style['stroke-width'];
+    //var strokeLineJoin = this.style['stroke-linejoin'];
+    var strokeColor = this.highlighted ? this.highlightColor : this.style['stroke-color'];
+    var strokeOpacity = this.style['stroke-opacity'];
+    var fillColor = this.style['fill-color'];
+    var fillOpacity = this.style['fill-opacity'];
+
+    //this.shape.setAttribute("transform", this.transformShape);
+    this.shape.setAttribute("stroke-width", strokeWidth);
+    this.shape.setAttribute("stroke", strokeColor);
+    this.shape.setAttribute('fill', fillColor);
+    this.shape.setAttribute('fill-opacity', '0.0');
+    //this.shape.setAttribute('stroke-linejoin', strokeLineJoin);
+    this.shape.setAttribute('d', this.getPath().join(' '));
 };
+
+CLOUD.Extensions.CommentCloud.prototype.getPath = function() {
+
+    return this.shapePath;
+};
+
+CLOUD.Extensions.CommentCloud.prototype.addToPath = function(point) {
+
+    if (this.shapePath.length === 0) {
+        this.shapePath.push('M');
+        this.shapePath.push(point.x);
+        this.shapePath.push(point.y);
+    } else {
+
+        // 计算控制点
+        var controlPoint = this.calculateControlPoint(this.lastShapePoint, point);
+
+        this.shapePath.push('Q');
+        this.shapePath.push(controlPoint.x);
+        this.shapePath.push(controlPoint.y);
+        this.shapePath.push(',');
+        this.shapePath.push(point.x);
+        this.shapePath.push(point.y);
+    }
+
+    this.lastShapePoint.x = point.x;
+    this.lastShapePoint.y = point.y;
+};
+
+// 计算控制点
+CLOUD.Extensions.CommentCloud.prototype.calculateControlPoint = function(startPoint, endPoint) {
+
+    var start = new THREE.Vector2(startPoint.x, startPoint.y);
+    var end = new THREE.Vector2(endPoint.x, endPoint.y);
+    var direction = end.clone().sub(start);
+    var halfLen = 0.5 * direction.length();
+    var centerX = 0.5 * (start.x + end.x);
+    var centerY = 0.5 * (start.y + end.y);
+    var center = new THREE.Vector2(centerX, centerY);
+
+    direction.normalize();
+    direction.rotateAround(new THREE.Vector2(0,0), -0.5 * Math.PI);
+    direction.multiplyScalar(halfLen);
+    center.add(direction);
+
+    return {
+        x: center.x,
+        y: center.y
+    };
+};
+
+
+
+CLOUD.Extensions.CommentCross = function (editor, id) {
+
+    CLOUD.Extensions.Comment.call(this, editor, id);
+
+    this.shapeType = CLOUD.Extensions.Comment.shapeTypes.CROSS;
+
+    this.createShape();
+    this.addDomEventListener();
+};
+
+CLOUD.Extensions.CommentCross.prototype = Object.create(CLOUD.Extensions.Comment.prototype);
+CLOUD.Extensions.CommentCross.prototype.constructor = CLOUD.Extensions.CommentCross;
+
+CLOUD.Extensions.CommentCross.prototype.addDomEventListener = function () {
+
+    this.shape.addEventListener("mousedown", this.onMouseDown.bind(this), true);
+    this.shape.addEventListener("mouseout", this.onMouseOut.bind(this));
+    this.shape.addEventListener("mouseover",this.onMouseOver.bind(this));
+};
+
+CLOUD.Extensions.CommentCross.prototype.onMouseOut = function() {
+    this.highlight(false);
+};
+
+CLOUD.Extensions.CommentCross.prototype.onMouseOver = function() {
+    this.highlight(true);
+};
+
+CLOUD.Extensions.CommentCross.prototype.createShape = function() {
+    this.shape = CLOUD.Extensions.Shape2D.createSvgElement('path');
+};
+
+CLOUD.Extensions.CommentCross.prototype.updateTransformMatrix = function () {
+
+    var strokeWidth = this.style['stroke-width'];
+
+    var originX = Math.max(this.size.x - strokeWidth, 0) * 0.5;
+    var originY = Math.max(this.size.y - strokeWidth, 0) * 0.5;
+
+    this.transformShape = [
+        'translate(', this.position.x, ',', this.position.y, ') ',
+        'rotate(', THREE.Math.radToDeg(-this.rotation), ') ',
+        'translate(', -originX, ',', -originY, ') '
+    ].join('');
+};
+
+CLOUD.Extensions.CommentCross.prototype.updateStyle = function () {
+
+    this.updateTransformMatrix();
+
+    var strokeWidth = this.style['stroke-width'];
+    var strokeColor = this.highlighted ? this.highlightColor : this.style['stroke-color'];
+    //var strokeOpacity = this.style['stroke-opacity'];
+    var fillColor = this.style['fill-color'];
+    var fillOpacity = this.style['fill-opacity'];
+
+    this.shape.setAttribute('transform', this.transformShape);
+    this.shape.setAttribute('stroke-width', strokeWidth);
+    this.shape.setAttribute('stroke',strokeColor);
+    this.shape.setAttribute('fill', fillColor);
+    this.shape.setAttribute('fill-opacity', 0.0 + '');
+    this.shape.setAttribute('d', this.getPath().join(' '));
+};
+
+CLOUD.Extensions.CommentCross.prototype.getPath = function() {
+
+    var size = this.size;
+    var l = 0;
+    var t = 0;
+    var r = size.x;
+    var b = size.y;
+
+    var path = [];
+
+    path.push('M');
+    path.push(l);
+    path.push(t);
+    path.push('L');
+    path.push(r);
+    path.push(b);
+    path.push('z');
+
+    path.push('M');
+    path.push(l);
+    path.push(b);
+    path.push('L');
+    path.push(r);
+    path.push(t);
+    path.push('z');
+
+    return path;
+};
+
+
+CLOUD.Extensions.CommentText = function (editor, id) {
+
+    CLOUD.Extensions.Comment.call(this, editor, id);
+
+    this.shapeType = CLOUD.Extensions.Comment.shapeTypes.TEXT;
+    this.currText = "";
+    this.currTextLines = [""];
+    this.textDirty = true;
+    this.lineHeight = 100;
+
+    this.createShape();
+    this.addDomEventListener();
+};
+
+CLOUD.Extensions.CommentText.prototype = Object.create(CLOUD.Extensions.Comment.prototype);
+CLOUD.Extensions.CommentText.prototype.constructor = CLOUD.Extensions.CommentText;
+
+CLOUD.Extensions.CommentText.prototype.addDomEventListener = function () {
+
+    this.shape.addEventListener("mousedown", this.onMouseDown.bind(this), true);
+    this.shape.addEventListener("mouseout", this.onMouseOut.bind(this));
+    this.shape.addEventListener("mouseover",this.onMouseOver.bind(this));
+};
+
+CLOUD.Extensions.CommentText.prototype.onMouseOut = function() {
+    this.highlight(false);
+};
+
+CLOUD.Extensions.CommentText.prototype.onMouseOver = function() {
+    this.highlight(true);
+};
+
+CLOUD.Extensions.CommentText.prototype.createShape = function() {
+
+    this.clipPath = CLOUD.Extensions.Shape2D.createSvgElement('clipPath');
+    this.clipPathId = 'clip_' + this.id;
+    this.clipPath.setAttribute('id', this.clipPathId);
+    this.clipPath.removeAttribute('pointer-events');
+
+    this.clipRect = CLOUD.Extensions.Shape2D.createSvgElement('rect');
+    this.clipRect.removeAttribute('pointer-events');
+    this.clipPath.appendChild(this.clipRect);
+
+    this.shape = CLOUD.Extensions.Shape2D.createSvgElement('text');
+    this.shapeBg = CLOUD.Extensions.Shape2D.createSvgElement('rect');
+};
+
+CLOUD.Extensions.CommentText.prototype.setSize = function (width, height, position) {
+
+    var recalcLines = (this.size.x !== width);
+
+    this.position.x = position.x;
+    this.position.y = position.y;
+    this.size.x = width;
+    this.size.y = height;
+
+    if (recalcLines) {
+        var newLines = this.calcTextLines();
+        if (!this.linesEqual(newLines)) {
+            this.currTextLines = newLines;
+            this.textDirty = true;
+            this.forceRedraw();
+        }
+    }
+
+    this.updateStyle();
+};
+
+CLOUD.Extensions.CommentText.prototype.setParent = function (parent) {
+
+    var currParent = this.clipPath.parentNode;
+
+    if (currParent) {
+        currParent.removeChild(this.clipPath);
+    }
+
+    if (parent) {
+        parent.appendChild(this.clipPath);
+    }
+
+    currParent = this.shapeBg.parentNode;
+
+    if (currParent) {
+        currParent.removeChild(this.shapeBg);
+    }
+
+    if (parent) {
+        parent.appendChild(this.shapeBg);
+    }
+
+    currParent = this.shape.parentNode;
+
+    if (currParent) {
+        currParent.removeChild(this.shape);
+    }
+
+    if (parent) {
+        parent.appendChild(this.shape);
+    }
+};
+
+CLOUD.Extensions.CommentText.prototype.updateTransformMatrix = function () {
+
+    var originX = this.size.x * 0.5;
+    var originY = this.size.y * 0.5;
+    var posX = this.position.x - originX;
+    var posY = this.position.y - originY;
+
+    this.transformShape = [
+        'translate(', posX, ',', posY, ') ',
+        'scale(', 1, ',', -1, ') '].join('');
+};
+
+CLOUD.Extensions.CommentText.prototype.updateStyle = function (forceDirty) {
+
+    this.updateTransformMatrix();
+
+    var fontSize = this.style['font-size'];
+    var strokeColor = this.highlighted ? this.highlightColor : this.style['stroke-color'];
+    var strokeOpacity = this.style['stroke-opacity'];
+    var fillColor = this.style['fill-color'];
+    var fillOpacity = this.style['fill-opacity'];
+
+    this.shape.setAttribute("font-family", this.style['font-family']);
+    this.shape.setAttribute("font-size", fontSize);
+    this.shape.setAttribute('font-weight', this.style['font-weight'] ? 'bold' : '');
+    this.shape.setAttribute("font-style", this.style['font-style'] ? 'italic' : '');
+    //this.shape.setAttribute("fill", fillColor);
+
+    var bBox = this.shape.getBoundingClientRect();
+    var verticalTransform = ['translate(0, ', -this.size.y + fontSize, ')'].join('');
+    this.shape.setAttribute("transform", (this.transformShape + verticalTransform));
+    this.shape.setAttribute('clip-path', 'url(#' + this.clipPathId + ')');
+
+    // Must be called AFTER shape's styles are in place.
+    if (this.textDirty || forceDirty) {
+        if (forceDirty) {
+            this.currTextLines = this.calcTextLines();
+        }
+        this.rebuildTextSvg();
+        this.textDirty = false;
+    }
+
+    this.clipRect.setAttribute('x', "0");
+    this.clipRect.setAttribute('y', bBox.height + '');
+    this.clipRect.setAttribute('width', this.size.x);
+    this.clipRect.setAttribute('height', this.size.y);
+
+    verticalTransform = ['translate(0, ', -this.size.y, ')'].join('');
+    this.shapeBg.setAttribute("transform", this.transformShape + verticalTransform);
+    this.shapeBg.setAttribute('width', this.size.x);
+    this.shapeBg.setAttribute('height', this.size.y);
+    this.shapeBg.setAttribute("stroke-width", '0');
+    this.shapeBg.setAttribute('fill','white');
+};
+
+CLOUD.Extensions.CommentText.prototype.calcTextLines = function () {
+     return 5;
+};
+
+CLOUD.Extensions.CommentText.prototype.getTextLines = function () {
+
+    return this.currTextLines.concat();
+};
+
+CLOUD.Extensions.CommentText.prototype.linesEqual = function (lines) {
+
+    var curr = this.currTextLines;
+    if (lines.length !== curr.length)
+        return false;
+
+    var len = curr.length;
+    for (var i = 0; i < len; ++i) {
+        if (lines[i] !== curr[i])
+            return false;
+    }
+
+    return true;
+};
+
+CLOUD.Extensions.CommentText.prototype.setText = function (text) {
+
+    this.currText = text;
+    this.currTextLines = this.calcTextLines();
+    this.textDirty = true;
+    this.updateStyle();
+};
+
+CLOUD.Extensions.CommentText.prototype.getText = function () {
+
+    return this.currText;
+};
+
+CLOUD.Extensions.CommentText.prototype.forceRedraw = function () {
+
+    window.requestAnimationFrame(function () {
+        this.highlighted = !this.highlighted;
+        this.updateStyle();
+        this.highlighted = !this.highlighted;
+        this.updateStyle();
+    }.bind(this));
+};
+
+CLOUD.Extensions.CommentText.prototype.rebuildTextSvg = function () {
+
+    while (this.shape.childNodes.length > 0) {
+        this.shape.removeChild(this.shape.childNodes[0]);
+    }
+
+    var dx = 0;
+    var dy = 0;
+    var yOffset = this.getLineHeight();
+
+    this.currTextLines.forEach(function (line) {
+        var tspan = CLOUD.Extensions.Shape2D.createSvgElement('tspan');
+        tspan.setAttribute('x', dx);
+        tspan.setAttribute('y', dy);
+        tspan.textContent = line;
+        this.shape.appendChild(tspan);
+        dy += yOffset;
+    }.bind(this));
+};
+
+CLOUD.Extensions.CommentText.prototype.getLineHeight = function () {
+    return this.style['font-size'] * (this.lineHeight * 0.01);
+};
+
+
 var CLOUD = CLOUD || {};
 CLOUD.Extensions = CLOUD.Extensions || {};
 
@@ -2637,36 +3184,53 @@ CLOUD.Extensions.CommentEditor = function (cameraEditor, scene, domElement) {
     this.comments = [];
     this.selectedComment = null;
     this.bounds = {x: 0, y: 0, width: 0, height: 0};
-
+    this.nextCommentId = 0;
+    this.keys = {
+        BACKSPACE: 8,
+        ALT: 18,
+        ESC: 27,
+        LEFT: 37,
+        UP: 38,
+        RIGHT: 39,
+        BOTTOM: 40,
+        DELETE: 46,
+        ZERO: 48,
+        A: 65,
+        D: 68,
+        E: 69,
+        Q: 81,
+        S: 83,
+        W: 87,
+        PLUS: 187,
+        SUB: 189
+    };
     this.isEditing = false;
-
     this.startX = 0;
     this.startY = 0;
     this.isCreating = false;
-};
+    this.isDragging = false;
 
-//CLOUD.Extensions.CommentEditor.prototype = Object.create(CLOUD.OrbitEditor.prototype);
-//CLOUD.Extensions.CommentEditor.prototype.constructor = CLOUD.CommentEditor;
+    this.commentType = "ARROW";
+};
 
 CLOUD.Extensions.CommentEditor.prototype.init = function() {
 
     if (!this.svg) {
+
+        var svgWidth = this.domElement.offsetWidth;
+        var svgHeight = this.domElement.offsetHeight;
+        //var viewBox = this.getViewBox(svgWidth, svgHeight);
+
         this.svg = CLOUD.Extensions.Shape2D.createSvgElement('svg');
         this.svg.style.position = "absolute";
         this.svg.style.display = "block";
         this.svg.style.left = "0";
         this.svg.style.top = "0";
+        //this.svg.setAttribute('viewBox', viewBox);
+        this.svg.setAttribute('width', svgWidth + '');
+        this.svg.setAttribute('height', svgHeight + '');
 
-        var svgContainer = this.domElement;
-        //var dim = CLOUD.DomUtil.getContainerOffsetToClient(this.domElement);
-
-        var svgWidth = svgContainer.offsetWidth;
-        var svgHeight = svgContainer.offsetHeight;
-        this.svg.setAttribute('viewBox', '0 0 ' + svgWidth + ' ' + svgHeight);
-        this.svg.setAttribute('width', svgWidth);
-        this.svg.setAttribute('height', svgHeight);
-
-        svgContainer.appendChild(this.svg);
+        this.domElement.appendChild(this.svg);
 
         this.bounds.width = svgWidth;
         this.bounds.height = svgHeight;
@@ -2694,104 +3258,48 @@ CLOUD.Extensions.CommentEditor.prototype.onExistEditor = function () {
 
 CLOUD.Extensions.CommentEditor.prototype.onMouseDown = function(event) {
 
-    event.preventDefault();
+    //event.preventDefault();
+    //event.stopPropagation();
 
-    if (this.selectedComment) return;
+    if (this.commentType !== "CLOUD") {
+        if (this.selectedComment) return;
+    }
 
-    var start = this.getRelatedClientPosition(event.clientX, event.clientY);
-
-    this.startX = start.x;
-    this.startY = start.y;
-
-    var width = 1;
-    var head = {x: this.startX, y: this.startY};
-    var tail = {
-        x: Math.round(head.x + Math.cos(Math.PI * 0.25) * width),
-        y: Math.round(head.y + Math.sin(-Math.PI * 0.25) * width)
-    };
-
-    var constrain = function (head, tail, width, bounds) {
-
-        if (this.isInsideBounds(tail.x, tail.y, bounds)) {
-            return;
-        }
-
-        tail.y = Math.round(head.y + Math.sin(Math.PI * 0.25) * width);
-
-        if (this.isInsideBounds(tail.x, tail.y, bounds)) {
-            return;
-        }
-
-        tail.x = Math.round(head.y + Math.cos(-Math.PI * 0.25) * width);
-
-        if (this.isInsideBounds(tail.x, tail.y, bounds)) {
-            return;
-        }
-
-        tail.y = Math.round(head.y + Math.sin(-Math.PI * 0.25) * width);
-
-    }.bind(this);
-
-    constrain(head, tail, width, this.getBounds());
-
-    //head = this.clientToWorld(head.x, head.y);
-    //tail = this.clientToWorld(tail.x, tail.y);
-
-    var arrowId = this.generateCommentId();
-    var arrow = new CLOUD.Extensions.CommentArrow(this, arrowId);
-    arrow.set(head.x, head.y, tail.x, tail.y);
-    this.addComment(arrow);
-    arrow.created();
-
-    this.selectedComment = arrow;
+    this.handleComment(event, "down");
 
     if (!this.isCreating) {
         this.isCreating = true;
     }
 };
 
-CLOUD.Extensions.CommentEditor.prototype.onMouseUp = function(event) {
-
-    if (this.selectedComment && this.isCreating) {
-
-        this.selectedComment.created();
-
-        if (this.isCreating) {
-            this.isCreating = false;
-        }
-
-        this.unselect();
-    }
-};
-
 CLOUD.Extensions.CommentEditor.prototype.onMouseMove = function(event) {
+
+    //event.preventDefault();
+    //event.stopPropagation();
 
     if (!this.selectedComment || !this.isCreating) {
         return;
     }
 
-    var arrow = this.selectedComment;
-    var end = this.getRelatedClientPosition(event.clientX, event.clientY);
-    var bounds = this.getBounds();
-
-    var startX = this.startX;
-    var startY = this.startY;
-    var endX = Math.min(Math.max(bounds.x, end.x), bounds.x + bounds.width);
-    var endY = Math.min(Math.max(bounds.y, end.y), bounds.y + bounds.height);
-
-    if (endX === startX && endY === startY) {
-        endX++;
-        endY++;
+    if (this.commentType !== "CLOUD") {
+        this.handleComment(event, "move");
     }
+};
 
-    var head = {x: startX, y: startY};
-    var tail = {x: endX, y: endY};
-    var epsilon = 0.0001;
+CLOUD.Extensions.CommentEditor.prototype.onMouseUp = function(event) {
 
-    if (Math.abs(arrow.head.x - head.x) >= epsilon || Math.abs(arrow.head.y - head.y) >= epsilon ||
-        Math.abs(arrow.tail.x - tail.x) >= epsilon || Math.abs(arrow.tail.y - tail.y) >= epsilon) {
+    //event.preventDefault();
+    //event.stopPropagation();
 
-        arrow.set(head.x, head.y, tail.x, tail.y);
+    if (this.commentType !== "CLOUD") {
+        if (this.selectedComment && this.isCreating) {
+
+            this.selectedComment.created();
+
+            this.isCreating = false;
+        }
+
+        this.unselect();
     }
 };
 
@@ -2810,6 +3318,30 @@ CLOUD.Extensions.CommentEditor.prototype.onKeyDown = function(event) {
 
 CLOUD.Extensions.CommentEditor.prototype.onKeyUp = function(event) {
 
+    switch (event.keyCode) {
+        case this.keys.DELETE:
+            if (this.selectedComment) {
+                this.deleteComment(this.selectedComment);
+                this.selectedComment = null;
+            }
+            break;
+        case this.keys.ESC: // 结束云图绘制
+
+            if (this.commentType === "CLOUD") {
+                if (this.selectedComment && this.isCreating) {
+
+                    this.selectedComment.created();
+
+                    this.isCreating = false;
+                }
+
+                this.unselect();
+            }
+
+            break;
+        default :
+            break;
+    }
 };
 
 CLOUD.Extensions.CommentEditor.prototype.touchstart = function(event) {
@@ -2844,6 +3376,10 @@ CLOUD.Extensions.CommentEditor.prototype.editBegin = function() {
         this.svgGroup = CLOUD.Extensions.Shape2D.createSvgElement('g');
     }
 
+    if (this.svgGroup.parentNode) {
+        this.svgGroup.parentNode.removeChild(this.svgGroup);
+    }
+
     this.svg.insertBefore(this.svgGroup, this.svg.firstChild);
 
     this.clear();
@@ -2857,18 +3393,15 @@ CLOUD.Extensions.CommentEditor.prototype.editEnd = function() {
     this.svg.removeChild(this.svgGroup);
 };
 
-CLOUD.Extensions.CommentEditor.prototype.changeMode = function(mode) {
-    this.editMode = mode;
-};
-
 CLOUD.Extensions.CommentEditor.prototype.generateCommentId = function () {
+
+    //return ++this.nextCommentId;
 
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
         var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
         return v.toString(16);
     });
 };
-
 CLOUD.Extensions.CommentEditor.prototype.clear = function() {
 
     var comments = this.comments;
@@ -2916,44 +3449,69 @@ CLOUD.Extensions.CommentEditor.prototype.removeComment = function(comment) {
 
 CLOUD.Extensions.CommentEditor.prototype.loadComments = function(commentInfoList) {
 
-    this.clear();
-
-    var svgContainer = this.domElement;
-
-    var currCommentState = this.commentState;
-
-    for (var i = 0, len = commentInfoList.length; i < len; i++) {
-        var info = commentInfoList[i];
-
-        var commentState = info.state;
-
-        this.setCommentState(commentState);
-
-        var shapeData = {
-            x: "0",
-            y: "0",
-            //label: "",
-            type : this.commentType,
-            fillColor: this.commentColor
-        };
-
-        var commentId = info.id;
-        var comment = new CLOUD.Extensions.Comment(commentId, this);
-
-        comment.createSVGShape(shapeData, svgContainer);
-        comment.setWorldPosition(info.position);
-        comment.setWorldBoundingBox(info.bBox);
-        comment.setState(info.state);
-
-        var pos = this.worldToClient(info.position);
-        comment.setClientPostion(pos);
-        comment.updateStyle();
-        //comment.setParent(scope.svgGroup);
-        this.addComment(comment);
+    if (!this.svgGroup) {
+        this.svgGroup = CLOUD.Extensions.Shape2D.createSvgElement('g');
     }
 
-    this.commentState = currCommentState;
-    this.setCommentState(currCommentState);
+    if (this.svgGroup.parentNode) {
+        this.svgGroup.parentNode.removeChild(this.svgGroup);
+    }
+
+    this.svg.insertBefore(this.svgGroup, this.svg.firstChild);
+
+    this.clear();
+
+    for (var i = 0, len = commentInfoList.length; i < len; i++) {
+
+        var info = commentInfoList[i];
+        var id = info.id;
+        var shapeType = info.shapeType;
+        var position = info.position;
+        var size = info.size;
+
+        switch (shapeType) {
+
+            case CLOUD.Extensions.Comment.shapeTypes.ARROW:
+                //var arrow = new CLOUD.Extensions.CommentArrow(this, arrowId);
+                //arrow.set(head.x, head.y, tail.x, tail.y);
+                //this.addComment(arrow);
+                //arrow.created();
+                break;
+            case  CLOUD.Extensions.Comment.shapeTypes.RECTANGLE:
+                var rectangle = new CLOUD.Extensions.CommentRectangle(this, id);
+                rectangle.set(position, size.x, size.y);
+                this.addComment(rectangle);
+                rectangle.created();
+                break;
+            case  CLOUD.Extensions.Comment.shapeTypes.CIRCLE:
+                var circle = new CLOUD.Extensions.CommentCircle(this, id);
+                circle.set(position, size.x, size.y);
+                this.addComment(circle);
+                circle.created();
+                break;
+            case  CLOUD.Extensions.Comment.shapeTypes.CROSS:
+                var cross = new CLOUD.Extensions.CommentCross(this, id);
+                cross.set(position, size.x, size.y);
+                this.addComment(cross);
+                cross.created();
+                break;
+            case CLOUD.Extensions.Comment.shapeTypes.CLOUD:
+                //var cloud = new CLOUD.Extensions.CommentCloud(this, id);
+                //cloud.set(position, size.x, size.y);
+                //this.addComment(cloud);
+                //cloud.created();
+                break;
+            case  CLOUD.Extensions.Comment.shapeTypes.TEXT:
+                //var text = new CLOUD.Extensions.CommentText(this, id);
+                //text.set(position, size.x, size.y);
+                //this.addComment(text);
+                //text.created();
+                //text.forceRedraw();
+                break;
+            default :
+                break;
+        }
+    }
 };
 
 CLOUD.Extensions.CommentEditor.prototype.getCommentInfoList = function() {
@@ -2965,9 +3523,9 @@ CLOUD.Extensions.CommentEditor.prototype.getCommentInfoList = function() {
 
         var info = {
             id: comment.id,
-            state : comment.state,
-            position: comment.worldPosition.clone(),
-            bBox: comment.worldBoundingBox.clone()
+            shapeType : comment.shapeType,
+            position: comment.position,
+            size: comment.size
         };
 
         commentInfoList.push(info);
@@ -2992,33 +3550,42 @@ CLOUD.Extensions.CommentEditor.prototype.worldToClient = function(point) {
     return result;
 };
 
-CLOUD.Extensions.CommentEditor.prototype.clientToWorld = function(point, depth) {
+CLOUD.Extensions.CommentEditor.prototype.clientToWorld = function(x, y, depth) {
 
     var dim = CLOUD.DomUtil.getContainerOffsetToClient(this.domElement);
     var camera = this.cameraEditor.object;
     var result = new THREE.Vector3();
 
-    result.x = (point.x) / dim.width * 2 - 1;
-    result.y = -((point.y) / dim.height) * 2 + 1;
+    depth = depth || 0;
+
+    result.x = x / dim.width * 2 - 1;
+    result.y = - y / dim.height * 2 + 1;
     result.z = depth;
 
     result.unproject(camera);
+    result.z = 0;
+
+    //result.add(camera.position).applyMatrix4(camera.matrixWorldInverse);
+    //result.z = 0;
 
     return result;
 };
 
 CLOUD.Extensions.CommentEditor.prototype.calcBoundingBox = function() {
 
-    if (this.comments.length < 1) return null;
+    //if (this.comments.length < 1) return null;
+    //
+    //var bBox = new THREE.Box3();
+    //
+    //for (var i = 0, len = this.comments.length; i < len; i++) {
+    //    var comment = this.comments[i];
+    //    bBox.union(comment.getWorldBoundingBox());
+    //}
+    //
+    //return bBox;
 
-    var bBox = new THREE.Box3();
 
-    for (var i = 0, len = this.comments.length; i < len; i++) {
-        var comment = this.comments[i];
-        bBox.union(comment.getWorldBoundingBox());
-    }
-
-    return bBox;
+    return null;
 };
 
 CLOUD.Extensions.CommentEditor.prototype.isInsideBounds = function(x, y, bounds) {
@@ -3032,7 +3599,7 @@ CLOUD.Extensions.CommentEditor.prototype.getBounds = function() {
     return this.bounds;
 };
 
-CLOUD.Extensions.CommentEditor.prototype.getRelatedClientPosition = function (clientX, clientY) {
+CLOUD.Extensions.CommentEditor.prototype.getPointOnSvgContainer = function (clientX, clientY) {
 
     var rect = CLOUD.DomUtil.getContainerOffsetToClient(this.domElement);
 
@@ -3042,7 +3609,446 @@ CLOUD.Extensions.CommentEditor.prototype.getRelatedClientPosition = function (cl
 CLOUD.Extensions.CommentEditor.prototype.unselect = function () {
 
     if (this.selectedComment) {
-        //this.selectedComment.unselect();
-        this.selectedMarkup = null;
+        this.selectedComment.unselect();
+        this.selectedComment = null;
     }
+};
+
+CLOUD.Extensions.CommentEditor.prototype.getViewBox = function (clientWidth, clientHeight) {
+
+    var lt = this.clientToWorld(0, 0);
+    var rb = this.clientToWorld(clientWidth, clientHeight);
+
+    var l = Math.min(lt.x, rb.x);
+    var t = Math.min(lt.y, rb.y);
+    var r = Math.max(lt.x, rb.x);
+    var b = Math.max(lt.y, rb.y);
+
+    return [l, t, r - l, b - t].join(' ');
+};
+
+CLOUD.Extensions.CommentEditor.prototype.onResize = function (event) {
+
+    var bounds = CLOUD.DomUtil.getContainerOffsetToClient(this.domElement);
+
+    this.bounds.x = 0;
+    this.bounds.y = 0;
+    this.bounds.width = bounds.width;
+    this.bounds.height = bounds.height;
+
+    var viewBox = this.getViewBox(this.bounds.width, this.bounds.height);
+
+    //this.svg.setAttribute('viewBox', viewBox);
+    this.svg.setAttribute('width', this.bounds.width + '');
+    this.svg.setAttribute('height', this.bounds.height + '');
+
+};
+
+CLOUD.Extensions.CommentEditor.prototype.dragBegin = function (event) {
+    if (this.selectedComment) {
+        this.dragging = true;
+    }
+};
+
+CLOUD.Extensions.CommentEditor.prototype.dragEnd = function (event) {
+    this.isDragging = false;
+};
+
+CLOUD.Extensions.CommentEditor.prototype.setSelection = function (comment) {
+
+    //if (this.selectedComment !== comment) {
+    //
+    //    this.unselect();
+    //
+    //    if(comment){
+    //        comment.select();
+    //    }
+    //}
+
+    this.selectedComment = comment;
+};
+
+CLOUD.Extensions.CommentEditor.prototype.deleteComment = function(comment) {
+
+    if (comment) {
+        this.removeComment(comment);
+        comment.destroy();
+    }
+};
+
+CLOUD.Extensions.CommentEditor.prototype.setCommentType = function(type) {
+     this.commentType = type;
+};
+
+CLOUD.Extensions.CommentEditor.prototype.handleComment = function(event , type) {
+
+    var mode = this.commentType;
+
+    switch (mode) {
+
+        case "RECTANGLE":
+            if (type === "down") {
+                this.createCommentRectangle(event);
+            } else if (type === "move") {
+                this.moveCommentRectangle(event);
+            }
+            break;
+        case "CIRCLE":
+            if (type === "down") {
+                this.createCommentCircle(event);
+            } else if (type === "move") {
+                this.moveCommentCircle(event);
+            }
+            break;
+        case "CROSS":
+            if (type === "down") {
+                this.createCommentCross(event);
+            } else if (type === "move") {
+                this.moveCommentCross(event);
+            }
+            break;
+        case "CLOUD":
+            if (type === "down") {
+                if (this.selectedComment && this.isCreating) {
+                    this.moveCommentCloud(event);
+                }  else {
+                    this.createCommentCloud(event);
+                }
+            }
+            //else if (type === "move") {
+            //    this.moveCommentCloud(event);
+            //}
+            break;
+        case "TEXT":
+            if (type === "down") {
+                this.createCommentText(event);
+            } else if (type === "move") {
+                this.moveCommentText(event);
+            }
+            break;
+        case "ARROW":
+        default :
+            if (type === "down") {
+                this.createCommentArrow(event);
+            } else if (type === "move") {
+                this.moveCommentArrow(event);
+            }
+            break;
+    }
+};
+
+CLOUD.Extensions.CommentEditor.prototype.createCommentArrow = function(event) {
+
+    var start = this.getPointOnSvgContainer(event.clientX, event.clientY);
+
+    this.startX = start.x;
+    this.startY = start.y;
+
+    var width = 2;
+    var head = {x: this.startX, y: this.startY};
+    var tail = {
+        x: Math.round(head.x + Math.cos(Math.PI * 0.25) * width),
+        y: Math.round(head.y + Math.sin(-Math.PI * 0.25) * width)
+    };
+
+    var constrain = function (head, tail, width, bounds) {
+
+        if (this.isInsideBounds(tail.x, tail.y, bounds)) {
+            return;
+        }
+
+        tail.y = Math.round(head.y + Math.sin(Math.PI * 0.25) * width);
+
+        if (this.isInsideBounds(tail.x, tail.y, bounds)) {
+            return;
+        }
+
+        tail.x = Math.round(head.y + Math.cos(-Math.PI * 0.25) * width);
+
+        if (this.isInsideBounds(tail.x, tail.y, bounds)) {
+            return;
+        }
+
+        tail.y = Math.round(head.y + Math.sin(-Math.PI * 0.25) * width);
+
+    }.bind(this);
+
+    constrain(head, tail, width, this.getBounds());
+
+    //head = this.clientToWorld(head.x, head.y);
+    //tail = this.clientToWorld(tail.x, tail.y);
+
+    var arrowId = this.generateCommentId();
+    var arrow = new CLOUD.Extensions.CommentArrow(this, arrowId);
+    arrow.set(head.x, head.y, tail.x, tail.y);
+    this.addComment(arrow);
+    arrow.created();
+
+    this.selectedComment = arrow;
+};
+
+CLOUD.Extensions.CommentEditor.prototype.moveCommentArrow = function(event) {
+
+    var arrow = this.selectedComment;
+    var end = this.getPointOnSvgContainer(event.clientX, event.clientY);
+    var bounds = this.getBounds();
+
+    var startX = this.startX;
+    var startY = this.startY;
+    var endX = Math.min(Math.max(bounds.x, end.x), bounds.x + bounds.width);
+    var endY = Math.min(Math.max(bounds.y, end.y), bounds.y + bounds.height);
+
+    if (endX === startX && endY === startY) {
+        endX++;
+        endY++;
+    }
+
+    //var head = this.clientToWorld(startX, startY);
+    //var tail = this.clientToWorld(endX, endY);
+
+    var head = {x:startX, y: startY};
+    var tail = {x: endX, y: endY};
+
+    var epsilon = 0.0001;
+
+    if (Math.abs(arrow.head.x - head.x) >= epsilon || Math.abs(arrow.head.y - head.y) >= epsilon ||
+        Math.abs(arrow.tail.x - tail.x) >= epsilon || Math.abs(arrow.tail.y - tail.y) >= epsilon) {
+
+        arrow.set(head.x, head.y, tail.x, tail.y);
+    }
+};
+
+CLOUD.Extensions.CommentEditor.prototype.createCommentRectangle = function(event) {
+
+    var start = this.getPointOnSvgContainer(event.clientX, event.clientY);
+
+    this.startX = start.x;
+    this.startY = start.y;
+
+    //var position = this.clientToWorld(start.x, start.y);
+    var position = {x: start.x, y: start.y};
+    var size = {x: 10, y: 10};
+
+    var id = this.generateCommentId();
+    var rectangle = new CLOUD.Extensions.CommentRectangle(this, id);
+    rectangle.set(position, size.x, size.y);
+    this.addComment(rectangle);
+    rectangle.created();
+
+    this.selectedComment = rectangle;
+};
+
+CLOUD.Extensions.CommentEditor.prototype.moveCommentRectangle = function(event) {
+
+    var rectangle = this.selectedComment;
+    var end = this.getPointOnSvgContainer(event.clientX, event.clientY);
+    var bounds = this.getBounds();
+
+    var startX = this.startX;
+    var startY = this.startY;
+    var endX = Math.min(Math.max(bounds.x, end.x), bounds.x + bounds.width);
+    var endY = Math.min(Math.max(bounds.y, end.y), bounds.y + bounds.height);
+
+    if (endX === startX && endY === startY) {
+        endX++;
+        endY++;
+    }
+
+    //var position = this.clientToWorld((startX + endX) / 2, (startY + endY) / 2);
+    //var size = this.clientToWorld(endX - startX, endY - startY);
+
+    var position = new THREE.Vector2((startX + endX) / 2, (startY + endY) / 2);
+    var size = new THREE.Vector2(endX - startX, endY - startY);
+
+    var epsilon = 0.0001;
+
+    if (Math.abs(rectangle.position.x - position.x) > epsilon || Math.abs(rectangle.size.y - size.y) > epsilon ||
+        Math.abs(rectangle.position.y - position.y) > epsilon || Math.abs(rectangle.size.y - size.y) > epsilon) {
+
+        rectangle.set(position, size.x, size.y);
+    }
+};
+
+CLOUD.Extensions.CommentEditor.prototype.createCommentCircle = function(event) {
+
+    var start = this.getPointOnSvgContainer(event.clientX, event.clientY);
+
+    this.startX = start.x;
+    this.startY = start.y;
+
+    //var position = this.clientToWorld(start.x, start.y);
+    var position = {x: start.x, y: start.y};
+    var size = {x: 10, y: 10};
+
+    var id = this.generateCommentId();
+    var circle = new CLOUD.Extensions.CommentCircle(this, id);
+    circle.set(position, size.x, size.y);
+    this.addComment(circle);
+    circle.created();
+
+    this.selectedComment = circle;
+};
+
+CLOUD.Extensions.CommentEditor.prototype.moveCommentCircle = function(event) {
+
+    var circle = this.selectedComment;
+    var end = this.getPointOnSvgContainer(event.clientX, event.clientY);
+    var bounds = this.getBounds();
+
+    var startX = this.startX;
+    var startY = this.startY;
+    var endX = Math.min(Math.max(bounds.x, end.x), bounds.x + bounds.width);
+    var endY = Math.min(Math.max(bounds.y, end.y), bounds.y + bounds.height);
+
+    if (endX === startX && endY === startY) {
+        endX++;
+        endY++;
+    }
+
+    //var position = this.clientToWorld((startX + endX) / 2, (startY + endY) / 2);
+    //var size = this.clientToWorld(endX - startX, endY - startY);
+
+    var position = new THREE.Vector2((startX + endX) / 2, (startY + endY) / 2);
+    var size = new THREE.Vector2(endX - startX, endY - startY);
+
+    var epsilon = 0.0001;
+
+    if (Math.abs(circle.position.x - position.x) > epsilon || Math.abs(circle.size.y - size.y) > epsilon ||
+        Math.abs(circle.position.y - position.y) > epsilon || Math.abs(circle.size.y - size.y) > epsilon) {
+
+        circle.set(position, size.x, size.y);
+    }
+};
+
+CLOUD.Extensions.CommentEditor.prototype.createCommentCross = function(event) {
+    var start = this.getPointOnSvgContainer(event.clientX, event.clientY);
+
+    this.startX = start.x;
+    this.startY = start.y;
+
+    //var position = this.clientToWorld(start.x, start.y);
+    var position = {x: start.x, y: start.y};
+    var size = {x: 10, y: 10};
+
+    var id = this.generateCommentId();
+    var cross = new CLOUD.Extensions.CommentCross(this, id);
+    cross.set(position, size.x, size.y);
+    this.addComment(cross);
+    cross.created();
+
+    this.selectedComment = cross;
+};
+
+CLOUD.Extensions.CommentEditor.prototype.moveCommentCross = function(event) {
+
+    var cross = this.selectedComment;
+    var end = this.getPointOnSvgContainer(event.clientX, event.clientY);
+    var bounds = this.getBounds();
+
+    var startX = this.startX;
+    var startY = this.startY;
+    var endX = Math.min(Math.max(bounds.x, end.x), bounds.x + bounds.width);
+    var endY = Math.min(Math.max(bounds.y, end.y), bounds.y + bounds.height);
+
+    if (endX === startX && endY === startY) {
+        endX++;
+        endY++;
+    }
+
+    //var position = this.clientToWorld((startX + endX) / 2, (startY + endY) / 2);
+    //var size = this.clientToWorld(endX - startX, endY - startY);
+
+    var position = new THREE.Vector2((startX + endX) / 2, (startY + endY) / 2);
+    var size = new THREE.Vector2(endX - startX, endY - startY);
+
+    var epsilon = 0.0001;
+
+    if (Math.abs(cross.position.x - position.x) > epsilon || Math.abs(cross.size.y - size.y) > epsilon ||
+        Math.abs(cross.position.y - position.y) > epsilon || Math.abs(cross.size.y - size.y) > epsilon) {
+
+        cross.set(position, size.x, size.y);
+    }
+};
+
+CLOUD.Extensions.CommentEditor.prototype.createCommentCloud = function(event) {
+
+    var start = this.getPointOnSvgContainer(event.clientX, event.clientY);
+
+    this.startX = start.x;
+    this.startY = start.y;
+
+    //var position = this.clientToWorld(start.x, start.y);
+    var position = {x: start.x, y: start.y};
+    var size = {x: 10, y: 10};
+
+    var id = this.generateCommentId();
+    var cloud = new CLOUD.Extensions.CommentCloud(this, id);
+    cloud.set(position, size.x, size.y);
+    this.addComment(cloud);
+    cloud.created();
+
+    this.selectedComment = cloud;
+};
+
+CLOUD.Extensions.CommentEditor.prototype.moveCommentCloud = function(event) {
+
+    var size = {x: 10, y: 10};
+    var cloud = this.selectedComment;
+    var position = this.getPointOnSvgContainer(event.clientX, event.clientY);
+    cloud.set(position, size.x, size.y);
+
+};
+
+CLOUD.Extensions.CommentEditor.prototype.createCommentText = function(event) {
+
+    var start = this.getPointOnSvgContainer(event.clientX, event.clientY);
+    var clientFontSize = 20;
+    var initialWidth = clientFontSize * 15;
+    var initialHeight = clientFontSize * 3;
+
+    var size = new THREE.Vector2(initialWidth, initialHeight);
+
+    var position = new THREE.Vector2(
+        start.x + (initialWidth * 0.5),
+        start.y + (initialHeight * 0.5));
+
+    var id = this.generateCommentId();
+    var text = new CLOUD.Extensions.CommentText(this, id);
+    text.set(position, size.x, size.y);
+    this.addComment(text);
+    text.created();
+    text.forceRedraw();
+
+    this.selectedComment = text;
+};
+
+CLOUD.Extensions.CommentEditor.prototype.moveCommentText = function(event) {
+
+    //var text = this.selectedComment;
+    //var end = this.getPointOnSvgContainer(event.clientX, event.clientY);
+    //var bounds = this.getBounds();
+    //
+    //var startX = this.startX;
+    //var startY = this.startY;
+    //var endX = Math.min(Math.max(bounds.x, end.x), bounds.x + bounds.width);
+    //var endY = Math.min(Math.max(bounds.y, end.y), bounds.y + bounds.height);
+    //
+    //if (endX === startX && endY === startY) {
+    //    endX++;
+    //    endY++;
+    //}
+    //
+    ////var position = this.clientToWorld((startX + endX) / 2, (startY + endY) / 2);
+    ////var size = this.clientToWorld(endX - startX, endY - startY);
+    //
+    //var position = new THREE.Vector2((startX + endX) / 2, (startY + endY) / 2);
+    //var size = new THREE.Vector2(endX - startX, endY - startY);
+    //
+    //var epsilon = 0.0001;
+    //
+    //if (Math.abs(text.position.x - position.x) > epsilon || Math.abs(text.size.y - size.y) > epsilon ||
+    //    Math.abs(text.position.y - position.y) > epsilon || Math.abs(text.size.y - size.y) > epsilon) {
+    //
+    //    text.set(position, size.x, size.y);
+    //}
 };

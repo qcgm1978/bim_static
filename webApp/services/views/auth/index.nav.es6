@@ -50,11 +50,14 @@ App.Services.AuthNav = Backbone.View.extend({
 		App.Services.role.init(function(){$("#blendList").removeClass("services_loading");});
 	},
 	keyUser : function(){
+		if(location.port==81){
+			App.API.Settings.hostname="http://bim.wanda-dev.cn:81/";
+		}
 		$(".serviceBody").empty();
 		this.breadCrumb(this.$el.find(".keyUser"));
 		App.Services.KeyUser.init();
 		$(".serviceBody").html(new App.Services.keyUserFrame().render().el); //框架
-		$('.keyUserList .needloading').html("<div class='smallLoading'><img  src='/static/dist/images/comm/images/pageLoading.gif'/></div>");
+		$('.keyUserList .needloading').html("<div class='smallLoading'><img  src='/static/dist/images/comm/images/load.gif'/></div>");
 		App.Services.KeyUser.loadData(App.Services.KeyUser.KeyUserList,'',function(r){
 			if(r && !r.code && r.data){
 				App.Services.KeyUser.KeyUserList.set(r.data);

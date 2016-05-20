@@ -810,7 +810,7 @@ App.Console = {
       var data = {
         "msgContent"   : JSON.stringify({
           "messageId"  : "411a109141d6473c83a86aa0480d6610",
-          "messageType": (type == '1' ? "QUALIFY-" :(type=='2'?"COST-": "PLAN-")) + num,
+          "messageType": (type == '1' ? "QUALITY-" :(type=='2'?"COST-": "PLAN-")) + num,
           "timestamp"  : (new Date).getTime(),
           "code"       : 0,
           "data"       : type == 1 ? new Array(datainit) : datainit
@@ -819,7 +819,7 @@ App.Console = {
         "msgCreateTime": 1461727280227,
         "msgId"        : "b2e5b467ef214f6196ac3f826017806e",
         "msgSendTime"  : 0,
-        "srcMsgType"   : (type == '1' ? "QUALIFY-" :(type=='2'?"COST-": "PLAN-")) + num,
+        "srcMsgType"   : (type == '1' ? "QUALITY-" :(type=='2'?"COST-": "PLAN-")) + "BIM",
         "retryTimes"   : 0,
         "status"       : 0,
         "sysCode"      : "1"
@@ -835,10 +835,13 @@ App.Console = {
       type   : "POST"
     }).done(function(data){
       $("#result" + index).val(JSON.stringify(data))
-      console.log(data)
-      setTimeout(function(){
-        window.location.reload();
-      }, 2500);
+      console.log(data);
+      if(location.port!=81){
+        setTimeout(function(){
+          window.location.reload();
+        }, 2500);
+      }
+
     });
   }, //2016-1-1转成时间戳
   getTime(str){

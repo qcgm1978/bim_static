@@ -57,9 +57,9 @@ App.Services.DetailView.Floor=Backbone.View.extend({
 			return 
 		}
 		if(r){
-			_$dom.css('border','1px solid #ccc');
+			_$dom.removeClass('errorInput');
 		}else{
-			_$dom.css('border','1px solid #FF0000');
+			_$dom.addClass('errorInput');
 		}
 	},
 
@@ -141,6 +141,10 @@ App.Services.DetailView.Floor=Backbone.View.extend({
 	},
 	
 	saveFloor(args,type){
+
+		if(this.$('.errorInput').length>0){
+			return 
+		}
 		var _this=this,_objName=null;
 		_this.$('input').each(function(){
 			var _=$(this);

@@ -87,9 +87,9 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			href = $target.prop("href");
 
 		if ($target.prop("href").indexOf("noVersion")>-1) {
-			alert('暂无版本'); 
+			alert('暂无版本');
 			return false;
-		}  
+		}
 
 	},
 
@@ -214,7 +214,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			$projectContainer.find(".rightProperty").removeClass("showPropety");
 			$projectContainer.find(".leftNav").show();
 
-			$projectCotent.removeClass("showPropety"); 
+			$projectCotent.removeClass("showPropety");
 
 			//内容
 			$projectContainer.find(".fileContainer").show();
@@ -267,8 +267,8 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			mRight = $projectCotent.data("mRight") || 398;
 
 		//左右侧
-		$projectContainer.find(".leftNav").hide(); 
-	 
+		$projectContainer.find(".leftNav").hide();
+
 		$projectCotent.addClass("showPropety");
 		$projectContainer.find(".rightProperty").addClass("showPropety").width(mRight);
 
@@ -276,7 +276,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		$projectContainer.find(".fileContainer").hide();
 		$projectContainer.find(".modelContainer").show();
 		//模型tab
-		$(".projectContainerApp .projectHeader .projectTab").show(); 
+		$(".projectContainerApp .projectHeader .projectTab").show();
 
 		//销毁上传
 		App.Comm.upload.destroy();
@@ -319,9 +319,10 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		this.typeContentChange();
 
 		//渲染模型属性
-		//App.Project.renderModelContentByType();   
+		//App.Project.renderModelContentByType();
 		//return;
-		var viewer = App.Project.Settings.Viewer = App.Comm.createModel({
+		var viewer = App.Project.Settings.Viewer = new bimView({
+			type:'model',
 			element: $("#projectContainer .modelContainerContent"),
 			sourceId: App.Project.Settings.DataModel.sourceId,
 			etag: App.Project.Settings.DataModel.etag,

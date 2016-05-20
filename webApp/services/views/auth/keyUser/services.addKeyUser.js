@@ -112,10 +112,10 @@ App.Services.addKeyUser = Backbone.View.extend({
       else if(step == 2){
         if(App.Services.KeyUser.html2[0]){
           $('.rightWindow').html(App.Services.KeyUser.html2[0]);
-          $('.rightWindow').siblings('p').text("已选项目 ( " + App.Services.KeyUser.pid.length + "个 )");
+          $('.rightWindow').siblings('p').text("已选"+App.Services.KeyUser.mode==2?"分区(":"项目(" + App.Services.KeyUser.pid.length + "个 )");
         }
         else{
-          $('.rightWindow div').html('').siblings('p').text("已选项目 ( 0个 )");
+          $('.rightWindow div').html('').siblings('p').text("已选"+App.Services.KeyUser.mode==2?"分区(":"项目("+" 0个 )");
 
         }
         $('.steps div').eq(1).addClass('active');
@@ -266,12 +266,12 @@ App.Services.addKeyUser = Backbone.View.extend({
         else{
           App.Services.KeyUser.pid.push(pid);
 
-          str += "<li class='proj-right' data-id=" + pid + "><i class='proj-remove'></i>" + $(this).html();
+          str += "<li class='proj-right list' data-id=" + pid + "><i class='proj-remove'></i>" + $(this).html();
 
         }
       })
       this.$el.find('.rightWindow div').append(str);
-      $('.rightWindow').siblings('p').text("已选项目 ( " + $(".rightWindow li").length + "个 )");
+      $('.rightWindow').siblings('p').text("已选"+App.Services.KeyUser.mode==2?"分区(":"项目(" + $(".rightWindow li").length + "个 )");
 
     }
     else if(stepNum == 3 || this.$el.find('.maintitle').text() == '部门授权'){
@@ -481,7 +481,7 @@ App.Services.addKeyUser = Backbone.View.extend({
     }
   },
   initialize: function(){
-    //this.listenTo(App.Services.KeyUser.KeyUserList,'add',this.add)
+
   }
 
 });

@@ -106,11 +106,10 @@ App.Index = {
 
 	//渲染模型
 	renderModel(modelId) {
-		App.Index.Settings.Viewer = new BIM({
-			single: true,
-			element: $("#contains .projectCotent")[0],
-			etag: modelId,
-			tools: true
+		App.Index.Settings.Viewer = new bimView({
+			type:'singleModel',
+			element: $("#contains .projectCotent"),
+			etag: modelId
 		});
 	},
 
@@ -167,7 +166,7 @@ App.Index = {
 		App.Comm.managePoint(data);
 	},
 
-	fetchChange: function() { 
+	fetchChange: function() {
 		var that = this;
 		App.Project.Collection.changeList.projectId = App.Index.Settings.projectId;
 		App.Project.Collection.changeList.projectVersionId = App.Index.Settings.projectVersionId;
@@ -199,8 +198,8 @@ App.Index = {
 	},
 
 	//api 接口 初始化
-	initApi(projectId, projectVersionId) { 
-		 
+	initApi(projectId, projectVersionId) {
+
 		this.Settings.projectId = projectId;
 		this.Settings.projectVersionId = projectVersionId;
 
@@ -253,7 +252,7 @@ App.Project.Model = {
 			return this;
 		},
 
-		addList: function(model) { 
+		addList: function(model) {
 			var data = model.toJSON();
 			var comparisonId = App.Index.Settings.referenceId;
 			var isload = false;
@@ -316,20 +315,20 @@ App.Project.Model = {
 		},
 		select: function() {
 			var that = $(event.target).closest(".tree-text");
-			var current = $(".rightTreeView .current");
-			var elementId = that.data('id');
-			var baseId = that.data('base');
-			var curElementId = current.data('id');
-			var curBaseId = current.data('base');
-			if (that.prev('.noneSwitch').length > 0) {
-				App.Index.Settings.Viewer.unSelected();
-				if (current[0] != that[0]) {
-					current.removeClass('current');
-					App.Index.Settings.Viewer.selectIds([elementId, baseId]);
-				}
-				that.toggleClass('current');
-				App.Index.Settings.Viewer.fit();
-			}
+			var parent = $(".rightTreeView");
+      var elementId = that.data('id');
+      var baseId = that.data('base');
+      if (that.prev('.noneSwitch').length > 0) {
+        if (that.is('.current')) {
+          that.removeClass('current');
+          App.Index.Settings.Viewer.highlight({type:"userId",ids:[]});
+        }else{
+        	parent.find('.current').removeClass('current');
+          that.addClass('current');
+          App.Index.Settings.Viewer.highlight({type:"userId",ids:[elementId,baseId]});
+        }
+        App.Index.Settings.Viewer.fit();
+      }
 		}
 	})
 }

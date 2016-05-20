@@ -54,13 +54,16 @@ App.Services.ProjectDetail.Pile=Backbone.View.extend({
 			return 
 		}
 		if(r){
-			_$dom.css('border','1px solid #ccc');
+			_$dom.removeClass('errorInput');
 		}else{
-			_$dom.css('border','1px solid #FF0000');
+			_$dom.addClass('errorInput');
 		}
 	},
 
 	savePile(args,type){
+		if(this.$('.errorInput').length>0){
+			return 
+		}
 		var _this=this,
 			_data=[];
 		this.$('.txtInput').each(function(){
