@@ -265,13 +265,49 @@
       // 保存检查点
       var self = this;
       var viewer = self.viewer;
-      return viewer.getMarkerInfoList();
+      var list = viewer.getMarkerInfoList();
+      var newList = [];
+      $.each(list,function(i,item){
+        newList.push(window.btoa(JSON.stringify(item)));
+      });
+      return newList;
     },
     loadMarkers:function(list){
       // 加载检查点
       var self = this;
       var viewer = self.viewer;
-      viewer.loadMarkers(list);
+      var newList = [];
+      $.each(list,function(i,item){
+        newList.push(JSON.parse(window.atob(item)));
+      });
+      viewer.setMarkerMode();
+      viewer.loadMarkers(newList);
+    },
+    // 批注
+    comment:function(){
+      // 进入添加检查点模式
+      var self = this;
+      var viewer = self.viewer;
+      viewer.setcommentMode();
+      viewer.editcommentBegin();
+    },
+    commentEnd : function() {
+      // 退出检查点模式
+      var self = this;
+      var viewer = self.viewer;
+      viewer.editcommentEnd();
+    },
+    saveComment : function() {
+      // 保存检查点
+      var self = this;
+      var viewer = self.viewer;
+      return viewer.getCommentInfoList();
+    },
+    loadComment:function(list){
+      // 加载检查点
+      var self = this;
+      var viewer = self.viewer;
+      viewer.loadComment(list);
     },
     // 模型过滤器
     filter:function(obj){
@@ -356,11 +392,19 @@
     },
     showScene:function(client,flag){
       // 显示隐藏场景
-      var viewer = BIM.common.viewer;
+      var viewer = this.viewer;
       if(viewer && viewer.showScene){
         viewer.showScene(client,flag);
         viewer.render();
       }
+    },
+    getCamera : function(){
+      var viewer = this.viewer;
+      return window.btoa(viewer.getCamera());
+    },
+    setCamera : function(json){
+      var viewer = this.viewer;
+      viewer.setCamera(window.atob(json));
     }
   }
 })($);

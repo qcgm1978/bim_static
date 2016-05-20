@@ -13,11 +13,18 @@
             <div class="bdB-c proe">
                 <h2>项目权限<span class="edit"></span></h2>
                 <ul>
+                    <% if(info.authType==2 && info.area.length){ %>
+                    <% for(var i=0;i<info.area.length;i++){ %>
+                    <li><div class="name"><span class="proImg"></span><a href="#"><%= info.area[i] %></a></div><div class="time"> &nbsp </div><div> &nbsp </div></li>
 
+                    <% }}else if(info.authType==1 && info.project.length){ %>
                     <% for(var i=0;i<info.project.length;i++){ %>
                     <li><div class="name"><span class="proImg"><img src="/static/dist/images/service/images/keyUser_proImg.gif" width="100%"></span><a href="#"><%= info.project[i]['name'] %></a></div><div class="time"><%= new Date(info.project[i]['createTime'] || 0).Format("yyyy-MM-dd")%><%= info.project[i]['openTime']?"--"+new Date(info.project[i]['openTime']).Format("yyyy-MM-dd"):''%></div><div><%= info.project[i]['province']||'无' %></div></li>
 
-                    <% } %>
+                   <% }}else if(info.authType==3){ %>
+                    <li><div class="name"><span class="proImg"></span><a href="#">所有项目</a></div><div class="time"> &nbsp </div><div> &nbsp </div></li>
+
+                  <% } %>
 
                 </ul>
             </div>

@@ -40,6 +40,6 @@ App.Services.userinfo = Backbone.View.extend({
   },
   initialize:function(){
     this.listenTo(App.Services.KeyUser.userinfo,'add',this.render)
-  },
+  }
 
 });
