@@ -16,7 +16,14 @@
 <% if(folder){%>
  <span data-id="<%=id%>" data-isfolder="<%=folder%>" class="text"><%=name%></span>
 <%}else{%>
- <a data-id="<%=id%>" href="/static/dist/app/project/single/filePreview.html?id=<%=fileVersionId%>&projectId=<%=App.Project.Settings.projectId%>&projectVersionId=<%=App.Project.Settings.CurrentVersion.id%>" target="_blank" data-isfolder="<%=folder%>" class="text"><%=name%></a>
+	
+	<%if(suffix=='rvt' ||suffix=='rfa' ||suffix=='dwg'  ){%>
+		<a data-id="<%=id%>" href="/static/dist/app/project/single/filePreview.html?id=<%=fileVersionId%>&projectId=<%=App.Project.Settings.projectId%>&projectVersionId=<%=App.Project.Settings.CurrentVersion.id%>" target="_blank" data-isfolder="<%=folder%>" class="text"><%=name%></a>
+	<%}else{%>
+		  <span data-id="<%=id%>" data-isfolder="false" class="text"><%=name%></span>
+	<%}%>
+
+
 <%}%> 
 
   </span> 
