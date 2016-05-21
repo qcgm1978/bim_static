@@ -447,10 +447,10 @@ App.Services.addKeyUser = Backbone.View.extend({
         data       : JSON.stringify(datas)
       };
       var self = this;
-      $('#dataLoading').show();
+      $('.submitLoading').show();
 
       App.Comm.ajax(data, function(data){
-        $('#dataLoading').hide();
+        $('.submitLoading').hide();
 
         if(data.code == 0){
           $('.mod-dialog,.mod-dialog-masklayer').hide();
