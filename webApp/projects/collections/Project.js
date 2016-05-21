@@ -578,7 +578,6 @@ App.Project = {
 				}
 			});
 		}
-		debugger
 		//模型属性 dwg 图纸
 		if (type.indexOf('dwg') != -1) {
 			App.Project.attrDwg.apply(this);
@@ -589,23 +588,31 @@ App.Project = {
 
 	//模型属性 dwg 图纸
 	attrDwg: function() {
-		var modelId = App.Project.Settings.ModelObj.intersect.userId;
 
-		var data = {
-			URLtype: 'attrDwg',
-			data: {
-				projectId: App.Project.Settings.projectId,
-				versionId: App.Project.Settings.CurrentVersion.id,
-				modelId:modelId
-			}
-		}
+		var modelId = App.Project.Settings.ModelObj.intersect.userId.split('.')[0],
+
+			data = {
+				URLtype: 'attrDwg',
+				data: {
+					projectId: App.Project.Settings.projectId,
+					versionId: App.Project.Settings.CurrentVersion.id,
+					modelId: modelId
+				}
+			},
 
 
-		App.Comm.ajax(data,(data)=>{
-			if (data.code==0) {
+			liTpl = '<li class="modleItem"><a data-id="<%=id%>" href="/static/dist/app/project/single/filePreview.html?id={id}&projectId='+App.Project.Settings.projectId+'&projectVersionId='+App.Project.Settings.CurrentVersion.id+'" target="_blank" ><div class="modleNameText overflowEllipsis modleName2">varName</div></a></li>';
 
-				debugger
+		App.Comm.ajax(data, (data) => {
+			if (data.code == 0) {
 
+				if (data.data.length > 0) {
+					var lis = '';
+					$.each(data.data, function(i, item) {
+						lis += liTpl.replace("varName", item.name).replace('{id}',item.id);
+					});
+					that.$el.find(".attrDwgBox").show().find(".modleList").html(lis);
+				} 
 			}
 		});
 
