@@ -147,8 +147,7 @@ App.Comm = {
 		}
 	},
 	//状态转换
-	convertStatus: function(status) {
-		//1：待上传；2：上传中；3：已上传；4：待审核；5：审核通过；6：审核退回；7：待移交；8：移交退回；9：已发布
+	convertStatus: function(status) { 
 
 		var result = "";
 		if (status == 1) {
@@ -156,9 +155,9 @@ App.Comm = {
 		} else if (status == 2) {
 			result = "上传中";
 		} else if (status == 3) {
-			result = "已上传";
-		} else if (status == 4) {
 			result = "待审核";
+		} else if (status == 4) {
+			result = "审核中";
 		} else if (status == 5) {
 			result = "审核通过";
 		} else if (status == 6) {

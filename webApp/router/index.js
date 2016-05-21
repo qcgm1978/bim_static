@@ -40,6 +40,7 @@ var AppRoute = Backbone.Router.extend({
 		App.Comm.setCookie('AuthUser_AuthMAC', '');
 		App.Comm.setCookie('OUTSSO_AuthNum', '');
 		App.Comm.setCookie('OUTSSO_AuthMAC', '');
+		App.Comm.setCookie('IS_OWNER_LOGIN', '1');
 
 		window.location.href = "/login.html";
 	},

@@ -133,7 +133,7 @@ App.API = {
 		fetchDesignSetting: "view/{projectId}/{projectVersionId}/{collision}/setting", //查看碰撞设置
 
 		// 模型对比
-		fetchDesignChange: "view/{projectId}/{projectVersionId}/comparison", // 获取模型对比列表
+		fetchDesignChange: "view/{projectId}/{projectVersionId}/comparison?type=std", // 获取模型对比列表
 		fetchDesignChangeInfo: "sixD/{projectId}/{projectVersionId}/comparison/result?comparisonId={comparisonId}", // 获取模型对比结果
 
 		//计划
