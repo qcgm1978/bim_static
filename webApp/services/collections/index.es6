@@ -49,8 +49,40 @@ App.Services = {
 
 		} else {
 			var indexTpl = _.templateUrl('/services/tpls/index.html');
-			$("#contains").html(indexTpl);
+			$("#contains").html(indexTpl); 
+			//设置权限
+			this.setAuth();
 			$("#pageLoading").hide();
+		}
+	},
+	//权限设置
+	setAuth(){
+		var $serviceNav = $(".servicesIndexBox .servicesIndex");
+
+		if (!App.AuthObj.service) {
+			$serviceNav.remove();
+		} else {
+			var Auth = App.AuthObj.service;
+			 
+			if (!Auth.app) {
+				$serviceNav.find(".application").remove();
+			}
+		 
+			if (!Auth.auth) {
+				$serviceNav.find(".notice").remove();
+			}
+		 
+			if (!Auth.log) {
+				$serviceNav.find(".log").remove();
+			}
+			 
+			if (!Auth.operationManual) {
+				$serviceNav.find(".workbook").remove();
+			}
+
+			if (!Auth.system) {
+				$serviceNav.find(".systen").remove();
+			}
 		}
 	}
 };

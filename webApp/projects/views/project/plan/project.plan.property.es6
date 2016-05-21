@@ -14,11 +14,46 @@ App.Project.ProjectPlanProperty = Backbone.View.extend({
 	render: function() {
 
 		this.$el.html(this.template);
-		this.$el.find(".planContainer").append(new App.Project.PlanModel().render().el); //模块化
-		this.$el.find(".planContainer").append(new App.Project.PlanAnalog().render().el); //模拟
-		this.$el.find(".planContainer").append(new App.Project.PlanPublicity().render().el); //关注
-		this.$el.find(".planContainer").append(new App.Project.PlanInspection().render().el); //效验
-		this.$el.find(".planContainer").append(new App.Project.PlanProperties().render().el); //属性
+
+		 
+		if (App.AuthObj.project && App.AuthObj.project.plan) {
+
+			var Auth = App.AuthObj.project.plan,
+				$projectNav = this.$(".projectPlanNav"),
+				CostTpl = App.Comm.AuthConfig.Project.PlanTab,
+				$container = this.$(".planContainer");
+
+			//模块化
+			if (Auth.modularization) {
+				$projectNav.append(CostTpl.modularization);
+				$container.append(new App.Project.PlanModel().render().el);
+			}
+
+			//模拟
+			if (Auth.simulation) {
+				$projectNav.append(CostTpl.simulation);
+				$container.append(new App.Project.PlanAnalog().render().el);
+			}
+
+			//关注
+			if (Auth.follow) {
+				$projectNav.append(CostTpl.follow);
+				$container.append(new App.Project.PlanPublicity().render().el);
+			}
+
+			//效验
+			if (Auth.proof) {
+				$projectNav.append(CostTpl.proof);
+				$container.append(new App.Project.PlanInspection().render().el);
+			}
+
+			//属性
+			if (Auth.prop) {
+				$projectNav.append(CostTpl.prop);
+				$container.append(new App.Project.PlanProperties().render().el);
+			}
+		}
+
 		return this;
 	},
 
@@ -71,17 +106,17 @@ App.Project.ProjectPlanProperty = Backbone.View.extend({
 			if ($planPublicity.find(".noLoading").length > 0) {
 				//计划关注列表
 				this.loadPublicityData(projectId, projectVersionId);
-			} 
+			}
 
 		} else if (type == "inspection") {
 			//设计检查
 
-			var $planInterest=this.$el.find(".planInterest");
+			var $planInterest = this.$el.find(".planInterest");
 			$planInterest.show().siblings().hide();
 
 			if ($planInterest.find(".noLoading").length > 0) {
 				this.loadPlanInspection(projectId, projectVersionId);
-			} 
+			}
 
 		} else if (type == "poperties") {
 			//属性

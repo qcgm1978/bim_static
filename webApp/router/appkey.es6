@@ -6,19 +6,19 @@ var AppRoute = Backbone.Router.extend({
 		'project/:projectCode/version/:versionId': 'project', //项目
 		'project/:projectCode/version/:versionId/differ/std': 'projectDifferStd', // 浏览项目模型与标准模型差异
 		'project/:projectCode/version/:versionId/differ/base': 'projectDifferBase' //浏览变更模型与变更基准模型差异
- 
+
 	},
 
 	// 浏览变更模型与变更基准模型差异
-	projectDifferBase(projectCode, versionId){
+	projectDifferBase(projectCode, versionId) {
 		//初始化之前 验证
-		this.beforeInit(() => { 
+		this.beforeInit(() => {
 
 			_.require('/static/dist/app/project/projectChange/index.css');
 			_.require('/static/dist/app/project/projectChange/index.js');
 			var temp = _.templateUrl('/page/tpls/project.change.html', true);
 			$("body").html(temp);
-			App.Index.initApi(projectCode, versionId); 
+			App.Index.initApi(projectCode, versionId);
 
 		});
 	},
@@ -34,7 +34,7 @@ var AppRoute = Backbone.Router.extend({
 			var temp = _.templateUrl('/page/tpls/model.change.html', true);
 			$("body").html(temp);
 
-			App.Index.initApi(projectCode, versionId,"std"); 
+			App.Index.initApi(projectCode, versionId, "std");
 
 		});
 
@@ -56,8 +56,8 @@ var AppRoute = Backbone.Router.extend({
 
 			App.Project.Settings.versionId = versionId;
 
-			App.Project.Settings.type="token";
-			 
+			App.Project.Settings.type = "token";
+
 			App.Project.init();
 
 
@@ -217,6 +217,31 @@ var AppRoute = Backbone.Router.extend({
 			}
 
 			localStorage.setItem("user", JSON.stringify(data.data));
+
+			var Autharr = data.data.function,
+				keys, len;
+			App.AuthObj = {};
+			//遍历权限
+			$.each(Autharr, function(i, item) {
+				keys = item.code.split('-');
+				len = keys.length;
+
+				if (len == 1) {
+					App.AuthObj[keys[0]] = true;
+				} else {
+
+					App.AuthObj[keys[0]] = App.AuthObj[keys[0]] || {}
+
+					if (len == 2) {
+						App.AuthObj[keys[0]][keys[1]] = true
+					} else {
+						App.AuthObj[keys[0]][keys[1]] = App.AuthObj[keys[0]][keys[1]] || {}
+						App.AuthObj[keys[0]][keys[1]][keys[2]] = true;
+					}
+
+				}
+			});
+
 			fn(true);
 
 

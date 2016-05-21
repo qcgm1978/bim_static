@@ -70,7 +70,7 @@ App.Console = {
     var tpl = _.templateUrl('/console1/tpls/fam/fam.html', true);
     $("#contains").html(tpl);
     $.ajax({
-      url: "platform/project?type=2&versionStatus=9"
+      url: "platform/project?type=2&versionStatus=9&pageItemCount=100000"
     }).done(function(data){
 
       var items = data.data.items, str = '';
@@ -186,7 +186,7 @@ App.Console = {
     var tpl = _.templateUrl('/console1/tpls/standardModel/standardmodel.html', true);
     $("#contains").html(tpl);
     $.ajax({
-      url: "platform/project?type=1"
+      url: "platform/project?type=1&pageItemCount=100000"
     }).done(function(data){
 
       var items = data.data.items, str = '';
@@ -198,7 +198,7 @@ App.Console = {
 
       });
 
-      $("#s11").html("<option value=null>请选择</option>"+str).change(function(){
+      $("#s11").html("<option value=''>请选择</option>"+str).change(function(){
         $.ajax({
           url: "platform/project/" + $(this).find('option:selected').attr('id') + "/version"
         }).done(function(data){
@@ -315,7 +315,7 @@ App.Console = {
         }
 
       });
-      $('#s11').html("<option value=null>请选择</option>"+str).change(function(){
+      $('#s11').html("<option value=''>请选择</option>"+str).change(function(){
         $("#p13").val($(this).children('option:selected').attr("versionid"));
       });
 
@@ -657,7 +657,7 @@ App.Console = {
         //type:$('#s12').val().trim(),
 
       };
-      App.Console.apply(1,"BIM", data,2);
+      App.Console.apply(1,1001, data,2);
 
 
     });
@@ -671,7 +671,7 @@ App.Console = {
         //type:$('#s22').val().trim()
 
       };
-      App.Console.apply(2,"BIM", data,2);
+      App.Console.apply(2,1003, data,2);
 
     });
 
@@ -680,7 +680,7 @@ App.Console = {
     var tpl = _.templateUrl('/console1/tpls/projectChange/projectchange.html', true);
     $("#contains").html(tpl);
     $.ajax({
-      url: "platform/project?type=3"
+      url: "platform/project?type=3&pageItemCount=100000"
     }).done(function(data){
 
       var items = data.data.items, str = '';
@@ -692,7 +692,7 @@ App.Console = {
         }
 
       });
-      $("#s11").html("<option value=null>请选择</option>"+str).change(function(){
+      $("#s11").html("<option value=''>请选择</option>"+str).change(function(){
         $.ajax({
           url: "platform/project/" + $(this).find('option:selected').attr('id') + "/version"
         }).done(function(data){
@@ -722,7 +722,7 @@ App.Console = {
         title                   : $('#p11').val().trim(),
         workflowId              : parseInt(9999999 * Math.random()),
         projectVersionName      : $('#p12').val().trim(),
-        refProjectModelId       : $('#s11').val().trim(),
+        refProjectModelCode       : $('#s11').val(),
         refProjectModelName     : $('#s11 option:selected').text().trim(),
         refProjectModelVersionId: $('#s12').val().trim(),
         description             : $('#p13').val().trim(),
@@ -809,6 +809,7 @@ App.Console = {
         "msgContent"   : JSON.stringify({
           "messageId"  : "411a109141d6473c83a86aa0480d6610",
           "messageType": (type == '1' ? "QUALITY-" :(type=='2'?"COST-": "PLAN-")) + num,
+          "message"    : "是",
           "timestamp"  : (new Date).getTime(),
           "code"       : 0,
           "data"       : type == 1 ? new Array(datainit) : datainit
