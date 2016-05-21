@@ -51,6 +51,7 @@
             type:'sceneId',
             name:'floor',
             data:'fileEtags',
+            id:'floors',
             rootName:'楼层'
           });
           var specialties = self.viewTree({
@@ -60,6 +61,7 @@
             children:'files',
             childrenName:'fileName',
             data:'fileEtag',
+            id:'specialty',
             rootName:'专业'
           });
           $('#filter>.tree').append(floors,specialties);
@@ -114,10 +116,11 @@
       self.el._dom.sidebar.find('#selected').show().siblings().hide();
     },
     more:function(viewer){
+      var self = this;
       var status = viewer.getTranslucentStatus();
-      bimView.sidebar._dom.sidebar.find('.bar-translucent').toggleClass('selected',status);
-      bimView.sidebar._dom.sidebar.find('.subBar').on('click',function(){
-        bimView.sidebar._dom.sidebar.find('.bar-more').removeClass('selected');
+      self.el._dom.sidebar.find('.bar-translucent').toggleClass('selected',status);
+      self.el._dom.sidebar.find('.subBar').on('click',function(){
+        self.el._dom.sidebar.find('.bar-more').removeClass('selected');
       });
     },
     toggleMap:function(el){
@@ -179,11 +182,12 @@
         childrenName:'',
         childrenType:'arr',
         data:'',
+        id:'',
         rootName:'',
         isChecked:true
       },
       _opt = $.extend({},defualts,options),
-      rootElement = $('<li class="itemNode" data-type="'+_opt.type+'">\
+      rootElement = $('<li class="itemNode" id="'+_opt.id+'" data-type="'+_opt.type+'">\
         <div class="itemContent">\
           <i class="m-openTree"></i>\
           <label class="treeCheckbox">\

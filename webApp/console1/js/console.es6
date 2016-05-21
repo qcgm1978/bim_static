@@ -461,7 +461,7 @@ App.Console = {
     $("#submit").click(function(){
       var data = {
         "id"           : $('#p11').val().trim(),
-        "projectCode"  : $('#s11').val().trim(),
+        //"projectCode"  : $('#s11').val().trim(),
         "specialtyName": $('#s12 option:selected').text().trim(),
         "specialtyId"  : $('#s12').val().trim(),
         "categoryId"   : $('#s13').val().trim(),
@@ -494,7 +494,7 @@ App.Console = {
     $("#submit").click(function(){
       var data = {
         "id"          : $('#p11').val().trim(),
-        "projectCode" : $('#s11').val().trim(),
+        //"projectCode" : $('#s11').val().trim(),
         "categoryId"  : $('#s12').val().trim(),
         "categoryName": $('#s12 option:selected').text().trim()
       };
@@ -506,7 +506,7 @@ App.Console = {
     $("#submit1").click(function(){
       var data = {
         "id"           : $('#p21').val().trim(),
-        "projectCode"  : $('#s21').val().trim(),
+        //"projectCode"  : $('#s21').val().trim(),
         "specialtyName": $('#s22 option:selected').text().trim(),
         "specialtyId"  : $('#s22').val().trim(),
         "categoryId"   : $('#s23').val().trim(),
@@ -534,7 +534,7 @@ App.Console = {
     $("#submit").click(function(){
       var data = {
         "id"                : $('#p11').val().trim(),
-        "projectCode"       : $('#s11').val().trim(),
+        //"projectCode"       : $('#s11').val().trim(),
         "acceptanceId"      : $('#p12').val().trim(),
         "name"              : $('#p13').val().trim(),
         "status"            : $('#s12').val().trim(),
@@ -565,7 +565,7 @@ App.Console = {
     $("#submit").click(function(){
       var data = {
         "id"            : $('#p11').val().trim(),
-        "projectCode"   : $('#s11').val().trim(),
+        //"projectCode"   : $('#s11').val().trim(),
         "acceptanceId"  : $('#p12').val().trim(),
         "acceptanceType": $('#s12').val().trim()
       };
@@ -605,7 +605,7 @@ App.Console = {
     $("#submit").click(function(){
       var data = {
         "id"                : $('#p11').val().trim(),
-        "projectCode"       : $('#s11').val().trim(),
+        //"projectCode"       : $('#s11').val().trim(),
         "name"              : $('#p12').val().trim(),
         "status"            : $('#s13').val().trim(),
         "specialtyName"     : $('#s12 option:selected').text().trim(),

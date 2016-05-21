@@ -27,9 +27,11 @@ App.Services.MemberozDetail=Backbone.View.extend({
     },
 
     unfold:function(){
+
         var _this =  this,container = this.$el.siblings(".childOz");
         //如果是快速点击，属于误操作，跳过
         if(!App.Services.queue.permit){return;}
+        if(App.Services.queue.que > 1 ){ return}
 
         //选择和加载状态
         if(this.$(".ozName span").hasClass("active") ){  //已选（必然已加载），收起
@@ -39,6 +41,8 @@ App.Services.MemberozDetail=Backbone.View.extend({
             container.hide();
             return
         }else if(container.html()){   //未选但已加载，选择，显示已加载项
+            $(".outer span").removeClass("active");
+            $(".inner span").removeClass("active");
             $(".ozName").removeClass("active");
             $(".ozName span").removeClass("active");//清除内部所有的激活的元素
             container.find(".childOz").hide();
