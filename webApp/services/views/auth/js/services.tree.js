@@ -43,9 +43,9 @@ App.Services.queue = {
             return;
         }
 
-        if(this.que.length > 1){
+        /*if(this.que.length > 1){
             return
-        }
+        }*/
         this.present.push(_this);
         this.que.push(fn);
         this.certificates();
