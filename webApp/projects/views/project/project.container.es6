@@ -420,7 +420,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		//其他属性
 		App.Project.propertiesOthers.call({
 			$el: $designProperties
-		}, "plan|cost|quality");
+		}, "plan|cost|quality|dwg");
 
 	}
 
