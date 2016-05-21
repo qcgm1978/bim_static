@@ -20,6 +20,7 @@ App.Project.QualityOpeningAcceptance = Backbone.View.extend({
 		"click .clearSearch": "clearSearch",
 		"click .tbOpeningacceptanceBody tr": "showInModel",
 		'click .resultStatusIcon':'showDiseaseList'
+		
 	},
 
 
@@ -33,7 +34,7 @@ App.Project.QualityOpeningAcceptance = Backbone.View.extend({
 		this.bindEvent();
 		return this;
 
-	},
+	}, 
 
 	//事件初始化
 	bindEvent() {

@@ -16,6 +16,7 @@ App.Project.ProcessDisease=Backbone.View.extend({
 	events:{
 		
 		'click .closeBtn':'closeView'
+
 	
 	},
 

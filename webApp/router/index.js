@@ -178,10 +178,14 @@ var AppRoute = Backbone.Router.extend({
 		App.Comm.upload.destroy();
 		App.Global.User && $("#topBar .userName .text").text(App.Global.User.name);
 
+		if (!App.Global.User) {
+			return;
+		}
 
 		var Autharr = App.Global.User.function,
 			keys, len;
-		App.AuthObj = {}; 
+		App.AuthObj = {};  
+
 		//遍历权限
 		$.each(Autharr, function(i, item) {
 			keys = item.code.split('-');
