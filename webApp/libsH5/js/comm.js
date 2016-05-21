@@ -48,6 +48,7 @@
         var regData = [],
             classCodeData = bimView.sidebar.classCodeData;
         $.each(list,function(i,item){
+          debugger
           var $item = $(item),
               isChecked = $item.find('input').prop('checked'),
               userData = $item.data('userData')?$item.data('userData').toString():'';
@@ -55,6 +56,7 @@
             regData.push(userData);
           }
         });
+        debugger
         var str = regData.toString().replace(/,/g,"|");
         var reg = new RegExp("^("+str+")");
         $.each(classCodeData,function(i,item){

@@ -122,8 +122,17 @@
             bimView.sidebar[fn](self);
             break;
           case "change":
-            $this.toggleClass('bar-hideMap bar-showMap')
+            $this.toggleClass('m-miniScreen m-fullScreen')
             $(bimView.sidebar.el._dom.sidebar).toggleClass("hideMap");
+            break;
+          case "comment":
+            if(fn == "exit"){
+              self.commentEnd();
+            }else{
+              $this.toggleClass('selected').siblings().removeClass('selected');
+              self.setCommentType(fn);
+            }
+            break;
         }
       }).on('click','.modelSelect .cur',function(){
         // 点击下拉
@@ -178,10 +187,18 @@
         //filter变化
         var $this = $(this),
             $li = $this.closest('.itemNode'),
+            type = $li.data('type'),
             parents = $this.parents('.itemNode'),
-            flag = $this.prop('checked');
+            flag = $this.prop('checked'),
+            filter;
         $li.find("input").prop("checked",flag);
-        var filter = bimView.comm.getFilters(parents,'ckecked');
+        if(type == "sceneId"){
+          var filter = bimView.comm.getFilters(self._dom.bimBox.find("#floors"),'ckecked');
+          var specialty = bimView.comm.getFilters(self._dom.bimBox.find("#specialty"),'ckecked');
+          filter.ids = filter.ids.concat(specialty.ids);
+        }else{
+          filter = bimView.comm.getFilters(parents,'ckecked');
+        }
         self.filter(filter);
       }).on('click','.treeText',function(){
         // 选中高亮
@@ -198,7 +215,7 @@
       });
       self.on('changeGrid',function(res){
         bimView.sidebar.el._dom.mapBar.find(".axisGrid").text(res.axis.offsetX+","+res.axis.offsetY+","+res.axis.offsetZ)
-      })
+      });
     },
     // 以下是对模型操作
     resize:function(width,height){
@@ -219,7 +236,7 @@
     zoom:function () {
       // 缩放模式
       var self = this;
-      self._dom.bimBox.attr('class','bim zoom');
+      self._dom.bimBox.find(".view").attr('class','view zoom');
       self.pub('zoom');
       self.viewer.setZoomMode();
     },
@@ -233,14 +250,14 @@
     fly : function () {
       // 漫游模式
       var self = this;
-      self._dom.bimBox.attr('class','bim fly');
+      self._dom.bimBox.find(".view").attr('class','view fly');
       self.pub('fly');
       self.viewer.setFlyMode();
     },
     picker:function(){
       // 普通模式
       var self = this;
-      self._dom.bimBox.attr('class','bim');
+      self._dom.bimBox.find(".view").attr('class','view');
       self.pub('picker');
       self.viewer.setPickMode();
     },
@@ -263,6 +280,7 @@
       var self = this;
       var viewer = self.viewer;
       viewer.editMarkerEnd();
+      viewer.setPickMode();
     },
     saveMarkers : function() {
       // 保存检查点
@@ -294,12 +312,16 @@
       self._dom.bimBox.attr('class','bim comment');
       viewer.setCommentMode();
       viewer.editCommentBegin();
+      bimView.model.comment(self._dom.bimBox);
     },
     commentEnd : function() {
       // 退出批注模式
       var self = this;
       var viewer = self.viewer;
+      self._dom.bimBox.attr('class','bim');
+      self._dom.bimBox.find('.commentBar').remove();
       viewer.editCommentEnd();
+      viewer.setPickMode();
     },
     setCommentType:function(type){
       var self = this;
