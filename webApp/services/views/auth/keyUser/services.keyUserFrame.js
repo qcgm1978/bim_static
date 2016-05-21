@@ -103,7 +103,7 @@ App.Services.keyUserFrame = Backbone.View.extend({
             }
 
         });
-
+        $('.mod-dialog').css({width:"280px",height:"180px",minHeight:""})
 
     },
 

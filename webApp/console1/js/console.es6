@@ -722,7 +722,7 @@ App.Console = {
         title                   : $('#p11').val().trim(),
         workflowId              : parseInt(9999999 * Math.random()),
         projectVersionName      : $('#p12').val().trim(),
-        refProjectModelId       : $('#s11').val().trim(),
+        refProjectModelCode       : $('#s11').val().trim(),
         refProjectModelName     : $('#s11 option:selected').text().trim(),
         refProjectModelVersionId: $('#s12').val().trim(),
         description             : $('#p13').val().trim(),
@@ -809,6 +809,7 @@ App.Console = {
         "msgContent"   : JSON.stringify({
           "messageId"  : "411a109141d6473c83a86aa0480d6610",
           "messageType": (type == '1' ? "QUALITY-" :(type=='2'?"COST-": "PLAN-")) + num,
+          "message"    : "是",
           "timestamp"  : (new Date).getTime(),
           "code"       : 0,
           "data"       : type == 1 ? new Array(datainit) : datainit
