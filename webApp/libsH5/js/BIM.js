@@ -22,6 +22,7 @@
       });
       _opt._dom.bimBox.append(modelBar);
       var viewer = new self.BIM(_opt);
+      viewer.disableLoD();
       return viewer;
     },
     familyModel:function(options){
@@ -47,7 +48,23 @@
         modelBar.find(".modelItem:eq(0)").trigger('click');
       });
       var viewer = new self.BIM(_opt);
+      viewer.disableLoD();
       return viewer;
+    },
+    comment:function(element){
+      var self = this;
+      var modelBar = $('<div class="commentBar"></div>');
+      $.each(self.commentBar,function(i,item){
+        var tmpHtml;
+        if(i == 0){
+          tmpHtml = $('<i class="bar-item '+item.icon+' selected" title="'+item.title+'" data-id="'+item.fn+'" data-type="'+item.type+'"></i>');
+        }else{
+          tmpHtml = $('<i class="bar-item '+item.icon+'" title="'+item.title+'" data-id="'+item.fn+'" data-type="'+item.type+'"></i>');
+        }
+        bimView.comm.bindEvent.on(item.keyCode,tmpHtml);
+        modelBar.append(tmpHtml);
+      });
+      element.append(modelBar);
     },
     BIM:function(options){
       var self = this;
@@ -58,7 +75,7 @@
     },
     singleBar:[{
       id:'fit',
-      icon:'bar-fit',
+      icon:'m-fit',
       title:'适应窗口(I)',
       fn:'fit',
       keyCode:'105',
@@ -66,25 +83,25 @@
     },
     {
       id:'zoom',
-      icon:'bar-zoom',
+      icon:'m-zoom',
       title:'缩放(Z)',
       fn:'zoom',
       keyCode:'122',
-      type:'selected',
+      type:'pattern',
       group:'3'
     },
     {
       id:'fly',
-      icon:'bar-fly',
+      icon:'m-fly',
       title:'漫游(Space)',
       fn:'fly',
       keyCode:'32',
-      type:'selected',
+      type:'pattern',
       group:'3'
     }],
     modelBar:[{
       id:'filter',
-      icon:'bar-filter',
+      icon:'m-filter',
       title:'选择器',
       fn:'filter',
       keyCode:'',
@@ -93,16 +110,16 @@
     },
     {
       id:'comment',
-      icon:'bar-comment',
+      icon:'m-camera',
       title:'快照',
       fn:'comment',
       keyCode:'',
-      type:'filter',
+      type:'viewer',
       group:'1'
     },
     {
       id:'selected',
-      icon:'bar-selected',
+      icon:'m-selected',
       title:'已选构件',
       fn:'selected',
       keyCode:'',
@@ -111,7 +128,7 @@
     },
     {
       id:'home',
-      icon:'bar-home',
+      icon:'m-home',
       title:'Home(I)',
       fn:'home',
       keyCode:'72',
@@ -119,7 +136,7 @@
       group:'2'
     },{
       id:'fit',
-      icon:'bar-fit',
+      icon:'m-fit',
       title:'适应窗口(I)',
       fn:'fit',
       keyCode:'105',
@@ -128,7 +145,7 @@
     },
     {
       id:'fly',
-      icon:'bar-fly',
+      icon:'m-fly',
       title:'漫游(Space)',
       fn:'fly',
       keyCode:'32',
@@ -137,7 +154,7 @@
     },
     {
       id:'more',
-      icon:'bar-more',
+      icon:'m-more',
       title:'更多',
       fn:'more',
       keyCode:'',
@@ -145,7 +162,7 @@
       group:'0',
       subBar:[{
         id:'color',
-        icon:'bar-color',
+        icon:'m-color',
         title:'颜色',
         fn:'color',
         keyCode:'',
@@ -154,7 +171,7 @@
       },
       {
         id:'zoom',
-        icon:'bar-zoom',
+        icon:'m-zoom',
         title:'缩放(Z)',
         fn:'zoom',
         keyCode:'122',
@@ -163,7 +180,7 @@
       },
       {
         id:'translucent',
-        icon:'bar-translucent',
+        icon:'m-translucent',
         title:'半透明',
         fn:'translucent',
         keyCode:'',
@@ -174,11 +191,54 @@
     },
     {
       id:'hideMap',
-      icon:'bar-hideMap',
-      title:'漫游(Space)',
+      icon:'m-miniScreen',
+      title:'',
       fn:'fly',
       keyCode:'',
       type:'change'
+    }],
+    commentBar:[{
+      id:'arrow',
+      icon:'m-arrow',
+      title:'箭头',
+      fn:'1',
+      type:'comment'
+    },{
+      id:'rect',
+      icon:'m-rect',
+      title:'矩形',
+      fn:'2',
+      type:'comment'
+    },{
+      id:'ellipse',
+      icon:'m-ellipse',
+      title:'圆形',
+      fn:'3',
+      type:'comment'
+    },{
+      id:'mark',
+      icon:'m-mark',
+      title:'标记',
+      fn:'4',
+      type:'comment'
+    },{
+      id:'cloud',
+      icon:'m-cloud',
+      title:'云线',
+      fn:'5',
+      type:'comment'
+    },{
+      id:'text',
+      icon:'m-text',
+      title:'文本',
+      fn:'6',
+      type:'comment'
+    },{
+      id:'close',
+      icon:'m-mark',
+      title:'关闭',
+      fn:'exit',
+      type:'comment'
     }]
   }
   bimView.model.BIM.prototype = {

@@ -17,14 +17,14 @@ var AppRoute = Backbone.Router.extend({
 		'services/:type': 'services',
 		'services/:type/:tab': 'services',
 		'list/:id': 'list',
-		'bodyContent':'bodyContent',
-		'logout':'logout'
+		'bodyContent': 'bodyContent',
+		'logout': 'logout'
 	},
-	
-    //首页主体展示
 
-	bodyContent :function(){
-		
+	//首页主体展示
+
+	bodyContent: function() {
+
 		this.reset();
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".bodyConMenu").addClass('selected');
 		_.require('/static/dist/bodyContent/bodyContent.css');
@@ -32,20 +32,20 @@ var AppRoute = Backbone.Router.extend({
 		App.BodyContent.control.init();
 		$("#pageLoading").hide();
 	},
-	
-	logout:function(){
-		
-		App.Comm.setCookie('OUTSSO_AuthToken','');
-		App.Comm.setCookie('AuthUser_AuthNum','');
-		App.Comm.setCookie('AuthUser_AuthMAC','');
-		App.Comm.setCookie('OUTSSO_AuthNum','');
-		App.Comm.setCookie('OUTSSO_AuthMAC','');
-		
-		window.location.href="/login.html";
+
+	logout: function() {
+
+		App.Comm.setCookie('OUTSSO_AuthToken', '');
+		App.Comm.setCookie('AuthUser_AuthNum', '');
+		App.Comm.setCookie('AuthUser_AuthMAC', '');
+		App.Comm.setCookie('OUTSSO_AuthNum', '');
+		App.Comm.setCookie('OUTSSO_AuthMAC', '');
+
+		window.location.href = "/login.html";
 	},
 	//待办
 	todo: function() {
-		
+
 		this.reset();
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".todo").addClass('selected');
 		//加载css js
@@ -68,19 +68,19 @@ var AppRoute = Backbone.Router.extend({
 	},
 
 	//单个项目
-	project: function(id,versionId) { 
-	 
+	project: function(id, versionId) {
+
 		this.reset();
 
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".projects").addClass('selected');
 		_.require('/static/dist/projects/projects.css');
 		_.require('/static/dist/projects/projects.js');
 
-		App.Project.Settings=$.extend({},App.Project.Defaults);
+		App.Project.Settings = $.extend({}, App.Project.Defaults);
 
-		App.Project.Settings.projectId = id; 
+		App.Project.Settings.projectId = id;
 
-		App.Project.Settings.versionId=versionId;
+		App.Project.Settings.versionId = versionId;
 
 		App.Project.init();
 	},
@@ -91,7 +91,7 @@ var AppRoute = Backbone.Router.extend({
 		//销毁上传
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".flow").addClass('selected');
 		_.require('/static/dist/flow/flow.css');
-		_.require('/static/dist/flow/flow.js'); 
+		_.require('/static/dist/flow/flow.js');
 		App.Flow.Controller.init();
 	},
 
@@ -124,7 +124,7 @@ var AppRoute = Backbone.Router.extend({
 		_.require('/static/dist/resources/resources.css');
 		_.require('/static/dist/resources/resources.js');
 		App.ResourcesNav.Settings.type = App.ResourceModel.Settings.type = type;
-		App.ResourceModel.Settings.CurrentVersion={};
+		App.ResourceModel.Settings.CurrentVersion = {};
 		App.ResourceModel.Settings.projectId = projectId;
 		App.ResourceModel.Settings.versionId = versionId;
 		App.ResourceModel.init();
@@ -132,52 +132,81 @@ var AppRoute = Backbone.Router.extend({
 
 
 	//貌似改掉了
-	console: function(type,step) {
+	console: function(type, step) {
 		this.reset();
 		//销毁上传
 		_.require('/static/dist/console/console.css');
 		_.require('/static/dist/console/console.js');
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".console").addClass('selected');
-		App.Console.Settings.type=type;
-		App.Console.Settings.step=step;
+		App.Console.Settings.type = type;
+		App.Console.Settings.step = step;
 		App.Console.init();
 		$("#pageLoading").hide();
 	},
 	//by zzx
-	console1: function(type,step) {
+	console1: function(type, step) {
 		this.reset();
 		//销毁上传
 		_.require('/static/dist/console1/console.css');
 		_.require('/static/dist/console1/console.js');
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".console").addClass('selected');
-		App.Console.Settings.type=type;
-		App.Console.Settings.step=step;
+		App.Console.Settings.type = type;
+		App.Console.Settings.step = step;
 		App.Console.init();
 		$("#pageLoading").hide();
 	},
 
 
-	services:function(type,tab){
+	services: function(type, tab) {
 		this.reset();
 		$("#pageLoading").hide();
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".services").addClass('selected');
 		_.require('/static/dist/services/services.css');
 		_.require('/static/dist/services/services.js');
-		$("#bottomBar").hide();//隐藏脚部
-		App.Services.init(type,tab);
-		
+		$("#bottomBar").hide(); //隐藏脚部
+		App.Services.init(type, tab);
+
 	},
 
 	//重置数据
-	reset: function() { 
+	reset: function() {
+
 		//用户信息
-		App.Global.User=JSON.parse(localStorage.getItem("user")); 
+		App.Global.User = JSON.parse(localStorage.getItem("user"));
 		$("#pageLoading").show();
 		//销毁上传
 		App.Comm.upload.destroy();
-		var user=JSON.parse(localStorage.getItem("user"));
-		user && $("#topBar .userName .text").text(user.name);
-		//App.Comm.getCookie("OUTSSO_LoginId") && $("#topBar .userName .text").text(App.Comm.getCookie("OUTSSO_LoginId"));
+		App.Global.User && $("#topBar .userName .text").text(App.Global.User.name);
+
+		if (!App.Global.User) {
+			return;
+		}
+
+		var Autharr = App.Global.User.function,
+			keys, len;
+		App.AuthObj = {};  
+
+		//遍历权限
+		$.each(Autharr, function(i, item) {
+			keys = item.code.split('-');
+			len = keys.length;
+
+			if (len == 1) {
+				App.AuthObj[keys[0]] = true;
+			} else {
+
+				App.AuthObj[keys[0]] = App.AuthObj[keys[0]] || {}
+
+				if (len == 2) {
+					App.AuthObj[keys[0]][keys[1]] = true
+				} else {
+					App.AuthObj[keys[0]][keys[1]] = App.AuthObj[keys[0]][keys[1]] || {}
+					App.AuthObj[keys[0]][keys[1]][keys[2]] = true;
+				}
+
+			} 
+		});
+
 	}
 
 

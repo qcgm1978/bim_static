@@ -75,35 +75,67 @@ App.Services.keyUserFrame = Backbone.View.extend({
         var username = $(e.target).attr('data-name');
         var $usernum = this.$el.find('.usernum');
 
-        App.Services.maskWindow=new App.Comm.modules.Dialog({
-            title:'确认要删除关键用户“'+username+'”？',
-            width:280,
-            message:'删除该关键用户后，该用户将不能继续管理项目',
-            height:180,
-            isConfirm:true,
-            okCallback:function(){
-                var data={
-                    URLtype :"fetchServiceKeyUserDelete",
-                    type:"DELETE",
-                    data:JSON.stringify({uid : uid})
+        //App.Services.maskWindow=new App.Comm.modules.Dialog({
+        //    title:'确认要删除关键用户“'+username+'”？',
+        //    width:280,
+        //    message:'删除该关键用户后，该用户将不能继续管理项目',
+        //    height:180,
+        //    isConfirm:true,
+        //    okCallback:function(){
+        //        var data={
+        //            URLtype :"fetchServiceKeyUserDelete",
+        //            type:"DELETE",
+        //            data:JSON.stringify({uid : uid})
+        //
+        //            //contentType:"application/json"
+        //        };
+        //        App.Comm.ajax(data,function(data){
+        //            if (data.code==0) {
+        //                $li.remove();
+        //                $('.mod-dialog,.mod-dialog-masklayer').hide();
+        //                $usernum.text($usernum.text()-1);
+        //            }
+        //
+        //        });
+        //    },
+        //    cancelCallback:function(){
+        //        $('.mod-dialog,.mod-dialog-masklayer').hide();
+        //    }
+        //
+        //});
 
-                    //contentType:"application/json"
-                };
-                App.Comm.ajax(data,function(data){
-                    if (data.code==0) {
-                        $li.remove();
-                        $('.mod-dialog,.mod-dialog-masklayer').hide();
-                        $usernum.text($usernum.text()-1);
-                    }
 
-                });
-            },
-            cancelCallback:function(){
-                $('.mod-dialog,.mod-dialog-masklayer').hide();
-            }
+        var frame = new App.Services.windowAlert().render(function(){
+              var data={
+                              URLtype :"fetchServiceKeyUserDelete",
+                              type:"DELETE",
+                              data:JSON.stringify({uid : uid})
 
+                              //contentType:"application/json"
+                          };
+                          App.Comm.ajax(data,function(data){
+                              if (data.code==0) {
+                                  $li.remove();
+                                  $('.mod-dialog,.mod-dialog-masklayer').hide();
+                                  $usernum.text($usernum.text()-1);
+                              }
+
+                          });
+        }).el;
+        var alertInfo = '确认要删除关键用户“'+username+'”？ <br> <span style="color:#999;">删除该关键用户后，该用户将不能继续管理项目</span>';
+
+        App.Services.alertWindow = new App.Comm.modules.Dialog({
+            title: "",
+            width: 280,
+            height: 180,
+            isConfirm: false,
+            isAlert: false,
+            message: frame
         });
-
+        $(".mod-dialog .wrapper .header").hide();//隐藏头部
+        $(".alertInfo").html(alertInfo);
+        $(".mod-dialog").css({"min-height":"auto"});
+        $(".mod-dialog .wrapper .content").css({"min-height":"auto"});
 
     },
 

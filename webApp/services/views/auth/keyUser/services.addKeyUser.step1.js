@@ -10,8 +10,7 @@ App.Services.step1 = Backbone.View.extend({
   template:_.templateUrl("/services/tpls/auth/keyUser/services.addKeyUser.step1.html"),
 
   events:{
-    "click  p":"changeStatus",
-    //"click .keyUserList li":'toggleClass'
+    "click  p":"changeStatus"
   },
 
   render:function(name){
@@ -65,8 +64,10 @@ App.Services.step1 = Backbone.View.extend({
 
           if(canLoad=='true'){
             $ul.removeClass('shut').addClass('open');
+            $('.submitLoading').show();
 
             App.Comm.ajax({URLtype:'fetchServicesMemberInnerList',data:{parentId:orgId,includeUsers:true}},function(r){
+              $('.submitLoading').hide();
 
               if(r && !r.code && r.data){
                 var str = '';

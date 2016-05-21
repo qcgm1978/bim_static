@@ -14,8 +14,9 @@ App.Services.windowAlert = Backbone.View.extend({
         "click #servicesClose":"close"
     },
 
-    render:function(){
+    render:function(sure){
         this.$el.html(this.template());
+        sure && (this.flag = sure);
         return this;
     },
 
@@ -25,6 +26,9 @@ App.Services.windowAlert = Backbone.View.extend({
 
     //确定
     sure : function(){
+        if(this.flag){
+            return this.flag();
+        }
         $(".serviceBody .roleCtrl").addClass("services_loading");
         var _thisModel = App.Services.deleteRoleInfo,roleId = _thisModel.get("roleId")+'';
 

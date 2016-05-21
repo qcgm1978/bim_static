@@ -17,13 +17,42 @@ App.Project.ProjectDesignPropety = Backbone.View.extend({
 
 		this.$el.html(this.template);
 
+
+
+		if (App.AuthObj.project && App.AuthObj.project.design) {
+
+			var Auth = App.AuthObj.project.design,
+				$projectNav = this.$(".projectPropetyHeader"),
+				CostTpl = App.Comm.AuthConfig.Project.DesignTab,
+				$container = this.$(".projectNavContentBox");
+
+
+			//属性
+			if (Auth.prop) {
+				$projectNav.append(CostTpl.prop);
+				$container.append(new App.Project.DesignProperties().render().el);
+			}
+
+			//碰撞
+			if (Auth.collision) {
+				$projectNav.append(CostTpl.collision);
+				$container.append(new App.Project.DesignCollision().render().el);
+			}
+
+			//检查
+			if (Auth.check) {
+				$projectNav.append(CostTpl.check);
+				$container.append(new App.Project.DesignVerification().render({
+					verOpts: this.VerificationOptions
+				}).el);
+			} 
+		}
+
+
+
 		this.initVerificationOptions();
 
-		this.$el.find(".projectNavContentBox").append(new App.Project.DesignCollision().render().el);
-		this.$el.find(".projectNavContentBox").append(new App.Project.DesignVerification().render({
-			verOpts: this.VerificationOptions
-		}).el);
-		this.$el.find(".projectNavContentBox").append(new App.Project.DesignProperties().render().el);
+
 		return this;
 	},
 
@@ -53,17 +82,17 @@ App.Project.ProjectDesignPropety = Backbone.View.extend({
 			this.$el.find(".detailList").show().siblings().hide();
 
 		} else if (type == "verifi") {
-			
+
 			//设计检查  
 
-			var $designVerification=this.$el.find(".designVerification");
+			var $designVerification = this.$el.find(".designVerification");
 
 			$designVerification.show().siblings().hide();
 
-			if ($designVerification.find(".noLoading").length>0) {
+			if ($designVerification.find(".noLoading").length > 0) {
 				this.getVerificationData();
-			} 
-			
+			}
+
 
 		} else if (type == "poperties") {
 
@@ -73,8 +102,6 @@ App.Project.ProjectDesignPropety = Backbone.View.extend({
 			App.Project.renderProperty();
 
 		}
-
-
 	},
 
 	//获取 设计检查数据
@@ -82,12 +109,10 @@ App.Project.ProjectDesignPropety = Backbone.View.extend({
 
 		App.Project.DesignAttr.VerificationCollection.reset();
 		App.Project.DesignAttr.VerificationCollection.projectId = App.Project.Settings.projectId;
-		App.Project.DesignAttr.VerificationCollection.versionId = App.Project.Settings.CurrentVersion.id; 
+		App.Project.DesignAttr.VerificationCollection.versionId = App.Project.Settings.CurrentVersion.id;
 		App.Project.DesignAttr.VerificationCollection.fetch({
 			data: this.VerificationOptions
 		});
-
-
 	},
 
 	//筛选设计检查
