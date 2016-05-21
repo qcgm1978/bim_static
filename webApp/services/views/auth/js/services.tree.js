@@ -44,8 +44,7 @@ App.Services.queue = {
         }
 
         if(this.que.length > 1){
-            this.que.pop();
-            this.present.pop();
+            return
         }
         this.present.push(_this);
         this.que.push(fn);
