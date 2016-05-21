@@ -36,21 +36,22 @@ App.Services.windowAlert = Backbone.View.extend({
             url:"http://bim.wanda-dev.cn/platform/auth/role?roleId=" +roleId,
             type:"DELETE",
             success:function(response){
+                console.log(response);
                  if(response.code==0){
                     if(response.data.success[0] == roleId){  //删除成功
                         App.Services.role.collection.remove(_thisModel);
-                        if(response.data.failure[0] ==roleId){ //删除失败
-                            $(".servicesAlert .confirm").hide();
-                            $(".servicesAlert .alert").show();
-                            $(".alertInfo").html("该角色已被使用，无法删除");
-                            App.Services.alertWindow.close();
-                        }
+                        App.Services.alertWindow.close();
+                        return
                     }
+                     if(response.data.failure[0] ==roleId){ //删除失败
+                         $(".servicesAlert .confirm").hide();
+                         $(".servicesAlert .alertRole").show();
+                         $(".alertInfo").html("该角色已被使用，无法删除");
+                     }
                 }
 
                 $(".serviceBody .roleCtrl").removeClass("services_loading");
                 App.Services.deleteRoleInfo ="";//清理
-                App.Services.alertWindow.close();
             },
             error:function(error){
                 $(".serviceBody .roleCtrl").removeClass("services_loading");
