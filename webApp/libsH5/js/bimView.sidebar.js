@@ -37,25 +37,37 @@
       var self = this;
       isSelected ? self.el._dom.sidebar.addClass('open') : self.el._dom.sidebar.removeClass('open');
       self.el._dom.sidebar.find('#filter').show().siblings().hide();
-      if(!self.sceneStatue){
-        self.sceneStatue = true;
+      if(!self.floorsStatue){
+        self.floorsStatue = true;
         bimView.comm.ajax({
           type:'get',
-          url:bimView.API.fetchScene,
+          url:bimView.API.fetchFloors,
           etag:self._opt.etag,
           sourceId:self._opt.sourceId
         },function(data){
           var data = data.data;
           var floors = self.viewTree({
-            arr:data.floors,
+            arr:data,
             type:'sceneId',
             name:'floor',
             data:'fileEtags',
             id:'floors',
             rootName:'楼层'
           });
+          $('#filter>.tree').append(floors);
+        });
+      }
+      if(!self.specialtyStatue){
+        self.specialtyStatue = true;
+        bimView.comm.ajax({
+          type:'get',
+          url:bimView.API.fetchSpecialty,
+          etag:self._opt.etag,
+          sourceId:self._opt.sourceId
+        },function(data){
+          var data = data.data;
           var specialties = self.viewTree({
-            arr:data.specialties,
+            arr:data,
             type:'sceneId',
             name:'specialty',
             children:'files',
@@ -64,7 +76,7 @@
             id:'specialty',
             rootName:'专业'
           });
-          $('#filter>.tree').append(floors,specialties);
+          $('#filter>.tree').append(specialties);
         });
       }
       if(!self.categoryStatue){
@@ -135,7 +147,7 @@
           axisGridData;
       bimView.comm.ajax({
         type:'get',
-        url:bimView.API.fetchFloors,
+        url:bimView.API.fetchFloorsMap,
         etag:self._opt.etag,
         sourceId:self._opt.sourceId
       },function(res){

@@ -8,10 +8,11 @@
     //模型
     fetchModel: "model/",//获取模型信息
     fetchFamilyType:'/model/{etag}/metadata/familyInfo.json',
-    fetchFloors: 'view/{etag}/{sourceId}/miniature/map', //获取模型楼层信息
+    fetchFloorsMap: 'view/{etag}/{sourceId}/miniature/map', //获取模型楼层信息
     fetchAxisGrid: 'model/{etag}/metadata/gridAndLevel.json', //获取楼层地图,轴网信息
     // 构件树
-    fetchScene: "view/{etag}/{sourceId}/tree", // 获取楼层,专业信息
+    fetchFloors: "view/{etag}/{sourceId}/floor", // 获取楼层
+    fetchSpecialty: "view/{etag}/{sourceId}/specialty", // 获取楼层,专业信息
     fetchCategory: "view/{etag}/{sourceId}/categories", // 获取构件信息
     fetchCoding: 'view/category/coding/{etag}', //获取构件编码信息
     //快照
