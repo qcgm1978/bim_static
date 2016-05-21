@@ -198,7 +198,7 @@ App.Console = {
 
       });
 
-      $("#s11").html("<option value=null>请选择</option>"+str).change(function(){
+      $("#s11").html("<option value=''>请选择</option>"+str).change(function(){
         $.ajax({
           url: "platform/project/" + $(this).find('option:selected').attr('id') + "/version"
         }).done(function(data){
@@ -315,7 +315,7 @@ App.Console = {
         }
 
       });
-      $('#s11').html("<option value=null>请选择</option>"+str).change(function(){
+      $('#s11').html("<option value=''>请选择</option>"+str).change(function(){
         $("#p13").val($(this).children('option:selected').attr("versionid"));
       });
 
@@ -692,7 +692,7 @@ App.Console = {
         }
 
       });
-      $("#s11").html("<option value=null>请选择</option>"+str).change(function(){
+      $("#s11").html("<option value=''>请选择</option>"+str).change(function(){
         $.ajax({
           url: "platform/project/" + $(this).find('option:selected').attr('id') + "/version"
         }).done(function(data){
@@ -722,7 +722,7 @@ App.Console = {
         title                   : $('#p11').val().trim(),
         workflowId              : parseInt(9999999 * Math.random()),
         projectVersionName      : $('#p12').val().trim(),
-        refProjectModelCode       : $('#s11').val().trim(),
+        refProjectModelCode       : $('#s11').val(),
         refProjectModelName     : $('#s11 option:selected').text().trim(),
         refProjectModelVersionId: $('#s12').val().trim(),
         description             : $('#p13').val().trim(),
