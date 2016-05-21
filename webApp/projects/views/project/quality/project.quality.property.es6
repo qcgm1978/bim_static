@@ -11,7 +11,8 @@ App.Project.ProjectQualityProperty = Backbone.View.extend({
 		"click .paginationBottom .pageInfo .next": "nextPage",
 		"click .paginationBottom .pageInfo .prev": "prevPage",
 		"click .btnFilter": "filterData",
-		"click .clearSearch": "clearSearch"
+		"click .clearSearch": "clearSearch",
+		"click .diseaseItem": "diseaseItemClick"
 	},
 
 	render: function() {
@@ -25,7 +26,7 @@ App.Project.ProjectQualityProperty = Backbone.View.extend({
 			var Auth = App.AuthObj.project.quality,
 				$projectNav = this.$(".projectQualityNav"),
 				CostTpl = App.Comm.AuthConfig.Project.QualityTab,
-				$container = this.$(".qualityContainer"); 
+				$container = this.$(".qualityContainer");
 
 			//材料设备
 			if (Auth.material) {
@@ -49,7 +50,7 @@ App.Project.ProjectQualityProperty = Backbone.View.extend({
 				$container.append(new App.Project.QualityOpeningAcceptance().render({
 					OpeningAcceptance: this.OpeningAcceptanceOptions
 				}).el);
-			} 
+			}
 
 			//隐患
 			if (Auth.latentDanger) {
@@ -74,6 +75,13 @@ App.Project.ProjectQualityProperty = Backbone.View.extend({
 		return this;
 	},
 
+	//过程v开业 隐患 顶啊及
+	diseaseItemClick(event) { 
+		var data = $(event.target).closest("li").data("location");
+		data=JSON.stringify(data);
+		App.Project.Settings.Viewer.loadMarkers([data]); 
+		event.stopPropagation(); 
+	},
 	//切换tab
 	navClick: function(event) {
 		var $target = $(event.target),

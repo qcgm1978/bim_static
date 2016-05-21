@@ -102,8 +102,6 @@ App.Project.ProjectDesignPropety = Backbone.View.extend({
 			App.Project.renderProperty();
 
 		}
-
-
 	},
 
 	//获取 设计检查数据
@@ -115,8 +113,6 @@ App.Project.ProjectDesignPropety = Backbone.View.extend({
 		App.Project.DesignAttr.VerificationCollection.fetch({
 			data: this.VerificationOptions
 		});
-
-
 	},
 
 	//筛选设计检查

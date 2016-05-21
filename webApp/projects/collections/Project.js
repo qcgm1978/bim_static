@@ -267,7 +267,7 @@ App.Project = {
 			$projectTab.find(".item:last").addClass('last');
 
 			// if (!App.AuthObj.project || !App.AuthObj.project.list) {
-				
+
 			// }
 		}
 
@@ -578,6 +578,38 @@ App.Project = {
 				}
 			});
 		}
+		debugger
+		//模型属性 dwg 图纸
+		if (type.indexOf('dwg') != -1) {
+			App.Project.attrDwg.apply(this);
+		}
+
+
+	},
+
+	//模型属性 dwg 图纸
+	attrDwg: function() {
+		var modelId = App.Project.Settings.ModelObj.intersect.userId;
+
+		var data = {
+			URLtype: 'attrDwg',
+			data: {
+				projectId: App.Project.Settings.projectId,
+				versionId: App.Project.Settings.CurrentVersion.id,
+				modelId:modelId
+			}
+		}
+
+
+		App.Comm.ajax(data,(data)=>{
+			if (data.code==0) {
+
+				debugger
+
+			}
+		});
+
+
 	},
 
 	//属性 数据获取

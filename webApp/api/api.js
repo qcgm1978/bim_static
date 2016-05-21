@@ -229,7 +229,7 @@ App.API = {
 		appToken:"platform/token", //获取app token
 		modelStd:'view/{projectId}/{projectVersionId}/comparison?type=std', // 与标准模型对比
 		modelBase:'view/{projectId}/{projectVersionId}/comparison?type=base', // 与标准模型对比
-
+		'attrDwg':'doc/{projectId}/{versionId}/file/tag', //图纸
 		//业务流程
 		fetchFlow:'platform/flow',
 		
