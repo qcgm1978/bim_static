@@ -50,6 +50,9 @@ App.Services.queue = {
         this.que.push(fn);
         this.certificates();
     },
+    stop:function(){
+
+    },
     //执行完毕，刷新队列，执行下一个
     next:function(){
         this.que.shift();

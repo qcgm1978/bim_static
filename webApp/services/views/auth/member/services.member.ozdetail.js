@@ -34,13 +34,17 @@ App.Services.MemberozDetail=Backbone.View.extend({
         if(App.Services.queue.que > 1 ){ return}
 
         //选择和加载状态
-        if(this.$(".ozName span").hasClass("active") ){  //已选（必然已加载），收起
+        if(this.$(".ozName span").hasClass("active")){  //已选（必然已加载），收起
+            if(App.Services.queue.que.length){return}
             this.$(".ozName").removeClass("active").find("span").removeClass("active");
+            App.Services.queue.certificates();
             //清空右侧列表
             $("#blendList").html("<li><span class='sele'>没有选择任何组织，请点击左侧组织名选择</span></li>");
             container.hide();
             return
-        }else if(container.html()){   //未选但已加载，选择，显示已加载项
+        }
+
+        if(!this.$(".ozName span").hasClass("active") && container.html()){   //未选但已加载，选择，显示已加载项
             $(".outer span").removeClass("active");
             $(".inner span").removeClass("active");
             $(".ozName").removeClass("active");

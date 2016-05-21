@@ -92,6 +92,8 @@ App.Services.memberDetail=Backbone.View.extend({
                 alreadyMenu.html(App.Services.tree(response));
             }
         }).done(function(){
+            var  active = $("#ozList span").hasClass("active");
+            console.log(1);
             App.Services.queue.next();
         });
     },
