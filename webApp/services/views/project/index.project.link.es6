@@ -56,9 +56,6 @@ App.Services.ProjectLink=Backbone.View.extend({
 		var projectId=_this.userData.projectId,
 			type=_this.userData.type;
 		var _result={
-				    'modularizeProjectCode': '',
-				    'costProjectCode':'',
-				    'qualityProjectCode': '',
 				    'projectId':projectId
 				}
 		if($li.length>0){

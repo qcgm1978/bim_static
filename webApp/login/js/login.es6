@@ -17,7 +17,7 @@ var Login = {
 
 	//事件绑定
 	bindEvent() {
-
+		var $remeber=$("#mainBox .remember");
 		//登录
 		$("#btnLogin").on("click", function() {
 			Login.signIn();
@@ -39,9 +39,12 @@ var Login = {
 		});
 
 		//一周内自动登陆
-		$("#mainBox .remember").on("click", function() {
+		$remeber.on("click", function() {
 			$(this).toggleClass("selected");
 		});
+		if(Login.getCookie("isAutoLogin")=='true'){
+			$remeber.click();
+		}
 
 	},
 
@@ -126,7 +129,8 @@ var Login = {
 			} else {
 				Login.setCookie("isAutoLogin", false);
 			}
-
+			//是否主动退出标记 2 默认状态 1 为主动退出
+			Login.setCookie('IS_OWNER_LOGIN','2');
 			window.location.href = "/index.html";
 		});
 	},
@@ -162,7 +166,7 @@ var Login = {
 
 				diffMillisecond = 24 * 7 * 60 * 60 * 1000;
 			//7 天内
-			if ((new Date() - setDate) <= diffMillisecond) {
+			if ((new Date() - setDate) <= diffMillisecond && Login.getCookie('IS_OWNER_LOGIN')=='2') {
 				//获取用户名
 				$("#userName").val(Login.getCookie("userName"));
 				$("#userPwd").val(Login.getCookie("userPwd"));
