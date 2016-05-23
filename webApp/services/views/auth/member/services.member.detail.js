@@ -46,6 +46,7 @@ App.Services.memberDetail=Backbone.View.extend({
 
     loadMenu:function(e){
         this.cancelBubble(e);
+        if(App.Services.queue.que > 1 ){ return}
         if(this.model.get("userId")){return}//用户，可能需要另行处理
         var findSelf = this.findSelf(),
             _thisType = App.Services.MemberType,

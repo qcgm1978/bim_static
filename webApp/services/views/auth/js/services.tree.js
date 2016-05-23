@@ -43,13 +43,15 @@ App.Services.queue = {
             return;
         }
 
-        if(this.que.length > 1){
-            this.que.pop();
-            this.present.pop();
-        }
+        /*if(this.que.length > 1){
+            return
+        }*/
         this.present.push(_this);
         this.que.push(fn);
         this.certificates();
+    },
+    stop:function(){
+
     },
     //执行完毕，刷新队列，执行下一个
     next:function(){

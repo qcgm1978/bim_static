@@ -31,6 +31,7 @@ App.Services.MemberNav=Backbone.View.extend({
     },
     //菜单切换
     nav:function(){
+        if(App.Services.queue.que > 2 ){ return}
         var _this =this,$tab = $("#" + App.Services.MemberType),already = $tab.siblings(".childOz").html();
         $("#ozList div").removeClass("active");
         $("#ozList span").removeClass("active");

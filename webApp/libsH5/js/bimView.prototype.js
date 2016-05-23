@@ -312,6 +312,7 @@
       self._dom.bimBox.attr('class','bim comment');
       viewer.setCommentMode();
       viewer.editCommentBegin();
+      viewer.setCommentType("0");
       bimView.model.comment(self._dom.bimBox);
     },
     commentEnd : function() {
