@@ -214,7 +214,7 @@
         self.resize();
       });
       self.on('changeGrid',function(res){
-        bimView.sidebar.el._dom.mapBar.find(".axisGrid").text(res.axis.offsetX+","+res.axis.offsetY+","+res.axis.offsetZ)
+        bimView.sidebar.el._dom.mapBar.find(".axisGrid").text(res.axis.infoX+","+res.axis.infoY+",("+res.axis.offsetZ+")")
       });
     },
     // 以下是对模型操作
