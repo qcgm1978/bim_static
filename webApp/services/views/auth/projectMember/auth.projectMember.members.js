@@ -19,7 +19,7 @@ App.Services.projectMember.members = Backbone.View.extend({
   		var _userName=event.currentTarget.getAttribute("data-userName");
   		var _opType=event.currentTarget.getAttribute("data-type");//对象类型：org,user
   		var _outer=event.currentTarget.getAttribute("data-outer");//对象类型：org,user
-  		
+
   		App.Services.Dialog.alert("<span class='delTip'>确认要将'"+_userName+"'从"+App.Comm.getCookie("currentProjectName")+"删除？</span>",function(_this){
   			App.Comm.ajax({
   				URLtype:'deleteServicesProjectMembers',
@@ -42,9 +42,8 @@ App.Services.projectMember.members = Backbone.View.extend({
   			}).fail(function(){
   				
   			})
-  			
-    		
   		});
+      $('.mod-dialog,.mod-dialog .wrapper .content').css('minHeight','auto');
   },
 
   render: function(items) {
