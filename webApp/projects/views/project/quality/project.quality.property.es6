@@ -15,6 +15,13 @@ App.Project.ProjectQualityProperty = Backbone.View.extend({
 		"click .diseaseItem": "diseaseItemClick"
 	},
 
+	initialize(){
+		var _this=this;
+		Backbone.on('qualityFilterDataChange',function(obj,key,val){
+			_this[obj][key]=val;
+		})
+	},
+
 	render: function() {
 
 		this.$el.html(this.template);

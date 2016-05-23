@@ -22,6 +22,10 @@ App.Project.QualityProcessAcceptance = Backbone.View.extend({
 		"click .tbProcessAccessBody tr": "showInModel"
 	},
 
+	//过程验收过滤条件change事件
+	changePA(key,val){
+		Backbone.trigger('qualityFilterDataChange','ProcessAcceptanceOptions',key,val);
+	},
 	//渲染
 	render: function(options) {
 
@@ -40,13 +44,15 @@ App.Project.QualityProcessAcceptance = Backbone.View.extend({
 		//隐患
 		this.$(".riskOption").myDropDown({
 			click: function($item) {
-				that.ProcessAcceptanceOptions.problemCount = $item.data("status");
+			//	that.ProcessAcceptanceOptions.problemCount = $item.data("status");
+				that.changePA('problemCount', $item.data("status"))
 			}
 		});
 		//列别
 		this.$(".categoryOption").myDropDown({
 			click: function($item) {
-				that.ProcessAcceptanceOptions.category = $item.text();
+			//	that.ProcessAcceptanceOptions.category = $item.text();
+				that.changePA('category', $item.text())
 			}
 		});
 		//显示搜索结果对应位置

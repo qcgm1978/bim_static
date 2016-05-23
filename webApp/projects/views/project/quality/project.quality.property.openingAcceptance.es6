@@ -36,6 +36,11 @@ App.Project.QualityOpeningAcceptance = Backbone.View.extend({
 
 	}, 
 
+	//开业验收过滤条件change事件
+	changeOA(key,val){
+		Backbone.trigger('qualityFilterDataChange','OpeningAcceptanceOptions',key,val);
+	},
+
 	//事件初始化
 	bindEvent() {
 
@@ -43,20 +48,23 @@ App.Project.QualityOpeningAcceptance = Backbone.View.extend({
 		//隐患
 		this.$(".riskOption").myDropDown({
 			click: function($item) {
-				that.OpeningAcceptanceOptions.problemCount = $item.data("status");
+			//	that.OpeningAcceptanceOptions.problemCount = $item.data("status");
+				that.changeOA('problemCount', $item.data("status"))
 			}
 		});
 		//列别
 		this.$(".categoryOption").myDropDown({
 			click: function($item) {
-				that.OpeningAcceptanceOptions.category = $item.text();
+				//that.OpeningAcceptanceOptions.category = $item.text();
+				that.changeOA('category', $item.attr('data-val'))
 			}
 		});
 
 		//专业
 		this.$(".specialitiesOption").myDropDown({
 			click: function($item) {
-				that.OpeningAcceptanceOptions.specialty = $item.text();
+			//	that.OpeningAcceptanceOptions.specialty = $item.text();
+				that.changeOA('specialty', $item.attr('data-val'))
 			}
 		});
 

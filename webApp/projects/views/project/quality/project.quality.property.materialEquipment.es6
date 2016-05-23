@@ -45,6 +45,15 @@ App.Project.QualityMaterialEquipment = Backbone.View.extend({
 		$searchDetail.slideToggle();
 	},
 
+	//材料设备过滤条件change事件
+	changeME(key,val){
+		Backbone.trigger('qualityFilterDataChange','MaterialEquipmentOptions',key,val);
+	},
+	//隐患过滤条件change事件
+	changeCO(key,val){
+		
+	},
+
 	//事件绑定
 	bindEvent: function() {
 
@@ -52,27 +61,30 @@ App.Project.QualityMaterialEquipment = Backbone.View.extend({
 		//专业
 		this.$(".specialitiesOption").myDropDown({
 			click: function($item) {
-
-				that.MaterialEquipmentOptions.specialty = $item.text();
+				//that.MaterialEquipmentOptions.specialty = $item.text();
+				that.changeME('specialty',$item.attr('data-val'));
 			}
 		});
 
 		//类别
 		this.$(".categoryOption").myDropDown({
 			click: function($item) {
-				that.MaterialEquipmentOptions.category = $item.text();
+			//	that.MaterialEquipmentOptions.category = $item.text();
+				that.changeME('category',$item.attr('data-val'));
 			}
 		});
 
 
 		this.$(".statusOption").myDropDown({
 			click: function($item) {
-				that.MaterialEquipmentOptions.status = $item.data("status");
+				//that.MaterialEquipmentOptions.status = $item.data("status");
+				that.changeME('status',$item.data("status"));
 			}
 		});
 
 		this.$(".txtSearchName").blur(function() {
-			that.MaterialEquipmentOptions.name = $(this).val().trim();
+			//that.MaterialEquipmentOptions.name = $(this).val().trim();
+			that.changeME('name',$(this).val().trim());
 		});
 
 		this.$("#dateStar").one("mousedown",function() { 
@@ -85,7 +97,8 @@ App.Project.QualityMaterialEquipment = Backbone.View.extend({
 				endDate: new Date()
 
 			}).on("changeDate",function(ev){
-				that.MaterialEquipmentOptions.startTime = ev.date.format("yyyy-MM-dd");
+				//that.MaterialEquipmentOptions.startTime = ev.date.format("yyyy-MM-dd");
+				that.changeME('startTime', ev.date.format("yyyy-MM-dd"));
 			});
 		});
 
@@ -99,7 +112,8 @@ App.Project.QualityMaterialEquipment = Backbone.View.extend({
 				endDate: new Date()
 
 			}).on("changeDate",function(ev){
-				that.MaterialEquipmentOptions.endTime = ev.date.format("yyyy-MM-dd");
+				//that.MaterialEquipmentOptions.endTime = ev.date.format("yyyy-MM-dd");
+				that.changeME('endTime',ev.date.format("yyyy-MM-dd"));
 			});
 		});
 
