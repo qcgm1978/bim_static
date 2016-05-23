@@ -1,12 +1,18 @@
  App.Projects = {
 
-    //项目业态
+    //项目类型
     projectType:{
-        '':'其他',
-        "1":'综合体',
-        "2":'文化旅游',
-        "3":'境外',
-        '4':'其他'
+        '':'其它',
+        "8":'综合体',
+        "16":'酒店',
+        "32":'文化旅游'
+    },
+    //项目模式
+    projectModel:{
+        '':'其它',
+        "1":'创新模式',
+        "2":'轻资产',
+        "3":'重资产'
     },
 
      ProjectCollection: new(Backbone.Collection.extend({
@@ -64,28 +70,32 @@
 
 
      //加载数据
-     loadData: function(projectName) {
+     loadData: function(params) {
 
+        var _data={
+             name: "",
+             projectType:"", //项目类型
+             estateType: "", //项目模式
+             province: "", //所属省份
+             region: "", //分区
+             complete: "", //是否完成
+             open: "", //是否开业
+             openTimeStart: "", 
+             openTimEnd: "",
+             pageIndex: App.Projects.Settings.pageIndex,
+             pageItemCount: App.Comm.Settings.pageItemCount
+
+         };
+         //初始化用户参数
+         _data=$.extend({},_data,params);
          $("#projectModes .proListBox").empty(); //清空数据
          App.Projects.ProjectCollection.reset();
          App.Projects.ProjectCollection.project = "project";
+
          //拉取数据
          App.Projects.ProjectCollection.fetch({
 
-             data: {
-                 // projectType: 1,
-                 name: projectName || "",
-                 estateType: "",
-                 province: "",
-                 region: "",
-                 complete: "",
-                 open: "",
-                 openTimeStart: "",
-                 openTimEnd: "",
-                 pageIndex: App.Projects.Settings.pageIndex,
-                 pageItemCount: App.Comm.Settings.pageItemCount
-
-             },
+             data: _data,
 
              success: function(collection, response, options) {
                 $("#pageLoading").hide();
@@ -162,8 +172,6 @@
          $(".dateBox .iconCal").click(function() {
              $(this).next().focus();
          });
-         //下拉
-         $(".advancedQueryConditions .pickProvince").myDropDown();
          //单选
          $(".groupRadio").myRadioCk();
          // $(".groupRadio2").myRadioCk();

@@ -20,7 +20,6 @@ var AppRoute = Backbone.Router.extend({
 		'bodyContent': 'bodyContent',
 		'logout': 'logout'
 	},
-
 	//首页主体展示
 
 	bodyContent: function() {

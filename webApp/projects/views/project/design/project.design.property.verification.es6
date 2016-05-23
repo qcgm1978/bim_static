@@ -36,6 +36,9 @@
  		$searchDetail.slideToggle();
  	},
 
+ 	dataChange(key,val){
+ 		Backbone.trigger('projectDesignPropetyFilterDataChange',key,val)
+ 	},
  	//初始化事件
  	initEvent() {
 
@@ -44,16 +47,17 @@
  		//专业
  		this.$(".specialitiesOption").myDropDown({
  			click: function($item) {
-
- 				that.VerificationOptions.specialty = $item.text();
+ 			//	that.VerificationOptions.specialty = $item.text();
+ 			//	Backbone.trigger('projectDesignPropetyFilterDataChange','specialty',$item.text())
+ 				that.dataChange('specialty',$item.text())
  			}
  		});
 
  		//类别
  		this.$(".categoryOption").myDropDown({
  			click: function($item) {
-
- 				that.VerificationOptions.type = $item.text();
+ 			//	that.VerificationOptions.type = $item.text();
+ 				that.dataChange('type',$item.text())
  			}
  		});
 
@@ -61,7 +65,8 @@
  		this.$(".statusOption").myDropDown({
  			click: function($item) {
 
- 				that.VerificationOptions.status = $item.data("status");
+ 			//	that.VerificationOptions.status = $item.data("status");
+ 				that.dataChange('status',$item.data("status"))
  			}
  		});
 
@@ -69,7 +74,8 @@
  		this.$(".inspectionUnitOption").myDropDown({
  			click: function($item) {
 
- 				that.VerificationOptions.reporter = $item.text();
+ 			//	that.VerificationOptions.reporter = $item.text();
+ 				that.dataChange('reporter',$item.text())
  			}
  		});
 
@@ -87,7 +93,8 @@
  				endDate: new Date()
 
  			}).on("changeDate", function(ev) {
- 				that.VerificationOptions.startTime = ev.date.format("yyyy-MM-dd");
+ 			//	that.VerificationOptions.startTime = ev.date.format("yyyy-MM-dd");
+ 				that.dataChange('startTime', ev.date.format("yyyy-MM-dd"))
  			});
  		});
 
@@ -101,7 +108,8 @@
  				endDate: new Date()
 
  			}).on("changeDate", function(ev) {
- 				that.VerificationOptions.endTime = ev.date.format("yyyy-MM-dd");
+ 				//that.VerificationOptions.endTime = ev.date.format("yyyy-MM-dd");
+ 				that.dataChange('endTime',ev.date.format("yyyy-MM-dd"))
  			});
  		});
 
