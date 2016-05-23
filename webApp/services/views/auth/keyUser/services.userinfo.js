@@ -39,7 +39,8 @@ App.Services.userinfo = Backbone.View.extend({
     $('.mod-dialog .wrapper').html(new App.Services.addKeyUser().render('org').el);
   },
   initialize:function(){
-    this.listenTo(App.Services.KeyUser.userinfo,'add',this.render)
+    this.listenTo(App.Services.KeyUser.userinfo,'add',this.render);
+
   }
 
 });

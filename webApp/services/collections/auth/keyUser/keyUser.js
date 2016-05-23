@@ -3,6 +3,7 @@
  */
 
 App.Services.KeyUser = {
+
   //暂存step2里选择的模式
   mode :1,
   //暂存被点击的关键用户信息的uid
@@ -197,6 +198,9 @@ App.Services.KeyUser = {
       return fmt;
     }
   },
+  //状态是否正在请求服务器
+  applying : false,
+
 
   fakedata:{}
 };
