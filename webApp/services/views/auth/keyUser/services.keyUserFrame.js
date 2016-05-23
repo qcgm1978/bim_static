@@ -32,6 +32,7 @@ App.Services.keyUserFrame = Backbone.View.extend({
 
     //切换active状态并且初始化右边的userinfo VIEW
     toggleClass:function(e){
+
         if($(e.target).hasClass('delete')){
             return
         }
@@ -52,7 +53,8 @@ App.Services.keyUserFrame = Backbone.View.extend({
                 App.Services.KeyUser.fakedata=data.data;
                 App.Services.KeyUser.editpid=_.pluck(data.data.project,'id');
                 App.Services.KeyUser.editorgId=_.pluck(data.data.org,'orgId');
-                new App.Services.userinfo().render();
+                App.Services.KeyUser.view && App.Services.KeyUser.view.undelegateEvents();
+                App.Services.KeyUser.view=new App.Services.userinfo().render();
 
             }
 
@@ -75,34 +77,6 @@ App.Services.keyUserFrame = Backbone.View.extend({
         var username = $(e.target).attr('data-name');
         var $usernum = this.$el.find('.usernum');
 
-        //App.Services.maskWindow=new App.Comm.modules.Dialog({
-        //    title:'确认要删除关键用户“'+username+'”？',
-        //    width:280,
-        //    message:'删除该关键用户后，该用户将不能继续管理项目',
-        //    height:180,
-        //    isConfirm:true,
-        //    okCallback:function(){
-        //        var data={
-        //            URLtype :"fetchServiceKeyUserDelete",
-        //            type:"DELETE",
-        //            data:JSON.stringify({uid : uid})
-        //
-        //            //contentType:"application/json"
-        //        };
-        //        App.Comm.ajax(data,function(data){
-        //            if (data.code==0) {
-        //                $li.remove();
-        //                $('.mod-dialog,.mod-dialog-masklayer').hide();
-        //                $usernum.text($usernum.text()-1);
-        //            }
-        //
-        //        });
-        //    },
-        //    cancelCallback:function(){
-        //        $('.mod-dialog,.mod-dialog-masklayer').hide();
-        //    }
-        //
-        //});
 
 
         var frame = new App.Services.windowAlert().render(function(){
@@ -111,9 +85,15 @@ App.Services.keyUserFrame = Backbone.View.extend({
                               type:"DELETE",
                               data:JSON.stringify({uid : uid})
 
-                              //contentType:"application/json"
                           };
+            if(App.Services.KeyUser.applying){
+                return ""
+            }else{
+                App.Services.KeyUser.applying=true;
+            }
                           App.Comm.ajax(data,function(data){
+                              App.Services.KeyUser.applying=false;
+
                               if (data.code==0) {
                                   $li.remove();
                                   $('.mod-dialog,.mod-dialog-masklayer').hide();

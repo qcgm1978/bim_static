@@ -64,10 +64,10 @@ App.Services.step1 = Backbone.View.extend({
 
           if(canLoad=='true'){
             $ul.removeClass('shut').addClass('open');
-            $('.submitLoading').show();
+            $('.leftWindow').addClass("services_loading");
 
             App.Comm.ajax({URLtype:'fetchServicesMemberInnerList',data:{parentId:orgId,includeUsers:true}},function(r){
-              $('.submitLoading').hide();
+              $('.leftWindow').removeClass("services_loading");
 
               if(r && !r.code && r.data){
                 var str = '';

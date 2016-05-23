@@ -56,11 +56,13 @@ App.Services.AuthNav = Backbone.View.extend({
 		$(".serviceBody").empty();
 		this.breadCrumb(this.$el.find(".keyUser"));
 		App.Services.KeyUser.init();
-		$(".serviceBody").html(new App.Services.keyUserFrame().render().el); //框架
+		var keyUserFrame = new App.Services.keyUserFrame();
+		$(".serviceBody").html(keyUserFrame.render().el); //框架
 		$('.keyUserList .needloading').html("<div class='smallLoading'><img  src='/static/dist/images/comm/images/load.gif'/></div>");
 		App.Services.KeyUser.loadData(App.Services.KeyUser.KeyUserList,'',function(r){
 			if(r && !r.code && r.data){
 				App.Services.KeyUser.KeyUserList.set(r.data);
+				keyUserFrame.render();
 				App.Services.KeyUser.userList = r.data;
 			}
 		});
