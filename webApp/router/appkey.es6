@@ -215,7 +215,6 @@ var AppRoute = Backbone.Router.extend({
 				fn(false);
 				return;
 			}
-
 			localStorage.setItem("user", JSON.stringify(data.data));
 
 			var Autharr = data.data.function,
