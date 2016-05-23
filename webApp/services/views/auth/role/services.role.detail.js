@@ -17,6 +17,7 @@ App.Services.roleDetail=Backbone.View.extend({
     },
 
     initialize:function(){
+        if(this.model.get("roleId") == 999999){this.$el.addClass("serviceRoleAdm");}
         this.listenTo(this.model, 'change', this.render);
         this.$el.hover(function(){$(this).addClass("active");},function(){$(this).removeClass("active")});
     },
@@ -84,7 +85,7 @@ App.Services.roleDetail=Backbone.View.extend({
 
     //删除角色
     delete:function() {
-        var frame = new App.Services.windowAlert().render().el,alertInfo = "确认删除角色 " + (this.model.get("name") ||  "未知")+"<br> id为"+this.model.get("roleId")  +"么？";
+        var frame = new App.Services.windowAlert().render().el,alertInfo = '确认要删除角色 "' + (this.model.get("name") ||  "未知")+ '"？';
         App.Services.deleteRoleInfo = this.model;//将model携带至弹窗view
         App.Services.alertWindow = new App.Comm.modules.Dialog({
             title: "",

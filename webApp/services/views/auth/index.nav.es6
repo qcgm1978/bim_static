@@ -20,14 +20,14 @@ App.Services.AuthNav = Backbone.View.extend({
 //面包屑
 
 	initialize:function(){
-	this.breadCrumb(this.$el.find(".memCtrl"));
-},
+		this.breadCrumb(this.$el.find(".memCtrl"));
+	},
 	breadCrumb : function(el){
 		//debugger;
-		var $el=$(el); 
-		$el.addClass("active").siblings("li").removeClass("active"); 
+		var $el=$(el);
+		$el.addClass("active").siblings("li").removeClass("active");
 		this.$el.find(".bcService span:last").text($el.text().trim());
-	}, 
+	},
 
 	memCtrl : function(){
 		$(".serviceBody").empty();
@@ -42,7 +42,7 @@ App.Services.AuthNav = Backbone.View.extend({
 		});
 		//App.Services.init("auth","memCtrl");
 	},
-	roleManager : function(){ 
+	roleManager : function(){
 		$(".serviceBody").empty();
 		$("#blendList").addClass("services_loading");
 		this.breadCrumb(this.$el.find(".roleManager"));

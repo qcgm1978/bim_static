@@ -45,17 +45,9 @@ App.Services.windowAlert = Backbone.View.extend({
                      if(response.data.failure[0] ==roleId){ //删除失败
                          $(".servicesAlert .confirm").hide();
                          $(".servicesAlert .alertRole").show();
-                         if(response.data.failure[0] == 999999){
-                             $(".alertInfo").html("您无权删除管理员！");
-                         }else if(response.data.failure[0] == 999998){
-                             $(".alertInfo").html("该角色为关键用户，无法删除！");
-                         }else{
-                             $(".alertInfo").html("该角色已被使用，无法删除！");
-                         }
-
+                         $(".alertInfo").html("该角色正在使用中，无法删除！");
                      }
                 }
-
                 $(".serviceBody .roleCtrl").removeClass("services_loading");
                 App.Services.deleteRoleInfo ="";//清理
             },

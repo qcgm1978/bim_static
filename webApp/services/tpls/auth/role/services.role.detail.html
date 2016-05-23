@@ -1,8 +1,10 @@
-<div class="roleEdit">
-    <span  class="explorer">查看</span>
-    <span  class="modify">修改</span>
-    <span  class="delete">删除</span>
-</div>
+<% if (obj.roleId !== 999999) {%>
+    <div class="roleEdit">
+        <span  class="explorer">查看</span>
+        <span  class="modify">修改</span>
+        <span  class="delete">删除</span>
+    </div>
+<% } %>
 <div class="sele">
     <div class="left">
             <span class="rohead"></span>
@@ -14,4 +16,3 @@
         <% } } else{ %>暂无数据<%}%>
     </div>
 </div>
-
