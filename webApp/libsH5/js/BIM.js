@@ -164,7 +164,7 @@
         id:'color',
         icon:'m-color',
         title:'颜色',
-        fn:'color',
+        fn:'color-1',
         keyCode:'',
         type:'color',
         group:'0'
@@ -239,6 +239,37 @@
       title:'关闭',
       fn:'exit',
       type:'comment'
+    }],
+    colorBar:[{
+      id:'color-1',
+      icon:'color-1',
+      fn:'color-1',
+      type:'color'
+    },{
+      id:'color-2',
+      icon:'color-2',
+      fn:'color-2',
+      type:'color'
+    },{
+      id:'color-3',
+      icon:'color-3',
+      fn:'color-3',
+      type:'color'
+    },{
+      id:'color-4',
+      icon:'color-4',
+      fn:'color-4',
+      type:'color'
+    },{
+      id:'color-5',
+      icon:'color-5',
+      fn:'color-5',
+      type:'color'
+    },{
+      id:'color-6',
+      icon:'color-6',
+      fn:'color-6',
+      type:'color'
     }]
   }
   bimView.model.BIM.prototype = {
