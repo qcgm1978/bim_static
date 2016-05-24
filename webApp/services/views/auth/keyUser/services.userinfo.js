@@ -20,7 +20,7 @@ App.Services.userinfo = Backbone.View.extend({
 
     //准备Collection的MODELS
     var datas={
-      info : App.Services.KeyUser.fakedata || [],
+      info : App.Services.KeyUser.fakedata || []
 
     };
     this.$el.html(this.template(datas));

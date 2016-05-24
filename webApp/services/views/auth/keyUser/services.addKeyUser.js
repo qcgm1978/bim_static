@@ -416,7 +416,8 @@ App.Services.addKeyUser = Backbone.View.extend({
     App.Comm.ajax(data, function(data){
       if(data.code == 0){
         App.Services.KeyUser.fakedata = data.data;
-        new App.Services.userinfo().render();
+        App.Services.KeyUser.view && App.Services.KeyUser.view.undelegateEvents();
+        App.Services.KeyUser.view=new App.Services.userinfo().render();
 
       }
 
