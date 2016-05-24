@@ -11,7 +11,7 @@ App.Project.ProjectQualityProperty = Backbone.View.extend({
 		"click .paginationBottom .pageInfo .next": "nextPage",
 		"click .paginationBottom .pageInfo .prev": "prevPage",
 		"click .btnFilter": "filterData",
-		"click .clearSearch": "clearSearch",
+	//	"click .clearSearch": "clearSearch",
 		"click .diseaseItem": "diseaseItemClick"
 	},
 
