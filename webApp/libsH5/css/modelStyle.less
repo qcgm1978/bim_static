@@ -75,4 +75,32 @@
     .tree{display:none;padding-left:15px;}
     .open>.tree {display:block;}
   }
+  // dwg
+  .mod-dwg {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    overflow: hidden;
+  }
+  .mod-dwg .scene {
+    position:relative;
+  }
+  .mod-dwg .view {
+    position:relative;
+  }
+  .mod-dwg .tile {
+    position: absolute;
+    width: 512px;
+    height: 512px;
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    z-index: 2
+  }
+  .mod-dwg .rect{
+    position:absolute;
+    border:2px solid #fff;
+    z-index:9;
+  }
 }

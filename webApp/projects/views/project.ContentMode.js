@@ -33,7 +33,7 @@ App.Projects.ContentMode = Backbone.View.extend({
 	//清空内容
 	emptyContent:function(){
 		 
-		this.$el.find(".proListBox").html('<li class="loading">正在加载……</li>');
+		this.$el.find(".proListBox").html('<li class="loading">没有结果</li>');
 	}
 
 });

@@ -80,7 +80,13 @@ App.Project.QualityOpeningAcceptance = Backbone.View.extend({
 		}
 		$searchDetail.slideToggle();
 	},
-
+	searchup() {
+ 		var $searchDetail = this.$(".searchDetail");
+ 		if ($searchDetail.is(":animated")) {
+ 			return;
+ 		}
+ 		$searchDetail.slideUp();
+ 	},
 	//清空搜索条件
 	clearSearch() {
 		this.$(".riskOption .text").html('全部')
@@ -120,7 +126,7 @@ App.Project.QualityOpeningAcceptance = Backbone.View.extend({
 	loading() {
 
 		this.$(".tbOpeningacceptanceBody tbody").html(App.Project.Settings.loadingTpl);
-
+		this.searchup();
 	},
 
 	//模型中显示

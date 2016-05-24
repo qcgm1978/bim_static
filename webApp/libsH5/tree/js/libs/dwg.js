@@ -19,7 +19,7 @@ var dwgViewer = function(options){
   });
   var getDwg = function(res){
     var modelTab=[],currentFile,
-        container = $('<div class="mod-view"></div>');
+        container = $('<div class="bim"></div>');
     $.each(res,function(i,item){
       modelTab.push({
         name:item.Name,
@@ -826,28 +826,27 @@ dwgViewer.prototype = {
   },
   addControll:function(model,container){
     var self = this;
-    var list = $('<ul class="mod-list"></ul>');
+    var list = $('<ul class="modelList"></ul>');
     $.each(model,function(i,item){
-      var tmp = $("<li></li>").text(item.name).data(item.res);
+      var tmp = $('<li class="modelItem"></li>').text(item.name).data(item.res);
       list.append(tmp);
       if(i == 0){
         tmp.trigger('click');
       }
     });
-    var modBar = $('<div class="mod-bar">'+
-    '  <i class="bar-item bar-fit" data-fn="fit"></i>'+
-    '  <i class="bar-item bar-pan selected" data-fn="pan"></i>'+
-    '  <i class="bar-item bar-zoom" data-fn="zoom"></i>'+
-    '  <i class="bar-item bar-zoomRect" data-fn="rectZoom"></i>'+
-    '  <div class="mod-select">'+
+    var modBar = $('<div class="modelBar">'+
+    '  <i class="bar-item m-fit2d" data-fn="fit"></i>'+
+    '  <i class="bar-item m-zoom" data-fn="zoom"></i>'+
+    '  <i class="bar-item m-zoomRect" data-fn="rectZoom"></i>'+
+    '  <div class="modelSelect">'+
     '    <span class="cur"></span>'+
     '  </div>'+
     '</div>');
-    modBar.find('.mod-select').append(list);
+    modBar.find('.modelSelect').append(list);
     container.append(modBar);
-    modBar.on("click",'.mod-select .cur',function(){
+    modBar.on("click",'.modelSelect .cur',function(){
       $(this).toggleClass('open');
-    }).on("click",'.mod-select li',function(){
+    }).on("click",'.modelSelect .modelItem',function(){
       var $this = $(this),
           val  = $this.text(),
           $cur = $this.parent().prev(),
@@ -857,9 +856,17 @@ dwgViewer.prototype = {
     }).on('click',".bar-item",function(){
       var $this = $(this),
           fn = $this.data('fn');
-      $this.not('.bar-fit').addClass('selected').siblings(':not(.bar-fit)').removeClass('selected');
-      self[fn]();
+      if($this.is('.m-fit2d')){
+        self[fn]();
+      }else{
+        $this.toggleClass('selected').siblings().removeClass('selected');
+        if($this.is('.selected')){
+          self[fn]();
+        }else{
+          self.pan();
+        }
+      }
     });
-    modBar.find(".mod-list li:last").trigger("click");
+    modBar.find(".modelItem:last").trigger("click");
   }
 }
