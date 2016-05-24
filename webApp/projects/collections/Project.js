@@ -582,15 +582,13 @@ App.Project = {
 		if (type.indexOf('dwg') != -1) {
 			App.Project.attrDwg.apply(this);
 		}
-
-
 	},
 
 	//模型属性 dwg 图纸
 	attrDwg: function() {
-
+		 
 		var modelId = App.Project.Settings.ModelObj.intersect.userId.split('.')[0],
-
+			that=this,
 			data = {
 				URLtype: 'attrDwg',
 				data: {
@@ -599,7 +597,6 @@ App.Project = {
 					modelId: modelId
 				}
 			},
-
 
 			liTpl = '<li class="modleItem"><a data-id="<%=id%>" href="/static/dist/app/project/single/filePreview.html?id={id}&projectId='+App.Project.Settings.projectId+'&projectVersionId='+App.Project.Settings.CurrentVersion.id+'" target="_blank" ><div class="modleNameText overflowEllipsis modleName2">varName</div></a></li>';
 
