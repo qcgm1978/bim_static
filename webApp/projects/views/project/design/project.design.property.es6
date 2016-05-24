@@ -8,8 +8,8 @@ App.Project.ProjectDesignPropety = Backbone.View.extend({
 
 	events: {
 		"click .projectPropetyHeader .item": "navItemClick",
-		"click .btnFilter": "filterVerification",
-		"click .clearSearch": "clearSearch"
+		"click .btnFilter": "filterVerification"
+	//	"click .clearSearch": "clearSearch"
 	},
 
 	initialize(){
@@ -17,6 +17,9 @@ App.Project.ProjectDesignPropety = Backbone.View.extend({
 		//监听子视图过滤参数change事件
 		Backbone.on('projectDesignPropetyFilterDataChange',function(key,val){
 			_this.VerificationOptions[key]=val;
+		},this)
+		Backbone.on('projectDesignPropetyFilterDataClear',function(key,val){
+			_this.clearSearch();
 		},this)
 
 	},

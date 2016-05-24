@@ -11,8 +11,8 @@
  	},
 
  	events: {
- 		"click .searchToggle": "searchToggle"
- 		
+ 		"click .searchToggle": "searchToggle",
+ 		"click .clearSearch": "clearSearch"
  	},
 
  	template: _.templateUrl("/projects/tpls/project/design/project.design.property.verification.html"),
@@ -36,6 +36,22 @@
  		$searchDetail.slideToggle();
  	},
 
+ 	searchup() {
+ 		var $searchDetail = this.$(".searchDetail");
+ 		if ($searchDetail.is(":animated")) {
+ 			return;
+ 		}
+ 		$searchDetail.slideUp();
+ 	},
+
+ 	clearSearch(){
+ 		this.$('.specialitiesOption .text').html('全部')
+ 		this.$('.categoryOption .text').html('全部')
+ 		this.$('.statusOption .text').html('全部')
+ 		this.$('.inspectionUnitOption .text').html('全部')
+ 		Backbone.trigger('projectDesignPropetyFilterDataClear');
+ 	},
+
  	dataChange(key,val){
  		Backbone.trigger('projectDesignPropetyFilterDataChange',key,val)
  	},
@@ -49,7 +65,7 @@
  			click: function($item) {
  			//	that.VerificationOptions.specialty = $item.text();
  			//	Backbone.trigger('projectDesignPropetyFilterDataChange','specialty',$item.text())
- 				that.dataChange('specialty',$item.text())
+ 				that.dataChange('specialty',$item.attr('data-val'))
  			}
  		});
 
@@ -57,7 +73,7 @@
  		this.$(".categoryOption").myDropDown({
  			click: function($item) {
  			//	that.VerificationOptions.type = $item.text();
- 				that.dataChange('type',$item.text())
+ 				that.dataChange('type',$item.attr('data-val'))
  			}
  		});
 
@@ -75,7 +91,7 @@
  			click: function($item) {
 
  			//	that.VerificationOptions.reporter = $item.text();
- 				that.dataChange('reporter',$item.text())
+ 				that.dataChange('reporter',$item.attr('data-val'))
  			}
  		});
 
@@ -146,6 +162,8 @@
 
  	reset:function(){
  		this.$(".ckBox .ckBody tbody").html(App.Project.Settings.loadingTpl);
+ 		this.searchup();
+
  	}
 
 

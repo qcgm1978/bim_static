@@ -45,6 +45,13 @@ App.Project.QualityMaterialEquipment = Backbone.View.extend({
 		}
 		$searchDetail.slideToggle();
 	},
+	searchup() {
+ 		var $searchDetail = this.$(".searchDetail");
+ 		if ($searchDetail.is(":animated")) {
+ 			return;
+ 		}
+ 		$searchDetail.slideUp();
+ 	},
 	//清空搜索条件
 	clearSearch() {
 		this.$(".specialitiesOption .text").html('全部')
@@ -59,11 +66,6 @@ App.Project.QualityMaterialEquipment = Backbone.View.extend({
 	changeME(key,val){
 		Backbone.trigger('qualityFilterDataChange','MaterialEquipmentOptions',key,val);
 	},
-	//隐患过滤条件change事件
-	changeCO(key,val){
-		
-	},
-
 	//事件绑定
 	bindEvent: function() {
 
@@ -176,6 +178,7 @@ App.Project.QualityMaterialEquipment = Backbone.View.extend({
 	loading() {
 
 		this.$(".tbMaterialequipmentBody tbody").html(App.Project.Settings.loadingTpl);
+		this.searchup();
 
 	}
 

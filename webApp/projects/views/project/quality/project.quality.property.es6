@@ -227,8 +227,6 @@ App.Project.ProjectQualityProperty = Backbone.View.extend({
 			projectId = App.Project.Settings.projectId,
 			projectVersionId = App.Project.Settings.CurrentVersion.id;
 
-
-
 		if (type == "materialequipment") {
 
 			this.MaterialEquipmentOptions.pageIndex = pageIndex;
@@ -309,6 +307,7 @@ App.Project.ProjectQualityProperty = Backbone.View.extend({
 
 	//帅选
 	filterData() {
+
 		this.getData(1);
 	},
 

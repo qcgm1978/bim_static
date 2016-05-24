@@ -52,7 +52,7 @@ App.Project.QualityProcessAcceptance = Backbone.View.extend({
 		this.$(".categoryOption").myDropDown({
 			click: function($item) {
 			//	that.ProcessAcceptanceOptions.category = $item.text();
-				that.changePA('category', $item.text())
+				that.changePA('category', $item.attr('data-val'))
 			}
 		});
 		//显示搜索结果对应位置
@@ -67,7 +67,13 @@ App.Project.QualityProcessAcceptance = Backbone.View.extend({
 		}
 		$searchDetail.slideToggle();
 	},
-
+	searchup() {
+ 		var $searchDetail = this.$(".searchDetail");
+ 		if ($searchDetail.is(":animated")) {
+ 			return;
+ 		}
+ 		$searchDetail.slideUp();
+ 	},
 	//清空搜索条件
 	clearSearch() {
 		this.$(".categoryOption .text").html('全部')
@@ -107,7 +113,7 @@ App.Project.QualityProcessAcceptance = Backbone.View.extend({
 	loading() {
 
 		this.$(".tbProcessAccessBody tbody").html(App.Project.Settings.loadingTpl);
-
+		this.searchup();
 	},
 
 	//模型中显示
