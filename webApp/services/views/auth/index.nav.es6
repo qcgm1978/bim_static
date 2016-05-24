@@ -51,7 +51,8 @@ App.Services.AuthNav = Backbone.View.extend({
 	},
 	keyUser : function(){
 		if(location.port==81){
-			App.API.Settings.hostname="http://bim.wanda-dev.cn:81/";
+			App.API.Settings.hostname = "http://bim.wanda-dev.cn:81/";
+			bimView.API.baseUrl = "http://bim.wanda-dev.cn:81/";
 		}
 		$(".serviceBody").empty();
 		this.breadCrumb(this.$el.find(".keyUser"));
