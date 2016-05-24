@@ -17,7 +17,8 @@ App.Project.QualityConcerns=Backbone.View.extend({
 
 	events:{
 		"click .searchToggle":"searchToggle",
-		"click .tbConcernsBody tr": "showInModel"
+		"click .tbConcernsBody tr": "showInModel",
+		"click .clearSearch": "clearSearch"
 	 
 	},
 
@@ -37,30 +38,40 @@ App.Project.QualityConcerns=Backbone.View.extend({
 
 	},
 
+	//隐患过滤条件change事件
+	changeHC(key,val){
+		Backbone.trigger('qualityFilterDataChange','ConcernsOptions',key,val);
+	},
+
 	//事件初始化
 	bindEvent(){
 
 		var that=this;
 		//列别
 		this.$(".categoryOption").myDropDown({click:function($item){
-			that.ConcernsOptions.category=$item.text();
+		//	that.ConcernsOptions.category=$item.text();
+			that.changeHC('category',$item.attr('data-val'))
 		}});
 		//状态
 		this.$(".statusOption").myDropDown({click:function($item){
-			that.ConcernsOptions.status=$item.data("status");
+		//	that.ConcernsOptions.status=$item.data("status");
+			that.changeHC('status',$item.data("status"))
 		}});
 
 		//填报人
-		this.$(".operatorOption ").myDropDown({click:function($item){
-			that.ConcernsOptions.reporter=$item.text();
+		this.$(".operatorOption").myDropDown({click:function($item){
+		//	that.ConcernsOptions.reporter=$item.text();
+			that.changeHC('reporter',$item.attr('data-val'))
 		}});
 		//等级
 		this.$(".gradeOption").myDropDown({click:function($item){
-			that.ConcernsOptions.level=$item.data("status");
+		//	that.ConcernsOptions.level=$item.data("status");
+			that.changeHC('level',$item.data("status"))
 		}});
 		//类型
 		this.$(".typeOption").myDropDown({click:function($item){
-			that.ConcernsOptions.type=$item.text();
+		//	that.ConcernsOptions.type=$item.text();
+			that.changeHC('type',$item.attr('data-val'))
 		}}); 
 		
 		//显示搜索结果对应位置
@@ -77,7 +88,8 @@ App.Project.QualityConcerns=Backbone.View.extend({
 				endDate: new Date()
 
 			}).on("changeDate",function(ev){
-				that.MaterialEquipmentOptions.startTime = ev.date.format("yyyy-MM-dd");
+			//	that.MaterialEquipmentOptions.startTime = ev.date.format("yyyy-MM-dd");
+				that.changeHC('startTime',new Date(ev.date.format("yyyy-MM-dd")+ ' 00:00:00').getTime())
 			});
 		});
 
@@ -91,7 +103,8 @@ App.Project.QualityConcerns=Backbone.View.extend({
 				endDate: new Date()
 
 			}).on("changeDate",function(ev){
-				that.MaterialEquipmentOptions.endTime = ev.date.format("yyyy-MM-dd");
+			//	that.MaterialEquipmentOptions.endTime = ev.date.format("yyyy-MM-dd");
+				that.changeHC('endTime',new Date(ev.date.format("yyyy-MM-dd")+ ' 23:59:59').getTime())
 			});
 		});
 
@@ -110,8 +123,25 @@ App.Project.QualityConcerns=Backbone.View.extend({
 		}
 		$searchDetail.slideToggle();
 	},
-
+	searchup() {
+ 		var $searchDetail = this.$(".searchDetail");
+ 		if ($searchDetail.is(":animated")) {
+ 			return;
+ 		}
+ 		$searchDetail.slideUp();
+ 	},
 	
+	//清空搜索条件
+	clearSearch() {
+		this.$(".categoryOption .text").html('全部')
+		this.$(".statusOption .text").html('全部')
+		this.$(".operatorOption .text").html('全部')
+		this.$(".gradeOption .text").html('全部')
+		this.$(".typeOption .text").html('全部')
+		this.$("#dateStar2").val('')
+		this.$("#dateEnd2").val('')
+		Backbone.trigger('qualityFilterDataClear');
+	},
 
 	template:_.templateUrl("/projects/tpls/project/quality/project.quality.property.concerns.body.html"),
 
@@ -144,6 +174,7 @@ App.Project.QualityConcerns=Backbone.View.extend({
 	loading(){
 
 		this.$(".tbConcernsBody tbody").html(App.Project.Settings.loadingTpl);
+		this.searchup();
 		 
 	},
 
