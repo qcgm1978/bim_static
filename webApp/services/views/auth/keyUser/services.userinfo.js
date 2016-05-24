@@ -28,9 +28,10 @@ App.Services.userinfo = Backbone.View.extend({
   },
   //修改项目
   projedit : function(){
-    //App.Services.KeyUser.pid = [];
+    App.Services.KeyUser.clearAll();
     App.Services.maskWindow=new App.Comm.modules.Dialog({title:'',width:600,height:500,isConfirm:false});
     $('.mod-dialog .wrapper').html(new App.Services.addKeyUser().render('edit').el);
+    App.Services.KeyUser.html2=[];
   },
   //修改部门授权
   orgedit : function(){
