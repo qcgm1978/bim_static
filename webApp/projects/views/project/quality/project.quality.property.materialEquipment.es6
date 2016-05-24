@@ -16,7 +16,8 @@ App.Project.QualityMaterialEquipment = Backbone.View.extend({
 
 
 	events: {
-		"click .searchToggle": "searchToggle"
+		"click .searchToggle": "searchToggle",
+		"click .clearSearch": "clearSearch"
 
 	},
 
@@ -44,7 +45,16 @@ App.Project.QualityMaterialEquipment = Backbone.View.extend({
 		}
 		$searchDetail.slideToggle();
 	},
-
+	//清空搜索条件
+	clearSearch() {
+		this.$(".specialitiesOption .text").html('全部')
+		this.$(".categoryOption .text").html('全部')
+		this.$(".statusOption .text").html('全部')
+		this.$(".txtSearchName").val('')
+		this.$("#dateStar").val('')
+		this.$("#dateEnd").val('')
+		Backbone.trigger('qualityFilterDataClear');
+	},
 	//材料设备过滤条件change事件
 	changeME(key,val){
 		Backbone.trigger('qualityFilterDataChange','MaterialEquipmentOptions',key,val);
@@ -87,9 +97,9 @@ App.Project.QualityMaterialEquipment = Backbone.View.extend({
 			that.changeME('name',$(this).val().trim());
 		});
 
-		this.$("#dateStar").one("mousedown",function() { 
+	//	this.$("#dateStar").one("mousedown",function() { 
 			//日期控件初始化
-			$('#dateStar').datetimepicker({
+			this.$('#dateStar').datetimepicker({
 				language: 'zh-CN',
 				autoclose: true,
 				format: 'yyyy-mm-dd',
@@ -98,13 +108,13 @@ App.Project.QualityMaterialEquipment = Backbone.View.extend({
 
 			}).on("changeDate",function(ev){
 				//that.MaterialEquipmentOptions.startTime = ev.date.format("yyyy-MM-dd");
-				that.changeME('startTime', ev.date.format("yyyy-MM-dd"));
+				that.changeME('startTime', new Date(ev.date.format("yyyy-MM-dd")+ ' 00:00:00').getTime());
 			});
-		});
+	//	});
 
-		this.$("#dateEnd").one("mousedown",function() {
+	//	this.$("#dateEnd").one("mousedown",function() {
 			//日期控件初始化
-			$('#dateEnd').datetimepicker({
+			this.$('#dateEnd').datetimepicker({
 				language: 'zh-CN',
 				autoclose: true,
 				format: 'yyyy-mm-dd',
@@ -113,9 +123,9 @@ App.Project.QualityMaterialEquipment = Backbone.View.extend({
 
 			}).on("changeDate",function(ev){
 				//that.MaterialEquipmentOptions.endTime = ev.date.format("yyyy-MM-dd");
-				that.changeME('endTime',ev.date.format("yyyy-MM-dd"));
+				that.changeME('endTime',new Date(ev.date.format("yyyy-MM-dd")+ ' 23:59:59').getTime());
 			});
-		});
+	//	});
 
 
 
