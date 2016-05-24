@@ -14,6 +14,9 @@ App.Services.KeyUser = {
   //暂存已被选关键用户的项目ID数组
   pid : [],
 
+  //暂存已被选关键用户的分区ID数组
+  partid : [],
+
   //暂存已被选关键用户的orgId数组
   orgId : [],
 
@@ -22,6 +25,10 @@ App.Services.KeyUser = {
 
   //暂存被编辑的关键用户的orgId数组
   editorgId : [],
+
+  //暂存已被选关键用户分区的html
+  parthtml : [],
+
   //暂存已被选关键用户step1的html
   html : [],
 
@@ -41,6 +48,8 @@ App.Services.KeyUser = {
     this.html  = [];
     this.html2 = [];
     this.html3 = [];
+    this.parthtml = [];
+    this.partid = [];
   },
 
   loadData : function(collection,data,fn) {

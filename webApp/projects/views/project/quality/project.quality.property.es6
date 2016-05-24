@@ -11,7 +11,7 @@ App.Project.ProjectQualityProperty = Backbone.View.extend({
 		"click .paginationBottom .pageInfo .next": "nextPage",
 		"click .paginationBottom .pageInfo .prev": "prevPage",
 		"click .btnFilter": "filterData",
-		"click .clearSearch": "clearSearch",
+	//	"click .clearSearch": "clearSearch",
 		"click .diseaseItem": "diseaseItemClick"
 	},
 
@@ -19,7 +19,10 @@ App.Project.ProjectQualityProperty = Backbone.View.extend({
 		var _this=this;
 		Backbone.on('qualityFilterDataChange',function(obj,key,val){
 			_this[obj][key]=val;
-		})
+		},this)
+		Backbone.on('qualityFilterDataClear',function(){
+			_this.clearSearch();
+		},this)
 	},
 
 	render: function() {
