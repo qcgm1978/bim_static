@@ -50,6 +50,7 @@
       self.regesiterEvent(_opt);
       self.controll();
       bimView.comm.bindEvent.init();
+      // new bimView.comm.dialog();
       self.pub("start");
     },
     regesiterEvent:function(options){
@@ -214,7 +215,21 @@
         self.resize();
       });
       self.on('changeGrid',function(res){
-        bimView.sidebar.el._dom.mapBar.find(".axisGrid").text(res.axis.infoX+","+res.axis.infoY+",("+res.axis.offsetZ+")")
+        var data = bimView.sidebar.axisGridData.Levels;
+        var infoZ;
+        data = data.sort(function(a,b){
+          return b.elevation - a.elevation;
+        });
+        $.each(data,function(i,item){
+          if(res.axis.offsetZ > item.elevation){
+            infoZ = "("+item.name.substring(0,3)+","+ (res.axis.offsetZ - item.elevation) +")";
+            return false;
+          }
+        });
+        if(!infoZ){
+          infoZ = "(B02,"+res.axis.offsetZ+")"
+        }
+        bimView.sidebar.el._dom.mapBar.find(".axisGrid").text(res.axis.infoX+","+res.axis.infoY+","+infoZ)
       });
     },
     // 以下是对模型操作
