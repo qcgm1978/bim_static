@@ -8,7 +8,9 @@ App.Project.ProjectPlanProperty = Backbone.View.extend({
 
 	events: {
 		"click .projectPlanNav .item": "navItemClick",
-		"change .selDate": "changeDate"
+		"change .selDate": "changeDate",
+		'change .dateStar':'loadPlanModelData',
+		'change .dateEnd':'loadPlanModelData'
 	},
 
 	render: function() {
@@ -54,9 +56,50 @@ App.Project.ProjectPlanProperty = Backbone.View.extend({
 			}
 		}
 
+
+		this.initDom();
 		return this;
 	},
 
+	//初始化dom事件
+	initDom(){
+		this.$('.dateStar').datetimepicker({
+             language: 'zh-CN',
+             autoclose: true,
+             format: 'yyyy-mm-dd',
+             minView: 'month',
+             endDate: new Date()
+
+         });
+         this.$('.dateEnd').datetimepicker({
+             language: 'zh-CN',
+             autoclose: true,
+             format: 'yyyy-mm-dd',
+             minView: 'month',
+             endDate: new Date()
+
+         });
+
+	},
+
+	loadPlanModelData(){
+		var _start=this.$('.dateStar').val(),
+			_end=this.$('.dateEnd').val(),
+			projectId = App.Project.Settings.projectId,
+			projectVersionId = App.Project.Settings.CurrentVersion.id;
+
+		_start=_start?new Date(_start+' 00:00:00').getTime():'';
+		_end=_end?new Date(_end+' 23:59:59').getTime():'';
+		App.Project.PlanAttr.PlanModelCollection.reset();
+		App.Project.PlanAttr.PlanModelCollection.projectId = projectId;
+		App.Project.PlanAttr.PlanModelCollection.projectVersionId = projectVersionId;
+		App.Project.PlanAttr.PlanModelCollection.fetch({
+			data:{
+				startTime:_start,
+				endTime:_end
+			}
+		});
+	},
 	//切换导航
 	navItemClick: function(event) {
 

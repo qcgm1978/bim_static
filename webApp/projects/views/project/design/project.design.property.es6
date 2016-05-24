@@ -10,6 +10,14 @@ App.Project.ProjectDesignPropety = Backbone.View.extend({
 		"click .projectPropetyHeader .item": "navItemClick",
 		"click .btnFilter": "filterVerification",
 		"click .clearSearch": "clearSearch"
+	},
+
+	initialize(){
+		var _this=this;
+		//监听子视图过滤参数change事件
+		Backbone.on('projectDesignPropetyFilterDataChange',function(key,val){
+			_this.VerificationOptions[key]=val;
+		},this)
 
 	},
 
@@ -106,7 +114,6 @@ App.Project.ProjectDesignPropety = Backbone.View.extend({
 
 	//获取 设计检查数据
 	getVerificationData() {
-
 		App.Project.DesignAttr.VerificationCollection.reset();
 		App.Project.DesignAttr.VerificationCollection.projectId = App.Project.Settings.projectId;
 		App.Project.DesignAttr.VerificationCollection.versionId = App.Project.Settings.CurrentVersion.id;

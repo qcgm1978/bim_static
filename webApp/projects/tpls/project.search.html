@@ -13,31 +13,37 @@
         <div class="myDropDown pickProjectType">
             <span class="myDropText">  <span class="text">请选择</span> <i class="myDropArrorw"></i> </span>
             <ul class="myDropList">
-                <li class="myItem">江苏省</li>
-                <li class="myItem">安徽省</li>
+                <li class="myItem" data-val=''>全部</li>
+                <li class="myItem" data-val='8'>综合体</li>
+                <li class="myItem" data-val='16'>酒店</li>
+                <li class="myItem" data-val='32'>文化旅游</li>
             </ul>
         </div>
-        <span>物业类别：</span>
+        <span>项目模式：</span>
         <div class="myDropDown pickCategory">
             <span class="myDropText">  <span class="text">请选择</span> <i class="myDropArrorw"></i> </span>
             <ul class="myDropList">
-                <li class="myItem">江苏省</li>
-                <li class="myItem">安徽省</li>
+                <li class="myItem" data-val=''>全部</li>
+                <li class="myItem" data-val='1'>创新模式</li>
+                <li class="myItem" data-val='2'>轻资产</li>
+                <li class="myItem" data-val='3'>重资产</li>
             </ul>
         </div>
         <span>管理分区：</span>
         <div class="myDropDown pickManager">
             <span class="myDropText">  <span class="text">请选择</span> <i class="myDropArrorw"></i> </span>
             <ul class="myDropList">
-                <li class="myItem">江苏省</li>
-                <li class="myItem">安徽省</li>
+                <li class="myItem" data-val=''>全部</li>
+                <li class="myItem" data-val='北区'>北区</li>
+                <li class="myItem" data-val='中区'>中区</li>
+                <li class="myItem" data-val='南区'>南区</li>
             </ul>
         </div>
         <span>是否完成：</span>
         <span class="groupRadio">
-            <label class="btnRadio"><i class="iconPic"></i>
+            <label class="btnRadio" data-val='true'><i class="iconPic"></i>
              是</label>
-       <label class="btnRadio"><i class="iconPic"></i>
+       <label class="btnRadio" data-val='false'><i class="iconPic"></i>
              否</label>
 
         </span>
@@ -56,6 +62,7 @@
         <div class="myDropDown pickProvince">
             <span class="myDropText">  <span class="text">请选择</span> <i class="myDropArrorw"></i> </span>
             <ul class="myDropList">
+                <li class="myItem">全部</li>
                 <li class="myItem">江苏省</li>
                 <li class="myItem">安徽省</li>
             </ul>
@@ -64,8 +71,8 @@
         <div class="myDropDown pickOpening">
             <span class="myDropText">  <span class="text">请选择</span> <i class="myDropArrorw"></i> </span>
             <ul class="myDropList">
-                <li class="myItem">江苏省</li>
-                <li class="myItem">安徽省</li>
+                <li class="myItem" data-val='true'>是</li>
+                <li class="myItem" data-val='false'>否</li>
             </ul>
         </div>
         <span>开业时间：</span>
@@ -85,7 +92,7 @@
     </div>
     <div class="item">
         <span>项目名称：</span>
-        <input type="text" class="txtInput" />
+        <input type="text" placeholder="请输入项目名称" class="txtInput moreSeachText" />
     </div>
     <div class="item">
         <span class="btnSearch">查询</span>

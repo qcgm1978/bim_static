@@ -20,7 +20,6 @@ var AppRoute = Backbone.Router.extend({
 		'bodyContent': 'bodyContent',
 		'logout': 'logout'
 	},
-
 	//首页主体展示
 
 	bodyContent: function() {
@@ -186,7 +185,6 @@ var AppRoute = Backbone.Router.extend({
 		var Autharr = App.Global.User.function,
 			keys, len;
 		App.AuthObj = {};  
-
 		//遍历权限
 		$.each(Autharr, function(i, item) {
 			keys = item.code.split('-');

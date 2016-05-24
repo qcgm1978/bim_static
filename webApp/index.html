@@ -59,11 +59,14 @@
 
 </body>
 <script type="text/javascript">
+
 var App = {};
 //缓存全局属性
 App.Global={
 	module:null
 }
+
+
 App.modules = {};
 </script>
 <script type="text/javascript" src="./libs/underscore.1.8.2.js"></script>
@@ -74,5 +77,11 @@ App.modules = {};
 <script type="text/javascript" src="./topNav/js/topNav.es6"></script>
 <script type="text/javascript" src="./router/index.js"></script>
 <!-- <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=osmP2eNEjPlvebAAIVhcDc6c"></script> -->
+<script type="text/javascript">
+    //临时使用
+    if (App.Comm.getCookie('IS_OWNER_LOGIN')=='1' || !App.Comm.getCookie('userId')) {
+        window.location.href = "/login.html";
+    }
 
+</script>
 </html>
