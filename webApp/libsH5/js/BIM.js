@@ -112,7 +112,7 @@
       id:'comment',
       icon:'m-camera',
       title:'快照',
-      fn:'comment',
+      fn:'commentInit',
       keyCode:'',
       type:'viewer',
       group:'1'

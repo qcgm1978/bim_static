@@ -3,7 +3,7 @@
 App.API = {
 
 	Settings: {
-		hostname: "http://bim.wanda-dev.cn:81/",
+		hostname: "http://bim.wanda-dev.cn/",
 		debug: false
 	},
 

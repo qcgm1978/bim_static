@@ -34,7 +34,7 @@ App.Services.roleDetail=Backbone.View.extend({
         var data = {};
         App.Services.roleFun.loadData(data,function(){
             $("#selectedRoleName").val(_this.model.get("name")).attr("disabled","disabled"); //暂时写入
-            var func = _this.model.get("functions");
+            var func = _this.model.get("functions") || [];
             App.Services.maskWindow.find(".seWinBody .func h2 i").text(func.length);
             //为当前角色在父项功能列表中功能设置选择状态
             App.Services.roleFun.collection.each(function(item){
@@ -56,15 +56,13 @@ App.Services.roleDetail=Backbone.View.extend({
 
     //查看
     explorer:function(){
-        var _this = this,
-            length = _this.model.get("functions").length;
+        var _this = this;
         this.window("查看角色");
         this.recognize(function(){
             //隐藏可选项
             $(".memCheck").hide();
             $(".windowSubmit").hide();
             $(".seWinBody .func li .name span.rohead ").hide();
-            App.Services.maskWindow.find(".seWinBody .func h2 i").text(length);
         });
     },
 

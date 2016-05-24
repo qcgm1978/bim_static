@@ -107,6 +107,75 @@
       init:function(){
         this.keyboardEvent();
       }
+    },
+    viewTree:function(options){
+      var defualts = {
+        arr:[],
+        name:'',
+        code:'',
+        type:'',
+        dataType:'arr',
+        children:'',
+        childrenName:'',
+        childrenType:'arr',
+        data:'',
+        id:'',
+        isChecked:true
+      },
+      _opt = $.extend({},defualts,options);
+      return renderTree(_opt.arr,_opt.name,_opt.dataType);
+      function renderTree(arr,name,dataType,prefix){
+        if(arr.length == 0) return;
+        var tree = $('<div class="tree"></div>');
+        $.each(arr,function(i,item){
+          var type = _opt.type,
+              itemName,data,iconStatus,input;
+          if(dataType == 'arr'){
+            itemName = item[name];
+            data = item[_opt.data] ? item[_opt.data].toString() :'';
+          }else{
+            itemName = item;
+            if(prefix!=null){
+              data = prefix +"_"+ i;
+            }else{
+              data = i;
+            }
+          };
+          if(item[_opt.children]){
+            iconStatus = 'm-openTree';
+          }else{
+            iconStatus = 'noneSwitch';
+          }
+          if(_opt.isChecked){
+           input = '<input type="checkbox" checked="checkde" />'
+          }else{
+            input = '<input type="checkbox" />'
+          }
+          var tmpHtml = $('<li class="itemNode" data-type="'+type+'">\
+            <div class="itemContent">\
+            <i class="'+iconStatus+'"></i>\
+            <label class="treeCheckbox">'+input+'<span class="m-lbl"></span></label>\
+            <span class="treeText">'+itemName+'</span>\
+          </div></li>');
+          tmpHtml.data('userData',data);
+          if(item[_opt.children]&&typeof item[_opt.children] =="object"){
+            var children = renderTree(item[_opt.children],_opt.childrenName,_opt.childrenType,item[_opt.code]);
+            tmpHtml.append(children);
+          }
+          tree.append(tmpHtml);
+        });
+        return tree;
+      }
+    },
+    dialog:function(options){
+      var defaults = {
+        title:"系统提示",
+        content:"",
+        okText:"确定"
+      }
+      var _opt = $.extend({},defaults,options);
+      var dialog = '<div class="modelDialog"><div class="dialogBody"><div class="dialogHeader"></div><div class="dialgoContent"></div><div class="dialogFooter"><input type="button" class="dialogOk" value=""/></div></div></div>';
+      $('body').append(dialog);
     }
   }
 })($);
