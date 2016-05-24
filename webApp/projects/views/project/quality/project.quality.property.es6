@@ -19,7 +19,10 @@ App.Project.ProjectQualityProperty = Backbone.View.extend({
 		var _this=this;
 		Backbone.on('qualityFilterDataChange',function(obj,key,val){
 			_this[obj][key]=val;
-		})
+		},this)
+		Backbone.on('qualityFilterDataClear',function(){
+			_this.clearSearch();
+		},this)
 	},
 
 	render: function() {

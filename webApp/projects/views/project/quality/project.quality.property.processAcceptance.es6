@@ -70,7 +70,9 @@ App.Project.QualityProcessAcceptance = Backbone.View.extend({
 
 	//清空搜索条件
 	clearSearch() {
-
+		this.$(".categoryOption .text").html('全部')
+		this.$(".categoryOption .text").html('全部')
+		Backbone.trigger('qualityFilterDataClear');
 	},
 
 	template: _.templateUrl("/projects/tpls/project/quality/project.quality.property.processAcceptance.body.html"),
