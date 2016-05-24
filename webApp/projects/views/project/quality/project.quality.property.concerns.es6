@@ -48,31 +48,46 @@ App.Project.QualityConcerns=Backbone.View.extend({
 
 		var that=this;
 		//列别
-		this.$(".categoryOption").myDropDown({click:function($item){
-		//	that.ConcernsOptions.category=$item.text();
-			that.changeHC('category',$item.attr('data-val'))
-		}});
+		this.$(".categoryOption").myDropDown({
+			zIndex: 9,
+			click: function($item) {
+				//	that.ConcernsOptions.category=$item.text();
+				that.changeHC('category', $item.attr('data-val'))
+			}
+		});
 		//状态
-		this.$(".statusOption").myDropDown({click:function($item){
-		//	that.ConcernsOptions.status=$item.data("status");
-			that.changeHC('status',$item.data("status"))
-		}});
+		this.$(".statusOption").myDropDown({
+			zIndex: 8,
+			click: function($item) {
+				//	that.ConcernsOptions.status=$item.data("status");
+				that.changeHC('status', $item.data("status"))
+			}
+		});
 
 		//填报人
-		this.$(".operatorOption").myDropDown({click:function($item){
-		//	that.ConcernsOptions.reporter=$item.text();
-			that.changeHC('reporter',$item.attr('data-val'))
-		}});
+		this.$(".operatorOption").myDropDown({
+			zIndex: 7,
+			click: function($item) {
+				//	that.ConcernsOptions.reporter=$item.text();
+				that.changeHC('reporter', $item.attr('data-val'))
+			}
+		});
 		//等级
-		this.$(".gradeOption").myDropDown({click:function($item){
-		//	that.ConcernsOptions.level=$item.data("status");
-			that.changeHC('level',$item.data("status"))
-		}});
+		this.$(".gradeOption").myDropDown({
+			zIndex:6,
+			click: function($item) {
+				//	that.ConcernsOptions.level=$item.data("status");
+				that.changeHC('level', $item.data("status"))
+			}
+		});
 		//类型
-		this.$(".typeOption").myDropDown({click:function($item){
-		//	that.ConcernsOptions.type=$item.text();
-			that.changeHC('type',$item.attr('data-val'))
-		}}); 
+		this.$(".typeOption").myDropDown({
+			zIndex:5,
+			click: function($item) {
+				//	that.ConcernsOptions.type=$item.text();
+				that.changeHC('type', $item.attr('data-val'))
+			}
+		});
 		
 		//显示搜索结果对应位置
 		this.$(".groupRadio").myRadioCk();
