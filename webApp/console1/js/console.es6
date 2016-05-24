@@ -539,8 +539,8 @@ App.Console = {
         "name"              : $('#p13').val().trim(),
         "status"            : $('#s12').val().trim(),
         "levelId"           : $('#s13').val().trim(),
-        "organizationTypeID": $('#s14').val().trim(),
-        "ratingCategoryID"  : $('#s15').val().trim()
+        "organizationTypeId": $('#s14').val().trim(),
+        "ratingCategoryId"  : $('#s15').val().trim()
       };
       App.Console.apply('', 1004, data, 1);
     });
@@ -610,8 +610,8 @@ App.Console = {
         "status"            : $('#s13').val().trim(),
         "specialtyName"     : $('#s12 option:selected').text().trim(),
         "specialtyId"       : $('#s12').val().trim(),
-        "organizationTypeID": $('#s14').val().trim(),
-        "ratingCategoryID"  : $('#s15').val().trim()
+        "organizationTypeId": $('#s14').val().trim(),
+        "ratingCategoryId"  : $('#s15').val().trim()
       };
       App.Console.apply('', 1006, data, 1);
 
