@@ -163,7 +163,7 @@
         url:bimView.API.fetchAxisGrid,
         etag:self._opt.etag
       },function(res){
-        axisGridData = JSON.parse(res);
+        axisGridData = self.axisGridData = JSON.parse(res);
         axisGridStatue = true;
         if(floorsStatue){
           renderMap();
