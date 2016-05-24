@@ -173,7 +173,7 @@
               tmpArr.push(item);
             }
           });
-          var children = bimView.sidebar.viewTree({
+          var children = bimView.comm.viewTree({
             arr:tmpArr,
             type:'classCode',
             name:'name',
@@ -338,16 +338,34 @@
       $.each(list,function(i,item){
         newList.push(window.btoa(JSON.stringify(item)));
       });
-      return newList;
+      var floors = bimView.comm.getFilters(self._dom.bimBox.find("#floors"),'ckecked');
+      var specialty = bimView.comm.getFilters(self._dom.bimBox.find("#specialty"),'ckecked');
+      var category = bimView.comm.getFilters(self._dom.bimBox.find("#specialty"),'ckecked');
+      var classCode = bimView.comm.getFilters(self._dom.bimBox.find("#specialty"),'ckecked');
+      return {
+        camera:self.getCamera(),
+        list:newList,
+        filter:{
+          floors:floors,
+          specialty:specialty,
+          category:category,
+          classCode:classCode
+        }
+      };
     },
-    loadComment:function(list){
+    loadComment:function(data){
       // 加载批注
       var self = this;
       var viewer = self.viewer;
       var newList = [];
-      $.each(list,function(i,item){
+      $.each(data.list,function(i,item){
         newList.push(JSON.parse(window.atob(item)));
       });
+      data.filter.floors.ids = data.filter.floors.ids.concat(data.filter.specialty.ids);
+      self.filter(data.filter.floors);
+      self.filter(filter.category);
+      self.filter(filter.classCode);
+      self.setCamera(data.camera);
       viewer.setCommentMode();
       viewer.loadComments(newList);
     },
@@ -447,6 +465,9 @@
     setCamera : function(json){
       var viewer = this.viewer;
       viewer.setCamera(window.atob(json));
+    },
+    commentInit:function(){
+      console.log($('#comment'))
     }
   }
 })($);
