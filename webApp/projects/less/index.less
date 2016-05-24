@@ -12,7 +12,7 @@
 		.vLine{position: absolute;left:52px;right:90px;border-top:1px #ddd solid;top:6px;}
 	}
 	.txtSearch{width:165px;}
-	.btnSearch{background-color: #117EE1;display: inline-block;width:80px;height:30px;text-align: center;line-height: 30px;color:#fff;margin-left:17px;letter-spacing: 10px;padding-left: 9px;
+	.btnSearch{background-color: #117EE1;display: inline-block;width:80px;height:30px;text-align: center;line-height: 30px;color:#fff;margin-left:70px;letter-spacing: 10px;padding-left: 9px;
     box-sizing: border-box;cursor: pointer;
 		&:hover{background-color: #439EF1;}
 	}
@@ -21,7 +21,13 @@
 		&.down{ margin-top: -34px;}
 	}
 	.advancedQueryConditions{ display: none;
-		.item{height: 50px;line-height: 50px;}
+		.item{height: 50px;line-height: 50px;
+			& .searchLabel{
+				width: 60px;
+				margin-left: 10px;
+				display: inline-block;
+			}
+		}
 	}
 	.dateBox{
 		display: inline-block; position: relative;
@@ -29,7 +35,13 @@
     background: url(../comm/images/commIcon.png) no-repeat 6px -232px;
 		position: absolute;right: 1px;width: 28px;height: 28px;top: 11px;background-color: #eee;border-left: 1px #ccc solid;
 		}
-		input{height: 30px;line-height: 30px;padding-left: 8px;broder:1px #ddd solid;width:140px;padding-right: 30px;}
+		input{height: 30px;line-height: 30px;padding-left: 8px;broder:1px #ddd solid;width:180px;padding-right: 30px;}
+	}
+	& .moreSeachText,& .myDropText{
+		width: 180px;
+	}
+	& .myDropList{
+		width: 180px;
 	}
 }
 
