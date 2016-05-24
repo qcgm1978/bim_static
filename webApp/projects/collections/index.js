@@ -113,7 +113,7 @@
                      itemCallback: function(pageIndex) {
                          //加载数据
                          App.Projects.Settings.pageIndex = pageIndex + 1;
-                         App.Projects.onlyLoadData(projectName);
+                         App.Projects.onlyLoadData(params);
                      },
                      prev_text: "上一页",
                      next_text: "下一页"
@@ -125,26 +125,23 @@
      },
 
      //只是加载数据
-     onlyLoadData: function(projectName) {
-
-
+     onlyLoadData: function(params) {
+        var _data= {
+             pageIndex: App.Projects.Settings.pageIndex,
+             pageItemCount: App.Comm.Settings.pageItemCount,
+             //projectType: 1,
+             name: "",
+             estateType: "",
+             province: "",
+             region: "",
+             complete: "",
+             open: "",
+             openTimeStart: "",
+             openTimEnd: ""
+         }
          App.Projects.ProjectCollection.reset();
          App.Projects.ProjectCollection.fetch({
-
-             data: {
-                 pageIndex: App.Projects.Settings.pageIndex,
-                 pageItemCount: App.Comm.Settings.pageItemCount,
-                 //projectType: 1,
-                 name: projectName || "",
-                 estateType: "",
-                 province: "",
-                 region: "",
-                 complete: "",
-                 open: "",
-                 openTimeStart: "",
-                 openTimEnd: ""
-
-             }
+             data:$({},_data,params)
          });
      },
 
