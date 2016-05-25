@@ -8,6 +8,7 @@ App.ResourcesNav.App = Backbone.View.extend({
 
 	template: _.templateUrl("/resources/tpls/resources.app.html", true),
 
+
 	render() {
 
 
@@ -32,10 +33,19 @@ App.ResourcesNav.App = Backbone.View.extend({
 		} else if (type == "manifestLibs") {
 			//清单库
 			this.$el.append(new App.ResourcesNav.ManifestLibs().render().el);
+
+		}else if(type == "artifactsMapRule"){
+			//构件映射规则??? 2016 5 25 zhangzj-b\
+			//另行处理点击事件
+			this.$el.append(new App.ResourcesNav.ArtifactsMapRule().render().el);
+			$("#pageLoading").hide();
 		}
 		this.bindScroll();
 		return this;
 	},
+
+
+
 
 	//获取标准模型库数据
 	fetchStandardLibs: function() {
