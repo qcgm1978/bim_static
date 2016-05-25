@@ -1,0 +1,33 @@
+#comment { height: 100%; overflow-y: hidden;
+	.commentListBox { height: 100%; }
+	.commentList { height: 100%; position: relative;
+		.navBar { margin-left: 10px;
+			.item { float: left; height: 45px; line-height: 45px; color: #b9b9b9; width: 80px; text-align: center; border-bottom: 2px transparent solid; cursor: pointer;
+				&.selected { color: #fff; border-bottom-color: #1E64AA; }
+				&.save { width: 98px; border: 1px #959A94 solid; height: 25px; line-height: 24px; margin-top: 12px; float: right; margin-right: 10px;
+					.iconSave { font-size: 18px; margin: 0; padding: 0; width: 18px; color: #b9b9b9; }
+				}
+			}
+		}
+		.listBox { position: absolute; top: 46px; bottom: 0px; left: 0px; right: 0px;
+			.item { height: 80px; color: #b9b9b9;
+				.thumbnailImg { float: left; width: 82px; height: 62px; margin: 10px 0px 0px 10px; }
+				.info { margin-left: 100px; padding-top: 9px; }
+				.title, .desc { width: 98%; }
+				.title { font-size: 14px; }
+				.desc { margin: 6px 0px 4px 0px; }
+				.name { width: 50px; }
+				.date { margin-left: 10px; vertical-align: middle; }
+				.remarkCount { float: right; margin-right: 5px;
+					&:hover { text-decoration: underline; cursor: pointer; }
+				}
+				&:hover { background-color: #4E7FAD }
+				&.selected { background-color: #0057A7; color: #fff; }
+			}
+			.loading { position: static; background-color: transparent; color: #fff; font-size: 16px; text-align: center; height: 100px; }
+		}
+	}
+	.projectListBox,.userListBox{height: 100%;}
+	.commentRemark { height: 100%; display: none; }
+}
+.listBox .mCustomScrollbar .mCSB_scrollTools_vertical .mCSB_draggerContainer { background-color: transparent; }

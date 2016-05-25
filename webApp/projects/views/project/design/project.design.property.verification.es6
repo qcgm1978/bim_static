@@ -99,35 +99,36 @@
  		//显示搜索结果对应位置
  		this.$(".groupRadio").myRadioCk();
 
- 		this.$("#dateStar").one("mousedown", function() {
+ 	//	this.$("#dateStar").one("mousedown", function() {
  			//日期控件初始化
- 			$('#dateStar').datetimepicker({
+ 			this.$('#dateStar').datetimepicker({
  				language: 'zh-CN',
  				autoclose: true,
  				format: 'yyyy-mm-dd',
- 				minView: 'month',
- 				endDate: new Date()
+ 				minView: 'month'
 
  			}).on("changeDate", function(ev) {
  			//	that.VerificationOptions.startTime = ev.date.format("yyyy-MM-dd");
  				that.dataChange('startTime', ev.date.format("yyyy-MM-dd"))
  			});
- 		});
+ 	//	});
 
- 		this.$("#dateEnd").one("mousedown", function() {
+ 	//	this.$("#dateEnd").one("mousedown", function() {
  			//日期控件初始化
- 			$('#dateEnd').datetimepicker({
+ 			this.$('#dateEnd').datetimepicker({
  				language: 'zh-CN',
  				autoclose: true,
  				format: 'yyyy-mm-dd',
- 				minView: 'month',
- 				endDate: new Date()
+ 				minView: 'month'
 
  			}).on("changeDate", function(ev) {
  				//that.VerificationOptions.endTime = ev.date.format("yyyy-MM-dd");
  				that.dataChange('endTime',ev.date.format("yyyy-MM-dd"))
  			});
- 		});
+ 	//	});
+ 		this.$(".dateBox .iconCal").click(function() {
+			$(this).next().focus();
+		});
 
  	},
 

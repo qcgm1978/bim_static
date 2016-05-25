@@ -18,7 +18,8 @@ App.Projects.searchView = Backbone.View.extend({
 	//
 	events: {
 		"click .seniorSearch": "seniorSearch",
-		"click .btnSearch": "searchProject"
+		"click .btnSearch": "searchProject",
+		"change .txtSearch":"linkSearchWord"
 	},
 
 	template: _.templateUrl("/projects/tpls/project.search.html", true),
@@ -103,6 +104,10 @@ App.Projects.searchView = Backbone.View.extend({
 		this.formData.name=moreSearchName||quickSearchName||'';
  		App.Projects.loadData(this.formData); 
 
+	},
+
+	linkSearchWord:function(e){
+		this.$('.moreSeachText').val($(e.currentTarget).val());
 	}
 
 });

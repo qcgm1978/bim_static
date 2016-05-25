@@ -14,7 +14,11 @@
         "2":'轻资产',
         "3":'重资产'
     },
-
+    concernsData:{
+        type:['随机','过程检查','开业验收','入伙验收'],
+        report:['','质监','第三方','项目公司','监理单位'],
+        classic:['','实测实量','防水工程','施工质量','安全文明','总包内业资料','材料设备']
+    },
      ProjectCollection: new(Backbone.Collection.extend({
          model: Backbone.Model.extend({
              defaults: function() {
