@@ -1,5 +1,5 @@
 /**
-  * @require /libsH5/js/bimView.js
+  * @require /libsH5/js/bimView.js  
 */
 'use strict'
 ;(function($){
@@ -134,7 +134,29 @@
               self.setCommentType(fn);
             }
             break;
+          case "color":
+            var bar = bimView.model.colorBar;
+            var content = $('<div class="colorBar"></div>')
+            $.each(bar,function(i,item){
+              var tmpHtml = $('<i class="bar-item '+item.icon+'" title="'+item.title+'" data-id="'+item.fn+'" data-type="'+item.type+'" data-group="'+item.group+'"></i>');
+              if(fn && fn == item.fn || !fn && i==0){
+                tmpHtml.addClass('selected')
+              }
+              content.append(tmpHtml);
+            });
+            bimView.comm.dialog({
+              title:"设置背景色",
+              content:content,
+              callback:function(res){
+                $this.attr('class','bar-item m-color '+res).data('id',res);
+                self._dom.bimBox.attr('class','bim '+res)
+              }
+            })
+            break;
         }
+      }).on('click','.subBar',function(){
+        var $this = $(this);
+        $this.prev().removeClass('selected');
       }).on('click','.modelSelect .cur',function(){
         // 点击下拉
         var $this = $(this);
@@ -481,7 +503,7 @@
       var viewer = this.viewer;
       viewer.setCamera(window.atob(json));
     },
-    commentInit:function(){
+    commentInit:function(){ 
       console.log($('#comment'))
     }
   }

@@ -232,6 +232,11 @@ App.API = {
 		'attrDwg':'doc/{projectId}/{versionId}/file/tag', //图纸
 		//业务流程
 		fetchFlow:'platform/flow',
+
+
+		//批注
+		projectPhoto:"http://bim.wanda-dev.cn/platform/project?type=3",//项目快照
+		userPhoto:"http://bim.wanda-dev.cn/platform/project?type=3",//用户快照
 		
 		test: ""
 	},

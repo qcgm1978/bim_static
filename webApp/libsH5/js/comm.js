@@ -172,10 +172,23 @@
         title:"系统提示",
         content:"",
         okText:"确定"
-      }
+      };
       var _opt = $.extend({},defaults,options);
-      var dialog = '<div class="modelDialog"><div class="dialogBody"><div class="dialogHeader"></div><div class="dialgoContent"></div><div class="dialogFooter"><input type="button" class="dialogOk" value=""/></div></div></div>';
+      var type = 'color-1'
+      var dialog = $('<div class="modelDialog"><div class="dialogBody"><div class="dialogHeader">'+_opt.title+'<span class="dialogClose"></span></div><div class="dialogContent"></div><div class="dialogFooter"><input type="button" class="dialogOk dialogBtn" value="'+_opt.okText+'"/></div></div></div>');
+      dialog.find(".dialogContent").append(_opt.content);
       $('body').append(dialog);
+      dialog.on('click','.dialogClose',function(){
+        dialog.remove();
+      }).on('click','.dialogOk',function(){
+        if(_opt.callback)_opt.callback(type);
+        dialog.remove();
+      }).on('click','.bar-item',function(){
+        var $this = $(this),
+            fn = $this.data('id');
+        type = fn;
+        $this.addClass('selected').siblings().removeClass('selected');
+      })
     }
   }
 })($);
