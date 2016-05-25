@@ -50,7 +50,6 @@
       self.regesiterEvent(_opt);
       self.controll();
       bimView.comm.bindEvent.init();
-      // new bimView.comm.dialog();
       self.pub("start");
     },
     regesiterEvent:function(options){
@@ -121,6 +120,13 @@
           case "more":
             $this.toggleClass('selected');
             bimView.sidebar[fn](self);
+            if($this.is('.selected')){
+              setTimeout(function(){
+                $(document).one('click',function(){
+                  $('.m-more').removeClass('selected');
+                });
+              },10)
+            }
             break;
           case "change":
             $this.toggleClass('m-miniScreen m-fullScreen')
@@ -133,6 +139,32 @@
               $this.toggleClass('selected').siblings().removeClass('selected');
               self.setCommentType(fn);
             }
+            break;
+          case "color":
+            var bar = bimView.model.colorBar;
+            var content = $('<div class="colorBar"></div>')
+            $.each(bar,function(i,item){
+              var tmpHtml = $('<i class="bar-item '+item.icon+'" title="'+item.title+'" data-id="'+item.fn+'" data-type="'+item.type+'" data-group="'+item.group+'"></i>');
+              if(fn && fn == item.fn || !fn && i==0){
+                tmpHtml.addClass('selected')
+              }
+              content.append(tmpHtml);
+            });
+            var type;
+            content.on('click','.bar-item',function(){
+              var $this = $(this),
+                  fn = $this.data('id');
+              type = fn;
+              $this.addClass('selected').siblings().removeClass('selected');
+            })
+            bimView.comm.dialog({
+              title:"设置背景色",
+              content:content,
+              callback:function(){
+                $this.attr('class','bar-item m-color '+type).data('id',type);
+                self._dom.bimBox.attr('class','bim '+type)
+              }
+            })
             break;
         }
       }).on('click','.modelSelect .cur',function(){
@@ -154,6 +186,8 @@
             ids:bimView.comm.removeById(filterData,data.id)
           })
         }else{
+          self.curFloor = text;
+          self.curFloorData = data;
           self.setFloorMap(data,"miniMap");
         }
       }).on('click','.m-openTree,.m-closeTree',function(){
@@ -210,25 +244,29 @@
         $li.find('.treeText').toggleClass('selected',!flag);
         var filter = bimView.comm.getFilters($li,'all');
         self.highlight(filter);
+      }).on('click','.axisGrid',function(){
+        if(!self.bigMap){
+          self.bigMap = $('<div id="map"></div>');
+        }
+        var data = self.curFloorData;
+        bimView.comm.dialog({
+          title:'选择轴网',
+          content:self.bigMap,
+          footer:'<label class="dialogLabel">X：<input type="text" class="dialogInput" id="axisGridX" /></label><label class="dialogLabel">Y：<input type="text" class="dialogInput" id="axisGridY" /></label>',
+          callback:function(res){
+            return false;
+          }
+        });
+        self.initMap('bigMap',self.bigMap);
+        self.showAxisGrid('bigMap');
+        self.setFloorMap(data,"bigMap");
       });
       $(window).on('resize',function(){
         self.resize();
       });
       self.on('changeGrid',function(res){
-        var data = bimView.sidebar.axisGridData.Levels;
-        var infoZ;
-        data = data.sort(function(a,b){
-          return b.elevation - a.elevation;
-        });
-        $.each(data,function(i,item){
-          if(res.axis.offsetZ > item.elevation){
-            infoZ = "("+item.name.substring(0,3)+","+ (res.axis.offsetZ - item.elevation) +")";
-            return false;
-          }
-        });
-        if(!infoZ){
-          infoZ = "(B02,"+res.axis.offsetZ+")"
-        }
+        var floors = self.curFloor;
+        var infoZ = 'Z('+ floors +','+res.axis.offsetZ+')'
         bimView.sidebar.el._dom.mapBar.find(".axisGrid").text(res.axis.infoX+","+res.axis.infoY+","+infoZ)
       });
     },
@@ -415,8 +453,8 @@
       var self = this;
       var viewer = self.viewer;
       var filter = viewer.getFilters();
-      filter.setOverriderByUserIds('collisionA',[idA],'lightBlue');
-      filter.setOverriderByUserIds('collisionB',[idB],'darkRed');
+      filter.setOverriderByUserIds('collisionA',[idA],'darkRed');
+      filter.setOverriderByUserIds('collisionB',[idB],'lightBlue');
       viewer.render();
     },
     translucent:function(flag){
@@ -434,7 +472,7 @@
       var filter = viewer.getFilters();
       return filter.isSceneOverriderEnabled();
     },
-    initMap:function(name,element,axisGrid,floorPlane){
+    initMap:function(name,element,axisGrid){
       // 初始化小地图
       var self = this,
           viewer = self.viewer,
@@ -446,7 +484,7 @@
             bottom:'0px',
             outline:'none'
           };
-      viewer.setAxisGridData(axisGrid)
+      if(axisGrid) viewer.setAxisGridData(axisGrid)
       viewer.createMiniMap(name,_el[0],_width,_height,_css,function(res){
         self.pub('changeGrid',res);
       });
@@ -457,6 +495,10 @@
       var viewer = this.viewer;
       viewer.setFloorPlaneData(obj);
       viewer.generateFloorPlane(name);
+    },
+    showAxisGrid:function(name){
+      var viewer = this.viewer;
+      viewer.showAxisGrid(name,true);
     },
     load:function(etag){
       // 加载场景

@@ -10,8 +10,11 @@ App.Project.ProjectPlanProperty = Backbone.View.extend({
 		"click .projectPlanNav .item": "navItemClick",
 		"change .selDate": "changeDate",
 		'change .dateStar':'loadPlanModelData',
-		'change .dateEnd':'loadPlanModelData'
+		'change .dateEnd':'loadPlanModelData',
+		'click .clearFormLink':'clearSearch'
 	},
+
+	planType:'1',
 
 	render: function() {
 
@@ -61,25 +64,33 @@ App.Project.ProjectPlanProperty = Backbone.View.extend({
 		return this;
 	},
 
-	//初始化dom事件
+	//初始化dom事件 
 	initDom(){
+		var _this=this
+		this.$('.planTimeType').myDropDown({
+			click: function($item) {
+				_this.planType=$item.attr('data-val');
+				_this.loadPlanModelData();
+			}
+		});
+
 		this.$('.dateStar').datetimepicker({
              language: 'zh-CN',
              autoclose: true,
              format: 'yyyy-mm-dd',
-             minView: 'month',
-             endDate: new Date()
+             minView: 'month'
 
          });
          this.$('.dateEnd').datetimepicker({
              language: 'zh-CN',
              autoclose: true,
              format: 'yyyy-mm-dd',
-             minView: 'month',
-             endDate: new Date()
+             minView: 'month'
 
          });
-
+         this.$(".dateBox .iconCal").click(function() {
+			$(this).next().focus();
+		});
 	},
 
 	loadPlanModelData(){
@@ -96,9 +107,18 @@ App.Project.ProjectPlanProperty = Backbone.View.extend({
 		App.Project.PlanAttr.PlanModelCollection.fetch({
 			data:{
 				startTime:_start,
-				endTime:_end
+				endTime:_end,
+				type:this.planType
 			}
 		});
+	},
+	
+	clearSearch(){
+		this.$('.dateStar').val('');
+		this.$('.dateEnd').val('');
+		this.$('.planTimeType .text').html('计划开始');
+		this.planType='1';
+		this.loadPlanModelData();
 	},
 	//切换导航
 	navItemClick: function(event) {

@@ -128,9 +128,6 @@
       var self = this;
       var status = viewer.getTranslucentStatus();
       self.el._dom.sidebar.find('.bar-translucent').toggleClass('selected',status);
-      self.el._dom.sidebar.find('.subBar').on('click',function(){
-        self.el._dom.sidebar.find('.bar-more').removeClass('selected');
-      });
     },
     toggleMap:function(el){
       var self = this;
@@ -163,7 +160,7 @@
         url:bimView.API.fetchAxisGrid,
         etag:self._opt.etag
       },function(res){
-        axisGridData = self.axisGridData = JSON.parse(res);
+        axisGridData = JSON.parse(res);
         axisGridStatue = true;
         if(floorsStatue){
           renderMap();

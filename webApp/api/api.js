@@ -231,6 +231,7 @@ App.API = {
 		extendAttrInsert:"platform/setting/extensions/property",//新增
 		extendAttrUpdate:"platform/setting/extensions/property",//更新扩展属性
 		extendAttrDel:"platform/setting/extensions/property/{classKey}?property={property}",//删除扩展属性
+		extendClassAttr:"platform/setting/extensions/{projectId}/property?classKey={classKey}&elementId={elementId}",//获取push的属性值
 		extendAttrGetReferene:"platform/setting/extensions/property/reference",// 获取引用扩展属性
 		projectCodeMapping:"platform/mapping/{projectId}",
 		getBoundingBox:"sixD/{projectId}/{projectVersionId}/bounding/box",//获取构建的 box id ?sceneId={sceneId}&elementId={elementId}
@@ -242,6 +243,11 @@ App.API = {
 		'attrDwg':'doc/{projectId}/{versionId}/file/tag', //图纸
 		//业务流程
 		fetchFlow:'platform/flow',
+
+
+		//批注
+		projectPhoto:"platform/project?type=3",//项目快照
+		userPhoto:"platform/project?type=3",//用户快照
 		
 		test: ""
 	},

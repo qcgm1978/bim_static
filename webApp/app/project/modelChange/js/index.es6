@@ -70,7 +70,7 @@ App.Index = {
 		var Request = App.Index.GetRequest();
 		App.Index.Settings.projectId = Request.projectId;
 		App.Index.Settings.projectVersionId = Request.projectVersionId;
-		App.Index.Settings.referenceId = Request.id;
+		App.Index.Settings.referenceId = Request.modificationId;
 	},
 
 	//获取url 参数
@@ -256,6 +256,7 @@ App.Project.Model = {
 			var data = model.toJSON();
 			var comparisonId = App.Index.Settings.referenceId;
 			var isload = false;
+			debugger
 			$.each(data.data, function(i, item) {
 				$.each(item.comparisons, function(j, file) {
 					if (file.currentVersion == comparisonId) {
