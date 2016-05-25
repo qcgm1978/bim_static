@@ -279,7 +279,7 @@
       var viewBox = $('<div class="view"></div>');
       _opt._dom.bimBox.append(viewBox);
       viewer.init(viewBox[0]);
-      viewer.load(_opt.etag,bimView.API.baseUrl + bimView.API.fetchModel);
+      // viewer.load(_opt.etag,bimView.API.baseUrl + bimView.API.fetchModel);
       return viewer;
     }
   }
