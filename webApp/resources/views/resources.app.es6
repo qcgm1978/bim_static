@@ -14,7 +14,7 @@ App.Resources.App = Backbone.View.extend({
 		this.$el.html(this.template);
 		var $resoucesNav = $(".resoucesNavBox .resoucesNav");
 		if (!App.AuthObj.lib) {
-			$resoucesNav.remove();
+			//$resoucesNav.remove();
 		} else {
 			var Auth = App.AuthObj.lib;
 			//族库

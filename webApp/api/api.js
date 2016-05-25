@@ -25,7 +25,6 @@ App.API = {
 		fetchServicesFunList: 'platform/auth/function',//功能列表
 		fetchServicesOzRoleList:'platform/auth/org/{orgId}/role?outer={outer}',//机构角色
 		fetchServicesUserRoleList:'platform/auth/user/{userId}/role?outer={outer}',//用户角色
-		putServicesRoleFun:'platform/auth/role/{roleId}/function?functionId=111,222,333',//保存角色功能，未用
 		fetchServicesNewRole:'platform/auth/role',//新增角色
 		fetchServiceMemberList:'platform/auth/org',
 		saveServicesRole:'platform/auth/role/grant',//赋予角色
@@ -178,6 +177,17 @@ App.API = {
 		putFileReName: "doc/{projectId}/{projectVersionId}/file/rename", // 重命名文件 ?fileVersionId={fileVersionId}&name={name}
 		createNewFolder: "doc/{projectId}/{projectVersionId}/file", // 创建新文件夹 ?parentId={parentId}&filePath={filePath}
 
+		//映射规则库
+		fetchArtifactsPlanLibs:"/dataJson/resources/fetchArtifactsMapPlan.json",//计划节点
+		fetchArtifactsPlanNewRule:"/dataJson/resources/fetchArtifactsMapPlan.json",//计划节点新建规则
+		modifyArtifactsPlanRule:"/dataJson/resources/fetchArtifactsMapPlan.json",//计划节点修改规则
+		deleteArtifactsPlanRule:"/dataJson/resources/fetchArtifactsMapPlan.json",//计划节点删除规则
+		fetchQualityPlanStandardLevel1:"/dataJson/resources/fetchArtifactsMapPlan.json", //质量标准1级菜单
+		fetchQualityPlanStandardLevel2:"/dataJson/resources/fetchArtifactsMapPlan.json", //质量标准2级菜单
+		fetchArtifactsQualityNewRule:"/dataJson/resources/fetchArtifactsMapPlan.json",//质量标准新建规则
+		modifyArtifactsQualityRule:"/dataJson/resources/fetchArtifactsMapPlan.json",//质量标准修改规则
+		deleteArtifactsQualityRule:"/dataJson/resources/fetchArtifactsMapPlan.json",//质量标准删除规则
+
 		//项目 变更 列表
 		fileList:"doc/internal/{projectId}/{versionId}/differ", //变更列表
 		projectChangeList:"sixD/{projectId}/{projectVersionId}/cost/comparison",// ?fileVerionId={fileVerionId}&baseFileVerionId={baseFileVerionId}
@@ -221,6 +231,7 @@ App.API = {
 		extendAttrInsert:"platform/setting/extensions/property",//新增
 		extendAttrUpdate:"platform/setting/extensions/property",//更新扩展属性
 		extendAttrDel:"platform/setting/extensions/property/{classKey}?property={property}",//删除扩展属性
+		extendClassAttr:"platform/setting/extensions/{projectId}/property?classKey={classKey}&elementId={elementId}",//获取push的属性值
 		extendAttrGetReferene:"platform/setting/extensions/property/reference",// 获取引用扩展属性
 		projectCodeMapping:"platform/mapping/{projectId}",
 		getBoundingBox:"sixD/{projectId}/{projectVersionId}/bounding/box",//获取构建的 box id ?sceneId={sceneId}&elementId={elementId}
@@ -346,6 +357,11 @@ App.API = {
 		deleteFile: "", //删除文件
 		putFileReName: "", //重命名文件
 		createNewFolder: "",
+
+		//映射规则库
+		fetchArtifactsPlanLibs:"/dataJson/resources/fetchArtifactsMapPlan.json",//计划节点
+		fetchQualityPlanStandardLevel1:"/dataJson/resources/fetchArtifactsMapPlan.json", //质量标准
+		fetchQualityPlanStandardLevel2:"/dataJson/resources/fetchArtifactsMapPlan.json", //质量标准
 
 
 
