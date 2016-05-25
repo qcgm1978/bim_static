@@ -22,7 +22,6 @@ App.Project.FileContainerDetail=Backbone.View.extend({
 
 	//渲染
 	render:function(){
-
 		this.$el.html(this.template(this.model.toJSON()));
 		return this;
 	},

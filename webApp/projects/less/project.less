@@ -104,7 +104,7 @@
 		}
 		.desctionAnalog { height: 30px; background-color: #ddd; line-height: 33px; padding-left: 15px; }
 	}
-	.planBox { position: absolute; top: 52px; bottom: 0px; left: 0px; right: 0px;
+	.planBox { position: absolute; top: 65px; bottom: 0px; left: 0px; right: 0px;
 		&.planAnalogContent { top: -1px; bottom: 80px; }
 		&.planPlanPublicity { top: 0px;
 			.selDate { margin-bottom: 7px; margin-top: 3px; }
@@ -132,9 +132,25 @@
 		}
 	}
 	.planSearch { width: 100%; min-width: 398px; margin-top: 10px; padding-left: 15px;
-		.dateBox { display: inline-block; position: relative;
+		.dateBox { display: inline-block; position: relative;width: 120px;margin-top: -5px;
 			.iconCal { background: url(../comm/images/commIcon.png) no-repeat 6px -232px; position: absolute; right: 1px; width: 28px; height: 28px; top: 1px; background-color: #eee; border-left: 1px #ccc solid; }
-			input { height: 30px; line-height: 30px; padding-left: 8px; broder: 1px #ddd solid; width: 175px; padding-right: 30px; box-sizing: border-box; }
+			input { height: 30px; line-height: 30px; padding-left: 8px; broder: 1px #ddd solid; width: 120px; padding-right: 30px; box-sizing: border-box; }
+		}
+		& .planTimeType{
+			margin-right: 10px;
+			& .myDropText{
+				width: 100px;
+			}
+			& .myDropList{
+				left: 0;
+				top: 32px;
+				width: 120px;
+			}
+		}
+		& .clearFormLink{
+			float: right;
+		    margin-right: 16px;
+		    margin-top: 5px;
 		}
 	}
 }

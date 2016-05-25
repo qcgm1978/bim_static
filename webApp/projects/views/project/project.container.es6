@@ -320,7 +320,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 
 		//渲染模型属性
 		//App.Project.renderModelContentByType();
-		//return;
+		return;
 		var viewer = App.Project.Settings.Viewer = new bimView({
 			type:'model',
 			element: $("#projectContainer .modelContainerContent"),
@@ -328,8 +328,6 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			etag: App.Project.Settings.DataModel.etag,
 			projectId: App.Project.Settings.projectId
 		});
-
-
 
 		viewer.on('viewpoint', function(point) {
 			$("#projectContainer .projectNavModelContainer .tree-view:eq(1) .item-content:eq(0)").addClass('open')

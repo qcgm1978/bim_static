@@ -328,7 +328,40 @@ App.Console = {
     App.Console.auditSheet1(7, "#s41", 16);
     //9获取
     App.Console.auditSheet1(8, "#s51", 8);
+    $("#submit0").click(function() {
+      var data = {
+        type: 3,
+        projectNo: $("#number").val().trim(),
+        name: $("#famTitle").val().trim(),
+        projectType: 2,
+        estateType: 1,
+        province: "上海市",
+        region: "管理分区", //管理分区，最大长度32。非空
+        openTime: $("#devDate").val().trim(), //开业时间
+        //versionName: “2016 版”, //版本名称，适用于标准模型。非空字段
+        designUnit: $("#launchDepartment").val().trim()
+      };
 
+
+
+      var stringData = JSON.stringify(data);
+
+      $.ajax({
+        url: "platform/project",
+        data: stringData,
+        headers: {
+          "Content-Type": "application/json"
+        },
+        type: "POST"
+      }).done(function(data) {
+
+        if (data.message == "success") {
+          alert("成功");
+          window.location.reload();
+        }
+
+      });
+    });
     $("#submit1").click(function(){
       var data = {
         workflowId : parseInt(9999999 * Math.random()),
