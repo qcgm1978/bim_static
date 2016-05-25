@@ -235,8 +235,8 @@ App.API = {
 
 
 		//批注
-		projectPhoto:"http://bim.wanda-dev.cn/platform/project?type=3",//项目快照
-		userPhoto:"http://bim.wanda-dev.cn/platform/project?type=3",//用户快照
+		projectPhoto:"platform/project?type=3",//项目快照
+		userPhoto:"platform/project?type=3",//用户快照
 		
 		test: ""
 	},

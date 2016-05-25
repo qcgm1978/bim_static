@@ -7,11 +7,16 @@
 ;
 (function() {
 
+	//非bim平台
+	if (!_.templateUrl) {
+		return;
+	}
+
 	var $comment, AppView;
 
 	//扩展 批注
 	bimView.prototype.commentInit = function() {
-		 return
+
 		//单利 不存在 则 新建
 		if (!AppView) {
 
@@ -23,51 +28,65 @@
 		}
 
 		//显示
-		bimView.sidebar.comment(true)
+		bimView.sidebar.comment(true);
+
+		$("#comment .navBar .item.project").click();
 
 	}
 
 	//集合
-	var CommentCollections={
+	var CommentCollections = {
 		//项目
-		Project:new (Backbone.Collection.extend({
+		Project: new(Backbone.Collection.extend({
 
-			model:Backbone.Model.extend({
-				defualt:{
-					title:""
+			model: Backbone.Model.extend({
+				defualt: {
+					title: ""
 				}
 			}),
 
-			urlType:"projectPhoto",
+			urlType: "projectPhoto",
+
+			parse(response, options) {
+				if (response.code == 0) {
+					return response.data.items;
+				}
+			}
 		})),
 
 		//用户
-		User:new (Backbone.Collection.extend({
+		User: new(Backbone.Collection.extend({
 
-			model:Backbone.Model.extend({
-				defaults:{
-					title:""
+			model: Backbone.Model.extend({
+				defaults: {
+					title: ""
 				}
 			}),
 
-			urlType:"userPhoto"
+			urlType: "userPhoto",
 
-		})),
+			parse(response, options) {
+				if (response.code == 0) {
+					return response.data.items;
+				}
+			}
+
+		}))
 	}
 
 
-	var CommentView = { 
+	var CommentView = {
 
 
 		//入口
 		App: Backbone.View.extend({
 
-			el: "div",
+			tagName: "div",
 
-			className: "commentList",
+			className: "commentListBox",
 
-			events:{
-				".navBar .item":"itemClick"
+			events: {
+				"click .navBar .item": "itemClick"
 			},
 
 			template: _.templateUrl('/libsH5/tpls/comment/bimview.pro.comment.html', true),
@@ -85,23 +104,38 @@
 			},
 
 			//导航
-			itemClick(event){
-
-				var $el=$(event.target).closest("li"),type=$el.data("type");
+			itemClick(event) {
+				 
+				var $el = $(event.target).closest(".item"),
+					type = $el.data("type");
 
 				//项目视点
-				if (type=="project") {
+				if (type == "project") {
+					this.$(".projectListBox").fadeIn("fast");
+					//this.$(".projectListScroll").animate({left:"0px" },300);
+					//获取数据
+					CommentCollections.Project.reset();
+					CommentCollections.Project.fetch();
 
-					this.$(".projectListScroll").show();
+					$el.addClass("selected").siblings().removeClass("selected");
 
-				}else if (type=="user") {
+					//绑定滚动条
+					App.Comm.initScroll(this.$(".projectListScroll"), "y");
+
+				} else if (type == "user") {
 					//个人视点
+					this.$(".projectListBox").fadeOut("fast");
+					//this.$(".projectListScroll").animate({left:"-406px" },300);
+					//获取数据
+					CommentCollections.User.reset();
+					CommentCollections.User.fetch();
 
-					this.$(".userListScroll").show();
+					$el.addClass("selected").siblings().removeClass("selected");
+					//绑定滚动条
+					App.Comm.initScroll(this.$(".userListScroll"), "y");
 
-				}else if (type=="save") {
+				} else if (type == "save") {
 					//保存
-
 
 
 				}
@@ -111,62 +145,94 @@
 		}),
 
 		//项目
-		Project:Backbone.View.extend({
+		Project: Backbone.View.extend({
 
-			el:"div",
+			tagName: "ul",
 
-			className:"projectList",
+			className: "projectList",
 
 			//初始化
-			initialize(){
-				this.listenTo(CommentCollections.Project,"add",this.addOne),
-				this.listenTo(CommentCollections.Project,"reset",this.reLoading)
+			initialize() {
+				this.listenTo(CommentCollections.Project, "add", this.addOne);
+				this.listenTo(CommentCollections.Project, "reset", this.reLoading)
 			},
 
-			render(){
+			render() {
 				return this;
 			},
 
 			//新增数据
-			addOne(){
-
+			addOne(model) {
+				var $list = new CommentView.listDetail({
+					model: model
+				}).render().$el;
+				this.$el.find(".loading").remove();
+				this.$el.append($list);
 			},
 
 			//重新加载
-			reLoading(){
-
+			reLoading() {
+				 
+				this.$el.html('<li class="loading">正在加载，请稍候……</li>');
 			}
 
 		}),
 
 		//用户
-		User:Backbone.View.extend({
+		User: Backbone.View.extend({
 
-			el:"div",
+			tagName: "ul",
 
-			className:"userList",
+			className: "userList",
 
 			//初始化
-			initialize(){
-				this.listenTo(CommentCollections.Project,"add",this.addOne),
-				this.listenTo(CommentCollections.Project,"reset",this.reLoading)
+			initialize() {
+				this.listenTo(CommentCollections.User, "add", this.addOne),
+					this.listenTo(CommentCollections.User, "reset", this.reLoading)
 			},
 
-			render(){
+			render() {
 				return this;
 			},
 
 			//新增数据
-			addOne(){
+			addOne(model) {
 
+				var $list = new CommentView.listDetail({
+					model: model
+				}).render().$el;
+				this.$el.find(".loading").remove();
+				this.$el.append($list);
 			},
 
 			//重新加载
-			reLoading(){
-				
+			reLoading() {
+				 
+				this.$el.html('<li class="loading">正在加载，请稍候……</li>');
 			}
 
 		}),
+
+		//单个列表
+		listDetail: Backbone.View.extend({
+
+			tagName: "li",
+
+			className: "item",
+
+			template: _.templateUrl('/libsH5/tpls/comment/bimview.pro.comment.list.detail.html'),
+
+			render() {
+
+				var data = this.model.toJSON();
+
+				this.$el.html(this.template(data));
+
+				return this;
+
+			}
+
+		})
 
 
 	}

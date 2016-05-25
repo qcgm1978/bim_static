@@ -61,7 +61,7 @@
     }
     .modelMap{width:100%;height:260px;background:#333;position:absolute;left:0;bottom:0;z-index:2;
       .map{height:180px;background:#fff;border-left:2px solid #333;border-right:2px solid #333;}
-      .axisGrid{margin:5px;float:right;text-align:right;color:#fff;line-height:30px;}
+      .axisGrid{margin:5px;float:right;text-align:right;color:#fff;line-height:30px;cursor:pointer;}
     }
     .modelFilter{width:100%;display:none;position:absolute;top:0;bottom:260px;color:#fff;padding:5px;background:rgba(0, 0, 0, 0.75);overflow:auto;}
   }
@@ -124,11 +124,11 @@
       &:before{display:block;content:'\e60d';font-family:"modelicon" !important;font-size:32px;}
     }
   }
-  .dialogContent{padding:20px;}
+  .dialogContent{}
   .dialogFooter{padding:20px;text-align:right;border-top:1px solid #666;
     .dialogBtn{width:80px;height:30px;font-size:14px;margin-left:20px;border:1px solid #fff;background:#333;outline:none;}
   }
-  .colorBar{height:115px;margin:0 -10px;
+  .colorBar{height:115px;margin:20px 10px;
     .bar-item{display:inline-block;width:58px;height:58px;padding:3px;border-radius:1000px;margin:11px;position:relative;border:2px solid transparent;
       &:before{display:block;width:48px;height:48px;content:'';border-radius:1000px;border:2px solid #fff;}
       &.selected{border:2px solid #006ECF;
@@ -141,6 +141,10 @@
     .color-4:before{background:#000;}
     .color-5:before{background:#748BA6;}
     .color-6:before{background:#273749;}
+  }
+  #map{width:100%;height:300px;}
+  .dialogLabel{line-height:30px;margin-right:10px;font-size:16px;
+    .dialogInput{width:60px;height:30px;border:none;background:#fff;text-align:center;outline:none;color:#000;}
   }
 }
 
