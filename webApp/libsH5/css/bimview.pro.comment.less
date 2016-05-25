@@ -1,6 +1,6 @@
 #comment { height: 100%; overflow-y: hidden;
-	.commentListBox { height: 100%; }
-	.commentList { height: 100%; position: relative;
+	.commentListBox { height: 100%; overflow: hidden; }
+	.commentList { height: 100%; position: relative; left: 0px;
 		.navBar { margin-left: 10px;
 			.item { float: left; height: 45px; line-height: 45px; color: #b9b9b9; width: 80px; text-align: center; border-bottom: 2px transparent solid; cursor: pointer;
 				&.selected { color: #fff; border-bottom-color: #1E64AA; }
@@ -24,10 +24,33 @@
 				&:hover { background-color: #4E7FAD }
 				&.selected { background-color: #0057A7; color: #fff; }
 			}
-			.loading { position: static; background-color: transparent; color: #fff; font-size: 16px; text-align: center; height: 100px; }
 		}
 	}
-	.projectListBox,.userListBox{height: 100%;}
-	.commentRemark { height: 100%; display: none; }
+	.projectListBox, .userListBox { height: 100%; }
+	.commentRemark { position: absolute; top: 6px; left: 330px; right: 0px; bottom: 0px; overflow: hidden;
+		.header { height: 49px; border-bottom: 1px #353535 solid; line-height: 48px; padding: 0px 10px; }
+		.talkReMark { position: absolute; bottom: 0px; background-color: #444; }
+		.reMarkListBox { position: absolute; top: 49px; bottom: 100px; background: #333; left: 0px; right: 0px; }
+		.iconTalk { font-size: 21px; width: 25px; margin: 0px; color: #b9b9b9; }
+		.goList { float: right; cursor: pointer; color: #b9b9b9; }
+		.inputBox{width: 310px; margin-left: 8px;color: #333; border-radius: 3px; background-color: #fff;}
+		.txtReMark {width:100%;border:0; height: 42px; outline: none; resize: none; padding: 5px;
+			&.input { height: 85px; }
+		}
+		.uploadImg { display: none; }
+		.btnEnter { float: right; margin: 5px 2px 10px 0px; width: 100px; height: 28px; background-color: transparent; outline: 0; border: 1px #fff solid; }
+		.btnUploadImg { float: left; margin: 12px 0px 0px 12px; cursor: pointer; }
+		.reMarkList { .item { border-top: 1px #656565 solid; margin: 0px 10px 8px 20px; }
+			.userInfo { margin-top: 5px; }
+			.userImg { width: 18px; height: 18px; border-radius: 3px; }
+			.userName { margin-left: 5px; vertical-align: 2px; }
+			.date { float: right; }
+			.content { margin: 5px 0px 0px 25px; }
+			.imgs { margin: 8px 0px 0px 25px;
+				.img { margin: 2px; }
+			}
+		}
+	}
+	.loading { position: static; background-color: transparent; color: #fff; font-size: 16px; text-align: center; height: 100px; }
 }
-.listBox .mCustomScrollbar .mCSB_scrollTools_vertical .mCSB_draggerContainer { background-color: transparent; }
+#comment .mCustomScrollbar .mCSB_scrollTools_vertical .mCSB_draggerContainer { background-color: transparent; }
