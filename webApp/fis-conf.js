@@ -138,7 +138,7 @@ fis.match('/libs/**.css', {
 
 
 //合并裤文件
-fis.match('/libsH5/**.js', {
+fis.match('/libsH5/**.{js,es6}', {
   packTo: '/static/dist/libs/libsH5_' + v + '.js'
 });
 

@@ -1,5 +1,5 @@
 /**
-  * @require /libsH5/js/bimView.js
+  * @require /libsH5/js/bimView.js  
 */
 'use strict'
 ;(function($){
@@ -481,7 +481,7 @@
       var viewer = this.viewer;
       viewer.setCamera(window.atob(json));
     },
-    commentInit:function(){
+    commentInit:function(){ 
       console.log($('#comment'))
     }
   }
