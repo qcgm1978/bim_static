@@ -93,9 +93,9 @@ App.Project.QualityConcerns=Backbone.View.extend({
 		this.$(".groupRadio").myRadioCk();
 
 
-		this.$("#dateStar2").one("mousedown",function() { 
+	//	this.$("#dateStar2").one("mousedown",function() { 
 			//日期控件初始化
-			$('#dateStar2').datetimepicker({
+			this.$('#dateStar2').datetimepicker({
 				language: 'zh-CN',
 				autoclose: true,
 				format: 'yyyy-mm-dd',
@@ -106,11 +106,11 @@ App.Project.QualityConcerns=Backbone.View.extend({
 			//	that.MaterialEquipmentOptions.startTime = ev.date.format("yyyy-MM-dd");
 				that.changeHC('startTime',new Date(ev.date.format("yyyy-MM-dd")+ ' 00:00:00').getTime())
 			});
-		});
+	//	});
 
-		this.$("#dateEnd2").one("mousedown",function() {
+//		this.$("#dateEnd2").one("mousedown",function() {
 			//日期控件初始化
-			$('#dateEnd2').datetimepicker({
+			this.$('#dateEnd2').datetimepicker({
 				language: 'zh-CN',
 				autoclose: true,
 				format: 'yyyy-mm-dd',
@@ -121,7 +121,7 @@ App.Project.QualityConcerns=Backbone.View.extend({
 			//	that.MaterialEquipmentOptions.endTime = ev.date.format("yyyy-MM-dd");
 				that.changeHC('endTime',new Date(ev.date.format("yyyy-MM-dd")+ ' 23:59:59').getTime())
 			});
-		});
+//		});
 
 
 
