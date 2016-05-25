@@ -61,25 +61,25 @@ App.Project.ProjectPlanProperty = Backbone.View.extend({
 		return this;
 	},
 
-	//初始化dom事件
+	//初始化dom事件 
 	initDom(){
 		this.$('.dateStar').datetimepicker({
              language: 'zh-CN',
              autoclose: true,
              format: 'yyyy-mm-dd',
-             minView: 'month',
-             endDate: new Date()
+             minView: 'month'
 
          });
          this.$('.dateEnd').datetimepicker({
              language: 'zh-CN',
              autoclose: true,
              format: 'yyyy-mm-dd',
-             minView: 'month',
-             endDate: new Date()
+             minView: 'month'
 
          });
-
+         this.$(".dateBox .iconCal").click(function() {
+			$(this).next().focus();
+		});
 	},
 
 	loadPlanModelData(){
