@@ -19,6 +19,7 @@ App.Projects.searchView = Backbone.View.extend({
 	events: {
 		"click .seniorSearch": "seniorSearch",
 		"click .btnSearch": "searchProject",
+		"click .btnClear": "clearSearch",
 		"change .txtSearch":"linkSearchWord"
 	},
 
@@ -76,6 +77,33 @@ App.Projects.searchView = Backbone.View.extend({
 
 	},
 
+	clearSearch:function(){
+		this.formData={
+			 name:"",
+			 projectType:"",
+			 estateType: "",
+	         province: "",
+	         region: "",
+	         complete: "",
+	         open: "",
+	         openTimeStart: "", 
+	         openTimEnd: ""
+		}
+		this.$(".pickProjectType .text").html('请选择');
+		this.$(".pickCategory .text").html('请选择');
+		this.$(".pickManager .text").html('请选择');
+		this.$(".pickProvince .text").html('请选择');
+		this.$(".pickOpening .text").html('请选择');
+
+		this.$(".btnRadio").removeClass('selected');
+		this.$('#dateStar').val('');
+		this.$('#dateEnd').val('');
+		this.$(".quickSearch .txtSearch").val('');
+		this.$('.moreSeachText').val('');
+		App.Projects.Settings.pageIndex=1;
+		App.Projects.loadData(this.formData); 
+	},
+
 	//显示隐藏高级收缩
 	seniorSearch: function() {
 
@@ -86,7 +114,6 @@ App.Projects.searchView = Backbone.View.extend({
 			$("#projectModes").addClass("projectModesDown");
 			//当前按钮添加事件
 			this.$el.find(".seniorSearch").addClass('down');
-
 		} else {
 			this.$el.find(".quickSearch").show();
 			this.$el.find(".advancedQueryConditions").hide();

@@ -109,7 +109,7 @@
 
  			}).on("changeDate", function(ev) {
  			//	that.VerificationOptions.startTime = ev.date.format("yyyy-MM-dd");
- 				that.dataChange('startTime', ev.date.format("yyyy-MM-dd"))
+ 				that.dataChange('startTime',new Date(ev.date.format("yyyy-MM-dd")+" 00:00:00").getTime())
  			});
  	//	});
 
@@ -123,7 +123,7 @@
 
  			}).on("changeDate", function(ev) {
  				//that.VerificationOptions.endTime = ev.date.format("yyyy-MM-dd");
- 				that.dataChange('endTime',ev.date.format("yyyy-MM-dd"))
+ 				that.dataChange('endTime', new Date(ev.date.format("yyyy-MM-dd")+" 23:59:59").getTime())
  			});
  	//	});
  		this.$(".dateBox .iconCal").click(function() {
