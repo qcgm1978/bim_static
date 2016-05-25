@@ -320,7 +320,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 
 		//渲染模型属性
 		//App.Project.renderModelContentByType();
-		//return;
+		return;
 		var viewer = App.Project.Settings.Viewer = new bimView({
 			type:'model',
 			element: $("#projectContainer .modelContainerContent"),
