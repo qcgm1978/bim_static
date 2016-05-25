@@ -79,7 +79,9 @@ App.Project.ProjectPlanProperty = Backbone.View.extend({
              endDate: new Date()
 
          });
-
+         this.$(".dateBox .iconCal").click(function() {
+			$(this).next().focus();
+		});
 	},
 
 	loadPlanModelData(){
