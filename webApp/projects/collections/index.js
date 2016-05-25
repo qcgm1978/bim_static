@@ -141,7 +141,7 @@
          }
          App.Projects.ProjectCollection.reset();
          App.Projects.ProjectCollection.fetch({
-             data:$({},_data,params)
+             data:$.extend({},_data,params)
          });
      },
 
