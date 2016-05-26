@@ -1,6 +1,6 @@
 /**
- * @require /libsH5/js/bimView.js 
- * @require /libsH5/js/bimView.prototype.js 
+ * @require /libsH5/js/bimView.js
+ * @require /libsH5/js/bimView.prototype.js
  */
 
 
