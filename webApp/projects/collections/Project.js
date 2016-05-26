@@ -754,7 +754,6 @@ fetchClassPropertData: function(id,param1, callback) {
 
 	//在模型中显示
 	showInModel: function($target, type) {
-		debugger
 		if ($target.hasClass("selected")) {
 			$target.parent().find(".selected").removeClass("selected");
 			//$target.removeClass("selected");
@@ -835,9 +834,12 @@ fetchClassPropertData: function(id,param1, callback) {
 			boxArr = boxArr.concat($(this).data("box"));
 
 		});
-
-		App.Project.Settings.Viewer.selectIds(Ids);
-		App.Project.Settings.Viewer.zoomBox(boxArr);
+		App.Project.Settings.Viewer.zoomToBox(boxArr);
+		App.Project.Settings.Viewer.translucent(true);
+		App.Project.Settings.Viewer.highlight({
+			type:'userId',
+			ids:Ids
+		});
 	},
 
 
