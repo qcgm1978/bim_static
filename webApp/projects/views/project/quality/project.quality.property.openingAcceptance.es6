@@ -135,7 +135,7 @@ App.Project.QualityOpeningAcceptance = Backbone.View.extend({
 	},
 
 	showDiseaseList(event){
-		App.Project.QualityAttr.showDisease(event,this,'open');// showDiseaseList
+		App.Project.QualityAttr.showDisease(event,this,'open',2);// showDiseaseList
 		event.stopPropagation();
 	}
 });

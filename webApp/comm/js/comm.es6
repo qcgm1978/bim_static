@@ -9,8 +9,8 @@ App.Comm = {
 	//版本状态
 	versionStatus: {
 		"1": "未初始化",
-		"3": "审核中",
-		"4": "待审核",
+		"3": "待审核",
+		"4": "审核中",
 		"5": "审批通过",
 		"6": "审批退回",
 		"7": "待移交",
@@ -20,6 +20,10 @@ App.Comm = {
 
 	//封装ajax
 	ajax: function(data, callback) {
+
+		if (!data) {
+			return;
+		}
 
 		data = App.Comm.getUrlByType(data);
 
@@ -54,6 +58,9 @@ App.Comm = {
 				//回调
 				callback(data);
 			}
+
+
+			App.Comm.ajax();
 
 		});
 

@@ -123,7 +123,7 @@ App.Project.QualityProcessAcceptance = Backbone.View.extend({
 	
 	//显示隐患列表
 	showDiseaseList(event){
-		App.Project.QualityAttr.showDisease(event,this,'pro');// showDiseaseList
+		App.Project.QualityAttr.showDisease(event,this,'pro',1);// showDiseaseList
 		event.stopPropagation();
 	}
 });
