@@ -791,10 +791,12 @@ fetchClassPropertData: function(id,param1, callback) {
 							sceneId: data.data.sceneId,
 							elementId: data.data.componentId
 						}
-					}
+					},
+					location=JSON.parse(data.data.location);
 
 					//构建id
 					$target.data("elem", data.data.componentId);
+					$target.data("userId", location.userId);
 
 					App.Comm.ajax(pars, function(data) {
 
@@ -824,21 +826,17 @@ fetchClassPropertData: function(id,param1, callback) {
 
 	//定位到模型
 	zommBox: function($target) {
-
 		var Ids = [],
 			boxArr = [];
-
 		$target.parent().find(".selected").each(function() {
-
-			Ids.push($(this).data("elem"));
+			Ids.push($(this).data("userId"));
 			boxArr = boxArr.concat($(this).data("box"));
-
 		});
 		App.Project.Settings.Viewer.zoomToBox(boxArr);
 		App.Project.Settings.Viewer.translucent(true);
 		App.Project.Settings.Viewer.highlight({
 			type:'userId',
-			ids:Ids
+			ids:Ids||["9ba18f953676cd4e679618ffc1ac85bd.865c9ca5-969a-4ed0-8a67-0a54e83beda3-0009d9a1"]
 		});
 	},
 

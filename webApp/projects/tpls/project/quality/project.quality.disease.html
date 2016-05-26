@@ -2,7 +2,8 @@
 	<div class="dafter"></div>
 	<div class="dbefore"></div>
 	<div class="header">隐患列表(<%=data.length%>)<i class="closeBtn"></i> </div>
-	<div class="scrollWrap">
+	<div style="position: absolute;top: 30px;bottom:0;left: 0;right: 0;">
+		<div class="scrollWrap">
 		<div class="scrollWrapContent">
 			<ul>
 				<% _.each(data,function(item){ %>
@@ -26,6 +27,7 @@
 				<% }) %>
 			</ul>
 		</div>
+	</div>
 	</div>
 	<div class="safter"></div>
 	

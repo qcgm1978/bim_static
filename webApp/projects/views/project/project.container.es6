@@ -341,7 +341,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		})
 
 		viewer.on("click", function(model) {
-
+			debugger
 			App.Project.Settings.ModelObj = null;
 
 			if (!model.intersect) {
