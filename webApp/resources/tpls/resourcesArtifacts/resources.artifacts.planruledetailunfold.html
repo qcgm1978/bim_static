@@ -1,0 +1,56 @@
+<div class="typeCode">
+    <div class="title"></div>
+    <div>
+        <input type="text" placeholder="请输入分类编码">
+        <span class="choose">选择</span>
+        <ul></ul><!--联想接口，最多显示5条-->
+    </div>
+</div>
+<div class="mapRule">
+    <div class="title">属性映射规则</div>
+    <div>
+        <dl>
+            <dd>
+                <input type="text" placeholder="请输入属性名称">
+                <div class="myDropDown pickOpening">
+                    <span class="myDropText">  <span class="text">未选</span> <i class="myDropArrorw down"></i> </span>
+                    <ul class="myDropList">
+                        <li class="myItem" data-val="==">等于</li>
+                        <li class="myItem" data-val="!=">不等于</li>
+                        <li class="myItem" data-val="<>">范围内</li>
+                        <li class="myItem" data-val="><">范围外</li>
+                    </ul>
+                </div>
+
+                <div><input type="text" placeholder='请输入属性值，多个属性值可用英文 "," 分隔'></div><!--等于/不等于-->
+
+                <div><!--范围 内/外-->
+                    <div class="myDropDown pickOpening">
+                        <span class="myDropText">  <span class="text">未选</span> <i class="myDropArrorw down"></i> </span>
+                        <ul class="myDropList">
+                            <li class="myItem" data-val="==">等于</li>
+                            <li class="myItem" data-val="!=">不等于</li>
+                            <li class="myItem" data-val="<>">范围内</li>
+                            <li class="myItem" data-val="><">范围外</li>
+                        </ul>
+                    </div>
+                    <input type="text" placeholder="请输入数值">
+                    <div class="myDropDown pickOpening">
+                        <span class="myDropText">  <span class="text">未选</span> <i class="myDropArrorw down"></i> </span>
+                        <ul class="myDropList">
+                            <li class="myItem" data-val="==">等于</li>
+                            <li class="myItem" data-val="!=">不等于</li>
+                            <li class="myItem" data-val="<>">范围内</li>
+                            <li class="myItem" data-val="><">范围外</li>
+                        </ul>
+                    </div>
+                    <input type="text" placeholder="请输入数值">
+                </div>
+            </dd>
+        </dl>
+        <div>新增属性</div>
+    </div>
+</div>
+<div class="control">
+    <!--保存/删除-->
+</div>
