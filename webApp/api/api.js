@@ -246,8 +246,8 @@ App.API = {
 
 
 		//批注
-		projectPhoto:"platform/project?type=3",//项目快照
-		userPhoto:"platform/project?type=3",//用户快照
+		projectPhoto:"sixD/{projectId}/viewPoint?type=1",//项目快照
+		userPhoto:"sixD/{projectId}/viewPoint?type=0",//用户快照
 		viewComments:"platform/project?type=3",//查看发表评论
 		
 		test: ""
