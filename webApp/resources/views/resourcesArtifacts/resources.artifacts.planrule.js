@@ -7,6 +7,10 @@ App.ResourcesNav.ArtifactsPlanRule = Backbone.View.extend({
 
     template: _.templateUrl("/resources/tpls/resourcesArtifacts/resources.artifacts.planrule.html"),
 
+    events:{
+        "click .newRule":"newRule"
+    },
+
     render:function() {
         this.$el.html(this.template);
         return this;
@@ -19,5 +23,12 @@ App.ResourcesNav.ArtifactsPlanRule = Backbone.View.extend({
     addOne:function(model) {
         var newList = new App.Resources.ArtifactsPlanRuleDetail({model: model});
         this.$("ul").append(newList.render().el);
+    },
+
+    //创建规则
+    newRule:function(){
+        //App.ResourceArtifacts.SavePlanRules  添加model
+        //添加
     }
+
 });

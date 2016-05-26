@@ -13,6 +13,7 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
         "click .addNewRule":"addNewRule",
         "click .deleteRule":"deleteRule",
         "click .save":"save",
+        "click .choose":"choose"
     },
 
     render:function() {
@@ -21,6 +22,10 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
     },
     initialize:function(){
         this.listenTo(this.model,"change",this.render);
+    },
+    //选择分类编码
+    choose:function(){
+
     },
     //切换规则
     tabRule:function(){
@@ -52,6 +57,10 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
     },
     //提示窗
     window:function(){
+
+    },
+    //选择分类编码
+    chooseWindow:function(){
 
     }
 });
