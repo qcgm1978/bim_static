@@ -22,20 +22,17 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
         var  planId = this.model.get("planId");
         if(!planId){return;}
 
-
-
         $(".artifactsContent .rules ul").empty();
-
 
         this.toggleClass();
         this. getRules(planId);
     },
-
+//切换计划
     toggleClass:function(){
         $(".artifactsList li").removeClass("active");
         this.$el.addClass("active");
     },
-
+//获取计划节点相关规则
     getRules:function(planId) {
         var _this = this ;
         var pdata = {
@@ -55,5 +52,4 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
            }
         });
     }
-
 });
