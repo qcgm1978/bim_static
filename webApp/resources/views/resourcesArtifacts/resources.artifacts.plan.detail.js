@@ -3,12 +3,13 @@
  */
 App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
 
-    el:"li",
+    tagName:"li",
+    className : "planItem",
 
     template: _.templateUrl("/resources/tpls/resourcesArtifacts/resources.artifacts.plandetail.html"),
 
     events:{
-        "click el":"getRuleList"
+        "click .planItem":"getRuleList"
     },
 
     render:function() {
@@ -19,6 +20,25 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
     initialize:function(){},
     //取得规则列表
     getRuleList:function(){
-        var  rules = this.model.get("ruleList");
+        var  planId = this.model.get("id");
+        if(!planId){return;}
+
+    },
+
+    getRules:function(planId) {
+        var pdata = {
+            URLtype: "fetchArtifactsPlanRule",
+            data:{
+                planId:planId
+            }
+        };
+        App.Comm.ajax(pdata,function(response){
+           if(response.code == 0 ){
+               if(response.data  &&  response.data.length){
+                   App.ResourceArtifacts.PlanRules.add(response.data);
+               }
+           }
+        });
     }
+
 });

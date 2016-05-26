@@ -36,8 +36,7 @@ App.ResourcesNav.App = Backbone.View.extend({
 			this.$el.append(new App.ResourcesNav.ManifestLibs().render().el);
 
 		}else if(type == "artifactsMapRule"){
-			//构件映射规则??? 2016 5 25 zhangzj-b\
-			//另行处理点击事件
+			//构件映射规则
 			App.ResourceArtifacts.init(_this);
 		}
 		this.bindScroll();

@@ -1,13 +1,13 @@
 /**
  * @require /resources/collection/resource.nav.es6
  */
-App.ResourcesNav.ArtifactsPlanList = Backbone.View.extend({
+App.ResourcesNav.ArtifactsPlanRule = Backbone.View.extend({
 
     tagName:"div",
 
-    id: "artifactsList",
+    className: "rules",
 
-    template: _.templateUrl("/resources/tpls/resourcesArtifacts/resources.artifacts.planlist.html"),
+    template: _.templateUrl("/resources/tpls/resourcesArtifacts/resources.artifacts.planrule.html"),
 
     render:function() {
         this.$el.html(this.template);
@@ -15,7 +15,7 @@ App.ResourcesNav.ArtifactsPlanList = Backbone.View.extend({
     },
 
     initialize:function(){
-        this.listenTo(App.ResourceArtifacts.PlanNode,"add",this.addOne);
+        this.listenTo(App.ResourceArtifacts.PlanRules,"add",this.addOne);
     },
 
     addOne:function(model) {
