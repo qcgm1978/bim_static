@@ -754,6 +754,7 @@ fetchClassPropertData: function(id,param1, callback) {
 
 	//在模型中显示
 	showInModel: function($target, type) {
+		var _this=this;
 		if ($target.hasClass("selected")) {
 			$target.parent().find(".selected").removeClass("selected");
 			//$target.removeClass("selected");
@@ -782,7 +783,6 @@ fetchClassPropertData: function(id,param1, callback) {
 			if (data.code == 0) {
 
 				if (data.data) {
-
 					var pars = {
 						URLtype: "getBoundingBox",
 						data: {
@@ -793,7 +793,6 @@ fetchClassPropertData: function(id,param1, callback) {
 						}
 					},
 					location=JSON.parse(data.data.location);
-
 					//构建id
 					$target.data("elem", data.data.componentId);
 					$target.data("userId", location.userId);
@@ -813,7 +812,7 @@ fetchClassPropertData: function(id,param1, callback) {
 							//box id
 							$target.data("box", box);
 							App.Project.zommBox($target);
-
+							_this.showMarks([data.data.location]);
 						}
 					});
 
@@ -822,6 +821,11 @@ fetchClassPropertData: function(id,param1, callback) {
 				}
 			}
 		});
+	},
+
+	//显示标记、隐患点
+	showMarks(marks){
+		marks && App.Project.Settings.Viewer.loadMarkers(marks);
 	},
 
 	//定位到模型
@@ -836,8 +840,9 @@ fetchClassPropertData: function(id,param1, callback) {
 		App.Project.Settings.Viewer.translucent(true);
 		App.Project.Settings.Viewer.highlight({
 			type:'userId',
-			ids:Ids||["9ba18f953676cd4e679618ffc1ac85bd.865c9ca5-969a-4ed0-8a67-0a54e83beda3-0009d9a1"]
+			ids:["9ba18f953676cd4e679618ffc1ac85bd.865c9ca5-969a-4ed0-8a67-0a54e83beda3-0009d9a1"]
 		});
+
 	},
 
 
