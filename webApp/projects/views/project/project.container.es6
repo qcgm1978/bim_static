@@ -329,8 +329,6 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			projectId: App.Project.Settings.projectId
 		});
 
-
-
 		viewer.on('viewpoint', function(point) {
 			$("#projectContainer .projectNavModelContainer .tree-view:eq(1) .item-content:eq(0)").addClass('open')
 			App.Project.ViewpointAttr.ListCollection.add({

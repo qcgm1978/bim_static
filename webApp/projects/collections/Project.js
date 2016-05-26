@@ -754,7 +754,7 @@ fetchClassPropertData: function(id,param1, callback) {
 
 	//在模型中显示
 	showInModel: function($target, type) {
-
+		debugger
 		if ($target.hasClass("selected")) {
 			$target.parent().find(".selected").removeClass("selected");
 			//$target.removeClass("selected");
