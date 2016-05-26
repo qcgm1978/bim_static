@@ -33,7 +33,6 @@ App.ResourceArtifacts={
         }
     })),
 
-
 //计划规则/获取
     PlanRules:new(Backbone.Collection.extend({
         model:Backbone.Model.extend({
@@ -91,13 +90,13 @@ App.ResourceArtifacts={
     })),
 
 
-
-
     init:function(_this) {
         var pre = new App.ResourcesNav.ArtifactsMapRule();
         var plans = new App.ResourcesNav.ArtifactsPlanList();
+        var planRule = new App.ResourcesNav.ArtifactsPlanRule();
         _this.$el.append(pre.render().el);//菜单
         pre.$(".plans").html(plans.render().el);//计划节点
+        pre.$(".rules").append(planRule.render().el);//菜单
         //插入默认为空的规则列表
         this.getPlan();
         $("#pageLoading").hide();

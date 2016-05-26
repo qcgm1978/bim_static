@@ -5,7 +5,7 @@ App.ResourcesNav.ArtifactsPlanList = Backbone.View.extend({
 
     tagName:"div",
 
-    id: "artifactsList",
+    className: "artifactsList",
 
     template: _.templateUrl("/resources/tpls/resourcesArtifacts/resources.artifacts.planlist.html"),
 
