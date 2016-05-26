@@ -16,7 +16,7 @@ App.Project.ProcessDisease=Backbone.View.extend({
 	events:{
 		
 		'click .closeBtn':'closeView'
-
+	//	'click .diseaseItem':'linkModelComponent'
 	
 	},
 
@@ -86,6 +86,13 @@ App.Project.ProcessDisease=Backbone.View.extend({
 	},
 	closeView(){
 		this.$el.remove();
+	},
+
+	linkModelComponent(e){
+		var _$target=$(e.currentTarget),
+			id=_$target.attr('data-id'),
+			type=_$target.attr('data-type');
+		App.Project.showInModel(_$target,type);
 	}
 
 });
