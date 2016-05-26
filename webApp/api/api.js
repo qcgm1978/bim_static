@@ -178,7 +178,7 @@ App.API = {
 		createNewFolder: "doc/{projectId}/{projectVersionId}/file", // 创建新文件夹 ?parentId={parentId}&filePath={filePath}
 
 		//映射规则库
-		fetchArtifactsPlanLibs:"/dataJson/resources/fetchArtifactsMapPlan.json",//计划节点
+		fetchArtifactsPlanLibs:"dataJson/resources/fetchArtifactsMapRulePlan.json",//计划节点
 		fetchArtifactsPlanNewRule:"/dataJson/resources/fetchArtifactsMapPlan.json",//计划节点新建规则
 		modifyArtifactsPlanRule:"/dataJson/resources/fetchArtifactsMapPlan.json",//计划节点修改规则
 		deleteArtifactsPlanRule:"/dataJson/resources/fetchArtifactsMapPlan.json",//计划节点删除规则
