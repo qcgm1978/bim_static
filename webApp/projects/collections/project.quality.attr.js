@@ -10,7 +10,7 @@ App.Project.QualityAttr = {
 		}
 	}()),
 
-	showDisease:function(event,_this,type){
+	showDisease:function(event,_this,type,flag){
 		_this.currentDiseaseView && _this.currentDiseaseView.$el.remove();
 		var 
 			$target=$(event.currentTarget),
@@ -40,7 +40,8 @@ App.Project.QualityAttr = {
 			params:{
 				projectId:projectId,
 				versionId:projectVersionId,
-				acceptanceId:id
+				acceptanceId:id,
+				type:flag
 			},
 			viewConfig:p,
 			_parent:$target,
