@@ -243,7 +243,7 @@
             data = $li.data();
         $li.find('.treeText').toggleClass('selected',!flag);
         var filter = bimView.comm.getFilters($li,'all');
-        self.highlight(filter);
+        flag ? self.downplay(filter) : self.highlight(filter);
       }).on('click','.axisGrid',function(){
         if(!self.bigMap){
           self.bigMap = $('<div id="map"></div>');
@@ -257,7 +257,7 @@
             return false;
           }
         });
-        self.initMap('bigMap',self.bigMap);
+        self.initMap('bigMap',self.bigMap,'',false);
         self.showAxisGrid('bigMap');
         self.setFloorMap(data,"bigMap");
       });
@@ -265,6 +265,7 @@
         self.resize();
       });
       self.on('changeGrid',function(res){
+        console.log(res)
         var floors = self.curFloor;
         var infoZ = 'Z('+ floors +','+res.axis.offsetZ+')'
         bimView.sidebar.el._dom.mapBar.find(".axisGrid").text(res.axis.infoX+","+res.axis.infoY+","+infoZ)
@@ -398,6 +399,7 @@
       return {
         camera:self.getCamera(),
         list:newList,
+        image:viewer.canvas2image().substr(22),
         filter:{
           floors:floors,
           specialty:specialty,
@@ -418,7 +420,6 @@
       self.filter(data.filter.floors);
       self.filter(filter.category);
       self.filter(filter.classCode);
-      self.setCamera(data.camera);
       viewer.setCommentMode();
       viewer.loadComments(newList);
     },
@@ -448,6 +449,19 @@
       }
       viewer.render();
     },
+    downplay:function(obj){
+      var self = this;
+      var viewer = self.viewer;
+      var filter = viewer.getFilters();
+      if(obj.type == "userId"){
+        filter.setOverriderByUserIds('highlight',[]);
+      }else{
+        $.each(obj.ids,function(i,id){
+          filter.removeUserOverrider(obj.type,id);
+        });
+      }
+      viewer.render();
+    },
     collision:function(idA,idB){
       // 碰撞
       var self = this;
@@ -472,7 +486,7 @@
       var filter = viewer.getFilters();
       return filter.isSceneOverriderEnabled();
     },
-    initMap:function(name,element,axisGrid){
+    initMap:function(name,element,axisGrid,enable){
       // 初始化小地图
       var self = this,
           viewer = self.viewer,
@@ -483,12 +497,17 @@
             left:'0px',
             bottom:'0px',
             outline:'none'
-          };
+          },
+          enable = enable == 'undefined' ? true : enable;
       if(axisGrid) viewer.setAxisGridData(axisGrid)
       viewer.createMiniMap(name,_el[0],_width,_height,_css,function(res){
         self.pub('changeGrid',res);
       });
+      viewer.enableAxisGridEvent(name,enable);
       viewer.generateAxisGrid(name);
+    },
+    setAxisGrid:function(name, x, y){
+      viewer.flyBypAxisGridNumber(name, x, y);
     },
     setFloorMap:function(obj,name){
       // 设置小地图
