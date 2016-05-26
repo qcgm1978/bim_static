@@ -16,7 +16,7 @@
 						<div class="descr">
 							<span class="title"><i></i><%=item.name%></span>
 							<span class="time">创建日期: <%=new Date(item.discoverDate).format("yyyy-MM-dd")%></span>
-							<span class="time">整改日期: <%=new Date(item.rectifyDat).format("yyyy-MM-dd")%></span>
+							<span class="time">整改日期: <%=new Date(item.rectifyDate).format("yyyy-MM-dd")%></span>
 						</div>
 						<div class="option">
 							<span class="status" style="color:<%= App.Project.mapData.statusColor[item.status||0] %>;"><%=App.Project.mapData.status[item.status||0]%></span>

@@ -72,7 +72,7 @@
         $.each(list,function(i,item){
           var $item = $(item),
               isChecked = $item.find('input').prop('checked'),
-              userData = $item.data('userData').toString().split(",");
+              userData = $item.data('userData') ? $item.data('userData').toString().split(","):[];
           if(select == 'ckecked' && !isChecked || select == 'all'){
             result.ids = result.ids.concat(userData);
           }
@@ -182,7 +182,7 @@
       dialog.on('click','.dialogClose',function(){
         dialog.remove();
       }).on('click','.dialogOk',function(){
-        if (_opt.callback && _opt.callback.call(self) !== false) {
+        if (_opt.callback && _opt.callback.call(this) !== false) {
           dialog.remove();
         }
       })

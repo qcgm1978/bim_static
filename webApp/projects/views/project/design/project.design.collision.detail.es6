@@ -40,7 +40,8 @@ App.Project.DesignCollisionDetail=Backbone.View.extend({
   },
 
   setCollisionPoint:function(event){
-    var that = $(event.target).closest("tr"),
+    var self = this,
+        that = $(event.target).closest("tr"),
         flag = that.is('.selected'),
         name = that.find(".ckName").text();
     if(flag){
@@ -48,7 +49,8 @@ App.Project.DesignCollisionDetail=Backbone.View.extend({
     }else{
       $.each(this.list,function(index,item){
         if(item.name == name){
-          var box=[item.leftElementBoxMin,item.leftElementBoxMax,item.rightElementBoxMin,item.rightElementBoxMax];
+          var box = self.getBox([item.leftElementBoxMin,item.leftElementBoxMax],[item.rightElementBoxMin,item.rightElementBoxMax]);
+          debugger
           App.Project.Settings.Viewer.collision(item.leftId,item.rightId);
           App.Project.Settings.Viewer.translucent(true);
           App.Project.Settings.Viewer.zoomToBox(box);
@@ -57,7 +59,17 @@ App.Project.DesignCollisionDetail=Backbone.View.extend({
     }
     that.toggleClass("selected").siblings().removeClass("selected");
   },
-
+  getBox:function(boxA,boxB){
+    return getVolume(boxA) > getVolume(boxB) ? boxB : boxA;
+    function getVolume(box){
+      var min = box[0],
+          max = box[1];
+          x = Math.abs(max[0]-min[0]),
+          y = Math.abs(max[1]-min[1]),
+          z = Math.abs(max[2]-min[2]);
+      return x*y*z;
+    }
+  },
   prePage:function(event){
     var that = $(event.target);
     if(that.is('.disabled')){

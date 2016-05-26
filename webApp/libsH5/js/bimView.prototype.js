@@ -243,21 +243,34 @@
             data = $li.data();
         $li.find('.treeText').toggleClass('selected',!flag);
         var filter = bimView.comm.getFilters($li,'all');
-        self.highlight(filter);
+        flag ? self.downplay(filter) : self.highlight(filter);
       }).on('click','.axisGrid',function(){
         if(!self.bigMap){
           self.bigMap = $('<div id="map"></div>');
+        }
+        if(!self.footer){
+          self.footer = $('<label class="dialogLabel">X：<input type="text" class="dialogInput" id="axisGridX" /></label><label class="dialogLabel">Y：<input type="text" class="dialogInput" id="axisGridY" /></label>');
         }
         var data = self.curFloorData;
         bimView.comm.dialog({
           title:'选择轴网',
           content:self.bigMap,
-          footer:'<label class="dialogLabel">X：<input type="text" class="dialogInput" id="axisGridX" /></label><label class="dialogLabel">Y：<input type="text" class="dialogInput" id="axisGridY" /></label>',
-          callback:function(res){
-            return false;
+          footer:self.footer,
+          callback:function(){
+            var x = self.footer.find('#axisGridX').val(),
+                y = self.footer.find('#axisGridY').val();
+            // self.setAxisGrid('bigMap',x,y);
           }
         });
-        self.initMap('bigMap',self.bigMap);
+        self.initMap({
+          name:'bigMap',
+          element:self.bigMap,
+          enable:false,
+          callback:function(res){
+            self.footer.find('#axisGridX').val(res.axis.abcName);
+            self.footer.find('#axisGridY').val(res.axis.numeralName);
+          }
+        });
         self.showAxisGrid('bigMap');
         self.setFloorMap(data,"bigMap");
       });
@@ -342,7 +355,7 @@
       var list = viewer.getMarkerInfoList();
       var newList = [];
       $.each(list,function(i,item){
-        newList.push(window.btoa(JSON.stringify(item)));
+        newList.push(JSON.stringify(item));
       });
       return newList;
     },
@@ -352,7 +365,7 @@
       var viewer = self.viewer;
       var newList = [];
       $.each(list,function(i,item){
-        newList.push(JSON.parse(window.atob(item)));
+        newList.push(JSON.parse(item));
       });
       viewer.setMarkerMode();
       viewer.loadMarkers(newList);
@@ -398,6 +411,7 @@
       return {
         camera:self.getCamera(),
         list:newList,
+        image:viewer.canvas2image().substr(22),
         filter:{
           floors:floors,
           specialty:specialty,
@@ -418,7 +432,6 @@
       self.filter(data.filter.floors);
       self.filter(filter.category);
       self.filter(filter.classCode);
-      self.setCamera(data.camera);
       viewer.setCommentMode();
       viewer.loadComments(newList);
     },
@@ -448,6 +461,19 @@
       }
       viewer.render();
     },
+    downplay:function(obj){
+      var self = this;
+      var viewer = self.viewer;
+      var filter = viewer.getFilters();
+      if(obj.type == "userId"){
+        filter.setOverriderByUserIds('highlight',[]);
+      }else{
+        $.each(obj.ids,function(i,id){
+          filter.removeUserOverrider(obj.type,id);
+        });
+      }
+      viewer.render();
+    },
     collision:function(idA,idB){
       // 碰撞
       var self = this;
@@ -472,11 +498,19 @@
       var filter = viewer.getFilters();
       return filter.isSceneOverriderEnabled();
     },
-    initMap:function(name,element,axisGrid){
+    initMap:function(options){
+      var defaults = {
+        element:'',
+        name:'defaultMap',
+        axisGrid:'',
+        enable:true,
+        callback:null
+      },
+      _opt = $.extend({},defaults,options);
       // 初始化小地图
       var self = this,
           viewer = self.viewer,
-          _el = element,
+          _el = _opt.element,
           _width = _el.width(),
           _height = _el.height(),
           _css={
@@ -484,11 +518,16 @@
             bottom:'0px',
             outline:'none'
           };
-      if(axisGrid) viewer.setAxisGridData(axisGrid)
-      viewer.createMiniMap(name,_el[0],_width,_height,_css,function(res){
-        self.pub('changeGrid',res);
+      if(_opt.axisGrid) viewer.setAxisGridData(_opt.axisGrid)
+      viewer.createMiniMap(_opt.name,_el[0],_width,_height,_css,function(res){
+        _opt.callback&&_opt.callback.call(this,res)
       });
-      viewer.generateAxisGrid(name);
+      viewer.enableAxisGridEvent(_opt.name,_opt.enable);
+      viewer.generateAxisGrid(_opt.name);
+    },
+    setAxisGrid:function(name, x, y){
+      var viewer = this.viewer;
+      viewer.flyBypAxisGridNumber(name, x, y);
     },
     setFloorMap:function(obj,name){
       // 设置小地图

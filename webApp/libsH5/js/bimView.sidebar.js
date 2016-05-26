@@ -174,7 +174,14 @@
           var tmp = $('<li class="modelItem" data-type="miniMap"></li>').text(item.name).data(item);
           floorSelect.append(tmp);
         });
-        self.obj.initMap('miniMap',self.el._dom.sidebar.find('.map'),axisGridData);
+        self.obj.initMap({
+          name:'miniMap',
+          element:self.el._dom.sidebar.find('.map'),
+          axisGrid:axisGridData,
+          callback:function(res){
+            self.obj.pub('changeGrid',res);
+          }
+        });
         self.el._dom.sidebar.find('.modelMap').append(self.el._dom.mapBar);
         self.el._dom.sidebar.find(".modelItem:eq(0)").trigger('click');
       }

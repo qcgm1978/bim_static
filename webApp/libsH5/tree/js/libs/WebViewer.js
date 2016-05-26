@@ -7360,6 +7360,7 @@ CLOUD.Scene.prototype.hitTestClipPlane = function (ray, intersects) {
 // point == null if hit nothing.
 CLOUD.Scene.prototype.hitTestPosition = function (mouse, camera, callback) {
 
+    //console.time("hitTest");
     var raycaster = this.raycaster;
     raycaster.setFromCamera(mouse, camera);
 
@@ -7381,6 +7382,7 @@ CLOUD.Scene.prototype.hitTestPosition = function (mouse, camera, callback) {
 
         //callback(null);
         // modified 2016-5-3  end
+        //console.timeEnd("hitTest");
         return;
     }
 
@@ -7388,7 +7390,7 @@ CLOUD.Scene.prototype.hitTestPosition = function (mouse, camera, callback) {
         return a.distance - b.distance;
     });
     callback(intersects[0].point);
-
+    //console.timeEnd("hitTest");
 };
 
 CLOUD.Scene.prototype.pick = function (mouse, camera, callback) {
@@ -8550,9 +8552,9 @@ CLOUD.SubScene.prototype.unload = function () {
             child.unload();
     }
     
-    //if (this.embedded === undefined)
-    //    this.children = [];
-    //this.loaded = false;
+    if (this.embedded === undefined)
+        this.children = [];
+    this.loaded = false;
 
     this.client.geomCacheVer += 1;
 }
@@ -15256,10 +15258,10 @@ CLOUD.MpkLoader.prototype.load = function (mpkId, parameters, client, callback, 
               
                scope.parseS3D(xhr.response, parameters, client, callback);           
 
-                onComplete();
+               onComplete();
+               xhr = null;
             }
-        }
-
+        }        
     }
     xhr.open("GET", url, true);
 
@@ -15617,6 +15619,7 @@ CLOUD.SceneLoader.prototype = {
                 //delayLoadMeshNodes.push({ meshNode: object, isInstanced: false });
                 var mpkId = client.meshIds[meshId];
                 client.addDelayLoadMesh(mpkId, { meshNode: object });
+                //console.log("delay load!");
             }
         }
 
@@ -18072,6 +18075,15 @@ CloudViewer.prototype = {
 
         if (miniMap) {
             miniMap.enableCameraNode(enable);
+        }
+    },
+
+    flyBypAxisGridNumber:function(name, abcName, numeralName){
+
+        var miniMap = this.miniMaps[name];
+
+        if (miniMap) {
+            miniMap.flyByAxisGridNumber(abcName, numeralName);
         }
     },
 
