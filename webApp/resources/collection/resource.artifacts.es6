@@ -57,15 +57,14 @@ App.ResourceArtifacts={
     SavePlanRules : Backbone.Model.extend({
             defaults:function(){
                 return{
-
+                    code : ""
                 }
             },
         urlType: "",
         parse: function(responese) {
             if (responese.code == 0 && responese.data.length > 0) {
                 return responese.data;
-            } else {
-                $().html('<li>无数据</li>');
+                //保存成功
             }
         }
     }),
