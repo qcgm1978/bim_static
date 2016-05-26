@@ -445,7 +445,7 @@
 						opts = {
 							title: "保存快照",
 							width: 500,
-							height: 260,
+							height: 250,
 							cssClass: "saveViewPoint",
 							okClass: "btnWhite",
 							cancelClass: "btnWhite",
@@ -454,7 +454,7 @@
 							message: dialogHtml,
 							okCallback: () => {
 								//保存批注
-								that.saveComment(dialog, data);
+								that.saveComment(dialog, data); 
 
 								return false;
 							}
@@ -490,7 +490,7 @@
 
 			//保存批注
 			saveComment(dialog, commentData) {
-				return false;
+			 	 
 				var $element = dialog.element,
 					pars = {
 						projectId: App.Project.Settings.projectId,
@@ -522,13 +522,13 @@
 
 					if (data.code == 0) {
 
-						data = data.dta;
+						data = data.data;
 
-						$.when(this.saveImage(commentData, data),
-							this.saveCanvasData(canvasData, data),
+						$.when(this.saveImage({id:data.id,img:commentData.image}),
+							this.saveCanvasData(),
 							this.saveFilter()).
 						done((imgData, canvasData) => {
-
+							debugger
 						});
 
 					}
@@ -538,13 +538,13 @@
 			},
 
 			//保存图片
-			saveImage() {
+			saveImage(data) {
 				//数据
 				var formdata = new FormData();
 				formdata.append("fileName", (+(new Date())) + ".png");
-				formdata.append("size", image.length);
-				formdata.append("file", image);
-				var url = '/sixD/' + data.projectId + '/viewPoint/' + data.id + '/pic';
+				formdata.append("size", data.img.length);
+				formdata.append("file", data.img);
+				var url = '/sixD/' + App.Project.Settings.projectId + '/viewPoint/' + data.id + '/pic';
 				return $.ajax({
 					url: url,
 					type: "post",
@@ -561,7 +561,7 @@
 
 			//保存过滤器
 			saveFilter() {
-
+				return 2;
 			}
 
 
