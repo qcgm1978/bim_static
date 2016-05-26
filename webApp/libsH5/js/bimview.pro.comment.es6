@@ -431,28 +431,53 @@
 			//绑定保存 批注事件
 			saveCommEvent() {
 
-				var $topSaveTip = $("#topSaveTip");
+				var $topSaveTip = $("#topSaveTip"),
+					that = this;
 
 				//保存
 				$topSaveTip.on("click", ".btnSave", function() {
 
-					var dialogHtml = _.templateUrl('/libsH5/tpls/comment/bimview.save.dialog.html')({});
+					var data = App.Project.Settings.Viewer.saveComment(),
+						dialogHtml = _.templateUrl('/libsH5/tpls/comment/bimview.save.dialog.html')({
+							img: data.image
+						}),
 
-					var opts = {
-						title: "保存快照",
-						width: 601,						
-						height: 400, 
-						cssClass: "saveViewPoint",
-						okClass:"btnWhite",
-						cancelClass:"btnWhite",
-						okText:"保存",
-						cancelText:"保存并分享",
-						message: dialogHtml,
-						okCallback: () => {
-							 
-						} 
-					} 
-					var dialog = new App.Comm.modules.Dialog(opts);
+						opts = {
+							title: "保存快照",
+							width: 500,
+							height: 260,
+							cssClass: "saveViewPoint",
+							okClass: "btnWhite",
+							cancelClass: "btnWhite",
+							okText: "保存",
+							cancelText: "保存并分享",
+							message: dialogHtml,
+							okCallback: () => {
+								//保存批注
+								that.saveComment(dialog, data);
+
+								return false;
+							}
+						},
+
+						dialog = new App.Comm.modules.Dialog(opts),
+
+						$viewPointType = dialog.element.find(".viewPointType");
+
+					dialog.type = 1;
+					//视点类型
+					$viewPointType.myDropDown({
+						click: function($item) {
+							var type = $item.data("type");
+							if (type == 0) {
+								$viewPointType.find(".modelicon").removeClass('m-unlock').addClass('m-lock');
+							} else {
+								$viewPointType.find(".modelicon").removeClass('m-lock').addClass('m-unlock');
+							}
+
+							dialog.type = type;
+						}
+					});
 
 				});
 
@@ -460,6 +485,82 @@
 				$topSaveTip.on("click", ".btnCanel", function() {
 					App.Project.Settings.Viewer.commentEnd();
 				});
+
+			},
+
+			//保存批注
+			saveComment(dialog, commentData) {
+				return false;
+				var $element = dialog.element,
+					pars = {
+						projectId: App.Project.Settings.projectId,
+						name: dialog.element.find(".name").val().trim(),
+						description: dialog.element.find(".desc").val().trim(),
+						type: dialog.type,
+						viewPoint: commentData.camera
+					};
+
+				if (!pars.name) {
+					alert("请输入批注名称");
+					return false;
+				}
+
+				if (!pars.description) {
+					alert("请输入批注描述");
+					return false;
+				}
+
+				var data = {
+					URLtype: "createViewPoint",
+					data: JSON.stringify(pars),
+					type: "POST",
+					contentType: "application/json"
+				}
+
+				//创建
+				App.Comm.ajax(data, (data) => {
+
+					if (data.code == 0) {
+
+						data = data.dta;
+
+						$.when(this.saveImage(commentData, data),
+							this.saveCanvasData(canvasData, data),
+							this.saveFilter()).
+						done((imgData, canvasData) => {
+
+						});
+
+					}
+					console.log(data);
+				});
+
+			},
+
+			//保存图片
+			saveImage() {
+				//数据
+				var formdata = new FormData();
+				formdata.append("fileName", (+(new Date())) + ".png");
+				formdata.append("size", image.length);
+				formdata.append("file", image);
+				var url = '/sixD/' + data.projectId + '/viewPoint/' + data.id + '/pic';
+				return $.ajax({
+					url: url,
+					type: "post",
+					data: formdata,
+					processData: false,
+					contentType: false
+				})
+			},
+
+			//保存原始数据
+			saveCanvasData() {
+				return 1;
+			},
+
+			//保存过滤器
+			saveFilter() {
 
 			}
 

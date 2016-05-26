@@ -247,6 +247,10 @@ App.API = {
 
 
 		//批注
+		createViewPoint:"sixD/{projectId}/viewPoint",//创建视点
+		createAnnotation:"sixD/{projectId}/viewPoint/{viewPointId}/annotation",//创建批注
+		savePointFilter:"sixD/{projectId}/viewPoint/{viewPointId}/filter",//保存视点过滤器
+		uploadPic:"sixD/{projectId}/viewPoint/{viewPointId}/pic",//上传图片
 		projectPhoto:"sixD/{projectId}/viewPoint?type=1",//项目快照
 		userPhoto:"sixD/{projectId}/viewPoint?type=0",//用户快照
 		viewComments:"platform/project?type=3",//查看发表评论
