@@ -22,7 +22,7 @@
         <td class="status"><span class="status" style="color:<%=App.Project.mapData.statusColor[item.status]%>">
         <%=App.Project.mapData.status[item.status]%>
      </span> </td>
-        <td class="grade"><%= item.level==1 && '一般' ||item.level==2 && '较大' ||item.level==3 && '重大' || '特大'  %></td>
+        <td class="grade"><%= item.levelId==1 && '一般' ||item.levelId==2 && '较大' ||item.levelId==3 && '重大' || '特大'  %></td>
         <td class="operator"><%=App.Projects.concernsData.report[item.organizationTypeId]%></td>
         <td class="type"><%=App.Projects.concernsData.classic[item.ratingCategoryId]%></td>
     </tr>
