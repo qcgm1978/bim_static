@@ -258,7 +258,7 @@ App.Project.Model = {
 		},
 
 		addList: function(model) {
-			var data = model.toJSON();console.log(data);
+			var data = model.toJSON();
 			var comparisonId = App.Index.Settings.referenceId;
 			var isload = false;
 			//debugger
@@ -310,7 +310,7 @@ App.Project.Model = {
 			return this;
 		},
 		addDetail: function(model) {
-			var data = model.toJSON();console.log('gg',data);
+			var data = model.toJSON();
 			if (data.message == 'success' && data.data.length > 0) {
 				this.$el.html(this.template(data));
 			} else {
@@ -380,7 +380,7 @@ App.Project.Model = {
 				},
 					that=this;
 				$.ajax({
-					url: "http://bim.wanda.cn/sixD/"+data.projectId+"/"+data.projectVersionId+"/comparison/property?baseModel="+data.baseModel+"&currentModel="+data.currentModel+"&elementId="+data.elementId
+					url: "http://bim.wanda-dev.cn/sixD/"+data.projectId+"/"+data.projectVersionId+"/comparison/property?baseModel="+data.baseModel+"&currentModel="+data.currentModel+"&elementId="+data.elementId
 				}).done(function(respone){
 					if(respone.code==0){
 						that.$el.html(that.template({data:respone.data}));
@@ -395,7 +395,6 @@ App.Project.Model = {
 
 			}else{
 				this.$el.html(this.template({data:[]}));
-				console.log('gg')
 			}
 			return this;
 		},

@@ -10,11 +10,14 @@
       <td>标准模型</td>
     </tr>
     <% _.each(data,function(item){%>
+    <% _.each(item.items,function(it){%>
+
     <tr>
-      <td><%= item.name %></td>
-      <td><%= item.value+item.unit %></td>
-      <td><%= item.baseValue+item.baseUnit %></td>
+      <td><%= it.name %></td>
+      <td><%= (it.value||'')+(item.unit||'') %></td>
+      <td><%= (it.baseValue||'')+(item.baseUnit||'') %></td>
     </tr>
+    <% })%>
     <% })%>
 
   </table>
