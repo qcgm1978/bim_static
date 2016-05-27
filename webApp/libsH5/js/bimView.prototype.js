@@ -98,7 +98,11 @@
             break;
           case "pattern":
             $this.toggleClass('selected');
-            $this.closest('.toolsBar').find('[data-group='+group+']').not($this).removeClass('selected');
+            if($this.closest('.toolsBar').length>0){
+              $this.closest('.toolsBar').find('[data-group='+group+']').not($this).removeClass('selected');
+            }else{
+              $this.siblings().removeClass('selected');
+            }
             if(isSelected){
               self.picker();
             }else{
@@ -404,10 +408,11 @@
       $.each(list,function(i,item){
         newList.push(window.btoa(JSON.stringify(item)));
       });
-      var floors = bimView.comm.getFilters(self._dom.bimBox.find("#floors"),'ckecked');
-      var specialty = bimView.comm.getFilters(self._dom.bimBox.find("#specialty"),'ckecked');
-      var category = bimView.comm.getFilters(self._dom.bimBox.find("#specialty"),'ckecked');
-      var classCode = bimView.comm.getFilters(self._dom.bimBox.find("#specialty"),'ckecked');
+      debugger
+      var floors = bimView.comm.getFilters($("#floors"),'ckecked');
+      var specialty = bimView.comm.getFilters($("#specialty"),'ckecked');
+      var category = bimView.comm.getFilters($("#category"),'ckecked');
+      var classCode = bimView.comm.getFilters($("#classCode"),'ckecked');
       return {
         camera:self.getCamera(),
         list:newList,

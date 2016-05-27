@@ -16,7 +16,12 @@
       bimView.sidebar.el = self;
       var bimBox = bimView.sidebar._opt._dom.bimBox;
       $.each(bimView.model.modelBar,function(i,item){
-        var tmpHtml = $('<i class="bar-item '+item.icon+'" title="'+item.title+'" data-id="'+item.fn+'" data-type="'+item.type+'" data-group="'+item.group+'"></i>');
+        var tmpHtml;
+        if(item.type == 'more'){
+          tmpHtml = $('<div class="bar-item '+item.icon+'" title="'+item.title+'" data-id="'+item.fn+'" data-type="'+item.type+'" data-group="'+item.group+'"></div>');
+        }else{
+          tmpHtml = $('<i class="bar-item '+item.icon+'" title="'+item.title+'" data-id="'+item.fn+'" data-type="'+item.type+'" data-group="'+item.group+'"></i>');
+        }
         item.keyCode&&bimView.comm.bindEvent.on(item.keyCode,tmpHtml);
         self._dom.modelBar.append(tmpHtml);
         if(item.subBar&&item.subBar.length>0){
@@ -26,7 +31,7 @@
             barItem.keyCode&&bimView.comm.bindEvent.on(barItem.keyCode,subItem);
             subBar.append(subItem);
           });
-          self._dom.modelBar.append(subBar);
+          tmpHtml.append(subBar);
         }
       });
       self._dom.sidebar.find('.modelMap').prepend(self._dom.modelBar);
