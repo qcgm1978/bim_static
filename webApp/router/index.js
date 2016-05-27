@@ -8,6 +8,7 @@ var AppRoute = Backbone.Router.extend({
 		'flow': 'flow',
 		'resources': 'resources',
 		'resources/:type': 'resource',
+		'resources/:type/:reltype': 'resourceArtifacts',
 		'resources/:type/:projectId/:versionId': 'resourceModel',
 		'console': 'console',
 		'console/:type/:step': 'console',
@@ -106,6 +107,17 @@ var AppRoute = Backbone.Router.extend({
 		$("#pageLoading").hide();
 		//$("#contains").html("resources");
 
+	},
+
+
+	resourceArtifacts:function(type,reltype){
+		this.reset();
+		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".resources").addClass('selected');
+		_.require('/static/dist/resources/resources.css');
+		_.require('/static/dist/resources/resources.js');
+		App.ResourcesNav.Settings.type = type;
+		App.ResourcesNav.Settings.reltype = reltype;
+		App.ResourcesNav.init();
 	},
 
 	//单个项目
