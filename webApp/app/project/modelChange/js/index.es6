@@ -291,6 +291,7 @@ App.Project.Model = {
 		className: "tree-view rightTreeView",
 		events: {
 			"click .tree-text": "select",
+			"click .link": "detail",
 			"click .item-content": "openTree",
 		},
 		initialize: function() {
@@ -330,6 +331,36 @@ App.Project.Model = {
         }
         App.Index.Settings.Viewer.fit();
       }
+		},
+		detail: function(e){
+			App.Index.alertWindow = new App.Comm.modules.Dialog({
+				title: "",
+				width: 560,
+				height: 330,
+				isConfirm: false,
+				isAlert: false,
+				message: new App.Project.Model.contrastInfo().render().el
+			});
+			$(".mod-dialog .wrapper .header").hide();//隐藏头部
+			//$(".alertInfo").html(alertInfo);
+			$(".mod-dialog,.mod-dialog .wrapper .content").css({"min-height":"auto",padding:0});
+
+		}
+	}),
+
+	contrastInfo: Backbone.View.extend({
+		tagName: "div",
+		className: "contrastInfo",
+		template: _.templateUrl('/app/project/modelChange/tpls/contrastInfo.html'),
+		events: {
+			"click .close": "close"
+		},
+		render: function() {
+			this.$el.html(this.template({}));
+			return this;
+		},
+		close: function(){
+			App.Index.alertWindow.close();
 		}
 	})
-}
+};
