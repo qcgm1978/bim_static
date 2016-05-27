@@ -4,7 +4,6 @@
 App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
 
     tagName:"div",
-    className:"ruleDetail",
 
     template: _.templateUrl("/resources/tpls/resourcesArtifacts/resources.artifacts.planruledetailunfold.html"),
 
@@ -13,7 +12,9 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
         "click .addNewRule":"addNewRule",
         "click .deleteRule":"deleteRule",
         "click .save":"save",
-        "click .choose":"choose"
+        "click .choose":"choose",
+        "click .myDropText":"seleRule",
+        "click .myItem":"myItem"
     },
 
     render:function() {
@@ -22,14 +23,39 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
     },
     initialize:function(){
         this.listenTo(this.model,"change",this.render);
+        this.getValue("(30,40]");
     },
     //选择分类编码
     choose:function(){
 
     },
+    //选择规则，切换输入方式
+    myItem:function(e){
+        var _this = $(e.target);
+        var val = _this.data("val");
+        var text = _this.text();
+        var parent =  _this.parent(".myDropList");
+        var eIn = _this.closest(".leftten").siblings(".eIn");
+        var ioside  = _this.closest(".leftten").siblings(".ioside");
+        //数据写入模型
+        parent.hide().siblings(".myDropText").find(".text").text(text);
+        if(val == "==" || val == "!="){
+            ioside.removeClass("active");
+            if(eIn.hasClass("active")){return}
+            eIn.addClass("active");
+        }else if(val == "<>" || val == "><"){
+            eIn.removeClass("active");
+            if(ioside.hasClass("active")){return}
+            ioside.addClass("active");
+        }
+    },
     //切换规则
-    tabRule:function(){
-
+    seleRule:function(e){
+        $(".myDropList").hide();
+        var _this = $(e.target);
+        if(_this.hasClass("myDropText")){
+            _this.siblings(".myDropList").show();
+        }
     },
     //增加新规则
     addNewRule:function(){
@@ -62,5 +88,10 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
     //选择分类编码
     chooseWindow:function(){
 
+    },
+    //拆解value字符串
+    getValue:function(str){
+        if( typeof str != "string"){return}
+        var arr = str.slice(",");
     }
 });
