@@ -5,12 +5,14 @@ App.ResourceArtifacts={
         delayCount:  0  //每层加载数量
     },
 
+    openRule: null,
+
 
     rule:{
-        equal :"==",
-        unequal:"!=",
-        inside:"<>",
-        outside:"><"
+        equal :"相等",
+        unequal:"不等",
+        inside:"范围内",
+        outside:"范围外"
     },
 
 

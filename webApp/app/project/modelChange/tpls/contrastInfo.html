@@ -9,46 +9,13 @@
       <td>项目模型</td>
       <td>标准模型</td>
     </tr>
+    <% _.each(data,function(item){%>
     <tr>
-      <td>1</td>
-      <td>2</td>
-      <td>3</td>
+      <td><%= item.name %></td>
+      <td><%= item.value+item.unit %></td>
+      <td><%= item.baseValue+item.baseUnit %></td>
     </tr>
-    <tr>
-      <td>1</td>
-      <td>2</td>
-      <td>3</td>
-    </tr>
-    <tr>
-    <td>1</td>
-    <td>2</td>
-    <td>3</td>
-  </tr>
-    <tr>
-      <td>1</td>
-      <td>2</td>
-      <td>3</td>
-    </tr>
-    <tr>
-      <td>1</td>
-      <td>2</td>
-      <td>3</td>
-    </tr>
-    <tr>
-      <td>1</td>
-      <td>2</td>
-      <td>3</td>
-    </tr>
-    <tr>
-      <td>1</td>
-      <td>2</td>
-      <td>3</td>
-    </tr>
-    <tr>
-      <td>1</td>
-      <td>2</td>
-      <td>3</td>
-    </tr>
+    <% })%>
 
   </table>
 </div>

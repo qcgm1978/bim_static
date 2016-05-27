@@ -267,10 +267,10 @@ App.Project.Model = {
 		},
 
 		addList: function(model) {
-			var data = model.toJSON();
+			var data = model.toJSON();console.log(data);
 			var comparisonId = App.Index.Settings.referenceId;
 			var isload = false;
-			debugger
+			//debugger
 			$.each(data.data, function(i, item) {
 				$.each(item.comparisons, function(j, file) {
 					if (file.currentVersion == comparisonId) {
@@ -317,7 +317,7 @@ App.Project.Model = {
 			return this;
 		},
 		addDetail: function(model) {
-			var data = model.toJSON();
+			var data = model.toJSON();console.log('gg',data);
 			if (data.message == 'success' && data.data.length > 0) {
 				this.$el.html(this.template(data));
 			} else {
@@ -347,13 +347,20 @@ App.Project.Model = {
       }
 		},
 		detail: function(e){
+
+			var $treetext = $(e.target).prev('.tree-text'),
+				data = {
+					baseModel:$treetext.data('base'),
+					currentModel:$treetext.data('id')
+				};
+
 			App.Index.alertWindow = new App.Comm.modules.Dialog({
 				title: "",
 				width: 560,
 				height: 330,
 				isConfirm: false,
 				isAlert: false,
-				message: new App.Project.Model.contrastInfo().render().el
+				message: new App.Project.Model.contrastInfo().render(data).el
 			});
 			$(".mod-dialog .wrapper .header").hide();//隐藏头部
 			//$(".alertInfo").html(alertInfo);
@@ -369,8 +376,33 @@ App.Project.Model = {
 		events: {
 			"click .close": "close"
 		},
-		render: function() {
-			this.$el.html(this.template({}));
+		render: function(data) {
+			if(data != undefined){
+				var dataObj = {
+					URLtype: "fetchChangeComparisonInfo",
+					data: {
+						projectId: App.Index.Settings.projectId,
+						projectVersionId: App.Index.Settings.projectVersionId,
+						elementId: data.currentModel,
+						baseModel: data.baseModel,
+						currentModel:data.currentModel
+					}
+				},
+					that=this;
+
+				App.Comm.ajax(dataObj, function(respone){
+					if(respone.code==0){
+						that.$el.html(that.template({data:respone.data}));
+
+					}else{
+						alert('获取数据失败')
+					}
+
+				});
+			}else{
+				this.$el.html(this.template({data:[]}));
+				console.log('gg')
+			}
 			return this;
 		},
 		close: function(){
