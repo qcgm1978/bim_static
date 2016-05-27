@@ -64,6 +64,7 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
         var model = new App.ResourceArtifacts.newRule(App.ResourceArtifacts.newModel);
         var newRule = new App.Resources.ArtifactsPlanRuleDetailNew({model:model}).render().el;
         this.$(".conR dl").append(newRule);
+        //向collection添加
         //向this.model 添加一条属性
     },
     //保存
