@@ -18,7 +18,7 @@
 				.desc { margin: 6px 0px 4px 0px; }
 				.name { width: 50px; }
 				.date { margin-left: 10px; vertical-align: middle; }
-				.remarkCount { float: right; margin-right: 5px;
+				.remarkCount { float: right; margin-right: 5px;margin-top: 3px;
 					&:hover { text-decoration: underline; cursor: pointer; }
 				}
 				&:hover { background-color: #4E7FAD }
@@ -30,7 +30,7 @@
 	.commentRemark { position: absolute; top: 6px; left: 330px; right: 0px; bottom: 0px; overflow: hidden;
 		.header { height: 49px; border-bottom: 1px #353535 solid; line-height: 48px; padding: 0px 10px; }
 		.talkReMark { position: absolute; bottom: 0px; background-color: #444; }
-		.reMarkListBox { position: absolute; top: 49px; bottom: 100px; background: #333; left: 0px; right: 0px; }
+		.reMarkListBox { width:342px; position: absolute; top: 49px; bottom: 100px; background: #333; left: 0px; right: 0px; }
 		.iconTalk { font-size: 21px; width: 25px; margin: 0px; color: #b9b9b9; }
 		.goList { float: right; cursor: pointer; color: #b9b9b9; }
 		.inputBox { width: 310px; margin-left: 8px; color: #333; border-radius: 3px; background-color: #fff; }
@@ -68,5 +68,8 @@
 			.modelicon { color: #ccc; font-size: 18px; vertical-align: -2px; margin-right: 5px; }
 		}
 	}
+}
+.viewPointContext.jqContextMenu { background-color: #333; color: #fff; width: 80px;border:0;
+	li { padding-left: 15px; }
 }
 #comment .mCustomScrollbar .mCSB_scrollTools_vertical .mCSB_draggerContainer { background-color: transparent; }

@@ -15,7 +15,7 @@ App.Comm = {
 		"6": "审批退回",
 		"7": "待移交",
 		"8": "移交退回",
-		"9": "已发布"
+		"9": "已发布" 
 	},
 
 	//封装ajax
@@ -57,10 +57,7 @@ App.Comm = {
 			if ($.isFunction(callback)) {
 				//回调
 				callback(data);
-			}
-
-
-			App.Comm.ajax();
+			} 
 
 		});
 

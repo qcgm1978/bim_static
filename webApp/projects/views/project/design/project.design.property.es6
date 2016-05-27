@@ -8,7 +8,8 @@ App.Project.ProjectDesignPropety = Backbone.View.extend({
 
 	events: {
 		"click .projectPropetyHeader .item": "navItemClick",
-		"click .btnFilter": "filterVerification"
+		"click .btnFilter": "filterVerification",
+		"click .ckBox tr":"showInModel"
 	//	"click .clearSearch": "clearSearch"
 	},
 
@@ -133,8 +134,55 @@ App.Project.ProjectDesignPropety = Backbone.View.extend({
 	clearSearch: function() {
 		this.initVerificationOptions();
 		this.getVerificationData();
-	}
+	},
 
+	//设计检查点关联构件
+	showInModel(e) {
+		var $target = $(e.currentTarget),
+			_keyId = $target.data('id'); //主键ID
+		$target.parent().find('tr').removeClass('selected');
+		$target.addClass('selected');
+		App.Comm.ajax({
+			URLtype: 'fetchDesignCheckPointMapParam',
+			data: {
+				projectId: App.Project.Settings.CurrentVersion.projectId,
+				projectVersionId: App.Project.Settings.CurrentVersion.id,
+				id: _keyId
+			}
+		}, function(res) {
+			if (res.code == 0) {
+				var _data=res.data;
+				if (_data) {
+					var pars = {
+							URLtype: "getBoundingBox",
+							data: {
+								projectId: App.Project.Settings.CurrentVersion.projectId,
+								projectVersionId: App.Project.Settings.CurrentVersion.id,
+								sceneId: _data.sceneId,
+								elementId: _data.componentId
+							}
+						},
+						location = JSON.parse(_data.location);
+					//构建id
+					$target.data("elem", _data.componentId);
+					$target.data("userId", location.userId);
+					App.Comm.ajax(pars, function(data) {
+						if (data.code == 0 && data.data) {
+							var box = [],
+								min = data.data.min,
+								minArr = [min.x, min.y, min.z],
+								max = data.data.max,
+								maxArr = [max.x, max.y, max.z];
+							box.push(minArr);
+							box.push(maxArr);
+							$target.data("box", box);
+							App.Project.zommBox($target);
+						}
+					});
+				}
+			}
+		})
+	}
 
 
 });
