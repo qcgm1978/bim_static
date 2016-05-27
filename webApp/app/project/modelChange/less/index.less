@@ -94,3 +94,60 @@
 .tree-text { vertical-align: 2px; padding: 2px 3px; cursor: pointer; }
 .tree-checkbox .box { display: inline-block; width: 13px; height: 13px; background: url(./images/tree.png) no-repeat; background-position: 0 -60px; }
 .tree-checkbox input:checked + .box { background-position: 0 -40px; }
+.contrastInfo{
+  .close{
+	cursor: pointer;
+  }
+  .titles{
+	position: relative;
+	top: 0;
+	left: 0;
+	height: 40px;
+	font-size: 15px;
+	line-height: 40px;
+	width: 100%;
+	padding: 0 13px;
+	border-bottom: 1px solid #ccc;
+	.close{
+	  width: 18px;
+	  height: 18px;
+	  font-size: 18px;
+	  line-height: 18px;
+	  color: #ccc;
+	  position: absolute;
+	  top: 13px;
+	  right: 13px;
+	}
+  }
+  .btn{
+	width: 80px;
+	height: 30px;
+	border: 1px solid #CCCCCC;
+	font-size: 16px;
+	line-height: 30px;
+	text-align: center;
+	position: absolute;
+	bottom: 14px;
+	right: 22px;
+	color: #888;
+  }
+  .contents{
+	width: 100%;
+	padding: 20px;
+	height: 201px;
+	overflow: auto;
+	table{
+	  width: 100%;
+	  tr{
+		height: 30px;
+	  }
+	  td{
+		width: 33%;
+		text-align: center;
+		font-size: 12px;
+		border: 1px solid #CCCCCC;
+	  }
+	}
+
+  }
+}

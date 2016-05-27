@@ -114,8 +114,7 @@ App.Services.keyUserFrame = Backbone.View.extend({
         });
         $(".mod-dialog .wrapper .header").hide();//隐藏头部
         $(".alertInfo").html(alertInfo);
-        $(".mod-dialog").css({"min-height":"auto"});
-        $(".mod-dialog .wrapper .content").css({"min-height":"auto"});
+        $(".mod-dialog,.mod-dialog .wrapper .content").css({"min-height":"auto"});
 
     },
 
