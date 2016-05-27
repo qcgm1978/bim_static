@@ -777,7 +777,7 @@ fetchClassPropertData: function(id,param1, callback) {
 				acceptanceId: $target.data("id")
 			}
 		};
-
+		//获取构件ID type 0：开业验收 1：过程验收 2：隐患
 		App.Comm.ajax(data, function(data) {
 
 			if (data.code == 0) {
