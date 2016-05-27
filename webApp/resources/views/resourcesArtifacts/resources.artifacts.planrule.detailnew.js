@@ -8,18 +8,21 @@ App.Resources.ArtifactsPlanRuleDetailNew = Backbone.View.extend({
     template: _.templateUrl("/resources/tpls/resourcesArtifacts/resources.artifacts.planruledetailnew.html"),
 
     events:{
-
+        "click .delRule": "delRule"
     },
 
     render:function() {
         this.$el.html(this.template(this.model.toJSON()));
         return this;
     },
-    initialize:function(){},
 
+    initialize:function(){
+        this.listenTo(this.model,"change",this.render);
+    },
 
-
-    reset:function(){//重置模型
-
+    //删除
+    delRule:function(){
+        this.$el.remove();//删除元素
+        this.model.clear();//销毁数据
     }
 });

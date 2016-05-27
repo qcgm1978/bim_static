@@ -1,44 +1,43 @@
-<dd>
-    <div class="leftten">
-        <input type="text" placeholder="请输入属性名称" value="<%= obj.key %>"><div class="myDropDown">
+<div class="leftten">
+    <input type="text" placeholder="请输入属性名称" value="<%= obj.key %>"><div class="myDropDown">
                         <span class="myDropText">
                             <span class="text">请选择规则</span>
                             <i class="myDropArrorw down"></i>
                         </span>
-        <ul class="myDropList">
-            <li class="myItem" data-val="==">等于</li>
-            <li class="myItem" data-val="!=">不等于</li>
-            <li class="myItem" data-val="<>">范围内</li>
-            <li class="myItem" data-val="><">范围外</li>
-        </ul>
-    </div>
-    </div>
-    <div class="eIn <%= (obj.rule == '==' || obj.rule == '!=') ? 'active' : ''  %>"><input type="text" placeholder='请输入属性值，多个属性值可用英文 "," 分隔' value="<%= obj.value %>"></div><!--等于/不等于-->
-    <div class="ioside  <%= (obj.rule == '<>' || obj.rule == '><') ? 'active' : ''  %>"><!--范围 内/外-->
-        <div class="myDropDown">
+    <ul class="myDropList">
+        <li class="myItem" data-val="==">等于</li>
+        <li class="myItem" data-val="!=">不等于</li>
+        <li class="myItem" data-val="<>">范围内</li>
+        <li class="myItem" data-val="><">范围外</li>
+    </ul>
+</div>
+</div>
+<div class="eIn <%= (obj.rule == '==' || obj.rule == '!=') ? 'active' : ''  %>"><input type="text" placeholder='请输入属性值，多个属性值可用英文 "," 分隔' value="<%= obj.value %>"></div><!--等于/不等于-->
+<div class="ioside  <%= (obj.rule == '<>' || obj.rule == '><') ? 'active' : ''  %>"><!--范围 内/外-->
+    <div class="myDropDown">
                         <span class="myDropText">
                             <span class="text">></span>
                             <i class="myDropArrorw down"></i>
                         </span><input type="text" placeholder="请输入数值">
-            <ul class="myDropList">
-                <li class="myItem" data-val="("> > </li>
-                <li class="myItem" data-val="["> ≥ </li>
-                <li class="myItem" data-val=")"> ＜ </li>
-                <li class="myItem" data-val="]"> ≤ </li>
-            </ul>
-        </div><div class="myDropDown pickOpening">
+        <ul class="myDropList">
+            <li class="myItem" data-val="("> > </li>
+            <li class="myItem" data-val="["> ≥ </li>
+            <li class="myItem" data-val=")"> ＜ </li>
+            <li class="myItem" data-val="]"> ≤ </li>
+        </ul>
+    </div><div class="myDropDown pickOpening">
                         <span class="myDropText">
                             <span class="text"><</span>
                             <i class="myDropArrorw down"></i>
-                        </span><input type="text" placeholder="请输入数值">
-            <ul class="myDropList">
-                <li class="myItem" data-val="("> > </li>
-                <li class="myItem" data-val="["> ≥ </li>
-                <li class="myItem" data-val=")"> ＜ </li>
-                <li class="myItem" data-val="]"> ≤ </li>
-            </ul>
-        </div>
-        <i class="delRule"></i>
+                        </span><input type="text" placeholder="请输入数值" class="last">
+        <ul class="myDropList">
+            <li class="myItem" data-val="("> > </li>
+            <li class="myItem" data-val="["> ≥ </li>
+            <li class="myItem" data-val=")"> ＜ </li>
+            <li class="myItem" data-val="]"> ≤ </li>
+        </ul>
     </div>
-</dd>
+</div>
+<i class="delRule"></i>
+
 

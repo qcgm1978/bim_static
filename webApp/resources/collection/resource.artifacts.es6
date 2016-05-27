@@ -7,15 +7,13 @@ App.ResourceArtifacts={
 
     openRule: null,
 
-
     rule:{
         equal :"相等",
         unequal:"不等",
         inside:"范围内",
         outside:"范围外"
     },
-
-
+//计划节点
     PlanNode : new(Backbone.Collection.extend({
         model:Backbone.Model.extend({
             defaults:function(){
@@ -70,6 +68,22 @@ App.ResourceArtifacts={
             }
         }
     }),
+
+
+    newModel : {
+        "key":"", "rule":"", "value": null
+    },
+
+
+    //新建规则
+    newRule : Backbone.Model.extend({
+        defaults:function(){
+            return{
+                code : ""
+            }
+        }
+    }),
+
 
     ArtifactsRule:new(Backbone.Collection.extend({
         model:Backbone.Model.extend({
