@@ -26,7 +26,14 @@
  			 	if ($(this).hasClass("disabled")) {
  			 		return;
  			 	}
- 				$that.find(".myDropList").show().end().find(".myDropArrorw").addClass('down');
+ 			 	
+ 			 	//点击箭头切换方向
+ 			 	if($that.find('.down').length >0){
+ 			 		$that.find(".myDropList").hide();
+ 			 	}else{
+ 			 		$that.find(".myDropList").show();
+ 			 	}
+ 			 	$that.find('.myDropArrorw').toggleClass('down');
  			});
 
 
@@ -39,6 +46,8 @@
  			 	if ($.isFunction(that.settings.click)) {
  			 		that.settings.click.call(that,$(this));
  			 	}   
+ 			 	//更改箭头方向
+ 			 	$that.find('.myDropArrorw').toggleClass('down');
  			 	
  			 	return false;
  				 //$(document).trigger('click.myDropDown');
@@ -56,7 +65,6 @@
  		}
 
  		this.init();
-
  }
 
 

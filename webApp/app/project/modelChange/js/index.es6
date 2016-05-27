@@ -106,16 +106,30 @@ App.Index = {
 
 	//渲染模型
 	renderModel(modelId) {
-		App.Index.Settings.Viewer = new bimView({
+		var _this=this;
+		var viewer = App.Index.Settings.Viewer = new bimView({
 			type:'singleModel',
 			element: $("#contains .projectCotent"),
 			etag: modelId
 		});
+
+		viewer.on("click", function(model) {
+			App.Index.Settings.ModelObj = null;
+
+			if (!model.intersect) {
+				$("#projectContainer .designProperties").html(' <div class="nullTip">请选择构件</div>');
+				return;
+			};
+
+			App.Index.Settings.ModelObj = model;
+			//App.Project.Settings.modelId = model.userId;
+			_this.renderAttr(modelId);
+
+		});
 	},
 
 	//渲染属性
-	renderAttr() {
-
+	renderAttr(sceneId) {
 		if (!App.Index.Settings.ModelObj || !App.Index.Settings.ModelObj.intersect) {
 			$("#projectContainer .designProperties").html(' <div class="nullTip">请选择构件</div>');
 			return;
@@ -126,11 +140,11 @@ App.Index = {
 			url: url,
 			data: {
 				elementId: App.Index.Settings.ModelObj.intersect.userId,
-				sceneId: App.Index.Settings.ModelObj.intersect.object.userData.sceneId
+				sceneId: sceneId
 			}
 		}).done(function(data) {
 			var template = _.templateUrl("/projects/tpls/project/design/project.design.property.properties.html");
-			$("#projectContainer .dropList").html(template(data.data));
+			$("#projectContainer .designProperties").html(template(data.data));
 		});
 
 	},

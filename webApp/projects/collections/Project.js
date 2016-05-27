@@ -777,7 +777,7 @@ fetchClassPropertData: function(id,param1, callback) {
 				acceptanceId: $target.data("id")
 			}
 		};
-
+		//获取构件ID type 0：开业验收 1：过程验收 2：隐患
 		App.Comm.ajax(data, function(data) {
 
 			if (data.code == 0) {
@@ -825,7 +825,12 @@ fetchClassPropertData: function(id,param1, callback) {
 
 	//显示标记、隐患点
 	showMarks(marks){
-		marks && App.Project.Settings.Viewer.loadMarkers(marks);
+		//if(marks && marks.length>0){
+			var m=[JSON.stringify({"id":"1b26a8bb-3c81-48e1-ba21-bf60221d32c3","userId":"9ba18f953676cd4e679618ffc1ac85bd.865c9ca5-969a-4ed0-8a67-0a54e83beda3-0009d9a1","state":0,"position":{"x":-38649.661298145635,"y":-24435.506082937514,"z":9057.762910436384},"bBox":{"min":{"x":-350,"y":-350,"z":-2640},"max":{"x":350,"y":350,"z":2640}}})]
+		 	App.Project.Settings.Viewer.loadMarkers(m);
+		//}else{
+
+		//}
 	},
 
 	//定位到模型
