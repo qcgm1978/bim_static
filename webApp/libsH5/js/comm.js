@@ -182,7 +182,7 @@
       dialog.on('click','.dialogClose',function(){
         dialog.remove();
       }).on('click','.dialogOk',function(){
-        if (_opt.callback && _opt.callback.call(self) !== false) {
+        if (_opt.callback && _opt.callback.call(this) !== false) {
           dialog.remove();
         }
       })

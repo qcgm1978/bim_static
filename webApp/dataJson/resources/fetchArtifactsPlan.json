@@ -1,0 +1,26 @@
+{
+  "code": 0,
+  "message": "success",
+  "data": [
+    {
+      "planId" : "GC0017",
+      "desc" : "基坑支护止水帷幕",
+      "ruleList" :[]
+    },
+    {
+      "planId" : "GC0018",
+      "desc" : "基坑支护止水帷幕",
+      "ruleList" :[]
+    },
+    {
+      "planId" : "GC0019",
+      "desc" : "基坑支护止水帷幕",
+      "ruleList" :[]
+    },
+    {
+      "planId" : "GC0020",
+      "desc" : "基坑支护止水帷幕",
+      "ruleList" :[]
+    }
+  ]
+}

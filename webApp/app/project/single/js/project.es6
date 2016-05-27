@@ -98,8 +98,7 @@ App.Project = {
 					} else if (data.data.modelStatus == 3) {
 						alert("转换失败");
 						return;
-					}
-
+					} 
 
 					//dwg 格式
 					if (data.data.suffix == "dwg") {

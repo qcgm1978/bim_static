@@ -248,16 +248,29 @@
         if(!self.bigMap){
           self.bigMap = $('<div id="map"></div>');
         }
+        if(!self.footer){
+          self.footer = $('<label class="dialogLabel">X：<input type="text" class="dialogInput" id="axisGridX" /></label><label class="dialogLabel">Y：<input type="text" class="dialogInput" id="axisGridY" /></label>');
+        }
         var data = self.curFloorData;
         bimView.comm.dialog({
           title:'选择轴网',
           content:self.bigMap,
-          footer:'<label class="dialogLabel">X：<input type="text" class="dialogInput" id="axisGridX" /></label><label class="dialogLabel">Y：<input type="text" class="dialogInput" id="axisGridY" /></label>',
-          callback:function(res){
-            return false;
+          footer:self.footer,
+          callback:function(){
+            var x = self.footer.find('#axisGridX').val(),
+                y = self.footer.find('#axisGridY').val();
+            // self.setAxisGrid('bigMap',x,y);
           }
         });
-        self.initMap('bigMap',self.bigMap,'',false);
+        self.initMap({
+          name:'bigMap',
+          element:self.bigMap,
+          enable:false,
+          callback:function(res){
+            self.footer.find('#axisGridX').val(res.axis.abcName);
+            self.footer.find('#axisGridY').val(res.axis.numeralName);
+          }
+        });
         self.showAxisGrid('bigMap');
         self.setFloorMap(data,"bigMap");
       });
@@ -265,7 +278,6 @@
         self.resize();
       });
       self.on('changeGrid',function(res){
-        console.log(res)
         var floors = self.curFloor;
         var infoZ = 'Z('+ floors +','+res.axis.offsetZ+')'
         bimView.sidebar.el._dom.mapBar.find(".axisGrid").text(res.axis.infoX+","+res.axis.infoY+","+infoZ)
@@ -343,7 +355,7 @@
       var list = viewer.getMarkerInfoList();
       var newList = [];
       $.each(list,function(i,item){
-        newList.push(window.btoa(JSON.stringify(item)));
+        newList.push(JSON.stringify(item));
       });
       return newList;
     },
@@ -353,7 +365,7 @@
       var viewer = self.viewer;
       var newList = [];
       $.each(list,function(i,item){
-        newList.push(JSON.parse(window.atob(item)));
+        newList.push(JSON.parse(item));
       });
       viewer.setMarkerMode();
       viewer.loadMarkers(newList);
@@ -486,27 +498,35 @@
       var filter = viewer.getFilters();
       return filter.isSceneOverriderEnabled();
     },
-    initMap:function(name,element,axisGrid,enable){
+    initMap:function(options){
+      var defaults = {
+        element:'',
+        name:'defaultMap',
+        axisGrid:'',
+        enable:true,
+        callback:null
+      },
+      _opt = $.extend({},defaults,options);
       // 初始化小地图
       var self = this,
           viewer = self.viewer,
-          _el = element,
+          _el = _opt.element,
           _width = _el.width(),
           _height = _el.height(),
           _css={
             left:'0px',
             bottom:'0px',
             outline:'none'
-          },
-          enable = enable == 'undefined' ? true : enable;
-      if(axisGrid) viewer.setAxisGridData(axisGrid)
-      viewer.createMiniMap(name,_el[0],_width,_height,_css,function(res){
-        self.pub('changeGrid',res);
+          };
+      if(_opt.axisGrid) viewer.setAxisGridData(_opt.axisGrid)
+      viewer.createMiniMap(_opt.name,_el[0],_width,_height,_css,function(res){
+        _opt.callback&&_opt.callback.call(this,res)
       });
-      viewer.enableAxisGridEvent(name,enable);
-      viewer.generateAxisGrid(name);
+      viewer.enableAxisGridEvent(_opt.name,_opt.enable);
+      viewer.generateAxisGrid(_opt.name);
     },
     setAxisGrid:function(name, x, y){
+      var viewer = this.viewer;
       viewer.flyBypAxisGridNumber(name, x, y);
     },
     setFloorMap:function(obj,name){
