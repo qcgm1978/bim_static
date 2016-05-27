@@ -8,7 +8,7 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
     template: _.templateUrl("/resources/tpls/resourcesArtifacts/resources.artifacts.planruledetail.html"),
 
     events:{
-        "click .getDetail":"getDetail"
+        "click .desc":"getDetail"
     },
 
     render:function() {
@@ -18,6 +18,16 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
     initialize:function(){},
 
     getDetail:function(){
+        var _this = this ;
+        $(".ruleDetail").empty().hide();
+       this.reset();
+        //¥Ê¥¢model
+        App.ResourceArtifacts.openRule = this.model;
+        this.$(".ruleDetail").html( new App.Resources.ArtifactsPlanRuleDetailUnfold({model:App.ResourceArtifacts.openRule}).render().el);
         this.$(".ruleDetail").show();
+    },
+
+    reset:function(){//÷ÿ÷√ƒ£–Õ
+        if(App.ResourceArtifacts.openRule){App.ResourceArtifacts.openRule=null;}
     }
 });

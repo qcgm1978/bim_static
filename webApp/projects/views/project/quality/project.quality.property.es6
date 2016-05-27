@@ -12,7 +12,7 @@ App.Project.ProjectQualityProperty = Backbone.View.extend({
 		"click .paginationBottom .pageInfo .prev": "prevPage",
 		"click .btnFilter": "filterData",
 	//	"click .clearSearch": "clearSearch",
-		"click .diseaseItem": "diseaseItemClick"
+		"click .diseaseItem": "diseaseItemLinkClick"
 	},
 
 	initialize(){
@@ -92,6 +92,17 @@ App.Project.ProjectQualityProperty = Backbone.View.extend({
 		App.Project.Settings.Viewer.loadMarkers([data]); 
 		event.stopPropagation(); 
 	},
+
+	//过程、开业验收-隐患列表关联构件
+	diseaseItemLinkClick(event) { 
+		var _$target=$(event.target).closest("li"),
+			data = _$target.data("location");
+		data=JSON.stringify(data);
+		App.Project.showInModel( _$target,2);  
+	//	App.Project.Settings.Viewer.loadMarkers([data]); 
+		event.stopPropagation(); 
+	},
+
 	//切换tab
 	navClick: function(event) {
 		var $target = $(event.target),

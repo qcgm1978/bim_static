@@ -120,6 +120,7 @@ App.API = {
 		fetchDesignPropertiesPlan: "sixD/{projectId}/{projectVersionId}/plan/edo", // 设计属性 计划  ?sceneId={sceneId}&elementId={elementId}
 		fetchDesignPropertiesCost: "sixD/{projectId}/{projectVersionId}/cost/edo", // 设计属性成本  ?sceneId={sceneId}&elementId={elementId}
 		fetchDesignPropertiesQuality: "sixD/{projectId}/{projectVersionId}/quality/standard", // 设计属性 质量 ?sceneId={sceneId}&elementId={elementId}
+		fetchDesignCheckPointMapParam:'sixD/{projectId}/{projectVersionId}/design/element',
 
 		fetchDesignVerification: "sixD/{projectId}/{versionId}/design/check", // 设计 检测  ?status={status}&type={type}&specialty={specialty}&reporter={reporter}&pageIndex={pageIndex}&pageItemCount={pageItemCount}
 		fetchDesignCollision: "", // 设计碰撞
@@ -134,6 +135,7 @@ App.API = {
 		// 模型对比
 		fetchDesignChange: "view/{projectId}/{projectVersionId}/comparison?type=std", // 获取模型对比列表
 		fetchDesignChangeInfo: "sixD/{projectId}/{projectVersionId}/comparison/result?comparisonId={comparisonId}", // 获取模型对比结果
+		fetchChangeComparisonInfo: "sixD/{projectId}/{projectVersionId}/comparison/property?baseModel={baseModel}&currentModel={currentModel}&elementId={elementId}", // 获取模型对比构件设计属性变更
 
 		//计划
 		fetchPlanModel: "sixD/{projectId}/{projectVersionId}/plan", //模型

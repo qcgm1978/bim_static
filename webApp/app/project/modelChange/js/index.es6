@@ -106,16 +106,30 @@ App.Index = {
 
 	//渲染模型
 	renderModel(modelId) {
-		App.Index.Settings.Viewer = new bimView({
+		var _this=this;
+		var viewer = App.Index.Settings.Viewer = new bimView({
 			type:'singleModel',
 			element: $("#contains .projectCotent"),
 			etag: modelId
 		});
+
+		viewer.on("click", function(model) {
+			App.Index.Settings.ModelObj = null;
+
+			if (!model.intersect) {
+				$("#projectContainer .designProperties").html(' <div class="nullTip">请选择构件</div>');
+				return;
+			};
+
+			App.Index.Settings.ModelObj = model;
+			//App.Project.Settings.modelId = model.userId;
+			_this.renderAttr(modelId);
+
+		});
 	},
 
 	//渲染属性
-	renderAttr() {
-
+	renderAttr(sceneId) {
 		if (!App.Index.Settings.ModelObj || !App.Index.Settings.ModelObj.intersect) {
 			$("#projectContainer .designProperties").html(' <div class="nullTip">请选择构件</div>');
 			return;
@@ -126,11 +140,11 @@ App.Index = {
 			url: url,
 			data: {
 				elementId: App.Index.Settings.ModelObj.intersect.userId,
-				sceneId: App.Index.Settings.ModelObj.intersect.object.userData.sceneId
+				sceneId: sceneId
 			}
 		}).done(function(data) {
 			var template = _.templateUrl("/projects/tpls/project/design/project.design.property.properties.html");
-			$("#projectContainer .dropList").html(template(data.data));
+			$("#projectContainer .designProperties").html(template(data.data));
 		});
 
 	},
@@ -178,8 +192,13 @@ App.Index = {
 				var groupText = $item.closest(".groups").prev().text() + "：";
 				$(".myDropDown .myDropText span:first").text(groupText);
 				var currentModel = $item.data("currentmodel"),
+				    baseModel = $item.data("basemodel"),
 					changeModel = $item.data("change").replace("_output", ""),
 					comparisonId = $item.data('id');
+				App.Index.Settings.currentModel = currentModel;
+				App.Index.Settings.baseModel = baseModel;
+
+
 				App.Index.Settings.changeModel = changeModel;
 				$('.checkboxGroup input').prop('checked', false);
 				App.Index.Settings.loadedModel = null;
@@ -256,7 +275,7 @@ App.Project.Model = {
 			var data = model.toJSON();
 			var comparisonId = App.Index.Settings.referenceId;
 			var isload = false;
-			debugger
+			//debugger
 			$.each(data.data, function(i, item) {
 				$.each(item.comparisons, function(j, file) {
 					if (file.currentVersion == comparisonId) {
@@ -275,6 +294,8 @@ App.Project.Model = {
 				App.Index.getDetail(file.comparisonId);
 				App.Index.Settings.changeModel = file.comparisonId;
 				App.Index.renderModel(file.currentModel);
+				App.Index.Settings.currentModel = file.currentModel;
+				App.Index.Settings.baseModel = file.baseModel;
 			}
 			if (data.data.length>0) {
 				this.$el.html(this.template(data));
@@ -333,13 +354,20 @@ App.Project.Model = {
       }
 		},
 		detail: function(e){
+
+			var $treetext = $(e.target).prev('.tree-text'),
+				data = {
+					baseModel:$treetext.data('base'),
+					currentModel:$treetext.data('id')
+				};
+
 			App.Index.alertWindow = new App.Comm.modules.Dialog({
 				title: "",
 				width: 560,
 				height: 330,
 				isConfirm: false,
 				isAlert: false,
-				message: new App.Project.Model.contrastInfo().render().el
+				message: new App.Project.Model.contrastInfo().render(data).el
 			});
 			$(".mod-dialog .wrapper .header").hide();//隐藏头部
 			//$(".alertInfo").html(alertInfo);
@@ -355,8 +383,33 @@ App.Project.Model = {
 		events: {
 			"click .close": "close"
 		},
-		render: function() {
-			this.$el.html(this.template({}));
+		render: function(datas) {
+			if(datas != undefined){
+				var data = {
+						projectId: App.Index.Settings.projectId,
+						projectVersionId: App.Index.Settings.projectVersionId,
+						elementId: datas.currentModel,
+						baseModel: App.Index.Settings.baseModel ,
+						currentModel:App.Index.Settings.currentModel
+				},
+					that=this;
+				$.ajax({
+					url: "http://bim.wanda-dev.cn/sixD/"+data.projectId+"/"+data.projectVersionId+"/comparison/property?baseModel="+data.baseModel+"&currentModel="+data.currentModel+"&elementId="+data.elementId
+				}).done(function(respone){
+					if(respone.code==0){
+						that.$el.html(that.template({data:respone.data}));
+
+					}else{
+						alert('获取数据失败');
+						App.Index.alertWindow.close();
+
+					}
+				});
+
+
+			}else{
+				this.$el.html(this.template({data:[]}));
+			}
 			return this;
 		},
 		close: function(){
