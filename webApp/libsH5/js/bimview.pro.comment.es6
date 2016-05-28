@@ -328,8 +328,68 @@
 				showComment(event) {
 					var $item = $(event.target).closest(".item"),
 						viewPint = $item.find(".thumbnailImg").data("viewpoint");
+
+						viewPointId=this.$(".remarkCount").data("id");
+
+					$item.addClass("selected").siblings().removeClass("selected");
+
 					App.Project.Settings.Viewer.setCamera(viewPint);
+
+					$.when(this.getFilter(), this.getAnnotation()).done((filterData, annotationData) => {				
+						 
+						 filterData=filterData[0];
+						 annotationData=annotationData[0];
+
+						 if (filterData.code==0 && annotationData.code==0) {
+						 
+						 	var filterObj={
+
+						 	},item;
+						 	$.each(filterData.data.filters,function(i,item){
+						 		item=JSON.parse(item);
+						 		filterObj[item.cateType]=item;
+						 		delete item.cateType;
+						 	});
+						 	 App.Project.Settings.Viewer.loadComment({
+						 	 	list:annotationData.data.annotations,
+						 	 	filter:filterObj
+						 	 });						 	 
+
+						 }else{
+						 	alert('数据获取失败');
+						 }
+
+					});
+
 				},
+
+				//获取批注
+				getFilter() {
+
+					var data = {
+						URLtype: "getFilter",
+						data: {
+							projectId: App.Project.Settings.projectId,
+							viewPointId: viewPointId
+						}
+					}
+
+					return App.Comm.ajax(data);
+				},
+
+				//获取批注
+				getAnnotation() {
+					var data = {
+						URLtype: "getAnnotation",
+						data: {
+							projectId: App.Project.Settings.projectId,
+							viewPointId: viewPointId
+						}
+					}
+
+					return App.Comm.ajax(data);
+				},
+
 
 				//更新后操作
 				afterUpdate() {
