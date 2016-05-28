@@ -499,8 +499,8 @@
       });
       data.filter.floors.ids = data.filter.floors.ids.concat(data.filter.specialty.ids);
       self.filter(data.filter.floors);
-      self.filter(filter.category);
-      self.filter(filter.classCode);
+      self.filter(data.filter.category);
+      self.filter(data.filter.classCode);
       viewer.setCommentMode();
       viewer.loadComments(newList);
     },
