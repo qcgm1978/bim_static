@@ -258,6 +258,7 @@ App.API = {
 		userPhoto:"sixD/{projectId}/viewPoint?type=0",//用户快照
 		viewComments:"sixD/{projectId}/viewPoint/{viewPointId}/comment",//查看发表评论
 		delViewPoint:"sixD/{projectId}/viewPoint/{viewPointId}",//删除视点
+		createComment:"sixD/{projectId}/viewPoint/{viewPointId}/comment",// 创建评论
 		
 		test: ""
 	},

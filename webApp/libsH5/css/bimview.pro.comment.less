@@ -10,7 +10,7 @@
 			}
 		}
 		.listBox { position: absolute; top: 46px; bottom: 0px; left: 0px; right: 0px;
-			.item { height: 80px; color: #b9b9b9;
+			.item { height: 80px; color: #b9b9b9; background-color: rgba(0, 0, 0, 0.8);
 				.thumbnailImg { float: left; width: 82px; height: 62px; margin: 10px 0px 0px 10px; }
 				.info { margin-left: 100px; padding-top: 9px; }
 				.title, .desc { width: 98%; }
@@ -18,11 +18,11 @@
 				.desc { margin: 6px 0px 4px 0px; }
 				.name { width: 50px; }
 				.date { margin-left: 10px; vertical-align: middle; }
-				.remarkCount { float: right; margin-right: 5px;margin-top: 3px;
+				.remarkCount { float: right; margin-right: 5px; margin-top: 3px;
 					&:hover { text-decoration: underline; cursor: pointer; }
 				}
 				&:hover { background-color: #4E7FAD }
-				&.selected { background-color: #0057A7; color: #fff; }
+				&.selected { background-color: #006ECF; color: #fff; }
 			}
 		}
 	}
@@ -30,7 +30,7 @@
 	.commentRemark { position: absolute; top: 6px; left: 330px; right: 0px; bottom: 0px; overflow: hidden;
 		.header { height: 49px; border-bottom: 1px #353535 solid; line-height: 48px; padding: 0px 10px; }
 		.talkReMark { position: absolute; bottom: 0px; background-color: #444; }
-		.reMarkListBox { width:342px; position: absolute; top: 49px; bottom: 100px; background: #333; left: 0px; right: 0px; }
+		.reMarkListBox { width: 328px; position: absolute; top: 49px; bottom: 100px; background: #333; left: 0px; right: 0px; }
 		.iconTalk { font-size: 21px; width: 25px; margin: 0px; color: #b9b9b9; }
 		.goList { float: right; cursor: pointer; color: #b9b9b9; }
 		.inputBox { width: 310px; margin-left: 8px; color: #333; border-radius: 3px; background-color: #fff; }
@@ -40,15 +40,31 @@
 		.uploadImg { display: none; }
 		.btnEnter { float: right; margin: 5px 2px 10px 0px; width: 100px; height: 28px; background-color: transparent; outline: 0; border: 1px #fff solid; }
 		.btnUploadImg { float: left; margin: 12px 0px 0px 12px; cursor: pointer; }
-		.reMarkList { .item { border-top: 1px #656565 solid; margin: 0px 10px 8px 20px; }
-			.userInfo { margin-top: 5px; }
-			.userImg { width: 18px; height: 18px; border-radius: 3px; }
-			.userName { margin-left: 5px; vertical-align: 2px; }
-			.date { float: right; }
-			.content { margin: 5px 0px 0px 25px; }
-			.imgs { margin: 8px 0px 0px 25px;
-				.img { margin: 2px; }
+		.reMarkList { .item { border-top: 1px #656565 solid; margin: 0px 10px 8px 20px;
+				&:hover { .delTalkBox { .delTalk { display: block; }
+					}
+				}
+				.userInfo { margin-top: 5px; }
+				.userImg { width: 18px; height: 18px; border-radius: 3px; }
+				.userName { margin-left: 5px; vertical-align: 2px; }
+				.date { float: right; }
+				.content { margin: 5px 0px 0px 25px; }
+				.imgs { margin: 8px 0px 0px 25px;
+					.img { margin: 2px; width: 42px; height: 32px; display: inline-block; }
+				}
+				.delTalkBox { height: 20px; text-align: right;
+					.delTalk { display: none; cursor: pointer; 
+						&:hover{text-decoration: underline;}
+					}
+				}
 			}
+		}
+		.singleImg { height: 42px; line-height: 44px; background-color: #eee; color: #999; margin-bottom: 5px;
+			.talkImg { width: 42px; height: 30px; border: 1px #ccc solid; vertical-align: top; margin: 7px 0px 7px 7px; display: none; }
+			.imgName { margin-left: 7px; width: 220px;
+				&.upload { colro: #333; }
+			}
+			.delUploadImg { float: right; cursor: pointer; margin-right: 10px; display: none; }
 		}
 	}
 	.loading { position: static; background-color: transparent; color: #fff; font-size: 16px; text-align: center; height: 100px; }
@@ -69,7 +85,7 @@
 		}
 	}
 }
-.viewPointContext.jqContextMenu { background-color: #333; color: #fff; width: 80px;border:0;
+.viewPointContext.jqContextMenu { background-color: #333; color: #fff; width: 80px; border: 0;
 	li { padding-left: 15px; }
 }
 #comment .mCustomScrollbar .mCSB_scrollTools_vertical .mCSB_draggerContainer { background-color: transparent; }
