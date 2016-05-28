@@ -94,6 +94,10 @@
             type = $this.data('type');
         switch(type){
           case "viewer":
+            debugger
+            self[fn]();
+            break;
+          case "view":
             self[fn]();
             break;
           case "pattern":
@@ -122,15 +126,8 @@
             bimView.sidebar[fn](!isSelected);
             break;
           case "more":
-            $this.toggleClass('selected');
+            $this.toggleClass('selected').siblings('[data-group='+group+']').removeClass('selected');
             bimView.sidebar[fn](self);
-            if($this.is('.selected')){
-              setTimeout(function(){
-                $(document).one('click',function(){
-                  $('.m-more').removeClass('selected');
-                });
-              },10)
-            }
             break;
           case "change":
             $this.toggleClass('m-miniScreen m-fullScreen')
@@ -281,6 +278,12 @@
       $(window).on('resize',function(){
         self.resize();
       });
+      $(document).on('click',function(event){
+        var $this = $(event.target);
+        if(!$this.is('.bar-item[data-type=more]')){
+          $('.bar-item[data-type=more]').removeClass('selected');
+        }
+      });
       self.on('changeGrid',function(res){
         var floors = self.curFloor;
         var infoZ = 'Z('+ floors +','+res.axis.offsetZ+')'
@@ -336,6 +339,66 @@
       var self = this;
       self.pub('home');
       self.viewer.setStandardView(CLOUD.EnumStandardView.ISO);
+    },
+    front : function () {
+      var self = this,
+          viewer = self.viewer;
+      self.pub('front');
+      viewer.setStandardView(CLOUD.EnumStandardView.Front);
+    },
+    behind : function () {
+      var self = this,
+          viewer = self.viewer;
+      self.pub('behind');
+      viewer.setStandardView(CLOUD.EnumStandardView.Back);
+    },
+    left : function () {
+      var self = this,
+          viewer = self.viewer;
+      self.pub('left');
+      viewer.setStandardView(CLOUD.EnumStandardView.Left);
+    },
+    right : function () {
+      var self = this,
+          viewer = self.viewer;
+      self.pub('right');
+      viewer.setStandardView(CLOUD.EnumStandardView.Right);
+    },
+    top : function () {
+      var self = this,
+          viewer = self.viewer;
+      self.pub('top');
+      viewer.setStandardView(CLOUD.EnumStandardView.Top);
+    },
+    bottom : function () {
+      var self = this,
+          viewer = self.viewer;
+      self.pub('bottom');
+      viewer.setStandardView(CLOUD.EnumStandardView.Bottom);
+    },
+    southEast : function () {
+      var self = this,
+          viewer = self.viewer;
+      self.pub('southEast');
+      viewer.setStandardView(CLOUD.EnumStandardView.SouthEast);
+    },
+    southWest : function () {
+      var self = this,
+          viewer = self.viewer;
+      self.pub('southWest');
+      viewer.setStandardView(CLOUD.EnumStandardView.SouthWest);
+    },
+    northEast : function () {
+      var self = this,
+          viewer = self.viewer;
+      self.pub('northEast');
+      viewer.setStandardView(CLOUD.EnumStandardView.NorthEast);
+    },
+    northWest : function () {
+      var self = this,
+          viewer = self.viewer;
+      self.pub('northWest');
+      viewer.setStandardView(CLOUD.EnumStandardView.NorthWest);
     },
     // 模型检查点
     markers:function(){
