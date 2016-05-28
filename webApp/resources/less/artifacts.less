@@ -1,5 +1,7 @@
 .pozero{left: 0;top: 0;right: 0;bottom: 0;}
 .bd-1-c{border: 1px solid #cccccc;}
+.clear{clear: both;}
+.pdR60{padding-right: 60px;}
 
 .artifactsNav{background-color: #eeeeee;padding-top: 9px;height: 38px;border-bottom: 1px solid #cccccc;padding-left: 20px;clear: both;}
 .artifactsNav li{border-top: 2px solid #eeeeee;float: left;line-height: 27px;height: 29px;width: 98px;text-align: center;margin-bottom: -1px;cursor: pointer;}
@@ -22,8 +24,8 @@
 .artifactsContent .rules{position: absolute;.pozero;left: 304px;.bd-1-c;}
 .artifactsContent .rules li{line-height: 38px;border-bottom: 1px solid #cccccc;font-size: 12px;}
 .artifactsContent .rules li .left{margin-right: 20px;font-size: 14px;}
-.artifactsContent  li .getDetail {padding:0 40px 0 20px;position: relative;color: #6d6d6d;}
-.artifactsContent  li .desc{color: #cccccc;cursor: pointer;}
+.artifactsContent li .getDetail {padding:0 40px 0 20px;position: relative;color: #6d6d6d;}
+.artifactsContent li .desc{cursor: pointer;font-size: 14px;color: #6d6d6d;}
 .artifactsContent li .getDetail.active{color: #006ecf;}
 .artifactsContent .rules .newRule{position: relative;padding: 0 20px 0 22px;color: #006ecf;cursor: pointer;}
 .artifactsContent .rules .newRule:before{position: absolute;content: "";width: 14px;height: 14px;left: 0;top: 12px;background: transparent url('../../comm/images/commIcon.png') left top no-repeat;background-position: -40px -80px;}
@@ -37,22 +39,39 @@
 .ruleDetail .title{width: 85px;text-align: right;padding-right: 10px;position: absolute;top: 5px;left: 0;}
 .ruleDetail .conR{margin-left: 85px;position: relative;}
 .ruleDetail .conR input{height: 30px;line-height: 28px;border: 1px solid #cccccc;margin-right: 9px;padding-left: 10px;width: 140px;}
+.ruleDetail .conR input.last{margin-right: 0;}
 .ruleDetail .typeCode{line-height: 49px; border-bottom: 1px solid #cccccc;position: relative;}
 .ruleDetail .typeCode input{width: 540px;}
-.ruleDetail .conR .choose{position: absolute;right: 0;width: 60px;height: 100%;top: 0;z-index: 2;cursor: pointer;color: #006ecf;}
+.ruleDetail .conR .choose{position: absolute;left: 480px;width: 60px;height: 100%;top: 0;padding-left: 20px;z-index: 3;cursor: pointer;color: #006ecf;}
 .ruleDetail .myDropDown .myDropText{width: 100px;padding-left: 10px;margin-right: 9px;height: 30px;}
-.ruleDetail  .myDropText .text{font-size: 12px;}
+.ruleDetail .myDropText .text{font-size: 12px;}
 .ruleDetail .leftten{float: left;}
-.addPro{font-size: 12px;color: #006ecf;cursor: pointer;}
-.conR .eIn{margin-left: 258px;width: 280px;}
+.addNewRule{font-size: 12px;color: #006ecf;cursor: pointer;}
+.conR .eIn{width: 280px;}
 .ruleDetail .conR .eIn input{width: 100%;}
 .ruleDetail .ioside .myDropText{width: 47px;margin-right: 0;}
 .ruleDetail .ioside input{width: 89px;border-left: none;}
 .ruleDetail .myDropDown{z-index: auto;}
 .ruleDetail .myDropDown .myDropList{width: 100px;left: 0;z-index: 10;top: 34px;}
 .ruleDetail .myDropList .myItem{border-bottom: none;}
-.ruleDetail .eIn,.ruleDetail .ioside{display: none}
+.ruleDetail .eIn,.ruleDetail .ioside{display: none;float: left;}
 .ruleDetail .eIn.active,.ruleDetail .ioside.active{display: block}
 .ruleDetail .conR dd{clear: both;}
+.ruleDetail .delRule{float: left;position: relative;width: 28px;height: 28px;margin-top: 5px;cursor: pointer;}
+.ruleDetail .delRule:before{content: '';position: absolute;width:13px ;height: 13px;top: 8px;left: 7px;background: transparent url('../../comm/images/commIcon.png') -40px -120px no-repeat ;background-size: 80px auto;}
 
-
+.windowSubmit {
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
+  background-color: #0572d0;
+  color: #ffffff;
+  width: 80px;
+  height: 30px;
+  line-height: 30px;
+  text-align: center;
+  cursor: pointer;
+}
+.windowSubmit:hover {
+  background-color: #1584e3;
+}

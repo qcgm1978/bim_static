@@ -17,6 +17,7 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
         "click .myItem":"myItem"
     },
 
+
     render:function() {
         this.$el.html(this.template(this.model.toJSON()));
         return this;
@@ -59,17 +60,22 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
     },
     //增加新规则
     addNewRule:function(){
-
+        var _this = this;
+        var model = new App.ResourceArtifacts.newRule(App.ResourceArtifacts.newModel);
+        var newRule = new App.Resources.ArtifactsPlanRuleDetailNew({model:model}).render().el;
+        this.$(".conR dl").append(newRule);
+        //向collection添加
+        //向this.model 添加一条属性
     },
     //保存
     save:function(){
 
     },
-    //删除计划中的规则
+    //删除计划中的整条规则
     deletePlanRule:function(){
 
     },
-    //删除规则
+    //删除单条规则
     deleteRule:function(){
 
     },

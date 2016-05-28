@@ -192,8 +192,13 @@ App.Index = {
 				var groupText = $item.closest(".groups").prev().text() + "：";
 				$(".myDropDown .myDropText span:first").text(groupText);
 				var currentModel = $item.data("currentmodel"),
+				    baseModel = $item.data("basemodel"),
 					changeModel = $item.data("change").replace("_output", ""),
 					comparisonId = $item.data('id');
+				App.Index.Settings.currentModel = currentModel;
+				App.Index.Settings.baseModel = baseModel;
+
+
 				App.Index.Settings.changeModel = changeModel;
 				$('.checkboxGroup input').prop('checked', false);
 				App.Index.Settings.loadedModel = null;
@@ -267,7 +272,7 @@ App.Project.Model = {
 		},
 
 		addList: function(model) {
-			var data = model.toJSON();console.log(data);
+			var data = model.toJSON();
 			var comparisonId = App.Index.Settings.referenceId;
 			var isload = false;
 			//debugger
@@ -289,6 +294,8 @@ App.Project.Model = {
 				App.Index.getDetail(file.comparisonId);
 				App.Index.Settings.changeModel = file.comparisonId;
 				App.Index.renderModel(file.currentModel);
+				App.Index.Settings.currentModel = file.currentModel;
+				App.Index.Settings.baseModel = file.baseModel;
 			}
 			if (data.data.length>0) {
 				this.$el.html(this.template(data));
@@ -317,7 +324,7 @@ App.Project.Model = {
 			return this;
 		},
 		addDetail: function(model) {
-			var data = model.toJSON();console.log('gg',data);
+			var data = model.toJSON();
 			if (data.message == 'success' && data.data.length > 0) {
 				this.$el.html(this.template(data));
 			} else {
@@ -376,32 +383,32 @@ App.Project.Model = {
 		events: {
 			"click .close": "close"
 		},
-		render: function(data) {
-			if(data != undefined){
-				var dataObj = {
-					URLtype: "fetchChangeComparisonInfo",
-					data: {
+		render: function(datas) {
+			if(datas != undefined){
+				var data = {
 						projectId: App.Index.Settings.projectId,
 						projectVersionId: App.Index.Settings.projectVersionId,
-						elementId: data.currentModel,
-						baseModel: data.baseModel,
-						currentModel:data.currentModel
-					}
+						elementId: datas.currentModel,
+						baseModel: App.Index.Settings.baseModel ,
+						currentModel:App.Index.Settings.currentModel
 				},
 					that=this;
-
-				App.Comm.ajax(dataObj, function(respone){
+				$.ajax({
+					url: "http://bim.wanda-dev.cn/sixD/"+data.projectId+"/"+data.projectVersionId+"/comparison/property?baseModel="+data.baseModel+"&currentModel="+data.currentModel+"&elementId="+data.elementId
+				}).done(function(respone){
 					if(respone.code==0){
 						that.$el.html(that.template({data:respone.data}));
 
 					}else{
-						alert('获取数据失败')
-					}
+						alert('获取数据失败');
+						App.Index.alertWindow.close();
 
+					}
 				});
+
+
 			}else{
 				this.$el.html(this.template({data:[]}));
-				console.log('gg')
 			}
 			return this;
 		},
