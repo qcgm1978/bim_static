@@ -127,13 +127,79 @@
       group:'1'
     },
     {
-      id:'home',
-      icon:'m-home',
-      title:'Home(I)',
-      fn:'home',
-      keyCode:'72',
-      type:'viewer',
-      group:'2'
+      id:'view',
+      icon:'m-view',
+      title:'标准视图',
+      fn:'more',
+      keyCode:'',
+      type:'more',
+      group:'0',
+      subBar:[{
+        id:'home',
+        icon:'m-home',
+        title:'Home',
+        fn:'home',
+        keyCode:'',
+        type:'view',
+        group:'4'
+      },{
+        id:'southEast',
+        icon:'i-southEast',
+        title:'西南方向',
+        fn:'southEast',
+        type:'view',
+        group:'4'
+      },{
+        id:'top',
+        icon:'i-top',
+        title:'上方',
+        fn:'top',
+        type:'view',
+        group:'4'
+      },{
+        id:'bottom',
+        icon:'i-bottom',
+        title:'下方',
+        fn:'bottom',
+        type:'view',
+        group:'4'
+      },{
+        id:'left',
+        icon:'i-left',
+        title:'左方',
+        fn:'left',
+        type:'view',
+        group:'4'
+      },{
+        id:'right',
+        icon:'i-right',
+        title:'右方',
+        fn:'right',
+        type:'view',
+        group:'4'
+      },{
+        id:'front',
+        icon:'i-front',
+        title:'前方',
+        fn:'front',
+        type:'view',
+        group:'4'
+      },{
+        id:'behind',
+        icon:'i-behind',
+        title:'后方',
+        fn:'behind',
+        type:'view',
+        group:'4'
+      }]
+    },{
+      id:'zoom',
+      icon:'m-zoom',
+      title:'缩放(Z)',
+      fn:'zoom',
+      keyCode:'122',
+      type:'pattern',
+      group:'3'
     },{
       id:'fit',
       icon:'m-fit',
@@ -144,13 +210,38 @@
       group:'2'
     },
     {
-      id:'fly',
-      icon:'m-fly',
-      title:'漫游(Space)',
-      fn:'fly',
-      keyCode:'32',
-      type:'pattern',
-      group:'3'
+      id:'rotate',
+      icon:'m-rotate',
+      title:'动态观察',
+      fn:'more',
+      keyCode:'',
+      type:'more',
+      group:'0',
+      subBar:[{
+        id:'rotateMouse',
+        icon:'m-rotateMouse',
+        title:'',
+        fn:'rotateMouse',
+        keyCode:'',
+        type:'pattern',
+        group:'3'
+      },{
+        id:'rotateCamera',
+        icon:'m-rotateCamera',
+        title:'',
+        fn:'rotateCamera',
+        keyCode:'',
+        type:'pattern',
+        group:'3'
+      },{
+        id:'rotateObj',
+        icon:'m-rotateObj',
+        title:'',
+        fn:'rotateObj',
+        keyCode:'',
+        type:'pattern',
+        group:'3'
+      }]
     },
     {
       id:'more',
@@ -182,6 +273,15 @@
         id:'translucent',
         icon:'m-translucent',
         title:'半透明',
+        fn:'translucent',
+        keyCode:'',
+        type:'status',
+        group:'0'
+      },
+      {
+        id:'hideObj',
+        icon:'m-hideObj',
+        title:'隐藏构件',
         fn:'translucent',
         keyCode:'',
         type:'status',
