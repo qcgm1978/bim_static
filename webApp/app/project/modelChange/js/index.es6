@@ -282,15 +282,15 @@ App.Project.Model = {
 			var data = model.toJSON();
 			var comparisonId = App.Index.Settings.referenceId;
 			var isload = false;
-			//debugger
 			$.each(data.data, function(i, item) {
 				$.each(item.comparisons, function(j, file) {
-					if (file.currentVersion == comparisonId) {
+					if (file.comparisonId == comparisonId) {
 						isload = true;
 						$(".rightPropertyContent .listDetail").html(new App.Project.Model.getInfo().render().el);
 						App.Index.getDetail(comparisonId);
 						App.Index.Settings.changeModel = file.comparisonId;
 						App.Index.renderModel(file.currentModel);
+						data.selected = [i,j]
 					}
 				});
 			});
