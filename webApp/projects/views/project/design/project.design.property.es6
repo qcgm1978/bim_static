@@ -31,34 +31,33 @@ App.Project.ProjectDesignPropety = Backbone.View.extend({
 
 
 
-		if (App.AuthObj.project && App.AuthObj.project.design) {
+		//if (App.AuthObj.project && App.AuthObj.project.design) {
 
 			var Auth = App.AuthObj.project.design,
 				$projectNav = this.$(".projectPropetyHeader"),
 				CostTpl = App.Comm.AuthConfig.Project.DesignTab,
 				$container = this.$(".projectNavContentBox");
 
-
 			//属性
-			if (Auth.prop) {
-				$projectNav.append(CostTpl.prop);
+			//if (Auth.prop) {
+			//	$projectNav.append(CostTpl.prop);
 				$container.append(new App.Project.DesignProperties().render().el);
-			}
+			//}
 
 			//碰撞
-			if (Auth.collision) {
-				$projectNav.append(CostTpl.collision);
+			//if (Auth.collision) {
+			//	$projectNav.append(CostTpl.collision);
 				$container.append(new App.Project.DesignCollision().render().el);
-			}
+			//}
 
 			//检查
-			if (Auth.check) {
-				$projectNav.append(CostTpl.check);
+			//if (Auth.check) {
+			//	$projectNav.append(CostTpl.check);
 				$container.append(new App.Project.DesignVerification().render({
 					verOpts: this.VerificationOptions
 				}).el);
-			} 
-		}
+			//}
+		//}
 
 
 

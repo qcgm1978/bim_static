@@ -24,28 +24,28 @@ App.Project.ProjectCostProperty = Backbone.View.extend({
 
 
 			//清单
-			if (AuthCost.list) {
-				$projectCostNav.append(CostTpl.list);
+			//if (AuthCost.list) {
+			//	$projectCostNav.append(CostTpl.list);
 				$planContainer.append(new App.Project.CostReference().render().el);
-			}
+			//}
 
 			//变更
-			if (AuthCost.change) {
-				$projectCostNav.append(CostTpl.change);
+			//if (AuthCost.change) {
+			//	$projectCostNav.append(CostTpl.change);
 				$planContainer.append(new App.Project.CostVerification().render().el);
-			}
+			//}
 
 			//校验
-			if (AuthCost.proof) {
-				$projectCostNav.append(CostTpl.proof);
+			//if (AuthCost.proof) {
+			//	$projectCostNav.append(CostTpl.proof);
 				$planContainer.append(new App.Project.CostChange().render().el);
-			}
+			//}
 
 			//属性
-			if (AuthCost.prop) {
-				$projectCostNav.append(CostTpl.prop);
+			//if (AuthCost.prop) {
+			//	$projectCostNav.append(CostTpl.prop);
 				$planContainer.append(new App.Project.CostProperties().render().el);
-			}
+			//}
 
 		}
 

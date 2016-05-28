@@ -245,24 +245,24 @@ App.Project = {
 				$projectTab = $(".projectContainerApp .projectHeader .projectTab");
 
 			//设计
-			if (projectAuth.design) {
+			//if (projectAuth.design) {
 				$projectTab.append(ProjectTab.DesignTab.tab);
-			}
+			//}
 
 			//计划
-			if (projectAuth.plan) {
+			//if (projectAuth.plan) {
 				$projectTab.append(ProjectTab.PlanTab.tab);
-			}
+			//}
 
 			//成本
-			if (projectAuth.cost) {
+			//if (projectAuth.cost) {
 				$projectTab.append(ProjectTab.CostTab.tab);
-			}
+			//}
 
 			//质量
-			if (projectAuth.quality) {
+			//if (projectAuth.quality) {
 				$projectTab.append(ProjectTab.QualityTab.tab);
-			}
+			//}
 
 			$projectTab.find(".item:last").addClass('last');
 
