@@ -35,9 +35,6 @@
 			}
 		}
 
-		//显示
-		bimView.sidebar.comment(true);
-
 		$("#comment .navBar .item.project").click();
 
 	}
@@ -303,7 +300,8 @@
 				className: "item",
 
 				events: {
-					"click .remarkCount": "viewComments"
+					"click .remarkCount": "viewComments",
+					"click": "showComment"
 				},
 
 				//初始化
@@ -324,6 +322,13 @@
 
 					return this;
 
+				},
+
+				//显示批注
+				showComment(event) {
+					var $item = $(event.target).closest(".item"),
+						viewPint = $item.find(".thumbnailImg").data("viewpoint");
+					App.Project.Settings.Viewer.setCamera(viewPint);
 				},
 
 				//更新后操作
@@ -373,7 +378,7 @@
 					}, 500);
 					$comment.find(".commentRemark").show().animate({
 						left: "0px"
-					}, 500); 
+					}, 500);
 
 					$el.addClass('current');
 					//获取数据
@@ -381,9 +386,13 @@
 					CommentCollections.ViewComments.projectId = App.Project.Settings.projectId;
 					CommentCollections.ViewComments.viewPointId = id;
 					viewPointId = id;
-					CommentCollections.ViewComments.fetch({success(model,data){
-						$(".commentRemark .reMarkCount .count").text(data.data.length);
-					}});
+					CommentCollections.ViewComments.fetch({
+						success(model, data) {
+							$(".commentRemark .reMarkCount .count").text(data.data.length);
+						}
+					});
+
+					event.stopPropagation();
 
 				},
 
@@ -749,8 +758,8 @@
 							this.$(".uploadImgs").empty();
 							this.$(".txtReMark").val('');
 							//评论的数量
-							var $count=$(".commentRemark .reMarkCount .count");
-							$count.text(+$count.text()+1);
+							var $count = $(".commentRemark .reMarkCount .count");
+							$count.text(+$count.text() + 1);
 						}
 
 					});
@@ -805,8 +814,8 @@
 				//删除后
 				remove() {
 
-					var $count=$(".commentRemark .reMarkCount .count");
-					$count.text(+$count.text()-1);
+					var $count = $(".commentRemark .reMarkCount .count");
+					$count.text(+$count.text() - 1);
 
 					this.$el.slideUp(function() {
 
