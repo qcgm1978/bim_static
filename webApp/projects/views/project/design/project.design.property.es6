@@ -152,6 +152,9 @@ App.Project.ProjectDesignPropety = Backbone.View.extend({
 		}, function(res) {
 			if (res.code == 0) {
 				var _data=res.data;
+
+
+
 				if (_data) {
 					var pars = {
 							URLtype: "getBoundingBox",
@@ -166,6 +169,22 @@ App.Project.ProjectDesignPropety = Backbone.View.extend({
 					//构建id
 					$target.data("elem", _data.componentId);
 					$target.data("userId", location.userId);
+
+					/**读取boundingbox**/
+					var box = [],
+								min = location.bBox.min,
+								minArr = [min.x, min.y, min.z],
+								max = location.bBox.max,
+								maxArr = [max.x, max.y, max.z];
+
+							box.push(minArr);
+							box.push(maxArr);
+							//box id
+							$target.data("box", box);
+							App.Project.zommBox($target);
+						//	_this.showMarks([_data.location]);
+					return
+
 					App.Comm.ajax(pars, function(data) {
 						if (data.code == 0 && data.data) {
 							var box = [],

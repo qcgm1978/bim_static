@@ -50,7 +50,6 @@ App.Project.DesignCollisionDetail=Backbone.View.extend({
       $.each(this.list,function(index,item){
         if(item.name == name){
           var box = self.getBox([item.leftElementBoxMin,item.leftElementBoxMax],[item.rightElementBoxMin,item.rightElementBoxMax]);
-          debugger
           App.Project.Settings.Viewer.collision(item.leftId,item.rightId);
           App.Project.Settings.Viewer.translucent(true);
           App.Project.Settings.Viewer.zoomToBox(box);
