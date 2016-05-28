@@ -119,9 +119,9 @@
         });
       }
     },
-    comment:function(isSelected){
+    comment:function(isSelected,viewer){
       var self = this;
-      isSelected ? self.el._dom.sidebar.addClass('open') : self.el._dom.sidebar.removeClass('open');
+      isSelected ? self.el._dom.sidebar.addClass('open') && viewer.commentInit() : self.el._dom.sidebar.removeClass('open');
       self.el._dom.sidebar.find('#comment').show().siblings().hide();
     },
     selected:function(isSelected){

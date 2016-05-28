@@ -16,6 +16,21 @@ CLOUD.Extensions.Utils.Geometric = {
     getAngleBetweenPoints: function (p1, p2) {
 
         return Math.atan2(p2.y - p1.y, p2.x - p1.x);
+    },
+    // 判断是否同一个点
+    isEqualBetweenPoints: function (p1, p2, epsilon) {
+
+        epsilon = epsilon || 0.0001;
+
+        var dx = p1.x - p2.x;
+        var dy = p1.y - p2.y;
+        var dist = Math.sqrt(dx * dx + dy * dy);
+
+        if (dist > epsilon) {
+            return false;
+        }
+
+        return true;
     }
 };
 
@@ -2002,6 +2017,8 @@ CLOUD.MarkerEditor.prototype.init = function() {
 
 CLOUD.MarkerEditor.prototype.uninit = function() {
 
+    this.clear();
+
     //if (!this.svg) return;
     //
     //var svg = this.svg;
@@ -2216,9 +2233,17 @@ CLOUD.MarkerEditor.prototype.loadMarkers = function(markerInfoList) {
         var markerId = info.id;
         var marker = new CLOUD.Marker(markerId, this);
 
+        var box = new THREE.Box3();
+        box.max.x = info.bBox.max.x;
+        box.max.y = info.bBox.max.y;
+        box.max.z = info.bBox.max.z;
+        box.min.x = info.bBox.min.x;
+        box.min.y = info.bBox.min.y;
+        box.min.z = info.bBox.min.z;
+
         marker.createSVGShape(shapeData, svgContainer);
         marker.setWorldPosition(info.position);
-        marker.setWorldBoundingBox(info.bBox);
+        marker.setWorldBoundingBox(box);
         marker.setUserId(info.userId);
         marker.setState(info.state);
 
@@ -2277,7 +2302,7 @@ CLOUD.MarkerEditor.prototype.worldToClient = function(point) {
     var result = new THREE.Vector3();
     var sceneMatrix = this.getSceneMatrix();
 
-    var worldPoint = point.clone();
+    var worldPoint = new THREE.Vector3(point.x, point.y, point.z);
     worldPoint.applyMatrix4(sceneMatrix);
 
     result.set(worldPoint.x, worldPoint.y, worldPoint.z);
@@ -2432,12 +2457,21 @@ CLOUD.Extensions.Comment = function (editor, id) {
 CLOUD.Extensions.Comment.prototype = {
     constructor: CLOUD.Extensions.Comment,
 
+    addDomEventListener: function () {
+    },
+
+    removeDomEventListener: function () {
+    },
+
     created: function () {
     },
+
     destroy: function () {
         this.deselect();
+        this.removeDomEventListener();
         this.setParent(null);
     },
+
     onMouseDown: function (event) {
 
         //event.preventDefault();
@@ -2449,16 +2483,15 @@ CLOUD.Extensions.Comment.prototype = {
 
         this.select();
 
-        //this.editor.dragCommentBegin();
-
         if (this.editor.commentFrame) {
             this.editor.commentFrame.dragBegin(event);
         }
-
     },
+
     disableInteractions : function (disable) {
         this.isDisableInteractions = disable;
     },
+
     set: function (position, width, height) {
         this.rotation = 0;
         this.position.x = position.x;
@@ -2468,15 +2501,18 @@ CLOUD.Extensions.Comment.prototype = {
 
         this.updateStyle();
     },
+
     setRotation: function (angle) {
         this.rotation = angle;
         this.updateStyle();
     },
+
     setPosition: function (x, y) {
         this.position.x = x;
         this.position.y = y;
         this.updateStyle();
     },
+
     setSize: function (width, height, position) {
         this.size.x = width;
         this.size.y = height;
@@ -2484,20 +2520,28 @@ CLOUD.Extensions.Comment.prototype = {
         this.position.y = position.y;
         this.updateStyle();
     },
+
     setParent: function (parent) {
+
         var shapeEl = this.shape;
+
         if (shapeEl.parentNode) {
             shapeEl.parentNode.removeChild(shapeEl);
         }
+
         if (parent) {
             parent.appendChild(shapeEl);
         }
     },
+
     updateTransformMatrix: function () {
     },
+
     updateStyle: function () {
     },
+
     select: function () {
+
         if (this.selected) {
             return;
         }
@@ -2508,23 +2552,30 @@ CLOUD.Extensions.Comment.prototype = {
 
         this.editor.selectComment(this);
     },
+
     deselect: function () {
         this.selected = false;
     },
+
     dragBegin: function () {
     },
+
     dragEnd: function () {
         //this.editor.dragCommentEnd();
     },
+
     edit: function () {
-        this.editor.editComment();
+        this.editor.editComment(this);
     },
+
     cancel: function () {
-        this.editor.deselectComment();
+        this.editor.deselectComment(this);
     },
+
     delete: function () {
-        this.editor.deleteComment();
+        this.editor.deleteComment(this);
     },
+
     highlight: function (isHighlight) {
 
         if (this.isDisableInteractions) {
@@ -2534,6 +2585,7 @@ CLOUD.Extensions.Comment.prototype = {
         this.highlighted = isHighlight;
         this.updateStyle();
     },
+
     createStyle: function () {
         var style = {};
 
@@ -2604,7 +2656,13 @@ CLOUD.Extensions.CommentArrow.prototype.addDomEventListener = function () {
     this.shape.addEventListener("mousedown", this.onMouseDown.bind(this), true);
     this.shape.addEventListener("mouseout", this.onMouseOut.bind(this));
     this.shape.addEventListener("mouseover",this.onMouseOver.bind(this));
+};
 
+CLOUD.Extensions.CommentArrow.prototype.removeDomEventListener = function () {
+
+    this.shape.removeEventListener("mousedown", this.onMouseDown.bind(this), true);
+    this.shape.removeEventListener("mouseout", this.onMouseOut.bind(this));
+    this.shape.removeEventListener("mouseover",this.onMouseOver.bind(this));
 };
 
 CLOUD.Extensions.CommentArrow.prototype.onMouseOut = function() {
@@ -2627,10 +2685,12 @@ CLOUD.Extensions.CommentArrow.prototype.set = function (sx, sy, ex, ey) {
 
     this.size.x = v0.distanceTo(v1);
     this.rotation = Math.acos(vDir.dot(new THREE.Vector2(1, 0)));
-    this.rotation = ey > sy ? (Math.PI * 2) - this.rotation : this.rotation;
+    //this.rotation = ey > sy ? (Math.PI * 2) - this.rotation : this.rotation;
 
-    this.head.set(sx, sy, 0);
-    this.tail.set(ex, ey, 0);
+    this.rotation = ey < sy ? (Math.PI * 2) - this.rotation : this.rotation;
+
+    this.tail.set(sx, sy, 0);
+    this.head.set(ex, ey, 0);
 
     this.updateStyle();
 };
@@ -2643,11 +2703,11 @@ CLOUD.Extensions.CommentArrow.prototype.setSize = function (width, height, posit
     endDir.multiplyScalar(width * 0.5);
 
     var vCenter = new THREE.Vector2(position.x, position.y);
-    var v0 = vCenter.clone().add(endDir);
-    var v1 = vCenter.clone().sub(endDir);
+    var v0 = vCenter.clone().sub(endDir);
+    var v1 = vCenter.clone().add(endDir);
 
-    this.head.set(v1.x, v1.y, 0);
     this.tail.set(v0.x, v0.y, 0);
+    this.head.set(v1.x, v1.y, 0);
     this.position.x = position.x;
     this.position.y = position.y;
     this.size.x = width;
@@ -2680,13 +2740,13 @@ CLOUD.Extensions.CommentArrow.prototype.updateTransformMatrix = function () {
     var head = this.head;
     var tail = this.tail;
     var midX = this.size.x * 0.5;
-    var midY = this.style['stroke-width'];
+    var midY = this.size.y;
     var posX = (head.x + tail.x) * 0.5;
     var posY = (head.y + tail.y) * 0.5;
 
     this.transformShape = [
         'translate(', posX, ',', posY, ') ',
-        'rotate(', THREE.Math.radToDeg(-this.rotation), ') ',
+        'rotate(', THREE.Math.radToDeg(this.rotation), ') ',
         'translate(', -midX, ',', -midY, ') '
     ].join('');
 
@@ -2759,7 +2819,13 @@ CLOUD.Extensions.CommentRectangle.prototype.addDomEventListener = function () {
     this.shape.addEventListener("mousedown", this.onMouseDown.bind(this), true);
     this.shape.addEventListener("mouseout", this.onMouseOut.bind(this));
     this.shape.addEventListener("mouseover",this.onMouseOver.bind(this));
+};
 
+CLOUD.Extensions.CommentRectangle.prototype.removeDomEventListener = function () {
+
+    this.shape.removeEventListener("mousedown", this.onMouseDown.bind(this), true);
+    this.shape.removeEventListener("mouseout", this.onMouseOut.bind(this));
+    this.shape.removeEventListener("mouseover",this.onMouseOver.bind(this));
 };
 
 CLOUD.Extensions.CommentRectangle.prototype.onMouseOut = function() {
@@ -2783,7 +2849,7 @@ CLOUD.Extensions.CommentRectangle.prototype.updateTransformMatrix = function () 
 
     this.transformShape = [
         'translate(', this.position.x, ',', this.position.y, ') ',
-        'rotate(', THREE.Math.radToDeg(-this.rotation), ') ',
+        'rotate(', THREE.Math.radToDeg(this.rotation), ') ',
         'translate(', -originX, ',', -originY, ') '
     ].join('');
 };
@@ -2829,6 +2895,14 @@ CLOUD.Extensions.CommentCircle.prototype.addDomEventListener = function () {
 
 };
 
+CLOUD.Extensions.CommentCircle.prototype.removeDomEventListener = function () {
+
+    this.shape.removeEventListener("mousedown", this.onMouseDown.bind(this), true);
+    this.shape.removeEventListener("mouseout", this.onMouseOut.bind(this));
+    this.shape.removeEventListener("mouseover",this.onMouseOver.bind(this));
+
+};
+
 CLOUD.Extensions.CommentCircle.prototype.onMouseOut = function() {
     this.highlight(false);
 };
@@ -2844,13 +2918,12 @@ CLOUD.Extensions.CommentCircle.prototype.createShape = function() {
 CLOUD.Extensions.CommentCircle.prototype.updateTransformMatrix = function () {
 
     var strokeWidth = this.style['stroke-width'];
-
     var originX = Math.max(this.size.x - strokeWidth, 0) * 0.5;
     var originY = Math.max(this.size.y - strokeWidth, 0) * 0.5;
 
     this.transformShape = [
         'translate(', this.position.x, ',', this.position.y, ') ',
-        'rotate(', THREE.Math.radToDeg(-this.rotation), ') ',
+        'rotate(', THREE.Math.radToDeg(this.rotation), ') ',
         'translate(', -originX, ',', -originY, ') '
     ].join('');
 };
@@ -2886,8 +2959,10 @@ CLOUD.Extensions.CommentCloud = function (editor, id) {
     this.shapeType = CLOUD.Extensions.Comment.shapeTypes.CLOUD;
 
     this.shapePath = [];
+    this.shapePoints = [];
 
     this.lastShapePoint = {x:0, y:0};
+    this.originShapePoint = {x:0, y:0};
 
     this.createShape();
     this.addDomEventListener();
@@ -2901,6 +2976,13 @@ CLOUD.Extensions.CommentCloud.prototype.addDomEventListener = function () {
     this.shape.addEventListener("mousedown", this.onMouseDown.bind(this), true);
     this.shape.addEventListener("mouseout", this.onMouseOut.bind(this));
     this.shape.addEventListener("mouseover",this.onMouseOver.bind(this));
+};
+
+CLOUD.Extensions.CommentCloud.prototype.removeDomEventListener = function () {
+
+    this.shape.removeEventListener("mousedown", this.onMouseDown.bind(this), true);
+    this.shape.removeEventListener("mouseout", this.onMouseOut.bind(this));
+    this.shape.removeEventListener("mouseover",this.onMouseOver.bind(this));
 };
 
 CLOUD.Extensions.CommentCloud.prototype.onMouseOut = function() {
@@ -2968,23 +3050,75 @@ CLOUD.Extensions.CommentCloud.prototype.getPathString = function() {
     return this.shapePath.join(' ');
 };
 
-CLOUD.Extensions.CommentCloud.prototype.addToPath = function(point) {
+CLOUD.Extensions.CommentCloud.prototype.addToPath = function(point, isEnd) {
+
+    // 计算控制点
+    var calculateControlPoint = function(startPoint, endPoint) {
+
+        var start = new THREE.Vector2(startPoint.x, startPoint.y);
+        var end = new THREE.Vector2(endPoint.x, endPoint.y);
+        var direction = end.clone().sub(start);
+        var halfLen = 0.5 * direction.length();
+        var centerX = 0.5 * (start.x + end.x);
+        var centerY = 0.5 * (start.y + end.y);
+        var center = new THREE.Vector2(centerX, centerY);
+
+        direction.normalize();
+        direction.rotateAround(new THREE.Vector2(0,0), -0.5 * Math.PI);
+        direction.multiplyScalar(halfLen);
+        center.add(direction);
+
+        return {
+            x: center.x,
+            y: center.y
+        };
+    };
 
     if (this.shapePath.length === 0) {
+
         this.shapePath.push('M');
         this.shapePath.push(point.x);
         this.shapePath.push(point.y);
+
+        this.originShapePoint.x = point.x;
+        this.originShapePoint.y = point.y;
+
     } else {
 
-        // 计算控制点
-        var controlPoint = this.calculateControlPoint(this.lastShapePoint, point);
+        var controlPoint;
+        var epsilon = 0.5;
 
-        this.shapePath.push('Q');
-        this.shapePath.push(controlPoint.x);
-        this.shapePath.push(controlPoint.y);
-        this.shapePath.push(',');
-        this.shapePath.push(point.x);
-        this.shapePath.push(point.y);
+        if (isEnd) {
+
+            if (!CLOUD.Extensions.Utils.Geometric.isEqualBetweenPoints(this.lastShapePoint, this.originShapePoint, epsilon)) {
+
+                // 计算控制点
+                controlPoint = calculateControlPoint(this.lastShapePoint, this.originShapePoint);
+
+                this.shapePath.push('Q');
+                this.shapePath.push(controlPoint.x);
+                this.shapePath.push(controlPoint.y);
+                this.shapePath.push(',');
+                this.shapePath.push(this.originShapePoint.x);
+                this.shapePath.push(this.originShapePoint.y);
+                this.shapePath.push('Z');
+            }
+
+        } else {
+
+            // 判断是否同一个点
+            if (!CLOUD.Extensions.Utils.Geometric.isEqualBetweenPoints(this.lastShapePoint, point, epsilon)) {
+                // 计算控制点
+                controlPoint = calculateControlPoint(this.lastShapePoint, point);
+
+                this.shapePath.push('Q');
+                this.shapePath.push(controlPoint.x);
+                this.shapePath.push(controlPoint.y);
+                this.shapePath.push(',');
+                this.shapePath.push(point.x);
+                this.shapePath.push(point.y);
+            }
+        }
     }
 
     this.lastShapePoint.x = point.x;
@@ -2992,29 +3126,6 @@ CLOUD.Extensions.CommentCloud.prototype.addToPath = function(point) {
 
     this.updateStyle();
 };
-
-// 计算控制点
-CLOUD.Extensions.CommentCloud.prototype.calculateControlPoint = function(startPoint, endPoint) {
-
-    var start = new THREE.Vector2(startPoint.x, startPoint.y);
-    var end = new THREE.Vector2(endPoint.x, endPoint.y);
-    var direction = end.clone().sub(start);
-    var halfLen = 0.5 * direction.length();
-    var centerX = 0.5 * (start.x + end.x);
-    var centerY = 0.5 * (start.y + end.y);
-    var center = new THREE.Vector2(centerX, centerY);
-
-    direction.normalize();
-    direction.rotateAround(new THREE.Vector2(0,0), -0.5 * Math.PI);
-    direction.multiplyScalar(halfLen);
-    center.add(direction);
-
-    return {
-        x: center.x,
-        y: center.y
-    };
-};
-
 
 
 CLOUD.Extensions.CommentCross = function (editor, id) {
@@ -3037,6 +3148,13 @@ CLOUD.Extensions.CommentCross.prototype.addDomEventListener = function () {
     this.shape.addEventListener("mouseover",this.onMouseOver.bind(this));
 };
 
+CLOUD.Extensions.CommentCross.prototype.removeDomEventListener = function () {
+
+    this.shape.removeEventListener("mousedown", this.onMouseDown.bind(this), true);
+    this.shape.removeEventListener("mouseout", this.onMouseOut.bind(this));
+    this.shape.removeEventListener("mouseover",this.onMouseOver.bind(this));
+};
+
 CLOUD.Extensions.CommentCross.prototype.onMouseOut = function() {
     this.highlight(false);
 };
@@ -3052,13 +3170,12 @@ CLOUD.Extensions.CommentCross.prototype.createShape = function() {
 CLOUD.Extensions.CommentCross.prototype.updateTransformMatrix = function () {
 
     var strokeWidth = this.style['stroke-width'];
-
     var originX = Math.max(this.size.x - strokeWidth, 0) * 0.5;
     var originY = Math.max(this.size.y - strokeWidth, 0) * 0.5;
 
     this.transformShape = [
         'translate(', this.position.x, ',', this.position.y, ') ',
-        'rotate(', THREE.Math.radToDeg(-this.rotation), ') ',
+        'rotate(', THREE.Math.radToDeg(this.rotation), ') ',
         'translate(', -originX, ',', -originY, ') '
     ].join('');
 };
@@ -3143,9 +3260,17 @@ CLOUD.Extensions.CommentText.prototype.constructor = CLOUD.Extensions.CommentTex
 CLOUD.Extensions.CommentText.prototype.addDomEventListener = function () {
 
     this.shape.addEventListener("mousedown", this.onMouseDown.bind(this), true);
-    this.shape.addEventListener("mouseout", this.onMouseOut.bind(this));
-    this.shape.addEventListener("mouseover", this.onMouseOver.bind(this));
-    this.textArea.addEventListener('keydown', this.onKeyDown.bind(this));
+    this.shape.addEventListener("mouseout", this.onMouseOut.bind(this), false);
+    this.shape.addEventListener("mouseover", this.onMouseOver.bind(this), false);
+    this.textArea.addEventListener('keydown', this.onKeyDown.bind(this), false);
+};
+
+CLOUD.Extensions.CommentText.prototype.removeDomEventListener = function () {
+
+    this.shape.removeEventListener("mousedown", this.onMouseDown.bind(this), true);
+    this.shape.removeEventListener("mouseout", this.onMouseOut.bind(this), false);
+    this.shape.removeEventListener("mouseover", this.onMouseOver.bind(this), false);
+    this.textArea.removeEventListener('keydown', this.onKeyDown.bind(this), false);
 };
 
 CLOUD.Extensions.CommentText.prototype.onMouseOut = function () {
@@ -3440,6 +3565,7 @@ CLOUD.Extensions.CommentText.prototype.splitWord = function (word, remaining, ma
 
     var lenSoFar = 1;
     var fits = true;
+
     while (fits) {
 
         var part = word.substr(0, lenSoFar);
@@ -3449,13 +3575,11 @@ CLOUD.Extensions.CommentText.prototype.splitWord = function (word, remaining, ma
         if (lineLen > maxLength) {
 
             if (lenSoFar === 1) {
-                // we can't split 1 character any longer.
                 output.push(part);
                 this.splitWord(word.substr(1), remaining, maxLength, output);
                 return;
             }
 
-            // It was fine until one less char //
             var okayWord = word.substr(0, lenSoFar - 1);
             output.push(okayWord);
             var extraWord = word.substr(lenSoFar - 1);
@@ -3463,12 +3587,9 @@ CLOUD.Extensions.CommentText.prototype.splitWord = function (word, remaining, ma
             return;
         }
 
-        // Try one more character
         lenSoFar++;
 
-        // Check if we are done with all characters
         if (lenSoFar > word.length) {
-            // Okay it fits
             output.push(word);
             return;
         }
@@ -3492,10 +3613,8 @@ CLOUD.Extensions.CommentText.prototype.splitLine = function (text, maxLength, ou
             this.splitLine(CLOUD.DomUtil.trimLeft(remaining), maxLength, output);
             done = true;
         } else {
-            // Need to try with a shorter word!
             var parts = this.getShorterLine(text);
             if (parts.length === 1) {
-                // text is only one word that is way too long.
                 this.splitWord(text, remaining, maxLength, output);
                 done = true;
             } else {
@@ -3616,13 +3735,15 @@ CLOUD.Extensions.CommentFrame.prototype.onMouseUp = function (event) {
 CLOUD.Extensions.CommentFrame.prototype.onDoubleClick = function(event) {
 
     this.selection.dragging = false;
-    //this.editor.onDoubleClick(this.comment);
+    this.editor.onMouseDoubleClick(event);
 };
 
 CLOUD.Extensions.CommentFrame.prototype.onMouseDownToReposition = function (event) {
 
     //event.preventDefault();
     //event.stopPropagation();
+
+    if (!this.comment) return;
 
     if (this.isDragPoint(event.target) || this.isRotatePoint(event.target)) return;
 
@@ -3639,13 +3760,15 @@ CLOUD.Extensions.CommentFrame.prototype.onMouseDownToReposition = function (even
     this.onMouseMove = this.onMouseMoveToReposition.bind(this);
     this.onMouseUp = this.onMouseUpToReposition.bind(this);
 
-    this.editor.editFrameBegin();
+    this.editor.dragCommentFrameBegin();
 };
 
 CLOUD.Extensions.CommentFrame.prototype.onMouseMoveToReposition = function (event) {
 
     //event.preventDefault();
     //event.stopPropagation();
+
+    if (!this.comment) return;
 
     if (!this.selection.dragging) return;
 
@@ -3666,17 +3789,18 @@ CLOUD.Extensions.CommentFrame.prototype.onMouseMoveToReposition = function (even
 
 CLOUD.Extensions.CommentFrame.prototype.onMouseUpToReposition = function () {
 
-    this.last = null;
 
     if (!this.selection.dragging) {
         return;
     }
 
     this.selection.dragging = false;
-    this.editor.editFrameEnd();
+    this.editor.dragCommentFrameEnd();
 };
 
 CLOUD.Extensions.CommentFrame.prototype.onMouseDownToResize = function (event) {
+
+    if (!this.comment) return;
 
     var target = event.target;
 
@@ -3703,7 +3827,7 @@ CLOUD.Extensions.CommentFrame.prototype.onMouseDownToResize = function (event) {
         this.onMouseMove = this.onMouseMoveToResize.bind(this);
         this.onMouseUp = this.onMouseUpToResize.bind(this);
 
-        this.editor.editFrameBegin();
+        this.editor.dragCommentFrameBegin();
     }
 };
 
@@ -3711,6 +3835,8 @@ CLOUD.Extensions.CommentFrame.prototype.onMouseMoveToResize = function (event) {
 
     //event.preventDefault();
     //event.stopPropagation();
+
+    if (!this.comment) return;
 
     if (!this.selection.resizing) return;
 
@@ -3790,13 +3916,15 @@ CLOUD.Extensions.CommentFrame.prototype.onMouseUpToResize = function (event) {
     this.selection.resizing = false;
     this.selection.handle.resizingPanel = null;
     this.container.style.cursor = '';
-    this.editor.editFrameEnd();
+    this.editor.dragCommentFrameEnd();
 };
 
 CLOUD.Extensions.CommentFrame.prototype.onMouseDownToRotation = function (event) {
 
     //event.preventDefault();
     //event.stopPropagation();
+
+    if (!this.comment) return;
 
     if (!this.isRotatePoint(event.target)) return;
 
@@ -3808,7 +3936,7 @@ CLOUD.Extensions.CommentFrame.prototype.onMouseDownToRotation = function (event)
     this.onMouseMove = this.onRotationMouseMove.bind(this);
     this.onMouseUp = this.onMouseUpToRotation.bind(this);
 
-    this.editor.editFrameBegin();
+    this.editor.dragCommentFrameBegin();
 };
 
 CLOUD.Extensions.CommentFrame.prototype.onRotationMouseMove = function (event) {
@@ -3816,14 +3944,16 @@ CLOUD.Extensions.CommentFrame.prototype.onRotationMouseMove = function (event) {
     //event.preventDefault();
     //event.stopPropagation();
 
+    if (!this.comment) return;
+
     if (!this.selection.rotating) return;
 
-    var cursor = this.editor.getPointOnDomContainer(event.clientX, event.clientY);
+    var mouse = this.editor.getPointOnDomContainer(event.clientX, event.clientY);
     var position = this.comment.position;
 
-    var r = CLOUD.Extensions.Utils.Geometric.getAngleBetweenPoints(position, cursor);
-    var r2 = CLOUD.Extensions.Utils.Geometric.getAngleBetweenPoints(position, this.originPosition);
-    var rotation = r - r2 + this.originRotation;
+    var angle1 = CLOUD.Extensions.Utils.Geometric.getAngleBetweenPoints(position, mouse);
+    var angle2 = CLOUD.Extensions.Utils.Geometric.getAngleBetweenPoints(position, this.originPosition);
+    var rotation = angle1 - angle2 + this.originRotation;
 
     this.updatePosition(this.selection.x, this.selection.y, rotation);
 
@@ -3835,7 +3965,7 @@ CLOUD.Extensions.CommentFrame.prototype.onMouseUpToRotation = function (event) {
     this.selection.rotating = false;
     this.originRotation = null;
     this.originPosition = null;
-    this.editor.editFrameEnd();
+    this.editor.dragCommentFrameEnd();
 };
 
 CLOUD.Extensions.CommentFrame.prototype.createFramePanel = function(){
@@ -4163,6 +4293,7 @@ CLOUD.Extensions.CommentEditor.prototype.registerDomEventListeners = function ()
     if (this.svg) {
         this.svg.addEventListener( 'mousedown', this.onMouseDown.bind(this), false );
         this.svg.addEventListener( 'mousewheel', this.onMouseWheel.bind(this), false );
+        this.svg.addEventListener( 'dblclick',  this.onMouseDoubleClick.bind(this), false);
 
         // 注册在document上会影响dbgUI的resize事件
         window.addEventListener('mousemove', this.onMouseMove.bind(this), false);
@@ -4175,7 +4306,7 @@ CLOUD.Extensions.CommentEditor.prototype.registerDomEventListeners = function ()
         this.svg.addEventListener( 'keydown', this.onKeyDown.bind(this), false );
         this.svg.addEventListener( 'keyup', this.onKeyUp.bind(this), false );
 
-        this.svg.focus();
+        this.onFocus();
     }
 
 };
@@ -4185,6 +4316,7 @@ CLOUD.Extensions.CommentEditor.prototype.unregisterDomEventListeners = function 
     if (this.svg) {
         this.svg.removeEventListener( 'mousedown', this.onMouseDown.bind(this), false );
         this.svg.removeEventListener( 'mousewheel', this.onMouseWheel.bind(this), false );
+        this.svg.removeEventListener( 'dblclick',  this.onMouseDoubleClick.bind(this), false);
 
         // 注册在document上会影响dbgUI的resize事件
         window.removeEventListener('mousemove', this.onMouseMove.bind(this), false);
@@ -4200,16 +4332,23 @@ CLOUD.Extensions.CommentEditor.prototype.unregisterDomEventListeners = function 
 
 };
 
+CLOUD.Extensions.CommentEditor.prototype.onFocus = function() {
+
+    if (this.svg) {
+        this.svg.focus();
+    }
+};
+
 CLOUD.Extensions.CommentEditor.prototype.onMouseDown = function(event) {
 
     event.preventDefault();
     event.stopPropagation();
 
-    this.handleMouseEvent(event, "down");
-
     if (!this.isCreating && event.target === this.svg) {
         this.selectComment(null);
     }
+
+    this.handleMouseEvent(event, "down");
 };
 
 CLOUD.Extensions.CommentEditor.prototype.onMouseMove = function(event) {
@@ -4219,6 +4358,10 @@ CLOUD.Extensions.CommentEditor.prototype.onMouseMove = function(event) {
 
     if (this.commentFrame.isActive()) {
         this.commentFrame.onMouseMove(event);
+
+        this.commentFrame.setComment(this.selectedComment);
+
+        //this.cameraChange();
 
         return;
     }
@@ -4241,8 +4384,6 @@ CLOUD.Extensions.CommentEditor.prototype.onMouseUp = function(event) {
 
     if (this.selectedComment && this.isCreating) {
         this.handleMouseEvent(event, "up");
-
-        this.deselectComment();
     }
 };
 
@@ -4253,6 +4394,18 @@ CLOUD.Extensions.CommentEditor.prototype.onMouseWheel = function (event) {
 
 CLOUD.Extensions.CommentEditor.prototype.onMouseDoubleClick = function(event) {
 
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (this.isCreating && this.selectedComment &&
+        this.selectedComment.shapeType === CLOUD.Extensions.Comment.shapeTypes.CLOUD) {
+
+        // 结束云图绘制，并封闭云图
+
+        this.endCommentCloud(event);
+        this.createCommentEnd();
+        this.deselectComment();
+    }
 };
 
 CLOUD.Extensions.CommentEditor.prototype.onKeyDown = function(event) {
@@ -4264,8 +4417,10 @@ CLOUD.Extensions.CommentEditor.prototype.onKeyUp = function(event) {
     switch (event.keyCode) {
         case this.keys.DELETE:
             if (this.selectedComment) {
-                this.deleteComment(this.selectedComment);
+                //this.deleteComment(this.selectedComment);
+                this.selectedComment.delete();
                 this.selectedComment = null;
+                this.deselectComment();
             }
             break;
         case this.keys.ESC: // 结束云图绘制
@@ -4273,6 +4428,7 @@ CLOUD.Extensions.CommentEditor.prototype.onKeyUp = function(event) {
             if (this.commentType === CLOUD.Extensions.Comment.shapeTypes.CLOUD) {
 
                 this.createCommentEnd();
+                this.deselectComment();
             }
 
             break;
@@ -4326,6 +4482,7 @@ CLOUD.Extensions.CommentEditor.prototype.handleMouseEvent = function(event , typ
                 this.moveCommentRectangle(event);
             } else if (type === "up") {
                 this.createCommentEnd();
+                this.deselectComment();
             }
             break;
         case CLOUD.Extensions.Comment.shapeTypes.CIRCLE:
@@ -4339,6 +4496,7 @@ CLOUD.Extensions.CommentEditor.prototype.handleMouseEvent = function(event , typ
             }else if (type === "up") {
                 //this.created()
                 this.createCommentEnd();
+                this.deselectComment();
             }
             break;
         case CLOUD.Extensions.Comment.shapeTypes.CROSS:
@@ -4350,6 +4508,7 @@ CLOUD.Extensions.CommentEditor.prototype.handleMouseEvent = function(event , typ
                 this.moveCommentCross(event);
             }else if (type === "up") {
                 this.createCommentEnd();
+                this.deselectComment();
             }
             break;
         case CLOUD.Extensions.Comment.shapeTypes.CLOUD:
@@ -4357,8 +4516,11 @@ CLOUD.Extensions.CommentEditor.prototype.handleMouseEvent = function(event , typ
                 if (this.selectedComment && this.isCreating) {
                     this.moveCommentCloud(event);
                 }  else {
-                    this.createCommentCloud(event);
-                    this.createCommentBegin();
+                    if (!this.isCreating) {
+                        this.createCommentCloud(event);
+                        this.createCommentBegin();
+                    }
+
                 }
             }
             break;
@@ -4380,6 +4542,7 @@ CLOUD.Extensions.CommentEditor.prototype.handleMouseEvent = function(event , typ
                 this.moveCommentArrow(event);
             }else if (type === "up") {
                 this.createCommentEnd();
+                this.deselectComment();
             }
             break;
     }
@@ -4444,16 +4607,6 @@ CLOUD.Extensions.CommentEditor.prototype.onExistEditor = function () {
     this.uninit();
 };
 
-CLOUD.Extensions.CommentEditor.prototype.update = function() {
-
-    //for (var i = 0, len = this.comments.length; i < len; i++) {
-    //    var comment = this.comments[i];
-    //    var pos = this.worldToClient(comment.worldPosition);
-    //    comment.setClientPostion(pos);
-    //    comment.updateStyle();
-    //}
-};
-
 CLOUD.Extensions.CommentEditor.prototype.editBegin = function() {
 
     if (this.isEditing) {
@@ -4479,13 +4632,12 @@ CLOUD.Extensions.CommentEditor.prototype.editEnd = function() {
 
     this.isEditing = false;
 
-    if (this.svgGroup.parentNode) {
+    if (this.svgGroup && this.svgGroup.parentNode) {
+        //this.svg.removeChild(this.svgGroup);
         this.svgGroup.parentNode.removeChild(this.svgGroup);
     }
 
-    //this.svg.removeChild(this.svgGroup);
-
-    this.commentFrame.setComment(null);
+    this.deselectComment();
 };
 
 CLOUD.Extensions.CommentEditor.prototype.createCommentBegin = function() {
@@ -4504,6 +4656,26 @@ CLOUD.Extensions.CommentEditor.prototype.createCommentEnd = function() {
         this.isCreating = false;
         this.disableCommentInteractions(false);
     }
+};
+
+CLOUD.Extensions.CommentEditor.prototype.dragCommentFrameBegin = function() {
+
+    this.disableCommentInteractions(true)
+};
+
+CLOUD.Extensions.CommentEditor.prototype.dragCommentFrameEnd = function() {
+
+    this.disableCommentInteractions(false)
+};
+
+CLOUD.Extensions.CommentEditor.prototype.update = function() {
+
+    //for (var i = 0, len = this.comments.length; i < len; i++) {
+    //    var comment = this.comments[i];
+    //    var pos = this.worldToClient(comment.worldPosition);
+    //    comment.setClientPostion(pos);
+    //    comment.updateStyle();
+    //}
 };
 
 CLOUD.Extensions.CommentEditor.prototype.clear = function() {
@@ -4528,7 +4700,13 @@ CLOUD.Extensions.CommentEditor.prototype.setCommentType = function(type) {
 
     this.commentType = type;
 
-    this.created();
+    // 强行完成
+    //this.created();
+
+    this.createCommentEnd();
+    this.deselectComment();
+
+    this.onFocus();
 };
 
 CLOUD.Extensions.CommentEditor.prototype.getComment = function (id) {
@@ -4566,24 +4744,42 @@ CLOUD.Extensions.CommentEditor.prototype.removeComment = function(comment) {
     }
 };
 
-CLOUD.Extensions.CommentEditor.prototype.selectComment = function (comment) {
+CLOUD.Extensions.CommentEditor.prototype.setCommentSelection = function (comment) {
 
-    //if (comment) {
-    //    if (this.commentType === comment.shapeType) {
-    //        if (this.selectedComment !== comment){
-    //
-    //        }
-    //    } else {
-    //
-    //    }
-    //
-    //} else {
-    //    this.selectedComment = null;
-    //}
+    if (this.selectedComment !== comment) {
+
+        this.deselectComment();
+    }
 
     this.selectedComment = comment;
 
-    this.cameraChange();
+    // 放在最前面
+
+    if (!this.isCreating) {
+        this.commentFrame.setComment(comment);
+    }
+};
+
+CLOUD.Extensions.CommentEditor.prototype.selectComment = function (comment) {
+
+    if (comment) {
+
+       if (this.commentType === comment.shapeType ) {
+
+           this.setCommentSelection(comment)
+
+       } else {
+
+           var shapeType = comment.shapeType;
+
+           this.setCommentSelection(null);
+           this.setCommentType(shapeType);
+           this.setCommentSelection(comment);
+       }
+
+    } else {
+        this.setCommentSelection(null);
+    }
 };
 
 CLOUD.Extensions.CommentEditor.prototype.deselectComment = function () {
@@ -4623,30 +4819,35 @@ CLOUD.Extensions.CommentEditor.prototype.loadComments = function(commentInfoList
         var text = info.text;
         var arrowHead = info.arrowHead;
         var arrowTail = info.arrowTail;
+        var rotation = info.rotation;
 
         switch (shapeType) {
 
             case CLOUD.Extensions.Comment.shapeTypes.ARROW:
                 var arrow = new CLOUD.Extensions.CommentArrow(this, id);
                 arrow.set(arrowHead.x, arrowHead.y, arrowTail.x, arrowTail.y);
+                arrow.setRotation(rotation);
                 this.addComment(arrow);
                 arrow.created();
                 break;
             case  CLOUD.Extensions.Comment.shapeTypes.RECTANGLE:
                 var rectangle = new CLOUD.Extensions.CommentRectangle(this, id);
                 rectangle.set(position, size.x, size.y);
+                rectangle.setRotation(rotation);
                 this.addComment(rectangle);
                 rectangle.created();
                 break;
             case  CLOUD.Extensions.Comment.shapeTypes.CIRCLE:
                 var circle = new CLOUD.Extensions.CommentCircle(this, id);
                 circle.set(position, size.x, size.y);
+                circle.setRotation(rotation);
                 this.addComment(circle);
                 circle.created();
                 break;
             case  CLOUD.Extensions.Comment.shapeTypes.CROSS:
                 var cross = new CLOUD.Extensions.CommentCross(this, id);
                 cross.set(position, size.x, size.y);
+                cross.setRotation(rotation);
                 this.addComment(cross);
                 cross.created();
                 break;
@@ -4654,6 +4855,7 @@ CLOUD.Extensions.CommentEditor.prototype.loadComments = function(commentInfoList
                 var cloud = new CLOUD.Extensions.CommentCloud(this, id);
                 cloud.setPath(shapePathStr);
                 cloud.set(position, size.x, size.y);
+                cloud.setRotation(rotation);
                 this.addComment(cloud);
                 cloud.created();
                 break;
@@ -4698,6 +4900,7 @@ CLOUD.Extensions.CommentEditor.prototype.getCommentInfoList = function() {
         var info = {
             id: comment.id,
             shapeType : comment.shapeType,
+            rotation: comment.rotation,
             position: comment.position,
             size: comment.size,
             shapePath: path,
@@ -5092,6 +5295,18 @@ CLOUD.Extensions.CommentEditor.prototype.moveCommentCloud = function(event) {
 
 };
 
+CLOUD.Extensions.CommentEditor.prototype.endCommentCloud = function(event) {
+
+    if (!this.selectedComment || !this.isCreating) {
+        return;
+    }
+
+    var cloud = this.selectedComment;
+    var position = this.getPointOnDomContainer(event.clientX, event.clientY);
+    cloud.addToPath(position, true);
+
+};
+
 CLOUD.Extensions.CommentEditor.prototype.createCommentText = function(event) {
 
     if (this.selectedComment && this.selectedComment.isActive) {
@@ -5103,14 +5318,14 @@ CLOUD.Extensions.CommentEditor.prototype.createCommentText = function(event) {
 
     var start = this.getPointOnDomContainer(event.clientX, event.clientY);
     var clientFontSize = 20;
-    var initialWidth = clientFontSize * 15;
-    var initialHeight = clientFontSize * 3;
+    var initWidth = clientFontSize * 15;
+    var initHeight = clientFontSize * 3;
 
-    var size = new THREE.Vector2(initialWidth, initialHeight);
+    var size = new THREE.Vector2(initWidth, initHeight);
 
     var position = new THREE.Vector2(
-        start.x + (initialWidth * 0.5),
-        start.y + (initialHeight * 0.5));
+        start.x + (initWidth * 0.5),
+        start.y + (initHeight * 0.5));
 
     var id = this.generateCommentId();
     var text = new CLOUD.Extensions.CommentText(this, id);
@@ -5142,7 +5357,10 @@ CLOUD.Extensions.CommentEditor.prototype.handleTextChange = function(dataBag) {
     text.set(position, size.x, size.y);
     text.setText(dataBag.newText);
 
-    this.created();
+    //this.created();
+
+    this.createCommentEnd();
+    this.deselectComment();
 };
 
 CLOUD.Extensions.CommentEditor.prototype.created= function() {
@@ -5164,15 +5382,7 @@ CLOUD.Extensions.CommentEditor.prototype.disableCommentInteractions = function(d
     });
 };
 
-CLOUD.Extensions.CommentEditor.prototype.editFrameBegin = function() {
 
-    this.disableCommentInteractions(true)
-};
-
-CLOUD.Extensions.CommentEditor.prototype.editFrameEnd = function() {
-
-    this.disableCommentInteractions(false)
-};
 
 CLOUD.Extensions.CommentEditor.prototype.cameraChange = function () {
 
@@ -5180,27 +5390,8 @@ CLOUD.Extensions.CommentEditor.prototype.cameraChange = function () {
     //
     //this.svg.setAttribute('viewBox', viewBox);
 
-    var comment = this.selectedComment;
-    this.commentFrame.setComment(comment);
-};
-
-CLOUD.Extensions.CommentEditor.prototype.dragCommentBegin= function() {
-
     if (this.selectedComment) {
-        this.isDragging = true;
-    }
-
-    //if (this.commentFrame) {
-    //    this.commentFrame.dragBegin(event);
-    //}
-};
-
-CLOUD.Extensions.CommentEditor.prototype.dragCommentEnd= function() {
-
-    this.isDragging = false;
-
-    if (this.selectedComment && this.isDragging) {
-        //this.selectedComment.dragEnd();
+        this.commentFrame.setComment(this.selectedComment);
     }
 };
 

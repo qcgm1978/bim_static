@@ -258,7 +258,11 @@ App.API = {
 		userPhoto:"sixD/{projectId}/viewPoint?type=0",//用户快照
 		viewComments:"sixD/{projectId}/viewPoint/{viewPointId}/comment",//查看发表评论
 		delViewPoint:"sixD/{projectId}/viewPoint/{viewPointId}",//删除视点
-		
+		createComment:"sixD/{projectId}/viewPoint/{viewPointId}/comment",// 创建评论
+		delComment:"sixD/{projectId}/viewPoint/{viewPointId}/comment/{commentId}",//删除评论
+		getFilter:"sixD/{projectId}/viewPoint/{viewPointId}/filter",//获取过滤器
+		getAnnotation:"sixD/{projectId}/viewPoint/{viewPointId}/annotation", //获取批注
+
 		test: ""
 	},
 
