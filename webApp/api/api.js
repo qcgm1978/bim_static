@@ -259,7 +259,8 @@ App.API = {
 		viewComments:"sixD/{projectId}/viewPoint/{viewPointId}/comment",//查看发表评论
 		delViewPoint:"sixD/{projectId}/viewPoint/{viewPointId}",//删除视点
 		createComment:"sixD/{projectId}/viewPoint/{viewPointId}/comment",// 创建评论
-		
+		delComment:"sixD/{projectId}/viewPoint/{viewPointId}/comment/{commentId}",//删除评论
+
 		test: ""
 	},
 

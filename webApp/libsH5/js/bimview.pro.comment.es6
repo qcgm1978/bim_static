@@ -96,6 +96,9 @@
 			ViewComments: new(Backbone.Collection.extend({
 
 				model: Backbone.Model.extend({
+
+					urlType: "delComment",
+
 					defaults: {
 						title: ""
 					}
@@ -364,19 +367,23 @@
 					var $el = $(event.target).closest(".remarkCount"),
 						id = $el.data("id");
 
+
 					$comment.find(".commentList").animate({
 						left: "314px"
 					}, 500);
 					$comment.find(".commentRemark").show().animate({
 						left: "0px"
-					}, 500);
+					}, 500); 
 
+					$el.addClass('current');
 					//获取数据
 					CommentCollections.ViewComments.reset();
 					CommentCollections.ViewComments.projectId = App.Project.Settings.projectId;
 					CommentCollections.ViewComments.viewPointId = id;
 					viewPointId = id;
-					CommentCollections.ViewComments.fetch();
+					CommentCollections.ViewComments.fetch({success(model,data){
+						$(".commentRemark .reMarkCount .count").text(data.data.length);
+					}});
 
 				},
 
@@ -661,6 +668,8 @@
 				//返回列表
 				goList() {
 
+					$(".remarkCount.current").removeClass("current").find(".count").text($(".commentRemark .reMarkCount .count").text());
+
 					$comment.find(".commentList").animate({
 						left: "0px"
 					}, 500);
@@ -735,14 +744,16 @@
 						if (data.code == 0) {
 
 							CommentCollections.ViewComments.push(data.data);
+							//清空数据
 							$btnEnter.val("评论").data("isSubmit", false);
 							this.$(".uploadImgs").empty();
 							this.$(".txtReMark").val('');
+							//评论的数量
+							var $count=$(".commentRemark .reMarkCount .count");
+							$count.text(+$count.text()+1);
 						}
 
 					});
-
-
 				}
 
 			}),
@@ -754,8 +765,12 @@
 
 				className: "item",
 
-				events:{
-					"click .delTalk":"delTalk"
+				events: {
+					"click .delTalk": "delTalk"
+				},
+
+				initialize() {
+					this.listenTo(this.model, "destroy", this.remove);
 				},
 
 				template: _.templateUrl("/libsH5/tpls/comment/bimview.remark.list.detail.html"),
@@ -771,12 +786,40 @@
 				},
 
 				//删除评论
-				delTalk(){
+				delTalk(event) {
 
-					if(!confirm('确认删除该评论么？')){
+					if (!confirm('确认删除该评论么？')) {
 						return;
 					}
-					console.log(1);
+
+					var $el = $(event.target),
+						id = $el.data("id");
+
+					this.model.projectId = App.Project.Settings.projectId;
+					this.model.viewPointId = viewPointId;
+					this.model.commentId = id;
+					this.model.destroy();
+
+				},
+
+				//删除后
+				remove() {
+
+					var $count=$(".commentRemark .reMarkCount .count");
+					$count.text(+$count.text()-1);
+
+					this.$el.slideUp(function() {
+
+						var $this = $(this),
+							$parent = $this.parent();
+
+						$this.remove();
+
+						if ($parent.find("li").length <= 0) {
+							$parent.html('<li class="loading">无数据</li>');
+						}
+
+					});
 				}
 
 			})

@@ -17,6 +17,8 @@
 </div>
 <%}%>
 
+<% if(creatorId==App.Global.User.userId){%>
 <div class="delTalkBox">
-	<i class="delTalk">删除</i>
+	<i class="delTalk" data-id="<%=id%>"  data-viewpointid="<%=viewpointId%>">删除</i>
 </div>
+<%}%>
