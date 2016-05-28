@@ -26,6 +26,10 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
 
         this.toggleClass();
         this. getRules(planId);
+
+        //保存计划规则
+        App.ResourceArtifacts.Status.presentPlan = null;
+        App.ResourceArtifacts.Status.presentPlan = this.model;
     },
 //切换计划
     toggleClass:function(){

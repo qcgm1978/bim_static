@@ -9,6 +9,7 @@ App.Index = {
 		projectId: "",
 		projectVersionId: "",
 		ModelObj: "",
+		currentModelId:"",
 		Viewer: null
 	},
 
@@ -19,10 +20,11 @@ App.Index = {
 
 		//切换属性tab
 		$projectContainer.on("click", ".projectPropetyHeader .item", function() {
+
 			App.Index.Settings.property = $(this).data("type");
 			//属性
 			if (App.Index.Settings.property == "attr") {
-				that.renderAttr(App.Index.Settings.ModelObj);
+				that.renderAttr();
 			}
 
 			var index = $(this).index();
@@ -126,10 +128,15 @@ App.Index = {
 			_this.renderAttr(modelId);
 
 		});
+
+		this.Settings.currentModelId=modelId;
 	},
 
 	//渲染属性
-	renderAttr(sceneId) {
+	renderAttr(modelId) {
+
+		modelId = modelId || this.Settings.currentModelId;
+		 
 		if (!App.Index.Settings.ModelObj || !App.Index.Settings.ModelObj.intersect) {
 			$("#projectContainer .designProperties").html(' <div class="nullTip">请选择构件</div>');
 			return;
@@ -140,7 +147,7 @@ App.Index = {
 			url: url,
 			data: {
 				elementId: App.Index.Settings.ModelObj.intersect.userId,
-				sceneId: sceneId
+				sceneId: modelId
 			}
 		}).done(function(data) {
 			var template = _.templateUrl("/projects/tpls/project/design/project.design.property.properties.html");
@@ -275,15 +282,15 @@ App.Project.Model = {
 			var data = model.toJSON();
 			var comparisonId = App.Index.Settings.referenceId;
 			var isload = false;
-			//debugger
 			$.each(data.data, function(i, item) {
 				$.each(item.comparisons, function(j, file) {
-					if (file.currentVersion == comparisonId) {
+					if (file.comparisonId == comparisonId) {
 						isload = true;
 						$(".rightPropertyContent .listDetail").html(new App.Project.Model.getInfo().render().el);
 						App.Index.getDetail(comparisonId);
 						App.Index.Settings.changeModel = file.comparisonId;
 						App.Index.renderModel(file.currentModel);
+						data.selected = [i,j]
 					}
 				});
 			});

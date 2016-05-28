@@ -96,6 +96,9 @@
           case "viewer":
             self[fn]();
             break;
+          case "view":
+            self[fn]();
+            break;
           case "pattern":
             $this.toggleClass('selected');
             if($this.closest('.toolsBar').length>0){
@@ -104,10 +107,17 @@
               $this.siblings().removeClass('selected');
             }
             if(isSelected){
-              self.picker();
+              self.rotateMouse();
             }else{
               self[fn]();
             }
+            break;
+          case "rotate":
+            var className = $this.attr('class'),
+                $parent = $this.parent().parent();
+            $parent.attr('class',className);
+            $this.closest('.toolsBar').find('[data-group='+group+']').not($this).removeClass('selected');
+            self[fn]();
             break;
           case "status":
             $this.toggleClass('selected');
@@ -119,30 +129,19 @@
             break;
           case "filter":
             $this.toggleClass('selected').siblings('[data-group='+group+']').removeClass('selected');
-            bimView.sidebar[fn](!isSelected);
+            bimView.sidebar[fn](!isSelected,self);
             break;
           case "more":
-            $this.toggleClass('selected');
+            $this.toggleClass('selected').siblings('[data-group='+group+']').removeClass('selected');
             bimView.sidebar[fn](self);
-            if($this.is('.selected')){
-              setTimeout(function(){
-                $(document).one('click',function(){
-                  $('.m-more').removeClass('selected');
-                });
-              },10)
-            }
             break;
           case "change":
             $this.toggleClass('m-miniScreen m-fullScreen')
             $(bimView.sidebar.el._dom.sidebar).toggleClass("hideMap");
             break;
           case "comment":
-            if(fn == "exit"){
-              self.commentEnd();
-            }else{
-              $this.toggleClass('selected').siblings().removeClass('selected');
-              self.setCommentType(fn);
-            }
+            $this.addClass('selected').siblings().removeClass('selected');
+            self.setCommentType(fn);
             break;
           case "color":
             var bar = bimView.model.colorBar;
@@ -281,6 +280,12 @@
       $(window).on('resize',function(){
         self.resize();
       });
+      $(document).on('click',function(event){
+        var $this = $(event.target);
+        if(!$this.is('.bar-item[data-type=more]')){
+          $('.bar-item[data-type=more]').removeClass('selected');
+        }
+      });
       self.on('changeGrid',function(res){
         var floors = self.curFloor;
         var infoZ = 'Z('+ floors +','+res.axis.offsetZ+')'
@@ -317,18 +322,18 @@
       viewer.zoomToBBox(CLOUD.Utils.computeBBox(box));
       viewer.render();
     },
-    fly : function () {
+    rotateCamera : function () {
       // 漫游模式
       var self = this;
       self._dom.bimBox.find(".view").attr('class','view fly');
       self.pub('fly');
       self.viewer.setFlyMode();
     },
-    picker:function(){
+    rotateMouse:function(){
       // 普通模式
       var self = this;
       self._dom.bimBox.find(".view").attr('class','view');
-      self.pub('picker');
+      self.pub('rotateMouse');
       self.viewer.setPickMode();
     },
     home:function(){
@@ -336,6 +341,66 @@
       var self = this;
       self.pub('home');
       self.viewer.setStandardView(CLOUD.EnumStandardView.ISO);
+    },
+    front : function () {
+      var self = this,
+          viewer = self.viewer;
+      self.pub('front');
+      viewer.setStandardView(CLOUD.EnumStandardView.Front);
+    },
+    behind : function () {
+      var self = this,
+          viewer = self.viewer;
+      self.pub('behind');
+      viewer.setStandardView(CLOUD.EnumStandardView.Back);
+    },
+    left : function () {
+      var self = this,
+          viewer = self.viewer;
+      self.pub('left');
+      viewer.setStandardView(CLOUD.EnumStandardView.Left);
+    },
+    right : function () {
+      var self = this,
+          viewer = self.viewer;
+      self.pub('right');
+      viewer.setStandardView(CLOUD.EnumStandardView.Right);
+    },
+    top : function () {
+      var self = this,
+          viewer = self.viewer;
+      self.pub('top');
+      viewer.setStandardView(CLOUD.EnumStandardView.Top);
+    },
+    bottom : function () {
+      var self = this,
+          viewer = self.viewer;
+      self.pub('bottom');
+      viewer.setStandardView(CLOUD.EnumStandardView.Bottom);
+    },
+    southEast : function () {
+      var self = this,
+          viewer = self.viewer;
+      self.pub('southEast');
+      viewer.setStandardView(CLOUD.EnumStandardView.SouthEast);
+    },
+    southWest : function () {
+      var self = this,
+          viewer = self.viewer;
+      self.pub('southWest');
+      viewer.setStandardView(CLOUD.EnumStandardView.SouthWest);
+    },
+    northEast : function () {
+      var self = this,
+          viewer = self.viewer;
+      self.pub('northEast');
+      viewer.setStandardView(CLOUD.EnumStandardView.NorthEast);
+    },
+    northWest : function () {
+      var self = this,
+          viewer = self.viewer;
+      self.pub('northWest');
+      viewer.setStandardView(CLOUD.EnumStandardView.NorthWest);
     },
     // 模型检查点
     markers:function(){
@@ -408,7 +473,6 @@
       $.each(list,function(i,item){
         newList.push(window.btoa(JSON.stringify(item)));
       });
-      debugger
       var floors = bimView.comm.getFilters($("#floors"),'ckecked');
       var specialty = bimView.comm.getFilters($("#specialty"),'ckecked');
       var category = bimView.comm.getFilters($("#category"),'ckecked');
@@ -435,8 +499,8 @@
       });
       data.filter.floors.ids = data.filter.floors.ids.concat(data.filter.specialty.ids);
       self.filter(data.filter.floors);
-      self.filter(filter.category);
-      self.filter(filter.classCode);
+      self.filter(data.filter.category);
+      self.filter(data.filter.classCode);
       viewer.setCommentMode();
       viewer.loadComments(newList);
     },

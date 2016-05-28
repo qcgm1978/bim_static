@@ -1,27 +1,25 @@
 <div class="header">
-	<span class="reMarkCount"> <i class="bar-item m-camera iconTalk"></i>评论（<span class="count">0</span>）</span>
-	<span class="goList"><i class="bar-item m-camera iconTalk"></i><span>返回项目列表</span></span>
+    <span class="reMarkCount"> <i class=" m-comment iconTalk"></i>评论（<span class="count">0</span>）</span>
+    <span class="goList"><i class=" m-goBack iconTalk"></i><span>返回项目列表</span></span>
 </div>
-
 <div class="reMarkListBox">
-  <div class="reMarkListScroll">
-  		<ul class="reMarkList"></ul>
-  </div>	
-
+    <div class="reMarkListScroll">
+        <ul class="reMarkList"></ul>
+    </div>
 </div>
-
-
 <div class="talkReMark">
-	<div class="inputBox">
-		<textarea class="txtReMark" placeholder="请输入评论"></textarea>	
-		<div class="uploadImgs">
-			
-		</div>
-	</div>
-	
-	<div class="opReMark">
-		<input type="file" value="上传图片" class="uploadImg" />
-		<span class="btnUploadImg">上传图片</span>
-		<input type="button" class="btnEnter" value="评论"/>
-	</div>
+    <div class="inputBox">
+        <textarea class="txtReMark" placeholder="请输入评论"></textarea>
+        <div class="uploadImgs">
+        </div>
+    </div>
+    <div class="opReMark">
+       
+        <form id="viewPointUploadImageForm" name="viewPointUploadImageForm" method="post" target="upload-iframe" enctype="multipart/form-data" encoding="multipart/form-data">
+            <input type="file" name="uploadImg" value="上传图片" class="uploadImg" />
+            <span class="btnUploadImg">上传图片</span>
+        </form>
+        <input type="button" class="btnEnter" value="评论" />
+    </div>
 </div>
+ <iframe id="viewPintUploadIframe" name="upload-iframe" style="display: none;"></iframe>

@@ -20,6 +20,7 @@
 
 	var menu, shadow, trigger, content, hash, currentTarget;
 	var defaults = {
+		theme:"",
 		menuStyle: {
 			listStyle: 'none',
 			padding: '0px',
@@ -50,15 +51,18 @@
 	};
 
 	$.fn.contextMenu = function(id, options) {
-		 
+		  
 		if (!menu) { // Create singleton menu
 			menu = $('<div class="jqContextMenu"></div>')
 				.hide()
 				.appendTo('body')
 				.bind('click', function(e) {
 					e.stopPropagation();
-				});
+				});				
 				menu.html($("#"+id));
+				if (options.theme) {
+					menu.addClass(options.theme);
+				}
 		}
 		if (!shadow) {
 			shadow = $('<div></div>')

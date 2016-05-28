@@ -205,6 +205,8 @@ App.Services.memberDetail=Backbone.View.extend({
             },
             message:frame
         });
+        $(".mod-dialog").css({"min-height": "545px"});
+        $(".mod-dialog .wrapper .content").css({"min-height": "500px"});
         $(".seWinBody .aim ul").append(new App.Services.MemberWindowDetail({model:_this.model}).render().el);//当前用户
         $(".memRoleList").append(new App.Services.windowRoleList().render().el);//角色列表
     }

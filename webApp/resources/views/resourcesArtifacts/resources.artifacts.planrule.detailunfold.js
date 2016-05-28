@@ -10,12 +10,13 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
     events:{
         "click .tabRule":"tabRule",
         "click .addNewRule":"addNewRule",
-        "click .deleteRule":"deleteRule",
+        "click .RuleDelete":"RuleDelete",
         "click .save":"save",
         "click .choose":"choose",
         "click .myDropText":"seleRule",
         "click .myItem":"myItem"
     },
+
 
     render:function() {
         this.$el.html(this.template(this.model.toJSON()));
@@ -27,7 +28,8 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
     },
     //选择分类编码
     choose:function(){
-
+        var frame = "";
+        this.window(frame);
     },
     //选择规则，切换输入方式
     myItem:function(e){
@@ -49,29 +51,39 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
             ioside.addClass("active");
         }
     },
+
     //切换规则
     seleRule:function(e){
         $(".myDropList").hide();
         var _this = $(e.target);
-        if(_this.hasClass("myDropText")){
-            _this.siblings(".myDropList").show();
-        }
+        _this.siblings(".myDropList").show();
     },
     //增加新规则
     addNewRule:function(){
-
+        var _this = this;
+        var model = new App.ResourceArtifacts.newRule(App.ResourceArtifacts.newModel);
+        var newRule = new App.Resources.ArtifactsPlanRuleDetailNew({model:model}).render().el;
+        this.$(".conR dl").append(newRule);
+        //向collection添加
+        //向this.model 添加一条属性
     },
     //保存
     save:function(){
 
     },
-    //删除计划中的规则
-    deletePlanRule:function(){
-
-    },
-    //删除规则
-    deleteRule:function(){
-
+    //删除计划中的整条规则
+    RuleDelete:function(){
+        var frame = new App.Resources.ArtifactsPlanRuleAlert().render().el;
+            App.Resources.ArtifactsAlertWindow = new App.Comm.modules.Dialog({
+                title: "",
+                width: 280,
+                height: 180,
+                isConfirm: false,
+                isAlert: false,
+                message: frame
+            });
+            $(".mod-dialog .wrapper .header").hide();//隐藏头部
+            $(".alertInfo").html('确认删除 “'+ this.model.get("desc") + '”！');
     },
     //联想模块
     legend:function(){
@@ -81,9 +93,19 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
     check:function(){
 
     },
-    //提示窗
-    window:function(){
-
+    //初始化窗口
+    window:function(frame){
+        App.Resources.ArtifactsMaskWindow = new App.Comm.modules.Dialog({
+            title:"选择分类编码",
+            width:600,
+            height:500,
+            isConfirm:false,
+            isAlert:false,
+            closeCallback:function(){
+                App.Resources.ArtifactsMaskWindow.close();
+            },
+            message:frame
+        });
     },
     //选择分类编码
     chooseWindow:function(){

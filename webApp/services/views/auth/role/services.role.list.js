@@ -50,6 +50,8 @@ App.Services.roleList=Backbone.View.extend({
             closeCallback:function(){},
             message:frame
         });
+        $(".mod-dialog").css({"min-height": "545px"});
+        $(".mod-dialog .wrapper .content").css({"min-height": "500px"});
 
 
         //角色信息
