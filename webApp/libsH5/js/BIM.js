@@ -112,9 +112,9 @@
       id:'comment',
       icon:'m-camera',
       title:'快照',
-      fn:'commentInit',
+      fn:'comment',
       keyCode:'',
-      type:'viewer',
+      type:'filter',
       group:'1'
     },
     {
@@ -211,7 +211,7 @@
     },
     {
       id:'rotate',
-      icon:'m-rotate',
+      icon:'m-rotateMouse',
       title:'动态观察',
       fn:'more',
       keyCode:'',
@@ -223,7 +223,7 @@
         title:'',
         fn:'rotateMouse',
         keyCode:'',
-        type:'pattern',
+        type:'rotate',
         group:'3'
       },{
         id:'rotateCamera',
@@ -231,15 +231,15 @@
         title:'',
         fn:'rotateCamera',
         keyCode:'',
-        type:'pattern',
+        type:'rotate',
         group:'3'
       },{
         id:'rotateObj',
         icon:'m-rotateObj',
         title:'',
-        fn:'rotateObj',
+        fn:'rotateMouse',
         keyCode:'',
-        type:'pattern',
+        type:'rotate',
         group:'3'
       }]
     },
@@ -332,12 +332,6 @@
       icon:'m-text',
       title:'文本',
       fn:'6',
-      type:'comment'
-    },{
-      id:'close',
-      icon:'m-mark',
-      title:'关闭',
-      fn:'exit',
       type:'comment'
     }],
     colorBar:[{

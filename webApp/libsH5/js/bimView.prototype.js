@@ -107,10 +107,17 @@
               $this.siblings().removeClass('selected');
             }
             if(isSelected){
-              self.picker();
+              self.rotateMouse();
             }else{
               self[fn]();
             }
+            break;
+          case "rotate":
+            var className = $this.attr('class'),
+                $parent = $this.parent().parent();
+            $parent.attr('class',className);
+            $this.closest('.toolsBar').find('[data-group='+group+']').not($this).removeClass('selected');
+            self[fn]();
             break;
           case "status":
             $this.toggleClass('selected');
@@ -122,7 +129,7 @@
             break;
           case "filter":
             $this.toggleClass('selected').siblings('[data-group='+group+']').removeClass('selected');
-            bimView.sidebar[fn](!isSelected);
+            bimView.sidebar[fn](!isSelected,self);
             break;
           case "more":
             $this.toggleClass('selected').siblings('[data-group='+group+']').removeClass('selected');
@@ -133,12 +140,8 @@
             $(bimView.sidebar.el._dom.sidebar).toggleClass("hideMap");
             break;
           case "comment":
-            if(fn == "exit"){
-              self.commentEnd();
-            }else{
-              $this.toggleClass('selected').siblings().removeClass('selected');
-              self.setCommentType(fn);
-            }
+            $this.addClass('selected').siblings().removeClass('selected');
+            self.setCommentType(fn);
             break;
           case "color":
             var bar = bimView.model.colorBar;
@@ -319,18 +322,18 @@
       viewer.zoomToBBox(CLOUD.Utils.computeBBox(box));
       viewer.render();
     },
-    fly : function () {
+    rotateCamera : function () {
       // 漫游模式
       var self = this;
       self._dom.bimBox.find(".view").attr('class','view fly');
       self.pub('fly');
       self.viewer.setFlyMode();
     },
-    picker:function(){
+    rotateMouse:function(){
       // 普通模式
       var self = this;
       self._dom.bimBox.find(".view").attr('class','view');
-      self.pub('picker');
+      self.pub('rotateMouse');
       self.viewer.setPickMode();
     },
     home:function(){

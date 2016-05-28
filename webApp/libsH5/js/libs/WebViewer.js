@@ -1,6 +1,6 @@
 /**
-  * @require /libsH5/js/libs/three.js
- */
+* @require /libsH5/js/libs/three.min.js
+*/
 
 var CLOUD = CLOUD || {};
 CLOUD.Version = "20160426";
@@ -109,6 +109,7 @@ CLOUD.EVENTS = {
     ON_LOAD_START: 0,
     ON_LOAD_PROGRESS: 1,
     ON_LOAD_COMPLETE: 2,
+    ON_LOAD_EMPTYSCENE: 3,
 
     ON_LOAD_SUBSCENE: 10,
 
@@ -7550,37 +7551,87 @@ CLOUD.Scene.prototype.hitTestPosition = function (mouse, camera, callback) {
 
 CLOUD.Scene.prototype.pickByReck = function (frustum, callback) {
 
-    var scope = this;
-    scope.filter.setSelectedIds();
+    var sphere = new THREE.Sphere();
 
-    function frustumTest(node) {
+    var INTERSECTION_STATE = {
+        IS_Leave:0,
+        IS_Intersection:1,
+        IS_Contains : 2
+    };
 
-        //if (node.worldBoundingBox) {
+    function intersectSphere(frustum, object) {
 
-        //    if (scope.containsBoxInFrustum(frustum, node.worldBoundingBox)) {
-        //        //console.log("inbox " + node.name);
-        //    }
-        //    else if (frustum.intersectsBox(node.worldBoundingBox)) {
-        //        //console.log("intersect " + node.name);
-        //    }
-        //    else {
-        //        return;
-        //    }
+        var geometry = object.geometry;
+        if (geometry.boundingSphere === null) geometry.computeBoundingSphere();
+
+        sphere.copy(geometry.boundingSphere);
+        sphere.applyMatrix4(object.matrixWorld);
+
+        var planes = frustum.planes;
+        var center = sphere.center;
+        var negRadius = -sphere.radius;
+
+        var nCount = 0;
+        for (var i = 0; i < 6; i++) {
+
+            var distance = planes[i].distanceToPoint(center);
+
+            if (distance < negRadius) {
+
+                return INTERSECTION_STATE.IS_Leave;
+
+            }
+
+            ++nCount;
+        }
+
+        return nCount == 6 ? INTERSECTION_STATE.IS_Contains : INTERSECTION_STATE.IS_Intersection;
+    }
+
+    return function () {
+        var scope = this;
+        scope.filter.setSelectedIds();
 
 
-        //}
-        //else {
+
+        function frustumTest(node) {
+
+            if (node.worldBoundingBox) {
+
+                if (!frustum.intersectsBox(node.worldBoundingBox)) {
+                    return;
+                }
+
+            }
 
             if (node.geometry && frustum.intersectsObject(node)) {
-                //console.log(node.name);
-                scope.filter.addSelectedId(node.name);
+
+                var geometry = node.geometry;
+
+                if (geometry.boundingBox === null)
+                    geometry.computeBoundingBox();
+
+                var box = geometry.boundingBox.clone();
+                box.applyMatrix4(node.matrixWorld);
+
+                if (frustum.intersectsBox(box)) {
+                    scope.filter.addSelectedId(node.name);
+                }
             }
-        //}
 
-        var children = node.children;
-        if (!children)
-            return;
+            var children = node.children;
+            if (!children)
+                return;
 
+            for (var i = 0, l = children.length; i < l; i++) {
+                var child = children[i];
+                if (child.visible) {
+                    frustumTest(child);
+                }
+            }
+        }
+
+        var children = this.rootNode.children;
         for (var i = 0, l = children.length; i < l; i++) {
             var child = children[i];
             if (child.visible) {
@@ -7589,15 +7640,7 @@ CLOUD.Scene.prototype.pickByReck = function (frustum, callback) {
         }
     }
 
-    var children = this.rootNode.children;
-    for (var i = 0, l = children.length; i < l; i++) {
-        var child = children[i];
-        if (child.visible) {
-            frustumTest(child);
-        }
-    }
-
-};
+}();
 
 CLOUD.Scene.prototype.pick = function (mouse, camera, callback) {
     var raycaster = this.raycaster;
@@ -17082,6 +17125,11 @@ CLOUD.ModelManager.prototype.load = function (parameters) {
         scope.loading = true;
         var defaultSceneId = client.index.metadata.scenes[0];
 
+        if (defaultSceneId === undefined) {
+            scope.dispatchEvent({ type: CLOUD.EVENTS.ON_LOAD_EMPTYSCENE });
+            return;
+        }
+
         if (parameters.byBox) {
             scope.boxLoader.load(defaultSceneId, scope.scene, client, function (result) {
             });
@@ -17096,7 +17144,6 @@ CLOUD.ModelManager.prototype.load = function (parameters) {
         }
 
     });
-
 }
 
 /**

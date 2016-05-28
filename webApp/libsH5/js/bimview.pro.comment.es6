@@ -35,8 +35,6 @@
 			}
 		}
 
-		//显示
-		bimView.sidebar.comment(true);
 
 		$("#comment .navBar .item.project").click();
 
@@ -581,14 +579,14 @@
 				triggerUpload() {
 
 					var url = "sixD/" + App.Project.Settings.projectId + "/viewPoint/" + viewPointId + "/pic";
-					
+
 					$("#viewPointUploadImageForm").prop("action", url);
-					
+
 					return this.$(".uploadImg").click();
 				},
 
 				uploadImg() {
-					
+
 					$("#viewPointUploadImageForm").submit();
 				},
 
@@ -806,7 +804,7 @@
 							if (imgData.code == 0 && annotationData.code == 0 && filterData.code == 0) {
 
 								imgData.data.isAdd = true;
-								//项目 
+								//项目
 								if ($comment.find(".navBar .project").hasClass("selected")) {
 									CommentCollections.Project.push(imgData.data);
 								} else {
