@@ -212,6 +212,8 @@ App.Services.MemberList=Backbone.View.extend({
             },
             message:frame
         });
+        $(".mod-dialog").css({"min-height": "545px"});
+        $(".mod-dialog .wrapper .content").css({"min-height": "500px"});
 
         $(".memRoleList").append(new App.Services.windowRoleList().render().el);//角色列表框架
         $(".serviceBody .content").addClass("services_loading");//状态

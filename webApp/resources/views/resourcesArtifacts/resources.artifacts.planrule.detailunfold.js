@@ -10,7 +10,7 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
     events:{
         "click .tabRule":"tabRule",
         "click .addNewRule":"addNewRule",
-        "click .deleteRule":"deleteRule",
+        "click .RuleDelete":"RuleDelete",
         "click .save":"save",
         "click .choose":"choose",
         "click .myDropText":"seleRule",
@@ -28,7 +28,8 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
     },
     //选择分类编码
     choose:function(){
-        this.window();
+        var frame = "";
+        this.window(frame);
     },
     //选择规则，切换输入方式
     myItem:function(e){
@@ -70,12 +71,18 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
 
     },
     //删除计划中的整条规则
-    deletePlanRule:function(){
-
-    },
-    //删除单条规则
-    deleteRule:function(){
-
+    RuleDelete:function(){
+        var frame = new App.Resources.ArtifactsPlanRuleAlert().render().el;
+            App.Resources.ArtifactsAlertWindow = new App.Comm.modules.Dialog({
+                title: "",
+                width: 280,
+                height: 180,
+                isConfirm: false,
+                isAlert: false,
+                message: frame
+            });
+            $(".mod-dialog .wrapper .header").hide();//隐藏头部
+            $(".alertInfo").html('确认删除 “'+ this.model.get("desc") + '”！');
     },
     //联想模块
     legend:function(){
@@ -87,7 +94,6 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
     },
     //初始化窗口
     window:function(frame){
-        var _this =this;
         App.Resources.ArtifactsMaskWindow = new App.Comm.modules.Dialog({
             title:"选择分类编码",
             width:600,
@@ -99,7 +105,6 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
             },
             message:frame
         });
-        //$(".seWinBody .aim ul").append(new App.Services.MemberWindowDetail({model:_this.model}).render().el);//当前用户
     },
     //选择分类编码
     chooseWindow:function(){
