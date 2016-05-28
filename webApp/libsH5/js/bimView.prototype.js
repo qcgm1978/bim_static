@@ -94,7 +94,6 @@
             type = $this.data('type');
         switch(type){
           case "viewer":
-            debugger
             self[fn]();
             break;
           case "view":
@@ -471,7 +470,6 @@
       $.each(list,function(i,item){
         newList.push(window.btoa(JSON.stringify(item)));
       });
-      debugger
       var floors = bimView.comm.getFilters($("#floors"),'ckecked');
       var specialty = bimView.comm.getFilters($("#specialty"),'ckecked');
       var category = bimView.comm.getFilters($("#category"),'ckecked');
