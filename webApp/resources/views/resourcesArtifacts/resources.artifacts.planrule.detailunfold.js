@@ -28,7 +28,7 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
     },
     //选择分类编码
     choose:function(){
-
+        this.window();
     },
     //选择规则，切换输入方式
     myItem:function(e){
@@ -54,9 +54,7 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
     seleRule:function(e){
         $(".myDropList").hide();
         var _this = $(e.target);
-        if(_this.hasClass("myDropText")){
-            _this.siblings(".myDropList").show();
-        }
+        _this.siblings(".myDropList").show();
     },
     //增加新规则
     addNewRule:function(){
@@ -87,9 +85,21 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
     check:function(){
 
     },
-    //提示窗
-    window:function(){
-
+    //初始化窗口
+    window:function(frame){
+        var _this =this;
+        App.Resources.ArtifactsMaskWindow = new App.Comm.modules.Dialog({
+            title:"选择分类编码",
+            width:600,
+            height:500,
+            isConfirm:false,
+            isAlert:false,
+            closeCallback:function(){
+                App.Resources.ArtifactsMaskWindow.close();
+            },
+            message:frame
+        });
+        //$(".seWinBody .aim ul").append(new App.Services.MemberWindowDetail({model:_this.model}).render().el);//当前用户
     },
     //选择分类编码
     chooseWindow:function(){
