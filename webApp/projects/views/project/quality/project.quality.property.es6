@@ -39,42 +39,42 @@ App.Project.ProjectQualityProperty = Backbone.View.extend({
 				$container = this.$(".qualityContainer");
 
 			//材料设备
-			if (Auth.material) {
-				$projectNav.append(CostTpl.material);
+			//if (Auth.material) {
+			//	$projectNav.append(CostTpl.material);
 				$container.append(new App.Project.QualityMaterialEquipment().render({
 					MaterialEquipmentOptions: this.MaterialEquipmentOptions
 				}).el);
-			}
+			//}
 
 			//过程验收
-			if (Auth.processAcceptanc) {
-				$projectNav.append(CostTpl.processAcceptanc);
+			//if (Auth.processAcceptanc) {
+			//	$projectNav.append(CostTpl.processAcceptanc);
 				$container.append(new App.Project.QualityProcessAcceptance().render({
 					ProcessAcceptance: this.ProcessAcceptanceOptions
 				}).el);
-			}
+			//}
 
 			//开业验收
-			if (Auth.openAcceptance) {
-				$projectNav.append(CostTpl.openAcceptance);
+			//if (Auth.openAcceptance) {
+			//	$projectNav.append(CostTpl.openAcceptance);
 				$container.append(new App.Project.QualityOpeningAcceptance().render({
 					OpeningAcceptance: this.OpeningAcceptanceOptions
 				}).el);
-			}
+			//}
 
 			//隐患
-			if (Auth.latentDanger) {
-				$projectNav.append(CostTpl.latentDanger);
+			//if (Auth.latentDanger) {
+			//	$projectNav.append(CostTpl.latentDanger);
 				$container.append(new App.Project.QualityConcerns().render({
 					Concerns: this.ConcernsOptions
 				}).el);
-			}
+			//}
 
 			//属性
-			if (Auth.prop) {
-				$projectNav.append(CostTpl.prop);
+			//if (Auth.prop) {
+			//	$projectNav.append(CostTpl.prop);
 				$container.append(new App.Project.QualityProperties().render().el);
-			}
+			//}
 		}
 
 

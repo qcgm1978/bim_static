@@ -8,7 +8,7 @@ App.ResourcesNav.ArtifactsPlanRule = Backbone.View.extend({
     template: _.templateUrl("/resources/tpls/resourcesArtifacts/resources.artifacts.planrule.html"),
 
     events:{
-        "click .newRule":"newRule"
+        "click .newPlanRule":"newPlanRule"
     },
 
     render:function() {
@@ -24,11 +24,25 @@ App.ResourcesNav.ArtifactsPlanRule = Backbone.View.extend({
         var newList = new App.Resources.ArtifactsPlanRuleDetail({model: model});
         this.$("ul").append(newList.render().el);
     },
-
     //创建规则
-    newRule:function(){
-        //App.ResourceArtifacts.SavePlanRules  添加model
-        //添加
+    newPlanRule:function(){
+        var _this = this;
+        if(!App.ResourceArtifacts.Status.saved){
+            //提示有没有保存现在的，重要
+            return
+        }
+        if(!App.ResourceArtifacts.Status.presentPlan){
+            //没有选择任何计划
+            return
+        }
+
+        var model =  App.ResourceArtifacts.createPlanRules("1",App.ResourceArtifacts.Status.presentPlan.get("targetCode"),"新建映射规则","1");
+        App.ResourceArtifacts.PlanRules.push(model);
+        
+
+        //向结尾添加一项新的规则
+        //App.ResourceArtifacts.SavePlanRules  添加model  ，先有json模型
+        //向现在的collection    App.ResourceArtifacts.PlanRules  末尾添加model
     }
 
 });

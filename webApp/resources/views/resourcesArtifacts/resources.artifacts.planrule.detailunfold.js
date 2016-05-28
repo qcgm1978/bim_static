@@ -51,6 +51,7 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
             ioside.addClass("active");
         }
     },
+
     //«–ªªπÊ‘Ú
     seleRule:function(e){
         $(".myDropList").hide();
