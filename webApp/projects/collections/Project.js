@@ -727,7 +727,10 @@ App.Project = {
 		}
 		sb.Append(item.code);
 		sb.Append('</div></span>');
-		sb.Append(' <span class="modleVal overflowEllipsis" title="' + item.name + '"> ' + item.name + '</span> ');
+		sb.Append(' <span class="modleVal overflowEllipsis" title="' + item.name + '"> ' + item.name + '</span>');
+		if(item.totalQuantity){
+			sb.Append('<span class="modelCostVal  overflowEllipsis" title="'+item.totalQuantity+'&nbsp;'+item.unit+'">'+Number(item.totalQuantity).toFixed(4)+'&nbsp;'+item.unit+'</span>');
+		}
 
 		//递归
 		if (item.children && item.children.length > 0) {
@@ -994,6 +997,34 @@ App.Project = {
 
 		App.Project.Settings.Viewer.highlight(Ids);
 		App.Project.Settings.Viewer.zoomToBox(boxArr);
+	},
+
+	fileInfo(param,call){
+		var dataObj = {
+			URLtype: "fetchFileByModel",
+			data: {
+				projectId: App.Project.Settings.projectId,
+				versionId: App.Project.Settings.versionId,
+				modelId: App.Project.Settings.ModelObj.intersect.object.userData.sceneId
+			}
+		}
+		App.Comm.ajax(dataObj,function(data){
+			debugger
+			var _=param[0].items;
+			_.push({
+				name: "文件名",
+				value: data.data.name
+			})
+			_.push({
+				name: "专业",
+				value: data.data.specialty
+			})
+			_.push({
+				name: "楼层",
+				value: data.data.floor
+			})
+			call(param)
+		})
 	}
 
 
