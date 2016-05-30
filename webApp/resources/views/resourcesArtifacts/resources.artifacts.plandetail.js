@@ -30,8 +30,8 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
 
     //取得规则列表
     getPlanId:function(){
-        var  planId = this.model.get("planId");
-        if(!planId){
+        var  code = this.model.get("code");
+        if(!code){
             //判断是否为新建规则，新建规则如何处理？
             return;
         }
@@ -55,7 +55,7 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
         $(".artifactsContent .rules ul").empty();
 
         this.toggleClass();
-        this. getRules(planId);
+        this. getRules();
 
         //保存计划规则
         App.ResourceArtifacts.Status.presentPlan = null;
@@ -67,19 +67,18 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
         this.$el.addClass("active");
     },
 //获取计划节点相关规则
-    getRules:function(planId) {
-
+    getRules:function() {
+        var code = this.model.get("code");
         if(!App.ResourceArtifacts.Status.saved){
             //提示有没有保存现在的，重要
             return
         }
 
-
         var _this = this ;
         var pdata = {
             URLtype: "fetchArtifactsPlanRule",
             data:{
-                planId:planId
+                code:code
             }
         };
         App.Comm.ajax(pdata,function(response){
@@ -87,7 +86,7 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
                App.ResourceArtifacts.PlanRules.reset();
                if(response.data  &&  response.data.length){
                     $(".artifactsContent .rules h2 i").html( "("+response.data.length + ")");
-                    $(".artifactsContent .rules h2 .name").html(_this.model.get("planId") + "&nbsp;" +_this.model.get("desc"));
+                    $(".artifactsContent .rules h2 .name").html(_this.model.get("code") + "&nbsp;" +_this.model.get("name"));
                    App.ResourceArtifacts.PlanRules.add(response.data);
                }
            }

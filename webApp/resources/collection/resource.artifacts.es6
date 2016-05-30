@@ -8,7 +8,6 @@ App.ResourceArtifacts={
 
     Settings: {
         delayCount:  0 , //每层加载数量
-
         ruleModel: 3   //  权限入口      1 只有模块化，  2 只有质量标准  ， 3 有模块化和质量标准
     },
 
@@ -75,15 +74,15 @@ App.ResourceArtifacts={
         }
     }),
 
-    //创建一条规则
+    //创建计划规则
     createPlanRules:function(biz,targetCode,targetName,type){
         //创建新的构件映射计划节点
         var newPlanRuleData ={
             "biz": 1,//1：模块化；2：质监标准  //新建时写入值
-                "targetCode": "",//新建时写入当前计划编号
-                "targetName": "",//计划名称
-                "type": 1,//1:标准规则；2：项目规则  //新建时写入值
-                "mappingCategory": {
+            "targetCode": "",//新建时写入当前计划编号
+            "targetName": "",//计划名称
+            "type": 1,//1:标准规则；2：项目规则  //新建时写入值
+            "mappingCategory": {
                 "categoryCode": "",
                 "categoryName": "",
                 "mappingPropertyList": [
@@ -104,7 +103,6 @@ App.ResourceArtifacts={
         return new this.newPlanRules(newPlanRuleData);
     },
 
-
 //保存计划规则
     SavePlanRules : Backbone.Model.extend({
             defaults:function(){
@@ -121,11 +119,9 @@ App.ResourceArtifacts={
         }
     }),
 
-
     newModel : {
         "key":"", "rule":"", "value": null
     },
-
 
     //新建规则
     newRule : Backbone.Model.extend({
@@ -135,7 +131,6 @@ App.ResourceArtifacts={
             }
         }
     }),
-
 
     ArtifactsRule:new(Backbone.Collection.extend({
         model:Backbone.Model.extend({
@@ -156,11 +151,11 @@ App.ResourceArtifacts={
         }
     })),
 
-
     init:function(_this) {
-        var pre = new App.ResourcesNav.ArtifactsMapRule();
-        var plans = new App.ResourcesNav.ArtifactsPlanList();
-        var planRule = new App.ResourcesNav.ArtifactsPlanRule();
+
+        var pre = new App.Resources.ArtifactsMapRule();
+        var plans = new App.Resources.ArtifactsPlanList();
+        var planRule = new App.Resources.ArtifactsPlanRule();
         _this.$el.append(pre.render().el);//菜单
         pre.$(".plans").html(plans.render().el);//计划节点
         pre.$(".rules").append(planRule.render().el);//菜单
@@ -183,7 +178,6 @@ App.ResourceArtifacts={
             }
         });
     },
-
     //延迟
     delay:function(data){
     var _this = this , batch , length = data.length , arr = []  , n = 1 , last;
@@ -200,5 +194,10 @@ App.ResourceArtifacts={
                 n++;
             },100);
         }
+    },
+
+    //提示保存
+    alertSave:function(){
+
     }
 };
