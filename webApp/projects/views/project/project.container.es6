@@ -424,17 +424,14 @@ App.Project.ProjectContainer = Backbone.View.extend({
 
 	//渲染属性
 	renderProperties(model) {
-
 		var data = model.toJSON().data,
 			templateProperties = _.templateUrl("/projects/tpls/project/design/project.design.property.properties.html"),
 			$designProperties = this.$el.find(".singlePropetyBox .designProperties");
-
-		$designProperties.html(templateProperties(data));
-		//其他属性
-		App.Project.propertiesOthers.call({
-			$el: $designProperties
-		}, "plan|cost|quality|dwg");
-
+			$designProperties.html(templateProperties(data));
+			//其他属性
+			App.Project.propertiesOthers.call({
+				$el: $designProperties
+			}, "plan|cost|quality|dwg");
 	}
 
 });

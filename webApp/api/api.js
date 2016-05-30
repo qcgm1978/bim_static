@@ -104,6 +104,7 @@ App.API = {
 		uploadFile: "doc/{projectId}/{projectVersionId}/file/data", //上传文件  ?parentId={parentId}&fileName={fileName}&size={size}&digest={digest}&position={position}
 		"checkDownLoad": "doc/{projectId}/{versionId}/file/size", // 下载确认 是否可以下载  ?fileVersionId={fileVersionId}
 		downLoad: "doc/{projectId}/{projectVersionId}/file/data", //文件下载  ?fileId={fileId}
+		fetchFileByModel:"doc/internal/{projectId}/{versionId}",
 
 		//快照
     fetchModelViewpoint: 'sixD/{projectId}/viewPoint', // 获取快照列表
