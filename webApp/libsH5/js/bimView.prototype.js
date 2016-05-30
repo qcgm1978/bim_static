@@ -262,7 +262,7 @@
           callback:function(){
             var x = self.footer.find('#axisGridX').val(),
                 y = self.footer.find('#axisGridY').val();
-            // self.setAxisGrid('bigMap',x,y);
+            self.setAxisGrid('bigMap',x,y);
           }
         });
         self.initMap({
@@ -288,8 +288,10 @@
       });
       self.on('changeGrid',function(res){
         var floors = self.curFloor;
-        var infoZ = 'Z('+ floors +','+res.axis.offsetZ+')'
-        bimView.sidebar.el._dom.mapBar.find(".axisGrid").text(res.axis.infoX+","+res.axis.infoY+","+infoZ)
+        var infoX = res.axis.infoX || '-';
+        var infoY = res.axis.infoY || '-';
+        var infoZ = 'Z('+ floors +','+res.axis.offsetZ+')';
+        bimView.sidebar.el._dom.mapBar.find(".axisGrid").text(infoY+","+infoY+","+infoZ)
       });
     },
     // 以下是对模型操作
@@ -501,7 +503,8 @@
       self.filter(data.filter.floors);
       self.filter(data.filter.category);
       self.filter(data.filter.classCode);
-      viewer.setCommentMode();
+      // viewer.setCommentMode();
+      debugger
       viewer.loadComments(newList);
     },
     // 模型过滤器
@@ -518,6 +521,7 @@
     },
     highlight:function(obj){
       // 高亮
+      debugger
       var self = this;
       var viewer = self.viewer;
       var filter = viewer.getFilters();
@@ -585,8 +589,7 @@
           _css={
             left:'0px',
             bottom:'0px',
-            outline:'none'
-          };
+            outline:'none'          };
       if(_opt.axisGrid) viewer.setAxisGridData(_opt.axisGrid)
       viewer.createMiniMap(_opt.name,_el[0],_width,_height,_css,function(res){
         _opt.callback&&_opt.callback.call(this,res)

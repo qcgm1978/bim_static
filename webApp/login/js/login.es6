@@ -112,6 +112,7 @@ var Login = {
 		$.ajax({
 			url: '/platform/user/current'
 		}).done(function(data) {
+
 			//失败
 			if (data.code!=0) {
 				alert("获取用户信息失败");

@@ -9,19 +9,19 @@ App.Project.ProjectDesignPropety = Backbone.View.extend({
 	events: {
 		"click .projectPropetyHeader .item": "navItemClick",
 		"click .btnFilter": "filterVerification",
-		"click .ckBox tr":"showInModel"
-	//	"click .clearSearch": "clearSearch"
+		"click .ckBox tr": "showInModel"
+			//	"click .clearSearch": "clearSearch"
 	},
 
-	initialize(){
-		var _this=this;
+	initialize() {
+		var _this = this;
 		//监听子视图过滤参数change事件
-		Backbone.on('projectDesignPropetyFilterDataChange',function(key,val){
-			_this.VerificationOptions[key]=val;
-		},this)
-		Backbone.on('projectDesignPropetyFilterDataClear',function(key,val){
+		Backbone.on('projectDesignPropetyFilterDataChange', function(key, val) {
+			_this.VerificationOptions[key] = val;
+		}, this)
+		Backbone.on('projectDesignPropetyFilterDataClear', function(key, val) {
 			_this.clearSearch();
-		},this)
+		}, this)
 
 	},
 
@@ -31,34 +31,33 @@ App.Project.ProjectDesignPropety = Backbone.View.extend({
 
 
 
-		if (App.AuthObj.project && App.AuthObj.project.design) {
+		//if (App.AuthObj.project && App.AuthObj.project.design) {
 
-			var Auth = App.AuthObj.project.design,
-				$projectNav = this.$(".projectPropetyHeader"),
-				CostTpl = App.Comm.AuthConfig.Project.DesignTab,
-				$container = this.$(".projectNavContentBox");
+		var Auth = App.AuthObj.project.design,
+			$projectNav = this.$(".projectPropetyHeader"),
+			CostTpl = App.Comm.AuthConfig.Project.DesignTab,
+			$container = this.$(".projectNavContentBox");
 
+		//属性
+		//if (Auth.prop) {
+		//	$projectNav.append(CostTpl.prop);
+		$container.append(new App.Project.DesignProperties().render().el);
+		//}
 
-			//属性
-			if (Auth.prop) {
-				$projectNav.append(CostTpl.prop);
-				$container.append(new App.Project.DesignProperties().render().el);
-			}
+		//碰撞
+		//if (Auth.collision) {
+		//	$projectNav.append(CostTpl.collision);
+		$container.append(new App.Project.DesignCollision().render().el);
+		//}
 
-			//碰撞
-			if (Auth.collision) {
-				$projectNav.append(CostTpl.collision);
-				$container.append(new App.Project.DesignCollision().render().el);
-			}
-
-			//检查
-			if (Auth.check) {
-				$projectNav.append(CostTpl.check);
-				$container.append(new App.Project.DesignVerification().render({
-					verOpts: this.VerificationOptions
-				}).el);
-			} 
-		}
+		//检查
+		//if (Auth.check) {
+		//	$projectNav.append(CostTpl.check);
+		$container.append(new App.Project.DesignVerification().render({
+			verOpts: this.VerificationOptions
+		}).el);
+		//}
+		//}
 
 
 
@@ -138,10 +137,18 @@ App.Project.ProjectDesignPropety = Backbone.View.extend({
 
 	//设计检查点关联构件
 	showInModel(e) {
+
 		var $target = $(e.currentTarget),
-			_keyId = $target.data('id'); //主键ID
+			_keyId = $target.data('id'),//主键ID
+			ids=$target.data('userId'),
+			box=$target.data('box'); 
 		$target.parent().find('tr').removeClass('selected');
 		$target.addClass('selected');
+		//判断是否取过
+		if (box && ids) {
+			App.Project.zoomModel(ids,box);
+			return;
+		}
 		App.Comm.ajax({
 			URLtype: 'fetchDesignCheckPointMapParam',
 			data: {
@@ -150,54 +157,24 @@ App.Project.ProjectDesignPropety = Backbone.View.extend({
 				id: _keyId
 			}
 		}, function(res) {
+			debugger
+
 			if (res.code == 0) {
-				var _data=res.data;
 
-
+				var _data = res.data;
 
 				if (_data) {
-					var pars = {
-							URLtype: "getBoundingBox",
-							data: {
-								projectId: App.Project.Settings.CurrentVersion.projectId,
-								projectVersionId: App.Project.Settings.CurrentVersion.id,
-								sceneId: _data.sceneId,
-								elementId: _data.componentId
-							}
-						},
-						location = JSON.parse(_data.location);
-					//构建id
-					$target.data("elem", _data.componentId);
-					$target.data("userId", location.userId);
+					var location = JSON.parse(_data.location),
+						bbox=location.bBox;
+					if(bbox){
+						box = App.Project.formatBBox(bbox);
+						ids=[location.userId];
+						$target.data("userId", ids);
+						$target.data("box", box);
+						App.Project.zoomModel(ids,box);
+					}
+					//	_this.showMarks([_data.location]);
 
-					/**读取boundingbox**/
-					var box = [],
-								min = location.bBox.min,
-								minArr = [min.x, min.y, min.z],
-								max = location.bBox.max,
-								maxArr = [max.x, max.y, max.z];
-
-							box.push(minArr);
-							box.push(maxArr);
-							//box id
-							$target.data("box", box);
-							App.Project.zommBox($target);
-						//	_this.showMarks([_data.location]);
-					return
-
-					App.Comm.ajax(pars, function(data) {
-						if (data.code == 0 && data.data) {
-							var box = [],
-								min = data.data.min,
-								minArr = [min.x, min.y, min.z],
-								max = data.data.max,
-								maxArr = [max.x, max.y, max.z];
-							box.push(minArr);
-							box.push(maxArr);
-							$target.data("box", box);
-							App.Project.zommBox($target);
-						}
-					});
 				}
 			}
 		})
