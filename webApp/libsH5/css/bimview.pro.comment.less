@@ -29,7 +29,7 @@
 	.projectListBox, .userListBox { height: 100%; }
 	.commentRemark { position: absolute; top: 6px; left: 330px; right: 0px; bottom: 0px; overflow: hidden;
 		.header { height: 49px; border-bottom: 1px #353535 solid; line-height: 48px; padding: 0px 10px; }
-		.talkReMark { position: absolute; bottom: 0px; background-color: #444; }
+		.talkReMark { position: absolute; bottom: 0px; background-color: #444; &.hidden{display: none;} }
 		.reMarkListBox { width: 328px; position: absolute; top: 49px; bottom: 100px; background: #333; left: 0px; right: 0px; }
 		.iconTalk { font-size: 21px; width: 25px; margin: 0px; color: #b9b9b9; font-family: "modelicon"; vertical-align: -3px; display: inline-block; }
 		.goList { float: right; cursor: pointer; color: #b9b9b9; }
@@ -83,10 +83,15 @@
 			.desc { resize: none; height: 60px; width: 360px; padding: 5px; margin-bottom: 20px; }
 			.modelicon { color: #ccc; font-size: 18px; vertical-align: -2px; margin-right: 5px; }
 		}
-		.info { color: #fff; margin-left: 104px;color:#b9b9b9;
-			.name { font-size: 14px; margin-bottom: 5px; width: 98%;color:#fff; }
+		.info { color: #fff; margin-left: 104px; color: #b9b9b9;
+			.name { font-size: 14px; margin-bottom: 5px; width: 98%; color: #fff; }
 			.desc { margin-bottom: 5px; width: 98%; }
-			.userName { display: inline-block; width: 60px; margin-right: 10px; }
+			.userName { display: inline-block; width: 60px; margin-right: 10px; vertical-align: bottom; }
+		}
+		.shareLink { border-top: 1px #666 solid; margin-top: 15px;
+			.tipText { color: #fff; font-size: 14px; margin-top: 10px; margin-bottom: 15px; }
+			.linkUrl { border: 0; width: 351px; padding-left: 7px; font-size: 16px; padding: 4px 5px; outline: none; }
+			.btnCopy { border: 1px #fff solid; background-color: transparent; color: #fff; height: 32px; vertical-align: top; width: 84px; margin-left: 18px; }
 		}
 	}
 }

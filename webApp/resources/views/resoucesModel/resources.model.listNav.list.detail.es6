@@ -68,7 +68,7 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 		this.$el.contextMenu('listContext', {
 			//显示 回调
 			onShowMenuCallback: function(event) {
-
+				 
 				var $item = $(event.target).closest(".item");
 				$("#reNameModel").removeClass('disable');
 				//预览
@@ -78,7 +78,7 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 				} else {
 
 					$("#previewModel").removeClass("disable");
-					var href = $item.find(".fileName .text").prop("href");
+					var href = $item.find(".fileName .boxText").prop("href");
 					$("#previewModel").find("a").prop("href", href);
 
 					//重命名 未上传

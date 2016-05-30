@@ -1,8 +1,8 @@
-<div class="typeCode">
+<div class="typeCode" data-id="<%= obj.mappingCategory.id %>">
     <div class="title">分类编码:</div>
     <div class="conR">
         <div>
-            <input type="text" placeholder="请输入分类编码" value="<%= obj.code %>"  class="pdR60">
+            <input type="text" placeholder="请输入分类编码" value="<%= obj.mappingCategory.categoryCode %>"  class="pdR60 categoryCode">
             <span class="choose">选择</span>
         </div>
         <ul></ul><!--联想接口，最多显示5条-->
@@ -12,10 +12,10 @@
     <div class="title">属性映射规则:</div>
     <div class="conR">
         <dl>
-            <% if (obj.rules && obj.rules.length) { for (var i = 0 ; i < obj.rules.length ; i ++) {   var  type = obj.rules[i].rule %>
+            <%  var rList = obj.mappingCategory.mappingPropertyList ;  if (rList && rList.length) { for (var i = 0 ; i < rList.length ; i++) {   var  type = rList[i].operator ; %>
             <dd>
-                <div class="leftten">
-                    <input type="text" placeholder="请输入属性名称" value="<%= obj.rules[i].key %>"><div class="myDropDown">
+                <div class="leftten" data-id="<%= rList[i].id %>">
+                    <input type="text" placeholder="请输入属性名称" value="<%= rList[i].propertyValue %>"><div class="myDropDown">
                         <span class="myDropText">
                             <span class="text">
                             <%=   type == "==" ? "相等" :  (type == "!=" ? "不等" :  (type == "<>" ? "范围内" :  (type == "><" ? "范围外" : "请选择规则")))%>
@@ -30,8 +30,8 @@
                         </ul>
                     </div>
                 </div>
-                <div class="eIn <%= (obj.rules[i].rule == '==' || obj.rules[i].rule == '!=') ? 'active' : ''  %>"><input type="text" placeholder='请输入属性值，多个属性值可用英文 "," 分隔' value="<%= obj.rules[i].value %>"></div><!--等于/不等于-->
-                <div class="ioside  <%= (obj.rules[i].rule == '<>' || obj.rules[i].rule == '><') ? 'active' : ''  %>"><!--范围 内/外-->
+                <div class="eIn <%= (rList[i].operator == '==' || rList[i].operator == '!=') ? 'active' : ''  %>"><input type="text" placeholder='请输入属性值，多个属性值可用英文 "," 分隔' value="<%= rList[i].propertyValue %>"></div><!--等于/不等于-->
+                <div class="ioside  <%= (rList[i].operator == '<>' || rList[i].operator == '><') ? 'active' : ''  %>"><!--范围 内/外-->
                     <div class="myDropDown">
                         <span class="myDropText">
                             <span class="text">></span>
@@ -63,7 +63,7 @@
         <div class="clear"><span class="addNewRule">新增属性</span></div>
     </div>
     <div class="controlRule">
-        <div class="RuleSubmit mgR10">保存</div>
-        <div class="RuleDelete">删除</div>
+        <div class="saveRule mgR10">保存</div>
+        <div class="deleteRule">删除</div>
     </div>
 </div>

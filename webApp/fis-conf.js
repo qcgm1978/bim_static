@@ -128,6 +128,11 @@ fis.match('**.{otf,eot,svg,ttf,woff}', {
   release: "/static/dist/comm/$0"
 });
 
+fis.match('/comm/**.swf', {
+  //useHash:true,
+  release: "/static/dist/swf/$0"
+});
+
 //合并裤文件
 fis.match('/libs/**.js', {
   packTo: '/static/dist/libs/commLib_' + v + '.js'
