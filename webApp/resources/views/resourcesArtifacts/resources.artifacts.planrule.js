@@ -1,7 +1,7 @@
 /**
- * @require /resources/collection/resource.nav.es6
+ * @require /resources/collection/resources.nav.es6
  */
-App.ResourcesNav.ArtifactsPlanRule = Backbone.View.extend({
+App.Resources.ArtifactsPlanRule = Backbone.View.extend({
 
     tagName:"div",
 
@@ -28,8 +28,6 @@ App.ResourcesNav.ArtifactsPlanRule = Backbone.View.extend({
     newPlanRule:function(){
         var _this = this;
 
-
-
         if( !App.ResourceArtifacts.Status.saved){
             alert("您还有没保存的");
             //查找未保存的元素并高亮提示变红
@@ -39,15 +37,14 @@ App.ResourcesNav.ArtifactsPlanRule = Backbone.View.extend({
         $(".ruleDetail").empty().hide();
         //创建规则
         var model =  App.ResourceArtifacts.createPlanRules("1",App.ResourceArtifacts.Status.presentPlan.get("targetCode"),"新建映射规则","1");
+
         App.ResourceArtifacts.PlanRules.push(model);
 
         if(!App.ResourceArtifacts.Status.presentPlan){
             //没有选择任何计划
             App.ResourceArtifacts.Status.presentPlan = model;
         }
-
         $(".artifactsContent .rules ul li:last-child .ruleDetail").html( new App.Resources.ArtifactsPlanRuleDetailUnfold({model:model}).render().el).show();
-
         //保存状态
         App.ResourceArtifacts.Status.saved = false;
     }

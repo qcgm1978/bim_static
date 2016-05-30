@@ -15,7 +15,8 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
         "click .choose":"choose",
         "click .myDropText":"seleRule",
         "click .myItem":"myItem",
-        "click .delRule": "delRule"
+        "click .delRule": "delRule",
+        "focus .categoryCode": "legend"
     },
 
 
@@ -89,19 +90,28 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
                 message: frame
             });
             $(".mod-dialog .wrapper .header").hide();//隐藏头部
-            $(".alertInfo").html('确认删除 “'+ this.model.get("desc") + '”！');
+            $(".alertInfo").html('确认删除 “'+ this.model.get("targetName") + '”！');
     },
 
     //删除单条规则
     delRule:function(e){
         var rule = $(e.target);
-        var id  = rule.siblings(".leftten").find("input").val();
-
-
+        var id  = rule.find(".leftten").data("id");
+        var parentId = $(".artifactsContent .rules h2").data("id");
+        //清除本dd项
+        //清除模型中的dd项
     },
-    //联想模块
-    legend:function(){
 
+    //根据data-id查找删除对象
+
+
+    //联想模块
+    legend:function(e){
+        var pre = $(e.target);
+        pre.on("keydown",function(ev){
+            var val = pre.val();
+            //从库对象里查找当前值
+        });
     },
     //校验模块
     check:function(){

@@ -1,7 +1,7 @@
 /**
  * @require /resources/collection/resource.nav.es6
  */
-App.ResourcesNav.ArtifactsPlanList = Backbone.View.extend({
+App.Resources.ArtifactsPlanList = Backbone.View.extend({
 
     tagName:"div",
 

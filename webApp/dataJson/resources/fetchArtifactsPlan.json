@@ -1,26 +1,29 @@
 {
+  "messageId": "97d311ab37384bfd88bd57c9fccbaf9a",
+  "messageType": null,
+  "timestamp": 1464340931753,
   "code": 0,
   "message": "success",
   "data": [
     {
-      "planId" : "GC0017",
-      "desc" : "基坑支护止水帷幕",
-      "ruleList" :[]
+      "code" : "GC0017",
+      "name" : "基坑支护止水帷幕",
+      "count" :1
     },
     {
-      "planId" : "GC0018",
-      "desc" : "基坑支护止水帷幕",
-      "ruleList" :[]
+      "code" : "GC0018",
+      "name" : "基坑支护止水帷幕",
+      "count" :0
     },
     {
-      "planId" : "GC0019",
-      "desc" : "基坑支护止水帷幕",
-      "ruleList" :[]
+      "code" : "GC0019",
+      "name" : "基坑支护止水帷幕",
+      "count" :1
     },
     {
-      "planId" : "GC0020",
-      "desc" : "基坑支护止水帷幕",
-      "ruleList" :[]
+      "code" : "GC0020",
+      "name" : "基坑支护止水帷幕",
+      "count" :2
     }
   ]
 }

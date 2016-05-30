@@ -1,52 +1,67 @@
 {
+  "messageId": "7e87af87b7d84425bc51aee5fa2934f8",
+  "messageType": null,
+  "timestamp": 1464426306033,
   "code": 0,
   "message": "success",
   "data": [
     {
-      "categoryCode" : "10.20.30.10",
-      "name" : "规则1",
-      "target" : "3",
-      "targetName" : "石材幕墙",
-      "rules":[
-        {"key":"a1", "rule":"==", "value":[10,20,30]},
-        {"key":"a2","rule":"!=","value":"(30,50]"},
-        {"key":"a3","rule":"<>","value":"(40,45]"},
-        {"key":"a4","rule":"><","value":"[40,50)"}
-      ]
+      "id": 840358391030112,
+      "biz": 1,
+      "targetCode": "CB0001",
+      "targetName": "室内土方回填",
+      "type": 1,
+      "mappingCategory": {
+        "id": 840358391415136,
+        "categoryCode": "30.30.90",
+        "categoryName": "基础挖方",
+        "ruleId": 840358391030112,
+        "mappingPropertyList": [
+          {
+            "id": 840358391677280,
+            "propertyKey": "QY",
+            "operator": "==",
+            "propertyValue": "样板",
+            "categoryId": 840358391415136
+          },
+          {
+            "id": 840358391931232,
+            "propertyKey": "QY",
+            "operator": "in",
+            "propertyValue": "(30,50]",
+            "categoryId": 840358391415136
+          }
+        ]
+      }
     },
     {
-      "code" : "10.20.30.20",
-      "name" : "规则2",
-      "target" : "4",
-      "targetName" : "全玻璃幕墙",
-      "rules":[
-        {"key":"a1", "rule":"==", "value":[10,20,30]},
-        {"key":"a3","rule":"<>","value":"(40,45]"},
-        {"key":"a4","rule":"><","value":"(40,60)"}
-      ]
-    },
-    {
-      "code" : "10.20.30.30",
-      "name" : "规则3",
-      "target" : "5",
-      "targetName" : "陶板幕墙",
-      "rules":[
-        {"key":"a1", "rule":"==", "value":[10,20,30]},
-        {"key":"a2","rule":"!=","value":"(30,50]"},
-        {"key":"a4","rule":"><","value":"(20,50)"}
-      ]
-    },
-    {
-      "code" : "10.20.30.40",
-      "name" : "规则4",
-      "target" : "6",
-      "targetName" : "陶板幕墙",
-      "rules":[
-        {"key":"a1", "rule":"==", "value":[10,20,30]},
-        {"key":"a2","rule":"!=","value":"(30,50]"},
-        {"key":"a3","rule":"<>","value":"(40,45]"},
-        {"key":"a4","rule":"><","value":"(45,50)"}
-      ]
+      "id": 840358391030103,
+      "biz": 1,
+      "targetCode": "CB0002",
+      "targetName": "回填",
+      "type": 1,
+      "mappingCategory": {
+        "id": 840358391415136,
+        "categoryCode": "30.30.90",
+        "categoryName": "基础挖方",
+        "ruleId": 840358391030112,
+        "mappingPropertyList": [
+          {
+            "id": 840358391677280,
+            "propertyKey": "QY",
+            "operator": "==",
+            "propertyValue": "样板",
+            "categoryId": 840358391415136
+          },
+          {
+            "id": 840358391931232,
+            "propertyKey": "QY",
+            "operator": "in",
+            "propertyValue": "(30,50]",
+            "categoryId": 840358391415136
+          }
+        ]
+      }
     }
   ]
 }

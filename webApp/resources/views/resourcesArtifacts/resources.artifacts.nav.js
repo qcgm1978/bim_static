@@ -1,7 +1,7 @@
 /**
  * @require /resources/collection/resource.nav.es6
  */
-App.ResourcesNav.ArtifactsMapRule = Backbone.View.extend({
+App.Resources.ArtifactsMapRule = Backbone.View.extend({
 
     tagName:"div",
 
