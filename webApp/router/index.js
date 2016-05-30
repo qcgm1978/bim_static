@@ -177,7 +177,6 @@ var AppRoute = Backbone.Router.extend({
 		_.require('/static/dist/services/services.js');
 		$("#bottomBar").hide(); //隐藏脚部
 		App.Services.init(type, tab);
-		App.AuthControl.do('service',type,tab);
 	},
 
 	//重置数据
