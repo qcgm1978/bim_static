@@ -2,6 +2,7 @@ App.Project = {
 
 	//默认参数
 	Defaults: {
+		isShare: false,
 		type: "user",
 		loadingTpl: '<td colspan="10" class="loadingTd">正在加载，请稍候……</td>',
 		fetchNavType: 'file', // 默认加载的类型
@@ -230,12 +231,37 @@ App.Project = {
 		if (App.Project.Settings.type == "token") {
 			$(".breadcrumbNav .fileModelNav li:last").click();
 			//分享
-			if (window.location.href.indexOf("share")>10) {
-				$(".breadcrumbNav .fileModelNav ").remove();
+			if (window.location.href.indexOf("share") > 10) {
+				App.Project.Settings.isShare = true;
+				//下拉箭头
+				$(".breadcrumbNav .myIcon-slanting-right").remove();
+				//绑定登录
+				this.bindLogin();
 			}
 		}
 
 
+	},
+
+	//绑定登录
+	bindLogin() {
+
+		$("#topBar .login").on("click", function() {
+
+			var dialogHtml = _.templateUrl('/libsH5/tpls/comment/login.html', true),
+
+				opts = {
+					title: "用户登录",
+					width: 300,
+					height: 220,
+					isConfirm: false,
+					cssClass: "loginDialog",
+					message: dialogHtml					 
+				},
+
+				dialog = new App.Comm.modules.Dialog(opts);
+
+		});
 	},
 
 	//设置 可以查看的属性
@@ -761,7 +787,7 @@ App.Project = {
 		return sb.toString();
 	},
 	//转换bounding box数据
-	formatBBox:function(data){
+	formatBBox: function(data) {
 		var box = [],
 			min = data.min,
 			minArr = [min.x, min.y, min.z],
@@ -889,7 +915,7 @@ App.Project = {
 	},
 
 	//通过userid 和 boundingbox 定位模型
-	zoomModel:function(ids,box){
+	zoomModel: function(ids, box) {
 		//定位
 		App.Project.Settings.Viewer.zoomToBox(box);
 		//半透明

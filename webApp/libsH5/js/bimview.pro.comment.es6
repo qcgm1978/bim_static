@@ -65,6 +65,28 @@
 				}
 			})),
 
+			//项目
+			Share: new(Backbone.Collection.extend({
+
+				model: Backbone.Model.extend({
+
+					urlType: "delViewPoint",
+					defualt: {
+						title: ""
+					}
+				}),
+
+				urlType: "projectPhoto",
+
+				parse(response, options) {
+					if (response.code == 0 && response.data.length > 0) {
+						return response.data;
+					} else {
+						this.trigger("dataNull");
+					}
+				}
+			})),
+
 			//用户
 			User: new(Backbone.Collection.extend({
 
@@ -133,12 +155,12 @@
 					"click .navBar .item": "itemClick"
 				},
 
-				template: _.templateUrl('/libsH5/tpls/comment/bimview.pro.comment.html', true),
+				template: _.templateUrl('/libsH5/tpls/comment/bimview.pro.comment.html'),
 
 				//渲染
 				render() {
 					//模板
-					this.$el.html(this.template);
+					this.$el.html(this.template({}));
 					//项目快照
 					this.$(".projectListScroll").html(new CommentView.Project().render().$el);
 					//个人快照
@@ -159,10 +181,23 @@
 					if (type == "project") {
 						this.$(".projectListBox").fadeIn("fast");
 						//this.$(".projectListScroll").animate({left:"0px" },300);
-						//获取数据
-						CommentCollections.Project.projectId = App.Project.Settings.projectId;
-						CommentCollections.Project.reset();
-						CommentCollections.Project.fetch();
+						if (App.Project.Settings.isShare) {
+							//获取数据
+							CommentCollections.Share.projectId = App.Project.Settings.projectId;
+							CommentCollections.Share.reset();
+							CommentCollections.Share.fetch({
+								success() {
+
+									$(".projectList .item:first").click();
+								}
+							});
+						} else {
+							//获取数据
+							CommentCollections.Project.projectId = App.Project.Settings.projectId;
+							CommentCollections.Project.reset();
+							CommentCollections.Project.fetch();
+						}
+
 
 
 						$el.addClass("selected").siblings().removeClass("selected");
@@ -210,7 +245,10 @@
 				initialize() {
 					this.listenTo(CommentCollections.Project, "add", this.addOne);
 					this.listenTo(CommentCollections.Project, "reset", this.reLoading);
-					this.listenTo(CommentCollections.Project, "dataNull", this.dataNull)
+					this.listenTo(CommentCollections.Project, "dataNull", this.dataNull);
+					this.listenTo(CommentCollections.Share, "add", this.addOne);
+					this.listenTo(CommentCollections.Share, "reset", this.reLoading);
+					this.listenTo(CommentCollections.Share, "dataNull", this.dataNull);
 				},
 
 				render() {
@@ -450,6 +488,7 @@
 					CommentCollections.ViewComments.fetch({
 						success(model, data) {
 							$(".commentRemark .reMarkCount .count").text(data.data.length);
+							this.$(".reMarkListBox").css("bottom", this.$(".talkReMark").height() + 10);
 						}
 					});
 
@@ -469,13 +508,15 @@
 						onShowMenuCallback: function(event) {
 
 							var $li = $(event.target).closest(".item"),
-								createId = $li.find(".name").data("creatorid");
+								createId = $li.find(".name").data("creatorid"); 
+
 							//创建者 可以 删除 分享 编辑
-							if (App.Global.User.userId == createId) {
+							if (App.Global.User && App.Global.User.userId == createId && !App.Project.Settings.isShare) {
 								$("#shareViewPoint,#delViewPoint,#editViewPoint").show();
 							} else {
 								$("#shareViewPoint,#delViewPoint,#editViewPoint").hide();
-							}
+							} 
+
 						},
 						//事件绑定
 						bindings: {
@@ -661,7 +702,7 @@
 
 				},
 
-				template: _.templateUrl('/libsH5/tpls/comment/bimview.remark.html', true),
+				template: _.templateUrl('/libsH5/tpls/comment/bimview.remark.html')(),
 
 				//渲染
 				render() {

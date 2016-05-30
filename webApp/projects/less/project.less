@@ -58,7 +58,7 @@
 .rightProperty { .odd { background-color: #eee; }
 	.selected { background-color: #A8DBFD; }
 	.btnCk.selected { background-color: #fff; }
-	.attrPlanBox, .attrCostBox, .attrQualityBox,.attrDwgBox { display: none; }
+	.attrPlanBox, .attrCostBox, .attrQualityBox, .attrDwgBox { display: none; }
 	.designVerification { height: 100%; }
 	.modle { .modleShowHide { transition: all .5s; background: url(/comm/images/commIcon.png) no-repeat 0px -256px; float: right; margin-right: 12px; margin-top: 6px; height: 14px; width: 14px; cursor: pointer;
 			&.down { margin-right: 14px; transform: rotate(180deg); -ms-transform: rotate(180deg); -moz-transform: rotate(180deg); -webkit-transform: rotate(180deg); -o-transform: rotate(180deg); }
@@ -85,8 +85,8 @@
 			.category { width: 10%; }
 			.specialty { width: 12%; }
 			.professional { width: 12%; }
-			& tr:hover{cursor: pointer;background: #A8DBFD;}
-			& tr.selected{background: #A8DBFD;}
+			& tr:hover { cursor: pointer; background: #A8DBFD; }
+			& tr.selected { background: #A8DBFD; }
 		}
 		tbody { td { padding-top: 10px; padding-bottom: 10px; vertical-align: middle; text-align: center; }
 			.issue { text-align: left;
@@ -134,26 +134,15 @@
 		}
 	}
 	.planSearch { width: 100%; min-width: 398px; margin-top: 10px; padding-left: 15px;
-		.dateBox { display: inline-block; position: relative;width: 120px;margin-top: -5px;
+		.dateBox { display: inline-block; position: relative; width: 120px; margin-top: -5px;
 			.iconCal { background: url(../comm/images/commIcon.png) no-repeat 6px -232px; position: absolute; right: 1px; width: 28px; height: 28px; top: 1px; background-color: #eee; border-left: 1px #ccc solid; }
 			input { height: 30px; line-height: 30px; padding-left: 8px; broder: 1px #ddd solid; width: 120px; padding-right: 30px; box-sizing: border-box; }
 		}
-		& .planTimeType{
-			margin-right: 10px;
-			& .myDropText{
-				width: 100px;
-			}
-			& .myDropList{
-				left: 0;
-				top: 32px;
-				width: 120px;
-			}
+		& .planTimeType { margin-right: 10px;
+			& .myDropText { width: 100px; }
+			& .myDropList { left: 0; top: 32px; width: 120px; }
 		}
-		& .clearFormLink{
-			float: right;
-		    margin-right: 16px;
-		    margin-top: 5px;
-		}
+		& .clearFormLink { float: right; margin-right: 16px; margin-top: 5px; }
 	}
 }
 .planInterest { .tbInspection { td { padding-left: 15px; }
@@ -165,7 +154,7 @@
 	}
 	.contentBox { height: 100%;
 		.inspectionOperator { padding: 10px; border-bottom: 1px solid #ccc; width: 100%; }
-		.contentBody { position: absolute; top: 51px; bottom: 0px; left: 0px; right: 0px; overflow-y: auto;}
+		.contentBody { position: absolute; top: 51px; bottom: 0px; left: 0px; right: 0px; overflow-y: auto; }
 	}
 	.title { height: 28px; line-height: 28px; font-weight: bold; padding-left: 15px; }
 	.inspecId { width: 10%; text-align: center; }
@@ -299,7 +288,7 @@
 			.myDropList { width: 100%; top: 25px; left: 0px; }
 		}
 		.optonLine { margin-top: 10px; padding-left: 5px; }
-		.materialEquipment.statusOption, .categoryOption, .specialitiesOption, .operatorOption, .typeOption, .firstDate,.inspectionUnitOption { margin-left: 7px; }
+		.materialEquipment.statusOption, .categoryOption, .specialitiesOption, .operatorOption, .typeOption, .firstDate, .inspectionUnitOption { margin-left: 7px; }
 		.zIndex10 { position: relative; z-index: 10; }
 		.zIndex11 { position: relative; z-index: 11; }
 		.searchName { width: 176px; margin-left: 7px; display: inline-block; border: 1px #ccc solid; height: 24px; vertical-align: top; line-height: 20px; padding-left: 12px; outline: none;
@@ -395,7 +384,7 @@
 	}
 	& .content > div { float: left; font-size: 14px; }
 	& .content { & .logo { width: 70px; height: 60px; }
-		& .descr { color: #333; width: 140px; height: 60px; padding-left: 8px; margin-top: -4px;}
+		& .descr { color: #333; width: 140px; height: 60px; padding-left: 8px; margin-top: -4px; }
 		& .option { width: 140px; height: 60px; padding-left: 5px; margin-top: -1px; }
 		& .title { height: 29px; line-height: 29px; display: inline-block; white-space: nowrap; text-overflow: ellipsis; width: 200px; overflow: hidden;
 			& i { width: 18px; height: 18px; display: inline-block; background: url('../../comm/images/commIcon.png') no-repeat 0 -658px; vertical-align: -5px; }
@@ -404,4 +393,8 @@
 		& .status { margin-top: 29px; font-size: 12px; }
 		& .from { color: #333; font-size: 12px; }
 	}
+}
+.loginDialog { .txtInput { padding: 20px 8px; width: 258px; border-radius: 5px; }
+	.pwdBox { margin-top: 10px; margin-bottom: 20px; }
+	.btnLogin { width: 258px; height: 40px; border-radius: 5px; }
 }

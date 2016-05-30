@@ -10,8 +10,7 @@ var AppRoute = Backbone.Router.extend({
 	},
 
 	//模型分享
-	shareModel(token){
-		console.log("token");
+	shareModel(token){ 
 
 			_.require('/static/dist/projects/projects.css');
 			_.require('/static/dist/projects/projects.js');
@@ -23,6 +22,8 @@ var AppRoute = Backbone.Router.extend({
 			App.Project.Settings.versionId = "201605091530";
 
 			App.Project.Settings.type = "token";
+
+			$("#topBar").prepend(' <ul class="navHeader"> <li class="item "> <span class="login">登录</span> </li></ul>');
 
 			App.Project.init();
 	},
