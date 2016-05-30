@@ -1,7 +1,4 @@
-//project.cost.property.change.es6
-
-
-//陈本清单
+//成本 -> 变更
 App.Project.CostChange=Backbone.View.extend({
 
 	tagName:"div",

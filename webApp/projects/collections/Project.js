@@ -760,7 +760,17 @@ App.Project = {
 
 		return sb.toString();
 	},
-
+	//转换bounding box数据
+	formatBBox:function(data){
+		var box = [],
+			min = data.min,
+			minArr = [min.x, min.y, min.z],
+			max = data.max,
+			maxArr = [max.x, max.y, max.z];
+		box.push(minArr);
+		box.push(maxArr);
+		return box;
+	},
 	//在模型中显示
 	showInModel: function($target, type) {
 		var _this = this;
@@ -878,6 +888,19 @@ App.Project = {
 		//}
 	},
 
+	//通过userid 和 boundingbox 定位模型
+	zoomModel:function(ids,box){
+		//定位
+		App.Project.Settings.Viewer.zoomToBox(box);
+		//半透明
+		App.Project.Settings.Viewer.translucent(true);
+		//高亮
+		App.Project.Settings.Viewer.highlight({
+			type: 'userId',
+			ids: ids
+		});
+	},
+
 	//定位到模型
 	zommBox: function($target) {
 
@@ -901,7 +924,6 @@ App.Project = {
 		});
 
 	},
-
 
 	//计划成本 校验 在模型中 显示
 	planCostShowInModel: function(event) {

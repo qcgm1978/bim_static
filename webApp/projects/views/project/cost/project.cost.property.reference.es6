@@ -1,6 +1,4 @@
-//project.cost.property.reference.es6
-
-//陈本清单
+//成本 -> 清单
 App.Project.CostReference = Backbone.View.extend({
 
 	tagName: "div",
@@ -46,36 +44,19 @@ App.Project.CostReference = Backbone.View.extend({
 	},
 	//模型中显示
 	showInModle(event) {
-
-		var $target = $(event.target).closest(".item");
-
-
+		var $target = $(event.target).closest(".item")
+			ids=$target.data("userId"),
+			box=$target.data("box");
 		if ($target.hasClass("selected")) {
 			this.$(".tbBodyScroll").find(".selected").removeClass("selected");
-			//$target.removeClass("selected");
 		} else {
 			this.$(".tbBodyScroll").find(".selected").removeClass("selected");
 			$target.addClass("selected");
 		}
-
-		var Ids = [];
-
-		if ($target.data("cate")) {
-
-			this.$(".tbBodyScroll").find(".selected").each(function() {
-				Ids = $.merge(Ids, $(this).data("cate"))
-			});
-			App.Project.Settings.Viewer.selectIds(Ids);
-			App.Project.Settings.Viewer.zoomSelected();
-			// App.Project.Settings.Viewer.highlight({
-			// 	type: "userId",
-			// 	ids: Ids
-			// }) 
-
+		if (ids && box) {
+			App.Project.zoomModel(ids,box);
 			return;
 		}
-
-
 		var data = {
 			URLtype: "fetchCostModleIdByCode",
 			data: {
@@ -84,20 +65,15 @@ App.Project.CostReference = Backbone.View.extend({
 				costCode: $target.data("code")
 			}
 		};
-
 		App.Comm.ajax(data, function(data) {
+			debugger
 			if (data.code == 0) {
-				$target.data("cate", data.data);
-				$target.parent().find(".selected").each(function() {
-					Ids = $.merge(Ids, $(this).data("cate"))
-				});
-				App.Project.Settings.Viewer.selectIds(Ids);
-				App.Project.Settings.Viewer.zoomSelected(); 
+				var box=App.Project.formatBBox(data.data.boundingBox);
+				$target.data("userId", data.data.elements);
+				$target.data("box", box);
+				App.Project.zoomModel(data.data.elements,box);
 			}
 		});
-
-
-
 	},
 
 	//收起展开

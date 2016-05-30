@@ -36,6 +36,8 @@ App.ResourcesNav.App = Backbone.View.extend({
 			this.$el.append(new App.ResourcesNav.ManifestLibs().render().el);
 
 		}else if(type == "artifactsMapRule"){
+			//  规则模板   --  权限入口
+			App.ResourceArtifacts.Settings.ruleModel = 3;         //    1 只有模块化，  2 只有质量标准  ， 3 有模块化和质量标准
 			//构件映射规则
 			App.ResourceArtifacts.init(_this);
 		}

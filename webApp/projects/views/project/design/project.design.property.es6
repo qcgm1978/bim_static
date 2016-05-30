@@ -139,20 +139,16 @@ App.Project.ProjectDesignPropety = Backbone.View.extend({
 	showInModel(e) {
 
 		var $target = $(e.currentTarget),
-
-			_keyId = $target.data('id'); //主键ID
-
+			_keyId = $target.data('id'),//主键ID
+			ids=$target.data('userId'),
+			box=$target.data('box'); 
 		$target.parent().find('tr').removeClass('selected');
-
 		$target.addClass('selected');
-
 		//判断是否取过
-		if ($target.data("box")) {
-			App.Project.zommBox($target);
+		if (box && ids) {
+			App.Project.zoomModel(ids,box);
 			return;
 		}
-
-
 		App.Comm.ajax({
 			URLtype: 'fetchDesignCheckPointMapParam',
 			data: {
@@ -161,29 +157,22 @@ App.Project.ProjectDesignPropety = Backbone.View.extend({
 				id: _keyId
 			}
 		}, function(res) {
+			debugger
 
 			if (res.code == 0) {
 
 				var _data = res.data;
 
 				if (_data) {
-					var location = JSON.parse(_data.location);
-					//构建id
-					$target.data("elem", _data.componentId);
-					$target.data("userId", location.userId);
-
-					/**读取boundingbox**/
-					var box = [],
-						min = location.bBox.min,
-						minArr = [min.x, min.y, min.z],
-						max = location.bBox.max,
-						maxArr = [max.x, max.y, max.z];
-
-					box.push(minArr);
-					box.push(maxArr);
-					//box id
-					$target.data("box", box);
-					App.Project.zommBox($target);
+					var location = JSON.parse(_data.location),
+						bbox=location.bBox;
+					if(bbox){
+						box = App.Project.formatBBox(bbox);
+						ids=[location.userId];
+						$target.data("userId", ids);
+						$target.data("box", box);
+						App.Project.zoomModel(ids,box);
+					}
 					//	_this.showMarks([_data.location]);
 
 				}
