@@ -1,6 +1,4 @@
-//project.cost.property.properties.es6
-
-//陈本清单
+//成本 -> 属性
 App.Project.CostProperties=Backbone.View.extend({
 
 	tagName:"div",

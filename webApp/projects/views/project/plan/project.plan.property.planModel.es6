@@ -29,36 +29,19 @@ App.Project.PlanModel = Backbone.View.extend({
 
 	//模型中显示
 	showInModle(event) {
-
-		var $target = $(event.target).closest("tr");
-
-
+		var $target = $(event.target).closest("tr"),
+			ids=$target.data("userId"),
+			box=$target.data("box");
 		if ($target.hasClass("selected")) {
 			$target.parent().find(".selected").removeClass("selected");
-			//$target.removeClass("selected");
 		} else {
 			$target.parent().find(".selected").removeClass("selected");
 			$target.addClass("selected");
 		}
-
-		var Ids = [];
-
-		if ($target.data("cate")) {
-
-			$target.parent().find(".selected").each(function() {
-				Ids = $.merge(Ids, $(this).data("cate"))
-			});
-			App.Project.Settings.Viewer.selectIds(Ids);
-			App.Project.Settings.Viewer.zoomSelected();
-			// App.Project.Settings.Viewer.highlight({
-			// 	type: "userId",
-			// 	ids: Ids
-			// }) 
-
+		if (box && ids) {
+			App.Project.zoomModel(ids,box);
 			return;
 		}
-
-
 		var data = {
 			URLtype: "fetchModleIdByCode",
 			data: {
@@ -67,25 +50,13 @@ App.Project.PlanModel = Backbone.View.extend({
 				planCode: $target.data("code")
 			}
 		};
-
 		App.Comm.ajax(data, function(data) {
 			if (data.code == 0) {
-				$target.data("cate", data.data);
-				$target.parent().find(".selected").each(function() {
-					Ids = $.merge(Ids, $(this).data("cate"))
-				});
-				App.Project.Settings.Viewer.selectIds(Ids);
-				App.Project.Settings.Viewer.zoomSelected();
-				// App.Project.Settings.Viewer.highlight({
-				// 	type: "userId",
-				// 	ids: Ids
-				// })
+				var box=App.Project.formatBBox(data.data.boundingBox);
+				$target.data("userId", data.data.elements);
+				$target.data("box", box);
+				App.Project.zoomModel(data.data.elements,box);
 			}
 		});
-
-
-
 	}
-
-
 });

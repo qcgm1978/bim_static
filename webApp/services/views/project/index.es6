@@ -32,7 +32,7 @@
 		
 		this.viewProjectPile = new App.Services.ProjectDetail.Pile();
 		
-		this.$(".projectContainer .projectMapping").html(this.viewProjectMapping.render().el);
+		this.$(".projectContainer .projectBase .mapItem").html(this.viewProjectMapping.render().el);
 
  		this.$(".projectContainer .projectFloor").html(this.viewProjectFloor.render().el);
  		

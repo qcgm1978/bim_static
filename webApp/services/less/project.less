@@ -8,7 +8,7 @@
 		}
 	}
 	.projectContainer { height: 100%; margin-top: -40px; padding-top: 40px;
-		.projectBase, .projectMapping, .projectFloor,.projectBaseHole,.projectSection,.projectPile { display: none; height: 100%;}
+		.projectBase, .projectFloor,.projectBaseHole,.projectSection,.projectPile { display: none; height: 100%;}
 	}
 	.folwSlideBar { .header { height: 38px; line-height: 38px; padding-left: 15px; font-size: 16px; border-bottom: 1px #ccc solid; }
 		.slideBarContainer { height: 100%; margin-top: -39px; padding-top: 39px; }
@@ -21,8 +21,13 @@
 		.date { margin-top: 5px; margin-left: 20px; }
 		.content { margin-left: 15px; margin-top: 5px;}
 	}
-	.projectBase { margin-left: 20px;
-		.projectBg { margin: 20px 0px; border-bottom: 1px #ccc solid; padding-bottom: 20px;
+	.projectBase {
+		& .baseInfoWrap { display: inline-block; width: 400px; padding-left: 48px; padding-top: 16px; }
+		& .baseItem { height: 240px; }
+		& .mapItem { & .header { height: 40px; border-top: 1px solid #ccc; border-bottom: 1px solid #ccc; line-height: 40px; font-size: 14px; color: #666; font-weight: bold; padding-left: 15px; }
+			& .listHeader { background: #EEE; color: #666; }
+		}
+		.projectBg { margin: 20px 0px 20px 20px; float: left; padding-bottom: 20px;
 			img { height: 118px; }
 			& .projectLogo{
 				width: 200px;

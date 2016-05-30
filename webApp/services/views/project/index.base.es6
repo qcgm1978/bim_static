@@ -15,7 +15,7 @@ App.Services.ProjectBase=Backbone.View.extend({
 		var _html=_.template(this.template);
 		var _data=data.toJSON()[0];
 		this.$el.html(_html(_data));   
-		$(".projectContainer .projectBase").html(this.$el);
+		$(".projectContainer .projectBase .baseItem").html(this.$el);
 		
 		$(".projectLogo").hover(function(){
 			var _$label=$(this).find("label");
