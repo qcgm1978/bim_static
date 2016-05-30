@@ -7,8 +7,9 @@ App.ResourceArtifacts={
     },
 
     Settings: {
-        delayCount:  0  //每层加载数量
+        delayCount:  0 , //每层加载数量
 
+        ruleModel: 3   //  权限入口      1 只有模块化，  2 只有质量标准  ， 3 有模块化和质量标准
     },
 
     openRule: null,

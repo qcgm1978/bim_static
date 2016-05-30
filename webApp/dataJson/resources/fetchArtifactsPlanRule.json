@@ -4,6 +4,7 @@
   "data": [
     {
       "categoryCode" : "10.20.30.10",
+      "name" : "规则1",
       "target" : "3",
       "targetName" : "石材幕墙",
       "rules":[
@@ -14,7 +15,8 @@
       ]
     },
     {
-      "categoryCode" : "10.20.30.20",
+      "code" : "10.20.30.20",
+      "name" : "规则2",
       "target" : "4",
       "targetName" : "全玻璃幕墙",
       "rules":[
@@ -24,7 +26,8 @@
       ]
     },
     {
-      "categoryCode" : "10.20.30.30",
+      "code" : "10.20.30.30",
+      "name" : "规则3",
       "target" : "5",
       "targetName" : "陶板幕墙",
       "rules":[
@@ -34,7 +37,7 @@
       ]
     },
     {
-      "categoryCode" : "10.20.30.40",
+      "code" : "10.20.30.40",
       "name" : "规则4",
       "target" : "6",
       "targetName" : "陶板幕墙",

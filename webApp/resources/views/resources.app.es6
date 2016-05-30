@@ -32,6 +32,7 @@ App.Resources.App = Backbone.View.extend({
 			//标准模型库
 			if (!Auth.list) {
 				$resoucesNav.find(".model").closest("li").remove();
+
 			}
 		}
 

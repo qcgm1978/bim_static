@@ -18,16 +18,39 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
     initialize:function(){},
 
     getDetail:function(){
-        var _this = this ;
+        if(App.ResourceArtifacts.Status.presentPlan){//有数据
+            if( !App.ResourceArtifacts.Status.saved){
+                if(App.ResourceArtifacts.openRule == this.model){  //当前
+                    this.tabRule();
+                    return ;
+                }else{
+                    alert("您还有没保存的");
+                    //查找未保存的元素并高亮提示变红
+                    return;
+                }
+            }else if(App.ResourceArtifacts.Status.presentPlan == this.model){
+                this.tabRule();
+                return ;
+            }
+        }
+        //无数据或无更改，更改当前数据
         $(".ruleDetail").empty().hide();
-       this.reset();
+        this.reset();
         //存储model
-        App.ResourceArtifacts.openRule = this.model;
-        this.$(".ruleDetail").html( new App.Resources.ArtifactsPlanRuleDetailUnfold({model:App.ResourceArtifacts.openRule}).render().el);
+        App.ResourceArtifacts.Status.presentPlan = this.model;
+        this.$(".ruleDetail").html( new App.Resources.ArtifactsPlanRuleDetailUnfold({model:App.ResourceArtifacts.Status.presentPlan}).render().el);
         this.$(".ruleDetail").show();
+    },
+    //开合状态
+    tabRule:function(){
+        if(this.$(".ruleDetail:hidden").length){    //未显示
+            this.$(".ruleDetail").show();
+        }else{
+            this.$(".ruleDetail").hide();
+        }
     },
 
     reset:function(){//重置模型
-        if(App.ResourceArtifacts.openRule){App.ResourceArtifacts.openRule=null;}
+        if(App.ResourceArtifacts.Status.presentPlan){App.ResourceArtifacts.Status.presentPlan=null;}
     }
 });

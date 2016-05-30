@@ -16,11 +16,41 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
         return this;
     },
 
-    initialize:function(){},
+    initialize:function(){
+        //监听展开的模型是否被更改，如果更改，列出更改项，提示保存
+        if(App.ResourceArtifacts.Status.presentPlan){
+            this.listenTo(App.ResourceArtifacts.Status.presentPlan,"chang",this.getChangeAttr);    //previous    model.previous(attribute)
+        }
+    },
+
+    //取得模型修改过的属性
+    getChangeAttr:function(e){
+        console.log(e);
+    },
+
     //取得规则列表
     getPlanId:function(){
         var  planId = this.model.get("planId");
-        if(!planId){return;}
+        if(!planId){
+            //判断是否为新建规则，新建规则如何处理？
+            return;
+        }
+
+        if(!App.ResourceArtifacts.Status.saved){
+
+            //提示部分
+         /*   $.tip({
+                type:'success',
+                message:'您还有没保存的',
+                timeout:2000
+            });*/
+
+            alert("您还有没保存的");
+            //更改部分判断
+            //更改部分变红
+            //提示有没有保存现在的，重要
+            return
+        }
 
         $(".artifactsContent .rules ul").empty();
 
@@ -38,6 +68,13 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
     },
 //获取计划节点相关规则
     getRules:function(planId) {
+
+        if(!App.ResourceArtifacts.Status.saved){
+            //提示有没有保存现在的，重要
+            return
+        }
+
+
         var _this = this ;
         var pdata = {
             URLtype: "fetchArtifactsPlanRule",
