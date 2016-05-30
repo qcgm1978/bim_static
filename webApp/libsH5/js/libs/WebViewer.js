@@ -6594,11 +6594,15 @@ CLOUD.Camera.prototype.zoomToBBox = function (bbox) {
     right.crossVectors(dir, up);
     right.normalize();
 
+    var newUp = new THREE.Vector3();
+    newUp.crossVectors(dir, right);
+    newUp.normalize();
+
     var vertPlane = new THREE.Plane();
     vertPlane.setFromNormalAndCoplanarPoint(right, position);
 
     var horzPlane = new THREE.Plane();
-    horzPlane.setFromNormalAndCoplanarPoint(up, position);
+    horzPlane.setFromNormalAndCoplanarPoint(newUp, position);
 
     var maxHeight = 0;
     var maxDistForHeight = 0;
@@ -6630,8 +6634,13 @@ CLOUD.Camera.prototype.zoomToBBox = function (bbox) {
         v.subVectors(corners[i], position);
         var dist = Math.abs(v.dot(dir));
 
-        var h = Math.abs(horzPlane.distanceToPoint(corners[i]));
-        var w = Math.abs(vertPlane.distanceToPoint(corners[i]));
+        var h1 = Math.abs(horzPlane.distanceToPoint(corners[i]));
+        var w1 = h1 * aspect;
+        var w2 = Math.abs(vertPlane.distanceToPoint(corners[i]));
+        var h2 = w2 / aspect;
+
+        var h = Math.max(h1, h2);
+        var w = Math.max(w1, w2);
 
         if (!maxHeight || !maxDistForHeight || h > maxHeight * dist / maxDistForHeight) {
             maxHeight = h;
@@ -6644,25 +6653,14 @@ CLOUD.Camera.prototype.zoomToBBox = function (bbox) {
         }
     }
 
-    var h1 = maxHeight;
-    var h2 = maxWidth / aspect;
-
-    maxHeight = Math.max(h1, h2);
-
-    var tmp =  maxHeight / Math.tan(halfFov) + (distToCenter - maxDistForHeight);
-
-    //var halfHorzFov = halfFov * aspect; // 相机左右方向fov
-    //var tmp1 = maxHeight / Math.tan(halfFov) + (distToCenter - maxDistForHeight);
-    //var tmp2 = maxWidth / Math.tan(halfHorzFov) + (distToCenter - maxDistForWidth);
-    //var tmp = Math.max(tmp1, tmp2);
-
-    // 大于球面包围盒半径，则取球面包围盒半径
-    if (tmp < distToCenter) {
-        distToCenter = tmp;
+    var cameraDist = maxHeight / Math.tan(halfFov) + (distToCenter - maxDistForHeight);
+    if (aspect < 1.0) {
+        cameraDist = maxWidth / Math.tan(halfFov) + (distToCenter - maxDistForWidth);
     }
 
-    offset.copy(dir).normalize().setLength(distToCenter);
+    offset.copy(dir).normalize().setLength(cameraDist);
     position.subVectors(center, offset);
+
 
     // ---------- 计算新位置 E ----------------- //
 
@@ -18084,7 +18082,7 @@ CloudViewer.prototype = {
             scope.render();
         });
 
-        this.lookAt(new THREE.Vector3(-CLOUD.GlobalData.SceneSize * 0.5, CLOUD.GlobalData.SceneSize * 0.5, CLOUD.GlobalData.SceneSize), new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 1, 0));
+        this.lookAt(new THREE.Vector3(-CLOUD.GlobalData.SceneSize * 0.2, CLOUD.GlobalData.SceneSize * 0.2, CLOUD.GlobalData.SceneSize), new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 1, 0));
         this.setPickMode();
 
         // Register Events
@@ -18253,16 +18251,32 @@ CloudViewer.prototype = {
     },
 
     canvas2image: function () {
+
         var mimetype = "image/png";
-        // 在chrome中多调用几次，会出现图片显示不正常（显示空白，原因是转换的值变得不正常了），
-        // 所有在每次调用前先render一次
-        this.render();
-        var dataUrl = this.renderer.domElement.toDataURL(mimetype);
+        var dataUrl = null;
+
+        if (this.editorManager.commentEditor && this.editorManager.editor === this.editorManager.commentEditor) {
+
+            // 在批注模式，底图已经锁定，不用调用render
+            var editor = this.editorManager.commentEditor;
+
+            dataUrl = this.renderer.domElement.toDataURL(mimetype);
+            dataUrl = editor.composeScreenSnapshot(dataUrl);
+
+        } else {
+
+            // 在chrome中多调用几次，会出现图片显示不正常（显示空白，原因是转换的值变得不正常了），
+            // 所有在每次调用前先render一次
+            this.render();
+
+            dataUrl = this.renderer.domElement.toDataURL(mimetype);
+        }
+
         return dataUrl;
     },
 
-    getFilters : function() {
-        return  this.getScene().filter;
+    getFilters: function () {
+        return this.getScene().filter;
     },
 
     disableLoD : function(){
