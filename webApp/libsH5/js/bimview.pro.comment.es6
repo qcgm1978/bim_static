@@ -468,21 +468,27 @@
 						//显示 回调
 						onShowMenuCallback: function(event) {
 
+							var $li = $(event.target).closest(".item"),
+								createId = $li.find(".name").data("creatorid");
+							//创建者 可以 删除 分享 编辑
+							if (App.Global.User.userId == createId) {
+								$("#shareViewPoint,#delViewPoint,#editViewPoint").show();
+							} else {
+								$("#shareViewPoint,#delViewPoint,#editViewPoint").hide();
+							}
 						},
 						//事件绑定
 						bindings: {
 
 							downLoadViewPoint(li) {
-
 								//下载
 								window.location.href = $(li).find(".thumbnailImg").prop("src");
-
 							},
 
 							shareViewPoint(li) {
 
 								var $li = $(li),
-									data= {
+									data = {
 										pic: $li.find(".thumbnailImg").prop("src"),
 										creatorId: $li.find(".name").text().trim(),
 										name: $li.find(".title").text().trim(),
@@ -601,10 +607,10 @@
 						return false;
 					}
 
-					if (!pars.description) {
-						alert("请输入批注描述");
-						return false;
-					}
+					// if (!pars.description) {
+					// 	alert("请输入批注描述");
+					// 	return false;
+					// }
 
 					var data = {
 						URLtype: "updateViewPoint",
@@ -939,9 +945,9 @@
 
 								return false;
 							},
-							cancelCallback(){
+							cancelCallback() {
 
-								that.saveComment(dialog, data,CommentApi.shareViewPoint);
+								that.saveComment(dialog, data, CommentApi.shareViewPoint);
 
 								return false;
 							}
@@ -995,10 +1001,10 @@
 					return false;
 				}
 
-				if (!pars.description) {
-					alert("请输入批注描述");
-					return false;
-				}
+				// if (!pars.description) {
+				// 	alert("请输入批注描述");
+				// 	return false;
+				// }
 
 				var data = {
 					URLtype: "createViewPoint",
@@ -1050,7 +1056,7 @@
 								dialog.close();
 
 								$("#topSaveTip .btnCanel").click();
-								 
+
 								if ($.isFunction(callback)) {
 									callback(imgData.data);
 								}
@@ -1138,12 +1144,18 @@
 						message: dialogHtml
 					},
 
-					dialog = new App.Comm.modules.Dialog(opts);
+					dialog = new App.Comm.modules.Dialog(opts),
 
+					$btnCopy = dialog.element.find(".btnCopy");
 
+				//复制
+				var clip = new ZeroClipboard($btnCopy);
+
+				clip.on("complete", function(e) {
+					alert("您已经复制了链接地址");
+				});
 
 			}
-
 
 		}
 
