@@ -229,6 +229,10 @@ App.Project = {
 		//api 页面 默认加载模型
 		if (App.Project.Settings.type == "token") {
 			$(".breadcrumbNav .fileModelNav li:last").click();
+			//分享
+			if (window.location.href.indexOf("share")>10) {
+				$(".breadcrumbNav .fileModelNav ").remove();
+			}
 		}
 
 
@@ -236,6 +240,10 @@ App.Project = {
 
 	//设置 可以查看的属性
 	setPropertyByAuth: function() {
+
+		if (!App.AuthObj) {
+			return;
+		}
 
 		var projectAuth = App.AuthObj.project;
 

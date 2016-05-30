@@ -59,6 +59,7 @@
         start:function(res){
           _opt._dom.loading.append(_opt._dom.progress);
           _opt._dom.bimBox.append(_opt._dom.loading);
+          _opt._dom.bimBox.append(_opt._dom.modelLoading);
         },
         loading:function(res){
           var total = res.progress.total,
@@ -67,6 +68,7 @@
           _opt._dom.progress.width(progress+'%');
           if(progress == 100){
             _opt._dom.loading.remove();
+            _opt._dom.modelLoading.remove();
           }
           self.pub('loading',res);
         },
