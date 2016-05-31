@@ -233,13 +233,13 @@
             filter;
         $li.find("input").prop("checked",flag);
         if(type == "sceneId"){
-          var filter = bimView.comm.getFilters(self._dom.bimBox.find("#floors"),'ckecked');
-          var specialty = bimView.comm.getFilters(self._dom.bimBox.find("#specialty"),'ckecked');
+          var filter = bimView.comm.getFilters(self._dom.bimBox.find("#floors,#specialty"),'ckecked');
           filter.ids = filter.ids.concat(specialty.ids);
+          self.fileFilter(filter);
         }else{
+          self.filter(filter);
           filter = bimView.comm.getFilters(parents,'ckecked');
         }
-        self.filter(filter);
       }).on('click','.treeText',function(){
         // 选中高亮
         var $this = $(this),
@@ -519,6 +519,17 @@
       $.each(obj.ids,function(i,id){
         filter.addUserFilter(obj.type,id);
       })
+      viewer.render();
+    },
+    fileFilter:function(obj){
+      var self = this;
+      var viewer = self.viewer;
+      var filter = viewer.getFilters();
+      viewer.adjustSceneLoD(obj.total);
+      filter.removeFileFilter();
+      $.each(obj.ids,function(i,id){
+        filter.addFileFilter(id)
+      });
       viewer.render();
     },
     highlight:function(obj){
