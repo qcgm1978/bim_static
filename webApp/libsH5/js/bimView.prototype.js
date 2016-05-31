@@ -292,8 +292,8 @@
         var floors = self.curFloor;
         var infoX = res.axis.infoX || '-';
         var infoY = res.axis.infoY || '-';
-        var infoZ = 'Z('+ floors +','+res.axis.offsetZ+')';
-        bimView.sidebar.el._dom.mapBar.find(".axisGrid").text(infoY+","+infoY+","+infoZ)
+        var infoZ = 'Z('+ floors +','+res.axis.offsetZ+')' || '-';
+        bimView.sidebar.el._dom.mapBar.find(".axisGrid").text(infoX+","+infoY+","+infoZ)
       });
     },
     // 以下是对模型操作
