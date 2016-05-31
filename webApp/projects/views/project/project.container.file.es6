@@ -23,7 +23,11 @@ App.Project.FileContainer=Backbone.View.extend({
 	render:function(){
 		this.$el.html(this.template);
 		var $container = this.$el.find('.serviceNav'),
-		    Auth = App.AuthObj.project.prjfile;
+		    Auth = App.AuthObj &&　App.AuthObj.project.prjfile;
+
+		  if (!Auth) {
+		  		Auth={};
+		  }
 
 		if (!Auth.edit) {
 			this.$('.btnFileUpload').addClass('disable');

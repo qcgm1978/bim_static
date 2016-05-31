@@ -33,10 +33,12 @@ App.Project.ProjectDesignPropety = Backbone.View.extend({
 
 		//if (App.AuthObj.project && App.AuthObj.project.design) {
 
-		var Auth = App.AuthObj.project.design,
-			$projectNav = this.$(".projectPropetyHeader"),
-			CostTpl = App.Comm.AuthConfig.Project.DesignTab,
-			$container = this.$(".projectNavContentBox");
+		// var Auth = App.AuthObj.project.design,
+		// 	$projectNav = this.$(".projectPropetyHeader"),
+		// 	CostTpl = App.Comm.AuthConfig.Project.DesignTab,
+		// 	$container = this.$(".projectNavContentBox");
+
+		var  $container = this.$(".projectNavContentBox");
 
 		//属性
 		//if (Auth.prop) {

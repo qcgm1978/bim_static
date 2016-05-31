@@ -692,7 +692,8 @@
 					"click .btnEnter": "sendComment",
 					"click .delUploadImg": "removeImg", //移除图片
 					"focus .txtReMark": "inputReMark", //输入评论
-					"blur .txtReMark": "outReMark" //失去焦点
+					"blur .txtReMark": "outReMark", //失去焦点
+					"click .btnLogin":"login" //登陆
 				},
 
 				initialize() {
@@ -709,6 +710,11 @@
 					//模板
 					this.$el.html(this.template);
 					return this;
+				},
+
+				login(){
+					//初始化登陆
+					App.Project.Share.initLogin();
 				},
 
 				//上传图片

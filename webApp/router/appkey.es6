@@ -1,4 +1,4 @@
-var AppRoute = Backbone.Router.extend({
+var AppKeyRoute = Backbone.Router.extend({
 
 	routes: {
 		'family/:libId': 'family', //族库
@@ -6,26 +6,41 @@ var AppRoute = Backbone.Router.extend({
 		'project/:projectCode/version/:versionId': 'project', //项目
 		'project/:projectCode/version/:versionId/differ/std': 'projectDifferStd', // 浏览项目模型与标准模型差异
 		'project/:projectCode/version/:versionId/differ/base': 'projectDifferBase', //浏览变更模型与变更基准模型差异
-		'share/:token':"shareModel"	//分享模型
+		'share/:token': "shareModel", //分享模型
+		'logout': 'logout'
 	},
 
 	//模型分享
-	shareModel(token){ 
+	shareModel(token) {
 
-			_.require('/static/dist/projects/projects.css');
-			_.require('/static/dist/projects/projects.js');
+		_.require('/static/dist/projects/projects.css');
+		_.require('/static/dist/projects/projects.js');
 
-			App.Project.Settings = $.extend({}, App.Project.Defaults);
+		App.Project.Settings = $.extend({}, App.Project.Defaults);
 
-			App.Project.Settings.projectId = "3";
 
-			App.Project.Settings.versionId = "201605091530";
-
-			App.Project.Settings.type = "token";
-
-			$("#topBar").prepend(' <ul class="navHeader"> <li class="item "> <span class="login">登录</span> </li></ul>');
-
+		this.parseToken(function() {
 			App.Project.init();
+		});
+
+
+
+	},
+
+	//解析token
+	parseToken(callback) {
+		App.Project.Settings.projectId = "3";
+
+		App.Project.Settings.versionId = "201605091530";
+
+		App.Project.Settings.type = "token";
+
+		$("#topBar").prepend(' <ul class="navHeader"> <li class="item "> <span class="login">登录</span> </li></ul>');
+
+		//回调
+		if ($.isFunction(callback)) {
+			callback();
+		}
 	},
 
 
@@ -272,6 +287,16 @@ var AppRoute = Backbone.Router.extend({
 		$(window).on('beforeunload', function() {
 			App.Comm.delCookie("token_cookie")
 		});
+	},
+
+	logout() {
+		App.Comm.delCookie('OUTSSO_AuthToken');
+		App.Comm.delCookie('AuthUser_AuthNum');
+		App.Comm.delCookie('AuthUser_AuthMAC');
+		App.Comm.delCookie('OUTSSO_AuthNum');
+		App.Comm.delCookie('OUTSSO_AuthMAC');
+		App.Comm.delCookie('IS_OWNER_LOGIN');
+		window.location.href = "/login.html";
 	}
 
 
@@ -280,7 +305,7 @@ var AppRoute = Backbone.Router.extend({
 
 
 
-App.Router = new AppRoute();
+App.AppKeyRoute = new AppKeyRoute();
 
 //开始监听
 Backbone.history.start();
