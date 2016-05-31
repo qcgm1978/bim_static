@@ -3,7 +3,7 @@
  	<div class="title overflowEllipsis"><%=name%></div>
  	<div class="desc overflowEllipsis"><%=description%></div>
  	<div class="other">
- 		<span class="name overflowEllipsis"><%=creatorId%></span>
+ 		<span class="name overflowEllipsis" data-creatorid="<%=creatorId%>"><%=creatorId%></span>
  		<span class="date"><%= new Date(createTime).format("yyyy-MM-dd")%></span>
  		<span class="remarkCount" data-id="<%=id%>">评论（<span class="count"><%=commentCount>99? '99+' :commentCount %></span>）</span>
  	</div>

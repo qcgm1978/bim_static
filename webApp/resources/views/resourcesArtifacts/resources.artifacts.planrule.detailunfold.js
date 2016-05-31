@@ -10,11 +10,13 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
     events:{
         "click .tabRule":"tabRule",
         "click .addNewRule":"addNewRule",
-        "click .RuleDelete":"RuleDelete",
-        "click .save":"save",
+        "click .deleteRule":"deleteRule",
+        "click .saveRule":"saveRule",
         "click .choose":"choose",
         "click .myDropText":"seleRule",
-        "click .myItem":"myItem"
+        "click .myItem":"myItem",
+        "click .delRule": "delRule",
+        "focus .categoryCode": "legend"
     },
 
 
@@ -58,6 +60,8 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
         var _this = $(e.target);
         _this.siblings(".myDropList").show();
     },
+
+
     //增加新规则
     addNewRule:function(){
         var _this = this;
@@ -68,11 +72,14 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
         //向this.model 添加一条属性
     },
     //保存
-    save:function(){
-
+    saveRule:function(){
+        this.$el.closest(".ruleDetail").hide().empty();
+        App.ResourceArtifacts.Status.saved = true ;//保存状态
+        App.ResourceArtifacts.Status.presentPlan= null; //重置模型
     },
+
     //删除计划中的整条规则
-    RuleDelete:function(){
+    deleteRule:function(){
         var frame = new App.Resources.ArtifactsPlanRuleAlert().render().el;
             App.Resources.ArtifactsAlertWindow = new App.Comm.modules.Dialog({
                 title: "",
@@ -83,11 +90,28 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
                 message: frame
             });
             $(".mod-dialog .wrapper .header").hide();//隐藏头部
-            $(".alertInfo").html('确认删除 “'+ this.model.get("desc") + '”！');
+            $(".alertInfo").html('确认删除 “'+ this.model.get("targetName") + '”！');
     },
-    //联想模块
-    legend:function(){
 
+    //删除单条规则
+    delRule:function(e){
+        var rule = $(e.target);
+        var id  = rule.find(".leftten").data("id");
+        var parentId = $(".artifactsContent .rules h2").data("id");
+        //清除本dd项
+        //清除模型中的dd项
+    },
+
+    //根据data-id查找删除对象
+
+
+    //联想模块
+    legend:function(e){
+        var pre = $(e.target);
+        pre.on("keydown",function(ev){
+            var val = pre.val();
+            //从库对象里查找当前值
+        });
     },
     //校验模块
     check:function(){

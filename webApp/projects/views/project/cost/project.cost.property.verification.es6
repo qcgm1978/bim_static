@@ -1,8 +1,4 @@
-//project.cost.property.verification.es6
-
-
-
-//陈本清单
+//成本 -> 校验
 App.Project.CostVerification = Backbone.View.extend({
 
 	tagName: "div",

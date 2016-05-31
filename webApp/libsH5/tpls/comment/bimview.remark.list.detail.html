@@ -1,5 +1,5 @@
 <div class="userInfo">
-    <img src="/platform/user/753757083/photo" class="userImg" />
+    <img src="/platform/user/<%=creatorId%>/photo" class="userImg" />
     <span class="userName"><%=creatorName%></span>
     <span class="date"><%= new Date(createTime).format('yyyy-MM-dd')%></span>
 </div>
@@ -17,7 +17,7 @@
 </div>
 <%}%>
 
-<% if(creatorId==App.Global.User.userId){%>
+<% if(App.Global.User && creatorId==App.Global.User.userId){%>
 <div class="delTalkBox">
 	<i class="delTalk" data-id="<%=id%>"  data-viewpointid="<%=viewpointId%>">删除</i>
 </div>

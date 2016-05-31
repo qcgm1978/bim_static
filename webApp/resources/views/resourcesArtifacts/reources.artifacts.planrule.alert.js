@@ -24,12 +24,16 @@ App.Resources.ArtifactsPlanRuleAlert = Backbone.View.extend({
     },
     //确定
     sure : function(){
+
         $.ajax({
             url:"http://bim.wanda-dev.cn/platform/mapping/rule/delete/" +"id",
             type:"DELETE",
             success:function(response){
-                 if(response.code==0){
-                    //删除成功
+
+                 if(response.code==0){ //删除成功
+                     this.$el.closest(".ruleDetail").hide().empty();
+                     App.ResourceArtifacts.Status.saved = true ;//保存状态
+                     App.ResourceArtifacts.Status.presentPlan= null; //重置模型
                      App.Resources.ArtifactsAlertWindow.close();
                 }
             },

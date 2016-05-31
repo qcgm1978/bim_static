@@ -32,16 +32,18 @@
 		  $container.append(tabs.baseInfo.tab);
 
 		  new App.Services.ProjectBase();
-
-	  }
-
-	  if (Auth.mappingRule) {
-		  $container.append(tabs.mappingRule.tab);
-
 		  this.viewProjectMapping = new App.Services.ProjectMapping();
-		  this.$(".projectContainer .projectMapping").html(this.viewProjectMapping.render().el);
+		  this.$(".projectContainer .projectBase .mapItem").html(this.viewProjectMapping.render().el);
 
 	  }
+
+	  //if (Auth.mappingRule) {
+		 // $container.append(tabs.mappingRule.tab);
+    //
+		 // this.viewProjectMapping = new App.Services.ProjectMapping();
+		 // this.$(".projectContainer .projectMapping").html(this.viewProjectMapping.render().el);
+    //
+	  //}
 
 	  if (Auth.designInfo) {
 		  $container.append(tabs.designInfo.tab);
@@ -63,7 +65,6 @@
 
 
 		
-
 
 
  		this.fetchData();

@@ -5,9 +5,29 @@ var AppRoute = Backbone.Router.extend({
 		'model/:modelCode/version/:versionId': 'standardLibs', //标准模型库
 		'project/:projectCode/version/:versionId': 'project', //项目
 		'project/:projectCode/version/:versionId/differ/std': 'projectDifferStd', // 浏览项目模型与标准模型差异
-		'project/:projectCode/version/:versionId/differ/base': 'projectDifferBase' //浏览变更模型与变更基准模型差异
-
+		'project/:projectCode/version/:versionId/differ/base': 'projectDifferBase', //浏览变更模型与变更基准模型差异
+		'share/:token':"shareModel"	//分享模型
 	},
+
+	//模型分享
+	shareModel(token){ 
+
+			_.require('/static/dist/projects/projects.css');
+			_.require('/static/dist/projects/projects.js');
+
+			App.Project.Settings = $.extend({}, App.Project.Defaults);
+
+			App.Project.Settings.projectId = "3";
+
+			App.Project.Settings.versionId = "201605091530";
+
+			App.Project.Settings.type = "token";
+
+			$("#topBar").prepend(' <ul class="navHeader"> <li class="item "> <span class="login">登录</span> </li></ul>');
+
+			App.Project.init();
+	},
+
 
 	// 浏览变更模型与变更基准模型差异
 	projectDifferBase(projectCode, versionId) {
@@ -37,8 +57,6 @@ var AppRoute = Backbone.Router.extend({
 			App.Index.initApi(projectCode, versionId, "std");
 
 		});
-
-
 	},
 
 	//项目

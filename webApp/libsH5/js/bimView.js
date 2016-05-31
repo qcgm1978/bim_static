@@ -22,7 +22,8 @@
     _opt._dom = self._dom = {
       bimBox:$('<div class="bim"></div>'),
       loading:$('<div class="loading"></div>'),
-      progress:$('<div class="progress"></div>')
+      progress:$('<div class="progress"></div>'),
+      modelLoading:$('<div class="modelLoading"></div>')
     };
     self.init(_opt);
   }

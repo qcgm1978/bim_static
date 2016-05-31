@@ -13,6 +13,7 @@
   }
   .loading{position:absolute;width:100%;height:6px;left:0;top:0;background:#ccc;overflow:hidden;}
   .progress{display:block;background:#358BD4;height:6px;width:0;}
+  .modelLoading{position:absolute;left:50%;top:50%;margin:-32px 0 0 -32px;width:64px;height:64px;background:url(../images/loading-blue-64.gif) no-repeat;}
   .view{width:100%;height:100%;/*cursor:url('../images/rotate.png'),default;*/}
   .fly{cursor:crosshair;}
   .zoom{cursor:url('../images/zoom.png'),default;}
@@ -71,7 +72,7 @@
       }
     }
     .modelMap{width:100%;height:260px;background:#333;position:absolute;left:0;bottom:0;z-index:2;
-      .map{height:180px;background:#fff;border-left:2px solid #333;border-right:2px solid #333;}
+      .map{height:180px;background:#333;margin:0 2px;border-top:1px solid #999;border-bottom:1px solid #999;}
       .axisGrid{margin:5px;float:right;text-align:right;color:#fff;line-height:30px;cursor:pointer;}
     }
     .modelFilter{width:100%;display:none;position:absolute;top:0;bottom:260px;color:#fff;padding:5px;background:rgba(0, 0, 0, 0.75);overflow:auto;}

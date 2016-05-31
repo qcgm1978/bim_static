@@ -20,13 +20,18 @@ App.Project.DesignProperties=Backbone.View.extend({
 	//添加
 	addOne:function(model){ 
 		//渲染数据
-		var data=model.toJSON().data; 
-		this.$el.html(this.template(data)); 
-		//其他属性
-		if($('.design').hasClass('selected')){
-			App.Project.propertiesOthers.call(this,"plan|cost|quality|dwg");
+		var data=model.toJSON().data,
+			_this=this; 
+	//	this.$el.html(this.template(data)); 
 
-		}
+		App.Project.fileInfo(data,function(data){
+			_this.$el.html(_this.template(data)); 
+			//其他属性
+			if($('.design').hasClass('selected')){
+				App.Project.propertiesOthers.call(_this,"plan|cost|quality|dwg");
+
+			}
+		});
 	}
 
 });

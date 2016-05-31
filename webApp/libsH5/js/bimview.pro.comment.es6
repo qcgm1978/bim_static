@@ -65,6 +65,28 @@
 				}
 			})),
 
+			//项目
+			Share: new(Backbone.Collection.extend({
+
+				model: Backbone.Model.extend({
+
+					urlType: "delViewPoint",
+					defualt: {
+						title: ""
+					}
+				}),
+
+				urlType: "projectPhoto",
+
+				parse(response, options) {
+					if (response.code == 0 && response.data.length > 0) {
+						return response.data;
+					} else {
+						this.trigger("dataNull");
+					}
+				}
+			})),
+
 			//用户
 			User: new(Backbone.Collection.extend({
 
@@ -133,12 +155,12 @@
 					"click .navBar .item": "itemClick"
 				},
 
-				template: _.templateUrl('/libsH5/tpls/comment/bimview.pro.comment.html', true),
+				template: _.templateUrl('/libsH5/tpls/comment/bimview.pro.comment.html'),
 
 				//渲染
 				render() {
 					//模板
-					this.$el.html(this.template);
+					this.$el.html(this.template({}));
 					//项目快照
 					this.$(".projectListScroll").html(new CommentView.Project().render().$el);
 					//个人快照
@@ -159,10 +181,23 @@
 					if (type == "project") {
 						this.$(".projectListBox").fadeIn("fast");
 						//this.$(".projectListScroll").animate({left:"0px" },300);
-						//获取数据
-						CommentCollections.Project.projectId = App.Project.Settings.projectId;
-						CommentCollections.Project.reset();
-						CommentCollections.Project.fetch();
+						if (App.Project.Settings.isShare) {
+							//获取数据
+							CommentCollections.Share.projectId = App.Project.Settings.projectId;
+							CommentCollections.Share.reset();
+							CommentCollections.Share.fetch({
+								success() {
+
+									$(".projectList .item:first").click();
+								}
+							});
+						} else {
+							//获取数据
+							CommentCollections.Project.projectId = App.Project.Settings.projectId;
+							CommentCollections.Project.reset();
+							CommentCollections.Project.fetch();
+						}
+
 
 
 						$el.addClass("selected").siblings().removeClass("selected");
@@ -210,7 +245,10 @@
 				initialize() {
 					this.listenTo(CommentCollections.Project, "add", this.addOne);
 					this.listenTo(CommentCollections.Project, "reset", this.reLoading);
-					this.listenTo(CommentCollections.Project, "dataNull", this.dataNull)
+					this.listenTo(CommentCollections.Project, "dataNull", this.dataNull);
+					this.listenTo(CommentCollections.Share, "add", this.addOne);
+					this.listenTo(CommentCollections.Share, "reset", this.reLoading);
+					this.listenTo(CommentCollections.Share, "dataNull", this.dataNull);
 				},
 
 				render() {
@@ -329,35 +367,36 @@
 					var $item = $(event.target).closest(".item"),
 						viewPint = $item.find(".thumbnailImg").data("viewpoint");
 
-						viewPointId=this.$(".remarkCount").data("id");
+					viewPointId = this.$(".remarkCount").data("id");
 
 					$item.addClass("selected").siblings().removeClass("selected");
 
 					App.Project.Settings.Viewer.setCamera(viewPint);
 
-					$.when(this.getFilter(), this.getAnnotation()).done((filterData, annotationData) => {				
-						 
-						 filterData=filterData[0];
-						 annotationData=annotationData[0];
+					$.when(this.getFilter(), this.getAnnotation()).done((filterData, annotationData) => {
 
-						 if (filterData.code==0 && annotationData.code==0) {
-						 
-						 	var filterObj={
+						filterData = filterData[0];
+						annotationData = annotationData[0];
 
-						 	},item;
-						 	$.each(filterData.data.filters,function(i,item){
-						 		item=JSON.parse(item);
-						 		filterObj[item.cateType]=item;
-						 		delete item.cateType;
-						 	});
-						 	 App.Project.Settings.Viewer.loadComment({
-						 	 	list:annotationData.data.annotations,
-						 	 	filter:filterObj
-						 	 });						 	 
+						if (filterData.code == 0 && annotationData.code == 0) {
 
-						 }else{
-						 	alert('数据获取失败');
-						 }
+							var filterObj = {
+
+								},
+								item;
+							$.each(filterData.data.filters, function(i, item) {
+								item = JSON.parse(item);
+								filterObj[item.cateType] = item;
+								delete item.cateType;
+							});
+							App.Project.Settings.Viewer.loadComment({
+								list: annotationData.data.annotations,
+								filter: filterObj
+							});
+
+						} else {
+							alert('数据获取失败');
+						}
 
 					});
 
@@ -449,6 +488,7 @@
 					CommentCollections.ViewComments.fetch({
 						success(model, data) {
 							$(".commentRemark .reMarkCount .count").text(data.data.length);
+							this.$(".reMarkListBox").css("bottom", this.$(".talkReMark").height() + 10);
 						}
 					});
 
@@ -467,19 +507,37 @@
 						//显示 回调
 						onShowMenuCallback: function(event) {
 
+							var $li = $(event.target).closest(".item"),
+								createId = $li.find(".name").data("creatorid"); 
+
+							//创建者 可以 删除 分享 编辑
+							if (App.Global.User && App.Global.User.userId == createId && !App.Project.Settings.isShare) {
+								$("#shareViewPoint,#delViewPoint,#editViewPoint").show();
+							} else {
+								$("#shareViewPoint,#delViewPoint,#editViewPoint").hide();
+							} 
+
 						},
 						//事件绑定
 						bindings: {
 
 							downLoadViewPoint(li) {
-
 								//下载
 								window.location.href = $(li).find(".thumbnailImg").prop("src");
-
 							},
 
-							shareViewPoint() {
-								//分享
+							shareViewPoint(li) {
+
+								var $li = $(li),
+									data = {
+										pic: $li.find(".thumbnailImg").prop("src"),
+										creatorId: $li.find(".name").text().trim(),
+										name: $li.find(".title").text().trim(),
+										description: $li.find(".desc").text().trim(),
+										createTime: $li.find(".date").text().trim()
+									};
+								//分享								
+								CommentApi.shareViewPoint(data);
 
 							},
 
@@ -590,10 +648,10 @@
 						return false;
 					}
 
-					if (!pars.description) {
-						alert("请输入批注描述");
-						return false;
-					}
+					// if (!pars.description) {
+					// 	alert("请输入批注描述");
+					// 	return false;
+					// }
 
 					var data = {
 						URLtype: "updateViewPoint",
@@ -644,7 +702,7 @@
 
 				},
 
-				template: _.templateUrl('/libsH5/tpls/comment/bimview.remark.html', true),
+				template: _.templateUrl('/libsH5/tpls/comment/bimview.remark.html')(),
 
 				//渲染
 				render() {
@@ -927,6 +985,12 @@
 								that.saveComment(dialog, data);
 
 								return false;
+							},
+							cancelCallback() {
+
+								that.saveComment(dialog, data, CommentApi.shareViewPoint);
+
+								return false;
 							}
 						},
 
@@ -978,10 +1042,10 @@
 					return false;
 				}
 
-				if (!pars.description) {
-					alert("请输入批注描述");
-					return false;
-				}
+				// if (!pars.description) {
+				// 	alert("请输入批注描述");
+				// 	return false;
+				// }
 
 				var data = {
 					URLtype: "createViewPoint",
@@ -1035,7 +1099,7 @@
 								$("#topSaveTip .btnCanel").click();
 
 								if ($.isFunction(callback)) {
-									callback(data);
+									callback(imgData.data);
 								}
 							}
 
@@ -1105,8 +1169,34 @@
 					}
 
 				return App.Comm.ajax(data);
-			}
+			},
 
+			//分享视点
+			shareViewPoint(data) {
+
+				var dialogHtml = _.templateUrl('/libsH5/tpls/comment/bimview.share.dialog.html')(data),
+
+					opts = {
+						title: "分享快照",
+						width: 500,
+						height: 250,
+						cssClass: "saveViewPoint",
+						isConfirm: false,
+						message: dialogHtml
+					},
+
+					dialog = new App.Comm.modules.Dialog(opts),
+
+					$btnCopy = dialog.element.find(".btnCopy");
+
+				//复制
+				var clip = new ZeroClipboard($btnCopy);
+
+				clip.on("complete", function(e) {
+					alert("您已经复制了链接地址");
+				});
+
+			}
 
 		}
 

@@ -52,6 +52,11 @@ App.Project.ProjectContainer = Backbone.View.extend({
 
 		var $target = $(event.target).closest(".breadItem");
 
+		//没有下拉箭头的 不加载
+		if ($target.find(".myIcon-slanting-right").length<=0) {
+			return;
+		}
+
 		if ($target.hasClass('project')) {
 			var $projectList = $(".breadItem .projectList");
 			if (!$projectList.is(":hidden")) {
@@ -353,6 +358,17 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			that.viewerPropertyRender();
 
 		});
+
+		//分享
+		if (App.Project.Settings.type=="token" && location.hash.indexOf("share")>0) {
+
+			viewer.on("loaded",function(){
+				//加载数据
+				$(".modelSidebar  .bar-item.m-camera").click();
+			});
+
+		}
+
 	},
 
 	//重置 内容为空
@@ -408,17 +424,14 @@ App.Project.ProjectContainer = Backbone.View.extend({
 
 	//渲染属性
 	renderProperties(model) {
-
 		var data = model.toJSON().data,
 			templateProperties = _.templateUrl("/projects/tpls/project/design/project.design.property.properties.html"),
 			$designProperties = this.$el.find(".singlePropetyBox .designProperties");
-
-		$designProperties.html(templateProperties(data));
-		//其他属性
-		App.Project.propertiesOthers.call({
-			$el: $designProperties
-		}, "plan|cost|quality|dwg");
-
+			$designProperties.html(templateProperties(data));
+			//其他属性
+			App.Project.propertiesOthers.call({
+				$el: $designProperties
+			}, "plan|cost|quality|dwg");
 	}
 
 });
