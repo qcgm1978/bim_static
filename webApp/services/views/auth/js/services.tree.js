@@ -16,7 +16,7 @@ App.Services.tree = function(data){
         li.append(new App.Services.MemberozDetail({model:initModel}).render().el);
         li.append("<div class='childOz' id='childOz"+initModel.cid +"'></div>");
         ele.append(li);
-        App.Comm.initScroll($(".serviceOgList"),"y");
+        App.Comm.initScroll($("#ozList"),"y");
     }
     return ele;
 };
