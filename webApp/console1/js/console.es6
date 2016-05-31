@@ -108,7 +108,7 @@ App.Console = {
             "developFinishDate": 1461140501452,
             "familyCode"       : $("#p13").val().trim(),
             "familyName"       : $("#p12").val().trim(),
-            "refFalimyCode"    : $("#p11").val().trim(),
+            "refFamilyCode"    : $("#p11").val().trim(),
             "status"           : 16,
             "workflowId"       : parseInt(9999999 * Math.random()),
             "title"            : $("#p12").val().trim(),
