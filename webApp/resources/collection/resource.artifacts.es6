@@ -152,17 +152,34 @@ App.ResourceArtifacts={
     })),
 
     init:function(_this) {
-
         var pre = new App.Resources.ArtifactsMapRule();
         var plans = new App.Resources.ArtifactsPlanList();
         var planRule = new App.Resources.ArtifactsPlanRule();
+
         _this.$el.append(pre.render().el);//菜单
+
         pre.$(".plans").html(plans.render().el);//计划节点
         pre.$(".rules").append(planRule.render().el);//菜单
+        pre.$(".rules").append(planRule.render().el);//菜单
+
         //插入默认为空的规则列表
         this.getPlan();
+
         $("#pageLoading").hide();
     },
+
+
+    //缺省加载
+    defaultLoad:function(_this){
+        var pre = new App.Resources.ArtifactsMapRule();
+        _this.$el.append(pre.render().el);//菜单
+        var plans = new App.Resources.ArtifactsPlanList();
+        var planRule = new App.Resources.ArtifactsPlanRule();
+        pre.$(".plans").html(plans.render().el);//计划节点
+        pre.$(".rules").append(planRule.render().el);//菜单
+    },
+
+
     getPlan:function(){
         var _this = this, pdata;
 

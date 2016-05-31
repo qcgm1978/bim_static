@@ -93,11 +93,20 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
         this.$el.closest(".ruleDetail").hide().empty();
         App.ResourceArtifacts.Status.saved = true ;//±£´æ×´Ì¬
 
+
         App.Comm.ajax(cdata,function(response){
             if(response.code == 0 && response.data.id){
+
+                //´´½¨
                 if(cdata.URLtype == "createArtifactsPlanNewRule"){
                     _this.createRule();
                 }
+
+
+
+
+
+
                 _this.$el.closest(".ruleDetail").hide().empty();
                 _this.reset();
             }
