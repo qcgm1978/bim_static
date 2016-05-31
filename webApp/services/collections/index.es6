@@ -80,7 +80,7 @@ App.Services = {
 				$serviceNav.find(".workbook").remove();
 			}
 
-			if (!Auth.system) {
+			if (!Auth.sys) {
 				$serviceNav.find(".systen").remove();
 			}
 

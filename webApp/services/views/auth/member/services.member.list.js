@@ -29,7 +29,7 @@ App.Services.MemberList=Backbone.View.extend({
     addOne:function(model){
         var newView = new App.Services.memberDetail({model:model});
         this.$("#blendList").append(newView.render().el);
-        App.Comm.initScroll(this.$el.find(".servicesMemScrollContent"),"y");
+        App.Comm.initScroll(this.$el.find(".readyForScroll"),"y");
     },
 
     //选中事件

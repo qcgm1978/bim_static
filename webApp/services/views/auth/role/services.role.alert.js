@@ -40,6 +40,7 @@ App.Services.windowAlert = Backbone.View.extend({
                     if(response.data.success[0] == roleId){  //删除成功
                         App.Services.role.collection.remove(_thisModel);
                         App.Services.alertWindow.close();
+                        $(".serviceBody .roleCtrl").addClass("services_loading");
                         return
                     }
                      if(response.data.failure[0] ==roleId){ //删除失败

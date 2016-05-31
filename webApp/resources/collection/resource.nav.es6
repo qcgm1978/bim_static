@@ -70,6 +70,9 @@ App.ResourcesNav = {
 		} else if (type == "manifestLibs") {
 			name = " 清单库";
 			href = "#resources/manifestLibs";
+		}else if(type == "artifactsMapRule"){
+			name = " 映射规则库";
+			href = "#resources/artifactsMapRule";
 		}
 		return {
 			name: name,

@@ -33,7 +33,7 @@ App.Services.roleDetail=Backbone.View.extend({
         var _this = this;
         var data = {};
         App.Services.roleFun.loadData(data,function(){
-            $("#selectedRoleName").val(_this.model.get("name")).attr("disabled","disabled"); //暂时写入
+            $("#selectedRoleName").val(_this.model.get("name")); //暂时写入
             var func = _this.model.get("functions") || [];
             App.Services.maskWindow.find(".seWinBody .func h2 i").text(func.length);
             //为当前角色在父项功能列表中功能设置选择状态
