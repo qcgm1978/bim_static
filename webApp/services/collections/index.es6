@@ -83,6 +83,10 @@ App.Services = {
 			if (!Auth.system) {
 				$serviceNav.find(".systen").remove();
 			}
+
+			if (!Auth.project) {
+				$serviceNav.find(".project").remove();
+			}
 		}
 	}
 };

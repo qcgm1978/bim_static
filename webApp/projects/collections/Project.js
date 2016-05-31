@@ -255,14 +255,14 @@ App.Project = {
 			//}
 
 			//成本
-			//if (projectAuth.cost) {
+			if (projectAuth.cost) {
 				$projectTab.append(ProjectTab.CostTab.tab);
-			//}
+			}
 
 			//质量
-			//if (projectAuth.quality) {
+			if (projectAuth.quality) {
 				$projectTab.append(ProjectTab.QualityTab.tab);
-			//}
+			}
 
 			$projectTab.find(".item:last").addClass('last');
 
@@ -313,10 +313,12 @@ App.Project = {
 
 	//事件初始化
 	initEvent: function() {
-
 		//下载
-		$("#projectContainer").on("click", ".btnFileDownLoad", function() {
+		$("#projectContainer").on("click", ".btnFileDownLoad", function(e) {
 
+			if($(e.currentTarget).is('.disable')){
+				return
+			}
 			var $selFile = $("#projectContainer .fileContent :checkbox:checked").parent();
 
 			if ($selFile.length < 1) {

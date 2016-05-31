@@ -15,7 +15,24 @@ App.Services.System=Backbone.View.extend({
 
 		this.$el.html(new App.Services.System.topBar().render().el);
 
-		this.$(".serviceNav .item").eq(2).trigger("click");
+		var $container = this.$el.find('.serviceNav'),
+		    tabs = App.Comm.AuthConfig.Service.system,
+		    Auth = App.AuthObj.service.sys;
+
+		if (Auth.bizCategary) {
+			$container.append(tabs.bizCategary.tab);
+
+		}
+		if (Auth.workflow) {
+			$container.append(tabs.workflow.tab);
+
+		}
+		if (Auth.extendedAttribute) {
+			$container.append(tabs.extendedAttribute.tab);
+
+		}
+
+		this.$(".serviceNav .item").eq(0).trigger("click");
 
 		return this;
 	},

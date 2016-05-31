@@ -22,25 +22,49 @@
  	render() {
  	
  		this.$el.html(this.template);
- 		
-		new App.Services.ProjectBase();
-		
-		this.viewProjectMapping = new App.Services.ProjectMapping();
-		this.viewProjectBaseHole = new App.Services.ProjectDetail.BaseHole();
-		this.viewProjectFloor = new App.Services.ProjectDetail.Floor();
-		this.viewProjectSection = new App.Services.ProjectDetail.Section();
-		
-		this.viewProjectPile = new App.Services.ProjectDetail.Pile();
-		
-		this.$(".projectContainer .projectMapping").html(this.viewProjectMapping.render().el);
 
- 		this.$(".projectContainer .projectFloor").html(this.viewProjectFloor.render().el);
- 		
- 		this.$(".projectContainer .projectBaseHole").html(this.viewProjectBaseHole.render().el);
- 		
- 		this.$(".projectContainer .projectSection").html(this.viewProjectSection.render().el);
- 		
- 		this.$(".projectContainer .projectPile").html(this.viewProjectPile.render().el);
+
+	  var $container = this.$el.find('.serviceNav'),
+	      tabs = App.Comm.AuthConfig.Service.project,
+		  Auth = App.AuthObj.service.project;
+
+	  if (Auth.baseInfo) {
+		  $container.append(tabs.baseInfo.tab);
+
+		  new App.Services.ProjectBase();
+
+	  }
+
+	  if (Auth.mappingRule) {
+		  $container.append(tabs.mappingRule.tab);
+
+		  this.viewProjectMapping = new App.Services.ProjectMapping();
+		  this.$(".projectContainer .projectMapping").html(this.viewProjectMapping.render().el);
+
+	  }
+
+	  if (Auth.designInfo) {
+		  $container.append(tabs.designInfo.tab);
+
+		  this.viewProjectBaseHole = new App.Services.ProjectDetail.BaseHole();
+		  this.viewProjectFloor = new App.Services.ProjectDetail.Floor();
+		  this.viewProjectSection = new App.Services.ProjectDetail.Section();
+		  this.viewProjectPile = new App.Services.ProjectDetail.Pile();
+
+		  this.$(".projectContainer .projectFloor").html(this.viewProjectFloor.render().el);
+
+		  this.$(".projectContainer .projectBaseHole").html(this.viewProjectBaseHole.render().el);
+
+		  this.$(".projectContainer .projectSection").html(this.viewProjectSection.render().el);
+
+		  this.$(".projectContainer .projectPile").html(this.viewProjectPile.render().el);
+	  }
+
+
+
+		
+
+
 
  		this.fetchData();
 

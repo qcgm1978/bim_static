@@ -81,7 +81,7 @@ App.Console = {
         }
 
       });
-      $("#p11").html(str);
+      $("#p11").html('<option value="">请选择</option>'+str);
     });
     //获取族库研发指令表单
     App.Console.auditSheet1(1, "#s21", 16);

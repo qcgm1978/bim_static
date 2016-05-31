@@ -22,6 +22,15 @@ App.Project.FileContainer=Backbone.View.extend({
 	//渲染
 	render:function(){
 		this.$el.html(this.template);
+		var $container = this.$el.find('.serviceNav'),
+		    Auth = App.AuthObj.project.prjfile;
+
+		if (!Auth.edit) {
+			this.$('.btnFileUpload').addClass('disable');
+			if(!Auth.downLoad){
+				this.$('.btnFileDownLoad').addClass('disable');
+			}
+		}
 		return this;
 	},  
 

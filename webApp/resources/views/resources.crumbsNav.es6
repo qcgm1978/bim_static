@@ -63,7 +63,7 @@ App.ResourceCrumbsNav = Backbone.View.extend({
 		}, function(data) {
 
 			var detail = _.templateUrl("/resources/tpls/resources.crumbsNav.nav.version.Detail.html");
-			var $
+
 			this.$(".standardLibsVersion .projectVersionList").html(detail(data)).show();
 
 		});
