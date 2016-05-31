@@ -23,12 +23,7 @@ App.Project.PlanProperties = Backbone.View.extend({
 
 	addOne: function(model) { 
 	 	var data=model.toJSON().data;
-		this.$el.html(this.template(data));
-		//其他属性
-		if($('.plan').hasClass('selected')){
-			App.Project.propertiesOthers.call(this,"plan|cost|quality|dwg");
-
-		}
+		App.Project.userProps.call(this,data);
 	}
 
 
