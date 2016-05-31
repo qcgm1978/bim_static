@@ -733,7 +733,9 @@ App.Project = {
 		sb.Append(item.code);
 		sb.Append('</div></span>');
 		sb.Append(' <span class="modleVal overflowEllipsis" title="' + item.name + '"> ' + item.name + '</span> ');
-
+		if(item.totalQuantity){
+			sb.Append('<span class="modelCostVal  overflowEllipsis" title="'+item.totalQuantity+'&nbsp;'+item.unit+'">'+Number(item.totalQuantity).toFixed(4)+'&nbsp;'+item.unit+'</span>');
+		}
 		//递归
 		if (item.children && item.children.length > 0) {
 
@@ -760,20 +762,21 @@ App.Project = {
 
 	//在模型中显示
 	showInModel: function($target, type) {
-		var _this = this;
+		var _this=this,
+			ids=$target.data('userId'),
+			box=$target.data('box');
+
 		if ($target.hasClass("selected")) {
 			$target.parent().find(".selected").removeClass("selected");
-			//$target.removeClass("selected");
 		} else {
 			$target.parent().find(".selected").removeClass("selected");
 			$target.addClass("selected");
 		}
 
-		if ($target.data("box")) {
-			this.zommBox($target);
+		if (ids && box) {
+			_this.zoomModel(ids,box);
 			return;
 		}
-
 		var data = {
 			URLtype: "fetchQualityModelById",
 			data: {
@@ -789,90 +792,28 @@ App.Project = {
 			if (data.code == 0) {
 
 				if (data.data) {
-					var pars = {
-							URLtype: "getBoundingBox",
-							data: {
-								projectId: App.Project.Settings.CurrentVersion.projectId,
-								projectVersionId: App.Project.Settings.CurrentVersion.id,
-								sceneId: data.data.sceneId,
-								elementId: data.data.componentId
-							}
-						},
-						location = JSON.parse(data.data.location);
-					//构建id
-					$target.data("elem", data.data.componentId);
-					$target.data("userId", location.userId);
-
-					/**读取boundingbox**/
-					var box = [],
-						min = location.bBox.min,
-						minArr = [min.x, min.y, min.z],
-						max = location.bBox.max,
-						maxArr = [max.x, max.y, max.z];
-
-					box.push(minArr);
-					box.push(maxArr);
-					//box id
+					var location=JSON.parse(data.data.location);
+					box=_this.formatBBox(location.bBox);
+					ids=[location.userId];
+					$target.data("userId", ids);
 					$target.data("box", box);
-					App.Project.zommBox($target);
-					_this.showMarks([data.data.location]);
-					return
-
-					App.Comm.ajax(pars, function(data) {
-
-						if (data.code == 0 && data.data) {
-
-							var box = [],
-								min = data.data.min,
-								minArr = [min.x, min.y, min.z],
-								max = data.data.max,
-								maxArr = [max.x, max.y, max.z];
-
-							box.push(minArr);
-							box.push(maxArr);
-							//box id
-							$target.data("box", box);
-							App.Project.zommBox($target);
-							_this.showMarks([data.data.location]);
-						}
-					});
-
-
-
+					_this.zoomModel(ids,box);
 				}
 			}
 		});
-	},
+	},	 
 
-	//显示标记、隐患点
-	showMarks(marks) {
-		//if(marks && marks.length>0){
-		var m = [JSON.stringify({
-			"id": "1b26a8bb-3c81-48e1-ba21-bf60221d32c3",
-			"userId": "9ba18f953676cd4e679618ffc1ac85bd.865c9ca5-969a-4ed0-8a67-0a54e83beda3-0009d9a1",
-			"state": 0,
-			"position": {
-				"x": -38649.661298145635,
-				"y": -24435.506082937514,
-				"z": 9057.762910436384
-			},
-			"bBox": {
-				"min": {
-					"x": -350,
-					"y": -350,
-					"z": -2640
-				},
-				"max": {
-					"x": 350,
-					"y": 350,
-					"z": 2640
-				}
-			}
-		})]
-		App.Project.Settings.Viewer.loadMarkers(m);
-		//}else{
-
-		//}
+	//通过userid 和 boundingbox 定位模型
+	zoomModel: function(ids, box) {
+		//定位
+		App.Project.Settings.Viewer.zoomToBox(box);
+		//半透明
+		App.Project.Settings.Viewer.translucent(true);
+		//高亮
+		App.Project.Settings.Viewer.highlight({
+			type: 'userId',
+			ids: ids
+		});
 	},
 
 	//定位到模型
@@ -883,12 +824,11 @@ App.Project = {
 			Ids.push($(this).data("userId"));
 			boxArr = boxArr.concat($(this).data("box"));
 		});
-		console.log(Ids);
 		App.Project.Settings.Viewer.zoomToBox(boxArr);
 		App.Project.Settings.Viewer.translucent(true);
 		App.Project.Settings.Viewer.highlight({
-			type: 'userId',
-			ids: Ids //||["9ba18f953676cd4e679618ffc1ac85bd.865c9ca5-969a-4ed0-8a67-0a54e83beda3-0009d9a1"]
+			type:'userId',
+			ids:Ids
 		});
 
 	},
@@ -969,8 +909,51 @@ App.Project = {
 			boxArr = boxArr.concat($code.data("box"));
 		});
 
-		App.Project.Settings.Viewer.selectIds(Ids);
-		App.Project.Settings.Viewer.zoomBox(boxArr);
+		App.Project.Settings.Viewer.highlight(Ids);
+		App.Project.Settings.Viewer.zoomToBox(boxArr);
+	},
+
+	userProps: function(param) {
+		var _this = this;
+		var dataObj = {
+			URLtype: "fetchFileByModel",
+			data: {
+				projectId: App.Project.Settings.projectId,
+				versionId: App.Project.Settings.versionId,
+				modelId: App.Project.Settings.ModelObj.intersect.object.userData.sceneId
+			}
+		}
+		App.Comm.ajax(dataObj, function(data) {
+			var _ = param[0].items;
+			_.push({
+				name: "文件名",
+				value: data.data.name
+			})
+			_.push({
+				name: "专业",
+				value: data.data.specialty
+			})
+			_.push({
+				name: "楼层",
+				value: data.data.floor
+			})
+			_this.$el.html(_this.template(param));
+			if ($('.design').hasClass('selected')) {
+				App.Project.propertiesOthers.call(_this, "plan|cost|quality|dwg");
+			}
+		})
+	},
+
+	//转换bounding box数据
+	formatBBox: function(data) {
+		var box = [],
+			min = data.min,
+			minArr = [min.x, min.y, min.z],
+			max = data.max,
+			maxArr = [max.x, max.y, max.z];
+		box.push(minArr);
+		box.push(maxArr);
+		return box;
 	}
 
 

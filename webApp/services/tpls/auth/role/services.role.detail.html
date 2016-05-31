@@ -12,7 +12,7 @@
     </div>
     <div class="fun">
         <% if (obj.functions ) { for( var i = 0 ; i < obj.functions.length ; i++) {%>
-        <span class="<%= obj.functions[i].id==1 ?  'adm' : '' %>"><%= obj.functions[i].name %></span>
+        <span class="<%= obj.functions[i].id==1 ?  'adm' : '' %>" title="<%= obj.functions[i].name %>"><%= obj.functions[i].name %></span>
         <% } } else{ %>暂无数据<%}%>
     </div>
 </div>
