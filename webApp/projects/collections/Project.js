@@ -229,10 +229,6 @@ App.Project = {
 		//api 页面 默认加载模型
 		if (App.Project.Settings.type == "token") {
 			$(".breadcrumbNav .fileModelNav li:last").click();
-			//分享
-			if (window.location.href.indexOf("share")>10) {
-				$(".breadcrumbNav .fileModelNav ").remove();
-			}
 		}
 
 
@@ -240,10 +236,6 @@ App.Project = {
 
 	//设置 可以查看的属性
 	setPropertyByAuth: function() {
-
-		if (!App.AuthObj) {
-			return;
-		}
 
 		var projectAuth = App.AuthObj.project;
 
@@ -254,23 +246,23 @@ App.Project = {
 
 			//设计
 			//if (projectAuth.design) {
-			$projectTab.append(ProjectTab.DesignTab.tab);
+				$projectTab.append(ProjectTab.DesignTab.tab);
 			//}
 
 			//计划
 			//if (projectAuth.plan) {
-			$projectTab.append(ProjectTab.PlanTab.tab);
+				$projectTab.append(ProjectTab.PlanTab.tab);
 			//}
 
 			//成本
-			//if (projectAuth.cost) {
-			$projectTab.append(ProjectTab.CostTab.tab);
-			//}
+			if (projectAuth.cost) {
+				$projectTab.append(ProjectTab.CostTab.tab);
+			}
 
 			//质量
-			//if (projectAuth.quality) {
-			$projectTab.append(ProjectTab.QualityTab.tab);
-			//}
+			if (projectAuth.quality) {
+				$projectTab.append(ProjectTab.QualityTab.tab);
+			}
 
 			$projectTab.find(".item:last").addClass('last');
 
@@ -321,10 +313,12 @@ App.Project = {
 
 	//事件初始化
 	initEvent: function() {
-
 		//下载
-		$("#projectContainer").on("click", ".btnFileDownLoad", function() {
+		$("#projectContainer").on("click", ".btnFileDownLoad", function(e) {
 
+			if($(e.currentTarget).is('.disable')){
+				return
+			}
 			var $selFile = $("#projectContainer .fileContent :checkbox:checked").parent();
 
 			if ($selFile.length < 1) {
@@ -592,7 +586,7 @@ App.Project = {
 		}
 
 		//获取所有类别
-		var num = 0;
+		var num=0;
 		App.Project.fetchPropertData("servicesCategoryList", function(data) {
 			if (data.code == 0) {
 
@@ -600,28 +594,27 @@ App.Project = {
 				if (!data) {
 					return;
 				}
-				var length = data.length,
-					wrap = '';
-				for (var i = 0; i < data.length; i++) {
+				var length = data.length,wrap='';
+				for(var i=0;i<data.length;i++){
 					var id = data[i]['id'],
-						classes = data[i];
-					App.Project.fetchClassPropertData(id, classes, function(res, cs) {
+					    classes = data[i];
+					App.Project.fetchClassPropertData(id,classes,function(res,cs) {
 						if (res.code == 0) {
 
 							var datas = res.data;
 							if (datas.length) {
 								return;
 							}
-							var str = '<div class="modle"><i class="modleShowHide"></i><h1 class="modleName">' + cs['busName'] + '</h1><ul class="modleList">',
-								liTpl = '<li class="modleItem"><span class="modleName overflowEllipsis"><div class="modleNameText overflowEllipsis">{property}</div></span> <span class="modleVal end">{value}</span></li>';
+							var str='<div class="modle"><i class="modleShowHide"></i><h1 class="modleName">'+cs['busName']+'</h1><ul class="modleList">',
+							liTpl = '<li class="modleItem"><span class="modleName overflowEllipsis"><div class="modleNameText overflowEllipsis">{property}</div></span> <span class="modleVal end">{value}</span></li>';
 
-							for (var j = 0; j < datas.length; j++) {
+							for(var j=0;j<datas.length;j++){
 								str += liTpl.replace("{property}", datas[j]['property']).replace('{value}', datas[j]['value']);
 
 							}
-							wrap += str + '</ul></div>';
+							wrap += str+'</ul></div>';
 						}
-						if (++num == length) {
+						if(++num==length){
 							that.$el.find(".attrClassBox").html(wrap);
 
 						}
@@ -633,9 +626,9 @@ App.Project = {
 
 	//模型属性 dwg 图纸
 	attrDwg: function() {
-
+		 
 		var modelId = App.Project.Settings.ModelObj.intersect.userId.split('.')[0],
-			that = this,
+			that=this,
 			data = {
 				URLtype: 'attrDwg',
 				data: {
@@ -645,7 +638,7 @@ App.Project = {
 				}
 			},
 
-			liTpl = '<li class="modleItem"><a data-id="<%=id%>" href="/static/dist/app/project/single/filePreview.html?id={id}&projectId=' + App.Project.Settings.projectId + '&projectVersionId=' + App.Project.Settings.CurrentVersion.id + '" target="_blank" ><div class="modleNameText overflowEllipsis modleName2">varName</div></a></li>';
+			liTpl = '<li class="modleItem"><a data-id="<%=id%>" href="/static/dist/app/project/single/filePreview.html?id={id}&projectId='+App.Project.Settings.projectId+'&projectVersionId='+App.Project.Settings.CurrentVersion.id+'" target="_blank" ><div class="modleNameText overflowEllipsis modleName2">varName</div></a></li>';
 
 		App.Comm.ajax(data, (data) => {
 			if (data.code == 0) {
@@ -653,10 +646,10 @@ App.Project = {
 				if (data.data.length > 0) {
 					var lis = '';
 					$.each(data.data, function(i, item) {
-						lis += liTpl.replace("varName", item.name).replace('{id}', item.id);
+						lis += liTpl.replace("varName", item.name).replace('{id}',item.id);
 					});
 					that.$el.find(".attrDwgBox").show().find(".modleList").html(lis);
-				}
+				} 
 			}
 		});
 
@@ -681,24 +674,24 @@ App.Project = {
 		App.Comm.ajax(data, callback);
 	},
 
-	//类别属性 数据获取
-	fetchClassPropertData: function(id, param1, callback) {
+//类别属性 数据获取
+fetchClassPropertData: function(id,param1, callback) {
 
-		var Intersect = App.Project.Settings.ModelObj.intersect;
+	var Intersect = App.Project.Settings.ModelObj.intersect;
 
-		var data = {
+	var data = {
 			projectId: App.Project.Settings.projectId,
 			elementId: Intersect.userId,
-			classKey: id
-		};
+			classKey:id
+	};
 
-		//App.Comm.ajax(data, callback);
-		$.ajax({
-			url: "platform/setting/extensions/" + data.projectId + "/property?classKey=" + data.classKey + "&elementId=" + data.elementId
-		}).done(function(data) {
-			callback(data, param1)
-		});
-	},
+	//App.Comm.ajax(data, callback);
+	$.ajax({
+		url: "platform/setting/extensions/"+data.projectId+"/property?classKey="+data.classKey+"&elementId="+data.elementId
+	}).done(function(data){
+		callback(data,param1)
+	});
+},
 
 	//成本树
 	properCostTree: function(data) {
@@ -735,11 +728,10 @@ App.Project = {
 		}
 		sb.Append(item.code);
 		sb.Append('</div></span>');
-		sb.Append(' <span class="modleVal overflowEllipsis" title="' + item.name + '"> ' + item.name + '</span>');
+		sb.Append(' <span class="modleVal overflowEllipsis" title="' + item.name + '"> ' + item.name + '</span> ');
 		if(item.totalQuantity){
 			sb.Append('<span class="modelCostVal  overflowEllipsis" title="'+item.totalQuantity+'&nbsp;'+item.unit+'">'+Number(item.totalQuantity).toFixed(4)+'&nbsp;'+item.unit+'</span>');
 		}
-
 		//递归
 		if (item.children && item.children.length > 0) {
 
@@ -763,8 +755,9 @@ App.Project = {
 
 		return sb.toString();
 	},
+
 	//转换bounding box数据
-	formatBBox:function(data){
+	formatBBox: function(data) {
 		var box = [],
 			min = data.min,
 			minArr = [min.x, min.y, min.z],
@@ -774,22 +767,24 @@ App.Project = {
 		box.push(maxArr);
 		return box;
 	},
+
 	//在模型中显示
 	showInModel: function($target, type) {
-		var _this = this;
+		var _this=this,
+			ids=$target.data('userId'),
+			box=$target.data('box');
+
 		if ($target.hasClass("selected")) {
 			$target.parent().find(".selected").removeClass("selected");
-			//$target.removeClass("selected");
 		} else {
 			$target.parent().find(".selected").removeClass("selected");
 			$target.addClass("selected");
 		}
 
-		if ($target.data("box")) {
-			this.zommBox($target);
+		if (ids && box) {
+			_this.zoomModel(ids,box);
 			return;
 		}
-
 		var data = {
 			URLtype: "fetchQualityModelById",
 			data: {
@@ -805,94 +800,25 @@ App.Project = {
 			if (data.code == 0) {
 
 				if (data.data) {
-					var pars = {
-							URLtype: "getBoundingBox",
-							data: {
-								projectId: App.Project.Settings.CurrentVersion.projectId,
-								projectVersionId: App.Project.Settings.CurrentVersion.id,
-								sceneId: data.data.sceneId,
-								elementId: data.data.componentId
-							}
-						},
-						location = JSON.parse(data.data.location);
-					//构建id
-					$target.data("elem", data.data.componentId);
-					$target.data("userId", location.userId);
-
-					/**读取boundingbox**/
-					var box = [],
-						min = location.bBox.min,
-						minArr = [min.x, min.y, min.z],
-						max = location.bBox.max,
-						maxArr = [max.x, max.y, max.z];
-
-					box.push(minArr);
-					box.push(maxArr);
-					//box id
+					var location=JSON.parse(data.data.location);
+					box=_this.formatBBox(location.bBox);
+					ids=[location.userId];
+					$target.data("userId", ids);
 					$target.data("box", box);
-					App.Project.zommBox($target);
-					_this.showMarks([data.data.location]);
-					return
-
-					App.Comm.ajax(pars, function(data) {
-
-						if (data.code == 0 && data.data) {
-
-							var box = [],
-								min = data.data.min,
-								minArr = [min.x, min.y, min.z],
-								max = data.data.max,
-								maxArr = [max.x, max.y, max.z];
-
-							box.push(minArr);
-							box.push(maxArr);
-							//box id
-							$target.data("box", box);
-							App.Project.zommBox($target);
-							_this.showMarks([data.data.location]);
-						}
-					});
-
-
-
+					_this.zoomModel(ids,box);
 				}
 			}
 		});
 	},
 
 	//显示标记、隐患点
-	showMarks(marks) {
-		//if(marks && marks.length>0){
-		var m = [JSON.stringify({
-			"id": "1b26a8bb-3c81-48e1-ba21-bf60221d32c3",
-			"userId": "9ba18f953676cd4e679618ffc1ac85bd.865c9ca5-969a-4ed0-8a67-0a54e83beda3-0009d9a1",
-			"state": 0,
-			"position": {
-				"x": -38649.661298145635,
-				"y": -24435.506082937514,
-				"z": 9057.762910436384
-			},
-			"bBox": {
-				"min": {
-					"x": -350,
-					"y": -350,
-					"z": -2640
-				},
-				"max": {
-					"x": 350,
-					"y": 350,
-					"z": 2640
-				}
-			}
-		})]
-		App.Project.Settings.Viewer.loadMarkers(m);
-		//}else{
-
-		//}
+	showMarks(marks){
+	//	var m=[JSON.stringify({"id":"1b26a8bb-3c81-48e1-ba21-bf60221d32c3","userId":"9ba18f953676cd4e679618ffc1ac85bd.865c9ca5-969a-4ed0-8a67-0a54e83beda3-0009d9a1","state":0,"position":{"x":-38649.661298145635,"y":-24435.506082937514,"z":9057.762910436384},"bBox":{"min":{"x":-350,"y":-350,"z":-2640},"max":{"x":350,"y":350,"z":2640}}})]
+	 //	App.Project.Settings.Viewer.loadMarkers(m);
 	},
 
 	//通过userid 和 boundingbox 定位模型
-	zoomModel:function(ids,box){
+	zoomModel: function(ids, box) {
 		//定位
 		App.Project.Settings.Viewer.zoomToBox(box);
 		//半透明
@@ -906,27 +832,21 @@ App.Project = {
 
 	//定位到模型
 	zommBox: function($target) {
-
 		var Ids = [],
-
 			boxArr = [];
-
 		$target.parent().find(".selected").each(function() {
 			Ids.push($(this).data("userId"));
 			boxArr = boxArr.concat($(this).data("box"));
 		});
-
-		//定位
 		App.Project.Settings.Viewer.zoomToBox(boxArr);
-		//半透明
 		App.Project.Settings.Viewer.translucent(true);
-		//高亮
 		App.Project.Settings.Viewer.highlight({
-			type: 'userId',
-			ids: Ids //||["9ba18f953676cd4e679618ffc1ac85bd.865c9ca5-969a-4ed0-8a67-0a54e83beda3-0009d9a1"]
+			type:'userId',
+			ids:Ids
 		});
 
 	},
+
 
 	//计划成本 校验 在模型中 显示
 	planCostShowInModel: function(event) {
@@ -1005,34 +925,6 @@ App.Project = {
 
 		App.Project.Settings.Viewer.highlight(Ids);
 		App.Project.Settings.Viewer.zoomToBox(boxArr);
-	},
-
-	fileInfo:function(param,call){
-		var dataObj = {
-			URLtype: "fetchFileByModel",
-			data: {
-				projectId: App.Project.Settings.projectId,
-				versionId: App.Project.Settings.versionId,
-				modelId: App.Project.Settings.ModelObj.intersect.object.userData.sceneId
-			}
-		}
-		App.Comm.ajax(dataObj,function(data){
-			debugger
-			var _=param[0].items;
-			_.push({
-				name: "文件名",
-				value: data.data.name
-			})
-			_.push({
-				name: "专业",
-				value: data.data.specialty
-			})
-			_.push({
-				name: "楼层",
-				value: data.data.floor
-			})
-			call(param)
-		})
 	},
 
 	userProps:function(param){

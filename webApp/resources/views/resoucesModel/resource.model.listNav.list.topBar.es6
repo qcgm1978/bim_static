@@ -14,17 +14,48 @@
 
  	render: function() {
  		this.$el.html(this.template);
- 		return this;
+	  if (!App.AuthObj.lib) {
+
+	  } else{
+		  var type = App.ResourcesNav.Settings.type;
+		  if (type == "standardLibs") {
+			  var Auth = App.AuthObj.lib.model;
+
+			  if(!Auth.edit){
+				  this.$('.btnNewFolder,.btnFileDel,.btnFileUpload').addClass('disable');
+				  if(!App.ResourceModel.Settings.CurrentVersion.byProjectRef){
+					  this.$('.btnFileDownLoad').addClass('disable');
+				  }
+			  }
+		  } else if (type == "famLibs") {
+			  var Auth = App.AuthObj.lib.family;
+
+			  if(!Auth.edit){
+				  this.$('.btnNewFolder,.btnFileDel,.btnFileUpload').addClass('disable');
+				  if(!App.ResourceModel.Settings.CurrentVersion.byProjectRef){
+					  this.$('.btnFileDownLoad').addClass('disable');
+				  }
+			  }
+		  }
+
+
+	  }
+		  return this;
  	},
 
  	//创建新文件家
- 	createNewFolder: function() {
+ 	createNewFolder: function(e) {
+	  if($(e.currentTarget).is('.disable')){
+		  return
+	  }
  		App.ResourceModel.createNewFolder();
  	},
 
  	//下载
- 	fileDownLoad: function() {
-
+ 	fileDownLoad: function(e) {
+	  if($(e.currentTarget).is('.disable')){
+		  return
+	  }
  		var $resourceListContent = $("#resourceListContent"),
  			$selFile = $resourceListContent.find(".fileContent :checkbox:checked").parent();
 
@@ -55,7 +86,10 @@
  	},
 
  	//删除文件
- 	deleteFile: function() {
+ 	deleteFile: function(e) {
+	  if($(e.currentTarget).is('.disable')){
+		  return
+	  }
  		var $resourceListContent = $("#resourceListContent"),
  			$selFile = $resourceListContent.find(".fileContent :checkbox:checked");
 

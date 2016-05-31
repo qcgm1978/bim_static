@@ -18,7 +18,7 @@ App.Resources.App = Backbone.View.extend({
 		} else {
 			var Auth = App.AuthObj.lib;
 			//族库
-			if (!Auth.family) {
+			if (!Auth.family && !App.Global.User.hasFamilies) {
 				$resoucesNav.find(".famLibs").closest("li").remove();
 			}
 			//质量标准库
@@ -30,9 +30,12 @@ App.Resources.App = Backbone.View.extend({
 				$resoucesNav.find(".manifestLibs").closest("li").remove();
 			}
 			//标准模型库
-			if (!Auth.list) {
-				$resoucesNav.find(".model").closest("li").remove();
-
+			if (!Auth.model && !App.Global.User.hasModels) {
+				$resoucesNav.find(".standardLibs").closest("li").remove();
+			}
+			//映射规则管理
+			if (!Auth.mappingRuleTemplate) {
+				$resoucesNav.find(".artifactsMapRule").closest("li").remove();
 			}
 		}
 

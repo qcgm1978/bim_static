@@ -292,8 +292,8 @@
         var floors = self.curFloor;
         var infoX = res.axis.infoX || '-';
         var infoY = res.axis.infoY || '-';
-        var infoZ = 'Z('+ floors +','+res.axis.offsetZ+')';
-        bimView.sidebar.el._dom.mapBar.find(".axisGrid").text(infoY+","+infoY+","+infoZ)
+        var infoZ = 'Z('+ floors +','+res.axis.offsetZ+')' || '-';
+        bimView.sidebar.el._dom.mapBar.find(".axisGrid").text(infoX+","+infoY+","+infoZ)
       });
     },
     // 以下是对模型操作
@@ -506,7 +506,7 @@
       self.filter(data.filter.category);
       self.filter(data.filter.classCode);
       // viewer.setCommentMode();
-      debugger
+      //debugger
       viewer.loadComments(newList);
     },
     // 模型过滤器
@@ -523,7 +523,7 @@
     },
     highlight:function(obj){
       // 高亮
-      debugger
+      //debugger
       var self = this;
       var viewer = self.viewer;
       var filter = viewer.getFilters();

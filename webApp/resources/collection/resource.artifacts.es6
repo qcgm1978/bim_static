@@ -2,7 +2,7 @@
 //fetchArtifactsPlanRule   获取规则
 App.ResourceArtifacts={
     Status:{
-        presentPlan:null,
+        presentPlan:null,  //当前计划
         saved : true    //创建规则后的保存状态，已保存  /  未保存
     },
 
