@@ -506,7 +506,7 @@
       self.filter(data.filter.category);
       self.filter(data.filter.classCode);
       // viewer.setCommentMode();
-      debugger
+      //debugger
       viewer.loadComments(newList);
     },
     // 模型过滤器
@@ -523,7 +523,7 @@
     },
     highlight:function(obj){
       // 高亮
-      debugger
+      //debugger
       var self = this;
       var viewer = self.viewer;
       var filter = viewer.getFilters();

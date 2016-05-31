@@ -8,11 +8,11 @@
     </div>
 </div>
 
-<%if(!App.Comm.getCookie("OUTSSO_AuthToken")){%>
-    <div class="noLogin">亲，请登录</div>
+<%if(!App.Comm.getCookie("OUTSSO_AuthToken_teset")){%>
+    <div class="noLogin">如需评论，请先<span class="btnLogin"> 登录</span></div>
 <%}%>
 
-<div class="talkReMark <%=!App.Comm.getCookie('OUTSSO_AuthToken')?'hidden':''  %>">
+<div class="talkReMark <%=!App.Comm.getCookie('OUTSSO_AuthToken_teset')?'hidden':''  %>">
     <div class="inputBox">
         <textarea class="txtReMark" placeholder="请输入评论"></textarea>
         <div class="uploadImgs">
