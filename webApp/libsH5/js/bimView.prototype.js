@@ -167,6 +167,7 @@
               content:content,
               callback:function(){
                 $this.attr('class','bar-item m-color '+type).data('id',type);
+                bimView.comm.setModelBgColor(type);
                 self._dom.bimBox.attr('class','bim '+type)
               }
             })
