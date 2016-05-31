@@ -24,7 +24,30 @@
                 </select>
             </div>
         </div>
-
+      <div class="form-group">
+        <label for="inputPassword3" class="col-sm-2 control-label">发起人</label>
+        <div class="col-sm-10">
+          <input type="text" class="form-control" id="p14" value="">
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="inputPassword3" class="col-sm-2 control-label">审核人</label>
+        <div class="col-sm-10">
+          <input type="text" class="form-control" id="p15" value="">
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="inputPassword3" class="col-sm-2 control-label">确认人</label>
+        <div class="col-sm-10">
+          <input type="text" class="form-control" id="p16" value="">
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="inputPassword3" class="col-sm-2 control-label">接收人</label>
+        <div class="col-sm-10">
+          <input type="text" class="form-control" id="p17" value="">
+        </div>
+      </div>
         <div class="form-group">
             <div class="col-sm-offset-2 col-sm-10">
                 <button type="button" id="submit1" class="btn btn-primary">提交</button>
@@ -63,7 +86,12 @@
             "familyDevelopWorkflowId": "3b617942-0c1e-458e-922a-9b1c85294f0e",
             "status": 8,
             "workflowId": "a57b543d-81da-4721-8a34-6e5dbecef4b7",
-            "title": "族库报审表单"
+            "title": "族库报审表单",
+            "initiator": "发起人",
+            "auditor": "审核人",
+            "confirmor": "确认人",
+            "receiver": "接收人"
+
           }
 
                     </textarea>
@@ -115,7 +143,11 @@ status	审批状态	int	8发起；16审批通过；（4驳回；32撤销；128�
             "description": "描述",
             "status": 16,
             "workflowId": "123",
-            "title": "族库报审表单"
+            "title": "族库报审表单",
+            "initiator": "发起人",
+            "auditor": "审核人",
+            "confirmor": "确认人",
+            "receiver": "接收人"
           }
 
                     </textarea>
@@ -173,7 +205,11 @@ status	审批状态	int	8发起；16审批通过；（4驳回；32撤销；128�
             "familyAprovalWorkflowId": "7730d3f4-2efe-4e6f-9b13-b5caed740cdc",
             "status": 8,
             "workflowId": "89de41ec-c988-4aa1-82ed-aeb8b047d3bc",
-            "title": "族库发布表单"
+            "title": "族库发布表单",
+            "initiator": "发起人",
+            "auditor": "审核人",
+            "confirmor": "确认人",
+            "receiver": "接收人"
           }
                     </textarea>
                      <textarea name="" id="" cols="30" rows="30">
@@ -218,11 +254,15 @@ createTime	表单创建时间	long
                 <div class="col-sm-10">
                     <textarea name="" id="data4" cols="30" rows="30">
            {
-        "auditFinishTime": 1461140797861,
-        "description": "描述",
-        "status": 16,
-        "workflowId": "123",
-        "title": "族库发布表单"
+            "auditFinishTime": 1461140797861,
+            "description": "描述",
+            "status": 16,
+            "workflowId": "123",
+            "title": "族库发布表单",
+            "initiator": "发起人",
+            "auditor": "审核人",
+            "confirmor": "确认人",
+            "receiver": "接收人"
     }
 
                     </textarea>
