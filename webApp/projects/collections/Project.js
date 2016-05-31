@@ -1007,7 +1007,7 @@ App.Project = {
 		App.Project.Settings.Viewer.zoomToBox(boxArr);
 	},
 
-	fileInfo(param,call){
+	fileInfo:function(param,call){
 		var dataObj = {
 			URLtype: "fetchFileByModel",
 			data: {
@@ -1032,6 +1032,37 @@ App.Project = {
 				value: data.data.floor
 			})
 			call(param)
+		})
+	},
+
+	userProps:function(param){
+		var _this=this;
+		var dataObj = {
+			URLtype: "fetchFileByModel",
+			data: {
+				projectId: App.Project.Settings.projectId,
+				versionId: App.Project.Settings.versionId,
+				modelId: App.Project.Settings.ModelObj.intersect.object.userData.sceneId
+			}
+		}
+		App.Comm.ajax(dataObj,function(data){
+			var _=param[0].items;
+			_.push({
+				name: "文件名",
+				value: data.data.name
+			})
+			_.push({
+				name: "专业",
+				value: data.data.specialty
+			})
+			_.push({
+				name: "楼层",
+				value: data.data.floor
+			})
+			_this.$el.html(_this.template(param)); 
+			if($('.design').hasClass('selected')){
+				App.Project.propertiesOthers.call(_this,"plan|cost|quality|dwg");
+			}
 		})
 	}
 
