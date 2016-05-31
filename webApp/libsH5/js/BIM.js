@@ -261,15 +261,6 @@
         group:'0'
       },
       {
-        id:'zoom',
-        icon:'m-zoom',
-        title:'缩放(Z)',
-        fn:'zoom',
-        keyCode:'122',
-        type:'pattern',
-        group:'3'
-      },
-      {
         id:'translucent',
         icon:'m-translucent',
         title:'半透明',
