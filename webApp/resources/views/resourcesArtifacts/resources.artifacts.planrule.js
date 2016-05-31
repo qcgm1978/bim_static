@@ -46,7 +46,7 @@ App.Resources.ArtifactsPlanRule = Backbone.View.extend({
         }
         $(".artifactsContent .rules ul li:last-child .ruleDetail").html( new App.Resources.ArtifactsPlanRuleDetailUnfold({model:model}).render().el).show();
         //±£´æ×´Ì¬
-        App.ResourceArtifacts.Status.saved = false;
+        //App.ResourceArtifacts.Status.saved = false;
     }
 
 });
