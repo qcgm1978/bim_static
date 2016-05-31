@@ -6,6 +6,7 @@
   bimView.sidebar = {
     init:function(options,obj){
       var self = this;
+      var modelBgColor = bimView.comm.getModelBgColor();
       self._dom={
         sidebar : $('<div class="modelSidebar"> <div class="modelMap"> <div class="map"></div> </div> <div class="modelFilter"> <div id="filter" class="modelTab"> <ul class="tree"> <li class="itemNode" id="specialty" data-type="sceneId"> <div class="itemContent"> <i class="m-openTree"></i> <label class="treeCheckbox"> <input type="checkbox" checked="true"> <span class="m-lbl"></span> </label> <span class="treeText">专业</span> </div> </li> <li class="itemNode" id="floors" data-type="sceneId"> <div class="itemContent"> <i class="m-openTree"></i> <label class="treeCheckbox"> <input type="checkbox" checked="true"> <span class="m-lbl"></span> </label> <span class="treeText">楼层</span> </div> </li> <li class="itemNode" id="category" data-type="categoryId"> <div class="itemContent"> <i class="m-openTree"></i> <label class="treeCheckbox"> <input type="checkbox" checked="true"> <span class="m-lbl"></span> </label> <span class="treeText">构件类型</span> </div> </li> <li class="itemNode" id="classCode" data-type="classCode"> <div class="itemContent"> <i class="m-openTree"></i> <label class="treeCheckbox"> <input type="checkbox" checked="true"> <span class="m-lbl"></span> </label> <span class="treeText">分类编码</span> </div> </li> </ul> </div> <div id="comment" class="modelTab">comment</div> <div id="selected" class="modelTab">selected</div> </div> </div>'),
         modelBar : $('<div class="toolsBar"></div>'),
@@ -35,6 +36,7 @@
         }
       });
       self._dom.sidebar.find('.modelMap').prepend(self._dom.modelBar);
+      bimBox.addClass(modelBgColor);
       bimBox.append(self._dom.sidebar);
       bimView.sidebar.loadMap();
     },
@@ -132,7 +134,9 @@
     more:function(viewer){
       var self = this;
       var status = viewer.getTranslucentStatus();
+      var modelBgColor = bimView.comm.getModelBgColor()
       self.el._dom.sidebar.find('.bar-translucent').toggleClass('selected',status);
+      self.el._dom.sidebar.find('.m-color').attr('class','bar-item m-color '+modelBgColor);
     },
     toggleMap:function(el){
       var self = this;

@@ -199,6 +199,18 @@
           dialog.remove();
         }
       })
+    },
+    getModelBgColor:function(){
+      if(window.localStorage){
+        return localStorage.getItem('modelBgColor') || 'color-1';
+      }else{
+        return 'color-1'
+      }
+    },
+    setModelBgColor:function(color){
+      if(window.localStorage){
+        localStorage.setItem('modelBgColor',color);
+      }
     }
   }
   Array.prototype.remove = function(item){
