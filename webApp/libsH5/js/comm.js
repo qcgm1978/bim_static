@@ -68,6 +68,19 @@
             result.ids.push(item.code);
           }
         });
+      }else if(type == 'sceneId'){
+        result.total = [];
+        $.each(list,function(i,item){
+          var $item = $(item),
+              isChecked = $item.find('input').prop('checked'),
+              userData = $item.data('userData') ? $item.data('userData').toString().split(","):[];
+          if(select == 'ckecked' && !isChecked || select == 'all'){
+            result.ids = result.ids.concat(userData);
+          }
+          result.total = result.total.concat(userData);
+        });
+        result.total = result.total.unique();
+        result.total = result.total.minus(result.ids);
       }else{
         $.each(list,function(i,item){
           var $item = $(item),
@@ -186,6 +199,80 @@
           dialog.remove();
         }
       })
+    },
+    getModelBgColor:function(){
+      if(window.localStorage){
+        return localStorage.getItem('modelBgColor') || 'color-1';
+      }else{
+        return 'color-1'
+      }
+    },
+    setModelBgColor:function(color){
+      if(window.localStorage){
+        localStorage.setItem('modelBgColor',color);
+      }
     }
+  }
+  Array.prototype.remove = function(item){
+    var _self = this;
+    if((typeof item) == 'object'){
+      for(var i=0,len=item.length;i<len;i++){
+        remove(item[i]);
+      }
+    }else{
+      remove(item);
+    }
+    function remove(x){
+      var index = _self.indexOf(x);
+      if (index > -1) {
+        _self.splice(index, 1);
+      }
+    }
+  }
+  Array.prototype.indexOf = function(item) {
+    for (var i = 0; i < this.length; i++) {
+      if (this[i] == item){
+        return i;
+      }
+    }
+    return -1;
+  }
+  Array.prototype.intersect = function(x){
+    var arr = [];
+    var that = this;
+    var i=0;
+    var len = that.length;
+    for(;i<len;i++){
+      if(x.indexOf(that[i]) > -1){
+        arr.push(that[i]);
+      }
+    }
+    return arr;
+  }
+  Array.prototype.unique = function(){
+    var n = {},r=[];
+    for(var i = 0; i < this.length; i++){
+      if (!n[this[i]]){
+        n[this[i]] = true;
+        r.push(this[i]);
+      }
+    }
+    return r;
+  }
+  Array.prototype.minus = function(arr){
+    var result = [];
+    var self = this;
+    for(var i=0,len = self.length;i<len;i++){
+      var flag = true;
+      for(var j=0,arrLen = arr.length;j<arrLen;j++){
+        if (arr[j] == self[i]) {
+          flag = false;
+        }
+      }
+      if(flag){
+        result.push(self[i]);
+      }
+    }
+    return result;
   }
 })($);

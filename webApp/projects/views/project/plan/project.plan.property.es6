@@ -23,10 +23,12 @@ App.Project.ProjectPlanProperty = Backbone.View.extend({
 		 
 		//if (App.AuthObj.project && App.AuthObj.project.plan) {
 
-			var Auth = App.AuthObj.project.plan,
-				$projectNav = this.$(".projectPlanNav"),
-				CostTpl = App.Comm.AuthConfig.Project.PlanTab,
-				$container = this.$(".planContainer");
+			// var Auth = App.AuthObj.project.plan,
+			// 	$projectNav = this.$(".projectPlanNav"),
+			// 	CostTpl = App.Comm.AuthConfig.Project.PlanTab,
+			// 	$container = this.$(".planContainer");
+
+			var $container = this.$(".planContainer");
 
 			////模块化
 			//if (Auth.modularization) {

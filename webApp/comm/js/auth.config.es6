@@ -36,6 +36,45 @@ App.Comm.AuthConfig = {
 			prop: '<li data-type="poperties" class="item">属性</li>'
 		}
 
+	},
+
+	//服务
+	Service:{
+		//项目
+		project:{
+			//项目基本信息
+			baseInfo : {
+				tab : '<li data-type="base" class="item ">项目基本信息</li>'
+			},
+			//项目映射规则
+			mappingRule : {
+				tab : '<li data-type="mapping" class="item">项目映射</li>'
+			},
+			//设计信息
+			designInfo : {
+				tab :  '<li data-type="floor" class="item">楼栋信息</li>'
+							+'<li data-type="basehole" class="item">基坑</li>'
+							+'<li data-type="section" class="item">剖面</li>'
+							+'<li data-type="pile" class="item">桩</li>'
+			}
+		},
+		//系统管理
+		system : {
+			//业务类别管理
+			bizCategary : {
+				tab : '<li data-type="category" class="item">业务类别管理</li>'
+			},
+			//业务流程管理
+			workflow : {
+				tab : '<li data-type="flow"     class="item ">业务流程管理</li>'
+
+			},
+			//扩展属性管理
+			extendedAttribute : {
+				tab : '<li data-type="extend"   class="item ">扩展属性管理</li>'
+
+			}
+		}
 	}
 
 	 

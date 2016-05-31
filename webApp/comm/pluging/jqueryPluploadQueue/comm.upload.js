@@ -381,6 +381,10 @@
             options.browse_dir_button = 'html5-uploaddir-btn'
             $(uploadButtons).appendTo(document.body)
             uploadButton.click(function(e) {
+                //灰色按钮点击无效
+                if($(e.currentTarget).is('.disable')){
+                    return
+                }
                 var p = $(this).offset()
                 uploadButtons.css({
                     top: p.top + $(this).height() + 18,

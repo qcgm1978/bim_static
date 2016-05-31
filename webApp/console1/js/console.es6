@@ -81,7 +81,7 @@ App.Console = {
         }
 
       });
-      $("#p11").html(str);
+      $("#p11").html('<option value="">请选择</option>'+str);
     });
     //获取族库研发指令表单
     App.Console.auditSheet1(1, "#s21", 16);
@@ -108,10 +108,14 @@ App.Console = {
             "developFinishDate": 1461140501452,
             "familyCode"       : $("#p13").val().trim(),
             "familyName"       : $("#p12").val().trim(),
-            "refFalimyCode"    : $("#p11").val().trim(),
+            "refFamilyCode"    : $("#p11").val().trim(),
             "status"           : 16,
             "workflowId"       : parseInt(9999999 * Math.random()),
-            "title"            : $("#p12").val().trim()
+            "title"            : $("#p12").val().trim(),
+            "initiator"        : $("#p14").val().trim(),
+            "auditor"          : $("#p15").val().trim(),
+            "confirmor"        : $("#p16").val().trim(),
+            "receiver"         : $("#p17").val().trim()
           }
         }),
         "msgCreateTime": 1461727280227,
@@ -339,7 +343,11 @@ App.Console = {
         region: "管理分区", //管理分区，最大长度32。非空
         openTime: $("#devDate").val().trim(), //开业时间
         //versionName: “2016 版”, //版本名称，适用于标准模型。非空字段
-        designUnit: $("#launchDepartment").val().trim()
+        designUnit: $("#launchDepartment").val().trim(),
+        "initiator"        : $("#p14").val().trim(),
+        "auditor"          : $("#p15").val().trim(),
+        "confirmor"        : $("#p16").val().trim(),
+        "receiver"         : $("#p17").val().trim()
       };
 
 

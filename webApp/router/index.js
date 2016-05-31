@@ -185,6 +185,11 @@ var AppRoute = Backbone.Router.extend({
 	//重置数据
 	reset: function() {
 
+		if (!$._data($(".user > span")[0],"events")) {
+			//绑定用户信息
+			App.TopNav.init();
+		}
+
 		//用户信息
 		App.Global.User = JSON.parse(localStorage.getItem("user"));
 		$("#pageLoading").show();
