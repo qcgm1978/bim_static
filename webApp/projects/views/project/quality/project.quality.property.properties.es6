@@ -31,7 +31,9 @@ App.Project.QualityProperties=Backbone.View.extend({
 	//获取数据后处理
 	addOne:function(model){
 		var data=model.toJSON().data;
-		App.Project.userProps.call(this,data);
+		var temp=JSON.stringify(data);
+		temp=JSON.parse(temp);
+		App.Project.userProps.call(this,temp);
 	}
 
 

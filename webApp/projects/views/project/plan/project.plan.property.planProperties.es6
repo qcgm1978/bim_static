@@ -23,7 +23,9 @@ App.Project.PlanProperties = Backbone.View.extend({
 
 	addOne: function(model) { 
 	 	var data=model.toJSON().data;
-		App.Project.userProps.call(this,data);
+		var temp=JSON.stringify(data);
+		temp=JSON.parse(temp);
+		App.Project.userProps.call(this,temp);
 	}
 
 
