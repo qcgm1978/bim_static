@@ -3,11 +3,11 @@
 */
 
 var CLOUD = CLOUD || {};
-CLOUD.Version = "20160426";
+CLOUD.Version = "20160530";
 
 CLOUD.GlobalData = {
     SceneSize: 1000,
-    SceneScale: 2,
+    SceneScale: 1,
     LengthUnitScale : 1000,
     MinBoxSize : new THREE.Vector3(500, 500, 500),
     MaxTriangle: 40000000,
@@ -15,7 +15,7 @@ CLOUD.GlobalData = {
     UseArrayBuffer: true,
     TextureResRoot: 'images/',
     ShowSubSceneBox: false,
-    ShowCellBox: false,
+    ShowCellBox: true,
     DynamicRelease: true,
     SubSceneVisibleDistance: 0.1,
     CellVisibleLOD: 15,
@@ -7182,7 +7182,7 @@ CLOUD.Object3D = function () {
 
 	this.renderOrder = 0;
 
-	this.userData = {};
+	//this.userData = null;
 
 };
 
@@ -7547,9 +7547,10 @@ CLOUD.Scene.prototype.hitTestPosition = function (mouse, camera, callback) {
     //console.timeEnd("hitTest");
 };
 
-CLOUD.Scene.prototype.pickByReck = function (frustum, callback) {
+CLOUD.Scene.prototype.pickByReck = function () {
 
     var sphere = new THREE.Sphere();
+    var box = new THREE.Box3();
 
     var INTERSECTION_STATE = {
         IS_Leave:0,
@@ -7557,7 +7558,7 @@ CLOUD.Scene.prototype.pickByReck = function (frustum, callback) {
         IS_Contains : 2
     };
 
-    function intersectSphere(frustum, object) {
+    function intersectObjectBySphere(frustum, object) {
 
         var geometry = object.geometry;
         if (geometry.boundingSphere === null) geometry.computeBoundingSphere();
@@ -7579,43 +7580,116 @@ CLOUD.Scene.prototype.pickByReck = function (frustum, callback) {
                 return INTERSECTION_STATE.IS_Leave;
 
             }
+            else if (distance >= sphere.radius) {
+                ++nCount;
+            }
 
-            ++nCount;
+
         }
 
         return nCount == 6 ? INTERSECTION_STATE.IS_Contains : INTERSECTION_STATE.IS_Intersection;
     }
 
-    return function () {
+    var p1 = new THREE.Vector3(),
+        p2 = new THREE.Vector3();
+
+    function intersectBox(frustum, box) {
+
+        var nCount = 0;
+        var planes = frustum.planes;
+
+        for (var i = 0; i < 6 ; i++) {
+
+            var plane = planes[i];
+
+            p1.x = plane.normal.x > 0 ? box.min.x : box.max.x;
+            p2.x = plane.normal.x > 0 ? box.max.x : box.min.x;
+            p1.y = plane.normal.y > 0 ? box.min.y : box.max.y;
+            p2.y = plane.normal.y > 0 ? box.max.y : box.min.y;
+            p1.z = plane.normal.z > 0 ? box.min.z : box.max.z;
+            p2.z = plane.normal.z > 0 ? box.max.z : box.min.z;
+
+            var d1 = plane.distanceToPoint(p1);
+            var d2 = plane.distanceToPoint(p2);
+
+            // if both outside plane, no intersection
+
+            if (d1 < 0 && d2 < 0) {
+
+                return INTERSECTION_STATE.IS_Leave;
+
+            }
+            else if (d1 * d2 >= 0) {
+                ++nCount;
+            }
+        }
+
+        return nCount == 6 ? INTERSECTION_STATE.IS_Contains : INTERSECTION_STATE.IS_Intersection;
+    }
+
+    function intersectObjectByBox(frustum, object) {
+
+        if (object.boundingBox) {
+            box.copy(object.boundingBox);
+        }
+        else {
+            var geometry = object.geometry;
+
+            if (geometry.boundingBox === null)
+                geometry.computeBoundingBox();
+
+            box.copy(geometry.boundingBox);
+        }
+
+        box.applyMatrix4(object.matrixWorld);
+
+        return intersectBox(frustum, box);
+    }
+
+
+    return function (frustum, callback) {
         var scope = this;
         scope.filter.setSelectedIds();
-
-
 
         function frustumTest(node) {
 
             if (node.worldBoundingBox) {
 
-                if (!frustum.intersectsBox(node.worldBoundingBox)) {
+                if (intersectBox(frustum, node.worldBoundingBox) === INTERSECTION_STATE.IS_Leave) {
                     return;
                 }
 
             }
 
-            if (node.geometry && frustum.intersectsObject(node)) {
-
-                var geometry = node.geometry;
-
-                if (geometry.boundingBox === null)
-                    geometry.computeBoundingBox();
-
-                var box = geometry.boundingBox.clone();
-                box.applyMatrix4(node.matrixWorld);
-
-                if (frustum.intersectsBox(box)) {
+            if (node.userData) {
+                var state = intersectObjectByBox(frustum, node);
+                if (state === INTERSECTION_STATE.IS_Contains) {
                     scope.filter.addSelectedId(node.name);
                 }
+                else {
+                    return;
+                }
             }
+
+            //if (node.geometry) {
+
+            //    var state = intersectObjectBySphere(frustum, node);
+            //    if(state === INTERSECTION_STATE.IS_Contains){
+            //        scope.filter.addSelectedId(node.name);
+            //    }
+            //    else if (state === INTERSECTION_STATE.IS_Intersection) {
+
+            //        var state = intersectObjectByBox(frustum, node);
+            //        if (state === INTERSECTION_STATE.IS_Contains) {
+            //            scope.filter.addSelectedId(node.name);
+            //        }
+            //        else if (state === INTERSECTION_STATE.IS_Intersection) {
+
+            //        }
+            //    }
+
+            //    return;
+            //}
 
             var children = node.children;
             if (!children)
@@ -10313,25 +10387,30 @@ CLOUD.PickEditor = function (object, scene, domElement) {
 CLOUD.PickEditor.prototype = Object.create(CLOUD.OrbitEditor.prototype);
 CLOUD.PickEditor.prototype.constructor = CLOUD.PickEditor;
 
+CLOUD.PickEditor.prototype.pickByClick = function (event) {
+
+    var scope = this;
+    this.isMouseClick = true;
+
+    function handleMouseUp() {
+        scope.handleMousePick(event);
+    }
+
+    if (scope.timerId) {
+        clearTimeout(scope.timerId);
+    }
+
+    // 延迟300ms以判断是否单击
+    scope.timerId = setTimeout(handleMouseUp, 300);
+};
+
 CLOUD.PickEditor.prototype.onMouseUp = function (event) {
     var scope = this;
 
     event.preventDefault();
 
     if (scope.oldMouseX == event.clientX && scope.oldMouseY == event.clientY) {
-
-        this.isMouseClick = true;
-
-        function handleMouseUp() {
-            scope.handleMousePick(event);
-        }
-
-        if (scope.timerId) {
-            clearTimeout(scope.timerId);
-        }
-
-        // 延迟300ms以判断是否单击
-        scope.timerId = setTimeout(handleMouseUp, 300);
+        this.pickByClick(event);
     }
     else {
 
@@ -10719,7 +10798,7 @@ CLOUD.PickEditor.prototype.setSelectedState = function (id, state) {
 
 CLOUD.RectPickEditor = function (object, scene, domElement) {
     "use strict";
-    CLOUD.OrbitEditor.call(this, object, scene, domElement);
+    CLOUD.PickEditor.call(this, object, scene, domElement);
 
     // 保存旋转点
     this.startPt = new THREE.Vector2();
@@ -10730,7 +10809,7 @@ CLOUD.RectPickEditor = function (object, scene, domElement) {
     this.mouseButtons = { ORBIT: THREE.MOUSE.RIGHT, PAN2: THREE.MOUSE.MIDDLE, PAN: THREE.MOUSE.LEFT };
 };
 
-CLOUD.RectPickEditor.prototype = Object.create(CLOUD.OrbitEditor.prototype);
+CLOUD.RectPickEditor.prototype = Object.create(CLOUD.PickEditor.prototype);
 CLOUD.RectPickEditor.prototype.constructor = CLOUD.RectPickEditor;
 
 CLOUD.RectPickEditor.prototype.udpateFrustum = function (updateUI) {
@@ -10757,7 +10836,7 @@ CLOUD.RectPickEditor.prototype.udpateFrustum = function (updateUI) {
     }
 
     if (x2 - x1 == 0 || y2 - y1 == 0)
-        return;
+        return false;
 
     var helper = this.cameraEditor;
     var dim = helper.getContainerDimensions();
@@ -10768,6 +10847,7 @@ CLOUD.RectPickEditor.prototype.udpateFrustum = function (updateUI) {
         this.onUpdateUI({ visible: true, dir: this.startPt.x < this.endPt.x, left: (x1 - dim.left), top: (y1 - dim.top), width: (x2 - x1), height: (y2 - y1) });
     }
 
+    return true;
 };
 
 CLOUD.RectPickEditor.prototype.onMouseDown = function (event) {
@@ -10816,7 +10896,11 @@ CLOUD.RectPickEditor.prototype.onMouseUp = function (event) {
     if (event.button === THREE.MOUSE.LEFT) {
 
         this.endPt.set(event.clientX, event.clientY);
-        this.udpateFrustum();
+        if (!this.udpateFrustum()) {
+            this.pickByClick(event);
+            return false;
+        }
+
 
         var scope = this;
         this.scene.pickByReck(this.frustum, function () {
@@ -16119,7 +16203,12 @@ CLOUD.SceneLoader.prototype = {
 
                     var localUserId = userId || objJSON.userId
 
-                    handle_children(parent, objJSON.children, level + 1, localUserId, userData, object.matrix);
+                    //handle_children(parent, objJSON.children, level + 1, localUserId, userData, object.matrix);
+
+
+                    handle_children(object, objJSON.children, level + 1, localUserId, userData);
+                    object.userData = userData;
+                    parent.add(object);
 
                 }
                 else if (objJSON.nodeType == "MeshNode") {
@@ -16162,9 +16251,11 @@ CLOUD.SceneLoader.prototype = {
                             object = new CLOUD.Group();
                             CLOUD.GeomUtil.parseNodeProperties(object, objJSON, nodeId, trf);
 
-                            handle_children(parent, symbolJSON.children, level + 1, objJSON.userId, userData, object.matrix);
+                            //handle_children(parent, symbolJSON.children, level + 1, objJSON.userId, userData, object.matrix);
 
-                            // update child userId
+                            handle_children(object, symbolJSON.children, level + 1, objJSON.userId, userData);
+                            object.userData = userData;
+                            parent.add(object);
                         }
                         else if (symbolJSON.nodeType === "MeshNode") {
 
@@ -17138,6 +17229,9 @@ CLOUD.ModelManager.prototype.load = function (parameters) {
 
                 scope.loadLinks(result, client);
 
+                //
+                var worldBox = scope.scene.worldBoundingBox();
+                scope.scene.innerBoundingBox.min.z = worldBox.z;
             });
         }
 
@@ -17674,6 +17768,8 @@ CloudViewer = function () {
     this.tmpBox = new THREE.Box3();
     var scope = this;
 
+    this.enableCameraNearFar = true;
+
     function initializeView() {
 
         scope.setViewHouseVisibility(true);
@@ -17838,7 +17934,7 @@ CloudViewer.prototype = {
 
             var newPos = position.clone().sub(target);
             var length = newPos.length();
-            if (this.camera.inside) {
+            if (this.camera.inside || !this.enableCameraNearFar) {
                 this.camera.cameraP.near = 0.1;
                 //CLOUD.GlobalData.SceneSize * 20.0
                 this.camera.cameraP.far = 20000.0;
@@ -18097,6 +18193,7 @@ CloudViewer.prototype = {
             this.editorManager.registerDomEventListeners(this.domElement);
         }
     },
+
     unregisterDomEventListeners : function() {
         if (this.domElement) {
             this.editorManager.unregisterDomEventListeners(this.domElement);
@@ -18303,6 +18400,7 @@ CloudViewer.prototype = {
             }
         }
 
+        this.enableCameraNearFar = false;
         if (totalCount == 0) {
             CLOUD.GlobalData.SubSceneVisibleLOD = 10;
             CLOUD.GlobalData.CellVisibleLOD = 15;
@@ -18312,6 +18410,7 @@ CloudViewer.prototype = {
             CLOUD.GlobalData.CellVisibleLOD = 800;
             CLOUD.GlobalData.ScreenCullLOD = 0.0001;
             CLOUD.GlobalData.GarbageCollection = false;
+
         }
         else if (totalCount < 100000) {
             CLOUD.GlobalData.SubSceneVisibleLOD = 200;
@@ -18330,6 +18429,8 @@ CloudViewer.prototype = {
             CLOUD.GlobalData.CellVisibleLOD = 15;
             CLOUD.GlobalData.ScreenCullLOD = 0.0002;
             CLOUD.GlobalData.GarbageCollection = true;
+
+            this.enableCameraNearFar = true;
         }
     },
 
