@@ -68,13 +68,12 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
     },
 //获取计划节点相关规则
     getRules:function() {
+        var _this = this;
         var code = this.model.get("code");
         if(!App.ResourceArtifacts.Status.saved){
             //提示有没有保存现在的，重要
             return
         }
-
-        var _this = this ;
         var pdata = {
             URLtype: "fetchArtifactsPlanRule",
             data:{
@@ -82,14 +81,14 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
             }
         };
         App.Comm.ajax(pdata,function(response){
-           if(response.code == 0 ){
-               App.ResourceArtifacts.PlanRules.reset();
-               if(response.data  &&  response.data.length){
+            if(response.code == 0 ){
+                App.ResourceArtifacts.PlanRules.reset();
+                if(response.data  &&  response.data.length){
                     $(".artifactsContent .rules h2 i").html( "("+response.data.length + ")");
                     $(".artifactsContent .rules h2 .name").html(_this.model.get("code") + "&nbsp;" +_this.model.get("name"));
-                   App.ResourceArtifacts.PlanRules.add(response.data);
-               }
-           }
+                    App.ResourceArtifacts.PlanRules.add(response.data);
+                }
+            }
         });
     }
 });

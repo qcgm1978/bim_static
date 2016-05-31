@@ -183,14 +183,15 @@ App.API = {
 		//映射规则库
 		fetchArtifactsPlan:"dataJson/resources/fetchArtifactsPlan.json",//计划节点
 		fetchArtifactsPlanRule:"dataJson/resources/fetchArtifactsPlanRule.json",//计划节点规则获取
-		fetchArtifactsPlanNewRule:"dataJson/resources/fetchArtifactsMapPlan.json",//计划节点新建规则     platform/mapping/rule/create
-		modifyArtifactsPlanRule:"dataJson/resources/fetchArtifactsPlanRule.json",//计划节点修改规则
+		createArtifactsPlanNewRule:"dataJson/resources/fetchArtifactsMapPlan.json",//计划节点新建规则     platform/mapping/rule/create
+		modifyArtifactsPlanRule:"dataJson/resources/fetchArtifactsPlanRule.json",//计划节点修改规则          platform/mapping/rule/update
 		deleteArtifactsPlanRule:"dataJson/resources/fetchArtifactsMapPlan.json",//计划节点删除规则           platform/mapping/rule/delete/{id}
 		fetchQualityPlanStandardLevel1:"dataJson/resources/fetchArtifactsMapPlan.json", //质量标准1级菜单
 		fetchQualityPlanStandardLevel2:"dataJson/resources/fetchArtifactsMapPlan.json", //质量标准2级菜单
 		fetchArtifactsQualityNewRule:"dataJson/resources/fetchArtifactsMapPlan.json",//质量标准新建规则
 		modifyArtifactsQualityRule:"dataJson/resources/fetchArtifactsMapPlan.json",//质量标准修改规则
 		deleteArtifactsQualityRule:"dataJson/resources/fetchArtifactsMapPlan.json",//质量标准删除规则
+
 
 		//项目 变更 列表
 		fileList:"doc/internal/{projectId}/{versionId}/differ", //变更列表
