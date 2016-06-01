@@ -18,12 +18,30 @@ App.Resources.ArtifactsPlanRule = Backbone.View.extend({
 
     initialize:function(){
         this.listenTo(App.ResourceArtifacts.PlanRules,"add",this.addOne);
+        this.getCategoryCode();
+        //获取分类编码
+
     },
 
     addOne:function(model) {
         var newList = new App.Resources.ArtifactsPlanRuleDetail({model: model});
         this.$("ul").append(newList.render().el);
     },
+
+
+    getCategoryCode:function(){
+        var cdata  = {
+            URLtype:'fetchArtifactsCategoryRule',
+            data :{
+            }
+        };
+        App.Comm.ajax(cdata,function(response){
+            if(response.code == 0 && response.data.length){
+                App.Resources.artifactsTreeData = response.data;
+            }
+        });
+    },
+
     //创建规则
     newPlanRule:function(){
         var _this = this;
