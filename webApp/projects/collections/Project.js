@@ -588,26 +588,31 @@ App.Project = {
 			App.Project.attrDwg.apply(this);
 		}
 
-		//获取所有类别 暂时注释等刘佳接口
-		//			App.Project.fetchClassPropertData(function(res) {
-		//				if (res.code == 0) {
-		//					var str = '<div class="modle"><i class="modleShowHide"></i><h1 class="modleName">' + cs['busName'] + '</h1><ul class="modleList">',
-		//					    liTpl = '<li class="modleItem"><span class="modleName overflowEllipsis"><div class="modleNameText overflowEllipsis">{property}</div></span> <span class="modleVal end">{value}</span></li>';
-    //
-		//					var datas = res.data.classId ||[];
-		//					for(var i=0;i<datas.length;i++){
-		//						str += liTpl.replace("{property}", datas[j]['property']).replace('{value}', datas[j]['value']);
-    //
-		//					}
-    //
-		//
-		//					wrap += str + '</ul></div>';
-		//				}
-		//				if (++num == length) {
-		//					that.$el.find(".attrClassBox").html(wrap);
-    //
-		//				}
-		//			});
+		//获取所有类别
+					App.Project.fetchClassPropertData(function(res) {
+						if (res.code == 0){
+							var str = '', liTpl = '<li class="modleItem"><span class="modleName overflowEllipsis"><div class="modleNameText overflowEllipsis">{property}</div></span> <span class="modleVal end">{value}</span></li>';
+							var datas = res.data || [];
+							for(var i = 0,prop; i < datas.length; i++){
+								prop = datas[i]['properties'];
+								if('设计管理成本管理计划管理质量管理'.indexOf(datas[i]['className'])>-1){
+									continue
+								}else if(prop==null){
+									str += '<div class="modle"><i class="modleShowHide"></i><h1 class="modleName">' + datas[i]['className'] + '</h1><ul class="modleList">';
+
+								}else{
+									for(var j = 0; j < (prop.length || 0); j++){
+										str += '<div class="modle"><i class="modleShowHide"></i><h1 class="modleName">' + datas[i]['className'] + '</h1><ul class="modleList">' + liTpl.replace("{property}", datas[i]['properties'][j]['property']).replace('{value}', datas[i]['properties'][j]['value']);
+									}
+								}
+
+								str += '</ul></div>';
+							}
+
+								that.$el.find(".attrClassBox").html(str);
+
+						}
+					});
 
 	},
 
