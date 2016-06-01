@@ -99,14 +99,15 @@ App.Services.memberDetail=Backbone.View.extend({
     //单个修改
     modify:function(e){
         this.cancelBubble(e);
+
         var  pre = $("#ozList span.active");
-        if(pre.hasClass(".inner") || pre.hasClass(".outer")){
-            App.Services.memOz = pre.html();
+        if(pre.closest(".inner").length || pre.closest(".outer").length){
+            App.Services.memOz = "-";
+            console.log(1);
         }else{
             App.Services.memOz = pre.html();
             App.Services.searchOrg(pre);     //获取所属组织列表
         }
-
 
         var _this =this,disable,selected;
         $(".serviceBody .content").addClass("services_loading");
