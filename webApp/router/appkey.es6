@@ -29,7 +29,7 @@ var AppKeyRoute = Backbone.Router.extend({
 
 	//解析token
 	parseToken(token, callback) {
-
+		 
 		var data = {
 			URLtype: 'parseToken',
 			data: {
@@ -38,14 +38,18 @@ var AppKeyRoute = Backbone.Router.extend({
 		}
 
 		App.Comm.ajax(data, function(data) {
-			  
+			   
 			if (data.code == 0) {
+
 				data=data.data;
+
 				App.Project.Settings.projectId =data.projectId;
 
 				App.Project.Settings.versionId = data.projectVersionId;
 
 				App.Project.Settings.type = "token";
+
+				App.Project.Settings.token=data.token;
 
 				$("#topBar").prepend(' <ul class="navHeader"> <li class="item "> <span class="login">登录</span> </li></ul>');
 
