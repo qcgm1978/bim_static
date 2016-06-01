@@ -527,9 +527,10 @@
 							},
 
 							shareViewPoint(li) {
-
+								 
 								var $li = $(li),
 									data = {
+										id:$li.find(".remarkCount").data("id"),
 										pic: $li.find(".thumbnailImg").prop("src"),
 										creatorId: $li.find(".name").text().trim(),
 										name: $li.find(".title").text().trim(),
@@ -1258,29 +1259,52 @@
 			},
 
 			//分享视点
-			shareViewPoint(data) {
+			shareViewPoint(obj) {
 
-				var dialogHtml = _.templateUrl('/libsH5/tpls/comment/bimview.share.dialog.html')(data),
 
-					opts = {
-						title: "分享快照",
-						width: 500,
-						height: 250,
-						cssClass: "saveViewPoint",
-						isConfirm: false,
-						message: dialogHtml
-					},
 
-					dialog = new App.Comm.modules.Dialog(opts),
+				var data = {
+					URLtype: 'shareComment',
+					type:"POST",
+					contentType:'application/json',
+					data: JSON.stringify({
+						projectId: App.Project.Settings.CurrentVersion.projectId,
+						projectVersionId: App.Project.Settings.CurrentVersion.id,
+						viewpointId: obj.id
+					})
+				}
 
-					$btnCopy = dialog.element.find(".btnCopy");
+				App.Comm.ajax(data, function(data) {
 
-				//复制
-				var clip = new ZeroClipboard($btnCopy);
+					if (data.code == 0) {
+						obj.url=data.data.url;
+						var dialogHtml = _.templateUrl('/libsH5/tpls/comment/bimview.share.dialog.html')(obj),
+							opts = {
+								title: "分享快照",
+								width: 500,
+								height: 250,
+								cssClass: "saveViewPoint",
+								isConfirm: false,
+								message: dialogHtml
+							},
 
-				clip.on("complete", function(e) {
-					alert("您已经复制了链接地址");
+							dialog = new App.Comm.modules.Dialog(opts),
+
+							$btnCopy = dialog.element.find(".btnCopy");
+
+						//复制 http://bim.wanda-dev.cn/page/#share/a374
+						var clip = new ZeroClipboard($btnCopy);
+
+						clip.on("complete", function(e) {
+							alert("您已经复制了链接地址");
+						});
+
+					}
+
+
 				});
+
+
 
 			},
 
@@ -1336,7 +1360,7 @@
 
 								var id = imgData.data.id,
 									models = [];
-								 
+
 								//项目 
 								if ($comment.find(".navBar .project").hasClass("selected")) {
 

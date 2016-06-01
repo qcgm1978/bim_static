@@ -265,6 +265,8 @@ App.API = {
 		getFilter:"sixD/{projectId}/viewPoint/{viewPointId}/filter",//获取过滤器
 		getAnnotation:"sixD/{projectId}/viewPoint/{viewPointId}/annotation", //获取批注
 		updateAnnotation:"sixD/{projectId}/viewPoint/{viewPointId}/annotation", //更新批注
+		shareComment:'sixD/sharedViewpoint',//分享快照
+		parseToken:'share/{id}', //解析链接
 
 		test: ""
 	},
