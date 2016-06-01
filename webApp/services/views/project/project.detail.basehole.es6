@@ -48,7 +48,6 @@ App.Services.ProjectDetail.BaseHole=Backbone.View.extend({
 		});
 		$container.append(view.render().el);
 	},
-	
 	createBaseHole(){
 		var _this=this;
 		if(_this.status !=='create'){

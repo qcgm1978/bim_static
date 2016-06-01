@@ -258,6 +258,7 @@ App.API = {
 		uploadPic:"sixD/{projectId}/viewPoint/{viewPointId}/pic",//上传图片
 		projectPhoto:"sixD/{projectId}/viewPoint?type=1",//项目快照
 		userPhoto:"sixD/{projectId}/viewPoint?type=0",//用户快照
+		getSharePhoto:'sixD/sharedViewpoint/{token}/viewpoint',// 获取分享视点信息
 		viewComments:"sixD/{projectId}/viewPoint/{viewPointId}/comment",//查看发表评论
 		delViewPoint:"sixD/{projectId}/viewPoint/{viewPointId}",//删除视点
 		createComment:"sixD/{projectId}/viewPoint/{viewPointId}/comment",// 创建评论
@@ -265,6 +266,15 @@ App.API = {
 		getFilter:"sixD/{projectId}/viewPoint/{viewPointId}/filter",//获取过滤器
 		getAnnotation:"sixD/{projectId}/viewPoint/{viewPointId}/annotation", //获取批注
 		updateAnnotation:"sixD/{projectId}/viewPoint/{viewPointId}/annotation", //更新批注
+		//分享
+		shareComment:'sixD/sharedViewpoint',//分享快照
+		parseToken:'share/{id}', //解析链接
+		getFilterByToken:"sixD/sharedViewpoint/{token}/filter",//分享过滤器
+		getAnnotationByToken:"sixD/sharedViewpoint/{token}/annotation",//分享批注
+		viewCommentsByToken:"sixD/sharedViewpoint/{token}/comment",//查看发表评论
+		uploadPicByToken:"sixD/sharedViewpoint/{token}/comment/pic",//上传图片
+		createCommentByToken:"sixD/sharedViewpoint/{token}/comment",//创建评论
+		delCommentByToken:"/sixD/sharedViewpoint/{token}/comment/{commentId}",//删除评论
 
 		test: ""
 	},

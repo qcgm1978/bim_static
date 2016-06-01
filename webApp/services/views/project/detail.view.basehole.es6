@@ -28,9 +28,13 @@ App.Services.DetailView.BaseHole=Backbone.View.extend({
 	template:_.templateUrl('/services/tpls/project/view.basehole.html'),
 	
 	initialize(data){
+		var _this=this;
 		//设置projectId 默认传递
 		this.formData.projectId=data.projectId;
 		this._parentView=data._parentView;
+		this.model.on('change',function(){
+			_this.render();			
+		})
 	},
 	
 	formatValue(e){
@@ -94,7 +98,7 @@ App.Services.DetailView.BaseHole=Backbone.View.extend({
 			_this.formData[_.attr('name')]=_.val();
 		})
 
-		_objName=_this.formData['pitNamepitName'];
+		_objName=_this.formData['pitName'];
 		_objName=_objName.replace(/\s/g,'');
 		if(_objName.length<1){
 			_this.$('input[name=pitName]').css('border','1px solid #FF0000');
@@ -115,9 +119,8 @@ App.Services.DetailView.BaseHole=Backbone.View.extend({
 		},function(res){
 			$.tip({message:type?'修改成功':'新增成功'});
 	 		Backbone.trigger('baseholeUserStatus','read');
-	 		_this.formData.id=res.data.pitId;
-	 		if(type){
-	 			_this.formData=res.data;
+	 		if(type!='put'){ //修改
+	 			_this.formData.id=res.data.pitId;
 	 		}
 	 		_this.model.set(_this.formData);
 	 		_this.$('.accordionDatail').trigger('click');

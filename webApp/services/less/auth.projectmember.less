@@ -15,12 +15,13 @@
   ul.projects{
     margin-right: 20px;
     border: 1px solid #CCCCCC; ;
-    width: 280px;
+    width: 300px;
     height: 100%;
     float: left;
     background: #eee;
     font-family: Microsoft YaHei;
     position: relative;
+    overflow-y: auto;
     .project{
       color: #999999;
       cursor: pointer;
@@ -72,12 +73,16 @@
     }
   }
   .members{
-    width: 100%;
-    height: 100%;
     float: left;
     overflow-y: hidden;
-    border: 1px solid #ccc; 
-    position: relative;
+    border: 1px solid #ccc;
+    position: absolute;
+    font-family: Microsoft YaHei;
+    display: inline-block;
+    right: 24px;
+    left: 340px;
+    bottom: 20px;
+    top: 20px;
     .noDataText{
       padding-top: 100px;
       top: 100px;

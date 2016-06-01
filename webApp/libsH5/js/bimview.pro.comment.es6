@@ -76,10 +76,11 @@
 					}
 				}),
 
-				urlType: "projectPhoto",
+				urlType: "getSharePhoto",
 
 				parse(response, options) {
-					if (response.code == 0 && response.data.length > 0) {
+
+					if (response.code == 0 && response.data) {
 						return response.data;
 					} else {
 						this.trigger("dataNull");
@@ -179,11 +180,12 @@
 
 					//项目视点
 					if (type == "project") {
+
 						this.$(".projectListBox").fadeIn("fast");
 						//this.$(".projectListScroll").animate({left:"0px" },300);
 						if (App.Project.Settings.isShare) {
 							//获取数据
-							CommentCollections.Share.projectId = App.Project.Settings.projectId;
+							CommentCollections.Share.token = App.Project.Settings.token;
 							CommentCollections.Share.reset();
 							CommentCollections.Share.fetch({
 								success() {
@@ -393,6 +395,8 @@
 								list: annotationData.data.annotations,
 								filter: filterObj
 							});
+							//隐藏加载
+							$("#pageLoading").hide();
 
 						} else {
 							alert('数据获取失败');
@@ -402,7 +406,7 @@
 
 				},
 
-				//获取批注
+				//获取 过滤器
 				getFilter() {
 
 					var data = {
@@ -410,6 +414,16 @@
 						data: {
 							projectId: App.Project.Settings.projectId,
 							viewPointId: viewPointId
+						}
+					}
+
+					if (App.Project.Settings.isShare) {
+
+						data = {
+							URLtype: "getFilterByToken",
+							data: {
+								token: App.Project.Settings.token
+							}
 						}
 					}
 
@@ -423,6 +437,16 @@
 						data: {
 							projectId: App.Project.Settings.projectId,
 							viewPointId: viewPointId
+						}
+					}
+
+					if (App.Project.Settings.isShare) {
+
+						data = {
+							URLtype: "getAnnotationByToken",
+							data: {
+								token: App.Project.Settings.token
+							}
 						}
 					}
 
@@ -485,6 +509,15 @@
 					CommentCollections.ViewComments.projectId = App.Project.Settings.projectId;
 					CommentCollections.ViewComments.viewPointId = id;
 					viewPointId = id;
+
+					//分享
+					if (App.Project.Settings.isShare) {
+						CommentCollections.ViewComments.urlType = "viewCommentsByToken";
+						CommentCollections.ViewComments.token = App.Project.Settings.token;
+					} else {
+						CommentCollections.ViewComments.urlType = "viewComments";
+					}
+
 					CommentCollections.ViewComments.fetch({
 						success(model, data) {
 							$(".commentRemark .reMarkCount .count").text(data.data.length);
@@ -530,6 +563,7 @@
 
 								var $li = $(li),
 									data = {
+										id: $li.find(".remarkCount").data("id"),
 										pic: $li.find(".thumbnailImg").prop("src"),
 										creatorId: $li.find(".name").text().trim(),
 										name: $li.find(".title").text().trim(),
@@ -775,6 +809,16 @@
 
 					var url = "sixD/" + App.Project.Settings.projectId + "/viewPoint/" + viewPointId + "/comment/pic"
 
+					if (App.Project.Settings.isShare) {
+
+						url = App.Comm.getUrlByType({
+							URLtype: "uploadPicByToken",
+							data: {
+								token: App.Project.Settings.token
+							}
+						}).url;
+					}
+
 					$("#viewPointUploadImageForm").prop("action", url);
 					//上传完成
 					if (!this.bindUpload) {
@@ -906,8 +950,9 @@
 					var pars = {
 							projectId: App.Project.Settings.projectId,
 							viewPointId: viewPointId,
-							text: this.$(".txtReMark").val().trim(),
-							pictures: pictures
+							text: this.$(".txtReMark").val().trim(),							
+							pictures: pictures,
+							token:App.Project.Settings.token
 						},
 						data = {
 							URLtype: "createComment",
@@ -924,6 +969,10 @@
 					}
 
 					$btnEnter.val("保存中").data("isSubmit", true);
+
+					if (App.Project.Settings.isShare) {
+						data.URLtype="createCommentByToken";
+					}
 
 					App.Comm.ajax(data, (data) => {
 
@@ -984,6 +1033,14 @@
 					this.model.projectId = App.Project.Settings.projectId;
 					this.model.viewPointId = viewPointId;
 					this.model.commentId = id;
+
+					if (App.Project.Settings.isShare) {
+						this.model.urlType="delCommentByToken";
+						this.model.token=App.Project.Settings.token;
+					}else{
+						this.model.urlType="delComment";
+					}
+
 					this.model.destroy();
 
 				},
@@ -1258,29 +1315,52 @@
 			},
 
 			//分享视点
-			shareViewPoint(data) {
+			shareViewPoint(obj) {
 
-				var dialogHtml = _.templateUrl('/libsH5/tpls/comment/bimview.share.dialog.html')(data),
 
-					opts = {
-						title: "分享快照",
-						width: 500,
-						height: 250,
-						cssClass: "saveViewPoint",
-						isConfirm: false,
-						message: dialogHtml
-					},
 
-					dialog = new App.Comm.modules.Dialog(opts),
+				var data = {
+					URLtype: 'shareComment',
+					type: "POST",
+					contentType: 'application/json',
+					data: JSON.stringify({
+						projectId: App.Project.Settings.CurrentVersion.projectId,
+						projectVersionId: App.Project.Settings.CurrentVersion.id,
+						viewpointId: obj.id
+					})
+				}
 
-					$btnCopy = dialog.element.find(".btnCopy");
+				App.Comm.ajax(data, function(data) {
 
-				//复制
-				var clip = new ZeroClipboard($btnCopy);
+					if (data.code == 0) {
+						obj.url = data.data.url;
+						var dialogHtml = _.templateUrl('/libsH5/tpls/comment/bimview.share.dialog.html')(obj),
+							opts = {
+								title: "分享快照",
+								width: 500,
+								height: 250,
+								cssClass: "saveViewPoint",
+								isConfirm: false,
+								message: dialogHtml
+							},
 
-				clip.on("complete", function(e) {
-					alert("您已经复制了链接地址");
+							dialog = new App.Comm.modules.Dialog(opts),
+
+							$btnCopy = dialog.element.find(".btnCopy");
+
+						//复制 http://bim.wanda-dev.cn/page/#share/a374
+						var clip = new ZeroClipboard($btnCopy);
+
+						clip.on("complete", function(e) {
+							alert("您已经复制了链接地址");
+						});
+
+					}
+
+
 				});
+
+
 
 			},
 
@@ -1336,7 +1416,7 @@
 
 								var id = imgData.data.id,
 									models = [];
-								 
+
 								//项目 
 								if ($comment.find(".navBar .project").hasClass("selected")) {
 

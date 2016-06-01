@@ -330,7 +330,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			type:'model',
 			element: $("#projectContainer .modelContainerContent"),
 			sourceId: App.Project.Settings.DataModel.sourceId,
-			etag:App.Project.Settings.DataModel.etag,//"a1064f310fa8204efd9d1866ef7370ee" ||
+			etag: App.Project.Settings.DataModel.etag,//"a1064f310fa8204efd9d1866ef7370ee" ||
 			projectId: App.Project.Settings.projectId
 		});
 

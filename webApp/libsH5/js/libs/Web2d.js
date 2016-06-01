@@ -1368,7 +1368,7 @@ CLOUD.MiniMap = function (viewer, callback) {
         _circleNode.setAttribute('transform', 'translate(' + highlightNode.intersectionPoint.x + ',' + highlightNode.intersectionPoint.y + ')');
 
         // 提示文本
-        _tipNode.innerHTML = highlightNode.abcName + "-" + highlightNode.numeralName;
+        _tipNode.innerHTML = highlightNode.numeralName + "-" + highlightNode.abcName;
 
         // 位置
         var box = _tipNode.getBoundingClientRect();
@@ -1716,8 +1716,8 @@ CLOUD.MiniMap = function (viewer, callback) {
                 var offsetX = Math.round(worldPosition.x - interPoint.x);
                 var offsetY = Math.round(worldPosition.y - interPoint.y);
                 var offsetZ = Math.round(worldPosition.z - _floorPlaneMinZ);
-                var axisInfoX = "X(" + intersection.abcName + "," + offsetX + ")";
-                var axisInfoY = "Y(" + intersection.numeralName + "," + offsetY + ")";
+                var axisInfoX = "X(" + intersection.numeralName + "," + offsetX + ")";
+                var axisInfoY = "Y(" + intersection.abcName + "," + offsetY + ")";
                 var isInScene = true;
 
                 var projectedWorldPosition = worldPosition.clone();
@@ -2723,26 +2723,21 @@ CLOUD.Extensions.CommentArrow.prototype.setPosition = function (x, y) {
 
 CLOUD.Extensions.CommentArrow.prototype.updateTransformMatrix = function () {
 
-    var head = this.head;
-    var tail = this.tail;
-    var midX = this.size.x * 0.5;
-    var midY = this.size.y;
-    var posX = (head.x + tail.x) * 0.5;
-    var posY = (head.y + tail.y) * 0.5;
+    var offsetX = this.size.x * 0.5;
+    var offsetY = this.size.y;
+
+    this.position.x = (this.head.x + this.tail.x) * 0.5;
+    this.position.y = (this.head.y + this.tail.y) * 0.5;
 
     this.transformShape = [
-        'translate(', posX, ',', posY, ') ',
+        'translate(', this.position.x, ',', this.position.y, ') ',
         'rotate(', THREE.Math.radToDeg(this.rotation), ') ',
-        'translate(', -midX, ',', -midY, ') '
+        'translate(', -offsetX, ',', -offsetY, ') '
     ].join('');
-
-    this.position.x = tail.x + (head.x - tail.x) * 0.5;
-    this.position.y = tail.y + (head.y - tail.y) * 0.5;
 };
 
 CLOUD.Extensions.CommentArrow.prototype.updateStyle = function () {
 
-    //this.size.y = this.style['stroke-width'] * 2;
     this.updateTransformMatrix();
 
     var strokeColor = this.highlighted ? this.highlightColor : this.style['stroke-color'];
@@ -2762,7 +2757,7 @@ CLOUD.Extensions.CommentArrow.prototype.updateStyle = function () {
 
 CLOUD.Extensions.CommentArrow.prototype.getShapePoints = function () {
 
-    var strokeWidth = this.style['stroke-width'] * 2;//
+    var strokeWidth = this.size.y;
     var halfLen = this.size.x * 0.5;
     var thickness = strokeWidth;
     var halfThickness = strokeWidth * 0.5;
@@ -2788,35 +2783,34 @@ CLOUD.Extensions.CommentArrow.prototype.getShapePoints = function () {
 
 CLOUD.Extensions.CommentArrow.prototype.renderToCanvas = function (ctx) {
 
-    var strokeWidth = this.style['stroke-width'];
+    var strokeWidth = this.size.y;;
     var strokeColor = this.style['stroke-color'];
     var strokeOpacity = this.style['stroke-opacity'];
 
-    var head = this.head;
-    var tail = this.tail;
-    var midX = this.size.x * 0.5;
-    var midY = strokeWidth;
-    var posX = (head.x + tail.x) * 0.5;
-    var posY = (head.y + tail.y) * 0.5;
-    var clientMid = {x: midX, y: midY};
-    var clientPos = {x: posX, y: posY};
-    var m1 = new THREE.Matrix4().makeTranslation(-clientMid.x, -clientMid.y, 0);
+    var offsetX = this.size.x * 0.5;
+    var offsetY = strokeWidth;
+    var posX = (this.head.x + this.tail.x) * 0.5;
+    var posY = (this.head.y + this.tail.y) * 0.5;
+
+    var m1 = new THREE.Matrix4().makeTranslation(-offsetX, -offsetY, 0);
     var m2 = new THREE.Matrix4().makeRotationZ(this.rotation);
-    var m3 = new THREE.Matrix4().makeTranslation(clientPos.x, clientPos.y, 0);
+    var m3 = new THREE.Matrix4().makeTranslation(posX, posY, 0);
     var transform = m3.multiply(m2).multiply(m1);
 
     var points = this.getShapePoints();
+
     ctx.fillStyle = CLOUD.Extensions.Utils.Shape2D.composeRGBAString(strokeColor, strokeOpacity);
     ctx.beginPath();
 
-    var that = this;
-
     points.forEach(function (point) {
+
         var x = point[0], y = point[1];
         var client = new THREE.Vector3(x, y, 0);
+
         client = client.applyMatrix4(transform);
         ctx.lineTo(client.x, client.y);
     });
+
     ctx.fill();
 };
 
@@ -2856,8 +2850,11 @@ CLOUD.Extensions.CommentRectangle.prototype.updateTransformMatrix = function () 
 
     var strokeWidth = this.style['stroke-width'];
 
-    var originX = Math.max(this.size.x - strokeWidth, 0) * 0.5;
-    var originY = Math.max(this.size.y - strokeWidth, 0) * 0.5;
+    //var originX = Math.max(this.size.x - strokeWidth, 0) * 0.5;
+    //var originY = Math.max(this.size.y - strokeWidth, 0) * 0.5;
+
+    var originX = (this.size.x - strokeWidth) * 0.5;
+    var originY = (this.size.y - strokeWidth) * 0.5;
 
     this.transformShape = [
         'translate(', this.position.x, ',', this.position.y, ') ',
@@ -2895,25 +2892,20 @@ CLOUD.Extensions.CommentRectangle.prototype.renderToCanvas = function (ctx) {
     var strokeOpacity = this.style['stroke-opacity'];
     var fillColor = this.style['fill-color'];
     var fillOpacity = this.style['fill-opacity'];
-
     var width = this.size.x - strokeWidth;
     var height = this.size.y - strokeWidth;
-    var size = {x: width, y: height};
-    var clientWidth = size.x;
-    var clientHeight = size.y;
-    var clientCenter = {x: this.position.x, y: this.position.y};
 
     ctx.strokeStyle = CLOUD.Extensions.Utils.Shape2D.composeRGBAString(strokeColor, strokeOpacity);
     ctx.fillStyle = CLOUD.Extensions.Utils.Shape2D.composeRGBAString(fillColor, fillOpacity);
     ctx.lineWidth = strokeWidth;
-    ctx.translate(clientCenter.x, clientCenter.y);
+    ctx.translate(this.position.x, this.position.y);
     ctx.rotate(this.rotation);
 
     if (fillOpacity !== 0) {
-        ctx.fillRect(clientWidth / -2, clientHeight / -2, clientWidth, clientHeight);
+        ctx.fillRect(width / -2, height / -2, width, height);
     }
 
-    ctx.strokeRect(clientWidth / -2, clientHeight / -2, clientWidth, clientHeight);
+    ctx.strokeRect(width / -2, height / -2, width, height);
 };
 
 CLOUD.Extensions.CommentCircle = function (editor, id) {
@@ -2950,13 +2942,16 @@ CLOUD.Extensions.CommentCircle.prototype.createShape = function () {
 CLOUD.Extensions.CommentCircle.prototype.updateTransformMatrix = function () {
 
     var strokeWidth = this.style['stroke-width'];
-    var originX = Math.max(this.size.x - strokeWidth, 0) * 0.5;
-    var originY = Math.max(this.size.y - strokeWidth, 0) * 0.5;
+    //var offsetX = Math.max(this.size.x - strokeWidth, 0) * 0.5;
+    //var offsetY = Math.max(this.size.y - strokeWidth, 0) * 0.5;
+
+    var offsetX = (this.size.x - strokeWidth) * 0.5;
+    var offsetY = (this.size.y - strokeWidth) * 0.5;
 
     this.transformShape = [
         'translate(', this.position.x, ',', this.position.y, ') ',
         'rotate(', THREE.Math.radToDeg(this.rotation), ') ',
-        'translate(', -originX, ',', -originY, ') '
+        'translate(', -offsetX, ',', -offsetY, ') '
     ].join('');
 };
 
@@ -2992,6 +2987,7 @@ CLOUD.Extensions.CommentCircle.prototype.renderToCanvas = function (ctx) {
     function ellipse(ctx, cx, cy, w, h) {
 
         ctx.beginPath();
+
         var lx = cx - w / 2,
             rx = cx + w / 2,
             ty = cy - h / 2,
@@ -3118,16 +3114,16 @@ CLOUD.Extensions.CommentCloud.prototype.updateTransformMatrix = function () {
     this.size.x = size.x;
     this.size.y = size.y;
 
-    var originX = this.position.x;
-    var originY = this.position.y;
+    //var offsetX = this.size.x * 0.5;
+    //var offsetY = this.size.y * 0.5;
 
-    //var originX = this.size.x * 0.5;
-    //var originY = this.size.y * 0.5;
+    var offsetX = this.position.x;
+    var offsetY = this.position.y;
 
     this.transformShape = [
         'translate(', this.position.x, ',', this.position.y, ') ',
         'rotate(', THREE.Math.radToDeg(this.rotation), ') ',
-        'translate(', -originX, ',', -originY, ') '
+        'translate(', -offsetX, ',', -offsetY, ') '
     ].join('');
 };
 
@@ -3154,29 +3150,29 @@ CLOUD.Extensions.CommentCloud.prototype.updateStyle = function () {
     this.shape.setAttribute('d', shapePathStr);
 };
 
-CLOUD.Extensions.CommentCloud.prototype.calculateShapePath = function () {
+// 计算控制点
+CLOUD.Extensions.CommentCloud.prototype.calculateControlPoint = function (startPoint, endPoint) {
 
-    // 计算控制点
-    var calculateControlPoint = function (startPoint, endPoint) {
+    var start = new THREE.Vector2(startPoint.x, startPoint.y);
+    var end = new THREE.Vector2(endPoint.x, endPoint.y);
+    var direction = end.clone().sub(start);
+    var halfLen = 0.5 * direction.length();
+    var centerX = 0.5 * (start.x + end.x);
+    var centerY = 0.5 * (start.y + end.y);
+    var center = new THREE.Vector2(centerX, centerY);
 
-        var start = new THREE.Vector2(startPoint.x, startPoint.y);
-        var end = new THREE.Vector2(endPoint.x, endPoint.y);
-        var direction = end.clone().sub(start);
-        var halfLen = 0.5 * direction.length();
-        var centerX = 0.5 * (start.x + end.x);
-        var centerY = 0.5 * (start.y + end.y);
-        var center = new THREE.Vector2(centerX, centerY);
+    direction.normalize();
+    direction.rotateAround(new THREE.Vector2(0, 0), -0.5 * Math.PI);
+    direction.multiplyScalar(halfLen);
+    center.add(direction);
 
-        direction.normalize();
-        direction.rotateAround(new THREE.Vector2(0, 0), -0.5 * Math.PI);
-        direction.multiplyScalar(halfLen);
-        center.add(direction);
-
-        return {
-            x: center.x,
-            y: center.y
-        };
+    return {
+        x: center.x,
+        y: center.y
     };
+};
+
+CLOUD.Extensions.CommentCloud.prototype.calculateShapePath = function () {
 
     // 根据形状点构造path
     var shapePath = [];
@@ -3211,7 +3207,7 @@ CLOUD.Extensions.CommentCloud.prototype.calculateShapePath = function () {
         } else {
 
             // 计算控制点
-            controlPoint = calculateControlPoint(lastShapePoint, currentShapePoint);
+            controlPoint = this.calculateControlPoint(lastShapePoint, currentShapePoint);
             shapeControlPoints.push(controlPoint.x);
             shapeControlPoints.push(controlPoint.y);
 
@@ -3230,7 +3226,7 @@ CLOUD.Extensions.CommentCloud.prototype.calculateShapePath = function () {
             if ((i === len - 2) && this.isSeal) {
 
                 // 计算控制点
-                controlPoint = calculateControlPoint(lastShapePoint, originShapePoint);
+                controlPoint = this.calculateControlPoint(lastShapePoint, originShapePoint);
                 shapeControlPoints.push(controlPoint.x);
                 shapeControlPoints.push(controlPoint.y);
 
@@ -3336,6 +3332,81 @@ CLOUD.Extensions.CommentCloud.prototype.getShapePoints = function () {
 
 CLOUD.Extensions.CommentCloud.prototype.renderToCanvas = function (ctx) {
 
+    // 小于两个点，不处理
+    if (this.shapePoints.length < 4) return;
+
+    var scope = this;
+
+    function drawCloud(ctx, points, isSeal) {
+
+        var len = points.length;
+        var originShapePoint = {};
+        var currentShapePoint = {};
+        var lastShapePoint = {};
+        var controlPoint;
+
+        ctx.beginPath();
+
+        for (var i = 0; i < len; i += 2) {
+
+            currentShapePoint.x = points[i];
+            currentShapePoint.y = points[i + 1];
+
+            if (i === 0) { // 第一个点
+
+                ctx.moveTo(currentShapePoint.x, currentShapePoint.y);
+
+                originShapePoint.x = currentShapePoint.x;
+                originShapePoint.y = currentShapePoint.y;
+
+                lastShapePoint.x = currentShapePoint.x;
+                lastShapePoint.y = currentShapePoint.y;
+
+            } else {
+
+                // 计算控制点
+                controlPoint = scope.calculateControlPoint(lastShapePoint, currentShapePoint);
+
+                ctx.quadraticCurveTo(controlPoint.x, controlPoint.y, currentShapePoint.x, currentShapePoint.y);
+
+                lastShapePoint.x = currentShapePoint.x;
+                lastShapePoint.y = currentShapePoint.y;
+
+                // 最后一个点, 处理封口
+                if ((i === len - 2) && isSeal) {
+
+                    // 计算控制点
+                    controlPoint = scope.calculateControlPoint(lastShapePoint, originShapePoint);
+
+                    ctx.quadraticCurveTo(controlPoint.x, controlPoint.y, originShapePoint.x, originShapePoint.y);
+                }
+            }
+        }
+
+        ctx.stroke();
+    }
+
+    var strokeWidth = this.style['stroke-width'];
+    var strokeColor = this.highlighted ? this.highlightColor : this.style['stroke-color'];
+    var strokeOpacity = this.style['stroke-opacity'];
+    var fillColor = this.style['fill-color'];
+    var fillOpacity = this.style['fill-opacity'];
+
+    ctx.strokeStyle = CLOUD.Extensions.Utils.Shape2D.composeRGBAString(strokeColor, strokeOpacity);
+    ctx.fillStyle = CLOUD.Extensions.Utils.Shape2D.composeRGBAString(fillColor, fillOpacity);
+    ctx.lineWidth = strokeWidth;
+
+    ctx.translate(this.position.x, this.position.y);
+    ctx.rotate(this.rotation);
+    ctx.translate(-this.position.x, -this.position.y);
+
+    drawCloud(ctx, this.shapePoints, this.isSeal);
+
+    if (fillOpacity !== 0) {
+        ctx.fill();
+    }
+
+    ctx.stroke();
 };
 
 
@@ -3373,13 +3444,13 @@ CLOUD.Extensions.CommentCross.prototype.createShape = function() {
 CLOUD.Extensions.CommentCross.prototype.updateTransformMatrix = function () {
 
     var strokeWidth = this.style['stroke-width'];
-    var originX = Math.max(this.size.x - strokeWidth, 0) * 0.5;
-    var originY = Math.max(this.size.y - strokeWidth, 0) * 0.5;
+    var offsetX = Math.max(this.size.x - strokeWidth, 0) * 0.5;
+    var offsetY = Math.max(this.size.y - strokeWidth, 0) * 0.5;
 
     this.transformShape = [
         'translate(', this.position.x, ',', this.position.y, ') ',
         'rotate(', THREE.Math.radToDeg(this.rotation), ') ',
-        'translate(', -originX, ',', -originY, ') '
+        'translate(', -offsetX, ',', -offsetY, ') '
     ].join('');
 };
 
@@ -3433,6 +3504,39 @@ CLOUD.Extensions.CommentCross.prototype.getPath = function() {
 
 CLOUD.Extensions.CommentCross.prototype.renderToCanvas = function (ctx) {
 
+    var strokeWidth = this.style['stroke-width'];
+    var strokeColor = this.highlighted ? this.highlightColor : this.style['stroke-color'];
+    var strokeOpacity = this.style['stroke-opacity'];
+    var fillColor = this.style['fill-color'];
+    var fillOpacity = this.style['fill-opacity'];
+
+    var width = this.size.x - strokeWidth;
+    var height = this.size.y - strokeWidth;
+    var size = {x: width, y: height};
+
+    ctx.strokeStyle = CLOUD.Extensions.Utils.Shape2D.composeRGBAString(strokeColor, strokeOpacity);
+    ctx.fillStyle = CLOUD.Extensions.Utils.Shape2D.composeRGBAString(fillColor, fillOpacity);
+    ctx.lineWidth = strokeWidth;
+
+    ctx.translate(this.position.x, this.position.y);
+    ctx.rotate(this.rotation);
+    ctx.translate(-0.5 * width, -0.5 * height);
+
+    //ctx.beginPath();
+
+    ctx.moveTo(0, 0);
+    ctx.lineTo(size.x, size.y);
+
+    ctx.moveTo(0, size.y);
+    ctx.lineTo(size.x, 0);
+
+    ctx.stroke();
+
+    if (fillOpacity !== 0) {
+        ctx.fill();
+    }
+
+    ctx.stroke();
 };
 
 CLOUD.Extensions.CommentText = function (editor, id) {
@@ -3577,21 +3681,14 @@ CLOUD.Extensions.CommentText.prototype.setParent = function (parent) {
 
 CLOUD.Extensions.CommentText.prototype.updateTransformMatrix = function () {
 
-    var originX = this.size.x * 0.5;
-    var originY = this.size.y * 0.5;
-    var posX = this.position.x - originX;
-    var posY = this.position.y - originY;
-
-    //this.transformShape = [
-    //    'translate(', posX, ',', posY, ') ',
-    //    'scale(', 1, ',', -1, ') '].join('');
+    var offsetX = this.size.x * 0.5;
+    var offsetY = this.size.y * 0.5;
 
     this.transformShape = [
         'translate(', this.position.x, ',', this.position.y, ') ',
         'rotate(', THREE.Math.radToDeg(this.rotation), ') ',
-        'translate(', -this.position.x, ',', -this.position.y, ') ',
-        'translate(', posX, ',', posY, ') '
-        ].join('');
+        'translate(', -offsetX, ',', -offsetY, ') '
+    ].join('');
 };
 
 CLOUD.Extensions.CommentText.prototype.updateStyle = function (forceDirty) {
@@ -3717,6 +3814,7 @@ CLOUD.Extensions.CommentText.prototype.renderToCanvas = function (ctx) {
             if ((y + lineHeight) > maxHeight) {
                 return;
             }
+
             ctx.fillText(line, 0, y);
             y += lineHeight;
         });
@@ -3727,7 +3825,7 @@ CLOUD.Extensions.CommentText.prototype.renderToCanvas = function (ctx) {
     var fontWeight = this.style['font-weight'];
     var strokeColor = this.style['stroke-color'];
     var fontOpacity = this.style['stroke-opacity'];
-    var fontSize = 12;
+    var fontSize = this.style['font-size'];
     var lineHeight = fontSize * (this.lineHeight * 0.01);
 
     var center = {x: this.position.x, y: this.position.y};
@@ -3739,7 +3837,11 @@ CLOUD.Extensions.CommentText.prototype.renderToCanvas = function (ctx) {
     ctx.save();
     ctx.fillStyle = CLOUD.Extensions.Utils.Shape2D.composeRGBAString(fillColor, fillOpacity);
     ctx.translate(center.x, center.y);
-    fillOpacity !== 0 && ctx.fillRect(clientSize.x * -0.5, clientSize.y * -0.5, clientSize.x, clientSize.y);
+
+    if (fillOpacity !== 0) {
+        ctx.fillRect(clientSize.x * -0.5, clientSize.y * -0.5, clientSize.x, clientSize.y);
+    }
+
     ctx.restore();
 
     // Text
@@ -3747,7 +3849,7 @@ CLOUD.Extensions.CommentText.prototype.renderToCanvas = function (ctx) {
     ctx.strokeStyle = strokeColor;
     ctx.textBaseline = 'top';
     ctx.translate(center.x - (clientSize.x * 0.5), center.y - (clientSize.y * 0.5));
-    //ctx.rotate(rotation);
+    //ctx.rotate(this.rotation);
     ctx.font = fontStyle + " " + fontWeight + " " + fontSize + "px " + fontFamily;
     ctx.globalAlpha = fontOpacity;
     renderTextLines(ctx, this.currTextLines, lineHeight, clientSize.y);
@@ -3942,21 +4044,6 @@ CLOUD.Extensions.CommentTextArea.prototype.accept = function () {
     this.inactive();
 };
 
-CLOUD.Extensions.CommentTextArea.prototype.injectData = function (dataBag) {
-
-    var width = parseFloat(this.textArea.style.width);
-    var height = parseFloat(this.textArea.style.height);
-    var ox = parseFloat(this.textArea.style.left);
-    var oy = parseFloat(this.textArea.style.top);
-
-    dataBag.width = width;
-    dataBag.height = height;
-    dataBag.newPos = {
-        x: ox + (width * 0.5),
-        y: oy + (height * 0.5)
-    };
-};
-
 CLOUD.Extensions.CommentTextArea.prototype.getTextValuesByComment = function (comment) {
 
     this.active(comment, false);
@@ -3997,6 +4084,7 @@ CLOUD.Extensions.CommentTextArea.prototype.calcTextLines = function () {
     var lines = [];
 
     for (var i = 0, len = linesBreaks.length; i < len; ++i) {
+
         var line = CLOUD.DomUtil.trimRight(linesBreaks[i]);
         this.splitLine(line, maxLineLength, lines);
     }
@@ -5856,13 +5944,25 @@ CLOUD.Extensions.CommentEditor.prototype.composeScreenSnapshot = function (snaps
     //preSnapshot.onload = onComposeImage;
     preSnapshot.src = snapshot;
 
-    // 绘制背景
-    var gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-    gradient.addColorStop(0, "#6A8DE7");
-    gradient.addColorStop(1, "#D6EEFA");
+    var startColor = this.gradientStartColor;
+    var stopColor = this.gradientStopColor;
 
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    // 绘制背景
+    if (startColor) {
+
+        if (stopColor) {
+
+            var gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            gradient.addColorStop(0, startColor);
+            gradient.addColorStop(1, stopColor);
+
+            ctx.fillStyle = gradient;
+        } else {
+            ctx.fillStyle = startColor;
+        }
+
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
 
     // 先绘制之前的图像
     ctx.drawImage(preSnapshot, 0, 0);
@@ -5874,4 +5974,10 @@ CLOUD.Extensions.CommentEditor.prototype.composeScreenSnapshot = function (snaps
     canvas = ctx = null;
 
     return data;
+};
+
+CLOUD.Extensions.CommentEditor.prototype.setBackgroundColor = function(startColor, stopColor) {
+
+    this.gradientStartColor = startColor;
+    this.gradientStopColor = stopColor;
 };
