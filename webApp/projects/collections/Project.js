@@ -571,13 +571,20 @@ App.Project = {
 			var liTpl = '<li class="modleItem"><div class="modleNameText overflowEllipsis modleName2">varName</div></li>';
 
 			App.Project.fetchPropertData("fetchDesignPropertiesQuality", function(data) {
-
 				if (data.code == 0) {
 
 					if (data.data.length > 0) {
 						var lis = '';
 						$.each(data.data, function(i, item) {
-							lis += liTpl.replace("varName", item.name);
+
+							var _name=item.name;
+							if(/标准$/.test(_name)){
+								_name='<a href="#">'+_name+'</a>&nbsp;&nbsp;';
+							}else{
+								_name='<a href="#">'+_name+'质量标准'+'</a>&nbsp;&nbsp;';
+							}
+
+							lis += liTpl.replace("varName", _name);
 						});
 						that.$el.find(".attrQualityBox").show().find(".modleList").html(lis);
 					}

@@ -191,7 +191,7 @@ App.API = {
 		fetchArtifactsQualityNewRule:"dataJson/resources/fetchArtifactsMapPlan.json",//质量标准新建规则
 		modifyArtifactsQualityRule:"dataJson/resources/fetchArtifactsMapPlan.json",//质量标准修改规则
 		deleteArtifactsQualityRule:"dataJson/resources/fetchArtifactsMapPlan.json",//质量标准删除规则
-
+		fetchArtifactsCategoryRule:"dataJson/resources/fetchArtifactsCategoryRule.json",//获取分类编码   platform/mapping/rule/category/coding?parentCode={parentCode}
 
 		//项目 变更 列表
 		fileList:"doc/internal/{projectId}/{versionId}/differ", //变更列表

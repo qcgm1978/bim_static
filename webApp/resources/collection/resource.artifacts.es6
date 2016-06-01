@@ -3,7 +3,8 @@
 App.ResourceArtifacts={
     Status:{
         presentPlan:null,  //当前计划
-        saved : true    //创建规则后的保存状态，已保存  /  未保存
+        saved : true,    //创建规则后的保存状态，已保存  /  未保存
+        presentRule : null    //当前规则
     },
 
     Settings: {
