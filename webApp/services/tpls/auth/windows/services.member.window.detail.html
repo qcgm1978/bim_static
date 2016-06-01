@@ -7,7 +7,7 @@
     <% if (obj.functions ) { for( var i = 0 ; i < obj.functions.length ; i++) {%>
     <span class="<%= obj.functions[i].id==1 ?  'adm' : '' %>"><%= obj.functions[i].name %></span>
     <% } } else if(obj.namePath){ %>
-    <%= obj.namePath %>
+    <i title="<%= obj.namePath %>"><%= obj.namePath %></i>
     <%}else{%>
     <%= '-' %>
     <%} %>

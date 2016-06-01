@@ -99,6 +99,15 @@ App.Services.memberDetail=Backbone.View.extend({
     //单个修改
     modify:function(e){
         this.cancelBubble(e);
+        var  pre = $("#ozList span.active");
+        if(pre.hasClass(".inner") || pre.hasClass(".outer")){
+            App.Services.memOz = pre.html();
+        }else{
+            App.Services.memOz = pre.html();
+            App.Services.searchOrg(pre);     //获取所属组织列表
+        }
+
+
         var _this =this,disable,selected;
         $(".serviceBody .content").addClass("services_loading");
         var frame = new App.Services.MemberWindowIndex().render().el;//外框
@@ -106,7 +115,7 @@ App.Services.memberDetail=Backbone.View.extend({
         _this.chooseSelf();
         _this.save();
 
-        //获取所有列表，就可以了，继承项设置不可修改
+        //获取所有列表，继承项设置不可修改
         App.Services.Member.loadData(App.Services.Member.SubRoleCollection,{},function(response){
             $(".serviceBody .content").removeClass("services_loading");
             var role = _this.model.get("role");
@@ -122,9 +131,8 @@ App.Services.memberDetail=Backbone.View.extend({
             }
             App.Services.maskWindow.find(".memRoleList h2 i").text(role.length);
         });
-
     },
-//不可选状态
+    //不可选状态
     disable:function(arr){
         App.Services.Member.SubRoleCollection.each(function(item){
             for(var i = 0 ; i< arr.length ; i++){
@@ -134,7 +142,6 @@ App.Services.memberDetail=Backbone.View.extend({
             }
         });
     },
-
     //已选状态
     selected:function(arr){
         var n = 0;//统计
@@ -151,7 +158,6 @@ App.Services.memberDetail=Backbone.View.extend({
         });
         return n;
     },
-
     //保存数据到全局变量
     save:function(){
         var type =  App.Services.MemberType || "inner",
@@ -165,7 +171,6 @@ App.Services.memberDetail=Backbone.View.extend({
         }
         App.Services.Member.saveMemData(data);
     },
-
     //已选部分，当弹窗加载时使用当前成员的角色列表，将弹窗的父角色内与当前成员角色重叠的部分设置为已选
     chooseSelf:function(){
         var type =  App.Services.MemberType || "inner";
@@ -207,6 +212,7 @@ App.Services.memberDetail=Backbone.View.extend({
         });
         $(".mod-dialog").css({"min-height": "545px"});
         $(".mod-dialog .wrapper .content").css({"min-height": "500px"});
+        _this.model.set("namePath",App.Services.memOz);
         $(".seWinBody .aim ul").append(new App.Services.MemberWindowDetail({model:_this.model}).render().el);//当前用户
         $(".memRoleList").append(new App.Services.windowRoleList().render().el);//角色列表
     }
