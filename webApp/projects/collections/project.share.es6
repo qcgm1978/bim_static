@@ -14,7 +14,7 @@ App.Project.Share = {
 	bindLogin() {
 
 		//点击登录这
-		if (App.Comm.getCookie("OUTSSO_AuthToken_test")) {
+		if (App.Comm.getCookie("OUTSSO_AuthToken")) {
 
 			App.Global.User = JSON.parse(localStorage.getItem("user"));
 			//解析权限

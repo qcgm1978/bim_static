@@ -86,7 +86,6 @@ App.Services.MemberNav=Backbone.View.extend({
                 if(already){return}
                 //菜单渲染
                 $("#" + _thisType +"+ .childOz").html(App.Services.tree(response));
-                App.Comm.initScroll(_this.$el.find(".serviceOgList"),"y");
             }
         }).done(function(){
             App.Services.queue.next();

@@ -1,6 +1,6 @@
 .ellipsis{overflow: hidden;white-space: nowrap;text-overflow: ellipsis;}
 ul,li{list-style: none outside none;}
-.serviceOgList{padding-top: 10px;padding-left: 22px;position: absolute;top: 51px;left: 0;right: 0;bottom: 0;}
+.serviceOgList{position: absolute;top: 61px;left: 22px;right: 0;bottom: 0;}
 .serviceInput{outline: none;border: none;-webkit-appearance: none;width: 13px;height: 13px;background: transparent url('../images/service_ico.png') 0 -380px no-repeat;vertical-align: middle;margin: 0;}
 .background-ioc{background: transparent url('../images/service_ico.png') 0 0 no-repeat;vertical-align: middle;}
 .bdB-c{border-bottom: 1px solid #cccccc;}
@@ -51,7 +51,7 @@ ul,li{list-style: none outside none;}
 #blendList li:hover .pers{display: block;}
 #blendList li .left{float: left;width: 300px;.ellipsis;}
 #blendList .sele .left .name{cursor: pointer;}
-#ozList{overflow: visible;}
+#ozList{position: absolute;left: 0;top: 0;right: 0;bottom: 0;}
 
 .serviceBody .content li .pers:before{content: '';position: absolute;width: 16px;height: 16px;left: 0;top: 16px;background: url('../images/service_ico.png') 0 -140px no-repeat;}
 .serviceBody .content li .sele{padding:  0 25px;height: 50px;}
@@ -74,7 +74,7 @@ ul,li{list-style: none outside none;}
 .roleCtrl  .serviceRoleAdm .left span.rohead{background-position: 0 -520px;}
 .roleCtrl .serviceRoleAdm .fun span{color: #a7a7a7;}
 .roleCtrl .roleHead{padding:0 22px;line-height: 50px;font-size: 12px;color: #a7a7a7;border-bottom: 1px solid #cccccc;}
-.roleCtrl .roleHead .newRole{position: relative;cursor: pointer;display: inline-block;line-height: 28px;height: 30px;vertical-align: middle;padding: 0 8px 0 32px;border: 1px solid #cccccc;margin-left: 24px;}
+.roleCtrl .roleHead .newRole{position: relative;cursor: pointer;display: inline-block;line-height: 28px;color: #333333;height: 30px;vertical-align: middle;padding: 0 8px 0 32px;border: 1px solid #cccccc;margin-left: 24px;}
 .roleCtrl .roleHead .newRole:before{position: absolute;content:'';left: 9px;top: 7px;height: 14px;width: 14px;background: transparent url('../images/service_ico.png') 0 -220px  no-repeat;}
 .roleCtrl .roleHead .left,.roleCtrl li .left{float: left;width: 268px;}
 .roleCtrl li.active{background-color: #a8dbfd;}
@@ -118,6 +118,7 @@ ul,li{list-style: none outside none;}
 .seWinBody .aim,.seWinBody .memRoleList,.seWinBody .func{padding: 0;margin: 0 20px;position: relative;}
 .seWinBody .aim .memCheck{display: none;}
 .seWinBody .aim .selec{position: absolute;width: 100%;height: 100%;left: 0;right: 0;top: 0;bottom: 0;overflow: hidden;}
+.seWinBody .aim .selec .fun{white-space: nowrap;overflow: hidden;text-overflow: ellipsis;}
 
 .seWinBody ul{}
 .seWinBody .aim{border:1px solid #cccccc;  height: 160px;overflow: hidden;}
@@ -148,8 +149,7 @@ ul,li{list-style: none outside none;}
 //
 
 .seWinBody .inputName{margin: 0 20px;}
-.seWinBody .inputName input{height: 30px;width: 100%;color: #cccccc;outline: none;border: 1px solid #cccccc;padding: 0 8px;line-height: 30px;}
-.seWinBody .inputName input:focus{color: #333333;}
+.seWinBody .inputName input{height: 30px;width: 100%;color: #333333;outline: none;border: 1px solid #cccccc;padding: 0 8px;line-height: 30px;}
 
 
 .seWinBody .func .title{margin: 0;}
@@ -180,6 +180,4 @@ ul,li{list-style: none outside none;}
 .services_loading{position: relative;}
 .services_loading:after{content: '';position: absolute;left: 0;top: 0;width: 100%;height: 100%;background: rgba(255,255,255,.3) url('../../comm/images/load.gif') center center no-repeat;background-size: 48px 48px;z-index: 99999;}
 
-/*
-.mod-dialog{min-height: 545px;}
-.mod-dialog .wrapper .content{min-height: 500px;}*/
+.readyForScroll{position: absolute;top: 0;right: 0;bottom: 0;left: 0;}

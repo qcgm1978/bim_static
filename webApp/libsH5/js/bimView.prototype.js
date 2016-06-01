@@ -238,8 +238,8 @@
           filter.ids = filter.ids.concat(specialty.ids);
           self.fileFilter(filter);
         }else{
-          self.filter(filter);
           filter = bimView.comm.getFilters(parents,'ckecked');
+          self.filter(filter);
         }
       }).on('click','.treeText',function(){
         // 选中高亮
@@ -445,13 +445,20 @@
       viewer.loadMarkers(newList);
     },
     // 批注
-    comment:function(){
+    comment:function(data){
       // 进入批注模式
       var self = this;
       var viewer = self.viewer;
       self._dom.bimBox.attr('class','bim comment');
       viewer.setCommentMode();
       viewer.editCommentBegin();
+      if(data){
+        var newList = [];
+        $.each(data.list,function(i,item){
+          newList.push(JSON.parse(window.atob(item)));
+        });
+        viewer.loadComments(newList);
+      }
       viewer.setCommentType("0");
       bimView.model.comment(self._dom.bimBox);
     },
@@ -506,8 +513,7 @@
       self.filter(data.filter.floors);
       self.filter(data.filter.category);
       self.filter(data.filter.classCode);
-      // viewer.setCommentMode();
-      //debugger
+      viewer.setCommentMode();
       viewer.loadComments(newList);
     },
     // 模型过滤器

@@ -29,7 +29,7 @@ App.Services.MemberList=Backbone.View.extend({
     addOne:function(model){
         var newView = new App.Services.memberDetail({model:model});
         this.$("#blendList").append(newView.render().el);
-        App.Comm.initScroll(this.$el.find(".servicesMemScrollContent"),"y");
+        App.Comm.initScroll(this.$el.find(".readyForScroll"),"y");
     },
 
     //选中事件
@@ -63,6 +63,15 @@ App.Services.MemberList=Backbone.View.extend({
             disable,
             singleModel; //单选模型
 
+        var  pre = $("#ozList span.active");
+        if(pre.hasClass(".inner") || pre.hasClass(".outer")){
+            App.Services.memOz = "-";
+        }else{
+            App.Services.memOz = pre.html();
+            App.Services.searchOrg(pre);     //获取所属组织列表
+        }
+
+
         //获取所选项
         seleUser = App.Services.Member[type + "Collection"].filter(function(item){
             if(item.get("checked")){
@@ -81,6 +90,7 @@ App.Services.MemberList=Backbone.View.extend({
             singleModel = seleUser[0];
             //角色数据
             App.Services.Member.loadData(App.Services.Member.SubRoleCollection,{},function(response){
+                seleUser[0].set("namePath",App.Services.memOz);
                 $(".seWinBody .aim ul").append(new App.Services.MemberWindowDetail({model:seleUser[0]}).render().el);
                 $(".serviceBody .content").removeClass("services_loading");
                 var role = singleModel.get("role");
@@ -101,6 +111,7 @@ App.Services.MemberList=Backbone.View.extend({
 
         //多选，写入已选用户和组织
         _.each(seleUser,function(item){
+            item.set("namePath",App.Services.memOz);
             $(".seWinBody .aim ul").append(new App.Services.MemberWindowDetail({model:item}).render().el);
             App.Comm.initScroll(App.Services.maskWindow.find(".selec"),"y");
         });

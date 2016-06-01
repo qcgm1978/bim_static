@@ -588,44 +588,27 @@ App.Project = {
 			App.Project.attrDwg.apply(this);
 		}
 
-		//获取所有类别
-		var num = 0;
-		App.Project.fetchPropertData("servicesCategoryList", function(data) {
-			if (data.code == 0) {
+		//获取所有类别 暂时注释等刘佳接口
+		//			App.Project.fetchClassPropertData(function(res) {
+		//				if (res.code == 0) {
+		//					var str = '<div class="modle"><i class="modleShowHide"></i><h1 class="modleName">' + cs['busName'] + '</h1><ul class="modleList">',
+		//					    liTpl = '<li class="modleItem"><span class="modleName overflowEllipsis"><div class="modleNameText overflowEllipsis">{property}</div></span> <span class="modleVal end">{value}</span></li>';
+    //
+		//					var datas = res.data.classId ||[];
+		//					for(var i=0;i<datas.length;i++){
+		//						str += liTpl.replace("{property}", datas[j]['property']).replace('{value}', datas[j]['value']);
+    //
+		//					}
+    //
+		//
+		//					wrap += str + '</ul></div>';
+		//				}
+		//				if (++num == length) {
+		//					that.$el.find(".attrClassBox").html(wrap);
+    //
+		//				}
+		//			});
 
-				data = data.data && data.data.items;
-				if (!data) {
-					return;
-				}
-				var length = data.length,
-					wrap = '';
-				for (var i = 0; i < data.length; i++) {
-					var id = data[i]['id'],
-						classes = data[i];
-					App.Project.fetchClassPropertData(id, classes, function(res, cs) {
-						if (res.code == 0) {
-
-							var datas = res.data;
-							if (datas.length) {
-								return;
-							}
-							var str = '<div class="modle"><i class="modleShowHide"></i><h1 class="modleName">' + cs['busName'] + '</h1><ul class="modleList">',
-								liTpl = '<li class="modleItem"><span class="modleName overflowEllipsis"><div class="modleNameText overflowEllipsis">{property}</div></span> <span class="modleVal end">{value}</span></li>';
-
-							for (var j = 0; j < datas.length; j++) {
-								str += liTpl.replace("{property}", datas[j]['property']).replace('{value}', datas[j]['value']);
-
-							}
-							wrap += str + '</ul></div>';
-						}
-						if (++num == length) {
-							that.$el.find(".attrClassBox").html(wrap);
-
-						}
-					});
-				}
-			}
-		});
 	},
 
 	//模型属性 dwg 图纸
@@ -679,21 +662,21 @@ App.Project = {
 	},
 
 	//类别属性 数据获取
-	fetchClassPropertData: function(id, param1, callback) {
+	fetchClassPropertData: function(callback) {
 
 		var Intersect = App.Project.Settings.ModelObj.intersect;
 
 		var data = {
 			projectId: App.Project.Settings.projectId,
-			elementId: Intersect.userId,
-			classKey: id
+			//elementId: Intersect.userId,
+			//classKey: id
 		};
 
 		//App.Comm.ajax(data, callback);
 		$.ajax({
-			url: "platform/setting/extensions/" + data.projectId + "/property?classKey=" + data.classKey + "&elementId=" + data.elementId
+			url: "platform/setting/extensions/" + data.projectId + "/property/all"
 		}).done(function(data) {
-			callback(data, param1)
+			callback(data)
 		});
 	},
 
