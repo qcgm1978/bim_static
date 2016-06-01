@@ -8,7 +8,7 @@ var AppRoute = Backbone.Router.extend({
 		'flow': 'flow',
 		'resources': 'resources',
 		'resources/:type': 'resource',
-		'resources/:type/:reltype/:ruleType': 'resourcesArtifacts',
+		//'resources/:type/:reltype/:ruleType': 'resourcesArtifacts',
 		'resources/:type/:projectId/:versionId': 'resourceModel',
 		'console': 'console',
 		'console/:type/:step': 'console',
