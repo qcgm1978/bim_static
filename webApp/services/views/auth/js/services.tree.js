@@ -21,6 +21,23 @@ App.Services.tree = function(data){
     return ele;
 };
 
+
+
+//获取所属组织列表
+    App.Services.memOz = '';
+App.Services.searchOrg = function (pre){
+        var text = App.Services.memOz;
+        var father = pre.closest(".childOz").siblings("div").find(".ozName");//最近的顶层节点
+        var li = father.closest("ul").closest("li");
+        if(!li.length){return}
+        var span = father.find("span");
+        App.Services.memOz = span.html()  + " > "  + text;
+        return App.Services.searchOrg(span);
+    };
+
+
+
+
 //队列管理
 App.Services.queue = {
     que : [],

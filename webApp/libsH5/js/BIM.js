@@ -74,14 +74,6 @@
 
     },
     singleBar:[{
-      id:'fit',
-      icon:'m-fit',
-      title:'适应窗口(I)',
-      fn:'fit',
-      keyCode:'105',
-      type:'click'
-    },
-    {
       id:'zoom',
       icon:'m-zoom',
       title:'缩放(Z)',
@@ -89,15 +81,39 @@
       keyCode:'122',
       type:'pattern',
       group:'3'
-    },
-    {
-      id:'fly',
-      icon:'m-fly',
-      title:'漫游(Space)',
-      fn:'fly',
-      keyCode:'32',
+    },{
+      id:'fit',
+      icon:'m-fit',
+      title:'适应窗口(I)',
+      fn:'fit',
+      keyCode:'105',
+      type:'click'
+    },{
+      id:'rotateMouse',
+      icon:'m-rotateMouse',
+      title:'旋转',
+      fn:'rotateMouse',
+      keyCode:'',
       type:'pattern',
       group:'3'
+    },
+    {
+      id:'translucent',
+      icon:'m-translucent',
+      title:'半透明',
+      fn:'translucent',
+      keyCode:'',
+      type:'click',
+      group:'0'
+    },
+    {
+      id:'hideObj',
+      icon:'m-hideObj',
+      title:'隐藏构件',
+      fn:'translucent',
+      keyCode:'',
+      type:'click',
+      group:'0'
     }],
     modelBar:[{
       id:'filter',
@@ -277,8 +293,7 @@
         keyCode:'',
         type:'status',
         group:'0'
-      },
-      ]
+      }]
     },
     {
       id:'hideMap',

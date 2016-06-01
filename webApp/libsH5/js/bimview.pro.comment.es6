@@ -508,14 +508,14 @@
 						onShowMenuCallback: function(event) {
 
 							var $li = $(event.target).closest(".item"),
-								createId = $li.find(".name").data("creatorid"); 
+								createId = $li.find(".name").data("creatorid");
 
 							//创建者 可以 删除 分享 编辑
 							if (App.Global.User && App.Global.User.userId == createId && !App.Project.Settings.isShare) {
-								$("#shareViewPoint,#delViewPoint,#editViewPoint").show();
+								$("#shareViewPoint,#delViewPoint,#editViewPoint,#reName").show();
 							} else {
-								$("#shareViewPoint,#delViewPoint,#editViewPoint").hide();
-							} 
+								$("#shareViewPoint,#delViewPoint,#editViewPoint,#reName").hide();
+							}
 
 						},
 						//事件绑定
@@ -546,10 +546,16 @@
 								$(li).find(".remarkCount").click();
 							},
 
-							editViewPoint() {
+							editViewPoint(li) {
 
 								//修改
-								that.editViewPoint();
+								that.editViewPoint(li);
+
+							},
+
+							reName() {
+								//修改
+								that.reName();
 
 							},
 
@@ -564,6 +570,53 @@
 					});
 				},
 
+				editViewPoint(li) {
+
+
+					var $li = $(li),
+						viewPointId = $li.find(".remarkCount").data("id"),
+						data = {
+							URLtype: "getAnnotation",
+							data: {
+								projectId: App.Project.Settings.projectId,
+								viewPointId: viewPointId
+							}
+						},
+						viewPint = $li.find(".thumbnailImg").data("viewpoint");
+
+					$li.addClass("selected").siblings().removeClass("selected");
+
+					App.Project.Settings.Viewer.setCamera(viewPint);
+
+					App.Comm.ajax(data, function(data) {
+
+						if (data.code == 0) {
+
+							var filterObj = {
+
+								},
+								item;
+
+							$.each(data.data.filters, function(i, item) {
+								item = JSON.parse(item);
+								filterObj[item.cateType] = item;
+								delete item.cateType;
+							});
+
+							//保存
+							App.Project.Settings.Viewer.comment(filterObj);
+
+							var topSaveHtml = _.templateUrl('/libsH5/tpls/comment/bimview.top.save.tip.html', true);
+
+							$("body").append(topSaveHtml);
+							//保存事件
+							CommentApi.saveCommEvent(viewPointId);
+
+						}
+					})
+
+
+				},
 
 
 				//删除试点
@@ -575,7 +628,7 @@
 				},
 
 				//修改批注
-				editViewPoint() {
+				reName() {
 
 					var data = {
 							id: this.$(".remarkCount").data("id"),
@@ -634,14 +687,14 @@
 						return;
 					}
 					var $element = dialog.element,
-						that = this;
-					pars = {
-						viewPointId: dialog.id,
-						projectId: App.Project.Settings.projectId,
-						name: dialog.element.find(".name").val().trim(),
-						description: dialog.element.find(".desc").val().trim(),
-						type: dialog.type
-					};
+						that = this,
+						pars = {
+							viewPointId: dialog.id,
+							projectId: App.Project.Settings.projectId,
+							name: dialog.element.find(".name").val().trim(),
+							description: dialog.element.find(".desc").val().trim(),
+							type: dialog.type
+						};
 
 					if (!pars.name) {
 						alert("请输入批注名称");
@@ -693,7 +746,7 @@
 					"click .delUploadImg": "removeImg", //移除图片
 					"focus .txtReMark": "inputReMark", //输入评论
 					"blur .txtReMark": "outReMark", //失去焦点
-					"click .btnLogin":"login" //登陆
+					"click .btnLogin": "login" //登陆
 				},
 
 				initialize() {
@@ -712,7 +765,7 @@
 					return this;
 				},
 
-				login(){
+				login() {
 					//初始化登陆
 					App.Project.Share.initLogin();
 				},
@@ -963,7 +1016,7 @@
 		CommentApi = {
 
 			//绑定保存 批注事件
-			saveCommEvent() {
+			saveCommEvent(viewPointId) {
 
 				var $topSaveTip = $("#topSaveTip"),
 					that = this;
@@ -972,9 +1025,25 @@
 				$topSaveTip.on("click", ".btnSave", function() {
 
 					var data = App.Project.Settings.Viewer.saveComment(),
-						dialogHtml = _.templateUrl('/libsH5/tpls/comment/bimview.save.dialog.html')({
+						pars = {
 							img: data.image
-						}),
+						};
+
+					if (viewPointId) {
+
+						var $li = $comment.find(".remarkCount_" + viewPointId).closest(".item");
+
+						pars = {
+							id: $li.find(".remarkCount").data("id"),
+							type: $li.find(".thumbnailImg").data("type"),
+							img: $li.find(".thumbnailImg").prop('src'),
+							name: $li.find(".title").text().trim(),
+							desc: $li.find(".desc").text().trim()
+						}
+					}
+
+
+					var dialogHtml = _.templateUrl('/libsH5/tpls/comment/bimview.save.dialog.html')(pars),
 
 						opts = {
 							title: "保存快照",
@@ -988,13 +1057,24 @@
 							message: dialogHtml,
 							okCallback: () => {
 								//保存批注
-								that.saveComment(dialog, data);
+								if (!viewPointId) {
+									that.saveComment(dialog, data);
+								} else {
+									data.id = viewPointId;
+									that.editComment(dialog, data, viewPointId);
+								}
+
 
 								return false;
 							},
 							cancelCallback() {
 
-								that.saveComment(dialog, data, CommentApi.shareViewPoint);
+								if (!viewPointId) {
+									that.saveComment(dialog, data, CommentApi.shareViewPoint);
+								} else {
+									data.id = viewPointId;
+									that.editComment(dialog, data, CommentApi.shareViewPoint);
+								}
 
 								return false;
 							}
@@ -1202,6 +1282,113 @@
 					alert("您已经复制了链接地址");
 				});
 
+			},
+
+			//编辑 批注
+			editComment(dialog, commentData, callback) {
+
+				if (dialog.isSubmit) {
+					return;
+				}
+				var $element = dialog.element,
+					that = this,
+					pars = {
+						viewPointId: commentData.id,
+						projectId: App.Project.Settings.projectId,
+						name: dialog.element.find(".name").val().trim(),
+						description: dialog.element.find(".desc").val().trim(),
+						type: dialog.type
+					};
+
+				if (!pars.name) {
+					alert("请输入批注名称");
+					return false;
+				}
+
+				var data = {
+					URLtype: "updateViewPoint",
+					data: JSON.stringify(pars),
+					type: "PUT",
+					contentType: "application/json"
+				}
+
+				//保存中
+				dialog.element.find(".ok").text("保存中");
+				dialog.isSubmit = true;
+
+				//创建
+				App.Comm.ajax(data, (data) => {
+
+					if (data.code == 0) {
+
+						//请求
+						$.when(this.saveImage({
+							id: commentData.id,
+							img: commentData.image
+						}), this.updateAnnotation(commentData)).
+						done((imgData, annotationData) => {
+
+							imgData = imgData[0];
+
+							annotationData = annotationData[0];
+
+							if (imgData.code == 0 && annotationData.code == 0) {
+
+								var id = imgData.data.id,
+									models = [];
+								 
+								//项目 
+								if ($comment.find(".navBar .project").hasClass("selected")) {
+
+									models = CommentCollections.Project.models;
+
+								} else {
+									//个人 
+									models = CommentCollections.User.models;
+								}
+
+								$.each(models, function() {
+									if (this.toJSON().id == id) {
+										this.set(imgData.data);
+										//跳出循环
+										return false;
+									}
+								});
+
+
+								dialog.close();
+								//取消
+								$("#topSaveTip .btnCanel").click();
+								//回掉
+								if ($.isFunction(callback)) {
+									callback(imgData.data);
+								}
+							}
+
+						});
+
+
+					}
+
+				});
+
+			},
+
+			//更新批注
+			updateAnnotation(commentData) {
+				var pars = {
+						projectId: App.Project.Settings.projectId,
+						viewPointId: commentData.id,
+						annotations: commentData.list
+					},
+					data = {
+						URLtype: "createAnnotation",
+						type: "PUT",
+						contentType: 'application/json',
+						data: JSON.stringify(pars)
+					}
+
+				return App.Comm.ajax(data);
 			}
 
 		}
