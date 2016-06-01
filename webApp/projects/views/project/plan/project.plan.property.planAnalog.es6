@@ -51,6 +51,9 @@
  			return;
  		}
 
+ 		this.showInModle($(event.currentTarget));
+
+
  		var code = $(event.target).closest("tr").addClass("selected").siblings().removeClass("selected").end().data("code"),
  		index=this.SourcePlay.indexOf(code);
 
@@ -145,7 +148,38 @@
  		this.$(".playOrPause").toggleClass("myIcon-play myIcon-pause");
  		this.$(".progressAnalog .processBg").width(0);
  		this.$(".progressAnalog .processPos").css("left", 0);
- 	}
+ 	},
+ 	showInModle(event) {
+		var $target = event,
+			ids=$target.data("userId"),
+			box=$target.data("box");
+		if ($target.hasClass("selected")) {
+			$target.parent().find(".selected").removeClass("selected");
+		} else {
+			$target.parent().find(".selected").removeClass("selected");
+			$target.addClass("selected");
+		}
+		if (box && ids) {
+			App.Project.zoomModel(ids,box);
+			return;
+		}
+		var data = {
+			URLtype: "fetchModleIdByCode",
+			data: {
+				projectId: App.Project.Settings.CurrentVersion.projectId,
+				projectVersionId: App.Project.Settings.CurrentVersion.id,
+				planCode: $target.data("code")
+			}
+		};
+		App.Comm.ajax(data, function(data) {
+			if (data.code == 0) {
+				var box=App.Project.formatBBox(data.data.boundingBox);
+				$target.data("userId", data.data.elements);
+				$target.data("box", box);
+				App.Project.zoomModel(data.data.elements,box);
+			}
+		});
+	}
 
 
  });

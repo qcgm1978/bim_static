@@ -8,6 +8,8 @@ App.Project = {
 		projectNav: "", //项目导航 计划 成本 设计 质量
 		property: "poperties", // 项目导航 下的 tab  如：检查 属性
 		fileId: "",
+		token:"",
+		isShare:false,
 		projectId: "", //项目id
 		versionId: "", //版本id
 		attrView: null,
@@ -934,6 +936,9 @@ App.Project = {
 
 	//转换bounding box数据
 	formatBBox: function(data) {
+		if(!data){
+			return [];
+		}
 		var box = [],
 			min = data.min,
 			minArr = [min.x, min.y, min.z],

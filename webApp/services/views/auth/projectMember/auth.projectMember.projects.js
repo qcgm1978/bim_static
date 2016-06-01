@@ -27,7 +27,7 @@ App.Services.projectMember.projects = Backbone.View.extend({
 	},
 	
 	selectProject:function(event){
-		$("#dataLoading").show();
+		$("#memberlistWrap").mmhMask();
 		var $li=$(event.currentTarget),
 			pid=$li.attr("data-pid"),
 			name=$li.find('h4').text();//权限ID

@@ -19,7 +19,7 @@ var AppKeyRoute = Backbone.Router.extend({
 		App.Project.Settings = $.extend({}, App.Project.Defaults);
 
 
-		this.parseToken(function() {
+		this.parseToken(token, function() {
 			App.Project.init();
 		});
 
@@ -28,19 +28,40 @@ var AppKeyRoute = Backbone.Router.extend({
 	},
 
 	//解析token
-	parseToken(callback) {
-		App.Project.Settings.projectId = "3";
-
-		App.Project.Settings.versionId = "201605091530";
-
-		App.Project.Settings.type = "token";
-
-		$("#topBar").prepend(' <ul class="navHeader"> <li class="item "> <span class="login">登录</span> </li></ul>');
-
-		//回调
-		if ($.isFunction(callback)) {
-			callback();
+	parseToken(token, callback) {
+		 
+		var data = {
+			URLtype: 'parseToken',
+			data: {
+				id: token
+			}
 		}
+
+		App.Comm.ajax(data, function(data) {
+			   
+			if (data.code == 0) {
+
+				data=data.data;
+
+				App.Project.Settings.projectId =data.projectId;
+
+				App.Project.Settings.versionId = data.projectVersionId;
+
+				App.Project.Settings.type = "token";
+
+				App.Project.Settings.token=data.token;
+
+				$("#topBar").prepend(' <ul class="navHeader"> <li class="item "> <span class="login">登录</span> </li></ul>');
+
+				App.Comm.setCookie("token_cookie",data.cookie);
+				//回调
+				if ($.isFunction(callback)) {
+					callback();
+				}
+			}
+		});
+
+
 	},
 
 
