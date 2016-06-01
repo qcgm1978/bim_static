@@ -83,8 +83,10 @@ App.Services.MemberWindowIndex = Backbone.View.extend({
             }
             App.Services.Member.resetMemData();
             App.Services.maskWindow.close();
+            App.Services.memOz = '';
         });
         App.Services.Member.resetMemData();
+        App.Services.memOz = '';
     },
 
     initialize:function(){

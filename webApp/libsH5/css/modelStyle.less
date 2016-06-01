@@ -73,7 +73,10 @@
     }
     .modelMap{width:100%;height:260px;background:rgba(34,34,34,.85);position:absolute;left:0;bottom:0;z-index:2;
       .map{height:180px;margin:0 2px;border-top:1px solid #999;border-bottom:1px solid #999;}
-      .axisGrid{margin:5px;float:right;text-align:right;color:#fff;line-height:30px;cursor:pointer;}
+      .axisGrid{margin:5px;float:right;max-width:240px;overflow:hidden;text-overflow:ellipsis;text-align:right;color:#fff;line-height:30px;cursor:pointer;}
+      .modelSelect{
+        .cur{width:60px;}
+      }
     }
     .modelFilter{width:100%;display:none;position:absolute;top:0;bottom:260px;color:#fff;padding:5px;background:rgba(0, 0, 0, 0.75);overflow:auto;}
   }

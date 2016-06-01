@@ -95,6 +95,9 @@ App.Services.keyUserFrame = Backbone.View.extend({
                               App.Services.KeyUser.applying=false;
 
                               if (data.code==0) {
+                                  if($li.is('.active')){
+                                      $('.keyBody').html('');
+                                  }
                                   $li.remove();
                                   $('.mod-dialog,.mod-dialog-masklayer').hide();
                                   $usernum.text($usernum.text()-1);

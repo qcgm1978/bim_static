@@ -3,11 +3,11 @@
 */
 
 var CLOUD = CLOUD || {};
-CLOUD.Version = "20160530";
+CLOUD.Version = "20160601";
 
 CLOUD.GlobalData = {
     SceneSize: 1000,
-    SceneScale: 1,
+    SceneScale: 2,
     LengthUnitScale : 1000,
     MinBoxSize : new THREE.Vector3(500, 500, 500),
     MaxTriangle: 40000000,
@@ -15,7 +15,7 @@ CLOUD.GlobalData = {
     UseArrayBuffer: true,
     TextureResRoot: 'images/',
     ShowSubSceneBox: false,
-    ShowCellBox: true,
+    ShowCellBox: false,
     DynamicRelease: true,
     SubSceneVisibleDistance: 0.1,
     CellVisibleLOD: 15,
@@ -18681,6 +18681,13 @@ CloudViewer.prototype = {
 
     setCommentMode: function () {
         this.editorManager.setCommentMode(this);
+    },
+
+    setCommentBackgroundColor: function (startColor, stopColor) {
+        if ( this.editorManager.commentEditor && this.editorManager.editor === this.editorManager.commentEditor) {
+
+            this.editorManager.commentEditor.setBackgroundColor(startColor, stopColor);
+        }
     },
 
     zoomToSelectedComments: function(){

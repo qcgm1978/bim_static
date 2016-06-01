@@ -282,21 +282,28 @@ App.Project.Model = {
 			var data = model.toJSON();
 			var comparisonId = App.Index.Settings.referenceId;
 			var isload = false;
+			console.log(data)
+
 			$.each(data.data, function(i, item) {
 				$.each(item.comparisons, function(j, file) {
+
 					if (file.comparisonId == comparisonId) {
 						isload = true;
 						$(".rightPropertyContent .listDetail").html(new App.Project.Model.getInfo().render().el);
 						App.Index.getDetail(comparisonId);
+						App.Index.Settings.currentModel = file.currentModel;
+						App.Index.Settings.baseModel = file.baseModel;
 						App.Index.Settings.changeModel = file.comparisonId;
 						App.Index.renderModel(file.currentModel);
 						data.selected = [i,j]
+
 					}
 				});
 			});
 			// 没有找到当前文件,默认加载第一个
 			if (!isload && data.data.length>0) {
 				var file = data.data[0].comparisons[0];
+
 				$(".rightPropertyContent .listDetail").html(new App.Project.Model.getInfo().render().el);
 				App.Index.getDetail(file.comparisonId);
 				App.Index.Settings.changeModel = file.comparisonId;
@@ -365,7 +372,7 @@ App.Project.Model = {
 			var $treetext = $(e.target).prev('.tree-text'),
 				data = {
 					baseModel:$treetext.data('base'),
-					currentModel:$treetext.data('id')
+					currentModel:$treetext.data('id')||$treetext.data('base')
 				};
 
 			App.Index.alertWindow = new App.Comm.modules.Dialog({
@@ -376,6 +383,7 @@ App.Project.Model = {
 				isAlert: false,
 				message: new App.Project.Model.contrastInfo().render(data).el
 			});
+
 			$(".mod-dialog .wrapper .header").hide();//隐藏头部
 			//$(".alertInfo").html(alertInfo);
 			$(".mod-dialog,.mod-dialog .wrapper .content").css({"min-height":"auto",padding:0});

@@ -238,8 +238,8 @@
           filter.ids = filter.ids.concat(specialty.ids);
           self.fileFilter(filter);
         }else{
-          self.filter(filter);
           filter = bimView.comm.getFilters(parents,'ckecked');
+          self.filter(filter);
         }
       }).on('click','.treeText',function(){
         // 选中高亮
