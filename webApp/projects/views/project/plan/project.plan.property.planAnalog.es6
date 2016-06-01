@@ -72,7 +72,7 @@
  			alert("没有模拟数据");
  			return;
  		}
-
+ 		 
  		if ($target.hasClass("myIcon-play")) {
 
  			//克隆数据
@@ -81,7 +81,7 @@
  			}
 
  			//隐藏全部
- 			App.Project.Settings.Viewer.hide({
+ 			App.Project.Settings.Viewer.filter({
  				type: "plan",
  				ids: this.PlayArr
  			});
@@ -108,9 +108,9 @@
  				var code = this.PlayArr.splice(0, 1),
  					$tr = this.$(".planContent tbody tr[data-code='" + code[0] + "']");
 
- 				App.Project.Settings.Viewer.show({
+ 				App.Project.Settings.Viewer.filter({
  					type: "plan",
- 					ids: code
+ 					ids: this.PlayArr
  				});
 
  				var processAnalog = (this.analogCount - this.PlayArr.length) / this.analogCount,
