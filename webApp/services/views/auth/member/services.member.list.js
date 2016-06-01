@@ -65,7 +65,7 @@ App.Services.MemberList=Backbone.View.extend({
 
         var  pre = $("#ozList span.active");
         if(pre.hasClass(".inner") || pre.hasClass(".outer")){
-            App.Services.memOz = pre.html();
+            App.Services.memOz = "-";
         }else{
             App.Services.memOz = pre.html();
             App.Services.searchOrg(pre);     //获取所属组织列表

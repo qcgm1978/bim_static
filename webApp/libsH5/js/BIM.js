@@ -236,7 +236,7 @@
       subBar:[{
         id:'rotateMouse',
         icon:'m-rotateMouse',
-        title:'',
+        title:'绕鼠标旋转',
         fn:'rotateMouse',
         keyCode:'',
         type:'rotate',
@@ -246,7 +246,7 @@
         icon:'m-rotateCamera',
         title:'',
         fn:'rotateCamera',
-        keyCode:'',
+        keyCode:'绕观察者旋转',
         type:'rotate',
         group:'3'
       },{
@@ -254,7 +254,7 @@
         icon:'m-rotateObj',
         title:'',
         fn:'rotateMouse',
-        keyCode:'',
+        keyCode:'绕构件旋转',
         type:'rotate',
         group:'3'
       }]
