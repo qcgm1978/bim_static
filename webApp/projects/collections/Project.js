@@ -946,6 +946,9 @@ App.Project = {
 
 	//转换bounding box数据
 	formatBBox: function(data) {
+		if(!data){
+			return [];
+		}
 		var box = [],
 			min = data.min,
 			minArr = [min.x, min.y, min.z],

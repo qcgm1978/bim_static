@@ -41,8 +41,14 @@ App.Services.ProjectCollection = {
 				r=zeroReg.test(val)||intReg.test(val)||floatReg.test(val);
 			}else if(_$dom.hasClass('intInput')){
 				r=zeroReg.test(val)||intReg.test(val);
+			}else if(_$dom.hasClass('rateInput')){
+				if(Number(val)<=100 && Number(val)>=0){
+					r=true;
+				}else{
+					r=false;
+				}
 			}else{
-				return 
+				return;
 			}
 			if(r){
 				_$dom.removeClass('errorInput');

@@ -21,7 +21,10 @@ App.Services.DetailView.Section=Backbone.View.extend({
 	},
 	
 	initialize(data){
-		this.listenTo(this.model,'change',this.render);
+		var _this=this;
+		this.model.on('change',function(){
+			_this.render();			
+		})
 	},
 
 	render(){
@@ -96,7 +99,9 @@ App.Services.DetailView.Section=Backbone.View.extend({
 		},function(res){
 			$.tip({message:type?'修改成功':'新增成功'});
 	 		Backbone.trigger('sectionUserStatus','read');
-	 		_this.formData.id=res.data.profileId;
+	 		if(type!='put'){
+	 			_this.formData.id=res.data.profileId;
+	 		}
 	 		_this.model.set(_this.formData);
 	 		_this.$('.accordionDatail').trigger('click');
 		}).fail(function(){
