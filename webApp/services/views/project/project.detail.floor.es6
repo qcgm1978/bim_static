@@ -72,18 +72,18 @@ App.Services.ProjectDetail.Floor=Backbone.View.extend({
 		        "groundLayers":0,//   地上层数
 		        "undergroundLayers":0,//  地下层数
 		        "layerHeight":0,//    层高
-		        "seismicIntensityId":"",//    抗震设防烈度
-		        "seismicLevelId":"",//    抗震等级
+		        "seismicIntensityId":"6度",//    抗震设防烈度
+		        "seismicLevelId":"一级",//    抗震等级
 		        "roofStayWarm":"",//  屋面保温
-		        "roofStayWarmLev":"",//    屋面保温防火等级
+		        "roofStayWarmLev":"A",//    屋面保温防火等级
 		        "outWallStayWarm":"",//   外墙保温
-		        "outWallStayWarmLev":"",// 外墙保温防火等级
+		        "outWallStayWarmLev":"A",// 外墙保温防火等级
 		        "lowStrainPercentage":0,//  低应变检测百分比
 		        "highStrainPercentage":0,// 高应变检测百分比
 		        "ultrasonicPercentage":0,//   超声波检测百分比
 		        "corebitPercentage":0,//  钻芯检测百分比
-		        "outSidedecorationType":"0",//   外装方式
-		        "structureType":""
+		        "outSidedecorationType":"",//   外装方式
+		        "structureType":"剪力墙结构"
 			}
 			App.Services.ProjectCollection.ProjecDetailFloorCollection.push(model);
 
