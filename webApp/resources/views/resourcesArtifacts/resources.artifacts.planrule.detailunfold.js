@@ -20,10 +20,6 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
         "blur .categoryCode": "legendClose",
         "click .searEnd":"searEnd"
     },
-    searEnd:function(e){
-
-    },
-
     render:function() {
         this.$el.html(this.template(this.model.toJSON()));
         return this;
@@ -175,25 +171,25 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
     //联想模块
     legend:function(e){
         var _this = this;
+        _this.$(".chide").css({"visibility":"hidden"});
         var ac = _.map(App.Resources.artifactsTreeData,function(item){return item.code}); //对象-数组
-
         var pre = $(e.target);
+        $(e.target).addClass("active");
+        pre.css({"opacity":"1"});
         //输入不合法，无法找到
         var list = pre.closest("div").siblings("ul");
         list.html();
 
         if(pre.val()){
-            //联想
-            //
             list.show();
         }
         //变红
         pre.on("keydown",function(){
             list.show();
-            pre.removeClass("active");
+            pre.removeClass("alert");
         });
 
-        console.log(this);
+
         $(".searEnd").on("click",function(e){
             var id =  $(this).data("id"),
                 data;
@@ -205,7 +201,7 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
         });
 
         pre.on("keyup",function(ev){
-            var val = pre.val(),test, count = 5,str = '',index;  //最多9块数据，显示5条
+            var val = pre.val(),test, count = 5,str = '',index,arr = [];  //显示5条
             list.html("");
             val = val.replace(/\s+/,'');
             if(!val){list.hide();return}
@@ -216,7 +212,6 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
                 list.html("<li>搜索：无匹配结果</li>");
                 return;
             }
-
 
             str = val;
             var x = str.length%3;
@@ -245,13 +240,20 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
                 if(App.Resources.artifactsTreeData[j].length <= val.length ||  j - index  + 1 >count) {
                     break
                 }
+                arr.push(App.Resources.artifactsTreeData[j]);
+
+                //此处创建新view
                 list.append("<li class='searEnd'   data-id='["+ content.code +"]"+"  " + content.name +"+'><span class='ccode'>"+  content.code  + "</span>" + content.name +"</li>");
             }
         });
     },
     //关闭联想
     legendClose:function(e){
-        $(e.target).closest("div").siblings("ul").hide();
+        $(e.target).removeClass("active");
+        var val = $(e.target).val();
+        //此处要保存数据
+        this.$(".chide").css({"visibility":"visible"});
+        $(e.target).css({"opacity":"0"}).closest("div").siblings("ul").hide();
     },
 
     //校验模块
@@ -280,12 +282,27 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
 
     //红色提示输入
     redAlert:function(ele){
-        ele.addClass("active");
+        ele.addClass("alert");
     },
 
-    //拆解value字符串
-    getValue:function(str){
-        if( typeof str != "string"){return}
-        var arr = str.slice(",");
+    //因为数据格式导致的保存数据到模型的额外内容
+    saveDataToModel:function(title,data){
+        var con = App.ResourceArtifacts.presentRule.model.get("mappingCategory");
+        con[title] =  typeof data == "number" ? data + '' : data;
+        App.ResourceArtifacts.presentRule.model.set({"mappingCategory":con});
+        App.ResourceArtifacts.presentRule.model.trigger("mappingCategoryChange");//重绘模型
+    },
+    //因为数据格式导致的保存数组到模型的额外内容
+    saveArrayToModel:function(id,title,data){
+        var con = App.ResourceArtifacts.presentRule.model.get("mappingCategory");
+        var arr = con.mappingPropertyList;
+        for(var i = 0 ;i < arr.length ; i++){
+            if(arr[i].id == id){
+                arr[i][title] =data;
+            }
+        }
+        con.mappingPropertyList = arr;
+        App.ResourceArtifacts.presentRule.model.set({"mappingCategory":con});
+        App.ResourceArtifacts.presentRule.model.trigger("mappingCategoryChange");//重绘模型
     }
 });
