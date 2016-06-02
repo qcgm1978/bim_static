@@ -16,9 +16,8 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
         "click .myDropText":"seleRule",
         "click .myItem":"myItem",
         "click .delRule": "delRule",
-        "focus .categoryCode": "legend",
-        "blur .categoryCode": "legendClose",
-        "click .searEnd":"searEnd"
+        "focus .categoryCode": "legend"
+        //"blur .categoryCode": "legendClose"
     },
     render:function() {
         this.$el.html(this.template(this.model.toJSON()));
@@ -76,7 +75,6 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
     },
     //保存
     saveRule:function(){
-
         //校验
         var  check = this.check();
         if(!check){return}
@@ -94,11 +92,9 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
             cdata.URLtype = "createArtifactsPlanNewRule";
             //创建
         }
-
         //临时内容
         this.$el.closest(".ruleDetail").hide().empty();
         App.ResourceArtifacts.Status.saved = true ;//保存状态
-
         //
         App.Comm.ajax(cdata,function(response){
             if(response.code == 0 && response.data.id){
@@ -190,16 +186,6 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
         });
 
 
-        $(".searEnd").on("click",function(e){
-            var id =  $(this).data("id"),
-                data;
-            data = App.ResourceArtifacts.presentRule.model.get("mappingCategory");
-            data["categoryCode"] = id + '';
-            App.ResourceArtifacts.presentRule.model.set({"mappingCategory":data});
-            App.ResourceArtifacts.presentRule.model.trigger("mappingCategoryChange");
-            console.log(App.ResourceArtifacts.presentRule);
-        });
-
         pre.on("keyup",function(ev){
             var val = pre.val(),test, count = 5,str = '',index,arr = [];  //显示5条
             list.html("");
@@ -236,14 +222,13 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
                 return
             }
             for(var j = index  ;  j < App.Resources.artifactsTreeData.length  ; j++){
-                var content =  App.Resources.artifactsTreeData[j];
                 if(App.Resources.artifactsTreeData[j].length <= val.length ||  j - index  + 1 >count) {
                     break
                 }
-                arr.push(App.Resources.artifactsTreeData[j]);
-
+               // arr.push(App.Resources.artifactsTreeData[j]);
                 //此处创建新view
-                list.append("<li class='searEnd'   data-id='["+ content.code +"]"+"  " + content.name +"+'><span class='ccode'>"+  content.code  + "</span>" + content.name +"</li>");
+                var newRule = new App.ResourceArtifacts.newCode(App.Resources.artifactsTreeData[j]);
+                list.append(new App.Resources.ArtifactsRuleLegend({model:newRule}).render().el);
             }
         });
     },

@@ -1,3 +1,6 @@
+/**
+ * @require /resources/collection/resource.nav.es6
+ */
 //fetchArtifactsPlan   获取计划
 //fetchArtifactsPlanRule   获取规则
 App.ResourceArtifacts={
@@ -120,9 +123,14 @@ App.ResourceArtifacts={
         }
     }),
 
-    newModel : {
-        "key":"", "rule":"", "value": null
-    },
+    //构件编码
+    newCode :Backbone.Model.extend({
+        defaults:function(){
+            return{
+                code : ""
+            }
+        }
+    }),
 
     //新建规则
     newRule : Backbone.Model.extend({

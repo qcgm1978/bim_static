@@ -1,6 +1,6 @@
-/*
- * @require  /services/views/auth/member/services.member.ozDetail.js
- * */
+/**
+ * @require /resources/collection/resource.nav.es6
+ */
 App.Resources.ArtifactsPlanRuleAlert = Backbone.View.extend({
 
     tagName :'div',
