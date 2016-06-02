@@ -111,7 +111,7 @@ var AppRoute = Backbone.Router.extend({
 
 	},
 
-	resourcesArtifacts:function(type,reltype,ruleType){
+	/*resourcesArtifacts:function(type,reltype,ruleType){
 		this.reset();
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".resources").addClass('selected');
 		_.require('/static/dist/resources/resources.css');
@@ -121,9 +121,10 @@ var AppRoute = Backbone.Router.extend({
 		App.ResourcesNav.Settings.type = type;
 		App.ResourcesNav.Settings.reltype = reltype;
 		App.ResourcesNav.Settings.ruleType = ruleType;
+		//App.AuthObj.lib.mappingRuleTemplate =true;
 		App.ResourcesNav.init();
 		//App.ResourceArtifacts.init();
-	},
+	},*/
 
 	//单个项目
 	resource: function(type) {
