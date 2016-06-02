@@ -78,7 +78,7 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 				} else {
 
 					$("#previewModel").removeClass("disable");
-					var href = $item.find(".fileName .boxText").prop("href");
+					var href = $item.find(".fileName .text").prop("href");
 					$("#previewModel").find("a").prop("href", href);
 
 					//重命名 未上传
