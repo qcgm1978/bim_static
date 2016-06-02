@@ -111,7 +111,7 @@
  				App.Project.Settings.Viewer.filter({
  					type: "plan",
  					ids: this.PlayArr
- 				});
+ 				}); 				
 
  				var processAnalog = (this.analogCount - this.PlayArr.length) / this.analogCount,
  					sourceWidth = this.$(".progressAnalog .bg").width(),
@@ -122,6 +122,8 @@
  				if (width > sourceWidth) {
  					width = sourceWidth;
  				}
+ 				
+ 				//this.showInModle($tr);
 
  				this.$(".progressAnalog .processBg").width(width);
  				this.$(".progressAnalog .processPos").css("left", width-10);
@@ -132,6 +134,8 @@
  				//底部文字
  				this.$(".desctionAnalog .analogDate").text($tr.find(".start").text());
  				this.$(".desctionAnalog .analogTitle").text($tr.find(".operationalMatters").text());
+
+ 				
 
  			} else {
  				//停止模拟
