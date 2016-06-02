@@ -26,9 +26,9 @@
 			$comment = $('#comment');
 			//生成
 			$comment.html(AppView.$el);
-
+			 
 			//右键菜单
-			if (!document.getElementById("viewPointContext")) {
+			if (!document.getElementById("viewPointContextPoint")) {
 				//右键菜单
 				var contextHtml = _.templateUrl("/libsH5/tpls/comment/viewPointContext.html", true);
 				$("body").append(contextHtml);
@@ -532,9 +532,9 @@
 
 				bindContent() {
 
-					var that = this;
-
-					this.$el.contextMenu('viewPointContext', {
+					var that = this;				 
+					 
+					this.$el.contextMenu('viewPointContextPoint', {
 						theme: "viewPointContext",
 						shadow: false,
 						//显示 回调
