@@ -17,7 +17,11 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
         "click .myItem":"myItem",
         "click .delRule": "delRule",
         "focus .categoryCode": "legend",
-        "blur .categoryCode": "legendClose"
+        "blur .categoryCode": "legendClose",
+        "click .searEnd":"searEnd"
+    },
+    searEnd:function(e){
+
     },
 
     render:function() {
@@ -170,25 +174,79 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
 
     //联想模块
     legend:function(e){
+        var _this = this;
+        var ac = _.map(App.Resources.artifactsTreeData,function(item){return item.code}); //对象-数组
+
         var pre = $(e.target);
         //输入不合法，无法找到
         var list = pre.closest("div").siblings("ul");
-        list.show();
+        list.html();
+
+        if(pre.val()){
+            //联想
+            //
+            list.show();
+        }
+        //变红
+        pre.on("keydown",function(){
+            list.show();
+            pre.removeClass("active");
+        });
+
+        console.log(this);
+        $(".searEnd").on("click",function(e){
+            var id =  $(this).data("id"),
+                data;
+            data = App.ResourceArtifacts.presentRule.model.get("mappingCategory");
+            data["categoryCode"] = id + '';
+            App.ResourceArtifacts.presentRule.model.set({"mappingCategory":data});
+            App.ResourceArtifacts.presentRule.model.trigger("mappingCategoryChange");
+            console.log(App.ResourceArtifacts.presentRule);
+        });
+
         pre.on("keyup",function(ev){
-            var val = pre.val();
+            var val = pre.val(),test, count = 5,str = '',index;  //最多9块数据，显示5条
+            list.html("");
             val = val.replace(/\s+/,'');
+            if(!val){list.hide();return}
             val = val.replace(/\u3002+/,'.');
             //禁止输出除数字，半角句号外的
-            var re = /[^\d\.]+/.test(val);
-            if(re){
-                list.html("<li>搜索结果：" + re +"无匹配结果</li>");
+            test = /[^\d\.]+/.test(val);
+            if(test){
+                list.html("<li>搜索：无匹配结果</li>");
                 return;
             }
-            jQuery.inArray();
-            for(var i = 0 ; i < val.length ; i++){
 
+
+            str = val;
+            var x = str.length%3;
+            if(x ==0){
+                str = _.initial(str);
+                str = str.join('');
+                index = _.indexOf(ac,str,true);
+            }else if(x == 1){
+                for(var s = 0 ; s< 9 ; s++){
+                    var sd = str + s + '';
+                    index = _.indexOf(ac,sd);
+                    if(index >= 0){
+                        break
+                    }
+                }
+            }else{
+                index = _.indexOf(ac,str,true);
             }
-            //从库对象里查找当前值
+
+            if(index < 0 ){
+                list.html("<li>搜索：无匹配结果</li>");
+                return
+            }
+            for(var j = index  ;  j < App.Resources.artifactsTreeData.length  ; j++){
+                var content =  App.Resources.artifactsTreeData[j];
+                if(App.Resources.artifactsTreeData[j].length <= val.length ||  j - index  + 1 >count) {
+                    break
+                }
+                list.append("<li class='searEnd'   data-id='["+ content.code +"]"+"  " + content.name +"+'><span class='ccode'>"+  content.code  + "</span>" + content.name +"</li>");
+            }
         });
     },
     //关闭联想
@@ -198,7 +256,12 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
 
     //校验模块
     check:function(){
-        return true;
+        var vals = this.$(".categoryCode");
+        if(!vals.val()){
+            vals.focus();
+            this.redAlert(vals)
+        }
+        return false;
     },
     //初始化窗口
     window:function(frame){
@@ -213,6 +276,11 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
             },
             message:frame
         });
+    },
+
+    //红色提示输入
+    redAlert:function(ele){
+        ele.addClass("active");
     },
 
     //拆解value字符串
