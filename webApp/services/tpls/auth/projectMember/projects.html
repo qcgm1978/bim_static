@@ -1,14 +1,24 @@
-<li>我管理的项目(<%=data.length%>)</li>
+<div class="header">
+<div class="myDropDown projectDropDown" >
+	<span class="myDropText">  <span class="text">我管理的项目(<%=data.length%>)</span> <i class="myDropArrorw"></i> </span>
+		<ul class="myDropList" style="display: none;">
+			<li class="myItem">我管理的项目(<%=data.length%>)</li>
+		</ul>
+	</div>
+</div>
+<ul class="projectListWrap">
 <% _.each(data,function(item,index){ %>
-	<li class="project<% if(index==0) { %> active <% } %>" data-pid="<%= item.id %>">
-		<div><img src="<%= item.image %>"></div>
-		<div>
-			<h4><%= item.name %></h4>
-			<p>
-				<%= item.province %><%= item.city %>
-					<%= new Date(item.startTime).format("yyyy-MM-dd") %>—
-						<%= new Date(item.endTime).format("yyyy-MM-dd") %>
-			</p>
-		</div>
-	</li>
-<% }) %>
+		<li class="project<% if(index==0) { %> active <% } %>" data-pid="<%= item.id %>">
+			<div><img src="<%= item.image %>"></div>
+			<div>
+				<h4><%= item.name %></h4>
+				<p>
+					<%= item.province %><%= item.city %>
+						<%= new Date(item.startTime).format("yyyy-MM-dd") %>—
+							<%= new Date(item.endTime).format("yyyy-MM-dd") %>
+				</p>
+			</div>
+		</li>
+	<% }) %>
+</ul>
+

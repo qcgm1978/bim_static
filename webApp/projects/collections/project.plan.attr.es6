@@ -31,7 +31,6 @@ App.Project.PlanAttr={
 		}),
 
 		urlType:"fetchPlanAnalog"
-
 	})),
 
 	//关注
@@ -45,8 +44,7 @@ App.Project.PlanAttr={
 			}
 		}),
 
-		urlType:"fetchPlanPublicity",
-
+		srcUrl:'http://10.199.200.219:8010/api/BIM/CurrentDateStartAndEndForProject/{type}/{projectCode}'
 		 
 	})),
 

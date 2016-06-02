@@ -83,7 +83,6 @@ App.Project = {
 
 		App.Comm.ajax(data, function(data) {
 			if (data.code == 0) {
-
 				data = data.data;
 				App.Project.Settings.projectName = data.projectName;
 				App.Project.Settings.CurrentVersion = data;
