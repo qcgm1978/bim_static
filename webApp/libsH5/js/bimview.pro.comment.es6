@@ -26,7 +26,7 @@
 			$comment = $('#comment');
 			//生成
 			$comment.html(AppView.$el);
-			 
+
 			//右键菜单
 			if (!document.getElementById("viewPointContextPoint")) {
 				//右键菜单
@@ -532,8 +532,8 @@
 
 				bindContent() {
 
-					var that = this;				 
-					 
+					var that = this;
+
 					this.$el.contextMenu('viewPointContextPoint', {
 						theme: "viewPointContext",
 						shadow: false,
@@ -548,7 +548,7 @@
 								$("#shareViewPoint,#delViewPoint,#editViewPoint,#reName").show();
 							} else {
 								$("#shareViewPoint,#delViewPoint,#editViewPoint,#reName").hide();
-							} 
+							}
 
 						},
 						//事件绑定
@@ -1116,10 +1116,10 @@
 							okCallback: () => {
 								//保存批注
 								if (!viewPointId) {
-									that.saveComment(dialog, data);
+									that.saveComment("save", dialog, data);
 								} else {
 									data.id = viewPointId;
-									that.editComment(dialog, data, viewPointId);
+									that.editComment("save", dialog, data, viewPointId);
 								}
 
 
@@ -1128,10 +1128,10 @@
 							cancelCallback() {
 
 								if (!viewPointId) {
-									that.saveComment(dialog, data, CommentApi.shareViewPoint);
+									that.saveComment("saveShare", dialog, data, CommentApi.shareViewPoint);
 								} else {
 									data.id = viewPointId;
-									that.editComment(dialog, data, CommentApi.shareViewPoint);
+									that.editComment("saveShare", dialog, data, CommentApi.shareViewPoint);
 								}
 
 								return false;
@@ -1167,7 +1167,7 @@
 			},
 
 			//保存批注
-			saveComment(dialog, commentData, callback) {
+			saveComment(type, dialog, commentData, callback) {
 
 				if (dialog.isSubmit) {
 					return;
@@ -1198,8 +1198,12 @@
 					contentType: "application/json"
 				}
 
-				//保存中
-				dialog.element.find(".ok").text("保存中");
+				if (type == "save") {
+					dialog.element.find(".ok").text("保存中");
+				} else {
+					dialog.element.find(".cancel").text("保存中");
+				}
+				//保存中				
 				dialog.isSubmit = true;
 
 				//创建
@@ -1230,9 +1234,9 @@
 
 								imgData.data.isAdd = true;
 								//项目 
-								if ($comment.find(".navBar .project").hasClass("selected")) {
+								if ($comment.find(".navBar .project").hasClass("selected") && dialog.type == 1) {
 									CommentCollections.Project.push(imgData.data);
-								} else {
+								} else if ($comment.find(".navBar .user").hasClass("selected") && dialog.type == 0) {
 									//个人
 									CommentCollections.User.push(imgData.data);
 								}
@@ -1251,7 +1255,12 @@
 
 					} else {
 						alert(data.message);
-						dialog.element.find(".ok").text("保存");
+						if (type == "save") {
+							dialog.element.find(".ok").text("保存");
+						} else {
+							dialog.element.find(".cancel").text("保存并分享");
+						}
+
 						dialog.isSubmit = false;
 					}
 
@@ -1380,7 +1389,7 @@
 			},
 
 			//编辑 批注
-			editComment(dialog, commentData, callback) {
+			editComment(type, dialog, commentData, callback) {
 
 				if (dialog.isSubmit) {
 					return;
@@ -1407,8 +1416,12 @@
 					contentType: "application/json"
 				}
 
-				//保存中
-				dialog.element.find(".ok").text("保存中");
+				if (type == "save") {
+					dialog.element.find(".ok").text("保存中");
+				} else {
+					dialog.element.find(".cancel").text("保存中");
+				}
+				//保存中				 
 				dialog.isSubmit = true;
 
 				//创建
@@ -1461,8 +1474,14 @@
 							}
 
 						});
-
-
+					} else {
+						dialog.isSubmit=false;
+						if (type == "save") {
+							dialog.element.find(".ok").text("保存");
+						} else {
+							dialog.element.find(".cancel").text("保存并分享");
+						}
+						alert(data.message);
 					}
 
 				});
