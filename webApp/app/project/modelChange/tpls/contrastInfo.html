@@ -4,18 +4,18 @@
 </div>
 <div  class="contents">
   <table>
-    <tr>
+    <tr class="title">
       <td></td>
-      <td><%= type==2?'':'项目模型' %></td>
-      <td><%= type==1?'':'标准模型' %></td>
+      <td>项目模型</td>
+      <td>标准模型</td>
     </tr>
     <% _.each(data,function(item){%>
     <% _.each(item.items,function(it){%>
 
     <tr>
       <td><%= it.name %></td>
-      <td><%= (it.value||'')+(item.unit||'') %></td>
-      <td><%= (it.baseValue||'')+(item.baseUnit||'') %></td>
+      <td><%= (it.value||'-')+(item.unit||'') %></td>
+      <td><%= (it.baseValue||'-')+(item.baseUnit||'') %></td>
     </tr>
     <% })%>
     <% })%>
