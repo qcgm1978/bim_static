@@ -4,7 +4,7 @@ var AppRoute = Backbone.Router.extend({
 		'': 'bodyContent',
 		'todo': 'todo',
 		'projects': 'projects',
-		'projects/:id/:versionId': 'project',
+		'projects/:id/:versionId/:projectCode': 'project',
 		'flow': 'flow',
 		'resources': 'resources',
 		'resources/:type': 'resource',
@@ -69,7 +69,7 @@ var AppRoute = Backbone.Router.extend({
 	},
 
 	//单个项目
-	project: function(id, versionId) {
+	project: function(id, versionId,code) {
 
 		this.reset();
 
@@ -80,6 +80,8 @@ var AppRoute = Backbone.Router.extend({
 		App.Project.Settings = $.extend({}, App.Project.Defaults);
 
 		App.Project.Settings.projectId = id;
+		
+		App.Project.Settings.projectCode = code;
 
 		App.Project.Settings.versionId = versionId;
 

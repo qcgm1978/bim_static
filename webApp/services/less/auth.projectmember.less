@@ -12,25 +12,43 @@
       }
   }
   
-  ul.projects{
+   div .projects{
     margin-right: 20px;
     border: 1px solid #CCCCCC; ;
-    width: 300px;
+    width: 320px;
     height: 100%;
     float: left;
     background: #eee;
     font-family: Microsoft YaHei;
     position: relative;
-    overflow-y: auto;
-    .project{
+    & .project{
       color: #999999;
       cursor: pointer;
     }
-    li:first-child{
-      padding-top: 18px;
-      height: 50px;
+    & .myDropText{
+      width: 280px;
     }
-    li{
+    & .myDropDown .myDropList{
+      left: 0;
+      top:29px;
+      width: 280px;
+    }
+    & .projectListWrap{
+      position: absolute;
+      top: 50px;
+      left: 0;
+      bottom: 0;
+      right: 0;
+      overflow: auto;
+    }
+    & .header{
+      border-bottom: 1px solid #ccc;
+      background: #eee;
+      height: 50px;
+      padding-left: 20px;
+      padding-top: 10px;
+    }
+    & .projectListWrap li{
       color:#333;
       font-size: 14px;
       height: 60px;
@@ -51,6 +69,10 @@
         color: #9B9B9B;
         font-size: 12px;
         margin-top: 8px;
+        width: 200px;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
       }
     }
     li.active{
@@ -80,7 +102,7 @@
     font-family: Microsoft YaHei;
     display: inline-block;
     right: 24px;
-    left: 340px;
+    left: 370px;
     bottom: 20px;
     top: 20px;
     .noDataText{
@@ -160,13 +182,17 @@
         margin-left: 12px;
         line-height: 32px;
         font-size: 14px;
+        display: relative;
       }
       .name{
         color: #333;
       }
       .direction{
-        margin-left: 100px;
         color: #666;
+        left: 300px;
+        color: #666;
+        position: absolute;
+        display: inline;
       }
       .remove{
         display: none;

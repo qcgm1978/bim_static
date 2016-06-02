@@ -225,7 +225,7 @@ App.Project.ProjectPlanProperty = Backbone.View.extend({
 
 		App.Project.PlanAttr.PlanPublicityCollection.fetch({
 			data: {
-				projectId: projectId,
+				projectCode:App.Project.Settings.projectCode,
 				type: monthType
 			}
 		});

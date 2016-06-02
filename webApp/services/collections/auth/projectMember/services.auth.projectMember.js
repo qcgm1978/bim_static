@@ -79,7 +79,7 @@ App.Services.projectMember = {
 				_member=_.map(_member,function(item){
 					return item={
 						name:item.name,
-						project:item.org.name,
+						project:item.org[0].namePath,
 						id:item.id, //成员ID
 						outer:item.outer
 					}
@@ -87,7 +87,7 @@ App.Services.projectMember = {
 				_org=_.map(_org,function(item){
 					return item={
 						name:item.name,
-						project:"",
+						project:item.parent.namePath,
 						id:item.id, //成员ID
 						outer:item.outer,
 						org:true
@@ -123,10 +123,7 @@ App.Services.projectMember = {
 		
 		collection.fetch({
 			reset: true,
-			data: data,
-			success:function(collection, response, options){},
-			error:function(collection, response, options){
-			}
+			data: data
 		});
 	}
 
