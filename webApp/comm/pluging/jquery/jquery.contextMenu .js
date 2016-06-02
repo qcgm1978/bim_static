@@ -97,7 +97,16 @@
 			if (bShowContext) display(index, this, e, options);
 			if ($.isFunction(options.onShowMenuCallback)) {
 				options.onShowMenuCallback(e);
+			} 
+
+			var top = e.pageY,
+				meunHeight = menu.height();
+			if (top + meunHeight > $("body").height()) {
+				top = top - meunHeight;
 			}
+
+			menu.css("top",top);
+
 			return false;
 		});
 
@@ -145,6 +154,7 @@
 			'left': e[cur.eventPosX],
 			'top': e[cur.eventPosY]
 		}).show();
+
 		if (cur.shadow) shadow.css({
 			width: menu.width(),
 			height: menu.height(),

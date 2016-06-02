@@ -78,7 +78,13 @@
         .cur{width:60px;}
       }
     }
-    .modelFilter{width:100%;display:none;position:absolute;top:0;bottom:260px;color:#fff;padding:5px;background:rgba(0, 0, 0, 0.75);overflow:auto;}
+    .modelFilter{width:100%;display:none;position:absolute;top:0;bottom:260px;color:#fff;background:rgba(0, 0, 0, 0.75);overflow:hidden;}
+    .modelTab{height:100%;overflow:auto;}
+    .headTab{height:41px;padding:0 20px;border-bottom:1px solid #333;font-size:14px;margin-bottom:2px;
+      .tabItem{padding:10px 13px;line-height:20px;float:left;
+        &.cur{border-bottom:3px solid #006ecf;margin-bottom:-2px;}
+      }
+    }
   }
   .modelTab{overflow:auto;}
   .tree{list-style:none;-webkit-user-select:none; -moz-user-select:none; user-select:none;

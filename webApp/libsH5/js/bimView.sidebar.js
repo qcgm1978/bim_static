@@ -8,7 +8,7 @@
       var self = this;
       var modelBgColor = bimView.comm.getModelBgColor();
       self._dom={
-        sidebar : $('<div class="modelSidebar"> <div class="modelMap"> <div class="map"></div> </div> <div class="modelFilter"> <div id="filter" class="modelTab"> <ul class="tree"> <li class="itemNode" id="specialty" data-type="sceneId"> <div class="itemContent"> <i class="m-openTree"></i> <label class="treeCheckbox"> <input type="checkbox" checked="true"> <span class="m-lbl"></span> </label> <span class="treeText">专业</span> </div> </li> <li class="itemNode" id="floors" data-type="sceneId"> <div class="itemContent"> <i class="m-openTree"></i> <label class="treeCheckbox"> <input type="checkbox" checked="true"> <span class="m-lbl"></span> </label> <span class="treeText">楼层</span> </div> </li> <li class="itemNode" id="category" data-type="categoryId"> <div class="itemContent"> <i class="m-openTree"></i> <label class="treeCheckbox"> <input type="checkbox" checked="true"> <span class="m-lbl"></span> </label> <span class="treeText">构件类型</span> </div> </li> <li class="itemNode" id="classCode" data-type="classCode"> <div class="itemContent"> <i class="m-openTree"></i> <label class="treeCheckbox"> <input type="checkbox" checked="true"> <span class="m-lbl"></span> </label> <span class="treeText">分类编码</span> </div> </li> </ul> </div> <div id="comment" class="modelTab">comment</div> <div id="selected" class="modelTab">selected</div> </div> </div>'),
+        sidebar : $('<div class="modelSidebar"> <div class="modelMap"> <div class="map"></div> </div> <div class="modelFilter"> <div id="filter" class="modelTab"> <ul class="tree"> <li class="itemNode" id="specialty" data-type="sceneId"> <div class="itemContent"> <i class="m-openTree"></i> <label class="treeCheckbox"> <input type="checkbox" checked="true"> <span class="m-lbl"></span> </label> <span class="treeText">专业</span> </div> </li> <li class="itemNode" id="floors" data-type="sceneId"> <div class="itemContent"> <i class="m-openTree"></i> <label class="treeCheckbox"> <input type="checkbox" checked="true"> <span class="m-lbl"></span> </label> <span class="treeText">楼层</span> </div> </li> <li class="itemNode" id="category" data-type="categoryId"> <div class="itemContent"> <i class="m-openTree"></i> <label class="treeCheckbox"> <input type="checkbox" checked="true"> <span class="m-lbl"></span> </label> <span class="treeText">构件类型</span> </div> </li> <li class="itemNode" id="classCode" data-type="classCode"> <div class="itemContent"> <i class="m-openTree"></i> <label class="treeCheckbox"> <input type="checkbox" checked="true"> <span class="m-lbl"></span> </label> <span class="treeText">分类编码</span> </div> </li> </ul> </div> <div id="comment" class="modelTab">comment</div> <div id="selected" class="modelTab"><div class="headTab"><div class="tabItem cur">当前选中</div></div></div> </div> </div>'),
         modelBar : $('<div class="toolsBar"></div>'),
         mapBar:$('<div class="footBar"><div class="modelSelect"><span class="cur"></span><div class="modelList"></div></div><div class="axisGrid"></div></div>')
       }
@@ -38,10 +38,12 @@
       self._dom.sidebar.find('.modelMap').prepend(self._dom.modelBar);
       bimBox.addClass(modelBgColor);
       bimBox.append(self._dom.sidebar);
+      bimView.sidebar.filter();
       bimView.sidebar.loadMap();
     },
     filter:function(isSelected){
       var self = this;
+      self.fileData = {};
       isSelected ? self.el._dom.sidebar.addClass('open') : self.el._dom.sidebar.removeClass('open');
       self.el._dom.sidebar.find('#filter').show().siblings().hide();
       if(!self.floorsStatue){
@@ -72,6 +74,11 @@
           sourceId:self._opt.sourceId
         },function(data){
           var data = data.data;
+          $.each(data,function(i,item){
+            $.each(item.files,function(j,file){
+              self.fileData[file.fileEtag] = item.specialty
+            })
+          })
           var specialties = bimView.comm.viewTree({
             arr:data,
             type:'sceneId',
@@ -126,17 +133,41 @@
       isSelected ? self.el._dom.sidebar.addClass('open') && viewer.commentInit() : self.el._dom.sidebar.removeClass('open');
       self.el._dom.sidebar.find('#comment').show().siblings().hide();
     },
-    selected:function(isSelected){
+    selected:function(isSelected,viewer){
       var self = this;
-      isSelected ? self.el._dom.sidebar.addClass('open') : self.el._dom.sidebar.removeClass('open');
-      self.el._dom.sidebar.find('#selected').show().siblings().hide();
+      if(isSelected){
+        self.el._dom.sidebar.addClass('open')
+        self.el._dom.sidebar.find('#selected').show().siblings().hide();
+        var flag = self.el._dom.sidebar.find('.modelFilter .selected').length;
+        if(flag){
+
+        }else{
+          var filters = viewer.viewer.getFilters();
+          var selection = filters.getSelectionSet();
+          var data = []
+          $.each(selection,function(i,item){
+            data.push(i);
+          });
+          bimView.comm.ajax({
+            type:'post',
+            url:bimView.API.fetchComponentById,
+            projectId:self._opt.projectId,
+            projectVersionId:self._opt.projectVersionId,
+            elementId:data.join(',')
+          },function(data){
+            debugger
+          });
+        }
+      }else{
+        self.el._dom.sidebar.removeClass('open')
+      }
     },
     more:function(viewer){
       var self = this;
       var status = viewer.getTranslucentStatus();
       var modelBgColor = bimView.comm.getModelBgColor()
       self.el._dom.sidebar.find('.bar-translucent').toggleClass('selected',status);
-      self.el._dom.sidebar.find('.m-color').attr('class','bar-item m-color '+modelBgColor);
+      self.el._dom.sidebar.find('.m-color').attr('class','bar-item m-color '+modelBgColor).data('id',modelBgColor);
     },
     toggleMap:function(el){
       var self = this;
