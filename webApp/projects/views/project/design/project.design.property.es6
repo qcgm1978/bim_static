@@ -159,7 +159,6 @@ App.Project.ProjectDesignPropety = Backbone.View.extend({
 				id: _keyId
 			}
 		}, function(res) {
-			debugger
 
 			if (res.code == 0) {
 

@@ -53,9 +53,11 @@ App.Project.PlanModel = Backbone.View.extend({
 		App.Comm.ajax(data, function(data) {
 			if (data.code == 0) {
 				var box=App.Project.formatBBox(data.data.boundingBox);
-				$target.data("userId", data.data.elements);
-				$target.data("box", box);
-				App.Project.zoomModel(data.data.elements,box);
+				if(box && box.length){
+					$target.data("userId", data.data.elements);
+					$target.data("box", box);
+					App.Project.zoomModel(data.data.elements,box);
+				}
 			}
 		});
 	}

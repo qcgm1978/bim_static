@@ -6,8 +6,8 @@
   <table>
     <tr>
       <td></td>
-      <td>项目模型</td>
-      <td>标准模型</td>
+      <td><%= type==2?'':'项目模型' %></td>
+      <td><%= type==1?'':'标准模型' %></td>
     </tr>
     <% _.each(data,function(item){%>
     <% _.each(item.items,function(it){%>
