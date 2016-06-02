@@ -141,9 +141,7 @@ App.Project.Share = {
 						App.Comm.setCookie(p, data.data[p]);
 					}
 				}
-
-				App.Comm.setCookie("OUTSSO_AuthToken_test","teset");
-
+				App.Comm.delCookie("token_cookie"); 
 				//获取用户信息
 				App.Project.Share.getUserInfo(dialog);
 
