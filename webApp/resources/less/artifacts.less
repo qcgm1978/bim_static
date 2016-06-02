@@ -34,7 +34,7 @@
 
 /*ÐÞ¸Ä¹æÔò*/
 .ruleDetail input{outline: none;}
-.ruleDetail input.active,.ruleDetail .typeCode input.active,.ruleDetail .conR input.active{box-shadow: 0 0 2px red;border-color: red;}
+.ruleDetail input.alert,.ruleDetail .typeCode input.alert,.ruleDetail .conR input.alert{box-shadow: 0 0 2px red;border-color: red;}
 .ruleDetail .mapRule{line-height: 40px;padding-top: 5px;position: relative;}
 .ruleDetail{border-top: 1px solid #cccccc;display: none;}
 .ruleDetail li{clear: both;}
@@ -49,9 +49,13 @@
 .ruleDetail .conR input{height: 30px;line-height: 28px;border: 1px solid #cccccc;margin-right: 9px;padding-left: 10px;width: 140px;}
 .ruleDetail .conR input.last{margin-right: 0;}
 .ruleDetail .typeCode{line-height: 49px; border-bottom: 1px solid #cccccc;position: relative;}
-.ruleDetail .typeCode input{width: 540px;position: relative;z-index: 3;}
-.ruleDetail .conR .chide{position: absolute;display: block;z-index: 2;width: 540px;}
-.ruleDetail .conR .choose{position: absolute;left: 480px;width: 60px;height: 100%;top: 0;padding-left: 20px;z-index: 3;cursor: pointer;color: #006ecf;}
+
+
+.ruleDetail .typeCode input{width: 540px;position: relative;z-index: 3;opacity: 0;background: transparent;border-color:#eeeeee ;height: 30px;line-height: 28px;}
+.ruleDetail .conR .chide{position: absolute;display: block;z-index: 2;width: 540px;left: 0;top: 9px;height: 30px;line-height: 28px;border: 1px solid #cccccc;margin-right: 9px;padding-left: 5px;}
+.ruleDetail .typeCode input.active{border-color:#cccccc ;background: #ffffff;}
+
+.ruleDetail .conR .choose{position: absolute;left: 480px;width: 60px;height: 100%;top: 0;padding-left: 20px;z-index: 5;cursor: pointer;color: #006ecf;}
 .ruleDetail .myDropDown .myDropText{width: 100px;padding-left: 10px;margin-right: 9px;height: 30px;}
 .ruleDetail .myDropText .text{font-size: 12px;}
 .ruleDetail .leftten{float: left;}

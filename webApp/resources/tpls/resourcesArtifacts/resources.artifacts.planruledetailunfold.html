@@ -2,16 +2,11 @@
     <div class="title">分类编码:</div>
     <div class="conR">
         <div>
-            <div class="chide" data-code="<%= obj.mappingCategory.categoryCode %>"><%= '[' + mappingCategory.categoryCode +']'  + mappingCategory.categoryCode.name %></div>
+            <div class="chide" data-code="<%= obj.mappingCategory.categoryCode %>"><span><%= '[' + mappingCategory.categoryCode +']'%></span>  <%= mappingCategory.categoryName %></div>
             <input type="text" placeholder="请输入分类编码" value="<%= obj.mappingCategory.categoryCode %>"  class="pdR60 categoryCode">
             <span class="choose">选择</span>
         </div>
         <ul>
-            <% if(obj.codeList){for (var i  = 0 ; i < obj.codeList; i++) {%>
-            <li class='searEnd'   data-code="<%= '[' + obj.codeList[i].code +']'  + obj.codeList[i].name%>">
-                <span class='ccode'>obj.codeList[i].code</span> + obj.codeList[i].name
-            </li>
-            <%}}%>
         </ul><!--联想接口，最多显示5条-->
     </div>
 </div>
