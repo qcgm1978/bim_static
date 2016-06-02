@@ -4751,13 +4751,14 @@ CLOUD.Extensions = CLOUD.Extensions || {};
 CLOUD.Extensions.CommentEditor = function (cameraEditor, scene, domElement) {
     "use strict";
 
-    this.cameraEditor = cameraEditor;
-    this.scene = scene;
-    this.domElement = domElement;
+    CLOUD.OrbitEditor.call(this, cameraEditor, scene, domElement);
+
+    //this.cameraEditor = cameraEditor;
+    //this.scene = scene;
+    //this.domElement = domElement;
     this.comments = [];
     this.selectedComment = null;
     this.bounds = {x: 0, y: 0, width: 0, height: 0};
-    this.nextCommentId = 0;
     this.keys = {
         BACKSPACE: 8,
         ALT: 18,
@@ -4781,24 +4782,27 @@ CLOUD.Extensions.CommentEditor = function (cameraEditor, scene, domElement) {
     this.originX = 0;
     this.originY = 0;
     this.isCreating = false;
-
+    this.beginEditCallback = null;
+    this.endEditCallback = null;
+    this.changeEditorModeCallback = null;
+    this.isCameraChange = false;
     this.commentType = CLOUD.Extensions.Comment.shapeTypes.ARROW;
+    this.nextCommentId = 0;
 };
 
-CLOUD.Extensions.CommentEditor.prototype.registerDomEventListeners = function () {
+CLOUD.Extensions.CommentEditor.prototype = Object.create(CLOUD.OrbitEditor.prototype);
+CLOUD.Extensions.CommentEditor.prototype.constructor = CLOUD.Extensions.CommentEditor;
+
+CLOUD.Extensions.CommentEditor.prototype.addDomEventListeners = function () {
 
     if (this.svg) {
+
         this.svg.addEventListener('mousedown', this.onMouseDown.bind(this), false);
         this.svg.addEventListener('mousewheel', this.onMouseWheel.bind(this), false);
         this.svg.addEventListener('dblclick', this.onMouseDoubleClick.bind(this), false);
 
-        // 注册在document上会影响dbgUI的resize事件
         window.addEventListener('mousemove', this.onMouseMove.bind(this), false);
         window.addEventListener('mouseup', this.onMouseUp.bind(this), false);
-
-        this.svg.addEventListener('touchstart', this.touchstart.bind(this), false);
-        this.svg.addEventListener('touchend', this.touchend.bind(this), false);
-        this.svg.addEventListener('touchmove', this.touchmove.bind(this), false);
 
         window.addEventListener('keydown', this.onKeyDown.bind(this), false);
         window.addEventListener('keyup', this.onKeyUp.bind(this), false);
@@ -4808,20 +4812,16 @@ CLOUD.Extensions.CommentEditor.prototype.registerDomEventListeners = function ()
 
 };
 
-CLOUD.Extensions.CommentEditor.prototype.unregisterDomEventListeners = function () {
+CLOUD.Extensions.CommentEditor.prototype.removeDomEventListeners = function () {
 
     if (this.svg) {
+
         this.svg.removeEventListener('mousedown', this.onMouseDown.bind(this), false);
         this.svg.removeEventListener('mousewheel', this.onMouseWheel.bind(this), false);
         this.svg.removeEventListener('dblclick', this.onMouseDoubleClick.bind(this), false);
 
-        // 注册在document上会影响dbgUI的resize事件
         window.removeEventListener('mousemove', this.onMouseMove.bind(this), false);
         window.removeEventListener('mouseup', this.onMouseUp.bind(this), false);
-
-        this.svg.removeEventListener('touchstart', this.touchstart.bind(this), false);
-        this.svg.removeEventListener('touchend', this.touchend.bind(this), false);
-        this.svg.removeEventListener('touchmove', this.touchmove.bind(this), false);
 
         window.removeEventListener('keydown', this.onKeyDown.bind(this), false);
         window.removeEventListener('keyup', this.onKeyUp.bind(this), false);
@@ -4832,11 +4832,18 @@ CLOUD.Extensions.CommentEditor.prototype.unregisterDomEventListeners = function 
 CLOUD.Extensions.CommentEditor.prototype.onFocus = function () {
 
     if (this.svg) {
+
         this.svg.focus();
     }
 };
 
 CLOUD.Extensions.CommentEditor.prototype.onMouseDown = function (event) {
+
+    if (!this.isEditing) {
+        CLOUD.OrbitEditor.prototype.onMouseDown.call(this, event);
+        this.isCameraChange = true;
+        return;
+    }
 
     event.preventDefault();
     event.stopPropagation();
@@ -4844,10 +4851,12 @@ CLOUD.Extensions.CommentEditor.prototype.onMouseDown = function (event) {
     if (this.commentFrame.isActive()) {
 
         this.commentFrame.setComment(this.selectedComment);
+
         return;
     }
 
     if (!this.isCreating && event.target === this.svg) {
+
         this.selectComment(null);
     }
 
@@ -4856,15 +4865,21 @@ CLOUD.Extensions.CommentEditor.prototype.onMouseDown = function (event) {
 
 CLOUD.Extensions.CommentEditor.prototype.onMouseMove = function (event) {
 
+    if (!this.isEditing) {
+
+        CLOUD.OrbitEditor.prototype.onMouseMove.call(this, event);
+        this.handleCallbacks("changeEditor");
+
+        return;
+    }
+
     event.preventDefault();
     event.stopPropagation();
 
     if (this.commentFrame.isActive()) {
+
         this.commentFrame.onMouseMove(event);
-
         this.commentFrame.setComment(this.selectedComment);
-
-        //this.cameraChange();
 
         return;
     }
@@ -4874,31 +4889,51 @@ CLOUD.Extensions.CommentEditor.prototype.onMouseMove = function (event) {
 
 CLOUD.Extensions.CommentEditor.prototype.onMouseUp = function (event) {
 
+    if (!this.isEditing) {
+
+        CLOUD.OrbitEditor.prototype.onMouseUp.call(this, event);
+        this.isCameraChange = false;
+
+        return;
+    }
+
     event.preventDefault();
     event.stopPropagation();
 
     // 批注编辑结束
     if (this.commentFrame.isActive()) {
+
         this.commentFrame.onMouseUp(event);
+
         return;
     }
 
-    //
-
     if (this.selectedComment && this.isCreating) {
+
         this.handleMouseEvent(event, "up");
     }
 };
 
 CLOUD.Extensions.CommentEditor.prototype.onMouseWheel = function (event) {
 
-    //this.update();
+    if (!this.isEditing) {
+
+        CLOUD.OrbitEditor.prototype.onMouseWheel.call(this, event);
+
+        this.isCameraChange = true;
+        this.handleCallbacks("changeEditor");
+        this.isCameraChange = false;
+    }
 };
 
 CLOUD.Extensions.CommentEditor.prototype.onMouseDoubleClick = function (event, comment) {
 
     event.preventDefault();
     event.stopPropagation();
+
+    if (!this.isEditing) {
+        return;
+    }
 
     this.mouseDoubleClickForCloud(event);
     this.mouseDoubleClickForText(event, comment);
@@ -4910,10 +4945,13 @@ CLOUD.Extensions.CommentEditor.prototype.onKeyDown = function (event) {
 
 CLOUD.Extensions.CommentEditor.prototype.onKeyUp = function (event) {
 
+    if (!this.isEditing) {
+        return;
+    }
+
     switch (event.keyCode) {
         case this.keys.DELETE:
             if (this.selectedComment) {
-                //this.deleteComment(this.selectedComment);
                 this.selectedComment.delete();
                 this.selectedComment = null;
                 this.deselectComment();
@@ -4935,7 +4973,7 @@ CLOUD.Extensions.CommentEditor.prototype.onKeyUp = function (event) {
     }
 };
 
-CLOUD.Extensions.CommentEditor.prototype.onResize = function (event) {
+CLOUD.Extensions.CommentEditor.prototype.onResize = function () {
 
     var bounds = CLOUD.DomUtil.getContainerOffsetToClient(this.domElement);
 
@@ -4944,24 +4982,13 @@ CLOUD.Extensions.CommentEditor.prototype.onResize = function (event) {
     this.bounds.width = bounds.width;
     this.bounds.height = bounds.height;
 
-    var viewBox = this.getViewBox(this.bounds.width, this.bounds.height);
+    var viewBox = this.getSVGViewBox(this.bounds.width, this.bounds.height);
 
-    //this.svg.setAttribute('viewBox', viewBox);
+    this.svg.setAttribute('viewBox', viewBox);
     this.svg.setAttribute('width', this.bounds.width + '');
     this.svg.setAttribute('height', this.bounds.height + '');
 
-};
-
-CLOUD.Extensions.CommentEditor.prototype.touchstart = function (event) {
-
-};
-
-CLOUD.Extensions.CommentEditor.prototype.touchmove = function (event) {
-
-};
-
-CLOUD.Extensions.CommentEditor.prototype.touchend = function (event) {
-
+    this.updateComments();
 };
 
 CLOUD.Extensions.CommentEditor.prototype.handleMouseEvent = function (event, type) {
@@ -5136,6 +5163,9 @@ CLOUD.Extensions.CommentEditor.prototype.mouseDownForRectangle = function (event
 
     var position = {x: start.x, y: start.y};
     var size = {x: 10, y: 10};
+
+    //var position = this.clientToWorld();
+    //var size = {x: 10, y: 10};
 
     var id = this.generateCommentId();
     var rectangle = new CLOUD.Extensions.CommentRectangle(this, id);
@@ -5339,14 +5369,7 @@ CLOUD.Extensions.CommentEditor.prototype.mouseDoubleClickForCloud = function (ev
 
 CLOUD.Extensions.CommentEditor.prototype.mouseDownForText = function (event) {
 
-    //if (this.selectedComment && this.selectedComment.isActive) {
-    //
-    //    this.selectedComment.accept();
-    //
-    //    return false;
-    //}
-
-    if (this.commentTextArea.isActive()){
+    if (this.commentTextArea.isActive()) {
 
         this.commentTextArea.accept();
         return;
@@ -5393,29 +5416,37 @@ CLOUD.Extensions.CommentEditor.prototype.mouseDoubleClickForText = function (eve
     }
 };
 
-CLOUD.Extensions.CommentEditor.prototype.init = function () {
+CLOUD.Extensions.CommentEditor.prototype.init = function (callbacks) {
+
+    if (callbacks) {
+
+        this.beginEditCallback = callbacks.beginEditCallback;
+        this.endEditCallback = callbacks.endEditCallback;
+        this.changeEditorModeCallback = callbacks.changeEditorModeCallback;
+    }
 
     if (!this.svg) {
 
         var svgWidth = this.domElement.offsetWidth;
         var svgHeight = this.domElement.offsetHeight;
-        //var viewBox = this.getViewBox(svgWidth, svgHeight);
+
+        this.bounds.width = svgWidth;
+        this.bounds.height = svgHeight;
+
+        var viewBox = this.getSVGViewBox(svgWidth, svgHeight);
 
         this.svg = CLOUD.Extensions.Utils.Shape2D.createSvgElement('svg');
         this.svg.style.position = "absolute";
         this.svg.style.display = "block";
         this.svg.style.left = "0";
         this.svg.style.top = "0";
-        //this.svg.setAttribute('viewBox', viewBox);
+        this.svg.setAttribute('viewBox', viewBox);
         this.svg.setAttribute('width', svgWidth + '');
         this.svg.setAttribute('height', svgHeight + '');
 
         this.domElement.appendChild(this.svg);
 
-        this.bounds.width = svgWidth;
-        this.bounds.height = svgHeight;
-
-        this.registerDomEventListeners();
+        this.enableSVGPaint(false);
 
         this.commentFrame = new CLOUD.Extensions.CommentFrame(this, this.domElement);
         this.commentTextArea = new CLOUD.Extensions.CommentTextArea(this, this.domElement);
@@ -5426,16 +5457,24 @@ CLOUD.Extensions.CommentEditor.prototype.uninit = function () {
 
     if (!this.svg) return;
 
-    var svg = this.svg;
+    // 如果仍然处在编辑中，强行结束
+    if (this.isEditing) {
+        this.editEnd();
+    }
 
-    this.unregisterDomEventListeners();
+    // 卸载数据
+    this.unloadComments();
 
-    if (svg.parentNode) {
-        svg.parentNode.removeChild(svg);
+    if (this.svg.parentNode) {
+        this.svg.parentNode.removeChild(this.svg);
     }
 
     this.svgGroup = null;
     this.svg = null;
+
+    this.beginEditCallback = null;
+    this.endEditCallback = null;
+    this.changeEditorModeCallback = null;
 
     //this.destroy();
 };
@@ -5444,7 +5483,7 @@ CLOUD.Extensions.CommentEditor.prototype.destroy = function () {
 
     if (this.commentTextArea) {
 
-        if (this.commentTextArea.isActive()){
+        if (this.commentTextArea.isActive()) {
 
             this.commentTextArea.accept();
         }
@@ -5484,12 +5523,21 @@ CLOUD.Extensions.CommentEditor.prototype.editBegin = function () {
         this.svgGroup = CLOUD.Extensions.Utils.Shape2D.createSvgElement('g');
     }
 
-    if (this.svgGroup.parentNode) {
-        this.svgGroup.parentNode.removeChild(this.svgGroup);
+    //if (this.svgGroup.parentNode) {
+    //    this.svgGroup.parentNode.removeChild(this.svgGroup);
+    //}
+
+    if (!this.svgGroup.parentNode) {
+        this.svg.insertBefore(this.svgGroup, this.svg.firstChild);
     }
 
-    this.svg.insertBefore(this.svgGroup, this.svg.firstChild);
+    this.handleCallbacks("beginEdit");
 
+    // 注册事件
+    this.addDomEventListeners();
+    // 允许穿透
+    this.enableSVGPaint(true);
+    // 清除数据
     this.clear();
 
     this.isEditing = true;
@@ -5504,6 +5552,12 @@ CLOUD.Extensions.CommentEditor.prototype.editEnd = function () {
         this.svgGroup.parentNode.removeChild(this.svgGroup);
     }
 
+    this.removeDomEventListeners();
+
+    this.handleCallbacks("endEdit");
+
+    // 不允许穿透
+    this.enableSVGPaint(false);
     this.deselectComment();
 };
 
@@ -5535,16 +5589,6 @@ CLOUD.Extensions.CommentEditor.prototype.dragCommentFrameEnd = function () {
     this.disableCommentInteractions(false)
 };
 
-CLOUD.Extensions.CommentEditor.prototype.update = function () {
-
-    //for (var i = 0, len = this.comments.length; i < len; i++) {
-    //    var comment = this.comments[i];
-    //    var pos = this.worldToClient(comment.worldPosition);
-    //    comment.setClientPostion(pos);
-    //    comment.updateStyle();
-    //}
-};
-
 CLOUD.Extensions.CommentEditor.prototype.clear = function () {
 
     var comments = this.comments;
@@ -5555,16 +5599,12 @@ CLOUD.Extensions.CommentEditor.prototype.clear = function () {
         comment.destroy();
     }
 
-    var svg = this.svgGroup;
-    if (svg && svg.childNodes.length > 0) {
-        while (svg.childNodes.length) {
-            svg.removeChild(svg.childNodes[0]);
+    var group = this.svgGroup;
+    if (group && group.childNodes.length > 0) {
+        while (group.childNodes.length) {
+            group.removeChild(group.childNodes[0]);
         }
     }
-};
-
-CLOUD.Extensions.CommentEditor.prototype.setCommentStyle = function (style) {
-
 };
 
 CLOUD.Extensions.CommentEditor.prototype.setCommentType = function (type) {
@@ -5572,8 +5612,6 @@ CLOUD.Extensions.CommentEditor.prototype.setCommentType = function (type) {
     this.commentType = type;
 
     // 强行完成
-    //this.created();
-
     this.createCommentEnd();
     this.deselectComment();
 
@@ -5652,21 +5690,269 @@ CLOUD.Extensions.CommentEditor.prototype.deselectComment = function () {
     this.commentFrame.setComment(null);
 };
 
-CLOUD.Extensions.CommentEditor.prototype.loadComments = function (commentInfoList) {
+CLOUD.Extensions.CommentEditor.prototype.worldToClient = function (point) {
 
-    this.isEditing = false;
+    var rect = CLOUD.DomUtil.getContainerOffsetToClient(this.domElement);
+    var camera = this.cameraEditor.object;
+    var result = new THREE.Vector3();
+
+    result.set(point.x, point.y, point.z);
+    result.project(camera);
+
+    result.x = Math.round(0.5 * (result.x + 1) * rect.width);
+    result.y = Math.round(-0.5 * (result.y - 1) * rect.height);
+    result.z = 0;
+
+    return result;
+};
+
+CLOUD.Extensions.CommentEditor.prototype.clientToWorld = function (x, y, depth) {
+
+    var rect = CLOUD.DomUtil.getContainerOffsetToClient(this.domElement);
+    var camera = this.cameraEditor.object;
+    var result = new THREE.Vector3();
+
+    depth = depth || 0;
+
+    result.x = x / rect.width * 2 - 1;
+    result.y = -y / rect.height * 2 + 1;
+    result.z = depth;
+
+    result.unproject(camera);
+    result.z = 0;
+
+    //result.add(camera.position).applyMatrix4(camera.matrixWorldInverse);
+    //result.z = 0;
+
+    return result;
+};
+
+CLOUD.Extensions.CommentEditor.prototype.calcBoundingBox = function () {
+
+    return null;
+};
+
+CLOUD.Extensions.CommentEditor.prototype.getBounds = function () {
+
+    return this.bounds;
+};
+
+CLOUD.Extensions.CommentEditor.prototype.getPointOnDomContainer = function (clientX, clientY) {
+
+    var rect = CLOUD.DomUtil.getContainerOffsetToClient(this.domElement);
+
+    return new THREE.Vector2(clientX - rect.left, clientY - rect.top);
+};
+
+CLOUD.Extensions.CommentEditor.prototype.getSVGViewBox = function (clientWidth, clientHeight) {
+
+    //var lt = this.clientToWorld(0, 0);
+    //var rb = this.clientToWorld(clientWidth, clientHeight);
+
+    //var lt = {x: 0, y: 0};
+    //var rb = {x:clientWidth, y:clientHeight};
+    //
+    //var l = Math.min(lt.x, rb.x);
+    //var t = Math.min(lt.y, rb.y);
+    //var r = Math.max(lt.x, rb.x);
+    //var b = Math.max(lt.y, rb.y);
+    //
+    //return [l, t, r - l, b - t].join(' ');
+
+    return [0, 0, clientWidth, clientHeight].join(' ');
+};
+
+CLOUD.Extensions.CommentEditor.prototype.handleTextChange = function (data) {
+
+    var text = data.comment;
+
+    if (data.text === '') {
+
+        this.selectComment(null);
+        return;
+    }
+
+    var position = {x: data.position.x, y: data.position.y};
+    var size = {x: data.width, y: data.height};
+
+    text.setSize(size.x, size.y, position);
+    text.setText(data.text);
+
+    this.createCommentEnd();
+    this.deselectComment();
+};
+
+CLOUD.Extensions.CommentEditor.prototype.disableCommentInteractions = function (disable) {
+
+    this.comments.forEach(function (comment) {
+        comment.disableInteractions(disable);
+    });
+};
+
+CLOUD.Extensions.CommentEditor.prototype.handleCallbacks = function (name) {
+
+    switch (name) {
+
+        case "beginEdit":
+            if (this.beginEditCallback) {
+                this.beginEditCallback(this.domElement);
+            }
+            break;
+        case "endEdit":
+            if (this.endEditCallback) {
+                this.endEditCallback(this.domElement);
+            }
+            break;
+        case "changeEditor":
+            if (this.isCameraChange && this.changeEditorModeCallback) {
+
+                this.changeEditorModeCallback(this.domElement);
+            }
+            break;
+    }
+
+};
+
+CLOUD.Extensions.CommentEditor.prototype.renderToCanvas = function (ctx) {
+
+    this.comments.forEach(function (comment) {
+        ctx.save();
+        comment.renderToCanvas(ctx);
+        ctx.restore();
+    });
+};
+
+// 是否允许在SVG上绘图
+CLOUD.Extensions.CommentEditor.prototype.enableSVGPaint = function (enable) {
+
+    if (enable) {
+
+        this.svg.setAttribute("pointer-events", "painted");
+    } else {
+
+        this.svg.setAttribute("pointer-events", "none");
+    }
+
+};
+
+// ---------------------------- 外部 API BEGIN ---------------------------- //
+
+// 屏幕快照
+CLOUD.Extensions.CommentEditor.prototype.composeScreenSnapshot = function (snapshot) {
+
+    var canvas = document.createElement("canvas");
+
+    var bounds = CLOUD.DomUtil.getContainerOffsetToClient(this.domElement);
+    canvas.width = bounds.width;
+    canvas.height = bounds.height;
+
+    var ctx = canvas.getContext('2d');
+    var preSnapshot = new Image();
+    preSnapshot.src = snapshot;
+
+    var startColor = this.gradientStartColor;
+    var stopColor = this.gradientStopColor;
+
+    // 绘制背景
+    if (startColor) {
+
+        if (stopColor) {
+
+            var gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            gradient.addColorStop(0, startColor);
+            gradient.addColorStop(1, stopColor);
+
+            ctx.fillStyle = gradient;
+        } else {
+            ctx.fillStyle = startColor;
+        }
+
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+
+    // 先绘制之前的图像
+    ctx.drawImage(preSnapshot, 0, 0);
+    // 绘制批注
+    this.renderToCanvas(ctx);
+
+    var data = canvas.toDataURL("image/png");
+
+    canvas = ctx = null;
+
+    return data;
+};
+
+// 设置导出背景色
+CLOUD.Extensions.CommentEditor.prototype.setBackgroundColor = function (startColor, stopColor) {
+
+    this.gradientStartColor = startColor;
+    this.gradientStopColor = stopColor;
+};
+
+// 获得批注列表
+CLOUD.Extensions.CommentEditor.prototype.getCommentInfoList = function () {
+
+    var commentInfoList = [];
+
+    for (var i = 0, len = this.comments.length; i < len; i++) {
+        var comment = this.comments[i];
+
+        var text = "";
+        if (comment.shapeType === CLOUD.Extensions.Comment.shapeTypes.TEXT) {
+            text = comment.currText;
+        }
+
+        var shapePoints = "";
+        var isSeal = false;
+        if (comment.shapeType === CLOUD.Extensions.Comment.shapeTypes.CLOUD) {
+            shapePoints = comment.getShapePoints();
+            isSeal = comment.isSeal;
+        }
+
+        var arrowHead = null;
+        var arrowTail = null;
+
+        if (comment.shapeType === CLOUD.Extensions.Comment.shapeTypes.ARROW) {
+            arrowHead = comment.head;
+            arrowTail = comment.tail;
+        }
+
+        var info = {
+            id: comment.id,
+            shapeType: comment.shapeType,
+            rotation: comment.rotation,
+            position: comment.position,
+            size: comment.size,
+            isSeal: isSeal,
+            shapePoints: shapePoints,
+            arrowHead: arrowHead,
+            arrowTail: arrowTail,
+            text: text
+        };
+
+        commentInfoList.push(info);
+    }
+
+    return commentInfoList;
+};
+
+// 加载批注
+CLOUD.Extensions.CommentEditor.prototype.loadComments = function (commentInfoList) {
 
     if (!this.svgGroup) {
         this.svgGroup = CLOUD.Extensions.Utils.Shape2D.createSvgElement('g');
     }
 
-    if (this.svgGroup.parentNode) {
-        this.svgGroup.parentNode.removeChild(this.svgGroup);
-    }
-
-    this.svg.insertBefore(this.svgGroup, this.svg.firstChild);
-
+    // 清除数据
     this.clear();
+
+    //if (this.svgGroup.parentNode) {
+    //    this.svgGroup.parentNode.removeChild(this.svgGroup);
+    //}
+
+    if (!this.svgGroup.parentNode) {
+        this.svg.insertBefore(this.svgGroup, this.svg.firstChild);
+    }
 
     for (var i = 0, len = commentInfoList.length; i < len; i++) {
 
@@ -5735,249 +6021,46 @@ CLOUD.Extensions.CommentEditor.prototype.loadComments = function (commentInfoLis
     }
 };
 
-CLOUD.Extensions.CommentEditor.prototype.getCommentInfoList = function () {
+// 卸载批注
+CLOUD.Extensions.CommentEditor.prototype.unloadComments = function () {
 
-    var commentInfoList = [];
+    // 清除数据
+    this.clear();
+
+    if (this.svgGroup && this.svgGroup.parentNode) {
+        this.svgGroup.parentNode.removeChild(this.svgGroup);
+    }
+};
+
+// 显示批注
+CLOUD.Extensions.CommentEditor.prototype.showComments = function () {
+
+    if (this.svgGroup) {
+        this.svgGroup.setAttribute("visibility", "visible");
+    }
+};
+
+// 隐藏批注
+CLOUD.Extensions.CommentEditor.prototype.hideComments = function () {
+
+    if (this.svgGroup) {
+        this.svgGroup.setAttribute("visibility", "hidden");
+    }
+};
+
+// 设置批注风格（边框色，填充色，字体大小等等）
+CLOUD.Extensions.CommentEditor.prototype.setCommentStyle = function (style) {
+
+    this.commentStyle = CLOUD.DomUtil.cloneStyle(style);
+};
+
+// 更新所有批注
+CLOUD.Extensions.CommentEditor.prototype.updateComments = function () {
 
     for (var i = 0, len = this.comments.length; i < len; i++) {
         var comment = this.comments[i];
-
-        var text = "";
-        if (comment.shapeType === CLOUD.Extensions.Comment.shapeTypes.TEXT) {
-            text = comment.currText;
-        }
-
-        var shapePoints = "";
-        var isSeal = false;
-        if (comment.shapeType === CLOUD.Extensions.Comment.shapeTypes.CLOUD) {
-            shapePoints = comment.getShapePoints();
-            isSeal = comment.isSeal;
-        }
-
-        var arrowHead = null;
-        var arrowTail = null;
-
-        if (comment.shapeType === CLOUD.Extensions.Comment.shapeTypes.ARROW) {
-            arrowHead = comment.head;
-            arrowTail = comment.tail;
-        }
-
-        var info = {
-            id: comment.id,
-            shapeType: comment.shapeType,
-            rotation: comment.rotation,
-            position: comment.position,
-            size: comment.size,
-            isSeal: isSeal,
-            shapePoints: shapePoints,
-            arrowHead: arrowHead,
-            arrowTail: arrowTail,
-            text: text
-        };
-
-        commentInfoList.push(info);
-    }
-
-    return commentInfoList;
-};
-
-CLOUD.Extensions.CommentEditor.prototype.worldToClient = function (point) {
-
-    var dim = CLOUD.DomUtil.getContainerOffsetToClient(this.domElement);
-    var camera = this.cameraEditor.object;
-    var result = new THREE.Vector3();
-
-    result.set(point.x, point.y, point.z);
-    result.project(camera);
-
-    result.x = Math.round(0.5 * (result.x + 1) * dim.width);
-    result.y = Math.round(-0.5 * (result.y - 1) * dim.height);
-    result.z = 0;
-
-    return result;
-};
-
-CLOUD.Extensions.CommentEditor.prototype.clientToWorld = function (x, y, depth) {
-
-    var dim = CLOUD.DomUtil.getContainerOffsetToClient(this.domElement);
-    var camera = this.cameraEditor.object;
-    var result = new THREE.Vector3();
-
-    depth = depth || 0;
-
-    result.x = x / dim.width * 2 - 1;
-    result.y = -y / dim.height * 2 + 1;
-    result.z = depth;
-
-    result.unproject(camera);
-    result.z = 0;
-
-    //result.add(camera.position).applyMatrix4(camera.matrixWorldInverse);
-    //result.z = 0;
-
-    return result;
-};
-
-CLOUD.Extensions.CommentEditor.prototype.calcBoundingBox = function () {
-
-    //if (this.comments.length < 1) return null;
-    //
-    //var bBox = new THREE.Box3();
-    //
-    //for (var i = 0, len = this.comments.length; i < len; i++) {
-    //    var comment = this.comments[i];
-    //    bBox.union(comment.getWorldBoundingBox());
-    //}
-    //
-    //return bBox;
-
-
-    return null;
-};
-
-CLOUD.Extensions.CommentEditor.prototype.getBounds = function () {
-
-    return this.bounds;
-};
-
-CLOUD.Extensions.CommentEditor.prototype.getPointOnDomContainer = function (clientX, clientY) {
-
-    var rect = CLOUD.DomUtil.getContainerOffsetToClient(this.domElement);
-
-    return new THREE.Vector2(clientX - rect.left, clientY - rect.top);
-};
-
-CLOUD.Extensions.CommentEditor.prototype.getViewBox = function (clientWidth, clientHeight) {
-
-    var lt = this.clientToWorld(0, 0);
-    var rb = this.clientToWorld(clientWidth, clientHeight);
-
-    var l = Math.min(lt.x, rb.x);
-    var t = Math.min(lt.y, rb.y);
-    var r = Math.max(lt.x, rb.x);
-    var b = Math.max(lt.y, rb.y);
-
-    return [l, t, r - l, b - t].join(' ');
-};
-
-CLOUD.Extensions.CommentEditor.prototype.handleTextChange = function (data) {
-
-    var text = data.comment;
-
-    if (data.text === '') {
-
-        this.selectComment(null);
-        return;
-    }
-
-    var position = {x: data.position.x, y: data.position.y};
-    var size = {x: data.width, y: data.height};
-
-    text.setSize(size.x, size.y, position);
-    text.setText(data.text);
-
-    this.createCommentEnd();
-    this.deselectComment();
-};
-
-CLOUD.Extensions.CommentEditor.prototype.created = function () {
-
-    if (this.selectedComment && this.isCreating) {
-
-        this.selectedComment.created();
-
-        this.isCreating = false;
-    }
-
-    this.deselectComment();
-};
-
-CLOUD.Extensions.CommentEditor.prototype.disableCommentInteractions = function (disable) {
-
-    this.comments.forEach(function (comment) {
-        comment.disableInteractions(disable);
-    });
-};
-
-CLOUD.Extensions.CommentEditor.prototype.cameraChange = function () {
-
-    //var viewBox = this.getViewBox(this.bounds.width, this.bounds.height);
-    //
-    //this.svg.setAttribute('viewBox', viewBox);
-
-    if (this.selectedComment) {
-        this.commentFrame.setComment(this.selectedComment);
+        comment.updateStyle();
     }
 };
 
-CLOUD.Extensions.CommentEditor.prototype.editComment = function () {
-
-};
-
-CLOUD.Extensions.CommentEditor.prototype.renderToCanvas = function (ctx) {
-
-    this.comments.forEach(function (comment) {
-        ctx.save();
-        comment.renderToCanvas(ctx);
-        ctx.restore();
-    });
-};
-
-CLOUD.Extensions.CommentEditor.prototype.composeScreenSnapshot = function (snapshot) {
-
-    var canvas = document.createElement("canvas");
-
-    var bounds = CLOUD.DomUtil.getContainerOffsetToClient(this.domElement);
-    canvas.width = bounds.width;
-    canvas.height = bounds.height;
-
-    var ctx = canvas.getContext('2d');
-
-    //var ctx1 = snapshot.getContext("2d");
-    //var imgData = ctx1.getImageData(0,0,canvas.width, canvas.height);
-    //context.putImageData(imgData,0,0);
-    //scope.renderToCanvas(context);
-    //var data = canvas.toDataURL("image/png");
-    //canvas = context = null;
-
-    var preSnapshot = new Image();
-    //preSnapshot.onload = onComposeImage;
-    preSnapshot.src = snapshot;
-
-    var startColor = this.gradientStartColor;
-    var stopColor = this.gradientStopColor;
-
-    // 绘制背景
-    if (startColor) {
-
-        if (stopColor) {
-
-            var gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-            gradient.addColorStop(0, startColor);
-            gradient.addColorStop(1, stopColor);
-
-            ctx.fillStyle = gradient;
-        } else {
-            ctx.fillStyle = startColor;
-        }
-
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-    }
-
-    // 先绘制之前的图像
-    ctx.drawImage(preSnapshot, 0, 0);
-    // 绘制批注
-    this.renderToCanvas(ctx);
-
-    var data = canvas.toDataURL("image/png");
-
-    canvas = ctx = null;
-
-    return data;
-};
-
-CLOUD.Extensions.CommentEditor.prototype.setBackgroundColor = function(startColor, stopColor) {
-
-    this.gradientStartColor = startColor;
-    this.gradientStopColor = stopColor;
-};
+// ---------------------------- 外部 API END ---------------------------- //

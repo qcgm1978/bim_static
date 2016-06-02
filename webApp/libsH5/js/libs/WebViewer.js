@@ -2,6 +2,7 @@
 * @require /libsH5/js/libs/three.min.js
 */
 
+
 var CLOUD = CLOUD || {};
 CLOUD.Version = "20160601";
 
@@ -17645,9 +17646,21 @@ CLOUD.EditorManager.prototype = {
             this.commentEditor = new CLOUD.Extensions.CommentEditor(viewer.cameraEditor, viewer.getScene(), viewer.domElement);
         }
 
-        this.commentEditor.init();
+        var callbacks = {
+            beginEditCallback: function(domElement){
+                scope.unregisterDomEventListeners(domElement);
+            },
+            endEditCallback: function(domElement){
+                scope.registerDomEventListeners(domElement);
+            },
+            changeEditorModeCallback:function(){
+                scope.setPickMode(viewer);
+            }
+        };
 
-        //this.registerDomEventListeners(this.commentEditor.svg);
+        this.commentEditor.init(callbacks);
+
+        callbacks = null;
 
         scope.setEditor(this.commentEditor);
     },
@@ -18132,6 +18145,8 @@ CloudViewer.prototype = {
         this.resizeFlyCross(); // 重设fly模式下十字光标位置
 
         this.resizeMarkerContainer();
+
+        this.resizeCommentContainer();
 
         this.render();
     },
@@ -18684,50 +18699,63 @@ CloudViewer.prototype = {
     },
 
     setCommentBackgroundColor: function (startColor, stopColor) {
-        if ( this.editorManager.commentEditor && this.editorManager.editor === this.editorManager.commentEditor) {
+
+        if ( this.editorManager.commentEditor) {
 
             this.editorManager.commentEditor.setBackgroundColor(startColor, stopColor);
         }
     },
 
     zoomToSelectedComments: function(){
-        if ( this.editorManager.commentEditor && this.editorManager.editor === this.editorManager.commentEditor) {
-            var bBox = this.editorManager.commentEditor.calcBoundingBox();
 
-            if (bBox) {
-                this.zoomToBBox(bBox);
-            }
-
-            this.editorManager.commentEditor.update();
-        }
     },
 
     editCommentBegin: function() {
-        if ( this.editorManager.commentEditor && this.editorManager.editor === this.editorManager.commentEditor) {
-            this.editorManager.commentEditor.editBegin();
+
+        // 如果没有设置批注模式，则自动进入批注模式
+        if (this.editorManager.editor !== this.editorManager.commentEditor) {
+            this.setCommentMode();
         }
+
+        this.editorManager.commentEditor.editBegin();
     },
 
     editCommentEnd: function() {
-        if ( this.editorManager.commentEditor && this.editorManager.editor === this.editorManager.commentEditor) {
+
+        // 在批注模式下有效
+        if ( this.editorManager.commentEditor &&
+            this.editorManager.editor === this.editorManager.commentEditor) {
+
             this.editorManager.commentEditor.editEnd();
         }
     },
 
     setCommentType: function(type) {
-        if ( this.editorManager.commentEditor && this.editorManager.editor === this.editorManager.commentEditor) {
+
+        // 在批注模式下有效
+        if ( this.editorManager.commentEditor &&
+            this.editorManager.editor === this.editorManager.commentEditor) {
+
             this.editorManager.commentEditor.setCommentType(type);
         }
     },
 
     loadComments: function(CommentInfoList) {
-        if ( this.editorManager.commentEditor && this.editorManager.editor === this.editorManager.commentEditor) {
-            this.editorManager.commentEditor.loadComments(CommentInfoList);
+
+        // 如果没有设置批注模式，则自动进入批注模式
+        if (this.editorManager.editor !== this.editorManager.commentEditor) {
+            this.setCommentMode();
         }
+
+        this.editorManager.commentEditor.loadComments(CommentInfoList);
     },
 
     getCommentInfoList: function() {
-        if ( this.editorManager.commentEditor && this.editorManager.editor === this.editorManager.commentEditor) {
+
+        // 在批注模式下有效
+        if ( this.editorManager.commentEditor &&
+            this.editorManager.editor === this.editorManager.commentEditor) {
+
             return this.editorManager.commentEditor.getCommentInfoList();
         }
 
@@ -18735,11 +18763,13 @@ CloudViewer.prototype = {
     },
 
     resizeCommentContainer: function() {
-        if ( this.editorManager.commentEditor && this.editorManager.editor === this.editorManager.commentEditor) {
-            return this.editorManager.commentEditor.update();
-        }
 
-        return null;
+        // 在批注模式下有效
+        if ( this.editorManager.commentEditor
+            && this.editorManager.editor === this.editorManager.commentEditor) {
+
+            this.editorManager.commentEditor.onResize();
+        }
     }
 
     // ------------------ 批注 API -- E ------------------ //
