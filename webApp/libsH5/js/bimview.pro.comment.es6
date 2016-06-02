@@ -548,9 +548,7 @@
 								$("#shareViewPoint,#delViewPoint,#editViewPoint,#reName").show();
 							} else {
 								$("#shareViewPoint,#delViewPoint,#editViewPoint,#reName").hide();
-							}
-
-							$("#shareViewPoint,#delViewPoint,#editViewPoint,#reName").show();
+							} 
 
 						},
 						//事件绑定
@@ -1361,7 +1359,19 @@
 						// clip.on("complete", function(e) {
 						// 	alert("您已经复制了链接地址");
 						// });
-						
+
+						//h5 复制
+						if (clipboard) {
+							clipboard.destroy();
+						}
+						clipboard = new Clipboard(".saveViewPoint .btnCopy");
+						clipboard.on('success', function(e) {
+							alert("您已经复制了链接地址");
+							e.clearSelection();
+						});
+
+					}
+
 
 				});
 
