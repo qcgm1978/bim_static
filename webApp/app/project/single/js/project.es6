@@ -55,6 +55,7 @@ App.Project = {
 	//获取模型id
 	getModelId: function() {
 		var Request = App.Project.GetRequest();
+		debugger
 		App.Project.Settings.projectId = Request.projectId;
 		App.Project.Settings.projectVersionId = Request.projectVersionId;
 		var data = {

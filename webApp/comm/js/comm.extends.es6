@@ -218,6 +218,11 @@ Backbone.sync = function(method, model, options) {
 	} else {
 		model.url = App.API.Settings.hostname + App.API.URL[model.urlType]; 
 	}
+
+	//如果有srcUrl 不解析
+	if (model.srcUrl){
+		model.url=model.srcUrl;
+	}
 	//}
 	//url 是否有参数
 	var urlPars = model.url.match(/\{([\s\S]+?(\}?)+)\}/g);
@@ -225,7 +230,7 @@ Backbone.sync = function(method, model, options) {
 		for (var i = 0; i < urlPars.length; i++) {
 			var rex = urlPars[i],
 				par = rex.replace(/[{|}]/g, ""),
-				val = model[par];
+				val = model[par]||options.data[par];
 			if (val) {
 				model.url = model.url.replace(rex, val);
 			}

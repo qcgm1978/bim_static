@@ -28,8 +28,8 @@ App.BodyContent.control= {
         	pageIndex:1,
         	pageItemCount:30
         });
-        this.loadData(this.monthEndCollection,{type:2,useId:App.Comm.getCookie('userId')});
-        this.loadData(this.monthStartCollection,{type:4,useId:App.Comm.getCookie('userId')});
+        this.loadData(this.monthEndCollection,{type:2,userID:App.Comm.getCookie('userId')});
+        this.loadData(this.monthStartCollection,{type:1,userID:App.Comm.getCookie('userId')});
         this.loadData(this.proCollection);
 
 
@@ -78,7 +78,8 @@ App.BodyContent.control= {
             if (response.message == "success") {
                 return response.data;
             }
-        }
+        },
+        srcUrl:'http://10.199.200.219:8010/api/BIM/CurrentMonthMyJob/{type}/{userID}'
     })),
 
     monthStartCollection:new (Backbone.Collection.extend({
@@ -88,7 +89,8 @@ App.BodyContent.control= {
             if (response.message == "success") {
                 return response.data;
             }
-        }
+        },
+        srcUrl:'http://10.199.200.219:8010/api/BIM/CurrentMonthMyJob/{type}/{userID}'
     })),
 
     proCollection:new (Backbone.Collection.extend({
