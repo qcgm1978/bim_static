@@ -571,13 +571,20 @@ App.Project = {
 			var liTpl = '<li class="modleItem"><div class="modleNameText overflowEllipsis modleName2">varName</div></li>';
 
 			App.Project.fetchPropertData("fetchDesignPropertiesQuality", function(data) {
-
 				if (data.code == 0) {
 
 					if (data.data.length > 0) {
 						var lis = '';
 						$.each(data.data, function(i, item) {
-							lis += liTpl.replace("varName", item.name);
+
+							var _name=item.name;
+							if(/标准$/.test(_name)){
+								_name='<a href="#">'+_name+'</a>&nbsp;&nbsp;';
+							}else{
+								_name='<a href="#">'+_name+'质量标准'+'</a>&nbsp;&nbsp;';
+							}
+
+							lis += liTpl.replace("varName", _name);
 						});
 						that.$el.find(".attrQualityBox").show().find(".modleList").html(lis);
 					}
@@ -754,7 +761,8 @@ App.Project = {
 	showInModel: function($target, type) {
 		var _this=this,
 			ids=$target.data('userId'),
-			box=$target.data('box');
+			box=$target.data('box'),
+			location=$target.data('location');
 
 		if ($target.hasClass("selected")) {
 			$target.parent().find(".selected").removeClass("selected");
@@ -765,6 +773,7 @@ App.Project = {
 
 		if (ids && box) {
 			_this.zoomModel(ids,box);
+			_this.showMarks(location);
 			return;
 		}
 		var data = {
@@ -782,17 +791,26 @@ App.Project = {
 			if (data.code == 0) {
 
 				if (data.data) {
-					var location=JSON.parse(data.data.location);
-					box=_this.formatBBox(location.bBox);
-					ids=[location.userId];
+					var location=data.data.location,
+						_temp=JSON.parse(location);
+					box=_this.formatBBox(_temp.bBox);
+					ids=[_temp.userId];
 					$target.data("userId", ids);
 					$target.data("box", box);
+					$target.data("location",location);
 					_this.zoomModel(ids,box);
+					_this.showMarks(location);
 				}
 			}
 		});
-	},	 
-
+	},
+	
+	showMarks:function(marks){
+		if(!_.isArray(marks)){
+			marks=[marks];
+		}
+		App.Project.Settings.Viewer.loadMarkers(marks);
+	},
 	//通过userid 和 boundingbox 定位模型
 	zoomModel: function(ids, box) {
 		//定位

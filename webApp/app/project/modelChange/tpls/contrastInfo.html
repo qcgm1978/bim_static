@@ -4,7 +4,7 @@
 </div>
 <div  class="contents">
   <table>
-    <tr>
+    <tr class="title">
       <td></td>
       <td>项目模型</td>
       <td>标准模型</td>
@@ -14,8 +14,8 @@
 
     <tr>
       <td><%= it.name %></td>
-      <td><%= (it.value||'')+(item.unit||'') %></td>
-      <td><%= (it.baseValue||'')+(item.baseUnit||'') %></td>
+      <td><%= (it.value||'-')+(item.unit||'') %></td>
+      <td><%= (it.baseValue||'-')+(item.baseUnit||'') %></td>
     </tr>
     <% })%>
     <% })%>

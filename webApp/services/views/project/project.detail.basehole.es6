@@ -59,13 +59,13 @@ App.Services.ProjectDetail.BaseHole=Backbone.View.extend({
 				"projectId" : _this.userData.projectId,
 				"pitName" : '',
 				"pitDepth" : 0,
-				"pitLevel" : '',
+				"pitLevel" : '一级',
 				"pitLevelRemark" : '',
 				"soldierPilePercentage" : 0,
 				"anchorCablePercentage" : 0,
 				"soilnailwallPercentage" : 0,
-				"isHaveBracingType" : '',
-				"isAnchorrodSoilnail" : ''
+				"isHaveBracingType" : '否',
+				"isAnchorrodSoilnail" : '否'
 			}
 
 			App.Services.ProjectCollection.ProjecDetailBaseHoleCollection.push(model);

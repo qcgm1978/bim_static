@@ -371,8 +371,9 @@ App.Project.Model = {
 
 			var $treetext = $(e.target).prev('.tree-text'),
 				data = {
-					baseModel:$treetext.data('base'),
-					currentModel:$treetext.data('id')||$treetext.data('base')
+					type:$(e.target).data('type'),
+					baseElementId:$treetext.data('base'),
+					currentElementId:$treetext.data('id')
 				};
 
 			App.Index.alertWindow = new App.Comm.modules.Dialog({
@@ -403,16 +404,17 @@ App.Project.Model = {
 				var data = {
 						projectId: App.Index.Settings.projectId,
 						projectVersionId: App.Index.Settings.projectVersionId,
-						elementId: datas.currentModel,
+					  currentElementId: datas.currentElementId,
+					  baseElementId: datas.baseElementId,
 						baseModel: App.Index.Settings.baseModel ,
 						currentModel:App.Index.Settings.currentModel
 				},
 					that=this;
 				$.ajax({
-					url: "http://bim.wanda-dev.cn/sixD/"+data.projectId+"/"+data.projectVersionId+"/comparison/property?baseModel="+data.baseModel+"&currentModel="+data.currentModel+"&elementId="+data.elementId
+					url: "http://bim.wanda-dev.cn/sixD/"+data.projectId+"/"+data.projectVersionId+"/comparison/property?baseModel="+data.baseModel+"&currentModel="+data.currentModel+"&baseElementId="+data.baseElementId+"&currentElementId="+data.currentElementId
 				}).done(function(respone){
 					if(respone.code==0){
-						that.$el.html(that.template({data:respone.data}));
+						that.$el.html(that.template({data:respone.data,type:datas.type}));
 
 					}else{
 						alert('获取数据失败');

@@ -111,7 +111,7 @@
  				App.Project.Settings.Viewer.filter({
  					type: "plan",
  					ids: this.PlayArr
- 				});
+ 				}); 				
 
  				var processAnalog = (this.analogCount - this.PlayArr.length) / this.analogCount,
  					sourceWidth = this.$(".progressAnalog .bg").width(),
@@ -122,6 +122,8 @@
  				if (width > sourceWidth) {
  					width = sourceWidth;
  				}
+ 				
+ 				//this.showInModle($tr);
 
  				this.$(".progressAnalog .processBg").width(width);
  				this.$(".progressAnalog .processPos").css("left", width-10);
@@ -132,6 +134,8 @@
  				//底部文字
  				this.$(".desctionAnalog .analogDate").text($tr.find(".start").text());
  				this.$(".desctionAnalog .analogTitle").text($tr.find(".operationalMatters").text());
+
+ 				
 
  			} else {
  				//停止模拟
@@ -174,9 +178,11 @@
 		App.Comm.ajax(data, function(data) {
 			if (data.code == 0) {
 				var box=App.Project.formatBBox(data.data.boundingBox);
-				$target.data("userId", data.data.elements);
-				$target.data("box", box);
-				App.Project.zoomModel(data.data.elements,box);
+				if(box && box.length){
+					$target.data("userId", data.data.elements);
+					$target.data("box", box);
+					App.Project.zoomModel(data.data.elements,box);
+				}
 			}
 		});
 	}
