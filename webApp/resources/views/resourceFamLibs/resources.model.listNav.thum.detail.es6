@@ -77,7 +77,8 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 	bindContext: function(event) {
 
 
-		var that = this;
+		var that = this; 
+		
 		this.$el.contextMenu('listContext', {
 			//显示 回调
 			onShowMenuCallback: function(event) {

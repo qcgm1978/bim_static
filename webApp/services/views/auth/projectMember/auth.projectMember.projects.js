@@ -1,10 +1,10 @@
 //我管理的项目列表view
 App.Services.projectMember.projects = Backbone.View.extend({
-	
+
 	template: _.templateUrl('/services/tpls/auth/projectMember/projects.html'),
 
-	events:{
-		'click .project':'selectProject'
+	events: {
+		'click .project': 'selectProject'
 	},
 	// 重写初始化
 	initialize: function() {
@@ -12,32 +12,42 @@ App.Services.projectMember.projects = Backbone.View.extend({
 	},
 
 	render: function(items) {
-		var _this=this;
+		var _this = this;
 		var data = App.Services.projectMember.method.model2JSON(items.models);
-		data={data:data};
+		data = {
+			data: data
+		};
 		$("#projectList").html(this.$el.html(this.template(data)));
-		if(data.data.length>0){
-			var id=data.data[0].id;
-			App.Services.projectMember.loadData(App.Services.projectMember.projectMemberMemberCollection,{outer:App.Comm.getCookie("isOuter")},{
-				dataPrivilegeId:id
+		if (data.data.length > 0) {
+			var id = data.data[0].id;
+			App.Services.projectMember.loadData(App.Services.projectMember.projectMemberMemberCollection, {
+				outer: App.Comm.getCookie("isOuter")
+			}, {
+				dataPrivilegeId: id
 			});
-			App.Comm.setCookie("currentPid",id);
+			App.Comm.setCookie("currentPid", id);
 		}
+		$('#projectList .projectDropDown').myDropDown({
+			zIndex: 9999
+		});
+
 		return this;
 	},
-	
-	selectProject:function(event){
+
+	selectProject: function(event) {
 		$("#memberlistWrap").mmhMask();
-		var $li=$(event.currentTarget),
-			pid=$li.attr("data-pid"),
-			name=$li.find('h4').text();//权限ID
+		var $li = $(event.currentTarget),
+			pid = $li.attr("data-pid"),
+			name = $li.find('h4').text(); //权限ID
 		$("#projectList .project").removeClass("active");
 		$li.addClass("active");
-		App.Comm.setCookie("currentPid",pid);
-		App.Comm.setCookie("currentProjectName",name);
-		App.Services.projectMember.loadData(App.Services.projectMember.projectMemberMemberCollection,{outer:App.Comm.getCookie("isOuter")},{
-			dataPrivilegeId:pid
+		App.Comm.setCookie("currentPid", pid);
+		App.Comm.setCookie("currentProjectName", name);
+		App.Services.projectMember.loadData(App.Services.projectMember.projectMemberMemberCollection, {
+			outer: App.Comm.getCookie("isOuter")
+		}, {
+			dataPrivilegeId: pid
 		});
-	},
+	}
 
 });

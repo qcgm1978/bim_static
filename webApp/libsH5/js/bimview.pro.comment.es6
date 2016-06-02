@@ -12,7 +12,7 @@
 		return;
 	}
 
-	var $comment, AppView, ModelView, viewPointId;
+	var $comment, AppView, ModelView, viewPointId, clipboard;
 
 	//扩展 批注
 	bimView.prototype.commentInit = function() {
@@ -26,9 +26,9 @@
 			$comment = $('#comment');
 			//生成
 			$comment.html(AppView.$el);
-
+			 
 			//右键菜单
-			if (!document.getElementById("viewPointContext")) {
+			if (!document.getElementById("viewPointContextPoint")) {
 				//右键菜单
 				var contextHtml = _.templateUrl("/libsH5/tpls/comment/viewPointContext.html", true);
 				$("body").append(contextHtml);
@@ -532,9 +532,9 @@
 
 				bindContent() {
 
-					var that = this;
-
-					this.$el.contextMenu('viewPointContext', {
+					var that = this;				 
+					 
+					this.$el.contextMenu('viewPointContextPoint', {
 						theme: "viewPointContext",
 						shadow: false,
 						//显示 回调
@@ -548,7 +548,7 @@
 								$("#shareViewPoint,#delViewPoint,#editViewPoint,#reName").show();
 							} else {
 								$("#shareViewPoint,#delViewPoint,#editViewPoint,#reName").hide();
-							}
+							} 
 
 						},
 						//事件绑定
@@ -570,6 +570,7 @@
 										description: $li.find(".desc").text().trim(),
 										createTime: $li.find(".date").text().trim()
 									};
+
 								//分享								
 								CommentApi.shareViewPoint(data);
 
@@ -950,9 +951,9 @@
 					var pars = {
 							projectId: App.Project.Settings.projectId,
 							viewPointId: viewPointId,
-							text: this.$(".txtReMark").val().trim(),							
+							text: this.$(".txtReMark").val().trim(),
 							pictures: pictures,
-							token:App.Project.Settings.token
+							token: App.Project.Settings.token
 						},
 						data = {
 							URLtype: "createComment",
@@ -971,7 +972,7 @@
 					$btnEnter.val("保存中").data("isSubmit", true);
 
 					if (App.Project.Settings.isShare) {
-						data.URLtype="createCommentByToken";
+						data.URLtype = "createCommentByToken";
 					}
 
 					App.Comm.ajax(data, (data) => {
@@ -1035,10 +1036,10 @@
 					this.model.commentId = id;
 
 					if (App.Project.Settings.isShare) {
-						this.model.urlType="delCommentByToken";
-						this.model.token=App.Project.Settings.token;
-					}else{
-						this.model.urlType="delComment";
+						this.model.urlType = "delCommentByToken";
+						this.model.token = App.Project.Settings.token;
+					} else {
+						this.model.urlType = "delComment";
 					}
 
 					this.model.destroy();
@@ -1248,6 +1249,10 @@
 
 						});
 
+					} else {
+						alert(data.message);
+						dialog.element.find(".ok").text("保存");
+						dialog.isSubmit = false;
 					}
 
 				});
@@ -1349,10 +1354,20 @@
 							$btnCopy = dialog.element.find(".btnCopy");
 
 						//复制 http://bim.wanda-dev.cn/page/#share/a374
-						var clip = new ZeroClipboard($btnCopy);
+						// var clip = new ZeroClipboard($btnCopy[0]);
 
-						clip.on("complete", function(e) {
+						// clip.on("complete", function(e) {
+						// 	alert("您已经复制了链接地址");
+						// });
+
+						//h5 复制
+						if (clipboard) {
+							clipboard.destroy();
+						}
+						clipboard = new Clipboard(".saveViewPoint .btnCopy");
+						clipboard.on('success', function(e) {
 							alert("您已经复制了链接地址");
+							e.clearSelection();
 						});
 
 					}

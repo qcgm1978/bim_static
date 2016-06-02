@@ -65,7 +65,6 @@ App.Comm = {
 
 	getUrlByType: function(data) {
 
-
 		//是否调试
 		if (App.API.Settings.debug) {
 			data.url = App.API.DEBUGURL[data.URLtype];

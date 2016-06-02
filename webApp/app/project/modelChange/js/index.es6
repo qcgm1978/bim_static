@@ -366,6 +366,24 @@ App.Project.Model = {
         }
         App.Index.Settings.Viewer.fit();
       }
+			console.log(elementId)
+
+			//test
+			$.ajax({
+				url: "http://bim.wanda-dev.cn/sixD/"+App.Index.Settings.projectId+"/"+App.Index.Settings.projectVersionId+"/bounding/box?sceneId="+elementId.split('.')[0]+"&elementId="+elementId
+			}).done(function(respone){
+				if(respone.code==0){
+					var max = respone.data.max,
+					    min = respone.data.min,
+					    box=[[max.x,max.y,max.z],[min.x,min.y,min.z]];
+					App.Index.Settings.Viewer.zoomToBox(box);
+
+
+				}else{
+
+				}
+			});
+
 		},
 		detail: function(e){
 
