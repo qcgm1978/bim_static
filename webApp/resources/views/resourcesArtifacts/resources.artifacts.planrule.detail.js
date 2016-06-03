@@ -28,7 +28,7 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
                     //查找未保存的元素并高亮提示变红
                     return;
                 }
-            }else if(App.ResourceArtifacts.Status.presentPlan == this.model){
+            }else if(App.ResourceArtifacts.Status.presentRule == this.model){
                 this.tabRule();
                 return ;
             }
@@ -37,8 +37,16 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
         $(".ruleDetail").empty().hide();
         this.reset();
         //存储model
-        App.ResourceArtifacts.Status.presentPlan = this.model;
-        this.$(".ruleDetail").html( new App.Resources.ArtifactsPlanRuleDetailUnfold({model:App.ResourceArtifacts.Status.presentPlan}).render().el);
+        App.ResourceArtifacts.Status.presentRule = this.model;
+        var rule = new App.Resources.ArtifactsPlanRuleDetailUnfold({model:App.ResourceArtifacts.Status.presentRule});
+        var operator = new App.Resources.ArtifactsPlanRuleDetailOperator().render().el;
+        this.$(".ruleDetail").html(rule.render().el);
+        rule.$(".mapRule").html(operator);//规则列表
+        var operatorData = this.dealStr(App.ResourceArtifacts.Status.presentRule);//规则数据
+        console.log(operatorData);
+
+        App.ResourceArtifacts.operator.reset();
+        App.ResourceArtifacts.operator.add(operatorData);
         this.$(".ruleDetail").show();
     },
     //开合状态
@@ -51,6 +59,35 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
     },
 
     reset:function(){//重置模型
-        if(App.ResourceArtifacts.Status.presentPlan){App.ResourceArtifacts.Status.presentPlan=null;}
+        if(App.ResourceArtifacts.Status.presentRule){App.ResourceArtifacts.Status.presentRule=null;}
+    },
+
+    //拆解字符串
+    dealStr:function(model){
+        var con = model.get("mappingCategory"),
+            list = con.mappingPropertyList;
+        if(list && list.length){
+            _.each(list,function(item){
+                var obj = {left:'',right:'',leftValue:'',rightValue:''};
+                if(item.operator == "<>" || item.operator == "><"){
+                        var str= item.propertyValue,
+                        index;
+                    index = _.indexOf(str,",");
+                    obj.left =str[0];
+                    obj.right = str[str.length-1];
+                    for(var i = 1 ; i < str.length-1 ; i++){
+                        if(i < index){
+                            obj.leftValue =  obj.leftValue + str[i];
+                        }else if(i>index){
+                            obj.rightValue = obj.rightValue +str[i];
+                        }
+                    }
+                    obj.leftValue = parseInt(obj.leftValue);
+                    obj.rightValue = parseInt(obj.rightValue);
+                }
+                item.ruleList = obj;
+            });
+        }
+        return list;
     }
 });

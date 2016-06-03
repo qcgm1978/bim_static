@@ -22,9 +22,10 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
         this.$el.html(this.template(this.model.toJSON()));
         return this;
     },
-    initialize:function(){
+    initialize:function(model){
         this.listenTo(this.model,"change",this.render);
         this.listenTo(this.model,"mappingCategoryChange",this.render);
+        this.dealStr(model);
         //this.getValue("(30,40]");
     },
     //选择分类编码
@@ -64,11 +65,11 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
     },
     //增加新规则
     addNewRule:function(){
-
         var _this = this;
         var model = new App.ResourceArtifacts.newRule(App.ResourceArtifacts.newModel);
-        var newRule = new App.Resources.ArtifactsPlanRuleDetailNew({model:model}).render().el;
-        this.$(".conR dl").append(newRule);
+        //var newRule = new App.Resources.ArtifactsPlanRuleDetailNew({model:model}).render().el;
+        App.ResourceArtifacts.operator.add(model);
+        //this.$(".conR dl").append(newRule);
         //因为新建整条与修改的模型不一致
         //向collection添加
         //向this.model 添加一条属性
@@ -283,5 +284,35 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
         con.mappingPropertyList = arr;
         App.ResourceArtifacts.presentRule.model.set({"mappingCategory":con});
         App.ResourceArtifacts.presentRule.model.trigger("mappingCategoryChange");//重绘模型
+    },
+
+
+    //拆解字符串
+    dealStr:function(model){
+        var con = this.model.get("mappingCategory"),
+            list = con.mappingPropertyList,
+            code=[];
+        if(list && list.length){
+            _.each(list,function(item){
+                if(item.operator == "<>" || item.operator == "><"){
+                    var obj = {left:'',right:'',leftValue:'',rightValue:''},
+                        str= item.propertyValue,
+                        arr,
+                        index;
+                    index = _.indexOf(str,",");
+
+                    obj.left =str[0];
+                    obj.right = str[str.length-1];
+                    for(var i = 1 ; i < str.length-2 ; i++){
+                        if(i < index){
+                            obj.leftValue =  obj.leftValue + str[i];
+                        }else if(i>index){
+                            obj.rightValue = obj.rightValue +str[i];
+                        }
+                    }
+                    item.ruleList = obj;
+                }
+            });
+        }
     }
 });
