@@ -34,6 +34,14 @@ App.Resources.artifactsTree = function(dataList,code){
     return ele;
 };
 
+App.Resources.cancelBubble = function(e){
+    if(e.stopPropagation){
+        e.stopPropagation();
+    }else{
+        window.cancelBubble = true;
+    }
+};
+
 //队列管理
 App.Resources.queue = {
     que : [],
