@@ -5,7 +5,8 @@ App.ResourceArtifacts={
         presentPlan:null,  //当前计划或质量，提交数据
         saved : true,    //创建规则后的保存状态，已保存  /  未保存
         presentRule : null,    //当前规则
-        qualityProcess:1   //质量标准 -过程选择  type
+        qualityProcessType:1,   //质量标准 -过程选择  type
+        qualityStandardType:"GC"   //质量标准 -过程选择  type
     },
 
     Settings: {

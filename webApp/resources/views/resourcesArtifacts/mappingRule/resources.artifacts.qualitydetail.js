@@ -52,40 +52,50 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
 
     //获取质量标准相关规则，如果是二级，加载三级标准
     getRules:function() {
-        var _this = this;
+        var _this = this,pdata;
         if(this.model.get("leaf")){
 
-            //存在，加载三级标准
-            //调用tree
+            //存在，加载二级或三级标准
+            pdata = {
+                URLtype : 'fetchQualityPlanQualityLevel2',
+                data : {
+                    type : App.ResourceArtifacts.qualityProcessType,
+                    standardType:App.ResourceArtifacts.qualityStandardType
+                }
+            };
+
+            App.Comm.ajax(pdata,function(response){
+                if(response.code == 0 && response.data.length){
+                    //调用tree叠加
+                    App.Resources.artifactsTree
+                }
+            });
 
             return
         }
 
-
-        $(".artifactsContent .rules ul").html( new App.Resources.ArtifactsPlanRule().render.el);
-
-
-        var code = this.model.get("code");
         if(!App.ResourceArtifacts.Status.saved){
             //提示有没有保存现在的，重要
             return
         }
-        var pdata = {
-            URLtype: "fetchQualityPlanQualityLevel3",
+
+
+
+        //刷新右面视图
+        var code = this.model.get("code");
+        pdata = {
+            URLtype: "fetchArtifactsPlanRule",
             data:{
                 code:code,
                 biz:2
             }
         };
-
         App.Comm.ajax(pdata,function(response){
             if(response.code == 0 && response.data.length){
                 App.ResourceArtifacts.PlanRules.reset();
-                if(response.data  &&  response.data.length){
-                    $(".artifactsContent .rules h2 i").html( "("+response.data.length + ")");
-                    $(".artifactsContent .rules h2 .name").html(_this.model.get("code") + "&nbsp;" +_this.model.get("name"));
-                    App.ResourceArtifacts.PlanRules.add(response.data);
-                }
+                $(".artifactsContent .rules h2 i").html( "("+response.data.length + ")");
+                $(".artifactsContent .rules h2 .name").html(_this.model.get("code") + "&nbsp;" +_this.model.get("name"));
+                App.ResourceArtifacts.PlanRules.add(response.data);
             }
         });
     }
