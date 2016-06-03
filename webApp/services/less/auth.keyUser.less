@@ -95,11 +95,32 @@ ul,li{list-style: none outside none;}
     width: 100%;
     height: 300px;
     &>div{
+      margin-top: 20px;
       float: left;
       width: 240px;
       height: 100%;
       overflow: hidden;
-      border: 1px solid #ccc;
+      border-bottom: 1px solid #ccc;
+      .search{
+        width: 240px;
+        height: 30px;
+        border: 1px solid #ccc;
+        input{
+          display: block;
+          width: 207px;
+          height: 100%;
+          float: left;
+          border: none;
+          padding-left: 10px;
+        }
+        span{
+          display: block;
+          float: right;
+          width: 30px;
+          height: 100%;
+          border-left: 1px solid #ccc;
+        }
+      }
       p.title{
         padding-left: 10px;
         color: #999;
@@ -111,6 +132,7 @@ ul,li{list-style: none outside none;}
         line-height:30px;
       }
       &>ul{
+        border: 1px solid #ccc;
         height: 270px;
         overflow-y: auto;
       }
