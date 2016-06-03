@@ -12,7 +12,7 @@
 		return;
 	}
 
-	var $comment, AppView, ModelView, viewPointId;
+	var $comment, AppView, ModelView, viewPointId, clipboard;
 
 	//扩展 批注
 	bimView.prototype.commentInit = function() {
@@ -28,7 +28,7 @@
 			$comment.html(AppView.$el);
 
 			//右键菜单
-			if (!document.getElementById("viewPointContext")) {
+			if (!document.getElementById("viewPointContextPoint")) {
 				//右键菜单
 				var contextHtml = _.templateUrl("/libsH5/tpls/comment/viewPointContext.html", true);
 				$("body").append(contextHtml);
@@ -534,7 +534,7 @@
 
 					var that = this;
 
-					this.$el.contextMenu('viewPointContext', {
+					this.$el.contextMenu('viewPointContextPoint', {
 						theme: "viewPointContext",
 						shadow: false,
 						//显示 回调
@@ -570,6 +570,7 @@
 										description: $li.find(".desc").text().trim(),
 										createTime: $li.find(".date").text().trim()
 									};
+
 								//分享								
 								CommentApi.shareViewPoint(data);
 
@@ -950,9 +951,9 @@
 					var pars = {
 							projectId: App.Project.Settings.projectId,
 							viewPointId: viewPointId,
-							text: this.$(".txtReMark").val().trim(),							
+							text: this.$(".txtReMark").val().trim(),
 							pictures: pictures,
-							token:App.Project.Settings.token
+							token: App.Project.Settings.token
 						},
 						data = {
 							URLtype: "createComment",
@@ -971,7 +972,7 @@
 					$btnEnter.val("保存中").data("isSubmit", true);
 
 					if (App.Project.Settings.isShare) {
-						data.URLtype="createCommentByToken";
+						data.URLtype = "createCommentByToken";
 					}
 
 					App.Comm.ajax(data, (data) => {
@@ -1035,10 +1036,10 @@
 					this.model.commentId = id;
 
 					if (App.Project.Settings.isShare) {
-						this.model.urlType="delCommentByToken";
-						this.model.token=App.Project.Settings.token;
-					}else{
-						this.model.urlType="delComment";
+						this.model.urlType = "delCommentByToken";
+						this.model.token = App.Project.Settings.token;
+					} else {
+						this.model.urlType = "delComment";
 					}
 
 					this.model.destroy();
@@ -1115,10 +1116,10 @@
 							okCallback: () => {
 								//保存批注
 								if (!viewPointId) {
-									that.saveComment(dialog, data);
+									that.saveComment("save", dialog, data);
 								} else {
 									data.id = viewPointId;
-									that.editComment(dialog, data, viewPointId);
+									that.editComment("save", dialog, data, viewPointId);
 								}
 
 
@@ -1127,10 +1128,10 @@
 							cancelCallback() {
 
 								if (!viewPointId) {
-									that.saveComment(dialog, data, CommentApi.shareViewPoint);
+									that.saveComment("saveShare", dialog, data, CommentApi.shareViewPoint);
 								} else {
 									data.id = viewPointId;
-									that.editComment(dialog, data, CommentApi.shareViewPoint);
+									that.editComment("saveShare", dialog, data, CommentApi.shareViewPoint);
 								}
 
 								return false;
@@ -1166,7 +1167,7 @@
 			},
 
 			//保存批注
-			saveComment(dialog, commentData, callback) {
+			saveComment(type, dialog, commentData, callback) {
 
 				if (dialog.isSubmit) {
 					return;
@@ -1197,8 +1198,12 @@
 					contentType: "application/json"
 				}
 
-				//保存中
-				dialog.element.find(".ok").text("保存中");
+				if (type == "save") {
+					dialog.element.find(".ok").text("保存中");
+				} else {
+					dialog.element.find(".cancel").text("保存中");
+				}
+				//保存中				
 				dialog.isSubmit = true;
 
 				//创建
@@ -1229,9 +1234,9 @@
 
 								imgData.data.isAdd = true;
 								//项目 
-								if ($comment.find(".navBar .project").hasClass("selected")) {
+								if ($comment.find(".navBar .project").hasClass("selected") && dialog.type == 1) {
 									CommentCollections.Project.push(imgData.data);
-								} else {
+								} else if ($comment.find(".navBar .user").hasClass("selected") && dialog.type == 0) {
 									//个人
 									CommentCollections.User.push(imgData.data);
 								}
@@ -1248,6 +1253,15 @@
 
 						});
 
+					} else {
+						alert(data.message);
+						if (type == "save") {
+							dialog.element.find(".ok").text("保存");
+						} else {
+							dialog.element.find(".cancel").text("保存并分享");
+						}
+
+						dialog.isSubmit = false;
 					}
 
 				});
@@ -1349,10 +1363,20 @@
 							$btnCopy = dialog.element.find(".btnCopy");
 
 						//复制 http://bim.wanda-dev.cn/page/#share/a374
-						var clip = new ZeroClipboard($btnCopy);
+						// var clip = new ZeroClipboard($btnCopy[0]);
 
-						clip.on("complete", function(e) {
+						// clip.on("complete", function(e) {
+						// 	alert("您已经复制了链接地址");
+						// });
+
+						//h5 复制
+						if (clipboard) {
+							clipboard.destroy();
+						}
+						clipboard = new Clipboard(".saveViewPoint .btnCopy");
+						clipboard.on('success', function(e) {
 							alert("您已经复制了链接地址");
+							e.clearSelection();
 						});
 
 					}
@@ -1365,7 +1389,7 @@
 			},
 
 			//编辑 批注
-			editComment(dialog, commentData, callback) {
+			editComment(type, dialog, commentData, callback) {
 
 				if (dialog.isSubmit) {
 					return;
@@ -1392,8 +1416,12 @@
 					contentType: "application/json"
 				}
 
-				//保存中
-				dialog.element.find(".ok").text("保存中");
+				if (type == "save") {
+					dialog.element.find(".ok").text("保存中");
+				} else {
+					dialog.element.find(".cancel").text("保存中");
+				}
+				//保存中				 
 				dialog.isSubmit = true;
 
 				//创建
@@ -1446,8 +1474,14 @@
 							}
 
 						});
-
-
+					} else {
+						dialog.isSubmit=false;
+						if (type == "save") {
+							dialog.element.find(".ok").text("保存");
+						} else {
+							dialog.element.find(".cancel").text("保存并分享");
+						}
+						alert(data.message);
 					}
 
 				});

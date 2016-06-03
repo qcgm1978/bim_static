@@ -140,8 +140,7 @@ App.Project.Share = {
 					for (var p in data.data) {
 						App.Comm.setCookie(p, data.data[p]);
 					}
-				}
-				App.Comm.delCookie("token_cookie"); 
+				}			
 				//获取用户信息
 				App.Project.Share.getUserInfo(dialog);
 
@@ -169,7 +168,7 @@ App.Project.Share = {
 				$el.find(".btnLogin").val("立即登录").data("islogin", false);
 				return;
 			}
-
+			App.Comm.delCookie("token_cookie");
 			localStorage.setItem("user", JSON.stringify(data.data))
 			App.Comm.setCookie('userId', data.data.userId);
 			App.Comm.setCookie('isOuter', data.data.outer);

@@ -273,8 +273,8 @@
           element:self.bigMap,
           enable:false,
           callback:function(res){
-            self.footer.find('#axisGridX').val(res.axis.abcName);
-            self.footer.find('#axisGridY').val(res.axis.numeralName);
+            self.footer.find('#axisGridX').val(res.axis.numeralName);
+            self.footer.find('#axisGridY').val(res.axis.abcName);
           }
         });
         self.showAxisGrid('bigMap');
@@ -449,9 +449,11 @@
       // 进入批注模式
       var self = this;
       var viewer = self.viewer;
+      var modelBgColor = self._dom.bimBox.css('background-color');
       self._dom.bimBox.attr('class','bim comment');
       viewer.setCommentMode();
       viewer.editCommentBegin();
+      viewer.setCommentBackgroundColor(modelBgColor);
       if(data){
         var newList = [];
         $.each(data.list,function(i,item){
@@ -541,7 +543,6 @@
     },
     highlight:function(obj){
       // 高亮
-      //debugger
       var self = this;
       var viewer = self.viewer;
       var filter = viewer.getFilters();

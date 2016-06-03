@@ -87,7 +87,7 @@
       title:'适应窗口(I)',
       fn:'fit',
       keyCode:'105',
-      type:'click'
+      type:'viewer'
     },{
       id:'rotateMouse',
       icon:'m-rotateMouse',

@@ -20,7 +20,7 @@
 
 	var menu, shadow, trigger, content, hash, currentTarget;
 	var defaults = {
-		theme:"",
+		theme: "",
 		menuStyle: {
 			listStyle: 'none',
 			padding: '0px',
@@ -47,22 +47,22 @@
 		shadow: true,
 		onContextMenu: null,
 		onShowMenu: null,
-		onShowMenuCallback:null
+		onShowMenuCallback: null
 	};
 
 	$.fn.contextMenu = function(id, options) {
-		  
+
 		if (!menu) { // Create singleton menu
 			menu = $('<div class="jqContextMenu"></div>')
 				.hide()
 				.appendTo('body')
 				.bind('click', function(e) {
 					e.stopPropagation();
-				});				
-				menu.html($("#"+id));
-				if (options.theme) {
-					menu.addClass(options.theme);
-				}
+				});
+			menu.html($("#" + id));
+			if (options.theme) {
+				menu.addClass(options.theme);
+			}
 		}
 		if (!shadow) {
 			shadow = $('<div></div>')
@@ -85,7 +85,7 @@
 			shadow: options.shadow || options.shadow === false ? options.shadow : defaults.shadow,
 			onContextMenu: options.onContextMenu || defaults.onContextMenu,
 			onShowMenu: options.onShowMenu || defaults.onShowMenu,
-			onShowMenuCallback:options.onShowMenuCallback|| null,
+			onShowMenuCallback: options.onShowMenuCallback || null,
 			eventPosX: options.eventPosX || defaults.eventPosX,
 			eventPosY: options.eventPosY || defaults.eventPosY
 		});
@@ -97,12 +97,27 @@
 			if (bShowContext) display(index, this, e, options);
 			if ($.isFunction(options.onShowMenuCallback)) {
 				options.onShowMenuCallback(e);
+			} 
+
+			var top = e.pageY,
+				meunHeight = menu.height();
+			if (top + meunHeight > $("body").height()) {
+				top = top - meunHeight;
 			}
+
+			menu.css("top",top);
+
 			return false;
-		}); 
+		});
 
 		return this;
 	};
+
+	//销毁
+	$.fn.contextMenu.destory = function() {
+		$(".jqContextMenu").remove();
+		menu = null;
+	}
 
 	function display(index, trigger, e, options) {
 		var cur = hash[index];
@@ -139,6 +154,7 @@
 			'left': e[cur.eventPosX],
 			'top': e[cur.eventPosY]
 		}).show();
+
 		if (cur.shadow) shadow.css({
 			width: menu.width(),
 			height: menu.height(),
