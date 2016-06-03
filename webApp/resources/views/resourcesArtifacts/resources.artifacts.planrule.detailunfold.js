@@ -17,15 +17,15 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
         "click .myItem":"myItem",
         "click .delRule": "delRule",
         "focus .categoryCode": "legend"
-        //"blur .categoryCode": "legendClose"
     },
     render:function() {
         this.$el.html(this.template(this.model.toJSON()));
         return this;
     },
-    initialize:function(){
+    initialize:function(model){
         this.listenTo(this.model,"change",this.render);
         this.listenTo(this.model,"mappingCategoryChange",this.render);
+        this.dealStr(model);
         //this.getValue("(30,40]");
     },
     //选择分类编码
@@ -67,8 +67,9 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
     addNewRule:function(){
         var _this = this;
         var model = new App.ResourceArtifacts.newRule(App.ResourceArtifacts.newModel);
-        var newRule = new App.Resources.ArtifactsPlanRuleDetailNew({model:model}).render().el;
-        this.$(".conR dl").append(newRule);
+        //var newRule = new App.Resources.ArtifactsPlanRuleDetailNew({model:model}).render().el;
+        App.ResourceArtifacts.operator.add(model);
+        //this.$(".conR dl").append(newRule);
         //因为新建整条与修改的模型不一致
         //向collection添加
         //向this.model 添加一条属性
@@ -186,8 +187,9 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
         });
 
 
-        pre.on("keyup",function(ev){
-            var val = pre.val(),test, count = 5,str = '',index,arr = [];  //显示5条
+        pre.on("keyup",function(e){
+            App.Resources.cancelBubble(e);
+            var val = pre.val(),test, count = 5,str = '',index,arr = [],unResult = "<li>搜索：无匹配结果</li>";  //显示5条
             list.html("");
             val = val.replace(/\s+/,'');
             if(!val){list.hide();return}
@@ -195,13 +197,14 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
             //禁止输出除数字，半角句号外的
             test = /[^\d\.]+/.test(val);
             if(test){
-                list.html("<li>搜索：无匹配结果</li>");
+                list.html(unResult);
                 return;
             }
 
             str = val;
             var x = str.length%3;
             if(x ==0){
+                if(_.last(str) != "."){ list.html(unResult);return}
                 str = _.initial(str);
                 str = str.join('');
                 index = _.indexOf(ac,str,true);
@@ -218,7 +221,7 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
             }
 
             if(index < 0 ){
-                list.html("<li>搜索：无匹配结果</li>");
+                list.html(unResult);
                 return
             }
             for(var j = index  ;  j < App.Resources.artifactsTreeData.length  ; j++){
@@ -231,14 +234,6 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
                 list.append(new App.Resources.ArtifactsRuleLegend({model:newRule}).render().el);
             }
         });
-    },
-    //关闭联想
-    legendClose:function(e){
-        $(e.target).removeClass("active");
-        var val = $(e.target).val();
-        //此处要保存数据
-        this.$(".chide").css({"visibility":"visible"});
-        $(e.target).css({"opacity":"0"}).closest("div").siblings("ul").hide();
     },
 
     //校验模块
@@ -289,5 +284,35 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
         con.mappingPropertyList = arr;
         App.ResourceArtifacts.presentRule.model.set({"mappingCategory":con});
         App.ResourceArtifacts.presentRule.model.trigger("mappingCategoryChange");//重绘模型
+    },
+
+
+    //拆解字符串
+    dealStr:function(model){
+        var con = this.model.get("mappingCategory"),
+            list = con.mappingPropertyList,
+            code=[];
+        if(list && list.length){
+            _.each(list,function(item){
+                if(item.operator == "<>" || item.operator == "><"){
+                    var obj = {left:'',right:'',leftValue:'',rightValue:''},
+                        str= item.propertyValue,
+                        arr,
+                        index;
+                    index = _.indexOf(str,",");
+
+                    obj.left =str[0];
+                    obj.right = str[str.length-1];
+                    for(var i = 1 ; i < str.length-2 ; i++){
+                        if(i < index){
+                            obj.leftValue =  obj.leftValue + str[i];
+                        }else if(i>index){
+                            obj.rightValue = obj.rightValue +str[i];
+                        }
+                    }
+                    item.ruleList = obj;
+                }
+            });
+        }
     }
 });

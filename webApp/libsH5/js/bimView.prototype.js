@@ -202,7 +202,8 @@
             data = bimView.sidebar.classCodeData,
             $li = $this.closest('.itemNode'),
             type = $li.data('type'),
-            flag = $this.next().find('input').prop('checked');
+            isChecked = $this.next().find('input').prop('checked'),
+            isSelected = $this.siblings('.treeText').is('.selected');
         $this.toggleClass('m-closeTree m-openTree')
         $li.toggleClass('open');
         if(type == 'classCode' && $li.has(".tree").length ==0){
@@ -220,7 +221,8 @@
             name:'name',
             data:'code',
             children:'isChild',
-            isChecked:flag
+            isChecked:isChecked,
+            isSelected:isSelected
           });
           $li.append(children);
         }
@@ -339,7 +341,7 @@
       var self = this;
       self._dom.bimBox.find(".view").attr('class','view');
       self.pub('rotateMouse');
-      self.viewer.setPickMode();
+      self.viewer.setRectPickMode();
     },
     home:function(){
       // 普通模式

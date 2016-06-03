@@ -103,7 +103,7 @@
       title:'半透明',
       fn:'translucent',
       keyCode:'',
-      type:'click',
+      type:'status',
       group:'0'
     },
     {

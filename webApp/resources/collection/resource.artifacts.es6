@@ -1,11 +1,8 @@
-/**
- * @require /resources/collection/resource.nav.es6
- */
 //fetchArtifactsPlan   获取计划
 //fetchArtifactsPlanRule   获取规则
 App.ResourceArtifacts={
     Status:{
-        presentPlan:null,  //当前计划
+        presentPlan:null,  //当前计划或质量，提交数据
         saved : true,    //创建规则后的保存状态，已保存  /  未保存
         presentRule : null    //当前规则
     },
@@ -41,6 +38,19 @@ App.ResourceArtifacts={
             }
         }
     })),
+
+    //计划规则/获取
+    operator:new(Backbone.Collection.extend({
+        model:Backbone.Model.extend({
+            defaults:function(){
+                return{
+
+                }
+            }
+        })
+    })),
+
+
 
 //计划规则/获取
     PlanRules:new(Backbone.Collection.extend({
@@ -123,17 +133,31 @@ App.ResourceArtifacts={
         }
     }),
 
-    //构件编码
-    newCode :Backbone.Model.extend({
+    //新映射数据模型
+    newModel : {
+        "id": null,
+        "propertyKey":"",
+        "operator":"",
+        "propertyValue": null,
+        categoryId:'',
+        ruleList:{
+            left:'',
+            right:'',
+            leftValue:'',
+            rightValue:''
+        }
+    },
+
+    //新建规则
+    newRule : Backbone.Model.extend({
         defaults:function(){
             return{
                 code : ""
             }
         }
     }),
-
     //新建规则
-    newRule : Backbone.Model.extend({
+    newCode : Backbone.Model.extend({
         defaults:function(){
             return{
                 code : ""

@@ -29,7 +29,7 @@ App.Services.ProjectCollection = {
 		}()),
 
 		//直接监听.txtInput  change事件 根据class判断校验类型
-		//已知类型：intInput floatInput
+		//已知类型：intInput floatInput rateInput
 		dataVal(e){
 			var _$dom=$(e.currentTarget),
 				zeroReg=/^0{1,1}$/,
@@ -81,10 +81,10 @@ App.Services.ProjectCollection = {
 				}
 			}
 		}),
-		urlType: "fetchProjects",
+		urlType: "fetchManageProjects",
 		parse(response) {
 			if (response.code == 0) {
-                 return response.data.items;
+                 return response.data;
             }
 		}
 	})),
