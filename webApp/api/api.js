@@ -78,6 +78,7 @@ App.API = {
 
 		//项目
 		fetchProjects: "platform/project?type=3", //项目列表
+		fetchManageProjects: "platform/projectManager/project", //项目列表
 		fetchProjectBaseInfo: "platform/project/{projectId}", //项目列表
 		fetchFileList: "doc/{projectId}/{projectVersionId}/file/children", //获取文件列表  ?fileId={parentId}
 		fetchDesignFileNav: "doc/{projectId}/{projectVersionId}/file/tree", //项目设计文件导航
