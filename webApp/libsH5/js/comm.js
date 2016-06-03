@@ -133,7 +133,8 @@
         childrenType:'arr',
         data:'',
         id:'',
-        isChecked:true
+        isChecked:true,
+        isSelected:false
       },
       _opt = $.extend({},defualts,options);
       return renderTree(_opt.arr,_opt.name,_opt.dataType);
@@ -142,7 +143,7 @@
         var tree = $('<div class="tree"></div>');
         $.each(arr,function(i,item){
           var type = _opt.type,
-              itemName,data,iconStatus,input;
+              itemName,data,iconStatus,input,span;
           if(dataType == 'arr'){
             itemName = item[name];
             data = item[_opt.data] ? item[_opt.data].toString() :'';
@@ -164,11 +165,15 @@
           }else{
             input = '<input type="checkbox" />'
           }
+          if(_opt.isSelected){
+           span = '<span class="treeText selected">'+itemName+'</span>'
+          }else{
+            span = '<span class="treeText">'+itemName+'</span>'
+          }
           var tmpHtml = $('<li class="itemNode" data-type="'+type+'">\
             <div class="itemContent">\
             <i class="'+iconStatus+'"></i>\
-            <label class="treeCheckbox">'+input+'<span class="m-lbl"></span></label>\
-            <span class="treeText">'+itemName+'</span>\
+            <label class="treeCheckbox">'+input+'<span class="m-lbl"></span></label>'+span + '\
           </div></li>');
           tmpHtml.data('userData',data);
           if(item[_opt.children]&&typeof item[_opt.children] =="object"){
