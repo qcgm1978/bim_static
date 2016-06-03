@@ -366,7 +366,6 @@ App.Project.Model = {
         }
         App.Index.Settings.Viewer.fit();
       }
-			console.log(elementId)
 
 			//test
 			$.ajax({

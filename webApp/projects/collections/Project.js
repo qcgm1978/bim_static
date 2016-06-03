@@ -11,8 +11,7 @@ App.Project = {
 		token:"",
 		isShare:false,
 		projectId: "", //项目id
-		versionId: "", //版本id
-		projectCode:"";
+		versionId: "", //版本id		
 		attrView: null,
 		CurrentVersion: null, //当前版本信息
 		DataModel: null //渲染模型的数据
