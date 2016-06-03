@@ -2,7 +2,6 @@
 * @require /libsH5/js/libs/three.min.js
 */
 
-
 var CLOUD = CLOUD || {};
 CLOUD.Version = "20160601";
 
@@ -23,7 +22,7 @@ CLOUD.GlobalData = {
     RayTracingDeep: 10,
     SubSceneVisibleLOD: 10,
     ScreenCullLOD: 0.0002,
-    LimitFrameTime: 60,
+    LimitFrameTime: 250,
     GarbageCollection: true
 };
 
@@ -7463,8 +7462,6 @@ CLOUD.Scene = function () {
 
     this.clipWidget = null;
 
-    this.selectedIds = []; // 存一份是为了供鼠标pick使用    this.autoUpdate = false;
-
     var len = CLOUD.GlobalData.SceneSize * 0.5;
     this.innerBoundingBox = new THREE.Box3();
 
@@ -7630,8 +7627,8 @@ CLOUD.Scene.prototype.pickByReck = function () {
 
     function intersectObjectByBox(frustum, object) {
 
-        if (object.boundingBox) {
-            box.copy(object.boundingBox);
+        if (object.boundingBox && !(object instanceof THREE.Mesh)) {
+             box.copy(object.boundingBox);
         }
         else {
             var geometry = object.geometry;
@@ -7648,9 +7645,11 @@ CLOUD.Scene.prototype.pickByReck = function () {
     }
 
 
-    return function (frustum, callback) {
+    return function (frustum, clearOld, callback) {
         var scope = this;
-        scope.filter.setSelectedIds();
+
+        if (clearOld)
+            scope.filter.setSelectedIds();
 
         function frustumTest(node) {
 
@@ -8200,54 +8199,6 @@ CLOUD.Scene.prototype.collectionGarbage = function () {
 
     this.garbageCount = 0;
 }
-
-CLOUD.Scene.prototype.clearAllSelectedIds = function () {
-
-    this.selectedIds = [];
-};
-
-// 将选中构件ID集合传入过滤器
-CLOUD.Scene.prototype.putSelectedIdsIntoFilter = function () {
-
-    this.filter.setSelectedIds(this.selectedIds);
-    this.filter.resetSelectionBox();
-};
-
-// 是否存在构件id： -1 不存在， 否则 存在
-CLOUD.Scene.prototype.existSelectedId = function (id) {
-
-    var idx = -1;
-
-    for(var i = 0, len = this.selectedIds.length; i < len; i++) {
-        if (id  === this.selectedIds[i]) {
-            idx = i;
-            break;
-        }
-    }
-
-    return idx;
-};
-
-// 删除选中构件id
-CLOUD.Scene.prototype.removeSelectedId = function (id) {
-
-    // 如果之前选中，则取消选中
-    var idx = this.existSelectedId(id);
-
-    if (idx != -1) {
-        this.selectedIds.splice(idx, 1);
-    }
-};
-
-// 增加选中构件id
-CLOUD.Scene.prototype.addSelectedId = function (id) {
-
-    var idx = this.existSelectedId(id);
-
-    if (idx === -1) {
-        this.selectedIds.push(id);
-    }
-};
 
 CLOUD.Scene.prototype.getHitPoint = function (x, y, camera) {
 
@@ -10095,8 +10046,6 @@ CLOUD.OrbitEditor = function (cameraEditor, scene, domElement) {
     // camera state
     this.cameraEditor = cameraEditor;
 
-    this.altHotKey = false;
-
     this.isMouseClick = false;
     this.oldMouseX = -1;
     this.oldMouseY = -1;
@@ -10132,6 +10081,11 @@ CLOUD.OrbitEditor.prototype.delayHandle = function () {
 
 
 CLOUD.OrbitEditor.prototype.processMouseDown = function (event) {
+
+    this.isMouseClick = false;
+    this.oldMouseX = event.clientX;
+    this.oldMouseY = event.clientY;
+
     var scope = this;
     var camera_scope = this.cameraEditor;
 
@@ -10171,10 +10125,6 @@ CLOUD.OrbitEditor.prototype.processMouseDown = function (event) {
     return false;
 };
 CLOUD.OrbitEditor.prototype.onMouseDown = function (event) {
-
-    this.isMouseClick = false;
-    this.oldMouseX = event.clientX;
-    this.oldMouseY = event.clientY;
 
     return this.processMouseDown(event);
 };
@@ -10254,9 +10204,6 @@ CLOUD.OrbitEditor.prototype.onKeyDown = function (event) {
     this.delayHandle();
 
     switch (event.keyCode) {
-        case camera_scope.keys.ALT:
-            this.altHotKey = true;
-            break;
         case camera_scope.keys.ZERO:
             camera_scope.keyPanSpeed = camera_scope.defaultKeyPanSpeed;
             camera_scope.movementSpeed = camera_scope.defaultMovementSpeed;
@@ -10323,12 +10270,6 @@ CLOUD.OrbitEditor.prototype.onKeyUp = function (event) {
 
     var camera_scope = this.cameraEditor;
     if (camera_scope.enabled === false || camera_scope.noKeys === true || camera_scope.noPan === true) return;
-
-    switch (event.keyCode) {
-        case camera_scope.keys.ALT:
-            this.altHotKey = false;
-            break;
-    }
 };
 
 CLOUD.OrbitEditor.prototype.touchstart = function (event) {
@@ -10372,11 +10313,6 @@ CLOUD.PickEditor = function (object, scene, domElement) {
     //this.mouseButtons = { ORBIT: THREE.MOUSE.RIGHT, PAN: THREE.MOUSE.MIDDLE, ZOOM: THREE.MOUSE.RIGHT };
 
     this.timerId = null;
-    this.lastDblUserId = null;
-    this.lastUserId = null;
-
-    this.semitransparentIds = []; // 半透明id集合
-    this.selectedIds = []; // 鼠标pick集合
 
     this.filter = scene.filter;
 
@@ -10405,10 +10341,9 @@ CLOUD.PickEditor.prototype.pickByClick = function (event) {
     scope.timerId = setTimeout(handleMouseUp, 300);
 };
 
-CLOUD.PickEditor.prototype.onMouseUp = function (event) {
-    var scope = this;
+CLOUD.PickEditor.prototype.processMouseUp = function (event) {
 
-    event.preventDefault();
+    var scope = this;
 
     if (scope.oldMouseX == event.clientX && scope.oldMouseY == event.clientY) {
         this.pickByClick(event);
@@ -10417,6 +10352,13 @@ CLOUD.PickEditor.prototype.onMouseUp = function (event) {
 
         scope.cameraEditor.update(true);
     }
+};
+
+CLOUD.PickEditor.prototype.onMouseUp = function (event) {
+
+    event.preventDefault();
+
+    this.processMouseUp(event);
 };
 
 CLOUD.PickEditor.prototype.onMouseDoubleClick = function (event) {
@@ -10456,87 +10398,44 @@ CLOUD.PickEditor.prototype.handleMousePick = function (event, isDoubleClick) {
 
         scope.scene.pick(mouse, cameraEditor.object, function (intersect) {
 
-            var userId = "";
+            if (!intersect) {
 
-            if (intersect)
-                userId = intersect.userId || userId;
+                if (scope.filter.setSelectedIds()) {
+                    cameraEditor.updateView(true);
+                }
+
+                scope.showPickedInformation(null);
+                return;
+            }
+
+             var  userId = intersect.userId;
 
             // 双击构件变半透明，再双击取消半透明状态
             if (isDoubleClick) {
 
-                // 选中构件条件：
-                //     1. 前无构件选中，后有构件选中；
-                //     2. 前后都有构件选中，且构件ID不同；
-                // 取消选中条件：
-                //      1. 前后都有构件选中且构件ID相同；
-                if (scope.lastDblUserId !== userId && userId !== "") {
-                    // 选中
-                    scope.lastDblUserId = userId;
-                    scope.addSemitransparentId(userId);
-                    scope.putSemitransparentIdsIntoFilter();
-
-                    // 如果上一次存在单击选中构件
-                    for (var i = 0, len = scope.selectedIds.length; i < len; i++) {
-                        if (scope.selectedIds[i] === userId) {
-                            scope.setSelectedState(userId, false);
-                            break;
-                        }
-                    }
-
-                    cameraEditor.updateView(true);
-
-                } else if (scope.lastDblUserId && scope.lastDblUserId === userId) {
-                    // 取消选中
-                    scope.removeSemitransparentId(scope.lastDblUserId);
-                    scope.putSemitransparentIdsIntoFilter();
-
-                    // 如果上一次存在单击选中构件
-                    for (var i = 0, len = scope.selectedIds.length; i < len; i++) {
-                        if (scope.selectedIds[i] === userId) {
-                            scope.setSelectedState(userId, true);
-                            break;
-                        }
-                    }
-
-                    cameraEditor.updateView(true);
-                    scope.lastDblUserId = null;
-                }
+                scope.filter.addDemolishId(userId, true);
+                cameraEditor.updateView(true);
 
             } else {
 
-                // 选中构件条件：
-                //     1. 前无构件选中，后有构件选中；
-                //     2. 前后都有构件选中，且构件ID不同；
-                // 取消选中条件：
-                //      1. 前后都有构件选中且构件ID相同；
-                //      2. 前有构件选中，后无构件选中；
-                if (scope.lastUserId !== userId && userId !== "") {
-                    // 选中
-                    scope.lastUserId = userId;
-                    // 先清除，这样处理即只支持单选
-                    scope.clearSelectedIds();
-                    scope.addSelectedId(userId);
-                    scope.putSelectedIdsIntoFilter();
-                    cameraEditor.updateView(true);
+                if (!event.ctrlKey) {
+                    scope.filter.setSelectedIds();
+                }
+
+                if (scope.filter.addSelectedId(userId, true)) {
+
                     scope.onObjectSelected(intersect);
 
-                    if (scope.altHotKey) {
+                    if (event.altKey) {
                         scope.showPickedInformation(intersect, screenX, screenY);
                     } else {
                         scope.showPickedInformation(null);
                     }
-
-                } else if (scope.lastUserId && (scope.lastUserId === userId || userId === "")) {
-                    // 取消选中
-                    scope.removeSelectedId(scope.lastUserId);
-                    scope.putSelectedIdsIntoFilter();
-
-                    cameraEditor.updateView(true);
-                    scope.onObjectSelected(null);
-                    scope.lastUserId = null;
-
+                }
+                else {
                     scope.showPickedInformation(null);
                 }
+                cameraEditor.updateView(true);
             }
 
         });
@@ -10694,107 +10593,8 @@ CLOUD.PickEditor.prototype.showPickedInformation = function (intersect, cx, cy) 
     adjustLocation(this.debugInfoDiv, cx, cy);
 };
 
-CLOUD.PickEditor.prototype.clearSemitransparentIds = function () {
-    this.semitransparentIds = [];
-};
 
-// 将选中半透明构件ID集合传入过滤器
-CLOUD.PickEditor.prototype.putSemitransparentIdsIntoFilter = function () {
-    this.filter.setOverriderByUserIds("dblClick", this.semitransparentIds, "scene");
-};
 
-// 是否存在半透明构件id： -1 不存在， 否则 存在
-CLOUD.PickEditor.prototype.existSemitransparentId = function (id) {
-
-    var idx = -1;
-
-    for(var i = 0, len = this.semitransparentIds.length; i < len; i++) {
-        if (id  === this.semitransparentIds[i]) {
-            idx = i;
-            break;
-        }
-    }
-
-    return idx;
-};
-
-// 删除选中半透明构件id
-CLOUD.PickEditor.prototype.removeSemitransparentId = function (id) {
-
-    // 如果之前选中，则取消选中
-    var idx = this.existSemitransparentId(id);
-
-    if (idx != -1) {
-        this.semitransparentIds.splice(idx, 1);
-    }
-};
-
-// 增加选中半透明构件id
-CLOUD.PickEditor.prototype.addSemitransparentId = function (id) {
-
-    var idx = this.existSemitransparentId(id);
-
-    if (idx === -1) {
-        this.semitransparentIds.push(id);
-    }
-};
-
-CLOUD.PickEditor.prototype.clearSelectedIds = function () {
-
-    this.selectedIds = [];
-};
-
-// 将选中构件ID集合传入过滤器
-CLOUD.PickEditor.prototype.putSelectedIdsIntoFilter = function () {
-
-    this.filter.setSelectedIds(this.selectedIds);
-    this.filter.resetSelectionBox();
-};
-
-// 是否存在构件id： -1 不存在， 否则 存在
-CLOUD.PickEditor.prototype.existSelectedId = function (id) {
-
-    var idx = -1;
-
-    for(var i = 0, len = this.selectedIds.length; i < len; i++) {
-        if (id  === this.selectedIds[i]) {
-            idx = i;
-            break;
-        }
-    }
-
-    return idx;
-};
-
-// 删除选中构件id
-CLOUD.PickEditor.prototype.removeSelectedId = function (id) {
-
-    // 如果之前选中，则取消选中
-    var idx = this.existSelectedId(id);
-
-    if (idx != -1) {
-        this.selectedIds.splice(idx, 1);
-    }
-};
-
-// 增加选中构件id
-CLOUD.PickEditor.prototype.addSelectedId = function (id) {
-
-    var idx = this.existSelectedId(id);
-
-    if (idx === -1) {
-        this.selectedIds.push(id);
-    }
-};
-
-CLOUD.PickEditor.prototype.setSelectedState = function (id, state) {
-
-    var idx = this.existSelectedId(id);
-
-    if (idx !== -1) {
-        this.filter.setSelectedState(id, state);
-    }
-};
 
 
 CLOUD.RectPickEditor = function (object, scene, domElement) {
@@ -10807,7 +10607,7 @@ CLOUD.RectPickEditor = function (object, scene, domElement) {
 
     this.frustum = new THREE.Frustum();
 
-    this.mouseButtons = { ORBIT: THREE.MOUSE.RIGHT, PAN2: THREE.MOUSE.MIDDLE, PAN: THREE.MOUSE.LEFT };
+    this.mouseButtons = { ORBIT: THREE.MOUSE.LEFT, PAN2: THREE.MOUSE.MIDDLE, PAN: THREE.MOUSE.RIGHT };
 };
 
 CLOUD.RectPickEditor.prototype = Object.create(CLOUD.PickEditor.prototype);
@@ -10871,7 +10671,7 @@ CLOUD.RectPickEditor.prototype.onMouseDown = function (event) {
 
         //this.onUpdateUI({ visible:true, left:x1, top: y1, width:1, height:1 });
 
-        return true;
+        //return true;
     }
 
     return this.processMouseDown(event);
@@ -10880,7 +10680,7 @@ CLOUD.RectPickEditor.prototype.onMouseDown = function (event) {
 CLOUD.RectPickEditor.prototype.onMouseMove = function (event) {
 
     event.preventDefault();
-    if (event.button === THREE.MOUSE.LEFT) {
+    if (event.shiftKey && event.button === THREE.MOUSE.LEFT) {
 
         this.endPt.set(event.clientX, event.clientY);
         this.udpateFrustum(true);
@@ -10894,7 +10694,7 @@ CLOUD.RectPickEditor.prototype.onMouseUp = function (event) {
     event.preventDefault();
     event.stopPropagation();
 
-    if (event.button === THREE.MOUSE.LEFT) {
+    if (event.shiftKey && event.button === THREE.MOUSE.LEFT) {
 
         this.endPt.set(event.clientX, event.clientY);
         if (!this.udpateFrustum()) {
@@ -10904,7 +10704,7 @@ CLOUD.RectPickEditor.prototype.onMouseUp = function (event) {
 
 
         var scope = this;
-        this.scene.pickByReck(this.frustum, function () {
+        this.scene.pickByReck(this.frustum, !event.ctrlKey, function () {
             scope.onObjectSelected();
         });
         this.cameraEditor.updateView(true);
@@ -12160,9 +11960,9 @@ CLOUD.Filter = function () {
 
     var materialOverriderByUserData = {};
 
-    var selectionSet = {
-        boundingBox: new THREE.Box3()
-    };
+    var selectionBoundingBox = new THREE.Box3();
+    var selectionSet = null;
+    var demolishSet = null;
 
     //DEBUG API
     this.getVisibleFilter = function () {
@@ -12183,6 +11983,10 @@ CLOUD.Filter = function () {
 
     this.getSelectionSet = function () {
         return selectionSet;
+    };
+
+    this.getDemolishSet = function () {
+        return demolishSet;
     };
 
     ////////////////////////////////////////////////////////////////////
@@ -12382,47 +12186,130 @@ CLOUD.Filter = function () {
         overridedMaterials.selection.color = color;
     };
 
-    this.setSelectedState = function(id, state) {
-
-        if (selectionSet.ids && (id in selectionSet.ids)) {
-            selectionSet.ids[id] = state;
-        }
-    };
-
     this.setSelectedIds = function (ids) {
 
         if (ids && ids.length > 0) {
-            selectionSet.ids = {};
+            selectionSet = {};
             for (var ii = 0, len = ids.length; ii < len; ++ii) {
-                selectionSet.ids[ids[ii]] = true;
+                selectionSet[ids[ii]] = true;
             }
+            return true;
         }
-        else {
-            delete selectionSet.ids;
+
+        if (selectionSet) {
+            selectionSet = null;
+            return true;
         }
+
+        return false;
     };
 
     this.addSelectedIds = function (ids) {
 
         if (!ids)
             return;
-        if (selectionSet.ids === undefined){
-            selectionSet.ids = {};
+
+        if (!selectionSet){
+            selectionSet = {};
+        }
+
+        for (var ii = 0, len = ids.length; ii < len; ++ii) {
+            selectionSet[ids[ii]] = true;
+        }
+
+    };
+
+    this.removeSelectedId = function (id) {
+        if (selectionSet[id]) {
+
+            delete selectionSet[id];
+
+            var count = 0;
+            for (var name in selectionSet) {
+                ++count;
+                break;
+            }
+
+            if (count == 0)
+                selectionSet = null;
+
+            return true;
+        }
+        return false;
+    };
+
+    this.addSelectedId = function (id, removeIfExist) {
+        if (!selectionSet) {
+            selectionSet = {};
+        }
+
+        if (removeIfExist && this.removeSelectedId(id)) {
+                return false;
+        }
+
+        selectionSet[id] = true;
+        return true;
+    };
+
+    //demolishSet
+
+    this.setDemolishIds = function (ids) {
+
+        if (ids && ids.length > 0) {
+            demolishSet = {};
+            for (var ii = 0, len = ids.length; ii < len; ++ii) {
+                demolishSet[ids[ii]] = true;
+            }
+        }
+        else {
+            demolishSet = null;
+        }
+    };
+
+    this.addDemolishIds = function (ids) {
+
+        if (!ids)
+            return;
+
+        if (!demolishSet) {
+            demolishSet = {};
         }
 
 
         for (var ii = 0, len = ids.length; ii < len; ++ii) {
-            selectionSet.ids[ids[ii]] = true;
+            demolishSet[ids[ii]] = true;
         }
 
     };
 
-    this.addSelectedId = function (id) {
-        if (selectionSet.ids === undefined) {
-            selectionSet.ids = {};
+    this.addDemolishId = function (id, removeIfExist) {
+        if (!demolishSet) {
+            demolishSet = {};
         }
-        selectionSet.ids[id] = true;
+
+        if (removeIfExist) {
+            if (demolishSet[id]) {
+
+                delete demolishSet[id];
+
+                var count = 0;
+                for (var name in demolishSet) {
+                    ++count;
+                    break;
+                }
+
+                if (count == 0)
+                    demolishSet = null;
+
+                return false;
+            }
+        }
+
+        demolishSet[id] = true;
+        return true;
     };
+
+
     ////////////////////////////////////////////////////////////////
     // 判断是否可见
     this.isVisible = function (node) {
@@ -12448,25 +12335,29 @@ CLOUD.Filter = function () {
 
 
     function hasSelection() {
-        if (selectionSet.ids === undefined)
-            return false;
 
-        for (var ii in selectionSet.ids) {
-            return true;
-        }
-
-        return false;
+        return selectionSet != null;
     };
 
     // 判断是否选中
     function isSelected (id) {
 
-        if (selectionSet.ids && selectionSet.ids[id]) {
+        if (selectionSet && selectionSet[id]) {
             return true;
         }
 
         return false;
     };
+
+    function isDemolished(id) {
+
+        if (demolishSet && demolishSet[id]) {
+            return true;
+        }
+
+        return false;
+    };
+
 
     // 计算选中对象的包围盒
     this.computeSelectionBox = function (renderList) {
@@ -12496,8 +12387,8 @@ CLOUD.Filter = function () {
                         box2.applyMatrix4(object.matrixWorld);
                     }
 
-                    selectionSet.boundingBox.expandByPoint(box2.min);
-                    selectionSet.boundingBox.expandByPoint(box2.max);
+                    selectionBoundingBox.expandByPoint(box2.min);
+                    selectionBoundingBox.expandByPoint(box2.max);
                 }
             }
 
@@ -12510,6 +12401,10 @@ CLOUD.Filter = function () {
     this.getOverridedMaterial = function (object) {
 
         var id = object.name;
+
+        if (isDemolished(id)) {
+            return overridedMaterials.scene;
+        }
 
         if (isSelected(id)) {
             return overridedMaterials.selection;
@@ -12540,11 +12435,11 @@ CLOUD.Filter = function () {
 
     // 重置包围盒
     this.resetSelectionBox = function() {
-        selectionSet.boundingBox.makeEmpty();
+        selectionBoundingBox.makeEmpty();
     };
 
     this.getSelectionBox = function() {
-        return selectionSet.boundingBox;
+        return selectionBoundingBox;
     };
 
     this.isSelectionSetEmpty = function() {
@@ -16221,6 +16116,8 @@ CLOUD.SceneLoader.prototype = {
                     object = new CLOUD.Mesh(CLOUD.GeomUtil.EmptyGeometry, matObj, objJSON.meshId);
                     CLOUD.GeomUtil.parseNodeProperties(object, objJSON, nodeId, trf);
                     object.userData = userData;
+                    if (!object.name)
+                        console.log(object);
 
                     loadMeshNode(object, objJSON.meshId);
 
@@ -16244,6 +16141,8 @@ CLOUD.SceneLoader.prototype = {
                 }
                 else if (objJSON.nodeType == "SymbolInstance") {
 
+                    var localUserId = userId || objJSON.userId
+
                     var symbolJSON = client.findSymbol(objJSON.symbolId);
                     if (symbolJSON) {
 
@@ -16254,7 +16153,7 @@ CLOUD.SceneLoader.prototype = {
 
                             //handle_children(parent, symbolJSON.children, level + 1, objJSON.userId, userData, object.matrix);
 
-                            handle_children(object, symbolJSON.children, level + 1, objJSON.userId, userData);
+                            handle_children(object, symbolJSON.children, level + 1, localUserId, userData);
                             object.userData = userData;
                             parent.add(object);
                         }
@@ -16266,6 +16165,7 @@ CLOUD.SceneLoader.prototype = {
                             object = new CLOUD.Mesh(CLOUD.GeomUtil.EmptyGeometry, matObj, symbolJSON.meshId);
                             CLOUD.GeomUtil.parseNodeProperties(object, objJSON, nodeId, trf);
                             object.userData = userData;
+                            object.name = localUserId;
 
                             loadMeshNode(object, symbolJSON.meshId);
 
@@ -16289,8 +16189,11 @@ CLOUD.SceneLoader.prototype = {
 
                             if (object) {
 
+                                if (!localUserId)
+                                    console.log(object);
+
                                 //object.name = nodeId;
-                                object.name = userId;
+                                object.name = localUserId;
                                 object.userData = userData;
 
                                 parent.add(object);
@@ -17561,8 +17464,8 @@ CLOUD.EditorManager.prototype = {
 
         if(this.rectPickEditor === undefined){
             var rectPickEditor = new CLOUD.RectPickEditor(viewer.cameraEditor, viewer.getScene(), viewer.domElement);
-            rectPickEditor.onObjectSelected = function () {
-                viewer.modelManager.dispatchEvent({ type: CLOUD.EVENTS.ON_SELECTION_CHANGED})
+            rectPickEditor.onObjectSelected = function (intersect) {
+                viewer.modelManager.dispatchEvent({ type: CLOUD.EVENTS.ON_SELECTION_CHANGED, intersect: intersect })
             };
             rectPickEditor.onUpdateUI = function (obj) {
                 viewer.modelManager.dispatchEvent({ type: CLOUD.EVENTS.ON_UPDATE_SELECTION_UI, data: obj })
@@ -18391,9 +18294,16 @@ CloudViewer.prototype = {
         return this.getScene().filter;
     },
 
-    disableLoD : function(){
-        CLOUD.GlobalData.SubSceneVisibleLOD = 1000;
-        CLOUD.GlobalData.CellVisibleLOD = 1000;
+    disableLoD: function (force) {
+        if (force) {
+            CLOUD.GlobalData.SubSceneVisibleLOD = 100000000;
+            CLOUD.GlobalData.CellVisibleLOD = 100000000;
+        }
+        else {
+            CLOUD.GlobalData.SubSceneVisibleLOD = 1000;
+            CLOUD.GlobalData.CellVisibleLOD = 1000;
+        }
+
     },
 
     adjustSceneLoD: function (sceneIds) {
