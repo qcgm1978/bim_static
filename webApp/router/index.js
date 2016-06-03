@@ -4,7 +4,7 @@ var AppRoute = Backbone.Router.extend({
 		'': 'bodyContent',
 		'todo': 'todo',
 		'projects': 'projects',
-		'projects/:id/:versionId/:projectCode': 'project',
+		'projects/:id/:versionId': 'project',
 		'flow': 'flow',
 		'resources': 'resources',
 		'resources/:type': 'resource',
@@ -33,13 +33,13 @@ var AppRoute = Backbone.Router.extend({
 		$("#pageLoading").hide();
 	},
 
-	logout: function() {
-
-		App.Comm.setCookie('OUTSSO_AuthToken', '');
-		App.Comm.setCookie('AuthUser_AuthNum', '');
-		App.Comm.setCookie('AuthUser_AuthMAC', '');
-		App.Comm.setCookie('OUTSSO_AuthNum', '');
-		App.Comm.setCookie('OUTSSO_AuthMAC', '');
+	logout: function() { 
+	 
+		App.Comm.delCookie('OUTSSO_AuthToken');
+		App.Comm.delCookie('AuthUser_AuthNum');
+		App.Comm.delCookie('AuthUser_AuthMAC');
+		App.Comm.delCookie('OUTSSO_AuthNum');
+		App.Comm.delCookie('OUTSSO_AuthMAC');
 		App.Comm.setCookie('IS_OWNER_LOGIN', '1');
 
 		window.location.href = "/login.html";
@@ -69,7 +69,7 @@ var AppRoute = Backbone.Router.extend({
 	},
 
 	//单个项目
-	project: function(id, versionId,code) {
+	project: function(id, versionId) {		 
 
 		this.reset();
 
@@ -79,9 +79,7 @@ var AppRoute = Backbone.Router.extend({
 
 		App.Project.Settings = $.extend({}, App.Project.Defaults);
 
-		App.Project.Settings.projectId = id;
-		
-		App.Project.Settings.projectCode = code;
+		App.Project.Settings.projectId = id;		
 
 		App.Project.Settings.versionId = versionId;
 
