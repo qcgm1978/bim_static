@@ -13,7 +13,6 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
         "click .deleteRule":"deleteRule",
         "click .saveRule":"saveRule",
         "click .choose":"choose",
-
         "click .delRule": "delRule",
         "focus .categoryCode": "legend"
     },
@@ -24,8 +23,6 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
     initialize:function(model){
         this.listenTo(this.model,"change",this.render);
         this.listenTo(this.model,"mappingCategoryChange",this.render);
-        this.dealStr(model);
-        //this.getValue("(30,40]");
     },
     //—°‘Ò∑÷¿‡±‡¬Î
     choose:function(){
