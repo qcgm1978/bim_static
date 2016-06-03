@@ -14,6 +14,14 @@ var Login = {
 		else
 			return null;
 	},
+	//删除cookie
+	delCookie: function(name) {
+		var exp = new Date();
+		exp.setTime(exp.getTime() - 31 * 24 * 60 * 60 * 1000);
+		var cval = this.getCookie(name);
+		if (cval != null)
+			document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString() + ";domain=.wanda-dev.cn;path=/";
+	},
 
 	//事件绑定
 	bindEvent() {
@@ -132,6 +140,7 @@ var Login = {
 			}
 			//是否主动退出标记 2 默认状态 1 为主动退出
 			Login.setCookie('IS_OWNER_LOGIN','2');
+			Login.delCookie("token_cookie");
 			window.location.href = "/index.html";
 		});
 	},

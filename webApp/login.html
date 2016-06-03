@@ -1,49 +1,47 @@
 <!DOCTYPE html>
 <html>
-
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>万达-登录</title>
-    <link rel="styleSheet" href="/login/css/login.less" />
-</head>
-
-<body>
-    <form>
-        <div id="loginBox">
-             <div id="mainBox">
-                <div class="logo">
-                </div>
-
-                <div class="headTitle">
-                    <h1>万达BIM信息化集成管理平台</h1>
-                    <ul class="introduction">
-                        <li class="item first">管理前置</li>
-                        <li class="item">协调同步</li>
-                        <li class="item">模式统一</li>
-                    </ul>
-                </div>
-
-                <div class="loginDialog">
-                    <div class="header">万达BIM平台</div>
-                    <div class="errorMSG"> <span class="iconWarning"></span> <span class="tip">用户名或密码错误</span></div>
-                    <div class="relative">
-                        <input type="text" id="userName" class="txtInput" placeholder="请输入用户名" />
-                        <span class="txtIcon"></span>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>万达-登录</title>
+        <link rel="styleSheet" href="/login/css/login.less" />
+    </head>
+    <body>
+        <form>
+            <div id="loginBox">
+                <div id="mainBox">
+                    <div class="logo">
                     </div>
-                    <div class="relative">
-                        <input type="password" id="userPwd" class="txtInput" placeholder="请输入密码" />
-                        <span class="txtIcon userPwd"></span>
+                    <div class="headTitle">
+                        <h1>万达BIM信息化集成管理平台</h1>
+                        <ul class="introduction">
+                            <li class="item first">管理前置</li>
+                            <li class="item">协调同步</li>
+                            <li class="item">模式统一</li>
+                        </ul>
                     </div>
-                    <div class="loginHelper">
-                        <div class="forgotPwd"><a href="###">忘记密码？</a></div>
-                        <div class="remember">一周内自动登录</div>
+                    <div class="loginDialog">
+                        <div class="header">万达BIM平台</div>
+                        <div class="errorMSG"> <span class="iconWarning"></span> <span class="tip">用户名或密码错误</span></div>
+                        <div class="relative">
+                            <input type="text" id="userName" class="txtInput" placeholder="请输入用户名" />
+                            <span class="txtIcon"></span>
+                        </div>
+                        <div class="relative">
+                            <input type="password" id="userPwd" class="txtInput" placeholder="请输入密码" />
+                            <span class="txtIcon userPwd"></span>
+                        </div>
+                        <div class="loginHelper">
+                            <div class="forgotPwd"><a href="###">忘记密码？</a></div>
+                            <div class="remember">一周内自动登录</div>
+                        </div>
+                        <input class="btnLogin" id="btnLogin" type="button" value="立即登录" />
                     </div>
-                    <input class="btnLogin" id="btnLogin" type="button" value="立即登录" />
                 </div>
             </div>
-            
-            <div class="footerWrap">
+        </form>
+        
+        <div class="footerWrap">
             <div class="footer">
                 <ul>
                     <li class="item">
@@ -84,18 +82,15 @@
                     </li>
                 </ul>
             </div>
-             </div>
-            <div class="clear"></div>
-            <div class="copyrightBox">
-                大连万达商业地产股份有限公司 &copy; 2016 WANDA版权所有
-            </div>
         </div>
-    </form>
-    <script type="text/javascript" src="/login/js/jquery-1.12.0.min.js"></script>
-    <script type="text/javascript" src="/login/js/login.es6"></script>
-    <script type="text/javascript">
+        <div class="clear"></div>
+        <div class="copyrightBox">
+            大连万达商业地产股份有限公司 &copy; 2016 WANDA版权所有
+        </div>
+        <script type="text/javascript" src="/login/js/jquery-1.12.0.min.js"></script>
+        <script type="text/javascript" src="/login/js/login.es6"></script>
+        <script type="text/javascript">
         Login.init();
-    </script>
-</body>
-
+        </script>
+    </body>
 </html>
