@@ -44,8 +44,7 @@ App.Project.PlanAttr={
 			}
 		}),
 
-		srcUrl:'http://10.199.200.219:8010/api/BIM/CurrentDateStartAndEndForProject/{type}/{projectCode}'
-		 
+		urlType:"fetchPlanPublicity"		 
 	})),
 
 	  PlanPublicityCollectionMonth: new(Backbone.Collection.extend({
