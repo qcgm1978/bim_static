@@ -196,11 +196,8 @@ App.API = {
 		//parentCode	否	String	上级Code, 空或不传获取顶级标准，all获取所有标准
 		//注：leaf 是否是叶子节点："leaf": false 不是叶子节点。"leaf": true 是叶子节点。
 		// 目标编码和对应属性规则  platform/mapping/rule/target/code/{code}?biz={biz}&type={type}&projectId={projectId}
-		fetchQualityPlanQualityLevel2:"dataJson/resources/fetchArtifactsMapPlan.json", //获取质量标准2级
-		fetchQualityPlanStandardLevel3:"dataJson/resources/fetchArtifactsMapPlan.json", //获取质量标准3级
-		fetchArtifactsQualityNewRule:"dataJson/resources/fetchArtifactsMapPlan.json",//质量标准新建规则
-		modifyArtifactsQualityRule:"dataJson/resources/fetchArtifactsMapPlan.json",//质量标准修改规则
-		deleteArtifactsQualityRule:"dataJson/resources/fetchArtifactsMapPlan.json",//质量标准删除规则
+		fetchQualityPlanQualityLevel2:"dataJson/resources/fetchArtifactsStandardQuality.json", //获取质量标准2级
+		fetchQualityPlanQualityLevel3:"dataJson/resources/fetchArtifactsStandardQuality.json", //获取质量标准3级
 
 		//项目 变更 列表
 		fileList:"doc/internal/{projectId}/{versionId}/differ", //变更列表
