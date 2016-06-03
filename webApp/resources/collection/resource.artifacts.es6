@@ -189,6 +189,8 @@ App.ResourceArtifacts={
         var plans = new App.Resources.ArtifactsPlanList();
         var planRule = new App.Resources.ArtifactsPlanRule();
 
+        $(".breadcrumbNav .mappingRule").show();
+
         _this.$el.append(pre.render().el);//菜单
 
         pre.$(".plans").html(plans.render().el);//计划节点
