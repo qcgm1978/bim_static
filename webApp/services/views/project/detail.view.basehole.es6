@@ -142,8 +142,12 @@ App.Services.DetailView.BaseHole=Backbone.View.extend({
 			data:{
 				pitId:_this.formData.id
 			}
-		},function(){
-			_this.reloadView();
+		},function(data){
+			if(data.code==0){
+				_this.reloadView();	
+			}else{
+				App.Services.Dialog.alert(data.message);
+			}
 		}).fail(function(){
 		})
 	},
