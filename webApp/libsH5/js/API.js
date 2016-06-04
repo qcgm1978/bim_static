@@ -16,8 +16,7 @@
     fetchCategory: "view/{etag}/{sourceId}/categories", // 获取构件信息
     fetchCoding: 'view/category/coding/{etag}', //获取构件编码信息
     // 获取构件信息
-    fetchComponentById:'sixD/{projectId}/{projectVersionId}/element?elementId={elementId}',
-    fetchComponentByModelId:'sixD/{projectId}/{projectVersionId}/element?modelId={modelId}&classCode={classCode}&cateId={cateId}',
+    fetchComponentById:'sixD/{projectId}/{projectVersionId}/element',
     //快照
     fetchModelViewpoint: 'sixD/{projectId}/viewPoint', // 获取快照列表
     fetacCanvasData: 'sixD/{projectId}/viewPoint/{viewPointId}/comment', // 获取批注信息
