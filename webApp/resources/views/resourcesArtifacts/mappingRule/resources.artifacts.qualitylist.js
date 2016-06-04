@@ -38,9 +38,19 @@ App.Resources.ArtifactsQualityList = Backbone.View.extend({
     },
 
     choose:function(){
+        var _this = this;
         this.toggle();
         var id = this.$(".present").data("type");
 
+        var pdata = {
+            URLtype:'fetchQualityPlanQualityLevel1',
+            data:{
+                type:1,
+                standardType: id
+            }
+        };
+
+        App.ResourceArtifacts.getQuality(pdata,_this);
         //Ë¢ÐÂµ×ÏÂcollection
     },
 

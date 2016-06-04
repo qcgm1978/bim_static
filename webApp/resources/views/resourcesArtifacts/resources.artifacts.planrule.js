@@ -18,7 +18,7 @@ App.Resources.ArtifactsPlanRule = Backbone.View.extend({
 
     initialize:function(){
         this.listenTo(App.ResourceArtifacts.PlanRules,"add",this.addOne);
-        this.getCategoryCode();
+        this.listenTo(App.ResourceArtifacts.PlanRules,"remove",this.render);
         //获取分类编码
 
     },
@@ -29,18 +29,7 @@ App.Resources.ArtifactsPlanRule = Backbone.View.extend({
     },
 
 
-    getCategoryCode:function(){
-        var cdata  = {
-            URLtype:'fetchArtifactsCategoryRule',
-            data :{
-            }
-        };
-        App.Comm.ajax(cdata,function(response){
-            if(response.code == 0 && response.data.length){
-                App.Resources.artifactsTreeData = response.data;
-            }
-        });
-    },
+
 
     //创建规则
     newPlanRule:function(){
@@ -53,6 +42,9 @@ App.Resources.ArtifactsPlanRule = Backbone.View.extend({
             //查找未保存的元素并高亮提示变红
             return
         }
+        if(!$(".ruleDetail").length){
+            $(".artifactsContent .rules ul").html("");
+        }
         //无数据或无更改，更改当前数据
         $(".ruleDetail").empty().hide();
         //创建规则
@@ -60,11 +52,22 @@ App.Resources.ArtifactsPlanRule = Backbone.View.extend({
 
         App.ResourceArtifacts.PlanRules.push(model);
 
-        if(!App.ResourceArtifacts.Status.presentPlan){
-            //没有选择任何计划
-            App.ResourceArtifacts.Status.presentPlan = model;
+        //新规则
+        if(!App.ResourceArtifacts.Status.presentRule){
+            App.ResourceArtifacts.Status.presentRule = model;
         }
-        $(".artifactsContent .rules ul li:last-child .ruleDetail").html( new App.Resources.ArtifactsPlanRuleDetailUnfold({model:model}).render().el).show();
+
+        var container = new App.Resources.ArtifactsPlanRuleDetailUnfold({model:model});
+        $(".artifactsContent .rules ul li:last-child .ruleDetail").html(container.render().el).show();
+
+        //加载底下规则
+        var newRuleView = new App.Resources.ArtifactsPlanRuleDetailOperator();
+        container.$(".mapRule").html(newRuleView.render().el);
+
+        var list = App.Resources.dealStr(model);
+        App.ResourceArtifacts.operator.add(list);
+
+
         //保存状态
         //App.ResourceArtifacts.Status.saved = false;
     }

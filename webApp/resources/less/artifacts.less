@@ -1,4 +1,4 @@
-.pozero{left: 0;top: 0;right: 0;bottom: 0;}
+.pozero{position: absolute;left: 0;top: 0;right: 0;bottom: 0;}
 .bd-1-c{border: 1px solid #cccccc;}
 .clear{clear: both;}
 .pdR60{padding-right: 60px;}
@@ -15,8 +15,10 @@
 .artifactsContent .plans,.artifactsContent  .qualifyC{position: absolute;width: 304px;padding-right: 20px;.pozero;}
 .artifactsContent  .qualifyC{display: none;}
 .artifactsContent .plans li,.artifactsContent  .qualityMenu  li {line-height: 28px;border-bottom: 1px solid #cccccc;padding: 0 17px 0 13px; cursor: pointer;font-size: 12px;}
-.artifactsContent .plans li.active,.artifactsContent  .qualityMenu  li.active{background-color: #a8dbfd;}
-.artifactsContent .artifactsList{height: 100%;.bd-1-c;}
+.artifactsContent .plans li.active,.qualityMenu  li.active{background-color: #a8dbfd;}
+.artifactsContent .artifactsList{.pozero;.bd-1-c;right: 20px;}
+.artifactsList .plcon {.pozero;top: 39px;}
+.artifactsList .plcon .list{.pozero;}
 .artifactsContent .plans h2,.artifactsContent .rules h2{line-height: 38px;padding-left: 13px;font-size: 14px;background-color: #eeeeee;border-bottom: 1px solid #cccccc;}
 .artifactsContent .plans li .right{color: #cccccc;}
 .artifactsContent .plans li .left{margin-right:  10px;}
@@ -114,3 +116,6 @@
 .qualityProcess.active .present:after{background-position: 0 -10px;}//¼¤»î²Ëµ¥
 .qualityProcess .pro:hover{background-color: #a8dbfd;}
 .qualityMenu{position: absolute;left: 0;top: 50px;right: 20px;bottom: 0;.bd-1-c}
+
+.services_loading{position: relative;}
+.services_loading:after{content: '';position: absolute;left: 0;top: 0;width: 100%;height: 100%;background: rgba(255,255,255,.3) url('../../comm/images/load.gif') center center no-repeat;background-size: 48px 48px;z-index: 99999;}

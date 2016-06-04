@@ -1,6 +1,6 @@
-<div class="leftten" data-id="<%= obj.id %>">
+<div class="leftten" data-id="<%= obj.id %>" data-name="">
     <%  var type = obj.operator,a1 = "==",a2 = "!=",a3 = "<>",a4 = "><";  %>
-    <input type="text" placeholder="请输入属性名称" value="<%= obj.propertyKey %>"><div class="myDropDown">
+    <input type="text" placeholder="请输入属性名称" value="<%= obj.propertyKey %>"><div class="myDropDown" data-operator="">
                         <span class="myDropText" data-operator = "<%= type %>">
                             <span class="text"><%=   type == a1 ? "相等" :  (type == a2 ? "不等" :  (type == a3 ? "范围内" :  (type == a4 ? "范围外" : "请选择规则")))%></span>
                             <i class="myDropArrorw down"></i>
@@ -15,16 +15,16 @@
 </div>
 <div class="eIn <%= (type == a1  || type == a2) ? 'active' : ''  %>"><input type="text" placeholder='请输入属性值，多个属性值可用英文 "," 分隔' value="<%= obj.propertyValue %>"></div><!--等于/不等于-->
 <div class="ioside  <%= (type == a3 || type == a4) ? 'active' : ''  %>"><!--范围 内/外-->
-    <div class="myDropDown">
+    <div class="myDropDown" data-operator="(">
                         <span class="myDropText" data-rule="<%= obj.ruleList.left %>">
                             <span class="text"><%= obj.ruleList.left=='(' ? '>' : (obj.ruleList.left=='[' ? "≥" : '>') %></span>
                             <i class="myDropArrorw down"></i>
                         </span><input type="number" placeholder="请输入数值"   class="leftValue" value="<%= obj.ruleList.leftValue %>">
         <ul class="myDropList">
-            <li class="myItem" data-val="("> > </li>
-            <li class="myItem" data-val="["> ≥ </li>
+            <li class="myItem" data-operator="("> > </li>
+            <li class="myItem" data-operator="["> ≥ </li>
         </ul>
-    </div><div class="myDropDown pickOpening">
+    </div><div class="myDropDown " data-operator=")">
                         <span class="myDropText" data-rule="<%= obj.ruleList.right  %>">
                             <span class="text"><%= obj.ruleList.right==')' ? '<' : (obj.ruleList.right==']' ? "≤" : '<') %></span>
                             <i class="myDropArrorw down"></i>
