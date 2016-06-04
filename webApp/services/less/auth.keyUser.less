@@ -80,10 +80,16 @@ ul,li{list-style: none outside none;}
   }
 }
 .serviceWindow{
+  .righttitle{
+    margin-bottom: 12px;
+  }
   .toselected{
     &>p>span{
       background: #A8DBFD;
     }
+  }
+  .none{
+    display: none;
   }
   .icon-person{
     display: inline-block;
@@ -93,7 +99,7 @@ ul,li{list-style: none outside none;}
   }
   .keyU{
     width: 100%;
-    height: 300px;
+    height: 312px;
     &>div{
       margin-top: 20px;
       float: left;
@@ -105,6 +111,7 @@ ul,li{list-style: none outside none;}
         width: 240px;
         height: 30px;
         border: 1px solid #ccc;
+        margin-bottom: 12px;
         input{
           display: block;
           width: 207px;
@@ -117,8 +124,15 @@ ul,li{list-style: none outside none;}
           display: block;
           float: right;
           width: 30px;
+          padding: 5px 0 0 7px;
           height: 100%;
           border-left: 1px solid #ccc;
+          i{
+            background: url(../../comm/images/commIcon.png) no-repeat 1px -477px;
+            display: block;
+            width: 15px;
+            height: 17px;
+          }
         }
       }
       p.title{
@@ -126,7 +140,6 @@ ul,li{list-style: none outside none;}
         color: #999;
         height: 30px;
         background: #eee;
-        border-bottom: 1px solid #ccc;
         .myh;
         font-size:14px;
         line-height:30px;
