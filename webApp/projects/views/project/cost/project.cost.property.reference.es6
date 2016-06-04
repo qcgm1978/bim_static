@@ -48,6 +48,7 @@ App.Project.CostReference = Backbone.View.extend({
 			ids=$target.data("userId"),
 			box=$target.data("box");
 		if ($target.hasClass("selected")) {
+			return
 			this.$(".tbBodyScroll").find(".selected").removeClass("selected");
 		} else {
 			this.$(".tbBodyScroll").find(".selected").removeClass("selected");
@@ -66,7 +67,6 @@ App.Project.CostReference = Backbone.View.extend({
 			}
 		};
 		App.Comm.ajax(data, function(data) {
-			debugger
 			if (data.code == 0) {
 				var box=App.Project.formatBBox(data.data.boundingBox);
 				$target.data("userId", data.data.elements);

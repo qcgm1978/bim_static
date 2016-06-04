@@ -74,7 +74,6 @@ App.Project = {
 				fileVersionId: Request.id
 			}
 		}).done(function(data) {
-
 			if (_.isString(data)) {
 				// to json
 				if (JSON && JSON.parse) {
