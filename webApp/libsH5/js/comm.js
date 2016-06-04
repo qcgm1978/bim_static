@@ -51,7 +51,7 @@
           var $item = $(item),
               isChecked = $item.find('input').prop('checked'),
               userData = $item.data('userData')?$item.data('userData').toString():'';
-          if(select == 'ckecked' && !isChecked || select == 'all'){
+          if(select == 'uncheck' && !isChecked || select == 'checked' && isChecked || select == 'all'){
             regData.push(userData);
           }
         });
@@ -74,11 +74,12 @@
           var $item = $(item),
               isChecked = $item.find('input').prop('checked'),
               userData = $item.data('userData') ? $item.data('userData').toString().split(","):[];
-          if(select == 'ckecked' && !isChecked || select == 'all'){
+          if(select == 'uncheck' && !isChecked || select == 'checked' && isChecked || select == 'all'){
             result.ids = result.ids.concat(userData);
           }
           result.total = result.total.concat(userData);
         });
+        result.ids = result.ids.unique();
         result.total = result.total.unique();
         result.total = result.total.minus(result.ids);
       }else{
@@ -86,7 +87,7 @@
           var $item = $(item),
               isChecked = $item.find('input').prop('checked'),
               userData = $item.data('userData') ? $item.data('userData').toString().split(","):[];
-          if(select == 'ckecked' && !isChecked || select == 'all'){
+          if(select == 'uncheck' && !isChecked || select == 'checked' && isChecked || select == 'all'){
             result.ids = result.ids.concat(userData);
           }
         });
@@ -133,16 +134,17 @@
         childrenType:'arr',
         data:'',
         id:'',
-        isChecked:true
+        isChecked:true,
+        isSelected:false
       },
       _opt = $.extend({},defualts,options);
       return renderTree(_opt.arr,_opt.name,_opt.dataType);
       function renderTree(arr,name,dataType,prefix){
         if(arr.length == 0) return;
-        var tree = $('<div class="tree"></div>');
+        var tree = $('<ul class="tree"></ul>');
         $.each(arr,function(i,item){
           var type = _opt.type,
-              itemName,data,iconStatus,input;
+              itemName,data,iconStatus,input,span;
           if(dataType == 'arr'){
             itemName = item[name];
             data = item[_opt.data] ? item[_opt.data].toString() :'';
@@ -164,11 +166,15 @@
           }else{
             input = '<input type="checkbox" />'
           }
+          if(_opt.isSelected){
+           span = '<span class="treeText selected">'+itemName+'</span>'
+          }else{
+            span = '<span class="treeText">'+itemName+'</span>'
+          }
           var tmpHtml = $('<li class="itemNode" data-type="'+type+'">\
             <div class="itemContent">\
             <i class="'+iconStatus+'"></i>\
-            <label class="treeCheckbox">'+input+'<span class="m-lbl"></span></label>\
-            <span class="treeText">'+itemName+'</span>\
+            <label class="treeCheckbox">'+input+'<span class="m-lbl"></span></label>'+span + '\
           </div></li>');
           tmpHtml.data('userData',data);
           if(item[_opt.children]&&typeof item[_opt.children] =="object"){
@@ -210,6 +216,44 @@
     setModelBgColor:function(color){
       if(window.localStorage){
         localStorage.setItem('modelBgColor',color);
+      }
+    },
+    renderSelected:function(data){
+      var fileData = bimView.sidebar.fileData;
+      var rootDom = $('#selected .selectTree');
+      var treeData = {};
+      var treeHtml = $('<div class="tree"></div>');
+      $.each(data,function(i,item){
+        var name = fileData[item.modelId];
+        var parents = treeHtml.find('[data-type='+name+']')
+        if(parents.length >0){
+          var child = parents.find('[data-type='+item.cateName+']')
+          if(child.length>0){
+            child.find('.tree').append(createli(item.name,false));
+          }else{
+            parents.append(createUl(item.cateName,createUl(item.name,false)))
+          }
+        }else{
+          var child = createUl(item.cateName,createUl(item.name,false));
+          var parent = $(createli(name,true)).append(child);
+          treeHtml.append(parent);
+        }
+      });
+      rootDom.html(treeHtml);
+      function createUl(parent,child){
+        var ul = $('<ul class="tree"></ul>');
+        var li = $(createli(parent,child)).append(child);
+        return ul.append(li);
+      }
+      function createli(name,hasChild){
+        var icon = hasChild ? 'm-closeTree' : 'noneSwitch'
+        var dom = '<li class="itemNode open" data-type="'+name+'">\
+              <div class="itemContent">\
+                <i class="'+ icon +'"></i>\
+                <span class="treeText">'+name+'</span>\
+              </div>\
+            </li>';
+        return dom;
       }
     }
   }

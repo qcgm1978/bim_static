@@ -1,4 +1,4 @@
-.pozero{left: 0;top: 0;right: 0;bottom: 0;}
+.pozero{position: absolute;left: 0;top: 0;right: 0;bottom: 0;}
 .bd-1-c{border: 1px solid #cccccc;}
 .clear{clear: both;}
 .pdR60{padding-right: 60px;}
@@ -12,10 +12,13 @@
 #artifacts{position: absolute;top: 87px;;z-index: 2;left: 0;right: 0;bottom: 0;}
 
 .artifactsContent{position: absolute;top: 58px;left: 20px;right: 20px;bottom: 20px;font-size: 12px;}
-.artifactsContent .plans{position: absolute;width: 304px;padding-right: 20px;.pozero;}
-.artifactsContent .plans li{line-height: 28px;border-bottom: 1px solid #cccccc;padding: 0 17px 0 13px; cursor: pointer;font-size: 12px;}
-.artifactsContent .plans li.active{background-color: #a8dbfd;}
-.artifactsContent .plans .artifactsList{height: 100%;.bd-1-c;}
+.artifactsContent .plans,.artifactsContent  .qualifyC{position: absolute;width: 304px;padding-right: 20px;.pozero;}
+.artifactsContent  .qualifyC{display: none;}
+.artifactsContent .plans li,.artifactsContent  .qualityMenu  li {line-height: 28px;border-bottom: 1px solid #cccccc;padding: 0 17px 0 13px; cursor: pointer;font-size: 12px;}
+.artifactsContent .plans li.active,.qualityMenu  li.active{background-color: #a8dbfd;}
+.artifactsContent .artifactsList{.pozero;.bd-1-c;right: 20px;}
+.artifactsList .plcon {.pozero;top: 39px;}
+.artifactsList .plcon .list{.pozero;}
 .artifactsContent .plans h2,.artifactsContent .rules h2{line-height: 38px;padding-left: 13px;font-size: 14px;background-color: #eeeeee;border-bottom: 1px solid #cccccc;}
 .artifactsContent .plans li .right{color: #cccccc;}
 .artifactsContent .plans li .left{margin-right:  10px;}
@@ -42,7 +45,7 @@
 .ruleDetail{background-color: #eeeeee;padding: 0 14px;}
 .ruleDetail .title{width: 90px;text-align: right;padding-right: 10px;position: absolute;top: 5px;left: 0;}
 .ruleDetail .conR{margin-left: 85px;position: relative;}
-.ruleDetail .conR ul{display: none;position: absolute;z-index: 2;left: 0;top: 39px;width: 540px;background-color: #ffffff;border: solid #cccccc;border-width: 0 1px 1px 1px;}
+.ruleDetail .conR ul{display: none;position: absolute;z-index: 2;left: 0;top: 38px;width: 540px;background-color: #ffffff;border: solid #cccccc;border-width: 0 1px 1px 1px;}
 .ruleDetail .conR ul li {line-height: 25px;padding: 0 12px;cursor: pointer;}
 .ruleDetail .conR ul li span {float: left;width: 120px;}
 .ruleDetail .conR ul li:hover{background-color: #a8dbfd;}
@@ -52,7 +55,7 @@
 
 
 .ruleDetail .typeCode input{width: 540px;position: relative;z-index: 3;opacity: 0;background: transparent;border-color:#eeeeee ;height: 30px;line-height: 28px;}
-.ruleDetail .conR .chide{position: absolute;display: block;z-index: 2;width: 540px;left: 0;top: 9px;height: 30px;line-height: 28px;border: 1px solid #cccccc;margin-right: 9px;padding-left: 5px;}
+.ruleDetail .conR .chide{position: absolute;background-color: #ffffff;display: block;z-index: 2;width: 540px;left: 0;top: 9px;height: 30px;line-height: 28px;border: 1px solid #cccccc;margin-right: 9px;padding-left: 5px;}
 .ruleDetail .typeCode input.active{border-color:#cccccc ;background: #ffffff;}
 
 .ruleDetail .conR .choose{position: absolute;left: 480px;width: 60px;height: 100%;top: 0;padding-left: 20px;z-index: 5;cursor: pointer;color: #006ecf;}
@@ -86,7 +89,7 @@
 .resourcesAlert .alertRole{text-align: center;display: none;}
 .resourcesAlert .confirm input{outline: none;}
 /*导航*/
-.breadcrumbNav .mappingRule{float: right;}
+.breadcrumbNav .mappingRule{float: right;display: none;}
 .breadcrumbNav .mappingRule a{margin-right: 27px;border-bottom: 2px solid #ffffff;float: right;margin-top: 6px;}
 .breadcrumbNav .mappingRule a.active{border-bottom: 2px solid #006ecf;}
 .mappingRule a,.mappingRule a:link,.mappingRule a:active,.mappingRule a:visited{color: #333333;text-decoration: none;line-height: 28px;font-size: 14px;}
@@ -98,8 +101,21 @@
 .ruleNodeName i{float: left;width: 9px;height: 9px;margin: 10px 5px 0 0;}
 .ruleNodeName i.hasChild{background: url('../../comm/images/tree.png') 0 -9px no-repeat;background-size: 20px auto;cursor: pointer;}
 .ruleNodeName i.hasChild{background-position :  0 -20px;}
-.ruleNodeName i.hasChild.active{}
+.ruleNodeName i.hasChild.active{background-position :  0 0;}
 .ruleNodeName span.name{float: left;padding:0 5px;line-height: 25px;cursor: pointer;}
 .ruleNodeName span.name.active{background-color: #a8dbfd;}
 .windowSubmit {position: absolute;right: 20px;bottom: 20px;background-color: #0572d0;color: #ffffff;width: 80px;height: 30px;line-height: 30px;text-align: center;cursor: pointer;}
 .windowSubmit:hover{background-color: #1584e3;}
+
+
+.qualityProcess{position: absolute;left: 0;top: 0;right: 20px;height: 40px;.bd-1-c;line-height: 38px;overflow: hidden;background-color: #ffffff;}
+.qualityProcess div{padding: 0 17px 0 13px;cursor: pointer;}
+.qualityProcess .present{position: relative;}//当前箭头
+.qualityProcess .present:after{content: '';position: absolute;width: 8px;height: 4px;right: 8px;top: 17px;background: url('../../comm/images/commIcon.png') 0 0 no-repeat;background-size: 80px auto;}//当前箭头
+.qualityProcess.active {height: 80px;z-index: 3;}
+.qualityProcess.active .present:after{background-position: 0 -10px;}//激活菜单
+.qualityProcess .pro:hover{background-color: #a8dbfd;}
+.qualityMenu{position: absolute;left: 0;top: 50px;right: 20px;bottom: 0;.bd-1-c}
+
+.services_loading{position: relative;}
+.services_loading:after{content: '';position: absolute;left: 0;top: 0;width: 100%;height: 100%;background: rgba(255,255,255,.3) url('../../comm/images/load.gif') center center no-repeat;background-size: 48px 48px;z-index: 99999;}

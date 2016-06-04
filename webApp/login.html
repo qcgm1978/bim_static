@@ -1,101 +1,97 @@
 <!DOCTYPE html>
 <html>
-
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>万达-登录</title>
-    <link rel="styleSheet" href="/login/css/login.less" />
-</head>
-
-<body>
-    <form>
-        <div id="loginBox">
-             <div id="mainBox">
-                <div class="logo">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>万达-登录</title>
+        <link rel="styleSheet" href="/login/css/login.less" />
+    </head>
+    <body>
+        <div class="layout">
+            <form class="loginForm">
+                <div id="loginBox">
+                    <div id="mainBox">
+                        <div class="logo">
+                        </div>
+                        <div class="headTitle">
+                            <h1>万达BIM信息化集成管理平台</h1>
+                            <ul class="introduction">
+                                <li class="item first">管理前置</li>
+                                <li class="item">协调同步</li>
+                                <li class="item">模式统一</li>
+                            </ul>
+                        </div>
+                        <div class="loginDialog">
+                            <div class="header">万达BIM平台</div>
+                            <div class="errorMSG"> <span class="iconWarning"></span> <span class="tip">用户名或密码错误</span></div>
+                            <div class="relative">
+                                <input type="text" id="userName" class="txtInput" placeholder="请输入用户名" />
+                                <span class="txtIcon"></span>
+                            </div>
+                            <div class="relative">
+                                <input type="password" id="userPwd" class="txtInput" placeholder="请输入密码" />
+                                <span class="txtIcon userPwd"></span>
+                            </div>
+                            <div class="loginHelper">
+                                <div class="forgotPwd"><a href="###">忘记密码？</a></div>
+                                <div class="remember">一周内自动登录</div>
+                            </div>
+                            <input class="btnLogin" id="btnLogin" type="button" value="立即登录" />
+                        </div>
+                    </div>
                 </div>
-
-                <div class="headTitle">
-                    <h1>万达BIM信息化集成管理平台</h1>
-                    <ul class="introduction">
-                        <li class="item first">管理前置</li>
-                        <li class="item">协调同步</li>
-                        <li class="item">模式统一</li>
+            </form>
+            <div class="footerWrap">
+                <div class="footer">
+                    <ul>
+                        <li class="item">
+                            <div class="iconBg iconPlanning"></div>
+                            <div class="introduction">
+                                <div class="title">规划设计</div>
+                                <div class="desc">
+                                    多专业模型的集成浏览和碰撞检查，提升规划设计的效率。
+                                </div>
+                            </div>
+                        </li>
+                        <li class="item">
+                            <div class="iconBg iconPlan"></div>
+                            <div class="introduction">
+                                <div class="title">计划管理</div>
+                                <div class="desc">
+                                    将进度计划与BIM模型挂接，实现了可视化的进度管理。
+                                </div>
+                            </div>
+                        </li>
+                        <li class="item">
+                            <div class="iconBg iconCost"></div>
+                            <div class="introduction">
+                                <div class="title">成本管理</div>
+                                <div class="desc">
+                                    将工程量和成本数据与BIM模型挂接，实现成本的有效控制。
+                                </div>
+                            </div>
+                        </li>
+                        <li class="item last">
+                            <div class="iconBg iconQuality"></div>
+                            <div class="introduction">
+                                <div class="title">质量管理</div>
+                                <div class="desc">
+                                    在BIM模型中预置检查点，方便质量管理人员进行质量管理。
+                                </div>
+                            </div>
+                        </li>
                     </ul>
                 </div>
-
-                <div class="loginDialog">
-                    <div class="header">万达BIM平台</div>
-                    <div class="errorMSG"> <span class="iconWarning"></span> <span class="tip">用户名或密码错误</span></div>
-                    <div class="relative">
-                        <input type="text" id="userName" class="txtInput" placeholder="请输入用户名" />
-                        <span class="txtIcon"></span>
-                    </div>
-                    <div class="relative">
-                        <input type="password" id="userPwd" class="txtInput" placeholder="请输入密码" />
-                        <span class="txtIcon userPwd"></span>
-                    </div>
-                    <div class="loginHelper">
-                        <div class="forgotPwd"><a href="###">忘记密码？</a></div>
-                        <div class="remember">一周内自动登录</div>
-                    </div>
-                    <input class="btnLogin" id="btnLogin" type="button" value="立即登录" />
-                </div>
             </div>
-            
-            <div class="footerWrap">
-            <div class="footer">
-                <ul>
-                    <li class="item">
-                        <div class="iconBg iconPlanning"></div>
-                        <div class="introduction">
-                            <div class="title">规划设计</div>
-                            <div class="desc">
-                                多专业模型的集成浏览和碰撞检查，提升规划设计的效率。
-                            </div>
-                        </div>
-                    </li>
-                    <li class="item">
-                        <div class="iconBg iconPlan"></div>
-                        <div class="introduction">
-                            <div class="title">计划管理</div>
-                            <div class="desc">
-                                将进度计划与BIM模型挂接，实现了可视化的进度管理。
-                            </div>
-                        </div>
-                    </li>
-                    <li class="item">
-                        <div class="iconBg iconCost"></div>
-                        <div class="introduction">
-                            <div class="title">成本管理</div>
-                            <div class="desc">
-                                将工程量和成本数据与BIM模型挂接，实现成本的有效控制。
-                            </div>
-                        </div>
-                    </li>
-                    <li class="item last">
-                        <div class="iconBg iconQuality"></div>
-                        <div class="introduction">
-                            <div class="title">质量管理</div>
-                            <div class="desc">
-                                在BIM模型中预置检查点，方便质量管理人员进行质量管理。
-                            </div>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-             </div>
             <div class="clear"></div>
             <div class="copyrightBox">
                 大连万达商业地产股份有限公司 &copy; 2016 WANDA版权所有
             </div>
         </div>
-    </form>
-    <script type="text/javascript" src="/login/js/jquery-1.12.0.min.js"></script>
-    <script type="text/javascript" src="/login/js/login.es6"></script>
-    <script type="text/javascript">
+        <script type="text/javascript" src="/login/js/jquery-1.12.0.min.js"></script>
+        <script type="text/javascript" src="/login/js/login.es6"></script>
+        <script type="text/javascript">
         Login.init();
-    </script>
-</body>
-
+        </script>
+    </body>
 </html>

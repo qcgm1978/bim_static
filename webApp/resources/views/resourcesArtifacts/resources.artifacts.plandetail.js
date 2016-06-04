@@ -8,7 +8,7 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
     template: _.templateUrl("/resources/tpls/resourcesArtifacts/resources.artifacts.plandetail.html"),
 
     events:{
-        "click .planItem":"getPlanId"
+        "click .item":"getPlanId"
     },
 
     render:function() {
@@ -37,22 +37,11 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
         }
 
         if(!App.ResourceArtifacts.Status.saved){
-
-            //提示部分
-         /*   $.tip({
-                type:'success',
-                message:'您还有没保存的',
-                timeout:2000
-            });*/
-
             alert("您还有没保存的");
-            //更改部分判断
-            //更改部分变红
-            //提示有没有保存现在的，重要
             return
         }
 
-        $(".artifactsContent .rules ul").empty();
+
 
         this.toggleClass();
         this. getRules();
@@ -60,6 +49,7 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
         //保存计划规则
         App.ResourceArtifacts.Status.presentPlan = null;
         App.ResourceArtifacts.Status.presentPlan = this.model;
+        console.log(App.ResourceArtifacts.Status.presentPlan);
     },
 //切换计划
     toggleClass:function(){
@@ -77,15 +67,20 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
         var pdata = {
             URLtype: "fetchArtifactsPlanRule",
             data:{
-                code:code
+                code:code,
+                biz :App.ResourceArtifacts.Status.biz,
+                type:App.ResourceArtifacts.Status.type
             }
         };
+
+
         App.Comm.ajax(pdata,function(response){
             if(response.code == 0 ){
                 App.ResourceArtifacts.PlanRules.reset();
+                $(".artifactsContent .rules h2 .name").html(_this.model.get("code") + "&nbsp;" +_this.model.get("name"));
+                $(".artifactsContent .rules h2 i").html( "("+response.data.length + ")");
                 if(response.data  &&  response.data.length){
-                    $(".artifactsContent .rules h2 i").html( "("+response.data.length + ")");
-                    $(".artifactsContent .rules h2 .name").html(_this.model.get("code") + "&nbsp;" +_this.model.get("name"));
+                    $(".artifactsContent .rules ul").empty();
                     App.ResourceArtifacts.PlanRules.add(response.data);
                 }
             }

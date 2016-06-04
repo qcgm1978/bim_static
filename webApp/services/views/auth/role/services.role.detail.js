@@ -62,6 +62,7 @@ App.Services.roleDetail=Backbone.View.extend({
             //隐藏可选项
             $(".memCheck").hide();
             $(".windowSubmit").hide();
+            $("#selectedRoleName").attr("disabled","disabled");
             $(".seWinBody .func li .name span.rohead ").hide();
         });
     },

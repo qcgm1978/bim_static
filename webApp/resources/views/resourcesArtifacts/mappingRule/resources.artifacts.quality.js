@@ -1,13 +1,13 @@
 /**
  * @require /resources/collection/resource.nav.es6
  */
-App.Resources.ArtifactsPlanList = Backbone.View.extend({
+App.Resources.ArtifactsQuality = Backbone.View.extend({
 
     tagName:"div",
 
     className: "artifactsList",
 
-    template: _.templateUrl("/resources/tpls/resourcesArtifacts/resources.artifacts.planlist.html"),
+    template: _.templateUrl("/resources/tpls/resourcesArtifacts/mappingRule/resources.artifacts.quality.html"),
 
     render:function() {
         this.$el.html(this.template);
@@ -21,6 +21,5 @@ App.Resources.ArtifactsPlanList = Backbone.View.extend({
     addOne:function(model) {
         var newList = new App.Resources.ArtifactsPlanDetail({model: model});
         this.$("ul").append(newList.render().el);
-        App.Comm.initScroll($(".list"),"y");
     }
 });

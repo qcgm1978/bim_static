@@ -13,20 +13,17 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
         "click .deleteRule":"deleteRule",
         "click .saveRule":"saveRule",
         "click .choose":"choose",
-        "click .myDropText":"seleRule",
-        "click .myItem":"myItem",
         "click .delRule": "delRule",
         "focus .categoryCode": "legend"
-        //"blur .categoryCode": "legendClose"
     },
     render:function() {
+        console.log(this.model);
         this.$el.html(this.template(this.model.toJSON()));
         return this;
     },
-    initialize:function(){
+    initialize:function(model){
         this.listenTo(this.model,"change",this.render);
         this.listenTo(this.model,"mappingCategoryChange",this.render);
-        //this.getValue("(30,40]");
     },
     //选择分类编码
     choose:function(){
@@ -37,42 +34,14 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
         $("#resourcesArtifactTree").html(contain);
         App.ResourceArtifacts.presentRule = this;
     },
-    //选择规则，切换输入方式
-    myItem:function(e){
-        var _this = $(e.target);
-        var val = _this.data("val");
-        var text = _this.text();
-        var parent =  _this.parent(".myDropList");
-        var eIn = _this.closest(".leftten").siblings(".eIn");
-        var ioside  = _this.closest(".leftten").siblings(".ioside");
-        //数据写入模型
-        parent.hide().siblings(".myDropText").find(".text").text(text);
-        if(val == "==" || val == "!="){
-            ioside.removeClass("active");
-            if(eIn.hasClass("active")){return}
-            eIn.addClass("active");
-        }else if(val == "<>" || val == "><"){
-            eIn.removeClass("active");
-            if(ioside.hasClass("active")){return}
-            ioside.addClass("active");
-        }
-    },
-    //切换规则
-    seleRule:function(e){
-        $(".myDropList").hide();
-        var _this = $(e.target);
-        _this.siblings(".myDropList").show();
-    },
+
+
     //增加新规则
     addNewRule:function(){
-        var _this = this;
         var model = new App.ResourceArtifacts.newRule(App.ResourceArtifacts.newModel);
-        var newRule = new App.Resources.ArtifactsPlanRuleDetailNew({model:model}).render().el;
-        this.$(".conR dl").append(newRule);
-        //因为新建整条与修改的模型不一致
-        //向collection添加
-        //向this.model 添加一条属性
+        App.ResourceArtifacts.operator.add(model);
     },
+
     //保存
     saveRule:function(){
         //校验
@@ -80,50 +49,115 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
         if(!check){return}
 
         var _this =this;
+
+        //查找所有数据，拼接成字符串
+        var title =  this.$(".ruleTitle");
+        var id = title.data("id");
+        var categoryName = this.$(".chide").data("name");
+
+        var categoryCode = this.$(".typeCode input").val();
+
+        if(!categoryCode){
+            alert("规则编码不能为空!");
+        }
+
+        var model = App.ResourceArtifacts.saveRuleModel();
+        var dd =  this.$("dd");
+        var Rulist = [];
+        var targetCode = this.$(".typeCode input").val();
+        var targetName = this.$(".chide").data("targetName");
+
+        for(var i =0 ; i < dd.length ; i++){
+            Rulist[i]  ={};
+            var propertyKey = dd.eq(i).find(".leftten input");
+            if(!propertyKey.val()){
+                propertyKey.focus();
+                alert("规则名称不能为空！");
+                return
+            }
+            Rulist[i].propertyKey = propertyKey.val();
+
+            if(!dd.eq(i).find(".ioside.active").length && !dd.eq(i).find(".eIn.active").length){
+                alert("至少选一项规则！");
+                return
+            }
+            Rulist[i].operator = dd.eq(i).find(".leftten .myDropText").data("operator");
+            if(dd.eq(i).find(".eIn").hasClass("active")){
+                var name = dd.eq(i).find(".eIn input");
+
+                if(!name.val()){
+                    name.focus();
+                    alert("规则内容不能为空");
+                    return
+                }
+                Rulist[i].propertyValue = name.val();
+
+            }else if(dd.eq(i).find(".ioside").hasClass("active")){
+                var left = dd.eq(i).find(".ioside .myDropDown").eq(0);
+                var leftValue = dd.eq(i).find(".ioside input").eq(0);
+                var right = dd.eq(i).find(".ioside .myDropDown").eq(1);
+                var rightValue = dd.eq(i).find(".ioside input").eq(1);
+
+                if(!leftValue.val() && !rightValue.val()){
+                    leftValue.focus();
+                    alert("请至少填写一项数据");
+                    //设定数据
+                    return
+                }
+
+                var str = left.data("operator")  + leftValue.val() + rightValue.val()+ right.data("operator") ;
+                Rulist[i].propertyValue = str;
+            }
+        }
+
+        model.id = this.model.get("id");
+        model.biz =  this.model.get("biz") || App.ResourceArtifacts.Status.biz; //后期设定
+        model.type =  this.model.get("type") || App.ResourceArtifacts.Status.type; //后期设定
+        model.targetCode =  this.model.get("targetCode") || App.ResourceArtifacts.Status.presentPlan.get("code");
+        model.targetName =  this.model.get("targetName") || App.ResourceArtifacts.Status.presentPlan.get("targetName");
+        model.mappingCategory.categoryCode = categoryCode;
+        model.mappingCategory.categoryName = categoryName;
+        model.mappingCategory.mappingPropertyList = Rulist;
+
+
+
         var cdata = {
             URLtype : '',
             type:"POST",
-            data:{}
+            data : JSON.stringify(model),
+            contentType: "application/json",
+            projectId : App.ResourceArtifacts.Status.projectId
         };
+
+
         if(this.model.get("id")){
             cdata.URLtype = "modifyArtifactsPlanRule";
+            model.id = this.model.get("id");
+            cdata.type ="PUT";
             //更新
         }else{
             cdata.URLtype = "createArtifactsPlanNewRule";
             //创建
         }
-        //临时内容
-        this.$el.closest(".ruleDetail").hide().empty();
-        App.ResourceArtifacts.Status.saved = true ;//保存状态
-        //
-        App.Comm.ajax(cdata,function(response){
-            if(response.code == 0 && response.data.id){
 
+        $(".artifactsContent .rules").addClass("services_loading");
+        App.Comm.ajax(cdata,function(response){
+            if(response.code == 0 && response.data){
                 //创建
                 if(cdata.URLtype == "createArtifactsPlanNewRule"){
-                    _this.createRule();
-                }
+                    _this.model.clear();
+                    _this.model.set(model);
+                    _this.model.set("id",response.data.id);
 
+                }
                 _this.$el.closest(".ruleDetail").hide().empty();
                 _this.reset();
+                $(".artifactsContent .rules").removeClass("services_loading");
             }
         });
-      /* 返回数据 {
-            "messageId": "8dd37a0f592c4d7e8a13895ea1ac3c2a",
-            "messageType": null,
-            "timestamp": 1464599023448,
-            "code": 0,
-            "message": "success",
-            "data": {
-            "id": 842508543648096
-            }
-        }
-        */
+
     },
-    //创建
-    createRule:function(response){
-        this.model.set("id",response.data.id);
-    },
+
     //重置保存状态
     reset:function(){
         App.ResourceArtifacts.Status.saved = true ;
@@ -131,6 +165,7 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
 
     //删除计划中的整条规则
     deleteRule:function(){
+        App.ResourceArtifacts.Status.delRule = this.model.get("id");
         var _this = this;
         //新建且未修改
         if(!_this.model.get("id") && App.ResourceArtifacts.Status.saved){//如果未修改则清空，注意新建时已修改   App.ResourceArtifacts.Status.saved 值，因此
@@ -163,7 +198,6 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
         _this.model.set(".mappingPropertyList",list);
         rule.closest("dd").remove();
     },
-
     //联想模块
     legend:function(e){
         var _this = this;
@@ -185,9 +219,9 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
             pre.removeClass("alert");
         });
 
-
-        pre.on("keyup",function(ev){
-            var val = pre.val(),test, count = 5,str = '',index,arr = [];  //显示5条
+        pre.on("keyup",function(e){
+            App.Resources.cancelBubble(e);
+            var val = pre.val(),test, count = 5,str = '',index,arr = [],unResult = "<li>搜索：无匹配结果</li>";  //显示5条
             list.html("");
             val = val.replace(/\s+/,'');
             if(!val){list.hide();return}
@@ -195,13 +229,14 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
             //禁止输出除数字，半角句号外的
             test = /[^\d\.]+/.test(val);
             if(test){
-                list.html("<li>搜索：无匹配结果</li>");
+                list.html(unResult);
                 return;
             }
 
             str = val;
             var x = str.length%3;
             if(x ==0){
+                if(_.last(str) != "."){ list.html(unResult);return}
                 str = _.initial(str);
                 str = str.join('');
                 index = _.indexOf(ac,str,true);
@@ -218,27 +253,17 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
             }
 
             if(index < 0 ){
-                list.html("<li>搜索：无匹配结果</li>");
+                list.html(unResult);
                 return
             }
             for(var j = index  ;  j < App.Resources.artifactsTreeData.length  ; j++){
                 if(App.Resources.artifactsTreeData[j].length <= val.length ||  j - index  + 1 >count) {
                     break
                 }
-               // arr.push(App.Resources.artifactsTreeData[j]);
-                //此处创建新view
                 var newRule = new App.ResourceArtifacts.newCode(App.Resources.artifactsTreeData[j]);
                 list.append(new App.Resources.ArtifactsRuleLegend({model:newRule}).render().el);
             }
         });
-    },
-    //关闭联想
-    legendClose:function(e){
-        $(e.target).removeClass("active");
-        var val = $(e.target).val();
-        //此处要保存数据
-        this.$(".chide").css({"visibility":"visible"});
-        $(e.target).css({"opacity":"0"}).closest("div").siblings("ul").hide();
     },
 
     //校验模块
@@ -246,9 +271,10 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
         var vals = this.$(".categoryCode");
         if(!vals.val()){
             vals.focus();
-            this.redAlert(vals)
+            this.redAlert(vals);
+            return false;
         }
-        return false;
+       return true
     },
     //初始化窗口
     window:function(frame){
@@ -264,30 +290,8 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
             message:frame
         });
     },
-
     //红色提示输入
     redAlert:function(ele){
         ele.addClass("alert");
-    },
-
-    //因为数据格式导致的保存数据到模型的额外内容
-    saveDataToModel:function(title,data){
-        var con = App.ResourceArtifacts.presentRule.model.get("mappingCategory");
-        con[title] =  typeof data == "number" ? data + '' : data;
-        App.ResourceArtifacts.presentRule.model.set({"mappingCategory":con});
-        App.ResourceArtifacts.presentRule.model.trigger("mappingCategoryChange");//重绘模型
-    },
-    //因为数据格式导致的保存数组到模型的额外内容
-    saveArrayToModel:function(id,title,data){
-        var con = App.ResourceArtifacts.presentRule.model.get("mappingCategory");
-        var arr = con.mappingPropertyList;
-        for(var i = 0 ;i < arr.length ; i++){
-            if(arr[i].id == id){
-                arr[i][title] =data;
-            }
-        }
-        con.mappingPropertyList = arr;
-        App.ResourceArtifacts.presentRule.model.set({"mappingCategory":con});
-        App.ResourceArtifacts.presentRule.model.trigger("mappingCategoryChange");//重绘模型
     }
 });

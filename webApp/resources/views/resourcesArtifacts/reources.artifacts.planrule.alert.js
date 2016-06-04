@@ -24,17 +24,20 @@ App.Resources.ArtifactsPlanRuleAlert = Backbone.View.extend({
     },
     //确定
     sure : function(){
+        var id =App.ResourceArtifacts.Status.delRule ;
 
         $.ajax({
-            url:"http://bim.wanda-dev.cn/platform/mapping/rule/delete/" +"id",
+            url:"http://bim.wanda-dev.cn/platform/mapping/rule/delete/" + id,
             type:"DELETE",
             success:function(response){
-
                  if(response.code==0){ //删除成功
-                     this.$el.closest(".ruleDetail").hide().empty();
+                     $(".ruleDetail").hide().empty();
                      App.ResourceArtifacts.Status.saved = true ;//保存状态
-                     App.ResourceArtifacts.Status.presentPlan= null; //重置模型
+                     App.ResourceArtifacts.PlanRules.remove(App.ResourceArtifacts.Status.presentPlan);//删除模型
+                     App.ResourceArtifacts.Status.presentPlan= null; //重置当前模型
                      App.Resources.ArtifactsAlertWindow.close();
+
+
                 }
             },
             error:function(error){
@@ -42,6 +45,8 @@ App.Resources.ArtifactsPlanRuleAlert = Backbone.View.extend({
                 App.Resources.ArtifactsAlertWindow.close();
             }
         });
+
+        App.ResourceArtifacts.Status.delRule = null;
     },
         //取消
     cancel:function(){

@@ -1,4 +1,4 @@
-<div class="typeCode" data-id="<%= obj.mappingCategory.id %>">
+<div class="typeCode" data-id="" data-name="<%= obj.mappingCategory.categoryName %>">
     <div class="title">分类编码:</div>
     <div class="conR">
         <div>
@@ -10,62 +10,4 @@
         </ul><!--联想接口，最多显示5条-->
     </div>
 </div>
-<div class="mapRule clearfix">
-    <div class="title">属性映射规则:</div>
-    <div class="conR">
-        <dl>
-            <%  var rList = obj.mappingCategory.mappingPropertyList ;  if (rList && rList.length) { for (var i = 0 ; i < rList.length ; i++) {   var  type = rList[i].operator ; %>
-            <dd>
-                <div class="leftten" data-id="<%= rList[i].id %>">
-                    <input type="text" placeholder="请输入属性名称" value="<%= rList[i].propertyValue %>"><div class="myDropDown">
-                        <span class="myDropText">
-                            <span class="text">
-                            <%=   type == "==" ? "相等" :  (type == "!=" ? "不等" :  (type == "<>" ? "范围内" :  (type == "><" ? "范围外" : "请选择规则")))%>
-                        </span>
-                            <i class="myDropArrorw down"></i>
-                        </span>
-                        <ul class="myDropList">
-                            <li class="myItem" data-val="==">等于</li>
-                            <li class="myItem" data-val="!=">不等于</li>
-                            <li class="myItem" data-val="<>">范围内</li>
-                            <li class="myItem" data-val="><">范围外</li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="eIn <%= (rList[i].operator == '==' || rList[i].operator == '!=') ? 'active' : ''  %>"><input type="text" placeholder='请输入属性值，多个属性值可用英文 "," 分隔' value="<%= rList[i].propertyValue %>"></div><!--等于/不等于-->
-                <div class="ioside  <%= (rList[i].operator == '<>' || rList[i].operator == '><') ? 'active' : ''  %>"><!--范围 内/外-->
-                    <div class="myDropDown">
-                        <span class="myDropText">
-                            <span class="text">></span>
-                            <i class="myDropArrorw down"></i>
-                        </span><input type="text" placeholder="请输入数值">
-                        <ul class="myDropList">
-                            <li class="myItem" data-val="("> > </li>
-                            <li class="myItem" data-val="["> ≥ </li>
-                            <li class="myItem" data-val=")"> ＜ </li>
-                            <li class="myItem" data-val="]"> ≤ </li>
-                        </ul>
-                    </div><div class="myDropDown pickOpening">
-                        <span class="myDropText">
-                            <span class="text"><</span>
-                            <i class="myDropArrorw down"></i>
-                        </span><input type="text" placeholder="请输入数值" class="last">
-                        <ul class="myDropList">
-                            <li class="myItem" data-val="("> > </li>
-                            <li class="myItem" data-val="["> ≥ </li>
-                            <li class="myItem" data-val=")"> ＜ </li>
-                            <li class="myItem" data-val="]"> ≤ </li>
-                        </ul>
-                    </div>
-                </div>
-                <i class="delRule"></i>
-            </dd>
-            <%}}%>
-        </dl>
-        <div class="clear"><span class="addNewRule">新增属性</span></div>
-    </div>
-    <div class="controlRule">
-        <div class="saveRule mgR10">保存</div>
-        <div class="deleteRule">删除</div>
-    </div>
-</div>
+<div class="mapRule clearfix"></div>

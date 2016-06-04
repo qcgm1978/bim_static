@@ -30,8 +30,15 @@ App.Resources.ArtifactsWindowRule = Backbone.View.extend({
             data["categoryCode"] = code + '';
             App.ResourceArtifacts.presentRule.model.set({"mappingCategory":data});
             App.ResourceArtifacts.presentRule.model.trigger("mappingCategoryChange");
-            console.log(App.ResourceArtifacts.presentRule);
+
+            //以下内容可重构
+            var operator = new App.Resources.ArtifactsPlanRuleDetailOperator().render().el;
+            $(".ruleDetail .mapRule").html(operator);//规则列表
+            var operatorData = App.Resources.dealStr(App.ResourceArtifacts.Status.presentRule);//规则数据
+            App.ResourceArtifacts.operator.reset();
+            App.ResourceArtifacts.operator.add(operatorData);
         }
+
         App.Resources.ArtifactsMaskWindow.close();
     },
         //取消

@@ -14,22 +14,18 @@ a { color: #fff; text-decoration: none; }
 @color: #4D926F;
 .rounded-corners (@radius:4px) { -webkit-border-radius: @radius; -moz-border-radius: @radius; -ms-border-radius: @radius; -o-border-radius: @radius; border-radius: @radius; }
 .loginDialogWidth() { width: 260px; box-sizing: border-box; display: block; margin: 0 auto; margin-top: 10px; }
-
-html,body,form,#loginBox{
-    height: 100%;
-}
-
-
-#mainBox { min-width: 1000px; height: 100%;min-height: 740px; margin-bottom: -212px; padding-top: 1px; background: url('/login/images/login-bg.jpg') no-repeat; background-size: cover; filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/login/images/login-bg.jpg', sizingMethod='scale');
+.layout { position: absolute; top: 0; left: 0; right: 0; bottom: 0; min-width: 1000px; min-height: 720px; background: url('/login/images/login-bg.jpg') no-repeat; background-size: cover; }
+.loginForm { position: absolute; bottom: 202px; top: 0; left: 0; right: 0; }
+#mainBox { height: 100%; padding-top: 1px; filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/login/images/login-bg.jpg', sizingMethod='scale');
   .logo { margin: 38px 0px 0px 50px; width: 128px; height: 30px; background: url('/login/images/logo.png') no-repeat; float: left; }
-  .headTitle { width: 525px; margin: 0 auto; font-size: 40px; color: #fff; margin-top: 128px;
+  .headTitle { width: 524px; font-size: 40px; color: #fff; top: 12%; position: absolute; left: 50%; margin-left: -262px;
     .introduction { margin-top: 15px; font-size: 26px; height: 30px;
       .item { width: 125px; float: left; margin-left: 65px; padding-left: 20px;
         &.first { margin-left: 0px; }
       }
     }
   }
-  .loginDialog { padding-top: 1px; width: 300px; height: 280px; background: #000; background-color: rgba(0, 0, 0, 0.5); color: #fff; margin: 0 auto; margin-top: 34px;
+  .loginDialog { width: 300px; height: 280px; background: #000; background-color: rgba(0, 0, 0, 0.5); color: #fff; top: 40%; position: absolute; left: 50%; margin-left: -150px; z-index: 6;
     .header { margin-top: 24px; font-size: 20px; text-align: center; }
     .errorMSG { border: 1px solid #FFCF85; background-color: #FFFDEA; color: #FF6649; height: 28px; padding-left: 5px; line-height: 28px; .loginDialogWidth; .rounded-corners; visibility: hidden;
       &.show { visibility: visible; }
@@ -49,25 +45,17 @@ html,body,form,#loginBox{
     .btnLogin:hover { background-color: #56A0E4; }
   }
 }
-
-#loginBox { 
-    .footerWrap{
-        width: 100%;
-        height: 176px;
-        background: #EEE;
-        position: absolute;z-index: 90;
-    }
-    .footer { width: 1100px; margin: 0 auto; padding-top: 50px;height: 176px;background-color: #eee;
-    .item { margin-right: 30px; float: left; display: inline;}
-    .iconBg { width: 72px; height: 72px; float: left; background: url('/login/images/icons.png') no-repeat; }
-    .iconPlanning { background-position: 0px -88px; }
-    .iconPlan { background-position: 0px -160px; }
-    .iconCost { background-position: 0px -232px; }
-    .iconQuality { background-position: 0px -305px; }
-    .introduction { margin-left: 80px; width: 170px; }
-    .title { font-size: 20px; color: #000; }
-    .desc { font-family: '微软雅黑'; color: #999; margin-top: 10px; line-height: 20px; }
-    .last { margin-right: 0px; }
-  }
-  .copyrightBox{position: absolute;z-index: 91;left:0;right:0;bottom:0;height: 36px;border-top:1px #ccc solid;text-align: center;background-color: #eee;line-height: 36px;color: #999;}
+.footerWrap { height: 202px; background: #EEE; position: absolute; bottom: 0; left: 0; right: 0; }
+.footer { width: 1000px; margin: 0 auto; padding-top: 40px; height: 176px; background-color: #eee;
+  .item { margin-right: 30px; float: left; display: inline; }
+  .iconBg { width: 72px; height: 72px; float: left; background: url('/login/images/icons.png') no-repeat; }
+  .iconPlanning { background-position: 0px -88px; }
+  .iconPlan { background-position: 0px -160px; }
+  .iconCost { background-position: 0px -232px; }
+  .iconQuality { background-position: 0px -305px; }
+  .introduction { margin-left: 80px; width: 145px; }
+  .title { font-size: 20px; color: #000; }
+  .desc { font-family: '微软雅黑'; color: #999; margin-top: 10px; line-height: 20px; }
+  .last { margin-right: 0px; }
 }
+.copyrightBox { position: absolute; z-index: 4; left: 0; right: 0; bottom: 0; height: 36px; border-top: 1px #ccc solid; text-align: center; background-color: #eee; line-height: 36px; color: #999; }

@@ -11,8 +11,7 @@ App.Project = {
 		token:"",
 		isShare:false,
 		projectId: "", //项目id
-		versionId: "", //版本id
-		projectCode:"";
+		versionId: "", //版本id		
 		attrView: null,
 		CurrentVersion: null, //当前版本信息
 		DataModel: null //渲染模型的数据
@@ -765,7 +764,8 @@ App.Project = {
 			location=$target.data('location');
 
 		if ($target.hasClass("selected")) {
-			$target.parent().find(".selected").removeClass("selected");
+			return 
+		//	$target.parent().find(".selected").removeClass("selected");
 		} else {
 			$target.parent().find(".selected").removeClass("selected");
 			$target.addClass("selected");

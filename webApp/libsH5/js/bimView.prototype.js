@@ -84,6 +84,30 @@
       self.viewer.registerEventListener(CLOUD.EVENTS.ON_SELECTION_CHANGED, loadEvent.click);
       self.viewer.registerEventListener(CLOUD.EVENTS.ON_LOAD_PROGRESS, loadEvent.loading);
       self.viewer.registerEventListener(CLOUD.EVENTS.ON_LOAD_COMPLETE, loadEvent.loaded);
+      self.viewer.registerEventListener(CLOUD.EVENTS.ON_UPDATE_SELECTION_UI, function (evt) {
+        var selectionUI;
+        if(!self.selectionStatue){
+          selectionUI = $('<div class="selection"></div>');
+          self._dom.bimBox.append(selectionUI);
+          self.selectionStatue = true;
+        }else{
+          selectionUI = self._dom.bimBox.find('.selection');
+        }
+        if (evt.data.visible) {
+          var data = evt.data;
+          selectionUI.css({
+            left:data.left,
+            top:data.top,
+            width:data.width,
+            height:data.height,
+            opacity: data.dit ? .5 : .1
+          });
+        }
+        else {
+          self.selectionStatue = false;
+          selectionUI.remove();
+        }
+      });
     },
     controll:function(){
       var self = this;
@@ -202,7 +226,8 @@
             data = bimView.sidebar.classCodeData,
             $li = $this.closest('.itemNode'),
             type = $li.data('type'),
-            flag = $this.next().find('input').prop('checked');
+            isChecked = $this.next().find('input').prop('checked'),
+            isSelected = $this.siblings('.treeText').is('.selected');
         $this.toggleClass('m-closeTree m-openTree')
         $li.toggleClass('open');
         if(type == 'classCode' && $li.has(".tree").length ==0){
@@ -220,7 +245,8 @@
             name:'name',
             data:'code',
             children:'isChild',
-            isChecked:flag
+            isChecked:isChecked,
+            isSelected:isSelected
           });
           $li.append(children);
         }
@@ -234,11 +260,10 @@
             filter;
         $li.find("input").prop("checked",flag);
         if(type == "sceneId"){
-          var filter = bimView.comm.getFilters(self._dom.bimBox.find("#floors,#specialty"),'ckecked');
-          filter.ids = filter.ids.concat(specialty.ids);
+          var filter = bimView.comm.getFilters($("#floors,#specialty"),'uncheck');
           self.fileFilter(filter);
         }else{
-          filter = bimView.comm.getFilters(parents,'ckecked');
+          filter = bimView.comm.getFilters(parents,'uncheck');
           self.filter(filter);
         }
       }).on('click','.treeText',function(){
@@ -339,7 +364,7 @@
       var self = this;
       self._dom.bimBox.find(".view").attr('class','view');
       self.pub('rotateMouse');
-      self.viewer.setPickMode();
+      self.viewer.setRectPickMode();
     },
     home:function(){
       // 普通模式
@@ -420,7 +445,7 @@
       var self = this;
       var viewer = self.viewer;
       viewer.editMarkerEnd();
-      viewer.setPickMode();
+      self.rotateMouse();
     },
     saveMarkers : function() {
       // 保存检查点
@@ -471,7 +496,7 @@
       self._dom.bimBox.attr('class','bim');
       self._dom.bimBox.find('.commentBar').remove();
       viewer.editCommentEnd();
-      viewer.setPickMode();
+      self.rotateMouse();
     },
     setCommentType:function(type){
       var self = this;

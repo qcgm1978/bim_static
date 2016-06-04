@@ -88,7 +88,7 @@
  				pageItemCount: 30
  			},
  			success(child, data) {
- 				that.$(".folwSlideBar .header .count").text(data.data.items.length);
+ 				that.$(".folwSlideBar .header .count").text(data.data.length);
  				this.$(".flowSliderUl .item:first").click();
  			}
  		});

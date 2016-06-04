@@ -28,7 +28,7 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
                     //查找未保存的元素并高亮提示变红
                     return;
                 }
-            }else if(App.ResourceArtifacts.Status.presentPlan == this.model){
+            }else if(App.ResourceArtifacts.Status.presentRule == this.model){
                 this.tabRule();
                 return ;
             }
@@ -37,8 +37,15 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
         $(".ruleDetail").empty().hide();
         this.reset();
         //存储model
-        App.ResourceArtifacts.Status.presentPlan = this.model;
-        this.$(".ruleDetail").html( new App.Resources.ArtifactsPlanRuleDetailUnfold({model:App.ResourceArtifacts.Status.presentPlan}).render().el);
+        App.ResourceArtifacts.Status.presentRule = this.model;
+        var rule = new App.Resources.ArtifactsPlanRuleDetailUnfold({model:App.ResourceArtifacts.Status.presentRule});
+        var operator = new App.Resources.ArtifactsPlanRuleDetailOperator().render().el;
+        this.$(".ruleDetail").html(rule.render().el);
+        rule.$(".mapRule").html(operator);//规则列表
+        var operatorData = App.Resources.dealStr(App.ResourceArtifacts.Status.presentRule);//规则数据
+
+        App.ResourceArtifacts.operator.reset();
+        App.ResourceArtifacts.operator.add(operatorData);
         this.$(".ruleDetail").show();
     },
     //开合状态
@@ -51,6 +58,6 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
     },
 
     reset:function(){//重置模型
-        if(App.ResourceArtifacts.Status.presentPlan){App.ResourceArtifacts.Status.presentPlan=null;}
+        if(App.ResourceArtifacts.Status.presentRule){App.ResourceArtifacts.Status.presentRule=null;}
     }
 });

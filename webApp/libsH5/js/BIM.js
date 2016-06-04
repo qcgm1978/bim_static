@@ -103,7 +103,7 @@
       title:'半透明',
       fn:'translucent',
       keyCode:'',
-      type:'click',
+      type:'status',
       group:'0'
     },
     {
@@ -244,17 +244,17 @@
       },{
         id:'rotateCamera',
         icon:'m-rotateCamera',
-        title:'',
+        title:'绕观察者旋转',
         fn:'rotateCamera',
-        keyCode:'绕观察者旋转',
+        keyCode:'',
         type:'rotate',
         group:'3'
       },{
         id:'rotateObj',
         icon:'m-rotateObj',
-        title:'',
+        title:'绕构件旋转',
         fn:'rotateMouse',
-        keyCode:'绕构件旋转',
+        keyCode:'',
         type:'rotate',
         group:'3'
       }]
@@ -380,6 +380,7 @@
       _opt._dom.bimBox.append(viewBox);
       viewer.init(viewBox[0]);
       viewer.load(_opt.etag,bimView.API.baseUrl + bimView.API.fetchModel);
+      viewer.setRectPickMode();
       return viewer;
     }
   }
