@@ -48,11 +48,22 @@ App.Resources.ArtifactsPlanRule = Backbone.View.extend({
 
         App.ResourceArtifacts.PlanRules.push(model);
 
-        if(!App.ResourceArtifacts.Status.presentPlan){
-            //没有选择任何计划
-            App.ResourceArtifacts.Status.presentPlan = model;
+        //新规则
+        if(!App.ResourceArtifacts.Status.presentRule){
+            App.ResourceArtifacts.Status.presentRule = model;
         }
-        $(".artifactsContent .rules ul li:last-child .ruleDetail").html( new App.Resources.ArtifactsPlanRuleDetailUnfold({model:model}).render().el).show();
+
+        var container = new App.Resources.ArtifactsPlanRuleDetailUnfold({model:model});
+        $(".artifactsContent .rules ul li:last-child .ruleDetail").html(container.render().el).show();
+
+        //加载底下规则
+        var newRuleView = new App.Resources.ArtifactsPlanRuleDetailOperator();
+        container.$(".mapRule").html(newRuleView.render().el);
+
+        var list = App.Resources.dealStr(model);
+        App.ResourceArtifacts.operator.add(list);
+
+
         //保存状态
         //App.ResourceArtifacts.Status.saved = false;
     }

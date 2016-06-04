@@ -75,5 +75,5 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
                 App.Resources.artifactsTreeData = response.data;
             }
         });
-    },
+    }
 });

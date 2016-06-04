@@ -10,7 +10,7 @@ App.Resources.ArtifactsPlanRuleDetailNew = Backbone.View.extend({
     events:{
         "click .delRule": "delRule",
         "click .myItem":"myItem",
-        "click .myDropText":"seleRule",
+        "click .myDropText":"seleRule"
     },
 
     render:function() {
@@ -41,13 +41,18 @@ App.Resources.ArtifactsPlanRuleDetailNew = Backbone.View.extend({
         parent.hide().siblings(".myDropText").find(".text").text(text);
         if(operator == "==" || operator == "!="){
             ioside.removeClass("active");
+            _this.closest(".myDropList").siblings(".myDropText").attr("data-operator",operator);
             if(eIn.hasClass("active")){return}
             eIn.addClass("active");
         }else if(operator == "<>" || operator == "><"){
             eIn.removeClass("active");
+            _this.closest(".myDropList").siblings(".myDropText").attr("data-operator",operator);
+            console.log(_this.closest(".myDropDown"));
             if(ioside.hasClass("active")){return}
             ioside.addClass("active");
         }
+
+
     },
 
     //É¾³ý

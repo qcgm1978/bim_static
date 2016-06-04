@@ -36,8 +36,6 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
             alert("您还有没保存的");
             return
         }
-
-
         this.toggleClass();
         this. getRules();
         //保存计划规则
@@ -47,7 +45,7 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
 //切换计划
     toggleClass:function(){
         $(".qualityMenu li").removeClass("active");
-        this.$el.addClass("active");
+        this.$el.closest("li").addClass("active");
     },
 
     //获取质量标准相关规则
@@ -64,6 +62,7 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
             //存在，加载二级或三级标准
             pdata = {
                 URLtype : 'fetchQualityPlanQualityLevel2',
+
                 data : {
                     type : 1,
                     standardType:"GC",
@@ -78,6 +77,8 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
             });
             return
         }
+
+        this.
 
         $(".artifactsContent .rules ul").empty();
         //刷新右面视图

@@ -6,7 +6,10 @@ App.ResourceArtifacts={
         saved : true,    //创建规则后的保存状态，已保存  /  未保存
         presentRule : null,    //当前规则
         qualityProcessType:1,   //质量标准 -过程选择  type
-        qualityStandardType:"GC"   //质量标准 -过程选择  type
+        qualityStandardType:"GC",   //质量标准 -过程选择  type
+        biz:1,
+        projectId : null,
+        type:1 //1:标准规则；2：项目规则
     },
 
     Settings: {
@@ -104,14 +107,38 @@ App.ResourceArtifacts={
         }
     }),
 
+    saveRuleModel:function(){
+        var a =   {
+            "biz": App.ResourceArtifacts.Status.biz,//1：模块化；2：质监标准  //新建时写入值
+                "targetCode": "",//新建时写入当前计划编号
+                "targetName": "",//计划名称
+                "type": App.ResourceArtifacts.Status.qualityProcessType,//1:标准规则；2：项目规则  //新建时写入值
+                "mappingCategory": {
+                "categoryCode": "",
+                    "categoryName": "",
+                    "mappingPropertyList": [
+                    {
+                        "propertyKey": "",
+                        "operator": "",
+                        "propertyValue": ""
+                    }
+                ]
+            }
+        };
+        return a
+    },
+
+
+
+
     //创建计划规则
     createPlanRules:function(biz,targetCode,targetName,type){
         //创建新的构件映射计划节点
-        var newPlanRuleData ={
-            "biz": 1,//1：模块化；2：质监标准  //新建时写入值
+        var newPlanRuleData = {
+            "biz": App.ResourceArtifacts.Status.biz,//1：模块化；2：质监标准  //新建时写入值
             "targetCode": "",//新建时写入当前计划编号
             "targetName": "",//计划名称
-            "type": 1,//1:标准规则；2：项目规则  //新建时写入值
+            "type": App.ResourceArtifacts.Status.qualityProcessType,//1:标准规则；2：项目规则  //新建时写入值
             "mappingCategory": {
                 "categoryCode": "",
                 "categoryName": "",
@@ -237,13 +264,13 @@ App.ResourceArtifacts={
 
         pdata  = {
             URLtype:"fetchArtifactsPlan",
-            data:{}
+            data:{
+                type :1
+            }
         };
-
         App.Comm.ajax(pdata,function(response){
             if(response.code == 0 && response.data.length){
                 App.ResourceArtifacts.PlanNode.add(response.data);
-                //_this.delay(response);
             }
         });
     },
