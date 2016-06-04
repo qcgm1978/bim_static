@@ -175,6 +175,10 @@ App.Services.DetailView.BaseHole=Backbone.View.extend({
  				collectionFloor.fetch();
  				collectionSection.reset();
 		 		collectionSection.fetch();
+
+		 		Backbone.trigger('baseholeUserStatus','read');
+		 		Backbone.trigger('floorUserStatus','read');
+		 		Backbone.trigger('sectionUserStatus','read');
  			}
  		});
  		
