@@ -158,7 +158,9 @@
             bimView.sidebar[fn](!isSelected,self);
             break;
           case "more":
+            var flag = self.getTranslucentStatus();
             $this.toggleClass('selected').siblings('[data-group='+group+']').removeClass('selected');
+            $this.find('.m-translucent').toggleClass('selected',flag)
             bimView.sidebar[fn](self);
             break;
           case "change":
@@ -290,16 +292,16 @@
           callback:function(){
             var x = self.footer.find('#axisGridX').val(),
                 y = self.footer.find('#axisGridY').val();
-            self.setAxisGrid('bigMap',x,y);
+            self.setAxisGrid('bigMap',y,x);
           }
         });
         self.initMap({
           name:'bigMap',
           element:self.bigMap,
           enable:false,
-          callback:function(res){
-            self.footer.find('#axisGridX').val(res.axis.numeralName);
-            self.footer.find('#axisGridY').val(res.axis.abcName);
+          callbackMoveOnAxisGrid:function(res){
+            self.footer.find('#axisGridX').val(res.numeralName);
+            self.footer.find('#axisGridY').val(res.abcName);
           }
         });
         self.showAxisGrid('bigMap');
@@ -316,10 +318,10 @@
       });
       self.on('changeGrid',function(res){
         var floors = self.curFloor;
-        var infoX = res.axis.infoX || '-';
-        var infoY = res.axis.infoY || '-';
-        var infoZ = 'Z('+ floors +','+res.axis.offsetZ+')' || '-';
-        bimView.sidebar.el._dom.mapBar.find(".axisGrid").text(infoX+","+infoY+","+infoZ)
+        var infoX = res.axis.infoX ? res.axis.infoX +"," : "";
+        var infoY = res.axis.infoY ? res.axis.infoY +"," : "";
+        var infoZ = 'Z('+ floors +','+res.axis.offsetZ+')';
+        bimView.sidebar.el._dom.mapBar.find(".axisGrid").text(infoX+infoY+infoZ)
       });
     },
     // 以下是对模型操作
@@ -350,6 +352,13 @@
       var self = this;
       var viewer = self.viewer;
       viewer.zoomToBBox(CLOUD.Utils.computeBBox(box));
+      viewer.render();
+    },
+    zoomToSelection:function(box){
+      // 缩放到当前选中构件
+      var self = this;
+      var viewer = self.viewer;
+      viewer.zoomToSelection();
       viewer.render();
     },
     rotateCamera : function () {
@@ -593,6 +602,11 @@
       }
       viewer.render();
     },
+    setSelectedIds:function(){
+      var self = this;
+      var viewer = self.viewer;
+      viewer.setSelectedIds(ids);
+    },
     collision:function(idA,idB){
       // 碰撞
       var self = this;
@@ -623,7 +637,8 @@
         name:'defaultMap',
         axisGrid:'',
         enable:true,
-        callback:null
+        callbackCameraChanged:null,
+        callbackMoveOnAxisGrid:null
       },
       _opt = $.extend({},defaults,options);
       // 初始化小地图
@@ -635,11 +650,11 @@
           _css={
             left:'0px',
             bottom:'0px',
-            outline:'none'          };
+            outline:'none',
+            position:'relative'
+          };
       if(_opt.axisGrid) viewer.setAxisGridData(_opt.axisGrid)
-      viewer.createMiniMap(_opt.name,_el[0],_width,_height,_css,function(res){
-        _opt.callback&&_opt.callback.call(this,res)
-      });
+      viewer.createMiniMap(_opt.name,_el[0],_width,_height,_css,_opt.callbackCameraChanged,_opt.callbackMoveOnAxisGrid);
       viewer.enableAxisGridEvent(_opt.name,_opt.enable);
       viewer.generateAxisGrid(_opt.name);
     },

@@ -2,8 +2,9 @@
 * @require /libsH5/js/libs/three.min.js
 */
 
+
 var CLOUD = CLOUD || {};
-CLOUD.Version = "20160601";
+CLOUD.Version = "20160604";
 
 CLOUD.GlobalData = {
     SceneSize: 1000,
@@ -7702,8 +7703,8 @@ CLOUD.Scene.prototype.pickByReck = function () {
             }
         }
 
-        if (count > 0)
-            callback();
+
+        callback();
     }
 
 }();
@@ -10396,6 +10397,7 @@ CLOUD.PickEditor.prototype.handleMousePick = function (event, isDoubleClick) {
 
                 if (scope.filter.setSelectedIds()) {
                     cameraEditor.updateView(true);
+                    scope.onObjectSelected(null);
                 }
 
                 scope.showPickedInformation(null);
@@ -10410,7 +10412,8 @@ CLOUD.PickEditor.prototype.handleMousePick = function (event, isDoubleClick) {
                 scope.filter.addDemolishId(userId, true);
                 cameraEditor.updateView(true);
 
-            } else {
+            }
+            else {
 
                 if (!event.ctrlKey) {
                     scope.filter.setSelectedIds();
@@ -10428,6 +10431,7 @@ CLOUD.PickEditor.prototype.handleMousePick = function (event, isDoubleClick) {
                 }
                 else {
                     scope.showPickedInformation(null);
+                    scope.onObjectSelected(null);
                 }
                 cameraEditor.updateView(true);
             }
@@ -17757,6 +17761,10 @@ CloudViewer = function () {
                     overCanvas = miniMap.mouseUp(event, function (point) {
                         // 飞到指定点
                         scope.cameraEditor.flyToPointWithParallelEye(point);
+
+                        // 如何处理小地图与批注的联动???
+                        // 下一步考虑将批注实现成组件
+                        scope.exitCommentMode();
                     });
                     break;
                 default:
@@ -18398,12 +18406,14 @@ CloudViewer.prototype = {
     // ------------------ ViewHouse API -- E ------------------ //
 
     // ------------------ 小地图API -- S ------------------ //
-    createMiniMap:function(name, domElement, width, height, styleOptions, callback){
+    createMiniMap:function(name, domElement, width, height, styleOptions, callbackCameraChanged, callbackMoveOnAxisGrid){
 
         var miniMap = this.miniMaps[name];
 
         if (!miniMap) {
-            miniMap = this.miniMaps[name] = new CLOUD.MiniMap(this, callback);
+            miniMap = this.miniMaps[name] = new CLOUD.MiniMap(this);
+            miniMap.setCameraChangedCallback(callbackCameraChanged);
+            miniMap.setMoveOnAxisGridCallback(callbackMoveOnAxisGrid);
         }
 
         domElement = domElement || this.domElement;
@@ -18601,6 +18611,16 @@ CloudViewer.prototype = {
 
     setCommentMode: function () {
         this.editorManager.setCommentMode(this);
+    },
+
+    exitCommentMode: function () {
+
+        if ( this.editorManager.commentEditor &&
+            this.editorManager.editor === this.editorManager.commentEditor) {
+
+            this.setPickMode();
+        }
+
     },
 
     setCommentBackgroundColor: function (startColor, stopColor) {
