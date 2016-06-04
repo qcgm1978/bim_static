@@ -131,7 +131,11 @@
 			.start { width: 20%; }
 			.end { width: 20%; }
 			.planGroup { height: 49%; overflow-y: hidden; position: relative; }
-			.planBody { position: absolute; left: 0px; right: 0px; top: 59px; bottom: 0px; }
+			.planBody { position: absolute; left: 0px; right: 0px; top: 59px; bottom: 0px; 
+				& .overflowEllipsis{
+					white-space: normal;
+				}
+			}
 		}
 	}
 	.planSearch { width: 100%; min-width: 398px; margin-top: 10px; padding-left: 15px;
