@@ -344,7 +344,10 @@ App.Project.Model = {
 			} else {
 				this.$el.html("没有变更");
 			}
-			$(".showChange .checkboxGroup input:checkbox").trigger('click');
+			if(!$(".showChange .checkboxGroup input:checkbox").prop('checked')){
+				$(".showChange .checkboxGroup input:checkbox").trigger('click');
+			}
+
 			return this;
 		},
 		openTree: function(event) {
