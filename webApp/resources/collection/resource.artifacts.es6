@@ -248,8 +248,8 @@ App.ResourceArtifacts={
         });
     },
 
-    getQuality:function(){
-        var pdata;
+    getQuality:function(pdata,_this){
+        /*var pdata;
         pdata  = {
             URLtype:"fetchQualityPlanQualityLevel2",
             data:{}
@@ -259,7 +259,18 @@ App.ResourceArtifacts={
         App.Comm.ajax(pdata,function(response){
             if(response.code == 0 && response.data.length){
                 App.ResourceArtifacts.QualityStandard.add(response.data);
-                //_this.delay(response);
+            }
+        });*/
+
+
+        App.Comm.ajax(pdata,function(response){
+            if(response.code == 0 && response.data.length){
+
+                var list = App.Resources.artifactsQualityTree(response.data);
+                _this.$(".qualityMenu div").html(list);
+
+                //App.ResourceArtifacts.QualityStandard.reset();//怎么重置是个问题，这里要用tree
+                //App.ResourceArtifacts.QualityStandard.add(response.data);
             }
         });
     },

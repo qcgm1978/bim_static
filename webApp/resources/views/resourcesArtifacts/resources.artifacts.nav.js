@@ -19,7 +19,7 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
     },
 
     select:function(e){
-        var pre = $(e.target);
+        var pre = $(e.target),_this =this;
         if(pre.hasClass("active")){
             return
         }
@@ -47,7 +47,18 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
             //重置规则部分
             this.$(".rules").html(planRule.render().el);//菜单
 
-            App.ResourceArtifacts.getQuality();
+
+
+
+            var pdata = {
+                URLtype:'fetchQualityPlanQualityLevel1',
+                data:{
+                    type:1,
+                    standardType: "GC"
+                }
+            };
+
+            App.ResourceArtifacts.getQuality(pdata,_this);
             this.$(".qualifyC").show();
         }
         pre.addClass("active").siblings("li").removeClass("active");

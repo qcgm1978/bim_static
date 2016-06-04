@@ -3,7 +3,7 @@
  */
 App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
 
-    tagName:"li",
+    tagName:"div",
 
     template: _.templateUrl("/resources/tpls/resourcesArtifacts/mappingRule/resources.artifacts.qualitydetail.html"),
 
@@ -36,7 +36,7 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
             alert("您还有没保存的");
             return
         }
-        $(".artifactsContent .rules ul").empty();
+
 
         this.toggleClass();
         this. getRules();
@@ -50,37 +50,36 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
         this.$el.addClass("active");
     },
 
-    //获取质量标准相关规则，如果是二级，加载三级标准
+    //获取质量标准相关规则
     getRules:function() {
         var _this = this,pdata;
+        if(!App.ResourceArtifacts.Status.saved){
+            //提示有没有保存现在的，重要
+            return
+        }
         if(this.model.get("leaf")){
+
+            //修改右侧名称
 
             //存在，加载二级或三级标准
             pdata = {
                 URLtype : 'fetchQualityPlanQualityLevel2',
                 data : {
-                    type : App.ResourceArtifacts.qualityProcessType,
-                    standardType:App.ResourceArtifacts.qualityStandardType
+                    type : 1,
+                    standardType:"GC",
+                    parentCode :this.model.get("code")
                 }
             };
-
             App.Comm.ajax(pdata,function(response){
                 if(response.code == 0 && response.data.length){
-                    //调用tree叠加
-                    App.Resources.artifactsTree
+                    var list = App.Resources.artifactsQualityTree(response.data);
+                    _this.$el.closest("li").find(".childList").html(list);
                 }
             });
-
             return
         }
 
-        if(!App.ResourceArtifacts.Status.saved){
-            //提示有没有保存现在的，重要
-            return
-        }
-
-
-
+        $(".artifactsContent .rules ul").empty();
         //刷新右面视图
         var code = this.model.get("code");
         pdata = {

@@ -33,6 +33,33 @@ App.Resources.artifactsTree = function(dataList,code){
     }
     return ele;
 };
+//质量标准tree
+App.Resources.artifactsQualityTree = function(dataList){
+    var data = dataList;
+    var ele  = $("<ul></ul>");
+    for(var i =0 ; i < data.length ; i++){
+        if(data[i].code ==  "-1"){ break}
+        var model = Backbone.Model.extend({
+            defaults:function(){
+                return{
+                    title:''
+                }
+            }
+        });
+        var initModel = new model(data[i]);
+        var li = $("<li></li>");
+        li.append(new App.Resources.ArtifactsQualityDetail({model:initModel}).render().el);
+        li.append("<div class='childList' data-code='"+data[i].code +"'></div>");
+        ele.append(li);
+        App.Comm.initScroll($(".qualityMenu"),"y");
+    }
+    return ele;
+};
+
+
+
+
+
 
 App.Resources.cancelBubble = function(e){
     if(e.stopPropagation){
