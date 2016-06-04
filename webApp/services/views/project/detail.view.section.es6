@@ -17,7 +17,7 @@ App.Services.DetailView.Section=Backbone.View.extend({
         "pitId":"",//    基坑编码
         "projectId":"",//    项目编码
         "profileName":"",//  剖面
-        "bracingType":0 //支护类型
+        "bracingType":'' //支护类型
 	},
 	
 	initialize(data){

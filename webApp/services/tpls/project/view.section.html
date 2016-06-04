@@ -23,7 +23,7 @@
 			<div class="formColumn">
 				<label>支护类型:</label>
 				<div class="myDropDown supportType" name='bracingType'>
-					<span class="myDropText supportType">  <span class="text"><%= bracingType|| '请选择' %></span> <i class="myDropArrorw"></i> </span>
+					<span class="myDropText supportType">  <span class="text"><%= bracingType|| App.Services.ProjectCollection.datas.bracingType[0] %></span> <i class="myDropArrorw"></i> </span>
 					<ul class="myDropList" style="display: none;">
 						<% _.each(App.Services.ProjectCollection.datas.bracingType,function(i){ %>
 						<li class="myItem"><%= i %></li>
