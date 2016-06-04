@@ -11,6 +11,7 @@
     .modelBar{display:none;}
     .view{cursor:default;}
   }
+  .selection{position:absolute;z-index:9;border:1px solid #03c;background:#000;}
   .loading{position:absolute;width:100%;height:6px;left:0;top:0;background:#ccc;overflow:hidden;}
   .progress{display:block;background:#358BD4;height:6px;width:0;}
   .modelLoading{position:absolute;left:50%;top:50%;margin:-32px 0 0 -32px;width:64px;height:64px;background:url(../images/loading-blue-64.gif) no-repeat;}
@@ -18,7 +19,7 @@
   .fly{cursor:crosshair;}
   .zoom{cursor:url('../images/zoom.png'),default;}
   .commentBar{position:absolute;z-index:20;background:#333;left:50%;bottom:10px;transform:translate(-50%,0);}
-  .modelBar{position:absolute;z-index:20;background:#333;left:50%;bottom:10px;transform:translate(-50%,0);}
+  .modelBar{position:absolute;z-index:20;background:#333;left:10px;bottom:10px;}
   .modelSelect{float:left;margin:5px;position:relative;color:#fff;
     .cur{display:block;width:100px;height:30px;line-height:28px;padding:0 30px 0 5px;border:1px solid #666;
       &:after{content:'';position:absolute;display:block;border-top:4px solid #fff;border-left:4px solid transparent;border-right:4px solid transparent;right:5px;top:12px;transition: all .5s;}

@@ -13,8 +13,6 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
         "click .deleteRule":"deleteRule",
         "click .saveRule":"saveRule",
         "click .choose":"choose",
-        "click .myDropText":"seleRule",
-        "click .myItem":"myItem",
         "click .delRule": "delRule",
         "focus .categoryCode": "legend"
     },
@@ -25,8 +23,6 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
     initialize:function(model){
         this.listenTo(this.model,"change",this.render);
         this.listenTo(this.model,"mappingCategoryChange",this.render);
-        this.dealStr(model);
-        //this.getValue("(30,40]");
     },
     //选择分类编码
     choose:function(){
@@ -37,42 +33,12 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
         $("#resourcesArtifactTree").html(contain);
         App.ResourceArtifacts.presentRule = this;
     },
-    //选择规则，切换输入方式
-    myItem:function(e){
-        var _this = $(e.target);
-        var val = _this.data("val");
-        var text = _this.text();
-        var parent =  _this.parent(".myDropList");
-        var eIn = _this.closest(".leftten").siblings(".eIn");
-        var ioside  = _this.closest(".leftten").siblings(".ioside");
-        //数据写入模型
-        parent.hide().siblings(".myDropText").find(".text").text(text);
-        if(val == "==" || val == "!="){
-            ioside.removeClass("active");
-            if(eIn.hasClass("active")){return}
-            eIn.addClass("active");
-        }else if(val == "<>" || val == "><"){
-            eIn.removeClass("active");
-            if(ioside.hasClass("active")){return}
-            ioside.addClass("active");
-        }
-    },
-    //切换规则
-    seleRule:function(e){
-        $(".myDropList").hide();
-        var _this = $(e.target);
-        _this.siblings(".myDropList").show();
-    },
+
+
     //增加新规则
     addNewRule:function(){
-        var _this = this;
         var model = new App.ResourceArtifacts.newRule(App.ResourceArtifacts.newModel);
-        //var newRule = new App.Resources.ArtifactsPlanRuleDetailNew({model:model}).render().el;
         App.ResourceArtifacts.operator.add(model);
-        //this.$(".conR dl").append(newRule);
-        //因为新建整条与修改的模型不一致
-        //向collection添加
-        //向this.model 添加一条属性
     },
     //保存
     saveRule:function(){
@@ -164,7 +130,6 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
         _this.model.set(".mappingPropertyList",list);
         rule.closest("dd").remove();
     },
-
     //联想模块
     legend:function(e){
         var _this = this;
@@ -185,7 +150,6 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
             list.show();
             pre.removeClass("alert");
         });
-
 
         pre.on("keyup",function(e){
             App.Resources.cancelBubble(e);
@@ -228,8 +192,6 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
                 if(App.Resources.artifactsTreeData[j].length <= val.length ||  j - index  + 1 >count) {
                     break
                 }
-               // arr.push(App.Resources.artifactsTreeData[j]);
-                //此处创建新view
                 var newRule = new App.ResourceArtifacts.newCode(App.Resources.artifactsTreeData[j]);
                 list.append(new App.Resources.ArtifactsRuleLegend({model:newRule}).render().el);
             }
@@ -259,7 +221,6 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
             message:frame
         });
     },
-
     //红色提示输入
     redAlert:function(ele){
         ele.addClass("alert");
@@ -284,35 +245,5 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
         con.mappingPropertyList = arr;
         App.ResourceArtifacts.presentRule.model.set({"mappingCategory":con});
         App.ResourceArtifacts.presentRule.model.trigger("mappingCategoryChange");//重绘模型
-    },
-
-
-    //拆解字符串
-    dealStr:function(model){
-        var con = this.model.get("mappingCategory"),
-            list = con.mappingPropertyList,
-            code=[];
-        if(list && list.length){
-            _.each(list,function(item){
-                if(item.operator == "<>" || item.operator == "><"){
-                    var obj = {left:'',right:'',leftValue:'',rightValue:''},
-                        str= item.propertyValue,
-                        arr,
-                        index;
-                    index = _.indexOf(str,",");
-
-                    obj.left =str[0];
-                    obj.right = str[str.length-1];
-                    for(var i = 1 ; i < str.length-2 ; i++){
-                        if(i < index){
-                            obj.leftValue =  obj.leftValue + str[i];
-                        }else if(i>index){
-                            obj.rightValue = obj.rightValue +str[i];
-                        }
-                    }
-                    item.ruleList = obj;
-                }
-            });
-        }
     }
 });

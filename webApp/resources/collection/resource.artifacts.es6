@@ -4,7 +4,9 @@ App.ResourceArtifacts={
     Status:{
         presentPlan:null,  //当前计划或质量，提交数据
         saved : true,    //创建规则后的保存状态，已保存  /  未保存
-        presentRule : null    //当前规则
+        presentRule : null,    //当前规则
+        qualityProcessType:1,   //质量标准 -过程选择  type
+        qualityStandardType:"GC"   //质量标准 -过程选择  type
     },
 
     Settings: {
@@ -12,14 +14,8 @@ App.ResourceArtifacts={
         ruleModel: 3   //  权限入口      1 只有模块化，  2 只有质量标准  ， 3 有模块化和质量标准
     },
 
-    openRule: null,
+    openRule: null, //正在打开的规则，注意重置
 
-    rule:{
-        equal :"相等",
-        unequal:"不等",
-        inside:"范围内",
-        outside:"范围外"
-    },
 //计划节点
     PlanNode : new(Backbone.Collection.extend({
         model:Backbone.Model.extend({
@@ -38,6 +34,26 @@ App.ResourceArtifacts={
             }
         }
     })),
+    //质量标准，获取二级列表
+    QualityStandard : new(Backbone.Collection.extend({
+        model:Backbone.Model.extend({
+            defaults:function(){
+                return{
+
+                }
+            }
+        }),
+        urlType: "fetchQualityPlanQualityLevel2",
+        parse: function(responese) {
+            if (responese.code == 0 && responese.data.length > 0) {
+                return responese.data;
+            } else {
+                $().html('<li>无数据</li>');
+            }
+        }
+    })),
+
+
 
     //计划规则/获取
     operator:new(Backbone.Collection.extend({
@@ -185,14 +201,17 @@ App.ResourceArtifacts={
     })),
 
     init:function(_this) {
+
+
         var pre = new App.Resources.ArtifactsMapRule();
         var plans = new App.Resources.ArtifactsPlanList();
         var planRule = new App.Resources.ArtifactsPlanRule();
 
+        $(".breadcrumbNav .mappingRule").show();
+
         _this.$el.append(pre.render().el);//菜单
 
         pre.$(".plans").html(plans.render().el);//计划节点
-        pre.$(".rules").append(planRule.render().el);//菜单
         pre.$(".rules").append(planRule.render().el);//菜单
 
         //插入默认为空的规则列表
@@ -209,7 +228,7 @@ App.ResourceArtifacts={
         var plans = new App.Resources.ArtifactsPlanList();
         var planRule = new App.Resources.ArtifactsPlanRule();
         pre.$(".plans").html(plans.render().el);//计划节点
-        pre.$(".rules").append(planRule.render().el);//菜单
+        pre.$(".rules").html(planRule.render().el);//菜单
     },
 
 
@@ -228,6 +247,23 @@ App.ResourceArtifacts={
             }
         });
     },
+
+    getQuality:function(){
+        var pdata;
+        pdata  = {
+            URLtype:"fetchQualityPlanQualityLevel2",
+            data:{}
+        };
+        App.ResourceArtifacts.QualityStandard.reset();
+
+        App.Comm.ajax(pdata,function(response){
+            if(response.code == 0 && response.data.length){
+                App.ResourceArtifacts.QualityStandard.add(response.data);
+                //_this.delay(response);
+            }
+        });
+    },
+
     //延迟
     delay:function(data){
     var _this = this , batch , length = data.length , arr = []  , n = 1 , last;
@@ -245,7 +281,6 @@ App.ResourceArtifacts={
             },100);
         }
     },
-
     //提示保存
     alertSave:function(){
 

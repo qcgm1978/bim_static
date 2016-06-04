@@ -42,8 +42,7 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
         var operator = new App.Resources.ArtifactsPlanRuleDetailOperator().render().el;
         this.$(".ruleDetail").html(rule.render().el);
         rule.$(".mapRule").html(operator);//规则列表
-        var operatorData = this.dealStr(App.ResourceArtifacts.Status.presentRule);//规则数据
-        console.log(operatorData);
+        var operatorData = App.Resources.dealStr(App.ResourceArtifacts.Status.presentRule);//规则数据
 
         App.ResourceArtifacts.operator.reset();
         App.ResourceArtifacts.operator.add(operatorData);
@@ -60,34 +59,5 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
 
     reset:function(){//重置模型
         if(App.ResourceArtifacts.Status.presentRule){App.ResourceArtifacts.Status.presentRule=null;}
-    },
-
-    //拆解字符串
-    dealStr:function(model){
-        var con = model.get("mappingCategory"),
-            list = con.mappingPropertyList;
-        if(list && list.length){
-            _.each(list,function(item){
-                var obj = {left:'',right:'',leftValue:'',rightValue:''};
-                if(item.operator == "<>" || item.operator == "><"){
-                        var str= item.propertyValue,
-                        index;
-                    index = _.indexOf(str,",");
-                    obj.left =str[0];
-                    obj.right = str[str.length-1];
-                    for(var i = 1 ; i < str.length-1 ; i++){
-                        if(i < index){
-                            obj.leftValue =  obj.leftValue + str[i];
-                        }else if(i>index){
-                            obj.rightValue = obj.rightValue +str[i];
-                        }
-                    }
-                    obj.leftValue = parseInt(obj.leftValue);
-                    obj.rightValue = parseInt(obj.rightValue);
-                }
-                item.ruleList = obj;
-            });
-        }
-        return list;
     }
 });

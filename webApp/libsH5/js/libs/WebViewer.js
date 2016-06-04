@@ -6570,7 +6570,11 @@ CLOUD.Camera.prototype.setStandardView = function (stdView, bbox) {
     return target;
 };
 
-CLOUD.Camera.prototype.zoomToBBox = function (bbox) {
+CLOUD.Camera.prototype.zoomToBBox = function (bound, margin) {
+    var bbox = new THREE.Box3();
+    bbox.copy(bound);
+    margin = margin || 0.05;
+    bbox.expandByScalar(bound.size().length() * margin);
 
     var dir = this.getWorldDirection();
     var up = this.up;
@@ -7651,6 +7655,8 @@ CLOUD.Scene.prototype.pickByReck = function () {
         if (clearOld)
             scope.filter.setSelectedIds();
 
+        var count = 0;
+
         function frustumTest(node) {
 
             if (node.worldBoundingBox) {
@@ -7664,32 +7670,17 @@ CLOUD.Scene.prototype.pickByReck = function () {
             if (node.userData) {
                 var state = intersectObjectByBox(frustum, node);
                 if (state === INTERSECTION_STATE.IS_Contains) {
-                    scope.filter.addSelectedId(node.name);
+
+                    if (scope.filter.isVisible(node)) {
+                        scope.filter.addSelectedId(node.name);
+                        ++count;
+                    }
+
                 }
                 else {
                     return;
                 }
             }
-
-            //if (node.geometry) {
-
-            //    var state = intersectObjectBySphere(frustum, node);
-            //    if(state === INTERSECTION_STATE.IS_Contains){
-            //        scope.filter.addSelectedId(node.name);
-            //    }
-            //    else if (state === INTERSECTION_STATE.IS_Intersection) {
-
-            //        var state = intersectObjectByBox(frustum, node);
-            //        if (state === INTERSECTION_STATE.IS_Contains) {
-            //            scope.filter.addSelectedId(node.name);
-            //        }
-            //        else if (state === INTERSECTION_STATE.IS_Intersection) {
-
-            //        }
-            //    }
-
-            //    return;
-            //}
 
             var children = node.children;
             if (!children)
@@ -7701,7 +7692,7 @@ CLOUD.Scene.prototype.pickByReck = function () {
                     frustumTest(child);
                 }
             }
-        }
+        };
 
         var children = this.rootNode.children;
         for (var i = 0, l = children.length; i < l; i++) {
@@ -7710,6 +7701,9 @@ CLOUD.Scene.prototype.pickByReck = function () {
                 frustumTest(child);
             }
         }
+
+        if (count > 0)
+            callback();
     }
 
 }();
@@ -18208,19 +18202,20 @@ CloudViewer.prototype = {
         this.editorManager.zoomAll(this);
     },
 
-    zoomToSelection: function () {
-
+    zoomToSelection: function (margin) {
+        margin = margin || 0.05; // give bounding box a margin 0.05 by default.
         var box = this.renderer.computeSelectionBBox();
         if (box == null || box.empty()) {
             box = this.getScene().worldBoundingBox();
         }
 
-        var target = this.camera.zoomToBBox(box);
+        var target = this.camera.zoomToBBox(box, margin);
         this.cameraEditor.updateCamera(target);
         this.render();
     },
 
-    zoomToBBox: function (box) {
+    zoomToBBox: function (box, margin) {
+        margin = margin || 0.05;
         if (!box) {
             box = this.getScene().worldBoundingBox();
         }
@@ -18228,7 +18223,7 @@ CloudViewer.prototype = {
             box.applyMatrix4(this.getScene().rootNode.matrix);
         }
 
-        var target = this.camera.zoomToBBox(box);
+        var target = this.camera.zoomToBBox(box, margin);
         this.cameraEditor.updateCamera(target);
         this.render();
     },
