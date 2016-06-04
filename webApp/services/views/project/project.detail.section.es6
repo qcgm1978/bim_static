@@ -58,6 +58,9 @@ App.Services.ProjectDetail.Section=Backbone.View.extend({
 		        "bracingType":'' ,//支护类型
 				"isAdd":true
 			}
+			if(App.Services.ProjectCollection.datas.pitData[0]){
+				data.pitId=App.Services.ProjectCollection.datas.pitData[0].id;
+			}
 			App.Services.ProjectCollection.ProjecDetailSectionCollection.push(data);
 			this.status='create';
 		}else{

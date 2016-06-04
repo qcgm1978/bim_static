@@ -61,7 +61,6 @@ App.Services.ProjectDetail.Floor=Backbone.View.extend({
 		if(this.status !=='create'){
 			this.$('dd').slideUp();
 			this.$('dt span').addClass('accordOpen');
-
 			var model={
 				"id":"",//栋号编码
 		        "pitId":"",//    基坑编码
@@ -84,6 +83,10 @@ App.Services.ProjectDetail.Floor=Backbone.View.extend({
 		        "corebitPercentage":0,//  钻芯检测百分比
 		        "outSidedecorationType":"",//   外装方式
 		        "structureType":"剪力墙结构"
+			}
+
+			if(App.Services.ProjectCollection.datas.pitData[0]){
+				model.pitId=App.Services.ProjectCollection.datas.pitData[0].id;
 			}
 			App.Services.ProjectCollection.ProjecDetailFloorCollection.push(model);
 

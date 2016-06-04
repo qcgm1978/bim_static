@@ -28,11 +28,12 @@
  	},
 
  	//显示隐藏搜索
- 	searchToggle() {
+ 	searchToggle(e) {
  		var $searchDetail = this.$(".searchDetail");
  		if ($searchDetail.is(":animated")) {
  			return;
  		}
+ 		$(e.currentTarget).toggleClass('expandArrowIcon');
  		$searchDetail.slideToggle();
  	},
 
@@ -41,6 +42,7 @@
  		if ($searchDetail.is(":animated")) {
  			return;
  		}
+ 		this.$('.searchToggle').removeClass('expandArrowIcon');
  		$searchDetail.slideUp();
  	},
 

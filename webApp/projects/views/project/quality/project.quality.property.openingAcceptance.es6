@@ -73,11 +73,12 @@ App.Project.QualityOpeningAcceptance = Backbone.View.extend({
 	},
 
 	//显示隐藏搜索
-	searchToggle() {
+	searchToggle(e) {
 		var $searchDetail = this.$(".searchDetail");
 		if ($searchDetail.is(":animated")) {
 			return;
 		}
+		$(e.currentTarget).toggleClass('expandArrowIcon');
 		$searchDetail.slideToggle();
 	},
 	searchup() {
@@ -85,6 +86,7 @@ App.Project.QualityOpeningAcceptance = Backbone.View.extend({
  		if ($searchDetail.is(":animated")) {
  			return;
  		}
+ 		this.$('.searchToggle').removeClass('expandArrowIcon');
  		$searchDetail.slideUp();
  	},
 	//清空搜索条件
