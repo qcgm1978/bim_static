@@ -18,6 +18,7 @@ App.Resources.ArtifactsPlanRule = Backbone.View.extend({
 
     initialize:function(){
         this.listenTo(App.ResourceArtifacts.PlanRules,"add",this.addOne);
+        this.listenTo(App.ResourceArtifacts.PlanRules,"remove",this.render);
         //获取分类编码
 
     },
@@ -40,6 +41,9 @@ App.Resources.ArtifactsPlanRule = Backbone.View.extend({
             alert("您还有没保存的");
             //查找未保存的元素并高亮提示变红
             return
+        }
+        if(!$(".ruleDetail").length){
+            $(".artifactsContent .rules ul").html("");
         }
         //无数据或无更改，更改当前数据
         $(".ruleDetail").empty().hide();

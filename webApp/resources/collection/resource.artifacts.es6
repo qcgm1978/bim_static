@@ -9,7 +9,8 @@ App.ResourceArtifacts={
         qualityStandardType:"GC",   //质量标准 -过程选择  type
         biz:1,
         projectId : null,
-        type:1 //1:标准规则；2：项目规则
+        type:1, //1:标准规则；2：项目规则
+        delRule:null,
     },
 
     Settings: {

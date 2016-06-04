@@ -28,7 +28,7 @@ App.Resources.ArtifactsRuleLegend = Backbone.View.extend({
 
         input.css({"opacity":"0"}).val(data);
         list.hide();
-        dataKeeper.css({"visibility": "visible"}).data("code",data).find("span").html(dataName).siblings("i").html(name);
+        dataKeeper.css({"visibility": "visible"}).data("code",data).attr("data-name",name).find("span").html(dataName).siblings("i").html(name);
 
         var presentRule = App.ResourceArtifacts.presentRule;
 

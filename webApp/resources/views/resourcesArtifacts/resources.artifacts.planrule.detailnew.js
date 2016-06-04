@@ -39,15 +39,14 @@ App.Resources.ArtifactsPlanRuleDetailNew = Backbone.View.extend({
         var ioside  = _this.closest(".leftten").siblings(".ioside");
         //数据写入模型
         parent.hide().siblings(".myDropText").find(".text").text(text);
+        _this.closest(".myDropDown").attr("data-operator",operator);
         if(operator == "==" || operator == "!="){
             ioside.removeClass("active");
-            _this.closest(".myDropList").siblings(".myDropText").attr("data-operator",operator);
+
             if(eIn.hasClass("active")){return}
             eIn.addClass("active");
         }else if(operator == "<>" || operator == "><"){
             eIn.removeClass("active");
-            _this.closest(".myDropList").siblings(".myDropText").attr("data-operator",operator);
-            console.log(_this.closest(".myDropDown"));
             if(ioside.hasClass("active")){return}
             ioside.addClass("active");
         }

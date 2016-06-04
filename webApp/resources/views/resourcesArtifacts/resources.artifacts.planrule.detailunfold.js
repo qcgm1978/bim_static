@@ -17,6 +17,7 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
         "focus .categoryCode": "legend"
     },
     render:function() {
+        console.log(this.model);
         this.$el.html(this.template(this.model.toJSON()));
         return this;
     },
@@ -52,7 +53,7 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
         //查找所有数据，拼接成字符串
         var title =  this.$(".ruleTitle");
         var id = title.data("id");
-        var categoryName = this.$(".typeCode").data("name");
+        var categoryName = this.$(".chide").data("name");
 
         var categoryCode = this.$(".typeCode input").val();
 
@@ -92,9 +93,9 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
                 Rulist[i].propertyValue = name.val();
 
             }else if(dd.eq(i).find(".ioside").hasClass("active")){
-                var left = dd.eq(i).find(".ioside .myDropText").eq(0);
+                var left = dd.eq(i).find(".ioside .myDropDown").eq(0);
                 var leftValue = dd.eq(i).find(".ioside input").eq(0);
-                var right = dd.eq(i).find(".ioside .myDropText").eq(1);
+                var right = dd.eq(i).find(".ioside .myDropDown").eq(1);
                 var rightValue = dd.eq(i).find(".ioside input").eq(1);
 
                 if(!leftValue.val() && !rightValue.val()){
@@ -104,7 +105,7 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
                     return
                 }
 
-                var str = left.data("rule")  + leftValue.val() + rightValue.val()+ right.data("rule") ;
+                var str = left.data("operator")  + leftValue.val() + rightValue.val()+ right.data("operator") ;
                 Rulist[i].propertyValue = str;
             }
         }
@@ -117,6 +118,8 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
         model.mappingCategory.categoryCode = categoryCode;
         model.mappingCategory.categoryName = categoryName;
         model.mappingCategory.mappingPropertyList = Rulist;
+
+
 
         var cdata = {
             URLtype : '',
@@ -134,19 +137,19 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
             //更新
         }else{
             cdata.URLtype = "createArtifactsPlanNewRule";
-            console.log(model);
             //创建
         }
 
         $(".artifactsContent .rules").addClass("services_loading");
         App.Comm.ajax(cdata,function(response){
-            if(response.code == 0 && response.data.id){
-
+            if(response.code == 0 && response.data){
                 //创建
                 if(cdata.URLtype == "createArtifactsPlanNewRule"){
-                    _this.createRule();
+                    _this.model.clear();
+                    _this.model.set(model);
+                    _this.model.set("id",response.data.id);
+
                 }
-                App.ResourceArtifacts.Status.saved = true ;
                 _this.$el.closest(".ruleDetail").hide().empty();
                 _this.reset();
                 $(".artifactsContent .rules").removeClass("services_loading");
@@ -154,10 +157,7 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
         });
 
     },
-    //创建
-    createRule:function(response){
-        this.model.set("id",response.data.id);
-    },
+
     //重置保存状态
     reset:function(){
         App.ResourceArtifacts.Status.saved = true ;
@@ -165,6 +165,7 @@ App.Resources.ArtifactsPlanRuleDetailUnfold = Backbone.View.extend({
 
     //删除计划中的整条规则
     deleteRule:function(){
+        App.ResourceArtifacts.Status.delRule = this.model.get("id");
         var _this = this;
         //新建且未修改
         if(!_this.model.get("id") && App.ResourceArtifacts.Status.saved){//如果未修改则清空，注意新建时已修改   App.ResourceArtifacts.Status.saved 值，因此
