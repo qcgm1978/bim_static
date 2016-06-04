@@ -443,7 +443,7 @@ App.Project.Model = {
 					url: "http://bim.wanda-dev.cn/sixD/"+data.projectId+"/"+data.projectVersionId+"/comparison/property?baseModel="+data.baseModel+"&currentModel="+data.currentModel+"&baseElementId="+data.baseElementId+"&currentElementId="+data.currentElementId
 				}).done(function(respone){
 					if(respone.code==0){
-						that.$el.html(that.template({data:respone.data,type:datas.type,name:datas.name}));
+						that.$el.html(that.template({data:respone.data,type:datas.type,name:datas.name,versionname:$('.projectVersion .text').text()}));
 
 					}else{
 						alert('获取数据失败');
