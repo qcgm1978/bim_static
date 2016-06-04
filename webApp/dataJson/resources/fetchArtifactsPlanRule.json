@@ -26,8 +26,8 @@
           },
           {
             "id": 840358391931232,
-            "propertyKey": "QY",
-            "operator": "in",
+            "propertyKey": "CY",
+            "operator": "<>",
             "propertyValue": "(30,50]",
             "categoryId": 840358391415136
           }
@@ -50,13 +50,13 @@
             "id": 840358391677280,
             "propertyKey": "QY",
             "operator": "==",
-            "propertyValue": "样板",
+            "propertyValue": "样板2",
             "categoryId": 840358391415136
           },
           {
             "id": 840358391931232,
-            "propertyKey": "QY",
-            "operator": "in",
+            "propertyKey": "XY",
+            "operator": "><",
             "propertyValue": "(30,50]",
             "categoryId": 840358391415136
           }

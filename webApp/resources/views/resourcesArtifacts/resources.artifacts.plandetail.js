@@ -8,7 +8,7 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
     template: _.templateUrl("/resources/tpls/resourcesArtifacts/resources.artifacts.plandetail.html"),
 
     events:{
-        "click .planItem":"getPlanId"
+        "click .item":"getPlanId"
     },
 
     render:function() {
@@ -37,18 +37,7 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
         }
 
         if(!App.ResourceArtifacts.Status.saved){
-
-            //提示部分
-         /*   $.tip({
-                type:'success',
-                message:'您还有没保存的',
-                timeout:2000
-            });*/
-
             alert("您还有没保存的");
-            //更改部分判断
-            //更改部分变红
-            //提示有没有保存现在的，重要
             return
         }
 

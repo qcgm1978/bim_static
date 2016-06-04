@@ -138,9 +138,35 @@
       if(isSelected){
         self.el._dom.sidebar.addClass('open')
         self.el._dom.sidebar.find('#selected').show().siblings().hide();
-        var flag = self.el._dom.sidebar.find('.modelFilter .selected').length;
-        if(flag){
-
+        var selectedDom =  self.el._dom.sidebar.find('.modelFilter .selected');
+        if(selectedDom.length >0){
+          var data = {
+            sceneId:[],
+            categoryId:[],
+            classCode:[]
+          };
+          $.each(selectedDom,function(i,item){
+            var tmpData = $(item.closest('.itemNode')).data();
+            var userData = tmpData.userData ? tmpData.userData.split(",") : [];
+            if(tmpData.type == "categoryId"){
+              data.categoryId = data.categoryId.concat(userData);
+            }else if(tmpData.type == "sceneId"){
+              data.sceneId = data.sceneId.concat(userData);
+            }else{
+              data.classCode = data.classCode.concat(userData);
+            }
+          });
+          bimView.comm.ajax({
+            type:'post',
+            url:bimView.API.fetchComponentByModelId,
+            projectId:self._opt.projectId,
+            projectVersionId:self._opt.projectVersionId,
+            modelId:data.sceneId.join(','),
+            classCode:data.classCode.join(','),
+            cateId:data.categoryId.join(',')
+          },function(data){
+            debugger
+          });
         }else{
           var filters = viewer.viewer.getFilters();
           var selection = filters.getSelectionSet();
