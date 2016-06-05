@@ -50,8 +50,6 @@ App.Resources.ArtifactsPlanRuleDetailNew = Backbone.View.extend({
             if(ioside.hasClass("active")){return}
             ioside.addClass("active");
         }
-
-
     },
 
     //É¾³ý

@@ -32,8 +32,10 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
         var planRule = new App.Resources.ArtifactsPlanRule();
         this.$(".rules").html(planRule.render().el);//菜单
 
-        if(pre.hasClass("modularization")){
-            //模块化
+        if(pre.hasClass("modularization")){//模块化
+
+            App.ResourceArtifacts.Status.rule.biz = 2 ;
+
             this.$(".qualifyC").empty().hide();
             var plans = new App.Resources.ArtifactsPlanList();
             $(".breadcrumbNav .mappingRule").show();
@@ -41,9 +43,12 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
             App.ResourceArtifacts.getPlan();
             this.$(".plans").show();
 
-        }else if(pre.hasClass("quality")){
+        }else if(pre.hasClass("quality")){//质量
+
+            App.ResourceArtifacts.Status.rule.biz = 1 ;
+
             this.$(".plans").empty().hide();
-            //质量
+
             var quality = new App.Resources.ArtifactsQualityList().render().el;
             this.$(".qualifyC").html(quality);
 
@@ -53,7 +58,7 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
             var pdata = {
                 URLtype:'fetchQualityPlanQualityLevel1',
                 data:{
-                    type:1,
+                    type:App.ResourceArtifacts.Status.type,
                     standardType: "GC"
                 }
             };
