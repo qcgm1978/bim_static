@@ -42,6 +42,7 @@ App.Resources.ArtifactsPlanRuleAlert = Backbone.View.extend({
             type:"DELETE",
             success:function(response){
                  if(response.code==0){ //删除成功
+
                      $(".ruleDetail").hide();
                      App.ResourceArtifacts.Status.saved = true ;//保存状态
 
@@ -53,20 +54,19 @@ App.Resources.ArtifactsPlanRuleAlert = Backbone.View.extend({
 
                      _.each($(".ruleTitle"),function(item){
                          if(parseInt($(item).attr("data-id")) == id){
-                             console.log(1);
                              $(item).closest("li").remove();
                          }
                      });
-;
 
                      var _this = App.ResourceArtifacts.Status.presentPlan;
-
 
                      $(".artifactsContent .rules h2 .name").html(App.ResourceArtifacts.Status.rule.targetCode + "&nbsp;" +App.ResourceArtifacts.Status.rule.targetName);
                      $(".artifactsContent .rules h2 i").html( "("+_this.get("count") + ")");
 
                      App.Resources.ArtifactsAlertWindow.close();
-                }
+                }else{
+                     alert("删除失败");
+                 }
                 $(".artifactsContent .rules").removeClass("services_loading");
             },
             error:function(error){

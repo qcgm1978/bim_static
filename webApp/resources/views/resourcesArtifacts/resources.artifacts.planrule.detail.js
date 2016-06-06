@@ -160,6 +160,7 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
 
         var baseData = this.model.toJSON();
 
+
         var cdata = {
             URLtype : '',
             type:"POST",
@@ -168,7 +169,7 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
             projectId : App.ResourceArtifacts.Status.projectId
         };
 
-        if(this.model.get("id")){
+        if(id){
             cdata.URLtype = "modifyArtifactsPlanRule";
             cdata.type ="PUT";
             //更新
@@ -182,10 +183,6 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
                 _this.$el.closest(".ruleDetail").hide();
                 //创建
                 if(cdata.URLtype == "createArtifactsPlanNewRule"){
-
-                    model.mappingCategory.id = response.data.id;
-
-                    _this.model.set({mappingCategory: model.mappingCategory},{silent:true});
 
                     _this.$(".ruleTitle").attr("data-id",response.data.id);
                     //写入相关的数据
