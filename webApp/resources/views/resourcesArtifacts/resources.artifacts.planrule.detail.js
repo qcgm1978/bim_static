@@ -30,6 +30,7 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
         this.tabRule();
         //映射规则
         var operatorData = App.Resources.dealStr(_this.model);//规则数据
+
         _this.$(".mapRule dl").html("");
         _.each(operatorData,function(item){
             var model = new App.ResourceArtifacts.operator(item);
@@ -193,15 +194,9 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
 
     //删除计划中的整条规则
     deleteRule:function(){
-        App.ResourceArtifacts.Status.delRule = this.model.get("id");
-
         var _this = this;
-        //新建且未修改
-        if(!_this.model.get("id") && App.ResourceArtifacts.Status.saved){//如果未修改则清空，注意新建时已修改   App.ResourceArtifacts.Status.saved 值，因此
-            _this.$el.closest("li").hide().empty();
-            _this.reset();
-            return
-        }
+
+        App.ResourceArtifacts.Status.delRule = this.model.get("id");
         var frame = new App.Resources.ArtifactsPlanRuleAlert().render().el;
         App.Resources.ArtifactsAlertWindow = new App.Comm.modules.Dialog({
             title: "",
@@ -212,7 +207,7 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
             message: frame
         });
         $(".mod-dialog .wrapper .header").hide();//隐藏头部
-        $(".alertInfo").html('确认删除 “'+ _this.model.get("targetName") + '”！');
+        $(".alertInfo").html('确认删除 “'+ _this.model.get("targetName") + '的 ”'+ App.ResourceArtifacts.Status.rule.categoryName+'！');
     },
     //删除单条规则
     delRule:function(e){

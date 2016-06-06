@@ -25,8 +25,14 @@ App.Resources.ArtifactsPlanRuleAlert = Backbone.View.extend({
     //确定
     sure : function(){
 
-        var id =App.ResourceArtifacts.Status.delRule ;
-
+        var id = App.ResourceArtifacts.Status.delRule;
+        //新建规则，直接删除
+        if(!id){
+            App.ResourceArtifacts.PlanRules.pop();//为什么全消失了·········触发了remove事件，导致谁重绘了
+            App.Resources.ArtifactsAlertWindow.close();
+            App.ResourceArtifacts.Status.saved = true;
+            return
+        }
         //如果是新建元素，直接删除
 
         $.ajax({
@@ -42,9 +48,7 @@ App.Resources.ArtifactsPlanRuleAlert = Backbone.View.extend({
                              App.ResourceArtifacts.PlanRules.remove(item);
                          }
                      });
-
                      var _this = App.ResourceArtifacts.Status.presentPlan;
-
                      $(".artifactsContent .rules h2 .name").html(App.ResourceArtifacts.Status.rule.targetCode + "&nbsp;" +App.ResourceArtifacts.Status.rule.targetName);
                      $(".artifactsContent .rules h2 i").html( "("+_this.get("count") + ")");
 

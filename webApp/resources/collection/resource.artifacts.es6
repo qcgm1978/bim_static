@@ -260,17 +260,23 @@ App.ResourceArtifacts={
         //插入默认为空的规则列表
         this.getPlan();
         $("#pageLoading").hide();
+
+        this.loaddeaprt();
     },
 
 
-    //缺省加载
-    defaultLoad:function(_this){
-        var pre = new App.Resources.ArtifactsMapRule();
-        _this.$el.append(pre.render().el);//菜单
-        var plans = new App.Resources.ArtifactsPlanList();
-        var planRule = new App.Resources.ArtifactsPlanRule();
-        pre.$(".plans").html(plans.render().el);//计划节点
-        pre.$(".rules .ruleContent").html(planRule.render().el);//菜单
+    //获取分类编码
+    loaddeaprt:function(){
+        //获取分类编码
+        var cdata = {
+            URLtype:"fetchArtifactsCategoryRule",
+            data:{}
+        };
+        App.Comm.ajax(cdata,function(response){
+            if(response.code == 0 && response.data && response.data.length){
+                App.Resources.artifactsTreeData = response.data;
+            }
+        });
     },
 
     //获取计划节点

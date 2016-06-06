@@ -26,7 +26,6 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
     //取得规则列表
     getPlanId:function(){
          App.ResourceArtifacts.Status.rule.targetCode = this.model.get("code");
-        console.log(App.ResourceArtifacts.Status.rule.targetCode);
         App.ResourceArtifacts.Status.rule.targetName = this.model.get("name");
         if(!App.ResourceArtifacts.Status.saved){
             alert("您还有没保存的");
