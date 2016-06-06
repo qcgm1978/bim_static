@@ -11,6 +11,9 @@ App.API = {
 
 		//首页bodyContent数据
 		fetchBodyContentTodos :'platform/todo',
+
+		fetchBodyContentSilde :'platform/project/top',
+
 		//本月开始、到期接口
 		fetchBodyContentMonthEnd :'sixD/plan/concern/index',//?type={type}&userId={userId}
 		fetchBodyContentMonthStart :'sixD/plan/concern/index',

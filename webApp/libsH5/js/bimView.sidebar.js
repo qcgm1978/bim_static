@@ -132,6 +132,9 @@
       var self = this;
       isSelected ? self.el._dom.sidebar.addClass('open') && viewer.commentInit() : self.el._dom.sidebar.removeClass('open');
       self.el._dom.sidebar.find('#comment').show().siblings().hide();
+      viewer.off('click',function(){
+        self.getSelected(viewer);
+      });
     },
     selected:function(isSelected,viewer){
       var self = this;
@@ -140,10 +143,12 @@
         self.el._dom.sidebar.find('#selected').show().siblings().hide();
         self.getSelected(viewer);
       }else{
-        self.el._dom.sidebar.removeClass('open')
+        self.el._dom.sidebar.removeClass('open');
       }
       viewer.on('click',function(){
-        self.getSelected(viewer);
+        if(!$("#selected").is(":hidden")){
+          self.getSelected(viewer);
+        }
       });
     },
     more:function(viewer){
@@ -202,7 +207,7 @@
           name:'miniMap',
           element:self.el._dom.sidebar.find('.map'),
           axisGrid:axisGridData,
-          callback:function(res){
+          callbackCameraChanged:function(res){
             self.obj.pub('changeGrid',res);
           }
         });
@@ -217,6 +222,7 @@
       var data = []
       $.each(selection,function(i,item){
         data.push(i);
+        if(data.length >1000)return false;
       });
       if(data.length>0){
         bimView.comm.ajax({
@@ -230,6 +236,8 @@
             bimView.comm.renderSelected(data.data);
           }
         });
+      }else{
+        bimView.comm.renderSelected();
       }
     }
   }

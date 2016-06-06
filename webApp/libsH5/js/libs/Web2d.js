@@ -2,7 +2,6 @@
   * @require /libsH5/js/libs/three.js
   * @require /libsH5/js/libs/WebViewer.js
 */
-
 var CLOUD = CLOUD || {};
 CLOUD.Extensions = CLOUD.Extensions || {};
 CLOUD.Extensions.Utils = CLOUD.Extensions.Utils || {};
@@ -386,17 +385,17 @@ CLOUD.AxisGrid.prototype = {
         }
     }
 };
-CLOUD.MiniMap = function (viewer, callback) {
+CLOUD.MiniMap = function (viewer) {
 
     this.viewer = viewer;
-    this.callbackFn = callback;
     this.visible = true;
     this.width = 0;
     this.height = 0;
     this.domContainer = null;
     this.autoClear = true;
-
     this.mouseButtons = {LEFT: THREE.MOUSE.LEFT, RIGHT: THREE.MOUSE.RIGHT};
+    this.callbackCameraChanged = null;
+    this.callbackMoveOnAxisGrid = null;
 
     var scope = this;
     var _mapContainer;
@@ -419,7 +418,7 @@ CLOUD.MiniMap = function (viewer, callback) {
     var _axisGridNumberCircleRadius = 10, _axisGridNumberFontSize = 8, _axisGridNumberInterval = 3; // 轴号间隔
     var _isShowAxisGridNumber = true, _isShowAxisGrid = false, _isInitializedAxisGrid = false, _isInitializedFloorPlane = false;
 
-    var _enableMouseEvent = true;
+    var _enableFlyByClick = true; // 是否允许click飞到指定位置
 
     var _tipNode, _circleNode, _highlightHorizLineNode, _highlightVerticalLineNode, _cameraNode, _cameraArrowNode;
     var _highlightColor = '#258ae3', _tipNodeColor = "#000", _tipNodeBackgroundColor = "#fff";
@@ -742,9 +741,8 @@ CLOUD.MiniMap = function (viewer, callback) {
     function calculateAxisGridBox() {
 
         var offset = 4;
-        var isExistData = (_isInitializedAxisGrid || _isInitializedFloorPlane);
 
-        if (_isShowAxisGridNumber && isExistData) {
+        if (_isShowAxisGridNumber) {
 
             var center = _axisGridBox2D.center();
             var oldSize = _axisGridBox2D.size();
@@ -758,12 +756,12 @@ CLOUD.MiniMap = function (viewer, callback) {
 
     this.enableMouseEvent = function(enable) {
 
-        _enableMouseEvent = enable;
+        _enableFlyByClick = enable;
         //this.render();
     };
 
     this.isEnableMouseEvent = function() {
-        return _enableMouseEvent;
+        return _enableFlyByClick;
     };
 
     this.isMouseOverCanvas = function (mouse) {
@@ -809,25 +807,9 @@ CLOUD.MiniMap = function (viewer, callback) {
         var mouse = new THREE.Vector2(event.clientX, event.clientY);
         var isOverCanvas = this.isMouseOverCanvas(mouse);
 
-        //if (!_enableMouseEvent) return isOverCanvas;
+        if (!_enableFlyByClick) return isOverCanvas;
 
-        if (isOverCanvas && _isShowAxisGrid) {
-
-            this.dealHighlightNode();
-
-            if (_hasHighlightInterPoint) {
-                this.showTip();
-            } else {
-                this.hideTip();
-            }
-
-            callback();
-
-        } else {
-            //this.hideTip();
-            //callback();
-            _hasHighlightInterPoint = false;
-        }
+        this.highlightedNode(isOverCanvas, _isShowAxisGrid, callback);
 
         return isOverCanvas;
     };
@@ -838,7 +820,12 @@ CLOUD.MiniMap = function (viewer, callback) {
         var isOverCanvas = this.isMouseOverCanvas(mouse);
         var isExistData = _isInitializedAxisGrid || _isInitializedFloorPlane;
 
-        if (!_enableMouseEvent) return isOverCanvas;
+        if (!_enableFlyByClick) {
+
+            this.highlightedNode(isOverCanvas, _isShowAxisGrid);
+
+            return isOverCanvas;
+        }
 
         if (isOverCanvas && isExistData && event.target.nodeName!= "LI" ) {
 
@@ -1060,7 +1047,8 @@ CLOUD.MiniMap = function (viewer, callback) {
             loadStyleString(css);
 
             _tipNode = document.createElement('div');
-            _tipNode.className = "cloud-tip";
+            _tipNode.className = "";
+            //_tipNode.className = "cloud-tip";
             _tipNode.style.position = "absolute";
             _tipNode.style.display = "block";
             _tipNode.style.background = _tipNodeBackgroundColor;
@@ -1096,6 +1084,7 @@ CLOUD.MiniMap = function (viewer, callback) {
     this.showTip = function () {
 
         if (_tipNode) {
+            _tipNode.className = "cloud-tip";
             _tipNode.style.opacity = 1;
         }
 
@@ -1115,6 +1104,7 @@ CLOUD.MiniMap = function (viewer, callback) {
     this.hideTip = function () {
 
         if (_tipNode) {
+            _tipNode.className = "";
             _tipNode.style.opacity = 0;
         }
 
@@ -1245,8 +1235,9 @@ CLOUD.MiniMap = function (viewer, callback) {
             }
         }
 
+        // 如果先初始化平面图，后初始化轴网，因为轴网确定范围，则需要重新初始化平面图
         if (_isInitializedFloorPlane && !_isInitializedAxisGrid) {
-            console.log("_isInitializedFloorPlane && !_isInitializedAxisGrid");
+            console.log("re-initialize floor plane!!!");
             this.initFloorPlane();
         }
 
@@ -1333,6 +1324,53 @@ CLOUD.MiniMap = function (viewer, callback) {
         }
 
         return intersection;
+    };
+
+    this.highlightedNode = function (isOverCanvas, isShowAxisGrid, callback) {
+
+        if (isOverCanvas && isShowAxisGrid) {
+
+            this.dealHighlightNode();
+
+            if (_hasHighlightInterPoint) {
+
+                this.showTip();
+
+                if (callback) {
+
+                    callback();
+
+                } else {
+
+                    this.render();
+                }
+
+                if (this.callbackMoveOnAxisGrid) {
+
+                    var gridInfo = this.getAxisGridInfoByNormalizedPoint(normalizedMouse);
+                    this.callbackMoveOnAxisGrid(gridInfo);
+                }
+
+            } else {
+
+                this.hideTip();
+
+                if (callback) {
+
+                    callback();
+
+                } else {
+
+                    this.render();
+                }
+            }
+
+        } else {
+            //this.hideTip();
+            //callback();
+            _hasHighlightInterPoint = false;
+        }
+
     };
 
     this.dealHighlightNode = function () {
@@ -1677,7 +1715,7 @@ CLOUD.MiniMap = function (viewer, callback) {
             posChanged = (worldPosition.distanceToSquared(_lastCameraWorldPosition) !== 0);
         }
 
-        if (this.callbackFn && posChanged) {
+        if (this.callbackCameraChanged && posChanged) {
 
             var cameraWorldPos = worldPosition.clone();
 
@@ -1723,9 +1761,9 @@ CLOUD.MiniMap = function (viewer, callback) {
 
                 //console.log(jsonObj.axis.infoX + "" + jsonObj.axis.infoY);
 
-                this.callbackFn(jsonObj);
+                this.callbackCameraChanged(jsonObj);
             } else {
-                this.callbackFn(null);
+                this.callbackCameraChanged(null);
             }
         }
     };
@@ -1773,7 +1811,19 @@ CLOUD.MiniMap = function (viewer, callback) {
 
         if (this.domContainer) {
             this.domContainer.appendChild(_mapContainer);
+
+            this.render();
         }
+    };
+
+    this.setCameraChangedCallback = function(callback) {
+
+        this.callbackCameraChanged = callback;
+    };
+
+    this.setMoveOnAxisGridCallback = function(callback) {
+
+        this.callbackMoveOnAxisGrid = callback;
     };
 
 };
@@ -2419,6 +2469,9 @@ CLOUD.Extensions.Comment = function (editor, id) {
     this.originX = 0;
     this.originY = 0;
     this.isDisableInteractions = false;
+    this.disableResizeWidth = false;
+    this.disableResizeHeight = false;
+    this.disableRotation = false;
 };
 
 CLOUD.Extensions.Comment.prototype = {
@@ -2640,6 +2693,8 @@ CLOUD.Extensions.CommentArrow = function (editor, id) {
     this.shapeType = CLOUD.Extensions.Comment.shapeTypes.ARROW;
     this.head = new THREE.Vector3();
     this.tail = new THREE.Vector3();
+
+    this.disableResizeHeight = true;
 
     this.clientSize = {x: 0, y: this.style['stroke-width'] * 4};
 
@@ -4432,18 +4487,18 @@ CLOUD.Extensions.CommentFrame = function (editor, container) {
 
 CLOUD.Extensions.CommentFrame.prototype.addDomEventListeners = function() {
 
-    this.framePanel.addEventListener('mousedown', this.onMouseDownToResize.bind(this));
+    this.framePanel.addEventListener('mousedown', this.onResizeDown.bind(this));
     this.framePanel.addEventListener('dblclick', this.onDoubleClick.bind(this));
-    this.selection.element.addEventListener('mousedown', this.onMouseDownToReposition.bind(this));
-    this.selection.element.addEventListener('mousedown', this.onMouseDownToRotation.bind(this));
+    this.selection.element.addEventListener('mousedown', this.onRepositionDown.bind(this));
+    this.selection.element.addEventListener('mousedown', this.onRotationDown.bind(this));
 };
 
 CLOUD.Extensions.CommentFrame.prototype.removeDomEventListeners = function() {
 
-    this.framePanel.removeEventListener('mousedown', this.onMouseDownToResize.bind(this));
+    this.framePanel.removeEventListener('mousedown', this.onResizeDown.bind(this));
     this.framePanel.removeEventListener('dblclick', this.onDoubleClick.bind(this));
-    this.selection.element.removeEventListener('mousedown', this.onMouseDownToReposition.bind(this));
-    this.selection.element.removeEventListener('mousedown', this.onMouseDownToRotation.bind(this));
+    this.selection.element.removeEventListener('mousedown', this.onRepositionDown.bind(this));
+    this.selection.element.removeEventListener('mousedown', this.onRotationDown.bind(this));
 };
 
 CLOUD.Extensions.CommentFrame.prototype.onMouseMove = function (event) {
@@ -4453,7 +4508,7 @@ CLOUD.Extensions.CommentFrame.prototype.onMouseMove = function (event) {
 CLOUD.Extensions.CommentFrame.prototype.onMouseUp = function (event) {
 };
 
-CLOUD.Extensions.CommentFrame.prototype.onMouseDownToReposition = function (event) {
+CLOUD.Extensions.CommentFrame.prototype.onRepositionDown = function (event) {
 
     if (!this.comment) return;
 
@@ -4471,13 +4526,13 @@ CLOUD.Extensions.CommentFrame.prototype.onMouseDownToReposition = function (even
         y: position.y
     };
 
-    this.onMouseMove = this.onMouseMoveToReposition.bind(this);
-    this.onMouseUp = this.onMouseUpToReposition.bind(this);
+    this.onMouseMove = this.onRepositionMove.bind(this);
+    this.onMouseUp = this.onRepositionUp.bind(this);
 
     this.editor.dragCommentFrameBegin();
 };
 
-CLOUD.Extensions.CommentFrame.prototype.onMouseMoveToReposition = function (event) {
+CLOUD.Extensions.CommentFrame.prototype.onRepositionMove = function (event) {
 
     if (!this.comment) return;
 
@@ -4497,7 +4552,7 @@ CLOUD.Extensions.CommentFrame.prototype.onMouseMoveToReposition = function (even
     this.comment.setPosition(x, y);
 };
 
-CLOUD.Extensions.CommentFrame.prototype.onMouseUpToReposition = function () {
+CLOUD.Extensions.CommentFrame.prototype.onRepositionUp = function () {
 
     if (!this.selection.dragging) {
         return;
@@ -4507,7 +4562,7 @@ CLOUD.Extensions.CommentFrame.prototype.onMouseUpToReposition = function () {
     this.editor.dragCommentFrameEnd();
 };
 
-CLOUD.Extensions.CommentFrame.prototype.onMouseDownToResize = function (event) {
+CLOUD.Extensions.CommentFrame.prototype.onResizeDown = function (event) {
 
     if (!this.comment) return;
 
@@ -4533,14 +4588,14 @@ CLOUD.Extensions.CommentFrame.prototype.onMouseDownToResize = function (event) {
             mouseY: mouse.y
         };
 
-        this.onMouseMove = this.onMouseMoveToResize.bind(this);
-        this.onMouseUp = this.onMouseUpToResize.bind(this);
+        this.onMouseMove = this.onResizeMove.bind(this);
+        this.onMouseUp = this.onResizeUp.bind(this);
 
         this.editor.dragCommentFrameBegin();
     }
 };
 
-CLOUD.Extensions.CommentFrame.prototype.onMouseMoveToResize = function (event) {
+CLOUD.Extensions.CommentFrame.prototype.onResizeMove = function (event) {
 
     if (!this.comment) return;
 
@@ -4614,7 +4669,7 @@ CLOUD.Extensions.CommentFrame.prototype.onMouseMoveToResize = function (event) {
     this.comment.setSize(width, height, newPos);
 };
 
-CLOUD.Extensions.CommentFrame.prototype.onMouseUpToResize = function (event) {
+CLOUD.Extensions.CommentFrame.prototype.onResizeUp = function (event) {
 
     this.selection.resizing = false;
     this.selection.handle.resizingPanel = null;
@@ -4622,7 +4677,7 @@ CLOUD.Extensions.CommentFrame.prototype.onMouseUpToResize = function (event) {
     this.editor.dragCommentFrameEnd();
 };
 
-CLOUD.Extensions.CommentFrame.prototype.onMouseDownToRotation = function (event) {
+CLOUD.Extensions.CommentFrame.prototype.onRotationDown = function (event) {
 
     if (!this.comment) return;
 
@@ -4633,13 +4688,13 @@ CLOUD.Extensions.CommentFrame.prototype.onMouseDownToRotation = function (event)
     this.originPosition = this.editor.getPointOnDomContainer(event.clientX, event.clientY);
     this.originRotation = this.selection.rotation || 0;
 
-    this.onMouseMove = this.onRotationMouseMove.bind(this);
-    this.onMouseUp = this.onMouseUpToRotation.bind(this);
+    this.onMouseMove = this.onRotationMove.bind(this);
+    this.onMouseUp = this.onRotationUp.bind(this);
 
     this.editor.dragCommentFrameBegin();
 };
 
-CLOUD.Extensions.CommentFrame.prototype.onRotationMouseMove = function (event) {
+CLOUD.Extensions.CommentFrame.prototype.onRotationMove = function (event) {
 
     if (!this.comment) return;
 
@@ -4657,7 +4712,7 @@ CLOUD.Extensions.CommentFrame.prototype.onRotationMouseMove = function (event) {
     this.comment.setRotation(rotation);
 };
 
-CLOUD.Extensions.CommentFrame.prototype.onMouseUpToRotation = function (event) {
+CLOUD.Extensions.CommentFrame.prototype.onRotationUp = function (event) {
 
     this.selection.rotating = false;
     this.originRotation = null;
@@ -4879,7 +4934,7 @@ CLOUD.Extensions.CommentFrame.prototype.isActive = function () {
 
 CLOUD.Extensions.CommentFrame.prototype.dragBegin = function (event) {
 
-    this.onMouseDownToReposition(event);
+    this.onRepositionDown(event);
 };
 
 CLOUD.Extensions.CommentFrame.prototype.isDragging = function () {
@@ -4901,19 +4956,43 @@ CLOUD.Extensions.CommentFrame.prototype.enableResize = function () {
 
     var handle, direction;
 
-    for (direction in this.selection.handle) {
+    if (this.comment.disableResizeHeight || this.comment.disableResizeWidth) {
 
-        handle = this.selection.handle[direction];
+        for (direction in this.selection.handle) {
 
-        if (handle) {
-            handle.style.display = 'block';
+            handle = this.selection.handle[direction];
+            if (handle) handle.style.display = 'none';
+        }
+
+        if (this.comment.disableResizeHeight) {
+
+            this.selection.handle['w'].style.display = 'block';
+            this.selection.handle['e'].style.display = 'block';
+        }
+
+        if (this.comment.disableResizeWidth) {
+
+            this.selection.handle['n'].style.display = 'block';
+            this.selection.handle['s'].style.display = 'block';
+        }
+    } else {
+
+        for (direction in this.selection.handle) {
+
+            handle = this.selection.handle[direction];
+
+            if (handle) {
+                handle.style.display = 'block';
+            }
         }
     }
+
 };
 
 CLOUD.Extensions.CommentFrame.prototype.enableRotation = function () {
 
-    this.selection.rotationPanel.style.display = 'block';
+    var display = this.comment.disableRotation ? 'none' : 'block';
+    this.selection.rotationPanel.style.display = display;
 };
 
 CLOUD.Extensions.CommentFrame.prototype.updateDimensions = function (width, height) {
@@ -5000,6 +5079,7 @@ CLOUD.Extensions.CommentEditor = function (cameraEditor, scene, domElement) {
     this.isCameraChange = false;
     this.commentType = CLOUD.Extensions.Comment.shapeTypes.ARROW;
     this.nextCommentId = 0;
+    this.arrowMinLen = 16;
 };
 
 CLOUD.Extensions.CommentEditor.prototype = Object.create(CLOUD.OrbitEditor.prototype);
@@ -5291,7 +5371,7 @@ CLOUD.Extensions.CommentEditor.prototype.mouseDownForArrow = function (event) {
     this.originX = start.x;
     this.originY = start.y;
 
-    var width = 2;
+    var width = this.arrowMinLen;
     var head = {x: this.originX, y: this.originY};
     var tail = {
         x: Math.round(head.x + Math.cos(Math.PI * 0.25) * width),
@@ -5344,6 +5424,18 @@ CLOUD.Extensions.CommentEditor.prototype.mouseMoveForArrow = function (event) {
 
     var startX = this.originX;
     var startY = this.originY;
+
+    var deltaX = end.x - startX;
+
+    if (Math.abs(deltaX) < this.arrowMinLen) {
+
+        if (deltaX > 0) {
+            end.x = startX + this.arrowMinLen;
+        } else {
+            end.x = startX - this.arrowMinLen;
+        }
+    }
+
     var endX = Math.min(Math.max(bounds.x, end.x), bounds.x + bounds.width);
     var endY = Math.min(Math.max(bounds.y, end.y), bounds.y + bounds.height);
 
@@ -5352,15 +5444,15 @@ CLOUD.Extensions.CommentEditor.prototype.mouseMoveForArrow = function (event) {
         endY++;
     }
 
-    var head = {x: startX, y: startY};
-    var tail = {x: endX, y: endY};
+    var tail = {x: startX, y: startY};
+    var head = {x: endX, y: endY};
 
     var epsilon = 0.0001;
 
     if (Math.abs(arrow.head.x - head.x) >= epsilon || Math.abs(arrow.head.y - head.y) >= epsilon ||
         Math.abs(arrow.tail.x - tail.x) >= epsilon || Math.abs(arrow.tail.y - tail.y) >= epsilon) {
 
-        arrow.set(head.x, head.y, tail.x, tail.y);
+        arrow.set(tail.x, tail.y, head.x, head.y);
     }
 };
 
