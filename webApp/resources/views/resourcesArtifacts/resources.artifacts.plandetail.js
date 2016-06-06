@@ -37,15 +37,11 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
             alert("您还有没保存的");
             return
         }
-
         this.toggleClass();
+        this. getRules();
 
         App.ResourceArtifacts.Status.presentPlan = null;
         App.ResourceArtifacts.Status.presentPlan = this.model;
-
-
-        this. getRules();
-
     },
 
 //切换计划
@@ -71,8 +67,6 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
                 App.ResourceArtifacts.PlanRules.reset();
                 $(".artifactsContent .rules h2 .name").html(_this.model.get("code") + "&nbsp;" +_this.model.get("name"));
                 $(".artifactsContent .rules h2 i").html( "("+response.data.length + ")");
-
-
 
                 if(response.data  &&  response.data.length){
                     $(".artifactsContent .rules ul").empty();

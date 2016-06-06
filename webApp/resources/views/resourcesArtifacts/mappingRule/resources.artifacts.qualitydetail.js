@@ -28,11 +28,9 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
     //取得规则列表
     getDetail:function(e){
         var item = $(e.target);
-        var  code = this.model.get("code");
-        if(!code){
-            //判断是否为新建规则，新建规则如何处理？
-            return;
-        }
+        App.ResourceArtifacts.Status.rule.targetCode = this.model.get("code");
+        App.ResourceArtifacts.Status.rule.targetName = this.model.get("name");
+
         if(!App.ResourceArtifacts.Status.saved){
             alert("您还有没保存的");
             return
@@ -57,8 +55,6 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
             return
         }
         if(this.model.get("leaf")){
-
-
             //存在，加载二级或三级标准
             pdata = {
                 URLtype : 'fetchQualityPlanQualityLevel2',
@@ -76,12 +72,9 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
             });
             return
         }
-
-        this.
-
         $(".artifactsContent .rules ul").empty();
         //刷新右面视图
-        var code = this.model.get("code");
+        var code = App.ResourceArtifacts.Status.rule.targetCode;
         pdata = {
             URLtype: "fetchArtifactsPlanRule",
             data:{
@@ -91,13 +84,14 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
             }
         };
         App.Comm.ajax(pdata,function(response){
-            if(response.code == 0 && response.data.length){
+            if(response.code == 0 ){
                 App.ResourceArtifacts.PlanRules.reset();
-                //修改右侧名称
                 $(".artifactsContent .rules h2 .name").html(_this.model.get("code") + "&nbsp;" +_this.model.get("name"));
                 $(".artifactsContent .rules h2 i").html( "("+response.data.length + ")");
-                $(".artifactsContent .rules ul").empty();
-                App.ResourceArtifacts.PlanRules.add(response.data);
+                if(response.data  &&  response.data.length){
+                    $(".artifactsContent .rules ul").empty();
+                    App.ResourceArtifacts.PlanRules.add(response.data);
+                }
             }
         });
     }

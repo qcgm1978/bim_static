@@ -52,8 +52,6 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
             this.$(".ruleDetail").show();
         }
     },
-
-
     //选择分类编码
     choose:function(){
         var tree  = new App.Resources.ArtifactsWindowRule().render().el;
@@ -68,7 +66,6 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
         var model = new App.ResourceArtifacts.newRule(App.ResourceArtifacts.newModel);
         App.ResourceArtifacts.operator.add(model);
     },
-
     //保存
     saveRule:function(){
         //校验
@@ -76,7 +73,6 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
         if(!check){return}*/
 
         var _this =this;
-
         //查找所有数据，拼接成字符串
         var title =  this.$(".ruleTitle");
         var id = title.data("id");
@@ -93,12 +89,10 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
             alert("规则名称不能为空!");
             return
         }
-
-
+        
         var model = App.ResourceArtifacts.saveRuleModel();
         var dd =  this.$("dd");
         var Rulist = [];
-
 
         for(var i =0 ; i < dd.length ; i++){
             Rulist[i]  ={};
@@ -141,12 +135,12 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
                     return
                 }
 
-           /*     if(!leftValue.val()){
+                if(!leftValue.val()){
                     left = ""
                 }
                 if(!rightValue.val()){
                     right = ""
-                }*/
+                }
 
                 var str = left.data("operator")  + leftValue.val() +","+ rightValue.val()+ right.data("operator") ;
                 Rulist[i].propertyValue = str;
@@ -158,16 +152,13 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
         model.mappingCategory.mappingPropertyList = Rulist;
 
 
-
         this.model.set({"targetCode":App.ResourceArtifacts.Status.rule.targetCode},{silent:true});
         this.model.set({"targetName":App.ResourceArtifacts.Status.rule.targetName},{silent:true});
         this.model.set({"biz":App.ResourceArtifacts.Status.rule.biz},{silent:true});
         this.model.set({"type":App.ResourceArtifacts.Status.type},{silent:true});
         this.model.set({"mappingCategory": model.mappingCategory},{silent:true});
 
-
         var baseData = this.model.toJSON();
-
 
         var cdata = {
             URLtype : '',
@@ -178,7 +169,6 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
         };
 
 
-
         if(this.model.get("id")){
             cdata.URLtype = "modifyArtifactsPlanRule";
             cdata.type ="PUT";
@@ -187,21 +177,18 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
             cdata.URLtype = "createArtifactsPlanNewRule";
         }
 
-
         $(".artifactsContent .rules").addClass("services_loading");
         App.Comm.ajax(cdata,function(response){
             if(response.code == 0 && response.data){
                 _this.$el.closest(".ruleDetail").hide();
                 //创建
                 if(cdata.URLtype == "createArtifactsPlanNewRule"){
-                    _this.model.set({"id":response.data.id},{silent:true});
+                    //_this.model.set({"id":response.data.id},{silent:true});
                     title.data("id",response.data.id);
-                    App.ResourceArtifacts.Status.delRule = response.data.id;
                     //创建
                     $(".artifactsContent .rules h2 .name").html(App.ResourceArtifacts.Status.rule.targetCode+ "&nbsp;" +App.ResourceArtifacts.Status.rule.targetName);
                     var count = parseInt(App.ResourceArtifacts.Status.presentPlan.get("count"));
                     $(".artifactsContent .rules h2 i").html( "("+Rulist.length + ")");
-
                 }
                 _this.reset();
                 $(".artifactsContent .rules").removeClass("services_loading");
@@ -241,20 +228,7 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
     //删除单条规则
     delRule:function(e){
         var rule = $(e.target),_this = this;
-        var id  = rule.siblings(".leftten").data("id");
-        var mappingCategory = _this.model.get("mappingCategory");
-        var list = mappingCategory["mappingPropertyList"];
-        for(var i = 0 ; i < list.length ; i ++){
-            if(list[i].id == id){
-                list.splice(i,1)
-            }
-        }
 
-        mappingCategory["mappingPropertyList"] = list;
-        _this.model.set({"mappingCategorymappingCategory":mappingCategory},{silent:true});
-        var operatorData = App.Resources.dealStr(_this.model);
-        App.ResourceArtifacts.operator.reset();
-        App.ResourceArtifacts.operator.add(operatorData);
     },
     //联想模块
     legend:function(e){

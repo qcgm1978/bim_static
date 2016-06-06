@@ -34,7 +34,7 @@ App.Resources.ArtifactsPlanRuleAlert = Backbone.View.extend({
             type:"DELETE",
             success:function(response){
                  if(response.code==0){ //删除成功
-                     $(".ruleDetail").hide().empty();
+                     $(".ruleDetail").hide();
                      App.ResourceArtifacts.Status.saved = true ;//保存状态va
 
                      App.ResourceArtifacts.PlanRules.each(function(item){
@@ -56,7 +56,6 @@ App.Resources.ArtifactsPlanRuleAlert = Backbone.View.extend({
                 App.Resources.ArtifactsAlertWindow.close();
             }
         });
-
         App.ResourceArtifacts.Status.delRule = null;
     },
         //取消

@@ -7,6 +7,7 @@ App.ResourceArtifacts={
         presentRule : null,    //当前规则
         qualityProcessType:1,   //质量标准 -过程选择  type
 
+
         delRule:null,
 
         qualityStandardType:"GC",   //质量标准 -过程选择  type
@@ -322,38 +323,14 @@ App.ResourceArtifacts={
 
     //获取质量标准
     getQuality:function(pdata,_this){
-        /*var pdata;
-        pdata  = {
-            URLtype:"fetchQualityPlanQualityLevel2",
-            data:{}
-        };
-        App.ResourceArtifacts.QualityStandard.reset();
-
-        App.Comm.ajax(pdata,function(response){
-            if(response.code == 0 && response.data.length){
-                App.ResourceArtifacts.QualityStandard.add(response.data);
-            }
-        });*/
-
         App.ResourceArtifacts.Status.quality.type = 1 ;
-        //type	是	Byte	1:标准规则；2：项目规则
-        //standardTyp	否	String	标准类型：KY-开业，GC-施工
-        //parentCode	否	String	上级Code, 空或不传获取顶级标准，all获取所有标准
-
-
-
         App.Comm.ajax(pdata,function(response){
             if(response.code == 0 && response.data.length){
-
                 var list = App.Resources.artifactsQualityTree(response.data);
-                _this.$(".qualityMenu div").html(list);
-
-                //App.ResourceArtifacts.QualityStandard.reset();//怎么重置是个问题，这里要用tree
-                //App.ResourceArtifacts.QualityStandard.add(response.data);
+                _this.$("#qualityMenuList").html(list);
             }
         });
     },
-
     //延迟
     delay:function(data){
     var _this = this , batch , length = data.length , arr = []  , n = 1 , last;

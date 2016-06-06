@@ -30,8 +30,9 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
         }
 
         //重置数据，导致每次重新获取映射规则
-        var planRule = new App.Resources.ArtifactsPlanRule();
-        this.$(".rules").html(planRule.render().el);//菜单
+        //需要清空当前列表
+        this.$(".ruleContent ul").html("<li><div class='ruleTitle delt'>没有选择模块/质量标准</div></li>");
+
 
         if(pre.hasClass("modularization")){//模块化
 
@@ -53,9 +54,6 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
             var quality = new App.Resources.ArtifactsQualityList().render().el;
             this.$(".qualifyC").html(quality);
 
-
-
-
             var pdata = {
                 URLtype:'fetchQualityPlanQualityLevel1',
                 data:{
@@ -63,7 +61,6 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
                     standardType: "GC"
                 }
             };
-
             App.ResourceArtifacts.getQuality(pdata,_this);
             this.$(".qualifyC").show();
         }
@@ -97,7 +94,6 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
             //查找未保存的元素并高亮提示变红
             return
         }
-
         if(!$(".ruleDetail").length){
             $(".artifactsContent .rules ul").html("");
         }
@@ -109,7 +105,6 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
         App.ResourceArtifacts.PlanRules.push(model);
 
         var container = new App.Resources.ArtifactsPlanRuleDetail({model:model}).render();
-
 
         //加载底下规则
         var operatorData = App.Resources.dealStr(model);//规则数据
@@ -123,5 +118,7 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
 
         $(".artifactsContent .rules ul li:last-child").html(container.el).show();
         $(".artifactsContent .rules ul li:last-child .ruleDetail").show();
+
+        App.ResourceArtifacts.Status.saved = false;
     }
 });
