@@ -215,8 +215,8 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
     //删除计划中的整条规则
     deleteRule:function(){
         var _this = this;
-
-        App.ResourceArtifacts.Status.delRule = this.model.get("id");
+        $(".artifactsContent .rules").addClass("services_loading");
+        App.ResourceArtifacts.Status.delRule = this.model.get("mappingCategory").id;
         var frame = new App.Resources.ArtifactsPlanRuleAlert().render().el;
         App.Resources.ArtifactsAlertWindow = new App.Comm.modules.Dialog({
             title: "",

@@ -52,11 +52,12 @@ App.Resources.ArtifactsPlanRuleAlert = Backbone.View.extend({
                      App.ResourceArtifacts.PlanRules.remove(pre);
 
                      _.each($(".ruleTitle"),function(item){
-
-                         if(parseInt($(item).attr("data-id")) == parseInt(id)){
+                         if(parseInt($(item).attr("data-id")) == id){
+                             console.log(1);
                              $(item).closest("li").remove();
                          }
                      });
+;
 
                      var _this = App.ResourceArtifacts.Status.presentPlan;
 
@@ -66,6 +67,7 @@ App.Resources.ArtifactsPlanRuleAlert = Backbone.View.extend({
 
                      App.Resources.ArtifactsAlertWindow.close();
                 }
+                $(".artifactsContent .rules").removeClass("services_loading");
             },
             error:function(error){
                 alert("错误类型"+ error.status +"，无法成功删除!");
