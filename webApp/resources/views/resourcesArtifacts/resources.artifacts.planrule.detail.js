@@ -175,7 +175,9 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
                 //创建
                 if(cdata.URLtype == "createArtifactsPlanNewRule"){
                     _this.model.set({"id":response.data.id},{silent:true});
-                    title.data("id",response.data.id);
+
+
+                    _this.$(".ruleTitle").attr("data-id",response.data.id);
 
                     //写入相关的数据
                     var count = parseInt(App.ResourceArtifacts.Status.presentPlan.get("count"));
