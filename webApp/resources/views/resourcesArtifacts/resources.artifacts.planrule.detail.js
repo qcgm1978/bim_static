@@ -58,7 +58,8 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
     //增加新规则
     addNewRule:function(){
         var model = new App.ResourceArtifacts.newRule(App.ResourceArtifacts.newModel);
-        App.ResourceArtifacts.operator.add(model);
+        var view = new App.Resources.ArtifactsPlanRuleDetailNew({model:model}).render().el;
+        this.$(".conR dl").append(view);
     },
     //保存
     saveRule:function(){
