@@ -51,7 +51,7 @@ App.Resources.artifactsQualityTree = function(dataList){
         li.append(new App.Resources.ArtifactsQualityDetail({model:initModel}).render().el);
         li.append("<div class='childList' data-code='"+data[i].code +"'></div>");
         ele.append(li);
-        App.Comm.initScroll($(".qualityMenu"),"y");
+        App.Comm.initScroll($("#qualityMenuList"),"y");
     }
     return ele;
 };

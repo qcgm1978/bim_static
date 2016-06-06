@@ -6,11 +6,34 @@ App.ResourceArtifacts={
         saved : true,    //创建规则后的保存状态，已保存  /  未保存
         presentRule : null,    //当前规则
         qualityProcessType:1,   //质量标准 -过程选择  type
-        qualityStandardType:"GC",   //质量标准 -过程选择  type
-        biz:1,
-        projectId : null,
-        type:1, //1:标准规则；2：项目规则
+
+
         delRule:null,
+
+        qualityStandardType:"GC",   //质量标准 -过程选择  type
+
+        type:"", //1:标准规则；2：项目规则
+        projectId : "",//如果有项目规则就有项目id
+
+        //模块化
+        plan:{},
+
+        rule:{
+            biz:"",//1：模块化；2：质监标准
+            type : "", //1:标准规则；2：项目规则
+            targetCode:"",  //对应模块的code
+            targetName:"",
+            "mappingCategory": {
+                "categoryCode": "",
+                "categoryName": "",
+                "mappingPropertyList":[]
+            }
+        },
+
+        quality:{
+            standardType:"GC",
+            parentCode:""
+        }
     },
 
     Settings: {
@@ -60,15 +83,12 @@ App.ResourceArtifacts={
 
 
     //计划规则/获取
-    operator:new(Backbone.Collection.extend({
-        model:Backbone.Model.extend({
-            defaults:function(){
-                return{
-
-                }
+    operator:Backbone.Model.extend({
+        defaults:function(){
+            return{
+                code : ""
             }
-        })
-    })),
+        }}),
 
 
 
@@ -109,15 +129,15 @@ App.ResourceArtifacts={
     }),
 
     saveRuleModel:function(){
-        var a =   {
-            "biz": App.ResourceArtifacts.Status.biz,//1：模块化；2：质监标准  //新建时写入值
-                "targetCode": "",//新建时写入当前计划编号
-                "targetName": "",//计划名称
-                "type": App.ResourceArtifacts.Status.qualityProcessType,//1:标准规则；2：项目规则  //新建时写入值
-                "mappingCategory": {
+        return   {
+            "biz": 1,//1：模块化；2：质监标准  //新建时写入值
+            "targetCode": "",//新建时写入当前计划编号
+            "targetName": "",//计划名称
+            "type": 1,//1:标准规则；2：项目规则  //新建时写入值
+            "mappingCategory": {
                 "categoryCode": "",
-                    "categoryName": "",
-                    "mappingPropertyList": [
+                "categoryName": "",
+                "mappingPropertyList": [
                     {
                         "propertyKey": "",
                         "operator": "",
@@ -125,21 +145,20 @@ App.ResourceArtifacts={
                     }
                 ]
             }
-        };
-        return a
+        }
     },
 
 
 
 
     //创建计划规则
-    createPlanRules:function(biz,targetCode,targetName,type){
+    createPlanRules:function(){
         //创建新的构件映射计划节点
         var newPlanRuleData = {
-            "biz": App.ResourceArtifacts.Status.biz,//1：模块化；2：质监标准  //新建时写入值
+            "biz": "",//1：模块化；2：质监标准  //新建时写入值
             "targetCode": "",//新建时写入当前计划编号
             "targetName": "",//计划名称
-            "type": App.ResourceArtifacts.Status.qualityProcessType,//1:标准规则；2：项目规则  //新建时写入值
+            "type": "",//1:标准规则；2：项目规则  //新建时写入值
             "mappingCategory": {
                 "categoryCode": "",
                 "categoryName": "",
@@ -153,13 +172,37 @@ App.ResourceArtifacts={
             }
         };
         //写入基础数据
-        newPlanRuleData.biz =  biz;
-        newPlanRuleData.targetCode =  targetCode;
-        newPlanRuleData.targetName =  targetName || "新建映射规则";
-        newPlanRuleData.type =  type;
+        newPlanRuleData.biz =  App.ResourceArtifacts.Status.biz;
+        newPlanRuleData.targetCode =  App.ResourceArtifacts.Status.rule.targetCode;
+        newPlanRuleData.targetName =  "";
+        newPlanRuleData.type =  App.ResourceArtifacts.Status.type;
 
         return new this.newPlanRules(newPlanRuleData);
     },
+
+
+
+/*{
+    "biz": 1,//1：模块化；2：质监标准
+    "targetCode": "GC0022",
+    "targetName": "室内土方回填",
+    "type": 1,//1:标准规则；2：项目规则
+    "mappingCategory": {
+    "categoryCode": "30.30.90",
+        "categoryName": "基础挖方",
+        "mappingPropertyList": [{
+        "propertyKey": "QY",
+        "operator": "==",
+        "propertyValue": "样板"
+    },
+        {
+            "propertyKey": "QY",
+            "operator": "<>",
+            "propertyValue": "(30,50]"
+        }]
+}
+}*/
+
 
 //保存计划规则
     SavePlanRules : Backbone.Model.extend({
@@ -229,7 +272,7 @@ App.ResourceArtifacts={
     })),
 
     init:function(_this) {
-
+        App.ResourceArtifacts.Status.rule.biz =1;  //设置默认规则为模块化
 
         var pre = new App.Resources.ArtifactsMapRule();
         var plans = new App.Resources.ArtifactsPlanList();
@@ -240,7 +283,9 @@ App.ResourceArtifacts={
         _this.$el.append(pre.render().el);//菜单
 
         pre.$(".plans").html(plans.render().el);//计划节点
-        pre.$(".rules").append(planRule.render().el);//菜单
+        pre.$(".rules .ruleContent").append(planRule.render().el);//
+
+        pre.$(".rules .ruleContent ul").html("<li><div class='ruleTitle delt'>没有相关规则节点</div></li>");
 
         //插入默认为空的规则列表
         this.getPlan();
@@ -256,17 +301,17 @@ App.ResourceArtifacts={
         var plans = new App.Resources.ArtifactsPlanList();
         var planRule = new App.Resources.ArtifactsPlanRule();
         pre.$(".plans").html(plans.render().el);//计划节点
-        pre.$(".rules").html(planRule.render().el);//菜单
+        pre.$(".rules .ruleContent").html(planRule.render().el);//菜单
     },
 
-
+    //获取计划节点
     getPlan:function(){
         var _this = this, pdata;
-
+        App.ResourceArtifacts.Status.type =1 ;
         pdata  = {
             URLtype:"fetchArtifactsPlan",
             data:{
-                type :1
+                type :App.ResourceArtifacts.Status.type =1
             }
         };
         App.Comm.ajax(pdata,function(response){
@@ -276,33 +321,16 @@ App.ResourceArtifacts={
         });
     },
 
+    //获取质量标准
     getQuality:function(pdata,_this){
-        /*var pdata;
-        pdata  = {
-            URLtype:"fetchQualityPlanQualityLevel2",
-            data:{}
-        };
-        App.ResourceArtifacts.QualityStandard.reset();
-
+        App.ResourceArtifacts.Status.quality.type = 1 ;
         App.Comm.ajax(pdata,function(response){
             if(response.code == 0 && response.data.length){
-                App.ResourceArtifacts.QualityStandard.add(response.data);
-            }
-        });*/
-
-
-        App.Comm.ajax(pdata,function(response){
-            if(response.code == 0 && response.data.length){
-
                 var list = App.Resources.artifactsQualityTree(response.data);
-                _this.$(".qualityMenu div").html(list);
-
-                //App.ResourceArtifacts.QualityStandard.reset();//怎么重置是个问题，这里要用tree
-                //App.ResourceArtifacts.QualityStandard.add(response.data);
+                _this.$("#qualityMenuList").html(list);
             }
         });
     },
-
     //延迟
     delay:function(data){
     var _this = this , batch , length = data.length , arr = []  , n = 1 , last;

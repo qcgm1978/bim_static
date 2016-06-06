@@ -15,8 +15,8 @@
 </div>
 <div class="eIn <%= (type == a1  || type == a2) ? 'active' : ''  %>"><input type="text" placeholder='请输入属性值，多个属性值可用英文 "," 分隔' value="<%= obj.propertyValue %>"></div><!--等于/不等于-->
 <div class="ioside  <%= (type == a3 || type == a4) ? 'active' : ''  %>"><!--范围 内/外-->
-    <div class="myDropDown" data-operator="(">
-                        <span class="myDropText" data-rule="<%= obj.ruleList.left %>">
+    <div class="myDropDown" data-operator="">
+                        <span class="myDropText">
                             <span class="text"><%= obj.ruleList.left=='(' ? '>' : (obj.ruleList.left=='[' ? "≥" : '>') %></span>
                             <i class="myDropArrorw down"></i>
                         </span><input type="number" placeholder="请输入数值"   class="leftValue" value="<%= obj.ruleList.leftValue %>">
@@ -24,9 +24,9 @@
             <li class="myItem" data-operator="("> > </li>
             <li class="myItem" data-operator="["> ≥ </li>
         </ul>
-    </div><div class="myDropDown " data-operator=")">
-                        <span class="myDropText" data-rule="<%= obj.ruleList.right  %>">
-                            <span class="text"><%= obj.ruleList.right==')' ? '<' : (obj.ruleList.right==']' ? "≤" : '<') %></span>
+    </div><div class="myDropDown " data-operator="">
+                        <span class="myDropText">
+                            <span class="text"><%= obj.ruleList.right==')' ? '<' : (obj.ruleList.right==']' ? "≤" : '') %></span>
                             <i class="myDropArrorw down"></i>
                         </span><input type="number" placeholder="请输入数值" class="rightValue last" value="<%= obj.ruleList.rightValue %>">
         <ul class="myDropList">

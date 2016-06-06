@@ -63,7 +63,7 @@ App.BodyContent.control= {
 
     slideCollection:new (Backbone.Collection.extend({
         model:App.BodyContent.model,
-        urlType:"fetchBodyContentMmhSlide",
+        urlType:"fetchBodyContentSilde",
         parse: function (response) {
             if (response.message == "success") {
                 return response.data;
@@ -113,7 +113,7 @@ App.BodyContent.control= {
             	var _$container=null;
                 //轮播插件是jquery对象、所以直接加载显示、不经过Backbone
                 if(collection ==App.BodyContent.control.slideCollection && response.message=="success"){
-                	var _datas=response.data.items;
+                	var _datas=response.data;
                 	_datas.length>=5? _datas.length = 5:"";
                     $(".mmhSlider").mmhSlider({
 						delay:5000,

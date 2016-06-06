@@ -344,7 +344,10 @@ App.Project.Model = {
 			} else {
 				this.$el.html("没有变更");
 			}
-			$(".showChange .checkboxGroup input:checkbox").trigger('click');
+			if(!$(".showChange .checkboxGroup input:checkbox").prop('checked')){
+				$(".showChange .checkboxGroup input:checkbox").trigger('click');
+			}
+
 			return this;
 		},
 		openTree: function(event) {
@@ -370,13 +373,17 @@ App.Project.Model = {
 
 			//zoomtobox
 			$.ajax({
-				url: "http://bim.wanda-dev.cn/sixD/"+App.Index.Settings.projectId+"/"+App.Index.Settings.projectVersionId+"/bounding/box?sceneId="+elementId.split('.')[0]+"&elementId="+elementId
+				url: "http://bim.wanda-dev.cn/sixD/"+App.Index.Settings.projectId+"/"+App.Index.Settings.projectVersionId+"/bounding/box?sceneId="+(elementId?elementId.split('.')[0]:baseId.split('.')[0])+"&elementId="+(elementId?elementId:baseId)
 			}).done(function(respone){
 				if(respone.code==0){
 					var max = respone.data.max,
 					    min = respone.data.min,
 					    box1=[[max.x,max.y,max.z],[min.x,min.y,min.z]];
 					if(baseId){
+						if(!elementId){
+							return 	App.Index.Settings.Viewer.zoomToBox(box1);
+
+						}
 						$.ajax({
 							url: "http://bim.wanda-dev.cn/sixD/"+App.Index.Settings.projectId+"/"+App.Index.Settings.projectVersionId+"/bounding/box?sceneId="+baseId.split('.')[0]+"&elementId="+baseId
 						}).done(function(respone){
@@ -388,6 +395,8 @@ App.Project.Model = {
 
 							}
 						});
+					}else{
+						App.Index.Settings.Viewer.zoomToBox(box1);
 					}
 
 

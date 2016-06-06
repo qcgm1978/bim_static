@@ -43,7 +43,9 @@ App.Resources.ArtifactsWindowRuleDetail = Backbone.View.extend({
             $(".ruleNodeName span.name").removeClass("active");
             pre.addClass("active");
 
-            //将内容添加到背后模型中
+            App.ResourceArtifacts.Status.rule.mappingCategory.categoryCode = this.$(".ruleNodeName").data("id");
+            App.ResourceArtifacts.Status.rule.mappingCategory.categoryName = this.$(".ruleNodeName").data("name");
+
         }
     }
 });

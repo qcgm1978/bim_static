@@ -223,11 +223,15 @@
       var rootDom = $('#selected .selectTree');
       var treeData = {};
       var treeHtml = $('<div class="tree"></div>');
+      if(!data){
+        rootDom.html('');
+        return
+      }
       $.each(data,function(i,item){
         var name = fileData[item.modelId];
-        var parents = treeHtml.find('[data-type='+name+']')
+        var parents = treeHtml.find('[data-type="'+name+'"]')
         if(parents.length >0){
-          var child = parents.find('[data-type='+item.cateName+']')
+          var child = parents.find('[data-type="'+item.cateName+'"]')
           if(child.length>0){
             child.find('.tree').append(createli(item.name,false));
           }else{
