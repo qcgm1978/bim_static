@@ -68,7 +68,6 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
     getRules:function() {
         var _this = this,pdata;
         if(!App.ResourceArtifacts.Status.saved){
-            //提示有没有保存现在的，重要
             return
         }
         if(!this.model.get("leaf")){
