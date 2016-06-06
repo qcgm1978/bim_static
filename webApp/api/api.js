@@ -11,6 +11,9 @@ App.API = {
 
 		//首页bodyContent数据
 		fetchBodyContentTodos :'platform/todo',
+
+		fetchBodyContentSilde :'platform/project/top',
+
 		//本月开始、到期接口
 		fetchBodyContentMonthEnd :'sixD/plan/concern/index',//?type={type}&userId={userId}
 		fetchBodyContentMonthStart :'sixD/plan/concern/index',
@@ -182,25 +185,16 @@ App.API = {
 		createNewFolder: "doc/{projectId}/{projectVersionId}/file", // 创建新文件夹 ?parentId={parentId}&filePath={filePath}
 
 		//映射规则库
-		fetchArtifactsCategoryRule:"dataJson/resources/fetchArtifactsCategoryRule.json",//获取分类编码   platform/mapping/rule/category/coding?parentCode={parentCode}
-		fetchArtifactsPlan:"dataJson/resources/fetchArtifactsPlan.json",//计划节点    platform/mapping/rule/plan/standard?type={type}  模块化列表  1:标准规则；2：项目规则
-		fetchArtifactsPlanRule:"dataJson/resources/fetchArtifactsPlanRule.json",//计划节点规则获取
-		createArtifactsPlanNewRule:"dataJson/resources/fetchArtifactsMapPlan.json",//计划节点新建规则      platform/mapping/rule/create?projectId={projectId}    如果为标准映射规则不用传projectId
-		modifyArtifactsPlanRule:"dataJson/resources/fetchArtifactsPlanRule.json",//计划节点修改规则          platform/mapping/rule/update?projectId={projectId}
+		fetchArtifactsCategoryRule:"dataJson/resources/fetchArtifactsCategoryRule.json",//获取分类编码   platform/mapping/rule/category/coding?parentCode={parentCode}  //接口无数据
+		fetchArtifactsPlan:"platform/mapping/rule/plan/standard",//计划节点    platform/mapping/rule/plan/standard?type={type}  模块化列表  1:标准规则；2：项目规则
+		fetchArtifactsPlanRule:"platform/mapping/rule/target/code/{code}?",//计划节点规则获取     //platform/mapping/rule/target/code/{code}?biz={biz}&type={type}&projectId={projectId}
+		createArtifactsPlanNewRule:"platform/mapping/rule/create",//计划节点新建规则      platform/mapping/rule/create?projectId={projectId}    如果为标准映射规则不用传projectId
+		modifyArtifactsPlanRule:"platform/mapping/rule/update",//计划节点修改规则          platform/mapping/rule/update?projectId={projectId}
 		deleteArtifactsPlanRule:"dataJson/resources/fetchArtifactsMapPlan.json",//计划节点删除规则           platform/mapping/rule/delete/{id}?projectId={projectId}
 
 		//质量标准
-		//platform/mapping/rule/quality/standard?type={type}&standardType=={KY|GC}&parentCode={parentCode}  获取质量标准列表
-		// type	是	Byte	1:标准规则；2：项目规则
-		//standardTyp	否	String	标准类型：KY-开业，GC-施工
-		//parentCode	否	String	上级Code, 空或不传获取顶级标准，all获取所有标准
-		//注：leaf 是否是叶子节点："leaf": false 不是叶子节点。"leaf": true 是叶子节点。
-		// 目标编码和对应属性规则  platform/mapping/rule/target/code/{code}?biz={biz}&type={type}&projectId={projectId}
-		fetchQualityPlanStandardLevel1:"dataJson/resources/fetchArtifactsMapPlan.json", //质量标准1级菜单
-		fetchQualityPlanStandardLevel2:"dataJson/resources/fetchArtifactsMapPlan.json", //质量标准2级菜单
-		fetchArtifactsQualityNewRule:"dataJson/resources/fetchArtifactsMapPlan.json",//质量标准新建规则
-		modifyArtifactsQualityRule:"dataJson/resources/fetchArtifactsMapPlan.json",//质量标准修改规则
-		deleteArtifactsQualityRule:"dataJson/resources/fetchArtifactsMapPlan.json",//质量标准删除规则
+		fetchQualityPlanQualityLevel1:"platform/mapping/rule/plan/standard", //获取质量标准1级  platform/mapping/rule/quality/standard?type={type}&standardType=={KY|GC}
+		fetchQualityPlanQualityLevel2:"dataJson/resources/fetchArtifactsStandardQuality.json", //获取质量标准其他级
 
 		//项目 变更 列表
 		fileList:"doc/internal/{projectId}/{versionId}/differ", //变更列表

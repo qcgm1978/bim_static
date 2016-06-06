@@ -1,5 +1,6 @@
 @iconSize: 32px;
 .bim{width:100%;height:100%;overflow:hidden;position:relative;background:#fff;
+  .selectTree{padding:5px 10px;}
   &.color-1{background:#fff;}
   &.color-2{background:#ccc;}
   &.color-3{background:#4a4a4a;}
@@ -11,6 +12,7 @@
     .modelBar{display:none;}
     .view{cursor:default;}
   }
+  .selection{position:absolute;z-index:9;border:1px solid #03c;background:#000;}
   .loading{position:absolute;width:100%;height:6px;left:0;top:0;background:#ccc;overflow:hidden;}
   .progress{display:block;background:#358BD4;height:6px;width:0;}
   .modelLoading{position:absolute;left:50%;top:50%;margin:-32px 0 0 -32px;width:64px;height:64px;background:url(../images/loading-blue-64.gif) no-repeat;}
@@ -18,15 +20,15 @@
   .fly{cursor:crosshair;}
   .zoom{cursor:url('../images/zoom.png'),default;}
   .commentBar{position:absolute;z-index:20;background:#333;left:50%;bottom:10px;transform:translate(-50%,0);}
-  .modelBar{position:absolute;z-index:20;background:#333;left:50%;bottom:10px;transform:translate(-50%,0);}
+  .modelBar{position:absolute;z-index:20;background:#333;left:10px;bottom:10px;}
   .modelSelect{float:left;margin:5px;position:relative;color:#fff;
-    .cur{display:block;width:100px;height:30px;line-height:28px;padding:0 30px 0 5px;border:1px solid #666;
+    .cur{display:block;width:100px;height:30px;line-height:28px;padding:0 30px 0 5px;border:1px solid #666;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
       &:after{content:'';position:absolute;display:block;border-top:4px solid #fff;border-left:4px solid transparent;border-right:4px solid transparent;right:5px;top:12px;transition: all .5s;}
       &.open:after{transform:rotate(-180deg);}
     }
     .modelList{display:none;position:absolute;width:100%;bottom:100%;background:#333;border:1px solid #666;border-bottom:none;}
     .open + .modelList{display:block;}
-    .modelItem{height:30px;line-height:28px;padding:0 5px;cursor:pointer;list-style:none;}
+    .modelItem{height:30px;line-height:28px;padding:0 5px;cursor:pointer;list-style:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   }
   .bar-item{float:left;display:block;width:34px;height:34px;border:1px solid #333;margin:3px 2px;color:#fff;position:relative;line-height:1; font-family: "modelicon" !important; font-size: 32px; font-style: normal; -webkit-font-smoothing: antialiased; -webkit-text-stroke-width: 0.2px; -moz-osx-font-smoothing: grayscale;
     &:hover{border:1px solid #666;}
@@ -73,7 +75,9 @@
     }
     .modelMap{width:100%;height:260px;background:rgba(34,34,34,.85);position:absolute;left:0;bottom:0;z-index:2;
       .map{height:180px;margin:0 2px;border-top:1px solid #999;border-bottom:1px solid #999;}
-      .axisGrid{margin:5px;float:right;max-width:240px;overflow:hidden;text-overflow:ellipsis;text-align:right;color:#fff;line-height:30px;cursor:pointer;}
+      .axisGrid{margin:5px;float:right;max-width:240px;overflow:hidden;text-overflow:ellipsis;text-align:right;color:#fff;line-height:30px;cursor:pointer;
+        &:before{content:'\e619';font-family:'modelicon';display:inline;margin-right:3px;}
+      }
       .modelSelect{
         .cur{width:60px;}
       }
@@ -91,7 +95,7 @@
     // icon
     [class^='m-']{font-family: "modelicon" !important; font-size: 16px; font-style: normal; -webkit-font-smoothing: antialiased; -webkit-text-stroke-width: 0.2px; -moz-osx-font-smoothing: grayscale;}
     .itemNode{
-      .itemContent{padding:5px 0;height:28px;line-height:18px;
+      .itemContent{padding:5px 0;height:28px;line-height:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
         i{vertical-align:middle;}
         .treeText{padding:3px;cursor:pointer;}
         .selected{background:#006ecf;}
@@ -139,7 +143,7 @@
   // dialog
 }
 .modelDialog{position:fixed;z-index:9;left:0;top:0;bottom:0;right:0;background:rgba(0,0,0,.5);}
-.dialogBody{width:500px;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:#333;color:#fff;
+.dialogBody{width:800px;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:#333;color:#fff;
   .dialogHeader{height:51px;padding:10px 21px;border-bottom:1px solid #666;font-size:16px;line-height:30px;
     .dialogClose{float:right;
       &:before{display:block;content:'\e60d';font-family:"modelicon" !important;font-size:32px;}
@@ -163,7 +167,7 @@
     .color-5:before{background:#748BA6;}
     .color-6:before{background:#273749;}
   }
-  #map{width:100%;height:300px;}
+  #map{width:100%;height:440px;}
   .dialogLabel{line-height:30px;margin-right:10px;font-size:16px;
     .dialogInput{width:60px;height:30px;border:none;background:#fff;text-align:center;outline:none;color:#000;}
   }

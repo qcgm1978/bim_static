@@ -385,17 +385,17 @@ CLOUD.AxisGrid.prototype = {
         }
     }
 };
-CLOUD.MiniMap = function (viewer, callback) {
+CLOUD.MiniMap = function (viewer) {
 
     this.viewer = viewer;
-    this.callbackFn = callback;
     this.visible = true;
     this.width = 0;
     this.height = 0;
     this.domContainer = null;
     this.autoClear = true;
-
     this.mouseButtons = {LEFT: THREE.MOUSE.LEFT, RIGHT: THREE.MOUSE.RIGHT};
+    this.callbackCameraChanged = null;
+    this.callbackMoveOnAxisGrid = null;
 
     var scope = this;
     var _mapContainer;
@@ -418,7 +418,7 @@ CLOUD.MiniMap = function (viewer, callback) {
     var _axisGridNumberCircleRadius = 10, _axisGridNumberFontSize = 8, _axisGridNumberInterval = 3; // 轴号间隔
     var _isShowAxisGridNumber = true, _isShowAxisGrid = false, _isInitializedAxisGrid = false, _isInitializedFloorPlane = false;
 
-    var _enableMouseEvent = true;
+    var _enableFlyByClick = true; // 是否允许click飞到指定位置
 
     var _tipNode, _circleNode, _highlightHorizLineNode, _highlightVerticalLineNode, _cameraNode, _cameraArrowNode;
     var _highlightColor = '#258ae3', _tipNodeColor = "#000", _tipNodeBackgroundColor = "#fff";
@@ -741,9 +741,8 @@ CLOUD.MiniMap = function (viewer, callback) {
     function calculateAxisGridBox() {
 
         var offset = 4;
-        var isExistData = (_isInitializedAxisGrid || _isInitializedFloorPlane);
 
-        if (_isShowAxisGridNumber && isExistData) {
+        if (_isShowAxisGridNumber) {
 
             var center = _axisGridBox2D.center();
             var oldSize = _axisGridBox2D.size();
@@ -757,12 +756,12 @@ CLOUD.MiniMap = function (viewer, callback) {
 
     this.enableMouseEvent = function(enable) {
 
-        _enableMouseEvent = enable;
+        _enableFlyByClick = enable;
         //this.render();
     };
 
     this.isEnableMouseEvent = function() {
-        return _enableMouseEvent;
+        return _enableFlyByClick;
     };
 
     this.isMouseOverCanvas = function (mouse) {
@@ -808,25 +807,9 @@ CLOUD.MiniMap = function (viewer, callback) {
         var mouse = new THREE.Vector2(event.clientX, event.clientY);
         var isOverCanvas = this.isMouseOverCanvas(mouse);
 
-        //if (!_enableMouseEvent) return isOverCanvas;
+        if (!_enableFlyByClick) return isOverCanvas;
 
-        if (isOverCanvas && _isShowAxisGrid) {
-
-            this.dealHighlightNode();
-
-            if (_hasHighlightInterPoint) {
-                this.showTip();
-            } else {
-                this.hideTip();
-            }
-
-            callback();
-
-        } else {
-            //this.hideTip();
-            //callback();
-            _hasHighlightInterPoint = false;
-        }
+        this.highlightedNode(isOverCanvas, _isShowAxisGrid, callback);
 
         return isOverCanvas;
     };
@@ -837,7 +820,12 @@ CLOUD.MiniMap = function (viewer, callback) {
         var isOverCanvas = this.isMouseOverCanvas(mouse);
         var isExistData = _isInitializedAxisGrid || _isInitializedFloorPlane;
 
-        if (!_enableMouseEvent) return isOverCanvas;
+        if (!_enableFlyByClick) {
+
+            this.highlightedNode(isOverCanvas, _isShowAxisGrid);
+
+            return isOverCanvas;
+        }
 
         if (isOverCanvas && isExistData && event.target.nodeName!= "LI" ) {
 
@@ -1059,7 +1047,8 @@ CLOUD.MiniMap = function (viewer, callback) {
             loadStyleString(css);
 
             _tipNode = document.createElement('div');
-            _tipNode.className = "cloud-tip";
+            _tipNode.className = "";
+            //_tipNode.className = "cloud-tip";
             _tipNode.style.position = "absolute";
             _tipNode.style.display = "block";
             _tipNode.style.background = _tipNodeBackgroundColor;
@@ -1095,6 +1084,7 @@ CLOUD.MiniMap = function (viewer, callback) {
     this.showTip = function () {
 
         if (_tipNode) {
+            _tipNode.className = "cloud-tip";
             _tipNode.style.opacity = 1;
         }
 
@@ -1114,6 +1104,7 @@ CLOUD.MiniMap = function (viewer, callback) {
     this.hideTip = function () {
 
         if (_tipNode) {
+            _tipNode.className = "";
             _tipNode.style.opacity = 0;
         }
 
@@ -1244,8 +1235,9 @@ CLOUD.MiniMap = function (viewer, callback) {
             }
         }
 
+        // 如果先初始化平面图，后初始化轴网，因为轴网确定范围，则需要重新初始化平面图
         if (_isInitializedFloorPlane && !_isInitializedAxisGrid) {
-            console.log("_isInitializedFloorPlane && !_isInitializedAxisGrid");
+            console.log("re-initialize floor plane!!!");
             this.initFloorPlane();
         }
 
@@ -1332,6 +1324,53 @@ CLOUD.MiniMap = function (viewer, callback) {
         }
 
         return intersection;
+    };
+
+    this.highlightedNode = function (isOverCanvas, isShowAxisGrid, callback) {
+
+        if (isOverCanvas && isShowAxisGrid) {
+
+            this.dealHighlightNode();
+
+            if (_hasHighlightInterPoint) {
+
+                this.showTip();
+
+                if (callback) {
+
+                    callback();
+
+                } else {
+
+                    this.render();
+                }
+
+                if (this.callbackMoveOnAxisGrid) {
+
+                    var gridInfo = this.getAxisGridInfoByNormalizedPoint(normalizedMouse);
+                    this.callbackMoveOnAxisGrid(gridInfo);
+                }
+
+            } else {
+
+                this.hideTip();
+
+                if (callback) {
+
+                    callback();
+
+                } else {
+
+                    this.render();
+                }
+            }
+
+        } else {
+            //this.hideTip();
+            //callback();
+            _hasHighlightInterPoint = false;
+        }
+
     };
 
     this.dealHighlightNode = function () {
@@ -1594,15 +1633,6 @@ CLOUD.MiniMap = function (viewer, callback) {
         projectedEye.z = 0;
         projectedEye.normalize();
 
-        //var worldProjectedCameraPosition = new THREE.Vector3();
-        //
-        //if (_floorPlaneBox.containsPoint(projectedCameraPosition)) {
-        //    worldProjectedCameraPosition.set(projectedCameraPosition.x, projectedCameraPosition.y, _projectedCameraPosZ);
-        //} else {
-        //    console.log("camera out");
-        //    worldProjectedCameraPosition.set(bBoxCenter.x, bBoxCenter.y, _projectedCameraPosZ);
-        //}
-
         // 计算相机世界位置
         var cameraWorldPosition = cameraPosition.clone();
         cameraWorldPosition.applyMatrix4(inverseMatrix);
@@ -1639,21 +1669,6 @@ CLOUD.MiniMap = function (viewer, callback) {
         this.setCallbackCameraInfo(cameraWorldPosition, cameraScreenPosition);
 
         _lastCameraWorldPosition = cameraWorldPosition.clone();
-
-        // 切换楼层时飞到指定点，切换楼层需设置 _isFlyToPoint状态
-        //if (_isFlyToPoint) {
-        //
-        //    _isFlyToPoint = false;
-        //
-        //    var cameraProjectedWorldPosition = new THREE.Vector3(projectedCameraPosition.x, projectedCameraPosition.y, _cameraProjectedPosZ);
-        //
-        //    this.flyToPoint(cameraProjectedWorldPosition);
-        //
-        //    // 相机在平面图包围盒中心截面上的投影
-        //    //var cameraProjectedWorldPosition = new THREE.Vector3(projectedCameraPosition.x, projectedCameraPosition.y, _cameraProjectedPosZ);
-        //    //transformWorldPoint(cameraProjectedWorldPosition);
-        //    //this.viewer.cameraEditor.flyToPointWithParallelEye(cameraProjectedWorldPosition);
-        //}
 
         var cameraProjectedWorldPosition = new THREE.Vector3(projectedCameraPosition.x, projectedCameraPosition.y, _cameraProjectedPosZ);
 
@@ -1700,7 +1715,7 @@ CLOUD.MiniMap = function (viewer, callback) {
             posChanged = (worldPosition.distanceToSquared(_lastCameraWorldPosition) !== 0);
         }
 
-        if (this.callbackFn && posChanged) {
+        if (this.callbackCameraChanged && posChanged) {
 
             var cameraWorldPos = worldPosition.clone();
 
@@ -1746,9 +1761,9 @@ CLOUD.MiniMap = function (viewer, callback) {
 
                 //console.log(jsonObj.axis.infoX + "" + jsonObj.axis.infoY);
 
-                this.callbackFn(jsonObj);
+                this.callbackCameraChanged(jsonObj);
             } else {
-                this.callbackFn(null);
+                this.callbackCameraChanged(null);
             }
         }
     };
@@ -1796,7 +1811,19 @@ CLOUD.MiniMap = function (viewer, callback) {
 
         if (this.domContainer) {
             this.domContainer.appendChild(_mapContainer);
+
+            this.render();
         }
+    };
+
+    this.setCameraChangedCallback = function(callback) {
+
+        this.callbackCameraChanged = callback;
+    };
+
+    this.setMoveOnAxisGridCallback = function(callback) {
+
+        this.callbackMoveOnAxisGrid = callback;
     };
 
 };
@@ -2433,7 +2460,7 @@ CLOUD.Extensions.Comment = function (editor, id) {
     this.shapeType = 0;
     this.style = this.getDefaultStyle();
     this.size = {x: 0, y: 0};
-    this.position = {x: 0, y: 0};
+    this.position = {x: 0, y: 0, z: 0};
     this.rotation = 0;
     this.shape = null;
     this.selected = false;
@@ -2442,6 +2469,9 @@ CLOUD.Extensions.Comment = function (editor, id) {
     this.originX = 0;
     this.originY = 0;
     this.isDisableInteractions = false;
+    this.disableResizeWidth = false;
+    this.disableResizeHeight = false;
+    this.disableRotation = false;
 };
 
 CLOUD.Extensions.Comment.prototype = {
@@ -2489,11 +2519,17 @@ CLOUD.Extensions.Comment.prototype = {
 
     set: function (position, width, height) {
 
+        var worldPosition = this.editor.clientToWorld(position.x, position.y);
+        this.position.x = worldPosition.x;
+        this.position.y = worldPosition.y;
+        this.position.z = worldPosition.z;
+
+        var left = this.editor.clientToWorld(position.x - 0.5 * width, position.y - 0.5 * height);
+        var right = this.editor.clientToWorld(position.x + 0.5 * width, position.y + 0.5 * height);
+        this.size.x =  Math.abs(right.x - left.x);
+        this.size.y =  Math.abs(right.y - left.y);
+
         this.rotation = 0;
-        this.position.x = position.x;
-        this.position.y = position.y;
-        this.size.x = width;
-        this.size.y = height;
 
         this.updateStyle();
     },
@@ -2511,8 +2547,11 @@ CLOUD.Extensions.Comment.prototype = {
 
     setPosition: function (x, y) {
 
-        this.position.x = x;
-        this.position.y = y;
+        var worldPosition = this.editor.clientToWorld(x, y);
+        this.position.x = worldPosition.x;
+        this.position.y = worldPosition.y;
+        this.position.z = worldPosition.z;
+
         this.updateStyle();
     },
 
@@ -2524,12 +2563,23 @@ CLOUD.Extensions.Comment.prototype = {
         };
     },
 
+    getClientPosition:function() {
+
+        return this.editor.worldToClient(this.position.x, this.position.y, this.position.z);
+    },
+
     setSize: function (width, height, position) {
 
-        this.size.x = width;
-        this.size.y = height;
-        this.position.x = position.x;
-        this.position.y = position.y;
+        var worldPosition = this.editor.clientToWorld(position.x, position.y);
+        this.position.x = worldPosition.x;
+        this.position.y = worldPosition.y;
+        this.position.z = worldPosition.z;
+
+        var left = this.editor.clientToWorld(position.x - 0.5 * width, position.y - 0.5 * height);
+        var right = this.editor.clientToWorld(position.x + 0.5 * width, position.y + 0.5 * height);
+        this.size.x =  Math.abs(right.x - left.x);
+        this.size.y =  Math.abs(right.y - left.y);
+
         this.updateStyle();
     },
 
@@ -2539,6 +2589,14 @@ CLOUD.Extensions.Comment.prototype = {
             x: this.size.x,
             y: this.size.y
         };
+    },
+
+    getClientSize: function () {
+
+        var left = this.editor.worldToClient(this.position.x - 0.5 * this.size.x, this.position.y - 0.5 * this.size.y, this.position.z);
+        var right = this.editor.worldToClient(this.position.x + 0.5 * this.size.x, this.position.y + 0.5 * this.size.y, this.position.z);
+
+        return {x: Math.floor(Math.abs(right.x - left.x)), y: Math.floor(Math.abs(right.y - left.y))};
     },
 
     setParent: function (parent) {
@@ -2636,7 +2694,11 @@ CLOUD.Extensions.CommentArrow = function (editor, id) {
     this.head = new THREE.Vector3();
     this.tail = new THREE.Vector3();
 
-    this.size.y = this.style['stroke-width'] * 2;
+    this.disableResizeHeight = true;
+
+    this.clientSize = {x: 0, y: this.style['stroke-width'] * 4};
+
+    this.size.y = this.style['stroke-width'] * 4;
 
     this.createShape();
     this.addDomEventListeners();
@@ -2665,43 +2727,100 @@ CLOUD.Extensions.CommentArrow.prototype.createShape = function () {
 
 CLOUD.Extensions.CommentArrow.prototype.set = function (sx, sy, ex, ey) {
 
-    var v0 = new THREE.Vector2(sx, sy);
-    var v1 = new THREE.Vector2(ex, ey);
+    this.tail = this.editor.clientToWorld(sx, sy);
+    this.head = this.editor.clientToWorld(ex, ey);
+
+    // 计算位置
+    this.position.x = 0.5 * (this.tail.x + this.head.x);
+    this.position.y = 0.5 * (this.tail.y + this.head.y);
+    this.position.z = 0.5 * (this.tail.z + this.head.z);
+
+    var v0 = new THREE.Vector2(this.tail.x, this.tail.y);
+    var v1 = new THREE.Vector2(this.head.x, this.head.y);
+    var vDir = v1.clone().sub(v0).normalize();
+
+    // 计算尺寸
+    this.size.x = v0.distanceTo(v1);
+
+    // 计算旋转角度
+    this.rotation = Math.acos(vDir.dot(new THREE.Vector2(1, 0)));
+    this.rotation = ey < sy ? (Math.PI * 2) - this.rotation : this.rotation;
+
+    this.updateStyle();
+};
+
+CLOUD.Extensions.CommentArrow.prototype.setToWorld = function (tail, head) {
+
+    var v0 = new THREE.Vector2(tail.x, tail.y);
+    var v1 = new THREE.Vector2(head.x, head.y);
     var vDir = v1.clone().sub(v0).normalize();
 
     this.size.x = v0.distanceTo(v1);
     this.rotation = Math.acos(vDir.dot(new THREE.Vector2(1, 0)));
-    //this.rotation = ey > sy ? (Math.PI * 2) - this.rotation : this.rotation;
 
-    this.rotation = ey < sy ? (Math.PI * 2) - this.rotation : this.rotation;
+    this.rotation = head.y < tail.y ? (Math.PI * 2) - this.rotation : this.rotation;
 
-    this.tail.set(sx, sy, 0);
-    this.head.set(ex, ey, 0);
+    this.tail.set(tail.x, tail.y, tail.z);
+    this.head.set(head.x, head.y, head.z);
+
+    // 计算位置
+    this.position.x = 0.5 * (this.tail.x + this.head.x);
+    this.position.y = 0.5 * (this.tail.y + this.head.y);
+    this.position.z = 0.5 * (this.tail.z + this.head.z);
 
     this.updateStyle();
 };
 
 CLOUD.Extensions.CommentArrow.prototype.setSize = function (width, height, position) {
 
+    var worldPosition = this.editor.clientToWorld(position.x, position.y);
+    this.position.x = worldPosition.x;
+    this.position.y = worldPosition.y;
+    this.position.z = worldPosition.z;
+
     var endX = Math.cos(this.rotation);
     var endY = Math.sin(this.rotation);
     var endDir = new THREE.Vector2(endX, endY);
     endDir.multiplyScalar(width * 0.5);
 
-    var vCenter = new THREE.Vector2(position.x, position.y);
-    var v0 = vCenter.clone().sub(endDir);
-    var v1 = vCenter.clone().add(endDir);
+    var center = new THREE.Vector2(position.x, position.y);
+    var v0 = center.clone().sub(endDir);
+    var v1 = center.clone().add(endDir);
 
-    this.tail.set(v0.x, v0.y, 0);
-    this.head.set(v1.x, v1.y, 0);
-    this.position.x = position.x;
-    this.position.y = position.y;
-    this.size.x = width;
+    var tail = this.editor.clientToWorld(v0.x, v0.y);
+    var head = this.editor.clientToWorld(v1.x, v1.y);
+
+    this.tail.set(tail.x, tail.y, tail.z);
+    this.head.set(head.x, head.y, head.z);
+
+    v0.set(this.tail.x, this.tail.y);
+    v1.set(this.head.x, this.head.y);
+
+    // 计算尺寸
+    this.size.x = v0.distanceTo(v1);
 
     this.updateStyle();
 };
 
+CLOUD.Extensions.CommentArrow.prototype.getClientSize = function () {
+
+    var tail = this.editor.worldToClient(this.tail.x, this.tail.y, this.tail.z);
+    var head = this.editor.worldToClient(this.head.x, this.head.y, this.head.z);
+
+    var v0 = new THREE.Vector2(tail.x, tail.y);
+    var v1 = new THREE.Vector2(head.x, head.y);
+    var sizeX = v0.distanceTo(v1);
+
+    return {x: sizeX, y: this.clientSize.y};
+};
+
 CLOUD.Extensions.CommentArrow.prototype.setPosition = function (x, y) {
+
+    var newPosition = this.editor.clientToWorld(x, y);
+
+    this.position.x = newPosition.x;
+    this.position.y = newPosition.y;
+    this.position.z = newPosition.z;
 
     var head = this.head;
     var tail = this.tail;
@@ -2709,28 +2828,36 @@ CLOUD.Extensions.CommentArrow.prototype.setPosition = function (x, y) {
     var dx = head.x - tail.x;
     var dy = head.y - tail.y;
 
-    var x0 = x - dx * 0.5;
-    var y0 = y - dy * 0.5;
+    var x0 = newPosition.x - dx * 0.5;
+    var y0 = newPosition.y - dy * 0.5;
 
     head.x = x0;
     head.y = y0;
+    head.z = newPosition.z;
 
     tail.x = x0 + dx;
     tail.y = y0 + dy;
+    tail.z = newPosition.z;
 
     this.updateStyle();
 };
 
 CLOUD.Extensions.CommentArrow.prototype.updateTransformMatrix = function () {
 
-    var offsetX = this.size.x * 0.5;
-    var offsetY = this.size.y;
+    var size = this.getClientSize();
 
-    this.position.x = (this.head.x + this.tail.x) * 0.5;
-    this.position.y = (this.head.y + this.tail.y) * 0.5;
+    this.clientSize.x = size.x;
+    this.clientSize.y = size.y;
+
+    var offsetX = this.clientSize.x * 0.5;
+    var offsetY = this.clientSize.y * 0.5;
+
+    var position = this.getClientPosition();
+    var positionX = position.x;
+    var positionY = position.y;
 
     this.transformShape = [
-        'translate(', this.position.x, ',', this.position.y, ') ',
+        'translate(', positionX, ',', positionY, ') ',
         'rotate(', THREE.Math.radToDeg(this.rotation), ') ',
         'translate(', -offsetX, ',', -offsetY, ') '
     ].join('');
@@ -2757,11 +2884,13 @@ CLOUD.Extensions.CommentArrow.prototype.updateStyle = function () {
 
 CLOUD.Extensions.CommentArrow.prototype.getShapePoints = function () {
 
-    var strokeWidth = this.size.y;
-    var halfLen = this.size.x * 0.5;
+    //var strokeWidth = this.size.y;
+    //var halfLen = this.size.x * 0.5;
+    var strokeWidth = this.style['stroke-width'] * 2;
+    var halfLen = this.clientSize.x * 0.5;
     var thickness = strokeWidth;
     var halfThickness = strokeWidth * 0.5;
-    var headLen = halfLen - (1.2 * thickness);
+    var headLen = halfLen - (2.0 * thickness);
 
     var p1 = [-halfLen, -halfThickness];
     var p7 = [-halfLen, halfThickness];
@@ -2783,14 +2912,16 @@ CLOUD.Extensions.CommentArrow.prototype.getShapePoints = function () {
 
 CLOUD.Extensions.CommentArrow.prototype.renderToCanvas = function (ctx) {
 
-    var strokeWidth = this.size.y;;
+    var position = this.getClientPosition();
+    var size = this.getClientSize();
+    var strokeWidth = this.style['stroke-width'] * 2;
     var strokeColor = this.style['stroke-color'];
     var strokeOpacity = this.style['stroke-opacity'];
 
-    var offsetX = this.size.x * 0.5;
+    var offsetX = size.x * 0.5;
     var offsetY = strokeWidth;
-    var posX = (this.head.x + this.tail.x) * 0.5;
-    var posY = (this.head.y + this.tail.y) * 0.5;
+    var posX = position.x;
+    var posY = position.y;
 
     var m1 = new THREE.Matrix4().makeTranslation(-offsetX, -offsetY, 0);
     var m2 = new THREE.Matrix4().makeRotationZ(this.rotation);
@@ -2846,20 +2977,34 @@ CLOUD.Extensions.CommentRectangle.prototype.createShape = function () {
     this.shape = CLOUD.Extensions.Utils.Shape2D.createSvgElement('rect');
 };
 
+CLOUD.Extensions.CommentRectangle.prototype.setToWorld = function (position, size, rotation) {
+
+    this.position.x = position.x;
+    this.position.y = position.y;
+    this.position.z = position.z;
+
+    this.size.x = size.x;
+    this.size.y = size.y;
+
+    this.rotation = rotation;
+
+    this.updateStyle();
+};
+
 CLOUD.Extensions.CommentRectangle.prototype.updateTransformMatrix = function () {
 
     var strokeWidth = this.style['stroke-width'];
 
-    //var originX = Math.max(this.size.x - strokeWidth, 0) * 0.5;
-    //var originY = Math.max(this.size.y - strokeWidth, 0) * 0.5;
+    this.clientSize = this.getClientSize();
+    this.clientPosition = this.getClientPosition();
 
-    var originX = (this.size.x - strokeWidth) * 0.5;
-    var originY = (this.size.y - strokeWidth) * 0.5;
+    var offsetX = Math.max(this.clientSize.x - strokeWidth, 0) * 0.5;
+    var offsetY = Math.max(this.clientSize.y - strokeWidth, 0) * 0.5;
 
     this.transformShape = [
-        'translate(', this.position.x, ',', this.position.y, ') ',
+        'translate(', this.clientPosition.x, ',', this.clientPosition.y, ') ',
         'rotate(', THREE.Math.radToDeg(this.rotation), ') ',
-        'translate(', -originX, ',', -originY, ') '
+        'translate(', -offsetX, ',', -offsetY, ') '
     ].join('');
 };
 
@@ -2881,8 +3026,8 @@ CLOUD.Extensions.CommentRectangle.prototype.updateStyle = function () {
     //this.shape.setAttribute('fill', fillColor);
     //this.shape.setAttribute('fill-opacity', fillOpacity);
     this.shape.setAttribute('fill', CLOUD.Extensions.Utils.Shape2D.composeRGBAString(fillColor, fillOpacity));
-    this.shape.setAttribute('width', Math.max(this.size.x - strokeWidth, 0) + '');
-    this.shape.setAttribute('height', Math.max(this.size.y - strokeWidth, 0) + '');
+    this.shape.setAttribute('width', Math.max(this.clientSize.x - strokeWidth, 0) + '');
+    this.shape.setAttribute('height', Math.max(this.clientSize.y - strokeWidth, 0) + '');
 };
 
 CLOUD.Extensions.CommentRectangle.prototype.renderToCanvas = function (ctx) {
@@ -2892,13 +3037,13 @@ CLOUD.Extensions.CommentRectangle.prototype.renderToCanvas = function (ctx) {
     var strokeOpacity = this.style['stroke-opacity'];
     var fillColor = this.style['fill-color'];
     var fillOpacity = this.style['fill-opacity'];
-    var width = this.size.x - strokeWidth;
-    var height = this.size.y - strokeWidth;
+    var width = this.clientSize.x - strokeWidth;
+    var height = this.clientSize.y - strokeWidth;
 
     ctx.strokeStyle = CLOUD.Extensions.Utils.Shape2D.composeRGBAString(strokeColor, strokeOpacity);
     ctx.fillStyle = CLOUD.Extensions.Utils.Shape2D.composeRGBAString(fillColor, fillOpacity);
     ctx.lineWidth = strokeWidth;
-    ctx.translate(this.position.x, this.position.y);
+    ctx.translate(this.clientPosition.x, this.clientPosition.y);
     ctx.rotate(this.rotation);
 
     if (fillOpacity !== 0) {
@@ -2939,17 +3084,30 @@ CLOUD.Extensions.CommentCircle.prototype.createShape = function () {
     this.shape = CLOUD.Extensions.Utils.Shape2D.createSvgElement('ellipse');
 };
 
+CLOUD.Extensions.CommentCircle.prototype.setToWorld = function (position, size, rotation) {
+
+    this.position.x = position.x;
+    this.position.y = position.y;
+    this.position.z = position.z;
+
+    this.size.x = size.x;
+    this.size.y = size.y;
+
+    this.rotation = rotation;
+
+    this.updateStyle();
+};
+
 CLOUD.Extensions.CommentCircle.prototype.updateTransformMatrix = function () {
 
     var strokeWidth = this.style['stroke-width'];
-    //var offsetX = Math.max(this.size.x - strokeWidth, 0) * 0.5;
-    //var offsetY = Math.max(this.size.y - strokeWidth, 0) * 0.5;
-
-    var offsetX = (this.size.x - strokeWidth) * 0.5;
-    var offsetY = (this.size.y - strokeWidth) * 0.5;
+    var position = this.getClientPosition();
+    var size = this.getClientSize();
+    var offsetX = (size.x - strokeWidth) * 0.5;
+    var offsetY = (size.y - strokeWidth) * 0.5;
 
     this.transformShape = [
-        'translate(', this.position.x, ',', this.position.y, ') ',
+        'translate(', position.x, ',', position.y, ') ',
         'rotate(', THREE.Math.radToDeg(this.rotation), ') ',
         'translate(', -offsetX, ',', -offsetY, ') '
     ].join('');
@@ -2965,8 +3123,10 @@ CLOUD.Extensions.CommentCircle.prototype.updateStyle = function () {
     var fillColor = this.style['fill-color'];
     var fillOpacity = this.style['fill-opacity'];
 
-    var radX = Math.max(this.size.x - strokeWidth, 0) * 0.5;
-    var radY = Math.max(this.size.y - strokeWidth, 0) * 0.5;
+    var size = this.getClientSize();
+
+    var radX = Math.max(size.x - strokeWidth, 0) * 0.5;
+    var radY = Math.max(size.y - strokeWidth, 0) * 0.5;
 
     this.shape.setAttribute("transform", this.transformShape);
     this.shape.setAttribute("stroke-width", strokeWidth);
@@ -3011,16 +3171,20 @@ CLOUD.Extensions.CommentCircle.prototype.renderToCanvas = function (ctx) {
     var fillColor = this.style['fill-color'];
     var fillOpacity = this.style['fill-opacity'];
 
-    var width = this.size.x - strokeWidth;
-    var height = this.size.y - strokeWidth;
+    var position = this.getClientPosition();
+    var clientSize = this.getClientSize();
+
+    var width = clientSize.x - strokeWidth;
+    var height = clientSize.y - strokeWidth;
     var size = {x: width, y: height};
-    var center = {x: this.position.x, y: this.position.y};
+    var center = {x: position.x, y: position.y};
 
     ctx.strokeStyle = CLOUD.Extensions.Utils.Shape2D.composeRGBAString(strokeColor, strokeOpacity);
     ctx.fillStyle = CLOUD.Extensions.Utils.Shape2D.composeRGBAString(fillColor, fillOpacity);
     ctx.lineWidth = strokeWidth;
     ctx.translate(center.x, center.y);
     ctx.rotate(this.rotation);
+    //ctx.translate(-0.5 * width, -0.5 * height);
     ctx.beginPath();
 
     ellipse(ctx, 0, 0, size.x, size.y);
@@ -3039,6 +3203,8 @@ CLOUD.Extensions.CommentCloud = function (editor, id) {
     this.shapePoints = [];
     this.shapePath = [];
     this.shapeControlPoints = [];
+
+    this.lastClientShapePoint = {x: 0, y: 0};
 
     this.isSeal = false; // 是否封口
 
@@ -3067,12 +3233,11 @@ CLOUD.Extensions.CommentCloud.prototype.createShape = function () {
     this.shape = CLOUD.Extensions.Utils.Shape2D.createSvgElement('path');
 };
 
-CLOUD.Extensions.CommentCloud.prototype.set = function (position, width, height) {
-    this.rotation = 0;
-    this.position.x = position.x;
-    this.position.y = position.y;
-    this.size.x = width;
-    this.size.y = height;
+CLOUD.Extensions.CommentCloud.prototype.setToWorld = function (shapePointsStr, rotation, isSeal) {
+
+    this.setShapePoints(shapePointsStr);
+    this.rotation = rotation;
+    this.isSeal = isSeal;
 
     this.updateStyle();
 };
@@ -3081,12 +3246,19 @@ CLOUD.Extensions.CommentCloud.prototype.setPosition = function (x, y) {
 
     var len = this.shapePoints.length;
 
-    var dx = x - this.position.x;
-    var dy = y - this.position.y;
+    var worldPosition = this.editor.clientToWorld(x, y);
+    var dx = worldPosition.x - this.position.x;
+    var dy = worldPosition.y - this.position.y;
+    var dz = worldPosition.z - this.position.z;
 
-    for (var i = 0; i < len; i += 2) {
-        this.shapePoints[i] += dx;
-        this.shapePoints[i + 1] += dy;
+    this.position.x = worldPosition.x;
+    this.position.y = worldPosition.y;
+    this.position.z = worldPosition.z;
+
+    for (var i = 0; i < len; i++) {
+        this.shapePoints[i].x += dx;
+        this.shapePoints[i].y += dy;
+        this.shapePoints[i].z += dz;
     }
 
     this.updateStyle();
@@ -3094,10 +3266,15 @@ CLOUD.Extensions.CommentCloud.prototype.setPosition = function (x, y) {
 
 CLOUD.Extensions.CommentCloud.prototype.setSize = function (width, height, position) {
 
-    this.position.x = position.x;
-    this.position.y = position.y;
-    this.size.x = width;
-    this.size.y = height;
+    var worldPosition = this.editor.clientToWorld(position.x, position.y);
+    this.position.x = worldPosition.x;
+    this.position.y = worldPosition.y;
+    this.position.z = worldPosition.z;
+
+    var left = this.editor.clientToWorld(position.x - 0.5 * width, position.y - 0.5 * height);
+    var right = this.editor.clientToWorld(position.x + 0.5 * width, position.y + 0.5 * height);
+    this.size.x = Math.abs(right.x - left.x);
+    this.size.y = Math.abs(right.y - left.y);
 
     this.updateStyle();
 };
@@ -3105,32 +3282,30 @@ CLOUD.Extensions.CommentCloud.prototype.setSize = function (width, height, posit
 CLOUD.Extensions.CommentCloud.prototype.updateTransformMatrix = function () {
 
     var box = this.getBoundingBox();
+    var posX = box.x + 0.5 * box.width;
+    var posY = box.y + 0.5 * box.height;
 
-    var center = box.center();
-    this.position.x = center.x;
-    this.position.y = center.y;
+    var position = this.editor.clientToWorld(posX, posY);
+    this.position.x = position.x;
+    this.position.y = position.y;
+    this.position.z = position.z;
 
-    var size = box.size();
-    this.size.x = size.x;
-    this.size.y = size.y;
-
-    //var offsetX = this.size.x * 0.5;
-    //var offsetY = this.size.y * 0.5;
-
-    var offsetX = this.position.x;
-    var offsetY = this.position.y;
+    var left = this.editor.clientToWorld(position.x - 0.5 * box.width, position.y - 0.5 * box.height);
+    var right = this.editor.clientToWorld(position.x + 0.5 * box.width, position.y + 0.5 * box.height);
+    this.size.x = Math.abs(right.x - left.x);
+    this.size.y = Math.abs(right.y - left.y);
 
     this.transformShape = [
-        'translate(', this.position.x, ',', this.position.y, ') ',
+        'translate(', posX, ',', posY, ') ',
         'rotate(', THREE.Math.radToDeg(this.rotation), ') ',
-        'translate(', -offsetX, ',', -offsetY, ') '
+        'translate(', -posX, ',', -posY, ') '
     ].join('');
 };
 
 CLOUD.Extensions.CommentCloud.prototype.updateStyle = function () {
 
     // 小于两个点，不处理
-    if (this.shapePoints.length < 4) return;
+    if (this.shapePoints.length < 2) return;
 
     this.updateTransformMatrix();
 
@@ -3181,16 +3356,17 @@ CLOUD.Extensions.CommentCloud.prototype.calculateShapePath = function () {
     var originShapePoint = {};
     var currentShapePoint = {};
     var lastShapePoint = {};
-    var controlPoint;
+    var controlPoint, clientShapePoint;
 
-    if (len % 2 !== 0) {
-        console.error("[CommentCloud] shape points is error!");
+    if (len < 2) {
+        return;
     }
 
-    for (var i = 0; i < len; i += 2) {
+    for (var i = 0; i < len; i++) {
 
-        currentShapePoint.x = this.shapePoints[i];
-        currentShapePoint.y = this.shapePoints[i + 1];
+        clientShapePoint = this.editor.worldToClient(this.shapePoints[i].x, this.shapePoints[i].y, this.shapePoints[i].z);
+        currentShapePoint.x = clientShapePoint.x;
+        currentShapePoint.y = clientShapePoint.y;
 
         if (i === 0) { // 第一个点
 
@@ -3221,9 +3397,8 @@ CLOUD.Extensions.CommentCloud.prototype.calculateShapePath = function () {
             lastShapePoint.x = currentShapePoint.x;
             lastShapePoint.y = currentShapePoint.y;
 
-
             // 最后一个点, 处理封口
-            if ((i === len - 2) && this.isSeal) {
+            if ((i === len - 1) && this.isSeal) {
 
                 // 计算控制点
                 controlPoint = this.calculateControlPoint(lastShapePoint, originShapePoint);
@@ -3250,33 +3425,38 @@ CLOUD.Extensions.CommentCloud.prototype.getPathString = function () {
     return this.shapePath.join(' ');
 };
 
+
 CLOUD.Extensions.CommentCloud.prototype.addPoint = function (point) {
 
     var len = this.shapePoints.length;
 
     if (len === 0) {
 
-        this.shapePoints.push(point.x);
-        this.shapePoints.push(point.y);
+        var worldPoint = this.editor.clientToWorld(point.x, point.y);
+        this.shapePoints.push({x: worldPoint.x, y: worldPoint.y, z: worldPoint.z});
+        this.lastClientShapePoint.x = point.x;
+        this.lastClientShapePoint.y = point.y;
 
     } else {
 
-        var epsilon = 0.5;
-
-        var preShapePoint = {};
-        preShapePoint.x = this.shapePoints[len - 2];
-        preShapePoint.y = this.shapePoints[len - 1];
+        var epsilon = 1; // 相差一个像素
 
         // 判断是否同一个点, 同一个点不加入集合
-        if (!CLOUD.Extensions.Utils.Geometric.isEqualBetweenPoints(preShapePoint, point, epsilon)) {
+        if (!CLOUD.Extensions.Utils.Geometric.isEqualBetweenPoints(this.lastClientShapePoint, point, epsilon)) {
 
-            this.shapePoints.push(point.x);
-            this.shapePoints.push(point.y);
+            //this.shapePoints.push(point.x);
+            //this.shapePoints.push(point.y);
+
+            var worldPoint = this.editor.clientToWorld(point.x, point.y);
+            this.shapePoints.push({x: worldPoint.x, y: worldPoint.y, z: worldPoint.z});
+            this.lastClientShapePoint.x = point.x;
+            this.lastClientShapePoint.y = point.y;
         }
     }
 
     this.updateStyle();
 };
+
 
 CLOUD.Extensions.CommentCloud.prototype.getBoundingBox = function () {
 
@@ -3284,9 +3464,9 @@ CLOUD.Extensions.CommentCloud.prototype.getBoundingBox = function () {
     var i, len = this.shapePoints.length;
     var point = new THREE.Vector2();
 
-    for (i = 0; i < len; i += 2) {
-
-        point.set(this.shapePoints[i], this.shapePoints[i + 1]);
+    for (i = 0; i < len; i++) {
+        var client = this.editor.worldToClient(this.shapePoints[i].x, this.shapePoints[i].y, this.shapePoints[i].z);
+        point.set(client.x, client.y);
         box.expandByPoint(point);
     }
 
@@ -3301,7 +3481,19 @@ CLOUD.Extensions.CommentCloud.prototype.getBoundingBox = function () {
         box.expandByPoint(point);
     }
 
-    return box;
+    var center = box.center();
+    var size = box.size();
+
+    //var bBox = this.shape.getBBox();
+
+    return {
+        x: center.x - 0.5 * size.x,
+        y: center.y - 0.5 * size.y,
+        width: size.x,
+        height: size.y
+    };
+
+    //return this.shape.getBBox();
 };
 
 CLOUD.Extensions.CommentCloud.prototype.setSeal = function (isSeal) {
@@ -3314,28 +3506,48 @@ CLOUD.Extensions.CommentCloud.prototype.setSeal = function (isSeal) {
 // 设置形状点集
 CLOUD.Extensions.CommentCloud.prototype.setShapePoints = function (shapeStr) {
 
-    var scope = this;
+    //var scope = this;
     var shapePoints = shapeStr.split(',');
 
     this.shapePoints = [];
 
-    shapePoints.forEach(function (point) {
-        scope.shapePoints.push(parseInt(point));
-    });
+    for (var i = 0, len = shapePoints.length; i < len; i += 3) {
+
+        var x = parseFloat(shapePoints[i]);
+        var y = parseFloat(shapePoints[i + 1]);
+        var z = parseFloat(shapePoints[i + 2]);
+
+        this.shapePoints.push({x: x, y: y, z: z});
+    }
+
+    //shapePoints.forEach(function (point) {
+    //    scope.shapePoints.push(parseInt(point));
+    //});
 };
 
 // 获得形状点集字符串（用“，”分割）
 CLOUD.Extensions.CommentCloud.prototype.getShapePoints = function () {
 
-    return this.shapePoints.join(',');
+    var points = [];
+
+    for (var i = 0, len = this.shapePoints.length; i < len; i++) {
+        points.push(this.shapePoints[i].x);
+        points.push(this.shapePoints[i].y);
+        points.push(this.shapePoints[i].z);
+    }
+
+    //return this.shapePoints.join(',');
+
+    return points.join(',');
 };
 
 CLOUD.Extensions.CommentCloud.prototype.renderToCanvas = function (ctx) {
 
     // 小于两个点，不处理
-    if (this.shapePoints.length < 4) return;
+    if (this.shapePoints.length < 2) return;
 
     var scope = this;
+
 
     function drawCloud(ctx, points, isSeal) {
 
@@ -3343,14 +3555,15 @@ CLOUD.Extensions.CommentCloud.prototype.renderToCanvas = function (ctx) {
         var originShapePoint = {};
         var currentShapePoint = {};
         var lastShapePoint = {};
-        var controlPoint;
+        var controlPoint, clientShapePoint;
 
         ctx.beginPath();
 
-        for (var i = 0; i < len; i += 2) {
+        for (var i = 0; i < len; i++) {
 
-            currentShapePoint.x = points[i];
-            currentShapePoint.y = points[i + 1];
+            clientShapePoint = scope.editor.worldToClient(points[i].x, points[i].y, points[i].z);
+            currentShapePoint.x = clientShapePoint.x;
+            currentShapePoint.y = clientShapePoint.y;
 
             if (i === 0) { // 第一个点
 
@@ -3373,7 +3586,7 @@ CLOUD.Extensions.CommentCloud.prototype.renderToCanvas = function (ctx) {
                 lastShapePoint.y = currentShapePoint.y;
 
                 // 最后一个点, 处理封口
-                if ((i === len - 2) && isSeal) {
+                if ((i === len - 1) && isSeal) {
 
                     // 计算控制点
                     controlPoint = scope.calculateControlPoint(lastShapePoint, originShapePoint);
@@ -3396,9 +3609,11 @@ CLOUD.Extensions.CommentCloud.prototype.renderToCanvas = function (ctx) {
     ctx.fillStyle = CLOUD.Extensions.Utils.Shape2D.composeRGBAString(fillColor, fillOpacity);
     ctx.lineWidth = strokeWidth;
 
-    ctx.translate(this.position.x, this.position.y);
+    var position = this.getClientPosition();
+
+    ctx.translate(position.x, position.y);
     ctx.rotate(this.rotation);
-    ctx.translate(-this.position.x, -this.position.y);
+    ctx.translate(-position.x, -position.y);
 
     drawCloud(ctx, this.shapePoints, this.isSeal);
 
@@ -3441,14 +3656,31 @@ CLOUD.Extensions.CommentCross.prototype.createShape = function() {
     this.shape = CLOUD.Extensions.Utils.Shape2D.createSvgElement('path');
 };
 
+CLOUD.Extensions.CommentCross.prototype.setToWorld = function (position, size, rotation) {
+
+    this.position.x = position.x;
+    this.position.y = position.y;
+    this.position.z = position.z;
+
+    this.size.x = size.x;
+    this.size.y = size.y;
+
+    this.rotation = rotation;
+
+    this.updateStyle();
+};
+
 CLOUD.Extensions.CommentCross.prototype.updateTransformMatrix = function () {
 
+    var position = this.getClientPosition();
+    var size = this.getClientSize();
+
     var strokeWidth = this.style['stroke-width'];
-    var offsetX = Math.max(this.size.x - strokeWidth, 0) * 0.5;
-    var offsetY = Math.max(this.size.y - strokeWidth, 0) * 0.5;
+    var offsetX = Math.max(size.x - strokeWidth, 0) * 0.5;
+    var offsetY = Math.max(size.y - strokeWidth, 0) * 0.5;
 
     this.transformShape = [
-        'translate(', this.position.x, ',', this.position.y, ') ',
+        'translate(', position.x, ',', position.y, ') ',
         'rotate(', THREE.Math.radToDeg(this.rotation), ') ',
         'translate(', -offsetX, ',', -offsetY, ') '
     ].join('');
@@ -3475,7 +3707,7 @@ CLOUD.Extensions.CommentCross.prototype.updateStyle = function () {
 
 CLOUD.Extensions.CommentCross.prototype.getPath = function() {
 
-    var size = this.size;
+    var size = this.getClientSize();
     var l = 0;
     var t = 0;
     var r = size.x;
@@ -3510,15 +3742,18 @@ CLOUD.Extensions.CommentCross.prototype.renderToCanvas = function (ctx) {
     var fillColor = this.style['fill-color'];
     var fillOpacity = this.style['fill-opacity'];
 
-    var width = this.size.x - strokeWidth;
-    var height = this.size.y - strokeWidth;
+    var position = this.getClientPosition();
+    var clientSize = this.getClientSize();
+
+    var width = clientSize.x - strokeWidth;
+    var height = clientSize.y - strokeWidth;
     var size = {x: width, y: height};
 
     ctx.strokeStyle = CLOUD.Extensions.Utils.Shape2D.composeRGBAString(strokeColor, strokeOpacity);
     ctx.fillStyle = CLOUD.Extensions.Utils.Shape2D.composeRGBAString(fillColor, fillOpacity);
     ctx.lineWidth = strokeWidth;
 
-    ctx.translate(this.position.x, this.position.y);
+    ctx.translate(position.x, position.y);
     ctx.rotate(this.rotation);
     ctx.translate(-0.5 * width, -0.5 * height);
 
@@ -3600,23 +3835,47 @@ CLOUD.Extensions.CommentText.prototype.createShape = function () {
 
 CLOUD.Extensions.CommentText.prototype.set = function (position, width, height, textString) {
 
+    var worldPosition = this.editor.clientToWorld(position.x, position.y);
+    this.position.x = worldPosition.x;
+    this.position.y = worldPosition.y;
+    this.position.z = worldPosition.z;
+
+    var left = this.editor.clientToWorld(position.x - 0.5 * width, position.y - 0.5 * height);
+    var right = this.editor.clientToWorld(position.x + 0.5 * width, position.y + 0.5 * height);
+    this.size.x = Math.abs(right.x - left.x);
+    this.size.y = Math.abs(right.y - left.y);
+
+    this.setText(textString);
+};
+
+CLOUD.Extensions.CommentText.prototype.setToWorld = function (position, size, rotation, textString) {
+
     this.position.x = position.x;
     this.position.y = position.y;
+    this.position.z = position.z;
 
-    this.size.x = width;
-    this.size.y = height;
+    this.size.x = size.x;
+    this.size.y = size.y;
+
+    this.rotation = rotation;
 
     this.setText(textString);
 };
 
 CLOUD.Extensions.CommentText.prototype.setSize = function (width, height, position) {
 
-    var isCalcLines = (this.size.x !== width);
+    var size = this.getClientSize();
+    var isCalcLines = (Math.floor(size.x) !== width);
 
-    this.position.x = position.x;
-    this.position.y = position.y;
-    this.size.x = width;
-    this.size.y = height;
+    var worldPosition = this.editor.clientToWorld(position.x, position.y);
+    this.position.x = worldPosition.x;
+    this.position.y = worldPosition.y;
+    this.position.z = worldPosition.z;
+
+    var left = this.editor.clientToWorld(position.x - 0.5 * width, position.y - 0.5 * height);
+    var right = this.editor.clientToWorld(position.x + 0.5 * width, position.y + 0.5 * height);
+    this.size.x = Math.abs(right.x - left.x);
+    this.size.y = Math.abs(right.y - left.y);
 
     if (isCalcLines) {
 
@@ -3681,11 +3940,14 @@ CLOUD.Extensions.CommentText.prototype.setParent = function (parent) {
 
 CLOUD.Extensions.CommentText.prototype.updateTransformMatrix = function () {
 
-    var offsetX = this.size.x * 0.5;
-    var offsetY = this.size.y * 0.5;
+    var position = this.getClientPosition();
+    var size = this.getClientSize();
+
+    var offsetX = size.x * 0.5;
+    var offsetY = size.y * 0.5;
 
     this.transformShape = [
-        'translate(', this.position.x, ',', this.position.y, ') ',
+        'translate(', position.x, ',', position.y, ') ',
         'rotate(', THREE.Math.radToDeg(this.rotation), ') ',
         'translate(', -offsetX, ',', -offsetY, ') '
     ].join('');
@@ -3694,6 +3956,9 @@ CLOUD.Extensions.CommentText.prototype.updateTransformMatrix = function () {
 CLOUD.Extensions.CommentText.prototype.updateStyle = function (forceDirty) {
 
     this.updateTransformMatrix();
+
+    var position = this.getClientPosition();
+    var size = this.getClientSize();
 
     var fontSize = this.style['font-size'];
     var strokeColor = this.highlighted ? this.highlightColor : this.style['stroke-color'];
@@ -3725,13 +3990,13 @@ CLOUD.Extensions.CommentText.prototype.updateStyle = function (forceDirty) {
 
     this.clipRect.setAttribute('x', "0");
     this.clipRect.setAttribute('y', bBox.y + '');
-    this.clipRect.setAttribute('width', this.size.x);
-    this.clipRect.setAttribute('height', this.size.y);
+    this.clipRect.setAttribute('width', size.x);
+    this.clipRect.setAttribute('height', size.y);
 
-    verticalTransform = ['translate(0, ', this.size.y, ')'].join('');
+    verticalTransform = ['translate(0, ', size.y, ')'].join('');
     this.backgroundRect.setAttribute("transform", this.transformShape + verticalTransform);
-    this.backgroundRect.setAttribute('width', this.size.x);
-    this.backgroundRect.setAttribute('height', this.size.y);
+    this.backgroundRect.setAttribute('width', size.x);
+    this.backgroundRect.setAttribute('height', size.y);
     this.backgroundRect.setAttribute("stroke-width", '0');
     this.backgroundRect.setAttribute('fill', CLOUD.Extensions.Utils.Shape2D.composeRGBAString(fillColor, fillOpacity));
 };
@@ -3820,6 +4085,9 @@ CLOUD.Extensions.CommentText.prototype.renderToCanvas = function (ctx) {
         });
     }
 
+    var position = this.getClientPosition();
+    var clientSize = this.getClientSize();
+
     var fontFamily = this.style['font-family'];
     var fontStyle = this.style['font-style'];
     var fontWeight = this.style['font-weight'];
@@ -3827,19 +4095,15 @@ CLOUD.Extensions.CommentText.prototype.renderToCanvas = function (ctx) {
     var fontOpacity = this.style['stroke-opacity'];
     var fontSize = this.style['font-size'];
     var lineHeight = fontSize * (this.lineHeight * 0.01);
-
-    var center = {x: this.position.x, y: this.position.y};
-    var clientSize = {x: this.size.x, y: this.size.y};
-
     var fillColor = this.style['fill-color'];
     var fillOpacity = this.style['fill-opacity'];
 
     ctx.save();
     ctx.fillStyle = CLOUD.Extensions.Utils.Shape2D.composeRGBAString(fillColor, fillOpacity);
-    ctx.translate(center.x, center.y);
+    ctx.translate(position.x, position.y);
 
     if (fillOpacity !== 0) {
-        ctx.fillRect(clientSize.x * -0.5, clientSize.y * -0.5, clientSize.x, clientSize.y);
+        ctx.fillRect(-0.5 * clientSize.x, -0.5 * clientSize.y, clientSize.x, clientSize.y);
     }
 
     ctx.restore();
@@ -3848,8 +4112,10 @@ CLOUD.Extensions.CommentText.prototype.renderToCanvas = function (ctx) {
     ctx.fillStyle = strokeColor;
     ctx.strokeStyle = strokeColor;
     ctx.textBaseline = 'top';
-    ctx.translate(center.x - (clientSize.x * 0.5), center.y - (clientSize.y * 0.5));
-    //ctx.rotate(this.rotation);
+    ctx.translate(position.x, position.y);
+    ctx.rotate(this.rotation);
+    ctx.translate(-0.5 * clientSize.x, -0.5 * clientSize.y);
+
     ctx.font = fontStyle + " " + fontWeight + " " + fontSize + "px " + fontFamily;
     ctx.globalAlpha = fontOpacity;
     renderTextLines(ctx, this.currTextLines, lineHeight, clientSize.y);
@@ -3916,8 +4182,8 @@ CLOUD.Extensions.CommentTextArea.prototype.destroy = function () {
 
 CLOUD.Extensions.CommentTextArea.prototype.init = function () {
 
-    var position = this.textComment.getPosition();
-    var size = this.textComment.getSize();
+    var position = this.textComment.getClientPosition();
+    var size = this.textComment.getClientSize();
     var left = position.x - size.x * 0.5;
     var top = position.y - size.y * 0.5;
 
@@ -3970,6 +4236,7 @@ CLOUD.Extensions.CommentTextArea.prototype.setStyle = function (style) {
     this.textAreaStyle['font-size'] = style['font-size'] + 'px';
     this.textAreaStyle['font-weight'] = style['font-weight'];
     this.textAreaStyle['font-style'] = style['font-style'];
+    this.textAreaStyle['color'] = style['fill-color'];
 
     var styleStr = CLOUD.DomUtil.getStyleString(this.textAreaStyle);
     this.textArea.setAttribute('style', styleStr);
@@ -4220,18 +4487,18 @@ CLOUD.Extensions.CommentFrame = function (editor, container) {
 
 CLOUD.Extensions.CommentFrame.prototype.addDomEventListeners = function() {
 
-    this.framePanel.addEventListener('mousedown', this.onMouseDownToResize.bind(this));
+    this.framePanel.addEventListener('mousedown', this.onResizeDown.bind(this));
     this.framePanel.addEventListener('dblclick', this.onDoubleClick.bind(this));
-    this.selection.element.addEventListener('mousedown', this.onMouseDownToReposition.bind(this));
-    this.selection.element.addEventListener('mousedown', this.onMouseDownToRotation.bind(this));
+    this.selection.element.addEventListener('mousedown', this.onRepositionDown.bind(this));
+    this.selection.element.addEventListener('mousedown', this.onRotationDown.bind(this));
 };
 
 CLOUD.Extensions.CommentFrame.prototype.removeDomEventListeners = function() {
 
-    this.framePanel.removeEventListener('mousedown', this.onMouseDownToResize.bind(this));
+    this.framePanel.removeEventListener('mousedown', this.onResizeDown.bind(this));
     this.framePanel.removeEventListener('dblclick', this.onDoubleClick.bind(this));
-    this.selection.element.removeEventListener('mousedown', this.onMouseDownToReposition.bind(this));
-    this.selection.element.removeEventListener('mousedown', this.onMouseDownToRotation.bind(this));
+    this.selection.element.removeEventListener('mousedown', this.onRepositionDown.bind(this));
+    this.selection.element.removeEventListener('mousedown', this.onRotationDown.bind(this));
 };
 
 CLOUD.Extensions.CommentFrame.prototype.onMouseMove = function (event) {
@@ -4241,7 +4508,7 @@ CLOUD.Extensions.CommentFrame.prototype.onMouseMove = function (event) {
 CLOUD.Extensions.CommentFrame.prototype.onMouseUp = function (event) {
 };
 
-CLOUD.Extensions.CommentFrame.prototype.onMouseDownToReposition = function (event) {
+CLOUD.Extensions.CommentFrame.prototype.onRepositionDown = function (event) {
 
     if (!this.comment) return;
 
@@ -4252,18 +4519,20 @@ CLOUD.Extensions.CommentFrame.prototype.onMouseDownToReposition = function (even
     var mouse = this.editor.getPointOnDomContainer(event.clientX, event.clientY);
 
     this.originMouse = mouse;
+
+    var position = this.comment.getClientPosition();
     this.originPosition = {
-        x: this.comment.position.x,
-        y: this.comment.position.y
+        x: position.x,
+        y: position.y
     };
 
-    this.onMouseMove = this.onMouseMoveToReposition.bind(this);
-    this.onMouseUp = this.onMouseUpToReposition.bind(this);
+    this.onMouseMove = this.onRepositionMove.bind(this);
+    this.onMouseUp = this.onRepositionUp.bind(this);
 
     this.editor.dragCommentFrameBegin();
 };
 
-CLOUD.Extensions.CommentFrame.prototype.onMouseMoveToReposition = function (event) {
+CLOUD.Extensions.CommentFrame.prototype.onRepositionMove = function (event) {
 
     if (!this.comment) return;
 
@@ -4280,11 +4549,10 @@ CLOUD.Extensions.CommentFrame.prototype.onMouseMoveToReposition = function (even
     var y = this.originPosition.y + movement.y;
 
     this.updatePosition(x, y, this.selection.rotation);
-
     this.comment.setPosition(x, y);
 };
 
-CLOUD.Extensions.CommentFrame.prototype.onMouseUpToReposition = function () {
+CLOUD.Extensions.CommentFrame.prototype.onRepositionUp = function () {
 
     if (!this.selection.dragging) {
         return;
@@ -4294,7 +4562,7 @@ CLOUD.Extensions.CommentFrame.prototype.onMouseUpToReposition = function () {
     this.editor.dragCommentFrameEnd();
 };
 
-CLOUD.Extensions.CommentFrame.prototype.onMouseDownToResize = function (event) {
+CLOUD.Extensions.CommentFrame.prototype.onResizeDown = function (event) {
 
     if (!this.comment) return;
 
@@ -4308,8 +4576,8 @@ CLOUD.Extensions.CommentFrame.prototype.onMouseDownToResize = function (event) {
         this.container.style.cursor = direction + '-resize';
 
         var mouse = this.editor.getPointOnDomContainer(event.clientX, event.clientY);
-        var position = this.comment.position;
-        var size = this.comment.size;
+        var position = this.comment.getClientPosition();
+        var size = this.comment.getClientSize();
 
         this.origin = {
             x: position.x,
@@ -4320,14 +4588,14 @@ CLOUD.Extensions.CommentFrame.prototype.onMouseDownToResize = function (event) {
             mouseY: mouse.y
         };
 
-        this.onMouseMove = this.onMouseMoveToResize.bind(this);
-        this.onMouseUp = this.onMouseUpToResize.bind(this);
+        this.onMouseMove = this.onResizeMove.bind(this);
+        this.onMouseUp = this.onResizeUp.bind(this);
 
         this.editor.dragCommentFrameBegin();
     }
 };
 
-CLOUD.Extensions.CommentFrame.prototype.onMouseMoveToResize = function (event) {
+CLOUD.Extensions.CommentFrame.prototype.onResizeMove = function (event) {
 
     if (!this.comment) return;
 
@@ -4401,7 +4669,7 @@ CLOUD.Extensions.CommentFrame.prototype.onMouseMoveToResize = function (event) {
     this.comment.setSize(width, height, newPos);
 };
 
-CLOUD.Extensions.CommentFrame.prototype.onMouseUpToResize = function (event) {
+CLOUD.Extensions.CommentFrame.prototype.onResizeUp = function (event) {
 
     this.selection.resizing = false;
     this.selection.handle.resizingPanel = null;
@@ -4409,7 +4677,7 @@ CLOUD.Extensions.CommentFrame.prototype.onMouseUpToResize = function (event) {
     this.editor.dragCommentFrameEnd();
 };
 
-CLOUD.Extensions.CommentFrame.prototype.onMouseDownToRotation = function (event) {
+CLOUD.Extensions.CommentFrame.prototype.onRotationDown = function (event) {
 
     if (!this.comment) return;
 
@@ -4420,21 +4688,20 @@ CLOUD.Extensions.CommentFrame.prototype.onMouseDownToRotation = function (event)
     this.originPosition = this.editor.getPointOnDomContainer(event.clientX, event.clientY);
     this.originRotation = this.selection.rotation || 0;
 
-    this.onMouseMove = this.onRotationMouseMove.bind(this);
-    this.onMouseUp = this.onMouseUpToRotation.bind(this);
+    this.onMouseMove = this.onRotationMove.bind(this);
+    this.onMouseUp = this.onRotationUp.bind(this);
 
     this.editor.dragCommentFrameBegin();
 };
 
-CLOUD.Extensions.CommentFrame.prototype.onRotationMouseMove = function (event) {
-
+CLOUD.Extensions.CommentFrame.prototype.onRotationMove = function (event) {
 
     if (!this.comment) return;
 
     if (!this.selection.rotating) return;
 
     var mouse = this.editor.getPointOnDomContainer(event.clientX, event.clientY);
-    var position = this.comment.position;
+    var position = this.comment.getClientPosition();
 
     var angle1 = CLOUD.Extensions.Utils.Geometric.getAngleBetweenPoints(position, mouse);
     var angle2 = CLOUD.Extensions.Utils.Geometric.getAngleBetweenPoints(position, this.originPosition);
@@ -4445,7 +4712,7 @@ CLOUD.Extensions.CommentFrame.prototype.onRotationMouseMove = function (event) {
     this.comment.setRotation(rotation);
 };
 
-CLOUD.Extensions.CommentFrame.prototype.onMouseUpToRotation = function (event) {
+CLOUD.Extensions.CommentFrame.prototype.onRotationUp = function (event) {
 
     this.selection.rotating = false;
     this.originRotation = null;
@@ -4647,8 +4914,8 @@ CLOUD.Extensions.CommentFrame.prototype.setComment = function (comment) {
         return;
     }
 
-    var size = comment.size,
-        position = comment.position,
+    var size = comment.getClientSize(),
+        position = comment.getClientPosition(),
         width = size.x,
         height = size.y,
         rotation = comment.rotation;
@@ -4667,7 +4934,7 @@ CLOUD.Extensions.CommentFrame.prototype.isActive = function () {
 
 CLOUD.Extensions.CommentFrame.prototype.dragBegin = function (event) {
 
-    this.onMouseDownToReposition(event);
+    this.onRepositionDown(event);
 };
 
 CLOUD.Extensions.CommentFrame.prototype.isDragging = function () {
@@ -4689,19 +4956,43 @@ CLOUD.Extensions.CommentFrame.prototype.enableResize = function () {
 
     var handle, direction;
 
-    for (direction in this.selection.handle) {
+    if (this.comment.disableResizeHeight || this.comment.disableResizeWidth) {
 
-        handle = this.selection.handle[direction];
+        for (direction in this.selection.handle) {
 
-        if (handle) {
-            handle.style.display = 'block';
+            handle = this.selection.handle[direction];
+            if (handle) handle.style.display = 'none';
+        }
+
+        if (this.comment.disableResizeHeight) {
+
+            this.selection.handle['w'].style.display = 'block';
+            this.selection.handle['e'].style.display = 'block';
+        }
+
+        if (this.comment.disableResizeWidth) {
+
+            this.selection.handle['n'].style.display = 'block';
+            this.selection.handle['s'].style.display = 'block';
+        }
+    } else {
+
+        for (direction in this.selection.handle) {
+
+            handle = this.selection.handle[direction];
+
+            if (handle) {
+                handle.style.display = 'block';
+            }
         }
     }
+
 };
 
 CLOUD.Extensions.CommentFrame.prototype.enableRotation = function () {
 
-    this.selection.rotationPanel.style.display = 'block';
+    var display = this.comment.disableRotation ? 'none' : 'block';
+    this.selection.rotationPanel.style.display = display;
 };
 
 CLOUD.Extensions.CommentFrame.prototype.updateDimensions = function (width, height) {
@@ -4714,7 +5005,7 @@ CLOUD.Extensions.CommentFrame.prototype.updateDimensions = function (width, heig
 
 CLOUD.Extensions.CommentFrame.prototype.updatePosition = function (x, y, rotation) {
 
-    var size = this.comment.size;
+    var size = this.comment.getClientSize();
 
     this.selection.x = x;
     this.selection.y = y;
@@ -4788,6 +5079,7 @@ CLOUD.Extensions.CommentEditor = function (cameraEditor, scene, domElement) {
     this.isCameraChange = false;
     this.commentType = CLOUD.Extensions.Comment.shapeTypes.ARROW;
     this.nextCommentId = 0;
+    this.arrowMinLen = 16;
 };
 
 CLOUD.Extensions.CommentEditor.prototype = Object.create(CLOUD.OrbitEditor.prototype);
@@ -4982,9 +5274,9 @@ CLOUD.Extensions.CommentEditor.prototype.onResize = function () {
     this.bounds.width = bounds.width;
     this.bounds.height = bounds.height;
 
-    var viewBox = this.getSVGViewBox(this.bounds.width, this.bounds.height);
+    //var viewBox = this.getSVGViewBox(this.bounds.width, this.bounds.height);
 
-    this.svg.setAttribute('viewBox', viewBox);
+    //this.svg.setAttribute('viewBox', viewBox);
     this.svg.setAttribute('width', this.bounds.width + '');
     this.svg.setAttribute('height', this.bounds.height + '');
 
@@ -5079,7 +5371,7 @@ CLOUD.Extensions.CommentEditor.prototype.mouseDownForArrow = function (event) {
     this.originX = start.x;
     this.originY = start.y;
 
-    var width = 2;
+    var width = this.arrowMinLen;
     var head = {x: this.originX, y: this.originY};
     var tail = {
         x: Math.round(head.x + Math.cos(Math.PI * 0.25) * width),
@@ -5132,6 +5424,18 @@ CLOUD.Extensions.CommentEditor.prototype.mouseMoveForArrow = function (event) {
 
     var startX = this.originX;
     var startY = this.originY;
+
+    var deltaX = end.x - startX;
+
+    if (Math.abs(deltaX) < this.arrowMinLen) {
+
+        if (deltaX > 0) {
+            end.x = startX + this.arrowMinLen;
+        } else {
+            end.x = startX - this.arrowMinLen;
+        }
+    }
+
     var endX = Math.min(Math.max(bounds.x, end.x), bounds.x + bounds.width);
     var endY = Math.min(Math.max(bounds.y, end.y), bounds.y + bounds.height);
 
@@ -5140,15 +5444,15 @@ CLOUD.Extensions.CommentEditor.prototype.mouseMoveForArrow = function (event) {
         endY++;
     }
 
-    var head = {x: startX, y: startY};
-    var tail = {x: endX, y: endY};
+    var tail = {x: startX, y: startY};
+    var head = {x: endX, y: endY};
 
     var epsilon = 0.0001;
 
     if (Math.abs(arrow.head.x - head.x) >= epsilon || Math.abs(arrow.head.y - head.y) >= epsilon ||
         Math.abs(arrow.tail.x - tail.x) >= epsilon || Math.abs(arrow.tail.y - tail.y) >= epsilon) {
 
-        arrow.set(head.x, head.y, tail.x, tail.y);
+        arrow.set(tail.x, tail.y, head.x, head.y);
     }
 };
 
@@ -5163,9 +5467,6 @@ CLOUD.Extensions.CommentEditor.prototype.mouseDownForRectangle = function (event
 
     var position = {x: start.x, y: start.y};
     var size = {x: 10, y: 10};
-
-    //var position = this.clientToWorld();
-    //var size = {x: 10, y: 10};
 
     var id = this.generateCommentId();
     var rectangle = new CLOUD.Extensions.CommentRectangle(this, id);
@@ -5198,8 +5499,8 @@ CLOUD.Extensions.CommentEditor.prototype.mouseMoveForRectangle = function (event
         endY++;
     }
 
-    var position = new THREE.Vector2((startX + endX) / 2, (startY + endY) / 2);
-    var size = new THREE.Vector2(endX - startX, endY - startY);
+    var position = {x: (startX + endX) / 2, y: (startY + endY) / 2};
+    var size = {x: endX - startX, y: endY - startY};
 
     var epsilon = 0.0001;
 
@@ -5381,8 +5682,8 @@ CLOUD.Extensions.CommentEditor.prototype.mouseDownForText = function (event) {
 
     var start = this.getPointOnDomContainer(event.clientX, event.clientY);
     var clientFontSize = 16;
-    var initWidth = clientFontSize * 15;
-    var initHeight = clientFontSize * 3;
+    var initWidth = clientFontSize * 20;
+    var initHeight = clientFontSize * 4;
 
     var size = new THREE.Vector2(initWidth, initHeight);
 
@@ -5433,14 +5734,14 @@ CLOUD.Extensions.CommentEditor.prototype.init = function (callbacks) {
         this.bounds.width = svgWidth;
         this.bounds.height = svgHeight;
 
-        var viewBox = this.getSVGViewBox(svgWidth, svgHeight);
+        //var viewBox = this.getSVGViewBox(svgWidth, svgHeight);
 
         this.svg = CLOUD.Extensions.Utils.Shape2D.createSvgElement('svg');
         this.svg.style.position = "absolute";
         this.svg.style.display = "block";
         this.svg.style.left = "0";
         this.svg.style.top = "0";
-        this.svg.setAttribute('viewBox', viewBox);
+        //this.svg.setAttribute('viewBox', viewBox);
         this.svg.setAttribute('width', svgWidth + '');
         this.svg.setAttribute('height', svgHeight + '');
 
@@ -5690,36 +5991,42 @@ CLOUD.Extensions.CommentEditor.prototype.deselectComment = function () {
     this.commentFrame.setComment(null);
 };
 
-CLOUD.Extensions.CommentEditor.prototype.worldToClient = function (point) {
+CLOUD.Extensions.CommentEditor.prototype.worldToClient = function (x, y, z) {
 
     var rect = CLOUD.DomUtil.getContainerOffsetToClient(this.domElement);
     var camera = this.cameraEditor.object;
     var result = new THREE.Vector3();
 
-    result.set(point.x, point.y, point.z);
+    result.set(x, y, z);
+
+    //result.applyMatrix4(camera.matrixWorld);
+    //result.sub(camera.position);
+
     result.project(camera);
 
-    result.x = Math.round(0.5 * (result.x + 1) * rect.width);
-    result.y = Math.round(-0.5 * (result.y - 1) * rect.height);
+    //result.x = Math.floor(0.5 * (result.x + 1) * rect.width);
+    //result.y = Math.floor(-0.5 * (result.y - 1) * rect.height);
+    //result.z = 0;
+
+    result.x = 0.5 * (result.x + 1) * rect.width;
+    result.y = -0.5 * (result.y - 1) * rect.height;
     result.z = 0;
 
     return result;
 };
 
-CLOUD.Extensions.CommentEditor.prototype.clientToWorld = function (x, y, depth) {
+CLOUD.Extensions.CommentEditor.prototype.clientToWorld = function (x, y) {
 
     var rect = CLOUD.DomUtil.getContainerOffsetToClient(this.domElement);
     var camera = this.cameraEditor.object;
     var result = new THREE.Vector3();
 
-    depth = depth || 0;
-
     result.x = x / rect.width * 2 - 1;
     result.y = -y / rect.height * 2 + 1;
-    result.z = depth;
+    result.z = 0;
 
     result.unproject(camera);
-    result.z = 0;
+    //result.z = 0;
 
     //result.add(camera.position).applyMatrix4(camera.matrixWorldInverse);
     //result.z = 0;
@@ -5972,45 +6279,38 @@ CLOUD.Extensions.CommentEditor.prototype.loadComments = function (commentInfoLis
 
             case CLOUD.Extensions.Comment.shapeTypes.ARROW:
                 var arrow = new CLOUD.Extensions.CommentArrow(this, id);
-                arrow.set(arrowHead.x, arrowHead.y, arrowTail.x, arrowTail.y);
+                arrow.setToWorld(arrowTail, arrowHead);
                 arrow.setRotation(rotation);
                 this.addComment(arrow);
                 arrow.created();
                 break;
             case  CLOUD.Extensions.Comment.shapeTypes.RECTANGLE:
                 var rectangle = new CLOUD.Extensions.CommentRectangle(this, id);
-                rectangle.set(position, size.x, size.y);
-                rectangle.setRotation(rotation);
+                rectangle.setToWorld(position, size, rotation);
                 this.addComment(rectangle);
                 rectangle.created();
                 break;
             case  CLOUD.Extensions.Comment.shapeTypes.CIRCLE:
                 var circle = new CLOUD.Extensions.CommentCircle(this, id);
-                circle.set(position, size.x, size.y);
-                circle.setRotation(rotation);
+                circle.setToWorld(position, size, rotation);
                 this.addComment(circle);
                 circle.created();
                 break;
             case  CLOUD.Extensions.Comment.shapeTypes.CROSS:
                 var cross = new CLOUD.Extensions.CommentCross(this, id);
-                cross.set(position, size.x, size.y);
-                cross.setRotation(rotation);
+                cross.setToWorld(position, size, rotation);
                 this.addComment(cross);
                 cross.created();
                 break;
             case CLOUD.Extensions.Comment.shapeTypes.CLOUD:
                 var cloud = new CLOUD.Extensions.CommentCloud(this, id);
-                cloud.setShapePoints(shapePointsStr);
-                cloud.setSeal(isSeal);
-                cloud.set(position, size.x, size.y);
-                cloud.setRotation(rotation);
+                cloud.setToWorld(shapePointsStr, rotation, isSeal);
                 this.addComment(cloud);
                 cloud.created();
                 break;
             case  CLOUD.Extensions.Comment.shapeTypes.TEXT:
                 var textComment = new CLOUD.Extensions.CommentText(this, id);
-                textComment.set(position, size.x, size.y, text);
-                textComment.setRotation(rotation);
+                textComment.setToWorld(position, size, rotation, text);
                 this.addComment(textComment);
                 textComment.created();
                 textComment.forceRedraw();
@@ -6060,6 +6360,10 @@ CLOUD.Extensions.CommentEditor.prototype.updateComments = function () {
     for (var i = 0, len = this.comments.length; i < len; i++) {
         var comment = this.comments[i];
         comment.updateStyle();
+    }
+
+    if (this.commentFrame && this.selectedComment) {
+        this.commentFrame.setComment(this.selectedComment)
     }
 };
 

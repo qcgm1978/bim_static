@@ -6,8 +6,13 @@
   <table>
     <tr class="title">
       <td></td>
-      <td>项目模型</td>
+      <td><%= versionname%></td>
       <td>标准模型</td>
+    </tr>
+    <tr>
+      <td>构件名称</td>
+      <td><%= name.split(']')[1]%></td>
+      <td><%= name.split(']')[1]%></td>
     </tr>
     <% _.each(data,function(item){%>
     <% _.each(item.items,function(it){%>

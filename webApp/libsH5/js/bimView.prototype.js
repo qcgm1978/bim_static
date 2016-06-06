@@ -84,6 +84,30 @@
       self.viewer.registerEventListener(CLOUD.EVENTS.ON_SELECTION_CHANGED, loadEvent.click);
       self.viewer.registerEventListener(CLOUD.EVENTS.ON_LOAD_PROGRESS, loadEvent.loading);
       self.viewer.registerEventListener(CLOUD.EVENTS.ON_LOAD_COMPLETE, loadEvent.loaded);
+      self.viewer.registerEventListener(CLOUD.EVENTS.ON_UPDATE_SELECTION_UI, function (evt) {
+        var selectionUI;
+        if(!self.selectionStatue){
+          selectionUI = $('<div class="selection"></div>');
+          self._dom.bimBox.append(selectionUI);
+          self.selectionStatue = true;
+        }else{
+          selectionUI = self._dom.bimBox.find('.selection');
+        }
+        if (evt.data.visible) {
+          var data = evt.data;
+          selectionUI.css({
+            left:data.left,
+            top:data.top,
+            width:data.width,
+            height:data.height,
+            opacity: data.dit ? .5 : .1
+          });
+        }
+        else {
+          self.selectionStatue = false;
+          selectionUI.remove();
+        }
+      });
     },
     controll:function(){
       var self = this;
@@ -134,7 +158,9 @@
             bimView.sidebar[fn](!isSelected,self);
             break;
           case "more":
+            var flag = self.getTranslucentStatus();
             $this.toggleClass('selected').siblings('[data-group='+group+']').removeClass('selected');
+            $this.find('.m-translucent').toggleClass('selected',flag)
             bimView.sidebar[fn](self);
             break;
           case "change":
@@ -236,11 +262,10 @@
             filter;
         $li.find("input").prop("checked",flag);
         if(type == "sceneId"){
-          var filter = bimView.comm.getFilters(self._dom.bimBox.find("#floors,#specialty"),'ckecked');
-          filter.ids = filter.ids.concat(specialty.ids);
+          var filter = bimView.comm.getFilters($("#floors,#specialty"),'uncheck');
           self.fileFilter(filter);
         }else{
-          filter = bimView.comm.getFilters(parents,'ckecked');
+          filter = bimView.comm.getFilters(parents,'uncheck');
           self.filter(filter);
         }
       }).on('click','.treeText',function(){
@@ -267,16 +292,16 @@
           callback:function(){
             var x = self.footer.find('#axisGridX').val(),
                 y = self.footer.find('#axisGridY').val();
-            self.setAxisGrid('bigMap',x,y);
+            self.setAxisGrid('bigMap',y,x);
           }
         });
         self.initMap({
           name:'bigMap',
           element:self.bigMap,
           enable:false,
-          callback:function(res){
-            self.footer.find('#axisGridX').val(res.axis.numeralName);
-            self.footer.find('#axisGridY').val(res.axis.abcName);
+          callbackMoveOnAxisGrid:function(res){
+            self.footer.find('#axisGridX').val(res.numeralName);
+            self.footer.find('#axisGridY').val(res.abcName);
           }
         });
         self.showAxisGrid('bigMap');
@@ -293,10 +318,10 @@
       });
       self.on('changeGrid',function(res){
         var floors = self.curFloor;
-        var infoX = res.axis.infoX || '-';
-        var infoY = res.axis.infoY || '-';
-        var infoZ = 'Z('+ floors +','+res.axis.offsetZ+')' || '-';
-        bimView.sidebar.el._dom.mapBar.find(".axisGrid").text(infoX+","+infoY+","+infoZ)
+        var infoX = res.axis.infoX ? res.axis.infoX +"," : "";
+        var infoY = res.axis.infoY ? res.axis.infoY +"," : "";
+        var infoZ = 'Z('+ floors +','+res.axis.offsetZ+')';
+        bimView.sidebar.el._dom.mapBar.find(".axisGrid").text(infoX+infoY+infoZ)
       });
     },
     // 以下是对模型操作
@@ -327,6 +352,13 @@
       var self = this;
       var viewer = self.viewer;
       viewer.zoomToBBox(CLOUD.Utils.computeBBox(box));
+      viewer.render();
+    },
+    zoomToSelection:function(box){
+      // 缩放到当前选中构件
+      var self = this;
+      var viewer = self.viewer;
+      viewer.zoomToSelection();
       viewer.render();
     },
     rotateCamera : function () {
@@ -422,7 +454,7 @@
       var self = this;
       var viewer = self.viewer;
       viewer.editMarkerEnd();
-      viewer.setPickMode();
+      self.rotateMouse();
     },
     saveMarkers : function() {
       // 保存检查点
@@ -473,7 +505,7 @@
       self._dom.bimBox.attr('class','bim');
       self._dom.bimBox.find('.commentBar').remove();
       viewer.editCommentEnd();
-      viewer.setPickMode();
+      self.rotateMouse();
     },
     setCommentType:function(type){
       var self = this;
@@ -570,6 +602,11 @@
       }
       viewer.render();
     },
+    setSelectedIds:function(){
+      var self = this;
+      var viewer = self.viewer;
+      viewer.setSelectedIds(ids);
+    },
     collision:function(idA,idB){
       // 碰撞
       var self = this;
@@ -600,7 +637,8 @@
         name:'defaultMap',
         axisGrid:'',
         enable:true,
-        callback:null
+        callbackCameraChanged:null,
+        callbackMoveOnAxisGrid:null
       },
       _opt = $.extend({},defaults,options);
       // 初始化小地图
@@ -612,11 +650,11 @@
           _css={
             left:'0px',
             bottom:'0px',
-            outline:'none'          };
+            outline:'none',
+            position:'relative'
+          };
       if(_opt.axisGrid) viewer.setAxisGridData(_opt.axisGrid)
-      viewer.createMiniMap(_opt.name,_el[0],_width,_height,_css,function(res){
-        _opt.callback&&_opt.callback.call(this,res)
-      });
+      viewer.createMiniMap(_opt.name,_el[0],_width,_height,_css,_opt.callbackCameraChanged,_opt.callbackMoveOnAxisGrid);
       viewer.enableAxisGridEvent(_opt.name,_opt.enable);
       viewer.generateAxisGrid(_opt.name);
     },

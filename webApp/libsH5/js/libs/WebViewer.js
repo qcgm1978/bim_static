@@ -2,8 +2,9 @@
 * @require /libsH5/js/libs/three.min.js
 */
 
+
 var CLOUD = CLOUD || {};
-CLOUD.Version = "20160601";
+CLOUD.Version = "20160604";
 
 CLOUD.GlobalData = {
     SceneSize: 1000,
@@ -6570,7 +6571,11 @@ CLOUD.Camera.prototype.setStandardView = function (stdView, bbox) {
     return target;
 };
 
-CLOUD.Camera.prototype.zoomToBBox = function (bbox) {
+CLOUD.Camera.prototype.zoomToBBox = function (bound, margin) {
+    var bbox = new THREE.Box3();
+    bbox.copy(bound);
+    margin = margin || 0.05;
+    bbox.expandByScalar(bound.size().length() * margin);
 
     var dir = this.getWorldDirection();
     var up = this.up;
@@ -7651,6 +7656,8 @@ CLOUD.Scene.prototype.pickByReck = function () {
         if (clearOld)
             scope.filter.setSelectedIds();
 
+        var count = 0;
+
         function frustumTest(node) {
 
             if (node.worldBoundingBox) {
@@ -7664,32 +7671,17 @@ CLOUD.Scene.prototype.pickByReck = function () {
             if (node.userData) {
                 var state = intersectObjectByBox(frustum, node);
                 if (state === INTERSECTION_STATE.IS_Contains) {
-                    scope.filter.addSelectedId(node.name);
+
+                    if (scope.filter.isVisible(node)) {
+                        scope.filter.addSelectedId(node.name);
+                        ++count;
+                    }
+
                 }
                 else {
                     return;
                 }
             }
-
-            //if (node.geometry) {
-
-            //    var state = intersectObjectBySphere(frustum, node);
-            //    if(state === INTERSECTION_STATE.IS_Contains){
-            //        scope.filter.addSelectedId(node.name);
-            //    }
-            //    else if (state === INTERSECTION_STATE.IS_Intersection) {
-
-            //        var state = intersectObjectByBox(frustum, node);
-            //        if (state === INTERSECTION_STATE.IS_Contains) {
-            //            scope.filter.addSelectedId(node.name);
-            //        }
-            //        else if (state === INTERSECTION_STATE.IS_Intersection) {
-
-            //        }
-            //    }
-
-            //    return;
-            //}
 
             var children = node.children;
             if (!children)
@@ -7701,7 +7693,7 @@ CLOUD.Scene.prototype.pickByReck = function () {
                     frustumTest(child);
                 }
             }
-        }
+        };
 
         var children = this.rootNode.children;
         for (var i = 0, l = children.length; i < l; i++) {
@@ -7710,6 +7702,9 @@ CLOUD.Scene.prototype.pickByReck = function () {
                 frustumTest(child);
             }
         }
+
+
+        callback();
     }
 
 }();
@@ -10402,6 +10397,7 @@ CLOUD.PickEditor.prototype.handleMousePick = function (event, isDoubleClick) {
 
                 if (scope.filter.setSelectedIds()) {
                     cameraEditor.updateView(true);
+                    scope.onObjectSelected(null);
                 }
 
                 scope.showPickedInformation(null);
@@ -10416,7 +10412,8 @@ CLOUD.PickEditor.prototype.handleMousePick = function (event, isDoubleClick) {
                 scope.filter.addDemolishId(userId, true);
                 cameraEditor.updateView(true);
 
-            } else {
+            }
+            else {
 
                 if (!event.ctrlKey) {
                     scope.filter.setSelectedIds();
@@ -10434,6 +10431,7 @@ CLOUD.PickEditor.prototype.handleMousePick = function (event, isDoubleClick) {
                 }
                 else {
                     scope.showPickedInformation(null);
+                    scope.onObjectSelected(null);
                 }
                 cameraEditor.updateView(true);
             }
@@ -17763,6 +17761,10 @@ CloudViewer = function () {
                     overCanvas = miniMap.mouseUp(event, function (point) {
                         // 飞到指定点
                         scope.cameraEditor.flyToPointWithParallelEye(point);
+
+                        // 如何处理小地图与批注的联动???
+                        // 下一步考虑将批注实现成组件
+                        scope.exitCommentMode();
                     });
                     break;
                 default:
@@ -18208,19 +18210,20 @@ CloudViewer.prototype = {
         this.editorManager.zoomAll(this);
     },
 
-    zoomToSelection: function () {
-
+    zoomToSelection: function (margin) {
+        margin = margin || 0.05; // give bounding box a margin 0.05 by default.
         var box = this.renderer.computeSelectionBBox();
         if (box == null || box.empty()) {
             box = this.getScene().worldBoundingBox();
         }
 
-        var target = this.camera.zoomToBBox(box);
+        var target = this.camera.zoomToBBox(box, margin);
         this.cameraEditor.updateCamera(target);
         this.render();
     },
 
-    zoomToBBox: function (box) {
+    zoomToBBox: function (box, margin) {
+        margin = margin || 0.05;
         if (!box) {
             box = this.getScene().worldBoundingBox();
         }
@@ -18228,7 +18231,7 @@ CloudViewer.prototype = {
             box.applyMatrix4(this.getScene().rootNode.matrix);
         }
 
-        var target = this.camera.zoomToBBox(box);
+        var target = this.camera.zoomToBBox(box, margin);
         this.cameraEditor.updateCamera(target);
         this.render();
     },
@@ -18403,12 +18406,14 @@ CloudViewer.prototype = {
     // ------------------ ViewHouse API -- E ------------------ //
 
     // ------------------ 小地图API -- S ------------------ //
-    createMiniMap:function(name, domElement, width, height, styleOptions, callback){
+    createMiniMap:function(name, domElement, width, height, styleOptions, callbackCameraChanged, callbackMoveOnAxisGrid){
 
         var miniMap = this.miniMaps[name];
 
         if (!miniMap) {
-            miniMap = this.miniMaps[name] = new CLOUD.MiniMap(this, callback);
+            miniMap = this.miniMaps[name] = new CLOUD.MiniMap(this);
+            miniMap.setCameraChangedCallback(callbackCameraChanged);
+            miniMap.setMoveOnAxisGridCallback(callbackMoveOnAxisGrid);
         }
 
         domElement = domElement || this.domElement;
@@ -18606,6 +18611,16 @@ CloudViewer.prototype = {
 
     setCommentMode: function () {
         this.editorManager.setCommentMode(this);
+    },
+
+    exitCommentMode: function () {
+
+        if ( this.editorManager.commentEditor &&
+            this.editorManager.editor === this.editorManager.commentEditor) {
+
+            this.setPickMode();
+        }
+
     },
 
     setCommentBackgroundColor: function (startColor, stopColor) {

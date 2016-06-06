@@ -198,9 +198,9 @@ App.Project.ProjectPlanProperty = Backbone.View.extend({
 	changeDate(event) {
 
 		var $target = $(event.target),
-			isEnd = $target.val() != 1 && $target.val() != 3 && true || false;
+			isEnd = $target.val() != 4 && $target.val() != 3 && true || false;
 
-		if ($target.val() == 1 || $target.val() == 2) {
+		if ($target.val() == 4 || $target.val() == 2) {
 			this.$(".selDate:last")[0].selectedIndex = $target[0].selectedIndex;
 		} else {
 			this.$(".selDate:first")[0].selectedIndex = $target[0].selectedIndex;
@@ -212,11 +212,11 @@ App.Project.ProjectPlanProperty = Backbone.View.extend({
 	//加载计划关注列表
 	loadPublicityData(projectId, projectVersionId, isEnd) {
 
-		var weekType = 1,
+		var weekType = 4,
 			monthType = 3;
 		if (isEnd) {
 			weekType = 2;
-			monthType = 4;
+			monthType = 1;
 		}
 
 		App.Project.PlanAttr.PlanPublicityCollection.reset();
@@ -236,7 +236,7 @@ App.Project.ProjectPlanProperty = Backbone.View.extend({
 
 		App.Project.PlanAttr.PlanPublicityCollectionMonth.fetch({
 			data: {
-				projectId: projectId,
+				projectCode: App.Project.Settings.CurrentVersion.projectNo,
 				type: weekType
 			}
 		});

@@ -1,5 +1,31 @@
-<div class="ruleTitle" data-id="<%= obj.mappingCategory.id ? obj.mappingCategory.id  :''%>">
+<div class="ruleTitle" data-id="<%= obj.mappingCategory.id ? obj.mappingCategory.id  : ''%>">
     <div class="right getDetail">详情</div>
-    <div class="desc"><%= (obj.mappingCategory.categoryCode ? ( "[" + obj.mappingCategory.categoryCode + "] &nbsp;") : '' ) +  (obj.mappingCategory.categoryName ? obj.mappingCategory.categoryName  : obj.targetName) %></div>
+    <div class="desc"><%= (obj.mappingCategory.categoryCode ? ( "[" + obj.mappingCategory.categoryCode + "] &nbsp;") : '' ) +  (obj.mappingCategory.categoryName ? obj.mappingCategory.categoryName  : "新建映射规则") %></div>
 </div>
-<div class="ruleDetail"></div>
+<div class="ruleDetail">
+    <div class="typeCode" data-code="<%= obj.mappingCategory.categoryCode %>" data-name="<%= obj.mappingCategory.categoryName %>">
+        <div class="title">分类编码:</div>
+        <div class="conR">
+            <div>
+                <div class="chide" data-code="<%= obj.mappingCategory.categoryCode %>"><span><%= '[' + mappingCategory.categoryCode +']'%></span>  <i><%= mappingCategory.categoryName %></i></div>
+                <input type="text" placeholder="请输入分类编码" value="<%= obj.mappingCategory.categoryCode %>"  class="pdR60 categoryCode">
+                <span class="choose">选择</span>
+            </div>
+            <ul>
+            </ul><!--联想接口，最多显示5条-->
+        </div>
+    </div>
+    <div class="mapRule clearfix">
+        <div class="title">属性映射规则:</div>
+        <div class="conR">
+            <dl>
+
+            </dl>
+            <div class="clear"><span class="addNewRule">新增属性</span></div>
+        </div>
+        <div class="controlRule">
+            <div class="saveRule mgR10">保存</div>
+            <div class="deleteRule">删除</div>
+        </div>
+    </div>
+</div>

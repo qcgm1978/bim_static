@@ -55,8 +55,11 @@ App.Services.ProjectDetail.Section=Backbone.View.extend({
 		        "pitId":"",//    基坑编码
 		        "projectId":_this.userData.projectId,//    项目编码
 		        "profileName":"",//  剖面
-		        "bracingType":0 ,//支护类型
+		        "bracingType":'' ,//支护类型
 				"isAdd":true
+			}
+			if(App.Services.ProjectCollection.datas.pitData[0]){
+				data.pitId=App.Services.ProjectCollection.datas.pitData[0].id;
 			}
 			App.Services.ProjectCollection.ProjecDetailSectionCollection.push(data);
 			this.status='create';

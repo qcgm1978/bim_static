@@ -764,7 +764,8 @@ App.Project = {
 			location=$target.data('location');
 
 		if ($target.hasClass("selected")) {
-			$target.parent().find(".selected").removeClass("selected");
+			return 
+		//	$target.parent().find(".selected").removeClass("selected");
 		} else {
 			$target.parent().find(".selected").removeClass("selected");
 			$target.addClass("selected");

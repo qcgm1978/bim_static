@@ -344,6 +344,7 @@ App.Console = {
         openTime: $("#devDate").val().trim(), //开业时间
         //versionName: “2016 版”, //版本名称，适用于标准模型。非空字段
         designUnit: $("#launchDepartment").val().trim(),
+        subType: $("#s01").val().trim(),
         "initiator"        : $("#p14").val().trim(),
         "auditor"          : $("#p15").val().trim(),
         "confirmor"        : $("#p16").val().trim(),
