@@ -86,9 +86,15 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
             return
         }
 
+        if(!this.$(".conR dd").length){
+            alert("至少添加一项规则!");
+            return
+        }
+
         var model = App.ResourceArtifacts.saveRuleModel();
         var dd =  this.$("dd");
         var Rulist = [];
+        var operator = "";
 
         for(var i =0 ; i < dd.length ; i++){
             Rulist[i]  ={};
@@ -100,7 +106,9 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
             }
             Rulist[i].propertyKey = propertyKey.val();
 
-            Rulist[i].operator = dd.eq(i).find(".leftten .myDropDown").attr("data-operator");
+            operator = dd.eq(i).find(".leftten .myDropDown").attr("data-operator");
+
+            Rulist[i].operator = operator;
 
             if(dd.eq(i).find(".eIn").hasClass("active")){
                 var name = dd.eq(i).find(".eIn input");
@@ -116,9 +124,9 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
                     alert("至少选一项规则！");
                     return
                 }
-                var left = dd.eq(i).find(".ioside .myDropDown").eq(0);
+                var left = dd.eq(i).find(".ioside .myDropDown").eq(0).data("operator");
                 var leftValue = dd.eq(i).find(".ioside input").eq(0);
-                var right = dd.eq(i).find(".ioside .myDropDown").eq(1);
+                var right = dd.eq(i).find(".ioside .myDropDown").eq(1).data("operator");
                 var rightValue = dd.eq(i).find(".ioside input").eq(1);
 
                 if(!leftValue.val() && !rightValue.val()){
@@ -135,7 +143,7 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
                     right = ""
                 }
 
-                var str = left.data("operator")  + leftValue.val() +","+ rightValue.val()+ right.data("operator") ;
+                var str = left  + leftValue.val() +","+ rightValue.val()+ right ;
                 Rulist[i].propertyValue = str;
             }
         }
@@ -174,11 +182,12 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
                 _this.$el.closest(".ruleDetail").hide();
                 //创建
                 if(cdata.URLtype == "createArtifactsPlanNewRule"){
-                    _this.model.set({"id":response.data.id},{silent:true});
 
+                    model.mappingCategory.id = response.data.id;
+
+                    _this.model.set({mappingCategory: model.mappingCategory},{silent:true});
 
                     _this.$(".ruleTitle").attr("data-id",response.data.id);
-
                     //写入相关的数据
                     var count = parseInt(App.ResourceArtifacts.Status.presentPlan.get("count"));
                     var code = App.ResourceArtifacts.Status.presentPlan.get("code");
@@ -187,12 +196,13 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
                     });
                     pre[0].set("count",count+1);
                     $(".artifactsContent .rules h2 i").html( "("+ (count+1) + ")");
-
-                    _this.$(".ruleTitle .desc").text("[" + categoryCode + "] " + categoryName);
-                    _this.$(".ruleDetail").hide();
+                }else{
+                    //更新，重写标题
                 }
                 _this.reset();
                 $(".artifactsContent .rules").removeClass("services_loading");
+                _this.$(".ruleTitle .desc").text("[" + categoryCode + "] " + categoryName);
+                _this.$(".ruleDetail").hide();
             }
         });
     },
@@ -217,7 +227,7 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
             message: frame
         });
         $(".mod-dialog .wrapper .header").hide();//隐藏头部
-        $(".alertInfo").html('确认删除 “'+ _this.model.get("targetName") + '的 ”'+ App.ResourceArtifacts.Status.rule.categoryName+'！');
+        $(".alertInfo").html('确认删除 “'+ _this.model.get("mappingCategory").categoryName   +' "?');
     },
     //删除单条规则
     delRule:function(e){

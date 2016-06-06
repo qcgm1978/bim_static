@@ -22,12 +22,16 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
 
     //取得规则列表
     getPlanId:function(){
+
+
+
          App.ResourceArtifacts.Status.rule.targetCode = this.model.get("code");
         App.ResourceArtifacts.Status.rule.targetName = this.model.get("name");
         if(!App.ResourceArtifacts.Status.saved){
             alert("您还有没保存的");
             return
         }
+        App.ResourceArtifacts.loading($(".rules"));
         this.toggleClass();
         this. getRules();
 
@@ -66,6 +70,7 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
                     $(".ruleContent ul").html("<li><div class='ruleTitle delt'>暂无内容</div></li>");
                 }
             }
+            App.ResourceArtifacts.loaded($(".rules"));
         });
     }
 });
