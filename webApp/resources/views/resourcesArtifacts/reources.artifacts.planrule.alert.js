@@ -52,6 +52,7 @@ App.Resources.ArtifactsPlanRuleAlert = Backbone.View.extend({
                      App.ResourceArtifacts.PlanRules.remove(pre);
 
                      _.each($(".ruleTitle"),function(item){
+
                          if(parseInt($(item).attr("data-id")) == parseInt(id)){
                              $(item).closest("li").remove();
                          }
