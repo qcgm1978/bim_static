@@ -82,15 +82,12 @@ App.ResourceArtifacts={
 
 
     //计划规则/获取
-    operator:new(Backbone.Collection.extend({
-        model:Backbone.Model.extend({
-            defaults:function(){
-                return{
-
-                }
+    operator:Backbone.Model.extend({
+        defaults:function(){
+            return{
+                code : ""
             }
-        })
-    })),
+        }}),
 
 
 
@@ -285,7 +282,9 @@ App.ResourceArtifacts={
         _this.$el.append(pre.render().el);//菜单
 
         pre.$(".plans").html(plans.render().el);//计划节点
-        pre.$(".rules").append(planRule.render().el);//菜单
+        pre.$(".rules .ruleContent").append(planRule.render().el);//
+
+        pre.$(".rules .ruleContent ul").html("<li><div class='ruleTitle delt'>没有相关规则节点</div></li>");
 
         //插入默认为空的规则列表
         this.getPlan();
@@ -301,7 +300,7 @@ App.ResourceArtifacts={
         var plans = new App.Resources.ArtifactsPlanList();
         var planRule = new App.Resources.ArtifactsPlanRule();
         pre.$(".plans").html(plans.render().el);//计划节点
-        pre.$(".rules").html(planRule.render().el);//菜单
+        pre.$(".rules .ruleContent").html(planRule.render().el);//菜单
     },
 
     //获取计划节点

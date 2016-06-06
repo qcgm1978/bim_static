@@ -19,7 +19,6 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
     },
 
     render:function() {
-
         this.$el.html(this.template(this.model.toJSON()));
         return this;
     },
@@ -31,12 +30,18 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
     getDetail:function(){
         var _this = this;
         this.tabRule();
+
+
         //映射规则
-        var operator = new App.Resources.ArtifactsPlanRuleDetailOperator().render().el;
-        this.$(".mapRule").html(operator);//规则列表
         var operatorData = App.Resources.dealStr(_this.model);//规则数据
-        App.ResourceArtifacts.operator.reset();
-        App.ResourceArtifacts.operator.add(operatorData);
+        _this.$(".mapRule dl").html("");
+        _.each(operatorData,function(item){
+            var model = new App.ResourceArtifacts.operator(item);
+            var view = new App.Resources.ArtifactsPlanRuleDetailNew({model:model}).render().el;
+            _this.$(".mapRule dl").append(view);
+        });
+
+
     },
     //开合状态
     tabRule:function(){

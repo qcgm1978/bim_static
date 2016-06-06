@@ -17,7 +17,7 @@
 <div class="ioside  <%= (type == a3 || type == a4) ? 'active' : ''  %>"><!--范围 内/外-->
     <div class="myDropDown" data-operator="">
                         <span class="myDropText">
-                            <span class="text"><%= obj.ruleList.left=='(' ? '>' : (obj.ruleList.left=='[' ? "≥" : '(') %></span>
+                            <span class="text"><%= obj.ruleList.left=='(' ? '>' : (obj.ruleList.left=='[' ? "≥" : '>') %></span>
                             <i class="myDropArrorw down"></i>
                         </span><input type="number" placeholder="请输入数值"   class="leftValue" value="<%= obj.ruleList.leftValue %>">
         <ul class="myDropList">
@@ -26,7 +26,7 @@
         </ul>
     </div><div class="myDropDown " data-operator="">
                         <span class="myDropText">
-                            <span class="text"><%= obj.ruleList.right==')' ? '<' : (obj.ruleList.right==']' ? "≤" : ')') %></span>
+                            <span class="text"><%= obj.ruleList.right==')' ? '<' : (obj.ruleList.right==']' ? "≤" : '') %></span>
                             <i class="myDropArrorw down"></i>
                         </span><input type="number" placeholder="请输入数值" class="rightValue last" value="<%= obj.ruleList.rightValue %>">
         <ul class="myDropList">

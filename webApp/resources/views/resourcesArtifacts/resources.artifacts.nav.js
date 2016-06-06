@@ -8,7 +8,8 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
     id: "artifacts",
 
     events:{
-        "click .sele": "select"
+        "click .sele": "select",
+        "click .newPlanRule":"newPlanRule"
     },
 
     template: _.templateUrl("/resources/tpls/resourcesArtifacts/resources.artifacts.nav.html"),
@@ -80,5 +81,47 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
                 App.Resources.artifactsTreeData = response.data;
             }
         });
+    },
+
+    //创建规则
+    newPlanRule:function(){
+        var _this = this;
+        var targetCode = App.ResourceArtifacts.Status.rule.targetCode;
+        if(!targetCode){
+            alert("您还没有选择模块/质量标准");
+            return;
+        }//没有选择计划无法创建规则
+
+        if( !App.ResourceArtifacts.Status.saved){
+            alert("您还有没保存的");
+            //查找未保存的元素并高亮提示变红
+            return
+        }
+
+        if(!$(".ruleDetail").length){
+            $(".artifactsContent .rules ul").html("");
+        }
+        //无数据或无更改，更改当前数据
+        $(".ruleDetail:visible").hide();
+        //创建规则
+
+        var model =  App.ResourceArtifacts.createPlanRules();
+        App.ResourceArtifacts.PlanRules.push(model);
+
+        var container = new App.Resources.ArtifactsPlanRuleDetail({model:model}).render();
+
+
+        //加载底下规则
+        var operatorData = App.Resources.dealStr(model);//规则数据
+        container.$(".mapRule dl").html("");
+        _.each(operatorData,function(item){
+            var model = new App.ResourceArtifacts.operator(item);
+            var view = new App.Resources.ArtifactsPlanRuleDetailNew({model:model}).render().el;
+            container.$(".mapRule dl").append(view);
+        });
+
+
+        $(".artifactsContent .rules ul li:last-child").html(container.el).show();
+        $(".artifactsContent .rules ul li:last-child .ruleDetail").show();
     }
 });
