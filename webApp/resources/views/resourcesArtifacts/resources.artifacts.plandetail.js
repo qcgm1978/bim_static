@@ -17,10 +17,7 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
     },
 
     initialize:function(){
-        //监听展开的模型是否被更改，如果更改，列出更改项，提示保存
-        if(App.ResourceArtifacts.Status.presentPlan){
-            this.listenTo(App.ResourceArtifacts.Status.presentPlan,"chang",this.getChangeAttr);    //previous    model.previous(attribute)
-        }
+        this.listenTo(this.model,"change",this.render);
     },
 
     //取得规则列表

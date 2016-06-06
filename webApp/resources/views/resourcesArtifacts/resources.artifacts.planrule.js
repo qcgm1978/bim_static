@@ -16,7 +16,6 @@ App.Resources.ArtifactsPlanRule = Backbone.View.extend({
 
     initialize:function(){
         this.listenTo(App.ResourceArtifacts.PlanRules,"add",this.addOne);
-        //this.listenTo(App.ResourceArtifacts.PlanRules,"change",this.render);
         this.listenTo(App.ResourceArtifacts.PlanRules,"remove",this.render);
     },
 

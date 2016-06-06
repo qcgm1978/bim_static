@@ -244,9 +244,9 @@ App.ResourceArtifacts={
     init:function(_this) {
         App.ResourceArtifacts.Status.rule.biz =1;  //设置默认规则为模块化
 
-        var pre = new App.Resources.ArtifactsMapRule();
-        var plans = new App.Resources.ArtifactsPlanList();
-        var planRule = new App.Resources.ArtifactsPlanRule();
+        var pre = new App.Resources.ArtifactsMapRule();  //外层菜单
+        var plans = new App.Resources.ArtifactsPlanList();   //模块化列表 /计划节点
+        var planRule = new App.Resources.ArtifactsPlanRule();  //默认规则
 
         $(".breadcrumbNav .mappingRule").show();
 
@@ -286,7 +286,7 @@ App.ResourceArtifacts={
         pdata  = {
             URLtype:"fetchArtifactsPlan",
             data:{
-                type :App.ResourceArtifacts.Status.type =1
+                type : App.ResourceArtifacts.Status.type
             }
         };
         App.ResourceArtifacts.PlanRules.reset();

@@ -105,7 +105,6 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
         //创建规则
 
         var model =  App.ResourceArtifacts.createPlanRules();
-        App.ResourceArtifacts.PlanRules.push(model);
 
         var container = new App.Resources.ArtifactsPlanRuleDetail({model:model}).render();
         //加载底下规则
@@ -117,8 +116,8 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
             container.$(".mapRule dl").append(view);
         });
 
-        $(".artifactsContent .rules ul li:last-child").html(container.el).show();
-        $(".artifactsContent .rules ul li:last-child .ruleDetail").show();
+        $(".ruleContent>ul").append(container.el).show();
+        $(".ruleContent>ul>li:last .ruleDetail").show();
         App.ResourceArtifacts.Status.saved = false;
     }
 

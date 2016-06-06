@@ -174,12 +174,20 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
                 _this.$el.closest(".ruleDetail").hide();
                 //创建
                 if(cdata.URLtype == "createArtifactsPlanNewRule"){
-                    //_this.model.set({"id":response.data.id},{silent:true});
+                    _this.model.set({"id":response.data.id},{silent:true});
                     title.data("id",response.data.id);
-                    //创建
-                    $(".artifactsContent .rules h2 .name").html(App.ResourceArtifacts.Status.rule.targetCode+ "&nbsp;" +App.ResourceArtifacts.Status.rule.targetName);
+
+                    //写入相关的数据
                     var count = parseInt(App.ResourceArtifacts.Status.presentPlan.get("count"));
-                    $(".artifactsContent .rules h2 i").html( "("+Rulist.length + ")");
+                    var code = App.ResourceArtifacts.Status.presentPlan.get("code");
+                    var pre = App.ResourceArtifacts.PlanNode.filter( function(item) {
+                        return item.get("code") == code;
+                    });
+                    pre[0].set("count",count+1);
+                    $(".artifactsContent .rules h2 i").html( "("+ (count+1) + ")");
+
+                    _this.$(".ruleTitle .desc").text("[" + categoryCode + "] " + categoryName);
+                    _this.$(".ruleDetail").hide();
                 }
                 _this.reset();
                 $(".artifactsContent .rules").removeClass("services_loading");

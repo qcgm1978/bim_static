@@ -18,7 +18,6 @@ App.Resources.ArtifactsRuleLegend = Backbone.View.extend({
     initialize:function(){},
     //选择
     sele : function(){
-
         var list = this.$el.closest("ul"),
             data = this.$(".searEnd").data("code"),
             dataKeeper = list.siblings("div").find(".chide"),
@@ -26,16 +25,12 @@ App.Resources.ArtifactsRuleLegend = Backbone.View.extend({
             name = this.model.get("name"),
             dataName = "[" + data +"]";
 
-        input.css({"opacity":"0"}).val(data);
+        input.val(data).css({"opacity":"0"});
         list.hide();
         dataKeeper.css({"visibility": "visible"}).data("code",data).attr("data-name",name).find("span").html(dataName).siblings("i").html(name);
 
-        var presentRule = App.ResourceArtifacts.presentRule;
-
         App.ResourceArtifacts.Status.rule.mappingCategory.categoryCode = data;
         App.ResourceArtifacts.Status.rule.mappingCategory.categoryName = name;
-
-
     }
 });
 
