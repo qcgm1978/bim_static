@@ -24,14 +24,10 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
     },
     initialize:function(){
         this.listenTo(this.model,"change",this.render);
-        this.listenTo(this.model,"mappingCategoryChange",this.render);
     },
-
     getDetail:function(){
         var _this = this;
         this.tabRule();
-
-
         //映射规则
         var operatorData = App.Resources.dealStr(_this.model);//规则数据
         _this.$(".mapRule dl").html("");
@@ -40,8 +36,6 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
             var view = new App.Resources.ArtifactsPlanRuleDetailNew({model:model}).render().el;
             _this.$(".mapRule dl").append(view);
         });
-
-
     },
     //开合状态
     tabRule:function(){
@@ -89,7 +83,7 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
             alert("规则名称不能为空!");
             return
         }
-        
+
         var model = App.ResourceArtifacts.saveRuleModel();
         var dd =  this.$("dd");
         var Rulist = [];
@@ -104,10 +98,7 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
             }
             Rulist[i].propertyKey = propertyKey.val();
 
-
-
             Rulist[i].operator = dd.eq(i).find(".leftten .myDropDown").attr("data-operator");
-
 
             if(dd.eq(i).find(".eIn").hasClass("active")){
                 var name = dd.eq(i).find(".eIn input");
@@ -151,7 +142,6 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
         model.mappingCategory.categoryName = categoryName;
         model.mappingCategory.mappingPropertyList = Rulist;
 
-
         this.model.set({"targetCode":App.ResourceArtifacts.Status.rule.targetCode},{silent:true});
         this.model.set({"targetName":App.ResourceArtifacts.Status.rule.targetName},{silent:true});
         this.model.set({"biz":App.ResourceArtifacts.Status.rule.biz},{silent:true});
@@ -167,7 +157,6 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
             contentType: "application/json",
             projectId : App.ResourceArtifacts.Status.projectId
         };
-
 
         if(this.model.get("id")){
             cdata.URLtype = "modifyArtifactsPlanRule";
@@ -194,7 +183,6 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
                 $(".artifactsContent .rules").removeClass("services_loading");
             }
         });
-
     },
 
     //重置保存状态

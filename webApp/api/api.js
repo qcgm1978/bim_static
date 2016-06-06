@@ -193,8 +193,7 @@ App.API = {
 		deleteArtifactsPlanRule:"dataJson/resources/fetchArtifactsMapPlan.json",//计划节点删除规则           platform/mapping/rule/delete/{id}?projectId={projectId}
 
 		//质量标准
-		fetchQualityPlanQualityLevel1:"platform/mapping/rule/plan/standard", //获取质量标准1级  platform/mapping/rule/quality/standard?type={type}&standardType=={KY|GC}
-		fetchQualityPlanQualityLevel2:"dataJson/resources/fetchArtifactsStandardQuality.json", //获取质量标准其他级
+		fetchArtifactsQuality:"platform/mapping/rule/quality/standard", //获取质量标准1级  platform/mapping/rule/quality/standard?type={type}&standardType=={KY|GC}
 
 		//项目 变更 列表
 		fileList:"doc/internal/{projectId}/{versionId}/differ", //变更列表
@@ -206,8 +205,6 @@ App.API = {
 		projectChangeListTest:"/dataJson/project/projectChange/list.json",
 		projectDesinPropertiesTest:"/dataJson/project/projectChange/comparisonAttr.json",//sixD/{projectId}/{projectVersionId}/property/comparison //?baseProjectVerionId={baseProjectVerionId}&sceneId={sceneId}&elementId={elementId}
 		fileListTest:"/dataJson/project/projectChange/changeFile.json", //doc/internal/{projectId}/{versionId}/alteration
-
-		//服务
 
 		//系统设置
 

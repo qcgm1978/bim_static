@@ -7,7 +7,6 @@ App.ResourceArtifacts={
         presentRule : null,    //当前规则
         qualityProcessType:1,   //质量标准 -过程选择  type
 
-
         delRule:null,
 
         qualityStandardType:"GC",   //质量标准 -过程选择  type
@@ -80,8 +79,6 @@ App.ResourceArtifacts={
         }
     })),
 
-
-
     //计划规则/获取
     operator:Backbone.Model.extend({
         defaults:function(){
@@ -89,9 +86,6 @@ App.ResourceArtifacts={
                 code : ""
             }
         }}),
-
-
-
 //计划规则/获取
     PlanRules:new(Backbone.Collection.extend({
         model:Backbone.Model.extend({

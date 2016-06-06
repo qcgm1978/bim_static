@@ -5,6 +5,8 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
 
     tagName:"div",
 
+    className : "title",
+
     template: _.templateUrl("/resources/tpls/resourcesArtifacts/mappingRule/resources.artifacts.qualitydetail.html"),
 
     events:{
@@ -27,6 +29,17 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
 
     //取得规则列表
     getDetail:function(e){
+        var hasCon =  this.$(".item").closest(".title").siblings(".childList:hidden");
+        if(hasCon.length && hasCon.html()){
+            hasCon.show();//显示列表
+            return
+        }
+        var innerCon =  this.$(".item").closest(".title").siblings(".childList:visible");
+        if(innerCon.html()){
+            innerCon.hide();//隐藏列表
+            return
+        }
+
         var item = $(e.target);
         App.ResourceArtifacts.Status.rule.targetCode = this.model.get("code");
         App.ResourceArtifacts.Status.rule.targetName = this.model.get("name");
@@ -35,6 +48,7 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
             alert("您还有没保存的");
             return
         }
+
         this.toggleClass(item);
         this. getRules();
         //保存计划规则
@@ -43,8 +57,8 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
     },
 //切换计划
     toggleClass:function(item){
-        $(".qualityMenu li").removeClass("active");
-        item.closest("li").addClass("active");
+        $(".item").removeClass("active");
+        item.closest(".item").addClass("active");
     },
 
     //获取质量标准相关规则
@@ -54,16 +68,17 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
             //提示有没有保存现在的，重要
             return
         }
-        if(this.model.get("leaf")){
+        if(!this.model.get("leaf")){
             //存在，加载二级或三级标准
             pdata = {
-                URLtype : 'fetchQualityPlanQualityLevel2',
+                URLtype : 'fetchArtifactsQuality',
                 data : {
                     type : App.ResourceArtifacts.Status.type,
                     standardType:"GC",
-                    parentCode :this.model.get("code")
+                    parentCode :this.model.get("code")  //传递父节点
                 }
             };
+
             App.Comm.ajax(pdata,function(response){
                 if(response.code == 0 && response.data.length){
                     var list = App.Resources.artifactsQualityTree(response.data);

@@ -14,8 +14,18 @@
 .artifactsContent{position: absolute;top: 58px;left: 20px;right: 20px;bottom: 20px;font-size: 12px;}
 .artifactsContent .plans,.artifactsContent  .qualifyC{position: absolute;width: 304px;padding-right: 20px;.pozero;}
 .artifactsContent  .qualifyC{display: none;}
-.artifactsContent .plans li,.artifactsContent  .qualityMenu  li {line-height: 28px;border-bottom: 1px solid #cccccc;padding: 0 17px 0 13px; cursor: pointer;font-size: 12px;}
-.artifactsContent .plans li.active,.qualityMenu  li.active{background-color: #a8dbfd;}
+.artifactsContent .plans li {line-height: 28px;border-bottom: 1px solid #cccccc;padding: 0 17px 0 13px; cursor: pointer;font-size: 12px;}
+.artifactsContent  .qualityMenu  li {line-height: 28px;cursor: pointer;font-size: 12px;}
+#qualityMenuList .item{border-bottom: 1px solid #cccccc; }
+#qualityMenuList li .item{padding-left: 14px;}
+#qualityMenuList li li .item {padding-left: 28px;}
+#qualityMenuList li li li .item{padding-left: 42px;}
+
+.qualityMenu .item{padding-right: 13px;}
+.qualityMenu .item .fold{float: right;width: 40px;height: 27px;position: relative;}
+.qualityMenu .item .fold:after{content: "";position: absolute;width: 15px;height: 7px;background: url('../../comm/images')}
+
+.artifactsContent .plans li.active,.qualityMenu .item.active{background-color: #a8dbfd;}
 .artifactsContent .artifactsList{.pozero;.bd-1-c;right: 20px;}
 .artifactsList .plcon {.pozero;top: 39px;}
 .artifactsList .plcon .list{.pozero;}

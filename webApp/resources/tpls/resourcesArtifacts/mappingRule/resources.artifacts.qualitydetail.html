@@ -1,5 +1,9 @@
 <div class="item">
     <div class="left"><%= obj.code %></div>
+    <% if (obj.leaf){%>
     <div class="right">(<%= obj.count ?  obj.count  : "0" %>)</div>
+    <%} else {%>
+    <div class="fold"></div>
+    <%}%>
     <div class=""><%= obj.name %></div>
 </div>

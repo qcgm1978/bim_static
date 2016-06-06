@@ -55,12 +55,13 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
             this.$(".qualifyC").html(quality);
 
             var pdata = {
-                URLtype:'fetchQualityPlanQualityLevel1',
+                URLtype:'fetchArtifactsQuality',
                 data:{
                     type:App.ResourceArtifacts.Status.type,
                     standardType: "GC"
                 }
             };
+
             App.ResourceArtifacts.getQuality(pdata,_this);
             this.$(".qualifyC").show();
         }
