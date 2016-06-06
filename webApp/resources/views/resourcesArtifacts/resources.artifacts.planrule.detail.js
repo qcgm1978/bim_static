@@ -53,7 +53,7 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
         this.window(tree);
         App.Resources.ArtifactsMaskWindow.find(".content").css({"position":"relative"});
         var contain = App.Resources.artifactsTree(App.Resources.artifactsTreeData);
-        $("#resourcesArtifactTree").html(contain);
+        $(".resourcesArtifactTree").html(contain);
         App.ResourceArtifacts.presentRule = this.model;
     },
     //增加新规则

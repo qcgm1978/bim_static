@@ -310,7 +310,7 @@ App.ResourceArtifacts={
         App.Comm.ajax(pdata,function(response){
             if(response.code == 0 && response.data.length){
                 var list = App.Resources.artifactsQualityTree(response.data);
-                _this.$("#qualityMenuList").html(list);
+                _this.$(".qualityMenuList").html(list);
             }
         });
     },

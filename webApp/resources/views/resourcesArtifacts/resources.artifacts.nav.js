@@ -33,7 +33,6 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
         //需要清空当前列表
         //this.$(".ruleContent ul").html("<li><div class='ruleTitle delt'>没有选择模块/质量标准</div></li>");
 
-
         if(pre.hasClass("modularization")){//模块化
 
             App.ResourceArtifacts.Status.rule.biz = 1 ;
