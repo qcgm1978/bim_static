@@ -86,6 +86,7 @@ App.ResourceArtifacts={
                 code : ""
             }
         }}),
+
 //计划规则/获取
     PlanRules:new(Backbone.Collection.extend({
         model:Backbone.Model.extend({
@@ -174,30 +175,6 @@ App.ResourceArtifacts={
         return new this.newPlanRules(newPlanRuleData);
     },
 
-
-
-/*{
-    "biz": 1,//1：模块化；2：质监标准
-    "targetCode": "GC0022",
-    "targetName": "室内土方回填",
-    "type": 1,//1:标准规则；2：项目规则
-    "mappingCategory": {
-    "categoryCode": "30.30.90",
-        "categoryName": "基础挖方",
-        "mappingPropertyList": [{
-        "propertyKey": "QY",
-        "operator": "==",
-        "propertyValue": "样板"
-    },
-        {
-            "propertyKey": "QY",
-            "operator": "<>",
-            "propertyValue": "(30,50]"
-        }]
-}
-}*/
-
-
 //保存计划规则
     SavePlanRules : Backbone.Model.extend({
             defaults:function(){
@@ -213,7 +190,6 @@ App.ResourceArtifacts={
             }
         }
     }),
-
     //新映射数据模型
     newModel : {
         "id": null,
@@ -277,13 +253,12 @@ App.ResourceArtifacts={
         _this.$el.append(pre.render().el);//菜单
 
         pre.$(".plans").html(plans.render().el);//计划节点
-        pre.$(".rules .ruleContent").append(planRule.render().el);//
+        pre.$(".rules .ruleContent").html(planRule.render().el);//映射规则
 
-        pre.$(".rules .ruleContent ul").html("<li><div class='ruleTitle delt'>没有相关规则节点</div></li>");
+
 
         //插入默认为空的规则列表
         this.getPlan();
-
         $("#pageLoading").hide();
     },
 
@@ -308,15 +283,23 @@ App.ResourceArtifacts={
                 type :App.ResourceArtifacts.Status.type =1
             }
         };
+        App.ResourceArtifacts.PlanRules.reset();
+        App.ResourceArtifacts.PlanNode.reset();
         App.Comm.ajax(pdata,function(response){
-            if(response.code == 0 && response.data.length){
+            if(response.code == 0 && response.data){
+                if(response.data.length){
                 App.ResourceArtifacts.PlanNode.add(response.data);
+                }else{
+                    _this.resetRuleList();
+                }
             }
         });
     },
 
     //获取质量标准
     getQuality:function(pdata,_this){
+
+        App.ResourceArtifacts.PlanRules.reset();
         App.ResourceArtifacts.Status.quality.type = 1 ;
         App.Comm.ajax(pdata,function(response){
             if(response.code == 0 && response.data.length){
@@ -345,5 +328,18 @@ App.ResourceArtifacts={
     //提示保存
     alertSave:function(){
 
+    },
+
+    loading:function(ele){
+        $(ele).addClass(".services_loading");
+    },
+
+    loaded:function(ele){
+        $(ele).removeClass(".services_loading");
+    },
+
+
+    resetRuleList:function(){
+        $(".ruleContent ul").html("<li><div class='ruleTitle delt'>暂无内容</div></li>");
     }
 };

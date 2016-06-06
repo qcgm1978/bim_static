@@ -29,6 +29,8 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
 
     //取得规则列表
     getDetail:function(e){
+
+        this.$(".fold").addClass("active");
         var hasCon =  this.$(".item").closest(".title").siblings(".childList:hidden");
         if(hasCon.length && hasCon.html()){
             hasCon.show();//显示列表
@@ -37,6 +39,7 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
         var innerCon =  this.$(".item").closest(".title").siblings(".childList:visible");
         if(innerCon.html()){
             innerCon.hide();//隐藏列表
+            this.$(".fold").removeClass("active");
             return
         }
 
@@ -79,10 +82,16 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
                 }
             };
 
+            App.ResourceArtifacts.PlanRules.reset();
+
             App.Comm.ajax(pdata,function(response){
-                if(response.code == 0 && response.data.length){
-                    var list = App.Resources.artifactsQualityTree(response.data);
-                    _this.$el.closest("li").find(".childList").html(list);
+                if(response.code == 0 && response.data){
+                    if(response.data.length){
+                        var list = App.Resources.artifactsQualityTree(response.data);
+                        _this.$el.closest("li").find(".childList").html(list);
+                    }else{
+                        //无数据咋办
+                    }
                 }
             });
             return
@@ -103,9 +112,13 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
                 App.ResourceArtifacts.PlanRules.reset();
                 $(".artifactsContent .rules h2 .name").html(_this.model.get("code") + "&nbsp;" +_this.model.get("name"));
                 $(".artifactsContent .rules h2 i").html( "("+response.data.length + ")");
-                if(response.data  &&  response.data.length){
-                    $(".artifactsContent .rules ul").empty();
-                    App.ResourceArtifacts.PlanRules.add(response.data);
+                if(response.data){
+                    if( response.data.length){
+                        $(".artifactsContent .rules ul").empty();
+                        App.ResourceArtifacts.PlanRules.add(response.data);
+                    }else{
+                        $(".ruleContent ul").html("<li><div class='ruleTitle delt'>暂无内容</div></li>");
+                    }
                 }
             }
         });
