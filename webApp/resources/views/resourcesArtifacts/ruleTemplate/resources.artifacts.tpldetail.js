@@ -8,7 +8,7 @@ App.Resources.ArtifactsTplDetail = Backbone.View.extend({
     template: _.templateUrl("/resources/tpls/resourcesArtifacts/ruleTemplate/resources.artifacts.tpldetail.html"),
 
     events:{
-        "click .item":"getPlanId"
+        "click .item":"getTpl"
     },
 
     render:function() {
@@ -23,6 +23,8 @@ App.Resources.ArtifactsTplDetail = Backbone.View.extend({
     //取得规则列表
     getPlanId:function(){
 
+        //刷新右面列表
+        App.ResourceArtifacts.Status.rule.templateId  = "";
          App.ResourceArtifacts.Status.rule.targetCode = this.model.get("code");
         App.ResourceArtifacts.Status.rule.targetName = this.model.get("name");
         if(!App.ResourceArtifacts.Status.saved){

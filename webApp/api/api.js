@@ -191,9 +191,10 @@ App.API = {
 		createArtifactsPlanNewRule:"platform/mapping/rule/create",//计划节点新建规则      platform/mapping/rule/create?projectId={projectId}    如果为标准映射规则不用传projectId
 		modifyArtifactsPlanRule:"platform/mapping/rule/update",//计划节点修改规则          platform/mapping/rule/update?projectId={projectId}
 		deleteArtifactsPlanRule:"dataJson/resources/fetchArtifactsMapPlan.json",//计划节点删除规则           platform/mapping/rule/delete/{id}?projectId={projectId}
-
 		//质量标准
 		fetchArtifactsQuality:"platform/mapping/rule/quality/standard", //获取质量标准1级  platform/mapping/rule/quality/standard?type={type}&standardType=={KY|GC}
+		//规则模板
+		fetchArtifactsTemplate: "dataJson/resources/fetchArtifactsTplList.json", //模板列表 //platform/rule/template/select/all
 
 		//项目 变更 列表
 		fileList:"doc/internal/{projectId}/{versionId}/differ", //变更列表

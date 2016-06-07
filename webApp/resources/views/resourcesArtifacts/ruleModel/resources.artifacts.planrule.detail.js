@@ -161,6 +161,7 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
 
         var baseData = this.model.toJSON();
 
+        console.log(baseData);
 
         var cdata = {
             URLtype : '',
@@ -181,6 +182,8 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
         $(".artifactsContent .rules").addClass("services_loading");
         App.Comm.ajax(cdata,function(response){
             if(response.code == 0 && response.data){
+
+
                 _this.$el.closest(".ruleDetail").hide();
                 //´´½¨
                 if(cdata.URLtype == "createArtifactsPlanNewRule"){

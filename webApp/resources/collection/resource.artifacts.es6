@@ -10,6 +10,7 @@ App.ResourceArtifacts={
         qualityStandardType:"GC",   //质量标准 -过程选择  type
         type:"", //1:标准规则；2：项目规则
         projectId : "",//如果有项目规则就有项目id
+        templateId:"",
         //模块化
         plan:{},
         rule:{
@@ -227,10 +228,10 @@ App.ResourceArtifacts={
             //规则模板
             $(".breadcrumbNav .mappingRule").show();
             var tplFrame = new App.Resources.ArtifactsTplFrame();
-            console.log(tplFrame);
             var tplList = new App.Resources.ArtifactsTplList();
             _this.$el.append(tplFrame.render().el);//菜单
             tplFrame.$(".modelListContainer").html(tplList.render().el);
+            this.getTpl();
 
 
 
@@ -299,6 +300,30 @@ App.ResourceArtifacts={
             }
         });
     },
+
+    //获取规则模板
+    getTpl:function(){
+        var _this = this, pdata;
+        //App.ResourceArtifacts.Status.type =1 ;
+        pdata  = {
+            URLtype:"fetchArtifactsTemplate",
+            data:{}
+        };
+        App.ResourceArtifacts.TplCollection.reset();
+        App.ResourceArtifacts.PlanRules.reset();
+        App.Comm.ajax(pdata,function(response){
+            console.log(response);
+            if(response.code == 0 && response.data){
+                if(response.data.length){
+                    App.ResourceArtifacts.TplCollection.add(response.data);
+                }else{
+
+                }
+            }
+        });
+    },
+
+
     //延迟
     delay:function(data){
     var _this = this , batch , length = data.length , arr = []  , n = 1 , last;
@@ -324,7 +349,7 @@ App.ResourceArtifacts={
     },
     resetRuleList:function(){
         $(".ruleContent ul").html("<li><div class='ruleTitle delt'>暂无内容</div></li>");
-    },
+    }
 
 
 };

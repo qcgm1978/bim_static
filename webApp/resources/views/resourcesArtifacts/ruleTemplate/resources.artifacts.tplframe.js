@@ -5,7 +5,7 @@ App.Resources.ArtifactsTplFrame = Backbone.View.extend({
 
     tagName:"div",
 
-    className: "artifactsList",
+    className: "artifactsTplFrame",
 
     template: _.templateUrl("/resources/tpls/resourcesArtifacts/ruleTemplate/resources.artifacts.tplframe.html"),
 
