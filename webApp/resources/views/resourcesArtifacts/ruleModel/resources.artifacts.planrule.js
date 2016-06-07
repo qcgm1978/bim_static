@@ -5,7 +5,7 @@ App.Resources.ArtifactsPlanRule = Backbone.View.extend({
 
     tagName:"ul",
 
-    template: _.templateUrl("/resources/tpls/resourcesArtifacts/resources.artifacts.planrule.html"),
+    template: _.templateUrl("/resources/tpls/resourcesArtifacts/ruleModel/resources.artifacts.planrule.html"),
 
     events:{},
 

@@ -5,7 +5,7 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
 
     tagName:"li",
 
-    template: _.templateUrl("/resources/tpls/resourcesArtifacts/resources.artifacts.planruledetail.html"),
+    template: _.templateUrl("/resources/tpls/resourcesArtifacts/ruleModel/resources.artifacts.planruledetail.html"),
 
     events:{
         "click .desc":"getDetail",
@@ -19,6 +19,7 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
     },
 
     render:function() {
+        console.log(this.model);
         this.$el.html(this.template(this.model.toJSON()));
         return this;
     },
@@ -213,7 +214,7 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
     deleteRule:function(){
         var _this = this;
         $(".artifactsContent .rules").addClass("services_loading");
-        App.ResourceArtifacts.Status.delRule = this.model.get("mappingCategory").id;
+        App.ResourceArtifacts.Status.delRule = this.model.get("id");
         var frame = new App.Resources.ArtifactsPlanRuleAlert().render().el;
         App.Resources.ArtifactsAlertWindow = new App.Comm.modules.Dialog({
             title: "",

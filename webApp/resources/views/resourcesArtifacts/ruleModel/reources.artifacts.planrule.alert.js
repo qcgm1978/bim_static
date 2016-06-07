@@ -6,7 +6,7 @@ App.Resources.ArtifactsPlanRuleAlert = Backbone.View.extend({
     tagName :'div',
     className:"resourcesAlert",
 
-    template:_.templateUrl("/resources/tpls/resourcesArtifacts/resources.artifacts.planrule.alert.html"),
+    template:_.templateUrl("/resources/tpls/resourcesArtifacts/ruleModel/resources.artifacts.planrule.alert.html"),
 
     events:{
         "click #resourcesSure":"sure",
@@ -48,16 +48,17 @@ App.Resources.ArtifactsPlanRuleAlert = Backbone.View.extend({
                      App.ResourceArtifacts.Status.saved = true ;//保存状态
 
                      var pre = App.ResourceArtifacts.PlanRules.filter(function(item){
-                         return item.get("mappingCategory")[id] == id;
+                         return item.get("id") == id;
                      });
 
-                     App.ResourceArtifacts.PlanRules.remove(pre);
+                     //App.ResourceArtifacts.PlanRules.remove(pre);
 
                      _.each($(".ruleTitle"),function(item){
                          if(parseInt($(item).attr("data-id")) == id){
                              $(item).closest("li").remove();
                          }
                      });
+                     //847958938484928
 
                      var _this = App.ResourceArtifacts.Status.presentPlan;
 
@@ -78,10 +79,12 @@ App.Resources.ArtifactsPlanRuleAlert = Backbone.View.extend({
     },
         //取消
     cancel:function(){
+        $(".artifactsContent .rules").removeClass("services_loading");
         App.Resources.ArtifactsAlertWindow.close();
     },
     //关闭
     close:function(){
+        $(".artifactsContent .rules").removeClass("services_loading");
         App.Resources.ArtifactsAlertWindow.close();
     }
 });
