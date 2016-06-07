@@ -5,6 +5,8 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
 
     tagName:"div",
 
+    className : "title",
+
     template: _.templateUrl("/resources/tpls/resourcesArtifacts/mappingRule/resources.artifacts.qualitydetail.html"),
 
     events:{
@@ -27,6 +29,20 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
 
     //取得规则列表
     getDetail:function(e){
+
+        this.$(".fold").addClass("active");
+        var hasCon =  this.$(".item").closest(".title").siblings(".childList:hidden");
+        if(hasCon.length && hasCon.html()){
+            hasCon.show();//显示列表
+            return
+        }
+        var innerCon =  this.$(".item").closest(".title").siblings(".childList:visible");
+        if(innerCon.html()){
+            innerCon.hide();//隐藏列表
+            this.$(".fold").removeClass("active");
+            return
+        }
+
         var item = $(e.target);
         App.ResourceArtifacts.Status.rule.targetCode = this.model.get("code");
         App.ResourceArtifacts.Status.rule.targetName = this.model.get("name");
@@ -35,6 +51,7 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
             alert("您还有没保存的");
             return
         }
+
         this.toggleClass(item);
         this. getRules();
         //保存计划规则
@@ -43,31 +60,37 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
     },
 //切换计划
     toggleClass:function(item){
-        $(".qualityMenu li").removeClass("active");
-        item.closest("li").addClass("active");
+        $(".item").removeClass("active");
+        item.closest(".item").addClass("active");
     },
 
     //获取质量标准相关规则
     getRules:function() {
         var _this = this,pdata;
         if(!App.ResourceArtifacts.Status.saved){
-            //提示有没有保存现在的，重要
             return
         }
-        if(this.model.get("leaf")){
+        if(!this.model.get("leaf")){
             //存在，加载二级或三级标准
             pdata = {
-                URLtype : 'fetchQualityPlanQualityLevel2',
+                URLtype : 'fetchArtifactsQuality',
                 data : {
                     type : App.ResourceArtifacts.Status.type,
                     standardType:"GC",
-                    parentCode :this.model.get("code")
+                    parentCode :this.model.get("code")  //传递父节点
                 }
             };
+
+            App.ResourceArtifacts.PlanRules.reset();
+
             App.Comm.ajax(pdata,function(response){
-                if(response.code == 0 && response.data.length){
-                    var list = App.Resources.artifactsQualityTree(response.data);
-                    _this.$el.closest("li").find(".childList").html(list);
+                if(response.code == 0 && response.data){
+                    if(response.data.length){
+                        var list = App.Resources.artifactsQualityTree(response.data);
+                        _this.$el.closest("li").find(".childList").html(list);
+                    }else{
+                        //无数据咋办
+                    }
                 }
             });
             return
@@ -88,9 +111,13 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
                 App.ResourceArtifacts.PlanRules.reset();
                 $(".artifactsContent .rules h2 .name").html(_this.model.get("code") + "&nbsp;" +_this.model.get("name"));
                 $(".artifactsContent .rules h2 i").html( "("+response.data.length + ")");
-                if(response.data  &&  response.data.length){
-                    $(".artifactsContent .rules ul").empty();
-                    App.ResourceArtifacts.PlanRules.add(response.data);
+                if(response.data){
+                    if( response.data.length){
+                        $(".artifactsContent .rules ul").empty();
+                        App.ResourceArtifacts.PlanRules.add(response.data);
+                    }else{
+                        $(".ruleContent ul").html("<li><div class='ruleTitle delt'>暂无内容</div></li>");
+                    }
                 }
             }
         });

@@ -26,8 +26,6 @@ App.Resources.ArtifactsWindowRule = Backbone.View.extend({
         code  = $(".ruleNodeName span.active").closest(".ruleNodeName").data("id"),
         name  = $(".ruleNodeName span.active").closest(".ruleNodeName").data("name");
 
-
-
         if(code){
             data = App.ResourceArtifacts.presentRule.get("mappingCategory");
 
@@ -37,6 +35,9 @@ App.Resources.ArtifactsWindowRule = Backbone.View.extend({
             $(".ruleDetail:visible").find(".chide").data("code",code).siblings("input").val(code).end().find("span").html("["+code + "]").end().find("i").html(name);
 
             App.ResourceArtifacts.presentRule.set({"mappingCategory":data},{silent:true});
+
+            App.ResourceArtifacts.Status.rule.mappingCategory.categoryCode  = code;
+            App.ResourceArtifacts.Status.rule.mappingCategory.categoryName = name;
         }
 
         App.Resources.ArtifactsMaskWindow.close();

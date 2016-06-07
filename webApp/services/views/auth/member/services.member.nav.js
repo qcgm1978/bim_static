@@ -90,25 +90,5 @@ App.Services.MemberNav=Backbone.View.extend({
         }).done(function(){
             App.Services.queue.next();
         });
-
-        //获取数据，将会刷新右侧视图
-        /*App.Services.Member.loadData(collection,{},function(response){
-            //菜单
-            if (response.data.org && response.data.org.length) {
-                //样式处理
-                _this.$("div").removeClass("active");
-                $("#" + _thisType).addClass("active");
-                $(".serviceOgList span").removeClass("active");//唯一选项
-                $("#" + _thisType + " > span").addClass("active");//选中状态
-                //外部和内部单选
-                _this.$(".childOz").empty();
-                //菜单渲染
-                $("#" + _thisType +"+ .childOz").html(App.Services.tree(response));
-            }
-            if(!response.data.org.length){
-                $("#blendList").html("<li>&nbsp;&nbsp;&nbsp;&nbsp;暂无数据!</li>");
-            }
-            $(".serviceBody .content").removeClass("services_loading");
-        });*/
     }
 });

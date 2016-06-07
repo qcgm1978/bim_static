@@ -24,7 +24,7 @@ App.Services.tree = function(data){
 
 
 //获取所属组织列表
-    App.Services.memOz = '';
+App.Services.memOz = '';
 App.Services.searchOrg = function (pre){
         var text = App.Services.memOz;
         var father = pre.closest(".childOz").siblings("div").find(".ozName");//最近的顶层节点
