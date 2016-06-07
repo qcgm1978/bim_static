@@ -187,14 +187,13 @@ App.API = {
 		//映射规则库
 		fetchArtifactsCategoryRule:"dataJson/resources/fetchArtifactsCategoryRule.json",//获取分类编码   platform/mapping/rule/category/coding?parentCode={parentCode}  //接口无数据
 		fetchArtifactsPlan:"platform/mapping/rule/plan/standard",//计划节点    platform/mapping/rule/plan/standard?type={type}  模块化列表  1:标准规则；2：项目规则
-		fetchArtifactsPlanRule:"/platform/mapping/rule/target/code/{code}",//计划节点规则获取     //platform/mapping/rule/target/code/{code}?biz={biz}&type={type}&projectId={projectId}
+		fetchArtifactsPlanRule:"platform/mapping/rule/target/code/{code}?",//计划节点规则获取     //platform/mapping/rule/target/code/{code}?biz={biz}&type={type}&projectId={projectId}
 		createArtifactsPlanNewRule:"platform/mapping/rule/create",//计划节点新建规则      platform/mapping/rule/create?projectId={projectId}    如果为标准映射规则不用传projectId
-		modifyArtifactsPlanRule:"dataJson/resources/fetchArtifactsPlanRule.json",//计划节点修改规则          platform/mapping/rule/update?projectId={projectId}
+		modifyArtifactsPlanRule:"platform/mapping/rule/update",//计划节点修改规则          platform/mapping/rule/update?projectId={projectId}
 		deleteArtifactsPlanRule:"dataJson/resources/fetchArtifactsMapPlan.json",//计划节点删除规则           platform/mapping/rule/delete/{id}?projectId={projectId}
 
 		//质量标准
-		fetchQualityPlanQualityLevel1:"dataJson/resources/fetchArtifactsStandardQuality.json", //获取质量标准1级  platform/mapping/rule/quality/standard?type={type}&standardType=={KY|GC}
-		fetchQualityPlanQualityLevel2:"dataJson/resources/fetchArtifactsStandardQuality.json", //获取质量标准其他级
+		fetchArtifactsQuality:"platform/mapping/rule/quality/standard", //获取质量标准1级  platform/mapping/rule/quality/standard?type={type}&standardType=={KY|GC}
 
 		//项目 变更 列表
 		fileList:"doc/internal/{projectId}/{versionId}/differ", //变更列表
@@ -206,8 +205,6 @@ App.API = {
 		projectChangeListTest:"/dataJson/project/projectChange/list.json",
 		projectDesinPropertiesTest:"/dataJson/project/projectChange/comparisonAttr.json",//sixD/{projectId}/{projectVersionId}/property/comparison //?baseProjectVerionId={baseProjectVerionId}&sceneId={sceneId}&elementId={elementId}
 		fileListTest:"/dataJson/project/projectChange/changeFile.json", //doc/internal/{projectId}/{versionId}/alteration
-
-		//服务
 
 		//系统设置
 

@@ -5,7 +5,7 @@ App.Resources.ArtifactsQualityList = Backbone.View.extend({
 
     tagName:"div",
 
-    className: "",
+    className: "qualityCon",
 
     template: _.templateUrl("/resources/tpls/resourcesArtifacts/mappingRule/resources.artifacts.quality.html"),
 
@@ -43,9 +43,9 @@ App.Resources.ArtifactsQualityList = Backbone.View.extend({
         var id = this.$(".present").data("type");
 
         var pdata = {
-            URLtype:'fetchQualityPlanQualityLevel1',
+            URLtype:'fetchArtifactsQuality',
             data:{
-                type:1,
+                type:App.ResourceArtifacts.Status.type,
                 standardType: id
             }
         };

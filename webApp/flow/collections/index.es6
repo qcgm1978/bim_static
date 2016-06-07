@@ -10,7 +10,7 @@ App.Flow.Controller={
 		var _collection=this.flowCollection;
 		_collection.fetch({
 			reset:true
-		})
+		});
 		
 		$("#pageLoading").hide();
 		

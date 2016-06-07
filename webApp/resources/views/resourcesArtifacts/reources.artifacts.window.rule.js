@@ -23,20 +23,21 @@ App.Resources.ArtifactsWindowRule = Backbone.View.extend({
     //确定
     sure : function(){
         var _this = this,data,
-        code  = $(".ruleNodeName span.active").closest(".ruleNodeName").data("id");
+        code  = $(".ruleNodeName span.active").closest(".ruleNodeName").data("id"),
+        name  = $(".ruleNodeName span.active").closest(".ruleNodeName").data("name");
 
         if(code){
-            data = App.ResourceArtifacts.presentRule.model.get("mappingCategory");
-            data["categoryCode"] = code + '';
-            App.ResourceArtifacts.presentRule.model.set({"mappingCategory":data});
-            App.ResourceArtifacts.presentRule.model.trigger("mappingCategoryChange");
+            data = App.ResourceArtifacts.presentRule.get("mappingCategory");
 
-            //以下内容可重构
-            var operator = new App.Resources.ArtifactsPlanRuleDetailOperator().render().el;
-            $(".ruleDetail .mapRule").html(operator);//规则列表
-            var operatorData = App.Resources.dealStr(App.ResourceArtifacts.Status.presentRule);//规则数据
-            App.ResourceArtifacts.operator.reset();
-            App.ResourceArtifacts.operator.add(operatorData);
+            data["categoryCode"] = code + '';
+            data["categoryName"] = name;
+
+            $(".ruleDetail:visible").find(".chide").data("code",code).siblings("input").val(code).end().find("span").html("["+code + "]").end().find("i").html(name);
+
+            App.ResourceArtifacts.presentRule.set({"mappingCategory":data},{silent:true});
+
+            App.ResourceArtifacts.Status.rule.mappingCategory.categoryCode  = code;
+            App.ResourceArtifacts.Status.rule.mappingCategory.categoryName = name;
         }
 
         App.Resources.ArtifactsMaskWindow.close();

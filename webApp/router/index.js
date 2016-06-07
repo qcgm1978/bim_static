@@ -33,8 +33,8 @@ var AppRoute = Backbone.Router.extend({
 		$("#pageLoading").hide();
 	},
 
-	logout: function() { 
-	 
+	logout: function() {
+
 		App.Comm.delCookie('OUTSSO_AuthToken');
 		App.Comm.delCookie('AuthUser_AuthNum');
 		App.Comm.delCookie('AuthUser_AuthMAC');
@@ -69,7 +69,7 @@ var AppRoute = Backbone.Router.extend({
 	},
 
 	//单个项目
-	project: function(id, versionId) {		 
+	project: function(id, versionId) {
 
 		this.reset();
 
@@ -79,7 +79,7 @@ var AppRoute = Backbone.Router.extend({
 
 		App.Project.Settings = $.extend({}, App.Project.Defaults);
 
-		App.Project.Settings.projectId = id;		
+		App.Project.Settings.projectId = id;
 
 		App.Project.Settings.versionId = versionId;
 
@@ -186,11 +186,12 @@ var AppRoute = Backbone.Router.extend({
 	//重置数据
 	reset: function() {
 
+		$("#topSaveTip,#topSaveTipLine").remove();
+
 		if (!$._data($(".user > span")[0],"events")) {
 			//绑定用户信息
 			App.TopNav.init();
-		}
-
+		}		 
 		//用户信息
 		App.Global.User = JSON.parse(localStorage.getItem("user"));
 		$("#pageLoading").show();
@@ -204,9 +205,9 @@ var AppRoute = Backbone.Router.extend({
 			return;
 		}
 
-		var Autharr = App.Global.User.function,
+		var Autharr =App.Global.User && App.Global.User["function"],
 			keys, len;
-		App.AuthObj = {};  
+		App.AuthObj = {};
 		//遍历权限
 		$.each(Autharr, function(i, item) {
 			keys = item.code.split('-');
@@ -225,8 +226,9 @@ var AppRoute = Backbone.Router.extend({
 					App.AuthObj[keys[0]][keys[1]][keys[2]] = true;
 				}
 
-			} 
+			}
 		});
+
 
 	}
 
