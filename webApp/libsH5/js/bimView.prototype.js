@@ -351,7 +351,7 @@
       // 缩放到指定位置
       var self = this;
       var viewer = self.viewer;
-      viewer.zoomToBBox(CLOUD.Utils.computeBBox(box));
+      viewer.zoomToBBox(CLOUD.Utils.computeBBox(box),0.05);
       viewer.render();
     },
     zoomToSelection:function(box){
@@ -379,7 +379,7 @@
       // 普通模式
       var self = this;
       self.pub('home');
-      self.viewer.setStandardView(CLOUD.EnumStandardView.ISO);
+      self.viewer.setStandardView(CLOUD.EnumStandardView.ISO,-0.2);
     },
     front : function () {
       var self = this,
