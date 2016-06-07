@@ -23,6 +23,7 @@ App.Resources.ArtifactsTplListItem = Backbone.View.extend({
 
     //取得模板
     getTpl:function(){
+
         App.ResourceArtifacts.Status.templateId = this.model.get("id");//保存id
         App.ResourceArtifacts.Status.templateName = this.model.get("name");//保存name
 
@@ -52,29 +53,10 @@ App.Resources.ArtifactsTplListItem = Backbone.View.extend({
 
         App.ResourceArtifacts.getPlan();//获取计划节点
 
-        this.getTplRule();
-
+        App.ResourceArtifacts.getTplRule();//获取规则模板列表
     },
 
-    //获取模板规则列表
-    getTplRule:function(){
-        var pdata = {
-            URLtype:"fetchArtifactsTemplateRule",
-            data:{
-                templateId : App.ResourceArtifacts.Status.templateId
-            }
-        };
-        App.Comm.ajax(pdata,function(response){
-                if(response.code == 0 && response.data){
-                    if(response.data.length){
-                        console.log(response);
-                        //按照ruleId查找rule，将对应节点设置为可编辑状态
-                    }else{
-                        //没有任何列表
-                    }
-                }
-        })
-    },
+
 
     //切换
     toggleClass:function(){

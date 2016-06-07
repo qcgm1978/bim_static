@@ -199,6 +199,7 @@ App.API = {
 		fetchArtifactsTemplate: "platform/rule/template/select/all", //模板列表 //platform/rule/template/select/all
 		createArtifactsTemplate: "platform/rule/template/create", //创建模板
 		fetchArtifactsTemplateRule: "platform/rule/template/select/rule/{templateId}", //模板规则列表  platform/rule/template/select/rule/{templateId}
+		saveArtifactsTemplateRule: "platform/rule/template/update", //模板规则列表  platform/rule/template/select/rule/{templateId}
 
 		//项目 变更 列表
 		fileList:"doc/internal/{projectId}/{versionId}/differ", //变更列表

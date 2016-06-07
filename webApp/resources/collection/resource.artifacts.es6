@@ -213,8 +213,19 @@ App.ResourceArtifacts={
         }
     })),
 
-    //质量标准，获取二级列表
+    //规则模板列表
     TplCollection : new(Backbone.Collection.extend({
+        model:Backbone.Model.extend({
+            defaults:function(){
+                return{
+
+                }
+            }
+        })
+    })),
+
+    //规则模板规则列表
+    TplCollectionRule : new(Backbone.Collection.extend({
         model:Backbone.Model.extend({
             defaults:function(){
                 return{
@@ -352,7 +363,25 @@ App.ResourceArtifacts={
     },
     resetRuleList:function(){
         $(".ruleContent ul").html("<li><div class='ruleTitle delt'>暂无内容</div></li>");
-    }
+    },
 
+    //获取模板规则列表
+    getTplRule:function(){
+        var pdata = {
+            URLtype:"fetchArtifactsTemplateRule",
+            data:{
+                templateId : App.ResourceArtifacts.Status.templateId
+            }
+        };
+        App.Comm.ajax(pdata,function(response){
+            if(response.code == 0 && response.data){
+                if(response.data.length){
+                    App.ResourceArtifacts.TplCollectionRule.add(response.data);
+                }else{
+                    //没有任何规则时候，创建规则按钮
+                }
+            }
+        })
+    },
 
 };

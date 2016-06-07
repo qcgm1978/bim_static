@@ -43,26 +43,59 @@ App.Resources.ArtifactsTplDetail = Backbone.View.extend({
     edit:function() {
         this.$(".tplDetailInfo").hide();
         this.$(".tplDetailEdit").show();
+
+        //查找collection
+        var checkCollection  = App.ResourceArtifacts.TplCollectionRule ; //已有
+        var allCollection  = App.ResourceArtifacts.ArtifactsRule ;//所有
+        var arr = [];
+
+        _.each(checkCollection,function(item){
+            arr.push(item.get("id"))
+        });
+
+        _.each(allCollection,function(item){
+            for(var i = 0 ;i < arr.length ; i++){
+                if(item.get("id") == arr[i]){
+                    item.set("checked", true);
+                }
+            }
+        });
+
+
+
     },
 
     //保存
     resourcesSure:function(){
-        var _this = this;
+
+        //查找所有的ruleId存储成数组形式，格式如下
+        /*[{
+            "templateId": "843148603580768",
+            "ruleId": "840358391034212"
+        },
+            {
+                "templateId": "843148603580768",
+                "ruleId": "841085297156426"
+            },
+            {
+                "templateId": "843148603580768",
+                "ruleId": "841085297156448"
+            }]
+        */
+
         var pdata = {
-            URLtype: "fetchArtifactsTemplateRule",
+            URLtype: "saveArtifactsTemplateRule",
             data:{
-                templateId: this.model.get("id")
+                templateId: App.ResourceArtifacts.Status.templateId
             }
         };
         //App.ResourceArtifacts.loading($(".modelContent"));
         App.Comm.ajax(pdata,function(response){
             if(response.code == 0 ){
                 if(response.data  &&  response.data.length){
-                    App.ResourceArtifacts.PlanRules.reset();
-                    $(".artifactsContent .rules ul").empty();
-                    App.ResourceArtifacts.PlanRules.add(response.data);
+
                 }else{
-                    $(".ruleContent ul").html("<li><div class='ruleTitle delt'>暂无内容</div></li>");
+
                 }
             }
             App.ResourceArtifacts.loaded($(".modelContent"));

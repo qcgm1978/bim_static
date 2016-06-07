@@ -19,7 +19,7 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
     },
 
     initialize:function(){
-        //this.listenTo(App.ResourceArtifacts.Status.presentPlan,"chang",this.getChangeAttr);    //监听展开的模型是否被更改，如果更改，列出更改项，提示保存
+        this.listenTo(this.model,"change",this.render);
     },
 
     //取得模型修改过的属性

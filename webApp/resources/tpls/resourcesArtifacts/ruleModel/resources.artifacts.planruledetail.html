@@ -1,4 +1,7 @@
 <div class="ruleTitle" data-id="<%= obj.id ? obj.id  : ''%>">
+    <%if (obj.checked) {%>
+    <i class="RuleCheck"></i>
+    <%}%>
     <div class="right getDetail">详情</div>
     <div class="desc"><%= (obj.mappingCategory.categoryCode ? ( "[" + obj.mappingCategory.categoryCode + "] &nbsp;") : '' ) +  (obj.mappingCategory.categoryName ? obj.mappingCategory.categoryName  : "新建映射规则") %></div>
 </div>
