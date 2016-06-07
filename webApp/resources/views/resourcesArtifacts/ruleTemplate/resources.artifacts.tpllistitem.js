@@ -18,12 +18,13 @@ App.Resources.ArtifactsTplListItem = Backbone.View.extend({
 
     initialize:function(){
         this.listenTo(this.model,"change",this.render);
+        this.listenTo(this.model,"remove",this.render);
     },
 
     //取得模板
     getTpl:function(){
         App.ResourceArtifacts.Status.templateId = this.model.get("id");//保存id
-        App.ResourceArtifacts.Status.templateName = this.model.get("name");//保存id
+        App.ResourceArtifacts.Status.templateName = this.model.get("name");//保存name
 
         //保存状态
         if(!App.ResourceArtifacts.Status.saved){
@@ -45,6 +46,7 @@ App.Resources.ArtifactsTplListItem = Backbone.View.extend({
 
         //修改内容
         $(".tplDetailTitle h2").text(this.model.get("name"));
+        $(".tplDetailTitle .tplName").val(this.model.get("name"));
     },
 
     //切换

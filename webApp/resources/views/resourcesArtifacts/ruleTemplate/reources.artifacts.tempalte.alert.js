@@ -11,7 +11,6 @@ App.Resources.ArtifactsPlanRuleAlert = Backbone.View.extend({
     events:{
         "click #resourcesSure":"sure",
         "click #resourcesCancel":"cancel",
-        "click #resourcesClose":"close"
     },
 
     render:function(){
@@ -24,37 +23,31 @@ App.Resources.ArtifactsPlanRuleAlert = Backbone.View.extend({
     },
     //确定
     sure : function(){
+        var templateId =  App.ResourceArtifacts.Status.templateId;
 
-        var id = App.ResourceArtifacts.Status.delRule;
-
-        //新建规则，直接删除
-        if(!id){
-            //直接删除末尾内容
-            $(".ruleContent>ul>li").last().remove();
-            App.Resources.ArtifactsAlertWindow.close();
-            $(".artifactsContent .rules").removeClass("services_loading");
-            App.ResourceArtifacts.Status.saved = true;
-            return
-        }
         //非新建
         $.ajax({
-            url:"http://bim.wanda-dev.cn/platform/mapping/rule/delete/" + id + "?projectId="+ App.ResourceArtifacts.Status.projectId,
+            url:"http://bim.wanda-dev.cn/platform/rule/template/delete/" + templateId ,
             type:"DELETE",
             success:function(response){
-                 if(response.code==0){ //删除成功
-                     $(".ruleDetail").hide();
+
+                console.log(response);
+                 if(response.code == 0){ //删除成功
+
                      App.ResourceArtifacts.Status.saved = true ;//保存状态
-                     var pre = App.ResourceArtifacts.PlanRules.filter(function(item){
-                         return item.get("id") == id;
+
+                     var pre = App.ResourceArtifacts.TplCollection.filter(function(item){
+                         return item.get("id") == templateId;
                      });
-                     _.each($(".ruleTitle"),function(item){
-                         if(parseInt($(item).attr("data-id")) == id){
+
+                     App.ResourceArtifacts.TplCollection.remove(pre);
+                     _.each($(".tplCon .item"),function(item){
+                         if(parseInt($(item).attr("data-id")) == templateId){
                              $(item).closest("li").remove();
                          }
                      });
-                     var _this = App.ResourceArtifacts.Status.presentPlan;
-                     $(".artifactsContent .rules h2 .name").html(App.ResourceArtifacts.Status.rule.targetCode + "&nbsp;" +App.ResourceArtifacts.Status.rule.targetName);
-                     $(".artifactsContent .rules h2 i").html( "("+_this.get("count") + ")");
+
+                     App.ResourceArtifacts.Status.templateId = null;
                 }else{
                      alert("删除失败");
                  }
@@ -65,7 +58,7 @@ App.Resources.ArtifactsPlanRuleAlert = Backbone.View.extend({
                 alert("错误类型"+ error.status +"，无法成功删除!");
             }
         });
-        App.ResourceArtifacts.Status.delRule = null;
+        App.ResourceArtifacts.Status.templateId = null;
     },
         //取消
     cancel:function(){

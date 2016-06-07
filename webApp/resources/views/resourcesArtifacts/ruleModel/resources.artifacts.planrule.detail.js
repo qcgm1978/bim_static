@@ -229,11 +229,7 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
         $(".mod-dialog .wrapper .header").hide();//隐藏头部
         $(".alertInfo").html('确认删除 “'+ _this.model.get("mappingCategory").categoryName   +' "?');
     },
-    //删除单条规则
-    delRule:function(e){
-        var rule = $(e.target),_this = this;
 
-    },
     //联想模块
     legend:function(e){
         var _this = this;

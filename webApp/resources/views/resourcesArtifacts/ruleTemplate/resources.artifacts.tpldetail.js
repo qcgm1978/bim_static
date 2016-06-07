@@ -10,7 +10,9 @@ App.Resources.ArtifactsTplDetail = Backbone.View.extend({
 
     events:{
         "click .delete":"delete",
-        "click .edit":"edit"
+        "click .edit":"edit",
+        "click #resourcesSure":"resourcesSure",
+        "click #resourcesCancel":"resourcesCancel"
     },
 
     render:function() {
@@ -22,24 +24,29 @@ App.Resources.ArtifactsTplDetail = Backbone.View.extend({
 
     },
 
-
     delete:function(){
-        var templateId =App.ResourceArtifacts.Status.templateId;//保存id
-
-        var pdata = {
-            URLtype: "fetchArtifactsTemplateRule",
-            data:{
-                templateId: this.model.get("id")
-            }
-        };
-
-        App.Comm.ajax(pdata,function(response){
-
-        })
+        var _this = this;
+        var frame = new App.Resources.ArtifactsPlanRuleAlert();
+        App.Resources.ArtifactsAlertWindow = new App.Comm.modules.Dialog({
+            title: "",
+            width: 280,
+            height: 180,
+            isConfirm: false,
+            isAlert: false,
+            message: frame.render().el
+        });
+        $(".mod-dialog .wrapper .header").hide();//隐藏头部
+        frame.$(".alertInfo").html('确认删除 “'+ App.ResourceArtifacts.Status.templateName   +' "?');
     },
 
 //编辑
     edit:function() {
+        this.$(".tplDetailInfo").hide();
+        this.$(".tplDetailEdit").show();
+    },
+
+    //保存
+    resourcesSure:function(){
         var _this = this;
         var pdata = {
             URLtype: "fetchArtifactsTemplateRule",
@@ -49,9 +56,7 @@ App.Resources.ArtifactsTplDetail = Backbone.View.extend({
         };
         //App.ResourceArtifacts.loading($(".modelContent"));
         App.Comm.ajax(pdata,function(response){
-
             if(response.code == 0 ){
-
                 if(response.data  &&  response.data.length){
                     App.ResourceArtifacts.PlanRules.reset();
                     $(".artifactsContent .rules ul").empty();
@@ -62,5 +67,10 @@ App.Resources.ArtifactsTplDetail = Backbone.View.extend({
             }
             App.ResourceArtifacts.loaded($(".modelContent"));
         });
+    },
+    //取消
+    resourcesCancel:function(){
+        this.$(".tplDetailInfo").show();
+        this.$(".tplDetailEdit").hide();
     }
 });
