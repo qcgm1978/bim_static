@@ -11,6 +11,7 @@ App.ResourceArtifacts={
         type:"", //1:标准规则；2：项目规则
         projectId : "",//如果有项目规则就有项目id
         templateId:"",
+        templateName:"",
         //模块化
         plan:{},
         rule:{
@@ -230,7 +231,7 @@ App.ResourceArtifacts={
             var tplFrame = new App.Resources.ArtifactsTplFrame();
             var tplList = new App.Resources.ArtifactsTplList();
             _this.$el.append(tplFrame.render().el);//菜单
-            tplFrame.$(".modelListContainer").html(tplList.render().el);
+            tplFrame.$(".tplListContainer").html(tplList.render().el);
             this.getTpl();
 
             $("#pageLoading").hide();

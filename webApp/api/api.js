@@ -195,7 +195,7 @@ App.API = {
 		fetchArtifactsQuality:"platform/mapping/rule/quality/standard", //获取质量标准1级  platform/mapping/rule/quality/standard?type={type}&standardType=={KY|GC}
 		//规则模板
 		fetchArtifactsTemplate: "platform/rule/template/select/all", //模板列表 //platform/rule/template/select/all
-		createArtifactsTemplate: "platform/rule/template/create", //模板列表
+		createArtifactsTemplate: "platform/rule/template/create", //创建模板
 		fetchArtifactsTemplateRule: "platform/rule/template/select/rule/{templateId}", //模板规则列表  platform/rule/template/select/rule/{templateId}
 
 		//项目 变更 列表

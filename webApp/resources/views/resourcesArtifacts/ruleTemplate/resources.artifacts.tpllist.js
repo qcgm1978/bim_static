@@ -25,7 +25,7 @@ App.Resources.ArtifactsTplList = Backbone.View.extend({
     },
 
     addOne:function(model) {
-        var newList = new App.Resources.ArtifactsTplDetail({model: model});
+        var newList = new App.Resources.ArtifactsTplListItem({model: model});
         this.$("ul").append(newList.render().el);
         App.Comm.initScroll($(".list"),"y");
     },

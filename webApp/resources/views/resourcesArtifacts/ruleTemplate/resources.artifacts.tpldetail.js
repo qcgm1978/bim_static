@@ -3,66 +3,54 @@
  */
 App.Resources.ArtifactsTplDetail = Backbone.View.extend({
 
-    tagName:"li",
+    tagName:"div",
+    className:"cont",
 
     template: _.templateUrl("/resources/tpls/resourcesArtifacts/ruleTemplate/resources.artifacts.tpldetail.html"),
 
     events:{
-        "click .item":"getTpl"
+        "click .delete":"delete",
+        "click .edit":"edit"
     },
 
     render:function() {
-        this.$el.html(this.template(this.model.toJSON()));
+        this.$el.html(this.template);
         return this;
     },
 
     initialize:function(){
-        this.listenTo(this.model,"change",this.render);
-    },
-
-    //取得模板
-    getTpl:function(){
-        App.ResourceArtifacts.Status.templateId = this.model.get("id");//保存id
-
-        //保存状态
-        if(!App.ResourceArtifacts.Status.saved){
-            alert("您还有没保存的");
-            return
-        }
-        this.toggleClass();
-
-        //重置右侧列表
-        //this. getRules();
 
     },
 
-    //切换
-    toggleClass:function(){
-        $(".tplCon li").removeClass("active");
-        this.$el.addClass("active");
-    },
 
+    delete:function(){
+        var templateId =App.ResourceArtifacts.Status.templateId;//保存id
 
-//获取模板
-    getRules:function() {
-        var _this = this;
         var pdata = {
-            URLtype: "fetchArtifactsPlanRule",
+            URLtype: "fetchArtifactsTemplateRule",
             data:{
-                code:App.ResourceArtifacts.Status.rule.targetCode,
-                biz :App.ResourceArtifacts.Status.rule.biz,
-                type:App.ResourceArtifacts.Status.type,
-                projectId:App.ResourceArtifacts.Status.projectId
+                templateId: this.model.get("id")
             }
         };
-        App.ResourceArtifacts.loading();
+
         App.Comm.ajax(pdata,function(response){
 
-            console.log(response);
-            if(response.code == 0 ){
+        })
+    },
 
-                $(".artifactsContent .rules h2 .name").html(_this.model.get("code") + "&nbsp;" +_this.model.get("name"));
-                $(".artifactsContent .rules h2 i").html( "("+response.data.length + ")");
+//编辑
+    edit:function() {
+        var _this = this;
+        var pdata = {
+            URLtype: "fetchArtifactsTemplateRule",
+            data:{
+                templateId: this.model.get("id")
+            }
+        };
+        //App.ResourceArtifacts.loading($(".modelContent"));
+        App.Comm.ajax(pdata,function(response){
+
+            if(response.code == 0 ){
 
                 if(response.data  &&  response.data.length){
                     App.ResourceArtifacts.PlanRules.reset();
@@ -72,7 +60,7 @@ App.Resources.ArtifactsTplDetail = Backbone.View.extend({
                     $(".ruleContent ul").html("<li><div class='ruleTitle delt'>暂无内容</div></li>");
                 }
             }
-            App.ResourceArtifacts.loaded($(".rules"));
+            App.ResourceArtifacts.loaded($(".modelContent"));
         });
     }
 });
