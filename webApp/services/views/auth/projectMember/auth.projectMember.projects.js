@@ -13,10 +13,7 @@ App.Services.projectMember.projects = Backbone.View.extend({
 
 	render: function(items) {
 		var _this = this;
-		var data = App.Services.projectMember.method.model2JSON(items.models);
-		data = {
-			data: data
-		};
+		var data = items.toJSON()[0];
 		$("#projectList").html(this.$el.html(this.template(data)));
 		if (data.data.length > 0) {
 			var id = data.data[0].id;
@@ -28,7 +25,17 @@ App.Services.projectMember.projects = Backbone.View.extend({
 			App.Comm.setCookie("currentPid", id);
 		}
 		$('#projectList .projectDropDown').myDropDown({
-			zIndex: 9999
+			zIndex: 9999,
+			click:function($item){
+				items.fetch({
+					reset:true,
+					data: {
+						userId:App.Comm.getCookie("userId"),
+						type:$item.data('type')
+					}
+				})
+
+			}
 		});
 
 		return this;

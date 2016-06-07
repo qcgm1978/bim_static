@@ -13,10 +13,18 @@ App.Services.projectMember = {
 	//	$("#dataLoading").show();
 		$('#projectList').mmhMask();
 		
-		this.loadData(this.projectMemberProjectCollection,{
+		/*this.loadData(this.projectMemberProjectCollection,{
 			outer:App.Comm.getCookie("isOuter")
 		},{
-			userId:App.Comm.getCookie("userId")
+			userId:App.Comm.getCookie("userId"),
+			type:3
+		});*/
+		this.projectMemberProjectCollection.fetch({
+			reset: true,
+			data: {
+				userId:App.Comm.getCookie("userId"),
+				type:3
+			}
 		});
 		/*this.loadData(this.projectMemberMemberCollection,{outer:true},{
 			dataPrivilegeId:"1"
@@ -45,8 +53,7 @@ App.Services.projectMember = {
 		parse: function(response) {
 			$("#dataLoading").hide();
 			if (response.code == 0) {
-				var data=response.data,
-					//TODO 测试数据、需要删除的
+				/*var data=response.data.items,
 					result=[];
 				    if(data.length>0){
 				    	result=[];
@@ -54,9 +61,9 @@ App.Services.projectMember = {
 					_.each(data,function(item){
 						item.image=item.logoUrl['small']||'/static/dist/images/projects/images/proDefault.png';
 						result.push(item)
-					})
+					})*/
 				clearMask();
-				return result;
+				return response;
 			}else{
 				return [];
 			}
