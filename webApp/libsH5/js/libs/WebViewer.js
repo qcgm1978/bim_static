@@ -1,7 +1,6 @@
 /**
 * @require /libsH5/js/libs/three.min.js
 */
-
 var CLOUD = CLOUD || {};
 CLOUD.Version = "20160604";
 
