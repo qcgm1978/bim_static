@@ -1,8 +1,6 @@
 /**
 * @require /libsH5/js/libs/three.min.js
 */
-
-
 var CLOUD = CLOUD || {};
 CLOUD.Version = "20160604";
 
@@ -165,21 +163,19 @@ CLOUD.Utils = {
 
         if (updateMatrix) {
             node.updateMatrix();
-            node.matrixAutoUpdate = false;
         }
 
         if (objJson.matrix) {
             node.matrix.fromArray(objJson.matrix);
-            node.matrixAutoUpdate = false;
+
         }
 
         if (trf) {
             var localTrf = node.matrix.clone();
             localTrf.multiplyMatrices(trf, node.matrix);
             node.matrix = localTrf;
-            node.matrixAutoUpdate = false;
         }
-
+        node.matrixAutoUpdate = false;
         node.boundingBox = CLOUD.Utils.box3FromArray(objJson.bbox);
     },
 
@@ -1409,7 +1405,8 @@ CLOUD.OrderedRenderer = function () {
 
     function projectObject(object, camera, inFrustum) {
 
-        if (object.visible === false) return true;
+        if (object.visible === false)
+            return true;
 
         if (!inFrustum)
             inFrustum = object.inFrustum;
@@ -7146,8 +7143,8 @@ CLOUD.Client.prototype = {
         this.taskManager.processMpkTasks(this, onFinished);
     },
 
-    processSceneTasks: function (renderId) {
-        this.taskManager.processSceneTasks(this, renderId);
+    processSceneTasks: function (renderId, load) {
+        this.taskManager.processSceneTasks(this, renderId, load);
     },
 
     needGroupBySceneId : function(){
@@ -7156,6 +7153,10 @@ CLOUD.Client.prototype = {
             return false;
 
         return fileCount > 1;
+    },
+
+    setTaskFinishedCallback : function(callback){
+        this.taskManager.onTaskFinished = callback;
     },
 }
 
@@ -7673,7 +7674,7 @@ CLOUD.Scene.prototype.pickByReck = function () {
                 if (state === INTERSECTION_STATE.IS_Contains) {
 
                     if (scope.filter.isVisible(node)) {
-                        scope.filter.addSelectedId(node.name);
+                        scope.filter.addSelectedId(node.name, node.userData);
                         ++count;
                     }
 
@@ -10419,7 +10420,7 @@ CLOUD.PickEditor.prototype.handleMousePick = function (event, isDoubleClick) {
                     scope.filter.setSelectedIds();
                 }
 
-                if (scope.filter.addSelectedId(userId, true)) {
+                if (scope.filter.addSelectedId(userId, intersect.object.userData, true)) {
 
                     scope.onObjectSelected(intersect);
 
@@ -12236,7 +12237,7 @@ CLOUD.Filter = function () {
         return false;
     };
 
-    this.addSelectedId = function (id, removeIfExist) {
+    this.addSelectedId = function (id, value, removeIfExist) {
         if (!selectionSet) {
             selectionSet = {};
         }
@@ -12245,7 +12246,7 @@ CLOUD.Filter = function () {
                 return false;
         }
 
-        selectionSet[id] = true;
+        selectionSet[id] = value || true;
         return true;
     };
 
@@ -12340,7 +12341,7 @@ CLOUD.Filter = function () {
     // 判断是否选中
     function isSelected (id) {
 
-        if (selectionSet && selectionSet[id]) {
+        if (selectionSet && selectionSet[id] !== undefined) {
             return true;
         }
 
@@ -16000,6 +16001,83 @@ CLOUD.SceneLoader.prototype = {
             }
         }
 
+        function handle_symbol_instance(parent, objJSON, symbolJSON, userData, localUserId, level, trf, nodeId) {
+
+            var object;
+
+            if (symbolJSON.nodeType === "GroupNode") {
+
+                object = new CLOUD.Group();
+                CLOUD.GeomUtil.parseNodeProperties(object, objJSON, nodeId, trf);
+
+                //handle_children(parent, symbolJSON.children, level + 1, objJSON.userId, userData, object.matrix);
+
+                handle_children(object, symbolJSON.children, level + 1, localUserId, userData);
+                object.userData = userData;
+                parent.add(object);
+            }
+            else if (symbolJSON.nodeType === "MeshNode") {
+
+                var materialId = objJSON.materialId || symbolJSON.materialId;
+                var matObj = client.findMaterial(materialId, false);
+
+                object = new CLOUD.Mesh(CLOUD.GeomUtil.EmptyGeometry, matObj, symbolJSON.meshId);
+                CLOUD.GeomUtil.parseNodeProperties(object, objJSON, nodeId, trf);
+                object.userData = userData;
+                object.name = localUserId;
+
+                loadMeshNode(object, symbolJSON.meshId);
+
+                parent.add(object);
+
+            }
+            else if (symbolJSON.nodeType === "PGeomNode") {
+
+                var materialId = objJSON.materialId || symbolJSON.materialId;
+                var matObj = client.findMaterial(materialId, false);
+
+                var trfLocal = new THREE.Matrix4();
+                if (objJSON.matrix) {
+                    trfLocal.fromArray(objJSON.matrix);
+                }
+                if (trf) {
+                    trfLocal.multiplyMatrices(trf, trfLocal.clone());
+                }
+
+                object = CLOUD.GeomUtil.parsePGeomNodeInstance(symbolJSON, matObj, trfLocal);
+
+                if (object) {
+
+                    if (!localUserId)
+                        console.log(object);
+
+                    //object.name = nodeId;
+                    object.name = localUserId;
+                    object.userData = userData;
+
+                    parent.add(object);
+                }
+            }
+            else if (symbolJSON.nodeType === "SymbolInstance") {
+
+                var symbolSymbolJSON = client.findSymbol(symbolJSON.symbolId);
+                if (symbolSymbolJSON) {
+                    object = new CLOUD.Group();
+                    CLOUD.GeomUtil.parseNodeProperties(object, objJSON, nodeId, trf);
+                    object.userData = userData;
+
+                    handle_symbol_instance(object, symbolJSON, symbolSymbolJSON, userData, localUserId, level + 1, null, nodeId);
+                    parent.add(object);
+                }
+                else {
+                    console.log("missing symbol" + symbolJSON.symbolId);
+                }
+
+            }
+
+            return object;
+        };
+
         function handle_children(parent, children, level, userId, userData, trf) {
 
             for (var nodeId in children) {
@@ -16144,59 +16222,7 @@ CLOUD.SceneLoader.prototype = {
                     var symbolJSON = client.findSymbol(objJSON.symbolId);
                     if (symbolJSON) {
 
-                        if (symbolJSON.nodeType === "GroupNode") {
-
-                            object = new CLOUD.Group();
-                            CLOUD.GeomUtil.parseNodeProperties(object, objJSON, nodeId, trf);
-
-                            //handle_children(parent, symbolJSON.children, level + 1, objJSON.userId, userData, object.matrix);
-
-                            handle_children(object, symbolJSON.children, level + 1, localUserId, userData);
-                            object.userData = userData;
-                            parent.add(object);
-                        }
-                        else if (symbolJSON.nodeType === "MeshNode") {
-
-                            var materialId = objJSON.materialId || symbolJSON.materialId;
-                            var matObj = client.findMaterial(materialId, false);
-
-                            object = new CLOUD.Mesh(CLOUD.GeomUtil.EmptyGeometry, matObj, symbolJSON.meshId);
-                            CLOUD.GeomUtil.parseNodeProperties(object, objJSON, nodeId, trf);
-                            object.userData = userData;
-                            object.name = localUserId;
-
-                            loadMeshNode(object, symbolJSON.meshId);
-
-                            parent.add(object);
-
-                        }
-                        else if (symbolJSON.nodeType === "PGeomNode") {
-
-                            var materialId = objJSON.materialId || symbolJSON.materialId;
-                            var matObj = client.findMaterial(materialId, false);
-
-                            var trfLocal = new THREE.Matrix4();
-                            if (objJSON.matrix) {
-                                trfLocal.fromArray(objJSON.matrix);
-                            }
-                            if (trf) {
-                                trfLocal.multiplyMatrices(trf, trfLocal.clone());
-                            }
-
-                            object = CLOUD.GeomUtil.parsePGeomNodeInstance(symbolJSON, matObj, trfLocal);
-
-                            if (object) {
-
-                                if (!localUserId)
-                                    console.log(object);
-
-                                //object.name = nodeId;
-                                object.name = localUserId;
-                                object.userData = userData;
-
-                                parent.add(object);
-                            }
-                        }
+                        object = handle_symbol_instance(parent, objJSON, symbolJSON, userData, localUserId, level + 1, trf, nodeId);
                     }
 
                 }
@@ -16608,7 +16634,7 @@ CLOUD.SceneBoxLoader.prototype = {
  * Load the index, material and mpkIndex
  */
 
-CLOUD.TaskWorker = function (threadCount) {
+CLOUD.TaskWorker = function (threadCount, finishCallback) {
 
     this.MaxThreadCount = threadCount || 6;
 
@@ -16624,6 +16650,11 @@ CLOUD.TaskWorker = function (threadCount) {
     this.addItem = function(id, item){
         scope.todoList[id] = item;
         scope.todoCount++;
+    };
+
+    this.clearTasks = function () {
+        scope.todoList = {}
+        scope.todoCount = 0;
     };
 
     this.run = function (renderId, loader, sorter) {
@@ -16660,9 +16691,9 @@ CLOUD.TaskWorker = function (threadCount) {
         function processItem(i) {
 
             if (i >= itemCount) {
-                //if (scope.doingCount < 1) {
-                //    scope.run(loader, sorter);
-                //}
+                if (scope.doingCount < 1) {
+                    finishCallback();
+                }
                 return;
             }
 
@@ -16821,14 +16852,22 @@ CLOUD.MpkNodeTaskWorker = function (threadCount) {
 
 }
 
-CLOUD.TaskManager = function (manager) {
+CLOUD.TaskManager = function (manager, finishCallback) {
     this.manager = manager;
+    this.onTaskFinished = finishCallback;
+
+    var scope = this;
 
     // MPK
     this.mpkWorker = new CLOUD.MpkNodeTaskWorker(8);
 
     // SubScene
-    this.sceneWorker = new CLOUD.TaskWorker(8);
+    this.sceneWorker = new CLOUD.TaskWorker(8, function () {
+        if(scope.onTaskFinished)
+            scope.onTaskFinished();
+    });
+
+
 };
 
 CLOUD.TaskManager.prototype = {
@@ -16955,9 +16994,13 @@ CLOUD.TaskManager.prototype = {
         return a.distance - b.distance;
     },
 
-    processSceneTasks: function (client, renderId) {
+    processSceneTasks: function (client, renderId, load) {
 
         var scope = this;
+
+        if (!load) {
+            scope.sceneWorker.clearTasks();
+        }
 
         if (!scope.sceneWorker.hasTask())
             return;
@@ -17054,12 +17097,12 @@ CLOUD.ModelManager.prototype.updateLights = function (camera) {
     assistLamp.updateMatrixWorld();
 };
 
-CLOUD.ModelManager.prototype.prepareScene = function (camera, renderId) {
+CLOUD.ModelManager.prototype.prepareScene = function (camera, renderId, ignoreLoad) {
 
     // update scene
     //this.scene.prepareSceneBox(camera);
     this.scene.prepareScene(camera);
-    this.prepareResource(renderId);
+    this.prepareResource(renderId, !ignoreLoad);
 };
 
 CLOUD.ModelManager.prototype.collectionGarbage = function () {
@@ -17082,6 +17125,13 @@ CLOUD.ModelManager.prototype.loadIndex = function (parameters, callback) {
     var client = this.clients[parameters.databagId];
     if (client === undefined) {
         client = new CLOUD.Client(this, parameters.serverUrl, parameters.databagId);
+
+        if (scope.onUpdateViewer) {
+            client.setTaskFinishedCallback(function () {
+                scope.onUpdateViewer();
+            });
+        }
+
         this.clients[parameters.databagId] = client;
     }
     else {
@@ -17224,14 +17274,14 @@ CLOUD.ModelManager.prototype.loadMpk = function (mpkId, client, callback) {
     );
 }
 
-CLOUD.ModelManager.prototype.prepareResource = function (renderId) {
+CLOUD.ModelManager.prototype.prepareResource = function (renderId, load) {
 
     //if (!CLOUD.GlobalData.DynamicRelease || this.loading)
     //    return;
 
     for (var ii in this.clients) {
         var client = this.clients[ii];
-        client.processSceneTasks(renderId);
+        client.processSceneTasks(renderId, load);
         //client.purgeUnusedResource();
     }
 }
@@ -17615,9 +17665,9 @@ CLOUD.EditorManager.prototype = {
         viewer.cameraEditor.zoom(factor);
     },
 
-    zoomAll: function (viewer) {
+    zoomAll: function (viewer, margin) {
         var box = viewer.getScene().worldBoundingBox();
-        var target = viewer.camera.zoomToBBox(box);
+        var target = viewer.camera.zoomToBBox(box, margin);
         viewer.cameraEditor.updateCamera(target);
 
         viewer.render();
@@ -17627,7 +17677,7 @@ CLOUD.EditorManager.prototype = {
         return (this.enableAnimation && this.animator && this.animator.isPlaying());
     },
 
-    setStandardView: function (stdView, viewer) {
+    setStandardView: function (stdView, viewer, margin) {
 
         var camera = viewer.camera;
 
@@ -17639,7 +17689,7 @@ CLOUD.EditorManager.prototype = {
 
             this.animator.setDuration(this.animationDuration);
             this.animator.setFrameTime(this.animationFrameTime);
-            this.animator.setStandardView(stdView, viewer);
+            this.animator.setStandardView(stdView, viewer, margin);
 
         } else {
 
@@ -17647,7 +17697,7 @@ CLOUD.EditorManager.prototype = {
             var target = camera.setStandardView(stdView, box); // 设置观察视图
 
             // fit all
-            target = viewer.camera.zoomToBBox(box);
+            target = viewer.camera.zoomToBBox(box, margin);
             viewer.cameraEditor.updateCamera(target);
             viewer.render();
 
@@ -17871,7 +17921,7 @@ CloudViewer.prototype = {
         }
     },
 
-    render: function () {
+    render: function (ignoreLoad) {
         ++this.requestRenderCount;
         if (this.requestRenderCount > 10000)
             this.requestRenderCount = 0;
@@ -17901,13 +17951,13 @@ CloudViewer.prototype = {
             if (scope.editorManager.isUpdateRenderList) {
 
                 //console.time("prepare");
-                this.modelManager.prepareScene(camera, this.requestRenderCount);
+                this.modelManager.prepareScene(camera, this.requestRenderCount, ignoreLoad);
                 this.calculateNearFar();
                 //console.timeEnd("prepare");
             }
         }
         else {
-            this.modelManager.prepareScene(camera, this.requestRenderCount);
+            this.modelManager.prepareScene(camera, this.requestRenderCount, ignoreLoad);
             this.calculateNearFar();
         }
 
@@ -17938,7 +17988,7 @@ CloudViewer.prototype = {
                     scope.rendering = false;
 
                     if (renderId != scope.requestRenderCount) {
-                         scope.render();
+                         scope.render(true);
                     }
                     else {
                         //console.time("gc" + renderId);
@@ -18098,13 +18148,15 @@ CloudViewer.prototype = {
             scope.render();
         });
 
-        this.lookAt(new THREE.Vector3(-CLOUD.GlobalData.SceneSize * 0.2, CLOUD.GlobalData.SceneSize * 0.2, CLOUD.GlobalData.SceneSize), new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 1, 0));
+        this.lookAt(new THREE.Vector3(-CLOUD.GlobalData.SceneSize * 0.5, CLOUD.GlobalData.SceneSize * 0.5, CLOUD.GlobalData.SceneSize), new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 1, 0));
         this.setPickMode();
 
         // Register Events
         this.editorManager.registerDomEventListeners(this.domElement);
 
-
+        this.modelManager.onUpdateViewer = function () {
+            scope.render(true);
+        }
         //this.editorManager.registerDomEventListeners(canvas);
     },
 
@@ -18206,8 +18258,9 @@ CloudViewer.prototype = {
         this.editorManager.zoomOut(factor, this);
     },
 
-    zoomAll: function () {
-        this.editorManager.zoomAll(this);
+    zoomAll: function (margin) {
+        margin = margin || -0.015;
+        this.editorManager.zoomAll(this, margin);
     },
 
     zoomToSelection: function (margin) {
@@ -18236,8 +18289,9 @@ CloudViewer.prototype = {
         this.render();
     },
 
-    setStandardView: function (stdView) {
-        this.editorManager.setStandardView(stdView, this);
+    setStandardView: function (stdView, margin) {
+        margin = margin || -0.05;
+        this.editorManager.setStandardView(stdView, this, margin);
     },
 
     lookAt: function (position, target, up) {

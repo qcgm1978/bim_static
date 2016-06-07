@@ -26,9 +26,9 @@ App.Services.addKeyUser = Backbone.View.extend({
       if(step == 'edit'){
         //编辑项目
         setTimeout(function(){
-          $('.leftWindow').siblings('p').text("请选择"+(App.Services.KeyUser.mode==2?"分区":"项目"));
+          $('.leftWindow').siblings('p').text("请选择"+(App.Services.KeyUser.mode==2?"分区":""));
         },100);
-        this.$el.find('.maintitle').text('项目授权');
+        this.$el.find('.maintitle').text('项目权限');
         this.$el.find('.up').hide();
         this.$el.find('.steps').hide();
         this.$el.find('.confirm').show();
@@ -59,7 +59,7 @@ App.Services.addKeyUser = Backbone.View.extend({
               "</li>";
           }
           App.Services.KeyUser.pid=pid;
-          this.$el.find('.rightWindow').html('<div>'+str+'</div>').siblings('p').text("已选项目（ "+pid.length+"个 ）");
+          this.$el.find('.rightWindow').html('<div>'+str+'</div>').siblings('p').text("已选择");
 
         }else if(App.Services.KeyUser.mode==2 && App.Services.KeyUser.fakedata.area){
           projs=App.Services.KeyUser.fakedata.area;
@@ -70,17 +70,18 @@ App.Services.addKeyUser = Backbone.View.extend({
 
           }
           App.Services.KeyUser.partid=pid;
-          this.$el.find('.rightWindow').html('<div>'+str+'</div>').siblings('p').text("已选分区（ "+pid.length+"个 ）");
+          this.$el.find('.rightWindow').html('<div>'+str+'</div>').siblings('p').text("已选择");
 
         }else if(App.Services.KeyUser.mode==3){
-          this.$el.find('.rightWindow').html('<div></div>').siblings('p').text("已选项目");
+          this.$el.find('.rightWindow').html('<div></div>').siblings('p').text("已选择");
+          $('.step2').css({background:"#ccc"});
 
         }
 
       }
       else if(step == 'org'){
         //编辑部门
-        this.$el.find('.maintitle').text('部门授权');
+        this.$el.find('.maintitle').text('部门权限');
         setTimeout(function(){
           $('.leftWindow').siblings('p').text("请选择部门");
         },100);
@@ -126,6 +127,45 @@ App.Services.addKeyUser = Backbone.View.extend({
           "</p>" +
           "<ul class='shut'></ul>" +
           "</li>";
+
+        }
+        App.Services.KeyUser.orgId=orgid;
+
+        this.$el.find('.rightWindow').html('<div>'+str+'</div>').siblings('p').text("已选部门");
+
+      }
+      else if(step == 'fam'){
+        //编辑族库
+        this.$el.find('.maintitle').text('族库权限');
+        setTimeout(function(){
+          $('.leftWindow').siblings('p').text("请选择族库");
+        },100);
+
+        this.$el.find('.confirm').show();
+
+        this.$el.find('.leftWindow').html(new App.Services.fam().render().el);
+
+        App.Services.KeyUser.loadData(App.Services.KeyUser.fam, '', function(r){
+
+          if(r && !r.code && r.data){
+            console.log(r)
+
+            App.Services.KeyUser.fam.set(r.data.items);
+          }
+        });
+
+        //遍历本身存在的部门数据添加到右边窗口
+        var str = '',orgs=App.Services.KeyUser.fakedata.org,orgid=App.Services.KeyUser.editorgId=[];
+        for(var i=0;i<orgs.length;i++){
+          var p = orgs[i];
+          orgid.push(p['orgId']);
+          str += " <li>"+
+            "<span class='delete'></span>" +
+            "<p class='shut mulu' data-id="+p['orgId']+" data-canload='true'>" +
+            "<i></i><span class='isspan'>"+p['name']+"</span>" +
+            "</p>" +
+            "<ul class='shut'></ul>" +
+            "</li>";
 
         }
         App.Services.KeyUser.orgId=orgid;
@@ -218,8 +258,8 @@ App.Services.addKeyUser = Backbone.View.extend({
       else{
         $('.rightWindow div').html('').siblings('p').text("已选项目 ( 0个 )");
       }
-      this.$el.find('.up').hide();
-      this.$el.find('.confirm').hide();
+      //this.$el.find('.up').hide();
+      this.$el.find('.confirm').show();
       this.$el.find('.leftWindow').html(new App.Services.step1().render().el);
       App.Comm.ajax({URLtype: 'fetchServicesMemberInnerList'}, function(r){
 
@@ -242,8 +282,8 @@ App.Services.addKeyUser = Backbone.View.extend({
     var $li                    = $(e.target).parents('li');
 
     var stepNum = $('.steps .active').find('span').text();
-    if(this.$el.find('.maintitle').text() == '部门授权'){
-      //部门授权移除已选中的名单
+    if(this.$el.find('.maintitle').text() == '部门权限'){
+      //部门权限移除已选中的名单
       var orgId                  = $li.find('p').attr('data-id');
       App.Services.KeyUser.editorgId = _.without(App.Services.KeyUser.editorgId,parseInt(orgId),orgId.toString());
 
@@ -290,10 +330,10 @@ App.Services.addKeyUser = Backbone.View.extend({
 
   //选择人到右边窗口
   move: function(){
-    var str = '', stepNum = $('.steps .active').find('span').text();
+    var str = '';
 
     //step2或者编辑项目的时候
-    if(stepNum == 2 || this.$el.find('.maintitle').text() == '项目授权'){
+    if( this.$el.find('.maintitle').text() == '项目权限'){
       if(App.Services.KeyUser.mode==3){
         return ''
       }else if(App.Services.KeyUser.mode==1){
@@ -327,10 +367,10 @@ App.Services.addKeyUser = Backbone.View.extend({
       }
 
       this.$el.find('.rightWindow div').append(str);
-      $('.rightWindow').siblings('p').text("已选"+(App.Services.KeyUser.mode==2?"分区 ( ":"项目 ( ") + $(".rightWindow li").length + "个 )");
+      //$('.rightWindow').siblings('p').text("已选"+(App.Services.KeyUser.mode==2?"分区 ( ":"项目 ( ") + $(".rightWindow li").length + "个 )");
 
     }
-    else if(stepNum == 3 || this.$el.find('.maintitle').text() == '部门授权'){
+    else if(this.$el.find('.maintitle').text() == '部门权限'){
       var $selected = this.$el.find('.toselected');
       if(!$selected.length){
         return ''
@@ -363,45 +403,7 @@ App.Services.addKeyUser = Backbone.View.extend({
 
   },
 
-  //切换步骤页
-  toNextStep: function(){
 
-    var stepNum = $('.steps .active').find('span').text();
-    if(stepNum == 1){
-      App.Services.KeyUser.html[0] = $('.rightWindow').html();
-    }
-    else{
-      if(App.Services.KeyUser.mode==1){
-        App.Services.KeyUser.html2[0] = $('.rightWindow').html();
-      }else if(App.Services.KeyUser.mode==2){
-        App.Services.KeyUser.parthtml[0] = $('.rightWindow').html();
-
-      }
-    }
-    this.render(++stepNum);
-  },
-
-  //切换步骤页
-  toUpStep: function(){
-
-    var stepNum = $('.steps .active').find('span').text();
-
-    if(--stepNum == 1){
-      if(App.Services.KeyUser.mode==1){
-        App.Services.KeyUser.html2[0] = $('.rightWindow').html();
-      }else if(App.Services.KeyUser.mode==2){
-        App.Services.KeyUser.parthtml[0] = $('.rightWindow').html();
-
-      }
-      this.render();
-
-    }
-    else{
-      App.Services.KeyUser.html3[0] = $('.rightWindow').html();
-      this.render(stepNum);
-
-    }
-  },
 
   //刷新userinfo页面
   refresh: function(){
@@ -427,12 +429,12 @@ App.Services.addKeyUser = Backbone.View.extend({
   //切换步骤页
   confirm: function(){
     //编辑项目提交
-    if($('.maintitle').text() == '项目授权'){
+    if($('.maintitle').text() == '项目权限'){
       App.Services.KeyUser.editpid = App.Services.KeyUser.pid;
       var datas = {
-        "authType" : App.Services.KeyUser.mode,
+        "authType" : parseInt(App.Services.KeyUser.mode),
         //"projectId": App.Services.KeyUser.pid,
-        "orgId": App.Services.KeyUser.editorgId,
+        //"orgId": App.Services.KeyUser.editorgId,
         uid              : App.Services.KeyUser.uuid
       };
       if(App.Services.KeyUser.mode==2){
@@ -466,14 +468,14 @@ App.Services.addKeyUser = Backbone.View.extend({
       });
 
     }
-    else if($('.maintitle').text() == '部门授权'){
+    else if($('.maintitle').text() == '部门权限'){
       //编辑部门提交
       App.Services.KeyUser.editorgId = App.Services.KeyUser.orgId;
       var datas = {
-        "authType" : App.Services.KeyUser.fakedata.authType,
+        //"authType" : App.Services.KeyUser.fakedata.authType,
         "orgId": App.Services.KeyUser.orgId,
-        "projectId": App.Services.KeyUser.editpid,
-        "area"     : App.Services.KeyUser.fakedata.area,
+        //"projectId": App.Services.KeyUser.editpid,
+        //"area"     : App.Services.KeyUser.fakedata.area,
         uid    : App.Services.KeyUser.uuid
       };
       var data  = {
@@ -505,18 +507,9 @@ App.Services.addKeyUser = Backbone.View.extend({
         return
       }
       var datas = {
-        "userId"         : App.Services.KeyUser.uid,
-        "orgId"          : App.Services.KeyUser.orgId || [],
-        "authType" : App.Services.KeyUser.mode
+        "userId"         : App.Services.KeyUser.uid
       };
-      if(App.Services.KeyUser.mode==2){
-        datas.area = [];
-        (_.contains(App.Services.KeyUser.partid,9991)||_.contains(App.Services.KeyUser.partid,'9991'))?datas.area.push('中区'):'';
-        (_.contains(App.Services.KeyUser.partid,9992)||_.contains(App.Services.KeyUser.partid,'9992'))?datas.area.push('南区'):'';
-        (_.contains(App.Services.KeyUser.partid,9993)||_.contains(App.Services.KeyUser.partid,'9993'))?datas.area.push('北区'):'';
-      }else if(App.Services.KeyUser.mode==1){
-        datas.projectId=App.Services.KeyUser.pid || [];
-      }
+
 
       var data  = {
         URLtype    : "fetchServiceKeyUserList",
@@ -568,27 +561,29 @@ App.Services.addKeyUser = Backbone.View.extend({
       var index = $a.attr('data-index');
       $a.addClass('active').siblings().removeClass('active');
       App.Services.KeyUser.mode=index;
-      //App.Services.KeyUser.pid=[];
-      //App.Services.KeyUser.html2=[];
       $('.rightWindow div').html('');
-      this.$el.find('.leftWindow').html(new App.Services.step2().render().el);
+
       if(index==1){
         //普通模式
-        $('.rightWindow').html(App.Services.KeyUser.html2[0]).siblings('p').text("已选项目");
+        $('.rightWindow').html(App.Services.KeyUser.html2[0]);
         $('.leftWindow').siblings('p').text("请选择项目");
+        this.$el.find('.leftWindow').html(new App.Services.step2().render().el);
 
 
       }else if(index==2){
         //分区模式
-        $('.rightWindow').html(App.Services.KeyUser.parthtml[0]).siblings('p').text("已选分区");
+        $('.rightWindow').html(App.Services.KeyUser.parthtml[0]);
         $('.leftWindow').siblings('p').text("请选择分区");
+        this.$el.find('.leftWindow').html(new App.Services.step2().render().el);
 
       }else{
         //全选模式
         $('.step2').css({background:"#ccc"});
-        $('.rightWindow').siblings('p').text("已选项目");
-        $('.leftWindow').siblings('p').text("请选择项目");
+        $('.rightWindow div').html('已选择所有项目');
+
       }
+
+
     }
   },
   initialize: function(){
@@ -596,3 +591,44 @@ App.Services.addKeyUser = Backbone.View.extend({
   }
 
 });
+
+
+////切换步骤页
+//toNextStep: function(){
+//
+//  var stepNum = $('.steps .active').find('span').text();
+//  if(stepNum == 1){
+//    App.Services.KeyUser.html[0] = $('.rightWindow').html();
+//  }
+//  else{
+//    if(App.Services.KeyUser.mode==1){
+//      App.Services.KeyUser.html2[0] = $('.rightWindow').html();
+//    }else if(App.Services.KeyUser.mode==2){
+//      App.Services.KeyUser.parthtml[0] = $('.rightWindow').html();
+//
+//    }
+//  }
+//  this.render(++stepNum);
+//},
+//
+////切换步骤页
+//toUpStep: function(){
+//
+//  var stepNum = $('.steps .active').find('span').text();
+//
+//  if(--stepNum == 1){
+//    if(App.Services.KeyUser.mode==1){
+//      App.Services.KeyUser.html2[0] = $('.rightWindow').html();
+//    }else if(App.Services.KeyUser.mode==2){
+//      App.Services.KeyUser.parthtml[0] = $('.rightWindow').html();
+//
+//    }
+//    this.render();
+//
+//  }
+//  else{
+//    App.Services.KeyUser.html3[0] = $('.rightWindow').html();
+//    this.render(stepNum);
+//
+//  }
+//},
