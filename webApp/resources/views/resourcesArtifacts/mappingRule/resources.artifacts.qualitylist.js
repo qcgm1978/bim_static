@@ -5,7 +5,7 @@ App.Resources.ArtifactsQualityList = Backbone.View.extend({
 
     tagName:"div",
 
-    className: "",
+    className: "qualityCon",
 
     template: _.templateUrl("/resources/tpls/resourcesArtifacts/mappingRule/resources.artifacts.quality.html"),
 
