@@ -161,7 +161,6 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
 
         var baseData = this.model.toJSON();
 
-        console.log(baseData);
 
         var cdata = {
             URLtype : '',
@@ -183,12 +182,12 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
         App.Comm.ajax(cdata,function(response){
             if(response.code == 0 && response.data){
 
-
                 _this.$el.closest(".ruleDetail").hide();
+                _this.$(".ruleTitle").attr("data-id",response.data.id);
+                _this.model.set({id:response.data.id},{silent:true});
+
                 //创建
                 if(cdata.URLtype == "createArtifactsPlanNewRule"){
-
-                    _this.$(".ruleTitle").attr("data-id",response.data.id);
                     //写入相关的数据
                     var count = parseInt(App.ResourceArtifacts.Status.presentPlan.get("count"));
                     var code = App.ResourceArtifacts.Status.presentPlan.get("code");
