@@ -17,7 +17,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		"click .slideBar": "navBarShowAndHide",
 		"mousedown .dragSize": "dragSize",
 		"click .projectVersionList .nav .item": "changeVersionTab",
-		"click .fileModelList li": "switchFileMoldel",
+		"click .fileNav .commSpan": "switchFileMoldel",
 		"click .modleShowHide": "slideUpAndDown"
 
 	},
@@ -53,7 +53,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		var $target = $(event.target).closest(".breadItem");
 
 		//没有下拉箭头的 不加载
-		if ($target.find(".myIcon-slanting-right").length<=0) {
+		if ($target.find(".myIcon-slanting-right").length <= 0) {
 			return;
 		}
 
@@ -91,7 +91,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		var $target = $(event.target).closest(".item"),
 			href = $target.prop("href");
 
-		if ($target.prop("href").indexOf("noVersion")>-1) {
+		if ($target.prop("href").indexOf("noVersion") > -1) {
 			alert('暂无版本');
 			return false;
 		}
@@ -207,7 +207,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 	//切换模型浏览器 和 文件浏览器
 	switchFileMoldel(event) {
 
-		var $target = $(event.target).closest("li"),
+		var $target = $(event.target),
 			type = $target.data("type"),
 			$projectContainer = $("#projectContainer"),
 			$projectCotent = $projectContainer.find(".projectCotent");
@@ -227,9 +227,6 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			//模型tab
 			$(".projectContainerApp .projectHeader .projectTab").hide();
 
-			//tab 文字
-			$target.closest('.fileModelNav').find(".breadItemText .text").text($target.text());
-
 			//绑定上传
 			if (App.Project.Settings.CurrentVersion.status != 9) {
 				$(".fileContainer .btnFileUpload").show();
@@ -238,6 +235,8 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			} else {
 				$(".fileContainer .btnFileUpload").hide();
 			}
+			//隐藏下拉
+			$target.addClass("selected").siblings().removeClass("selected");
 
 		} else {
 
@@ -251,16 +250,10 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			} else {
 				this.fetchModelIdByProject();
 			}
-			//tab 文字
-			$target.closest('.fileModelNav').find(".breadItemText .text").text($target.text());
-
+			//隐藏下拉
+			$target.addClass("selected").siblings().removeClass("selected");
 
 		}
-
-		//隐藏下拉
-		$(".breadcrumbNav .fileModelList").hide();
-
-		event.stopPropagation();
 
 	},
 
@@ -327,10 +320,10 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		//App.Project.renderModelContentByType();
 		//return;
 		var viewer = App.Project.Settings.Viewer = new bimView({
-			type:'model',
+			type: 'model',
 			element: $("#projectContainer .modelContainerContent"),
 			sourceId: App.Project.Settings.DataModel.sourceId,
-			etag: App.Project.Settings.DataModel.etag,//"a1064f310fa8204efd9d1866ef7370ee" ||
+			etag: "a1064f310fa8204efd9d1866ef7370ee" || App.Project.Settings.DataModel.etag, //"a1064f310fa8204efd9d1866ef7370ee" ||
 			projectId: App.Project.Settings.projectId,
 			projectVersionId: App.Project.Settings.CurrentVersion.id
 		});
@@ -362,9 +355,9 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		});
 
 		//分享
-		if (App.Project.Settings.type=="token" && location.hash.indexOf("share")>0) {
+		if (App.Project.Settings.type == "token" && location.hash.indexOf("share") > 0) {
 
-			viewer.on("loaded",function(){
+			viewer.on("loaded", function() {
 				//加载数据
 				$(".modelSidebar  .bar-item.m-camera").click();
 			});
@@ -429,11 +422,11 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		var data = model.toJSON().data,
 			templateProperties = _.templateUrl("/projects/tpls/project/design/project.design.property.properties.html"),
 			$designProperties = this.$el.find(".singlePropetyBox .designProperties");
-			$designProperties.html(templateProperties(data));
-			//其他属性
-			App.Project.propertiesOthers.call({
-				$el: $designProperties
-			}, "plan|cost|quality|dwg");
+		$designProperties.html(templateProperties(data));
+		//其他属性
+		App.Project.propertiesOthers.call({
+			$el: $designProperties
+		}, "plan|cost|quality|dwg");
 	}
 
 });
