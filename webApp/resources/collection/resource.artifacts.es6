@@ -60,15 +60,7 @@ App.ResourceArtifacts={
 
                 }
             }
-        }),
-        urlType: "fetchQualityPlanQualityLevel2",
-        parse: function(responese) {
-            if (responese.code == 0 && responese.data.length > 0) {
-                return responese.data;
-            } else {
-                $().html('<li>无数据</li>');
-            }
-        }
+        })
     })),
     //计划规则/获取
     operator:Backbone.Model.extend({
@@ -102,13 +94,6 @@ App.ResourceArtifacts={
         defaults:function(){
             return{
                 code : ""
-            }
-        },
-        urlType: "fetchArtifactsPlanNewRule",
-        parse: function(responese) {
-            if (responese.code == 0 && responese.data.length > 0) {
-                return responese.data;
-                //保存成功
             }
         }
     }),
@@ -226,10 +211,26 @@ App.ResourceArtifacts={
         }
     })),
 
+    //质量标准，获取二级列表
+    TplCollection : new(Backbone.Collection.extend({
+        model:Backbone.Model.extend({
+            defaults:function(){
+                return{
+
+                }
+            }
+        })
+    })),
+
     init:function(_this,optionType) {
         if(optionType == "template" ){
             //规则模板
-
+            $(".breadcrumbNav .mappingRule").show();
+            var tplFrame = new App.Resources.ArtifactsTplFrame();
+            console.log(tplFrame);
+            var tplList = new App.Resources.ArtifactsTplList();
+            _this.$el.append(tplFrame.render().el);//菜单
+            tplFrame.$(".modelListContainer").html(tplList.render().el);
 
 
 

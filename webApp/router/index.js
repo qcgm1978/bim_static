@@ -127,13 +127,12 @@ var AppRoute = Backbone.Router.extend({
 		_.require('/static/dist/resources/resources.js');
 		App.ResourcesNav.Settings.type = type;
 		App.ResourcesNav.Settings.optionType = optionType;
-
 		new App.ResourcesNav.App().render();
+		$(".breadcrumbNav .mappingRule").show();
 		$("#pageLoading").hide();
 	},
 
 	resourceModel: function(type, projectId, versionId) {
-		console.log(2);
 		this.reset();
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".resources").addClass('selected');
 		_.require('/static/dist/resources/resources.css');

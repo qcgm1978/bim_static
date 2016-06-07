@@ -23,7 +23,6 @@ App.ResourcesNav.App = Backbone.View.extend({
 			//获取标准模型库数据
 			this.fetchStandardLibs();
 
-
 		} else if (type == "famLibs") {
 			//族库
 			this.fetchFamLibs();
@@ -38,6 +37,7 @@ App.ResourcesNav.App = Backbone.View.extend({
 
 		}else if(type == "artifactsMapRule"){
 			//构件映射规则
+			$(".breadcrumbNav .mappingRule").show();
 			if(optionType){//映射规则/规则模板
 				App.ResourceArtifacts.init(_this,optionType);
 			}
