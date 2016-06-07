@@ -225,6 +225,8 @@ App.ResourceArtifacts={
     })),
 
     init:function(_this,optionType) {
+
+        _this.$el.append( new App.Resources.ArtifactsIndexNav().render().el);
         if(optionType == "template" ){
             //πÊ‘Úƒ£∞Â
             $(".breadcrumbNav .mappingRule").show();
