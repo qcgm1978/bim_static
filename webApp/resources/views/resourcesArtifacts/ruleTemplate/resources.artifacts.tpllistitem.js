@@ -32,8 +32,6 @@ App.Resources.ArtifactsTplListItem = Backbone.View.extend({
         }
         this.toggleClass();
 
-
-
         //重置右侧列表
         var detail = new App.Resources.ArtifactsTplDetail();
         var pre = new App.Resources.ArtifactsMapRule();  //外层菜单
@@ -45,40 +43,13 @@ App.Resources.ArtifactsTplListItem = Backbone.View.extend({
         pre.$(".rules .ruleContent").html(planRule.render().el);//映射规则
         $("#artifacts").addClass("tpl");
 
-        //this. tplDetail();
-
+        //修改内容
+        $(".tplDetailTitle h2").text(this.model.get("name"));
     },
 
     //切换
     toggleClass:function(){
         $(".tplCon li").removeClass("active");
         this.$el.addClass("active");
-    },
-
-
-//获取模板
-    tplDetail:function() {
-        var _this = this;
-        var pdata = {
-            URLtype: "fetchArtifactsTemplateRule",
-            data:{
-                templateId: this.model.get("id")
-            }
-        };
-        //App.ResourceArtifacts.loading($(".modelContent"));
-        App.Comm.ajax(pdata,function(response){
-
-            if(response.code == 0 ){
-
-                if(response.data  &&  response.data.length){
-                    App.ResourceArtifacts.PlanRules.reset();
-                    $(".artifactsContent .rules ul").empty();
-                    App.ResourceArtifacts.PlanRules.add(response.data);
-                }else{
-                    $(".ruleContent ul").html("<li><div class='ruleTitle delt'>暂无内容</div></li>");
-                }
-            }
-            App.ResourceArtifacts.loaded($(".modelContent"));
-        });
     }
 });
