@@ -8,7 +8,7 @@ var AppRoute = Backbone.Router.extend({
 		'flow': 'flow',
 		'resources': 'resources',
 		'resources/:type': 'resource',
-		//'resources/:type/:reltype/:ruleType': 'resourcesArtifacts',
+		'resources/:type/:optionType': 'resourceMapping',
 		'resources/:type/:projectId/:versionId': 'resourceModel',
 		'console': 'console',
 		'console/:type/:step': 'console',
@@ -109,21 +109,6 @@ var AppRoute = Backbone.Router.extend({
 
 	},
 
-	/*resourcesArtifacts:function(type,reltype,ruleType){
-		this.reset();
-		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".resources").addClass('selected');
-		_.require('/static/dist/resources/resources.css');
-		_.require('/static/dist/resources/resources.js');
-		//  规则模板   --  权限入口
-		App.ResourceArtifacts.Settings.ruleModel = 3;         //    1 只有模块化，  2 只有质量标准  ， 3 有模块化和质量标准
-		App.ResourcesNav.Settings.type = type;
-		App.ResourcesNav.Settings.reltype = reltype;
-		App.ResourcesNav.Settings.ruleType = ruleType;
-		//App.AuthObj.lib.mappingRuleTemplate =true;
-		App.ResourcesNav.init();
-		//App.ResourceArtifacts.init();
-	},*/
-
 	//单个项目
 	resource: function(type) {
 		this.reset();
@@ -134,12 +119,28 @@ var AppRoute = Backbone.Router.extend({
 		App.ResourcesNav.init();
 	},
 
+	//单个项目
+	resourceMapping: function(type,optionType) {
+		this.reset();
+		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".resources").addClass('selected');
+		_.require('/static/dist/resources/resources.css');
+		_.require('/static/dist/resources/resources.js');
+		App.ResourcesNav.Settings.type = type;
+		App.ResourcesNav.Settings.optionType = optionType;
+
+		new App.ResourcesNav.App().render();
+		$("#pageLoading").hide();
+	},
+
 	resourceModel: function(type, projectId, versionId) {
+		console.log(2);
 		this.reset();
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".resources").addClass('selected');
 		_.require('/static/dist/resources/resources.css');
 		_.require('/static/dist/resources/resources.js');
 		if(type == "artifactsMapRule"){
+			//第三层处理方案
+			App.ResourceArtifacts.Settings.optionType = versionId;
 			App.ResourcesNav.init();
 			return
 		}

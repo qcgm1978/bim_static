@@ -31,7 +31,8 @@ App.ResourceArtifacts={
     },
     Settings: {
         delayCount:  0 , //每层加载数量
-        ruleModel: 3   //  权限入口      1 只有模块化，  2 只有质量标准  ， 3 有模块化和质量标准
+        ruleModel: 3,   //  权限入口      1 只有模块化，  2 只有质量标准  ， 3 有模块化和质量标准
+        model : ""
     },
 //计划节点
     PlanNode : new(Backbone.Collection.extend({
@@ -225,20 +226,30 @@ App.ResourceArtifacts={
         }
     })),
 
-    init:function(_this) {
-        App.ResourceArtifacts.Status.rule.biz =1;  //设置默认规则为模块化
-        var pre = new App.Resources.ArtifactsMapRule();  //外层菜单
-        var plans = new App.Resources.ArtifactsPlanList();   //模块化列表 /计划节点
-        var planRule = new App.Resources.ArtifactsPlanRule();  //默认规则
-        $(".breadcrumbNav .mappingRule").show();
-        _this.$el.append(pre.render().el);//菜单
-        pre.$(".plans").html(plans.render().el);//计划节点
-        pre.$(".rules .ruleContent").html(planRule.render().el);//映射规则
+    init:function(_this,optionType) {
+        if(optionType == "template" ){
+            //规则模板
 
-        //插入默认为空的规则列表
-        this.getPlan();
-        $("#pageLoading").hide();
-        this.loaddeaprt();
+
+
+
+            $("#pageLoading").hide();
+        }else if(optionType == "library"){
+            App.ResourceArtifacts.Status.rule.biz =1;  //设置默认规则为模块化
+            var pre = new App.Resources.ArtifactsMapRule();  //外层菜单
+            var plans = new App.Resources.ArtifactsPlanList();   //模块化列表 /计划节点
+            var planRule = new App.Resources.ArtifactsPlanRule();  //默认规则
+
+            _this.$el.append(pre.render().el);//菜单
+            pre.$(".plans").html(plans.render().el);//计划节点
+            pre.$(".rules .ruleContent").html(planRule.render().el);//映射规则
+
+            //插入默认为空的规则列表
+            this.getPlan();
+            $("#pageLoading").hide();
+            this.loaddeaprt();
+            $(".mappingRule").show();
+        }
     },
     //获取分类编码
     loaddeaprt:function(){
