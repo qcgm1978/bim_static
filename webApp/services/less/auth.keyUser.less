@@ -3,7 +3,6 @@ ul,li{list-style: none outside none;}
 .serviceOgList{padding-top: 10px;padding-left: 22px;}
 .serviceInput{outline: none;border: none;-webkit-appearance: none;width: 13px;height: 13px;background: transparent url("../images/service_ico.png") 0 -380px no-repeat;vertical-align: middle;margin: 0;}
 .background-ioc{background: transparent url("../images/service_ico.png") 0 0 no-repeat;vertical-align: middle;}
-.bdB-c{border-bottom: 1px solid #cccccc;}
 .left{float: left;}
 .right{float: right;}
 .myh{font-family: "Microsoft Yahei"}
@@ -22,8 +21,8 @@ ul,li{list-style: none outside none;}
 .keyBody .head{position: absolute;left: 20px;top: 49px;width: 61px;height: 86px;overflow: hidden;background-position: right top;background-size: 100% auto;background-repeat: no-repeat;}
 .keyBody .baseInfo li{line-height: 25px;position: relative;padding-left: 42px;}
 .keyBody .baseInfo li span{position: absolute;left: 0;top: 0;}
-.keyBody .proe ul{padding: 0 20px;}
-.keyBody .proe li{line-height: 60px; text-align: center;.bdB-c;font-size: 12px;color: #999999;clear: both;}
+.keyBody .proe ul,{padding: 0 20px;}
+.keyBody .proe li{line-height: 60px; .bdB-c;font-size: 12px;color: #999999;clear: both;}
 .keyBody .proe li .name,.keyBody .oz li .name{.left}
 .keyBody .proe li .time{.right}
 .keyBody .proe .proImg{
@@ -50,7 +49,17 @@ ul,li{list-style: none outside none;}
     vertical-align: middle;
   }
 }
-.keyBody .oz li {text-align: center;line-height: 48px;clear: left;}
+.bdB-c{
+  border-bottom: 1px solid #cccccc;
+  li{
+    text-align: left;
+    .link{
+      cursor: pointer;
+      color: #76B3EF;
+    }
+  }
+}
+.keyBody .oz li {line-height: 48px;clear: left;}
 .keyBody .oz ul{padding: 0 20px;}
 .keyBody .oz ul li:not(:last-child),.keyBody .proe ul li:not(:last-child){border-bottom: 1px solid #cccccc;}
 .keyBody .edit:after{position: absolute;content: "";.background-ioc;width: 13px;height: 13px;top: 5px;left: 5px;background-position: 0 -260px;}
@@ -140,6 +149,7 @@ ul,li{list-style: none outside none;}
         color: #999;
         height: 30px;
         background: #eee;
+        margin-bottom: 12px;
         .myh;
         font-size:14px;
         line-height:30px;
@@ -350,7 +360,7 @@ ul,li{list-style: none outside none;}
     height: 40px;
     display: none;
     border: 1px solid #ccc;
-    margin: 0px 20px 10px;
+    margin: 10px 20px 0px;
     font-size: 14px;
     a{
       line-height: 40px;
@@ -445,4 +455,16 @@ ul,li{list-style: none outside none;}
     top: 50%;
 
   }
+}
+.keyBody .fam,.keyBody .standard{
+  li{
+    line-height: 60px;
+    .bdB-c;
+    font-size: 12px;
+    color: #999999;clear: both;
+    .name{.left}
+    .time{.right}
+  }
+  ul{padding: 0 20px;}
+
 }
