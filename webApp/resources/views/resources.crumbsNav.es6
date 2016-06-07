@@ -7,9 +7,9 @@ App.ResourceCrumbsNav = Backbone.View.extend({
 	events: {
 		"click .resourcesList": "itemClick",
 		"click .fileModelNav": "toggleSwitchFileModel",
-		"click .fileModelList li": "switchFileMoldel",
+		"click .fileNav .commSpan": "switchFileMoldel",
 		"click .standardLibsVersion": "standardLibsVersion",
-		"click .itemA":"stopPropagation"
+		"click .itemA": "stopPropagation"
 
 	},
 
@@ -48,7 +48,7 @@ App.ResourceCrumbsNav = Backbone.View.extend({
 				$projectVersionList.find(".listResource").html(detail(data));
 				$projectVersionList.show();
 			});
-		} 
+		}
 
 	},
 
@@ -70,7 +70,7 @@ App.ResourceCrumbsNav = Backbone.View.extend({
 
 	},
 
-	stopPropagation(event){
+	stopPropagation(event) {
 		//this.$(".projectVersionList").hide();
 		event.stopPropagation();
 	},
@@ -85,7 +85,7 @@ App.ResourceCrumbsNav = Backbone.View.extend({
 	//切换 文件 模型 浏览器
 	switchFileMoldel(event) {
 
-		var $target = $(event.target).closest("li"),
+		var $target = $(event.target),
 			type = $target.data("type");
 
 		App.ResourceModel.Settings.leftType = type;
@@ -93,8 +93,8 @@ App.ResourceCrumbsNav = Backbone.View.extend({
 		if (type == "file") {
 
 			Backbone.trigger('navClickCB', type);
-			this.$(".fileModelNav  .breadItemText .text").text("文件浏览器");
-
+			//隐藏下拉
+			$target.addClass("selected").siblings().removeClass("selected");
 		} else {
 
 			if (!typeof(Worker)) {
@@ -104,17 +104,13 @@ App.ResourceCrumbsNav = Backbone.View.extend({
 
 			if (App.ResourceModel.Settings.DataModel && App.ResourceModel.Settings.DataModel.sourceId) {
 				Backbone.trigger('navClickCB', App.ResourceModel.Settings.leftType);
-				this.$(".fileModelNav  .breadItemText .text").text("模型浏览器");
 			} else {
 				//获取模型id
 				this.fetchModelIdByResource();
 			}
-
-		}
-
-		$(".breadcrumbNav .fileModelList").hide();
-		event.stopPropagation();
-
+			//隐藏下拉
+			$target.addClass("selected").siblings().removeClass("selected");
+		} 
 	},
 
 	//获取模型id

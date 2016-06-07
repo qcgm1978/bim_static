@@ -607,6 +607,12 @@
       var viewer = self.viewer;
       viewer.setSelectedIds(ids);
     },
+    getSelectedIds:function(){
+      var self = this;
+      var viewer = self.viewer;
+      var filters = viewer.getFilters();
+      return filters.getSelectionSet();
+    },
     collision:function(idA,idB){
       // 碰撞
       var self = this;
@@ -630,6 +636,13 @@
       var viewer = self.viewer;
       var filter = viewer.getFilters();
       return filter.isSceneOverriderEnabled();
+    },
+    isolate:function(){
+      var self = this;
+      var viewer = self.viewer;
+      var filter = viewer.getFilters();
+      filter.setHideUnselected(!filter.isHideUnselected());
+      viewer.render();
     },
     initMap:function(options){
       var defaults = {

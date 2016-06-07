@@ -229,7 +229,7 @@ App.Project = {
 
 		//api 页面 默认加载模型
 		if (App.Project.Settings.type == "token") {
-			$(".breadcrumbNav .fileModelNav li:last").click();
+			$(".fileNav .model").click();
 			//分享
 			if (window.location.href.indexOf("share") > 10) {
 				//初始化分享
