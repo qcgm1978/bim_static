@@ -144,9 +144,9 @@
 }
 .modelDialog{position:fixed;z-index:9;left:0;top:0;bottom:0;right:0;background:rgba(0,0,0,.5);}
 .dialogBody{width:800px;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:#333;color:#fff;
-  .dialogHeader{height:51px;padding:10px 21px;border-bottom:1px solid #666;font-size:16px;line-height:30px;
-    .dialogClose{float:right;
-      &:before{display:block;content:'\e60d';font-family:"modelicon" !important;font-size:32px;}
+  .dialogHeader{padding:10px 21px;border-bottom:1px solid #666;font-size:16px;line-height:30px;
+    .dialogClose{float:right;font-size:32px;
+      &:before{display:block;content:'\e60d';font-family:"modelicon" !important;}
     }
   }
   .dialogContent{}
@@ -173,6 +173,16 @@
   }
 }
 
+.modelSelectDialog{position:fixed;z-index:9;left:0;top:0;bottom:0;right:0;background:rgba(255,255,255,0);
+  .dialogBody{width:960px;background:#fff;color:#797979;border:1px solid #eaeaea;border-radius:3px;
+    .dialogHeader{border-bottom:1px solid #eaeaea;
+      .dialogClose{color:#d6d6d6;font-size:24px;}
+    }
+    .dialogFooter{border-top:1px solid #eaeaea;
+      .dialogBtn{width:80px;height:30px;font-size:14px;margin-left:20px;border:1px solid #fff;background:#333;outline:none;}
+    }
+  }
+}
 
 
 

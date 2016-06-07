@@ -1,5 +1,5 @@
 /**
- * @require /projects/collections/Project.js
+ * @require /projects/collections/Project.es6
  */
 App.Project.CostAttr={
 

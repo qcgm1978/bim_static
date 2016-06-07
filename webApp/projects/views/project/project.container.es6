@@ -357,6 +357,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			App.Project.Settings.ModelObj = model;
 			//App.Project.Settings.modelId = model.userId;
 			that.viewerPropertyRender();
+			that.navBarRightShowAndHide();
 
 		});
 

@@ -17,33 +17,27 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
     },
 
     initialize:function(){
-        //监听展开的模型是否被更改，如果更改，列出更改项，提示保存
-        if(App.ResourceArtifacts.Status.presentPlan){
-            this.listenTo(App.ResourceArtifacts.Status.presentPlan,"chang",this.getChangeAttr);    //previous    model.previous(attribute)
-        }
-    },
-
-    //取得模型修改过的属性
-    getChangeAttr:function(e){
-        console.log(e);
+        this.listenTo(this.model,"change",this.render);
     },
 
     //取得规则列表
     getPlanId:function(){
+
+
+
          App.ResourceArtifacts.Status.rule.targetCode = this.model.get("code");
         App.ResourceArtifacts.Status.rule.targetName = this.model.get("name");
-
         if(!App.ResourceArtifacts.Status.saved){
             alert("您还有没保存的");
             return
         }
+        App.ResourceArtifacts.loading($(".rules"));
         this.toggleClass();
         this. getRules();
 
         App.ResourceArtifacts.Status.presentPlan = null;
         App.ResourceArtifacts.Status.presentPlan = this.model;
     },
-
 //切换计划
     toggleClass:function(){
         $(".artifactsList li").removeClass("active");
@@ -61,18 +55,22 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
                 projectId:App.ResourceArtifacts.Status.projectId
             }
         };
-
+        App.ResourceArtifacts.loading();
         App.Comm.ajax(pdata,function(response){
             if(response.code == 0 ){
-                App.ResourceArtifacts.PlanRules.reset();
+
                 $(".artifactsContent .rules h2 .name").html(_this.model.get("code") + "&nbsp;" +_this.model.get("name"));
                 $(".artifactsContent .rules h2 i").html( "("+response.data.length + ")");
 
                 if(response.data  &&  response.data.length){
+                    App.ResourceArtifacts.PlanRules.reset();
                     $(".artifactsContent .rules ul").empty();
                     App.ResourceArtifacts.PlanRules.add(response.data);
+                }else{
+                    $(".ruleContent ul").html("<li><div class='ruleTitle delt'>暂无内容</div></li>");
                 }
             }
+            App.ResourceArtifacts.loaded($(".rules"));
         });
     }
 });

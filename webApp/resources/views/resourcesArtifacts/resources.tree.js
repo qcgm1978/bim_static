@@ -29,7 +29,7 @@ App.Resources.artifactsTree = function(dataList,code){
         li.append(new App.Resources.ArtifactsWindowRuleDetail({model:initModel}).render().el);
         li.append("<div class='childList' data-code='"+data[i].code +"'></div>");
         ele.append(li);
-        App.Comm.initScroll($("#resourcesArtifactTree"),"y");
+        App.Comm.initScroll($(".concc"),"y");
     }
     return ele;
 };
@@ -51,7 +51,7 @@ App.Resources.artifactsQualityTree = function(dataList){
         li.append(new App.Resources.ArtifactsQualityDetail({model:initModel}).render().el);
         li.append("<div class='childList' data-code='"+data[i].code +"'></div>");
         ele.append(li);
-        App.Comm.initScroll($("#qualityMenuList"),"y");
+        App.Comm.initScroll($(".qualityMenu"),"y");
     }
     return ele;
 };
