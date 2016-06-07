@@ -8,7 +8,9 @@
       var self = this;
       var _opt = options;
       var viewer = new self.BIM(_opt);
-      new bimView.sidebar.init(_opt,obj);
+      obj.on('loaded',function(){
+        new bimView.sidebar.init(_opt,obj);
+      });
       return viewer;
     },
     singleModel:function(options){
@@ -110,9 +112,9 @@
       id:'hideObj',
       icon:'m-hideObj',
       title:'隐藏构件',
-      fn:'translucent',
+      fn:'isolate',
       keyCode:'',
-      type:'click',
+      type:'status',
       group:'0'
     }],
     modelBar:[{
@@ -289,7 +291,7 @@
         id:'hideObj',
         icon:'m-hideObj',
         title:'隐藏构件',
-        fn:'translucent',
+        fn:'isolate',
         keyCode:'',
         type:'status',
         group:'0'

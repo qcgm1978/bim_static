@@ -190,6 +190,35 @@ App.Services.KeyUser = {
     urlType: "fetchProjects"
 
   })),
+
+  fam : new(Backbone.Collection.extend({
+    model : Backbone.Model.extend({
+      defaults: function() {
+        return {
+          title: ""
+        }
+      }
+    }),
+
+
+    urlType: "fetchFamLibs"
+
+  })),
+
+
+  standard : new(Backbone.Collection.extend({
+    model : Backbone.Model.extend({
+      defaults: function() {
+        return {
+          title: ""
+        }
+      }
+    }),
+
+
+    urlType: "fetchStandardLibs"
+
+  })),
   init : function(){
     Date.prototype.Format = function (fmt) { //author: meizz
       var o = {

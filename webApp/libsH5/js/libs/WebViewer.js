@@ -1,7 +1,6 @@
 /**
 * @require /libsH5/js/libs/three.min.js
 */
-
 var CLOUD = CLOUD || {};
 CLOUD.Version = "20160604";
 
@@ -97,6 +96,12 @@ CLOUD.SCENETYPE = {
     Aux: 1,
     Child: 2,
     Link: 3
+};
+
+CLOUD.OPSELECTIONTYPE = {
+    Clear: 0,
+    Add: 1,
+    Remove: 2
 };
 
 CLOUD.MPKSTATUS = {
@@ -7652,10 +7657,10 @@ CLOUD.Scene.prototype.pickByReck = function () {
     }
 
 
-    return function (frustum, clearOld, callback) {
+    return function (frustum, selectState, callback) {
         var scope = this;
 
-        if (clearOld)
+        if (selectState === CLOUD.OPSELECTIONTYPE.Clear)
             scope.filter.setSelectedIds();
 
         var count = 0;
@@ -7675,7 +7680,13 @@ CLOUD.Scene.prototype.pickByReck = function () {
                 if (state === INTERSECTION_STATE.IS_Contains) {
 
                     if (scope.filter.isVisible(node)) {
-                        scope.filter.addSelectedId(node.name, node.userData);
+
+                        if (selectState === CLOUD.OPSELECTIONTYPE.Remove) {
+                            scope.filter.removeSelectedId(node.name);
+                        }
+                        else {
+                            scope.filter.addSelectedId(node.name, node.userData);
+                        }
                         ++count;
                     }
 
@@ -10607,7 +10618,7 @@ CLOUD.RectPickEditor = function (object, scene, domElement) {
 
     this.frustum = new THREE.Frustum();
 
-    this.mouseButtons = { ORBIT: THREE.MOUSE.LEFT, PAN2: THREE.MOUSE.MIDDLE, PAN: THREE.MOUSE.RIGHT };
+    this.mouseButtons = { ORBIT: THREE.MOUSE.RIGHT, PAN2: THREE.MOUSE.MIDDLE, PAN: THREE.MOUSE.LEFT };
 };
 
 CLOUD.RectPickEditor.prototype = Object.create(CLOUD.PickEditor.prototype);
@@ -10663,15 +10674,6 @@ CLOUD.RectPickEditor.prototype.onMouseDown = function (event) {
     if (event.button === THREE.MOUSE.LEFT) {
 
         this.startPt.set(event.clientX, event.clientY);
-
-        //var x1 = event.clientX;
-        //var x2 = x1 + 1;
-        //var y1 = event.clientY;
-        //var y2 = y1 + 1;
-
-        //this.onUpdateUI({ visible:true, left:x1, top: y1, width:1, height:1 });
-
-        //return true;
     }
 
     return this.processMouseDown(event);
@@ -10680,7 +10682,7 @@ CLOUD.RectPickEditor.prototype.onMouseDown = function (event) {
 CLOUD.RectPickEditor.prototype.onMouseMove = function (event) {
 
     event.preventDefault();
-    if (event.shiftKey && event.button === THREE.MOUSE.LEFT) {
+    if (!event.shiftKey && event.button === THREE.MOUSE.LEFT) {
 
         this.endPt.set(event.clientX, event.clientY);
         this.udpateFrustum(true);
@@ -10694,7 +10696,9 @@ CLOUD.RectPickEditor.prototype.onMouseUp = function (event) {
     event.preventDefault();
     event.stopPropagation();
 
-    if (event.shiftKey && event.button === THREE.MOUSE.LEFT) {
+    this.onUpdateUI({ visible: false });
+
+    if (!event.shiftKey && event.button === THREE.MOUSE.LEFT) {
 
         this.endPt.set(event.clientX, event.clientY);
         if (!this.udpateFrustum()) {
@@ -10702,14 +10706,18 @@ CLOUD.RectPickEditor.prototype.onMouseUp = function (event) {
             return false;
         }
 
-
+        var state = CLOUD.OPSELECTIONTYPE.Clear;
+        if (event.ctrlKey) {
+            state = CLOUD.OPSELECTIONTYPE.Add;
+        }
+        else if (event.altKey) {
+            state = CLOUD.OPSELECTIONTYPE.Remove;
+        }
         var scope = this;
-        this.scene.pickByReck(this.frustum, !event.ctrlKey, function () {
+        this.scene.pickByReck(this.frustum, state, function () {
             scope.onObjectSelected();
         });
         this.cameraEditor.updateView(true);
-
-        this.onUpdateUI({visible:false});
 
         return true;
     }
@@ -11849,14 +11857,14 @@ CLOUD.CameraAnimator = function () {
         _frameTime = frameTime;
     };
 
-    this.setStandardView = function (stdView, viewer) {
+    this.setStandardView = function (stdView, viewer, margin) {
 
         _isPlaying = false; // 无动画，将状态置成 false
 
         var redoRender = function (viewer, box) {
 
             // fit all
-            var target = viewer.camera.zoomToBBox(box);
+            var target = viewer.camera.zoomToBBox(box, margin);
             viewer.cameraEditor.updateCamera(target);
             viewer.render();
         };
@@ -11948,6 +11956,7 @@ CLOUD.Filter = function () {
     var fileFilter = {};
 
     var _sceneOverriderState = false;
+    var _hideUnselected = false;
 
     var overridedMaterials = {};
     overridedMaterials.selection = CLOUD.MaterialUtil.createHilightMaterial();
@@ -11991,6 +12000,14 @@ CLOUD.Filter = function () {
 
     ////////////////////////////////////////////////////////////////////
     // Visbililty Filter API
+    this.setHideUnselected = function(enabled){
+        _hideUnselected = enabled;
+    };
+
+    this.isHideUnselected = function () {
+        return _hideUnselected;
+    };
+
     this.setFilterByUserIds = function (ids) {
 
         if (ids) {
@@ -12220,7 +12237,7 @@ CLOUD.Filter = function () {
     };
 
     this.removeSelectedId = function (id) {
-        if (selectionSet[id]) {
+        if (selectionSet && selectionSet[id]) {
 
             delete selectionSet[id];
 
@@ -12328,6 +12345,14 @@ CLOUD.Filter = function () {
             if(userValue && visibilityFilter[item][userValue] !== undefined ){
                 return false;
             }
+        }
+
+        if (_hideUnselected) {
+
+            if (selectionSet && selectionSet[id])
+                return true;
+
+            return false;
         }
 
         return true;
@@ -16126,6 +16151,7 @@ CLOUD.SceneLoader.prototype = {
                     if (objJSON.deep === undefined &&  object.out ) {
                         group.innerBoundingBox.expandByPoint(object.worldBoundingBox.min);
                         group.innerBoundingBox.expandByPoint(object.worldBoundingBox.max);
+                        group.innerBoundingBox.valid = true;
                     }
 
                     if (CLOUD.GlobalData.ShowCellBox) {
@@ -18260,24 +18286,27 @@ CloudViewer.prototype = {
     },
 
     zoomAll: function (margin) {
-        margin = margin || -0.015;
+        margin = margin || -0.05;
         this.editorManager.zoomAll(this, margin);
     },
 
     zoomToSelection: function (margin) {
-        margin = margin || 0.05; // give bounding box a margin 0.05 by default.
+
         var box = this.renderer.computeSelectionBBox();
         if (box == null || box.empty()) {
             box = this.getScene().worldBoundingBox();
+            margin = margin || -0.05; // give bounding box a margin 0.05 by default.
         }
-
+        else {
+            margin = margin || 0.05; // give bounding box a margin 0.05 by default.
+        }
         var target = this.camera.zoomToBBox(box, margin);
         this.cameraEditor.updateCamera(target);
         this.render();
     },
 
     zoomToBBox: function (box, margin) {
-        margin = margin || 0.05;
+        margin = margin || -0.05;
         if (!box) {
             box = this.getScene().worldBoundingBox();
         }

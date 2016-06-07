@@ -30,8 +30,11 @@ App.Services.step2 = Backbone.View.extend({
       };
       this.$el.html(this.template(datas));
     }
-    //$(".serviceWindow .keyU > div").css({height:"260px"});
     $('.partition').show();
+    if(App.Services.KeyUser.mode==3){
+      $('.step2').css({background:"#ccc"});
+
+    }
     return this;
   },
 

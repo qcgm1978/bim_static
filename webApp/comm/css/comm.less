@@ -1,17 +1,15 @@
-.overflowEllipsis {vertical-align: middle; display: inline-block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.overflowEllipsis { vertical-align: middle; display: inline-block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 #contains { min-width: 1100px; margin: 0 auto; height: 100%; position: relative; box-sizing: border-box; margin-top: -50px; padding-top: 50px; }
 .hidden { display: none; }
 .right { float: right; }
-.relative{position: relative;}
+.relative { position: relative; }
 .left { float: left; }
 .clear { clear: both; }
 .myHidden { display: none; }
 .pointer { cursor: pointer; }
-#pageLoading,#dataLoading { position: fixed; top: 50px; width: 100%; bottom: 0px; z-index: 9999; background: #fff url('/comm/images/load.gif') no-repeat center; }
-#dataLoading{
-	display: none;
-}
-
+#pageLoading, #dataLoading { position: fixed; top: 50px; width: 100%; bottom: 0px; z-index: 9999; background: #fff url('/comm/images/load.gif') no-repeat center; }
+#dataLoading { display: none; }
+.overflow2 {    word-wrap: break-word; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
 
 /* bootstrap  */
 .txtInput { height: 30px; padding: 6px 8px; outline: none; font-size: 14px; line-height: 1.2; color: #666; background-color: #fff; border: 1px solid #ccc; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box; }
@@ -54,7 +52,7 @@
 	i { color: #85B200; font-size: 20px; vertical-align: -3px; margin-right: 5px; }
 }
 
-/*  面包屑导航  */
+/*  面包屑导� */
 .breadcrumbNav { line-height: 37px; padding-left: 20px; font-size: 14px; position: relative;
 	.projectText, .breadItem { float: left; }
 	.projectText a { color: #000; text-decoration: none; }
@@ -64,7 +62,7 @@
 			.icon-sort-down { font-size: 16px; margin-left: 11px; vertical-align: 2px; }
 		}
 		.projectList, .projectVersionList { display: none;
-			.container { width: 100%; padding: 0; max-height: 305px;overflow-y: auto;
+			.container { width: 100%; padding: 0; max-height: 305px; overflow-y: auto;
 				.header { margin-top: 5px; height: 26px; line-height: 25px; font-size: 12px; background-color: #f2f2f2; padding-left: 12px; }
 					.item { display: block; cursor: pointer; height: 26px; line-height: 25px; font-size: 12px; padding-left: 12px; color: #A599B2; margin-top: 5px; text-decoration: none; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
 					&:hover { background-color: #A8DBFD; }
@@ -73,7 +71,7 @@
 			.loading { text-align: center; color: #ccc; }
 		}
 		.projectList { position: absolute; width: 248px; background-color: #fff; max-height: 420px; overflow-y: auto; border: 1px #ccc solid; top: 32; left: 0px;
-			.txtSearch { margin: 5px 10px 1px 10px; width: 214px; margin-right: 0px;}
+			.txtSearch { margin: 5px 10px 1px 10px; width: 214px; margin-right: 0px; }
 		}
 		.projectVersionList { position: absolute; top: 32px; border: 1px #ccc solid; background-color: #fff; left: 0px; width: 288px; max-height: 378px;
 			.listContent { display: none;
@@ -89,13 +87,19 @@
 				.vDate { width: 76px; margin-left: 3px; }
 			}
 		}
-		.fileModelList { display: none; left: 12px; position: absolute; background-color: #fff; top: 32px; width: 126px; border: 1px #ccc solid;
-			.fileNavUl { padding: 6px 0px;
-				li { padding-left: 12px; cursor: pointer; color: #666; height: 26px; line-height: 26px; font-size: 12px;
-					&:hover { background-color: #A8DBFD; }
-				}
-			}
+		// .fileModelList { display: none; left: 12px; position: absolute; background-color: #fff; top: 32px; width: 126px; border: 1px #ccc solid;
+			// 	.fileNavUl { padding: 6px 0px;
+				// 		li { padding-left: 12px; cursor: pointer; color: #666; height: 26px; line-height: 26px; font-size: 12px;
+					// 			&:hover { background-color: #A8DBFD; }
+				// }
+			// }
+		// }
+	}
+	.fileNav { margin-left: 15px;
+		.commSpan { cursor: pointer; width: 40px; font-size: 12px; text-align: center; display: inline-block; border: 1px #006ECF solid; height: 20px; line-height: 17px; border-radius: 3px 0 0 3px; color: #006ECF;
+			&.selected { background-color: #006ECF; color: #fff; }
 		}
+		.model { border-radius: 0 3px 3px 0px; margin-left: -4px; }
 	}
 	.allProject { cursor: pointer }
 }
@@ -123,15 +127,15 @@
 	.filecKAll { width: 5%; text-align: center; }
 	.fileName { width: 48%;
 		.fileType { margin-right: 10px; display: inline-block; margin-top: 5px; vertical-align: top; width: 35px; height: 30px; background: url('/projects/images/fileicon.png') no-repeat;
-			&.rvt { background-position: 0px -39px;}
+			&.rvt { background-position: 0px -39px; }
 			&.dwg { background-position: 0px -79px; }
-			&.rfa{background-position: 0px -558px; }
+			&.rfa { background-position: 0px -558px; }
 			&.other { background-position: 0px -519px; }
 		}
 		.text { cursor: pointer;
 			&:hover { text-decoration: underline; }
 		}
-		.fileTypeImg { height: 30px; width: 35px; vertical-align: top; margin-top: 3px;margin-right: 10px; }
+		.fileTypeImg { height: 30px; width: 35px; vertical-align: top; margin-top: 3px; margin-right: 10px; }
 	}
 	.fileStatus { width: 11%; }
 	.fileOp { width: 11%; }
@@ -161,61 +165,23 @@
 .slideBar { top: 40px; width: 15px; height: 32px; right: -15px; z-index: 99; position: absolute; display: none; background-color: #fff; border: 2px #ccc solid; line-height: 26px; box-sizing: border-box; padding-left: 2px; cursor: pointer; }
 .sourceFileType { background: url('/projects/images/fileicon.png') no-repeat 0px -200px; width: 105px; height: 80px;
 	&.folder { background-position: 0px -120px; }
-	&.dwg { background-position: 0px -276px; } 
+	&.dwg { background-position: 0px -276px; }
 	&.other { background-position: 0px -439px; }
 }
-
-ul li.loading{text-align: center;font-size: 14px;padding-top: 30px;color:#ccc;}
+ul li.loading { text-align: center; font-size: 14px; padding-top: 30px; color: #ccc; }
 
 /**mmh tip**/
-.mmhTip{
-	position: fixed;
-	left: 0;
-	top: -100px;
-	right: 0;
-	text-align: center;
-	z-index: 999999;
-	& .content{
-		display: inline-block;
-		height: 40px;
-		line-height: 40px;
-		font-size: 14px;
-		color: #666;
-		box-sizing: border-box;
-		position: relative;
-		padding-left: 46px;
-		padding-right: 20px;
-		background: #FFFFFF;
-		& i{
-			position: absolute;
-			left: 20px;
-			top: 12px;
-			width: 16px;
-			height: 16px;
-			background: url(../images/icon.png) no-repeat;
+.mmhTip { position: fixed; left: 0; top: -100px; right: 0; text-align: center; z-index: 999999;
+	& .content { display: inline-block; height: 40px; line-height: 40px; font-size: 14px; color: #666; box-sizing: border-box; position: relative; padding-left: 46px; padding-right: 20px; background: #FFFFFF;
+		& i { position: absolute; left: 20px; top: 12px; width: 16px; height: 16px; background: url(../images/icon.png) no-repeat; }
+		&.success { border: 1px solid #80C729;
+			& i { background-position: -0px -0px; }
 		}
-		
-		&.success{
-			border:1px solid #80C729;
-			& i{
-				background-position: -0px -0px;
-			}
+		&.common { border: 1px solid #2DB7F5;
+			& i { background-position: -18px -0px; }
 		}
-		&.common{
-			border:1px solid #2DB7F5;
-			& i{
-				background-position: -18px -0px;
-			}
-		}
-		&.alarm{
-			border:1px solid #ffaa00;
-			& i{
-				background-position: -36px -0px;
-			}
+		&.alarm { border: 1px solid #ffaa00;
+			& i { background-position: -36px -0px; }
 		}
 	}
-	
-	
 }
-			
-			

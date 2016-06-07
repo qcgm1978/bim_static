@@ -5,7 +5,7 @@ App.Resources.ArtifactsRuleLegend = Backbone.View.extend({
 
     tagName :'li',
 
-    template:_.templateUrl("/resources/tpls/resourcesArtifacts/resources.artifacts.rule.legend.html"),
+    template:_.templateUrl("/resources/tpls/resourcesArtifacts/ruleModel/resources.artifacts.rule.legend.html"),
 
     events:{
         "click .searEnd":"sele"

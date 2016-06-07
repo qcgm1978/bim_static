@@ -7,7 +7,7 @@ App.Resources.ArtifactsPlanList = Backbone.View.extend({
 
     className: "artifactsList",
 
-    template: _.templateUrl("/resources/tpls/resourcesArtifacts/resources.artifacts.planlist.html"),
+    template: _.templateUrl("/resources/tpls/resourcesArtifacts/ruleModel/resources.artifacts.planlist.html"),
 
     render:function() {
         this.$el.html(this.template);

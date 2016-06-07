@@ -491,13 +491,22 @@
 
 				//查看发表评论
 				viewComments(event) {
-
 					var $el = $(event.target).closest(".remarkCount"),
-						id = $el.data("id");
+						id = $el.data("id"),
+						$item = $el.closest(".item"),
+						creatorId = $item.find(".name").data("creatorid");
 
+					//批注信息 赋值
+					$(".commentRemark .viewPointInfo").html($item.html());
+
+					if (creatorId == App.Global.User.userId) {
+						$(".commentRemark  .reMarkBox .operators").show();
+					} else {
+						$(".commentRemark  .reMarkBox .operators").hide();
+					}
 
 					$comment.find(".commentList").animate({
-						left: "314px"
+						left: "330px"
 					}, 500);
 					$comment.find(".commentRemark").show().animate({
 						left: "0px"
@@ -518,9 +527,10 @@
 						CommentCollections.ViewComments.urlType = "viewComments";
 					}
 
+
 					CommentCollections.ViewComments.fetch({
 						success(model, data) {
-							$(".commentRemark .reMarkCount .count").text(data.data.length);
+							$(".commentRemark .remarkBox .count").text(data.data.length);
 							this.$(".reMarkListBox").css("bottom", this.$(".talkReMark").height() + 10);
 						}
 					});
@@ -560,19 +570,8 @@
 							},
 
 							shareViewPoint(li) {
-
-								var $li = $(li),
-									data = {
-										id: $li.find(".remarkCount").data("id"),
-										pic: $li.find(".thumbnailImg").prop("src"),
-										creatorId: $li.find(".name").text().trim(),
-										name: $li.find(".title").text().trim(),
-										description: $li.find(".desc").text().trim(),
-										createTime: $li.find(".date").text().trim()
-									};
-
 								//分享								
-								CommentApi.shareViewPoint(data);
+								CommentApi.shareViewPointData($(li));
 
 							},
 
@@ -781,6 +780,7 @@
 					"click .delUploadImg": "removeImg", //移除图片
 					"focus .txtReMark": "inputReMark", //输入评论
 					"blur .txtReMark": "outReMark", //失去焦点
+					"click .iconShare": "share",
 					"click .btnLogin": "login" //登陆
 				},
 
@@ -798,6 +798,12 @@
 					//模板
 					this.$el.html(this.template);
 					return this;
+				},
+
+				//分享
+				share(event) {
+					var $data = $(event.target).closest(".reMarkBox").find(".viewPointInfo");
+					CommentApi.shareViewPointData($data);
 				},
 
 				login() {
@@ -893,13 +899,13 @@
 
 				//无数据
 				dataNull() {
-					this.$(".reMarkList").html('<li class="loading">无数据</li>');
+					this.$(".reMarkList").html('<li class="loading">暂无评论</li>');
 				},
 
 				//返回列表
 				goList() {
 
-					$(".remarkCount.current").removeClass("current").find(".count").text($(".commentRemark .reMarkCount .count").text());
+					$(".remarkCount.current").removeClass("current").find(".count").text($(".commentRemark .remarkBox .count").text());
 
 					$comment.find(".commentList").animate({
 						left: "0px"
@@ -985,7 +991,7 @@
 							this.$(".uploadImgs").empty();
 							this.$(".txtReMark").val('');
 							//评论的数量
-							var $count = $(".commentRemark .reMarkCount .count");
+							var $count = $(".commentRemark .remarkBox .count");
 							$count.text(+$count.text() + 1);
 						}
 
@@ -1049,7 +1055,7 @@
 				//删除后
 				remove() {
 
-					var $count = $(".commentRemark .reMarkCount .count");
+					var $count = $(".commentRemark .remarkBox .count");
 					$count.text(+$count.text() - 1);
 
 					this.$el.slideUp(function() {
@@ -1060,7 +1066,7 @@
 						$this.remove();
 
 						if ($parent.find("li").length <= 0) {
-							$parent.html('<li class="loading">无数据</li>');
+							$parent.html('<li class="loading">暂无评论</li>');
 						}
 
 					});
@@ -1175,8 +1181,7 @@
 				var $element = dialog.element,
 					pars = {
 						projectId: App.Project.Settings.projectId,
-						name: dialog.element.find(".name").val().trim(),
-						description: dialog.element.find(".desc").val().trim(),
+						name: dialog.element.find(".name").val().trim(),					
 						type: dialog.type,
 						viewPoint: commentData.camera
 					};
@@ -1328,10 +1333,20 @@
 				return App.Comm.ajax(data);
 			},
 
+			//分享解析数据
+			shareViewPointData($li) {
+				var data = {
+					id: $li.find(".remarkCount").data("id"),
+					pic: $li.find(".thumbnailImg").prop("src"),
+					creatorId: $li.find(".name").text().trim(),
+					name: $li.find(".title").text().trim(),
+					createTime: $li.find(".date").text().trim()
+				};
+				this.shareViewPoint(data);
+			},
+
 			//分享视点
 			shareViewPoint(obj) {
-
-
 
 				var data = {
 					URLtype: 'shareComment',
@@ -1384,8 +1399,6 @@
 
 				});
 
-
-
 			},
 
 			//编辑 批注
@@ -1399,8 +1412,7 @@
 					pars = {
 						viewPointId: commentData.id,
 						projectId: App.Project.Settings.projectId,
-						name: dialog.element.find(".name").val().trim(),
-						description: dialog.element.find(".desc").val().trim(),
+						name: dialog.element.find(".name").val().trim(),					
 						type: dialog.type
 					};
 
@@ -1475,7 +1487,7 @@
 
 						});
 					} else {
-						dialog.isSubmit=false;
+						dialog.isSubmit = false;
 						if (type == "save") {
 							dialog.element.find(".ok").text("保存");
 						} else {

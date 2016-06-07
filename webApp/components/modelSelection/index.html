@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>模型选择器</title>
+  <script src="libs/jquery-1.12.0.min.js"></script>
+  <script src="/libs/underscore.1.8.2.js"></script>
+  <script src="js/modelSelection.js"></script>
+</head>
+<body>
+<input type="button" id="model" value="show">
+<script>
+$(function(){
+  $('#model').on('click',function(){
+    new ModelSelection({
+      sourceId: '848069790540000',
+      etag: "ca4863cf122ac55b5a8e845595aeb7ce",
+      projectId:'1',
+      projectVersionId: '784306105035931'
+    });
+  })
+})
+</script>
+</body>
+</html>

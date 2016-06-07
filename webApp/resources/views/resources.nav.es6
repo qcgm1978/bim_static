@@ -16,12 +16,12 @@ App.ResourcesNav.App = Backbone.View.extend({
 		this.$el.html(new App.ResourceCrumbsNav().render().el);
 
 		var type = App.ResourcesNav.Settings.type;
+		var optionType = App.ResourcesNav.Settings.optionType;
 
 
 		if (type == "standardLibs") {
 			//获取标准模型库数据
 			this.fetchStandardLibs();
-
 
 		} else if (type == "famLibs") {
 			//族库
@@ -37,7 +37,10 @@ App.ResourcesNav.App = Backbone.View.extend({
 
 		}else if(type == "artifactsMapRule"){
 			//构件映射规则
-			App.ResourceArtifacts.init(_this);
+			$(".breadcrumbNav .mappingRule").show();
+			if(optionType){//映射规则/规则模板
+				App.ResourceArtifacts.init(_this,optionType);
+			}
 		}
 		this.bindScroll();
 		return this;
