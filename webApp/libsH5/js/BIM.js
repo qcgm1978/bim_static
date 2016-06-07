@@ -112,9 +112,9 @@
       id:'hideObj',
       icon:'m-hideObj',
       title:'隐藏构件',
-      fn:'translucent',
+      fn:'isolate',
       keyCode:'',
-      type:'click',
+      type:'status',
       group:'0'
     }],
     modelBar:[{
@@ -291,7 +291,7 @@
         id:'hideObj',
         icon:'m-hideObj',
         title:'隐藏构件',
-        fn:'translucent',
+        fn:'isolate',
         keyCode:'',
         type:'status',
         group:'0'

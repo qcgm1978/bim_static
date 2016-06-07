@@ -5,6 +5,10 @@
 		li { float: left;
 			a { color: #fff; width: 90px; text-align: center; height: 50px; line-height: 50px; font-size: 16px; cursor: pointer; display: block; .transparent_class; }
 		}
+		& .imbox { color: #fff;
+			& a{width: 40px;}
+			& i { background: url(../images/message.png) no-repeat; display: inline-block; width: 20px; height: 10px; }
+		}
 	}
 }
 #topBar .navHeader li.item:hover { a { .transparent_class(1); }
@@ -16,7 +20,7 @@
 }
 #topBar { a:hover, a:focus { color: #fff; text-decoration: none; }
 }
-#topBar { .user { padding-left: 40px; width: 210px; font-size: 12px; line-height: 49px;
+#topBar { .user { padding-left: 40px; width: 180px; font-size: 12px; line-height: 49px;
 		span { font-size: 12px; }
 		.userBg { float: left; width: 35px; height: 35px; background: url('/topNav/images/user.png') no-repeat; margin-top: 9px; margin-right: 5px; }
 	}

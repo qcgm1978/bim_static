@@ -14,13 +14,15 @@ App.API = {
 
 		fetchBodyContentSilde :'platform/project/top',
 
+		fetchIMBoxList:'platform/message',
+
 		//本月开始、到期接口
 		fetchBodyContentMonthEnd :'sixD/plan/concern/index',//?type={type}&userId={userId}
 		fetchBodyContentMonthStart :'sixD/plan/concern/index',
 
 		fetchBodyContentSlide :'dataJson/bodyContent/bodyContent.slide.json',
 		fetchBodyContentMmhSlide :'platform/project',
-		fetchBodyContentProclamation :'dataJson/bodyContent/bodyContent.proclamation.json',
+		fetchBodyContentProclamation :'platform/notice',
 
 		//services
 		fetchServicesRolesList:'platform/auth/role',//角色列表

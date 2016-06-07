@@ -1,8 +1,6 @@
 /**
 * @require /libsH5/js/libs/three.min.js
 */
-
-
 var CLOUD = CLOUD || {};
 CLOUD.Version = "20160604";
 
@@ -11958,6 +11956,7 @@ CLOUD.Filter = function () {
     var fileFilter = {};
 
     var _sceneOverriderState = false;
+    var _hideUnselected = false;
 
     var overridedMaterials = {};
     overridedMaterials.selection = CLOUD.MaterialUtil.createHilightMaterial();
@@ -12001,6 +12000,14 @@ CLOUD.Filter = function () {
 
     ////////////////////////////////////////////////////////////////////
     // Visbililty Filter API
+    this.setHideUnselected = function(enabled){
+        _hideUnselected = enabled;
+    };
+
+    this.isHideUnselected = function () {
+        return _hideUnselected;
+    };
+
     this.setFilterByUserIds = function (ids) {
 
         if (ids) {
@@ -12338,6 +12345,14 @@ CLOUD.Filter = function () {
             if(userValue && visibilityFilter[item][userValue] !== undefined ){
                 return false;
             }
+        }
+
+        if (_hideUnselected) {
+
+            if (selectionSet && selectionSet[id])
+                return true;
+
+            return false;
         }
 
         return true;
