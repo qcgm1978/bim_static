@@ -9,8 +9,10 @@ App.Services.userinfo = Backbone.View.extend({
   template:_.templateUrl("/services/tpls/auth/keyUser/services.userinfo.html"),
 
   events:{
-    "click .proe .edit":'projedit',
-    "click .oz .edit":'orgedit'
+    "click .proe .link,.proe .edit":'projedit',//项目权限编辑
+    "click .oz .edit,.oz .link":'orgedit',//部门权限编辑
+    "click .fam .edit,.fam .link":'famedit',//族库权限编辑
+    "click .standard .edit,.standard .link":'standardedit'//部门权限编辑
 
 
     //"click .keyUserList li":'toggleClass'
@@ -38,6 +40,27 @@ App.Services.userinfo = Backbone.View.extend({
     App.Services.KeyUser.orgId = [];
     App.Services.maskWindow=new App.Comm.modules.Dialog({title:'',width:600,height:500,isConfirm:false});
     $('.mod-dialog .wrapper').html(new App.Services.addKeyUser().render('org').el);
+    $('.keyU .title').show();
+    $('.keyU .search').hide();
+
+  },
+  //修改族库
+  famedit : function(){
+    App.Services.KeyUser.orgId = [];
+    App.Services.maskWindow=new App.Comm.modules.Dialog({title:'',width:600,height:500,isConfirm:false});
+    $('.mod-dialog .wrapper').html(new App.Services.addKeyUser().render('fam').el);
+    $('.keyU .title').show();
+    $('.keyU .search').hide();
+
+  },
+  //修改标准模型
+  standardedit : function(){
+    App.Services.KeyUser.orgId = [];
+    App.Services.maskWindow=new App.Comm.modules.Dialog({title:'',width:600,height:500,isConfirm:false});
+    $('.mod-dialog .wrapper').html(new App.Services.addKeyUser().render('standard').el);
+    $('.keyU .title').show();
+    $('.keyU .search').hide();
+
   },
   initialize:function(){
     this.listenTo(App.Services.KeyUser.userinfo,'add',this.render);

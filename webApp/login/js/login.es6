@@ -118,7 +118,7 @@ var Login = {
 			url: '/platform/user/current'
 		}).done(function(data) {
 			//获取referer returnurl 进行重定向
-			var r=document.URL.split('RetutnUrl=').pop();
+			var r=document.URL.split('ReturnUrl=').pop();
 			//失败
 			if (data.code!=0) {
 				alert("获取用户信息失败");
@@ -139,7 +139,7 @@ var Login = {
 			//是否主动退出标记 2 默认状态 1 为主动退出
 			Login.setCookie('IS_OWNER_LOGIN','2');
 			Login.delCookie("token_cookie");
-			if(r){
+			if(r && r != document.URL){
 				window.location=decodeURIComponent(r);
 			}else{
 				window.location.href='/index.html';

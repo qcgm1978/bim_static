@@ -10,7 +10,7 @@
                     <li><span>部门：</span><%= info.user.org[0]['name'] %></li>
                 </ul>
             </div>
-            <div class="bdB-c proe">
+            <div class="bdB-c proe ">
                 <h2>项目权限<span class="edit"></span></h2>
                 <ul>
                     <% if(info.authType==2 && info.area.length){ %>
@@ -24,18 +24,66 @@
                    <% }}else if(info.authType==3){ %>
                     <li><div class="name"><span class="proImg"></span><a href="#">所有项目</a></div><div class="time"> &nbsp </div><div> &nbsp </div></li>
 
+                  <% }else { %>
+                    <li><span>该用户还没有项目权限,<b class="link">点此可添加项目</b></span></li>
                   <% } %>
 
                 </ul>
+            </div>
+
+            <div class="bdB-c standard">
+              <h2>标准模型库权限<span class="edit"></span></h2>
+              <ul>
+                <% if(info.authType==2 && info.area.length){ %>
+                <% for(var i=0;i<info.area.length;i++){ %>
+                <li><div class="name"><span class="proImg"></span><a href="#"><%= info.area[i] %></a></div><div class="time"> &nbsp </div><div> &nbsp </div></li>
+
+                <% }}else if(info.authType==1 && info.project.length){ %>
+                <% for(var i=0;i<info.project.length;i++){ %>
+                <li><div class="name"><span class="proImg"><img src="<%= info.project[i]['logoUrl']['middle'] %>" width="100%"></span><a href="#"><%= info.project[i]['name'] %></a></div><div class="time"><%= new Date(info.project[i]['createTime'] || 0).Format("yyyy-MM-dd")%><%= info.project[i]['openTime']?"--"+new Date(info.project[i]['openTime']).Format("yyyy-MM-dd"):''%></div><div><%= info.project[i]['province']||'无' %></div></li>
+
+                <% }}else if(info.authType==3){ %>
+                <li><div class="name"><span class="proImg"></span><a href="#">所有项目</a></div><div class="time"> &nbsp </div><div> &nbsp </div></li>
+
+                <% }else { %>
+                <li><span>该用户还没有标准模型权限,<b class="link">点此可添加标准模型</b></span></li>
+                <% } %>
+
+              </ul>
+            </div>
+
+            <div class="bdB-c fam">
+              <h2>族库权限<span class="edit"></span></h2>
+              <ul>
+                <% if(info.authType==2 && info.area.length){ %>
+                <% for(var i=0;i<info.area.length;i++){ %>
+                <li><div class="name"><span class="proImg"></span><a href="#"><%= info.area[i] %></a></div><div class="time"> &nbsp </div><div> &nbsp </div></li>
+
+                <% }}else if(info.authType==1 && info.project.length){ %>
+                <% for(var i=0;i<info.project.length;i++){ %>
+                <li><div class="name"><span class="proImg"><img src="<%= info.project[i]['logoUrl']['middle'] %>" width="100%"></span><a href="#"><%= info.project[i]['name'] %></a></div><div class="time"><%= new Date(info.project[i]['createTime'] || 0).Format("yyyy-MM-dd")%><%= info.project[i]['openTime']?"--"+new Date(info.project[i]['openTime']).Format("yyyy-MM-dd"):''%></div><div><%= info.project[i]['province']||'无' %></div></li>
+
+                <% }}else if(info.authType==3){ %>
+                <li><div class="name"><span class="proImg"></span><a href="#">所有项目</a></div><div class="time"> &nbsp </div><div> &nbsp </div></li>
+
+                <% }else { %>
+                <li><span>该用户还没有族库权限,<b class="link">点此可添加族库</b></span></li>
+                <% } %>
+
+              </ul>
             </div>
             <div class="bdB-c oz">
                 <h2>部门权限<span class="edit"></span></h2>
                 <div class="keyHead"></div>
                 <ul>
-                    <% _.each(info.org,function(org){ %>
-                    <li><div class="name"><%= org.name %></div><div><%= org.namePath %></div></li>
-                    <% }) %>
+                  <% if(info.org.length){ %>
 
+                    <% _.each(info.org,function(org){ %>
+                      <li><div class="name"><%= org.name %></div><div><%= org.namePath %></div></li>
+                      <% }) %>
+                  <% }else { %>
+                  <li><span>该用户还没有可以管理的部门,<b class="link">点此可添加部门</b></span></li>
+                  <% } %>
                 </ul>
             </div>
 

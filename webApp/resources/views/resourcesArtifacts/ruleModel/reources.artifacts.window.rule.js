@@ -6,7 +6,7 @@ App.Resources.ArtifactsWindowRule = Backbone.View.extend({
     tagName :'div',
     className:"resourcesAlert",
 
-    template:_.templateUrl("/resources/tpls/resourcesArtifacts/resources.artifacts.window.rule.html"),
+    template:_.templateUrl("/resources/tpls/resourcesArtifacts/ruleModel/resources.artifacts.window.rule.html"),
 
     events:{
         "click .windowSubmit":"sure"

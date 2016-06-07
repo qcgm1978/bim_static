@@ -6,7 +6,7 @@ App.Resources.ArtifactsWindowRuleDetail = Backbone.View.extend({
     tagName :'div',
     className:"",
 
-    template:_.templateUrl("/resources/tpls/resourcesArtifacts/resources.artifacts.ruletreedetail.html"),
+    template:_.templateUrl("/resources/tpls/resourcesArtifacts/ruleModel/resources.artifacts.ruletreedetail.html"),
 
     events:{
         "click .hasChild":"hasChild",
