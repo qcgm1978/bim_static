@@ -16,6 +16,14 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
 
     render:function() {
         this.$el.html(this.template);
+
+        var power = App.ResourceArtifacts.Settings.ruleModel;
+        if(power == 1){
+            this.$(".modularization").remove();
+            this.$(".quality").addClass("active");
+        }else if(power == 2){
+            this.$(".quality").remove();
+        }
         return this;
     },
 

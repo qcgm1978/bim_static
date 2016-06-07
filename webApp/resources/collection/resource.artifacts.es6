@@ -71,7 +71,7 @@ App.ResourceArtifacts={
                 code : ""
             }
         }}),
-//计划规则/获取
+//计划规则/获取节点规则
     PlanRules:new(Backbone.Collection.extend({
         model:Backbone.Model.extend({
             defaults:function(){

@@ -37,25 +37,6 @@ App.Resources.App = Backbone.View.extend({
 			if (!Auth.mappingRuleTemplate) {
 				$resoucesNav.find(".artifactsMapRule").closest("li").remove();
 			}
-
-			//一直显示
-			//if(!Auth.list){
-			//	$resoucesNav.find(".artifactsMapRule").closest("li").remove();
-			//}
-			//映射规则库-规则模板-模块化/质量标准
-			switch(Auth.ruleModel){
-				case 1:{
-					break;
-				}
-				case 2:{
-					break;
-				}
-				case 3:{
-					break;
-				}
-			}
-
-
 		}
 
 

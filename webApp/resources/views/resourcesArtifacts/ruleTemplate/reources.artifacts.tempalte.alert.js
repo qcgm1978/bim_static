@@ -48,6 +48,7 @@ App.Resources.ArtifactsPlanRuleAlert = Backbone.View.extend({
                      });
 
                      App.ResourceArtifacts.Status.templateId = null;
+                     //刷新右侧视图  //清空所有选项
                 }else{
                      alert("删除失败");
                  }

@@ -42,11 +42,38 @@ App.Resources.ArtifactsTplListItem = Backbone.View.extend({
         detail.$(".tplDetailCon").append(pre.render().el);//菜单
         pre.$(".plans").html(plans.render().el);//计划节点
         pre.$(".rules .ruleContent").html(planRule.render().el);//映射规则
-        $("#artifacts").addClass("tpl");
+        $("#artifacts").addClass("tpl");//此处为修正样式表现
 
         //修改内容
         $(".tplDetailTitle h2").text(this.model.get("name"));
         $(".tplDetailTitle .tplName").val(this.model.get("name"));
+
+        //获取列表
+
+        App.ResourceArtifacts.getPlan();//获取计划节点
+
+        this.getTplRule();
+
+    },
+
+    //获取模板规则列表
+    getTplRule:function(){
+        var pdata = {
+            URLtype:"fetchArtifactsTemplateRule",
+            data:{
+                templateId : App.ResourceArtifacts.Status.templateId
+            }
+        };
+        App.Comm.ajax(pdata,function(response){
+                if(response.code == 0 && response.data){
+                    if(response.data.length){
+                        console.log(response);
+                        //按照ruleId查找rule，将对应节点设置为可编辑状态
+                    }else{
+                        //没有任何列表
+                    }
+                }
+        })
     },
 
     //切换

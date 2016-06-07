@@ -137,6 +137,9 @@ var AppRoute = Backbone.Router.extend({
 		App.ResourcesNav.Settings.type = type;
 		App.ResourcesNav.Settings.optionType = optionType;
 		new App.ResourcesNav.App().render();
+
+
+		App.ResourceArtifacts.Settings.ruleModel = 3;  //权限入口，模块化，质量标准
 		$(".breadcrumbNav .mappingRule").show();
 		$("#pageLoading").hide();
 	},
