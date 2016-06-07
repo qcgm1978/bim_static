@@ -174,12 +174,18 @@
 }
 
 .modelSelectDialog{position:fixed;z-index:9;left:0;top:0;bottom:0;right:0;background:rgba(255,255,255,0);
+  *,*:after,*:before{box-sizing:border-box;}
   .dialogBody{width:960px;background:#fff;color:#797979;border:1px solid #eaeaea;border-radius:3px;
     .dialogHeader{border-bottom:1px solid #eaeaea;
       .dialogClose{color:#d6d6d6;font-size:24px;}
     }
-    .dialogFooter{border-top:1px solid #eaeaea;
-      .dialogBtn{width:80px;height:30px;font-size:14px;margin-left:20px;border:1px solid #fff;background:#333;outline:none;}
+    .dialogContent{
+      &:after{content:'';display:table;clear:both;}
+      .model{width:760px;height:500px;float:left;}
+      .rightEnter{width:200px;float:right;}
+    }
+    .dialogFooter{padding:10px 20px 20px;border-top:1px solid #eaeaea;
+      .dialogBtn{color:#fff;background:#117EE1;}
     }
   }
 }
