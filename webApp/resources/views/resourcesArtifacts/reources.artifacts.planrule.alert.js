@@ -32,13 +32,14 @@ App.Resources.ArtifactsPlanRuleAlert = Backbone.View.extend({
             //直接删除末尾内容
             $(".ruleContent>ul>li").last().remove();
             App.Resources.ArtifactsAlertWindow.close();
+            $(".artifactsContent .rules").removeClass("services_loading");
             App.ResourceArtifacts.Status.saved = true;
             return
         }
 
         //非新建
         $.ajax({
-            url:"http://bim.wanda-dev.cn/platform/mapping/rule/delete/" + id,
+            url:"http://bim.wanda-dev.cn/platform/mapping/rule/delete/" + id + "?projectId="+ App.ResourceArtifacts.Status.projectId,
             type:"DELETE",
             success:function(response){
                  if(response.code==0){ //删除成功
@@ -62,11 +63,10 @@ App.Resources.ArtifactsPlanRuleAlert = Backbone.View.extend({
 
                      $(".artifactsContent .rules h2 .name").html(App.ResourceArtifacts.Status.rule.targetCode + "&nbsp;" +App.ResourceArtifacts.Status.rule.targetName);
                      $(".artifactsContent .rules h2 i").html( "("+_this.get("count") + ")");
-
-                     App.Resources.ArtifactsAlertWindow.close();
                 }else{
                      alert("删除失败");
                  }
+                App.Resources.ArtifactsAlertWindow.close();
                 $(".artifactsContent .rules").removeClass("services_loading");
             },
             error:function(error){
