@@ -143,29 +143,17 @@ App.Services.addKeyUser = Backbone.View.extend({
 
         this.$el.find('.confirm').show();
 
-        this.$el.find('.leftWindow').html(new App.Services.step1().render('step3').el);
-        this.$el.find('.leftWindow').append(new App.Services.step3().render().el);
+        this.$el.find('.leftWindow').html(new App.Services.fam().render().el);
 
-        App.Services.KeyUser.loadData(App.Services.KeyUser.Step1, '', function(r){
-
-          if(r && !r.code && r.data){
-            _.each(r.data.org, function(data, index){
-              data.shut    = true;
-              data.canLoad = true;
-            });
-            App.Services.KeyUser.Step1.set(r.data.org);
-          }
-        });
-        App.Services.KeyUser.loadData(App.Services.KeyUser.Step3, '', function(r){
+        App.Services.KeyUser.loadData(App.Services.KeyUser.fam, '', function(r){
 
           if(r && !r.code && r.data){
-            _.each(r.data.org, function(data, index){
-              data.shut    = true;
-              data.canLoad = true;
-            });
-            App.Services.KeyUser.Step3.set(r.data.org);
+            console.log(r)
+
+            App.Services.KeyUser.fam.set(r.data.items);
           }
         });
+
         //遍历本身存在的部门数据添加到右边窗口
         var str = '',orgs=App.Services.KeyUser.fakedata.org,orgid=App.Services.KeyUser.editorgId=[];
         for(var i=0;i<orgs.length;i++){

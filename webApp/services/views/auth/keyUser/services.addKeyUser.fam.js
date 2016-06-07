@@ -4,7 +4,7 @@ App.Services.fam = Backbone.View.extend({
 
   tagName:'div',
 
-  className:'fam',
+  className:'fams',
 
   template:_.templateUrl("/services/tpls/auth/keyUser/services.addKeyUser.fam.html"),
 
