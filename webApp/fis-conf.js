@@ -100,6 +100,10 @@ fis.match('todo/**.html', {
   //useHash:true,
   release: "/static/dist/tpls/$0"
 });
+fis.match('imbox/**.html', {
+  //useHash:true,
+  release: "/static/dist/tpls/$0"
+});
 fis.match('app/**.html', {
   //useHash:true,
   release: "/static/dist/$0"
@@ -194,6 +198,17 @@ fis.match('/todo/**.{js,es6}', {
 fis.match('/todo/**.{less,css}', {
   //useHash:true,
   packTo: '/static/dist/todo/todo_' + v + '.css'
+});
+
+// 消息中心
+fis.match('/imbox/**.{js,es6}', {
+  //useHash:true,
+  packTo: '/static/dist/imbox/imbox_' + v + '.js'
+});
+
+fis.match('/imbox/**.{less,css}', {
+  //useHash:true,
+  packTo: '/static/dist/imbox/imbox_' + v + '.css'
 });
 
 fis.match('/router/**.{js,es6}', {

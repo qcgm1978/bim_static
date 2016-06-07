@@ -1,0 +1,6 @@
+<% _.each(data,function(item){ %>
+<li>
+	<span class="title"><i></i><a href='<%=item.url%>' target='_blank'><%=item.content%></a></span>
+	<span class="time"><%=item.createStmp||new Date().format('yyyy-MM-dd hh:mm:ss')%></span>
+</li>
+<% }) %>
