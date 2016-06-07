@@ -20,30 +20,30 @@ App.Resources.ArtifactsTplDetail = Backbone.View.extend({
         this.listenTo(this.model,"change",this.render);
     },
 
-    //取得规则列表
-    getPlanId:function(){
+    //取得模板
+    getTpl:function(){
+        App.ResourceArtifacts.Status.templateId = this.model.get("id");//保存id
 
-        //刷新右面列表
-        App.ResourceArtifacts.Status.rule.templateId  = "";
-         App.ResourceArtifacts.Status.rule.targetCode = this.model.get("code");
-        App.ResourceArtifacts.Status.rule.targetName = this.model.get("name");
+        //保存状态
         if(!App.ResourceArtifacts.Status.saved){
             alert("您还有没保存的");
             return
         }
-        App.ResourceArtifacts.loading($(".rules"));
         this.toggleClass();
-        this. getRules();
 
-        App.ResourceArtifacts.Status.presentPlan = null;
-        App.ResourceArtifacts.Status.presentPlan = this.model;
+        //重置右侧列表
+        //this. getRules();
+
     },
-//切换计划
+
+    //切换
     toggleClass:function(){
-        $(".modelListContainer li").removeClass("active");
+        $(".tplCon li").removeClass("active");
         this.$el.addClass("active");
     },
-//获取计划节点相关规则
+
+
+//获取模板
     getRules:function() {
         var _this = this;
         var pdata = {

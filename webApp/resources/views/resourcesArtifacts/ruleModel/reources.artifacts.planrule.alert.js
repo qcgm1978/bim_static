@@ -58,7 +58,6 @@ App.Resources.ArtifactsPlanRuleAlert = Backbone.View.extend({
                              $(item).closest("li").remove();
                          }
                      });
-                     //847958938484928
 
                      var _this = App.ResourceArtifacts.Status.presentPlan;
 

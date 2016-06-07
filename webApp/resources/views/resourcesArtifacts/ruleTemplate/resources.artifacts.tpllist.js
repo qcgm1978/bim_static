@@ -43,7 +43,7 @@ App.Resources.ArtifactsTplList = Backbone.View.extend({
             return
         }
 
-        var frame = ""; //新建模板
+        var frame = new App.Resources.ArtifactsWindowTpl().render().el; //新建模板
         this.window(frame);
     },
 

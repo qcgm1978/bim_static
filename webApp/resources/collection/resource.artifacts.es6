@@ -233,8 +233,6 @@ App.ResourceArtifacts={
             tplFrame.$(".modelListContainer").html(tplList.render().el);
             this.getTpl();
 
-
-
             $("#pageLoading").hide();
         }else if(optionType == "library"){
             App.ResourceArtifacts.Status.rule.biz =1;  //设置默认规则为模块化

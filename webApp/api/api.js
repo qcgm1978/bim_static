@@ -194,7 +194,9 @@ App.API = {
 		//质量标准
 		fetchArtifactsQuality:"platform/mapping/rule/quality/standard", //获取质量标准1级  platform/mapping/rule/quality/standard?type={type}&standardType=={KY|GC}
 		//规则模板
-		fetchArtifactsTemplate: "dataJson/resources/fetchArtifactsTplList.json", //模板列表 //platform/rule/template/select/all
+		fetchArtifactsTemplate: "platform/rule/template/select/all", //模板列表 //platform/rule/template/select/all
+		createArtifactsTemplate: "platform/rule/template/create", //模板列表
+		fetchArtifactsTemplateRule: "platform/rule/template/select/rule/{templateId}", //模板规则列表  platform/rule/template/select/rule/{templateId}
 
 		//项目 变更 列表
 		fileList:"doc/internal/{projectId}/{versionId}/differ", //变更列表
