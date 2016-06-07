@@ -52,10 +52,10 @@ App.Services.System.FolwContainerListDetail = Backbone.View.extend({
 	listMove($target, dirc) {
 
 		var nextId;
-		if (dirc=="up") {
-			nextId=$target.prev().data("id");
-		}else{
-			nextId=$target.next().data("id");
+		if (dirc == "up") {
+			nextId = $target.prev().data("id");
+		} else {
+			nextId = $target.next().data("id");
 		}
 
 		var id = $target.data("id"),
@@ -63,7 +63,7 @@ App.Services.System.FolwContainerListDetail = Backbone.View.extend({
 			data = {
 				URLtype: "servicesFolwMove",
 				data: {
-					ids: id+","+nextId,
+					ids: id + "," + nextId,
 					type: dirc == 'up' ? 0 : 1
 				}
 			}
@@ -113,7 +113,7 @@ App.Services.System.FolwContainerListDetail = Backbone.View.extend({
 	//移动完成之后
 	afterMove() {
 
-		var $flowListBodyLi=$("#systemContainer .flowListBody li");
+		var $flowListBodyLi = $("#systemContainer .flowListBody li");
 		$flowListBodyLi.find(".myIcon-up-disable").toggleClass("myIcon-up myIcon-up-disable").end().find(".myIcon-down-disable").toggleClass("myIcon-down myIcon-down-disable").end().
 		first().find(".myIcon-up").toggleClass("myIcon-up myIcon-up-disable").end().end().last().find(".myIcon-down").toggleClass("myIcon-down myIcon-down-disable");
 		//重新生成 索引
@@ -228,22 +228,43 @@ App.Services.System.FolwContainerListDetail = Backbone.View.extend({
 	delFolw() {
 
 		var text = _.templateUrl('/services/tpls/system/category/system.category.del.html', true),
+		
 			$target = $(event.target),
+
 			that = this,
-			opts = {
-				width: 284,
-				height: 180,
-				showTitle: false,
-				cssClass: "delConfirm",
-				showClose: false,
-				isAlert: false,
-				isConfirm: false
-			},
+
+			id = $target.closest(".item").data("id"),
+
 			msg = "确认要删除" + $target.closest(".item").find(".name").text().trim() + "流程吗？";
 
 		opts.message = text.replace('#title', msg);
-		var confirmDialog = new App.Comm.modules.Dialog(opts);
-		this.delFlowEvent(confirmDialog, $target.closest(".item").data("id"));
+
+
+
+		//var confirmDialog = new App.Comm.modules.Dialog(opts);
+
+		App.Services.Dialog.alert(msg, function(dialog) {
+
+			var data = {
+				URLtype: "servicesFlowDel",
+				data: {
+					id: id
+				}
+			};
+
+			App.Comm.ajax(data, (data) => {
+				if (data.code == 0) {
+
+					that.model.destroy();
+
+					dialog.close();
+				}
+
+			});
+
+		});
+
+		//this.delFlowEvent(confirmDialog, $target.closest(".item").data("id"));
 
 	},
 	//删除时间
@@ -287,14 +308,21 @@ App.Services.System.FolwContainerListDetail = Backbone.View.extend({
 
 	//销毁
 	removeModel() {
+
 		var $parent = this.$el.parent();
 		if ($parent.find("li").length <= 1) {
 			$parent.append('<li class="loading">无数据</li>');
 		}
-		this.remove();
+
 		$parent.find("li").each(function(i, item) {
-			$(this).find(".code").text(i + 1)
+			$(this).find(".code").text(i + 1);
 		});
+
+		//删除
+		this.remove();
+
+		//移动过后
+		this.afterMove();
 	}
 
 
