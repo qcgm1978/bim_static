@@ -8,7 +8,7 @@
 	   <% for(var j=0;j<provinceCount;j++){%>
 	   		<% province=provinces[j]; %>
 
-	    	<a href="#projects/<%=province.id%>/<%=province.version && province.version.id || 'noVersion' %>" class="item"> <%= province.name%></a>
+	    	<a href="#projects/<%=province.id%>/<%=province.version && province.version.id || 'noVersion' %>" class="item" title='<%= province.name%>'> <%= province.name%></a>
 	    <% } %>
 	<% } %> 
 </div>
