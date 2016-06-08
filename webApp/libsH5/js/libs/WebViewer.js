@@ -1,6 +1,7 @@
 /**
 * @require /libsH5/js/libs/three.min.js
 */
+
 var CLOUD = CLOUD || {};
 CLOUD.Version = "20160604";
 
@@ -8326,22 +8327,22 @@ CLOUD.Mesh.prototype.unload = function () {
     if (!this.meshId)
         return;
 
-    if (this.geometry.refCount === undefined)
+    var geometry = this.geometry;
+    if (geometry.refCount === undefined)
         return;
 
     if (this.loaded == 0)
         return;
 
     this.loaded = 0;
-    this.geometry.refCount -= 1;
+    geometry.refCount -= 1;
 
-    if (this.geometry.refCount <= 0) {
+    if (geometry.refCount <= 0) {
 
-        this.geometry.refCount = 0;
-        if(this.geometry.symbol === undefined)
-            this.geometry.dispose();
+        geometry.refCount = 0;
+        if (geometry.symbol === undefined)
+            geometry.dispose();
     }
-
 }
 
 CLOUD.Mesh.prototype.load = function () {
@@ -10682,7 +10683,8 @@ CLOUD.RectPickEditor.prototype.onMouseDown = function (event) {
 CLOUD.RectPickEditor.prototype.onMouseMove = function (event) {
 
     event.preventDefault();
-    if (!event.shiftKey && event.button === THREE.MOUSE.LEFT) {
+    var allowRectPick = event.shiftKey || event.ctrlKey || event.altKey;
+    if (allowRectPick && event.button === THREE.MOUSE.LEFT) {
 
         this.endPt.set(event.clientX, event.clientY);
         this.udpateFrustum(true);
@@ -10698,7 +10700,8 @@ CLOUD.RectPickEditor.prototype.onMouseUp = function (event) {
 
     this.onUpdateUI({ visible: false });
 
-    if (!event.shiftKey && event.button === THREE.MOUSE.LEFT) {
+    var allowRectPick = event.shiftKey || event.ctrlKey || event.altKey;
+    if (allowRectPick && event.button === THREE.MOUSE.LEFT) {
 
         this.endPt.set(event.clientX, event.clientY);
         if (!this.udpateFrustum()) {
@@ -10707,6 +10710,7 @@ CLOUD.RectPickEditor.prototype.onMouseUp = function (event) {
         }
 
         var state = CLOUD.OPSELECTIONTYPE.Clear;
+
         if (event.ctrlKey) {
             state = CLOUD.OPSELECTIONTYPE.Add;
         }
@@ -16181,8 +16185,6 @@ CLOUD.SceneLoader.prototype = {
 
                         object.client = client;
 
-                        object.client = client;
-
                         CLOUD.GeomUtil.parseSceneNode(object, objJSON, scope.manager, level);
 
                         parent.add(object);
@@ -16711,10 +16713,11 @@ CLOUD.TaskWorker = function (threadCount, finishCallback) {
             items.sort(sorter);
         }
 
-        itemCount = Math.min(itemCount, 50);
+        itemCount = Math.min(itemCount, 40);
 
         var TASK_COUNT = Math.min(this.MaxThreadCount, itemCount);
         scope.doingCount = itemCount;
+
         function processItem(i) {
 
             if (i >= itemCount) {
@@ -18418,15 +18421,15 @@ CloudViewer.prototype = {
             CLOUD.GlobalData.CellVisibleLOD = 15;
         }
         else if (totalCount < 10000) {
-            CLOUD.GlobalData.SubSceneVisibleLOD = 800;
-            CLOUD.GlobalData.CellVisibleLOD = 800;
+            CLOUD.GlobalData.SubSceneVisibleLOD = 200;
+            CLOUD.GlobalData.CellVisibleLOD = 200;
             CLOUD.GlobalData.ScreenCullLOD = 0.0001;
             CLOUD.GlobalData.GarbageCollection = false;
 
         }
         else if (totalCount < 100000) {
-            CLOUD.GlobalData.SubSceneVisibleLOD = 200;
-            CLOUD.GlobalData.CellVisibleLOD = 500;
+            CLOUD.GlobalData.SubSceneVisibleLOD = 100;
+            CLOUD.GlobalData.CellVisibleLOD = 150;
             CLOUD.GlobalData.ScreenCullLOD = 0.0001;
             CLOUD.GlobalData.GarbageCollection = false;
         }
@@ -18557,11 +18560,11 @@ CloudViewer.prototype = {
         CLOUD.MiniMap.setFloorPlaneData(jsonObj);
     },
 
-    generateFloorPlane: function(name) {
+    generateFloorPlane: function(name, changeView) {
         var miniMap = this.miniMaps[name];
 
         if (miniMap) {
-            miniMap.generateFloorPlane();
+            miniMap.generateFloorPlane(changeView);
         }
     },
 

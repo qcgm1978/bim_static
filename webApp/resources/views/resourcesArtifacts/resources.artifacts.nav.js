@@ -29,12 +29,14 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
             return
         }
 
+        //如果当前是规则模板存在
+        //if(){}
+
+
         //重置数据，导致每次重新获取映射规则
         //需要清空当前列表
         //this.$(".ruleContent ul").html("<li><div class='ruleTitle delt'>没有选择模块/质量标准</div></li>");
-
         if(pre.hasClass("modularization")){//模块化
-
             App.ResourceArtifacts.Status.rule.biz = 1 ;
             this.$(".qualifyC").empty().hide();
             var plans = new App.Resources.ArtifactsPlanList();
@@ -86,11 +88,11 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
     newPlanRule:function(){
         var _this = this;
         var targetCode = App.ResourceArtifacts.Status.rule.targetCode;
+
         if(!targetCode){
             alert("请选择模块/质量标准");
             return;
         }//没有选择计划无法创建规则
-
         if( !App.ResourceArtifacts.Status.saved){
             alert("您还有没保存的");
             //查找未保存的元素并高亮提示变红
@@ -101,8 +103,9 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
         }
         //无数据或无更改，更改当前数据
         $(".ruleDetail:visible").hide();
-        //创建规则
 
+
+        //创建规则
         var model =  App.ResourceArtifacts.createPlanRules();
 
         var container = new App.Resources.ArtifactsPlanRuleDetail({model:model}).render();

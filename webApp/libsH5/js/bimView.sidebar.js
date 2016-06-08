@@ -209,7 +209,7 @@
           }
         });
         self.el._dom.sidebar.find('.modelMap').append(self.el._dom.mapBar);
-        self.el._dom.sidebar.find(".modelItem:eq(0)").trigger('click');
+        self.el._dom.sidebar.find(".modelItem:eq(0)").trigger('click',true);
       }
     },
     getSelected:function(viewer){
