@@ -23,6 +23,7 @@ App.API = {
 		fetchBodyContentSlide :'dataJson/bodyContent/bodyContent.slide.json',
 		fetchBodyContentMmhSlide :'platform/project',
 		fetchBodyContentProclamation :'platform/notice',
+		fetchBodyContentNotice :'platform/notice/find',
 
 		//services
 		fetchServicesRolesList:'platform/auth/role',//角色列表
@@ -39,6 +40,7 @@ App.API = {
 		deleteServicesRoleSingle:"platform/role?",//删除角色
 		putServicesProjectMembers:"platform/auth/dataPrivilege/grant",//添加项目成员
 		deleteServicesProjectMembers:"platform/auth/{memberType}/{userId}/dataPrivilege",//删除项目成员
+		checkDelAuth:"platform/auth/keyUser/user/check",//删除项目成员
 		
 		//项目详细信息-创建
 		fetchProjectCreateBaseHole:'platform/pit/createPit',

@@ -225,7 +225,10 @@ App.ResourceArtifacts={
     })),
 
     init:function(_this,optionType) {
+
+        _this.$el.append( new App.Resources.ArtifactsIndexNav().render().el);
         if(optionType == "template" ){
+            $(".mappingRule .template").addClass("active").siblings("a").removeClass("active");
             //规则模板
             $(".breadcrumbNav .mappingRule").show();
             var tplFrame = new App.Resources.ArtifactsTplFrame();
@@ -236,6 +239,7 @@ App.ResourceArtifacts={
 
             $("#pageLoading").hide();
         }else if(optionType == "library"){
+            $(".mappingRule .library").addClass("active").siblings("a").removeClass("active");
             App.ResourceArtifacts.Status.rule.biz =1;  //设置默认规则为模块化
             var pre = new App.Resources.ArtifactsMapRule();  //外层菜单
             var plans = new App.Resources.ArtifactsPlanList();   //模块化列表 /计划节点

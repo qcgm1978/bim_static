@@ -20,7 +20,8 @@ var AppRoute = Backbone.Router.extend({
 		'services/:type/:tab': 'services',
 		'list/:id': 'list',
 		'bodyContent': 'bodyContent',
-		'logout': 'logout'
+		'logout': 'logout',
+		"post/detail/:id":'postDetail'
 	},
 	//首页主体展示
 
@@ -63,7 +64,11 @@ var AppRoute = Backbone.Router.extend({
 		_.require('/static/dist/imbox/imbox.js');
 		App.IMBox.init();
 	},
-
+	postDetail:function(id){
+		_.require('/static/dist/bodyContent/bodyContent.css');
+		_.require('/static/dist/bodyContent/bodyContent.js');
+		App.BodyContent.control.post(id);
+	},
 	//项目
 	projects: function() {
 		this.reset();

@@ -188,13 +188,14 @@
     },
     dialog:function(options){
       var defaults = {
+        width:500,
         title:"系统提示",
         content:"",
         okText:"确定",
         callback:null
       };
       var _opt = $.extend({},defaults,options);
-      var dialog = $('<div class="modelDialog"><div class="dialogBody"><div class="dialogHeader">'+_opt.title+'<span class="dialogClose"></span></div><div class="dialogContent"></div><div class="dialogFooter"><input type="button" class="dialogOk dialogBtn" value="'+_opt.okText+'"/></div></div></div>');
+      var dialog = $('<div class="modelDialog"><div class="dialogBody" style="width:'+ _opt.width +'px;"><div class="dialogHeader">'+_opt.title+'<span class="dialogClose"></span></div><div class="dialogContent"></div><div class="dialogFooter"><input type="button" class="dialogOk dialogBtn" value="'+_opt.okText+'"/></div></div></div>');
       dialog.find(".dialogContent").append(_opt.content);
       dialog.find(".dialogFooter").prepend(_opt.footer);
       $('body').append(dialog);
