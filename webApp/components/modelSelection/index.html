@@ -11,13 +11,14 @@
 <input type="button" id="model" value="show">
 <script>
 $(function(){
-  $('#model').on('click',function(){
-    new ModelSelection({
+  var viewer;
+    viewer = new ModelSelection({
       sourceId: '848069790540000',
       etag: "ca4863cf122ac55b5a8e845595aeb7ce",
       projectId:'1',
       projectVersionId: '784306105035931'
     });
+  $('#model').on('click',function(){
   })
 })
 </script>

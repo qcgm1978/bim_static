@@ -222,16 +222,8 @@
 
 					} else if (type == "save") {
 						//保存
-						App.Project.Settings.Viewer.comment();
-
-						var topSaveHtml = _.templateUrl('/libsH5/tpls/comment/bimview.top.save.tip.html', true);
-
-						$("body").append(topSaveHtml);
-						//保存事件
-						CommentApi.saveCommEvent();
-
+						CommentApi.saveCommentStart(null, 'viewPoint', null);
 					}
-
 				}
 
 			}),
@@ -631,6 +623,8 @@
 					"blur .txtReMark": "outReMark", //失去焦点
 					"click .iconShare": "share", //分享
 					"click .iconEdit": "reNameViewPoint", //编辑视点
+					"click .btnAdress": "address", //地址
+					"click .btnCommViewPoint": "commentViewPoint",
 					"click .btnLogin": "login" //登陆
 				},
 
@@ -647,7 +641,28 @@
 				render() {
 					//模板
 					this.$el.html(this.template);
+					this.$(".txtReMark").at();
 					return this;
+				},
+
+				//评论视点
+				commentViewPoint() { 
+
+					CommentApi.saveCommentStart(null, "commentViewPoint", (data) => {
+						//上传地址或者评论视点后
+						CommentApi.afterUploadAddressViewPoint.call(this,data);
+					});
+				},
+
+				//保存位置
+				address() { 
+					
+					//直接保存
+					CommentApi.saveCommentStart(null, "address", (data) => {
+						//上传地址或者评论视点后
+						CommentApi.afterUploadAddressViewPoint.call(this,data);
+					});
+					$("#topSaveTip .btnSave").click();
 				},
 
 				//编辑批注
@@ -935,8 +950,20 @@
 
 		CommentApi = {
 
+			//开始保存批注
+			saveCommentStart(viewPointId, cate, callback) {
+				//保存
+				App.Project.Settings.Viewer.comment();
+
+				var topSaveHtml = _.templateUrl('/libsH5/tpls/comment/bimview.top.save.tip.html', true);
+
+				$(".modelContainerContent .commentBar").append(topSaveHtml);
+				//保存事件
+				CommentApi.saveCommEvent(viewPointId, cate, callback);
+			},
+
 			//绑定保存 批注事件
-			saveCommEvent(viewPointId) {
+			saveCommEvent(viewPointId, cate, callback) {
 
 				var $topSaveTip = $("#topSaveTip"),
 					that = this;
@@ -946,6 +973,7 @@
 
 					var data = App.Project.Settings.Viewer.saveComment(),
 						pars = {
+							cate: cate,
 							img: data.image
 						};
 
@@ -954,46 +982,58 @@
 						var $li = $comment.find(".remarkCount_" + viewPointId).closest(".item");
 
 						pars = {
+							cate: cate,
 							id: $li.find(".remarkCount").data("id"),
 							type: $li.find(".thumbnailImg").data("type"),
 							img: $li.find(".thumbnailImg").prop('src'),
-							name: $li.find(".title").text().trim(),
-							desc: $li.find(".desc").text().trim()
+							name: $li.find(".title").text().trim()
 						}
 					}
 
 
+					var title = "保存快照";
+
+					if (cate == "address") {
+						title = "保存位置";
+					} else if (cate == "comment") {
+						title = "保存批注";
+					}
+
 					var dialogHtml = _.templateUrl('/libsH5/tpls/comment/bimview.save.dialog.html')(pars),
 
 						opts = {
-							title: "保存快照",
+							title: title,
 							width: 500,
 							height: 250,
 							cssClass: "saveViewPoint",
 							okClass: "btnWhite",
 							cancelClass: "btnWhite",
 							okText: "保存",
+							closeCallback: function() {
+								if (cate != "viewPoint") {
+									App.Project.Settings.Viewer.commentEnd();
+								}
+							},
 							cancelText: "保存并分享",
 							message: dialogHtml,
 							okCallback: () => {
 								//保存批注
 								if (!viewPointId) {
-									that.saveComment("save", dialog, data);
+									that.saveComment("save", dialog, data, callback, cate);
 								} else {
 									data.id = viewPointId;
-									that.editComment("save", dialog, data, viewPointId);
+									that.editComment("save", dialog, data, viewPointId, callback, cate);
 								}
-
 
 								return false;
 							},
 							cancelCallback() {
-
+								//保存并分享
 								if (!viewPointId) {
-									that.saveComment("saveShare", dialog, data, CommentApi.shareViewPoint);
+									that.saveComment("saveShare", dialog, data, CommentApi.shareViewPoint, cate);
 								} else {
 									data.id = viewPointId;
-									that.editComment("saveShare", dialog, data, CommentApi.shareViewPoint);
+									that.editComment("saveShare", dialog, data, CommentApi.shareViewPoint, cate);
 								}
 
 								return false;
@@ -1003,6 +1043,11 @@
 						dialog = new App.Comm.modules.Dialog(opts),
 
 						$viewPointType = dialog.element.find(".viewPointType");
+
+					//分享按钮
+					if (cate != "viewPoint") {
+						dialog.element.find(".cancel").remove();
+					}
 
 					dialog.type = 1;
 					//视点类型
@@ -1029,7 +1074,7 @@
 			},
 
 			//保存批注
-			saveComment(type, dialog, commentData, callback) {
+			saveComment(type, dialog, commentData, callback, cate) {
 
 				if (dialog.isSubmit) {
 					return;
@@ -1046,12 +1091,6 @@
 					alert("请输入批注名称");
 					return false;
 				}
-
-				// if (!pars.description) {
-				// 	alert("请输入批注描述");
-				// 	return false;
-				// }
-
 				var data = {
 					URLtype: "createViewPoint",
 					data: JSON.stringify(pars),
@@ -1094,12 +1133,15 @@
 							if (imgData.code == 0 && annotationData.code == 0 && filterData.code == 0) {
 
 								imgData.data.isAdd = true;
-								//项目 
-								if ($comment.find(".navBar .project").hasClass("selected") && dialog.type == 1) {
-									CommentCollections.Project.push(imgData.data);
-								} else if ($comment.find(".navBar .user").hasClass("selected") && dialog.type == 0) {
-									//个人
-									CommentCollections.User.push(imgData.data);
+								//创建视点 才添加 colleciton
+								if (cate == "viewPoint") {
+									//项目 
+									if ($comment.find(".navBar .project").hasClass("selected") && dialog.type == 1) {
+										CommentCollections.Project.push(imgData.data);
+									} else if ($comment.find(".navBar .user").hasClass("selected") && dialog.type == 0) {
+										//个人
+										CommentCollections.User.push(imgData.data);
+									}
 								}
 
 								//关闭弹出层 取消编辑状态
@@ -1394,9 +1436,9 @@
 
 						var topSaveHtml = _.templateUrl('/libsH5/tpls/comment/bimview.top.save.tip.html', true);
 
-						$("body").append(topSaveHtml);
+						$(".modelContainerContent .commentBar").append(topSaveHtml);
 						//保存事件
-						CommentApi.saveCommEvent(viewPointId);
+						CommentApi.saveCommEvent(viewPointId, 'viewPoint');
 
 					}
 				})
@@ -1534,7 +1576,21 @@
 					}
 
 				return App.Comm.ajax(data);
+			},
+
+			//上传地址或者评论视点后
+			afterUploadAddressViewPoint(data) {
+
+				var imgLoadHTML = _.templateUrl('/libsH5/tpls/comment/upload.img.html', true);
+				this.$(".uploadImgs").append(imgLoadHTML);
+
+				this.$(".uploading:first").find(".talkImg").prop("src", "/" + data.pic).show().end().
+				find(".imgName").text(data.name).addClass("upload").end().
+				find(".delUploadImg").show().end().
+				data("id", data.id).removeClass("uploading").data("data", data);
+
 			}
+
 
 		}
 

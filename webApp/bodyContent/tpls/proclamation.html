@@ -1,2 +1,4 @@
-<div class="conInfo"><span class="receivedTime"><%= new Date(receivedTime).format("yyyy-MM-dd") %></span></div>
-<a href="<%= targetUrl %>" target="_blank" title="<%= desc %>"><%= desc %></a><% if(status == 1){%><span class="new"></span><%}%><!--为可能的需求保留链接-->
+<td>
+	<a href="#post/detail/<%= id %>"target="_blank"title="<%= content %>"data-pid='<%= id %>'><%= title %></a><% if(1 == 1) {%><span class="new"></span><%}%>
+</td>
+<td><span class="receivedTime"><%= new Date(createStmp).format("yyyy-MM-dd") %></span></td>

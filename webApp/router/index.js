@@ -3,7 +3,7 @@ var AppRoute = Backbone.Router.extend({
 	routes: {
 		'': 'bodyContent',
 		'todo': 'todo',
-		'imbox': 'imbox',
+		'inbox': 'inbox',
 		'projects': 'projects',
 		'projects/:id/:versionId': 'project',
 		'flow': 'flow',
@@ -20,7 +20,8 @@ var AppRoute = Backbone.Router.extend({
 		'services/:type/:tab': 'services',
 		'list/:id': 'list',
 		'bodyContent': 'bodyContent',
-		'logout': 'logout'
+		'logout': 'logout',
+		"post/detail/:id":'postDetail'
 	},
 	//首页主体展示
 
@@ -56,14 +57,18 @@ var AppRoute = Backbone.Router.extend({
 		App.Todo.init();
 	},
 	//消息中心
-	imbox: function() {
+	inbox: function() {
 		this.reset();
 		//加载css js
 		_.require('/static/dist/imbox/imbox.css');
 		_.require('/static/dist/imbox/imbox.js');
-		App.IMBox.init();
+		App.INBox.init();
 	},
-
+	postDetail:function(id){
+		_.require('/static/dist/bodyContent/bodyContent.css');
+		_.require('/static/dist/bodyContent/bodyContent.js');
+		App.BodyContent.control.post(id);
+	},
 	//项目
 	projects: function() {
 		this.reset();
@@ -197,9 +202,7 @@ var AppRoute = Backbone.Router.extend({
 	},
 
 	//重置数据
-	reset: function() {
-
-		$("#topSaveTip,#topSaveTipLine").remove();
+	reset: function() { 
 
 		if (!$._data($(".user > span")[0],"events")) {
 			//绑定用户信息

@@ -129,6 +129,7 @@ App.Projects.searchView = Backbone.View.extend({
 		var quickSearchName =encodeURI($(".quickSearch .txtSearch").val().trim()),
 			moreSearchName =encodeURI($('.moreSeachText').val().trim());
 		this.formData.name=moreSearchName||quickSearchName||'';
+		App.Projects.Settings.pageIndex=1;
  		App.Projects.loadData(this.formData); 
 
 	},

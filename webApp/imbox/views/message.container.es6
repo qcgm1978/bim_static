@@ -1,11 +1,11 @@
-App.IMBox=App.IMBox||{}
-App.IMBox.imboxContainerView=Backbone.View.extend({
+App.INBox=App.INBox||{}
+App.INBox.imboxContainerView=Backbone.View.extend({
 
 	template:_.templateUrl('./imbox/tpls/container.html',true),
 
 	initialize : function(){
-        this.listenTo(App.IMBox.messageCollection,"reset",this.renderData);
-        this.listenTo(App.IMBox.messageAllCollection,"reset",this.renderAllData);
+        this.listenTo(App.INBox.messageCollection,"reset",this.renderData);
+        this.listenTo(App.INBox.messageAllCollection,"reset",this.renderAllData);
     },
 
 	render(){
@@ -14,16 +14,17 @@ App.IMBox.imboxContainerView=Backbone.View.extend({
 	},
 
 	renderData(item){
+        var _data=item.toJSON()[0];
 		var _html=_.templateUrl('./imbox/tpls/list.html');
-		this.$('.commissionLists').html(_html({data:item.toJSON()}));
-        this.$(".commissionListPagination").empty().pagination(50, {
-             items_per_page:20,
-             current_page:1,
+		this.$('.commissionLists').html(_html({data:_data.items}));
+        this.$(".commissionListPagination").empty().pagination(_data.totalItemCount, {
+             items_per_page:_data.pageItemCount,
+             current_page:_data.pageIndex-1,
              num_edge_entries: 3, //边缘页数
              num_display_entries: 5, //主体页数
              link_to: 'javascript:void(0);',
              itemCallback: function(pageIndex) {
-                 App.IMBox.pageIndex = pageIndex + 1;
+                App.INBox.loadData('un',pageIndex + 1);
              },
              prev_text: "上一页",
              next_text: "下一页"
@@ -32,16 +33,17 @@ App.IMBox.imboxContainerView=Backbone.View.extend({
 	},
 
 	renderAllData(item){
+        var _data=item.toJSON()[0];
 		var _html=_.templateUrl('./imbox/tpls/list.html');
-		this.$('.alreadyLists').html(_html({data:item.toJSON()}));
-        this.$(".alreadyListPagination").empty().pagination(80, {
-             items_per_page:20,
-             current_page:1,
+		this.$('.alreadyLists').html(_html({data:_data.items}));
+        this.$(".alreadyListPagination").empty().pagination(_data.totalItemCount, {
+             items_per_page:_data.pageItemCount,
+             current_page:_data.pageIndex-1,
              num_edge_entries: 3, //边缘页数
              num_display_entries: 5, //主体页数
              link_to: 'javascript:void(0);',
              itemCallback: function(pageIndex) {
-                 App.IMBox.pageIndex = pageIndex + 1;
+                App.INBox.loadData('all',pageIndex + 1);
              },
              prev_text: "上一页",
              next_text: "下一页"

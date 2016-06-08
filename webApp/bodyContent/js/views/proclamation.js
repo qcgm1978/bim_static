@@ -4,7 +4,7 @@
 
 App.BodyContent.proclamationView = Backbone .View.extend({
 
-    tagName :  "li",
+    tagName :  "tr",
 
     event:{},
 
