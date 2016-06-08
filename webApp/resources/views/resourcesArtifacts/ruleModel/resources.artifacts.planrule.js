@@ -3,9 +3,9 @@
  */
 App.Resources.ArtifactsPlanRule = Backbone.View.extend({
 
-    tagName:"ul",
+    tagName:"div",
 
-    template: _.templateUrl("/resources/tpls/resourcesArtifacts/ruleModel/resources.artifacts.planrule.html"),
+    template: _.templateUrl("/resources/tpls/resourcesArtifacts/ruleModel/resources.artifacts.planrule.html",true),
 
     events:{},
 
@@ -21,7 +21,7 @@ App.Resources.ArtifactsPlanRule = Backbone.View.extend({
 
     addOne:function(model) {
         var newList = new App.Resources.ArtifactsPlanRuleDetail({model: model});
-        this.$el.append(newList.render().el);
+        this.$el.append(newList.render().el);   /*为什么换成this.$(".ruleContentRuleList ul")就会出错～～～～·*/
     }
 
 });

@@ -21,7 +21,12 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
     },
 
     //取得规则列表
-    getPlanId:function(){
+    getPlanId:function(e){
+        var $this = $(e.target);
+        if($this.closest("li").hasClass("active")){
+            return
+        }
+
          App.ResourceArtifacts.Status.rule.targetCode = this.model.get("code");
         App.ResourceArtifacts.Status.rule.targetName = this.model.get("name");
         if(!App.ResourceArtifacts.Status.saved){

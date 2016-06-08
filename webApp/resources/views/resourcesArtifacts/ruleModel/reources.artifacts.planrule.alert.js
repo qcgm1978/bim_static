@@ -41,12 +41,15 @@ App.Resources.ArtifactsPlanRuleAlert = Backbone.View.extend({
             url:"http://bim.wanda-dev.cn/platform/mapping/rule/delete/" + id + "?projectId="+ App.ResourceArtifacts.Status.projectId,
             type:"DELETE",
             success:function(response){
+                console.log(response);
                  if(response.code==0){ //删除成功
                      $(".ruleDetail").hide();
                      App.ResourceArtifacts.Status.saved = true ;//保存状态
                      var pre = App.ResourceArtifacts.PlanRules.filter(function(item){
                          return item.get("id") == id;
                      });
+                     App.ResourceArtifacts.PlanRules.remove(pre);
+
                      _.each($(".ruleTitle"),function(item){
                          if(parseInt($(item).attr("data-id")) == id){
                              $(item).closest("li").remove();
@@ -62,6 +65,8 @@ App.Resources.ArtifactsPlanRuleAlert = Backbone.View.extend({
                 $(".artifactsContent .rules").removeClass("services_loading");
             },
             error:function(error){
+                App.Resources.ArtifactsAlertWindow.close();
+                $(".artifactsContent .rules").removeClass("services_loading");
                 alert("错误类型"+ error.status +"，无法成功删除!");
             }
         });
