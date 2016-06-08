@@ -203,7 +203,7 @@
         // 点击下拉
         var $this = $(this);
         $this.toggleClass('open');
-      }).on('click','.modelItem',function(){
+      }).on('click','.modelItem',function(event,flag){
         // 点击下拉框选择
         var filterData = bimView.comm.filterData;
         var $this = $(this),
@@ -220,7 +220,7 @@
         }else{
           self.curFloor = text;
           self.curFloorData = data;
-          self.setFloorMap(data,"miniMap");
+          self.setFloorMap(data,"miniMap",!flag);
         }
       }).on('click','.m-openTree,.m-closeTree',function(){
         // 展开关闭树
