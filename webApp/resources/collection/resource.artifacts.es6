@@ -12,8 +12,6 @@ App.ResourceArtifacts={
         projectId : "",//如果有项目规则就有项目id
         templateId:"",
         templateName:"",
-        //模块化
-        plan:{},
         rule:{
             biz:"",//1：模块化；2：质监标准
             type : "", //1:标准规则；2：项目规则
@@ -238,35 +236,49 @@ App.ResourceArtifacts={
     init:function(_this,optionType) {
 
         _this.$el.append( new App.Resources.ArtifactsIndexNav().render().el);
-        if(optionType == "template" ){
+
+        //公用组件
+        this.menu = new App.Resources.ArtifactsMapRule();  //外层菜单
+        this.plans = new App.Resources.ArtifactsPlanList();   //模块化列表 /计划节点
+        this.planRule = new App.Resources.ArtifactsPlanRule();  //规则
+        this.quality = new App.Resources.ArtifactsQualityList();//质量标准，外层
+        this.plans.planRule = this.menu;
+        this.menu.quality = this.quality;
+        this.menu.plans = this.plans;
+
+
+        if(optionType == "template" ){//规则模板
             $(".mappingRule .template").addClass("active").siblings("a").removeClass("active");
-            //规则模板
+
             $(".breadcrumbNav .mappingRule").show();
-            var tplFrame = new App.Resources.ArtifactsTplFrame();
-            var tplList = new App.Resources.ArtifactsTplList();
-            _this.$el.append(tplFrame.render().el);//菜单
-            tplFrame.$(".tplListContainer").html(tplList.render().el);
+            this.tplFrame = new App.Resources.ArtifactsTplFrame();
+            this.tplList = new App.Resources.ArtifactsTplList();
+
+
+            _this.$el.append(this.tplFrame.render().el);//菜单
+            this.tplFrame.$(".tplListContainer").html(this.tplList.render().el);
+
+
             this.getTpl();
 
-            $("#pageLoading").hide();
-        }else if(optionType == "library"){
+        }else if(optionType == "library"){//规则库
             $(".mappingRule .library").addClass("active").siblings("a").removeClass("active");
             App.ResourceArtifacts.Status.rule.biz =1;  //设置默认规则为模块化
-            var pre = new App.Resources.ArtifactsMapRule();  //外层菜单
-            var plans = new App.Resources.ArtifactsPlanList();   //模块化列表 /计划节点
-            var planRule = new App.Resources.ArtifactsPlanRule();  //默认规则
 
-            _this.$el.append(pre.render().el);//菜单
-            pre.$(".plans").html(plans.render().el);//计划节点
-            pre.$(".rules .ruleContent").html(planRule.render().el);//映射规则
+
+            _this.$el.append(this.menu.render().el);//菜单
+            this.menu.$(".plans").html(this.plans.render().el);//计划节点
+            this.menu.$(".rules").html(this.planRule.render().el);//映射规则
 
             //插入默认为空的规则列表
             this.getPlan();
-            $("#pageLoading").hide();
             this.loaddeaprt();
             $(".mappingRule").show();
         }
     },
+
+
+
     //获取分类编码
     loaddeaprt:function(){
         //获取分类编码
@@ -282,7 +294,7 @@ App.ResourceArtifacts={
     },
     //获取计划节点
     getPlan:function(){
-        var _this = this, pdata;
+        var _this = App.ResourceArtifacts, pdata;
         App.ResourceArtifacts.Status.type =1 ;
         pdata  = {
             URLtype:"fetchArtifactsPlan",
@@ -355,33 +367,13 @@ App.ResourceArtifacts={
         }
     },
     loading:function(ele){
-        $(ele).addClass(".services_loading");
+        $(ele).addClass("services_loading");
     },
 
     loaded:function(ele){
-        $(ele).removeClass(".services_loading");
+        $(ele).removeClass("services_loading");
     },
     resetRuleList:function(){
         $(".ruleContent ul").html("<li><div class='ruleTitle delt'>暂无内容</div></li>");
-    },
-
-    //获取模板规则列表
-    getTplRule:function(){
-        var pdata = {
-            URLtype:"fetchArtifactsTemplateRule",
-            data:{
-                templateId : App.ResourceArtifacts.Status.templateId
-            }
-        };
-        App.Comm.ajax(pdata,function(response){
-            if(response.code == 0 && response.data){
-                if(response.data.length){
-                    App.ResourceArtifacts.TplCollectionRule.add(response.data);
-                }else{
-                    //没有任何规则时候，创建规则按钮
-                }
-            }
-        })
-    },
-
+    }
 };

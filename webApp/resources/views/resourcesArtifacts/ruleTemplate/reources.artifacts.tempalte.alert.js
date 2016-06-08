@@ -30,8 +30,6 @@ App.Resources.ArtifactsPlanRuleAlert = Backbone.View.extend({
             url:"http://bim.wanda-dev.cn/platform/rule/template/delete/" + templateId ,
             type:"DELETE",
             success:function(response){
-
-                console.log(response);
                  if(response.code == 0){ //删除成功
 
                      App.ResourceArtifacts.Status.saved = true ;//保存状态

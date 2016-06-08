@@ -23,7 +23,8 @@ App.Resources.ArtifactsWindowTpl = Backbone.View.extend({
     //确定
     sure : function(){
         var _this = this,pdata;
-        var name = $("#tplName").val();
+        var name = $("#artifactsTplName").val();
+
         if(!name){
             alert("模板名称不能为空");
         }
@@ -44,7 +45,9 @@ App.Resources.ArtifactsWindowTpl = Backbone.View.extend({
             if(response.code == 0&&  response.data ){
                     baseData.id = response.data.id;
                     App.ResourceArtifacts.TplCollection.push(baseData);
-
+                //刷新右面名称，数据，视图
+                App.ResourceArtifacts.TplCollectionRule.reset();
+                //触发事件
             }
         });
 

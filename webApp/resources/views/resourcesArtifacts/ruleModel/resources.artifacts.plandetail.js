@@ -22,9 +22,6 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
 
     //取得规则列表
     getPlanId:function(){
-
-
-
          App.ResourceArtifacts.Status.rule.targetCode = this.model.get("code");
         App.ResourceArtifacts.Status.rule.targetName = this.model.get("name");
         if(!App.ResourceArtifacts.Status.saved){
@@ -57,8 +54,6 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
         };
         App.ResourceArtifacts.loading();
         App.Comm.ajax(pdata,function(response){
-
-            console.log(response);
             if(response.code == 0 ){
 
                 $(".artifactsContent .rules h2 .name").html(_this.model.get("code") + "&nbsp;" +_this.model.get("name"));

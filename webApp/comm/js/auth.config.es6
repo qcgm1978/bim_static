@@ -48,7 +48,7 @@ App.Comm.AuthConfig = {
 			},
 			//项目映射规则
 			mappingRule : {
-				tab : '<li data-type="mapping" class="item">项目映射</li>'
+				tab : '<li data-type="mappingRule" class="item">项目映射规则</li>'
 			},
 			//设计信息
 			designInfo : {

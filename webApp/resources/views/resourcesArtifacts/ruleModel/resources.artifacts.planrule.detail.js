@@ -19,6 +19,11 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
     },
 
     render:function() {
+        var _this = this;
+        this.tabRule();
+        //映射规则
+        var operatorData = App.Resources.dealStr2(_this.model);//规则数据
+        this.model.set({mappingCategory:operatorData},{silent:true});
         this.$el.html(this.template(this.model.toJSON()));
         return this;
     },
@@ -26,26 +31,16 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
         this.listenTo(this.model,"change",this.render);
     },
     getDetail:function(){
-        var _this = this;
-        this.tabRule();
-        //映射规则
-        var operatorData = App.Resources.dealStr(_this.model);//规则数据
-
-        _this.$(".mapRule dl").html("");
-        _.each(operatorData,function(item){
-            var model = new App.ResourceArtifacts.operator(item);
-            var view = new App.Resources.ArtifactsPlanRuleDetailNew({model:model}).render().el;
-            _this.$(".mapRule dl").append(view);
-        });
-    },
-    //开合状态
-    tabRule:function(){
         if(this.$(".ruleDetail:visible").length){    //显示
             this.$(".ruleDetail").hide();
         }else{
             $(".ruleDetail").hide();
             this.$(".ruleDetail").show();
         }
+    },
+    //开合状态
+    tabRule:function(){
+
     },
     //选择分类编码
     choose:function(){

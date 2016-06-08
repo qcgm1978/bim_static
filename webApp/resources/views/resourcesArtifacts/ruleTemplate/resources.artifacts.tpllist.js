@@ -35,8 +35,6 @@ App.Resources.ArtifactsTplList = Backbone.View.extend({
         var _this = this;
         //直接输入名称即可
 
-
-
         if( !App.ResourceArtifacts.Status.saved){
             alert("您还有没保存的");
             //查找未保存的元素并高亮提示变红

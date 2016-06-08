@@ -21,7 +21,7 @@ App.Resources.ArtifactsTplDetail = Backbone.View.extend({
     },
 
     initialize:function(){
-
+        //this.listenTo(App.ResourceArtifacts.TplCollectionRule,"reset",this.render);
     },
 
     delete:function(){
@@ -45,7 +45,7 @@ App.Resources.ArtifactsTplDetail = Backbone.View.extend({
         this.$(".tplDetailEdit").show();
 
         //查找collection
-        var checkCollection  = App.ResourceArtifacts.TplCollectionRule ; //已有
+        var checkCollection  = App.ResourceArtifacts.TplCollectionRule ; //已有  ruleId
         var allCollection  = App.ResourceArtifacts.ArtifactsRule ;//所有
         var arr = [];
 
@@ -67,35 +67,29 @@ App.Resources.ArtifactsTplDetail = Backbone.View.extend({
 
     //保存
     resourcesSure:function(){
-
+        var baseData = {};
         //查找所有的ruleId存储成数组形式，格式如下
-        /*[{
-            "templateId": "843148603580768",
-            "ruleId": "840358391034212"
-        },
-            {
-                "templateId": "843148603580768",
-                "ruleId": "841085297156426"
-            },
-            {
-                "templateId": "843148603580768",
-                "ruleId": "841085297156448"
-            }]
+        /*
+         {
+         templateId:841085297156448,
+         templateName:"全标项目模板",
+         ruleIds:[841085297156448,841085297156448,841085297156448]
+         }
         */
 
         var pdata = {
             URLtype: "saveArtifactsTemplateRule",
-            data:{
-                templateId: App.ResourceArtifacts.Status.templateId
-            }
+            type:"POST",
+            data:JSON.stringify(baseData),
+            contentType: "application/json"
         };
         //App.ResourceArtifacts.loading($(".modelContent"));
         App.Comm.ajax(pdata,function(response){
             if(response.code == 0 ){
                 if(response.data  &&  response.data.length){
-
+                    //提交成功
                 }else{
-
+                    //提交失败
                 }
             }
             App.ResourceArtifacts.loaded($(".modelContent"));
