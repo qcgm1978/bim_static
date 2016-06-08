@@ -3,7 +3,7 @@ var AppRoute = Backbone.Router.extend({
 	routes: {
 		'': 'bodyContent',
 		'todo': 'todo',
-		'imbox': 'imbox',
+		'inbox': 'inbox',
 		'projects': 'projects',
 		'projects/:id/:versionId': 'project',
 		'flow': 'flow',
@@ -57,12 +57,12 @@ var AppRoute = Backbone.Router.extend({
 		App.Todo.init();
 	},
 	//消息中心
-	imbox: function() {
+	inbox: function() {
 		this.reset();
 		//加载css js
 		_.require('/static/dist/imbox/imbox.css');
 		_.require('/static/dist/imbox/imbox.js');
-		App.IMBox.init();
+		App.INBox.init();
 	},
 	postDetail:function(id){
 		_.require('/static/dist/bodyContent/bodyContent.css');

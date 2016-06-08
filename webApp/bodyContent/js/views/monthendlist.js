@@ -3,6 +3,8 @@
  */
 App.BodyContent.monthEndList = Backbone.View.extend({
 
+    _items:0,
+
     tagName:'tbody',
 
     id:"monthEnd",
@@ -20,6 +22,15 @@ App.BodyContent.monthEndList = Backbone.View.extend({
     //数据加载
     addOne:function(item){
         var newView = new App.BodyContent.monthEndView({model : item});
-        this.$el.append(newView.render().el);
+        this._items++;
+        if($('#layoutMonth').height()-70<this._items*30){
+            return
+        }
+        var el=newView.render().$el;
+        if(this._items%2==0){
+            el.addClass('odd');
+        }
+
+        this.$el.append(el);
     }
 });

@@ -93,8 +93,7 @@ table{border-collapse: collapse;border: none;}
 .conBody.pro .time,.conBody.pro li,.conBody.moth li{line-height: @lineHeight50 * 0.6;}
 
 table tbody tr{
-
-        height: 36px;
+        height: 30px;
     }
     #proclamation li{
         height: 34px;
@@ -113,11 +112,16 @@ table tbody tr{
         
     }
 
-    & .listHeader{
-        border-bottom: 1px solid #CCC;
-        height: 38px;
-        & span{
-            display: inline-block;
+    & table{
+        width: 100%;
+        & .listHeader{
+            height: 30px;
+            line-height: 30px;
+            color: #999999;
+            border-bottom: 1px solid #dddddd;
+        }
+        & tr.odd{
+            background: #F4F4F4;
         }
     }
     
