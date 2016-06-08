@@ -352,7 +352,7 @@
       // 缩放到指定位置
       var self = this;
       var viewer = self.viewer;
-      viewer.zoomToBBox(CLOUD.Utils.computeBBox(box),0.05);
+      viewer.zoomToBBox(CLOUD.Utils.computeBBox(box),0.05,1.2);
       viewer.render();
     },
     zoomToSelection:function(box){

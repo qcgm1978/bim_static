@@ -2,7 +2,6 @@
   * @require /libsH5/js/libs/three.js
   * @require /libsH5/js/libs/WebViewer.js
 */
-
 var CLOUD = CLOUD || {};
 CLOUD.Extensions = CLOUD.Extensions || {};
 CLOUD.Extensions.Utils = CLOUD.Extensions.Utils || {};
@@ -1259,6 +1258,8 @@ CLOUD.MiniMap = function (viewer) {
 
             if (_isChangeView) {
                 this.fly();
+            }else {
+                this.render();
             }
 
         } else {
@@ -1470,6 +1471,8 @@ CLOUD.MiniMap = function (viewer) {
 
         if (_isChangeView) {
             this.fly();
+        }else {
+            this.render();
         }
 
     };
@@ -1753,7 +1756,7 @@ CLOUD.MiniMap = function (viewer) {
                     break;
                 }
             }
-
+            
             return existEqual;
         };
 
