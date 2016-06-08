@@ -4,7 +4,7 @@
         <li data-type="plan" class="item plan">计划<i class="line"></i></li>
     </ul>
     <div class="breadcrumbNav">
-        <span class="projectText">项目</span>
+        <span class="projectText"><a href="#projects">项目</a></span>
         <span class="breadItem project relative"> <i class="icon-angle-right"></i> 
            <span class="breadItemText"> <span class="text"><%= App.Project.Settings.projectName %></span>
         <i class="myIcon-slanting-right"></i></span>
@@ -32,16 +32,13 @@
             </div>
         </div>
         </span>
-        <span class="breadItem fileModelNav relative"> <i class="icon-angle-right"></i> 
-           <span class="breadItemText"> <span class="text"> 文件浏览器 </span>
-        <i class="myIcon-slanting-right"></i></span>
-        <div class="fileModelList">
-            <ul class="fileNavUl">
-                <li data-type="file">文件浏览器</li>
-                <li data-type="model">模型浏览器</li>
-            </ul>
-        </div>
+
+
+        <span class="fileNav">
+            <span  data-type="file" class="file selected commSpan">文档</span>
+            <span  data-type="model" class="model commSpan">模型</span>
         </span>
+ 
     </div>
 </div>
 <div id="projectContainer">

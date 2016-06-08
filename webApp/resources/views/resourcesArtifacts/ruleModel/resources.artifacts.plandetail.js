@@ -5,7 +5,7 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
 
     tagName:"li",
 
-    template: _.templateUrl("/resources/tpls/resourcesArtifacts/resources.artifacts.plandetail.html"),
+    template: _.templateUrl("/resources/tpls/resourcesArtifacts/ruleModel/resources.artifacts.plandetail.html"),
 
     events:{
         "click .item":"getPlanId"
@@ -57,6 +57,8 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
         };
         App.ResourceArtifacts.loading();
         App.Comm.ajax(pdata,function(response){
+
+            console.log(response);
             if(response.code == 0 ){
 
                 $(".artifactsContent .rules h2 .name").html(_this.model.get("code") + "&nbsp;" +_this.model.get("name"));

@@ -1,10 +1,4 @@
 <div class="breadcrumbNav">
-<!--添加判断条件-->
-    <div class="mappingRule">
-        <a href="#resources/artifactsMapRule/model">规则模板</a>
-        <a class="active" href="#resources/artifactsMapRule/mule">映射规则</a>
-    </div>
-
 
     <span class="projectText"><a href="#resources">资源库</a></span>
 
@@ -40,15 +34,11 @@
                 </div>
                 </span>
 
-    <span class="breadItem fileModelNav relative <%=App.ResourceModel.Settings.type=='famLibs'||App.ResourceModel.Settings.type==''  ? 'myHidden':'' %>"> 
-    <i class="icon-angle-right"></i> 
-           <span class="breadItemText"> <span class="text"> 文件浏览器 </span>
-                <i class="myIcon-slanting-right"></i></span>
-                <div class="fileModelList">
-                    <ul class="fileNavUl">
-                        <li data-type="file">文件浏览器</li>
-                        <li data-type="model">模型浏览器</li>
-                    </ul>
-                </div>
-                </span>
+
+    <span class="fileNav <%=App.ResourceModel.Settings.type=='famLibs'||App.ResourceModel.Settings.type==''?'myHidden':'' %>">
+            <span  data-type="file" class="file selected commSpan">文档</span>
+            <span  data-type="model" class="model commSpan">模型</span>
+        </span>
+
+    
 </div>
