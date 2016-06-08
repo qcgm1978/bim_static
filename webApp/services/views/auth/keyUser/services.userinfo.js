@@ -46,7 +46,7 @@ App.Services.userinfo = Backbone.View.extend({
   },
   //修改族库
   famedit : function(){
-    App.Services.KeyUser.orgId = [];
+    App.Services.KeyUser.pid = [];
     App.Services.maskWindow=new App.Comm.modules.Dialog({title:'',width:600,height:500,isConfirm:false});
     $('.mod-dialog .wrapper').html(new App.Services.addKeyUser().render('fam').el);
     $('.keyU .title').show();
@@ -55,7 +55,7 @@ App.Services.userinfo = Backbone.View.extend({
   },
   //修改标准模型
   standardedit : function(){
-    App.Services.KeyUser.orgId = [];
+    App.Services.KeyUser.pid = [];
     App.Services.maskWindow=new App.Comm.modules.Dialog({title:'',width:600,height:500,isConfirm:false});
     $('.mod-dialog .wrapper').html(new App.Services.addKeyUser().render('standard').el);
     $('.keyU .title').show();
