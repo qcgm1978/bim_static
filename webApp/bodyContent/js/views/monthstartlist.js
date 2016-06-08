@@ -23,7 +23,6 @@ App.BodyContent.monthStartList = Backbone.View.extend({
         if($('#layoutMonth').height()-70<this._items*30){
             return
         }
-
         var newView = new App.BodyContent.monthStartView({model : item});
         var el=newView.render().$el;
         if(this._items%2==0){

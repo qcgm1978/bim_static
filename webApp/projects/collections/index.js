@@ -162,16 +162,14 @@
              language: 'zh-CN',
              autoclose: true,
              format: 'yyyy-mm-dd',
-             minView: 'month',
-             endDate: new Date()
+             minView: 'month'
 
          });
          $('#dateEnd').datetimepicker({
              language: 'zh-CN',
              autoclose: true,
              format: 'yyyy-mm-dd',
-             minView: 'month',
-             endDate: new Date()
+             minView: 'month'
 
          });
 
