@@ -6,7 +6,7 @@ App.BodyContent.todosView = Backbone .View.extend({
 
     className : "",//预留
     event:{},
-    tagName :  "li",
+    tagName :  "tr",
 
     template:_.templateUrl("/bodyContent/tpls/todos.html"),
 

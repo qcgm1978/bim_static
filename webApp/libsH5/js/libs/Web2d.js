@@ -2,7 +2,6 @@
   * @require /libsH5/js/libs/three.js
   * @require /libsH5/js/libs/WebViewer.js
 */
-
 var CLOUD = CLOUD || {};
 CLOUD.Extensions = CLOUD.Extensions || {};
 CLOUD.Extensions.Utils = CLOUD.Extensions.Utils || {};
@@ -417,11 +416,11 @@ CLOUD.MiniMap = function (viewer) {
 
     var _axisGridElements = [], _axisGridIntersectionPoints = [], _axisGridLevels = [];
     var _axisGridNumberCircleRadius = 10, _axisGridNumberFontSize = 8, _axisGridNumberInterval = 3; // 轴号间隔
-    var _isShowAxisGridNumber = true, _isShowAxisGrid = false, _isInitializedAxisGrid = false, _isInitializedFloorPlane = false;
+    var _isShowAxisGridNumber = true, _isShowAxisGrid = false, _isLoadedAxisGrid = false, _isLoadedFloorPlane = false;
 
     var _enableFlyByClick = true; // 是否允许click飞到指定位置
 
-    var _tipNode, _circleNode, _highlightHorizLineNode, _highlightVerticalLineNode, _cameraNode, _cameraArrowNode;
+    var _tipNode, _circleNode, _highlightHorizLineNode, _highlightVerticalLineNode, _cameraNode, _cameraArrowNode, _cameraCircleNode;
     var _highlightColor = '#258ae3', _tipNodeColor = "#000", _tipNodeBackgroundColor = "#fff";
     var _highlightLineWidth = 1, _circleNodeRadius = 3;
     var _hasHighlightInterPoint = false;
@@ -432,8 +431,10 @@ CLOUD.MiniMap = function (viewer) {
 
     var _enableShowCamera = true;
     var _lastCameraWorldPosition;
-    var _isFlyToPoint = false;
     var _epsilon = 0.00001;
+
+    var _isNormalizeMousePoint = false;
+    var _isChangeView = false;
 
     // ------------- 这些算法可以独立成单独文件 S ------------- //
 
@@ -648,7 +649,7 @@ CLOUD.MiniMap = function (viewer) {
     // 绘制平面图
     function renderFloorPlan() {
 
-        if (_isInitializedFloorPlane) {
+        if (_isLoadedFloorPlane) {
             _svgNode = getImageNode(0);
             _svg.appendChild(_svgNode);
         }
@@ -769,6 +770,8 @@ CLOUD.MiniMap = function (viewer) {
 
         var domElement = _mapContainer;
 
+        _isNormalizeMousePoint = false;
+
         if (domElement !== undefined) {
             var dim = CLOUD.DomUtil.getContainerOffsetToClient(domElement);
             var canvasMouse = new THREE.Vector2();
@@ -777,10 +780,16 @@ CLOUD.MiniMap = function (viewer) {
             canvasMouse.x = mouse.x - dim.left;
             canvasMouse.y = mouse.y - dim.top;
 
+            if (dim.width === 0 || dim.height === 0) {
+                return false;
+            }
+
             // 规范化坐标系[-1, 1]
             if (canvasMouse.x > 0 && canvasMouse.x < this.width && canvasMouse.y > 0 && canvasMouse.y < this.height) {
                 normalizedMouse.x = canvasMouse.x / this.width * 2 - 1;
                 normalizedMouse.y = -canvasMouse.y / this.height * 2 + 1;
+
+                _isNormalizeMousePoint = true;
 
                 return true;
             }
@@ -793,6 +802,8 @@ CLOUD.MiniMap = function (viewer) {
 
         var mouse = new THREE.Vector2(event.clientX, event.clientY);
         var isOverCanvas = this.isMouseOverCanvas(mouse);
+
+        _hasMouseDown = true;
 
         //if (!_enableMouseEvent) return isOverCanvas;
 
@@ -810,7 +821,7 @@ CLOUD.MiniMap = function (viewer) {
 
         if (!_enableFlyByClick) return isOverCanvas;
 
-        this.highlightedNode(isOverCanvas, _isShowAxisGrid, callback);
+        this.highlightedNode(isOverCanvas, _isShowAxisGrid, false, callback);
 
         return isOverCanvas;
     };
@@ -819,11 +830,11 @@ CLOUD.MiniMap = function (viewer) {
 
         var mouse = new THREE.Vector2(event.clientX, event.clientY);
         var isOverCanvas = this.isMouseOverCanvas(mouse);
-        var isExistData = _isInitializedAxisGrid || _isInitializedFloorPlane;
+        var isExistData = _isLoadedAxisGrid || _isLoadedFloorPlane;
 
         if (!_enableFlyByClick) {
 
-            this.highlightedNode(isOverCanvas, _isShowAxisGrid);
+            this.highlightedNode(isOverCanvas, _isShowAxisGrid, true);
 
             return isOverCanvas;
         }
@@ -863,6 +874,8 @@ CLOUD.MiniMap = function (viewer) {
 
             callback(clickPoint);
         }
+
+        _hasMouseDown = false;
 
         return isOverCanvas;
     };
@@ -940,7 +953,7 @@ CLOUD.MiniMap = function (viewer) {
 
     this.render = function () {
 
-        if (!_isInitializedAxisGrid) return;
+        if (!_isLoadedAxisGrid) return;
 
         if (this.autoClear) this.clear();
 
@@ -1014,10 +1027,10 @@ CLOUD.MiniMap = function (viewer) {
             // 尺寸大小 直径 12px
             var circle = document.createElementNS (_xmlns, 'circle');
             circle.setAttribute('r', '6');
+            _cameraCircleNode = circle;
 
             var path = document.createElementNS (_xmlns, 'path');
             path.setAttribute('d', 'M 7 6 Q 10 0, 7 -6 L 19 0 Z');
-
             _cameraArrowNode = path;
 
             _cameraNode.appendChild (circle);
@@ -1129,12 +1142,11 @@ CLOUD.MiniMap = function (viewer) {
         if (!jsonObj)  return;
 
         var grids = jsonObj.Grids;
-        var levels = jsonObj.Levels;
+        //var levels = jsonObj.Levels;
 
         this.clearAxisGird();
+        //this.initAxisGirdLevels(levels);
         this.initAxisGird(grids);
-        this.initAxisGirdLevels(levels);
-        this.render();
     };
 
     this.clearAxisGird = function () {
@@ -1149,7 +1161,7 @@ CLOUD.MiniMap = function (viewer) {
         }
 
         _axisGridBox2D.makeEmpty();
-        _isInitializedAxisGrid = false;
+        _isLoadedAxisGrid = false;
     };
 
     this.initAxisGird = function (grids) {
@@ -1237,12 +1249,24 @@ CLOUD.MiniMap = function (viewer) {
         }
 
         // 如果先初始化平面图，后初始化轴网，因为轴网确定范围，则需要重新初始化平面图
-        if (_isInitializedFloorPlane && !_isInitializedAxisGrid) {
+        if (_isLoadedFloorPlane && !_isLoadedAxisGrid) {
+
             console.log("re-initialize floor plane!!!");
+
+            _isLoadedAxisGrid = true;
             this.initFloorPlane();
+
+            if (_isChangeView) {
+                this.fly();
+            }else {
+                this.render();
+            }
+
+        } else {
+            _isLoadedAxisGrid = true;
+            this.render();
         }
 
-        _isInitializedAxisGrid = true;
     };
 
     this.initAxisGirdLevels = function (levels) {
@@ -1259,7 +1283,7 @@ CLOUD.MiniMap = function (viewer) {
 
     this.showAxisGird = function () {
 
-        if (_isInitializedAxisGrid) {
+        if (_isLoadedAxisGrid) {
             _isShowAxisGrid = true;
             //_svgGroupForAxisGrid.style.opacity = 1;
             _svgGroupForAxisGrid.style.display = "";
@@ -1274,7 +1298,7 @@ CLOUD.MiniMap = function (viewer) {
 
     this.hideAxisGird = function () {
 
-        if (_isInitializedAxisGrid) {
+        if (_isLoadedAxisGrid) {
             _isShowAxisGrid = false;
             //_svgGroupForAxisGrid.style.opacity = 0;
             _svgGroupForAxisGrid.style.display = "none";
@@ -1289,49 +1313,11 @@ CLOUD.MiniMap = function (viewer) {
         _isShowAxisGridNumber = show;
     };
 
-    this.getIntersectionByNormalizedPoint = function(normalizedPoint) {
-
-        var intersection = null;
-        var _circleRadiusToSquared = _circleNodeRadius * _circleNodeRadius;
-
-        for (var i = 0, len = _axisGridIntersectionPoints.length; i < len; i++) {
-            var interPoint = _axisGridIntersectionPoints[i].intersectionPoint;
-            var point = new THREE.Vector2(normalizedPoint.x, normalizedPoint.y);
-            normalizedPointToScreen(point);
-
-            var distanceSquared = interPoint.distanceToSquared(point);
-
-            if (distanceSquared < _circleRadiusToSquared) {
-                intersection = _axisGridIntersectionPoints[i];
-                break;
-            }
-        }
-
-        return intersection;
-    };
-
-    this.getIntersectionByAxisGridNumber = function(abcName, numeralName) {
-
-        var intersection = null;
-
-        for (var i = 0, len = _axisGridIntersectionPoints.length; i < len; i++) {
-            var abcNameTmp = _axisGridIntersectionPoints[i].abcName.toLowerCase();
-            var numeralNameTmp = _axisGridIntersectionPoints[i].numeralName;
-
-            if (abcNameTmp === abcName.toLowerCase() && numeralNameTmp === numeralName) {
-                intersection = _axisGridIntersectionPoints[i];
-                break;
-            }
-        }
-
-        return intersection;
-    };
-
-    this.highlightedNode = function (isOverCanvas, isShowAxisGrid, callback) {
+    this.highlightedNode = function (isOverCanvas, isShowAxisGrid, allowNear, callback) {
 
         if (isOverCanvas && isShowAxisGrid) {
 
-            this.dealHighlightNode();
+            this.dealHighlightNode(allowNear);
 
             if (_hasHighlightInterPoint) {
 
@@ -1374,11 +1360,21 @@ CLOUD.MiniMap = function (viewer) {
 
     };
 
-    this.dealHighlightNode = function () {
+    this.dealHighlightNode = function (allowNear) {
 
         _hasHighlightInterPoint = false;
 
-        var intersection = this.getIntersectionByNormalizedPoint(normalizedMouse);
+        var intersection;
+
+        if (allowNear) {
+
+            var screenPosition = normalizedMouse.clone();
+            normalizedPointToScreen(screenPosition);
+            // 获得最近的轴网交点
+            intersection = this.computeMinDistanceIntersection(screenPosition);
+        } else {
+            intersection = this.getIntersectionByNormalizedPoint(normalizedMouse);
+        }
 
         if (!intersection) return null;
 
@@ -1429,9 +1425,15 @@ CLOUD.MiniMap = function (viewer) {
         _highlightVerticalLineNode.setAttribute('y2', highlightNode.verticalLine[1].y);
     };
 
-    this.generateFloorPlane = function() {
+    this.generateFloorPlane = function(changeView) {
 
-        _isInitializedFloorPlane = false;
+        if (changeView === undefined) {
+            changeView = false;
+        }
+
+        _isChangeView = changeView;
+
+        //_isLoadedFloorPlane = false;
 
         var jsonObj = CLOUD.MiniMap.floorPlaneData;
 
@@ -1445,7 +1447,7 @@ CLOUD.MiniMap = function (viewer) {
             return;
         }
 
-        _isInitializedFloorPlane = true;
+        _isLoadedFloorPlane = true;
 
         _floorPlaneUrl = url;
         _floorPlaneBox = new THREE.Box3(new THREE.Vector3(boundingBox.Min.X, boundingBox.Min.Y, boundingBox.Min.Z), new THREE.Vector3(boundingBox.Max.X, boundingBox.Max.Y, boundingBox.Max.Z));
@@ -1454,7 +1456,7 @@ CLOUD.MiniMap = function (viewer) {
         _cameraProjectedPosZ = 0.5 * (_floorPlaneBox.min.z + _floorPlaneBox.max.z);
         _floorPlaneMinZ = _floorPlaneBox.min.z;
 
-        if (!_isInitializedAxisGrid) {
+        if (!_isLoadedAxisGrid) {
             console.warn('axis-grid is not initialized!');
 
             return;
@@ -1467,9 +1469,12 @@ CLOUD.MiniMap = function (viewer) {
 
         this.initFloorPlane();
 
-        this.fly();
+        if (_isChangeView) {
+            this.fly();
+        }else {
+            this.render();
+        }
 
-        //this.render();
     };
 
     this.initFloorPlane = function () {
@@ -1503,14 +1508,11 @@ CLOUD.MiniMap = function (viewer) {
         _svgNode.setAttribute("x", (-0.5 * width) + "");
         _svgNode.setAttribute("y", (-0.5 * height) + "");
         _svgNode.setAttribute("transform", 'translate(' + offset.x + ',' + offset.y + ')');
-
-        // 切换楼层，置为true
-        _isFlyToPoint = true;
     };
 
     this.getAxisGridInfoByPoint = function(point) {
 
-        if (!_isInitializedFloorPlane) return null;
+        if (!_isLoadedFloorPlane) return null;
 
         var sceneMatrix = this.getMainSceneMatrix();
 
@@ -1552,9 +1554,10 @@ CLOUD.MiniMap = function (viewer) {
         return null;
     };
 
+    // 根据规范化坐标点获得轴网信息
     this.getAxisGridInfoByNormalizedPoint = function(normalizedPoint) {
 
-        if (!_isInitializedFloorPlane) return null;
+        if (!_isLoadedFloorPlane) return null;
 
         // 世界坐标
         var pointWorldPosition = normalizedPoint.clone();
@@ -1588,9 +1591,47 @@ CLOUD.MiniMap = function (viewer) {
         return null;
     };
 
+    this.getIntersectionByNormalizedPoint = function(normalizedPoint) {
+
+        var intersection = null;
+        var _circleRadiusToSquared = _circleNodeRadius * _circleNodeRadius;
+
+        for (var i = 0, len = _axisGridIntersectionPoints.length; i < len; i++) {
+            var interPoint = _axisGridIntersectionPoints[i].intersectionPoint;
+            var point = new THREE.Vector2(normalizedPoint.x, normalizedPoint.y);
+            normalizedPointToScreen(point);
+
+            var distanceSquared = interPoint.distanceToSquared(point);
+
+            if (distanceSquared < _circleRadiusToSquared) {
+                intersection = _axisGridIntersectionPoints[i];
+                break;
+            }
+        }
+
+        return intersection;
+    };
+
+    this.getIntersectionByAxisGridNumber = function(abcName, numeralName) {
+
+        var intersection = null;
+
+        for (var i = 0, len = _axisGridIntersectionPoints.length; i < len; i++) {
+            var abcNameTmp = _axisGridIntersectionPoints[i].abcName.toLowerCase();
+            var numeralNameTmp = _axisGridIntersectionPoints[i].numeralName;
+
+            if (abcNameTmp === abcName.toLowerCase() && numeralNameTmp === numeralName) {
+                intersection = _axisGridIntersectionPoints[i];
+                break;
+            }
+        }
+
+        return intersection;
+    };
+
     this.calculateCameraPosition = function () {
 
-        if (!_isInitializedFloorPlane) return;
+        if (!_isLoadedFloorPlane) return;
 
         var camera = this.viewer.camera;
         var cameraEditor = this.viewer.cameraEditor;
@@ -1646,10 +1687,13 @@ CLOUD.MiniMap = function (viewer) {
         _cameraNode.setAttribute('opacity', '1.0');
 
         if (projectedEye.length() < _epsilon) {
+
             // 隐藏箭头方向
             _cameraArrowNode.setAttribute('opacity', '0.0');
             _cameraNode.setAttribute("transform", "translate(" + cameraScreenPosition.x + "," + cameraScreenPosition.y + ")");
+
         } else {
+
             // 计算角度
             var up = new THREE.Vector3(0, 0, 1);
             var axisX = new THREE.Vector3(1, 0, 0);
@@ -1663,8 +1707,25 @@ CLOUD.MiniMap = function (viewer) {
                 angle *= -1;
             }
 
-            _cameraArrowNode.setAttribute('opacity', '1.0');
-            _cameraNode.setAttribute("transform", "translate(" + cameraScreenPosition.x + "," + cameraScreenPosition.y + ") rotate(" + angle + ")");
+            // 计算边缘交点
+            var newProjectedCameraPosition = this.calculateEdgePositionCameraOutBounds(_axisGridBox2D, projectedCameraPosition, projectedEye);
+
+            if (newProjectedCameraPosition) {
+
+                var newCameraScreenPosition = new THREE.Vector2(newProjectedCameraPosition.x, newProjectedCameraPosition.y);
+                worldToNormalizedPoint(newCameraScreenPosition);
+                normalizedPointToScreen(newCameraScreenPosition);
+
+                _cameraArrowNode.setAttribute('opacity', '1.0');
+                _cameraCircleNode.setAttribute('opacity', '0.0');
+                _cameraNode.setAttribute("transform", "translate(" + newCameraScreenPosition.x + "," + newCameraScreenPosition.y + ") rotate(" + angle + ")");
+
+            } else {
+                _cameraArrowNode.setAttribute('opacity', '1.0');
+                _cameraCircleNode.setAttribute('opacity', '1.0');
+                _cameraNode.setAttribute("transform", "translate(" + cameraScreenPosition.x + "," + cameraScreenPosition.y + ") rotate(" + angle + ")");
+
+            }
         }
 
         this.setCallbackCameraInfo(cameraWorldPosition, cameraScreenPosition);
@@ -1678,6 +1739,143 @@ CLOUD.MiniMap = function (viewer) {
             projectedWorldPosition : cameraProjectedWorldPosition,
             screenPosition : cameraScreenPosition
         }
+    };
+
+    this.calculateEdgePositionCameraOutBounds = function(bBox, worldPosition, direction){
+
+        // 先计算射线与Y轴平行的两个面的交点，再计算射线与X轴平行的两个面的交点
+
+        var isExistedPoint = function(points, p) {
+
+            var existEqual = false;
+
+            for (var i = 0, len = points.length; i < len; i++) {
+
+                if (CLOUD.Extensions.Utils.Geometric.isEqualBetweenPoints(p, points[i], _epsilon)) {
+                    existEqual = true;
+                    break;
+                }
+            }
+            
+            return existEqual;
+        };
+
+        // 将包围盒上下左右拉大0.5，预防浮点精度问题
+        var extendBox = bBox.clone();
+        extendBox.min.x -= 0.5;
+        extendBox.min.y -= 0.5;
+        extendBox.max.x += 0.5;
+        extendBox.max.y += 0.5;
+
+        // 判断点是否在包围盒中，不在则计算与边缘的交点
+        if (!extendBox.containsPoint(worldPosition)) {
+
+            var intersects = [];
+
+            var origin = new THREE.Vector3(worldPosition.x, worldPosition.y, 0);
+            var ray = new THREE.Ray(origin, direction);
+
+            // 与Y轴平行的面
+            var point = new THREE.Vector3(bBox.min.x, bBox.min.y, 0);
+            var normal = new THREE.Vector3(-1, 0, 0);
+            var plane = new THREE.Plane();
+            plane.setFromNormalAndCoplanarPoint(normal, point);
+
+            var intersect = ray.intersectPlane(plane);
+
+            if (intersect && extendBox.containsPoint(intersect)) {
+                intersects.push(intersect);
+            }
+
+            // 与Y轴平行的面
+            point.set(bBox.max.x, bBox.max.y, 0);
+            normal.set(-1, 0, 0);
+            plane.setFromNormalAndCoplanarPoint(normal, point);
+            intersect = ray.intersectPlane(plane);
+
+            if (intersect && extendBox.containsPoint(intersect)) {
+                intersects.push(intersect);
+            }
+
+            // 与X轴平行的面
+            point.set(bBox.min.x, bBox.min.y, 0);
+            normal.set(0, 1, 0);
+            plane.setFromNormalAndCoplanarPoint(normal, point);
+            intersect = ray.intersectPlane(plane);
+
+            if (intersect && extendBox.containsPoint(intersect)) {
+
+                // 判断是否存在同一个点（四个角的位置可能出现同点）
+                if (!isExistedPoint(intersect, intersects)) {
+                    intersects.push(intersect);
+                }
+
+            }
+
+            // 与X轴平行的面
+            point.set(bBox.max.x, bBox.max.y, 0);
+            normal.set(0, 1, 0);
+            plane.setFromNormalAndCoplanarPoint(normal, point);
+            intersect = ray.intersectPlane(plane);
+
+            if (intersect && extendBox.containsPoint(intersect)) {
+
+                // 判断是否存在同一个点（四个角的位置可能出现同点）
+                if (!isExistedPoint(intersect, intersects)) {
+                    intersects.push(intersect);
+                }
+            }
+
+            if (intersects.length != 2) {
+
+                return null;
+            }
+
+            // 存在两个交点则射线与包围盒相交
+            var inter1 = intersects[0];
+            var inter2 = intersects[1];
+
+            var dir = inter2.clone().sub(inter1).normalize();
+
+            if (CLOUD.Extensions.Utils.Geometric.isEqualBetweenPoints(dir, direction, _epsilon)) {
+
+                return intersects[0];
+
+            } else {
+
+                return intersects[1];
+
+            }
+
+        }
+
+        return null;
+    };
+
+    // 计算离相机最近的交点
+    this.computeMinDistanceIntersection = function (screenPosition) {
+
+        if (_axisGridIntersectionPoints.length < 1) return null;
+
+        var minDistanceSquared = 0;
+        var idx = 0;
+
+        for (var i = 0, len = _axisGridIntersectionPoints.length; i < len; i++) {
+            var interObj = _axisGridIntersectionPoints[i];
+            var interPoint = new THREE.Vector2(interObj.intersectionPoint.x, interObj.intersectionPoint.y);
+            var distanceSquared = interPoint.distanceToSquared(screenPosition);
+
+            if (i == 0) {
+                minDistanceSquared = distanceSquared;
+            } else {
+                if (minDistanceSquared > distanceSquared) {
+                    minDistanceSquared = distanceSquared;
+                    idx = i;
+                }
+            }
+        }
+
+        return _axisGridIntersectionPoints[idx];
     };
 
     this.fly = function() {
@@ -1767,32 +1965,6 @@ CLOUD.MiniMap = function (viewer) {
                 this.callbackCameraChanged(null);
             }
         }
-    };
-
-    // 计算离相机最近的交点
-    this.computeMinDistanceIntersection = function (screenPosition) {
-
-        if (_axisGridIntersectionPoints.length < 1) return null;
-
-        var minDistanceSquared = 0;
-        var idx = 0;
-
-        for (var i = 0, len = _axisGridIntersectionPoints.length; i < len; i++) {
-            var interObj = _axisGridIntersectionPoints[i];
-            var interPoint = new THREE.Vector2(interObj.intersectionPoint.x, interObj.intersectionPoint.y);
-            var distanceSquared = interPoint.distanceToSquared(screenPosition);
-
-            if (i == 0) {
-                minDistanceSquared = distanceSquared;
-            } else {
-                if (minDistanceSquared > distanceSquared) {
-                    minDistanceSquared = distanceSquared;
-                    idx = i;
-                }
-            }
-        }
-
-        return _axisGridIntersectionPoints[idx];
     };
 
     this.enableCameraNode = function(enable) {

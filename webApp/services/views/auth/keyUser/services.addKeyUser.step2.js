@@ -14,7 +14,7 @@ App.Services.step2 = Backbone.View.extend({
     //"click .keyUserList li":'toggleClass'
   },
 
-  render:function(){
+  render:function(searchvalue){
     var index=$('.partition .active').attr('data-index');
     //准备Collection的MODELS
     if(index==2){
@@ -24,10 +24,22 @@ App.Services.step2 = Backbone.View.extend({
       this.$el.html(str);
 
     }else{
-      var datas={
-        direction : App.Services.KeyUser.Step2.toJSON() || [],
+      if(typeof searchvalue == 'string'){
 
-      };
+        var data =_.filter(App.Services.KeyUser.Step2.toJSON(),function(item){
+          return item.name.indexOf(searchvalue)>-1;
+        });
+        var datas={
+          direction : data || []
+
+        };
+      }else{
+        var datas={
+          direction : App.Services.KeyUser.Step2.toJSON() || []
+
+        };
+      }
+
       this.$el.html(this.template(datas));
     }
     $('.partition').show();

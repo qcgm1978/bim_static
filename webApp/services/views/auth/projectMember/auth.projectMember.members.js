@@ -52,12 +52,29 @@ App.Services.projectMember.members = Backbone.View.extend({
   	data={data:data};
     $("#memberlistWrap").html(this.$el.html(this.template(data)));
     this.$('.remove').on('click',function(e){
-    	
-    	_this.del(e);
-    	
+    	_this.checkAuth(e);
     })
     $('#dataLoading').hide();
     clearMask();
     return this;
+  },
+
+  checkAuth:function(event){
+    var _this=this;
+    var _userId=event.currentTarget.getAttribute("data-user");
+    App.Comm.ajax({
+      URLtype:'checkDelAuth',
+      data:{
+        userId:_userId
+      }
+    },function(res){
+      if(res.code==0){
+        if(res.data.checkResult){
+          _this.del(event);
+        }else{
+          $.tip({message:'没有权限',type:'alarm'})
+        }
+      }
+    })
   }
 });

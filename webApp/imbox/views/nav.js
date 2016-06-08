@@ -1,4 +1,4 @@
-App.IMBox.NavView = Backbone.View.extend({
+App.INBox.NavView = Backbone.View.extend({
 
 	tagName: 'div',
 
@@ -16,7 +16,7 @@ App.IMBox.NavView = Backbone.View.extend({
 		$(".imboxNav .already").removeClass("selected");
 		$('#imboxContent .commissionBox').show();
 		$('#imboxContent .alreadyBox').hide();
-		App.IMBox.messageCollection.fetch({
+		App.INBox.messageCollection.fetch({
 			reset:true,
 			data:{
 				status:0
@@ -30,7 +30,7 @@ App.IMBox.NavView = Backbone.View.extend({
 		$(".imboxNav .commission").removeClass("selected");
 		$('#imboxContent .commissionBox').hide();
 		$('#imboxContent .alreadyBox').show();
-		App.IMBox.messageAllCollection.fetch({
+		App.INBox.messageAllCollection.fetch({
 			reset:true
 		});
 	},

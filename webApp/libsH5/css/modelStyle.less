@@ -181,8 +181,21 @@
     }
     .dialogContent{
       &:after{content:'';display:table;clear:both;}
-      .model{width:760px;height:500px;float:left;}
-      .rightEnter{width:200px;float:right;}
+      .model{width:760px;height:500px;float:left;border-right:1px solid #d6d6d6;}
+      .rightBar{width:198px;float:right;
+        .tab{height:40px;padding:7px 12px 0;background:#e3e3e3;border-bottom:1px solid #d6d6d6;font-size:12px;}
+        .tabItem{width:80px;text-align:center;line-height:30px;height:33px;border-top:2px solid #4C8CE9;border-left:1px solid #d6d6d6;border-right:1px solid #d6d6d6;background:#fff;}
+        .tools{padding:10px;border-bottom:1px solid #d6d6d6;
+          .toolsBtn{width:80px;height:30px;padding:0 6px;line-height:28px;border:1px solid #d6d6d6;float:left;}
+          .m-checked{display:inline-block;width:13px;height:13px;color:#85B200;font-family:'modelicon';border:1px solid #85B200;margin-right:3px;
+            &:before{display:block;line-height:13px;margin-left:-1px;}
+          }
+          .isSecleted{float:right;line-height:30px;
+            .num{color:#f60;margin:0 2px;}
+          }
+          &:after{clear:both;content:'';display:table;}
+        }
+      }
     }
     .dialogFooter{padding:10px 20px 20px;border-top:1px solid #eaeaea;
       .dialogBtn{color:#fff;background:#117EE1;}

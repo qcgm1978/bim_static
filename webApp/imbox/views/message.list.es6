@@ -1,5 +1,5 @@
-App.IMBox=App.IMBox||{}
-App.IMBox.imboxListView=Backbone.View.extend({
+App.INBox=App.INBox||{}
+App.INBox.imboxListView=Backbone.View.extend({
 
 	template:_.templateUrl('./imbox/tpls/container.html',true),
 
@@ -13,7 +13,6 @@ App.IMBox.imboxListView=Backbone.View.extend({
 	},
 
 	renderData(item){
-		debugger
 	}
 
 
