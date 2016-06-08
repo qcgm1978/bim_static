@@ -197,9 +197,7 @@ var AppRoute = Backbone.Router.extend({
 	},
 
 	//重置数据
-	reset: function() {
-
-		$("#topSaveTip,#topSaveTipLine").remove();
+	reset: function() { 
 
 		if (!$._data($(".user > span")[0],"events")) {
 			//绑定用户信息
