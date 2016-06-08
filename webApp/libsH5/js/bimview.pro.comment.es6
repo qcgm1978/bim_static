@@ -641,6 +641,7 @@
 				render() {
 					//模板
 					this.$el.html(this.template);
+					this.$(".txtReMark").at();
 					return this;
 				},
 

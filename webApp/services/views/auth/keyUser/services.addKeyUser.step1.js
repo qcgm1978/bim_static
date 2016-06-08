@@ -17,6 +17,25 @@ App.Services.step1 = Backbone.View.extend({
 
     if(name && name=='step3'){
       this.$el.addClass('step1in3');
+    }else if(typeof name=='string'){
+      $.ajax({
+        url: "platform//auth/user?name="+name
+      }).done(function(data){
+        console.log(data);
+        if(data.message == "success"){
+          var items = data.data, str = "";
+
+          $.each(items, function(i, item){
+            if(item.title){
+              str+="<li>"+
+                "<p class='person "+"' data-uid='"+item['userId']+ "' data-canLoad='true' ><i ></i><span class='isspan'>"+ item['name']+"</span><span>"+item['orgNamePath']+"</span></p>"+
+                "</li>";
+            }
+
+          });
+          $(selector).append(str);
+        }
+      });
     }
     //准备Collection的MODELS
     var datas={
