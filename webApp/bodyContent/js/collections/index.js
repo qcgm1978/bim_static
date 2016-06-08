@@ -44,7 +44,31 @@ App.BodyContent.control= {
         });
 
     },
-    
+
+    post:function(id){
+        $('#pageLoading').hide();
+        $('#dataLoading').hide();
+        $("#topBar li").hide();
+
+        new App.BodyContent.postDetailView();
+
+        this.postDetailCollection.fetch({
+            reset:true,
+            data:{
+                id:id
+            }
+        })
+
+    },
+    postDetailCollection:new (Backbone.Collection.extend({
+        model:App.BodyContent.model,
+        urlType:"fetchBodyContentNotice",
+        parse: function (response) {
+            if (response.message == "success") {
+                return response.data;
+            }
+        }
+    })),
 
     todoCollection:new (Backbone.Collection.extend({
         model:App.BodyContent.model,
