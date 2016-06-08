@@ -286,6 +286,7 @@
         }
         var data = self.curFloorData;
         bimView.comm.dialog({
+          width:800,
           title:'选择轴网',
           content:self.bigMap,
           footer:self.footer,
