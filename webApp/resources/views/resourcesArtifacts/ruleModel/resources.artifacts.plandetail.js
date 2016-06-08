@@ -41,8 +41,8 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
         App.ResourceArtifacts.Status.presentPlan = this.model;
     },
 //切换计划
-    toggleClass:function(){
-        $(".artifactsList li").removeClass("active");
+    toggleClass:function(e){
+        $(".artifactsList .plcon li").removeClass("active");
         this.$el.addClass("active");
     },
 //获取计划节点相关规则

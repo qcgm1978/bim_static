@@ -20,7 +20,7 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
 
     render:function() {
         var _this = this;
-        this.tabRule();
+
         //映射规则
         var operatorData = App.Resources.dealStr2(_this.model);//规则数据
         this.model.set({mappingCategory:operatorData},{silent:true});
@@ -37,10 +37,6 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
             $(".ruleDetail").hide();
             this.$(".ruleDetail").show();
         }
-    },
-    //开合状态
-    tabRule:function(){
-
     },
     //选择分类编码
     choose:function(){

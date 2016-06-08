@@ -9,7 +9,8 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
 
     events:{
         "click .sele": "select",
-        "click .default" : "create"
+        "click .default" : "create",
+
     },
 
     template: _.templateUrl("/resources/tpls/resourcesArtifacts/resources.artifacts.nav.html"),
