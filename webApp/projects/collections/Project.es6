@@ -921,7 +921,7 @@ App.Project = {
 		App.Project.Settings.Viewer.zoomToBox(boxArr);
 	},
 
-	userProps: function(param) {
+	userProps: function(param,callback) {
 		var _this = this;
 		var dataObj = {
 			URLtype: "fetchFileByModel",
@@ -945,10 +945,15 @@ App.Project = {
 				name: "楼层",
 				value: data.data.floor
 			})
-			_this.$el.html(_this.template(param));
-			if ($('.design').hasClass('selected')) {
-				App.Project.propertiesOthers.call(_this, "plan|cost|quality|dwg");
+			if(callback){
+				callback(param);
+			}else{
+				_this.$el.html(_this.template(param));
+				if ($('.design').hasClass('selected')) {
+					App.Project.propertiesOthers.call(_this, "plan|cost|quality|dwg");
+				}
 			}
+			
 		})
 	},
 

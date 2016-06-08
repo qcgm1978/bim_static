@@ -12,8 +12,12 @@ App.BodyContent.control= {
        
        
         $("#contains").empty();
+
+        this.loadMessageCount();
+        
         new App.BodyContent.App().render(); //渲染框架
-        $("#todos").html(new App.BodyContent.todosList().render().el);
+        new App.BodyContent.todosList();
+     //   $("#todos").html(new App.BodyContent.todosList().render().el);
         $(".conMonth .article table").append(new App.BodyContent.monthEndList().render().el);
         $(".conMonth .article table").append(new App.BodyContent.monthStartList().render().el);
         $("#proclamation").html(new App.BodyContent.proclamationList().render().el);
@@ -60,6 +64,20 @@ App.BodyContent.control= {
         })
 
     },
+
+    loadMessageCount:function(){
+
+        App.Comm.ajax({
+            URLtype:'fetchIMBoxList',
+            data:{
+                status:0
+            }
+        },function(res){
+            $('#messageCount').html(res.data.totalItemCount);
+        })
+
+    },
+
     postDetailCollection:new (Backbone.Collection.extend({
         model:App.BodyContent.model,
         urlType:"fetchBodyContentNotice",

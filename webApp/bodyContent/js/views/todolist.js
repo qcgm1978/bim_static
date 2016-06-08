@@ -3,6 +3,8 @@
  */
 App.BodyContent.todosList = Backbone.View.extend({
 
+    _items:0,
+
     events:{
     //无事件，预留
     },
@@ -17,7 +19,15 @@ App.BodyContent.todosList = Backbone.View.extend({
     },
     //数据加载
     addOne:function(item){
+        this._items++;
+        if($('#layoutTodo').height()-70<this._items*30){
+            return
+        }
         var newView = new App.BodyContent.todosView({model : item});
-        this.$el.append(newView.render().el);
+        var el=newView.render().$el;
+        if(this._items%2==0){
+            el.addClass('odd');
+        }
+        $("#todos").append(el);
     }
 });
