@@ -31,7 +31,7 @@
           $body = $('<div class="dialogBody"></div>'),
           Settings = this.Settings,
           $header = $('<div class="dialogHeader"/>').html('请选择构件<span class="dialogClose" title="关闭"></span> '),
-          $content = $('<div class="dialogContent"><div id="modelView" class="model"></div><div class="rightBar"><div class="tab"><div class="tabItem">已选构件</div></div><div class="tools"><div class="toolsBtn"><i class="m-checked"></i>已选构件</div><span>已选<span class="num">3</span>个构件</span></div></div></div>'),
+          $content = $('<div class="dialogContent"><div id="modelView" class="model"></div><div class="rightBar"><div class="tab"><div class="tabItem">已选构件</div></div><div class="tools"><div class="toolsBtn"><i class="m-checked"></i>已选构件</div><span class="isSecleted">已选<span class="num">3</span>个构件</span></div></div></div>'),
           $bottom = $('<div class="dialogFooter"/>').html('<input type="button" class="dialogOk dialogBtn" value="' + this.Settings.btnText + '" />');
       $body.append($header,$content,$bottom);
       $dialog.append($body);
