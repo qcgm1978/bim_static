@@ -40,11 +40,13 @@ App.Resources.ArtifactsTplListItem = Backbone.View.extend({
         this.plans = new App.Resources.ArtifactsPlanList();
         this.planRule = new App.Resources.ArtifactsPlanRule();
         this.quality = new App.Resources.ArtifactsQualityList();//质量标准，外层
+        this.planRuleTitle = new App.Resources.ArtifactsPlanRuleTitle();  //规则头部
 
         $(".tplContent").html(this.detail.render().el);
         this.detail.$(".tplDetailCon").append(this.menu.render().el);//菜单
         this.menu.$(".plans").append(this.plans.render().el);//计划
-        this.menu.$(".rules").append(this.planRule.render().el);//规则
+        this.menu.$(".rules").append(this.planRuleTitle.render().el);//计划
+        this.planRuleTitle.$(".ruleContentRuleList").append(this.planRule.render().el);//计划
         this.menu.$(".qualifyC").append(this.quality.render().el);//质量
 
 
