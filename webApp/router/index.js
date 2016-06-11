@@ -196,6 +196,19 @@ var AppRoute = Backbone.Router.extend({
 	},
 
 
+/*
+	servicesMappingRule: function(type) {
+		this.reset();
+		$("#pageLoading").hide();
+		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".services").addClass('selected');
+		_.require('/static/dist/services/services.css');
+		_.require('/static/dist/services/services.js');
+		$("#bottomBar").hide(); //隐藏脚部
+		App.Services.init(type, tab);
+	},
+*/
+
+
 	services: function(type, tab) {
 		this.reset();
 		$("#pageLoading").hide();

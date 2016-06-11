@@ -258,8 +258,18 @@ App.ResourceArtifacts={
         this.menu.quality = this.quality;
         this.menu.plans = this.plans;
 
+        App.ResourceArtifacts.Status.rule.biz = 1;
+
+
+
+
 
         if(optionType == "template" ){//规则模板
+
+            if(App.ResourceArtifacts.Settings.ruleModel  ==2){
+                App.ResourceArtifacts.Status.rule.biz =2
+            }
+
             $(".mappingRule .template").addClass("active").siblings("a").removeClass("active");
 
             $(".breadcrumbNav .mappingRule").show();
@@ -275,8 +285,8 @@ App.ResourceArtifacts={
 
         }else if(optionType == "library"){//规则库
             $(".mappingRule .library").addClass("active").siblings("a").removeClass("active");
-            App.ResourceArtifacts.Status.rule.biz =1;  //设置默认规则为模块化
 
+            App.ResourceArtifacts.Status.rule.biz =1;  //设置默认规则为模块化
 
             _this.$el.append(this.menu.render().el);//菜单
             this.menu.$(".plans").html(this.plans.render().el);//计划节点

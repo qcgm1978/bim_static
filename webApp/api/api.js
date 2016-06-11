@@ -214,6 +214,8 @@ App.API = {
 		fetchArtifactsTemplateRule: "platform/rule/template/select/rule/{templateId}", //模板规则列表  platform/rule/template/select/rule/{templateId}
 		saveArtifactsTemplateRule: "platform/rule/template/update", //模板规则列表
 
+		modifyProjectMappingRule:"platform/rule/template/update/project/{projectId}/{templateId}",    //修改项目规则模板
+
 		//项目 变更 列表
 		fileList:"doc/internal/{projectId}/{versionId}/differ", //变更列表
 		projectChangeList:"sixD/{projectId}/{projectVersionId}/cost/comparison",// ?fileVerionId={fileVerionId}&baseFileVerionId={baseFileVerionId}

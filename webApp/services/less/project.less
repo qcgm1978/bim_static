@@ -351,11 +351,46 @@
 	  line-height: 30px;
 	  cursor: pointer;
 	}
-	.mappingContainer{
-	  padding: 0 15px;
-	  line-height: 30px;
 
-	}
   }
-
+  .mappingContainer{
+	border: solid #cccccc;
+	border-width: 1px 0 1px 0;
+	 padding: 15px 15px;
+	 line-height: 30px;
+	 .editSelf{
+	   line-height: 29px;
+	   color: #117ee1;
+	   cursor: pointer;
+	 }
+   }
+}
+.projectMappingRuleWindow{
+  position: absolute;left: 20px;right:20px;top:65px;bottom:60px;border: 1px solid #cccccc;;
+	.projectMappingModelList{
+	  li{
+		padding: 0 14px ;
+		font-size: 14px;line-height: 29px;border-bottom: 1px solid #cccccc;
+		cursor: pointer;
+		&.active{background-color:#A8DBFD; }
+	  }
+	}
+}
+.mappingFooter{
+  padding-top: 15px;
+  p{
+	font-size: 12px;
+	line-height: 21px;
+	color: #777777;
+  }
+  .resetMappingRule {
+	margin-bottom: 10px;
+	background-color: #0572d0;
+	color: #ffffff;
+	width: 80px;
+	height: 30px;
+	line-height: 30px;
+	text-align: center;
+	cursor: pointer;
+  }
 }
