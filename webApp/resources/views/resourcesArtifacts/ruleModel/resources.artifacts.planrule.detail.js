@@ -170,29 +170,24 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
 
         $(".artifactsContent .rules").addClass("services_loading");
         App.Comm.ajax(cdata,function(response){
-            if(response.code == 0 && response.data){
 
-                _this.$el.closest(".ruleDetail").hide();
+            if(response.code == 0 && response.data){
                 _this.$(".ruleTitle").attr("data-id",response.data.id);
                 _this.model.set({id:response.data.id},{silent:true});
-
-                //创建
-                if(cdata.URLtype == "createArtifactsPlanNewRule"){
-                    //写入相关的数据
-                    var count = parseInt(App.ResourceArtifacts.Status.presentPlan.get("count"));
-                    var code = App.ResourceArtifacts.Status.presentPlan.get("code");
-                    var pre = App.ResourceArtifacts.PlanNode.filter( function(item) {
-                        return item.get("code") == code;
-                    });
-                    pre[0].set("count",count+1);
-                    $(".artifactsContent .rules h2 i").html( "("+ (count+1) + ")");
-                }else{
-                    //更新，重写标题
-                }
-                _this.reset();
-                $(".artifactsContent .rules").removeClass("services_loading");
                 _this.$(".ruleTitle .desc").text("[" + categoryCode + "] " + categoryName);
                 _this.$(".ruleDetail").hide();
+
+
+                App.ResourceArtifacts.Status.rule.count +=  1;
+                if(cdata.URLtype = "modifyArtifactsPlanRule"){
+                    Backbone.trigger("resetTitle");
+                    Backbone.trigger("countChange");
+                }
+
+                App.ResourceArtifacts.Status.saved = true;
+
+                _this.$el.closest(".ruleDetail").hide();
+                $(".artifactsContent .rules").removeClass("services_loading");
             }
         });
     },
