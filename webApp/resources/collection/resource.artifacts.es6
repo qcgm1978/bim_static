@@ -17,6 +17,7 @@ App.ResourceArtifacts={
             type : "", //1:标准规则；2：项目规则
             targetCode:"",  //对应模块的code
             targetName:"",
+            count:"",
             "mappingCategory": {
                 "categoryCode": "",
                 "categoryName": "",
@@ -240,7 +241,8 @@ App.ResourceArtifacts={
         //公用组件
         this.menu = new App.Resources.ArtifactsMapRule();  //外层菜单
         this.plans = new App.Resources.ArtifactsPlanList();   //模块化列表 /计划节点
-        this.planRule = new App.Resources.ArtifactsPlanRule();  //规则
+        this.planRuleTitle = new App.Resources.ArtifactsPlanRuleTitle();  //规则头部
+        this.planRule = new App.Resources.ArtifactsPlanRule();  //规则列表
         this.quality = new App.Resources.ArtifactsQualityList();//质量标准，外层
         this.plans.planRule = this.menu;
         this.menu.quality = this.quality;
@@ -268,7 +270,8 @@ App.ResourceArtifacts={
 
             _this.$el.append(this.menu.render().el);//菜单
             this.menu.$(".plans").html(this.plans.render().el);//计划节点
-            this.menu.$(".rules").html(this.planRule.render().el);//映射规则
+            this.menu.$(".rules").html(this.planRuleTitle.render().el);//映射规则
+            this.planRuleTitle.$(".ruleContentRuleList").html(this.planRule.render().el);//映射规则
 
             //插入默认为空的规则列表
             this.getPlan();

@@ -1,11 +1,11 @@
 /**
  * @require /resources/collection/resources.nav.es6
  */
-App.Resources.ArtifactsPlanRule = Backbone.View.extend({
+App.Resources.ArtifactsPlanRuleTitle = Backbone.View.extend({
 
-    tagName:"ul",
+    tagName:"div",
 
-    template: _.templateUrl("/resources/tpls/resourcesArtifacts/ruleModel/resources.artifacts.planrule.html"),
+    template: _.templateUrl("/resources/tpls/resourcesArtifacts/ruleModel/resources.artifacts.planruletitle.html"),
 
     events:{
         "click .newPlanRule":"newPlanRule"
@@ -20,29 +20,15 @@ App.Resources.ArtifactsPlanRule = Backbone.View.extend({
         Backbone.on("resetTitle",this.resetTitle,this);
     },
 
-    addOne:function(model) {
-        var newList = new App.Resources.ArtifactsPlanRuleDetail({model: model});
-        this.$el.append(newList.render().el);
-    },
-
     resetTitle:function(){
-        var _this = this;
-        this.collection = App.ResourceArtifacts.PlanRules;
-        this.$el.html("");
-        if(this.collection.length == 0){
-            this.$(".ruleContentRuleList ul").html("<li><div class='ruleTitle delt'>暂无内容</div></li>");
-        }else{
-            this.collection.each(function(item){
-                _this.addOne(item);
-            })
-        }
+        this.$("h2 .name").html(App.ResourceArtifacts.Status.rule.targetCode +
+            " " +App.ResourceArtifacts.Status.rule.targetName  +
+            "("+App.ResourceArtifacts.Status.rule.count + ")");
     },
     //创建规则
     newPlanRule:function(){
         var _this = this;
         var targetCode = App.ResourceArtifacts.Status.rule.targetCode;
-
-
 
         if(!targetCode){
             alert("请选择模块/质量标准");
@@ -53,17 +39,11 @@ App.Resources.ArtifactsPlanRule = Backbone.View.extend({
             //查找未保存的元素并高亮提示变红
             return
         }
-
         //重置删除状态
         App.ResourceArtifacts.Status.delRule ="";
 
-
-        if(!$(".ruleDetail").length){
-            $(".artifactsContent .rules ul").html("");
-        }
         //无数据或无更改，更改当前数据
         $(".ruleDetail:visible").hide();
-
 
         //创建规则
         var model =  App.ResourceArtifacts.createPlanRules();
