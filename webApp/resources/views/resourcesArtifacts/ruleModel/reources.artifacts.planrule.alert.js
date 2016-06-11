@@ -34,6 +34,7 @@ App.Resources.ArtifactsPlanRuleAlert = Backbone.View.extend({
             App.Resources.ArtifactsAlertWindow.close();
             $(".artifactsContent .rules").removeClass("services_loading");
             App.ResourceArtifacts.Status.saved = true;
+            App.ResourceArtifacts.Status.delRule = "";
             return
         }
         //非新建

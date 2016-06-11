@@ -30,6 +30,8 @@ App.Resources.ArtifactsPlanRule = Backbone.View.extend({
         var _this = this;
         var targetCode = App.ResourceArtifacts.Status.rule.targetCode;
 
+
+
         if(!targetCode){
             alert("请选择模块/质量标准");
             return;
@@ -39,6 +41,11 @@ App.Resources.ArtifactsPlanRule = Backbone.View.extend({
             //查找未保存的元素并高亮提示变红
             return
         }
+
+        //重置删除状态
+        App.ResourceArtifacts.Status.delRule ="";
+
+
         if(!$(".ruleDetail").length){
             $(".artifactsContent .rules ul").html("");
         }
