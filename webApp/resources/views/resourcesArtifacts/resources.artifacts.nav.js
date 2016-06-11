@@ -9,7 +9,7 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
 
     events:{
         "click .sele": "select",
-        "click .default" : "create",
+        "click .default" : "create"
 
     },
 
@@ -36,6 +36,10 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
 
     select:function(e){
         var $pre = $(e.target),_this = this;
+
+        if(!App.ResourceArtifacts.Status.saved ){
+            alert("«Îœ»±£¥Ê£°");
+        }
 
         if($pre.closest(".artifactsNav").length){
             $pre.addClass("active").siblings("li").removeClass("active");

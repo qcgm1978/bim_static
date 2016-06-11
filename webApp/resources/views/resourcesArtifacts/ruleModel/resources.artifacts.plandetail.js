@@ -18,6 +18,15 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
 
     initialize:function(){
         this.listenTo(this.model,"change",this.render);
+        Backbone.on("countChange",this.changeCount,this);
+    },
+
+
+    changeCount:function(){
+        var count = App.ResourceArtifacts.Status.rule.count;
+        console.log(this.model);
+        this.model.set({count:count},{silent:true});
+        this.$(".count").text("("+ count + ")");
     },
 
     //取得规则列表

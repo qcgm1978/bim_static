@@ -141,8 +141,10 @@ var AppRoute = Backbone.Router.extend({
 		_.require('/static/dist/resources/resources.js');
 		App.ResourcesNav.Settings.type = type;
 		App.ResourcesNav.Settings.optionType = optionType;
+
 		new App.ResourcesNav.App().render();
 
+		App.ResourceArtifacts.resetPreRule();
 
 		App.ResourceArtifacts.Settings.ruleModel = 3;  //权限入口，模块化，质量标准
 		$(".breadcrumbNav .mappingRule").show();

@@ -1,7 +1,7 @@
 /**
  * @require /resources/collection/resource.nav.es6
  */
-App.Resources.ArtifactsPlanRuleAlert = Backbone.View.extend({
+App.Resources.ArtifactsTplAlert = Backbone.View.extend({
 
     tagName :'div',
     className:"resourcesAlert",
@@ -10,7 +10,7 @@ App.Resources.ArtifactsPlanRuleAlert = Backbone.View.extend({
 
     events:{
         "click #resourcesSure":"sure",
-        "click #resourcesCancel":"cancel",
+        "click #resourcesCancel":"cancel"
     },
 
     render:function(){
@@ -45,7 +45,7 @@ App.Resources.ArtifactsPlanRuleAlert = Backbone.View.extend({
                          }
                      });
 
-                     App.ResourceArtifacts.Status.templateId = null;
+                     App.ResourceArtifacts.Status.templateId = "";
                      //刷新右侧视图  //清空所有选项
                 }else{
                      alert("删除失败");
@@ -57,7 +57,7 @@ App.Resources.ArtifactsPlanRuleAlert = Backbone.View.extend({
                 alert("错误类型"+ error.status +"，无法成功删除!");
             }
         });
-        App.ResourceArtifacts.Status.templateId = null;
+        App.ResourceArtifacts.Status.templateId = "";
     },
         //取消
     cancel:function(){

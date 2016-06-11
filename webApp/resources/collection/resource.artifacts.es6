@@ -1,12 +1,22 @@
 //fetchArtifactsPlan   获取计划
 //fetchArtifactsPlanRule   获取规则
 App.ResourceArtifacts={
+    resetPreRule:function(){
+
+        App.ResourceArtifacts.Status.templateId = "";
+        App.ResourceArtifacts.Status.templateName = "";
+        App.ResourceArtifacts.Status.rule.biz = "";
+        App.ResourceArtifacts.Status.rule.targetCode = "";
+        App.ResourceArtifacts.Status.rule.targetName = "";
+    },
+
+
     Status:{
         presentPlan:null,  //当前计划或质量，提交数据
         saved : true,    //创建规则后的保存状态，已保存  /  未保存
         presentRule : null,    //当前规则
         qualityProcessType:1,   //质量标准 -过程选择  type
-        delRule:null,
+        delRule:"",
         qualityStandardType:"GC",   //质量标准 -过程选择  type
         type:"", //1:标准规则；2：项目规则
         projectId : "",//如果有项目规则就有项目id
