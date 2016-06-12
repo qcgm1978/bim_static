@@ -641,7 +641,23 @@
 				render() {
 					//模板
 					this.$el.html(this.template);
-					this.$(".txtReMark").at();
+					this.$(".txtReMark").at({
+
+						getData:function(name){
+							console.log(name);
+
+							var data={
+								URLtype:"autoComplateUser",
+								data:{
+									projectId:App.Project.Settings.projectId,
+									name:name
+								}
+							}
+
+							return App.Comm.ajax(data);
+
+						}
+					});
 					return this;
 				},
 
@@ -1450,6 +1466,7 @@
 			reName($li) {
 
 				var data = {
+						cate:"viewPoint",
 						id: $li.find(".remarkCount").data("id"),
 						type: $li.find(".thumbnailImg").data("type"),
 						img: $li.find(".thumbnailImg").prop('src'),

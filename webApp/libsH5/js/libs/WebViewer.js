@@ -8170,9 +8170,10 @@ CLOUD.Scene.prototype.prepareScene = function () {
                 }
 
 
-                if (bVisible && !object.visible) {
+                if (/*bVisible &&*/ !object.visible) {
                     object.isGarbage = true;
                     ++scope.garbageCount;
+                    object.unload();
                 }
                 else {
                     object.isGarbage = false;
@@ -8863,7 +8864,7 @@ CLOUD.SubScene.prototype.update = function () {
         var scope = this;
 
         var distance = 0;
-        if (scope.worldBoundingBox.containsPoint(camera.position)) {
+        if (scope.worldBoundingBox.containsPoint(camera.position) || scope.worldBoundingBox.containsPoint(camera.target)) {
             needLoad = true;
         }
         else {
@@ -8882,11 +8883,8 @@ CLOUD.SubScene.prototype.update = function () {
 
             var target = lodValue * CLOUD.GlobalData.SubSceneVisibleDistance * CLOUD.GlobalData.SubSceneVisibleLOD;
 
-            if (scope.level > CLOUD.EnumObjectLevel.Small) {
-
-                if (scope.out && !camera.inside) {
-                    target = target * 6;
-                }
+            if (scope.level > CLOUD.EnumObjectLevel.Small && scope.out && !camera.inside) {
+                    target = target * 8;
             }
 
             needLoad = distance < target;
@@ -17138,6 +17136,7 @@ CLOUD.ModelManager.prototype.prepareScene = function (camera, renderId, ignoreLo
     // update scene
     //this.scene.prepareSceneBox(camera);
     this.scene.prepareScene(camera);
+    
     this.prepareResource(renderId, !ignoreLoad);
 };
 
@@ -17219,7 +17218,7 @@ CLOUD.ModelManager.prototype.load = function (parameters) {
 
                 //
                 var worldBox = scope.scene.worldBoundingBox();
-                scope.scene.innerBoundingBox.min.z = worldBox.z;
+                scope.scene.innerBoundingBox.min.z = worldBox.min.z;
             });
         }
 
@@ -17701,9 +17700,9 @@ CLOUD.EditorManager.prototype = {
         viewer.cameraEditor.zoom(factor);
     },
 
-    zoomAll: function (viewer, margin) {
+    zoomAll: function (viewer, margin, ratio) {
         var box = viewer.getScene().worldBoundingBox();
-        var target = viewer.camera.zoomToBBox(box, margin);
+        var target = viewer.camera.zoomToBBox(box, margin, ratio);
         viewer.cameraEditor.updateCamera(target);
 
         viewer.render();
@@ -18028,7 +18027,7 @@ CloudViewer.prototype = {
                     }
                     else {
                         //console.time("gc" + renderId);
-                        scope.modelManager.collectionGarbage();
+                        //scope.modelManager.collectionGarbage();
                         //console.timeEnd("gc" + renderId);
                     }
                         
@@ -18259,7 +18258,8 @@ CloudViewer.prototype = {
     },
 
     setPickMode: function () {
-        this.editorManager.setPickMode(this);
+        this.editorManager.setRectPickMode(this);
+        //this.editorManager.setPickMode(this);
     },
     setRectPickMode: function () {
         this.editorManager.setRectPickMode(this);
@@ -18294,9 +18294,21 @@ CloudViewer.prototype = {
         this.editorManager.zoomOut(factor, this);
     },
 
-    zoomAll: function (margin) {
+    zoomAll: function (margin, ratio) {
         margin = margin || -0.05;
-        this.editorManager.zoomAll(this, margin);
+        this.editorManager.zoomAll(this, margin, ratio);
+    },
+
+    zoomToBuilding: function (margin, ratio) {
+
+        var box = this.getScene().innerBoundingBox;
+        if (box.empty()) {
+            this.zoomAll();
+        }
+        else {
+            var target = this.camera.zoomToBBox(box, margin, ratio);
+            this.cameraEditor.updateCamera(target);
+        }
     },
 
     zoomToSelection: function (margin, ratio) {
@@ -18599,15 +18611,6 @@ CloudViewer.prototype = {
             } else {
                 miniMap.hideAxisGird();
             }
-        }
-    },
-
-    showAxisGridNumber: function(name, show){
-
-        var miniMap = this.miniMaps[name];
-
-        if (miniMap) {
-            miniMap.showAxisGridNumber(show);
         }
     },
 

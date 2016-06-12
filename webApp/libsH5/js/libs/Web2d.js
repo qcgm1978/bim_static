@@ -405,6 +405,12 @@ CLOUD.MiniMap = function (viewer) {
     var _defaultClearColor = 0x333333;//0xffffff; // 0xadadad; // 缺省背景色
     var _materialColor = 0x999999;
 
+    // 轴网材质
+    var _materialGrid = new THREE.LineBasicMaterial({
+        color: _materialColor,
+        linewidth: 0.5
+    });
+
     var _xmlns = "http://www.w3.org/2000/svg";
     var _svg = document.createElementNS(_xmlns, 'svg');
     var _svgGroupForAxisGrid = document.createElementNS(_xmlns, "g");
@@ -416,7 +422,7 @@ CLOUD.MiniMap = function (viewer) {
 
     var _axisGridElements = [], _axisGridIntersectionPoints = [], _axisGridLevels = [];
     var _axisGridNumberCircleRadius = 10, _axisGridNumberFontSize = 8, _axisGridNumberInterval = 3; // 轴号间隔
-    var _isShowAxisGridNumber = true, _isShowAxisGrid = false, _isLoadedAxisGrid = false, _isLoadedFloorPlane = false;
+    var _isShowAxisGrid = false, _isLoadedAxisGrid = false, _isLoadedFloorPlane = false;
 
     var _enableFlyByClick = true; // 是否允许click飞到指定位置
 
@@ -683,20 +689,19 @@ CLOUD.MiniMap = function (viewer) {
                 if (_clipBox2D.isIntersectionBox(_elemBox2D) === true) {
                     renderLine(v1, v2, material);
 
-                    if (_isShowAxisGridNumber) {
-                        if (j % _axisGridNumberInterval == 0) {
-                            var dir = new THREE.Vector2();
-                            dir.subVectors(v2, v1).normalize().multiplyScalar(_axisGridNumberCircleRadius);
+                    // 绘制轴号
+                    if (j % _axisGridNumberInterval == 0) {
+                        var dir = new THREE.Vector2();
+                        dir.subVectors(v2, v1).normalize().multiplyScalar(_axisGridNumberCircleRadius);
 
-                            var newV1 = v1.clone().sub(dir);
-                            var newV2 = v2.clone().add(dir);
+                        var newV1 = v1.clone().sub(dir);
+                        var newV2 = v2.clone().add(dir);
 
-                            renderCircle(newV1.x, newV1.y, material);
-                            renderCircle(newV2.x, newV2.y, material);
+                        renderCircle(newV1.x, newV1.y, material);
+                        renderCircle(newV2.x, newV2.y, material);
 
-                            renderText(newV1.x, newV1.y, element.name, material);
-                            renderText(newV2.x, newV2.y, element.name, material);
-                        }
+                        renderText(newV1.x, newV1.y, element.name, material);
+                        renderText(newV2.x, newV2.y, element.name, material);
                     }
                 }
             }
@@ -740,11 +745,24 @@ CLOUD.MiniMap = function (viewer) {
         point.applyMatrix4(sceneMatrix);
     }
 
-    function calculateAxisGridBox() {
+    // 计算轴网包围盒
+    function calculateAxisGridBox(grids) {
+
+        _axisGridBox2D.makeEmpty();
+
+        // 计算轴网包围盒
+        for (var i = 0, len = grids.length; i < len; i++) {
+
+            var start = new THREE.Vector2(grids[i].start.X, grids[i].start.Y);
+            var end = new THREE.Vector2(grids[i].end.X, grids[i].end.Y);
+
+            _axisGridBox2D.expandByPoint(start);
+            _axisGridBox2D.expandByPoint(end);
+        }
 
         var offset = 4;
 
-        if (_isShowAxisGridNumber) {
+        if (_isShowAxisGrid) {
 
             var center = _axisGridBox2D.center();
             var oldSize = _axisGridBox2D.size();
@@ -753,6 +771,80 @@ CLOUD.MiniMap = function (viewer) {
             newSize.y = oldSize.y * _svgHeight / (_svgHeight - 4.0 * (_axisGridNumberCircleRadius + offset));
 
             _axisGridBox2D.setFromCenterAndSize(center, newSize);
+        }
+    }
+
+    // 计算轴网交叉点
+    function calculateAxisGridIntersection(grids, material) {
+
+        if (_axisGridElements.length > 0) {
+            //_axisGridElements.splice(0,_axisGridElements.length);
+            _axisGridElements = [];
+        }
+
+        if (_axisGridIntersectionPoints.length > 0) {
+            _axisGridIntersectionPoints = [];
+        }
+
+        var horizLineElements = []; // 水平线集合
+        var verticalLineElements = []; // 垂直线集
+
+        var i = 0, j = 0, len = grids.length;
+
+        for (i = 0; i < len; i++) {
+
+            var name = grids[i].name;
+            var start = new THREE.Vector2(grids[i].start.X, grids[i].start.Y);
+            var end = new THREE.Vector2(grids[i].end.X, grids[i].end.Y);
+
+            worldToNormalizedPoint(start);
+            normalizedPointToScreen(start);
+
+            worldToNormalizedPoint(end);
+            normalizedPointToScreen(end);
+
+            var dir = end.clone().sub(start).normalize();
+
+            if (Math.abs(dir.x) >= Math.abs(dir.y)) {
+                // 水平方向线条
+                horizLineElements.push({name: name, v1: start, v2: end, material: material});
+            } else {
+                // 垂直方向线条
+                verticalLineElements.push({name: name, v1: start, v2: end, material: material});
+            }
+        }
+
+        _axisGridElements.push(horizLineElements);
+        _axisGridElements.push(verticalLineElements);
+
+        // 计算交点
+        var horizLineElementsLen = horizLineElements.length;
+        var verticalLineElementsLen = verticalLineElements.length;
+        var horizLine, verticalLine, numeralName, abcName;
+        var p1, p2, p3, p4;
+
+        for (i = 0; i < horizLineElementsLen; i++) {
+            horizLine = horizLineElements[i];
+            abcName = horizLine.name;
+            p1 = horizLine.v1.clone();
+            p2 = horizLine.v2.clone();
+
+            for (j = 0; j < verticalLineElementsLen; j++) {
+                verticalLine = verticalLineElements[j];
+                numeralName = verticalLine.name;
+                p3 = verticalLine.v1.clone();
+                p4 = verticalLine.v2.clone();
+
+                // 获得交点
+                var interPoint = getInterPoint(p1, p2, p3, p4);
+                _axisGridIntersectionPoints.push({
+                    intersectionPoint: interPoint,
+                    horizLine: [p1.clone(), p2.clone()],
+                    verticalLine: [p3.clone(), p4.clone()],
+                    abcName: abcName,
+                    numeralName: numeralName
+                });
+            }
         }
     }
 
@@ -802,8 +894,6 @@ CLOUD.MiniMap = function (viewer) {
 
         var mouse = new THREE.Vector2(event.clientX, event.clientY);
         var isOverCanvas = this.isMouseOverCanvas(mouse);
-
-        _hasMouseDown = true;
 
         //if (!_enableMouseEvent) return isOverCanvas;
 
@@ -874,8 +964,6 @@ CLOUD.MiniMap = function (viewer) {
 
             callback(clickPoint);
         }
-
-        _hasMouseDown = false;
 
         return isOverCanvas;
     };
@@ -972,26 +1060,6 @@ CLOUD.MiniMap = function (viewer) {
             _svg.appendChild(_cameraNode);
         }
 
-    };
-
-    this.getMainSceneMatrix = function () {
-        var mainScene = this.viewer.getScene();
-        var rootNode = mainScene.rootNode;
-        //rootNode.updateMatrixWorld(true);
-        //rootNode.updateMatrix();
-        //rootNode.matrixAutoUpdate = false;
-
-        return rootNode.matrix.clone();
-    };
-
-    this.containsPointInMainScene = function(point) {
-        var mainScene = this.viewer.getScene();
-
-        if (mainScene.rootNode.boundingBox) {
-            return mainScene.rootNode.boundingBox.containsPoint(point);
-        }
-
-        return false;
     };
 
     this.initCanvasContainer = function (domContainer, styleOptions) {
@@ -1142,118 +1210,27 @@ CLOUD.MiniMap = function (viewer) {
         if (!jsonObj)  return;
 
         var grids = jsonObj.Grids;
-        //var levels = jsonObj.Levels;
-
-        this.clearAxisGird();
-        //this.initAxisGirdLevels(levels);
-        this.initAxisGird(grids);
-    };
-
-    this.clearAxisGird = function () {
-
-        if (_axisGridElements.length > 0) {
-            //_axisGridElements.splice(0,_axisGridElements.length);
-            _axisGridElements = [];
-        }
-
-        if (_axisGridIntersectionPoints.length > 0) {
-            _axisGridIntersectionPoints = [];
-        }
-
-        _axisGridBox2D.makeEmpty();
-        _isLoadedAxisGrid = false;
-    };
-
-    this.initAxisGird = function (grids) {
-
         var len = grids.length;
 
-        if (len < 1) return;
+        if (len < 1) {
 
-        var materialGrid = new THREE.LineBasicMaterial({
-            color: _materialColor,
-            linewidth: 0.5
-        });
-
-        var i = 0, j = 0;
-
-        // 计算轴网包围盒
-        for (i = 0; i < len; i++) {
-
-            var start = new THREE.Vector2(grids[i].start.X, grids[i].start.Y);
-            var end = new THREE.Vector2(grids[i].end.X, grids[i].end.Y);
-
-            _axisGridBox2D.expandByPoint(start);
-            _axisGridBox2D.expandByPoint(end);
+            console.error("axis grid data error!!!");
+            return;
         }
 
-        calculateAxisGridBox();
+        _isLoadedAxisGrid = true;
 
-        var horizLineElements = []; // 水平线集合
-        var verticalLineElements = []; // 垂直线集合
+        //var levels = jsonObj.Levels;
+        //this.clearAxisGird();
+        //this.initAxisGirdLevels(levels);
 
-        for (i = 0; i < len; i++) {
-
-            var name = grids[i].name;
-            var start = new THREE.Vector2(grids[i].start.X, grids[i].start.Y);
-            var end = new THREE.Vector2(grids[i].end.X, grids[i].end.Y);
-
-            worldToNormalizedPoint(start);
-            normalizedPointToScreen(start);
-
-            worldToNormalizedPoint(end);
-            normalizedPointToScreen(end);
-
-            var dir = end.clone().sub(start).normalize();
-
-            if (Math.abs(dir.x) >= Math.abs(dir.y)) {
-                // 水平方向线条
-                horizLineElements.push({name: name, v1: start, v2: end, material: materialGrid});
-            } else {
-                // 垂直方向线条
-                verticalLineElements.push({name: name, v1: start, v2: end, material: materialGrid});
-            }
-        }
-
-        _axisGridElements.push(horizLineElements);
-        _axisGridElements.push(verticalLineElements);
-
-        // 计算交点
-        var horizLineElementsLen = horizLineElements.length;
-        var verticalLineElementsLen = verticalLineElements.length;
-        var horizLine, verticalLine, numeralName, abcName;
-        var p1, p2, p3, p4;
-
-        for (i = 0; i < horizLineElementsLen; i++) {
-            horizLine = horizLineElements[i];
-            abcName = horizLine.name;
-            p1 = horizLine.v1.clone();
-            p2 = horizLine.v2.clone();
-
-            for (j = 0; j < verticalLineElementsLen; j++) {
-                verticalLine = verticalLineElements[j];
-                numeralName = verticalLine.name;
-                p3 = verticalLine.v1.clone();
-                p4 = verticalLine.v2.clone();
-
-                // 获得交点
-                var interPoint = getInterPoint(p1, p2, p3, p4);
-                _axisGridIntersectionPoints.push({
-                    intersectionPoint: interPoint,
-                    horizLine: [p1.clone(), p2.clone()],
-                    verticalLine: [p3.clone(), p4.clone()],
-                    abcName: abcName,
-                    numeralName: numeralName
-                });
-            }
-        }
+        this.initAxisGird(grids);
 
         // 如果先初始化平面图，后初始化轴网，因为轴网确定范围，则需要重新初始化平面图
-        if (_isLoadedFloorPlane && !_isLoadedAxisGrid) {
+        if (_isLoadedFloorPlane) {
 
             console.log("re-initialize floor plane!!!");
 
-            _isLoadedAxisGrid = true;
             this.initFloorPlane();
 
             if (_isChangeView) {
@@ -1263,10 +1240,32 @@ CLOUD.MiniMap = function (viewer) {
             }
 
         } else {
-            _isLoadedAxisGrid = true;
             this.render();
         }
+    };
 
+    //this.clearAxisGird = function () {
+    //
+    //    if (_axisGridElements.length > 0) {
+    //        //_axisGridElements.splice(0,_axisGridElements.length);
+    //        _axisGridElements = [];
+    //    }
+    //
+    //    if (_axisGridIntersectionPoints.length > 0) {
+    //        _axisGridIntersectionPoints = [];
+    //    }
+    //
+    //    _axisGridBox2D.makeEmpty();
+    //    _isLoadedAxisGrid = false;
+    //};
+
+    this.initAxisGird = function (grids) {
+
+        // 计算轴网包围盒
+        calculateAxisGridBox(grids);
+
+        // 计算轴网交叉点
+        calculateAxisGridIntersection(grids, _materialGrid);
     };
 
     this.initAxisGirdLevels = function (levels) {
@@ -1281,10 +1280,107 @@ CLOUD.MiniMap = function (viewer) {
         //}
     };
 
+    this.generateFloorPlane = function(changeView) {
+
+        if (changeView === undefined) {
+            changeView = false;
+        }
+
+        _isChangeView = changeView;
+
+        //_isLoadedFloorPlane = false;
+
+        var jsonObj = CLOUD.MiniMap.floorPlaneData;
+
+        if (!jsonObj) return;
+
+        var url = jsonObj["Path"] || jsonObj["path"];
+        var boundingBox = jsonObj["BoundingBox"] || jsonObj["boundingBox"];
+
+        if (!url || !boundingBox) {
+            console.warn('floor-plan data is error!');
+            return;
+        }
+
+        _floorPlaneUrl = url;
+        _floorPlaneBox = new THREE.Box3(new THREE.Vector3(boundingBox.Min.X, boundingBox.Min.Y, boundingBox.Min.Z), new THREE.Vector3(boundingBox.Max.X, boundingBox.Max.Y, boundingBox.Max.Z));
+
+        // 设置相机投影点位置高度在平面图包围盒中心
+        _cameraProjectedPosZ = 0.5 * (_floorPlaneBox.min.z + _floorPlaneBox.max.z);
+        _floorPlaneMinZ = _floorPlaneBox.min.z;
+
+        _isLoadedFloorPlane = true;
+
+        if (!_isLoadedAxisGrid) {
+            console.warn('axis-grid is not initialized!');
+
+            return;
+        }
+
+        this.initFloorPlane();
+
+        // render
+        if (_isChangeView) {
+            this.fly();
+        }else {
+            this.render();
+        }
+
+    };
+
+    this.initFloorPlane = function () {
+
+        var url = _floorPlaneUrl;
+        // 平面图不需要使用Z坐标
+        var bBox2D = new THREE.Box2(new THREE.Vector2(_floorPlaneBox.min.x, _floorPlaneBox.min.y), new THREE.Vector2(_floorPlaneBox.max.x, _floorPlaneBox.max.y));
+        // 计算位置
+        var axisGridBoxSize = _axisGridBox2D.size();
+        var axisGridCenter = _axisGridBox2D.center();
+        var boxSize = bBox2D.size();
+        var boxCenter = bBox2D.center();
+        var scaleX = _svgWidth / axisGridBoxSize.x;
+        var scaleY = _svgHeight / axisGridBoxSize.y;
+        var width = boxSize.x * scaleX;
+        var height = boxSize.y * scaleY;
+        var offset = boxCenter.clone().sub(axisGridCenter);
+
+        offset.x *= scaleX;
+        offset.y *= -scaleY;
+
+        if (!_axisGridBox2D.containsBox(bBox2D)) {
+            console.warn('the bounding-box of axis-grid is not contains the bounding-box of floor-plane!');
+        }
+
+        _svgNode = getImageNode(0);
+        _svgNode.href.baseVal = url;
+        _svgNode.setAttribute("id", "Floor-" + _imageCount);
+        _svgNode.setAttribute("width", width + "");
+        _svgNode.setAttribute("height", height + "");
+        _svgNode.setAttribute("x", (-0.5 * width) + "");
+        _svgNode.setAttribute("y", (-0.5 * height) + "");
+        _svgNode.setAttribute("transform", 'translate(' + offset.x + ',' + offset.y + ')');
+    };
+
+    // 重设轴网大小
+    this.resizeClientAxisGrid = function() {
+
+        var grids = CLOUD.MiniMap.axisGridData.Grids;
+
+        this.initAxisGird(grids);
+
+        if (_isLoadedFloorPlane) {
+            this.initFloorPlane();
+        }
+    };
+
     this.showAxisGird = function () {
 
         if (_isLoadedAxisGrid) {
+
             _isShowAxisGrid = true;
+
+            this.resizeClientAxisGrid();
+
             //_svgGroupForAxisGrid.style.opacity = 1;
             _svgGroupForAxisGrid.style.display = "";
 
@@ -1299,7 +1395,11 @@ CLOUD.MiniMap = function (viewer) {
     this.hideAxisGird = function () {
 
         if (_isLoadedAxisGrid) {
+
             _isShowAxisGrid = false;
+
+            this.resizeClientAxisGrid();
+
             //_svgGroupForAxisGrid.style.opacity = 0;
             _svgGroupForAxisGrid.style.display = "none";
 
@@ -1307,10 +1407,6 @@ CLOUD.MiniMap = function (viewer) {
 
             this.render();
         }
-    };
-
-    this.showAxisGridNumber = function(show) {
-        _isShowAxisGridNumber = show;
     };
 
     this.highlightedNode = function (isOverCanvas, isShowAxisGrid, allowNear, callback) {
@@ -1425,89 +1521,24 @@ CLOUD.MiniMap = function (viewer) {
         _highlightVerticalLineNode.setAttribute('y2', highlightNode.verticalLine[1].y);
     };
 
-    this.generateFloorPlane = function(changeView) {
+    this.getMainSceneMatrix = function () {
+        var mainScene = this.viewer.getScene();
+        var rootNode = mainScene.rootNode;
+        //rootNode.updateMatrixWorld(true);
+        //rootNode.updateMatrix();
+        //rootNode.matrixAutoUpdate = false;
 
-        if (changeView === undefined) {
-            changeView = false;
-        }
-
-        _isChangeView = changeView;
-
-        //_isLoadedFloorPlane = false;
-
-        var jsonObj = CLOUD.MiniMap.floorPlaneData;
-
-        if (!jsonObj) return;
-
-        var url = jsonObj["Path"] || jsonObj["path"];
-        var boundingBox = jsonObj["BoundingBox"] || jsonObj["boundingBox"];
-
-        if (!url || !boundingBox) {
-            console.warn('floor-plan data is error!');
-            return;
-        }
-
-        _isLoadedFloorPlane = true;
-
-        _floorPlaneUrl = url;
-        _floorPlaneBox = new THREE.Box3(new THREE.Vector3(boundingBox.Min.X, boundingBox.Min.Y, boundingBox.Min.Z), new THREE.Vector3(boundingBox.Max.X, boundingBox.Max.Y, boundingBox.Max.Z));
-
-        // 设置相机投影点位置高度在平面图包围盒中心
-        _cameraProjectedPosZ = 0.5 * (_floorPlaneBox.min.z + _floorPlaneBox.max.z);
-        _floorPlaneMinZ = _floorPlaneBox.min.z;
-
-        if (!_isLoadedAxisGrid) {
-            console.warn('axis-grid is not initialized!');
-
-            return;
-
-            // 没有设置轴网，取自己的包围盒
-            //_axisGridBox.copy(bBox2D);
-            //
-            //computeAxisGridBox();
-        }
-
-        this.initFloorPlane();
-
-        if (_isChangeView) {
-            this.fly();
-        }else {
-            this.render();
-        }
-
+        return rootNode.matrix.clone();
     };
 
-    this.initFloorPlane = function () {
+    this.containsPointInMainScene = function(point) {
+        var mainScene = this.viewer.getScene();
 
-        var url = _floorPlaneUrl;
-        // 平面图不需要使用Z坐标
-        var bBox2D = new THREE.Box2(new THREE.Vector2(_floorPlaneBox.min.x, _floorPlaneBox.min.y), new THREE.Vector2(_floorPlaneBox.max.x, _floorPlaneBox.max.y));
-        // 计算位置
-        var axisGridBoxSize = _axisGridBox2D.size();
-        var axisGridCenter = _axisGridBox2D.center();
-        var boxSize = bBox2D.size();
-        var boxCenter = bBox2D.center();
-        var scaleX = _svgWidth / axisGridBoxSize.x;
-        var scaleY = _svgHeight / axisGridBoxSize.y;
-        var width = boxSize.x * scaleX;
-        var height = boxSize.y * scaleY;
-        var offset = boxCenter.clone().sub(axisGridCenter);
-
-        offset.x *= scaleX;
-        offset.y *= -scaleY;
-
-        if (!_axisGridBox2D.containsBox(bBox2D)) {
-            console.warn('the bounding-box of axis-grid is not contains the bounding-box of floor-plane!');
+        if (mainScene.rootNode.boundingBox) {
+            return mainScene.rootNode.boundingBox.containsPoint(point);
         }
 
-        _svgNode = getImageNode(0);
-        _svgNode.href.baseVal = url;
-        _svgNode.setAttribute("id", "Floor-" + _imageCount);
-        _svgNode.setAttribute("width", width + "");
-        _svgNode.setAttribute("height", height + "");
-        _svgNode.setAttribute("x", (-0.5 * width) + "");
-        _svgNode.setAttribute("y", (-0.5 * height) + "");
-        _svgNode.setAttribute("transform", 'translate(' + offset.x + ',' + offset.y + ')');
+        return false;
     };
 
     this.getAxisGridInfoByPoint = function(point) {

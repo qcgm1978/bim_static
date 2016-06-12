@@ -168,6 +168,21 @@ fis.match('/comm/**.{js,es6}', {
   packTo: '/static/dist/comm/comm_' + v + '.js'
 });
 
+
+//合并公共样式文件
+fis.match('/commH5/**.{less,css}', {
+  useHash: false,
+  packTo: '/static/dist/comm/commH5_' + v + '.css'
+});
+
+//合并公共文件
+fis.match('/commH5/**.{js,es6}', {
+  useHash: false,
+  //useHash:true,
+  packTo: '/static/dist/commH5/commH5_' + v + '.js'
+});
+
+
 //bodyContent
 fis.match('/bodyContent/**.{less,css}', {
   //useHash: false,
