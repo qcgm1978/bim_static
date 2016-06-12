@@ -296,6 +296,7 @@ App.API = {
 		uploadPicByToken:"sixD/sharedViewpoint/{token}/comment/pic",//上传图片
 		createCommentByToken:"sixD/sharedViewpoint/{token}/comment",//创建评论
 		delCommentByToken:"/sixD/sharedViewpoint/{token}/comment/{commentId}",//删除评论
+		autoComplateUser:"/platform/project/{projectId}/member",
 
 		test: ""
 	},
