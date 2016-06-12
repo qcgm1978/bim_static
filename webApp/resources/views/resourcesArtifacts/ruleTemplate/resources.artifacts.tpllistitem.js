@@ -20,7 +20,6 @@ App.Resources.ArtifactsTplListItem = Backbone.View.extend({
         this.listenTo(this.model,"change",this.render);
         this.listenTo(this.model,"remove",this.render);
     },
-
     //取得模板
     getTpl:function(){
         App.ResourceArtifacts.Status.templateId = this.model.get("id");//保存id
@@ -33,25 +32,62 @@ App.Resources.ArtifactsTplListItem = Backbone.View.extend({
         }
         this.toggleClass();
 
+
+        $(".tplContent").addClass("services_loading");
         //重置右侧列表
-        var detail = new App.Resources.ArtifactsTplDetail();
-        var pre = new App.Resources.ArtifactsMapRule();  //外层菜单
-        var plans = new App.Resources.ArtifactsPlanList();   //模块化列表 /计划节点
-        var planRule = new App.Resources.ArtifactsPlanRule();  //默认规则
-        $(".tplContent").html(detail.render().el);
-        detail.$(".tplDetailCon").append(pre.render().el);//菜单
-        pre.$(".plans").html(plans.render().el);//计划节点
-        pre.$(".rules .ruleContent").html(planRule.render().el);//映射规则
-        $("#artifacts").addClass("tpl");
+        this.detail = new App.Resources.ArtifactsTplDetail();
+        this.menu = new App.Resources.ArtifactsMapRule();
+        this.plans = new App.Resources.ArtifactsPlanList();
+        this.planRule = new App.Resources.ArtifactsPlanRule();
+        this.quality = new App.Resources.ArtifactsQualityList();//质量标准，外层
+
+        $(".tplContent").html(this.detail.render().el);
+        this.detail.$(".tplDetailCon").append(this.menu.render().el);//菜单
+        this.menu.$(".plans").append(this.plans.render().el);//计划
+        this.menu.$(".rules").append(this.planRule.render().el);//规则
+        this.menu.$(".qualifyC").append(this.quality.render().el);//质量
+
+
+
+        $("#artifacts").addClass("tpl");//此处为修正样式表现
 
         //修改内容
         $(".tplDetailTitle h2").text(this.model.get("name"));
         $(".tplDetailTitle .tplName").val(this.model.get("name"));
-    },
 
+        //获取列表
+        this.getTplRule();//获取规则模板列表
+    },
     //切换
     toggleClass:function(){
         $(".tplCon li").removeClass("active");
         this.$el.addClass("active");
+    },
+    //获取模板规则列表
+    getTplRule:function(){
+        var _this = this;
+        var pdata = {
+            URLtype:"fetchArtifactsTemplateRule",
+            data:{
+                templateId : App.ResourceArtifacts.Status.templateId
+            }
+        };
+        App.Comm.ajax(pdata,function(response){
+            if(response.code == 0 && response.data){
+                if(response.data.length){
+
+                    _this.menu.$(".plans").html(_this.plans.render().el);
+                    _this.menu.$(".rules .ruleContent").html(_this.planRule.render().el);
+
+                    App.ResourceArtifacts.getPlan();//获取计划节点
+                    App.ResourceArtifacts.TplCollectionRule.add(response.data);
+                    $(".tplContent").removeClass("services_loading");
+                }else{
+                    //没有任何规则时候，创建规则按钮
+                    _this.menu.$(".artifactsContent .default").show().siblings().hide();
+                    $(".tplContent").removeClass("services_loading");
+                }
+            }
+        })
     }
 });

@@ -9,13 +9,24 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
 
     events:{
         "click .sele": "select",
-        "click .newPlanRule":"newPlanRule"
+        "click .default" : "create",
+
     },
 
     template: _.templateUrl("/resources/tpls/resourcesArtifacts/resources.artifacts.nav.html"),
 
     render:function() {
         this.$el.html(this.template);
+
+        App.ResourceArtifacts.Status.rule.biz = 1;
+        var power = App.ResourceArtifacts.Settings.ruleModel;
+        if(power == 1){
+            this.$(".modularization").remove();
+            this.$(".quality").addClass("active");
+        }else if(power == 2){
+            App.ResourceArtifacts.Status.rule.biz = 2;
+            this.$(".quality").remove();
+        }
         return this;
     },
 
@@ -24,35 +35,36 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
     },
 
     select:function(e){
-        var pre = $(e.target),_this =this;
-        if(pre.hasClass("active")){
-            return
+        var $pre = $(e.target),_this = this;
+
+        if($pre.closest(".artifactsNav").length){
+            $pre.addClass("active").siblings("li").removeClass("active");
         }
 
-        //如果当前是规则模板存在
-        //if(){}
 
+        var modularization = this.$(".modularization.active").length;
+        var quality = this.$(".quality.active").length;
 
-        //重置数据，导致每次重新获取映射规则
-        //需要清空当前列表
-        //this.$(".ruleContent ul").html("<li><div class='ruleTitle delt'>没有选择模块/质量标准</div></li>");
-        if(pre.hasClass("modularization")){//模块化
+        if(modularization){//模块化
             App.ResourceArtifacts.Status.rule.biz = 1 ;
-            this.$(".qualifyC").empty().hide();
-            var plans = new App.Resources.ArtifactsPlanList();
-            $(".breadcrumbNav .mappingRule").show();
-            this.$(".plans").html(plans.render().el);//计划节点
-            App.ResourceArtifacts.getPlan();
-            this.$(".plans").show();
+            if(this.$(".default:visible").length){
+                return
+            }
 
+            this.$(".plans").html(App.ResourceArtifacts.plans.render().el);//计划节点
+            App.ResourceArtifacts.getPlan();
+
+            this.$(".qualifyC").hide();
+            this.$(".plans").show();
             this.resetRule();
 
-        }else if(pre.hasClass("quality")){//质量
-
+        }else if(quality){//质量
             App.ResourceArtifacts.Status.rule.biz = 2 ;
-            this.$(".plans").empty().hide();
-            var quality = new App.Resources.ArtifactsQualityList().render().el;
-            this.$(".qualifyC").html(quality);
+            if(this.$(".default:visible").length){
+                return
+            }
+
+            this.$(".qualifyC").html(App.ResourceArtifacts.quality.render().el);
             var pdata = {
                 URLtype:'fetchArtifactsQuality',
                 data:{
@@ -61,10 +73,14 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
                 }
             };
             App.ResourceArtifacts.getQuality(pdata,_this);
-            this.$(".qualifyC").show();
             this.resetRule();
+
+            this.$(".plans").hide();
+            this.$(".qualifyC").show();
         }
-        pre.addClass("active").siblings("li").removeClass("active");
+
+        this.$(".rules").show();
+
     },
 
     getCategoryCode:function(){
@@ -84,43 +100,10 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
         this.$(".rules h2 name").text("没有选择模块/质量标准");
         //this.$(".ruleContent ul").html("<li><div class='ruleTitle delt'>没有选择模块/质量标准</div></li>");
     },
-    //创建规则
-    newPlanRule:function(){
-        var _this = this;
-        var targetCode = App.ResourceArtifacts.Status.rule.targetCode;
 
-        if(!targetCode){
-            alert("请选择模块/质量标准");
-            return;
-        }//没有选择计划无法创建规则
-        if( !App.ResourceArtifacts.Status.saved){
-            alert("您还有没保存的");
-            //查找未保存的元素并高亮提示变红
-            return
-        }
-        if(!$(".ruleDetail").length){
-            $(".artifactsContent .rules ul").html("");
-        }
-        //无数据或无更改，更改当前数据
-        $(".ruleDetail:visible").hide();
-
-
-        //创建规则
-        var model =  App.ResourceArtifacts.createPlanRules();
-
-        var container = new App.Resources.ArtifactsPlanRuleDetail({model:model}).render();
-        //加载底下规则
-        var operatorData = App.Resources.dealStr(model);//规则数据
-        container.$(".mapRule dl").html("");
-        _.each(operatorData,function(item){
-            var model = new App.ResourceArtifacts.operator(item);
-            var view = new App.Resources.ArtifactsPlanRuleDetailNew({model:model}).render().el;
-            container.$(".mapRule dl").append(view);
-        });
-
-        $(".ruleContent>ul").append(container.el).show();
-        $(".ruleContent>ul>li:last .ruleDetail").show();
-        App.ResourceArtifacts.Status.saved = false;
+    //为项目设置创建规则
+    create:function(e){
+        this.$(".default").hide();
+        this.select(e);
     }
-
 });

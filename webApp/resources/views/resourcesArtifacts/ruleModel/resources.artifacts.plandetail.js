@@ -21,9 +21,11 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
     },
 
     //取得规则列表
-    getPlanId:function(){
-
-
+    getPlanId:function(e){
+        var $this = $(e.target);
+        if($this.closest("li").hasClass("active")){
+            return
+        }
 
          App.ResourceArtifacts.Status.rule.targetCode = this.model.get("code");
         App.ResourceArtifacts.Status.rule.targetName = this.model.get("name");
@@ -39,8 +41,8 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
         App.ResourceArtifacts.Status.presentPlan = this.model;
     },
 //切换计划
-    toggleClass:function(){
-        $(".artifactsList li").removeClass("active");
+    toggleClass:function(e){
+        $(".artifactsList .plcon li").removeClass("active");
         this.$el.addClass("active");
     },
 //获取计划节点相关规则
@@ -57,8 +59,6 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
         };
         App.ResourceArtifacts.loading();
         App.Comm.ajax(pdata,function(response){
-
-            console.log(response);
             if(response.code == 0 ){
 
                 $(".artifactsContent .rules h2 .name").html(_this.model.get("code") + "&nbsp;" +_this.model.get("name"));

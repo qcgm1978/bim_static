@@ -37,13 +37,14 @@
 
 	  }
 
-	  //if (Auth.mappingRule) {
-		 // $container.append(tabs.mappingRule.tab);
-    //
-		 // this.viewProjectMapping = new App.Services.ProjectMapping();
-		 // this.$(".projectContainer .projectMapping").html(this.viewProjectMapping.render().el);
-    //
-	  //}
+		//映射规则
+		if (Auth.mappingRule) {
+			$container.append(tabs.mappingRule.tab);
+			this.viewMappingRule = new App.Services.viewMappingRule();
+			this.$(".projectContainer .projectMappingRule").html(this.viewMappingRule.render().el);
+		}
+
+
 
 	  if (Auth.designInfo) {
 		  $container.append(tabs.designInfo.tab);
@@ -123,8 +124,22 @@
  		collectionMap.fetch({
  			reset:true,
  			success(child, data) {
+
  			}
  		});
+
+
+		//映射规则
+		let collectionMapRule=App.Services.ProjectCollection.ProjectMappingRuleCollection;
+		collectionMapRule.reset();
+		collectionMapRule.projectId=_projectId;
+		collectionMapRule.fetch({
+			data: {projectId: _projectId},
+			success(child, data) {}
+		});
+
+
+
  		
  		//加载基坑数据
  		this.viewProjectBaseHole.setUserData({
@@ -214,7 +229,9 @@
  			this.$(".projectContainer .projectSection").show().siblings().hide();
  		} else if (type == "pile") {//桩
  			this.$(".projectContainer .projectPile").show().siblings().hide();
- 		}
+ 		}else if (type == "mappingRule") {//映射规则
+			this.$(".projectContainer .projectMappingRule").show().siblings().hide();
+		}
 
  	}
 

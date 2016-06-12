@@ -25,7 +25,6 @@ App.Services.projectMember.projects = Backbone.View.extend({
 			App.Comm.setCookie("currentPid", id);
 		}
 		$('#projectList .projectDropDown').myDropDown({
-			zIndex: 9999,
 			click:function($item){
 				items.fetch({
 					reset:true,

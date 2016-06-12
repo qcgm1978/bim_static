@@ -28,6 +28,8 @@ App.Services.addKeyUser = Backbone.View.extend({
         //编辑项目
         setTimeout(function(){
           $('.leftWindow').siblings('p').text("请选择"+(App.Services.KeyUser.mode==2?"分区":""));
+          $('.search input').attr('placeholder','请输入要搜索的项目名称');
+
         },100);
         this.$el.find('.maintitle').text('项目权限');
         this.$el.find('.up').hide();
@@ -46,7 +48,6 @@ App.Services.addKeyUser = Backbone.View.extend({
             App.Services.KeyUser.Step2.set(r.data.items);
           }
         });
-
         //遍历本身存在的项目数据添加到右边窗口
         App.Services.KeyUser.mode=App.Services.KeyUser.fakedata.authType;
         var str = '',projs=App.Services.KeyUser.fakedata.project,pid=App.Services.KeyUser.editpid=[];
@@ -721,6 +722,7 @@ App.Services.addKeyUser = Backbone.View.extend({
       if($('.maintitle').text()=="项目权限"){
         this.$el.find('.leftWindow').html(new App.Services.step2().render(value).el);
       }else{
+        this.$el.find('.leftWindow').html(new App.Services.step1().render(value).el);
 
       }
     }
