@@ -16,12 +16,15 @@ App.BodyContent.control= {
         this.loadMessageCount();
         
         new App.BodyContent.App().render(); //渲染框架
+
         this.viewCacheTodo=this.viewCacheTodo || new App.BodyContent.todosList();
-        this.viewCacheMonthEnd=this.viewCacheMonthEnd || new App.BodyContent.monthEndList()
-     //   $("#todos").html(new App.BodyContent.todosList().render().el);
-        $(".conMonth .article table").append(new App.BodyContent.monthEndList().render().el);
-        $(".conMonth .article table").append(new App.BodyContent.monthStartList().render().el);
-        $("#proclamation").html(new App.BodyContent.proclamationList().render().el);
+        this.viewCacheMonthEnd=this.viewCacheMonthEnd || new App.BodyContent.monthEndList();
+        this.viewCacheMonthStart=this.viewCacheMonthStart || new App.BodyContent.monthStartList();
+        this.viewCacheProclamation=this.viewCacheProclamation || new App.BodyContent.proclamationList();
+        
+        $(".conMonth .article table").append(this.viewCacheMonthEnd.render().el);
+        $(".conMonth .article table").append(this.viewCacheMonthStart.render().el);
+        $("#proclamation").append(this.viewCacheProclamation.render().el);
 		
         this.loadData(this.todoCollection,{
         	status:1,
@@ -156,11 +159,20 @@ App.BodyContent.control= {
             	var _$container=null;
                 //轮播插件是jquery对象、所以直接加载显示、不经过Backbone
                 if(collection ==App.BodyContent.control.slideCollection && response.message=="success"){
-                	var _datas=response.data;
-                	_datas.length>=5? _datas.length = 5:"";
+                	var _datas=response.data,
+                        _len=_datas.length,
+                        _nodata=null;
+                	_len>=5? _datas.length = 5:"";
+                    if(_len==0){
+                        _nodata=function(){
+                            $(".mmhSlider").html('<img style="margin:16% auto 0;display:inherit;" src="/static/dist/images/bodyContent/images/nodata.png"><div style="color:#CCC;text-align:center;">暂无可访问项目</div>');
+                            $("#slideTitle").html('项目');
+                        }
+                    }
                     $(".mmhSlider").mmhSlider({
 						delay:5000,
 						data:_datas,
+                        noData:_nodata,
 						onChange:function(d){
 							$("#slideTitle").html(d.name);
 						}

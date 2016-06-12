@@ -27,13 +27,14 @@ App.Projects.ContentMode = Backbone.View.extend({
 		$proListBox.find(".loading").remove(); 
 
 		$proListBox.append(listView.render().el);
+
 	 
 	},
 
 	//清空内容
 	emptyContent:function(){
 		 
-		this.$el.find(".proListBox").html('<li class="loading">没有结果</li>');
+		this.$el.find(".proListBox").html('<li class="loading"><img src="/static/dist/images/projects/images/emptyProject.png"><div>暂无可访问项目</div></li>');
 	}
 
 });
