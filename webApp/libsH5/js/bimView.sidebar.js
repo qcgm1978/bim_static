@@ -212,10 +212,9 @@
         self.el._dom.sidebar.find(".modelItem:eq(0)").trigger('click',true);
       }
     },
-    getSelected:function(viewer){
+    getSelected:function(viewer,callback){
       var self = this;
       var selection = viewer.getSelectedIds();
-      debugger
       var data = []
       $.each(selection,function(i,item){
         data.push(i);
@@ -231,6 +230,27 @@
         },function(data){
           if(data.message == 'success' && data.data.length){
             bimView.comm.renderSelected(data.data);
+            var viewData = {};
+            var fileData = bimView.sidebar.fileData;
+            $.each(data.data,function(i,item){
+              var modelName = fileData[item.modelId]
+              if(viewData[modelName]){
+                if(viewData[modelName][item.cateName]){
+                  viewData[modelName][item.cateName][item.id] = item.name;
+                }else{
+                  viewData[modelName][item.cateName] = {
+                    [item.id]:item.name
+                  }
+                }
+              }else{
+                viewData[modelName] = {
+                  [item.cateName] : {
+                    [item.id]:item.name
+                  }
+                }
+              }
+            });
+            if(callback)callback(viewData);
           }
         });
       }else{

@@ -332,30 +332,38 @@ App.Services.addKeyUser = Backbone.View.extend({
   //移除已选中的名单
   remove: function(e){
 
-    var $li                    = $(e.target).parents('li');
+    var $li                    = $(e.target).parents('li'),
+      title = this.$el.find('.maintitle').text();
 
-    if(this.$el.find('.maintitle').text() == '部门权限'){
+    if(title == '部门权限'){
       //部门权限移除已选中的名单
       var orgId                  = $li.find('p').attr('data-id');
       App.Services.KeyUser.editorgId = _.without(App.Services.KeyUser.editorgId,parseInt(orgId),orgId.toString());
 
       App.Services.KeyUser.orgId = App.Services.KeyUser.editorgId;
 
-    }else if(stepNum == 3){
-      //step3移除已选中的名单
-
-      var orgId                  = $li.find('p').attr('data-id');
-      App.Services.KeyUser.orgId = _.without(App.Services.KeyUser.orgId,parseInt(orgId),orgId.toString());
-
-    }
-    else{
+    }else if(title == "新增关键用户"){
       //step1移除已选中的名单
 
       var uid                  = $li.find('p').attr('data-uid');
       App.Services.KeyUser.uid = _.without(App.Services.KeyUser.uid, parseInt(uid), uid.toString());
 
       $('.rightWindow').siblings('p').text("已选成员 ( " + App.Services.KeyUser.uid.length + "个 )");
+
+      ////step3移除已选中的名单
+      //
+      //var orgId                  = $li.find('p').attr('data-id');
+      //App.Services.KeyUser.orgId = _.without(App.Services.KeyUser.orgId,parseInt(orgId),orgId.toString());
+
     }
+    //else{
+    //  //step1移除已选中的名单
+    //
+    //  var uid                  = $li.find('p').attr('data-uid');
+    //  App.Services.KeyUser.uid = _.without(App.Services.KeyUser.uid, parseInt(uid), uid.toString());
+    //
+    //  $('.rightWindow').siblings('p').text("已选成员 ( " + App.Services.KeyUser.uid.length + "个 )");
+    //}
     $li.remove();
 
   },

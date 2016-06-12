@@ -7,7 +7,7 @@ App.Services.viewMappingRule= Backbone.View.extend({
 
 	events:{
 		'click .changeTpl':'changeTpl',
-		'click .editSelf':'editTpl'
+		'click .editSelf':'editSelf'
 	},
 
 	template:_.templateUrl('/services/tpls/project/index.mappingrule.html'),
@@ -38,14 +38,11 @@ App.Services.viewMappingRule= Backbone.View.extend({
 		App.Services.ProjectCollection.ProjectMappingRuleModelCollection.fetch({},function(response){});
 	},
 	//编辑模板
-	editTpl:function(){
-		/*<a href="#resources/artifactsMapRule/library"></a>*/
-		//需要添加公共 参数，projectId
+	editSelf:function(){
 		if(App.Services.ProjectMappingRuleId){
 			window.location.href =   "#services/project/" + App.Services.ProjectMappingRuleId;
 		}
 	},
-
 	//获取数量自定义规则数量
 	getSelfRule:function(){
 		var data = {
@@ -54,7 +51,9 @@ App.Services.viewMappingRule= Backbone.View.extend({
 				projectId: App.Services.ProjectMappingRuleId
 			}
 		};
-		App.Comm.ajax();
+		App.Comm.ajax(data,function(response){
+			console.log(response);
+		});
 	},
 	//弹窗
 	ruleWindow:function(frame){

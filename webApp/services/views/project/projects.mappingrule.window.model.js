@@ -34,24 +34,25 @@ App.Services.MappingRuleWindow = Backbone.View.extend({
     sure : function(){
         var _this = this,
             data,
-            templateId  = $(".item li.active").find(".item").data("id");
-        //projectId  没给呢
+            templateId  = $(".projectMappingModelList li.active .item").data("id"),
+            name = $(".projectMappingModelList li.active .item").text();
+        console.log(templateId);
 
         data = {
             URLtype:"modifyProjectMappingRule",
             data:{
-                projectId:projectId,
+                projectId:App.Services.ProjectMappingRuleId,
                 templateId:templateId
-            }
+            },
+            type:"PUT"
         };
 
         App.Comm.ajax(data,function(response){
             if(response.code == 0){
-                //修改成功
-                App.Services.maskWindow.close();
+                $(".mappingHeader .nameBox").text(name);
             }else{
-
             }
+            App.Services.maskWindow.close();
         });
 
     },

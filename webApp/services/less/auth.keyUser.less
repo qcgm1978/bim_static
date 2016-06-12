@@ -22,7 +22,24 @@ ul,li{list-style: none outside none;}
 .keyBody .baseInfo li{line-height: 25px;position: relative;padding-left: 42px;}
 .keyBody .baseInfo li span{position: absolute;left: 0;top: 0;}
 .keyBody .proe ul,{padding: 0 20px;}
-.keyBody .proe li{line-height: 60px; .bdB-c;font-size: 12px;color: #999999;clear: both;}
+.keyBody  ul{
+  margin-bottom: -1px;
+}
+.keyBody .proe li{
+  height: 60px;
+  line-height: 60px; .bdB-c;font-size: 12px;color: #999999;clear: both;
+  .province{
+    width: 27%;
+    float: left;
+  }
+  .name{
+    width: 46%;
+  }
+  .time{
+    width: 27%;
+    text-align: right;
+  }
+}
 .keyBody .proe li .name,.keyBody .oz li .name{.left}
 .keyBody .proe li .time{.right}
 .keyBody .proe .proImg{
@@ -59,7 +76,15 @@ ul,li{list-style: none outside none;}
     }
   }
 }
-.keyBody .oz li {line-height: 48px;clear: left;}
+.keyBody .oz li {
+  line-height: 48px;
+  clear: left;
+  color: #999;
+  .path{
+    float: right;
+    width: 54%;
+  }
+}
 .keyBody .oz ul{padding: 0 20px;}
 .keyBody .oz ul li:not(:last-child),.keyBody .proe ul li:not(:last-child){border-bottom: 1px solid #cccccc;}
 .keyBody .edit:after{position: absolute;content: "";.background-ioc;width: 13px;height: 13px;top: 5px;left: 5px;background-position: 0 -260px;}
@@ -457,11 +482,22 @@ ul,li{list-style: none outside none;}
   }
 }
 .keyBody .fam,.keyBody .standard{
+  .time{
+    text-align: right;
+    width: 27%;
+    float: right;
+  }
+  .name{
+    width: 46%;
+  }
+  .designunit{
+    width: 24%;
+  }
   li{
     line-height: 60px;
     height: 60px;
     div{
-      width: 33%;
+
       float: left;
     }
     .bdB-c;
@@ -473,6 +509,7 @@ ul,li{list-style: none outside none;}
 
 }
 .fams,.standards{
+
   .selected-proj{
     background: #A8DBFD;
   }

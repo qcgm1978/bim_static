@@ -8864,7 +8864,7 @@ CLOUD.SubScene.prototype.update = function () {
         var scope = this;
 
         var distance = 0;
-        if (scope.worldBoundingBox.containsPoint(camera.position) || scope.worldBoundingBox.containsPoint(camera.target)) {
+        if (scope.worldBoundingBox.containsPoint(camera.position)) {
             needLoad = true;
         }
         else {
@@ -16320,6 +16320,7 @@ CLOUD.SceneLoader.prototype = {
                 counter_models -= 1;
                 finalize();
                 callbackFinished(resource);
+
             }
         };
 
@@ -16717,7 +16718,7 @@ CLOUD.TaskWorker = function (threadCount, finishCallback) {
             items.sort(sorter);
         }
 
-        itemCount = Math.min(itemCount, 40);
+        itemCount = Math.min(itemCount, 80);
 
         var TASK_COUNT = Math.min(this.MaxThreadCount, itemCount);
         scope.doingCount = itemCount;
@@ -16896,7 +16897,7 @@ CLOUD.TaskManager = function (manager, finishCallback) {
     this.mpkWorker = new CLOUD.MpkNodeTaskWorker(8);
 
     // SubScene
-    this.sceneWorker = new CLOUD.TaskWorker(8, function () {
+    this.sceneWorker = new CLOUD.TaskWorker(10, function () {
         if(scope.onTaskFinished)
             scope.onTaskFinished();
     });
@@ -17195,6 +17196,8 @@ CLOUD.ModelManager.prototype.loadIndex = function (parameters, callback) {
 CLOUD.ModelManager.prototype.load = function (parameters) {
        
     var scope = this;
+
+    var scene = this.scene;
    
     return this.loadIndex(parameters, function (client) {
 
@@ -17207,18 +17210,26 @@ CLOUD.ModelManager.prototype.load = function (parameters) {
         }
 
         if (parameters.byBox) {
-            scope.boxLoader.load(defaultSceneId, scope.scene, client, function (result) {
+            scope.boxLoader.load(defaultSceneId, scene, client, function (result) {
             });
         }
         else {
 
-            scope.sceneLoader.load(defaultSceneId, scope.scene, client, true, function (result) {
+            scope.sceneLoader.load(defaultSceneId, scene, client, true, function (result) {
 
                 scope.loadLinks(result, client);
+                
+                if (!scene.innerBoundingBox.empty()) {
+                    //
+                    var worldBox = scene.worldBoundingBox();
+                    scene.innerBoundingBox.max.y = worldBox.max.y;
+                    scene.innerBoundingBox.min.y = worldBox.min.y;
 
-                //
-                var worldBox = scope.scene.worldBoundingBox();
-                scope.scene.innerBoundingBox.min.z = worldBox.min.z;
+                    //var clr = 0xff;
+                    //var boxNode = new CLOUD.BBoxNode(scene.innerBoundingBox, clr);
+                    //scene.add(boxNode);
+                }
+
             });
         }
 
@@ -18307,6 +18318,7 @@ CloudViewer.prototype = {
         }
         else {
             var target = this.camera.zoomToBBox(box, margin, ratio);
+
             this.cameraEditor.updateCamera(target);
         }
     },
