@@ -6,12 +6,11 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
     tagName:"li",
 
     template: function(){
-        console.log(App.ResourceArtifacts.Status.type);
         var url = "";
         if(App.ResourceArtifacts.Status.type ==2){
-          url = "/resources/tpls/resourcesArtifacts/ruleModel/resources.artifacts.planruledetail.html"
-        }else{
             url = "/resources/tpls/resourcesArtifacts/ruleModel/resources.artifacts.planruledetail.project.html"
+        }else{
+            url = "/resources/tpls/resourcesArtifacts/ruleModel/resources.artifacts.planruledetail.html"
         }
         return _.templateUrl(url)
     },
@@ -29,7 +28,6 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
 
     render:function() {
         var _this = this;
-
         //映射规则
         var operatorData = App.Resources.dealStr2(_this.model);//规则数据
         this.model.set({mappingCategory:operatorData},{silent:true});
