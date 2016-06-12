@@ -65,6 +65,14 @@
     at.prototype.initEvent = function() {
 
       var that = this;
+
+      this.Settings.atList.on({
+
+        mouseover: function() {
+          $(this).addClass("selected").siblings().removeClass("selected");
+        }
+
+      }, ".item");
       //keyup
       this.Settings.$el.on("keyup", function() {
 
@@ -113,6 +121,55 @@
         }
       });
 
+
+      //按下
+      this.Settings.$el.on("keydown", function(event) {
+
+
+        if (that.Settings.atList.is(":visible")) {
+          var keyCode = event.keyCode,
+            index = that.Settings.atList.find(".item.selected").index(),
+            count = that.Settings.atList.find(".item").length;
+
+          //上
+          if (keyCode == 38) {
+
+            if (index == -1) {
+              that.Settings.atList.find(".item:last").addClass("selected");
+            } else {
+              if (index == 0) {
+                index = count;
+              }
+              that.Settings.atList.find(".item").eq(index - 1).addClass("selected").siblings().removeClass("selected");
+            }
+
+            return false;
+
+          } else if (keyCode == 40) {
+            //下
+            if (index == -1) {
+
+              that.Settings.atList.find(".item:first").addClass("selected");
+            } else {
+
+              if (index + 1 == count) {
+                index = -1;
+              }
+              that.Settings.atList.find(".item").eq(index + 1).addClass("selected").siblings().removeClass("selected");
+            }
+
+            return false;
+          } else if (keyCode == 13) {
+
+            that.Settings.atList.find(".selected").click();
+            
+            return false;
+          }
+        }
+
+      });
+
+
       this.Settings.$el.on("click", function() {
 
         var index = that.Settings.ePos = that.getCursortPosition(),
@@ -130,7 +187,13 @@
 
           lastAtLen = lastAt.length,
 
-          lastAtIndex = lastAt.indexOf('@') + 1;
+          lastAtIndex = lastAt.indexOf('@');
+
+        //未找到
+        if (lastAtIndex == -1) {
+          return;
+        }
+        lastAtIndex + 1;
 
         //点击了 at
         if (lastAt.substring(lastAtIndex, lastAtLen).trim() != "") {
@@ -151,7 +214,7 @@
 
       that.Settings.atList.on("click", ".item", function() {
 
-        var text = $(this).text()+" ",
+        var text = $(this).text() + " ",
 
           val = that.Settings.$el.val(),
 
