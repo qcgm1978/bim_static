@@ -46,10 +46,6 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
             alert("«Îœ»±£¥Ê£°");
         }
 
-        if(!App.ResourceArtifacts.Status.projectId){
-            App.ResourceArtifacts.Status.type = 1
-        }
-
         if($pre.closest(".artifactsNav").length){
             $pre.addClass("active").siblings("li").removeClass("active");
         }

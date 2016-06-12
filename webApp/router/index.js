@@ -141,6 +141,7 @@ var AppRoute = Backbone.Router.extend({
 		_.require('/static/dist/resources/resources.js');
 		App.ResourcesNav.Settings.type = type;
 		App.ResourcesNav.Settings.optionType = optionType;
+		App.ResourceArtifacts.Status.type = 1;
 		new App.ResourcesNav.App().render();
 		App.ResourceArtifacts.resetPreRule();
 		App.ResourceArtifacts.Settings.ruleModel = 3;  //权限入口，模块化，质量标准
@@ -191,7 +192,7 @@ var AppRoute = Backbone.Router.extend({
 		$("#pageLoading").hide();
 	},
 
-
+//服务-项目管理-项目映射规则
 	servicesMappingRule: function(type,optionType,projectModelId) {
 		this.reset();
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".services").addClass('selected');
@@ -200,6 +201,7 @@ var AppRoute = Backbone.Router.extend({
 		App.ResourcesNav.Settings.type = type;
 		App.ResourcesNav.Settings.optionType = optionType;
 		App.ResourceArtifacts.Status.projectId = projectModelId;
+		App.ResourceArtifacts.Status.type = 2;
 		new App.ResourcesNav.App().render();
 		App.ResourceArtifacts.resetPreRule();
 		App.ResourceArtifacts.Settings.ruleModel = 3;  //权限入口，模块化，质量标准

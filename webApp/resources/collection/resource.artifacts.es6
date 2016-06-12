@@ -247,9 +247,18 @@ App.ResourceArtifacts={
     init:function(_this,optionType) {
 
 
+
+        //项目映射入口
+        if(optionType != "library" ){
+            //_this.$el.html("");//处理菜单
+        }
+
+        //项目id
         if(!App.ResourceArtifacts.Status.projectId){
             _this.$el.append( new App.Resources.ArtifactsIndexNav().render().el);
         }
+
+
         //公用组件
         this.menu = new App.Resources.ArtifactsMapRule();  //外层菜单
         this.plans = new App.Resources.ArtifactsPlanList();   //模块化列表 /计划节点
@@ -284,9 +293,6 @@ App.ResourceArtifacts={
 
         }else{//规则库
 
-            if(optionType != "library" ){
-                _this.$el.html("");
-            }
 
             $(".mappingRule .library").addClass("active").siblings("a").removeClass("active");
 
@@ -322,7 +328,6 @@ App.ResourceArtifacts={
     //获取计划节点
     getPlan:function(){
         var _this = App.ResourceArtifacts, pdata;
-        App.ResourceArtifacts.Status.type =1 ;
         pdata  = {
             URLtype:"fetchArtifactsPlan",
             data:{
