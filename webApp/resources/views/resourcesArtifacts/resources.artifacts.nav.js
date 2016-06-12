@@ -32,6 +32,11 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
 
     initialize:function(){
         this.getCategoryCode(); //获取分类编码
+        Backbone.on("startFromProject",this.startFromProject,this);
+    },
+
+    startFromProject:function(){
+        
     },
 
     select:function(e){

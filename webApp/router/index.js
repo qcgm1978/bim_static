@@ -17,7 +17,7 @@ var AppRoute = Backbone.Router.extend({
 		'console1/:type/:step': 'console1',
 		'services': 'services',
 		'services/:type': 'services',
-		'services/:type/*': 'servicesMappingRule',
+		'services/:optionType/:projectModelId': 'servicesMappingRule',
 		'list/:id': 'list',
 		'bodyContent': 'bodyContent',
 		'logout': 'logout',
@@ -144,7 +144,6 @@ var AppRoute = Backbone.Router.extend({
 		new App.ResourcesNav.App().render();
 		App.ResourceArtifacts.resetPreRule();
 		App.ResourceArtifacts.Settings.ruleModel = 3;  //权限入口，模块化，质量标准
-		$(".breadcrumbNav .mappingRule").show();
 		$("#pageLoading").hide();
 	},
 
@@ -193,19 +192,18 @@ var AppRoute = Backbone.Router.extend({
 	},
 
 
-	servicesMappingRule: function(type,tab,projectModelId) {
-		console.log(1);
+	servicesMappingRule: function(type,optionType,projectModelId) {
 		this.reset();
-		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".resources").addClass('selected');
+		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".services").addClass('selected');
 		_.require('/static/dist/resources/resources.css');
 		_.require('/static/dist/resources/resources.js');
 		App.ResourcesNav.Settings.type = type;
 		App.ResourcesNav.Settings.optionType = optionType;
-		App.ResourcesNav.Status.projectId = projectModelId;
+		App.ResourceArtifacts.Status.projectId = projectModelId;
 		new App.ResourcesNav.App().render();
 		App.ResourceArtifacts.resetPreRule();
 		App.ResourceArtifacts.Settings.ruleModel = 3;  //权限入口，模块化，质量标准
-		$(".breadcrumbNav .mappingRule").show();
+		$("#pageLoading").hide();
 	},
 
 

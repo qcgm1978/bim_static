@@ -245,7 +245,9 @@ App.ResourceArtifacts={
     })),
 
     init:function(_this,optionType) {
-        if(!App.ResourcesNav.Status.projectId){
+
+
+        if(!App.ResourceArtifacts.Status.projectId){
             _this.$el.append( new App.Resources.ArtifactsIndexNav().render().el);
         }
         //公用组件
@@ -280,7 +282,12 @@ App.ResourceArtifacts={
 
             this.getTpl();
 
-        }else if(optionType == "library" || optionType == "project"){//规则库
+        }else{//规则库
+
+            if(optionType != "library" ){
+                _this.$el.html("");
+            }
+
             $(".mappingRule .library").addClass("active").siblings("a").removeClass("active");
 
             App.ResourceArtifacts.Status.rule.biz =1;  //设置默认规则为模块化
