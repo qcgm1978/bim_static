@@ -69,6 +69,9 @@
       this.Settings.atList.on({
 
         mouseover: function() {
+          if ($(this).hasClass("loadingUser")) {
+            return;
+          }
           $(this).addClass("selected").siblings().removeClass("selected");
         }
 
@@ -78,55 +81,49 @@
 
         var keyCode = event.keyCode;
 
-        if (keyCode == 50) {
-
-          var index = that.Settings.ePos = that.getCursortPosition(),
-            val = that.Settings.$el.val().substring(0, index);
-
-          //替换空格 回车
-          val = val.replace(/[\n\r]/gi, "<br/>").replace(/[ ]/g, "a");
-
-          val += '<span class="at"></span>'; //标示列
-
-          that.Settings.atDiv.html(val);
-
-          var paddingWidth = parseInt($(this).css("padding-left")) + parseInt($(this).css("padding-right")),
-
-            paddingHeight = parseInt($(this).css("padding-top")) + parseInt($(this).css("padding-bottom")),
-
-            pos = that.Settings.atDiv.height($(this).height() + paddingHeight).width($(this).width() + paddingWidth).find(".at").position();
-
-          that.atListPosition(pos);
-
-
-        } else if (keyCode == 32 || keyCode == 13) {
+        if (keyCode == 13) {
           //回车 空格
           that.Settings.atList.hide();
+          return;
 
         } else if (keyCode == 8) {
+
           //回退
           var index = ePos = that.getCursortPosition(),
 
             val = that.Settings.$el.val().substring(0, index),
 
-            valArr = val.split(' '),
+            lastAtIndex = that.hasAt(val);
 
-            len = valArr.length;
-
-          if (valArr[len - 1].indexOf('@') < 0) {
+          if (lastAtIndex == -1) {
 
             that.Settings.atList.hide();
+
+            return;
           }
 
         }
-      });
 
+        //计算 at 的位置
+        var index = that.Settings.ePos = that.getCursortPosition(),
+          val = that.Settings.$el.val().substring(0, index),
+
+          lastAtIndex = that.hasAt(val);
+        //未找到
+        if (lastAtIndex == -1) {
+          return;
+        }
+        //计算位置
+        that.beforeAtListPosition($(this), val);
+
+      });
 
       //按下
       this.Settings.$el.on("keydown", function(event) {
 
 
         if (that.Settings.atList.is(":visible")) {
+
           var keyCode = event.keyCode,
             index = that.Settings.atList.find(".item.selected").index(),
             count = that.Settings.atList.find(".item").length;
@@ -162,7 +159,7 @@
           } else if (keyCode == 13) {
 
             that.Settings.atList.find(".selected").click();
-            
+
             return false;
           }
         }
@@ -179,40 +176,35 @@
           return;
         }
 
-        var valArr = val.replace(/[\n\r]/gi, " ").split(' '),
-
-          len = valArr.length,
-
-          lastAt = valArr[len - 1],
-
-          lastAtLen = lastAt.length,
-
-          lastAtIndex = lastAt.indexOf('@');
+        var lastAtIndex = that.hasAt(val);
 
         //未找到
         if (lastAtIndex == -1) {
           return;
         }
+
         lastAtIndex + 1;
 
-        //点击了 at
-        if (lastAt.substring(lastAtIndex, lastAtLen).trim() != "") {
+        //点击了 at 
+        val = val.replace(/[\n\r]/gi, "<br/>").replace(/[ ]/g, "a");
 
-          val = val.replace(/[\n\r]/gi, "<br/>").replace(/[ ]/g, "a");
+        val += '<span class="at"></span>';
 
-          val += '<span class="at"></span>';
+        that.Settings.atDiv.html(val);
 
-          that.Settings.atDiv.html(val);
+        var pos = that.Settings.atDiv.find(".at").position();
 
-          var pos = that.Settings.atDiv.find(".at").position();
+        that.atListPosition(pos);
 
-          that.atListPosition(pos);
+        event.stopPropagation();
 
-          event.stopPropagation();
-        }
       });
 
       that.Settings.atList.on("click", ".item", function() {
+
+        if ($(this).hasClass("loadingUser")) {
+          return;
+        }
 
         var text = $(this).text() + " ",
 
@@ -241,6 +233,41 @@
 
     }
 
+    //定位前的计算
+    at.prototype.beforeAtListPosition = function($txt, val) {
+      //替换空格 回车
+      val = val.replace(/[\n\r]/gi, "<br/>").replace(/[ ]/g, "a");
+
+      val += '<span class="at"></span>'; //标示列
+
+      this.Settings.atDiv.html(val);
+
+      var paddingWidth = parseInt($txt.css("padding-left")) + parseInt($txt.css("padding-right")),
+
+        paddingHeight = parseInt($txt.css("padding-top")) + parseInt($txt.css("padding-bottom")),
+
+        pos = this.Settings.atDiv.height($txt.height() + paddingHeight).width($txt.width() + paddingWidth).find(".at").position();
+
+      this.atListPosition(pos);
+    }
+
+    //是否存在 at 
+    at.prototype.hasAt = function(val) {
+
+      var valArr = val.replace(/[\n\r]/gi, " ").split(' '),
+
+        len = valArr.length,
+
+        lastAt = valArr[len - 1],
+
+        lastAtLen = lastAt.length,
+
+        lastAtIndex = lastAt.indexOf('@');
+
+      return lastAtIndex;
+
+    }
+
     //at list 位置
     at.prototype.atListPosition = function(pos) {
 
@@ -249,18 +276,23 @@
         left: pos.left + 6
       }).show();
 
+      //获取数据
+      this.getData();
+
+    }
+
+    //获取数据
+    at.prototype.getData = function() {
 
       var index = this.Settings.ePos,
         that = this,
 
         val = this.Settings.$el.val().substring(0, index);
 
+      //没有参数
       if (!val) {
         return;
       }
-
-      // var valArrEnter = val.split('\n');
-      // val = valArrEnter[valArr.length - 1];
 
       var valArr = val.replace(/[\n\r]/gi, " ").split(' '),
 
@@ -277,9 +309,17 @@
       if ($.isFunction(this.Settings.getData)) {
 
         var timer = setTimeout(() => {
+
           clearTimeout(timer);
-          this.Settings.getData(name).done(function(data) {
+
+          if (this.Settings.Req) {
+            this.Settings.Req.abort();
+          }
+
+          this.Settings.Req = this.Settings.getData(name).done(function(data) {
+
             if (data.code == 0) {
+
               var lis = '',
                 liTpl = '<li data-uid="{uid}" class="item"><span class="name">{name}</span>（<span class="dep">{dep}</span>）</li>';
               $.each(data.data, function() {
@@ -288,6 +328,8 @@
 
               if (lis.length > 0) {
                 that.Settings.atList.html(lis);
+              } else {
+                that.Settings.atList.html('<li class="loadingUser item">未找到用户</li></ul>');
               }
 
             }
@@ -295,7 +337,6 @@
         }, 200);
 
       }
-
     }
 
     //获取光标位置
