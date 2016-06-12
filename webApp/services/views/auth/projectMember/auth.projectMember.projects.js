@@ -6,6 +6,8 @@ App.Services.projectMember.projects = Backbone.View.extend({
 	events: {
 		'click .project': 'selectProject'
 	},
+
+	currentSelect:3,
 	// 重写初始化
 	initialize: function() {
 		this.listenTo(App.Services.projectMember.projectMemberProjectCollection, 'reset', this.render);
@@ -14,6 +16,7 @@ App.Services.projectMember.projects = Backbone.View.extend({
 	render: function(items) {
 		var _this = this;
 		var data = items.toJSON()[0];
+		data.data.type=_this.currentSelect;
 		$("#projectList").html(this.$el.html(this.template(data)));
 		if (data.data.length > 0) {
 			var id = data.data[0].id;
@@ -26,6 +29,8 @@ App.Services.projectMember.projects = Backbone.View.extend({
 		}
 		$('#projectList .projectDropDown').myDropDown({
 			click:function($item){
+				_this.currentSelect=$item.data('type');
+				$("#memberlistWrap").html('<div class="noDataText">暂无信息,请点击选择左侧的项目列表</div>');
 				items.fetch({
 					reset:true,
 					data: {
@@ -36,7 +41,7 @@ App.Services.projectMember.projects = Backbone.View.extend({
 
 			}
 		});
-
+		this.delegateEvents();
 		return this;
 	},
 
