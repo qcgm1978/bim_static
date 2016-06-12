@@ -19,7 +19,7 @@
 
                     <% }}else if(info.authType==1 && info.project.length){ %>
                     <% for(var i=0;i<info.project.length;i++){ %>
-                    <li><div class="name"><a href="#"><%= info.project[i]['name'] %></a></div><div class="time"><%= new Date(info.project[i]['startTime'] || 0).Format("yyyy-MM-dd")%><%= info.project[i]['openTime']?"--"+new Date(info.project[i]['endTime']).Format("yyyy-MM-dd"):''%></div><div><%= info.project[i]['province']||'无' %></div></li>
+                    <li><div class="name"><a href="#projects/<%= info.project[i]['id'] %>/<%= info.project[i]['version']!=null?info.project[i]['version']['id']:0 %>"><%= info.project[i]['name'] %></a></div><div class="time"><%= new Date(info.project[i]['startTime'] || 0).Format("yyyy-MM-dd")%><%= info.project[i]['openTime']?"--"+new Date(info.project[i]['endTime']).Format("yyyy-MM-dd"):''%></div><div class="province"><%= info.project[i]['province']||'无' %></div></li>
 
                    <% }}else if(info.authType==3){ %>
                     <li><div class="name"><a href="#">所有项目</a></div><div class="time"> &nbsp </div><div> &nbsp </div></li>
@@ -37,7 +37,7 @@
                 <% if(info.model.length){ %>
 
                 <% for(var i=0;i<info.model.length;i++){ %>
-                <li><div class="name"><%= info.model[i]['name'] %></div><div ><%= info.model[i]['designUnit']||"无" %></div><div ><%= new Date(info.model[i]['createTime']).Format("yyyy-MM-dd") %></div></li>
+                <li><div class="name"><%= info.model[i]['name'] %></div><div class="designunit"><%= info.model[i]['designUnit']||"无" %></div><div class="time"><%= new Date(info.model[i]['createTime']).Format("yyyy-MM-dd") %></div></li>
 
                 <% }}else{ %>
                 <li><span>该用户还没有标准模型权限,<b class="link">点此可添加标准模型</b></span></li>
@@ -52,7 +52,7 @@
                 <% if(info.family.length){ %>
 
                 <% for(var i=0;i<info.family.length;i++){ %>
-                <li><div class="name"><%= info.family[i]['name'] %></div><div ><%= info.family[i]['designUnit']||"无" %></div><div ><%= new Date(info.family[i]['createTime']).Format("yyyy-MM-dd") %></div></li>
+                <li><div class="name"><%= info.family[i]['name'] %></div><div  class="designunit"><%= info.family[i]['designUnit']||"无" %></div><div  class="time"><%= new Date(info.family[i]['createTime']).Format("yyyy-MM-dd") %></div></li>
 
                 <% }}else{ %>
 
