@@ -19,12 +19,20 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
     },
 
     initialize:function(){
-        //this.listenTo(App.ResourceArtifacts.Status.presentPlan,"chang",this.getChangeAttr);    //监听展开的模型是否被更改，如果更改，列出更改项，提示保存
+        this.listenTo(this.model,"change",this.render);
+        Backbone.on("countChange",this.changeCount,this);
     },
 
     //取得模型修改过的属性
     getChangeAttr:function(e){
         console.log("模型已被更改");
+    },
+
+
+    changeCount:function(){
+        var count = App.ResourceArtifacts.Status.rule.count;
+        this.model.set({count:count},{silent:true});
+        this.$(".count").text("("+ count + ")");
     },
 
     //取得规则列表
@@ -46,6 +54,7 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
         var item = $(e.target);
         App.ResourceArtifacts.Status.rule.targetCode = this.model.get("code");
         App.ResourceArtifacts.Status.rule.targetName = this.model.get("name");
+        App.ResourceArtifacts.Status.rule.count = this.model.get("count");
 
         if(!App.ResourceArtifacts.Status.saved){
             alert("您还有没保存的");
@@ -95,7 +104,7 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
             });
             return
         }
-        $(".artifactsContent .rules ul").empty();
+
         //刷新右面视图
         var code = App.ResourceArtifacts.Status.rule.targetCode;
         pdata = {
@@ -103,23 +112,22 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
             data:{
                 code:code,
                 biz:App.ResourceArtifacts.Status.rule.biz,
-                type:App.ResourceArtifacts.Status.type
+                type:App.ResourceArtifacts.Status.type,
+                projectId:App.ResourceArtifacts.Status.projectId
             }
         };
+        App.ResourceArtifacts.loading();
         App.Comm.ajax(pdata,function(response){
             if(response.code == 0 ){
-                App.ResourceArtifacts.PlanRules.reset();
-                $(".artifactsContent .rules h2 .name").html(_this.model.get("code") + "&nbsp;" +_this.model.get("name"));
-                $(".artifactsContent .rules h2 i").html( "("+response.data.length + ")");
-                if(response.data){
-                    if( response.data.length){
-                        $(".artifactsContent .rules ul").empty();
-                        App.ResourceArtifacts.PlanRules.add(response.data);
-                    }else{
-                        $(".ruleContent ul").html("<li><div class='ruleTitle delt'>暂无内容</div></li>");
-                    }
+                if(response.data  &&  response.data.length){
+                    App.ResourceArtifacts.PlanRules.reset();
+                    App.ResourceArtifacts.PlanRules.add(response.data);
+                    Backbone.trigger("resetTitle");
+                }else{
+                    $(".ruleContentRuleList ul").html("<li><div class='ruleTitle delt'>暂无内容</div></li>");
                 }
             }
+            App.ResourceArtifacts.loaded($(".rules"));
         });
     }
 });

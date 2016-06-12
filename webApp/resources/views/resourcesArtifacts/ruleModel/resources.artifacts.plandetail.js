@@ -18,29 +18,45 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
 
     initialize:function(){
         this.listenTo(this.model,"change",this.render);
+        Backbone.on("countChange",this.changeCount,this);
+    },
+
+
+    changeCount:function(){
+        var count = App.ResourceArtifacts.Status.rule.count;
+        this.model.set({count:count},{silent:true});
+        this.$(".count").text("("+ count + ")");
     },
 
     //取得规则列表
-    getPlanId:function(){
+    getPlanId:function(e){
 
 
+        var $this = $(e.target);
+        if($this.closest("li").hasClass("active")){
+            return
+        }
 
          App.ResourceArtifacts.Status.rule.targetCode = this.model.get("code");
         App.ResourceArtifacts.Status.rule.targetName = this.model.get("name");
+        App.ResourceArtifacts.Status.rule.count = this.model.get("count");
+
         if(!App.ResourceArtifacts.Status.saved){
             alert("您还有没保存的");
             return
         }
         App.ResourceArtifacts.loading($(".rules"));
+
         this.toggleClass();
         this. getRules();
 
         App.ResourceArtifacts.Status.presentPlan = null;
         App.ResourceArtifacts.Status.presentPlan = this.model;
+
     },
 //切换计划
-    toggleClass:function(){
-        $(".artifactsList li").removeClass("active");
+    toggleClass:function(e){
+        $(".artifactsList .plcon li").removeClass("active");
         this.$el.addClass("active");
     },
 //获取计划节点相关规则
@@ -50,26 +66,20 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
             URLtype: "fetchArtifactsPlanRule",
             data:{
                 code:App.ResourceArtifacts.Status.rule.targetCode,
-                biz :App.ResourceArtifacts.Status.rule.biz,
+                biz : 1,
                 type:App.ResourceArtifacts.Status.type,
                 projectId:App.ResourceArtifacts.Status.projectId
             }
         };
         App.ResourceArtifacts.loading();
         App.Comm.ajax(pdata,function(response){
-
-            console.log(response);
             if(response.code == 0 ){
-
-                $(".artifactsContent .rules h2 .name").html(_this.model.get("code") + "&nbsp;" +_this.model.get("name"));
-                $(".artifactsContent .rules h2 i").html( "("+response.data.length + ")");
-
                 if(response.data  &&  response.data.length){
                     App.ResourceArtifacts.PlanRules.reset();
-                    $(".artifactsContent .rules ul").empty();
                     App.ResourceArtifacts.PlanRules.add(response.data);
+                    Backbone.trigger("resetTitle");
                 }else{
-                    $(".ruleContent ul").html("<li><div class='ruleTitle delt'>暂无内容</div></li>");
+                    $(".ruleContentRuleList ul").html("<li><div class='ruleTitle delt'>暂无内容</div></li>");
                 }
             }
             App.ResourceArtifacts.loaded($(".rules"));

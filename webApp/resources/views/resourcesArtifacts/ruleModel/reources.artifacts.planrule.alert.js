@@ -34,6 +34,7 @@ App.Resources.ArtifactsPlanRuleAlert = Backbone.View.extend({
             App.Resources.ArtifactsAlertWindow.close();
             $(".artifactsContent .rules").removeClass("services_loading");
             App.ResourceArtifacts.Status.saved = true;
+            App.ResourceArtifacts.Status.delRule = "";
             return
         }
         //非新建
@@ -47,14 +48,16 @@ App.Resources.ArtifactsPlanRuleAlert = Backbone.View.extend({
                      var pre = App.ResourceArtifacts.PlanRules.filter(function(item){
                          return item.get("id") == id;
                      });
+                     App.ResourceArtifacts.PlanRules.remove(pre);
+                     App.ResourceArtifacts.Status.rule.count = App.ResourceArtifacts.PlanRules.length;
+
                      _.each($(".ruleTitle"),function(item){
                          if(parseInt($(item).attr("data-id")) == id){
                              $(item).closest("li").remove();
                          }
                      });
-                     var _this = App.ResourceArtifacts.Status.presentPlan;
-                     $(".artifactsContent .rules h2 .name").html(App.ResourceArtifacts.Status.rule.targetCode + "&nbsp;" +App.ResourceArtifacts.Status.rule.targetName);
-                     $(".artifactsContent .rules h2 i").html( "("+_this.get("count") + ")");
+                     Backbone.trigger("countChange");
+
                 }else{
                      alert("删除失败");
                  }
@@ -62,6 +65,8 @@ App.Resources.ArtifactsPlanRuleAlert = Backbone.View.extend({
                 $(".artifactsContent .rules").removeClass("services_loading");
             },
             error:function(error){
+                App.Resources.ArtifactsAlertWindow.close();
+                $(".artifactsContent .rules").removeClass("services_loading");
                 alert("错误类型"+ error.status +"，无法成功删除!");
             }
         });

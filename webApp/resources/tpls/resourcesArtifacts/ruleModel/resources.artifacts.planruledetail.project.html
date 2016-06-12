@@ -11,7 +11,7 @@
         <div class="conR">
             <div>
                 <div class="chide" data-code="<%= obj.mappingCategory.categoryCode %>"><span><%= '[' + mappingCategory.categoryCode +']'%></span>  <i><%= mappingCategory.categoryName %></i></div>
-                <input type="text" placeholder="请输入分类编码" value="<%= obj.mappingCategory.categoryCode %>"  class="pdR60 categoryCode">
+                <%= obj.mappingCategory.categoryCode %>
                 <span class="choose">选择</span>
             </div>
             <ul>
@@ -22,12 +22,12 @@
         <div class="title">属性映射规则:</div>
         <div class="conR">
             <dl>
-
                 <% var list =obj.mappingCategory.mappingPropertyList ; for(var i = 0 ; i < list.length ; i++) { %>
                 <dd>
                     <div class="leftten" data-id="<%= obj.id %>" data-name="">
                         <%  var type = list[i].operator,a1 = "==",a2 = "!=",a3 = "<>",a4 = "><";  %>
-                        <input type="text" placeholder="请输入属性名称" value="<%= list[i].propertyKey %>"><div class="myDropDown" data-operator="<%= type %>">
+                        <%= list[i].propertyKey %>"
+                        <div class="myDropDown" data-operator="<%= type %>">
                         <span class="myDropText">
                             <span class="text"><%=   type == a1 ? "相等" :  (type == a2 ? "不等" :  (type == a3 ? "范围内" :  (type == a4 ? "范围外" : "请选择规则")))%></span>
                             <i class="myDropArrorw down"></i>
@@ -46,30 +46,18 @@
                         <span class="myDropText">
                             <span class="text"><%= list[i].ruleList.left=='(' ? '>' : (list[i].ruleList.left=='[' ? "≥" : '>') %></span>
                             <i class="myDropArrorw down"></i>
-                        </span><input type="number" placeholder="请输入数值"   class="leftValue" value="<%= list[i].ruleList.leftValue %>">
-                            <ul class="myDropList">
-                                <li class="myItem" data-operator="("> > </li>
-                                <li class="myItem" data-operator="["> ≥ </li>
-                            </ul>
+                        </span><%= list[i].ruleList.leftValue %>
+
                         </div><div class="myDropDown " data-operator=")">
                         <span class="myDropText">
                             <span class="text"><%= list[i].ruleList.right==')' ? '<' : (list[i].ruleList.right==']' ? "≤" : '<') %></span>
                             <i class="myDropArrorw down"></i>
-                        </span><input type="number" placeholder="请输入数值" class="rightValue last" value="<%= list[i].ruleList.rightValue %>">
-                            <ul class="myDropList">
-                                <li class="myItem" data-operator=")"> < </li>
-                                <li class="myItem" data-operator="]"> ≤ </li>
-                            </ul>
+                        </span><%= list[i].ruleList.rightValue %>
                         </div>
-                    </div><i class="delRule"></i>
+                    </div>
                 </dd>
                 <% }%>
             </dl>
-            <div class="clear"><span class="addNewRule">新增属性</span></div>
-        </div>
-        <div class="controlRule">
-            <div class="saveRule mgR10">保存</div>
-            <div class="deleteRule">删除</div>
         </div>
     </div>
 </div>

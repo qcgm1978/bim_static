@@ -21,7 +21,7 @@ App.Resources.ArtifactsTplDetail = Backbone.View.extend({
     },
 
     initialize:function(){
-
+        //this.listenTo(App.ResourceArtifacts.TplCollectionRule,"reset",this.render);
     },
 
     delete:function(){
@@ -43,26 +43,53 @@ App.Resources.ArtifactsTplDetail = Backbone.View.extend({
     edit:function() {
         this.$(".tplDetailInfo").hide();
         this.$(".tplDetailEdit").show();
+
+        //查找collection
+        var checkCollection  = App.ResourceArtifacts.TplCollectionRule ; //已有  ruleId
+        var allCollection  = App.ResourceArtifacts.ArtifactsRule ;//所有
+        var arr = [];
+
+        _.each(checkCollection,function(item){
+            arr.push(item.get("id"))
+        });
+
+        _.each(allCollection,function(item){
+            for(var i = 0 ;i < arr.length ; i++){
+                if(item.get("id") == arr[i]){
+                    item.set("checked", true);
+                }
+            }
+        });
+
+
+
     },
 
     //保存
     resourcesSure:function(){
-        var _this = this;
+        var baseData = {};
+        //查找所有的ruleId存储成数组形式，格式如下
+        /*
+         {
+         templateId:841085297156448,
+         templateName:"全标项目模板",
+         ruleIds:[841085297156448,841085297156448,841085297156448]
+         }
+        */
+
         var pdata = {
-            URLtype: "fetchArtifactsTemplateRule",
-            data:{
-                templateId: this.model.get("id")
-            }
+            URLtype: "saveArtifactsTemplateRule",
+            type:"POST",
+            data:JSON.stringify(baseData),
+            contentType: "application/json"
         };
         //App.ResourceArtifacts.loading($(".modelContent"));
         App.Comm.ajax(pdata,function(response){
             if(response.code == 0 ){
                 if(response.data  &&  response.data.length){
-                    App.ResourceArtifacts.PlanRules.reset();
-                    $(".artifactsContent .rules ul").empty();
-                    App.ResourceArtifacts.PlanRules.add(response.data);
+                    //提交成功
                 }else{
-                    $(".ruleContent ul").html("<li><div class='ruleTitle delt'>暂无内容</div></li>");
+                    //提交失败
                 }
             }
             App.ResourceArtifacts.loaded($(".modelContent"));

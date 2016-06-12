@@ -40,7 +40,9 @@ App.API = {
 		deleteServicesRoleSingle:"platform/role?",//删除角色
 		putServicesProjectMembers:"platform/auth/dataPrivilege/grant",//添加项目成员
 		deleteServicesProjectMembers:"platform/auth/{memberType}/{userId}/dataPrivilege",//删除项目成员
+
 		checkDelAuth:"platform/auth/keyUser/user/check",//删除项目成员
+
 		
 		//项目详细信息-创建
 		fetchProjectCreateBaseHole:'platform/pit/createPit',
@@ -52,8 +54,11 @@ App.API = {
 		fetchProjectDetailFloorList:'platform/building/{projectId}',
 		fetchProjectDetailSectionList:'platform/profile/{projectId}',
 		fetchProjectDetailPileList:'platform/pile/{projectId}',
-		
-		//项目详细信息-更新
+		fetchServicesProjectMappingRule:"platform/rule/template/select/project/{projectId}", //项目映射规则
+		fetchServicesProjectMappingRuleCount:"platform/mapping/rule/project/rule/count/{projectId}",
+
+
+	//项目详细信息-更新
 		fetchProjectUpdateBaseHole:'platform/pit/updatePit',
 		fetchProjectUpdateFloor:'platform/building/updateBuilding',
 		fetchProjectUpdateSection:'platform/profile/updateProfile',
@@ -66,6 +71,8 @@ App.API = {
 		putProjectLink:'platform/mapping/{projectId}',//项目关联
 		fetchProjectManagerProjectList:'platform/mapping/project',//项目管理-项目列表
 		fetchProjectManagerProjectLogo:'platform/project/{projectId}/logo/cut',//项目管理-项目logo裁剪
+
+
 		
 
 
@@ -76,6 +83,8 @@ App.API = {
 		fetchServiceStep1:'platform/auth/org?outer=false&parentId=&includeUsers=',//项目列表
 		fetchServicesProjectMemberProjectList:'platform/auth/user/{userId}/dataPrivilege/project',//项目成员/项目管理
 		fetchServicesProjectMemberMemberList:'platform/auth/{dataPrivilegeId}/member',//项目成员/项目管理
+
+
 
 
 
@@ -91,6 +100,8 @@ App.API = {
 		fetchDesignFileNav: "doc/{projectId}/{projectVersionId}/file/tree", //项目设计文件导航
 		fetchDesignModelNav: "dataJson/project/project.design.model.json", //项目设计模型导航
 		fetchProjectDetail: 'platform/project/{projectId}/version/{versionId}', //获取项目 详细信息  包含最新版本
+
+
 
 		// 项目面包屑
 		fetchCrumbsProject: "platform/project/groupByProvince", // 项目导航
@@ -201,6 +212,9 @@ App.API = {
 		fetchArtifactsTemplate: "platform/rule/template/select/all", //模板列表 //platform/rule/template/select/all
 		createArtifactsTemplate: "platform/rule/template/create", //创建模板
 		fetchArtifactsTemplateRule: "platform/rule/template/select/rule/{templateId}", //模板规则列表  platform/rule/template/select/rule/{templateId}
+		saveArtifactsTemplateRule: "platform/rule/template/update", //模板规则列表
+
+		modifyProjectMappingRule:"platform/rule/template/update/project/{projectId}/{templateId}",    //修改项目规则模板
 
 		//项目 变更 列表
 		fileList:"doc/internal/{projectId}/{versionId}/differ", //变更列表
@@ -282,6 +296,7 @@ App.API = {
 		uploadPicByToken:"sixD/sharedViewpoint/{token}/comment/pic",//上传图片
 		createCommentByToken:"sixD/sharedViewpoint/{token}/comment",//创建评论
 		delCommentByToken:"/sixD/sharedViewpoint/{token}/comment/{commentId}",//删除评论
+		autoComplateUser:"/platform/project/{projectId}/member",
 
 		test: ""
 	},

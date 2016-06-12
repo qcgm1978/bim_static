@@ -37,13 +37,14 @@
 
 	  }
 
-	  //if (Auth.mappingRule) {
-		 // $container.append(tabs.mappingRule.tab);
-    //
-		 // this.viewProjectMapping = new App.Services.ProjectMapping();
-		 // this.$(".projectContainer .projectMapping").html(this.viewProjectMapping.render().el);
-    //
-	  //}
+		//映射规则
+		if (Auth.mappingRule) {
+			$container.append(tabs.mappingRule.tab);
+			this.viewMappingRule = new App.Services.viewMappingRule();
+			this.$(".projectContainer .projectMappingRule").html(this.viewMappingRule.render().el);
+		}
+
+
 
 	  if (Auth.designInfo) {
 		  $container.append(tabs.designInfo.tab);
@@ -100,7 +101,7 @@
  		var _this=this,
  			$item=$(event.target).closest(".item"),
  			_collection=App.Services.ProjectCollection.ProjectBaseInfoCollection;
- 		let _projectId=$item.attr('data-projectId');
+ 		let _projectId= App.Services.ProjectMappingRuleId =$item.attr('data-projectId');
  		
  		$item.addClass("selected").siblings().removeClass("selected");
  		//加载项目基本信息数据
@@ -123,8 +124,24 @@
  		collectionMap.fetch({
  			reset:true,
  			success(child, data) {
+
  			}
  		});
+
+
+		//映射规则
+		let collectionMapRule=App.Services.ProjectCollection.ProjectMappingRuleCollection;
+		collectionMapRule.reset();
+		collectionMapRule.projectId=_projectId;
+		collectionMapRule.fetch({
+			data: {projectId: _projectId},
+			success(child, data) {
+				console.log(data);
+			}
+		});
+
+
+
  		
  		//加载基坑数据
  		this.viewProjectBaseHole.setUserData({
@@ -214,7 +231,9 @@
  			this.$(".projectContainer .projectSection").show().siblings().hide();
  		} else if (type == "pile") {//桩
  			this.$(".projectContainer .projectPile").show().siblings().hide();
- 		}
+ 		}else if (type == "mappingRule") {//映射规则
+			this.$(".projectContainer .projectMappingRule").show().siblings().hide();
+		}
 
  	}
 
