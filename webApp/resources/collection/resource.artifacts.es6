@@ -247,9 +247,18 @@ App.ResourceArtifacts={
     init:function(_this,optionType) {
 
 
+
+        //项目映射入口
+        if(optionType != "library" ){
+            //_this.$el.html("");//处理菜单
+        }
+
+        //项目id
         if(!App.ResourceArtifacts.Status.projectId){
             _this.$el.append( new App.Resources.ArtifactsIndexNav().render().el);
         }
+
+
         //公用组件
         this.menu = new App.Resources.ArtifactsMapRule();  //外层菜单
         this.plans = new App.Resources.ArtifactsPlanList();   //模块化列表 /计划节点
@@ -261,7 +270,7 @@ App.ResourceArtifacts={
         this.menu.plans = this.plans;
 
         App.ResourceArtifacts.Status.rule.biz = 1;
-
+        App.ResourceArtifacts.Status.templateId = "";
 
         if(optionType == "template" ){//规则模板
 
@@ -275,18 +284,11 @@ App.ResourceArtifacts={
             this.tplFrame = new App.Resources.ArtifactsTplFrame();
             this.tplList = new App.Resources.ArtifactsTplList();
 
-
             _this.$el.append(this.tplFrame.render().el);//菜单
             this.tplFrame.$(".tplListContainer").html(this.tplList.render().el);
 
-
             this.getTpl();
-
         }else{//规则库
-
-            if(optionType != "library" ){
-                _this.$el.html("");
-            }
 
             $(".mappingRule .library").addClass("active").siblings("a").removeClass("active");
 
@@ -322,7 +324,6 @@ App.ResourceArtifacts={
     //获取计划节点
     getPlan:function(){
         var _this = App.ResourceArtifacts, pdata;
-        App.ResourceArtifacts.Status.type =1 ;
         pdata  = {
             URLtype:"fetchArtifactsPlan",
             data:{
