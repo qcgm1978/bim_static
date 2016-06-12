@@ -9,7 +9,7 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
 
     events:{
         "click .sele": "select",
-        "click .default" : "create",
+        "click .default" : "create"
 
     },
 
@@ -32,10 +32,19 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
 
     initialize:function(){
         this.getCategoryCode(); //获取分类编码
+        Backbone.on("startFromProject",this.startFromProject,this);
+    },
+
+    startFromProject:function(){
+        
     },
 
     select:function(e){
         var $pre = $(e.target),_this = this;
+
+        if(!App.ResourceArtifacts.Status.saved ){
+            alert("请先保存！");
+        }
 
         if($pre.closest(".artifactsNav").length){
             $pre.addClass("active").siblings("li").removeClass("active");

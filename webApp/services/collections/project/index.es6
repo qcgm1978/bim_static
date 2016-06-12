@@ -124,6 +124,22 @@ App.Services.ProjectCollection = {
 			}
 		}
 	})),
+	//映射规则模板
+	ProjectMappingRuleModelCollection: new(Backbone.Collection.extend({
+		model: Backbone.Model.extend({
+			defaults: function() {
+				return {
+					title: ""
+				}
+			}
+		}),
+		urlType: "fetchArtifactsTemplate",
+		parse(response) {
+			if (response.code == 0 && response.data) {
+				return response.data;
+			}
+		}
+	})),
 
 	
 	ProjecMappingCollection: new(Backbone.Collection.extend({

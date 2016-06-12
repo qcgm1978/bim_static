@@ -1,0 +1,63 @@
+<div class="ruleTitle" data-id="<%= obj.id ? obj.id  : ''%>">
+    <%if (obj.checked) {%>
+    <i class="RuleCheck"></i>
+    <%}%>
+    <div class="right getDetail">详情</div>
+    <div class="desc"><%= (obj.mappingCategory.categoryCode ? ( "[" + obj.mappingCategory.categoryCode + "] &nbsp;") : '' ) +  (obj.mappingCategory.categoryName ? obj.mappingCategory.categoryName  : "新建映射规则") %></div>
+</div>
+<div class="ruleDetail">
+    <div class="typeCode" data-code="<%= obj.mappingCategory.categoryCode %>" data-name="<%= obj.mappingCategory.categoryName %>">
+        <div class="title">分类编码:</div>
+        <div class="conR">
+            <div>
+                <div class="chide" data-code="<%= obj.mappingCategory.categoryCode %>"><span><%= '[' + mappingCategory.categoryCode +']'%></span>  <i><%= mappingCategory.categoryName %></i></div>
+                <%= obj.mappingCategory.categoryCode %>
+                <span class="choose">选择</span>
+            </div>
+            <ul>
+            </ul><!--联想接口，最多显示5条-->
+        </div>
+    </div>
+    <div class="mapRule clearfix">
+        <div class="title">属性映射规则:</div>
+        <div class="conR">
+            <dl>
+                <% var list =obj.mappingCategory.mappingPropertyList ; for(var i = 0 ; i < list.length ; i++) { %>
+                <dd>
+                    <div class="leftten" data-id="<%= obj.id %>" data-name="">
+                        <%  var type = list[i].operator,a1 = "==",a2 = "!=",a3 = "<>",a4 = "><";  %>
+                        <%= list[i].propertyKey %>"
+                        <div class="myDropDown" data-operator="<%= type %>">
+                        <span class="myDropText">
+                            <span class="text"><%=   type == a1 ? "相等" :  (type == a2 ? "不等" :  (type == a3 ? "范围内" :  (type == a4 ? "范围外" : "请选择规则")))%></span>
+                            <i class="myDropArrorw down"></i>
+                        </span>
+                        <ul class="myDropList">
+                            <li class="myItem" data-operator="==">等于</li>
+                            <li class="myItem" data-operator="!=">不等于</li>
+                            <li class="myItem" data-operator="<>">范围内</li>
+                            <li class="myItem" data-operator="><">范围外</li>
+                        </ul>
+                    </div>
+                    </div>
+                    <div class="eIn <%= (type == a1  || type == a2) ? 'active' : ''  %>"><input type="text" placeholder='请输入属性值，多个属性值可用英文 "," 分隔' value="<%= list[i].propertyValue %>"></div><!--等于/不等于-->
+                    <div class="ioside  <%= (type == a3 || type == a4) ? 'active' : ''  %>"><!--范围 内/外-->
+                        <div class="myDropDown" data-operator="(">
+                        <span class="myDropText">
+                            <span class="text"><%= list[i].ruleList.left=='(' ? '>' : (list[i].ruleList.left=='[' ? "≥" : '>') %></span>
+                            <i class="myDropArrorw down"></i>
+                        </span><%= list[i].ruleList.leftValue %>
+
+                        </div><div class="myDropDown " data-operator=")">
+                        <span class="myDropText">
+                            <span class="text"><%= list[i].ruleList.right==')' ? '<' : (list[i].ruleList.right==']' ? "≤" : '<') %></span>
+                            <i class="myDropArrorw down"></i>
+                        </span><%= list[i].ruleList.rightValue %>
+                        </div>
+                    </div>
+                </dd>
+                <% }%>
+            </dl>
+        </div>
+    </div>
+</div>

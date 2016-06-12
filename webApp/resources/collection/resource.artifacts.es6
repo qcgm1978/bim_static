@@ -1,12 +1,22 @@
 //fetchArtifactsPlan   获取计划
 //fetchArtifactsPlanRule   获取规则
 App.ResourceArtifacts={
+    resetPreRule:function(){
+
+        App.ResourceArtifacts.Status.templateId = "";
+        App.ResourceArtifacts.Status.templateName = "";
+        App.ResourceArtifacts.Status.rule.biz = "";
+        App.ResourceArtifacts.Status.rule.targetCode = "";
+        App.ResourceArtifacts.Status.rule.targetName = "";
+    },
+
+
     Status:{
         presentPlan:null,  //当前计划或质量，提交数据
         saved : true,    //创建规则后的保存状态，已保存  /  未保存
         presentRule : null,    //当前规则
         qualityProcessType:1,   //质量标准 -过程选择  type
-        delRule:null,
+        delRule:"",
         qualityStandardType:"GC",   //质量标准 -过程选择  type
         type:"", //1:标准规则；2：项目规则
         projectId : "",//如果有项目规则就有项目id
@@ -17,6 +27,7 @@ App.ResourceArtifacts={
             type : "", //1:标准规则；2：项目规则
             targetCode:"",  //对应模块的code
             targetName:"",
+            count:"",
             "mappingCategory": {
                 "categoryCode": "",
                 "categoryName": "",
@@ -235,19 +246,29 @@ App.ResourceArtifacts={
 
     init:function(_this,optionType) {
 
-        _this.$el.append( new App.Resources.ArtifactsIndexNav().render().el);
 
+        if(!App.ResourceArtifacts.Status.projectId){
+            _this.$el.append( new App.Resources.ArtifactsIndexNav().render().el);
+        }
         //公用组件
         this.menu = new App.Resources.ArtifactsMapRule();  //外层菜单
         this.plans = new App.Resources.ArtifactsPlanList();   //模块化列表 /计划节点
-        this.planRule = new App.Resources.ArtifactsPlanRule();  //规则
+        this.planRuleTitle = new App.Resources.ArtifactsPlanRuleTitle();  //规则头部
+        this.planRule = new App.Resources.ArtifactsPlanRule();  //规则列表
         this.quality = new App.Resources.ArtifactsQualityList();//质量标准，外层
         this.plans.planRule = this.menu;
         this.menu.quality = this.quality;
         this.menu.plans = this.plans;
 
+        App.ResourceArtifacts.Status.rule.biz = 1;
+
 
         if(optionType == "template" ){//规则模板
+
+            if(App.ResourceArtifacts.Settings.ruleModel  ==2){
+                App.ResourceArtifacts.Status.rule.biz =2
+            }
+
             $(".mappingRule .template").addClass("active").siblings("a").removeClass("active");
 
             $(".breadcrumbNav .mappingRule").show();
@@ -261,14 +282,20 @@ App.ResourceArtifacts={
 
             this.getTpl();
 
-        }else if(optionType == "library"){//规则库
-            $(".mappingRule .library").addClass("active").siblings("a").removeClass("active");
-            App.ResourceArtifacts.Status.rule.biz =1;  //设置默认规则为模块化
+        }else{//规则库
 
+            if(optionType != "library" ){
+                _this.$el.html("");
+            }
+
+            $(".mappingRule .library").addClass("active").siblings("a").removeClass("active");
+
+            App.ResourceArtifacts.Status.rule.biz =1;  //设置默认规则为模块化
 
             _this.$el.append(this.menu.render().el);//菜单
             this.menu.$(".plans").html(this.plans.render().el);//计划节点
-            this.menu.$(".rules").html(this.planRule.render().el);//映射规则
+            this.menu.$(".rules").html(this.planRuleTitle.render().el);//映射规则
+            this.planRuleTitle.$(".ruleContentRuleList").html(this.planRule.render().el);//映射规则
 
             //插入默认为空的规则列表
             this.getPlan();
