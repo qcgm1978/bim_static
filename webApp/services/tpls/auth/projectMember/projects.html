@@ -12,12 +12,12 @@
 <ul class="projectListWrap">
 <% _.each(data.items,function(item,index){ %>
 		<li class="project" data-pid="<%= item.id %>">
-			<div><img src="<%= item.logoUrl && item.logoUrl['small'] %>"></div>
+			<div><img src="<%=item.logoUrl && item.logoUrl['small'] %>"></div>
 			<div>
 				<h4><%= item.name %></h4>
 				<p>
 					<%= item.province %><%= item.city %>
-						<%= new Date(item.startTime).format("yyyy-MM-dd") %>â€
+						<%= new Date(item.startTime).format("yyyy-MM-dd") %>â€”
 							<%= new Date(item.endTime).format("yyyy-MM-dd") %>
 				</p>
 			</div>
