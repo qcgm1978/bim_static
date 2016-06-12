@@ -18,10 +18,9 @@ App.Services.fam = Backbone.View.extend({
         direction : App.Services.KeyUser.fam.toJSON() || []
 
       };
-    console.log(datas)
       this.$el.html(this.template(datas));
 
-
+console.log('1')
     return this;
   },
 

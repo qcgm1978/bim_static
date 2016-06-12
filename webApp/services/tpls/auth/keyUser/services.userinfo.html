@@ -37,7 +37,7 @@
                 <% if(info.model.length){ %>
 
                 <% for(var i=0;i<info.model.length;i++){ %>
-                <li><div class="name"><%= info.model[i]['name'] %></div><div ><%= new Date(info.model[i]['createTime']).Format("yyyy-MM-dd") %></div></li>
+                <li><div class="name"><%= info.model[i]['name'] %></div><div ><%= info.model[i]['designUnit']||"无" %></div><div ><%= new Date(info.model[i]['createTime']).Format("yyyy-MM-dd") %></div></li>
 
                 <% }}else{ %>
                 <li><span>该用户还没有标准模型权限,<b class="link">点此可添加标准模型</b></span></li>
@@ -52,7 +52,7 @@
                 <% if(info.family.length){ %>
 
                 <% for(var i=0;i<info.family.length;i++){ %>
-                <li><div class="name"><%= info.family[i]['name'] %></div><div ><%= new Date(info.family[i]['createTime']).Format("yyyy-MM-dd") %></div></li>
+                <li><div class="name"><%= info.family[i]['name'] %></div><div ><%= info.family[i]['designUnit']||"无" %></div><div ><%= new Date(info.family[i]['createTime']).Format("yyyy-MM-dd") %></div></li>
 
                 <% }}else{ %>
 
