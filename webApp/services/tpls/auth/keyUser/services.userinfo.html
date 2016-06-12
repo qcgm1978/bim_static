@@ -68,7 +68,7 @@
                   <% if(info.org.length){ %>
 
                     <% _.each(info.org,function(org){ %>
-                      <li><div class="name"><%= org.name %></div><div><%= org.namePath %></div></li>
+                      <li><div class="name"><%= org.name %></div><div class="path"><%= org.namePath %></div></li>
                       <% }) %>
                   <% }else { %>
                   <li><span>该用户还没有可以管理的部门,<b class="link">点此可添加部门</b></span></li>
