@@ -38,16 +38,28 @@ App.Services.addKeyUser = Backbone.View.extend({
         this.$el.find('.next').hide();
         this.$el.find('.leftWindow').html(new App.Services.step2().render().el);
         this.$el.find('.partition a').eq(App.Services.KeyUser.fakedata.authType-1).trigger('click');
-        App.Services.KeyUser.loadData(App.Services.KeyUser.Step2, '', function(r){
 
-          if(r && !r.code && r.data){
-            _.each(r.data.items, function(data, index){
-              data.shut    = true;
-              data.canLoad = true;
-            });
-            App.Services.KeyUser.Step2.set(r.data.items);
+        $.ajax({
+          //url: "platform/auth/user/"+App.Services.KeyUser.fakedata.user.userId+"/dataPrivilege/project?type=2"
+          url: "platform/auth/project?type=3"
+        }).done(function(datas){
+          if(datas && !datas.code && datas.data){
+
+            App.Services.KeyUser.Step2.reset(datas.data);
+            App.Services.KeyUser.Step2.trigger('add');
           }
         });
+
+        //App.Services.KeyUser.loadData(App.Services.KeyUser.Step2, '', function(r){
+        //
+        //  if(r && !r.code && r.data){
+        //    _.each(r.data.items, function(data, index){
+        //      data.shut    = true;
+        //      data.canLoad = true;
+        //    });
+        //    App.Services.KeyUser.Step2.set(r.data.items);
+        //  }
+        //});
         //遍历本身存在的项目数据添加到右边窗口
         App.Services.KeyUser.mode=App.Services.KeyUser.fakedata.authType;
         var str = '',projs=App.Services.KeyUser.fakedata.project,pid=App.Services.KeyUser.editpid=[];
@@ -147,24 +159,30 @@ App.Services.addKeyUser = Backbone.View.extend({
 
         this.$el.find('.leftWindow').html(new App.Services.fam().render().el);
 
-        App.Services.KeyUser.loadData(App.Services.KeyUser.fam, '', function(r){
+        $.ajax({
+          //url: "platform/auth/user/"+App.Services.KeyUser.fakedata.user.userId+"/dataPrivilege/project?type=2"
+          url: "platform/auth/project?type=2"
+        }).done(function(datas){
+          if(datas && !datas.code && datas.data){
 
-          if(r && !r.code && r.data){
-            console.log(r)
-
-            App.Services.KeyUser.fam.set(r.data.items);
+            App.Services.KeyUser.fam.reset(datas.data);
+            App.Services.KeyUser.fam.trigger('add');
           }
         });
 
+
         //遍历本身存在的部门数据添加到右边窗口
-        var str = '',orgs=App.Services.KeyUser.fakedata.familyId,orgid=App.Services.KeyUser.editorgId=[];
-        //for(var i=0;i<orgs.length;i++){
-        //  var p = orgs[i];
-        //  orgid.push(p['orgId']);
-        //  str += "";
-        //
-        //}
-        App.Services.KeyUser.orgId=orgid;
+        var str = '',orgs=App.Services.KeyUser.fakedata.family,orgid=App.Services.KeyUser.editorgId=[];
+        for(var i=0;i<orgs.length;i++){
+          var p = orgs[i];
+          orgid.push(p['id']);
+          str += "<li class='proj-right' data-id="+p['id']+"><i class='proj-remove'></i>"+
+            "<h3 data-id="+p['id']+">"+p['name']+"</h3>"+
+            "<p>"+(p['designUnit']||' ')+"<span>"+new Date(p['createTime']).Format("yyyy-MM-dd")+"</span></p>"+
+            "</li>";
+
+        }
+        App.Services.KeyUser.pid=orgid;
 
         this.$el.find('.rightWindow').html('<div>'+str+'</div>').siblings('p').text("已选择");
 
@@ -180,24 +198,30 @@ App.Services.addKeyUser = Backbone.View.extend({
 
         this.$el.find('.leftWindow').html(new App.Services.standard().render().el);
 
-        App.Services.KeyUser.loadData(App.Services.KeyUser.standard, '', function(r){
+        $.ajax({
+          //url: "platform/auth/user/"+App.Services.KeyUser.fakedata.user.userId+"/dataPrivilege/project?type=2"
+          url: "platform/auth/project?type=1"
+        }).done(function(datas){
+          if(datas && !datas.code && datas.data){
 
-          if(r && !r.code && r.data){
-            console.log(r)
-
-            App.Services.KeyUser.standard.set(r.data.items);
+            App.Services.KeyUser.standard.reset(datas.data);
+            App.Services.KeyUser.standard.trigger('add');
           }
         });
 
+
         //遍历本身存在的部门数据添加到右边窗口
-        var str = '',orgs=App.Services.KeyUser.fakedata.familyId,orgid=App.Services.KeyUser.editorgId=[];
-        //for(var i=0;i<orgs.length;i++){
-        //  var p = orgs[i];
-        //  orgid.push(p['orgId']);
-        //  str += "";
-        //
-        //}
-        App.Services.KeyUser.orgId=orgid;
+        var str = '',orgs=App.Services.KeyUser.fakedata.model,orgid=[];
+        for(var i=0;i<orgs.length;i++){
+          var p = orgs[i];
+          orgid.push(p['id']);
+          str += "<li class='proj-right' data-id="+p['id']+"><i class='proj-remove'></i>"+
+            "<h3 data-id="+p['id']+">"+p['name']+"</h3>"+
+            "<p>"+(p['designUnit']||' ')+"<span>"+new Date(p['createTime']).Format("yyyy-MM-dd")+"</span></p>"+
+            "</li>";
+
+        }
+        App.Services.KeyUser.pid=orgid;
 
         this.$el.find('.rightWindow').html('<div>'+str+'</div>').siblings('p').text("已选择");
 
@@ -308,31 +332,38 @@ App.Services.addKeyUser = Backbone.View.extend({
   //移除已选中的名单
   remove: function(e){
 
-    var $li                    = $(e.target).parents('li');
+    var $li                    = $(e.target).parents('li'),
+      title = this.$el.find('.maintitle').text();
 
-    var stepNum = $('.steps .active').find('span').text();
-    if(this.$el.find('.maintitle').text() == '部门权限'){
+    if(title == '部门权限'){
       //部门权限移除已选中的名单
       var orgId                  = $li.find('p').attr('data-id');
       App.Services.KeyUser.editorgId = _.without(App.Services.KeyUser.editorgId,parseInt(orgId),orgId.toString());
 
       App.Services.KeyUser.orgId = App.Services.KeyUser.editorgId;
 
-    }else if(stepNum == 3){
-      //step3移除已选中的名单
-
-      var orgId                  = $li.find('p').attr('data-id');
-      App.Services.KeyUser.orgId = _.without(App.Services.KeyUser.orgId,parseInt(orgId),orgId.toString());
-
-    }
-    else{
+    }else if(title == "新增关键用户"){
       //step1移除已选中的名单
 
       var uid                  = $li.find('p').attr('data-uid');
       App.Services.KeyUser.uid = _.without(App.Services.KeyUser.uid, parseInt(uid), uid.toString());
 
       $('.rightWindow').siblings('p').text("已选成员 ( " + App.Services.KeyUser.uid.length + "个 )");
+
+      ////step3移除已选中的名单
+      //
+      //var orgId                  = $li.find('p').attr('data-id');
+      //App.Services.KeyUser.orgId = _.without(App.Services.KeyUser.orgId,parseInt(orgId),orgId.toString());
+
     }
+    //else{
+    //  //step1移除已选中的名单
+    //
+    //  var uid                  = $li.find('p').attr('data-uid');
+    //  App.Services.KeyUser.uid = _.without(App.Services.KeyUser.uid, parseInt(uid), uid.toString());
+    //
+    //  $('.rightWindow').siblings('p').text("已选成员 ( " + App.Services.KeyUser.uid.length + "个 )");
+    //}
     $li.remove();
 
   },
