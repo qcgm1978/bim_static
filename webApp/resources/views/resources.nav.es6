@@ -19,6 +19,7 @@ App.ResourcesNav.App = Backbone.View.extend({
 		var optionType = App.ResourcesNav.Settings.optionType;
 
 
+
 		if (type == "standardLibs") {
 			//获取标准模型库数据
 			this.fetchStandardLibs();
@@ -35,10 +36,11 @@ App.ResourcesNav.App = Backbone.View.extend({
 			//清单库
 			this.$el.append(new App.ResourcesNav.ManifestLibs().render().el);
 
-		}else if(type == "artifactsMapRule"){
+		}else if(type == "artifactsMapRule" ||  type == "project"){
 			//构件映射规则
-			$(".breadcrumbNav .mappingRule").show();
 			if(optionType){//映射规则/规则模板
+				//http://bim.wanda-dev.cn/#services/project/845159666131136
+				//http://bim.wanda-dev.cn/#resources/artifactsMapRule/library
 				App.ResourceArtifacts.init(_this,optionType);
 			}
 		}

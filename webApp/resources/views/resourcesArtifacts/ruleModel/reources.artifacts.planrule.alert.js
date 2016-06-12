@@ -34,6 +34,7 @@ App.Resources.ArtifactsPlanRuleAlert = Backbone.View.extend({
             App.Resources.ArtifactsAlertWindow.close();
             $(".artifactsContent .rules").removeClass("services_loading");
             App.ResourceArtifacts.Status.saved = true;
+            App.ResourceArtifacts.Status.delRule = "";
             return
         }
         //非新建
@@ -41,7 +42,6 @@ App.Resources.ArtifactsPlanRuleAlert = Backbone.View.extend({
             url:"http://bim.wanda-dev.cn/platform/mapping/rule/delete/" + id + "?projectId="+ App.ResourceArtifacts.Status.projectId,
             type:"DELETE",
             success:function(response){
-                console.log(response);
                  if(response.code==0){ //删除成功
                      $(".ruleDetail").hide();
                      App.ResourceArtifacts.Status.saved = true ;//保存状态
@@ -49,15 +49,15 @@ App.Resources.ArtifactsPlanRuleAlert = Backbone.View.extend({
                          return item.get("id") == id;
                      });
                      App.ResourceArtifacts.PlanRules.remove(pre);
+                     App.ResourceArtifacts.Status.rule.count = App.ResourceArtifacts.PlanRules.length;
 
                      _.each($(".ruleTitle"),function(item){
                          if(parseInt($(item).attr("data-id")) == id){
                              $(item).closest("li").remove();
                          }
                      });
-                     var _this = App.ResourceArtifacts.Status.presentPlan;
-                     $(".artifactsContent .rules h2 .name").html(App.ResourceArtifacts.Status.rule.targetCode + "&nbsp;" +App.ResourceArtifacts.Status.rule.targetName);
-                     $(".artifactsContent .rules h2 i").html( "("+_this.get("count") + ")");
+                     Backbone.trigger("countChange");
+
                 }else{
                      alert("删除失败");
                  }

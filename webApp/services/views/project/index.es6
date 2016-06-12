@@ -101,7 +101,7 @@
  		var _this=this,
  			$item=$(event.target).closest(".item"),
  			_collection=App.Services.ProjectCollection.ProjectBaseInfoCollection;
- 		let _projectId=$item.attr('data-projectId');
+ 		let _projectId= App.Services.ProjectMappingRuleId =$item.attr('data-projectId');
  		
  		$item.addClass("selected").siblings().removeClass("selected");
  		//加载项目基本信息数据
@@ -135,7 +135,9 @@
 		collectionMapRule.projectId=_projectId;
 		collectionMapRule.fetch({
 			data: {projectId: _projectId},
-			success(child, data) {}
+			success(child, data) {
+				console.log(data);
+			}
 		});
 
 
