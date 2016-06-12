@@ -43,7 +43,6 @@ App.Services.viewMappingRule= Backbone.View.extend({
 			window.location.href =   "#services/project/" + App.Services.ProjectMappingRuleId;
 		}
 	},
-
 	//获取数量自定义规则数量
 	getSelfRule:function(){
 		var data = {

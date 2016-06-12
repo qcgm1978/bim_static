@@ -270,7 +270,7 @@ App.ResourceArtifacts={
         this.menu.plans = this.plans;
 
         App.ResourceArtifacts.Status.rule.biz = 1;
-
+        App.ResourceArtifacts.Status.templateId = "";
 
         if(optionType == "template" ){//规则模板
 
@@ -284,15 +284,11 @@ App.ResourceArtifacts={
             this.tplFrame = new App.Resources.ArtifactsTplFrame();
             this.tplList = new App.Resources.ArtifactsTplList();
 
-
             _this.$el.append(this.tplFrame.render().el);//菜单
             this.tplFrame.$(".tplListContainer").html(this.tplList.render().el);
 
-
             this.getTpl();
-
         }else{//规则库
-
 
             $(".mappingRule .library").addClass("active").siblings("a").removeClass("active");
 
