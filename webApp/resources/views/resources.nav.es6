@@ -35,9 +35,8 @@ App.ResourcesNav.App = Backbone.View.extend({
 			//清单库
 			this.$el.append(new App.ResourcesNav.ManifestLibs().render().el);
 
-		}else if(type == "artifactsMapRule"){
+		}else if(type == "artifactsMapRule" || type == "services"){
 			//构件映射规则
-			$(".breadcrumbNav .mappingRule").show();
 			if(optionType){//映射规则/规则模板
 				App.ResourceArtifacts.init(_this,optionType);
 			}

@@ -17,7 +17,7 @@ var AppRoute = Backbone.Router.extend({
 		'console1/:type/:step': 'console1',
 		'services': 'services',
 		'services/:type': 'services',
-		'services/:type/:tab': 'services',
+		'services/:type/*': 'servicesMappingRule',
 		'list/:id': 'list',
 		'bodyContent': 'bodyContent',
 		'logout': 'logout',
@@ -141,11 +141,8 @@ var AppRoute = Backbone.Router.extend({
 		_.require('/static/dist/resources/resources.js');
 		App.ResourcesNav.Settings.type = type;
 		App.ResourcesNav.Settings.optionType = optionType;
-
 		new App.ResourcesNav.App().render();
-
 		App.ResourceArtifacts.resetPreRule();
-
 		App.ResourceArtifacts.Settings.ruleModel = 3;  //权限入口，模块化，质量标准
 		$(".breadcrumbNav .mappingRule").show();
 		$("#pageLoading").hide();
@@ -196,20 +193,23 @@ var AppRoute = Backbone.Router.extend({
 	},
 
 
-/*
-	servicesMappingRule: function(type) {
+	servicesMappingRule: function(type,tab,projectModelId) {
+		console.log(1);
 		this.reset();
-		$("#pageLoading").hide();
-		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".services").addClass('selected');
-		_.require('/static/dist/services/services.css');
-		_.require('/static/dist/services/services.js');
-		$("#bottomBar").hide(); //隐藏脚部
-		App.Services.init(type, tab);
+		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".resources").addClass('selected');
+		_.require('/static/dist/resources/resources.css');
+		_.require('/static/dist/resources/resources.js');
+		App.ResourcesNav.Settings.type = type;
+		App.ResourcesNav.Settings.optionType = optionType;
+		App.ResourcesNav.Status.projectId = projectModelId;
+		new App.ResourcesNav.App().render();
+		App.ResourceArtifacts.resetPreRule();
+		App.ResourceArtifacts.Settings.ruleModel = 3;  //权限入口，模块化，质量标准
+		$(".breadcrumbNav .mappingRule").show();
 	},
-*/
 
 
-	services: function(type, tab) {
+	services: function(type,tab) {
 		this.reset();
 		$("#pageLoading").hide();
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".services").addClass('selected');

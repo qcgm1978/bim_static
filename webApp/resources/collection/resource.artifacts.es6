@@ -245,9 +245,9 @@ App.ResourceArtifacts={
     })),
 
     init:function(_this,optionType) {
-
-        _this.$el.append( new App.Resources.ArtifactsIndexNav().render().el);
-
+        if(!App.ResourcesNav.Status.projectId){
+            _this.$el.append( new App.Resources.ArtifactsIndexNav().render().el);
+        }
         //公用组件
         this.menu = new App.Resources.ArtifactsMapRule();  //外层菜单
         this.plans = new App.Resources.ArtifactsPlanList();   //模块化列表 /计划节点
@@ -259,9 +259,6 @@ App.ResourceArtifacts={
         this.menu.plans = this.plans;
 
         App.ResourceArtifacts.Status.rule.biz = 1;
-
-
-
 
 
         if(optionType == "template" ){//规则模板
@@ -283,7 +280,7 @@ App.ResourceArtifacts={
 
             this.getTpl();
 
-        }else if(optionType == "library"){//规则库
+        }else if(optionType == "library" || optionType == "project"){//规则库
             $(".mappingRule .library").addClass("active").siblings("a").removeClass("active");
 
             App.ResourceArtifacts.Status.rule.biz =1;  //设置默认规则为模块化
