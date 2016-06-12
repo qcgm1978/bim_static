@@ -127,11 +127,14 @@ ViewComp.MemberManager = Backbone.View.extend({
 			if(res.message==="success"){
 				var zNodes=[]
 				if(url=='fetchServiceKeyUserInfo'){
-					zNodes=res.data.org;
-					zNodes.forEach(function(i){
+					var _org=res.data.org||[],
+						_user=res.data.user||[],
+						_newOrg=[];
+					_org.forEach(function(i){
 						i.iconSkin='business';
 						i.name=i.name+'<label style="margin-left:40px;color:#ccc;">('+i.namePath+')</label>';
 					})
+					zNodes=_org.concat(_user);
 				}else{
 					var _org=res.data.org||[],
 						_user=res.data.user||[],

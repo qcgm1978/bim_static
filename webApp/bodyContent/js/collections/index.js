@@ -16,7 +16,8 @@ App.BodyContent.control= {
         this.loadMessageCount();
         
         new App.BodyContent.App().render(); //渲染框架
-        new App.BodyContent.todosList();
+        this.viewCacheTodo=this.viewCacheTodo || new App.BodyContent.todosList();
+        this.viewCacheMonthEnd=this.viewCacheMonthEnd || new App.BodyContent.monthEndList()
      //   $("#todos").html(new App.BodyContent.todosList().render().el);
         $(".conMonth .article table").append(new App.BodyContent.monthEndList().render().el);
         $(".conMonth .article table").append(new App.BodyContent.monthStartList().render().el);
@@ -161,7 +162,6 @@ App.BodyContent.control= {
 						delay:5000,
 						data:_datas,
 						onChange:function(d){
-							
 							$("#slideTitle").html(d.name);
 						}
 					})

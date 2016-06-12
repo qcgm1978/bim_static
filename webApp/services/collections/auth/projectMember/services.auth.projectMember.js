@@ -3,6 +3,16 @@
  */
 
 App.Services.projectMember = {
+
+	selectData:function(data){
+		if(data.type==3){
+			return "我管理的项目("+data.projectCount+")";
+		}else if(data.type==2){
+			return "我管理的族库("+data.familyCount+")";
+		}else if(data.type==1){
+			return "我管理的标准模型("+data.modelCount+")";
+		}
+	},
 	
 	
 	//初始化

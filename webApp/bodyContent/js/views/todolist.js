@@ -14,7 +14,12 @@ App.BodyContent.todosList = Backbone.View.extend({
     },
 
     initialize : function(){
+        var _this=this;
         this.listenTo(App.BodyContent.control.todoCollection,"add",this.addOne);
+         this.listenTo(App.BodyContent.control.todoCollection,"reset",function(){
+            $("#todos").empty();
+            _this._items=0;
+         });
         this.render();
     },
     //数据加载
