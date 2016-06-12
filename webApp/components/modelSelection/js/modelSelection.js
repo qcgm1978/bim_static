@@ -24,19 +24,47 @@
           $css = '<link rel="stylesheet" href="'+styleUrl+'" />';
       $('head').append($css,$script);
       this.dialog();
+      this.controll();
+    },
+    controll:function(){
+      var self = this;
+      self.$dialog.on('click','.toolsBtn',function(){
+        self.getSelected();
+      }).on('click','.dialogClose',function(){
+        self.$dialog.remove();
+        self.$dialog = null;
+      }).on('click','.dialogOk',function(){
+        var setting = self.Settings;
+        if (setting.callback && setting.callback.call(this) !== false) {
+          self.$dialog.remove();
+          self.$dialog = null;
+          return self.viewData
+        }
+      }).on('click','.rightBar .m-openTree,.rightBar .m-closeTree',function(){
+        var $this = $(this),
+            $li = $this.closest('.itemNode');
+        $this.toggleClass('m-openTree m-closeTree');
+        $li.toggleClass('open');
+      })
     },
     dialog:function(){
       var self = this,
-          $dialog = this.$dialog = $('<div class="modelSelectDialog"></div>'),
-          $body = $('<div class="dialogBody"></div>'),
           Settings = this.Settings,
-          $header = $('<div class="dialogHeader"/>').html('请选择构件<span class="dialogClose" title="关闭"></span> '),
-          $content = $('<div class="dialogContent"><div id="modelView" class="model"></div><div class="rightBar"><div class="tab"><div class="tabItem">已选构件</div></div><div class="tools"><div class="toolsBtn"><i class="m-checked"></i>已选构件</div><span class="isSecleted">已选<span class="num">3</span>个构件</span></div></div></div>'),
-          $bottom = $('<div class="dialogFooter"/>').html('<input type="button" class="dialogOk dialogBtn" value="' + this.Settings.btnText + '" />');
-      $body.append($header,$content,$bottom);
+          $dialog;
+      if(this.$dialog){
+        $dialog = self.$dialog;
+      }else{
+        $dialog = self.$dialog= $('<div class="modelSelectDialog"></div>');
+        var $body = $('<div class="dialogBody"></div>'),
+            $header = $('<div class="dialogHeader"/>').html('请选择构件<span class="dialogClose" title="关闭"></span> '),
+            $modelView = self.$modelView = $('<div id="modelView" class="model"></div>')
+            $content = $('<div class="dialogContent"><div class="rightBar"><div class="tab"><div class="tabItem">已选构件</div></div><div class="tools"><div class="toolsBtn"><i class="m-checked"></i>已选构件</div><span class="isSecleted">已选<span class="num">3</span>个构件</span></div><div class="bim" id="modelTree"></div></div></div>'),
+            $bottom = $('<div class="dialogFooter"/>').html('<input type="button" class="dialogOk dialogBtn" value="' + this.Settings.btnText + '" />');
+        $content.prepend($modelView);
+        $body.append($header,$content,$bottom);
+      }
       $dialog.append($body);
       $("body").append($dialog);
-      Settings.$dialog = $dialog;
       setTimeout(function(){
         self.renderModel();
       },10);
@@ -44,7 +72,7 @@
     renderModel:function(){
       this.viewer = new bimView({
         type:'model',
-        element: $('#modelView'),
+        element: this.$modelView,
         sourceId: this.Settings.sourceId,
         etag: this.Settings.etag,
         projectId:this.Settings.projectId,
@@ -52,7 +80,34 @@
       })
     },
     getSelected:function(){
-      return this.viewer.getSelected()
+      var self = this;
+      var viewData = self.viewData || {};
+      bimView.sidebar.getSelected(this.viewer,function(ids){
+        self.viewData = $.extend(true,{},viewData,ids);
+        var tree = self.renderTree(self.viewData);
+        $('#modelTree').html(tree);
+      });
+    },
+    renderTree:function(data){
+      var self = this,
+          rootHtml = $('<ul class="tree"></ul>');
+      $.each(data,function(i,j){
+        var hasChild = typeof j == 'object' ? true :false,
+            icon = hasChild ? 'm-openTree':'noneSwitch',
+            name = hasChild ? i : j;
+        var html = $('<li class="itemNode">\
+          <div class="itemContent">\
+            <i class="'+icon+'"></i>\
+            <span class="treeText">'+name+'</span>\
+          </div>\
+        </li>');
+        if(hasChild){
+          var children = self.renderTree(j);
+          html.append(children);
+        }
+        rootHtml.append(html);
+      });
+      return rootHtml;
     }
   }
   win.ModelSelection = ModelSelection;
