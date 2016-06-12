@@ -34,13 +34,19 @@ App.Projects.searchView = Backbone.View.extend({
 		this.$(".pickProjectType").myDropDown({
 			zIndex:99,
 			click:function($item){
-				_this.formData.projectType=$item.attr('data-val');
+				_this.formData.subType=$item.attr('data-val');
 			}
 		});
 		this.$(".pickCategory").myDropDown({
 			zIndex:98,
 			click:function($item){
 				_this.formData.estateType=$item.attr('data-val');
+			}
+		});
+		this.$(".projectStatus").myDropDown({
+			zIndex:98,
+			click:function($item){
+				_this.formData.projectType=$item.attr('data-val');
 			}
 		});
 		this.$(".pickManager").myDropDown({

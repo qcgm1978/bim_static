@@ -201,7 +201,7 @@ App.Services.KeyUser = {
     }),
 
 
-    urlType: "fetchFamLibs"
+    urlType: "fetchServicesProjectMemberProjectList"
 
   })),
 

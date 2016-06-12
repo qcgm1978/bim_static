@@ -20,7 +20,10 @@
 			var _def=$.fn.mmhSlider.defaults;
 			var delay = setting.delay,
 				_pause=_def._pause;
-				
+			if(setting.noData){
+				setting.noData();
+				return ;
+			}
 			this.cacheArray(setting.data.length);
 			$.fn.mmhSlider.methods.render($dom, setting, function(data) {
 				//定时器任务

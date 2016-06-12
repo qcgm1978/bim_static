@@ -251,8 +251,8 @@
         return ul.append(li);
       }
       function createli(name,hasChild){
-        var icon = hasChild ? 'm-closeTree' : 'noneSwitch'
-        var dom = '<li class="itemNode open" data-type="'+name+'">\
+        var icon = hasChild ? 'm-openTree' : 'noneSwitch'
+        var dom = '<li class="itemNode" data-type="'+name+'">\
               <div class="itemContent">\
                 <i class="'+ icon +'"></i>\
                 <span class="treeText">'+name+'</span>\
