@@ -17,13 +17,14 @@
 	  if (!App.AuthObj.lib) {
 
 	  } else{
+		  debugger
 		  var type = App.ResourcesNav.Settings.type;
 		  if (type == "standardLibs") {
 			  var Auth = App.AuthObj.lib.model;
 
 			  if(!Auth.edit){
 				  this.$('.btnNewFolder,.btnFileDel,.btnFileUpload').addClass('disable');
-				  if(!App.ResourceModel.Settings.CurrentVersion.byProjectRef){
+				  if(!Auth.download || !App.ResourceModel.Settings.CurrentVersion.byProjectRef){
 					  this.$('.btnFileDownLoad').addClass('disable');
 				  }
 			  }
@@ -32,7 +33,7 @@
 
 			  if(!Auth.edit){
 				  this.$('.btnNewFolder,.btnFileDel,.btnFileUpload').addClass('disable');
-				  if(!App.ResourceModel.Settings.CurrentVersion.byProjectRef){
+				  if(!Auth.download || !App.ResourceModel.Settings.CurrentVersion.byProjectRef){
 					  this.$('.btnFileDownLoad').addClass('disable');
 				  }
 			  }
