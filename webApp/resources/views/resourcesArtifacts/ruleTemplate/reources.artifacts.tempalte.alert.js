@@ -31,7 +31,8 @@ App.Resources.ArtifactsTplAlert = Backbone.View.extend({
             type:"DELETE",
             success:function(response){
                  if(response.code == 0){ //删除成功
-
+                     App.ResourceArtifacts.Status.rule.count -=  1;
+                     Backbone.trigger("resetTitle");
                      App.ResourceArtifacts.Status.saved = true ;//保存状态
 
                      var pre = App.ResourceArtifacts.TplCollection.filter(function(item){
@@ -39,6 +40,8 @@ App.Resources.ArtifactsTplAlert = Backbone.View.extend({
                      });
 
                      App.ResourceArtifacts.TplCollection.remove(pre);
+
+
                      _.each($(".tplCon .item"),function(item){
                          if(parseInt($(item).attr("data-id")) == templateId){
                              $(item).closest("li").remove();
@@ -46,6 +49,8 @@ App.Resources.ArtifactsTplAlert = Backbone.View.extend({
                      });
 
                      App.ResourceArtifacts.Status.templateId = "";
+
+
                      //刷新右侧视图  //清空所有选项
                 }else{
                      alert("删除失败");

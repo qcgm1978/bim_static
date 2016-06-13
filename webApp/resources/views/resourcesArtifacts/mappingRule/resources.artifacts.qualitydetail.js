@@ -19,8 +19,7 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
     },
 
     initialize:function(){
-        this.listenTo(this.model,"change",this.render);
-        Backbone.on("countChange",this.changeCount,this);
+        Backbone.on("resetTitle",this.changeCount,this);
     },
 
     //取得模型修改过的属性
@@ -31,8 +30,10 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
 
     changeCount:function(){
         var count = App.ResourceArtifacts.Status.rule.count;
-        this.model.set({count:count},{silent:true});
-        this.$(".count").text("("+ count + ")");
+        if(this.model.get("code") ==App.ResourceArtifacts.Status.rule.targetCode ){
+            this.model.set({count:count},{silent:true});
+            this.$(".count").text("("+ count + ")");
+        }
     },
 
     //取得规则列表
@@ -63,9 +64,7 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
 
         this.toggleClass(item);
         this. getRules();
-        //保存计划规则
-        App.ResourceArtifacts.Status.presentPlan = null;
-        App.ResourceArtifacts.Status.presentPlan = this.model;
+
     },
 //切换计划
     toggleClass:function(item){
@@ -105,27 +104,30 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
             return
         }
 
+
+
         //刷新右面视图
         var code = App.ResourceArtifacts.Status.rule.targetCode;
         pdata = {
             URLtype: "fetchArtifactsPlanRule",
             data:{
                 code:code,
-                biz:App.ResourceArtifacts.Status.rule.biz,
                 type:App.ResourceArtifacts.Status.type,
                 projectId:App.ResourceArtifacts.Status.projectId
             }
         };
+        App.ResourceArtifacts.Status.rule.biz = pdata.data.biz = 2 ;
         App.ResourceArtifacts.loading();
+        App.ResourceArtifacts.PlanRules.reset();
         App.Comm.ajax(pdata,function(response){
             if(response.code == 0 ){
                 if(response.data  &&  response.data.length){
-                    App.ResourceArtifacts.PlanRules.reset();
                     App.ResourceArtifacts.PlanRules.add(response.data);
-                    Backbone.trigger("resetTitle");
                 }else{
-                    $(".ruleContentRuleList ul").html("<li><div class='ruleTitle delt'>暂无内容</div></li>");
+                    App.ResourceArtifacts.Status.rule.count  = response.data.length = 0;
+                    Backbone.trigger("mappingRuleNoContent")
                 }
+                Backbone.trigger("resetTitle");
             }
             App.ResourceArtifacts.loaded($(".rules"));
         });

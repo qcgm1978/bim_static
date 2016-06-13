@@ -36,7 +36,7 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
     },
 
     startFromProject:function(){
-        
+        //¼àÌıÏîÄ¿ÄÚÈİ
     },
 
     select:function(e){

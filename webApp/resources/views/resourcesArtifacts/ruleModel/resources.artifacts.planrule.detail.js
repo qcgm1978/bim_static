@@ -23,7 +23,9 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
         "click .saveRule":"saveRule",
         "click .choose":"choose",
         "click .delRule": "delRule",
-        "focus .categoryCode": "legend"
+        "focus .categoryCode": "legend",
+        "click .myDropText":"seleRule",
+        "click .myItem":"myItem"
     },
 
     render:function() {
@@ -35,7 +37,7 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
         return this;
     },
     initialize:function(){
-        this.listenTo(this.model,"change",this.render);
+        //this.listenTo(this.model,"change",this.render);
     },
     getDetail:function(){
         if(this.$(".ruleDetail:visible").length){    //显示
@@ -78,12 +80,10 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
             alert("规则编码不能为空!");
             return
         }
-
         if(!categoryName){
             alert("规则名称不能为空!");
             return
         }
-
         if(!this.$(".conR dd").length){
             alert("至少添加一项规则!");
             return
@@ -150,6 +150,7 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
         model.mappingCategory.categoryName = categoryName;
         model.mappingCategory.mappingPropertyList = Rulist;
 
+
         this.model.set({"targetCode":App.ResourceArtifacts.Status.rule.targetCode},{silent:true});
         this.model.set({"targetName":App.ResourceArtifacts.Status.rule.targetName},{silent:true});
         this.model.set({"biz":App.ResourceArtifacts.Status.rule.biz},{silent:true});
@@ -158,50 +159,64 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
 
         var baseData = this.model.toJSON();
 
+        console.log(JSON.stringify(baseData));
 
         var cdata = {
-            URLtype : '',
             type:"POST",
             data : JSON.stringify(baseData),
             contentType: "application/json",
             projectId : App.ResourceArtifacts.Status.projectId
         };
 
-        if(id){
-            cdata.URLtype = "modifyArtifactsPlanRule";
-            cdata.type ="PUT";
-            //更新
-        }else{
-            cdata.URLtype = "createArtifactsPlanNewRule";
-        }
 
         $(".artifactsContent .rules").addClass("services_loading");
-        App.Comm.ajax(cdata,function(response){
 
-            if(response.code == 0 && response.data){
-                _this.$(".ruleTitle").attr("data-id",response.data.id);
-                _this.model.set({id:response.data.id},{silent:true});
-                _this.$(".ruleTitle .desc").text("[" + categoryCode + "] " + categoryName);
-                _this.$(".ruleDetail").hide();
+        if(id){
+            //更新
+            cdata.URLtype = "modifyArtifactsPlanRule";
+            cdata.type ="PUT";
 
+            App.Comm.ajax(cdata,function(response){
+                if(response.code == 0 && response.data){
+                    _this.$(".ruleTitle").attr("data-id",response.data.id);
+                    _this.model.set({id:response.data.id},{silent:true});
+                    _this.$(".ruleTitle .desc").text("[" + categoryCode + "] " + categoryName);
+                    _this.$(".ruleDetail").hide();
 
-                App.ResourceArtifacts.Status.rule.count +=  1;
-                if(cdata.URLtype = "modifyArtifactsPlanRule"){
-                    Backbone.trigger("resetTitle");
-                    Backbone.trigger("countChange");
+                    App.ResourceArtifacts.PlanRules.push(_this.model);
+
+                    if(cdata.URLtype == "modifyArtifactsPlanRule"){
+                        Backbone.trigger("resetTitle");
+                    }
                 }
+            });
 
-                App.ResourceArtifacts.Status.saved = true;
+        }else{
+            //创建
+            cdata.URLtype = "createArtifactsPlanNewRule";
+            $.ajax({
+                url: "http://bim.wanda-dev.cn/platform/mapping/rule/create?projectId=" + App.ResourceArtifacts.Status.projectId,
+                data:JSON.stringify(baseData),
+                type:"POST",
+                contentType: "application/json",
+                success:function(response){
+                    if(response.code == 0 && response.data){
+                        _this.model.set({id:response.data.id},{silent:true});
+                        _this.$el.remove();
 
-                _this.$el.closest(".ruleDetail").hide();
-                $(".artifactsContent .rules").removeClass("services_loading");
-            }
-        });
-    },
+                        App.ResourceArtifacts.PlanRules.push(_this.model);
 
-    //重置保存状态
-    reset:function(){
-        App.ResourceArtifacts.Status.saved = true ;
+                        App.ResourceArtifacts.Status.rule.count = App.ResourceArtifacts.PlanRules.length;
+
+                        Backbone.trigger("resetTitle");
+
+                    }
+                }
+            });
+        }
+        App.ResourceArtifacts.Status.saved = true;
+        $(".artifactsContent .rules").removeClass("services_loading");
+
     },
 
     //删除计划中的整条规则
@@ -317,6 +332,43 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
     //红色提示输入
     redAlert:function(ele){
         ele.addClass("alert");
+    },
+
+    //切换规则
+    seleRule:function(e) {
+        $(".myDropList").hide();
+        var _this = $(e.target);
+        _this.siblings(".myDropList").show();
+    },
+
+    //选择规则，切换输入方式
+    myItem:function(e){
+        var _this = $(e.target);
+        var operator = _this.data("operator");
+        var text = _this.text();
+        var parent =  _this.parent(".myDropList");
+        var eIn = _this.closest(".leftten").siblings(".eIn");
+        var ioside  = _this.closest(".leftten").siblings(".ioside");
+        //数据写入模型
+        parent.hide().siblings(".myDropText").find(".text").text(text);
+        _this.closest(".myDropDown").attr("data-operator",operator);
+        if(operator == "==" || operator == "!="){
+            ioside.removeClass("active");
+
+            if(eIn.hasClass("active")){return}
+            eIn.addClass("active");
+        }else if(operator == "<>" || operator == "><"){
+            eIn.removeClass("active");
+            if(ioside.hasClass("active")){return}
+            ioside.addClass("active");
+        }
+    },
+
+    //删除
+    delRule:function(e){
+        var _this = $(e.target);
+        _this.closest("dd").remove();//删除元素
+        //还用管未更新的model么？
     }
 
 });
