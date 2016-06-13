@@ -159,8 +159,6 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
 
         var baseData = this.model.toJSON();
 
-        console.log(JSON.stringify(baseData));
-
         var cdata = {
             type:"POST",
             data : JSON.stringify(baseData),
