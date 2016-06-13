@@ -48,10 +48,11 @@
     &:before{position:relative;z-index:2;color:#ccc;margin:0 -6px;}
     &:after{width:17px;height:17px;background:#666;content:'';display:block;position:absolute;left:1px;top:7px;border-radius:1000px;}
   }
-  .modelSidebar{position:absolute;left:0;bottom:0;width:328px;
+  .modelSidebar{position:absolute;left:0;bottom:0;width:328px;transition:all .5s;transform:translate(-100%,0);
     &.open{top:0;
       .modelFilter{display:block;}
     }
+    &.show{transform:translate(0,0);}
     &.hideMap{
       .modelMap{bottom:-220px;}
       .modelFilter{bottom:40px;}
