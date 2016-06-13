@@ -358,93 +358,10 @@
 
 				//显示批注
 				showComment(event) {
-					var $item = $(event.target).closest(".item"),
-						viewPint = $item.find(".thumbnailImg").data("viewpoint");
 
-					viewPointId = this.$(".remarkCount").data("id");
-
-					$item.addClass("selected").siblings().removeClass("selected");
-
-					App.Project.Settings.Viewer.setCamera(viewPint);
-
-					$.when(this.getFilter(), this.getAnnotation()).done((filterData, annotationData) => {
-
-						filterData = filterData[0];
-						annotationData = annotationData[0];
-
-						if (filterData.code == 0 && annotationData.code == 0) {
-
-							var filterObj = {
-
-								},
-								item;
-							$.each(filterData.data.filters, function(i, item) {
-								item = JSON.parse(item);
-								filterObj[item.cateType] = item;
-								delete item.cateType;
-							});
-							App.Project.Settings.Viewer.loadComment({
-								list: annotationData.data.annotations,
-								filter: filterObj
-							});
-							//隐藏加载
-							$("#pageLoading").hide();
-
-						} else {
-							alert('数据获取失败');
-						}
-
-					});
+					CommentApi.showComment($(event.target).closest(".item"));
 
 				},
-
-				//获取 过滤器
-				getFilter() {
-
-					var data = {
-						URLtype: "getFilter",
-						data: {
-							projectId: App.Project.Settings.projectId,
-							viewPointId: viewPointId
-						}
-					}
-
-					if (App.Project.Settings.isShare) {
-
-						data = {
-							URLtype: "getFilterByToken",
-							data: {
-								token: App.Project.Settings.token
-							}
-						}
-					}
-
-					return App.Comm.ajax(data);
-				},
-
-				//获取批注
-				getAnnotation() {
-					var data = {
-						URLtype: "getAnnotation",
-						data: {
-							projectId: App.Project.Settings.projectId,
-							viewPointId: viewPointId
-						}
-					}
-
-					if (App.Project.Settings.isShare) {
-
-						data = {
-							URLtype: "getAnnotationByToken",
-							data: {
-								token: App.Project.Settings.token
-							}
-						}
-					}
-
-					return App.Comm.ajax(data);
-				},
-
 
 				//更新后操作
 				afterUpdate() {
@@ -625,6 +542,7 @@
 					"click .iconEdit": "reNameViewPoint", //编辑视点
 					"click .btnAdress": "address", //地址
 					"click .btnCommViewPoint": "commentViewPoint",
+					"click .viewPointInfo .info": "viewPointShow",
 					"click .btnLogin": "login" //登陆
 				},
 
@@ -641,16 +559,16 @@
 				render() {
 					//模板
 					this.$el.html(this.template);
+
 					this.$(".txtReMark").at({
 
-						getData:function(name){
-							console.log(name);
+						getData: function(name) {
 
-							var data={
-								URLtype:"autoComplateUser",
-								data:{
-									projectId:App.Project.Settings.projectId,
-									name:name
+							var data = {
+								URLtype: "autoComplateUser",
+								data: {
+									projectId: App.Project.Settings.projectId,
+									name: name
 								}
 							}
 
@@ -661,22 +579,31 @@
 					return this;
 				},
 
+				//显示视点
+				viewPointShow(event) {
+					//移除选中
+					$comment.find(".reMarkBox .selected").removeClass("selected");
+					//显示批注
+					CommentApi.showComment($(event.target).closest(".viewPointInfo"));
+				},
+
 				//评论视点
-				commentViewPoint() { 
+				commentViewPoint() {
 
 					CommentApi.saveCommentStart(null, "commentViewPoint", (data) => {
+
 						//上传地址或者评论视点后
-						CommentApi.afterUploadAddressViewPoint.call(this,data);
+						CommentApi.afterUploadAddressViewPoint.call(this, {pictureUrl:data.pic,description:data.name,id:data.id});
 					});
 				},
 
 				//保存位置
-				address() { 
-					
+				address() {
+
 					//直接保存
 					CommentApi.saveCommentStart(null, "address", (data) => {
 						//上传地址或者评论视点后
-						CommentApi.afterUploadAddressViewPoint.call(this,data);
+						CommentApi.afterUploadAddressViewPoint.call(this, data);
 					});
 					$("#topSaveTip .btnSave").click();
 				},
@@ -748,8 +675,8 @@
 
 							data = data.data;
 
-							that.$(".uploading:first").find(".talkImg").prop("src", "/" + data.url).show().end().
-							find(".imgName").text(data.name).addClass("upload").end().
+							that.$(".uploading:first").find(".talkImg").prop("src", "/" + data.pictureUrl).show().end().
+							find(".imgName").text(data.description).addClass("upload").end().
 							find(".delUploadImg").show().end().
 							data("id", data.id).removeClass("uploading");
 						}
@@ -811,9 +738,17 @@
 
 				//失去焦点
 				outReMark(event) {
-					$(event.target).removeClass("input");
-					//列表高度
-					this.listHeight();
+
+					var timer = setTimeout(() => {
+						if (!$(event.target).is(":focus")) {
+							$(event.target).removeClass("input");
+							//列表高度
+							this.listHeight();
+						}
+
+					}, 500);
+
+
 				},
 
 				//计算列表高度
@@ -845,7 +780,7 @@
 							projectId: App.Project.Settings.projectId,
 							viewPointId: viewPointId,
 							text: this.$(".txtReMark").val().trim(),
-							pictures: pictures,
+							attachments: pictures,
 							token: App.Project.Settings.token
 						},
 						data = {
@@ -895,7 +830,9 @@
 				className: "item",
 
 				events: {
-					"click .delTalk": "delTalk"
+					"click .delTalk": "delTalk",
+					"click .showPosition": "showPosition",
+					"click .showCommentPoint": "showCommentPoint"
 				},
 
 				initialize() {
@@ -912,6 +849,35 @@
 
 					return this;
 
+				},
+
+				//显示位置
+				showPosition(event) {
+
+					//退出批注
+					App.Project.Settings.Viewer.commentEnd();
+					$comment.find(".reMarkBox .selected").removeClass("selected");
+					//显示相机
+					var camera = $(event.target).closest(".showPosition").addClass("selected").data("camera");
+					App.Project.Settings.Viewer.setCamera(camera);
+
+				},
+
+				//评论批注显示
+				showCommentPoint() {
+
+					//移除所有选中
+					$comment.find(".reMarkBox .selected").removeClass("selected");
+
+					var $showCommentPoint = $(event.target).closest(".showCommentPoint"),
+						camera = $showCommentPoint.addClass("selected").data("camera");
+
+					viewPointId = $showCommentPoint.data("viewpointid");
+
+					//显示相机
+					App.Project.Settings.Viewer.setCamera(camera);
+					//获取显示视点的数据
+					CommentApi.getShowCommentData();
 				},
 
 				//删除评论
@@ -1030,12 +996,22 @@
 									App.Project.Settings.Viewer.commentEnd();
 								}
 							},
+
 							cancelText: "保存并分享",
+
 							message: dialogHtml,
+
 							okCallback: () => {
 								//保存批注
 								if (!viewPointId) {
-									that.saveComment("save", dialog, data, callback, cate);
+
+									if (cate == "address") {
+										//保存位置
+										that.savePosition(dialog, data, callback);
+									} else {
+										that.saveComment("save", dialog, data, callback, cate);
+									}
+
 								} else {
 									data.id = viewPointId;
 									that.editComment("save", dialog, data, viewPointId, callback, cate);
@@ -1100,6 +1076,7 @@
 						projectId: App.Project.Settings.projectId,
 						name: dialog.element.find(".name").val().trim(),
 						type: dialog.type,
+						viewPointId: $comment.find('.remarkCount.current').data("id"),
 						viewPoint: commentData.camera
 					};
 
@@ -1107,8 +1084,10 @@
 					alert("请输入批注名称");
 					return false;
 				}
+
+
 				var data = {
-					URLtype: "createViewPoint",
+					URLtype: cate != "viewPoint" ? "viewPointCommentViewpoint" : "createViewPoint",
 					data: JSON.stringify(pars),
 					type: "POST",
 					contentType: "application/json"
@@ -1257,6 +1236,57 @@
 					createTime: $li.find(".date").text().trim()
 				};
 				this.shareViewPoint(data);
+			},
+
+			//保存位置
+			savePosition(dialog, data, callback) {
+
+				if (dialog.isSubmit) {
+					return;
+				}
+
+				var description = dialog.element.find(".name").val().trim();
+
+				if (!description) {
+					alert("请输入位置信息");
+					return;
+				}
+
+				var viewPintId = $comment.find('.remarkCount.current').data("id"),
+					//数据
+					formdata = new FormData();
+
+				formdata.append("fileName", (+(new Date())) + ".png");
+				formdata.append("size", data.image.length);
+				formdata.append("file", data.image);
+
+				var pars = {
+						URLtype: 'viewPointPosition',
+						data: {
+							projectId: App.Project.Settings.projectId,
+							viewPointId: viewPintId,
+							description: description,
+							position: data.camera
+						}
+					},
+					url = App.Comm.getUrlByType(pars).url;
+
+				$.ajax({
+					url: url,
+					type: "post",
+					data: formdata,
+					processData: false,
+					contentType: false
+				}).done(function(data) {
+					if (data.code == 0) {
+						if ($.isFunction(callback)) {
+							callback(data.data);
+						}
+						dialog.close();
+						App.Project.Settings.Viewer.commentEnd();
+					}
+				});
+
 			},
 
 			//分享视点
@@ -1466,7 +1496,7 @@
 			reName($li) {
 
 				var data = {
-						cate:"viewPoint",
+						cate: "viewPoint",
 						id: $li.find(".remarkCount").data("id"),
 						type: $li.find(".thumbnailImg").data("type"),
 						img: $li.find(".thumbnailImg").prop('src'),
@@ -1514,6 +1544,7 @@
 					}
 				});
 			},
+
 			//更新视点
 			updateComment(dialog) {
 
@@ -1544,6 +1575,8 @@
 				dialog.element.find(".ok").text("保存中");
 				dialog.isSubmit = true;
 
+				dialog.element.find(".ok").text("保存中");
+
 				//创建
 				App.Comm.ajax(data, (data) => {
 
@@ -1572,6 +1605,11 @@
 
 
 						dialog.close();
+					} else {
+
+						alert(data.message);
+						dialog.isSubmit = false;
+						dialog.element.find(".ok").text("保存");
 					}
 
 				});
@@ -1601,11 +1639,108 @@
 				var imgLoadHTML = _.templateUrl('/libsH5/tpls/comment/upload.img.html', true);
 				this.$(".uploadImgs").append(imgLoadHTML);
 
-				this.$(".uploading:first").find(".talkImg").prop("src", "/" + data.pic).show().end().
-				find(".imgName").text(data.name).addClass("upload").end().
+				this.$(".uploading:first").find(".talkImg").prop("src", "/" + data.pictureUrl).show().end().
+				find(".imgName").text(data.description).addClass("upload").end().
 				find(".delUploadImg").show().end().
 				data("id", data.id).removeClass("uploading").data("data", data);
 
+			},
+
+			//显示批注
+			showComment($item) {
+
+				var viewPint = $item.find(".thumbnailImg").data("viewpoint");
+
+				viewPointId = $item.find(".remarkCount").data("id");
+
+				$item.addClass("selected").siblings().removeClass("selected");
+
+				App.Project.Settings.Viewer.setCamera(viewPint);
+
+				//获取显示视点的数据
+				this.getShowCommentData();
+
+			},
+
+			//获取显示视点的数据
+			getShowCommentData() {
+
+				$.when(this.getFilter(), this.getAnnotation()).done((filterData, annotationData) => {
+
+					filterData = filterData[0];
+					annotationData = annotationData[0];
+
+					if (filterData.code == 0 && annotationData.code == 0) {
+
+						var filterObj = {
+
+							},
+							item;
+						$.each(filterData.data.filters, function(i, item) {
+							item = JSON.parse(item);
+							filterObj[item.cateType] = item;
+							delete item.cateType;
+						});
+						App.Project.Settings.Viewer.loadComment({
+							list: annotationData.data.annotations,
+							filter: filterObj
+						});
+						//隐藏加载
+						$("#pageLoading").hide();
+
+					} else {
+						alert('数据获取失败');
+					}
+
+				});
+			},
+
+			//获取 过滤器
+			getFilter() {
+
+				var data = {
+					URLtype: "getFilter",
+					data: {
+						projectId: App.Project.Settings.projectId,
+						viewPointId: viewPointId
+					}
+				}
+
+				if (App.Project.Settings.isShare) {
+
+					data = {
+						URLtype: "getFilterByToken",
+						data: {
+							token: App.Project.Settings.token
+						}
+					}
+				}
+
+				return App.Comm.ajax(data);
+			},
+
+			//获取批注
+			getAnnotation() {
+
+				var data = {
+					URLtype: "getAnnotation",
+					data: {
+						projectId: App.Project.Settings.projectId,
+						viewPointId: viewPointId
+					}
+				}
+
+				if (App.Project.Settings.isShare) {
+
+					data = {
+						URLtype: "getAnnotationByToken",
+						data: {
+							token: App.Project.Settings.token
+						}
+					}
+				}
+
+				return App.Comm.ajax(data);
 			}
 
 

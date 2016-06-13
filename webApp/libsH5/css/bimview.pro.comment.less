@@ -75,8 +75,13 @@
 				.userName { margin-left: 5px; vertical-align: 3px; }
 				.date { float: right; color: #999; }
 				.content { margin: 5px 0px 0px 25px; }
-				.imgs { margin: 8px 0px 0px 25px;
-					.img { margin: 2px; width: 42px; height: 32px; display: inline-block; }
+				.singleAttachment{ margin: 8px 0px 8px 8px;
+					.linkImg:hover{color:#fff;text-decoration: none;}
+					.img {width: 42px; height: 32px;margin-right: 5px;}
+
+					.text{vertical-align: top;line-height: 32px;color:#fff;padding: 2px 5px;
+						&.selected{background-color: rgba(0, 110, 207, .8);}
+					}
 				}
 				.delTalkBox { height: 20px; text-align: right;
 					.delTalk { display: none; cursor: pointer;

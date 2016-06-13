@@ -10,6 +10,8 @@
       var viewer = new self.BIM(_opt);
       new bimView.sidebar.init(_opt,obj);
       obj.on('loaded',function(){
+        $('.modelSidebar').addClass('show');
+        viewer.zoomToBuilding();
       });
       return viewer;
     },

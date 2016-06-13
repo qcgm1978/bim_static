@@ -50,8 +50,9 @@
         $.each(list,function(i,item){
           var $item = $(item),
               isChecked = $item.find('input').prop('checked'),
-              userData = $item.data('userData')?$item.data('userData').toString():'';
-          if(select == 'uncheck' && !isChecked || select == 'checked' && isChecked || select == 'all'){
+              userData = $item.data('userData')?$item.data('userData').toString():'',
+              hasChild = $item.find('.tree').length;
+          if((!hasChild && select == 'uncheck' && !isChecked) || (!hasChild && select == 'checked' && isChecked) || select == 'all'){
             regData.push(userData);
           }
         });
@@ -251,8 +252,8 @@
         return ul.append(li);
       }
       function createli(name,hasChild){
-        var icon = hasChild ? 'm-closeTree' : 'noneSwitch'
-        var dom = '<li class="itemNode open" data-type="'+name+'">\
+        var icon = hasChild ? 'm-openTree' : 'noneSwitch'
+        var dom = '<li class="itemNode" data-type="'+name+'">\
               <div class="itemContent">\
                 <i class="'+ icon +'"></i>\
                 <span class="treeText">'+name+'</span>\
