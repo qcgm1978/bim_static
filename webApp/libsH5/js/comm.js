@@ -50,8 +50,9 @@
         $.each(list,function(i,item){
           var $item = $(item),
               isChecked = $item.find('input').prop('checked'),
-              userData = $item.data('userData')?$item.data('userData').toString():'';
-          if(select == 'uncheck' && !isChecked || select == 'checked' && isChecked || select == 'all'){
+              userData = $item.data('userData')?$item.data('userData').toString():'',
+              hasChild = $item.find('.tree').length;
+          if((!hasChild && select == 'uncheck' && !isChecked) || (!hasChild && select == 'checked' && isChecked) || select == 'all'){
             regData.push(userData);
           }
         });
