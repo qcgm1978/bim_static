@@ -22,8 +22,26 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
     initialize:function(){
         Backbone.on("resetTitle",this.changeCount,this);
         Backbone.on("checkedChange",this.checkList,this);
+        Backbone.on("modelRuleEmpty",this.modelRuleEmpty,this);
+        Backbone.on("modelRuleFull",this.modelRuleFull,this);
+        Backbone.on("modelRuleHalf",this.modelRuleHalf,this);
     },
 
+    modelRuleEmpty:function(){
+        if(this.model.get("leaf")&&App.ResourceArtifacts.Status.rule.targetCode == this.model.get("code")){
+            this.$(".ruleCheck").removeClass("all").removeClass("half");
+        }
+    },
+    modelRuleFull:function(){
+        if(this.model.get("leaf")&&App.ResourceArtifacts.Status.rule.targetCode == this.model.get("code")) {
+            this.$(".ruleCheck").addClass("all").removeClass("half");
+        }
+    },
+    modelRuleHalf:function(){
+        if(this.model.get("leaf")&&App.ResourceArtifacts.Status.rule.targetCode == this.model.get("code")){
+        this.$(".ruleCheck").addClass("half").removeClass("all");
+        }
+    },
 
     checked:function(e){
         var ele = $(e.target);
@@ -86,6 +104,7 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
                 }
             }
             if(leaf){
+                //操作右侧全不选
                 return
             }
             //取消所有下级菜单
@@ -121,6 +140,7 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
             }
 
             if(leaf){
+                //操作右侧全选
                 return
             }
             //添加所有下级菜单

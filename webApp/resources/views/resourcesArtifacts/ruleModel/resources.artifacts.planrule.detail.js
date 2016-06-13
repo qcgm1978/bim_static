@@ -37,7 +37,17 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
         this.$el.html(this.template()(this.model.toJSON()));
 
         //写入是否选中
+        var modelRule = this.getModelRule();
+        var check = _.find(modelRule,function(item){
+            return item == _this.model.get("id");
+        });
 
+        if(check){
+            this.$(".ruleCheck").addClass("all");
+            this.$el.attr("data-check","1");
+        }else{
+            this.$el.attr("data-check","0");
+        }
 
         return this;
     },
@@ -45,19 +55,38 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
         //this.listenTo(this.model,"change",this.render);
     },
 
+    //查找 项目规则collection，返回规则id数组
+    getModelRule:function(){
+        return App.ResourceArtifacts.TplCollectionRule.map(function(item){
+            return item.get("ruleId");
+        })
+    },
 
     ruleCheck:function(e){
         App.Resources.cancelBubble(e);
         var ele = $(e.target);
+        var allSele = ele.closest("ul").find("li");
+        Backbone.trigger("modelRuleHalf");
         if(ele.hasClass("all")){
             ele.removeClass("all");
             ele.closest("li").attr("data-check","0");
+            var checked1 = _.filter(allSele,function(item){
+                return $(item).attr("data-check") == "1"
+            });
+            console.log(checked1.length);
+            if(!checked1.length){
+                Backbone.trigger("modelRuleEmpty");
+            }
         }else{
-            ele.addClass("all");
             ele.closest("li").attr("data-check","1");
+            var checked2 = _.filter(allSele,function(item){
+                return $(item).attr("data-check") == "0"
+            });
+            ele.addClass("all");
+            if(!checked2.length){
+                Backbone.trigger("modelRuleFull");
+            }
         }
-        ele.removeClass("half");
-        //不设置模型类型
     },
 
 
