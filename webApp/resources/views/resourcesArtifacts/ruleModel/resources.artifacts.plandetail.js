@@ -8,21 +8,60 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
     template: _.templateUrl("/resources/tpls/resourcesArtifacts/ruleModel/resources.artifacts.plandetail.html"),
 
     events:{
-        "click .item":"getPlanId"
+        "click .item":"getPlanId",
+        "click .ruleCheck":"checked"
     },
 
     render:function() {
         this.$el.html(this.template(this.model.toJSON()));
+        var ruleContain = this.model.get("ruleContain");
+        var a  = ruleContain == 1 ?  1 : 0;
+        this.$el.attr("data-check", a);
+        this.$el.attr("data-code", this.model.get("code"));
         return this;
     },
 
     initialize:function(){
+        //this.listenTo(this.model,"change:checked",this.check);
         Backbone.on("resetTitle",this.changeCount,this);
+        Backbone.on("modelRuleEmpty",this.modelRuleEmpty,this);
+        Backbone.on("modelRuleFull",this.modelRuleFull,this);
+        Backbone.on("modelRuleHalf",this.modelRuleHalf,this);
+    },
+
+    modelRuleEmpty:function(){
+        if(App.ResourceArtifacts.Status.rule.targetCode == this.model.get("code")){
+            this.$(".ruleCheck").removeClass("all").removeClass("half");
+        }
+    },
+    modelRuleFull:function(){
+        if(App.ResourceArtifacts.Status.rule.targetCode == this.model.get("code")) {
+            this.$(".ruleCheck").addClass("all").removeClass("half");
+        }
+    },
+    modelRuleHalf:function(){
+        if(App.ResourceArtifacts.Status.rule.targetCode == this.model.get("code")){
+            this.$(".ruleCheck").addClass("half").removeClass("all");
+        }
+    },
+
+    checked:function(e){
+        App.Resources.cancelBubble(e);
+        var ele = $(e.target);
+        if(ele.hasClass("all")){
+            ele.removeClass("all");
+            ele.closest("li").attr("data-check","0");
+        }else{
+            ele.addClass("all");
+            ele.closest("li").attr("data-check","1");
+        }
+        ele.removeClass("half");
+        //不设置模型类型
     },
 
     changeCount:function(){
         var count = App.ResourceArtifacts.Status.rule.count;
-        if(this.model.get("code") ==App.ResourceArtifacts.Status.rule.targetCode ){
+        if(this.model.get("code") ==App.ResourceArtifacts.Status.rule.targetCode){
             this.model.set({count:count},{silent:true});
             this.$(".count").text("("+ count + ")");
         }

@@ -43,26 +43,7 @@ App.Resources.ArtifactsTplDetail = Backbone.View.extend({
     edit:function() {
         this.$(".tplDetailInfo").hide();
         this.$(".tplDetailEdit").show();
-
-        //查找collection
-        var checkCollection  = App.ResourceArtifacts.TplCollectionRule ; //已有  ruleId
-        var allCollection  = App.ResourceArtifacts.ArtifactsRule ;//所有
-        var arr = [];
-
-        _.each(checkCollection,function(item){
-            arr.push(item.get("id"))
-        });
-
-        _.each(allCollection,function(item){
-            for(var i = 0 ;i < arr.length ; i++){
-                if(item.get("id") == arr[i]){
-                    item.set("checked", true);
-                }
-            }
-        });
-
-
-
+        Backbone.trigger("checkedChange");
     },
 
     //保存
@@ -99,5 +80,6 @@ App.Resources.ArtifactsTplDetail = Backbone.View.extend({
     resourcesCancel:function(){
         this.$(".tplDetailInfo").show();
         this.$(".tplDetailEdit").hide();
+        Backbone.trigger("projectMappingRuleCheckedClose");
     }
 });

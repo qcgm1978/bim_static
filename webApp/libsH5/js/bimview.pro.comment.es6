@@ -221,6 +221,10 @@
 						App.Comm.initScroll(this.$(".userListScroll"), "y");
 
 					} else if (type == "save") {
+						//禁止 二次 点击
+						if ($("#topSaveTip").length>0) {
+							return;
+						}
 						//保存
 						CommentApi.saveCommentStart(null, 'viewPoint', null);
 					}
