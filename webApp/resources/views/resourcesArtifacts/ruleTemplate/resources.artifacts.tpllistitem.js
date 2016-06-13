@@ -84,10 +84,11 @@ App.Resources.ArtifactsTplListItem = Backbone.View.extend({
                 if(response.data.length){
                     _this.menu.$(".plans").html(_this.plans.render().el);
                     _this.menu.$(".rules .ruleContent").html(_this.planRule.render().el);
-
-                    App.ResourceArtifacts.getPlan();//获取计划节点
                     App.ResourceArtifacts.TplCollectionRule.add(response.data);
                     $(".tplContent").removeClass("services_loading");
+                    _this.menu.$(".artifactsContent .default").hide();
+                    _this.menu.$(".artifactsContent .plans").show();
+                    _this.menu.$(".artifactsContent .rules").show();
                 }else{
                     //没有任何规则时候，创建规则按钮
                     _this.menu.$(".artifactsContent .default").siblings().hide();

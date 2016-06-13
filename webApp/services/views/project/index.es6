@@ -40,8 +40,7 @@
 		//映射规则
 		if (Auth.mappingRule) {
 			$container.append(tabs.mappingRule.tab);
-			this.viewMappingRule = new App.Services.viewMappingRule();
-			this.$(".projectContainer .projectMappingRule").html(this.viewMappingRule.render().el);
+
 		}
 
 
@@ -136,7 +135,8 @@
 		collectionMapRule.fetch({
 			data: {projectId: _projectId},
 			success(child, data) {
-				console.log(data);
+				this.viewMappingRule = new App.Services.viewMappingRule(collectionMapRule.models[0]);
+				this.$(".projectContainer .projectMappingRule").html(this.viewMappingRule.render().el);
 			}
 		});
 

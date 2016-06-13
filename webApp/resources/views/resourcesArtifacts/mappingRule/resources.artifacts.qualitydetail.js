@@ -16,6 +16,7 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
 
     render:function() {
         this.$el.html(this.template(this.model.toJSON()));
+        var ruleContain = this.model.get("ruleContain");
         return this;
     },
 
