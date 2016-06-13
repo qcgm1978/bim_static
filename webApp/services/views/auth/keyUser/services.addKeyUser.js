@@ -15,6 +15,8 @@ App.Services.addKeyUser = Backbone.View.extend({
     "click .rightWindow .delete"     : 'remove',
     "click .rightWindow .proj-remove": 'remove2',
     "click .search span"             : 'search',
+    "keypress .search input"             : 'keyup',
+    "click .search .closeicon"       : 'clear',
     "click .partition a"             : 'partition'
 
   },
@@ -756,6 +758,20 @@ App.Services.addKeyUser = Backbone.View.extend({
         this.$el.find('.leftWindow').html(new App.Services.step1().render(value).el);
 
       }
+    }
+  },
+  clear:function(){
+    $('.search input').val('');
+    if($('.maintitle').text()=="项目权限"){
+      this.$el.find('.leftWindow').html(new App.Services.step2().render().el);
+    }else{
+      this.$el.find('.leftWindow').html(new App.Services.step1().render().el);
+
+    }
+  },
+  keyup:function(e){
+    if(e.keyCode==13){
+      this.search();
     }
   },
   initialize: function(){

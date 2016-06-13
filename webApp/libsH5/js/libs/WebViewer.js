@@ -11973,6 +11973,14 @@ CLOUD.Filter = function () {
     overridedMaterials.lightBlue = CLOUD.MaterialUtil.createPhongMaterial({ color: 0x1377C0, opacity: 1, transparent: false, side: THREE.DoubleSide });
     overridedMaterials.black = CLOUD.MaterialUtil.createPhongMaterial({ color: 0x0, opacity: 0.3, transparent: true, side: THREE.DoubleSide });
 
+    // Green
+    overridedMaterials.add = CLOUD.MaterialUtil.createPhongMaterial({ color: 0x00FF00, opacity: 1, transparent: true, side: THREE.DoubleSide });
+    // Red
+    overridedMaterials.delete = CLOUD.MaterialUtil.createPhongMaterial({ color: 0xFF0000, opacity: 0.5, transparent: true, side: THREE.DoubleSide });
+    // Yellow
+    overridedMaterials.beforeEdit = CLOUD.MaterialUtil.createPhongMaterial({ color: 0xFABD05, opacity: 0.5, transparent: true, side: THREE.DoubleSide });
+    overridedMaterials.afterEdit = CLOUD.MaterialUtil.createPhongMaterial({ color: 0xFABD05, opacity: 1, transparent: true, side: THREE.DoubleSide });
+
     var materialOverriderByUserId = {};
 
     var materialOverriderByUserData = {};

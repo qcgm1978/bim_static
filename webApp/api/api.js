@@ -124,7 +124,7 @@ App.API = {
 		uploadFile: "doc/{projectId}/{projectVersionId}/file/data", //上传文件  ?parentId={parentId}&fileName={fileName}&size={size}&digest={digest}&position={position}
 		"checkDownLoad": "doc/{projectId}/{versionId}/file/size", // 下载确认 是否可以下载  ?fileVersionId={fileVersionId}
 		downLoad: "doc/{projectId}/{projectVersionId}/file/data", //文件下载  ?fileId={fileId}
-		fetchFileByModel:"doc/internal/{projectId}/{versionId}",
+		fetchFileByModel:"doc/{projectId}/{versionId}",
 
 		//快照
     fetchModelViewpoint: 'sixD/{projectId}/viewPoint', // 获取快照列表
@@ -218,7 +218,7 @@ App.API = {
 		modifyProjectMappingRule:"platform/rule/template/update/project/{projectId}/{templateId}",    //修改项目规则模板
 
 		//项目 变更 列表
-		fileList:"doc/internal/{projectId}/{versionId}/differ", //变更列表
+		fileList:"doc/{projectId}/{versionId}/differ", //变更列表
 		projectChangeList:"sixD/{projectId}/{projectVersionId}/cost/comparison",// ?fileVerionId={fileVerionId}&baseFileVerionId={baseFileVerionId}
 
 		projectDesinProperties:"sixD/{projectId}/{projectVersionId}/property/comparison",//?baseFileVerionId={baseFileVerionId}&fileVerionId={fileVerionId}&sceneId={sceneId}&elementId={elementId}
@@ -226,7 +226,7 @@ App.API = {
 		//TEST
 		projectChangeListTest:"/dataJson/project/projectChange/list.json",
 		projectDesinPropertiesTest:"/dataJson/project/projectChange/comparisonAttr.json",//sixD/{projectId}/{projectVersionId}/property/comparison //?baseProjectVerionId={baseProjectVerionId}&sceneId={sceneId}&elementId={elementId}
-		fileListTest:"/dataJson/project/projectChange/changeFile.json", //doc/internal/{projectId}/{versionId}/alteration
+		fileListTest:"/dataJson/project/projectChange/changeFile.json", //doc/{projectId}/{versionId}/alteration
 
 		//系统设置
 

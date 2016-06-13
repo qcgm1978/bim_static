@@ -2,15 +2,7 @@
 <h1 class="maintitle">新增关键用户</h1>
 <div class="winBody">
   <div class="windowSubmit confirm">确定</div>
-  <!--<div class="windowSubmit up">上一步</div>-->
-  <!--<div class="windowSubmit next">下一步</div>-->
-  <!--<div>-->
-    <!--<div class="steps">-->
-      <!--<div class="active"><span>1</span>选择成员</div>-->
-      <!--<div><span>2</span>项目授权</div>-->
-      <!--<div><span>3</span>组织授权</div>-->
-    <!--</div>-->
-  <!--</div>-->
+
   <div class="partition">
     <a data-index="1" class="<%= App.Services.KeyUser.mode==1?'active':'' %>"><span><i></i></span>选择指定项目</a>
     <a data-index="2" class="<%= App.Services.KeyUser.mode==2?'active':'' %>"><span><i></i></span>选择指定分区</a>
@@ -19,7 +11,7 @@
   <div class="keyU pdX20">
 
       <div>
-        <div class="search"><input type="text"placeholder="请输入要搜索的成员"><span><i></i></span></div>
+        <div class="search"><input type="text"placeholder="请输入要搜索的成员"><b class="closeicon"></b><span><i></i></span></div>
         <p class="title none">请选择成员</p>
         <ul class="leftWindow">
 

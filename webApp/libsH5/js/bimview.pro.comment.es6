@@ -221,6 +221,10 @@
 						App.Comm.initScroll(this.$(".userListScroll"), "y");
 
 					} else if (type == "save") {
+						//禁止 二次 点击
+						if ($("#topSaveTip").length>0) {
+							return;
+						}
 						//保存
 						CommentApi.saveCommentStart(null, 'viewPoint', null);
 					}
@@ -358,93 +362,10 @@
 
 				//显示批注
 				showComment(event) {
-					var $item = $(event.target).closest(".item"),
-						viewPint = $item.find(".thumbnailImg").data("viewpoint");
 
-					viewPointId = this.$(".remarkCount").data("id");
-
-					$item.addClass("selected").siblings().removeClass("selected");
-
-					App.Project.Settings.Viewer.setCamera(viewPint);
-
-					$.when(this.getFilter(), this.getAnnotation()).done((filterData, annotationData) => {
-
-						filterData = filterData[0];
-						annotationData = annotationData[0];
-
-						if (filterData.code == 0 && annotationData.code == 0) {
-
-							var filterObj = {
-
-								},
-								item;
-							$.each(filterData.data.filters, function(i, item) {
-								item = JSON.parse(item);
-								filterObj[item.cateType] = item;
-								delete item.cateType;
-							});
-							App.Project.Settings.Viewer.loadComment({
-								list: annotationData.data.annotations,
-								filter: filterObj
-							});
-							//隐藏加载
-							$("#pageLoading").hide();
-
-						} else {
-							alert('数据获取失败');
-						}
-
-					});
+					CommentApi.showComment($(event.target).closest(".item"));
 
 				},
-
-				//获取 过滤器
-				getFilter() {
-
-					var data = {
-						URLtype: "getFilter",
-						data: {
-							projectId: App.Project.Settings.projectId,
-							viewPointId: viewPointId
-						}
-					}
-
-					if (App.Project.Settings.isShare) {
-
-						data = {
-							URLtype: "getFilterByToken",
-							data: {
-								token: App.Project.Settings.token
-							}
-						}
-					}
-
-					return App.Comm.ajax(data);
-				},
-
-				//获取批注
-				getAnnotation() {
-					var data = {
-						URLtype: "getAnnotation",
-						data: {
-							projectId: App.Project.Settings.projectId,
-							viewPointId: viewPointId
-						}
-					}
-
-					if (App.Project.Settings.isShare) {
-
-						data = {
-							URLtype: "getAnnotationByToken",
-							data: {
-								token: App.Project.Settings.token
-							}
-						}
-					}
-
-					return App.Comm.ajax(data);
-				},
-
 
 				//更新后操作
 				afterUpdate() {
@@ -625,6 +546,7 @@
 					"click .iconEdit": "reNameViewPoint", //编辑视点
 					"click .btnAdress": "address", //地址
 					"click .btnCommViewPoint": "commentViewPoint",
+					"click .viewPointInfo .info": "viewPointShow",
 					"click .btnLogin": "login" //登陆
 				},
 
@@ -661,12 +583,21 @@
 					return this;
 				},
 
+				//显示视点
+				viewPointShow(event) {
+					//移除选中
+					$comment.find(".reMarkBox .selected").removeClass("selected");
+					//显示批注
+					CommentApi.showComment($(event.target).closest(".viewPointInfo"));
+				},
+
 				//评论视点
 				commentViewPoint() {
 
 					CommentApi.saveCommentStart(null, "commentViewPoint", (data) => {
+
 						//上传地址或者评论视点后
-						CommentApi.afterUploadAddressViewPoint.call(this, data);
+						CommentApi.afterUploadAddressViewPoint.call(this, {pictureUrl:data.pic,description:data.name,id:data.id});
 					});
 				},
 
@@ -853,7 +784,7 @@
 							projectId: App.Project.Settings.projectId,
 							viewPointId: viewPointId,
 							text: this.$(".txtReMark").val().trim(),
-							pictures: pictures,
+							attachments: pictures,
 							token: App.Project.Settings.token
 						},
 						data = {
@@ -903,7 +834,9 @@
 				className: "item",
 
 				events: {
-					"click .delTalk": "delTalk"
+					"click .delTalk": "delTalk",
+					"click .showPosition": "showPosition",
+					"click .showCommentPoint": "showCommentPoint"
 				},
 
 				initialize() {
@@ -920,6 +853,35 @@
 
 					return this;
 
+				},
+
+				//显示位置
+				showPosition(event) {
+
+					//退出批注
+					App.Project.Settings.Viewer.commentEnd();
+					$comment.find(".reMarkBox .selected").removeClass("selected");
+					//显示相机
+					var camera = $(event.target).closest(".showPosition").addClass("selected").data("camera");
+					App.Project.Settings.Viewer.setCamera(camera);
+
+				},
+
+				//评论批注显示
+				showCommentPoint() {
+
+					//移除所有选中
+					$comment.find(".reMarkBox .selected").removeClass("selected");
+
+					var $showCommentPoint = $(event.target).closest(".showCommentPoint"),
+						camera = $showCommentPoint.addClass("selected").data("camera");
+
+					viewPointId = $showCommentPoint.data("viewpointid");
+
+					//显示相机
+					App.Project.Settings.Viewer.setCamera(camera);
+					//获取显示视点的数据
+					CommentApi.getShowCommentData();
 				},
 
 				//删除评论
@@ -1118,7 +1080,7 @@
 						projectId: App.Project.Settings.projectId,
 						name: dialog.element.find(".name").val().trim(),
 						type: dialog.type,
-						viewPointId:$comment.find('.remarkCount.current').data("id"),
+						viewPointId: $comment.find('.remarkCount.current').data("id"),
 						viewPoint: commentData.camera
 					};
 
@@ -1127,13 +1089,13 @@
 					return false;
 				}
 
-				 
+
 				var data = {
 					URLtype: cate != "viewPoint" ? "viewPointCommentViewpoint" : "createViewPoint",
 					data: JSON.stringify(pars),
 					type: "POST",
 					contentType: "application/json"
-				} 
+				}
 
 				if (type == "save") {
 					dialog.element.find(".ok").text("保存中");
@@ -1586,6 +1548,7 @@
 					}
 				});
 			},
+
 			//更新视点
 			updateComment(dialog) {
 
@@ -1685,6 +1648,103 @@
 				find(".delUploadImg").show().end().
 				data("id", data.id).removeClass("uploading").data("data", data);
 
+			},
+
+			//显示批注
+			showComment($item) {
+
+				var viewPint = $item.find(".thumbnailImg").data("viewpoint");
+
+				viewPointId = $item.find(".remarkCount").data("id");
+
+				$item.addClass("selected").siblings().removeClass("selected");
+
+				App.Project.Settings.Viewer.setCamera(viewPint);
+
+				//获取显示视点的数据
+				this.getShowCommentData();
+
+			},
+
+			//获取显示视点的数据
+			getShowCommentData() {
+
+				$.when(this.getFilter(), this.getAnnotation()).done((filterData, annotationData) => {
+
+					filterData = filterData[0];
+					annotationData = annotationData[0];
+
+					if (filterData.code == 0 && annotationData.code == 0) {
+
+						var filterObj = {
+
+							},
+							item;
+						$.each(filterData.data.filters, function(i, item) {
+							item = JSON.parse(item);
+							filterObj[item.cateType] = item;
+							delete item.cateType;
+						});
+						App.Project.Settings.Viewer.loadComment({
+							list: annotationData.data.annotations,
+							filter: filterObj
+						});
+						//隐藏加载
+						$("#pageLoading").hide();
+
+					} else {
+						alert('数据获取失败');
+					}
+
+				});
+			},
+
+			//获取 过滤器
+			getFilter() {
+
+				var data = {
+					URLtype: "getFilter",
+					data: {
+						projectId: App.Project.Settings.projectId,
+						viewPointId: viewPointId
+					}
+				}
+
+				if (App.Project.Settings.isShare) {
+
+					data = {
+						URLtype: "getFilterByToken",
+						data: {
+							token: App.Project.Settings.token
+						}
+					}
+				}
+
+				return App.Comm.ajax(data);
+			},
+
+			//获取批注
+			getAnnotation() {
+
+				var data = {
+					URLtype: "getAnnotation",
+					data: {
+						projectId: App.Project.Settings.projectId,
+						viewPointId: viewPointId
+					}
+				}
+
+				if (App.Project.Settings.isShare) {
+
+					data = {
+						URLtype: "getAnnotationByToken",
+						data: {
+							token: App.Project.Settings.token
+						}
+					}
+				}
+
+				return App.Comm.ajax(data);
 			}
 
 

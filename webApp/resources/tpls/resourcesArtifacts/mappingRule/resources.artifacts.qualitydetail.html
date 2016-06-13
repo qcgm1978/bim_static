@@ -1,8 +1,6 @@
 <div class="item">
     <div class="left">
-        <%if (obj.checked ) {%>
-        <i class="RuleCheck"></i>
-        <%}%>
+        <i class="ruleCheck <%= obj.ruleContain == 1 ? 'all' : (obj.ruleContain == 3 ? 'half' :  '')%>"></i>
         <%= obj.code %></div>
     <% if (obj.leaf){%>
     <div class="right count">(<%= obj.count ?  obj.count  : "0" %>)</div>

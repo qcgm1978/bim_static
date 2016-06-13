@@ -8,13 +8,43 @@
 </div>
 
 <%if(attachments && attachments.length>0){%>
-<div class="imgs">
+
 	<% $.each(attachments,function(i,item){%>
-    <a class="example-image-link img" href="/<%=item.url%>" title="<%=item.name%>" data-lightbox="example-1">
-     <img class="example-image" src="/<%=item.url%>" alt="<%=item.name%>" /></a>
+
+		<%if(item.type==1){%>
+			<div class="singleAttachment"> 
+				  <a class="linkImg" href="/<%=item.pictureUrl%>"
+				     title="<%=item.description%>" data-lightbox="example-1">
+	     		<img class="img" src="/<%=item.pictureUrl%>" alt="<%=item.description%>" />
+	     		 <span class="text"><%= item.description%></span></a>
+			</div>
+		<%}else if(item.type==2){%>
+			<div class="singleAttachment">
+			  <a class="linkImg" href="/<%=item.pictureUrl%>"
+				     title="<%=item.description%>" data-lightbox="example-1">
+				<img class="img" src="/<%=item.pictureUrl%>" alt="<%=item.description%>" />
+				</a>
+				<span class="showPosition pointer text" data-camera="<%=item.data%>">位置：<%= item.description%></span>
+				
+			</div> 
+		<%}else if(item.type==3){%>
+			<div class="singleAttachment" >
+				<a class="linkImg" href="/<%=item.pictureUrl%>"
+				     title="<%=item.description%>" data-lightbox="example-1">
+				<img class="img" src="/<%=item.pictureUrl%>" alt="<%=item.description%>" />
+				</a>
+				<span class="showCommentPoint pointer text" data-camera="<%=item.data%>" 
+				 data-viewpointid="<%=item.id%>">批注：<%= item.description%></span>
+				 			 
+			</div>
+
+		<%}%>
+
+		
+	  
     <% }) %>
-      
-</div>
+
+
 <%}%>
 
 <% if(App.Global.User && creatorId==App.Global.User.userId){%>

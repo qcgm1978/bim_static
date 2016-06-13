@@ -75,8 +75,13 @@
 				.userName { margin-left: 5px; vertical-align: 3px; }
 				.date { float: right; color: #999; }
 				.content { margin: 5px 0px 0px 25px; }
-				.imgs { margin: 8px 0px 0px 25px;
-					.img { margin: 2px; width: 42px; height: 32px; display: inline-block; }
+				.singleAttachment{ margin: 8px 0px 8px 8px;
+					.linkImg:hover{color:#fff;text-decoration: none;}
+					.img {width: 42px; height: 32px;margin-right: 5px;}
+
+					.text{vertical-align: top;line-height: 32px;color:#fff;padding: 2px 5px;
+						&.selected{background-color: rgba(0, 110, 207, .8);}
+					}
 				}
 				.delTalkBox { height: 20px; text-align: right;
 					.delTalk { display: none; cursor: pointer;
@@ -105,7 +110,9 @@
 		.btnWhite { background-color: #333; border-color: #555; color: #EBEBEB; }
 		.img { width: 82px; height: 62px; background-color: #fff; float: left; }
 		.form { margin-left: 100px;
-			.name { width: 360px; height: 31px; padding-left: 7px; border: 0; outline: none; margin-bottom: 20px; }
+			.name { width: 360px; height: 31px; padding-left: 7px;padding-top: 7px; border: 0; outline: none; margin-bottom: 20px; 
+				&.mHeight{height: 62px;}
+			}
 			.desc { resize: none; height: 60px; width: 360px; padding: 5px; margin-bottom: 20px; }
 			.modelicon { color: #ccc; font-size: 18px; vertical-align: -2px; margin-right: 5px; }
 		}

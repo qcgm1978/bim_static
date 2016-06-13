@@ -5,8 +5,12 @@
 <%}%>
 
 <div class="form">
-    <input type="text" placeholder="请输入描述" value="<%=obj.name%>" class="name" />
+
+<textarea placeholder="请输入描述"  class="name <%=cate!='viewPoint'?'mHeight' : '' %>">
+<%=obj.name%></textarea> 
    
+
+
    <% if(cate=='viewPoint'){ %>
     <div class="myDropDown viewPointType">
         <span class="myDropText">
