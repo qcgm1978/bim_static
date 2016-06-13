@@ -70,9 +70,8 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
                 return
             }
 
-            this.$(".plans").html(App.ResourceArtifacts.plans.render().el);//计划节点
-            App.ResourceArtifacts.getPlan();
-
+            //this.$(".plans").html(App.ResourceArtifacts.plans.render().el);//计划节点
+            //App.ResourceArtifacts.getPlan();
             this.$(".qualifyC").hide();
             this.$(".plans").show();
             this.resetRule();
@@ -83,15 +82,15 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
                 return
             }
 
-            this.$(".qualifyC").html(App.ResourceArtifacts.quality.render().el);
-            var pdata = {
+           // this.$(".qualifyC").html(App.ResourceArtifacts.quality.render().el);
+          /*  var pdata = {
                 URLtype:'fetchArtifactsQuality',
                 data:{
                     type:App.ResourceArtifacts.Status.type,
                     standardType: "GC"
                 }
             };
-            App.ResourceArtifacts.getQuality(pdata,_this);
+            App.ResourceArtifacts.getQuality(pdata,_this);*/
             this.resetRule();
 
             this.$(".plans").hide();

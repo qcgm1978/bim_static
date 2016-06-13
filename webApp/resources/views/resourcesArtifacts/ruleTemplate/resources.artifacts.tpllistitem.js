@@ -62,6 +62,8 @@ App.Resources.ArtifactsTplListItem = Backbone.View.extend({
         _this.menu.$(".artifactsContent .default").show().siblings().hide();
         //获取列表
         this.getTplRule();//获取规则模板列表
+        App.ResourceArtifacts.getPlan();
+        App.ResourceArtifacts.getQuality();
     },
     //切换
     toggleClass:function(){
