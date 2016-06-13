@@ -52,7 +52,7 @@ App.Resources.ArtifactsTplDetail = Backbone.View.extend({
         App.ResourceArtifacts.resetModelRuleSaveData();//重置数据
         var _this = this;
         App.ResourceArtifacts.modelRuleSaveData.templateId = App.ResourceArtifacts.Status.templateId;
-        App.ResourceArtifacts.modelRuleSaveData.templateName = App.ResourceArtifacts.Status.templateName;
+        App.ResourceArtifacts.modelRuleSaveData.templateName = App.ResourceArtifacts.Status.templateName = this.$(".tplDetailEdit .tplName").val();
         //计划
         var plan = _.filter($(".artifactsContent .plans li"),function(item){
             return $(item).attr("data-check") == "1";
@@ -78,8 +78,6 @@ App.Resources.ArtifactsTplDetail = Backbone.View.extend({
             App.ResourceArtifacts.modelRuleSaveData.codeIdsIn.push($(item).attr("data-code"));
         });
 
-        console.log(App.ResourceArtifacts.modelRuleSaveData);
-
         var pdata = {
             URLtype: "saveArtifactsTemplateRule",
             type:"PUT",
@@ -90,6 +88,11 @@ App.Resources.ArtifactsTplDetail = Backbone.View.extend({
         App.ResourceArtifacts.loading($(".modelContent"));
         App.Comm.ajax(pdata,function(response){
             if(response.code == 0 ){
+
+                //更改模板名称
+                _this.$(".tplDetailTitle h2").text(App.ResourceArtifacts.Status.templateName);
+
+                Backbone.trigger("resourcesChangeMappingRuleModelName");
                 _this.resourcesCancel();
             }else{
             //提交失败

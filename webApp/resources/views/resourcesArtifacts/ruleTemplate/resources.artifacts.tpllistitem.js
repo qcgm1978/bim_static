@@ -19,6 +19,14 @@ App.Resources.ArtifactsTplListItem = Backbone.View.extend({
     initialize:function(){
         this.listenTo(this.model,"change",this.render);
         this.listenTo(this.model,"remove",this.render);
+
+        Backbone.on("resourcesChangeMappingRuleModelName",this.changeName,this);
+    },
+
+    changeName:function(){
+        if(this.$(".item").attr("data-id") == App.ResourceArtifacts.Status.templateId){
+            this.$(".item div").text(App.ResourceArtifacts.Status.templateName);
+        }
     },
     //È¡µÃÄ£°å
     getTpl:function(){
