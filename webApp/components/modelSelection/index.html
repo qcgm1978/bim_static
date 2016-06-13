@@ -11,8 +11,8 @@
 <input type="button" id="model" value="show">
 <script>
 $(function(){
-  var viewer;
-    viewer = new ModelSelection({
+  $('#model').on('click',function(){
+    var viewer = new ModelSelection({
       sourceId: '848069790540000',
       etag: "ca4863cf122ac55b5a8e845595aeb7ce",
       projectId:'1',
@@ -21,7 +21,6 @@ $(function(){
         console.log(ids);
       }
     });
-  $('#model').on('click',function(){
   })
 })
 </script>

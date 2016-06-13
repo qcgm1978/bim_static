@@ -18,13 +18,10 @@ App.Resources.ArtifactsTplAlert = Backbone.View.extend({
         return this;
     },
 
-    initialize:function(models){
-
-    },
+    initialize:function(models){},
     //确定
     sure : function(){
         var templateId =  App.ResourceArtifacts.Status.templateId;
-
         //非新建
         $.ajax({
             url:"http://bim.wanda-dev.cn/platform/rule/template/delete/" + templateId ,
@@ -39,12 +36,15 @@ App.Resources.ArtifactsTplAlert = Backbone.View.extend({
                      });
 
                      App.ResourceArtifacts.TplCollection.remove(pre);
+
+
                      _.each($(".tplCon .item"),function(item){
                          if(parseInt($(item).attr("data-id")) == templateId){
                              $(item).closest("li").remove();
                          }
                      });
 
+                     Backbone.trigger("resetTitle");
                      App.ResourceArtifacts.Status.templateId = "";
                      //刷新右侧视图  //清空所有选项
                 }else{

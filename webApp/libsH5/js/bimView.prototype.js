@@ -59,13 +59,14 @@
         start:function(res){
           _opt._dom.loading.append(_opt._dom.progress);
           _opt._dom.bimBox.append(_opt._dom.loading);
-          _opt._dom.bimBox.append(_opt._dom.modelLoading);
+          _opt._dom.bimBox.append(_opt._dom.modelLoading.text('0%'));
         },
         loading:function(res){
           var total = res.progress.total,
               loaded = res.progress.loaded,
               progress = loaded/total*100;
           _opt._dom.progress.width(progress+'%');
+          _opt._dom.modelLoading.text(parseInt(progress)+'%');
           if(progress == 100){
             _opt._dom.loading.remove();
             _opt._dom.modelLoading.remove();
@@ -621,6 +622,13 @@
       var filter = viewer.getFilters();
       filter.setOverriderByUserIds('collisionA',[idA],'darkRed');
       filter.setOverriderByUserIds('collisionB',[idB],'lightBlue');
+      viewer.render();
+    },
+    setOverrider:function(name,ids){
+      var self = this;
+      var viewer = self.viewer;
+      var filter = viewer.getFilters();
+      filter.setOverriderByUserIds(name,ids,name);
       viewer.render();
     },
     translucent:function(flag){

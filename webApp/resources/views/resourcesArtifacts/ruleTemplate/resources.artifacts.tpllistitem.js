@@ -22,6 +22,8 @@ App.Resources.ArtifactsTplListItem = Backbone.View.extend({
     },
     //取得模板
     getTpl:function(){
+
+        var _this = this;
         App.ResourceArtifacts.Status.templateId = this.model.get("id");//保存id
         App.ResourceArtifacts.Status.templateName = this.model.get("name");//保存name
 
@@ -31,7 +33,6 @@ App.Resources.ArtifactsTplListItem = Backbone.View.extend({
             return
         }
         this.toggleClass();
-
 
         $(".tplContent").addClass("services_loading");
         //重置右侧列表
@@ -57,6 +58,8 @@ App.Resources.ArtifactsTplListItem = Backbone.View.extend({
         $(".tplDetailTitle h2").text(this.model.get("name"));
         $(".tplDetailTitle .tplName").val(this.model.get("name"));
 
+
+        _this.menu.$(".artifactsContent .default").show().siblings().hide();
         //获取列表
         this.getTplRule();//获取规则模板列表
     },
@@ -77,7 +80,6 @@ App.Resources.ArtifactsTplListItem = Backbone.View.extend({
         App.Comm.ajax(pdata,function(response){
             if(response.code == 0 && response.data){
                 if(response.data.length){
-
                     _this.menu.$(".plans").html(_this.plans.render().el);
                     _this.menu.$(".rules .ruleContent").html(_this.planRule.render().el);
 
@@ -86,7 +88,7 @@ App.Resources.ArtifactsTplListItem = Backbone.View.extend({
                     $(".tplContent").removeClass("services_loading");
                 }else{
                     //没有任何规则时候，创建规则按钮
-                    _this.menu.$(".artifactsContent .default").show().siblings().hide();
+                    _this.menu.$(".artifactsContent .default").siblings().hide();
                     $(".tplContent").removeClass("services_loading");
                 }
             }

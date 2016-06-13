@@ -26,7 +26,7 @@ App.Resources.ArtifactsTplDetail = Backbone.View.extend({
 
     delete:function(){
         var _this = this;
-        var frame = new App.Resources.ArtifactsPlanRuleAlert();
+        var frame = new App.Resources.ArtifactsTplAlert();
         App.Resources.ArtifactsAlertWindow = new App.Comm.modules.Dialog({
             title: "",
             width: 280,

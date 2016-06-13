@@ -200,7 +200,7 @@ var AppRoute = Backbone.Router.extend({
 		_.require('/static/dist/resources/resources.js');
 		App.ResourcesNav.Settings.type = type;
 		App.ResourcesNav.Settings.optionType = optionType;
-		App.ResourceArtifacts.Status.projectId = projectModelId;
+		App.ResourceArtifacts.Status.projectId = optionType;
 		App.ResourceArtifacts.Status.type = 2;
 		new App.ResourcesNav.App().render();
 		App.ResourceArtifacts.resetPreRule();
