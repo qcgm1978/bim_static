@@ -641,16 +641,16 @@
 				render() {
 					//模板
 					this.$el.html(this.template);
+
 					this.$(".txtReMark").at({
 
-						getData:function(name){
-							console.log(name);
+						getData: function(name) {
 
-							var data={
-								URLtype:"autoComplateUser",
-								data:{
-									projectId:App.Project.Settings.projectId,
-									name:name
+							var data = {
+								URLtype: "autoComplateUser",
+								data: {
+									projectId: App.Project.Settings.projectId,
+									name: name
 								}
 							}
 
@@ -662,21 +662,21 @@
 				},
 
 				//评论视点
-				commentViewPoint() { 
+				commentViewPoint() {
 
 					CommentApi.saveCommentStart(null, "commentViewPoint", (data) => {
 						//上传地址或者评论视点后
-						CommentApi.afterUploadAddressViewPoint.call(this,data);
+						CommentApi.afterUploadAddressViewPoint.call(this, data);
 					});
 				},
 
 				//保存位置
-				address() { 
-					
+				address() {
+
 					//直接保存
 					CommentApi.saveCommentStart(null, "address", (data) => {
 						//上传地址或者评论视点后
-						CommentApi.afterUploadAddressViewPoint.call(this,data);
+						CommentApi.afterUploadAddressViewPoint.call(this, data);
 					});
 					$("#topSaveTip .btnSave").click();
 				},
@@ -748,8 +748,8 @@
 
 							data = data.data;
 
-							that.$(".uploading:first").find(".talkImg").prop("src", "/" + data.url).show().end().
-							find(".imgName").text(data.name).addClass("upload").end().
+							that.$(".uploading:first").find(".talkImg").prop("src", "/" + data.pictureUrl).show().end().
+							find(".imgName").text(data.description).addClass("upload").end().
 							find(".delUploadImg").show().end().
 							data("id", data.id).removeClass("uploading");
 						}
@@ -811,9 +811,17 @@
 
 				//失去焦点
 				outReMark(event) {
-					$(event.target).removeClass("input");
-					//列表高度
-					this.listHeight();
+
+					var timer = setTimeout(() => {
+						if (!$(event.target).is(":focus")) {
+							$(event.target).removeClass("input");
+							//列表高度
+							this.listHeight();
+						}
+
+					}, 500);
+
+
 				},
 
 				//计算列表高度
@@ -1030,12 +1038,22 @@
 									App.Project.Settings.Viewer.commentEnd();
 								}
 							},
+
 							cancelText: "保存并分享",
+
 							message: dialogHtml,
+
 							okCallback: () => {
 								//保存批注
 								if (!viewPointId) {
-									that.saveComment("save", dialog, data, callback, cate);
+
+									if (cate == "address") {
+										//保存位置
+										that.savePosition(dialog, data, callback);
+									} else {
+										that.saveComment("save", dialog, data, callback, cate);
+									}
+
 								} else {
 									data.id = viewPointId;
 									that.editComment("save", dialog, data, viewPointId, callback, cate);
@@ -1100,6 +1118,7 @@
 						projectId: App.Project.Settings.projectId,
 						name: dialog.element.find(".name").val().trim(),
 						type: dialog.type,
+						viewPointId:$comment.find('.remarkCount.current').data("id"),
 						viewPoint: commentData.camera
 					};
 
@@ -1107,12 +1126,14 @@
 					alert("请输入批注名称");
 					return false;
 				}
+
+				 
 				var data = {
-					URLtype: "createViewPoint",
+					URLtype: cate != "viewPoint" ? "viewPointCommentViewpoint" : "createViewPoint",
 					data: JSON.stringify(pars),
 					type: "POST",
 					contentType: "application/json"
-				}
+				} 
 
 				if (type == "save") {
 					dialog.element.find(".ok").text("保存中");
@@ -1257,6 +1278,57 @@
 					createTime: $li.find(".date").text().trim()
 				};
 				this.shareViewPoint(data);
+			},
+
+			//保存位置
+			savePosition(dialog, data, callback) {
+
+				if (dialog.isSubmit) {
+					return;
+				}
+
+				var description = dialog.element.find(".name").val().trim();
+
+				if (!description) {
+					alert("请输入位置信息");
+					return;
+				}
+
+				var viewPintId = $comment.find('.remarkCount.current').data("id"),
+					//数据
+					formdata = new FormData();
+
+				formdata.append("fileName", (+(new Date())) + ".png");
+				formdata.append("size", data.image.length);
+				formdata.append("file", data.image);
+
+				var pars = {
+						URLtype: 'viewPointPosition',
+						data: {
+							projectId: App.Project.Settings.projectId,
+							viewPointId: viewPintId,
+							description: description,
+							position: data.camera
+						}
+					},
+					url = App.Comm.getUrlByType(pars).url;
+
+				$.ajax({
+					url: url,
+					type: "post",
+					data: formdata,
+					processData: false,
+					contentType: false
+				}).done(function(data) {
+					if (data.code == 0) {
+						if ($.isFunction(callback)) {
+							callback(data.data);
+						}
+						dialog.close();
+						App.Project.Settings.Viewer.commentEnd();
+					}
+				});
+
 			},
 
 			//分享视点
@@ -1466,7 +1538,7 @@
 			reName($li) {
 
 				var data = {
-						cate:"viewPoint",
+						cate: "viewPoint",
 						id: $li.find(".remarkCount").data("id"),
 						type: $li.find(".thumbnailImg").data("type"),
 						img: $li.find(".thumbnailImg").prop('src'),
@@ -1544,6 +1616,8 @@
 				dialog.element.find(".ok").text("保存中");
 				dialog.isSubmit = true;
 
+				dialog.element.find(".ok").text("保存中");
+
 				//创建
 				App.Comm.ajax(data, (data) => {
 
@@ -1572,6 +1646,11 @@
 
 
 						dialog.close();
+					} else {
+
+						alert(data.message);
+						dialog.isSubmit = false;
+						dialog.element.find(".ok").text("保存");
 					}
 
 				});
@@ -1601,8 +1680,8 @@
 				var imgLoadHTML = _.templateUrl('/libsH5/tpls/comment/upload.img.html', true);
 				this.$(".uploadImgs").append(imgLoadHTML);
 
-				this.$(".uploading:first").find(".talkImg").prop("src", "/" + data.pic).show().end().
-				find(".imgName").text(data.name).addClass("upload").end().
+				this.$(".uploading:first").find(".talkImg").prop("src", "/" + data.pictureUrl).show().end().
+				find(".imgName").text(data.description).addClass("upload").end().
 				find(".delUploadImg").show().end().
 				data("id", data.id).removeClass("uploading").data("data", data);
 

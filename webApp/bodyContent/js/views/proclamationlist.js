@@ -12,7 +12,12 @@ App.BodyContent.proclamationList = Backbone.View.extend({
     },
 
     initialize : function(){
+        var _this=this;
         this.listenTo(App.BodyContent.control.proCollection,"add",this.addOne);
+        this.listenTo(App.BodyContent.control.proCollection,"reset",function(){
+            $('#proclamation').empty();
+            _this._items=0;
+        });
     },
     //数据加载
     addOne:function(item){

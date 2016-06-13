@@ -17,9 +17,14 @@ App.BodyContent.monthEndList = Backbone.View.extend({
     },
 
     initialize : function(){
+        var _this=this;
         this.listenTo(App.BodyContent.control.monthEndCollection,"add",this.addOne);
+        this.listenTo(App.BodyContent.control.monthEndCollection,"reset",function(){
+            _this._items=0;
+        });
     },
     //数据加载
+
     addOne:function(item){
         var newView = new App.BodyContent.monthEndView({model : item});
         this._items++;
