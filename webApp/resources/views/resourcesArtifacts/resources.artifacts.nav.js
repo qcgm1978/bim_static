@@ -33,6 +33,16 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
     initialize:function(){
         this.getCategoryCode(); //获取分类编码
         Backbone.on("startFromProject",this.startFromProject,this);
+        Backbone.on("checkedChange",this.checkList,this);
+        Backbone.on("projectMappingRuleCheckedClose",this.checkClose,this);
+    },
+
+    checkList:function(){
+       this.$(".artifactsContent").addClass("edit");
+    },
+
+    checkClose:function(){
+        this.$(".artifactsContent").removeClass("edit");
     },
 
     startFromProject:function(){
@@ -87,9 +97,7 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
             this.$(".plans").hide();
             this.$(".qualifyC").show();
         }
-
         this.$(".rules").show();
-
     },
 
     getCategoryCode:function(){

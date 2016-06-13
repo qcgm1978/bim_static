@@ -46,87 +46,75 @@
       self.fileData = self.fileData || {};
       isSelected ? self.el._dom.sidebar.addClass('open') : self.el._dom.sidebar.removeClass('open');
       self.el._dom.sidebar.find('#filter').show().siblings().hide();
-      if(!self.floorsStatue){
-        self.floorsStatue = true;
-        bimView.comm.ajax({
-          type:'get',
-          url:bimView.API.fetchFloors,
-          etag:self._opt.etag,
-          sourceId:self._opt.sourceId
-        },function(data){
-          var data = data.data;
-          var floors = bimView.comm.viewTree({
-            arr:data,
-            type:'sceneId',
-            name:'floor',
-            data:'fileEtags',
-            id:'floors',
-          });
-          $('#floors').append(floors);
+      bimView.comm.ajax({
+        type:'get',
+        url:bimView.API.fetchFloors,
+        etag:self._opt.etag,
+        sourceId:self._opt.sourceId
+      },function(data){
+        var data = data.data;
+        var floors = bimView.comm.viewTree({
+          arr:data,
+          type:'sceneId',
+          name:'floor',
+          data:'fileEtags',
+          id:'floors',
         });
-      }
-      if(!self.specialtyStatue){
-        self.specialtyStatue = true;
-        bimView.comm.ajax({
-          type:'get',
-          url:bimView.API.fetchSpecialty,
-          etag:self._opt.etag,
-          sourceId:self._opt.sourceId
-        },function(data){
-          var data = data.data;
-          $.each(data,function(i,item){
-            $.each(item.files,function(j,file){
-              self.fileData[file.fileEtag] = item.specialty
-            })
+        $('#floors').append(floors);
+      });
+      bimView.comm.ajax({
+        type:'get',
+        url:bimView.API.fetchSpecialty,
+        etag:self._opt.etag,
+        sourceId:self._opt.sourceId
+      },function(data){
+        var data = data.data;
+        $.each(data,function(i,item){
+          $.each(item.files,function(j,file){
+            self.fileData[file.fileEtag] = item.specialty
           })
-          var specialties = bimView.comm.viewTree({
-            arr:data,
-            type:'sceneId',
-            name:'specialty',
-            children:'files',
-            childrenName:'fileName',
-            data:'fileEtag',
-            id:'specialty',
-          });
-          $('#specialty').append(specialties);
+        })
+        var specialties = bimView.comm.viewTree({
+          arr:data,
+          type:'sceneId',
+          name:'specialty',
+          children:'files',
+          childrenName:'fileName',
+          data:'fileEtag',
+          id:'specialty',
         });
-      }
-      if(!self.categoryStatue){
-        self.categoryStatue = true;
-        bimView.comm.ajax({
-          type:'get',
-          url:bimView.API.fetchCategory,
-          etag:self._opt.etag,
-          sourceId:self._opt.sourceId
-        },function(data){
-          var data = data.data;
-          var category = bimView.comm.viewTree({
-            arr:data,
-            type:'categoryId',
-            name:'specialty',
-            code:'specialtyCode',
-            children:'categories',
-            childrenType:'json',
-          });
-          $('#category').append(category);
+        $('#specialty').append(specialties);
+      });
+      bimView.comm.ajax({
+        type:'get',
+        url:bimView.API.fetchCategory,
+        etag:self._opt.etag,
+        sourceId:self._opt.sourceId
+      },function(data){
+        var data = data.data;
+        var category = bimView.comm.viewTree({
+          arr:data,
+          type:'categoryId',
+          name:'specialty',
+          code:'specialtyCode',
+          children:'categories',
+          childrenType:'json',
         });
-      }
-      if(!self.classCodeStatue){
-        self.classCodeStatue = true;
-        bimView.comm.ajax({
-          type:'get',
-          url:bimView.API.fetchCoding,
-          etag:self._opt.etag,
-          sourceId:self._opt.sourceId
-        },function(data){
-          self.classCodeData = data.data;
-          var classCode = bimView.comm.viewTree({
-            type:'classCode',
-            rootName:'分类编码'
-          });
-          $('#classCode').append(classCode);
+        $('#category').append(category);
+      });
+      bimView.comm.ajax({
+        type:'get',
+        url:bimView.API.fetchCoding,
+        etag:self._opt.etag,
+        sourceId:self._opt.sourceId
+      },function(data){
+        self.classCodeData = data.data;
+        var classCode = bimView.comm.viewTree({
+          type:'classCode',
+          rootName:'分类编码'
         });
-      }
+        $('#classCode').append(classCode);
+      });
     },
     comment:function(isSelected,viewer){
       var self = this;

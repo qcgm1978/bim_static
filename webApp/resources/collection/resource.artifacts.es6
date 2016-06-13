@@ -291,9 +291,6 @@ App.ResourceArtifacts={
         }else{//规则库
 
             $(".mappingRule .library").addClass("active").siblings("a").removeClass("active");
-
-            App.ResourceArtifacts.Status.rule.biz =1;  //设置默认规则为模块化
-
             _this.$el.append(this.menu.render().el);//菜单
             this.menu.$(".plans").html(this.plans.render().el);//计划节点
             this.menu.$(".rules").html(this.planRuleTitle.render().el);//映射规则
