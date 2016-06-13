@@ -14,9 +14,9 @@
             <span class="myDropText">  <span class="text">请选择</span> <i class="myDropArrorw"></i> </span>
             <ul class="myDropList">
                 <li class="myItem" data-val=''>全部</li>
-                <li class="myItem" data-val='8'>全标</li>
-                <li class="myItem" data-val='16'>类标</li>
-                <li class="myItem" data-val='32'>非标</li>
+                 <% _.each(App.Projects.projectType,function(item,i){ if(i!=0) { %>
+                    <li class="myItem" data-val='<%= i %>'><%=item%></li>
+                <% }}) %>
             </ul>
         </div>
         <span class="searchLabel">项目模式：</span>
@@ -24,9 +24,9 @@
             <span class="myDropText">  <span class="text">请选择</span> <i class="myDropArrorw"></i> </span>
             <ul class="myDropList">
                 <li class="myItem" data-val=''>全部</li>
-                <li class="myItem" data-val='1'>创新模式</li>
-                <li class="myItem" data-val='2'>轻资产</li>
-                <li class="myItem" data-val='3'>重资产</li>
+                <% _.each(App.Projects.projectModel,function(item,i){ if(i!=0) { %>
+                    <li class="myItem" data-val='<%= i %>'><%=item%></li>
+                <% }}) %>
             </ul>
         </div>
         <span class="searchLabel">项目业态：</span>

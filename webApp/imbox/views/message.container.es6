@@ -44,7 +44,7 @@ App.INBox.imboxContainerView=Backbone.View.extend({
              link_to: 'javascript:void(0);',
              itemCallback: function(pageIndex) {
                 App.INBox.loadData('all',pageIndex + 1);
-             },
+             }, 
              prev_text: "上一页",
              next_text: "下一页"
 
