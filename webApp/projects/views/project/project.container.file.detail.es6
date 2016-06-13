@@ -15,7 +15,9 @@ App.Project.FileContainerDetail=Backbone.View.extend({
 	//事件绑定
 	events:{
 		"click .fileName  .text":"fileClick",
-		"click .ckAll":"singleCheck"
+		"click .ckAll":"singleCheck",
+		"click .btnCalcel": "cancelEdit",
+		"click .btnEnter": "enterEditNameOrCreateNew",
 	},
 
 	template:_.templateUrl("/projects/tpls/project/project.container.file.detail.html"),
@@ -23,6 +25,7 @@ App.Project.FileContainerDetail=Backbone.View.extend({
 	//渲染
 	render:function(){
 		this.$el.html(this.template(this.model.toJSON()));
+		App.Project.bindContextMenu(this.$el);
 		return this;
 	},
 
@@ -80,6 +83,12 @@ App.Project.FileContainerDetail=Backbone.View.extend({
 		});  
 	},
 
+	cancelEdit(e){
+		App.Project.calcelEditName(e);
+	},
+	enterEditNameOrCreateNew(e){
+		App.Project.editFolderName($(event.target).closest(".item"));
+	},
 	//是否全选
 	singleCheck(event){
 	 

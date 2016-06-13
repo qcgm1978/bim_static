@@ -62,6 +62,146 @@ App.Project = {
 
 	})),
 
+	bindContextMenu:function($el){
+		var _this=this;
+		//右键菜单
+ 		if (!document.getElementById("listContext")) {
+ 			//右键菜单
+ 			var contextHtml = _.templateUrl("/resources/tpls/context/listContext.html", true);
+ 			$("body").append(contextHtml);
+ 		}  
+
+		$el.contextMenu('listContext', {
+			//显示 回调
+			onShowMenuCallback: function(event) {
+				var $item = $(event.target).closest(".item");
+				$("#reNameModel").removeClass('disable');
+				//预览
+				if ($item.find(".folder").length > 0) {
+					$("#previewModel").addClass("disable");
+					$("#previewModel").find("a").removeAttr("href");
+				} else {
+
+					$("#previewModel").removeClass("disable");
+					var href = $item.find(".fileName .text").prop("href");
+					$("#previewModel").find("a").prop("href", href);
+
+					//重命名 未上传
+					if ($item.data("status") == 1) {
+						$("#reNameModel").addClass('disable');
+					}
+
+				}
+				$item.addClass("selected").siblings().removeClass("selected");
+			},
+			shadow: false,
+			bindings: {
+				'previewModel': function($target) {},
+				'downLoadModel': function(item) {
+
+					var $item = $(item);
+
+					if ($item.find(".folder").length > 0) {
+						alert("暂不支持文件夹下载");
+						return;
+					}
+
+					//下载链接 
+					var fileVersionId = $item.find(".filecKAll").data("fileversionid");
+
+					// //请求数据
+					var data = {
+						URLtype: "downLoad",
+						data: {
+							projectId:  App.Project.Settings.CurrentVersion.projectId,
+							projectVersionId:App.Project.Settings.CurrentVersion.id
+						}
+					};
+
+					var data = App.Comm.getUrlByType(data),
+						url = data.url + "?fileVersionId=" + fileVersionId;
+					window.location.href = url;
+				},
+				'delModel': function(item) {
+				},
+				'reNameModel': function(item) {
+					//重命名
+					let $reNameModel = $("#reNameModel");
+					//不可重命名状态
+					if ($reNameModel.hasClass('disable')) {
+						return;
+					}
+					var $prevEdit = $(".fileContent .txtEdit");
+					if ($prevEdit.length > 0) {
+						_this.cancelEdit($prevEdit);
+						return 
+					}
+					var $item = $(item),
+						$fileName = $item.find(".fileName"),
+						text = $item.find(".text").hide().text().trim();
+					$fileName.append('<input type="text" value="' + text + '" class="txtEdit txtInput" /> <span class="btnEnter myIcon-enter"></span><span class="btnCalcel pointer myIcon-cancel"></span>');
+				}
+			}
+		});
+	},
+
+	//取消修改名称
+	calcelEditName: function(event) {
+
+		var $prevEdit = $("#projectContainer .txtEdit");
+		if ($prevEdit.length > 0) {
+			this.cancelEdit($prevEdit);
+		}
+		return false;
+	},
+	//取消修改
+	cancelEdit: function($prevEdit) {
+		var $item = $prevEdit.closest(".item");
+		if ($item.hasClass('createNew')) {
+			//取消监听 促发销毁
+			/*var model = App.ResourceModel.FileThumCollection.last();
+			model.stopListening();
+			model.trigger('destroy', model, model.collection);
+			App.ResourceModel.FileThumCollection.models.pop();*/
+			//删除页面元素
+			$item.remove();
+		} else {
+			$prevEdit.prev().show().end().nextAll().remove().end().remove();
+		}
+
+	},
+
+	editFolderName: function($item) {
+		debugger
+		var that = this,
+			fileVersionId = $item.find(".filecKAll").data("fileversionid"),
+			name = $item.find(".txtEdit").val().trim();
+		// //请求数据
+		var data = {
+			URLtype: "putFileReName",
+			type: "PUT",
+			data: {
+				projectId: App.Project.Settings.CurrentVersion.projectId,
+				projectVersionId: App.Project.Settings.CurrentVersion.id,
+				fileVersionId: fileVersionId,
+				name: encodeURI(name)
+			}
+		};
+
+		App.Comm.ajax(data, function(data) {
+			if (data.message == "success") {
+				var id = data.data.id;
+				$("#projectContainer .treeViewMarUl span[data-id='" + id + "']").text(name);
+			} else {
+				//取消
+				var $prevEdit = $item.find(".txtEdit");
+				if ($prevEdit.length > 0) {
+					$prevEdit.prev().show().end().nextAll().remove().end().remove();
+				}
+
+			}
+		});
+	},
 	//初始化
 	init: function() {
 

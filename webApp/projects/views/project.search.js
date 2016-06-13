@@ -23,12 +23,12 @@ App.Projects.searchView = Backbone.View.extend({
 		"change .txtSearch":"linkSearchWord"
 	},
 
-	template: _.templateUrl("/projects/tpls/project.search.html", true),
+	template: _.templateUrl("/projects/tpls/project.search.html"),
 
 
 	render: function() {
 		var _this=this;
-		this.$el.html(this.template);
+		this.$el.html(this.template());
 		//type=="my-backbone-fast" && this.$el.find(".fast").addClass('selected')|| this.$el.find(".msg").addClass('selected');
 
 		this.$(".pickProjectType").myDropDown({

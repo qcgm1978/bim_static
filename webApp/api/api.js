@@ -15,6 +15,7 @@ App.API = {
 		fetchBodyContentSilde :'platform/project/top',
 
 		fetchIMBoxList:'platform/message',
+		fetchReadMessage:'platform/message/read',//?id={id}
 
 		//本月开始、到期接口
 		fetchBodyContentMonthEnd :'sixD/plan/concern/index',//?type={type}&userId={userId}
