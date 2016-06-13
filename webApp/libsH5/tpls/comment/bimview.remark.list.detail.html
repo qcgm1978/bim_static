@@ -7,9 +7,9 @@
     <%= text%>
 </div>
 
-<%if(pictures && pictures.length>0){%>
+<%if(attachments && attachments.length>0){%>
 <div class="imgs">
-	<% $.each(pictures,function(i,item){%>
+	<% $.each(attachments,function(i,item){%>
     <a class="example-image-link img" href="/<%=item.url%>" title="<%=item.name%>" data-lightbox="example-1">
      <img class="example-image" src="/<%=item.url%>" alt="<%=item.name%>" /></a>
     <% }) %>

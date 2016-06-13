@@ -50,13 +50,17 @@ App.Resources.ArtifactsPlanRuleAlert = Backbone.View.extend({
                      });
                      App.ResourceArtifacts.PlanRules.remove(pre);
                      App.ResourceArtifacts.Status.rule.count = App.ResourceArtifacts.PlanRules.length;
+                     console.log(App.ResourceArtifacts.PlanRules);
+             /*        if(App.ResourceArtifacts.Status.rule.count ==0){
+                         Backbone.trigger("mappingRuleNoContent")
+                     }*/
 
                      _.each($(".ruleTitle"),function(item){
                          if(parseInt($(item).attr("data-id")) == id){
                              $(item).closest("li").remove();
                          }
                      });
-                     Backbone.trigger("countChange");
+                     Backbone.trigger("resetTitle");
 
                 }else{
                      alert("删除失败");

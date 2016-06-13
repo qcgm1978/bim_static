@@ -18,6 +18,11 @@ App.Resources.ArtifactsPlanRule = Backbone.View.extend({
 
     initialize:function(){
         Backbone.on("resetTitle",this.resetTitle,this);
+        Backbone.on("mappingRuleNoContent",this.mappingRuleNoContent,this);
+    },
+
+    mappingRuleNoContent:function(){
+        this.$el.html("<li><div class='ruleTitle delt'>暂无内容</div></li>");
     },
 
     addOne:function(model) {
@@ -58,9 +63,6 @@ App.Resources.ArtifactsPlanRule = Backbone.View.extend({
         App.ResourceArtifacts.Status.delRule ="";
 
 
-        if(!$(".ruleDetail").length){
-            $(".artifactsContent .rules ul").html("");
-        }
         //无数据或无更改，更改当前数据
         $(".ruleDetail:visible").hide();
 
