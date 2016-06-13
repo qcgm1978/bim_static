@@ -25,7 +25,8 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
         "click .delRule": "delRule",
         "focus .categoryCode": "legend",
         "click .myDropText":"seleRule",
-        "click .myItem":"myItem"
+        "click .myItem":"myItem",
+        "click .ruleCheck":"ruleCheck"
     },
 
     render:function() {
@@ -34,11 +35,32 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
         var operatorData = App.Resources.dealStr2(_this.model);//规则数据
         this.model.set({mappingCategory:operatorData},{silent:true});
         this.$el.html(this.template()(this.model.toJSON()));
+
+        //写入是否选中
+
+
         return this;
     },
     initialize:function(){
         //this.listenTo(this.model,"change",this.render);
     },
+
+
+    ruleCheck:function(e){
+        App.Resources.cancelBubble(e);
+        var ele = $(e.target);
+        if(ele.hasClass("all")){
+            ele.removeClass("all");
+            ele.closest("li").attr("data-check","0");
+        }else{
+            ele.addClass("all");
+            ele.closest("li").attr("data-check","1");
+        }
+        ele.removeClass("half");
+        //不设置模型类型
+    },
+
+
     getDetail:function(){
         if(this.$(".ruleDetail:visible").length){    //显示
             this.$(".ruleDetail").hide();

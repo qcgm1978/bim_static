@@ -170,10 +170,15 @@
 .tplDetailTitle .myBtn-primary{margin-right: 10px;}
 .tplDetailTitle h2{padding-left: 10px;}
 /*µ¥Ñ¡¿ò*/
-.ruleCheck{position: relative;float: left;}
+.artifactsContent .ruleCheck{display: none;}
+.artifactsContent.edit .ruleCheck{display: block;}
+.artifactsContent .ruleCheck{position: relative;float: left;width: 15px;height: 15px;margin-right: 5px;background: url('../../comm/images/tree.png') left top no-repeat;background-position: 0 -80px;border: 1px solid #cccccc;margin-top: 8px;}
+.artifactsContent .ruleCheck.all{background-position: 0 -40px;}
+.artifactsContent .ruleCheck.half{background-position: 0 -60px;}
+.artifactsContent .ruleContentRuleList .ruleCheck{margin: 10px 10px 0 0;}
 /*È±Ê¡*/
 .artifactsTplFrame .tplContent .default{position: absolute;top: 100px;left: 50%;font-size: 14px;margin-left: -100px;color: #9d9d9d;}
 .artifactsContent .default{display:none;position: absolute;width: 200px;padding-left: 40px;height: 58px;font-size: 14px;line-height: 29px;}
-.artifactsContent .default:before{content: '';position: absolute;background: transparent url('../../services/images/service_ico.png') 0 0 no-repeat;vertical-align: middle;;width:32px;height: 32px; background-position: 0 -300px;left: 0;top: 0;}
+.artifactsContent .default:before{content: '';position: absolute;background:transparent url('../../services/images/service_ico.png') 0 0 no-repeat;vertical-align: middle;;width:32px;height: 32px; background-position: 0 -300px;left: 0;top: 0;}
 .artifactsContent .default p{cursor: pointer;color:#0572d0;font-size: 12px; }
 

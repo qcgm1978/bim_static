@@ -48,6 +48,9 @@ App.Resources.artifactsQualityTree = function(dataList){
         });
         var initModel = new model(data[i]);
         var li = $("<li></li>");
+        var  a  = data[i].ruleContain == 1 ? 1 : 0 ;
+        li.attr("data-check",a);
+        li.attr("data-code",data[i].code);
         li.append(new App.Resources.ArtifactsQualityDetail({model:initModel}).render().el);
         li.append("<div class='childList' data-code='"+data[i].code +"'></div>");
         ele.append(li);
