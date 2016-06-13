@@ -14,7 +14,7 @@ App.Services.step1 = Backbone.View.extend({
   },
 
   render:function(name){
-
+    var self = this;
     if(name && name=='step3'){
       this.$el.addClass('step1in3');
     }else if(typeof name=='string'){
@@ -22,27 +22,30 @@ App.Services.step1 = Backbone.View.extend({
         url: "platform//auth/user?name="+name
       }).done(function(data){
         console.log(data);
-        if(data.message == "success"){
+        if(data.code == 0){
           var items = data.data, str = "";
 
           $.each(items, function(i, item){
-            if(item.title){
+            if(item.name){
               str+="<li>"+
-                "<p class='person "+"' data-uid='"+item['userId']+ "' data-canLoad='true' ><i ></i><span class='isspan'>"+ item['name']+"</span><span>"+item['orgNamePath']+"</span></p>"+
+                "<p class='person "+"' data-uid='"+item['userId']+ "'  ><i ></i><span class='isspan'>"+ item['name']+"</span><span class='namepath' title='"+item['orgNamePath']+"'> (..."+(item['orgNamePath']).split(">").pop()+")</span></p>"+
                 "</li>";
             }
 
           });
-          $(selector).append(str);
+          self.$el.html(str);
+
         }
       });
-    }
-    //准备Collection的MODELS
-    var datas={
-      direction : App.Services.KeyUser.Step1.toJSON() || []
+    }else{
+      //准备Collection的MODELS
+      var datas={
+        direction : App.Services.KeyUser.Step1.toJSON() || []
 
-    };
-    this.$el.html(this.template(datas));
+      };
+      this.$el.html(this.template(datas));
+    }
+
     return this;
   },
 

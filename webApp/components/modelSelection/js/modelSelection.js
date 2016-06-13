@@ -17,14 +17,18 @@
   }
   ModelSelection.prototype = {
     init:function(){
-      var serverUrl = 'http://bim.wanda-dev.cn/',
+      var self = this,
+          serverUrl = 'http://bim.wanda-dev.cn/',
           srciptUrl = serverUrl + 'static/dist/libs/libsH5_20160312.js',
           styleUrl = serverUrl + 'static/dist/libs/libsH5_20160312.css',
           $script = '<script src="'+srciptUrl+'"></script>',
           $css = '<link rel="stylesheet" href="'+styleUrl+'" />';
-      $('head').append($css,$script);
-      this.dialog();
-      this.controll();
+      if(!ModelSelection.isLoad){
+        $('head').append($css,$script);
+        ModelSelection.isLoad = true;
+      }
+      self.dialog();
+      self.controll();
     },
     controll:function(){
       var self = this;
@@ -58,7 +62,7 @@
         var $body = $('<div class="dialogBody"></div>'),
             $header = $('<div class="dialogHeader"/>').html('请选择构件<span class="dialogClose" title="关闭"></span> '),
             $modelView = self.$modelView = $('<div id="modelView" class="model"></div>')
-            $content = $('<div class="dialogContent"><div class="rightBar"><div class="tab"><div class="tabItem">已选构件</div></div><div class="tools"><div class="toolsBtn"><i class="m-checked"></i>已选构件</div><span class="isSecleted">已选<span class="num">3</span>个构件</span></div><div class="bim" id="modelTree"></div></div></div>'),
+            $content = $('<div class="dialogContent"><div class="rightBar"><div class="tab"><div class="tabItem">已选构件</div></div><div class="tools"><div class="toolsBtn"><i class="m-checked"></i>已选构件</div><span class="isSecleted">已选<span class="num"></span>个构件</span></div><div class="bim" id="modelTree"></div></div></div>'),
             $bottom = $('<div class="dialogFooter"/>').html('<input type="button" class="dialogOk dialogBtn" value="' + this.Settings.btnText + '" />');
         $content.prepend($modelView);
         $body.append($header,$content,$bottom);
@@ -85,6 +89,8 @@
       bimView.sidebar.getSelected(this.viewer,function(ids){
         self.viewData = $.extend(true,{},viewData,ids);
         var tree = self.renderTree(self.viewData);
+        var len = tree.find('.noneSwitch').length();
+        self.$dialog.find('.num').text(len);
         $('#modelTree').html(tree);
       });
     },
