@@ -542,6 +542,27 @@ App.Index = {
 	},
 
 
+	//获取项目信息信息
+	fetchProjectDetail: function() {
+
+		var data = {
+			URLtype: "fetchProjectDetail",
+			data: {
+				projectId: this.Settings.projectId,
+				versionId: this.Settings.projectVersionId
+			}
+		};
+
+		App.Comm.ajax(data, function(data) {
+			if (data.code == 0) {
+				data = data.data;
+			 	$(".breadcrumbNav .project .text").text(data.projectName);
+			 	$(".breadcrumbNav .projectVersion .text").text(data.name);				  
+			}
+		});
+
+	},
+
 	init() {
 
 		//初始化参数
@@ -550,6 +571,8 @@ App.Index = {
 		this.bindEvent();
 		//获取文件裂隙
 		this.fetchFileType();
+		//导航
+		this.fetchProjectDetail();
 
 
 	}
