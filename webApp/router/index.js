@@ -102,7 +102,7 @@ var AppRoute = Backbone.Router.extend({
 	},
 
 	//直接转到视点
-	projectViewPoint(id, versionId,viewPintId){
+	projectViewPoint:function(id, versionId,viewPintId){
 		 
 		this.reset();
 
@@ -250,8 +250,7 @@ var AppRoute = Backbone.Router.extend({
 		//用户信息
 		App.Global.User = JSON.parse(localStorage.getItem("user"));
 		$("#pageLoading").show();
-		//销毁右键
-		$.fn.contextMenu.destory();
+	 
 		//销毁上传
 		App.Comm.upload.destroy();
 		App.Global.User && $("#topBar .userName .text").text(App.Global.User.name);
