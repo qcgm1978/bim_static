@@ -263,19 +263,15 @@ App.ResourceArtifacts={
     })),
 
     init:function(_this,optionType) {
-
-
-
         //项目映射入口
         if(optionType != "library" ){
             //_this.$el.html("");//处理菜单
-        }
-
-        //项目id
-        if(!App.ResourceArtifacts.Status.projectId){
+            //处理名称
+        }else{
+            //项目id
+            App.ResourceArtifacts.Status.projectId = "";
             _this.$el.append( new App.Resources.ArtifactsIndexNav().render().el);
         }
-
 
         //公用组件
         this.menu = new App.Resources.ArtifactsMapRule();  //外层菜单
@@ -307,6 +303,11 @@ App.ResourceArtifacts={
 
             this.getTpl();
         }else{//规则库
+            if(optionType != "library" ){
+
+            }
+
+
             $(".mappingRule .library").addClass("active").siblings("a").removeClass("active");
             _this.$el.append(this.menu.render().el);//菜单
             this.menu.$(".plans").html(this.plans.render().el);//计划节点
