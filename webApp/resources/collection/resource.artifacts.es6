@@ -264,6 +264,7 @@ App.ResourceArtifacts={
 
     init:function(_this,optionType) {
 
+        $("#artifacts").addClass("services_loading");
 
         this.ArtifactsIndexNav = new App.Resources.ArtifactsIndexNav();
         //项目映射入口
@@ -325,8 +326,6 @@ App.ResourceArtifacts={
         }
     },
 
-
-
     //获取分类编码
     loaddeaprt:function(){
         //获取分类编码
@@ -338,6 +337,7 @@ App.ResourceArtifacts={
             if(response.code == 0 && response.data && response.data.length){
                 App.Resources.artifactsTreeData = response.data;
             }
+            $("#artifacts").removeClass("services_loading");
         });
     },
     //获取计划节点
@@ -362,8 +362,9 @@ App.ResourceArtifacts={
                 if(response.data.length){
                 App.ResourceArtifacts.PlanNode.add(response.data);
                 }else{
-                    _this.resetRuleList();
+                    Backbone.trigger("mappingRuleNoContent");
                 }
+                $("#artifacts").removeClass("services_loading");
             }
         });
     },
@@ -389,6 +390,7 @@ App.ResourceArtifacts={
                 var list = App.Resources.artifactsQualityTree(response.data);
                 this.$(".qualityMenuList").html(list);
             }
+            $("#artifacts").removeClass("services_loading");
         });
     },
 
@@ -403,20 +405,19 @@ App.ResourceArtifacts={
         App.ResourceArtifacts.TplCollection.reset();
         App.ResourceArtifacts.PlanRules.reset();
         App.Comm.ajax(pdata,function(response){
-            console.log(response);
             if(response.code == 0 && response.data){
                 if(response.data.length){
                     App.ResourceArtifacts.TplCollection.add(response.data);
                 }else{
-
                 }
             }
+            $("#artifacts").removeClass("services_loading");
         });
     },
 
 
     //延迟
-    delay:function(data){
+   /* delay:function(data){
     var _this = this , batch , length = data.length , arr = []  , n = 1 , last;
         batch = Math.ceil(length/20); //循环次数
         last = length % 20; //余数
@@ -428,15 +429,12 @@ App.ResourceArtifacts={
                 n++;
             },100);
         }
-    },
+    },*/
     loading:function(ele){
         $(ele).addClass("services_loading");
     },
 
     loaded:function(ele){
         $(ele).removeClass("services_loading");
-    },
-    resetRuleList:function(){
-        $(".ruleContent ul").html("<li><div class='ruleTitle delt'>暂无内容</div></li>");
     }
 };
