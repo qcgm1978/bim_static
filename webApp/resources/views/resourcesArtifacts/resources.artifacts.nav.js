@@ -108,7 +108,7 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
         App.ResourceArtifacts.Status.rule.targetCode = "";
         App.ResourceArtifacts.Status.rule.targetName = "";
         this.$(".rules h2 .name").html("没有选择模块/质量标准");
-        this.$(".ruleContentRuleList ul").html("<li><div class='ruleTitle delt'>没有选择模块/质量标准</div></li>");
+        this.$(".ruleContentRuleList ul").html("<li><div class='ruleTitle delt'>暂无内容</div></li>");
     },
 
     //为项目设置创建规则

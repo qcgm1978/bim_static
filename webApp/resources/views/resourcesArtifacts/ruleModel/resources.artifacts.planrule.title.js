@@ -38,7 +38,6 @@ App.Resources.ArtifactsPlanRuleTitle = Backbone.View.extend({
         }//没有选择计划无法创建规则
         if( !App.ResourceArtifacts.Status.saved){
             alert("您还有没保存的");
-            //查找未保存的元素并高亮提示变红
             return
         }
         //重置删除状态

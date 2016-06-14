@@ -27,7 +27,7 @@ App.Resources.ArtifactsQualityList = Backbone.View.extend({
         var newList = new App.Resources.ArtifactsQualityDetail({model: model});
         this.$(".qualityMenu ul").append(newList.render().el);
     },
-
+    //当前选项
     present:function(){
         var active = this.$(".qualityProcess");
         if( active.hasClass("active") ){
@@ -40,18 +40,7 @@ App.Resources.ArtifactsQualityList = Backbone.View.extend({
     choose:function(){
         var _this = this;
         this.toggle();
-        var id = this.$(".present").data("type");
-
-        var pdata = {
-            URLtype:'fetchArtifactsQuality',
-            data:{
-                type:App.ResourceArtifacts.Status.type,
-                standardType: id
-            }
-        };
-
-        App.ResourceArtifacts.getQuality(pdata,_this);
-        //刷新底下collection
+        App.ResourceArtifacts.getQuality();
     },
 
     //切换
@@ -66,6 +55,7 @@ App.Resources.ArtifactsQualityList = Backbone.View.extend({
         this.$(".present").text(newText);
         this.$(".pro").data("type",extendData);
         this.$(".pro").text(extendText);
+        App.ResourceArtifacts.Status.qualityStandardType = newData;
     }
 
 });

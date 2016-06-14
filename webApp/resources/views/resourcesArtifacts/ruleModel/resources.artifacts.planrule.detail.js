@@ -104,8 +104,6 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
             if(modelRuleList.length && !preInRule.length && !preDelRule.length){
                 App.ResourceArtifacts.modelRuleSaveData.ruleIdsDel.push(_this.model.get("id"));
             }
-
-
             var checked1 = _.filter(allSele,function(item){
                 return $(item).attr("data-check") == "1"
             });
@@ -114,8 +112,6 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
             }
         }else{
             ele.closest("li").attr("data-check","1");
-
-
             if(!modelRuleList.length && !preInRule.length && !preDelRule.length){
                 App.ResourceArtifacts.modelRuleSaveData.ruleIdsIn.push(_this.model.get("id"));
             }
@@ -268,21 +264,20 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
             cdata.URLtype = "modifyArtifactsPlanRule";
             cdata.type ="PUT";
 
-            App.Comm.ajax(cdata,function(response){
-                if(response.code == 0 && response.data){
-                    _this.$(".ruleTitle").attr("data-id",response.data.id);
-                    _this.model.set({id:response.data.id},{silent:true});
-                    _this.$(".ruleTitle .desc").text("[" + categoryCode + "] " + categoryName);
-                    _this.$(".ruleDetail").hide();
-
-                    App.ResourceArtifacts.PlanRules.push(_this.model);
-
-                    if(cdata.URLtype == "modifyArtifactsPlanRule"){
-                        Backbone.trigger("resetTitle");
+            $.ajax({
+                url: "http://bim.wanda-dev.cn/platform/mapping/rule/update?projectId=" + App.ResourceArtifacts.Status.projectId,
+                data:JSON.stringify(baseData),
+                contentType: "application/json",
+                type:"PUT",
+                success:function(response){
+                    if(response.code == 0 && response.data){
+                        _this.$(".ruleTitle").attr("data-id",response.data.id);
+                        _this.model.set({id:response.data.id},{silent:true});
+                        _this.$(".ruleTitle .desc").text("[" + categoryCode + "] " + categoryName);
+                        _this.$(".ruleDetail").hide();
                     }
                 }
             });
-
         }else{
             //´´½¨
             cdata.URLtype = "createArtifactsPlanNewRule";
