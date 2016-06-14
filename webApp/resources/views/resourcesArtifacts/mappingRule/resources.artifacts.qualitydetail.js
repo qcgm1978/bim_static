@@ -209,7 +209,7 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
 
     //获取质量标准相关规则
     getRules:function() {
-        var _this = this,pdata,n = this.closest("li").attr("data-check");
+        var _this = this,pdata,n = this.$el.closest("li").attr("data-check");
         if(!App.ResourceArtifacts.Status.saved){
             return
         }
