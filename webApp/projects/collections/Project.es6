@@ -93,6 +93,11 @@ App.Project = {
 					}
 
 				}
+				if(App.Project.Settings.CurrentVersion.status!=9){
+					$("#reNameModel").addClass('disable').attr('disabled','disabled');
+					$("#downLoadModel").addClass('disable').attr('disabled','disabled');
+					$("#delModel").addClass('disable').attr('disabled','disabled');
+				}
 				$item.addClass("selected").siblings().removeClass("selected");
 			},
 			shadow: false,
@@ -146,6 +151,31 @@ App.Project = {
 				}
 			}
 		});
+	},
+
+	afterRemoveFolder(file) {
+
+		if (!file.folder) {
+			return;
+		}
+
+		var $treeViewMarUl =  $("#projectContainer .treeViewMarUl");
+
+		if ($treeViewMarUl.length > 0) {
+			var $span = $treeViewMarUl.find("span[data-id='" + file.id + "']");
+			if ($span.length > 0) {
+				var $li = $span.closest('li'),
+					$parent = $li.parent();
+				$li.remove();
+				//没有文件夹了
+				if ($parent.find("li").length <= 0) {
+					$parent.parent().children(".item-content").find(".nodeSwitch").removeClass().addClass("noneSwitch");
+				}
+
+			}
+
+		}
+
 	},
 
 	delFile:function($item){
@@ -219,18 +249,27 @@ App.Project = {
 		};
 
 		App.Comm.ajax(data, function(data) {
+			var $prevEdit = $item.find(".txtEdit");
 			if (data.code == 0) {
-				var id = data.data.id;
+				var id = data.data.id,
+					models = App.Project.FileCollection.models;
 				$("#projectContainer .treeViewMarUl span[data-id='" + id + "']").text(name);
-			} else {
-				//取消
-				var $prevEdit = $item.find(".txtEdit");
-				if ($prevEdit.length > 0) {
-					$prevEdit.prev().show().end().nextAll().remove().end().remove();
-				}
-				$.tip({type:'alarm',message:'操作失败:'+data.message})
 
+				$.each(models, (i, model) => {
+					var dataJson = model.toJSON();
+					if (dataJson.id == id) {
+						model.set(data.data);
+						return false;
+					}
+				});
+
+			} else {
+				$.tip({type:'alarm',message:'操作失败:'+data.message})
 			}
+			if ($prevEdit.length > 0) {
+				$prevEdit.prev().show().end().nextAll().remove().end().remove();
+			}
+			
 		});
 	},
 	//初始化
