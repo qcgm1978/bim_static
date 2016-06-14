@@ -70,9 +70,10 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
                 return
             }
 
-
             this.$(".qualifyC").hide();
+            this.$(".qualifyC li").removeClass("active");
             this.$(".plans").show();
+
             this.resetRule();
 
         }else if(quality){//÷ ¡ø
@@ -85,6 +86,7 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
 
             this.$(".plans").hide();
             this.$(".qualifyC").show();
+            this.$(".plans li").removeClass("active");
         }
         this.$(".rules").show();
     },

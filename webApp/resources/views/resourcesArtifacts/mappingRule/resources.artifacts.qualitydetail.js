@@ -209,7 +209,7 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
 
     //获取质量标准相关规则
     getRules:function() {
-        var _this = this,pdata;
+        var _this = this,pdata,n = this.closest("li").attr("data-check");
         if(!App.ResourceArtifacts.Status.saved){
             return
         }
@@ -229,7 +229,7 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
             App.Comm.ajax(pdata,function(response){
                 if(response.code == 0 && response.data){
                     if(response.data.length){
-                        var list = App.Resources.artifactsQualityTree(response.data);
+                        var list = App.Resources.artifactsQualityTree(response.data,n);
                         _this.$el.closest("li").find(".childList").html(list);
                     }else{
                         //无数据咋办

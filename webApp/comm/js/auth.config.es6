@@ -75,8 +75,15 @@ App.Comm.AuthConfig = {
 
 			}
 		}
+	},
+
+	//映射规则 模块化/质量标准  管理
+	resource:{
+		model:{
+
+		}
 	}
 
 	 
 
-}
+};
