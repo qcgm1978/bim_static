@@ -371,26 +371,26 @@ App.Project.Model = {
         App.Index.Settings.Viewer.fit();
       }
 
-			App.Index.Settings.Viewer.setOverrider('add',[]);
-			App.Index.Settings.Viewer.setOverrider('beforeEdit',[]);
-			App.Index.Settings.Viewer.setOverrider('afterEdit',[]);
-			App.Index.Settings.Viewer.setOverrider('delete',[]);
+			App.Index.Settings.Viewer.setOverrider('add');
+			App.Index.Settings.Viewer.setOverrider('beforeEdit');
+			App.Index.Settings.Viewer.setOverrider('afterEdit');
+			App.Index.Settings.Viewer.setOverrider('delete');
 
 			//判断是新增，修改，删除
 			if(baseId && elementId){
 				//修改
 
-				App.Index.Settings.Viewer.setOverrider('beforeEdit');
-				App.Index.Settings.Viewer.setOverrider('afterEdit');
+				App.Index.Settings.Viewer.setOverrider('beforeEdit',[baseId]);
+				App.Index.Settings.Viewer.setOverrider('afterEdit',[elementId]);
 			}else if(baseId){
 				//删除
 
-				App.Index.Settings.Viewer.setOverrider('delete');
+				App.Index.Settings.Viewer.setOverrider('delete',[baseId]);
 
 			}else{
 				//新增
 
-				App.Index.Settings.Viewer.setOverrider('add');
+				App.Index.Settings.Viewer.setOverrider('add',[elementId]);
 			}
 			console.log(baseId,elementId)
 
