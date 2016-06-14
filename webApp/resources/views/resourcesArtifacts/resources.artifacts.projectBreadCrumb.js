@@ -9,7 +9,7 @@ App.Resources.ArtifactsProjectBreadCrumb= Backbone.View.extend({
 
     events:{},
 
-    template: _.templateUrl("/resources/tpls/resourcesArtifacts/resources.artifacts.projectBreadCrumb.html"),
+    //template: _.templateUrl("/resources/tpls/resourcesArtifacts/resources.artifacts.projectBreadCrumb.html"),
 
     render:function() {
         this.$el.html(this.template);

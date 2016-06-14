@@ -223,9 +223,13 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
                     parentCode :this.model.get("code")  //´«µÝ¸¸½Úµã
                 }
             };
+            if(App.ResourceArtifacts.Status.templateId){
+                pdata.data.templateId = App.ResourceArtifacts.Status.templateId;
+            }else if(App.ResourceArtifacts.Status.projectId){
+                pdata.data.projectId = App.ResourceArtifacts.Status.projectId;
+            }
 
             App.ResourceArtifacts.PlanRules.reset();
-
             App.Comm.ajax(pdata,function(response){
                 if(response.code == 0 && response.data){
                     if(response.data.length){

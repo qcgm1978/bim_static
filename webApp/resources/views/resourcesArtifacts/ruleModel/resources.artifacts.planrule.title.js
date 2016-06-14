@@ -53,9 +53,17 @@ App.Resources.ArtifactsPlanRuleTitle = Backbone.View.extend({
         model.set({mappingCategory:operatorData},{silent:true});
         var container = new App.Resources.ArtifactsPlanRuleDetail({model:model});
 
-        $(".ruleContentRuleList ul.outsideList").append(container.render().el).show();
-        $(".ruleContentRuleList ul.outsideList>li:last-child .ruleDetail").show();
+        var li = $(".ruleContentRuleList ul.outsideList>li");
+        if(li.length == 1 && !li.attr("data-check")){
+            $(".ruleContentRuleList ul.outsideList").html(container.render().el).show();
+        }else{
+            $(".ruleContentRuleList ul.outsideList").append(container.render().el).show();
+        }
+
         App.ResourceArtifacts.Status.saved = false;
+        $(".ruleContentRuleList ul.outsideList>li:last-child .ruleDetail").show();
+
+
     }
 
 });

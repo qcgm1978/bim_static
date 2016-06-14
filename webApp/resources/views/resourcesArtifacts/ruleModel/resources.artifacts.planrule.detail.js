@@ -231,6 +231,13 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
                     right = ""
                 }
 
+                //有效性验证
+                if(leftValue.val() && rightValue.val()){
+                    if(parseInt(leftValue.val())){
+
+                    }
+                }
+
                 var str = left  + leftValue.val() +","+ rightValue.val()+ right ;
                 Rulist[i].propertyValue = str;
             }
@@ -290,13 +297,9 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
                     if(response.code == 0 && response.data){
                         _this.model.set({id:response.data.id},{silent:true});
                         _this.$el.remove();
-
                         App.ResourceArtifacts.PlanRules.push(_this.model);
-
                         App.ResourceArtifacts.Status.rule.count = App.ResourceArtifacts.PlanRules.length;
-
                         Backbone.trigger("resetTitle");
-
                     }
                 }
             });
