@@ -17619,17 +17619,17 @@ CLOUD.EditorManager.prototype = {
         }
     },
 
-    setEditor : function (newEditor) {
-
-        if (this.editor === newEditor)
-            return;
+    setEditor : function (newEditor, slaveEditor) {
 
         if (this.editor !== null) {
-            // 切换模块引起的状态变化应该都在这里处理
             this.editor.onExistEditor();
         }
 
+        if (slaveEditor)
+            newEditor.slaveEditor = slaveEditor;
+
         this.editor = newEditor;
+        
     },
 
     getClipEditor : function(viewer){
@@ -17675,8 +17675,7 @@ CLOUD.EditorManager.prototype = {
         }
         
         this.orbitEditor.orbitBySelection = orbitBySelection || false;
-        this.rectPickEditor.slaveEditor = this.orbitEditor;
-        scope.setEditor(this.rectPickEditor);
+        scope.setEditor(this.rectPickEditor, this.orbitEditor);
     },
     setOrbitMode: function (viewer) {
         var scope = this;
@@ -17725,15 +17724,9 @@ CLOUD.EditorManager.prototype = {
             this.rectPickEditor = rectPickEditor;
         }
 
+        scope.setEditor(this.rectPickEditor, this.flyEditor);
         this.flyEditor.showControlPanel(bShowControlPanel);
-
         this.flyEditor.activate();
-
-        this.rectPickEditor.slaveEditor = this.flyEditor;
-        scope.setEditor(this.rectPickEditor);
-
-        // 进入fly模式，视图设置为ISO
-        //scope.setStandardView(CLOUD.EnumStandardView.ISO, viewer);
     },
 
     isFlyMode: function() {
