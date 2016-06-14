@@ -12,7 +12,7 @@
 <ul class="projectListWrap">
 <% _.each(data.items,function(item,index){ %>
 		<li class="project" data-pid="<%= item.id %>">
-			<div><img src="<%=item.logoUrl && item.logoUrl['small'] %>"></div>
+			<div><% if(item.logoUrl) {%><img src="<%= item.logoUrl['small'] %>"> <%}%></div>
 			<div>
 				<h4><%= item.name %></h4>
 				<p>
