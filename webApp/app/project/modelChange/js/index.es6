@@ -371,28 +371,28 @@ App.Project.Model = {
         App.Index.Settings.Viewer.fit();
       }
 
-			App.Index.Settings.Viewer.setOverrider('add');
-			App.Index.Settings.Viewer.setOverrider('beforeEdit');
-			App.Index.Settings.Viewer.setOverrider('afterEdit');
-			App.Index.Settings.Viewer.setOverrider('delete');
+			App.Index.Settings.Viewer.setOverrider('add',[]);
+			App.Index.Settings.Viewer.setOverrider('beforeEdit',[]);
+			App.Index.Settings.Viewer.setOverrider('afterEdit',[]);
+			App.Index.Settings.Viewer.setOverrider('delete',[]);
 
 			//判断是新增，修改，删除
 			if(baseId && elementId){
 				//修改
 
-				App.Index.Settings.Viewer.setOverrider('beforeEdit',[baseId]);
-				App.Index.Settings.Viewer.setOverrider('afterEdit',[elementId]);
+				App.Index.Settings.Viewer.setOverrider('beforeEdit');
+				App.Index.Settings.Viewer.setOverrider('afterEdit');
 			}else if(baseId){
 				//删除
 
-				App.Index.Settings.Viewer.setOverrider('delete',[baseId]);
+				App.Index.Settings.Viewer.setOverrider('delete');
 
 			}else{
 				//新增
 
-				App.Index.Settings.Viewer.setOverrider('add',[elementId]);
-
+				App.Index.Settings.Viewer.setOverrider('add');
 			}
+			console.log(baseId,elementId)
 
 			//zoomtobox
 			$.ajax({
@@ -416,12 +416,10 @@ App.Project.Model = {
 								box1.push([max.x,max.y,max.z],[min.x,min.y,min.z]);
 
 								App.Index.Settings.Viewer.zoomToBox(box1);
-debugger
 							}
 						});
 					}else{
 						App.Index.Settings.Viewer.zoomToBox(box1);
-						debugger
 
 					}
 
