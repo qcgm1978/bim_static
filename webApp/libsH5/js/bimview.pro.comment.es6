@@ -12,7 +12,7 @@
 		return;
 	}
 
-	var $comment, AppView, ModelView, viewPointId, clipboard;
+	var $comment, AppView, ModelView, viewPointId, clipboard, atUserArr = [];
 
 	//扩展 批注
 	bimView.prototype.commentInit = function() {
@@ -222,7 +222,7 @@
 
 					} else if (type == "save") {
 						//禁止 二次 点击
-						if ($("#topSaveTip").length>0) {
+						if ($("#topSaveTip").length > 0) {
 							return;
 						}
 						//保存
@@ -412,7 +412,7 @@
 					//批注信息 赋值
 					$(".commentRemark .viewPointInfo").html($item.html());
 
-					if (creatorId == App.Global.User.userId) {
+					if (creatorId == (App.Global.User && App.Global.User.userId)) {
 						$(".commentRemark  .reMarkBox .operators").show();
 					} else {
 						$(".commentRemark  .reMarkBox .operators").hide();
@@ -567,7 +567,7 @@
 					this.$(".txtReMark").at({
 
 						getData: function(name) {
-
+							//返回数据源
 							var data = {
 								URLtype: "autoComplateUser",
 								data: {
@@ -575,9 +575,15 @@
 									name: name
 								}
 							}
-
 							return App.Comm.ajax(data);
+						},
 
+						callback: function($item) {
+							//点击单个用户回调
+							atUserArr.push({
+								userId: $item.data("uid"),
+								userName: $item.find(".name").text().trim()
+							});
 						}
 					});
 					return this;
@@ -597,7 +603,11 @@
 					CommentApi.saveCommentStart(null, "commentViewPoint", (data) => {
 
 						//上传地址或者评论视点后
-						CommentApi.afterUploadAddressViewPoint.call(this, {pictureUrl:data.pic,description:data.name,id:data.id});
+						CommentApi.afterUploadAddressViewPoint.call(this, {
+							pictureUrl: data.pic,
+							description: data.name,
+							id: data.id
+						});
 					});
 				},
 
@@ -784,7 +794,9 @@
 							projectId: App.Project.Settings.projectId,
 							viewPointId: viewPointId,
 							text: this.$(".txtReMark").val().trim(),
+							projectVersionId: App.Project.Settings.versionId,
 							attachments: pictures,
+							receivers: atUserArr,
 							token: App.Project.Settings.token
 						},
 						data = {
@@ -810,7 +822,7 @@
 					App.Comm.ajax(data, (data) => {
 
 						if (data.code == 0) {
-
+							atUserArr = [];
 							CommentCollections.ViewComments.push(data.data);
 							//清空数据
 							$btnEnter.val("评论").data("isSubmit", false);

@@ -7,9 +7,14 @@
 	        	<% $.each(obj,function(i,item){ %>
 	        		 <li class="myItemGroup"><span><%=item.specialty%></span></li>
 	        		 	<ul class="groups">
+	        		 		 
 	                   		<% $.each(item.data,function(i,item){  %>
-	                   			<li class="myItem"  data-differFileVersionId="<%=item.differFileVersionId%>"
-	                   			data-baseFileVersionId="<%=item.baseFileVersionId%>"><%=item.name%></li>
+	                   			<li class="myItem"  
+	                   			data-basemodelid="<%=item.baseModelId%>"   
+	                   		data-differmodelid="<%=item.differModelId%>"
+	                   			data-differFileVersionId="<%=item.differFileVersionId%>"
+	                   			data-baseFileVersionId="<%=item.baseFileVersionId%>">
+	                   			<%=item.name%></li>
 	                   		<% }) %>
 	            		</ul>
 

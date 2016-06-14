@@ -8,11 +8,12 @@
 	        		 <li class="myItemGroup"><span><%=item.specialtyName%></span></li>
 	        		 	<ul class="groups">
 	                   		<% $.each(item.comparisons,function(i,item){  %>
-	                   			<li class="myItem" 
-	                   			data-currentfile="<%=item.currentVersion%>"  
-	                   			data-basefile="<%=item.baseVersion%>" 
-	                   			data-currentmodel="<%=item.currentModel%>" 
-	                   			data-basemodel="<%=item.baseModel%>"><%=item.fileName%></li>
+                   			<li class="myItem"  
+                   			data-currentfile="<%=item.currentVersion%>"  data-basemodelid="<%=item.baseModelId%>"  
+                   		  data-differmodelid="<%=item.differModelId%>" 
+                   			data-basefile="<%=item.baseVersion%>"  
+                   			data-currentmodel="<%=item.currentModel%>"  
+                   			data-basemodel="<%=item.baseModel%>"><%=item.fileName%></li>
 	                   		<% }) %>
 	            		</ul>
 
