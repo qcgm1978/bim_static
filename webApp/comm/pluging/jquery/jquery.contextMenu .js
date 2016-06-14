@@ -115,6 +115,7 @@
 
 	//销毁
 	$.fn.contextMenu.destory = function() {
+		$("body").append($(".jqContextMenu .contextMenu"));
 		$(".jqContextMenu").remove();
 		menu = null;
 	}

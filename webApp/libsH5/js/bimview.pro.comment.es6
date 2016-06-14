@@ -363,8 +363,11 @@
 					var data = this.model.toJSON();
 
 					this.$el.html(this.template(data));
+					
 
 					this.bindContent();
+
+
 
 					return this;
 
