@@ -26,7 +26,7 @@
                     <div class="leftten" data-id="<%= obj.id %>" data-name="">
                        <%  var type = list[i].operator,a1 = "==",a2 = "!=",a3 = "<>",a4 = "><";  %>
                         <%= '"' + list[i].propertyKey + '"'%>
-                        <span class="text"><%=   type == a1 ? "等于：" :  (type == a2 ? "不等于：" :  (type == a3 ? "在如下范围内：" :  (type == a4 ? "在如下范围外：" : "")))%></span>
+                        <span><%=   type == a1 ? "等于：" :  (type == a2 ? "不等于：" :  (type == a3 ? "在如下范围内：" :  (type == a4 ? "在如下范围外：" : "")))%></span>
                     </div>
                     <div class="eIn <%= (type == a1  || type == a2) ? 'active' : ''  %>"><%= '"' + list[i].propertyValue +'"' %></div><!--等于/不等于-->
                     <div class="ioside  <%= (type == a3 || type == a4) ? 'active' : ''  %>"><!--范围 内/外-->

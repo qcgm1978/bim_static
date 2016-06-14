@@ -88,6 +88,7 @@ App.Resources.ArtifactsTplDetail = Backbone.View.extend({
         App.ResourceArtifacts.loading($(".modelContent"));
         App.Comm.ajax(pdata,function(response){
             if(response.code == 0 ){
+                console.log(response);
 
                 //更改模板名称
                 _this.$(".tplDetailTitle h2").text(App.ResourceArtifacts.Status.templateName);
