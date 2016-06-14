@@ -52,7 +52,23 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
         return this;
     },
     initialize:function(){
-        //this.listenTo(this.model,"change",this.render);
+        this.listenTo(this.model,"change",this.render);
+        Backbone.on("modelRuleSelectNone",this.modelRuleSelectNone,this);
+        Backbone.on("modelRuleSelectAll",this.modelRuleSelectAll,this);
+    },
+
+    modelRuleSelectNone:function(){
+        this.$el.attr("data-check","0");
+        if(this.$(".ruleCheck").hasClass("all")){
+            this.$(".ruleCheck").removeClass("all")
+        }
+    },
+
+    modelRuleSelectAll:function(){
+        this.$el.attr("data-check","1");
+        if(!this.$(".ruleCheck").hasClass("all")){
+            this.$(".ruleCheck").addClass("all")
+        }
     },
 
     //查找 项目规则collection，返回规则id数组
@@ -64,21 +80,48 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
 
     ruleCheck:function(e){
         App.Resources.cancelBubble(e);
+        var _this = this;
+
+        var  modelRuleList = App.ResourceArtifacts.TplCollectionRule.filter(function(item){
+                return item.get("ruleId") == _this.model.get("id");
+        });
+
+        var preInRule =  _.filter(App.ResourceArtifacts.modelRuleSaveData.ruleIdsIn,function(item){
+            return item == _this.model.get("id");
+        });
+        var preDelRule = _.filter(App.ResourceArtifacts.modelRuleSaveData.ruleIdsDel,function(item){
+            return item == _this.model.get("id");
+        });
+
+
         var ele = $(e.target);
         var allSele = ele.closest("ul").find("li");
         Backbone.trigger("modelRuleHalf");
         if(ele.hasClass("all")){
             ele.removeClass("all");
             ele.closest("li").attr("data-check","0");
+
+            if(modelRuleList.length && !preInRule.length && !preDelRule.length){
+                App.ResourceArtifacts.modelRuleSaveData.ruleIdsDel.push(_this.model.get("id"));
+            }
+
+
             var checked1 = _.filter(allSele,function(item){
                 return $(item).attr("data-check") == "1"
             });
-            console.log(checked1.length);
             if(!checked1.length){
                 Backbone.trigger("modelRuleEmpty");
             }
         }else{
             ele.closest("li").attr("data-check","1");
+
+
+            if(!modelRuleList.length && !preInRule.length && !preDelRule.length){
+                App.ResourceArtifacts.modelRuleSaveData.ruleIdsIn.push(_this.model.get("id"));
+            }
+
+
+
             var checked2 = _.filter(allSele,function(item){
                 return $(item).attr("data-check") == "0"
             });

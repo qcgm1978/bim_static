@@ -23,7 +23,6 @@ App.Services.MappingRuleWindow = Backbone.View.extend({
 
     //数据加载
     addOne:function(model){
-        console.log(model);
         var newView = new App.Services.MappingRuleWindowDetail({model:model});
         this.$(".projectMappingModelList ul").append(newView.render().el);
         App.Comm.initScroll(this.$el.find(".projectMappingRuleWindow"),"y");
@@ -36,7 +35,6 @@ App.Services.MappingRuleWindow = Backbone.View.extend({
             data,
             templateId  = $(".projectMappingModelList li.active .item").data("id"),
             name = $(".projectMappingModelList li.active .item").text();
-        console.log(templateId);
 
         data = {
             URLtype:"modifyProjectMappingRule",
@@ -48,6 +46,7 @@ App.Services.MappingRuleWindow = Backbone.View.extend({
         };
 
         App.Comm.ajax(data,function(response){
+            console.log(response);
             if(response.code == 0){
                 $(".mappingHeader .nameBox").text(name);
             }else{

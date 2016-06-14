@@ -10,6 +10,24 @@ App.ResourceArtifacts={
         App.ResourceArtifacts.Status.rule.targetName = "";
     },
 
+    modelRuleSaveData:{
+        templateId: "",
+        templateName:"",
+        ruleIdsIn:[],//插入的规则id
+        ruleIdsDel:[],//删除的规则id
+        codeIdsIn:[],//插入的目标编码
+        codeIdsDel:[]//删除的目标编码
+    },
+
+    resetModelRuleSaveData:function(){
+        App.ResourceArtifacts.modelRuleSaveData.templateId ="";
+        App.ResourceArtifacts.modelRuleSaveData.templateName = "";
+        App.ResourceArtifacts.modelRuleSaveData.ruleIdsIn = [];
+        App.ResourceArtifacts.modelRuleSaveData.ruleIdsDel = [];
+        App.ResourceArtifacts.modelRuleSaveData.codeIdsIn = [];
+        App.ResourceArtifacts.modelRuleSaveData.codeIdsDel = [];
+    },
+
 
     Status:{
         presentPlan:null,  //当前计划或质量，提交数据
@@ -289,7 +307,6 @@ App.ResourceArtifacts={
 
             this.getTpl();
         }else{//规则库
-
             $(".mappingRule .library").addClass("active").siblings("a").removeClass("active");
             _this.$el.append(this.menu.render().el);//菜单
             this.menu.$(".plans").html(this.plans.render().el);//计划节点
@@ -326,7 +343,8 @@ App.ResourceArtifacts={
         pdata  = {
             URLtype:"fetchArtifactsPlan",
             data:{
-                type : App.ResourceArtifacts.Status.type
+                type : App.ResourceArtifacts.Status.type,
+                templateId:App.ResourceArtifacts.Status.templateId
             }
         };
         App.ResourceArtifacts.PlanRules.reset();
@@ -347,7 +365,8 @@ App.ResourceArtifacts={
             URLtype:'fetchArtifactsQuality',
             data:{
                 type:App.ResourceArtifacts.Status.type,
-                standardType: "GC"
+                standardType: "GC",
+                templateId:App.ResourceArtifacts.Status.templateId
             }
         };
         App.ResourceArtifacts.PlanRules.reset();
@@ -392,9 +411,7 @@ App.ResourceArtifacts={
             App.ResourceArtifacts.delays = setTimeout(function(){
                // var as = ;
                 App.ResourceArtifacts.PlanNode.add();
-
                 _this.delay();
-
                 n++;
             },100);
         }

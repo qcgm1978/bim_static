@@ -12,8 +12,9 @@ App.Services.viewMappingRule= Backbone.View.extend({
 
 	template:_.templateUrl('/services/tpls/project/index.mappingrule.html'),
 
-	initialize(data){
-		this.listenTo(App.Services.ProjectCollection.ProjectMappingRuleCollection,"change",this.render);
+	initialize(model){
+		//this.listenTo(App.Services.ProjectCollection.ProjectMappingRuleCollection,"add",this.addData);
+		this.model = model;
 		Backbone.on("modelChange",this.modelChange,this);
 	},
 
@@ -21,14 +22,11 @@ App.Services.viewMappingRule= Backbone.View.extend({
 		this.$(".nameBox").text();//写入名字
 	},
 
-	render(data){
-		if(data){
-			this.$el.html(this.template(this.model.toJSON()));
-		}else{
-			this.$el.html(this.template)
-		}
+	render(){
+		this.$el.html(this.template(this.model.toJSON()));
 		return this;
 	},
+
 	//修改模板
 	changeTpl:function(){
 		var frame = new App.Services.MappingRuleWindow().render().el;
