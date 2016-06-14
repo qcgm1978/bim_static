@@ -80,6 +80,7 @@
 .mod-dialog .wrapper .content {
     padding: 20px;
     background-color: #FFFFFF;
+    box-sizing: content-box;
 }
 
 .mod-dialog .wrapper .footer {
