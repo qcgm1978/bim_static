@@ -52,9 +52,8 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
     select:function(e){
         var $pre = $(e.target),_this = this;
 
-        if(!App.ResourceArtifacts.Status.saved ){
-            alert("«Îœ»±£¥Ê£°");
-        }
+        App.ResourceArtifacts.Status.saved = true;
+
 
         if($pre.closest(".artifactsNav").length){
             $pre.addClass("active").siblings("li").removeClass("active");
