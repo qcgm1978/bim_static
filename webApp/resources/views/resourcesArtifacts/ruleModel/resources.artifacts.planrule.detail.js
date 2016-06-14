@@ -52,7 +52,23 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
         return this;
     },
     initialize:function(){
-        //this.listenTo(this.model,"change",this.render);
+        this.listenTo(this.model,"change",this.render);
+        Backbone.on("modelRuleSelectNone",this.modelRuleSelectNone,this);
+        Backbone.on("modelRuleSelectAll",this.modelRuleSelectAll,this);
+    },
+
+    modelRuleSelectNone:function(){
+        this.$el.attr("data-check","0");
+        if(this.$(".ruleCheck").hasClass("all")){
+            this.$(".ruleCheck").removeClass("all")
+        }
+    },
+
+    modelRuleSelectAll:function(){
+        this.$el.attr("data-check","1");
+        if(!this.$(".ruleCheck").hasClass("all")){
+            this.$(".ruleCheck").addClass("all")
+        }
     },
 
     //查找 项目规则collection，返回规则id数组

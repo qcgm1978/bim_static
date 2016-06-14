@@ -51,9 +51,17 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
         if(ele.hasClass("all")){
             ele.removeClass("all");
             ele.closest("li").attr("data-check","0");
+            if(this.$el.hasClass("active")){
+                Backbone.trigger("modelRuleSelectNone");
+                //触发全不选事件
+            }
         }else{
             ele.addClass("all");
             ele.closest("li").attr("data-check","1");
+            if(this.$el.hasClass("active")){
+                //触发全选事件
+                Backbone.trigger("modelRuleSelectAll");
+            }
         }
         ele.removeClass("half");
         //不设置模型类型
