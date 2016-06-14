@@ -102,7 +102,7 @@ var AppRoute = Backbone.Router.extend({
 	},
 
 	//直接转到视点
-	projectViewPoint(id, versionId,viewPintId){
+	projectViewPoint:function(id, versionId,viewPintId){
 		 
 		this.reset();
 
