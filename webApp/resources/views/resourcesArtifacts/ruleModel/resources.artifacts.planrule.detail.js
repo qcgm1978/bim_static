@@ -24,7 +24,7 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
         "click .choose":"choose",
         "click .delRule": "delRule",
         "focus .categoryCode": "legend",
-        "click .myDropText":"seleRule",
+        "click .text":"seleRule",
         "click .myItem":"myItem",
         "click .ruleCheck":"ruleCheck"
     },
@@ -231,6 +231,13 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
                     right = ""
                 }
 
+                //有效性验证
+                if(leftValue.val() && rightValue.val()){
+                    if(parseInt(leftValue.val())){
+
+                    }
+                }
+
                 var str = left  + leftValue.val() +","+ rightValue.val()+ right ;
                 Rulist[i].propertyValue = str;
             }
@@ -290,13 +297,9 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
                     if(response.code == 0 && response.data){
                         _this.model.set({id:response.data.id},{silent:true});
                         _this.$el.remove();
-
                         App.ResourceArtifacts.PlanRules.push(_this.model);
-
                         App.ResourceArtifacts.Status.rule.count = App.ResourceArtifacts.PlanRules.length;
-
                         Backbone.trigger("resetTitle");
-
                     }
                 }
             });
@@ -423,9 +426,9 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
 
     //切换规则
     seleRule:function(e) {
-        $(".myDropList").hide();
         var _this = $(e.target);
-        _this.siblings(".myDropList").show();
+        $(".myDropList").hide();
+        _this.closest(".myDropText").siblings(".myDropList").show();
     },
 
     //选择规则，切换输入方式

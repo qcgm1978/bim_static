@@ -66,37 +66,37 @@ App.Project = {
 	bindContextMenu:function($el){
 		var _this=this;
 		//右键菜单
- 		if (!document.getElementById("listContext")) {
+ 		if (!document.getElementById("listContextProject")) {
  			//右键菜单
- 			var contextHtml = _.templateUrl("/resources/tpls/context/listContext.html", true);
+ 			var contextHtml = _.templateUrl("/projects/tpls/listContext.html", true);
  			$("body").append(contextHtml);
  		}  
 
-		$el.contextMenu('listContext', {
+		$el.contextMenu('listContextProject', {
 			//显示 回调
 			onShowMenuCallback: function(event) {
 				var $item = $(event.target).closest(".item");
-				$("#reNameModel").removeClass('disable');
+				$("#reNameModelProject").removeClass('disable');
 				//预览
 				if ($item.find(".folder").length > 0) {
-					$("#previewModel").addClass("disable");
-					$("#previewModel").find("a").removeAttr("href");
+					$("#previewModelProject").addClass("disable");
+					$("#previewModelProject").find("a").removeAttr("href");
 				} else {
 
-					$("#previewModel").removeClass("disable");
+					$("#previewModelProject").removeClass("disable");
 					var href = $item.find(".fileName .text").prop("href");
-					$("#previewModel").find("a").prop("href", href);
+					$("#previewModelProject").find("a").prop("href", href);
 
 					//重命名 未上传
 					if ($item.data("status") == 1) {
-						$("#reNameModel").addClass('disable');
+						$("#reNameModelProject").addClass('disable');
 					}
 
 				}
 				if(App.Project.Settings.CurrentVersion.status!=9){
-					$("#reNameModel").addClass('disable').attr('disabled','disabled');
-					$("#downLoadModel").addClass('disable').attr('disabled','disabled');
-					$("#delModel").addClass('disable').attr('disabled','disabled');
+					$("#reNameModelProject").addClass('disable').attr('disabled','disabled');
+					$("#downLoadModelProject").addClass('disable').attr('disabled','disabled');
+					$("#delModelProject").addClass('disable').attr('disabled','disabled');
 				}
 				$item.addClass("selected").siblings().removeClass("selected");
 			},
@@ -134,7 +134,7 @@ App.Project = {
 				},
 				'reNameModel': function(item) {
 					//重命名
-					let $reNameModel = $("#reNameModel");
+					let $reNameModel = $("#reNameModelProject");
 					//不可重命名状态
 					if ($reNameModel.hasClass('disable')) {
 						return;
