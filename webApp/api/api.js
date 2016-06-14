@@ -201,7 +201,7 @@ App.API = {
 		createNewFolder: "doc/{projectId}/{projectVersionId}/file", // 创建新文件夹 ?parentId={parentId}&filePath={filePath}
 
 		//映射规则库
-		fetchArtifactsCategoryRule:"dataJson/resources/fetchArtifactsCategoryRule.json",//获取分类编码   platform/mapping/rule/category/coding?parentCode={parentCode}  //接口无数据
+		fetchArtifactsCategoryRule:"platform/mapping/rule/category/coding",//获取分类编码   platform/mapping/rule/category/coding?parentCode={parentCode}  //接口无数据
 		fetchArtifactsPlan:"platform/mapping/rule/plan/standard",//计划节点    platform/mapping/rule/plan/standard?type={type}  模块化列表  1:标准规则；2：项目规则
 		fetchArtifactsPlanRule:"platform/mapping/rule/target/code/{code}?",//计划节点规则获取     //platform/mapping/rule/target/code/{code}?biz={biz}&type={type}&projectId={projectId}
 		createArtifactsPlanNewRule:"platform/mapping/rule/create",//计划节点新建规则      platform/mapping/rule/create?projectId={projectId}    如果为标准映射规则不用传projectId

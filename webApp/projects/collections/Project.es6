@@ -173,7 +173,6 @@ App.Project = {
 	},
 
 	editFolderName: function($item) {
-		debugger
 		var that = this,
 			fileVersionId = $item.find(".filecKAll").data("fileversionid"),
 			name = $item.find(".txtEdit").val().trim();
@@ -190,7 +189,7 @@ App.Project = {
 		};
 
 		App.Comm.ajax(data, function(data) {
-			if (data.message == "success") {
+			if (data.code == 0) {
 				var id = data.data.id;
 				$("#projectContainer .treeViewMarUl span[data-id='" + id + "']").text(name);
 			} else {
@@ -199,6 +198,7 @@ App.Project = {
 				if ($prevEdit.length > 0) {
 					$prevEdit.prev().show().end().nextAll().remove().end().remove();
 				}
+				$.tip({type:'alarm',message:'操作失败:'+data.message})
 
 			}
 		});
