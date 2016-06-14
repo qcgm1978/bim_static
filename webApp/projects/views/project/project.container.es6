@@ -323,7 +323,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			type: 'model',
 			element: $("#projectContainer .modelContainerContent"),
 			sourceId: App.Project.Settings.DataModel.sourceId,
-			etag:App.Project.Settings.DataModel.etag, //"a1064f310fa8204efd9d1866ef7370ee" ||
+			etag: App.Project.Settings.DataModel.etag, //"a1064f310fa8204efd9d1866ef7370ee" ||
 			projectId: App.Project.Settings.projectId,
 			projectVersionId: App.Project.Settings.CurrentVersion.id
 		});
@@ -357,7 +357,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		});
 
 		//分享
-		if (App.Project.Settings.type == "token" && location.hash.indexOf("share") > 0) {
+		if (App.Project.Settings.type == "token" && location.hash.indexOf("share") > 0 || App.Project.Settings.viewPintId) {
 
 			viewer.on("loaded", function() {
 				//加载数据

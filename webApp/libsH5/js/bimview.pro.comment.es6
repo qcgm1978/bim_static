@@ -197,7 +197,14 @@
 							//获取数据
 							CommentCollections.Project.projectId = App.Project.Settings.projectId;
 							CommentCollections.Project.reset();
-							CommentCollections.Project.fetch();
+							CommentCollections.Project.fetch({
+								success() {
+									//存在viewpintid 调到评论
+									if (App.Project.Settings.viewPintId) {
+										$comment.find(".remarkCount_"+App.Project.Settings.viewPintId).click();
+									}
+								}
+							});
 						}
 
 
@@ -581,7 +588,7 @@
 						callback: function($item) {
 							//点击单个用户回调
 							atUserArr.push({
-								userId: $item.data("uid"),
+								userId: $item.data("uid") + "",
 								userName: $item.find(".name").text().trim()
 							});
 						}
@@ -794,7 +801,7 @@
 							projectId: App.Project.Settings.projectId,
 							viewPointId: viewPointId,
 							text: this.$(".txtReMark").val().trim(),
-							projectVersionId: App.Project.Settings.versionId,
+							projectVersionId: +App.Project.Settings.versionId,
 							attachments: pictures,
 							receivers: atUserArr,
 							token: App.Project.Settings.token
