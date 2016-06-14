@@ -6,14 +6,14 @@
 	$.fn.mmhSlider = function(name, options) {
 		var _setting = null;
 		if (typeof name === 'string') {
-			return null;
+			return $(this);
 		} else {
 			options = name;
 			_setting = $.extend({},
 				$.fn.mmhSlider.defaults, options);
 			$.fn.mmhSlider.methods['init']($(this), _setting);
 		}
-
+		return $(this);
 	}
 	$.fn.mmhSlider.methods = {
 		init: function($dom, setting) {

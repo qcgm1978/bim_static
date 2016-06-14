@@ -52,9 +52,8 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
     select:function(e){
         var $pre = $(e.target),_this = this;
 
-        if(!App.ResourceArtifacts.Status.saved ){
-            alert("请先保存！");
-        }
+        App.ResourceArtifacts.Status.saved = true;
+
 
         if($pre.closest(".artifactsNav").length){
             $pre.addClass("active").siblings("li").removeClass("active");
@@ -70,9 +69,10 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
                 return
             }
 
-
             this.$(".qualifyC").hide();
+            this.$(".qualifyC li").removeClass("active");
             this.$(".plans").show();
+
             this.resetRule();
 
         }else if(quality){//质量
@@ -85,6 +85,7 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
 
             this.$(".plans").hide();
             this.$(".qualifyC").show();
+            this.$(".plans li").removeClass("active");
         }
         this.$(".rules").show();
     },
@@ -107,7 +108,7 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
         App.ResourceArtifacts.Status.rule.targetCode = "";
         App.ResourceArtifacts.Status.rule.targetName = "";
         this.$(".rules h2 .name").html("没有选择模块/质量标准");
-        this.$(".ruleContentRuleList ul").html("<li><div class='ruleTitle delt'>没有选择模块/质量标准</div></li>");
+        this.$(".ruleContentRuleList ul").html("<li><div class='ruleTitle delt'>暂无内容</div></li>");
     },
 
     //为项目设置创建规则

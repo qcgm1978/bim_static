@@ -11,7 +11,7 @@
       new bimView.sidebar.init(_opt,obj);
       obj.on('loaded',function(){
         $('.modelSidebar').addClass('show');
-        viewer.zoomToBuilding();
+        viewer.zoomToBuilding(0,1.15);
       });
       return viewer;
     },
@@ -257,7 +257,7 @@
         id:'rotateObj',
         icon:'m-rotateObj',
         title:'绕构件旋转',
-        fn:'rotateMouse',
+        fn:'rotateObj',
         keyCode:'',
         type:'rotate',
         group:'3'

@@ -263,14 +263,16 @@ App.ResourceArtifacts={
     })),
 
     init:function(_this,optionType) {
+
+        $("#artifacts").addClass("services_loading");
+
+        this.ArtifactsIndexNav = new App.Resources.ArtifactsIndexNav();
         //项目映射入口
-        if(optionType != "library" ){
-            //_this.$el.html("");//处理菜单
-            //处理名称
-        }else{
-            //项目id
+        if(optionType == "library" ||  optionType == "template"){
             App.ResourceArtifacts.Status.projectId = "";
-            _this.$el.append( new App.Resources.ArtifactsIndexNav().render().el);
+            _this.$el.append(this.ArtifactsIndexNav.render().el);
+        }else{
+            //项目部分入口
         }
 
         //公用组件
@@ -288,13 +290,14 @@ App.ResourceArtifacts={
 
         if(optionType == "template" ){//规则模板
 
+            App.ResourceArtifacts.Status.qualityStandardType = "GC";
+
+            _this.$(".mappingRule .template").addClass("active").siblings("a").removeClass("active");
+
             if(App.ResourceArtifacts.Settings.ruleModel  ==2){
                 App.ResourceArtifacts.Status.rule.biz =2
             }
 
-            $(".mappingRule .template").addClass("active").siblings("a").removeClass("active");
-
-            $(".breadcrumbNav .mappingRule").show();
             this.tplFrame = new App.Resources.ArtifactsTplFrame();
             this.tplList = new App.Resources.ArtifactsTplList();
 
@@ -308,7 +311,7 @@ App.ResourceArtifacts={
             }
 
 
-            $(".mappingRule .library").addClass("active").siblings("a").removeClass("active");
+            _this.$(".mappingRule .library").addClass("active").siblings("a").removeClass("active");
             _this.$el.append(this.menu.render().el);//菜单
             this.menu.$(".plans").html(this.plans.render().el);//计划节点
             this.menu.$(".qualifyC").hide().html(this.quality.render().el);
@@ -323,8 +326,6 @@ App.ResourceArtifacts={
         }
     },
 
-
-
     //获取分类编码
     loaddeaprt:function(){
         //获取分类编码
@@ -336,6 +337,7 @@ App.ResourceArtifacts={
             if(response.code == 0 && response.data && response.data.length){
                 App.Resources.artifactsTreeData = response.data;
             }
+            $("#artifacts").removeClass("services_loading");
         });
     },
     //获取计划节点
@@ -344,10 +346,15 @@ App.ResourceArtifacts={
         pdata  = {
             URLtype:"fetchArtifactsPlan",
             data:{
-                type : App.ResourceArtifacts.Status.type,
-                templateId:App.ResourceArtifacts.Status.templateId
+                type : App.ResourceArtifacts.Status.type
             }
         };
+
+        if(App.ResourceArtifacts.Status.templateId){
+            pdata.data.templateId = App.ResourceArtifacts.Status.templateId;
+        }else if(App.ResourceArtifacts.Status.projectId){
+            pdata.data.projectId = App.ResourceArtifacts.Status.projectId;
+        }
         App.ResourceArtifacts.PlanRules.reset();
         App.ResourceArtifacts.PlanNode.reset();
         App.Comm.ajax(pdata,function(response){
@@ -355,8 +362,9 @@ App.ResourceArtifacts={
                 if(response.data.length){
                 App.ResourceArtifacts.PlanNode.add(response.data);
                 }else{
-                    _this.resetRuleList();
+                    Backbone.trigger("mappingRuleNoContent");
                 }
+                $("#artifacts").removeClass("services_loading");
             }
         });
     },
@@ -366,17 +374,23 @@ App.ResourceArtifacts={
             URLtype:'fetchArtifactsQuality',
             data:{
                 type:App.ResourceArtifacts.Status.type,
-                standardType: "GC",
-                templateId:App.ResourceArtifacts.Status.templateId
+                standardType: App.ResourceArtifacts.Status.qualityStandardType
             }
         };
+
+        if(App.ResourceArtifacts.Status.templateId){
+            pdata.data.templateId = App.ResourceArtifacts.Status.templateId;
+        }else if(App.ResourceArtifacts.Status.projectId){
+            pdata.data.projectId = App.ResourceArtifacts.Status.projectId;
+        }
+
         App.ResourceArtifacts.PlanRules.reset();
-        App.ResourceArtifacts.Status.quality.type = 1 ;
         App.Comm.ajax(pdata,function(response){
             if(response.code == 0 && response.data.length){
                 var list = App.Resources.artifactsQualityTree(response.data);
                 this.$(".qualityMenuList").html(list);
             }
+            $("#artifacts").removeClass("services_loading");
         });
     },
 
@@ -391,20 +405,19 @@ App.ResourceArtifacts={
         App.ResourceArtifacts.TplCollection.reset();
         App.ResourceArtifacts.PlanRules.reset();
         App.Comm.ajax(pdata,function(response){
-            console.log(response);
             if(response.code == 0 && response.data){
                 if(response.data.length){
                     App.ResourceArtifacts.TplCollection.add(response.data);
                 }else{
-
                 }
             }
+            $("#artifacts").removeClass("services_loading");
         });
     },
 
 
     //延迟
-    delay:function(data){
+   /* delay:function(data){
     var _this = this , batch , length = data.length , arr = []  , n = 1 , last;
         batch = Math.ceil(length/20); //循环次数
         last = length % 20; //余数
@@ -416,15 +429,12 @@ App.ResourceArtifacts={
                 n++;
             },100);
         }
-    },
+    },*/
     loading:function(ele){
         $(ele).addClass("services_loading");
     },
 
     loaded:function(ele){
         $(ele).removeClass("services_loading");
-    },
-    resetRuleList:function(){
-        $(".ruleContent ul").html("<li><div class='ruleTitle delt'>暂无内容</div></li>");
     }
 };

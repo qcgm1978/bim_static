@@ -63,12 +63,10 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 	//绑定右键菜单
 	bindContext: function(event) {
 
-
 		var that = this;
 		this.$el.contextMenu('listContext', {
 			//显示 回调
 			onShowMenuCallback: function(event) {
-				 
 				var $item = $(event.target).closest(".item");
 				$("#reNameModel").removeClass('disable');
 				//预览
@@ -88,7 +86,14 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 
 				}
 				$item.addClass("selected").siblings().removeClass("selected");
-
+				//权限控制
+				var Auth = App.AuthObj.lib.model;
+				if(!Auth.edit){
+					$('#reNameModel,#delModel').addClass('disable');
+					if(!Auth.download || !App.ResourceModel.Settings.CurrentVersion.byProjectRef){
+						$('#downLoadModel').addClass('disable');
+					}
+				}
 
 
 			},
@@ -99,7 +104,9 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 
 				},
 				'downLoadModel': function(item) {
-
+					if($('#downLoadModel').is('.disable')){
+						return ''
+					}
 					//下载
 					var $item = $(item);
 
@@ -126,13 +133,17 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 
 				},
 				'delModel': function(item) {
-
+					if($('#delModel').is('.disable')){
+						return ''
+					}
 					//删除提示
 					App.ResourceModel.delFileDialog($(item));
 
 				},
 				'reNameModel': function(item) {
-
+					if($('#reNameModel').is('.disable')){
+						return ''
+					}
 					//重命名
 					let $reNameModel = $("#reNameModel");
 					//不可重命名状态

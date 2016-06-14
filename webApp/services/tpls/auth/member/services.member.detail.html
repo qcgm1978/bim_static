@@ -2,7 +2,11 @@
 <div class="sele">
     <div class="left">
             <i class="memCheck"></i>
-            <span class="ushead<%= obj.orgId ? ' oz' : '' %>"><img src="<%= obj.photoUrl %>" width="100%"></span>
+            <span class="ushead<%= obj.orgId ? ' oz' : '' %>">
+                <% if(obj.photoUrl){%>
+                <img src="<%= obj.photoUrl %>" width="100%">
+                <%}%>
+            </span>
             <span class=" <%= obj.orgId ? 'name' : '' %>"><%= obj.name %></span>
     </div>
     <div class="roles">

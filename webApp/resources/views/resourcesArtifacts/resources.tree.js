@@ -34,7 +34,7 @@ App.Resources.artifactsTree = function(dataList,code){
     return ele;
 };
 //质量标准tree
-App.Resources.artifactsQualityTree = function(dataList){
+App.Resources.artifactsQualityTree = function(dataList,n){
     var data = dataList;
     var ele  = $("<ul></ul>");
     for(var i =0 ; i < data.length ; i++){

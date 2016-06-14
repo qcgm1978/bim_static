@@ -5,6 +5,8 @@ App.Resources.ArtifactsPlanRuleTitle = Backbone.View.extend({
 
     tagName:"div",
 
+    className:"pozero",
+
     template: _.templateUrl("/resources/tpls/resourcesArtifacts/ruleModel/resources.artifacts.planruletitle.html"),
 
     events:{
@@ -36,7 +38,6 @@ App.Resources.ArtifactsPlanRuleTitle = Backbone.View.extend({
         }//没有选择计划无法创建规则
         if( !App.ResourceArtifacts.Status.saved){
             alert("您还有没保存的");
-            //查找未保存的元素并高亮提示变红
             return
         }
         //重置删除状态
@@ -52,8 +53,8 @@ App.Resources.ArtifactsPlanRuleTitle = Backbone.View.extend({
         model.set({mappingCategory:operatorData},{silent:true});
         var container = new App.Resources.ArtifactsPlanRuleDetail({model:model});
 
-        $(".rules>div").append(container.render().el).show();
-        $(".rules>div>li:last-child .ruleDetail").show();
+        $(".ruleContentRuleList ul.outsideList").append(container.render().el).show();
+        $(".ruleContentRuleList ul.outsideList>li:last-child .ruleDetail").show();
         App.ResourceArtifacts.Status.saved = false;
     }
 

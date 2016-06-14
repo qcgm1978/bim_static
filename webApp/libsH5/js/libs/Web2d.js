@@ -1354,6 +1354,7 @@ CLOUD.MiniMap = function (viewer) {
         _svgNode = getImageNode(0);
         _svgNode.href.baseVal = url;
         _svgNode.setAttribute("id", "Floor-" + _imageCount);
+        _svgNode.setAttribute("preserveAspectRatio", "none");
         _svgNode.setAttribute("width", width + "");
         _svgNode.setAttribute("height", height + "");
         _svgNode.setAttribute("x", (-0.5 * width) + "");
@@ -3412,6 +3413,10 @@ CLOUD.Extensions.CommentCloud = function (editor, id) {
 
     this.isSeal = false; // 是否封口
 
+    this.trackingPoint = {x: 0, y: 0, z:0};
+    this.isTrack = false;
+    this.isEnableTrack = false;
+
     this.createShape();
     this.addDomEventListeners();
 };
@@ -3509,7 +3514,7 @@ CLOUD.Extensions.CommentCloud.prototype.updateTransformMatrix = function () {
 CLOUD.Extensions.CommentCloud.prototype.updateStyle = function () {
 
     // 小于两个点，不处理
-    if (this.shapePoints.length < 2) return;
+    if (this.shapePoints.length < 1) return;
 
     this.updateTransformMatrix();
 
@@ -3562,32 +3567,29 @@ CLOUD.Extensions.CommentCloud.prototype.calculateShapePath = function () {
     var lastShapePoint = {};
     var controlPoint, clientShapePoint;
 
-    if (len < 2) {
+    if (len < 1) {
         return;
     }
 
-    for (var i = 0; i < len; i++) {
+    if (len === 1) {
 
-        clientShapePoint = this.editor.worldToClient(this.shapePoints[i].x, this.shapePoints[i].y, this.shapePoints[i].z);
+        clientShapePoint = this.editor.worldToClient(this.shapePoints[0].x, this.shapePoints[0].y, this.shapePoints[0].z);
         currentShapePoint.x = clientShapePoint.x;
         currentShapePoint.y = clientShapePoint.y;
 
-        if (i === 0) { // 第一个点
+        shapePath.push('M');
+        shapePath.push(currentShapePoint.x);
+        shapePath.push(currentShapePoint.y);
 
-            shapePath.push('M');
-            shapePath.push(currentShapePoint.x);
-            shapePath.push(currentShapePoint.y);
+        lastShapePoint.x = currentShapePoint.x;
+        lastShapePoint.y = currentShapePoint.y;
 
-            originShapePoint.x = currentShapePoint.x;
-            originShapePoint.y = currentShapePoint.y;
+        if (this.isTrack) {
 
-            lastShapePoint.x = currentShapePoint.x;
-            lastShapePoint.y = currentShapePoint.y;
-
-        } else {
+            var trackingPoint = this.editor.worldToClient(this.trackingPoint.x, this.trackingPoint.y, this.trackingPoint.z);
 
             // 计算控制点
-            controlPoint = this.calculateControlPoint(lastShapePoint, currentShapePoint);
+            controlPoint = this.calculateControlPoint(lastShapePoint, trackingPoint);
             shapeControlPoints.push(controlPoint.x);
             shapeControlPoints.push(controlPoint.y);
 
@@ -3595,17 +3597,35 @@ CLOUD.Extensions.CommentCloud.prototype.calculateShapePath = function () {
             shapePath.push(controlPoint.x);
             shapePath.push(controlPoint.y);
             shapePath.push(',');
-            shapePath.push(currentShapePoint.x);
-            shapePath.push(currentShapePoint.y);
+            shapePath.push(trackingPoint.x);
+            shapePath.push(trackingPoint.y);
 
-            lastShapePoint.x = currentShapePoint.x;
-            lastShapePoint.y = currentShapePoint.y;
+        }
 
-            // 最后一个点, 处理封口
-            if ((i === len - 1) && this.isSeal) {
+    } else {
+
+        for (var i = 0; i < len; i++) {
+
+            clientShapePoint = this.editor.worldToClient(this.shapePoints[i].x, this.shapePoints[i].y, this.shapePoints[i].z);
+            currentShapePoint.x = clientShapePoint.x;
+            currentShapePoint.y = clientShapePoint.y;
+
+            if (i === 0) { // 第一个点
+
+                shapePath.push('M');
+                shapePath.push(currentShapePoint.x);
+                shapePath.push(currentShapePoint.y);
+
+                originShapePoint.x = currentShapePoint.x;
+                originShapePoint.y = currentShapePoint.y;
+
+                lastShapePoint.x = currentShapePoint.x;
+                lastShapePoint.y = currentShapePoint.y;
+
+            } else {
 
                 // 计算控制点
-                controlPoint = this.calculateControlPoint(lastShapePoint, originShapePoint);
+                controlPoint = this.calculateControlPoint(lastShapePoint, currentShapePoint);
                 shapeControlPoints.push(controlPoint.x);
                 shapeControlPoints.push(controlPoint.y);
 
@@ -3613,9 +3633,48 @@ CLOUD.Extensions.CommentCloud.prototype.calculateShapePath = function () {
                 shapePath.push(controlPoint.x);
                 shapePath.push(controlPoint.y);
                 shapePath.push(',');
-                shapePath.push(originShapePoint.x);
-                shapePath.push(originShapePoint.y);
-                shapePath.push('Z');
+                shapePath.push(currentShapePoint.x);
+                shapePath.push(currentShapePoint.y);
+
+                lastShapePoint.x = currentShapePoint.x;
+                lastShapePoint.y = currentShapePoint.y;
+
+                // 最后一个点, 处理封口
+                if (i === len - 1) {
+
+                    if (this.isTrack) {
+
+                        var trackingPoint = this.editor.worldToClient(this.trackingPoint.x, this.trackingPoint.y, this.trackingPoint.z);
+
+                        // 计算控制点
+                        controlPoint = this.calculateControlPoint(lastShapePoint, trackingPoint);
+                        shapeControlPoints.push(controlPoint.x);
+                        shapeControlPoints.push(controlPoint.y);
+
+                        shapePath.push('Q');
+                        shapePath.push(controlPoint.x);
+                        shapePath.push(controlPoint.y);
+                        shapePath.push(',');
+                        shapePath.push(trackingPoint.x);
+                        shapePath.push(trackingPoint.y);
+
+                    } else if (this.isSeal) {
+
+                        // 计算控制点
+                        controlPoint = this.calculateControlPoint(lastShapePoint, originShapePoint);
+                        shapeControlPoints.push(controlPoint.x);
+                        shapeControlPoints.push(controlPoint.y);
+
+                        shapePath.push('Q');
+                        shapePath.push(controlPoint.x);
+                        shapePath.push(controlPoint.y);
+                        shapePath.push(',');
+                        shapePath.push(originShapePoint.x);
+                        shapePath.push(originShapePoint.y);
+                        shapePath.push('Z');
+                    }
+
+                }
             }
         }
     }
@@ -3661,6 +3720,35 @@ CLOUD.Extensions.CommentCloud.prototype.addPoint = function (point) {
     this.updateStyle();
 };
 
+CLOUD.Extensions.CommentCloud.prototype.setTrackingPoint = function (point) {
+
+    var worldPoint = this.editor.clientToWorld(point.x, point.y);
+    this.trackingPoint.x = worldPoint.x;
+    this.trackingPoint.y = worldPoint.y;
+    this.trackingPoint.z = worldPoint.z;
+
+    this.updateStyle();
+};
+
+CLOUD.Extensions.CommentCloud.prototype.startTrack = function () {
+    this.isTrack = true;
+};
+
+CLOUD.Extensions.CommentCloud.prototype.finishTrack = function () {
+    this.isTrack = false;
+};
+
+CLOUD.Extensions.CommentCloud.prototype.enableTrack = function () {
+    this.isEnableTrack = true;
+};
+
+CLOUD.Extensions.CommentCloud.prototype.disableTrack = function () {
+    this.isEnableTrack = false;
+};
+
+CLOUD.Extensions.CommentCloud.prototype.getTrackState = function () {
+    return this.isEnableTrack;
+};
 
 CLOUD.Extensions.CommentCloud.prototype.getBoundingBox = function () {
 
@@ -3687,8 +3775,6 @@ CLOUD.Extensions.CommentCloud.prototype.getBoundingBox = function () {
 
     var center = box.center();
     var size = box.size();
-
-    //var bBox = this.shape.getBBox();
 
     return {
         x: center.x - 0.5 * size.x,
@@ -5459,6 +5545,7 @@ CLOUD.Extensions.CommentEditor.prototype.onKeyUp = function (event) {
 
                 // 结束云图绘制，不封闭云图
                 this.selectedComment.setSeal(false);
+                this.selectedComment.finishTrack();
                 this.createCommentEnd();
                 this.deselectComment();
             }
@@ -5534,14 +5621,22 @@ CLOUD.Extensions.CommentEditor.prototype.handleMouseEvent = function (event, typ
             break;
         case CLOUD.Extensions.Comment.shapeTypes.CLOUD:
             if (type === "down") {
-                if (this.selectedComment && this.isCreating) {
-                    this.moveCommentCloud(event);
-                } else {
-                    if (!this.isCreating) {
-                        this.mouseDownForCloud(event);
-                        this.createCommentBegin();
-                    }
+                //if (this.selectedComment && this.isCreating) {
+                //    this.mouseMoveForCloud(event);
+                //} else {
+                //    if (!this.isCreating) {
+                //        this.mouseDownForCloud(event);
+                //        this.createCommentBegin();
+                //    }
+                //}
+
+                if (this.mouseDownForCloud(event)) {
+                    this.createCommentBegin();
                 }
+            } else if (type === "move") {
+                this.mouseMoveForCloud(event);
+            } else if (type === "up") {
+                this.mouseUpForCloud(event);
             }
             break;
         case CLOUD.Extensions.Comment.shapeTypes.TEXT:
@@ -5827,6 +5922,8 @@ CLOUD.Extensions.CommentEditor.prototype.mouseMoveForCross = function (event) {
 
 CLOUD.Extensions.CommentEditor.prototype.mouseDownForCloud = function (event) {
 
+    if (this.selectedComment) return false;
+
     var start = this.getPointOnDomContainer(event.clientX, event.clientY);
 
     this.originX = start.x;
@@ -5841,22 +5938,56 @@ CLOUD.Extensions.CommentEditor.prototype.mouseDownForCloud = function (event) {
     cloud.set(position, size.x, size.y);
     this.addComment(cloud);
     cloud.created();
+    cloud.enableTrack();
 
     this.selectedComment = cloud;
 
     return true;
 };
 
-CLOUD.Extensions.CommentEditor.prototype.moveCommentCloud = function (event) {
+CLOUD.Extensions.CommentEditor.prototype.mouseMoveForCloud = function (event) {
 
     if (!this.selectedComment || !this.isCreating) {
         return;
     }
 
-    var size = {x: 10, y: 10};
     var cloud = this.selectedComment;
+
+    if (cloud.getTrackState()) {
+
+        var position = this.getPointOnDomContainer(event.clientX, event.clientY);
+
+        cloud.startTrack();
+        cloud.setTrackingPoint(position);
+    }
+};
+
+CLOUD.Extensions.CommentEditor.prototype.mouseUpForCloud = function (event) {
+
+    if (!this.selectedComment || !this.isCreating) {
+        return;
+    }
+
     var position = this.getPointOnDomContainer(event.clientX, event.clientY);
-    cloud.addPoint(position);
+    var cloud = this.selectedComment;
+
+    // 先禁止跟踪，在真正响应事件时启用
+    cloud.disableTrack();
+
+    // 采用计时器来判断是否单击和双击
+    function handleMouseUp() {
+
+        cloud.finishTrack();
+        cloud.addPoint(position);
+        cloud.enableTrack();
+    }
+
+    if (this.timerId) {
+        clearTimeout(this.timerId);
+    }
+
+    // 延迟300ms以判断是否单击
+    this.timerId = setTimeout(handleMouseUp, 300);
 };
 
 CLOUD.Extensions.CommentEditor.prototype.mouseDoubleClickForCloud = function (event) {
@@ -5864,10 +5995,25 @@ CLOUD.Extensions.CommentEditor.prototype.mouseDoubleClickForCloud = function (ev
     if (this.isCreating && this.selectedComment) {
 
         if (this.selectedComment.shapeType === CLOUD.Extensions.Comment.shapeTypes.CLOUD) {
+
+            // 清除定时器
+            if (this.timerId) {
+                clearTimeout(this.timerId);
+            }
+
+            var position = this.getPointOnDomContainer(event.clientX, event.clientY);
+
+            this.selectedComment.finishTrack();
+
+            this.selectedComment.addPoint(position);
+
             // 结束云图绘制，并封闭云图
             this.selectedComment.setSeal(true);
+
             this.createCommentEnd();
             this.deselectComment();
+
+            //console.log("mouseDoubleClickForCloud");
         }
     }
 };
@@ -6195,13 +6341,13 @@ CLOUD.Extensions.CommentEditor.prototype.deselectComment = function () {
     this.commentFrame.setComment(null);
 };
 
-CLOUD.Extensions.CommentEditor.prototype.worldToClient = function (x, y, z) {
+CLOUD.Extensions.CommentEditor.prototype.worldToClient = function (wx, wy, wz) {
 
     var rect = CLOUD.DomUtil.getContainerOffsetToClient(this.domElement);
     var camera = this.cameraEditor.object;
     var result = new THREE.Vector3();
 
-    result.set(x, y, z);
+    result.set(wx, wy, wz);
 
     //result.applyMatrix4(camera.matrixWorld);
     //result.sub(camera.position);
@@ -6219,14 +6365,14 @@ CLOUD.Extensions.CommentEditor.prototype.worldToClient = function (x, y, z) {
     return result;
 };
 
-CLOUD.Extensions.CommentEditor.prototype.clientToWorld = function (x, y) {
+CLOUD.Extensions.CommentEditor.prototype.clientToWorld = function (cx, cy) {
 
     var rect = CLOUD.DomUtil.getContainerOffsetToClient(this.domElement);
     var camera = this.cameraEditor.object;
     var result = new THREE.Vector3();
 
-    result.x = x / rect.width * 2 - 1;
-    result.y = -y / rect.height * 2 + 1;
+    result.x = cx / rect.width * 2 - 1;
+    result.y = -cy / rect.height * 2 + 1;
     result.z = 0;
 
     result.unproject(camera);
@@ -6236,6 +6382,32 @@ CLOUD.Extensions.CommentEditor.prototype.clientToWorld = function (x, y) {
     //result.z = 0;
 
     return result;
+};
+
+CLOUD.Extensions.CommentEditor.prototype.getCommentWorldPosition = function (cPos) {
+
+    return this.clientToWorld(cPos.x, cPos.y);
+};
+
+CLOUD.Extensions.CommentEditor.prototype.getCommentClientPosition = function (wPos) {
+
+    return this.worldToClient(wPos.x, wPos.y, wPos.z);
+};
+
+CLOUD.Extensions.CommentEditor.prototype.getCommentWorldSize = function (cSize, cPos) {
+
+    var lt = this.clientToWorld(cPos.x - 0.5 * cSize.x, cPos.y - 0.5 * cSize.y);
+    var rb = this.clientToWorld(cPos.x + 0.5 * cSize.x, cPos.y + 0.5 * cSize.y);
+
+    return {x: Math.abs(rb.x - lt.x), y: Math.abs(rb.y - lt.y)}
+};
+
+CLOUD.Extensions.CommentEditor.prototype.getCommentClientSize = function (wSize, wPos) {
+
+    var lt = this.worldToClient(wPos.x - 0.5 * wSize.x, wPos - 0.5 * wSize.y, wPos.z);
+    var rb = this.worldToClient(wPos.x + 0.5 * wSize.x, wPos + 0.5 * wSize.y, wPos.z);
+
+    return {x: Math.abs(rb.x - lt.x), y: Math.abs(rb.y - lt.y)};
 };
 
 CLOUD.Extensions.CommentEditor.prototype.calcBoundingBox = function () {
@@ -6402,6 +6574,10 @@ CLOUD.Extensions.CommentEditor.prototype.setBackgroundColor = function (startCol
 
 // 获得批注列表
 CLOUD.Extensions.CommentEditor.prototype.getCommentInfoList = function () {
+
+    // 强行完成
+    this.createCommentEnd();
+    this.deselectComment();
 
     var commentInfoList = [];
 
