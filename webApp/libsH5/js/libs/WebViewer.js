@@ -10046,7 +10046,282 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
         target.addVectors(position, eye);
     };
 
+    this.updatePivot = function (bySelection, failback) {
+        if (bySelection) {
+            var box = this.viewer.renderer.computeSelectionBBox();
+            if (box == null || box.empty()) {
+                failback();
+                return;
+            }
+            this.pivot = box.center(this.pivot);
+            return;
+        }
+        
+        failback();
+    };
 };
+CLOUD.PickHelper = function (scene, cameraEditor, onObjectSelected) {
+    "use strict";
+
+    this.cameraEditor = cameraEditor;
+    this.scene = scene;
+    this.filter = scene.filter;
+    this.onObjectSelected = onObjectSelected;
+
+    this.timerId = null;
+
+    // debug 用
+    this.debugInfoDiv = null;
+    this.lastDebugInfoDivShow = false;   
+};
+
+CLOUD.PickHelper.prototype = {
+
+    constructor: CLOUD.PickHelper,     
+    
+    click: function (event) {
+        var scope = this;
+
+        function handleMouseUp() {
+            scope.handleMousePick(event, false);
+        }
+
+        if (scope.timerId) {
+            clearTimeout(scope.timerId);
+        }
+
+        // 延迟300ms以判断是否单击
+        scope.timerId = setTimeout(handleMouseUp, 300);
+    },
+
+    doubleClick : function (event) {
+
+        event.preventDefault();
+
+        if (this.timerId) {
+            clearTimeout(this.timerId);
+        }
+
+        this.handleMousePick(event, true);
+    },
+
+    handleMousePick : function (event, isDoubleClick) {
+
+        var cameraEditor = this.cameraEditor;
+
+        if (cameraEditor.enabled === false)
+            return false;
+
+
+        var scope = this;
+
+        var screenX = event.clientX;
+        var screenY = event.clientY;
+
+        var mouse = cameraEditor.mapWindowToViewport(screenX, screenY);
+
+        scope.scene.pick(mouse, cameraEditor.object, function (intersect) {
+
+            if (!intersect) {
+
+                if (scope.filter.setSelectedIds()) {
+                    cameraEditor.updateView(true);
+                    scope.onObjectSelected(null);
+                }
+
+                scope.showPickedInformation(null);
+                return;
+            }
+
+            var  userId = intersect.userId;
+
+            // 双击构件变半透明，再双击取消半透明状态
+            if (isDoubleClick) {
+
+                scope.filter.addDemolishId(userId, true);
+                cameraEditor.updateView(true);
+
+            }
+            else {
+
+                if (!event.ctrlKey) {
+                    scope.filter.setSelectedIds();
+                }
+                
+                if (scope.filter.addSelectedId(userId, intersect.object.userData, true)) {
+
+                    scope.onObjectSelected(intersect);
+
+                    if (event.altKey) {
+                        scope.showPickedInformation(intersect, screenX, screenY);
+                    } else {
+                        scope.showPickedInformation(null);
+                    }
+                }
+                else {
+                    scope.showPickedInformation(null);
+                    scope.onObjectSelected(null);
+                }
+                cameraEditor.updateView(true);
+            }
+
+        });
+ 
+    },
+
+    showPickedInformation : function (intersect, cx, cy) {
+
+        var divWidth = 340, divHeight = 320, offset = 15;
+        var scope = this;
+
+        function hideDiv() {
+
+            var info = scope.debugInfoDiv;
+
+            if (info) {
+                info.style.display = "none";
+                //info.parentNode.removeChild(info);
+
+                if (scope.lastDebugInfoDivShow) {
+                    info.removeEventListener('dblclick', hideDiv, false);
+                    scope.lastDebugInfoDivShow = false;
+                }
+            }
+        }
+
+        function adjustLocation(div, posX, posY) {
+
+            if (!div) return;
+
+            if (div.style.display != "none") {
+                var oLeft, oTop;
+
+                var tmpX = posX + divWidth;
+                var tmpY = posY + divHeight;
+
+                if (posX !== undefined && posY !== undefined) {
+                    if (window.innerWidth) {
+
+                        if (tmpX > window.innerWidth) {
+                            oLeft = window.pageXOffset + (posX - divWidth) + "px";
+                        } else {
+                            oLeft = window.pageXOffset + posX + "px";
+                        }
+
+                        if (tmpY > window.innerHeight) {
+                            oTop = window.pageYOffset + (posY - divHeight) + "px";
+                        } else {
+                            oTop = window.pageYOffset + posY + "px";
+                        }
+
+                        //oLeft = window.pageXOffset + posX + "px";
+                        //oTop = window.pageYOffset + posY + "px";
+                    } else {
+                        var dde = document.documentElement;
+                        oLeft = dde.scrollLeft + posX + "px";
+                        oTop = dde.scrollTop + posY + "px";
+                    }
+                } else {
+                    // 居中
+                    if (window.innerWidth) {
+                        oLeft = window.pageXOffset + (window.innerWidth - divWidth) / 2 + "px";
+                        oTop = window.pageYOffset + (window.innerHeight - divHeight) / 2 + "px";
+                    } else {
+                        var dde = document.documentElement;
+                        oLeft = dde.scrollLeft + (dde.offsetWidth - divWidth) / 2 + "px";
+                        oTop = dde.scrollTop + (dde.offsetHeight - divHeight) / 2 + "px";
+                    }
+                }
+
+                div.style.left = oLeft;
+                div.style.top = oTop;
+            }
+        }
+
+        if (!intersect) {
+            hideDiv();
+            return;
+        }
+
+        if (!this.debugInfoDiv) {
+            this.debugInfoDiv = document.createElement("div");
+            this.debugInfoDiv.id = "debugPickedInfo";
+            this.debugInfoDiv.style.display = "block";
+            this.debugInfoDiv.style.position = "absolute";
+            this.debugInfoDiv.style.width = divWidth + "px";
+            this.debugInfoDiv.style.height = divHeight + "px";
+            this.debugInfoDiv.style.backgroundColor = "#ffffdd";
+            this.debugInfoDiv.style.borderWidth = "2px";
+            this.debugInfoDiv.style.borderStyle = "solid";
+            this.debugInfoDiv.style.opacity = "0.8";
+
+            document.body.appendChild(this.debugInfoDiv);
+        }
+
+        this.debugInfoDiv.style.display = "";
+
+        // 支持面板一直显示
+        if (!this.lastDebugInfoDivShow) {
+            this.lastDebugInfoDivShow = true;
+            this.debugInfoDiv.addEventListener('dblclick', hideDiv, false);
+        }
+
+        var viewer = this.cameraEditor.viewer;
+
+        var axisGridInfo = null;
+
+        if (viewer.defaultMiniMap) {
+            axisGridInfo = viewer.defaultMiniMap.getAxisGridInfoByPoint(intersect.point);
+        }
+
+        // 加些样式
+        var html = "";
+        html += "<span>&#9830;&nbsp;&nbsp;Base Information</span><ul style='width:340px;list-style:none'>";
+        html += "<li style='border-left:1px solid #ccc;border-top:1px solid #ccc;border-bottom: 1px solid #ccc;float:left;width:80px;height:66px;text-align:left;line-height:66px'>ID</li>";
+        html += "<li style='border:1px solid #ccc;float:left;width:200px;height:66px;text-align:left;'>" + intersect.userId + "</li>";
+        html += "</ul>";
+
+        if (axisGridInfo) {
+
+            html += "<span>&#9830;&nbsp;&nbsp;Position</span><ul style='width:340px;list-style:none'>";
+            html += "<li style='border-left:1px solid #ccc;border-top:1px solid #ccc;float:left;width:80px;height:33px;text-align:left;line-height:33px'>X</li>";
+            html += "<li style='border-left:1px solid #ccc;border-top:1px solid #ccc;float:left;width:200px;height:33px;text-align:left;line-height:33px;border-right: 1px solid #ccc'>" + axisGridInfo.position.x + "</li>";
+            html += "<li style='border-left:1px solid #ccc;border-top:1px solid #ccc;float:left;width:80px;height:33px;text-align:left;line-height:33px'>Y</li>";
+            html += "<li style='border-left:1px solid #ccc;border-top:1px solid #ccc;float:left;width:200px;height:33px;text-align:left;line-height:33px;border-right: 1px solid #ccc'>" + axisGridInfo.position.y + "</li>";
+            html += "<li style='border-left:1px solid #ccc;border-top:1px solid #ccc;float:left;width:80px;height:33px;text-align:left;line-height:33px;border-bottom: 1px solid #ccc'>Z</li>";
+            html += "<li style='border:1px solid #ccc;float:left;width:200px;height:33px;text-align:left;line-height:33px'>" + axisGridInfo.position.z + "</li>";
+            html += "</ul>";
+
+            html += "<span>&#9830;&nbsp;&nbsp;Axis Grid Information</span><ul style='width:340px;list-style:none'>";
+            html += "<li style='border-left:1px solid #ccc;border-top:1px solid #ccc;float:left;width:80px;height:33px;text-align:left;line-height:33px'>distanceX</li>";
+            html += "<li style='border-left:1px solid #ccc;border-top:1px solid #ccc;float:left;width:200px;height:33px;text-align:left;line-height:33px;border-right: 1px solid #ccc'>(" + axisGridInfo.abcName + ", " + axisGridInfo.offsetX + ")</li>";
+            html += "<li style='border-left:1px solid #ccc;border-top:1px solid #ccc;float:left;width:80px;height:33px;text-align:left;line-height:33px;border-bottom: 1px solid #ccc'>distanceY</li>";
+            html += "<li style='border:1px solid #ccc;float:left;width:200px;height:33px;text-align:left;line-height:33px'>(" + axisGridInfo.numeralName + ", " + axisGridInfo.offsetY + ")</li>";
+            html += "</ul>";
+        } else {
+
+            html += "<span>&#9830;&nbsp;&nbsp;Other</span><ul style='width:340px;list-style:none'>";
+            html += "<li style='border-left:1px solid #ccc;border-top:1px solid #ccc;float:left;width:80px;height:33px;text-align:left;line-height:33px;border-bottom: 1px solid #ccc'>message</li>";
+            html += "<li style='border:1px solid #ccc;float:left;width:200px;height:33px;text-align:left;line-height:33px'><span style='color: red'> not exist axis grid!!!</span></li>";
+            html += "</ul>";
+        }
+
+        this.debugInfoDiv.innerHTML = html + "<br /><br />";
+
+        //var box = this.debugInfoDiv.getBoundingClientRect();
+        //divWidth = box.width + offset;
+        //divHeight = box.height;
+        //
+        //this.debugInfoDiv.style.width = divWidth + "px";
+        //this.debugInfoDiv.style.height = divHeight + "px";
+
+        adjustLocation(this.debugInfoDiv, cx, cy);
+    }
+};
+
+
+
+
 CLOUD.OrbitEditor = function (cameraEditor, scene, domElement) {
     "use strict";
     this.scene = scene;
@@ -10054,7 +10329,7 @@ CLOUD.OrbitEditor = function (cameraEditor, scene, domElement) {
 
     // Mouse buttons
     //this.mouseButtons = { ORBIT: THREE.MOUSE.LEFT, PAN: THREE.MOUSE.MIDDLE, ZOOM: THREE.MOUSE.RIGHT };
-    this.mouseButtons = { ORBIT: THREE.MOUSE.LEFT, PAN2: THREE.MOUSE.MIDDLE, PAN: THREE.MOUSE.RIGHT };
+    this.mouseButtons = { ORBIT: THREE.MOUSE.RIGHT, PAN2: THREE.MOUSE.MIDDLE, PAN: THREE.MOUSE.LEFT };
 
     // camera state
     this.cameraEditor = cameraEditor;
@@ -10063,6 +10338,7 @@ CLOUD.OrbitEditor = function (cameraEditor, scene, domElement) {
     this.oldMouseX = -1;
     this.oldMouseY = -1;
     this.timeoutId = null;
+    this.orbitBySelection = false;
 };
 
 CLOUD.OrbitEditor.prototype = Object.create(THREE.EventDispatcher.prototype);
@@ -10113,10 +10389,13 @@ CLOUD.OrbitEditor.prototype.processMouseDown = function (event) {
             return;
         
         var mouse = camera_scope.mapWindowToViewport(event.clientX, event.clientY);
-        scope.scene.hitTestPosition(mouse, camera_scope.object, function (pt) {
-            camera_scope.pivot = pt;
-        });
 
+        camera_scope.updatePivot(this.orbitBySelection, function () {
+            scope.scene.hitTestPosition(mouse, camera_scope.object, function (pt) {
+                camera_scope.pivot = pt;
+            });
+        });
+ 
         camera_scope.beginRotate(event.clientX, event.clientY);
 
     } else if (event.button === scope.mouseButtons.ZOOM) {
@@ -10142,7 +10421,7 @@ CLOUD.OrbitEditor.prototype.onMouseDown = function (event) {
     return this.processMouseDown(event);
 };
 
-CLOUD.OrbitEditor.prototype.onMouseMove = function (event) {
+CLOUD.OrbitEditor.prototype.processMouseMove = function (event) {
     var camera_scope = this.cameraEditor;
     if (camera_scope.enabled === false) {
         return;
@@ -10157,6 +10436,10 @@ CLOUD.OrbitEditor.prototype.onMouseMove = function (event) {
     //camera_scope.process(event.offsetX, event.offsetY);
 
     camera_scope.process(event.clientX, event.clientY, true);
+};
+
+CLOUD.OrbitEditor.prototype.onMouseMove = function (event) {
+    this.processMouseMove(event);
 };
 
 CLOUD.OrbitEditor.prototype.processMouseUp = function (event) {
@@ -10324,14 +10607,10 @@ CLOUD.PickEditor = function (object, scene, domElement) {
 
     // Customize the mouse buttons
     //this.mouseButtons = { ORBIT: THREE.MOUSE.RIGHT, PAN: THREE.MOUSE.MIDDLE, ZOOM: THREE.MOUSE.RIGHT };
-
-    this.timerId = null;
-
-    this.filter = scene.filter;
-
-    // debug 用
-    this.debugInfoDiv = null;
-    this.lastDebugInfoDivShow = false;
+    var scope = this;
+    this.pickHelper = new CLOUD.PickHelper(scene, this.cameraEditor, function (select) {
+        scope.onObjectSelected(select);
+    });
 };
 
 CLOUD.PickEditor.prototype = Object.create(CLOUD.OrbitEditor.prototype);
@@ -10339,19 +10618,7 @@ CLOUD.PickEditor.prototype.constructor = CLOUD.PickEditor;
 
 CLOUD.PickEditor.prototype.pickByClick = function (event) {
 
-    var scope = this;
-    this.isMouseClick = true;
-
-    function handleMouseUp() {
-        scope.handleMousePick(event);
-    }
-
-    if (scope.timerId) {
-        clearTimeout(scope.timerId);
-    }
-
-    // 延迟300ms以判断是否单击
-    scope.timerId = setTimeout(handleMouseUp, 300);
+    this.pickHelper.click(event);
 };
 
 CLOUD.PickEditor.prototype.processMouseUp = function (event) {
@@ -10376,361 +10643,167 @@ CLOUD.PickEditor.prototype.onMouseUp = function (event) {
 
 CLOUD.PickEditor.prototype.onMouseDoubleClick = function (event) {
 
-    event.preventDefault();
-
-    if (this.timerId) {
-        clearTimeout(this.timerId);
-    }
-
-    this.handleMousePick(event, true);
+    this.pickHelper.doubleClick(event);
 };
 
-CLOUD.PickEditor.prototype.handleMousePick = function (event, isDoubleClick) {
-    "use strict";
+CLOUD.RectPickEditor = function (slaveEditor, onSelectionChanged) {
 
-    if (!isDoubleClick) {
-        isDoubleClick = false;
-    }
-
-    var cameraEditor = this.cameraEditor;
-
-    if (cameraEditor.enabled === false)
-        return false;
+    this.onObjectSelected = onSelectionChanged;
 
 
-    var scope = this;
-
-    var screenX = event.clientX;
-    var screenY = event.clientY;
-
-    // Pick
-    //if (event.button === THREE.MOUSE.LEFT && cameraEditor.IsIdle() === true)
-    if (event.button === THREE.MOUSE.LEFT) {
-        var scope = this;
-        var mouse = cameraEditor.mapWindowToViewport(event.clientX, event.clientY);
-
-        scope.scene.pick(mouse, cameraEditor.object, function (intersect) {
-
-            if (!intersect) {
-
-                if (scope.filter.setSelectedIds()) {
-                    cameraEditor.updateView(true);
-                    scope.onObjectSelected(null);
-                }
-
-                scope.showPickedInformation(null);
-                return;
-            }
-
-             var  userId = intersect.userId;
-
-            // 双击构件变半透明，再双击取消半透明状态
-            if (isDoubleClick) {
-
-                scope.filter.addDemolishId(userId, true);
-                cameraEditor.updateView(true);
-
-            }
-            else {
-
-                if (!event.ctrlKey) {
-                    scope.filter.setSelectedIds();
-                }
-                
-                if (scope.filter.addSelectedId(userId, intersect.object.userData, true)) {
-
-                    scope.onObjectSelected(intersect);
-
-                    if (event.altKey) {
-                        scope.showPickedInformation(intersect, screenX, screenY);
-                    } else {
-                        scope.showPickedInformation(null);
-                    }
-                }
-                else {
-                    scope.showPickedInformation(null);
-                    scope.onObjectSelected(null);
-                }
-                cameraEditor.updateView(true);
-            }
-
-        });
-    }
-
-    //return this.processMouseDown(event);
-};
-
-CLOUD.PickEditor.prototype.showPickedInformation = function (intersect, cx, cy) {
-
-    var divWidth = 340, divHeight = 320, offset = 15;
-    var scope = this;
-
-    function hideDiv() {
-
-        var info = scope.debugInfoDiv;
-
-        if (info) {
-            info.style.display = "none";
-            //info.parentNode.removeChild(info);
-
-            if (scope.lastDebugInfoDivShow) {
-                info.removeEventListener('dblclick', hideDiv, false);
-                scope.lastDebugInfoDivShow = false;
-            }
-        }
-    }
-
-    function adjustLocation(div, posX, posY) {
-
-        if (!div) return;
-
-        if (div.style.display != "none") {
-            var oLeft, oTop;
-
-            var tmpX = posX + divWidth;
-            var tmpY = posY + divHeight;
-
-            if (posX !== undefined && posY !== undefined) {
-                if (window.innerWidth) {
-
-                    if (tmpX > window.innerWidth) {
-                        oLeft = window.pageXOffset + (posX - divWidth) + "px";
-                    } else {
-                        oLeft = window.pageXOffset + posX + "px";
-                    }
-
-                    if (tmpY > window.innerHeight) {
-                        oTop = window.pageYOffset + (posY - divHeight) + "px";
-                    } else {
-                        oTop = window.pageYOffset + posY + "px";
-                    }
-
-                    //oLeft = window.pageXOffset + posX + "px";
-                    //oTop = window.pageYOffset + posY + "px";
-                } else {
-                    var dde = document.documentElement;
-                    oLeft = dde.scrollLeft + posX + "px";
-                    oTop = dde.scrollTop + posY + "px";
-                }
-            } else {
-                // 居中
-                if (window.innerWidth) {
-                    oLeft = window.pageXOffset + (window.innerWidth - divWidth) / 2 + "px";
-                    oTop = window.pageYOffset + (window.innerHeight - divHeight) / 2 + "px";
-                } else {
-                    var dde = document.documentElement;
-                    oLeft = dde.scrollLeft + (dde.offsetWidth - divWidth) / 2 + "px";
-                    oTop = dde.scrollTop + (dde.offsetHeight - divHeight) / 2 + "px";
-                }
-            }
-
-            div.style.left = oLeft;
-            div.style.top = oTop;
-        }
-    }
-
-    if (!intersect) {
-        hideDiv();
-        return;
-    }
-
-    if (!this.debugInfoDiv) {
-        this.debugInfoDiv = document.createElement("div");
-        this.debugInfoDiv.id = "debugPickedInfo";
-        this.debugInfoDiv.style.display = "block";
-        this.debugInfoDiv.style.position = "absolute";
-        this.debugInfoDiv.style.width = divWidth + "px";
-        this.debugInfoDiv.style.height = divHeight + "px";
-        this.debugInfoDiv.style.backgroundColor = "#ffffdd";
-        this.debugInfoDiv.style.borderWidth = "2px";
-        this.debugInfoDiv.style.borderStyle = "solid";
-        this.debugInfoDiv.style.opacity = "0.8";
-
-        document.body.appendChild(this.debugInfoDiv);
-    }
-
-    this.debugInfoDiv.style.display = "";
-
-    // 支持面板一直显示
-    if (!this.lastDebugInfoDivShow) {
-        this.lastDebugInfoDivShow = true;
-        this.debugInfoDiv.addEventListener('dblclick', hideDiv, false);
-    }
-
-    var viewer = this.cameraEditor.viewer;
-
-    var axisGridInfo = null;
-
-    if (viewer.defaultMiniMap) {
-        axisGridInfo = viewer.defaultMiniMap.getAxisGridInfoByPoint(intersect.point);
-    }
-
-    // 加些样式
-    var html = "";
-    html += "<span>&#9830;&nbsp;&nbsp;Base Information</span><ul style='width:340px;list-style:none'>";
-    html += "<li style='border-left:1px solid #ccc;border-top:1px solid #ccc;border-bottom: 1px solid #ccc;float:left;width:80px;height:66px;text-align:left;line-height:66px'>ID</li>";
-    html += "<li style='border:1px solid #ccc;float:left;width:200px;height:66px;text-align:left;'>" + intersect.userId + "</li>";
-    html += "</ul>";
-
-    if (axisGridInfo) {
-
-        html += "<span>&#9830;&nbsp;&nbsp;Position</span><ul style='width:340px;list-style:none'>";
-        html += "<li style='border-left:1px solid #ccc;border-top:1px solid #ccc;float:left;width:80px;height:33px;text-align:left;line-height:33px'>X</li>";
-        html += "<li style='border-left:1px solid #ccc;border-top:1px solid #ccc;float:left;width:200px;height:33px;text-align:left;line-height:33px;border-right: 1px solid #ccc'>" + axisGridInfo.position.x + "</li>";
-        html += "<li style='border-left:1px solid #ccc;border-top:1px solid #ccc;float:left;width:80px;height:33px;text-align:left;line-height:33px'>Y</li>";
-        html += "<li style='border-left:1px solid #ccc;border-top:1px solid #ccc;float:left;width:200px;height:33px;text-align:left;line-height:33px;border-right: 1px solid #ccc'>" + axisGridInfo.position.y + "</li>";
-        html += "<li style='border-left:1px solid #ccc;border-top:1px solid #ccc;float:left;width:80px;height:33px;text-align:left;line-height:33px;border-bottom: 1px solid #ccc'>Z</li>";
-        html += "<li style='border:1px solid #ccc;float:left;width:200px;height:33px;text-align:left;line-height:33px'>" + axisGridInfo.position.z + "</li>";
-        html += "</ul>";
-
-        html += "<span>&#9830;&nbsp;&nbsp;Axis Grid Information</span><ul style='width:340px;list-style:none'>";
-        html += "<li style='border-left:1px solid #ccc;border-top:1px solid #ccc;float:left;width:80px;height:33px;text-align:left;line-height:33px'>distanceX</li>";
-        html += "<li style='border-left:1px solid #ccc;border-top:1px solid #ccc;float:left;width:200px;height:33px;text-align:left;line-height:33px;border-right: 1px solid #ccc'>(" + axisGridInfo.abcName + ", " + axisGridInfo.offsetX + ")</li>";
-        html += "<li style='border-left:1px solid #ccc;border-top:1px solid #ccc;float:left;width:80px;height:33px;text-align:left;line-height:33px;border-bottom: 1px solid #ccc'>distanceY</li>";
-        html += "<li style='border:1px solid #ccc;float:left;width:200px;height:33px;text-align:left;line-height:33px'>(" + axisGridInfo.numeralName + ", " + axisGridInfo.offsetY + ")</li>";
-        html += "</ul>";
-    } else {
-
-        html += "<span>&#9830;&nbsp;&nbsp;Other</span><ul style='width:340px;list-style:none'>";
-        html += "<li style='border-left:1px solid #ccc;border-top:1px solid #ccc;float:left;width:80px;height:33px;text-align:left;line-height:33px;border-bottom: 1px solid #ccc'>message</li>";
-        html += "<li style='border:1px solid #ccc;float:left;width:200px;height:33px;text-align:left;line-height:33px'><span style='color: red'> not exist axis grid!!!</span></li>";
-        html += "</ul>";
-    }
-
-    this.debugInfoDiv.innerHTML = html + "<br /><br />";
-
-    //var box = this.debugInfoDiv.getBoundingClientRect();
-    //divWidth = box.width + offset;
-    //divHeight = box.height;
-    //
-    //this.debugInfoDiv.style.width = divWidth + "px";
-    //this.debugInfoDiv.style.height = divHeight + "px";
-
-    adjustLocation(this.debugInfoDiv, cx, cy);
-};
-
-
-
-
-
-CLOUD.RectPickEditor = function (object, scene, domElement) {
-    "use strict";
-    CLOUD.PickEditor.call(this, object, scene, domElement);
-
-    // 保存旋转点
     this.startPt = new THREE.Vector2();
     this.endPt = new THREE.Vector2();
 
     this.frustum = new THREE.Frustum();
 
-    this.mouseButtons = { ORBIT: THREE.MOUSE.RIGHT, PAN2: THREE.MOUSE.MIDDLE, PAN: THREE.MOUSE.LEFT };
+    this.slaveEditor = slaveEditor;
+
+    var scope = this;
+    this.pickHelper = new CLOUD.PickHelper(slaveEditor.scene, slaveEditor.cameraEditor, function (select) {
+        scope.onObjectSelected(select);
+    });
 };
 
-CLOUD.RectPickEditor.prototype = Object.create(CLOUD.PickEditor.prototype);
-CLOUD.RectPickEditor.prototype.constructor = CLOUD.RectPickEditor;
 
-CLOUD.RectPickEditor.prototype.udpateFrustum = function (updateUI) {
+CLOUD.RectPickEditor.prototype = {
 
-    var x1 = this.startPt.x;
-    var x2 = this.endPt.x;
-    var y1 = this.startPt.y;
-    var y2 = this.endPt.y;
+    onstructor: CLOUD.RectPickEditor,
 
-    if (x1 > x2) {
+    udpateFrustum : function (updateUI) {
 
-        var tmp1 = x1;
-        x1 = x2;
-        x2 = tmp1;
+        var x1 = this.startPt.x;
+        var x2 = this.endPt.x;
+        var y1 = this.startPt.y;
+        var y2 = this.endPt.y;
 
-    }
+        if (x1 > x2) {
 
-    if (y1 > y2) {
+            var tmp1 = x1;
+            x1 = x2;
+            x2 = tmp1;
 
-        var tmp2 = y1;
-        y1 = y2;
-        y2 = tmp2;
+        }
 
-    }
+        if (y1 > y2) {
 
-    if (x2 - x1 == 0 || y2 - y1 == 0)
-        return false;
+            var tmp2 = y1;
+            y1 = y2;
+            y2 = tmp2;
 
-    var helper = this.cameraEditor;
-    var dim = helper.getContainerDimensions();
+        }
 
-    helper.computeFrustum(x1, x2, y1, y2, this.frustum, dim);
-
-    if (updateUI) {
-        this.onUpdateUI({ visible: true, dir: this.startPt.x < this.endPt.x, left: (x1 - dim.left), top: (y1 - dim.top), width: (x2 - x1), height: (y2 - y1) });
-    }
-       
-    return true;
-};
-
-CLOUD.RectPickEditor.prototype.onMouseDown = function (event) {
-
-    if (this.domElement !== document) {
-        this.domElement.focus();
-    }
-
-    event.preventDefault();
-    event.stopPropagation();
-
-    if (event.button === THREE.MOUSE.LEFT) {
-
-        this.startPt.set(event.clientX, event.clientY);
-    }
-
-    return this.processMouseDown(event);
-};
-
-CLOUD.RectPickEditor.prototype.onMouseMove = function (event) {
-
-    event.preventDefault();
-    var allowRectPick = event.shiftKey || event.ctrlKey || event.altKey;
-    if (allowRectPick && event.button === THREE.MOUSE.LEFT) {
-
-        this.endPt.set(event.clientX, event.clientY);
-        this.udpateFrustum(true);
-        return true;
-    }
-
-    this.cameraEditor.process(event.clientX, event.clientY, true);
-};
-
-CLOUD.RectPickEditor.prototype.onMouseUp = function (event) {
-    event.preventDefault();
-    event.stopPropagation();
-
-    this.onUpdateUI({ visible: false });
-
-    var allowRectPick = event.shiftKey || event.ctrlKey || event.altKey;
-    if (allowRectPick && event.button === THREE.MOUSE.LEFT) {
-
-        this.endPt.set(event.clientX, event.clientY);
-        if (!this.udpateFrustum()) {
-            this.pickByClick(event);
+        if (x2 - x1 == 0 || y2 - y1 == 0)
             return false;
-        }
-           
-        var state = CLOUD.OPSELECTIONTYPE.Clear;
 
-        if (event.ctrlKey) {
-            state = CLOUD.OPSELECTIONTYPE.Add;
-        }
-        else if (event.altKey) {
-            state = CLOUD.OPSELECTIONTYPE.Remove;
-        }
-        var scope = this;
-        this.scene.pickByReck(this.frustum, state, function () {
-            scope.onObjectSelected();
-        });
-        this.cameraEditor.updateView(true);     
+        var helper = this.slaveEditor.cameraEditor;
+        var dim = helper.getContainerDimensions();
 
+        helper.computeFrustum(x1, x2, y1, y2, this.frustum, dim);
+
+        if (updateUI) {
+            this.onUpdateUI({ visible: true, dir: this.startPt.x < this.endPt.x, left: (x1 - dim.left), top: (y1 - dim.top), width: (x2 - x1), height: (y2 - y1) });
+        }
+       
         return true;
-    } 
+    },
 
-    return this.processMouseUp(event);
+    onExistEditor : function(){
+        this.slaveEditor.onExistEditor();
+    },
+
+    onKeyDown : function(evt){
+        this.slaveEditor.onKeyDown(evt);
+    },
+
+    onKeyUp : function(evt){
+        this.slaveEditor.onKeyUp(evt);
+    },
+
+    onMouseDoubleClick : function(evt){
+        this.pickHelper.doubleClick(evt);
+    },
+
+    onMouseDown :   function (event) {
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (event.button === THREE.MOUSE.LEFT) {
+
+            this.startPt.set(event.clientX, event.clientY);
+        }
+
+        return this.slaveEditor.processMouseDown(event);
+    },
+
+    onMouseMove : function (event) {
+
+        event.preventDefault();
+        var allowRectPick = event.shiftKey || event.ctrlKey || event.altKey;
+        if (allowRectPick && event.button === THREE.MOUSE.LEFT) {
+
+            this.endPt.set(event.clientX, event.clientY);
+            this.udpateFrustum(true);
+            return true;
+        }
+
+        this.slaveEditor.processMouseMove(event);
+    },
+
+    onMouseUp : function (event) {
+
+        event.preventDefault();
+        event.stopPropagation();
+        var slaveEditor = this.slaveEditor;
+
+        this.onUpdateUI({ visible: false });
+
+        if(event.button === THREE.MOUSE.LEFT)  {
+            var allowRectPick = event.shiftKey || event.ctrlKey || event.altKey;
+            if (allowRectPick) {
+
+                this.endPt.set(event.clientX, event.clientY);
+                if (!this.udpateFrustum()) {
+                    this.pickByClick(event);
+                    return false;
+                }
+           
+                var state = CLOUD.OPSELECTIONTYPE.Clear;
+
+                if (event.ctrlKey) {
+                    state = CLOUD.OPSELECTIONTYPE.Add;
+                }
+                else if (event.altKey) {
+                    state = CLOUD.OPSELECTIONTYPE.Remove;
+                }
+            
+
+                var scope = this;
+                slaveEditor.scene.pickByReck(this.frustum, state, function () {
+                    scope.onObjectSelected();
+                });
+                slaveEditor.cameraEditor.updateView(true);
+
+                return true;
+            }
+            else {
+
+                if (this.startPt.x == event.clientX && this.startPt.y == event.clientY) {
+                    this.pickHelper.click(event);
+                    return true;
+                }
+
+            }
+        }
+
+
+
+        return slaveEditor.processMouseUp(event);
+    },
+
+    onMouseWheel: function (evt) {
+        this.slaveEditor.onMouseWheel(evt);
+    }
 };
 CLOUD.ZoomEditor = function ( object, scene, domElement ) {
 	CLOUD.OrbitEditor.call( this,  object, scene, domElement );
@@ -11199,6 +11272,8 @@ CLOUD.FlyEditor = function (cameraEditor, scene, domElement) {
     this.pitchMax = 0.5 * Math.PI - this.pitchMin; // 仰角最大值
     this.pitchDeltaTotal = 0;
 
+    this.mouseButtons = { ORBIT: THREE.MOUSE.RIGHT, PAN2: THREE.MOUSE.MIDDLE, PAN: THREE.MOUSE.LEFT };
+
     this.MoveDirection = {
         NONE: 0,
         UP: 0x0001,
@@ -11359,8 +11434,7 @@ CLOUD.FlyEditor.prototype = {
         }
     },
 
-    onMouseDown: function (event) {
-
+    processMouseDown : function(event){
         if (this.domElement !== document) {
             this.domElement.focus();
         }
@@ -11368,11 +11442,11 @@ CLOUD.FlyEditor.prototype = {
         event.preventDefault();
         event.stopPropagation();
 
-        if (event.button === THREE.MOUSE.LEFT) {
+        if (event.button === this.mouseButtons.ORBIT) {
             // 设置旋转起点
             this.rotateStart.set(event.clientX, event.clientY);
 
-        } else if (event.button === THREE.MOUSE.RIGHT) {
+        } else if (event.button === this.mouseButtons.PAN) {
             //this.cameraEditor.beginPan(event.clientX, event.clientY);
             this.cameraEditor.beginPan(event.clientX, event.clientY);
 
@@ -11384,9 +11458,13 @@ CLOUD.FlyEditor.prototype = {
         return true;
     },
 
-    onMouseMove: function (event) {
+    onMouseDown: function (event) {
 
-        if (event.button === THREE.MOUSE.LEFT) {
+        return this.processMouseDown(event);
+    },
+
+    processMouseMove : function(event){
+        if (event.button === this.mouseButtons.ORBIT) {
 
             this.rotateEnd.set(event.clientX, event.clientY);
             this.rotateDelta.subVectors(this.rotateEnd, this.rotateStart);
@@ -11399,7 +11477,7 @@ CLOUD.FlyEditor.prototype = {
 
                 this.update();
             }
-        } else if (event.button === THREE.MOUSE.RIGHT) {
+        } else if (event.button === this.mouseButtons.PAN) {
 
             if (this.isLockCameraHeight) {
                 this.cameraEditor.process(event.clientX, this.lockCameraHeight, true);
@@ -11409,18 +11487,23 @@ CLOUD.FlyEditor.prototype = {
         }
     },
 
-    onMouseUp: function (event) {
+    onMouseMove: function (event) {
+        this.processMouseMove(event);
+    },
+
+
+    processMouseUp: function(event){
         event.preventDefault();
         event.stopPropagation();
 
-        if (event.button === THREE.MOUSE.LEFT) {
+        if (event.button === this.mouseButtons.ORBIT) {
 
             this.rotateDelta.set(0, 0);
             this.deltaYaw = 0;
             this.deltaPitch = 0;
             this.update();
 
-        } else if (event.button === THREE.MOUSE.RIGHT) {
+        } else if (event.button === this.mouseButtons.PAN) {
 
             if (this.isLockCameraHeight) {
                 this.cameraEditor.process(event.clientX, this.lockCameraHeight, true);
@@ -11432,6 +11515,10 @@ CLOUD.FlyEditor.prototype = {
         }
 
         return true;
+    },
+
+    onMouseUp: function (event) {
+        return this.processMouseUp(event);
     },
 
     onMouseWheel: function (event) {
@@ -12401,10 +12488,10 @@ CLOUD.Filter = function () {
 
 
     // 计算选中对象的包围盒
-    this.computeSelectionBox = function (renderList) {
-        
+    this.computeSelectionBox = function (renderList) {                
+
         if (!hasSelection())
-            return false;
+            return false;        
 
         for(var ii=0; ii<renderList.length; ++ii){
 
@@ -17432,8 +17519,7 @@ CLOUD.EditorManager = function (handleEvents) {
     function onMouseDown( event ) {
 
         // 每次按下鼠标激活canvas
-        var canvas = scope.editor.domElement.querySelector("#cloud-main-canvas");
-        if (canvas) canvas.focus();
+        setFocuse();
 
         _mouseDownOnDomContainer = true;
         _canMouseMoveOperation = false;
@@ -17462,6 +17548,16 @@ CLOUD.EditorManager = function (handleEvents) {
         scope.editor.onMouseDoubleClick(event);
     }
 
+    function setFocuse() {
+        // 设置焦点
+        var dom = scope.editor.domElement;
+        if (dom) {
+            var canvas = scope.editor.domElement.querySelector("#cloud-main-canvas");
+            if (canvas)
+                canvas.focus();
+        }
+    }
+
     this.registerDomEventListeners = function (domElement) {
 
         domElement.addEventListener( 'contextmenu', function ( event ) { event.preventDefault(); }, false );
@@ -17484,9 +17580,7 @@ CLOUD.EditorManager = function (handleEvents) {
         domElement.addEventListener( 'keydown', onKeyDown, false );
         domElement.addEventListener( 'keyup', onKeyUp, false );
 
-        // 设置焦点
-        var canvas = scope.editor.domElement.querySelector("#cloud-main-canvas");
-        if (canvas) canvas.focus();
+        setFocuse();
     };
 
     this.unregisterDomEventListeners = function (domElement) {
@@ -17561,21 +17655,27 @@ CLOUD.EditorManager.prototype = {
         scope.setEditor(this.pickEditor);
     },
 
-    setRectPickMode: function (viewer) {
+    setRectPickMode: function (viewer, orbitBySelection) {
         var scope = this;
 
-        if(this.rectPickEditor === undefined){
-            var rectPickEditor = new CLOUD.RectPickEditor(viewer.cameraEditor, viewer.getScene(), viewer.domElement);
-            rectPickEditor.onObjectSelected = function (intersect) {
-                viewer.modelManager.dispatchEvent({ type: CLOUD.EVENTS.ON_SELECTION_CHANGED, intersect: intersect })
-            };
+        if (this.orbitEditor === undefined) {
+            this.orbitEditor = new CLOUD.OrbitEditor(viewer.cameraEditor, viewer.getScene(), viewer.domElement);
+        }
+
+        if (this.rectPickEditor === undefined) {
+
+            var rectPickEditor = new CLOUD.RectPickEditor(this.orbitEditor,
+                function (intersect) {
+                    viewer.modelManager.dispatchEvent({ type: CLOUD.EVENTS.ON_SELECTION_CHANGED, intersect: intersect });
+                });
             rectPickEditor.onUpdateUI = function (obj) {
                 viewer.modelManager.dispatchEvent({ type: CLOUD.EVENTS.ON_UPDATE_SELECTION_UI, data: obj })
             };
             this.rectPickEditor = rectPickEditor;
         }
-
-
+        
+        this.orbitEditor.orbitBySelection = orbitBySelection || false;
+        this.rectPickEditor.slaveEditor = this.orbitEditor;
         scope.setEditor(this.rectPickEditor);
     },
     setOrbitMode: function (viewer) {
@@ -17610,15 +17710,27 @@ CLOUD.EditorManager.prototype = {
 
     setFlyMode: function (bShowControlPanel, viewer) {
         var scope = this;
+
         if(this.flyEditor === undefined){
             this.flyEditor = new CLOUD.FlyEditor(viewer.cameraEditor, viewer.getScene(), viewer.domElement);
+        }
+        if (this.rectPickEditor === undefined) {
+
+            var rectPickEditor = new CLOUD.RectPickEditor(this.flyEditor, function (intersect) {
+                viewer.modelManager.dispatchEvent({ type: CLOUD.EVENTS.ON_SELECTION_CHANGED, intersect: intersect })
+            });
+            rectPickEditor.onUpdateUI = function (obj) {
+                viewer.modelManager.dispatchEvent({ type: CLOUD.EVENTS.ON_UPDATE_SELECTION_UI, data: obj })
+            };
+            this.rectPickEditor = rectPickEditor;
         }
 
         this.flyEditor.showControlPanel(bShowControlPanel);
 
         this.flyEditor.activate();
 
-        scope.setEditor(this.flyEditor);
+        this.rectPickEditor.slaveEditor = this.flyEditor;
+        scope.setEditor(this.rectPickEditor);
 
         // 进入fly模式，视图设置为ISO
         //scope.setStandardView(CLOUD.EnumStandardView.ISO, viewer);
@@ -18276,12 +18388,12 @@ CloudViewer.prototype = {
         this.getScene().showSceneNodes(client, bVisibles);
     },
 
-    setPickMode: function () {
-        this.editorManager.setRectPickMode(this);
+    setPickMode: function (orbitBySelection) {
+        this.editorManager.setRectPickMode(this, orbitBySelection);
         //this.editorManager.setPickMode(this);
     },
-    setRectPickMode: function () {
-        this.editorManager.setRectPickMode(this);
+    setRectPickMode: function (orbitBySelection) {
+        this.editorManager.setRectPickMode(this, orbitBySelection);
     },
     setOrbitMode: function () {
         this.editorManager.setOrbitMode(this);
