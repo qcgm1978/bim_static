@@ -28,7 +28,8 @@
                                     <div class="modleNameText overflowEllipsis">
                                     <%=subItem.baseValue%><%=subItem.baseUnit%></div></span>
                                     <span class="changeValue afterChange">
-                                       <div class="modleNameText overflowEllipsis <%= subItem.baaseValue!=subItem.value ? 'changeColor':'' %>">
+
+                                       <div class="modleNameText overflowEllipsis <%= subItem.baseValue!=subItem.value ? 'changeColor':'' %>">
                                     <%=subItem.value%><%=subItem.unit%></div>
                                      </span>
                                 </li>
@@ -54,15 +55,10 @@
                         </div>
                     </div>
                 </div>
-                <div class="modle">
+                <div class="modle dwgBox">
                     <i class="modleShowHide"></i>
                     <h1 class="modleName">图纸</h1>
                     <ul class="modleList">
-                        <li class="modleItem">
-                            <a class="modelLink" href="/static/dist/app/project/single/filePreview.html?id=815581801980128&projectId=1&projectVersionId=784306105035931" target="_blank">CBS-WP-RIDE-WWI-GroupI.dwg</a>
-                        </li>
-                        <li class="modleItem">
-                            <a class="modelLink" href="/static/dist/app/project/single/filePreview.html?id=815581801980128&projectId=1&projectVersionId=784306105035931" target="_blank">CBS-WP-RIDE-WWI-GroupII.dwg</a>
-                        </li>
+                    
                     </ul>
                 </div>

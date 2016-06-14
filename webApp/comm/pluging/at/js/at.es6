@@ -14,7 +14,8 @@
       var defaults = {
         $el: $el, //当前元素
         ePos: 0, //光标位置
-        getData: null
+        getData: null,
+        callback:null
       }
 
       this.Settings = $.extend(defaults, opts);
@@ -223,6 +224,11 @@
         that.Settings.ePos += text.length;
 
         that.setCaretPosition(that.Settings.ePos);
+         
+        //回调
+        if (that.Settings.callback) {
+            that.Settings.callback($(this));
+        }
 
       });
 
@@ -235,6 +241,7 @@
 
     //定位前的计算
     at.prototype.beforeAtListPosition = function($txt, val) {
+       
       //替换空格 回车
       val = val.replace(/[\n\r]/gi, "<br/>").replace(/[ ]/g, "a");
 
@@ -272,7 +279,7 @@
     at.prototype.atListPosition = function(pos) {
 
       this.Settings.atList.css({
-        top: pos.top + 20 + this.Settings.atBox.offset().top,
+        top: pos.top  + this.Settings.atBox.offset().top-60,
         left: pos.left + 6
       }).show();
 

@@ -12,6 +12,7 @@ App.Project = {
 		isShare:false,
 		projectId: "", //项目id
 		versionId: "", //版本id		
+		viewPintId:"",//批注id 存在此id直接跳转到 批注
 		attrView: null,
 		CurrentVersion: null, //当前版本信息
 		DataModel: null //渲染模型的数据
@@ -408,6 +409,12 @@ App.Project = {
 				App.Project.Share.init();
 			}
 		}
+
+		//存在viewpintid
+		if (App.Project.Settings.viewPintId) {
+			$(".fileNav .model").click();
+		}
+
 	},
 
 	//设置 可以查看的属性

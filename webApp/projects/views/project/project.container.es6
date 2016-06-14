@@ -357,7 +357,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		});
 
 		//分享
-		if (App.Project.Settings.type == "token" && location.hash.indexOf("share") > 0) {
+		if (App.Project.Settings.type == "token" && location.hash.indexOf("share") > 0 || App.Project.Settings.viewPintId) {
 
 			viewer.on("loaded", function() {
 				//加载数据

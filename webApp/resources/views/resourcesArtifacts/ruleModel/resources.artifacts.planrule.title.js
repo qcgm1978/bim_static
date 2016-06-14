@@ -5,6 +5,8 @@ App.Resources.ArtifactsPlanRuleTitle = Backbone.View.extend({
 
     tagName:"div",
 
+    className:"pozero",
+
     template: _.templateUrl("/resources/tpls/resourcesArtifacts/ruleModel/resources.artifacts.planruletitle.html"),
 
     events:{
@@ -52,8 +54,8 @@ App.Resources.ArtifactsPlanRuleTitle = Backbone.View.extend({
         model.set({mappingCategory:operatorData},{silent:true});
         var container = new App.Resources.ArtifactsPlanRuleDetail({model:model});
 
-        $(".rules>div").append(container.render().el).show();
-        $(".rules>div>li:last-child .ruleDetail").show();
+        $(".ruleContentRuleList ul.outsideList").append(container.render().el).show();
+        $(".ruleContentRuleList ul.outsideList>li:last-child .ruleDetail").show();
         App.ResourceArtifacts.Status.saved = false;
     }
 
