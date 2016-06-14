@@ -17,11 +17,11 @@ App.Project.FileContainer=Backbone.View.extend({
 		 
 	},
 
-	template:_.templateUrl("/projects/tpls/project/project.container.file.html",true),
+	template:_.templateUrl("/projects/tpls/project/project.container.file.html"),
 
 	//渲染
 	render:function(){
-		this.$el.html(this.template);
+		this.$el.html(this.template());
 		var $container = this.$el.find('.serviceNav'),
 		    Auth = App.AuthObj && App.AuthObj.project  &&　App.AuthObj.project.prjfile;
 

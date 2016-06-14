@@ -223,10 +223,7 @@ App.API = {
 
 		projectDesinProperties:"sixD/{projectId}/{projectVersionId}/property/comparison",//?baseFileVerionId={baseFileVerionId}&fileVerionId={fileVerionId}&sceneId={sceneId}&elementId={elementId}
 		projectDesinPropertiesCost:"sixD/{projectId}/{projectVersionId}/cost/edo/comparison", //属性成本 ?baseProjectVerionId={baseProjectVerionId}&sceneId={sceneId}&elementId={elementId}
-		//TEST
-		projectChangeListTest:"/dataJson/project/projectChange/list.json",
-		projectDesinPropertiesTest:"/dataJson/project/projectChange/comparisonAttr.json",//sixD/{projectId}/{projectVersionId}/property/comparison //?baseProjectVerionId={baseProjectVerionId}&sceneId={sceneId}&elementId={elementId}
-		fileListTest:"/dataJson/project/projectChange/changeFile.json", //doc/{projectId}/{versionId}/alteration
+	 
 
 		//系统设置
 

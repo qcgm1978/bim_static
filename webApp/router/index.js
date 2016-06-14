@@ -6,6 +6,7 @@ var AppRoute = Backbone.Router.extend({
 		'inbox': 'inbox',
 		'projects': 'projects',
 		'projects/:id/:versionId': 'project',
+		'projects/:id/:versionId/:viewPintId': 'projectViewPoint',
 		'flow': 'flow',
 		'resources': 'resources',
 		'resources/:type': 'resource',
@@ -96,6 +97,26 @@ var AppRoute = Backbone.Router.extend({
 		App.Project.Settings.projectId = id;
 
 		App.Project.Settings.versionId = versionId;
+
+		App.Project.init();
+	},
+
+	//直接转到视点
+	projectViewPoint(id, versionId,viewPintId){
+		 
+		this.reset();
+
+		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".projects").addClass('selected');
+		_.require('/static/dist/projects/projects.css');
+		_.require('/static/dist/projects/projects.js');
+
+		App.Project.Settings = $.extend({}, App.Project.Defaults);
+
+		App.Project.Settings.projectId = id;
+
+		App.Project.Settings.versionId = versionId;
+
+		App.Project.Settings.viewPintId = viewPintId;
 
 		App.Project.init();
 	},

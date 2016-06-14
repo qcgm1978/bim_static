@@ -11,6 +11,8 @@ App.Index = {
 		referenceVersionId: "",
 		baseFileVersionId: "",
 		differFileVersionId: "",
+		baseModelId: "",
+		differModelId: "",
 		ModelObj: "",
 		modelId: "",
 		diffModleId: "",
@@ -163,7 +165,7 @@ App.Index = {
 
 				if (isSelected) {
 
-					if (App.Index.Settings.type=="api") {
+					if (App.Index.Settings.type == "api") {
 						App.Index.Settings.changeModel = App.Index.Settings.Viewer.load(App.Index.Settings.diffModleId);
 						return;
 					}
@@ -257,7 +259,7 @@ App.Index = {
 	renderModelById() {
 
 		App.Index.Settings.Viewer = new bimView({
-			type:'singleModel',
+			type: 'singleModel',
 			element: $("#contains .projectCotent"),
 			etag: App.Index.Settings.modelId,
 		});
@@ -283,7 +285,6 @@ App.Index = {
 	//渲染属性
 	renderAttr() {
 
-
 		if (!App.Index.Settings.ModelObj || !App.Index.Settings.ModelObj.intersect) {
 			$("#projectContainer .designProperties").html(' <div class="nullTip">请选择构件</div>');
 			return;
@@ -292,6 +293,8 @@ App.Index = {
 		var data = {
 			URLtype: "projectDesinProperties",
 			data: {
+				baseModelId: App.Index.Settings.baseModelId,
+				currentModelId: App.Index.Settings.differModelId,
 				projectId: App.Index.Settings.projectId,
 				projectVersionId: App.Index.Settings.projectVersionId,
 				elementId: App.Index.Settings.ModelObj.intersect.userId,
@@ -302,11 +305,49 @@ App.Index = {
 		};
 
 		App.Comm.ajax(data, function(data) {
+			
+			//隐藏图纸
+			$("#projectContainer .dwgBox").hide();
+
 			var template = _.templateUrl("/app/project/projectChange/tpls/proterties.html");
 			$("#projectContainer .designProperties").html(template(data.data));
 			//获取构建成本
 			App.Index.getAcquisitionCost();
+			//图纸
+			App.Index.attrDwg();
 		});
+
+	},
+
+	//模型属性 dwg 图纸
+	attrDwg: function() {
+
+		var modelId = App.Index.Settings.ModelObj.intersect.userId.split('.')[0],
+			data = {
+				URLtype: 'attrDwg',
+				data: {
+					projectId: App.Index.Settings.projectId,
+					versionId: App.Index.Settings.projectVersionId,
+					modelId: modelId
+				}
+			},
+
+			liTpl = '<li class="modleItem"><a data-id="<%=id%>" href="/static/dist/app/project/single/filePreview.html?id={id}&projectId=' + App.Project.Settings.projectId + '&projectVersionId=' + App.Project.Settings.CurrentVersion.id + '" target="_blank" ><div class="modleNameText overflowEllipsis modleName2">varName</div></a></li>';
+
+
+		App.Comm.ajax(data, (data) => {
+			if (data.code == 0) {
+
+				if (data.data.length > 0) {
+					var lis = '';
+					$.each(data.data, function(i, item) {
+						lis += liTpl.replace("varName", item.name).replace('{id}', item.id);
+					});
+					$("#projectContainer .dwgBox").show().find(".modleList").html(lis);
+				}
+			}
+		});
+
 
 	},
 
@@ -382,6 +423,7 @@ App.Index = {
 				items = _.findWhere(lists, {
 					"specialty": item.specialty
 				});
+
 				if (items) {
 					items.data.push(item);
 				} else {
@@ -394,6 +436,8 @@ App.Index = {
 			});
 
 			var firstData = lists[0].data[0];
+			that.Settings.baseModelId = firstData.baseModelId;
+			that.Settings.differModelId = firstData.differModelId;
 
 			//渲染模型
 			that.renderModel(firstData.differFileVersionId);
@@ -405,9 +449,8 @@ App.Index = {
 
 			var c = template(lists);
 
-
-
 			$(".projectNavContentBox .projectChangeListBox:first").prepend(c);
+
 			//下拉 事件绑定
 			$(".projectNavContentBox .projectChangeListBox:first .specialitiesOption").myDropDown({
 				click: function($item) {
@@ -422,8 +465,13 @@ App.Index = {
 
 					//重置数据
 					$(".showChange .groupRadio .selected").removeClass('selected');
+
+
 					App.Index.Settings.changeModel = null;
-					App.Index.Settings.baseFileVersionId = baseFileVersionId;
+					App.Index.Settings.changeModel = null;
+
+					App.Index.Settings.baseModelId = $item.data("basemodelid");
+					App.Index.Settings.differModelId = $item.data("differmodelid");
 
 					that.renderModel(differFileVersionId);
 					that.fetchChangeList(baseFileVersionId, differFileVersionId);
@@ -456,7 +504,7 @@ App.Index = {
 
 					var firstData = data[0].comparisons[0];
 					App.Index.Settings.modelId = firstData.currentModel;
-					App.Index.Settings.diffModleId=firstData.baseModel;
+					App.Index.Settings.diffModleId = firstData.baseModel;
 
 					//渲染 下拉
 					var template = _.templateUrl("/app/project/projectChange/tpls/file.list.api.html"),
@@ -513,6 +561,8 @@ App.Index = {
 		App.Collections.changeListCollection.projectId = App.Index.Settings.projectId;
 		App.Collections.changeListCollection.projectVersionId = App.Index.Settings.projectVersionId;
 
+
+
 		App.Index.Settings.baseFileVersionId = baseFileVersionId;
 		App.Index.Settings.differFileVersionId = differFileVersionId;
 
@@ -556,8 +606,8 @@ App.Index = {
 		App.Comm.ajax(data, function(data) {
 			if (data.code == 0) {
 				data = data.data;
-			 	$(".breadcrumbNav .project .text").text(data.projectName);
-			 	$(".breadcrumbNav .projectVersion .text").text(data.name);				  
+				$(".breadcrumbNav .project .text").text(data.projectName);
+				$(".breadcrumbNav .projectVersion .text").text(data.name);
 			}
 		});
 
