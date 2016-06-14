@@ -10,6 +10,24 @@ App.ResourceArtifacts={
         App.ResourceArtifacts.Status.rule.targetName = "";
     },
 
+    modelRuleSaveData:{
+        templateId: "",
+        templateName:"",
+        ruleIdsIn:[],//插入的规则id
+        ruleIdsDel:[],//删除的规则id
+        codeIdsIn:[],//插入的目标编码
+        codeIdsDel:[]//删除的目标编码
+    },
+
+    resetModelRuleSaveData:function(){
+        App.ResourceArtifacts.modelRuleSaveData.templateId ="";
+        App.ResourceArtifacts.modelRuleSaveData.templateName = "";
+        App.ResourceArtifacts.modelRuleSaveData.ruleIdsIn = [];
+        App.ResourceArtifacts.modelRuleSaveData.ruleIdsDel = [];
+        App.ResourceArtifacts.modelRuleSaveData.codeIdsIn = [];
+        App.ResourceArtifacts.modelRuleSaveData.codeIdsDel = [];
+    },
+
 
     Status:{
         presentPlan:null,  //当前计划或质量，提交数据
@@ -289,15 +307,16 @@ App.ResourceArtifacts={
 
             this.getTpl();
         }else{//规则库
-
             $(".mappingRule .library").addClass("active").siblings("a").removeClass("active");
             _this.$el.append(this.menu.render().el);//菜单
             this.menu.$(".plans").html(this.plans.render().el);//计划节点
+            this.menu.$(".qualifyC").hide().html(this.quality.render().el);
             this.menu.$(".rules").html(this.planRuleTitle.render().el);//映射规则
             this.planRuleTitle.$(".ruleContentRuleList").html(this.planRule.render().el);//映射规则
 
             //插入默认为空的规则列表
             this.getPlan();
+            this.getQuality();
             this.loaddeaprt();
             $(".mappingRule").show();
         }
@@ -324,7 +343,8 @@ App.ResourceArtifacts={
         pdata  = {
             URLtype:"fetchArtifactsPlan",
             data:{
-                type : App.ResourceArtifacts.Status.type
+                type : App.ResourceArtifacts.Status.type,
+                templateId:App.ResourceArtifacts.Status.templateId
             }
         };
         App.ResourceArtifacts.PlanRules.reset();
@@ -340,14 +360,21 @@ App.ResourceArtifacts={
         });
     },
     //获取质量标准
-    getQuality:function(pdata,_this){
-
+    getQuality:function(){
+        var pdata = {
+            URLtype:'fetchArtifactsQuality',
+            data:{
+                type:App.ResourceArtifacts.Status.type,
+                standardType: "GC",
+                templateId:App.ResourceArtifacts.Status.templateId
+            }
+        };
         App.ResourceArtifacts.PlanRules.reset();
         App.ResourceArtifacts.Status.quality.type = 1 ;
         App.Comm.ajax(pdata,function(response){
             if(response.code == 0 && response.data.length){
                 var list = App.Resources.artifactsQualityTree(response.data);
-                _this.$(".qualityMenuList").html(list);
+                this.$(".qualityMenuList").html(list);
             }
         });
     },
@@ -384,9 +411,7 @@ App.ResourceArtifacts={
             App.ResourceArtifacts.delays = setTimeout(function(){
                // var as = ;
                 App.ResourceArtifacts.PlanNode.add();
-
                 _this.delay();
-
                 n++;
             },100);
         }

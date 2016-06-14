@@ -24,6 +24,25 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
     initialize:function(){
         //this.listenTo(this.model,"change:checked",this.check);
         Backbone.on("resetTitle",this.changeCount,this);
+        Backbone.on("modelRuleEmpty",this.modelRuleEmpty,this);
+        Backbone.on("modelRuleFull",this.modelRuleFull,this);
+        Backbone.on("modelRuleHalf",this.modelRuleHalf,this);
+    },
+
+    modelRuleEmpty:function(){
+        if(App.ResourceArtifacts.Status.rule.targetCode == this.model.get("code")){
+            this.$(".ruleCheck").removeClass("all").removeClass("half");
+        }
+    },
+    modelRuleFull:function(){
+        if(App.ResourceArtifacts.Status.rule.targetCode == this.model.get("code")) {
+            this.$(".ruleCheck").addClass("all").removeClass("half");
+        }
+    },
+    modelRuleHalf:function(){
+        if(App.ResourceArtifacts.Status.rule.targetCode == this.model.get("code")){
+            this.$(".ruleCheck").addClass("half").removeClass("all");
+        }
     },
 
     checked:function(e){
@@ -32,9 +51,17 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
         if(ele.hasClass("all")){
             ele.removeClass("all");
             ele.closest("li").attr("data-check","0");
+            if(this.$el.hasClass("active")){
+                Backbone.trigger("modelRuleSelectNone");
+                //触发全不选事件
+            }
         }else{
             ele.addClass("all");
             ele.closest("li").attr("data-check","1");
+            if(this.$el.hasClass("active")){
+                //触发全选事件
+                Backbone.trigger("modelRuleSelectAll");
+            }
         }
         ele.removeClass("half");
         //不设置模型类型
