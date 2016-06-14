@@ -82,16 +82,19 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
         if($this.closest("li").hasClass("active")){
             return
         }
+
+        if(!App.ResourceArtifacts.Status.saved){
+            alert("您还有没保存的");
+            return
+        }
+
         App.ResourceArtifacts.PlanRules.reset();
 
          App.ResourceArtifacts.Status.rule.targetCode = this.model.get("code");
         App.ResourceArtifacts.Status.rule.targetName = this.model.get("name");
         App.ResourceArtifacts.Status.rule.count = this.model.get("count");
 
-        if(!App.ResourceArtifacts.Status.saved){
-            alert("您还有没保存的");
-            return
-        }
+
         App.ResourceArtifacts.loading($(".rules"));
 
         this.toggleClass();

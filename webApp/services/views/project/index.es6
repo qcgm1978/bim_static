@@ -23,14 +23,12 @@
  	
  		this.$el.html(this.template);
 
-
 	  var $container = this.$el.find('.serviceNav'),
 	      tabs = App.Comm.AuthConfig.Service.project,
 		  Auth = App.AuthObj.service.project;
 
 	  if (Auth.baseInfo) {
 		  $container.append(tabs.baseInfo.tab);
-
 		  new App.Services.ProjectBase();
 		  this.viewProjectMapping = new App.Services.ProjectMapping();
 		  this.$(".projectContainer .projectBase .mapItem").html(this.viewProjectMapping.render().el);
@@ -111,11 +109,13 @@
  			}
  		});
  		
+ 		if(this.viewProjectMapping){
+ 			//参数传递
+	 		this.viewProjectMapping.setUserData({
+	 			projectId:_projectId
+	 		});
+ 		}
  		
- 		//参数传递
- 		this.viewProjectMapping.setUserData({
- 			projectId:_projectId
- 		});
  		
  		//加载项目映射数据
  		let collectionMap=App.Services.ProjectCollection.ProjecMappingCollection;
