@@ -12,7 +12,7 @@ App.Project.Collection = {
       }
     }),
 
-    urlType: "fetchDesignChange"
+    urlType: "modelStd"
 
   })),
   changeInfo: new(Backbone.Collection.extend({
