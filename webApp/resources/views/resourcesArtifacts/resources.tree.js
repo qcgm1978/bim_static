@@ -34,7 +34,7 @@ App.Resources.artifactsTree = function(dataList,code){
     return ele;
 };
 //质量标准tree
-App.Resources.artifactsQualityTree = function(dataList){
+App.Resources.artifactsQualityTree = function(dataList,n){
     var data = dataList;
     var ele  = $("<ul></ul>");
     for(var i =0 ; i < data.length ; i++){
@@ -51,7 +51,15 @@ App.Resources.artifactsQualityTree = function(dataList){
         var  a  = data[i].ruleContain == 1 ? 1 : 0 ;
         li.attr("data-check",a);
         li.attr("data-code",data[i].code);
-        li.append(new App.Resources.ArtifactsQualityDetail({model:initModel}).render().el);
+        li.attr("data-ruleContain",data[i].ruleContain);
+        li.attr("data-leaf",(data[i].leaf ? "1" : 0));
+        var as = new App.Resources.ArtifactsQualityDetail({model:initModel});
+        if(data[i].ruleContain = 1){
+            as.$(".ruleCheck").addClass("all");
+        }else if(data[i].ruleContain = 3){
+            as.$(".ruleCheck").addClass("half");
+        }
+        li.append(as.render().el);
         li.append("<div class='childList' data-code='"+data[i].code +"'></div>");
         ele.append(li);
         App.Comm.initScroll($(".qualityMenu"),"y");

@@ -39,8 +39,6 @@ App.ResourcesNav.App = Backbone.View.extend({
 		}else if(type == "artifactsMapRule" ||  type == "project"){
 			//构件映射规则
 			if(optionType){//映射规则/规则模板
-				//http://bim.wanda-dev.cn/#services/project/845159666131136
-				//http://bim.wanda-dev.cn/#resources/artifactsMapRule/library
 				App.ResourceArtifacts.init(_this,optionType);
 			}
 		}

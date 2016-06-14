@@ -55,8 +55,7 @@ App.INBox = {
 				reset: true,
 				data: {
 					pageIndex:index||1,
-					pageItemCount:size||10,
-					status: 0
+					pageItemCount:size||10
 				}
 			})
 		}else{
@@ -64,7 +63,8 @@ App.INBox = {
 				reset: true,
 				data: {
 					pageIndex:index||1,
-					pageItemCount:size||10
+					pageItemCount:size||10,
+					status: 0
 				}
 			})
 		}

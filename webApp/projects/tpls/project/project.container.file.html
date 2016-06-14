@@ -8,7 +8,8 @@
             <span class="filecKAll inlineBlock"><input type="checkbox" class="ckAll" /></span>
             <span class="fileBg inlineBlock"></span>
             <span class="fileName inlineBlock">名称</span>
-              <span class="changeContrast inlineBlock">变更比对</span>
+              <span class="changeContrast inlineBlock">
+              <%=App.Project.Settings.CurrentVersion.name=='初始版本'?'标准比对':'变更比对'%>  </span>
             <span class="fileStatus inlineBlock">状态</span>
             <span class="fileOp inlineBlock">操作人</span>
             <span class="fileSize inlineBlock">大小</span>

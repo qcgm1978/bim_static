@@ -39,3 +39,6 @@ orkbench
 *.mswwsettings
 
 tempfiles/
+/webApp/test
+/webApp/1.html
+/webApp/resources/tpls/resourcesArtifacts/resources.artifacts.IndexNav.html
