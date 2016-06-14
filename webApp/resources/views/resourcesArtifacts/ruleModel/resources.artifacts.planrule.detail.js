@@ -24,7 +24,7 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
         "click .choose":"choose",
         "click .delRule": "delRule",
         "focus .categoryCode": "legend",
-        "click .myDropText":"seleRule",
+        "click .text":"seleRule",
         "click .myItem":"myItem",
         "click .ruleCheck":"ruleCheck"
     },
@@ -423,9 +423,9 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
 
     //切换规则
     seleRule:function(e) {
-        $(".myDropList").hide();
         var _this = $(e.target);
-        _this.siblings(".myDropList").show();
+        $(".myDropList").hide();
+        _this.closest(".myDropText").siblings(".myDropList").show();
     },
 
     //选择规则，切换输入方式
