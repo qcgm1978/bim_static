@@ -103,7 +103,14 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 				}
 				$item.addClass("selected").siblings().removeClass("selected");
 
-
+				//权限控制
+				var Auth = App.AuthObj.lib.family;
+				if(!Auth.edit){
+					$('#reNameModel,#delModel').addClass('disable');
+					if(!Auth.download || !App.ResourceModel.Settings.CurrentVersion.byProjectRef){
+						$('#downLoadModel').addClass('disable');
+					}
+				}
 
 			},
 			shadow: false,
@@ -113,7 +120,9 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 
 				},
 				'downLoadModel': function(item) {
-
+					if($('#downLoadModel').is('.disable')){
+						return ''
+					}
 					//下载
 					var $item = $(item);
 
@@ -140,13 +149,17 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 
 				},
 				'delModel': function(item) {
-
+					if($('#delModel').is('.disable')){
+						return ''
+					}
 					//删除提示
 					App.ResourceModel.delFileDialog($(item));
 
 				},
 				'reNameModel': function(item) {
-
+					if($('#reNameModel').is('.disable')){
+						return ''
+					}
 
 					//重命名
 					let $reNameModel = $("#reNameModel");

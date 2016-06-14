@@ -199,9 +199,12 @@
 							CommentCollections.Project.reset();
 							CommentCollections.Project.fetch({
 								success() {
+
 									//存在viewpintid 调到评论
 									if (App.Project.Settings.viewPintId) {
-										$comment.find(".remarkCount_"+App.Project.Settings.viewPintId).click();
+										var $remark = $comment.find(".remarkCount_" + App.Project.Settings.viewPintId);
+										$remark.closest(".item").click();
+										$remark.click();
 									}
 								}
 							});
@@ -615,6 +618,9 @@
 							description: data.name,
 							id: data.id
 						});
+
+						//显示
+						$("#projectContainer .modelSidebar").addClass("show open");
 					});
 				},
 
@@ -625,6 +631,8 @@
 					CommentApi.saveCommentStart(null, "address", (data) => {
 						//上传地址或者评论视点后
 						CommentApi.afterUploadAddressViewPoint.call(this, data);
+						//显示
+						$("#projectContainer .modelSidebar").addClass("show open");
 					});
 					$("#topSaveTip .btnSave").click();
 				},
@@ -957,6 +965,9 @@
 
 			//开始保存批注
 			saveCommentStart(viewPointId, cate, callback) {
+
+				//收起导航
+				$("#projectContainer .modelSidebar").removeClass("show open");
 				//保存
 				App.Project.Settings.Viewer.comment();
 
@@ -1017,6 +1028,8 @@
 							closeCallback: function() {
 								if (cate != "viewPoint") {
 									App.Project.Settings.Viewer.commentEnd();
+									//收起导航
+									$("#projectContainer .modelSidebar").addClass("show open");
 								}
 							},
 
@@ -1084,6 +1097,9 @@
 				//取消
 				$topSaveTip.on("click", ".btnCanel", function() {
 					App.Project.Settings.Viewer.commentEnd();
+					//显示
+					$("#projectContainer .modelSidebar").addClass("show open");
+
 				});
 
 			},
@@ -1164,6 +1180,9 @@
 
 								//关闭弹出层 取消编辑状态
 								dialog.close();
+
+								//显示
+								$("#projectContainer .modelSidebar").addClass("show open");
 
 								$("#topSaveTip .btnCanel").click();
 

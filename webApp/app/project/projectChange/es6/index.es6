@@ -115,11 +115,28 @@ App.Index = {
 			if ($target.data("cate")) {
 
 				$target.closest(".treeRoot").find(".selected").each(function() {
-					Ids = $.merge(Ids, $(this).data("cate"))
+					Ids = $.merge(Ids, $(this).data("cate").elements)
 				});
 
-				App.Index.Settings.Viewer.selectIds(Ids);
-				App.Index.Settings.Viewer.zoomSelected();
+				//没有构建id 返回
+				if (Ids.length <= 0) {
+					return;
+				}
+
+				var box1 = [],
+					boundingBox = $(this).data("cate").boundingBox,
+					max = boundingBox.max,
+					min = boundingBox.min;
+				box1.push([max.x, max.y, max.z], [min.x, min.y, min.z]);
+
+				//App.Index.Settings.Viewer.setSelectedIds(Ids);
+				App.Index.Settings.Viewer.zoomToBox(box1);
+				App.Index.Settings.Viewer.highlight({
+					type: "userId",
+					ids: Ids
+				});
+
+
 				return;
 			}
 
@@ -138,17 +155,26 @@ App.Index = {
 
 					$target.data("cate", data.data);
 
+					if (data.data.elements.length <= 0) {
+						return;
+					}
+
 					$target.closest(".treeRoot").find(".selected").each(function() {
-						Ids = $.merge(Ids, $(this).data("cate"))
+						Ids = $.merge(Ids, $(this).data("cate").elements);
 					});
 
-					App.Index.Settings.Viewer.selectIds(Ids);
-					App.Index.Settings.Viewer.zoomSelected();
+					var box1 = [],
+						max = data.data.boundingBox.max,
+						min = data.data.boundingBox.min;
+					box1.push([max.x, max.y, max.z], [min.x, min.y, min.z]);
 
-					// App.Index.Settings.Viewer.highlight({
-					// 	type: "userId",
-					// 	ids: Ids
-					// })
+					//App.Index.Settings.Viewer.setSelectedIds(Ids);
+					App.Index.Settings.Viewer.zoomToBox(box1);
+					App.Index.Settings.Viewer.highlight({
+						type: "userId",
+						ids: Ids
+					});
+
 				}
 			});
 
@@ -280,6 +306,13 @@ App.Index = {
 			}
 
 		});
+
+		App.Index.Settings.Viewer.on("loaded", function() {
+			//加载数据
+			$(".showChange .groupRadio").click();
+		});
+
+
 	},
 
 	//渲染属性
@@ -298,14 +331,14 @@ App.Index = {
 				projectId: App.Index.Settings.projectId,
 				projectVersionId: App.Index.Settings.projectVersionId,
 				elementId: App.Index.Settings.ModelObj.intersect.userId,
-				baseFileVerionId: App.Index.Settings.baseFileVersionId,
-				fileVerionId: App.Index.Settings.differFileVersionId,
+				baseFileVerionId: App.Index.Settings.baseFileVersionId, //上一个
+				fileVerionId: App.Index.Settings.differFileVersionId, //当前
 				sceneId: App.Index.Settings.ModelObj.intersect.object.userData.sceneId || ""
 			}
 		};
 
 		App.Comm.ajax(data, function(data) {
-			
+
 			//隐藏图纸
 			$("#projectContainer .dwgBox").hide();
 

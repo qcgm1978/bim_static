@@ -29,7 +29,7 @@
   </span> 
 
 <%if(!folder && modificationId){%>
- <a href="/static/dist/app/project/modelChange/index.html?id=<%=fileVersionId%>&projectId=<%=App.Project.Settings.projectId%>&projectVersionId=<%=App.Project.Settings.CurrentVersion.id%>&modificationId=<%=modificationId%>" target="_blank" class="changeContrast inlineBlock">有</a> 
+ <a href="/static/dist/app/project/modelChange/index.html?id=<%=fileVersionId%>&projectId=<%=App.Project.Settings.projectId%>&projectVersionId=<%=App.Project.Settings.CurrentVersion.id%>&modificationId=<%=modificationId%>&type=<%=App.Project.Settings.CurrentVersion.name=='初始版本'?'std':'base'%>" target="_blank" class="changeContrast inlineBlock">有</a> 
 <%}else{%>
 	<span class="changeContrast inlineBlock"></span>
 <%}%>
