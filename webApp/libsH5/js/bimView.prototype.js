@@ -269,7 +269,7 @@
           filter = bimView.comm.getFilters(parents,'uncheck');
           self.filter(filter);
         }
-      }).on('click','.treeText',function(){
+      }).on('click','#filter .treeText',function(){
         // 选中高亮
         var $this = $(this),
             $li = $this.closest('.itemNode'),
