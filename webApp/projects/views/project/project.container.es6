@@ -212,8 +212,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			$projectContainer = $("#projectContainer"),
 			$projectCotent = $projectContainer.find(".projectCotent");
 		App.Project.Settings.fetchNavType = type;
-
-		$.fn.contextMenu.destory();
+ 
 		
 		if (type == "file") {
 
