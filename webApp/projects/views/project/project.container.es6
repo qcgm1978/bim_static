@@ -49,7 +49,6 @@ App.Project.ProjectContainer = Backbone.View.extend({
 	//点击面包靴
 	breadItemClick: function(event) {
 
-
 		var $target = $(event.target).closest(".breadItem");
 
 		//没有下拉箭头的 不加载
