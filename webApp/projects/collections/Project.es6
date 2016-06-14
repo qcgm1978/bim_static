@@ -124,6 +124,8 @@ App.Project = {
 					window.location.href = url;
 				},
 				'delModel': function(item) {
+					var $item=$(item);
+					_this.delFile($item);
 				},
 				'reNameModel': function(item) {
 					//重命名
@@ -146,6 +148,34 @@ App.Project = {
 		});
 	},
 
+	delFile:function($item){
+		var dialog = new App.Comm.modules.Dialog({
+			width: 580,
+			height: 168,
+			limitHeight: false,
+			title: '删除文件提示',
+			cssClass: 'deleteFileDialog',
+			okClass: "delFile",
+			okText: '确&nbsp;&nbsp;认',
+			okCallback: function() {
+				var fileVersionId = $item.find(".filecKAll").data("fileversionid"),
+					id = $item.find(".text").data("id"),
+					models = App.Project.FileCollection.models;
+				//修改数据
+				$.each(models, function(i, model) {
+					if (model.toJSON().id == id) {
+						model.urlType = "deleteFile";
+						model.projectId = App.Project.Settings.CurrentVersion.projectId;
+						model.projectVersionId = App.Project.Settings.CurrentVersion.id;
+						model.fileVersionId = fileVersionId;
+						model.destroy();
+						return false;
+					}
+				});
+			},
+			message: $item.find(".folder").length > 0 ? "确认要删除该文件夹么？" : "确认要删除该文件么？"
+		});
+	},
 	//取消修改名称
 	calcelEditName: function(event) {
 

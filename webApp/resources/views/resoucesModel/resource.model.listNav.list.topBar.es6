@@ -17,7 +17,6 @@
 	  if (!App.AuthObj.lib) {
 
 	  } else{
-		  debugger
 		  var type = App.ResourcesNav.Settings.type;
 		  if (type == "standardLibs") {
 			  var Auth = App.AuthObj.lib.model;

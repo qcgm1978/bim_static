@@ -371,6 +371,29 @@ App.Project.Model = {
         App.Index.Settings.Viewer.fit();
       }
 
+			App.Index.Settings.Viewer.setOverrider('add');
+			App.Index.Settings.Viewer.setOverrider('beforeEdit');
+			App.Index.Settings.Viewer.setOverrider('afterEdit');
+			App.Index.Settings.Viewer.setOverrider('delete');
+
+			//判断是新增，修改，删除
+			if(baseId && elementId){
+				//修改
+
+				App.Index.Settings.Viewer.setOverrider('beforeEdit',[baseId]);
+				App.Index.Settings.Viewer.setOverrider('afterEdit',[elementId]);
+			}else if(baseId){
+				//删除
+
+				App.Index.Settings.Viewer.setOverrider('delete',[baseId]);
+
+			}else{
+				//新增
+
+				App.Index.Settings.Viewer.setOverrider('add',[elementId]);
+			}
+			console.log(baseId,elementId)
+
 			//zoomtobox
 			$.ajax({
 				url: "http://bim.wanda-dev.cn/sixD/"+App.Index.Settings.projectId+"/"+App.Index.Settings.projectVersionId+"/bounding/box?sceneId="+(elementId?elementId.split('.')[0]:baseId.split('.')[0])+"&elementId="+(elementId?elementId:baseId)
@@ -391,12 +414,13 @@ App.Project.Model = {
 								var max = respone.data.max,
 								    min = respone.data.min;
 								box1.push([max.x,max.y,max.z],[min.x,min.y,min.z]);
-								App.Index.Settings.Viewer.zoomToBox(box1);
 
+								App.Index.Settings.Viewer.zoomToBox(box1);
 							}
 						});
 					}else{
 						App.Index.Settings.Viewer.zoomToBox(box1);
+
 					}
 
 

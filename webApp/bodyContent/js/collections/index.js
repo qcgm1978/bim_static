@@ -148,7 +148,7 @@ App.BodyContent.control= {
     })),
 
     loadData : function(collection,data,urlParam) {
-    	
+    	var _this=this;
         //数据重置
         collection.reset();
         // load list
@@ -169,14 +169,16 @@ App.BodyContent.control= {
                             $("#slideTitle").html('项目');
                         }
                     }
-                    $(".mmhSlider").mmhSlider({
-						delay:5000,
-						data:_datas,
-                        noData:_nodata,
-						onChange:function(d){
-							$("#slideTitle").html(d.name);
-						}
-					})
+                    if(!_this.slider){
+                        _this.slider=$(".mmhSlider").mmhSlider({
+                            delay:5000,
+                            data:_datas,
+                            noData:_nodata,
+                            onChange:function(d){
+                                $("#slideTitle").html(d.name);
+                            }
+                        })
+                    }
                 }
                 //空数据提示视图
                 if(!collection.models.length){

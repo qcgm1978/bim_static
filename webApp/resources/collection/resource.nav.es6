@@ -23,7 +23,11 @@ App.ResourcesNav = {
 
 		parse: function(responese) {
 			if (responese.message == "success") {
-				return responese.data.items;
+				if(responese.data.items.length<=0){
+					Backbone.trigger('StandModelNullData');
+				}else{
+					return responese.data.items;
+				}
 			}
 		}
 
@@ -45,7 +49,11 @@ App.ResourcesNav = {
 
 		parse: function(responese) {
 			if (responese.message == "success") {
-				return responese.data.items;
+				if(responese.data.items.length<=0){
+					Backbone.trigger('FamlibNullData');
+				}else{
+					return responese.data.items;
+				}
 			}
 		}
 

@@ -377,6 +377,13 @@
       self.pub('rotateMouse');
       self.viewer.setRectPickMode();
     },
+    rotateObj:function(){
+      // 普通模式
+      var self = this;
+      self._dom.bimBox.find(".view").attr('class','view');
+      self.pub('rotateMouse');
+      self.viewer.setRectPickMode(true);
+    },
     home:function(){
       // 普通模式
       var self = this;

@@ -31,7 +31,6 @@ App.ResourceModel.ListContent = Backbone.View.extend({
 
 	//添加单个文件
 	addOneFile: function(model) {
-
 		var view = new App.ResourceModel.ListNavDetail({
 			model: model
 		});

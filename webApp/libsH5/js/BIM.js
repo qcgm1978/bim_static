@@ -257,7 +257,7 @@
         id:'rotateObj',
         icon:'m-rotateObj',
         title:'绕构件旋转',
-        fn:'rotateMouse',
+        fn:'rotateObj',
         keyCode:'',
         type:'rotate',
         group:'3'

@@ -10,6 +10,7 @@ App.ResourcesNav.StandardLibs = Backbone.View.extend({
 	initialize() {
 		this.listenTo(App.ResourcesNav.StandardLibsCollection, "add", this.addOne);
 		this.listenTo(App.ResourcesNav.StandardLibsCollection, "reset", this.emptyContent);
+		Backbone.on('StandModelNullData',this.nullData,this);
 	},
 
 	events: {
@@ -27,7 +28,6 @@ App.ResourcesNav.StandardLibs = Backbone.View.extend({
 
 	//添加单个
 	addOne(model) {
-
 		var $standar = this.$el.find(".standarBody .standar"),
 			$loading = $standar.find(".loading");
 
@@ -62,6 +62,9 @@ App.ResourcesNav.StandardLibs = Backbone.View.extend({
 	//清空内容为加载
 	emptyContent() {
 		this.$el.find(".standarBody .standar").html(' <li class="loading">正在加载，请稍候……</li>');
+	},
+	nullData() {
+		this.$el.find(".standarBody .standar").html('<li class="loading"><img src="/static/dist/images/projects/images/emptyProject.png"><div>暂无可访问标准模型</div></li>');
 	}
 
 
