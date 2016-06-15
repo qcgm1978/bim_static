@@ -31,16 +31,18 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
     modelRuleEmpty:function(){
         if(this.model.get("leaf")&&App.ResourceArtifacts.Status.rule.targetCode == this.model.get("code")){
             this.$(".ruleCheck").removeClass("all").removeClass("half");
+            Backbone.trigger("modelRuleSelectNone");
         }
     },
     modelRuleFull:function(){
         if(this.model.get("leaf")&&App.ResourceArtifacts.Status.rule.targetCode == this.model.get("code")) {
             this.$(".ruleCheck").addClass("all").removeClass("half");
+            Backbone.trigger("modelRuleSelectAll");
         }
     },
     modelRuleHalf:function(){
         if(this.model.get("leaf")&&App.ResourceArtifacts.Status.rule.targetCode == this.model.get("code")){
-        this.$(".ruleCheck").addClass("half").removeClass("all");
+            this.$(".ruleCheck").addClass("half").removeClass("all");
         }
     },
 

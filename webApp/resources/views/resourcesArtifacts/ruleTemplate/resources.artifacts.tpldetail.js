@@ -20,9 +20,7 @@ App.Resources.ArtifactsTplDetail = Backbone.View.extend({
         return this;
     },
 
-    initialize:function(){
-        //this.listenTo(App.ResourceArtifacts.TplCollectionRule,"reset",this.render);
-    },
+    initialize:function(){},
 
     delete:function(){
         var _this = this;
@@ -53,19 +51,20 @@ App.Resources.ArtifactsTplDetail = Backbone.View.extend({
 
     //保存
     resourcesSure:function(){
-
+        var _this = this;
+        //如果不存在模板id则无法保存
         if(!App.ResourceArtifacts.Status.templateId){
             return
         }
 
-
-        var _this = this;
         App.ResourceArtifacts.modelRuleSaveData.templateId = App.ResourceArtifacts.Status.templateId;
         App.ResourceArtifacts.modelRuleSaveData.templateName = App.ResourceArtifacts.Status.templateName = this.$(".tplDetailEdit .tplName").val();
-        //计划
+
+        //模块化
         var plan = _.filter($(".artifactsContent .plans li"),function(item){
             return $(item).attr("data-check") == "1";
         });
+
         //如果，collection里已选，则放弃，未选则添加，单条rule由planruledetail自行添加，每次需比较id
         App.ResourceArtifacts.PlanNode.each(function(item){
             for(var i = 0  ; i < plan.length ; i++){

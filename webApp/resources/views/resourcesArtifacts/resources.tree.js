@@ -67,11 +67,6 @@ App.Resources.artifactsQualityTree = function(dataList,n){
     return ele;
 };
 
-
-
-
-
-
 App.Resources.cancelBubble = function(e){
     if(e.stopPropagation){
         e.stopPropagation();

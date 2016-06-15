@@ -30,7 +30,7 @@ App.Resources.ArtifactsPlanRuleAlert = Backbone.View.extend({
         //新建规则，直接删除
         if(!id){
             //直接删除末尾内容
-            $(".ruleContent>ul>li").last().remove();
+            $(".outsideList>li").last().remove();
             App.Resources.ArtifactsAlertWindow.close();
             $(".artifactsContent .rules").removeClass("services_loading");
             App.ResourceArtifacts.Status.saved = true;

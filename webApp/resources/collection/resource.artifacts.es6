@@ -1,34 +1,6 @@
 //fetchArtifactsPlan   获取计划
 //fetchArtifactsPlanRule   获取规则
 App.ResourceArtifacts={
-    resetPreRule:function(){
-
-        App.ResourceArtifacts.Status.templateId = "";
-        App.ResourceArtifacts.Status.templateName = "";
-        App.ResourceArtifacts.Status.rule.biz = "";
-        App.ResourceArtifacts.Status.rule.targetCode = "";
-        App.ResourceArtifacts.Status.rule.targetName = "";
-    },
-
-    modelRuleSaveData:{
-        templateId: "",
-        templateName:"",
-        ruleIdsIn:[],//插入的规则id
-        ruleIdsDel:[],//删除的规则id
-        codeIdsIn:[],//插入的目标编码
-        codeIdsDel:[]//删除的目标编码
-    },
-
-    resetModelRuleSaveData:function(){
-        App.ResourceArtifacts.modelRuleSaveData.templateId ="";
-        App.ResourceArtifacts.modelRuleSaveData.templateName = "";
-        App.ResourceArtifacts.modelRuleSaveData.ruleIdsIn = [];
-        App.ResourceArtifacts.modelRuleSaveData.ruleIdsDel = [];
-        App.ResourceArtifacts.modelRuleSaveData.codeIdsIn = [];
-        App.ResourceArtifacts.modelRuleSaveData.codeIdsDel = [];
-    },
-
-
     Status:{
         presentPlan:null,  //当前计划或质量，提交数据
         saved : true,    //创建规则后的保存状态，已保存  /  未保存
@@ -275,7 +247,7 @@ App.ResourceArtifacts={
         }else{
             this.ArtifactsProjectBreadCrumb = new App.Resources.ArtifactsProjectBreadCrumb();
             _this.$el.html(this.ArtifactsProjectBreadCrumb.render().el);
-            //项目映射入口
+            //项目映射规则名称
             App.ResourceArtifacts.Status.projectName = App.Comm.publicData.services.project.projectName;
         }
 
@@ -295,9 +267,7 @@ App.ResourceArtifacts={
         if(optionType == "template" ){//规则模板
 
             _this.$(".resourcesMappingRule .template").addClass("active").siblings("a").removeClass("active");
-
             App.ResourceArtifacts.Status.qualityStandardType = "GC";
-
             if(App.ResourceArtifacts.Settings.ruleModel  ==2){
                 App.ResourceArtifacts.Status.rule.biz =2
             }
@@ -309,10 +279,8 @@ App.ResourceArtifacts={
             this.tplFrame.$(".tplListContainer").html(this.tplList.render().el);
 
             this.getTpl();
+            this.getAllQuality();
         }else{//规则库
-            if(optionType != "library" ){
-
-            }
             _this.$(".resourcesMappingRule .library").addClass("active").siblings("a").removeClass("active");
             _this.$el.append(this.menu.render().el);//菜单
             _this.$(".projectName").html( App.ResourceArtifacts.Status.projectName);
@@ -321,12 +289,12 @@ App.ResourceArtifacts={
             this.menu.$(".rules").html(this.planRuleTitle.render().el);//映射规则
             this.planRuleTitle.$(".ruleContentRuleList").html(this.planRule.render().el);//映射规则
 
-            //插入默认为空的规则列表
+            //读入数据
             this.getPlan();
             this.getQuality();
             this.loaddeaprt();
-            $(".mappingRule").show();
         }
+        $(".resourcesMappingRule").show();
     },
 
     //获取分类编码
@@ -381,13 +349,11 @@ App.ResourceArtifacts={
                 standardType: App.ResourceArtifacts.Status.qualityStandardType
             }
         };
-
         if(App.ResourceArtifacts.Status.templateId){
             pdata.data.templateId = App.ResourceArtifacts.Status.templateId;
         }else if(App.ResourceArtifacts.Status.projectId){
             pdata.data.projectId = App.ResourceArtifacts.Status.projectId;
         }
-
         App.ResourceArtifacts.PlanRules.reset();
         App.Comm.ajax(pdata,function(response){
             if(response.code == 0 && response.data.length){
@@ -397,6 +363,38 @@ App.ResourceArtifacts={
             $("#artifacts").removeClass("services_loading");
         });
     },
+
+
+    //所有质量标准列表
+    allQuality:new(Backbone.Collection.extend({
+        model:Backbone.Model.extend({
+            defaults:function(){
+                return{
+
+                }
+            }
+        })
+    })),
+    //获取全部质量标准
+    getAllQuality:function(){
+        var _this = this;
+        var pdata = {
+            URLtype:'fetchArtifactsQuality',
+            data:{
+                parentCode: "all",
+                type:App.ResourceArtifacts.Status.type,
+                standardType: App.ResourceArtifacts.Status.qualityStandardType
+            }
+        };
+        this.allQuality.reset();
+        App.Comm.ajax(pdata,function(response){
+            if(response.code == 0 && response.data.length){
+                _this.allQuality.add(response.data);
+            }
+        });
+    },
+
+
 
     //获取规则模板
     getTpl:function(){
@@ -412,8 +410,7 @@ App.ResourceArtifacts={
             if(response.code == 0 && response.data){
                 if(response.data.length){
                     App.ResourceArtifacts.TplCollection.add(response.data);
-                }else{
-                }
+                }else{}
             }
             $("#artifacts").removeClass("services_loading");
         });
@@ -440,5 +437,32 @@ App.ResourceArtifacts={
 
     loaded:function(ele){
         $(ele).removeClass("services_loading");
+    },
+
+
+    //重置规则
+    resetPreRule:function(){
+        App.ResourceArtifacts.Status.templateId = "";
+        App.ResourceArtifacts.Status.templateName = "";
+        App.ResourceArtifacts.Status.rule.biz = "";
+        App.ResourceArtifacts.Status.rule.targetCode = "";
+        App.ResourceArtifacts.Status.rule.targetName = "";
+    },
+    modelRuleSaveData:{
+        templateId: "",
+            templateName:"",
+            ruleIdsIn:[],//插入的规则id
+            ruleIdsDel:[],//删除的规则id
+            codeIdsIn:[],//插入的目标编码
+            codeIdsDel:[]//删除的目标编码
+    },
+    //重置要存储的模板
+    resetModelRuleSaveData:function(){
+        App.ResourceArtifacts.modelRuleSaveData.templateId ="";
+        App.ResourceArtifacts.modelRuleSaveData.templateName = "";
+        App.ResourceArtifacts.modelRuleSaveData.ruleIdsIn = [];
+        App.ResourceArtifacts.modelRuleSaveData.ruleIdsDel = [];
+        App.ResourceArtifacts.modelRuleSaveData.codeIdsIn = [];
+        App.ResourceArtifacts.modelRuleSaveData.codeIdsDel = [];
     }
 };

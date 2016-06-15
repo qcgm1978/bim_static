@@ -44,6 +44,7 @@ App.Resources.ArtifactsTplListItem = Backbone.View.extend({
         }
         this.toggleClass();
 
+        //这里最好另行处理
         $(".tplContent").addClass("services_loading");
         //重置右侧列表
         this.detail = new App.Resources.ArtifactsTplDetail();
