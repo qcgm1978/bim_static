@@ -294,7 +294,7 @@ App.ResourceArtifacts={
 
         if(optionType == "template" ){//规则模板
 
-            _this.$(".mappingRule .template").addClass("active").siblings("a").removeClass("active");
+            _this.$(".resourcesMappingRule .template").addClass("active").siblings("a").removeClass("active");
 
             App.ResourceArtifacts.Status.qualityStandardType = "GC";
 
@@ -313,7 +313,7 @@ App.ResourceArtifacts={
             if(optionType != "library" ){
 
             }
-            _this.$(".mappingRule .library").addClass("active").siblings("a").removeClass("active");
+            _this.$(".resourcesMappingRule .library").addClass("active").siblings("a").removeClass("active");
             _this.$el.append(this.menu.render().el);//菜单
             _this.$(".projectName").html( App.ResourceArtifacts.Status.projectName);
             this.menu.$(".plans").html(this.plans.render().el);//计划节点
