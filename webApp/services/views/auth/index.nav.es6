@@ -14,7 +14,10 @@ App.Services.AuthNav = Backbone.View.extend({
 		"click .projectMember" : "projectMember"
 	},
 	render:function(){
-		this.$el.html(this.template);
+		var user = JSON.parse(localStorage.user || "{}"),
+			isadmin = user.isAdmin || false,
+			isKeyUser = user.isKeyUser || false;
+		this.$el.html(this.template({isadmin:isadmin,iskeyuser:isKeyUser}));
 		return this;
 	},
 //面包屑
