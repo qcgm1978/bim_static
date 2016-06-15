@@ -263,16 +263,18 @@ App.ResourceArtifacts={
     })),
 
     init:function(_this,optionType) {
-
+        _this.$(".breadcrumbNav span").eq(3).hide();
+        _this.$(".breadcrumbNav span").eq(4).hide();
         $("#artifacts").addClass("services_loading");
 
-        this.ArtifactsIndexNav = new App.Resources.ArtifactsIndexNav();
-        //项目映射入口
+        this.ArtifactsIndexNav = new App.Resources.ArtifactsIndexNav();//模块化/质量标准菜单
         if(optionType == "library" ||  optionType == "template"){
             App.ResourceArtifacts.Status.projectId = "";
             _this.$el.append(this.ArtifactsIndexNav.render().el);
         }else{
-            //项目部分入口
+            this.ArtifactsProjectBreadCrumb = new App.Resources.ArtifactsProjectBreadCrumb();
+            _this.$el.html(this.ArtifactsProjectBreadCrumb.render().el);
+            //项目映射入口
         }
 
         //公用组件
@@ -290,9 +292,9 @@ App.ResourceArtifacts={
 
         if(optionType == "template" ){//规则模板
 
-            App.ResourceArtifacts.Status.qualityStandardType = "GC";
-
             _this.$(".mappingRule .template").addClass("active").siblings("a").removeClass("active");
+
+            App.ResourceArtifacts.Status.qualityStandardType = "GC";
 
             if(App.ResourceArtifacts.Settings.ruleModel  ==2){
                 App.ResourceArtifacts.Status.rule.biz =2
@@ -309,8 +311,6 @@ App.ResourceArtifacts={
             if(optionType != "library" ){
 
             }
-
-
             _this.$(".mappingRule .library").addClass("active").siblings("a").removeClass("active");
             _this.$el.append(this.menu.render().el);//菜单
             this.menu.$(".plans").html(this.plans.render().el);//计划节点
