@@ -32,16 +32,19 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
     modelRuleEmpty:function(){
         if(App.ResourceArtifacts.Status.rule.targetCode == this.model.get("code")){
             this.$(".ruleCheck").removeClass("all").removeClass("half");
+            this.$el.attr("data-check","0")
         }
     },
     modelRuleFull:function(){
         if(App.ResourceArtifacts.Status.rule.targetCode == this.model.get("code")) {
             this.$(".ruleCheck").addClass("all").removeClass("half");
+            this.$el.attr("data-check","1")
         }
     },
     modelRuleHalf:function(){
         if(App.ResourceArtifacts.Status.rule.targetCode == this.model.get("code")){
             this.$(".ruleCheck").addClass("half").removeClass("all");
+            this.$el.attr("data-check","0")
         }
     },
 
