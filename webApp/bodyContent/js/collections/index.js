@@ -9,8 +9,6 @@ App.BodyContent.control= {
 
     init : function(){
 
-       
-       
         $("#contains").empty();
 
         this.loadMessageCount();
