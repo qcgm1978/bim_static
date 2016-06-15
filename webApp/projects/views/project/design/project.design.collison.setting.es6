@@ -48,16 +48,15 @@ App.Project.ProjectDesignSetting= Backbone.View.extend({
   },
 
   selectAll:function(e){
-    var $target=$(e.currentTarget);
-    var $dom=$target.closest("li");
-    if(!$target.attr("checked")){
-      $dom.find('.inputCheckbox').each(function(){
-        $(this).attr("checked",true)
-      });
+     
+    var $target=$(e.target),
+
+      $itemNode=$target.closest(".itemNode");
+
+    if($target.prop("checked")){
+      $itemNode.find('.inputCheckbox').prop("checked",true);
     }else{
-       $dom.find('.inputCheckbox').each(function(){
-        $(this).attr("checked",false)
-      });
+       $itemNode.find('.inputCheckbox').prop("checked",false);
     }
     e.stopPropagation();
   },
