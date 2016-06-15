@@ -824,7 +824,7 @@ App.Project = {
 						if(false){
 							continue
 						}else {
-							str += '<div class="modle"><i class="modleShowHide"></i><h1 class="modleName">' + prop + '</h1><ul class="modleList"></ul></div>';
+							str += '<div class="modle"><i class="modleShowHide down"></i><h1 class="modleName">' + prop + '</h1><ul class="modleList"></ul></div>';
 
 						}
 
