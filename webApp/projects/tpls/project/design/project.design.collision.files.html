@@ -6,11 +6,12 @@
         <span class="tree-text"><%= item.specialty %></span>
       </div>
       <ul class="subTree">
-        <% _.each(item.files,function(file){ %>
+        <% _.each(item.files,function(file,key){ %>
           <li class="itemNode file">
             <div class="itemContent" data-id="<%= file.fileId %>" data-etag="<%= file.fileEtag %>">
               <i class="nodeSwitch"></i>
               <span class="tree-text"><%= file.fileName %></span>
+              <input type="checkbox"  class="inputCheckbox parentCheckbox">
             </div>
           </li>
         <% }) %>
