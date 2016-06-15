@@ -20,8 +20,21 @@
       var _opt = options;
       var modelBar = $('<div class="modelBar"></div>');
       $.each(self.singleBar,function(i,item){
-        var tmpHtml = $('<i class="bar-item '+item.icon+'" title="'+item.title+'" data-id="'+item.fn+'" data-type="'+item.type+'" data-group="'+item.group+'"></i>');
+        if(item.type == 'more'){
+          tmpHtml = $('<div class="bar-item '+item.icon+'" title="'+item.title+'" data-id="'+item.fn+'" data-type="'+item.type+'" data-group="'+item.group+'"></div>');
+        }else{
+          tmpHtml = $('<i class="bar-item '+item.icon+'" title="'+item.title+'" data-id="'+item.fn+'" data-type="'+item.type+'" data-group="'+item.group+'"></i>');
+        }
         bimView.comm.bindEvent.on(item.keyCode,tmpHtml);
+        if(item.subBar&&item.subBar.length>0){
+          var subBar = $('<div class="subBar"></div>')
+          $.each(item.subBar,function(index,barItem){
+            var subItem = $('<i class="bar-item '+barItem.icon+'" title="'+barItem.title+'" data-id="'+barItem.fn+'" data-type="'+barItem.type+'" data-group="'+barItem.group+'"></i>');
+            barItem.keyCode&&bimView.comm.bindEvent.on(barItem.keyCode,subItem);
+            subBar.append(subItem);
+          });
+          tmpHtml.append(subBar);
+        }
         modelBar.append(tmpHtml);
       });
       _opt._dom.bimBox.append(modelBar);
@@ -92,14 +105,40 @@
       fn:'fit',
       keyCode:'105',
       type:'viewer'
-    },{
-      id:'rotateMouse',
+    },
+    {
+      id:'rotate',
       icon:'m-rotateMouse',
-      title:'旋转',
-      fn:'rotateMouse',
+      title:'动态观察',
+      fn:'rotate',
       keyCode:'',
-      type:'pattern',
-      group:'3'
+      type:'more',
+      group:'0',
+      subBar:[{
+        id:'rotateMouse',
+        icon:'m-rotateMouse',
+        title:'绕鼠标旋转',
+        fn:'rotateMouse',
+        keyCode:'',
+        type:'rotate',
+        group:'3'
+      },{
+        id:'rotateCamera',
+        icon:'m-rotateCamera',
+        title:'绕观察者旋转',
+        fn:'rotateCamera',
+        keyCode:'',
+        type:'rotate',
+        group:'3'
+      },{
+        id:'rotateObj',
+        icon:'m-rotateObj',
+        title:'绕构件旋转',
+        fn:'rotateObj',
+        keyCode:'',
+        type:'rotate',
+        group:'3'
+      }]
     },
     {
       id:'translucent',
@@ -150,7 +189,7 @@
       id:'view',
       icon:'m-view',
       title:'标准视图',
-      fn:'more',
+      fn:'view',
       keyCode:'',
       type:'more',
       group:'0',
@@ -233,7 +272,7 @@
       id:'rotate',
       icon:'m-rotateMouse',
       title:'动态观察',
-      fn:'more',
+      fn:'rotate',
       keyCode:'',
       type:'more',
       group:'0',
