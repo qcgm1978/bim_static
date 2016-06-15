@@ -72,6 +72,11 @@ App.Resources.ArtifactsTplListItem = Backbone.View.extend({
         this.getTplRule();//获取规则模板列表
         App.ResourceArtifacts.getPlan();
         App.ResourceArtifacts.getQuality();
+
+        //获取全部标准
+        //App.ResourceArtifacts.Status.quality.parentCode = "all";
+        //App.ResourceArtifacts.getQuality();
+        //App.ResourceArtifacts.Status.quality.parentCode = "";
     },
     //切换
     toggleClass:function(){

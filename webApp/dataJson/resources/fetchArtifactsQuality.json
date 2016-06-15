@@ -1,0 +1,954 @@
+{
+  "messageId": "3650f8a0ae1c403bb6b99a18742839aa",
+  "messageType": null,
+  "timestamp": 1465959979124,
+  "code": 0,
+  "message": "success",
+  "data": [
+    {
+      "code": "GC01",
+      "name": "地基与基础",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": null,
+      "type": "GC",
+      "leaf": false
+    },
+    {
+      "code": "GC0101",
+      "name": "桩基、地基处理及天然地基",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC01",
+      "type": "GC",
+      "leaf": false
+    },
+    {
+      "code": "GC010101",
+      "name": "灌注桩",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC0101",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC010102",
+      "name": "后注浆",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC0101",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC010103",
+      "name": "管桩、方桩",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC0101",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC010104",
+      "name": "CFG地基处理",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC0101",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC010105",
+      "name": "抗浮锚杆",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC0101",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC010106",
+      "name": "天然地基",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC0101",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC0102",
+      "name": "基坑工程",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC01",
+      "type": "GC",
+      "leaf": false
+    },
+    {
+      "code": "GC010201",
+      "name": "止水帷幕",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC0102",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC010202",
+      "name": "降水",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC0102",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC010203",
+      "name": "土方开挖",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC0102",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC010204",
+      "name": "土钉",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC0102",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC010205",
+      "name": "支护桩",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC0102",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC010206",
+      "name": "锚索",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC0102",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC010207",
+      "name": "内支撑",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC0102",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC010208",
+      "name": "地下连续墙",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC0102",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC010209",
+      "name": "回填土",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC0102",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC02",
+      "name": "主体结构",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": null,
+      "type": "GC",
+      "leaf": false
+    },
+    {
+      "code": "GC0201",
+      "name": "钢筋",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC02",
+      "type": "GC",
+      "leaf": false
+    },
+    {
+      "code": "GC020101",
+      "name": "钢筋加工",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC0201",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC020102",
+      "name": "基础",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC0201",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC020103",
+      "name": "柱",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC0201",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC020104",
+      "name": "梁",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC0201",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC020105",
+      "name": "墙",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC0201",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC020106",
+      "name": "楼板",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC0201",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC020107",
+      "name": "楼梯",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC0201",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC020108",
+      "name": "悬挑构件",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC0201",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC0202",
+      "name": "混凝土",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC02",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC0203",
+      "name": "砌筑",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC02",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC0204",
+      "name": "钢结构",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC02",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC0205",
+      "name": "地下防水",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC02",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC0206",
+      "name": "梁柱节点",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC02",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC03",
+      "name": "建筑装饰装修",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": null,
+      "type": "GC",
+      "leaf": false
+    },
+    {
+      "code": "GC0301",
+      "name": "采光顶",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC03",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC0302",
+      "name": "幕墙",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC03",
+      "type": "GC",
+      "leaf": false
+    },
+    {
+      "code": "GC030201",
+      "name": "石材幕墙",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC0302",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC030202",
+      "name": "铝板幕墙",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC0302",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC030203",
+      "name": "玻璃幕墙",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC0302",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC0303",
+      "name": "墙地铺贴",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC03",
+      "type": "GC",
+      "leaf": false
+    },
+    {
+      "code": "GC030301",
+      "name": "地面铺贴",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC0303",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC030302",
+      "name": "墙面铺贴",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC0303",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC0304",
+      "name": "吊顶工程",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC03",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC0305",
+      "name": "商铺玻璃隔断",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC03",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC0306",
+      "name": "玻璃栏板",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC03",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC0307",
+      "name": "门窗安装",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC03",
+      "type": "GC",
+      "leaf": false
+    },
+    {
+      "code": "GC030701",
+      "name": "木质门",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC0307",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC030702",
+      "name": "钢质防火门",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC0307",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC030703",
+      "name": "主出入玻璃门",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC0307",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC030704",
+      "name": "铝合金窗",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC0307",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC0308",
+      "name": "卫生间防水",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC03",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC04",
+      "name": "屋面工程",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": null,
+      "type": "GC",
+      "leaf": false
+    },
+    {
+      "code": "GC0401",
+      "name": "屋面防水",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC04",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC0402",
+      "name": "屋面排水",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC04",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC0403",
+      "name": "细部构造",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC04",
+      "type": "GC",
+      "leaf": false
+    },
+    {
+      "code": "GC040301",
+      "name": "变形缝",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC0403",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC040302",
+      "name": "女儿墙",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC0403",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC040303",
+      "name": "屋面出入口",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC0403",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC040304",
+      "name": "出屋面管道、构筑物",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC0403",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC040305",
+      "name": "设备基础",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC0403",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC040306",
+      "name": "水落口",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC0403",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC040307",
+      "name": "反梁过水孔",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC0403",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC05",
+      "name": "建筑给水排水及供暖",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": null,
+      "type": "GC",
+      "leaf": false
+    },
+    {
+      "code": "GC0501",
+      "name": "管道安装",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC05",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC0502",
+      "name": "设备安装",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC05",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC0503",
+      "name": "消防泵房",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC05",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC0504",
+      "name": "给水泵房",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC05",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC0505",
+      "name": "湿式报警阀室",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC05",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC06",
+      "name": "通风空调",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": null,
+      "type": "GC",
+      "leaf": false
+    },
+    {
+      "code": "GC0601",
+      "name": "风管制作和安装",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC06",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC0602",
+      "name": "风口安装",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC06",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC0603",
+      "name": "设备安装",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC06",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC0604",
+      "name": "空调机房",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC06",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC0605",
+      "name": "冷冻机房",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC06",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC07",
+      "name": "建筑气电",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": null,
+      "type": "GC",
+      "leaf": false
+    },
+    {
+      "code": "GC0701",
+      "name": "母线安装",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC07",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC0702",
+      "name": "桥架安装",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC07",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC0703",
+      "name": "变配电室",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC07",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC0704",
+      "name": "发电机房",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC07",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC0705",
+      "name": "防雷及接地安装",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC07",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC08",
+      "name": "建筑智能化",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": null,
+      "type": "GC",
+      "leaf": false
+    },
+    {
+      "code": "GC0801",
+      "name": "火灾报警及消防联动系统",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC08",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC0802",
+      "name": "慧云系统",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC08",
+      "type": "GC",
+      "leaf": false
+    },
+    {
+      "code": "GC080201",
+      "name": "消防系统",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC0802",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC080202",
+      "name": "信息发布",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC0802",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC080203",
+      "name": "背景音乐",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC0802",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC080204",
+      "name": "防盗系统",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC0802",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC080205",
+      "name": "门禁系统",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC0802",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC080206",
+      "name": "客流统计系统",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC0802",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC080207",
+      "name": "停车管理系统",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC0802",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC080208",
+      "name": "能源管理系统",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC0802",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC080209",
+      "name": "电梯监控",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC0802",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC080210",
+      "name": "视频监控",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC0802",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC080211",
+      "name": "暖通空调",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC0802",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC080212",
+      "name": "给水、排水",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC0802",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC080213",
+      "name": "变配电系统",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC0802",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC080214",
+      "name": "公共照明系统",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC0802",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC080215",
+      "name": "夜景照明系统",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC0802",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC0803",
+      "name": "慧云机房",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC08",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC09",
+      "name": "建筑节能",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": null,
+      "type": "GC",
+      "leaf": false
+    },
+    {
+      "code": "GC0901",
+      "name": "涂料外墙保温",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC09",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC0902",
+      "name": "屋面保温",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC09",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC10",
+      "name": "电梯",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": null,
+      "type": "GC",
+      "leaf": false
+    },
+    {
+      "code": "GC1001",
+      "name": "电梯机房",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC10",
+      "type": "GC",
+      "leaf": true
+    },
+    {
+      "code": "GC1002",
+      "name": "电梯底坑",
+      "count": 0,
+      "ruleContain": 0,
+      "parentCode": "GC10",
+      "type": "GC",
+      "leaf": true
+    }
+  ]
+}
