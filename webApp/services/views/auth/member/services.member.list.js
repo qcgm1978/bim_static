@@ -24,12 +24,17 @@ App.Services.MemberList=Backbone.View.extend({
         this.listenTo(App.Services.Member.innerCollection,"reset",this.render);
         this.listenTo(App.Services.Member.outerCollection,"add",this.addOne);
         this.listenTo(App.Services.Member.outerCollection,"reset",this.render);
+        Backbone.on("servicesMemberControlCancelSelectAll",this.cancelSelectAll,this);
     },
     //数据加载
     addOne:function(model){
         var newView = new App.Services.memberDetail({model:model});
         this.$("#blendList").append(newView.render().el);
         App.Comm.initScroll(this.$el.find(".readyForScroll"),"y");
+    },
+
+    cancelSelectAll:function(){
+        this.$(".selectAll input").attr("checked",false);
     },
 
     //选中事件

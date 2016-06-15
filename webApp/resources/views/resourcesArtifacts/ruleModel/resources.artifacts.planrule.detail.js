@@ -88,6 +88,7 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
                 return item.get("ruleId") == id;
         });
 
+
         var preInRule =  _.filter(ruleIdsIn,function(item){
             return item == id;
         });
@@ -99,38 +100,61 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
         var ele = $(e.target);
         var allSele = ele.closest("ul").find("li");
         Backbone.trigger("modelRuleHalf");
+
+
         if(ele.hasClass("all")){
             ele.removeClass("all");
             ele.closest("li").attr("data-check","0");
 
-            if(modelRuleList.length ){ //模板已有      //&& !preInRule.length && !preDelRule.length
-                if(preInRule.length){
-                    App.ResourceArtifacts.modelRuleSaveData.ruleIdsIn = _.without(ruleIdsIn,id);
-                }
-                App.ResourceArtifacts.modelRuleSaveData.ruleIdsDel.push(id);
-            }else{
 
-            }
+            //触发全不选时右面菜单变化，将发送父级code
             var checked1 = _.filter(allSele,function(item){
                 return $(item).attr("data-check") == "1"
             });
             if(!checked1.length){
                 Backbone.trigger("modelRuleEmpty");
             }
-        }else{
-            ele.closest("li").attr("data-check","1");
-            if(!modelRuleList.length && !preInRule.length && !preDelRule.length){
-                App.ResourceArtifacts.modelRuleSaveData.ruleIdsIn.push(id);
+
+
+            if(preInRule.length){  //在提交添加   内存在
+                App.ResourceArtifacts.modelRuleSaveData.ruleIdsIn = _.without(ruleIdsIn,id);
+            }
+
+            if(modelRuleList.length ){ //模板已有
+                if(!preDelRule.length){//在提交删除   内存在
+                    App.ResourceArtifacts.modelRuleSaveData.ruleIdsDel.push(id);
+                }
+            }else{//模板没有
+                if(preDelRule.length){//在提交删除   内存在
+                    App.ResourceArtifacts.modelRuleSaveData.ruleIdsDel = _.without(ruleIdsDel,id);
+                }
             }
 
 
+        }else{
+            ele.closest("li").attr("data-check","1");
 
+            //如果全选，将发送父级code而非id
             var checked2 = _.filter(allSele,function(item){
                 return $(item).attr("data-check") == "0"
             });
             ele.addClass("all");
             if(!checked2.length){
                 Backbone.trigger("modelRuleFull");
+                return
+            }
+
+            if(!preDelRule.length){  //在提交删除   内存在
+                App.ResourceArtifacts.modelRuleSaveData.ruleIdsDel = _.without(ruleIdsDel,id);
+            }
+            if(modelRuleList.length ){ //模板已有
+                if(!preInRule.length){//在提交添加   内存在
+                    App.ResourceArtifacts.modelRuleSaveData.ruleIdsIn = _.without(ruleIdsIn,id);
+                }
+            }else{//模板没有
+                if(preInRule.length){//在提交添加   内存在
+                    App.ResourceArtifacts.modelRuleSaveData.ruleIdsIn.push(id);
+                }
             }
         }
     },

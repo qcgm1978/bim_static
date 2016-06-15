@@ -58,7 +58,7 @@ App.Resources.ArtifactsTplDetail = Backbone.View.extend({
             return
         }
 
-        App.ResourceArtifacts.resetModelRuleSaveData();//÷ÿ÷√ ˝æ›
+
         var _this = this;
         App.ResourceArtifacts.modelRuleSaveData.templateId = App.ResourceArtifacts.Status.templateId;
         App.ResourceArtifacts.modelRuleSaveData.templateName = App.ResourceArtifacts.Status.templateName = this.$(".tplDetailEdit .tplName").val();
@@ -88,7 +88,6 @@ App.Resources.ArtifactsTplDetail = Backbone.View.extend({
         });
 
 
-        console.log(App.ResourceArtifacts.modelRuleSaveData);
         var pdata = {
             URLtype: "saveArtifactsTemplateRule",
             type:"PUT",
