@@ -98,8 +98,8 @@
  		var _this=this,
  			$item=$(event.target).closest(".item"),
  			_collection=App.Services.ProjectCollection.ProjectBaseInfoCollection;
- 		let _projectId= App.Services.ProjectMappingRuleId =$item.attr('data-projectId');
- 		
+ 		let _projectId= App.Services.ProjectMappingRuleId = App.Comm.publicData.services.project.projectId = $item.attr('data-projectId');
+		App.Comm.publicData.services.project.projectName = $item.find(".name").text();
  		$item.addClass("selected").siblings().removeClass("selected");
  		//加载项目基本信息数据
  		_collection.projectId=_projectId;

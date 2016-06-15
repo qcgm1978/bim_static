@@ -394,3 +394,12 @@ App.Comm = {
 
 //模块
 App.Comm.modules = {};
+//跨路由调用数据
+App.Comm.publicData = {
+	services:{
+		project:{
+			projectId: "",
+			projectName: ""
+		}
+	}
+};

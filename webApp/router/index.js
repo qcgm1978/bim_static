@@ -154,7 +154,7 @@ var AppRoute = Backbone.Router.extend({
 		App.ResourcesNav.init();
 	},
 
-	//单个项目
+	//项目映射
 	resourceMapping: function(type,optionType) {
 		this.reset();
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".resources").addClass('selected');
@@ -174,12 +174,6 @@ var AppRoute = Backbone.Router.extend({
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".resources").addClass('selected');
 		_.require('/static/dist/resources/resources.css');
 		_.require('/static/dist/resources/resources.js');
-		if(type == "artifactsMapRule"){
-			//第三层处理方案
-			App.ResourceArtifacts.Settings.optionType = versionId;
-			App.ResourcesNav.init();
-			return
-		}
 		App.ResourcesNav.Settings.type = App.ResourceModel.Settings.type = type;
 		App.ResourceModel.Settings.CurrentVersion = {};
 		App.ResourceModel.Settings.projectId = projectId;
