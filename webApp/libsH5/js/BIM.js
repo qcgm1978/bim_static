@@ -11,7 +11,7 @@
       new bimView.sidebar.init(_opt,obj);
       obj.on('loaded',function(){
         $('.modelSidebar').addClass('show');
-        viewer.zoomToBuilding();
+        viewer.zoomToBuilding(0,1.15);
       });
       return viewer;
     },

@@ -94,7 +94,8 @@
 		$(this).bind('contextmenu', function(e) {
 			// Check if onContextMenu() defined
 			var bShowContext = (!!hash[index].onContextMenu) ? hash[index].onContextMenu(e) : true;
-			if (bShowContext) display(index, this, e, options);
+			 
+			if (bShowContext) display(index, this, e, options,id);
 			if ($.isFunction(options.onShowMenuCallback)) {
 				options.onShowMenuCallback(e);
 			} 
@@ -111,15 +112,21 @@
 		});
 
 		return this;
-	};
+	}; 
 
-	//销毁
-	$.fn.contextMenu.destory = function() {
-		$(".jqContextMenu").remove();
-		menu = null;
-	}
+	function display(index, trigger, e, options,id) {
+		 
+		if (menu.find("#"+id).length<=0) {
+			$("body").append($(".jqContextMenu").children("div"));
+			menu.html($("#" + id));
+		} 
 
-	function display(index, trigger, e, options) {
+		menu.removeClass().addClass("jqContextMenu");
+
+		if (options.theme) {
+			menu.addClass(options.theme);
+		}
+
 		var cur = hash[index];
 		//content = $('#' + cur.id).find('ul:first').clone(true);
 		//禁用hover
@@ -141,6 +148,7 @@
 		// if there's an onShowMenu, run it now -- must run after content has been added
 		// if you try to alter the content variable before the menu.html(), IE6 has issues
 		// updating the content
+		 
 		if (!!cur.onShowMenu) menu = cur.onShowMenu(e, menu);
 
 		$.each(cur.bindings, function(id, func) {

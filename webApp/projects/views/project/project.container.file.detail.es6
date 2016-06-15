@@ -8,8 +8,8 @@ App.Project.FileContainerDetail=Backbone.View.extend({
 
 	//初始化
 	initialize:function(){
-		//this.listenTo(this.model, 'change', this.render);
-	   // this.listenTo(this.model, 'destroy', this.removeItem);
+		this.listenTo(this.model, 'change', this.render);
+	    this.listenTo(this.model, 'destroy',this.destroy);
 	},
 
 	//事件绑定
@@ -98,6 +98,11 @@ App.Project.FileContainerDetail=Backbone.View.extend({
 		}else{
 			$(".fileContentHeader  .header .ckAll").prop("checked",true);
 		}
+	},
+
+	destroy(model){
+		this.$el.remove();
+		App.Project.afterRemoveFolder(model.toJSON());
 	}
 
 });

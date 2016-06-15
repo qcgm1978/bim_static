@@ -9,7 +9,8 @@ App.Index = {
 		projectId: "",
 		projectVersionId: "",
 		ModelObj: "",
-		currentModelId:"",
+		currentModelId: "",
+		comparisonType: "", //std 标准模型 base 基准版本
 		Viewer: null
 	},
 
@@ -72,6 +73,7 @@ App.Index = {
 		App.Index.Settings.projectId = Request.projectId;
 		App.Index.Settings.projectVersionId = Request.projectVersionId;
 		App.Index.Settings.referenceId = Request.modificationId;
+		App.Index.Settings.comparisonType = Request.type;
 	},
 
 	//获取url 参数
@@ -107,9 +109,9 @@ App.Index = {
 
 	//渲染模型
 	renderModel(modelId) {
-		var _this=this;
+		var _this = this;
 		var viewer = App.Index.Settings.Viewer = new bimView({
-			type:'singleModel',
+			type: 'singleModel',
 			element: $("#contains .projectCotent"),
 			etag: modelId
 		});
@@ -128,14 +130,14 @@ App.Index = {
 
 		});
 
-		this.Settings.currentModelId=modelId;
+		this.Settings.currentModelId = modelId;
 	},
 
 	//渲染属性
 	renderAttr(modelId) {
 
 		modelId = modelId || this.Settings.currentModelId;
-		 
+
 		if (!App.Index.Settings.ModelObj || !App.Index.Settings.ModelObj.intersect) {
 			$("#projectContainer .designProperties").html(' <div class="nullTip">请选择构件</div>');
 			return;
@@ -198,7 +200,7 @@ App.Index = {
 				var groupText = $item.closest(".groups").prev().text() + "：";
 				$(".myDropDown .myDropText span:first").text(groupText);
 				var currentModel = $item.data("currentmodel"),
-				    baseModel = $item.data("basemodel"),
+					baseModel = $item.data("basemodel"),
 					changeModel = $item.data("change").replace("_output", ""),
 					comparisonId = $item.data('id');
 				App.Index.Settings.currentModel = currentModel;
@@ -249,8 +251,48 @@ App.Index = {
 		//渲染模型
 		//事件绑定
 		this.bindEvent();
-		//变更获取
-		this.fetchChange();
+
+		if (App.Index.Settings.comparisonType) {
+			//默认std 
+			if (App.Index.Settings.comparisonType == "base") {
+				App.Project.Collection.changeList.urlType = "modelBase";
+			}
+			//变更获取
+			this.fetchChange();
+		}
+
+		//显示导航文字
+		this.showNavBarText();
+
+	},
+
+
+	//显示导航文字
+	showNavBarText: function() {
+		var data = {
+			URLtype: "fetchProjectDetail",
+			data: {
+				projectId: this.Settings.projectId,
+				versionId: this.Settings.projectVersionId
+			}
+		};
+
+		App.Comm.ajax(data, function(data) {
+			if (data.code == 0) {
+				data = data.data;
+				$(".breadcrumbNav .project .text").text(data.projectName);
+				$(".breadcrumbNav .projectVersion .text").text(data.name);
+
+				//没有传参数 对比类型 不会加载
+				if (!App.Index.Settings.comparisonType) {
+					if (data.name != "初始版本") {
+						App.Project.Collection.changeList.urlType = "modelBase";
+					}
+					//变更获取
+					this.fetchChange();
+				}
+			}
+		});
 	}
 }
 
@@ -295,13 +337,13 @@ App.Project.Model = {
 						App.Index.Settings.baseModel = file.baseModel;
 						App.Index.Settings.changeModel = file.comparisonId;
 						App.Index.renderModel(file.currentModel);
-						data.selected = [i,j]
+						data.selected = [i, j]
 
 					}
 				});
 			});
 			// 没有找到当前文件,默认加载第一个
-			if (!isload && data.data.length>0) {
+			if (!isload && data.data.length > 0) {
 				var file = data.data[0].comparisons[0];
 
 				$(".rightPropertyContent .listDetail").html(new App.Project.Model.getInfo().render().el);
@@ -311,7 +353,7 @@ App.Project.Model = {
 				App.Index.Settings.currentModel = file.currentModel;
 				App.Index.Settings.baseModel = file.baseModel;
 			}
-			if (data.data.length>0) {
+			if (data.data.length > 0) {
 				this.$el.html(this.template(data));
 			} else {
 				this.$el.html("没有变更")
@@ -344,7 +386,7 @@ App.Project.Model = {
 			} else {
 				this.$el.html("没有变更");
 			}
-			if(!$(".showChange .checkboxGroup input:checkbox").prop('checked')){
+			if (!$(".showChange .checkboxGroup input:checkbox").prop('checked')) {
 				$(".showChange .checkboxGroup input:checkbox").trigger('click');
 			}
 
@@ -357,19 +399,25 @@ App.Project.Model = {
 		select: function() {
 			var that = $(event.target).closest(".tree-text");
 			var parent = $(".rightTreeView");
-      var elementId = that.data('id');
-      var baseId = that.data('base');
-      if (that.prev('.noneSwitch').length > 0) {
-        if (that.is('.current')) {
-          that.removeClass('current');
-          App.Index.Settings.Viewer.highlight({type:"userId",ids:[]});
-        }else{
-        	parent.find('.current').removeClass('current');
-          that.addClass('current');
-          App.Index.Settings.Viewer.highlight({type:"userId",ids:[elementId,baseId]});
-        }
-        App.Index.Settings.Viewer.fit();
-      }
+			var elementId = that.data('id');
+			var baseId = that.data('base');
+			if (that.prev('.noneSwitch').length > 0) {
+				if (that.is('.current')) {
+					that.removeClass('current');
+					App.Index.Settings.Viewer.highlight({
+						type: "userId",
+						ids: []
+					});
+				} else {
+					parent.find('.current').removeClass('current');
+					that.addClass('current');
+					App.Index.Settings.Viewer.highlight({
+						type: "userId",
+						ids: [elementId, baseId]
+					});
+				}
+				App.Index.Settings.Viewer.fit();
+			}
 
 			App.Index.Settings.Viewer.setOverrider('add');
 			App.Index.Settings.Viewer.setOverrider('beforeEdit');
@@ -377,50 +425,51 @@ App.Project.Model = {
 			App.Index.Settings.Viewer.setOverrider('delete');
 
 			//判断是新增，修改，删除
-			if(baseId && elementId){
+			if (baseId && elementId) {
 				//修改
 
-				App.Index.Settings.Viewer.setOverrider('beforeEdit',[baseId]);
-				App.Index.Settings.Viewer.setOverrider('afterEdit',[elementId]);
-			}else if(baseId){
+				App.Index.Settings.Viewer.setOverrider('beforeEdit', [baseId]);
+				App.Index.Settings.Viewer.setOverrider('afterEdit', [elementId]);
+			} else if (baseId) {
 				//删除
 
-				App.Index.Settings.Viewer.setOverrider('delete',[baseId]);
+				App.Index.Settings.Viewer.setOverrider('delete', [baseId]);
 
-			}else{
+			} else {
 				//新增
 
-				App.Index.Settings.Viewer.setOverrider('add',[elementId]);
+				App.Index.Settings.Viewer.setOverrider('add', [elementId]);
 			}
-			console.log(baseId,elementId)
 
 			//zoomtobox
 			$.ajax({
-				url: "http://bim.wanda-dev.cn/sixD/"+App.Index.Settings.projectId+"/"+App.Index.Settings.projectVersionId+"/bounding/box?sceneId="+(elementId?elementId.split('.')[0]:baseId.split('.')[0])+"&elementId="+(elementId?elementId:baseId)
-			}).done(function(respone){
-				if(respone.code==0){
+				url: "http://bim.wanda-dev.cn/sixD/" + App.Index.Settings.projectId + "/" + App.Index.Settings.projectVersionId + "/bounding/box?sceneId=" + (elementId ? elementId.split('.')[0] : baseId.split('.')[0]) + "&elementId=" + (elementId ? elementId : baseId)
+			}).done(function(respone) {
+				if (respone.code == 0) {
 					var max = respone.data.max,
-					    min = respone.data.min,
-					    box1=[[max.x,max.y,max.z],[min.x,min.y,min.z]];
-					if(baseId){
-						if(!elementId){
-							return 	App.Index.Settings.Viewer.zoomToBox(box1);
+						min = respone.data.min,
+						box1 = [
+							[max.x, max.y, max.z],
+							[min.x, min.y, min.z]
+						];
+					if (baseId) {
+						if (!elementId) {
+							return App.Index.Settings.Viewer.zoomToBox(box1);
 
 						}
 						$.ajax({
-							url: "http://bim.wanda-dev.cn/sixD/"+App.Index.Settings.projectId+"/"+App.Index.Settings.projectVersionId+"/bounding/box?sceneId="+baseId.split('.')[0]+"&elementId="+baseId
-						}).done(function(respone){
-							if(respone.code==0){
+							url: "http://bim.wanda-dev.cn/sixD/" + App.Index.Settings.projectId + "/" + App.Index.Settings.projectVersionId + "/bounding/box?sceneId=" + baseId.split('.')[0] + "&elementId=" + baseId
+						}).done(function(respone) {
+							if (respone.code == 0) {
 								var max = respone.data.max,
-								    min = respone.data.min;
-								box1.push([max.x,max.y,max.z],[min.x,min.y,min.z]);
-
+									min = respone.data.min;
+								box1.push([max.x, max.y, max.z], [min.x, min.y, min.z]);
 								App.Index.Settings.Viewer.zoomToBox(box1);
+
 							}
 						});
-					}else{
+					} else {
 						App.Index.Settings.Viewer.zoomToBox(box1);
-
 					}
 
 
@@ -428,14 +477,14 @@ App.Project.Model = {
 			});
 
 		},
-		detail: function(e){
+		detail: function(e) {
 
 			var $treetext = $(e.target).prev('.tree-text'),
 				data = {
-					type:$(e.target).data('type'),
-					baseElementId:$treetext.data('base'),
-					currentElementId:$treetext.data('id'),
-					name:$treetext.text()
+					type: $(e.target).data('type'),
+					baseElementId: $treetext.data('base'),
+					currentElementId: $treetext.data('id'),
+					name: $treetext.text()
 				};
 
 			App.Index.alertWindow = new App.Comm.modules.Dialog({
@@ -447,9 +496,12 @@ App.Project.Model = {
 				message: new App.Project.Model.contrastInfo().render(data).el
 			});
 
-			$(".mod-dialog .wrapper .header").hide();//隐藏头部
+			$(".mod-dialog .wrapper .header").hide(); //隐藏头部
 			//$(".alertInfo").html(alertInfo);
-			$(".mod-dialog,.mod-dialog .wrapper .content").css({"min-height":"auto",padding:0});
+			$(".mod-dialog,.mod-dialog .wrapper .content").css({
+				"min-height": "auto",
+				padding: 0
+			});
 
 		}
 	}),
@@ -462,23 +514,28 @@ App.Project.Model = {
 			"click .close": "close"
 		},
 		render: function(datas) {
-			if(datas != undefined){
+			if (datas != undefined) {
 				var data = {
 						projectId: App.Index.Settings.projectId,
 						projectVersionId: App.Index.Settings.projectVersionId,
-					  currentElementId: datas.currentElementId,
-					  baseElementId: datas.baseElementId,
-						baseModel: App.Index.Settings.baseModel ,
-						currentModel:App.Index.Settings.currentModel
-				},
-					that=this;
+						currentElementId: datas.currentElementId,
+						baseElementId: datas.baseElementId,
+						baseModel: App.Index.Settings.baseModel,
+						currentModel: App.Index.Settings.currentModel
+					},
+					that = this;
 				$.ajax({
-					url: "http://bim.wanda-dev.cn/sixD/"+data.projectId+"/"+data.projectVersionId+"/comparison/property?baseModel="+data.baseModel+"&currentModel="+data.currentModel+"&baseElementId="+data.baseElementId+"&currentElementId="+data.currentElementId
-				}).done(function(respone){
-					if(respone.code==0){
-						that.$el.html(that.template({data:respone.data,type:datas.type,name:datas.name,versionname:$('.projectVersion .text').text()}));
+					url: "http://bim.wanda-dev.cn/sixD/" + data.projectId + "/" + data.projectVersionId + "/comparison/property?baseModel=" + data.baseModel + "&currentModel=" + data.currentModel + "&baseElementId=" + data.baseElementId + "&currentElementId=" + data.currentElementId
+				}).done(function(respone) {
+					if (respone.code == 0) {
+						that.$el.html(that.template({
+							data: respone.data,
+							type: datas.type,
+							name: datas.name,
+							versionname: $('.projectVersion .text').text()
+						}));
 
-					}else{
+					} else {
 						alert('获取数据失败');
 						App.Index.alertWindow.close();
 
@@ -486,12 +543,14 @@ App.Project.Model = {
 				});
 
 
-			}else{
-				this.$el.html(this.template({data:[]}));
+			} else {
+				this.$el.html(this.template({
+					data: []
+				}));
 			}
 			return this;
 		},
-		close: function(){
+		close: function() {
 			App.Index.alertWindow.close();
 		}
 	})

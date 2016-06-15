@@ -11398,6 +11398,7 @@ CLOUD.FlyEditor.prototype = {
 
         this.delayHandle();
 
+        this.isFirstPerson = !event.shiftKey;
         this.update();
     },
 
@@ -11475,6 +11476,7 @@ CLOUD.FlyEditor.prototype = {
                 this.deltaYaw += this.rotateDelta.x * this.lookSpeed;
                 this.deltaPitch += this.rotateDelta.y * this.lookSpeed;
 
+                this.isFirstPerson = !event.shiftKey;
                 this.update();
             }
         } else if (event.button === this.mouseButtons.PAN) {
@@ -11501,6 +11503,7 @@ CLOUD.FlyEditor.prototype = {
             this.rotateDelta.set(0, 0);
             this.deltaYaw = 0;
             this.deltaPitch = 0;
+            this.isFirstPerson = !event.shiftKey;
             this.update();
 
         } else if (event.button === this.mouseButtons.PAN) {
@@ -18307,7 +18310,7 @@ CloudViewer.prototype = {
             scope.render();
         });
 
-        this.lookAt(new THREE.Vector3(-CLOUD.GlobalData.SceneSize * 0.5, CLOUD.GlobalData.SceneSize * 0.5, CLOUD.GlobalData.SceneSize), new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 1, 0));
+        this.lookAt(new THREE.Vector3(-CLOUD.GlobalData.SceneSize * 0.5, CLOUD.GlobalData.SceneSize * 0.3, CLOUD.GlobalData.SceneSize), new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 1, 0));
         this.setPickMode();
 
         // Register Events

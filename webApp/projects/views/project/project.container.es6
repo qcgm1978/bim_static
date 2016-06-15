@@ -49,7 +49,6 @@ App.Project.ProjectContainer = Backbone.View.extend({
 	//点击面包靴
 	breadItemClick: function(event) {
 
-
 		var $target = $(event.target).closest(".breadItem");
 
 		//没有下拉箭头的 不加载
@@ -212,7 +211,8 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			$projectContainer = $("#projectContainer"),
 			$projectCotent = $projectContainer.find(".projectCotent");
 		App.Project.Settings.fetchNavType = type;
-
+ 
+		
 		if (type == "file") {
 
 			//左右侧
@@ -323,7 +323,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			type: 'model',
 			element: $("#projectContainer .modelContainerContent"),
 			sourceId: App.Project.Settings.DataModel.sourceId,
-			etag: App.Project.Settings.DataModel.etag, //"a1064f310fa8204efd9d1866ef7370ee" ||
+			etag:App.Project.Settings.DataModel.etag, //"a1064f310fa8204efd9d1866ef7370ee" ||
 			projectId: App.Project.Settings.projectId,
 			projectVersionId: App.Project.Settings.CurrentVersion.id
 		});
