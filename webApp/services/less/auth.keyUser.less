@@ -229,8 +229,12 @@ ul,li{list-style: none outside none;}
     }
   }
   .leftWindow,.rightWindow{
+    h3{
+      max-width: 100%;
+      overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+    }
     .proj-right{
-      padding: 5px 0px 5px 10px;
+      padding: 8px 0px 0px 10px;
       height: 50px;
       border-bottom: 1px solid #CCC;
       h3{
@@ -240,6 +244,7 @@ ul,li{list-style: none outside none;}
         height: 18px;
         line-height: 18px;
         border: none;
+
       }
       &:hover{
         i{
@@ -282,11 +287,12 @@ ul,li{list-style: none outside none;}
       }
       .list{
         h3{
-          line-height:40px ;
+          line-height:31px ;
+          height: 100%;
         }
       }
       li{
-        padding: 5px 0px 5px 10px;
+        padding: 8px 0px 0px 10px;
         height: 50px;
         border-bottom: 1px solid #CCC;
         h3{
@@ -362,7 +368,7 @@ ul,li{list-style: none outside none;}
 
     }
     &>div>li:first-child{
-      margin-top: 3px;
+
     }
     .lastLayer{
       li{
@@ -376,9 +382,10 @@ ul,li{list-style: none outside none;}
     .namepath{
       display: none;
     }
-    .list {
-      h3 {
-        line-height: 40px;
+    .list{
+      h3{
+        line-height:31px ;
+        height: 100%;
       }
     }
     li{
