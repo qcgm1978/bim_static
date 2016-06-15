@@ -743,6 +743,7 @@ App.Services.addKeyUser = Backbone.View.extend({
         //全选模式
         $('.step2').css({background:"#ccc"});
         $('.rightWindow div').html('已选择所有项目');
+        $('.selected-proj').removeClass('selected-proj');
 
       }
 
