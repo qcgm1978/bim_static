@@ -147,7 +147,7 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
             //添加所有下级菜单
             if(_this.find("li").length) {
                 _.each(_this.find("li"), function (item) {
-                    $(item).attr("data-check", "1").find(".ruleCheck").addClass("all");
+                    $(item).attr("data-check", "1").find(".ruleCheck").removeClass("half").addClass("all");
                 });
             }
         }

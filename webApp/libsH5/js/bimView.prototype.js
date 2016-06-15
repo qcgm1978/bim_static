@@ -159,10 +159,12 @@
             bimView.sidebar[fn](!isSelected,self);
             break;
           case "more":
-            var flag = self.getTranslucentStatus();
             $this.toggleClass('selected').siblings('[data-group='+group+']').removeClass('selected');
-            $this.find('.m-translucent').toggleClass('selected',flag)
-            bimView.sidebar[fn](self);
+            if(fn == 'more'){
+              var flag = self.getTranslucentStatus();
+              $this.find('.m-translucent').toggleClass('selected',flag);
+              bimView.sidebar[fn](self);
+            }
             break;
           case "change":
             $this.toggleClass('m-miniScreen m-fullScreen')

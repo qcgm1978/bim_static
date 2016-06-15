@@ -80,17 +80,19 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
 
     ruleCheck:function(e){
         App.Resources.cancelBubble(e);
-        var _this = this;
+        var _this = this,id = _this.model.get("id"),
+            ruleIdsIn = App.ResourceArtifacts.modelRuleSaveData.ruleIdsIn,
+            ruleIdsDel  = App.ResourceArtifacts.modelRuleSaveData.ruleIdsDel;
 
         var  modelRuleList = App.ResourceArtifacts.TplCollectionRule.filter(function(item){
-                return item.get("ruleId") == _this.model.get("id");
+                return item.get("ruleId") == id;
         });
 
-        var preInRule =  _.filter(App.ResourceArtifacts.modelRuleSaveData.ruleIdsIn,function(item){
-            return item == _this.model.get("id");
+        var preInRule =  _.filter(ruleIdsIn,function(item){
+            return item == id;
         });
-        var preDelRule = _.filter(App.ResourceArtifacts.modelRuleSaveData.ruleIdsDel,function(item){
-            return item == _this.model.get("id");
+        var preDelRule = _.filter(ruleIdsDel,function(item){
+            return item == id;
         });
 
 
@@ -101,8 +103,13 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
             ele.removeClass("all");
             ele.closest("li").attr("data-check","0");
 
-            if(modelRuleList.length && !preInRule.length && !preDelRule.length){
-                App.ResourceArtifacts.modelRuleSaveData.ruleIdsDel.push(_this.model.get("id"));
+            if(modelRuleList.length ){ //模板已有      //&& !preInRule.length && !preDelRule.length
+                if(preInRule.length){
+                    App.ResourceArtifacts.modelRuleSaveData.ruleIdsIn = _.without(ruleIdsIn,id);
+                }
+                App.ResourceArtifacts.modelRuleSaveData.ruleIdsDel.push(id);
+            }else{
+
             }
             var checked1 = _.filter(allSele,function(item){
                 return $(item).attr("data-check") == "1"
@@ -113,7 +120,7 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
         }else{
             ele.closest("li").attr("data-check","1");
             if(!modelRuleList.length && !preInRule.length && !preDelRule.length){
-                App.ResourceArtifacts.modelRuleSaveData.ruleIdsIn.push(_this.model.get("id"));
+                App.ResourceArtifacts.modelRuleSaveData.ruleIdsIn.push(id);
             }
 
 
@@ -233,10 +240,10 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
 
                 //有效性验证
                 if(leftValue.val() && rightValue.val()){
-                    if(parseInt(leftValue.val()) >= parseInt(rightValue.val())){
+                    if(parseInt(leftValue.val()) <=parseInt(rightValue.val())){
                         alert("请填写有效的数字");
                         leftValue.focus();
-                        return
+                        retrun
                     }
                 }
 

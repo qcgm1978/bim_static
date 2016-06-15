@@ -9,11 +9,11 @@ App.Services.Auth = Backbone.View.extend({
 
 	render(){
 		App.Services.MemberType = "inner";//默认加载类型
-		var menu = new App.Services.MemberNav().render(),
-			content = new App.Services.MemberList().render();
+		//var menu = new App.Services.MemberNav().render(),
+		//	content = new App.Services.MemberList().render();
 		this.$el.html(new App.Services.AuthNav().render().el);//菜单
-		this.$(".serviceBody").html(menu.el);//组织菜单
-		this.$(".serviceBody .content").html(content.el);//主体列表
+		//this.$(".serviceBody").html(menu.el);//组织菜单
+		//this.$(".serviceBody .content").html(content.el);//主体列表
 		$("#blendList").addClass("services_loading");
 		return this;
 	},
@@ -25,6 +25,9 @@ App.Services.Auth = Backbone.View.extend({
 			$("#inner").addClass("active").siblings(".childOz").html(App.Services.tree(response));
 			$("#blendList").removeClass("services_loading");
 		});
+		setTimeout(function(){
+			$('.serviceNav .active').trigger('click');
+		},1000)
 	}
 
 });
