@@ -15,7 +15,7 @@
         $el: $el, //当前元素
         ePos: 0, //光标位置
         getData: null,
-        callback:null
+        callback: null
       }
 
       this.Settings = $.extend(defaults, opts);
@@ -106,9 +106,9 @@
         }
 
         if (that.Settings.atList.is(":visible")) {
-           if (keyCode == 38 || keyCode == 40) {
+          if (keyCode == 38 || keyCode == 40) {
             return;
-           }
+          }
         }
 
         //计算 at 的位置
@@ -121,7 +121,7 @@
           return;
         }
         //计算位置
-        that.beforeAtListPosition($(this), val);
+        that.beforeAtListPosition(val);
 
       });
 
@@ -199,9 +199,7 @@
 
         that.Settings.atDiv.html(val);
 
-        var pos = that.Settings.atDiv.find(".at").position();
-
-        that.atListPosition(pos);
+        that.atListPosition();
 
         event.stopPropagation();
 
@@ -230,10 +228,10 @@
         that.Settings.ePos += text.length;
 
         that.setCaretPosition(that.Settings.ePos);
-         
+
         //回调
         if (that.Settings.callback) {
-            that.Settings.callback($(this));
+          that.Settings.callback($(this));
         }
 
       });
@@ -246,8 +244,8 @@
     }
 
     //定位前的计算
-    at.prototype.beforeAtListPosition = function($txt, val) {
-       
+    at.prototype.beforeAtListPosition = function(val) {
+
       //替换空格 回车
       val = val.replace(/[\n\r]/gi, "<br/>").replace(/[ ]/g, "a");
 
@@ -255,13 +253,7 @@
 
       this.Settings.atDiv.html(val);
 
-      var paddingWidth = parseInt($txt.css("padding-left")) + parseInt($txt.css("padding-right")),
-
-        paddingHeight = parseInt($txt.css("padding-top")) + parseInt($txt.css("padding-bottom")),
-
-        pos = this.Settings.atDiv.height($txt.height() + paddingHeight).width($txt.width() + paddingWidth).find(".at").position();
-
-      this.atListPosition(pos);
+      this.atListPosition();
     }
 
     //是否存在 at 
@@ -282,15 +274,31 @@
     }
 
     //at list 位置
-    at.prototype.atListPosition = function(pos) {
+    at.prototype.atListPosition = function() {
 
-      this.Settings.atList.css({
-        top: pos.top  + this.Settings.atBox.offset().top-60,
-        left: pos.left + 6
-      }).show();
+      this.rePosition();
 
       //获取数据
       this.getData();
+
+    }
+
+    //重新定位
+    at.prototype.rePosition = function() {
+
+      var $txt = this.Settings.$el,
+
+        paddingWidth = parseInt($txt.css("padding-left")) + parseInt($txt.css("padding-right")),
+
+        paddingHeight = parseInt($txt.css("padding-top")) + parseInt($txt.css("padding-bottom")),
+
+        pos = this.Settings.atDiv.height($txt.height() + paddingHeight).width($txt.width() + paddingWidth).find(".at").position();
+
+
+      this.Settings.atList.css({
+        top: pos.top + this.Settings.atBox.offset().top - 60,
+        left: pos.left + 6
+      }).show();
 
     }
 
@@ -337,8 +345,8 @@
                 liTpl = '<li data-uid="{uid}" class="item"><span class="name">{name}</span>（<span class="dep">{dep}</span>）</li>';
               $.each(data.data, function() {
                 lis += liTpl.replace('{name}', this.username).replace('{dep}', this.orgName).replace('{uid}', this.userId);
-              });
-
+              }); 
+               
               if (lis.length > 0) {
                 that.Settings.atList.html(lis);
               } else {
