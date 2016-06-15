@@ -816,50 +816,47 @@ App.Project = {
 		$.ajax({
 			url: "platform/set/category"
 			}).done(function(res){
+			console.log(res)
 				if (res.code == 0){
-					var str = '', liTpl = '<li class="modleItem"><span class="modleName overflowEllipsis"><div class="modleNameText overflowEllipsis">{property}</div></span> <span class="modleVal end">{value}</span></li>';
-					var datas = res.data || [];
+					var str = '',datas = res.data.items || [];
 					for(var i = 0,prop; i < datas.length; i++){
-						prop = datas[i]['properties'];
-						if('设计管理成本管理计划管理质量管理'.indexOf(datas[i]['className'])>-1){
+						prop = datas[i]['busName'];
+						if(false){
 							continue
-						}else if(prop==null){
-							str += '<div class="modle"><i class="modleShowHide"></i><h1 class="modleName">' + datas[i]['className'] + '</h1><ul class="modleList">';
+						}else {
+							str += '<div class="modle"><i class="modleShowHide"></i><h1 class="modleName">' + datas[i]['className'] + '</h1><ul class="modleList"></ul></div>';
 
-						}else{
-							for(var j = 0; j < (prop.length || 0); j++){
-								str += '<div class="modle"><i class="modleShowHide"></i><h1 class="modleName">' + datas[i]['className'] + '</h1><ul class="modleList">' + liTpl.replace("{property}", datas[i]['properties'][j]['property']).replace('{value}', datas[i]['properties'][j]['value']);
-							}
 						}
 
-						str += '</ul></div>';
+
 					}
+					that.$el.find(".attrClassBox").html(str);
 				}
 		});
-					App.Project.fetchClassPropertData(function(res) {
-						if (res.code == 0){
-							var str = '', liTpl = '<li class="modleItem"><span class="modleName overflowEllipsis"><div class="modleNameText overflowEllipsis">{property}</div></span> <span class="modleVal end">{value}</span></li>';
-							var datas = res.data || [];
-							for(var i = 0,prop; i < datas.length; i++){
-								prop = datas[i]['properties'];
-								if('设计管理成本管理计划管理质量管理'.indexOf(datas[i]['className'])>-1){
-									continue
-								}else if(prop==null){
-									str += '<div class="modle"><i class="modleShowHide"></i><h1 class="modleName">' + datas[i]['className'] + '</h1><ul class="modleList">';
-
-								}else{
-									for(var j = 0; j < (prop.length || 0); j++){
-										str += '<div class="modle"><i class="modleShowHide"></i><h1 class="modleName">' + datas[i]['className'] + '</h1><ul class="modleList">' + liTpl.replace("{property}", datas[i]['properties'][j]['property']).replace('{value}', datas[i]['properties'][j]['value']);
-									}
-								}
-
-								str += '</ul></div>';
-							}
-
-								that.$el.find(".attrClassBox").html(str);
-
-						}
-					});
+					//App.Project.fetchClassPropertData(function(res) {
+					//	if (res.code == 0){
+					//		var str = '', liTpl = '<li class="modleItem"><span class="modleName overflowEllipsis"><div class="modleNameText overflowEllipsis">{property}</div></span> <span class="modleVal end">{value}</span></li>';
+					//		var datas = res.data || [];
+					//		for(var i = 0,prop; i < datas.length; i++){
+					//			prop = datas[i]['properties'];
+					//			if('设计管理成本管理计划管理质量管理'.indexOf(datas[i]['className'])>-1){
+					//				continue
+					//			}else if(prop==null){
+					//				str += '<div class="modle"><i class="modleShowHide"></i><h1 class="modleName">' + datas[i]['className'] + '</h1><ul class="modleList">';
+          //
+					//			}else{
+					//				for(var j = 0; j < (prop.length || 0); j++){
+					//					str += '<div class="modle"><i class="modleShowHide"></i><h1 class="modleName">' + datas[i]['className'] + '</h1><ul class="modleList">' + liTpl.replace("{property}", datas[i]['properties'][j]['property']).replace('{value}', datas[i]['properties'][j]['value']);
+					//				}
+					//			}
+          //
+					//			str += '</ul></div>';
+					//		}
+          //
+					//			that.$el.find(".attrClassBox").html(str);
+          //
+					//	}
+					//});
 
 	},
 
