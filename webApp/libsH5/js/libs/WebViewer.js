@@ -17769,13 +17769,12 @@ CLOUD.EditorManager.prototype = {
             changeEditorModeCallback:function(){
                 scope.setPickMode(viewer);
             }
-        };
-
-        this.commentEditor.init(callbacks);
+        };    
 
         callbacks = null;
 
         scope.setEditor(this.commentEditor);
+        this.commentEditor.init(callbacks);
     },
 
     zoomIn: function (factor, viewer) {
