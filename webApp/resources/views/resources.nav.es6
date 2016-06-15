@@ -37,6 +37,7 @@ App.ResourcesNav.App = Backbone.View.extend({
 			this.$el.append(new App.ResourcesNav.ManifestLibs().render().el);
 
 		}else if(type == "artifactsMapRule" ||  type == "project"){
+
 			//构件映射规则
 			if(optionType){//映射规则/规则模板
 				App.ResourceArtifacts.init(_this,optionType);

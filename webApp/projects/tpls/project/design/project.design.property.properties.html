@@ -1,6 +1,6 @@
 <% var count=obj.length,item; %>
     <% for(var i=0;i<count;i++){ %>
-        <% item=obj[i]; %>
+        <% item=obj[i];if(item.group=='设计')continue %>
             <div class="modle">
                 <i class="modleShowHide"></i>
                 <h1 class="modleName overflowEllipsis"><%= item.group%></h1>
