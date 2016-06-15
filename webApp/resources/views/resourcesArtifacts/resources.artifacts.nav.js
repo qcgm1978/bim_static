@@ -31,7 +31,6 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
     },
 
     initialize:function(){
-        this.getCategoryCode(); //获取分类编码
         Backbone.on("startFromProject",this.startFromProject,this);
         Backbone.on("checkedChange",this.checkList,this);
         Backbone.on("projectMappingRuleCheckedClose",this.checkClose,this);
@@ -49,14 +48,16 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
         //监听项目内容
     },
 
+    //切换选项
     select:function(e){
         var $pre = $(e.target),_this = this;
 
         App.ResourceArtifacts.Status.saved = true;
 
-
         if($pre.closest(".artifactsNav").length){
-            $pre.addClass("active").siblings("li").removeClass("active");
+            if(!$pre.hasClass("active")){
+                $pre.addClass("active").siblings("li").removeClass("active");
+            }
         }
 
 
@@ -88,19 +89,6 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
             this.$(".plans li").removeClass("active");
         }
         this.$(".rules").show();
-    },
-
-    getCategoryCode:function(){
-        var cdata  = {
-            URLtype:'fetchArtifactsCategoryRule',
-            data :{
-            }
-        };
-        App.Comm.ajax(cdata,function(response){
-            if(response.code == 0 && response.data.length){
-                App.Resources.artifactsTreeData = response.data;
-            }
-        });
     },
     //重置规则
     resetRule:function(){

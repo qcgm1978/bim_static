@@ -105,6 +105,12 @@
 
         }
 
+        if (that.Settings.atList.is(":visible")) {
+           if (keyCode == 38 || keyCode == 40) {
+            return;
+           }
+        }
+
         //计算 at 的位置
         var index = that.Settings.ePos = that.getCursortPosition(),
           val = that.Settings.$el.val().substring(0, index),

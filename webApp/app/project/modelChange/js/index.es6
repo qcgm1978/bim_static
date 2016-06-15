@@ -401,23 +401,23 @@ App.Project.Model = {
 			var parent = $(".rightTreeView");
 			var elementId = that.data('id');
 			var baseId = that.data('base');
-			if (that.prev('.noneSwitch').length > 0) {
-				if (that.is('.current')) {
-					that.removeClass('current');
-					App.Index.Settings.Viewer.highlight({
-						type: "userId",
-						ids: []
-					});
-				} else {
-					parent.find('.current').removeClass('current');
-					that.addClass('current');
-					App.Index.Settings.Viewer.highlight({
-						type: "userId",
-						ids: [elementId, baseId]
-					});
-				}
-				App.Index.Settings.Viewer.fit();
-			}
+			//if (that.prev('.noneSwitch').length > 0) {
+			//	if (that.is('.current')) {
+			//		that.removeClass('current');
+			//		App.Index.Settings.Viewer.highlight({
+			//			type: "userId",
+			//			ids: []
+			//		});
+			//	} else {
+			//		parent.find('.current').removeClass('current');
+			//		that.addClass('current');
+			//		App.Index.Settings.Viewer.highlight({
+			//			type: "userId",
+			//			ids: [elementId, baseId]
+			//		});
+			//	}
+			//	App.Index.Settings.Viewer.fit();
+			//}
 
 			App.Index.Settings.Viewer.setOverrider('add');
 			App.Index.Settings.Viewer.setOverrider('beforeEdit');

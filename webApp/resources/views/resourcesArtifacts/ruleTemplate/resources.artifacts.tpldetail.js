@@ -46,8 +46,17 @@ App.Resources.ArtifactsTplDetail = Backbone.View.extend({
         Backbone.trigger("checkedChange");
     },
 
+    //当模板为空时触发
+    reset:function(){
+        this.$(".tplDetailInfo h2").empty();
+    },
+
     //保存
     resourcesSure:function(){
+
+        if(!App.ResourceArtifacts.Status.templateId){
+            return
+        }
 
         App.ResourceArtifacts.resetModelRuleSaveData();//重置数据
         var _this = this;
@@ -71,13 +80,15 @@ App.Resources.ArtifactsTplDetail = Backbone.View.extend({
         //质量
         //需要保存旧code和ruleContain，如果code有，则放弃，未选则添加，单条rule由planruledetail自行添加
         var qualifyC = _.filter($(".qualifyC .qualityMenuList ul li"),function(item){
-
             return $(item).attr("data-check") == "1" && $(item).attr("data-leaf") == "1";
         });
+
         _.each(qualifyC,function(item){
             App.ResourceArtifacts.modelRuleSaveData.codeIdsIn.push($(item).attr("data-code"));
         });
 
+
+        console.log(App.ResourceArtifacts.modelRuleSaveData);
         var pdata = {
             URLtype: "saveArtifactsTemplateRule",
             type:"PUT",
@@ -87,8 +98,9 @@ App.Resources.ArtifactsTplDetail = Backbone.View.extend({
 
         App.ResourceArtifacts.loading($(".modelContent"));
         App.Comm.ajax(pdata,function(response){
+            console.log(response);
             if(response.code == 0 ){
-                console.log(response);
+
 
                 //更改模板名称
                 _this.$(".tplDetailTitle h2").text(App.ResourceArtifacts.Status.templateName);

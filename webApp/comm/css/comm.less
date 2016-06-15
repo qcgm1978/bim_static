@@ -9,10 +9,10 @@
 .pointer { cursor: pointer; }
 #pageLoading, #dataLoading { position: fixed; top: 0px; width: 100%; bottom: 0px; z-index: 9999; background: #fff url('/comm/images/load.gif') no-repeat center; }
 #dataLoading { display: none; }
-.overflow2 {    word-wrap: break-word; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.overflow2 {word-wrap: break-word; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
 
 /* bootstrap  */
-.txtInput { height: 30px; padding: 6px 8px; outline: none; font-size: 12px; line-height: 1.2; color: #666; background-color: #fff; border: 1px solid #ccc; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box; }
+.txtInput {resize: none;height: 30px; padding: 6px 8px; outline: none; font-size: 12px; line-height: 1.2; color: #666; background-color: #fff; border: 1px solid #ccc; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box; }
 .txtInput:focus { border-color: #0075df; }
 .txtInput.disabled { border-color: #ccc; background-color: #eee; color: #333; }
 .txtNoneBorder { border: 1px #ccc solid; }
@@ -105,7 +105,7 @@
 }
 
 /*  left nav */
-.projectNav { min-width: 396px; width: 100%; padding-left: 10px; background-color: #ddd; height: 40px; border-bottom: 1px #ccc solid; font-size: 12px; color: #666;
+.projectNav { min-width: 396px; width: 100%; padding-left: 10px; background-color: #ddd; height: 40px; font-size: 12px; color: #666;
 	.item { float: left; line-height: 30px; height: 30px; margin-right: 10px; width: 80px; border: 1px #ddd solid; text-align: center; margin-top: 10px; cursor: pointer;
 		&:hover { border-color: #ccc; color: #333; }
 		&.selected { color: #333; border: 1px #ccc solid; border-top-width: 2px; border-top-color: #3e78e6; border-bottom-color: #fff; background-color: #fff; }
