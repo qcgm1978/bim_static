@@ -6,6 +6,7 @@ App.Project.ProjectDesignSetting= Backbone.View.extend({
 
   events: {
     "click .itemContent":"openTree",
+    "click .parentCheckbox":"selectAll",
     "blur .labelInput":"requireName"
   },
 
@@ -45,6 +46,22 @@ App.Project.ProjectDesignSetting= Backbone.View.extend({
     }
     that.toggleClass("open");
   },
+
+  selectAll:function(e){
+    var $target=$(e.currentTarget);
+    var $dom=$target.closest("li");
+    if(!$target.attr("checked")){
+      $dom.find('.inputCheckbox').each(function(){
+        $(this).attr("checked",true)
+      });
+    }else{
+       $dom.find('.inputCheckbox').each(function(){
+        $(this).attr("checked",false)
+      });
+    }
+    e.stopPropagation();
+  },
+
   addCategory:function(model){
     var data = model.toJSON();
     this.element.after(new App.Project.DesignTreeView({

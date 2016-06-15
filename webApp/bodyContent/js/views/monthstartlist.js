@@ -18,6 +18,7 @@ App.BodyContent.monthStartList = Backbone.View.extend({
         var _this=this;
         this.listenTo(App.BodyContent.control.monthStartCollection,"add",this.addOne);
          this.listenTo(App.BodyContent.control.monthStartCollection,"reset",function(){
+            _this.$el.empty();
             _this._items=0;
         });
     },

@@ -20,6 +20,7 @@ App.BodyContent.monthEndList = Backbone.View.extend({
         var _this=this;
         this.listenTo(App.BodyContent.control.monthEndCollection,"add",this.addOne);
         this.listenTo(App.BodyContent.control.monthEndCollection,"reset",function(){
+            _this.$el.empty();
             _this._items=0;
         });
     },
