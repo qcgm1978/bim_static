@@ -195,16 +195,8 @@ App.Index = {
 						App.Index.Settings.changeModel = App.Index.Settings.Viewer.load(App.Index.Settings.diffModleId);
 						return;
 					}
+					App.Index.Settings.changeModel = App.Index.Settings.Viewer.load(App.Index.Settings.baseModelId);
 
-					var diff = App.Index.Settings.baseFileVersionId;
-					if (diff) {
-						App.Index.getModelId(diff, function(data) {
-							if (data.code == 0) {
-								//加载差异模型
-								App.Index.Settings.changeModel = App.Index.Settings.Viewer.load(data.data.modelId);
-							}
-						});
-					}
 				}
 			}
 		});
@@ -252,42 +244,13 @@ App.Index = {
 		App.Comm.ajax(dataObj, callback);
 	},
 
-	//渲染模型
-	renderModel(differFileVersionId) {
-
-		var that = this;
-		App.Index.Settings.Viewer = null;
-		this.getModelId(differFileVersionId, function(data) {
-
-			if (data.message != "success") {
-				alert("转换失败");
-				return;
-			}
-
-			App.Index.Settings.modelId = data.data.modelId;
-
-			var Model = data.data;
-
-			if (data.data.modelStatus == 1) {
-				alert("模型转换中");
-				return;
-			} else if (data.data.modelStatus == 3) {
-				alert("转换失败");
-				return;
-			}
-			//渲染模型根据id
-			App.Index.renderModelById(data.data.modelId);
-		});
-
-	},
-
 	//渲染模型根据id
 	renderModelById() {
 
 		App.Index.Settings.Viewer = new bimView({
 			type: 'singleModel',
 			element: $("#contains .projectCotent"),
-			etag: App.Index.Settings.modelId,
+			etag: App.Index.Settings.differModelId
 		});
 
 
@@ -305,13 +268,10 @@ App.Index = {
 				App.Index.renderAttr(App.Index.Settings.ModelObj);
 			}
 
-		});
+		}); 
 
-		App.Index.Settings.Viewer.on("loaded", function() {
-			//加载数据
-			$(".showChange .groupRadio").click();
-		});
-
+		$(".showChange .groupRadio .btnCk").click();
+	 
 
 	},
 
@@ -473,7 +433,7 @@ App.Index = {
 			that.Settings.differModelId = firstData.differModelId;
 
 			//渲染模型
-			that.renderModel(firstData.differFileVersionId);
+			that.renderModelById();
 
 			//变更获取
 			that.fetchChangeList(firstData.baseFileVersionId, firstData.differFileVersionId);
@@ -501,12 +461,11 @@ App.Index = {
 
 
 					App.Index.Settings.changeModel = null;
-					App.Index.Settings.changeModel = null;
 
 					App.Index.Settings.baseModelId = $item.data("basemodelid");
 					App.Index.Settings.differModelId = $item.data("differmodelid");
 
-					that.renderModel(differFileVersionId);
+					that.renderModelById();
 					that.fetchChangeList(baseFileVersionId, differFileVersionId);
 
 				}
