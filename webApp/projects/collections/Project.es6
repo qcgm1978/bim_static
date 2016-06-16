@@ -50,7 +50,6 @@ App.Project = {
 		urlType: "fetchFileList",
 
 		parse: function(responese) {
-
 			if (responese.code == 0) {
 				if (responese.data.length > 0) {
 					return responese.data;
@@ -93,11 +92,11 @@ App.Project = {
 					}
 
 				}
-				if(App.Project.Settings.CurrentVersion.status!=9){
+				/*if(App.Project.Settings.CurrentVersion.status!=9){
 					$("#reNameModelProject").addClass('disable').attr('disabled','disabled');
 					$("#downLoadModelProject").addClass('disable').attr('disabled','disabled');
 					$("#delModelProject").addClass('disable').attr('disabled','disabled');
-				}
+				}*/
 				$item.addClass("selected").siblings().removeClass("selected");
 			},
 			shadow: false,
@@ -129,6 +128,7 @@ App.Project = {
 					window.location.href = url;
 				},
 				'delModel': function(item) {
+					debugger
 					var $item=$(item);
 					_this.delFile($item);
 				},
@@ -151,6 +151,142 @@ App.Project = {
 				}
 			}
 		});
+	},
+
+	addNewFileModel(){
+		var model = {
+				isAdd:true,
+				children: null,
+				createTime: null,
+				creatorId: "",
+				creatorName: "",
+				digest: null,
+				fileVersionId: null,
+				floor: null,
+				folder: true,
+				id: 'createNew',
+				length: null,
+				locked: null,
+				modelId: null,
+				modelStatus: null,
+				modificationId: null,
+				name: "新建文件夹",
+				parentId: null,
+				projectId: null,
+				specialty: null,
+				status: null,
+				suffix: null,
+				thumbnail: null
+		}
+		App.Project.FileCollection.push(model)
+	},
+	afterCreateNewFolder(file, parentId) {
+		var $treeViewMar = $(".projectNavFileContainer .treeViewMar"),
+			$treeViewMarUl = $treeViewMar.find(".treeViewMarUl");
+
+		var data = {
+			data: [file],
+			iconType: 1
+		};
+
+		if ($treeViewMar.find('span[data-id="' + file.id + '"]').length > 0) {
+			return;
+		}
+
+		//没有的时候绑定点击事件
+		if ($treeViewMarUl.length <= 0) {
+			data.click = function(event) {
+				var file = $(event.target).data("file");
+				$("#projectContainer .fileContent").empty();
+				App.Project.Settings.fileVersionId = file.fileVersionId;
+				App.Project.FileCollection.reset();
+				App.Project.FileCollection.fetch({
+					data: {
+						parentId: file.fileVersionId
+					}
+				});
+
+			}
+		}
+		var navHtml = new App.Comm.TreeViewMar(data);
+		//不存在创建
+		if ($treeViewMarUl.length <= 0) {
+			$treeViewMar.html($(navHtml).find(".treeViewMarUl"));
+		} else {
+			if (parentId) {
+				var $span = $treeViewMarUl.find("span[data-id='" + parentId + "']");
+				if ($span.length > 0) {
+					var $li = $span.closest('li');
+					if ($li.find(".treeViewSub").length <= 0) {
+						$li.append('<ul class="treeViewSub mIconOrCk" style="display:block;" />');
+					}
+
+					var $itemContent = $li.children('.item-content'),
+						$noneSwitch = $itemContent.find(".noneSwitch");
+
+					if ($noneSwitch.length > 0) {
+						$noneSwitch.toggleClass('noneSwitch nodeSwitch on');
+					}
+					var $newLi = $(navHtml).find(".treeViewMarUl li").removeClass("rootNode").addClass('itemNode');
+					$li.find(".treeViewSub").prepend($newLi);
+				}
+
+			} else {
+				$treeViewMarUl.prepend($(navHtml).find(".treeViewMarUl li"));
+			}
+		}
+
+	},
+	createNewFolder: function($item) {
+		var filePath = $item.find(".txtEdit").val().trim(),
+			that = this;
+		$leftSel = $("#projectContainer .treeViewMarUl .selected");
+		parentId = "";
+		if ($leftSel.length > 0) {
+			parentId = $leftSel.data("file").fileVersionId;
+		}
+		// //请求数据
+		var data = {
+			URLtype: "createNewFolder",
+			type: "POST",
+			data: {
+				projectId: App.Project.Settings.CurrentVersion.projectId,
+				projectVersionId: App.Project.Settings.CurrentVersion.id,
+				parentId: parentId,
+				filePath: filePath
+			}
+		};
+
+		App.Comm.ajax(data, function(data) {
+			if (data.message == "success") {
+				var id = data.data.id,
+					isExists = false;
+				$.each(App.Project.FileCollection.models, function(i, item) {
+					if (item.id == id) {
+						isExists = true;
+						return false;
+					}
+				});
+
+				//已存在的不在添加 返回
+				if (isExists) {
+					that.cancelEdit($item.find(".fileName"));
+					return;
+				}
+
+				var models = App.Project.FileCollection.models;
+				data.data.isAdd = false;
+				//修改数据
+				App.Project.FileCollection.last().set(data.data);
+
+				App.Project.afterCreateNewFolder(data.data, parentId);
+				//tree name
+				//$("#resourceModelLeftNav .treeViewMarUl span[data-id='" + id + "']").text(name);
+
+
+			}
+		});
+
 	},
 
 	afterRemoveFolder(file) {
@@ -208,7 +344,7 @@ App.Project = {
 	},
 	//取消修改名称
 	calcelEditName: function(event) {
-
+		debugger
 		var $prevEdit = $("#projectContainer .txtEdit");
 		if ($prevEdit.length > 0) {
 			this.cancelEdit($prevEdit);
@@ -217,13 +353,14 @@ App.Project = {
 	},
 	//取消修改
 	cancelEdit: function($prevEdit) {
+		debugger
 		var $item = $prevEdit.closest(".item");
 		if ($item.hasClass('createNew')) {
 			//取消监听 促发销毁
-			/*var model = App.ResourceModel.FileThumCollection.last();
+			var model = App.Project.FileCollection.last();
 			model.stopListening();
 			model.trigger('destroy', model, model.collection);
-			App.ResourceModel.FileThumCollection.models.pop();*/
+			App.Project.FileCollection.models.pop();
 			//删除页面元素
 			$item.remove();
 		} else {
@@ -533,6 +670,7 @@ App.Project = {
 
 	//事件初始化
 	initEvent: function() {
+		var _this=this;
 		//下载
 		$("#projectContainer").on("click", ".btnFileDownLoad", function(e) {
 
@@ -560,6 +698,16 @@ App.Project = {
 			// App.Comm.ajax(data).done(function(){
 			// 	console.log("下载完成");
 			// });
+
+		});
+
+		//下载
+		$("#projectContainer").on("click", ".btnNewFolder", function(e) {
+
+			if ($(e.currentTarget).is('.disable')) {
+				return
+			}
+			_this.addNewFileModel();
 
 		});
 	},
