@@ -145,6 +145,7 @@
                 index = count;
               }
               that.Settings.atList.find(".item").eq(index - 1).addClass("selected").siblings().removeClass("selected");
+               that.Settings.atList.scrollTop(that.Settings.atList.find(".selected").position().top);
             }
 
             return false;
@@ -160,6 +161,7 @@
                 index = -1;
               }
               that.Settings.atList.find(".item").eq(index + 1).addClass("selected").siblings().removeClass("selected");
+              that.Settings.atList.scrollTop(that.Settings.atList.find(".selected").position().top);
             }
 
             return false;
@@ -292,11 +294,17 @@
 
         paddingHeight = parseInt($txt.css("padding-top")) + parseInt($txt.css("padding-bottom")),
 
-        pos = this.Settings.atDiv.height($txt.height() + paddingHeight).width($txt.width() + paddingWidth).find(".at").position();
+        pos = this.Settings.atDiv.height($txt.height() + paddingHeight).width($txt.width() + paddingWidth).find(".at").position(),
 
+        top = pos.top + this.Settings.atBox.offset().top - 60;
+
+          
+      if (top + this.Settings.atList.height() > $("body").height()) {
+           top-=this.Settings.atList.height()+30;
+      }
 
       this.Settings.atList.css({
-        top: pos.top + this.Settings.atBox.offset().top - 60,
+        top: top,
         left: pos.left + 6
       }).show();
 
@@ -345,13 +353,16 @@
                 liTpl = '<li data-uid="{uid}" class="item"><span class="name">{name}</span>（<span class="dep">{dep}</span>）</li>';
               $.each(data.data, function() {
                 lis += liTpl.replace('{name}', this.username).replace('{dep}', this.orgName).replace('{uid}', this.userId);
-              }); 
-               
+              });
+
               if (lis.length > 0) {
                 that.Settings.atList.html(lis);
               } else {
                 that.Settings.atList.html('<li class="loadingUser item">未找到用户</li></ul>');
               }
+
+              //加载用户后 重新定位
+              that.rePosition();
 
             }
           });
