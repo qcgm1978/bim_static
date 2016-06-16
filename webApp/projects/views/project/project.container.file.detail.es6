@@ -41,7 +41,6 @@ App.Project.FileContainerDetail=Backbone.View.extend({
 
 	//文件或者文件夹点击
 	fileClick:function(event){
-
 		var $target=$(event.target),id=$target.data("id"),isFolder=$target.data("isfolder");
 		//文件夹
 		if (isFolder) {

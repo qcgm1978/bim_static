@@ -709,6 +709,15 @@ App.Project = {
 			_this.addNewFileModel();
 
 		});
+		//新建文件
+		$("#projectContainer").on("click", ".returnBack", function(e) {
+
+			if ($(e.currentTarget).is('.disable')) {
+				return
+			}
+			_this.returnBack();
+
+		});
 
 		//删除
 		$("#projectContainer").on("click", ".btnFileDel", function(e) {
@@ -729,7 +738,13 @@ App.Project = {
 			_this.delFile($item);
 		});
 	},
-
+	returnBack:function(){
+		var $currentLevel=$('#projectContainer .treeViewMarUl .selected');
+		var file=$currentLevel.data('file');
+		var parentId=file.parentId;
+		var $parent=$('#projectContainer .treeViewMarUl span[data-id="' + parentId + '"]');
+		$parent.click();
+	},
 	//绑定全局事件  document 事件
 	initGlobalEvent: function() {
 		$(document).on("click.project", function(event) {
