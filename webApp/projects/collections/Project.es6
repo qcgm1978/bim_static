@@ -98,6 +98,14 @@ App.Project = {
 					$("#delModelProject").addClass('disable').attr('disabled','disabled');
 				}*/
 				$item.addClass("selected").siblings().removeClass("selected");
+				//权限控制
+				var Auth = App.AuthObj.project.prjfile;
+				if(!Auth.edit){
+					$('#reNameModel,#delModel').addClass('disable');
+					if(!Auth.download || !App.ResourceModel.Settings.CurrentVersion.byProjectRef){
+						$('#downLoadModel').addClass('disable');
+					}
+				}
 			},
 			shadow: false,
 			bindings: {
