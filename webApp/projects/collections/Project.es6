@@ -821,8 +821,12 @@ App.Project = {
 					var str = '',datas = res.data.items || [];
 					for(var i = 0,prop; i < datas.length; i++){
 						prop = datas[i]['busName'];
-						if(false){
-							continue
+						if(prop == '设计'){
+							$.ajax({
+								url: "platform/setting/extensions/"+App.Project.Settings.projectId+"/"+App.Project.Settings.CurrentVersion.id+"/property?classKey={classKey}&elementId={elementId}
+							}).done(function(res){
+
+							});
 						}else {
 							str += '<div class="modle"><i class="modleShowHide down"></i><h1 class="modleName">' + prop + '</h1><ul class="modleList"></ul></div>';
 
