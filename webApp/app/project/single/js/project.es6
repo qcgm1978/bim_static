@@ -393,6 +393,7 @@ App.Project = {
 			$(this).toggleClass("down");
 			var $modleList = $(this).parent().find(".modleList");
 			$modleList.slideToggle();
+
 		});
 		//收起 暂开 属性
 		$projectContainer.on("click", ".slideBar", function() {
