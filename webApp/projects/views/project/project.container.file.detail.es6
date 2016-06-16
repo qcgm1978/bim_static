@@ -24,7 +24,17 @@ App.Project.FileContainerDetail=Backbone.View.extend({
 
 	//渲染
 	render:function(){
+
+		var data = this.model.toJSON();
+
 		this.$el.html(this.template(this.model.toJSON()));
+
+		if (data.isAdd) {
+			this.$el.addClass('createNew');
+		} else {
+			this.$el.removeClass('createNew');
+		}
+
 		App.Project.bindContextMenu(this.$el);
 		return this;
 	},
@@ -87,7 +97,14 @@ App.Project.FileContainerDetail=Backbone.View.extend({
 		App.Project.calcelEditName(e);
 	},
 	enterEditNameOrCreateNew(e){
-		App.Project.editFolderName($(event.target).closest(".item"));
+		var $item=$(e.target).closest(".item");
+		var $target=$(e.currentTarget);
+		if($target.hasClass('createNewCls')){
+			App.Project.createNewFolder($item);
+		}else{
+			App.Project.editFolderName($item);
+		}
+		//;
 	},
 	//是否全选
 	singleCheck(event){

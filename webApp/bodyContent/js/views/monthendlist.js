@@ -33,7 +33,7 @@ App.BodyContent.monthEndList = Backbone.View.extend({
             return
         }
         var el=newView.render().$el;
-        if(this._items%2==0){
+        if(this._items%2==1){
             el.addClass('odd');
         }
 

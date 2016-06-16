@@ -9,8 +9,6 @@ App.BodyContent.control= {
 
     init : function(){
 
-       
-       
         $("#contains").empty();
 
         this.loadMessageCount();
@@ -169,8 +167,8 @@ App.BodyContent.control= {
                             $("#slideTitle").html('项目');
                         }
                     }
-                    if(!_this.slider){
-                        _this.slider=$(".mmhSlider").mmhSlider({
+                    if($('.mmhSlider').children().length==0){
+                         $(".mmhSlider").mmhSlider({
                             delay:5000,
                             data:_datas,
                             noData:_nodata,

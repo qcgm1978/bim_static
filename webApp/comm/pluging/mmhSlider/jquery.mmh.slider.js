@@ -1,10 +1,14 @@
 (function($) {
 
 	var tpl = "<li class='{class}' style='background-image:url({src})'></li>",
-		toolTpl = "<label class='{class}'>&bull;</label>";
+		toolTpl = "<label class='{class}'>&bull;</label>",
+		timer=null;
 
 	$.fn.mmhSlider = function(name, options) {
 		var _setting = null;
+		if(timer){
+			clearInterval(timer)
+		}
 		if (typeof name === 'string') {
 			return $(this);
 		} else {
@@ -27,7 +31,7 @@
 			this.cacheArray(setting.data.length);
 			$.fn.mmhSlider.methods.render($dom, setting, function(data) {
 				//定时器任务
-				setInterval(function() {
+				timer=setInterval(function() {
 					if(_pause){
 						return 
 					}
