@@ -69,6 +69,7 @@ App.Index = {
 			$(this).toggleClass("down");
 			var $modleList = $(this).parent().find(".modleList");
 			$modleList.slideToggle();
+
 		});
 
 		//收起 暂开 属性 右侧

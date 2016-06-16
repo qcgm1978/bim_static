@@ -213,7 +213,7 @@
           return;
         }
 
-        var text = $(this).text() + " ",
+        var text = $(this).find(".name").text() + " ",
 
           val = that.Settings.$el.val(),
 
