@@ -102,7 +102,7 @@ App.Project = {
 			shadow: false,
 			bindings: {
 				'previewModel': function($target) {},
-				'downLoadModel': function(item) {
+				'downLoadModelProject': function(item) {
 
 					var $item = $(item);
 
@@ -127,12 +127,11 @@ App.Project = {
 						url = data.url + "?fileVersionId=" + fileVersionId;
 					window.location.href = url;
 				},
-				'delModel': function(item) {
-					debugger
+				'delModelProject': function(item) {
 					var $item=$(item);
 					_this.delFile($item);
 				},
-				'reNameModel': function(item) {
+				'reNameModelProject': function(item) {
 					//重命名
 					let $reNameModel = $("#reNameModelProject");
 					//不可重命名状态
@@ -701,7 +700,7 @@ App.Project = {
 
 		});
 
-		//下载
+		//新建文件
 		$("#projectContainer").on("click", ".btnNewFolder", function(e) {
 
 			if ($(e.currentTarget).is('.disable')) {
@@ -709,6 +708,25 @@ App.Project = {
 			}
 			_this.addNewFileModel();
 
+		});
+
+		//删除
+		$("#projectContainer").on("click", ".btnFileDel", function(e) {
+			if ($(e.currentTarget).is('.disable')) {
+				return
+			}
+			var $selFile = $("#projectContainer .fileContent :checkbox:checked").parent();
+
+			if ($selFile.length < 1) {
+				App.Services.Dialog.alert('请选择需要删除的文件...');
+				return;
+			}
+			if ($selFile.length > 1) {
+	 			App.Services.Dialog.alert('目前只支持单文件删除...');
+	 			return;
+	 		}
+			var $item = $selFile.closest(".item");
+			_this.delFile($item);
 		});
 	},
 
