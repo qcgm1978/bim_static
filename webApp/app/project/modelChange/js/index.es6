@@ -39,6 +39,7 @@ App.Index = {
 			$(this).toggleClass("down");
 			var $modleList = $(this).parent().find(".modleList");
 			$modleList.slideToggle();
+
 		});
 
 
