@@ -778,12 +778,12 @@ App.Project = {
 
 			//面包屑 项目
 			if ($target.closest(".breadItem.project").length <= 0) {
-				$(".breadItem .projectList").hide();
+				$(".breadItem .projectList").find(".txtSearch").val("").end().hide();
 			}
 
 			//面包屑 项目版本
 			if ($target.closest(".breadItem.projectVersion").length <= 0) {
-				$(".breadItem .projectVersionList").hide();
+				$(".breadItem .projectVersionList").find(".txtSearch").val("").end().hide();
 			}
 
 			//面包屑 切换 文件 模型 浏览器 

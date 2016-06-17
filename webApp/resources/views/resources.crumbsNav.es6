@@ -83,7 +83,7 @@ App.ResourceCrumbsNav = Backbone.View.extend({
 	},
 
 	//切换 文件 模型 浏览器
-	switchFileMoldel(event) {
+	switchFileMoldel(event) { 
 
 		var $target = $(event.target),
 			type = $target.data("type");
