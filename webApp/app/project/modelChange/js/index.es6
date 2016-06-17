@@ -382,29 +382,32 @@ App.Project.Model = {
 		},
 		addDetail: function(model) {
 			var data = model.toJSON();
+			console.log(data)
 			if (data.message == 'success' && data.data.length > 0) {
 				this.$el.html(this.template(data));
 				var editbefore=[],editafter=[],add=[],remove=[];
 				for(var i=0,obj;i<data.data.length;i++){
 					obj = data.data[i]['results'];
 					for(var j=0;j<obj.length;j++){
-						if(obj['changeType']==1){
-							add.push(obj['currentElementId']);
-						}else if(obj['changeType']==2){
-							remove.push(obj['baseElementId']);
+						if(obj[j]['changeType']==1){
+							add.push(obj[j]['currentElementId']);
+						}else if(obj[j]['changeType']==2){
+							remove.push(obj[j]['baseElementId']);
 
-						}else if(obj['changeType']==8){
-							editafter.push(obj['currentElementId']);
-							editbefore.push(obj['baseElementId']);
+						}else if(obj[j]['changeType']==8){
+							editafter.push(obj[j]['currentElementId']);
+							editbefore.push(obj[j]['baseElementId']);
 
 						}
 					}
 				}
+       //setTimeout(function(){
+	       App.Index.Settings.Viewer.setOverrider('beforeEdit', editbefore);
+	       App.Index.Settings.Viewer.setOverrider('afterEdit', editafter);
+	       App.Index.Settings.Viewer.setOverrider('add',add);
+	       App.Index.Settings.Viewer.setOverrider('delete',remove);
+       //},2000);
 
-				App.Index.Settings.Viewer.setOverrider('beforeEdit', editbefore);
-				App.Index.Settings.Viewer.setOverrider('afterEdit', editafter);
-				App.Index.Settings.Viewer.setOverrider('add',add);
-				App.Index.Settings.Viewer.setOverrider('delete',remove);
 			} else {
 				this.$el.html("没有变更");
 			}
