@@ -56,7 +56,7 @@ App.Project.FileContainerDetail=Backbone.View.extend({
 				}
 				$leftItem.click();
 			}
-
+			$('#projectContainer .returnBack').attr('isReturn','1').removeClass('theEnd').html('返回上级');
 		}else{
 
 			//this.fetchFileModelIdByFileVersionId(id,$target);

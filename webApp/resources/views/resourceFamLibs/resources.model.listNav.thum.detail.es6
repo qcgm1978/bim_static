@@ -13,7 +13,8 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 		"click .ckMe": "itemSelected",
 		"keyup .txtEdit": "enterCreateNew",
 		"click .txtEdit": "returnPop",
-		"click .ckMe": "stopPop"
+		"click .ckMe": "stopPop",
+		'click .returnBack':'returnBack'
 
 	},
 
@@ -48,7 +49,9 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 
 
 	},
-
+	returnBack:function(){
+		alert();
+	},
 	//文件或者文件夹点击
 	fileClick: function(event) {
 
@@ -69,7 +72,7 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 				}
 				$leftItem.click();
 			}
-
+			$('#navContainer .returnBack').removeClass('theEnd').attr('isReturn','1').html('返回上级');
 		}
 	},
 

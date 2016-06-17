@@ -4,6 +4,8 @@
 
 App.Services.projectMember = {
 
+	managerType:3,
+
 	selectData:function(data){
 		if(data.type==3){
 			return "我管理的项目("+data.projectCount+")";
