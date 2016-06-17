@@ -119,6 +119,7 @@ App.Project = {
 	// 除 dwg以外的格式
 	renderOther(modelId,type) {
 		var typeMap = {
+			rte:'singleModel',
 			rvt:'singleModel',
 			rfa:'familyModel'
 		}
