@@ -277,7 +277,7 @@ App.Index = {
 			}
 		};
 
-		App.Comm.ajax(data, function(data) {
+		App.Comm.ajax(data, (data)=> {
 			if (data.code == 0) {
 				data = data.data;
 				$(".breadcrumbNav .project .text").text(data.projectName);
