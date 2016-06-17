@@ -8,6 +8,7 @@ App.Projects.ContentMode = Backbone.View.extend({
 	initialize: function() {
 		this.listenTo(App.Projects.ProjectCollection, "add", this.addOne);
 		this.listenTo(App.Projects.ProjectCollection, "reset", this.emptyContent);
+		Backbone.on('projectListNullData',this.showNullTip,this);
 	},
 
 	template: _.templateUrl('/projects/tpls/project.ContentMode.html', true),
@@ -33,7 +34,11 @@ App.Projects.ContentMode = Backbone.View.extend({
 
 	//清空内容
 	emptyContent:function(){
-		 
+	//	this.$el.find(".proListBox").html('<li class="loading"><img src="/static/dist/images/projects/images/emptyProject.png"><div>暂无可访问项目</div></li>');
+		this.$el.find(".proListBox").html('<li class="loading">正在加载...</li>');
+	},
+
+	showNullTip:function(){
 		this.$el.find(".proListBox").html('<li class="loading"><img src="/static/dist/images/projects/images/emptyProject.png"><div>暂无可访问项目</div></li>');
 	}
 
