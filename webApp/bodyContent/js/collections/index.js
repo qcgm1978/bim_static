@@ -172,7 +172,7 @@ App.BodyContent.control= {
                         sildeData.push({
                             image:item.logoUrl['large'],
                             projectId:item.id,
-                            versionId:item.version ?item.version.id:'nodata',
+                            versionId:item.version ?item.version.id:'845160092246208',
                             title:item.name
                         })
                     })

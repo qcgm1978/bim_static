@@ -1,6 +1,6 @@
 (function($) {
 
-	var tpl = "<li class='{class}' style='background-image:url({src})'><a target='_blank' href='#project/{projectId}/{versionId}' style='width:100%;height:100%;display:inline-block;'><a></li>",
+	var tpl = "<li class='{class}' style='background-image:url({src})'><a href='/#projects/{projectId}/{versionId}' style='width:100%;height:100%;display:inline-block;'><a></li>",
 		toolTpl = "<label class='{class}'>&bull;</label>",
 		timer=null;
 
