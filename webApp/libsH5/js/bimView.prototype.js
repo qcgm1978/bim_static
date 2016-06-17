@@ -532,10 +532,10 @@
       $.each(list,function(i,item){
         newList.push(window.btoa(JSON.stringify(item)));
       });
-      var floors = bimView.comm.getFilters($("#floors"),'ckecked');
-      var specialty = bimView.comm.getFilters($("#specialty"),'ckecked');
-      var category = bimView.comm.getFilters($("#category"),'ckecked');
-      var classCode = bimView.comm.getFilters($("#classCode"),'ckecked');
+      var floors = bimView.comm.getFilters($("#floors"),'uncheck');
+      var specialty = bimView.comm.getFilters($("#specialty"),'uncheck');
+      var category = bimView.comm.getFilters($("#category"),'uncheck');
+      var classCode = bimView.comm.getFilters($("#classCode"),'uncheck');
       return {
         camera:self.getCamera(),
         list:newList,
