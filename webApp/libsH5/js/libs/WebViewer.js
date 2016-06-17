@@ -9032,8 +9032,7 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
     // the orbit center
     this.pivot = null;
 
-    //this.movementSpeed = 0.005 * CLOUD.GlobalData.SceneSize; // 移动速度
-    this.movementSpeed = 0.0008 * CLOUD.GlobalData.SceneSize; // 移动速度
+    this.movementSpeed = 0.005 * CLOUD.GlobalData.SceneSize; // 移动速度
     this.defaultMovementSpeed = this.movementSpeed;
     this.minMovementSpeed = 0.01;
 
@@ -9055,7 +9054,7 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
 
     // Set to true to disable this control
     this.noPan = false;
-    this.keyPanSpeed = 2.0;	// pixels moved per arrow key push
+    this.keyPanSpeed = 7.0;	// pixels moved per arrow key push
     this.defaultKeyPanSpeed = this.keyPanSpeed;
     this.minKeyPanSpeed = 0.01;
     //this.movementSpeedMultiplier = 1.0;
@@ -9113,9 +9112,15 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
 
     var STATE = {NONE: -1, ROTATE: 0, DOLLY: 1, PAN: 2};
 
+    //var isAtZoom = 0; // 指示是否处在滚动缩放状态
     var state = STATE.NONE;
 
     var lastTrackingPoint;
+
+    //var lastCameraView = {
+    //    dir: new THREE.Vector3(),
+    //    up: new THREE.Vector3()
+    //};
 
     this.IsIdle = function () {
         return state === STATE.NONE;
@@ -10502,7 +10507,7 @@ CLOUD.OrbitEditor.prototype.onMouseWheel = function (event) {
     //两者只在取值上不一致，代表含义一致，detail与wheelDelta只各取两个值，detail只取±3，wheelDelta只取±120，其中正数表示为向上，负数表示向下。
     var delta = 0 || event.wheelDelta || event.detail;
     delta = (Math.abs(delta) > 10 ? delta : -delta * 40);
-    delta *= 0.0001; // 0.0005
+    delta *= 0.0005;
 
     this.delayHandle();
 
@@ -17777,11 +17782,11 @@ CLOUD.EditorManager.prototype = {
         scope.setEditor(this.markerEditor);
     },
 
-    setAnnotationMode: function (viewer) {
+    setCommentMode: function (viewer) {
         var scope = this;
 
-        if(this.annotationEditor === undefined){
-            this.annotationEditor = new CLOUD.Extensions.AnnotationEditor(viewer.cameraEditor, viewer.getScene(), viewer.domElement);
+        if(this.commentEditor === undefined){
+            this.commentEditor = new CLOUD.Extensions.CommentEditor(viewer.cameraEditor, viewer.getScene(), viewer.domElement);
         }
 
         var callbacks = {
@@ -17794,12 +17799,12 @@ CLOUD.EditorManager.prototype = {
             changeEditorModeCallback:function(){
                 scope.setPickMode(viewer);
             }
-        };
-
-        scope.setEditor(this.annotationEditor);
-        this.annotationEditor.init(callbacks);
+        };    
 
         callbacks = null;
+
+        scope.setEditor(this.commentEditor);
+        this.commentEditor.init(callbacks);
     },
 
     zoomIn: function (factor, viewer) {
@@ -18530,10 +18535,10 @@ CloudViewer.prototype = {
         var mimetype = "image/png";
         var dataUrl = null;
 
-        if (this.editorManager.annotationEditor && this.editorManager.editor === this.editorManager.annotationEditor) {
+        if (this.editorManager.commentEditor && this.editorManager.editor === this.editorManager.commentEditor) {
 
             // 在批注模式，底图已经锁定，不用调用render
-            var editor = this.editorManager.annotationEditor;
+            var editor = this.editorManager.commentEditor;
 
             dataUrl = this.renderer.domElement.toDataURL(mimetype);
             dataUrl = editor.composeScreenSnapshot(dataUrl);
@@ -18563,7 +18568,7 @@ CloudViewer.prototype = {
             CLOUD.GlobalData.SubSceneVisibleLOD = 1000;
             CLOUD.GlobalData.CellVisibleLOD = 1000;
         }
-
+        this.enableCameraNearFar = false;
     },
 
     adjustSceneLoD: function (sceneIds) {
@@ -18858,13 +18863,13 @@ CloudViewer.prototype = {
     // ------------------ 批注 API -- S ------------------ //
 
     setCommentMode: function () {
-        this.editorManager.setAnnotationMode(this);
+        this.editorManager.setCommentMode(this);
     },
 
     exitCommentMode: function () {
 
-        if ( this.editorManager.annotationEditor &&
-            this.editorManager.editor === this.editorManager.annotationEditor) {
+        if ( this.editorManager.commentEditor &&
+            this.editorManager.editor === this.editorManager.commentEditor) {
 
             this.setPickMode();
         }
@@ -18873,9 +18878,9 @@ CloudViewer.prototype = {
 
     setCommentBackgroundColor: function (startColor, stopColor) {
 
-        if ( this.editorManager.annotationEditor) {
+        if ( this.editorManager.commentEditor) {
 
-            this.editorManager.annotationEditor.setBackgroundColor(startColor, stopColor);
+            this.editorManager.commentEditor.setBackgroundColor(startColor, stopColor);
         }
     },
 
@@ -18886,50 +18891,50 @@ CloudViewer.prototype = {
     editCommentBegin: function() {
 
         // 如果没有设置批注模式，则自动进入批注模式
-        if (this.editorManager.editor !== this.editorManager.annotationEditor) {
+        if (this.editorManager.editor !== this.editorManager.commentEditor) {
             this.setCommentMode();
         }
 
-        this.editorManager.annotationEditor.editBegin();
+        this.editorManager.commentEditor.editBegin();
     },
 
     editCommentEnd: function() {
 
         // 在批注模式下有效
-        if ( this.editorManager.annotationEditor &&
-            this.editorManager.editor === this.editorManager.annotationEditor) {
+        if ( this.editorManager.commentEditor &&
+            this.editorManager.editor === this.editorManager.commentEditor) {
 
-            this.editorManager.annotationEditor.editEnd();
+            this.editorManager.commentEditor.editEnd();
         }
     },
 
     setCommentType: function(type) {
 
         // 在批注模式下有效
-        if ( this.editorManager.annotationEditor &&
-            this.editorManager.editor === this.editorManager.annotationEditor) {
+        if ( this.editorManager.commentEditor &&
+            this.editorManager.editor === this.editorManager.commentEditor) {
 
-            this.editorManager.annotationEditor.setAnnotationType(type);
+            this.editorManager.commentEditor.setCommentType(type);
         }
     },
 
     loadComments: function(CommentInfoList) {
 
         // 如果没有设置批注模式，则自动进入批注模式
-        if (this.editorManager.editor !== this.editorManager.annotationEditor) {
+        if (this.editorManager.editor !== this.editorManager.commentEditor) {
             this.setCommentMode();
         }
 
-        this.editorManager.annotationEditor.loadAnnotations(CommentInfoList);
+        this.editorManager.commentEditor.loadComments(CommentInfoList);
     },
 
     getCommentInfoList: function() {
 
         // 在批注模式下有效
-        if ( this.editorManager.annotationEditor &&
-            this.editorManager.editor === this.editorManager.annotationEditor) {
+        if ( this.editorManager.commentEditor &&
+            this.editorManager.editor === this.editorManager.commentEditor) {
 
-            return this.editorManager.annotationEditor.getAnnotationInfoList();
+            return this.editorManager.commentEditor.getCommentInfoList();
         }
 
         return null;
@@ -18938,10 +18943,10 @@ CloudViewer.prototype = {
     resizeCommentContainer: function() {
 
         // 在批注模式下有效
-        if ( this.editorManager.annotationEditor
-            && this.editorManager.editor === this.editorManager.annotationEditor) {
+        if ( this.editorManager.commentEditor
+            && this.editorManager.editor === this.editorManager.commentEditor) {
 
-            this.editorManager.annotationEditor.onResize();
+            this.editorManager.commentEditor.onResize();
         }
     }
 
