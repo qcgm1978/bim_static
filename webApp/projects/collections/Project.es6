@@ -711,7 +711,7 @@ App.Project = {
 
 		//新建文件
 		$("#projectContainer").on("click", ".btnNewFolder", function(e) {
-
+			
 			if ($(e.currentTarget).is('.disable')) {
 				return
 			}
