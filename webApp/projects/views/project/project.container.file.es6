@@ -35,6 +35,17 @@ App.Project.FileContainer=Backbone.View.extend({
 				this.$('.btnFileDownLoad').addClass('disable');
 			}
 		}
+		if(App.Project.Settings.CurrentVersion.status !=9 ||
+			App.Project.Settings.CurrentVersion.subType==1){
+			this.$('.btnNewFolder').addClass('disable');
+			this.$('.btnFileDel').addClass('disable');
+		}
+		if(!Auth.create){
+			this.$('.btnNewFolder').addClass('disable');
+		}
+		if(!Auth.delete){
+			this.$('.btnFileDel').addClass('disable');
+		}
 		return this;
 	},  
 

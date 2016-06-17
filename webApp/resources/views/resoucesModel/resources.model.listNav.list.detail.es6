@@ -52,7 +52,7 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 				}
 				$leftItem.click();
 			}
-
+			$('#navContainer .returnBack').removeClass('theEnd').attr('isReturn','1').html('返回上级');
 		} else {
 
 			//文件直接跳转 不做处理

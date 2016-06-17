@@ -8,6 +8,7 @@
  		"click .btnNewFolder": "createNewFolder", //创建文件夹
  		"click .btnFileDownLoad": "fileDownLoad", //文件下载  
  		"click .btnFileDel": "deleteFile", //删除文件
+		'click .returnBack':'returnBack'
  	},
 
  	template: _.templateUrl('/resources/tpls/resourceModel/resource.model.listNav.list.topBar.html', true),
@@ -41,6 +42,41 @@
 
 	  }
 		  return this;
+ 	},
+
+ 	returnBack:function(e){
+ 		if($(e.currentTarget).attr('isReturn')=='0'){
+ 			return 
+ 		}
+		var type = App.ResourcesNav.Settings.type;
+ 		var $currentLevel=type=="standardLibs"?$('#resourceModelLeftNav .treeViewMarUl .selected'):$('#resourceFamlibsLeftNav .treeViewMarUl .selected');
+		var file=$currentLevel.data('file');
+		var parentId=file.parentId;
+		var $parent=$('#resourceModelLeftNav .treeViewMarUl span[data-id="' + parentId + '"]');
+		if($parent.length){
+			$parent.click();
+		}else{
+			$(e.currentTarget).attr('isReturn','0').addClass('theEnd').html('全部文件');
+			if (type == "standardLibs") {
+				App.ResourceModel.FileCollection.projectId = App.ResourceModel.Settings.CurrentVersion.projectId;
+				App.ResourceModel.FileCollection.projectVersionId = App.ResourceModel.Settings.CurrentVersion.id;
+				App.ResourceModel.FileCollection.reset();
+				App.ResourceModel.FileCollection.fetch({
+					success: function() {
+						$("#pageLoading").hide();
+					}
+				});
+			} else if (type == "famLibs") {
+				App.ResourceModel.FileThumCollection.projectId = App.ResourceModel.Settings.CurrentVersion.projectId;
+				App.ResourceModel.FileThumCollection.projectVersionId = App.ResourceModel.Settings.CurrentVersion.id;
+				App.ResourceModel.FileThumCollection.reset();
+				App.ResourceModel.FileThumCollection.fetch({
+					success: function() {
+						$("#pageLoading").hide();
+					}
+				});
+			}
+		}
  	},
 
  	//创建新文件家
