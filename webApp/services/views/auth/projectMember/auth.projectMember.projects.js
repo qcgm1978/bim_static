@@ -30,6 +30,7 @@ App.Services.projectMember.projects = Backbone.View.extend({
 		$('#projectList .projectDropDown').myDropDown({
 			click:function($item){
 				_this.currentSelect=$item.data('type');
+				App.Services.projectMember.managerType=$item.data('type');
 				$("#memberlistWrap").html('<div class="noDataText">暂无信息,请点击选择左侧的项目列表</div>');
 				items.fetch({
 					reset:true,

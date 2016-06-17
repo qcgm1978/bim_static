@@ -19,7 +19,13 @@
 
 
 		//单利 不存在 则 新建
-		if (!AppView) {
+		if (!AppView || AppView.$el.parents("body").length <= 0) {
+
+			//刷新页面销毁
+			if (AppView) {
+				AppView.remove();
+			}
+
 			ModelView = this;
 			AppView = new CommentView.App().render();
 
@@ -33,7 +39,7 @@
 				var contextHtml = _.templateUrl("/libsH5/tpls/comment/viewPointContext.html", true);
 				$("body").append(contextHtml);
 			}
-		}
+		} 
 
 		$("#comment .navBar .item.project").click();
 
@@ -802,7 +808,11 @@
 					}
 
 					if (this.$(".uploading").length > 0) {
-						$.tip({ message:"图片上传中", timeout:3000,type:"alarm"});
+						$.tip({
+							message: "图片上传中",
+							timeout: 3000,
+							type: "alarm"
+						});
 						//alert('图片上传中');
 						return;
 					}
@@ -831,7 +841,11 @@
 
 
 					if (!pars.text) {
-						$.tip({ message:"请输入评论内容", timeout:3000,type:"alarm"});
+						$.tip({
+							message: "请输入评论内容",
+							timeout: 3000,
+							type: "alarm"
+						});
 						//alert('请输入评论内容');
 						return;
 					}
@@ -1132,7 +1146,11 @@
 					};
 
 				if (!pars.name) {
-					$.tip({ message:"请输入批注名称", timeout:3000,type:"alarm"});
+					$.tip({
+						message: "请输入批注名称",
+						timeout: 3000,
+						type: "alarm"
+					});
 					//alert("请输入批注名称");
 					return false;
 				}
@@ -1303,7 +1321,11 @@
 				var description = dialog.element.find(".name").val().trim();
 
 				if (!description) {
-					$.tip({ message:"请输入位置信息", timeout:3000,type:"alarm"});
+					$.tip({
+						message: "请输入位置信息",
+						timeout: 3000,
+						type: "alarm"
+					});
 					//alert("请输入位置信息");
 					return;
 				}
@@ -1390,7 +1412,10 @@
 						}
 						clipboard = new Clipboard(".saveViewPoint .btnCopy");
 						clipboard.on('success', function(e) {
-							$.tip({ message:"您已经复制了链接地址", timeout:3000});
+							$.tip({
+								message: "您已经复制了链接地址",
+								timeout: 3000
+							});
 							//alert("您已经复制了链接地址");
 							e.clearSelection();
 						});
@@ -1418,7 +1443,11 @@
 					};
 
 				if (!pars.name) {
-					$.tip({ message:"请输入批注名称", timeout:3000,type:"alarm"});
+					$.tip({
+						message: "请输入批注名称",
+						timeout: 3000,
+						type: "alarm"
+					});
 					//alert("请输入批注名称");
 					return false;
 				}
@@ -1618,7 +1647,11 @@
 					};
 
 				if (!pars.name) {
-						$.tip({ message:"请输入批注名称", timeout:3000,type:"alarm"});
+					$.tip({
+						message: "请输入批注名称",
+						timeout: 3000,
+						type: "alarm"
+					});
 					//alert("请输入批注名称");
 					return false;
 				}

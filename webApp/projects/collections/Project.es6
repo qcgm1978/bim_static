@@ -92,11 +92,12 @@ App.Project = {
 					}
 
 				}
-				/*if(App.Project.Settings.CurrentVersion.status!=9){
+				if(App.Project.Settings.CurrentVersion.status!=9 ||
+					App.Project.Settings.CurrentVersion.subType==1){
 					$("#reNameModelProject").addClass('disable').attr('disabled','disabled');
 					$("#downLoadModelProject").addClass('disable').attr('disabled','disabled');
 					$("#delModelProject").addClass('disable').attr('disabled','disabled');
-				}*/
+				}
 				$item.addClass("selected").siblings().removeClass("selected");
 				//权限控制
 				var Auth = App.AuthObj.project.prjfile;
@@ -717,6 +718,15 @@ App.Project = {
 			_this.addNewFileModel();
 
 		});
+		//新建文件
+		$("#projectContainer").on("click", ".returnBack", function(e) {
+
+			if ($(e.currentTarget).is('.disable')) {
+				return
+			}
+			_this.returnBack(e);
+
+		});
 
 		//删除
 		$("#projectContainer").on("click", ".btnFileDel", function(e) {
@@ -737,7 +747,30 @@ App.Project = {
 			_this.delFile($item);
 		});
 	},
-
+	returnBack:function(e){
+		if($(e.currentTarget).attr('isReturn')=='0'){
+ 			return 
+ 		}
+		var $currentLevel=$('#projectContainer .treeViewMarUl .selected');
+		var file=$currentLevel.data('file');
+		var parentId=file.parentId;
+		var $parent=$('#projectContainer .treeViewMarUl span[data-id="' + parentId + '"]');
+		if($parent.length){
+			$parent.click();
+		}else{
+			$(e.currentTarget).attr('isReturn','0').addClass('theEnd').html('全部文件');
+			App.Project.FileCollection.projectId = App.Project.Settings.projectId;
+			App.Project.FileCollection.projectVersionId = App.Project.Settings.CurrentVersion.id;
+			App.Project.FileCollection.reset();
+			//文件列表
+			App.Project.FileCollection.fetch({
+				data: {
+					parentId: ''
+				}
+			});
+		//	this.loadData();
+		}
+	},
 	//绑定全局事件  document 事件
 	initGlobalEvent: function() {
 		$(document).on("click.project", function(event) {
@@ -745,12 +778,12 @@ App.Project = {
 
 			//面包屑 项目
 			if ($target.closest(".breadItem.project").length <= 0) {
-				$(".breadItem .projectList").hide();
+				$(".breadItem .projectList").find(".txtSearch").val("").end().hide();
 			}
 
 			//面包屑 项目版本
 			if ($target.closest(".breadItem.projectVersion").length <= 0) {
-				$(".breadItem .projectVersionList").hide();
+				$(".breadItem .projectVersionList").find(".txtSearch").val("").end().hide();
 			}
 
 			//面包屑 切换 文件 模型 浏览器 

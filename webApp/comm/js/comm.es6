@@ -6,16 +6,42 @@ App.Comm = {
 		pageItemCount: 30 //Math.floor(($("body").height() + 60) / 70) > 10 && Math.floor(($("body").height() + 60) / 70) || 10
 	},
 
-	//版本状态
-	versionStatus: {
-		"1": "未初始化",
+	//项目版本状态
+	versionStatus: { 
 		"3": "待审核",
 		"4": "审核中",
-		"5": "审批通过",
-		"6": "审批退回",
+		"5": "审核通过",
+		"6": "审核退回",
 		"7": "待移交",
 		"8": "移交退回",
 		"9": "已发布" 
+	},
+
+	//文件状态转换
+	convertStatus: function(status) { 
+
+		var result = "";
+		if (status == 1) {
+			result = "待上传";
+		} else if (status == 2) {
+			result = "上传中";
+		} else if (status == 3) {
+			result = "待审核";
+		} else if (status == 4) {
+			result = "审核中";
+		} else if (status == 5) {
+			result = "审核通过";
+		} else if (status == 6) {
+			result = "审核退回";
+		} else if (status == 7) {
+			result = "待移交";
+		} else if (status == 8) {
+			result = "移交退回";
+		} else if (status == 9) {
+			result = "已发布";
+		}
+
+		return result;
 	},
 
 	//封装ajax
@@ -148,33 +174,7 @@ App.Comm = {
 		} else {
 			return size + 'b';
 		}
-	},
-	//状态转换
-	convertStatus: function(status) { 
-
-		var result = "";
-		if (status == 1) {
-			result = "待上传";
-		} else if (status == 2) {
-			result = "上传中";
-		} else if (status == 3) {
-			result = "待审核";
-		} else if (status == 4) {
-			result = "审核中";
-		} else if (status == 5) {
-			result = "审核通过";
-		} else if (status == 6) {
-			result = "审核退回";
-		} else if (status == 7) {
-			result = "待移交";
-		} else if (status == 8) {
-			result = "移交退回";
-		} else if (status == 9) {
-			result = "已发布";
-		}
-
-		return result;
-	},
+	}, 
 
 	//收起和暂开
 	navBarToggle: function($el, $content, dirc, Viewer) {

@@ -168,6 +168,7 @@ ViewComp.MemberManager = Backbone.View.extend({
 		var pid=App.Comm.getCookie('currentPid');
 		var url=App.API.URL.putServicesProjectMembers;
 		var data={
+			"type":App.Services.projectMember.managerType,
 		    "projectId":[pid],
 		    "outer":{
 		        "orgId":[],

@@ -52,7 +52,6 @@ App.Comm.TreeViewMar.prototype.TreeViewBuild = function() {
 		},
 		//点击单个
 		itemClick: function(event) {
-
 			$(".treeViewMarUl .selected").removeClass("selected");
 
 			var $el = $(event.target);

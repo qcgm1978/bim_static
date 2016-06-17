@@ -237,7 +237,7 @@ App.Services.System.FolwContainerListDetail = Backbone.View.extend({
 
 			msg = "确认要删除" + $target.closest(".item").find(".name").text().trim() + "流程吗？";
 
-		opts.message = text.replace('#title', msg);
+		//opts.message = text.replace('#title', msg);
 
 
 
