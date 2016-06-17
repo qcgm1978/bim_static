@@ -98,6 +98,14 @@ App.Project = {
 					$("#delModelProject").addClass('disable').attr('disabled','disabled');
 				}*/
 				$item.addClass("selected").siblings().removeClass("selected");
+				//权限控制
+				var Auth = App.AuthObj.project.prjfile;
+				if(!Auth.edit){
+					$('#reNameModel,#delModel').addClass('disable');
+					if(!Auth.download || !App.ResourceModel.Settings.CurrentVersion.byProjectRef){
+						$('#downLoadModel').addClass('disable');
+					}
+				}
 			},
 			shadow: false,
 			bindings: {
@@ -709,6 +717,15 @@ App.Project = {
 			_this.addNewFileModel();
 
 		});
+		//新建文件
+		$("#projectContainer").on("click", ".returnBack", function(e) {
+
+			if ($(e.currentTarget).is('.disable')) {
+				return
+			}
+			_this.returnBack();
+
+		});
 
 		//删除
 		$("#projectContainer").on("click", ".btnFileDel", function(e) {
@@ -729,7 +746,13 @@ App.Project = {
 			_this.delFile($item);
 		});
 	},
-
+	returnBack:function(){
+		var $currentLevel=$('#projectContainer .treeViewMarUl .selected');
+		var file=$currentLevel.data('file');
+		var parentId=file.parentId;
+		var $parent=$('#projectContainer .treeViewMarUl span[data-id="' + parentId + '"]');
+		$parent.click();
+	},
 	//绑定全局事件  document 事件
 	initGlobalEvent: function() {
 		$(document).on("click.project", function(event) {
@@ -987,10 +1010,18 @@ App.Project = {
 					var str = '',datas = res.data.items || [];
 					for(var i = 0,prop; i < datas.length; i++){
 						prop = datas[i]['busName'];
-						if(false){
-							continue
+						if(prop == '设计管理'){
+							//$.ajax({
+							//	url: "platform/setting/extensions/"+App.Project.Settings.projectId+"/"+App.Project.Settings.CurrentVersion.id+"/property?classKey="+datas[i]['id']+"&elementId="+App.Project.Settings.ModelObj.intersect.userId
+							//}).done(function(res){
+							//		if(res.code==0){
+							//
+							//		}
+							//});
+							var string = '<div class="modle"><i data-classkey="'+datas[i]['id']+'" class="modleShowHide getdata down"></i><h1 class="modleName">' + prop + '</h1><ul class="modleList"></ul></div>';
+							that.$el.find(".fordesign").html(string);
 						}else {
-							str += '<div class="modle"><i class="modleShowHide"></i><h1 class="modleName">' + prop + '</h1><ul class="modleList"></ul></div>';
+							str += '<div class="modle"><i data-classkey="'+datas[i]['id']+'" class="modleShowHide getdata down"></i><h1 class="modleName">' + prop + '</h1><ul class="modleList"></ul></div>';
 
 						}
 

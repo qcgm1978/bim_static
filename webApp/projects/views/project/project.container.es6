@@ -43,7 +43,25 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		} else {
 			$modleList.slideUp();
 		}
+		//classkey临时请求数据
+		if($(event.target).is('.getdata')){
+			$(event.target).removeClass('getdata');
+			$modleList.slideDown();
+			$.ajax({
+				url: "platform/setting/extensions/"+App.Project.Settings.projectId+"/"+App.Project.Settings.CurrentVersion.id+"/property?classKey="+$(event.target).data('classkey')+"&elementId="+App.Project.Settings.ModelObj.intersect.userId
+			}).done(function(res){
+				if(res.code==0){
+					console.log(res)
+					var props=res.data.properties;
+					for(var str = '',i = 0;i<props.length;i++){
 
+					}
+					//str += '<li class="modleItem">'+
+					//	'<span class="modleName"><div title='<%=subItem.name%>' class="modleNameText overflowEllipsis"><%=subItem.name%></div></span> <span class="modleVal overflowEllipsis"><%=subItem.value%><%=subItem.unit%></span>'+
+					//	'</li>'
+				}
+			});
+		}
 	},
 
 	//点击面包靴
@@ -318,7 +336,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 
 		//渲染模型属性
 		//App.Project.renderModelContentByType();
-		return;
+		//return;
 		var viewer = App.Project.Settings.Viewer = new bimView({
 			type: 'model',
 			element: $("#projectContainer .modelContainerContent"),
