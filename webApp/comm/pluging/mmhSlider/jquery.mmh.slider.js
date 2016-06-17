@@ -1,6 +1,6 @@
 (function($) {
 
-	var tpl = "<li class='{class}' style='background-image:url({src})'></li>",
+	var tpl = "<li class='{class}' style='background-image:url({src})'><a target='_blank' href='#project/{projectId}/{versionId}' style='width:100%;height:100%;display:inline-block;'><a></li>",
 		toolTpl = "<label class='{class}'>&bull;</label>",
 		timer=null;
 
@@ -94,15 +94,17 @@
 				var _ = tpl,
 					__ = toolTpl;
 				_ = _.replace('{class}', i == 0 ? 'selected' : 'remove');
+				_ = _.replace('{projectId}', data[i].projectId);
+				_ = _.replace('{versionId}', data[i].versionId);
 				__ = __.replace('{class}', i == 0 ? 'nonFlag flag' : 'nonFlag');
-				_ = _.replace('{src}', data[i].image||data[i].logoUrl["large"]||'/static/dist/images/bodyContent/images/1683103954.jpg');
+				_ = _.replace('{src}', data[i].image);
 				result.push(_);
 				tools.push(__);
 			}
 			tools.push("</div>");
 			result.push("</ul>");
 			result = result.concat(tools);
-			result.push('<div class="slideTitle">' + (data[0].title || data[0].name)+ '</div>');
+			result.push('<div class="slideTitle">' + (data[0].title)+ '</div>');
 			$dom.prepend(result.join(""));
 			
 			setting.onChange(data[0]);

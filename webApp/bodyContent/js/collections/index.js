@@ -159,7 +159,8 @@ App.BodyContent.control= {
                 if(collection ==App.BodyContent.control.slideCollection && response.message=="success"){
                 	var _datas=response.data,
                         _len=_datas.length,
-                        _nodata=null;
+                        _nodata=null,
+                        sildeData=[];
                 	_len>=5? _datas.length = 5:"";
                     if(_len==0){
                         _nodata=function(){
@@ -167,13 +168,21 @@ App.BodyContent.control= {
                             $("#slideTitle").html('项目');
                         }
                     }
+                    _.each(_datas,function(item){
+                        sildeData.push({
+                            image:item.logoUrl['large'],
+                            projectId:item.id,
+                            versionId:item.version ?item.version.id:'nodata',
+                            title:item.name
+                        })
+                    })
                     if($('.mmhSlider').children().length==0){
                          $(".mmhSlider").mmhSlider({
                             delay:5000,
-                            data:_datas,
+                            data:sildeData,
                             noData:_nodata,
                             onChange:function(d){
-                                $("#slideTitle").html(d.name);
+                                $("#slideTitle").html(d.title);
                             }
                         })
                     }
