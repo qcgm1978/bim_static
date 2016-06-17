@@ -384,6 +384,27 @@ App.Project.Model = {
 			var data = model.toJSON();
 			if (data.message == 'success' && data.data.length > 0) {
 				this.$el.html(this.template(data));
+				var editbefore=[],editafter=[],add=[],remove=[];
+				for(var i=0,obj;i<data.data.length;i++){
+					obj = data.data[i]['results'];
+					for(var j=0;j<obj.length;j++){
+						if(obj['changeType']==1){
+							add.push(obj['currentElementId']);
+						}else if(obj['changeType']==2){
+							remove.push(obj['baseElementId']);
+
+						}else if(obj['changeType']==8){
+							editafter.push(obj['currentElementId']);
+							editbefore.push(obj['baseElementId']);
+
+						}
+					}
+				}
+
+				App.Index.Settings.Viewer.setOverrider('beforeEdit', editbefore);
+				App.Index.Settings.Viewer.setOverrider('afterEdit', editafter);
+				App.Index.Settings.Viewer.setOverrider('add',add);
+				App.Index.Settings.Viewer.setOverrider('delete',remove);
 			} else {
 				this.$el.html("没有变更");
 			}
@@ -420,27 +441,27 @@ App.Project.Model = {
 			//	App.Index.Settings.Viewer.fit();
 			//}
 
-			App.Index.Settings.Viewer.setOverrider('add');
-			App.Index.Settings.Viewer.setOverrider('beforeEdit');
-			App.Index.Settings.Viewer.setOverrider('afterEdit');
-			App.Index.Settings.Viewer.setOverrider('delete');
+			//App.Index.Settings.Viewer.setOverrider('add');
+			//App.Index.Settings.Viewer.setOverrider('beforeEdit');
+			//App.Index.Settings.Viewer.setOverrider('afterEdit');
+			//App.Index.Settings.Viewer.setOverrider('delete');
 
 			//判断是新增，修改，删除
-			if (baseId && elementId) {
-				//修改
-
-				App.Index.Settings.Viewer.setOverrider('beforeEdit', [baseId]);
-				App.Index.Settings.Viewer.setOverrider('afterEdit', [elementId]);
-			} else if (baseId) {
-				//删除
-
-				App.Index.Settings.Viewer.setOverrider('delete', [baseId]);
-
-			} else {
-				//新增
-
-				App.Index.Settings.Viewer.setOverrider('add', [elementId]);
-			}
+			//if (baseId && elementId) {
+			//	//修改
+      //
+			//	App.Index.Settings.Viewer.setOverrider('beforeEdit', [baseId]);
+			//	App.Index.Settings.Viewer.setOverrider('afterEdit', [elementId]);
+			//} else if (baseId) {
+			//	//删除
+      //
+			//	App.Index.Settings.Viewer.setOverrider('delete', [baseId]);
+      //
+			//} else {
+			//	//新增
+      //
+			//	App.Index.Settings.Viewer.setOverrider('add', [elementId]);
+			//}
 
 			//zoomtobox
 			$.ajax({
