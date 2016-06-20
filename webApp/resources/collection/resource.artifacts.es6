@@ -2,9 +2,7 @@
 //fetchArtifactsPlanRule   获取规则
 App.ResourceArtifacts={
     Status:{
-        presentPlan:null,  //当前计划或质量，提交数据
         saved : true,    //创建规则后的保存状态，已保存  /  未保存
-        presentRule : null,    //当前规则
         qualityProcessType:1,   //质量标准 -过程选择  type
         delRule:"",
         qualityStandardType:"GC",   //质量标准 -过程选择  type
@@ -24,7 +22,6 @@ App.ResourceArtifacts={
                 "mappingPropertyList":[]
             }
         },
-        openRule: null, //正在打开的规则，注意重置
         quality:{
             standardType:"GC",
             parentCode:""
@@ -203,7 +200,6 @@ App.ResourceArtifacts={
         }),
         urlType: "",
         parse: function(responese) {
-
             if (responese.code == 0 && responese.data.length > 0) {
                 return responese.data;
             } else {
@@ -244,7 +240,8 @@ App.ResourceArtifacts={
             App.ResourceArtifacts.Status.projectId = "";
             App.ResourceArtifacts.Status.projectName = "";
             _this.$el.append(this.ArtifactsIndexNav.render().el);
-        }else{
+        }else{ //项目
+            //https://bim.wanda.cn/platform/rule/template/select/project/info/{projectId} //通过id获得项目名
             this.ArtifactsProjectBreadCrumb = new App.Resources.ArtifactsProjectBreadCrumb();
             _this.$el.html(this.ArtifactsProjectBreadCrumb.render().el);
             //项目映射规则名称
@@ -291,7 +288,7 @@ App.ResourceArtifacts={
 
             //读入数据
             this.getPlan();
-            this.getQuality();
+            this.getAllQuality();
             this.loaddeaprt();
         }
         $(".resourcesMappingRule").show();
@@ -363,18 +360,10 @@ App.ResourceArtifacts={
             $("#artifacts").removeClass("services_loading");
         });
     },
-
-
-    //所有质量标准列表
-    allQuality:new(Backbone.Collection.extend({
-        model:Backbone.Model.extend({
-            defaults:function(){
-                return{
-
-                }
-            }
-        })
-    })),
+    //所有
+    modelSaving:[],
+    allQualityGC: [],
+    allQualityKY: [],
     //获取全部质量标准
     getAllQuality:function(){
         var _this = this;
@@ -382,19 +371,62 @@ App.ResourceArtifacts={
             URLtype:'fetchArtifactsQuality',
             data:{
                 parentCode: "all",
-                type:App.ResourceArtifacts.Status.type,
-                standardType: App.ResourceArtifacts.Status.qualityStandardType
+                type:App.ResourceArtifacts.Status.type
             }
         };
-        this.allQuality.reset();
         App.Comm.ajax(pdata,function(response){
             if(response.code == 0 && response.data.length){
-                _this.allQuality.add(response.data);
+                _this.allQualityKY = _.filter(response.data,function(item){
+                    return item.type = "KY"
+                });
+                _this.allQualityGC = _.filter(response.data,function(item){
+                    return item.type = "GC"
+                });
+                //向要存储的部分提交   质量标准的  原有数据
+                var arr = _this.getValid("quality",response.data);
+                _this.modelSaving= _this.modelSaving.concat(arr);
             }
         });
     },
 
+    //获取已经加载并且要存储的有效数据
+    getValid:function(type,data){
+        var arr= [];
+        var s =  _.filter(data,function(item){
+            var  a = true;
+            if(type == "quality"){
+                a = item.leaf
+            }
+            return a && (item.ruleContain == 1 || item.ruleContain == 3) && item.count != 0;  //过滤掉规则包函数为0的规则组
+        });
+        _.each(s,function(item){
+            var obj = {
+                code : item.code,
+                ruleIds : item.ruleIds || []
+            };
+            arr.push(obj);
+        });
+        return arr
+    },
 
+
+    //质量标准三级分类，要插入元素，数据，是否有父节点，n值是否存在
+    departQuality:function(ele,cdata,parentCode,ruleContain){
+        var data = cdata.data , levelData;
+        if(!parentCode){
+            levelData = _.filter(data,function(item){
+                return !item.parentCode
+            });
+        }else{
+            levelData = _.filter(data,function(item){
+                return item.parentCode == parentCode
+            });
+        }
+        if(levelData.length){
+            if(ruleContain != 1){ ruleContain = 0; }
+            $(ele).html(App.Resources.artifactsQualityTree(levelData,ruleContain));
+        }
+    },
 
     //获取规则模板
     getTpl:function(){

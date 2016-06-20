@@ -49,14 +49,13 @@ App.Resources.ArtifactsTplDetail = Backbone.View.extend({
         this.$(".tplDetailInfo h2").empty();
     },
 
-    //保存
+    //保存，要重写
     resourcesSure:function(){
         var _this = this;
         //如果不存在模板id则无法保存
         if(!App.ResourceArtifacts.Status.templateId){
             return
         }
-
         App.ResourceArtifacts.modelRuleSaveData.templateId = App.ResourceArtifacts.Status.templateId;
         App.ResourceArtifacts.modelRuleSaveData.templateName = App.ResourceArtifacts.Status.templateName = this.$(".tplDetailEdit .tplName").val();
 
@@ -65,27 +64,28 @@ App.Resources.ArtifactsTplDetail = Backbone.View.extend({
             return $(item).attr("data-check") == "1";
         });
 
-        //如果，collection里已选，则放弃，未选则添加，单条rule由planruledetail自行添加，每次需比较id
-        App.ResourceArtifacts.PlanNode.each(function(item){
-            for(var i = 0  ; i < plan.length ; i++){
-                if(item.get("code") == $(plan[i]).attr("data-code")){
-                    if(item.get("ruleContain") != 1){
-                        App.ResourceArtifacts.modelRuleSaveData.codeIdsIn.push(item.get("code"));
-                        return
-                    }
-                }
-            }
-        }) ;
-        //质量
-        //需要保存旧code和ruleContain，如果code有，则放弃，未选则添加，单条rule由planruledetail自行添加
+        //
+        for(var i = 0  ; i < plan.length ; i++){
+            App.ResourceArtifacts.modelRuleSaveData.codeIdsIn.push($(plan[i]).attr("data-code"));
+        }
+        //质量标准
         var qualifyC = _.filter($(".qualifyC .qualityMenuList ul li"),function(item){
             return $(item).attr("data-check") == "1" && $(item).attr("data-leaf") == "1";
         });
-
         _.each(qualifyC,function(item){
             App.ResourceArtifacts.modelRuleSaveData.codeIdsIn.push($(item).attr("data-code"));
         });
+        //要查找两级看是否是叶子节点
+   /*     var allQuality = App.ResourceArtifacts.allQuality;
+        var father  = _.filter(plan,function(item){
 
+        });
+
+        var grandFather  = _.filter(plan,function(item){
+
+        });*/
+
+        console.log(App.ResourceArtifacts.modelRuleSaveData);
 
         var pdata = {
             URLtype: "saveArtifactsTemplateRule",

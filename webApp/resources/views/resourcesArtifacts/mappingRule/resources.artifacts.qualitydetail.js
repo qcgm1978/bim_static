@@ -201,7 +201,6 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
 
         this.toggleClass(item);
         this. getRules();
-
     },
 //切换计划
     toggleClass:function(item){
@@ -221,8 +220,8 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
                 URLtype : 'fetchArtifactsQuality',
                 data : {
                     type : App.ResourceArtifacts.Status.type,
-                    standardType:"GC",
-                    parentCode :this.model.get("code")  //传递父节点
+                    standardType: App.ResourceArtifacts.Status.qualityStandardType,
+                    parentCode : this.model.get("code")  //传递父节点
                 }
             };
             if(App.ResourceArtifacts.Status.templateId){
@@ -244,8 +243,6 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
             });
             return
         }
-
-
 
         //刷新右面视图
         var code = App.ResourceArtifacts.Status.rule.targetCode;
