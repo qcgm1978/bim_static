@@ -50,7 +50,6 @@ App.Project = {
 		urlType: "fetchFileList",
 
 		parse: function(responese) {
-
 			if (responese.code == 0) {
 				if (responese.data.length > 0) {
 					return responese.data;
@@ -93,17 +92,26 @@ App.Project = {
 					}
 
 				}
-				if(App.Project.Settings.CurrentVersion.status!=9){
+				if(App.Project.Settings.CurrentVersion.status!=9 ||
+					App.Project.Settings.CurrentVersion.subType==1){
 					$("#reNameModelProject").addClass('disable').attr('disabled','disabled');
 					$("#downLoadModelProject").addClass('disable').attr('disabled','disabled');
 					$("#delModelProject").addClass('disable').attr('disabled','disabled');
 				}
 				$item.addClass("selected").siblings().removeClass("selected");
+				//权限控制
+				var Auth = App.AuthObj.project.prjfile;
+				if(!Auth.edit){
+					$('#reNameModel,#delModel').addClass('disable');
+					if(!Auth.download || !App.ResourceModel.Settings.CurrentVersion.byProjectRef){
+						$('#downLoadModel').addClass('disable');
+					}
+				}
 			},
 			shadow: false,
 			bindings: {
 				'previewModel': function($target) {},
-				'downLoadModel': function(item) {
+				'downLoadModelProject': function(item) {
 
 					var $item = $(item);
 
@@ -128,11 +136,11 @@ App.Project = {
 						url = data.url + "?fileVersionId=" + fileVersionId;
 					window.location.href = url;
 				},
-				'delModel': function(item) {
+				'delModelProject': function(item) {
 					var $item=$(item);
 					_this.delFile($item);
 				},
-				'reNameModel': function(item) {
+				'reNameModelProject': function(item) {
 					//重命名
 					let $reNameModel = $("#reNameModelProject");
 					//不可重命名状态
@@ -151,6 +159,142 @@ App.Project = {
 				}
 			}
 		});
+	},
+
+	addNewFileModel(){
+		var model = {
+				isAdd:true,
+				children: null,
+				createTime: null,
+				creatorId: "",
+				creatorName: "",
+				digest: null,
+				fileVersionId: null,
+				floor: null,
+				folder: true,
+				id: 'createNew',
+				length: null,
+				locked: null,
+				modelId: null,
+				modelStatus: null,
+				modificationId: null,
+				name: "新建文件夹",
+				parentId: null,
+				projectId: null,
+				specialty: null,
+				status: null,
+				suffix: null,
+				thumbnail: null
+		}
+		App.Project.FileCollection.push(model)
+	},
+	afterCreateNewFolder(file, parentId) {
+		var $treeViewMar = $(".projectNavFileContainer .treeViewMar"),
+			$treeViewMarUl = $treeViewMar.find(".treeViewMarUl");
+
+		var data = {
+			data: [file],
+			iconType: 1
+		};
+
+		if ($treeViewMar.find('span[data-id="' + file.id + '"]').length > 0) {
+			return;
+		}
+
+		//没有的时候绑定点击事件
+		if ($treeViewMarUl.length <= 0) {
+			data.click = function(event) {
+				var file = $(event.target).data("file");
+				$("#projectContainer .fileContent").empty();
+				App.Project.Settings.fileVersionId = file.fileVersionId;
+				App.Project.FileCollection.reset();
+				App.Project.FileCollection.fetch({
+					data: {
+						parentId: file.fileVersionId
+					}
+				});
+
+			}
+		}
+		var navHtml = new App.Comm.TreeViewMar(data);
+		//不存在创建
+		if ($treeViewMarUl.length <= 0) {
+			$treeViewMar.html($(navHtml).find(".treeViewMarUl"));
+		} else {
+			if (parentId) {
+				var $span = $treeViewMarUl.find("span[data-id='" + parentId + "']");
+				if ($span.length > 0) {
+					var $li = $span.closest('li');
+					if ($li.find(".treeViewSub").length <= 0) {
+						$li.append('<ul class="treeViewSub mIconOrCk" style="display:block;" />');
+					}
+
+					var $itemContent = $li.children('.item-content'),
+						$noneSwitch = $itemContent.find(".noneSwitch");
+
+					if ($noneSwitch.length > 0) {
+						$noneSwitch.toggleClass('noneSwitch nodeSwitch on');
+					}
+					var $newLi = $(navHtml).find(".treeViewMarUl li").removeClass("rootNode").addClass('itemNode');
+					$li.find(".treeViewSub").prepend($newLi);
+				}
+
+			} else {
+				$treeViewMarUl.prepend($(navHtml).find(".treeViewMarUl li"));
+			}
+		}
+
+	},
+	createNewFolder: function($item) {
+		var filePath = $item.find(".txtEdit").val().trim(),
+			that = this;
+		$leftSel = $("#projectContainer .treeViewMarUl .selected");
+		parentId = "";
+		if ($leftSel.length > 0) {
+			parentId = $leftSel.data("file").fileVersionId;
+		}
+		// //请求数据
+		var data = {
+			URLtype: "createNewFolder",
+			type: "POST",
+			data: {
+				projectId: App.Project.Settings.CurrentVersion.projectId,
+				projectVersionId: App.Project.Settings.CurrentVersion.id,
+				parentId: parentId,
+				filePath: filePath
+			}
+		};
+
+		App.Comm.ajax(data, function(data) {
+			if (data.message == "success") {
+				var id = data.data.id,
+					isExists = false;
+				$.each(App.Project.FileCollection.models, function(i, item) {
+					if (item.id == id) {
+						isExists = true;
+						return false;
+					}
+				});
+
+				//已存在的不在添加 返回
+				if (isExists) {
+					that.cancelEdit($item.find(".fileName"));
+					return;
+				}
+
+				var models = App.Project.FileCollection.models;
+				data.data.isAdd = false;
+				//修改数据
+				App.Project.FileCollection.last().set(data.data);
+
+				App.Project.afterCreateNewFolder(data.data, parentId);
+				//tree name
+				//$("#resourceModelLeftNav .treeViewMarUl span[data-id='" + id + "']").text(name);
+
+
+			}
+		});
+
 	},
 
 	afterRemoveFolder(file) {
@@ -208,7 +352,7 @@ App.Project = {
 	},
 	//取消修改名称
 	calcelEditName: function(event) {
-
+		debugger
 		var $prevEdit = $("#projectContainer .txtEdit");
 		if ($prevEdit.length > 0) {
 			this.cancelEdit($prevEdit);
@@ -217,13 +361,14 @@ App.Project = {
 	},
 	//取消修改
 	cancelEdit: function($prevEdit) {
+		debugger
 		var $item = $prevEdit.closest(".item");
 		if ($item.hasClass('createNew')) {
 			//取消监听 促发销毁
-			/*var model = App.ResourceModel.FileThumCollection.last();
+			var model = App.Project.FileCollection.last();
 			model.stopListening();
 			model.trigger('destroy', model, model.collection);
-			App.ResourceModel.FileThumCollection.models.pop();*/
+			App.Project.FileCollection.models.pop();
 			//删除页面元素
 			$item.remove();
 		} else {
@@ -533,6 +678,7 @@ App.Project = {
 
 	//事件初始化
 	initEvent: function() {
+		var _this=this;
 		//下载
 		$("#projectContainer").on("click", ".btnFileDownLoad", function(e) {
 
@@ -562,8 +708,69 @@ App.Project = {
 			// });
 
 		});
-	},
 
+		//新建文件
+		$("#projectContainer").on("click", ".btnNewFolder", function(e) {
+			
+			if ($(e.currentTarget).is('.disable')) {
+				return
+			}
+			_this.addNewFileModel();
+
+		});
+		//新建文件
+		$("#projectContainer").on("click", ".returnBack", function(e) {
+
+			if ($(e.currentTarget).is('.disable')) {
+				return
+			}
+			_this.returnBack(e);
+
+		});
+
+		//删除
+		$("#projectContainer").on("click", ".btnFileDel", function(e) {
+			if ($(e.currentTarget).is('.disable')) {
+				return
+			}
+			var $selFile = $("#projectContainer .fileContent :checkbox:checked").parent();
+
+			if ($selFile.length < 1) {
+				App.Services.Dialog.alert('请选择需要删除的文件...');
+				return;
+			}
+			if ($selFile.length > 1) {
+	 			App.Services.Dialog.alert('目前只支持单文件删除...');
+	 			return;
+	 		}
+			var $item = $selFile.closest(".item");
+			_this.delFile($item);
+		});
+	},
+	returnBack:function(e){
+		if($(e.currentTarget).attr('isReturn')=='0'){
+ 			return 
+ 		}
+		var $currentLevel=$('#projectContainer .treeViewMarUl .selected');
+		var file=$currentLevel.data('file');
+		var parentId=file.parentId;
+		var $parent=$('#projectContainer .treeViewMarUl span[data-id="' + parentId + '"]');
+		if($parent.length){
+			$parent.click();
+		}else{
+			$(e.currentTarget).attr('isReturn','0').addClass('theEnd').html('全部文件');
+			App.Project.FileCollection.projectId = App.Project.Settings.projectId;
+			App.Project.FileCollection.projectVersionId = App.Project.Settings.CurrentVersion.id;
+			App.Project.FileCollection.reset();
+			//文件列表
+			App.Project.FileCollection.fetch({
+				data: {
+					parentId: ''
+				}
+			});
+		//	this.loadData();
+		}
+	},
 	//绑定全局事件  document 事件
 	initGlobalEvent: function() {
 		$(document).on("click.project", function(event) {
@@ -571,12 +778,12 @@ App.Project = {
 
 			//面包屑 项目
 			if ($target.closest(".breadItem.project").length <= 0) {
-				$(".breadItem .projectList").hide();
+				$(".breadItem .projectList").find(".txtSearch").val("").end().hide();
 			}
 
 			//面包屑 项目版本
 			if ($target.closest(".breadItem.projectVersion").length <= 0) {
-				$(".breadItem .projectVersionList").hide();
+				$(".breadItem .projectVersionList").find(".txtSearch").val("").end().hide();
 			}
 
 			//面包屑 切换 文件 模型 浏览器 
@@ -813,30 +1020,58 @@ App.Project = {
 		}
 
 		//获取所有类别
-					App.Project.fetchClassPropertData(function(res) {
-						if (res.code == 0){
-							var str = '', liTpl = '<li class="modleItem"><span class="modleName overflowEllipsis"><div class="modleNameText overflowEllipsis">{property}</div></span> <span class="modleVal end">{value}</span></li>';
-							var datas = res.data || [];
-							for(var i = 0,prop; i < datas.length; i++){
-								prop = datas[i]['properties'];
-								if('设计管理成本管理计划管理质量管理'.indexOf(datas[i]['className'])>-1){
-									continue
-								}else if(prop==null){
-									str += '<div class="modle"><i class="modleShowHide"></i><h1 class="modleName">' + datas[i]['className'] + '</h1><ul class="modleList">';
-
-								}else{
-									for(var j = 0; j < (prop.length || 0); j++){
-										str += '<div class="modle"><i class="modleShowHide"></i><h1 class="modleName">' + datas[i]['className'] + '</h1><ul class="modleList">' + liTpl.replace("{property}", datas[i]['properties'][j]['property']).replace('{value}', datas[i]['properties'][j]['value']);
-									}
-								}
-
-								str += '</ul></div>';
-							}
-
-								that.$el.find(".attrClassBox").html(str);
+		$.ajax({
+			url: "platform/set/category"
+			}).done(function(res){
+			console.log(res)
+				if (res.code == 0){
+					var str = '',datas = res.data.items || [];
+					for(var i = 0,prop; i < datas.length; i++){
+						prop = datas[i]['busName'];
+						if(prop == '设计管理'){
+							//$.ajax({
+							//	url: "platform/setting/extensions/"+App.Project.Settings.projectId+"/"+App.Project.Settings.CurrentVersion.id+"/property?classKey="+datas[i]['id']+"&elementId="+App.Project.Settings.ModelObj.intersect.userId
+							//}).done(function(res){
+							//		if(res.code==0){
+							//
+							//		}
+							//});
+							var string = '<div class="modle"><i data-classkey="'+datas[i]['id']+'" class="modleShowHide getdata down"></i><h1 class="modleName">' + prop + '</h1><ul class="modleList"></ul></div>';
+							that.$el.find(".fordesign").html(string);
+						}else {
+							str += '<div class="modle"><i data-classkey="'+datas[i]['id']+'" class="modleShowHide getdata down"></i><h1 class="modleName">' + prop + '</h1><ul class="modleList"></ul></div>';
 
 						}
-					});
+
+
+					}
+					that.$el.find(".attrClassBox").html(str);
+				}
+		});
+					//App.Project.fetchClassPropertData(function(res) {
+					//	if (res.code == 0){
+					//		var str = '', liTpl = '<li class="modleItem"><span class="modleName overflowEllipsis"><div class="modleNameText overflowEllipsis">{property}</div></span> <span class="modleVal end">{value}</span></li>';
+					//		var datas = res.data || [];
+					//		for(var i = 0,prop; i < datas.length; i++){
+					//			prop = datas[i]['properties'];
+					//			if('设计管理成本管理计划管理质量管理'.indexOf(datas[i]['className'])>-1){
+					//				continue
+					//			}else if(prop==null){
+					//				str += '<div class="modle"><i class="modleShowHide"></i><h1 class="modleName">' + datas[i]['className'] + '</h1><ul class="modleList">';
+          //
+					//			}else{
+					//				for(var j = 0; j < (prop.length || 0); j++){
+					//					str += '<div class="modle"><i class="modleShowHide"></i><h1 class="modleName">' + datas[i]['className'] + '</h1><ul class="modleList">' + liTpl.replace("{property}", datas[i]['properties'][j]['property']).replace('{value}', datas[i]['properties'][j]['value']);
+					//				}
+					//			}
+          //
+					//			str += '</ul></div>';
+					//		}
+          //
+					//			that.$el.find(".attrClassBox").html(str);
+          //
+					//	}
+					//});
 
 	},
 

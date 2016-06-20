@@ -159,10 +159,12 @@
             bimView.sidebar[fn](!isSelected,self);
             break;
           case "more":
-            var flag = self.getTranslucentStatus();
             $this.toggleClass('selected').siblings('[data-group='+group+']').removeClass('selected');
-            $this.find('.m-translucent').toggleClass('selected',flag)
-            bimView.sidebar[fn](self);
+            if(fn == 'more'){
+              var flag = self.getTranslucentStatus();
+              $this.find('.m-translucent').toggleClass('selected',flag);
+              bimView.sidebar[fn](self);
+            }
             break;
           case "change":
             $this.toggleClass('m-miniScreen m-fullScreen')
@@ -530,10 +532,10 @@
       $.each(list,function(i,item){
         newList.push(window.btoa(JSON.stringify(item)));
       });
-      var floors = bimView.comm.getFilters($("#floors"),'ckecked');
-      var specialty = bimView.comm.getFilters($("#specialty"),'ckecked');
-      var category = bimView.comm.getFilters($("#category"),'ckecked');
-      var classCode = bimView.comm.getFilters($("#classCode"),'ckecked');
+      var floors = bimView.comm.getFilters($("#floors"),'uncheck');
+      var specialty = bimView.comm.getFilters($("#specialty"),'uncheck');
+      var category = bimView.comm.getFilters($("#category"),'uncheck');
+      var classCode = bimView.comm.getFilters($("#classCode"),'uncheck');
       return {
         camera:self.getCamera(),
         list:newList,

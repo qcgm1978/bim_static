@@ -14,7 +14,10 @@ App.Services.AuthNav = Backbone.View.extend({
 		"click .projectMember" : "projectMember"
 	},
 	render:function(){
-		this.$el.html(this.template);
+		var user = JSON.parse(localStorage.user || "{}"),
+			isadmin = user.isAdmin || false,
+			isKeyUser = user.isKeyUser || false;
+		this.$el.html(this.template({isadmin:isadmin,iskeyuser:isKeyUser}));
 		return this;
 	},
 //面包屑
@@ -50,10 +53,7 @@ App.Services.AuthNav = Backbone.View.extend({
 		App.Services.role.init(function(){$("#blendList").removeClass("services_loading");});
 	},
 	keyUser : function(){
-		if(location.port==81){
-			App.API.Settings.hostname = "http://bim.wanda-dev.cn:81/";
-			bimView.API.baseUrl = "http://bim.wanda-dev.cn:81/";
-		}
+
 		$(".serviceBody").empty();
 		this.breadCrumb(this.$el.find(".keyUser"));
 		App.Services.KeyUser.init();

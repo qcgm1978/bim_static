@@ -18,6 +18,8 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		"mousedown .dragSize": "dragSize",
 		"click .projectVersionList .nav .item": "changeVersionTab",
 		"click .fileNav .commSpan": "switchFileMoldel",
+		"keyup .projectList .txtSearch": "filterProject",
+		"keyup .projectVersionList .txtSearch": "filterProjectVersion",
 		"click .modleShowHide": "slideUpAndDown"
 
 	},
@@ -33,6 +35,48 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		return this;
 	},
 
+	//过滤项目
+	filterProject(event) {
+
+
+		var $target = $(event.target),
+			val = $target.val().trim(),
+			$list = $target.parent().find(".container a.item");
+
+		if (!val) {
+			$list.show();
+		} else {
+			$list.each(function() {
+
+				if ($(this).text().indexOf(val) < 0) {
+					$(this).hide();
+				}
+
+			});
+		}
+
+	},
+
+	//过滤项目版本
+	filterProjectVersion(event) {
+
+		var $target = $(event.target),
+			val = $target.val().trim(),
+			$list = $target.parent().find(".container a.item");
+
+		if (!val) {
+			$list.show();
+		} else {
+			$list.each(function() {
+
+				if ($(this).find(".vName").text().indexOf(val) < 0) {
+					$(this).hide();
+				}
+
+			});
+		}
+	},
+
 	//展开和收起
 	slideUpAndDown: function(event) {
 		var $parent = $(event.target).parent(),
@@ -43,7 +87,25 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		} else {
 			$modleList.slideUp();
 		}
+		//classkey临时请求数据
+		if ($(event.target).is('.getdata')) {
+			$(event.target).removeClass('getdata');
+			$modleList.slideDown();
+			$.ajax({
+				url: "platform/setting/extensions/" + App.Project.Settings.projectId + "/" + App.Project.Settings.CurrentVersion.id + "/property?classKey=" + $(event.target).data('classkey') + "&elementId=" + App.Project.Settings.ModelObj.intersect.userId
+			}).done(function(res) {
+				if (res.code == 0) {
+					console.log(res)
+					var props = res.data.properties;
+					for (var str = '', i = 0; i < props.length; i++) {
 
+					}
+					//str += '<li class="modleItem">'+
+					//	'<span class="modleName"><div title='<%=subItem.name%>' class="modleNameText overflowEllipsis"><%=subItem.name%></div></span> <span class="modleVal overflowEllipsis"><%=subItem.value%><%=subItem.unit%></span>'+
+					//	'</li>'
+				}
+			});
+		}
 	},
 
 	//点击面包靴
@@ -211,8 +273,8 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			$projectContainer = $("#projectContainer"),
 			$projectCotent = $projectContainer.find(".projectCotent");
 		App.Project.Settings.fetchNavType = type;
- 
-		
+
+
 		if (type == "file") {
 
 			//左右侧
@@ -323,7 +385,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			type: 'model',
 			element: $("#projectContainer .modelContainerContent"),
 			sourceId: App.Project.Settings.DataModel.sourceId,
-			etag:App.Project.Settings.DataModel.etag, //"a1064f310fa8204efd9d1866ef7370ee" ||
+			etag: App.Project.Settings.DataModel.etag, //"a1064f310fa8204efd9d1866ef7370ee" ||
 			projectId: App.Project.Settings.projectId,
 			projectVersionId: App.Project.Settings.CurrentVersion.id
 		});
@@ -351,8 +413,8 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			//App.Project.Settings.modelId = model.userId;
 			that.viewerPropertyRender();
 			//展开
-			$("#projectContainer .rightProperty").css('marginRight','0');
-			$("#projectContainer .rightProperty .icon-caret-left").attr('class','icon-caret-right');
+			$("#projectContainer .rightProperty").css('marginRight', '0');
+			$("#projectContainer .rightProperty .icon-caret-left").attr('class', 'icon-caret-right');
 
 		});
 
@@ -424,19 +486,19 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		var data = model.toJSON().data,
 			templateProperties = _.templateUrl("/projects/tpls/project/design/project.design.property.properties.html"),
 			$designProperties = this.$el.find(".singlePropetyBox .designProperties");
-		App.Project.userProps.call(this,data,function(data){
+		App.Project.userProps.call(this, data, function(data) {
 			$designProperties.html(templateProperties(data));
 			//其他属性
 			App.Project.propertiesOthers.call({
 				$el: $designProperties
-			},"plan|cost|quality|dwg");
+			}, "plan|cost|quality|dwg");
 		});
-	/*	$designProperties.html(templateProperties(data));
-		//其他属性
-		App.Project.propertiesOthers.call({
-			$el: $designProperties
-		}, "plan|cost|quality|dwg");*/
-	//	App.Project.userProps.call(this,data);
+		/*	$designProperties.html(templateProperties(data));
+			//其他属性
+			App.Project.propertiesOthers.call({
+				$el: $designProperties
+			}, "plan|cost|quality|dwg");*/
+		//	App.Project.userProps.call(this,data);
 	}
 
 });

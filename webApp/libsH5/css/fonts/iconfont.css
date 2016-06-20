@@ -1,10 +1,10 @@
 
 @font-face {font-family: "modelicon";
-  src: url('iconfont.eot?t=1465286018'); /* IE9*/
-  src: url('iconfont.eot?t=1465286018#iefix') format('embedded-opentype'), /* IE6-IE8 */
-  url('iconfont.woff?t=1465286018') format('woff'), /* chrome, firefox */
-  url('iconfont.ttf?t=1465286018') format('truetype'), /* chrome, firefox, opera, Safari, Android, iOS 4.2+*/
-  url('iconfont.svg?t=1465286018#modelicon') format('svg'); /* iOS 4.1- */
+  src: url('iconfont.eot?t=1466062376'); /* IE9*/
+  src: url('iconfont.eot?t=1466062376#iefix') format('embedded-opentype'), /* IE6-IE8 */
+  url('iconfont.woff?t=1466062376') format('woff'), /* chrome, firefox */
+  url('iconfont.ttf?t=1466062376') format('truetype'), /* chrome, firefox, opera, Safari, Android, iOS 4.2+*/
+  url('iconfont.svg?t=1466062376#modelicon') format('svg'); /* iOS 4.1- */
 }
 
 .modelicon {
@@ -25,9 +25,7 @@
 .m-camera:before { content: "\e607"; }
 .m-more:before { content: "\e608"; }
 .m-fit2d:before { content: "\e609"; }
-.m-zoomRect:before { content: "\e60a"; }
 .m-arrow:before { content: "\e60b"; }
-.m-cloud:before { content: "\e60c"; }
 .m-mark:before { content: "\e60d"; }
 .m-text:before { content: "\e60e"; }
 .m-fly:before { content: "\e60f"; }
@@ -55,7 +53,9 @@
 .m-hideObj:before { content: "\e626"; }
 .m-view:before { content: "\e627"; }
 .m-rotate:before { content: "\e628"; }
-.m-pizhuqietuyunxian:before { content: "\e629"; }
+.m-cloud:before { content: "\e629"; }
 .m-edit:before { content: "\e62a"; }
 .m-img:before { content: "\e622"; }
 .m-address:before { content: "\e62b"; }
+.m-zoomRect:before { content: "\e60c"; }
+.m-tip:before { content: "\e60a"; }

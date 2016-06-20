@@ -27,7 +27,7 @@ App.BodyContent.proclamationList = Backbone.View.extend({
         }
         var newView = new App.BodyContent.proclamationView({model : item});
         var el=newView.render().$el
-        if(this._items%2==0){
+        if(this._items%2==1){
             el.addClass('odd');
         }
         $('#proclamation').append(el);

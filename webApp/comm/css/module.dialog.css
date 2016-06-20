@@ -57,6 +57,7 @@
     white-space: nowrap;
     overflow: hidden;
     float: left;
+    line-height: 45px;
     _width: 350px;
     color: #666;
     font-weight: bold;

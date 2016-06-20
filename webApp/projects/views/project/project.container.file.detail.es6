@@ -24,14 +24,23 @@ App.Project.FileContainerDetail=Backbone.View.extend({
 
 	//渲染
 	render:function(){
+
+		var data = this.model.toJSON();
+
 		this.$el.html(this.template(this.model.toJSON()));
+
+		if (data.isAdd) {
+			this.$el.addClass('createNew');
+		} else {
+			this.$el.removeClass('createNew');
+		}
+
 		App.Project.bindContextMenu(this.$el);
 		return this;
 	},
 
 	//文件或者文件夹点击
 	fileClick:function(event){
-
 		var $target=$(event.target),id=$target.data("id"),isFolder=$target.data("isfolder");
 		//文件夹
 		if (isFolder) {
@@ -47,7 +56,7 @@ App.Project.FileContainerDetail=Backbone.View.extend({
 				}
 				$leftItem.click();
 			}
-
+			$('#projectContainer .returnBack').attr('isReturn','1').removeClass('theEnd').html('返回上级');
 		}else{
 
 			//this.fetchFileModelIdByFileVersionId(id,$target);
@@ -87,7 +96,14 @@ App.Project.FileContainerDetail=Backbone.View.extend({
 		App.Project.calcelEditName(e);
 	},
 	enterEditNameOrCreateNew(e){
-		App.Project.editFolderName($(event.target).closest(".item"));
+		var $item=$(e.target).closest(".item");
+		var $target=$(e.currentTarget);
+		if($target.hasClass('createNewCls')){
+			App.Project.createNewFolder($item);
+		}else{
+			App.Project.editFolderName($item);
+		}
+		//;
 	},
 	//是否全选
 	singleCheck(event){

@@ -16,6 +16,9 @@ App.INBox.imboxContainerView=Backbone.View.extend({
 	renderData(item){
         var _data=item.toJSON()[0];
 		var _html=_.templateUrl('./imbox/tpls/list.html');
+        if(!_data.items.length){
+            return 
+        }
 		this.$('.commissionLists').html(_html({data:_data.items}));
         this.$(".commissionListPagination").empty().pagination(_data.totalItemCount, {
              items_per_page:_data.pageItemCount,
@@ -35,6 +38,11 @@ App.INBox.imboxContainerView=Backbone.View.extend({
 	renderAllData(item){
         var _data=item.toJSON()[0];
 		var _html=_.templateUrl('./imbox/tpls/list.html');
+
+         if(!_data.items.length){
+            return 
+        }
+
 		this.$('.alreadyLists').html(_html({data:_data.items}));
         this.$(".alreadyListPagination").empty().pagination(_data.totalItemCount, {
              items_per_page:_data.pageItemCount,

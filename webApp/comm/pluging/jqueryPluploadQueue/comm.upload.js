@@ -214,7 +214,8 @@
                     axis: 'x',
                     containment: 'window',
                     handle: '.plupload_header'
-                })
+                }); 
+
             }
 
             //双击头部收起展开
@@ -319,6 +320,8 @@
 
         // 切换 最大化 最小化
         __toggleUploadModal: function() {
+            //设置top bottom 无效
+            upload.container.css("top","auto");
             if (upload.container.css('bottom') === '-382px') {
                 upload.container.animate({
                     bottom: 0

@@ -14,7 +14,13 @@
 
 
 <% if(folder){%>
- <span data-id="<%=id%>" data-isfolder="<%=folder%>" class="text"><%=name%></span>
+	
+	 <span data-id="<%=id%>" data-isfolder="<%=folder%>" class="text <%= id=='createNew'?'hidden':'' %>"><%=name%></span>
+    <% if(id=='createNew'){%>
+    	<input type="text" value="<%=name%>" class="txtEdit txtInput" /> 
+    	<span class="btnEnter myIcon-enter createNewCls"></span>
+    	<span class="btnCalcel pointer myIcon-cancel"></span>
+    <%}%>
 <%}else{%>
 	
 	<%if(suffix=='rvt' ||suffix=='rfa' ||suffix=='dwg'  ){%>

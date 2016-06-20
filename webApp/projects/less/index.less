@@ -8,7 +8,7 @@ a:hover{
 		.vLine { position: absolute; left: 52px; right: 2px; border-top: 1px #ddd solid; top: 6px; }
 	}
 	.txtSearch { width: 165px; }
-	.btnSearch { background-color: #117EE1; display: inline-block; width: 80px; height: 30px; text-align: center; line-height: 30px; color: #fff; margin-left: 74px; letter-spacing: 10px; padding-left: 9px; box-sizing: border-box; cursor: pointer;
+	.btnSearch { background-color: #117EE1; display: inline-block; width: 80px; height: 30px; text-align: center; line-height: 30px; color: #fff; margin-left: 90px; letter-spacing: 10px; padding-left: 9px; box-sizing: border-box; cursor: pointer;
 		&:hover { background-color: #439EF1; }
 	}
 	.btnClear {  margin-left: 20px; }
@@ -18,7 +18,7 @@ a:hover{
 	}
 	.advancedQueryConditions { display: none;
 		.item { height: 50px; line-height: 50px;
-			& .searchLabel { width: 60px; margin-left: 10px; display: inline-block; }
+			& .searchLabel { width: 76px; margin-left: 10px; display: inline-block; }
 		}
 	}
 	.dateBox { display: inline-block; position: relative;
@@ -41,11 +41,16 @@ a:hover{
 }
 #projectModes { position: absolute; left: 0px; right: 0px; top: 184px; bottom: 0px;
 	.proListSite { position: relative; height: 100%; }
-	.proListContent { position: absolute; top: 40px; left: 20px; right: 20px; bottom: 0px; }
+	.proListContent { position: absolute; top: 40px; left: 20px; right: 20px; bottom: 40px; }
+	.pagingBox{position: absolute;bottom: 0px;left:20px;right: 20px;line-height: 40px;
+		.sumDesc { float: left; margin-left: 20px; }
+		.listPagination { float: right; margin-right: 20px; }
+		.pagination {margin: 0px;}
+	}
 	.proListBox, .proListBoxHeader { .loading { font-size: 14px; color: #ccc; text-align: center;
 			& div { margin-top: 20px; }
 		}
-		span { display: inline-block; vertical-align: top; }
+		span { display: inline-block; vertical-align: top;font-size: 14px; a{font-size: 14px;}}
 		.header, .item { height: 36px; border: 1px #ddd solid; border-width: 1px 0px; background-color: #EEE; line-height: 36px; margin: 0px 20px;color: #999;
 			.proImg { width: 7%; }
 			.proName { width: 24%; }
@@ -56,7 +61,7 @@ a:hover{
 			.proStar { width: 11%; }
 			.proEnd { width: 11%; }
 		}
-		.item { margin-left: 0px; background-color: #fff; border-bottom: 1px #ddd solid; height: 46px; line-height: 46px; border-top: 0;
+		.item { margin-right: 0;margin-left: 0px; background-color: #fff; border-bottom: 1px #ddd solid; height: 46px; line-height: 46px; border-top: 0;margin:0;color: #666;
 			.proImg { text-align: center;
 				img { margin-top: 4px; }
 			}
@@ -64,9 +69,7 @@ a:hover{
 			}
 		}
 	}
-	.proListBoxScroll { .sumDesc { float: left; margin-left: 20px; margin-top: 20px; }
-		.listPagination { float: right; margin-right: 20px; }
-	}
+	 
 	&.projectModesDown { top: 355px; }
 }
 .proMapBox { height: 100%; overflow: hidden;

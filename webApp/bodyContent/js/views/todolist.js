@@ -30,7 +30,7 @@ App.BodyContent.todosList = Backbone.View.extend({
         }
         var newView = new App.BodyContent.todosView({model : item});
         var el=newView.render().$el;
-        if(this._items%2==0){
+        if(this._items%2==1){
             el.addClass('odd');
         }
         $("#todos").append(el);

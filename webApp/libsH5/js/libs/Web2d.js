@@ -39,7 +39,8 @@ CLOUD.Extensions = CLOUD.Extensions || {};
 CLOUD.Extensions.Utils = CLOUD.Extensions.Utils || {};
 
 CLOUD.Extensions.Utils.Shape2D = {
-    createSvgElement: function(type) {
+
+    createSvgElement: function (type) {
 
         var xmlns = 'http://www.w3.org/2000/svg';
         var svg = document.createElementNS(xmlns, type);
@@ -47,93 +48,7 @@ CLOUD.Extensions.Utils.Shape2D = {
 
         return svg;
     },
-    makeSVG:function(){
-        var xmlns = "http://www.w3.org/2000/svg";
-        var xlinkns = "http://www.w3.org/1999/xlink";
-        var attrMap = {
-            "className": "class",
-            "svgHref": "href"
-        };
-        var nsMap = {
-            "svgHref": xlinkns
-        };
-
-        return function (tag, attributes) {
-
-            var elem = document.createElementNS(xmlns, tag);
-
-            for (var attribute in attributes) {
-
-                var name = (attribute in attrMap ? attrMap[attribute] : attribute);
-                var value = attributes[attribute];
-
-                if (attribute in nsMap)
-                    elem.setAttributeNS(nsMap[attribute], name, value);
-                else
-                    elem.setAttribute(name, value);
-            }
-
-            return elem;
-        }
-    }(),
-    createPin: function(fillColor, strokeColor, offset) {
-
-        //var path = "m21.13861,6.59583c0.12562,-0.43852 0.13677,-1.15678 0.0254,-1.59779l-0.36852,-1.45603c-0.11135,-0.441 -0.60654,-0.86506 -1.10105,-0.94223l-3.39636,-0.52882c-0.49415,-0.07717 -1.30358,-0.07465 -1.79704,0.00563l-3.67894,0.59721c-0.49451,0.08029 -1.30357,0.08844 -1.79981,0.01882l-3.59961,-0.50564c0.00452,0.01568 0.01253,0.0295 0.01636,0.04519l2.46376,10.55033l1.1275,0.17563c0.49449,0.07718 1.30286,0.07403 1.79737,-0.00562l3.67789,-0.59784c0.49346,-0.07966 1.30358,-0.08781 1.79982,-0.0182l3.94932,0.5552c0.49624,0.06961 0.8265,-0.23653 0.736,-0.68191l-0.44228,-2.15799c-0.09118,-0.44479 -0.06301,-1.16683 0.06193,-1.60535l0.52826,-1.85059l0,0zm-17.67267,-4.82849c-0.49379,0.09408 -0.80942,0.52881 -0.70537,0.97296l5.25743,22.51152l1.86349,0l-5.33469,-22.84839c-0.10579,-0.44604 -0.58845,-0.73021 -1.08086,-0.63609l0,0z";
-        var path = "M0 0 L0 -25 L20 -16 L4 -8.8 L4 0Z";
-
-        var shape = this.makeSVG("path", {
-            x: "0",
-            y: "0",
-            d: path,
-            fill: fillColor,
-            stroke: strokeColor,
-            "stroke-width": "2"
-        });
-
-        shape.setAttribute('transform', 'translate(0, 32)');
-
-        // 以图形左下角点为基准，则需要移动元素，移动偏移量
-        offset.offsetX = 0;
-        offset.offsetY = -32;
-
-        return shape;
-
-    },
-    createBubble: function(fillColor, strokeColor, offset){
-
-        var path = "m-3.74999,-31.25c-6.35107,0 -11.50001,4.06299 -11.50001,9.07458c0,5.0128 11.50001,21.9254 11.50001,21.9254s11.50001,-16.9126 11.50001,-21.9254c0,-5.01159 -5.1474,-9.07458 -11.50001,-9.07458z";
-        var shape = this.makeSVG("path", {
-            x: "0",
-            y: "0",
-            d: path,
-            fill: fillColor,
-            stroke: strokeColor,
-            "stroke-width": "2"
-        });
-
-        shape.setAttribute('transform', 'translate(16, 32)');
-
-        offset.offsetX = -16;
-        offset.offsetY = -32;
-
-        return shape;
-    },
-    createArrow:function(){
-
-    },
-    createRectangle:function(){
-
-    },
-    createCircle:function(){
-
-    },
-    createCloud:function(){
-
-    },
-    createFreeHand:function(){
-
-    },
-    composeRGBAString: function (hexRGBString, opacity) {
+    getRGBAString: function (hexRGBString, opacity) {
 
         if (opacity <= 0) {
             return 'none';
@@ -145,6 +60,22 @@ CLOUD.Extensions.Utils.Shape2D = {
             parseInt('0x' + hexRGBString.substr(5, 2)), ',', opacity, ')'].join('');
 
         return rgba;
+    },
+    makeFlag: function () {
+
+        var path = "M0 0 L0 -20 L15 -13 L4 -6.87 L4 0Z";
+        var shape = this.createSvgElement('path');
+        shape.setAttribute('d', path);
+
+        return shape;
+    },
+    makeBubble: function (style) {
+
+        var path = "m0.0035,-19.88544c-3.838253,0 -6.95,2.581968 -6.95,5.766754c0,3.185555 6.95,13.933247 6.95,13.933247s6.95,-10.747692 6.95,-13.933247c0,-3.184786 -3.11082,-5.766754 -6.95,-5.766754z";
+        var shape = this.createSvgElement('path');
+        shape.setAttribute('d', path);
+
+        return shape;
     }
 };
 
@@ -2044,643 +1975,27 @@ CLOUD.MiniMap.setFloorPlaneData = function(jsonObj){
 };
 
 
-/**
- * 暂时用于处理检查点
- *
- */
-CLOUD.Marker = function (id, editor) {
+CLOUD.Extensions.Marker = function (id, editor) {
 
     this.id = id;
     this.editor = editor;
-    this.worldPosition = new THREE.Vector3();
-    this.worldBoundingBox = new THREE.Box3();
-    this.clientPosition = new THREE.Vector2();
-    this.size = new THREE.Vector2();
-    this.selected = false;
-    this.userId = "";
-    this.borderColor = "#fffaff";
-    this.svgShape = null;
-    this.shapeTypes = {pin: 0, bubble: 1};
-    this.state = 0;
-    this.shapeOriOffset = {offsetX : 0, offsetY: 0}; // 屏幕坐标顶点在左上角
-};
 
-CLOUD.Marker.prototype = {
-    constructor: CLOUD.Marker,
-    onMouseDown: function () {
+    this.position = new THREE.Vector3();
+    this.boundingBox = new THREE.Box3();
 
-    },
-    destroy:function() {
-        this.setParent(null);
-    },
-    setUserId: function(id) {
-        this.userId = id;
-    },
-    setParent: function (parent) {
-
-        if (this.svgShape) {
-            var element = this.svgShape;
-
-            if(element.parentNode){
-                element.parentNode.removeChild(element);
-            }
-
-            if(parent){
-                parent.appendChild(element);
-            }
-        }
-    },
-    setWorldPosition: function (pos) {
-        this.worldPosition.set(pos.x, pos.y, pos.z);
-    },
-    setClientPostion: function (pos) {
-        this.clientPosition.set(pos.x, pos.y);
-    },
-    setWorldBoundingBox:function(box) {
-        this.worldBoundingBox.copy(box);
-    },
-    getWorldBoundingBox: function(){
-        return this.worldBoundingBox;
-    },
-    setState:function(state) {
-      this.state = state;
-    },
-    setSize: function ( width, height) {
-        this.size.set(width, height);
-    },
-    createPinShape: function(fillColor, strokeColor) {
-
-        //var path = "m21.13861,6.59583c0.12562,-0.43852 0.13677,-1.15678 0.0254,-1.59779l-0.36852,-1.45603c-0.11135,-0.441 -0.60654,-0.86506 -1.10105,-0.94223l-3.39636,-0.52882c-0.49415,-0.07717 -1.30358,-0.07465 -1.79704,0.00563l-3.67894,0.59721c-0.49451,0.08029 -1.30357,0.08844 -1.79981,0.01882l-3.59961,-0.50564c0.00452,0.01568 0.01253,0.0295 0.01636,0.04519l2.46376,10.55033l1.1275,0.17563c0.49449,0.07718 1.30286,0.07403 1.79737,-0.00562l3.67789,-0.59784c0.49346,-0.07966 1.30358,-0.08781 1.79982,-0.0182l3.94932,0.5552c0.49624,0.06961 0.8265,-0.23653 0.736,-0.68191l-0.44228,-2.15799c-0.09118,-0.44479 -0.06301,-1.16683 0.06193,-1.60535l0.52826,-1.85059l0,0zm-17.67267,-4.82849c-0.49379,0.09408 -0.80942,0.52881 -0.70537,0.97296l5.25743,22.51152l1.86349,0l-5.33469,-22.84839c-0.10579,-0.44604 -0.58845,-0.73021 -1.08086,-0.63609l0,0z";
-        var path = "M0 0 L0 -25 L20 -16 L4 -8.8 L4 0Z";
-
-        var shape = this.editor.makeSVG("path", {
-            x: "0",
-            y: "0",
-            d: path,
-            fill: fillColor,
-            stroke: strokeColor,
-            "stroke-width": "2"
-        });
-
-        shape.setAttribute('transform', 'translate(0, 32)');
-
-        // 以图形左下角点为基准，则需要移动元素，移动偏移量
-        this.shapeOriOffset.offsetX = 0;
-        this.shapeOriOffset.offsetY = -32;
-
-        return shape;
-    },
-    createBubbleShape: function(fillColor, strokeColor) {
-
-        //var path = "m12.25,0.75c-5.7988,0 -10.5,3.80087 -10.5,8.48913c0,4.6894 10.5,20.51087 10.5,20.51087s10.5,-15.82148 10.5,-20.51087c0,-4.68826 -4.6998,-8.48913 -10.5,-8.48913z";
-        var path = "m-3.74999,-31.25c-6.35107,0 -11.50001,4.06299 -11.50001,9.07458c0,5.0128 11.50001,21.9254 11.50001,21.9254s11.50001,-16.9126 11.50001,-21.9254c0,-5.01159 -5.1474,-9.07458 -11.50001,-9.07458z";
-        var shape = this.editor.makeSVG("path", {
-            x: "0",
-            y: "0",
-            d: path,
-            fill: fillColor,
-            stroke: strokeColor,
-            "stroke-width": "2"
-        });
-
-        shape.setAttribute('transform', 'translate(16, 32)');
-
-        this.shapeOriOffset.offsetX = -16;
-        this.shapeOriOffset.offsetY = -32;
-
-        return shape;
-    },
-    createSVGShape: function (sharpData, svgContainer) {
-
-        var svgElem = this.svgShape = this.editor.makeSVG("svg", {viewBox: "0 0 32 32", width: "32", height: "32"});
-        svgElem.style.position = "absolute";
-        svgElem.style.display = "block";
-
-        //var group = this.makeSVG("g", {x: "0", y: "0", transform: "translate("+sharpData.left+", "+sharpData.top+")"});
-        //var group = this.editor.makeSVG("g", {x: "0", y: "0"});
-
-        var fillColor = sharpData.fillColor;
-        var strokeColor = this.borderColor;
-
-        var shape;
-        if (sharpData.type === this.shapeTypes.pin) {
-            shape = this.createPinShape(fillColor, strokeColor);
-        }else {
-            shape = this.createBubbleShape(fillColor, strokeColor);
-        }
-
-        //this.svgShape = shape;
-        //group.appendChild(shape);
-
-        svgElem.appendChild(shape);
-
-        svgContainer.appendChild(svgElem);
-    },
-    updateTransformMatrix: function () {
-
-    },
-
-    updateStyle: function () {
-
-        //this.svgShape.style.left = this.clientPosition.x - 15;
-        //this.svgShape.style.top = this.clientPosition.y - 30;
-
-        this.svgShape.style.left = this.clientPosition.x + this.shapeOriOffset.offsetX;
-        this.svgShape.style.top = this.clientPosition.y + this.shapeOriOffset.offsetY;
-    }
-};
-
-CLOUD.MarkerEditor = function (cameraEditor, scene, domElement) {
-    "use strict";
-
-    CLOUD.OrbitEditor.call(this, cameraEditor, scene, domElement);
-
-    this.markers = [];
-
-    //this.selectedMarker = null;
-    //this.bounds = {x: 0, y: 0, width: 0, height: 0};
-
-    // 隐患待整改：红色
-    // 隐患已整改：黄色
-    // 隐患已关闭：绿色
-    // size: 22 * 27
-    this.pinColorSelector = {red: "#ff2129", green: "#85af03", yellow:"#fe9829"};
-    // 有隐患：红色
-    // 无隐患：绿色
-    // 过程验收点、开业验收点的未检出：灰色
-    this.bubbleColorSelector = {red: "#f92a24", green: "#86b507", gray:"#fffaff"};
-    this.markerType = 0;
-    this.markerColor = this.pinColorSelector.red;
-    this.markerState = 0;
-    this.isEditing = false;
-};
-
-CLOUD.MarkerEditor.prototype = Object.create(CLOUD.OrbitEditor.prototype);
-CLOUD.MarkerEditor.prototype.constructor = CLOUD.MarkerEditor;
-
-CLOUD.MarkerEditor.prototype.init = function() {
-
-    //if (!this.svg) {
-    //    this.svg = this.createSvgElement('svg');
-    //    this.svg.style.position = "absolute";
-    //    this.svg.style.display = "block";
-    //
-    //    var dim = CLOUD.DomUtil.getContainerOffsetToClient(this.domElement);
-    //
-    //    var svgContainer = document.body;
-    //    //var rect = svgContainer.getBoundingClientRect();
-    //
-    //    var svgWidth = dim.width;
-    //    var svgHeight = dim.height;
-    //    this.svg.setAttribute('viewBox', '0 0 ' + svgWidth + ' ' + svgHeight);
-    //    this.svg.setAttribute('width', svgWidth);
-    //    this.svg.setAttribute('height', svgHeight);
-    //
-    //    svgContainer.appendChild(this.svg);
-    //}
-};
-
-CLOUD.MarkerEditor.prototype.uninit = function() {
-
-    this.clear();
-
-    //if (!this.svg) return;
-    //
-    //var svg = this.svg;
-    //
-    //if (svg.parentNode) {
-    //    svg.parentNode.removeChild(svg);
-    //}
-    //
-    //this.svgGroup = null;
-    //this.svg = null;
-};
-
-CLOUD.MarkerEditor.prototype.onExistEditor = function () {
-
-    this.uninit();
-};
-
-CLOUD.MarkerEditor.prototype.onMouseUp = function(event) {
-    var cameraEditor = this.cameraEditor;
-
-    if (cameraEditor.enabled === false)
-        return;
-
-    event.preventDefault();
-
-    if (this.oldMouseX == event.clientX && this.oldMouseY == event.clientY) {
-
-        this.isMouseClick = true;
-
-        if (event.button === THREE.MOUSE.LEFT) {
-            var scope = this;
-            var normalizedVec = cameraEditor.mapWindowToViewport(event.clientX, event.clientY);
-            var dim = CLOUD.DomUtil.getContainerOffsetToClient(this.domElement);
-
-            scope.scene.pick(normalizedVec, cameraEditor.object, function (intersect) {
-
-                if (intersect) {
-
-                    var userId = "";
-                    userId = intersect.userId || userId;
-
-                    if (userId === "") return;
-
-                    var svgContainer = scope.domElement;
-                    var shapeData = {
-                        x: "0",
-                        y: "0",
-                        //label: "",
-                        type : scope.markerType,
-                        fillColor: scope.markerColor
-                    };
-
-                    var bBox = intersect.object.boundingBox;
-
-                    if (!bBox) {
-                        intersect.object.geometry.computeBoundingBox();
-                        bBox = intersect.object.geometry.boundingBox;
-                    }
-
-                    var worldPoint = intersect.point.clone();
-                    var inverseMatrix = scope.getInverseSceneMatrix();
-                    worldPoint.applyMatrix4(inverseMatrix);
-
-                    var markerId = scope.generateMarkerId();
-
-                    //console.log(markerId);
-                    var marker = new CLOUD.Marker(markerId, scope);
-
-                    marker.createSVGShape(shapeData, svgContainer);
-                    marker.setWorldPosition(worldPoint);
-                    marker.setWorldBoundingBox(bBox);
-                    marker.setUserId(userId);
-                    marker.setState(scope.markerState);
-                    marker.setClientPostion({x: event.clientX - dim.left, y: event.clientY - dim.top});
-                    marker.updateStyle();
-                    //marker.setParent(scope.svgGroup);
-                    scope.addMarker(marker);
-                }
-            });
-        }
-    }
-};
-
-CLOUD.MarkerEditor.prototype.onMouseMove = function(event) {
-
-    CLOUD.OrbitEditor.prototype.onMouseMove.call(this, event);
-
-    this.update();
-};
-
-CLOUD.MarkerEditor.prototype.onMouseWheel = function (event) {
-
-    CLOUD.OrbitEditor.prototype.onMouseWheel.call(this, event);
-    this.update();
-};
-
-CLOUD.MarkerEditor.prototype.update = function() {
-
-    for (var i = 0, len = this.markers.length; i < len; i++) {
-        var marker = this.markers[i];
-        var pos = this.worldToClient(marker.worldPosition);
-        marker.setClientPostion(pos);
-        marker.updateStyle();
-    }
-};
-
-CLOUD.MarkerEditor.prototype.editBegin = function() {
-
-    if (this.isEditing) {
-        return true;
-    }
-
-    //if (!this.svgGroup) {
-    //    this.svgGroup = this.createSvgElement('g');
-    //}
-    //
-    //this.svg.insertBefore(this.svgGroup, this.svg.firstChild);
-
-    this.clear();
-
-    this.isEditing = true;
-};
-
-CLOUD.MarkerEditor.prototype.editEnd = function() {
-    this.isEditing = false;
-
-    //this.svg.removeChild(this.svgGroup);
-};
-
-//CLOUD.MarkerEditor.prototype.generateMarkerId = (function () {
-//
-//    var value = 0;
-//
-//    return function () {
-//        return ++value;
-//    };
-//})();
-
-CLOUD.MarkerEditor.prototype.generateMarkerId = function () {
-
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-        return v.toString(16);
-    });
-};
-
-CLOUD.MarkerEditor.prototype.clear = function() {
-
-    var markers = this.markers;
-
-    while (markers.length) {
-        var marker = markers[0];
-        this.removeMarker(marker);
-        marker.destroy();
-    }
-
-    //var svg = this.svgGroup;
-    //if (svg && svg.childNodes.length > 0) {
-    //    while (svg.childNodes.length) {
-    //        svg.removeChild(svg.childNodes[0]);
-    //    }
-    //}
-};
-
-CLOUD.MarkerEditor.prototype.getMarker = function (id) {
-
-    for (var i = 0, len = this.markers.length; i < len; ++i) {
-        if (this.markers[i].id == id) {
-            return this.markers[i];
-        }
-    }
-
-    return null;
-};
-
-CLOUD.MarkerEditor.prototype.addMarker = function(marker) {
-    this.markers.push(marker);
-};
-
-CLOUD.MarkerEditor.prototype.removeMarker = function(marker) {
-
-    var idx = this.markers.indexOf(marker);
-
-    if (idx !== -1) {
-        this.markers.splice(idx, 1);
-    }
-};
-
-CLOUD.MarkerEditor.prototype.loadMarkers = function(markerInfoList) {
-
-    this.clear();
-
-    var svgContainer = this.domElement;
-
-    var currMarkerState = this.markerState;
-
-    for (var i = 0, len = markerInfoList.length; i < len; i++) {
-        var info = markerInfoList[i];
-
-        var markerState = info.state;
-
-        this.setMarkerState(markerState);
-
-        var shapeData = {
-            x: "0",
-            y: "0",
-            //label: "",
-            type : this.markerType,
-            fillColor: this.markerColor
-        };
-
-        var markerId = info.id;
-        var marker = new CLOUD.Marker(markerId, this);
-
-        var box = new THREE.Box3();
-        box.max.x = info.bBox.max.x;
-        box.max.y = info.bBox.max.y;
-        box.max.z = info.bBox.max.z;
-        box.min.x = info.bBox.min.x;
-        box.min.y = info.bBox.min.y;
-        box.min.z = info.bBox.min.z;
-
-        marker.createSVGShape(shapeData, svgContainer);
-        marker.setWorldPosition(info.position);
-        marker.setWorldBoundingBox(box);
-        marker.setUserId(info.userId);
-        marker.setState(info.state);
-
-        var pos = this.worldToClient(info.position);
-        marker.setClientPostion(pos);
-        marker.updateStyle();
-        //marker.setParent(scope.svgGroup);
-        this.addMarker(marker);
-    }
-
-    this.markerState = currMarkerState;
-    this.setMarkerState(currMarkerState);
-};
-
-CLOUD.MarkerEditor.prototype.getMarkerInfoList = function() {
-
-    var markerInfoList = [];
-
-    for (var i = 0, len = this.markers.length; i < len; i++) {
-        var marker = this.markers[i];
-
-        var info = {
-            id: marker.id,
-            userId: marker.userId,
-            state : marker.state,
-            position: marker.worldPosition.clone(),
-            bBox: marker.worldBoundingBox.clone()
-        };
-
-        markerInfoList.push(info);
-    }
-
-    return markerInfoList;
-};
-
-CLOUD.MarkerEditor.prototype.getInverseSceneMatrix = function() {
-
-    var sceneMatrix = this.scene.rootNode.matrix;
-    var inverseMatrix = new THREE.Matrix4();
-    inverseMatrix.getInverse(sceneMatrix);
-
-    return inverseMatrix;
-};
-
-CLOUD.MarkerEditor.prototype.getSceneMatrix = function() {
-
-    var sceneMatrix = this.scene.rootNode.matrix;
-
-    return sceneMatrix;
-};
-
-CLOUD.MarkerEditor.prototype.worldToClient = function(point) {
-
-    var dim = CLOUD.DomUtil.getContainerOffsetToClient(this.domElement);
-    var camera = this.cameraEditor.object;
-    var result = new THREE.Vector3();
-    var sceneMatrix = this.getSceneMatrix();
-
-    var worldPoint = new THREE.Vector3(point.x, point.y, point.z);
-    worldPoint.applyMatrix4(sceneMatrix);
-
-    result.set(worldPoint.x, worldPoint.y, worldPoint.z);
-    result.project(camera);
-
-    //result.x =  Math.round(0.5 * (result.x + 1) * dim.width + dim.left);
-    //result.y =  Math.round(-0.5 * (result.y - 1) * dim.height + dim.top);
-    result.x =  Math.round(0.5 * (result.x + 1) * dim.width);
-    result.y =  Math.round(-0.5 * (result.y - 1) * dim.height);
-    result.z = 0;
-
-    return result;
-};
-
-CLOUD.MarkerEditor.prototype.clientToWorld = function(point, depth) {
-
-    var dim = CLOUD.DomUtil.getContainerOffsetToClient(this.domElement);
-    var camera = this.cameraEditor.object;
-    var result = new THREE.Vector3();
-
-    //result.x = (point.x - dim.left) / dim.width * 2 - 1;
-    //result.y = -((point.y - dim.top) / dim.height) * 2 + 1;
-    result.x = (point.x) / dim.width * 2 - 1;
-    result.y = -((point.y) / dim.height) * 2 + 1;
-    result.z = depth;
-
-    result.unproject(camera);
-
-    //var inverseMatrix = this.getInverseSceneMatrix();
-    //result.applyMatrix4(inverseMatrix);
-
-    return result;
-};
-
-CLOUD.MarkerEditor.prototype.makeSVG = function() {
-    var xmlns = "http://www.w3.org/2000/svg";
-    var xlinkns = "http://www.w3.org/1999/xlink";
-    var attrMap = {
-        "className": "class",
-        "svgHref": "href"
-    };
-    var nsMap = {
-        "svgHref": xlinkns
-    };
-
-    return function (tag, attributes) {
-
-        var elem = document.createElementNS(xmlns, tag);
-
-        for (var attribute in attributes) {
-
-            var name = (attribute in attrMap ? attrMap[attribute] : attribute);
-            var value = attributes[attribute];
-
-            if (attribute in nsMap)
-                elem.setAttributeNS(nsMap[attribute], name, value);
-            else
-                elem.setAttribute(name, value);
-        }
-
-        return elem;
-    }
-}();
-
-CLOUD.MarkerEditor.prototype.createSvgElement = function(type) {
-
-    var xmlns = 'http://www.w3.org/2000/svg';
-    var svg = document.createElementNS(xmlns, type);
-    svg.setAttribute('pointer-events', 'inherit');
-
-    return svg;
-};
-
-CLOUD.MarkerEditor.prototype.calcBoundingBox = function() {
-
-    if (this.markers.length < 1) return null;
-
-    var bBox = new THREE.Box3();
-
-    for (var i = 0, len = this.markers.length; i < len; i++) {
-        var marker = this.markers[i];
-        bBox.union(marker.getWorldBoundingBox());
-    }
-
-    return bBox;
-};
-
-CLOUD.MarkerEditor.prototype.setMarkerState = function(state) {
-
-    if (state < 0 && state > 5) {
-        state = 0;
-    }
-
-    switch (state) {
-        case 0:
-            this.markerType = 0;
-            this.markerColor = this.pinColorSelector.red;
-            break;
-        case 1:
-            this.markerType = 0;
-            this.markerColor = this.pinColorSelector.green;
-            break;
-        case 2:
-            this.markerType = 0;
-            this.markerColor = this.pinColorSelector.yellow;
-            break;
-        case 3:
-            this.markerType = 1;
-            this.markerColor = this.bubbleColorSelector.red;
-            break;
-        case 4:
-            this.markerType = 1;
-            this.markerColor = this.bubbleColorSelector.green;
-            break;
-        case 5:
-            this.markerType = 1;
-            this.markerColor = this.bubbleColorSelector.gray;
-            break;
-        default:
-            this.markerType = 0;
-            this.markerColor = this.pinColorSelector.red;
-            break;
-    }
-
-    this.markerState = state;
-};
-
-
-
-
-CLOUD.Extensions.Comment = function (editor, id) {
-
-    this.editor = editor;
-    this.id = id;
-    this.shapeType = 0;
-    this.style = this.getDefaultStyle();
-    this.size = {x: 0, y: 0};
-    this.position = {x: 0, y: 0, z: 0};
-    this.rotation = 0;
     this.shape = null;
+    this.shapeOffset = {offsetX : 0, offsetY: 0}; // 屏幕坐标顶点在左上角
+
+    this.style = CLOUD.Extensions.Marker.getDefaultStyle();
+
     this.selected = false;
     this.highlighted = false;
-    this.highlightColor = '#FAFF3C';
-    this.originX = 0;
-    this.originY = 0;
+    this.highlightColor = '#faff3c';
     this.isDisableInteractions = false;
-    this.disableResizeWidth = false;
-    this.disableResizeHeight = false;
-    this.disableRotation = false;
 };
 
-CLOUD.Extensions.Comment.prototype = {
-    constructor: CLOUD.Extensions.Comment,
+CLOUD.Extensions.Marker.prototype = {
+    constructor: CLOUD.Extensions.Marker,
 
     addDomEventListeners: function () {
     },
@@ -2690,8 +2005,923 @@ CLOUD.Extensions.Comment.prototype = {
 
     onMouseDown: function (event) {
 
-        //event.preventDefault();
-        //event.stopPropagation();
+        this.select();
+    },
+
+    onMouseOut: function () {
+        this.highlight(false);
+    },
+
+    onMouseOver: function () {
+        this.highlight(true);
+    },
+
+    destroy:function() {
+        this.setParent(null);
+    },
+
+    set: function(userId, position, boundingBox, state, style){
+
+        this.userId = userId;
+        this.position.set(position.x, position.y, position.z);
+        this.boundingBox = boundingBox.clone();
+        this.state = state;
+
+        if (style) {
+            this.style = CLOUD.DomUtil.cloneStyle(style);
+        }
+
+        this.update();
+    },
+
+    setParent: function (parent) {
+
+        var shapeEl = this.shape;
+
+        if (shapeEl) {
+
+            if (shapeEl.parentNode) {
+                shapeEl.parentNode.removeChild(shapeEl);
+            }
+
+            if (parent) {
+                parent.appendChild(shapeEl);
+            }
+        }
+    },
+
+    setStyle: function (style) {
+        this.style = CLOUD.DomUtil.cloneStyle(style);
+        this.update();
+    },
+
+    select: function () {
+
+        if (this.selected) {
+            return;
+        }
+
+        this.selected = true;
+        this.highlighted = false;
+        this.update();
+
+        this.editor.selectMarker(this);
+    },
+
+    deselect: function () {
+
+        this.selected = false;
+    },
+
+    highlight: function (isHighlight) {
+
+        if (this.isDisableInteractions) {
+            return;
+        }
+
+        this.highlighted = isHighlight;
+        this.update();
+    },
+
+    disableInteractions: function (disable) {
+
+        this.isDisableInteractions = disable;
+    },
+
+    delete: function () {
+
+        this.editor.deleteMarker(this);
+    },
+
+    getClientPosition: function () {
+
+        return this.editor.worldToClient(this.position);
+    },
+
+    getBoundingBox: function(){
+        return this.boundingBox;
+    },
+
+    update: function () {
+
+        var position = this.getClientPosition();
+        var offsetX = position.x + this.shapeOffset.offsetX;
+        var offsetY = position.y + this.shapeOffset.offsetY;
+
+        this.transformShape = [
+            'translate(', offsetX, ',', offsetY, ') '
+        ].join('');
+
+        this.shape.setAttribute("transform", this.transformShape);
+    }
+};
+
+CLOUD.Extensions.Marker.shapeTypes = {BUBBLE: 0, FLAG: 1};
+
+CLOUD.Extensions.Marker.getDefaultStyle = function() {
+    var style = {};
+
+    style['stroke-width'] = 2;
+    style['stroke-color'] = '#fffaff';
+    style['stroke-opacity'] = 1.0;
+    style['fill-color'] = '#ff2129';
+    style['fill-opacity'] = 1.0;
+
+    return style;
+};
+
+CLOUD.Extensions.MarkerFlag = function (id, editor) {
+
+    CLOUD.Extensions.Marker.call(this, id, editor);
+
+    this.shapeType = CLOUD.Extensions.Marker.shapeTypes.FLAG;
+
+    this.createShape();
+    this.addDomEventListeners();
+};
+
+CLOUD.Extensions.MarkerFlag.prototype = Object.create(CLOUD.Extensions.Marker.prototype);
+CLOUD.Extensions.MarkerFlag.prototype.constructor = CLOUD.Extensions.Marker;
+
+CLOUD.Extensions.MarkerFlag.prototype.addDomEventListeners = function () {
+
+    this.shape.addEventListener("mousedown", this.onMouseDown.bind(this), true);
+    this.shape.addEventListener("mouseout", this.onMouseOut.bind(this));
+    this.shape.addEventListener("mouseover", this.onMouseOver.bind(this));
+};
+
+CLOUD.Extensions.MarkerFlag.prototype.removeDomEventListeners = function () {
+
+    this.shape.removeEventListener("mousedown", this.onMouseDown.bind(this), true);
+    this.shape.removeEventListener("mouseout", this.onMouseOut.bind(this));
+    this.shape.removeEventListener("mouseover", this.onMouseOver.bind(this));
+};
+
+CLOUD.Extensions.MarkerFlag.prototype.createShape = function () {
+
+    this.shape = CLOUD.Extensions.Utils.Shape2D.makeFlag();
+};
+
+CLOUD.Extensions.MarkerFlag.prototype.update = function () {
+
+    var strokeWidth = this.style['stroke-width'];
+    var strokeColor = this.style['stroke-color'];
+    var strokeOpacity = this.style['stroke-opacity'];
+    var fillColor = this.style['fill-color'];
+    var fillOpacity = this.style['fill-opacity'];
+
+    var position = this.getClientPosition();
+    var offsetX = position.x;
+    var offsetY = position.y;
+
+    var transformShape = [
+        'translate(', offsetX, ',', offsetY, ') '
+    ].join('');
+
+    this.shape.setAttribute("transform", transformShape);
+    this.shape.setAttribute("stroke-width", strokeWidth);
+    this.shape.setAttribute("stroke", strokeColor);
+    this.shape.setAttribute("stroke-opacity", strokeOpacity);
+    this.shape.setAttribute('fill', fillColor);
+    this.shape.setAttribute('fill-opacity', fillOpacity);
+};
+
+CLOUD.Extensions.MarkerFlag.prototype.renderToCanvas = function (ctx) {
+
+};
+CLOUD.Extensions.MarkerBubble = function (id, editor) {
+
+    CLOUD.Extensions.Marker.call(this, id, editor);
+
+    this.shapeType = CLOUD.Extensions.Marker.shapeTypes.BUBBLE;
+
+    this.createShape();
+    this.addDomEventListeners();
+};
+
+CLOUD.Extensions.MarkerBubble.prototype = Object.create(CLOUD.Extensions.Marker.prototype);
+CLOUD.Extensions.MarkerBubble.prototype.constructor = CLOUD.Extensions.Marker;
+
+CLOUD.Extensions.MarkerBubble.prototype.addDomEventListeners = function () {
+
+    this.shape.addEventListener("mousedown", this.onMouseDown.bind(this), true);
+    this.shape.addEventListener("mouseout", this.onMouseOut.bind(this));
+    this.shape.addEventListener("mouseover", this.onMouseOver.bind(this));
+};
+
+CLOUD.Extensions.MarkerBubble.prototype.removeDomEventListeners = function () {
+
+    this.shape.removeEventListener("mousedown", this.onMouseDown.bind(this), true);
+    this.shape.removeEventListener("mouseout", this.onMouseOut.bind(this));
+    this.shape.removeEventListener("mouseover", this.onMouseOver.bind(this));
+};
+
+CLOUD.Extensions.MarkerBubble.prototype.createShape = function () {
+
+    this.shape = CLOUD.Extensions.Utils.Shape2D.makeBubble(this.style, this.shapeOffset);
+};
+
+CLOUD.Extensions.MarkerBubble.prototype.update = function () {
+
+    var strokeWidth = this.style['stroke-width'];
+    var strokeColor = this.style['stroke-color'];
+    var strokeOpacity = this.style['stroke-opacity'];
+    var fillColor = this.style['fill-color'];
+    var fillOpacity = this.style['fill-opacity'];
+
+    var position = this.getClientPosition();
+    var offsetX = position.x;
+    var offsetY = position.y;
+
+    var transformShape = [
+        'translate(', offsetX, ',', offsetY, ') '
+    ].join('');
+
+    this.shape.setAttribute("transform", transformShape);
+    this.shape.setAttribute("stroke-width", strokeWidth);
+    this.shape.setAttribute("stroke", strokeColor);
+    this.shape.setAttribute("stroke-opacity", strokeOpacity);
+    this.shape.setAttribute('fill', fillColor);
+    this.shape.setAttribute('fill-opacity', fillOpacity);
+};
+
+CLOUD.Extensions.MarkerBubble.prototype.renderToCanvas = function (ctx) {
+
+};
+
+
+
+
+CLOUD.Extensions.MarkerEditor = function (viewer) {
+    "use strict";
+
+    this.cameraEditor = viewer.cameraEditor;
+    this.scene = viewer.getScene();
+    this.domElement = viewer.domElement;
+
+    this.markers = [];
+
+    this.selectedMarker = null;
+
+    // 隐患待整改：红色
+    // 隐患已整改：黄色
+    // 隐患已关闭：绿色
+    // size: 15 * 20
+    this.flagColors = {red: "#ff2129", green: "#85af03", yellow:"#fe9829"};
+
+    // 有隐患：红色
+    // 无隐患：绿色
+    // 过程验收点、开业验收点的未检出：灰色
+    // size: 14 * 20
+    this.bubbleColors = {red: "#f92a24", green: "#86b507", gray:"#ccccca"};
+
+    this.keys = {
+        BACKSPACE: 8,
+        ALT: 18,
+        ESC: 27,
+        LEFT: 37,
+        UP: 38,
+        RIGHT: 39,
+        BOTTOM: 40,
+        DELETE: 46,
+        ZERO: 48,
+        A: 65,
+        D: 68,
+        E: 69,
+        Q: 81,
+        S: 83,
+        W: 87,
+        PLUS: 187,
+        SUB: 189
+    };
+
+    this.markerType = 0;
+    this.markerColor = this.flagColors.red;
+    this.markerState = 0;
+    this.isEditing = false;
+
+    this.beginEditCallback = null;
+    this.endEditCallback = null;
+
+    this.nextMarkerId = 0;
+
+    this.initialized = false;
+};
+
+CLOUD.Extensions.MarkerEditor.prototype.addDomEventListeners = function () {
+
+    if (this.svg) {
+
+        this.svg.addEventListener('mousedown', this.onMouseDown.bind(this), false);
+        this.svg.addEventListener('mouseup', this.onMouseUp.bind(this), false);
+
+        window.addEventListener('keydown', this.onKeyDown.bind(this), false);
+        window.addEventListener('keyup', this.onKeyUp.bind(this), false);
+    }
+};
+
+CLOUD.Extensions.MarkerEditor.prototype.removeDomEventListeners = function () {
+
+    if (this.svg) {
+
+        this.svg.removeEventListener('mousedown', this.onMouseDown.bind(this), false);
+        this.svg.removeEventListener('mouseup', this.onMouseUp.bind(this), false);
+
+        window.removeEventListener('keydown', this.onKeyDown.bind(this), false);
+        window.removeEventListener('keyup', this.onKeyUp.bind(this), false);
+    }
+
+};
+
+CLOUD.Extensions.MarkerEditor.prototype.onMouseDown = function (event) {
+
+    if (this.selectedMarker && event.target === this.svg) {
+
+        this.selectMarker(null);
+    }
+};
+
+CLOUD.Extensions.MarkerEditor.prototype.onMouseUp = function (event) {
+
+    var cameraEditor = this.cameraEditor;
+
+    if (cameraEditor.enabled === false)
+        return;
+
+    if (this.selectedMarker) {
+        return;
+    }
+
+    event.preventDefault();
+
+    if (event.button === THREE.MOUSE.LEFT) {
+
+        var scope = this;
+        var point = this.getPointOnDomContainer(event.clientX, event.clientY);
+        var normalizedPoint = this.clientToViewport(point);
+
+        scope.scene.pick(normalizedPoint, cameraEditor.object, function (intersect) {
+
+            if (intersect) {
+
+                var userId = "";
+                userId = intersect.userId || userId;
+
+                if (userId === "") return;
+
+                var bBox = intersect.object.boundingBox;
+
+                if (!bBox) {
+                    intersect.object.geometry.computeBoundingBox();
+                    bBox = intersect.object.geometry.boundingBox;
+                }
+
+                var position = intersect.point.clone();
+                var inverseMatrix = scope.getInverseSceneMatrix();
+                position.applyMatrix4(inverseMatrix);
+
+                var markerId = scope.generateMarkerId();
+                var marker;
+
+                if (scope.markerType === 1) {
+
+                    marker = new CLOUD.Extensions.MarkerBubble(markerId, scope);
+
+                } else {
+
+                    marker = new CLOUD.Extensions.MarkerFlag(markerId, scope);
+                }
+
+                var style = CLOUD.Extensions.Marker.getDefaultStyle();
+                style['fill-color'] = scope.markerColor;
+                marker.set(userId, position, bBox, scope.markerState, style);
+                scope.addMarker(marker);
+            }
+        });
+    }
+
+};
+
+CLOUD.Extensions.MarkerEditor.prototype.onKeyDown = function (event) {
+
+};
+
+CLOUD.Extensions.MarkerEditor.prototype.onKeyUp = function (event) {
+
+    if (!this.isEditing) {
+        return;
+    }
+
+    switch (event.keyCode) {
+        case this.keys.DELETE:
+            if (this.selectedMarker) {
+                this.selectedMarker.delete();
+                this.deselectMarker();
+            }
+            break;
+        default :
+            break;
+    }
+};
+
+CLOUD.Extensions.MarkerEditor.prototype.onResize = function () {
+
+    var bounds = this.getDomContainerBounds();
+
+    this.svg.setAttribute('width', bounds.width + '');
+    this.svg.setAttribute('height', bounds.height + '');
+
+    this.updateMarkers();
+};
+
+CLOUD.Extensions.MarkerEditor.prototype.init = function(callbacks) {
+
+    if (callbacks) {
+
+        this.beginEditCallback = callbacks.beginEditCallback;
+        this.endEditCallback = callbacks.endEditCallback;
+    }
+
+    if (!this.svg) {
+
+        var bounds = CLOUD.DomUtil.getContainerOffsetToClient(this.domElement);
+        var svgWidth = bounds.width;
+        var svgHeight = bounds.height;
+
+        this.svg = CLOUD.Extensions.Utils.Shape2D.createSvgElement('svg');
+        this.svg.style.position = "absolute";
+        this.svg.style.display = "block";
+        this.svg.style.position = "absolute";
+        this.svg.style.display = "block";
+        this.svg.style.left = "0";
+        this.svg.style.top = "0";
+        this.svg.setAttribute('width', svgWidth + '');
+        this.svg.setAttribute('height', svgHeight + '');
+
+        this.domElement.appendChild(this.svg);
+        this.enableSVGPaint(false);
+
+        this.svgGroup = CLOUD.Extensions.Utils.Shape2D.createSvgElement('g');
+        this.svg.insertBefore(this.svgGroup, this.svg.firstChild);
+    }
+
+    this.initialized = true;
+};
+
+CLOUD.Extensions.MarkerEditor.prototype.uninit = function() {
+
+    this.initialized = false;
+
+    if (!this.svg) return;
+
+    // 如果仍然处在编辑中，强行结束
+    if (this.isEditing) {
+        this.editEnd();
+    }
+
+    // 卸载数据
+    this.unloadMarkers();
+
+    if (this.svgGroup && this.svgGroup.parentNode) {
+        this.svgGroup.parentNode.removeChild(this.svgGroup);
+    }
+
+    if (this.svg.parentNode) {
+        this.svg.parentNode.removeChild(this.svg);
+    }
+
+    this.svgGroup = null;
+    this.svg = null;
+};
+
+CLOUD.Extensions.MarkerEditor.prototype.isInitialized = function() {
+
+    return this.initialized;
+};
+
+CLOUD.Extensions.MarkerEditor.prototype.onExistEditor = function () {
+
+    this.uninit();
+};
+
+CLOUD.Extensions.MarkerEditor.prototype.generateMarkerId = function () {
+
+    ++this.nextMarkerId;
+
+    var id = this.nextMarkerId.toString(10);
+
+    //var id = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+    //    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+    //    return v.toString(16);
+    //});
+
+    return id;
+};
+
+// 清除数据
+CLOUD.Extensions.MarkerEditor.prototype.clear = function() {
+
+    var markers = this.markers;
+
+    while (markers.length) {
+        var marker = markers[0];
+        this.deleteMarker(marker);
+    }
+
+    var group = this.svgGroup;
+    if (group && group.childNodes.length > 0) {
+        while (group.childNodes.length) {
+            group.removeChild(group.childNodes[0]);
+        }
+    }
+};
+
+CLOUD.Extensions.MarkerEditor.prototype.updateMarkers = function() {
+
+    for (var i = 0, len = this.markers.length; i < len; i++) {
+        var marker = this.markers[i];
+        marker.update();
+    }
+};
+
+CLOUD.Extensions.MarkerEditor.prototype.addMarker = function(marker) {
+
+    marker.setParent(this.svgGroup);
+
+    this.markers.push(marker);
+};
+
+CLOUD.Extensions.MarkerEditor.prototype.deleteMarker = function (marker) {
+
+    if (marker) {
+
+        var idx = this.markers.indexOf(marker);
+
+        if (idx !== -1) {
+            this.markers.splice(idx, 1);
+        }
+
+        marker.destroy();
+    }
+};
+
+CLOUD.Extensions.MarkerEditor.prototype.selectMarker = function (marker) {
+
+    if (this.selectedMarker !== marker) {
+
+        this.deselectMarker();
+    }
+
+    this.selectedMarker = marker;
+
+};
+
+CLOUD.Extensions.MarkerEditor.prototype.deselectMarker = function () {
+
+    if (this.selectedMarker) {
+
+        this.selectedMarker.deselect();
+        this.selectedMarker = null;
+    }
+};
+
+CLOUD.Extensions.MarkerEditor.prototype.getSceneMatrix = function() {
+
+    var matrix = this.scene.getRootNodeMatrix();
+
+    if (!matrix) {
+
+        matrix = new THREE.Matrix4();
+    }
+
+    return matrix;
+};
+
+CLOUD.Extensions.MarkerEditor.prototype.getInverseSceneMatrix = function() {
+
+    var sceneMatrix = this.getSceneMatrix();
+    var inverseMatrix = new THREE.Matrix4();
+
+    inverseMatrix.getInverse(sceneMatrix);
+
+    return inverseMatrix;
+};
+
+CLOUD.Extensions.MarkerEditor.prototype.worldToClient = function(wPoint) {
+
+    var bounds = this.getDomContainerBounds();
+    var camera = this.cameraEditor.object;
+    var sceneMatrix = this.getSceneMatrix();
+    var result = new THREE.Vector3(wPoint.x, wPoint.y, wPoint.z);
+
+    result.applyMatrix4(sceneMatrix);
+    result.project(camera);
+
+    result.x =  Math.round(0.5 * (result.x + 1) * bounds.width);
+    result.y =  Math.round(-0.5 * (result.y - 1) * bounds.height);
+    result.z = 0;
+
+    return result;
+};
+
+CLOUD.Extensions.MarkerEditor.prototype.clientToWorld = function(cPoint) {
+
+    var bounds = this.getDomContainerBounds();
+    var camera = this.cameraEditor.object;
+    var result = new THREE.Vector3();
+
+    result.x = cPoint.x / bounds.width * 2 - 1;
+    result.y = - cPoint.y / bounds.height * 2 + 1;
+    result.z = 0;
+
+    result.unproject(camera);
+
+    var inverseMatrix = this.getInverseSceneMatrix();
+
+    result.applyMatrix4(inverseMatrix);
+
+    return result;
+};
+
+CLOUD.Extensions.MarkerEditor.prototype.clientToViewport = function(cPoint) {
+
+    var bounds = this.getDomContainerBounds();
+    var result = new THREE.Vector3();
+
+    result.x = cPoint.x / bounds.width * 2 - 1;
+    result.y = - cPoint.y / bounds.height * 2 + 1;
+    result.z = 0;
+
+    return result;
+};
+
+CLOUD.Extensions.MarkerEditor.prototype.setMarkerState = function(state) {
+
+    if (state < 0 && state > 5) {
+        state = 0;
+    }
+
+    switch (state) {
+        case 0:
+            this.markerType = CLOUD.Extensions.Marker.shapeTypes.FLAG;
+            this.markerColor = this.flagColors.red;
+            break;
+        case 1:
+            this.markerType = CLOUD.Extensions.Marker.shapeTypes.FLAG;
+            this.markerColor = this.flagColors.green;
+            break;
+        case 2:
+            this.markerType = CLOUD.Extensions.Marker.shapeTypes.FLAG;
+            this.markerColor = this.flagColors.yellow;
+            break;
+        case 3:
+            this.markerType = CLOUD.Extensions.Marker.shapeTypes.BUBBLE;
+            this.markerColor = this.bubbleColors.red;
+            break;
+        case 4:
+            this.markerType = CLOUD.Extensions.Marker.shapeTypes.BUBBLE;
+            this.markerColor = this.bubbleColors.green;
+            break;
+        case 5:
+            this.markerType = CLOUD.Extensions.Marker.shapeTypes.BUBBLE;
+            this.markerColor = this.bubbleColors.gray;
+            break;
+    }
+
+    this.markerState = state;
+};
+
+// 是否允许在SVG上绘图
+CLOUD.Extensions.MarkerEditor.prototype.enableSVGPaint = function (enable) {
+
+    if (enable) {
+
+        this.svg.setAttribute("pointer-events", "painted");
+    } else {
+
+        this.svg.setAttribute("pointer-events", "none");
+    }
+
+};
+
+CLOUD.Extensions.MarkerEditor.prototype.handleCallbacks = function (name) {
+
+    switch (name) {
+
+        case "beginEdit":
+            if (this.beginEditCallback) {
+                this.beginEditCallback(this.domElement);
+            }
+            break;
+        case "endEdit":
+            if (this.endEditCallback) {
+                this.endEditCallback(this.domElement);
+            }
+            break;
+    }
+
+};
+
+CLOUD.Extensions.MarkerEditor.prototype.getDomContainerBounds = function () {
+
+    return CLOUD.DomUtil.getContainerOffsetToClient(this.domElement);
+};
+
+CLOUD.Extensions.MarkerEditor.prototype.getPointOnDomContainer = function (clientX, clientY) {
+
+    var rect = this.getDomContainerBounds();
+
+    return new THREE.Vector2(clientX - rect.left, clientY - rect.top);
+};
+
+CLOUD.Extensions.MarkerEditor.prototype.getDomElement = function () {
+    return this.domElement;
+};
+
+// ---------------------------- 外部 API BEGIN ---------------------------- //
+
+CLOUD.Extensions.MarkerEditor.prototype.editBegin = function() {
+
+    if (this.isEditing) {
+        return true;
+    }
+
+    if (!this.svgGroup.parentNode) {
+        this.svg.insertBefore(this.svgGroup, this.svg.firstChild);
+    }
+
+    this.handleCallbacks("beginEdit");
+
+    // 注册事件
+    this.addDomEventListeners();
+    // 允许绘图
+    this.enableSVGPaint(true);
+
+    this.clear();
+
+    this.isEditing = true;
+};
+
+CLOUD.Extensions.MarkerEditor.prototype.editEnd = function() {
+
+    this.isEditing = false;
+
+    this.removeDomEventListeners();
+
+    if (this.svgGroup && this.svgGroup.parentNode) {
+        this.svgGroup.parentNode.removeChild(this.svgGroup);
+    }
+
+    this.handleCallbacks("endEdit");
+
+    // 不允许绘图
+    this.enableSVGPaint(false);
+};
+
+CLOUD.Extensions.MarkerEditor.prototype.getMarkersBoundingBox = function() {
+
+    if (this.markers.length < 1) return null;
+
+    var bBox = new THREE.Box3();
+
+    for (var i = 0, len = this.markers.length; i < len; i++) {
+        var marker = this.markers[i];
+        bBox.union(marker.getBoundingBox());
+    }
+
+    return bBox;
+};
+
+// 获得列表
+CLOUD.Extensions.MarkerEditor.prototype.getMarkerInfoList = function() {
+
+    var markerInfoList = [];
+
+    for (var i = 0, len = this.markers.length; i < len; i++) {
+
+        var marker = this.markers[i];
+
+        var info = {
+            id: marker.id,
+            userId: marker.userId,
+            shapeType: marker.shapeType,
+            position: marker.position,
+            boundingBox: marker.boundingBox,
+            state : marker.state
+        };
+
+        markerInfoList.push(info);
+    }
+
+    return markerInfoList;
+};
+
+// 加载
+CLOUD.Extensions.MarkerEditor.prototype.loadMarkers = function (markerInfoList) {
+
+    if (!this.svgGroup.parentNode) {
+        this.svg.insertBefore(this.svgGroup, this.svg.firstChild);
+    }
+
+    // 清除数据
+    this.clear();
+
+    var currMarkerState = this.markerState;
+
+    for (var i = 0, len = markerInfoList.length; i < len; i++) {
+
+        var info = markerInfoList[i];
+
+        var id = info.id;
+        var userId = info.userId;
+        var shapeType = info.shapeType;
+        var position = info.position;
+        var boundingBox = info.boundingBox;
+        var state = info.state;
+
+        this.setMarkerState(state);
+
+        var style = CLOUD.Extensions.Marker.getDefaultStyle();
+        style['fill-color'] = this.markerColor;
+
+        switch (shapeType) {
+
+            case CLOUD.Extensions.Marker.shapeTypes.FLAG:
+                var flag = new CLOUD.Extensions.MarkerFlag(id, this);
+                flag.set(userId, position, boundingBox, state, style);
+                this.addMarker(flag);
+                break;
+            case  CLOUD.Extensions.Marker.shapeTypes.BUBBLE:
+                var bubble = new CLOUD.Extensions.MarkerBubble(id, this);
+                bubble.set(userId, position, boundingBox, state, style);
+                this.addMarker(bubble);
+                break;
+        }
+    }
+
+    this.markerState = currMarkerState;
+    this.setMarkerState(currMarkerState);
+};
+
+// 卸载
+CLOUD.Extensions.MarkerEditor.prototype.unloadMarkers = function () {
+
+    // 清除数据
+    this.clear();
+};
+
+// 显示
+CLOUD.Extensions.MarkerEditor.prototype.showMarkers = function () {
+
+    if (this.svgGroup) {
+        this.svgGroup.setAttribute("visibility", "visible");
+    }
+};
+
+// 隐藏
+CLOUD.Extensions.MarkerEditor.prototype.hideMarkers = function () {
+
+    if (this.svgGroup) {
+        this.svgGroup.setAttribute("visibility", "hidden");
+    }
+};
+
+// ---------------------------- 外部 API END ---------------------------- //
+
+
+
+CLOUD.Extensions.Annotation = function (editor, id) {
+
+    this.editor = editor;
+    this.id = id;
+    this.shapeType = 0;
+
+    this.position = {x: 0, y: 0, z: 0};
+    this.size = {width: 0, height: 0};
+    this.rotation = 0;
+
+    this.style = this.getDefaultStyle();
+    this.viewport = {width: 0, height: 0};
+    this.shape = null;
+    this.selected = false;
+    this.highlighted = false;
+    this.highlightColor = '#FAFF3C';
+    this.isDisableInteractions = false;
+    this.disableResizeWidth = false;
+    this.disableResizeHeight = false;
+    this.disableRotation = false;
+};
+
+CLOUD.Extensions.Annotation.prototype = {
+    constructor: CLOUD.Extensions.Annotation,
+
+    addDomEventListeners: function () {
+    },
+
+    removeDomEventListeners: function () {
+    },
+
+    onMouseDown: function (event) {
 
         if (this.isDisableInteractions) {
             return;
@@ -2699,8 +2929,8 @@ CLOUD.Extensions.Comment.prototype = {
 
         this.select();
 
-        if (this.editor.commentFrame) {
-            this.editor.commentFrame.dragBegin(event);
+        if (this.editor.annotationFrame) {
+            this.editor.annotationFrame.dragBegin(event);
         }
     },
 
@@ -2717,91 +2947,106 @@ CLOUD.Extensions.Comment.prototype = {
 
     destroy: function () {
 
-        this.deselect();
         this.removeDomEventListeners();
+        this.deselect();
         this.setParent(null);
     },
 
-    set: function (position, width, height) {
+    set: function (position, size, rotation, viewport) {
 
-        var worldPosition = this.editor.clientToWorld(position.x, position.y);
-        this.position.x = worldPosition.x;
-        this.position.y = worldPosition.y;
-        this.position.z = worldPosition.z;
+        this.position.x = position.x;
+        this.position.y = position.y;
+        this.position.z = position.z;
+        this.size.width = size.width;
+        this.size.height = size.height;
+        this.rotation = rotation || 0;
 
-        var left = this.editor.clientToWorld(position.x - 0.5 * width, position.y - 0.5 * height);
-        var right = this.editor.clientToWorld(position.x + 0.5 * width, position.y + 0.5 * height);
-        this.size.x =  Math.abs(right.x - left.x);
-        this.size.y =  Math.abs(right.y - left.y);
+        if (viewport) {
+            this.setViewport(viewport);
+        }
 
-        this.rotation = 0;
-
-        this.updateStyle();
+        this.update();
     },
 
-    setRotation: function (angle) {
+    // 设置旋转角（弧度）
+    resetRotation: function (angle) {
 
         this.rotation = angle;
-        this.updateStyle();
+        this.update();
     },
 
-    getRotation:function() {
+    // 获得旋转角（弧度）
+    getRotation: function () {
 
         return this.rotation;
     },
 
-    setPosition: function (x, y) {
+    // 设置位置
+    resetPosition: function (position) {
 
-        var worldPosition = this.editor.clientToWorld(x, y);
-        this.position.x = worldPosition.x;
-        this.position.y = worldPosition.y;
-        this.position.z = worldPosition.z;
-
-        this.updateStyle();
+        this.position.x = position.x;
+        this.position.y = position.y;
+        this.position.z = position.z;
+        this.update();
     },
 
-    getPosition:function() {
+    getClientPosition: function () {
 
-        return {
-            x: this.position.x,
-            y: this.position.y
-        };
+        return this.editor.worldToClient(this.position);
     },
 
-    getClientPosition:function() {
+    resetSize: function (size, position) {
 
-        return this.editor.worldToClient(this.position.x, this.position.y, this.position.z);
-    },
-
-    setSize: function (width, height, position) {
-
-        var worldPosition = this.editor.clientToWorld(position.x, position.y);
-        this.position.x = worldPosition.x;
-        this.position.y = worldPosition.y;
-        this.position.z = worldPosition.z;
-
-        var left = this.editor.clientToWorld(position.x - 0.5 * width, position.y - 0.5 * height);
-        var right = this.editor.clientToWorld(position.x + 0.5 * width, position.y + 0.5 * height);
-        this.size.x =  Math.abs(right.x - left.x);
-        this.size.y =  Math.abs(right.y - left.y);
-
-        this.updateStyle();
-    },
-
-    getSize:function() {
-
-        return {
-            x: this.size.x,
-            y: this.size.y
-        };
+        this.size.width = size.width;
+        this.size.height = size.height;
+        this.position.x = position.x;
+        this.position.y = position.y;
+        this.position.z = position.z;
+        this.update();
     },
 
     getClientSize: function () {
 
-        var left = this.editor.worldToClient(this.position.x - 0.5 * this.size.x, this.position.y - 0.5 * this.size.y, this.position.z);
-        var right = this.editor.worldToClient(this.position.x + 0.5 * this.size.x, this.position.y + 0.5 * this.size.y, this.position.z);
+        var width, height, xScale, yScale;
+        var containerBound = this.editor.getDomContainerBounds();
 
-        return {x: Math.floor(Math.abs(right.x - left.x)), y: Math.floor(Math.abs(right.y - left.y))};
+        if (this.viewport.width !== 0 && this.viewport.height !== 0) {
+
+            xScale = containerBound.width / this.viewport.width;
+            yScale = containerBound.height / this.viewport.height;
+
+            // 确保图形不变形: 窗口的宽度放大（或缩小）w倍，高度放大（或缩小）h倍。
+            // 当w>=h时，图形的宽度和高度都放大（或缩小）h倍；
+            // 当w<h时, 图形的宽度和高度都放大（或缩小）w倍。
+            if (xScale >= yScale) {
+                xScale = yScale;
+            }else{
+                yScale = xScale;
+            }
+
+            width = Math.floor(xScale * this.size.width + 0.5);
+            height = Math.floor(yScale * this.size.height + 0.5);
+
+        } else {
+
+            xScale = 1;
+            yScale = 1;
+            width = Math.floor(this.size.width + 0.5);
+            height = Math.floor(this.size.height + 0.5);
+        }
+
+        return {xScale: xScale, yScale: yScale, width: width, height: height};
+    },
+
+    setViewport: function (viewport) {
+
+        this.viewport.width = viewport.width;
+        this.viewport.height = viewport.height;
+    },
+
+    getViewport: function () {
+
+        return this.viewport;
     },
 
     setParent: function (parent) {
@@ -2817,21 +3062,18 @@ CLOUD.Extensions.Comment.prototype = {
         }
     },
 
-    setStyle:function(style){
+    setStyle: function (style) {
 
         this.style = CLOUD.DomUtil.cloneStyle(style);
-        this.updateStyle();
+        this.update();
     },
 
-    getStyle:function(){
+    getStyle: function () {
 
         return CLOUD.DomUtil.cloneStyle(this.style);
     },
 
-    updateTransformMatrix: function () {
-    },
-
-    updateStyle: function () {
+    update: function () {
     },
 
     select: function () {
@@ -2842,9 +3084,9 @@ CLOUD.Extensions.Comment.prototype = {
 
         this.selected = true;
         this.highlighted = false;
-        this.updateStyle();
+        this.update();
 
-        this.editor.selectComment(this);
+        this.editor.selectAnnotation(this);
     },
 
     deselect: function () {
@@ -2859,17 +3101,17 @@ CLOUD.Extensions.Comment.prototype = {
         }
 
         this.highlighted = isHighlight;
-        this.updateStyle();
+        this.update();
     },
 
-    disableInteractions : function (disable) {
+    disableInteractions: function (disable) {
 
         this.isDisableInteractions = disable;
     },
 
     delete: function () {
 
-        this.editor.deleteComment(this);
+        this.editor.deleteAnnotation(this);
     },
 
     getDefaultStyle: function () {
@@ -2890,174 +3132,162 @@ CLOUD.Extensions.Comment.prototype = {
     }
 };
 
-CLOUD.Extensions.Comment.shapeTypes = {ARROW: 1, RECTANGLE: 2, CIRCLE: 3, CROSS: 4, CLOUD: 5, TEXT: 6};
-CLOUD.Extensions.CommentArrow = function (editor, id) {
+CLOUD.Extensions.Annotation.shapeTypes = {ARROW: 0, RECTANGLE: 1, CIRCLE: 2, CROSS: 3, CLOUD: 4, TEXT: 5};
+CLOUD.Extensions.AnnotationArrow = function (editor, id) {
 
-    CLOUD.Extensions.Comment.call(this, editor, id);
+    CLOUD.Extensions.Annotation.call(this, editor, id);
 
-    this.shapeType = CLOUD.Extensions.Comment.shapeTypes.ARROW;
+    this.shapeType = CLOUD.Extensions.Annotation.shapeTypes.ARROW;
     this.head = new THREE.Vector3();
     this.tail = new THREE.Vector3();
-
     this.disableResizeHeight = true;
-
-    this.clientSize = {x: 0, y: this.style['stroke-width'] * 4};
-
-    this.size.y = this.style['stroke-width'] * 4;
+    this.size.height = this.style['stroke-width'] * 4; // 箭头固定高度
 
     this.createShape();
     this.addDomEventListeners();
 };
 
-CLOUD.Extensions.CommentArrow.prototype = Object.create(CLOUD.Extensions.Comment.prototype);
-CLOUD.Extensions.CommentArrow.prototype.constructor = CLOUD.Extensions.CommentArrow;
+CLOUD.Extensions.AnnotationArrow.prototype = Object.create(CLOUD.Extensions.Annotation.prototype);
+CLOUD.Extensions.AnnotationArrow.prototype.constructor = CLOUD.Extensions.AnnotationArrow;
 
-CLOUD.Extensions.CommentArrow.prototype.addDomEventListeners = function () {
+CLOUD.Extensions.AnnotationArrow.prototype.addDomEventListeners = function () {
 
     this.shape.addEventListener("mousedown", this.onMouseDown.bind(this), true);
     this.shape.addEventListener("mouseout", this.onMouseOut.bind(this));
     this.shape.addEventListener("mouseover", this.onMouseOver.bind(this));
 };
 
-CLOUD.Extensions.CommentArrow.prototype.removeDomEventListeners = function () {
+CLOUD.Extensions.AnnotationArrow.prototype.removeDomEventListeners = function () {
 
     this.shape.removeEventListener("mousedown", this.onMouseDown.bind(this), true);
     this.shape.removeEventListener("mouseout", this.onMouseOut.bind(this));
     this.shape.removeEventListener("mouseover", this.onMouseOver.bind(this));
 };
 
-CLOUD.Extensions.CommentArrow.prototype.createShape = function () {
+CLOUD.Extensions.AnnotationArrow.prototype.createShape = function () {
     this.shape = CLOUD.Extensions.Utils.Shape2D.createSvgElement('polygon');
 };
 
-CLOUD.Extensions.CommentArrow.prototype.set = function (sx, sy, ex, ey) {
+CLOUD.Extensions.AnnotationArrow.prototype.setByTailHead = function (tail, head, viewport) {
 
-    this.tail = this.editor.clientToWorld(sx, sy);
-    this.head = this.editor.clientToWorld(ex, ey);
-
-    // 计算位置
-    this.position.x = 0.5 * (this.tail.x + this.head.x);
-    this.position.y = 0.5 * (this.tail.y + this.head.y);
-    this.position.z = 0.5 * (this.tail.z + this.head.z);
-
-    var v0 = new THREE.Vector2(this.tail.x, this.tail.y);
-    var v1 = new THREE.Vector2(this.head.x, this.head.y);
-    var vDir = v1.clone().sub(v0).normalize();
+    var v0 = new THREE.Vector2(tail.x, tail.y);
+    var v1 = new THREE.Vector2(head.x, head.y);
+    var dir = v1.clone().sub(v0).normalize();
 
     // 计算尺寸
-    this.size.x = v0.distanceTo(v1);
+    this.size.width = v0.distanceTo(v1);
 
     // 计算旋转角度
-    this.rotation = Math.acos(vDir.dot(new THREE.Vector2(1, 0)));
-    this.rotation = ey < sy ? (Math.PI * 2) - this.rotation : this.rotation;
-
-    this.updateStyle();
-};
-
-CLOUD.Extensions.CommentArrow.prototype.setToWorld = function (tail, head) {
-
-    var v0 = new THREE.Vector2(tail.x, tail.y);
-    var v1 = new THREE.Vector2(head.x, head.y);
-    var vDir = v1.clone().sub(v0).normalize();
-
-    this.size.x = v0.distanceTo(v1);
-    this.rotation = Math.acos(vDir.dot(new THREE.Vector2(1, 0)));
-
+    this.rotation = Math.acos(dir.dot(new THREE.Vector2(1, 0)));
     this.rotation = head.y < tail.y ? (Math.PI * 2) - this.rotation : this.rotation;
 
-    this.tail.set(tail.x, tail.y, tail.z);
-    this.head.set(head.x, head.y, head.z);
+    this.tail.set(tail.x, tail.y, 0);
+    this.head.set(head.x, head.y, 0);
 
     // 计算位置
-    this.position.x = 0.5 * (this.tail.x + this.head.x);
-    this.position.y = 0.5 * (this.tail.y + this.head.y);
-    this.position.z = 0.5 * (this.tail.z + this.head.z);
+    var dx = this.head.x - this.tail.x;
+    var dy = this.head.y - this.tail.y;
+    var posX = this.tail.x + dx * 0.5;
+    var posY = this.tail.y + dy * 0.5;
+    var center = {x: posX, y: posY};
+    var position = this.editor.clientToWorld(center);
+    this.position.x = position.x;
+    this.position.y = position.y;
+    this.position.z = position.z;
 
-    this.updateStyle();
+    if (viewport) {
+        this.setViewport(viewport);
+    }
+
+    this.update();
 };
 
-CLOUD.Extensions.CommentArrow.prototype.setSize = function (width, height, position) {
+CLOUD.Extensions.AnnotationArrow.prototype.resetSize = function (size, position) {
 
-    var worldPosition = this.editor.clientToWorld(position.x, position.y);
-    this.position.x = worldPosition.x;
-    this.position.y = worldPosition.y;
-    this.position.z = worldPosition.z;
+    var dir = new THREE.Vector2(Math.cos(this.rotation), Math.sin(this.rotation));
+    dir.multiplyScalar(size.width * 0.5);
 
-    var endX = Math.cos(this.rotation);
-    var endY = Math.sin(this.rotation);
-    var endDir = new THREE.Vector2(endX, endY);
-    endDir.multiplyScalar(width * 0.5);
+    var clientPosition = this.editor.worldToClient(position);
 
-    var center = new THREE.Vector2(position.x, position.y);
-    var v0 = center.clone().sub(endDir);
-    var v1 = center.clone().add(endDir);
+    var center = new THREE.Vector2(clientPosition.x, clientPosition.y);
+    var tail = center.clone().sub(dir);
+    var head = center.clone().add(dir);
 
-    var tail = this.editor.clientToWorld(v0.x, v0.y);
-    var head = this.editor.clientToWorld(v1.x, v1.y);
+    this.tail.set(tail.x, tail.y, 0);
+    this.head.set(head.x, head.y, 0);
 
-    this.tail.set(tail.x, tail.y, tail.z);
-    this.head.set(head.x, head.y, head.z);
+    this.position.x = position.x;
+    this.position.y = position.y;
+    this.position.z = position.z;
 
-    v0.set(this.tail.x, this.tail.y);
-    v1.set(this.head.x, this.head.y);
+    this.size.width = size.width;
 
-    // 计算尺寸
-    this.size.x = v0.distanceTo(v1);
-
-    this.updateStyle();
+    this.update();
 };
 
-CLOUD.Extensions.CommentArrow.prototype.getClientSize = function () {
+CLOUD.Extensions.AnnotationArrow.prototype.getClientSize = function () {
 
-    var tail = this.editor.worldToClient(this.tail.x, this.tail.y, this.tail.z);
-    var head = this.editor.worldToClient(this.head.x, this.head.y, this.head.z);
+    var width, height, xScale, yScale;
+    var containerBound = this.editor.getDomContainerBounds();
 
-    var v0 = new THREE.Vector2(tail.x, tail.y);
-    var v1 = new THREE.Vector2(head.x, head.y);
-    var sizeX = v0.distanceTo(v1);
+    if (this.viewport.width !== 0 && this.viewport.height !== 0) {
 
-    return {x: sizeX, y: this.clientSize.y};
+        xScale = containerBound.width / this.viewport.width;
+        yScale = containerBound.height / this.viewport.height;
+
+        if (xScale >= yScale) {
+            xScale = yScale;
+        }else{
+            yScale = xScale;
+        }
+
+        width = Math.floor(xScale * this.size.width + 0.5);
+        height = this.size.height;
+
+    } else {
+
+        xScale = 1;
+        yScale = 1;
+        width = Math.floor(this.size.width + 0.5);
+        height = this.size.height;
+    }
+
+    return {xScale: xScale, yScale: yScale, width: width, height: height};
 };
 
-CLOUD.Extensions.CommentArrow.prototype.setPosition = function (x, y) {
+CLOUD.Extensions.AnnotationArrow.prototype.resetPosition = function (position) {
 
-    var newPosition = this.editor.clientToWorld(x, y);
+    var dx = this.head.x - this.tail.x;
+    var dy = this.head.y - this.tail.y;
 
-    this.position.x = newPosition.x;
-    this.position.y = newPosition.y;
-    this.position.z = newPosition.z;
+    this.position.x = position.x;
+    this.position.y = position.y;
+    this.position.z = position.z;
 
-    var head = this.head;
-    var tail = this.tail;
+    var clientPosition = this.editor.worldToClient(position);
 
-    var dx = head.x - tail.x;
-    var dy = head.y - tail.y;
+    this.tail.x = clientPosition.x - dx * 0.5;
+    this.tail.y = clientPosition.y - dy * 0.5;
+    this.head.x = this.tail.x + dx;
+    this.head.y = this.tail.y + dy;
 
-    var x0 = newPosition.x - dx * 0.5;
-    var y0 = newPosition.y - dy * 0.5;
-
-    head.x = x0;
-    head.y = y0;
-    head.z = newPosition.z;
-
-    tail.x = x0 + dx;
-    tail.y = y0 + dy;
-    tail.z = newPosition.z;
-
-    this.updateStyle();
+    this.update();
 };
 
-CLOUD.Extensions.CommentArrow.prototype.updateTransformMatrix = function () {
+CLOUD.Extensions.AnnotationArrow.prototype.update = function () {
 
-    var size = this.getClientSize();
+    var strokeColor = this.highlighted ? this.highlightColor : this.style['stroke-color'];
+    var strokeOpacity = this.style['stroke-opacity'];
 
-    this.clientSize.x = size.x;
-    this.clientSize.y = size.y;
-
-    var offsetX = this.clientSize.x * 0.5;
-    var offsetY = this.clientSize.y * 0.5;
-
+    var shapePoints = this.getShapePoints();
+    var mappedPoints = shapePoints.map(function (point) {
+        return point[0] + ',' + point[1];
+    });
+    var pointsStr = mappedPoints.join(' ');
     var position = this.getClientPosition();
+    var size = this.getClientSize();
+    var offsetX = 0.5 * size.width;
+    var offsetY = 0.5 * size.height;
     var positionX = position.x;
     var positionY = position.y;
 
@@ -3066,20 +3296,6 @@ CLOUD.Extensions.CommentArrow.prototype.updateTransformMatrix = function () {
         'rotate(', THREE.Math.radToDeg(this.rotation), ') ',
         'translate(', -offsetX, ',', -offsetY, ') '
     ].join('');
-};
-
-CLOUD.Extensions.CommentArrow.prototype.updateStyle = function () {
-
-    this.updateTransformMatrix();
-
-    var strokeColor = this.highlighted ? this.highlightColor : this.style['stroke-color'];
-    var strokeOpacity = this.style['stroke-opacity'];
-    var shapePoints = this.getShapePoints();
-    var mappedPoints = shapePoints.map(function (point) {
-        return point[0] + ',' + point[1];
-    });
-
-    var pointsStr = mappedPoints.join(' ');
 
     this.shape.setAttribute('points', pointsStr);
     this.shape.setAttribute("transform", this.transformShape);
@@ -3087,12 +3303,11 @@ CLOUD.Extensions.CommentArrow.prototype.updateStyle = function () {
     this.shape.setAttribute('opacity', strokeOpacity);
 };
 
-CLOUD.Extensions.CommentArrow.prototype.getShapePoints = function () {
+CLOUD.Extensions.AnnotationArrow.prototype.getShapePoints = function () {
 
-    //var strokeWidth = this.size.y;
-    //var halfLen = this.size.x * 0.5;
     var strokeWidth = this.style['stroke-width'] * 2;
-    var halfLen = this.clientSize.x * 0.5;
+    var size = this.getClientSize();
+    var halfLen = size.width * 0.5;
     var thickness = strokeWidth;
     var halfThickness = strokeWidth * 0.5;
     var headLen = halfLen - (2.0 * thickness);
@@ -3115,15 +3330,15 @@ CLOUD.Extensions.CommentArrow.prototype.getShapePoints = function () {
     return points;
 };
 
-CLOUD.Extensions.CommentArrow.prototype.renderToCanvas = function (ctx) {
+CLOUD.Extensions.AnnotationArrow.prototype.renderToCanvas = function (ctx) {
 
     var position = this.getClientPosition();
     var size = this.getClientSize();
-    var strokeWidth = this.style['stroke-width'] * 2;
+    var strokeWidth = this.style['stroke-width'] *2;
     var strokeColor = this.style['stroke-color'];
     var strokeOpacity = this.style['stroke-opacity'];
 
-    var offsetX = size.x * 0.5;
+    var offsetX = size.width * 0.5;
     var offsetY = strokeWidth;
     var posX = position.x;
     var posY = position.y;
@@ -3135,7 +3350,7 @@ CLOUD.Extensions.CommentArrow.prototype.renderToCanvas = function (ctx) {
 
     var points = this.getShapePoints();
 
-    ctx.fillStyle = CLOUD.Extensions.Utils.Shape2D.composeRGBAString(strokeColor, strokeOpacity);
+    ctx.fillStyle = CLOUD.Extensions.Utils.Shape2D.getRGBAString(strokeColor, strokeOpacity);
     ctx.beginPath();
 
     points.forEach(function (point) {
@@ -3151,104 +3366,82 @@ CLOUD.Extensions.CommentArrow.prototype.renderToCanvas = function (ctx) {
 };
 
 
-CLOUD.Extensions.CommentRectangle = function (editor, id) {
+CLOUD.Extensions.AnnotationRectangle = function (editor, id) {
 
-    CLOUD.Extensions.Comment.call(this, editor, id);
+    CLOUD.Extensions.Annotation.call(this, editor, id);
 
-    this.shapeType = CLOUD.Extensions.Comment.shapeTypes.RECTANGLE;
+    this.shapeType = CLOUD.Extensions.Annotation.shapeTypes.RECTANGLE;
 
     this.createShape();
     this.addDomEventListeners();
 };
 
-CLOUD.Extensions.CommentRectangle.prototype = Object.create(CLOUD.Extensions.Comment.prototype);
-CLOUD.Extensions.CommentRectangle.prototype.constructor = CLOUD.Extensions.CommentRectangle;
+CLOUD.Extensions.AnnotationRectangle.prototype = Object.create(CLOUD.Extensions.Annotation.prototype);
+CLOUD.Extensions.AnnotationRectangle.prototype.constructor = CLOUD.Extensions.AnnotationRectangle;
 
-CLOUD.Extensions.CommentRectangle.prototype.addDomEventListeners = function () {
+CLOUD.Extensions.AnnotationRectangle.prototype.addDomEventListeners = function () {
 
     this.shape.addEventListener("mousedown", this.onMouseDown.bind(this), true);
     this.shape.addEventListener("mouseout", this.onMouseOut.bind(this));
     this.shape.addEventListener("mouseover", this.onMouseOver.bind(this));
 };
 
-CLOUD.Extensions.CommentRectangle.prototype.removeDomEventListeners = function () {
+CLOUD.Extensions.AnnotationRectangle.prototype.removeDomEventListeners = function () {
 
     this.shape.removeEventListener("mousedown", this.onMouseDown.bind(this), true);
     this.shape.removeEventListener("mouseout", this.onMouseOut.bind(this));
     this.shape.removeEventListener("mouseover", this.onMouseOver.bind(this));
 };
 
-CLOUD.Extensions.CommentRectangle.prototype.createShape = function () {
+CLOUD.Extensions.AnnotationRectangle.prototype.createShape = function () {
     this.shape = CLOUD.Extensions.Utils.Shape2D.createSvgElement('rect');
 };
 
-CLOUD.Extensions.CommentRectangle.prototype.setToWorld = function (position, size, rotation) {
-
-    this.position.x = position.x;
-    this.position.y = position.y;
-    this.position.z = position.z;
-
-    this.size.x = size.x;
-    this.size.y = size.y;
-
-    this.rotation = rotation;
-
-    this.updateStyle();
-};
-
-CLOUD.Extensions.CommentRectangle.prototype.updateTransformMatrix = function () {
+CLOUD.Extensions.AnnotationRectangle.prototype.update = function () {
 
     var strokeWidth = this.style['stroke-width'];
+    var strokeColor = this.highlighted ? this.highlightColor : this.style['stroke-color'];
+    var strokeOpacity = this.style['stroke-opacity'];
+    var fillColor = this.style['fill-color'];
+    var fillOpacity = this.style['fill-opacity'];
 
-    this.clientSize = this.getClientSize();
-    this.clientPosition = this.getClientPosition();
+    var size = this.getClientSize();
+    var position = this.getClientPosition();
 
-    var offsetX = Math.max(this.clientSize.x - strokeWidth, 0) * 0.5;
-    var offsetY = Math.max(this.clientSize.y - strokeWidth, 0) * 0.5;
+    var offsetX = Math.max(size.width - strokeWidth, 0) * 0.5;
+    var offsetY = Math.max(size.height - strokeWidth, 0) * 0.5;
 
     this.transformShape = [
-        'translate(', this.clientPosition.x, ',', this.clientPosition.y, ') ',
+        'translate(', position.x, ',', position.y, ') ',
         'rotate(', THREE.Math.radToDeg(this.rotation), ') ',
         'translate(', -offsetX, ',', -offsetY, ') '
     ].join('');
-};
-
-CLOUD.Extensions.CommentRectangle.prototype.updateStyle = function () {
-
-    this.updateTransformMatrix();
-
-    var strokeWidth = this.style['stroke-width'];
-    var strokeColor = this.highlighted ? this.highlightColor : this.style['stroke-color'];
-    var strokeOpacity = this.style['stroke-opacity'];
-    var fillColor = this.style['fill-color'];
-    var fillOpacity = this.style['fill-opacity'];
 
     this.shape.setAttribute('transform', this.transformShape);
     this.shape.setAttribute('stroke-width', strokeWidth);
-    //this.shape.setAttribute('stroke', strokeColor);
-    //this.shape.setAttribute('stroke-opacity', strokeOpacity);
-    this.shape.setAttribute("stroke", CLOUD.Extensions.Utils.Shape2D.composeRGBAString(strokeColor, strokeOpacity));
-    //this.shape.setAttribute('fill', fillColor);
-    //this.shape.setAttribute('fill-opacity', fillOpacity);
-    this.shape.setAttribute('fill', CLOUD.Extensions.Utils.Shape2D.composeRGBAString(fillColor, fillOpacity));
-    this.shape.setAttribute('width', Math.max(this.clientSize.x - strokeWidth, 0) + '');
-    this.shape.setAttribute('height', Math.max(this.clientSize.y - strokeWidth, 0) + '');
+    this.shape.setAttribute("stroke", CLOUD.Extensions.Utils.Shape2D.getRGBAString(strokeColor, strokeOpacity));
+    this.shape.setAttribute('fill', CLOUD.Extensions.Utils.Shape2D.getRGBAString(fillColor, fillOpacity));
+    this.shape.setAttribute('width', Math.max(size.width - strokeWidth, 0) + '');
+    this.shape.setAttribute('height', Math.max(size.height - strokeWidth, 0) + '');
 };
 
-CLOUD.Extensions.CommentRectangle.prototype.renderToCanvas = function (ctx) {
+CLOUD.Extensions.AnnotationRectangle.prototype.renderToCanvas = function (ctx) {
 
     var strokeWidth = this.style['stroke-width'];
     var strokeColor = this.highlighted ? this.highlightColor : this.style['stroke-color'];
     var strokeOpacity = this.style['stroke-opacity'];
     var fillColor = this.style['fill-color'];
     var fillOpacity = this.style['fill-opacity'];
-    var width = this.clientSize.x - strokeWidth;
-    var height = this.clientSize.y - strokeWidth;
 
-    ctx.strokeStyle = CLOUD.Extensions.Utils.Shape2D.composeRGBAString(strokeColor, strokeOpacity);
-    ctx.fillStyle = CLOUD.Extensions.Utils.Shape2D.composeRGBAString(fillColor, fillOpacity);
+    var size = this.getClientSize();
+    var position = this.getClientPosition();
+    var width = size.width - strokeWidth;
+    var height = size.height - strokeWidth;
+
+    ctx.strokeStyle = CLOUD.Extensions.Utils.Shape2D.getRGBAString(strokeColor, strokeOpacity);
+    ctx.fillStyle = CLOUD.Extensions.Utils.Shape2D.getRGBAString(fillColor, fillOpacity);
     ctx.lineWidth = strokeWidth;
-    ctx.translate(this.clientPosition.x, this.clientPosition.y);
+    ctx.translate(position.x, position.y);
     ctx.rotate(this.rotation);
 
     if (fillOpacity !== 0) {
@@ -3258,69 +3451,38 @@ CLOUD.Extensions.CommentRectangle.prototype.renderToCanvas = function (ctx) {
     ctx.strokeRect(width / -2, height / -2, width, height);
 };
 
-CLOUD.Extensions.CommentCircle = function (editor, id) {
+CLOUD.Extensions.AnnotationCircle = function (editor, id) {
 
-    CLOUD.Extensions.Comment.call(this, editor, id);
+    CLOUD.Extensions.Annotation.call(this, editor, id);
 
-    this.shapeType = CLOUD.Extensions.Comment.shapeTypes.CIRCLE;
+    this.shapeType = CLOUD.Extensions.Annotation.shapeTypes.CIRCLE;
 
     this.createShape();
     this.addDomEventListeners();
 };
 
-CLOUD.Extensions.CommentCircle.prototype = Object.create(CLOUD.Extensions.Comment.prototype);
-CLOUD.Extensions.CommentCircle.prototype.constructor = CLOUD.Extensions.CommentCircle;
+CLOUD.Extensions.AnnotationCircle.prototype = Object.create(CLOUD.Extensions.Annotation.prototype);
+CLOUD.Extensions.AnnotationCircle.prototype.constructor = CLOUD.Extensions.AnnotationCircle;
 
-CLOUD.Extensions.CommentCircle.prototype.addDomEventListeners = function () {
+CLOUD.Extensions.AnnotationCircle.prototype.addDomEventListeners = function () {
 
     this.shape.addEventListener("mousedown", this.onMouseDown.bind(this), true);
     this.shape.addEventListener("mouseout", this.onMouseOut.bind(this));
     this.shape.addEventListener("mouseover", this.onMouseOver.bind(this));
 };
 
-CLOUD.Extensions.CommentCircle.prototype.removeDomEventListeners = function () {
+CLOUD.Extensions.AnnotationCircle.prototype.removeDomEventListeners = function () {
 
     this.shape.removeEventListener("mousedown", this.onMouseDown.bind(this), true);
     this.shape.removeEventListener("mouseout", this.onMouseOut.bind(this));
     this.shape.removeEventListener("mouseover", this.onMouseOver.bind(this));
 };
 
-CLOUD.Extensions.CommentCircle.prototype.createShape = function () {
+CLOUD.Extensions.AnnotationCircle.prototype.createShape = function () {
     this.shape = CLOUD.Extensions.Utils.Shape2D.createSvgElement('ellipse');
 };
 
-CLOUD.Extensions.CommentCircle.prototype.setToWorld = function (position, size, rotation) {
-
-    this.position.x = position.x;
-    this.position.y = position.y;
-    this.position.z = position.z;
-
-    this.size.x = size.x;
-    this.size.y = size.y;
-
-    this.rotation = rotation;
-
-    this.updateStyle();
-};
-
-CLOUD.Extensions.CommentCircle.prototype.updateTransformMatrix = function () {
-
-    var strokeWidth = this.style['stroke-width'];
-    var position = this.getClientPosition();
-    var size = this.getClientSize();
-    var offsetX = (size.x - strokeWidth) * 0.5;
-    var offsetY = (size.y - strokeWidth) * 0.5;
-
-    this.transformShape = [
-        'translate(', position.x, ',', position.y, ') ',
-        'rotate(', THREE.Math.radToDeg(this.rotation), ') ',
-        'translate(', -offsetX, ',', -offsetY, ') '
-    ].join('');
-};
-
-CLOUD.Extensions.CommentCircle.prototype.updateStyle = function () {
-
-    this.updateTransformMatrix();
+CLOUD.Extensions.AnnotationCircle.prototype.update = function () {
 
     var strokeWidth = this.style['stroke-width'];
     var strokeColor = this.highlighted ? this.highlightColor : this.style['stroke-color'];
@@ -3328,26 +3490,28 @@ CLOUD.Extensions.CommentCircle.prototype.updateStyle = function () {
     var fillColor = this.style['fill-color'];
     var fillOpacity = this.style['fill-opacity'];
 
+    var position = this.getClientPosition();
     var size = this.getClientSize();
+    var offsetX = Math.max(size.width - strokeWidth, 0) * 0.5;
+    var offsetY = Math.max(size.height - strokeWidth, 0) * 0.5;
 
-    var radX = Math.max(size.x - strokeWidth, 0) * 0.5;
-    var radY = Math.max(size.y - strokeWidth, 0) * 0.5;
+    this.transformShape = [
+        'translate(', position.x, ',', position.y, ') ',
+        'rotate(', THREE.Math.radToDeg(this.rotation), ') ',
+        'translate(', -offsetX, ',', -offsetY, ') '
+    ].join('');
 
     this.shape.setAttribute("transform", this.transformShape);
     this.shape.setAttribute("stroke-width", strokeWidth);
-    //this.shape.setAttribute("stroke", strokeColor);
-    //this.shape.setAttribute("stroke-opacity", strokeOpacity);
-    this.shape.setAttribute("stroke", CLOUD.Extensions.Utils.Shape2D.composeRGBAString(strokeColor, strokeOpacity));
-    //this.shape.setAttribute('fill', fillColor);
-    //this.shape.setAttribute('fill-opacity', fillOpacity);
-    this.shape.setAttribute('fill', CLOUD.Extensions.Utils.Shape2D.composeRGBAString(fillColor, fillOpacity));
-    this.shape.setAttribute('cx', radX);
-    this.shape.setAttribute('cy', radY);
-    this.shape.setAttribute('rx', radX);
-    this.shape.setAttribute('ry', radY);
+    this.shape.setAttribute("stroke", CLOUD.Extensions.Utils.Shape2D.getRGBAString(strokeColor, strokeOpacity));
+    this.shape.setAttribute('fill', CLOUD.Extensions.Utils.Shape2D.getRGBAString(fillColor, fillOpacity));
+    this.shape.setAttribute('cx', offsetX);
+    this.shape.setAttribute('cy', offsetY);
+    this.shape.setAttribute('rx', offsetX);
+    this.shape.setAttribute('ry', offsetY);
 };
 
-CLOUD.Extensions.CommentCircle.prototype.renderToCanvas = function (ctx) {
+CLOUD.Extensions.AnnotationCircle.prototype.renderToCanvas = function (ctx) {
 
     function ellipse(ctx, cx, cy, w, h) {
 
@@ -3377,146 +3541,117 @@ CLOUD.Extensions.CommentCircle.prototype.renderToCanvas = function (ctx) {
     var fillOpacity = this.style['fill-opacity'];
 
     var position = this.getClientPosition();
-    var clientSize = this.getClientSize();
+    var size = this.getClientSize();
+    var width = size.width - strokeWidth;
+    var height = size.height - strokeWidth;
 
-    var width = clientSize.x - strokeWidth;
-    var height = clientSize.y - strokeWidth;
-    var size = {x: width, y: height};
-    var center = {x: position.x, y: position.y};
-
-    ctx.strokeStyle = CLOUD.Extensions.Utils.Shape2D.composeRGBAString(strokeColor, strokeOpacity);
-    ctx.fillStyle = CLOUD.Extensions.Utils.Shape2D.composeRGBAString(fillColor, fillOpacity);
+    ctx.strokeStyle = CLOUD.Extensions.Utils.Shape2D.getRGBAString(strokeColor, strokeOpacity);
+    ctx.fillStyle = CLOUD.Extensions.Utils.Shape2D.getRGBAString(fillColor, fillOpacity);
     ctx.lineWidth = strokeWidth;
-    ctx.translate(center.x, center.y);
+    ctx.translate(position.x, position.y);
     ctx.rotate(this.rotation);
-    //ctx.translate(-0.5 * width, -0.5 * height);
-    ctx.beginPath();
 
-    ellipse(ctx, 0, 0, size.x, size.y);
+    //ctx.beginPath();
+
+    ellipse(ctx, 0, 0, width, height);
 
     if (fillOpacity !== 0) {
         ctx.fill();
     }
 
-    ctx.stroke();
+    //ctx.stroke();
 };
-CLOUD.Extensions.CommentCloud = function (editor, id) {
+CLOUD.Extensions.AnnotationCloud = function (editor, id) {
 
-    CLOUD.Extensions.Comment.call(this, editor, id);
+    CLOUD.Extensions.Annotation.call(this, editor, id);
 
-    this.shapeType = CLOUD.Extensions.Comment.shapeTypes.CLOUD;
+    this.shapeType = CLOUD.Extensions.Annotation.shapeTypes.CLOUD;
     this.shapePoints = [];
     this.shapePath = [];
-    this.shapeControlPoints = [];
-
-    this.lastClientShapePoint = {x: 0, y: 0};
-
+    this.trackingPoint = {x: 0, y: 0};
     this.isSeal = false; // 是否封口
-
-    this.trackingPoint = {x: 0, y: 0, z:0};
-    this.isTrack = false;
+    this.isTracking = false;
     this.isEnableTrack = false;
+    this.initialSize = {};
 
     this.createShape();
     this.addDomEventListeners();
 };
 
-CLOUD.Extensions.CommentCloud.prototype = Object.create(CLOUD.Extensions.Comment.prototype);
-CLOUD.Extensions.CommentCloud.prototype.constructor = CLOUD.Extensions.CommentCloud;
+CLOUD.Extensions.AnnotationCloud.prototype = Object.create(CLOUD.Extensions.Annotation.prototype);
+CLOUD.Extensions.AnnotationCloud.prototype.constructor = CLOUD.Extensions.AnnotationCloud;
 
-CLOUD.Extensions.CommentCloud.prototype.addDomEventListeners = function () {
+CLOUD.Extensions.AnnotationCloud.prototype.addDomEventListeners = function () {
 
     this.shape.addEventListener("mousedown", this.onMouseDown.bind(this), true);
     this.shape.addEventListener("mouseout", this.onMouseOut.bind(this));
     this.shape.addEventListener("mouseover", this.onMouseOver.bind(this));
 };
 
-CLOUD.Extensions.CommentCloud.prototype.removeDomEventListeners = function () {
+CLOUD.Extensions.AnnotationCloud.prototype.removeDomEventListeners = function () {
 
     this.shape.removeEventListener("mousedown", this.onMouseDown.bind(this), true);
     this.shape.removeEventListener("mouseout", this.onMouseOut.bind(this));
     this.shape.removeEventListener("mouseover", this.onMouseOver.bind(this));
 };
 
-CLOUD.Extensions.CommentCloud.prototype.createShape = function () {
+CLOUD.Extensions.AnnotationCloud.prototype.createShape = function () {
     this.shape = CLOUD.Extensions.Utils.Shape2D.createSvgElement('path');
 };
 
-CLOUD.Extensions.CommentCloud.prototype.setToWorld = function (shapePointsStr, rotation, isSeal) {
+CLOUD.Extensions.AnnotationCloud.prototype.setByPositions = function (positions, viewport, isSeal) {
 
-    this.setShapePoints(shapePointsStr);
-    this.rotation = rotation;
-    this.isSeal = isSeal;
+    this.positions = positions.concat();
 
-    this.updateStyle();
-};
+    this.isSeal = isSeal || false;
 
-CLOUD.Extensions.CommentCloud.prototype.setPosition = function (x, y) {
-
-    var len = this.shapePoints.length;
-
-    var worldPosition = this.editor.clientToWorld(x, y);
-    var dx = worldPosition.x - this.position.x;
-    var dy = worldPosition.y - this.position.y;
-    var dz = worldPosition.z - this.position.z;
-
-    this.position.x = worldPosition.x;
-    this.position.y = worldPosition.y;
-    this.position.z = worldPosition.z;
-
-    for (var i = 0; i < len; i++) {
-        this.shapePoints[i].x += dx;
-        this.shapePoints[i].y += dy;
-        this.shapePoints[i].z += dz;
+    if (viewport) {
+        this.setViewport(viewport);
     }
 
-    this.updateStyle();
+    // 计算位置及大小
+    this.calculatePosition(true);
+
+    this.initialSize.width = (this.size.width === 0) ? 1 : this.size.width;
+    this.initialSize.height = (this.size.height === 0) ? 1 : this.size.height;
+
+    this.update();
 };
 
-CLOUD.Extensions.CommentCloud.prototype.setSize = function (width, height, position) {
+CLOUD.Extensions.AnnotationCloud.prototype.set = function (position, size, rotation, viewport, shapePointsStr) {
 
-    var worldPosition = this.editor.clientToWorld(position.x, position.y);
-    this.position.x = worldPosition.x;
-    this.position.y = worldPosition.y;
-    this.position.z = worldPosition.z;
-
-    var left = this.editor.clientToWorld(position.x - 0.5 * width, position.y - 0.5 * height);
-    var right = this.editor.clientToWorld(position.x + 0.5 * width, position.y + 0.5 * height);
-    this.size.x = Math.abs(right.x - left.x);
-    this.size.y = Math.abs(right.y - left.y);
-
-    this.updateStyle();
-};
-
-CLOUD.Extensions.CommentCloud.prototype.updateTransformMatrix = function () {
-
-    var box = this.getBoundingBox();
-    var posX = box.x + 0.5 * box.width;
-    var posY = box.y + 0.5 * box.height;
-
-    var position = this.editor.clientToWorld(posX, posY);
     this.position.x = position.x;
     this.position.y = position.y;
     this.position.z = position.z;
+    this.size.width = size.width;
+    this.size.height = size.height;
+    this.rotation = rotation || 0;
 
-    var left = this.editor.clientToWorld(position.x - 0.5 * box.width, position.y - 0.5 * box.height);
-    var right = this.editor.clientToWorld(position.x + 0.5 * box.width, position.y + 0.5 * box.height);
-    this.size.x = Math.abs(right.x - left.x);
-    this.size.y = Math.abs(right.y - left.y);
+    this.initialSize.width = (this.size.width === 0) ? 1 : this.size.width;
+    this.initialSize.height = (this.size.height === 0) ? 1 : this.size.height;
 
-    this.transformShape = [
-        'translate(', posX, ',', posY, ') ',
-        'rotate(', THREE.Math.radToDeg(this.rotation), ') ',
-        'translate(', -posX, ',', -posY, ') '
-    ].join('');
+    if (viewport) {
+        this.setViewport(viewport);
+    }
+
+    this.setShapePoints(shapePointsStr);
+
+    this.update();
 };
 
-CLOUD.Extensions.CommentCloud.prototype.updateStyle = function () {
+CLOUD.Extensions.AnnotationCloud.prototype.setTrackingPoint = function (point) {
 
-    // 小于两个点，不处理
+    this.trackingPoint.x = point.x;
+    this.trackingPoint.y = point.y;
+
+    this.calculatePosition(false);
+
+    this.update();
+};
+
+CLOUD.Extensions.AnnotationCloud.prototype.update = function () {
+
     if (this.shapePoints.length < 1) return;
-
-    this.updateTransformMatrix();
 
     var shapePathStr = this.getPathString();
     var strokeWidth = this.style['stroke-width'];
@@ -3525,17 +3660,86 @@ CLOUD.Extensions.CommentCloud.prototype.updateStyle = function () {
     var fillColor = this.style['fill-color'];
     var fillOpacity = this.style['fill-opacity'];
 
+    var position = this.getClientPosition();
+    var size = this.getClientSize();
+    var scaleX = size.width / this.initialSize.width ;
+    var scaleY = size.height / this.initialSize.height;
+
+    this.transformShape = [
+        'translate(', position.x, ',', position.y, ') ',
+        'rotate(', THREE.Math.radToDeg(this.rotation), ') ',
+        'scale(', scaleX, ',', scaleY, ') '
+    ].join('');
+
     this.shape.setAttribute("transform", this.transformShape);
     this.shape.setAttribute("stroke-width", strokeWidth);
-    this.shape.setAttribute("stroke", strokeColor);
-    this.shape.setAttribute("stroke-opacity", strokeOpacity);
-    this.shape.setAttribute('fill', fillColor);
-    this.shape.setAttribute('fill-opacity', fillOpacity);
+    this.shape.setAttribute("stroke", CLOUD.Extensions.Utils.Shape2D.getRGBAString(strokeColor, strokeOpacity));
+    this.shape.setAttribute('fill', CLOUD.Extensions.Utils.Shape2D.getRGBAString(fillColor, fillOpacity));
     this.shape.setAttribute('d', shapePathStr);
 };
 
+CLOUD.Extensions.AnnotationCloud.prototype.getPathString = function () {
+
+    var path = this.shapePoints.map(function(point, i){
+        if (i === 0) {
+            return ['M'].concat([point.x, point.y]).join(' ');
+        } else {
+            return ['Q'].concat([point.cx, point.cy, point.x, point.y ]).join(' ');
+        }
+    }).join(' ');
+
+    return path;
+};
+
+// 设置形状点集
+CLOUD.Extensions.AnnotationCloud.prototype.setShapePoints = function (shapeStr) {
+
+    var shapePoints = shapeStr.split(',');
+
+    this.shapePoints = [];
+
+    var x0 = parseFloat(shapePoints[0]);
+    var y0 = parseFloat(shapePoints[1]);
+
+    this.shapePoints.push({x: x0, y: y0});
+
+    for (var i = 2, len = shapePoints.length; i < len; i += 4) {
+
+        var cx = parseFloat(shapePoints[i]);
+        var cy = parseFloat(shapePoints[i + 1]);
+        var x = parseFloat(shapePoints[i + 2]);
+        var y = parseFloat(shapePoints[i + 3]);
+
+        this.shapePoints.push({cx: cx, cy: cy, x: x, y: y});
+    }
+};
+
+// 获得形状点集字符串（用“，”分割）
+CLOUD.Extensions.AnnotationCloud.prototype.getShapePoints = function () {
+
+    var points = [];
+
+    for (var i = 0, len = this.shapePoints.length; i < len; i++) {
+
+        if (i === 0) {
+
+            points.push(this.shapePoints[i].x);
+            points.push(this.shapePoints[i].y);
+
+        } else {
+
+            points.push(this.shapePoints[i].cx);
+            points.push(this.shapePoints[i].cy);
+            points.push(this.shapePoints[i].x);
+            points.push(this.shapePoints[i].y);
+        }
+    }
+
+    return points.join(',');
+};
+
 // 计算控制点
-CLOUD.Extensions.CommentCloud.prototype.calculateControlPoint = function (startPoint, endPoint) {
+CLOUD.Extensions.AnnotationCloud.prototype.getControlPoint = function (startPoint, endPoint) {
 
     var start = new THREE.Vector2(startPoint.x, startPoint.y);
     var end = new THREE.Vector2(endPoint.x, endPoint.y);
@@ -3556,16 +3760,40 @@ CLOUD.Extensions.CommentCloud.prototype.calculateControlPoint = function (startP
     };
 };
 
-CLOUD.Extensions.CommentCloud.prototype.calculateShapePath = function () {
+CLOUD.Extensions.AnnotationCloud.prototype.getBoundingBox = function () {
 
-    // 根据形状点构造path
-    var shapePath = [];
-    var shapeControlPoints = [];
-    var len = this.shapePoints.length;
+    var box = new THREE.Box2();
+    var point = new THREE.Vector2();
+
+    for (var i = 0, len = this.shapePoints.length; i < len; i++) {
+
+        if (i === 0) {
+
+            point.set(this.shapePoints[i].x, this.shapePoints[i].y);
+            box.expandByPoint(point);
+
+        } else {
+
+            point.set(this.shapePoints[i].cx, this.shapePoints[i].cy);
+            box.expandByPoint(point);
+
+            point.set(this.shapePoints[i].x, this.shapePoints[i].y);
+            box.expandByPoint(point);
+        }
+    }
+
+    return box;
+};
+
+CLOUD.Extensions.AnnotationCloud.prototype.calculateShapePath = function () {
+
     var originShapePoint = {};
     var currentShapePoint = {};
     var lastShapePoint = {};
-    var controlPoint, clientShapePoint;
+    var controlPoint;
+
+    var len = this.positions.length;
+    this.shapePoints = [];
 
     if (len < 1) {
         return;
@@ -3573,32 +3801,17 @@ CLOUD.Extensions.CommentCloud.prototype.calculateShapePath = function () {
 
     if (len === 1) {
 
-        clientShapePoint = this.editor.worldToClient(this.shapePoints[0].x, this.shapePoints[0].y, this.shapePoints[0].z);
-        currentShapePoint.x = clientShapePoint.x;
-        currentShapePoint.y = clientShapePoint.y;
+        currentShapePoint.x = this.positions[0].x;
+        currentShapePoint.y = this.positions[0].y;
 
-        shapePath.push('M');
-        shapePath.push(currentShapePoint.x);
-        shapePath.push(currentShapePoint.y);
+        this.shapePoints.push({x: this.positions[0].x, y: this.positions[0].y});
 
-        lastShapePoint.x = currentShapePoint.x;
-        lastShapePoint.y = currentShapePoint.y;
-
-        if (this.isTrack) {
-
-            var trackingPoint = this.editor.worldToClient(this.trackingPoint.x, this.trackingPoint.y, this.trackingPoint.z);
+        if (this.isTracking) {
 
             // 计算控制点
-            controlPoint = this.calculateControlPoint(lastShapePoint, trackingPoint);
-            shapeControlPoints.push(controlPoint.x);
-            shapeControlPoints.push(controlPoint.y);
+            controlPoint = this.getControlPoint(currentShapePoint, this.trackingPoint);
 
-            shapePath.push('Q');
-            shapePath.push(controlPoint.x);
-            shapePath.push(controlPoint.y);
-            shapePath.push(',');
-            shapePath.push(trackingPoint.x);
-            shapePath.push(trackingPoint.y);
+            this.shapePoints.push({cx: controlPoint.x, cy: controlPoint.y, x: this.trackingPoint.x, y: this.trackingPoint.y});
 
         }
 
@@ -3606,35 +3819,25 @@ CLOUD.Extensions.CommentCloud.prototype.calculateShapePath = function () {
 
         for (var i = 0; i < len; i++) {
 
-            clientShapePoint = this.editor.worldToClient(this.shapePoints[i].x, this.shapePoints[i].y, this.shapePoints[i].z);
-            currentShapePoint.x = clientShapePoint.x;
-            currentShapePoint.y = clientShapePoint.y;
+            currentShapePoint.x = this.positions[i].x;
+            currentShapePoint.y = this.positions[i].y;
 
-            if (i === 0) { // 第一个点
+            if (i === 0) {
 
-                shapePath.push('M');
-                shapePath.push(currentShapePoint.x);
-                shapePath.push(currentShapePoint.y);
+                this.shapePoints.push({x: this.positions[i].x, y: this.positions[i].y});
 
-                originShapePoint.x = currentShapePoint.x;
-                originShapePoint.y = currentShapePoint.y;
+                lastShapePoint.x = this.positions[i].x;
+                lastShapePoint.y = this.positions[i].y;
 
-                lastShapePoint.x = currentShapePoint.x;
-                lastShapePoint.y = currentShapePoint.y;
+                originShapePoint.x = this.positions[i].x;
+                originShapePoint.y = this.positions[i].y;
 
             } else {
 
                 // 计算控制点
-                controlPoint = this.calculateControlPoint(lastShapePoint, currentShapePoint);
-                shapeControlPoints.push(controlPoint.x);
-                shapeControlPoints.push(controlPoint.y);
+                controlPoint = this.getControlPoint(lastShapePoint, currentShapePoint);
 
-                shapePath.push('Q');
-                shapePath.push(controlPoint.x);
-                shapePath.push(controlPoint.y);
-                shapePath.push(',');
-                shapePath.push(currentShapePoint.x);
-                shapePath.push(currentShapePoint.y);
+                this.shapePoints.push({cx: controlPoint.x, cy: controlPoint.y, x: currentShapePoint.x, y: currentShapePoint.y});
 
                 lastShapePoint.x = currentShapePoint.x;
                 lastShapePoint.y = currentShapePoint.y;
@@ -3642,36 +3845,18 @@ CLOUD.Extensions.CommentCloud.prototype.calculateShapePath = function () {
                 // 最后一个点, 处理封口
                 if (i === len - 1) {
 
-                    if (this.isTrack) {
-
-                        var trackingPoint = this.editor.worldToClient(this.trackingPoint.x, this.trackingPoint.y, this.trackingPoint.z);
+                    if (this.isTracking) {
 
                         // 计算控制点
-                        controlPoint = this.calculateControlPoint(lastShapePoint, trackingPoint);
-                        shapeControlPoints.push(controlPoint.x);
-                        shapeControlPoints.push(controlPoint.y);
+                        controlPoint = this.getControlPoint(lastShapePoint, this.trackingPoint);
 
-                        shapePath.push('Q');
-                        shapePath.push(controlPoint.x);
-                        shapePath.push(controlPoint.y);
-                        shapePath.push(',');
-                        shapePath.push(trackingPoint.x);
-                        shapePath.push(trackingPoint.y);
+                        this.shapePoints.push({cx: controlPoint.x, cy: controlPoint.y, x: this.trackingPoint.x, y: this.trackingPoint.y});
 
                     } else if (this.isSeal) {
-
                         // 计算控制点
-                        controlPoint = this.calculateControlPoint(lastShapePoint, originShapePoint);
-                        shapeControlPoints.push(controlPoint.x);
-                        shapeControlPoints.push(controlPoint.y);
+                        controlPoint = this.getControlPoint(lastShapePoint, originShapePoint);
 
-                        shapePath.push('Q');
-                        shapePath.push(controlPoint.x);
-                        shapePath.push(controlPoint.y);
-                        shapePath.push(',');
-                        shapePath.push(originShapePoint.x);
-                        shapePath.push(originShapePoint.y);
-                        shapePath.push('Z');
+                        this.shapePoints.push({cx: controlPoint.x, cy: controlPoint.y, x: originShapePoint.x, y: originShapePoint.y});
                     }
 
                 }
@@ -3679,210 +3864,118 @@ CLOUD.Extensions.CommentCloud.prototype.calculateShapePath = function () {
         }
     }
 
-    this.shapePath = shapePath;
-    this.shapeControlPoints = shapeControlPoints;
 };
 
-CLOUD.Extensions.CommentCloud.prototype.getPathString = function () {
+CLOUD.Extensions.AnnotationCloud.prototype.calculateRelativePosition = function (center) {
 
-    return this.shapePath.join(' ');
+    // 计算相对位置
+    for (var i = 0, len = this.shapePoints.length; i < len; i++) {
+
+        if (i === 0) {
+
+            this.shapePoints[i].x -= center.x;
+            this.shapePoints[i].y -= center.y;
+
+        } else {
+
+            this.shapePoints[i].x -= center.x;
+            this.shapePoints[i].y -= center.y;
+            this.shapePoints[i].cx -= center.x;
+            this.shapePoints[i].cy -= center.y;
+        }
+    }
 };
 
+CLOUD.Extensions.AnnotationCloud.prototype.calculatePosition = function (force) {
 
-CLOUD.Extensions.CommentCloud.prototype.addPoint = function (point) {
+    force = force || false;
 
-    var len = this.shapePoints.length;
+    // 计算控制点
+    this.calculateShapePath();
 
-    if (len === 0) {
+    if (force) {
 
-        var worldPoint = this.editor.clientToWorld(point.x, point.y);
-        this.shapePoints.push({x: worldPoint.x, y: worldPoint.y, z: worldPoint.z});
-        this.lastClientShapePoint.x = point.x;
-        this.lastClientShapePoint.y = point.y;
+        var box = this.getBoundingBox();
+
+        var center = box.center();
+
+        this.center = {x: center.x, y: center.y};
+        //var size = box.size();
+
+        var position = this.editor.clientToWorld({x: center.x, y: center.y});
+
+        this.position.x  = position.x;
+        this.position.y  = position.y;
+        this.position.z = position.z;
+
+        // 计算相对位置
+        this.calculateRelativePosition(center);
+
+        // 重计算包围盒
+        box = this.getBoundingBox();
+
+        var size = box.size();
+
+        this.size.width = size.x || 16;
+        this.size.height = size.y || 16;
 
     } else {
 
-        var epsilon = 1; // 相差一个像素
+        if (this.center) {
 
-        // 判断是否同一个点, 同一个点不加入集合
-        if (!CLOUD.Extensions.Utils.Geometric.isEqualBetweenPoints(this.lastClientShapePoint, point, epsilon)) {
-
-            //this.shapePoints.push(point.x);
-            //this.shapePoints.push(point.y);
-
-            var worldPoint = this.editor.clientToWorld(point.x, point.y);
-            this.shapePoints.push({x: worldPoint.x, y: worldPoint.y, z: worldPoint.z});
-            this.lastClientShapePoint.x = point.x;
-            this.lastClientShapePoint.y = point.y;
+            // 计算相对位置
+            this.calculateRelativePosition(this.center);
         }
+
     }
-
-    this.updateStyle();
 };
 
-CLOUD.Extensions.CommentCloud.prototype.setTrackingPoint = function (point) {
-
-    var worldPoint = this.editor.clientToWorld(point.x, point.y);
-    this.trackingPoint.x = worldPoint.x;
-    this.trackingPoint.y = worldPoint.y;
-    this.trackingPoint.z = worldPoint.z;
-
-    this.updateStyle();
+CLOUD.Extensions.AnnotationCloud.prototype.startTrack = function () {
+    this.isTracking = true;
 };
 
-CLOUD.Extensions.CommentCloud.prototype.startTrack = function () {
-    this.isTrack = true;
+CLOUD.Extensions.AnnotationCloud.prototype.finishTrack = function () {
+    this.isTracking = false;
 };
 
-CLOUD.Extensions.CommentCloud.prototype.finishTrack = function () {
-    this.isTrack = false;
-};
-
-CLOUD.Extensions.CommentCloud.prototype.enableTrack = function () {
+CLOUD.Extensions.AnnotationCloud.prototype.enableTrack = function () {
     this.isEnableTrack = true;
 };
 
-CLOUD.Extensions.CommentCloud.prototype.disableTrack = function () {
+CLOUD.Extensions.AnnotationCloud.prototype.disableTrack = function () {
     this.isEnableTrack = false;
 };
 
-CLOUD.Extensions.CommentCloud.prototype.getTrackState = function () {
+CLOUD.Extensions.AnnotationCloud.prototype.getTrackState = function () {
     return this.isEnableTrack;
 };
 
-CLOUD.Extensions.CommentCloud.prototype.getBoundingBox = function () {
-
-    var box = new THREE.Box2();
-    var i, len = this.shapePoints.length;
-    var point = new THREE.Vector2();
-
-    for (i = 0; i < len; i++) {
-        var client = this.editor.worldToClient(this.shapePoints[i].x, this.shapePoints[i].y, this.shapePoints[i].z);
-        point.set(client.x, client.y);
-        box.expandByPoint(point);
-    }
-
-    // 计算path
-    this.calculateShapePath();
-
-    len = this.shapeControlPoints.length;
-
-    for (i = 0; i < len; i += 2) {
-
-        point.set(this.shapeControlPoints[i], this.shapeControlPoints[i + 1]);
-        box.expandByPoint(point);
-    }
-
-    var center = box.center();
-    var size = box.size();
-
-    return {
-        x: center.x - 0.5 * size.x,
-        y: center.y - 0.5 * size.y,
-        width: size.x,
-        height: size.y
-    };
-
-    //return this.shape.getBBox();
-};
-
-CLOUD.Extensions.CommentCloud.prototype.setSeal = function (isSeal) {
+CLOUD.Extensions.AnnotationCloud.prototype.setSeal = function (isSeal) {
 
     this.isSeal = isSeal;
 
-    this.updateStyle();
+    this.calculatePosition(true);
+    this.update();
 };
 
-// 设置形状点集
-CLOUD.Extensions.CommentCloud.prototype.setShapePoints = function (shapeStr) {
-
-    //var scope = this;
-    var shapePoints = shapeStr.split(',');
-
-    this.shapePoints = [];
-
-    for (var i = 0, len = shapePoints.length; i < len; i += 3) {
-
-        var x = parseFloat(shapePoints[i]);
-        var y = parseFloat(shapePoints[i + 1]);
-        var z = parseFloat(shapePoints[i + 2]);
-
-        this.shapePoints.push({x: x, y: y, z: z});
-    }
-
-    //shapePoints.forEach(function (point) {
-    //    scope.shapePoints.push(parseInt(point));
-    //});
-};
-
-// 获得形状点集字符串（用“，”分割）
-CLOUD.Extensions.CommentCloud.prototype.getShapePoints = function () {
-
-    var points = [];
-
-    for (var i = 0, len = this.shapePoints.length; i < len; i++) {
-        points.push(this.shapePoints[i].x);
-        points.push(this.shapePoints[i].y);
-        points.push(this.shapePoints[i].z);
-    }
-
-    //return this.shapePoints.join(',');
-
-    return points.join(',');
-};
-
-CLOUD.Extensions.CommentCloud.prototype.renderToCanvas = function (ctx) {
+CLOUD.Extensions.AnnotationCloud.prototype.renderToCanvas = function (ctx) {
 
     // 小于两个点，不处理
     if (this.shapePoints.length < 2) return;
 
-    var scope = this;
-
-
-    function drawCloud(ctx, points, isSeal) {
-
-        var len = points.length;
-        var originShapePoint = {};
-        var currentShapePoint = {};
-        var lastShapePoint = {};
-        var controlPoint, clientShapePoint;
+    function drawCloud(ctx, points) {
 
         ctx.beginPath();
 
-        for (var i = 0; i < len; i++) {
-
-            clientShapePoint = scope.editor.worldToClient(points[i].x, points[i].y, points[i].z);
-            currentShapePoint.x = clientShapePoint.x;
-            currentShapePoint.y = clientShapePoint.y;
+        for (var i = 0, len = points.length; i < len; i++) {
 
             if (i === 0) { // 第一个点
 
-                ctx.moveTo(currentShapePoint.x, currentShapePoint.y);
-
-                originShapePoint.x = currentShapePoint.x;
-                originShapePoint.y = currentShapePoint.y;
-
-                lastShapePoint.x = currentShapePoint.x;
-                lastShapePoint.y = currentShapePoint.y;
+                ctx.moveTo(points[i].x, points[i].y);
 
             } else {
 
-                // 计算控制点
-                controlPoint = scope.calculateControlPoint(lastShapePoint, currentShapePoint);
-
-                ctx.quadraticCurveTo(controlPoint.x, controlPoint.y, currentShapePoint.x, currentShapePoint.y);
-
-                lastShapePoint.x = currentShapePoint.x;
-                lastShapePoint.y = currentShapePoint.y;
-
-                // 最后一个点, 处理封口
-                if ((i === len - 1) && isSeal) {
-
-                    // 计算控制点
-                    controlPoint = scope.calculateControlPoint(lastShapePoint, originShapePoint);
-
-                    ctx.quadraticCurveTo(controlPoint.x, controlPoint.y, originShapePoint.x, originShapePoint.y);
-                }
+                ctx.quadraticCurveTo(points[i].cx, points[i].cy, points[i].x, points[i].y);
             }
         }
 
@@ -3895,17 +3988,16 @@ CLOUD.Extensions.CommentCloud.prototype.renderToCanvas = function (ctx) {
     var fillColor = this.style['fill-color'];
     var fillOpacity = this.style['fill-opacity'];
 
-    ctx.strokeStyle = CLOUD.Extensions.Utils.Shape2D.composeRGBAString(strokeColor, strokeOpacity);
-    ctx.fillStyle = CLOUD.Extensions.Utils.Shape2D.composeRGBAString(fillColor, fillOpacity);
+    ctx.strokeStyle = CLOUD.Extensions.Utils.Shape2D.getRGBAString(strokeColor, strokeOpacity);
+    ctx.fillStyle = CLOUD.Extensions.Utils.Shape2D.getRGBAString(fillColor, fillOpacity);
     ctx.lineWidth = strokeWidth;
 
     var position = this.getClientPosition();
 
     ctx.translate(position.x, position.y);
     ctx.rotate(this.rotation);
-    ctx.translate(-position.x, -position.y);
 
-    drawCloud(ctx, this.shapePoints, this.isSeal);
+    drawCloud(ctx, this.shapePoints);
 
     if (fillOpacity !== 0) {
         ctx.fill();
@@ -3915,76 +4007,55 @@ CLOUD.Extensions.CommentCloud.prototype.renderToCanvas = function (ctx) {
 };
 
 
-CLOUD.Extensions.CommentCross = function (editor, id) {
+CLOUD.Extensions.AnnotationCross = function (editor, id) {
 
-    CLOUD.Extensions.Comment.call(this, editor, id);
+    CLOUD.Extensions.Annotation.call(this, editor, id);
 
-    this.shapeType = CLOUD.Extensions.Comment.shapeTypes.CROSS;
+    this.shapeType = CLOUD.Extensions.Annotation.shapeTypes.CROSS;
 
     this.createShape();
     this.addDomEventListeners();
 };
 
-CLOUD.Extensions.CommentCross.prototype = Object.create(CLOUD.Extensions.Comment.prototype);
-CLOUD.Extensions.CommentCross.prototype.constructor = CLOUD.Extensions.CommentCross;
+CLOUD.Extensions.AnnotationCross.prototype = Object.create(CLOUD.Extensions.Annotation.prototype);
+CLOUD.Extensions.AnnotationCross.prototype.constructor = CLOUD.Extensions.AnnotationCross;
 
-CLOUD.Extensions.CommentCross.prototype.addDomEventListeners = function () {
+CLOUD.Extensions.AnnotationCross.prototype.addDomEventListeners = function () {
 
     this.shape.addEventListener("mousedown", this.onMouseDown.bind(this), true);
     this.shape.addEventListener("mouseout", this.onMouseOut.bind(this));
     this.shape.addEventListener("mouseover",this.onMouseOver.bind(this));
 };
 
-CLOUD.Extensions.CommentCross.prototype.removeDomEventListeners = function () {
+CLOUD.Extensions.AnnotationCross.prototype.removeDomEventListeners = function () {
 
     this.shape.removeEventListener("mousedown", this.onMouseDown.bind(this), true);
     this.shape.removeEventListener("mouseout", this.onMouseOut.bind(this));
     this.shape.removeEventListener("mouseover",this.onMouseOver.bind(this));
 };
 
-CLOUD.Extensions.CommentCross.prototype.createShape = function() {
+CLOUD.Extensions.AnnotationCross.prototype.createShape = function() {
     this.shape = CLOUD.Extensions.Utils.Shape2D.createSvgElement('path');
 };
 
-CLOUD.Extensions.CommentCross.prototype.setToWorld = function (position, size, rotation) {
-
-    this.position.x = position.x;
-    this.position.y = position.y;
-    this.position.z = position.z;
-
-    this.size.x = size.x;
-    this.size.y = size.y;
-
-    this.rotation = rotation;
-
-    this.updateStyle();
-};
-
-CLOUD.Extensions.CommentCross.prototype.updateTransformMatrix = function () {
-
-    var position = this.getClientPosition();
-    var size = this.getClientSize();
-
-    var strokeWidth = this.style['stroke-width'];
-    var offsetX = Math.max(size.x - strokeWidth, 0) * 0.5;
-    var offsetY = Math.max(size.y - strokeWidth, 0) * 0.5;
-
-    this.transformShape = [
-        'translate(', position.x, ',', position.y, ') ',
-        'rotate(', THREE.Math.radToDeg(this.rotation), ') ',
-        'translate(', -offsetX, ',', -offsetY, ') '
-    ].join('');
-};
-
-CLOUD.Extensions.CommentCross.prototype.updateStyle = function () {
-
-    this.updateTransformMatrix();
+CLOUD.Extensions.AnnotationCross.prototype.update = function () {
 
     var strokeWidth = this.style['stroke-width'];
     var strokeColor = this.highlighted ? this.highlightColor : this.style['stroke-color'];
     var strokeOpacity = this.style['stroke-opacity'];
     var fillColor = this.style['fill-color'];
     var fillOpacity = this.style['fill-opacity'];
+
+    var position = this.getClientPosition();
+    var size = this.getClientSize();
+    var offsetX = Math.max(size.width - strokeWidth, 0) * 0.5;
+    var offsetY = Math.max(size.height - strokeWidth, 0) * 0.5;
+
+    this.transformShape = [
+        'translate(', position.x, ',', position.y, ') ',
+        'rotate(', THREE.Math.radToDeg(this.rotation), ') ',
+        'translate(', -offsetX, ',', -offsetY, ') '
+    ].join('');
 
     this.shape.setAttribute('transform', this.transformShape);
     this.shape.setAttribute('stroke-width', strokeWidth);
@@ -3995,13 +4066,13 @@ CLOUD.Extensions.CommentCross.prototype.updateStyle = function () {
     this.shape.setAttribute('d', this.getPath().join(' '));
 };
 
-CLOUD.Extensions.CommentCross.prototype.getPath = function() {
+CLOUD.Extensions.AnnotationCross.prototype.getPath = function() {
 
     var size = this.getClientSize();
     var l = 0;
     var t = 0;
-    var r = size.x;
-    var b = size.y;
+    var r = size.width;
+    var b = size.height;
 
     var path = [];
 
@@ -4024,7 +4095,7 @@ CLOUD.Extensions.CommentCross.prototype.getPath = function() {
     return path;
 };
 
-CLOUD.Extensions.CommentCross.prototype.renderToCanvas = function (ctx) {
+CLOUD.Extensions.AnnotationCross.prototype.renderToCanvas = function (ctx) {
 
     var strokeWidth = this.style['stroke-width'];
     var strokeColor = this.highlighted ? this.highlightColor : this.style['stroke-color'];
@@ -4034,13 +4105,12 @@ CLOUD.Extensions.CommentCross.prototype.renderToCanvas = function (ctx) {
 
     var position = this.getClientPosition();
     var clientSize = this.getClientSize();
+    var width = clientSize.width - strokeWidth;
+    var height = clientSize.height - strokeWidth;
+    var size = {width: width, height: height};
 
-    var width = clientSize.x - strokeWidth;
-    var height = clientSize.y - strokeWidth;
-    var size = {x: width, y: height};
-
-    ctx.strokeStyle = CLOUD.Extensions.Utils.Shape2D.composeRGBAString(strokeColor, strokeOpacity);
-    ctx.fillStyle = CLOUD.Extensions.Utils.Shape2D.composeRGBAString(fillColor, fillOpacity);
+    ctx.strokeStyle = CLOUD.Extensions.Utils.Shape2D.getRGBAString(strokeColor, strokeOpacity);
+    ctx.fillStyle = CLOUD.Extensions.Utils.Shape2D.getRGBAString(fillColor, fillOpacity);
     ctx.lineWidth = strokeWidth;
 
     ctx.translate(position.x, position.y);
@@ -4050,10 +4120,10 @@ CLOUD.Extensions.CommentCross.prototype.renderToCanvas = function (ctx) {
     //ctx.beginPath();
 
     ctx.moveTo(0, 0);
-    ctx.lineTo(size.x, size.y);
+    ctx.lineTo(size.width, size.height);
 
-    ctx.moveTo(0, size.y);
-    ctx.lineTo(size.x, 0);
+    ctx.moveTo(0, size.height);
+    ctx.lineTo(size.width, 0);
 
     ctx.stroke();
 
@@ -4064,11 +4134,11 @@ CLOUD.Extensions.CommentCross.prototype.renderToCanvas = function (ctx) {
     ctx.stroke();
 };
 
-CLOUD.Extensions.CommentText = function (editor, id) {
+CLOUD.Extensions.AnnotationText = function (editor, id) {
 
-    CLOUD.Extensions.Comment.call(this, editor, id);
+    CLOUD.Extensions.Annotation.call(this, editor, id);
 
-    this.shapeType = CLOUD.Extensions.Comment.shapeTypes.TEXT;
+    this.shapeType = CLOUD.Extensions.Annotation.shapeTypes.TEXT;
     this.currText = "";
     this.currTextLines = [""];
     this.textDirty = true;
@@ -4076,8 +4146,6 @@ CLOUD.Extensions.CommentText = function (editor, id) {
 
     this.textArea = document.createElement('textarea');
     this.textArea.setAttribute('maxlength', '260');
-
-    this.parentDiv = null;
 
     this.textAreaStyle = {};
     this.textAreaStyle['position'] = 'absolute';
@@ -4091,24 +4159,24 @@ CLOUD.Extensions.CommentText = function (editor, id) {
     this.addDomEventListeners();
 };
 
-CLOUD.Extensions.CommentText.prototype = Object.create(CLOUD.Extensions.Comment.prototype);
-CLOUD.Extensions.CommentText.prototype.constructor = CLOUD.Extensions.CommentText;
+CLOUD.Extensions.AnnotationText.prototype = Object.create(CLOUD.Extensions.Annotation.prototype);
+CLOUD.Extensions.AnnotationText.prototype.constructor = CLOUD.Extensions.AnnotationText;
 
-CLOUD.Extensions.CommentText.prototype.addDomEventListeners = function () {
+CLOUD.Extensions.AnnotationText.prototype.addDomEventListeners = function () {
 
     this.shape.addEventListener("mousedown", this.onMouseDown.bind(this), true);
     this.shape.addEventListener("mouseout", this.onMouseOut.bind(this), false);
     this.shape.addEventListener("mouseover", this.onMouseOver.bind(this), false);
 };
 
-CLOUD.Extensions.CommentText.prototype.removeDomEventListeners = function () {
+CLOUD.Extensions.AnnotationText.prototype.removeDomEventListeners = function () {
 
     this.shape.removeEventListener("mousedown", this.onMouseDown.bind(this), true);
     this.shape.removeEventListener("mouseout", this.onMouseOut.bind(this), false);
     this.shape.removeEventListener("mouseover", this.onMouseOver.bind(this), false);
 };
 
-CLOUD.Extensions.CommentText.prototype.createShape = function () {
+CLOUD.Extensions.AnnotationText.prototype.createShape = function () {
 
     this.clipPath = CLOUD.Extensions.Utils.Shape2D.createSvgElement('clipPath');
     this.clipPathId = 'clip_' + this.id;
@@ -4123,49 +4191,35 @@ CLOUD.Extensions.CommentText.prototype.createShape = function () {
     this.backgroundRect = CLOUD.Extensions.Utils.Shape2D.createSvgElement('rect');
 };
 
-CLOUD.Extensions.CommentText.prototype.set = function (position, width, height, textString) {
-
-    var worldPosition = this.editor.clientToWorld(position.x, position.y);
-    this.position.x = worldPosition.x;
-    this.position.y = worldPosition.y;
-    this.position.z = worldPosition.z;
-
-    var left = this.editor.clientToWorld(position.x - 0.5 * width, position.y - 0.5 * height);
-    var right = this.editor.clientToWorld(position.x + 0.5 * width, position.y + 0.5 * height);
-    this.size.x = Math.abs(right.x - left.x);
-    this.size.y = Math.abs(right.y - left.y);
-
-    this.setText(textString);
-};
-
-CLOUD.Extensions.CommentText.prototype.setToWorld = function (position, size, rotation, textString) {
+CLOUD.Extensions.AnnotationText.prototype.set = function (position, size, rotation, viewport, textString) {
 
     this.position.x = position.x;
     this.position.y = position.y;
     this.position.z = position.z;
 
-    this.size.x = size.x;
-    this.size.y = size.y;
+    this.size.width = size.width;
+    this.size.height = size.height;
 
     this.rotation = rotation;
+
+    if(viewport) {
+        this.setViewport(viewport);
+    }
 
     this.setText(textString);
 };
 
-CLOUD.Extensions.CommentText.prototype.setSize = function (width, height, position) {
+CLOUD.Extensions.AnnotationText.prototype.resetSize = function (size, position) {
 
-    var size = this.getClientSize();
-    var isCalcLines = (Math.floor(size.x) !== width);
+    var clientSize = this.getClientSize();
+    var isCalcLines = (Math.floor(clientSize.width) !== size.width);
 
-    var worldPosition = this.editor.clientToWorld(position.x, position.y);
-    this.position.x = worldPosition.x;
-    this.position.y = worldPosition.y;
-    this.position.z = worldPosition.z;
+    this.position.x = position.x;
+    this.position.y = position.y;
+    this.position.z = position.z;
 
-    var left = this.editor.clientToWorld(position.x - 0.5 * width, position.y - 0.5 * height);
-    var right = this.editor.clientToWorld(position.x + 0.5 * width, position.y + 0.5 * height);
-    this.size.x = Math.abs(right.x - left.x);
-    this.size.y = Math.abs(right.y - left.y);
+    this.size.width = size.width;
+    this.size.height = size.height;
 
     if (isCalcLines) {
 
@@ -4179,23 +4233,23 @@ CLOUD.Extensions.CommentText.prototype.setSize = function (width, height, positi
         }
     }
 
-    this.updateStyle();
+    this.update();
 };
 
-CLOUD.Extensions.CommentText.prototype.setText = function (text) {
+CLOUD.Extensions.AnnotationText.prototype.setText = function (text) {
 
     this.currText = text;
     this.currTextLines = this.calcTextLines();
     this.textDirty = true;
-    this.updateStyle();
+    this.update();
 };
 
-CLOUD.Extensions.CommentText.prototype.getText = function () {
+CLOUD.Extensions.AnnotationText.prototype.getText = function () {
 
     return this.currText;
 };
 
-CLOUD.Extensions.CommentText.prototype.setParent = function (parent) {
+CLOUD.Extensions.AnnotationText.prototype.setParent = function (parent) {
 
     var currParent = this.clipPath.parentNode;
 
@@ -4228,27 +4282,7 @@ CLOUD.Extensions.CommentText.prototype.setParent = function (parent) {
     }
 };
 
-CLOUD.Extensions.CommentText.prototype.updateTransformMatrix = function () {
-
-    var position = this.getClientPosition();
-    var size = this.getClientSize();
-
-    var offsetX = size.x * 0.5;
-    var offsetY = size.y * 0.5;
-
-    this.transformShape = [
-        'translate(', position.x, ',', position.y, ') ',
-        'rotate(', THREE.Math.radToDeg(this.rotation), ') ',
-        'translate(', -offsetX, ',', -offsetY, ') '
-    ].join('');
-};
-
-CLOUD.Extensions.CommentText.prototype.updateStyle = function (forceDirty) {
-
-    this.updateTransformMatrix();
-
-    var position = this.getClientPosition();
-    var size = this.getClientSize();
+CLOUD.Extensions.AnnotationText.prototype.update = function (forceDirty) {
 
     var fontSize = this.style['font-size'];
     var strokeColor = this.highlighted ? this.highlightColor : this.style['stroke-color'];
@@ -4256,11 +4290,22 @@ CLOUD.Extensions.CommentText.prototype.updateStyle = function (forceDirty) {
     var fillColor = this.style['fill-color'];
     var fillOpacity = this.style['fill-opacity'];
 
+    var position = this.getClientPosition();
+    var size = this.getClientSize();
+    var offsetX = size.width * 0.5;
+    var offsetY = size.height * 0.5;
+
+    this.transformShape = [
+        'translate(', position.x, ',', position.y, ') ',
+        'rotate(', THREE.Math.radToDeg(this.rotation), ') ',
+        'translate(', -offsetX, ',', -offsetY, ') '
+    ].join('');
+
     this.shape.setAttribute("font-family", this.style['font-family']);
     this.shape.setAttribute("font-size", fontSize);
     this.shape.setAttribute('font-weight', this.style['font-weight']);
     this.shape.setAttribute("font-style", this.style['font-style']);
-    this.shape.setAttribute("fill", CLOUD.Extensions.Utils.Shape2D.composeRGBAString(strokeColor, strokeOpacity));
+    this.shape.setAttribute("fill", CLOUD.Extensions.Utils.Shape2D.getRGBAString(strokeColor, strokeOpacity));
 
     var bBox = this.shape.getBBox();
     //var verticalTransform = ['translate(0, ', (-this.size.y + fontSize), ')'].join('');
@@ -4280,31 +4325,31 @@ CLOUD.Extensions.CommentText.prototype.updateStyle = function (forceDirty) {
 
     this.clipRect.setAttribute('x', "0");
     this.clipRect.setAttribute('y', bBox.y + '');
-    this.clipRect.setAttribute('width', size.x);
-    this.clipRect.setAttribute('height', size.y);
+    this.clipRect.setAttribute('width', size.width);
+    this.clipRect.setAttribute('height', size.height);
 
-    verticalTransform = ['translate(0, ', size.y, ')'].join('');
+    verticalTransform = ['translate(0, ', size.height, ')'].join('');
     this.backgroundRect.setAttribute("transform", this.transformShape + verticalTransform);
-    this.backgroundRect.setAttribute('width', size.x);
-    this.backgroundRect.setAttribute('height', size.y);
+    this.backgroundRect.setAttribute('width', size.width);
+    this.backgroundRect.setAttribute('height', size.height);
     this.backgroundRect.setAttribute("stroke-width", '0');
-    this.backgroundRect.setAttribute('fill', CLOUD.Extensions.Utils.Shape2D.composeRGBAString(fillColor, fillOpacity));
+    this.backgroundRect.setAttribute('fill', CLOUD.Extensions.Utils.Shape2D.getRGBAString(fillColor, fillOpacity));
 };
 
-CLOUD.Extensions.CommentText.prototype.forceRedraw = function () {
+CLOUD.Extensions.AnnotationText.prototype.forceRedraw = function () {
 
     window.requestAnimationFrame(function () {
 
         this.highlighted = !this.highlighted;
-        this.updateStyle();
+        this.update();
 
         this.highlighted = !this.highlighted;
-        this.updateStyle();
+        this.update();
 
     }.bind(this));
 };
 
-CLOUD.Extensions.CommentText.prototype.rebuildTextSvg = function () {
+CLOUD.Extensions.AnnotationText.prototype.rebuildTextSvg = function () {
 
     while (this.shape.childNodes.length > 0) {
         this.shape.removeChild(this.shape.childNodes[0]);
@@ -4326,22 +4371,22 @@ CLOUD.Extensions.CommentText.prototype.rebuildTextSvg = function () {
     }.bind(this));
 };
 
-CLOUD.Extensions.CommentText.prototype.getLineHeight = function () {
+CLOUD.Extensions.AnnotationText.prototype.getLineHeight = function () {
     return this.style['font-size'] * (this.lineHeight * 0.01);
 };
 
-CLOUD.Extensions.CommentText.prototype.calcTextLines = function () {
+CLOUD.Extensions.AnnotationText.prototype.calcTextLines = function () {
 
-    var textValues = this.editor.commentTextArea.getTextValuesByComment(this);
+    var textValues = this.editor.annotationTextArea.getTextValuesByAnnotation(this);
     return textValues.lines;
 };
 
-CLOUD.Extensions.CommentText.prototype.getTextLines = function () {
+CLOUD.Extensions.AnnotationText.prototype.getTextLines = function () {
 
     return this.currTextLines.concat();
 };
 
-CLOUD.Extensions.CommentText.prototype.linesEqual = function (lines) {
+CLOUD.Extensions.AnnotationText.prototype.linesEqual = function (lines) {
 
     var curr = this.currTextLines;
 
@@ -4358,7 +4403,7 @@ CLOUD.Extensions.CommentText.prototype.linesEqual = function (lines) {
     return true;
 };
 
-CLOUD.Extensions.CommentText.prototype.renderToCanvas = function (ctx) {
+CLOUD.Extensions.AnnotationText.prototype.renderToCanvas = function (ctx) {
 
     function renderTextLines(ctx, lines, lineHeight, maxHeight) {
 
@@ -4375,25 +4420,25 @@ CLOUD.Extensions.CommentText.prototype.renderToCanvas = function (ctx) {
         });
     }
 
-    var position = this.getClientPosition();
-    var clientSize = this.getClientSize();
-
+    var fillColor = this.style['fill-color'];
+    var fillOpacity = this.style['fill-opacity'];
+    var strokeColor = this.style['stroke-color'];
+    var fontOpacity = this.style['stroke-opacity'];
     var fontFamily = this.style['font-family'];
     var fontStyle = this.style['font-style'];
     var fontWeight = this.style['font-weight'];
-    var strokeColor = this.style['stroke-color'];
-    var fontOpacity = this.style['stroke-opacity'];
     var fontSize = this.style['font-size'];
+
     var lineHeight = fontSize * (this.lineHeight * 0.01);
-    var fillColor = this.style['fill-color'];
-    var fillOpacity = this.style['fill-opacity'];
+    var position = this.getClientPosition();
+    var size = this.getClientSize();
 
     ctx.save();
-    ctx.fillStyle = CLOUD.Extensions.Utils.Shape2D.composeRGBAString(fillColor, fillOpacity);
+    ctx.fillStyle = CLOUD.Extensions.Utils.Shape2D.getRGBAString(fillColor, fillOpacity);
     ctx.translate(position.x, position.y);
 
     if (fillOpacity !== 0) {
-        ctx.fillRect(-0.5 * clientSize.x, -0.5 * clientSize.y, clientSize.x, clientSize.y);
+        ctx.fillRect(-0.5 * size.width, -0.5 * size.height, size.width, size.height);
     }
 
     ctx.restore();
@@ -4404,15 +4449,15 @@ CLOUD.Extensions.CommentText.prototype.renderToCanvas = function (ctx) {
     ctx.textBaseline = 'top';
     ctx.translate(position.x, position.y);
     ctx.rotate(this.rotation);
-    ctx.translate(-0.5 * clientSize.x, -0.5 * clientSize.y);
+    ctx.translate(-0.5 * size.width, -0.5 * size.height);
 
     ctx.font = fontStyle + " " + fontWeight + " " + fontSize + "px " + fontFamily;
     ctx.globalAlpha = fontOpacity;
-    renderTextLines(ctx, this.currTextLines, lineHeight, clientSize.y);
+    renderTextLines(ctx, this.currTextLines, lineHeight, size.height);
 };
 
 
-CLOUD.Extensions.CommentTextArea = function (editor, container) {
+CLOUD.Extensions.AnnotationTextArea = function (editor, container) {
 
     this.editor = editor;
     this.container = container;
@@ -4426,22 +4471,22 @@ CLOUD.Extensions.CommentTextArea = function (editor, container) {
 
     this.measurePanel = document.createElement('div');
 
-    this.textComment = null;
+    this.textAnnotation = null;
 
     this.addDomEventListeners();
 };
 
-CLOUD.Extensions.CommentTextArea.prototype.addDomEventListeners = function () {
+CLOUD.Extensions.AnnotationTextArea.prototype.addDomEventListeners = function () {
 
     this.textArea.addEventListener('keydown', this.onKeyDown.bind(this), false);
 };
 
-CLOUD.Extensions.CommentTextArea.prototype.removeDomEventListeners = function () {
+CLOUD.Extensions.AnnotationTextArea.prototype.removeDomEventListeners = function () {
 
     this.textArea.removeEventListener('keydown', this.onKeyDown.bind(this), false);
 };
 
-CLOUD.Extensions.CommentTextArea.prototype.onKeyDown = function () {
+CLOUD.Extensions.AnnotationTextArea.prototype.onKeyDown = function () {
 
     var keyCode = event.keyCode;
     var shiftDown = event.shiftKey;
@@ -4452,41 +4497,44 @@ CLOUD.Extensions.CommentTextArea.prototype.onKeyDown = function () {
     }
 };
 
-CLOUD.Extensions.CommentTextArea.prototype.onResize = function () {
+CLOUD.Extensions.AnnotationTextArea.prototype.onResize = function () {
 
     window.requestAnimationFrame(function () {
 
-        var text = this.textArea.value;
-        this.style = null;
-        this.init();
-        this.textArea.value = text;
+        if (this.textAnnotation) {
+
+            var text = this.textArea.value;
+            this.style = null;
+            this.init();
+            this.textArea.value = text;
+        }
 
     }.bind(this));
 };
 
-CLOUD.Extensions.CommentTextArea.prototype.destroy = function () {
+CLOUD.Extensions.AnnotationTextArea.prototype.destroy = function () {
 
     this.removeDomEventListeners();
     this.inactive();
 };
 
-CLOUD.Extensions.CommentTextArea.prototype.init = function () {
+CLOUD.Extensions.AnnotationTextArea.prototype.init = function () {
 
-    var position = this.textComment.getClientPosition();
-    var size = this.textComment.getClientSize();
-    var left = position.x - size.x * 0.5;
-    var top = position.y - size.y * 0.5;
+    var position = this.textAnnotation.getClientPosition();
+    var size = this.textAnnotation.getClientSize();
+    var left = Math.floor(position.x - size.width * 0.5 + 0.5);
+    var top = Math.floor(position.y - size.height * 0.5 + 0.5);
 
-    var lineHeightPercentage = this.textComment.lineHeight + "%";
+    var lineHeightPercentage = this.textAnnotation.lineHeight + "%";
     this.textAreaStyle['line-height'] = lineHeightPercentage;
 
-    this.setPositionAndSize(left, top, size.x, size.y);
-    this.setStyle(this.textComment.getStyle());
-    this.textArea.value = this.textComment.getText();
+    this.setBound(left, top, size.width, size.height);
+    this.setStyle(this.textAnnotation.getStyle());
+    this.textArea.value = this.textAnnotation.getText();
 
 };
 
-CLOUD.Extensions.CommentTextArea.prototype.setPositionAndSize = function (left, top, width, height) {
+CLOUD.Extensions.AnnotationTextArea.prototype.setBound = function (left, top, width, height) {
 
     if (left + width >= this.container.clientWidth) {
         left = this.container.clientWidth - (width + 10);
@@ -4502,7 +4550,7 @@ CLOUD.Extensions.CommentTextArea.prototype.setPositionAndSize = function (left, 
     this.textAreaStyle['height'] = height + 'px';
 };
 
-CLOUD.Extensions.CommentTextArea.prototype.setStyle = function (style) {
+CLOUD.Extensions.AnnotationTextArea.prototype.setStyle = function (style) {
 
     if (this.style) {
 
@@ -4516,7 +4564,7 @@ CLOUD.Extensions.CommentTextArea.prototype.setStyle = function (style) {
             y: top + (height * 0.5)
         };
 
-        this.setPositionAndSize(
+        this.setBound(
             position.x - width * 0.5,
             position.y - height * 0.5,
             width, height);
@@ -4534,21 +4582,21 @@ CLOUD.Extensions.CommentTextArea.prototype.setStyle = function (style) {
     this.style = CLOUD.DomUtil.cloneStyle(style);
 };
 
-CLOUD.Extensions.CommentTextArea.prototype.isActive = function () {
+CLOUD.Extensions.AnnotationTextArea.prototype.isActive = function () {
 
-    return !!this.textComment;
+    return !!this.textAnnotation;
 };
 
-CLOUD.Extensions.CommentTextArea.prototype.active = function (comment, firstEdit) {
+CLOUD.Extensions.AnnotationTextArea.prototype.active = function (annotation, firstEdit) {
 
-    if (this.textComment === comment) {
+    if (this.textAnnotation === annotation) {
         return;
     }
 
     this.inactive();
 
     this.container.appendChild(this.textArea);
-    this.textComment = comment;
+    this.textAnnotation = annotation;
     this.firstEdit = firstEdit || false;
 
     this.init();
@@ -4562,20 +4610,20 @@ CLOUD.Extensions.CommentTextArea.prototype.active = function (comment, firstEdit
     });
 };
 
-CLOUD.Extensions.CommentTextArea.prototype.inactive = function () {
+CLOUD.Extensions.AnnotationTextArea.prototype.inactive = function () {
 
     window.removeEventListener('resize', this.onResize.bind(this));
 
-    if (this.textComment) {
+    if (this.textAnnotation) {
 
-        this.textComment = null;
+        this.textAnnotation = null;
         this.container.removeChild(this.textArea);
     }
 
     this.style = null;
 };
 
-CLOUD.Extensions.CommentTextArea.prototype.accept = function () {
+CLOUD.Extensions.AnnotationTextArea.prototype.accept = function () {
 
     var width = parseFloat(this.textArea.style.width);
     var height = parseFloat(this.textArea.style.height);
@@ -4587,7 +4635,7 @@ CLOUD.Extensions.CommentTextArea.prototype.accept = function () {
         y: top + (height * 0.5)
     };
     var data = {
-        comment: this.textComment,
+        annotation: this.textAnnotation,
         firstEdit: this.firstEdit,
         style: this.style,
         position: position,
@@ -4601,9 +4649,9 @@ CLOUD.Extensions.CommentTextArea.prototype.accept = function () {
     this.inactive();
 };
 
-CLOUD.Extensions.CommentTextArea.prototype.getTextValuesByComment = function (comment) {
+CLOUD.Extensions.AnnotationTextArea.prototype.getTextValuesByAnnotation = function (annotation) {
 
-    this.active(comment, false);
+    this.active(annotation, false);
 
     var textValues = this.getTextValues();
 
@@ -4612,7 +4660,7 @@ CLOUD.Extensions.CommentTextArea.prototype.getTextValuesByComment = function (co
     return textValues;
 };
 
-CLOUD.Extensions.CommentTextArea.prototype.getTextValues = function () {
+CLOUD.Extensions.AnnotationTextArea.prototype.getTextValues = function () {
 
     var text = this.textArea.value;
 
@@ -4622,7 +4670,7 @@ CLOUD.Extensions.CommentTextArea.prototype.getTextValues = function () {
     };
 };
 
-CLOUD.Extensions.CommentTextArea.prototype.calcTextLines = function () {
+CLOUD.Extensions.AnnotationTextArea.prototype.calcTextLines = function () {
 
     var text = this.textArea.value;
     var linesBreaks = text.split(/\r*\n/);
@@ -4651,7 +4699,7 @@ CLOUD.Extensions.CommentTextArea.prototype.calcTextLines = function () {
     return lines;
 };
 
-CLOUD.Extensions.CommentTextArea.prototype.getShorterLine = function (line) {
+CLOUD.Extensions.AnnotationTextArea.prototype.getShorterLine = function (line) {
 
     var iLastSpace = line.lastIndexOf(' ');
 
@@ -4669,7 +4717,7 @@ CLOUD.Extensions.CommentTextArea.prototype.getShorterLine = function (line) {
     return [shorterLine, trailingWord];
 };
 
-CLOUD.Extensions.CommentTextArea.prototype.splitWord = function (word, remaining, maxLength, output) {
+CLOUD.Extensions.AnnotationTextArea.prototype.splitWord = function (word, remaining, maxLength, output) {
 
     var lenSoFar = 1;
     var fits = true;
@@ -4711,7 +4759,7 @@ CLOUD.Extensions.CommentTextArea.prototype.splitWord = function (word, remaining
     }
 };
 
-CLOUD.Extensions.CommentTextArea.prototype.splitLine = function (text, maxLength, output) {
+CLOUD.Extensions.AnnotationTextArea.prototype.splitLine = function (text, maxLength, output) {
 
     if (text === '') {
         return;
@@ -4751,8 +4799,7 @@ CLOUD.Extensions.CommentTextArea.prototype.splitLine = function (text, maxLength
 };
 
 
-
-CLOUD.Extensions.CommentFrame = function (editor, container) {
+CLOUD.Extensions.AnnotationFrame = function (editor, container) {
 
     this.editor = editor;
     this.container = container;
@@ -4769,13 +4816,13 @@ CLOUD.Extensions.CommentFrame = function (editor, container) {
         handle: {}
     };
 
-    this.comment = null;
+    this.annotation = null;
 
     this.createFramePanel();
     this.addDomEventListeners();
 };
 
-CLOUD.Extensions.CommentFrame.prototype.addDomEventListeners = function() {
+CLOUD.Extensions.AnnotationFrame.prototype.addDomEventListeners = function () {
 
     this.framePanel.addEventListener('mousedown', this.onResizeDown.bind(this));
     this.framePanel.addEventListener('dblclick', this.onDoubleClick.bind(this));
@@ -4783,7 +4830,7 @@ CLOUD.Extensions.CommentFrame.prototype.addDomEventListeners = function() {
     this.selection.element.addEventListener('mousedown', this.onRotationDown.bind(this));
 };
 
-CLOUD.Extensions.CommentFrame.prototype.removeDomEventListeners = function() {
+CLOUD.Extensions.AnnotationFrame.prototype.removeDomEventListeners = function () {
 
     this.framePanel.removeEventListener('mousedown', this.onResizeDown.bind(this));
     this.framePanel.removeEventListener('dblclick', this.onDoubleClick.bind(this));
@@ -4791,16 +4838,16 @@ CLOUD.Extensions.CommentFrame.prototype.removeDomEventListeners = function() {
     this.selection.element.removeEventListener('mousedown', this.onRotationDown.bind(this));
 };
 
-CLOUD.Extensions.CommentFrame.prototype.onMouseMove = function (event) {
+CLOUD.Extensions.AnnotationFrame.prototype.onMouseMove = function (event) {
 
 };
 
-CLOUD.Extensions.CommentFrame.prototype.onMouseUp = function (event) {
+CLOUD.Extensions.AnnotationFrame.prototype.onMouseUp = function (event) {
 };
 
-CLOUD.Extensions.CommentFrame.prototype.onRepositionDown = function (event) {
+CLOUD.Extensions.AnnotationFrame.prototype.onRepositionDown = function (event) {
 
-    if (!this.comment) return;
+    if (!this.annotation) return;
 
     if (this.isDragPoint(event.target) || this.isRotatePoint(event.target)) return;
 
@@ -4810,8 +4857,9 @@ CLOUD.Extensions.CommentFrame.prototype.onRepositionDown = function (event) {
 
     this.originMouse = mouse;
 
-    var position = this.comment.getClientPosition();
-    this.originPosition = {
+    var position = this.annotation.getClientPosition();
+
+    this.offset = {
         x: position.x,
         y: position.y
     };
@@ -4819,12 +4867,12 @@ CLOUD.Extensions.CommentFrame.prototype.onRepositionDown = function (event) {
     this.onMouseMove = this.onRepositionMove.bind(this);
     this.onMouseUp = this.onRepositionUp.bind(this);
 
-    this.editor.dragCommentFrameBegin();
+    this.editor.dragAnnotationFrameBegin();
 };
 
-CLOUD.Extensions.CommentFrame.prototype.onRepositionMove = function (event) {
+CLOUD.Extensions.AnnotationFrame.prototype.onRepositionMove = function (event) {
 
-    if (!this.comment) return;
+    if (!this.annotation) return;
 
     if (!this.selection.dragging) return;
 
@@ -4835,26 +4883,27 @@ CLOUD.Extensions.CommentFrame.prototype.onRepositionMove = function (event) {
         y: mouse.y - this.originMouse.y
     };
 
-    var x = this.originPosition.x + movement.x;
-    var y = this.originPosition.y + movement.y;
+    var x = this.offset.x + movement.x;
+    var y = this.offset.y + movement.y;
 
     this.updatePosition(x, y, this.selection.rotation);
-    this.comment.setPosition(x, y);
+    var position = this.editor.clientToWorld({x: x, y: y});
+    this.annotation.resetPosition(position);
 };
 
-CLOUD.Extensions.CommentFrame.prototype.onRepositionUp = function () {
+CLOUD.Extensions.AnnotationFrame.prototype.onRepositionUp = function () {
 
     if (!this.selection.dragging) {
         return;
     }
 
     this.selection.dragging = false;
-    this.editor.dragCommentFrameEnd();
+    this.editor.dragAnnotationFrameEnd();
 };
 
-CLOUD.Extensions.CommentFrame.prototype.onResizeDown = function (event) {
+CLOUD.Extensions.AnnotationFrame.prototype.onResizeDown = function (event) {
 
-    if (!this.comment) return;
+    if (!this.annotation) return;
 
     var target = event.target;
 
@@ -4862,18 +4911,19 @@ CLOUD.Extensions.CommentFrame.prototype.onResizeDown = function (event) {
 
         this.selection.resizing = true;
         this.selection.handle.resizingPanel = target;
+
         var direction = this.selection.handle.resizingPanel.getAttribute('data-drag-point');
         this.container.style.cursor = direction + '-resize';
 
         var mouse = this.editor.getPointOnDomContainer(event.clientX, event.clientY);
-        var position = this.comment.getClientPosition();
-        var size = this.comment.getClientSize();
+        var position = this.annotation.getClientPosition();
+        var size = this.annotation.getClientSize();
 
         this.origin = {
             x: position.x,
             y: position.y,
-            width: size.x,
-            height: size.y,
+            width: size.width,
+            height: size.height,
             mouseX: mouse.x,
             mouseY: mouse.y
         };
@@ -4881,13 +4931,13 @@ CLOUD.Extensions.CommentFrame.prototype.onResizeDown = function (event) {
         this.onMouseMove = this.onResizeMove.bind(this);
         this.onMouseUp = this.onResizeUp.bind(this);
 
-        this.editor.dragCommentFrameBegin();
+        this.editor.dragAnnotationFrameBegin();
     }
 };
 
-CLOUD.Extensions.CommentFrame.prototype.onResizeMove = function (event) {
+CLOUD.Extensions.AnnotationFrame.prototype.onResizeMove = function (event) {
 
-    if (!this.comment) return;
+    if (!this.annotation) return;
 
     if (!this.selection.resizing) return;
 
@@ -4955,76 +5005,79 @@ CLOUD.Extensions.CommentFrame.prototype.onResizeMove = function (event) {
     var newPos = new THREE.Vector2(
         x + (actualDelta.x * 0.5),
         y + (actualDelta.y * 0.5));
+    newPos = this.editor.clientToWorld(newPos);
 
-    this.comment.setSize(width, height, newPos);
+    var size = {width: width, height: height};
+
+    this.annotation.resetSize(size, newPos);
 };
 
-CLOUD.Extensions.CommentFrame.prototype.onResizeUp = function (event) {
+CLOUD.Extensions.AnnotationFrame.prototype.onResizeUp = function (event) {
 
     this.selection.resizing = false;
     this.selection.handle.resizingPanel = null;
     this.container.style.cursor = '';
-    this.editor.dragCommentFrameEnd();
+    this.editor.dragAnnotationFrameEnd();
 };
 
-CLOUD.Extensions.CommentFrame.prototype.onRotationDown = function (event) {
+CLOUD.Extensions.AnnotationFrame.prototype.onRotationDown = function (event) {
 
-    if (!this.comment) return;
+    if (!this.annotation) return;
 
     if (!this.isRotatePoint(event.target)) return;
 
     this.selection.rotating = true;
 
-    this.originPosition = this.editor.getPointOnDomContainer(event.clientX, event.clientY);
+    this.offset = this.editor.getPointOnDomContainer(event.clientX, event.clientY);
     this.originRotation = this.selection.rotation || 0;
 
     this.onMouseMove = this.onRotationMove.bind(this);
     this.onMouseUp = this.onRotationUp.bind(this);
 
-    this.editor.dragCommentFrameBegin();
+    this.editor.dragAnnotationFrameBegin();
 };
 
-CLOUD.Extensions.CommentFrame.prototype.onRotationMove = function (event) {
+CLOUD.Extensions.AnnotationFrame.prototype.onRotationMove = function (event) {
 
-    if (!this.comment) return;
+    if (!this.annotation) return;
 
     if (!this.selection.rotating) return;
 
     var mouse = this.editor.getPointOnDomContainer(event.clientX, event.clientY);
-    var position = this.comment.getClientPosition();
+    var position = this.annotation.getClientPosition();
 
     var angle1 = CLOUD.Extensions.Utils.Geometric.getAngleBetweenPoints(position, mouse);
-    var angle2 = CLOUD.Extensions.Utils.Geometric.getAngleBetweenPoints(position, this.originPosition);
+    var angle2 = CLOUD.Extensions.Utils.Geometric.getAngleBetweenPoints(position, this.offset);
     var rotation = angle1 - angle2 + this.originRotation;
 
     this.updatePosition(this.selection.x, this.selection.y, rotation);
 
-    this.comment.setRotation(rotation);
+    this.annotation.resetRotation(rotation);
 };
 
-CLOUD.Extensions.CommentFrame.prototype.onRotationUp = function (event) {
+CLOUD.Extensions.AnnotationFrame.prototype.onRotationUp = function (event) {
 
     this.selection.rotating = false;
     this.originRotation = null;
-    this.originPosition = null;
-    this.editor.dragCommentFrameEnd();
+    this.offset = null;
+    this.editor.dragAnnotationFrameEnd();
 };
 
-CLOUD.Extensions.CommentFrame.prototype.onDoubleClick = function(event) {
+CLOUD.Extensions.AnnotationFrame.prototype.onDoubleClick = function (event) {
 
     this.selection.dragging = false;
 
-    if (this.comment) {
-        this.editor.onMouseDoubleClick(event, this.comment);
+    if (this.annotation) {
+        this.editor.onMouseDoubleClick(event, this.annotation);
     }
 };
 
-CLOUD.Extensions.CommentFrame.prototype.destroy = function(){
+CLOUD.Extensions.AnnotationFrame.prototype.destroy = function () {
 
-   this.removeDomEventListeners();
+    this.removeDomEventListeners();
 };
 
-CLOUD.Extensions.CommentFrame.prototype.createFramePanel = function(){
+CLOUD.Extensions.AnnotationFrame.prototype.createFramePanel = function () {
 
     var scope = this;
 
@@ -5183,7 +5236,7 @@ CLOUD.Extensions.CommentFrame.prototype.createFramePanel = function(){
     this.updateState(false);
 };
 
-CLOUD.Extensions.CommentFrame.prototype.setSelection = function(x, y, width, height, rotation) {
+CLOUD.Extensions.AnnotationFrame.prototype.setSelection = function (x, y, width, height, rotation) {
 
     this.updateDimensions(width, height);
     this.updatePosition(x, y, rotation);
@@ -5191,62 +5244,60 @@ CLOUD.Extensions.CommentFrame.prototype.setSelection = function(x, y, width, hei
     this.framePanel.style.visibility = 'visible';
 };
 
-CLOUD.Extensions.CommentFrame.prototype.setComment = function (comment) {
+CLOUD.Extensions.AnnotationFrame.prototype.setAnnotation = function (annotation) {
 
-    if (!comment) {
+    if (!annotation) {
 
-        if (this.comment) {
+        if (this.annotation) {
 
-            this.comment = null;
+            this.annotation = null;
             this.updateState(false);
         }
 
         return;
     }
 
-    var size = comment.getClientSize(),
-        position = comment.getClientPosition(),
-        width = size.x,
-        height = size.y,
-        rotation = comment.rotation;
+    var size = annotation.getClientSize();
+    var position = annotation.getClientPosition();
+    var rotation = annotation.rotation;
 
-    this.comment = comment;
+    this.annotation = annotation;
 
-    this.setSelection(position.x - (width / 2), position.y - (height / 2), width, height, rotation);
+    this.setSelection(position.x - (size.width / 2), position.y - (size.height / 2), size.width, size.height, rotation);
 
     this.enableResize();
     this.enableRotation();
 };
 
-CLOUD.Extensions.CommentFrame.prototype.isActive = function () {
+CLOUD.Extensions.AnnotationFrame.prototype.isActive = function () {
     return this.isDragging() || this.isResizing() || this.isRotating();
 };
 
-CLOUD.Extensions.CommentFrame.prototype.dragBegin = function (event) {
+CLOUD.Extensions.AnnotationFrame.prototype.dragBegin = function (event) {
 
     this.onRepositionDown(event);
 };
 
-CLOUD.Extensions.CommentFrame.prototype.isDragging = function () {
+CLOUD.Extensions.AnnotationFrame.prototype.isDragging = function () {
 
     return this.selection.dragging;
 };
 
-CLOUD.Extensions.CommentFrame.prototype.isResizing = function () {
+CLOUD.Extensions.AnnotationFrame.prototype.isResizing = function () {
 
     return this.selection.resizing;
 };
 
-CLOUD.Extensions.CommentFrame.prototype.isRotating = function () {
+CLOUD.Extensions.AnnotationFrame.prototype.isRotating = function () {
 
     return this.selection.rotating;
 };
 
-CLOUD.Extensions.CommentFrame.prototype.enableResize = function () {
+CLOUD.Extensions.AnnotationFrame.prototype.enableResize = function () {
 
     var handle, direction;
 
-    if (this.comment.disableResizeHeight || this.comment.disableResizeWidth) {
+    if (this.annotation.disableResizeHeight || this.annotation.disableResizeWidth) {
 
         for (direction in this.selection.handle) {
 
@@ -5254,13 +5305,13 @@ CLOUD.Extensions.CommentFrame.prototype.enableResize = function () {
             if (handle) handle.style.display = 'none';
         }
 
-        if (this.comment.disableResizeHeight) {
+        if (this.annotation.disableResizeHeight) {
 
             this.selection.handle['w'].style.display = 'block';
             this.selection.handle['e'].style.display = 'block';
         }
 
-        if (this.comment.disableResizeWidth) {
+        if (this.annotation.disableResizeWidth) {
 
             this.selection.handle['n'].style.display = 'block';
             this.selection.handle['s'].style.display = 'block';
@@ -5279,13 +5330,13 @@ CLOUD.Extensions.CommentFrame.prototype.enableResize = function () {
 
 };
 
-CLOUD.Extensions.CommentFrame.prototype.enableRotation = function () {
+CLOUD.Extensions.AnnotationFrame.prototype.enableRotation = function () {
 
-    var display = this.comment.disableRotation ? 'none' : 'block';
+    var display = this.annotation.disableRotation ? 'none' : 'block';
     this.selection.rotationPanel.style.display = display;
 };
 
-CLOUD.Extensions.CommentFrame.prototype.updateDimensions = function (width, height) {
+CLOUD.Extensions.AnnotationFrame.prototype.updateDimensions = function (width, height) {
 
     this.selection.width = width;
     this.selection.height = height;
@@ -5293,43 +5344,43 @@ CLOUD.Extensions.CommentFrame.prototype.updateDimensions = function (width, heig
     this.selection.element.style.height = height + 'px';
 };
 
-CLOUD.Extensions.CommentFrame.prototype.updatePosition = function (x, y, rotation) {
+CLOUD.Extensions.AnnotationFrame.prototype.updatePosition = function (x, y, rotation) {
 
-    var size = this.comment.getClientSize();
+    var size = this.annotation.getClientSize();
 
     this.selection.x = x;
     this.selection.y = y;
     this.selection.rotation = rotation;
 
     this.selection.element.style.msTransform = CLOUD.DomUtil.toTranslate3d(x, y) + ' rotate(' + rotation + 'rad)';
-    this.selection.element.style.msTransformOrigin = (size.x / 2) + 'px ' + (size.y / 2) + 'px';
+    this.selection.element.style.msTransformOrigin = (size.width / 2) + 'px ' + (size.height / 2) + 'px';
 
     this.selection.element.style.webkitTransform = CLOUD.DomUtil.toTranslate3d(x, y) + ' rotate(' + rotation + 'rad)';
-    this.selection.element.style.webkitTransformOrigin = (size.x / 2) + 'px ' + (size.y / 2) + 'px';
+    this.selection.element.style.webkitTransformOrigin = (size.width / 2) + 'px ' + (size.height / 2) + 'px';
 
     this.selection.element.style.transform = CLOUD.DomUtil.toTranslate3d(x, y) + ' rotate(' + rotation + 'rad)';
-    this.selection.element.style.transformOrigin = (size.x / 2) + 'px ' + (size.y / 2) + 'px';
+    this.selection.element.style.transformOrigin = (size.width / 2) + 'px ' + (size.height / 2) + 'px';
 };
 
-CLOUD.Extensions.CommentFrame.prototype.updateState = function (active) {
+CLOUD.Extensions.AnnotationFrame.prototype.updateState = function (active) {
 
     this.selection.active = active;
     this.selection.element.style.display = active ? 'block' : 'none';
 };
 
-CLOUD.Extensions.CommentFrame.prototype.isDragPoint = function (element) {
+CLOUD.Extensions.AnnotationFrame.prototype.isDragPoint = function (element) {
 
     return CLOUD.DomUtil.matchesSelector(element, '.select-drag-point');
 };
 
-CLOUD.Extensions.CommentFrame.prototype.isRotatePoint = function (element) {
+CLOUD.Extensions.AnnotationFrame.prototype.isRotatePoint = function (element) {
 
     return CLOUD.DomUtil.matchesSelector(element, '.select-rotate-point');
 };
 var CLOUD = CLOUD || {};
 CLOUD.Extensions = CLOUD.Extensions || {};
 
-CLOUD.Extensions.CommentEditor = function (cameraEditor, scene, domElement) {
+CLOUD.Extensions.AnnotationEditor = function (cameraEditor, scene, domElement) {
     "use strict";
 
     CLOUD.OrbitEditor.call(this, cameraEditor, scene, domElement);
@@ -5337,8 +5388,8 @@ CLOUD.Extensions.CommentEditor = function (cameraEditor, scene, domElement) {
     //this.cameraEditor = cameraEditor;
     //this.scene = scene;
     //this.domElement = domElement;
-    this.comments = [];
-    this.selectedComment = null;
+    this.annotations = [];
+    this.selectedAnnotation = null;
     this.bounds = {x: 0, y: 0, width: 0, height: 0};
     this.keys = {
         BACKSPACE: 8,
@@ -5367,15 +5418,15 @@ CLOUD.Extensions.CommentEditor = function (cameraEditor, scene, domElement) {
     this.endEditCallback = null;
     this.changeEditorModeCallback = null;
     this.isCameraChange = false;
-    this.commentType = CLOUD.Extensions.Comment.shapeTypes.ARROW;
-    this.nextCommentId = 0;
-    this.arrowMinLen = 16;
+    this.annotationType = CLOUD.Extensions.Annotation.shapeTypes.ARROW;
+    this.nextAnnotationId = 0;
+    this.annotationMinLen = 16;
 };
 
-CLOUD.Extensions.CommentEditor.prototype = Object.create(CLOUD.OrbitEditor.prototype);
-CLOUD.Extensions.CommentEditor.prototype.constructor = CLOUD.Extensions.CommentEditor;
+CLOUD.Extensions.AnnotationEditor.prototype = Object.create(CLOUD.OrbitEditor.prototype);
+CLOUD.Extensions.AnnotationEditor.prototype.constructor = CLOUD.Extensions.AnnotationEditor;
 
-CLOUD.Extensions.CommentEditor.prototype.addDomEventListeners = function () {
+CLOUD.Extensions.AnnotationEditor.prototype.addDomEventListeners = function () {
 
     if (this.svg) {
 
@@ -5394,7 +5445,7 @@ CLOUD.Extensions.CommentEditor.prototype.addDomEventListeners = function () {
 
 };
 
-CLOUD.Extensions.CommentEditor.prototype.removeDomEventListeners = function () {
+CLOUD.Extensions.AnnotationEditor.prototype.removeDomEventListeners = function () {
 
     if (this.svg) {
 
@@ -5411,7 +5462,7 @@ CLOUD.Extensions.CommentEditor.prototype.removeDomEventListeners = function () {
 
 };
 
-CLOUD.Extensions.CommentEditor.prototype.onFocus = function () {
+CLOUD.Extensions.AnnotationEditor.prototype.onFocus = function () {
 
     if (this.svg) {
 
@@ -5419,7 +5470,7 @@ CLOUD.Extensions.CommentEditor.prototype.onFocus = function () {
     }
 };
 
-CLOUD.Extensions.CommentEditor.prototype.onMouseDown = function (event) {
+CLOUD.Extensions.AnnotationEditor.prototype.onMouseDown = function (event) {
 
     if (!this.isEditing) {
         CLOUD.OrbitEditor.prototype.onMouseDown.call(this, event);
@@ -5430,22 +5481,22 @@ CLOUD.Extensions.CommentEditor.prototype.onMouseDown = function (event) {
     event.preventDefault();
     event.stopPropagation();
 
-    if (this.commentFrame.isActive()) {
+    if (this.annotationFrame.isActive()) {
 
-        this.commentFrame.setComment(this.selectedComment);
+        this.annotationFrame.setAnnotation(this.selectedAnnotation);
 
         return;
     }
 
+    this.handleMouseEvent(event, "down");
+
     if (!this.isCreating && event.target === this.svg) {
 
-        this.selectComment(null);
+        this.selectAnnotation(null);
     }
-
-    this.handleMouseEvent(event, "down");
 };
 
-CLOUD.Extensions.CommentEditor.prototype.onMouseMove = function (event) {
+CLOUD.Extensions.AnnotationEditor.prototype.onMouseMove = function (event) {
 
     if (!this.isEditing) {
 
@@ -5458,10 +5509,10 @@ CLOUD.Extensions.CommentEditor.prototype.onMouseMove = function (event) {
     event.preventDefault();
     event.stopPropagation();
 
-    if (this.commentFrame.isActive()) {
+    if (this.annotationFrame.isActive()) {
 
-        this.commentFrame.onMouseMove(event);
-        this.commentFrame.setComment(this.selectedComment);
+        this.annotationFrame.onMouseMove(event);
+        this.annotationFrame.setAnnotation(this.selectedAnnotation);
 
         return;
     }
@@ -5469,7 +5520,7 @@ CLOUD.Extensions.CommentEditor.prototype.onMouseMove = function (event) {
     this.handleMouseEvent(event, "move");
 };
 
-CLOUD.Extensions.CommentEditor.prototype.onMouseUp = function (event) {
+CLOUD.Extensions.AnnotationEditor.prototype.onMouseUp = function (event) {
 
     if (!this.isEditing) {
 
@@ -5483,20 +5534,20 @@ CLOUD.Extensions.CommentEditor.prototype.onMouseUp = function (event) {
     event.stopPropagation();
 
     // 批注编辑结束
-    if (this.commentFrame.isActive()) {
+    if (this.annotationFrame.isActive()) {
 
-        this.commentFrame.onMouseUp(event);
+        this.annotationFrame.onMouseUp(event);
 
         return;
     }
 
-    if (this.selectedComment && this.isCreating) {
+    if (this.selectedAnnotation && this.isCreating) {
 
         this.handleMouseEvent(event, "up");
     }
 };
 
-CLOUD.Extensions.CommentEditor.prototype.onMouseWheel = function (event) {
+CLOUD.Extensions.AnnotationEditor.prototype.onMouseWheel = function (event) {
 
     if (!this.isEditing) {
 
@@ -5508,7 +5559,7 @@ CLOUD.Extensions.CommentEditor.prototype.onMouseWheel = function (event) {
     }
 };
 
-CLOUD.Extensions.CommentEditor.prototype.onMouseDoubleClick = function (event, comment) {
+CLOUD.Extensions.AnnotationEditor.prototype.onMouseDoubleClick = function (event, annotation) {
 
     event.preventDefault();
     event.stopPropagation();
@@ -5518,14 +5569,14 @@ CLOUD.Extensions.CommentEditor.prototype.onMouseDoubleClick = function (event, c
     }
 
     this.mouseDoubleClickForCloud(event);
-    this.mouseDoubleClickForText(event, comment);
+    this.mouseDoubleClickForText(event, annotation);
 };
 
-CLOUD.Extensions.CommentEditor.prototype.onKeyDown = function (event) {
+CLOUD.Extensions.AnnotationEditor.prototype.onKeyDown = function (event) {
 
 };
 
-CLOUD.Extensions.CommentEditor.prototype.onKeyUp = function (event) {
+CLOUD.Extensions.AnnotationEditor.prototype.onKeyUp = function (event) {
 
     if (!this.isEditing) {
         return;
@@ -5533,21 +5584,29 @@ CLOUD.Extensions.CommentEditor.prototype.onKeyUp = function (event) {
 
     switch (event.keyCode) {
         case this.keys.DELETE:
-            if (this.selectedComment) {
-                this.selectedComment.delete();
-                this.selectedComment = null;
-                this.deselectComment();
+            if (this.selectedAnnotation) {
+                this.selectedAnnotation.delete();
+                this.selectedAnnotation = null;
+                this.deselectAnnotation();
             }
             break;
-        case this.keys.ESC: // 结束云图绘制
+        case this.keys.ESC:
 
-            if (this.commentType === CLOUD.Extensions.Comment.shapeTypes.CLOUD) {
+            // 结束云图绘制
+            if (this.annotationType === CLOUD.Extensions.Annotation.shapeTypes.CLOUD) {
 
                 // 结束云图绘制，不封闭云图
-                this.selectedComment.setSeal(false);
-                this.selectedComment.finishTrack();
-                this.createCommentEnd();
-                this.deselectComment();
+                this.selectedAnnotation.setSeal(false);
+                this.selectedAnnotation.finishTrack();
+                this.createAnnotationEnd();
+                this.deselectAnnotation();
+            }
+
+            if (this.annotationType === CLOUD.Extensions.Annotation.shapeTypes.TEXT) {
+
+                if (this.annotationTextArea.isActive()) {
+                    this.annotationTextArea.accept();
+                }
             }
 
             break;
@@ -5556,9 +5615,9 @@ CLOUD.Extensions.CommentEditor.prototype.onKeyUp = function (event) {
     }
 };
 
-CLOUD.Extensions.CommentEditor.prototype.onResize = function () {
+CLOUD.Extensions.AnnotationEditor.prototype.onResize = function () {
 
-    var bounds = CLOUD.DomUtil.getContainerOffsetToClient(this.domElement);
+    var bounds = this.getDomContainerBounds();
 
     this.bounds.x = 0;
     this.bounds.y = 0;
@@ -5571,67 +5630,67 @@ CLOUD.Extensions.CommentEditor.prototype.onResize = function () {
     this.svg.setAttribute('width', this.bounds.width + '');
     this.svg.setAttribute('height', this.bounds.height + '');
 
-    this.updateComments();
+    this.updateAnnotations();
 };
 
-CLOUD.Extensions.CommentEditor.prototype.handleMouseEvent = function (event, type) {
+CLOUD.Extensions.AnnotationEditor.prototype.handleMouseEvent = function (event, type) {
 
-    var mode = this.commentType;
+    var mode = this.annotationType;
 
     switch (mode) {
 
-        case CLOUD.Extensions.Comment.shapeTypes.RECTANGLE:
+        case CLOUD.Extensions.Annotation.shapeTypes.RECTANGLE:
             if (type === "down") {
 
                 if (this.mouseDownForRectangle(event)) {
-                    this.createCommentBegin();
+                    this.createAnnotationBegin();
                 }
             } else if (type === "move") {
                 this.mouseMoveForRectangle(event);
             } else if (type === "up") {
-                this.createCommentEnd();
-                this.deselectComment();
+                this.createAnnotationEnd();
+                this.deselectAnnotation();
             }
             break;
-        case CLOUD.Extensions.Comment.shapeTypes.CIRCLE:
+        case CLOUD.Extensions.Annotation.shapeTypes.CIRCLE:
             if (type === "down") {
 
                 if (this.mouseDownForCircle(event)) {
-                    this.createCommentBegin();
+                    this.createAnnotationBegin();
                 }
             } else if (type === "move") {
                 this.mouseMoveForCircle(event);
             } else if (type === "up") {
                 //this.created()
-                this.createCommentEnd();
-                this.deselectComment();
+                this.createAnnotationEnd();
+                this.deselectAnnotation();
             }
             break;
-        case CLOUD.Extensions.Comment.shapeTypes.CROSS:
+        case CLOUD.Extensions.Annotation.shapeTypes.CROSS:
             if (type === "down") {
                 if (this.mouseDownForCross(event)) {
-                    this.createCommentBegin();
+                    this.createAnnotationBegin();
                 }
             } else if (type === "move") {
                 this.mouseMoveForCross(event);
             } else if (type === "up") {
-                this.createCommentEnd();
-                this.deselectComment();
+                this.createAnnotationEnd();
+                this.deselectAnnotation();
             }
             break;
-        case CLOUD.Extensions.Comment.shapeTypes.CLOUD:
+        case CLOUD.Extensions.Annotation.shapeTypes.CLOUD:
             if (type === "down") {
-                //if (this.selectedComment && this.isCreating) {
+                //if (this.selectedAnnotation && this.isCreating) {
                 //    this.mouseMoveForCloud(event);
                 //} else {
                 //    if (!this.isCreating) {
                 //        this.mouseDownForCloud(event);
-                //        this.createCommentBegin();
+                //        this.createAnnotationBegin();
                 //    }
                 //}
 
                 if (this.mouseDownForCloud(event)) {
-                    this.createCommentBegin();
+                    this.createAnnotationBegin();
                 }
             } else if (type === "move") {
                 this.mouseMoveForCloud(event);
@@ -5639,38 +5698,40 @@ CLOUD.Extensions.CommentEditor.prototype.handleMouseEvent = function (event, typ
                 this.mouseUpForCloud(event);
             }
             break;
-        case CLOUD.Extensions.Comment.shapeTypes.TEXT:
+        case CLOUD.Extensions.Annotation.shapeTypes.TEXT:
             if (type === "down") {
                 this.mouseDownForText(event);
             }
             break;
-        case CLOUD.Extensions.Comment.shapeTypes.ARROW:
+        case CLOUD.Extensions.Annotation.shapeTypes.ARROW:
         default :
             if (type === "down") {
 
                 if (this.mouseDownForArrow(event)) {
-                    this.createCommentBegin();
+                    this.createAnnotationBegin();
                 }
             } else if (type === "move") {
                 this.mouseMoveForArrow(event);
             } else if (type === "up") {
-                this.createCommentEnd();
-                this.deselectComment();
+                this.createAnnotationEnd();
+                this.deselectAnnotation();
             }
             break;
     }
 };
 
-CLOUD.Extensions.CommentEditor.prototype.mouseDownForArrow = function (event) {
+CLOUD.Extensions.AnnotationEditor.prototype.mouseDownForArrow = function (event) {
 
-    if (this.selectedComment) return false;
+    if (this.selectedAnnotation) return false;
 
     var start = this.getPointOnDomContainer(event.clientX, event.clientY);
+
+    var domBounds = this.getDomContainerBounds();
 
     this.originX = start.x;
     this.originY = start.y;
 
-    var width = this.arrowMinLen;
+    var width = this.annotationMinLen;
     var head = {x: this.originX, y: this.originY};
     var tail = {
         x: Math.round(head.x + Math.cos(Math.PI * 0.25) * width),
@@ -5700,24 +5761,24 @@ CLOUD.Extensions.CommentEditor.prototype.mouseDownForArrow = function (event) {
 
     constrain(head, tail, width, this.getBounds());
 
-    var arrowId = this.generateCommentId();
-    var arrow = new CLOUD.Extensions.CommentArrow(this, arrowId);
-    arrow.set(head.x, head.y, tail.x, tail.y);
-    this.addComment(arrow);
+    var arrowId = this.generateAnnotationId();
+    var arrow = new CLOUD.Extensions.AnnotationArrow(this, arrowId);
+    arrow.setByTailHead(head, tail, domBounds);
+    this.addAnnotation(arrow);
     arrow.created();
 
-    this.selectedComment = arrow;
+    this.selectedAnnotation = arrow;
 
     return true;
 };
 
-CLOUD.Extensions.CommentEditor.prototype.mouseMoveForArrow = function (event) {
+CLOUD.Extensions.AnnotationEditor.prototype.mouseMoveForArrow = function (event) {
 
-    if (!this.selectedComment || !this.isCreating) {
+    if (!this.selectedAnnotation || !this.isCreating) {
         return;
     }
 
-    var arrow = this.selectedComment;
+    var arrow = this.selectedAnnotation;
     var end = this.getPointOnDomContainer(event.clientX, event.clientY);
     var bounds = this.getBounds();
 
@@ -5726,12 +5787,12 @@ CLOUD.Extensions.CommentEditor.prototype.mouseMoveForArrow = function (event) {
 
     var deltaX = end.x - startX;
 
-    if (Math.abs(deltaX) < this.arrowMinLen) {
+    if (Math.abs(deltaX) < this.annotationMinLen) {
 
         if (deltaX > 0) {
-            end.x = startX + this.arrowMinLen;
+            end.x = startX + this.annotationMinLen;
         } else {
-            end.x = startX - this.arrowMinLen;
+            end.x = startX - this.annotationMinLen;
         }
     }
 
@@ -5751,40 +5812,43 @@ CLOUD.Extensions.CommentEditor.prototype.mouseMoveForArrow = function (event) {
     if (Math.abs(arrow.head.x - head.x) >= epsilon || Math.abs(arrow.head.y - head.y) >= epsilon ||
         Math.abs(arrow.tail.x - tail.x) >= epsilon || Math.abs(arrow.tail.y - tail.y) >= epsilon) {
 
-        arrow.set(tail.x, tail.y, head.x, head.y);
+        arrow.setByTailHead(tail, head);
     }
 };
 
-CLOUD.Extensions.CommentEditor.prototype.mouseDownForRectangle = function (event) {
+CLOUD.Extensions.AnnotationEditor.prototype.mouseDownForRectangle = function (event) {
 
-    if (this.selectedComment) return false;
+    if (this.selectedAnnotation) return false;
 
     var start = this.getPointOnDomContainer(event.clientX, event.clientY);
+    var domBounds = this.getDomContainerBounds();
+    var minLen = this.annotationMinLen;
 
     this.originX = start.x;
     this.originY = start.y;
 
     var position = {x: start.x, y: start.y};
-    var size = {x: 10, y: 10};
+    position = this.clientToWorld(position);
+    var size = {width: minLen, height: minLen};
 
-    var id = this.generateCommentId();
-    var rectangle = new CLOUD.Extensions.CommentRectangle(this, id);
-    rectangle.set(position, size.x, size.y);
-    this.addComment(rectangle);
+    var id = this.generateAnnotationId();
+    var rectangle = new CLOUD.Extensions.AnnotationRectangle(this, id);
+    rectangle.set(position, size, 0, domBounds);
+    this.addAnnotation(rectangle);
     rectangle.created();
 
-    this.selectedComment = rectangle;
+    this.selectedAnnotation = rectangle;
 
     return true;
 };
 
-CLOUD.Extensions.CommentEditor.prototype.mouseMoveForRectangle = function (event) {
+CLOUD.Extensions.AnnotationEditor.prototype.mouseMoveForRectangle = function (event) {
 
-    if (!this.selectedComment || !this.isCreating) {
+    if (!this.selectedAnnotation || !this.isCreating) {
         return;
     }
 
-    var rectangle = this.selectedComment;
+    var rectangle = this.selectedAnnotation;
     var end = this.getPointOnDomContainer(event.clientX, event.clientY);
     var bounds = this.getBounds();
 
@@ -5799,47 +5863,51 @@ CLOUD.Extensions.CommentEditor.prototype.mouseMoveForRectangle = function (event
     }
 
     var position = {x: (startX + endX) / 2, y: (startY + endY) / 2};
-    var size = {x: endX - startX, y: endY - startY};
+    position = this.clientToWorld(position);
+    var size = {width: Math.abs(endX - startX), height: Math.abs(endY - startY)};
 
     var epsilon = 0.0001;
 
     if (Math.abs(rectangle.position.x - position.x) > epsilon || Math.abs(rectangle.size.y - size.y) > epsilon ||
         Math.abs(rectangle.position.y - position.y) > epsilon || Math.abs(rectangle.size.y - size.y) > epsilon) {
 
-        rectangle.set(position, size.x, size.y);
+        rectangle.set(position, size);
     }
 };
 
-CLOUD.Extensions.CommentEditor.prototype.mouseDownForCircle = function (event) {
+CLOUD.Extensions.AnnotationEditor.prototype.mouseDownForCircle = function (event) {
 
-    if (this.selectedComment) return false;
+    if (this.selectedAnnotation) return false;
 
     var start = this.getPointOnDomContainer(event.clientX, event.clientY);
+    var domBounds = this.getDomContainerBounds();
 
     this.originX = start.x;
     this.originY = start.y;
 
+    var minLen = this.annotationMinLen;
     var position = {x: start.x, y: start.y};
-    var size = {x: 10, y: 10};
+    position = this.clientToWorld(position);
+    var size = {width: minLen, height: minLen};
 
-    var id = this.generateCommentId();
-    var circle = new CLOUD.Extensions.CommentCircle(this, id);
-    circle.set(position, size.x, size.y);
-    this.addComment(circle);
+    var id = this.generateAnnotationId();
+    var circle = new CLOUD.Extensions.AnnotationCircle(this, id);
+    circle.set(position, size, 0, domBounds);
+    this.addAnnotation(circle);
     circle.created();
 
-    this.selectedComment = circle;
+    this.selectedAnnotation = circle;
 
     return true;
 };
 
-CLOUD.Extensions.CommentEditor.prototype.mouseMoveForCircle = function (event) {
+CLOUD.Extensions.AnnotationEditor.prototype.mouseMoveForCircle = function (event) {
 
-    if (!this.selectedComment || !this.isCreating) {
+    if (!this.selectedAnnotation || !this.isCreating) {
         return;
     }
 
-    var circle = this.selectedComment;
+    var circle = this.selectedAnnotation;
     var end = this.getPointOnDomContainer(event.clientX, event.clientY);
     var bounds = this.getBounds();
 
@@ -5854,47 +5922,51 @@ CLOUD.Extensions.CommentEditor.prototype.mouseMoveForCircle = function (event) {
     }
 
     var position = new THREE.Vector2((startX + endX) / 2, (startY + endY) / 2);
-    var size = new THREE.Vector2(endX - startX, endY - startY);
+    position = this.clientToWorld(position);
+    var size ={width: Math.abs(endX - startX), height: Math.abs(endY - startY)};
 
     var epsilon = 0.0001;
 
     if (Math.abs(circle.position.x - position.x) > epsilon || Math.abs(circle.size.y - size.y) > epsilon ||
         Math.abs(circle.position.y - position.y) > epsilon || Math.abs(circle.size.y - size.y) > epsilon) {
 
-        circle.set(position, size.x, size.y);
+        circle.set(position, size);
     }
 };
 
-CLOUD.Extensions.CommentEditor.prototype.mouseDownForCross = function (event) {
+CLOUD.Extensions.AnnotationEditor.prototype.mouseDownForCross = function (event) {
 
-    if (this.selectedComment) return false;
+    if (this.selectedAnnotation) return false;
 
     var start = this.getPointOnDomContainer(event.clientX, event.clientY);
+    var domBounds = this.getDomContainerBounds();
 
     this.originX = start.x;
     this.originY = start.y;
 
+    var minLen = this.annotationMinLen;
     var position = {x: start.x, y: start.y};
-    var size = {x: 10, y: 10};
+    position = this.clientToWorld(position);
+    var size = {width: minLen, height: minLen};
 
-    var id = this.generateCommentId();
-    var cross = new CLOUD.Extensions.CommentCross(this, id);
-    cross.set(position, size.x, size.y);
-    this.addComment(cross);
+    var id = this.generateAnnotationId();
+    var cross = new CLOUD.Extensions.AnnotationCross(this, id);
+    cross.set(position, size, 0, domBounds);
+    this.addAnnotation(cross);
     cross.created();
 
-    this.selectedComment = cross;
+    this.selectedAnnotation = cross;
 
     return true;
 };
 
-CLOUD.Extensions.CommentEditor.prototype.mouseMoveForCross = function (event) {
+CLOUD.Extensions.AnnotationEditor.prototype.mouseMoveForCross = function (event) {
 
-    if (!this.selectedComment || !this.isCreating) {
+    if (!this.selectedAnnotation || !this.isCreating) {
         return;
     }
 
-    var cross = this.selectedComment;
+    var cross = this.selectedAnnotation;
     var end = this.getPointOnDomContainer(event.clientX, event.clientY);
     var bounds = this.getBounds();
 
@@ -5909,76 +5981,91 @@ CLOUD.Extensions.CommentEditor.prototype.mouseMoveForCross = function (event) {
     }
 
     var position = new THREE.Vector2((startX + endX) / 2, (startY + endY) / 2);
-    var size = new THREE.Vector2(endX - startX, endY - startY);
+    position = this.clientToWorld(position);
+
+    var size ={width: Math.abs(endX - startX), height: Math.abs(endY - startY)};
 
     var epsilon = 0.0001;
 
     if (Math.abs(cross.position.x - position.x) > epsilon || Math.abs(cross.size.y - size.y) > epsilon ||
         Math.abs(cross.position.y - position.y) > epsilon || Math.abs(cross.size.y - size.y) > epsilon) {
 
-        cross.set(position, size.x, size.y);
+        cross.set(position, size);
     }
 };
 
-CLOUD.Extensions.CommentEditor.prototype.mouseDownForCloud = function (event) {
+CLOUD.Extensions.AnnotationEditor.prototype.mouseDownForCloud = function (event) {
 
-    if (this.selectedComment) return false;
+    if (this.selectedAnnotation) return false;
 
     var start = this.getPointOnDomContainer(event.clientX, event.clientY);
+    var domBounds = this.getDomContainerBounds();
 
     this.originX = start.x;
     this.originY = start.y;
 
-    var position = {x: start.x, y: start.y};
-    var size = {x: 10, y: 10};
+    //var minLen = this.annotationMinLen;
+    //var position = {x: start.x, y: start.y};
+    //position = this.clientToWorld(position);
+    //var size = {width: minLen, height: minLen};
 
-    var id = this.generateCommentId();
-    var cloud = new CLOUD.Extensions.CommentCloud(this, id);
-    cloud.addPoint(start);
-    cloud.set(position, size.x, size.y);
-    this.addComment(cloud);
+    this.clientPositions = [{x: start.x, y: start.y}];
+
+    var id = this.generateAnnotationId();
+    var cloud = new CLOUD.Extensions.AnnotationCloud(this, id);
+    cloud.setByPositions(this.clientPositions, domBounds);
     cloud.created();
     cloud.enableTrack();
 
-    this.selectedComment = cloud;
+    this.addAnnotation(cloud);
+    this.selectedAnnotation = cloud;
 
     return true;
 };
 
-CLOUD.Extensions.CommentEditor.prototype.mouseMoveForCloud = function (event) {
+CLOUD.Extensions.AnnotationEditor.prototype.mouseMoveForCloud = function (event) {
 
-    if (!this.selectedComment || !this.isCreating) {
+    if (!this.selectedAnnotation || !this.isCreating) {
         return;
     }
 
-    var cloud = this.selectedComment;
+    var cloud = this.selectedAnnotation;
 
     if (cloud.getTrackState()) {
 
         var position = this.getPointOnDomContainer(event.clientX, event.clientY);
-
         cloud.startTrack();
         cloud.setTrackingPoint(position);
     }
 };
 
-CLOUD.Extensions.CommentEditor.prototype.mouseUpForCloud = function (event) {
+CLOUD.Extensions.AnnotationEditor.prototype.mouseUpForCloud = function (event) {
 
-    if (!this.selectedComment || !this.isCreating) {
+    if (!this.selectedAnnotation || !this.isCreating) {
         return;
     }
 
-    var position = this.getPointOnDomContainer(event.clientX, event.clientY);
-    var cloud = this.selectedComment;
+    var end = this.getPointOnDomContainer(event.clientX, event.clientY);
+    var origin = {x: this.originX, y: this.originY};
+    var epsilon = 1; // 相差一个像素
+
+    // 判断是否同一个点, 同一个点不加入集合
+    if (CLOUD.Extensions.Utils.Geometric.isEqualBetweenPoints(origin, end, epsilon)) return;
+
+    this.clientPositions.push({x: end.x, y: end.y});
+
+    var cloud = this.selectedAnnotation;
 
     // 先禁止跟踪，在真正响应事件时启用
     cloud.disableTrack();
+
+    var positions = this.clientPositions;
 
     // 采用计时器来判断是否单击和双击
     function handleMouseUp() {
 
         cloud.finishTrack();
-        cloud.addPoint(position);
+        cloud.setByPositions(positions);
         cloud.enableTrack();
     }
 
@@ -5990,11 +6077,11 @@ CLOUD.Extensions.CommentEditor.prototype.mouseUpForCloud = function (event) {
     this.timerId = setTimeout(handleMouseUp, 300);
 };
 
-CLOUD.Extensions.CommentEditor.prototype.mouseDoubleClickForCloud = function (event) {
+CLOUD.Extensions.AnnotationEditor.prototype.mouseDoubleClickForCloud = function (event) {
 
-    if (this.isCreating && this.selectedComment) {
+    if (this.isCreating && this.selectedAnnotation) {
 
-        if (this.selectedComment.shapeType === CLOUD.Extensions.Comment.shapeTypes.CLOUD) {
+        if (this.selectedAnnotation.shapeType === CLOUD.Extensions.Annotation.shapeTypes.CLOUD) {
 
             // 清除定时器
             if (this.timerId) {
@@ -6003,30 +6090,28 @@ CLOUD.Extensions.CommentEditor.prototype.mouseDoubleClickForCloud = function (ev
 
             var position = this.getPointOnDomContainer(event.clientX, event.clientY);
 
-            this.selectedComment.finishTrack();
+            this.clientPositions.push({x: position.x, y: position.y});
 
-            this.selectedComment.addPoint(position);
+            this.selectedAnnotation.finishTrack();
 
             // 结束云图绘制，并封闭云图
-            this.selectedComment.setSeal(true);
+            this.selectedAnnotation.setByPositions(this.clientPositions, null, true);
 
-            this.createCommentEnd();
-            this.deselectComment();
-
-            //console.log("mouseDoubleClickForCloud");
+            this.createAnnotationEnd();
+            this.deselectAnnotation();
         }
     }
 };
 
-CLOUD.Extensions.CommentEditor.prototype.mouseDownForText = function (event) {
+CLOUD.Extensions.AnnotationEditor.prototype.mouseDownForText = function (event) {
 
-    if (this.commentTextArea.isActive()) {
+    if (this.annotationTextArea.isActive()) {
 
-        this.commentTextArea.accept();
+        this.annotationTextArea.accept();
         return;
     }
 
-    if (this.selectedComment) {
+    if (this.selectedAnnotation) {
         return;
     }
 
@@ -6035,39 +6120,43 @@ CLOUD.Extensions.CommentEditor.prototype.mouseDownForText = function (event) {
     var initWidth = clientFontSize * 20;
     var initHeight = clientFontSize * 4;
 
+    var domBounds = this.getDomContainerBounds();
+
     var size = new THREE.Vector2(initWidth, initHeight);
 
     var position = new THREE.Vector2(
         start.x + (initWidth * 0.5),
         start.y + (initHeight * 0.5));
 
-    var id = this.generateCommentId();
-    var text = new CLOUD.Extensions.CommentText(this, id);
-    text.set(position, size.x, size.y, '');
-    this.addComment(text);
+    position = this.clientToWorld(position);
+
+    var id = this.generateAnnotationId();
+    var text = new CLOUD.Extensions.AnnotationText(this, id);
+    text.set(position, size, 0, domBounds, '');
+    this.addAnnotation(text);
     text.created();
     text.forceRedraw();
 
-    this.selectedComment = text;
+    this.selectedAnnotation = text;
 
-    this.commentTextArea.active(this.selectedComment, true);
+    this.annotationTextArea.active(this.selectedAnnotation, true);
 
     return true;
 };
 
-CLOUD.Extensions.CommentEditor.prototype.mouseDoubleClickForText = function (event, comment) {
+CLOUD.Extensions.AnnotationEditor.prototype.mouseDoubleClickForText = function (event, annotation) {
 
-    if (comment) {
+    if (annotation) {
 
-        if (this.selectedComment && (this.selectedComment.shapeType === CLOUD.Extensions.Comment.shapeTypes.TEXT)) {
+        if (this.selectedAnnotation && (this.selectedAnnotation.shapeType === CLOUD.Extensions.Annotation.shapeTypes.TEXT)) {
 
-            this.deselectComment();
-            this.commentTextArea.active(comment, false);
+            this.deselectAnnotation();
+            this.annotationTextArea.active(annotation, false);
         }
     }
 };
 
-CLOUD.Extensions.CommentEditor.prototype.init = function (callbacks) {
+CLOUD.Extensions.AnnotationEditor.prototype.init = function (callbacks) {
 
     if (callbacks) {
 
@@ -6099,12 +6188,12 @@ CLOUD.Extensions.CommentEditor.prototype.init = function (callbacks) {
 
         this.enableSVGPaint(false);
 
-        this.commentFrame = new CLOUD.Extensions.CommentFrame(this, this.domElement);
-        this.commentTextArea = new CLOUD.Extensions.CommentTextArea(this, this.domElement);
+        this.annotationFrame = new CLOUD.Extensions.AnnotationFrame(this, this.domElement);
+        this.annotationTextArea = new CLOUD.Extensions.AnnotationTextArea(this, this.domElement);
     }
 };
 
-CLOUD.Extensions.CommentEditor.prototype.uninit = function () {
+CLOUD.Extensions.AnnotationEditor.prototype.uninit = function () {
 
     if (!this.svg) return;
 
@@ -6114,7 +6203,7 @@ CLOUD.Extensions.CommentEditor.prototype.uninit = function () {
     }
 
     // 卸载数据
-    this.unloadComments();
+    this.unloadAnnotations();
 
     if (this.svg.parentNode) {
         this.svg.parentNode.removeChild(this.svg);
@@ -6130,28 +6219,28 @@ CLOUD.Extensions.CommentEditor.prototype.uninit = function () {
     //this.destroy();
 };
 
-CLOUD.Extensions.CommentEditor.prototype.destroy = function () {
+CLOUD.Extensions.AnnotationEditor.prototype.destroy = function () {
 
-    if (this.commentTextArea) {
+    if (this.annotationTextArea) {
 
-        if (this.commentTextArea.isActive()) {
+        if (this.annotationTextArea.isActive()) {
 
-            this.commentTextArea.accept();
+            this.annotationTextArea.accept();
         }
     }
 
-    this.deselectComment();
+    this.deselectAnnotation();
 
-    if (this.commentFrame) {
+    if (this.annotationFrame) {
 
-        this.commentFrame.destroy();
-        this.commentFrame = null;
+        this.annotationFrame.destroy();
+        this.annotationFrame = null;
     }
 };
 
-CLOUD.Extensions.CommentEditor.prototype.generateCommentId = function () {
+CLOUD.Extensions.AnnotationEditor.prototype.generateAnnotationId = function () {
 
-    //return ++this.nextCommentId;
+    //return ++this.nextAnnotationId;
 
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
         var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
@@ -6159,12 +6248,12 @@ CLOUD.Extensions.CommentEditor.prototype.generateCommentId = function () {
     });
 };
 
-CLOUD.Extensions.CommentEditor.prototype.onExistEditor = function () {
+CLOUD.Extensions.AnnotationEditor.prototype.onExistEditor = function () {
 
     this.uninit();
 };
 
-CLOUD.Extensions.CommentEditor.prototype.editBegin = function () {
+CLOUD.Extensions.AnnotationEditor.prototype.editBegin = function () {
 
     if (this.isEditing) {
         return true;
@@ -6186,7 +6275,7 @@ CLOUD.Extensions.CommentEditor.prototype.editBegin = function () {
 
     // 注册事件
     this.addDomEventListeners();
-    // 允许穿透
+    // 允许在SVG上绘图
     this.enableSVGPaint(true);
     // 清除数据
     this.clear();
@@ -6194,9 +6283,13 @@ CLOUD.Extensions.CommentEditor.prototype.editBegin = function () {
     this.isEditing = true;
 };
 
-CLOUD.Extensions.CommentEditor.prototype.editEnd = function () {
+CLOUD.Extensions.AnnotationEditor.prototype.editEnd = function () {
 
     this.isEditing = false;
+
+    if (this.annotationTextArea && this.annotationTextArea.isActive()) {
+        this.annotationTextArea.accept();
+    }
 
     if (this.svgGroup && this.svgGroup.parentNode) {
         //this.svg.removeChild(this.svgGroup);
@@ -6209,45 +6302,45 @@ CLOUD.Extensions.CommentEditor.prototype.editEnd = function () {
 
     // 不允许穿透
     this.enableSVGPaint(false);
-    this.deselectComment();
+    this.deselectAnnotation();
 };
 
-CLOUD.Extensions.CommentEditor.prototype.createCommentBegin = function () {
+CLOUD.Extensions.AnnotationEditor.prototype.createAnnotationBegin = function () {
 
     if (!this.isCreating) {
 
         this.isCreating = true;
-        this.disableCommentInteractions(true);
+        this.disableAnnotationInteractions(true);
     }
 };
 
-CLOUD.Extensions.CommentEditor.prototype.createCommentEnd = function () {
+CLOUD.Extensions.AnnotationEditor.prototype.createAnnotationEnd = function () {
 
     if (this.isCreating) {
 
         this.isCreating = false;
-        this.disableCommentInteractions(false);
+        this.disableAnnotationInteractions(false);
     }
 };
 
-CLOUD.Extensions.CommentEditor.prototype.dragCommentFrameBegin = function () {
+CLOUD.Extensions.AnnotationEditor.prototype.dragAnnotationFrameBegin = function () {
 
-    this.disableCommentInteractions(true)
+    this.disableAnnotationInteractions(true)
 };
 
-CLOUD.Extensions.CommentEditor.prototype.dragCommentFrameEnd = function () {
+CLOUD.Extensions.AnnotationEditor.prototype.dragAnnotationFrameEnd = function () {
 
-    this.disableCommentInteractions(false)
+    this.disableAnnotationInteractions(false)
 };
 
-CLOUD.Extensions.CommentEditor.prototype.clear = function () {
+CLOUD.Extensions.AnnotationEditor.prototype.clear = function () {
 
-    var comments = this.comments;
+    var annotations = this.annotations;
 
-    while (comments.length) {
-        var comment = comments[0];
-        this.removeComment(comment);
-        comment.destroy();
+    while (annotations.length) {
+        var annotation = annotations[0];
+        this.removeAnnotation(annotation);
+        annotation.destroy();
     }
 
     var group = this.svgGroup;
@@ -6258,143 +6351,137 @@ CLOUD.Extensions.CommentEditor.prototype.clear = function () {
     }
 };
 
-CLOUD.Extensions.CommentEditor.prototype.setCommentType = function (type) {
+CLOUD.Extensions.AnnotationEditor.prototype.setAnnotationType = function (type) {
 
-    this.commentType = type;
+    this.annotationType = type;
 
     // 强行完成
-    this.createCommentEnd();
-    this.deselectComment();
+    this.createAnnotationEnd();
+    this.deselectAnnotation();
 
     this.onFocus();
 };
 
-CLOUD.Extensions.CommentEditor.prototype.addComment = function (comment) {
+CLOUD.Extensions.AnnotationEditor.prototype.addAnnotation = function (annotation) {
 
-    comment.setParent(this.svgGroup);
+    annotation.setParent(this.svgGroup);
 
-    this.comments.push(comment);
+    this.annotations.push(annotation);
 };
 
-CLOUD.Extensions.CommentEditor.prototype.deleteComment = function (comment) {
+CLOUD.Extensions.AnnotationEditor.prototype.deleteAnnotation = function (annotation) {
 
-    if (comment) {
-        this.removeComment(comment);
-        comment.destroy();
+    if (annotation) {
+        this.removeAnnotation(annotation);
+        annotation.destroy();
     }
 };
 
-CLOUD.Extensions.CommentEditor.prototype.removeComment = function (comment) {
+CLOUD.Extensions.AnnotationEditor.prototype.removeAnnotation = function (annotation) {
 
-    var idx = this.comments.indexOf(comment);
+    var idx = this.annotations.indexOf(annotation);
 
     if (idx !== -1) {
-        this.comments.splice(idx, 1);
+        this.annotations.splice(idx, 1);
     }
 };
 
-CLOUD.Extensions.CommentEditor.prototype.setCommentSelection = function (comment) {
+CLOUD.Extensions.AnnotationEditor.prototype.setAnnotationSelection = function (annotation) {
 
-    if (this.selectedComment !== comment) {
+    if (this.selectedAnnotation !== annotation) {
 
-        this.deselectComment();
+        this.deselectAnnotation();
     }
 
-    this.selectedComment = comment;
+    this.selectedAnnotation = annotation;
 
     // 放在最前面
 
     if (!this.isCreating) {
-        this.commentFrame.setComment(comment);
+        this.annotationFrame.setAnnotation(annotation);
     }
 };
 
-CLOUD.Extensions.CommentEditor.prototype.selectComment = function (comment) {
+CLOUD.Extensions.AnnotationEditor.prototype.selectAnnotation = function (annotation) {
 
-    if (comment) {
+    if (annotation) {
 
-        if (this.commentType === comment.shapeType) {
+        if (this.annotationType === annotation.shapeType) {
 
-            this.setCommentSelection(comment)
+            this.setAnnotationSelection(annotation)
 
         } else {
 
-            var shapeType = comment.shapeType;
+            var shapeType = annotation.shapeType;
 
-            this.setCommentSelection(null);
-            this.setCommentType(shapeType);
-            this.setCommentSelection(comment);
+            this.setAnnotationSelection(null);
+            //this.setAnnotationType(shapeType);
+            this.setAnnotationSelection(annotation);
         }
 
     } else {
-        this.setCommentSelection(null);
-    }
-};
-
-CLOUD.Extensions.CommentEditor.prototype.deselectComment = function () {
-
-    if (this.selectedComment) {
-        this.selectedComment.deselect();
-        this.selectedComment = null;
+        this.setAnnotationSelection(null);
     }
 
-    this.commentFrame.setComment(null);
 };
 
-CLOUD.Extensions.CommentEditor.prototype.worldToClient = function (wx, wy, wz) {
+CLOUD.Extensions.AnnotationEditor.prototype.deselectAnnotation = function () {
 
-    var rect = CLOUD.DomUtil.getContainerOffsetToClient(this.domElement);
+    if (this.selectedAnnotation) {
+        this.selectedAnnotation.deselect();
+        this.selectedAnnotation = null;
+    }
+
+    this.annotationFrame.setAnnotation(null);
+};
+
+CLOUD.Extensions.AnnotationEditor.prototype.worldToClient = function (wPoint) {
+
+    var size = this.getDomContainerBounds();
     var camera = this.cameraEditor.object;
-    var result = new THREE.Vector3();
+    var result = new THREE.Vector3(wPoint.x, wPoint.y, wPoint.z);
 
-    result.set(wx, wy, wz);
-
-    //result.applyMatrix4(camera.matrixWorld);
-    //result.sub(camera.position);
-
+    // 变换到相机空间
+    result.applyMatrix4(camera.matrixWorld);
+    result.sub(camera.position);
     result.project(camera);
 
-    //result.x = Math.floor(0.5 * (result.x + 1) * rect.width);
-    //result.y = Math.floor(-0.5 * (result.y - 1) * rect.height);
-    //result.z = 0;
-
-    result.x = 0.5 * (result.x + 1) * rect.width;
-    result.y = -0.5 * (result.y - 1) * rect.height;
+    // 变换到屏幕空间
+    result.x = Math.round(0.5 * (result.x + 1) * size.width);
+    result.y = Math.round(-0.5 * (result.y - 1) * size.height);
     result.z = 0;
 
     return result;
 };
 
-CLOUD.Extensions.CommentEditor.prototype.clientToWorld = function (cx, cy) {
+CLOUD.Extensions.AnnotationEditor.prototype.clientToWorld = function (cPoint) {
 
-    var rect = CLOUD.DomUtil.getContainerOffsetToClient(this.domElement);
+    var rect = this.getDomContainerBounds();
     var camera = this.cameraEditor.object;
     var result = new THREE.Vector3();
 
-    result.x = cx / rect.width * 2 - 1;
-    result.y = -cy / rect.height * 2 + 1;
+    result.x = cPoint.x / rect.width * 2 - 1;
+    result.y = - cPoint.y / rect.height * 2 + 1;
     result.z = 0;
 
     result.unproject(camera);
-    //result.z = 0;
-
-    //result.add(camera.position).applyMatrix4(camera.matrixWorldInverse);
+    result.add(camera.position).applyMatrix4(camera.matrixWorldInverse);
     //result.z = 0;
 
     return result;
 };
 
-CLOUD.Extensions.CommentEditor.prototype.getCommentWorldPosition = function (cPos) {
+CLOUD.Extensions.AnnotationEditor.prototype.getAnnotationWorldPosition = function (cPos) {
 
     return this.clientToWorld(cPos.x, cPos.y);
 };
 
-CLOUD.Extensions.CommentEditor.prototype.getCommentClientPosition = function (wPos) {
+CLOUD.Extensions.AnnotationEditor.prototype.getAnnotationClientPosition = function (wPos) {
 
     return this.worldToClient(wPos.x, wPos.y, wPos.z);
 };
 
-CLOUD.Extensions.CommentEditor.prototype.getCommentWorldSize = function (cSize, cPos) {
+CLOUD.Extensions.AnnotationEditor.prototype.getAnnotationWorldSize = function (cSize, cPos) {
 
     var lt = this.clientToWorld(cPos.x - 0.5 * cSize.x, cPos.y - 0.5 * cSize.y);
     var rb = this.clientToWorld(cPos.x + 0.5 * cSize.x, cPos.y + 0.5 * cSize.y);
@@ -6402,7 +6489,7 @@ CLOUD.Extensions.CommentEditor.prototype.getCommentWorldSize = function (cSize, 
     return {x: Math.abs(rb.x - lt.x), y: Math.abs(rb.y - lt.y)}
 };
 
-CLOUD.Extensions.CommentEditor.prototype.getCommentClientSize = function (wSize, wPos) {
+CLOUD.Extensions.AnnotationEditor.prototype.getAnnotationClientSize = function (wSize, wPos) {
 
     var lt = this.worldToClient(wPos.x - 0.5 * wSize.x, wPos - 0.5 * wSize.y, wPos.z);
     var rb = this.worldToClient(wPos.x + 0.5 * wSize.x, wPos + 0.5 * wSize.y, wPos.z);
@@ -6410,24 +6497,29 @@ CLOUD.Extensions.CommentEditor.prototype.getCommentClientSize = function (wSize,
     return {x: Math.abs(rb.x - lt.x), y: Math.abs(rb.y - lt.y)};
 };
 
-CLOUD.Extensions.CommentEditor.prototype.calcBoundingBox = function () {
+CLOUD.Extensions.AnnotationEditor.prototype.getMarkersBoundingBox = function () {
 
     return null;
 };
 
-CLOUD.Extensions.CommentEditor.prototype.getBounds = function () {
+CLOUD.Extensions.AnnotationEditor.prototype.getBounds = function () {
 
     return this.bounds;
 };
 
-CLOUD.Extensions.CommentEditor.prototype.getPointOnDomContainer = function (clientX, clientY) {
+CLOUD.Extensions.AnnotationEditor.prototype.getPointOnDomContainer = function (clientX, clientY) {
 
-    var rect = CLOUD.DomUtil.getContainerOffsetToClient(this.domElement);
+    var rect = this.getDomContainerBounds();
 
     return new THREE.Vector2(clientX - rect.left, clientY - rect.top);
 };
 
-CLOUD.Extensions.CommentEditor.prototype.getSVGViewBox = function (clientWidth, clientHeight) {
+CLOUD.Extensions.AnnotationEditor.prototype.getDomContainerBounds = function () {
+
+    return CLOUD.DomUtil.getContainerOffsetToClient(this.domElement);
+};
+
+CLOUD.Extensions.AnnotationEditor.prototype.getSVGViewBox = function (clientWidth, clientHeight) {
 
     //var lt = this.clientToWorld(0, 0);
     //var rb = this.clientToWorld(clientWidth, clientHeight);
@@ -6445,34 +6537,37 @@ CLOUD.Extensions.CommentEditor.prototype.getSVGViewBox = function (clientWidth, 
     return [0, 0, clientWidth, clientHeight].join(' ');
 };
 
-CLOUD.Extensions.CommentEditor.prototype.handleTextChange = function (data) {
+CLOUD.Extensions.AnnotationEditor.prototype.handleTextChange = function (data) {
 
-    var text = data.comment;
+    var text = data.annotation;
 
     if (data.text === '') {
 
-        this.selectComment(null);
+        data.annotation.delete();
+        this.selectAnnotation(null);
         return;
     }
 
     var position = {x: data.position.x, y: data.position.y};
-    var size = {x: data.width, y: data.height};
+    position = this.clientToWorld(position);
 
-    text.setSize(size.x, size.y, position);
+    var size = {width: data.width, height: data.height};
+
+    text.resetSize(size, position);
     text.setText(data.text);
 
-    this.createCommentEnd();
-    this.deselectComment();
+    this.createAnnotationEnd();
+    this.deselectAnnotation();
 };
 
-CLOUD.Extensions.CommentEditor.prototype.disableCommentInteractions = function (disable) {
+CLOUD.Extensions.AnnotationEditor.prototype.disableAnnotationInteractions = function (disable) {
 
-    this.comments.forEach(function (comment) {
-        comment.disableInteractions(disable);
+    this.annotations.forEach(function (annotation) {
+        annotation.disableInteractions(disable);
     });
 };
 
-CLOUD.Extensions.CommentEditor.prototype.handleCallbacks = function (name) {
+CLOUD.Extensions.AnnotationEditor.prototype.handleCallbacks = function (name) {
 
     switch (name) {
 
@@ -6496,17 +6591,17 @@ CLOUD.Extensions.CommentEditor.prototype.handleCallbacks = function (name) {
 
 };
 
-CLOUD.Extensions.CommentEditor.prototype.renderToCanvas = function (ctx) {
+CLOUD.Extensions.AnnotationEditor.prototype.renderToCanvas = function (ctx) {
 
-    this.comments.forEach(function (comment) {
+    this.annotations.forEach(function (annotation) {
         ctx.save();
-        comment.renderToCanvas(ctx);
+        annotation.renderToCanvas(ctx);
         ctx.restore();
     });
 };
 
 // 是否允许在SVG上绘图
-CLOUD.Extensions.CommentEditor.prototype.enableSVGPaint = function (enable) {
+CLOUD.Extensions.AnnotationEditor.prototype.enableSVGPaint = function (enable) {
 
     if (enable) {
 
@@ -6521,11 +6616,11 @@ CLOUD.Extensions.CommentEditor.prototype.enableSVGPaint = function (enable) {
 // ---------------------------- 外部 API BEGIN ---------------------------- //
 
 // 屏幕快照
-CLOUD.Extensions.CommentEditor.prototype.composeScreenSnapshot = function (snapshot) {
+CLOUD.Extensions.AnnotationEditor.prototype.composeScreenSnapshot = function (snapshot) {
 
     var canvas = document.createElement("canvas");
 
-    var bounds = CLOUD.DomUtil.getContainerOffsetToClient(this.domElement);
+    var bounds = this.getDomContainerBounds();
     canvas.width = bounds.width;
     canvas.height = bounds.height;
 
@@ -6566,65 +6661,64 @@ CLOUD.Extensions.CommentEditor.prototype.composeScreenSnapshot = function (snaps
 };
 
 // 设置导出背景色
-CLOUD.Extensions.CommentEditor.prototype.setBackgroundColor = function (startColor, stopColor) {
+CLOUD.Extensions.AnnotationEditor.prototype.setBackgroundColor = function (startColor, stopColor) {
 
     this.gradientStartColor = startColor;
     this.gradientStopColor = stopColor;
 };
 
 // 获得批注列表
-CLOUD.Extensions.CommentEditor.prototype.getCommentInfoList = function () {
+CLOUD.Extensions.AnnotationEditor.prototype.getAnnotationInfoList = function () {
 
     // 强行完成
-    this.createCommentEnd();
-    this.deselectComment();
 
-    var commentInfoList = [];
+    if (this.annotationType === CLOUD.Extensions.Annotation.shapeTypes.TEXT) {
 
-    for (var i = 0, len = this.comments.length; i < len; i++) {
-        var comment = this.comments[i];
+        if (this.annotationTextArea.isActive()) {
+            this.annotationTextArea.accept();
+        }
+    }
+
+    this.createAnnotationEnd();
+    this.deselectAnnotation();
+
+    var annotationInfoList = [];
+
+    for (var i = 0, len = this.annotations.length; i < len; i++) {
+        var annotation = this.annotations[i];
 
         var text = "";
-        if (comment.shapeType === CLOUD.Extensions.Comment.shapeTypes.TEXT) {
-            text = comment.currText;
+        if (annotation.shapeType === CLOUD.Extensions.Annotation.shapeTypes.TEXT) {
+            text = encodeURIComponent(annotation.currText); // 编码中文
         }
 
         var shapePoints = "";
-        var isSeal = false;
-        if (comment.shapeType === CLOUD.Extensions.Comment.shapeTypes.CLOUD) {
-            shapePoints = comment.getShapePoints();
-            isSeal = comment.isSeal;
-        }
-
-        var arrowHead = null;
-        var arrowTail = null;
-
-        if (comment.shapeType === CLOUD.Extensions.Comment.shapeTypes.ARROW) {
-            arrowHead = comment.head;
-            arrowTail = comment.tail;
+        if (annotation.shapeType === CLOUD.Extensions.Annotation.shapeTypes.CLOUD) {
+            shapePoints = annotation.getShapePoints();
         }
 
         var info = {
-            id: comment.id,
-            shapeType: comment.shapeType,
-            rotation: comment.rotation,
-            position: comment.position,
-            size: comment.size,
-            isSeal: isSeal,
+            id: annotation.id,
+            shapeType: annotation.shapeType,
+            position: annotation.position,
+            size: annotation.size,
+            rotation: annotation.rotation,
+            viewport: annotation.viewport,
             shapePoints: shapePoints,
-            arrowHead: arrowHead,
-            arrowTail: arrowTail,
             text: text
         };
 
-        commentInfoList.push(info);
+        //var str = window.btoa(JSON.stringify(info));
+        //console.log(str);
+
+        annotationInfoList.push(info);
     }
 
-    return commentInfoList;
+    return annotationInfoList;
 };
 
 // 加载批注
-CLOUD.Extensions.CommentEditor.prototype.loadComments = function (commentInfoList) {
+CLOUD.Extensions.AnnotationEditor.prototype.loadAnnotations = function (annotationInfoList) {
 
     if (!this.svgGroup) {
         this.svgGroup = CLOUD.Extensions.Utils.Shape2D.createSvgElement('g');
@@ -6641,59 +6735,56 @@ CLOUD.Extensions.CommentEditor.prototype.loadComments = function (commentInfoLis
         this.svg.insertBefore(this.svgGroup, this.svg.firstChild);
     }
 
-    for (var i = 0, len = commentInfoList.length; i < len; i++) {
+    for (var i = 0, len = annotationInfoList.length; i < len; i++) {
 
-        var info = commentInfoList[i];
+        var info = annotationInfoList[i];
         var id = info.id;
         var shapeType = info.shapeType;
         var position = info.position;
         var size = info.size;
-        var shapePointsStr = info.shapePoints;
-        var text = info.text;
-        var arrowHead = info.arrowHead;
-        var arrowTail = info.arrowTail;
         var rotation = info.rotation;
-        var isSeal = info.isSeal;
+        var viewport = info.viewport;
+        var shapePointsStr = info.shapePoints;
+        var text = decodeURIComponent(info.text); // 解码中文
 
         switch (shapeType) {
 
-            case CLOUD.Extensions.Comment.shapeTypes.ARROW:
-                var arrow = new CLOUD.Extensions.CommentArrow(this, id);
-                arrow.setToWorld(arrowTail, arrowHead);
-                arrow.setRotation(rotation);
-                this.addComment(arrow);
+            case CLOUD.Extensions.Annotation.shapeTypes.ARROW:
+                var arrow = new CLOUD.Extensions.AnnotationArrow(this, id);
+                arrow.set(position, size, rotation, viewport);
+                this.addAnnotation(arrow);
                 arrow.created();
                 break;
-            case  CLOUD.Extensions.Comment.shapeTypes.RECTANGLE:
-                var rectangle = new CLOUD.Extensions.CommentRectangle(this, id);
-                rectangle.setToWorld(position, size, rotation);
-                this.addComment(rectangle);
+            case  CLOUD.Extensions.Annotation.shapeTypes.RECTANGLE:
+                var rectangle = new CLOUD.Extensions.AnnotationRectangle(this, id);
+                rectangle.set(position, size, rotation, viewport);
+                this.addAnnotation(rectangle);
                 rectangle.created();
                 break;
-            case  CLOUD.Extensions.Comment.shapeTypes.CIRCLE:
-                var circle = new CLOUD.Extensions.CommentCircle(this, id);
-                circle.setToWorld(position, size, rotation);
-                this.addComment(circle);
+            case  CLOUD.Extensions.Annotation.shapeTypes.CIRCLE:
+                var circle = new CLOUD.Extensions.AnnotationCircle(this, id);
+                circle.set(position, size, rotation, viewport);
+                this.addAnnotation(circle);
                 circle.created();
                 break;
-            case  CLOUD.Extensions.Comment.shapeTypes.CROSS:
-                var cross = new CLOUD.Extensions.CommentCross(this, id);
-                cross.setToWorld(position, size, rotation);
-                this.addComment(cross);
+            case  CLOUD.Extensions.Annotation.shapeTypes.CROSS:
+                var cross = new CLOUD.Extensions.AnnotationCross(this, id);
+                cross.set(position, size, rotation, viewport);
+                this.addAnnotation(cross);
                 cross.created();
                 break;
-            case CLOUD.Extensions.Comment.shapeTypes.CLOUD:
-                var cloud = new CLOUD.Extensions.CommentCloud(this, id);
-                cloud.setToWorld(shapePointsStr, rotation, isSeal);
-                this.addComment(cloud);
+            case CLOUD.Extensions.Annotation.shapeTypes.CLOUD:
+                var cloud = new CLOUD.Extensions.AnnotationCloud(this, id);
+                cloud.set(position, size, rotation, viewport, shapePointsStr);
+                this.addAnnotation(cloud);
                 cloud.created();
                 break;
-            case  CLOUD.Extensions.Comment.shapeTypes.TEXT:
-                var textComment = new CLOUD.Extensions.CommentText(this, id);
-                textComment.setToWorld(position, size, rotation, text);
-                this.addComment(textComment);
-                textComment.created();
-                textComment.forceRedraw();
+            case  CLOUD.Extensions.Annotation.shapeTypes.TEXT:
+                var textAnnotation = new CLOUD.Extensions.AnnotationText(this, id);
+                textAnnotation.set(position, size, rotation, viewport, text);
+                this.addAnnotation(textAnnotation);
+                textAnnotation.created();
+                textAnnotation.forceRedraw();
                 break;
             default :
                 break;
@@ -6702,7 +6793,7 @@ CLOUD.Extensions.CommentEditor.prototype.loadComments = function (commentInfoLis
 };
 
 // 卸载批注
-CLOUD.Extensions.CommentEditor.prototype.unloadComments = function () {
+CLOUD.Extensions.AnnotationEditor.prototype.unloadAnnotations = function () {
 
     // 清除数据
     this.clear();
@@ -6713,7 +6804,7 @@ CLOUD.Extensions.CommentEditor.prototype.unloadComments = function () {
 };
 
 // 显示批注
-CLOUD.Extensions.CommentEditor.prototype.showComments = function () {
+CLOUD.Extensions.AnnotationEditor.prototype.showAnnotations = function () {
 
     if (this.svgGroup) {
         this.svgGroup.setAttribute("visibility", "visible");
@@ -6721,7 +6812,7 @@ CLOUD.Extensions.CommentEditor.prototype.showComments = function () {
 };
 
 // 隐藏批注
-CLOUD.Extensions.CommentEditor.prototype.hideComments = function () {
+CLOUD.Extensions.AnnotationEditor.prototype.hideAnnotations = function () {
 
     if (this.svgGroup) {
         this.svgGroup.setAttribute("visibility", "hidden");
@@ -6729,21 +6820,21 @@ CLOUD.Extensions.CommentEditor.prototype.hideComments = function () {
 };
 
 // 设置批注风格（边框色，填充色，字体大小等等）
-CLOUD.Extensions.CommentEditor.prototype.setCommentStyle = function (style) {
+CLOUD.Extensions.AnnotationEditor.prototype.setAnnotationStyle = function (style) {
 
-    this.commentStyle = CLOUD.DomUtil.cloneStyle(style);
+    this.annotationStyle = CLOUD.DomUtil.cloneStyle(style);
 };
 
 // 更新所有批注
-CLOUD.Extensions.CommentEditor.prototype.updateComments = function () {
+CLOUD.Extensions.AnnotationEditor.prototype.updateAnnotations = function () {
 
-    for (var i = 0, len = this.comments.length; i < len; i++) {
-        var comment = this.comments[i];
-        comment.updateStyle();
+    for (var i = 0, len = this.annotations.length; i < len; i++) {
+        var annotation = this.annotations[i];
+        annotation.update();
     }
 
-    if (this.commentFrame && this.selectedComment) {
-        this.commentFrame.setComment(this.selectedComment)
+    if (this.annotationFrame && this.selectedAnnotation) {
+        this.annotationFrame.setAnnotation(this.selectedAnnotation)
     }
 };
 

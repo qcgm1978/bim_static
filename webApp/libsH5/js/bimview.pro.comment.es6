@@ -19,7 +19,13 @@
 
 
 		//单利 不存在 则 新建
-		if (!AppView) {
+		if (!AppView || AppView.$el.parents("body").length <= 0) {
+
+			//刷新页面销毁
+			if (AppView) {
+				AppView.remove();
+			}
+
 			ModelView = this;
 			AppView = new CommentView.App().render();
 
@@ -33,7 +39,7 @@
 				var contextHtml = _.templateUrl("/libsH5/tpls/comment/viewPointContext.html", true);
 				$("body").append(contextHtml);
 			}
-		}
+		} 
 
 		$("#comment .navBar .item.project").click();
 
@@ -363,7 +369,7 @@
 					var data = this.model.toJSON();
 
 					this.$el.html(this.template(data));
-					
+
 
 					this.bindContent();
 
@@ -520,10 +526,14 @@
 							},
 
 							'delViewPoint': function() {
-								//删除视点
-								if (confirm("确认删除该视点么？")) {
+
+								$.confirm("确认删除该视点么？", function() {
 									that.delViewPoint();
-								}
+								});
+								// //删除视点
+								// if ($.confirm("确认删除该视点么？")) {
+								// 	that.delViewPoint();
+								// }
 							}
 
 						}
@@ -798,7 +808,12 @@
 					}
 
 					if (this.$(".uploading").length > 0) {
-						alert('图片上传中');
+						$.tip({
+							message: "图片上传中",
+							timeout: 3000,
+							type: "alarm"
+						});
+						//alert('图片上传中');
 						return;
 					}
 					//图片
@@ -826,8 +841,12 @@
 
 
 					if (!pars.text) {
-
-						alert('请输入评论内容');
+						$.tip({
+							message: "请输入评论内容",
+							timeout: 3000,
+							type: "alarm"
+						});
+						//alert('请输入评论内容');
 						return;
 					}
 
@@ -917,25 +936,29 @@
 				//删除评论
 				delTalk(event) {
 
-					if (!confirm('确认删除该评论么？')) {
-						return;
-					}
+					$.confirm('确认删除该评论么？', () => {
+						var $el = $(event.target),
+							id = $el.data("id");
 
-					var $el = $(event.target),
-						id = $el.data("id");
+						this.model.projectId = App.Project.Settings.projectId;
+						this.model.viewPointId = viewPointId;
+						this.model.commentId = id;
 
-					this.model.projectId = App.Project.Settings.projectId;
-					this.model.viewPointId = viewPointId;
-					this.model.commentId = id;
+						if (App.Project.Settings.isShare) {
+							this.model.urlType = "delCommentByToken";
+							this.model.token = App.Project.Settings.token;
+						} else {
+							this.model.urlType = "delComment";
+						}
 
-					if (App.Project.Settings.isShare) {
-						this.model.urlType = "delCommentByToken";
-						this.model.token = App.Project.Settings.token;
-					} else {
-						this.model.urlType = "delComment";
-					}
+						this.model.destroy();
+					});
 
-					this.model.destroy();
+					// if (!confirm('确认删除该评论么？')) {
+					// 	return;
+					// }
+
+
 
 				},
 
@@ -1123,7 +1146,12 @@
 					};
 
 				if (!pars.name) {
-					alert("请输入批注名称");
+					$.tip({
+						message: "请输入批注名称",
+						timeout: 3000,
+						type: "alarm"
+					});
+					//alert("请输入批注名称");
 					return false;
 				}
 
@@ -1293,7 +1321,12 @@
 				var description = dialog.element.find(".name").val().trim();
 
 				if (!description) {
-					alert("请输入位置信息");
+					$.tip({
+						message: "请输入位置信息",
+						timeout: 3000,
+						type: "alarm"
+					});
+					//alert("请输入位置信息");
 					return;
 				}
 
@@ -1379,7 +1412,11 @@
 						}
 						clipboard = new Clipboard(".saveViewPoint .btnCopy");
 						clipboard.on('success', function(e) {
-							alert("您已经复制了链接地址");
+							$.tip({
+								message: "您已经复制了链接地址",
+								timeout: 3000
+							});
+							//alert("您已经复制了链接地址");
 							e.clearSelection();
 						});
 
@@ -1406,7 +1443,12 @@
 					};
 
 				if (!pars.name) {
-					alert("请输入批注名称");
+					$.tip({
+						message: "请输入批注名称",
+						timeout: 3000,
+						type: "alarm"
+					});
+					//alert("请输入批注名称");
 					return false;
 				}
 
@@ -1605,7 +1647,12 @@
 					};
 
 				if (!pars.name) {
-					alert("请输入批注名称");
+					$.tip({
+						message: "请输入批注名称",
+						timeout: 3000,
+						type: "alarm"
+					});
+					//alert("请输入批注名称");
 					return false;
 				}
 

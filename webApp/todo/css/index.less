@@ -1,7 +1,7 @@
 .todoNav { min-width: 1000px; height: 40px; background-color: #f5f5f5; border-bottom: 1px #ccc solid;
-	.todoSearch { float: right; margin-top: 5px; margin-right: 28px;
-		.txtSearch { width: 163px; border: 1px #ccc solid; outline: none; border: 1px solid #ccc; outline: none; height: 30px; padding: 4px 12px; }
-		.btnSearch { width: 78px; height: 28px; line-height: 28px; text-align: center; cursor: pointer; display: inline-block; border: 1px #ccc solid; margin-left: 20px; }
+	.todoSearch { float: right; margin-top: 5px; margin-right: 20px;
+		.txtSearch { width: 160px; border: 1px #ccc solid; outline: none; border: 1px solid #ccc; outline: none; height: 25px; padding: 0 12px; }
+		.btnSearch { width: 80px; height: 25px; line-height: 25px; text-align: center; cursor: pointer; display: inline-block; border: 1px #ccc solid; margin-left: 10px; }
 	}
 	ul { margin-left: 35px;
 		li { float: left; list-style-type: none; font-size: 14px; width: 130px; height: 30px; line-height: 30px; text-align: center; border: 1px #ccc solid; margin-top: 10px; cursor: pointer;
@@ -22,4 +22,7 @@
 	}
 	.pagination { float: right; margin-right: 21px; }
 	.sumDesc { float: left; margin-top: 20px; margin-left: 13px; }
+	& .noData { width: 100%; display: inline-block; text-align: center; padding-top: 80px; color: #ccc; font-size: 20px;
+		& .tip { background: url('/imbox/images/icon.png') no-repeat -40px -260px; width: 40px; height: 40px; display: inline-block; vertical-align: -17px; margin-right: 10px; }
+	}
 }

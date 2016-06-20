@@ -119,6 +119,7 @@ App.Project = {
 	// 除 dwg以外的格式
 	renderOther(modelId,type) {
 		var typeMap = {
+			rte:'singleModel',
 			rvt:'singleModel',
 			rfa:'familyModel'
 		}
@@ -393,6 +394,7 @@ App.Project = {
 			$(this).toggleClass("down");
 			var $modleList = $(this).parent().find(".modleList");
 			$modleList.slideToggle();
+
 		});
 		//收起 暂开 属性
 		$projectContainer.on("click", ".slideBar", function() {

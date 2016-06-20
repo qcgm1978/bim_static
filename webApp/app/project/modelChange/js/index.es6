@@ -39,6 +39,7 @@ App.Index = {
 			$(this).toggleClass("down");
 			var $modleList = $(this).parent().find(".modleList");
 			$modleList.slideToggle();
+
 		});
 
 
@@ -277,7 +278,7 @@ App.Index = {
 			}
 		};
 
-		App.Comm.ajax(data, function(data) {
+		App.Comm.ajax(data, (data)=> {
 			if (data.code == 0) {
 				data = data.data;
 				$(".breadcrumbNav .project .text").text(data.projectName);
@@ -381,8 +382,32 @@ App.Project.Model = {
 		},
 		addDetail: function(model) {
 			var data = model.toJSON();
+			console.log(data)
 			if (data.message == 'success' && data.data.length > 0) {
 				this.$el.html(this.template(data));
+				var editbefore=[],editafter=[],add=[],remove=[];
+				for(var i=0,obj;i<data.data.length;i++){
+					obj = data.data[i]['results'];
+					for(var j=0;j<obj.length;j++){
+						if(obj[j]['changeType']==1){
+							add.push(obj[j]['currentElementId']);
+						}else if(obj[j]['changeType']==2){
+							remove.push(obj[j]['baseElementId']);
+
+						}else if(obj[j]['changeType']==8){
+							editafter.push(obj[j]['currentElementId']);
+							editbefore.push(obj[j]['baseElementId']);
+
+						}
+					}
+				}
+       //setTimeout(function(){
+	       App.Index.Settings.Viewer.setOverrider('beforeEdit', editbefore);
+	       App.Index.Settings.Viewer.setOverrider('afterEdit', editafter);
+	       App.Index.Settings.Viewer.setOverrider('add',add);
+	       App.Index.Settings.Viewer.setOverrider('delete',remove);
+       //},2000);
+
 			} else {
 				this.$el.html("没有变更");
 			}
@@ -401,45 +426,45 @@ App.Project.Model = {
 			var parent = $(".rightTreeView");
 			var elementId = that.data('id');
 			var baseId = that.data('base');
-			if (that.prev('.noneSwitch').length > 0) {
-				if (that.is('.current')) {
-					that.removeClass('current');
-					App.Index.Settings.Viewer.highlight({
-						type: "userId",
-						ids: []
-					});
-				} else {
-					parent.find('.current').removeClass('current');
-					that.addClass('current');
-					App.Index.Settings.Viewer.highlight({
-						type: "userId",
-						ids: [elementId, baseId]
-					});
-				}
-				App.Index.Settings.Viewer.fit();
-			}
+			//if (that.prev('.noneSwitch').length > 0) {
+			//	if (that.is('.current')) {
+			//		that.removeClass('current');
+			//		App.Index.Settings.Viewer.highlight({
+			//			type: "userId",
+			//			ids: []
+			//		});
+			//	} else {
+			//		parent.find('.current').removeClass('current');
+			//		that.addClass('current');
+			//		App.Index.Settings.Viewer.highlight({
+			//			type: "userId",
+			//			ids: [elementId, baseId]
+			//		});
+			//	}
+			//	App.Index.Settings.Viewer.fit();
+			//}
 
-			App.Index.Settings.Viewer.setOverrider('add');
-			App.Index.Settings.Viewer.setOverrider('beforeEdit');
-			App.Index.Settings.Viewer.setOverrider('afterEdit');
-			App.Index.Settings.Viewer.setOverrider('delete');
+			//App.Index.Settings.Viewer.setOverrider('add');
+			//App.Index.Settings.Viewer.setOverrider('beforeEdit');
+			//App.Index.Settings.Viewer.setOverrider('afterEdit');
+			//App.Index.Settings.Viewer.setOverrider('delete');
 
 			//判断是新增，修改，删除
-			if (baseId && elementId) {
-				//修改
-
-				App.Index.Settings.Viewer.setOverrider('beforeEdit', [baseId]);
-				App.Index.Settings.Viewer.setOverrider('afterEdit', [elementId]);
-			} else if (baseId) {
-				//删除
-
-				App.Index.Settings.Viewer.setOverrider('delete', [baseId]);
-
-			} else {
-				//新增
-
-				App.Index.Settings.Viewer.setOverrider('add', [elementId]);
-			}
+			//if (baseId && elementId) {
+			//	//修改
+      //
+			//	App.Index.Settings.Viewer.setOverrider('beforeEdit', [baseId]);
+			//	App.Index.Settings.Viewer.setOverrider('afterEdit', [elementId]);
+			//} else if (baseId) {
+			//	//删除
+      //
+			//	App.Index.Settings.Viewer.setOverrider('delete', [baseId]);
+      //
+			//} else {
+			//	//新增
+      //
+			//	App.Index.Settings.Viewer.setOverrider('add', [elementId]);
+			//}
 
 			//zoomtobox
 			$.ajax({

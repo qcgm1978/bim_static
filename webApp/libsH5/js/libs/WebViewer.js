@@ -3,7 +3,7 @@
 */
 
 var CLOUD = CLOUD || {};
-CLOUD.Version = "20160604";
+CLOUD.Version = "20160616";
 
 CLOUD.GlobalData = {
     SceneSize: 1000,
@@ -7505,6 +7505,16 @@ CLOUD.Scene.prototype.worldBoundingBox = function () {
 
 }();
 
+CLOUD.Scene.prototype.getRootNodeMatrix = function () {
+
+    if (this.rootNode.matrix) {
+
+        return this.rootNode.matrix.clone();
+    }
+
+    return null;
+};
+
 CLOUD.Scene.prototype.hitTestClipPlane = function (ray, intersects) {
     if (this.clipWidget && this.clipWidget.isEnabled()) {
         var hit = this.clipWidget.hitTest(ray);
@@ -9032,7 +9042,8 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
     // the orbit center
     this.pivot = null;
 
-    this.movementSpeed = 0.005 * CLOUD.GlobalData.SceneSize; // 移动速度
+    //this.movementSpeed = 0.005 * CLOUD.GlobalData.SceneSize; // 移动速度
+    this.movementSpeed = 0.0008 * CLOUD.GlobalData.SceneSize; // 移动速度
     this.defaultMovementSpeed = this.movementSpeed;
     this.minMovementSpeed = 0.01;
 
@@ -9054,7 +9065,7 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
 
     // Set to true to disable this control
     this.noPan = false;
-    this.keyPanSpeed = 7.0;	// pixels moved per arrow key push
+    this.keyPanSpeed = 2.0;	// pixels moved per arrow key push
     this.defaultKeyPanSpeed = this.keyPanSpeed;
     this.minKeyPanSpeed = 0.01;
     //this.movementSpeedMultiplier = 1.0;
@@ -9112,15 +9123,9 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
 
     var STATE = {NONE: -1, ROTATE: 0, DOLLY: 1, PAN: 2};
 
-    //var isAtZoom = 0; // 指示是否处在滚动缩放状态
     var state = STATE.NONE;
 
     var lastTrackingPoint;
-
-    //var lastCameraView = {
-    //    dir: new THREE.Vector3(),
-    //    up: new THREE.Vector3()
-    //};
 
     this.IsIdle = function () {
         return state === STATE.NONE;
@@ -10025,25 +10030,48 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
     };
 
     // 后退
-    this.moveBackward = function (step) {
+    this.moveBackward = function (step, keepHeight) {
 
         var position = this.object.position;
         var target = this.target;
-        var eye = target.clone().sub(position);
+        if (keepHeight) {
+            var diff = new THREE.Vector3(target.x - position.x, 0, target.z - position.z);
+            var len = diff.length();
+            var coe = step / len;
+            var stepDiff = new THREE.Vector3(-diff.x * coe, 0, -diff.z * coe);
 
-        this.object.translateZ(step);
-        target.addVectors(position, eye);
+            position.add(stepDiff);
+            target.add(stepDiff);
+        }
+        else {
+            var eye = target.clone().sub(position);
+            this.object.translateZ(step);
+            target.addVectors(position, eye);
+        }
     };
 
     // 前进
-    this.moveForward = function (step) {
+    this.moveForward = function (step, keepHeight) {
 
         var position = this.object.position;
         var target = this.target;
-        var eye = target.clone().sub(position);
 
-        this.object.translateZ(-step);
-        target.addVectors(position, eye);
+        if (keepHeight) {
+            var diff = new THREE.Vector3(target.x - position.x, 0, target.z - position.z);
+            var len = diff.length();
+            var coe = step / len;
+            var stepDiff = new THREE.Vector3(diff.x * coe, 0, diff.z * coe);
+
+            position.add(stepDiff);
+            target.add(stepDiff);
+        }
+        else {
+            var eye = target.clone().sub(position);
+
+            this.object.translateZ(-step);
+            target.addVectors(position, eye);
+        }
+
     };
 
     this.updatePivot = function (bySelection, failback) {
@@ -10347,6 +10375,9 @@ CLOUD.OrbitEditor.prototype.constructor = CLOUD.OrbitEditor;
 CLOUD.OrbitEditor.prototype.onExistEditor = function () {
 };
 
+CLOUD.OrbitEditor.prototype.getDomElement = function () {
+    return this.domElement;
+};
 // 稍后考虑将延迟处理功能移到EditorManager
 //CLOUD.OrbitEditor.prototype.update = function () {
 //    this.cameraEditor.update(true, true);
@@ -10449,15 +10480,15 @@ CLOUD.OrbitEditor.prototype.processMouseUp = function (event) {
     }
 
     var camera_scope = this.cameraEditor;
-    if (camera_scope.enabled === false) return false;
-
+    if (camera_scope.enabled === false)
+        return false;
     if (camera_scope.IsIdle() === true) {
         return false;
     }
 
-    // Mouse Up后，需要刷新，这里强制刷一帧
-    camera_scope.process(event.clientX, event.clientY, true);
-
+    if (!this.isMouseClick) {
+        camera_scope.update(true);
+    }
     camera_scope.endOperation();
     return true;
 };
@@ -10481,7 +10512,7 @@ CLOUD.OrbitEditor.prototype.onMouseWheel = function (event) {
     //两者只在取值上不一致，代表含义一致，detail与wheelDelta只各取两个值，detail只取±3，wheelDelta只取±120，其中正数表示为向上，负数表示向下。
     var delta = 0 || event.wheelDelta || event.detail;
     delta = (Math.abs(delta) > 10 ? delta : -delta * 40);
-    delta *= 0.0005;
+    delta *= 0.0001; // 0.0005
 
     this.delayHandle();
 
@@ -10550,13 +10581,13 @@ CLOUD.OrbitEditor.prototype.onKeyDown = function (event) {
         case camera_scope.keys.UP:
         case camera_scope.keys.W:
             //camera_scope.beginPan();
-            camera_scope.moveForward(camera_scope.movementSpeed);
+            camera_scope.moveForward(camera_scope.movementSpeed, !event.shiftKey);
             camera_scope.update(true);
             break;
         case camera_scope.keys.BOTTOM:
         case camera_scope.keys.S:
             //camera_scope.beginPan();
-            camera_scope.moveBackward(camera_scope.movementSpeed);
+            camera_scope.moveBackward(camera_scope.movementSpeed, !event.shiftKey);
             camera_scope.update(true);
             break;
     }
@@ -10669,6 +10700,10 @@ CLOUD.RectPickEditor.prototype = {
 
     onstructor: CLOUD.RectPickEditor,
 
+    getDomElement : function () {
+        return this.slaveEditor.domElement;
+    },
+
     udpateFrustum : function (updateUI) {
 
         var x1 = this.startPt.x;
@@ -10758,42 +10793,42 @@ CLOUD.RectPickEditor.prototype = {
 
         this.onUpdateUI({ visible: false });
 
-        if(event.button === THREE.MOUSE.LEFT)  {
-            var allowRectPick = event.shiftKey || event.ctrlKey || event.altKey;
-            if (allowRectPick) {
+        if (event.button === THREE.MOUSE.LEFT) {
 
-                this.endPt.set(event.clientX, event.clientY);
-                if (!this.udpateFrustum()) {
-                    this.pickByClick(event);
-                    return false;
-                }
-           
-                var state = CLOUD.OPSELECTIONTYPE.Clear;
-
-                if (event.ctrlKey) {
-                    state = CLOUD.OPSELECTIONTYPE.Add;
-                }
-                else if (event.altKey) {
-                    state = CLOUD.OPSELECTIONTYPE.Remove;
-                }
-            
-
-                var scope = this;
-                slaveEditor.scene.pickByReck(this.frustum, state, function () {
-                    scope.onObjectSelected();
-                });
-                slaveEditor.cameraEditor.updateView(true);
-
+            if (this.startPt.x == event.clientX && this.startPt.y == event.clientY) {
+                this.pickHelper.click(event);
                 return true;
             }
             else {
+                var allowRectPick = event.shiftKey || event.ctrlKey || event.altKey;
+                if (allowRectPick) {
 
-                if (this.startPt.x == event.clientX && this.startPt.y == event.clientY) {
-                    this.pickHelper.click(event);
+                    this.endPt.set(event.clientX, event.clientY);
+                    if (!this.udpateFrustum()) {
+                        this.pickByClick(event);
+                        return false;
+                    }
+
+                    var state = CLOUD.OPSELECTIONTYPE.Clear;
+
+                    if (event.ctrlKey) {
+                        state = CLOUD.OPSELECTIONTYPE.Add;
+                    }
+                    else if (event.altKey) {
+                        state = CLOUD.OPSELECTIONTYPE.Remove;
+                    }
+
+
+                    var scope = this;
+                    slaveEditor.scene.pickByReck(this.frustum, state, function () {
+                        scope.onObjectSelected();
+                    });
+                    slaveEditor.cameraEditor.updateView(true);
+
                     return true;
                 }
-
             }
+
         }
 
 
@@ -17553,9 +17588,9 @@ CLOUD.EditorManager = function (handleEvents) {
 
     function setFocuse() {
         // 设置焦点
-        var dom = scope.editor.domElement;
+        var dom = scope.editor.getDomElement();
         if (dom) {
-            var canvas = scope.editor.domElement.querySelector("#cloud-main-canvas");
+            var canvas = dom.querySelector("#cloud-main-canvas");
             if (canvas)
                 canvas.focus();
         }
@@ -17740,23 +17775,11 @@ CLOUD.EditorManager.prototype = {
         return false;
     },
 
-    setMarkerMode: function (viewer) {
+    setAnnotationMode: function (viewer) {
         var scope = this;
 
-        if(this.markerEditor === undefined){
-            this.markerEditor = new CLOUD.MarkerEditor(viewer.cameraEditor, viewer.getScene(), viewer.domElement);
-        }
-
-        this.markerEditor.init();
-
-        scope.setEditor(this.markerEditor);
-    },
-
-    setCommentMode: function (viewer) {
-        var scope = this;
-
-        if(this.commentEditor === undefined){
-            this.commentEditor = new CLOUD.Extensions.CommentEditor(viewer.cameraEditor, viewer.getScene(), viewer.domElement);
+        if(this.annotationEditor === undefined){
+            this.annotationEditor = new CLOUD.Extensions.AnnotationEditor(viewer.cameraEditor, viewer.getScene(), viewer.domElement);
         }
 
         var callbacks = {
@@ -17769,12 +17792,12 @@ CLOUD.EditorManager.prototype = {
             changeEditorModeCallback:function(){
                 scope.setPickMode(viewer);
             }
-        };    
+        };
+
+        scope.setEditor(this.annotationEditor);
+        this.annotationEditor.init(callbacks);
 
         callbacks = null;
-
-        scope.setEditor(this.commentEditor);
-        this.commentEditor.init(callbacks);
     },
 
     zoomIn: function (factor, viewer) {
@@ -17883,7 +17906,9 @@ CloudViewer = function () {
     this.incrementRenderEnabled = true; // 启用增量绘制
     this.updateRenderListEnabled = true; // 是否启用渲染队列更新
 
-    this.modelManager = new CLOUD.ModelManager();    
+    this.modelManager = new CLOUD.ModelManager();
+
+    this.extensions = {}; // 扩展功能
 
     this.viewHouse = null;
 
@@ -18175,9 +18200,8 @@ CloudViewer.prototype = {
 
         this.renderViewHouse();
 
-        this.renderMiniMap();
-
-        
+        // 刷新扩展绘制
+        this.renderExtensions();
     },
 
     setEditorDefault: function () {
@@ -18256,13 +18280,9 @@ CloudViewer.prototype = {
 
         this.renderer.setSize(width, height);
 
-        this.resizeViewHouse(width, height, this.isMobile);
-
         this.resizeFlyCross(); // 重设fly模式下十字光标位置
 
-        this.resizeMarkerContainer();
-
-        this.resizeCommentContainer();
+        this.resizeExtensions(width, height, this.isMobile);
 
         this.render();
     },
@@ -18505,10 +18525,10 @@ CloudViewer.prototype = {
         var mimetype = "image/png";
         var dataUrl = null;
 
-        if (this.editorManager.commentEditor && this.editorManager.editor === this.editorManager.commentEditor) {
+        if (this.editorManager.annotationEditor && this.editorManager.editor === this.editorManager.annotationEditor) {
 
             // 在批注模式，底图已经锁定，不用调用render
-            var editor = this.editorManager.commentEditor;
+            var editor = this.editorManager.annotationEditor;
 
             dataUrl = this.renderer.domElement.toDataURL(mimetype);
             dataUrl = editor.composeScreenSnapshot(dataUrl);
@@ -18538,7 +18558,7 @@ CloudViewer.prototype = {
             CLOUD.GlobalData.SubSceneVisibleLOD = 1000;
             CLOUD.GlobalData.CellVisibleLOD = 1000;
         }
-
+        this.enableCameraNearFar = false;
     },
 
     adjustSceneLoD: function (sceneIds) {
@@ -18592,6 +18612,25 @@ CloudViewer.prototype = {
 
             this.enableCameraNearFar = true;
         }
+    },
+
+    // 扩展功能的 render
+    renderExtensions: function() {
+
+        // 刷新小地图
+        this.renderMiniMap();
+        // 刷新标记点
+        this.renderMarkers();
+    },
+
+    // 扩展功能的 resize
+    resizeExtensions: function(width, height, isMobile) {
+
+        this.resizeViewHouse(width, height, isMobile);
+
+        this.resizeMarkers();
+
+        this.resizeComments();
     },
 
     // ------------------ ViewHouse API -- S ------------------ //
@@ -18771,61 +18810,138 @@ CloudViewer.prototype = {
     // ------------------ 小地图API -- E ------------------ //
 
     // ------------------ 标记 API -- S ------------------ //
+
     setMarkerMode: function () {
-        this.editorManager.setMarkerMode(this);
+
+        if (!this.extensions.markerEditor) {
+
+            this.extensions.markerEditor = new CLOUD.Extensions.MarkerEditor(this);
+        }
+
     },
 
-    // 用于检查点、隐患点
+    // 初始化
+    initMarkerEditor: function() {
+
+        var scope = this;
+
+        if (!this.extensions.markerEditor.isInitialized()) {
+
+            var callbacks = {
+                beginEditCallback: function(domElement){
+                    scope.editorManager.unregisterDomEventListeners(domElement);
+                },
+                endEditCallback: function(domElement){
+                    scope.editorManager.registerDomEventListeners(domElement);
+                }
+            };
+
+            this.extensions.markerEditor.init(callbacks);
+
+            callbacks = null;
+        }
+    },
+
+    // 卸载
+    uninitMarkerEditor: function() {
+
+        if (this.extensions.markerEditor.isInitialized()) {
+
+            this.extensions.markerEditor.uninit();
+
+        }
+    },
+
+    // zoom到合适的大小
     zoomToSelectedMarkers: function(){
-        if ( this.editorManager.markerEditor && this.editorManager.editor === this.editorManager.markerEditor) {
-            var bBox = this.editorManager.markerEditor.calcBoundingBox();
+
+        if (this.extensions.markerEditor) {
+
+            var bBox = this.extensions.markerEditor.getMarkersBoundingBox();
 
             if (bBox) {
-                this.zoomToBBox(bBox);
+                this.editorManager.zoomToBBox(bBox);
             }
 
-            this.editorManager.markerEditor.update();
+            this.extensions.markerEditor.updateMarkers();
+
         }
+
     },
 
+    // 开始编辑
     editMarkerBegin: function() {
-        if ( this.editorManager.markerEditor && this.editorManager.editor === this.editorManager.markerEditor) {
-            this.editorManager.markerEditor.editBegin();
-        }
+
+        this.setMarkerMode();
+        this.initMarkerEditor();
+        this.extensions.markerEditor.editBegin();
     },
 
+    // 结束编辑
     editMarkerEnd: function() {
-        if ( this.editorManager.markerEditor && this.editorManager.editor === this.editorManager.markerEditor) {
-            this.editorManager.markerEditor.editEnd();
+
+        if (this.extensions.markerEditor) {
+
+            this.extensions.markerEditor.editEnd();
+
         }
     },
 
+    // 设置标记状态
     setMarkerState: function(state) {
-        if ( this.editorManager.markerEditor && this.editorManager.editor === this.editorManager.markerEditor) {
-            this.editorManager.markerEditor.setMarkerState(state);
+
+        if (this.extensions.markerEditor) {
+
+            this.extensions.markerEditor.setMarkerState(state);
+
         }
     },
 
+    // 加载标记
     loadMarkers: function(markerInfoList) {
-        if ( this.editorManager.markerEditor && this.editorManager.editor === this.editorManager.markerEditor) {
-            this.editorManager.markerEditor.loadMarkers(markerInfoList);
+
+        this.setMarkerMode();
+
+        if (markerInfoList) {
+
+            this.initMarkerEditor();
+            this.extensions.markerEditor.loadMarkers(markerInfoList);
+
+        } else {
+
+            this.uninitMarkerEditor();
         }
+
     },
 
+    // 获得标记列表
     getMarkerInfoList: function() {
-        if ( this.editorManager.markerEditor && this.editorManager.editor === this.editorManager.markerEditor) {
-             return this.editorManager.markerEditor.getMarkerInfoList();
+
+        if (this.extensions.markerEditor) {
+
+            return this.extensions.markerEditor.getMarkerInfoList();
+
         }
 
         return null;
     },
 
-    resizeMarkerContainer: function() {
-        if ( this.editorManager.markerEditor && this.editorManager.editor === this.editorManager.markerEditor) {
-            return this.editorManager.markerEditor.update();
-        }
+    resizeMarkers: function() {
 
-        return null;
+        if (this.extensions.markerEditor) {
+
+            return this.extensions.markerEditor.onResize();
+
+        }
+    },
+
+    renderMarkers: function() {
+
+        if (this.extensions.markerEditor) {
+
+            return this.extensions.markerEditor.updateMarkers();
+
+        }
     },
 
     // ------------------ 标记 API -- E ------------------ //
@@ -18833,13 +18949,13 @@ CloudViewer.prototype = {
     // ------------------ 批注 API -- S ------------------ //
 
     setCommentMode: function () {
-        this.editorManager.setCommentMode(this);
+        this.editorManager.setAnnotationMode(this);
     },
 
     exitCommentMode: function () {
 
-        if ( this.editorManager.commentEditor &&
-            this.editorManager.editor === this.editorManager.commentEditor) {
+        if ( this.editorManager.annotationEditor &&
+            this.editorManager.editor === this.editorManager.annotationEditor) {
 
             this.setPickMode();
         }
@@ -18848,9 +18964,9 @@ CloudViewer.prototype = {
 
     setCommentBackgroundColor: function (startColor, stopColor) {
 
-        if ( this.editorManager.commentEditor) {
+        if ( this.editorManager.annotationEditor) {
 
-            this.editorManager.commentEditor.setBackgroundColor(startColor, stopColor);
+            this.editorManager.annotationEditor.setBackgroundColor(startColor, stopColor);
         }
     },
 
@@ -18861,62 +18977,62 @@ CloudViewer.prototype = {
     editCommentBegin: function() {
 
         // 如果没有设置批注模式，则自动进入批注模式
-        if (this.editorManager.editor !== this.editorManager.commentEditor) {
+        if (this.editorManager.editor !== this.editorManager.annotationEditor) {
             this.setCommentMode();
         }
 
-        this.editorManager.commentEditor.editBegin();
+        this.editorManager.annotationEditor.editBegin();
     },
 
     editCommentEnd: function() {
 
         // 在批注模式下有效
-        if ( this.editorManager.commentEditor &&
-            this.editorManager.editor === this.editorManager.commentEditor) {
+        if ( this.editorManager.annotationEditor &&
+            this.editorManager.editor === this.editorManager.annotationEditor) {
 
-            this.editorManager.commentEditor.editEnd();
+            this.editorManager.annotationEditor.editEnd();
         }
     },
 
     setCommentType: function(type) {
 
         // 在批注模式下有效
-        if ( this.editorManager.commentEditor &&
-            this.editorManager.editor === this.editorManager.commentEditor) {
+        if ( this.editorManager.annotationEditor &&
+            this.editorManager.editor === this.editorManager.annotationEditor) {
 
-            this.editorManager.commentEditor.setCommentType(type);
+            this.editorManager.annotationEditor.setAnnotationType(type);
         }
     },
 
     loadComments: function(CommentInfoList) {
 
         // 如果没有设置批注模式，则自动进入批注模式
-        if (this.editorManager.editor !== this.editorManager.commentEditor) {
+        if (this.editorManager.editor !== this.editorManager.annotationEditor) {
             this.setCommentMode();
         }
 
-        this.editorManager.commentEditor.loadComments(CommentInfoList);
+        this.editorManager.annotationEditor.loadAnnotations(CommentInfoList);
     },
 
     getCommentInfoList: function() {
 
         // 在批注模式下有效
-        if ( this.editorManager.commentEditor &&
-            this.editorManager.editor === this.editorManager.commentEditor) {
+        if ( this.editorManager.annotationEditor &&
+            this.editorManager.editor === this.editorManager.annotationEditor) {
 
-            return this.editorManager.commentEditor.getCommentInfoList();
+            return this.editorManager.annotationEditor.getAnnotationInfoList();
         }
 
         return null;
     },
 
-    resizeCommentContainer: function() {
+    resizeComments: function() {
 
         // 在批注模式下有效
-        if ( this.editorManager.commentEditor
-            && this.editorManager.editor === this.editorManager.commentEditor) {
+        if ( this.editorManager.annotationEditor
+            && this.editorManager.editor === this.editorManager.annotationEditor) {
 
-            this.editorManager.commentEditor.onResize();
+            this.editorManager.annotationEditor.onResize();
         }
     }
 
