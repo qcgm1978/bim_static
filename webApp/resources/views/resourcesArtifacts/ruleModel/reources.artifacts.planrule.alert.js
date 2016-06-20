@@ -39,7 +39,7 @@ App.Resources.ArtifactsPlanRuleAlert = Backbone.View.extend({
         }
         //非新建
         $.ajax({
-            url:"http://bim.wanda-dev.cn/platform/mapping/rule/delete/" + id + "?projectId="+ App.ResourceArtifacts.Status.projectId,
+            url:App.API.Settings.hostname +"platform/mapping/rule/delete/" + id + "?projectId="+ App.ResourceArtifacts.Status.projectId,
             type:"DELETE",
             success:function(response){
                  if(response.code==0){ //删除成功
