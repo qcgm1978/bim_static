@@ -30,7 +30,6 @@ App.Resources.ArtifactsTplListItem = Backbone.View.extend({
     },
     //取得模板
     getTpl:function(){
-
         var _this = this;
         App.ResourceArtifacts.Status.templateId = this.model.get("id");//保存id
         App.ResourceArtifacts.Status.templateName = this.model.get("name");//保存name
@@ -61,25 +60,27 @@ App.Resources.ArtifactsTplListItem = Backbone.View.extend({
         this.planRuleTitle.$(".ruleContentRuleList").append(this.planRule.render().el);//计划
         this.menu.$(".qualifyC").append(this.quality.render().el);//质量
 
-
-
         $("#artifacts").addClass("tpl");//此处为修正样式表现
 
         //修改内容
         $(".tplDetailTitle h2").text(this.model.get("name"));
         $(".tplDetailTitle .tplName").val(this.model.get("name"));
 
-
         _this.menu.$(".artifactsContent .default").show().siblings().hide();
         //获取列表
         this.getTplRule();//获取规则模板列表
         App.ResourceArtifacts.getPlan();
-        App.ResourceArtifacts.getQuality();
 
-        //获取全部标准
-        //App.ResourceArtifacts.Status.quality.parentCode = "all";
-        //App.ResourceArtifacts.getQuality();
-        //App.ResourceArtifacts.Status.quality.parentCode = "";
+
+        App.ResourceArtifacts.getAllQuality(function(data){
+            //生成
+            App.ResourceArtifacts.departQuality(_this.menu.$(".qualityMenuListGC"),App.ResourceArtifacts.allQualityGC,null,"0");
+            _this.menu.$(".qualityMenuListGC").show();
+            App.ResourceArtifacts.departQuality(_this.menu.$(".qualityMenuListKY"),App.ResourceArtifacts.allQualityKY,null,"0");
+            //向要存储的部分提交   质量标准的  原有数据
+            var arr = App.ResourceArtifacts.getValid("quality",data);
+            App.ResourceArtifacts.modelSaving= App.ResourceArtifacts.modelSaving.concat(arr);
+        });
     },
     //切换
     toggleClass:function(){

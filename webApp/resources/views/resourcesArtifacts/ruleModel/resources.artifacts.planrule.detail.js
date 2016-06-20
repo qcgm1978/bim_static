@@ -80,32 +80,18 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
 
     ruleCheck:function(e){
         App.Resources.cancelBubble(e);
-        var _this = this,id = _this.model.get("id"),
-            ruleIdsIn = App.ResourceArtifacts.modelRuleSaveData.ruleIdsIn,
-            ruleIdsDel  = App.ResourceArtifacts.modelRuleSaveData.ruleIdsDel;
+        var _this = this,id = _this.model.get("id");
 
-        var  modelRuleList = App.ResourceArtifacts.TplCollectionRule.filter(function(item){
-                return item.get("ruleId") == id;
-        });
-
-
-        var preInRule =  _.filter(ruleIdsIn,function(item){
-            return item == id;
-        });
-        var preDelRule = _.filter(ruleIdsDel,function(item){
-            return item == id;
-        });
-
+        //原有的所有数据
+        var modelSaving = App.ResourceArtifacts.modelSaving;
 
         var ele = $(e.target);
         var allSele = ele.closest("ul").find("li");
         Backbone.trigger("modelRuleHalf");
 
-
         if(ele.hasClass("all")){
             ele.removeClass("all");
             ele.closest("li").attr("data-check","0");
-
 
             //触发全不选时右面菜单变化，将发送父级code
             var checked1 = _.filter(allSele,function(item){
@@ -115,21 +101,18 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
                 Backbone.trigger("modelRuleEmpty");
             }
 
+            //查找当前已选code的并修改其内的ruleId列表
+           _.indexOf(modelSaving,function(item) {
+               return item.code == App.ResourceArtifacts.Status.rule.targetCode
+           });
 
-            if(preInRule.length){  //在提交添加   内存在
-                App.ResourceArtifacts.modelRuleSaveData.ruleIdsIn = _.without(ruleIdsIn,id);
-            }
-
-            if(modelRuleList.length ){ //模板已有
-                if(!preDelRule.length){//在提交删除   内存在
-                    App.ResourceArtifacts.modelRuleSaveData.ruleIdsDel.push(id);
+           /* for(var i = 0 ; i < item.ruleIds; i++){
+                if(_this.$(".ruleTitle").attr("data-id") == item.ruleIds[i]){
+                    item.ruleIds = item.ruleIds.splice(i,1);
                 }
-            }else{//模板没有
-                if(preDelRule.length){//在提交删除   内存在
-                    App.ResourceArtifacts.modelRuleSaveData.ruleIdsDel = _.without(ruleIdsDel,id);
-                }
-            }
+            }*/
 
+            console.log(modelSaving);//没删除
 
         }else{
             ele.closest("li").attr("data-check","1");
@@ -144,18 +127,6 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
                 return
             }
 
-            if(!preDelRule.length){  //在提交删除   内存在
-                App.ResourceArtifacts.modelRuleSaveData.ruleIdsDel = _.without(ruleIdsDel,id);
-            }
-            if(modelRuleList.length ){ //模板已有
-                if(!preInRule.length){//在提交添加   内存在
-                    App.ResourceArtifacts.modelRuleSaveData.ruleIdsIn = _.without(ruleIdsIn,id);
-                }
-            }else{//模板没有
-                if(preInRule.length){//在提交添加   内存在
-                    App.ResourceArtifacts.modelRuleSaveData.ruleIdsIn.push(id);
-                }
-            }
         }
     },
 
@@ -267,7 +238,7 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
                     if(parseInt(leftValue.val()) <=parseInt(rightValue.val())){
                         alert("请填写有效的数字");
                         leftValue.focus();
-                        retrun
+                        return
                     }
                 }
 

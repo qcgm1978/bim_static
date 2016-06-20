@@ -2,9 +2,7 @@
 //fetchArtifactsPlanRule   获取规则
 App.ResourceArtifacts={
     Status:{
-        presentPlan:null,  //当前计划或质量，提交数据
         saved : true,    //创建规则后的保存状态，已保存  /  未保存
-        presentRule : null,    //当前规则
         qualityProcessType:1,   //质量标准 -过程选择  type
         delRule:"",
         qualityStandardType:"GC",   //质量标准 -过程选择  type
@@ -24,7 +22,6 @@ App.ResourceArtifacts={
                 "mappingPropertyList":[]
             }
         },
-        openRule: null, //正在打开的规则，注意重置
         quality:{
             standardType:"GC",
             parentCode:""
@@ -203,7 +200,6 @@ App.ResourceArtifacts={
         }),
         urlType: "",
         parse: function(responese) {
-
             if (responese.code == 0 && responese.data.length > 0) {
                 return responese.data;
             } else {
@@ -238,13 +234,15 @@ App.ResourceArtifacts={
         _this.$(".breadcrumbNav span").eq(3).hide();
         _this.$(".breadcrumbNav span").eq(4).hide();
         $("#artifacts").addClass("services_loading");
+        this.loaddeaprt();//分类编码
 
-        this.ArtifactsIndexNav = new App.Resources.ArtifactsIndexNav();//模块化/质量标准菜单
         if(optionType == "library" ||  optionType == "template"){
             App.ResourceArtifacts.Status.projectId = "";
             App.ResourceArtifacts.Status.projectName = "";
+            this.ArtifactsIndexNav = new App.Resources.ArtifactsIndexNav();//模块化/质量标准菜单
             _this.$el.append(this.ArtifactsIndexNav.render().el);
         }else{
+            //项目
             this.ArtifactsProjectBreadCrumb = new App.Resources.ArtifactsProjectBreadCrumb();
             _this.$el.html(this.ArtifactsProjectBreadCrumb.render().el);
             //项目映射规则名称
@@ -276,23 +274,28 @@ App.ResourceArtifacts={
             this.tplList = new App.Resources.ArtifactsTplList();
 
             _this.$el.append(this.tplFrame.render().el);//菜单
-            this.tplFrame.$(".tplListContainer").html(this.tplList.render().el);
+            this.tplFrame.$(".tplListContainer").html(this.tplList.render().el);//右侧框架
 
             this.getTpl();
-            this.getAllQuality();
+
         }else{//规则库
             _this.$(".resourcesMappingRule .library").addClass("active").siblings("a").removeClass("active");
             _this.$el.append(this.menu.render().el);//菜单
-            _this.$(".projectName").html( App.ResourceArtifacts.Status.projectName);
             this.menu.$(".plans").html(this.plans.render().el);//计划节点
             this.menu.$(".qualifyC").hide().html(this.quality.render().el);
             this.menu.$(".rules").html(this.planRuleTitle.render().el);//映射规则
             this.planRuleTitle.$(".ruleContentRuleList").html(this.planRule.render().el);//映射规则
 
+            //写入项目名称
+            _this.$(".projectName").html( App.ResourceArtifacts.Status.projectName);
+
             //读入数据
             this.getPlan();
-            this.getQuality();
-            this.loaddeaprt();
+            this.getAllQuality(function(data){
+                App.ResourceArtifacts.departQuality(App.ResourceArtifacts.menu.$(".qualityMenuListGC"),App.ResourceArtifacts.allQualityGC,null,"0");
+                App.ResourceArtifacts.menu.$(".qualityMenuListGC").show();
+                App.ResourceArtifacts.departQuality(App.ResourceArtifacts.menu.$(".qualityMenuListKY"),App.ResourceArtifacts.allQualityKY,null,"0");
+            });
         }
         $(".resourcesMappingRule").show();
     },
@@ -332,6 +335,9 @@ App.ResourceArtifacts={
             if(response.code == 0 && response.data){
                 if(response.data.length){
                 App.ResourceArtifacts.PlanNode.add(response.data);
+
+                    var arr = App.ResourceArtifacts.getValid("model",response.data);
+                    App.ResourceArtifacts.modelSaving= App.ResourceArtifacts.modelSaving.concat(arr);
                 }else{
                     Backbone.trigger("mappingRuleNoContent");
                 }
@@ -339,62 +345,77 @@ App.ResourceArtifacts={
             }
         });
     },
-    //获取质量标准
-    getQuality:function(){
-        var pdata = {
-            URLtype:'fetchArtifactsQuality',
-            data:{
-                parentCode: "",
-                type:App.ResourceArtifacts.Status.type,
-                standardType: App.ResourceArtifacts.Status.qualityStandardType
-            }
-        };
-        if(App.ResourceArtifacts.Status.templateId){
-            pdata.data.templateId = App.ResourceArtifacts.Status.templateId;
-        }else if(App.ResourceArtifacts.Status.projectId){
-            pdata.data.projectId = App.ResourceArtifacts.Status.projectId;
-        }
-        App.ResourceArtifacts.PlanRules.reset();
-        App.Comm.ajax(pdata,function(response){
-            if(response.code == 0 && response.data.length){
-                var list = App.Resources.artifactsQualityTree(response.data);
-                this.$(".qualityMenuList").html(list);
-            }
-            $("#artifacts").removeClass("services_loading");
-        });
-    },
-
-
-    //所有质量标准列表
-    allQuality:new(Backbone.Collection.extend({
-        model:Backbone.Model.extend({
-            defaults:function(){
-                return{
-
-                }
-            }
-        })
-    })),
+    //所有
+    modelSaving:[],
+    allQualityGC: [],
+    allQualityKY: [],
     //获取全部质量标准
-    getAllQuality:function(){
+    getAllQuality:function(fn){
         var _this = this;
         var pdata = {
             URLtype:'fetchArtifactsQuality',
             data:{
                 parentCode: "all",
-                type:App.ResourceArtifacts.Status.type,
-                standardType: App.ResourceArtifacts.Status.qualityStandardType
+                type:App.ResourceArtifacts.Status.type
             }
         };
-        this.allQuality.reset();
         App.Comm.ajax(pdata,function(response){
             if(response.code == 0 && response.data.length){
-                _this.allQuality.add(response.data);
+                App.ResourceArtifacts.allQualityKY = _.filter(response.data,function(item){
+                    return item.type == "KY"
+                });
+                App.ResourceArtifacts.allQualityGC = _.filter(response.data,function(item){
+                    return item.type == "GC"
+                });
+                if(fn && typeof fn == "function"){
+                    fn(response.data);
+                }
             }
         });
     },
 
+    //获取已经加载并且要存储的有效数据
+    getValid:function(type,data){
+        var arr= [];
+        var s =  _.filter(data,function(item){
+            var  a = true;
+            if(type == "quality"){
+                a = item.leaf
+            }
+            return a && (item.ruleContain == 1 || item.ruleContain == 3) && item.count != 0;  //过滤掉规则包函数为0的规则组
+        });
+        _.each(s,function(item){
+            var obj = {
+                code : item.code,
+                ruleIds : item.ruleIds || []
+            };
+            arr.push(obj);
+        });
+        return arr
+    },
 
+
+    //质量标准三级分类，要插入元素，数据，是否有父节点，ruleContain
+    // 值是否存在
+    departQuality:function(ele,cdata,parentCode,ruleContain){
+        var data = cdata , levelData;
+
+        if(!parentCode){
+
+            levelData = _.filter(data,function(item){
+                return !item.parentCode
+            });
+
+        }else{
+            levelData = _.filter(data,function(item){
+                return item.parentCode == parentCode
+            });
+        }
+        if(levelData.length){
+            if(ruleContain != 1){ ruleContain = 0; }
+            $(ele).html(App.Resources.artifactsQualityTree(levelData,ruleContain));
+        }
+    },
 
     //获取规则模板
     getTpl:function(){

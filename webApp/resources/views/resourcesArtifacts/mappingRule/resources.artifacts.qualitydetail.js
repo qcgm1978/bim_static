@@ -199,9 +199,8 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
             return
         }
 
-        this.toggleClass(item);
-        this. getRules();
 
+        this. getRules(item);
     },
 //切换计划
     toggleClass:function(item){
@@ -210,43 +209,36 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
     },
 
     //获取质量标准相关规则
-    getRules:function() {
+    getRules:function(item) {
+        Backbone.trigger("resetRule");
+
         var _this = this,pdata,n = this.$el.closest("li").attr("data-check");
         if(!App.ResourceArtifacts.Status.saved){
             return
         }
-        if(!this.model.get("leaf")){
-            //存在，加载二级或三级标准
-            pdata = {
-                URLtype : 'fetchArtifactsQuality',
-                data : {
-                    type : App.ResourceArtifacts.Status.type,
-                    standardType:"GC",
-                    parentCode :this.model.get("code")  //传递父节点
-                }
-            };
-            if(App.ResourceArtifacts.Status.templateId){
-                pdata.data.templateId = App.ResourceArtifacts.Status.templateId;
-            }else if(App.ResourceArtifacts.Status.projectId){
-                pdata.data.projectId = App.ResourceArtifacts.Status.projectId;
-            }
+        var type = this.model.get("type") ;
+        var parentCode = this.model.get("code");
 
-            App.ResourceArtifacts.PlanRules.reset();
-            App.Comm.ajax(pdata,function(response){
-                if(response.code == 0 && response.data){
-                    if(response.data.length){
-                        var list = App.Resources.artifactsQualityTree(response.data,n);
-                        _this.$el.closest("li").find(".childList").html(list);
-                    }else{
-                        //无数据咋办
-                    }
-                }
-            });
-            return
+        if(type == "GC"){
+            data = App.ResourceArtifacts.allQualityGC;
+        }else if(type == "KY"){
+            data = App.ResourceArtifacts.allQualityKY;
         }
 
-
-
+        if(!this.model.get("leaf")){
+            //存在，加载二级或三级标准
+            var children,data;
+            children =  _.filter(data,function(item){
+                 return item.parentCode == parentCode;
+             });
+            var list = App.Resources.artifactsQualityTree(children,n);
+            _this.$el.closest("li").find(".childList").html(list);
+            return
+        }
+        this.toggleClass(item);
+        //加载规则部分
+        App.ResourceArtifacts.Status.rule.targetCode  = parentCode;
+        App.ResourceArtifacts.Status.rule.targetName  = this.model.get("name");
         //刷新右面视图
         var code = App.ResourceArtifacts.Status.rule.targetCode;
         pdata = {
