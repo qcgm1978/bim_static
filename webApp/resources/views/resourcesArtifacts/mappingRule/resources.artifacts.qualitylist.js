@@ -42,6 +42,7 @@ App.Resources.ArtifactsQualityList = Backbone.View.extend({
         var _this = this;
         this.toggle();
         //App.ResourceArtifacts.getAllQuality();
+        App.ResourceArtifacts.departQuality();  //departQuality:function(ele,cdata,parentCode,ruleContain){
     },
 
     toggle:function(){
@@ -56,6 +57,11 @@ App.Resources.ArtifactsQualityList = Backbone.View.extend({
         this.$(".pro").data("type",extendData);
         this.$(".pro").text(extendText);
         App.ResourceArtifacts.Status.qualityStandardType = newData;
+        if(newData == "GC"){
+            this.$(".qualityMenuListGC").show().siblings(".qualityMenuListKY").hide();
+        }else{
+            this.$(".qualityMenuListKY").show().siblings(".qualityMenuListGC").hide();
+        }
     }
 
 });

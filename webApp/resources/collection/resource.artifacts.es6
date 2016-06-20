@@ -287,9 +287,10 @@ App.ResourceArtifacts={
             this.planRuleTitle.$(".ruleContentRuleList").html(this.planRule.render().el);//映射规则
 
             //读入数据
+            this.loaddeaprt();
             this.getPlan();
             this.getAllQuality();
-            this.loaddeaprt();
+
         }
         $(".resourcesMappingRule").show();
     },
@@ -337,7 +338,7 @@ App.ResourceArtifacts={
         });
     },
     //获取质量标准
-    getQuality:function(){
+   /* getQuality:function(){
         var pdata = {
             URLtype:'fetchArtifactsQuality',
             data:{
@@ -359,7 +360,7 @@ App.ResourceArtifacts={
             }
             $("#artifacts").removeClass("services_loading");
         });
-    },
+    },*/
     //所有
     modelSaving:[],
     allQualityGC: [],
@@ -377,11 +378,18 @@ App.ResourceArtifacts={
         App.Comm.ajax(pdata,function(response){
             if(response.code == 0 && response.data.length){
                 _this.allQualityKY = _.filter(response.data,function(item){
-                    return item.type = "KY"
+                    return item.type == "KY"
                 });
                 _this.allQualityGC = _.filter(response.data,function(item){
-                    return item.type = "GC"
+                    return item.type == "GC"
                 });
+
+                //生成
+                _this.departQuality(_this.menu.$(".qualityMenuListGC"),_this.allQualityGC,null,"0");
+                _this.menu.$(".qualityMenuListGC").show();
+                _this.departQuality(_this.menu.$(".qualityMenuListKY"),_this.allQualityKY,null,"0");
+
+
                 //向要存储的部分提交   质量标准的  原有数据
                 var arr = _this.getValid("quality",response.data);
                 _this.modelSaving= _this.modelSaving.concat(arr);
@@ -410,13 +418,17 @@ App.ResourceArtifacts={
     },
 
 
-    //质量标准三级分类，要插入元素，数据，是否有父节点，n值是否存在
+    //质量标准三级分类，要插入元素，数据，是否有父节点，ruleContain
+    // 值是否存在
     departQuality:function(ele,cdata,parentCode,ruleContain){
-        var data = cdata.data , levelData;
+        var data = cdata , levelData;
+
         if(!parentCode){
+
             levelData = _.filter(data,function(item){
                 return !item.parentCode
             });
+
         }else{
             levelData = _.filter(data,function(item){
                 return item.parentCode == parentCode
@@ -425,6 +437,7 @@ App.ResourceArtifacts={
         if(levelData.length){
             if(ruleContain != 1){ ruleContain = 0; }
             $(ele).html(App.Resources.artifactsQualityTree(levelData,ruleContain));
+
         }
     },
 
