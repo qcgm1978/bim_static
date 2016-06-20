@@ -39,7 +39,7 @@
 
          parse: function(response) {
              if (response.message == "success") {
-                if(response.data.items.length){
+                if(response.data.items && response.data.items.length){
                  return response.data.items;
                 }else{
                     Backbone.trigger('projectListNullData');

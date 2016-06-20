@@ -41,7 +41,12 @@ a:hover{
 }
 #projectModes { position: absolute; left: 0px; right: 0px; top: 184px; bottom: 0px;
 	.proListSite { position: relative; height: 100%; }
-	.proListContent { position: absolute; top: 40px; left: 20px; right: 20px; bottom: 0px; }
+	.proListContent { position: absolute; top: 40px; left: 20px; right: 20px; bottom: 40px; }
+	.pagingBox{position: absolute;bottom: 0px;left:20px;right: 20px;line-height: 40px;
+		.sumDesc { float: left; margin-left: 20px; }
+		.listPagination { float: right; margin-right: 20px; }
+		.pagination {margin: 0px;}
+	}
 	.proListBox, .proListBoxHeader { .loading { font-size: 14px; color: #ccc; text-align: center;
 			& div { margin-top: 20px; }
 		}
@@ -64,9 +69,7 @@ a:hover{
 			}
 		}
 	}
-	.proListBoxScroll { .sumDesc { float: left; margin-left: 20px; margin-top: 20px; }
-		.listPagination { float: right; margin-right: 20px; }
-	}
+	 
 	&.projectModesDown { top: 355px; }
 }
 .proMapBox { height: 100%; overflow: hidden;
