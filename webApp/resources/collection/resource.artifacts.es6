@@ -234,14 +234,15 @@ App.ResourceArtifacts={
         _this.$(".breadcrumbNav span").eq(3).hide();
         _this.$(".breadcrumbNav span").eq(4).hide();
         $("#artifacts").addClass("services_loading");
+        this.loaddeaprt();//分类编码
 
-        this.ArtifactsIndexNav = new App.Resources.ArtifactsIndexNav();//模块化/质量标准菜单
         if(optionType == "library" ||  optionType == "template"){
             App.ResourceArtifacts.Status.projectId = "";
             App.ResourceArtifacts.Status.projectName = "";
+            this.ArtifactsIndexNav = new App.Resources.ArtifactsIndexNav();//模块化/质量标准菜单
             _this.$el.append(this.ArtifactsIndexNav.render().el);
-        }else{ //项目
-            //https://bim.wanda.cn/platform/rule/template/select/project/info/{projectId} //通过id获得项目名
+        }else{
+            //项目
             this.ArtifactsProjectBreadCrumb = new App.Resources.ArtifactsProjectBreadCrumb();
             _this.$el.html(this.ArtifactsProjectBreadCrumb.render().el);
             //项目映射规则名称
@@ -273,24 +274,28 @@ App.ResourceArtifacts={
             this.tplList = new App.Resources.ArtifactsTplList();
 
             _this.$el.append(this.tplFrame.render().el);//菜单
-            this.tplFrame.$(".tplListContainer").html(this.tplList.render().el);
+            this.tplFrame.$(".tplListContainer").html(this.tplList.render().el);//右侧框架
 
             this.getTpl();
-            this.getAllQuality();
+
         }else{//规则库
             _this.$(".resourcesMappingRule .library").addClass("active").siblings("a").removeClass("active");
             _this.$el.append(this.menu.render().el);//菜单
-            _this.$(".projectName").html( App.ResourceArtifacts.Status.projectName);
             this.menu.$(".plans").html(this.plans.render().el);//计划节点
             this.menu.$(".qualifyC").hide().html(this.quality.render().el);
             this.menu.$(".rules").html(this.planRuleTitle.render().el);//映射规则
             this.planRuleTitle.$(".ruleContentRuleList").html(this.planRule.render().el);//映射规则
 
-            //读入数据
-            this.loaddeaprt();
-            this.getPlan();
-            this.getAllQuality();
+            //写入项目名称
+            _this.$(".projectName").html( App.ResourceArtifacts.Status.projectName);
 
+            //读入数据
+            this.getPlan();
+            this.getAllQuality(function(data){
+                App.ResourceArtifacts.departQuality(App.ResourceArtifacts.menu.$(".qualityMenuListGC"),App.ResourceArtifacts.allQualityGC,null,"0");
+                App.ResourceArtifacts.menu.$(".qualityMenuListGC").show();
+                App.ResourceArtifacts.departQuality(App.ResourceArtifacts.menu.$(".qualityMenuListKY"),App.ResourceArtifacts.allQualityKY,null,"0");
+            });
         }
         $(".resourcesMappingRule").show();
     },
@@ -366,7 +371,7 @@ App.ResourceArtifacts={
     allQualityGC: [],
     allQualityKY: [],
     //获取全部质量标准
-    getAllQuality:function(){
+    getAllQuality:function(fn){
         var _this = this;
         var pdata = {
             URLtype:'fetchArtifactsQuality',
@@ -377,22 +382,15 @@ App.ResourceArtifacts={
         };
         App.Comm.ajax(pdata,function(response){
             if(response.code == 0 && response.data.length){
-                _this.allQualityKY = _.filter(response.data,function(item){
+                App.ResourceArtifacts.allQualityKY = _.filter(response.data,function(item){
                     return item.type == "KY"
                 });
-                _this.allQualityGC = _.filter(response.data,function(item){
+                App.ResourceArtifacts.allQualityGC = _.filter(response.data,function(item){
                     return item.type == "GC"
                 });
-
-                //生成
-                _this.departQuality(_this.menu.$(".qualityMenuListGC"),_this.allQualityGC,null,"0");
-                _this.menu.$(".qualityMenuListGC").show();
-                _this.departQuality(_this.menu.$(".qualityMenuListKY"),_this.allQualityKY,null,"0");
-
-
-                //向要存储的部分提交   质量标准的  原有数据
-                var arr = _this.getValid("quality",response.data);
-                _this.modelSaving= _this.modelSaving.concat(arr);
+                if(fn && typeof fn == "function"){
+                    fn(response.data);
+                }
             }
         });
     },
@@ -437,7 +435,6 @@ App.ResourceArtifacts={
         if(levelData.length){
             if(ruleContain != 1){ ruleContain = 0; }
             $(ele).html(App.Resources.artifactsQualityTree(levelData,ruleContain));
-
         }
     },
 
