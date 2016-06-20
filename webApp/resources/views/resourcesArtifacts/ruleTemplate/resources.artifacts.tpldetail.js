@@ -52,6 +52,8 @@ App.Resources.ArtifactsTplDetail = Backbone.View.extend({
     //保存，要重写
     resourcesSure:function(){
         var _this = this;
+
+        var modelSaving = App.ResourceArtifacts.modelSaving;
         //如果不存在模板id则无法保存
         if(!App.ResourceArtifacts.Status.templateId){
             return
@@ -72,34 +74,27 @@ App.Resources.ArtifactsTplDetail = Backbone.View.extend({
         var qualifyC = _.filter($(".qualifyC .qualityMenuList ul li"),function(item){
             return $(item).attr("data-check") == "1" && $(item).attr("data-leaf") == "1";
         });
-        _.each(qualifyC,function(item){
-            App.ResourceArtifacts.modelRuleSaveData.codeIdsIn.push($(item).attr("data-code"));
+        _.each(modelSaving,function(item){
+            for(var i = 0 ; i < qualifyC.length ; i++){
+                if(qualifyC[i].attr("data-code") == item.code){
+
+                }
+            }
         });
-        //要查找两级看是否是叶子节点
-   /*     var allQuality = App.ResourceArtifacts.allQuality;
-        var father  = _.filter(plan,function(item){
+        //要查找两级看是否是叶子节点直接过滤即可，无需查找
 
-        });
 
-        var grandFather  = _.filter(plan,function(item){
 
-        });*/
-
-        console.log(App.ResourceArtifacts.modelRuleSaveData);
-
-        var pdata = {
+        /*var pdata = {
             URLtype: "saveArtifactsTemplateRule",
             type:"PUT",
             data:JSON.stringify(App.ResourceArtifacts.modelRuleSaveData),
             contentType: "application/json"
         };
-
         App.ResourceArtifacts.loading($(".modelContent"));
         App.Comm.ajax(pdata,function(response){
             console.log(response);
             if(response.code == 0 ){
-
-
                 //更改模板名称
                 _this.$(".tplDetailTitle h2").text(App.ResourceArtifacts.Status.templateName);
 
@@ -110,7 +105,7 @@ App.Resources.ArtifactsTplDetail = Backbone.View.extend({
             alert("提交失败");
         }
             App.ResourceArtifacts.loaded($(".modelContent"));
-        });
+        });*/
     },
     //取消
     resourcesCancel:function(){

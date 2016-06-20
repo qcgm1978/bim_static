@@ -199,8 +199,8 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
             return
         }
 
-        this.toggleClass(item);
-        this. getRules();
+
+        this. getRules(item);
     },
 //切换计划
     toggleClass:function(item){
@@ -209,7 +209,7 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
     },
 
     //获取质量标准相关规则
-    getRules:function() {
+    getRules:function(item) {
         Backbone.trigger("resetRule");
 
         var _this = this,pdata,n = this.$el.closest("li").attr("data-check");
@@ -235,7 +235,7 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
             _this.$el.closest("li").find(".childList").html(list);
             return
         }
-
+        this.toggleClass(item);
         //加载规则部分
         App.ResourceArtifacts.Status.rule.targetCode  = parentCode;
         App.ResourceArtifacts.Status.rule.targetName  = this.model.get("name");

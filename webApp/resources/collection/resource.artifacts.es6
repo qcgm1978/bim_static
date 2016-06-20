@@ -335,6 +335,9 @@ App.ResourceArtifacts={
             if(response.code == 0 && response.data){
                 if(response.data.length){
                 App.ResourceArtifacts.PlanNode.add(response.data);
+
+                    var arr = App.ResourceArtifacts.getValid("model",response.data);
+                    App.ResourceArtifacts.modelSaving= App.ResourceArtifacts.modelSaving.concat(arr);
                 }else{
                     Backbone.trigger("mappingRuleNoContent");
                 }
@@ -342,30 +345,6 @@ App.ResourceArtifacts={
             }
         });
     },
-    //获取质量标准
-   /* getQuality:function(){
-        var pdata = {
-            URLtype:'fetchArtifactsQuality',
-            data:{
-                parentCode: "",
-                type:App.ResourceArtifacts.Status.type,
-                standardType: App.ResourceArtifacts.Status.qualityStandardType
-            }
-        };
-        if(App.ResourceArtifacts.Status.templateId){
-            pdata.data.templateId = App.ResourceArtifacts.Status.templateId;
-        }else if(App.ResourceArtifacts.Status.projectId){
-            pdata.data.projectId = App.ResourceArtifacts.Status.projectId;
-        }
-        App.ResourceArtifacts.PlanRules.reset();
-        App.Comm.ajax(pdata,function(response){
-            if(response.code == 0 && response.data.length){
-                var list = App.Resources.artifactsQualityTree(response.data);
-                this.$(".qualityMenuList").html(list);
-            }
-            $("#artifacts").removeClass("services_loading");
-        });
-    },*/
     //所有
     modelSaving:[],
     allQualityGC: [],
