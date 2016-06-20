@@ -276,7 +276,7 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
             cdata.type ="PUT";
 
             $.ajax({
-                url: "http://bim.wanda-dev.cn/platform/mapping/rule/update?projectId=" + App.ResourceArtifacts.Status.projectId,
+                url: App.API.Settings.hostname +"platform/mapping/rule/update?projectId=" + App.ResourceArtifacts.Status.projectId,
                 data:JSON.stringify(baseData),
                 contentType: "application/json",
                 type:"PUT",
@@ -293,7 +293,7 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
             //´´½¨
             cdata.URLtype = "createArtifactsPlanNewRule";
             $.ajax({
-                url: "http://bim.wanda-dev.cn/platform/mapping/rule/create?projectId=" + App.ResourceArtifacts.Status.projectId,
+                url: App.API.Settings.hostname +"platform/mapping/rule/create?projectId=" + App.ResourceArtifacts.Status.projectId,
                 data:JSON.stringify(baseData),
                 type:"POST",
                 contentType: "application/json",
