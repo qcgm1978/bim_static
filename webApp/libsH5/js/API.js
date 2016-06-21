@@ -7,7 +7,7 @@
     baseUrl:"/",
     //模型
     fetchModel: "model/",//获取模型信息
-    fetchFamilyType:'/model/{etag}/metadata/familyInfo.json',
+    fetchFamilyType:'model/{etag}/metadata/familyInfo.json',
     fetchFloorsMap: 'view/{etag}/{sourceId}/miniature/map', //获取模型楼层信息
     fetchAxisGrid: 'model/{etag}/metadata/gridAndLevel.json', //获取楼层地图,轴网信息
     // 构件树

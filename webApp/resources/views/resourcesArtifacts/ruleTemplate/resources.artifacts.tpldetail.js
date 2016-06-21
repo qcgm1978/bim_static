@@ -58,37 +58,17 @@ App.Resources.ArtifactsTplDetail = Backbone.View.extend({
         if(!App.ResourceArtifacts.Status.templateId){
             return
         }
-        App.ResourceArtifacts.modelRuleSaveData.templateId = App.ResourceArtifacts.Status.templateId;
-        App.ResourceArtifacts.modelRuleSaveData.templateName = App.ResourceArtifacts.Status.templateName = this.$(".tplDetailEdit .tplName").val();
+        App.ResourceArtifacts.modelSaving.templateId = App.ResourceArtifacts.Status.templateId;
+        App.ResourceArtifacts.modelSaving.templateName = App.ResourceArtifacts.Status.templateName = this.$(".tplDetailEdit .tplName").val();
 
-        //模块化
-        var plan = _.filter($(".artifactsContent .plans li"),function(item){
-            return $(item).attr("data-check") == "1";
-        });
 
-        //
-        for(var i = 0  ; i < plan.length ; i++){
-            App.ResourceArtifacts.modelRuleSaveData.codeIdsIn.push($(plan[i]).attr("data-code"));
-        }
-        //质量标准
-        var qualifyC = _.filter($(".qualifyC .qualityMenuList ul li"),function(item){
-            return $(item).attr("data-check") == "1" && $(item).attr("data-leaf") == "1";
-        });
-        _.each(modelSaving,function(item){
-            for(var i = 0 ; i < qualifyC.length ; i++){
-                if(qualifyC[i].attr("data-code") == item.code){
+        console.log(App.ResourceArtifacts.modelSaving);
 
-                }
-            }
-        });
         //要查找两级看是否是叶子节点直接过滤即可，无需查找
-
-
-
-        /*var pdata = {
+        var pdata = {
             URLtype: "saveArtifactsTemplateRule",
             type:"PUT",
-            data:JSON.stringify(App.ResourceArtifacts.modelRuleSaveData),
+            data:JSON.stringify(modelSaving),
             contentType: "application/json"
         };
         App.ResourceArtifacts.loading($(".modelContent"));
@@ -105,7 +85,7 @@ App.Resources.ArtifactsTplDetail = Backbone.View.extend({
             alert("提交失败");
         }
             App.ResourceArtifacts.loaded($(".modelContent"));
-        });*/
+        });
     },
     //取消
     resourcesCancel:function(){

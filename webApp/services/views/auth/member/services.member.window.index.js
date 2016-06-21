@@ -38,6 +38,8 @@ App.Services.MemberWindowIndex = Backbone.View.extend({
 
         App.Services.Member.saveMemData(submitData);
 
+        console.log(submitData);
+
         data = {
             URLtype:"saveServicesRole",
             data : JSON.stringify(submitData),
