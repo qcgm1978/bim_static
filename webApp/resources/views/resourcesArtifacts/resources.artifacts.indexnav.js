@@ -7,9 +7,9 @@ App.Resources.ArtifactsIndexNav = Backbone.View.extend({
 
     className: "resourcesMappingRule",
 
-    template: _.templateUrl("/resources/tpls/resourcesArtifacts/resources.artifacts.indexnav.html"),
+    template: _.templateUrl("/resources/tpls/resourcesArtifacts/resources.artifacts.indexnavx.html"),
 
-    render:function() {
+    render:function() {об
         this.$el.html(this.template);
         return this;
     }
