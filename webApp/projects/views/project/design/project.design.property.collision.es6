@@ -28,6 +28,7 @@ App.Project.DesignCollision=Backbone.View.extend({
 		var that = this;
 		var list = that.$el.find('.collSelect');
 		list.show();
+		$('.collHead').height('90%');
 		if($el.next(".collSelect").find("ul").length==0){
 			App.Project.DesignAttr.CollisionTaskList.projectId = App.Project.Settings.CurrentVersion.projectId;
 			App.Project.DesignAttr.CollisionTaskList.projectVerionId = App.Project.Settings.CurrentVersion.id;
@@ -43,6 +44,7 @@ App.Project.DesignCollision=Backbone.View.extend({
 		var list = $(that).find('.collSelect');
 		if(!target.is('.selectBox,.selectBox *')){
 			list.hide();
+			$('.collHead').height('auto');
 			$(document).off('click',that.hideSelectList);
 		}
 	},
@@ -129,6 +131,7 @@ App.Project.DesignCollision=Backbone.View.extend({
 		currentInput.val(name);
 		that.addClass("selected").siblings().removeClass("selected");
 		list.hide();
+		$('.collHead').height('auto');
 		if(status == "2"){
 			App.Project.Settings.collisionId = collisionId;
 			App.Project.DesignAttr.CollisionTaskDetail.projectId = App.Project.Settings.projectId

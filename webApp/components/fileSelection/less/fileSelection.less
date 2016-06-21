@@ -14,14 +14,14 @@
 		}
 		.rightEnter { float: right; width: 220px;
 			.title { height: 50px; background-color: #ddd; line-height: 50px; }
-			.fileEnterBox { height: 450px; border-bottom: 1px #ccc solid; overflow: auto; }
+			.fileEnterBox { height: 450px; border-bottom: 1px #ccc solid; }
 			.btnEnter { margin-left: 15px;}
 			.fileSelText{margin-left: 12px;}
 			.fileCount { color: red; margin: 0px 2px; }
 			.null { font-size: 18px; padding-top: 100px; color: #ccc; text-align: center; }
 			.ckBg { display: inline-block; width: 14px; height: 14px; background-position: 0px -118px; vertical-align: -1px; }
-			.text-field { width: 100px; }
-			.delFile { display:none; width: 16px; height: 13px; background-position: 3px -173px; vertical-align: top; margin-top: 2px; }
+		
+			.delFile { display:none; width: 16px; height: 13px; background-position: 3px -173px; vertical-align: top;position: absolute;    top: 0px;    right: 0px; }
 			.item-content:hover .delFile{display: inline-block;}
 		}
 		.contentBox { width: 560px; margin: 0px 220px 0px 180px; border-right: 1px #ccc solid; height: 500px; border-bottom: 1px #ccc solid;
@@ -86,14 +86,19 @@
 			&.on { background-position: 0px -22px; }
 		}
 		.noneSwitch { display: inline-block; width: 11px; }
-		.item-content { height: 22px; position: relative; min-width: 136px;
+		.item-content { height: 22px; position: relative; width: 136px;
+			&.file{ 
+				.text-field{margin-left: 10px;}
+				.folderIcon+.text-field{margin-left: 0px;}
+
+			}
 			.folderIcon { background-position: 0px -146px; margin-top: 1px; display: inline-block; width: 23px; height: 13px; vertical-align: top; }
 		}
-		.treeViewSub { margin-left: 20px; display: none;
+		.treeViewSub { margin-left: 20px; display: none;width:100%;
 			&.noneIcon { margin-left: 8px; }
 			&.mIconAndCk { margin-left: 30px; }
 		}
-		.text-field { cursor: default;
+		.text-field { cursor: default;width: 92px;
 			&.selected { background-color: #A8DBFD; }
 			&.over { position: absolute; left: 40px; right: 11px; }
 		}

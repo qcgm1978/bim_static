@@ -8,12 +8,12 @@ App.Project = {
 		projectNav: "", //项目导航 计划 成本 设计 质量
 		property: "poperties", // 项目导航 下的 tab  如：检查 属性
 		fileId: "",
-		token:"",
-		isShare:false,
-		searchText:"",//搜索的文本
+		token: "",
+		isShare: false,
+		searchText: "", //搜索的文本
 		projectId: "", //项目id
 		versionId: "", //版本id		
-		viewPintId:"",//批注id 存在此id直接跳转到 批注
+		viewPintId: "", //批注id 存在此id直接跳转到 批注
 		attrView: null,
 		CurrentVersion: null, //当前版本信息
 		DataModel: null //渲染模型的数据
@@ -63,14 +63,14 @@ App.Project = {
 
 	})),
 
-	bindContextMenu:function($el){
-		var _this=this;
+	bindContextMenu: function($el) {
+		var _this = this;
 		//右键菜单
- 		if (!document.getElementById("listContextProject")) {
- 			//右键菜单
- 			var contextHtml = _.templateUrl("/projects/tpls/listContext.html", true);
- 			$("body").append(contextHtml);
- 		}  
+		if (!document.getElementById("listContextProject")) {
+			//右键菜单
+			var contextHtml = _.templateUrl("/projects/tpls/listContext.html", true);
+			$("body").append(contextHtml);
+		}
 
 		$el.contextMenu('listContextProject', {
 			//显示 回调
@@ -94,23 +94,23 @@ App.Project = {
 					}
 
 				}
-				if(App.Project.Settings.CurrentVersion.status!=9 ||
-					App.Project.Settings.CurrentVersion.subType==1){
-					$("#reNameModelProject").addClass('disable').attr('disabled','disabled');
-					$("#downLoadModelProject").addClass('disable').attr('disabled','disabled');
-					$("#delModelProject").addClass('disable').attr('disabled','disabled');
+				if (App.Project.Settings.CurrentVersion.status != 9 ||
+					App.Project.Settings.CurrentVersion.subType == 1) {
+					$("#reNameModelProject").addClass('disable').attr('disabled', 'disabled');
+					$("#downLoadModelProject").addClass('disable').attr('disabled', 'disabled');
+					$("#delModelProject").addClass('disable').attr('disabled', 'disabled');
 				}
-				if(_this.isDisabled('edit')){
-					$("#reNameModelProject").addClass('disable').attr('disabled','disabled');
+				if (_this.isDisabled('edit')) {
+					$("#reNameModelProject").addClass('disable').attr('disabled', 'disabled');
 				}
-				if(_this.isDisabled('delete')){
-					$("#delModelProject").addClass('disable').attr('disabled','disabled');
+				if (_this.isDisabled('delete')) {
+					$("#delModelProject").addClass('disable').attr('disabled', 'disabled');
 				}
-				if(_this.isDisabled('downLoad')|| !App.ResourceModel.Settings.CurrentVersion.byProjectRef){
-					$("#downLoadModelProject").addClass('disable').attr('disabled','disabled');
+				if (_this.isDisabled('downLoad') || !App.ResourceModel.Settings.CurrentVersion.byProjectRef) {
+					$("#downLoadModelProject").addClass('disable').attr('disabled', 'disabled');
 				}
 				$item.addClass("selected").siblings().removeClass("selected");
-				if($('#listContextProject li[class!=disable]').length==0){
+				if ($('#listContextProject li[class!=disable]').length == 0) {
 					$('#listContextProject').parent().hide();
 				}
 			},
@@ -120,11 +120,11 @@ App.Project = {
 				'downLoadModelProject': function(item) {
 
 					var $item = $(item);
-/*
-					if ($item.find(".folder").length > 0) {
-						alert("暂不支持文件夹下载");
-						return;
-					}*/
+					/*
+										if ($item.find(".folder").length > 0) {
+											alert("暂不支持文件夹下载");
+											return;
+										}*/
 
 					//下载链接 
 					var fileVersionId = $item.find(".filecKAll").data("fileversionid");
@@ -133,8 +133,8 @@ App.Project = {
 					var data = {
 						URLtype: "downLoad",
 						data: {
-							projectId:  App.Project.Settings.CurrentVersion.projectId,
-							projectVersionId:App.Project.Settings.CurrentVersion.id
+							projectId: App.Project.Settings.CurrentVersion.projectId,
+							projectVersionId: App.Project.Settings.CurrentVersion.id
 						}
 					};
 
@@ -144,8 +144,8 @@ App.Project = {
 
 				},
 				'delModelProject': function(item) {
-					var rel=$('#delModelProject'),
-						$item=$(item);
+					var rel = $('#delModelProject'),
+						$item = $(item);
 					if (rel.hasClass('disable')) {
 						return;
 					}
@@ -161,7 +161,7 @@ App.Project = {
 					var $prevEdit = $(".fileContent .txtEdit");
 					if ($prevEdit.length > 0) {
 						_this.cancelEdit($prevEdit);
-						return 
+						return
 					}
 					var $item = $(item),
 						$fileName = $item.find(".fileName"),
@@ -172,30 +172,30 @@ App.Project = {
 		});
 	},
 
-	addNewFileModel(){
+	addNewFileModel() {
 		var model = {
-				isAdd:true,
-				children: null,
-				createTime: null,
-				creatorId: "",
-				creatorName: "",
-				digest: null,
-				fileVersionId: null,
-				floor: null,
-				folder: true,
-				id: 'createNew',
-				length: null,
-				locked: null,
-				modelId: null,
-				modelStatus: null,
-				modificationId: null,
-				name: "新建文件夹",
-				parentId: null,
-				projectId: null,
-				specialty: null,
-				status: null,
-				suffix: null,
-				thumbnail: null
+			isAdd: true,
+			children: null,
+			createTime: null,
+			creatorId: "",
+			creatorName: "",
+			digest: null,
+			fileVersionId: null,
+			floor: null,
+			folder: true,
+			id: 'createNew',
+			length: null,
+			locked: null,
+			modelId: null,
+			modelStatus: null,
+			modificationId: null,
+			name: "新建文件夹",
+			parentId: null,
+			projectId: null,
+			specialty: null,
+			status: null,
+			suffix: null,
+			thumbnail: null
 		}
 		App.Project.FileCollection.push(model)
 	},
@@ -314,7 +314,7 @@ App.Project = {
 			return;
 		}
 
-		var $treeViewMarUl =  $("#projectContainer .treeViewMarUl");
+		var $treeViewMarUl = $("#projectContainer .treeViewMarUl");
 
 		if ($treeViewMarUl.length > 0) {
 			var $span = $treeViewMarUl.find("span[data-id='" + file.id + "']");
@@ -333,7 +333,7 @@ App.Project = {
 
 	},
 
-	delFile:function($item){
+	delFile: function($item) {
 		var dialog = new App.Comm.modules.Dialog({
 			width: 580,
 			height: 168,
@@ -418,12 +418,15 @@ App.Project = {
 				});
 
 			} else {
-				$.tip({type:'alarm',message:'操作失败:'+data.message})
+				$.tip({
+					type: 'alarm',
+					message: '操作失败:' + data.message
+				})
 			}
 			if ($prevEdit.length > 0) {
 				$prevEdit.prev().show().end().nextAll().remove().end().remove();
 			}
-			
+
 		});
 	},
 	//初始化
@@ -684,7 +687,7 @@ App.Project = {
 
 	//事件初始化
 	initEvent: function() {
-		var _this=this;
+		var _this = this;
 		//下载
 		$("#projectContainer").on("click", ".btnFileDownLoad", function(e) {
 
@@ -717,7 +720,7 @@ App.Project = {
 
 		//新建文件
 		$("#projectContainer").on("click", ".btnNewFolder", function(e) {
-			
+
 			if ($(e.currentTarget).is('.disable')) {
 				return
 			}
@@ -746,38 +749,38 @@ App.Project = {
 				return;
 			}
 			if ($selFile.length > 1) {
-	 			App.Services.Dialog.alert('目前只支持单文件删除...');
-	 			return;
-	 		}
+				App.Services.Dialog.alert('目前只支持单文件删除...');
+				return;
+			}
 			var $item = $selFile.closest(".item");
 			_this.delFile($item);
 		});
 	},
 
-	isDisabled(name){
-		var status=App.Project.Settings.CurrentVersion.status,
+	isDisabled(name) {
+		var status = App.Project.Settings.CurrentVersion.status,
 			Auth = App.AuthObj && App.AuthObj.project && 　App.AuthObj.project.prjfile;
-		if(status!=9){
+		if (status != 9) {
 			return true;
 		}
-		Auth=Auth||{};
-		if(!Auth[name]){
+		Auth = Auth || {};
+		if (!Auth[name]) {
 			return true
 		}
 		return false;
 	},
-	returnBack:function(e){
-		if($(e.currentTarget).attr('isReturn')=='0'){
- 			return 
- 		}
-		var $currentLevel=$('#projectContainer .treeViewMarUl .selected');
-		var file=$currentLevel.data('file');
-		var parentId=file.parentId;
-		var $parent=$('#projectContainer .treeViewMarUl span[data-id="' + parentId + '"]');
-		if($parent.length){
+	returnBack: function(e) {
+		if ($(e.currentTarget).attr('isReturn') == '0') {
+			return
+		}
+		var $currentLevel = $('#projectContainer .treeViewMarUl .selected');
+		var file = $currentLevel.data('file');
+		var parentId = file.parentId;
+		var $parent = $('#projectContainer .treeViewMarUl span[data-id="' + parentId + '"]');
+		if ($parent.length) {
 			$parent.click();
-		}else{
-			$(e.currentTarget).attr('isReturn','0').addClass('theEnd').html('全部文件');
+		} else {
+			$(e.currentTarget).attr('isReturn', '0').addClass('theEnd').html('全部文件');
 			App.Project.FileCollection.projectId = App.Project.Settings.projectId;
 			App.Project.FileCollection.projectVersionId = App.Project.Settings.CurrentVersion.id;
 			App.Project.FileCollection.reset();
@@ -787,7 +790,7 @@ App.Project = {
 					parentId: ''
 				}
 			});
-		//	this.loadData();
+			//	this.loadData();
 		}
 	},
 	//绑定全局事件  document 事件
@@ -909,6 +912,14 @@ App.Project = {
 				//App.Project.FileCollection.parentId=file.id;
 				//清空数据
 				App.Project.FileCollection.reset();
+
+				//清除搜索
+				$("#projectContainer .fileContainer").find(".clearSearch").hide().end().
+				find(".opBox").show().end().
+				find(".searchCount").hide().end().
+				find("#txtFileSearch").val("");  
+				App.Project.Settings.searchText = "";
+
 				App.Project.Settings.fileId = file.fileVersionId;
 
 				App.Project.FileCollection.fetch({
@@ -1018,11 +1029,11 @@ App.Project = {
 						var lis = '';
 						$.each(data.data, function(i, item) {
 
-							var _name=item.name;
-							if(/标准$/.test(_name)){
-								_name='<a href="#">'+_name+'</a>&nbsp;&nbsp;';
-							}else{
-								_name='<a href="#">'+_name+'质量标准'+'</a>&nbsp;&nbsp;';
+							var _name = item.name;
+							if (/标准$/.test(_name)) {
+								_name = '<a href="#">' + _name + '</a>&nbsp;&nbsp;';
+							} else {
+								_name = '<a href="#">' + _name + '质量标准' + '</a>&nbsp;&nbsp;';
 							}
 
 							lis += liTpl.replace("varName", _name);
@@ -1041,7 +1052,7 @@ App.Project = {
 		//获取所有类别
 		$.ajax({
 			url: "platform/set/category"
-			}).done(function(res){
+		}).done(function(res) {
 			console.log(res)
 				if (res.code == 0){
 					var str = '',datas = res.data.items || [];
@@ -1052,45 +1063,45 @@ App.Project = {
 							//	url: "platform/setting/extensions/"+App.Project.Settings.projectId+"/"+App.Project.Settings.CurrentVersion.id+"/property?classKey="+datas[i]['id']+"&elementId="+App.Project.Settings.ModelObj.intersect.userId
 							//}).done(function(res){
 							//		if(res.code==0){
-							//
+              //
 							//		}
 							//});
-							var string = '<div class="modle"><i data-classkey="'+datas[i]['id']+'" class="modleShowHide getdata down"></i><h1 class="modleName">' + prop + '</h1><ul class="modleList"></ul></div>';
+							var string = '<div class="modle"><i data-classkey="'+datas[i]['id']+'" class="modleShowHide getdata down"></i><h1 class="modleName">' + prop + '</h1></div>';
 							that.$el.find(".fordesign").html(string);
 						}else {
-							str += '<div class="modle"><i data-classkey="'+datas[i]['id']+'" class="modleShowHide getdata down"></i><h1 class="modleName">' + prop + '</h1><ul class="modleList"></ul></div>';
-
-						}
-
+							str += '<div class="modle"><i data-classkey="'+datas[i]['id']+'" class="modleShowHide getdata down"></i><h1 class="modleName">' + prop + '</h1></div>';
 
 					}
-					that.$el.find(".attrClassBox").html(str);
+
+
 				}
+				that.$el.find(".attrClassBox").html(str);
+			}
 		});
-					//App.Project.fetchClassPropertData(function(res) {
-					//	if (res.code == 0){
-					//		var str = '', liTpl = '<li class="modleItem"><span class="modleName overflowEllipsis"><div class="modleNameText overflowEllipsis">{property}</div></span> <span class="modleVal end">{value}</span></li>';
-					//		var datas = res.data || [];
-					//		for(var i = 0,prop; i < datas.length; i++){
-					//			prop = datas[i]['properties'];
-					//			if('设计管理成本管理计划管理质量管理'.indexOf(datas[i]['className'])>-1){
-					//				continue
-					//			}else if(prop==null){
-					//				str += '<div class="modle"><i class="modleShowHide"></i><h1 class="modleName">' + datas[i]['className'] + '</h1><ul class="modleList">';
-          //
-					//			}else{
-					//				for(var j = 0; j < (prop.length || 0); j++){
-					//					str += '<div class="modle"><i class="modleShowHide"></i><h1 class="modleName">' + datas[i]['className'] + '</h1><ul class="modleList">' + liTpl.replace("{property}", datas[i]['properties'][j]['property']).replace('{value}', datas[i]['properties'][j]['value']);
-					//				}
-					//			}
-          //
-					//			str += '</ul></div>';
-					//		}
-          //
-					//			that.$el.find(".attrClassBox").html(str);
-          //
-					//	}
-					//});
+		//App.Project.fetchClassPropertData(function(res) {
+		//	if (res.code == 0){
+		//		var str = '', liTpl = '<li class="modleItem"><span class="modleName overflowEllipsis"><div class="modleNameText overflowEllipsis">{property}</div></span> <span class="modleVal end">{value}</span></li>';
+		//		var datas = res.data || [];
+		//		for(var i = 0,prop; i < datas.length; i++){
+		//			prop = datas[i]['properties'];
+		//			if('设计管理成本管理计划管理质量管理'.indexOf(datas[i]['className'])>-1){
+		//				continue
+		//			}else if(prop==null){
+		//				str += '<div class="modle"><i class="modleShowHide"></i><h1 class="modleName">' + datas[i]['className'] + '</h1><ul class="modleList">';
+		//
+		//			}else{
+		//				for(var j = 0; j < (prop.length || 0); j++){
+		//					str += '<div class="modle"><i class="modleShowHide"></i><h1 class="modleName">' + datas[i]['className'] + '</h1><ul class="modleList">' + liTpl.replace("{property}", datas[i]['properties'][j]['property']).replace('{value}', datas[i]['properties'][j]['value']);
+		//				}
+		//			}
+		//
+		//			str += '</ul></div>';
+		//		}
+		//
+		//			that.$el.find(".attrClassBox").html(str);
+		//
+		//	}
+		//});
 
 	},
 
@@ -1199,8 +1210,8 @@ App.Project = {
 		sb.Append(item.code);
 		sb.Append('</div></span>');
 		sb.Append(' <span class="modleVal overflowEllipsis" title="' + item.name + '"> ' + item.name + '</span> ');
-		if(item.totalQuantity){
-			sb.Append('<span class="modelCostVal  overflowEllipsis" title="'+item.totalQuantity+'&nbsp;'+item.unit+'">'+Number(item.totalQuantity).toFixed(4)+'&nbsp;'+item.unit+'</span>');
+		if (item.totalQuantity) {
+			sb.Append('<span class="modelCostVal  overflowEllipsis" title="' + item.totalQuantity + '&nbsp;' + item.unit + '">' + Number(item.totalQuantity).toFixed(4) + '&nbsp;' + item.unit + '</span>');
 		}
 		//递归
 		if (item.children && item.children.length > 0) {
@@ -1228,21 +1239,21 @@ App.Project = {
 
 	//在模型中显示
 	showInModel: function($target, type) {
-		var _this=this,
-			ids=$target.data('userId'),
-			box=$target.data('box'),
-			location=$target.data('location');
+		var _this = this,
+			ids = $target.data('userId'),
+			box = $target.data('box'),
+			location = $target.data('location');
 
 		if ($target.hasClass("selected")) {
-			return 
-		//	$target.parent().find(".selected").removeClass("selected");
+			return
+			//	$target.parent().find(".selected").removeClass("selected");
 		} else {
 			$target.parent().find(".selected").removeClass("selected");
 			$target.addClass("selected");
 		}
 
 		if (ids && box) {
-			_this.zoomModel(ids,box);
+			_this.zoomModel(ids, box);
 			_this.showMarks(location);
 			return;
 		}
@@ -1261,23 +1272,23 @@ App.Project = {
 			if (data.code == 0) {
 
 				if (data.data) {
-					var location=data.data.location,
-						_temp=JSON.parse(location);
-					box=_this.formatBBox(_temp.bBox);
-					ids=[_temp.userId];
+					var location = data.data.location,
+						_temp = JSON.parse(location);
+					box = _this.formatBBox(_temp.bBox);
+					ids = [_temp.userId];
 					$target.data("userId", ids);
 					$target.data("box", box);
-					$target.data("location",location);
-					_this.zoomModel(ids,box);
+					$target.data("location", location);
+					_this.zoomModel(ids, box);
 					_this.showMarks(location);
 				}
 			}
 		});
 	},
-	
-	showMarks:function(marks){
-		if(!_.isArray(marks)){
-			marks=[marks];
+
+	showMarks: function(marks) {
+		if (!_.isArray(marks)) {
+			marks = [marks];
 		}
 		App.Project.Settings.Viewer.loadMarkers(marks);
 	},
@@ -1305,8 +1316,8 @@ App.Project = {
 		App.Project.Settings.Viewer.zoomToBox(boxArr);
 		App.Project.Settings.Viewer.translucent(true);
 		App.Project.Settings.Viewer.highlight({
-			type:'userId',
-			ids:Ids
+			type: 'userId',
+			ids: Ids
 		});
 
 	},
@@ -1391,7 +1402,7 @@ App.Project = {
 		App.Project.Settings.Viewer.zoomToBox(boxArr);
 	},
 
-	userProps: function(param,callback) {
+	userProps: function(param, callback) {
 		var _this = this;
 		var dataObj = {
 			URLtype: "fetchFileByModel",
@@ -1415,21 +1426,21 @@ App.Project = {
 				name: "楼层",
 				value: data.data.floor
 			})
-			if(callback){
+			if (callback) {
 				callback(param);
-			}else{
+			} else {
 				_this.$el.html(_this.template(param));
 				if ($('.design').hasClass('selected')) {
 					App.Project.propertiesOthers.call(_this, "plan|cost|quality|dwg");
 				}
 			}
-			
+
 		})
 	},
 
 	//转换bounding box数据
 	formatBBox: function(data) {
-		if(!data){
+		if (!data) {
 			return [];
 		}
 		var box = [],
@@ -1440,6 +1451,16 @@ App.Project = {
 		box.push(minArr);
 		box.push(maxArr);
 		return box;
+	},
+
+	//获取文件名称 搜索
+	getName(name){
+
+		var searchText=App.Project.Settings.searchText;
+		if (searchText) {
+			name=name.replace(searchText,'<span class="searchText">'+searchText+'</span>');
+		} 
+		return name;
 	}
 
 

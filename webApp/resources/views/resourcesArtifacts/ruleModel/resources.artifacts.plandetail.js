@@ -65,6 +65,9 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
             //保存提交数据
             if(already>0){
                 App.ResourceArtifacts.modelSaving.codeIds[already].ruleIds = []
+            }else{
+                model.ruleIds = [];
+                App.ResourceArtifacts.modelSaving.codeIds.push(App.ResourceArtifacts.getValid(model));
             }
 
             if(this.$el.hasClass("active")){

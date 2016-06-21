@@ -3,7 +3,7 @@
     <i class="serchIcon"></i>
 </div> -->
 <ul class="collList">
-  <% _.forEach(data,function(item){ %>
+  <% _.forEach(data.reverse(),function(item){ %>
     <li class="collItem" data-pId="<%=item.projectId%>" data-vId="<%=item.projectVersionId%>" data-id="<%=item.id%>" data-status="<%= item.status %>">
       <span class="collStatus">
         <% switch(item.status){case 0: %>
