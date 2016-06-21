@@ -77,9 +77,7 @@ App.Resources.ArtifactsTplListItem = Backbone.View.extend({
             App.ResourceArtifacts.departQuality(_this.menu.$(".qualityMenuListGC"),App.ResourceArtifacts.allQualityGC,null,"0");
             _this.menu.$(".qualityMenuListGC").show();
             App.ResourceArtifacts.departQuality(_this.menu.$(".qualityMenuListKY"),App.ResourceArtifacts.allQualityKY,null,"0");
-            //向要存储的部分提交   质量标准的  原有数据
-            var arr = App.ResourceArtifacts.getValid("quality",data);
-            App.ResourceArtifacts.modelSaving= App.ResourceArtifacts.modelSaving.concat(arr);
+
         });
     },
     //切换

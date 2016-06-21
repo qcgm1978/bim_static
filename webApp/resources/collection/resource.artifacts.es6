@@ -335,9 +335,6 @@ App.ResourceArtifacts={
             if(response.code == 0 && response.data){
                 if(response.data.length){
                 App.ResourceArtifacts.PlanNode.add(response.data);
-
-                    var arr = App.ResourceArtifacts.getValid("model",response.data);
-                    App.ResourceArtifacts.modelSaving= App.ResourceArtifacts.modelSaving.concat(arr);
                 }else{
                     Backbone.trigger("mappingRuleNoContent");
                 }
@@ -382,7 +379,9 @@ App.ResourceArtifacts={
             if(type == "quality"){
                 a = item.leaf
             }
-            return a && (item.ruleContain == 1 || item.ruleContain == 3) && item.count != 0;  //过滤掉规则包函数为0的规则组
+            return a && (item.ruleContain == 1 || item.ruleContain == 3) && item.count != 0;
+            //存储3时候要注意将ruleIds设置为相应的值，保证能够存储
+            //操作rule时注意操作内容，未更改和已更改，已更改全不选，删除code/已更改全选全部写入id
         });
         _.each(s,function(item){
             var obj = {

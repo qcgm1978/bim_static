@@ -16,7 +16,6 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
 
     render:function() {
         this.$el.html(this.template(this.model.toJSON()));
-        var ruleContain = this.model.get("ruleContain");
         return this;
     },
 
@@ -52,12 +51,26 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
         var _this = this.$el.closest("li");
         ele.removeClass("half");
 
+
+
+
         //非叶子节点，加载
         if(!leaf && !this.$el.siblings(".childList").html()){
             return
         }
 
         App.Resources.cancelBubble(e);
+
+
+
+        //存储模型
+        var model = JSON.parse(this.$el.closest("li").attr("data-model")),already;
+        if(App.ResourceArtifacts.modelSaving.length){
+            already = _.indexOf(App.ResourceArtifacts.modelSaving,function(item){
+                return item.code = model.code
+            });
+        }
+
 
         var siblings = _this.siblings("li");
         var father = _this.closest("ul").closest("li");
@@ -107,6 +120,9 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
                 }
             }
             if(leaf){
+                if(already>0){
+                    App.ResourceArtifacts.modelSaving[already].ruleIds = []
+                }
                 //操作右侧全不选
                 return
             }
@@ -114,6 +130,12 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
             if(_this.find("li").length){
                 _.each(_this.find("li"),function(item){
                     $(item).attr("data-check","0").find(".ruleCheck").removeClass("all");
+                    var models = jQuery.parseJSON($(item).attr("data-model"));
+                    for(var i = 0 ; i < App.ResourceArtifacts.modelSaving.length ; i++){
+                        if(models.code == App.ResourceArtifacts.modelSaving[i].code){
+                            App.ResourceArtifacts.modelSaving[i].ruleIds = []
+                        }
+                    }
                 });
             }
 
@@ -143,6 +165,9 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
             }
 
             if(leaf){
+                if(already>0){
+                    App.ResourceArtifacts.modelSaving[already].ruleIds = model
+                }
                 //操作右侧全选
                 return
             }
@@ -150,10 +175,15 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
             if(_this.find("li").length) {
                 _.each(_this.find("li"), function (item) {
                     $(item).attr("data-check", "1").find(".ruleCheck").removeClass("half").addClass("all");
+                    var models = jQuery.parseJSON($(item).attr("data-model"));
+                    for(var i = 0 ; i < App.ResourceArtifacts.modelSaving.length ; i++){
+                        if(models.code == App.ResourceArtifacts.modelSaving[i].code){
+                            App.ResourceArtifacts.modelSaving[i].ruleIds = models.ruleIds
+                        }
+                    }
                 });
             }
         }
-
     },
     //查找所给元素的check元素
     searchSelf:function(ele){
