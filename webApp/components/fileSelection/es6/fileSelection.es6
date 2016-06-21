@@ -154,7 +154,7 @@
 
 			rightEnter += '<span class="fileSelText">已选<span class="fileCount">' + count + '</span>文件</span>';
 			rightEnter += '</div>';
-			rightEnter += '<div class="fileEnterBox"> <div class="treeViewMar"><ul class="treeViewMarUl"><li class="null">未选择</li></ul>  </div>	 </div>';
+			rightEnter += '<div class="fileEnterBox"> <div class="bindScroll"> <div class="treeViewMar"><ul class="treeViewMarUl"><li class="null">未选择</li></ul> </div> </div>	 </div>';
 			$content.find('.rightEnter').html(rightEnter);
 
 			$dialog.append($header);
@@ -213,6 +213,20 @@
 
 			this.Settings.$dialog.find(".leftFile, .contentBox, .rightEnter,.footer").show();
 			this.Settings.$dialog.find(".loading").hide();
+
+
+			var opts = {
+				theme: 'minimal-dark',
+				set_width: "100%",
+				set_height: "100%",
+				axis: "xy",
+				keyboard: {
+					enable: true
+				},
+				scrollInertia: 0
+			};
+			//treeViewMar
+			this.Settings.$dialog.find(".treeViewScroll").mCustomScrollbar(opts);
 		},
 
 		// 根
@@ -311,6 +325,14 @@
 					$this.addClass('on');
 					$this.closest('li').children('ul').show();
 				}
+
+				if ($this.closest(".fileEnterBox").length > 0) {
+					that.bindScroll();
+				} else {
+					var width = that.Settings.$dialog.find(".leftFile .treeViewMarUl")[0].scrollWidth;
+					that.Settings.$dialog.find(".leftFile .treeViewMar").width(width);
+				}
+
 			});
 
 			//点击树文字
@@ -376,6 +398,7 @@
 			//全选
 			$dialog.on("click", ".rightEnter .btnEnter", function() {
 				that.enterSelect.call(that);
+				that.bindScroll();
 			});
 
 			//全选
@@ -440,13 +463,49 @@
 				if (event.keyCode == 27) {
 					$dialog.find(".close").trigger('click');
 				}
-			}); 
-		
+			});
+
 
 			//拖拽
 			// $dialog.on("mousedown",".header.drag",function(event){
 			// 	that.drag.call(that,event);
 			// });  
+		},
+
+		//绑定滚动条
+		bindScroll() {
+
+
+			if (this.Settings.$dialog.find(".fileEnterBox .bindScroll").hasClass("mCustomScrollbar")) {
+				return;
+			} else {
+				var width = this.Settings.$dialog.find(".fileEnterBox .treeViewMarUl")[0].scrollWidth;
+				if (width < 220) {
+					width = 220;
+				}
+				this.Settings.$dialog.find(".fileEnterBox .treeViewMar").width(width);
+			}
+
+			var opts = {
+				theme: 'minimal-dark',
+				set_width: "100%",
+				set_height: "100%",
+				axis: "xy",
+				keyboard: {
+					enable: true
+				},
+				scrollInertia: 0
+			};
+
+
+			var width = this.Settings.$dialog.find(".fileEnterBox .treeViewMarUl")[0].scrollWidth;
+			if (width < 220) {
+				width = 220;
+			}
+			this.Settings.$dialog.find(".fileEnterBox .treeViewMar").width(width);
+			this.Settings.$dialog.find(".fileEnterBox .bindScroll").mCustomScrollbar(opts);
+
+
 		},
 
 
@@ -505,9 +564,11 @@
 
 
 			for (var i = bodyCount; i >= 0; i--) {
+
 				$item = $($fileBody[i]);
 
 				id = $item.data("id");
+
 				fileVersionId = $item.data("fileversionid");
 
 				if (isAppend) {
@@ -622,9 +683,9 @@
 			} else if (status == 2) {
 				result = "上传中";
 			} else if (status == 3) {
-				result = "已上传";
-			} else if (status == 4) {
 				result = "待审核";
+			} else if (status == 4) {
+				result = "审核中";
 			} else if (status == 5) {
 				result = "审核通过";
 			} else if (status == 6) {
@@ -638,6 +699,8 @@
 			}
 
 			return result;
+
+			
 		},
 
 		//格式化 文件大小

@@ -121,7 +121,7 @@ var Login = {
 			var r=document.URL.split('ReturnUrl=').pop();
 			//失败
 			if (data.code!=0) {
-				alert("获取用户信息失败");
+				$("#mainBox .errorMSG").addClass('show').find(".tip").text("获取用户信息失败");
 				$("#btnLogin").val("立即登录").data("islogin", false);
 				return;
 			}

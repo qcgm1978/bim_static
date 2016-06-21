@@ -107,7 +107,7 @@
 			}
 
 			menu.css("top",top);
-
+			
 			return false;
 		});
 

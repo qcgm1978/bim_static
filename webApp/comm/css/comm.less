@@ -38,6 +38,10 @@
 	&.disable { .iconPic { background-position: 0px -120px; }
 	}
 }
+.btnNormal.disable{ background: #eee;
+		  color: #ccc;
+		  border-color: #ccc;
+		  cursor: default;}
 .btnCk { cursor: pointer; margin-right: 5px; display: inline-block; vertical-align: middle; padding-right: 15px; line-height: 1.2; height: 15px;
 	.iconPic { background: url(../images/comm/images/commIcon.png) no-repeat 0px -160px; display: inline-block; width: 18px; height: 15px; vertical-align: -4px; }
 	&.selected { .iconPic { background-position: 0px -140px; }
@@ -134,6 +138,9 @@
 			&.other { background-position: 0px -519px; }
 		}
 		.text { cursor: pointer;
+			.searchText{
+				color:#ff7f00;
+			}
 			&:hover { text-decoration: underline; }
 		}
 		.fileTypeImg { height: 30px; width: 35px; vertical-align: top; margin-top: 3px; margin-right: 10px; }

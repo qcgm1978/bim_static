@@ -123,7 +123,7 @@ App.ResourcesNav.App = Backbone.View.extend({
 				//todo 分页
 
 				$standarPagination = $standardLibs.find(".standarPagination");
-				$standardLibs.find(".sumDesc").html('共 ' + pageCount + ' 个标准模型');
+				$standardLibs.find(".sumDesc").html('共 ' + pageCount + ' 个族库');
 
 				$standarPagination.pagination(pageCount, {
 					items_per_page: response.data.pageItemCount,

@@ -198,15 +198,24 @@ App.Project.ProjectPlanProperty = Backbone.View.extend({
 	changeDate(event) {
 
 		var $target = $(event.target),
-			isEnd = $target.val() != 4 && $target.val() != 3 && true || false;
+			val=$target.val(),
+			data={
+				projectCode:App.Project.Settings.CurrentVersion.projectNo,
+				type: val
+			};
 
-		if ($target.val() == 4 || $target.val() == 2) {
-			this.$(".selDate:last")[0].selectedIndex = $target[0].selectedIndex;
-		} else {
-			this.$(".selDate:first")[0].selectedIndex = $target[0].selectedIndex;
+		if(val == 4 || val == 2){
+			App.Project.PlanAttr.PlanPublicityCollectionMonth.reset();
+			App.Project.PlanAttr.PlanPublicityCollectionMonth.fetch({
+				data: data
+			});
 		}
-
-		this.loadPublicityData(App.Project.Settings.projectId, App.Project.Settings.CurrentVersion.id, isEnd);
+		if(val==3||val==1){
+			App.Project.PlanAttr.PlanPublicityCollection.reset();
+			App.Project.PlanAttr.PlanPublicityCollection.fetch({
+				data: data
+			});
+		}
 	},
 
 	//加载计划关注列表

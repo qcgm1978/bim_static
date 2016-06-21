@@ -67,6 +67,7 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 		this.$el.contextMenu('listContext', {
 			//显示 回调
 			onShowMenuCallback: function(event) {
+				event.preventDefault();
 				var $item = $(event.target).closest(".item");
 				$("#reNameModel").removeClass('disable');
 				//预览
@@ -86,6 +87,14 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 
 				}
 				$item.addClass("selected").siblings().removeClass("selected");
+				if(App.ResourceModel.Settings.CurrentVersion.status==4 ||
+					App.ResourceModel.Settings.CurrentVersion.status==7 ||
+					App.ResourceModel.Settings.CurrentVersion.subType==1){
+					$("#reNameModel").addClass('disable').attr('disabled','disabled');
+					$("#downLoadModel").addClass('disable').attr('disabled','disabled');
+					$("#delModel").addClass('disable').attr('disabled','disabled');
+				}
+
 				//权限控制
 				var Auth = App.AuthObj.lib.model;
 				if(!Auth.edit){
@@ -110,10 +119,10 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 					//下载
 					var $item = $(item);
 
-					if ($item.find(".folder").length > 0) {
+					/*if ($item.find(".folder").length > 0) {
 						alert("暂不支持文件夹下载");
 						return;
-					}
+					}*/
 
 					//下载链接 
 					var fileVersionId = $item.find(".filecKAll").data("fileversionid");

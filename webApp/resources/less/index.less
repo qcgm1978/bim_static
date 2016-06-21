@@ -54,7 +54,7 @@
 	.modelTreeBox{display: none;height: 100%;}
  
 }
-#resourceListContent { height: 100%; margin-top: -53px; padding-top: 53px;
+#resourceListContent {  margin-left: 10px; position: absolute; bottom: 20px; top: 124px; right: 0; left: 228px;
 	.fileBody { margin-top: -51px; padding-top: 40px; height: 100%;
 		.btnEnter { margin-left: 5px; margin-right: 5px; cursor: pointer; }
 	}
@@ -62,16 +62,11 @@
 #navContainer { margin-left: 237px; height: 100%; margin-top: -40px; padding-top: 40px;
 	 &.hideLeft{margin-left: 0px;}
 	.listContent { height: 100%; }
-	.topBar { padding: 15px; padding-bottom: 8px;
-		.btnNormal { margin-right: 10px; }
+	.topBar { padding: 10px;
+		.btnNormal { margin-right: 7px; }
 		.btnNewFolder {
 			margin-left: 5px;
 			.myIcon-createFolder{    height: 17px; margin-top: -2px;}
-		}
-	    .disable{
-		  background: #eee;
-		  color: #ccc;
-		  border-color: #ccc;
 		}
 	}
 	.modelContentBox { height: 100%; display: none;
@@ -106,6 +101,7 @@
 #resourceFamlibsLeftNav,#resourceModelLeftNav{
 	.projectNav{
 		    min-width: 236px;
+		    display: none;
 	}
 	.text-field{max-width:135px;}
 }
