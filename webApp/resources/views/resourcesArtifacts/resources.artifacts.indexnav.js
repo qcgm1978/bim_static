@@ -5,7 +5,7 @@ App.Resources.ArtifactsIndexNav = Backbone.View.extend({
 
     tagName:"div",
 
-    className: "mappingRule",
+    className: "resourcesMappingRule",
 
     template: _.templateUrl("/resources/tpls/resourcesArtifacts/resources.artifacts.indexnav.html"),
 

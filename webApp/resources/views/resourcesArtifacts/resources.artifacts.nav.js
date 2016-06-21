@@ -34,6 +34,7 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
         Backbone.on("startFromProject",this.startFromProject,this);
         Backbone.on("checkedChange",this.checkList,this);
         Backbone.on("projectMappingRuleCheckedClose",this.checkClose,this);
+        Backbone.on("resetRule",this.resetRule,this);
     },
 
     checkList:function(){

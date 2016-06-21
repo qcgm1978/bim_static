@@ -61,6 +61,7 @@
     _width: 350px;
     color: #666;
     font-weight: bold;
+    line-height: 45px;
 }
 
 .mod-dialog .header .close {

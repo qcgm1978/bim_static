@@ -37,13 +37,14 @@ App.Resources.ArtifactsQualityList = Backbone.View.extend({
         active.addClass("active");
     },
 
+    //切换，一次加载，仅切换不同对话框
     choose:function(){
         var _this = this;
         this.toggle();
-        App.ResourceArtifacts.getQuality();
+        //App.ResourceArtifacts.getAllQuality();
+        App.ResourceArtifacts.departQuality();  //departQuality:function(ele,cdata,parentCode,ruleContain){
     },
 
-    //切换
     toggle:function(){
         var extendData,extendText;
         this.$(".qualityProcess").removeClass("active");
@@ -56,6 +57,11 @@ App.Resources.ArtifactsQualityList = Backbone.View.extend({
         this.$(".pro").data("type",extendData);
         this.$(".pro").text(extendText);
         App.ResourceArtifacts.Status.qualityStandardType = newData;
+        if(newData == "GC"){
+            this.$(".qualityMenuListGC").show().siblings(".qualityMenuListKY").hide();
+        }else{
+            this.$(".qualityMenuListKY").show().siblings(".qualityMenuListGC").hide();
+        }
     }
 
 });
