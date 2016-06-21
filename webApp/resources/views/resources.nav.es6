@@ -57,7 +57,8 @@ App.ResourcesNav.App = Backbone.View.extend({
 		this.$el.append(new App.ResourcesNav.StandardLibs().render().el);
 		//重置 和 加载数据
 		App.ResourcesNav.StandardLibsCollection.reset();
-		var that = this;
+		var that = this,
+			typeText = App.ResourcesNav.Settings.type=='standardLibs'?'标准模型':'族库';
 		App.ResourcesNav.StandardLibsCollection.fetch({
 			data: {
 				pageIndex: App.ResourcesNav.Settings.pageIndex,
@@ -70,7 +71,7 @@ App.ResourcesNav.App = Backbone.View.extend({
 				//todo 分页
 
 				$standarPagination = $standardLibs.find(".standarPagination");
-				$standardLibs.find(".sumDesc").html('共 ' + pageCount + ' 个标准模型');
+				$standardLibs.find(".sumDesc").html('共 ' + pageCount + ' 个'+typeText);
 
 				$standarPagination.pagination(pageCount, {
 					items_per_page: response.data.pageItemCount,
