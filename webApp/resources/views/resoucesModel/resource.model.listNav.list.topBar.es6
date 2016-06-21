@@ -13,35 +13,40 @@
 
  	template: _.templateUrl('/resources/tpls/resourceModel/resource.model.listNav.list.topBar.html', true),
 
- 	render: function() {
- 		this.$el.html(this.template);
-	  if (!App.AuthObj.lib) {
+	render: function() {
+		var type = App.ResourcesNav.Settings.type;
+		this.$el.html(this.template);
+		if (App.AuthObj.lib) {
+			if (type == "standardLibs") {
+				var Auth = App.AuthObj.lib.model;
+				if (!Auth.edit) {
+					this.$('.btnNewFolder,.btnFileDel,.btnFileUpload').addClass('disable');
+					if (!Auth.download || !App.ResourceModel.Settings.CurrentVersion.byProjectRef) {
+						this.$('.btnFileDownLoad').addClass('disable');
+					}
+				}
+			} else if (type == "famLibs") {
+				var Auth = App.AuthObj.lib.family;
+				if (!Auth.edit) {
+					this.$('.btnNewFolder,.btnFileDel,.btnFileUpload').addClass('disable');
+					if (!Auth.download || !App.ResourceModel.Settings.CurrentVersion.byProjectRef) {
+						this.$('.btnFileDownLoad').addClass('disable');
+					}
+				}
+			}
+		}
+		if (this.isDisabled()) {
+			this.$('.btnNewFolder,.btnFileDel,.btnFileUpload').addClass('disable');
+		}
+		return this;
+	},
 
-	  } else{
-		  var type = App.ResourcesNav.Settings.type;
-		  if (type == "standardLibs") {
-			  var Auth = App.AuthObj.lib.model;
-
-			  if(!Auth.edit){
-				  this.$('.btnNewFolder,.btnFileDel,.btnFileUpload').addClass('disable');
-				  if(!Auth.download || !App.ResourceModel.Settings.CurrentVersion.byProjectRef){
-					  this.$('.btnFileDownLoad').addClass('disable');
-				  }
-			  }
-		  } else if (type == "famLibs") {
-			  var Auth = App.AuthObj.lib.family;
-
-			  if(!Auth.edit){
-				  this.$('.btnNewFolder,.btnFileDel,.btnFileUpload').addClass('disable');
-				  if(!Auth.download || !App.ResourceModel.Settings.CurrentVersion.byProjectRef){
-					  this.$('.btnFileDownLoad').addClass('disable');
-				  }
-			  }
-		  }
-
-
-	  }
-		  return this;
+ 	isDisabled:function(){
+ 		if(App.ResourceModel.Settings.CurrentVersion.status==4||
+ 			App.ResourceModel.Settings.CurrentVersion.status==7){
+ 			return true
+ 		}
+ 		return false;
  	},
 
  	returnBack:function(e){

@@ -107,7 +107,10 @@
 					if ($leftSel.length > 0) {
 						parentId = $leftSel.data("file").fileVersionId;
 					}
-					App.ResourceModel.afterCreateNewFolder(data.data, parentId);
+					if(data.data.folder){
+						App.ResourceModel.afterCreateNewFolder(data.data, parentId);
+					}
+					
 					//$.jps.publish('add-upload-file', response, file)
 				},
 

@@ -74,6 +74,7 @@ App.Project = {
 		$el.contextMenu('listContextProject', {
 			//显示 回调
 			onShowMenuCallback: function(event) {
+				event.preventDefault();
 				var $item = $(event.target).closest(".item");
 				$("#reNameModelProject").removeClass('disable');
 				//预览
@@ -98,14 +99,18 @@ App.Project = {
 					$("#downLoadModelProject").addClass('disable').attr('disabled','disabled');
 					$("#delModelProject").addClass('disable').attr('disabled','disabled');
 				}
+				if(_this.isDisabled('edit')){
+					$("#reNameModelProject").addClass('disable').attr('disabled','disabled');
+				}
+				if(_this.isDisabled('delete')){
+					$("#delModelProject").addClass('disable').attr('disabled','disabled');
+				}
+				if(_this.isDisabled('downLoad')|| !App.ResourceModel.Settings.CurrentVersion.byProjectRef){
+					$("#downLoadModelProject").addClass('disable').attr('disabled','disabled');
+				}
 				$item.addClass("selected").siblings().removeClass("selected");
-				//权限控制
-				var Auth = App.AuthObj.project.prjfile;
-				if(!Auth.edit){
-					$('#reNameModel,#delModel').addClass('disable');
-					if(!Auth.download || !App.ResourceModel.Settings.CurrentVersion.byProjectRef){
-						$('#downLoadModel').addClass('disable');
-					}
+				if($('#listContextProject li[class!=disable]').length==0){
+					$('#listContextProject').parent().hide();
 				}
 			},
 			shadow: false,
@@ -114,11 +119,11 @@ App.Project = {
 				'downLoadModelProject': function(item) {
 
 					var $item = $(item);
-
+/*
 					if ($item.find(".folder").length > 0) {
 						alert("暂不支持文件夹下载");
 						return;
-					}
+					}*/
 
 					//下载链接 
 					var fileVersionId = $item.find(".filecKAll").data("fileversionid");
@@ -135,9 +140,14 @@ App.Project = {
 					var data = App.Comm.getUrlByType(data),
 						url = data.url + "?fileVersionId=" + fileVersionId;
 					window.location.href = url;
+
 				},
 				'delModelProject': function(item) {
-					var $item=$(item);
+					var rel=$('#delModelProject'),
+						$item=$(item);
+					if (rel.hasClass('disable')) {
+						return;
+					}
 					_this.delFile($item);
 				},
 				'reNameModelProject': function(item) {
@@ -352,7 +362,6 @@ App.Project = {
 	},
 	//取消修改名称
 	calcelEditName: function(event) {
-		debugger
 		var $prevEdit = $("#projectContainer .txtEdit");
 		if ($prevEdit.length > 0) {
 			this.cancelEdit($prevEdit);
@@ -361,7 +370,6 @@ App.Project = {
 	},
 	//取消修改
 	cancelEdit: function($prevEdit) {
-		debugger
 		var $item = $prevEdit.closest(".item");
 		if ($item.hasClass('createNew')) {
 			//取消监听 促发销毁
@@ -746,6 +754,19 @@ App.Project = {
 			var $item = $selFile.closest(".item");
 			_this.delFile($item);
 		});
+	},
+
+	isDisabled(name){
+		var status=App.Project.Settings.CurrentVersion.status,
+			Auth = App.AuthObj && App.AuthObj.project && 　App.AuthObj.project.prjfile;
+		if(status!=9){
+			return true;
+		}
+		Auth=Auth||{};
+		if(!Auth[name]){
+			return true
+		}
+		return false;
 	},
 	returnBack:function(e){
 		if($(e.currentTarget).attr('isReturn')=='0'){
