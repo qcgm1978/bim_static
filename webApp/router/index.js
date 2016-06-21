@@ -250,6 +250,7 @@ var AppRoute = Backbone.Router.extend({
 		App.Global.User && $("#topBar .userName .text").text(App.Global.User.name);
 
 		if (!App.Global.User) {
+			this.getUserInfo();
 			return;
 		}
 
@@ -278,6 +279,22 @@ var AppRoute = Backbone.Router.extend({
 		});
 
 
+	},
+
+	//获取用户信息
+	getUserInfo() {
+		$.ajax({
+			url: '/platform/user/current'
+		}).done(function(data) {
+
+			localStorage.setItem("user", JSON.stringify(data.data))
+			App.Comm.setCookie('userId', data.data.userId);
+			App.Comm.setCookie('isOuter', data.data.outer);
+
+			//是否主动退出标记 2 默认状态 1 为主动退出
+			App.Comm.setCookie('IS_OWNER_LOGIN', '2');
+			App.Comm.setCookie("token_cookie");
+		});
 	}
 
 
