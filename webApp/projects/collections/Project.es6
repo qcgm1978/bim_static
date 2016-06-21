@@ -1033,13 +1033,13 @@ App.Project = {
 							//	url: "platform/setting/extensions/"+App.Project.Settings.projectId+"/"+App.Project.Settings.CurrentVersion.id+"/property?classKey="+datas[i]['id']+"&elementId="+App.Project.Settings.ModelObj.intersect.userId
 							//}).done(function(res){
 							//		if(res.code==0){
-							//
+              //
 							//		}
 							//});
-							var string = '<div class="modle"><i data-classkey="'+datas[i]['id']+'" class="modleShowHide getdata down"></i><h1 class="modleName">' + prop + '</h1><ul class="modleList"></ul></div>';
+							var string = '<div class="modle"><i data-classkey="'+datas[i]['id']+'" class="modleShowHide getdata down"></i><h1 class="modleName">' + prop + '</h1></div>';
 							that.$el.find(".fordesign").html(string);
 						}else {
-							str += '<div class="modle"><i data-classkey="'+datas[i]['id']+'" class="modleShowHide getdata down"></i><h1 class="modleName">' + prop + '</h1><ul class="modleList"></ul></div>';
+							str += '<div class="modle"><i data-classkey="'+datas[i]['id']+'" class="modleShowHide getdata down"></i><h1 class="modleName">' + prop + '</h1></div>';
 
 						}
 
