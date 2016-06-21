@@ -693,11 +693,11 @@
       var viewer = this.viewer;
       viewer.flyBypAxisGridNumber(name, x, y);
     },
-    setFloorMap:function(obj,name){
+    setFloorMap:function(obj,name,flag){
       // 设置小地图
       var viewer = this.viewer;
       viewer.setFloorPlaneData(obj);
-      viewer.generateFloorPlane(name);
+      viewer.generateFloorPlane(name,flag);
     },
     showAxisGrid:function(name){
       var viewer = this.viewer;
