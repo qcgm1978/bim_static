@@ -10,6 +10,7 @@ App.Project = {
 		fileId: "",
 		token:"",
 		isShare:false,
+		searchText:"",//搜索的文本
 		projectId: "", //项目id
 		versionId: "", //版本id		
 		viewPintId:"",//批注id 存在此id直接跳转到 批注

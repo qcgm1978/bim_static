@@ -7,7 +7,7 @@ App.TopNav = {
 			$("#loginName").html(_userInfo.name);
 			$("#uiAccount").html(App.Comm.getCookie('OUTSSO_LoginId'));
 			$("#uiPosition").html(_userInfo.position);
-			$("#uiPartment").html(_userInfo.org ? _userInfo.org[0].name : '');
+			$("#uiPartment").html("test");//_userInfo.org ? _userInfo.org[0].name : ''
 			$("#uiLogo").attr('src', _userInfo.photoUrl);
 		}else{
 			return;

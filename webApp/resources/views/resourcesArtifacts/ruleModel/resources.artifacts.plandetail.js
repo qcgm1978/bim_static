@@ -17,6 +17,7 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
         var ruleContain = this.model.get("ruleContain");
         var a  = ruleContain == 1 ?  1 : 0;
         this.$el.attr("data-check", a);
+        this.$el.attr("data-model",JSON.stringify(this.model.toJSON()));
         this.$el.attr("data-code", this.model.get("code"));
         return this;
     },
@@ -51,9 +52,21 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
     checked:function(e){
         App.Resources.cancelBubble(e);
         var ele = $(e.target);
+        var model = jQuery.parseJSON(this.$el.attr("data-model")),already;
+        if(App.ResourceArtifacts.modelSaving.codeIds.length){
+            already = _.indexOf(App.ResourceArtifacts.modelSaving.codeIds,function(item){
+                return item.code = model.code
+            });
+        }
+
         if(ele.hasClass("all")){
             ele.removeClass("all");
             ele.closest("li").attr("data-check","0");
+            //保存提交数据
+            if(already>0){
+                App.ResourceArtifacts.modelSaving.codeIds[already].ruleIds = []
+            }
+
             if(this.$el.hasClass("active")){
                 Backbone.trigger("modelRuleSelectNone");
                 //触发全不选事件
@@ -61,6 +74,13 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
         }else{
             ele.addClass("all");
             ele.closest("li").attr("data-check","1");
+            //保存提交数据
+            if(already>0){
+                App.ResourceArtifacts.modelSaving.codeIds[already].ruleIds = model.ruleIds
+            }else{
+                App.ResourceArtifacts.modelSaving.codeIds.push(App.ResourceArtifacts.getValid(model));
+            }
+
             if(this.$el.hasClass("active")){
                 //触发全选事件
                 Backbone.trigger("modelRuleSelectAll");

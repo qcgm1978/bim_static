@@ -9,11 +9,14 @@ App.Project.FileContainer = Backbone.View.extend({
 	initialize: function() {
 		this.listenTo(App.Project.FileCollection, "reset", this.reset);
 		this.listenTo(App.Project.FileCollection, "add", this.addOneFile);
+		this.listenTo(App.Project.FileCollection, "searchNull", this.searchNull);
+
 	},
 
 	events: {
 		"click .header .ckAll": "ckAll",
-		"click .btnFileSearch": "fileSearch"
+		"click .btnFileSearch": "fileSearch",
+		"click .clearSearch": "clearSearch"
 
 	},
 
@@ -61,27 +64,62 @@ App.Project.FileContainer = Backbone.View.extend({
 		if (!txtSearch) {
 			return;
 		}
-
+		//搜索赋值
+		App.Project.Settings.searchText = txtSearch;
 		var data = {
 			URLtype: "fileSearch",
 			data: {
 				projectId: App.Project.Settings.projectId,
 				versionId: App.Project.Settings.versionId,
-				key:txtSearch
+				key: txtSearch
 			}
 		}
 
-		App.Comm.ajax(data,(data)=>{
+		App.Comm.ajax(data, (data) => {
 
-			if (data.code==0) {
-
+			if (data.code == 0) {
+				var count = data.data.length;
+				this.$(".clearSearch").show();
+				this.$(".opBox").hide();
+				this.$(".searchCount").show().find(".count").text(count);
 				App.Project.FileCollection.reset();
-				App.Project.FileCollection.push(data.data);
+
+				if (count > 0) {
+					App.Project.FileCollection.push(data.data);
+				} else {
+					App.Project.FileCollection.trigger("searchNull");
+				}
 
 			}
-
-
 		});
+	},
+
+	searchNull() {
+		this.$el.find(".fileContent").html('<li class="loading"><i class="iconTip"></i>未搜索到相关文件/文件夹</li>');
+	},
+
+	clearSearch() {
+
+		this.$(".clearSearch").hide();
+		this.$(".opBox").show();
+		this.$(".searchCount").hide();
+		$("#txtFileSearch").val("");
+		App.Project.Settings.searchText="";
+		App.Project.FileCollection.reset();
+
+		var $selectFile = $(".projectNavFileContainer .selected");
+
+		if ($selectFile.length > 0) {
+			App.Project.FileCollection.fetch({
+				data: {
+					parentId: $selectFile.data("file").fileVersionId
+				}
+			});
+		}else{
+			App.Project.FileCollection.fetch();
+		}
+
+
 	},
 
 	//添加单个li

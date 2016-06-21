@@ -335,9 +335,6 @@ App.ResourceArtifacts={
             if(response.code == 0 && response.data){
                 if(response.data.length){
                 App.ResourceArtifacts.PlanNode.add(response.data);
-
-                    var arr = App.ResourceArtifacts.getValid("model",response.data);
-                    App.ResourceArtifacts.modelSaving= App.ResourceArtifacts.modelSaving.concat(arr);
                 }else{
                     Backbone.trigger("mappingRuleNoContent");
                 }
@@ -346,7 +343,11 @@ App.ResourceArtifacts={
         });
     },
     //所有
-    modelSaving:[],
+    modelSaving:{
+        templateId: "",
+        templateName: "",
+        codeIds:[]
+    },
     allQualityGC: [],
     allQualityKY: [],
     //获取全部质量标准
@@ -359,6 +360,13 @@ App.ResourceArtifacts={
                 type:App.ResourceArtifacts.Status.type
             }
         };
+
+        if(App.ResourceArtifacts.Status.templateId){
+            pdata.data.templateId = App.ResourceArtifacts.Status.templateId;
+        }else if(App.ResourceArtifacts.Status.projectId){
+            pdata.data.projectId = App.ResourceArtifacts.Status.projectId;
+        }
+
         App.Comm.ajax(pdata,function(response){
             if(response.code == 0 && response.data.length){
                 App.ResourceArtifacts.allQualityKY = _.filter(response.data,function(item){
@@ -375,23 +383,11 @@ App.ResourceArtifacts={
     },
 
     //获取已经加载并且要存储的有效数据
-    getValid:function(type,data){
-        var arr= [];
-        var s =  _.filter(data,function(item){
-            var  a = true;
-            if(type == "quality"){
-                a = item.leaf
-            }
-            return a && (item.ruleContain == 1 || item.ruleContain == 3) && item.count != 0;  //过滤掉规则包函数为0的规则组
-        });
-        _.each(s,function(item){
-            var obj = {
-                code : item.code,
-                ruleIds : item.ruleIds || []
+    getValid:function(obj){
+        return  {
+                code : obj.code,
+                ruleIds : obj.ruleIds || []
             };
-            arr.push(obj);
-        });
-        return arr
     },
 
 

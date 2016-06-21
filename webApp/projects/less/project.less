@@ -38,8 +38,14 @@
 				.modelContainer { height: 500px; position: relative; }
 				.loading { margin: 0px -1px; background-color: #fff; }
 				.returnBack { margin-right: 10px; }
-				.fileSearchBox { float: right; }
-				#txtFileSearch { width: 200px; vertical-align: top; margin-right: -5px; outline: none;position: relative; }
+				.fileSearchBox { float: right; position: relative; }
+				.clearSearch { cursor: pointer; display: none; position: absolute; width: 14px; height: 14px; left: 180px; top: 8px; background: url('/static/dist/images/comm/images/commIcon.png') no-repeat -40px -440px; }
+				#txtFileSearch { width: 200px; vertical-align: top; margin-right: -5px; outline: none; position: relative; }
+				.searchCount { display: none; height: 27px; line-height: 26px;
+					.count { color: #ff4c4c; }
+				}
+				.fileContent { .iconTip { display: inline-block; width: 22px; vertical-align: top; height: 20px; background: url('/static/dist/images/projects/images/nullPage.png') no-repeat 0px -879px; }
+				}
 			}
 			.modelContainer { height: 100%; display: none;
 				.modelContainerScroll { height: 100%;

@@ -49,10 +49,16 @@ App.Resources.artifactsQualityTree = function(dataList,n){
         var initModel = new model(data[i]);
         var li = $("<li></li>");
         var  a  = data[i].ruleContain == 1 ? 1 : 0 ;
+
+        li.attr("data-model",JSON.stringify(data[i]));
+
         li.attr("data-check",a);
         li.attr("data-code",data[i].code);
         li.attr("data-ruleContain",data[i].ruleContain);
         li.attr("data-leaf",(data[i].leaf ? "1" : 0));
+        if(data[i].leaf){
+            li.attr("data-rule",data[i].ruleIds);
+        }
         var as = new App.Resources.ArtifactsQualityDetail({model:initModel});
         if(data[i].ruleContain = 1){
             as.$(".ruleCheck").addClass("all");
