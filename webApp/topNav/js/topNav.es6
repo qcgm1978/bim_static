@@ -3,7 +3,6 @@ App.TopNav = {
 	init() {
 		//获取用户只
 		var _userInfo = JSON.parse(localStorage.getItem("user"));
-
 		if (_userInfo) {
 			$("#loginName").html(_userInfo.name);
 			$("#uiAccount").html(App.Comm.getCookie('OUTSSO_LoginId'));
