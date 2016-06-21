@@ -350,37 +350,37 @@
       id:'arrow',
       icon:'m-arrow',
       title:'箭头',
-      fn:'1',
+      fn:'0',
       type:'comment'
     },{
       id:'rect',
       icon:'m-rect',
       title:'矩形',
-      fn:'2',
+      fn:'1',
       type:'comment'
     },{
       id:'ellipse',
       icon:'m-ellipse',
       title:'圆形',
-      fn:'3',
+      fn:'2',
       type:'comment'
     },{
       id:'mark',
       icon:'m-mark',
       title:'标记',
-      fn:'4',
+      fn:'3',
       type:'comment'
     },{
       id:'cloud',
       icon:'m-cloud',
       title:'云线',
-      fn:'5',
+      fn:'4',
       type:'comment'
     },{
       id:'text',
       icon:'m-text',
       title:'文本',
-      fn:'6',
+      fn:'5',
       type:'comment'
     }],
     colorBar:[{
