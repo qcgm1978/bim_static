@@ -587,7 +587,6 @@ App.Project = {
 			App.Project.initGlobalEvent();
 		}
 
-
 		//设置项目可查看的属性
 		this.setPropertyByAuth();
 
@@ -612,7 +611,6 @@ App.Project = {
 	setPropertyByAuth: function() {
 
 		var projectAuth = App.AuthObj && App.AuthObj.project;
-
 		if (projectAuth) {
 
 			var ProjectTab = App.Comm.AuthConfig.Project,
@@ -632,7 +630,6 @@ App.Project = {
 			if (projectAuth.cost) {
 				$projectTab.append(ProjectTab.CostTab.tab);
 			}
-
 			//质量
 			if (projectAuth.quality) {
 				$projectTab.append(ProjectTab.QualityTab.tab);
