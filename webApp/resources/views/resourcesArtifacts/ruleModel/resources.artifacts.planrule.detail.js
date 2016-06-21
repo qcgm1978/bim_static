@@ -85,6 +85,19 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
         //原有的所有数据
         var modelSaving = App.ResourceArtifacts.modelSaving;
 
+        //查找当前已选code的并修改其内的ruleId列表
+        var  n = _.indexOf(modelSaving,function(item) {
+            return item.code == App.ResourceArtifacts.Status.rule.targetCode
+        });
+        if(n > 0){
+            var ruleIds = App.ResourceArtifacts.modelSaving[n].ruleIds;
+        }
+        var s = _.indexOf(ruleIds,function(item){
+            return item == id;
+        });
+
+
+
         var ele = $(e.target);
         var allSele = ele.closest("ul").find("li");
         Backbone.trigger("modelRuleHalf");
@@ -101,18 +114,11 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
                 Backbone.trigger("modelRuleEmpty");
             }
 
-            //查找当前已选code的并修改其内的ruleId列表
-           _.indexOf(modelSaving,function(item) {
-               return item.code == App.ResourceArtifacts.Status.rule.targetCode
-           });
+            //删除
+            if(s){
+                ruleIds.splice(s,1);
+            }
 
-           /* for(var i = 0 ; i < item.ruleIds; i++){
-                if(_this.$(".ruleTitle").attr("data-id") == item.ruleIds[i]){
-                    item.ruleIds = item.ruleIds.splice(i,1);
-                }
-            }*/
-
-            console.log(modelSaving);//没删除
 
         }else{
             ele.closest("li").attr("data-check","1");
@@ -126,7 +132,10 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
                 Backbone.trigger("modelRuleFull");
                 return
             }
-
+            //已存在
+            if(s){
+                return
+            }
         }
     },
 
@@ -322,7 +331,7 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
         App.Resources.ArtifactsAlertWindow = new App.Comm.modules.Dialog({
             title: "",
             width: 280,
-            height: 180,
+            height: 150,
             isConfirm: false,
             isAlert: false,
             message: frame

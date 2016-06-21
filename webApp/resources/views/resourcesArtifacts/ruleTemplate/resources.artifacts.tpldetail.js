@@ -66,18 +66,16 @@ App.Resources.ArtifactsTplDetail = Backbone.View.extend({
             return $(item).attr("data-check") == "1";
         });
 
-        //
-        for(var i = 0  ; i < plan.length ; i++){
-            App.ResourceArtifacts.modelRuleSaveData.codeIdsIn.push($(plan[i]).attr("data-code"));
-        }
-        //质量标准
-        var qualifyC = _.filter($(".qualifyC .qualityMenuList ul li"),function(item){
+        //将模块化内容加入modelSaving
+
+        //质量标准,选中项
+        var qualifyC = _.filter($(".qualifyC li"),function(item){
             return $(item).attr("data-check") == "1" && $(item).attr("data-leaf") == "1";
         });
         _.each(modelSaving,function(item){
             for(var i = 0 ; i < qualifyC.length ; i++){
                 if(qualifyC[i].attr("data-code") == item.code){
-
+                    //item.ruleIds
                 }
             }
         });
