@@ -55,6 +55,19 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
         if(!leaf && !this.$el.siblings(".childList").html()){
             return
         }
+        //没有叶子节点无法选择
+        if(!leaf){
+            var xLeaf =  this.$el.siblings(".childList").find("li");
+            if(xLeaf.length){
+                var cs = _.filter(xLeaf,function(item){
+                    return $(item).attr("data-leaf") == "1"
+                });
+                //没有直接子元素，叶子节点未加载无法选择
+                if(cs.length == 0){
+                    return
+                }
+            }
+        }
 
         App.Resources.cancelBubble(e);
 
