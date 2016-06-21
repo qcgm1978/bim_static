@@ -9,7 +9,7 @@
           sourceId:'',
           projectId:'',//模型关联项目ID
         },
-        serverUrl = "/";//模型后端接口服务地址
+        serverUrl = "";//模型后端接口服务地址
     self.subscribers = {};// 私有订阅对象
     var _opt = $.extend({},defaults,options);
     if((typeof _opt.element) == 'string'){

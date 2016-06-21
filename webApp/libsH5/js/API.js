@@ -4,7 +4,7 @@
 'use strict'
 ;(function($){
   bimView.API = {
-    baseUrl:"/",
+    baseUrl:"",
     //模型
     fetchModel: "model/",//获取模型信息
     fetchFamilyType:'/model/{etag}/metadata/familyInfo.json',
