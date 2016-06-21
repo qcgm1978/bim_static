@@ -51,17 +51,12 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
         var _this = this.$el.closest("li");
         ele.removeClass("half");
 
-
-
-
         //非叶子节点，加载
         if(!leaf && !this.$el.siblings(".childList").html()){
             return
         }
 
         App.Resources.cancelBubble(e);
-
-
 
         //存储模型
         var model = JSON.parse(this.$el.closest("li").attr("data-model")),already;
@@ -179,6 +174,16 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
             //添加所有下级菜单
             if(_this.find("li").length) {
 
+                _.each(_this.find("li"),function(item){
+                    $(item).attr("data-check","1");
+                    if($(item).hasClass("all")){
+                        return
+                    }
+                    $(item).find(".ruleCheck").removeClass("half").addClass("all")
+                });
+
+
+
                 var allLeaf = _.filter(_this.find("li"),function(item){
                     return $(item).attr("data-leaf")== "1"
                 });
@@ -232,9 +237,6 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
         }
 
         var item = $(e.target);
-        App.ResourceArtifacts.Status.rule.targetCode = this.model.get("code");
-        App.ResourceArtifacts.Status.rule.targetName = this.model.get("name");
-        App.ResourceArtifacts.Status.rule.count = this.model.get("count");
 
         if(!App.ResourceArtifacts.Status.saved){
             alert("您还有没保存的");
@@ -277,6 +279,13 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
             _this.$el.closest("li").find(".childList").html(list);
             return
         }
+
+
+        App.ResourceArtifacts.Status.rule.targetCode = this.model.get("code");
+        App.ResourceArtifacts.Status.rule.targetName = this.model.get("name");
+        App.ResourceArtifacts.Status.rule.count = this.model.get("count");
+
+
         this.toggleClass(item);
         //加载规则部分
         App.ResourceArtifacts.Status.rule.targetCode  = parentCode;
