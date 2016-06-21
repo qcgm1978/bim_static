@@ -1,64 +1,94 @@
+App.Project.FileContainer = Backbone.View.extend({
 
-App.Project.FileContainer=Backbone.View.extend({
 
+	tagName: "div",
 
-	tagName:"div",
-
-	className:"fileContainer",
+	className: "fileContainer",
 
 	//初始化
 	initialize: function() {
-		this.listenTo(App.Project.FileCollection,"reset",this.reset); 
-		this.listenTo(App.Project.FileCollection,"add",this.addOneFile); 
+		this.listenTo(App.Project.FileCollection, "reset", this.reset);
+		this.listenTo(App.Project.FileCollection, "add", this.addOneFile);
 	},
 
-	events:{
-		"click .header .ckAll":"ckAll"
-		 
+	events: {
+		"click .header .ckAll": "ckAll",
+		"click .btnFileSearch": "fileSearch"
+
 	},
 
-	template:_.templateUrl("/projects/tpls/project/project.container.file.html"),
+	template: _.templateUrl("/projects/tpls/project/project.container.file.html"),
 
 	//渲染
-	render:function(){
+	render: function() {
 		this.$el.html(this.template());
 		var $container = this.$el.find('.serviceNav'),
-		    Auth = App.AuthObj && App.AuthObj.project  &&　App.AuthObj.project.prjfile;
+			Auth = App.AuthObj && App.AuthObj.project && 　App.AuthObj.project.prjfile;
 
-		  if (!Auth) {
-		  		Auth={};
-		  }
+		if (!Auth) {
+			Auth = {};
+		}
 
 		if (!Auth.edit) {
 			this.$('.btnFileUpload').addClass('disable');
-			if(!Auth.downLoad){
+			if (!Auth.downLoad) {
 				this.$('.btnFileDownLoad').addClass('disable');
 			}
 		}
-		if(App.Project.Settings.CurrentVersion.status !=9 ||
-			App.Project.Settings.CurrentVersion.subType==1){
+		if (App.Project.Settings.CurrentVersion.status != 9 ||
+			App.Project.Settings.CurrentVersion.subType == 1) {
 			this.$('.btnNewFolder').addClass('disable');
 			this.$('.btnFileDel').addClass('disable');
 		}
-		if(!Auth.create){
+		if (!Auth.create) {
 			this.$('.btnNewFolder').addClass('disable');
 		}
-		if(!Auth.delete){
+		if (!Auth.delete) {
 			this.$('.btnFileDel').addClass('disable');
 		}
 		return this;
-	},  
+	},
 
-	ckAll(event){ 
-		this.$el.find(".fileContent .ckAll").prop("checked",event.target.checked);
-	}, 
+	ckAll(event) {
+		this.$el.find(".fileContent .ckAll").prop("checked", event.target.checked);
+	},
 
+	fileSearch() {
+
+		var txtSearch = $("#txtFileSearch").val().trim();
+
+		//没有搜索内容
+		if (!txtSearch) {
+			return;
+		}
+
+		var data = {
+			URLtype: "fileSearch",
+			data: {
+				projectId: App.Project.Settings.projectId,
+				versionId: App.Project.Settings.versionId,
+				key:txtSearch
+			}
+		}
+
+		App.Comm.ajax(data,(data)=>{
+
+			if (data.code==0) {
+
+				App.Project.FileCollection.reset();
+				App.Project.FileCollection.push(data.data);
+
+			}
+
+
+		});
+	},
 
 	//添加单个li
-	addOneFile:function(model){ 
-		 
-		var view=new App.Project.FileContainerDetail({
-			model:model
+	addOneFile: function(model) {
+
+		var view = new App.Project.FileContainerDetail({
+			model: model
 		});
 
 		this.$el.find(".fileContent .loading").remove();
@@ -66,18 +96,16 @@ App.Project.FileContainer=Backbone.View.extend({
 		this.$el.find(".fileContent").append(view.render().el);
 
 		//绑定滚动条
-		App.Comm.initScroll(this.$el.find(".fileContainerScrollContent"),"y");
-		 
+		App.Comm.initScroll(this.$el.find(".fileContainerScrollContent"), "y");
+
 
 	},
 
 	//重置加载
-	reset(){
+	reset() {
 
 		this.$el.find(".fileContent").html('<li class="loading">正在加载，请稍候……</li>');
 	}
-
- 
 
 
 
