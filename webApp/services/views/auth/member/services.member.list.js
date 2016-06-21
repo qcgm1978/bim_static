@@ -107,9 +107,11 @@ App.Services.MemberList=Backbone.View.extend({
                     disable = _.filter(role,function(item){
                         return item.inherit
                     });
+
                     _this.disable(disable);
                 }
             });
+            _this.saveData(seleUser);
             return
         }
 
