@@ -294,6 +294,7 @@
 
 		//事件初始化
 		initEvent() {
+
 			var $dialog = this.Settings.$dialog,
 				that = this;
 
@@ -439,9 +440,8 @@
 				if (event.keyCode == 27) {
 					$dialog.find(".close").trigger('click');
 				}
-			});
-
-
+			}); 
+		
 
 			//拖拽
 			// $dialog.on("mousedown",".header.drag",function(event){
