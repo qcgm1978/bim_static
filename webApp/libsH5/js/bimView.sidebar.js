@@ -187,7 +187,7 @@
       function renderMap(){
         var floorSelect = self.el._dom.mapBar.find('.modelList');
         $.each(floorsData,function(i,item){
-          item.Path=  bimView.API.baseUrl + "/model"+item.path;
+          item.Path=  bimView.API.baseUrl + "model"+item.path;
           item.BoundingBox = item.boundingBox;
           var tmp = $('<li class="modelItem" data-type="miniMap"></li>').text(item.name).data(item);
           floorSelect.append(tmp);

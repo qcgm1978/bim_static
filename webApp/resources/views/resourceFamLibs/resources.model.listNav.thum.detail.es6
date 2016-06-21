@@ -85,7 +85,7 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 		this.$el.contextMenu('listContext', {
 			//显示 回调
 			onShowMenuCallback: function(event) {
-				 
+				event.preventDefault();
 				var $item = $(event.target).closest(".item");
 				$("#reNameModel").removeClass('disable');
 				//预览
@@ -128,11 +128,12 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 					}
 					//下载
 					var $item = $(item);
-
+/*
 					if ($item.find(".folder").length > 0) {
-						alert("暂不支持文件夹下载");
+						//alert("暂不支持文件夹下载");
+						App.ResourceModel.folderDown($item);
 						return;
-					}
+					}*/
 
 					//下载链接 
 					var fileVersionId = $item.find(".filecKAll").data("fileversionid");

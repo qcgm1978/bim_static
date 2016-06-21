@@ -58,35 +58,17 @@ App.Resources.ArtifactsTplDetail = Backbone.View.extend({
         if(!App.ResourceArtifacts.Status.templateId){
             return
         }
-        App.ResourceArtifacts.modelRuleSaveData.templateId = App.ResourceArtifacts.Status.templateId;
-        App.ResourceArtifacts.modelRuleSaveData.templateName = App.ResourceArtifacts.Status.templateName = this.$(".tplDetailEdit .tplName").val();
+        App.ResourceArtifacts.modelSaving.templateId = App.ResourceArtifacts.Status.templateId;
+        App.ResourceArtifacts.modelSaving.templateName = App.ResourceArtifacts.Status.templateName = this.$(".tplDetailEdit .tplName").val();
 
-        //模块化
-        var plan = _.filter($(".artifactsContent .plans li"),function(item){
-            return $(item).attr("data-check") == "1";
-        });
 
-        //将模块化内容加入modelSaving
+        console.log(App.ResourceArtifacts.modelSaving);
 
-        //质量标准,选中项
-        var qualifyC = _.filter($(".qualifyC li"),function(item){
-            return $(item).attr("data-check") == "1" && $(item).attr("data-leaf") == "1";
-        });
-        _.each(modelSaving,function(item){
-            for(var i = 0 ; i < qualifyC.length ; i++){
-                if(qualifyC[i].attr("data-code") == item.code){
-                    //item.ruleIds
-                }
-            }
-        });
         //要查找两级看是否是叶子节点直接过滤即可，无需查找
-
-
-
-        /*var pdata = {
+        var pdata = {
             URLtype: "saveArtifactsTemplateRule",
             type:"PUT",
-            data:JSON.stringify(App.ResourceArtifacts.modelRuleSaveData),
+            data:JSON.stringify(modelSaving),
             contentType: "application/json"
         };
         App.ResourceArtifacts.loading($(".modelContent"));
@@ -103,7 +85,7 @@ App.Resources.ArtifactsTplDetail = Backbone.View.extend({
             alert("提交失败");
         }
             App.ResourceArtifacts.loaded($(".modelContent"));
-        });*/
+        });
     },
     //取消
     resourcesCancel:function(){

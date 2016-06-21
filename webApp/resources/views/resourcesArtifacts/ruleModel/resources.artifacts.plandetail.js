@@ -53,8 +53,8 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
         App.Resources.cancelBubble(e);
         var ele = $(e.target);
         var model = jQuery.parseJSON(this.$el.attr("data-model")),already;
-        if(App.ResourceArtifacts.modelSaving.length){
-            already = _.indexOf(App.ResourceArtifacts.modelSaving,function(item){
+        if(App.ResourceArtifacts.modelSaving.codeIds.length){
+            already = _.indexOf(App.ResourceArtifacts.modelSaving.codeIds,function(item){
                 return item.code = model.code
             });
         }
@@ -64,7 +64,7 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
             ele.closest("li").attr("data-check","0");
             //保存提交数据
             if(already>0){
-                App.ResourceArtifacts.modelSaving[already].ruleIds = []
+                App.ResourceArtifacts.modelSaving.codeIds[already].ruleIds = []
             }
 
             if(this.$el.hasClass("active")){
@@ -76,7 +76,9 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
             ele.closest("li").attr("data-check","1");
             //保存提交数据
             if(already>0){
-                App.ResourceArtifacts.modelSaving[already].ruleIds = model.ruleIds
+                App.ResourceArtifacts.modelSaving.codeIds[already].ruleIds = model.ruleIds
+            }else{
+                App.ResourceArtifacts.modelSaving.codeIds.push(App.ResourceArtifacts.getValid(model));
             }
 
             if(this.$el.hasClass("active")){
