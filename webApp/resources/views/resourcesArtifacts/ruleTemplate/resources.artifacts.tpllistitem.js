@@ -77,7 +77,6 @@ App.Resources.ArtifactsTplListItem = Backbone.View.extend({
             App.ResourceArtifacts.departQuality(_this.menu.$(".qualityMenuListGC"),App.ResourceArtifacts.allQualityGC,null,"0");
             _this.menu.$(".qualityMenuListGC").show();
             App.ResourceArtifacts.departQuality(_this.menu.$(".qualityMenuListKY"),App.ResourceArtifacts.allQualityKY,null,"0");
-
         });
     },
     //ÇÐ»»

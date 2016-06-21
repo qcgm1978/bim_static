@@ -343,7 +343,11 @@ App.ResourceArtifacts={
         });
     },
     //所有
-    modelSaving:[],
+    modelSaving:{
+        templateId: "",
+        templateName: "",
+        codeIds:[]
+    },
     allQualityGC: [],
     allQualityKY: [],
     //获取全部质量标准
@@ -356,6 +360,13 @@ App.ResourceArtifacts={
                 type:App.ResourceArtifacts.Status.type
             }
         };
+
+        if(App.ResourceArtifacts.Status.templateId){
+            pdata.data.templateId = App.ResourceArtifacts.Status.templateId;
+        }else if(App.ResourceArtifacts.Status.projectId){
+            pdata.data.projectId = App.ResourceArtifacts.Status.projectId;
+        }
+
         App.Comm.ajax(pdata,function(response){
             if(response.code == 0 && response.data.length){
                 App.ResourceArtifacts.allQualityKY = _.filter(response.data,function(item){
@@ -372,25 +383,11 @@ App.ResourceArtifacts={
     },
 
     //获取已经加载并且要存储的有效数据
-    getValid:function(type,data){
-        var arr= [];
-        var s =  _.filter(data,function(item){
-            var  a = true;
-            if(type == "quality"){
-                a = item.leaf
-            }
-            return a && (item.ruleContain == 1 || item.ruleContain == 3) && item.count != 0;
-            //存储3时候要注意将ruleIds设置为相应的值，保证能够存储
-            //操作rule时注意操作内容，未更改和已更改，已更改全不选，删除code/已更改全选全部写入id
-        });
-        _.each(s,function(item){
-            var obj = {
-                code : item.code,
-                ruleIds : item.ruleIds || []
+    getValid:function(obj){
+        return  {
+                code : obj.code,
+                ruleIds : obj.ruleIds || []
             };
-            arr.push(obj);
-        });
-        return arr
     },
 
 
