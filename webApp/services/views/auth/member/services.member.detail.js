@@ -21,7 +21,7 @@ App.Services.memberDetail=Backbone.View.extend({
         this.model.set({"checked":false},{silent:true});//预设选择状态
         this.listenTo(this.model, 'change:checked', this.render);
         this.listenTo(this.model, 'change:role', this.render);
-        Backbone.on("memberControlModifyRole",this.memberControlModifyRole,this);
+        //Backbone.on("memberControlModifyRole",this.memberControlModifyRole,this);
     },
 
     memberControlModifyRole:function(){

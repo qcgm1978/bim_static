@@ -132,6 +132,9 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
                 //包含现有
                 if(already>0){
                     App.ResourceArtifacts.modelSaving.codeIds[already].ruleIds = []
+                }else{
+                    model.ruleIds = [];
+                    App.ResourceArtifacts.modelSaving.codeIds.push(App.ResourceArtifacts.getValid(model));
                 }
                 //操作右侧全不选
                 return

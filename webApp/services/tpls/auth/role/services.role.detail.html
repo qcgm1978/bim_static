@@ -1,10 +1,12 @@
-<% if (obj.roleId !== 999999) {%>
+
     <div class="roleEdit">
         <span  class="explorer">查看</span>
+        <% if (obj.roleId !== 999999) {%>
         <span  class="modify">修改</span>
         <span  class="delete">删除</span>
+        <% } %>
     </div>
-<% } %>
+
 <div class="sele">
     <div class="left">
             <span class="rohead"></span>
