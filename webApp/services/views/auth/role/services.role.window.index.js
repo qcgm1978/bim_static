@@ -44,7 +44,7 @@ App.Services.roleWindowIndex = Backbone.View.extend({
             return item.get("checked");
         });
 
-        var url = "http://bim.wanda-dev.cn/platform/auth/role/"+ roleId +"/function?functionId=";
+        var url = App.API.Settings.hostname+"platform/auth/role/"+ roleId +"/function?functionId=";
 
         for(var i = 0 ; i < seleFun.length ; i++){
             if(i !== seleFun.length -1){
@@ -74,7 +74,6 @@ App.Services.roleWindowIndex = Backbone.View.extend({
     //新增
     newRole :function(){
         if(App.Services.roleAddStatus){alert("已在提交中，请等待！");App.Services.maskWindow.close();App.Services.roleAddStatus = 1;return}
-
 
         //新增角色  fetchServicesNewRole
         var name  = $("#selectedRoleName").val(),seleFun,roleModel;

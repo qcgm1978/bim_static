@@ -24,7 +24,7 @@ App.Resources.ArtifactsTplAlert = Backbone.View.extend({
         var templateId =  App.ResourceArtifacts.Status.templateId;
         //非新建
         $.ajax({
-            url:"http://bim.wanda-dev.cn/platform/rule/template/delete/" + templateId ,
+            url: App.API.Settings.hostname +"platform/rule/template/delete/" + templateId ,
             type:"DELETE",
             success:function(response){
                  if(response.code == 0){ //删除成功

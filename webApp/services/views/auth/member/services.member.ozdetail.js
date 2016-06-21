@@ -91,6 +91,7 @@ App.Services.MemberozDetail=Backbone.View.extend({
             $(".serviceBody .content").removeClass("services_loading");
             if(!response.data.org.length && !response.data.user.length ){
                 $("#blendList").html("<li><span class='sele'>暂无数据</span></li>");
+                Backbone.trigger("servicesMemberControlCancelSelectAll");
                 return
             }
             collection.reset();

@@ -14,16 +14,19 @@ App.Services.memberDetail=Backbone.View.extend({
 
     render:function(){
         this.$el.html(this.template(this.model.toJSON()));
-        //this.delegateEvents();
         return this;
     },
 
     initialize:function(){
-        this.model.set({"checked":false});//预设选择状态
+        this.model.set({"checked":false},{silent:true});//预设选择状态
         this.listenTo(this.model, 'change:checked', this.render);
         this.listenTo(this.model, 'change:role', this.render);
+        Backbone.on("memberControlModifyRole",this.memberControlModifyRole,this);
     },
 
+    memberControlModifyRole:function(){
+
+    },
     //查找当前元素
     findSelf:function() {
         var _this =this;
@@ -103,7 +106,6 @@ App.Services.memberDetail=Backbone.View.extend({
         var  pre = $("#ozList span.active");
         if(pre.closest(".inner").length || pre.closest(".outer").length){
             App.Services.memOz = "-";
-            console.log(1);
         }else{
             App.Services.memOz = pre.html();
             App.Services.searchOrg(pre);     //获取所属组织列表
@@ -138,7 +140,7 @@ App.Services.memberDetail=Backbone.View.extend({
         App.Services.Member.SubRoleCollection.each(function(item){
             for(var i = 0 ; i< arr.length ; i++){
                 if(item.get("roleId") == arr[i]["roleId"]){
-                    item.set("inherit", true);
+                    item.set({"inherit": true});
                 }
             }
         });

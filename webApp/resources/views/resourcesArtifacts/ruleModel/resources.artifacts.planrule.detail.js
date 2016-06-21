@@ -80,58 +80,53 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
 
     ruleCheck:function(e){
         App.Resources.cancelBubble(e);
-        var _this = this,id = _this.model.get("id"),
-            ruleIdsIn = App.ResourceArtifacts.modelRuleSaveData.ruleIdsIn,
-            ruleIdsDel  = App.ResourceArtifacts.modelRuleSaveData.ruleIdsDel;
+        var _this = this,id = _this.model.get("id");
 
-        var  modelRuleList = App.ResourceArtifacts.TplCollectionRule.filter(function(item){
-                return item.get("ruleId") == id;
-        });
-
-        var preInRule =  _.filter(ruleIdsIn,function(item){
-            return item == id;
-        });
-        var preDelRule = _.filter(ruleIdsDel,function(item){
-            return item == id;
-        });
-
+        //原有的所有数据
+        var modelSaving = App.ResourceArtifacts.modelSaving;
 
         var ele = $(e.target);
         var allSele = ele.closest("ul").find("li");
         Backbone.trigger("modelRuleHalf");
+
         if(ele.hasClass("all")){
             ele.removeClass("all");
             ele.closest("li").attr("data-check","0");
 
-            if(modelRuleList.length ){ //模板已有      //&& !preInRule.length && !preDelRule.length
-                if(preInRule.length){
-                    App.ResourceArtifacts.modelRuleSaveData.ruleIdsIn = _.without(ruleIdsIn,id);
-                }
-                App.ResourceArtifacts.modelRuleSaveData.ruleIdsDel.push(id);
-            }else{
-
-            }
+            //触发全不选时右面菜单变化，将发送父级code
             var checked1 = _.filter(allSele,function(item){
                 return $(item).attr("data-check") == "1"
             });
             if(!checked1.length){
                 Backbone.trigger("modelRuleEmpty");
             }
+
+            //查找当前已选code的并修改其内的ruleId列表
+           _.indexOf(modelSaving,function(item) {
+               return item.code == App.ResourceArtifacts.Status.rule.targetCode
+           });
+
+           /* for(var i = 0 ; i < item.ruleIds; i++){
+                if(_this.$(".ruleTitle").attr("data-id") == item.ruleIds[i]){
+                    item.ruleIds = item.ruleIds.splice(i,1);
+                }
+            }*/
+
+            console.log(modelSaving);//没删除
+
         }else{
             ele.closest("li").attr("data-check","1");
-            if(!modelRuleList.length && !preInRule.length && !preDelRule.length){
-                App.ResourceArtifacts.modelRuleSaveData.ruleIdsIn.push(id);
-            }
 
-
-
+            //如果全选，将发送父级code而非id
             var checked2 = _.filter(allSele,function(item){
                 return $(item).attr("data-check") == "0"
             });
             ele.addClass("all");
             if(!checked2.length){
                 Backbone.trigger("modelRuleFull");
+                return
             }
+
         }
     },
 
@@ -243,7 +238,7 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
                     if(parseInt(leftValue.val()) <=parseInt(rightValue.val())){
                         alert("请填写有效的数字");
                         leftValue.focus();
-                        retrun
+                        return
                     }
                 }
 
@@ -281,7 +276,7 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
             cdata.type ="PUT";
 
             $.ajax({
-                url: "http://bim.wanda-dev.cn/platform/mapping/rule/update?projectId=" + App.ResourceArtifacts.Status.projectId,
+                url: App.API.Settings.hostname +"platform/mapping/rule/update?projectId=" + App.ResourceArtifacts.Status.projectId,
                 data:JSON.stringify(baseData),
                 contentType: "application/json",
                 type:"PUT",
@@ -298,7 +293,7 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
             //创建
             cdata.URLtype = "createArtifactsPlanNewRule";
             $.ajax({
-                url: "http://bim.wanda-dev.cn/platform/mapping/rule/create?projectId=" + App.ResourceArtifacts.Status.projectId,
+                url: App.API.Settings.hostname +"platform/mapping/rule/create?projectId=" + App.ResourceArtifacts.Status.projectId,
                 data:JSON.stringify(baseData),
                 type:"POST",
                 contentType: "application/json",

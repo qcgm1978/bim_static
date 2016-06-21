@@ -67,47 +67,12 @@ App.Resources.artifactsQualityTree = function(dataList,n){
     return ele;
 };
 
-
-
-
-
-
 App.Resources.cancelBubble = function(e){
     if(e.stopPropagation){
         e.stopPropagation();
     }else{
         window.cancelBubble = true;
     }
-};
-
-
-App.Resources.dealStr = function(model){
-    var con = model.get("mappingCategory"),
-        list = con.mappingPropertyList;
-
-    if(list && list.length){
-        _.each(list,function(item){
-            var obj = {left:'',right:'',leftValue:'',rightValue:''};
-            if(item.operator == "<>" || item.operator == "><"){
-                var str= item.propertyValue,
-                    index;
-                index = _.indexOf(str,",");
-                obj.left =str[0];
-                obj.right = str[str.length-1];
-                for(var i = 1 ; i < str.length-1 ; i++){
-                    if(i < index){
-                        obj.leftValue =  obj.leftValue + str[i];
-                    }else if(i>index){
-                        obj.rightValue = obj.rightValue +str[i];
-                    }
-                }
-                obj.leftValue = parseInt(obj.leftValue);
-                obj.rightValue = parseInt(obj.rightValue);
-            }
-            item.ruleList = obj;
-        });
-    }
-    return list;
 };
 
 
