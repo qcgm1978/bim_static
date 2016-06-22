@@ -13,7 +13,7 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 		"click .ckMe": "itemSelected",
 		"keyup .txtEdit": "enterCreateNew",
 		"click .txtEdit": "returnPop",
-		"click .ckMe": "stopPop",
+	//	"click .ckMe": "stopPop",
 		'click .returnBack':'returnBack'
 
 	},
@@ -42,12 +42,10 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 	},
 
 	itemSelected(event) {
-
-		var $target = $(event.target);
-
-		$target.closest(".item")[$target.prop("checked") ? 'addClass' : 'removeClass']('selected');
-
-
+		var $target = $(event.target),
+			ck=$target.prop("checked");
+		$target.closest(".item")[ ck? 'addClass' : 'removeClass']('selected');
+		event.stopPropagation();
 	},
 	returnBack:function(){
 		alert();
@@ -105,12 +103,19 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 
 				}
 				$item.addClass("selected").siblings().removeClass("selected");
-
+				if(App.ResourceModel.Settings.CurrentVersion.status==4 ||
+					App.ResourceModel.Settings.CurrentVersion.status==7 ||
+					App.ResourceModel.Settings.CurrentVersion.status==9 ||
+					App.ResourceModel.Settings.CurrentVersion.subType==1){
+					$("#reNameModel").addClass('disable').attr('disabled','disabled');
+					//$("#downLoadModel").addClass('disable').attr('disabled','disabled');
+					$("#delModel").addClass('disable').attr('disabled','disabled');
+				}
 				//权限控制
 				var Auth = App.AuthObj.lib.family;
 				if(!Auth.edit){
 					$('#reNameModel,#delModel').addClass('disable');
-					if(!Auth.download || !App.ResourceModel.Settings.CurrentVersion.byProjectRef){
+					if(!Auth.download && !App.ResourceModel.Settings.CurrentVersion.byProjectRef){
 						$('#downLoadModel').addClass('disable');
 					}
 				}

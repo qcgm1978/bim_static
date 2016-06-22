@@ -9,7 +9,8 @@ App.ResourceModel.ThumContent = Backbone.View.extend({
 	initialize: function() {
 		this.listenTo(App.ResourceModel.FileThumCollection, "add", this.addOneFile);
 		this.listenTo(App.ResourceModel.FileThumCollection, "reset", this.reset);
-		
+		this.listenTo(App.ResourceModel.FileThumCollection, "searchNull", this.searchNull);
+
 	},
 
 
@@ -32,19 +33,22 @@ App.ResourceModel.ThumContent = Backbone.View.extend({
 		var data = model.toJSON();
 
 		this.$el.find(".thumContent .loading").remove();
-	 
+
 		this.$el.find(".thumContent").prepend(view.render().el);
 
-		App.Comm.initScroll(this.$el.find(".thumLists"),'y'); 
-		 
+		App.Comm.initScroll(this.$el.find(".thumLists"), 'y');
+
 	},
 
 	//加载
-	reset(){
+	reset() {
 		this.$el.find(".thumContent").html('<li class="loading">正在加载，请稍候…</li>');
-	}
+	},
 
- 
+	//搜索为空
+	searchNull() {
+		this.$el.find(".thumContent").html('<li class="loading"><i class="iconTip"></i>未搜索到相关文件/文件夹</li>');
+	}
 
 
 

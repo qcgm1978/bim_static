@@ -88,7 +88,7 @@ ViewComp.MemberManager = Backbone.View.extend({
 		_this.$(".scrollWrap").mmhMask();
 		var url="fetchServiceKeyUserInfo",
 			_getData={
-				uid:App.Comm.getCookie('userId')
+				uid:App.Comm.user('userId')
 			},
 			setting = {
 				callback: {
