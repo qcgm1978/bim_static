@@ -1200,12 +1200,23 @@
 								imgData.data.isAdd = true;
 								//创建视点 才添加 colleciton
 								if (cate == "viewPoint") {
+									 
 									//项目 
-									if ($comment.find(".navBar .project").hasClass("selected") && dialog.type == 1) {
-										CommentCollections.Project.push(imgData.data);
-									} else if ($comment.find(".navBar .user").hasClass("selected") && dialog.type == 0) {
-										//个人
-										CommentCollections.User.push(imgData.data);
+									if ($comment.find(".navBar .project").hasClass("selected")) {
+										if (dialog.type == 1) {
+											CommentCollections.Project.push(imgData.data);
+										}else{
+											$comment.find(".navBar .project").click();
+										}
+										
+									} else  if ($comment.find(".navBar .user").hasClass("selected")) {
+									 	//个人
+									 	if (dialog.type == 0) {
+									 		CommentCollections.User.push(imgData.data);
+									 	}else{
+									 		$comment.find(".navBar .user").click();
+									 	}									
+										
 									}
 								}
 
