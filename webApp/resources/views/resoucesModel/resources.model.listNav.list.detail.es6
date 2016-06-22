@@ -89,9 +89,10 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 				$item.addClass("selected").siblings().removeClass("selected");
 				if(App.ResourceModel.Settings.CurrentVersion.status==4 ||
 					App.ResourceModel.Settings.CurrentVersion.status==7 ||
+					App.ResourceModel.Settings.CurrentVersion.status==9 ||
 					App.ResourceModel.Settings.CurrentVersion.subType==1){
 					$("#reNameModel").addClass('disable').attr('disabled','disabled');
-					$("#downLoadModel").addClass('disable').attr('disabled','disabled');
+					//$("#downLoadModel").addClass('disable').attr('disabled','disabled');
 					$("#delModel").addClass('disable').attr('disabled','disabled');
 				}
 
@@ -99,7 +100,7 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 				var Auth = App.AuthObj.lib.model;
 				if(!Auth.edit){
 					$('#reNameModel,#delModel').addClass('disable');
-					if(!Auth.download || !App.ResourceModel.Settings.CurrentVersion.byProjectRef){
+					if(!Auth.download && !App.ResourceModel.Settings.CurrentVersion.byProjectRef){
 						$('#downLoadModel').addClass('disable');
 					}
 				}

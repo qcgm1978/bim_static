@@ -35,7 +35,7 @@
 					<% cVersion = Versions[k]; %>  
 						  <a class="item" href="/#projects/<%= cVersion.projectId %>/<%= cVersion.id %>" projectId >
 						      <span class="vName overflowEllipsis"><%=cVersion.name%></span>
-					          <span class="vStatus overflowEllipsis"><%= App.Comm.convertStatus(cVersion.status) %></span>
+					          <span class="vStatus overflowEllipsis"><%= App.Comm.formatStatus(cVersion.status,1) %></span>
 					          <span class="vDate overflowEllipsis"><%= new Date(cVersion.createTime).format("yyyy-MM-dd") %></span> 
 					        </a>
 

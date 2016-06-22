@@ -45,6 +45,7 @@ App.Resources.ArtifactsTplAlert = Backbone.View.extend({
                      });
 
                      Backbone.trigger("resetTitle");
+                     Backbone.trigger("mappingRuleResetModel");
                      App.ResourceArtifacts.Status.templateId = "";
                      //刷新右侧视图  //清空所有选项
                 }else{

@@ -94,7 +94,10 @@ App.Project = {
 					}
 
 				}
-				if (App.Project.Settings.CurrentVersion.status != 9 ||
+				if (
+					App.Project.Settings.CurrentVersion.status == 4 ||
+					App.Project.Settings.CurrentVersion.status == 7 ||
+					App.Project.Settings.CurrentVersion.status == 9 ||
 					App.Project.Settings.CurrentVersion.subType == 1) {
 					$("#reNameModelProject").addClass('disable').attr('disabled', 'disabled');
 					$("#downLoadModelProject").addClass('disable').attr('disabled', 'disabled');
@@ -758,11 +761,7 @@ App.Project = {
 	},
 
 	isDisabled(name) {
-		var status = App.Project.Settings.CurrentVersion.status,
-			Auth = App.AuthObj && App.AuthObj.project && 　App.AuthObj.project.prjfile;
-		if (status != 9) {
-			return true;
-		}
+		var Auth = App.AuthObj && App.AuthObj.project && 　App.AuthObj.project.prjfile;
 		Auth = Auth || {};
 		if (!Auth[name]) {
 			return true
@@ -1018,7 +1017,7 @@ App.Project = {
 		}
 
 		//质监标准
-		if (type.indexOf("quality") != -1) {
+		if (0 && type.indexOf("quality") != -1) {
 
 			var liTpl = '<li class="modleItem"><div class="modleNameText overflowEllipsis modleName2">varName</div></li>';
 

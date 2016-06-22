@@ -42,11 +42,23 @@
       bimView.sidebar.filter();
       bimView.sidebar.loadMap();
     },
-    filter:function(isSelected){
+    filter:function(isSelected,viewer){
       var self = this;
       self.fileData = self.fileData || {};
-      isSelected ? self.el._dom.sidebar.addClass('open') : self.el._dom.sidebar.removeClass('open');
-      self.el._dom.sidebar.find('#filter').show().siblings().hide();
+      if(isSelected){
+        self.el._dom.sidebar.addClass('open')
+        self.el._dom.sidebar.find('#filter').show().siblings().hide();
+        if(viewer){
+          var specialty = bimView.comm.getFilters($("#specialty,#floors"),'uncheck');
+          var category = bimView.comm.getFilters($("#category"),'uncheck');
+          var classCode = bimView.comm.getFilters($("#classCode"),'uncheck');
+          viewer.fileFilter(specialty);
+          viewer.filter(category);
+          viewer.filter(classCode);
+        }
+      }else{
+        self.el._dom.sidebar.removeClass('open');
+      }
       if(!bimView.isLoad){
         bimView.isLoad = true;
         bimView.comm.ajax({

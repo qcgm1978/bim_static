@@ -59,6 +59,9 @@
 .artifactsContent .rules .conlist{.pozero;top: 39px;}
 
 /*修改规则*/
+.ruleDetail.modelRelate .title{top: 0;}
+.ruleDetail.modelRelate div{line-height: 44px;}
+.ruleDetail.modelRelate .mapRule{padding-top: 0;}
 .ruleDetail input{outline: none;}
 .ruleDetail input.alert,.ruleDetail .typeCode input.alert,.ruleDetail .conR input.alert{box-shadow: 0 0 2px red;border-color: red;}
 .ruleDetail .mapRule{line-height: 40px;padding-top: 5px;position: relative;}
@@ -68,7 +71,7 @@
 .ruleDetail{background-color: #eeeeee;padding: 0 14px;}
 .ruleDetail .title{width: 90px;text-align: right;padding-right: 10px;position: absolute;top: 5px;left: 0;}
 .ruleDetail .conR{margin-left: 85px;position: relative;}
-.ruleDetail .conR ul{display: none;position: absolute;z-index: 2;left: 0;top: 38px;width: 540px;background-color: #ffffff;border: solid #cccccc;border-width: 0 1px 1px 1px;}
+.ruleDetail .conR ul{display: none;position: absolute;z-index: 10;left: 0;top: 38px;width: 540px;background-color: #ffffff;border: solid #cccccc;border-width: 0 1px 1px 1px;}
 .ruleDetail .conR ul li {line-height: 25px;padding: 0 12px;cursor: pointer;}
 .ruleDetail .conR ul li span {float: left;width: 120px;}
 .ruleDetail .conR ul li:hover{background-color: #a8dbfd;}
@@ -94,7 +97,7 @@
 .conR .eIn{width: 280px;}
 .ruleDetail .conR .eIn input{width: 100%;}
 .ruleDetail .ioside input{width: 89px;border-left: none;}
-.ruleDetail .myDropDown{z-index: auto;}
+.ruleDetail .myDropDown{z-index: 2;}
 .ruleDetail .myDropDown .myDropList{width: 100px;left: 0;z-index: 10;top: 34px;}
 .ruleDetail .myDropList .myItem{border-bottom: none;}
 .ruleDetail .eIn,.ruleDetail .ioside{display: none;float: left;}
@@ -165,6 +168,9 @@
 
 .tplContent {position: absolute;left: 241px;top: 0;right: 0;bottom: 20px;border-bottom: 1px solid #cccccc;}
 .tplContent .cont{position: absolute;left: 20px;right: 20px;top: 0;bottom: 0;}
+.tplContent .content{position: absolute;.pozero;z-index: 1;}
+.tplContent .default{position: absolute;.pozero;padding-top: 100px;text-align: center;font-size: 14px;color: #9d9d9d;z-index: 2;background-color: #ffffff;}
+
 .tplDetailTitle{line-height: 49px;font-size: 14px;}
 .tplDetailTitle span{float: right;color: #0572d0;position: relative;margin-right: 34px;padding-left: 17px;}
 .tplDetailTitle span:before{content: "";position: absolute;width: 13px;height: 13px;top: 17px;left: 0;background: url('../../comm/images/commIcon.png') left top no-repeat;background-size: 80px auto;}
@@ -189,10 +195,10 @@
 .artifactsContent .ruleCheck.half{background-position: 0 -60px;}
 .artifactsContent .ruleContentRuleList .ruleCheck{margin: 10px 10px 0 0;}
 /*缺省*/
-.artifactsTplFrame .tplContent .default{position: absolute;top: 100px;left: 50%;font-size: 14px;margin-left: -100px;color: #9d9d9d;}
-.artifactsContent .default{display:none;position: absolute;width: 200px;padding-left: 40px;height: 58px;font-size: 14px;line-height: 29px;}
-.artifactsContent .default:before{content: '';position: absolute;background:transparent url('../../services/images/service_ico.png') 0 0 no-repeat;vertical-align: middle;;width:32px;height: 32px; background-position: 0 -300px;left: 0;top: 0;}
-.artifactsContent .default p{cursor: pointer;color:#0572d0;font-size: 12px; }
+.artifactsContent .default{display:none;position: absolute;.pozero;}
+.artifactsContent .default span{position: absolute;width: 200px;padding-left: 40px;height: 58px;font-size: 14px;line-height: 29px;}
+.artifactsContent .default span:before{content: '';position: absolute;background:transparent url('../../services/images/service_ico.png') 0 0 no-repeat;vertical-align: middle;;width:32px;height: 32px; background-position: 0 -300px;left: 0;top: 0;}
+.artifactsContent .default span p{cursor: pointer;color:#0572d0;font-size: 12px; }
 
 .artifactsProjectBreadCrumb{line-height: 36px;padding-left: 20px;height: 37px;border-bottom: 1px solid #cccccc;}
 .artifactsProjectBreadCrumb span{display: inline-block;padding-right: 25px;position: relative;}

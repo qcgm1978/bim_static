@@ -81,8 +81,6 @@ App.Resources.cancelBubble = function(e){
     }
 };
 
-
-
 App.Resources.dealStr2 = function(model){
     var con = model.get("mappingCategory"),
         list = con.mappingPropertyList;

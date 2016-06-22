@@ -20,7 +20,9 @@ App.Resources.ArtifactsTplDetail = Backbone.View.extend({
         return this;
     },
 
-    initialize:function(){},
+    initialize:function(){
+        Backbone.on("mappingRuleModelEdit",this.edit,this);
+    },
 
     delete:function(){
         var _this = this;
