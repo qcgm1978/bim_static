@@ -1273,7 +1273,7 @@ App.Project = {
 				if (data.data) {
 					var location = data.data.location,
 						_temp = JSON.parse(location);
-					box = _this.formatBBox(_temp.bBox);
+					box = _this.formatBBox(_temp.bBox||_temp.boundingBox);
 					ids = [_temp.userId];
 					$target.data("userId", ids);
 					$target.data("box", box);
