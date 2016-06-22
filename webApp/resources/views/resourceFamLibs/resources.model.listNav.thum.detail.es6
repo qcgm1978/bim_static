@@ -13,7 +13,7 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 		"click .ckMe": "itemSelected",
 		"keyup .txtEdit": "enterCreateNew",
 		"click .txtEdit": "returnPop",
-		"click .ckMe": "stopPop",
+	//	"click .ckMe": "stopPop",
 		'click .returnBack':'returnBack'
 
 	},
@@ -42,12 +42,10 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 	},
 
 	itemSelected(event) {
-
-		var $target = $(event.target);
-
-		$target.closest(".item")[$target.prop("checked") ? 'addClass' : 'removeClass']('selected');
-
-
+		var $target = $(event.target),
+			ck=$target.prop("checked");
+		$target.closest(".item")[ ck? 'addClass' : 'removeClass']('selected');
+		event.stopPropagation();
 	},
 	returnBack:function(){
 		alert();

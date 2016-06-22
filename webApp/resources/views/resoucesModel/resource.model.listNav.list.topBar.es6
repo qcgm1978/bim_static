@@ -53,11 +53,12 @@
  		if($(e.currentTarget).attr('isReturn')=='0'){
  			return 
  		}
-		var type = App.ResourcesNav.Settings.type;
- 		var $currentLevel=type=="standardLibs"?$('#resourceModelLeftNav .treeViewMarUl .selected'):$('#resourceFamlibsLeftNav .treeViewMarUl .selected');
+		var type = App.ResourcesNav.Settings.type,
+			pid=type=='standardLibs'?'resourceModelLeftNav':'resourceFamlibsLeftNav';
+ 		var $currentLevel=$('#'+pid+' .treeViewMarUl .selected');
 		var file=$currentLevel.data('file');
 		var parentId=file.parentId;
-		var $parent=$('#resourceModelLeftNav .treeViewMarUl span[data-id="' + parentId + '"]');
+		var $parent=$('#'+pid+' .treeViewMarUl span[data-id="' + parentId + '"]');
 		if($parent.length){
 			$parent.click();
 		}else{

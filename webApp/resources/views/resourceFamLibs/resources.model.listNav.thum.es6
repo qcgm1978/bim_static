@@ -33,7 +33,7 @@ App.ResourceModel.ThumContent = Backbone.View.extend({
 
 		this.$el.find(".thumContent .loading").remove();
 	 
-		this.$el.find(".thumContent").prepend(view.render().el);
+		this.$el.find(".thumContent").append(view.render().el);
 
 		App.Comm.initScroll(this.$el.find(".thumLists"),'y'); 
 		 
