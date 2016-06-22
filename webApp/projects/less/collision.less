@@ -25,6 +25,9 @@
           .subTree{padding-left:15px;display:none;font-size:12px;}
         }
       }
+      .itemNode.file{
+        margin-bottom: 9px;
+      }
     }
   }
 .rightProperty {
@@ -55,7 +58,15 @@
     tbody { td { padding-top: 10px; padding-bottom: 10px; vertical-align: middle; text-align: center; }
       .issue { text-align: left;
         .ckImg { float: left; padding: 0px 10px; background:#fff;}
-        .ckHeader { margin-left: 84px; }
+        .ckHeader {
+          margin-left: 84px;
+          .detailicon{
+            float: right;
+            width: 15px;
+            height: 15px;
+            background:url(/comm/images/commIcon.png) no-repeat;background-position:0 -660px;
+          }
+        }
       }
     }
   }
@@ -82,6 +93,12 @@
           .ckHeader { margin-left: 100px;
             .ckName{color:#000;}
             .date{color:#ccc;margin-top:10px;}
+            .detailicon{
+              float: right;
+              width: 15px;
+              height: 15px;
+              background:url(/comm/images/commIcon.png) no-repeat;background-position:0 -660px;
+            }
           }
         }
       }
