@@ -36,7 +36,7 @@
         }
       });
       self._dom.sidebar.find('.modelMap').prepend(self._dom.modelBar);
-      bimBox.addClass(modelBgColor);
+      bimBox.find('.view').addClass(modelBgColor);
       bimBox.append(self._dom.sidebar);
       bimView.isLoad = false;
       bimView.sidebar.filter();
