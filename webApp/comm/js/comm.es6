@@ -68,7 +68,7 @@ App.Comm = {
 
 	user:function(key){
 		return App.Global.User[key]
-	}
+	},
 
 	//封装ajax
 	ajax: function(data, callback) {

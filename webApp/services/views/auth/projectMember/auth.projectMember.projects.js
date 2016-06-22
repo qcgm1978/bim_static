@@ -35,7 +35,7 @@ App.Services.projectMember.projects = Backbone.View.extend({
 				items.fetch({
 					reset:true,
 					data: {
-						userId:App.Comm.getCookie("userId"),
+						userId:App.Comm.user("userId"),
 						type:$item.data('type')
 					}
 				})
