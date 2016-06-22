@@ -23,7 +23,7 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
         "click .saveRule":"saveRule",
         "click .choose":"choose",
         "click .delRule": "delRule",
-        "focus .categoryCode": "legend",
+        "click .categoryCode": "legend",
         "click .text":"seleRule",
         "click .myItem":"myItem",
         "click .ruleCheck":"ruleCheck"
@@ -341,6 +341,7 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
 
     //联想模块
     legend:function(e){
+        App.Resources.cancelBubble(e);
         var _this = this;
         _this.$(".chide").css({"visibility":"hidden"});
         var ac = _.map(App.Resources.artifactsTreeData,function(item){return item.code}); //对象-数组

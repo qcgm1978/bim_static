@@ -9,8 +9,8 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
 
     events:{
         "click .sele": "select",
-        "click .default" : "create"
-
+        "click .default" : "create",
+        "click .rules" : "closeMenu"
     },
 
     template: _.templateUrl("/resources/tpls/resourcesArtifacts/resources.artifacts.nav.html"),
@@ -28,6 +28,10 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
             this.$(".quality").remove();
         }
         return this;
+    },
+
+    closeMenu:function(){
+        this.$(".ruleDetail .conR ul").hide();
     },
 
     initialize:function(){
