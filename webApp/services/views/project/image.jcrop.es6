@@ -20,7 +20,7 @@ App.Services.ImageJcrop=Backbone.View.extend({
 			x,y,w,h,currentSize;
 		var _timg=null,
 			_jcrop=null;
-			
+		
 		$("#uploadIframe").on("load",function(){
 			_timg && _timg.remove();
 			if($('.jcrop-holder').length>0){
@@ -36,51 +36,52 @@ App.Services.ImageJcrop=Backbone.View.extend({
 			_$preImg=$("<img id='preImage' src='"+_timestamp+"' class='jcrop-preview'/>");
 
 			$("body").append('<img id="preImageSource"  style="display:none;" src="'+_timestamp+'" />');
+			$('<img/>').attr('src',_timestamp).load(function(){
+				var sourceWidth=this.width,
+						sourceHeight=this.height;
+				$('.previewImage').prepend(_$timg)
+				$('.previewImage input').css({
+					    top: '304px',
+					    left: '381px',
+					    height: '40px',
+					    width: '80px'
+				})
+				$('.previewImage p').hide();
+				$('.cutImage').html(_$preImg);
+				
+				_$timg.Jcrop({
+					aspectRatio:1.33,
+					onChange:function(c){
 
-			$('.previewImage').prepend(_$timg)
-			$('.previewImage input').css({
-				    top: '304px',
-				    left: '381px',
-				    height: '40px',
-				    width: '80px'
+						currentSize=c;
+						if (parseInt(c.w) > 0) {
+								var rx = 200 / c.w;
+								var ry = 150 / c.h;
+								$("#preImage").css({
+									width:Math.round(rx * boundx) + 'px',
+									height: Math.round(ry * boundy) + 'px',
+									marginLeft: '-' + Math.round(rx * c.x) + 'px',
+									marginTop: '-' + Math.round(ry * c.y) + 'px'
+								});
+							}
+					},
+					onSelect:function(c){
+						var px=sourceWidth/boundx,
+							py=sourceHeight/boundy;
+						w= Math.round(c.w*px);
+						h= Math.round(c.h*py);
+						x= Math.round(c.x*px);
+						y= Math.round(c.y*py);
+					}
+				},function(){
+					 
+					var bounds = this.getBounds();
+						boundx = bounds[0];
+						boundy = bounds[1];
+					_jcrop=this;
+					_jcrop.setSelect([60,40,260,190]);
+				});
 			})
-			$('.previewImage p').hide();
-			$('.cutImage').html(_$preImg);
-			
-			_$timg.Jcrop({
-				aspectRatio:1.33,
-				onChange:function(c){
-
-					currentSize=c;
-					if (parseInt(c.w) > 0) {
-							var rx = 200 / c.w;
-							var ry = 150 / c.h;
-							$("#preImage").css({
-								width:Math.round(rx * boundx) + 'px',
-								height: Math.round(ry * boundy) + 'px',
-								marginLeft: '-' + Math.round(rx * c.x) + 'px',
-								marginTop: '-' + Math.round(ry * c.y) + 'px'
-							});
-						}
-				},
-				onSelect:function(c){
-					var sourceWidth=$('#preImageSource').width(),
-						sourceHeight=$('#preImageSource').height(),
-						px=sourceWidth/boundx,
-						py=sourceHeight/boundy;
-					w= Math.round(c.w*px);
-					h= Math.round(c.h*py);
-					x= Math.round(c.x*px);
-					y= Math.round(c.y*py);
-				}
-			},function(){
-				 
-				var bounds = this.getBounds();
-					boundx = bounds[0];
-					boundy = bounds[1];
-				_jcrop=this;
-				_jcrop.setSelect([60,40,260,190]);
-			});
 			
 		})
 		
