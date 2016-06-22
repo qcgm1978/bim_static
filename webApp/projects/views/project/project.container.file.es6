@@ -16,7 +16,8 @@ App.Project.FileContainer = Backbone.View.extend({
 	events: {
 		"click .header .ckAll": "ckAll",
 		"click .btnFileSearch": "fileSearch",
-		"click .clearSearch": "clearSearch"
+		"click .clearSearch": "clearSearch",
+		"keyup #txtFileSearch":"enterSearch"
 
 	},
 
@@ -56,6 +57,14 @@ App.Project.FileContainer = Backbone.View.extend({
 		this.$el.find(".fileContent .ckAll").prop("checked", event.target.checked);
 	},
 
+	//回车搜索
+	enterSearch(event){
+		if (event.keyCode==13) {
+			this.fileSearch();
+		}
+	},
+
+	//搜索
 	fileSearch() {
 
 		var txtSearch = $("#txtFileSearch").val().trim();
@@ -94,10 +103,12 @@ App.Project.FileContainer = Backbone.View.extend({
 		});
 	},
 
+	//搜索为空
 	searchNull() {
 		this.$el.find(".fileContent").html('<li class="loading"><i class="iconTip"></i>未搜索到相关文件/文件夹</li>');
 	},
 
+	//清除搜索
 	clearSearch() {
 
 		this.$(".clearSearch").hide();

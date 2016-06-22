@@ -32,6 +32,14 @@ App.ResourceModel.LeftNav = Backbone.View.extend({
 
 			data.click = function(event) {
 				var file = $(event.target).data("file");
+
+				//清除搜索
+				$("#navContainer").find(".clearSearch").hide().end().
+				find(".opBox").show().end().
+				find(".searchCount").hide();
+				$("#txtFileSearch").val("");
+				App.ResourceModel.Settings.searchText = "";
+
 				//清空数据
 				$("#navContainer .header .ckAll").prop("checked", false);
 				$("#resourceListContent .fileContent").empty();

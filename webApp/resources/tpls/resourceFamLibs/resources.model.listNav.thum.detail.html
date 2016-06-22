@@ -25,7 +25,8 @@
 
 <span class="fileName">
 
- <span data-id="<%=id%>" title="<%=name%>" data-isfolder="<%=folder%>" class="text <%= id=='createNew'?'hidden':'' %>"><%=name%></span>
+ <span data-id="<%=id%>" title="<%=name%>" data-isfolder="<%=folder%>" class="text <%= id=='createNew'?'hidden':'' %>">
+  <%= App.ResourceModel.getName(name)  %> </span>
 
 <%if(folder){%> 
     <% if(id=='createNew'){%>

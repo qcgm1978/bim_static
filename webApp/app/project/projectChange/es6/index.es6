@@ -271,7 +271,16 @@ App.Index = {
 
 		}); 
 
-		$(".showChange .groupRadio .btnCk").click();
+		App.Index.Settings.Viewer.on("loaded",function(){
+
+			var $btnCk=$(".showChange .groupRadio .btnCk");
+			if (!$btnCk.hasClass("selected")) {
+				$btnCk.click();
+			}
+			
+		});
+
+		
 	 
 
 	},
