@@ -68,8 +68,7 @@
                         return;
                     } else {
                         App.isUploading = true;
-                    }
-
+                    } 
                     // quota info in the right bottom corner
                     if (options.getQuotaInfo) {
                         self.container.find('.quota-tip-info').text(options.getQuotaInfo())
@@ -238,7 +237,7 @@
                    
                     if (!e.originalEvent.dataTransfer) return
                     var files = e.originalEvent.dataTransfer.files,
-                        items = e.originalEvent.dataTransfer.items
+                        items = e.originalEvent.dataTransfer.items 
                     if (items) {
                         var allFiles = []
                         for (var i = 0; i < items.length; i++) {
@@ -344,7 +343,7 @@
         },
 
         //遍历文件夹目录
-        __traverseDirectory: function(entry, callback) {
+        __traverseDirectory: function(entry, callback) {  
             if (entry.isFile) {
                 upload.__readFile(entry, callback)
             } else if (entry.isDirectory) {
@@ -360,6 +359,7 @@
 
         //读取文件
         __readFile: function(fileEntry, callback) {
+             
             fileEntry.file(function(file) {
                 file.fullPath = fileEntry.fullPath
                 callback && callback(file)
