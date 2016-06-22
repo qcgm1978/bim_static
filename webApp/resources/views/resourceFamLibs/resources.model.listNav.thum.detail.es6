@@ -108,14 +108,14 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 					App.ResourceModel.Settings.CurrentVersion.status==9 ||
 					App.ResourceModel.Settings.CurrentVersion.subType==1){
 					$("#reNameModel").addClass('disable').attr('disabled','disabled');
-					$("#downLoadModel").addClass('disable').attr('disabled','disabled');
+					//$("#downLoadModel").addClass('disable').attr('disabled','disabled');
 					$("#delModel").addClass('disable').attr('disabled','disabled');
 				}
 				//权限控制
 				var Auth = App.AuthObj.lib.family;
 				if(!Auth.edit){
 					$('#reNameModel,#delModel').addClass('disable');
-					if(!Auth.download || !App.ResourceModel.Settings.CurrentVersion.byProjectRef){
+					if(!Auth.download && !App.ResourceModel.Settings.CurrentVersion.byProjectRef){
 						$('#downLoadModel').addClass('disable');
 					}
 				}
