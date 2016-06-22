@@ -485,6 +485,10 @@
 							var $li = $(event.target).closest(".item"),
 								createId = $li.find(".name").data("creatorid");
 
+							if (!$li.hasClass("selected")) {
+								CommentApi.showComment($li);								 
+							}
+
 							//创建者 可以 删除 分享 编辑
 							if (App.Global.User && App.Global.User.userId == createId && !App.Project.Settings.isShare) {
 								$("#shareViewPoint,#delViewPoint,#editViewPoint,#reName").show();
@@ -1703,7 +1707,7 @@
 						// 	}
 
 						// }
-						var models=[];
+						var models = [];
 						//项目 
 						if ($comment.find(".navBar .project").hasClass("selected")) {
 							models = CommentCollections.Project.models;

@@ -373,7 +373,7 @@
         },
 
         //初始化文件夹上传
-        __initDirectoryUpload: function(options) {
+        __initDirectoryUpload: function(options) { 
             var uploadButton = $('#' + options.browse_button)
             var uploadButtons = $('<div class="upload-dropdown-buttons">' +
                 '<ul>' +
