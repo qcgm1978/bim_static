@@ -78,6 +78,7 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
         })
     },
 
+    //选中状态
     ruleCheck:function(e){
         App.Resources.cancelBubble(e);
         var _this = this,id = _this.model.get("id");
@@ -106,7 +107,7 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
             ele.removeClass("all");
             ele.closest("li").attr("data-check","0");
 
-            //触发全不选时右面菜单变化，将发送父级code
+            //触发全不选时右面菜单变化
             var checked1 = _.filter(allSele,function(item){
                 return $(item).attr("data-check") == "1"
             });
@@ -115,15 +116,13 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
             }
 
             //删除
-            if(s){
+            if(s>0){
                 ruleIds.splice(s,1);
             }
 
 
         }else{
             ele.closest("li").attr("data-check","1");
-
-            //如果全选，将发送父级code而非id
             var checked2 = _.filter(allSele,function(item){
                 return $(item).attr("data-check") == "0"
             });
@@ -133,7 +132,7 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
                 return
             }
             //已存在
-            if(s){
+            if(s>0){
                 return
             }
         }
