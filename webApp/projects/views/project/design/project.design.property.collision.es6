@@ -28,7 +28,7 @@ App.Project.DesignCollision=Backbone.View.extend({
 		var that = this;
 		var list = that.$el.find('.collSelect');
 		list.show();
-		$('.collHead').height('90%');
+	//	$('.collHead').height('240');
 		if($el.next(".collSelect").find("ul").length==0){
 			App.Project.DesignAttr.CollisionTaskList.projectId = App.Project.Settings.CurrentVersion.projectId;
 			App.Project.DesignAttr.CollisionTaskList.projectVerionId = App.Project.Settings.CurrentVersion.id;

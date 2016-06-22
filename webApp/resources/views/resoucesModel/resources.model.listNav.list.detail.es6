@@ -89,6 +89,7 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 				$item.addClass("selected").siblings().removeClass("selected");
 				if(App.ResourceModel.Settings.CurrentVersion.status==4 ||
 					App.ResourceModel.Settings.CurrentVersion.status==7 ||
+					App.ResourceModel.Settings.CurrentVersion.status==9 ||
 					App.ResourceModel.Settings.CurrentVersion.subType==1){
 					$("#reNameModel").addClass('disable').attr('disabled','disabled');
 					$("#downLoadModel").addClass('disable').attr('disabled','disabled');

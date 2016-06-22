@@ -7,7 +7,9 @@ App.Comm = {
 	},
 
 	//项目版本状态
-	versionStatus: { 
+	versionStatus: {
+		"1": "待上传",
+		"2": "上传中", 
 		"3": "待审核",
 		"4": "审核中",
 		"5": "审核通过",
@@ -16,7 +18,27 @@ App.Comm = {
 		"8": "移交退回",
 		"9": "已移交" 
 	},
+	//项目版本状态
+	modelStatus: { 
+		"1": "待上传",
+		"2": "上传中",
+		"3": "待审核",
+		"4": "审核中",
+		"5": "审核通过",
+		"6": "审核退回",
+		"7": "待发布",
+		"8": "发布退回",
+		"9": "已发布" 
+	},
 
+	formatStatus:function(status,type){
+		if(type==1){
+			return App.Comm.versionStatus[status]||'';
+		}else if(type==2){
+			return App.Comm.modelStatus[status]||'';
+		}
+		return '';
+	},
 	//文件状态转换
 	convertStatus: function(status) { 
 
