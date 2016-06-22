@@ -326,7 +326,7 @@ CLOUD.MiniMap = function (viewer) {
     this.autoClear = true;
     this.mouseButtons = {LEFT: THREE.MOUSE.LEFT, RIGHT: THREE.MOUSE.RIGHT};
     this.callbackCameraChanged = null;
-    this.callbackMoveOnAxisGrid = null;
+    this.callbackClickOnAxisGrid = null;
 
     var scope = this;
     var _mapContainer;
@@ -872,7 +872,7 @@ CLOUD.MiniMap = function (viewer) {
             normalizedPointToScreen(screenPosition);
 
             // 获得最近的交点
-            var intersection = this.computeMinDistanceIntersection(screenPosition);
+            var intersection = this.getIntersectionToMinDistance(screenPosition);
 
             if (intersection) {
                 // 计算轴信息
@@ -915,6 +915,8 @@ CLOUD.MiniMap = function (viewer) {
         // 设置绘图面板背景色
         this.setClearColor(_defaultClearColor, alpha);
         this.clear();
+
+        _hasHighlightInterPoint = false;
     };
 
     this.setSize = function (width, height) {
@@ -938,9 +940,15 @@ CLOUD.MiniMap = function (viewer) {
             _clipBox2D.min.set(-_svgHalfWidth, -_svgHalfHeight);
             _clipBox2D.max.set(_svgHalfWidth, _svgHalfHeight);
 
-            // redo init ???
-            //this.initAxisGird();
-            //this.initFloorPlane()
+            //this.resizeClientAxisGrid();
+            //
+            //_svgGroupForAxisGrid.style.display = "";
+            //
+            //if (_hasHighlightInterPoint) {
+            //    this.showTip();
+            //}
+            //
+            //this.render();
         }
     };
 
@@ -1008,20 +1016,13 @@ CLOUD.MiniMap = function (viewer) {
     this.initCameraNode = function () {
 
         if (!_cameraNode) {
-            //_cameraNode = document.createElementNS(_xmlns, 'path');
-            //_cameraNode.setAttribute('d', 'M-2,-4 L6,0 L-2,4 L0,0 L-2,-4');
-            //_cameraNode.setAttribute('fill', '#1b8cef');
-            //_cameraNode.setAttribute('stroke', "#cbd7e1");
-            //_cameraNode.setAttribute('stroke-width', '0.4');
-            //_cameraNode.setAttribute('stroke-linejoin', "round");
-            //_cameraNode.setAttribute('opacity', '0.0');
 
             _cameraNode = document.createElementNS (_xmlns, 'g');
             _cameraNode.setAttribute('fill', '#1b8cef');
             _cameraNode.setAttribute('stroke', '#cbd7e1');
             _cameraNode.setAttribute('stroke-width', '1');
             _cameraNode.setAttribute('stroke-linejoin', 'round');
-            _cameraNode.setAttribute('opacity', '0.0');
+            //_cameraNode.setAttribute('opacity', '0.0');
 
             // 尺寸大小 直径 12px
             var circle = document.createElementNS (_xmlns, 'circle');
@@ -1035,6 +1036,8 @@ CLOUD.MiniMap = function (viewer) {
             _cameraNode.appendChild (circle);
             _cameraNode.appendChild (path);
         }
+
+        _cameraNode.setAttribute('opacity', '0.0');
     };
 
     this.initTipNode = function () {
@@ -1074,24 +1077,32 @@ CLOUD.MiniMap = function (viewer) {
             _mapContainer.appendChild(_tipNode);
         }
 
+        _tipNode.style.opacity = 0;
+
         if (!_circleNode) {
             _circleNode = document.createElementNS(_xmlns, 'circle');
             _circleNode.setAttribute('r', _circleNodeRadius + '');
             _circleNode.setAttribute('fill', _highlightColor);
-            _circleNode.style.opacity = 0;
+            //_circleNode.style.opacity = 0;
         }
+
+        _circleNode.style.opacity = 0;
 
         if (!_highlightHorizLineNode) {
             _highlightHorizLineNode = document.createElementNS(_xmlns, 'line');
             _highlightHorizLineNode.setAttribute('style', 'stroke:' + _highlightColor + ';stroke-width:' + _highlightLineWidth + '');
-            _highlightHorizLineNode.style.opacity = 0;
+            //_highlightHorizLineNode.style.opacity = 0;
         }
+
+        _highlightHorizLineNode.style.opacity = 0;
 
         if (!_highlightVerticalLineNode) {
             _highlightVerticalLineNode = document.createElementNS(_xmlns, 'line');
             _highlightVerticalLineNode.setAttribute('style', 'stroke:' + _highlightColor + ';stroke-width:' + _highlightLineWidth + '');
-            _highlightVerticalLineNode.style.opacity = 0;
+            //_highlightVerticalLineNode.style.opacity = 0;
         }
+
+        _highlightVerticalLineNode.style.opacity = 0;
     };
 
     this.showTip = function () {
@@ -1175,21 +1186,6 @@ CLOUD.MiniMap = function (viewer) {
         }
     };
 
-    //this.clearAxisGird = function () {
-    //
-    //    if (_axisGridElements.length > 0) {
-    //        //_axisGridElements.splice(0,_axisGridElements.length);
-    //        _axisGridElements = [];
-    //    }
-    //
-    //    if (_axisGridIntersectionPoints.length > 0) {
-    //        _axisGridIntersectionPoints = [];
-    //    }
-    //
-    //    _axisGridBox2D.makeEmpty();
-    //    _isLoadedAxisGrid = false;
-    //};
-
     this.initAxisGird = function (grids) {
 
         // 计算轴网包围盒
@@ -1219,7 +1215,6 @@ CLOUD.MiniMap = function (viewer) {
 
         _isChangeView = changeView;
 
-        //_isLoadedFloorPlane = false;
 
         var jsonObj = CLOUD.MiniMap.floorPlaneData;
 
@@ -1341,88 +1336,72 @@ CLOUD.MiniMap = function (viewer) {
         }
     };
 
+    // 通过轴网号高亮
+    this.highlightNodeByAxisGridNumber = function (abcName, numeralName) {
+
+        var intersection = this.getIntersectionByAxisGridNumber(abcName, numeralName);
+
+        if (intersection) {
+
+            this.setHighlightNode(intersection);
+            this.showTip();
+
+        } else {
+
+            this.hideTip();
+        }
+
+        this.render();
+    };
+
     this.highlightedNode = function (isOverCanvas, isShowAxisGrid, allowNear, callback) {
+
+        _hasHighlightInterPoint = false;
 
         if (isOverCanvas && isShowAxisGrid) {
 
-            this.dealHighlightNode(allowNear);
+            var intersection;
 
-            if (_hasHighlightInterPoint) {
+            // 允许获得离选中的点最近的交点
+            if (allowNear) {
 
+                var screenPosition = normalizedMouse.clone();
+                normalizedPointToScreen(screenPosition);
+                // 获得最近的轴网交点
+                intersection = this.getIntersectionToMinDistance(screenPosition);
+
+            } else {
+
+                intersection = this.getIntersectionByNormalizedPoint(normalizedMouse);
+            }
+
+            if (intersection) {
+
+                _hasHighlightInterPoint = true;
+
+                this.setHighlightNode(intersection);
                 this.showTip();
-
-                if (callback) {
-
-                    callback();
-
-                } else {
-
-                    this.render();
-                }
-
-                if (this.callbackMoveOnAxisGrid) {
-
-                    var gridInfo = this.getAxisGridInfoByNormalizedPoint(normalizedMouse);
-                    this.callbackMoveOnAxisGrid(gridInfo);
-                }
 
             } else {
 
                 this.hideTip();
-
-                if (callback) {
-
-                    callback();
-
-                } else {
-
-                    this.render();
-                }
             }
 
-        } else {
-            //this.hideTip();
-            //callback();
-            _hasHighlightInterPoint = false;
+            if (callback) {
+
+                callback();
+
+            } else {
+
+                this.render();
+            }
+
+            if (this.callbackClickOnAxisGrid) {
+
+                var gridInfo = this.getAxisGridInfoByNormalizedPoint(normalizedMouse);
+                this.callbackClickOnAxisGrid(gridInfo);
+            }
         }
-
-    };
-
-    this.dealHighlightNode = function (allowNear) {
-
-        _hasHighlightInterPoint = false;
-
-        var intersection;
-
-        if (allowNear) {
-
-            var screenPosition = normalizedMouse.clone();
-            normalizedPointToScreen(screenPosition);
-            // 获得最近的轴网交点
-            intersection = this.computeMinDistanceIntersection(screenPosition);
-        } else {
-            intersection = this.getIntersectionByNormalizedPoint(normalizedMouse);
-        }
-
-        if (!intersection) return null;
-
-        this.setHighlightNode(intersection);
-
-        _hasHighlightInterPoint = true;
-
-    };
-
-    this.dealHighlightNodeByAxisGridNumber = function (abcName, numeralName) {
-
-        _hasHighlightInterPoint = false;
-
-        var intersection = this.getIntersectionByAxisGridNumber(abcName, numeralName);
-
-        if (!intersection) return null;
-
-        this.setHighlightNode(intersection);
-
-        _hasHighlightInterPoint = true;
 
     };
 
@@ -1453,32 +1432,30 @@ CLOUD.MiniMap = function (viewer) {
         _highlightVerticalLineNode.setAttribute('y2', highlightNode.verticalLine[1].y);
     };
 
+    // 获得主场景变换矩阵
     this.getMainSceneMatrix = function () {
-        var mainScene = this.viewer.getScene();
-        var rootNode = mainScene.rootNode;
-        //rootNode.updateMatrixWorld(true);
-        //rootNode.updateMatrix();
-        //rootNode.matrixAutoUpdate = false;
 
-        return rootNode.matrix.clone();
+        return this.viewer.getScene().getRootNodeMatrix();
     };
 
+    // 判断点是否在场景包围盒中
     this.containsPointInMainScene = function(point) {
-        var mainScene = this.viewer.getScene();
 
-        if (mainScene.rootNode.boundingBox) {
-            return mainScene.rootNode.boundingBox.containsPoint(point);
+        var boundingBox = this.viewer.getScene().getRootNodeBoundingBox();
+
+        if (boundingBox) {
+            return boundingBox.containsPoint(point);
         }
 
         return false;
     };
 
+    // 根据指定位置点获得轴网信息
     this.getAxisGridInfoByPoint = function(point) {
 
         if (!_isLoadedFloorPlane) return null;
 
         var sceneMatrix = this.getMainSceneMatrix();
-
         var inverseMatrix = new THREE.Matrix4();
         inverseMatrix.getInverse(sceneMatrix);
 
@@ -1486,15 +1463,13 @@ CLOUD.MiniMap = function (viewer) {
         var pointWorldPosition = point.clone();
         pointWorldPosition.applyMatrix4(inverseMatrix);
 
-        //var projectedWorldPosition = new THREE.Vector3(pointWorldPosition.x, pointWorldPosition.y, _projectedCameraPosZ);
-
         // 屏幕坐标
         var screenPosition = pointWorldPosition.clone();
         worldToNormalizedPoint(screenPosition);
         normalizedPointToScreen(screenPosition);
 
         // 获得最近的轴网交点
-        var intersection = this.computeMinDistanceIntersection(screenPosition);
+        var intersection = this.getIntersectionToMinDistance(screenPosition);
 
         if (intersection) {
             // 计算轴信息
@@ -1524,14 +1499,14 @@ CLOUD.MiniMap = function (viewer) {
 
         // 世界坐标
         var pointWorldPosition = normalizedPoint.clone();
-        screenToNormalizedPoint(pointWorldPosition);
         normalizedPointToWorld(pointWorldPosition);
 
+        // 屏幕坐标
         var screenPosition = normalizedPoint.clone();
         normalizedPointToScreen(screenPosition);
 
         // 获得最近的轴网交点
-        var intersection = this.computeMinDistanceIntersection(screenPosition);
+        var intersection = this.getIntersectionToMinDistance(screenPosition);
 
         if (intersection) {
             // 计算轴信息
@@ -1554,6 +1529,7 @@ CLOUD.MiniMap = function (viewer) {
         return null;
     };
 
+    // 根据正规化坐标获得轴网交叉点
     this.getIntersectionByNormalizedPoint = function(normalizedPoint) {
 
         var intersection = null;
@@ -1575,6 +1551,7 @@ CLOUD.MiniMap = function (viewer) {
         return intersection;
     };
 
+    // 根据轴网号获得轴网交叉点
     this.getIntersectionByAxisGridNumber = function(abcName, numeralName) {
 
         var intersection = null;
@@ -1592,6 +1569,33 @@ CLOUD.MiniMap = function (viewer) {
         return intersection;
     };
 
+    // 获得离指定位置最近的交叉点
+    this.getIntersectionToMinDistance = function (screenPosition) {
+
+        if (_axisGridIntersectionPoints.length < 1) return null;
+
+        var minDistanceSquared = 0;
+        var idx = 0;
+
+        for (var i = 0, len = _axisGridIntersectionPoints.length; i < len; i++) {
+            var interObj = _axisGridIntersectionPoints[i];
+            var interPoint = new THREE.Vector2(interObj.intersectionPoint.x, interObj.intersectionPoint.y);
+            var distanceSquared = interPoint.distanceToSquared(screenPosition);
+
+            if (i == 0) {
+                minDistanceSquared = distanceSquared;
+            } else {
+                if (minDistanceSquared > distanceSquared) {
+                    minDistanceSquared = distanceSquared;
+                    idx = i;
+                }
+            }
+        }
+
+        return _axisGridIntersectionPoints[idx];
+    };
+
+    // 计算相机在小地图上的位置
     this.calculateCameraPosition = function () {
 
         if (!_isLoadedFloorPlane) return;
@@ -1604,14 +1608,6 @@ CLOUD.MiniMap = function (viewer) {
         var cameraPosition = camera.position;
         var cameraTargetPosition = cameraEditor.target;
         var sceneMatrix = this.getMainSceneMatrix();
-
-        //var box = bBox.clone();
-        //box.applyMatrix4(sceneMatrix);
-        //
-        //if (!box.containsPoint(camera.position)) {
-        //    return null;
-        //}
-
         var inverseMatrix = new THREE.Matrix4();
         inverseMatrix.getInverse(sceneMatrix);
 
@@ -1691,6 +1687,7 @@ CLOUD.MiniMap = function (viewer) {
             }
         }
 
+        // 设置回调相机信息
         this.setCallbackCameraInfo(cameraWorldPosition, cameraScreenPosition);
 
         _lastCameraWorldPosition = cameraWorldPosition.clone();
@@ -1704,6 +1701,7 @@ CLOUD.MiniMap = function (viewer) {
         }
     };
 
+    // 计算相机在边界上的位置
     this.calculateEdgePositionCameraOutBounds = function(bBox, worldPosition, direction){
 
         // 先计算射线与Y轴平行的两个面的交点，再计算射线与X轴平行的两个面的交点
@@ -1815,32 +1813,7 @@ CLOUD.MiniMap = function (viewer) {
         return null;
     };
 
-    // 计算离相机最近的交点
-    this.computeMinDistanceIntersection = function (screenPosition) {
-
-        if (_axisGridIntersectionPoints.length < 1) return null;
-
-        var minDistanceSquared = 0;
-        var idx = 0;
-
-        for (var i = 0, len = _axisGridIntersectionPoints.length; i < len; i++) {
-            var interObj = _axisGridIntersectionPoints[i];
-            var interPoint = new THREE.Vector2(interObj.intersectionPoint.x, interObj.intersectionPoint.y);
-            var distanceSquared = interPoint.distanceToSquared(screenPosition);
-
-            if (i == 0) {
-                minDistanceSquared = distanceSquared;
-            } else {
-                if (minDistanceSquared > distanceSquared) {
-                    minDistanceSquared = distanceSquared;
-                    idx = i;
-                }
-            }
-        }
-
-        return _axisGridIntersectionPoints[idx];
-    };
-
+    // 定位
     this.fly = function() {
 
         var cameraPosition = this.calculateCameraPosition();
@@ -1851,6 +1824,7 @@ CLOUD.MiniMap = function (viewer) {
         this.viewer.cameraEditor.flyToPointWithParallelEye(cameraProjectedWorldPosition);
     };
 
+    // 根据轴号定位
     this.flyByAxisGridNumber = function(abcName, numeralName) {
 
         // 获得最近的交点
@@ -1882,7 +1856,7 @@ CLOUD.MiniMap = function (viewer) {
             var cameraWorldPos = worldPosition.clone();
 
             // 获得离相机最近的交点
-            var intersection = this.computeMinDistanceIntersection(screenPosition);
+            var intersection = this.getIntersectionToMinDistance(screenPosition);
 
             if (intersection) {
                 // 计算轴信息
@@ -1921,8 +1895,6 @@ CLOUD.MiniMap = function (viewer) {
                     }
                 };
 
-                //console.log(jsonObj.axis.infoX + "" + jsonObj.axis.infoY);
-
                 this.callbackCameraChanged(jsonObj);
             } else {
                 this.callbackCameraChanged(null);
@@ -1938,14 +1910,16 @@ CLOUD.MiniMap = function (viewer) {
 
     this.removeMiniMap = function() {
 
-        if (this.domContainer) {
-            this.domContainer.removeChild(_mapContainer);
+        if (_mapContainer && _mapContainer.parentNode) {
+
+            _mapContainer.parentNode.removeChild(_mapContainer)
         }
     };
 
     this.appendMiniMap = function() {
 
-        if (this.domContainer) {
+        if (_mapContainer && !_mapContainer.parentNode) {
+
             this.domContainer.appendChild(_mapContainer);
 
             this.render();
@@ -1957,9 +1931,9 @@ CLOUD.MiniMap = function (viewer) {
         this.callbackCameraChanged = callback;
     };
 
-    this.setMoveOnAxisGridCallback = function(callback) {
+    this.setClickOnAxisGridCallback = function(callback) {
 
-        this.callbackMoveOnAxisGrid = callback;
+        this.callbackClickOnAxisGrid = callback;
     };
 
 };
@@ -6690,6 +6664,7 @@ CLOUD.Extensions.AnnotationEditor.prototype.getAnnotationInfoList = function () 
         var text = "";
         if (annotation.shapeType === CLOUD.Extensions.Annotation.shapeTypes.TEXT) {
             text = encodeURIComponent(annotation.currText); // 编码中文
+            //text = annotation.currText; // 编码中文
         }
 
         var shapePoints = "";
@@ -6707,9 +6682,6 @@ CLOUD.Extensions.AnnotationEditor.prototype.getAnnotationInfoList = function () 
             shapePoints: shapePoints,
             text: text
         };
-
-        //var str = window.btoa(JSON.stringify(info));
-        //console.log(str);
 
         annotationInfoList.push(info);
     }
@@ -6746,6 +6718,7 @@ CLOUD.Extensions.AnnotationEditor.prototype.loadAnnotations = function (annotati
         var viewport = info.viewport;
         var shapePointsStr = info.shapePoints;
         var text = decodeURIComponent(info.text); // 解码中文
+        //var text = info.text; // 解码中文
 
         switch (shapeType) {
 

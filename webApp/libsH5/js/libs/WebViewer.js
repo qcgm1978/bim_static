@@ -3,7 +3,7 @@
 */
 
 var CLOUD = CLOUD || {};
-CLOUD.Version = "20160616";
+CLOUD.Version = "20160622";
 
 CLOUD.GlobalData = {
     SceneSize: 1000,
@@ -23,7 +23,8 @@ CLOUD.GlobalData = {
     SubSceneVisibleLOD: 10,
     ScreenCullLOD: 0.0002,
     LimitFrameTime: 250,
-    GarbageCollection: true
+    GarbageCollection: true,
+    ByTargetDistance : false
 };
 
 CLOUD.EnumObjectLevel = {
@@ -7505,11 +7506,22 @@ CLOUD.Scene.prototype.worldBoundingBox = function () {
 
 }();
 
+// 获得场景 root node 变换矩阵
 CLOUD.Scene.prototype.getRootNodeMatrix = function () {
 
     if (this.rootNode.matrix) {
 
         return this.rootNode.matrix.clone();
+    }
+
+    return null;
+};
+
+// 获得场景 root node 包围盒
+CLOUD.Scene.prototype.getRootNodeBoundingBox = function () {
+
+    if (this.rootNode.boundingBox) {
+        return this.rootNode.boundingBox;
     }
 
     return null;
@@ -8780,6 +8792,10 @@ CLOUD.Cell.prototype.update = function () {
 
         if (!shouldShow) {
             
+            if (CLOUD.GlobalData.ByTargetDistance) {
+
+            }
+
             //shouldShow = scope.level > (CLOUD.GlobalData.SubSceneVisibleDistance * CLOUD.GlobalData.CellVisibleLOD);
 
             //if (!shouldShow)
@@ -8788,7 +8804,13 @@ CLOUD.Cell.prototype.update = function () {
                 scope.worldBoundingBox.center(v2);
                 //var distance = camera.positionPlane.distanceToPoint(v2);
                 //distance = distance * distance;
-                var distance = camera.position.distanceToSquared(v2);
+                var distance = 0;
+                if (CLOUD.GlobalData.ByTargetDistance) {
+                    distance = camera.target.distanceToSquared(v2);
+                }
+                else {
+                    distance = camera.position.distanceToSquared(v2);
+                }
                 distance = Math.min(distance * 2, 250000) * 0.001;
 
                 var target = CLOUD.GlobalData.CellVisibleLOD * CLOUD.GlobalData.SubSceneVisibleDistance;
@@ -8879,7 +8901,15 @@ CLOUD.SubScene.prototype.update = function () {
         }
         else {
             scope.worldBoundingBox.center(v2);
-            distance  = camera.position.distanceToSquared(v2);
+
+            if (CLOUD.GlobalData.ByTargetDistance) {
+                distance = camera.target.distanceToSquared(v2);
+            }
+            else {
+                distance = camera.position.distanceToSquared(v2);
+            }
+            
+
             distance = Math.min(distance * 2, 250000) * 0.001;
 
             //distance = camera.positionPlane.distanceToPoint(v2);
@@ -10805,7 +10835,7 @@ CLOUD.RectPickEditor.prototype = {
 
                     this.endPt.set(event.clientX, event.clientY);
                     if (!this.udpateFrustum()) {
-                        this.pickByClick(event);
+                        this.pickHelper.click(event);
                         return false;
                     }
 
@@ -18470,7 +18500,10 @@ CloudViewer.prototype = {
         }
         var target = this.camera.zoomToBBox(box, margin, ratio);
         this.cameraEditor.updateCamera(target);
+        var oldValue = CLOUD.GlobalData.ByTargetDistance;
+        CLOUD.GlobalData.ByTargetDistance = true;
         this.render();
+        CLOUD.GlobalData.ByTargetDistance = oldValue;
     },
 
     zoomToBBox: function (box, margin, ratio) {
@@ -18484,7 +18517,11 @@ CloudViewer.prototype = {
        
         var target = this.camera.zoomToBBox(box, margin, ratio);
         this.cameraEditor.updateCamera(target);
+
+        var oldValue = CLOUD.GlobalData.ByTargetDistance;
+        CLOUD.GlobalData.ByTargetDistance = true;
         this.render();
+        CLOUD.GlobalData.ByTargetDistance = oldValue;
     },
 
     setStandardView: function (stdView, margin) {
@@ -18677,14 +18714,14 @@ CloudViewer.prototype = {
     // ------------------ ViewHouse API -- E ------------------ //
 
     // ------------------ 小地图API -- S ------------------ //
-    createMiniMap:function(name, domElement, width, height, styleOptions, callbackCameraChanged, callbackMoveOnAxisGrid){
+    createMiniMap:function(name, domElement, width, height, styleOptions, callbackCameraChanged, callbackClickOnAxisGrid){
 
         var miniMap = this.miniMaps[name];
 
         if (!miniMap) {
             miniMap = this.miniMaps[name] = new CLOUD.MiniMap(this);
             miniMap.setCameraChangedCallback(callbackCameraChanged);
-            miniMap.setMoveOnAxisGridCallback(callbackMoveOnAxisGrid);
+            miniMap.setClickOnAxisGridCallback(callbackClickOnAxisGrid);
         }
 
         domElement = domElement || this.domElement;
