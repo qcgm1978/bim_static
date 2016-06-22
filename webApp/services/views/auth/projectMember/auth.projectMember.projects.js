@@ -56,7 +56,7 @@ App.Services.projectMember.projects = Backbone.View.extend({
 		App.Comm.setCookie("currentPid", pid);
 		App.Comm.setCookie("currentProjectName", name);
 		App.Services.projectMember.loadData(App.Services.projectMember.projectMemberMemberCollection, {
-			outer: App.Comm.User("outer")
+			outer: App.Comm.user("outer")
 		}, {
 			dataPrivilegeId: pid
 		});
