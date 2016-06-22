@@ -16,7 +16,8 @@
 
 
 <% if(folder){%>
-    <span data-id="<%=id%>" data-isfolder="<%=folder%>" class="text <%= id=='createNew'?'hidden':'' %>"><%=name%></span>
+    <span data-id="<%=id%>" data-isfolder="<%=folder%>" class="text <%= id=='createNew'?'hidden':'' %>">
+     <%= App.ResourceModel.getName(name)%></span>
     <% if(id=='createNew'){%>
     	<input type="text" value="<%=name%>" class="txtEdit txtInput" /> 
     	<span class="btnEnter myIcon-enter"></span>
@@ -25,7 +26,7 @@
 <%}else{%>
  
         <a data-id="<%=id%>" href="/static/dist/app/project/single/filePreview.html?id=<%=fileVersionId%>&projectId=<%=projectId%>&projectVersionId=<%=App.ResourceModel.Settings.CurrentVersion.id%>" target="_blank" data-isfolder="<%=folder%>" class="text">
-            <%=name%>
+           <%= App.ResourceModel.getName(name)  %>
         </a>
 <%}%>
 </span>

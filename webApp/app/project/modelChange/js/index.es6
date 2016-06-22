@@ -56,7 +56,8 @@ App.Index = {
 		this.bindTreeScroll();
 
 		// 加载变更模型
-		$(".showChange .checkboxGroup input:checkbox").on("change", function() {
+		$(".showChange .checkboxGroup input:checkbox").on("change", function() { 
+			
 			var changeModel = App.Index.Settings.changeModel;
 			var viewer = App.Index.Settings.Viewer;
 			var flag = $(this).prop("checked");
@@ -129,6 +130,13 @@ App.Index = {
 			//App.Project.Settings.modelId = model.userId;
 			_this.renderAttr(modelId);
 
+		});
+
+		//加载完成后加载
+		viewer.on("loaded", function() {
+			if (!$(".showChange .checkboxGroup input:checkbox").prop('checked')) {
+				$(".showChange .checkboxGroup input:checkbox").trigger('click');
+			}
 		});
 
 		this.Settings.currentModelId = modelId;
@@ -278,7 +286,7 @@ App.Index = {
 			}
 		};
 
-		App.Comm.ajax(data, (data)=> {
+		App.Comm.ajax(data, (data) => {
 			if (data.code == 0) {
 				data = data.data;
 				$(".breadcrumbNav .project .text").text(data.projectName);
@@ -325,7 +333,7 @@ App.Project.Model = {
 			var data = model.toJSON();
 			var comparisonId = App.Index.Settings.referenceId;
 			var isload = false;
-			console.log(data)
+
 
 			$.each(data.data, function(i, item) {
 				$.each(item.comparisons, function(j, file) {
@@ -385,34 +393,34 @@ App.Project.Model = {
 			console.log(data)
 			if (data.message == 'success' && data.data.length > 0) {
 				this.$el.html(this.template(data));
-				var editbefore=[],editafter=[],add=[],remove=[];
-				for(var i=0,obj;i<data.data.length;i++){
+				var editbefore = [],
+					editafter = [],
+					add = [],
+					remove = [];
+				for (var i = 0, obj; i < data.data.length; i++) {
 					obj = data.data[i]['results'];
-					for(var j=0;j<obj.length;j++){
-						if(obj[j]['changeType']==1){
+					for (var j = 0; j < obj.length; j++) {
+						if (obj[j]['changeType'] == 1) {
 							add.push(obj[j]['currentElementId']);
-						}else if(obj[j]['changeType']==2){
+						} else if (obj[j]['changeType'] == 2) {
 							remove.push(obj[j]['baseElementId']);
 
-						}else if(obj[j]['changeType']==8){
+						} else if (obj[j]['changeType'] == 8) {
 							editafter.push(obj[j]['currentElementId']);
 							editbefore.push(obj[j]['baseElementId']);
 
 						}
 					}
 				}
-       //setTimeout(function(){
-	       App.Index.Settings.Viewer.setOverrider('beforeEdit', editbefore);
-	       App.Index.Settings.Viewer.setOverrider('afterEdit', editafter);
-	       App.Index.Settings.Viewer.setOverrider('add',add);
-	       App.Index.Settings.Viewer.setOverrider('delete',remove);
-       //},2000);
+				//setTimeout(function(){
+				App.Index.Settings.Viewer.setOverrider('beforeEdit', editbefore);
+				App.Index.Settings.Viewer.setOverrider('afterEdit', editafter);
+				App.Index.Settings.Viewer.setOverrider('add', add);
+				App.Index.Settings.Viewer.setOverrider('delete', remove);
+				//},2000);
 
 			} else {
 				this.$el.html("没有变更");
-			}
-			if (!$(".showChange .checkboxGroup input:checkbox").prop('checked')) {
-				$(".showChange .checkboxGroup input:checkbox").trigger('click');
 			}
 
 			return this;
@@ -452,23 +460,23 @@ App.Project.Model = {
 			//判断是新增，修改，删除
 			//if (baseId && elementId) {
 			//	//修改
-      //
+			//
 			//	App.Index.Settings.Viewer.setOverrider('beforeEdit', [baseId]);
 			//	App.Index.Settings.Viewer.setOverrider('afterEdit', [elementId]);
 			//} else if (baseId) {
 			//	//删除
-      //
+			//
 			//	App.Index.Settings.Viewer.setOverrider('delete', [baseId]);
-      //
+			//
 			//} else {
 			//	//新增
-      //
+			//
 			//	App.Index.Settings.Viewer.setOverrider('add', [elementId]);
 			//}
 
 			//zoomtobox
 			$.ajax({
-				url: "http://bim.wanda-dev.cn/sixD/" + App.Index.Settings.projectId + "/" + App.Index.Settings.projectVersionId + "/bounding/box?sceneId=" + (elementId ? elementId.split('.')[0] : baseId.split('.')[0]) + "&elementId=" + (elementId ? elementId : baseId)
+				url: "/sixD/" + App.Index.Settings.projectId + "/" + App.Index.Settings.projectVersionId + "/bounding/box?sceneId=" + (elementId ? elementId.split('.')[0] : baseId.split('.')[0]) + "&elementId=" + (elementId ? elementId : baseId)
 			}).done(function(respone) {
 				if (respone.code == 0) {
 					var max = respone.data.max,
@@ -483,7 +491,7 @@ App.Project.Model = {
 
 						}
 						$.ajax({
-							url: "http://bim.wanda-dev.cn/sixD/" + App.Index.Settings.projectId + "/" + App.Index.Settings.projectVersionId + "/bounding/box?sceneId=" + baseId.split('.')[0] + "&elementId=" + baseId
+							url: "/sixD/" + App.Index.Settings.projectId + "/" + App.Index.Settings.projectVersionId + "/bounding/box?sceneId=" + baseId.split('.')[0] + "&elementId=" + baseId
 						}).done(function(respone) {
 							if (respone.code == 0) {
 								var max = respone.data.max,
@@ -550,7 +558,7 @@ App.Project.Model = {
 					},
 					that = this;
 				$.ajax({
-					url: "http://bim.wanda-dev.cn/sixD/" + data.projectId + "/" + data.projectVersionId + "/comparison/property?baseModel=" + data.baseModel + "&currentModel=" + data.currentModel + "&baseElementId=" + data.baseElementId + "&currentElementId=" + data.currentElementId
+					url: "/sixD/" + data.projectId + "/" + data.projectVersionId + "/comparison/property?baseModel=" + data.baseModel + "&currentModel=" + data.currentModel + "&baseElementId=" + data.baseElementId + "&currentElementId=" + data.currentElementId
 				}).done(function(respone) {
 					if (respone.code == 0) {
 						that.$el.html(that.template({

@@ -4,6 +4,7 @@ App.ResourceModel = {
 		leftType: "file",
 		DataModel: "", //模型id
 		fileVersionId: "",
+		searchText:"",//搜索文本
 		type: "", //模型类型
 		projectId: "", //项目id
 		versionId: "", // 版本id
@@ -105,9 +106,7 @@ App.ResourceModel = {
 	//token 初始化
 	initToken() {
 		//释放上传
-		App.Comm.upload.destroy();
-
-		 
+		App.Comm.upload.destroy();	 
 
 		//重置参数
 		this.reset();
@@ -129,6 +128,7 @@ App.ResourceModel = {
 
 
 		App.ResourceModel.Settings.leftType = "file";
+		App.ResourceModel.Settings.searchText="";
 		App.ResourceModel.Settings.pageIndex = 1;
 		App.ResourceModel.Settings.DataModel = null;
 		App.ResourceModel.Settings.CurrentVersion = {};
@@ -478,6 +478,18 @@ App.ResourceModel = {
 
 		});
 
-	}
+	},
 
+
+	
+	//获取文件名称 搜索
+	getName(name){
+		 
+		var searchText=App.ResourceModel.Settings.searchText;
+		if (searchText) {
+			var replaceText=
+			name=name.replace(searchText.toLowerCase(),'<span class="searchText">'+searchText.toLowerCase()+'</span>').replace(searchText.toUpperCase(),'<span class="searchText">'+searchText.toUpperCase()+'</span>');
+		} 
+		return name;
+	}
 }

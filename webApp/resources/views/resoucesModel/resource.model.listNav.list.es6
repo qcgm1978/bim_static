@@ -9,6 +9,7 @@ App.ResourceModel.ListContent = Backbone.View.extend({
 	initialize: function() {
 		this.listenTo(App.ResourceModel.FileCollection, "add", this.addOneFile);
 		this.listenTo(App.ResourceModel.FileCollection, "reset", this.reset);
+		this.listenTo(App.ResourceModel.FileCollection, "searchNull", this.searchNull);
 	},
 
 
@@ -49,7 +50,12 @@ App.ResourceModel.ListContent = Backbone.View.extend({
 
 	reset(){
 		this.$el.find(".fileContent").html('<li class="loading">正在加载，请稍候…</li>');
-	}
+	},
+
+		//搜索为空
+ 	searchNull() {
+ 		this.$el.find(".fileContent").html('<li class="loading"><i class="iconTip"></i>未搜索到相关文件/文件夹</li>');
+ 	}
  
 
 
