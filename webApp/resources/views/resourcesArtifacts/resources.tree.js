@@ -51,20 +51,27 @@ App.Resources.artifactsQualityTree = function(dataList,n){
         var  a  = data[i].ruleContain == 1 ? 1 : 0 ;
 
         li.attr("data-model",JSON.stringify(data[i]));
-
-        li.attr("data-check",a);
         li.attr("data-code",data[i].code);
         li.attr("data-ruleContain",data[i].ruleContain);
         li.attr("data-leaf",(data[i].leaf ? "1" : 0));
-        if(data[i].leaf){
-            li.attr("data-rule",data[i].ruleIds);
+
+        if(!data[i].count){
+            li.addClass("tplShow");
         }
+
         var as = new App.Resources.ArtifactsQualityDetail({model:initModel});
-        if(data[i].ruleContain = 1){
+        if(n == 0){
+            if(data[i].ruleContain = 1){
+                as.$(".ruleCheck").addClass("all");
+            }else if(data[i].ruleContain = 3){
+                as.$(".ruleCheck").addClass("half");
+            }
+            li.attr("data-check",a);
+        }else if(n == 1){
             as.$(".ruleCheck").addClass("all");
-        }else if(data[i].ruleContain = 3){
-            as.$(".ruleCheck").addClass("half");
+            li.attr("data-check",n);
         }
+
         li.append(as.render().el);
         li.append("<div class='childList' data-code='"+data[i].code +"'></div>");
         ele.append(li);

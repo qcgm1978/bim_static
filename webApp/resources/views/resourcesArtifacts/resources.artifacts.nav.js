@@ -42,11 +42,12 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
     },
 
     checkList:function(){
-       this.$(".artifactsContent").addClass("edit");
+       this.$(".artifactsContent").addClass("edit").removeClass("explorer");
+
     },
 
     checkClose:function(){
-        this.$(".artifactsContent").removeClass("edit");
+        this.$(".artifactsContent").removeClass("edit").addClass("explorer");
     },
 
     startFromProject:function(){
