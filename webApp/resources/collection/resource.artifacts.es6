@@ -78,12 +78,12 @@ App.ResourceArtifacts={
         }),
         urlType: "fetchArtifactsPlanRule",
         parse: function(responese) {
-
             if (responese.code == 0 && responese.data.length > 0) {
                 return responese.data;
-            } else {
-                $().html('<li>无数据</li>');
-            }
+            } else {}
+        },
+        comparator:function(item){
+            return item.get("mappingCategory").categoryCode
         }
     })),
 
@@ -95,7 +95,6 @@ App.ResourceArtifacts={
             }
         }
     }),
-
     saveRuleModel:function(){
         return   {
             "biz": 1,//1：模块化；2：质监标准  //新建时写入值
@@ -181,7 +180,7 @@ App.ResourceArtifacts={
             }
         }
     }),
-    //新建规则
+    //新建条目
     newCode : Backbone.Model.extend({
         defaults:function(){
             return{

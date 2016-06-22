@@ -243,7 +243,7 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
 
                 //有效性验证
                 if(leftValue.val() && rightValue.val()){
-                    if(parseInt(leftValue.val()) <=parseInt(rightValue.val())){
+                    if(parseInt(leftValue.val()) >=parseInt(rightValue.val())){
                         alert("请填写有效的数字");
                         leftValue.focus();
                         return
