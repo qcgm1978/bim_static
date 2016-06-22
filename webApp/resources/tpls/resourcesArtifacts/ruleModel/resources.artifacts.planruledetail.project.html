@@ -6,7 +6,7 @@
     <div class="right getDetail">详情</div>
     <div class="desc"><%= (obj.mappingCategory.categoryCode ? ( "[" + obj.mappingCategory.categoryCode + "] &nbsp;") : '' ) +  (obj.mappingCategory.categoryName ? obj.mappingCategory.categoryName  : "新建映射规则") %></div>
 </div>
-<div class="ruleDetail">
+<div class="ruleDetail modelRelate">
     <div class="typeCode" data-code="<%= obj.mappingCategory.categoryCode %>" data-name="<%= obj.mappingCategory.categoryName %>">
         <div class="title">分类编码:</div>
         <div class="conR">
@@ -30,8 +30,8 @@
                     </div>
                     <div class="eIn <%= (type == a1  || type == a2) ? 'active' : ''  %>"><%= '"' + list[i].propertyValue +'"' %></div><!--等于/不等于-->
                     <div class="ioside  <%= (type == a3 || type == a4) ? 'active' : ''  %>"><!--范围 内/外-->
-                            <%= '"' + list[i].ruleList.left=='(' ? '>' : (list[i].ruleList.left=='[' ? "≥" : '>')   + list[i].ruleList.leftValue + '"'  %>
-                            <%= '"' + list[i].ruleList.right==')' ? '<' : (list[i].ruleList.right==']' ? "≤" : '<') +  list[i].ruleList.rightValue +'"' %>
+                        <i>"</i><%= list[i].ruleList.left=='(' ? '>' : (list[i].ruleList.left=='[' ? '≥' : '>') %><%= list[i].ruleList.leftValue %><i>"</i>
+                        <i>"</i><%=  list[i].ruleList.right==')' ? '<' : (list[i].ruleList.right==']' ? '≤' : '<') %><%= list[i].ruleList.rightValue  %><i>"</i>
                     </div>
                 </dd>
                 <% }%>

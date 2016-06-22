@@ -104,5 +104,6 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
     create:function(e){
         this.$(".default").hide();
         this.select(e);
+        Backbone.trigger("mappingRuleModelEdit");
     }
 });
