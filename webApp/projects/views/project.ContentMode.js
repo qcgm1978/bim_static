@@ -39,7 +39,12 @@ App.Projects.ContentMode = Backbone.View.extend({
 	},
 
 	showNullTip:function(){
-		this.$el.find(".proListBox").html('<li class="loading"><img src="/static/dist/images/projects/images/emptyProject.png"><div>暂无可访问项目</div></li>');
+
+		if (App.Projects.Settings.pageIndex!=1) {
+			this.$el.find(".proListBox").html('<li class="loading">此页没有数据</li>');
+		}else{
+			this.$el.find(".proListBox").html('<li class="loading"><img src="/static/dist/images/projects/images/emptyProject.png"><div>暂无可访问项目</div></li>');
+		}		
 	}
 
 });

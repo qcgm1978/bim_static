@@ -39,7 +39,7 @@
 				var contextHtml = _.templateUrl("/libsH5/tpls/comment/viewPointContext.html", true);
 				$("body").append(contextHtml);
 			}
-		} 
+		}
 
 		$("#comment .navBar .item.project").click();
 
@@ -1200,23 +1200,23 @@
 								imgData.data.isAdd = true;
 								//创建视点 才添加 colleciton
 								if (cate == "viewPoint") {
-									 
+
 									//项目 
 									if ($comment.find(".navBar .project").hasClass("selected")) {
 										if (dialog.type == 1) {
 											CommentCollections.Project.push(imgData.data);
-										}else{
+										} else {
+											$comment.find(".navBar .user").click();
+										}
+
+									} else if ($comment.find(".navBar .user").hasClass("selected")) {
+										//个人
+										if (dialog.type == 0) {
+											CommentCollections.User.push(imgData.data);
+										} else {
 											$comment.find(".navBar .project").click();
 										}
-										
-									} else  if ($comment.find(".navBar .user").hasClass("selected")) {
-									 	//个人
-									 	if (dialog.type == 0) {
-									 		CommentCollections.User.push(imgData.data);
-									 	}else{
-									 		$comment.find(".navBar .user").click();
-									 	}									
-										
+
 									}
 								}
 
@@ -1685,6 +1685,25 @@
 
 					if (data.code == 0) {
 
+
+						//项目 
+						// if ($comment.find(".navBar .project").hasClass("selected")) {
+						// 	if (dialog.type == 1) {
+						// 		models = CommentCollections.Project.models;
+						// 	} else {
+						// 		$comment.find(".navBar .user").click();
+						// 	}
+
+						// } else if ($comment.find(".navBar .user").hasClass("selected")) {
+						// 	//个人
+						// 	if (dialog.type == 0) {
+						// 		models = CommentCollections.User.models;
+						// 	} else {
+						// 		$comment.find(".navBar .project").click();
+						// 	}
+
+						// }
+						var models=[];
 						//项目 
 						if ($comment.find(".navBar .project").hasClass("selected")) {
 							models = CommentCollections.Project.models;
@@ -1693,13 +1712,15 @@
 							models = CommentCollections.User.models;
 						}
 
-						$.each(models, function() {
-							if (this.toJSON().id == dialog.id) {
-								this.set(data.data);
-								//跳出循环
-								return false;
-							}
-						});
+						if (models) {
+							$.each(models, function() {
+								if (this.toJSON().id == dialog.id) {
+									this.set(data.data);
+									//跳出循环
+									return false;
+								}
+							});
+						}
 
 						//评论中的视点信息
 						var $item = $comment.find(".remarkCount_" + dialog.id).closest(".item");

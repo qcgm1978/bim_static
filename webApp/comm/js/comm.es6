@@ -167,7 +167,7 @@ App.Comm = {
 		var Days = 30,
 			exp = new Date();
 		exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 1000);
-		document.cookie = name + "=" + escape(value) + ";expires=" + exp.toGMTString() + ";domain=.wanda-dev.cn;path=/";
+		document.cookie = name + "=" + escape(value) + ";expires=" + exp.toGMTString() + ";path=/";
 	},
 	//获取cookie
 	getCookie: function(name) {
@@ -183,7 +183,7 @@ App.Comm = {
 		exp.setTime(exp.getTime() - 31 * 24 * 60 * 60 * 1000);
 		var cval = this.getCookie(name);
 		if (cval != null)
-			document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString() + ";domain=.wanda-dev.cn;path=/";
+			document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString() + ";path=/";
 	},
 	//格式化 文件大小
 	formatSize: function(size) {
