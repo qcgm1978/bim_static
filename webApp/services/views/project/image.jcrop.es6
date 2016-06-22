@@ -35,7 +35,7 @@ App.Services.ImageJcrop=Backbone.View.extend({
 
 			_$preImg=$("<img id='preImage' src='"+_timestamp+"' class='jcrop-preview'/>");
 
-			$("body").append('<img id="preImageSource"  style="display:none;" src="'+_timestamp+'" />');
+		//	$("body").append('<img id="preImageSource"  style="display:none;" src="'+_timestamp+'" />');
 			$('<img/>').attr('src',_timestamp).load(function(){
 				var sourceWidth=this.width,
 						sourceHeight=this.height;
