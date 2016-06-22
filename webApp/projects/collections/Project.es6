@@ -1021,7 +1021,7 @@ App.Project = {
 		}
 
 		//质监标准
-		if (type.indexOf("quality") != -1) {
+		if (0 && type.indexOf("quality") != -1) {
 
 			var liTpl = '<li class="modleItem"><div class="modleNameText overflowEllipsis modleName2">varName</div></li>';
 
