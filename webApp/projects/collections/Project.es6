@@ -590,7 +590,6 @@ App.Project = {
 			App.Project.initGlobalEvent();
 		}
 
-
 		//设置项目可查看的属性
 		this.setPropertyByAuth();
 
@@ -615,7 +614,6 @@ App.Project = {
 	setPropertyByAuth: function() {
 
 		var projectAuth = App.AuthObj && App.AuthObj.project;
-
 		if (projectAuth) {
 
 			var ProjectTab = App.Comm.AuthConfig.Project,
@@ -635,7 +633,6 @@ App.Project = {
 			if (projectAuth.cost) {
 				$projectTab.append(ProjectTab.CostTab.tab);
 			}
-
 			//质量
 			if (projectAuth.quality) {
 				$projectTab.append(ProjectTab.QualityTab.tab);
@@ -1021,7 +1018,7 @@ App.Project = {
 		}
 
 		//质监标准
-		if (type.indexOf("quality") != -1) {
+		if (0 && type.indexOf("quality") != -1) {
 
 			var liTpl = '<li class="modleItem"><div class="modleNameText overflowEllipsis modleName2">varName</div></li>';
 
@@ -1057,23 +1054,22 @@ App.Project = {
 			url: "platform/set/category"
 		}).done(function(res) {
 			console.log(res)
-			if (res.code == 0) {
-				var str = '',
-					datas = res.data.items || [];
-				for (var i = 0, prop; i < datas.length; i++) {
-					prop = datas[i]['busName'];
-					if (prop == '设计管理') {
-						//$.ajax({
-						//	url: "platform/setting/extensions/"+App.Project.Settings.projectId+"/"+App.Project.Settings.CurrentVersion.id+"/property?classKey="+datas[i]['id']+"&elementId="+App.Project.Settings.ModelObj.intersect.userId
-						//}).done(function(res){
-						//		if(res.code==0){
-						//
-						//		}
-						//});
-						var string = '<div class="modle"><i data-classkey="' + datas[i]['id'] + '" class="modleShowHide getdata down"></i><h1 class="modleName">' + prop + '</h1><ul class="modleList"></ul></div>';
-						that.$el.find(".fordesign").html(string);
-					} else {
-						str += '<div class="modle"><i data-classkey="' + datas[i]['id'] + '" class="modleShowHide getdata down"></i><h1 class="modleName">' + prop + '</h1><ul class="modleList"></ul></div>';
+				if (res.code == 0){
+					var str = '',datas = res.data.items || [];
+					for(var i = 0,prop; i < datas.length; i++){
+						prop = datas[i]['busName'];
+						if(prop == '设计管理'){
+							//$.ajax({
+							//	url: "platform/setting/extensions/"+App.Project.Settings.projectId+"/"+App.Project.Settings.CurrentVersion.id+"/property?classKey="+datas[i]['id']+"&elementId="+App.Project.Settings.ModelObj.intersect.userId
+							//}).done(function(res){
+							//		if(res.code==0){
+              //
+							//		}
+							//});
+							var string = '<div class="modle"><i data-classkey="'+datas[i]['id']+'" class="modleShowHide getdata down"></i><h1 class="modleName">' + prop + '</h1></div>';
+							that.$el.find(".fordesign").html(string);
+						}else {
+							str += '<div class="modle"><i data-classkey="'+datas[i]['id']+'" class="modleShowHide getdata down"></i><h1 class="modleName">' + prop + '</h1></div>';
 
 					}
 

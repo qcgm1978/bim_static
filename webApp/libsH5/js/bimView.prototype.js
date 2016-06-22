@@ -557,11 +557,10 @@
         newList.push(JSON.parse(window.atob(item)));
       });
       data.filter.floors.ids = data.filter.floors.ids.concat(data.filter.specialty.ids);
-      self.filter(data.filter.floors);
+      self.fileFilter(data.filter.floors);
       self.filter(data.filter.category);
       self.filter(data.filter.classCode);
       viewer.setCommentMode();
-      viewer.loadComments(newList);
     },
     // 模型过滤器
     filter:function(obj){
@@ -569,6 +568,7 @@
       var self = this;
       var viewer = self.viewer;
       var filter = viewer.getFilters();
+      if(obj.ids.length ==0) return;
       filter.removeUserFilter(obj.type);
       $.each(obj.ids,function(i,id){
         filter.addUserFilter(obj.type,id);
