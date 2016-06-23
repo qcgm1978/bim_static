@@ -60,13 +60,21 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
         if(!leaf && !this.$el.siblings(".childList").html()){
             this.loadNextTree();
         }
+
+
+
         //存储模型
         var model = JSON.parse(this.$el.closest("li").attr("data-model")),already;
-        if(App.ResourceArtifacts.modelSaving.codeIds.length){
-            already = _.indexOf(App.ResourceArtifacts.modelSaving.codeIds,function(item){
-                return item.code = model.code
-            });
+        var modelSaving = App.ResourceArtifacts.modelSaving.codeIds;
+        var n = "string";
+        for(var is = 0 ; is < modelSaving.length ; is++){
+            if(modelSaving[is].code == this.model.get("code")){
+                n = is;
+                break
+            }
         }
+
+
         var siblings = _this.siblings("li");
         var father = _this.closest("ul").closest("li");
         var fatherSiblings = father.siblings("li");
@@ -114,12 +122,13 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
             }
             if(leaf){
                 //包含现有
-                if(already>0){
-                    App.ResourceArtifacts.modelSaving.codeIds[already].ruleIds = []
-                }else{
+                if(n=="string"){
                     model.ruleIds = [];
                     App.ResourceArtifacts.modelSaving.codeIds.push(App.ResourceArtifacts.getValid(model));
+                }else{
+                    App.ResourceArtifacts.modelSaving.codeIds[n].ruleIds = []
                 }
+
                 if(this.model.get("code") == App.ResourceArtifacts.Status.rule.targetCode){
                     Backbone.trigger("modelRuleSelectNone");
                 }
@@ -127,7 +136,7 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
                 //移除所有下级菜单
                 if(this.$el.siblings(".childList").find("li").length) {
                     _.each(this.$el.siblings(".childList").find("li"),function (item) {
-                        console.log();
+
                         $(item).attr("data-check", "0");
                         $(item).find(".ruleCheck").removeClass("all").removeClass("half")
                     });
@@ -160,10 +169,11 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
             }
 
             if(leaf){
-                if(already>0){
-                    App.ResourceArtifacts.modelSaving.codeIds[already].ruleIds = App.ResourceArtifacts.getValid(model).ruleIds
-                }else{
+                //包含现有
+                if(n=="string"){
                     App.ResourceArtifacts.modelSaving.codeIds.push(App.ResourceArtifacts.getValid(model));
+                }else{
+                    App.ResourceArtifacts.modelSaving.codeIds[n].ruleIds = App.ResourceArtifacts.getValid(model).ruleIds
                 }
                 //操作右侧全选
                 if(this.model.get("code") == App.ResourceArtifacts.Status.rule.targetCode){
@@ -187,7 +197,6 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
     //为模板-保存数据
     checkControl:function(judge){
         var _this = this,data;
-        //此处需重写，从模型中查找叶子元素
         var type = this.model.get("type") ;
         if(type == "GC"){
             data = App.ResourceArtifacts.allQualityGC;
@@ -197,8 +206,6 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
         var allNode = _.filter(data,function(item){
             return item["parentCode"] == _this.model.get("code")
         });
-
-
         //存在叶子节点
         var isLeaf = _.filter(allNode,function(item){
             return item.leaf
@@ -206,13 +213,14 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
         if(isLeaf.length){
             _.each(isLeaf, function (item) {
                 var model  = item;
+                var val = model.ruleIds;
                 if(judge == "cancel"){
-                    model.ruleIds = [];
+                    val = [];
                 }
                 if(App.ResourceArtifacts.modelSaving.codeIds.length){
                     for(var i = 0 ; i < App.ResourceArtifacts.modelSaving.codeIds.length ; i++){
                         if(model.code == App.ResourceArtifacts.modelSaving.codeIds[i].code){
-                            App.ResourceArtifacts.modelSaving.codeIds[i].ruleIds = model.ruleIds;
+                            App.ResourceArtifacts.modelSaving.codeIds[i].ruleIds = val;
                             return
                         }
                     }
@@ -220,33 +228,36 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
                 App.ResourceArtifacts.modelSaving.codeIds.push(App.ResourceArtifacts.getValid(model));
             });
         }
-
         //存在树枝节点
         var isNotLeaf = _.filter(allNode,function(item){
             return !item.leaf
         });
         if(isNotLeaf.length){
             _.each(isNotLeaf,function(item){
-                if(judge == "cancel"){
-                    item.ruleIds = [];
-                }
-                for(var i = 0 ; i < data.length ; i ++){
-                    if(item.code == data[i].parentCode){
-                        if(App.ResourceArtifacts.modelSaving.codeIds.length){
-                            for(var j = 0 ; j < App.ResourceArtifacts.modelSaving.codeIds.length ; j++){
-                                if(item.code == App.ResourceArtifacts.modelSaving.codeIds[j].code){
-                                    App.ResourceArtifacts.modelSaving.codeIds[j].ruleIds = item.ruleIds;
-                                    return
-                                }
+
+
+                var childrenCode = _.filter(data,function(model){
+                    return item.code == model.parentCode
+                });
+
+                _.each(childrenCode,function(leafNode){
+                    var val = leafNode.ruleIds;
+                    if(judge == "cancel"){
+                        val = [];
+                    }
+                    if(App.ResourceArtifacts.modelSaving.codeIds.length){
+                        for(var j = 0 ; j < App.ResourceArtifacts.modelSaving.codeIds.length ; j++){
+                            if(leafNode.code == App.ResourceArtifacts.modelSaving.codeIds[j].code){
+                                App.ResourceArtifacts.modelSaving.codeIds[j].ruleIds = val;
+                                return
                             }
                         }
-                        App.ResourceArtifacts.modelSaving.codeIds.push(App.ResourceArtifacts.getValid(data[i]))
                     }
-                }
+                    App.ResourceArtifacts.modelSaving.codeIds.push(App.ResourceArtifacts.getValid(leafNode))
+                });
             })
         }
     },
-
 
     //查找所给元素的check元素
     searchSelf:function(ele){

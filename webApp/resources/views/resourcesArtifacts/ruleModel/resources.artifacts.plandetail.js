@@ -56,21 +56,28 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
         App.Resources.cancelBubble(e);
         var ele = $(e.target);
         var model = jQuery.parseJSON(this.$el.attr("data-model")),already;
-        if(App.ResourceArtifacts.modelSaving.codeIds.length){
-            already = _.indexOf(App.ResourceArtifacts.modelSaving.codeIds,function(item){
-                return item.code = model.code
-            });
+
+
+        var modelSaving = App.ResourceArtifacts.modelSaving.codeIds;
+        var n = "string";
+        for(var is = 0 ; is < modelSaving.length ; is++){
+            if(modelSaving[is].code == this.model.get("code")){
+                n = is;
+                break
+            }
         }
+
 
         if(ele.hasClass("all")){
             ele.removeClass("all");
             ele.closest("li").attr("data-check","0");
             //保存提交数据
-            if(already>0){
-                App.ResourceArtifacts.modelSaving.codeIds[already].ruleIds = []
-            }else{
+
+            if( n == "string"){
                 model.ruleIds = [];
                 App.ResourceArtifacts.modelSaving.codeIds.push(App.ResourceArtifacts.getValid(model));
+            }else{
+                App.ResourceArtifacts.modelSaving.codeIds[n].ruleIds = []
             }
 
             if(this.$el.hasClass("active")){
@@ -81,10 +88,10 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
             ele.addClass("all");
             ele.closest("li").attr("data-check","1");
             //保存提交数据
-            if(already>0){
-                App.ResourceArtifacts.modelSaving.codeIds[already].ruleIds = model.ruleIds
-            }else{
+            if( n == "string"){
                 App.ResourceArtifacts.modelSaving.codeIds.push(App.ResourceArtifacts.getValid(model));
+            }else{
+                App.ResourceArtifacts.modelSaving.codeIds[n].ruleIds = model.ruleIds
             }
 
             if(this.$el.hasClass("active")){
