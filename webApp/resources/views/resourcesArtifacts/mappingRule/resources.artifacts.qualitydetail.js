@@ -16,7 +16,7 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
 
     render:function() {
         this.$el.html(this.template(this.model.toJSON()));
-        if (this.model.get("ruleContain") == "1"){
+        if (this.model.get("ruleContain") == 1){
             this.$(".ruleCheck").addClass("all");
         }else if(this.model.get("ruleContain") == 3){
             this.$(".ruleCheck").addClass("half");
@@ -123,20 +123,17 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
                 if(this.model.get("code") == App.ResourceArtifacts.Status.rule.targetCode){
                     Backbone.trigger("modelRuleSelectNone");
                 }
-
+            }else{
+                //移除所有下级菜单
+                if(this.$el.siblings(".childList").find("li").length) {
+                    _.each(this.$el.siblings(".childList").find("li"),function (item) {
+                        console.log();
+                        $(item).attr("data-check", "0");
+                        $(item).find(".ruleCheck").removeClass("all").removeClass("half")
+                    });
+                }
+                this.checkControl("cancel");
             }
-
-            //移除所有下级菜单
-
-            if(this.$el.siblings(".childList").find("li").length) {
-                _.each(this.$el.siblings(".childList").find("li"),function (item) {
-                    console.log();
-                    $(item).attr("data-check", "0");
-                    $(item).find(".ruleCheck").removeClass("all").removeClass("half")
-                });
-            }
-            this.checkControl("cancel");
-
         }else{
             ele.addClass("all").removeClass("half");
             _this.attr("data-check","1");
@@ -172,21 +169,22 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
                 if(this.model.get("code") == App.ResourceArtifacts.Status.rule.targetCode){
                     Backbone.trigger("modelRuleSelectAll");
                 }
-            }
-            //添加所有下级菜单
-            if(this.$el.siblings(".childList").find("li").length) {
-                _.each(this.$el.siblings(".childList").find("li"),function(item){
-                    $(item).attr("data-check","1");
-                    if($(item).hasClass("all")){
-                        return
-                    }
-                    $(item).find(".ruleCheck").removeClass("half").addClass("all")
-                });
-            this.checkControl("check");
+            }else{
+                //添加所有下级菜单
+                if(this.$el.siblings(".childList").find("li").length) {
+                    _.each(this.$el.siblings(".childList").find("li"),function(item){
+                        $(item).attr("data-check","1");
+                        if($(item).hasClass("all")){
+                            return
+                        }
+                        $(item).find(".ruleCheck").removeClass("half").addClass("all")
+                    });
+                    this.checkControl("check");
+                }
             }
         }
     },
-
+    //为模板-保存数据
     checkControl:function(judge){
         var _this = this,data;
         //此处需重写，从模型中查找叶子元素
@@ -290,7 +288,11 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
             return
         }
 
-        this. getRules(item);
+        if(this.model.get("leaf")){
+            this. getRules(item);
+        }else if(!this.$(".item").closest(".title").siblings(".childList").html()){}{
+            this.loadNextTree();
+        }
     },
 //切换计划
     toggleClass:function(item){
@@ -323,21 +325,19 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
     //获取质量标准相关规则
     getRules:function(event) {
         Backbone.trigger("resetRule");
+
         var _this = this,pdata,n = this.$el.closest("li").attr("data-check");
         var parentCode = this.model.get("code");
         var leaf = this.model.get("leaf");
-
+        var ruleContain = this.$el.closest("li").attr("data-ruleContain");
 
         if(!App.ResourceArtifacts.Status.saved){
             return
         }
-        this.loadNextTree();
         App.ResourceArtifacts.Status.rule.targetCode = this.model.get("code");
         App.ResourceArtifacts.Status.rule.targetName = this.model.get("name");
         App.ResourceArtifacts.Status.rule.count = this.model.get("count");
-        if(!leaf){
-            return
-        }
+
 
         this.toggleClass(event);
         //加载规则部分
@@ -360,6 +360,9 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
             if(response.code == 0 ){
                 if(response.data  &&  response.data.length){
                     App.ResourceArtifacts.PlanRules.add(response.data);
+                    if(ruleContain == "1"){
+                        Backbone.trigger("modelRuleSelectAll");
+                    }
                 }else{
                     App.ResourceArtifacts.Status.rule.count  = response.data.length = 0;
                     Backbone.trigger("mappingRuleNoContent")
