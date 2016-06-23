@@ -214,6 +214,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 
 			$projectVersionList.find(".loading").hide();
 			$projectVersionList.find(".listContent").show();
+			$projectVersionList.find('.item.selected').click();
 
 		});
 	},
@@ -229,7 +230,12 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		if (type == "release") {
 			var $releaseVersionBox = $target.closest(".listContent").find(".releaseVersionBox");
 			if ($releaseVersionBox.length <= 0) {
-				$target.closest(".listContent").find(".container").append('<div class="releaseVersionBox">暂无版本</div>');
+				var _null=$('<div class="releaseVersionBox"><span class="GlobalBlankMessage"><i></i>暂无发布版本</span></div>');
+				_null.css({
+					'textAlign':'center',
+					'color':'#ccc'
+				})
+				$target.closest(".listContent").find(".container").append(_null);
 
 			}
 			$target.closest(".listContent").find(".releaseVersionBox").show().siblings().hide();
@@ -238,7 +244,12 @@ App.Project.ProjectContainer = Backbone.View.extend({
 
 			var $changeVersionBox = $target.closest(".listContent").find(".changeVersionBox");
 			if ($changeVersionBox.length <= 0) {
-				$target.closest(".listContent").find(".container").append('<div class="changeVersionBox">暂无版本</div>');
+				var _null=$('<div class="changeVersionBox"><span class="GlobalBlankMessage"><i></i>暂无变更版本</span></div>');
+				_null.css({
+					'textAlign':'center',
+					'color':'#ccc'
+				})
+				$target.closest(".listContent").find(".container").append(_null);
 
 			}
 			$target.closest(".listContent").find(".changeVersionBox").show().siblings().hide();
