@@ -50,6 +50,29 @@ App.Project.DesignCollision=Backbone.View.extend({
 	},
 
 	collPanel:function(){
+		//判断是否重新发送碰撞检测
+		//if($(event.target).text()=="点此重新碰撞"){
+		//	var $selected=$('.collItem.selected');
+		//	if($selected.data('status')==3){
+		//		$.ajax({
+		//			url: "view/"+App.Project.Settings.projectId+"/"+App.Project.Settings.CurrentVersion.id+"/"+$selected.data('id')+"/setting",
+		//			//headers: {
+		//			//	"Content-Type": "application/json"
+		//			//},
+		//			type   : "PUT"
+		//		}
+		//		).done(function(data){
+		//				console.log(data)
+		//			if(data.code == 0){
+		//				App.Project.DesignAttr.CollisionTaskDetail.add({message:"running"});
+		//			}else{
+		//				App.Project.DesignAttr.CollisionTaskDetail.add({message:"failed"});
+		//				alert(data.message);
+		//			}
+		//		});
+		//		return
+		//	}
+		//}
 		var dialog = new App.Comm.modules.Dialog({
 			width: 580,
 			height:360,

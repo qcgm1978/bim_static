@@ -329,9 +329,9 @@ App.ResourceArtifacts={
             pdata.data.projectId = App.ResourceArtifacts.Status.projectId;
         }
         App.ResourceArtifacts.PlanRules.reset();
-        App.ResourceArtifacts.PlanNode.reset();
         App.Comm.ajax(pdata,function(response){
             if(response.code == 0 && response.data){
+                App.ResourceArtifacts.PlanNode.reset();
                 if(response.data.length){
                 App.ResourceArtifacts.PlanNode.add(response.data);
                 }else{

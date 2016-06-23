@@ -30,7 +30,7 @@ App.Resources.ArtifactsTplDetail = Backbone.View.extend({
         App.Resources.ArtifactsAlertWindow = new App.Comm.modules.Dialog({
             title: "",
             width: 280,
-            height: 180,
+            height: 150,
             isConfirm: false,
             isAlert: false,
             message: frame.render().el

@@ -70,22 +70,16 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
             this.$(".ruleCheck").addClass("all")
         }
     },
-
     //查找 项目规则collection，返回规则id数组
     getModelRule:function(){
         return App.ResourceArtifacts.TplCollectionRule.map(function(item){
             return item.get("ruleId");
         })
     },
-
     //选中状态
     ruleCheck:function(e){
         App.Resources.cancelBubble(e);
         var _this = this,id = _this.model.get("id");
-
-
-
-
         //原有的所有数据
         var modelSaving = App.ResourceArtifacts.modelSaving.codeIds;
         //查找当前已选code的并修改其内的ruleId列表
@@ -103,15 +97,12 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
             n = App.ResourceArtifacts.modelSaving.codeIds.length - 1;
         }
 
-
         var ele = $(e.target);
         var allSele = ele.closest("ul").find("li");
         Backbone.trigger("modelRuleHalf");
-
         if(ele.hasClass("all")){
             ele.removeClass("all");
             ele.closest("li").attr("data-check","0");
-
             //触发全不选时右面菜单变化
             var checked1 = _.filter(allSele,function(item){
                 return $(item).attr("data-check") == "1"
@@ -120,7 +111,6 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
                 Backbone.trigger("modelRuleEmpty");
             }
 
-
             var listEle = _.filter($(".outsideList li"),function(item){
                 return $(item).attr("data-check") == "1"
             });
@@ -128,8 +118,6 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
             _.each(listEle,function(item){
                 idList.push($(item).find(".ruleTitle").attr("data-id"));
             });
-
-
             App.ResourceArtifacts.modelSaving.codeIds[n].ruleIds = idList;
 
         }else{
@@ -140,7 +128,6 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
             ele.addClass("all");
             if(!checked2.length){
                 Backbone.trigger("modelRuleFull");
-                return
             }
 
             var listEle2 = _.filter($(".outsideList li"),function(item){
@@ -150,12 +137,9 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
             _.each(listEle2,function(item){
                 idList2.push($(item).find(".ruleTitle").attr("data-id"));
             });
-
             App.ResourceArtifacts.modelSaving.codeIds[n].ruleIds = idList2;
         }
     },
-
-
     getDetail:function(){
         if(this.$(".ruleDetail:visible").length){    //显示
             this.$(".ruleDetail").hide();
