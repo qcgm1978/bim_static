@@ -92,7 +92,6 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
             }
         }
         if( n == "string"){
-
             App.ResourceArtifacts.modelSaving.codeIds.push({code:App.ResourceArtifacts.Status.rule.targetCode,ruleIds:[]});
             n = App.ResourceArtifacts.modelSaving.codeIds.length - 1;
         }
