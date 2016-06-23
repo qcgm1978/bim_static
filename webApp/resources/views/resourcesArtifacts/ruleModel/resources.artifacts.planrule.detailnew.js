@@ -25,8 +25,9 @@ App.Resources.ArtifactsPlanRuleDetailNew = Backbone.View.extend({
 
     //«–ªªπÊ‘Ú
     seleRule:function(e){
-        $(".myDropList").hide();
         var _this = $(e.target);
+        $(".myDropList").hide();
+        App.Resources.cancelBubble(e);
         _this.siblings(".myDropList").show();
     },
 

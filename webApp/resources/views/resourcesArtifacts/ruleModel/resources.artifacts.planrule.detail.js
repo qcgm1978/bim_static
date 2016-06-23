@@ -83,20 +83,25 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
         App.Resources.cancelBubble(e);
         var _this = this,id = _this.model.get("id");
 
+
+
+
         //原有的所有数据
-        var modelSaving = App.ResourceArtifacts.modelSaving;
-
+        var modelSaving = App.ResourceArtifacts.modelSaving.codeIds;
         //查找当前已选code的并修改其内的ruleId列表
-        var  n = _.indexOf(modelSaving,function(item) {
-            return item.code == App.ResourceArtifacts.Status.rule.targetCode
-        });
-        if(n > 0){
-            var ruleIds = App.ResourceArtifacts.modelSaving[n].ruleIds;
-        }
-        var s = _.indexOf(ruleIds,function(item){
-            return item == id;
-        });
 
+        var n = "string";
+        for(var is = 0 ; is < modelSaving.length ; is++){
+            if(modelSaving[is].code == App.ResourceArtifacts.Status.rule.targetCode){
+                n = is;
+                break
+            }
+        }
+        if( n == "string"){
+
+            App.ResourceArtifacts.modelSaving.codeIds.push({code:App.ResourceArtifacts.Status.rule.targetCode,ruleIds:[]});
+            n = App.ResourceArtifacts.modelSaving.codeIds.length - 1;
+        }
 
 
         var ele = $(e.target);
@@ -115,11 +120,17 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
                 Backbone.trigger("modelRuleEmpty");
             }
 
-            //删除
-            if(s>0){
-                ruleIds.splice(s,1);
-            }
 
+            var listEle = _.filter($(".outsideList li"),function(item){
+                return $(item).attr("data-check") == "1"
+            });
+            var idList = [];
+            _.each(listEle,function(item){
+                idList.push($(item).find(".ruleTitle").attr("data-id"));
+            });
+
+
+            App.ResourceArtifacts.modelSaving.codeIds[n].ruleIds = idList;
 
         }else{
             ele.closest("li").attr("data-check","1");
@@ -131,10 +142,16 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
                 Backbone.trigger("modelRuleFull");
                 return
             }
-            //已存在
-            if(s>0){
-                return
-            }
+
+            var listEle2 = _.filter($(".outsideList li"),function(item){
+                return $(item).attr("data-check") == "1"
+            });
+            var idList2 = [];
+            _.each(listEle2,function(item){
+                idList2.push($(item).find(".ruleTitle").attr("data-id"));
+            });
+
+            App.ResourceArtifacts.modelSaving.codeIds[n].ruleIds = idList2;
         }
     },
 
@@ -440,6 +457,7 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
     //切换规则
     seleRule:function(e) {
         var _this = $(e.target);
+        App.Resources.cancelBubble(e);
         $(".myDropList").hide();
         _this.closest(".myDropText").siblings(".myDropList").show();
     },
