@@ -113,11 +113,12 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
 
     //取得规则列表
     getPlanId:function(e){
-
         var $this = $(e.target);
         if($this.closest("li").hasClass("active")){
             return
         }
+
+        App.ResourceArtifacts.Status.check = this.$el.attr("data-check");
 
         if(!App.ResourceArtifacts.Status.saved){
             alert("您还有没保存的");

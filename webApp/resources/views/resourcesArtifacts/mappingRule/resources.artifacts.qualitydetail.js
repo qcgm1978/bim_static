@@ -103,7 +103,7 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
         if(ele.hasClass("all")){
             ele.removeClass("all").removeClass("half");
             _this.attr("data-check","0");
-            //取消所有上级菜单，如果本级都未选中，则上级菜单取消half，如果有选中，则增加half
+            //取消所有上级菜单
             if(father.length){
                 father.attr("data-check","0");
                 var pre = this.searchSelf(father);
@@ -146,8 +146,7 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
         }else{
             ele.addClass("all").removeClass("half");
             _this.attr("data-check","1");
-
-            //选择填充上级菜单，如果本级都未选中，则上级菜单取消half，如果有选中，则增加half
+            //选择填充上级菜单
             if(father.length){
                 father.attr("data-check","1");
                 var pre1 = this.searchSelf(father);

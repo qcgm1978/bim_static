@@ -47,14 +47,12 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
             var check = _.find(modelRule,function(item){
                 return item == _this.model.get("id");
             });
-
             if(check){
                 this.$(".ruleCheck").addClass("all");
                 this.$el.attr("data-check","1");
             }else{
                 this.$el.attr("data-check","0");
             }
-
         }
 
         return this;
@@ -106,11 +104,13 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
 
         var ele = $(e.target);
         var allSele = ele.closest("ul").find("li");
+        //半选状态
         Backbone.trigger("modelRuleHalf");
         if(ele.hasClass("all")){
             ele.removeClass("all");
             ele.closest("li").attr("data-check","0");
-            //触发全不选时右面菜单变化
+
+            //全不选时触发左侧变化
             var checked1 = _.filter(allSele,function(item){
                 return $(item).attr("data-check") == "1"
             });
@@ -129,6 +129,8 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
 
         }else{
             ele.closest("li").attr("data-check","1");
+
+            //全选时触发左侧变化
             var checked2 = _.filter(allSele,function(item){
                 return $(item).attr("data-check") == "0"
             });
