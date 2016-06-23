@@ -35,7 +35,7 @@ App.Services.projectMember.members = Backbone.View.extend({
   				$.tip({message:'删除成功',type:'success'});
     			if(res.message=="success"){
     				//$('#dataLoading').show();
-    				App.Services.projectMember.loadData(App.Services.projectMember.projectMemberMemberCollection,{outer:App.Comm.getCookie("isOuter")},{
+    				App.Services.projectMember.loadData(App.Services.projectMember.projectMemberMemberCollection,{outer:App.Comm.user("outer")},{
 						dataPrivilegeId:App.Comm.getCookie("currentPid")
 					});
     			}

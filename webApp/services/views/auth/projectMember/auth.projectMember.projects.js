@@ -21,7 +21,7 @@ App.Services.projectMember.projects = Backbone.View.extend({
 		if (data.data.length > 0) {
 			var id = data.data[0].id;
 			App.Services.projectMember.loadData(App.Services.projectMember.projectMemberMemberCollection, {
-				outer: App.Comm.getCookie("isOuter")
+				outer: App.Comm.user("outer")
 			}, {
 				dataPrivilegeId: id
 			});
@@ -56,7 +56,7 @@ App.Services.projectMember.projects = Backbone.View.extend({
 		App.Comm.setCookie("currentPid", pid);
 		App.Comm.setCookie("currentProjectName", name);
 		App.Services.projectMember.loadData(App.Services.projectMember.projectMemberMemberCollection, {
-			outer: App.Comm.getCookie("isOuter")
+			outer: App.Comm.user("outer")
 		}, {
 			dataPrivilegeId: pid
 		});

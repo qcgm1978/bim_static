@@ -325,7 +325,7 @@
 						});
 					}
 					
-					inputFile.onchange = function() {
+					inputFile.onchange = function() { 
 						// Add the selected files from file input
 						var files = [];
 						for(var i = 0; i < this.files.length; i++){
@@ -378,6 +378,7 @@
 						}
 					}
 				}
+				
 				if(up.settings.directoryUpload){
 					inputContainer.innerHTML += '<input id="' + uploader.id + '_html5_dir" type="file" accept="' + mimes.join(',') + '" webkitdirectory="">';
 					initBrowseInput(uploader.id + '_html5_dir', up.settings.browse_dir_button);

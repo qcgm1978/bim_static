@@ -166,7 +166,7 @@ App.Project.ProjectDesignPropety = Backbone.View.extend({
 
 				if (_data) {
 					var location = JSON.parse(_data.location),
-						bbox=location.bBox;
+						bbox=location.bBox||location.boundingBox;
 					if(bbox){
 						box = App.Project.formatBBox(bbox);
 						ids=[location.userId];

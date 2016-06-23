@@ -32,10 +32,7 @@
 			alert("缺少参数appKey");
 			return false;
 		}
-		if (!this.Settings.token) {
-			alert("缺少参数token");
-			return false;
-		}
+	 
 		if (!this.Settings.projectId) {
 			alert("缺少参数projectId");
 			return false;
@@ -45,8 +42,9 @@
 			return false;
 		}
 
+
 		//设置cookie
-		if (!this.initCookie()) {
+		if (this.Settings.token && !this.initCookie()) {
 			return;
 		}
 
@@ -106,7 +104,7 @@
 			var Days = 30,
 				exp = new Date();
 			exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 1000);
-			document.cookie = name + "=" + escape(value) + ";expires=" + exp.toGMTString() + ";domain=.wanda-dev.cn";
+			document.cookie = name + "=" + escape(value) + ";expires=" + exp.toGMTString() + ";path=/";
 		},
 		//初始化
 		init() {
