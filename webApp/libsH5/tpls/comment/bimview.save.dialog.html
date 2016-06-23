@@ -12,12 +12,12 @@
 
 
    <% if(cate=='viewPoint'){ %>
-    <div class="myDropDown viewPointType">
+    <div class="myDropDown viewPointType black">
         <span class="myDropText">
-             <i class="m-unlock modelicon"></i> <span class="text"><%=!obj.type? '项目快照':obj.type==1?'项目快照':'个人快照'  %></span> <i class="myDropArrorw"></i> </span>
+             <i class="m-unlock modelicon"></i> <span class="text"><%=!obj.type? '项目批注':obj.type==1?'项目批注':'个人批注'  %></span> <i class="myDropArrorw"></i> </span>
         <ul class="myDropList" style="display: none;">
-            <li data-type="1" class="myItem">项目快照</li>
-            <li data-type="0" class="myItem">个人快照</li>
+            <li data-type="1" class="myItem">项目批注</li>
+            <li data-type="0" class="myItem">个人批注</li>
         </ul>
     </div>
     <% } %>
