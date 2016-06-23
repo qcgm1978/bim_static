@@ -496,7 +496,6 @@
       var viewer = self.viewer;
       var modelBgColor = self._dom.bimBox.find('.view').css('background-color');
       self._dom.bimBox.attr('class','bim comment');
-      viewer.setCommentMode();
       viewer.editCommentBegin();
       viewer.setCommentBackgroundColor(modelBgColor);
       if(data){
@@ -556,11 +555,11 @@
       $.each(data.list,function(i,item){
         newList.push(JSON.parse(window.atob(item)));
       });
+      viewer.loadComments(newList);
       data.filter.floors.ids = data.filter.floors.ids.concat(data.filter.specialty.ids);
       self.fileFilter(data.filter.floors);
       self.filter(data.filter.category);
       self.filter(data.filter.classCode);
-      viewer.setCommentMode();
     },
     // 模型过滤器
     filter:function(obj){
