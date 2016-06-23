@@ -79,12 +79,17 @@
         },
         click:function(res){
           self.pub('click',res);
+        },
+        empty:function(res){
+          _opt._dom.bimBox.append('<div class="tips"><i class="icon"></i>无法三维预览，请下载查看</div>');
+          self.pub('empty',res);
         }
       }
       self.on('start',loadEvent.start);
       self.viewer.registerEventListener(CLOUD.EVENTS.ON_SELECTION_CHANGED, loadEvent.click);
       self.viewer.registerEventListener(CLOUD.EVENTS.ON_LOAD_PROGRESS, loadEvent.loading);
       self.viewer.registerEventListener(CLOUD.EVENTS.ON_LOAD_COMPLETE, loadEvent.loaded);
+      self.viewer.registerEventListener(CLOUD.EVENTS.ON_LOAD_EMPTYSCENE, loadEvent.empty);
       self.viewer.registerEventListener(CLOUD.EVENTS.ON_UPDATE_SELECTION_UI, function (evt) {
         var selectionUI;
         if(!self.selectionStatue){
