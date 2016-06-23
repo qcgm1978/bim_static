@@ -214,6 +214,7 @@ App.API = {
 		createArtifactsTemplate: "platform/rule/template/create", //创建模板
 		fetchArtifactsTemplateRule: "platform/rule/template/select/rule/{templateId}", //模板规则列表  platform/rule/template/select/rule/{templateId}
 		saveArtifactsTemplateRule: "platform/rule/template/update", //模板规则列表
+		fetchArtifactsProjectName :"platform/rule/template/select/project/info/{projectId}",//platform/rule/template/select/project/info/{projectId}
 
 		modifyProjectMappingRule:"platform/rule/template/update/project/{projectId}/{templateId}",    //修改项目规则模板
 

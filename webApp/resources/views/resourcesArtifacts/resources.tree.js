@@ -63,6 +63,8 @@ App.Resources.artifactsQualityTree = function(dataList,n){
         if(n == "1"){
             as.$(".ruleCheck").addClass("all");
             li.attr("data-check",n);
+        }else{
+            li.attr("data-check",a);
         }
 
         li.append(as.el);

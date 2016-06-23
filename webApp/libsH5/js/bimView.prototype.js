@@ -457,7 +457,6 @@
       // 进入添加检查点模式
       var self = this;
       var viewer = self.viewer;
-      viewer.setMarkerMode();
       viewer.editMarkerBegin();
     },
     markerEnd : function() {
@@ -567,7 +566,6 @@
       var self = this;
       var viewer = self.viewer;
       var filter = viewer.getFilters();
-      if(obj.ids.length ==0) return;
       filter.removeUserFilter(obj.type);
       $.each(obj.ids,function(i,id){
         filter.addUserFilter(obj.type,id);

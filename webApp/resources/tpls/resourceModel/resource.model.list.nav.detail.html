@@ -16,7 +16,7 @@
 
 
 <% if(folder){%>
-    <span data-id="<%=id%>" data-isfolder="<%=folder%>" class="text <%= id=='createNew'?'hidden':'' %>">
+    <span data-id="<%=id%>" data-isfolder="<%=folder%>" title="<%= name %>" class="text overflowEllipsis <%= id=='createNew'?'hidden':'' %>">
      <%= App.ResourceModel.getName(name)%></span>
     <% if(id=='createNew'){%>
     	<input type="text" value="<%=name%>" class="txtEdit txtInput" /> 

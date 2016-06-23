@@ -25,7 +25,7 @@
 
 <span class="fileName">
 
- <span data-id="<%=id%>" title="<%=name%>" data-isfolder="<%=folder%>" class="text <%= id=='createNew'?'hidden':'' %>">
+ <span data-id="<%=id%>" title="<%=name%>" data-isfolder="<%=folder%>" class="text overflowEllipsis <%= id=='createNew'?'hidden':'' %>">
   <%= App.ResourceModel.getName(name)  %> </span>
 
 <%if(folder){%> 

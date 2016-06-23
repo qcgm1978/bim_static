@@ -228,7 +228,7 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 		};
 
 		App.Comm.ajax(data, function(data) {
-			if (data.message == "success") {
+			if (data.code == 0) {
 				var models = App.ResourceModel.FileCollection.models,
 					id = data.data.id;
 				$.each(models, (i, model) => {
@@ -287,7 +287,7 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 		};
 
 		App.Comm.ajax(data, function(data) {
-			if (data.message == "success") {
+			if (data.code == 0) {
 
 				var id = data.data.id,
 					isExists = false;
@@ -317,6 +317,8 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 				//$("#resourceModelLeftNav .treeViewMarUl span[data-id='" + id + "']").text(name);
 
 
+			}else{
+				alert(data.message);
 			}
 		});
 
