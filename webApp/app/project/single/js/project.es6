@@ -4,7 +4,7 @@ App.Project = {
 		projectId: "",
 		projectVersionId: "",
 		famHtml: "",
-		axisHtm:"",
+		axisHtm: "",
 		modelId: ""
 	},
 
@@ -97,13 +97,13 @@ App.Project = {
 					} else if (data.data.modelStatus == 3) {
 						alert("转换失败");
 						return;
-					} 
+					}
 
 					//dwg 格式
 					if (data.data.suffix == "dwg") {
 						App.Project.renderDwg(data.data.modelId);
 					} else {
-						App.Project.renderOther(data.data.modelId,data.data.suffix);
+						App.Project.renderOther(data.data.modelId, data.data.suffix);
 					}
 
 
@@ -117,19 +117,19 @@ App.Project = {
 	},
 
 	// 除 dwg以外的格式
-	renderOther(modelId,type) {
+	renderOther(modelId, type) {
 		var typeMap = {
-			rte:'singleModel',
-			rvt:'singleModel',
-			rfa:'familyModel'
+			rte: 'singleModel',
+			rvt: 'singleModel',
+			rfa: 'familyModel'
 		}
 		$(".rightProperty").show();
 		App.Project.Settings.Viewer = new bimView({
 			element: $("#modelBox"),
 			etag: modelId,
-			type:typeMap[type],
+			type: typeMap[type],
 			callback: function(id) {
-				App.Project.renderAttr(id,1);
+				App.Project.renderAttr(id, 1);
 			}
 		});
 
@@ -137,7 +137,7 @@ App.Project = {
 		App.Project.Settings.Viewer.on("changType", function(id) {
 			if (id) {
 				App.Project.Settings.typeId = id;
-				App.Project.renderAttr(id,2);
+				App.Project.renderAttr(id, 2);
 			}
 		})
 
@@ -145,7 +145,7 @@ App.Project = {
 		App.Project.Settings.Viewer.on("click", function(model) {
 
 			if (!model.intersect) {
-				App.Project.renderAttr(App.Project.Settings.typeId,2);
+				App.Project.renderAttr(App.Project.Settings.typeId, 2);
 				return;
 			}
 			//渲染属性
@@ -163,6 +163,38 @@ App.Project = {
 			element: $("#modelBox"),
 			sourceId: modelId
 		});
+
+	},
+
+	//模型属性 dwg 图纸
+	attrDwg: function() {
+
+		var that = this,
+
+			url = '/doc/' + App.Project.Settings.projectId + '/' + App.Project.Settings.projectVersionId + '/file/tag',
+
+			liTpl = '<li class="modleItem"><a data-id="<%=id%>" href="/static/dist/app/project/single/filePreview.html?id={id}&projectId=' + App.Project.Settings.projectId + '&projectVersionId=' + App.Project.Settings.projectVersionId + '" target="_blank" ><div class="modleNameText overflowEllipsis modleName2">varName</div></a></li>';
+
+		that = this;
+
+		$.ajax({
+			url: url,
+			data: {
+				modelId: App.Project.Settings.modelId
+			}
+		}).done(function(data) {
+
+			if (data.code == 0) {
+				if (data.data.length > 0) {
+					var lis = '';
+					$.each(data.data, function(i, item) {
+						lis += liTpl.replace("varName", item.name).replace('{id}', item.id);
+					});
+					$("#projectContainer .attrDwgBox").show().find(".modleList").html(lis);
+				}
+			}
+
+		}); 
 
 	},
 
@@ -206,7 +238,11 @@ App.Project = {
 	renderAttr(elementId, type) {
 
 
-		var url = "/sixD/" + App.Project.Settings.projectId + "/" + App.Project.Settings.projectVersionId + "/property";
+		var url = "/sixD/" + App.Project.Settings.projectId + "/" + App.Project.Settings.projectVersionId + "/property",
+
+			that = this;
+
+
 		$.ajax({
 			url: url,
 			data: {
@@ -217,6 +253,7 @@ App.Project = {
 			var template = App.Project.templateUrl("/projects/tpls/project/design/project.design.property.properties.html"),
 				html = template(data.data);
 
+			that.attrDwg(elementId);
 
 			if (type == 1) {
 				App.Project.Settings.famHtml = html;
@@ -228,10 +265,9 @@ App.Project = {
 						$("#projectContainer .designProperties").append(html);
 
 					} else {
-						App.Project.Settings.axisHtm=html;
+						App.Project.Settings.axisHtm = html;
 						App.Project.renderAxisComm();
 					}
-
 
 				} else {
 					$("#projectContainer .designProperties").html(html);
