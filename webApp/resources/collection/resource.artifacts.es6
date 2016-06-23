@@ -243,12 +243,11 @@ App.ResourceArtifacts={
             _this.$el.append(this.ArtifactsIndexNav.render().el);
         }else{
             //项目
+            App.ResourceArtifacts.Status.projectId  = optionType;
             this.ArtifactsProjectBreadCrumb = new App.Resources.ArtifactsProjectBreadCrumb();
             _this.$el.html(this.ArtifactsProjectBreadCrumb.render().el);
-
             //项目映射规则名称
             App.ResourceArtifacts.Status.projectName = App.Comm.publicData.services.project.projectName;
-            this.getProjetName();
         }
 
         //公用组件
@@ -288,10 +287,11 @@ App.ResourceArtifacts={
             this.menu.$(".rules").html(this.planRuleTitle.render().el);//映射规则
             this.planRuleTitle.$(".ruleContentRuleList").html(this.planRule.render().el);//映射规则
             //写入项目名称
-            _this.$(".projectName").html( App.ResourceArtifacts.Status.projectName);
+            if(App.ResourceArtifacts.Status.projectId){
+               this.getProjectName(_this,App.ResourceArtifacts.Status.projectId)
+            }
 
             //读入数据
-
             this.getPlan();
             this.getAllQuality(function(data){
                 App.ResourceArtifacts.departQuality(App.ResourceArtifacts.menu.$(".qualityMenuListGC"),App.ResourceArtifacts.allQualityGC,null,"0");
@@ -302,10 +302,19 @@ App.ResourceArtifacts={
         }
         $(".resourcesMappingRule").show();
     },
-
-    //获取xian项目名称
-    getProjetName:function(){
-        //platform/rule/template/select/project/info/{projectId}
+    //获取项目名称
+    getProjectName:function(_this,projectId){
+        var pdata = {
+            URLtype: "fetchArtifactsProjectName",
+            data:{
+                projectId:projectId
+            }
+        };
+        App.Comm.ajax(pdata,function(response){
+            if(response.code == 0){
+                _this.$(".projectName").html( response.data.name);
+            }
+        });
     },
     // 获取分类编码
     loaddeaprt:function(){
