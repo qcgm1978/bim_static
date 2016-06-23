@@ -36,7 +36,13 @@ App.Project.DesignCollision=Backbone.View.extend({
 		}
 		$(document).on('click',that.hideSelectList);
 	},
-
+	//重新请求列表
+	refreshSelectList:function(){
+		// 显示碰撞任务列表
+		App.Project.DesignAttr.CollisionTaskList.projectId = App.Project.Settings.CurrentVersion.projectId;
+		App.Project.DesignAttr.CollisionTaskList.projectVerionId = App.Project.Settings.CurrentVersion.id;
+		App.Project.DesignAttr.CollisionTaskList.fetch();
+	},
 	hideSelectList:function(event){
 		// 隐藏碰撞任务列表
 		var that = this;
@@ -50,29 +56,34 @@ App.Project.DesignCollision=Backbone.View.extend({
 	},
 
 	collPanel:function(){
+		var self = this;
 		//判断是否重新发送碰撞检测
-		//if($(event.target).text()=="点此重新碰撞"){
-		//	var $selected=$('.collItem.selected');
-		//	if($selected.data('status')==3){
-		//		$.ajax({
-		//			url: "view/"+App.Project.Settings.projectId+"/"+App.Project.Settings.CurrentVersion.id+"/"+$selected.data('id')+"/setting",
-		//			//headers: {
-		//			//	"Content-Type": "application/json"
-		//			//},
-		//			type   : "PUT"
-		//		}
-		//		).done(function(data){
-		//				console.log(data)
-		//			if(data.code == 0){
-		//				App.Project.DesignAttr.CollisionTaskDetail.add({message:"running"});
-		//			}else{
-		//				App.Project.DesignAttr.CollisionTaskDetail.add({message:"failed"});
-		//				alert(data.message);
-		//			}
-		//		});
-		//		return
-		//	}
-		//}
+		if($(event.target).text()=="点此重新碰撞"){
+			var $selected=$('.collItem.selected');
+			if($selected.data('status')==3){
+				$.ajax({
+					url: "view/"+App.Project.Settings.projectId+"/"+App.Project.Settings.CurrentVersion.id+"/"+$selected.data('id')+"/setting",
+					//headers: {
+					//	"Content-Type": "application/json"
+					//},
+					type   : "PUT"
+				}
+				).done(function(data){
+						console.log(data)
+					if(data.code == 0){
+						App.Project.DesignAttr.CollisionTaskDetail.add({message:"running"});
+						self.refreshSelectList();
+					}else if(data.code == 30009){
+						$('.designCollision .collTips p').text("文件发生变更，无法重新碰撞，请新建碰撞");
+					}else{
+						App.Project.DesignAttr.CollisionTaskDetail.add({message:"failed"});
+						alert(data.message);
+					}
+
+				});
+				return
+			}
+		}
 		var dialog = new App.Comm.modules.Dialog({
 			width: 580,
 			height:360,
@@ -116,7 +127,9 @@ App.Project.DesignCollision=Backbone.View.extend({
 		      	App.Project.DesignAttr.CollisionTaskDetail.add({message:"failed"});
 		        alert(data.message);
 		      }
-		    });
+		      self.refreshSelectList();
+
+	      });
 			}
 		})
 		function getSpecialty(element){
