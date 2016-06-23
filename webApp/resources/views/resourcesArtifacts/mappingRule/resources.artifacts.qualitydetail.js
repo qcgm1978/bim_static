@@ -120,11 +120,14 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
                     model.ruleIds = [];
                     App.ResourceArtifacts.modelSaving.codeIds.push(App.ResourceArtifacts.getValid(model));
                 }
-                //Backbone.trigger("modelRuleSelectNone");
+                if(this.model.get("code") == App.ResourceArtifacts.Status.rule.targetCode){
+                    Backbone.trigger("modelRuleSelectNone");
+                }
+
             }
 
             //移除所有下级菜单
-            console.log(this.$el.siblings(".childList").find("li"));
+
             if(this.$el.siblings(".childList").find("li").length) {
                 _.each(this.$el.siblings(".childList").find("li"),function (item) {
                     console.log();
@@ -166,7 +169,9 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
                     App.ResourceArtifacts.modelSaving.codeIds.push(App.ResourceArtifacts.getValid(model));
                 }
                 //操作右侧全选
-                //Backbone.trigger("modelRuleSelectAll");
+                if(this.model.get("code") == App.ResourceArtifacts.Status.rule.targetCode){
+                    Backbone.trigger("modelRuleSelectAll");
+                }
             }
             //添加所有下级菜单
             if(this.$el.siblings(".childList").find("li").length) {
@@ -177,9 +182,7 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
                     }
                     $(item).find(".ruleCheck").removeClass("half").addClass("all")
                 });
-
             this.checkControl("check");
-
             }
         }
     },
@@ -245,10 +248,6 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
             })
         }
     },
-
-
-
-
 
 
     //查找所给元素的check元素
