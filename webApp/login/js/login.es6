@@ -91,12 +91,13 @@ var Login = {
 			}
 		}).done(function(data) {
 			if (data.code == 0) { 
+
 				if (data.data && typeof data.data === 'object') {
 					for (var p in data.data) {
 						Login.setCookie(p, data.data[p]);
 					}
-				}
-
+				} 
+				//debugger
 				//获取用户信息
 				Login.getUserInfo();
 
@@ -117,6 +118,7 @@ var Login = {
 		$.ajax({
 			url: '/platform/user/current'
 		}).done(function(data) {
+		
 			//获取referer returnurl 进行重定向
 			var r=document.URL.split('ReturnUrl=').pop();
 			//失败

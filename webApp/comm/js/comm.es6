@@ -3,23 +3,23 @@ App.Comm = {
 	Settings: {
 		v: 20160312,
 		loginType: "user", // 登录状态 user token
-		pageItemCount: 30 //Math.floor(($("body").height() + 60) / 70) > 10 && Math.floor(($("body").height() + 60) / 70) || 10
+		pageItemCount: 10 //Math.floor(($("body").height() + 60) / 70) > 10 && Math.floor(($("body").height() + 60) / 70) || 10
 	},
 
 	//项目版本状态
 	versionStatus: {
 		"1": "待上传",
-		"2": "上传中", 
+		"2": "上传中",
 		"3": "待审核",
 		"4": "审核中",
 		"5": "审核通过",
 		"6": "审核退回",
 		"7": "待移交",
 		"8": "移交退回",
-		"9": "已移交" 
+		"9": "已移交"
 	},
 	//项目版本状态
-	modelStatus: { 
+	modelStatus: {
 		"1": "待上传",
 		"2": "上传中",
 		"3": "待审核",
@@ -28,19 +28,19 @@ App.Comm = {
 		"6": "审核退回",
 		"7": "待发布",
 		"8": "发布退回",
-		"9": "已发布" 
+		"9": "已发布"
 	},
 
-	formatStatus:function(status,type){
-		if(type==1){
-			return App.Comm.versionStatus[status]||'';
-		}else if(type==2){
-			return App.Comm.modelStatus[status]||'';
+	formatStatus: function(status, type) {
+		if (type == 1) {
+			return App.Comm.versionStatus[status] || '';
+		} else if (type == 2) {
+			return App.Comm.modelStatus[status] || '';
 		}
 		return '';
 	},
 	//文件状态转换
-	convertStatus: function(status) { 
+	convertStatus: function(status) {
 
 		var result = "";
 		if (status == 1) {
@@ -66,8 +66,13 @@ App.Comm = {
 		return result;
 	},
 
-	user:function(key){
-		return App.Global.User[key]
+	user: function(key) {
+
+		if (!App.Global.User) {
+			window.location.href="/login.html";
+		}
+
+		return  App.Global.User[key];
 	},
 
 	//封装ajax
@@ -109,7 +114,7 @@ App.Comm = {
 			if ($.isFunction(callback)) {
 				//回调
 				callback(data);
-			} 
+			}
 
 		});
 
@@ -185,6 +190,14 @@ App.Comm = {
 		if (cval != null)
 			document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString() + ";path=/";
 	},
+
+	clearCookie() {
+		var keys = document.cookie.match(/[^ =;]+(?=\=)/g);
+		if (keys) {
+			for (var i = keys.length; i--;)
+				document.cookie = keys[i] + '=0;expires=' + new Date(0).toUTCString()
+		}
+	},
 	//格式化 文件大小
 	formatSize: function(size) {
 		if (size === undefined || /\D/.test(size)) {
@@ -200,7 +213,7 @@ App.Comm = {
 		} else {
 			return size + 'b';
 		}
-	}, 
+	},
 
 	//收起和暂开
 	navBarToggle: function($el, $content, dirc, Viewer) {
@@ -422,8 +435,8 @@ App.Comm = {
 App.Comm.modules = {};
 //跨路由调用数据
 App.Comm.publicData = {
-	services:{
-		project:{
+	services: {
+		project: {
 			projectId: "",
 			projectName: ""
 		}
