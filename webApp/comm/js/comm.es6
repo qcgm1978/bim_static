@@ -411,9 +411,6 @@ App.Comm = {
 			}, _this._userData.timeout || 2000)
 		}
 	})
-
-
-
 };
 
 
