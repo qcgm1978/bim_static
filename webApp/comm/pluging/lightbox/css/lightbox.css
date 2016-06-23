@@ -181,6 +181,7 @@ body.lb-disable-scrolling {
   padding-bottom: 1em;
   font-size: 12px;
   color: #999999;
+  display: none;
 }
 
 .lb-data .lb-close {
@@ -197,6 +198,9 @@ body.lb-disable-scrolling {
   -moz-transition: opacity 0.2s;
   -o-transition: opacity 0.2s;
   transition: opacity 0.2s;
+  position: fixed;
+  right: 10px;
+  top: 10px;
 }
 
 .lb-data .lb-close:hover {
