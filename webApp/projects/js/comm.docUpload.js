@@ -23,7 +23,7 @@
             App.Comm.upload.init(upload, {
 
                 getParentId: function() {
-                    return App.Project.Settings.fileId; 
+                    return App.Project.Settings.fileId;
                 },
 
                 getQuotaInfo: function() {
@@ -35,7 +35,7 @@
 
                     if (App.Project.Settings.fileId) {
                         return true;
-                    }else{
+                    } else {
                         return false;
                     }
                     //return App.Comm.modules.util.canUploadFile()
@@ -49,17 +49,17 @@
 
                 //获取上传url
                 getUploadUrl: function(file) {
-                  
-               
+
+
                     var data = {
                         data: {
                             projectId: App.Project.Settings.projectId,
                             projectVersionId: App.Project.Settings.CurrentVersion.id
-                        }, 
+                        },
                         URLtype: "uploadFile"
-                    }; 
+                    };
 
-                    return  App.Comm.getUrlByType(data).url; 
+                    return App.Comm.getUrlByType(data).url;
 
 
                     //return "http://172.16.233.210:8080/bim/api/1232321/file/data?fileId=444444444444";
@@ -70,16 +70,20 @@
                 },
 
                 //上传成功
-                fileUploaded: function(response, file) {  
+                fileUploaded: function(response, file) {
 
 
-                     var data=JSON.parse(response.response);
-                     //上传成功 且 是在当前文件夹下 才显示 上传的文件
-                     if (App.Project.Settings.fileId && data.code==0) {
-                        if (App.Project.Settings.fileId==data.data.parentId) {
-                            App.Project.FileCollection.push(data.data); 
+                    var data = JSON.parse(response.response);
+                    //上传成功 且 是在当前文件夹下 才显示 上传的文件
+                    if (App.Project.Settings.fileId && data.code == 0) {
+                        //文件夹
+                        if (data.data.folder) {
+                            App.Project.afterCreateNewFolder(data.data, data.data.parentId);
                         }
-                     }                     
+                        if (App.Project.Settings.fileId == data.data.parentId) {
+                            App.Project.FileCollection.push(data.data);
+                        }
+                    }
                 },
 
                 //上传失败

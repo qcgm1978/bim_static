@@ -1,7 +1,7 @@
 var Login = {
 
 	setCookie(name, value) {
-		var Days = 30,
+		var Days = 0.02,
 			exp = new Date();
 		exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 1000);
 		document.cookie = name + "=" + escape(value) + ";expires=" + exp.toGMTString() + ";";
@@ -25,7 +25,7 @@ var Login = {
 
 	//事件绑定
 	bindEvent() {
-		var $remeber=$("#mainBox .remember");
+		var $remeber = $("#mainBox .remember");
 		//登录
 		$("#btnLogin").on("click", function() {
 			Login.signIn();
@@ -50,7 +50,7 @@ var Login = {
 		$remeber.on("click", function() {
 			$(this).toggleClass("selected");
 		});
-		if(Login.getCookie("isAutoLogin")=='true'){
+		if (Login.getCookie("isAutoLogin") == 'true') {
 			$remeber.click();
 		}
 
@@ -90,13 +90,13 @@ var Login = {
 				password: userPwd
 			}
 		}).done(function(data) {
-			if (data.code == 0) { 
+			if (data.code == 0) {
 
 				if (data.data && typeof data.data === 'object') {
 					for (var p in data.data) {
 						Login.setCookie(p, data.data[p]);
 					}
-				} 
+				}
 				//debugger
 				//获取用户信息
 				Login.getUserInfo();
@@ -118,11 +118,11 @@ var Login = {
 		$.ajax({
 			url: '/platform/user/current'
 		}).done(function(data) {
-		
+
 			//获取referer returnurl 进行重定向
-			var r=document.URL.split('ReturnUrl=').pop();
+			var r = document.URL.split('ReturnUrl=').pop();
 			//失败
-			if (data.code!=0) {
+			if (data.code != 0) {
 				$("#mainBox .errorMSG").addClass('show').find(".tip").text("获取用户信息失败");
 				$("#btnLogin").val("立即登录").data("islogin", false);
 				return;
@@ -131,7 +131,7 @@ var Login = {
 			localStorage.setItem("user", JSON.stringify(data.data))
 			Login.setCookie('userId', data.data.userId);
 			Login.setCookie('isOuter', data.data.outer);
-
+			 
 			//记住我
 			if ($(".loginDialog .remember").hasClass("selected")) {
 				Login.rememberMe();
@@ -139,12 +139,12 @@ var Login = {
 				Login.setCookie("isAutoLogin", false);
 			}
 			//是否主动退出标记 2 默认状态 1 为主动退出
-			Login.setCookie('IS_OWNER_LOGIN','2');
+			Login.setCookie('IS_OWNER_LOGIN', '2');
 			Login.delCookie("token_cookie");
-			if(r && r != document.URL){
-				window.location=decodeURIComponent(r);
-			}else{
-				window.location.href='/index.html';
+			if (r && r != document.URL) {
+				window.location = decodeURIComponent(r);
+			} else {
+				window.location.href = '/index.html';
 			}
 		});
 	},
@@ -180,7 +180,7 @@ var Login = {
 
 				diffMillisecond = 24 * 7 * 60 * 60 * 1000;
 			//7 天内
-			if ((new Date() - setDate) <= diffMillisecond && Login.getCookie('IS_OWNER_LOGIN')=='2') {
+			if ((new Date() - setDate) <= diffMillisecond && Login.getCookie('IS_OWNER_LOGIN') == '2') {
 				//获取用户名
 				$("#userName").val(Login.getCookie("userName"));
 				$("#userPwd").val(Login.getCookie("userPwd"));
