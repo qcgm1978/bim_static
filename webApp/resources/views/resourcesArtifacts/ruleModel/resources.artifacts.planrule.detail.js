@@ -37,16 +37,24 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
         this.$el.html(this.template()(this.model.toJSON()));
 
         //写入是否选中
-        var modelRule = this.getModelRule();
-        var check = _.find(modelRule,function(item){
-            return item == _this.model.get("id");
-        });
-
-        if(check){
+        if(App.ResourceArtifacts.Status.check == "1"){
             this.$(".ruleCheck").addClass("all");
-            this.$el.attr("data-check","1");
+            this.$el.attr("data-check",App.ResourceArtifacts.Status.check );
+        }else if(App.ResourceArtifacts.Status.check == "0"){
+            this.$el.attr("data-check",App.ResourceArtifacts.Status.check );
         }else{
-            this.$el.attr("data-check","0");
+            var modelRule = this.getModelRule();
+            var check = _.find(modelRule,function(item){
+                return item == _this.model.get("id");
+            });
+
+            if(check){
+                this.$(".ruleCheck").addClass("all");
+                this.$el.attr("data-check","1");
+            }else{
+                this.$el.attr("data-check","0");
+            }
+
         }
 
         return this;

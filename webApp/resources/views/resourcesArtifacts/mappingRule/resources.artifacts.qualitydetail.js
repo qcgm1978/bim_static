@@ -234,12 +234,9 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
         });
         if(isNotLeaf.length){
             _.each(isNotLeaf,function(item){
-
-
                 var childrenCode = _.filter(data,function(model){
                     return item.code == model.parentCode
                 });
-
                 _.each(childrenCode,function(leafNode){
                     var val = leafNode.ruleIds;
                     if(judge == "cancel"){
@@ -258,7 +255,6 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
             })
         }
     },
-
     //查找所给元素的check元素
     searchSelf:function(ele){
         var childList = ele.find(".childList");
@@ -267,8 +263,7 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
         });
         return   $(pre).eq(0).siblings(".title").find(".ruleCheck");
     },
-
-
+    //数量更改时的操作
     changeCount:function(){
         var count = App.ResourceArtifacts.Status.rule.count;
         if(this.model.get("code") ==App.ResourceArtifacts.Status.rule.targetCode ){
@@ -276,7 +271,6 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
             this.$(".count").text("("+ count + ")");
         }
     },
-
     //取得规则列表
     getDetail:function(e){
         this.$(".fold").addClass("active");
@@ -291,14 +285,11 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
             this.$(".fold").removeClass("active");
             return
         }
-
         var item = $(e.target);
-
         if(!App.ResourceArtifacts.Status.saved){
             alert("您还有没保存的");
             return
         }
-
         if(this.model.get("leaf")){
             this. getRules(item);
         }else if(!this.$(".item").closest(".title").siblings(".childList").html()){}{
@@ -335,20 +326,19 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
 
     //获取质量标准相关规则
     getRules:function(event) {
-        Backbone.trigger("resetRule");
-
-        var _this = this,pdata,n = this.$el.closest("li").attr("data-check");
-        var parentCode = this.model.get("code");
-        var leaf = this.model.get("leaf");
-        var ruleContain = this.$el.closest("li").attr("data-ruleContain");
-
+        Backbone.trigger("resetRule");//重置右侧规则
         if(!App.ResourceArtifacts.Status.saved){
             return
         }
+        var _this = this,pdata;
+        var parentCode = this.model.get("code");
+        var leaf = this.model.get("leaf");
+        var ruleContain = this.$el.closest("li").attr("data-ruleContain");
+        App.ResourceArtifacts.Status.check = this.$el.closest("li").attr("data-check");
+
         App.ResourceArtifacts.Status.rule.targetCode = this.model.get("code");
         App.ResourceArtifacts.Status.rule.targetName = this.model.get("name");
         App.ResourceArtifacts.Status.rule.count = this.model.get("count");
-
 
         this.toggleClass(event);
         //加载规则部分
@@ -365,7 +355,7 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
             }
         };
         App.ResourceArtifacts.Status.rule.biz = pdata.data.biz = 2 ;
-        App.ResourceArtifacts.loading();
+        App.ResourceArtifacts.loading($(".rules"));
         App.ResourceArtifacts.PlanRules.reset();
         App.Comm.ajax(pdata,function(response){
             if(response.code == 0 ){
