@@ -95,7 +95,7 @@
       icon:'m-zoom',
       title:'缩放(Z)',
       fn:'zoom',
-      keyCode:'122',
+      keyCode:'',
       type:'pattern',
       group:'3'
     },{
@@ -103,7 +103,7 @@
       icon:'m-fit',
       title:'适应窗口(I)',
       fn:'fit',
-      keyCode:'105',
+      keyCode:'',
       type:'viewer'
     },
     {
@@ -205,7 +205,7 @@
         id:'southEast',
         icon:'i-southEast',
         title:'西南方向',
-        fn:'southEast',
+        fn:'southWest',
         type:'view',
         group:'4'
       },{
@@ -256,7 +256,7 @@
       icon:'m-zoom',
       title:'缩放(Z)',
       fn:'zoom',
-      keyCode:'122',
+      keyCode:'',
       type:'pattern',
       group:'3'
     },{
@@ -264,7 +264,7 @@
       icon:'m-fit',
       title:'适应窗口(I)',
       fn:'fit',
-      keyCode:'105',
+      keyCode:'',
       type:'viewer',
       group:'2'
     },
