@@ -93,7 +93,7 @@ App.Project.ProjectDesignPropety = Backbone.View.extend({
 		if (type == "collision") {
 			//碰撞
 			this.$el.find(".detailList").show().siblings().hide();
-
+			$('.detailList .currColl').trigger('click');
 		} else if (type == "verifi") {
 
 			//设计检查  
