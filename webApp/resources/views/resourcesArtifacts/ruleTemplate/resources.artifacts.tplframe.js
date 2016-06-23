@@ -62,6 +62,7 @@ App.Resources.ArtifactsTplFrame = Backbone.View.extend({
             App.ResourceArtifacts.departQuality(_this.menu.$(".qualityMenuListGC"),App.ResourceArtifacts.allQualityGC,null,"0");
             _this.menu.$(".qualityMenuListGC").show();
             App.ResourceArtifacts.departQuality(_this.menu.$(".qualityMenuListKY"),App.ResourceArtifacts.allQualityKY,null,"0");
+            _this.$(".tplContent").removeClass("services_loading");
         });
     },
 
@@ -80,15 +81,14 @@ App.Resources.ArtifactsTplFrame = Backbone.View.extend({
                     _this.menu.$(".plans").html(_this.plans.render().el);
                     _this.menu.$(".rules .ruleContent").html(_this.planRule.render().el);
                     App.ResourceArtifacts.TplCollectionRule.add(response.data);
-                    $(".tplContent").removeClass("services_loading");
                     _this.menu.$(".artifactsContent .default").hide();
                     _this.menu.$(".artifactsContent .plans").show();
                     _this.menu.$(".artifactsContent .rules").show();
                 }else{
                     //没有任何规则时候，创建规则按钮
                     _this.menu.$(".artifactsContent .default").siblings().hide();
-                    $(".tplContent").removeClass("services_loading");
                 }
+                _this.$(".tplContent").removeClass("services_loading");
             }
         })
     }

@@ -230,8 +230,9 @@ App.ResourceArtifacts={
     })),
 
     init:function(_this,optionType) {
-        _this.$(".breadcrumbNav span").eq(3).hide();
-        _this.$(".breadcrumbNav span").eq(4).hide();
+        _this.$(".breadcrumbNav .breadItem").hide();
+        _this.$(".breadcrumbNav .fileNav").hide();
+        _this.$(".breadcrumbNav .breadItem.project").show();
         $("#artifacts").addClass("services_loading");
         this.loaddeaprt();//分类编码
 
@@ -244,8 +245,10 @@ App.ResourceArtifacts={
             //项目
             this.ArtifactsProjectBreadCrumb = new App.Resources.ArtifactsProjectBreadCrumb();
             _this.$el.html(this.ArtifactsProjectBreadCrumb.render().el);
+
             //项目映射规则名称
             App.ResourceArtifacts.Status.projectName = App.Comm.publicData.services.project.projectName;
+            this.getProjetName();
         }
 
         //公用组件
@@ -284,22 +287,27 @@ App.ResourceArtifacts={
             this.menu.$(".qualifyC").hide().html(this.quality.render().el);
             this.menu.$(".rules").html(this.planRuleTitle.render().el);//映射规则
             this.planRuleTitle.$(".ruleContentRuleList").html(this.planRule.render().el);//映射规则
-
             //写入项目名称
             _this.$(".projectName").html( App.ResourceArtifacts.Status.projectName);
 
             //读入数据
+
             this.getPlan();
             this.getAllQuality(function(data){
                 App.ResourceArtifacts.departQuality(App.ResourceArtifacts.menu.$(".qualityMenuListGC"),App.ResourceArtifacts.allQualityGC,null,"0");
                 App.ResourceArtifacts.menu.$(".qualityMenuListGC").show();
                 App.ResourceArtifacts.departQuality(App.ResourceArtifacts.menu.$(".qualityMenuListKY"),App.ResourceArtifacts.allQualityKY,null,"0");
+
             });
         }
         $(".resourcesMappingRule").show();
     },
 
-    //获取分类编码
+    //获取xian项目名称
+    getProjetName:function(){
+        //platform/rule/template/select/project/info/{projectId}
+    },
+    // 获取分类编码
     loaddeaprt:function(){
         //获取分类编码
         var cdata = {
@@ -333,7 +341,8 @@ App.ResourceArtifacts={
             if(response.code == 0 && response.data){
                 App.ResourceArtifacts.PlanNode.reset();
                 if(response.data.length){
-                App.ResourceArtifacts.PlanNode.add(response.data);
+
+                    App.ResourceArtifacts.PlanNode.add(response.data);
                 }else{
                     Backbone.trigger("mappingRuleNoContent");
                 }
