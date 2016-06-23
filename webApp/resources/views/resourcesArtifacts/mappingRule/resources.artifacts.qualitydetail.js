@@ -16,6 +16,11 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
 
     render:function() {
         this.$el.html(this.template(this.model.toJSON()));
+        if (this.model.get("ruleContain") == "1"){
+            this.$(".ruleCheck").addClass("all");
+        }else if(this.model.get("ruleContain") == 3){
+            this.$(".ruleCheck").addClass("half");
+        }
         return this;
     },
 
@@ -115,22 +120,19 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
                     model.ruleIds = [];
                     App.ResourceArtifacts.modelSaving.codeIds.push(App.ResourceArtifacts.getValid(model));
                 }
-                //操作右侧全不选
-                return
+                //Backbone.trigger("modelRuleSelectNone");
             }
 
-
-
-
-
-
-            //取消所有下级菜单，需要修正
+            //移除所有下级菜单
+            console.log(this.$el.siblings(".childList").find("li"));
+            if(this.$el.siblings(".childList").find("li").length) {
+                _.each(this.$el.siblings(".childList").find("li"),function (item) {
+                    console.log();
+                    $(item).attr("data-check", "0");
+                    $(item).find(".ruleCheck").removeClass("all").removeClass("half")
+                });
+            }
             this.checkControl("cancel");
-
-
-
-
-
 
         }else{
             ele.addClass("all").removeClass("half");
@@ -164,12 +166,11 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
                     App.ResourceArtifacts.modelSaving.codeIds.push(App.ResourceArtifacts.getValid(model));
                 }
                 //操作右侧全选
-                return
+                //Backbone.trigger("modelRuleSelectAll");
             }
             //添加所有下级菜单
-            if(_this.find("li").length) {
-
-                _.each(_this.find("li"),function(item){
+            if(this.$el.siblings(".childList").find("li").length) {
+                _.each(this.$el.siblings(".childList").find("li"),function(item){
                     $(item).attr("data-check","1");
                     if($(item).hasClass("all")){
                         return

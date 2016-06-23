@@ -29,7 +29,7 @@ App.Services.AuthNav = Backbone.View.extend({
 		//debugger;
 		var $el=$(el);
 		$el.addClass("active").siblings("li").removeClass("active");
-		this.$el.find(".bcService span:last").text($el.text().trim());
+		//this.$el.find(".bcService span:last").text($el.text().trim());
 	},
 
 	memCtrl : function(){

@@ -59,20 +59,13 @@ App.Resources.artifactsQualityTree = function(dataList,n){
             li.addClass("tplShow");
         }
 
-        var as = new App.Resources.ArtifactsQualityDetail({model:initModel});
-        if(n == 0){
-            if(data[i].ruleContain = 1){
-                as.$(".ruleCheck").addClass("all");
-            }else if(data[i].ruleContain = 3){
-                as.$(".ruleCheck").addClass("half");
-            }
-            li.attr("data-check",a);
-        }else if(n == 1){
+        var as = new App.Resources.ArtifactsQualityDetail({model:initModel}).render();
+        if(n == "1"){
             as.$(".ruleCheck").addClass("all");
             li.attr("data-check",n);
         }
 
-        li.append(as.render().el);
+        li.append(as.el);
         li.append("<div class='childList' data-code='"+data[i].code +"'></div>");
         ele.append(li);
         App.Comm.initScroll($(".qualityMenu"),"y");
