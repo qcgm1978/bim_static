@@ -457,7 +457,6 @@
       // 进入添加检查点模式
       var self = this;
       var viewer = self.viewer;
-      viewer.setMarkerMode();
       viewer.editMarkerBegin();
     },
     markerEnd : function() {
