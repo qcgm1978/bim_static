@@ -2774,7 +2774,6 @@ CLOUD.Extensions.MarkerEditor.prototype.getMarkerInfoList = function() {
     for (var i = 0, len = this.markers.length; i < len; i++) {
 
         var marker = this.markers[i];
-
         var info = {
             id: marker.id,
             userId: marker.userId,
@@ -2810,7 +2809,15 @@ CLOUD.Extensions.MarkerEditor.prototype.loadMarkers = function (markerInfoList) 
         var userId = info.userId;
         var shapeType = info.shapeType;
         var position = info.position;
-        var boundingBox = info.boundingBox;
+        //var boundingBox = info.boundingBox;
+        var boundingBox = new THREE.Box3();
+        boundingBox.max.x = info.boundingBox.max.x;
+        boundingBox.max.y = info.boundingBox.max.y;
+        boundingBox.max.z = info.boundingBox.max.z;
+        boundingBox.min.x = info.boundingBox.min.x;
+        boundingBox.min.y = info.boundingBox.min.y;
+        boundingBox.min.z = info.boundingBox.min.z;
+
         var state = info.state;
 
         this.setMarkerState(state);
@@ -5391,7 +5398,6 @@ CLOUD.Extensions.AnnotationEditor = function (cameraEditor, scene, domElement) {
     this.beginEditCallback = null;
     this.endEditCallback = null;
     this.changeEditorModeCallback = null;
-    this.isCameraChange = false;
     this.annotationType = CLOUD.Extensions.Annotation.shapeTypes.ARROW;
     this.nextAnnotationId = 0;
     this.annotationMinLen = 16;
@@ -5448,7 +5454,6 @@ CLOUD.Extensions.AnnotationEditor.prototype.onMouseDown = function (event) {
 
     if (!this.isEditing) {
         CLOUD.OrbitEditor.prototype.onMouseDown.call(this, event);
-        this.isCameraChange = true;
         return;
     }
 
@@ -5475,7 +5480,7 @@ CLOUD.Extensions.AnnotationEditor.prototype.onMouseMove = function (event) {
     if (!this.isEditing) {
 
         CLOUD.OrbitEditor.prototype.onMouseMove.call(this, event);
-        this.handleCallbacks("changeEditor");
+        //this.handleCallbacks("changeEditor");
 
         return;
     }
@@ -5499,8 +5504,6 @@ CLOUD.Extensions.AnnotationEditor.prototype.onMouseUp = function (event) {
     if (!this.isEditing) {
 
         CLOUD.OrbitEditor.prototype.onMouseUp.call(this, event);
-        this.isCameraChange = false;
-
         return;
     }
 
@@ -5526,10 +5529,6 @@ CLOUD.Extensions.AnnotationEditor.prototype.onMouseWheel = function (event) {
     if (!this.isEditing) {
 
         CLOUD.OrbitEditor.prototype.onMouseWheel.call(this, event);
-
-        this.isCameraChange = true;
-        this.handleCallbacks("changeEditor");
-        this.isCameraChange = false;
     }
 };
 
@@ -5654,15 +5653,6 @@ CLOUD.Extensions.AnnotationEditor.prototype.handleMouseEvent = function (event, 
             break;
         case CLOUD.Extensions.Annotation.shapeTypes.CLOUD:
             if (type === "down") {
-                //if (this.selectedAnnotation && this.isCreating) {
-                //    this.mouseMoveForCloud(event);
-                //} else {
-                //    if (!this.isCreating) {
-                //        this.mouseDownForCloud(event);
-                //        this.createAnnotationBegin();
-                //    }
-                //}
-
                 if (this.mouseDownForCloud(event)) {
                     this.createAnnotationBegin();
                 }
@@ -6556,7 +6546,7 @@ CLOUD.Extensions.AnnotationEditor.prototype.handleCallbacks = function (name) {
             }
             break;
         case "changeEditor":
-            if (this.isCameraChange && this.changeEditorModeCallback) {
+            if (this.changeEditorModeCallback) {
 
                 this.changeEditorModeCallback(this.domElement);
             }
@@ -6809,6 +6799,16 @@ CLOUD.Extensions.AnnotationEditor.prototype.updateAnnotations = function () {
     if (this.annotationFrame && this.selectedAnnotation) {
         this.annotationFrame.setAnnotation(this.selectedAnnotation)
     }
+};
+
+CLOUD.Extensions.AnnotationEditor.prototype.onCameraChange = function () {
+
+    if (this.cameraEditor.cameraDirty) {
+        //this.changeEditorModeCallback(this.domElement);
+
+        this.handleCallbacks("changeEditor");
+    }
+
 };
 
 // ---------------------------- 外部 API END ---------------------------- //
