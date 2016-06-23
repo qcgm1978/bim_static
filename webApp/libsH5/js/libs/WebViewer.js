@@ -3,7 +3,7 @@
 */
 
 var CLOUD = CLOUD || {};
-CLOUD.Version = "20160622";
+CLOUD.Version = "20160623";
 
 CLOUD.GlobalData = {
     SceneSize: 1000,
@@ -24,7 +24,8 @@ CLOUD.GlobalData = {
     ScreenCullLOD: 0.0002,
     LimitFrameTime: 250,
     GarbageCollection: true,
-    ByTargetDistance : false
+    ByTargetDistance: false,
+    MaxLoadSceneCount: 50,
 };
 
 CLOUD.EnumObjectLevel = {
@@ -793,207 +794,190 @@ CLOUD.GeomUtil = {
     UnitCylinderInstance: new THREE.CylinderGeometry(1, 1, 1, 8, 1, false),
     UnitBoxInstance : new THREE.BoxGeometry(1, 1, 1)
 };
+THREE.CombinedCamera = function (width, height, fov, near, far, orthoNear, orthoFar) {
 
-THREE.CombinedCamera = function ( width, height, fov, near, far, orthoNear, orthoFar ) {
+    THREE.Camera.call(this);
 
-	THREE.Camera.call( this );
+    this.fov = fov;
 
-	this.fov = fov;
+    this.left = -width / 2;
+    this.right = width / 2;
+    this.top = height / 2;
+    this.bottom = -height / 2;
+    this.aspect = width / height;
 
-	this.left = -width / 2;
-	this.right = width / 2
-	this.top = height / 2;
-	this.bottom = -height / 2;
+    // We could also handle the projectionMatrix internally, but just wanted to test nested camera objects
 
-	// We could also handle the projectionMatrix internally, but just wanted to test nested camera objects
+    this.cameraO = new THREE.OrthographicCamera(width / -2, width / 2, height / 2, height / -2, orthoNear, orthoFar);
+    this.cameraP = new THREE.PerspectiveCamera(fov, width / height, near, far);
 
-	this.cameraO = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 	orthoNear, orthoFar );
-	this.cameraP = new THREE.PerspectiveCamera( fov, width / height, near, far );
+    this.zoom = 1;
 
-	this.zoom = 1;
+    this.toPerspective();
 
-	this.toPerspective();
-
-	this.aspect = width/height;
 };
 
-THREE.CombinedCamera.prototype = Object.create( THREE.Camera.prototype );
+THREE.CombinedCamera.prototype = Object.create(THREE.Camera.prototype);
 THREE.CombinedCamera.prototype.constructor = THREE.CombinedCamera;
 
 THREE.CombinedCamera.prototype.toPerspective = function () {
 
-	// Switches to the Perspective Camera
+    // Switches to the Perspective Camera
 
-	this.near = this.cameraP.near;
-	this.far = this.cameraP.far;
-
-	this.cameraP.fov =  this.fov / this.zoom ;
-
-	this.cameraP.updateProjectionMatrix();
-
-	this.projectionMatrix = this.cameraP.projectionMatrix;
-
-	this.inPerspectiveMode = true;
-	this.inOrthographicMode = false;
+    this.near = this.cameraP.near;
+    this.far = this.cameraP.far;
+    this.cameraP.fov = this.fov / this.zoom;
+    this.cameraP.updateProjectionMatrix();
+    this.projectionMatrix = this.cameraP.projectionMatrix;
+    this.inPerspectiveMode = true;
+    this.inOrthographicMode = false;
 
 };
 
 THREE.CombinedCamera.prototype.toOrthographic = function () {
 
-	// Switches to the Orthographic camera estimating viewport from Perspective
+    // Switches to the Orthographic camera estimating viewport from Perspective
 
-	var fov = this.fov;
-	var aspect = this.cameraP.aspect;
-	var near = this.cameraP.near;
-	var far = this.cameraP.far;
+    var fov = this.fov;
+    var aspect = this.cameraP.aspect;
+    var near = this.cameraP.near;
+    var far = this.cameraP.far;
 
-	// The size that we set is the mid plane of the viewing frustum
+    // The size that we set is the mid plane of the viewing frustum
 
-	var hyperfocus = ( near + far ) / 2;
+    var hyperfocus = ( near + far ) / 2;
 
-	var halfHeight = Math.tan( fov * Math.PI / 180 / 2 ) * hyperfocus;
-	var planeHeight = 2 * halfHeight;
-	var planeWidth = planeHeight * aspect;
-	var halfWidth = planeWidth / 2;
+    var halfHeight = Math.tan(fov * Math.PI / 180 / 2) * hyperfocus;
+    var planeHeight = 2 * halfHeight;
+    var planeWidth = planeHeight * aspect;
+    var halfWidth = planeWidth / 2;
 
-	halfHeight /= this.zoom;
-	halfWidth /= this.zoom;
+    halfHeight /= this.zoom;
+    halfWidth /= this.zoom;
 
-	this.cameraO.left = -halfWidth;
-	this.cameraO.right = halfWidth;
-	this.cameraO.top = halfHeight;
-	this.cameraO.bottom = -halfHeight;
+    this.cameraO.left = -halfWidth;
+    this.cameraO.right = halfWidth;
+    this.cameraO.top = halfHeight;
+    this.cameraO.bottom = -halfHeight;
 
-	// this.cameraO.left = -farHalfWidth;
-	// this.cameraO.right = farHalfWidth;
-	// this.cameraO.top = farHalfHeight;
-	// this.cameraO.bottom = -farHalfHeight;
+    // this.cameraO.left = -farHalfWidth;
+    // this.cameraO.right = farHalfWidth;
+    // this.cameraO.top = farHalfHeight;
+    // this.cameraO.bottom = -farHalfHeight;
 
-	// this.cameraO.left = this.left / this.zoom;
-	// this.cameraO.right = this.right / this.zoom;
-	// this.cameraO.top = this.top / this.zoom;
-	// this.cameraO.bottom = this.bottom / this.zoom;
+    // this.cameraO.left = this.left / this.zoom;
+    // this.cameraO.right = this.right / this.zoom;
+    // this.cameraO.top = this.top / this.zoom;
+    // this.cameraO.bottom = this.bottom / this.zoom;
 
-	this.cameraO.updateProjectionMatrix();
+    this.cameraO.updateProjectionMatrix();
 
-	this.near = this.cameraO.near;
-	this.far = this.cameraO.far;
-	this.projectionMatrix = this.cameraO.projectionMatrix;
+    this.near = this.cameraO.near;
+    this.far = this.cameraO.far;
+    this.projectionMatrix = this.cameraO.projectionMatrix;
 
-	this.inPerspectiveMode = false;
-	this.inOrthographicMode = true;
-
-};
-
-
-THREE.CombinedCamera.prototype.setSize = function( width, height ) {
-
-	this.cameraP.aspect = width / height;
-	this.left = -width / 2;
-	this.right = width / 2
-	this.top = height / 2;
-	this.bottom = -height / 2;
+    this.inPerspectiveMode = false;
+    this.inOrthographicMode = true;
 
 };
 
 
-THREE.CombinedCamera.prototype.setFov = function( fov ) {
+THREE.CombinedCamera.prototype.setSize = function (width, height) {
 
-	this.fov = fov;
+    this.cameraP.aspect = width / height;
+    this.left = -width / 2;
+    this.right = width / 2;
+    this.top = height / 2;
+    this.bottom = -height / 2;
+    this.aspect = width / height;
+};
 
-	if ( this.inPerspectiveMode ) {
 
-		this.toPerspective();
+THREE.CombinedCamera.prototype.setFov = function (fov) {
 
-	} else {
+    this.fov = fov;
 
-		this.toOrthographic();
+    if (this.inPerspectiveMode) {
 
-	}
+        this.toPerspective();
+
+    } else {
+
+        this.toOrthographic();
+
+    }
+
+};
+
+THREE.CombinedCamera.prototype.setNearFar = function (near, far) {
+
+    if (this.inPerspectiveMode) {
+
+        this.cameraP.near = near;
+        this.cameraP.far = far;
+
+        this.toPerspective();
+
+    } else {
+
+        this.cameraO.near = near;
+        this.cameraO.far = far;
+
+        this.toOrthographic();
+
+    }
 
 };
 
 // For mantaining similar API with PerspectiveCamera
 
-THREE.CombinedCamera.prototype.updateProjectionMatrix = function() {
+THREE.CombinedCamera.prototype.updateProjectionMatrix = function () {
 
-	if ( this.inPerspectiveMode ) {
+    if (this.inPerspectiveMode) {
 
-		this.toPerspective();
+        this.toPerspective();
 
-	} else {
+    } else {
 
-		this.toPerspective();
-		this.toOrthographic();
+        //this.toPerspective();
+        this.toOrthographic();
 
-	}
+    }
 
 };
 
 /*
-* Uses Focal Length (in mm) to estimate and set FOV
-* 35mm (fullframe) camera is used if frame size is not specified;
-* Formula based on http://www.bobatkins.com/photography/technical/field_of_view.html
-*/
-THREE.CombinedCamera.prototype.setLens = function ( focalLength, frameHeight ) {
+ * Uses Focal Length (in mm) to estimate and set FOV
+ * 35mm (fullframe) camera is used if frame size is not specified;
+ * Formula based on http://www.bobatkins.com/photography/technical/field_of_view.html
+ */
+THREE.CombinedCamera.prototype.setLens = function (focalLength, frameHeight) {
 
-	if ( frameHeight === undefined ) frameHeight = 24;
+    if (frameHeight === undefined) frameHeight = 24;
 
-	var fov = 2 * THREE.Math.radToDeg( Math.atan( frameHeight / ( focalLength * 2 ) ) );
+    var fov = 2 * THREE.Math.radToDeg(Math.atan(frameHeight / ( focalLength * 2 )));
 
-	this.setFov( fov );
+    this.setFov(fov);
 
-	return fov;
+    return fov;
 };
 
 
-THREE.CombinedCamera.prototype.setZoom = function( zoom ) {
+THREE.CombinedCamera.prototype.setZoom = function (zoom) {
 
-	this.zoom = zoom;
+    this.zoom = zoom;
 
-	if ( this.inPerspectiveMode ) {
+    if (this.inPerspectiveMode) {
 
-		this.toPerspective();
+        this.toPerspective();
 
-	} else {
+    } else {
 
-		this.toOrthographic();
+        this.toOrthographic();
 
-	}
+    }
 
 };
-
-//THREE.CombinedCamera.prototype.setZoomByEye = function( factor, target, minDistance ) {
-//
-//	// 放大，相当于相机朝目标点前移；缩小，相当于相机朝目标点后移
-//
-//	var eye = this.position.clone();
-//	var dir = new THREE.Vector3();
-//
-//	dir.subVectors(eye, target);
-//
-//	var len = dir.length();
-//
-//	dir.normalize();
-//
-//	// 相机离目标点较近时，直接往前推动相机
-//	if (len < minDistance) {
-//		dir.setLength(minDistance * 1.1);
-//
-//		if (factor < 1) {
-//			// ZoomIn
-//			target.add(dir.clone().multiplyScalar(-1));
-//		} else {
-//			// ZoomOut
-//			target.add(dir);
-//		}
-//	} else {
-//		dir.setLength(len * factor);
-//	}
-//
-//	this.position.addVectors(target, dir);
-//
-//};
 CLOUD.BBoxNode = function (boundingBox, color) {
     "use strict";
     var geometry = new THREE.BufferGeometry();
@@ -8792,10 +8776,6 @@ CLOUD.Cell.prototype.update = function () {
 
         if (!shouldShow) {
             
-            if (CLOUD.GlobalData.ByTargetDistance) {
-
-            }
-
             //shouldShow = scope.level > (CLOUD.GlobalData.SubSceneVisibleDistance * CLOUD.GlobalData.CellVisibleLOD);
 
             //if (!shouldShow)
@@ -9064,6 +9044,8 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
     this.object = camera;
     this.domElement = domElement;
 
+    this.cameraDirty = true;
+
     // Set to false to disable this control
     this.enabled = true;
 
@@ -9083,7 +9065,8 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
     this.zoomSpeed = 0.2;
 
     // Limits to how far you can dolly in and out
-    this.minDistance = 0.001; // 0.000001;
+    //this.minDistance = camera.near;//
+    this.minDistance = 0.1; // 0.000001; // 可能影响pick，pick对象与camera.near有关，是否这里也设置成camera.near？待进一步测试
     //this.maxDistance = Infinity;
     this.maxDistance = camera.far - CLOUD.GlobalData.SceneSize * 2;//camera.far * 0.9
 
@@ -9354,6 +9337,9 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
     };
 
     this.updateCamera = function (target) {
+
+        this.cameraDirty = true;
+
         lastPosition.copy(this.object.position);
         lastQuaternion.copy(this.object.quaternion);
         this.target.copy(target);
@@ -9375,6 +9361,10 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
             //    target = bBox.center();
             //}
             //
+
+            if (state !== STATE.NONE) {
+                this.cameraDirty = true;
+            }
 
             if (state == STATE.ROTATE) {
 
@@ -9462,18 +9452,18 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
                 }
             }
 
-            if (Math.abs(scale - 1) > 0.001) {
-
-                //var eye = this.target.clone().sub(position);
-                //var lastLength = eye.length();
-                //var currLength = lastLength * scale;
-                //var deltaStep = currLength - lastLength;
-                //var dollyVec = eye.clone().normalize();
-                //dollyVec.multiplyScalar(deltaStep);
-                //position.add(dollyVec);
-                //
-                //this.target.addVectors(position, eye);
-            }
+            //if (Math.abs(scale - 1) > 0.001) {
+            //
+            //    //var eye = this.target.clone().sub(position);
+            //    //var lastLength = eye.length();
+            //    //var currLength = lastLength * scale;
+            //    //var deltaStep = currLength - lastLength;
+            //    //var dollyVec = eye.clone().normalize();
+            //    //dollyVec.multiplyScalar(deltaStep);
+            //    //position.add(dollyVec);
+            //    //
+            //    //this.target.addVectors(position, eye);
+            //}
 
             if (state === STATE.PAN) {
                 //var disOffset = this.target.clone().sub(this.object.position);
@@ -9502,6 +9492,8 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
 
                 onChange();
 
+                this.cameraDirty = false;
+
                 lastPosition.copy(this.object.position);
                 lastQuaternion.copy(this.object.quaternion);
             } else {
@@ -9516,12 +9508,16 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
                     //console.log("CameraEditor.render");
                     onChange();
 
+                    this.cameraDirty = false;
+
                     lastPosition.copy(this.object.position);
                     lastQuaternion.copy(this.object.quaternion);
                 }
             }
-        }
 
+
+
+        }
 
     }();
 
@@ -11623,6 +11619,8 @@ CLOUD.FlyEditor.prototype = {
         var target = this.cameraEditor.target;
         var eye = target.clone().sub(position);
 
+        this.cameraEditor.cameraDirty = true;
+
         // 前进
         if (this.moveState & this.MoveDirection.FORWARD) {
             this.goForward(moveStep);
@@ -11713,6 +11711,8 @@ CLOUD.FlyEditor.prototype = {
 
         // 刷新
         this.cameraEditor.flyOnWorld();
+
+        this.cameraEditor.cameraDirty = false;
     },
 
     // 前进
@@ -12559,7 +12559,7 @@ CLOUD.Filter = function () {
     this.computeSelectionBox = function (renderList) {                
 
         if (!hasSelection())
-            return false;        
+            return false;
 
         for(var ii=0; ii<renderList.length; ++ii){
 
@@ -16153,7 +16153,7 @@ CLOUD.SceneLoader.prototype = {
 
         var total_models = data.metadata.count;
         if (total_models <= 0) {
-            callbackFinished(resource);
+            callbackFinished(resource, total_models);
             return;
         }
 
@@ -16482,7 +16482,7 @@ CLOUD.SceneLoader.prototype = {
             if (counter_models == 0) {
                 counter_models -= 1;
                 finalize();
-                callbackFinished(resource);
+                callbackFinished(resource, data.metadata.count);
 
             }
         };
@@ -16881,7 +16881,7 @@ CLOUD.TaskWorker = function (threadCount, finishCallback) {
             items.sort(sorter);
         }
 
-        itemCount = Math.min(itemCount, 80);
+        itemCount = Math.min(itemCount, CLOUD.GlobalData.MaxLoadSceneCount);
 
         var TASK_COUNT = Math.min(this.MaxThreadCount, itemCount);
         scope.doingCount = itemCount;
@@ -17378,7 +17378,12 @@ CLOUD.ModelManager.prototype.load = function (parameters) {
         }
         else {
 
-            scope.sceneLoader.load(defaultSceneId, scene, client, true, function (result) {
+            scope.sceneLoader.load(defaultSceneId, scene, client, true, function (result, count) {
+
+                if (count == 0) {
+                    scope.dispatchEvent({ type: CLOUD.EVENTS.ON_LOAD_EMPTYSCENE });
+                    return;
+                }
 
                 scope.loadLinks(result, client);
                 
@@ -18119,18 +18124,24 @@ CloudViewer.prototype = {
             var newPos = position.clone().sub(target);
             var length = newPos.length();
             if (this.camera.inside || !this.enableCameraNearFar) {
-                this.camera.cameraP.near = 0.1;
-                //CLOUD.GlobalData.SceneSize * 20.0
-                this.camera.cameraP.far = 20000.0;
+                //this.camera.cameraP.near = 0.1;
+                ////CLOUD.GlobalData.SceneSize * 20.0
+                //this.camera.cameraP.far = 20000.0;
+
+                this.camera.setNearFar(0.1, 20000.0);
             }
             else {
                 var delta = 0.001;
                 var Znear = (length * length + length * delta) / ((1 << 24) * delta);
-                this.camera.cameraP.near = Znear;
-                //CLOUD.GlobalData.SceneSize * 10.0
-                this.camera.cameraP.far = length + 10000.0;
+                //this.camera.cameraP.near = Znear;
+                ////CLOUD.GlobalData.SceneSize * 10.0
+                //this.camera.cameraP.far = length + 10000.0;
+
+                this.camera.setNearFar(Znear, length + 10000.0);
             }
-            this.camera.cameraP.updateProjectionMatrix();
+
+            //this.camera.cameraP.updateProjectionMatrix();
+            //this.camera.updateProjectionMatrix();
             //console.log("near: ", this.camera.cameraP.near);
             //console.log("far: ", this.camera.cameraP.far);
             //console.log("length: ", length);
@@ -18500,10 +18511,7 @@ CloudViewer.prototype = {
         }
         var target = this.camera.zoomToBBox(box, margin, ratio);
         this.cameraEditor.updateCamera(target);
-        var oldValue = CLOUD.GlobalData.ByTargetDistance;
-        CLOUD.GlobalData.ByTargetDistance = true;
         this.render();
-        CLOUD.GlobalData.ByTargetDistance = oldValue;
     },
 
     zoomToBBox: function (box, margin, ratio) {
@@ -18520,8 +18528,11 @@ CloudViewer.prototype = {
 
         var oldValue = CLOUD.GlobalData.ByTargetDistance;
         CLOUD.GlobalData.ByTargetDistance = true;
+        var oldMaxCount = CLOUD.GlobalData.MaxLoadSceneCount;
+        CLOUD.GlobalData.MaxLoadSceneCount = oldMaxCount * 2;
         this.render();
         CLOUD.GlobalData.ByTargetDistance = oldValue;
+        CLOUD.GlobalData.MaxLoadSceneCount = oldMaxCount;
     },
 
     setStandardView: function (stdView, margin) {
@@ -18658,6 +18669,8 @@ CloudViewer.prototype = {
         this.renderMiniMap();
         // 刷新标记点
         this.renderMarkers();
+        // 刷新批注
+        this.renderAnnotations();
     },
 
     // 扩展功能的 resize
@@ -19071,7 +19084,16 @@ CloudViewer.prototype = {
 
             this.editorManager.annotationEditor.onResize();
         }
-    }
+    },
+
+    renderAnnotations: function() {
+
+        if ( this.editorManager.annotationEditor
+            && this.editorManager.editor === this.editorManager.annotationEditor) {
+
+            this.editorManager.annotationEditor.onCameraChange();
+        }
+    },
 
     // ------------------ 批注 API -- E ------------------ //
 };

@@ -81,7 +81,7 @@
           self.pub('click',res);
         },
         empty:function(res){
-          _opt._dom.bimBox.append('<div class="tips">无法三维预览，请下载查看</div>')
+          _opt._dom.bimBox.append('<div class="tips"><i class="icon"></i>无法三维预览，请下载查看</div>');
           self.pub('empty',res);
         }
       }
