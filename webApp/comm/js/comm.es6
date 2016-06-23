@@ -3,7 +3,7 @@ App.Comm = {
 	Settings: {
 		v: 20160312,
 		loginType: "user", // 登录状态 user token
-		pageItemCount: 10 //Math.floor(($("body").height() + 60) / 70) > 10 && Math.floor(($("body").height() + 60) / 70) || 10
+		pageItemCount: 15 //Math.floor(($("body").height() + 60) / 70) > 10 && Math.floor(($("body").height() + 60) / 70) || 10
 	},
 
 	//项目版本状态
