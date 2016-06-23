@@ -23,7 +23,7 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
         "click .saveRule":"saveRule",
         "click .choose":"choose",
         "click .delRule": "delRule",
-        "focus .categoryCode": "legend",
+        "click .categoryCode": "legend",
         "click .text":"seleRule",
         "click .myItem":"myItem",
         "click .ruleCheck":"ruleCheck"
@@ -70,43 +70,39 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
             this.$(".ruleCheck").addClass("all")
         }
     },
-
     //查找 项目规则collection，返回规则id数组
     getModelRule:function(){
         return App.ResourceArtifacts.TplCollectionRule.map(function(item){
             return item.get("ruleId");
         })
     },
-
     //选中状态
     ruleCheck:function(e){
         App.Resources.cancelBubble(e);
         var _this = this,id = _this.model.get("id");
-
         //原有的所有数据
-        var modelSaving = App.ResourceArtifacts.modelSaving;
-
+        var modelSaving = App.ResourceArtifacts.modelSaving.codeIds;
         //查找当前已选code的并修改其内的ruleId列表
-        var  n = _.indexOf(modelSaving,function(item) {
-            return item.code == App.ResourceArtifacts.Status.rule.targetCode
-        });
-        if(n > 0){
-            var ruleIds = App.ResourceArtifacts.modelSaving[n].ruleIds;
+
+        var n = "string";
+        for(var is = 0 ; is < modelSaving.length ; is++){
+            if(modelSaving[is].code == App.ResourceArtifacts.Status.rule.targetCode){
+                n = is;
+                break
+            }
         }
-        var s = _.indexOf(ruleIds,function(item){
-            return item == id;
-        });
+        if( n == "string"){
 
-
+            App.ResourceArtifacts.modelSaving.codeIds.push({code:App.ResourceArtifacts.Status.rule.targetCode,ruleIds:[]});
+            n = App.ResourceArtifacts.modelSaving.codeIds.length - 1;
+        }
 
         var ele = $(e.target);
         var allSele = ele.closest("ul").find("li");
         Backbone.trigger("modelRuleHalf");
-
         if(ele.hasClass("all")){
             ele.removeClass("all");
             ele.closest("li").attr("data-check","0");
-
             //触发全不选时右面菜单变化
             var checked1 = _.filter(allSele,function(item){
                 return $(item).attr("data-check") == "1"
@@ -115,11 +111,14 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
                 Backbone.trigger("modelRuleEmpty");
             }
 
-            //删除
-            if(s>0){
-                ruleIds.splice(s,1);
-            }
-
+            var listEle = _.filter($(".outsideList li"),function(item){
+                return $(item).attr("data-check") == "1"
+            });
+            var idList = [];
+            _.each(listEle,function(item){
+                idList.push($(item).find(".ruleTitle").attr("data-id"));
+            });
+            App.ResourceArtifacts.modelSaving.codeIds[n].ruleIds = idList;
 
         }else{
             ele.closest("li").attr("data-check","1");
@@ -129,16 +128,18 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
             ele.addClass("all");
             if(!checked2.length){
                 Backbone.trigger("modelRuleFull");
-                return
             }
-            //已存在
-            if(s>0){
-                return
-            }
+
+            var listEle2 = _.filter($(".outsideList li"),function(item){
+                return $(item).attr("data-check") == "1"
+            });
+            var idList2 = [];
+            _.each(listEle2,function(item){
+                idList2.push($(item).find(".ruleTitle").attr("data-id"));
+            });
+            App.ResourceArtifacts.modelSaving.codeIds[n].ruleIds = idList2;
         }
     },
-
-
     getDetail:function(){
         if(this.$(".ruleDetail:visible").length){    //显示
             this.$(".ruleDetail").hide();
@@ -243,7 +244,7 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
 
                 //有效性验证
                 if(leftValue.val() && rightValue.val()){
-                    if(parseInt(leftValue.val()) <=parseInt(rightValue.val())){
+                    if(parseInt(leftValue.val()) >=parseInt(rightValue.val())){
                         alert("请填写有效的数字");
                         leftValue.focus();
                         return
@@ -341,6 +342,7 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
 
     //联想模块
     legend:function(e){
+        App.Resources.cancelBubble(e);
         var _this = this;
         _this.$(".chide").css({"visibility":"hidden"});
         var ac = _.map(App.Resources.artifactsTreeData,function(item){return item.code}); //对象-数组
@@ -439,6 +441,7 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
     //切换规则
     seleRule:function(e) {
         var _this = $(e.target);
+        App.Resources.cancelBubble(e);
         $(".myDropList").hide();
         _this.closest(".myDropText").siblings(".myDropList").show();
     },

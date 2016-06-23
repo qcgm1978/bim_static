@@ -378,6 +378,7 @@
 						}
 					}
 				}
+				
 				if(up.settings.directoryUpload){
 					inputContainer.innerHTML += '<input id="' + uploader.id + '_html5_dir" type="file" accept="' + mimes.join(',') + '" webkitdirectory="">';
 					initBrowseInput(uploader.id + '_html5_dir', up.settings.browse_dir_button);

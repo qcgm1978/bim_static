@@ -9,8 +9,8 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
 
     events:{
         "click .sele": "select",
-        "click .default" : "create"
-
+        "click .default" : "create",
+        "click .rules" : "closeMenu"
     },
 
     template: _.templateUrl("/resources/tpls/resourcesArtifacts/resources.artifacts.nav.html"),
@@ -30,6 +30,10 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
         return this;
     },
 
+    closeMenu:function(){
+        this.$(".ruleDetail .conR ul").hide();
+    },
+
     initialize:function(){
         Backbone.on("startFromProject",this.startFromProject,this);
         Backbone.on("checkedChange",this.checkList,this);
@@ -38,11 +42,12 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
     },
 
     checkList:function(){
-       this.$(".artifactsContent").addClass("edit");
+       this.$(".artifactsContent").addClass("edit").removeClass("explorer");
+
     },
 
     checkClose:function(){
-        this.$(".artifactsContent").removeClass("edit");
+        this.$(".artifactsContent").removeClass("edit").addClass("explorer");
     },
 
     startFromProject:function(){

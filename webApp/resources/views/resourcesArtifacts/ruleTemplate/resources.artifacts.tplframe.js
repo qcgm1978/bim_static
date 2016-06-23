@@ -48,7 +48,9 @@ App.Resources.ArtifactsTplFrame = Backbone.View.extend({
         //修改内容
         this.detail.$(".tplDetailTitle h2").text(name);
         this.detail.$(".tplDetailTitle .tplName").val(name);
+        this.detail.$(".artifactsContent").addClass("explorer");
         this.detail.$(".artifactsContent .default").show().siblings().hide();
+
 
         this.$(".tplContent>.default").hide();
         //获取列表

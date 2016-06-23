@@ -16,6 +16,11 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
 
     render:function() {
         this.$el.html(this.template(this.model.toJSON()));
+        if (this.model.get("ruleContain") == "1"){
+            this.$(".ruleCheck").addClass("all");
+        }else if(this.model.get("ruleContain") == 3){
+            this.$(".ruleCheck").addClass("half");
+        }
         return this;
     },
 
@@ -46,31 +51,15 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
     },
 
     checked:function(e){
+        App.Resources.cancelBubble(e);
         var ele = $(e.target);
         var leaf = this.model.get("leaf");
         var _this = this.$el.closest("li");
         ele.removeClass("half");
-
         //非叶子节点，加载
         if(!leaf && !this.$el.siblings(".childList").html()){
-            return
+            this.loadNextTree();
         }
-        //没有叶子节点无法选择
-        if(!leaf){
-            var xLeaf =  this.$el.siblings(".childList").find("li");
-            if(xLeaf.length){
-                var cs = _.filter(xLeaf,function(item){
-                    return $(item).attr("data-leaf") == "1"
-                });
-                //没有直接子元素，叶子节点未加载无法选择
-                if(cs.length == 0){
-                    return
-                }
-            }
-        }
-
-        App.Resources.cancelBubble(e);
-
         //存储模型
         var model = JSON.parse(this.$el.closest("li").attr("data-model")),already;
         if(App.ResourceArtifacts.modelSaving.codeIds.length){
@@ -78,13 +67,10 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
                 return item.code = model.code
             });
         }
-
-
         var siblings = _this.siblings("li");
         var father = _this.closest("ul").closest("li");
         var fatherSiblings = father.siblings("li");
         var grandfather = father.closest("ul").closest("li");
-
 
         if(siblings.length){
             //查找同类是否有选
@@ -106,7 +92,6 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
                 return $(item).attr("data-check") == "0";
             });
         }
-
         if(ele.hasClass("all")){
             ele.removeClass("all").removeClass("half");
             _this.attr("data-check","0");
@@ -127,7 +112,6 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
                     grPre.removeClass("half");
                 }
             }
-
             if(leaf){
                 //包含现有
                 if(already>0){
@@ -136,22 +120,22 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
                     model.ruleIds = [];
                     App.ResourceArtifacts.modelSaving.codeIds.push(App.ResourceArtifacts.getValid(model));
                 }
-                //操作右侧全不选
-                return
+                if(this.model.get("code") == App.ResourceArtifacts.Status.rule.targetCode){
+                    Backbone.trigger("modelRuleSelectNone");
+                }
+
             }
 
-            //取消所有下级菜单
-            if(_this.find("li").length){
-                _.each(_this.find("li"),function(item){
-                    $(item).attr("data-check","0").find(".ruleCheck").removeClass("all");
-                    var models = jQuery.parseJSON($(item).attr("data-model"));
-                    for(var i = 0 ; i < App.ResourceArtifacts.modelSaving.codeIds.length ; i++){
-                        if(models.code == App.ResourceArtifacts.modelSaving.codeIds[i].code){
-                            App.ResourceArtifacts.modelSaving.codeIds[i].ruleIds = []
-                        }
-                    }
+            //移除所有下级菜单
+
+            if(this.$el.siblings(".childList").find("li").length) {
+                _.each(this.$el.siblings(".childList").find("li"),function (item) {
+                    console.log();
+                    $(item).attr("data-check", "0");
+                    $(item).find(".ruleCheck").removeClass("all").removeClass("half")
                 });
             }
+            this.checkControl("cancel");
 
         }else{
             ele.addClass("all").removeClass("half");
@@ -185,35 +169,83 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
                     App.ResourceArtifacts.modelSaving.codeIds.push(App.ResourceArtifacts.getValid(model));
                 }
                 //操作右侧全选
-                return
+                if(this.model.get("code") == App.ResourceArtifacts.Status.rule.targetCode){
+                    Backbone.trigger("modelRuleSelectAll");
+                }
             }
             //添加所有下级菜单
-            if(_this.find("li").length) {
-
-                _.each(_this.find("li"),function(item){
+            if(this.$el.siblings(".childList").find("li").length) {
+                _.each(this.$el.siblings(".childList").find("li"),function(item){
                     $(item).attr("data-check","1");
                     if($(item).hasClass("all")){
                         return
                     }
                     $(item).find(".ruleCheck").removeClass("half").addClass("all")
                 });
+            this.checkControl("check");
+            }
+        }
+    },
+
+    checkControl:function(judge){
+        var _this = this,data;
+        //此处需重写，从模型中查找叶子元素
+        var type = this.model.get("type") ;
+        if(type == "GC"){
+            data = App.ResourceArtifacts.allQualityGC;
+        }else if(type == "KY"){
+            data = App.ResourceArtifacts.allQualityKY;
+        }
+        var allNode = _.filter(data,function(item){
+            return item["parentCode"] == _this.model.get("code")
+        });
 
 
-
-                var allLeaf = _.filter(_this.find("li"),function(item){
-                    return $(item).attr("data-leaf")== "1"
-                });
-                _.each(allLeaf, function (item) {
-                    var models = jQuery.parseJSON($(item).attr("data-model"));
+        //存在叶子节点
+        var isLeaf = _.filter(allNode,function(item){
+            return item.leaf
+        });
+        if(isLeaf.length){
+            _.each(isLeaf, function (item) {
+                var model  = item;
+                if(judge == "cancel"){
+                    model.ruleIds = [];
+                }
+                if(App.ResourceArtifacts.modelSaving.codeIds.length){
                     for(var i = 0 ; i < App.ResourceArtifacts.modelSaving.codeIds.length ; i++){
-                        if(models.code == App.ResourceArtifacts.modelSaving.codeIds[i].code){
-                            App.ResourceArtifacts.modelSaving.codeIds[i].ruleIds = models.ruleIds
-                        }else{
-                            App.ResourceArtifacts.modelSaving.codeIds.push(App.ResourceArtifacts.getValid(models));
+                        if(model.code == App.ResourceArtifacts.modelSaving.codeIds[i].code){
+                            App.ResourceArtifacts.modelSaving.codeIds[i].ruleIds = model.ruleIds;
+                            return
                         }
                     }
-                });
-            }
+                }
+                App.ResourceArtifacts.modelSaving.codeIds.push(App.ResourceArtifacts.getValid(model));
+            });
+        }
+
+        //存在树枝节点
+        var isNotLeaf = _.filter(allNode,function(item){
+            return !item.leaf
+        });
+        if(isNotLeaf.length){
+            _.each(isNotLeaf,function(item){
+                if(judge == "cancel"){
+                    item.ruleIds = [];
+                }
+                for(var i = 0 ; i < data.length ; i ++){
+                    if(item.code == data[i].parentCode){
+                        if(App.ResourceArtifacts.modelSaving.codeIds.length){
+                            for(var j = 0 ; j < App.ResourceArtifacts.modelSaving.codeIds.length ; j++){
+                                if(item.code == App.ResourceArtifacts.modelSaving.codeIds[j].code){
+                                    App.ResourceArtifacts.modelSaving.codeIds[j].ruleIds = item.ruleIds;
+                                    return
+                                }
+                            }
+                        }
+                        App.ResourceArtifacts.modelSaving.codeIds.push(App.ResourceArtifacts.getValid(data[i]))
+                    }
+                }
+            })
         }
     },
 
@@ -238,7 +270,6 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
 
     //取得规则列表
     getDetail:function(e){
-
         this.$(".fold").addClass("active");
         var hasCon =  this.$(".item").closest(".title").siblings(".childList:hidden");
         if(hasCon.length && hasCon.html()){
@@ -259,7 +290,6 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
             return
         }
 
-
         this. getRules(item);
     },
 //切换计划
@@ -268,14 +298,9 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
         item.closest(".item").addClass("active");
     },
 
-    //获取质量标准相关规则
-    getRules:function(item) {
-        Backbone.trigger("resetRule");
-
-        var _this = this,pdata,n = this.$el.closest("li").attr("data-check");
-        if(!App.ResourceArtifacts.Status.saved){
-            return
-        }
+    loadNextTree:function(){
+        var children,data;
+        var _this = this,n = this.$el.closest("li").attr("data-check");
         var type = this.model.get("type") ;
         var parentCode = this.model.get("code");
 
@@ -287,22 +312,34 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
 
         if(!this.model.get("leaf")){
             //存在，加载二级或三级标准
-            var children,data;
             children =  _.filter(data,function(item){
-                 return item.parentCode == parentCode;
-             });
+                return item.parentCode == parentCode;
+            });
             var list = App.Resources.artifactsQualityTree(children,n);
             _this.$el.closest("li").find(".childList").html(list);
+        }
+    },
+
+    //获取质量标准相关规则
+    getRules:function(event) {
+        Backbone.trigger("resetRule");
+        var _this = this,pdata,n = this.$el.closest("li").attr("data-check");
+        var parentCode = this.model.get("code");
+        var leaf = this.model.get("leaf");
+
+
+        if(!App.ResourceArtifacts.Status.saved){
             return
         }
-
-
+        this.loadNextTree();
         App.ResourceArtifacts.Status.rule.targetCode = this.model.get("code");
         App.ResourceArtifacts.Status.rule.targetName = this.model.get("name");
         App.ResourceArtifacts.Status.rule.count = this.model.get("count");
+        if(!leaf){
+            return
+        }
 
-
-        this.toggleClass(item);
+        this.toggleClass(event);
         //加载规则部分
         App.ResourceArtifacts.Status.rule.targetCode  = parentCode;
         App.ResourceArtifacts.Status.rule.targetName  = this.model.get("name");
