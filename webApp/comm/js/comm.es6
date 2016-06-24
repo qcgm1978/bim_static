@@ -18,7 +18,7 @@ App.Comm = {
 		"8": "移交退回",
 		"9": "已移交"
 	},
-	//项目版本状态
+	//族库和标准模型状态
 	modelStatus: {
 		"1": "待上传",
 		"2": "上传中",
@@ -31,7 +31,9 @@ App.Comm = {
 		"9": "已发布"
 	},
 
+	//格式化 状态
 	formatStatus: function(status, type) {
+
 		if (type == 1) {
 			return App.Comm.versionStatus[status] || '';
 		} else if (type == 2) {
@@ -39,33 +41,7 @@ App.Comm = {
 		}
 		return '';
 	},
-	//文件状态转换
-	convertStatus: function(status) {
-
-		var result = "";
-		if (status == 1) {
-			result = "待上传";
-		} else if (status == 2) {
-			result = "上传中";
-		} else if (status == 3) {
-			result = "待审核";
-		} else if (status == 4) {
-			result = "审核中";
-		} else if (status == 5) {
-			result = "审核通过";
-		} else if (status == 6) {
-			result = "审核退回";
-		} else if (status == 7) {
-			result = "待移交";
-		} else if (status == 8) {
-			result = "移交退回";
-		} else if (status == 9) {
-			result = "已发布";
-		}
-
-		return result;
-	},
-
+	 
 	user: function(key) {
 
 		if (!App.Global.User) {

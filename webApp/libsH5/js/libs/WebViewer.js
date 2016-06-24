@@ -9531,7 +9531,12 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
         //this.target.copy( this.target0 );
         //this.object.position.copy( this.position0 );
 
-        this.update();
+        // Modified by xmh 2016-6-24 begin
+        // 强制重刷一帧，设置视点后，将相机设成脏状态，不强制刷新，状态设成正常状态的时机可能会出错。
+        // 问题对应：批注模式下,先设置视点，后加载批注，因为没有即时刷新，批注加载完成后，才开始render,这时批注才收到视点变化的消息，造成批注不能显示。
+        //this.update();
+        this.update(true);
+        // Modified by xmh 2016-6-24 end
     };
 
     function getAutoRotationAngle() {
