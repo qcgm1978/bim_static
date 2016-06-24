@@ -48,10 +48,10 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
             this.changeFatherStatus("check");
         }
     },
-    modelRuleHalf:function(){
+    modelRuleHalf:function(half){
         if(this.model.get("leaf")&&App.ResourceArtifacts.Status.rule.targetCode == this.model.get("code")){
             this.$(".ruleCheck").addClass("half").removeClass("all");
-            this.changeFatherStatus("check");
+            this.changeFatherStatus("cancel");
         }
     },
 
@@ -155,7 +155,6 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
             });
         }
 
-
         if(fatherSiblings.length){
             //查找父级同类是否有选
             fatherData  =  _.filter(fatherSiblings,function(item){
@@ -164,8 +163,6 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
                 return s == val;
             });
         }
-
-
         if(status == "cancel"){
             if(father.length){
                 father.attr("data-check","0");
@@ -193,7 +190,6 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
             }
         }else if(status == "check"){
             if(father.length){
-
                 pre = this.searchSelf(father);
                 pre.addClass("half");
                 if(!siblings.length){

@@ -105,7 +105,7 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
         var ele = $(e.target);
         var allSele = ele.closest("ul").find("li");
         //°ëÑ¡×´Ì¬
-        Backbone.trigger("modelRuleHalf");
+        Backbone.trigger("modelRuleHalf","half");
         if(ele.hasClass("all")){
             ele.removeClass("all");
             ele.closest("li").attr("data-check","0");
@@ -117,7 +117,6 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
             if(!checked1.length){
                 Backbone.trigger("modelRuleEmpty");
             }
-
             var listEle = _.filter($(".outsideList li"),function(item){
                 return $(item).attr("data-check") == "1"
             });
