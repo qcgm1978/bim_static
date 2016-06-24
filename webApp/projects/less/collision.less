@@ -46,6 +46,7 @@
     }
   }
   .ckBox { overflow: auto; height: 100%;
+
     .ckTable { min-width: 500px; width: 100%;
       th { height: 24px; line-height: 24px; text-align: center; }
       td, th { border: 1px #ccc solid; }
@@ -77,6 +78,24 @@
       .failedIcon{width:80px;height:80px;display:inline-block;background:url(../images/collision.png) no-repeat;background-position:0 -160px;}
       p{margin:1em 0;color:#ccc;}
       a{color:#006ecf;}
+    }
+    .tfoot{
+      position: absolute;
+      width: 100%;
+      bottom: 41px;
+      .th{padding:0 10px;background:#e4e4e4;text-align:right;height: 20px;
+        line-height: 20px;}
+      .pointTotal{float:left;}
+      a{color:#006ecf;text-decoration:none;
+        &.disabled{color:#ccc;}
+      }
+      .cur{color:#006ecf;}
+      .nextPage,.prePage,.pages,.cur{
+        float: right;
+      }
+      .pages,.prePage{
+        margin-right: 4px;
+      }
     }
     .ckTable { width: 100%; min-width: 390px;margin-top:-1px;
       th { height: 24px; line-height: 24px; text-align: center; }
