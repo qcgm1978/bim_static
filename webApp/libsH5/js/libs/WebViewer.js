@@ -17507,7 +17507,7 @@ CLOUD.ModelManager.prototype.prepareResource = function (renderId, load) {
 
 THREE.EventDispatcher.prototype.apply(CLOUD.ModelManager.prototype);
 // handleViewHouseEvent
-CLOUD.EditorManager = function (handleEvents) {
+CLOUD.EditorManager = function () {
 
     this.editor = null;
     this.animationDuration = 500;// 500毫秒
@@ -17517,9 +17517,6 @@ CLOUD.EditorManager = function (handleEvents) {
 
     var scope = this;
     var _canMouseMoveOperation = false; // 是否可以进行mouseMove相关操作
-    var _mouseDownOnDomContainer = false; // mouse move 和 mouse up 注册到 window上，判断下dom元素上是否有down
-    var handleViewHouseEvent = handleEvents.viewHouse;
-    var handleMiniMapEvent = handleEvents.miniMap;
 
     function touchmove( event ) {
         scope.editor.touchmove(event);
@@ -17540,24 +17537,34 @@ CLOUD.EditorManager = function (handleEvents) {
         scope.editor.onMouseWheel(event);
     }
 
+    function onMouseDown( event ) {
+
+        // 每次按下鼠标激活canvas
+        setFocuse();
+
+        _canMouseMoveOperation = true;
+        scope.isUpdateRenderList = false;
+
+        var isAnimating = scope.isAnimating();
+
+        // 判断是否在动画中, 若是动画中，不响应事件
+        if (isAnimating) return;
+
+        scope.editor.onMouseDown(event);
+    }
+
     function onMouseMove( event ) {
 
         var isAnimating = scope.isAnimating();
 
         // 判断是否在动画中, 若是动画中，不响应事件
-        if (isAnimating)
-            return;
+        if (isAnimating) return;
 
         // 其它交互
         if (_canMouseMoveOperation) {
             // 不更新渲染列表
             scope.isUpdateRenderList = false;
             scope.editor.onMouseMove(event);
-        } else {
-            // viewHouse 交互
-            handleViewHouseEvent("move", event);
-            // 子地图交互
-            handleMiniMapEvent("move", event);
         }
     }
 
@@ -17572,55 +17579,15 @@ CLOUD.EditorManager = function (handleEvents) {
         // 只要存在up事件，就将其置为false
         _canMouseMoveOperation = false;
 
-        var mouseOnDomContainer = _mouseDownOnDomContainer;
-        _mouseDownOnDomContainer = false;
-
         // 判断是否在动画中, 若是动画中，不响应事件
-        if (isAnimating)
-            return;
+        if (isAnimating) return;
 
         if (isCanMouseMove) {
             // 其它交互
             scope.editor.onMouseUp(event);
-        } else {
-
-            //if (mouseOnDomContainer)
-            if (!mouseOnDomContainer) {
-                // viewHouse 交互
-                handleViewHouseEvent("up", event);
-                // 子地图交互
-                handleMiniMapEvent("up", event);
-            }
         }
     }
 
-    function onMouseDown( event ) {
-
-        // 每次按下鼠标激活canvas
-        setFocuse();
-
-        _mouseDownOnDomContainer = true;
-        _canMouseMoveOperation = false;
-        scope.isUpdateRenderList = false;
-
-        var isAnimating = scope.isAnimating();
-
-        // 判断是否在动画中, 若是动画中，不响应事件
-        if (isAnimating)
-            return;
-
-        // viewHouse 交互
-        var isInHouse = handleViewHouseEvent("down", event);
-        // 子地图 交互
-        var isOverMiniMap = handleMiniMapEvent("down", event);
-
-        // 鼠标点不在viewHouse区域和子地图区域
-        if (!isInHouse && !isOverMiniMap) {
-            _canMouseMoveOperation = true;
-            // 其它交互
-            scope.editor.onMouseDown(event);
-        }
-    }
 
     function onMouseDoubleClick(event) {
         scope.editor.onMouseDoubleClick(event);
@@ -17636,6 +17603,12 @@ CLOUD.EditorManager = function (handleEvents) {
         }
     }
 
+    // 返回鼠标运动状态
+    this.isMouseMoving = function() {
+
+        return _canMouseMoveOperation;
+    };
+
     this.registerDomEventListeners = function (domElement) {
 
         domElement.addEventListener( 'contextmenu', function ( event ) { event.preventDefault(); }, false );
@@ -17643,7 +17616,6 @@ CLOUD.EditorManager = function (handleEvents) {
         domElement.addEventListener( 'mousewheel', onMouseWheel, false );
         domElement.addEventListener( 'DOMMouseScroll', onMouseWheel, false ); // firefox
         domElement.addEventListener( 'dblclick',  onMouseDoubleClick, false);
-        //domElement.addEventListener('click', onMouseClick, false);
 
         // 注册在document上会影响dbgUI的resize事件
         window.addEventListener('mousemove', onMouseMove, false);
@@ -17668,7 +17640,6 @@ CLOUD.EditorManager = function (handleEvents) {
         domElement.removeEventListener( 'mousewheel', onMouseWheel, false );
         domElement.removeEventListener( 'DOMMouseScroll', onMouseWheel, false ); // firefox
         domElement.removeEventListener( 'dblclick',  onMouseDoubleClick, false);
-        //domElement.addEventListener('click', onMouseClick, false);
 
         // 注册在document上会影响dbgUI的resize事件
         window.removeEventListener('mousemove', onMouseMove, false);
@@ -17947,96 +17918,96 @@ CloudViewer = function () {
     scope.modelManager.addEventListener(CLOUD.EVENTS.ON_LOAD_START, initializeView);
 
     // 处理ViewHouse交互
-    function handleViewHouseEvent(type, event) {
+    //function handleViewHouseEvent(type, event) {
+    //
+    //    if (!scope.viewHouse) return false;
+    //
+    //    var isInHouse = false;
+    //
+    //    switch (type) {
+    //        case "down":
+    //            isInHouse = scope.viewHouse.mouseDown(event, function () {
+    //                //
+    //            });
+    //            break;
+    //        case "move":
+    //            isInHouse = scope.viewHouse.mouseMove(event, function (delta) {
+    //                if (delta !== undefined) {
+    //                    scope.cameraEditor.processRotate(delta);
+    //                } else {
+    //                    scope.cameraEditor.updateView();
+    //                }
+    //            });
+    //            break;
+    //        case "up":
+    //            isInHouse = scope.viewHouse.mouseUp(event, function (view, delta) {
+    //                if (delta !== undefined) {
+    //                    scope.cameraEditor.processRotate(delta);
+    //                }
+    //
+    //                // 0代表home，不能用 if (view) 判断
+    //                if (view !== undefined && view !== null) {
+    //                    scope.setStandardView(view);
+    //                }
+    //                //scope.cameraEditor.updateView();
+    //            });
+    //            break;
+    //        default:
+    //            break;
+    //    }
+    //
+    //    return isInHouse;
+    //}
 
-        if (!scope.viewHouse) return false;
+    //function handleMiniMapEvent(type, event) {
+    //
+    //    var isOverCanvas = false;
+    //
+    //    //for (var name in scope.miniMaps) {
+    //    //    var miniMap = scope.miniMaps[name];
+    //    //
+    //    //    var overCanvas = false;
+    //    //
+    //    //    switch (type) {
+    //    //        case "down":
+    //    //            overCanvas = miniMap.mouseDown(event, function () {
+    //    //                //
+    //    //            });
+    //    //            break;
+    //    //        case "move":
+    //    //            overCanvas = miniMap.mouseMove(event, function () {
+    //    //                miniMap.render();
+    //    //            });
+    //    //            break;
+    //    //        case "up":
+    //    //            overCanvas = miniMap.mouseUp(event, function (point) {
+    //    //                // 飞到指定点
+    //    //                scope.cameraEditor.flyToPointWithParallelEye(point);
+    //    //
+    //    //                // 如何处理小地图与批注的联动???
+    //    //                // 下一步考虑将批注实现成组件
+    //    //                //scope.exitCommentMode();
+    //    //            });
+    //    //            break;
+    //    //        default:
+    //    //            break;
+    //    //    }
+    //    //
+    //    //    if (overCanvas) {
+    //    //        isOverCanvas = true;
+    //    //    }
+    //    //}
+    //
+    //    return isOverCanvas;
+    //}
 
-        var isInHouse = false;
+    ////this.editorManager = new CLOUD.EditorManager(handleViewHouseEvent);
+    //var handleEvents = {
+    //    viewHouse: handleViewHouseEvent,
+    //    miniMap: handleMiniMapEvent
+    //};
 
-        switch (type) {
-            case "down":
-                isInHouse = scope.viewHouse.mouseDown(event, function () {
-                    //
-                });
-                break;
-            case "move":
-                isInHouse = scope.viewHouse.mouseMove(event, function (delta) {
-                    if (delta !== undefined) {
-                        scope.cameraEditor.processRotate(delta);
-                    } else {
-                        scope.cameraEditor.updateView();
-                    }
-                });
-                break;
-            case "up":
-                isInHouse = scope.viewHouse.mouseUp(event, function (view, delta) {
-                    if (delta !== undefined) {
-                        scope.cameraEditor.processRotate(delta);
-                    }
-
-                    // 0代表home，不能用 if (view) 判断
-                    if (view !== undefined && view !== null) {
-                        scope.setStandardView(view);
-                    }
-                    //scope.cameraEditor.updateView();
-                });
-                break;
-            default:
-                break;
-        }
-
-        return isInHouse;
-    }
-
-    function handleMiniMapEvent(type, event) {
-
-        var isOverCanvas = false;
-
-        for (var name in scope.miniMaps) {
-            var miniMap = scope.miniMaps[name];
-
-            var overCanvas = false;
-
-            switch (type) {
-                case "down":
-                    overCanvas = miniMap.mouseDown(event, function () {
-                        //
-                    });
-                    break;
-                case "move":
-                    overCanvas = miniMap.mouseMove(event, function () {
-                        miniMap.render();
-                    });
-                    break;
-                case "up":
-                    overCanvas = miniMap.mouseUp(event, function (point) {
-                        // 飞到指定点
-                        scope.cameraEditor.flyToPointWithParallelEye(point);
-
-                        // 如何处理小地图与批注的联动???
-                        // 下一步考虑将批注实现成组件
-                        scope.exitCommentMode();
-                    });
-                    break;
-                default:
-                    break;
-            }
-
-            if (overCanvas) {
-                isOverCanvas = true;
-            }
-        }
-
-        return isOverCanvas;
-    }
-
-    //this.editorManager = new CLOUD.EditorManager(handleViewHouseEvent);
-    var handleEvents = {
-        viewHouse: handleViewHouseEvent,
-        miniMap: handleMiniMapEvent
-    };
-
-    this.editorManager = new CLOUD.EditorManager(handleEvents);
+    this.editorManager = new CLOUD.EditorManager();
 
     this.isMobile = 0;
     var u = navigator.userAgent;
@@ -18104,27 +18075,16 @@ CloudViewer.prototype = {
             var newPos = position.clone().sub(target);
             var length = newPos.length();
             if (this.camera.inside || !this.enableCameraNearFar) {
-                //this.camera.cameraP.near = 0.1;
                 ////CLOUD.GlobalData.SceneSize * 20.0
-                //this.camera.cameraP.far = 20000.0;
-
                 this.camera.setNearFar(0.1, 20000.0);
             }
             else {
                 var delta = 0.001;
                 var Znear = (length * length + length * delta) / ((1 << 24) * delta);
-                //this.camera.cameraP.near = Znear;
                 ////CLOUD.GlobalData.SceneSize * 10.0
-                //this.camera.cameraP.far = length + 10000.0;
 
                 this.camera.setNearFar(Znear, length + 10000.0);
             }
-
-            //this.camera.cameraP.updateProjectionMatrix();
-            //this.camera.updateProjectionMatrix();
-            //console.log("near: ", this.camera.cameraP.near);
-            //console.log("far: ", this.camera.cameraP.far);
-            //console.log("length: ", length);
         }
     },
 
@@ -18296,6 +18256,14 @@ CloudViewer.prototype = {
         var clipEditor = this.editorManager.getClipEditor(this);
         clipEditor.restore(status, offset, rotx, roty);
         this.render();
+    },
+
+    // 主场景面板鼠标运动状态
+    // 主场景面板的mouse move 和 mouse up 注册在 window 上，
+    // 当鼠标从主场景移动到其他元素上时，不响应其他元素的事件
+    isMouseMoving:function(){
+
+        return this.editorManager.isMouseMoving();
     },
 
     resize: function (width, height) {
@@ -18731,12 +18699,28 @@ CloudViewer.prototype = {
         //return this.miniMaps[name];
     },
 
+    destroyMiniMap:function(name){
+
+        var miniMap = this.miniMaps[name];
+
+        if (miniMap) {
+
+            miniMap.uninit();
+
+            if (this.defaultMiniMap === miniMap) {
+                this.defaultMiniMap = null;
+            }
+
+            delete this.miniMaps[name];
+        }
+    },
+
     removeMiniMap: function (name) {
 
         var miniMap = this.miniMaps[name];
 
         if (miniMap) {
-            miniMap.removeMiniMap();
+            miniMap.remove();
 
             //delete this.miniMaps[name];
         }
@@ -18747,7 +18731,7 @@ CloudViewer.prototype = {
         var miniMap = this.miniMaps[name];
 
         if (miniMap) {
-            miniMap.appendMiniMap();
+            miniMap.append();
         }
     },
 
