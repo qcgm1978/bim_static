@@ -289,12 +289,12 @@ App.API = {
 		//分享
 		shareComment:'sixD/sharedViewpoint',//分享快照
 		parseToken:'share/{id}', //解析链接
-		getFilterByToken:"sixD/sharedViewpoint/{token}/filter",//分享过滤器
-		getAnnotationByToken:"sixD/sharedViewpoint/{token}/annotation",//分享批注
-		viewCommentsByToken:"sixD/sharedViewpoint/{token}/comment",//查看发表评论
-		uploadPicByToken:"sixD/sharedViewpoint/{token}/comment/pic",//上传图片
-		createCommentByToken:"sixD/sharedViewpoint/{token}/comment",//创建评论
-		delCommentByToken:"sixD/sharedViewpoint/{token}/comment/{commentId}",//删除评论
+		getFilterByToken:"sixD/sharedViewpoint/{auth}/filter",//分享过滤器
+		getAnnotationByToken:"sixD/sharedViewpoint/{auth}/annotation",//分享批注
+		viewCommentsByToken:"sixD/sharedViewpoint/{auth}/comment",//查看发表评论
+		uploadPicByToken:"sixD/sharedViewpoint/{auth}/comment/pic",//上传图片
+		createCommentByToken:"sixD/sharedViewpoint/{auth}/comment",//创建评论
+		delCommentByToken:"sixD/sharedViewpoint/{auth}/comment/{commentId}",//删除评论
 		autoComplateUser:"platform/project/{projectId}/member",
 		viewPointPosition:"sixD/{projectId}/viewPoint/{viewPointId}/comment/position?description={description}&position={position}", //视点上传位置
 		viewPointCommentViewpoint:"sixD/{projectId}/viewPoint/{viewPointId}/comment/viewpoint",//视点评论视点
@@ -358,11 +358,11 @@ App.API = {
 		fetchAxisGrid: '/datajson/map/gridAndLevel.json', //获取楼层地图,轴网信息
 
 		//快照
-    fetchModelViewpoint: '/datajson/project/project.viewpoint.property.json', // 获取快照列表
-    fetacCanvasData: '/datajson/project/project.viewpoint.comments.json', // 获取批注信息
-    createViewpointById: '', // 创建快照
-    editViewpointById: '', // 修改快照
-    deleteViewpointById: '', // 删除快照
+	    fetchModelViewpoint: '/datajson/project/project.viewpoint.property.json', // 获取快照列表
+	    fetacCanvasData: '/datajson/project/project.viewpoint.comments.json', // 获取批注信息
+	    createViewpointById: '', // 创建快照
+	    editViewpointById: '', // 修改快照
+	    deleteViewpointById: '', // 删除快照
 
 		//设计
 		fetchDesignProperties: "/dataJson/project/project.design.property.json", //设计属性
