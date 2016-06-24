@@ -119,10 +119,10 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
 
         App.ResourceArtifacts.Status.check = this.$el.attr("data-check");
 
-        if(!App.ResourceArtifacts.Status.saved){
+     /*   if(!App.ResourceArtifacts.Status.saved){
             alert("您还有没保存的");
             return
-        }
+        }*/
 
         App.ResourceArtifacts.PlanRules.reset();
 

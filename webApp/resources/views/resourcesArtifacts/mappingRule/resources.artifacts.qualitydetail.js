@@ -325,10 +325,10 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
             return
         }
         var item = $(e.target);
-        if(!App.ResourceArtifacts.Status.saved){
+       /* if(!App.ResourceArtifacts.Status.saved){
             alert("您还有没保存的");
             return
-        }
+        }*/
         if(this.model.get("leaf")){
             this. getRules(item);
         }else if(!this.$(".item").closest(".title").siblings(".childList").html()){}{
