@@ -61,7 +61,10 @@ App.Resources.artifactsQualityTree = function(dataList,n){
 
         var as = new App.Resources.ArtifactsQualityDetail({model:initModel}).render();
         if(n == "1"){
-            as.$(".ruleCheck").addClass("all");
+            as.$(".ruleCheck").addClass("all").removeClass("half");
+            li.attr("data-check",n);
+        }else if(n == "0"){
+            as.$(".ruleCheck").removeClass("all").removeClass("half");
             li.attr("data-check",n);
         }else{
             li.attr("data-check",a);
