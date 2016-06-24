@@ -30,6 +30,10 @@ App.Resources.ArtifactsTplListItem = Backbone.View.extend({
     },
     //取得模板
     getTpl:function(){
+        if(App.ResourceArtifacts.modelEdit){
+            alert("编辑状态不能切换模板");
+            return;
+        }
         var _this = this;
         App.ResourceArtifacts.Status.templateId = this.model.get("id");//保存id
         App.ResourceArtifacts.Status.templateName = this.model.get("name");//保存name
@@ -41,8 +45,7 @@ App.Resources.ArtifactsTplListItem = Backbone.View.extend({
         }
         Backbone.trigger("loadTplRelateContent",null);
         this.toggleClass();
-        Backbone.trigger("mappingRuleModelLoadContent",this.model.get("name"),this.model.cid);
-
+        Backbone.trigger("mappingRuleModelLoadContent",this.model.get("name"));
     },
     //切换
     toggleClass:function(){

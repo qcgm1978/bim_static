@@ -9,6 +9,7 @@ App.ResourceArtifacts={
         type:"", //1:标准规则；2：项目规则
         projectId : "",//如果有项目规则就有项目id
         templateId:"",
+        modelEdit:false,
         templateName:"",
         rule:{
             biz:"",//1：模块化；2：质监标准

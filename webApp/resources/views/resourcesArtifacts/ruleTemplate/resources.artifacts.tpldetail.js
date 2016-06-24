@@ -43,6 +43,7 @@ App.Resources.ArtifactsTplDetail = Backbone.View.extend({
     edit:function() {
         this.$(".tplDetailInfo").hide();
         this.$(".tplDetailEdit").show();
+        App.ResourceArtifacts.modelEdit = true;
         Backbone.trigger("checkedChange");
     },
 
@@ -89,7 +90,7 @@ App.Resources.ArtifactsTplDetail = Backbone.View.extend({
                     }
                 });
 
-
+                App.ResourceArtifacts.modelEdit = false
 
             }else{
             //Ã·Ωª ß∞‹
@@ -103,5 +104,6 @@ App.Resources.ArtifactsTplDetail = Backbone.View.extend({
         this.$(".tplDetailInfo").show();
         this.$(".tplDetailEdit").hide();
         Backbone.trigger("projectMappingRuleCheckedClose");
+        App.ResourceArtifacts.modelEdit = false
     }
 });
