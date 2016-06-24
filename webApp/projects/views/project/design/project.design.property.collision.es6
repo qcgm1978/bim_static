@@ -127,6 +127,7 @@ App.Project.DesignCollision=Backbone.View.extend({
 		      	App.Project.DesignAttr.CollisionTaskDetail.add({message:"failed"});
 		        alert(data.message);
 		      }
+		      $('.detailList .collList').html('');
 		      self.refreshSelectList();
 
 	      });
