@@ -168,8 +168,8 @@ App.Project.DesignCollision=Backbone.View.extend({
 		that.addClass("selected").siblings().removeClass("selected");
 		list.hide();
 		$('.collHead').height('auto');
+		App.Project.Settings.collisionId = collisionId;
 		if(status == "2"){
-			App.Project.Settings.collisionId = collisionId;
 			App.Project.DesignAttr.CollisionTaskDetail.projectId = App.Project.Settings.projectId
 			App.Project.DesignAttr.CollisionTaskDetail.projectVersionId = App.Project.Settings.CurrentVersion.id
 			App.Project.DesignAttr.CollisionTaskDetail.collisionId = collisionId

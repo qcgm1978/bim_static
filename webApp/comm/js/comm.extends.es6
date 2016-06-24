@@ -230,7 +230,7 @@ Backbone.sync = function(method, model, options) {
 		for (var i = 0; i < urlPars.length; i++) {
 			var rex = urlPars[i],
 				par = rex.replace(/[{|}]/g, ""),
-				val = model[par]||options.data[par];
+				val = model[par];
 			if (val) {
 				model.url = model.url.replace(rex, val);
 			}

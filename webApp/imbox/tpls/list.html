@@ -1,6 +1,6 @@
 <% _.each(data,function(item){%>
 <li>
 	<span class="title"><% if(item.status !== 1) {%><i></i><% } %><a href='<%=App.API.Settings.hostname+"platform/message/read?id="+item.id %>' target='_blank'><%=item.content%></a></span>
-	<span class="time"><%=item.createStmp?new Date().format('yyyy-MM-dd hh:mm:ss'):'--'%></span>
+	<span class="time"><%=item.createStmp?new Date(item.createStmp).format('yyyy-MM-dd hh:mm:ss'):'--'%></span>
 </li>
 <% }) %>
