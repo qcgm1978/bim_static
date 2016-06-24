@@ -5361,14 +5361,11 @@ CLOUD.Extensions.AnnotationFrame.prototype.isRotatePoint = function (element) {
 var CLOUD = CLOUD || {};
 CLOUD.Extensions = CLOUD.Extensions || {};
 
-CLOUD.Extensions.AnnotationEditor = function (cameraEditor, scene, domElement) {
+CLOUD.Extensions.AnnotationEditor = function (viewer) {
     "use strict";
 
-    CLOUD.OrbitEditor.call(this, cameraEditor, scene, domElement);
-
-    //this.cameraEditor = cameraEditor;
-    //this.scene = scene;
-    //this.domElement = domElement;
+    this.cameraEditor = viewer.cameraEditor;
+    this.domElement = viewer.domElement;
     this.annotations = [];
     this.selectedAnnotation = null;
     this.bounds = {x: 0, y: 0, width: 0, height: 0};
@@ -5401,17 +5398,14 @@ CLOUD.Extensions.AnnotationEditor = function (cameraEditor, scene, domElement) {
     this.annotationType = CLOUD.Extensions.Annotation.shapeTypes.ARROW;
     this.nextAnnotationId = 0;
     this.annotationMinLen = 16;
+    this.initialized = false;
 };
-
-CLOUD.Extensions.AnnotationEditor.prototype = Object.create(CLOUD.OrbitEditor.prototype);
-CLOUD.Extensions.AnnotationEditor.prototype.constructor = CLOUD.Extensions.AnnotationEditor;
 
 CLOUD.Extensions.AnnotationEditor.prototype.addDomEventListeners = function () {
 
     if (this.svg) {
 
         this.svg.addEventListener('mousedown', this.onMouseDown.bind(this), false);
-        this.svg.addEventListener('mousewheel', this.onMouseWheel.bind(this), false);
         this.svg.addEventListener('dblclick', this.onMouseDoubleClick.bind(this), false);
 
         window.addEventListener('mousemove', this.onMouseMove.bind(this), false);
@@ -5430,7 +5424,7 @@ CLOUD.Extensions.AnnotationEditor.prototype.removeDomEventListeners = function (
     if (this.svg) {
 
         this.svg.removeEventListener('mousedown', this.onMouseDown.bind(this), false);
-        this.svg.removeEventListener('mousewheel', this.onMouseWheel.bind(this), false);
+        //this.svg.removeEventListener('mousewheel', this.onMouseWheel.bind(this), false);
         this.svg.removeEventListener('dblclick', this.onMouseDoubleClick.bind(this), false);
 
         window.removeEventListener('mousemove', this.onMouseMove.bind(this), false);
@@ -5452,11 +5446,6 @@ CLOUD.Extensions.AnnotationEditor.prototype.onFocus = function () {
 
 CLOUD.Extensions.AnnotationEditor.prototype.onMouseDown = function (event) {
 
-    if (!this.isEditing) {
-        CLOUD.OrbitEditor.prototype.onMouseDown.call(this, event);
-        return;
-    }
-
     event.preventDefault();
     event.stopPropagation();
 
@@ -5477,14 +5466,6 @@ CLOUD.Extensions.AnnotationEditor.prototype.onMouseDown = function (event) {
 
 CLOUD.Extensions.AnnotationEditor.prototype.onMouseMove = function (event) {
 
-    if (!this.isEditing) {
-
-        CLOUD.OrbitEditor.prototype.onMouseMove.call(this, event);
-        //this.handleCallbacks("changeEditor");
-
-        return;
-    }
-
     event.preventDefault();
     event.stopPropagation();
 
@@ -5501,12 +5482,6 @@ CLOUD.Extensions.AnnotationEditor.prototype.onMouseMove = function (event) {
 
 CLOUD.Extensions.AnnotationEditor.prototype.onMouseUp = function (event) {
 
-    if (!this.isEditing) {
-
-        CLOUD.OrbitEditor.prototype.onMouseUp.call(this, event);
-        return;
-    }
-
     event.preventDefault();
     event.stopPropagation();
 
@@ -5521,14 +5496,6 @@ CLOUD.Extensions.AnnotationEditor.prototype.onMouseUp = function (event) {
     if (this.selectedAnnotation && this.isCreating) {
 
         this.handleMouseEvent(event, "up");
-    }
-};
-
-CLOUD.Extensions.AnnotationEditor.prototype.onMouseWheel = function (event) {
-
-    if (!this.isEditing) {
-
-        CLOUD.OrbitEditor.prototype.onMouseWheel.call(this, event);
     }
 };
 
@@ -6155,9 +6122,13 @@ CLOUD.Extensions.AnnotationEditor.prototype.init = function (callbacks) {
         this.annotationFrame = new CLOUD.Extensions.AnnotationFrame(this, this.domElement);
         this.annotationTextArea = new CLOUD.Extensions.AnnotationTextArea(this, this.domElement);
     }
+
+    this.initialized = true;
 };
 
 CLOUD.Extensions.AnnotationEditor.prototype.uninit = function () {
+
+    this.initialized = false;
 
     if (!this.svg) return;
 
@@ -6181,6 +6152,11 @@ CLOUD.Extensions.AnnotationEditor.prototype.uninit = function () {
     this.changeEditorModeCallback = null;
 
     //this.destroy();
+};
+
+CLOUD.Extensions.AnnotationEditor.prototype.isInitialized = function() {
+
+    return this.initialized;
 };
 
 CLOUD.Extensions.AnnotationEditor.prototype.destroy = function () {
@@ -6580,7 +6556,7 @@ CLOUD.Extensions.AnnotationEditor.prototype.enableSVGPaint = function (enable) {
 // ---------------------------- 外部 API BEGIN ---------------------------- //
 
 // 屏幕快照
-CLOUD.Extensions.AnnotationEditor.prototype.composeScreenSnapshot = function (snapshot) {
+CLOUD.Extensions.AnnotationEditor.prototype.getScreenSnapshot = function (snapshot) {
 
     var canvas = document.createElement("canvas");
 
