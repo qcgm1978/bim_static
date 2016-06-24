@@ -42,6 +42,7 @@ App.Resources.ArtifactsTplListItem = Backbone.View.extend({
         Backbone.trigger("loadTplRelateContent",null);
         this.toggleClass();
         Backbone.trigger("mappingRuleModelLoadContent",this.model.get("name"),this.model.cid);
+
     },
     //ÇÐ»»
     toggleClass:function(){

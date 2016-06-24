@@ -16,7 +16,8 @@ App.Resources.ArtifactsPlanList = Backbone.View.extend({
 
     initialize:function(){
         this.listenTo(App.ResourceArtifacts.PlanNode,"add",this.addOne);
-        this.listenTo(App.ResourceArtifacts.PlanNode,"change",this.render);
+        //this.listenTo(App.ResourceArtifacts.PlanNode,"change",this.render);
+        this.listenTo(App.ResourceArtifacts.PlanNode,"reset",this.render);
     },
 
     addOne:function(model) {
