@@ -25,13 +25,13 @@ App.Services.System.FolwContainer = Backbone.View.extend({
 
 		var view = new App.Services.System.FolwContainerListDetail({
 			model: model
-		}); 
+		});
 
 		this.$(".flowListBody .loading").remove();
 
 		this.$(".flowListBody").append(view.render().el);
 
-		App.Comm.initScroll(this.$(".flowListBodScroll"),"y");
+		App.Comm.initScroll(this.$(".flowListBodScroll"), "y");
 
 	},
 
@@ -48,8 +48,8 @@ App.Services.System.FolwContainer = Backbone.View.extend({
 		var opts = {
 			title: "新增流程",
 			width: 601,
-			isConfirm:false,
-			isAlert:true,
+			isConfirm: false,
+			isAlert: true,
 			cssClass: "flowAddDialog",
 			message: dialogHtml,
 			okCallback: () => {
@@ -62,11 +62,11 @@ App.Services.System.FolwContainer = Backbone.View.extend({
 		var dialog = new App.Comm.modules.Dialog(opts);
 
 		dialog.element.find(".ckUrl").myRadioCk({
-			click: function(isCk) { 
+			click: function(isCk) {
 				if (isCk) {
 					$(this).next().removeAttr("readonly").removeClass("disabled");
-				}else{
-					$(this).next().attr("readonly",true).addClass("disabled");
+				} else {
+					$(this).next().attr("readonly", true).addClass("disabled");
 				}
 			}
 		});
@@ -75,11 +75,11 @@ App.Services.System.FolwContainer = Backbone.View.extend({
 			click: function(isCk) {
 				if (isCk) {
 					$(this).next().removeAttr("readonly").removeClass("disabled");
-				}else{
-					$(this).next().attr("readonly",true).addClass("disabled");
+				} else {
+					$(this).next().attr("readonly", true).addClass("disabled");
 				}
 			}
-		});  
+		});
 	},
 
 
@@ -90,14 +90,14 @@ App.Services.System.FolwContainer = Backbone.View.extend({
 			return;
 		}
 
-		var data={
-			URLtype:"servicesFlowAdd",
-			type:"POST",
-			data:{
-				busName:dialog.element.find(".txtFlowTitle").val().trim(),
-				busViewUrl:dialog.element.find(".txtFlowCkUrl").val().trim(),
-				busSendUrl:dialog.element.find(".txtFlowStarUrl").val().trim(),
-				categoryId:$("#systemContainer .flowSliderUl .selected").data("id") 
+		var data = {
+			URLtype: "servicesFlowAdd",
+			type: "POST",
+			data: {
+				busName: dialog.element.find(".txtFlowTitle").val().trim(),
+				busViewUrl: dialog.element.find(".txtFlowCkUrl").val().trim(),
+				busSendUrl: dialog.element.find(".txtFlowStarUrl").val().trim(),
+				categoryId: $("#systemContainer .flowSliderUl .selected").data("id")
 			}
 		}
 
@@ -105,28 +105,38 @@ App.Services.System.FolwContainer = Backbone.View.extend({
 			alert("请输入流程名称");
 			return;
 		}
-		  
-		if (!data.data.busViewUrl && dialog.element.find(".ckUrl .selected").length > 0 ) {
-			alert("未填查看url");
-			return;
+
+		if (dialog.element.find(".ckUrl .selected").length > 0) {
+
+			if (!data.data.busViewUrl) {
+				alert("未填查看url");
+				return;
+			}
+
+		} else {
+			data.data.busViewUrl = "";
 		}
 
-		if (!data.data.busSendUrl && dialog.element.find(".starUrl .selected").length > 0 ) {
-			alert("未填发起url");
-			return;
+		if (dialog.element.find(".starUrl .selected").length > 0) {
+			if (!!data.data.busSendUrl) {
+				alert("未填发起url");
+				return;
+			} 
+		} else {
+			data.data.busSendUrl = "";
 		}
 
-		dialog.isSubmit=true;
+		dialog.isSubmit = true;
 
 		//新增
-		App.Comm.ajax(data,function(data){
-			if (data.code==0) {
+		App.Comm.ajax(data, function(data) {
+			if (data.code == 0) {
 				$(".folwContainer .flowListBody li:last").find(".myIcon-down-disable").toggleClass("myIcon-down-disable myIcon-down");
-				 App.Services.SystemCollection.FlowCollection.push(data.data);
-				 $(".folwContainer .flowListBody li:last").find(".myIcon-down").toggleClass("myIcon-down-disable myIcon-down");
-				 dialog.close();
-				 var $count=$(".systemContainer .folwContainer .textSum .count");
-				  $count.text(+$count.text()+1);
+				App.Services.SystemCollection.FlowCollection.push(data.data);
+				$(".folwContainer .flowListBody li:last").find(".myIcon-down").toggleClass("myIcon-down-disable myIcon-down");
+				dialog.close();
+				var $count = $(".systemContainer .folwContainer .textSum .count");
+				$count.text(+$count.text() + 1);
 			}
 		});
 
