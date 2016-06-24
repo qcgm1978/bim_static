@@ -284,15 +284,15 @@ App.ResourceArtifacts={
             this.planRuleTitle.$(".ruleContentRuleList").append(this.planRule.render().el);//规则列表
             this.menu.$(".qualifyC").append(this.quality.render().el);//质量
 
-            var menu = this.menu;
-            var tplFrame = this.tplFrame;
             this.detail.$(".artifactsContent").addClass("explorer");
             $("#artifacts").addClass("services_loading");
             this.getTpl();
 
-            Backbone.on("loadTplRelateContent",this.loadTplRelateContent);
+
+
 
         }else{//规则库
+            App.ResourceArtifacts.modelEdit = false;
             _this.$(".resourcesMappingRule .library").addClass("active").siblings("a").removeClass("active");
             _this.$el.append(this.menu.render().el);//菜单
             this.menu.$(".plans").html(this.plans.render().el);//计划节点
@@ -312,22 +312,14 @@ App.ResourceArtifacts={
                 App.ResourceArtifacts.departQuality(App.ResourceArtifacts.menu.$(".qualityMenuListGC"),App.ResourceArtifacts.allQualityGC,null,"0");
                 App.ResourceArtifacts.menu.$(".qualityMenuListGC").show();
                 App.ResourceArtifacts.departQuality(App.ResourceArtifacts.menu.$(".qualityMenuListKY"),App.ResourceArtifacts.allQualityKY,null,"0");
-
             });
         }
         $(".resourcesMappingRule").show();
     },
 
     loadTplRelateContent:function(n){
-        App.ResourceArtifacts.getPlan();
-        App.ResourceArtifacts.getAllQuality(function(){
-            App.ResourceArtifacts.departQuality(App.ResourceArtifacts.menu.$(".qualityMenuListGC"),App.ResourceArtifacts.allQualityGC,null,n);
-            App.ResourceArtifacts.menu.$(".qualityMenuListGC").show();
-            App.ResourceArtifacts.departQuality(App.ResourceArtifacts.menu.$(".qualityMenuListKY"),App.ResourceArtifacts.allQualityKY,null,n);
-            App.ResourceArtifacts.tplFrame.$(".tplContent").removeClass("services_loading");
-        });
-    },
 
+    },
     //获取项目名称
     getProjectName:function(_this,projectId){
         var pdata = {
@@ -357,6 +349,7 @@ App.ResourceArtifacts={
     },
     //获取计划节点
     getPlan:function(){
+
         var _this = App.ResourceArtifacts, pdata;
         pdata  = {
             URLtype:"fetchArtifactsPlan",
@@ -452,7 +445,6 @@ App.ResourceArtifacts={
             $(ele).html(App.Resources.artifactsQualityTree(levelData,ruleContain));
         }
     },
-
     //获取规则模板
     getTpl:function(){
         var _this = this, pdata;
@@ -472,7 +464,6 @@ App.ResourceArtifacts={
         });
     },
 
-
     //延迟
    /* delay:function(data){
     var _this = this , batch , length = data.length , arr = []  , n = 1 , last;
@@ -490,12 +481,9 @@ App.ResourceArtifacts={
     loading:function(ele){
         $(ele).addClass("services_loading");
     },
-
     loaded:function(ele){
         $(ele).removeClass("services_loading");
     },
-
-
     //重置规则
     resetPreRule:function(){
         App.ResourceArtifacts.Status.templateId = "";

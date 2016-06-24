@@ -22,7 +22,7 @@ App.Resources.ArtifactsPlanList = Backbone.View.extend({
 
     addOne:function(model) {
         var newList = new App.Resources.ArtifactsPlanDetail({model: model});
-        newList.planRule = this.planRule;
+        //newList.planRule = this.planRule;
         this.$("ul").append(newList.render().el);
         App.Comm.initScroll(this.$(".list"),"y");
     }

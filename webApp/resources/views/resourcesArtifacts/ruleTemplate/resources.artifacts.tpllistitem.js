@@ -38,13 +38,19 @@ App.Resources.ArtifactsTplListItem = Backbone.View.extend({
         App.ResourceArtifacts.Status.templateId = this.model.get("id");//保存id
         App.ResourceArtifacts.Status.templateName = this.model.get("name");//保存name
         App.ResourceArtifacts.resetModelRuleSaveData();//重置要保存的数据
+        this.toggleClass();
         //保存状态
         if(!App.ResourceArtifacts.Status.saved){
             alert("您还有没保存的");
             return
         }
-        Backbone.trigger("loadTplRelateContent",null);
-        this.toggleClass();
+        App.ResourceArtifacts.getPlan();
+        App.ResourceArtifacts.getAllQuality(function(){
+            App.ResourceArtifacts.departQuality(App.ResourceArtifacts.menu.$(".qualityMenuListGC"),App.ResourceArtifacts.allQualityGC,null,null);
+            App.ResourceArtifacts.menu.$(".qualityMenuListGC").show();
+            App.ResourceArtifacts.departQuality(App.ResourceArtifacts.menu.$(".qualityMenuListKY"),App.ResourceArtifacts.allQualityKY,null,null);
+            App.ResourceArtifacts.tplFrame.$(".tplContent").removeClass("services_loading");
+        });
         Backbone.trigger("mappingRuleModelLoadContent",this.model.get("name"));
     },
     //切换
