@@ -124,8 +124,8 @@
 
 		//获取上传容量
 		getQuotaInfo: function() {
-			var quota = this.quota;
-			return "共 20GB，已用 564.2MB"; //App.Comm.modules.util.format('共 $0，已用 $1', [App.common.modules.util.formatSize(quota.total), App.common.modules.util.formatSize(quota.used)])
+			//var quota = this.quota;
+			//return "共 20GB，已用 564.2MB"; //App.Comm.modules.util.format('共 $0，已用 $1', [App.common.modules.util.formatSize(quota.total), App.common.modules.util.formatSize(quota.used)])
 		},
 
 		//更新上传容量
