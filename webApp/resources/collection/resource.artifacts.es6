@@ -288,14 +288,8 @@ App.ResourceArtifacts={
             this.detail.$(".artifactsContent").addClass("explorer");
             $("#artifacts").addClass("services_loading");
             this.getTpl();
-             App.ResourceArtifacts.getPlan();
 
-             App.ResourceArtifacts.getAllQuality(function(){
-             App.ResourceArtifacts.departQuality(menu.$(".qualityMenuListGC"),App.ResourceArtifacts.allQualityGC,null,"0");
-             menu.$(".qualityMenuListGC").show();
-             App.ResourceArtifacts.departQuality(menu.$(".qualityMenuListKY"),App.ResourceArtifacts.allQualityKY,null,"0");
-                 tplFrame.$(".tplContent").removeClass("services_loading");
-             });
+            Backbone.on("loadTplRelateContent",this.loadTplRelateContent);
 
         }else{//规则库
             _this.$(".resourcesMappingRule .library").addClass("active").siblings("a").removeClass("active");
@@ -322,6 +316,17 @@ App.ResourceArtifacts={
         }
         $(".resourcesMappingRule").show();
     },
+
+    loadTplRelateContent:function(n){
+        App.ResourceArtifacts.getPlan();
+        App.ResourceArtifacts.getAllQuality(function(){
+            App.ResourceArtifacts.departQuality(App.ResourceArtifacts.menu.$(".qualityMenuListGC"),App.ResourceArtifacts.allQualityGC,null,n);
+            App.ResourceArtifacts.menu.$(".qualityMenuListGC").show();
+            App.ResourceArtifacts.departQuality(App.ResourceArtifacts.menu.$(".qualityMenuListKY"),App.ResourceArtifacts.allQualityKY,null,n);
+            App.ResourceArtifacts.tplFrame.$(".tplContent").removeClass("services_loading");
+        });
+    },
+
     //获取项目名称
     getProjectName:function(_this,projectId){
         var pdata = {
@@ -443,7 +448,6 @@ App.ResourceArtifacts={
             });
         }
         if(levelData.length){
-            if(ruleContain != 1){ ruleContain = 0; }
             $(ele).html(App.Resources.artifactsQualityTree(levelData,ruleContain));
         }
     },

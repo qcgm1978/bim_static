@@ -25,6 +25,7 @@ App.Resources.ArtifactsTplListItem = Backbone.View.extend({
     changeName:function(){
         if(this.$(".item").attr("data-id") == App.ResourceArtifacts.Status.templateId){
             this.$(".item div").text(App.ResourceArtifacts.Status.templateName);
+            this.model.set("name",App.ResourceArtifacts.Status.templateName)
         }
     },
     //取得模板
@@ -38,8 +39,9 @@ App.Resources.ArtifactsTplListItem = Backbone.View.extend({
             alert("您还有没保存的");
             return
         }
+        Backbone.trigger("loadTplRelateContent",null);
         this.toggleClass();
-        Backbone.trigger("mappingRuleModelLoadContent",this.model.get("name"));
+        Backbone.trigger("mappingRuleModelLoadContent",this.model.get("name"),this.model.cid);
     },
     //切换
     toggleClass:function(){

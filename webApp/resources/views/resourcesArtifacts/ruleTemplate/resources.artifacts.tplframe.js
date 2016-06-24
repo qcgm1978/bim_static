@@ -24,7 +24,7 @@ App.Resources.ArtifactsTplFrame = Backbone.View.extend({
     },
 
     //写入内容
-    loadContent:function(name){
+    loadContent:function(name,cid){
         var _this = this;
         this.$(".tplContent").addClass("services_loading");
         //重置右侧列表
@@ -34,6 +34,8 @@ App.Resources.ArtifactsTplFrame = Backbone.View.extend({
         this.$(".tplDetailTitle .tplName").val(name);
         this.$(".artifactsContent").addClass("explorer");
         this.$(".artifactsContent .default").show().siblings().hide();
+
+
 
         this.$(".tplContent>.default").hide();
         //获取列表

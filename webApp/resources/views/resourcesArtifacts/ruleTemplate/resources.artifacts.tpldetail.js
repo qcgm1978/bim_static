@@ -89,6 +89,8 @@ App.Resources.ArtifactsTplDetail = Backbone.View.extend({
                     }
                 });
 
+
+
             }else{
             //提交失败
             alert("提交失败");
