@@ -454,7 +454,7 @@
 					//分享
 					if (App.Project.Settings.isShare) {
 						CommentCollections.ViewComments.urlType = "viewCommentsByToken";
-						CommentCollections.ViewComments.token = App.Project.Settings.token;
+						CommentCollections.ViewComments.auth = App.Project.Settings.token;
 					} else {
 						CommentCollections.ViewComments.urlType = "viewComments";
 					}
@@ -681,7 +681,7 @@
 						url = App.Comm.getUrlByType({
 							URLtype: "uploadPicByToken",
 							data: {
-								token: App.Project.Settings.token
+								auth: App.Project.Settings.token
 							}
 						}).url;
 					}
@@ -834,7 +834,7 @@
 							projectVersionId: +App.Project.Settings.versionId,
 							attachments: pictures,
 							receivers: atUserArr,
-							token: App.Project.Settings.token
+							auth: App.Project.Settings.token
 						},
 						data = {
 							URLtype: "createComment",
@@ -950,7 +950,7 @@
 
 						if (App.Project.Settings.isShare) {
 							this.model.urlType = "delCommentByToken";
-							this.model.token = App.Project.Settings.token;
+							this.model.auth = App.Project.Settings.token;
 						} else {
 							this.model.urlType = "delComment";
 						}
@@ -1839,7 +1839,7 @@
 					data = {
 						URLtype: "getFilterByToken",
 						data: {
-							token: App.Project.Settings.token
+							auth: App.Project.Settings.token
 						}
 					}
 				}
@@ -1863,7 +1863,7 @@
 					data = {
 						URLtype: "getAnnotationByToken",
 						data: {
-							token: App.Project.Settings.token
+							auth: App.Project.Settings.token
 						}
 					}
 				}
