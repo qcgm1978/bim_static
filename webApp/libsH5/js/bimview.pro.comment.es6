@@ -486,7 +486,7 @@
 								createId = $li.find(".name").data("creatorid");
 
 							if (!$li.hasClass("selected")) {
-								CommentApi.showComment($li);								 
+								CommentApi.showComment($li);
 							}
 
 							//创建者 可以 删除 分享 编辑
@@ -506,7 +506,7 @@
 							},
 
 							shareViewPoint(li) {
-								//分享								
+								//分享
 								CommentApi.shareViewPointData($(li));
 
 							},
@@ -563,7 +563,7 @@
 
 				events: {
 					"click .btnUploadImg": "triggerUpload", //上传图片
-					"change .uploadImg": "uploadImg", //开始上传 
+					"change .uploadImg": "uploadImg", //开始上传
 					"click .goList": "goList",
 					"click .btnEnter": "sendComment",
 					"click .delUploadImg": "removeImg", //移除图片
@@ -1172,7 +1172,7 @@
 				} else {
 					dialog.element.find(".cancel").text("保存中");
 				}
-				//保存中				
+				//保存中
 				dialog.isSubmit = true;
 
 				//创建
@@ -1205,7 +1205,7 @@
 								//创建视点 才添加 colleciton
 								if (cate == "viewPoint") {
 
-									//项目 
+									//项目
 									if ($comment.find(".navBar .project").hasClass("selected")) {
 										if (dialog.type == 1) {
 											CommentCollections.Project.push(imgData.data);
@@ -1230,7 +1230,7 @@
 								//显示
 								$("#projectContainer .modelSidebar").addClass("show open");
 
-								$("#topSaveTip .btnCanel").click(); 
+								$("#topSaveTip .btnCanel").click();
 
 								if ($.isFunction(callback)) {
 									callback(imgData.data);
@@ -1479,7 +1479,7 @@
 				} else {
 					dialog.element.find(".cancel").text("保存中");
 				}
-				//保存中				 
+				//保存中
 				dialog.isSubmit = true;
 
 				//创建
@@ -1503,13 +1503,13 @@
 								var id = imgData.data.id,
 									models = [];
 
-								//项目 
+								//项目
 								if ($comment.find(".navBar .project").hasClass("selected")) {
 
 									models = CommentCollections.Project.models;
 
 								} else {
-									//个人 
+									//个人
 									models = CommentCollections.User.models;
 								}
 
@@ -1596,7 +1596,7 @@
 
 			//修改视点
 			reName($li) {
-				 
+
 				var data = {
 						cate: "viewPoint",
 						id: $li.find(".remarkCount").data("id"),
@@ -1690,7 +1690,7 @@
 					if (data.code == 0) {
 
 
-						//项目 
+						//项目
 						// if ($comment.find(".navBar .project").hasClass("selected")) {
 						// 	if (dialog.type == 1) {
 						// 		models = CommentCollections.Project.models;
@@ -1708,11 +1708,11 @@
 
 						// }
 						var models = [];
-						//项目 
+						//项目
 						if ($comment.find(".navBar .project").hasClass("selected")) {
 							models = CommentCollections.Project.models;
 						} else {
-							//个人 
+							//个人
 							models = CommentCollections.User.models;
 						}
 
@@ -1880,7 +1880,7 @@
 		// 退出批注模式
 		var self = this;
 		var viewer = self.viewer;
-		self._dom.bimBox.attr('class', 'bim');
+		self._dom.bimBox.removeClass('comment');
 		self._dom.bimBox.find('.commentBar').remove();
 		viewer.editCommentEnd();
 		viewer.setPickMode();

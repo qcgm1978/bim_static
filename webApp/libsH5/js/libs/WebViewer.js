@@ -18161,6 +18161,9 @@ CloudViewer.prototype = {
                 this.modelManager.prepareScene(camera, this.requestRenderCount, ignoreLoad);
                 this.calculateNearFar();
                 //console.timeEnd("prepare");
+
+                CLOUD.GlobalData.ByTargetDistance = false;
+                CLOUD.GlobalData.MaxLoadSceneCount = 50;
             }
         }
         else {
@@ -18506,13 +18509,10 @@ CloudViewer.prototype = {
         var target = this.camera.zoomToBBox(box, margin, ratio);
         this.cameraEditor.updateCamera(target);
 
-        var oldValue = CLOUD.GlobalData.ByTargetDistance;
         CLOUD.GlobalData.ByTargetDistance = true;
-        var oldMaxCount = CLOUD.GlobalData.MaxLoadSceneCount;
-        CLOUD.GlobalData.MaxLoadSceneCount = oldMaxCount * 2;
+        CLOUD.GlobalData.MaxLoadSceneCount = 100;
         this.render();
-        CLOUD.GlobalData.ByTargetDistance = oldValue;
-        CLOUD.GlobalData.MaxLoadSceneCount = oldMaxCount;
+
     },
 
     setStandardView: function (stdView, margin) {

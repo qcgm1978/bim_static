@@ -202,7 +202,7 @@
               callback:function(){
                 $this.attr('class','bar-item m-color '+type).data('id',type);
                 bimView.comm.setModelBgColor(type);
-                self._dom.bimBox.find('.view').attr('class','view '+type)
+                self._dom.bimBox.attr('class','bim '+type);
               }
             })
             break;
@@ -499,7 +499,7 @@
       var self = this;
       var viewer = self.viewer;
       var modelBgColor = self._dom.bimBox.find('.view').css('background-color');
-      self._dom.bimBox.attr('class','bim comment');
+      self._dom.bimBox.addClass('comment');
       viewer.editCommentBegin();
       viewer.setCommentBackgroundColor(modelBgColor);
       if(data){
@@ -514,9 +514,10 @@
     },
     commentEnd : function() {
       // 退出批注模式
+      deubgger
       var self = this;
       var viewer = self.viewer;
-      self._dom.bimBox.attr('class','bim');
+      self._dom.bimBox.removeClass('comment');
       self._dom.bimBox.find('.commentBar').remove();
       viewer.editCommentEnd();
       self.rotateMouse();

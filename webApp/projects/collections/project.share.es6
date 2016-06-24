@@ -19,6 +19,9 @@ App.Project.Share = {
 			App.Global.User = JSON.parse(localStorage.getItem("user"));
 			//解析权限
 			this.parseAuth();
+
+			//设置权限
+			App.Project.setPropertyByAuth();
 			//销毁上传
 			App.Comm.upload.destroy();
 

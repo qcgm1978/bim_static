@@ -74,6 +74,7 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
                 break
             }
         }
+
         if(ele.hasClass("all")){
             ele.removeClass("all").removeClass("half");
             _this.attr("data-check","0");
@@ -136,6 +137,7 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
     //修正父项状态
     changeFatherStatus:function(status){
         var _this = this.$el.closest("li");
+        var _thisStatus  = _this.attr("data-check");
         var siblings = _this.siblings("li");
         var father = _this.closest("ul").closest("li");
         var fatherSiblings = father.siblings("li");
@@ -145,7 +147,9 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
 
         if(siblings.length){//多个元素
             data = _.filter(siblings,function(item){
-                return $(item).attr("data-check") == val;
+                var s = $(item).attr("data-check");
+                if(s == "3" ){ s = "0";}
+                return val == s;
             });
         }else{//只有一个元素
             data = arr1.push(_this);
@@ -153,7 +157,9 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
         if(fatherSiblings.length){
             //查找父级同类是否有选
             fatherData  =  _.filter(fatherSiblings,function(item){
-                return $(item).attr("data-check") == val;
+                var s = $(item).attr("data-check");
+                if(s == "3" ){ s = "0";}
+                return s == val;
             });
         }else{
             fatherData = arr2.push(father);
@@ -180,7 +186,7 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
                 father.attr("data-check","1");
                 pre = this.searchSelf(father);
                 pre.addClass("half");
-                if(!data.length){
+                if(!data.length && _thisStatus == "1"){
                     pre.removeClass("half").addClass("all");
                 }
             }
@@ -189,11 +195,11 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
                 grPre = this.searchSelf(grandfather);
                 grPre.addClass("half");
 
-                if(!data.length && !fatherData.length){
-                    _.each(grandfather.find(".ruleCheck"),function(item){
-                        $(item).removeClass("half").addClass("all");
-                    });
-                    grPre.removeClass("half").addClass("all");
+                if(!data.length && !fatherData.length && _thisStatus == "1"){
+                        _.each(grandfather.find(".ruleCheck"), function (item) {
+                            $(item).removeClass("half").addClass("all");
+                        });
+                        grPre.removeClass("half").addClass("all");
                 }
             }
         }
