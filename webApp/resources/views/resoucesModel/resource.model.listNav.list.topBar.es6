@@ -24,7 +24,7 @@
  				var Auth = App.AuthObj.lib.model;
  				if (!Auth.edit) {
  					this.$('.btnNewFolder,.btnFileDel,.btnFileUpload').addClass('disable');
- 					if (!Auth.download || !App.ResourceModel.Settings.CurrentVersion.byProjectRef) {
+ 					if (!Auth.download && !App.ResourceModel.Settings.CurrentVersion.byProjectRef) {
  						this.$('.btnFileDownLoad').addClass('disable');
  					}
  				}
@@ -32,7 +32,7 @@
  				var Auth = App.AuthObj.lib.family;
  				if (!Auth.edit) {
  					this.$('.btnNewFolder,.btnFileDel,.btnFileUpload').addClass('disable');
- 					if (!Auth.download || !App.ResourceModel.Settings.CurrentVersion.byProjectRef) {
+ 					if (!Auth.download && !App.ResourceModel.Settings.CurrentVersion.byProjectRef) {
  						this.$('.btnFileDownLoad').addClass('disable');
  					}
  				}
