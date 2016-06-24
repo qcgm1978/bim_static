@@ -51,7 +51,7 @@ var AppKeyRoute = Backbone.Router.extend({
 
 				App.Project.Settings.token=data.token;
 
-				$("#topBar").prepend(' <ul class="navHeader"> <li class="item "> <span class="login">登录</span> </li></ul>');
+				$("#topBar").prepend(' <ul class="navHeader"> <li class="item "> <span class="login">立即登录</span> </li></ul>');
 
 				App.Comm.setCookie("token_cookie",data.cookie);
 				//回调
