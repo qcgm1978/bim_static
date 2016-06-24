@@ -294,8 +294,8 @@ App.API = {
 		viewCommentsByToken:"sixD/sharedViewpoint/{token}/comment",//查看发表评论
 		uploadPicByToken:"sixD/sharedViewpoint/{token}/comment/pic",//上传图片
 		createCommentByToken:"sixD/sharedViewpoint/{token}/comment",//创建评论
-		delCommentByToken:"/sixD/sharedViewpoint/{token}/comment/{commentId}",//删除评论
-		autoComplateUser:"/platform/project/{projectId}/member",
+		delCommentByToken:"sixD/sharedViewpoint/{token}/comment/{commentId}",//删除评论
+		autoComplateUser:"platform/project/{projectId}/member",
 		viewPointPosition:"sixD/{projectId}/viewPoint/{viewPointId}/comment/position?description={description}&position={position}", //视点上传位置
 		viewPointCommentViewpoint:"sixD/{projectId}/viewPoint/{viewPointId}/comment/viewpoint",//视点评论视点
 			
