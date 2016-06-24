@@ -249,7 +249,11 @@ var AppRoute = Backbone.Router.extend({
 		App.Global.User && $("#topBar .userName .text").text(App.Global.User.name);
 
 		if (!App.Global.User) {
+			App.Comm.ajax({
+				URLtype:"current"
+			});
 			return;
+			//location.href="/login.html";
 		}
 
 		var Autharr = App.Global.User && App.Global.User["function"],

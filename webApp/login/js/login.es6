@@ -97,7 +97,7 @@ var Login = {
 						Login.setCookie(p, data.data[p]);
 					}
 				}
-				//debugger
+				 
 				//获取用户信息
 				Login.getUserInfo();
 
