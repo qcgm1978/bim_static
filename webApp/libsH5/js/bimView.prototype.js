@@ -562,11 +562,16 @@
       data.filter.floors.ids = data.filter.floors.ids.concat(data.filter.specialty.ids);
       self.fileFilter(data.filter.floors);
       self.filter(data.filter.category);
-      self.filter(data.filter.classCode);
+      self.filter(data.filter.classCode,function(){});
       viewer.loadComments(newList);
     },
+    exitComment:function(){
+      var self = this;
+      var viewer = self.viewer;
+      viewer.exitCommentMode();
+    },
     // 模型过滤器
-    filter:function(obj){
+    filter:function(obj,callback){
       // obj{type:"categoryId",ids:[id,id,id]},type为自定义属性,包括categoryId,classCode,sceneId
       var self = this;
       var viewer = self.viewer;
@@ -576,6 +581,7 @@
         filter.addUserFilter(obj.type,id);
       })
       viewer.render();
+      callback&&callback();
     },
     fileFilter:function(obj){
       var self = this;

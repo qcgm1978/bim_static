@@ -39,7 +39,8 @@ App.Services.System.CategoryListDetail = Backbone.View.extend({
 				isAlert: false,
 				isConfirm: false
 			},
-		msg = "确认要删除" + $target.closest(".item").find(".name").text().trim() + "业务类别吗？";
+			  name = $target.closest(".item").find(".name").text().trim();
+		msg = "确认要删除" + (name.length>17?(name.slice(0,16)+"..."):name) + "业务类别吗？";
 
 
 			 
