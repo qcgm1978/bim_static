@@ -17810,31 +17810,6 @@ CLOUD.EditorManager.prototype = {
         return false;
     },
 
-    setAnnotationMode: function (viewer) {
-        var scope = this;
-
-        if(this.annotationEditor === undefined){
-            this.annotationEditor = new CLOUD.Extensions.AnnotationEditor(viewer.cameraEditor, viewer.getScene(), viewer.domElement);
-        }
-
-        var callbacks = {
-            beginEditCallback: function(domElement){
-                scope.unregisterDomEventListeners(domElement);
-            },
-            endEditCallback: function(domElement){
-                scope.registerDomEventListeners(domElement);
-            },
-            changeEditorModeCallback:function(){
-                scope.setPickMode(viewer);
-            }
-        };
-
-        scope.setEditor(this.annotationEditor);
-        this.annotationEditor.init(callbacks);
-
-        callbacks = null;
-    },
-
     zoomIn: function (factor, viewer) {
         //if(factor === undefined){
         //    factor = viewer.camera.zoom * 1.1;
@@ -18573,13 +18548,13 @@ CloudViewer.prototype = {
         var mimetype = "image/png";
         var dataUrl = null;
 
-        if (this.editorManager.annotationEditor && this.editorManager.editor === this.editorManager.annotationEditor) {
+        if (this.extensions.annotationEditor) {
 
             // 在批注模式，底图已经锁定，不用调用render
-            var editor = this.editorManager.annotationEditor;
+            var editor = this.extensions.annotationEditor;
 
             dataUrl = this.renderer.domElement.toDataURL(mimetype);
-            dataUrl = editor.composeScreenSnapshot(dataUrl);
+            dataUrl = editor.getScreenSnapshot(dataUrl);
 
         } else {
 
@@ -18999,78 +18974,94 @@ CloudViewer.prototype = {
     // ------------------ 批注 API -- S ------------------ //
 
     setCommentMode: function () {
-        this.editorManager.setAnnotationMode(this);
+
+        var scope = this;
+
+        if (!this.extensions.annotationEditor) {
+
+            this.extensions.annotationEditor = new CLOUD.Extensions.AnnotationEditor(this);
+        }
+
+        if (!this.extensions.annotationEditor.isInitialized()) {
+
+            var callbacks = {
+                beginEditCallback: function(domElement){
+                    scope.editorManager.unregisterDomEventListeners(domElement);
+                },
+                endEditCallback: function(domElement){
+                    scope.editorManager.registerDomEventListeners(domElement);
+                },
+                changeEditorModeCallback:function(){
+                    scope.exitCommentMode();
+                }
+            };
+
+            this.extensions.annotationEditor.init(callbacks);
+
+            callbacks = null;
+        }
     },
 
     exitCommentMode: function () {
 
-        if ( this.editorManager.annotationEditor &&
-            this.editorManager.editor === this.editorManager.annotationEditor) {
+        if (this.extensions.annotationEditor.isInitialized()) {
 
-            this.setPickMode();
+            this.extensions.annotationEditor.uninit();
+
         }
-
     },
+
 
     setCommentBackgroundColor: function (startColor, stopColor) {
 
-        if ( this.editorManager.annotationEditor) {
+        if ( this.extensions.annotationEditor) {
 
-            this.editorManager.annotationEditor.setBackgroundColor(startColor, stopColor);
+            this.extensions.annotationEditor.setBackgroundColor(startColor, stopColor);
         }
-    },
-
-    zoomToSelectedComments: function(){
-
     },
 
     editCommentBegin: function() {
 
         // 如果没有设置批注模式，则自动进入批注模式
-        if (this.editorManager.editor !== this.editorManager.annotationEditor) {
-            this.setCommentMode();
-        }
-
-        this.editorManager.annotationEditor.editBegin();
+        this.setCommentMode();
+        this.extensions.annotationEditor.editBegin();
     },
 
     editCommentEnd: function() {
 
-        // 在批注模式下有效
-        if ( this.editorManager.annotationEditor &&
-            this.editorManager.editor === this.editorManager.annotationEditor) {
+        if (this.extensions.annotationEditor) {
 
-            this.editorManager.annotationEditor.editEnd();
+            this.extensions.annotationEditor.editEnd();
+
         }
     },
 
     setCommentType: function(type) {
 
-        // 在批注模式下有效
-        if ( this.editorManager.annotationEditor &&
-            this.editorManager.editor === this.editorManager.annotationEditor) {
+        if (this.extensions.annotationEditor) {
 
-            this.editorManager.annotationEditor.setAnnotationType(type);
+            this.extensions.annotationEditor.setAnnotationType(type);
+
         }
     },
 
-    loadComments: function(CommentInfoList) {
+    loadComments: function(commentInfoList) {
 
-        // 如果没有设置批注模式，则自动进入批注模式
-        if (this.editorManager.editor !== this.editorManager.annotationEditor) {
+        if (commentInfoList) {
+
             this.setCommentMode();
+            this.extensions.annotationEditor.loadAnnotations(commentInfoList);
+        } else {
+            this.exitCommentMode();
         }
-
-        this.editorManager.annotationEditor.loadAnnotations(CommentInfoList);
     },
 
     getCommentInfoList: function() {
 
-        // 在批注模式下有效
-        if ( this.editorManager.annotationEditor &&
-            this.editorManager.editor === this.editorManager.annotationEditor) {
+        if (this.extensions.annotationEditor) {
 
-            return this.editorManager.annotationEditor.getAnnotationInfoList();
+            return this.extensions.annotationEditor.getAnnotationInfoList();
+
         }
 
         return null;
@@ -19078,20 +19069,19 @@ CloudViewer.prototype = {
 
     resizeComments: function() {
 
-        // 在批注模式下有效
-        if ( this.editorManager.annotationEditor
-            && this.editorManager.editor === this.editorManager.annotationEditor) {
+        if (this.extensions.annotationEditor&&this.extensions.annotationEditor.isInitialized()) {
 
-            this.editorManager.annotationEditor.onResize();
+            this.extensions.annotationEditor.onResize();
+
         }
     },
 
     renderAnnotations: function() {
 
-        if ( this.editorManager.annotationEditor
-            && this.editorManager.editor === this.editorManager.annotationEditor) {
+        if (this.extensions.annotationEditor&&this.extensions.annotationEditor.isInitialized()) {
 
-            this.editorManager.annotationEditor.onCameraChange();
+            this.extensions.annotationEditor.onCameraChange();
+
         }
     },
 

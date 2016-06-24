@@ -200,14 +200,25 @@ App.Services.System.FolwContainerListDetail = Backbone.View.extend({
 			return;
 		}
 
-		if (!data.data.busViewUrl && dialog.element.find(".ckUrl .selected").length > 0) {
-			alert("未填查看url");
-			return;
+		if (dialog.element.find(".ckUrl .selected").length > 0) {
+
+			if (!data.data.busViewUrl) {
+				alert("未填查看url");
+				return;
+			}
+		} else {
+			data.data.busViewUrl = "";
 		}
 
-		if (!data.data.busSendUrl && dialog.element.find(".starUrl .selected").length > 0) {
-			alert("未填发起url");
-			return;
+
+
+		if (dialog.element.find(".starUrl .selected").length > 0) {
+			if (!data.data.busSendUrl) {
+				alert("未填发起url");
+				return;
+			} 
+		}else{
+			data.data.busSendUrl="";
 		}
 
 		dialog.isSubmit = true;
@@ -228,7 +239,7 @@ App.Services.System.FolwContainerListDetail = Backbone.View.extend({
 	delFolw() {
 
 		var text = _.templateUrl('/services/tpls/system/category/system.category.del.html', true),
-		
+
 			$target = $(event.target),
 
 			that = this,

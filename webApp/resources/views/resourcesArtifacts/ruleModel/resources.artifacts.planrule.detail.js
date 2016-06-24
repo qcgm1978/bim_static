@@ -37,16 +37,22 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
         this.$el.html(this.template()(this.model.toJSON()));
 
         //写入是否选中
-        var modelRule = this.getModelRule();
-        var check = _.find(modelRule,function(item){
-            return item == _this.model.get("id");
-        });
-
-        if(check){
+        if(App.ResourceArtifacts.Status.check == "1"){
             this.$(".ruleCheck").addClass("all");
-            this.$el.attr("data-check","1");
+            this.$el.attr("data-check",App.ResourceArtifacts.Status.check );
+        }else if(App.ResourceArtifacts.Status.check == "0"){
+            this.$el.attr("data-check",App.ResourceArtifacts.Status.check );
         }else{
-            this.$el.attr("data-check","0");
+            var modelRule = this.getModelRule();
+            var check = _.find(modelRule,function(item){
+                return item == _this.model.get("id");
+            });
+            if(check){
+                this.$(".ruleCheck").addClass("all");
+                this.$el.attr("data-check","1");
+            }else{
+                this.$el.attr("data-check","0");
+            }
         }
 
         return this;
@@ -92,18 +98,19 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
             }
         }
         if( n == "string"){
-
             App.ResourceArtifacts.modelSaving.codeIds.push({code:App.ResourceArtifacts.Status.rule.targetCode,ruleIds:[]});
             n = App.ResourceArtifacts.modelSaving.codeIds.length - 1;
         }
 
         var ele = $(e.target);
         var allSele = ele.closest("ul").find("li");
+        //半选状态
         Backbone.trigger("modelRuleHalf");
         if(ele.hasClass("all")){
             ele.removeClass("all");
             ele.closest("li").attr("data-check","0");
-            //触发全不选时右面菜单变化
+
+            //全不选时触发左侧变化
             var checked1 = _.filter(allSele,function(item){
                 return $(item).attr("data-check") == "1"
             });
@@ -122,6 +129,8 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
 
         }else{
             ele.closest("li").attr("data-check","1");
+
+            //全选时触发左侧变化
             var checked2 = _.filter(allSele,function(item){
                 return $(item).attr("data-check") == "0"
             });

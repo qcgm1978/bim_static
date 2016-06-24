@@ -168,6 +168,7 @@ App.Project.Share = {
 				$el.find(".btnLogin").val("立即登录").data("islogin", false);
 				return;
 			}
+			debugger
 			App.Comm.delCookie("token_cookie");
 			localStorage.setItem("user", JSON.stringify(data.data))
 			App.Comm.setCookie('userId', data.data.userId);

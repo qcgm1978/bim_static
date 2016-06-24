@@ -1151,7 +1151,7 @@
 
 				if (!pars.name) {
 					$.tip({
-						message: "请输入批注名称",
+						message: "请输入批注描述",
 						timeout: 3000,
 						type: "alarm"
 					});
@@ -1230,7 +1230,7 @@
 								//显示
 								$("#projectContainer .modelSidebar").addClass("show open");
 
-								$("#topSaveTip .btnCanel").click();
+								$("#topSaveTip .btnCanel").click(); 
 
 								if ($.isFunction(callback)) {
 									callback(imgData.data);
@@ -1319,7 +1319,7 @@
 				var data = {
 					id: $li.find(".remarkCount").data("id"),
 					pic: $li.find(".thumbnailImg").prop("src"),
-					creatorId: $li.find(".name").text().trim(),
+					creatorName: $li.find(".name").text().trim(),
 					name: $li.find(".title").text().trim(),
 					createTime: $li.find(".date").text().trim()
 				};
@@ -1596,7 +1596,7 @@
 
 			//修改视点
 			reName($li) {
-
+				 
 				var data = {
 						cate: "viewPoint",
 						id: $li.find(".remarkCount").data("id"),

@@ -55,6 +55,7 @@
           viewer.fileFilter(specialty);
           viewer.filter(category);
           viewer.filter(classCode);
+          viewer.exitComment();
         }
       }else{
         self.el._dom.sidebar.removeClass('open');
