@@ -4,6 +4,8 @@ App.Project.ProjectDesignSetting= Backbone.View.extend({
 
   className:"designCollSetting",
 
+  isCheck:false,
+
   events: {
     "click .itemContent":"openTree",
     "click .parentCheckbox":"selectAll",
@@ -33,25 +35,36 @@ App.Project.ProjectDesignSetting= Backbone.View.extend({
     return this;
   },
 
-  openTree:function(event){
+  openTree:function(event,$target){
     var self = this,
         that = self.element = $(event.target).closest(".itemContent"),
+        that=$target||that,
         etag = that.data('etag');
-
+    if(!$target){
+      this.isCheck=false;
+    }
     if(etag&&!that.hasClass('open')&&that.next('.subTree').length==0){
       App.Project.DesignAttr.CollisionCategory.sourceId = App.Project.Settings.DataModel.sourceId;
       App.Project.DesignAttr.CollisionCategory.etag = etag;
       App.Project.DesignAttr.CollisionCategory.fetch();
       this.listenTo(App.Project.DesignAttr.CollisionCategory,"add",this.addCategory);
     }
-    that.toggleClass("open");
+    if(!$target){
+      that.toggleClass("open");
+    }else{
+      if(!that.hasClass('open')){
+        that.addClass("open");
+      }
+    }
   },
 
   selectAll:function(e){
-     
+    this.isCheck=true;
     var $target=$(e.target),
 
       $itemNode=$target.closest(".itemNode");
+
+      this.openTree(e,$target.closest(".itemContent"));
 
     if($target.prop("checked")){
       $itemNode.find('.inputCheckbox').prop("checked",true);
@@ -63,6 +76,7 @@ App.Project.ProjectDesignSetting= Backbone.View.extend({
 
   addCategory:function(model){
     var data = model.toJSON();
+    data.isCheck=this.isCheck;
     this.element.after(new App.Project.DesignTreeView({
       model:data
     }).render().el)

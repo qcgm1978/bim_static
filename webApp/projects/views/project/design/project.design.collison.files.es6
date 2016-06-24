@@ -11,6 +11,7 @@ App.Project.CollisionFiles= Backbone.View.extend({
   template:_.templateUrl("/projects/tpls/project/design/project.design.collision.files.html"),
 
   render:function(){
+    debugger
     this.$el.html(this.template(this.model))
     return this;
   }

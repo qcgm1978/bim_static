@@ -327,6 +327,7 @@ CLOUD.MiniMap = function (viewer) {
     this.mouseButtons = {LEFT: THREE.MOUSE.LEFT, RIGHT: THREE.MOUSE.RIGHT};
     this.callbackCameraChanged = null;
     this.callbackClickOnAxisGrid = null;
+    this.initialized = false;
 
     var scope = this;
     var _mapContainer;
@@ -343,8 +344,9 @@ CLOUD.MiniMap = function (viewer) {
     });
 
     var _xmlns = "http://www.w3.org/2000/svg";
-    var _svg = document.createElementNS(_xmlns, 'svg');
-    var _svgGroupForAxisGrid = document.createElementNS(_xmlns, "g");
+    //var _svg = document.createElementNS(_xmlns, 'svg');
+    //var _svgGroupForAxisGrid = document.createElementNS(_xmlns, "g");
+    var _svg, _svgGroupForAxisGrid;
     var _svgPathPool = [], _svgLinePool = [], _svgTextPool = [], _svgImagePool = [],_svgCirclePool = [],
         _pathCount = 0, _lineCount = 0, _textCount = 0, _imageCount = 0, _circleCount = 0, _quality = 1;
     var _svgNode, _svgWidth, _svgHeight, _svgHalfWidth, _svgHalfHeight;
@@ -795,7 +797,7 @@ CLOUD.MiniMap = function (viewer) {
 
         _isNormalizeMousePoint = false;
 
-        if (domElement !== undefined) {
+        if (domElement) {
             var dim = CLOUD.DomUtil.getContainerOffsetToClient(domElement);
             var canvasMouse = new THREE.Vector2();
 
@@ -821,33 +823,37 @@ CLOUD.MiniMap = function (viewer) {
         return false;
     };
 
-    this.mouseDown = function (event, callback) {
+    this.onMouseDown = function (event) {
 
-        var mouse = new THREE.Vector2(event.clientX, event.clientY);
-        var isOverCanvas = this.isMouseOverCanvas(mouse);
-
-        //if (!_enableMouseEvent) return isOverCanvas;
-
-        if (isOverCanvas) {
-            callback();
+        if (this.viewer.isMouseMoving()) {
+            return;
         }
 
-        return isOverCanvas;
+        this.isMouseDown = true;
     };
 
-    this.mouseMove = function (event, callback) {
+    this.onMouseMove = function (event) {
+
+        if (this.viewer.isMouseMoving()) {
+            return;
+        }
+
+        if (!_enableFlyByClick) return;
 
         var mouse = new THREE.Vector2(event.clientX, event.clientY);
         var isOverCanvas = this.isMouseOverCanvas(mouse);
 
-        if (!_enableFlyByClick) return isOverCanvas;
-
-        this.highlightedNode(isOverCanvas, _isShowAxisGrid, false, callback);
-
-        return isOverCanvas;
+        this.highlightedNode(isOverCanvas, _isShowAxisGrid, false);
     };
 
-    this.mouseUp = function (event, callback) {
+    this.onMouseUp = function (event) {
+
+        if (!this.isMouseDown) {
+
+            return;
+        }
+
+        this.isMouseDown = false;
 
         var mouse = new THREE.Vector2(event.clientX, event.clientY);
         var isOverCanvas = this.isMouseOverCanvas(mouse);
@@ -857,10 +863,10 @@ CLOUD.MiniMap = function (viewer) {
 
             this.highlightedNode(isOverCanvas, _isShowAxisGrid, true);
 
-            return isOverCanvas;
+            return;
         }
 
-        if (isOverCanvas && isExistData && event.target.nodeName!= "LI" ) {
+        if (isOverCanvas && isExistData ) {
 
             // 计算选中点的坐标
             var clickPoint = new THREE.Vector3();
@@ -893,10 +899,30 @@ CLOUD.MiniMap = function (viewer) {
 
             transformWorldPoint(clickPoint);
 
-            callback(clickPoint);
+            this.flyToPointWithParallelEye(clickPoint);
         }
+    };
 
-        return isOverCanvas;
+    this.addDomEventListeners = function () {
+
+        if (_mapContainer) {
+
+            _mapContainer.addEventListener( 'contextmenu', function ( event ) { event.preventDefault(); }, false );
+            _mapContainer.addEventListener('mousedown', this.onMouseDown.bind(this), false);
+            _mapContainer.addEventListener('mousemove', this.onMouseMove.bind(this), false);
+            _mapContainer.addEventListener('mouseup', this.onMouseUp.bind(this), false);
+        }
+    };
+
+    this.removeDomEventListeners = function () {
+
+        if (_mapContainer) {
+
+            _mapContainer.removeEventListener( 'contextmenu', function ( event ) { event.preventDefault(); }, false );
+            _mapContainer.removeEventListener('mousedown', this.onMouseDown.bind(this), false);
+            _mapContainer.removeEventListener('mousemove', this.onMouseMove.bind(this), false);
+            _mapContainer.removeEventListener('mouseup', this.onMouseUp.bind(this), false);
+        }
     };
 
     this.init = function (domContainer, width, height, styleOptions, alpha) {
@@ -904,6 +930,11 @@ CLOUD.MiniMap = function (viewer) {
         width = width || 320;
         height = height || 240;
         alpha = alpha || 0;
+
+        if (!_svg) {
+            _svg = document.createElementNS(_xmlns, 'svg');
+            _svgGroupForAxisGrid = document.createElementNS(_xmlns, "g");
+        }
 
         // 初始化绘图面板
         this.initCanvasContainer(domContainer, styleOptions);
@@ -915,10 +946,38 @@ CLOUD.MiniMap = function (viewer) {
         // 设置绘图面板背景色
         this.setClearColor(_defaultClearColor, alpha);
         this.clear();
+        this.addDomEventListeners();
 
         _hasHighlightInterPoint = false;
+
+        this.initialized = true;
     };
 
+    this.uninit = function() {
+
+        if (this.initialized) {
+
+            this.initialized = false;
+
+            this.removeDomEventListeners();
+
+            this.clear();
+
+            if ( _svg.parentNode) {
+
+                _svg.parentNode.removeChild(_svg)
+            }
+
+            this.remove();
+
+            _mapContainer = null;
+            _svg = null;
+            _svgGroupForAxisGrid = null;
+        }
+
+    };
+
+    // 设置绘图面板大小
     this.setSize = function (width, height) {
 
         if (_mapContainer) {
@@ -952,6 +1011,7 @@ CLOUD.MiniMap = function (viewer) {
         }
     };
 
+    // 设置绘图面板背景色
     this.setClearColor = function (color, alpha) {
 
         _clearColor.set(color);
@@ -1001,6 +1061,7 @@ CLOUD.MiniMap = function (viewer) {
 
     };
 
+    // 初始化绘图面板
     this.initCanvasContainer = function (domContainer, styleOptions) {
 
         this.domContainer = domContainer;
@@ -1013,6 +1074,7 @@ CLOUD.MiniMap = function (viewer) {
         }
     };
 
+    // 初始化相机图形节点
     this.initCameraNode = function () {
 
         if (!_cameraNode) {
@@ -1040,6 +1102,7 @@ CLOUD.MiniMap = function (viewer) {
         _cameraNode.setAttribute('opacity', '0.0');
     };
 
+    // 初始化提示节点
     this.initTipNode = function () {
 
         if (!_tipNode) {
@@ -1105,46 +1168,7 @@ CLOUD.MiniMap = function (viewer) {
         _highlightVerticalLineNode.style.opacity = 0;
     };
 
-    this.showTip = function () {
-
-        if (_tipNode) {
-            _tipNode.className = "cloud-tip";
-            _tipNode.style.opacity = 1;
-        }
-
-        if (_circleNode) {
-            _circleNode.style.opacity = 1;
-        }
-
-        if (_highlightHorizLineNode) {
-            _highlightHorizLineNode.style.opacity = 1;
-        }
-
-        if (_highlightVerticalLineNode) {
-            _highlightVerticalLineNode.style.opacity = 1;
-        }
-    };
-
-    this.hideTip = function () {
-
-        if (_tipNode) {
-            _tipNode.className = "";
-            _tipNode.style.opacity = 0;
-        }
-
-        if (_circleNode) {
-            _circleNode.style.opacity = 0;
-        }
-
-        if (_highlightHorizLineNode) {
-            _highlightHorizLineNode.style.opacity = 0;
-        }
-
-        if (_highlightVerticalLineNode) {
-            _highlightVerticalLineNode.style.opacity = 0;
-        }
-    };
-
+    // 构造轴网
     this.generateAxisGrid = function() {
 
         var jsonObj = CLOUD.MiniMap.axisGridData;
@@ -1161,10 +1185,6 @@ CLOUD.MiniMap = function (viewer) {
         }
 
         _isLoadedAxisGrid = true;
-
-        //var levels = jsonObj.Levels;
-        //this.clearAxisGird();
-        //this.initAxisGirdLevels(levels);
 
         this.initAxisGird(grids);
 
@@ -1186,6 +1206,7 @@ CLOUD.MiniMap = function (viewer) {
         }
     };
 
+    // 初始化轴网
     this.initAxisGird = function (grids) {
 
         // 计算轴网包围盒
@@ -1195,18 +1216,19 @@ CLOUD.MiniMap = function (viewer) {
         calculateAxisGridIntersection(grids, _materialGrid);
     };
 
-    this.initAxisGirdLevels = function (levels) {
-        //var len = levels.length;
-        //
-        //if (len < 1) {
-        //    return;
-        //}
-        //
-        //for (var i = 0; i < len; i++) {
-        //    _axisGridLevels.push(levels[i]);
-        //}
-    };
+    //this.initAxisGirdLevels = function (levels) {
+    //    var len = levels.length;
+    //
+    //    if (len < 1) {
+    //        return;
+    //    }
+    //
+    //    for (var i = 0; i < len; i++) {
+    //        _axisGridLevels.push(levels[i]);
+    //    }
+    //};
 
+    // 构造平面图
     this.generateFloorPlane = function(changeView) {
 
         if (changeView === undefined) {
@@ -1254,6 +1276,7 @@ CLOUD.MiniMap = function (viewer) {
 
     };
 
+    // 初始化平面图
     this.initFloorPlane = function () {
 
         var url = _floorPlaneUrl;
@@ -1300,6 +1323,7 @@ CLOUD.MiniMap = function (viewer) {
         }
     };
 
+    // 显示轴网
     this.showAxisGird = function () {
 
         if (_isLoadedAxisGrid) {
@@ -1319,6 +1343,7 @@ CLOUD.MiniMap = function (viewer) {
         }
     };
 
+    // 隐藏轴网
     this.hideAxisGird = function () {
 
         if (_isLoadedAxisGrid) {
@@ -1333,6 +1358,48 @@ CLOUD.MiniMap = function (viewer) {
             this.hideTip();
 
             this.render();
+        }
+    };
+
+    // 显示提示节点
+    this.showTip = function () {
+
+        if (_tipNode) {
+            _tipNode.className = "cloud-tip";
+            _tipNode.style.opacity = 1;
+        }
+
+        if (_circleNode) {
+            _circleNode.style.opacity = 1;
+        }
+
+        if (_highlightHorizLineNode) {
+            _highlightHorizLineNode.style.opacity = 1;
+        }
+
+        if (_highlightVerticalLineNode) {
+            _highlightVerticalLineNode.style.opacity = 1;
+        }
+    };
+
+    // 隐藏提示节点
+    this.hideTip = function () {
+
+        if (_tipNode) {
+            _tipNode.className = "";
+            _tipNode.style.opacity = 0;
+        }
+
+        if (_circleNode) {
+            _circleNode.style.opacity = 0;
+        }
+
+        if (_highlightHorizLineNode) {
+            _highlightHorizLineNode.style.opacity = 0;
+        }
+
+        if (_highlightVerticalLineNode) {
+            _highlightVerticalLineNode.style.opacity = 0;
         }
     };
 
@@ -1354,7 +1421,8 @@ CLOUD.MiniMap = function (viewer) {
         this.render();
     };
 
-    this.highlightedNode = function (isOverCanvas, isShowAxisGrid, allowNear, callback) {
+    // 高亮节点
+    this.highlightedNode = function (isOverCanvas, isShowAxisGrid, allowNear) {
 
         _hasHighlightInterPoint = false;
 
@@ -1387,24 +1455,22 @@ CLOUD.MiniMap = function (viewer) {
                 this.hideTip();
             }
 
-            if (callback) {
-
-                callback();
-
-            } else {
-
-                this.render();
-            }
+            this.render();
 
             if (this.callbackClickOnAxisGrid) {
 
                 var gridInfo = this.getAxisGridInfoByNormalizedPoint(normalizedMouse);
                 this.callbackClickOnAxisGrid(gridInfo);
             }
+        } else {
+
+            this.hideTip();
+            this.render();
         }
 
     };
 
+    // 设置节点高亮状态
     this.setHighlightNode = function(highlightNode) {
 
         // 高亮点的变换位置
@@ -1821,7 +1887,13 @@ CLOUD.MiniMap = function (viewer) {
 
         // 变换到缩放后的场景区域
         transformWorldPoint(cameraProjectedWorldPosition);
-        this.viewer.cameraEditor.flyToPointWithParallelEye(cameraProjectedWorldPosition);
+        this.flyToPointWithParallelEye(cameraProjectedWorldPosition);
+    };
+
+    // 根据给定世界系中的点以平行视线方向定位
+    this.flyToPointWithParallelEye = function(wPoint) {
+
+        this.viewer.cameraEditor.flyToPointWithParallelEye(wPoint);
     };
 
     // 根据轴号定位
@@ -1902,21 +1974,24 @@ CLOUD.MiniMap = function (viewer) {
         }
     };
 
+    // 启用或禁用相机图标
     this.enableCameraNode = function(enable) {
 
         _enableShowCamera = enable;
         //this.render();
     };
 
-    this.removeMiniMap = function() {
+    // 从主容器中移除小地图
+    this.remove = function() {
 
         if (_mapContainer && _mapContainer.parentNode) {
 
-            _mapContainer.parentNode.removeChild(_mapContainer)
+            _mapContainer.parentNode.removeChild(_mapContainer);
         }
     };
 
-    this.appendMiniMap = function() {
+    // 增加小地图到主容器
+    this.append = function() {
 
         if (_mapContainer && !_mapContainer.parentNode) {
 
@@ -1926,11 +2001,13 @@ CLOUD.MiniMap = function (viewer) {
         }
     };
 
+    // 相机变化回调
     this.setCameraChangedCallback = function(callback) {
 
         this.callbackCameraChanged = callback;
     };
 
+    // 轴网上点击回调
     this.setClickOnAxisGridCallback = function(callback) {
 
         this.callbackClickOnAxisGrid = callback;

@@ -1,5 +1,42 @@
  App.Projects = {
 
+    _cache:[],
+
+    _upload:"1,3,5,6",
+    _delnew:"3,5,6",
+    _down:"3,4,5,6,7,9",
+
+    fromCache:function(index,key,p){
+        var result=null;
+        _.each(App.Projects._cache,function(item){
+            if(item['id']==index){
+                if(p){
+                     result=item[p][key];
+                }else{
+                    result=item[key];
+                }
+            }
+        })
+        return result;
+    },
+
+    isAuth:function(id,op){
+        var _s=this.fromCache(id,'status','version');
+        if(op=='CREATE'){
+            return this._delnew.indexOf(_s)!=-1;
+        }
+        if(op=='DELETE'){
+            return this._delnew.indexOf(_s)!=-1;
+        }
+        if(op=='DOWN'){
+            return this._down.indexOf(_s)!=-1;
+        }
+        if(op=='UPLOAD'){
+            return this._upload.indexOf(_s)!=-1;
+        }
+        return true;
+    },
+
     //项目业态
     proRetailing: {
         '': '其它',
@@ -40,6 +77,7 @@
          parse: function(response) {
              if (response.message == "success") {
                 if(response.data.items && response.data.items.length){
+                App.Projects._cache=response.data.items||[];
                  return response.data.items;
                 }else{
                     Backbone.trigger('projectListNullData');
@@ -116,6 +154,7 @@
                 $("#pageLoading").hide();
                  var $content = $("#projectModes"),
                      pageCount = response.data.totalItemCount;
+
 
                  $content.find(".sumDesc").html('共 ' + pageCount + ' 个项目');
 

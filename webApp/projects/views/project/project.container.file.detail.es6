@@ -26,8 +26,9 @@ App.Project.FileContainerDetail=Backbone.View.extend({
 	render:function(){
 
 		var data = this.model.toJSON();
+		data.isSearch=data.isSearch||false;
 
-		this.$el.html(this.template(this.model.toJSON()));
+		this.$el.html(this.template(data));
 
 		if (data.isAdd) {
 			this.$el.addClass('createNew');

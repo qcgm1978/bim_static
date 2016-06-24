@@ -32,6 +32,8 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
         Backbone.on("modelRuleHalf",this.modelRuleHalf,this);
     },
 
+
+
     modelRuleEmpty:function(){
         if(this.model.get("leaf")&&App.ResourceArtifacts.Status.rule.targetCode == this.model.get("code")){
             this.$(".ruleCheck").removeClass("all").removeClass("half");
@@ -74,6 +76,7 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
                 break
             }
         }
+
         if(ele.hasClass("all")){
             ele.removeClass("all").removeClass("half");
             _this.attr("data-check","0");
@@ -136,6 +139,7 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
     //修正父项状态
     changeFatherStatus:function(status){
         var _this = this.$el.closest("li");
+        var _thisStatus  = _this.attr("data-check");
         var siblings = _this.siblings("li");
         var father = _this.closest("ul").closest("li");
         var fatherSiblings = father.siblings("li");
@@ -145,55 +149,73 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
 
         if(siblings.length){//多个元素
             data = _.filter(siblings,function(item){
-                return $(item).attr("data-check") == val;
+                var s = $(item).attr("data-check");
+                if(s == "3" ){ s = "0";}
+                return val == s;
             });
-        }else{//只有一个元素
-            data = arr1.push(_this);
         }
+
+
         if(fatherSiblings.length){
             //查找父级同类是否有选
             fatherData  =  _.filter(fatherSiblings,function(item){
-                return $(item).attr("data-check") == val;
+                var s = $(item).attr("data-check");
+                if(s == "3" ){ s = "0";}
+                return s == val;
             });
-        }else{
-            fatherData = arr2.push(father);
         }
+
+
         if(status == "cancel"){
             if(father.length){
                 father.attr("data-check","0");
                 pre = this.searchSelf(father);
-                pre.removeClass("all").addClass("half");
-                if(!data.length){
-                    pre.removeClass("half");
+                if(!siblings.length){
+                    pre.removeClass("all").removeClass("half");
+                }else{
+                    pre.removeClass("all").addClass("half");
+                    if(!data.length){
+                        pre.removeClass("half");
+                    }
                 }
             }
             if(grandfather.length){
                 grandfather.attr("data-check","0");
                 grPre = this.searchSelf(grandfather);
-                grPre.removeClass("all").addClass("half");
-                if(!data.length && !fatherData.length){
-                    grPre.removeClass("half");
+                if(!fatherSiblings.length){
+                    grPre.removeClass("all").removeClass("half");
+                }else{
+                    grPre.removeClass("all").addClass("half");
+                    if(!data.length && !fatherData.length){
+                        grPre.removeClass("half");
+                    }
                 }
             }
         }else if(status == "check"){
             if(father.length){
-                father.attr("data-check","1");
+
                 pre = this.searchSelf(father);
                 pre.addClass("half");
-                if(!data.length){
-                    pre.removeClass("half").addClass("all");
+                if(!siblings.length){
+                    pre.addClass("all");
+                    father.attr("data-check","1");
+                }else{
+                    if(!data.length){
+                        father.attr("data-check","1");
+                        pre.removeClass("half").addClass("all");
+                    }
                 }
             }
             if(grandfather.length){
                 grandfather.attr("data-check","1");
                 grPre = this.searchSelf(grandfather);
                 grPre.addClass("half");
-
-                if(!data.length && !fatherData.length){
-                    _.each(grandfather.find(".ruleCheck"),function(item){
-                        $(item).removeClass("half").addClass("all");
-                    });
-                    grPre.removeClass("half").addClass("all");
+                if(!fatherSiblings.length){
+                    grPre.addClass("all").removeClass("half");
+                }else{
+                    if(!data.length && !fatherData.length){
+                        grPre.addClass("all").removeClass("half");
+                    }
                 }
             }
         }

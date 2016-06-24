@@ -40,7 +40,8 @@ ViewComp.MemberManager = Backbone.View.extend({
 		
 		this.selectedTree = $.fn.zTree.init($("#selectedTree"), {
 			view: {
-				showLine: false
+				showLine: false,
+				nameIsHTML:true
 			}
 		}, []);
 		
