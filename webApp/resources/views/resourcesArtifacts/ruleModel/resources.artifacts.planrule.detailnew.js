@@ -5,7 +5,7 @@ App.Resources.ArtifactsPlanRuleDetailNew = Backbone.View.extend({
 
     tagName:"dd",
 
-    template: _.templateUrl("/resources/tpls/resourcesArtifacts/ruleModel/resources.artifacts.planruledetailnew.html"),
+    template: _.templateUrl("/resources/tpls/resourcesArtifacts/ruleModel/resources.artifacts.planruledetailnewx.html"),
 
     events:{
         "click .delRule": "delRule",
