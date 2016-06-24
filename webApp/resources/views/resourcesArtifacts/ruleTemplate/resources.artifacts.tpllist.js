@@ -32,6 +32,10 @@ App.Resources.ArtifactsTplList = Backbone.View.extend({
 
     //创建规则
     newPlanRule:function(){
+        if(App.ResourceArtifacts.modelEdit){
+            alert("编辑状态不能创建模板");
+            return;
+        }
         var _this = this;
         //直接输入名称即可
 
@@ -40,12 +44,9 @@ App.Resources.ArtifactsTplList = Backbone.View.extend({
             //查找未保存的元素并高亮提示变红
             return
         }
-
         var frame = new App.Resources.ArtifactsWindowTpl().render().el; //新建模板
         this.window(frame);
     },
-
-
     //初始化窗口
     window:function(frame){
         App.Resources.ArtifactsMaskWindow = new App.Comm.modules.Dialog({

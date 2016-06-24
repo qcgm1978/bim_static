@@ -34,6 +34,7 @@ App.Resources.ArtifactsTplFrame = Backbone.View.extend({
         this.$(".tplDetailTitle .tplName").val(name);
         this.$(".artifactsContent").addClass("explorer");
         this.$(".artifactsContent .default").show().siblings().hide();
+        this.$(".artifactsNav li").eq(0).addClass("active").siblings("li").removeClass("active");
 
         this.$(".tplContent>.default").hide();
         //获取列表
@@ -57,7 +58,7 @@ App.Resources.ArtifactsTplFrame = Backbone.View.extend({
                     _this.$(".artifactsContent .plans").show();
                     _this.$(".artifactsContent .rules").show();
                 }else{
-                    //没有任何规则时候，创建规则按钮
+                    //没有任何规则时候，显示创建规则按钮
                     _this.$(".artifactsContent .default").siblings().hide();
                 }
                 _this.$(".tplContent").removeClass("services_loading");
