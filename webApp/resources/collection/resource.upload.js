@@ -107,12 +107,29 @@
 					if ($leftSel.length > 0) {
 						parentId = $leftSel.data("file").fileVersionId;
 					}
+
 					if(data.data.folder){
-						App.ResourceModel.afterCreateNewFolder(data.data, parentId);
+						this.afterCreateNewFolder(data.data);
+						//App.ResourceModel.afterCreateNewFolder(data.data, parentId);
 					}
 					
 					//$.jps.publish('add-upload-file', response, file)
 				},
+
+				  //上传文件后操作
+                afterCreateNewFolder(data) {
+
+                    App.ResourceModel.afterCreateNewFolder(data, data.parentId);
+
+                    if (data.children) {
+
+                        var count=data.children.length;
+
+                        for(var i=0;i<count;i++){
+                            this.afterCreateNewFolder(data.children[i]);
+                        }
+                    }
+                },
 
 				//上传失败
 				uploadError: function(file) {
