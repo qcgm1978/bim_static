@@ -48,7 +48,7 @@ App.Resources.artifactsQualityTree = function(dataList,n){
         });
         var initModel = new model(data[i]);
         var li = $("<li></li>");
-        var  a  = data[i].ruleContain;
+        var  a  = data[i].ruleContain ;
 
         li.attr("data-model",JSON.stringify(data[i]));
         li.attr("data-code",data[i].code);
