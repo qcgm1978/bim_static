@@ -446,15 +446,14 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
     redAlert:function(ele){
         ele.addClass("alert");
     },
-
     //切换规则
     seleRule:function(e) {
-        var _this = $(e.target);
         App.Resources.cancelBubble(e);
+        var _this = $(e.target);
         $(".myDropList").hide();
         _this.closest(".myDropText").siblings(".myDropList").show();
+        _this.siblings(".myDropArrorw").removeClass("down").addClass("up");
     },
-
     //选择规则，切换输入方式
     myItem:function(e){
         var _this = $(e.target);
@@ -466,6 +465,7 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
         //数据写入模型
         parent.hide().siblings(".myDropText").find(".text").text(text);
         _this.closest(".myDropDown").attr("data-operator",operator);
+        _this.closest(".myDropDown").find(".myDropArrorw").removeClass("up").addClass("down");
         if(operator == "==" || operator == "!="){
             ioside.removeClass("active");
 

@@ -22,15 +22,14 @@ App.Resources.ArtifactsPlanRuleDetailNew = Backbone.View.extend({
     initialize:function(){
         this.listenTo(this.model,"change",this.render);
     },
-
     //切换规则
     seleRule:function(e){
+        App.Resources.cancelBubble(e);
         var _this = $(e.target);
         $(".myDropList").hide();
-        App.Resources.cancelBubble(e);
-        _this.siblings(".myDropList").show();
+        _this.closest(".myDropText").siblings(".myDropList").show();
+        _this.siblings(".myDropArrorw").removeClass("down").addClass("up");
     },
-
     //选择规则，切换输入方式
     myItem:function(e){
         var _this = $(e.target);
@@ -42,9 +41,10 @@ App.Resources.ArtifactsPlanRuleDetailNew = Backbone.View.extend({
         //数据写入模型
         parent.hide().siblings(".myDropText").find(".text").text(text);
         _this.closest(".myDropDown").attr("data-operator",operator);
+        _this.closest(".myDropDown").find(".myDropArrorw").removeClass("up").addClass("down");
+
         if(operator == "==" || operator == "!="){
             ioside.removeClass("active");
-
             if(eIn.hasClass("active")){return}
             eIn.addClass("active");
         }else if(operator == "<>" || operator == "><"){
@@ -53,7 +53,6 @@ App.Resources.ArtifactsPlanRuleDetailNew = Backbone.View.extend({
             ioside.addClass("active");
         }
     },
-
     //删除
     delRule:function(){
         this.$el.remove();//删除元素
