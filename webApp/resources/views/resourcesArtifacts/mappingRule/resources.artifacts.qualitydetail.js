@@ -46,6 +46,7 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
             this.$(".ruleCheck").addClass("all").removeClass("half");
             Backbone.trigger("modelRuleSelectAll");
             this.changeFatherStatus("check");
+            this.$el.closest("li").attr("data-check",1);
         }
     },
     modelRuleHalf:function(){
@@ -97,6 +98,11 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
                 //移除所有下级菜单
                 if(this.$el.siblings(".childList").find("li").length) {
                     _.each(this.$el.siblings(".childList").find("li"),function (item) {
+
+                        if($(item).attr("data-code") == App.ResourceArtifacts.Status.rule.targetCode && ($(item).attr("data-check") == "1" ||  $(item).attr("data-check") == "3")){
+                            Backbone.trigger("modelRuleSelectNone");
+                        }
+
                         $(item).attr("data-check", "0");
                         $(item).find(".ruleCheck").removeClass("all").removeClass("half")
                     });
@@ -124,6 +130,9 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
                 //添加所有下级菜单
                 if(this.$el.siblings(".childList").find("li").length) {
                     _.each(this.$el.siblings(".childList").find("li"),function(item){
+                        if($(item).attr("data-code") == App.ResourceArtifacts.Status.rule.targetCode && $(item).attr("data-check") != "1"){
+                            Backbone.trigger("modelRuleSelectAll");
+                        }
                         $(item).attr("data-check","1");
                         if($(item).hasClass("all")){
                             return
@@ -149,7 +158,7 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
         if(siblings.length){//多个元素
             data = _.filter(siblings,function(item){
                 var s = $(item).attr("data-check");
-                if(s == "3" ){ s = "0";}
+                if(s == "3" || s == "2"){ s = "0";}
                 return val == s;
             });
         }
@@ -157,7 +166,7 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
             //查找父级同类是否有选
             fatherData  =  _.filter(fatherSiblings,function(item){
                 var s = $(item).attr("data-check");
-                if(s == "3" ){ s = "0";}
+                if(s == "3" || s == "2"){ s = "0";}
                 return s == val;
             });
         }
