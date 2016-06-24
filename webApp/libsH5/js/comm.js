@@ -55,6 +55,9 @@
           if((!hasChild && select == 'uncheck' && !isChecked) || (!hasChild && select == 'checked' && isChecked) || select == 'all'){
             regData.push(userData);
           }
+          if((hasChild && select == 'uncheck' && !isChecked)||hasChild && select == 'checked' && isChecked){
+            result.ids.push(userData);
+          }
         });
         var str = regData.toString().replace(/,/g,"|");
         var reg = new RegExp("^("+str+")");

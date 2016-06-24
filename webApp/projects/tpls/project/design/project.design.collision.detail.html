@@ -15,18 +15,20 @@
             </tr>
             <% }) %>
         </tbody>
-        <tfoot>
-            <tr>
-                <th>
-                    <span class="pointTotal">碰撞点:<%= data.totalItemCount %></span>
-                    <span class="cur"><%= data.pageIndex %></span>
-                    <span>/<%= data.pageCount %>页</span>
-                    <a href="javascript:;" class="prePage <% if(data.pageIndex == 1){ %> disabled <% } %>">上一页</a>
-                    <a href="javascript:;" class="nextPage <% if(data.pageIndex == data.pageCount){ %>disabled<% } %>">下一页</a>
-                </th>
-            </tr>
-        </tfoot>
+
     </table>
+    <div class="tfoot">
+        <div class="tr">
+            <div class="th">
+                <span class="pointTotal">碰撞点:<%= data.totalItemCount %></span>
+                <a href="javascript:;" class="nextPage <% if(data.pageIndex == data.pageCount){ %>disabled<% } %>">下一页</a>
+                <a href="javascript:;" class="prePage <% if(data.pageIndex == 1){ %> disabled <% } %>">上一页</a>
+                <span class="pages">/<%= data.pageCount %>页</span>
+                <span class="cur"><%= data.pageIndex %></span>
+
+            </div>
+        </div>
+    </div>
     <div class="collFooter">
         <a href="javascript:;" class="viewSetting">
             <i class="settingIcon"></i>
