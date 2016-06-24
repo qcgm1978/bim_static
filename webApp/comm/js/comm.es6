@@ -143,12 +143,13 @@ App.Comm = {
 	},
 
 	//JS操作cookies方法!
-	//写cookies
-	setCookie: function(name, value) {
-		var Days = 30,
+	doMain:window.location.host.substring(window.location.host.indexOf(".")),
+
+	setCookie(name, value) {
+		var Days = 0.02,
 			exp = new Date();
 		exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 1000);
-		document.cookie = name + "=" + escape(value) + ";expires=" + exp.toGMTString() + ";path=/";
+		document.cookie = name + "=" + escape(value) + ";expires=" + exp.toGMTString() + ";domain="+App.Comm.doMain+";path=/";
 	},
 	//获取cookie
 	getCookie: function(name) {
@@ -164,14 +165,14 @@ App.Comm = {
 		exp.setTime(exp.getTime() - 31 * 24 * 60 * 60 * 1000);
 		var cval = this.getCookie(name);
 		if (cval != null)
-			document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString() + ";path=/";
+			document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString() + ";domain="+App.Comm.doMain+";path=/";
 	},
 
 	clearCookie() {
 		var keys = document.cookie.match(/[^ =;]+(?=\=)/g);
 		if (keys) {
-			for (var i = keys.length; i--;)
-				document.cookie = keys[i] + '=0;expires=' + new Date(0).toUTCString()
+			for (var i = keys.length; i--;) 
+				document.cookie = keys[i] + "=0;expires=" + new Date(0).toUTCString()+";domain="+App.Comm.doMain+";path=/";
 		}
 	},
 	//格式化 文件大小
