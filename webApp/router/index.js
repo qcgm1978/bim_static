@@ -235,7 +235,7 @@ var AppRoute = Backbone.Router.extend({
 
 	//重置数据
 	reset: function() {
-
+		 
 		if (!$._data($(".user > span")[0], "events")) {
 			//绑定用户信息
 			App.TopNav.init();
@@ -248,7 +248,7 @@ var AppRoute = Backbone.Router.extend({
 		App.Comm.upload.destroy();
 		App.Global.User && $("#topBar .userName .text").text(App.Global.User.name);
 
-		if (!App.Global.User) {
+		if (!App.Global.User || !App.Comm.getCookie('OUTSSO_AuthMAC')) {
 			App.Comm.ajax({
 				URLtype:"current"
 			});

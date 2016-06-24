@@ -107,12 +107,29 @@
 					if ($leftSel.length > 0) {
 						parentId = $leftSel.data("file").fileVersionId;
 					}
+
 					if(data.data.folder){
-						App.ResourceModel.afterCreateNewFolder(data.data, parentId);
+						this.afterCreateNewFolder(data.data);
+						//App.ResourceModel.afterCreateNewFolder(data.data, parentId);
 					}
 					
 					//$.jps.publish('add-upload-file', response, file)
 				},
+
+				  //上传文件后操作
+                afterCreateNewFolder(data) {
+
+                    App.ResourceModel.afterCreateNewFolder(data, data.parentId);
+
+                    if (data.children) {
+
+                        var count=data.children.length;
+
+                        for(var i=0;i<count;i++){
+                            this.afterCreateNewFolder(data.children[i]);
+                        }
+                    }
+                },
 
 				//上传失败
 				uploadError: function(file) {
@@ -124,8 +141,8 @@
 
 		//获取上传容量
 		getQuotaInfo: function() {
-			var quota = this.quota;
-			return "共 20GB，已用 564.2MB"; //App.Comm.modules.util.format('共 $0，已用 $1', [App.common.modules.util.formatSize(quota.total), App.common.modules.util.formatSize(quota.used)])
+			//var quota = this.quota;
+			//return "共 20GB，已用 564.2MB"; //App.Comm.modules.util.format('共 $0，已用 $1', [App.common.modules.util.formatSize(quota.total), App.common.modules.util.formatSize(quota.used)])
 		},
 
 		//更新上传容量

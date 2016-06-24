@@ -4,7 +4,7 @@ var Login = {
 		var Days = 0.02,
 			exp = new Date();
 		exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 1000);
-		document.cookie = name + "=" + escape(value) + ";expires=" + exp.toGMTString() + ";";
+		document.cookie = name + "=" + escape(value) + ";expires=" + exp.toGMTString() + ";path=/";
 	},
 	//获取cookie
 	getCookie: function(name) {
@@ -98,6 +98,7 @@ var Login = {
 					}
 				}
 				 
+				Login.delCookie("token_cookie");
 				//获取用户信息
 				Login.getUserInfo();
 
@@ -140,7 +141,7 @@ var Login = {
 			}
 			//是否主动退出标记 2 默认状态 1 为主动退出
 			Login.setCookie('IS_OWNER_LOGIN', '2');
-			Login.delCookie("token_cookie");
+			
 			if (r && r != document.URL) {
 				window.location = decodeURIComponent(r);
 			} else {
