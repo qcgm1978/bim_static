@@ -233,7 +233,7 @@ App.ResourceArtifacts={
         _this.$(".breadcrumbNav .breadItem").hide();
         _this.$(".breadcrumbNav .fileNav").hide();
         _this.$(".breadcrumbNav .breadItem.project").show();
-        $("#artifacts").addClass("services_loading");
+
         this.loaddeaprt();//分类编码
 
         if(optionType == "library" ||  optionType == "template"){
@@ -264,7 +264,6 @@ App.ResourceArtifacts={
         App.ResourceArtifacts.Status.templateId = "";
 
         if(optionType == "template" ){//规则模板
-
             _this.$(".resourcesMappingRule .template").addClass("active").siblings("a").removeClass("active");
             App.ResourceArtifacts.Status.qualityStandardType = "GC";
             if(App.ResourceArtifacts.Settings.ruleModel  ==2){
@@ -273,11 +272,30 @@ App.ResourceArtifacts={
 
             this.tplFrame = new App.Resources.ArtifactsTplFrame();
             this.tplList = new App.Resources.ArtifactsTplList();
+            this.detail = new App.Resources.ArtifactsTplDetail();
 
             _this.$el.append(this.tplFrame.render().el);//菜单
             this.tplFrame.$(".tplListContainer").html(this.tplList.render().el);//右侧框架
+            this.tplFrame.$(".tplContent .content").html(this.detail.render().el);
+            this.detail.$(".tplDetailCon").append(this.menu.render().el);//菜单
+            this.menu.$(".plans").html(this.plans.render().el);//计划
+            this.menu.$(".rules").append(this.planRuleTitle.render().el);//规则
+            this.planRuleTitle.$(".ruleContentRuleList").append(this.planRule.render().el);//规则列表
+            this.menu.$(".qualifyC").append(this.quality.render().el);//质量
 
+            var menu = this.menu;
+            var tplFrame = this.tplFrame;
+            this.detail.$(".artifactsContent").addClass("explorer");
+            $("#artifacts").addClass("services_loading");
             this.getTpl();
+             App.ResourceArtifacts.getPlan();
+
+             App.ResourceArtifacts.getAllQuality(function(){
+             App.ResourceArtifacts.departQuality(menu.$(".qualityMenuListGC"),App.ResourceArtifacts.allQualityGC,null,"0");
+             menu.$(".qualityMenuListGC").show();
+             App.ResourceArtifacts.departQuality(menu.$(".qualityMenuListKY"),App.ResourceArtifacts.allQualityKY,null,"0");
+                 tplFrame.$(".tplContent").removeClass("services_loading");
+             });
 
         }else{//规则库
             _this.$(".resourcesMappingRule .library").addClass("active").siblings("a").removeClass("active");
@@ -290,6 +308,8 @@ App.ResourceArtifacts={
             if(App.ResourceArtifacts.Status.projectId){
                this.getProjectName(_this,App.ResourceArtifacts.Status.projectId)
             }
+
+            $("#artifacts").addClass("services_loading");
 
             //读入数据
             this.getPlan();
@@ -327,7 +347,6 @@ App.ResourceArtifacts={
             if(response.code == 0 && response.data && response.data.length){
                 App.Resources.artifactsTreeData = response.data;
             }
-            $("#artifacts").removeClass("services_loading");
         });
     },
     //获取计划节点
@@ -346,16 +365,14 @@ App.ResourceArtifacts={
             pdata.data.projectId = App.ResourceArtifacts.Status.projectId;
         }
         App.ResourceArtifacts.PlanRules.reset();
+        App.ResourceArtifacts.PlanNode.reset();
         App.Comm.ajax(pdata,function(response){
             if(response.code == 0 && response.data){
-                App.ResourceArtifacts.PlanNode.reset();
                 if(response.data.length){
-
                     App.ResourceArtifacts.PlanNode.add(response.data);
                 }else{
                     Backbone.trigger("mappingRuleNoContent");
                 }
-                $("#artifacts").removeClass("services_loading");
             }
         });
     },
@@ -396,6 +413,7 @@ App.ResourceArtifacts={
                     fn(response.data);
                 }
             }
+            $("#artifacts").removeClass("services_loading");
         });
     },
 
@@ -439,7 +457,6 @@ App.ResourceArtifacts={
             data:{}
         };
         App.ResourceArtifacts.TplCollection.reset();
-        App.ResourceArtifacts.PlanRules.reset();
         App.Comm.ajax(pdata,function(response){
             if(response.code == 0 && response.data){
                 if(response.data.length){
