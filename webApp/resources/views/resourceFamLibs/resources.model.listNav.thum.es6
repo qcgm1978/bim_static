@@ -25,7 +25,6 @@ App.ResourceModel.ThumContent = Backbone.View.extend({
 
 	//添加单个文件
 	addOneFile: function(model) {
-
 		var view = new App.ResourceModel.ThumDetail({
 			model: model
 		});
@@ -33,8 +32,11 @@ App.ResourceModel.ThumContent = Backbone.View.extend({
 		var data = model.toJSON();
 
 		this.$el.find(".thumContent .loading").remove();
-
-		this.$el.find(".thumContent").prepend(view.render().el);
+		if(data.isAdd){
+			this.$el.find(".thumContent").prepend(view.render().el);
+		}else{
+			this.$el.find(".thumContent").append(view.render().el);
+		}
 
 		App.Comm.initScroll(this.$el.find(".thumLists"), 'y');
 

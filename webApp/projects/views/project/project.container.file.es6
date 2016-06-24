@@ -27,7 +27,8 @@ App.Project.FileContainer = Backbone.View.extend({
 	render: function() {
 		this.$el.html(this.template());
 		var $container = this.$el.find('.serviceNav'),
-			Auth = App.AuthObj && App.AuthObj.project && 　App.AuthObj.project.prjfile;
+			Auth = App.AuthObj && App.AuthObj.project && 　App.AuthObj.project.prjfile,
+			projectId=App.Project.Settings.CurrentVersion.projectId;
 
 		if (!Auth) {
 			Auth = {};
@@ -39,8 +40,22 @@ App.Project.FileContainer = Backbone.View.extend({
 				this.$('.btnFileDownLoad').addClass('disable');
 			}
 		}
-		if (App.Project.Settings.CurrentVersion.status != 9 ||
-			App.Project.Settings.CurrentVersion.subType == 1) {
+	/*	if (App.Project.Settings.CurrentVersion.status == 9 ||
+			App.Projects.fromCache(projectId,'subType') == 1) {
+			this.$('.btnNewFolder').addClass('disable');
+			this.$('.btnFileDel').addClass('disable');
+		}*/
+		if(!App.Projects.isAuth(projectId,'CREATE')){
+			this.$('.btnNewFolder').addClass('disable');
+			this.$('.btnFileDel').addClass('disable');
+		}
+		if(!App.Projects.isAuth(projectId,'UPLOAD')){
+			this.$('.btnFileUpload').addClass('disable');
+		}
+		if(!App.Projects.isAuth(projectId,'DOWN')){
+			this.$('.btnFileDownLoad').addClass('disable');
+		}
+		if(App.Projects.fromCache(projectId,'subType') == 1){
 			this.$('.btnNewFolder').addClass('disable');
 			this.$('.btnFileDel').addClass('disable');
 		}
@@ -94,7 +109,11 @@ App.Project.FileContainer = Backbone.View.extend({
 				App.Project.FileCollection.reset();
 
 				if (count > 0) {
-					App.Project.FileCollection.push(data.data);
+					var _temp=data.data||[];
+					_.each(_temp,function(item){
+						item.isSearch='search';
+					})
+					App.Project.FileCollection.push(_temp);
 				} else {
 					App.Project.FileCollection.trigger("searchNull");
 				}
