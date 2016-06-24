@@ -15,11 +15,10 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
     render:function() {
         this.$el.html(this.template(this.model.toJSON()));
         var ruleContain = this.model.get("ruleContain");
-        var a  = ruleContain == 1 ?  1 : 0;
         if(!this.model.get("ruleIds").length){
             this.$el.addClass("tplShow");
         }
-        this.$el.attr("data-check", a);
+        this.$el.attr("data-check", ruleContain);
         this.$el.attr("data-model",JSON.stringify(this.model.toJSON()));
         this.$el.attr("data-code", this.model.get("code"));
         return this;

@@ -54,7 +54,6 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
                 this.$el.attr("data-check","0");
             }
         }
-
         return this;
     },
     initialize:function(){
@@ -105,7 +104,7 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
         var ele = $(e.target);
         var allSele = ele.closest("ul").find("li");
         //°ëÑ¡×´Ì¬
-        Backbone.trigger("modelRuleHalf","half");
+
         if(ele.hasClass("all")){
             ele.removeClass("all");
             ele.closest("li").attr("data-check","0");
@@ -116,6 +115,8 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
             });
             if(!checked1.length){
                 Backbone.trigger("modelRuleEmpty");
+            }else{
+                Backbone.trigger("modelRuleHalf");
             }
             var listEle = _.filter($(".outsideList li"),function(item){
                 return $(item).attr("data-check") == "1"
@@ -136,6 +137,8 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
             ele.addClass("all");
             if(!checked2.length){
                 Backbone.trigger("modelRuleFull");
+            }else{
+                Backbone.trigger("modelRuleHalf");
             }
 
             var listEle2 = _.filter($(".outsideList li"),function(item){

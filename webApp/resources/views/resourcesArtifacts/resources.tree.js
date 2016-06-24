@@ -52,7 +52,7 @@ App.Resources.artifactsQualityTree = function(dataList,n){
 
         li.attr("data-model",JSON.stringify(data[i]));
         li.attr("data-code",data[i].code);
-        li.attr("data-ruleContain",data[i].ruleContain);
+        //li.attr("data-ruleContain",data[i].ruleContain);
         li.attr("data-leaf",(data[i].leaf ? "1" : 0));
 
         if(!data[i].count){

@@ -48,7 +48,7 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
             this.changeFatherStatus("check");
         }
     },
-    modelRuleHalf:function(half){
+    modelRuleHalf:function(){
         if(this.model.get("leaf")&&App.ResourceArtifacts.Status.rule.targetCode == this.model.get("code")){
             this.$(".ruleCheck").addClass("half").removeClass("all");
             this.changeFatherStatus("cancel");
@@ -139,7 +139,6 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
     //修正父项状态
     changeFatherStatus:function(status){
         var _this = this.$el.closest("li");
-        var _thisStatus  = _this.attr("data-check");
         var siblings = _this.siblings("li");
         var father = _this.closest("ul").closest("li");
         var fatherSiblings = father.siblings("li");
@@ -154,7 +153,6 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
                 return val == s;
             });
         }
-
         if(fatherSiblings.length){
             //查找父级同类是否有选
             fatherData  =  _.filter(fatherSiblings,function(item){
