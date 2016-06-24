@@ -38,23 +38,23 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
         if(this.model.get("leaf")&&App.ResourceArtifacts.Status.rule.targetCode == this.model.get("code")){
             this.$(".ruleCheck").removeClass("all").removeClass("half");
             Backbone.trigger("modelRuleSelectNone");
-            this.changeFatherStatus("cancel");
             this.$el.closest("li").attr("data-check",2);
+            this.changeFatherStatus("cancel");
         }
     },
     modelRuleFull:function(){
         if(this.model.get("leaf")&&App.ResourceArtifacts.Status.rule.targetCode == this.model.get("code")) {
             this.$(".ruleCheck").addClass("all").removeClass("half");
             Backbone.trigger("modelRuleSelectAll");
-            this.changeFatherStatus("check");
             this.$el.closest("li").attr("data-check",1);
+            this.changeFatherStatus("check");
         }
     },
     modelRuleHalf:function(){
         if(this.model.get("leaf")&&App.ResourceArtifacts.Status.rule.targetCode == this.model.get("code")){
             this.$(".ruleCheck").addClass("half").removeClass("all");
-            this.changeFatherStatus("cancel");
             this.$el.closest("li").attr("data-check",3);
+            this.changeFatherStatus("cancel");
         }
     },
 
@@ -109,7 +109,7 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
                         $(item).find(".ruleCheck").removeClass("all").removeClass("half")
                     });
                 }
-                this.checkControl(e,"cancel");
+                this.checkControl("cancel");
             }
         }else{
             ele.addClass("all").removeClass("half");
@@ -156,7 +156,7 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
         var fatherSiblings = father.siblings("li");
         var grandfather = father.closest("ul").closest("li");
         var val = status == "check" ? "2" : "1";
-        var pre,grPre,data,fatherData,arr1=[],arr2 = [];
+        var pre,grPre,data,fatherData;
 
         if(siblings.length){//¶à¸öÔªËØ
             data = _.filter(siblings,function(item){
@@ -185,8 +185,8 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
                     pre.removeClass("all").removeClass("half");
                 }else{
                     pre.removeClass("all").addClass("half");
-                    if(!data.length){
-                        pre.removeClass("half");
+                    if(!data.length && _thisStatus == "2"){
+                        pre.removeClass("half").removeClass("half");
                     }
                 }
             }
@@ -200,8 +200,8 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
                     grPre.removeClass("all").removeClass("half");
                 }else{
                     grPre.removeClass("all").addClass("half");
-                    if(!data.length && !fatherData.length){
-                        grPre.removeClass("half");
+                    if(!data.length && !fatherData.length &&  _thisStatus == "2"){
+                        grPre.removeClass("half").removeClass("half");
                     }
                 }
             }
