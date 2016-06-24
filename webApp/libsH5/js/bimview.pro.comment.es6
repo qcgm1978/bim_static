@@ -1596,7 +1596,7 @@
 
 			//修改视点
 			reName($li) {
-
+				 
 				var data = {
 						cate: "viewPoint",
 						id: $li.find(".remarkCount").data("id"),

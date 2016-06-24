@@ -41,7 +41,7 @@
 <%}%>
 
 
-<span class="fileStatus inlineBlock"><%=  App.Comm.formatStatus(status,1) %></span>
+<span class="fileStatus inlineBlock"><%= folder?'':App.Comm.formatStatus(status,1) %></span>
 <span class="fileOp inlineBlock"><%= creatorName %></span>
 <span class="fileSize inlineBlock"><%=App.Comm.formatSize(length)%></span>
 <span class="fileDate inlineBlock"><%= new Date(createTime).format("yyyy-MM-dd") %></span>

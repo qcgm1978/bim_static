@@ -25,14 +25,14 @@
     <%}%>
 <%}else{%>
  
-        <a data-id="<%=id%>" href="/static/dist/app/project/single/filePreview.html?id=<%=fileVersionId%>&projectId=<%=projectId%>&projectVersionId=<%=App.ResourceModel.Settings.CurrentVersion.id%>" target="_blank" data-isfolder="<%=folder%>" class="text">
+        <a data-id="<%=id%>" href="/static/dist/app/project/single/filePreview.html?id=<%=fileVersionId%>&projectId=<%=projectId%>&projectVersionId=<%=App.ResourceModel.Settings.CurrentVersion.id%>" target="_blank" data-isfolder="<%=folder%>" class="text overflowEllipsis">
            <%= App.ResourceModel.getName(name)  %>
         </a>
 <%}%>
 </span>
 
 
-<span class="fileStatus inlineBlock"><%=  App.Comm.formatStatus(status,2) %></span>
+<span class="fileStatus inlineBlock"><%= folder?'': App.Comm.formatStatus(status,2) %></span>
 <span class="fileOp inlineBlock"><%= creatorName %></span>
 <span class="fileSize inlineBlock"><%=length?App.Comm.formatSize(length):""%></span>
 <span class="fileDate inlineBlock"><%= createTime?new Date(createTime).format("yyyy-MM-dd"):"" %></span>

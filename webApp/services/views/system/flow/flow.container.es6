@@ -31,6 +31,7 @@ App.Services.System.FolwContainer = Backbone.View.extend({
 
 		this.$(".flowListBody").append(view.render().el);
 
+		App.Comm.initScroll(this.$(".flowListBodScroll"),"y");
 
 	},
 
