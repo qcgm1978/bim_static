@@ -23,7 +23,13 @@ App.Project.DesignCollisionTaskList=Backbone.View.extend({
     if(data.data.length == 0){
       return this.$el.html('<p class="tips">没有碰撞</p>');
     }else{
-      this.$el.html(this.template(data)).find('.collList').children().eq(0).trigger('click');
+      if(this.$el.find("ul").length==0){
+        this.$el.html(this.template(data)).find('.collList').children().eq(0).trigger('click');
+
+      }else{
+        this.$el.html(this.template(data));
+
+      }
 
       return this;
     }

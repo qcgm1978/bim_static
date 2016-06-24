@@ -29,7 +29,7 @@ App.Project.DesignCollision=Backbone.View.extend({
 		var list = that.$el.find('.collSelect');
 		list.show();
 	//	$('.collHead').height('240');
-		if($el.next(".collSelect").find("ul").length==0){
+		if(true || $el.next(".collSelect").find("ul").length==0){
 			App.Project.DesignAttr.CollisionTaskList.projectId = App.Project.Settings.CurrentVersion.projectId;
 			App.Project.DesignAttr.CollisionTaskList.projectVerionId = App.Project.Settings.CurrentVersion.id;
 			App.Project.DesignAttr.CollisionTaskList.fetch();
@@ -127,6 +127,7 @@ App.Project.DesignCollision=Backbone.View.extend({
 		      	App.Project.DesignAttr.CollisionTaskDetail.add({message:"failed"});
 		        alert(data.message);
 		      }
+		      $('.detailList .collList').html('');
 		      self.refreshSelectList();
 
 	      });

@@ -2,7 +2,7 @@
   <li class="itemNode">
     <label class="itemContent">
       <i class="fileIcon"></i><span class="treeText"><%= value %></span>
-      <input type="checkbox" class="inputCheckbox" data-id="<%= key %>" value="<%= value %>">
+      <input type="checkbox" class="inputCheckbox" <% if(isCheck){%>checked='checked'<%}%> data-id="<%= key %>" value="<%= value %>">
     </label>
   </li>
 <% }); %>
