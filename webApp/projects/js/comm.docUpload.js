@@ -78,10 +78,27 @@
                     if (App.Project.Settings.fileId && data.code == 0) {
                         //文件夹
                         if (data.data.folder) {
-                            App.Project.afterCreateNewFolder(data.data, data.data.parentId);
+                            this.afterCreateNewFolder(data.data);
+                            //App.Project.afterCreateNewFolder(data.data, data.data.parentId);
                         }
                         if (App.Project.Settings.fileId == data.data.parentId) {
                             App.Project.FileCollection.push(data.data);
+                        }
+                    }
+                },
+
+
+                //上传文件后操作
+                afterCreateNewFolder(data) {
+
+                    App.Project.afterCreateNewFolder(data, data.parentId);
+
+                    if (data.children) {
+
+                        var count=data.children.length;
+
+                        for(var i=0;i<count;i++){
+                            this.afterCreateNewFolder(data.children[i]);
                         }
                     }
                 },
