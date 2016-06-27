@@ -57,7 +57,7 @@ App.Project.PlanAttr={
 			}
 		}),
 
-		urlType:"fetchPlanPublicity",
+		urlType:"fetchPlanPublicity"
 
 		 
 

@@ -63,7 +63,7 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 
 			if ($leftItem.length > 0) {
 
-				$nodeSwitch = $leftItem.parent().find(".nodeSwitch");
+				var $nodeSwitch = $leftItem.parent().find(".nodeSwitch");
 
 				if ($nodeSwitch.length > 0 && !$nodeSwitch.hasClass('on')) {
 					$nodeSwitch.click();
@@ -295,7 +295,7 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 
 		var filePath = $item.find(".txtEdit").val().trim(),
 			that = this,
-			$leftSel = $("#resourceFamlibsLeftNav .treeViewMarUl .selected");
+			$leftSel = $("#resourceFamlibsLeftNav .treeViewMarUl .selected"),
 		parentId = "";
 		if ($leftSel.length > 0) {
 			parentId = $leftSel.data("file").fileVersionId;

@@ -23,9 +23,9 @@ a { color: #fff; text-decoration: none; }
 @color: #4D926F;
 .rounded-corners (@radius:4px) { -webkit-border-radius: @radius; -moz-border-radius: @radius; -ms-border-radius: @radius; -o-border-radius: @radius; border-radius: @radius; }
 .loginDialogWidth() { width: 260px; box-sizing: border-box; display: block; margin: 0 auto; margin-top: 10px; }
-.layout { position: absolute; top: 0; left: 0; right: 0; bottom: 0; min-width: 1000px; min-height: 720px; background: url('/login/images/login-bg.jpg') no-repeat; background-size: cover; }
+.layout { position: absolute; top: 0; left: 0; right: 0; bottom: 0; min-width: 1000px; min-height: 720px; background: url('/login/images/login-bg.jpg') no-repeat; background-size: cover;filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/login/images/login-bg.jpg', sizingMethod='scale');}
 .loginForm { position: absolute; bottom: 202px; top: 0; left: 0; right: 0; }
-#mainBox { height: 100%; padding-top: 1px; filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/login/images/login-bg.jpg', sizingMethod='scale');
+#mainBox { height: 100%; padding-top: 1px;
   .logo { margin: 38px 0px 0px 50px; width: 128px; height: 30px; background: url('/login/images/logo.png') no-repeat; float: left; }
   .headTitle { width: 524px; font-size: 40px; color: #fff; top: 18%; position: absolute; left: 50%; margin-left: -262px;
     .introduction { margin-top: 15px; font-size: 26px; height: 30px;

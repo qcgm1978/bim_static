@@ -77,8 +77,9 @@ var AppRoute = Backbone.Router.extend({
 		//加载css js
 		_.require('/static/dist/projects/projects.css');
 		_.require('/static/dist/projects/projects.js');
-		//_.require('http://www.api.map.baidu.com/api?v=2.0&ak=osmP2eNEjPlvebAAIVhcDc6c');
+	//	//_.require('http://www.api.map.baidu.com/api?v=2.0&ak=osmP2eNEjPlvebAAIVhcDc6c');
 		App.Projects.init();
+		alert();
 
 	},
 
@@ -235,7 +236,16 @@ var AppRoute = Backbone.Router.extend({
 
 	//重置数据
 	reset: function() {
-		 
+		 //判断是否是IE浏览器
+		var hash = window.location.hash;
+		if(hash && hash!="#bodyContent"){
+			var explorer = window.navigator.userAgent ;
+			//ie
+			if (!!window.ActiveXObject || "ActiveXObject" in window){
+				window.location.href = location.host + "/static/dist/app/todo/remind.html";
+			}
+		}
+
 		if (!$._data($(".user > span")[0], "events")) {
 			//绑定用户信息
 			App.TopNav.init();

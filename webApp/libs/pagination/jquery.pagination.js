@@ -148,7 +148,7 @@
 			show_if_single_page:false,
 			load_first_page:true,
 			callback:function(){return false;},
-			click:null,
+			click:null
 		},opts||{});
 		
 		var containers = this,
