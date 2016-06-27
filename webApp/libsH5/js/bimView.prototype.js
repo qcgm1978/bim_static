@@ -498,7 +498,7 @@
       // 进入批注模式
       var self = this;
       var viewer = self.viewer;
-      var modelBgColor = self._dom.bimBox.find('.view').css('background-color');
+      var modelBgColor = self._dom.bimBox.css('background-color');
       self._dom.bimBox.addClass('comment');
       viewer.editCommentBegin();
       viewer.setCommentBackgroundColor(modelBgColor);
