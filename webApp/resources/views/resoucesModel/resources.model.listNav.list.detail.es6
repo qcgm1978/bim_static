@@ -22,6 +22,12 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 
 	render: function() {
 		var data = this.model.toJSON();
+		data.isSearch=data.isSearch||false;
+		if(data.isSearch){
+			$('#resourceListContent .ckAll').hide();
+		}else{
+			$('#resourceListContent .ckAll').show();
+		}
 		this.$el.html(this.template(data)).data("status", data.status);
 		if (data.isAdd) {
 			this.$el.addClass('createNew');
