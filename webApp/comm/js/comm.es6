@@ -336,7 +336,7 @@ App.Comm = {
 				};
 
 				var data = App.Comm.getUrlByType(data);
-				var url = data.url + "?fileVersionId=" + fileVersionId;
+				var url = data.url + "&fileVersionId=" + fileVersionId;
 				window.location.href = url;
 			} else {
 				alert(data.message);

@@ -142,7 +142,7 @@ App.Project = {
 					};
 
 					var data = App.Comm.getUrlByType(data),
-						url = data.url + "?fileVersionId=" + fileVersionId;
+						url = data.url + "&fileVersionId=" + fileVersionId;
 					window.location.href = url;
 
 				},
