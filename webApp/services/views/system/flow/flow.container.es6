@@ -105,7 +105,7 @@ App.Services.System.FolwContainer = Backbone.View.extend({
 			alert("请输入流程名称");
 			return;
 		}
-
+		 
 		if (dialog.element.find(".ckUrl .selected").length > 0) {
 
 			if (!data.data.busViewUrl) {
@@ -118,7 +118,7 @@ App.Services.System.FolwContainer = Backbone.View.extend({
 		}
 
 		if (dialog.element.find(".starUrl .selected").length > 0) {
-			if (!!data.data.busSendUrl) {
+			if (!data.data.busSendUrl) {
 				alert("未填发起url");
 				return;
 			} 
