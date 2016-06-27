@@ -75,7 +75,7 @@ App.Comm = {
 		return $.ajax(data).done(function(data) {
 
 			//cookie延长30分钟
-			//App.Comm.setCookieTime(30);
+			App.Comm.setCookieTime(30);
 
 			if (_.isString(data)) {
 				// to json
@@ -190,15 +190,14 @@ App.Comm = {
 	//设置cookie 时间
 	setCookieTime(min) {
 
-		var Days = +(min/24*60).toFixed(2),
-			exp = new Date();
-		exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 1000), 
+		var exp = new Date();
+		exp.setTime(exp.getTime() + min * 60 * 1000), 
 		
 		keys = document.cookie.match(/[^ =;]+(?=\=)/g);
-
+		 
 		if (keys) {
 			for (var i = keys.length; i--;)
-				document.cookie = keys[i] + "=0;expires=" + exp.toGMTString() + ";domain=" + App.Comm.doMain + ";path=/";
+				document.cookie = keys[i] + "="+this.getCookie(keys[i])+";expires=" + exp.toGMTString() + ";domain=" + App.Comm.doMain + ";path=/";
 		}
 	},
 

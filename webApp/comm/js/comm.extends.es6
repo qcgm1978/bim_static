@@ -253,7 +253,7 @@ Backbone.sync = function(method, model, options) {
 	return BackboneSync.apply(this, arguments).done(function(data) {
 
 		//cookie延长30分钟
-		//App.Comm.setCookieTime(30);
+		App.Comm.setCookieTime(30);
 
 		if (data.code == 10004) {
 			window.location.href = data.data;
