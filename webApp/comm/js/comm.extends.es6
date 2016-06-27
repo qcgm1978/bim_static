@@ -90,7 +90,7 @@ Array.prototype.removeByItem = function(item) {
 		this.splice(index, 1);
 		return true;
 	}
-	return false; 
+	return false;
 
 }
 
@@ -209,19 +209,19 @@ String.prototype.format = function(args) {
 var BackboneSync = Backbone.sync;
 //重写backbone 的 sync 
 Backbone.sync = function(method, model, options) {
-	  
+
 	// 在没有url 的情况下 取 api 的值 以防有特别的处理
 	//if (!model.url) 
 	//测试
 	if (App.API.Settings.debug) {
 		model.url = App.API.DEBUGURL[model.urlType];
 	} else {
-		model.url = App.API.Settings.hostname + App.API.URL[model.urlType]; 
+		model.url = App.API.Settings.hostname + App.API.URL[model.urlType];
 	}
 
 	//如果有srcUrl 不解析
-	if (model.srcUrl){
-		model.url=model.srcUrl;
+	if (model.srcUrl) {
+		model.url = model.srcUrl;
 	}
 	//}
 	//url 是否有参数
@@ -235,19 +235,25 @@ Backbone.sync = function(method, model, options) {
 				model.url = model.url.replace(rex, val);
 			}
 		}
-	} 
+	}
 
 	//设置header
-	options.headers={
-		ReturnUrl:location.href
-	} 
-	 
+	options.headers = {
+		ReturnUrl: location.href
+	}
+
+	//时间戳
+	if (model.url.indexOf("?") > -1) {
+		model.url += "&t=" + (+new Date);
+	} else {
+		model.url += '?t=' + (+new Date);
+	}
 	//调用backbone 原本的方法
-	return BackboneSync.apply(this, arguments).done(function(data){
-			if (data.code==10004) { 
-				 window.location.href=data.data;
-				  
-				console.log("未登录");
-			}
+	return BackboneSync.apply(this, arguments).done(function(data) {
+		if (data.code == 10004) {
+			window.location.href = data.data;
+
+			console.log("未登录");
+		}
 	});
 };

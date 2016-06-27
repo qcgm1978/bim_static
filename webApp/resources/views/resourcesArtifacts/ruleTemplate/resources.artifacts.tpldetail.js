@@ -83,12 +83,12 @@ App.Resources.ArtifactsTplDetail = Backbone.View.extend({
 
                 Backbone.trigger("resourcesChangeMappingRuleModelName");
                 _this.resourcesCancel();
-
                 App.ResourceArtifacts.TplCollection.each(function(item){
                     if(item.get("id") == App.ResourceArtifacts.Status.templateId){
                         item.set({"ruleId":response.data.ruleIds},{silent:true})
                     }
                 });
+
 
                 App.ResourceArtifacts.modelEdit = false
 

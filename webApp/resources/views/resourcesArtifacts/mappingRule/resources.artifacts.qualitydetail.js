@@ -38,6 +38,7 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
         if(this.model.get("leaf")&&App.ResourceArtifacts.Status.rule.targetCode == this.model.get("code")){
             this.$(".ruleCheck").removeClass("all").removeClass("half");
             Backbone.trigger("modelRuleSelectNone");
+            this.$el.closest("li").attr("data-check",2);
             this.changeFatherStatus("cancel");
         }
     },
@@ -45,13 +46,15 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
         if(this.model.get("leaf")&&App.ResourceArtifacts.Status.rule.targetCode == this.model.get("code")) {
             this.$(".ruleCheck").addClass("all").removeClass("half");
             Backbone.trigger("modelRuleSelectAll");
+            this.$el.closest("li").attr("data-check",1);
             this.changeFatherStatus("check");
         }
     },
     modelRuleHalf:function(){
         if(this.model.get("leaf")&&App.ResourceArtifacts.Status.rule.targetCode == this.model.get("code")){
             this.$(".ruleCheck").addClass("half").removeClass("all");
-            this.changeFatherStatus("check");
+            this.$el.closest("li").attr("data-check",3);
+            this.changeFatherStatus("cancel");
         }
     },
 
@@ -79,7 +82,7 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
 
         if(ele.hasClass("all")){
             ele.removeClass("all").removeClass("half");
-            _this.attr("data-check","0");
+            _this.attr("data-check","2");
             //取消所有上级菜单
             this.changeFatherStatus("cancel");
             if(leaf){
@@ -97,11 +100,16 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
                 //移除所有下级菜单
                 if(this.$el.siblings(".childList").find("li").length) {
                     _.each(this.$el.siblings(".childList").find("li"),function (item) {
-                        $(item).attr("data-check", "0");
+
+                        if($(item).attr("data-code") == App.ResourceArtifacts.Status.rule.targetCode && ($(item).attr("data-check") == "1" ||  $(item).attr("data-check") == "3")){
+                            Backbone.trigger("modelRuleSelectNone");
+                        }
+
+                        $(item).attr("data-check", "2");
                         $(item).find(".ruleCheck").removeClass("all").removeClass("half")
                     });
                 }
-                this.checkControl(e,"cancel");
+                this.checkControl("cancel");
             }
         }else{
             ele.addClass("all").removeClass("half");
@@ -124,6 +132,9 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
                 //添加所有下级菜单
                 if(this.$el.siblings(".childList").find("li").length) {
                     _.each(this.$el.siblings(".childList").find("li"),function(item){
+                        if($(item).attr("data-code") == App.ResourceArtifacts.Status.rule.targetCode && $(item).attr("data-check") != "1"){
+                            Backbone.trigger("modelRuleSelectAll");
+                        }
                         $(item).attr("data-check","1");
                         if($(item).hasClass("all")){
                             return
@@ -139,61 +150,63 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
     //修正父项状态
     changeFatherStatus:function(status){
         var _this = this.$el.closest("li");
-        var _thisStatus  = _this.attr("data-check");
         var siblings = _this.siblings("li");
+        var _thisStatus = _this.attr("data-check");
         var father = _this.closest("ul").closest("li");
         var fatherSiblings = father.siblings("li");
         var grandfather = father.closest("ul").closest("li");
-        var val = status == "check" ? "0" : "1";
-        var pre,grPre,data,fatherData,arr1=[],arr2 = [];
+        var val = status == "check" ? "2" : "1";
+        var pre,grPre,data,fatherData;
 
         if(siblings.length){//多个元素
             data = _.filter(siblings,function(item){
                 var s = $(item).attr("data-check");
-                if(s == "3" ){ s = "0";}
+                if(s == "3"){ s = "2";}
                 return val == s;
             });
         }
-
-
         if(fatherSiblings.length){
             //查找父级同类是否有选
             fatherData  =  _.filter(fatherSiblings,function(item){
                 var s = $(item).attr("data-check");
-                if(s == "3" ){ s = "0";}
+                if(s == "3"){ s = "2";}
                 return s == val;
             });
         }
-
-
         if(status == "cancel"){
             if(father.length){
-                father.attr("data-check","0");
                 pre = this.searchSelf(father);
+                if(_thisStatus != "2"){
+                    father.attr("data-check","3");
+                    pre.addClass("half");
+                }
+
                 if(!siblings.length){
                     pre.removeClass("all").removeClass("half");
                 }else{
                     pre.removeClass("all").addClass("half");
-                    if(!data.length){
-                        pre.removeClass("half");
+                    if(!data.length && _thisStatus == "2"){
+                        pre.removeClass("half").removeClass("half");
                     }
                 }
             }
             if(grandfather.length){
-                grandfather.attr("data-check","0");
                 grPre = this.searchSelf(grandfather);
+                if(_thisStatus != "2"){
+                    grandfather.attr("data-check","3");
+                    grPre.addClass("half");
+                }
                 if(!fatherSiblings.length){
                     grPre.removeClass("all").removeClass("half");
                 }else{
                     grPre.removeClass("all").addClass("half");
-                    if(!data.length && !fatherData.length){
-                        grPre.removeClass("half");
+                    if(!data.length && !fatherData.length &&  _thisStatus == "2"){
+                        grPre.removeClass("half").removeClass("half");
                     }
                 }
             }
         }else if(status == "check"){
             if(father.length){
-
                 pre = this.searchSelf(father);
                 pre.addClass("half");
                 if(!siblings.length){
@@ -220,7 +233,6 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
             }
         }
     },
-
     //为模板-保存数据
     checkControl:function(judge){
         var _this = this,data;
@@ -313,10 +325,10 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
             return
         }
         var item = $(e.target);
-        if(!App.ResourceArtifacts.Status.saved){
+       /* if(!App.ResourceArtifacts.Status.saved){
             alert("您还有没保存的");
             return
-        }
+        }*/
         if(this.model.get("leaf")){
             this. getRules(item);
         }else if(!this.$(".item").closest(".title").siblings(".childList").html()){}{

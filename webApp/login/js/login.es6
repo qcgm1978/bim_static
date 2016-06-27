@@ -1,10 +1,12 @@
 var Login = {
 
+	doMain:window.location.host.substring(window.location.host.indexOf(".")),
+
 	setCookie(name, value) {
 		var Days = 0.02,
 			exp = new Date();
 		exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 1000);
-		document.cookie = name + "=" + escape(value) + ";expires=" + exp.toGMTString() + ";path=/";
+		document.cookie = name + "=" + escape(value) + ";expires=" + exp.toGMTString() + ";domain="+Login.doMain+";path=/";
 	},
 	//获取cookie
 	getCookie: function(name) {
@@ -20,7 +22,7 @@ var Login = {
 		exp.setTime(exp.getTime() - 31 * 24 * 60 * 60 * 1000);
 		var cval = this.getCookie(name);
 		if (cval != null)
-			document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString() + ";path=/";
+			document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString() + ";domain="+Login.doMain+";path=/";
 	},
 
 	//事件绑定
@@ -117,7 +119,8 @@ var Login = {
 	//获取用户信息
 	getUserInfo() {
 		$.ajax({
-			url: '/platform/user/current'
+			url: '/platform/user/current?t='+(+new Date())			 
+
 		}).done(function(data) {
 
 			//获取referer returnurl 进行重定向
