@@ -248,8 +248,13 @@ Backbone.sync = function(method, model, options) {
 	} else {
 		model.url += '?t=' + (+new Date);
 	}
+
 	//调用backbone 原本的方法
 	return BackboneSync.apply(this, arguments).done(function(data) {
+
+		//cookie延长30分钟
+		//App.Comm.setCookieTime(30);
+
 		if (data.code == 10004) {
 			window.location.href = data.data;
 
