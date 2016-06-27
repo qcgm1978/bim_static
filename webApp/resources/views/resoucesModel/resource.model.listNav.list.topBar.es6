@@ -204,7 +204,11 @@
  				collection.reset();
 
  				if (count > 0) {
- 					collection.push(data.data);
+ 					var _temp=data.data||[];
+					_.each(_temp,function(item){
+						item.isSearch='search';
+					})
+ 					collection.push(_temp);
  				} else {
  					collection.trigger("searchNull");
  				}

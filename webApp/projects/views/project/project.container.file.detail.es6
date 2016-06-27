@@ -27,7 +27,11 @@ App.Project.FileContainerDetail=Backbone.View.extend({
 
 		var data = this.model.toJSON();
 		data.isSearch=data.isSearch||false;
-
+		if(data.isSearch){
+			$('#projectContainer .fileContainer .ckAll').hide();
+		}else{
+			$('#projectContainer .fileContainer .ckAll').show();
+		}
 		this.$el.html(this.template(data));
 
 		if (data.isAdd) {
