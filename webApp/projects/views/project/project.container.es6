@@ -97,24 +97,30 @@ App.Project.ProjectContainer = Backbone.View.extend({
 				if (res.code == 0) {
 					var props = res.data.properties;
 					for (var str = '', i = 0; i < props.length; i++) {
-						if(res.data.className=='成本管理'){
+						if(res.data.className=='成本管理'||(props[i]['type']=='tree')){
 							str+=App.Project.properCostTree(props[i]['value']);
 
-						}else if((props[i]['emelentType']=='link')||(props[i]['elementType']=='link')){
-							for(var j=0;j<props[i]['value'].length;j++){
-								str+='<li class="modleItem"><div class="modleNameText overflowEllipsis modleName2"><a href="'+props[i]['value'][j]['value']+'">'+props[i]['value'][j]['name']+'</a>&nbsp;&nbsp;</div></li>';
+						}else if(props[i]['type']=='list'){
 
-							}
-						}else {
-							if(_.isArray(props[i]['value'])){
+							if(props[i]['elementType'] && props[i]['elementType']=='link'){
 								for(var j=0;j<props[i]['value'].length;j++){
-									str+='<li class="modleItem"><span class="modleName overflowEllipsis"><div class="modleNameText overflowEllipsis">'+props[i]['property']+'</div></span> <span class="modleVal rEnd">'+props[i]['value'][j]['name']+'</span> </li>';
+									str+='<li class="modleItem"><div class="modleNameText overflowEllipsis modleName2"><a href="'+props[i]['value'][j]['value']+'">'+props[i]['value'][j]['name']+'</a>&nbsp;&nbsp;</div></li>';
 
 								}
 							}else{
-								str+='<li class="modleItem"><span class="modleName overflowEllipsis"><div class="modleNameText overflowEllipsis">'+props[i]['property']+'</div></span> <span class="modleVal rEnd">'+props[i]['value']+'</span> </li>';
+								str += '<li class="modleItem"><div class="modleNameText overflowEllipsis modleName2">'+props[i]['property']+'</div></li>';
+								for(var j=0;j<props[i]['value'].length;j++){
+									str+='<li class="modleItem"><span class="modleName overflowEllipsis"><div class="modleNameText overflowEllipsis">'+props[i]['value'][j]['property']+'</div></span> <span class="modleVal rEnd">'+props[i]['value'][j]['value']+'</span> </li>';
+
+								}
 							}
+
+						}else if(props[i]['type']=='character'){
+									str+='<li class="modleItem"><span class="modleName overflowEllipsis"><div class="modleNameText overflowEllipsis">'+props[i]['property']+'</div></span> <span class="modleVal rEnd">'+props[i]['value']+'</span> </li>';
+
+								}
 						}
+
 					}
 					if(res.data.className=='成本管理'){
 						$(event.target).parent().append(str);
