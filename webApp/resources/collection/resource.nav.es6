@@ -3,7 +3,7 @@ App.ResourcesNav = {
 	Settings: {
 
 		pageIndex: 1,
-		type: "", // 库的类型 
+		type: "" // 库的类型
 
 	},
 

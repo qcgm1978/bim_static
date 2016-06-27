@@ -46,9 +46,9 @@ App.Comm = {
 
 		if (!App.Global.User) {
 			window.location.href="/login.html";
+		}else{
+			return  App.Global.User[key];
 		}
-
-		return  App.Global.User[key];
 	},
 
 	//封装ajax
@@ -210,30 +210,30 @@ App.Comm = {
 
 		dircWidth = parseInt($el.css(mDirc));
 
-		if (dircWidth < 0) {
+		if (dircWidth >= 0) {
+			var width = $el.width(),
+				ani = {};
+
+			ani[mDirc] = -width;
+			$el.animate(ani, 500, function () {
+				$el.find(".dragSize").hide().end().find(".slideBar i").toggleClass('icon-caret-left icon-caret-right');
+				//$content.css(mDirc, 0);
+				if (Viewer) {
+					Viewer.resize();
+				}
+			});
+		} else {
 
 			var ani = {}
 			ani[mDirc] = "0px";
 
-			$el.animate(ani, 500, function() {
+			$el.animate(ani, 500, function () {
 				$el.find(".dragSize").show().end().find(".slideBar i").toggleClass('icon-caret-left icon-caret-right');
 				//$content.css(mDirc, $el.width());
 				if (Viewer) {
 					Viewer.resize();
 				}
 
-			});
-		} else {
-			var width = $el.width(),
-				ani = {};
-
-			ani[mDirc] = -width;
-			$el.animate(ani, 500, function() {
-				$el.find(".dragSize").hide().end().find(".slideBar i").toggleClass('icon-caret-left icon-caret-right');
-				//$content.css(mDirc, 0);
-				if (Viewer) {
-					Viewer.resize();
-				}
 			});
 		}
 
@@ -302,7 +302,7 @@ App.Comm = {
 				versionId: projectVersionId,
 				fileVersionId: fileVersionId
 			}
-		}
+		};
 
 		App.Comm.ajax(checkData, function(data) {
 			if (data.code == 0) {
@@ -352,7 +352,7 @@ App.Comm = {
 				enable: true
 			},
 			scrollInertia: 0
-		}
+		};
 
 		if (axis.indexOf("x") > -1) {
 			opts["set_width"] = "100%";
@@ -401,7 +401,7 @@ App.Comm = {
 			$('body').append(this.$el);
 			this.$el.animate({
 				top: '40px',
-			}, 1000)
+			}, 1000);
 			setTimeout(function() {
 				_this.$el.remove();
 			}, _this._userData.timeout || 2000)
