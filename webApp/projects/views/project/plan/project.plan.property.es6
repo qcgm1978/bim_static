@@ -68,7 +68,7 @@ App.Project.ProjectPlanProperty = Backbone.View.extend({
 
 	//初始化dom事件 
 	initDom(){
-		var _this=this
+		var _this=this;
 		this.$('.planTimeType').myDropDown({
 			click: function($item) {
 				_this.planType=$item.attr('data-val');
@@ -126,11 +126,10 @@ App.Project.ProjectPlanProperty = Backbone.View.extend({
 	navItemClick: function(event) {
 
 		var $target = $(event.target),
-			type = $target.data("type");
-		$target.addClass('selected').siblings().removeClass('selected'),
-			projectId = App.Project.Settings.projectId,
-			projectVersionId = App.Project.Settings.CurrentVersion.id;
-
+			type = $target.data("type"),
+			projectVersionId = App.Project.Settings.CurrentVersion.id,
+			projectId = App.Project.Settings.projectId ;
+		$target.addClass('selected').siblings().removeClass('selected');
 		App.Project.Settings.property = type;
 
 		if (type == "model") {

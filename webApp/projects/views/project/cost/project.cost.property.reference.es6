@@ -44,12 +44,11 @@ App.Project.CostReference = Backbone.View.extend({
 	},
 	//模型中显示
 	showInModle(event) {
-		var $target = $(event.target).closest(".item")
+		var $target = $(event.target).closest(".item"),
 			ids=$target.data("userId"),
 			box=$target.data("box");
 		if ($target.hasClass("selected")) {
 			return
-			this.$(".tbBodyScroll").find(".selected").removeClass("selected");
 		} else {
 			this.$(".tbBodyScroll").find(".selected").removeClass("selected");
 			$target.addClass("selected");

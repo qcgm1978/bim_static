@@ -56,12 +56,12 @@ App.Project.QualityMaterialEquipment = Backbone.View.extend({
  	},
 	//清空搜索条件
 	clearSearch() {
-		this.$(".specialitiesOption .text").html('全部')
-		this.$(".categoryOption .text").html('全部')
-		this.$(".statusOption .text").html('全部')
-		this.$(".txtSearchName").val('')
-		this.$("#dateStar").val('')
-		this.$("#dateEnd").val('')
+		this.$(".specialitiesOption .text").html('全部');
+		this.$(".categoryOption .text").html('全部');
+		this.$(".statusOption .text").html('全部');
+		this.$(".txtSearchName").val('');
+		this.$("#dateStar").val('');
+		this.$("#dateEnd").val('');
 		Backbone.trigger('qualityFilterDataClear');
 	},
 	//材料设备过滤条件change事件

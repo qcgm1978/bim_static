@@ -95,7 +95,7 @@
          type: "list",
          isInitMap: false,
          initBodyEvent: false,
-         pageIndex: 1,
+         pageIndex: 1
      },
 
      init: function() {

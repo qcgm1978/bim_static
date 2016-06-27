@@ -77,8 +77,9 @@ var AppRoute = Backbone.Router.extend({
 		//加载css js
 		_.require('/static/dist/projects/projects.css');
 		_.require('/static/dist/projects/projects.js');
-		//_.require('http://www.api.map.baidu.com/api?v=2.0&ak=osmP2eNEjPlvebAAIVhcDc6c');
+	//	//_.require('http://www.api.map.baidu.com/api?v=2.0&ak=osmP2eNEjPlvebAAIVhcDc6c');
 		App.Projects.init();
+		alert();
 
 	},
 

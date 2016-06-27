@@ -94,7 +94,7 @@ App.Projects.searchView = Backbone.View.extend({
 	         open: "",
 	         openTimeStart: "", 
 	         openTimEnd: ""
-		}
+		};
 		this.$(".pickProjectType .text").html('请选择');
 		this.$(".pickCategory .text").html('请选择');
 		this.$(".pickManager .text").html('请选择');

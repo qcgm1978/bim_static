@@ -487,7 +487,7 @@ App.ResourceModel = {
 		 
 		var searchText=App.ResourceModel.Settings.searchText;
 		if (searchText) {
-			var replaceText=
+
 			name=name.replace(searchText.toLowerCase(),'<span class="searchText">'+searchText.toLowerCase()+'</span>').replace(searchText.toUpperCase(),'<span class="searchText">'+searchText.toUpperCase()+'</span>');
 		} 
 		return name;

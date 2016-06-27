@@ -100,7 +100,7 @@ App.ResourcesNav = {
 		 
 		if (App.ResourceModel) {
 			 
-			var settings = App.ResourceModel.Settings
+			var settings = App.ResourceModel.Settings;
 			for (var p in settings) {
 				settings[p] = "";
 			}

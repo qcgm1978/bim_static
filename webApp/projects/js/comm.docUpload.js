@@ -3,21 +3,21 @@
  */
 (function($) {
 
-    'use strict'
+    'use strict';
 
     var docUpload = {
 
         __container: null,
 
         init: function(container, options) {
-            var self = this
-            self.__options = options
-            self.__container = container
+            var self = this;
+            self.__options = options;
+            self.__container = container;
 
             //添加元素
             var upload = $('<div>', {
                 'class': 'mod-plupload'
-            }).appendTo(container)
+            }).appendTo(container);
 
             //初始化
             App.Comm.upload.init(upload, {

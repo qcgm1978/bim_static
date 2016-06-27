@@ -95,7 +95,6 @@ App.Project.ProjectContainer = Backbone.View.extend({
 				url: "platform/setting/extensions/" + App.Project.Settings.projectId + "/" + App.Project.Settings.CurrentVersion.id + "/property?classKey=" + $(event.target).data('classkey') + "&elementId=" + App.Project.Settings.ModelObj.intersect.userId
 			}).done(function(res) {
 				if (res.code == 0) {
-					console.log(res)
 					var props = res.data.properties;
 					for (var str = '', i = 0; i < props.length; i++) {
 						if(res.data.className=='成本管理'){
@@ -387,7 +386,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 				projectId: App.Project.Settings.projectId,
 				projectVersionId: App.Project.Settings.CurrentVersion.id
 			}
-		}
+		};
 		var that = this;
 
 		App.Comm.ajax(data, function(data) {
@@ -426,7 +425,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		});
 
 		viewer.on('viewpoint', function(point) {
-			$("#projectContainer .projectNavModelContainer .tree-view:eq(1) .item-content:eq(0)").addClass('open')
+			$("#projectContainer .projectNavModelContainer .tree-view:eq(1) .item-content:eq(0)").addClass('open');
 			App.Project.ViewpointAttr.ListCollection.add({
 				data: [{
 					id: '',
@@ -434,7 +433,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 					viewPoint: point
 				}]
 			})
-		})
+		});
 
 		viewer.on("click", function(model) {
 			App.Project.Settings.ModelObj = null;
@@ -442,7 +441,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			if (!model.intersect) {
 				that.resetProperNull();
 				return;
-			};
+			}
 
 			App.Project.Settings.ModelObj = model;
 			//App.Project.Settings.modelId = model.userId;

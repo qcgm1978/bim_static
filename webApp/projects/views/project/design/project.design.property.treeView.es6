@@ -12,7 +12,6 @@ App.Project.DesignTreeView=Backbone.View.extend({
 
   render:function(){
     var data = this.model;
-    debugger
     if(data.message == "success" && data.data.length>0){
       this.$el.html(this.template(data));
     }else{

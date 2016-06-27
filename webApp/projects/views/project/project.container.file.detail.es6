@@ -17,7 +17,7 @@ App.Project.FileContainerDetail=Backbone.View.extend({
 		"click .fileName  .text":"fileClick",
 		"click .ckAll":"singleCheck",
 		"click .btnCalcel": "cancelEdit",
-		"click .btnEnter": "enterEditNameOrCreateNew",
+		"click .btnEnter": "enterEditNameOrCreateNew"
 	},
 
 	template:_.templateUrl("/projects/tpls/project/project.container.file.detail.html"),
@@ -50,7 +50,7 @@ App.Project.FileContainerDetail=Backbone.View.extend({
 
 			if ($leftItem.length>0) {
 
-				$nodeSwitch=$leftItem.parent().find(".nodeSwitch");
+				var $nodeSwitch=$leftItem.parent().find(".nodeSwitch");
 
 				if ($nodeSwitch.length>0  && !$nodeSwitch.hasClass('on') ) {
 					$nodeSwitch.click();
@@ -73,7 +73,7 @@ App.Project.FileContainerDetail=Backbone.View.extend({
 			data:{
 				projectId:App.Project.Settings.projectId,
 				projectVersionId:App.Project.Settings.CurrentVersion.id,
-				fileVersionId:id,
+				fileVersionId:id
 			}
 		};
 

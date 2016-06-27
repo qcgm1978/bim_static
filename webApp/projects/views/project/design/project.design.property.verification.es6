@@ -47,10 +47,10 @@
  	},
 
  	clearSearch(){
- 		this.$('.specialitiesOption .text').html('全部')
- 		this.$('.categoryOption .text').html('全部')
- 		this.$('.statusOption .text').html('全部')
- 		this.$('.inspectionUnitOption .text').html('全部')
+ 		this.$('.specialitiesOption .text').html('全部');
+ 		this.$('.categoryOption .text').html('全部');
+ 		this.$('.statusOption .text').html('全部');
+ 		this.$('.inspectionUnitOption .text').html('全部');
  		Backbone.trigger('projectDesignPropetyFilterDataClear');
  	},
 
