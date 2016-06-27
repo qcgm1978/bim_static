@@ -138,6 +138,12 @@ App.Comm = {
 			}
 		}
 
+		if (data.url.indexOf("?")>-1) {
+			data.url+="&t="+(+new Date);
+		}else{
+			data.url+='?t='+(+new Date);
+		}
+
 		return data;
 
 	},
