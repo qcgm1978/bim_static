@@ -100,13 +100,13 @@ App.Project.ProjectContainer = Backbone.View.extend({
 						if(res.data.className=='成本管理'){
 							str+=App.Project.properCostTree(props[i]['value']);
 
-						}else if(props[i]['emelentType']=='link'){
+						}else if((props[i]['emelentType']=='link')||(props[i]['elementType']=='link')){
 							for(var j=0;j<props[i]['value'].length;j++){
 								str+='<li class="modleItem"><div class="modleNameText overflowEllipsis modleName2"><a href="'+props[i]['value'][j]['value']+'">'+props[i]['value'][j]['name']+'</a>&nbsp;&nbsp;</div></li>';
 
 							}
 						}else {
-							if(props[i]['value']['push']){
+							if(_.isArray(props[i]['value'])){
 								for(var j=0;j<props[i]['value'].length;j++){
 									str+='<li class="modleItem"><span class="modleName overflowEllipsis"><div class="modleNameText overflowEllipsis">'+props[i]['property']+'</div></span> <span class="modleVal rEnd">'+props[i]['value'][j]['name']+'</span> </li>';
 
