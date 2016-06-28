@@ -12,7 +12,7 @@
 		return;
 	}
 
-	var $comment, AppView, ModelView, viewPointId, clipboard, atUserArr = [];
+	var $comment, AppView, ModelView, viewPointId, clipboard, atUserArr = [],isFirst=true;
 
 	//扩展 批注
 	bimView.prototype.commentInit = function() {
@@ -39,6 +39,11 @@
 				var contextHtml = _.templateUrl("/libsH5/tpls/comment/viewPointContext.html", true);
 				$("body").append(contextHtml);
 			}
+		} 
+
+		//分享 直接跳详情，遮掉项目
+		if (App.Project.Settings.viewPintId && isFirst) {
+			$comment.find(".fullLoading").show();
 		}
 
 		$("#comment .navBar .item.project").click();
@@ -204,10 +209,11 @@
 							CommentCollections.Project.projectId = App.Project.Settings.projectId;
 							CommentCollections.Project.reset();
 							CommentCollections.Project.fetch({
-								success() {
+								success() { 
 
 									//存在viewpintid 调到评论
-									if (App.Project.Settings.viewPintId) {
+									if (App.Project.Settings.viewPintId && isFirst) {
+										isFirst=false;
 										var $remark = $comment.find(".remarkCount_" + App.Project.Settings.viewPintId);
 										$remark.closest(".item").click();
 										$remark.click();
@@ -271,10 +277,13 @@
 
 				//新增数据
 				addOne(model) {
+					 
 					var $list = new CommentView.listDetail({
 						model: model
 					}).render().$el;
+
 					this.$el.find(".loading").remove();
+
 					//新增放前面
 					if (model.toJSON().isAdd) {
 						this.$el.prepend($list);
@@ -437,12 +446,18 @@
 						$(".commentRemark  .reMarkBox .operators").hide();
 					}
 
-					$comment.find(".commentList").animate({
-						left: "330px"
-					}, 500);
-					$comment.find(".commentRemark").show().animate({
-						left: "0px"
-					}, 500);
+					// $comment.find(".commentList").animate({
+					// 	left: "330px"
+					// }, 500);
+
+					$comment.find(".commentList").css('left','330px');
+
+
+					// $comment.find(".commentRemark").show().animate({
+					// 	left: "0px"
+					// }, 500);
+
+					$comment.find(".commentRemark").show().css("left","0px");
 
 					$el.addClass('current');
 					//获取数据
@@ -464,6 +479,7 @@
 						success(model, data) {
 							$(".commentRemark .remarkBox .count").text(data.data.length);
 							this.$(".reMarkListBox").css("bottom", this.$(".talkReMark").height() + 10);
+							$comment.find(".fullLoading").hide();
 						}
 					});
 
@@ -767,12 +783,15 @@
 
 					$(".remarkCount.current").removeClass("current").find(".count").text($(".commentRemark .remarkBox .count").text());
 
-					$comment.find(".commentList").animate({
-						left: "0px"
-					}, 500);
-					$comment.find(".commentRemark").show().animate({
-						left: "330px"
-					}, 500);
+					// $comment.find(".commentList").animate({
+					// 	left: "0px"
+					// }, 500);
+					// $comment.find(".commentRemark").show().animate({
+					// 	left: "330px"
+					// }, 500);
+
+					$comment.find(".commentList").css("left","0px");
+					$comment.find(".commentRemark").show().css("left","330px");
 				},
 
 				//获取到焦点
