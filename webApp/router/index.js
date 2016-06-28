@@ -162,7 +162,6 @@ var AppRoute = Backbone.Router.extend({
 		App.ResourceArtifacts.Status.type = 1;
 		new App.ResourcesNav.App().render();
 		App.ResourceArtifacts.resetPreRule();
-		App.ResourceArtifacts.Settings.ruleModel = 3; //权限入口，模块化，质量标准
 		$("#pageLoading").hide();
 	},
 
@@ -216,7 +215,6 @@ var AppRoute = Backbone.Router.extend({
 		App.ResourceArtifacts.Status.type = 2;
 		new App.ResourcesNav.App().render();
 		App.ResourceArtifacts.resetPreRule();
-		App.ResourceArtifacts.Settings.ruleModel = 3; //权限入口，模块化，质量标准
 		$("#pageLoading").hide();
 	},
 

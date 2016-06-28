@@ -10,7 +10,7 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
         if(App.ResourceArtifacts.Status.templateId){
             url = "/resources/tpls/resourcesArtifacts/ruleModel/resources.artifacts.planruledetail.projectx.html"
         }else{
-            url = "/resources/tpls/resourcesArtifacts/ruleModel/resources.artifacts.planruledetail.html"
+            url = "/resources/tpls/resourcesArtifacts/ruleModel/resources.artifacts.planruledetailx.html"
         }
         return _.templateUrl(url)
     },
@@ -360,10 +360,8 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
         var pre = $(e.target);
         $(e.target).addClass("active");
         pre.css({"opacity":"1"});
-        //输入不合法，无法找到
         var list = pre.closest("div").siblings("ul");
         list.html();
-
         if(pre.val()){
             list.show();
         }
@@ -372,7 +370,6 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
             list.show();
             pre.removeClass("alert");
         });
-
         pre.on("keyup",function(e){
             App.Resources.cancelBubble(e);
             var val = pre.val(),test, count = 5,str = '',index,arr = [],unResult = "<li>搜索：无匹配结果</li>";  //显示5条
@@ -470,7 +467,6 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
         _this.closest(".myDropDown").find(".myDropArrorw").removeClass("up").addClass("down");
         if(operator == "==" || operator == "!="){
             ioside.removeClass("active");
-
             if(eIn.hasClass("active")){return}
             eIn.addClass("active");
         }else if(operator == "<>" || operator == "><"){
@@ -479,12 +475,10 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
             ioside.addClass("active");
         }
     },
-
     //删除
     delRule:function(e){
         var _this = $(e.target);
         _this.closest("dd").remove();//删除元素
         //还用管未更新的model么？
     }
-
 });
