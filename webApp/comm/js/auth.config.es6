@@ -79,8 +79,10 @@ App.Comm.AuthConfig = {
 
 	//映射规则 模块化/质量标准  管理
 	resource:{
-		model:{
-
+		mappingRule:{
+			module : '<li class="sele modularization">模块化</li>',
+			quality : '<li class="sele quality">质量标准</li>',
+			mappingRuleTemplateEdit:'<span class="edit">编辑</span><span class="delete">删除</span>'
 		}
 	}
 

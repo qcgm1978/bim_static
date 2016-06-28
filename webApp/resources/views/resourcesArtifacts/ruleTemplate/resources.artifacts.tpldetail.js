@@ -17,6 +17,13 @@ App.Resources.ArtifactsTplDetail = Backbone.View.extend({
 
     render:function() {
         this.$el.html(this.template);
+
+        var tabs = App.Comm.AuthConfig.resource.mappingRule,
+            Auth = App.AuthObj.lib;
+
+        if(App.AuthObj.lib.mappingRuleTemplate.edit){
+            this.$(".tplDetailInfo").prepend(tabs.mappingRuleTemplateEdit);
+        }
         return this;
     },
 
