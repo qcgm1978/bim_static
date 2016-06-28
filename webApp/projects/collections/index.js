@@ -39,7 +39,6 @@
 
     //项目业态
     proRetailing: {
-        '': '其它',
         "8": '综合体',
         "16": '酒店',
         "32": '文化旅游'
@@ -183,7 +182,6 @@
         var _data= {
              pageIndex: App.Projects.Settings.pageIndex,
              pageItemCount: App.Comm.Settings.pageItemCount,
-             //projectType: 1,
              name: "",
              estateType: "",
              province: "",
@@ -293,9 +291,6 @@
          }
 
      }
-
-
-
 
  };
 

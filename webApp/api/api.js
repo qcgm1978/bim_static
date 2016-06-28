@@ -3,11 +3,7 @@
 App.API = {
 
 	vendor:function(){
-		if(this.Settings.debug){
-			return 'http://vendor.wanda-dev.cn/';
-		}else{
-			return 'http://vendor.wanda.cn/';
-		}
+		return "";
 	},
 
 	Settings: {
