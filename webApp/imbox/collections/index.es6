@@ -8,8 +8,8 @@ App.INBox = {
 		$("#topBar li.user").show();
 		$("#contains").html(new App.INBox.NavView().render().$el);
 		$("#contains").append(new App.INBox.imboxContainerView().render().$el);
-
 		this.loadData('un');
+		this.loadCount();
 		// this.messageCollection.fetch({
 		// 	reset:true,
 		// 	data:{
@@ -19,6 +19,22 @@ App.INBox = {
 		// 		collection.relData=response;
 		// 	}
 		// });
+	},
+
+	read(id){
+		window.open(App.API.Settings.hostname+"platform/message/read?id="+id);
+		this.loadCount();
+	},
+
+	loadCount(){
+		 App.Comm.ajax({
+            URLtype:'fetchIMBoxList',
+            data:{
+                status:0
+            }
+        },function(res){
+            $('#messageCount').html(res.data.totalItemCount);
+        })
 	},
 
 	messageCollection: new(Backbone.Collection.extend({

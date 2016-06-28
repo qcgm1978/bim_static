@@ -15,7 +15,8 @@
 
 <% if(folder){%>
 	
-	 <span data-id="<%=id%>" data-isfolder="<%=folder%>" title="<%=name%>" class="text overflowEllipsis <%= id=='createNew'?'hidden':'' %>">
+	 <span data-id="<%=id%>" data-isfolder="<%=folder%>" title="<%=name%>" 
+	    class="text  overflowEllipsis <%= id=='createNew'?'hidden':'' %>">
 	   <%= App.Project.getName(name) %></span>
     <% if(id=='createNew'){%>
     	<input type="text" value="<%=name%>" class="txtEdit txtInput" /> 
@@ -27,7 +28,7 @@
 	<%if(suffix=='rvt' ||suffix=='rfa' ||suffix=='dwg'  ){%>
 		<a data-id="<%=id%>" href="/static/dist/app/project/single/filePreview.html?id=<%=fileVersionId%>&projectId=<%=App.Project.Settings.projectId%>&projectVersionId=<%=App.Project.Settings.CurrentVersion.id%>" target="_blank" title="<%=name%>" data-isfolder="<%=folder%>" class="text overflowEllipsis"> <%= App.Project.getName(name) %></a>
 	<%}else{%>
-		  <span data-id="<%=id%>" data-isfolder="false" title="<%=name%>" class="text overflowEllipsis"> <%= App.Project.getName(name) %></span>
+		  <span data-id="<%=id%>" data-isfolder="false" title="<%=name%>" class="text overflowEllipsis <%= folder ? '':'textFolder' %>"> <%= App.Project.getName(name) %></span>
 	<%}%>
 
 <%}%> 
