@@ -18,7 +18,7 @@ App.Services.projectMember.members = Backbone.View.extend({
   		var _userId=event.currentTarget.getAttribute("data-user");
   		var _userName=event.currentTarget.getAttribute("data-userName");
   		var _opType=event.currentTarget.getAttribute("data-type");//对象类型：org,user
-  		var _outer=event.currentTarget.getAttribute("data-outer");//对象类型：org,user
+  		var _outer=event.currentTarget.getAttribute("data-outer");//是否是外网用户
 
   		App.Services.Dialog.alert("<span class='delTip'>确认要将'"+_userName+"'从"+App.Comm.getCookie("currentProjectName")+"删除？</span>",function(_this){
   			App.Comm.ajax({
@@ -60,13 +60,19 @@ App.Services.projectMember.members = Backbone.View.extend({
   },
 
   checkAuth:function(event){
-    var _this=this;
-    var _userId=event.currentTarget.getAttribute("data-user");
+    var _this=this,
+        data={},
+        _userId=event.currentTarget.getAttribute("data-user"),
+        _opType=event.currentTarget.getAttribute("data-type");
+
+    if(_opType=='org'){
+      data.orgId=_userId;
+    }else{
+      data.userId=_userId;
+    }
     App.Comm.ajax({
       URLtype:'checkDelAuth',
-      data:{
-        userId:_userId
-      }
+      data:data
     },function(res){
       if(res.code==0){
         if(res.data.checkResult){
