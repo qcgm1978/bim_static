@@ -44,7 +44,7 @@ App.ResourceModel.ListNav = Backbone.View.extend({
 			this.remove();
 			return;
 		}
- 
+
 		if (type == "file") {
 
 			this.$el.removeClass('hideLeft');
@@ -53,9 +53,12 @@ App.ResourceModel.ListNav = Backbone.View.extend({
 			$("#resourceModelLeftNav").show();
 
 			//绑定上传
-			if (App.ResourceModel.Settings.CurrentVersion.status != 9) {
+			var status = App.ResourceModel.Settings.CurrentVersion.status;
+
+			if (status != 9 && status != 4 && status != 7) {
 				//上传
 				App.ResourceUpload.init($(document.body));
+				$("#file-upload-btn").show();
 			} else {
 				$("#file-upload-btn").hide();
 			}

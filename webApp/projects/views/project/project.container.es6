@@ -97,36 +97,36 @@ App.Project.ProjectContainer = Backbone.View.extend({
 				if (res.code == 0) {
 					var props = res.data.properties;
 					for (var str = '', i = 0; i < props.length; i++) {
-						if(res.data.className=='成本管理'||(props[i]['type']=='tree')){
-							str+=App.Project.properCostTree(props[i]['value']);
+						if (res.data.className == '成本管理' || (props[i]['type'] == 'tree')) {
+							str += App.Project.properCostTree(props[i]['value']);
 
-						}else if(props[i]['type']=='list'){
+						} else if (props[i]['type'] == 'list') {
 
-							if(props[i]['elementType'] && props[i]['elementType']=='link'){
-								for(var j=0;j<props[i]['value'].length;j++){
-									str+='<li class="modleItem"><div class="modleNameText overflowEllipsis modleName2"><a href="'+props[i]['value'][j]['value']+'">'+props[i]['value'][j]['name']+'</a>&nbsp;&nbsp;</div></li>';
+							if (props[i]['elementType'] && props[i]['elementType'] == 'link') {
+								for (var j = 0; j < props[i]['value'].length; j++) {
+									str += '<li class="modleItem"><div class="modleNameText overflowEllipsis modleName2"><a href="' + props[i]['value'][j]['value'] + '">' + props[i]['value'][j]['name'] + '</a>&nbsp;&nbsp;</div></li>';
 
 								}
-							}else{
-								str += '<li class="modleItem"><div class="modleNameText overflowEllipsis modleName2">'+props[i]['property']+'</div></li>';
-								for(var j=0;j<props[i]['value'].length;j++){
-									str+='<li class="modleItem"><span class="modleName overflowEllipsis"><div class="modleNameText overflowEllipsis">'+props[i]['value'][j]['property']+'</div></span> <span class="modleVal rEnd">'+props[i]['value'][j]['value']+'</span> </li>';
+							} else {
+								str += '<li class="modleItem"><div class="modleNameText overflowEllipsis modleName2">' + props[i]['property'] + '</div></li>';
+								for (var j = 0; j < props[i]['value'].length; j++) {
+									str += '<li class="modleItem"><span class="modleName overflowEllipsis"><div class="modleNameText overflowEllipsis">' + props[i]['value'][j]['property'] + '</div></span> <span class="modleVal rEnd">' + props[i]['value'][j]['value'] + '</span> </li>';
 
 								}
 							}
 
-						}else if(props[i]['type']=='character'){
-									str+='<li class="modleItem"><span class="modleName overflowEllipsis"><div class="modleNameText overflowEllipsis">'+props[i]['property']+'</div></span> <span class="modleVal rEnd">'+props[i]['value']+'</span> </li>';
+						} else if (props[i]['type'] == 'character') {
+							str += '<li class="modleItem"><span class="modleName overflowEllipsis"><div class="modleNameText overflowEllipsis">' + props[i]['property'] + '</div></span> <span class="modleVal rEnd">' + props[i]['value'] + '</span> </li>';
 
-								}
 						}
+					}
 
 
-					if(res.data.className=='成本管理'){
+					if (res.data.className == '成本管理') {
 						$(event.target).parent().append(str);
 
-					}else{
-						$(event.target).parent().append('<ul class="modleList">'+str+'</ul>');
+					} else {
+						$(event.target).parent().append('<ul class="modleList">' + str + '</ul>');
 
 					}
 					//str += '<li class="modleItem">'+
@@ -238,10 +238,10 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		if (type == "release") {
 			var $releaseVersionBox = $target.closest(".listContent").find(".releaseVersionBox");
 			if ($releaseVersionBox.length <= 0) {
-				var _null=$('<div class="releaseVersionBox"><span class="GlobalBlankMessage"><i></i>暂无发布版本</span></div>');
+				var _null = $('<div class="releaseVersionBox"><span class="GlobalBlankMessage"><i></i>暂无发布版本</span></div>');
 				_null.css({
-					'textAlign':'center',
-					'color':'#ccc'
+					'textAlign': 'center',
+					'color': '#ccc'
 				})
 				$target.closest(".listContent").find(".container").append(_null);
 
@@ -252,10 +252,10 @@ App.Project.ProjectContainer = Backbone.View.extend({
 
 			var $changeVersionBox = $target.closest(".listContent").find(".changeVersionBox");
 			if ($changeVersionBox.length <= 0) {
-				var _null=$('<div class="changeVersionBox"><span class="GlobalBlankMessage"><i></i>暂无变更版本</span></div>');
+				var _null = $('<div class="changeVersionBox"><span class="GlobalBlankMessage"><i></i>暂无变更版本</span></div>');
 				_null.css({
-					'textAlign':'center',
-					'color':'#ccc'
+					'textAlign': 'center',
+					'color': '#ccc'
 				})
 				$target.closest(".listContent").find(".container").append(_null);
 
@@ -330,7 +330,8 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			$(".projectContainerApp .projectHeader .projectTab").hide();
 
 			//绑定上传
-			if (App.Project.Settings.CurrentVersion.status != 9) {
+			var status = App.Project.Settings.CurrentVersion.status;
+			if (status != 9 && status != 4 && status != 7) {
 				$(".fileContainer .btnFileUpload").show();
 				//上传
 				App.Project.upload = App.modules.docUpload.init($(document.body));

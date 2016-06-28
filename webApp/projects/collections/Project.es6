@@ -262,8 +262,8 @@ App.Project = {
 	createNewFolder: function($item) {
 		var filePath = $item.find(".txtEdit").val().trim(),
 			that = this,
-		$leftSel = $("#projectContainer .treeViewMarUl .selected"),
-		parentId = "";
+			$leftSel = $("#projectContainer .treeViewMarUl .selected"),
+			parentId = "";
 		if ($leftSel.length > 0) {
 			parentId = $leftSel.data("file").fileVersionId;
 		}
@@ -556,7 +556,8 @@ App.Project = {
 
 		//var $contains = $("#contains");
 		$("#contains").html(new App.Project.ProjectApp().render().el);
-		if (App.Project.Settings.CurrentVersion.status != 9) {
+		var status = App.Project.Settings.CurrentVersion.status;
+		if (status != 9 && status != 4 && status != 7) {
 			$(".fileContainer .btnFileUpload").show();
 			//上传
 			App.Project.upload = App.modules.docUpload.init($(document.body));
@@ -822,7 +823,7 @@ App.Project = {
 
 
 		$rightPropertyContent.children('div').hide();
-			//设计
+		//设计
 		if (type == "design") {
 
 			$rightPropertyContent.find(".singlePropetyBox").remove();
@@ -916,7 +917,7 @@ App.Project = {
 				$("#projectContainer .fileContainer").find(".clearSearch").hide().end().
 				find(".opBox").show().end().
 				find(".searchCount").hide().end().
-				find("#txtFileSearch").val("");  
+				find("#txtFileSearch").val("");
 				App.Project.Settings.searchText = "";
 
 				App.Project.Settings.fileId = file.fileVersionId;
@@ -1052,22 +1053,23 @@ App.Project = {
 		$.ajax({
 			url: "platform/set/category"
 		}).done(function(res) {
-				if (res.code == 0){
-					var str = '',datas = res.data.items || [];
-					for(var i = 0,prop; i < datas.length; i++){
-						prop = datas[i]['busName'];
-						if(prop == '设计管理'){
-							//$.ajax({
-							//	url: "platform/setting/extensions/"+App.Project.Settings.projectId+"/"+App.Project.Settings.CurrentVersion.id+"/property?classKey="+datas[i]['id']+"&elementId="+App.Project.Settings.ModelObj.intersect.userId
-							//}).done(function(res){
-							//		if(res.code==0){
-              //
-							//		}
-							//});
-							var string = '<div class="modle"><i data-classkey="'+datas[i]['id']+'" class="modleShowHide getdata down"></i><h1 class="modleName">' + prop + '</h1></div>';
-							that.$el.find(".fordesign").html(string);
-						}else {
-							str += '<div class="modle"><i data-classkey="'+datas[i]['id']+'" class="modleShowHide getdata down"></i><h1 class="modleName">' + prop + '</h1></div>';
+			if (res.code == 0) {
+				var str = '',
+					datas = res.data.items || [];
+				for (var i = 0, prop; i < datas.length; i++) {
+					prop = datas[i]['busName'];
+					if (prop == '设计管理') {
+						//$.ajax({
+						//	url: "platform/setting/extensions/"+App.Project.Settings.projectId+"/"+App.Project.Settings.CurrentVersion.id+"/property?classKey="+datas[i]['id']+"&elementId="+App.Project.Settings.ModelObj.intersect.userId
+						//}).done(function(res){
+						//		if(res.code==0){
+						//
+						//		}
+						//});
+						var string = '<div class="modle"><i data-classkey="' + datas[i]['id'] + '" class="modleShowHide getdata down"></i><h1 class="modleName">' + prop + '</h1></div>';
+						that.$el.find(".fordesign").html(string);
+					} else {
+						str += '<div class="modle"><i data-classkey="' + datas[i]['id'] + '" class="modleShowHide getdata down"></i><h1 class="modleName">' + prop + '</h1></div>';
 
 					}
 
@@ -1160,8 +1162,8 @@ App.Project = {
 
 		var data = {
 			projectId: App.Project.Settings.projectId
-			//elementId: Intersect.userId,
-			//classKey: id
+				//elementId: Intersect.userId,
+				//classKey: id
 		};
 
 		//App.Comm.ajax(data, callback);
@@ -1272,7 +1274,7 @@ App.Project = {
 				if (data.data) {
 					var location = data.data.location,
 						_temp = JSON.parse(location);
-					box = _this.formatBBox(_temp.bBox||_temp.boundingBox);
+					box = _this.formatBBox(_temp.bBox || _temp.boundingBox);
 					ids = [_temp.userId];
 					$target.data("userId", ids);
 					$target.data("box", box);
@@ -1452,12 +1454,12 @@ App.Project = {
 	},
 
 	//获取文件名称 搜索
-	getName(name){
+	getName(name) {
 
-		var searchText=App.Project.Settings.searchText;
+		var searchText = App.Project.Settings.searchText;
 		if (searchText) {
-			name=name.replace(searchText,'<span class="searchText">'+searchText+'</span>');
-		} 
+			name = name.replace(searchText, '<span class="searchText">' + searchText + '</span>');
+		}
 		return name;
 	}
 
