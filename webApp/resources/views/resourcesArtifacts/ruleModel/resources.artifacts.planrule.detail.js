@@ -287,7 +287,6 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
             projectId : App.ResourceArtifacts.Status.projectId
         };
 
-
         $(".artifactsContent .rules").addClass("services_loading");
 
         if(id){
@@ -307,6 +306,7 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
                         _this.$(".ruleTitle .desc").text("[" + categoryCode + "] " + categoryName);
                         _this.$(".ruleDetail").hide();
                     }
+                    $(".artifactsContent .rules").removeClass("services_loading");
                 }
             });
         }else{
@@ -325,12 +325,11 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
                         App.ResourceArtifacts.Status.rule.count = App.ResourceArtifacts.PlanRules.length;
                         Backbone.trigger("resetTitle");
                     }
+                    $(".artifactsContent .rules").removeClass("services_loading");
                 }
             });
         }
         App.ResourceArtifacts.Status.saved = true;
-        $(".artifactsContent .rules").removeClass("services_loading");
-
     },
 
     //删除计划中的整条规则
@@ -366,53 +365,74 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
             list.show();
         }
         //变红
-        pre.on("keydown",function(){
+        pre.on("keydown",function(e){
             list.show();
+            //console.log(e.keyCode);
+            var key = e.keyCode;
+            var ele = $(e.target).closest("div").siblings("ul");
+            var preList = ele.find("li");
+            var preEle = ele.find("li.active").index(preList);
+            var index = preEle != -1 ? preEle : 0;
+            if(key == 38){
+                //上移
+                var prev = App.Resources.prev(index,preList.length);
+                preList.eq(prev).addClass("active").siblings("li").removeClass("active");
+            }else if(key == 40){
+                //下移
+                var next = App.Resources.next(index,preList.length);
+                preList.removeClass("active");
+                preList.eq(next).addClass("active").siblings("li").removeClass("active");
+            }
             pre.removeClass("alert");
         });
         pre.on("keyup",function(e){
             App.Resources.cancelBubble(e);
-            var val = pre.val(),test, count = 5,str = '',index,arr = [],unResult = "<li>搜索：无匹配结果</li>";  //显示5条
-            list.html("");
-            val = val.replace(/\s+/,'');
-            if(!val){list.hide();return}
-            val = val.replace(/\u3002+/,'.');
-            //禁止输出除数字，半角句号外的
-            test = /[^\d\.]+/.test(val);
-            if(test){
-                list.html(unResult);
-                return;
-            }
+            var key = e.keyCode;
+            if(key != 38 || key != 40 || key != 13){
+                var val = pre.val(),test, count = 5,str = '',index,unResult = "<li>搜索：无匹配结果</li>";  //显示5条
+                list.html("");
+                val = val.replace(/\s+/,'');
+                if(!val){list.hide();return}
+                val = val.replace(/\u3002+/,'.');
+                //禁止输出除数字，半角句号外的
+                test = /[^\d\.]+/.test(val);
+                if(test){
+                    list.html(unResult);
+                    return;
+                }
 
-            str = val;
-            var x = str.length%3;
-            if(x ==0){
-                if(_.last(str) != "."){ list.html(unResult);return}
-                str = _.initial(str);
-                str = str.join('');
-                index = _.indexOf(ac,str,true);
-            }else if(x == 1){
-                for(var s = 0 ; s< 9 ; s++){
-                    var sd = str + s + '';
-                    index = _.indexOf(ac,sd);
-                    if(index >= 0){
+                str = val;
+                var x = str.length%3;
+                if(x ==0){
+                    if(_.last(str) != "."){ list.html(unResult);return}
+                    str = _.initial(str);
+                    str = str.join('');
+                    index = _.indexOf(ac,str,true);
+                }else if(x == 1){
+                    for(var s = 0 ; s< 9 ; s++){
+                        var sd = str + s + '';
+                        index = _.indexOf(ac,sd);
+                        if(index >= 0){
+                            break
+                        }
+                    }
+                }else{
+                    index = _.indexOf(ac,str,true);
+                }
+
+                if(index < 0 ){
+                    list.html(unResult);
+                    return
+                }
+                for(var j = index  ;  j < App.Resources.artifactsTreeData.length  ; j++){
+                    if(App.Resources.artifactsTreeData[j].length <= val.length ||  j - index  + 1 >count) {
                         break
                     }
+                    var newRule = new App.ResourceArtifacts.newCode(App.Resources.artifactsTreeData[j]);
+                    list.append(new App.Resources.ArtifactsRuleLegend({model:newRule}).render().el);
                 }
-            }else{
-                index = _.indexOf(ac,str,true);
-            }
-
-            if(index < 0 ){
-                list.html(unResult);
-                return
-            }
-            for(var j = index  ;  j < App.Resources.artifactsTreeData.length  ; j++){
-                if(App.Resources.artifactsTreeData[j].length <= val.length ||  j - index  + 1 >count) {
-                    break
-                }
-                var newRule = new App.ResourceArtifacts.newCode(App.Resources.artifactsTreeData[j]);
-                list.append(new App.Resources.ArtifactsRuleLegend({model:newRule}).render().el);
+            }else if(key == 13){
+                //回车键
             }
         });
     },

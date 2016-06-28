@@ -20,13 +20,9 @@ App.Resources.ArtifactsQualityList = Backbone.View.extend({
     },
 
     initialize:function(){
-        this.listenTo(App.ResourceArtifacts.QualityStandard,"add",this.addOne);
+
     },
 
-    addOne:function(model) {
-        var newList = new App.Resources.ArtifactsQualityDetail({model: model});
-        this.$(".qualityMenu ul").append(newList.render().el);
-    },
     //当前选项
     present:function(){
         var active = this.$(".qualityProcess");
@@ -41,10 +37,9 @@ App.Resources.ArtifactsQualityList = Backbone.View.extend({
     choose:function(){
         var _this = this;
         this.toggle();
-        //App.ResourceArtifacts.getAllQuality();
-        App.ResourceArtifacts.departQuality();  //departQuality:function(ele,cdata,parentCode,ruleContain){
+        App.ResourceArtifacts.departQuality();
     },
-
+    //切换过程
     toggle:function(){
         var extendData,extendText;
         this.$(".qualityProcess").removeClass("active");
@@ -63,5 +58,4 @@ App.Resources.ArtifactsQualityList = Backbone.View.extend({
             this.$(".qualityMenuListKY").show().siblings(".qualityMenuListGC").hide();
         }
     }
-
 });

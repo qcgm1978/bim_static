@@ -346,6 +346,7 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
         var _this = this,n = this.$el.closest("li").attr("data-check");
         var type = this.model.get("type") ;
         var parentCode = this.model.get("code");
+        var list ;
 
         if(type == "GC"){
             data = App.ResourceArtifacts.allQualityGC;
@@ -358,7 +359,7 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
             children =  _.filter(data,function(item){
                 return item.parentCode == parentCode;
             });
-            var list = App.Resources.artifactsQualityTree(children,n);
+            list = App.Resources.artifactsQualityTree(children,n);
             _this.$el.closest("li").find(".childList").html(list);
         }
     },
@@ -370,7 +371,6 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
             return
         }
         var _this = this,pdata;
-        var parentCode = this.model.get("code");
         var leaf = this.model.get("leaf");
         var ruleContain = this.$el.closest("li").attr("data-ruleContain");
         App.ResourceArtifacts.Status.check = this.$el.closest("li").attr("data-check");
@@ -380,9 +380,6 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
         App.ResourceArtifacts.Status.rule.count = this.model.get("count");
 
         this.toggleClass(event);
-        //加载规则部分
-        App.ResourceArtifacts.Status.rule.targetCode  = parentCode;
-        App.ResourceArtifacts.Status.rule.targetName  = this.model.get("name");
         //刷新右面视图
         var code = App.ResourceArtifacts.Status.rule.targetCode;
         pdata = {
