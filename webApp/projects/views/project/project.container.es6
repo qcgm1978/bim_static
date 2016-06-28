@@ -119,7 +119,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 									str+='<li class="modleItem"><span class="modleName overflowEllipsis"><div class="modleNameText overflowEllipsis">'+props[i]['property']+'</div></span> <span class="modleVal rEnd">'+props[i]['value']+'</span> </li>';
 
 								}
-						}
+					}
 
 
 					if(res.data.className=='成本管理'){
