@@ -16,8 +16,10 @@
         <% }else{%>
 
             <div class="modle">
-                <i class="modleShowHide"></i>
-                <h1 class="modleName overflowEllipsis"><%= item.group%></h1>
+                <div class="modleTitleBar">
+                    <i class="modleShowHide"></i>
+                    <h1 class="modleName overflowEllipsis"><%= item.group%></h1>
+                </div>
                 <ul class="modleList">
                     <% var subItems=item.items,subCount=subItems.length,subItem %>
                         <% for(var j=0;j<subCount;j++){ %>

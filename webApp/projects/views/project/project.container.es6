@@ -20,6 +20,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		"click .fileNav .commSpan": "switchFileMoldel",
 		"keyup .projectList .txtSearch": "filterProject",
 		"keyup .projectVersionList .txtSearch": "filterProjectVersion",
+		"click .modleTitleBar":"triggerUpDown",
 		"click .modleShowHide": "slideUpAndDown"
 
 	},
@@ -77,19 +78,25 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		}
 	},
 
+	triggerUpDown:function(e){
+		this.slideUpAndDown(e,$(e.currentTarget),$(e.currentTarget).find('.modleShowHide'));
+	},
+
 	//展开和收起
-	slideUpAndDown: function(event) {
-		var $parent = $(event.target).parent(),
+	slideUpAndDown: function(event,_$parent,$current) {
+		var $parent = _$parent||$(event.target).parent(),
 			$modleList = $parent.find(".modleList");
-		$(event.target).toggleClass("down");
+		$modleList=$modleList.length==0?_$parent.next():$modleList;
+		_$current=$current||$(event.target);
+		_$current.toggleClass("down");
 		if ($modleList.is(":hidden")) {
 			$modleList.slideDown();
 		} else {
 			$modleList.slideUp();
 		}
 		//classkey临时请求数据
-		if ($(event.target).is('.getdata')) {
-			$(event.target).removeClass('getdata');
+		if (_$current.is('.getdata')) {
+			_$current.removeClass('getdata');
 			$modleList.slideDown();
 			$.ajax({
 				url: "platform/setting/extensions/" + App.Project.Settings.projectId + "/" + App.Project.Settings.CurrentVersion.id + "/property?classKey=" + $(event.target).data('classkey') + "&elementId=" + App.Project.Settings.ModelObj.intersect.userId
@@ -118,15 +125,17 @@ App.Project.ProjectContainer = Backbone.View.extend({
 						} else if (props[i]['type'] == 'character') {
 							str += '<li class="modleItem"><span class="modleName overflowEllipsis"><div class="modleNameText overflowEllipsis">' + props[i]['property'] + '</div></span> <span class="modleVal rEnd">' + props[i]['value'] + '</span> </li>';
 
+
 						}
+
 					}
 
 
 					if (res.data.className == '成本管理') {
-						$(event.target).parent().append(str);
+						_$current.parent().append(str);
 
 					} else {
-						$(event.target).parent().append('<ul class="modleList">' + str + '</ul>');
+						_$current.parent().append('<ul class="modleList">' + str + '</ul>');
 
 					}
 					//str += '<li class="modleItem">'+
@@ -454,8 +463,8 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			//App.Project.Settings.modelId = model.userId;
 			that.viewerPropertyRender();
 			//展开
-			$("#projectContainer .rightProperty").css('marginRight', '0');
-			$("#projectContainer .rightProperty .icon-caret-left").attr('class', 'icon-caret-right');
+	//		$("#projectContainer .rightProperty").css('marginRight', '0');
+	//		$("#projectContainer .rightProperty .icon-caret-left").attr('class', 'icon-caret-right');
 
 		});
 
