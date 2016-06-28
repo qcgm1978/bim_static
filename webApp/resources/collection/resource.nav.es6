@@ -3,7 +3,7 @@ App.ResourcesNav = {
 	Settings: {
 
 		pageIndex: 1,
-		type: "", // 库的类型 
+		type: "" // 库的类型
 
 	},
 
@@ -100,7 +100,7 @@ App.ResourcesNav = {
 		 
 		if (App.ResourceModel) {
 			 
-			var settings = App.ResourceModel.Settings
+			var settings = App.ResourceModel.Settings;
 			for (var p in settings) {
 				settings[p] = "";
 			}

@@ -106,9 +106,11 @@ App.Project.ProjectQualityProperty = Backbone.View.extend({
 	//切换tab
 	navClick: function(event) {
 		var $target = $(event.target),
-			type = $target.data("type");
+			type = $target.data("type"),
+			isLoadData = false;
 		$target.addClass('selected').siblings().removeClass('selected');
-		App.Project.Settings.property = type, isLoadData = false;
+		App.Project.Settings.property = type;
+
 
 		if (type == "materialequipment") {
 			//材料设备

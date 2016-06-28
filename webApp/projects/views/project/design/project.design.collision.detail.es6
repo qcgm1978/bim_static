@@ -32,10 +32,10 @@ App.Project.DesignCollisionDetail=Backbone.View.extend({
       var pageIndex = data.data.pageIndex,
           pageCount = data.data.pageCount;
       this.list = data.data.items;
-      this.prePage = pageIndex - 1
+      this.prePage = pageIndex - 1;
       this.nextPage = pageIndex + 1;
-    }
-    this.$el.html(this.template(data))
+    };
+    this.$el.html(this.template(data));
     return this;
   },
 
@@ -62,7 +62,7 @@ App.Project.DesignCollisionDetail=Backbone.View.extend({
     return getVolume(boxA) > getVolume(boxB) ? boxB : boxA;
     function getVolume(box){
       var min = box[0],
-          max = box[1];
+          max = box[1],
           x = Math.abs(max[0]-min[0]),
           y = Math.abs(max[1]-min[1]),
           z = Math.abs(max[2]-min[2]);

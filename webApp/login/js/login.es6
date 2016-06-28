@@ -119,7 +119,8 @@ var Login = {
 	//获取用户信息
 	getUserInfo() {
 		$.ajax({
-			url: '/platform/user/current'
+			url: '/platform/user/current?t='+(+new Date())			 
+
 		}).done(function(data) {
 
 			//获取referer returnurl 进行重定向

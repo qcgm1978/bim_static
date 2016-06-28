@@ -62,12 +62,12 @@ App.Project.Share = {
 				App.AuthObj[keys[0]] = true;
 			} else {
 
-				App.AuthObj[keys[0]] = App.AuthObj[keys[0]] || {}
+				App.AuthObj[keys[0]] = App.AuthObj[keys[0]] || {};
 
 				if (len == 2) {
 					App.AuthObj[keys[0]][keys[1]] = true
 				} else {
-					App.AuthObj[keys[0]][keys[1]] = App.AuthObj[keys[0]][keys[1]] || {}
+					App.AuthObj[keys[0]][keys[1]] = App.AuthObj[keys[0]][keys[1]] || {};
 					App.AuthObj[keys[0]][keys[1]][keys[2]] = true;
 				}
 
@@ -124,7 +124,7 @@ App.Project.Share = {
 		if (!userPwd) {
 			alert("请输入密码");
 			return false;
-		};
+		}
 
 		$btnLogin.val("登录中").data("islogin", true);
 
@@ -173,7 +173,7 @@ App.Project.Share = {
 				$el.find(".btnLogin").val("立即登录").data("islogin", false);
 				return;
 			}
-			localStorage.setItem("user", JSON.stringify(data.data))
+			localStorage.setItem("user", JSON.stringify(data.data));
 			App.Comm.setCookie('userId', data.data.userId);
 			App.Comm.setCookie('isOuter', data.data.outer);
 			//是否主动退出标记 2 默认状态 1 为主动退出

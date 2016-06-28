@@ -22,6 +22,12 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 
 	render: function() {
 		var data = this.model.toJSON();
+		data.isSearch=data.isSearch||false;
+		if(data.isSearch){
+			$('#resourceListContent .ckAll').hide();
+		}else{
+			$('#resourceListContent .ckAll').show();
+		}
 		this.$el.html(this.template(data)).data("status", data.status);
 		if (data.isAdd) {
 			this.$el.addClass('createNew');
@@ -45,7 +51,7 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 
 			if ($leftItem.length > 0) {
 
-				$nodeSwitch = $leftItem.parent().find(".nodeSwitch");
+				var $nodeSwitch = $leftItem.parent().find(".nodeSwitch");
 
 				if ($nodeSwitch.length > 0 && !$nodeSwitch.hasClass('on')) {
 					$nodeSwitch.click();
@@ -268,8 +274,8 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 
 
 		var filePath = $item.find(".txtEdit").val().trim(),
-			that = this;
-		$leftSel = $("#resourceModelLeftNav .treeViewMarUl .selected");
+			that = this,
+		$leftSel = $("#resourceModelLeftNav .treeViewMarUl .selected"),
 		parentId = "";
 		if ($leftSel.length > 0) {
 			parentId = $leftSel.data("file").fileVersionId;

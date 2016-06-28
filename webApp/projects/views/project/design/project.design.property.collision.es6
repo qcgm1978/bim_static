@@ -69,7 +69,6 @@ App.Project.DesignCollision=Backbone.View.extend({
 					type   : "PUT"
 				}
 				).done(function(data){
-						console.log(data)
 					if(data.code == 0){
 						App.Project.DesignAttr.CollisionTaskDetail.add({message:"running"});
 						self.refreshSelectList();
@@ -114,27 +113,27 @@ App.Project.DesignCollision=Backbone.View.extend({
 					alert("请选择碰撞文件");
 					return false;
 				}
-				data = {
-	        type:'post',
-	        URLtype:"creatCollisionTask",
-	        contentType:"application/json",
-	        data:JSON.stringify(formData)
-	      }
-	      App.Comm.ajax(data,function(data){
-		      if (data.message=="success") {
-		      	App.Project.DesignAttr.CollisionTaskDetail.add({message:"running"});
-		      }else{
-		      	App.Project.DesignAttr.CollisionTaskDetail.add({message:"failed"});
-		        alert(data.message);
-		      }
-		      $('.detailList .collList').html('');
-		      self.refreshSelectList();
+				var data = {
+					type:'post',
+					URLtype:"creatCollisionTask",
+					contentType:"application/json",
+					data:JSON.stringify(formData)
+				  }
+				  App.Comm.ajax(data,function(data){
+					  if (data.message=="success") {
+						App.Project.DesignAttr.CollisionTaskDetail.add({message:"running"});
+					  }else{
+						App.Project.DesignAttr.CollisionTaskDetail.add({message:"failed"});
+						alert(data.message);
+					  }
+					  $('.detailList .collList').html('');
+					  self.refreshSelectList();
 
-	      });
+				  });
 			}
 		})
 		function getSpecialty(element){
-			var data = []
+			var data = [];
 			element.find(".file").each(function(){
 				var that = $(this),
 						etag = that.children('.itemContent').data("etag"),
@@ -171,11 +170,11 @@ App.Project.DesignCollision=Backbone.View.extend({
 		$('.collHead').height('auto');
 		App.Project.Settings.collisionId = collisionId;
 		if(status == "2"){
-			App.Project.DesignAttr.CollisionTaskDetail.projectId = App.Project.Settings.projectId
-			App.Project.DesignAttr.CollisionTaskDetail.projectVersionId = App.Project.Settings.CurrentVersion.id
-			App.Project.DesignAttr.CollisionTaskDetail.collisionId = collisionId
-			App.Project.DesignAttr.CollisionTaskDetail.pageNo = 1
-			App.Project.DesignAttr.CollisionTaskDetail.pageSize = len
+			App.Project.DesignAttr.CollisionTaskDetail.projectId = App.Project.Settings.projectId;
+			App.Project.DesignAttr.CollisionTaskDetail.projectVersionId = App.Project.Settings.CurrentVersion.id;
+			App.Project.DesignAttr.CollisionTaskDetail.collisionId = collisionId;
+			App.Project.DesignAttr.CollisionTaskDetail.pageNo = 1;
+			App.Project.DesignAttr.CollisionTaskDetail.pageSize = len;
 			App.Project.DesignAttr.CollisionTaskDetail.fetch();
 		}else if(status =="3"){
 			App.Project.DesignAttr.CollisionTaskDetail.add({message:"failed"})

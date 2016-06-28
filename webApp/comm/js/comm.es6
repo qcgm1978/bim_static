@@ -41,14 +41,14 @@ App.Comm = {
 		}
 		return '';
 	},
-	 
+
 	user: function(key) {
 
 		if (!App.Global.User) {
-			window.location.href="/login.html";
+			window.location.href = "/login.html";
+		} else {
+			return App.Global.User[key];
 		}
-
-		return  App.Global.User[key];
 	},
 
 	//封装ajax
@@ -70,7 +70,12 @@ App.Comm = {
 			}
 		}
 
+		
+
 		return $.ajax(data).done(function(data) {
+
+			//cookie延长30分钟
+			App.Comm.setCookieTime(30);
 
 			if (_.isString(data)) {
 				// to json
@@ -138,18 +143,24 @@ App.Comm = {
 			}
 		}
 
+		if (data.url.indexOf("?") > -1) {
+			data.url += "&t=" + (+new Date);
+		} else {
+			data.url += '?t=' + (+new Date);
+		}
+
 		return data;
 
 	},
 
 	//JS操作cookies方法!
-	doMain:window.location.host.substring(window.location.host.indexOf(".")),
+	doMain: window.location.host.substring(window.location.host.indexOf(".")),
 
 	setCookie(name, value) {
 		var Days = 0.02,
 			exp = new Date();
 		exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 1000);
-		document.cookie = name + "=" + escape(value) + ";expires=" + exp.toGMTString() + ";domain="+App.Comm.doMain+";path=/";
+		document.cookie = name + "=" + escape(value) + ";expires=" + exp.toGMTString() + ";domain=" + App.Comm.doMain + ";path=/";
 	},
 	//获取cookie
 	getCookie: function(name) {
@@ -165,16 +176,31 @@ App.Comm = {
 		exp.setTime(exp.getTime() - 31 * 24 * 60 * 60 * 1000);
 		var cval = this.getCookie(name);
 		if (cval != null)
-			document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString() + ";domain="+App.Comm.doMain+";path=/";
+			document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString() + ";domain=" + App.Comm.doMain + ";path=/";
 	},
 
 	clearCookie() {
 		var keys = document.cookie.match(/[^ =;]+(?=\=)/g);
 		if (keys) {
-			for (var i = keys.length; i--;) 
-				document.cookie = keys[i] + "=0;expires=" + new Date(0).toUTCString()+";domain="+App.Comm.doMain+";path=/";
+			for (var i = keys.length; i--;)
+				document.cookie = keys[i] + "=0;expires=" + new Date(0).toUTCString() + ";domain=" + App.Comm.doMain + ";path=/";
 		}
 	},
+
+	//设置cookie 时间
+	setCookieTime(min) {
+
+		var exp = new Date();
+		exp.setTime(exp.getTime() + min * 60 * 1000), 
+		
+		keys = document.cookie.match(/[^ =;]+(?=\=)/g);
+		 
+		if (keys) {
+			for (var i = keys.length; i--;)
+				document.cookie = keys[i] + "="+this.getCookie(keys[i])+";expires=" + exp.toGMTString() + ";domain=" + App.Comm.doMain + ";path=/";
+		}
+	},
+
 	//格式化 文件大小
 	formatSize: function(size) {
 		if (size === undefined || /\D/.test(size)) {
@@ -204,7 +230,19 @@ App.Comm = {
 
 		dircWidth = parseInt($el.css(mDirc));
 
-		if (dircWidth < 0) {
+		if (dircWidth >= 0) {
+			var width = $el.width(),
+				ani = {};
+
+			ani[mDirc] = -width;
+			$el.animate(ani, 500, function() {
+				$el.find(".dragSize").hide().end().find(".slideBar i").toggleClass('icon-caret-left icon-caret-right');
+				//$content.css(mDirc, 0);
+				if (Viewer) {
+					Viewer.resize();
+				}
+			});
+		} else {
 
 			var ani = {}
 			ani[mDirc] = "0px";
@@ -216,18 +254,6 @@ App.Comm = {
 					Viewer.resize();
 				}
 
-			});
-		} else {
-			var width = $el.width(),
-				ani = {};
-
-			ani[mDirc] = -width;
-			$el.animate(ani, 500, function() {
-				$el.find(".dragSize").hide().end().find(".slideBar i").toggleClass('icon-caret-left icon-caret-right');
-				//$content.css(mDirc, 0);
-				if (Viewer) {
-					Viewer.resize();
-				}
 			});
 		}
 
@@ -296,7 +322,7 @@ App.Comm = {
 				versionId: projectVersionId,
 				fileVersionId: fileVersionId
 			}
-		}
+		};
 
 		App.Comm.ajax(checkData, function(data) {
 			if (data.code == 0) {
@@ -310,7 +336,7 @@ App.Comm = {
 				};
 
 				var data = App.Comm.getUrlByType(data);
-				var url = data.url + "?fileVersionId=" + fileVersionId;
+				var url = data.url + "&fileVersionId=" + fileVersionId;
 				window.location.href = url;
 			} else {
 				alert(data.message);
@@ -346,7 +372,7 @@ App.Comm = {
 				enable: true
 			},
 			scrollInertia: 0
-		}
+		};
 
 		if (axis.indexOf("x") > -1) {
 			opts["set_width"] = "100%";
@@ -395,7 +421,7 @@ App.Comm = {
 			$('body').append(this.$el);
 			this.$el.animate({
 				top: '40px',
-			}, 1000)
+			}, 1000);
 			setTimeout(function() {
 				_this.$el.remove();
 			}, _this._userData.timeout || 2000)

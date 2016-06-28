@@ -26,7 +26,7 @@ App.Project = {
 		planPublicity: '<div class="nullPage publicity"><i class="bg"></i>暂无内容</div>', //计划 关注
 		costList: '<div class="nullPage costList"><i class="bg"></i>暂无清单项</div>', //成本 清单
 		costChange: '<div class="nullPage costChange"><i class="bg"></i>暂无变更单</div>', //成本 变更
-		planVerification: '<div class="nullPage planVerification"><i class="bg"></i> <div>您还没有关联校验</div>  <span>点此进行关联校验</span> </div>', //计划成本 关联校验
+		planVerification: '<div class="nullPage planVerification"><i class="bg"></i> <div>您还没有关联校验</div>  <span>点此进行关联校验</span> </div>' //计划成本 关联校验
 	},
 
 	//客户化数据映射字典
@@ -142,7 +142,7 @@ App.Project = {
 					};
 
 					var data = App.Comm.getUrlByType(data),
-						url = data.url + "?fileVersionId=" + fileVersionId;
+						url = data.url + "&fileVersionId=" + fileVersionId;
 					window.location.href = url;
 
 				},
@@ -261,8 +261,8 @@ App.Project = {
 	},
 	createNewFolder: function($item) {
 		var filePath = $item.find(".txtEdit").val().trim(),
-			that = this;
-		$leftSel = $("#projectContainer .treeViewMarUl .selected");
+			that = this,
+		$leftSel = $("#projectContainer .treeViewMarUl .selected"),
 		parentId = "";
 		if ($leftSel.length > 0) {
 			parentId = $leftSel.data("file").fileVersionId;
@@ -821,7 +821,7 @@ App.Project = {
 			$rightPropertyContent = $("#projectContainer .rightPropertyContent");
 
 
-		$rightPropertyContent.children('div').hide()
+		$rightPropertyContent.children('div').hide();
 			//设计
 		if (type == "design") {
 
@@ -1052,7 +1052,6 @@ App.Project = {
 		$.ajax({
 			url: "platform/set/category"
 		}).done(function(res) {
-			console.log(res)
 				if (res.code == 0){
 					var str = '',datas = res.data.items || [];
 					for(var i = 0,prop; i < datas.length; i++){
@@ -1160,7 +1159,7 @@ App.Project = {
 		var Intersect = App.Project.Settings.ModelObj.intersect;
 
 		var data = {
-			projectId: App.Project.Settings.projectId,
+			projectId: App.Project.Settings.projectId
 			//elementId: Intersect.userId,
 			//classKey: id
 		};
