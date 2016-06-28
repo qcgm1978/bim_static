@@ -70,7 +70,7 @@ App.Comm = {
 			}
 		}
 
-		
+
 
 		return $.ajax(data).done(function(data) {
 
@@ -190,14 +190,15 @@ App.Comm = {
 	//设置cookie 时间
 	setCookieTime(min) {
 
-		var exp = new Date();
-		exp.setTime(exp.getTime() + min * 60 * 1000), 
-		
-		keys = document.cookie.match(/[^ =;]+(?=\=)/g);
-		 
+		var exp = new Date(),
+
+			keys = localStorage.getItem("keys").split(','); //document.cookie.match(/[^ =;]+(?=\=)/g);
+
+		exp.setTime(exp.getTime() + min * 60 * 1000);
+
 		if (keys) {
 			for (var i = keys.length; i--;)
-				document.cookie = keys[i] + "="+this.getCookie(keys[i])+";expires=" + exp.toGMTString() + ";domain=" + App.Comm.doMain + ";path=/";
+				document.cookie = keys[i] + "=" + this.getCookie(keys[i]) + ";expires=" + exp.toGMTString() + ";domain=" + App.Comm.doMain + ";path=/";
 		}
 	},
 

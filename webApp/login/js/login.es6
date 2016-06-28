@@ -94,12 +94,15 @@ var Login = {
 		}).done(function(data) {
 			if (data.code == 0) {
 
+				var keys=[];
 				if (data.data && typeof data.data === 'object') {
 					for (var p in data.data) {
 						Login.setCookie(p, data.data[p]);
+						keys.push(p);
 					}
 				}
-				 
+				
+				localStorage.setItem("keys",keys.join(','));
 				Login.delCookie("token_cookie");
 				//获取用户信息
 				Login.getUserInfo();
