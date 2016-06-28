@@ -127,6 +127,7 @@ App.Project.DesignCollision=Backbone.View.extend({
 						alert(data.message);
 					  }
 					  $('.detailList .collList').html('');
+					  App.Project.DesignAttr.CollisionTaskList.isNew = true;
 					  self.refreshSelectList();
 
 				  });

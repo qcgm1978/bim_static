@@ -23,9 +23,11 @@ App.Project.DesignCollisionTaskList=Backbone.View.extend({
     if(data.data.length == 0){
       return this.$el.html('<p class="tips">没有碰撞</p>');
     }else{
-      if(this.$el.find("ul").length==0){
+      if(this.$el.find("ul").length==0 || App.Project.DesignAttr.CollisionTaskList.isNew){
         this.$el.html(this.template(data)).find('.collList').children().eq(0).trigger('click');
-
+        if(App.Project.DesignAttr.CollisionTaskList.isNew){
+          App.Project.DesignAttr.CollisionTaskList.isNew = false;
+        }
       }else{
         this.$el.html(this.template(data));
 

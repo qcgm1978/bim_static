@@ -118,7 +118,9 @@ App.Project.ProjectContainer = Backbone.View.extend({
 						} else if (props[i]['type'] == 'character') {
 							str += '<li class="modleItem"><span class="modleName overflowEllipsis"><div class="modleNameText overflowEllipsis">' + props[i]['property'] + '</div></span> <span class="modleVal rEnd">' + props[i]['value'] + '</span> </li>';
 
+
 						}
+
 					}
 
 
@@ -454,8 +456,8 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			//App.Project.Settings.modelId = model.userId;
 			that.viewerPropertyRender();
 			//展开
-			$("#projectContainer .rightProperty").css('marginRight', '0');
-			$("#projectContainer .rightProperty .icon-caret-left").attr('class', 'icon-caret-right');
+	//		$("#projectContainer .rightProperty").css('marginRight', '0');
+	//		$("#projectContainer .rightProperty .icon-caret-left").attr('class', 'icon-caret-right');
 
 		});
 
