@@ -30,7 +30,6 @@ App.ResourceArtifacts={
     },
     Settings: {
         delayCount:  0 , //每层加载数量
-        ruleModel: 3,   //  权限入口      1 只有模块化，  2 只有质量标准  ， 3 有模块化和质量标准
         model : ""
     },
 //计划节点
@@ -46,20 +45,8 @@ App.ResourceArtifacts={
         parse: function(responese) {
             if (responese.code == 0 && responese.data.length > 0) {
                 return responese.data;
-            } else {
-                $().html('<li>无数据</li>');
-            }
+            } else {}
         }
-    })),
-    //质量标准，获取二级列表
-    QualityStandard : new(Backbone.Collection.extend({
-        model:Backbone.Model.extend({
-            defaults:function(){
-                return{
-
-                }
-            }
-        })
     })),
     //计划规则/获取
     operator:Backbone.Model.extend({
@@ -96,6 +83,7 @@ App.ResourceArtifacts={
             }
         }
     }),
+    //新建的规则数据模型
     saveRuleModel:function(){
         return   {
             "biz": 1,//1：模块化；2：质监标准  //新建时写入值
@@ -207,7 +195,6 @@ App.ResourceArtifacts={
             }
         }
     })),
-
     //规则模板列表
     TplCollection : new(Backbone.Collection.extend({
         model:Backbone.Model.extend({
@@ -218,7 +205,6 @@ App.ResourceArtifacts={
             }
         })
     })),
-
     //规则模板规则列表
     TplCollectionRule : new(Backbone.Collection.extend({
         model:Backbone.Model.extend({
@@ -231,11 +217,9 @@ App.ResourceArtifacts={
     })),
 
     init:function(_this,optionType) {
-
         var tabs = App.Comm.AuthConfig.resource.mappingRule,
             Auth = App.AuthObj.lib;
-
-
+        //console.log(_this);
         _this.$(".breadcrumbNav .breadItem").hide();
         _this.$(".breadcrumbNav .fileNav").hide();
         _this.$(".breadcrumbNav .breadItem.project").show();
@@ -269,6 +253,7 @@ App.ResourceArtifacts={
         App.ResourceArtifacts.Status.rule.biz = 1;
         App.ResourceArtifacts.Status.templateId = "";
 
+
         if(optionType == "template" ){//规则模板
             _this.$(".resourcesMappingRule .template").addClass("active").siblings("a").removeClass("active");
             App.ResourceArtifacts.Status.qualityStandardType = "GC";
@@ -285,8 +270,11 @@ App.ResourceArtifacts={
             this.tplFrame.$(".tplContent .content").html(this.detail.render().el);
             this.detail.$(".tplDetailCon").append(this.menu.render().el);//菜单
 
+            this.tplFrame.$(".artifactsTplFrame").addClass("services_loading");
+
             if(Auth.moduleMappingRule.view){
                 this.menu.$(".plans").html(this.plans.render().el);//计划
+
             }
 
             if(Auth.qualityMappingRule.view) {
@@ -299,22 +287,19 @@ App.ResourceArtifacts={
             }
 
             this.detail.$(".artifactsContent").addClass("explorer");
-            $("#artifacts").addClass("services_loading");
-            this.getTpl();
 
+            this.getTpl();
 
         }else{//规则库
             $("#artifacts").addClass("services_loading");
             App.ResourceArtifacts.modelEdit = false;
             _this.$(".resourcesMappingRule .library").addClass("active").siblings("a").removeClass("active");
             _this.$el.append(this.menu.render().el);//菜单
-
-
+            this.menu.$el.addClass("services_loading");
             //写入项目名称
             if(App.ResourceArtifacts.Status.projectId){
                this.getProjectName(_this,App.ResourceArtifacts.Status.projectId)
             }
-
             //读入数据
             if(Auth.moduleMappingRule.view){
                 this.menu.$(".plans").html(this.plans.render().el);//计划节点
@@ -328,7 +313,6 @@ App.ResourceArtifacts={
                     App.ResourceArtifacts.departQuality(App.ResourceArtifacts.menu.$(".qualityMenuListKY"),App.ResourceArtifacts.allQualityKY,null,"0");
                 });
             }
-
             if(Auth.moduleMappingRule.edit || Auth.qualityMappingRule.edit){
                 this.menu.$(".rules").html(this.planRuleTitle.render().el);//映射规则标题
                 this.planRuleTitle.$(".ruleContentRuleList").html(this.planRule.render().el);//映射规则列表
@@ -336,7 +320,6 @@ App.ResourceArtifacts={
         }
         $(".resourcesMappingRule").show();
     },
-
     //获取项目名称
     getProjectName:function(_this,projectId){
         var pdata = {
@@ -374,7 +357,6 @@ App.ResourceArtifacts={
                 type : App.ResourceArtifacts.Status.type
             }
         };
-
         if(App.ResourceArtifacts.Status.templateId){
             pdata.data.templateId = App.ResourceArtifacts.Status.templateId;
         }else if(App.ResourceArtifacts.Status.projectId){
@@ -391,6 +373,7 @@ App.ResourceArtifacts={
                     Backbone.trigger("mappingRuleNoContent");
                 }
             }
+            _this.menu.$el.removeClass("services_loading");
         });
     },
     //所有
@@ -430,7 +413,7 @@ App.ResourceArtifacts={
                     fn(response.data);
                 }
             }
-            $("#artifacts").removeClass("services_loading");
+
         });
     },
 
@@ -478,24 +461,9 @@ App.ResourceArtifacts={
                     App.ResourceArtifacts.TplCollection.add(response.data);
                 }else{}
             }
-            $("#artifacts").removeClass("services_loading");
+            _this.tplFrame.$(".artifactsTplFrame").removeClass("services_loading");
         });
     },
-
-    //延迟
-   /* delay:function(data){
-    var _this = this , batch , length = data.length , arr = []  , n = 1 , last;
-        batch = Math.ceil(length/20); //循环次数
-        last = length % 20; //余数
-        if(batch > 0){
-            App.ResourceArtifacts.delays = setTimeout(function(){
-               // var as = ;
-                App.ResourceArtifacts.PlanNode.add();
-                _this.delay();
-                n++;
-            },100);
-        }
-    },*/
     loading:function(ele){
         $(ele).addClass("services_loading");
     },
@@ -510,6 +478,7 @@ App.ResourceArtifacts={
         App.ResourceArtifacts.Status.rule.targetCode = "";
         App.ResourceArtifacts.Status.rule.targetName = "";
     },
+    //保存的规则
     modelRuleSaveData:{
         templateId: "",
             templateName:"",
