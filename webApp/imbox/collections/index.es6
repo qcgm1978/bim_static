@@ -23,6 +23,7 @@ App.INBox = {
 
 	read(id){
 		window.open(App.API.Settings.hostname+"platform/message/read?id="+id);
+		this.loadCount();
 	},
 
 	loadCount(){
