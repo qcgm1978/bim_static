@@ -903,14 +903,24 @@ CLOUD.MiniMap = function (viewer) {
         }
     };
 
+    this.onContextMenu = function(event) {
+
+        event.preventDefault();
+    };
+
+    this.onMouseDownBinded = this.onMouseDown.bind(this);
+    this.onMouseMoveBinded = this.onMouseMove.bind(this);
+    this.onMouseUpBinded = this.onMouseUp.bind(this);
+    this.onContextMenuBinded = this.onContextMenu.bind(this);
+
     this.addDomEventListeners = function () {
 
         if (_mapContainer) {
 
-            _mapContainer.addEventListener( 'contextmenu', function ( event ) { event.preventDefault(); }, false );
-            _mapContainer.addEventListener('mousedown', this.onMouseDown.bind(this), false);
-            _mapContainer.addEventListener('mousemove', this.onMouseMove.bind(this), false);
-            _mapContainer.addEventListener('mouseup', this.onMouseUp.bind(this), false);
+            _mapContainer.addEventListener( 'contextmenu', this.onContextMenuBinded, false );
+            _mapContainer.addEventListener('mousedown', this.onMouseDownBinded, false);
+            _mapContainer.addEventListener('mousemove', this.onMouseMoveBinded, false);
+            _mapContainer.addEventListener('mouseup', this.onMouseUpBinded, false);
         }
     };
 
@@ -918,10 +928,10 @@ CLOUD.MiniMap = function (viewer) {
 
         if (_mapContainer) {
 
-            _mapContainer.removeEventListener( 'contextmenu', function ( event ) { event.preventDefault(); }, false );
-            _mapContainer.removeEventListener('mousedown', this.onMouseDown.bind(this), false);
-            _mapContainer.removeEventListener('mousemove', this.onMouseMove.bind(this), false);
-            _mapContainer.removeEventListener('mouseup', this.onMouseUp.bind(this), false);
+            _mapContainer.removeEventListener( 'contextmenu', this.onContextMenuBinded, false );
+            _mapContainer.removeEventListener('mousedown', this.onMouseDownBinded, false);
+            _mapContainer.removeEventListener('mousemove', this.onMouseMoveBinded, false);
+            _mapContainer.removeEventListener('mouseup', this.onMouseUpBinded, false);
         }
     };
 
@@ -949,6 +959,18 @@ CLOUD.MiniMap = function (viewer) {
         this.addDomEventListeners();
 
         _hasHighlightInterPoint = false;
+
+        if (this.callbackClickOnAxisGrid) {
+
+            var gridInfo = {
+                position: '',
+                abcName: '',
+                numeralName: '',
+                offsetX: '',
+                offsetY: ''
+            };
+            this.callbackClickOnAxisGrid(gridInfo);
+        }
 
         this.initialized = true;
     };
@@ -1519,80 +1541,94 @@ CLOUD.MiniMap = function (viewer) {
     // 根据指定位置点获得轴网信息
     this.getAxisGridInfoByPoint = function(point) {
 
-        if (!_isLoadedFloorPlane) return null;
+        if (_isLoadedFloorPlane) {
 
-        var sceneMatrix = this.getMainSceneMatrix();
-        var inverseMatrix = new THREE.Matrix4();
-        inverseMatrix.getInverse(sceneMatrix);
+            var sceneMatrix = this.getMainSceneMatrix();
+            var inverseMatrix = new THREE.Matrix4();
+            inverseMatrix.getInverse(sceneMatrix);
 
-        // 点对应的世界坐标
-        var pointWorldPosition = point.clone();
-        pointWorldPosition.applyMatrix4(inverseMatrix);
+            // 点对应的世界坐标
+            var pointWorldPosition = point.clone();
+            pointWorldPosition.applyMatrix4(inverseMatrix);
 
-        // 屏幕坐标
-        var screenPosition = pointWorldPosition.clone();
-        worldToNormalizedPoint(screenPosition);
-        normalizedPointToScreen(screenPosition);
+            // 屏幕坐标
+            var screenPosition = pointWorldPosition.clone();
+            worldToNormalizedPoint(screenPosition);
+            normalizedPointToScreen(screenPosition);
 
-        // 获得最近的轴网交点
-        var intersection = this.getIntersectionToMinDistance(screenPosition);
+            // 获得最近的轴网交点
+            var intersection = this.getIntersectionToMinDistance(screenPosition);
 
-        if (intersection) {
-            // 计算轴信息
-            var interPoint = new THREE.Vector2(intersection.intersectionPoint.x, intersection.intersectionPoint.y);
-            screenToNormalizedPoint(interPoint);
-            normalizedPointToWorld(interPoint);
+            if (intersection) {
+                // 计算轴信息
+                var interPoint = new THREE.Vector2(intersection.intersectionPoint.x, intersection.intersectionPoint.y);
+                screenToNormalizedPoint(interPoint);
+                normalizedPointToWorld(interPoint);
 
-            var offsetX = Math.round(pointWorldPosition.x - interPoint.x);
-            var offsetY = Math.round(pointWorldPosition.y - interPoint.y);
+                var offsetX = Math.round(pointWorldPosition.x - interPoint.x);
+                var offsetY = Math.round(pointWorldPosition.y - interPoint.y);
 
-            return {
-                position: pointWorldPosition,
-                abcName: intersection.abcName,
-                numeralName: intersection.numeralName,
-                offsetX: offsetX,
-                offsetY: offsetY
+                return {
+                    position: pointWorldPosition,
+                    abcName: intersection.abcName,
+                    numeralName: intersection.numeralName,
+                    offsetX: offsetX,
+                    offsetY: offsetY
+                }
             }
         }
 
-        return null;
+        return {
+            position: new THREE.Vector3(),
+            abcName: '',
+            numeralName: '',
+            offsetX: '',
+            offsetY: ''
+        };
     };
 
     // 根据规范化坐标点获得轴网信息
     this.getAxisGridInfoByNormalizedPoint = function(normalizedPoint) {
 
-        if (!_isLoadedFloorPlane) return null;
+        if (_isLoadedFloorPlane) {
 
-        // 世界坐标
-        var pointWorldPosition = normalizedPoint.clone();
-        normalizedPointToWorld(pointWorldPosition);
+            // 世界坐标
+            var pointWorldPosition = normalizedPoint.clone();
+            normalizedPointToWorld(pointWorldPosition);
 
-        // 屏幕坐标
-        var screenPosition = normalizedPoint.clone();
-        normalizedPointToScreen(screenPosition);
+            // 屏幕坐标
+            var screenPosition = normalizedPoint.clone();
+            normalizedPointToScreen(screenPosition);
 
-        // 获得最近的轴网交点
-        var intersection = this.getIntersectionToMinDistance(screenPosition);
+            // 获得最近的轴网交点
+            var intersection = this.getIntersectionToMinDistance(screenPosition);
 
-        if (intersection) {
-            // 计算轴信息
-            var interPoint = new THREE.Vector2(intersection.intersectionPoint.x, intersection.intersectionPoint.y);
-            screenToNormalizedPoint(interPoint);
-            normalizedPointToWorld(interPoint);
+            if (intersection) {
+                // 计算轴信息
+                var interPoint = new THREE.Vector2(intersection.intersectionPoint.x, intersection.intersectionPoint.y);
+                screenToNormalizedPoint(interPoint);
+                normalizedPointToWorld(interPoint);
 
-            var offsetX = Math.round(pointWorldPosition.x - interPoint.x);
-            var offsetY = Math.round(pointWorldPosition.y - interPoint.y);
+                var offsetX = Math.round(pointWorldPosition.x - interPoint.x);
+                var offsetY = Math.round(pointWorldPosition.y - interPoint.y);
 
-            return {
-                position: pointWorldPosition,
-                abcName: intersection.abcName,
-                numeralName: intersection.numeralName,
-                offsetX: offsetX,
-                offsetY: offsetY
+                return {
+                    position: pointWorldPosition,
+                    abcName: intersection.abcName,
+                    numeralName: intersection.numeralName,
+                    offsetX: offsetX,
+                    offsetY: offsetY
+                }
             }
         }
 
-        return null;
+        return {
+            position: new THREE.Vector3(),
+            abcName: '',
+            numeralName: '',
+            offsetX: '',
+            offsetY: ''
+        };
     };
 
     // 根据正规化坐标获得轴网交叉点
@@ -1969,7 +2005,22 @@ CLOUD.MiniMap = function (viewer) {
 
                 this.callbackCameraChanged(jsonObj);
             } else {
-                this.callbackCameraChanged(null);
+
+                var jsonObj = {
+                    position: cameraWorldPos,
+                    isInScene : false,
+                    axis: {
+                        abcName: '',
+                        numeralName: '',
+                        offsetX: '',
+                        offsetY: '',
+                        offsetZ: '',
+                        infoX: '',
+                        infoY: ''
+                    }
+                };
+
+                this.callbackCameraChanged(jsonObj);
             }
         }
     };
@@ -2043,6 +2094,10 @@ CLOUD.Extensions.Marker = function (id, editor) {
     this.highlighted = false;
     this.highlightColor = '#faff3c';
     this.isDisableInteractions = false;
+
+    this.onMouseDownBinded = this.onMouseDown.bind(this);
+    this.onMouseOutBinded = this.onMouseOut.bind(this);
+    this.onMouseOverBinded = this.onMouseOver.bind(this);
 };
 
 CLOUD.Extensions.Marker.prototype = {
@@ -2196,16 +2251,16 @@ CLOUD.Extensions.MarkerFlag.prototype.constructor = CLOUD.Extensions.Marker;
 
 CLOUD.Extensions.MarkerFlag.prototype.addDomEventListeners = function () {
 
-    this.shape.addEventListener("mousedown", this.onMouseDown.bind(this), true);
-    this.shape.addEventListener("mouseout", this.onMouseOut.bind(this));
-    this.shape.addEventListener("mouseover", this.onMouseOver.bind(this));
+    this.shape.addEventListener("mousedown", this.onMouseDownBinded, true);
+    this.shape.addEventListener("mouseout", this.onMouseOutBinded);
+    this.shape.addEventListener("mouseover", this.onMouseOverBinded);
 };
 
 CLOUD.Extensions.MarkerFlag.prototype.removeDomEventListeners = function () {
 
-    this.shape.removeEventListener("mousedown", this.onMouseDown.bind(this), true);
-    this.shape.removeEventListener("mouseout", this.onMouseOut.bind(this));
-    this.shape.removeEventListener("mouseover", this.onMouseOver.bind(this));
+    this.shape.removeEventListener("mousedown", this.onMouseDownBinded, true);
+    this.shape.removeEventListener("mouseout", this.onMouseOutBinded);
+    this.shape.removeEventListener("mouseover", this.onMouseOverBinded);
 };
 
 CLOUD.Extensions.MarkerFlag.prototype.createShape = function () {
@@ -2255,16 +2310,16 @@ CLOUD.Extensions.MarkerBubble.prototype.constructor = CLOUD.Extensions.Marker;
 
 CLOUD.Extensions.MarkerBubble.prototype.addDomEventListeners = function () {
 
-    this.shape.addEventListener("mousedown", this.onMouseDown.bind(this), true);
-    this.shape.addEventListener("mouseout", this.onMouseOut.bind(this));
-    this.shape.addEventListener("mouseover", this.onMouseOver.bind(this));
+    this.shape.addEventListener("mousedown", this.onMouseDownBinded, true);
+    this.shape.addEventListener("mouseout", this.onMouseOutBinded);
+    this.shape.addEventListener("mouseover", this.onMouseOverBinded);
 };
 
 CLOUD.Extensions.MarkerBubble.prototype.removeDomEventListeners = function () {
 
-    this.shape.removeEventListener("mousedown", this.onMouseDown.bind(this), true);
-    this.shape.removeEventListener("mouseout", this.onMouseOut.bind(this));
-    this.shape.removeEventListener("mouseover", this.onMouseOver.bind(this));
+    this.shape.removeEventListener("mousedown", this.onMouseDownBinded, true);
+    this.shape.removeEventListener("mouseout", this.onMouseOutBinded);
+    this.shape.removeEventListener("mouseover", this.onMouseOverBinded);
 };
 
 CLOUD.Extensions.MarkerBubble.prototype.createShape = function () {
@@ -2357,17 +2412,22 @@ CLOUD.Extensions.MarkerEditor = function (viewer) {
     this.nextMarkerId = 0;
 
     this.initialized = false;
+
+    this.onMouseDownBinded = this.onMouseDown.bind(this);
+    this.onMouseUpBinded = this.onMouseUp.bind(this);
+    this.onKeyDownBinded = this.onKeyDown.bind(this);
+    this.onKeyUpBinded = this.onKeyUp.bind(this);
 };
 
 CLOUD.Extensions.MarkerEditor.prototype.addDomEventListeners = function () {
 
     if (this.svg) {
 
-        this.svg.addEventListener('mousedown', this.onMouseDown.bind(this), false);
-        this.svg.addEventListener('mouseup', this.onMouseUp.bind(this), false);
+        this.svg.addEventListener('mousedown', this.onMouseDownBinded, false);
+        this.svg.addEventListener('mouseup', this.onMouseUpBinded, false);
 
-        window.addEventListener('keydown', this.onKeyDown.bind(this), false);
-        window.addEventListener('keyup', this.onKeyUp.bind(this), false);
+        window.addEventListener('keydown', this.onKeyDownBinded, false);
+        window.addEventListener('keyup', this.onKeyUpBinded, false);
     }
 };
 
@@ -2375,11 +2435,11 @@ CLOUD.Extensions.MarkerEditor.prototype.removeDomEventListeners = function () {
 
     if (this.svg) {
 
-        this.svg.removeEventListener('mousedown', this.onMouseDown.bind(this), false);
-        this.svg.removeEventListener('mouseup', this.onMouseUp.bind(this), false);
+        this.svg.removeEventListener('mousedown', this.onMouseDownBinded, false);
+        this.svg.removeEventListener('mouseup', this.onMouseUpBinded, false);
 
-        window.removeEventListener('keydown', this.onKeyDown.bind(this), false);
-        window.removeEventListener('keyup', this.onKeyUp.bind(this), false);
+        window.removeEventListener('keydown', this.onKeyDownBinded, false);
+        window.removeEventListener('keyup', this.onKeyUpBinded, false);
     }
 
 };
@@ -2968,6 +3028,10 @@ CLOUD.Extensions.Annotation = function (editor, id) {
     this.disableResizeWidth = false;
     this.disableResizeHeight = false;
     this.disableRotation = false;
+
+    this.onMouseDownBinded = this.onMouseDown.bind(this);
+    this.onMouseOutBinded = this.onMouseOut.bind(this);
+    this.onMouseOverBinded = this.onMouseOver.bind(this);
 };
 
 CLOUD.Extensions.Annotation.prototype = {
@@ -3210,16 +3274,16 @@ CLOUD.Extensions.AnnotationArrow.prototype.constructor = CLOUD.Extensions.Annota
 
 CLOUD.Extensions.AnnotationArrow.prototype.addDomEventListeners = function () {
 
-    this.shape.addEventListener("mousedown", this.onMouseDown.bind(this), true);
-    this.shape.addEventListener("mouseout", this.onMouseOut.bind(this));
-    this.shape.addEventListener("mouseover", this.onMouseOver.bind(this));
+    this.shape.addEventListener("mousedown", this.onMouseDownBinded, true);
+    this.shape.addEventListener("mouseout", this.onMouseOutBinded);
+    this.shape.addEventListener("mouseover", this.onMouseOverBinded);
 };
 
 CLOUD.Extensions.AnnotationArrow.prototype.removeDomEventListeners = function () {
 
-    this.shape.removeEventListener("mousedown", this.onMouseDown.bind(this), true);
-    this.shape.removeEventListener("mouseout", this.onMouseOut.bind(this));
-    this.shape.removeEventListener("mouseover", this.onMouseOver.bind(this));
+    this.shape.removeEventListener("mousedown", this.onMouseDownBinded, true);
+    this.shape.removeEventListener("mouseout", this.onMouseOutBinded);
+    this.shape.removeEventListener("mouseover", this.onMouseOverBinded);
 };
 
 CLOUD.Extensions.AnnotationArrow.prototype.createShape = function () {
@@ -3439,16 +3503,16 @@ CLOUD.Extensions.AnnotationRectangle.prototype.constructor = CLOUD.Extensions.An
 
 CLOUD.Extensions.AnnotationRectangle.prototype.addDomEventListeners = function () {
 
-    this.shape.addEventListener("mousedown", this.onMouseDown.bind(this), true);
-    this.shape.addEventListener("mouseout", this.onMouseOut.bind(this));
-    this.shape.addEventListener("mouseover", this.onMouseOver.bind(this));
+    this.shape.addEventListener("mousedown", this.onMouseDownBinded, true);
+    this.shape.addEventListener("mouseout", this.onMouseOutBinded);
+    this.shape.addEventListener("mouseover", this.onMouseOverBinded);
 };
 
 CLOUD.Extensions.AnnotationRectangle.prototype.removeDomEventListeners = function () {
 
-    this.shape.removeEventListener("mousedown", this.onMouseDown.bind(this), true);
-    this.shape.removeEventListener("mouseout", this.onMouseOut.bind(this));
-    this.shape.removeEventListener("mouseover", this.onMouseOver.bind(this));
+    this.shape.removeEventListener("mousedown", this.onMouseDownBinded, true);
+    this.shape.removeEventListener("mouseout", this.onMouseOutBinded);
+    this.shape.removeEventListener("mouseover", this.onMouseOverBinded);
 };
 
 CLOUD.Extensions.AnnotationRectangle.prototype.createShape = function () {
@@ -3524,16 +3588,16 @@ CLOUD.Extensions.AnnotationCircle.prototype.constructor = CLOUD.Extensions.Annot
 
 CLOUD.Extensions.AnnotationCircle.prototype.addDomEventListeners = function () {
 
-    this.shape.addEventListener("mousedown", this.onMouseDown.bind(this), true);
-    this.shape.addEventListener("mouseout", this.onMouseOut.bind(this));
-    this.shape.addEventListener("mouseover", this.onMouseOver.bind(this));
+    this.shape.addEventListener("mousedown", this.onMouseDownBinded, true);
+    this.shape.addEventListener("mouseout", this.onMouseOutBinded);
+    this.shape.addEventListener("mouseover", this.onMouseOverBinded);
 };
 
 CLOUD.Extensions.AnnotationCircle.prototype.removeDomEventListeners = function () {
 
-    this.shape.removeEventListener("mousedown", this.onMouseDown.bind(this), true);
-    this.shape.removeEventListener("mouseout", this.onMouseOut.bind(this));
-    this.shape.removeEventListener("mouseover", this.onMouseOver.bind(this));
+    this.shape.removeEventListener("mousedown", this.onMouseDownBinded, true);
+    this.shape.removeEventListener("mouseout", this.onMouseOutBinded);
+    this.shape.removeEventListener("mouseover", this.onMouseOverBinded);
 };
 
 CLOUD.Extensions.AnnotationCircle.prototype.createShape = function () {
@@ -3641,16 +3705,16 @@ CLOUD.Extensions.AnnotationCloud.prototype.constructor = CLOUD.Extensions.Annota
 
 CLOUD.Extensions.AnnotationCloud.prototype.addDomEventListeners = function () {
 
-    this.shape.addEventListener("mousedown", this.onMouseDown.bind(this), true);
-    this.shape.addEventListener("mouseout", this.onMouseOut.bind(this));
-    this.shape.addEventListener("mouseover", this.onMouseOver.bind(this));
+    this.shape.addEventListener("mousedown", this.onMouseDownBinded, true);
+    this.shape.addEventListener("mouseout", this.onMouseOutBinded);
+    this.shape.addEventListener("mouseover", this.onMouseOverBinded);
 };
 
 CLOUD.Extensions.AnnotationCloud.prototype.removeDomEventListeners = function () {
 
-    this.shape.removeEventListener("mousedown", this.onMouseDown.bind(this), true);
-    this.shape.removeEventListener("mouseout", this.onMouseOut.bind(this));
-    this.shape.removeEventListener("mouseover", this.onMouseOver.bind(this));
+    this.shape.removeEventListener("mousedown", this.onMouseDownBinded, true);
+    this.shape.removeEventListener("mouseout", this.onMouseOutBinded);
+    this.shape.removeEventListener("mouseover", this.onMouseOverBinded);
 };
 
 CLOUD.Extensions.AnnotationCloud.prototype.createShape = function () {
@@ -4080,16 +4144,16 @@ CLOUD.Extensions.AnnotationCross.prototype.constructor = CLOUD.Extensions.Annota
 
 CLOUD.Extensions.AnnotationCross.prototype.addDomEventListeners = function () {
 
-    this.shape.addEventListener("mousedown", this.onMouseDown.bind(this), true);
-    this.shape.addEventListener("mouseout", this.onMouseOut.bind(this));
-    this.shape.addEventListener("mouseover",this.onMouseOver.bind(this));
+    this.shape.addEventListener("mousedown", this.onMouseDownBinded, true);
+    this.shape.addEventListener("mouseout", this.onMouseOutBinded);
+    this.shape.addEventListener("mouseover", this.onMouseOverBinded);
 };
 
 CLOUD.Extensions.AnnotationCross.prototype.removeDomEventListeners = function () {
 
-    this.shape.removeEventListener("mousedown", this.onMouseDown.bind(this), true);
-    this.shape.removeEventListener("mouseout", this.onMouseOut.bind(this));
-    this.shape.removeEventListener("mouseover",this.onMouseOver.bind(this));
+    this.shape.removeEventListener("mousedown", this.onMouseDownBinded, true);
+    this.shape.removeEventListener("mouseout", this.onMouseOutBinded);
+    this.shape.removeEventListener("mouseover", this.onMouseOverBinded);
 };
 
 CLOUD.Extensions.AnnotationCross.prototype.createShape = function() {
@@ -4222,16 +4286,16 @@ CLOUD.Extensions.AnnotationText.prototype.constructor = CLOUD.Extensions.Annotat
 
 CLOUD.Extensions.AnnotationText.prototype.addDomEventListeners = function () {
 
-    this.shape.addEventListener("mousedown", this.onMouseDown.bind(this), true);
-    this.shape.addEventListener("mouseout", this.onMouseOut.bind(this), false);
-    this.shape.addEventListener("mouseover", this.onMouseOver.bind(this), false);
+    this.shape.addEventListener("mousedown", this.onMouseDownBinded, true);
+    this.shape.addEventListener("mouseout", this.onMouseOutBinded);
+    this.shape.addEventListener("mouseover", this.onMouseOverBinded);
 };
 
 CLOUD.Extensions.AnnotationText.prototype.removeDomEventListeners = function () {
 
-    this.shape.removeEventListener("mousedown", this.onMouseDown.bind(this), true);
-    this.shape.removeEventListener("mouseout", this.onMouseOut.bind(this), false);
-    this.shape.removeEventListener("mouseover", this.onMouseOver.bind(this), false);
+    this.shape.removeEventListener("mousedown", this.onMouseDownBinded, true);
+    this.shape.removeEventListener("mouseout", this.onMouseOutBinded);
+    this.shape.removeEventListener("mouseover", this.onMouseOverBinded);
 };
 
 CLOUD.Extensions.AnnotationText.prototype.createShape = function () {
@@ -4530,18 +4594,20 @@ CLOUD.Extensions.AnnotationTextArea = function (editor, container) {
     this.measurePanel = document.createElement('div');
 
     this.textAnnotation = null;
+    this.onKeyDownBinded = this.onKeyDown.bind(this);
+    this.onResizeBinded = this.onResize.bind(this);
 
     this.addDomEventListeners();
 };
 
 CLOUD.Extensions.AnnotationTextArea.prototype.addDomEventListeners = function () {
 
-    this.textArea.addEventListener('keydown', this.onKeyDown.bind(this), false);
+    this.textArea.addEventListener('keydown', this.onKeyDownBinded, false);
 };
 
 CLOUD.Extensions.AnnotationTextArea.prototype.removeDomEventListeners = function () {
 
-    this.textArea.removeEventListener('keydown', this.onKeyDown.bind(this), false);
+    this.textArea.removeEventListener('keydown', this.onKeyDownBinded, false);
 };
 
 CLOUD.Extensions.AnnotationTextArea.prototype.onKeyDown = function () {
@@ -4659,7 +4725,7 @@ CLOUD.Extensions.AnnotationTextArea.prototype.active = function (annotation, fir
 
     this.init();
 
-    window.addEventListener('resize', this.onResize.bind(this));
+    window.addEventListener('resize', this.onResizeBinded);
 
     var textArea = this.textArea;
 
@@ -4670,7 +4736,7 @@ CLOUD.Extensions.AnnotationTextArea.prototype.active = function (annotation, fir
 
 CLOUD.Extensions.AnnotationTextArea.prototype.inactive = function () {
 
-    window.removeEventListener('resize', this.onResize.bind(this));
+    window.removeEventListener('resize', this.onResizeBinded);
 
     if (this.textAnnotation) {
 
@@ -4876,24 +4942,29 @@ CLOUD.Extensions.AnnotationFrame = function (editor, container) {
 
     this.annotation = null;
 
+    this.onResizeDownBinded = this.onResizeDown.bind(this);
+    this.onDoubleClickBinded = this.onDoubleClick.bind(this);
+    this.onRepositionDownBinded = this.onRepositionDown.bind(this);
+    this.onRotationDownBinded = this.onRotationDown.bind(this);
+
     this.createFramePanel();
     this.addDomEventListeners();
 };
 
 CLOUD.Extensions.AnnotationFrame.prototype.addDomEventListeners = function () {
 
-    this.framePanel.addEventListener('mousedown', this.onResizeDown.bind(this));
-    this.framePanel.addEventListener('dblclick', this.onDoubleClick.bind(this));
-    this.selection.element.addEventListener('mousedown', this.onRepositionDown.bind(this));
-    this.selection.element.addEventListener('mousedown', this.onRotationDown.bind(this));
+    this.framePanel.addEventListener('mousedown', this.onResizeDownBinded);
+    this.framePanel.addEventListener('dblclick', this.onDoubleClickBinded);
+    this.selection.element.addEventListener('mousedown', this.onRepositionDownBinded);
+    this.selection.element.addEventListener('mousedown', this.onRotationDownBinded);
 };
 
 CLOUD.Extensions.AnnotationFrame.prototype.removeDomEventListeners = function () {
 
-    this.framePanel.removeEventListener('mousedown', this.onResizeDown.bind(this));
-    this.framePanel.removeEventListener('dblclick', this.onDoubleClick.bind(this));
-    this.selection.element.removeEventListener('mousedown', this.onRepositionDown.bind(this));
-    this.selection.element.removeEventListener('mousedown', this.onRotationDown.bind(this));
+    this.framePanel.removeEventListener('mousedown', this.onResizeDownBinded);
+    this.framePanel.removeEventListener('dblclick', this.onDoubleClickBinded);
+    this.selection.element.removeEventListener('mousedown', this.onRepositionDownBinded);
+    this.selection.element.removeEventListener('mousedown', this.onRotationDownBinded);
 };
 
 CLOUD.Extensions.AnnotationFrame.prototype.onMouseMove = function (event) {
@@ -5476,20 +5547,26 @@ CLOUD.Extensions.AnnotationEditor = function (viewer) {
     this.nextAnnotationId = 0;
     this.annotationMinLen = 16;
     this.initialized = false;
+
+    this.onMouseDownBinded = this.onMouseDown.bind(this);
+    this.onMouseDoubleClickBinded = this.onMouseDoubleClick.bind(this);
+    this.onMouseMoveBinded = this.onMouseMove.bind(this);
+    this.onMouseUpBinded = this.onMouseUp.bind(this);
+    this.onKeyDownBinded = this.onKeyDown.bind(this);
+    this.onKeyUpBinded = this.onKeyUp.bind(this);
 };
 
 CLOUD.Extensions.AnnotationEditor.prototype.addDomEventListeners = function () {
 
     if (this.svg) {
 
-        this.svg.addEventListener('mousedown', this.onMouseDown.bind(this), false);
-        this.svg.addEventListener('dblclick', this.onMouseDoubleClick.bind(this), false);
+        this.svg.addEventListener('mousedown', this.onMouseDownBinded, false);
+        this.svg.addEventListener('dblclick', this.onMouseDoubleClickBinded, false);
 
-        window.addEventListener('mousemove', this.onMouseMove.bind(this), false);
-        window.addEventListener('mouseup', this.onMouseUp.bind(this), false);
-
-        window.addEventListener('keydown', this.onKeyDown.bind(this), false);
-        window.addEventListener('keyup', this.onKeyUp.bind(this), false);
+        window.addEventListener('mousemove', this.onMouseMoveBinded, false);
+        window.addEventListener('mouseup', this.onMouseUpBinded, false);
+        window.addEventListener('keydown', this.onKeyDownBinded, false);
+        window.addEventListener('keyup', this.onKeyUpBinded, false);
 
         this.onFocus();
     }
@@ -5500,15 +5577,13 @@ CLOUD.Extensions.AnnotationEditor.prototype.removeDomEventListeners = function (
 
     if (this.svg) {
 
-        this.svg.removeEventListener('mousedown', this.onMouseDown.bind(this), false);
-        //this.svg.removeEventListener('mousewheel', this.onMouseWheel.bind(this), false);
-        this.svg.removeEventListener('dblclick', this.onMouseDoubleClick.bind(this), false);
+        this.svg.removeEventListener('mousedown', this.onMouseDownBinded, false);
+        this.svg.removeEventListener('dblclick', this.onMouseDoubleClickBinded, false);
 
-        window.removeEventListener('mousemove', this.onMouseMove.bind(this), false);
-        window.removeEventListener('mouseup', this.onMouseUp.bind(this), false);
-
-        window.removeEventListener('keydown', this.onKeyDown.bind(this), false);
-        window.removeEventListener('keyup', this.onKeyUp.bind(this), false);
+        window.removeEventListener('mousemove', this.onMouseMoveBinded, false);
+        window.removeEventListener('mouseup', this.onMouseUpBinded, false);
+        window.removeEventListener('keydown', this.onKeyDownBinded, false);
+        window.removeEventListener('keyup', this.onKeyUpBinded, false);
     }
 
 };
@@ -6559,9 +6634,8 @@ CLOUD.Extensions.AnnotationEditor.prototype.handleTextChange = function (data) {
     var text = data.annotation;
 
     if (data.text === '') {
-
-        data.annotation.delete();
         this.selectAnnotation(null);
+        data.annotation.delete();
         return;
     }
 
