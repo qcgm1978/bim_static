@@ -601,7 +601,7 @@
 				if ($item.find(".folder").length > 0) {
 					sb += '<i class="nodeSwitch bg on"></i> <i class="folderIcon bg"></i>';
 				}
-				sb += '<span class="text-field overflowEllipsis " data-id="' + id + '" data-fileversionid="' + fileVersionId + '">' + $item.find(".fileName").text() + '</span> ';
+				sb += '<span class="text-field overflowEllipsis " data-id="' + id + '" data-fileversionid="' + fileVersionId + '" title="'+$item.find(".fileName").text() +'">' + $item.find(".fileName").text() + '</span> ';
 				sb += '<i class="bg delFile"></i></div></li>';
 			}
 
