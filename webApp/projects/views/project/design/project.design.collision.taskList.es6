@@ -25,7 +25,9 @@ App.Project.DesignCollisionTaskList=Backbone.View.extend({
     }else{
       if(this.$el.find("ul").length==0 || App.Project.DesignAttr.CollisionTaskList.isNew){
         this.$el.html(this.template(data)).find('.collList').children().eq(0).trigger('click');
-
+        if(App.Project.DesignAttr.CollisionTaskList.isNew){
+          App.Project.DesignAttr.CollisionTaskList.isNew = false;
+        }
       }else{
         this.$el.html(this.template(data));
 
