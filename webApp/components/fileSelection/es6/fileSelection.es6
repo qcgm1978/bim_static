@@ -530,9 +530,7 @@
 
 
 		//确认选择的文件
-		enterSelect() {
-
-
+		enterSelect() { 
 
 			var $dialog = this.Settings.$dialog,
 				treeFolders = $dialog.find(".treeViewScroll .selected").parents("li"),
@@ -607,8 +605,8 @@
 				sb += '<i class="bg delFile"></i></div></li>';
 			}
 
-
-
+			//默认展开
+			$trees.find(".treeViewSub").show();
 			//未追加
 			if (isAppend == false) {
 

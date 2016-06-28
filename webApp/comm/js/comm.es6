@@ -192,8 +192,8 @@ App.Comm = {
 
 		var exp = new Date(),
 
-			keys = localStorage.getItem("keys").split(','); //document.cookie.match(/[^ =;]+(?=\=)/g);
-
+			keys =localStorage.getItem("keys") && localStorage.getItem("keys").split(',') || ""; //document.cookie.match(/[^ =;]+(?=\=)/g);
+ 
 		exp.setTime(exp.getTime() + min * 60 * 1000);
 
 		if (keys) {
