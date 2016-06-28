@@ -453,8 +453,8 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			//App.Project.Settings.modelId = model.userId;
 			that.viewerPropertyRender();
 			//展开
-			$("#projectContainer .rightProperty").css('marginRight', '0');
-			$("#projectContainer .rightProperty .icon-caret-left").attr('class', 'icon-caret-right');
+	//		$("#projectContainer .rightProperty").css('marginRight', '0');
+	//		$("#projectContainer .rightProperty .icon-caret-left").attr('class', 'icon-caret-right');
 
 		});
 
