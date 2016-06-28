@@ -2,7 +2,7 @@
     <%  var type = obj.operator,a1 = "==",a2 = "!=",a3 = "<>",a4 = "><";  %>
     <input type="text" placeholder="请输入属性名称" value="<%= obj.propertyKey %>"><div class="myDropDown" data-operator="<%= type %>">
                         <span class="myDropText">
-                            <span class="text"><%=   type == a1 ? "等于" :  (type == a2 ? "不等" :  (type == a3 ? "范围内" :  (type == a4 ? "范围外" : "请选择规则")))%></span>
+                            <span class="text"><%=   type == a1 ? "等于" :  (type == a2 ? "不等于" :  (type == a3 ? "范围内" :  (type == a4 ? "范围外" : "请选择规则")))%></span>
                             <i class="myDropArrorw down"></i>
                         </span>
     <ul class="myDropList">

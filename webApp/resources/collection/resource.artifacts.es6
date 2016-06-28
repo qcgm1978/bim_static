@@ -284,6 +284,7 @@ App.ResourceArtifacts={
             this.tplFrame.$(".tplListContainer").html(this.tplList.render().el);//ÓÒ²à¿ò¼Ü
             this.tplFrame.$(".tplContent .content").html(this.detail.render().el);
             this.detail.$(".tplDetailCon").append(this.menu.render().el);//²Ëµ¥
+
             if(Auth.moduleMappingRule.view){
                 this.menu.$(".plans").html(this.plans.render().el);//¼Æ»®
             }
@@ -298,8 +299,6 @@ App.ResourceArtifacts={
             }
 
             this.detail.$(".artifactsContent").addClass("explorer");
-
-
             $("#artifacts").addClass("services_loading");
             this.getTpl();
 
