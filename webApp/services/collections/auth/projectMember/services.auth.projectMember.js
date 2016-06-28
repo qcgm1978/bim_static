@@ -31,6 +31,8 @@ App.Services.projectMember = {
 			userId:App.Comm.getCookie("userId"),
 			type:3
 		});*/
+		this.projectMemberProjectCollection.userId=App.Global.User.userId;
+		
 		this.projectMemberProjectCollection.fetch({
 			reset: true,
 			data: {

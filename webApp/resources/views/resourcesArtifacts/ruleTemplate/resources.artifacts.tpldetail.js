@@ -17,6 +17,13 @@ App.Resources.ArtifactsTplDetail = Backbone.View.extend({
 
     render:function() {
         this.$el.html(this.template);
+
+        var tabs = App.Comm.AuthConfig.resource.mappingRule,
+            Auth = App.AuthObj.lib;
+
+        if(App.AuthObj.lib.mappingRuleTemplate.edit){
+            this.$(".tplDetailInfo").prepend(tabs.mappingRuleTemplateEdit);
+        }
         return this;
     },
 
@@ -52,7 +59,7 @@ App.Resources.ArtifactsTplDetail = Backbone.View.extend({
         this.$(".tplDetailInfo h2").empty();
     },
 
-    //保存，要重写
+    //保存
     resourcesSure:function(){
         var _this = this;
 
@@ -88,7 +95,6 @@ App.Resources.ArtifactsTplDetail = Backbone.View.extend({
                         item.set({"ruleId":response.data.ruleIds},{silent:true})
                     }
                 });
-
 
                 App.ResourceArtifacts.modelEdit = false
 
