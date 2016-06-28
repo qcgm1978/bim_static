@@ -4,7 +4,7 @@ App.ResourceModel = {
 		leftType: "file",
 		DataModel: "", //模型id
 		fileVersionId: "",
-		searchText:"",//搜索文本
+		searchText: "", //搜索文本
 		type: "", //模型类型
 		projectId: "", //项目id
 		versionId: "", // 版本id
@@ -106,7 +106,7 @@ App.ResourceModel = {
 	//token 初始化
 	initToken() {
 		//释放上传
-		App.Comm.upload.destroy();	 
+		App.Comm.upload.destroy();
 
 		//重置参数
 		this.reset();
@@ -128,7 +128,7 @@ App.ResourceModel = {
 
 
 		App.ResourceModel.Settings.leftType = "file";
-		App.ResourceModel.Settings.searchText="";
+		App.ResourceModel.Settings.searchText = "";
 		App.ResourceModel.Settings.pageIndex = 1;
 		App.ResourceModel.Settings.DataModel = null;
 		App.ResourceModel.Settings.CurrentVersion = {};
@@ -168,7 +168,7 @@ App.ResourceModel = {
 			}
 		});
 
-		
+
 	},
 
 
@@ -218,8 +218,8 @@ App.ResourceModel = {
 			}
 		};
 
-		App.Comm.ajax(data, function(data) { 
-			if (data.code == 0) { 
+		App.Comm.ajax(data, function(data) {
+			if (data.code == 0) {
 
 				App.ResourceModel.Settings.CurrentVersion = data.data.version;
 
@@ -272,13 +272,20 @@ App.ResourceModel = {
 				});
 			}
 
-			//上传
-			App.ResourceUpload.init($(document.body));
 
-			if (App.ResourceModel.Settings.CurrentVersion.status==9) {
-				 $("#navContainer .topBar").find(".btnNewFolder,.btnFileUpload,.btnFileDel").remove();
+
+			var status = App.ResourceModel.Settings.CurrentVersion.status;
+			
+			if (status != 9 && status != 4 && status != 7) {
+				//上传
+				App.ResourceUpload.init($(document.body));
+				$("#navContainer .topBar").find(".btnNewFolder,.btnFileUpload,.btnFileDel").show();  
+
+			} else {
+				$("#navContainer .topBar").find(".btnNewFolder,.btnFileUpload,.btnFileDel").hide();
 			}
-			 
+
+
 
 		}
 	},
@@ -481,15 +488,15 @@ App.ResourceModel = {
 	},
 
 
-	
+
 	//获取文件名称 搜索
-	getName(name){
-		 
-		var searchText=App.ResourceModel.Settings.searchText;
+	getName(name) {
+
+		var searchText = App.ResourceModel.Settings.searchText;
 		if (searchText) {
 
-			name=name.replace(searchText.toLowerCase(),'<span class="searchText">'+searchText.toLowerCase()+'</span>').replace(searchText.toUpperCase(),'<span class="searchText">'+searchText.toUpperCase()+'</span>');
-		} 
+			name = name.replace(searchText.toLowerCase(), '<span class="searchText">' + searchText.toLowerCase() + '</span>').replace(searchText.toUpperCase(), '<span class="searchText">' + searchText.toUpperCase() + '</span>');
+		}
 		return name;
 	}
 }

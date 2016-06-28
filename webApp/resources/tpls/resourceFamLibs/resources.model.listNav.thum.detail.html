@@ -1,11 +1,11 @@
 
-<%if(folder){%>
+<%if(folder || (suffix!='rvt' && suffix!='rfa' && suffix!='dwg') ){%>
   <span data-id="<%=id%>" data-isfolder="<%=folder%>" class="boxText">
   
 <%}else{%>
-  <a data-id="<%=id%>" href="/static/dist/app/project/single/filePreview.html?id=<%=fileVersionId%>&model=<%=modelId%>&projectId=<%=projectId%>&projectVersionId=<%=App.ResourceModel.Settings.CurrentVersion.id%>" target="_blank" data-isfolder="<%=folder%>" class="boxText">
-           
-      
+  
+  
+       <a data-id="<%=id%>" href="/static/dist/app/project/single/filePreview.html?id=<%=fileVersionId%>&model=<%=modelId%>&projectId=<%=projectId%>&projectVersionId=<%=App.ResourceModel.Settings.CurrentVersion.id%>" target="_blank" data-isfolder="<%=folder%>" class="boxText"> 
 <%}%>
 
 
@@ -37,7 +37,7 @@
 <%} %> 
 </span> 
 
-<%if(folder){%>
+<%if(folder || (suffix!='rvt' && suffix!='rfa' && suffix!='dwg')){%>
    </span> 
 <%}else{%>
   </a> 

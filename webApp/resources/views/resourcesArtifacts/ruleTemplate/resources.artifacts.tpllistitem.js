@@ -30,6 +30,7 @@ App.Resources.ArtifactsTplListItem = Backbone.View.extend({
     },
     //取得模板
     getTpl:function(){
+        var Auth = App.AuthObj.lib;
         if(App.ResourceArtifacts.modelEdit){
             alert("编辑状态不能切换模板");
             return;
@@ -44,14 +45,21 @@ App.Resources.ArtifactsTplListItem = Backbone.View.extend({
             alert("您还有没保存的");
             return
         }
-        App.ResourceArtifacts.getPlan();
-        App.ResourceArtifacts.getAllQuality(function(){
-            App.ResourceArtifacts.departQuality(App.ResourceArtifacts.menu.$(".qualityMenuListGC"),App.ResourceArtifacts.allQualityGC,null,null);
-            App.ResourceArtifacts.menu.$(".qualityMenuListGC").show();
-            App.ResourceArtifacts.departQuality(App.ResourceArtifacts.menu.$(".qualityMenuListKY"),App.ResourceArtifacts.allQualityKY,null,null);
-            App.ResourceArtifacts.tplFrame.$(".tplContent").removeClass("services_loading");
-        });
-        Backbone.trigger("mappingRuleModelLoadContent",this.model.get("name"));
+
+        if(Auth.moduleMappingRule.view) {
+            App.ResourceArtifacts.getPlan();
+        }
+        if(Auth.qualityMappingRule.view){
+            App.ResourceArtifacts.getAllQuality(function(){
+                App.ResourceArtifacts.departQuality(App.ResourceArtifacts.menu.$(".qualityMenuListGC"),App.ResourceArtifacts.allQualityGC,null,null);
+                App.ResourceArtifacts.menu.$(".qualityMenuListGC").show();
+                App.ResourceArtifacts.departQuality(App.ResourceArtifacts.menu.$(".qualityMenuListKY"),App.ResourceArtifacts.allQualityKY,null,null);
+                App.ResourceArtifacts.tplFrame.$(".tplContent").removeClass("services_loading");
+            });
+        }
+        if(Auth.moduleMappingRule.view || Auth.qualityMappingRule.view){
+            Backbone.trigger("mappingRuleModelLoadContent",this.model.get("name"));
+        }
     },
     //切换
     toggleClass:function(){

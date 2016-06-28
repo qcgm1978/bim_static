@@ -28,11 +28,11 @@
 			this.Settings.isEnable = false;
 		}
 
-		if (!this.Settings.appKey) {
-			alert("缺少参数appKey");
-			return false;
-		}
-	 
+		// if (!this.Settings.appKey) {
+		// 	alert("缺少参数appKey");
+		// 	return false;
+		// }
+
 		if (!this.Settings.projectId) {
 			alert("缺少参数projectId");
 			return false;
@@ -54,6 +54,8 @@
 		this.Settings.downLoadUrl = url + "/data";
 		this.Settings.reverseTree = url += "/select";
 		this.Settings.modelPrevView = this.Settings.http + "/static/dist/app/project/single/filePreview.html?projectId=" + this.Settings.projectId + "&projectVersionId=" + this.Settings.projectVersionId;
+
+
 		//初始化
 		this.init();
 
@@ -88,8 +90,8 @@
 				if (data.code == 0) {
 
 					that.setCookie("token_cookie", data.data);
+					that.Settings.token_cookie = data.data;
 					isVerification = true;
-
 				} else {
 					alert("验证失败");
 					isVerification = false;
@@ -108,13 +110,27 @@
 		},
 		//初始化
 		init() {
+
 			//生成Dialog
 			this.buildDialog();
+
+
 			if (this.Settings.fileIds) {
+
 				this.loadData(this.Settings.reverseTree + "?fileVersionId=" + this.Settings.fileIds, this.renderRightTree);
+
+				if (this.Settings.token_cookie) {
+					this.Settings.reverseTree += '&token_cookie=' + this.Settings.token_cookie;
+				}
+			}
+
+			if (this.Settings.token_cookie) {
+				this.Settings.treeUrl += '?token_cookie=' + this.Settings.token_cookie;
 			}
 			//加载数据
 			this.loadData(this.Settings.treeUrl, this.renderTree);
+
+
 			//事件初始化
 			this.initEvent();
 		},
@@ -127,9 +143,7 @@
 				$header = $('<div class="header"/>').html('<i class="bg close" title="关闭"></i><h2>请选择申请变更的文件</h2> '),
 				$content = $('<div class="container" />').html(' <div class="loading">正在加载，请稍候……</div> <div class="leftFile"></div><div class="rightEnter"></div> <div class="contentBox"></div>  '),
 				$bottom = $('<div class="footer"/>').html('<input type="button" class="btnEnter myBtn myBtn-primary" value="' + this.Settings.btnText + '" />');
-
-
-
+ 
 			//插入html架构
 			$content.find(".leftFile").html('<div class="title">文件浏览器</div> <div class="treeViewBox"> <div class="treeViewScroll"></div> </div> ');
 
@@ -336,9 +350,14 @@
 			//点击树文字
 			$dialog.on("click", ".treeViewBox .text-field", function() {
 
+				 
 				var $this = $(this),
 					fileVersionId = $this.data("fileversionid"),
 					url = that.Settings.nodeUrl + "?parentId=" + fileVersionId;
+
+				if (that.Settings.token_cookie) {
+					url += '&token_cookie=' + that.Settings.token_cookie;
+				}
 
 				$dialog.find(".treeViewBox .text-field").removeClass('selected');
 				$this.addClass('selected');
@@ -438,6 +457,9 @@
 				}
 
 				var url = that.Settings.downLoadUrl + "?fileVersionId=" + FileIdArr.join(",");
+				if (that.Settings.token_cookie) {
+					that.Settings.downLoadUrl += '&token_cookie=' + that.Settings.token_cookie;
+				}
 				window.location.href = url;
 
 				//
@@ -629,6 +651,11 @@
 					op, folder,
 					url = this.Settings.modelPrevView,
 					item, isLock, status;
+
+				if (this.Settings.token_cookie) { 
+					this.Settings.modelPrevView += '&token_cookie=' + this.Settings.token_cookie; 
+				}
+
 				if (count > 0) {
 					for (var i = 0; i < count; i++) {
 						item = list[i];
@@ -698,7 +725,7 @@
 
 			return result;
 
-			
+
 		},
 
 		//格式化 文件大小
