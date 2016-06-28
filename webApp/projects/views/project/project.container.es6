@@ -121,7 +121,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 								}
 						}
 
-					}
+
 					if(res.data.className=='成本管理'){
 						$(event.target).parent().append(str);
 
