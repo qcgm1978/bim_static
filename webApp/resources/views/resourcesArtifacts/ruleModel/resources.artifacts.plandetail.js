@@ -25,13 +25,11 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
     },
 
     initialize:function(){
-        //this.listenTo(this.model,"change:checked",this.check);
         Backbone.on("resetTitle",this.changeCount,this);
         Backbone.on("modelRuleEmpty",this.modelRuleEmpty,this);
         Backbone.on("modelRuleFull",this.modelRuleFull,this);
         Backbone.on("modelRuleHalf",this.modelRuleHalf,this);
     },
-
     modelRuleEmpty:function(){
         if(App.ResourceArtifacts.Status.rule.targetCode == this.model.get("code")){
             this.$(".ruleCheck").removeClass("all").removeClass("half");
@@ -50,12 +48,10 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
             this.$el.attr("data-check","0")
         }
     },
-
     checked:function(e){
         App.Resources.cancelBubble(e);
         var ele = $(e.target);
         var model = jQuery.parseJSON(this.$el.attr("data-model")),already;
-
 
         var modelSaving = App.ResourceArtifacts.modelSaving.codeIds;
         var n = "string";
@@ -66,12 +62,10 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
             }
         }
 
-
         if(ele.hasClass("all")){
             ele.removeClass("all");
             ele.closest("li").attr("data-check","0");
             //保存提交数据
-
             if( n == "string"){
                 model.ruleIds = [];
                 App.ResourceArtifacts.modelSaving.codeIds.push(App.ResourceArtifacts.getValid(model));
@@ -101,7 +95,7 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
         ele.removeClass("half");
         //不设置模型类型
     },
-
+    //改变数量
     changeCount:function(){
         var count = App.ResourceArtifacts.Status.rule.count;
         if(this.model.get("code") ==App.ResourceArtifacts.Status.rule.targetCode){
@@ -123,9 +117,7 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
             alert("您还有没保存的");
             return
         }*/
-
         App.ResourceArtifacts.PlanRules.reset();
-
          App.ResourceArtifacts.Status.rule.targetCode = this.model.get("code");
         App.ResourceArtifacts.Status.rule.targetName = this.model.get("name");
         App.ResourceArtifacts.Status.rule.count = this.model.get("count");
