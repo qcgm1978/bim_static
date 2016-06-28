@@ -116,8 +116,25 @@ App.Resources.dealStr2 = function(model){
     return con;
 };
 
-
-
+//轮换计数
+    App.Resources.prev = function(present,length){
+        var a;
+        if( present  > 0 ){
+            a =  present - 1;
+        }else if( present  == 0){
+            a = length - 1;
+        }
+        return a;
+    };
+    App.Resources.next = function( present,length ){
+    var a;
+    if( present + 1 < length ) {
+        a = present + 1;
+    }else if( present + 1 == length ){
+        a = 0;
+    }
+    return a;
+};
 
 //队列管理
 App.Resources.queue = {

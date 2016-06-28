@@ -57,10 +57,11 @@
  			return
  		}
  		var type = App.ResourcesNav.Settings.type;
- 		var $currentLevel = type == "standardLibs" ? $('#resourceModelLeftNav .treeViewMarUl .selected') : $('#resourceFamlibsLeftNav .treeViewMarUl .selected');
+ 		var id=type == "standardLibs"?"resourceModelLeftNav":"resourceFamlibsLeftNav";
+ 		var $currentLevel =$('#'+id+' .treeViewMarUl .selected');
  		var file = $currentLevel.data('file');
  		var parentId = file.parentId;
- 		var $parent = $('#resourceModelLeftNav .treeViewMarUl span[data-id="' + parentId + '"]');
+ 		var $parent = $('#'+id+' .treeViewMarUl span[data-id="' + parentId + '"]');
  		if ($parent.length) {
  			$parent.click();
  		} else {
