@@ -18,15 +18,24 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
     render:function() {
         this.$el.html(this.template);
 
-        App.ResourceArtifacts.Status.rule.biz = 1;
-        var power = App.ResourceArtifacts.Settings.ruleModel;
-        if(power == 1){
-            this.$(".modularization").remove();
-            this.$(".quality").addClass("active");
-        }else if(power == 2){
-            App.ResourceArtifacts.Status.rule.biz = 2;
-            this.$(".quality").remove();
+        var tabs = App.Comm.AuthConfig.resource.mappingRule,
+            Auth = App.AuthObj.lib;
+        if(Auth.moduleMappingRule.view){
+            this.$(".artifactsNav ul").append(tabs.module);
+            this.$(".artifactsNav ul .modularization").addClass("active");
+            App.ResourceArtifacts.Status.rule.biz = 1;
         }
+        if(Auth.qualityMappingRule.view){
+            this.$(".artifactsNav ul").append(tabs.quality);
+            if(!Auth.moduleMappingRule.view){
+                this.$(".artifactsNav ul .quality").addClass("active");
+            }
+            App.ResourceArtifacts.Status.rule.biz = 2;
+        }
+        if(Auth.moduleMappingRule.view && Auth.qualityMappingRule.view){
+            App.ResourceArtifacts.Status.rule.biz = 1;
+        }
+
         return this;
     },
 
@@ -107,8 +116,13 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
 
     //为项目设置创建规则
     create:function(e){
-        this.$(".default").hide();
-        this.select(e);
-        Backbone.trigger("mappingRuleModelEdit");
+        if(App.AuthObj.lib.mappingRuleTemplate.edit){
+            this.$(".default").hide();
+            this.select(e);
+            Backbone.trigger("mappingRuleModelEdit");
+        }else{
+            alert("您没有修改模板权限！")
+        }
+
     }
 });
