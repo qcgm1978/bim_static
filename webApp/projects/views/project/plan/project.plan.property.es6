@@ -200,7 +200,8 @@ App.Project.ProjectPlanProperty = Backbone.View.extend({
 			val=$target.val(),
 			data={
 				projectCode:App.Project.Settings.CurrentVersion.projectNo,
-				type: val
+				type: val,
+				userId:App.Comm.user('userId')
 			};
 
 		if(val == 4 || val == 2){
@@ -234,7 +235,8 @@ App.Project.ProjectPlanProperty = Backbone.View.extend({
 		App.Project.PlanAttr.PlanPublicityCollection.fetch({
 			data: {
 				projectCode:App.Project.Settings.CurrentVersion.projectNo,
-				type: monthType
+				type: monthType,
+				userId:App.Comm.user('userId')
 			}
 		});
 
@@ -245,7 +247,8 @@ App.Project.ProjectPlanProperty = Backbone.View.extend({
 		App.Project.PlanAttr.PlanPublicityCollectionMonth.fetch({
 			data: {
 				projectCode: App.Project.Settings.CurrentVersion.projectNo,
-				type: weekType
+				type: weekType,
+				userId:App.Comm.user('userId')
 			}
 		});
 	},

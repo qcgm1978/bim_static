@@ -89,7 +89,7 @@
 
 
                 //上传文件后操作
-                afterCreateNewFolder(data) {
+                afterCreateNewFolder:function(data) {
 
                     App.Project.afterCreateNewFolder(data, data.parentId);
 
