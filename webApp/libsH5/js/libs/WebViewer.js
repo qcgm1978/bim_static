@@ -3,7 +3,7 @@
 */
 
 var CLOUD = CLOUD || {};
-CLOUD.Version = "20160623";
+CLOUD.Version = "20160627";
 
 CLOUD.GlobalData = {
     SceneSize: 1000,
@@ -6664,7 +6664,7 @@ CLOUD.Camera.prototype.zoomToBBox = function (bound, margin, ratio) {
     this.position.copy(position);
     this.lookAt(center);
     this.updateProjectionMatrix();
-
+    this.target.copy(center);
     return center;
 };
 
@@ -8786,18 +8786,27 @@ CLOUD.Cell.prototype.update = function () {
                 //distance = distance * distance;
                 var distance = 0;
                 if (CLOUD.GlobalData.ByTargetDistance) {
-                    distance = camera.target.distanceToSquared(v2);
+                    if (scope.worldBoundingBox.containsPoint(camera.target)) {
+                        distance = 0;
+                    }
+                    else {
+                        distance = camera.target.distanceToSquared(v2);
+                    }                   
                 }
                 else {
                     distance = camera.position.distanceToSquared(v2);
                 }
-                distance = Math.min(distance * 2, 250000) * 0.001;
+                distance = distance  * 0.002;
 
                 var target = CLOUD.GlobalData.CellVisibleLOD * CLOUD.GlobalData.SubSceneVisibleDistance;
                 if (scope.out && !camera.inside) {
                     target = target * 20;
+                    shouldShow = true;
                 }
-                shouldShow = distance < target;
+                else {
+                    shouldShow = distance < target;
+                }
+                
                 //if(!shouldShow)
                 //    console.log(distance + " " + target);
             }
@@ -8882,18 +8891,20 @@ CLOUD.SubScene.prototype.update = function () {
         else {
             scope.worldBoundingBox.center(v2);
 
-            if (CLOUD.GlobalData.ByTargetDistance) {
-                distance = camera.target.distanceToSquared(v2);
+            if (CLOUD.GlobalData.ByTargetDistance) {                
+                if (scope.worldBoundingBox.containsPoint(camera.target)) {
+                    distance = 0;
+                }
+                else {
+                    distance = camera.target.distanceToSquared(v2);
+                }
             }
             else {
                 distance = camera.position.distanceToSquared(v2);
             }
             
 
-            distance = Math.min(distance * 2, 250000) * 0.001;
-
-            //distance = camera.positionPlane.distanceToPoint(v2);
-            //distance = distance * distance;           
+            distance = distance * 0.002;
 
             var lodValue = CLOUD.ObjectLevelLoD[scope.level];
             if (!lodValue) {
@@ -8903,9 +8914,13 @@ CLOUD.SubScene.prototype.update = function () {
 
             var target = lodValue * CLOUD.GlobalData.SubSceneVisibleDistance * CLOUD.GlobalData.SubSceneVisibleLOD;
 
-            if (scope.level > CLOUD.EnumObjectLevel.Small && scope.out && !camera.inside) {
+            var loadOutside =   scope.out && !camera.inside;
+            if (scope.level > CLOUD.EnumObjectLevel.Small && loadOutside) {
                     target = target * 8;
             }
+            
+            if (loadOutside)
+                distance = distance * 0.01;
 
             needLoad = distance < target;
         }
@@ -9336,14 +9351,18 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
         this.target.addVectors(this.object.position, eye);
     };
 
-    this.updateCamera = function (target) {
+    this.updateCamera = function (target, noRest) {
 
         this.cameraDirty = true;
 
         lastPosition.copy(this.object.position);
         lastQuaternion.copy(this.object.quaternion);
         this.target.copy(target);
-        scope.reset();
+
+        if (!noRest) {
+            scope.reset();
+        }
+        
     };
 
     this.update = function () {
@@ -17193,10 +17212,6 @@ CLOUD.TaskManager.prototype = {
 
     },
 
-    sort : function(a, b){
-        return a.distance - b.distance;
-    },
-
     processSceneTasks: function (client, renderId, load) {
 
         var scope = this;
@@ -17239,7 +17254,9 @@ CLOUD.TaskManager.prototype = {
                     callback(nextIdx);
                 }
             },
-        scope.sort);
+        function (a, b) {
+            return a.distance - b.distance;
+        });
 
     }
 }
@@ -17888,6 +17905,7 @@ CloudViewer = function () {
 
     this.requestRenderCount = 0;
     this.rendering = false;
+    this.renderIterator = 0;
 
     this.incrementRenderEnabled = true; // 启用增量绘制
     this.updateRenderListEnabled = true; // 是否启用渲染队列更新
@@ -18099,6 +18117,10 @@ CloudViewer.prototype = {
         }
 
         this.rendering = true;
+        if (ignoreLoad)
+            this.renderIterator += 1;
+        else
+            this.renderIterator = 1;
         //console.log(this.requestRenderCount);
 
         var scope = this;
@@ -18118,7 +18140,7 @@ CloudViewer.prototype = {
             if (scope.editorManager.isUpdateRenderList) {
                
                 //console.time("prepare");
-                this.modelManager.prepareScene(camera, this.requestRenderCount, ignoreLoad);
+                this.modelManager.prepareScene(camera, this.requestRenderCount, ignoreLoad && this.renderIterator > 2);
                 this.calculateNearFar();
                 //console.timeEnd("prepare");
 
@@ -18461,7 +18483,9 @@ CloudViewer.prototype = {
             margin = margin || 0.05; // give bounding box a margin 0.05 by default.
         }
         var target = this.camera.zoomToBBox(box, margin, ratio);
-        this.cameraEditor.updateCamera(target);
+        this.cameraEditor.updateCamera(target, true);
+        CLOUD.GlobalData.ByTargetDistance = true;
+        CLOUD.GlobalData.MaxLoadSceneCount = 100;
         this.render();
     },
 
@@ -18475,7 +18499,7 @@ CloudViewer.prototype = {
         }
        
         var target = this.camera.zoomToBBox(box, margin, ratio);
-        this.cameraEditor.updateCamera(target);
+        this.cameraEditor.updateCamera(target, true);
 
         CLOUD.GlobalData.ByTargetDistance = true;
         CLOUD.GlobalData.MaxLoadSceneCount = 100;
@@ -18993,7 +19017,7 @@ CloudViewer.prototype = {
 
     exitCommentMode: function () {
 
-        if (this.extensions.annotationEditor.isInitialized()) {
+        if (this.extensions.annotationEditor&&this.extensions.annotationEditor.isInitialized()) {
 
             this.extensions.annotationEditor.uninit();
 
