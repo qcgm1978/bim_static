@@ -9,7 +9,7 @@ App.INBox = {
 		$("#contains").html(new App.INBox.NavView().render().$el);
 		$("#contains").append(new App.INBox.imboxContainerView().render().$el);
 		this.loadData('un');
-		this.loadCount();
+		App.Common.loadMessageCount();
 		// this.messageCollection.fetch({
 		// 	reset:true,
 		// 	data:{
@@ -21,20 +21,12 @@ App.INBox = {
 		// });
 	},
 
-	read(id){
+	read(id,_this){
+		App.Comm.loadMessageCount(-1);
 		window.open(App.API.Settings.hostname+"platform/message/read?id="+id);
-		this.loadCount();
-	},
-
-	loadCount(){
-		 App.Comm.ajax({
-            URLtype:'fetchIMBoxList',
-            data:{
-                status:0
-            }
-        },function(res){
-            $('#messageCount').html(res.data.totalItemCount);
-        })
+		$(_this).closest('li').remove();
+	//	this.loadData('un');
+		//location.reload();
 	},
 
 	messageCollection: new(Backbone.Collection.extend({

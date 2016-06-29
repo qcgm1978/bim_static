@@ -1,7 +1,7 @@
 App.Comm = {
 
 	Settings: {
-		v: 20160312,
+		v: 20160313,
 		loginType: "user", // 登录状态 user token
 		pageItemCount: 15 //Math.floor(($("body").height() + 60) / 70) > 10 && Math.floor(($("body").height() + 60) / 70) || 10
 	},
@@ -427,7 +427,23 @@ App.Comm = {
 				_this.$el.remove();
 			}, _this._userData.timeout || 2000)
 		}
-	})
+	}),
+	loadMessageCount:function(param){
+		if(param != undefined){
+			var _=$('#messageCount');
+			_.text(Number(_.text())+param);
+			return
+		}
+        App.Comm.ajax({
+            URLtype:'fetchIMBoxList',
+            data:{
+                status:0
+            }
+        },function(res){
+            $('#messageCount').html(res.data.totalItemCount);
+        })
+
+    }
 };
 
 
