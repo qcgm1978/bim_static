@@ -60,10 +60,10 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
     },
 
     startFromProject:function(){
-        //¼àÌıÏîÄ¿ÄÚÈİ
+        //ç›‘å¬é¡¹ç›®å†…å®¹
     },
 
-    //ÇĞ»»Ñ¡Ïî
+    //åˆ‡æ¢é€‰é¡¹
     select:function(e){
         var $pre = $(e.target),_this = this;
 
@@ -79,7 +79,7 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
         var modularization = this.$(".modularization.active").length;
         var quality = this.$(".quality.active").length;
 
-        if(modularization){//Ä£¿é»¯
+        if(modularization){//æ¨¡å—åŒ–
             App.ResourceArtifacts.Status.rule.biz = 1 ;
             if(this.$(".default:visible").length){
                 return
@@ -91,7 +91,7 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
 
             this.resetRule();
 
-        }else if(quality){//ÖÊÁ¿
+        }else if(quality){//è´¨é‡
             App.ResourceArtifacts.Status.rule.biz = 2 ;
             if(this.$(".default:visible").length){
                 return
@@ -105,23 +105,23 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
         }
         this.$(".rules").show();
     },
-    //ÖØÖÃ¹æÔò
+    //é‡ç½®è§„åˆ™
     resetRule:function(){
         App.ResourceArtifacts.PlanRules.reset();
         App.ResourceArtifacts.Status.rule.targetCode = "";
         App.ResourceArtifacts.Status.rule.targetName = "";
-        this.$(".rules h2 .name").html("Ã»ÓĞÑ¡ÔñÄ£¿é/ÖÊÁ¿±ê×¼");
-        this.$(".ruleContentRuleList ul").html("<li><div class='ruleTitle delt'>ÔİÎŞÄÚÈİ</div></li>");
+        this.$(".rules h2 .name").html("æ²¡æœ‰é€‰æ‹©æ¨¡å—/è´¨é‡æ ‡å‡†");
+        this.$(".ruleContentRuleList ul").html("<li><div class='ruleTitle delt'>æš‚æ— å†…å®¹</div></li>");
     },
 
-    //ÎªÏîÄ¿ÉèÖÃ´´½¨¹æÔò
+    //ä¸ºé¡¹ç›®è®¾ç½®åˆ›å»ºè§„åˆ™
     create:function(e){
         if(App.AuthObj.lib.mappingRuleTemplate.edit){
             this.$(".default").hide();
             this.select(e);
             Backbone.trigger("mappingRuleModelEdit");
         }else{
-            alert("ÄúÃ»ÓĞĞŞ¸ÄÄ£°åÈ¨ÏŞ£¡")
+            alert("æ‚¨æ²¡æœ‰ä¿®æ”¹æ¨¡æ¿æƒé™ï¼")
         }
 
     }

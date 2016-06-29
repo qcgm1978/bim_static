@@ -1,14 +1,14 @@
 /**
  * @require /resources/collection/resource.nav.es6
  */
-//App.Resources.artifactsTreeData;//ËùÓĞÊı¾İ
+//App.Resources.artifactsTreeData;//æ‰€æœ‰æ•°æ®
 App.Resources.artifactsTree = function(dataList,code){
     var data = [];
     if(!code){
         data = _.filter(dataList,function(item){
             return !item.parentCode
         });
-        //×¢ÒâÓĞ¸öÆäËûÑ¡Ïî,code == -1
+        //æ³¨æ„æœ‰ä¸ªå…¶ä»–é€‰é¡¹,code == -1
     }else{
         data = _.filter(dataList,function(item){
             return item.parentCode == code
@@ -33,7 +33,7 @@ App.Resources.artifactsTree = function(dataList,code){
     }
     return ele;
 };
-//ÖÊÁ¿±ê×¼tree
+//è´¨é‡æ ‡å‡†tree
 App.Resources.artifactsQualityTree = function(dataList,n){
     var data = dataList;
     var ele  = $("<ul></ul>");
@@ -116,7 +116,7 @@ App.Resources.dealStr2 = function(model){
     return con;
 };
 
-//ÂÖ»»¼ÆÊı
+//è½®æ¢è®¡æ•°
     App.Resources.prev = function(present,length){
         var a;
         if( present  > 0 ){
@@ -136,22 +136,22 @@ App.Resources.dealStr2 = function(model){
     return a;
 };
 
-//¶ÓÁĞ¹ÜÀí
+//é˜Ÿåˆ—ç®¡ç†
 App.Resources.queue = {
     que : [],
     permit : true,
     present : [],
-    //Ğí¿ÉÖ¤·¢·Å£¬400msºó·¢·ÅÒ»¸öĞí¿ÉÖ¤£¬±ÜÃâµã»÷¹ı¿ì
+    //è®¸å¯è¯å‘æ”¾ï¼Œ400msåå‘æ”¾ä¸€ä¸ªè®¸å¯è¯ï¼Œé¿å…ç‚¹å‡»è¿‡å¿«
     certificates:function(){
         this.permit = false;
         setTimeout(function(){
             App.Services.queue.permit = true;
         },400);
     },
-    //ÑéÖ¤²¢Ïò¶ÓÁĞÌí¼ÓÖ´ĞĞº¯Êı
+    //éªŒè¯å¹¶å‘é˜Ÿåˆ—æ·»åŠ æ‰§è¡Œå‡½æ•°
     promise:function(fn,_this){
         if(!this.permit){ return;}
-        if(!this.que.length){//Ã»ÓĞÖ±½ÓÌí¼Ó
+        if(!this.que.length){//æ²¡æœ‰ç›´æ¥æ·»åŠ 
             this.que.push(fn);
             this.present.push(_this);
             this.que[0]();
@@ -169,7 +169,7 @@ App.Resources.queue = {
     stop:function(){
 
     },
-    //Ö´ĞĞÍê±Ï£¬Ë¢ĞÂ¶ÓÁĞ£¬Ö´ĞĞÏÂÒ»¸ö
+    //æ‰§è¡Œå®Œæ¯•ï¼Œåˆ·æ–°é˜Ÿåˆ—ï¼Œæ‰§è¡Œä¸‹ä¸€ä¸ª
     next:function(){
         this.que.shift();
         this.present.shift();

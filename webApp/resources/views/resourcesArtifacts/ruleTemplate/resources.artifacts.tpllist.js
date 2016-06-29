@@ -30,27 +30,27 @@ App.Resources.ArtifactsTplList = Backbone.View.extend({
         App.Comm.initScroll($(".list"),"y");
     },
 
-    //´´½¨¹æÔò
+    //åˆ›å»ºè§„åˆ™
     newPlanRule:function(){
         if(App.ResourceArtifacts.modelEdit){
-            alert("±à¼­×´Ì¬²»ÄÜ´´½¨Ä£°å");
+            alert("ç¼–è¾‘çŠ¶æ€ä¸èƒ½åˆ›å»ºæ¨¡æ¿");
             return;
         }
         var _this = this;
-        //Ö±½ÓÊäÈëÃû³Æ¼´¿É
+        //ç›´æ¥è¾“å…¥åç§°å³å¯
 
         if( !App.ResourceArtifacts.Status.saved){
-            alert("Äú»¹ÓĞÃ»±£´æµÄ");
-            //²éÕÒÎ´±£´æµÄÔªËØ²¢¸ßÁÁÌáÊ¾±äºì
+            alert("æ‚¨è¿˜æœ‰æ²¡ä¿å­˜çš„");
+            //æŸ¥æ‰¾æœªä¿å­˜çš„å…ƒç´ å¹¶é«˜äº®æç¤ºå˜çº¢
             return
         }
-        var frame = new App.Resources.ArtifactsWindowTpl().render().el; //ĞÂ½¨Ä£°å
+        var frame = new App.Resources.ArtifactsWindowTpl().render().el; //æ–°å»ºæ¨¡æ¿
         this.window(frame);
     },
-    //³õÊ¼»¯´°¿Ú
+    //åˆå§‹åŒ–çª—å£
     window:function(frame){
         App.Resources.ArtifactsMaskWindow = new App.Comm.modules.Dialog({
-            title:"ĞÂ½¨Ä£°å",
+            title:"æ–°å»ºæ¨¡æ¿",
             width:600,
             height:500,
             isConfirm:false,

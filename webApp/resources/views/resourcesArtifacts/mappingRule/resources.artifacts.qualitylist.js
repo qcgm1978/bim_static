@@ -23,7 +23,7 @@ App.Resources.ArtifactsQualityList = Backbone.View.extend({
 
     },
 
-    //当前选项
+    //褰撳墠閫夐」
     present:function(){
         var active = this.$(".qualityProcess");
         if( active.hasClass("active") ){
@@ -33,13 +33,13 @@ App.Resources.ArtifactsQualityList = Backbone.View.extend({
         active.addClass("active");
     },
 
-    //切换，一次加载，仅切换不同对话框
+    //鍒囨崲锛屼竴娆″姞杞斤紝浠呭垏鎹笉鍚屽璇濇
     choose:function(){
         var _this = this;
         this.toggle();
         App.ResourceArtifacts.departQuality();
     },
-    //切换过程
+    //鍒囨崲杩囩▼
     toggle:function(){
         var extendData,extendText;
         this.$(".qualityProcess").removeClass("active");
