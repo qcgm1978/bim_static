@@ -100,7 +100,7 @@ App.Project = {
 					App.Project.Settings.CurrentVersion.status == 9 ||
 					App.Project.Settings.CurrentVersion.subType == 1) {
 					$("#reNameModelProject").addClass('disable').attr('disabled', 'disabled');
-					$("#downLoadModelProject").addClass('disable').attr('disabled', 'disabled');
+					//$("#downLoadModelProject").addClass('disable').attr('disabled', 'disabled');
 					$("#delModelProject").addClass('disable').attr('disabled', 'disabled');
 				}
 				if (_this.isDisabled('edit')) {
@@ -110,7 +110,7 @@ App.Project = {
 					$("#delModelProject").addClass('disable').attr('disabled', 'disabled');
 				}
 				if (_this.isDisabled('downLoad') || !App.ResourceModel.Settings.CurrentVersion.byProjectRef) {
-					$("#downLoadModelProject").addClass('disable').attr('disabled', 'disabled');
+					//$("#downLoadModelProject").addClass('disable').attr('disabled', 'disabled');
 				}
 				$item.addClass("selected").siblings().removeClass("selected");
 				if ($('#listContextProject li[class!=disable]').length == 0) {
