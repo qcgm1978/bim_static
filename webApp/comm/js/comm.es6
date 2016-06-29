@@ -75,7 +75,7 @@ App.Comm = {
 		return $.ajax(data).done(function(data) {
 
 			//cookie延长30分钟
-			App.Comm.setCookieTime(30);
+			App.Comm.setCookieTime(120);
 
 			if (_.isString(data)) {
 				// to json

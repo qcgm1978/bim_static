@@ -45,10 +45,11 @@
 					&.disable { background-position: 0px -60px; }
 				}
 			}
-			.fileBody { overflow: hidden; overflow-y: auto; height: 449px;
+			.fileBodyScrollBox{height: 449px; width: 558px;}
+			.fileBody {  
 				li { text-align: left; text-align: center; border-bottom: 1px #ccc solid; height: 38px; line-height: 38px; background-color: #fff; }
 				.fileName { text-align: left; }
-				.null { border-bottom: 0; font-size: 18px; color: #ccc; line-height: 150px; }
+				.null { border-bottom: 0; font-size: 18px; color: #ccc; line-height: 150px; height: 150px; }
 				.error { color: red; }
 				span { &.ckAll, &.name, &.status, &.op, &.date, &.size { height: 38px; }
 				}
