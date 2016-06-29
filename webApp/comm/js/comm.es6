@@ -1,7 +1,7 @@
 App.Comm = {
 
 	Settings: {
-		v: 20160312,
+		v: 20160313,
 		loginType: "user", // 登录状态 user token
 		pageItemCount: 15 //Math.floor(($("body").height() + 60) / 70) > 10 && Math.floor(($("body").height() + 60) / 70) || 10
 	},
