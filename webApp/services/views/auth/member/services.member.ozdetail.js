@@ -16,7 +16,8 @@ App.Services.MemberozDetail=Backbone.View.extend({
     },
 
     initialize:function(){
-        this.listenTo(this.model,"change:active",this.sele)
+        this.listenTo(this.model,"change:active",this.sele);
+        Backbone.on("serviceMemberOrgLoad",this.unfold,this)
     },
 
     sele:function(){
@@ -26,7 +27,7 @@ App.Services.MemberozDetail=Backbone.View.extend({
         }
     },
 
-    unfold:function(){
+    unfold:function(parentId){
 
         var _this =  this,container = this.$el.siblings(".childOz");
         //如果是快速点击，属于误操作，跳过

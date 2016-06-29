@@ -48,10 +48,15 @@ App.Services.memberDetail=Backbone.View.extend({
     },
 
     loadMenu:function(e){
+        console.log(this.model.toJSON());
         this.cancelBubble(e);
         if(App.Services.queue.que > 1 ){ return}
         if(this.model.get("userId")){return}//用户，可能需要另行处理
-        var findSelf = this.findSelf(),
+
+        Backbone.trigger("serviceMemberOrgLoad",this.model.get("parentId"));
+
+
+        /*var findSelf = this.findSelf(),
             _thisType = App.Services.MemberType,
             _thisId = App.Services.memFatherId =  this.model.get("orgId"),
             collection = App.Services.Member[_thisType + "Collection"];
@@ -96,7 +101,7 @@ App.Services.memberDetail=Backbone.View.extend({
             }
         }).done(function(){
             App.Services.queue.next();
-        });
+        });*/
     },
 
     //单个修改
