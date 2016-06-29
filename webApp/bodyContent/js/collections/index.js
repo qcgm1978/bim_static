@@ -11,8 +11,6 @@ App.BodyContent.control= {
 
         $("#contains").empty();
 
-        this.loadMessageCount();
-        
         new App.BodyContent.App().render(); //渲染框架
 
         this.viewCacheTodo=this.viewCacheTodo || new App.BodyContent.todosList();
@@ -63,19 +61,6 @@ App.BodyContent.control= {
             data:{
                 id:id
             }
-        })
-
-    },
-
-    loadMessageCount:function(){
-
-        App.Comm.ajax({
-            URLtype:'fetchIMBoxList',
-            data:{
-                status:0
-            }
-        },function(res){
-            $('#messageCount').html(res.data.totalItemCount);
         })
 
     },

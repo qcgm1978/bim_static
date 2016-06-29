@@ -240,7 +240,6 @@ var AppRoute = Backbone.Router.extend({
 		//		window.location.href = "/static/dist/app/todo/remind.html";
 		//	}
 		//}
-
 		if (!$._data($(".user > span")[0], "events")) {
 			//绑定用户信息
 			App.TopNav.init();
@@ -284,7 +283,7 @@ var AppRoute = Backbone.Router.extend({
 
 			}
 		});
-
+		App.Comm.loadMessageCount();
 
 	}
 

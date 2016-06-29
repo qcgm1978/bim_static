@@ -610,6 +610,7 @@ App.Project = {
 		//存在viewpintid
 		if (App.Project.Settings.viewPintId) {
 			$(".fileNav .model").click();
+			
 		}
 
 	},

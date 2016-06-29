@@ -427,7 +427,23 @@ App.Comm = {
 				_this.$el.remove();
 			}, _this._userData.timeout || 2000)
 		}
-	})
+	}),
+	loadMessageCount:function(param){
+		if(param != undefined){
+			var _=$('#messageCount');
+			_.text(Number(_.text())+param);
+			return
+		}
+        App.Comm.ajax({
+            URLtype:'fetchIMBoxList',
+            data:{
+                status:0
+            }
+        },function(res){
+            $('#messageCount').html(res.data.totalItemCount);
+        })
+
+    }
 };
 
 
