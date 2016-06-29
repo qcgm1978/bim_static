@@ -110,7 +110,7 @@ App.Project = {
 					$("#delModelProject").addClass('disable').attr('disabled', 'disabled');
 				}
 				if (_this.isDisabled('downLoad') || !App.ResourceModel.Settings.CurrentVersion.byProjectRef) {
-					$("#downLoadModelProject").addClass('disable').attr('disabled', 'disabled');
+					//$("#downLoadModelProject").addClass('disable').attr('disabled', 'disabled');
 				}
 				$item.addClass("selected").siblings().removeClass("selected");
 				if ($('#listContextProject li[class!=disable]').length == 0) {
