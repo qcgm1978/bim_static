@@ -1,7 +1,7 @@
 App.Comm = {
 
 	Settings: {
-		v: 20160312,
+		v: 20160313,
 		loginType: "user", // 登录状态 user token
 		pageItemCount: 15 //Math.floor(($("body").height() + 60) / 70) > 10 && Math.floor(($("body").height() + 60) / 70) || 10
 	},
@@ -75,7 +75,7 @@ App.Comm = {
 		return $.ajax(data).done(function(data) {
 
 			//cookie延长30分钟
-			App.Comm.setCookieTime(30);
+			App.Comm.setCookieTime(120);
 
 			if (_.isString(data)) {
 				// to json
