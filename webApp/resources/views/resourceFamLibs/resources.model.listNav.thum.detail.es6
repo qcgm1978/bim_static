@@ -119,6 +119,9 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 						$('#downLoadModel').addClass('disable');
 					}
 				}
+				if ($('#listContext li[class!=disable]').length == 0) {
+					$('#listContext').parent().hide();
+				}
 
 			},
 			shadow: false,
@@ -133,7 +136,7 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 					}
 					//下载
 					var $item = $(item);
-/*
+/*					
 					if ($item.find(".folder").length > 0) {
 						//alert("暂不支持文件夹下载");
 						App.ResourceModel.folderDown($item);
@@ -153,7 +156,7 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 					};
 
 					var data = App.Comm.getUrlByType(data),
-						url = data.url + "?fileVersionId=" + fileVersionId;
+						url = data.url + "&fileVersionId=" + fileVersionId;
 					window.location.href = url;
 
 				},

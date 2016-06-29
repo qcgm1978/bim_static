@@ -110,7 +110,9 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 						$('#downLoadModel').addClass('disable');
 					}
 				}
-
+				if ($('#listContext li[class!=disable]').length == 0) {
+					$('#listContext').parent().hide();
+				}
 
 			},
 			shadow: false,
@@ -144,7 +146,7 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 					};
 
 					var data = App.Comm.getUrlByType(data),
-						url = data.url + "?fileVersionId=" + fileVersionId;
+						url = data.url + "&fileVersionId=" + fileVersionId;
 					window.location.href = url;
 
 				},
