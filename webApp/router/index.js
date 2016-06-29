@@ -135,7 +135,6 @@ var AppRoute = Backbone.Router.extend({
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".resources").addClass('selected');
 		_.require('/static/dist/resources/resources.css');
 		_.require('/static/dist/resources/resources.js');
-		_.require('/static/dist/projects/projects.js');
 		App.Resources.init();
 		$("#pageLoading").hide();
 		//$("#contains").html("resources");
@@ -148,7 +147,6 @@ var AppRoute = Backbone.Router.extend({
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".resources").addClass('selected');
 		_.require('/static/dist/resources/resources.css');
 		_.require('/static/dist/resources/resources.js');
-		_.require('/static/dist/projects/projects.js');
 		App.ResourcesNav.Settings.type = type;
 		App.ResourcesNav.init();
 	},
@@ -158,8 +156,7 @@ var AppRoute = Backbone.Router.extend({
 		this.reset();
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".resources").addClass('selected');
 		_.require('/static/dist/resources/resources.css');
-		_.require('/static/dist/resources/resources.js'); 
-		_.require('/static/dist/projects/projects.js');
+		_.require('/static/dist/resources/resources.js');
 		App.ResourcesNav.Settings.type = type;
 		App.ResourcesNav.Settings.optionType = optionType;
 		App.ResourceArtifacts.Status.type = 1;
@@ -173,7 +170,6 @@ var AppRoute = Backbone.Router.extend({
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".resources").addClass('selected');
 		_.require('/static/dist/resources/resources.css');
 		_.require('/static/dist/resources/resources.js');
-		_.require('/static/dist/projects/projects.js');
 		App.ResourcesNav.Settings.type = App.ResourceModel.Settings.type = type;
 		App.ResourceModel.Settings.CurrentVersion = {};
 		App.ResourceModel.Settings.projectId = projectId;

@@ -25,7 +25,7 @@
     <%}%>
 <%}else{%>
 	
-	<%if(suffix=='rvt' ||suffix=='rfa' ||suffix=='dwg'  ){%>
+	<%if(suffix=='rvt' ||suffix=='rfa' ||suffix=='dwg'  || suffix=='rte'  ){%>
 		<a data-id="<%=id%>" href="/static/dist/app/project/single/filePreview.html?id=<%=fileVersionId%>&projectId=<%=App.Project.Settings.projectId%>&projectVersionId=<%=App.Project.Settings.CurrentVersion.id%>" target="_blank" title="<%=name%>" data-isfolder="<%=folder%>" class="text overflowEllipsis"> <%= App.Project.getName(name) %></a>
 	<%}else{%>
 		  <span data-id="<%=id%>" data-isfolder="false" title="<%=name%>" class="text overflowEllipsis <%= folder ? '':'textFolder' %>"> <%= App.Project.getName(name) %></span>
