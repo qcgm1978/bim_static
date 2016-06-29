@@ -416,7 +416,6 @@ App.ResourceArtifacts={
 
         });
     },
-
     //获取已经加载并且要存储的有效数据
     getValid:function(obj){
         return  {
@@ -424,8 +423,6 @@ App.ResourceArtifacts={
                 ruleIds : obj.ruleIds || []
             };
     },
-
-
     //质量标准三级分类，要插入元素，数据，是否有父节点，ruleContain
     // 值是否存在
     departQuality:function(ele,cdata,parentCode,ruleContain){

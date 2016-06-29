@@ -23,8 +23,8 @@ App.Resources.ArtifactsWindowRule = Backbone.View.extend({
     //确定
     sure : function(){
         var _this = this,data,
-        code  = $(".ruleNodeName span.active").closest(".ruleNodeName").data("id"),
-        name  = $(".ruleNodeName span.active").closest(".ruleNodeName").data("name");
+        code  = $(".ruleNodeName span.active").closest(".ruleNodeName").attr("data-id"),
+        name  = $(".ruleNodeName span.active").closest(".ruleNodeName").attr("data-name");
 
         if(code){
             data = App.ResourceArtifacts.presentRule.get("mappingCategory");
@@ -39,7 +39,6 @@ App.Resources.ArtifactsWindowRule = Backbone.View.extend({
             App.ResourceArtifacts.Status.rule.mappingCategory.categoryCode  = code;
             App.ResourceArtifacts.Status.rule.mappingCategory.categoryName = name;
         }
-
         App.Resources.ArtifactsMaskWindow.close();
     },
         //取消

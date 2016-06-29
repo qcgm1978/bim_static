@@ -175,7 +175,9 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
         this.$(".conR dl").append(view);
     },
     //保存
-    saveRule:function(){
+    saveRule:function(e){
+        App.Resources.cancelBubble(e);
+        var ele = $(e.target);
         //校验
         /*var  check = this.check();
         if(!check){return}*/
@@ -187,9 +189,17 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
 
         var categoryCode = App.ResourceArtifacts.Status.rule.mappingCategory.categoryCode  ||  this.$(".categoryCode").val();
         var categoryName = App.ResourceArtifacts.Status.rule.mappingCategory.categoryName || this.$(".chide i").text();
-
+        //验证分类编码有效性
+        var  departCode = _.find(App.Resources.artifactsTreeData,function(item){
+            return item.code == categoryCode;
+        });
+        if(!departCode){
+            alert("分类编码不合法!");
+            ele.closest(".mapRule").siblings(".typeCode").find(".categoryCode").focus();
+            return
+        }
         if(!categoryCode){
-            alert("规则编码不能为空!");
+            alert("分类编码不能为空!");
             return
         }
         if(!categoryName){
@@ -198,6 +208,15 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
         }
         if(!this.$(".conR dd").length){
             alert("至少添加一项规则!");
+            return
+        }
+        var ruleCon = ele.closest(".mapRule").find(".myDropDown");
+        var unSelect =  _.find(ruleCon,function(item){
+            return !$(item).attr("data-operator")
+        });
+        if(unSelect){
+            alert("请选择规则类型!");
+            $(unSelect).find(".myDropList").show();
             return
         }
 

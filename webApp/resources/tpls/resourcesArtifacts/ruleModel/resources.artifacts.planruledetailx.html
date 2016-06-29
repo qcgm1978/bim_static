@@ -24,7 +24,7 @@
             <dl>
                 <% var list =obj.mappingCategory.mappingPropertyList ; for(var i = 0 ; i < list.length ; i++) { %>
                 <dd>
-                    <div class="leftten" data-id="<%= obj.id %>" data-name="">
+                    <div class="leftten">
                         <%  var type = list[i].operator,a1 = "==",a2 = "!=",a3 = "<>",a4 = "><";  %>
                         <input type="text" placeholder="ÇëÊäÈëÊôÐÔÃû³Æ" value="<%= list[i].propertyKey %>"><div class="myDropDown" data-operator="<%= type %>">
                         <span class="myDropText">
