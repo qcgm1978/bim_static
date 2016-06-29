@@ -4,7 +4,7 @@
 
 <div class="commentList">
     <ul class="navBar">
-        <%if(App.Project.Settings.isShare){%>
+        <%if(App.Project && App.Project.Settings.isShare){%>
              <li data-type="project" class="item project selected">分享批注</li>
         <%}else{%>
             <li data-type="project" class="item project selected">项目批注</li>
