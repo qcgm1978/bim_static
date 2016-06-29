@@ -129,6 +129,7 @@ var AppKeyRoute = Backbone.Router.extend({
 
 			_.require('/static/dist/resources/resources.css');
 			_.require('/static/dist/resources/resources.js');
+			_.require('/static/dist/projects/projects.js');
 			this.resourceModel("famLibs", libIid);
 		});
 
@@ -143,6 +144,8 @@ var AppKeyRoute = Backbone.Router.extend({
 			_.require('/static/dist/resources/resources.css');
 
 			_.require('/static/dist/resources/resources.js');
+
+			_.require('/static/dist/projects/projects.js');
 
 			App.ResourcesNav.Settings.type = App.ResourceModel.Settings.type = "standardLibs";
 			App.ResourceModel.Settings.CurrentVersion = {};
@@ -167,6 +170,8 @@ var AppKeyRoute = Backbone.Router.extend({
 			_.require('/static/dist/resources/resources.css');
 
 			_.require('/static/dist/resources/resources.js');
+
+			_.require('/static/dist/projects/projects.js');
 
 			App.ResourcesNav.Settings.type = App.ResourceModel.Settings.type = type;
 			App.ResourceModel.Settings.CurrentVersion = {};
