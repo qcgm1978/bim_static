@@ -8906,19 +8906,24 @@ CLOUD.SubScene.prototype.update = function () {
         var scope = this;
 
         var distance = 0;
-        if (scope.worldBoundingBox.containsPoint(camera.position)) {
-            needLoad = true;
+
+        var needLoad = false;
+        if (CLOUD.GlobalData.ByTargetDistance) {
+            if (scope.worldBoundingBox.containsPoint(camera.target)) {
+                needLoad = true;
+            }
         }
         else {
+            if (scope.worldBoundingBox.containsPoint(camera.position)) {
+                needLoad = true;
+            }
+        }
+
+        if(!needLoad){
             scope.worldBoundingBox.center(v2);
 
             if (CLOUD.GlobalData.ByTargetDistance) {                
-                if (scope.worldBoundingBox.containsPoint(camera.target)) {
-                    distance = 0;
-                }
-                else {
-                    distance = camera.target.distanceToSquared(v2);
-                }
+                distance = camera.target.distanceToSquared(v2);
             }
             else {
                 distance = camera.position.distanceToSquared(v2);
@@ -18176,6 +18181,7 @@ CloudViewer.prototype = {
                 //console.timeEnd("prepare");
 
                 CLOUD.GlobalData.ByTargetDistance = false;
+                CLOUD.GlobalData.MaxLoadSceneCount = 40;
             }
         }
         else {
