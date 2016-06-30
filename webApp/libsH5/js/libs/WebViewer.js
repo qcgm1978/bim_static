@@ -8196,6 +8196,27 @@ CLOUD.Scene.prototype.prepareScene = function () {
 }();
 
 
+CLOUD.Scene.prototype.prepareOutside = function (camera) {
+
+    var v2 = new THREE.Vector3();
+
+    this.traverseIf(function (object, parent) {
+
+        if (object instanceof CLOUD.Cell) {
+
+            if (object.out) {
+                object.worldBoundingBox.center(v2);
+                object.distance = camera.target.distanceToSquared(v2) * 0.0001;
+                object.load();
+            }
+
+            return true;
+        }
+
+        return false;
+    });
+}
+
 CLOUD.Scene.prototype.collectionGarbage = function () {
 
     if (this.garbageCount < 10)
@@ -17326,6 +17347,14 @@ CLOUD.ModelManager.prototype.prepareScene = function (camera, renderId, ignoreLo
     this.prepareResource(renderId, !ignoreLoad);
 };
 
+CLOUD.ModelManager.prototype.loadBuidingOutside = function (camera) {
+
+    this.scene.prepareOutside(camera);
+    CLOUD.GlobalData.MaxLoadSceneCount = 120;
+    this.prepareResource(0, true);
+    CLOUD.GlobalData.MaxLoadSceneCount = 40;
+}
+
 CLOUD.ModelManager.prototype.collectionGarbage = function () {
 
     if (CLOUD.GlobalData.GarbageCollection) {
@@ -18147,7 +18176,6 @@ CloudViewer.prototype = {
                 //console.timeEnd("prepare");
 
                 CLOUD.GlobalData.ByTargetDistance = false;
-                CLOUD.GlobalData.MaxLoadSceneCount = 40;
             }
         }
         else {
@@ -18398,6 +18426,11 @@ CloudViewer.prototype = {
         return scope.modelManager.load({databagId: databagId, serverUrl: serverUrl, debug: debug, byBox:byBox});
     },
 
+    loadOutside: function(){
+
+        this.modelManager.loadBuidingOutside(this.camera);
+    },
+
     /**
      * Load databag index only
      * callback is called when loading is finished.
@@ -18471,6 +18504,8 @@ CloudViewer.prototype = {
             var target = this.camera.zoomToBBox(box, margin, ratio);
 
             this.cameraEditor.updateCamera(target);
+
+            this.loadOutside();
         }
     },
 
@@ -18487,7 +18522,6 @@ CloudViewer.prototype = {
         var target = this.camera.zoomToBBox(box, margin, ratio);
         this.cameraEditor.updateCamera(target, true);
         CLOUD.GlobalData.ByTargetDistance = true;
-        CLOUD.GlobalData.MaxLoadSceneCount = 40;
         this.render();
     },
 
@@ -18504,7 +18538,6 @@ CloudViewer.prototype = {
         this.cameraEditor.updateCamera(target, true);
 
         CLOUD.GlobalData.ByTargetDistance = true;
-        CLOUD.GlobalData.MaxLoadSceneCount = 40;
         this.render();
 
     },
