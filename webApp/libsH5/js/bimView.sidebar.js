@@ -136,8 +136,8 @@
     },
     comment:function(isSelected,viewer){
       var self = this;
-      isSelected ? self.el._dom.sidebar.addClass('open') && viewer.commentInit() : self.el._dom.sidebar.removeClass('open');
       self.el._dom.sidebar.find('#comment').show().siblings().hide();
+      isSelected ? self.el._dom.sidebar.addClass('open') && viewer.commentInit() : self.el._dom.sidebar.removeClass('open');
     },
     selected:function(isSelected,viewer){
       var self = this;
@@ -231,7 +231,7 @@
           type:'post',
           url:bimView.API.fetchComponentById,
           projectId:self._opt.projectId,
-          projectVersionId:self._opt.projectVersionId,
+          projectVersionId:self._opt.projectVersionId||self._opt.projectId,
           data:"elementId="+data.join(',')
         },function(data){
           if(data.message == 'success' && data.data.length){

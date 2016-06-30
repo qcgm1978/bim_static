@@ -12,7 +12,9 @@
 		return;
 	}
 
-	var $comment, AppView, ModelView, viewPointId, clipboard, atUserArr = [],isFirst=true;
+
+	var $comment, AppView, ModelView, viewPointId, clipboard, atUserArr = [],
+		isFirst = true;
 
 	//扩展 批注
 	bimView.prototype.commentInit = function() {
@@ -39,7 +41,23 @@
 				var contextHtml = _.templateUrl("/libsH5/tpls/comment/viewPointContext.html", true);
 				$("body").append(contextHtml);
 			}
-		} 
+
+
+			if (!App.Project) {
+				App.Project = {
+					Settings: {
+						projectId: App.ResourceModel.Settings.CurrentVersion.projectId,
+						versionId: App.ResourceModel.Settings.CurrentVersion.id
+					}
+				};
+
+			}
+		}
+
+
+		if (location.href.indexOf("resources")>-1) {
+			App.Project.Settings.Viewer=App.ResourceModel.Settings.Viewer;
+		}
 
 		//分享 直接跳详情，遮掉项目
 		if (App.Project.Settings.viewPintId && isFirst) {
@@ -194,7 +212,7 @@
 
 						this.$(".projectListBox").fadeIn("fast");
 						//this.$(".projectListScroll").animate({left:"0px" },300);
-						if (App.Project.Settings.isShare) {
+						if (App.Project && App.Project.Settings.isShare) {
 							//获取数据
 							CommentCollections.Share.token = App.Project.Settings.token;
 							CommentCollections.Share.reset();
@@ -209,11 +227,11 @@
 							CommentCollections.Project.projectId = App.Project.Settings.projectId;
 							CommentCollections.Project.reset();
 							CommentCollections.Project.fetch({
-								success() { 
+								success() {
 
 									//存在viewpintid 调到评论
 									if (App.Project.Settings.viewPintId && isFirst) {
-										isFirst=false;
+										isFirst = false;
 										var $remark = $comment.find(".remarkCount_" + App.Project.Settings.viewPintId);
 										$remark.closest(".item").click();
 										$remark.click();
@@ -277,7 +295,7 @@
 
 				//新增数据
 				addOne(model) {
-					 
+
 					var $list = new CommentView.listDetail({
 						model: model
 					}).render().$el;
@@ -450,14 +468,14 @@
 					// 	left: "330px"
 					// }, 500);
 
-					$comment.find(".commentList").css('left','330px');
+					$comment.find(".commentList").css('left', '330px');
 
 
 					// $comment.find(".commentRemark").show().animate({
 					// 	left: "0px"
 					// }, 500);
 
-					$comment.find(".commentRemark").show().css("left","0px");
+					$comment.find(".commentRemark").show().css("left", "0px");
 
 					$el.addClass('current');
 					//获取数据
@@ -467,7 +485,7 @@
 					viewPointId = id;
 
 					//分享
-					if (App.Project.Settings.isShare) {
+					if (App.Project && App.Project.Settings.isShare) {
 						CommentCollections.ViewComments.urlType = "viewCommentsByToken";
 						CommentCollections.ViewComments.auth = App.Project.Settings.token;
 					} else {
@@ -506,7 +524,7 @@
 							}
 
 							//创建者 可以 删除 分享 编辑
-							if (App.Global.User && App.Global.User.userId == createId && !App.Project.Settings.isShare) {
+							if (App.Global.User && App.Global.User.userId == createId &&  !App.Project.Settings.isShare) {
 								$("#shareViewPoint,#delViewPoint,#editViewPoint,#reName").show();
 							} else {
 								$("#shareViewPoint,#delViewPoint,#editViewPoint,#reName").hide();
@@ -653,7 +671,7 @@
 						});
 
 						//显示
-						$("#projectContainer .modelSidebar").addClass("show open");
+						$(".modelSidebar").addClass("show open");
 					});
 				},
 
@@ -665,7 +683,7 @@
 						//上传地址或者评论视点后
 						CommentApi.afterUploadAddressViewPoint.call(this, data);
 						//显示
-						$("#projectContainer .modelSidebar").addClass("show open");
+						$(".modelSidebar").addClass("show open");
 					});
 					$("#topSaveTip .btnSave").click();
 				},
@@ -692,7 +710,7 @@
 
 					var url = "sixD/" + App.Project.Settings.projectId + "/viewPoint/" + viewPointId + "/comment/pic"
 
-					if (App.Project.Settings.isShare) {
+					if (App.Project && App.Project.Settings.isShare) {
 
 						url = App.Comm.getUrlByType({
 							URLtype: "uploadPicByToken",
@@ -790,8 +808,8 @@
 					// 	left: "330px"
 					// }, 500);
 
-					$comment.find(".commentList").css("left","0px");
-					$comment.find(".commentRemark").show().css("left","330px");
+					$comment.find(".commentList").css("left", "0px");
+					$comment.find(".commentRemark").show().css("left", "330px");
 				},
 
 				//获取到焦点
@@ -875,7 +893,7 @@
 
 					$btnEnter.val("保存中").data("isSubmit", true);
 
-					if (App.Project.Settings.isShare) {
+					if (App.Project && App.Project.Settings.isShare) {
 						data.URLtype = "createCommentByToken";
 					}
 
@@ -967,7 +985,7 @@
 						this.model.viewPointId = viewPointId;
 						this.model.commentId = id;
 
-						if (App.Project.Settings.isShare) {
+						if (App.Project && App.Project.Settings.isShare) {
 							this.model.urlType = "delCommentByToken";
 							this.model.auth = App.Project.Settings.token;
 						} else {
@@ -1016,13 +1034,13 @@
 			saveCommentStart(viewPointId, cate, callback) {
 
 				//收起导航
-				$("#projectContainer .modelSidebar").removeClass("show open");
+				$(".modelSidebar").removeClass("show open");
 				//保存
 				App.Project.Settings.Viewer.comment();
 
 				var topSaveHtml = _.templateUrl('/libsH5/tpls/comment/bimview.top.save.tip.html', true);
 
-				$(".modelContainerContent .commentBar").append(topSaveHtml);
+				$(".commentBar").append(topSaveHtml);
 				//保存事件
 				CommentApi.saveCommEvent(viewPointId, cate, callback);
 			},
@@ -1078,7 +1096,7 @@
 								if (cate != "viewPoint") {
 									App.Project.Settings.Viewer.commentEnd();
 									//收起导航
-									$("#projectContainer .modelSidebar").addClass("show open");
+									$(".modelSidebar").addClass("show open");
 								}
 							},
 
@@ -1147,7 +1165,7 @@
 				$topSaveTip.on("click", ".btnCanel", function() {
 					App.Project.Settings.Viewer.commentEnd();
 					//显示
-					$("#projectContainer .modelSidebar").addClass("show open");
+					$(".modelSidebar").addClass("show open");
 
 				});
 
@@ -1247,7 +1265,7 @@
 								dialog.close();
 
 								//显示
-								$("#projectContainer .modelSidebar").addClass("show open");
+								$(".modelSidebar").addClass("show open");
 
 								$("#topSaveTip .btnCanel").click();
 
@@ -1409,8 +1427,8 @@
 					type: "POST",
 					contentType: 'application/json',
 					data: JSON.stringify({
-						projectId: App.Project.Settings.CurrentVersion.projectId,
-						projectVersionId: App.Project.Settings.CurrentVersion.id,
+						projectId: App.Project.Settings.projectId,
+						projectVersionId: App.Project.Settings.versionId,
 						viewpointId: obj.id
 					})
 				}
@@ -1853,7 +1871,7 @@
 					}
 				}
 
-				if (App.Project.Settings.isShare) {
+				if (App.Project && App.Project.Settings.isShare) {
 
 					data = {
 						URLtype: "getFilterByToken",
@@ -1877,7 +1895,7 @@
 					}
 				}
 
-				if (App.Project.Settings.isShare) {
+				if (App.Project && App.Project.Settings.isShare) {
 
 					data = {
 						URLtype: "getAnnotationByToken",

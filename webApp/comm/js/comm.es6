@@ -31,6 +31,31 @@ App.Comm = {
 		"9": "已发布"
 	},
 
+	isAuth:function(type,s){
+		var _subType=App.Project.Settings.CurrentVersion.subType,
+			_auth=App.AuthObj.project.prjfile,
+			_status=App.Project.Settings.CurrentVersion.status,
+			_temp='4,7,9';
+		if(s=='family'){
+			_auth=App.AuthObj.lib.family;
+		}
+		if(s=='model'){
+			_auth=App.AuthObj.lib.model;
+		}
+		if(type=='create'){
+			if(_subType==1&&_auth.edit&&_temp.indexOf(_status)==-1){
+				return true;
+			}
+		}else if(type=="upload"||type=="delete"||type=="rename"){
+			if(_subType!=1&&_auth.edit&&_temp.indexOf(_status)==-1){
+				return true;
+			}
+		}else if(type=="down"){
+			return true;
+		}
+		return false;
+	},
+
 	//格式化 状态
 	formatStatus: function(status, type) {
 
@@ -75,7 +100,7 @@ App.Comm = {
 		return $.ajax(data).done(function(data) {
 
 			//cookie延长30分钟
-			App.Comm.setCookieTime(30);
+			App.Comm.setCookieTime(120);
 
 			if (_.isString(data)) {
 				// to json

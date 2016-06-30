@@ -93,24 +93,32 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 
 				}
 				$item.addClass("selected").siblings().removeClass("selected");
-				if(App.ResourceModel.Settings.CurrentVersion.status==4 ||
+				/*if(App.ResourceModel.Settings.CurrentVersion.status==4 ||
 					App.ResourceModel.Settings.CurrentVersion.status==7 ||
 					App.ResourceModel.Settings.CurrentVersion.status==9 ||
 					App.ResourceModel.Settings.CurrentVersion.subType==1){
 					$("#reNameModel").addClass('disable').attr('disabled','disabled');
 					//$("#downLoadModel").addClass('disable').attr('disabled','disabled');
 					$("#delModel").addClass('disable').attr('disabled','disabled');
-				}
+				}*/
 
-				//权限控制
+				/*//权限控制
 				var Auth = App.AuthObj.lib.model;
 				if(!Auth.edit){
 					$('#reNameModel,#delModel').addClass('disable');
 					if(!Auth.download && !App.ResourceModel.Settings.CurrentVersion.byProjectRef){
 						$('#downLoadModel').addClass('disable');
 					}
+				}*/
+				if(!App.Comm.isAuth('rename','model')){
+					$("#reNameModelProject").addClass('disable').attr('disabled', 'disabled');
 				}
-
+				if(!App.Comm.isAuth('delete','model')){
+					$("#delModelProject").addClass('disable').attr('disabled', 'disabled');
+				}
+				if ($('#listContext li[class!=disable]').length == 0) {
+					$('#listContext').parent().hide();
+				}
 
 			},
 			shadow: false,
@@ -144,7 +152,7 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 					};
 
 					var data = App.Comm.getUrlByType(data),
-						url = data.url + "?fileVersionId=" + fileVersionId;
+						url = data.url + "&fileVersionId=" + fileVersionId;
 					window.location.href = url;
 
 				},

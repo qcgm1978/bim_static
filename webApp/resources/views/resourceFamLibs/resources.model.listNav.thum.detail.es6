@@ -103,7 +103,7 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 
 				}
 				$item.addClass("selected").siblings().removeClass("selected");
-				if(App.ResourceModel.Settings.CurrentVersion.status==4 ||
+				i/*f(App.ResourceModel.Settings.CurrentVersion.status==4 ||
 					App.ResourceModel.Settings.CurrentVersion.status==7 ||
 					App.ResourceModel.Settings.CurrentVersion.status==9 ||
 					App.ResourceModel.Settings.CurrentVersion.subType==1){
@@ -118,6 +118,15 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 					if(!Auth.download && !App.ResourceModel.Settings.CurrentVersion.byProjectRef){
 						$('#downLoadModel').addClass('disable');
 					}
+				}*/
+				if(!App.Comm.isAuth('rename','family')){
+					$("#reNameModelProject").addClass('disable').attr('disabled', 'disabled');
+				}
+				if(!App.Comm.isAuth('delete','family')){
+					$("#delModelProject").addClass('disable').attr('disabled', 'disabled');
+				}
+				if ($('#listContext li[class!=disable]').length == 0) {
+					$('#listContext').parent().hide();
 				}
 
 			},
@@ -133,7 +142,7 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 					}
 					//下载
 					var $item = $(item);
-/*
+/*					
 					if ($item.find(".folder").length > 0) {
 						//alert("暂不支持文件夹下载");
 						App.ResourceModel.folderDown($item);
@@ -153,7 +162,7 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 					};
 
 					var data = App.Comm.getUrlByType(data),
-						url = data.url + "?fileVersionId=" + fileVersionId;
+						url = data.url + "&fileVersionId=" + fileVersionId;
 					window.location.href = url;
 
 				},

@@ -17,12 +17,15 @@
 	var Files;
 		$("#show").click(function(){
 			Files=FileSelection({
-				//appKey:"99a3d82442594d3e8446108e21f6fb61",
-				//token:"123",
+				appKey:"99a3d82442594d3e8446108e21f6fb61",
+				token:"123",
 				isDrag:true,
 				projectId:1,
 				projectVersionId:784306105035931,
-				//fileIds:"854440553947648", //逗号隔开
+				closeCallback:function(){
+					console.log(1)
+				},
+				fileIds:"854440553947648", //逗号隔开
 				callback:function(a){
 					debugger
 				}

@@ -17,6 +17,7 @@
 			fileIds: "", // fileids 有值时，默认isEndable 为 false
 			mask: true,
 			http: "http://bim.wanda-dev.cn",
+			closeCallback: null,
 			callback: null
 		}
 
@@ -47,6 +48,9 @@
 		if (this.Settings.token && !this.initCookie()) {
 			return;
 		}
+
+		this.Settings.tokenPars = "token=" + this.Settings.token + "&appKey=" + this.Settings.appKey;
+
 
 		var url = this.Settings.http + "/doc/" + this.Settings.projectId + "/" + this.Settings.projectVersionId + "/file";
 		this.Settings.treeUrl = url + "/tree";
@@ -112,20 +116,23 @@
 		init() {
 
 			//生成Dialog
-			this.buildDialog();
-
+			this.buildDialog(); 
 
 			if (this.Settings.fileIds) {
 
-				this.loadData(this.Settings.reverseTree + "?fileVersionId=" + this.Settings.fileIds, this.renderRightTree);
+				var url=this.Settings.reverseTree;
 
-				if (this.Settings.token_cookie) {
-					this.Settings.reverseTree += '&token_cookie=' + this.Settings.token_cookie;
+				if (this.Settings.token) {
+					url += '?' + this.Settings.tokenPars;
 				}
+
+				this.loadData(url + "&fileVersionId=" + this.Settings.fileIds, this.renderRightTree);
+
+				
 			}
 
-			if (this.Settings.token_cookie) {
-				this.Settings.treeUrl += '?token_cookie=' + this.Settings.token_cookie;
+			if (this.Settings.token) {
+				this.Settings.treeUrl += '?' + this.Settings.tokenPars;
 			}
 			//加载数据
 			this.loadData(this.Settings.treeUrl, this.renderTree);
@@ -143,7 +150,7 @@
 				$header = $('<div class="header"/>').html('<i class="bg close" title="关闭"></i><h2>请选择申请变更的文件</h2> '),
 				$content = $('<div class="container" />').html(' <div class="loading">正在加载，请稍候……</div> <div class="leftFile"></div><div class="rightEnter"></div> <div class="contentBox"></div>  '),
 				$bottom = $('<div class="footer"/>').html('<input type="button" class="btnEnter myBtn myBtn-primary" value="' + this.Settings.btnText + '" />');
- 
+
 			//插入html架构
 			$content.find(".leftFile").html('<div class="title">文件浏览器</div> <div class="treeViewBox"> <div class="treeViewScroll"></div> </div> ');
 
@@ -151,7 +158,7 @@
 			sb += '<span class="name"><button class="btnDownLoad myBtn myBtn-default"><i class="bg downBg"></i>下载选中文件</button></span> ';
 			sb += '<span class="status">状态</span>  <span class="op">操作人</span>  ';
 			sb += '<span class="size">大小</span> <span class="date">时间</span>';
-			sb += '</li></ul> <ul class="fileBody"> <li class="null">暂无数据</li> </ul>';
+			sb += '</li></ul> <div class="fileBodyScrollBox"><div class="fileBodyScroll"><ul class="fileBody"> <li class="null">暂无数据</li> </ul></div></div>';
 			$content.find('.contentBox').html(sb);
 
 			var rightEnter = '<div class="title">';
@@ -350,20 +357,22 @@
 			//点击树文字
 			$dialog.on("click", ".treeViewBox .text-field", function() {
 
-				 
+
 				var $this = $(this),
 					fileVersionId = $this.data("fileversionid"),
 					url = that.Settings.nodeUrl + "?parentId=" + fileVersionId;
 
-				if (that.Settings.token_cookie) {
-					url += '&token_cookie=' + that.Settings.token_cookie;
+				if (that.Settings.token) {
+					url += '&' + that.Settings.tokenPars;
 				}
 
 				$dialog.find(".treeViewBox .text-field").removeClass('selected');
 				$this.addClass('selected');
 
-				$dialog.find(".tbFile .ck").removeClass('selected');
-
+				$dialog.find(".tbFile .ck").removeClass('selected'); 
+			 
+				$dialog.find(".fileBody").html(' <li class="null">正在加载，请稍候……</li>');
+				 
 				that.loadData(url, that.renderFile);
 
 			});
@@ -437,6 +446,10 @@
 					$(this).remove();
 				});
 
+				if (that.Settings.closeCallback) {
+					that.Settings.closeCallback.call(this);
+				}
+
 				$(document).unbind('keyup.FileSelection');
 
 			});
@@ -448,8 +461,7 @@
 
 				$dialog.find(".contentBox .ck.selected").each(function() {
 					FileIdArr.push($(this).data("fileversionid"));
-				});
-
+				}); 
 
 				if (FileIdArr.length <= 0) {
 					alert("请选择下载的文件");
@@ -457,8 +469,8 @@
 				}
 
 				var url = that.Settings.downLoadUrl + "?fileVersionId=" + FileIdArr.join(",");
-				if (that.Settings.token_cookie) {
-					that.Settings.downLoadUrl += '&token_cookie=' + that.Settings.token_cookie;
+				if (that.Settings.token) {
+					that.Settings.downLoadUrl += '&' + that.Settings.tokenPars;
 				}
 				window.location.href = url;
 
@@ -476,7 +488,6 @@
 				$dialog.find(".close").trigger('click');
 
 			});
-
 
 			//esc 
 			$(document).on("keyup.FileSelection", function(event) {
@@ -530,7 +541,7 @@
 
 
 		//确认选择的文件
-		enterSelect() { 
+		enterSelect() {
 
 			var $dialog = this.Settings.$dialog,
 				treeFolders = $dialog.find(".treeViewScroll .selected").parents("li"),
@@ -601,12 +612,12 @@
 				if ($item.find(".folder").length > 0) {
 					sb += '<i class="nodeSwitch bg on"></i> <i class="folderIcon bg"></i>';
 				}
-				sb += '<span class="text-field overflowEllipsis " data-id="' + id + '" data-fileversionid="' + fileVersionId + '" title="'+$item.find(".fileName").text() +'">' + $item.find(".fileName").text() + '</span> ';
+				sb += '<span class="text-field overflowEllipsis " data-id="' + id + '" data-fileversionid="' + fileVersionId + '" title="' + $item.find(".fileName").text() + '">' + $item.find(".fileName").text() + '</span> ';
 				sb += '<i class="bg delFile"></i></div></li>';
 			}
 
 			//默认展开
-			$trees.find(".treeViewSub").show();
+			$trees && $trees.find(".treeViewSub").show();
 			//未追加
 			if (isAppend == false) {
 
@@ -650,8 +661,8 @@
 					url = this.Settings.modelPrevView,
 					item, isLock, status;
 
-				if (this.Settings.token_cookie) { 
-					this.Settings.modelPrevView += '&token_cookie=' + this.Settings.token_cookie; 
+				if (this.Settings.token) {
+					this.Settings.modelPrevView += '&' + this.Settings.tokenPars;
 				}
 
 				if (count > 0) {
@@ -694,6 +705,24 @@
 			}
 
 			this.Settings.$dialog.find(".fileBody").html(trs);
+
+
+			var $fileBody = this.Settings.$dialog.find(".fileBodyScroll");
+
+			if (!$fileBody.hasClass("mCustomScrollbar")) {
+				var opts = {
+					theme: 'minimal-dark',
+					set_height: "100%",
+					axis: "y",
+					keyboard: {
+						enable: true
+					},
+					scrollInertia: 0
+				}; 
+				$fileBody.mCustomScrollbar(opts);
+			}
+
+
 		},
 
 		//状态转换

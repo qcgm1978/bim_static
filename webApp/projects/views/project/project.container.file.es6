@@ -30,31 +30,24 @@ App.Project.FileContainer = Backbone.View.extend({
 			Auth = App.AuthObj && App.AuthObj.project && 　App.AuthObj.project.prjfile,
 			projectId=App.Project.Settings.CurrentVersion.projectId;
 
-		if (!Auth) {
+		/*if (!Auth) {
 			Auth = {};
 		}
-
+		 
 		if (!Auth.edit) {
 			this.$('.btnFileUpload').addClass('disable');
 			if (!Auth.downLoad) {
 				this.$('.btnFileDownLoad').addClass('disable');
 			}
 		}
-	/*	if (App.Project.Settings.CurrentVersion.status == 9 ||
+		if (App.Project.Settings.CurrentVersion.status == 9 ||
 			App.Projects.fromCache(projectId,'subType') == 1) {
 			this.$('.btnNewFolder').addClass('disable');
 			this.$('.btnFileDel').addClass('disable');
-		}*/
-		if(!App.Projects.isAuth(projectId,'CREATE')){
-			this.$('.btnNewFolder').addClass('disable');
-			this.$('.btnFileDel').addClass('disable');
 		}
-		if(!App.Projects.isAuth(projectId,'UPLOAD')){
-			this.$('.btnFileUpload').addClass('disable');
-		}
-		if(!App.Projects.isAuth(projectId,'DOWN')){
-			this.$('.btnFileDownLoad').addClass('disable');
-		}
+
+
+
 		if(App.Projects.fromCache(projectId,'subType') == 1){
 			this.$('.btnNewFolder').addClass('disable');
 			this.$('.btnFileDel').addClass('disable');
@@ -63,6 +56,15 @@ App.Project.FileContainer = Backbone.View.extend({
 			this.$('.btnNewFolder').addClass('disable');
 		}
 		if (!Auth.delete) {
+			this.$('.btnFileDel').addClass('disable');
+		}*/
+		
+		if(!App.Comm.isAuth('create')){
+			this.$('.btnNewFolder').addClass('disable');
+		}
+		//删除、上传、重命名权限判断方式一样
+		if(!App.Comm.isAuth('upload')){
+			this.$('.btnFileUpload ').addClass('disable');
 			this.$('.btnFileDel').addClass('disable');
 		}
 		return this;

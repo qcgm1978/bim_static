@@ -8,8 +8,9 @@ App.Todo.TodoListView=Backbone.View.extend({
 
 	// 重写初始化
 	initialize:function(){ 
+		this.listenTo(App.Todo.TodoCollection, 'reset', this.resetDom);  
 		this.listenTo(App.Todo.TodoCollection, 'add', this.addOne);  
-		 
+		Backbone.on('todoEmptyDataEvent',this.emptyDom,this);
 	}, 
 
 	//代办
@@ -40,6 +41,13 @@ App.Todo.TodoListView=Backbone.View.extend({
 	    }
     	
 	} ,
+
+	resetDom:function(){
+		this.$el.find('.'+App.Todo.Settings.type+'Lists').empty();
+	},
+	emptyDom:function(){
+		this.$el.find('.'+App.Todo.Settings.type+'Lists').html('<span class="noData"><i class="tip"></i>暂无'+(App.Todo.Settings.type=='already'?'已':'待')+'办</span>');
+	},
 
 	bindScroll:function(type){
 

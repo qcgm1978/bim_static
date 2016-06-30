@@ -21,25 +21,38 @@
  		this.$el.html(this.template);
  		if (App.AuthObj.lib) {
  			if (type == "standardLibs") {
- 				var Auth = App.AuthObj.lib.model;
+ 				/*var Auth = App.AuthObj.lib.model;
  				if (!Auth.edit) {
  					this.$('.btnNewFolder,.btnFileDel,.btnFileUpload').addClass('disable');
  					if (!Auth.download && !App.ResourceModel.Settings.CurrentVersion.byProjectRef) {
  						this.$('.btnFileDownLoad').addClass('disable');
  					}
+ 				}*/
+ 				if(!App.Comm.isAuth('create','model')){
+ 					this.$('.btnNewFolder').addClass('disable');
  				}
+				//删除、上传、重命名权限判断方式一样
+				if(!App.Comm.isAuth('upload','model')){
+					this.$('.btnFileUpload ').addClass('disable');
+					this.$('.btnFileDel').addClass('disable');
+				}
  			} else if (type == "famLibs") {
- 				var Auth = App.AuthObj.lib.family;
+ 				/*var Auth = App.AuthObj.lib.family;
  				if (!Auth.edit) {
  					this.$('.btnNewFolder,.btnFileDel,.btnFileUpload').addClass('disable');
  					if (!Auth.download && !App.ResourceModel.Settings.CurrentVersion.byProjectRef) {
  						this.$('.btnFileDownLoad').addClass('disable');
  					}
+ 				}*/
+ 				if(!App.Comm.isAuth('create','family')){
+ 					this.$('.btnNewFolder').addClass('disable');
  				}
+				//删除、上传、重命名权限判断方式一样
+				if(!App.Comm.isAuth('upload','family')){
+					this.$('.btnFileUpload ').addClass('disable');
+					this.$('.btnFileDel').addClass('disable');
+				}
  			}
- 		}
- 		if (this.isDisabled()) {
- 			this.$('.btnNewFolder,.btnFileDel,.btnFileUpload').addClass('disable');
  		}
  		return this;
  	},

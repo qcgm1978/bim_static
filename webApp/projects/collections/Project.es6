@@ -94,23 +94,20 @@ App.Project = {
 					}
 
 				}
-				if (
+
+				/*if (
 					App.Project.Settings.CurrentVersion.status == 4 ||
 					App.Project.Settings.CurrentVersion.status == 7 ||
 					App.Project.Settings.CurrentVersion.status == 9 ||
 					App.Project.Settings.CurrentVersion.subType == 1) {
 					$("#reNameModelProject").addClass('disable').attr('disabled', 'disabled');
-					$("#downLoadModelProject").addClass('disable').attr('disabled', 'disabled');
 					$("#delModelProject").addClass('disable').attr('disabled', 'disabled');
-				}
-				if (_this.isDisabled('edit')) {
+				}*/
+				if(!App.Comm.isAuth('rename')){
 					$("#reNameModelProject").addClass('disable').attr('disabled', 'disabled');
 				}
-				if (_this.isDisabled('delete')) {
+				if(!App.Comm.isAuth('delete')){
 					$("#delModelProject").addClass('disable').attr('disabled', 'disabled');
-				}
-				if (_this.isDisabled('downLoad') || !App.ResourceModel.Settings.CurrentVersion.byProjectRef) {
-					$("#downLoadModelProject").addClass('disable').attr('disabled', 'disabled');
 				}
 				$item.addClass("selected").siblings().removeClass("selected");
 				if ($('#listContextProject li[class!=disable]').length == 0) {
@@ -433,8 +430,7 @@ App.Project = {
 		});
 	},
 	//初始化
-	init: function() {
-
+	init: function() { 
 		//加载项目
 		this.fetchProjectDetail();
 
@@ -557,13 +553,10 @@ App.Project = {
 		//var $contains = $("#contains");
 		$("#contains").html(new App.Project.ProjectApp().render().el);
 		var status = App.Project.Settings.CurrentVersion.status;
-		if (status != 9 && status != 4 && status != 7) {
-			$(".fileContainer .btnFileUpload").show();
+		if (status != 9 && status != 4 && status != 7) { 
 			//上传
 			App.Project.upload = App.modules.docUpload.init($(document.body));
-		} else {
-			$(".fileContainer .btnFileUpload").hide();
-		}
+		} 
 
 
 		// 导航文件
