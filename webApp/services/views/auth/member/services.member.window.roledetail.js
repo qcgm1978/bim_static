@@ -9,7 +9,8 @@ App.Services.windowRoleDetail=Backbone.View.extend({
     events:{
         "click .name":"memCheck",
         "mouseenter .fun":"showAll",
-        "mouseleave .fun":"hideAll"
+        "mouseleave .fun":"hideAll",
+        "mouseleave .showAll":"hideInfo"
     },
     render:function(){
         this.$el.html(this.template(this.model.toJSON()));
@@ -34,15 +35,17 @@ App.Services.windowRoleDetail=Backbone.View.extend({
         }else{
             ele = $(ele)
         }
-
         App.Services.showAll(ele);
-
     },
     hideAll:function(e){
         e.stopPropagation();
         if(e.target.nodeName == "SPAN"){
             $(".showAll").remove();
         }
+    },
+    hideInfo:function(e){
+        e.stopPropagation();
+        $(".showAll").remove();
     },
 
     //继承属性不可修改

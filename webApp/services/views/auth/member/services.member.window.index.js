@@ -10,13 +10,18 @@ App.Services.MemberWindowIndex = Backbone.View.extend({
     template:_.templateUrl("/services/tpls/auth/windows/services.member.window.index.html"),
 
     events:{
-        "click .windowSubmit":"windowSubmit"
+        "click .windowSubmit":"windowSubmit",
+        "mouseleave .memRoleList":"removeRoleInfo"
     },
 
 
     render:function(){
         this.$el.html(this.template);
         return this;
+    },
+
+    removeRoleInfo:function(){
+        $(".showAll").remove();
     },
 
     //提交表单，完毕会触发列表更新，列表为memBlend所属列表
