@@ -33,6 +33,9 @@ App.ResourceModel.LeftNav = Backbone.View.extend({
 			data.click = function(event) {
 				var file = $(event.target).data("file");
 
+				if(file.folder){
+					$('#navContainer .returnBack').removeClass('theEnd').attr('isReturn','1').html('返回上级');
+				}
 				//清除搜索
 				$("#navContainer").find(".clearSearch").hide().end().
 				find(".opBox").show().end().

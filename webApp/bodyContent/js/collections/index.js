@@ -163,7 +163,7 @@ App.BodyContent.control= {
                     })
                     if($('.mmhSlider').children().length==0){
                          $(".mmhSlider").mmhSlider({
-                            delay:5000,
+                            delay:2000,
                             data:sildeData,
                             noData:_nodata,
                             onChange:function(d){

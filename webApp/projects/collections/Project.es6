@@ -216,6 +216,9 @@ App.Project = {
 		if ($treeViewMarUl.length <= 0) {
 			data.click = function(event) {
 				var file = $(event.target).data("file");
+				if(file.folder){
+					$('#projectContainer .returnBack').attr('isReturn','1').removeClass('theEnd').html('返回上级');
+				}
 				$("#projectContainer .fileContent").empty();
 				App.Project.Settings.fileVersionId = file.fileVersionId;
 				App.Project.FileCollection.reset();
@@ -901,6 +904,9 @@ App.Project = {
 			data.click = function(event) {
 
 				var file = $(event.target).data("file");
+				if(file.folder){
+					$('#projectContainer .returnBack').attr('isReturn','1').removeClass('theEnd').html('返回上级');
+				}
 				// 
 				$("#projectContainer .header .ckAll").prop("checked", false);
 				//App.Project.FileCollection.parentId=file.id;

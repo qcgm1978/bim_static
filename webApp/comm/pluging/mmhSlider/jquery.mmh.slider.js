@@ -24,6 +24,7 @@
 			var _def=$.fn.mmhSlider.defaults;
 			var delay = setting.delay,
 				_pause=_def._pause;
+			$.fn.mmhSlider.defaults._index=0;
 			if(setting.noData){
 				setting.noData();
 				return ;
@@ -35,7 +36,7 @@
 					if(_pause){
 						return 
 					}
-					$.fn.mmhSlider.methods.next($dom,setting,data)
+					$.fn.mmhSlider.methods.next($dom,setting,data);
 				}, delay)
 				
 				$dom.find("li").hover(function() {
@@ -63,14 +64,17 @@
 			var _this=this;
 			var _index=$.fn.mmhSlider.defaults._index;
 			var $current = $dom.find("li.selected"),
-				$currentLabel = $dom.find("label").eq(_index),
+				$currentLabel = $dom.find("label.flag"),
+
 				$nextItem = $dom.find("li").eq(_this.cache(_index)),
 				$nextLable=$dom.find("label").eq(_this.cache(_index));
 			
 			$current.removeClass('selected').addClass('remove');
 			$nextItem.removeClass('remove').addClass('selected');
+
 			$currentLabel.toggleClass('flag');
 			$nextLable.toggleClass('flag');
+
 			$.fn.mmhSlider.defaults._index=_this.cache(_index);
 			setting.onChange(data[_this.cache(_index)]);
 		},
@@ -105,7 +109,7 @@
 			result.push("</ul>");
 			result = result.concat(tools);
 			result.push('<div class="slideTitle">' + (data[0].title)+ '</div>');
-			$dom.prepend(result.join(""));
+			$dom.empty().prepend(result.join(""));
 			
 			setting.onChange(data[0]);
 			

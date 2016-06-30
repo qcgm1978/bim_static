@@ -340,7 +340,9 @@ App.ResourceModel = {
 
 			data.click = function(event) {
 				var file = $(event.target).data("file");
-
+				if(file.folder){
+					$('#navContainer .returnBack').removeClass('theEnd').attr('isReturn','1').html('返回上级');
+				}
 				if (type == "standardLibs") {
 					//清空数据
 					$("#resourceListContent .fileContent").empty();
