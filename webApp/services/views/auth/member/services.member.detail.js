@@ -149,6 +149,7 @@ App.Services.memberDetail=Backbone.View.extend({
             isAlert:false,
             closeCallback:function(){
                 App.Services.Member.resetMemData();
+                $(".showAll").remove();
             },
             message:frame
         });

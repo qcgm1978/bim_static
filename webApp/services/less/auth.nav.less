@@ -138,12 +138,12 @@ ul,li{list-style: none outside none;}
 .memRoleList li.inherit{color: #cccccc;}
 .memRoleList li.inherit .memCheck{background-position: 0 -440px;}
 .memRoleList li.inherit .rohead{background-position: 0 -560px;}
-.memRoleList li .fun {overflow: hidden;height: 30px;}
+.memRoleList li .fun {overflow: hidden;height: 30px; cursor: default;}
 .memRoleList li.active .fun{border-color:#a8dbfd; }
-.memRoleList li .fun:hover {width: 340px;z-index: 10;line-height: 24px;position: absolute;border: 1px solid #eeeeee;height: auto;overflow-y: auto;background-color: #ffffff;left: 170px;top: 1px;overflow: auto;word-break: keep-all;white-space: normal;padding-left: 15px;border-radius: 3px;box-shadow: 1px 1px 4px #333333;}
-.memRoleList .fun span{padding-left: 16px;position: relative;white-space: nowrap;float: left;margin-right: 4px;}
+//.memRoleList li .fun:hover {width: 340px;z-index: 10;line-height: 24px;position: absolute;border: 1px solid #eeeeee;height: auto;overflow-y: auto;background-color: #ffffff;left: 170px;top: 1px;overflow: auto;word-break: keep-all;white-space: normal;padding-left: 15px;border-radius: 3px;box-shadow: 1px 1px 4px #333333;}
+.memRoleList .fun span{padding-left: 16px;position: relative;white-space: nowrap;float: left;margin-right: 4px;cursor: default;}
 .memRoleList .fun span:before{.background-ioc;content: '';position: absolute;width: 11px;height: 11px;top: 9px;left: 0;background-position: 0 -200px}
-.memRoleList li .fun:hover span:before{top: 6px;}
+//.memRoleList li .fun:hover span:before{top: 6px;}
 .memRoleList .fun span.adm:before{background-position: 0  -162px;width: 14px;height: 14px;}
 .memRoleList li .rohead{.background-ioc;display: inline-block;width: 15px;height: 15px;vertical-align: middle;background-position: 0 -180px;margin: 0 5px 0 5px;}
 .memRoleList li .rohead.adm{background-position: 0  -162px;width: 14px;height: 14px;}
@@ -174,8 +174,16 @@ ul,li{list-style: none outside none;}
 .servicesAlert .confirm{text-align: center;}
 .servicesAlert .alertRole{text-align: center;display: none;}
 .servicesAlert .confirm input{outline: none;}
-
 /*����*/
 .services_loading:after{content: '';position: absolute;left: 0;top: 0;width: 100%;height: 100%;background: rgba(255,255,255,1) url('../../comm/images/load.gif') center center no-repeat;background-size: 48px 48px;z-index: 99999;}
-
 .readyForScroll{position: absolute;top: 0;right: 0;bottom: 0;left: 0;}
+//浮动提示栏
+.showAll{position: absolute;z-index: 999999;width: 340px;background-color: #ffffff;line-height: 24px;border: 1px solid #eeeeee;height: auto;overflow: visible;white-space: normal;padding-left: 5px;border-radius: 3px;box-shadow: 1px 1px 5px #333333;}
+.showAll span{padding-left: 16px;position: relative;white-space: nowrap;float: left;margin-right: 4px;}
+.showAll span:before{.background-ioc;content: '';position: absolute;width: 11px;height: 11px;top: 6px;left: 0;background-position: 0 -200px}
+.showAll span.adm:before{background-position: 0  -162px;width: 14px;height: 14px;}
+.showAll .rohead{.background-ioc;display: inline-block;width: 15px;height: 15px;vertical-align: middle;background-position: 0 -180px;margin: 0 5px 0 5px;}
+.showAll .rohead.adm{background-position: 0  -162px;width: 14px;height: 14px;}
+.showAll:before{position: absolute;content: '';width: 14px;height: 8px;left: 10px;z-index: 20;background: transparent url('../images/services_mem_role_tip.png') center top no-repeat;background-size: 14px auto;}
+.showAll.down:before{top: -8px;background-position:  0 0;}
+.showAll.up:before{bottom: -8px;background-position:  0 -10px;}

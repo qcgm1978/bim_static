@@ -20,9 +20,6 @@ App.Services.tree = function(data){
     }
     return ele;
 };
-
-
-
 //获取所属组织列表
 App.Services.memOz = '';
 App.Services.searchOrg = function (pre){
@@ -34,9 +31,6 @@ App.Services.searchOrg = function (pre){
         App.Services.memOz = span.html()  + " > "  + text;
         return App.Services.searchOrg(span);
     };
-
-
-
 
 //队列管理
 App.Services.queue = {
@@ -60,7 +54,6 @@ App.Services.queue = {
             this.certificates();
             return;
         }
-
         /*if(this.que.length > 1){
             return
         }*/
@@ -68,9 +61,7 @@ App.Services.queue = {
         this.que.push(fn);
         this.certificates();
     },
-    stop:function(){
-
-    },
+    stop:function(){},
     //执行完毕，刷新队列，执行下一个
     next:function(){
         this.que.shift();
@@ -79,4 +70,23 @@ App.Services.queue = {
             this.que[0]();
         }
     }
+};
+App.Services.showAll = function(ele){
+    var tip = $("<div class='showAll'></div>");
+    var content = $(ele).html();
+    var offset = $(ele).offset();
+    tip.html(content);
+    $(".showAll").remove();
+    $("body").append(tip);
+    var height = $(".showAll").height();
+    var leaveHeight = $("body").height() - offset.top;
+    if (leaveHeight < height + $(ele).height()){
+        offset.top = offset.top - height - 7;
+        tip.addClass("up");
+    }else{
+        offset.top = offset.top + $(ele).height()+3;
+        tip.addClass("down");
+    }
+    offset.left =  offset.left - 5;
+    tip.offset(offset);
 };

@@ -7,7 +7,9 @@ App.Services.windowRoleDetail=Backbone.View.extend({
 
     template:_.templateUrl("/services/tpls/auth/windows/services.member.window.detail.html"),
     events:{
-        "click .name":"memCheck"
+        "click .name":"memCheck",
+        "mouseenter .fun":"showAll",
+        "mouseleave .fun":"hideAll"
     },
     render:function(){
         this.$el.html(this.template(this.model.toJSON()));
@@ -21,6 +23,25 @@ App.Services.windowRoleDetail=Backbone.View.extend({
     checked:function(){
         if(this.model.get("checked")){
             this.$el.addClass("active");
+        }
+    },
+    showAll:function(e){
+        e.stopPropagation();
+        this.hoverStauts = true;
+        var ele = e.target;
+        if(ele.nodeName == "SPAN"){
+            ele = $(ele).closest(".fun")
+        }else{
+            ele = $(ele)
+        }
+
+        App.Services.showAll(ele);
+
+    },
+    hideAll:function(e){
+        e.stopPropagation();
+        if(e.target.nodeName == "SPAN"){
+            $(".showAll").remove();
         }
     },
 

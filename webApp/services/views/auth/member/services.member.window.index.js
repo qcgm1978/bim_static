@@ -21,6 +21,7 @@ App.Services.MemberWindowIndex = Backbone.View.extend({
 
     //提交表单，完毕会触发列表更新，列表为memBlend所属列表
     windowSubmit:function(){
+        $(".showAll").remove();
         var submitData  = App.Services.memberWindowData;//获取要提交的成员/组织相关信息
         var data,
             selectRole;//实际的提交信息
@@ -37,8 +38,6 @@ App.Services.MemberWindowIndex = Backbone.View.extend({
         }
 
         App.Services.Member.saveMemData(submitData);
-
-        console.log(submitData);
 
         data = {
             URLtype:"saveServicesRole",
@@ -85,10 +84,12 @@ App.Services.MemberWindowIndex = Backbone.View.extend({
             }
             App.Services.Member.resetMemData();
             App.Services.maskWindow.close();
+            $(".showAll").remove();
             App.Services.memOz = '';
         });
         App.Services.Member.resetMemData();
         App.Services.memOz = '';
+        $(".showAll").remove();
     },
 
     initialize:function(){
