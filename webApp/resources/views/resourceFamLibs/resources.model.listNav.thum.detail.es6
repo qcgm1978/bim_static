@@ -103,7 +103,7 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 
 				}
 				$item.addClass("selected").siblings().removeClass("selected");
-				if(App.ResourceModel.Settings.CurrentVersion.status==4 ||
+				i/*f(App.ResourceModel.Settings.CurrentVersion.status==4 ||
 					App.ResourceModel.Settings.CurrentVersion.status==7 ||
 					App.ResourceModel.Settings.CurrentVersion.status==9 ||
 					App.ResourceModel.Settings.CurrentVersion.subType==1){
@@ -118,6 +118,12 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 					if(!Auth.download && !App.ResourceModel.Settings.CurrentVersion.byProjectRef){
 						$('#downLoadModel').addClass('disable');
 					}
+				}*/
+				if(!App.Comm.isAuth('rename','family')){
+					$("#reNameModelProject").addClass('disable').attr('disabled', 'disabled');
+				}
+				if(!App.Comm.isAuth('delete','family')){
+					$("#delModelProject").addClass('disable').attr('disabled', 'disabled');
 				}
 				if ($('#listContext li[class!=disable]').length == 0) {
 					$('#listContext').parent().hide();
