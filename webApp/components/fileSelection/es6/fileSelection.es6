@@ -116,16 +116,19 @@
 		init() {
 
 			//生成Dialog
-			this.buildDialog();
-
+			this.buildDialog(); 
 
 			if (this.Settings.fileIds) {
 
-				this.loadData(this.Settings.reverseTree + "?fileVersionId=" + this.Settings.fileIds, this.renderRightTree);
+				var url=this.Settings.reverseTree;
 
 				if (this.Settings.token) {
-					this.Settings.reverseTree += '&' + this.Settings.tokenPars;
+					url += '?' + this.Settings.tokenPars;
 				}
+
+				this.loadData(url + "&fileVersionId=" + this.Settings.fileIds, this.renderRightTree);
+
+				
 			}
 
 			if (this.Settings.token) {
@@ -458,8 +461,7 @@
 
 				$dialog.find(".contentBox .ck.selected").each(function() {
 					FileIdArr.push($(this).data("fileversionid"));
-				});
-
+				}); 
 
 				if (FileIdArr.length <= 0) {
 					alert("请选择下载的文件");

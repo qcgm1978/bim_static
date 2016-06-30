@@ -33,7 +33,7 @@ App.Project.FileContainer = Backbone.View.extend({
 		if (!Auth) {
 			Auth = {};
 		}
-
+		 
 		if (!Auth.edit) {
 			this.$('.btnFileUpload').addClass('disable');
 			if (!Auth.downLoad) {
