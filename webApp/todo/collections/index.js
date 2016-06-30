@@ -88,6 +88,10 @@ App.Todo = {
 					next_text: "下一页"
 
 				});
+
+				if(pageCount==0){
+					Backbone.trigger('todoEmptyDataEvent');
+				}
 			}
 		});
 	},
