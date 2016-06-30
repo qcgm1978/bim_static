@@ -51,9 +51,6 @@ App.Services.MemberozDetail=Backbone.View.extend({
             }
             //选择和加载状态
             if (this.$(".ozName span").hasClass("active")) {  //已选（必然已加载），收起
-                if (App.Services.queue.que.length) {
-                    return
-                }
                 this.$(".ozName").removeClass("active").find("span").removeClass("active");
                 App.Services.queue.certificates();
                 //清空右侧列表

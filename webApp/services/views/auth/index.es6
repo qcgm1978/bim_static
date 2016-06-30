@@ -17,7 +17,7 @@ App.Services.Auth = Backbone.View.extend({
 	initialize:function(){
 		Backbone.on("loadMemberData",this.loadMemberData,this);
 	},
-	loadMemberData:function(pram){
+	loadMemberData:function(){
 		this.$(".serviceBody").addClass("services_loading");
 		var _this = this;
 		this.$(".serviceBody").html(new App.Services.MemberNav().render().el);
