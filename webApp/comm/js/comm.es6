@@ -32,6 +32,11 @@ App.Comm = {
 	},
 
 	isAuth:function(type,s){
+
+		if (!App.AuthObj) {
+			return false;
+		}
+
 		var _subType,_auth,_status,
 			_temp='4,7,9';
 		if(s=='family'){
