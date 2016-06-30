@@ -430,8 +430,7 @@ App.Project = {
 		});
 	},
 	//初始化
-	init: function() {
-
+	init: function() { 
 		//加载项目
 		this.fetchProjectDetail();
 
@@ -554,13 +553,10 @@ App.Project = {
 		//var $contains = $("#contains");
 		$("#contains").html(new App.Project.ProjectApp().render().el);
 		var status = App.Project.Settings.CurrentVersion.status;
-		if (status != 9 && status != 4 && status != 7) {
-			$(".fileContainer .btnFileUpload").show();
+		if (status != 9 && status != 4 && status != 7) { 
 			//上传
 			App.Project.upload = App.modules.docUpload.init($(document.body));
-		} else {
-			$(".fileContainer .btnFileUpload").hide();
-		}
+		} 
 
 
 		// 导航文件

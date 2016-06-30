@@ -23,7 +23,7 @@ App.Resources.ArtifactsPlanRule = Backbone.View.extend({
     },
 
     mappingRuleNoContent:function(){
-        this.$el.html("<li><div class='ruleTitle delt'>暂无内容</div></li>");
+        this.$el.html("<li><div class='ruleTitle delt'>鏆傛棤鍐呭</div></li>");
     },
 
     addOne:function(model) {
@@ -37,7 +37,7 @@ App.Resources.ArtifactsPlanRule = Backbone.View.extend({
         this.collection = App.ResourceArtifacts.PlanRules;
         this.$el.html("");
         if(this.collection.length == 0){
-            this.$el.html("<li><div class='ruleTitle delt'>暂无内容</div></li>");
+            this.$el.html("<li><div class='ruleTitle delt'>鏆傛棤鍐呭</div></li>");
         }else{
             this.collection.each(function(item){
                 _this.addOne(item);

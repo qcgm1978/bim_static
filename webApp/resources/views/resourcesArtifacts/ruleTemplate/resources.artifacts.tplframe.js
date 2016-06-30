@@ -23,13 +23,13 @@ App.Resources.ArtifactsTplFrame = Backbone.View.extend({
         this.$(".tplContent>.default").show();
     },
 
-    //Ğ´ÈëÄÚÈİ
+    //å†™å…¥å†…å®¹
     loadContent:function(name){
         var _this = this;
         this.$(".tplContent").addClass("services_loading");
-        //ÖØÖÃÓÒ²àÁĞ±í
-        $("#artifacts").addClass("tpl");//´Ë´¦ÎªĞŞÕıÑùÊ½±íÏÖ
-        //ĞŞ¸ÄÄÚÈİ
+        //é‡ç½®å³ä¾§åˆ—è¡¨
+        $("#artifacts").addClass("tpl");//æ­¤å¤„ä¸ºä¿®æ­£æ ·å¼è¡¨ç°
+        //ä¿®æ”¹å†…å®¹
         this.$(".tplDetailTitle h2").text(name);
         this.$(".tplDetailTitle .tplName").val(name);
         this.$(".artifactsContent").addClass("explorer");
@@ -37,11 +37,11 @@ App.Resources.ArtifactsTplFrame = Backbone.View.extend({
         this.$(".artifactsNav li").eq(0).addClass("active").siblings("li").removeClass("active");
 
         this.$(".tplContent>.default").hide();
-        //»ñÈ¡ÁĞ±í
-        this.getTplRule();//»ñÈ¡¹æÔòÄ£°åÁĞ±í
+        //è·å–åˆ—è¡¨
+        this.getTplRule();//è·å–è§„åˆ™æ¨¡æ¿åˆ—è¡¨
     },
 
-    //»ñÈ¡Ä£°å¹æÔòÁĞ±í
+    //è·å–æ¨¡æ¿è§„åˆ™åˆ—è¡¨
     getTplRule:function(){
         var _this = this;
         var pdata = {
@@ -58,7 +58,7 @@ App.Resources.ArtifactsTplFrame = Backbone.View.extend({
                     _this.$(".artifactsContent .plans").show();
                     _this.$(".artifactsContent .rules").show();
                 }else{
-                    //Ã»ÓĞÈÎºÎ¹æÔòÊ±ºò£¬ÏÔÊ¾´´½¨¹æÔò°´Å¥
+                    //æ²¡æœ‰ä»»ä½•è§„åˆ™æ—¶å€™ï¼Œæ˜¾ç¤ºåˆ›å»ºè§„åˆ™æŒ‰é’®
                     _this.$(".artifactsContent .default").siblings().hide();
                 }
                 _this.$(".tplContent").removeClass("services_loading");

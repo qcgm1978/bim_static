@@ -84,7 +84,7 @@ App.ResourceModel.ListNav = Backbone.View.extend({
 			App.ResourceModel.Settings.Viewer = new bimView({
 				element: this.$el.find(".modelContent"),
 				sourceId: App.ResourceModel.Settings.DataModel.sourceId,
-				etag: App.ResourceModel.Settings.DataModel.etag,
+				etag:App.ResourceModel.Settings.DataModel.etag, //"a1064f310fa8204efd9d1866ef7370ee" ||
 				projectId: App.ResourceModel.Settings.CurrentVersion.projectId
 			});
 

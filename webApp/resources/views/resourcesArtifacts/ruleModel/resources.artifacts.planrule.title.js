@@ -27,29 +27,29 @@ App.Resources.ArtifactsPlanRuleTitle = Backbone.View.extend({
             " " +App.ResourceArtifacts.Status.rule.targetName  +
             "("+App.ResourceArtifacts.Status.rule.count + ")");
     },
-    //´´½¨¹æÔò
+    //åˆ›å»ºè§„åˆ™
     newPlanRule:function(){
         var _this = this;
         var targetCode = App.ResourceArtifacts.Status.rule.targetCode;
 
         if(!targetCode){
-            alert("ÇëÑ¡ÔñÄ£¿é/ÖÊÁ¿±ê×¼");
+            alert("è¯·é€‰æ‹©æ¨¡å—/è´¨é‡æ ‡å‡†");
             return;
-        }//Ã»ÓĞÑ¡Ôñ¼Æ»®ÎŞ·¨´´½¨¹æÔò
+        }//æ²¡æœ‰é€‰æ‹©è®¡åˆ’æ— æ³•åˆ›å»ºè§„åˆ™
         if( !App.ResourceArtifacts.Status.saved){
-            alert("Äú»¹ÓĞÃ»±£´æµÄ");
+            alert("æ‚¨è¿˜æœ‰æ²¡ä¿å­˜çš„");
             return
         }
-        //ÖØÖÃÉ¾³ı×´Ì¬
+        //é‡ç½®åˆ é™¤çŠ¶æ€
         App.ResourceArtifacts.Status.delRule ="";
 
-        //ÎŞÊı¾İ»òÎŞ¸ü¸Ä£¬¸ü¸Äµ±Ç°Êı¾İ
+        //æ— æ•°æ®æˆ–æ— æ›´æ”¹ï¼Œæ›´æ”¹å½“å‰æ•°æ®
         $(".ruleDetail:visible").hide();
 
-        //´´½¨¹æÔò
+        //åˆ›å»ºè§„åˆ™
         var model =  App.ResourceArtifacts.createPlanRules();
-        //¼ÓÔØµ×ÏÂ¹æÔò
-        var operatorData = App.Resources.dealStr2(model);//¹æÔòÊı¾İ
+        //åŠ è½½åº•ä¸‹è§„åˆ™
+        var operatorData = App.Resources.dealStr2(model);//è§„åˆ™æ•°æ®
         model.set({mappingCategory:operatorData},{silent:true});
         var container = new App.Resources.ArtifactsPlanRuleDetail({model:model});
 

@@ -22,7 +22,7 @@ App.Resources.ArtifactsPlanRuleDetailNew = Backbone.View.extend({
     initialize:function(){
         this.listenTo(this.model,"change",this.render);
     },
-    //ÇĞ»»¹æÔò
+    //åˆ‡æ¢è§„åˆ™
     seleRule:function(e){
         App.Resources.cancelBubble(e);
         var _this = $(e.target);
@@ -30,7 +30,7 @@ App.Resources.ArtifactsPlanRuleDetailNew = Backbone.View.extend({
         _this.closest(".myDropText").siblings(".myDropList").show();
         _this.siblings(".myDropArrorw").removeClass("down").addClass("up");
     },
-    //Ñ¡Ôñ¹æÔò£¬ÇĞ»»ÊäÈë·½Ê½
+    //é€‰æ‹©è§„åˆ™ï¼Œåˆ‡æ¢è¾“å…¥æ–¹å¼
     myItem:function(e){
         var _this = $(e.target);
         var operator = _this.data("operator");
@@ -38,7 +38,7 @@ App.Resources.ArtifactsPlanRuleDetailNew = Backbone.View.extend({
         var parent =  _this.parent(".myDropList");
         var eIn = _this.closest(".leftten").siblings(".eIn");
         var ioside  = _this.closest(".leftten").siblings(".ioside");
-        //Êı¾İĞ´ÈëÄ£ĞÍ
+        //æ•°æ®å†™å…¥æ¨¡å‹
         parent.hide().siblings(".myDropText").find(".text").text(text);
         _this.closest(".myDropDown").attr("data-operator",operator);
         _this.closest(".myDropDown").find(".myDropArrorw").removeClass("up").addClass("down");
@@ -53,9 +53,9 @@ App.Resources.ArtifactsPlanRuleDetailNew = Backbone.View.extend({
             ioside.addClass("active");
         }
     },
-    //É¾³ı
+    //åˆ é™¤
     delRule:function(){
-        this.$el.remove();//É¾³ıÔªËØ
-        this.model.clear();//Ïú»ÙÊı¾İ
+        this.$el.remove();//åˆ é™¤å…ƒç´ 
+        this.model.clear();//é”€æ¯æ•°æ®
     }
 });

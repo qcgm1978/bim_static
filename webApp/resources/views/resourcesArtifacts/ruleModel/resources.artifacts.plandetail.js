@@ -65,7 +65,7 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
         if(ele.hasClass("all")){
             ele.removeClass("all");
             ele.closest("li").attr("data-check","0");
-            //±£´æÌá½»Êı¾İ
+            //ä¿å­˜æäº¤æ•°æ®
             if( n == "string"){
                 model.ruleIds = [];
                 App.ResourceArtifacts.modelSaving.codeIds.push(App.ResourceArtifacts.getValid(model));
@@ -75,12 +75,12 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
 
             if(this.$el.hasClass("active")){
                 Backbone.trigger("modelRuleSelectNone");
-                //´¥·¢È«²»Ñ¡ÊÂ¼ş
+                //è§¦å‘å…¨ä¸é€‰äº‹ä»¶
             }
         }else{
             ele.addClass("all");
             ele.closest("li").attr("data-check","1");
-            //±£´æÌá½»Êı¾İ
+            //ä¿å­˜æäº¤æ•°æ®
             if( n == "string"){
                 App.ResourceArtifacts.modelSaving.codeIds.push(App.ResourceArtifacts.getValid(model));
             }else{
@@ -88,14 +88,14 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
             }
 
             if(this.$el.hasClass("active")){
-                //´¥·¢È«Ñ¡ÊÂ¼ş
+                //è§¦å‘å…¨é€‰äº‹ä»¶
                 Backbone.trigger("modelRuleSelectAll");
             }
         }
         ele.removeClass("half");
-        //²»ÉèÖÃÄ£ĞÍÀàĞÍ
+        //ä¸è®¾ç½®æ¨¡å‹ç±»å‹
     },
-    //¸Ä±äÊıÁ¿
+    //æ”¹å˜æ•°é‡
     changeCount:function(){
         var count = App.ResourceArtifacts.Status.rule.count;
         if(this.model.get("code") ==App.ResourceArtifacts.Status.rule.targetCode){
@@ -104,7 +104,7 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
         }
     },
 
-    //È¡µÃ¹æÔòÁĞ±í
+    //å–å¾—è§„åˆ™åˆ—è¡¨
     getPlanId:function(e){
         var $this = $(e.target);
         if($this.closest("li").hasClass("active")){
@@ -114,7 +114,7 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
         App.ResourceArtifacts.Status.check = this.$el.attr("data-check");
 
      /*   if(!App.ResourceArtifacts.Status.saved){
-            alert("Äú»¹ÓĞÃ»±£´æµÄ");
+            alert("æ‚¨è¿˜æœ‰æ²¡ä¿å­˜çš„");
             return
         }*/
         App.ResourceArtifacts.PlanRules.reset();
@@ -131,12 +131,12 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
 
 
     },
-//ÇĞ»»¼Æ»®
+//åˆ‡æ¢è®¡åˆ’
     toggleClass:function(e){
         $(".artifactsList .plcon li").removeClass("active");
         this.$el.addClass("active");
     },
-//»ñÈ¡¼Æ»®½ÚµãÏà¹Ø¹æÔò
+//è·å–è®¡åˆ’èŠ‚ç‚¹ç›¸å…³è§„åˆ™
     getRules:function() {
 
         var _this = this;

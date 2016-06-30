@@ -1,20 +1,20 @@
-//fetchArtifactsPlan   »ñÈ¡¼Æ»®
-//fetchArtifactsPlanRule   »ñÈ¡¹æÔò
+//fetchArtifactsPlan   è·å–è®¡åˆ’
+//fetchArtifactsPlanRule   è·å–è§„åˆ™
 App.ResourceArtifacts={
     Status:{
-        saved : true,    //´´½¨¹æÔòºóµÄ±£´æ×´Ì¬£¬ÒÑ±£´æ  /  Î´±£´æ
-        qualityProcessType:1,   //ÖÊÁ¿±ê×¼ -¹ı³ÌÑ¡Ôñ  type
+        saved : true,    //åˆ›å»ºè§„åˆ™åçš„ä¿å­˜çŠ¶æ€ï¼Œå·²ä¿å­˜  /  æœªä¿å­˜
+        qualityProcessType:1,   //è´¨é‡æ ‡å‡† -è¿‡ç¨‹é€‰æ‹©  type
         delRule:"",
-        qualityStandardType:"GC",   //ÖÊÁ¿±ê×¼ -¹ı³ÌÑ¡Ôñ  type
-        type:"", //1:±ê×¼¹æÔò£»2£ºÏîÄ¿¹æÔò
-        projectId : "",//Èç¹ûÓĞÏîÄ¿¹æÔò¾ÍÓĞÏîÄ¿id
+        qualityStandardType:"GC",   //è´¨é‡æ ‡å‡† -è¿‡ç¨‹é€‰æ‹©  type
+        type:"", //1:æ ‡å‡†è§„åˆ™ï¼›2ï¼šé¡¹ç›®è§„åˆ™
+        projectId : "",//å¦‚æœæœ‰é¡¹ç›®è§„åˆ™å°±æœ‰é¡¹ç›®id
         templateId:"",
         modelEdit:false,
         templateName:"",
         rule:{
-            biz:"",//1£ºÄ£¿é»¯£»2£ºÖÊ¼à±ê×¼
-            type : "", //1:±ê×¼¹æÔò£»2£ºÏîÄ¿¹æÔò
-            targetCode:"",  //¶ÔÓ¦Ä£¿éµÄcode
+            biz:"",//1ï¼šæ¨¡å—åŒ–ï¼›2ï¼šè´¨ç›‘æ ‡å‡†
+            type : "", //1:æ ‡å‡†è§„åˆ™ï¼›2ï¼šé¡¹ç›®è§„åˆ™
+            targetCode:"",  //å¯¹åº”æ¨¡å—çš„code
             targetName:"",
             count:"",
             "mappingCategory": {
@@ -29,10 +29,10 @@ App.ResourceArtifacts={
         }
     },
     Settings: {
-        delayCount:  0 , //Ã¿²ã¼ÓÔØÊıÁ¿
+        delayCount:  0 , //æ¯å±‚åŠ è½½æ•°é‡
         model : ""
     },
-//¼Æ»®½Úµã
+//è®¡åˆ’èŠ‚ç‚¹
     PlanNode : new(Backbone.Collection.extend({
         model:Backbone.Model.extend({
             defaults:function(){
@@ -48,14 +48,14 @@ App.ResourceArtifacts={
             } else {}
         }
     })),
-    //¼Æ»®¹æÔò/»ñÈ¡
+    //è®¡åˆ’è§„åˆ™/è·å–
     operator:Backbone.Model.extend({
         defaults:function(){
             return{
                 code : ""
             }
         }}),
-//¼Æ»®¹æÔò/»ñÈ¡½Úµã¹æÔò
+//è®¡åˆ’è§„åˆ™/è·å–èŠ‚ç‚¹è§„åˆ™
     PlanRules:new(Backbone.Collection.extend({
         model:Backbone.Model.extend({
             defaults:function(){
@@ -75,7 +75,7 @@ App.ResourceArtifacts={
         }
     })),
 
-    //´´½¨¼Æ»®¹æÔò
+    //åˆ›å»ºè®¡åˆ’è§„åˆ™
     newPlanRules : Backbone.Model.extend({
         defaults:function(){
             return{
@@ -83,13 +83,13 @@ App.ResourceArtifacts={
             }
         }
     }),
-    //ĞÂ½¨µÄ¹æÔòÊı¾İÄ£ĞÍ
+    //æ–°å»ºçš„è§„åˆ™æ•°æ®æ¨¡å‹
     saveRuleModel:function(){
         return   {
-            "biz": 1,//1£ºÄ£¿é»¯£»2£ºÖÊ¼à±ê×¼  //ĞÂ½¨Ê±Ğ´ÈëÖµ
-            "targetCode": "",//ĞÂ½¨Ê±Ğ´Èëµ±Ç°¼Æ»®±àºÅ
-            "targetName": "",//¼Æ»®Ãû³Æ
-            "type": 1,//1:±ê×¼¹æÔò£»2£ºÏîÄ¿¹æÔò  //ĞÂ½¨Ê±Ğ´ÈëÖµ
+            "biz": 1,//1ï¼šæ¨¡å—åŒ–ï¼›2ï¼šè´¨ç›‘æ ‡å‡†  //æ–°å»ºæ—¶å†™å…¥å€¼
+            "targetCode": "",//æ–°å»ºæ—¶å†™å…¥å½“å‰è®¡åˆ’ç¼–å·
+            "targetName": "",//è®¡åˆ’åç§°
+            "type": 1,//1:æ ‡å‡†è§„åˆ™ï¼›2ï¼šé¡¹ç›®è§„åˆ™  //æ–°å»ºæ—¶å†™å…¥å€¼
             "mappingCategory": {
                 "categoryCode": "",
                 "categoryName": "",
@@ -103,14 +103,14 @@ App.ResourceArtifacts={
             }
         }
     },
-    //´´½¨¼Æ»®¹æÔò£¬Ä£°å
+    //åˆ›å»ºè®¡åˆ’è§„åˆ™ï¼Œæ¨¡æ¿
     createPlanRules:function(){
-        //´´½¨ĞÂµÄ¹¹¼şÓ³Éä¼Æ»®½Úµã
+        //åˆ›å»ºæ–°çš„æ„ä»¶æ˜ å°„è®¡åˆ’èŠ‚ç‚¹
         var newPlanRuleData = {
-            "biz": "",//1£ºÄ£¿é»¯£»2£ºÖÊ¼à±ê×¼  //ĞÂ½¨Ê±Ğ´ÈëÖµ
-            "targetCode": "",//ĞÂ½¨Ê±Ğ´Èëµ±Ç°¼Æ»®±àºÅ
-            "targetName": "",//¼Æ»®Ãû³Æ
-            "type": "",//1:±ê×¼¹æÔò£»2£ºÏîÄ¿¹æÔò  //ĞÂ½¨Ê±Ğ´ÈëÖµ
+            "biz": "",//1ï¼šæ¨¡å—åŒ–ï¼›2ï¼šè´¨ç›‘æ ‡å‡†  //æ–°å»ºæ—¶å†™å…¥å€¼
+            "targetCode": "",//æ–°å»ºæ—¶å†™å…¥å½“å‰è®¡åˆ’ç¼–å·
+            "targetName": "",//è®¡åˆ’åç§°
+            "type": "",//1:æ ‡å‡†è§„åˆ™ï¼›2ï¼šé¡¹ç›®è§„åˆ™  //æ–°å»ºæ—¶å†™å…¥å€¼
             "mappingCategory": {
                 "categoryCode": "",
                 "categoryName": "",
@@ -123,7 +123,7 @@ App.ResourceArtifacts={
                 ]
             }
         };
-        //Ğ´Èë»ù´¡Êı¾İ
+        //å†™å…¥åŸºç¡€æ•°æ®
         newPlanRuleData.biz =  App.ResourceArtifacts.Status.biz;
         newPlanRuleData.targetCode =  App.ResourceArtifacts.Status.rule.targetCode;
         newPlanRuleData.targetName =  "";
@@ -132,7 +132,7 @@ App.ResourceArtifacts={
         return new this.newPlanRules(newPlanRuleData);
     },
 
-//±£´æ¼Æ»®¹æÔò
+//ä¿å­˜è®¡åˆ’è§„åˆ™
     SavePlanRules : Backbone.Model.extend({
             defaults:function(){
                 return{
@@ -143,11 +143,11 @@ App.ResourceArtifacts={
         parse: function(responese) {
             if (responese.code == 0 && responese.data.length > 0) {
                 return responese.data;
-                //±£´æ³É¹¦
+                //ä¿å­˜æˆåŠŸ
             }
         }
     }),
-    //ĞÂÓ³ÉäÊı¾İÄ£ĞÍ
+    //æ–°æ˜ å°„æ•°æ®æ¨¡å‹
     newModel : {
         "id": null,
         "propertyKey":"",
@@ -161,7 +161,7 @@ App.ResourceArtifacts={
             rightValue:''
         }
     },
-    //ĞÂ½¨¹æÔò
+    //æ–°å»ºè§„åˆ™
     newRule : Backbone.Model.extend({
         defaults:function(){
             return{
@@ -169,7 +169,7 @@ App.ResourceArtifacts={
             }
         }
     }),
-    //ĞÂ½¨ÌõÄ¿
+    //æ–°å»ºæ¡ç›®
     newCode : Backbone.Model.extend({
         defaults:function(){
             return{
@@ -177,7 +177,7 @@ App.ResourceArtifacts={
             }
         }
     }),
-    //¹æÔòcollection
+    //è§„åˆ™collection
     ArtifactsRule:new(Backbone.Collection.extend({
         model:Backbone.Model.extend({
             defaults:function(){
@@ -191,11 +191,11 @@ App.ResourceArtifacts={
             if (responese.code == 0 && responese.data.length > 0) {
                 return responese.data;
             } else {
-                //$().html('<li>ÎŞÊı¾İ</li>');
+                //$().html('<li>æ— æ•°æ®</li>');
             }
         }
     })),
-    //¹æÔòÄ£°åÁĞ±í
+    //è§„åˆ™æ¨¡æ¿åˆ—è¡¨
     TplCollection : new(Backbone.Collection.extend({
         model:Backbone.Model.extend({
             defaults:function(){
@@ -205,7 +205,7 @@ App.ResourceArtifacts={
             }
         })
     })),
-    //¹æÔòÄ£°å¹æÔòÁĞ±í
+    //è§„åˆ™æ¨¡æ¿è§„åˆ™åˆ—è¡¨
     TplCollectionRule : new(Backbone.Collection.extend({
         model:Backbone.Model.extend({
             defaults:function(){
@@ -224,28 +224,28 @@ App.ResourceArtifacts={
         _this.$(".breadcrumbNav .fileNav").hide();
         _this.$(".breadcrumbNav .breadItem.project").show();
 
-        this.loaddeaprt();//·ÖÀà±àÂë
+        this.loaddeaprt();//åˆ†ç±»ç¼–ç 
 
         if(optionType == "library" ||  optionType == "template"){
             App.ResourceArtifacts.Status.projectId = "";
             App.ResourceArtifacts.Status.projectName = "";
-            this.ArtifactsIndexNav = new App.Resources.ArtifactsIndexNav();//Ä£¿é»¯/ÖÊÁ¿±ê×¼²Ëµ¥
+            this.ArtifactsIndexNav = new App.Resources.ArtifactsIndexNav();//æ¨¡å—åŒ–/è´¨é‡æ ‡å‡†èœå•
             _this.$el.append(this.ArtifactsIndexNav.render().el);
         }else{
-            //ÏîÄ¿
+            //é¡¹ç›®
             App.ResourceArtifacts.Status.projectId  = optionType;
             this.ArtifactsProjectBreadCrumb = new App.Resources.ArtifactsProjectBreadCrumb();
             _this.$el.html(this.ArtifactsProjectBreadCrumb.render().el);
-            //ÏîÄ¿Ó³Éä¹æÔòÃû³Æ
+            //é¡¹ç›®æ˜ å°„è§„åˆ™åç§°
             App.ResourceArtifacts.Status.projectName = App.Comm.publicData.services.project.projectName;
         }
 
-        //¹«ÓÃ×é¼ş
-        this.menu = new App.Resources.ArtifactsMapRule();  //Íâ²ã²Ëµ¥
-        this.plans = new App.Resources.ArtifactsPlanList();   //Ä£¿é»¯ÁĞ±í /¼Æ»®½Úµã
-        this.planRuleTitle = new App.Resources.ArtifactsPlanRuleTitle();  //¹æÔòÍ·²¿
-        this.planRule = new App.Resources.ArtifactsPlanRule();  //¹æÔòÁĞ±í
-        this.quality = new App.Resources.ArtifactsQualityList();//ÖÊÁ¿±ê×¼£¬Íâ²ã
+        //å…¬ç”¨ç»„ä»¶
+        this.menu = new App.Resources.ArtifactsMapRule();  //å¤–å±‚èœå•
+        this.plans = new App.Resources.ArtifactsPlanList();   //æ¨¡å—åŒ–åˆ—è¡¨ /è®¡åˆ’èŠ‚ç‚¹
+        this.planRuleTitle = new App.Resources.ArtifactsPlanRuleTitle();  //è§„åˆ™å¤´éƒ¨
+        this.planRule = new App.Resources.ArtifactsPlanRule();  //è§„åˆ™åˆ—è¡¨
+        this.quality = new App.Resources.ArtifactsQualityList();//è´¨é‡æ ‡å‡†ï¼Œå¤–å±‚
         this.plans.planRule = this.menu;
         this.menu.quality = this.quality;
         this.menu.plans = this.plans;
@@ -254,7 +254,7 @@ App.ResourceArtifacts={
         App.ResourceArtifacts.Status.templateId = "";
 
 
-        if(optionType == "template" ){//¹æÔòÄ£°å
+        if(optionType == "template" ){//è§„åˆ™æ¨¡æ¿
             _this.$(".resourcesMappingRule .template").addClass("active").siblings("a").removeClass("active");
             App.ResourceArtifacts.Status.qualityStandardType = "GC";
             if(App.ResourceArtifacts.Settings.ruleModel  ==2){
@@ -265,44 +265,44 @@ App.ResourceArtifacts={
             this.tplList = new App.Resources.ArtifactsTplList();
             this.detail = new App.Resources.ArtifactsTplDetail();
 
-            _this.$el.append(this.tplFrame.render().el);//²Ëµ¥
-            this.tplFrame.$(".tplListContainer").html(this.tplList.render().el);//ÓÒ²à¿ò¼Ü
+            _this.$el.append(this.tplFrame.render().el);//èœå•
+            this.tplFrame.$(".tplListContainer").html(this.tplList.render().el);//å³ä¾§æ¡†æ¶
             this.tplFrame.$(".tplContent .content").html(this.detail.render().el);
-            this.detail.$(".tplDetailCon").append(this.menu.render().el);//²Ëµ¥
+            this.detail.$(".tplDetailCon").append(this.menu.render().el);//èœå•
 
             this.tplFrame.$(".artifactsTplFrame").addClass("services_loading");
 
             if(Auth.moduleMappingRule.view){
-                this.menu.$(".plans").html(this.plans.render().el);//¼Æ»®
+                this.menu.$(".plans").html(this.plans.render().el);//è®¡åˆ’
 
             }
 
             if(Auth.qualityMappingRule.view) {
-                this.menu.$(".qualifyC").append(this.quality.render().el);//ÖÊÁ¿
+                this.menu.$(".qualifyC").append(this.quality.render().el);//è´¨é‡
             }
 
             if(Auth.moduleMappingRule.edit || Auth.qualityMappingRule.edit) {
-                this.menu.$(".rules").append(this.planRuleTitle.render().el);//¹æÔò
-                this.planRuleTitle.$(".ruleContentRuleList").append(this.planRule.render().el);//¹æÔòÁĞ±í
+                this.menu.$(".rules").append(this.planRuleTitle.render().el);//è§„åˆ™
+                this.planRuleTitle.$(".ruleContentRuleList").append(this.planRule.render().el);//è§„åˆ™åˆ—è¡¨
             }
 
             this.detail.$(".artifactsContent").addClass("explorer");
 
             this.getTpl();
 
-        }else{//¹æÔò¿â
+        }else{//è§„åˆ™åº“
             $("#artifacts").addClass("services_loading");
             App.ResourceArtifacts.modelEdit = false;
             _this.$(".resourcesMappingRule .library").addClass("active").siblings("a").removeClass("active");
-            _this.$el.append(this.menu.render().el);//²Ëµ¥
+            _this.$el.append(this.menu.render().el);//èœå•
             this.menu.$el.addClass("services_loading");
-            //Ğ´ÈëÏîÄ¿Ãû³Æ
+            //å†™å…¥é¡¹ç›®åç§°
             if(App.ResourceArtifacts.Status.projectId){
                this.getProjectName(_this,App.ResourceArtifacts.Status.projectId)
             }
-            //¶ÁÈëÊı¾İ
+            //è¯»å…¥æ•°æ®
             if(Auth.moduleMappingRule.view){
-                this.menu.$(".plans").html(this.plans.render().el);//¼Æ»®½Úµã
+                this.menu.$(".plans").html(this.plans.render().el);//è®¡åˆ’èŠ‚ç‚¹
                 this.getPlan();
             }
             if(Auth.qualityMappingRule.view){
@@ -314,13 +314,13 @@ App.ResourceArtifacts={
                 });
             }
             if(Auth.moduleMappingRule.edit || Auth.qualityMappingRule.edit){
-                this.menu.$(".rules").html(this.planRuleTitle.render().el);//Ó³Éä¹æÔò±êÌâ
-                this.planRuleTitle.$(".ruleContentRuleList").html(this.planRule.render().el);//Ó³Éä¹æÔòÁĞ±í
+                this.menu.$(".rules").html(this.planRuleTitle.render().el);//æ˜ å°„è§„åˆ™æ ‡é¢˜
+                this.planRuleTitle.$(".ruleContentRuleList").html(this.planRule.render().el);//æ˜ å°„è§„åˆ™åˆ—è¡¨
             }
         }
         $(".resourcesMappingRule").show();
     },
-    //»ñÈ¡ÏîÄ¿Ãû³Æ
+    //è·å–é¡¹ç›®åç§°
     getProjectName:function(_this,projectId){
         var pdata = {
             URLtype: "fetchArtifactsProjectName",
@@ -334,9 +334,9 @@ App.ResourceArtifacts={
             }
         });
     },
-    // »ñÈ¡·ÖÀà±àÂë
+    // è·å–åˆ†ç±»ç¼–ç 
     loaddeaprt:function(){
-        //»ñÈ¡·ÖÀà±àÂë
+        //è·å–åˆ†ç±»ç¼–ç 
         var cdata = {
             URLtype:"fetchArtifactsCategoryRule",
             data:{}
@@ -347,7 +347,7 @@ App.ResourceArtifacts={
             }
         });
     },
-    //»ñÈ¡¼Æ»®½Úµã
+    //è·å–è®¡åˆ’èŠ‚ç‚¹
     getPlan:function(){
 
         var _this = App.ResourceArtifacts, pdata;
@@ -376,7 +376,7 @@ App.ResourceArtifacts={
             _this.menu.$el.removeClass("services_loading");
         });
     },
-    //ËùÓĞ
+    //æ‰€æœ‰
     modelSaving:{
         templateId: "",
         templateName: "",
@@ -384,7 +384,7 @@ App.ResourceArtifacts={
     },
     allQualityGC: [],
     allQualityKY: [],
-    //»ñÈ¡È«²¿ÖÊÁ¿±ê×¼
+    //è·å–å…¨éƒ¨è´¨é‡æ ‡å‡†
     getAllQuality:function(fn){
         var _this = this;
         var pdata = {
@@ -416,15 +416,15 @@ App.ResourceArtifacts={
 
         });
     },
-    //»ñÈ¡ÒÑ¾­¼ÓÔØ²¢ÇÒÒª´æ´¢µÄÓĞĞ§Êı¾İ
+    //è·å–å·²ç»åŠ è½½å¹¶ä¸”è¦å­˜å‚¨çš„æœ‰æ•ˆæ•°æ®
     getValid:function(obj){
         return  {
                 code : obj.code,
                 ruleIds : obj.ruleIds || []
             };
     },
-    //ÖÊÁ¿±ê×¼Èı¼¶·ÖÀà£¬Òª²åÈëÔªËØ£¬Êı¾İ£¬ÊÇ·ñÓĞ¸¸½Úµã£¬ruleContain
-    // ÖµÊÇ·ñ´æÔÚ
+    //è´¨é‡æ ‡å‡†ä¸‰çº§åˆ†ç±»ï¼Œè¦æ’å…¥å…ƒç´ ï¼Œæ•°æ®ï¼Œæ˜¯å¦æœ‰çˆ¶èŠ‚ç‚¹ï¼ŒruleContain
+    // å€¼æ˜¯å¦å­˜åœ¨
     departQuality:function(ele,cdata,parentCode,ruleContain){
         var data = cdata , levelData;
 
@@ -443,7 +443,7 @@ App.ResourceArtifacts={
             $(ele).html(App.Resources.artifactsQualityTree(levelData,ruleContain));
         }
     },
-    //»ñÈ¡¹æÔòÄ£°å
+    //è·å–è§„åˆ™æ¨¡æ¿
     getTpl:function(){
         var _this = this, pdata;
         //App.ResourceArtifacts.Status.type =1 ;
@@ -467,7 +467,7 @@ App.ResourceArtifacts={
     loaded:function(ele){
         $(ele).removeClass("services_loading");
     },
-    //ÖØÖÃ¹æÔò
+    //é‡ç½®è§„åˆ™
     resetPreRule:function(){
         App.ResourceArtifacts.Status.templateId = "";
         App.ResourceArtifacts.Status.templateName = "";
@@ -475,16 +475,16 @@ App.ResourceArtifacts={
         App.ResourceArtifacts.Status.rule.targetCode = "";
         App.ResourceArtifacts.Status.rule.targetName = "";
     },
-    //±£´æµÄ¹æÔò
+    //ä¿å­˜çš„è§„åˆ™
     modelRuleSaveData:{
         templateId: "",
             templateName:"",
-            ruleIdsIn:[],//²åÈëµÄ¹æÔòid
-            ruleIdsDel:[],//É¾³ıµÄ¹æÔòid
-            codeIdsIn:[],//²åÈëµÄÄ¿±ê±àÂë
-            codeIdsDel:[]//É¾³ıµÄÄ¿±ê±àÂë
+            ruleIdsIn:[],//æ’å…¥çš„è§„åˆ™id
+            ruleIdsDel:[],//åˆ é™¤çš„è§„åˆ™id
+            codeIdsIn:[],//æ’å…¥çš„ç›®æ ‡ç¼–ç 
+            codeIdsDel:[]//åˆ é™¤çš„ç›®æ ‡ç¼–ç 
     },
-    //ÖØÖÃÒª´æ´¢µÄÄ£°å
+    //é‡ç½®è¦å­˜å‚¨çš„æ¨¡æ¿
     resetModelRuleSaveData:function(){
         App.ResourceArtifacts.modelRuleSaveData.templateId ="";
         App.ResourceArtifacts.modelRuleSaveData.templateName = "";

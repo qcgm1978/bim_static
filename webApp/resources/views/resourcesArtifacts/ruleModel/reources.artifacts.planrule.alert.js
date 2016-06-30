@@ -23,7 +23,6 @@ App.Resources.ArtifactsPlanRuleAlert = Backbone.View.extend({
             //直接删除末尾内容
             $(".outsideList>li").last().remove();
             App.Resources.ArtifactsAlertWindow.close();
-            $(".artifactsContent .rules").removeClass("services_loading");
             App.ResourceArtifacts.Status.saved = true;
             App.ResourceArtifacts.Status.delRule = "";
             return
@@ -56,11 +55,9 @@ App.Resources.ArtifactsPlanRuleAlert = Backbone.View.extend({
                      alert("删除失败");
                  }
                 App.Resources.ArtifactsAlertWindow.close();
-                $(".artifactsContent .rules").removeClass("services_loading");
             },
             error:function(error){
                 App.Resources.ArtifactsAlertWindow.close();
-                $(".artifactsContent .rules").removeClass("services_loading");
                 alert("错误类型"+ error.status +"，无法成功删除!");
             }
         });
@@ -68,12 +65,10 @@ App.Resources.ArtifactsPlanRuleAlert = Backbone.View.extend({
     },
         //取消
     cancel:function(){
-        $(".artifactsContent .rules").removeClass("services_loading");
         App.Resources.ArtifactsAlertWindow.close();
     },
     //关闭
     close:function(){
-        $(".artifactsContent .rules").removeClass("services_loading");
         App.Resources.ArtifactsAlertWindow.close();
     }
 });
