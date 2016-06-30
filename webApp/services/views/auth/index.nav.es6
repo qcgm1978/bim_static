@@ -24,6 +24,7 @@ App.Services.AuthNav = Backbone.View.extend({
 //面包屑
 
 	initialize:function(){
+		Backbone.on('loadProjectMemberEvent',this.projectMember,this);
 		this.breadCrumb(this.$el.find(".memCtrl"));
 
 	},
@@ -64,6 +65,7 @@ App.Services.AuthNav = Backbone.View.extend({
 		});
 	},
 	projectMember : function(){
+		debugger
 		$(".serviceBody").empty();
 		this.breadCrumb(this.$el.find(".projectMember"));
 		App.Services.projectMember.init({type : "auth",tab:"projectMember"});
