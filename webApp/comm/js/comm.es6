@@ -53,12 +53,24 @@ App.Comm = {
 			_status=App.Project.Settings.CurrentVersion.status;
 		}
 		if(type=='create'){
-			if(_subType==1&&_auth.edit&&_temp.indexOf(_status)==-1){
-				return true;
+			if(s=='family'||s=='model'){
+				if(_auth.edit&&_temp.indexOf(_status)==-1){
+					return true;
+				}
+			}else{
+				if(_subType==1&&_auth.edit&&_temp.indexOf(_status)==-1){
+					return true;
+				}
 			}
 		}else if(type=="upload"||type=="delete"||type=="rename"){
-			if(_subType!=1&&_auth.edit&&_temp.indexOf(_status)==-1){
-				return true;
+			if(s=='family'||s=='model'){
+				if(_auth.edit&&_temp.indexOf(_status)==-1){
+					return true;
+				}
+			}else{
+				if(_subType!=1&&_auth.edit&&_temp.indexOf(_status)==-1){
+					return true;
+				}
 			}
 		}else if(type=="down"){
 			return true;

@@ -86,7 +86,6 @@ ViewComp.MemberManager = Backbone.View.extend({
 	},
 	
 	loadChildren:function(_this,outer,parentId,treeNode){
-		debugger
 		_this.$(".scrollWrap").mmhMask();
 		var url="fetchServiceKeyUserInfo",
 			_getData={
@@ -128,7 +127,6 @@ ViewComp.MemberManager = Backbone.View.extend({
 		},function(res){
 			if(res.message==="success"){
 				var zNodes=[];
-				debugger
 				if(url=='fetchServiceKeyUserInfo'){
 					var _org=res.data.org||[],
 						_user=res.data.user||[],
