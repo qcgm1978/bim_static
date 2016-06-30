@@ -13,11 +13,16 @@ App.Services.MemberNav=Backbone.View.extend({
     },
     render:function(){
         this.$el.html(this.template);
-
         return this;
     },
     initialize:function(){
         //默认根据角色权限加载  adm用户加载全部，keyMem用户只显示项目管理.
+        Backbone.on("serviceMemberTopSelectStatus",this.serviceMemberTopSelectStatus,this)
+    },
+
+    serviceMemberTopSelectStatus:function(){
+        this.$(".inner span").removeClass("active");
+        this.$(".outer span").removeClass("active");
     },
     //外部用户
     outer:function(){
