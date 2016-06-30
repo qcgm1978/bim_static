@@ -15,9 +15,10 @@ App.Services.AuthNav = Backbone.View.extend({
 	},
 	render:function(){
 		var user = JSON.parse(localStorage.user || "{}"),
-			isadmin = user.isAdmin || false,
+			//isadmin = user.isAdmin || false,
+			 auth =  App.AuthObj.service &&  App.AuthObj.service.auth,
 			isKeyUser = user.isKeyUser || false;
-		this.$el.html(this.template({isadmin:isadmin,iskeyuser:isKeyUser}));
+		this.$el.html(this.template({isadmin:auth,iskeyuser:isKeyUser}));
 		return this;
 	},
 //面包屑
