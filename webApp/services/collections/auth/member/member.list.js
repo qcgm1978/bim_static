@@ -4,6 +4,7 @@
 
 App.Services.memberWindowData = {"roleId":[], "outer":{"orgId":[],"userId":[]},"inner":{"orgId":[], "userId":[]}};
 App.Services.Member ={
+    memLoadingStatus: true,
     //组织
     collection:Backbone.Collection.extend({
         model: Backbone.Model.extend({

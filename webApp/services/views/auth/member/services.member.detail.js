@@ -21,23 +21,6 @@ App.Services.memberDetail=Backbone.View.extend({
         this.model.set({"checked":false},{silent:true});//预设选择状态
         this.listenTo(this.model, 'change:checked', this.render);
         this.listenTo(this.model, 'change:role', this.render);
-        //Backbone.on("memberControlModifyRole",this.memberControlModifyRole,this);
-    },
-
-    memberControlModifyRole:function(){
-
-    },
-    //查找当前元素
-    findSelf:function() {
-        var _this =this;
-        var parent = '';
-        _.each($(".ozName"),function (item) {
-            var id = $(item).data("id");
-            if (id == _this.model.get("orgId")) {
-                parent = $(item).parent("div").parent("li");
-            }
-        });
-        return parent
     },
     cancelBubble:function(event){
         if(event.stopPropagation){
@@ -48,60 +31,10 @@ App.Services.memberDetail=Backbone.View.extend({
     },
 
     loadMenu:function(e){
-        console.log(this.model.toJSON());
         this.cancelBubble(e);
         if(App.Services.queue.que > 1 ){ return}
         if(this.model.get("userId")){return}//用户，可能需要另行处理
-
-        Backbone.trigger("serviceMemberOrgLoad",this.model.get("parentId"));
-
-
-        /*var findSelf = this.findSelf(),
-            _thisType = App.Services.MemberType,
-            _thisId = App.Services.memFatherId =  this.model.get("orgId"),
-            collection = App.Services.Member[_thisType + "Collection"];
-        //样式操作
-        $(".serviceOgList span").removeClass("active");
-        findSelf.find(".ozName > span").addClass("active"); //this偏差导致选择不正确
-        $("#blendList").empty();
-        $(".serviceBody .content").addClass("services_loading");
-        var cdata = {
-            URLtype: "fetchServicesMemberList",
-            type:"GET",
-            data:{
-                parentId:_thisId,
-                outer:  !(_thisType == "inner"),
-                includeUsers:true
-            }
-        };
-        //此处为延迟
-        App.Comm.ajax(cdata,function(response){
-            var alreadyCon,alreadyMenu = findSelf.find(".childOz");//已加载菜单将不再加载
-
-            $(".serviceBody .content").removeClass("services_loading");
-            if(!response.data.org.length && !response.data.user.length ){
-                $("#blendList").html("<li><span class='sele'>暂无数据</span></li>");
-                return
-            }
-            collection.reset();
-            if(response.data.user && response.data.user.length){
-                collection.add(response.data.user);
-            }
-            if(!response.data.org.length){
-                if(!alreadyMenu.hasClass("alreadyGet")){
-                    alreadyMenu.addClass("alreadyGet");
-                }
-            }
-            if (response.data.org && response.data.org.length) {
-                collection.add(response.data.org);
-                //菜单渲染
-                alreadyCon =  alreadyMenu.html();
-                if(alreadyCon || alreadyMenu.hasClass("alreadyGet")){return;}
-                alreadyMenu.html(App.Services.tree(response));
-            }
-        }).done(function(){
-            App.Services.queue.next();
-        });*/
+        Backbone.trigger("serviceMemberOrgLoad" ,this.model.get("orgId"));
     },
 
     //单个修改
@@ -117,15 +50,16 @@ App.Services.memberDetail=Backbone.View.extend({
         }
 
         var _this =this,disable,selected;
-        $(".serviceBody .content").addClass("services_loading");
+
         var frame = new App.Services.MemberWindowIndex().render().el;//外框
         _this.window(frame);
         _this.chooseSelf();
         _this.save();
+        $(App.Services.maskWindow.element[0]).addClass("services_loading");
 
         //获取所有列表，继承项设置不可修改
         App.Services.Member.loadData(App.Services.Member.SubRoleCollection,{},function(response){
-            $(".serviceBody .content").removeClass("services_loading");
+            $(App.Services.maskWindow.element[0]).removeClass("services_loading");
             var role = _this.model.get("role");
             if(role && role.length) {
                 selected  = _.filter(role,function(item){

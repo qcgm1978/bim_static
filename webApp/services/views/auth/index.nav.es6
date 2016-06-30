@@ -30,21 +30,21 @@ App.Services.AuthNav = Backbone.View.extend({
 		//debugger;
 		var $el=$(el);
 		$el.addClass("active").siblings("li").removeClass("active");
+		App.Services.Member.memLoadingStatus = true;
 	},
 
 	memCtrl : function(){
 		$(".serviceBody").empty();
 		$("#blendList").addClass("services_loading");
 		this.breadCrumb(this.$el.find(".memCtrl"));
-		this.$(".serviceBody").html(new App.Services.MemberNav().render().el);
-		this.$(".serviceBody .content").html(new App.Services.MemberList().render().el);
-		Backbone.trigger("loadMemberData");
+		Backbone.trigger("loadMemberData","1");
 	},
 	roleManager : function(){
-		$(".serviceBody").empty();
-		$("#blendList").addClass("services_loading");
+		var _this = this;
+		this.$(".serviceBody").empty();
+		this.$(".serviceBody").addClass("services_loading");
 		this.breadCrumb(this.$el.find(".roleManager"));
-		App.Services.role.init(function(){$("#blendList").removeClass("services_loading");});
+		App.Services.role.init(function(){_this.$(".serviceBody").removeClass("services_loading");});
 	},
 	keyUser : function(){
 
