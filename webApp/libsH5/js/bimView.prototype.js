@@ -536,8 +536,7 @@
       $.each(list,function(i,item){
         newList.push(window.btoa(JSON.stringify(item)));
       });
-      var floors = bimView.comm.getFilters($("#floors"),'uncheck');
-      var specialty = bimView.comm.getFilters($("#specialty"),'uncheck');
+      var files = bimView.comm.getFilters($("#floors,#specialty"),'uncheck');
       var category = bimView.comm.getFilters($("#category"),'uncheck');
       var classCode = bimView.comm.getFilters($("#classCode"),'uncheck');
       return {
@@ -545,8 +544,7 @@
         list:newList,
         image:viewer.canvas2image().substr(22),
         filter:{
-          floors:floors,
-          specialty:specialty,
+          files:files,
           category:category,
           classCode:classCode
         }
@@ -560,8 +558,7 @@
       $.each(data.list,function(i,item){
         newList.push(JSON.parse(window.atob(item)));
       });
-      data.filter.floors.ids = data.filter.floors.ids.concat(data.filter.specialty.ids);
-      self.fileFilter(data.filter.floors);
+      self.fileFilter(data.filter.files);
       self.filter(data.filter.category);
       self.filter(data.filter.classCode,function(){});
       viewer.loadComments(newList);

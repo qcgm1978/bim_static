@@ -2807,10 +2807,10 @@ CLOUD.Extensions.MarkerEditor.prototype.enableSVGPaint = function (enable) {
 
     if (enable) {
 
-        this.svg.setAttribute("pointer-events", "painted");
+        this.svg && this.svg.setAttribute("pointer-events", "painted");
     } else {
 
-        this.svg.setAttribute("pointer-events", "none");
+        this.svg && this.svg.setAttribute("pointer-events", "none");
     }
 
 };
@@ -3740,7 +3740,7 @@ CLOUD.Extensions.AnnotationCloud.prototype.setByPositions = function (positions,
     this.update();
 };
 
-CLOUD.Extensions.AnnotationCloud.prototype.set = function (position, size, rotation, viewport, shapePointsStr) {
+CLOUD.Extensions.AnnotationCloud.prototype.set = function (position, size, rotation, viewport, shapePointsStr, initialSize) {
 
     this.position.x = position.x;
     this.position.y = position.y;
@@ -3749,14 +3749,22 @@ CLOUD.Extensions.AnnotationCloud.prototype.set = function (position, size, rotat
     this.size.height = size.height;
     this.rotation = rotation || 0;
 
-    this.initialSize.width = (this.size.width === 0) ? 1 : this.size.width;
-    this.initialSize.height = (this.size.height === 0) ? 1 : this.size.height;
-
     if (viewport) {
         this.setViewport(viewport);
     }
 
     this.setShapePoints(shapePointsStr);
+
+    if (initialSize) {
+
+        this.initialSize.width = (initialSize.width === 0) ? 1 : initialSize.width;
+        this.initialSize.height = (initialSize.height === 0) ? 1 : initialSize.height;
+
+    } else {
+
+        this.initialSize.width = (this.size.width === 0) ? 1 : this.size.width;
+        this.initialSize.height = (this.size.height === 0) ? 1 : this.size.height;
+    }
 
     this.update();
 };
@@ -3784,7 +3792,7 @@ CLOUD.Extensions.AnnotationCloud.prototype.update = function () {
 
     var position = this.getClientPosition();
     var size = this.getClientSize();
-    var scaleX = size.width / this.initialSize.width ;
+    var scaleX = size.width / this.initialSize.width;
     var scaleY = size.height / this.initialSize.height;
 
     this.transformShape = [
@@ -4115,9 +4123,13 @@ CLOUD.Extensions.AnnotationCloud.prototype.renderToCanvas = function (ctx) {
     ctx.lineWidth = strokeWidth;
 
     var position = this.getClientPosition();
+    var size = this.getClientSize();
+    var scaleX = size.width / this.initialSize.width;
+    var scaleY = size.height / this.initialSize.height;
 
     ctx.translate(position.x, position.y);
     ctx.rotate(this.rotation);
+    ctx.scale(scaleX, scaleY);
 
     drawCloud(ctx, this.shapePoints);
 
@@ -4363,6 +4375,7 @@ CLOUD.Extensions.AnnotationText.prototype.setText = function (text) {
     this.currText = text;
     this.currTextLines = this.calcTextLines();
     this.textDirty = true;
+    this.show();
     this.update();
 };
 
@@ -4456,6 +4469,21 @@ CLOUD.Extensions.AnnotationText.prototype.update = function (forceDirty) {
     this.backgroundRect.setAttribute('height', size.height);
     this.backgroundRect.setAttribute("stroke-width", '0');
     this.backgroundRect.setAttribute('fill', CLOUD.Extensions.Utils.Shape2D.getRGBAString(fillColor, fillOpacity));
+};
+
+CLOUD.Extensions.AnnotationText.prototype.show = function () {
+
+    if (this.shape.style.display !== "") {
+        this.shape.style.display = "";
+    }
+};
+
+CLOUD.Extensions.AnnotationText.prototype.hide = function () {
+
+    if (this.shape.style.display !== "none") {
+        this.shape.style.display = "none";
+    }
+
 };
 
 CLOUD.Extensions.AnnotationText.prototype.forceRedraw = function () {
@@ -5078,35 +5106,34 @@ CLOUD.Extensions.AnnotationFrame.prototype.onResizeMove = function (event) {
         y: mouse.y - origin.mouseY
     };
 
-    var vector = new THREE.Vector3(movement.x, movement.y, 0);
-    var undoRotation = new THREE.Matrix4().makeRotationZ(-this.selection.rotation);
-    movement = vector.applyMatrix4(undoRotation);
+    var vMovement = new THREE.Vector3(movement.x, movement.y, 0);
+    var matRotation = new THREE.Matrix4().makeRotationZ(-this.selection.rotation);
+    movement = vMovement.applyMatrix4(matRotation);
 
     var x = origin.x,
         y = origin.y,
         width = origin.width,
         height = origin.height;
 
-    var localSpaceDelta = new THREE.Vector3();
-
+    var translationDelta = new THREE.Vector3();
     var direction = this.selection.handle.resizingPanel.getAttribute('data-drag-point');
 
     var translations = {
         n: function () {
             height -= movement.y;
-            localSpaceDelta.y = movement.y;
+            translationDelta.y = movement.y;
         },
         s: function () {
             height += movement.y;
-            localSpaceDelta.y = movement.y;
+            translationDelta.y = movement.y;
         },
         w: function () {
             width -= movement.x;
-            localSpaceDelta.x = movement.x;
+            translationDelta.x = movement.x;
         },
         e: function () {
             width += movement.x;
-            localSpaceDelta.x = movement.x;
+            translationDelta.x = movement.x;
         },
         nw: function () {
             this.n();
@@ -5128,8 +5155,8 @@ CLOUD.Extensions.AnnotationFrame.prototype.onResizeMove = function (event) {
 
     translations[direction]();
 
-    var redoRotation = new THREE.Matrix4().makeRotationZ(this.selection.rotation);
-    var actualDelta = localSpaceDelta.applyMatrix4(redoRotation);
+    var matRedoRotation = new THREE.Matrix4().makeRotationZ(this.selection.rotation);
+    var actualDelta = translationDelta.applyMatrix4(matRedoRotation);
 
     var newPos = new THREE.Vector2(
         x + (actualDelta.x * 0.5),
@@ -6233,6 +6260,7 @@ CLOUD.Extensions.AnnotationEditor.prototype.mouseDoubleClickForText = function (
 
         if (this.selectedAnnotation && (this.selectedAnnotation.shapeType === CLOUD.Extensions.Annotation.shapeTypes.TEXT)) {
 
+            this.selectedAnnotation.hide();
             this.deselectAnnotation();
             this.annotationTextArea.active(annotation, false);
         }
@@ -6696,10 +6724,10 @@ CLOUD.Extensions.AnnotationEditor.prototype.enableSVGPaint = function (enable) {
 
     if (enable) {
 
-        this.svg.setAttribute("pointer-events", "painted");
+        this.svg && this.svg.setAttribute("pointer-events", "painted");
     } else {
 
-        this.svg.setAttribute("pointer-events", "none");
+        this.svg && this.svg.setAttribute("pointer-events", "none");
     }
 
 };
@@ -6785,8 +6813,10 @@ CLOUD.Extensions.AnnotationEditor.prototype.getAnnotationInfoList = function () 
         }
 
         var shapePoints = "";
+        var initialSize = null;
         if (annotation.shapeType === CLOUD.Extensions.Annotation.shapeTypes.CLOUD) {
             shapePoints = annotation.getShapePoints();
+            initialSize = annotation.initialSize;
         }
 
         var info = {
@@ -6797,6 +6827,7 @@ CLOUD.Extensions.AnnotationEditor.prototype.getAnnotationInfoList = function () 
             rotation: annotation.rotation,
             viewport: annotation.viewport,
             shapePoints: shapePoints,
+            initialSize:initialSize,
             text: text
         };
 
@@ -6834,6 +6865,7 @@ CLOUD.Extensions.AnnotationEditor.prototype.loadAnnotations = function (annotati
         var rotation = info.rotation;
         var viewport = info.viewport;
         var shapePointsStr = info.shapePoints;
+        var initialSize = info.initialSize;
         var text = decodeURIComponent(info.text); // 解码中文
         //var text = info.text; // 解码中文
 
@@ -6865,7 +6897,7 @@ CLOUD.Extensions.AnnotationEditor.prototype.loadAnnotations = function (annotati
                 break;
             case CLOUD.Extensions.Annotation.shapeTypes.CLOUD:
                 var cloud = new CLOUD.Extensions.AnnotationCloud(this, id);
-                cloud.set(position, size, rotation, viewport, shapePointsStr);
+                cloud.set(position, size, rotation, viewport, shapePointsStr, initialSize);
                 this.addAnnotation(cloud);
                 cloud.created();
                 break;

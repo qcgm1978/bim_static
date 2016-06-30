@@ -54,9 +54,10 @@
 			}
 		}
 
-
-		if (location.href.indexOf("resources")>-1) {
-			App.Project.Settings.Viewer=App.ResourceModel.Settings.Viewer;
+		if (location.href.indexOf("resources") > -1) {
+			App.Project.Settings.Viewer = App.ResourceModel.Settings.Viewer;
+			App.Project.Settings.projectId = App.ResourceModel.Settings.CurrentVersion.projectId;
+			App.Project.Settings.versionId = App.ResourceModel.Settings.CurrentVersion.id;
 		}
 
 		//分享 直接跳详情，遮掉项目
@@ -524,7 +525,7 @@
 							}
 
 							//创建者 可以 删除 分享 编辑
-							if (App.Global.User && App.Global.User.userId == createId &&  !App.Project.Settings.isShare) {
+							if (App.Global.User && App.Global.User.userId == createId && !App.Project.Settings.isShare) {
 								$("#shareViewPoint,#delViewPoint,#editViewPoint,#reName").show();
 							} else {
 								$("#shareViewPoint,#delViewPoint,#editViewPoint,#reName").hide();
@@ -627,7 +628,8 @@
 
 					this.$(".txtReMark").at({
 
-						getData: function(name) {
+						getData: function(name) { 
+
 							//返回数据源
 							var data = {
 								URLtype: "autoComplateUser",

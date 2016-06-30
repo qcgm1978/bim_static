@@ -147,7 +147,7 @@ App.Comm.TreeViewMar.prototype.treeNode = function(item) {
 	var dataItem=$.extend({},item);
 	delete dataItem.children;
 	var itemString=JSON.stringify(dataItem); 
-	sb.Append('<span class="text-field overflowEllipsis" data-id="'+item.id+'" data-file=\''+itemString+'\'>' + item.name + '</span> ');
+	sb.Append('<span class="text-field overflowEllipsis" data-id="'+item.id+'" data-file=\''+itemString+'\' title="'+item.name+'">' + item.name + '</span> ');
 
 	sb.Append('</div>');
 

@@ -32,15 +32,25 @@ App.Comm = {
 	},
 
 	isAuth:function(type,s){
-		var _subType=App.Project.Settings.CurrentVersion.subType,
-			_auth=App.AuthObj.project.prjfile,
-			_status=App.Project.Settings.CurrentVersion.status,
+
+		if (!App.AuthObj) {
+			return false;
+		}
+
+		var _subType,_auth,_status,
 			_temp='4,7,9';
 		if(s=='family'){
 			_auth=App.AuthObj.lib.family;
-		}
-		if(s=='model'){
+			_subType=App.ResourceModel.Settings.CurrentVersion.subType;
+			_status=App.ResourceModel.Settings.CurrentVersion.status;
+		}else if(s=='model'){
+			_subType=App.ResourceModel.Settings.CurrentVersion.subType;
+			_status=App.ResourceModel.Settings.CurrentVersion.status;
 			_auth=App.AuthObj.lib.model;
+		}else{
+			_subType=App.Project.Settings.CurrentVersion.subType;
+			_auth=App.AuthObj.project.prjfile;
+			_status=App.Project.Settings.CurrentVersion.status;
 		}
 		if(type=='create'){
 			if(_subType==1&&_auth.edit&&_temp.indexOf(_status)==-1){

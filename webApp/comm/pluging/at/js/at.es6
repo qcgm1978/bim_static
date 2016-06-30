@@ -145,7 +145,7 @@
                 index = count;
               }
               that.Settings.atList.find(".item").eq(index - 1).addClass("selected").siblings().removeClass("selected");
-               that.Settings.atList.scrollTop(that.Settings.atList.find(".selected").position().top);
+              that.Settings.atList.scrollTop(that.Settings.atList.find(".selected").position().top);
             }
 
             return false;
@@ -278,6 +278,11 @@
     //at list 位置
     at.prototype.atListPosition = function() {
 
+      //个人不可以
+      if ($(".commentList .navBar .user").hasClass("selected")) {
+        return;
+      }
+
       this.rePosition();
 
       //获取数据
@@ -298,9 +303,9 @@
 
         top = pos.top + this.Settings.atBox.offset().top - 60;
 
-          
+
       if (top + this.Settings.atList.height() > $("body").height()) {
-           top-=this.Settings.atList.height()+30;
+        top -= this.Settings.atList.height() + 30;
       }
 
       this.Settings.atList.css({
