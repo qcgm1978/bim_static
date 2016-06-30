@@ -61,10 +61,8 @@ App.Services.step1 = Backbone.View.extend({
     if($(e.target).hasClass('person') || $(e.target).hasClass('mulu') ){
       $p = $(e.target);
       target = 'p';
-
     }else{
       $p = $(e.target).parent();
-
       if($(e.target).hasClass('isspan')){
         target = 'span';
       }else{
@@ -76,24 +74,19 @@ App.Services.step1 = Backbone.View.extend({
     instep3 = this.$el.hasClass('step1in3');
     var func = function(isstep3){
       //是否需要加载子目录
-      var canLoad=$p.attr('data-canLoad');
-
-      var orgId=$p.attr('data-id');
-      if(orgId){
-        if($ul.hasClass('shut')){
-
+      var canLoad = $p.attr('data-canLoad');
+      var orgId = $p.attr('data-id');
+      if (orgId) {
+        if ($ul.hasClass('shut')) {
           $p.removeClass('shut').addClass('open');
-
-          if(canLoad=='true'){
+          if (canLoad == 'true') {
             $ul.removeClass('shut').addClass('open');
             $('.leftWindow').addClass("services_loading");
-
-            App.Comm.ajax({URLtype:'fetchServicesMemberInnerList',data:{parentId:orgId,includeUsers:true}},function(r){
+            App.Comm.ajax({URLtype:'fetchServicesMemberInnerList', data:{parentId:orgId, includeUsers:true}}, function(r){
               $('.leftWindow').removeClass("services_loading");
-
-              if(r && !r.code && r.data){
+              if (r && !r.code && r.data){
                 var str = '';
-                if(isstep3 != "isstep3"){
+                if (isstep3 != "isstep3") {
                   _.each(r.data.user,function(data){
                     data.canLoad = false;
                     //<%= data[i]['child'] && data[i]['child'][0]=='string'?'lastLayer':''%>
