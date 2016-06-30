@@ -2,73 +2,73 @@
     <%if (obj.checked) {%>
     <i class="RuleCheck"></i>
     <%}%>
-    <div class="right getDetail">œÍ«È</div>
-    <div class="desc"><%= (obj.mappingCategory.categoryCode ? ( "[" + obj.mappingCategory.categoryCode + "] &nbsp;") : '' ) +  (obj.mappingCategory.categoryName ? obj.mappingCategory.categoryName  : "–¬Ω®”≥…‰πÊ‘Ú") %></div>
+    <div class="right getDetail">ËØ¶ÊÉÖ</div>
+    <div class="desc"><%= (obj.mappingCategory.categoryCode ? ( "[" + obj.mappingCategory.categoryCode + "] &nbsp;") : '' ) +  (obj.mappingCategory.categoryName ? obj.mappingCategory.categoryName  : "Êñ∞Âª∫Êò†Â∞ÑËßÑÂàô") %></div>
 </div>
 <div class="ruleDetail">
     <div class="typeCode" data-code="<%= obj.mappingCategory.categoryCode %>" data-name="<%= obj.mappingCategory.categoryName %>">
-        <div class="title">∑÷¿‡±‡¬Î:</div>
+        <div class="title">ÂàÜÁ±ªÁºñÁ†Å:</div>
         <div class="conR">
             <div>
                 <div class="chide" data-code="<%= obj.mappingCategory.categoryCode %>"><span><%= '[' + mappingCategory.categoryCode +']'%></span>  <i><%= mappingCategory.categoryName %></i></div>
-                <input type="text" placeholder="«Î ‰»Î∑÷¿‡±‡¬Î" value="<%= obj.mappingCategory.categoryCode %>"  class="pdR60 categoryCode">
-                <span class="choose">—°‘Ò</span>
+                <input type="text" placeholder="ËØ∑ËæìÂÖ•ÂàÜÁ±ªÁºñÁ†Å" value="<%= obj.mappingCategory.categoryCode %>"  class="pdR60 categoryCode">
+                <span class="choose">ÈÄâÊã©</span>
             </div>
             <ul class="">
-            </ul><!--¡™œÎΩ”ø⁄£¨◊Ó∂‡œ‘ æ5Ãı-->
+            </ul><!--ËÅîÊÉ≥Êé•Âè£ÔºåÊúÄÂ§öÊòæÁ§∫5Êù°-->
         </div>
     </div>
     <div class="mapRule clearfix">
-        <div class="title"> Ù–‘”≥…‰πÊ‘Ú:</div>
+        <div class="title">Â±ûÊÄßÊò†Â∞ÑËßÑÂàô:</div>
         <div class="conR">
             <dl>
                 <% var list =obj.mappingCategory.mappingPropertyList ; for(var i = 0 ; i < list.length ; i++) { %>
                 <dd>
                     <div class="leftten">
                         <%  var type = list[i].operator,a1 = "==",a2 = "!=",a3 = "<>",a4 = "><";  %>
-                        <input type="text" placeholder="«Î ‰»Î Ù–‘√˚≥∆" value="<%= list[i].propertyKey %>"><div class="myDropDown" data-operator="<%= type %>">
+                        <input type="text" placeholder="ËØ∑ËæìÂÖ•Â±ûÊÄßÂêçÁß∞" value="<%= list[i].propertyKey %>"><div class="myDropDown" data-operator="<%= type %>">
                         <span class="myDropText">
-                            <span class="text"><%=   type == a1 ? "µ»”⁄" :  (type == a2 ? "≤ªµ»”⁄" :  (type == a3 ? "∑∂Œßƒ⁄" :  (type == a4 ? "∑∂ŒßÕ‚" : "«Î—°‘ÒπÊ‘Ú")))%></span>
+                            <span class="text"><%=   type == a1 ? "Á≠â‰∫é" :  (type == a2 ? "‰∏çÁ≠â‰∫é" :  (type == a3 ? "ËåÉÂõ¥ÂÜÖ" :  (type == a4 ? "ËåÉÂõ¥Â§ñ" : "ËØ∑ÈÄâÊã©ËßÑÂàô")))%></span>
                             <i class="myDropArrorw down"></i>
                         </span>
                         <ul class="myDropList">
-                            <li class="myItem" data-operator="==">µ»”⁄</li>
-                            <li class="myItem" data-operator="!=">≤ªµ»”⁄</li>
-                            <li class="myItem" data-operator="<>">∑∂Œßƒ⁄</li>
-                            <li class="myItem" data-operator="><">∑∂ŒßÕ‚</li>
+                            <li class="myItem" data-operator="==">Á≠â‰∫é</li>
+                            <li class="myItem" data-operator="!=">‰∏çÁ≠â‰∫é</li>
+                            <li class="myItem" data-operator="<>">ËåÉÂõ¥ÂÜÖ</li>
+                            <li class="myItem" data-operator="><">ËåÉÂõ¥Â§ñ</li>
                         </ul>
                     </div>
                     </div>
-                    <div class="eIn <%= (type == a1  || type == a2) ? 'active' : ''  %>"><input type="text" placeholder='«Î ‰»Î Ù–‘÷µ' value="<%= (type == a1  || type == a2) ? list[i].propertyValue :'' %>"></div><!--µ»”⁄/≤ªµ»”⁄-->
-                    <div class="ioside  <%= (type == a3 || type == a4) ? 'active' : ''  %>"><!--∑∂Œß ƒ⁄/Õ‚-->
+                    <div class="eIn <%= (type == a1  || type == a2) ? 'active' : ''  %>"><input type="text" placeholder='ËØ∑ËæìÂÖ•Â±ûÊÄßÂÄº' value="<%= (type == a1  || type == a2) ? list[i].propertyValue :'' %>"></div><!--Á≠â‰∫é/‰∏çÁ≠â‰∫é-->
+                    <div class="ioside  <%= (type == a3 || type == a4) ? 'active' : ''  %>"><!--ËåÉÂõ¥ ÂÜÖ/Â§ñ-->
                         <div class="myDropDown" data-operator="(">
                         <span class="myDropText">
-                            <span class="text"><%= list[i].ruleList.left=='(' ? '>' : (list[i].ruleList.left=='[' ? "°›" : '>') %></span>
+                            <span class="text"><%= list[i].ruleList.left=='(' ? '>' : (list[i].ruleList.left=='[' ? "‚â•" : '>') %></span>
                             <i class="myDropArrorw down"></i>
-                        </span><input type="number" placeholder="«Î ‰»Î ˝÷µ"   class="leftValue" value="<%= list[i].ruleList.leftValue %>">
+                        </span><input type="number" placeholder="ËØ∑ËæìÂÖ•Êï∞ÂÄº"   class="leftValue" value="<%= list[i].ruleList.leftValue %>">
                             <ul class="myDropList">
                                 <li class="myItem" data-operator="("> > </li>
-                                <li class="myItem" data-operator="["> °› </li>
+                                <li class="myItem" data-operator="["> ‚â• </li>
                             </ul>
                         </div><div class="myDropDown " data-operator=")">
                         <span class="myDropText">
-                            <span class="text"><%= list[i].ruleList.right==')' ? '<' : (list[i].ruleList.right==']' ? "°‹" : '<') %></span>
+                            <span class="text"><%= list[i].ruleList.right==')' ? '<' : (list[i].ruleList.right==']' ? "‚â§" : '<') %></span>
                             <i class="myDropArrorw down"></i>
-                        </span><input type="number" placeholder="«Î ‰»Î ˝÷µ" class="rightValue last" value="<%= list[i].ruleList.rightValue %>">
+                        </span><input type="number" placeholder="ËØ∑ËæìÂÖ•Êï∞ÂÄº" class="rightValue last" value="<%= list[i].ruleList.rightValue %>">
                             <ul class="myDropList">
                                 <li class="myItem" data-operator=")"> < </li>
-                                <li class="myItem" data-operator="]"> °‹ </li>
+                                <li class="myItem" data-operator="]"> ‚â§ </li>
                             </ul>
                         </div>
                     </div><i class="delRule"></i>
                 </dd>
                 <% }%>
             </dl>
-            <div class="clear"><span class="addNewRule">–¬‘ˆ Ù–‘</span></div>
+            <div class="clear"><span class="addNewRule">Êñ∞Â¢ûÂ±ûÊÄß</span></div>
         </div>
         <div class="controlRule">
-            <div class="saveRule mgR10">±£¥Ê</div>
-            <div class="deleteRule">…æ≥˝</div>
+            <div class="saveRule mgR10">‰øùÂ≠ò</div>
+            <div class="deleteRule">Âà†Èô§</div>
         </div>
     </div>
 </div>

@@ -21,28 +21,28 @@ App.Resources.ArtifactsTplListItem = Backbone.View.extend({
         this.listenTo(this.model,"remove",this.render);
         Backbone.on("resourcesChangeMappingRuleModelName",this.changeName,this);
     },
-    //ĞŞ¸ÄÄ£°åÃû³ÆÊ±ĞŞ¸ÄÃû×Ö
+    //ä¿®æ”¹æ¨¡æ¿åç§°æ—¶ä¿®æ”¹åå­—
     changeName:function(){
         if(this.$(".item").attr("data-id") == App.ResourceArtifacts.Status.templateId){
             this.$(".item div").text(App.ResourceArtifacts.Status.templateName);
             this.model.set("name",App.ResourceArtifacts.Status.templateName)
         }
     },
-    //È¡µÃÄ£°å
+    //å–å¾—æ¨¡æ¿
     getTpl:function(){
         var Auth = App.AuthObj.lib;
         if(App.ResourceArtifacts.modelEdit){
-            alert("±à¼­×´Ì¬²»ÄÜÇĞ»»Ä£°å");
+            alert("ç¼–è¾‘çŠ¶æ€ä¸èƒ½åˆ‡æ¢æ¨¡æ¿");
             return;
         }
         var _this = this;
-        App.ResourceArtifacts.Status.templateId = this.model.get("id");//±£´æid
-        App.ResourceArtifacts.Status.templateName = this.model.get("name");//±£´æname
-        App.ResourceArtifacts.resetModelRuleSaveData();//ÖØÖÃÒª±£´æµÄÊı¾İ
+        App.ResourceArtifacts.Status.templateId = this.model.get("id");//ä¿å­˜id
+        App.ResourceArtifacts.Status.templateName = this.model.get("name");//ä¿å­˜name
+        App.ResourceArtifacts.resetModelRuleSaveData();//é‡ç½®è¦ä¿å­˜çš„æ•°æ®
         this.toggleClass();
-        //±£´æ×´Ì¬
+        //ä¿å­˜çŠ¶æ€
         if(!App.ResourceArtifacts.Status.saved){
-            alert("Äú»¹ÓĞÃ»±£´æµÄ");
+            alert("æ‚¨è¿˜æœ‰æ²¡ä¿å­˜çš„");
             return
         }
 
@@ -61,7 +61,7 @@ App.Resources.ArtifactsTplListItem = Backbone.View.extend({
             Backbone.trigger("mappingRuleModelLoadContent",this.model.get("name"));
         }
     },
-    //ÇĞ»»
+    //åˆ‡æ¢
     toggleClass:function(){
         $(".tplCon li").removeClass("active");
         this.$el.addClass("active");

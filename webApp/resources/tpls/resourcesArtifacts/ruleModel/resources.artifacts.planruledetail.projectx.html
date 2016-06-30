@@ -3,22 +3,22 @@
     <%if (obj.checked) {%>
     <i class="RuleCheck"></i>
     <%}%>
-    <div class="right getDetail">œÍ«È</div>
-    <div class="desc"><%= (obj.mappingCategory.categoryCode ? ( "[" + obj.mappingCategory.categoryCode + "] &nbsp;") : '' ) +  (obj.mappingCategory.categoryName ? obj.mappingCategory.categoryName  : "–¬Ω®”≥…‰πÊ‘Ú") %></div>
+    <div class="right getDetail">ËØ¶ÊÉÖ</div>
+    <div class="desc"><%= (obj.mappingCategory.categoryCode ? ( "[" + obj.mappingCategory.categoryCode + "] &nbsp;") : '' ) +  (obj.mappingCategory.categoryName ? obj.mappingCategory.categoryName  : "Êñ∞Âª∫Êò†Â∞ÑËßÑÂàô") %></div>
 </div>
 <div class="ruleDetail modelRelate">
     <div class="typeCode" data-code="<%= obj.mappingCategory.categoryCode %>" data-name="<%= obj.mappingCategory.categoryName %>">
-        <div class="title">∑÷¿‡±‡¬Î:</div>
+        <div class="title">ÂàÜÁ±ªÁºñÁ†Å:</div>
         <div class="conR">
             <div>
                 <%= '[' + mappingCategory.categoryCode +']'%> <%= mappingCategory.categoryName %>
             </div>
             <ul>
-            </ul><!--¡™œÎΩ”ø⁄£¨◊Ó∂‡œ‘ æ5Ãı-->
+            </ul><!--ËÅîÊÉ≥Êé•Âè£ÔºåÊúÄÂ§öÊòæÁ§∫5Êù°-->
         </div>
     </div>
     <div class="mapRule clearfix">
-        <div class="title"> Ù–‘”≥…‰πÊ‘Ú:</div>
+        <div class="title">Â±ûÊÄßÊò†Â∞ÑËßÑÂàô:</div>
         <div class="conR">
             <dl>
                 <% var list =obj.mappingCategory.mappingPropertyList ; for(var i = 0 ; i < list.length ; i++) { %>
@@ -26,12 +26,12 @@
                     <div class="leftten" data-id="<%= obj.id %>" data-name="">
                        <%  var type = list[i].operator,a1 = "==",a2 = "!=",a3 = "<>",a4 = "><";  %>
                         <%= '"' + list[i].propertyKey + '"'%>
-                        <span><%=   type == a1 ? "µ»”⁄£∫" :  (type == a2 ? "≤ªµ»”⁄£∫" :  (type == a3 ? "‘⁄»Áœ¬∑∂Œßƒ⁄£∫" :  (type == a4 ? "‘⁄»Áœ¬∑∂ŒßÕ‚£∫" : "")))%></span>
+                        <span><%=   type == a1 ? "Á≠â‰∫éÔºö" :  (type == a2 ? "‰∏çÁ≠â‰∫éÔºö" :  (type == a3 ? "Âú®Â¶Ç‰∏ãËåÉÂõ¥ÂÜÖÔºö" :  (type == a4 ? "Âú®Â¶Ç‰∏ãËåÉÂõ¥Â§ñÔºö" : "")))%></span>
                     </div>
-                    <div class="eIn <%= (type == a1  || type == a2) ? 'active' : ''  %>"><%= '"' + list[i].propertyValue +'"' %></div><!--µ»”⁄/≤ªµ»”⁄-->
-                    <div class="ioside  <%= (type == a3 || type == a4) ? 'active' : ''  %>"><!--∑∂Œß ƒ⁄/Õ‚-->
-                        <i>"</i><%= list[i].ruleList.left=='(' ? '>' : (list[i].ruleList.left=='[' ? '°›' : '>') %><%= list[i].ruleList.leftValue %><i>"</i>
-                        <i>"</i><%=  list[i].ruleList.right==')' ? '<' : (list[i].ruleList.right==']' ? '°‹' : '<') %><%= list[i].ruleList.rightValue  %><i>"</i>
+                    <div class="eIn <%= (type == a1  || type == a2) ? 'active' : ''  %>"><%= '"' + list[i].propertyValue +'"' %></div><!--Á≠â‰∫é/‰∏çÁ≠â‰∫é-->
+                    <div class="ioside  <%= (type == a3 || type == a4) ? 'active' : ''  %>"><!--ËåÉÂõ¥ ÂÜÖ/Â§ñ-->
+                        <i>"</i><%= list[i].ruleList.left=='(' ? '>' : (list[i].ruleList.left=='[' ? '‚â•' : '>') %><%= list[i].ruleList.leftValue %><i>"</i>
+                        <i>"</i><%=  list[i].ruleList.right==')' ? '<' : (list[i].ruleList.right==']' ? '‚â§' : '<') %><%= list[i].ruleList.rightValue  %><i>"</i>
                     </div>
                 </dd>
                 <% }%>

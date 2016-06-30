@@ -51,6 +51,7 @@ App.Services.roleDetail=Backbone.View.extend({
             if(fn && typeof  fn == "function"){
                 fn()
             }
+            $(App.Services.maskWindow.element[0]).removeClass("services_loading")
         });
     },
 
@@ -81,7 +82,7 @@ App.Services.roleDetail=Backbone.View.extend({
         });
         $(".mod-dialog").css({"min-height": "545px"});
         $(".mod-dialog .wrapper .content").css({"min-height": "500px"});
-
+        $(App.Services.maskWindow.element[0]).addClass("services_loading")
     },
 
     //删除角色
@@ -91,7 +92,7 @@ App.Services.roleDetail=Backbone.View.extend({
         App.Services.alertWindow = new App.Comm.modules.Dialog({
             title: "",
             width: 280,
-            height: 180,
+            height: 150,
             isConfirm: false,
             isAlert: false,
             message: frame

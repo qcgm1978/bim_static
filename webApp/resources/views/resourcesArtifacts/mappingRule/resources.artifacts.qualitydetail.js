@@ -64,12 +64,12 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
         var leaf = this.model.get("leaf");
         var _this = this.$el.closest("li");
         ele.removeClass("half");
-        //·ÇÒ¶×Ó½Úµã£¬¼ÓÔØ
+        //éå¶å­èŠ‚ç‚¹ï¼ŒåŠ è½½
         if(!leaf && !this.$el.siblings(".childList").html()){
             this.loadNextTree();
         }
 
-        //´æ´¢Ä£ĞÍ
+        //å­˜å‚¨æ¨¡å‹
         var model = JSON.parse(this.$el.closest("li").attr("data-model")),already;
         var modelSaving = App.ResourceArtifacts.modelSaving.codeIds;
         var n = "string";
@@ -83,10 +83,10 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
         if(ele.hasClass("all")){
             ele.removeClass("all").removeClass("half");
             _this.attr("data-check","2");
-            //È¡ÏûËùÓĞÉÏ¼¶²Ëµ¥
+            //å–æ¶ˆæ‰€æœ‰ä¸Šçº§èœå•
             this.changeFatherStatus("cancel");
             if(leaf){
-                //°üº¬ÏÖÓĞ
+                //åŒ…å«ç°æœ‰
                 if(n=="string"){
                     model.ruleIds = [];
                     App.ResourceArtifacts.modelSaving.codeIds.push(App.ResourceArtifacts.getValid(model));
@@ -97,7 +97,7 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
                     Backbone.trigger("modelRuleSelectNone");
                 }
             }else{
-                //ÒÆ³ıËùÓĞÏÂ¼¶²Ëµ¥
+                //ç§»é™¤æ‰€æœ‰ä¸‹çº§èœå•
                 if(this.$el.siblings(".childList").find("li").length) {
                     _.each(this.$el.siblings(".childList").find("li"),function (item) {
 
@@ -114,22 +114,22 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
         }else{
             ele.addClass("all").removeClass("half");
             _this.attr("data-check","1");
-            //Ñ¡ÔñÌî³äÉÏ¼¶²Ëµ¥
+            //é€‰æ‹©å¡«å……ä¸Šçº§èœå•
             this.changeFatherStatus("check");
 
             if(leaf){
-                //°üº¬ÏÖÓĞ
+                //åŒ…å«ç°æœ‰
                 if(n=="string"){
                     App.ResourceArtifacts.modelSaving.codeIds.push(App.ResourceArtifacts.getValid(model));
                 }else{
                     App.ResourceArtifacts.modelSaving.codeIds[n].ruleIds = App.ResourceArtifacts.getValid(model).ruleIds
                 }
-                //²Ù×÷ÓÒ²àÈ«Ñ¡
+                //æ“ä½œå³ä¾§å…¨é€‰
                 if(this.model.get("code") == App.ResourceArtifacts.Status.rule.targetCode){
                     Backbone.trigger("modelRuleSelectAll");
                 }
             }else{
-                //Ìí¼ÓËùÓĞÏÂ¼¶²Ëµ¥
+                //æ·»åŠ æ‰€æœ‰ä¸‹çº§èœå•
                 if(this.$el.siblings(".childList").find("li").length) {
                     _.each(this.$el.siblings(".childList").find("li"),function(item){
                         if($(item).attr("data-code") == App.ResourceArtifacts.Status.rule.targetCode && $(item).attr("data-check") != "1"){
@@ -147,7 +147,7 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
         }
     },
 
-    //ĞŞÕı¸¸Ïî×´Ì¬
+    //ä¿®æ­£çˆ¶é¡¹çŠ¶æ€
     changeFatherStatus:function(status){
         var _this = this.$el.closest("li");
         var siblings = _this.siblings("li");
@@ -158,7 +158,7 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
         var val = status == "check" ? "2" : "1";
         var pre,grPre,data,fatherData;
 
-        if(siblings.length){//¶à¸öÔªËØ
+        if(siblings.length){//å¤šä¸ªå…ƒç´ 
             data = _.filter(siblings,function(item){
                 var s = $(item).attr("data-check");
                 if(s == "3"){ s = "2";}
@@ -166,7 +166,7 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
             });
         }
         if(fatherSiblings.length){
-            //²éÕÒ¸¸¼¶Í¬ÀàÊÇ·ñÓĞÑ¡
+            //æŸ¥æ‰¾çˆ¶çº§åŒç±»æ˜¯å¦æœ‰é€‰
             fatherData  =  _.filter(fatherSiblings,function(item){
                 var s = $(item).attr("data-check");
                 if(s == "3"){ s = "2";}
@@ -233,7 +233,7 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
             }
         }
     },
-    //ÎªÄ£°å-±£´æÊı¾İ
+    //ä¸ºæ¨¡æ¿-ä¿å­˜æ•°æ®
     checkControl:function(judge){
         var _this = this,data;
         var type = this.model.get("type") ;
@@ -245,7 +245,7 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
         var allNode = _.filter(data,function(item){
             return item["parentCode"] == _this.model.get("code")
         });
-        //´æÔÚÒ¶×Ó½Úµã
+        //å­˜åœ¨å¶å­èŠ‚ç‚¹
         var isLeaf = _.filter(allNode,function(item){
             return item.leaf
         });
@@ -267,7 +267,7 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
                 App.ResourceArtifacts.modelSaving.codeIds.push(App.ResourceArtifacts.getValid(model));
             });
         }
-        //´æÔÚÊ÷Ö¦½Úµã
+        //å­˜åœ¨æ ‘æèŠ‚ç‚¹
         var isNotLeaf = _.filter(allNode,function(item){
             return !item.leaf
         });
@@ -294,7 +294,7 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
             })
         }
     },
-    //²éÕÒËù¸øÔªËØµÄcheckÔªËØ
+    //æŸ¥æ‰¾æ‰€ç»™å…ƒç´ çš„checkå…ƒç´ 
     searchSelf:function(ele){
         var childList = ele.find(".childList");
         var pre = _.filter(childList,function(item){
@@ -302,7 +302,7 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
         });
         return   $(pre).eq(0).siblings(".title").find(".ruleCheck");
     },
-    //ÊıÁ¿¸ü¸ÄÊ±µÄ²Ù×÷
+    //æ•°é‡æ›´æ”¹æ—¶çš„æ“ä½œ
     changeCount:function(){
         var count = App.ResourceArtifacts.Status.rule.count;
         if(this.model.get("code") ==App.ResourceArtifacts.Status.rule.targetCode ){
@@ -310,23 +310,23 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
             this.$(".count").text("("+ count + ")");
         }
     },
-    //È¡µÃ¹æÔòÁĞ±í
+    //å–å¾—è§„åˆ™åˆ—è¡¨
     getDetail:function(e){
         this.$(".fold").addClass("active");
         var hasCon =  this.$(".item").closest(".title").siblings(".childList:hidden");
         if(hasCon.length && hasCon.html()){
-            hasCon.show();//ÏÔÊ¾ÁĞ±í
+            hasCon.show();//æ˜¾ç¤ºåˆ—è¡¨
             return
         }
         var innerCon =  this.$(".item").closest(".title").siblings(".childList:visible");
         if(innerCon.html()){
-            innerCon.hide();//Òş²ØÁĞ±í
+            innerCon.hide();//éšè—åˆ—è¡¨
             this.$(".fold").removeClass("active");
             return
         }
         var item = $(e.target);
        /* if(!App.ResourceArtifacts.Status.saved){
-            alert("Äú»¹ÓĞÃ»±£´æµÄ");
+            alert("æ‚¨è¿˜æœ‰æ²¡ä¿å­˜çš„");
             return
         }*/
         if(this.model.get("leaf")){
@@ -335,12 +335,12 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
             this.loadNextTree();
         }
     },
-    //ÇĞ»»¼Æ»®
+    //åˆ‡æ¢è®¡åˆ’
     toggleClass:function(item){
         $(".item").removeClass("active");
         item.closest(".item").addClass("active");
     },
-    //¼ÓÔØ×ÓÊ÷
+    //åŠ è½½å­æ ‘
     loadNextTree:function(){
         var children,data;
         var _this = this,n = this.$el.closest("li").attr("data-check");
@@ -355,7 +355,7 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
         }
 
         if(!this.model.get("leaf")){
-            //´æÔÚ£¬¼ÓÔØ¶ş¼¶»òÈı¼¶±ê×¼
+            //å­˜åœ¨ï¼ŒåŠ è½½äºŒçº§æˆ–ä¸‰çº§æ ‡å‡†
             children =  _.filter(data,function(item){
                 return item.parentCode == parentCode;
             });
@@ -364,9 +364,9 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
         }
     },
 
-    //»ñÈ¡ÖÊÁ¿±ê×¼Ïà¹Ø¹æÔò
+    //è·å–è´¨é‡æ ‡å‡†ç›¸å…³è§„åˆ™
     getRules:function(event) {
-        Backbone.trigger("resetRule");//ÖØÖÃÓÒ²à¹æÔò
+        Backbone.trigger("resetRule");//é‡ç½®å³ä¾§è§„åˆ™
         if(!App.ResourceArtifacts.Status.saved){
             return
         }
@@ -380,7 +380,7 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
         App.ResourceArtifacts.Status.rule.count = this.model.get("count");
 
         this.toggleClass(event);
-        //Ë¢ĞÂÓÒÃæÊÓÍ¼
+        //åˆ·æ–°å³é¢è§†å›¾
         var code = App.ResourceArtifacts.Status.rule.targetCode;
         pdata = {
             URLtype: "fetchArtifactsPlanRule",

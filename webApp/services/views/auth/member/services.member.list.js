@@ -24,16 +24,24 @@ App.Services.MemberList=Backbone.View.extend({
         this.listenTo(App.Services.Member.outerCollection,"add",this.addOne);
         this.listenTo(App.Services.Member.outerCollection,"reset",this.render);
         Backbone.on("servicesMemberControlCancelSelectAll",this.cancelSelectAll,this);
+        Backbone.on("servicesMemberControlNoSelect",this.servicesMemberControlNoSelect,this);
     },
+    servicesMemberControlNoSelect:function(){
+        this.$("#blendList").html("<li><span class='sele'>没有选择任何组织，请点击左侧组织名选择</span></li>");
+    },
+
     //数据加载
     addOne:function(model){
-        var newView = new App.Services.memberDetail({model:model});
-        this.$("#blendList").append(newView.render().el);
-        App.Comm.initScroll(this.$el.find(".readyForScroll"),"y");
+        if(App.Services.Member.memLoadingStatus){
+            var newView = new App.Services.memberDetail({model:model});
+            this.$("#blendList").append(newView.render().el);
+            App.Comm.initScroll(this.$el.find(".readyForScroll"),"y");
+        }
     },
 
     cancelSelectAll:function(){
         this.$(".selectAll input").attr("checked",false);
+        this.$("#blendList").html("<li><span class='sele'>暂无数据</span></li>");
     },
 
     //选中事件
@@ -96,7 +104,7 @@ App.Services.MemberList=Backbone.View.extend({
             App.Services.Member.loadData(App.Services.Member.SubRoleCollection,{},function(response){
                 seleUser[0].set("namePath",App.Services.memOz);
                 $(".seWinBody .aim ul").append(new App.Services.MemberWindowDetail({model:seleUser[0]}).render().el);
-                $(".serviceBody .content").removeClass("services_loading");
+                $(App.Services.maskWindow.element[0]).removeClass("services_loading");
                 var role = singleModel.get("role");
                 if(role && role.length) {
                     App.Services.maskWindow.find(".memRoleList h2 i").text(role.length);
@@ -137,7 +145,7 @@ App.Services.MemberList=Backbone.View.extend({
         //无父项时获取缺省角色列表，此处为可能出错
         if(!parentId){
             App.Services.Member.loadData(App.Services.Member.SubRoleCollection,{},function(response){
-                $(".serviceBody .content").removeClass("services_loading");
+                $(App.Services.maskWindow.element[0]).removeClass("services_loading");
             });
             return
         }
@@ -153,7 +161,7 @@ App.Services.MemberList=Backbone.View.extend({
         App.Comm.ajax(cdata,function(response){
             if(response.message=="success"){
                 if(!response.data.length){
-                    $(".serviceBody .content").removeClass("services_loading");
+                    $(App.Services.maskWindow.element[0]).removeClass("services_loading");
                     return;}
 
                 var role = response.data;
@@ -163,7 +171,7 @@ App.Services.MemberList=Backbone.View.extend({
                     App.Services.maskWindow.find(".memRoleList h2 i").text(role.length);
                 }
 
-                $(".serviceBody .content").removeClass("services_loading");
+                $(App.Services.maskWindow.element[0]).removeClass("services_loading");
             }
         });
     },
@@ -233,7 +241,7 @@ App.Services.MemberList=Backbone.View.extend({
         $(".mod-dialog .wrapper .content").css({"min-height": "500px"});
 
         $(".memRoleList").append(new App.Services.windowRoleList().render().el);//角色列表框架
-        $(".serviceBody .content").addClass("services_loading");//状态
+        $(App.Services.maskWindow.element[0]).addClass("services_loading");//状态
     },
     //排序
     comparator:function(){}

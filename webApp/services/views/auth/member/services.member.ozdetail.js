@@ -16,7 +16,9 @@ App.Services.MemberozDetail=Backbone.View.extend({
     },
 
     initialize:function(){
-        this.listenTo(this.model,"change:active",this.sele)
+        this.listenTo(this.model,"change:active",this.sele);
+        Backbone.on("serviceMemberOrgLoad",this.unfold,this);
+        Backbone.on("serviceMemberSelectStatus",this.serviceMemberSelectStatus,this)
     },
 
     sele:function(){
@@ -26,44 +28,65 @@ App.Services.MemberozDetail=Backbone.View.extend({
         }
     },
 
-    unfold:function(){
-
-        var _this =  this,container = this.$el.siblings(".childOz");
-        //如果是快速点击，属于误操作，跳过
-        if(!App.Services.queue.permit){return;}
-        if(App.Services.queue.que > 2 ){ return}
-
-        //选择和加载状态
-        if(this.$(".ozName span").hasClass("active")){  //已选（必然已加载），收起
-            if(App.Services.queue.que.length){return}
-            this.$(".ozName").removeClass("active").find("span").removeClass("active");
-            App.Services.queue.certificates();
-            //清空右侧列表
-            $("#blendList").html("<li><span class='sele'>没有选择任何组织，请点击左侧组织名选择</span></li>");
-            container.hide();
-            return
+    serviceMemberSelectStatus:function(){
+        this.$(".ozName span").removeClass("active");//清除内部所有的激活的元素
+        if(!this.model.get("hasChildren")){
+            this.$(".ozName").removeClass("active");
         }
-        if(container.html()){   //未选但已加载，选择，显示已加载项
-            if(!container.is(":hidden")){
-                container.find(".childOz").hide();
-                $(".ozName").removeClass("active").find("span").removeClass("active");
-                $("#blendList").html("<li><span class='sele'>没有选择任何组织，请点击左侧组织名选择</span></li>");
+    },
+
+    unfold:function(pram){
+        if(pram == this.$(".ozName").attr("data-id") || typeof pram == "object"){//为右侧触发，参数为父级id
+
+            var _this =  this,container = this.$el.siblings(".childOz");
+
+            if(typeof pram == "object") {
+                //如果是快速点击，属于误操作，跳过
+                if (!App.Services.queue.permit) {
+                    return;
+                }
+                if (App.Services.queue.que > 2) {
+                    return
+                }
+            }
+            //选择和加载状态
+            if (this.$(".ozName span").hasClass("active")) {  //已选（必然已加载），收起
+                if (App.Services.queue.que.length) {
+                    return
+                }
+                this.$(".ozName").removeClass("active").find("span").removeClass("active");
+                App.Services.queue.certificates();
+                //清空右侧列表
+                Backbone.trigger("servicesMemberControlNoSelect");
                 container.hide();
-                return}
-            $(".outer span").removeClass("active");
-            $(".inner span").removeClass("active");
-            $(".ozName span").removeClass("active");//清除内部所有的激活的元素
-            container.find(".childOz").hide();
-            this.$el.find(".ozName").addClass("active").find("span").addClass("active");
-            container.show();
-        }else{ //未加载 ，移除所有加载项再选择和显示
-            $(".ozName span").removeClass("active");
-            $(".outer span").removeClass("active");
-            $(".inner span").removeClass("active");
-            this.$(".ozName").addClass("active").find("span").addClass("active");
-            container.show();
+                return;
+            }else if (container.html()) {   //未选但已加载，选择，显示已加载项
+                if (!container.is(":hidden")) {
+                    container.find(".childOz").hide();
+                    var preOrg = _.filter($(".ozName span"), function (item) {
+                        return _this.model.get("orgId") == $(item).attr("data-id")
+                    });
+                    $(preOrg[0]).closest(".ozName").removeClass("active");
+                    this.$(".ozName").removeClass("active");
+                    container.find(".ozName").removeClass("active");
+                    container.find(".ozName span").removeClass("active");
+                    Backbone.trigger("servicesMemberControlNoSelect");
+                    container.hide();
+                    return;
+                }
+                Backbone.trigger("serviceMemberTopSelectStatus");
+                Backbone.trigger("serviceMemberSelectStatus");//清除内部所有的激活的元素
+                this.$(".ozName").addClass("active").find("span").addClass("active");
+                container.find(".childOz").hide();
+                container.show();
+            } else { //未加载 ，移除所有加载项再选择和显示
+                Backbone.trigger("serviceMemberTopSelectStatus");
+                Backbone.trigger("serviceMemberSelectStatus");
+                this.$(".ozName").addClass("active").find("span").addClass("active");
+                container.show();
+            }
+            App.Services.queue.promise(_this.pull, _this);
         }
-        App.Services.queue.promise(_this.pull,_this);
     },
 
     //队列请求
@@ -90,10 +113,10 @@ App.Services.MemberozDetail=Backbone.View.extend({
 
             $(".serviceBody .content").removeClass("services_loading");
             if(!response.data.org.length && !response.data.user.length ){
-                $("#blendList").html("<li><span class='sele'>暂无数据</span></li>");
                 Backbone.trigger("servicesMemberControlCancelSelectAll");
                 return
             }
+            App.Services.Member.memLoadingStatus = true;
             collection.reset();
             if(response.data.user && response.data.user.length){
                 collection.add(response.data.user);
@@ -103,6 +126,7 @@ App.Services.MemberozDetail=Backbone.View.extend({
                 if(alreadyMenu.html()){return}//判断不再刷新菜单
                 alreadyMenu.html(App.Services.tree(response));
             }
+            App.Services.Member.memLoadingStatus = false;
         }).done(function(){
             //删除执行完毕的 ，添加执行新的
              App.Services.queue.next();

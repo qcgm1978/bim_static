@@ -42,11 +42,11 @@ App.Resources.ArtifactsTplDetail = Backbone.View.extend({
             isAlert: false,
             message: frame.render().el
         });
-        $(".mod-dialog .wrapper .header").hide();//Òş²ØÍ·²¿
-        frame.$(".alertInfo").html('È·ÈÏÉ¾³ı ¡°'+ App.ResourceArtifacts.Status.templateName   +' "?');
+        $(".mod-dialog .wrapper .header").hide();//éšè—å¤´éƒ¨
+        frame.$(".alertInfo").html('ç¡®è®¤åˆ é™¤ â€œ'+ App.ResourceArtifacts.Status.templateName   +' "?');
     },
 
-//±à¼­
+//ç¼–è¾‘
     edit:function() {
         this.$(".tplDetailInfo").hide();
         this.$(".tplDetailEdit").show();
@@ -54,17 +54,17 @@ App.Resources.ArtifactsTplDetail = Backbone.View.extend({
         Backbone.trigger("checkedChange");
     },
 
-    //µ±Ä£°åÎª¿ÕÊ±´¥·¢
+    //å½“æ¨¡æ¿ä¸ºç©ºæ—¶è§¦å‘
     reset:function(){
         this.$(".tplDetailInfo h2").empty();
     },
 
-    //±£´æ
+    //ä¿å­˜
     resourcesSure:function(){
         var _this = this;
 
         var modelSaving = App.ResourceArtifacts.modelSaving;
-        //Èç¹û²»´æÔÚÄ£°åidÔòÎŞ·¨±£´æ
+        //å¦‚æœä¸å­˜åœ¨æ¨¡æ¿idåˆ™æ— æ³•ä¿å­˜
         if(!App.ResourceArtifacts.Status.templateId){
             return
         }
@@ -74,7 +74,7 @@ App.Resources.ArtifactsTplDetail = Backbone.View.extend({
 
         console.log(App.ResourceArtifacts.modelSaving);
 
-        //Òª²éÕÒÁ½¼¶¿´ÊÇ·ñÊÇÒ¶×Ó½ÚµãÖ±½Ó¹ıÂË¼´¿É£¬ÎŞĞè²éÕÒ
+        //è¦æŸ¥æ‰¾ä¸¤çº§çœ‹æ˜¯å¦æ˜¯å¶å­èŠ‚ç‚¹ç›´æ¥è¿‡æ»¤å³å¯ï¼Œæ— éœ€æŸ¥æ‰¾
         var pdata = {
             URLtype: "saveArtifactsTemplateRule",
             type:"PUT",
@@ -85,7 +85,7 @@ App.Resources.ArtifactsTplDetail = Backbone.View.extend({
         App.Comm.ajax(pdata,function(response){
             console.log(response);
             if(response.code == 0 ){
-                //¸ü¸ÄÄ£°åÃû³Æ
+                //æ›´æ”¹æ¨¡æ¿åç§°
                 _this.$(".tplDetailTitle h2").text(App.ResourceArtifacts.Status.templateName);
 
                 Backbone.trigger("resourcesChangeMappingRuleModelName");
@@ -99,13 +99,13 @@ App.Resources.ArtifactsTplDetail = Backbone.View.extend({
                 App.ResourceArtifacts.modelEdit = false
 
             }else{
-            //Ìá½»Ê§°Ü
-            alert("Ìá½»Ê§°Ü");
+            //æäº¤å¤±è´¥
+            alert("æäº¤å¤±è´¥");
         }
             App.ResourceArtifacts.loaded($(".modelContent"));
         });
     },
-    //È¡Ïû
+    //å–æ¶ˆ
     resourcesCancel:function(){
         this.$(".tplDetailInfo").show();
         this.$(".tplDetailEdit").hide();
