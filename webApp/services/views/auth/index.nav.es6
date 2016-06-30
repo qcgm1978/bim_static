@@ -65,7 +65,6 @@ App.Services.AuthNav = Backbone.View.extend({
 		});
 	},
 	projectMember : function(){
-		debugger
 		$(".serviceBody").empty();
 		this.breadCrumb(this.$el.find(".projectMember"));
 		App.Services.projectMember.init({type : "auth",tab:"projectMember"});
