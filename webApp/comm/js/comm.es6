@@ -32,45 +32,44 @@ App.Comm = {
 	},
 
 	isAuth:function(type,s){
-
 		if (!App.AuthObj) {
 			return false;
 		}
-
-		var _subType,_auth,_status,
+		var _subType,_auth,_status,_setting,isChange=false,
 			_temp='4,7,9';
 		if(s=='family'){
 			_auth=App.AuthObj.lib.family;
-			_subType=App.ResourceModel.Settings.CurrentVersion.subType;
-			_status=App.ResourceModel.Settings.CurrentVersion.status;
+			_setting=App.ResourceModel.Settings;
 		}else if(s=='model'){
-			_subType=App.ResourceModel.Settings.CurrentVersion.subType;
-			_status=App.ResourceModel.Settings.CurrentVersion.status;
+			_setting=App.ResourceModel.Settings;
 			_auth=App.AuthObj.lib.model;
 		}else{
-			_subType=App.Project.Settings.CurrentVersion.subType;
+			_setting=App.Project.Settings;
 			_auth=App.AuthObj.project.prjfile;
-			_status=App.Project.Settings.CurrentVersion.status;
 		}
-		if(type=='create'){
-			if(s=='family'||s=='model'){
-				if(_auth.edit&&_temp.indexOf(_status)==-1){
-					return true;
-				}
-			}else{
-				if(_subType==1&&_auth.edit&&_temp.indexOf(_status)==-1){
-					return true;
-				}
+		_subType=_setting.CurrentVersion.subType;
+		_status=_setting.CurrentVersion.status;
+		isChange=_setting.projectId==_setting.CurrentVersion.id?false:true;
+
+		//如果状态等于4,7,9直接禁用
+		if(_temp.indexOf(_status)!=-1){
+			return false;
+		}
+		//如果状态不等于4,7,9，并且是族库、标准模型则有所有权限
+		if(s=='family'||s=='model'){
+			return true;
+		}
+
+		//非标、用户权限、不是变更版本才有（创建、重命名、删除）
+		if(type=='create'||type=="rename"||type=="delete"){
+			//变更版本不能创建、删除、重命名
+			if(_subType==3&&_auth.edit&& !isChange){
+				return true;
 			}
-		}else if(type=="upload"||type=="delete"||type=="rename"){
-			if(s=='family'||s=='model'){
-				if(_auth.edit&&_temp.indexOf(_status)==-1){
-					return true;
-				}
-			}else{
-				if(_subType!=1&&_auth.edit&&_temp.indexOf(_status)==-1){
-					return true;
-				}
+			return false;
+		}else if(type=="upload"){
+			if(_auth.edit){
+				return true;
 			}
 		}else if(type=="down"){
 			return true;
