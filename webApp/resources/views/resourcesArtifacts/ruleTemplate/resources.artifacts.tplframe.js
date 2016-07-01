@@ -23,7 +23,7 @@ App.Resources.ArtifactsTplFrame = Backbone.View.extend({
         this.$(".tplContent>.default").show();
     },
 
-    //写入内容
+    //写入模板包含的内容
     loadContent:function(name){
         var _this = this;
         this.$(".tplContent").addClass("services_loading");
@@ -36,8 +36,9 @@ App.Resources.ArtifactsTplFrame = Backbone.View.extend({
         this.$(".artifactsContent .default").show().siblings().hide();
         this.$(".artifactsNav li").eq(0).addClass("active").siblings("li").removeClass("active");
 
+        //隐藏默认
         this.$(".tplContent>.default").hide();
-        //获取列表
+
         this.getTplRule();//获取规则模板列表
     },
 

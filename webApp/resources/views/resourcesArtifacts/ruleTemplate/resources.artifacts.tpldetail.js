@@ -5,9 +5,7 @@ App.Resources.ArtifactsTplDetail = Backbone.View.extend({
 
     tagName:"div",
     className:"cont",
-
     template: _.templateUrl("/resources/tpls/resourcesArtifacts/ruleTemplate/resources.artifacts.tpldetail.html"),
-
     events:{
         "click .delete":"delete",
         "click .edit":"edit",
@@ -17,10 +15,7 @@ App.Resources.ArtifactsTplDetail = Backbone.View.extend({
 
     render:function() {
         this.$el.html(this.template);
-
-        var tabs = App.Comm.AuthConfig.resource.mappingRule,
-            Auth = App.AuthObj.lib;
-
+        var tabs = App.Comm.AuthConfig.resource.mappingRule;
         if(App.AuthObj.lib.mappingRuleTemplate.edit){
             this.$(".tplDetailInfo").prepend(tabs.mappingRuleTemplateEdit);
         }
@@ -45,24 +40,20 @@ App.Resources.ArtifactsTplDetail = Backbone.View.extend({
         $(".mod-dialog .wrapper .header").hide();//隐藏头部
         frame.$(".alertInfo").html('确认删除 “'+ App.ResourceArtifacts.Status.templateName   +' "?');
     },
-
-//编辑
+    //编辑
     edit:function() {
         this.$(".tplDetailInfo").hide();
         this.$(".tplDetailEdit").show();
         App.ResourceArtifacts.modelEdit = true;
         Backbone.trigger("checkedChange");
     },
-
     //当模板为空时触发
     reset:function(){
         this.$(".tplDetailInfo h2").empty();
     },
-
     //保存
     resourcesSure:function(){
         var _this = this;
-
         var modelSaving = App.ResourceArtifacts.modelSaving;
         //如果不存在模板id则无法保存
         if(!App.ResourceArtifacts.Status.templateId){
@@ -70,10 +61,7 @@ App.Resources.ArtifactsTplDetail = Backbone.View.extend({
         }
         App.ResourceArtifacts.modelSaving.templateId = App.ResourceArtifacts.Status.templateId;
         App.ResourceArtifacts.modelSaving.templateName = App.ResourceArtifacts.Status.templateName = this.$(".tplDetailEdit .tplName").val();
-
-
         console.log(App.ResourceArtifacts.modelSaving);
-
         //要查找两级看是否是叶子节点直接过滤即可，无需查找
         var pdata = {
             URLtype: "saveArtifactsTemplateRule",
@@ -84,28 +72,27 @@ App.Resources.ArtifactsTplDetail = Backbone.View.extend({
         App.ResourceArtifacts.loading($(".modelContent"));
         App.Comm.ajax(pdata,function(response){
             console.log(response);
-            if(response.code == 0 ){
+            if(response.code == 0 && response.data){
                 //更改模板名称
                 _this.$(".tplDetailTitle h2").text(App.ResourceArtifacts.Status.templateName);
-
                 Backbone.trigger("resourcesChangeMappingRuleModelName");
-                _this.resourcesCancel();
+                //修正模板数据
                 App.ResourceArtifacts.TplCollection.each(function(item){
                     if(item.get("id") == App.ResourceArtifacts.Status.templateId){
                         item.set({"ruleId":response.data.ruleIds},{silent:true})
                     }
                 });
-
+                //取消编辑状态
+                _this.resourcesCancel();
                 App.ResourceArtifacts.modelEdit = false
 
             }else{
-            //提交失败
-            alert("提交失败");
-        }
+                alert("提交失败");
+            }
             App.ResourceArtifacts.loaded($(".modelContent"));
         });
     },
-    //取消
+    //取消编辑状态
     resourcesCancel:function(){
         this.$(".tplDetailInfo").show();
         this.$(".tplDetailEdit").hide();

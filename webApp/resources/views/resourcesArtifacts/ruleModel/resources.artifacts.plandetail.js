@@ -156,7 +156,6 @@ App.Resources.ArtifactsPlanDetail = Backbone.View.extend({
                     App.ResourceArtifacts.PlanRules.add(response.data);
                 }else{
                     App.ResourceArtifacts.Status.rule.count  = response.data.length = 0;
-                    Backbone.trigger("mappingRuleNoContent")
                 }
                 Backbone.trigger("resetTitle");
             }

@@ -17,7 +17,6 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
 
     render:function() {
         this.$el.html(this.template);
-
         var tabs = App.Comm.AuthConfig.resource.mappingRule,
             Auth = App.AuthObj.lib;
         if(Auth.moduleMappingRule.view){
@@ -35,7 +34,6 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
         if(Auth.moduleMappingRule.view && Auth.qualityMappingRule.view){
             App.ResourceArtifacts.Status.rule.biz = 1;
         }
-
         return this;
     },
 
@@ -44,7 +42,6 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
     },
 
     initialize:function(){
-        Backbone.on("startFromProject",this.startFromProject,this);
         Backbone.on("checkedChange",this.checkList,this);
         Backbone.on("projectMappingRuleCheckedClose",this.checkClose,this);
         Backbone.on("resetRule",this.resetRule,this);
@@ -52,17 +49,11 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
 
     checkList:function(){
        this.$(".artifactsContent").addClass("edit").removeClass("explorer");
-
     },
 
     checkClose:function(){
         this.$(".artifactsContent").removeClass("edit").addClass("explorer");
     },
-
-    startFromProject:function(){
-        //监听项目内容
-    },
-
     //切换选项
     select:function(e){
         var $pre = $(e.target),_this = this;
@@ -74,8 +65,6 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
                 $pre.addClass("active").siblings("li").removeClass("active");
             }
         }
-
-
         var modularization = this.$(".modularization.active").length;
         var quality = this.$(".quality.active").length;
 
@@ -84,21 +73,16 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
             if(this.$(".default:visible").length){
                 return
             }
-
+            this.resetRule();
             this.$(".qualifyC").hide();
             this.$(".qualifyC li").removeClass("active");
             this.$(".plans").show();
-
-            this.resetRule();
-
         }else if(quality){//质量
             App.ResourceArtifacts.Status.rule.biz = 2 ;
             if(this.$(".default:visible").length){
                 return
             }
-
             this.resetRule();
-
             this.$(".plans").hide();
             this.$(".qualifyC").show();
             this.$(".plans li").removeClass("active");
@@ -113,7 +97,6 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
         this.$(".rules h2 .name").html("没有选择模块/质量标准");
         this.$(".ruleContentRuleList ul").html("<li><div class='ruleTitle delt'>暂无内容</div></li>");
     },
-
     //为项目设置创建规则
     create:function(e){
         if(App.AuthObj.lib.mappingRuleTemplate.edit){
@@ -123,6 +106,5 @@ App.Resources.ArtifactsMapRule = Backbone.View.extend({
         }else{
             alert("您没有修改模板权限！")
         }
-
     }
 });

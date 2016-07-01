@@ -239,7 +239,6 @@ App.ResourceArtifacts={
             //项目映射规则名称
             App.ResourceArtifacts.Status.projectName = App.Comm.publicData.services.project.projectName;
         }
-
         //公用组件
         this.menu = new App.Resources.ArtifactsMapRule();  //外层菜单
         this.plans = new App.Resources.ArtifactsPlanList();   //模块化列表 /计划节点
@@ -253,7 +252,6 @@ App.ResourceArtifacts={
         App.ResourceArtifacts.Status.rule.biz = 1;
         App.ResourceArtifacts.Status.templateId = "";
 
-
         if(optionType == "template" ){//规则模板
             _this.$(".resourcesMappingRule .template").addClass("active").siblings("a").removeClass("active");
             App.ResourceArtifacts.Status.qualityStandardType = "GC";
@@ -261,16 +259,17 @@ App.ResourceArtifacts={
                 App.ResourceArtifacts.Status.rule.biz =2
             }
 
-            this.tplFrame = new App.Resources.ArtifactsTplFrame();
+            this.tplFrame = new App.Resources.ArtifactsTplFrame().render();
             this.tplList = new App.Resources.ArtifactsTplList();
             this.detail = new App.Resources.ArtifactsTplDetail();
 
-            _this.$el.append(this.tplFrame.render().el);//菜单
+            _this.$el.append(this.tplFrame.el);//菜单
             this.tplFrame.$(".tplListContainer").html(this.tplList.render().el);//右侧框架
             this.tplFrame.$(".tplContent .content").html(this.detail.render().el);
             this.detail.$(".tplDetailCon").append(this.menu.render().el);//菜单
 
-            this.tplFrame.$(".artifactsTplFrame").addClass("services_loading");
+            this.tplFrame.$el.addClass("services_loading");
+
 
             if(Auth.moduleMappingRule.view){
                 this.menu.$(".plans").html(this.plans.render().el);//计划
@@ -446,7 +445,6 @@ App.ResourceArtifacts={
     //获取规则模板
     getTpl:function(){
         var _this = this, pdata;
-        //App.ResourceArtifacts.Status.type =1 ;
         pdata  = {
             URLtype:"fetchArtifactsTemplate",
             data:{}
@@ -458,7 +456,7 @@ App.ResourceArtifacts={
                     App.ResourceArtifacts.TplCollection.add(response.data);
                 }else{}
             }
-            _this.tplFrame.$(".artifactsTplFrame").removeClass("services_loading");
+            _this.tplFrame.$el.removeClass("services_loading");
         });
     },
     loading:function(ele){
@@ -474,23 +472,5 @@ App.ResourceArtifacts={
         App.ResourceArtifacts.Status.rule.biz = "";
         App.ResourceArtifacts.Status.rule.targetCode = "";
         App.ResourceArtifacts.Status.rule.targetName = "";
-    },
-    //保存的规则
-    modelRuleSaveData:{
-        templateId: "",
-            templateName:"",
-            ruleIdsIn:[],//插入的规则id
-            ruleIdsDel:[],//删除的规则id
-            codeIdsIn:[],//插入的目标编码
-            codeIdsDel:[]//删除的目标编码
-    },
-    //重置要存储的模板
-    resetModelRuleSaveData:function(){
-        App.ResourceArtifacts.modelRuleSaveData.templateId ="";
-        App.ResourceArtifacts.modelRuleSaveData.templateName = "";
-        App.ResourceArtifacts.modelRuleSaveData.ruleIdsIn = [];
-        App.ResourceArtifacts.modelRuleSaveData.ruleIdsDel = [];
-        App.ResourceArtifacts.modelRuleSaveData.codeIdsIn = [];
-        App.ResourceArtifacts.modelRuleSaveData.codeIdsDel = [];
     }
 };
