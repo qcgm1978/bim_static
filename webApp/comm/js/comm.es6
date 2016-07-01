@@ -49,8 +49,7 @@ App.Comm = {
 		}
 		_subType=_setting.CurrentVersion.subType;
 		_status=_setting.CurrentVersion.status;
-		isChange=_setting.projectId==_setting.CurrentVersion.id?false:true;
-
+		isChange=_setting.CurrentVersion.name=="初始版本"?false:true;
 		//如果状态等于4,7,9直接禁用
 		if(_temp.indexOf(_status)!=-1){
 			return false;
