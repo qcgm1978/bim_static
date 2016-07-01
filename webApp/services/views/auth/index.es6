@@ -9,8 +9,16 @@ App.Services.Auth = Backbone.View.extend({
 
 	render(){
 		App.Services.MemberType = "inner";//默认加载类型
-		this.$el.html(new App.Services.AuthNav().render().el);//菜单
-		this.loadMemberData();
+		var _$nav=new App.Services.AuthNav().render();
+		this.$el.html(_$nav.el);//菜单
+	//	this.loadMemberData();
+		if(_$nav.$('.serviceNav .active').hasClass('projectMember')){
+			setTimeout(function(){
+				_$nav.projectMember();
+			},1)
+		}else{
+			this.loadMemberData();
+		}
 		return this;
 	},
 
@@ -27,6 +35,7 @@ App.Services.Auth = Backbone.View.extend({
 			_this.$("#inner span").addClass("active");
 			_this.$("#inner").addClass("active").siblings(".childOz").html(App.Services.tree(response));
 			_this.$(".serviceBody").removeClass("services_loading");
+
 		});
 	}
 });

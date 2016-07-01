@@ -57,7 +57,9 @@ App.Services = {
 	},
 	//权限设置
 	setAuth(){
-		var $serviceNav = $(".servicesIndexBox .servicesIndex");
+		var $serviceNav = $(".servicesIndexBox .servicesIndex"),
+		    user = JSON.parse(localStorage.user || "{}"),
+		    isKeyUser = user.isKeyUser || false;
 
 		if (!App.AuthObj.service) {
 			$serviceNav.remove();
@@ -68,7 +70,7 @@ App.Services = {
 				$serviceNav.find(".application").remove();
 			}
 		 
-			if (!Auth.auth) {
+			if (!Auth.auth && !isKeyUser) {
 				$serviceNav.find(".notice").remove();
 			}
 		 
