@@ -12,12 +12,10 @@ App.Resources.ArtifactsTplAlert = Backbone.View.extend({
         "click #resourcesSure":"sure",
         "click #resourcesCancel":"cancel"
     },
-
     render:function(){
         this.$el.html(this.template);
         return this;
     },
-
     initialize:function(models){},
     //确定
     sure : function(){
@@ -31,23 +29,22 @@ App.Resources.ArtifactsTplAlert = Backbone.View.extend({
 
                      App.ResourceArtifacts.Status.saved = true ;//保存状态
 
+                    //删除模型
                      var pre = App.ResourceArtifacts.TplCollection.filter(function(item){
                          return item.get("id") == templateId;
                      });
-
                      App.ResourceArtifacts.TplCollection.remove(pre);
 
-
+                    //删除相应视图
                      _.each($(".tplCon .item"),function(item){
                          if(parseInt($(item).attr("data-id")) == templateId){
                              $(item).closest("li").remove();
                          }
                      });
 
-                     Backbone.trigger("resetTitle");
-                     Backbone.trigger("mappingRuleResetModel");
-                     App.ResourceArtifacts.Status.templateId = "";
-                     //刷新右侧视图  //清空所有选项
+                     Backbone.trigger("resetTitle");//刷新右侧标题
+                     Backbone.trigger("mappingRuleResetModel");//刷新右侧正文
+                     App.ResourceArtifacts.Status.templateId = "";//清空所选模板
                 }else{
                      alert("删除失败");
                  }
@@ -58,7 +55,6 @@ App.Resources.ArtifactsTplAlert = Backbone.View.extend({
                 alert("错误类型"+ error.status +"，无法成功删除!");
             }
         });
-        App.ResourceArtifacts.Status.templateId = "";
     },
         //取消
     cancel:function(){

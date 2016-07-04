@@ -8,9 +8,7 @@ App.Resources.ArtifactsPlanRule = Backbone.View.extend({
 
     template: _.templateUrl("/resources/tpls/resourcesArtifacts/ruleModel/resources.artifacts.planrule.html"),
 
-    events:{
-
-    },
+    events:{},
 
     render:function() {
         this.$el.html(this.template);
@@ -19,11 +17,6 @@ App.Resources.ArtifactsPlanRule = Backbone.View.extend({
 
     initialize:function(){
         Backbone.on("resetTitle",this.resetTitle,this);
-        //Backbone.on("mappingRuleNoContent",this.mappingRuleNoContent,this);
-    },
-
-    mappingRuleNoContent:function(){
-        this.$el.html("<li><div class='ruleTitle delt'>暂无内容</div></li>");
     },
 
     addOne:function(model) {

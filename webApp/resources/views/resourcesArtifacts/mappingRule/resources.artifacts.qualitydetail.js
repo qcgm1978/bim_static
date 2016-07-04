@@ -100,11 +100,9 @@ App.Resources.ArtifactsQualityDetail = Backbone.View.extend({
                 //移除所有下级菜单
                 if(this.$el.siblings(".childList").find("li").length) {
                     _.each(this.$el.siblings(".childList").find("li"),function (item) {
-
                         if($(item).attr("data-code") == App.ResourceArtifacts.Status.rule.targetCode && ($(item).attr("data-check") == "1" ||  $(item).attr("data-check") == "3")){
                             Backbone.trigger("modelRuleSelectNone");
                         }
-
                         $(item).attr("data-check", "2");
                         $(item).find(".ruleCheck").removeClass("all").removeClass("half")
                     });

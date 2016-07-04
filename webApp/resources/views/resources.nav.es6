@@ -42,6 +42,7 @@ App.ResourcesNav.App = Backbone.View.extend({
 			if(optionType){//映射规则/规则模板
 				App.ResourceArtifacts.init(_this,optionType);
 			}
+			$("#pageLoading").hide();
 		}
 		this.bindScroll();
 		return this;
