@@ -8,36 +8,29 @@ App.Resources.ArtifactsTplList = Backbone.View.extend({
     className: "artifactsList",
 
     events:{
-
         "click .newPlanRule":"newPlanRule"
     },
 
-
     template: _.templateUrl("/resources/tpls/resourcesArtifacts/ruleTemplate/resources.artifacts.tpllist.html"),
-
     render:function() {
         this.$el.html(this.template);
         return this;
     },
-
     initialize:function(){
         this.listenTo(App.ResourceArtifacts.TplCollection,"add",this.addOne);
     },
-
     addOne:function(model) {
         var newList = new App.Resources.ArtifactsTplListItem({model: model});
         this.$("ul").append(newList.render().el);
         App.Comm.initScroll($(".list"),"y");
     },
-
     //创建规则
     newPlanRule:function(){
+        var _this = this;
         if(App.ResourceArtifacts.modelEdit){
-            alert("编辑状态不能创建模板");
+            alert("编辑状态不能创建模板！");
             return;
         }
-        var _this = this;
-        //直接输入名称即可
 
         if( !App.ResourceArtifacts.Status.saved){
             alert("您还有没保存的");

@@ -24,8 +24,8 @@ App.Resources.ArtifactsPlanRuleDetailNew = Backbone.View.extend({
     },
     //切换规则
     seleRule:function(e){
-        App.Resources.cancelBubble(e);
         var _this = $(e.target);
+        App.Resources.cancelBubble(e);
         $(".myDropList").hide();
         _this.closest(".myDropText").siblings(".myDropList").show();
         _this.siblings(".myDropArrorw").removeClass("down").addClass("up");
@@ -56,6 +56,5 @@ App.Resources.ArtifactsPlanRuleDetailNew = Backbone.View.extend({
     //删除
     delRule:function(){
         this.$el.remove();//删除元素
-        this.model.clear();//销毁数据
     }
 });
