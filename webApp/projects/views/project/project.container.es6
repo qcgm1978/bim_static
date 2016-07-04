@@ -59,23 +59,29 @@ App.Project.ProjectContainer = Backbone.View.extend({
 	},
 
 	//过滤项目版本
-	filterProjectVersion(event) {
-
-		var $target = $(event.target),
+	filterProjectVersion(event,t) {
+		var $target = t||$(event.target),
 			val = $target.val().trim(),
-			$list = $target.parent().find(".container a.item");
-
-		if (!val) {
-			$list.show();
-		} else {
-			$list.each(function() {
-
+			type=this.currentVersionType||'release';
+			$list = $target.parent().find(".container "+" ."+type+"VersionBox"+" a.item"),
+			$noheader= $target.parent().find('.'+type+'VersionBox'+' .versionNoheader');
+		$noheader.show();
+		$list.show();
+		$list.each(function() {
 				if ($(this).find(".vName").text().indexOf(val) < 0) {
 					$(this).hide();
 				}
-
 			});
-		}
+			$noheader.each(function(){
+				if(!$(this).find('.item').is(':visible')){
+					$(this).hide();
+				}
+			})
+		/*if (!val) {
+			$list.show();
+		} else {
+			
+		}*/
 	},
 
 	triggerUpDown:function(e){
@@ -242,9 +248,14 @@ App.Project.ProjectContainer = Backbone.View.extend({
 	changeVersionTab: function(event) {
 
 		var $target = $(event.target),
-			type = $target.data("type");
+			type = $target.data("type"),
+			that=this;
+			this.currentVersionType=type;
 		$target.addClass("selected").siblings().removeClass("selected");
-
+		this.$('.projectVersionList .txtSearch').val('');
+		setTimeout(function(){
+			that.filterProjectVersion(null,that.$('.projectVersionList .txtSearch'));
+		},10)
 		//发布版本
 		if (type == "release") {
 			var $releaseVersionBox = $target.closest(".listContent").find(".releaseVersionBox");

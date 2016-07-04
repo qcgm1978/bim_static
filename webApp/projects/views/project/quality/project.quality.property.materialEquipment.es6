@@ -107,11 +107,12 @@ App.Project.QualityMaterialEquipment = Backbone.View.extend({
 				language: 'zh-CN',
 				autoclose: true,
 				format: 'yyyy-mm-dd',
-				minView: 'month',
-				endDate: new Date()
-
+				minView: 'month'
 			}).on("changeDate",function(ev){
 				//that.MaterialEquipmentOptions.startTime = ev.date.format("yyyy-MM-dd");
+				var _dateStr=new Date(ev.date.getTime()+24*60*60*1000).format('yyyy-MM-dd');
+ 				that.$('#dateEnd').datetimepicker('setStartDate',_dateStr);
+ 				that.$('#dateEnd').val(_dateStr);
 				that.changeME('startTime', new Date(ev.date.format("yyyy-MM-dd")+ ' 00:00:00').getTime());
 			});
 	//	});
@@ -122,8 +123,7 @@ App.Project.QualityMaterialEquipment = Backbone.View.extend({
 				language: 'zh-CN',
 				autoclose: true,
 				format: 'yyyy-mm-dd',
-				minView: 'month',
-				endDate: new Date()
+				minView: 'month'
 
 			}).on("changeDate",function(ev){
 				//that.MaterialEquipmentOptions.endTime = ev.date.format("yyyy-MM-dd");
