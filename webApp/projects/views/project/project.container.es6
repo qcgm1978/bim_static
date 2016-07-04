@@ -79,12 +79,13 @@ App.Project.ProjectContainer = Backbone.View.extend({
 	},
 
 	triggerUpDown:function(e){
+		//debugger
 		this.slideUpAndDown(e,$(e.currentTarget),$(e.currentTarget).find('.modleShowHide'));
 	},
 
 	//展开和收起
 	slideUpAndDown: function(event,_$parent,$current) {
-		var $parent = _$parent||$(event.target).parent(),
+		var $parent = _$parent||$(event.target).closest('.modle'),
 			$modleList = $parent.find(".modleList");
 		$modleList=$modleList.length==0?_$parent.next():$modleList;
 		_$current=$current||$(event.target);
@@ -144,6 +145,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 				}
 			});
 		}
+		event.stopPropagation(); 
 	},
 
 	//点击面包靴
