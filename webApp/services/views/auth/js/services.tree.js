@@ -72,13 +72,13 @@ App.Services.queue = {
     }
 };
 App.Services.showAll = function(ele){
-    var tip = $("<div class='showAll'></div>");
+    $(".servicesShowAll").remove();
+    var tip = $("<div class='servicesShowAll'></div>");
     var content = $(ele).html();
     var offset = $(ele).offset();
     tip.html(content);
-    $(".showAll").remove();
     $("body").append(tip);
-    var height = $(".showAll").height();
+    var height = $(".servicesShowAll").height();
     var leaveHeight = $("body").height() - offset.top;
     if (leaveHeight < height + $(ele).height()){
         offset.top = offset.top - height - 7;
@@ -89,4 +89,29 @@ App.Services.showAll = function(ele){
     }
     offset.left =  offset.left - 5;
     tip.offset(offset);
+};
+//Ìí¼Ó...ÄÚÈÝ
+App.Services.exetor = function(_this){
+    var cwidth,span;
+    if(_this.model){
+        cwidth = _this.$(".roles").width();
+        span = _this.$(".roles span");
+    }else{
+        cwidth = _this.find(".roles").width();
+        span = _this.find(".roles span");
+    }
+    var is = $("<i style='width: 15px'>...</i>");
+    var arr = [];
+    _.each(span,function(item){
+        arr.push($(item).width() + parseInt($(item).css("padding-left")) + parseInt($(item).css("margin-left")));
+    });
+    if(arr.length){
+        var allWidth = 0 , n = null;
+        for(var i = 0 ; i < arr.length ; i ++){
+            allWidth  = allWidth + arr[i];
+        }
+        if(allWidth > cwidth && !_this.$(".roles i").length){
+            span.eq(n).before(is);
+        }
+    }
 };

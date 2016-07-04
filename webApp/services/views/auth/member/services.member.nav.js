@@ -76,14 +76,15 @@ App.Services.MemberNav=Backbone.View.extend({
 
             $(".serviceBody .content").removeClass("services_loading");
             if(!response.data.org.length && !response.data.user.length ){
-                $("#blendList").html("<li><span class='sele'>暂无数据</span></li>");
+                Backbone.trigger("servicesMemberControlCancelSelectAll");
                 return
             }
-
+            App.Services.Member.memLoadingStatus = true;
             collection.reset();
             if(response.data.user && response.data.user.length){
                 collection.add(response.data.user);
             }
+
             if (response.data.org && response.data.org.length) {
                 collection.add(response.data.org);
                 //外部和内部单选
@@ -92,6 +93,7 @@ App.Services.MemberNav=Backbone.View.extend({
                 //菜单渲染
                 $("#" + _thisType +"+ .childOz").html(App.Services.tree(response));
             }
+            App.Services.Member.memLoadingStatus = false;
         }).done(function(){
             App.Services.queue.next();
         });

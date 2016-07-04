@@ -14,12 +14,12 @@ App.Services.memberDetail=Backbone.View.extend({
 
     render:function(){
         this.$el.html(this.template(this.model.toJSON()));
+        App.Services.exetor(this);
         return this;
     },
 
     initialize:function(){
         this.model.set({"checked":false},{silent:true});//预设选择状态
-        this.listenTo(this.model, 'change:checked', this.render);
         this.listenTo(this.model, 'change:role', this.render);
     },
     cancelBubble:function(event){
@@ -126,7 +126,6 @@ App.Services.memberDetail=Backbone.View.extend({
         this.$el.addClass("active");
         this.model.set("checked",true);
     },
-
    //选择选项时作的操作。
     choose:function(){
         var boolean = this.model.get("checked");

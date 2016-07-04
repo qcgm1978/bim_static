@@ -35,7 +35,9 @@ App.Services.Auth = Backbone.View.extend({
 			_this.$("#inner span").addClass("active");
 			_this.$("#inner").addClass("active").siblings(".childOz").html(App.Services.tree(response));
 			_this.$(".serviceBody").removeClass("services_loading");
-
+			_.each(_this.$("#blendList .roles span"),function(item){
+				App.Services.exetor($(item));
+			});
 		});
 	}
 });
