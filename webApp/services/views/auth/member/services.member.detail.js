@@ -14,7 +14,7 @@ App.Services.memberDetail=Backbone.View.extend({
 
     render:function(){
         this.$el.html(this.template(this.model.toJSON()));
-        //App.Services.exetor(this);
+        App.Services.exetor(this);
         return this;
     },
 
