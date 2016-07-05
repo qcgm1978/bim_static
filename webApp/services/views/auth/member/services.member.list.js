@@ -33,8 +33,11 @@ App.Services.MemberList=Backbone.View.extend({
     //数据加载
     addOne:function(model){
         if(App.Services.Member.memLoadingStatus){
-            var newView = new App.Services.memberDetail({model:model});
-            this.$("#blendList").append(newView.render().el);
+            var newView = new App.Services.memberDetail({model:model}).render();
+            this.$("#blendList").append(newView.el);
+            if(!this.$(".roles i").length){
+                App.Services.exetor(newView);
+            }
             App.Comm.initScroll(this.$el.find(".readyForScroll"),"y");
         }
     },
