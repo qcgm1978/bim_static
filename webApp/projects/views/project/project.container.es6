@@ -93,7 +93,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 	slideUpAndDown: function(event,_$parent,$current) {
 		var $parent = _$parent||$(event.target).closest('.modle'),
 			$modleList = $parent.find(".modleList");
-		$modleList=$modleList.length==0?_$parent.next():$modleList;
+		$modleList=$modleList.length==0?$parent.next():$modleList;
 		_$current=$current||$(event.target);
 		_$current.toggleClass("down");
 		if ($modleList.is(":hidden")) {
@@ -466,7 +466,6 @@ App.Project.ProjectContainer = Backbone.View.extend({
 
 		viewer.on("click", function(model) {
 			App.Project.Settings.ModelObj = null;
-
 			if (!model.intersect) {
 				that.resetProperNull();
 				return;

@@ -81,6 +81,7 @@
           self.pub('click',res);
         },
         empty:function(res){
+          debugger
           _opt._dom.bimBox.html('<div class="tips"><i class="icon"></i><span>无法三维预览，请下载查看</span></div>');
           self.pub('empty',res);
         }
