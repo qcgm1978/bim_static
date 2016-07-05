@@ -23,7 +23,7 @@
 		<%for (var j = 0; j < dateCount; j++) { %>		
 
 			<% cVersionDate = VersionsDates[j]; %>
-
+				<div class="versionNoheader">
 				<div class="header"><%= new Date(cVersionDate.date).shortFormat() %></div>
 
 			<%var Versions = cVersionDate.version,
@@ -40,6 +40,7 @@
 					        </a>
 
 		    	<% }%>
+		    	</div>
 		<% }%>
 		</div>
 <% }%>

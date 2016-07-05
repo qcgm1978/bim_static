@@ -81,14 +81,16 @@ App.Project.ProjectPlanProperty = Backbone.View.extend({
              autoclose: true,
              format: 'yyyy-mm-dd',
              minView: 'month'
-
-         });
+         }).on("changeDate", function(ev) {
+			var _dateStr=new Date(ev.date.getTime()+24*60*60*1000).format('yyyy-MM-dd');
+			_this.$('.dateEnd').datetimepicker('setStartDate',_dateStr);
+			_this.$('.dateEnd').val(_dateStr);
+		});
          this.$('.dateEnd').datetimepicker({
              language: 'zh-CN',
              autoclose: true,
              format: 'yyyy-mm-dd',
              minView: 'month'
-
          });
          this.$(".dateBox .iconCal").click(function() {
 			$(this).next().focus();

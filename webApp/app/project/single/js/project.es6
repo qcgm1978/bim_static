@@ -52,11 +52,25 @@ App.Project = {
 
 	},
 
+	downUrl:function(){
+		var data = {
+			URLtype: "downLoad",
+			data: {
+				projectId: App.Project.Settings.projectId,
+				projectVersionId: App.Project.Settings.projectVersionId
+			}
+		};
+
+		var data = this.getUrlByType(data),
+			url = data.url + "&fileVersionId=" + App.Project.Settings.fileVersionId;
+		return url;
+	},
 	//获取模型id
 	getModelId: function() {
 		var Request = App.Project.GetRequest();
 		App.Project.Settings.projectId = Request.projectId;
 		App.Project.Settings.projectVersionId = Request.projectVersionId;
+		App.Project.Settings.fileVersionId = Request.id;
 		var data = {
 			URLtype: "fetchFileModelIdByFileVersionId",
 			data: {
@@ -143,7 +157,7 @@ App.Project = {
 
 		App.Project.Settings.modelId = modelId;
 		App.Project.Settings.Viewer.on("click", function(model) {
-
+			debugger
 			if (!model.intersect) {
 				App.Project.renderAttr(App.Project.Settings.typeId, 2);
 				return;

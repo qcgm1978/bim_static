@@ -111,6 +111,9 @@
 
  			}).on("changeDate", function(ev) {
  			//	that.VerificationOptions.startTime = ev.date.format("yyyy-MM-dd");
+ 				var _dateStr=new Date(ev.date.getTime()+24*60*60*1000).format('yyyy-MM-dd');
+ 				that.$('#dateEnd').datetimepicker('setStartDate',_dateStr);
+ 				that.$('#dateEnd').val(_dateStr);
  				that.dataChange('startTime',new Date(ev.date.format("yyyy-MM-dd")+" 00:00:00").getTime())
  			});
  	//	});
@@ -125,7 +128,9 @@
 
  			}).on("changeDate", function(ev) {
  				//that.VerificationOptions.endTime = ev.date.format("yyyy-MM-dd");
- 				that.dataChange('endTime', new Date(ev.date.format("yyyy-MM-dd")+" 23:59:59").getTime())
+ 				var _dateStr=ev.date.format("yyyy-MM-dd");
+ 				//that.$('#dateStar').datetimepicker('setEndDate',_dateStr);
+ 				that.dataChange('endTime', new Date(_dateStr+" 23:59:59").getTime());
  			});
  	//	});
  		this.$(".dateBox .iconCal").click(function() {

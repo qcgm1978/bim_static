@@ -65,6 +65,8 @@ App.Project.FileContainer = Backbone.View.extend({
 		//删除、上传、重命名权限判断方式一样
 		if(!App.Comm.isAuth('upload')){
 			this.$('.btnFileUpload ').addClass('disable');
+		}
+		if(!App.Comm.isAuth('delete')){
 			this.$('.btnFileDel').addClass('disable');
 		}
 		return this;

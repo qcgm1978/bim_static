@@ -17,42 +17,20 @@
  	template: _.templateUrl('/resources/tpls/resourceModel/resource.model.listNav.list.topBar.html', true),
 
  	render: function() {
- 		var type = App.ResourcesNav.Settings.type;
+ 		var type = App.ResourcesNav.Settings.type=="famLibs"?'family':'model';
  		this.$el.html(this.template);
  		if (App.AuthObj.lib) {
- 			if (type == "standardLibs") {
- 				/*var Auth = App.AuthObj.lib.model;
- 				if (!Auth.edit) {
- 					this.$('.btnNewFolder,.btnFileDel,.btnFileUpload').addClass('disable');
- 					if (!Auth.download && !App.ResourceModel.Settings.CurrentVersion.byProjectRef) {
- 						this.$('.btnFileDownLoad').addClass('disable');
- 					}
- 				}*/
- 				if(!App.Comm.isAuth('create','model')){
- 					this.$('.btnNewFolder').addClass('disable');
- 				}
-				//删除、上传、重命名权限判断方式一样
-				if(!App.Comm.isAuth('upload','model')){
-					this.$('.btnFileUpload ').addClass('disable');
-					this.$('.btnFileDel').addClass('disable');
-				}
- 			} else if (type == "famLibs") {
- 				/*var Auth = App.AuthObj.lib.family;
- 				if (!Auth.edit) {
- 					this.$('.btnNewFolder,.btnFileDel,.btnFileUpload').addClass('disable');
- 					if (!Auth.download && !App.ResourceModel.Settings.CurrentVersion.byProjectRef) {
- 						this.$('.btnFileDownLoad').addClass('disable');
- 					}
- 				}*/
- 				if(!App.Comm.isAuth('create','family')){
- 					this.$('.btnNewFolder').addClass('disable');
- 				}
-				//删除、上传、重命名权限判断方式一样
-				if(!App.Comm.isAuth('upload','family')){
-					this.$('.btnFileUpload ').addClass('disable');
-					this.$('.btnFileDel').addClass('disable');
-				}
- 			}
+
+ 			if(!App.Comm.isAuth('create',type)){
+				this.$('.btnNewFolder').addClass('disable');
+			}
+			//删除、重命名权限判断方式一样
+			if(!App.Comm.isAuth('upload',type)){
+				this.$('.btnFileUpload ').addClass('disable');
+			}
+			if(!App.Comm.isAuth('delete',type)){
+				this.$('.btnFileDel ').addClass('disable');
+			}
  		}
  		return this;
  	},
