@@ -37,7 +37,7 @@ App.Index = {
 		//收起 暂开 属性内容
 		$projectContainer.on("click", ".modleShowHide", function() {
 			$(this).toggleClass("down");
-			var $modleList = $(this).parent().find(".modleList");
+			var $modleList = $(this).parent().siblings(".modleList");
 			$modleList.slideToggle();
 
 		});

@@ -105,8 +105,7 @@ App.Services.exetor = function(_this){
         cwidth = _this.find(".roles").width();
         span = _this.find(".roles span");
     }
-    var is = $("<i style='width: 15px'>...</i>");
-    var arr = [];
+    var arr = [],inherit = "";
     _.each(span,function(item){
         arr.push($(item).width() + parseInt($(item).css("padding-left")) + parseInt($(item).css("margin-left")));
     });
@@ -116,6 +115,10 @@ App.Services.exetor = function(_this){
             allWidth  = allWidth + arr[i];
         }
         if(allWidth > cwidth && !_this.$(".roles i").length){
+            if(span.eq(n-1).hasClass("inherit")){
+                inherit = "inherit";
+            }
+            var is = $("<i class='"+ inherit +"' style='width: 15px'>...</i>");
             span.eq(n).before(is);
         }
     }

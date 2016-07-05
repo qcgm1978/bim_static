@@ -98,7 +98,6 @@ App.Services.MemberWindowIndex = Backbone.View.extend({
         App.Services.Member.resetMemData();
         _this.removeRoleInfo();
         App.Services.memOz = '';
-        $(App.Services.maskWindow.element[0]).removeClass("services_loading");
     },
     initialize:function(){}
 });
