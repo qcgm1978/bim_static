@@ -87,7 +87,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 	slideUpAndDown: function(event,_$parent,$current) {
 		var $parent = _$parent||$(event.target).closest('.modle'),
 			$modleList = $parent.find(".modleList");
-		$modleList=$modleList.length==0?_$parent.next():$modleList;
+		$modleList=$modleList.length==0?$parent.next():$modleList;
 		_$current=$current||$(event.target);
 		_$current.toggleClass("down");
 		if ($modleList.is(":hidden")) {
@@ -133,10 +133,12 @@ App.Project.ProjectContainer = Backbone.View.extend({
 
 
 					if (res.data.className == '成本管理') {
-						_$current.parent().append(str);
+						//_$current.parent().append(str);
+						_$current.parent().siblings('.modleList').html(str);
 
 					} else {
-						_$current.parent().append('<ul class="modleList">' + str + '</ul>');
+						_$current.parent().siblings('.modleList').html(str);
+
 
 					}
 					//str += '<li class="modleItem">'+

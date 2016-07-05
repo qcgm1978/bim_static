@@ -1066,10 +1066,10 @@ App.Project = {
 						//
 						//		}
 						//});
-						var string = '<div class="modle"><div class="modleTitleBar"><i data-classkey="' + datas[i]['id'] + '" class="modleShowHide getdata down"></i><h1 class="modleName">' + prop + '</h1></div></div>';
+						var string = '<div class="modle"><div class="modleTitleBar"><i data-classkey="' + datas[i]['id'] + '" class="modleShowHide getdata "></i><h1 class="modleName">' + prop + '</h1></div><ul class="modleList"></ul></div>';
 						that.$el.find(".fordesign").html(string);
 					} else {
-						str += '<div class="modle"><div class="modleTitleBar"><i data-classkey="' + datas[i]['id'] + '" class="modleShowHide getdata down"></i><h1 class="modleName">' + prop + '</h1></div></div>';
+						str += '<div class="modle"><div class="modleTitleBar"><i data-classkey="' + datas[i]['id'] + '" class="modleShowHide getdata "></i><h1 class="modleName">' + prop + '</h1></div><ul class="modleList"></ul></div>';
 
 					}
 
