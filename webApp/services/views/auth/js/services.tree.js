@@ -71,6 +71,7 @@ App.Services.queue = {
         }
     }
 };
+//成员-角色-提示信息
 App.Services.showAll = function(ele){
     $(".servicesShowAll").remove();
     var tip = $("<div class='servicesShowAll'></div>");
@@ -81,7 +82,7 @@ App.Services.showAll = function(ele){
     var height = $(".servicesShowAll").height();
     var leaveHeight = $("body").height() - offset.top;
     if (leaveHeight < height + $(ele).height()){
-        offset.top = offset.top - height - 7;
+        offset.top = offset.top - height - 6;
         tip.addClass("up");
     }else{
         offset.top = offset.top + $(ele).height()+3;
@@ -89,6 +90,10 @@ App.Services.showAll = function(ele){
     }
     offset.left =  offset.left - 5;
     tip.offset(offset);
+
+    $(".servicesShowAll").on("mouseover",function(e){
+        $(".servicesShowAll").remove();
+    });
 };
 //添加...内容
 App.Services.exetor = function(_this){
