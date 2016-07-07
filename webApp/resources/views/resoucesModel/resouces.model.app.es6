@@ -21,5 +21,11 @@
  			var contextHtml = _.templateUrl("/resources/tpls/context/listContext.html", true);
  			$("body").append(contextHtml);
  		}  
+ 		//右键菜单
+ 		if (!document.getElementById("listContextFamily")) {
+ 			//右键菜单
+ 			var contextHtml = _.templateUrl("/resources/tpls/context/listContextFamily.html", true);
+ 			$("body").append(contextHtml);
+ 		}  
  	} 
  });

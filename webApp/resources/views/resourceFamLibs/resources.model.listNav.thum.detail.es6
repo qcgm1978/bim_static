@@ -80,38 +80,38 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 
 		var that = this; 
 		
-		this.$el.contextMenu('listContext', {
+		this.$el.contextMenu('listContextFamily', {
 			//显示 回调
 			onShowMenuCallback: function(event) {
 				event.preventDefault();
 				var $item = $(event.target).closest(".item");
-				$("#reNameModel").removeClass('disable');
+				$("#reNameModelFamily").removeClass('disable');
 				//预览
 				if ($item.find(".folder").length > 0) {
-					$("#previewModel").addClass("disable");
-					$("#previewModel").find("a").removeAttr("href");
+					$("#previewModelFamily").addClass("disable");
+					$("#previewModelFamily").find("a").removeAttr("href");
 				} else {
 
-					$("#previewModel").removeClass("disable");
+					$("#previewModelFamily").removeClass("disable");
 					var href = $item.find(".boxText").prop("href");
-					$("#previewModel").find("a").prop("href", href);
+					$("#previewModelFamily").find("a").prop("href", href);
 
 					//重命名 未上传
 					if ($item.data("status") == 1) {
-						$("#reNameModel").addClass('disable');
+						$("#reNameModelFamily").addClass('disable');
 					}
 
 				}
 				$item.addClass("selected").siblings().removeClass("selected");
 				
 				if(!App.Comm.isAuth('rename','family')){
-					$("#reNameModel").addClass('disable').attr('disabled', 'disabled');
+					$("#reNameModelFamily").addClass('disable').attr('disabled', 'disabled');
 				}
 				if(!App.Comm.isAuth('delete','family')){
-					$("#delModel").addClass('disable').attr('disabled', 'disabled');
+					$("#delModelFamily").addClass('disable').attr('disabled', 'disabled');
 				}
-				if ($('#listContext li[class!=disable]').length == 0) {
-					$('#listContext').parent().hide();
+				if ($('#listContextFamily li[class!=disable]').length == 0) {
+					$('#listContextFamily').parent().hide();
 				}
 
 			},

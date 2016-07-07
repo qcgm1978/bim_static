@@ -51,20 +51,6 @@ App.Project = {
 		return data;
 
 	},
-
-	downUrl:function(){
-		var data = {
-			URLtype: "downLoad",
-			data: {
-				projectId: App.Project.Settings.projectId,
-				projectVersionId: App.Project.Settings.projectVersionId
-			}
-		};
-
-		var data = this.getUrlByType(data),
-			url = data.url + "&fileVersionId=" + App.Project.Settings.fileVersionId;
-		return url;
-	},
 	//获取模型id
 	getModelId: function() {
 		var Request = App.Project.GetRequest();
@@ -132,6 +118,7 @@ App.Project = {
 
 	// 除 dwg以外的格式
 	renderOther(modelId, type) {
+		var _this=this;
 		var typeMap = {
 			rte: 'singleModel',
 			rvt: 'singleModel',
@@ -157,7 +144,6 @@ App.Project = {
 
 		App.Project.Settings.modelId = modelId;
 		App.Project.Settings.Viewer.on("click", function(model) {
-			debugger
 			if (!model.intersect) {
 				App.Project.renderAttr(App.Project.Settings.typeId, 2);
 				return;
@@ -166,6 +152,10 @@ App.Project = {
 			App.Project.renderAttr(model.intersect.userId);
 
 		});
+
+		App.Project.Settings.Viewer.on('empty',function(){
+			$('.tips span').html('无法三维预览，请<a href="javascript:;" onclick="App.Project.downLoad();" style="font-size:20px;text-decoration:underline;color:#CFCFCF;">下载</a>查看');
+		})
 	},
 
 	//渲染dwg 文件
