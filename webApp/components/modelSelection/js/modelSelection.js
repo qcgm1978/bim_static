@@ -22,7 +22,7 @@
   ModelSelection.prototype = {
     init:function(){
       var self = this,
-          serverUrl = 'http://bim.wanda-dev.cn/',
+          serverUrl = 'http://bim.wanda.cn/',
           srciptUrl = '/static/dist/libs/libsH5_20160313.js',
           styleUrl = '/static/dist/libs/libsH5_20160313.css',
           $script = '<script src="'+srciptUrl+'"></script>',
