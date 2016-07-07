@@ -67,9 +67,9 @@ App.Services.MemberozDetail=Backbone.View.extend({
                     this.$(".ozName").removeClass("active");
                     container.find(".ozName").removeClass("active");
                     container.find(".ozName span").removeClass("active");
-                    Backbone.trigger("servicesMemberControlNoSelect");
+                    //Backbone.trigger("servicesMemberControlNoSelect");
                     container.hide();
-                    return;
+                    //return;
                 }
                 Backbone.trigger("serviceMemberTopSelectStatus");
                 Backbone.trigger("serviceMemberSelectStatus");//清除内部所有的激活的元素

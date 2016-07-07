@@ -35,7 +35,7 @@ App.Services.MemberList=Backbone.View.extend({
         if(App.Services.Member.memLoadingStatus){
             var newView = new App.Services.memberDetail({model:model}).render();
             this.$("#blendList").append(newView.el);
-            if(!this.$(".roles i").length){
+            if(!newView.$(".roles i").length){
                 App.Services.exetor(newView);
             }
             App.Comm.initScroll(this.$el.find(".readyForScroll"),"y");

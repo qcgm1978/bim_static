@@ -146,7 +146,7 @@
                     $.each(files, function(i, file) {
                         htmlStr += '<li id="' + file.id + '" class="clr pl_up">' +
                             '<div class="pl-na">' + file.name + '</div>' +
-                            '<div class="pl-ac"><a title="取消" href="#"></a></div>' +
+                            '<div class="pl-ac"><a title="取消" href="javascript:;"></a></div>' +
                             '<div class="pl-st">0%</div>' +
                             '<div class="pl-si">' + formatSize(file.size) + '</div></li>';
                     });
@@ -167,6 +167,13 @@
                         var file = uploader.getFile(fileId);
                         if (file.status === plupload.UPLOADING) {
                             uploader.stop();
+                        }
+                        if(file.status===plupload.FAILED){
+                            $('#' + fileId).remove();
+                            uploader.removeFile(file);
+                            file.id=new Date().getTime();
+                            uploader.addFiles([uploader.getNativeFiles()[fileId]]);
+                            return false;
                         }
                         $('#' + fileId).remove();
                         uploader.removeFile(file);
@@ -219,7 +226,6 @@
                     }
                 });
                 uploader.bind('FilesAdded', function(up, files) {
-                   
                     //改参数在 com.upload.js 中
                     if (App.isUploading) {
                         var d = new Date();
