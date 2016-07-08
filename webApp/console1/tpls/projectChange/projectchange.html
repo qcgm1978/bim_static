@@ -59,7 +59,7 @@
             "refProjectModelVersionId": 201605121042,
             "workflowId": "4f26391485fc496b9fff9b3049c3563f",
             "status": 8,
-            "initiator": "gongcen",
+            "initiator": {"userId":"123","loginId":"gongcen"},
             "auditor": [{"userId":"123","loginId":"gc"}],
             "confirmor": [{"userId":"123","loginId":"gc"}],
             "receiver": [{"userId":"123","loginId":"gc"}]
@@ -125,7 +125,7 @@ fileId	变更文件ID	long
             "status": 16,
             "workflowId":"123",
             "title": "项目模型变更申请表审批",
-            "initiator": "gongcen",
+            "initiator": {"userId":"123","loginId":"gongcen"},
             "auditor": [{"userId":"123","loginId":"gc"}],
             "confirmor": [{"userId":"123","loginId":"gc"}],
             "receiver": [{"userId":"123","loginId":"gc"}]
@@ -180,6 +180,14 @@ status	审批状态	int	8发起；16审批通过；（4驳回；32撤销；128�
         </div>
       </div>
       <div class="form-group">
+        <label for="inputPassword3" class="col-sm-2 control-label">项目模型变更申请表单</label>
+        <div class="col-sm-10">
+          <select class="form-control referenceResources" id="s311">
+            <option value="0">请选择</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
         <div class="col-sm-10">
                     <textarea name="" id="data3" cols="40" rows="40">
            {
@@ -189,7 +197,7 @@ status	审批状态	int	8发起；16审批通过；（4驳回；32撤销；128�
             "status": 8,
             "workflowId": "27dcddc066f44491ae89be14fb5a0f0c",
             "title": "项目模型变更报审表单发起",
-            "initiator": "gongcen",
+            "initiator": {"userId":"123","loginId":"gongcen"},
             "auditor": [{"userId":"123","loginId":"gc"}],
             "confirmor": [{"userId":"123","loginId":"gc"}],
             "receiver": [{"userId":"123","loginId":"gc"}]
@@ -252,7 +260,7 @@ fileId	签出变更文件ID	guid
             "status": 16,
             "workflowId": "54adf13e70ee46d68ec8882a889ace2e",
             "title": "项目模型变更报审表单状态变化",
-           "initiator": "gongcen",
+           "initiator": {"userId":"123","loginId":"gongcen"},
             "auditor": [{"userId":"123","loginId":"gc"}],
             "confirmor": [{"userId":"123","loginId":"gc"}],
             "receiver": [{"userId":"123","loginId":"gc"}]
@@ -317,7 +325,7 @@ fileId	签出变更文件ID	guid
             "status": 8,
             "workflowId": "a2a6f2461d9f4276b6978575f63230f8",
             "title": "项目模型变更移交表单发起",
-            "initiator": "gongcen",
+            "initiator": {"userId":"123","loginId":"gongcen"},
             "auditor": [{"userId":"123","loginId":"gc"}],
             "confirmor": [{"userId":"123","loginId":"gc"}],
             "receiver": [{"userId":"123","loginId":"gc"}]
@@ -374,7 +382,7 @@ status	审批状态	int	8发起；16审批通过；（4驳回；32撤销；128�
             "status": 16,
             "workflowId": "c7e1c92f98094eee9e31343945819618",
             "title": "项目模型变更移交表单状态变化",
-            "initiator": "gongcen",
+            "initiator": {"userId":"123","loginId":"gongcen"},
             "auditor": [{"userId":"123","loginId":"gc"}],
             "confirmor": [{"userId":"123","loginId":"gc"}],
             "receiver": [{"userId":"123","loginId":"gc"}]
