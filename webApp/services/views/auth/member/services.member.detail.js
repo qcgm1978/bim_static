@@ -40,18 +40,14 @@ App.Services.memberDetail=Backbone.View.extend({
     //单个修改
     modify:function(e){
         this.cancelBubble(e);
-
-        var  pre = $("#ozList span.active");
+        var  pre = $("#ozList span.active"), _this = this,frame,disable,selected;
         if(pre.closest(".inner").length || pre.closest(".outer").length){
             App.Services.memOz = "-";
         }else{
             App.Services.memOz = pre.html();
             App.Services.searchOrg(pre);     //获取所属组织列表
         }
-
-        var _this =this,disable,selected;
-
-        var frame = new App.Services.MemberWindowIndex().render().el;//外框
+        frame = new App.Services.MemberWindowIndex().render().el;//外框
         _this.window(frame);
         _this.chooseSelf();
         _this.save();

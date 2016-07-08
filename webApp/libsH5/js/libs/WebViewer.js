@@ -26,6 +26,8 @@ CLOUD.GlobalData = {
     GarbageCollection: true,
     ByTargetDistance: false,
     MaxLoadSceneCount: 40,
+    UseMpkWorker: true,
+    MpkWorkerUrl: "js/mpkWorker.min.js"
 };
 
 CLOUD.EnumObjectLevel = {
@@ -10398,9 +10400,9 @@ CLOUD.PickHelper.prototype = {
 
             html += "<span>&#9830;&nbsp;&nbsp;Axis Grid Information</span><ul style='width:340px;list-style:none'>";
             html += "<li style='border-left:1px solid #ccc;border-top:1px solid #ccc;float:left;width:80px;height:33px;text-align:left;line-height:33px'>distanceX</li>";
-            html += "<li style='border-left:1px solid #ccc;border-top:1px solid #ccc;float:left;width:200px;height:33px;text-align:left;line-height:33px;border-right: 1px solid #ccc'>(" + axisGridInfo.abcName + ", " + axisGridInfo.offsetX + ")</li>";
+            html += "<li style='border-left:1px solid #ccc;border-top:1px solid #ccc;float:left;width:200px;height:33px;text-align:left;line-height:33px;border-right: 1px solid #ccc'>(" + axisGridInfo.numeralName + ", " + axisGridInfo.offsetX + ")</li>";
             html += "<li style='border-left:1px solid #ccc;border-top:1px solid #ccc;float:left;width:80px;height:33px;text-align:left;line-height:33px;border-bottom: 1px solid #ccc'>distanceY</li>";
-            html += "<li style='border:1px solid #ccc;float:left;width:200px;height:33px;text-align:left;line-height:33px'>(" + axisGridInfo.numeralName + ", " + axisGridInfo.offsetY + ")</li>";
+            html += "<li style='border:1px solid #ccc;float:left;width:200px;height:33px;text-align:left;line-height:33px'>(" + axisGridInfo.abcName + ", " + axisGridInfo.offsetY + ")</li>";
             html += "</ul>";
         } else {
 
@@ -12692,6 +12694,145 @@ CLOUD.Filter = function () {
         return !hasSelection();
     }
 };
+
+CLOUD.MaterialLoader = function ( showStatus ) {
+	THREE.Loader.call( this, showStatus );
+};
+
+CLOUD.MaterialLoader.prototype = Object.create(THREE.Loader.prototype);
+CLOUD.MaterialLoader.prototype.constructor = CLOUD.MaterialLoader;
+
+CLOUD.MaterialLoader.prototype.setBaseUrl = function( value ) {
+    this.baseUrl = value;
+};
+
+CLOUD.MaterialLoader.prototype.setCrossOrigin = function( value ) {
+    this.crossOrigin = value;
+};
+
+CLOUD.MaterialLoader.prototype.load = function (materialUrl, callback, result) {
+
+    var scope = this;
+    var texturePath = this.baseUrl;
+
+    function hack_material(json) {
+        var material = new THREE[json.type](json.parameters);
+
+        if (CloudShaderLib === undefined) {
+            return material;
+        }
+
+        if (json.type === 'MeshPhongMaterial') {
+            material.type = 'phong_cust_clip';
+            material.uniforms = CloudShaderLib.phong_cust_clip.uniforms;
+            material.vertexShader = CloudShaderLib.phong_cust_clip.vertexShader;
+            material.fragmentShader = CloudShaderLib.phong_cust_clip.fragmentShader;
+        }
+
+
+        if ( json.parameters.mapDiffuse !== undefined ) {
+            //material.map = THREE.ImageUtils.loadTexture( texturePath + "/" + json.parameters.mapDiffuse );
+            material.map = scope.loadTexture( texturePath + "/" + json.parameters.mapDiffuse );
+        }
+
+        if ( json.parameters.mapSpecular !== undefined ) {
+            //material.specularMap = THREE.ImageUtils.loadTexture( texturePath + "/" + json.parameters.mapSpecular );
+            material.specularMap = scope.loadTexture( texturePath + "/" + json.parameters.mapSpecular );
+        }
+
+        return material;
+    }
+
+    var loader = new THREE.XHRLoader();
+
+    loader.load(materialUrl, function (text) {
+        var matData = JSON.parse(text);
+
+        for (var matID in matData.materials) {
+            var matJSON = matData.materials[matID];
+
+            if (matJSON.parameters.opacity !== undefined && matJSON.parameters.opacity < 1.0) {
+                matJSON.parameters.transparent = true;
+            }
+            if (matJSON.parameters.side != undefined && matJSON.parameters.side === "double") {
+                matJSON.parameters.side = THREE.DoubleSide;
+            }
+
+            if (matJSON.parameters.ambient !== undefined)
+                delete matJSON.parameters.ambient; // ambient is removed for PhongMaterial
+
+
+            //material = new THREE[ matJSON.type ]( matJSON.parameters );
+            material = hack_material(matJSON);
+            material.name = matID;
+
+            result.materials[matID] = material;
+        }
+
+        callback();
+    });
+};
+
+CLOUD.MaterialLoader.prototype.loadTexture = function( url, mapping, onLoad, onProgress, onError ) {
+
+    var texture;
+    var loader = THREE.Loader.Handlers.get( url );
+    var manager = ( this.manager !== undefined ) ? this.manager : THREE.DefaultLoadingManager;
+
+    if ( loader !== null ) {
+
+        texture = loader.load( url, onLoad );
+
+    } else {
+
+        texture = new THREE.Texture();
+
+        loader = new THREE.ImageLoader( manager );
+        loader.setCrossOrigin( this.crossOrigin );
+        loader.load( url, function ( image ) {
+
+            texture.image = CLOUD.MaterialLoader.ensurePowerOfTwo( image );
+            texture.needsUpdate = true;
+
+            if ( onLoad ) onLoad( texture );
+
+        }, onProgress, onError );
+
+    }
+
+    if ( mapping !== undefined ) texture.mapping = mapping;
+
+    return texture;
+};
+
+CLOUD.MaterialLoader.ensurePowerOfTwo = function ( image ) {
+
+    if ( ! THREE.Math.isPowerOfTwo( image.width ) || ! THREE.Math.isPowerOfTwo( image.height ) ) {
+
+        var canvas = document.createElement( "canvas" );
+        canvas.width = CLOUD.MaterialLoader.nextHighestPowerOfTwo( image.width );
+        canvas.height = CLOUD.MaterialLoader.nextHighestPowerOfTwo( image.height );
+
+        var ctx = canvas.getContext( "2d" );
+        ctx.drawImage( image, 0, 0, image.width, image.height, 0, 0, canvas.width, canvas.height );
+        return canvas;
+
+    }
+
+    return image;
+};
+
+CLOUD.MaterialLoader.nextHighestPowerOfTwo = function( x ) {
+
+    --x;
+
+    for ( var i = 1; i < 32; i <<= 1 ) {
+        x = x | x >> i;
+    }
+
+    return x + 1;
+};
+
 /*global ArrayBuffer, Uint32Array, Int32Array, Float32Array, Int8Array, Uint8Array, window, performance, Console*/
 
 /*
@@ -12873,27 +13014,49 @@ var o3dgc = (function () {
         return pos;
     }
     // Timer class
-    if (typeof window.performance === 'undefined') {
-        window.performance = {};
-    }
-    if (!window.performance.now) {
-        local.nowOffset = Date.now();
-        if (performance.timing && performance.timing.navigationStart) {
-            local.nowOffset = performance.timing.navigationStart;
-        }
-        window.performance.now = function now() {
-            return Date.now() - local.nowOffset;
-        };
-    }
+    // if (typeof window.performance === 'undefined') {
+        // window.performance = {};
+    // }
+    // if (!window.performance.now) {
+        // local.nowOffset = Date.now();
+        // if (performance.timing && performance.timing.navigationStart) {
+            // local.nowOffset = performance.timing.navigationStart;
+        // }
+        // window.performance.now = function now() {
+            // return Date.now() - local.nowOffset;
+        // };
+    // }
+	
+	    // begin - william 
+	    var getTimestamp = (function() {
+        if (typeof performance != 'undefined' && typeof performance.now !== 'undefined') {
+             return function() {
+                 return performance.now();
+             };
+         } else {
+             var nowOffset = Date.now();
+             return function() {
+                 return Date.now() - nowOffset;
+             };
+          }
+		  })();
+		  //end 
+		  
     module.Timer = function () {
         this.m_start = 0;
         this.m_end = 0;
     };
     module.Timer.prototype.Tic = function () {
-        this.m_start = window.performance.now();
+		// begin - william 
+        //this.m_start = window.performance.now();
+		this.m_start = getTimestamp();
+		//end 
     };
     module.Timer.prototype.Toc = function () {
-        this.m_end = window.performance.now();
+		// begin - william
+        //this.m_end = window.performance.now();
+		this.m_end = getTimestamp();
+		//end 
     };
     module.Timer.prototype.GetElapsedTime = function () {
         return this.m_end - this.m_start;
@@ -14494,7 +14657,7 @@ var o3dgc = (function () {
             for (f = 0; f < ntfans; ++f) {
                 tfans.AddTFAN();
                 degree = ctfans.ReadDegree(itDegree) + 2 - numConqueredTriangles;
-                config = ctfans.ReadConfig(itConfig);
+                var config = ctfans.ReadConfig(itConfig);
                 k0 = tfans.GetNumVertices();
                 tfans.AddVertex(focusVertex);
                 processConfig[config](this, degree, focusVertex);
@@ -15700,165 +15863,31 @@ S3D.S3DLoader.prototype = {
 
 	
 
-CLOUD.MaterialLoader = function ( showStatus ) {
-	THREE.Loader.call( this, showStatus );
-};
-
-CLOUD.MaterialLoader.prototype = Object.create(THREE.Loader.prototype);
-CLOUD.MaterialLoader.prototype.constructor = CLOUD.MaterialLoader;
-
-CLOUD.MaterialLoader.prototype.setBaseUrl = function( value ) {
-    this.baseUrl = value;
-};
-
-CLOUD.MaterialLoader.prototype.setCrossOrigin = function( value ) {
-    this.crossOrigin = value;
-};
-
-CLOUD.MaterialLoader.prototype.load = function (materialUrl, callback, result) {
-
-    var scope = this;
-    var texturePath = this.baseUrl;
-
-    function hack_material(json) {
-        var material = new THREE[json.type](json.parameters);
-
-        if (CloudShaderLib === undefined) {
-            return material;
-        }
-
-        if (json.type === 'MeshPhongMaterial') {
-            material.type = 'phong_cust_clip';
-            material.uniforms = CloudShaderLib.phong_cust_clip.uniforms;
-            material.vertexShader = CloudShaderLib.phong_cust_clip.vertexShader;
-            material.fragmentShader = CloudShaderLib.phong_cust_clip.fragmentShader;
-        }
-
-
-        if ( json.parameters.mapDiffuse !== undefined ) {
-            //material.map = THREE.ImageUtils.loadTexture( texturePath + "/" + json.parameters.mapDiffuse );
-            material.map = scope.loadTexture( texturePath + "/" + json.parameters.mapDiffuse );
-        }
-
-        if ( json.parameters.mapSpecular !== undefined ) {
-            //material.specularMap = THREE.ImageUtils.loadTexture( texturePath + "/" + json.parameters.mapSpecular );
-            material.specularMap = scope.loadTexture( texturePath + "/" + json.parameters.mapSpecular );
-        }
-
-        return material;
-    }
-
-    var loader = new THREE.XHRLoader();
-
-    loader.load(materialUrl, function (text) {
-        var matData = JSON.parse(text);
-
-        for (var matID in matData.materials) {
-            var matJSON = matData.materials[matID];
-
-            if (matJSON.parameters.opacity !== undefined && matJSON.parameters.opacity < 1.0) {
-                matJSON.parameters.transparent = true;
-            }
-            if (matJSON.parameters.side != undefined && matJSON.parameters.side === "double") {
-                matJSON.parameters.side = THREE.DoubleSide;
-            }
-
-            if (matJSON.parameters.ambient !== undefined)
-                delete matJSON.parameters.ambient; // ambient is removed for PhongMaterial
-
-
-            //material = new THREE[ matJSON.type ]( matJSON.parameters );
-            material = hack_material(matJSON);
-            material.name = matID;
-
-            result.materials[matID] = material;
-        }
-
-        callback();
-    });
-};
-
-CLOUD.MaterialLoader.prototype.loadTexture = function( url, mapping, onLoad, onProgress, onError ) {
-
-    var texture;
-    var loader = THREE.Loader.Handlers.get( url );
-    var manager = ( this.manager !== undefined ) ? this.manager : THREE.DefaultLoadingManager;
-
-    if ( loader !== null ) {
-
-        texture = loader.load( url, onLoad );
-
-    } else {
-
-        texture = new THREE.Texture();
-
-        loader = new THREE.ImageLoader( manager );
-        loader.setCrossOrigin( this.crossOrigin );
-        loader.load( url, function ( image ) {
-
-            texture.image = CLOUD.MaterialLoader.ensurePowerOfTwo( image );
-            texture.needsUpdate = true;
-
-            if ( onLoad ) onLoad( texture );
-
-        }, onProgress, onError );
-
-    }
-
-    if ( mapping !== undefined ) texture.mapping = mapping;
-
-    return texture;
-};
-
-CLOUD.MaterialLoader.ensurePowerOfTwo = function ( image ) {
-
-    if ( ! THREE.Math.isPowerOfTwo( image.width ) || ! THREE.Math.isPowerOfTwo( image.height ) ) {
-
-        var canvas = document.createElement( "canvas" );
-        canvas.width = CLOUD.MaterialLoader.nextHighestPowerOfTwo( image.width );
-        canvas.height = CLOUD.MaterialLoader.nextHighestPowerOfTwo( image.height );
-
-        var ctx = canvas.getContext( "2d" );
-        ctx.drawImage( image, 0, 0, image.width, image.height, 0, 0, canvas.width, canvas.height );
-        return canvas;
-
-    }
-
-    return image;
-};
-
-CLOUD.MaterialLoader.nextHighestPowerOfTwo = function( x ) {
-
-    --x;
-
-    for ( var i = 1; i < 32; i <<= 1 ) {
-        x = x | x >> i;
-    }
-
-    return x + 1;
-};
-
-
 CLOUD.MpkLoader = function ( showStatus ) {
 
-	THREE.Loader.call( this, showStatus );
+    THREE.Loader.call( this, showStatus );
 
 };
 
 CLOUD.MpkLoader.prototype = Object.create( THREE.Loader.prototype );
 CLOUD.MpkLoader.prototype.constructor = CLOUD.MpkLoader;
 
-CLOUD.MpkLoader.prototype.load = function (mpkId, parameters, client, callback, onComplete) {
+CLOUD.MpkLoader.prototype.load = function (mpkId, parameters, client, callback, onComplete,useWorker) {
 
-    var url = client.mpkUrl(mpkId);
     var scope = this;
     if (parameters.binaryData) {
-        scope.parseS3D(parameters.binaryData, parameters, client, callback);
-        onComplete();
-        parameters.binaryData = null;
+        // open a worker thread
+        if (useWorker == true) {
+
+        }
+        else {
+            scope.parseS3D(parameters.binaryData, parameters, client, callback);
+            onComplete();
+            parameters.binaryData = null;
+        }
         return;
     }
-   
+
     var useArraybuffer = CLOUD.GlobalData.UseArrayBuffer;
 
     var xhr = new XMLHttpRequest();
@@ -15868,14 +15897,41 @@ CLOUD.MpkLoader.prototype.load = function (mpkId, parameters, client, callback, 
     xhr.onreadystatechange = function () {
         if (xhr.readyState === 4) {
             if (xhr.status === 200 || xhr.status === 0) {
-              
-               scope.parseS3D(xhr.response, parameters, client, callback);           
+                if(useWorker == true){
 
-               onComplete();
-               xhr = null;
+
+
+                    var worker = new Worker(CLOUD.GlobalData.MpkWorkerUrl);
+
+                    worker.onmessage = function( event ) {
+
+                        var files = event.data;
+                        var symbol = parameters.symbol;
+                        var i = 0;
+                        for (var meshId in parameters.items) {
+
+                            var s3dFile = files[ i ];
+
+                            scope.createModel(s3dFile[0], s3dFile[1], meshId, symbol, callback);
+                            s3dFile = null;
+                            ++i;
+                        }
+
+                        onComplete();
+                    };
+                    var offsets = parameters.items;
+                    worker.postMessage( { "data": xhr.response, "offsets": offsets} );
+
+                }else {
+                    scope.parseS3D(xhr.response, parameters, client, callback);
+                    onComplete();
+                }
+                xhr = null;
             }
-        }        
-    }
+        }
+    };
+
+    var url = client.mpkUrl(mpkId);
     xhr.open("GET", url, true);
 
     if(useArraybuffer){
@@ -15928,7 +15984,6 @@ CLOUD.MpkLoader.prototype.createModel = function (indices, vertices, meshId, sym
 
     callback(geometry);
 };
-
 
 /**
  * @author Liwei.Ma
@@ -17008,7 +17063,7 @@ CLOUD.FileTaskWorker = function (threadCount) {
 
 CLOUD.MpkNodeTaskWorker = function (threadCount) {
 
-    this.MaxThreadCount = threadCount || 6;
+    this.MaxThreadCount = threadCount || 8;
 
     var scope = this;
 
@@ -17522,7 +17577,9 @@ CLOUD.ModelManager.prototype.loadMpk = function (mpkId, client, callback) {
     mpkIdx.status = CLOUD.MPKSTATUS.LOADING;
 
     var scope = this;
-
+    // multi-threading o3dgc decoding, disable it by default, revisit this when performance turning.
+    // "CLOUD.MpkLoader.prototype.load" get tested only for non "parameters.binaryData" situation.
+    var useWorker = CLOUD.GlobalData.UseMpkWorker && (typeof window.Worker === "function");
     mpkLoader.load(mpkId, mpkIdx, client,
         function (mesh) {
 
@@ -17540,7 +17597,8 @@ CLOUD.ModelManager.prototype.loadMpk = function (mpkId, client, callback) {
             mpkIdx.dispatchEvent({ type: "ON_MPK_LOADED" });
             mpkIdx._listeners = {};
             mpkIdx.items = null;
-        }
+        },
+        useWorker
     );
 }
 

@@ -250,7 +250,7 @@ App.Index = {
 
 
 	init() {
-
+		App.Comm.isIEModel();
 		//非api 调用
 		if (this.Settings.type != 'api') {
 			//初始化参数

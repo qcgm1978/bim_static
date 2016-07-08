@@ -27,7 +27,6 @@ var AppRoute = Backbone.Router.extend({
 	//首页主体展示
 
 	bodyContent: function() {
-
 		this.reset();
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".bodyConMenu").addClass('selected');
 		_.require('/static/dist/bodyContent/bodyContent.css');
@@ -78,10 +77,13 @@ var AppRoute = Backbone.Router.extend({
 		_.require('/static/dist/projects/projects.css');
 		_.require('/static/dist/projects/projects.js');
 		App.Projects.init();
+
 	},
 
 	//单个项目
 	project: function(id, versionId) {
+
+
 
 		this.reset();
 
@@ -94,7 +96,6 @@ var AppRoute = Backbone.Router.extend({
 		App.Project.Settings.projectId = id;
 
 		App.Project.Settings.versionId = versionId;
-
 		App.Project.init();
 	},
 
@@ -240,6 +241,10 @@ var AppRoute = Backbone.Router.extend({
 		//		window.location.href = "/static/dist/app/todo/remind.html";
 		//	}
 		//}
+		if(!window.ActiveXObject){
+			_.require('/static/dist/libs/libsH5.js');
+		}
+		App.Comm.isIEModel();
 		if (!$._data($(".user > span")[0], "events")) {
 			//绑定用户信息
 			App.TopNav.init();

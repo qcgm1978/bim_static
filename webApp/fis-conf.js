@@ -319,6 +319,17 @@ fis.match('/components/fileSelection/**.{less,css}',{
 fis.match('/components/fileSelection/es6/**.{es6,js}',{
      packTo: '/static/dist/components/fileSelection/js/fileSelection.js'
 });
+
+//模型 \modelSelection
+fis.match('/components/modelSelection/index.html',{
+     release: '/static/dist/components/modelSelection/index.html'
+});
+fis.match('/components/modelSelection/**.{js,es6}',{
+     packTo: '/static/dist/components/modelSelection/js/modelSelection.js'
+});
+// 项
+
+
 // 项目预览
 
 fis.match('/app/project/single/**.{js,es6}', {
@@ -342,6 +353,12 @@ fis.match('/app/project/projectChange/**.{css,less}', {
   packTo: '/static/dist/app/project/projectChange/index_' + v + '.css'
 });
 
+
+//单独
+fis.match('/js/**.js', {
+  //useHash:true,
+  release: "/static/dist/$0"
+});
 
 
 

@@ -12,7 +12,7 @@ var AppKeyRoute = Backbone.Router.extend({
 
 	//模型分享
 	shareModel(token) {
-
+		App.Comm.isIEModel();
 		_.require('/static/dist/projects/projects.css');
 		_.require('/static/dist/projects/projects.js');
 
@@ -192,7 +192,7 @@ var AppKeyRoute = Backbone.Router.extend({
 
 	//加载之前
 	beforeInit(callback) {
-
+		App.Comm.isIEModel();
 		//验证登录
 		this.checkLogin((isLogin) => {
 
