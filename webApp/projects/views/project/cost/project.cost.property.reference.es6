@@ -13,7 +13,8 @@ App.Project.CostReference = Backbone.View.extend({
 
 	events: {
 		"click .tbBodyContent": "showInModle",
-		"click .tbBodyContent .nodeSwitch": "nodeSwitch"
+		"click .tbBodyContent .nodeSwitch": "nodeSwitch",
+		"keydown .txtSearch":'search'
 	},
 
 
@@ -93,6 +94,24 @@ App.Project.CostReference = Backbone.View.extend({
 
 		event.stopPropagation(); 
 
+	},
+	search(e){
+		var _this=this;
+		if(e.keyCode==13){
+			App.Project.CostAttr.ReferenceCollection.reset();
+			App.Project.CostAttr.ReferenceCollection.projectId = App.Project.Settings.projectId;
+			App.Project.CostAttr.ReferenceCollection.projectVersionId = App.Project.Settings.CurrentVersion.id;
+			App.Project.CostAttr.ReferenceCollection.fetch({
+				data:{
+					keyword:$(e.currentTarget).val()
+				},
+				success:function(c,d,x){
+					if(d.data.length<=0){
+						_this.$(".tbBody .tbBodyContent").html('<div class="nullPage costList"><i class="bg"></i>暂无搜索结果</div>');
+					}
+				}
+			});
+		}
 	}
 
 

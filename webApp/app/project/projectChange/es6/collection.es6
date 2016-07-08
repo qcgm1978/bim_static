@@ -28,14 +28,13 @@ App.Views = {
 		//初始化
 		initialize() {
 			this.listenTo(App.Collections.changeListCollection, "add", this.addOne);
-
+			this.listenTo(App.Collections.changeListCollection, "reset", this.resetData);
 		}, 
-		 
-
 		//渲染
 		render() {
 
 			this.$el.html('<div class="loadings">正在加载，请稍候……</div>');
+			$('.txtSearch').on('keydown',this.search);
 			return this;
 		},
 
@@ -53,6 +52,9 @@ App.Views = {
 			this.bindScroll();//绑定滚动条
 		},
 
+		resetData(){
+			this.$el.html('<div class="loadings">正在加载，请稍候……</div>');
+		},
 		
 		//绑定滚动条
 		bindScroll() {
@@ -72,6 +74,24 @@ App.Views = {
 				},
 				scrollInertia: 0
 			});
+		},
+
+		search(e){
+			if(e.keyCode==13){
+				App.Collections.changeListCollection.reset();
+				App.Collections.changeListCollection.projectId = App.Index.Settings.projectId;
+				App.Collections.changeListCollection.projectVersionId =App.Index.Settings.projectVersionId;
+				App.Collections.changeListCollection.fetch({
+					data:{
+						keyword:$(e.currentTarget).val()
+					},
+					success:function(c,d,x){
+						if(d.data.length<=0){
+							$('.changeListBox ').html('<div class="loadings">暂无搜索结果</div>');
+						}
+					}
+				});
+			}
 		}
  
 
