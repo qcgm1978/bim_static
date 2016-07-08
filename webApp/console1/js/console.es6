@@ -393,6 +393,22 @@ App.Console = {
       });
 
     });
+    //6.1
+    $.ajax({
+      url: "platform/api/project?uninit=1"
+    }).done(function(data){
+
+      var items = data.data, str = '';
+
+      $.each(items, function(i, item){
+        if(item.projectCode){
+          str += '<option id="' + item.projectCode  + '">' + item.name + '</option>';
+        }
+
+      });
+      $("#s1").html("<option value=''>请选择</option>"+str);
+    });
+    //6.4
     //6.2
     $.ajax({
       url: "platform/api/project"
@@ -934,6 +950,7 @@ App.Console = {
         projectVersionName      : $('#p12').val().trim(),
         refProjectModelCode       : $('#s11').val(),
         refProjectModelName     : $('#s11 option:selected').text().trim(),
+        projectCode             : $('#s11').val(),
         refProjectModelVersionId: $('#s12').val().trim(),
         description             : $('#p13').val().trim(),
         changedFiles            : $('#p14').val().trim().split(','),
