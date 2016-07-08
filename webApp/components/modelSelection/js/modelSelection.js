@@ -11,7 +11,7 @@
     }
 
     var defaults = {
-      btnText:'确&nbsp;&nbsp;定',
+      btnText:'确&nbsp;&nbsp;定'
     }
 
     //合并参数
@@ -22,7 +22,6 @@
   ModelSelection.prototype = {
     init:function(){
       var self = this,
-          serverUrl = 'http://bim.wanda.cn/',
           srciptUrl = '/static/dist/libs/libsH5_20160313.js',
           styleUrl = '/static/dist/libs/libsH5_20160313.css',
           $script = '<script src="'+srciptUrl+'"></script>',

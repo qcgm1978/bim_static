@@ -5,7 +5,35 @@ App.Comm = {
 		loginType: "user", // 登录状态 user token
 		pageItemCount: 15 //Math.floor(($("body").height() + 60) / 70) > 10 && Math.floor(($("body").height() + 60) / 70) || 10
 	},
-
+	isIEModel: function() {
+		if ($('#iewrapbox').length > 0) {
+			return;
+		}
+		//IE11 以下都是真
+		if (window.ActiveXObject) {
+			$("#topBar").remove();
+			$("body").empty();
+			try{
+				var WebView = document.createElement("object");
+				WebView.classid = "CLSID:15A5F85D-A81B-45D1-A03A-6DBC69C891D1";
+				WebView.url = window.location.href;
+				WebView.id = 'iewrapbox';
+				WebView.width = '100%';
+				WebView.height = '100%';
+				function navigateTo(url){
+					var aLink = "<a href='"+ url + "' target='_blank' >test</a>";
+					var a = $(aLink).get(0);
+					var e = document.createEvent('MouseEvents');
+					e.initEvent('click', true, true);
+					a.dispatchEvent(e);
+				}
+				WebView.registerEvent('urlChanged', navigateTo);
+				$('body').html(WebView);
+			}catch(e){
+				alert('请安装ActiveX插件');
+			}
+		}
+	},
 	//项目版本状态
 	versionStatus: {
 		"1": "待上传",

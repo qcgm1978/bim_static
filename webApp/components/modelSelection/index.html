@@ -4,8 +4,6 @@
   <meta charset="UTF-8">
   <title>模型选择器</title>
   <script src="http://bim.wanda-dev.cn/static/dist/components/modelSelection/js/modelSelection.js"></script>
-  <script src="http://cdn.bootcss.com/underscore.js/1.8.3/underscore-min.js"></script>
-  
 </head>
 <body>
 <input type="button" id="model" value="show">
@@ -13,6 +11,7 @@
 $(function(){
   $('#model').on('click',function(){
     var viewer = new ModelSelection({
+
       sourceId: '848069790540000',
       etag: "ca4863cf122ac55b5a8e845595aeb7ce",
       projectId:'1',

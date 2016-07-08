@@ -244,16 +244,15 @@
                 if(viewData[modelName][item.cateName]){
                   viewData[modelName][item.cateName][item.id] = item.name;
                 }else{
-                  viewData[modelName][item.cateName] = {
-                    [item.id]:item.name
-                  }
+                  var __obj={};
+                  __obj[item.id]=item.name;
+                  viewData[modelName][item.cateName] = __obj;
                 }
               }else{
-                viewData[modelName] = {
-                  [item.cateName] : {
-                    [item.id]:item.name
-                  }
-                }
+                var __obj={},__obj2={};
+                  __obj[item.id]=item.name;
+                  __obj2[item.cateName]=__obj;
+                viewData[modelName] = __obj2;
               }
             });
             if(callback)callback(viewData);

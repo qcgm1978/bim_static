@@ -4288,7 +4288,6 @@ THREE.Box3.prototype = {
  */
 
 THREE.Matrix3 = function () {
-
 	this.elements = new Float32Array( [
 
 		1, 0, 0,
