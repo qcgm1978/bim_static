@@ -72,25 +72,25 @@
       <div class="form-group">
         <label for="inputPassword3" class="col-sm-2 control-label">发起人</label>
         <div class="col-sm-10">
-          <input type="text" class="form-control" id="p14" value="">
+          <input type="text" class="form-control" id="p14" value='{"userId":"123","loginId":"gongcen"}'>
         </div>
       </div>
       <div class="form-group">
         <label for="inputPassword3" class="col-sm-2 control-label">审核人</label>
         <div class="col-sm-10">
-          <input type="text" class="form-control" id="p15" value="">
+          <input type="text" class="form-control" id="p15" value='[{"userId":"123","loginId":"gongcen"}]'>
         </div>
       </div>
       <div class="form-group">
         <label for="inputPassword3" class="col-sm-2 control-label">确认人</label>
         <div class="col-sm-10">
-          <input type="text" class="form-control" id="p16" value="">
+          <input type="text" class="form-control" id="p16" value='[{"userId":"123","loginId":"gongcen"}]'>
         </div>
       </div>
       <div class="form-group">
         <label for="inputPassword3" class="col-sm-2 control-label">接收人</label>
         <div class="col-sm-10">
-          <input type="text" class="form-control" id="p17" value="">
+          <input type="text" class="form-control" id="p17" value='[{"userId":"123","loginId":"gongcen"}]'>
         </div>
       </div>
       <div class="form-group">
@@ -113,17 +113,25 @@
         </div>
       </div>
       <div class="form-group">
-        <label for="inputPassword3" class="col-sm-2 control-label">项目名称</label>
+        <label for="inputPassword3" class="col-sm-2 control-label">项目模型列表</label>
         <div class="col-sm-10">
-          <input type="text" class="form-control" id="p12" value="">
+          <select class="form-control referenceResources" id="s1">
+            <option value="0">请选择</option>
+          </select>
         </div>
       </div>
-      <div class="form-group">
-        <label for="inputPassword3" class="col-sm-2 control-label">流程标题</label>
-        <div class="col-sm-10">
-          <input type="text" class="form-control" id="p13" value="项目模型研发指令表单">
-        </div>
-      </div>
+      <!--<div class="form-group">-->
+        <!--<label for="inputPassword3" class="col-sm-2 control-label">项目名称</label>-->
+        <!--<div class="col-sm-10">-->
+          <!--<input type="text" class="form-control" id="p12" value="">-->
+        <!--</div>-->
+      <!--</div>-->
+      <!--<div class="form-group">-->
+        <!--<label for="inputPassword3" class="col-sm-2 control-label">流程标题</label>-->
+        <!--<div class="col-sm-10">-->
+          <!--<input type="text" class="form-control" id="p13" value="项目模型研发指令表单">-->
+        <!--</div>-->
+      <!--</div>-->
 
       <div class="form-group">
         <!--<label for="inputPassword3" class="col-sm-2 control-label"></label>-->
@@ -143,10 +151,10 @@
         "status": 16,
         "workflowId": "da276ee428064f609dd522d20cc932a4",
         "title": "项目模型研发指令表单",
-            "initiator": "gongcen",
-            "auditor": [{"userId":"123","loginId":"gc"}],
-            "confirmor": [{"userId":"123","loginId":"gc"}],
-            "receiver": [{"userId":"123","loginId":"gc"}]
+            "initiator": {"userId":"123","loginId":"gongcen"},
+            "auditor": [{"userId":"123","loginId":"gongcen"}],
+            "confirmor": [{"userId":"123","loginId":"gongcen"}],
+            "receiver": [{"userId":"123","loginId":"gongcen"}]
     }
 
                     </textarea>
@@ -195,6 +203,14 @@ createTime	表单创建时间	long
         </div>
       </div>
       <div class="form-group">
+        <label for="inputPassword3" class="col-sm-2 control-label">项目模型版本</label>
+        <div class="col-sm-10">
+          <select class="form-control referenceResources" id="s211">
+            <option value="0">请选择</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
         <label for="inputPassword3" class="col-sm-2 control-label">流程标题</label>
         <div class="col-sm-10">
           <input type="text" class="form-control" id="p21" value="项目模型报审表单发起">
@@ -211,10 +227,10 @@ createTime	表单创建时间	long
         "workflowId": "47f445a925f44cdfb6c1b130f37466ee",
         "projectModelInstructionsWorkflowId": "411a109141d6473c83a86aa0480d6610",
         "title": "项目模型报审表单发起",
-           "initiator": "gongcen",
-            "auditor": [{"userId":"123","loginId":"gc"}],
-            "confirmor": [{"userId":"123","loginId":"gc"}],
-            "receiver": [{"userId":"123","loginId":"gc"}]
+           "initiator": {"userId":"123","loginId":"gongcen"},
+            "auditor": [{"userId":"123","loginId":"gongcen"}],
+            "confirmor": [{"userId":"123","loginId":"gongcen"}],
+            "receiver": [{"userId":"123","loginId":"gongcen"}]
     }
 
 
@@ -274,10 +290,10 @@ status	审批状态	int	8发起；16审批通过；（4驳回；32撤销；128�
         "status": 16,
         "workflowId": "a574a17300694600974e2bef4b8fcc4d",
         "title": "项目模型报审表单状态变化",
-           "initiator": "gongcen",
-            "auditor": [{"userId":"123","loginId":"gc"}],
-            "confirmor": [{"userId":"123","loginId":"gc"}],
-            "receiver": [{"userId":"123","loginId":"gc"}]
+           "initiator": {"userId":"123","loginId":"gongcen"},
+            "auditor": [{"userId":"123","loginId":"gongcen"}],
+            "confirmor": [{"userId":"123","loginId":"gongcen"}],
+            "receiver": [{"userId":"123","loginId":"gongcen"}]
     }
 
 
@@ -320,11 +336,20 @@ status	审批状态	int	8发起；16审批通过；（4驳回；32撤销；128�
         </div>
       </div>
       <div class="form-group">
-        <label for="inputPassword3" class="col-sm-2 control-label">流程标题</label>
+        <label for="inputPassword3" class="col-sm-2 control-label">项目模型版本</label>
         <div class="col-sm-10">
-          <input type="text" class="form-control" id="p41" value="项目模型移交表单发起">
+          <select class="form-control referenceResources" id="s411">
+            <option value="0">请选择</option>
+          </select>
         </div>
       </div>
+      <div class="form-group">
+        <label for="inputPassword3" class="col-sm-2 control-label">流程标题</label>
+        <div class="col-sm-10">
+          <input type="text" class="form-control" id="p41" value="项目模型移交表单">
+        </div>
+      </div>
+
       <div class="form-group">
         <!--<label for="inputPassword3" class="col-sm-2 control-label"></label>-->
         <div class="col-sm-10">
@@ -336,10 +361,10 @@ status	审批状态	int	8发起；16审批通过；（4驳回；32撤销；128�
         "status": 8,
         "workflowId": "6914fa7c6c4542ffa67741d1140d06d1",
         "title": "项目模型移交表单发起",
-            "initiator": "gongcen",
-            "auditor": [{"userId":"123","loginId":"gc"}],
-            "confirmor": [{"userId":"123","loginId":"gc"}],
-            "receiver": [{"userId":"123","loginId":"gc"}]
+            "initiator": {"userId":"123","loginId":"gongcen"},
+            "auditor": [{"userId":"123","loginId":"gongcen"}],
+            "confirmor": [{"userId":"123","loginId":"gongcen"}],
+            "receiver": [{"userId":"123","loginId":"gongcen"}]
     }
 
 
@@ -393,10 +418,10 @@ status	审批状态	int	8发起；16审批通过；（4驳回；32撤销；128�
         "status": 16,
         "workflowId": "6f56e25884bc4233a4fce3f3490627f4",
         "title": "项目模型移交表单状态变化",
-            "initiator": "gongcen",
-            "auditor": [{"userId":"123","loginId":"gc"}],
-            "confirmor": [{"userId":"123","loginId":"gc"}],
-            "receiver": [{"userId":"123","loginId":"gc"}]
+            "initiator": {"userId":"123","loginId":"gongcen"},
+            "auditor": [{"userId":"123","loginId":"gongcen"}],
+            "confirmor": [{"userId":"123","loginId":"gongcen"}],
+            "receiver": [{"userId":"123","loginId":"gongcen"}]
     }
 
 

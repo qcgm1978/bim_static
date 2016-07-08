@@ -84,14 +84,44 @@ App.Console = {
       $("#p11").html('<option value="">请选择</option>'+str);
     });
     //获取族库研发指令表单
-    App.Console.auditSheet1(1, "#s21", 16);
+    //App.Console.auditSheet1(1, "#s21", 16);
 
     //获取族库审核审批单
     App.Console.auditSheet1(2, "#s31", 8);
-    App.Console.auditSheet1(2, "#s41", 16);
+    //App.Console.auditSheet1(2, "#s41", 16);
 
     //获取族库发版审批单
     App.Console.auditSheet1(3, "#s51", 8);
+    //4.2
+    $.ajax({
+      url: "platform/api/family?status=3"
+    }).done(function(data){
+
+      var items = data.data, str = '';
+
+      $.each(items, function(i, item){
+        if(item.code){
+          str += '<option id="' + item.code  + '">' + item.name + '</option>';
+        }
+
+      });
+      $("#s21").html("<option value=''>请选择</option>"+str);
+    });
+    //4.4
+    $.ajax({
+      url: "platform/api/family?status=5"
+    }).done(function(data){
+
+      var items = data.data, str = '';
+
+      $.each(items, function(i, item){
+        if(item.code){
+          str += '<option id="' + item.code  + '">' + item.name + '</option>';
+        }
+
+      });
+      $("#s41").html("<option value=''>请选择</option>"+str);
+    });
 
     $("#submit1").click(function(){
       var data       = {
@@ -112,10 +142,10 @@ App.Console = {
             "status"           : 16,
             "workflowId"       : parseInt(9999999 * Math.random()),
             "title"            : $("#p12").val().trim(),
-            "initiator"        : $("#p14").val().trim(),
-            "auditor"          : $("#p15").val().trim(),
-            "confirmor"        : $("#p16").val().trim(),
-            "receiver"         : $("#p17").val().trim()
+            "initiator"        : JSON.parse($("#p14").val().trim()),
+            "auditor"          : JSON.parse($("#p15").val().trim()),
+            "confirmor"        : JSON.parse($("#p16").val().trim()),
+            "receiver"         : JSON.parse($("#p17").val().trim())
           }
         }),
         "msgCreateTime": 1461727280227,
@@ -134,7 +164,8 @@ App.Console = {
     $("#submit2").click(function(){
       var data = {
         workflowId             : parseInt(9999999 * Math.random()),
-        familyDevelopWorkflowId: $('#s21').val().trim(),
+        //familyDevelopWorkflowId: $('#s21').val().trim(),
+        familyCode: $('#s21').val().trim(),
         title                  : $("#p21").val().trim()
       };
       App.Console.apply(1, 1003, data);
@@ -162,7 +193,8 @@ App.Console = {
     $("#submit4").click(function(){
       var data = {
         workflowId             : parseInt(9999999 * Math.random()),
-        familyAprovalWorkflowId: $('#s41').val().trim(),
+        //familyAprovalWorkflowId: $('#s41').val().trim(),
+        familyCode: $('#s41').val().trim(),
         title                  : $("#p41").val().trim()
 
       };
@@ -189,22 +221,23 @@ App.Console = {
   standardModel(){
     var tpl = _.templateUrl('/console1/tpls/standardModel/standardmodel.html', true);
     $("#contains").html(tpl);
+    this.twoApply(1,'s11','p14');
+    //5.2
     $.ajax({
-      url: "platform/project?type=1&pageItemCount=100000"
+      url: "platform/api/model"
     }).done(function(data){
 
-      var items = data.data.items, str = '';
+      var items = data.data, str = '';
 
       $.each(items, function(i, item){
-        if(item.id){
-          str += '<option id="' + item.id + '" value="' + item.projectNo + '">' + item.name + '</option>';
+        if(item.code){
+          str += '<option id="' + item.code  + '">' + item.name + '</option>';
         }
 
       });
-
-      $("#s11").html("<option value=''>请选择</option>"+str).change(function(){
+      $("#s21").html("<option value=''>请选择</option>"+str).change(function(){
         $.ajax({
-          url: "platform/project/" + $(this).find('option:selected').attr('id') + "/version"
+          url: "platform/api/model/"+$(this).find('option:selected').attr('id')+"/version?status=3"
         }).done(function(data){
 
           var items = data.data, str = '';
@@ -216,16 +249,48 @@ App.Console = {
             }
 
           });
-          $("#p14").html(str);
+          $("#s211").html(str);
+
+        });
+      });
+    });
+    //5.4
+    $.ajax({
+      url: "platform/api/model"
+    }).done(function(data){
+
+      var items = data.data, str = '';
+
+      $.each(items, function(i, item){
+        if(item.code){
+          str += '<option id="' + item.code  + '">' + item.name + '</option>';
+        }
+
+      });
+      $("#s41").html("<option value=''>请选择</option>"+str).change(function(){
+        $.ajax({
+          url: "platform/api/model/"+$(this).find('option:selected').attr('id')+"/version?status=5"
+        }).done(function(data){
+
+          var items = data.data, str = '';
+
+          $.each(items, function(i, item){
+            if(item.id){
+
+              str += '<option  value="' + item.id + '">' + item.name + '</option>';
+            }
+
+          });
+          $("#s411").html(str);
 
         });
       });
     });
     //获取研发标准模型指令审批单
-    App.Console.auditSheet1(4, "#s21", 16);
+    //App.Console.auditSheet1(4, "#s21", 16);
     //获取标准模型报审表单
     App.Console.auditSheet1(5, "#s31", 8);
-    App.Console.auditSheet1(5, "#s41", 16);
+    //App.Console.auditSheet1(5, "#s41", 16);
     //获取标准模型发布表单
     App.Console.auditSheet1(6, "#s51", 8);
 
@@ -250,7 +315,9 @@ App.Console = {
     $("#submit2").click(function(){
       var data = {
         workflowId                    : parseInt(9999999 * Math.random()),
-        standardModelDevelopWorkflowId: $('#s21').val().trim(),
+        //standardModelDevelopWorkflowId: $('#s21').val().trim(),
+        modelCode: $('#s21').val().trim(),
+        versionId: $('#s211').val().trim(),
         title                         : $("#p21").val().trim()
 
       };
@@ -281,7 +348,9 @@ App.Console = {
     $("#submit4").click(function(){
       var data = {
         workflowId                    : parseInt(9999999 * Math.random()),
-        standardModelAprovalWorkflowId: $('#s41').val().trim(),
+        //standardModelAprovalWorkflowId: $('#s41').val().trim(),
+        modelCode: $('#s41').val().trim(),
+        versionId: $('#s411').val().trim(),
         title                         : $("#p41").val().trim()
       };
       App.Console.apply(4, 1010, data);
@@ -324,12 +393,91 @@ App.Console = {
       });
 
     });
+    //6.1
+    $.ajax({
+      url: "platform/api/project?uninit=1"
+    }).done(function(data){
 
+      var items = data.data, str = '';
+
+      $.each(items, function(i, item){
+        if(item.projectCode){
+          str += '<option id="' + item.projectCode  + '">' + item.name + '</option>';
+        }
+
+      });
+      $("#s1").html("<option value=''>请选择</option>"+str);
+    });
+    //6.4
+    //6.2
+    $.ajax({
+      url: "platform/api/project"
+    }).done(function(data){
+
+      var items = data.data, str = '';
+
+      $.each(items, function(i, item){
+        if(item.projectCode){
+          str += '<option id="' + item.projectCode  + '">' + item.name + '</option>';
+        }
+
+      });
+      $("#s21").html("<option value=''>请选择</option>"+str).change(function(){
+        $.ajax({
+          url: "platform/api/project/"+$(this).find('option:selected').attr('id')+"/version?status=3"
+        }).done(function(data){
+
+          var items = data.data, str = '';
+
+          $.each(items, function(i, item){
+            if(item.id){
+
+              str += '<option  value="' + item.id + '">' + item.name + '</option>';
+            }
+
+          });
+          $("#s211").html(str);
+
+        });
+      });
+    });
+    //6.4
+    $.ajax({
+      url: "platform/api/project"
+    }).done(function(data){
+
+      var items = data.data, str = '';
+
+      $.each(items, function(i, item){
+        if(item.projectCode){
+          str += '<option id="' + item.projectCode  + '">' + item.name + '</option>';
+        }
+
+      });
+      $("#s41").html("<option value=''>请选择</option>"+str).change(function(){
+        $.ajax({
+          url: "platform/api/project/"+$(this).find('option:selected').attr('id')+"/version?status=5"
+        }).done(function(data){
+
+          var items = data.data, str = '';
+
+          $.each(items, function(i, item){
+            if(item.id){
+
+              str += '<option  value="' + item.id + '">' + item.name + '</option>';
+            }
+
+          });
+          $("#s411").html(str);
+
+        });
+      });
+    });
     //20获取
-    App.Console.auditSheet1(20, "#s21", 16);
+    //App.Console.auditSheet1(20, "#s21", 16);
     //8获取
     App.Console.auditSheet1(7, "#s31", 8);
-    App.Console.auditSheet1(7, "#s41", 16);
+    //App.Console.auditSheet1(7, "#s41", 16);
     //9获取
     App.Console.auditSheet1(8, "#s51", 8);
     $("#submit0").click(function() {
@@ -345,10 +493,10 @@ App.Console = {
         //versionName: “2016 版”, //版本名称，适用于标准模型。非空字段
         designUnit: $("#launchDepartment").val().trim(),
         subType: $("#s01").val().trim(),
-        "initiator"        : $("#p14").val().trim(),
-        "auditor"          : $("#p15").val().trim(),
-        "confirmor"        : $("#p16").val().trim(),
-        "receiver"         : $("#p17").val().trim()
+        "initiator"        : JSON.parse($("#p14").val().trim()),
+        "auditor"          : JSON.parse($("#p15").val().trim()),
+        "confirmor"        : JSON.parse($("#p16").val().trim()),
+        "receiver"         : JSON.parse($("#p17").val().trim())
       };
 
 
@@ -388,7 +536,9 @@ App.Console = {
     $("#submit2").click(function(){
       var data = {
         workflowId                        : parseInt(9999999 * Math.random()),
-        projectModelInstructionsWorkflowId: $('#s21').val().trim(),
+        //projectModelInstructionsWorkflowId: $('#s21').val().trim(),
+        projectCode: $('#s21').val().trim(),
+        versionId  : $('#s211').val().trim(),
         title                             : $("#p21").val().trim()
 
       };
@@ -417,7 +567,9 @@ App.Console = {
     $("#submit4").click(function(){
       var data = {
         workflowId                   : parseInt(9999999 * Math.random()),
-        projectModelAprovalWorkflowId: $('#s41').val().trim(),
+        //projectModelAprovalWorkflowId: $('#s41').val().trim(),
+        projectCode: $('#s41').val().trim(),
+        versionId  : $('#s411').val().trim(),
         title                        : $("#p41").val().trim()
 
       };
@@ -758,6 +910,38 @@ App.Console = {
     App.Console.auditSheet1(10, '#s41', 8);
     App.Console.auditSheet1(10, '#s51', 16);
     App.Console.auditSheet1(11, '#s61', 8);
+    //7.3
+    $.ajax({
+      url: "platform/api/workflow/project?status=10"
+    }).done(function(data){
+
+      var items = data.data, str = '';
+
+      $.each(items, function(i, item){
+        if(item.code){
+          str += '<option id="' + item.code  + '">' + item.name + '</option>';
+        }
+
+      });
+      $("#s31").html("<option value=''>请选择</option>"+str).change(function(){
+        $.ajax({
+          url: "platform/api/workflow/project/"+$(this).find('option:selected').attr('id')+"/version?status=10"
+        }).done(function(data){
+
+          var items = data.data, str = '';
+
+          $.each(items, function(i, item){
+            if(item.id){
+
+              str += '<option  value="' + item.id + '">' + item.name + '</option>';
+            }
+
+          });
+          $("#s311").html(str);
+
+        });
+      });
+    });
     var data;
     $("#submit4").click(function(){
       data = {
@@ -766,6 +950,7 @@ App.Console = {
         projectVersionName      : $('#p12').val().trim(),
         refProjectModelCode       : $('#s11').val(),
         refProjectModelName     : $('#s11 option:selected').text().trim(),
+        projectCode             : $('#s11').val(),
         refProjectModelVersionId: $('#s12').val().trim(),
         description             : $('#p13').val().trim(),
         changedFiles            : $('#p14').val().trim().split(','),
@@ -943,7 +1128,7 @@ App.Console = {
       type   : "POST"
     }).done(function(data){
       console.log(data)
-      if(data.message == "success"){
+      if(data.code == 0){
         alert("成功");
         window.location.reload();
       }
@@ -967,6 +1152,76 @@ App.Console = {
         });
         $(selector).append(str);
       }
+    });
+  },
+
+  twoApply(type,tagid,versionid){
+    $.ajax({
+      url: "platform/project?type="+type+"&pageItemCount=100000"
+    }).done(function(data){
+
+      var items = data.data.items, str = '';
+
+      $.each(items, function(i, item){
+        if(item.id){
+          str += '<option id="' + item.id + '" value="' + item.projectNo + '">' + item.name + '</option>';
+        }
+
+      });
+
+      $("#"+tagid).html("<option value=''>请选择</option>"+str).change(function(){
+        $.ajax({
+          url: "platform/project/" + $(this).find('option:selected').attr('id') + "/version"
+        }).done(function(data){
+
+          var items = data.data, str = '';
+
+          $.each(items, function(i, item){
+            if(item.id){
+
+              str += '<option  value="' + item.id + '">' + item.name + '</option>';
+            }
+
+          });
+          $("#"+versionid).html(str);
+
+        });
+      });
+    });
+  },
+
+  urlfor(url1,url2,tagid,versionid){
+    $.ajax({
+      url: url1
+    }).done(function(data){
+
+      var items = data.data.items, str = '';
+
+      $.each(items, function(i, item){
+        if(item.id){
+          str += '<option id="' + item.id + '" value="' + item.projectNo + '">' + item.name + '</option>';
+        }
+
+      });
+
+      $("#"+tagid).html("<option value=''>请选择</option>"+str).change(function(){
+        $.ajax({
+          url: "platform/project/" + $(this).find('option:selected').attr('id') + "/version"
+        }).done(function(data){
+
+          var items = data.data, str = '';
+
+          $.each(items, function(i, item){
+            if(item.id){
+
+              str += '<option  value="' + item.id + '">' + item.name + '</option>';
+            }
+
+          });
+          $("#"+versionid).html(str);
+
+        });
+      });
     });
   }
 };
