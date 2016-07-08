@@ -354,6 +354,12 @@ fis.match('/app/project/projectChange/**.{css,less}', {
 });
 
 
+//单独
+fis.match('/js/**.js', {
+  //useHash:true,
+  release: "/static/dist/$0"
+});
+
 
 
 // 清除其他配置，只保留如下配置
