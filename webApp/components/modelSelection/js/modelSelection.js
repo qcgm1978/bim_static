@@ -1,7 +1,5 @@
-/**
- * @require /components/modelSelection/libs/jquery-1.12.0.min.js
- */
-
+// 业务功能：设置隐患点
+// 逻辑功能: 选择隐患点构件
 (function($,win){
   var ModelSelection = function(options) {
 

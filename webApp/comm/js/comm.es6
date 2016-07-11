@@ -9,8 +9,12 @@ App.Comm = {
 		if ($('#iewrapbox').length > 0) {
 			return;
 		}
+		if(navigator.userAgent.indexOf("MSIE 8.0")>0){
+			window.location.href='ie8.html?path='+ window.location.href;
+			return 
+		}
 		//IE11 以下都是真
-		if (window.ActiveXObject) {
+		if ("ActiveXObject" in window) {
 			$("#topBar").remove();
 			$("body").empty();
 			try{

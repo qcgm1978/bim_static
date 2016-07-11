@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<title>Document</title>
+	</head>
+	<body>
+		<object ID="WebView" style="width: 100%;" CLASSID="CLSID:15A5F85D-A81B-45D1-A03A-6DBC69C891D1">
+		<PARAM NAME="url" VALUE="" />
+			</object>
+			<script type="text/javascript">
+			var LocString = String(window.document.location.href),
+				View=document.getElementById('WebView');
+				function getQueryStr(str) {
+				var rs = new RegExp("(^|)" + str + "=([^&]*)(&|$)", "gi").exec(LocString), tmp;
+				if (tmp = rs) {
+				return tmp[2];
+				}
+				return "";
+				}
+				View.height=document.body.parentElement.clientHeight+"px";
+				View.url=getQueryStr('path');
+			</script>
+		</body>
+	</html>

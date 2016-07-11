@@ -127,6 +127,12 @@ fis.match('page/tpls/**.html', {
   release: "/static/dist/tpls/$0"
 });
 
+//首页主体
+fis.match('components/inspectSelection/tpls/**.html', {
+  //useHash:true,
+  release: "/static/dist/tpls/$0"
+});
+
 fis.match('**.{otf,eot,svg,ttf,woff}', {
   //useHash:true,
   release: "/static/dist/comm/$0"
@@ -326,6 +332,17 @@ fis.match('/components/modelSelection/index.html',{
 });
 fis.match('/components/modelSelection/**.{js,es6}',{
      packTo: '/static/dist/components/modelSelection/js/modelSelection.js'
+});
+
+//模型 \modelSelection
+fis.match('/components/inspectSelection/index.html',{
+     release: '/static/dist/components/inspectSelection/index.html'
+});
+fis.match('/components/inspectSelection/libs/**.{js,es6}',{
+     packTo: '/static/dist/components/inspectSelection/libs/libs.js'
+});
+fis.match('/components/inspectSelection/js/**.{js,es6}',{
+     packTo: '/static/dist/components/inspectSelection/js/inspectSelection.js'
 });
 // 项
 

@@ -135,6 +135,7 @@
       }
     },
     comment:function(isSelected,viewer){
+      return;
       var self = this;
       self.el._dom.sidebar.find('#comment').show().siblings().hide();
       isSelected ? self.el._dom.sidebar.addClass('open') && viewer.commentInit() : self.el._dom.sidebar.removeClass('open');
