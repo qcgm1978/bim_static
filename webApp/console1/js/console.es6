@@ -906,9 +906,9 @@ App.Console = {
       });
     });
     App.Console.auditSheet1(9, '#s21', 8);
-    App.Console.auditSheet1(9, '#s31', 16);
+    //App.Console.auditSheet1(9, '#s31', 16);
     App.Console.auditSheet1(10, '#s41', 8);
-    App.Console.auditSheet1(10, '#s51', 16);
+    //App.Console.auditSheet1(10, '#s51', 16);
     App.Console.auditSheet1(11, '#s61', 8);
     //7.3
     $.ajax({
@@ -918,8 +918,8 @@ App.Console = {
       var items = data.data, str = '';
 
       $.each(items, function(i, item){
-        if(item.code){
-          str += '<option id="' + item.code  + '">' + item.name + '</option>';
+        if(item.projectCode){
+          str += '<option id="' + item.projectCode  + '">' + item.name + '</option>';
         }
 
       });
@@ -938,6 +938,38 @@ App.Console = {
 
           });
           $("#s311").html(str);
+
+        });
+      });
+    });
+    //7.5
+    $.ajax({
+      url: "platform/api/workflow/project?status=10"
+    }).done(function(data){
+
+      var items = data.data, str = '';
+
+      $.each(items, function(i, item){
+        if(item.projectCode){
+          str += '<option id="' + item.projectCode  + '">' + item.name + '</option>';
+        }
+
+      });
+      $("#s51").html("<option value=''>请选择</option>"+str).change(function(){
+        $.ajax({
+          url: "platform/api/workflow/project/"+$(this).find('option:selected').attr('id')+"/version?status=10"
+        }).done(function(data){
+
+          var items = data.data, str = '';
+
+          $.each(items, function(i, item){
+            if(item.id){
+
+              str += '<option  value="' + item.id + '">' + item.name + '</option>';
+            }
+
+          });
+          $("#s511").html(str);
 
         });
       });
@@ -977,7 +1009,9 @@ App.Console = {
     $("#submit6").click(function(){
       data = {
         workflowId                       : parseInt(9999999 * Math.random()),
-        projectModelChangeApplyWorkflowId: $('#s31').val().trim(),
+        //projectModelChangeApplyWorkflowId: $('#s31').val().trim(),
+        projectCode: $('#s31').val().trim(),
+        versionId: $('#s311').val().trim(),
         status                           : 8,
         title                            : $('#p31').val().trim()
       };
@@ -1002,7 +1036,9 @@ App.Console = {
     $("#submit8").click(function(){
       data = {
         workflowId                         : parseInt(9999999 * Math.random()),
-        projectModelChangeAprovalWorkflowId: $('#s51').val().trim(),
+        //projectModelChangeAprovalWorkflowId: $('#s51').val().trim(),
+        projectCode: $('#s51').val().trim(),
+        versionId: $('#s511').val().trim(),
         status                             : 8,
         title                              : $('#p51').val().trim()
       };
