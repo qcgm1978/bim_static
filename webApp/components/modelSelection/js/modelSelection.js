@@ -1,6 +1,10 @@
 // 业务功能：设置隐患点
 // 逻辑功能: 选择隐患点构件
-(function($,win){
+(function($, win) {
+  var Project = {
+    Settings: {},
+    data: {}
+  }
   var ModelSelection = function(options) {
 
     //强制new
@@ -9,106 +13,138 @@
     }
 
     var defaults = {
-      btnText:'确&nbsp;&nbsp;定'
+      btnText: '确&nbsp;&nbsp;定'
     }
 
     //合并参数
     this.Settings = $.extend(defaults, options);
-
+    Project.Settings = this.Settings;
     this.init();
   }
   ModelSelection.prototype = {
-    init:function(){
+    init: function() {
       var self = this,
-          srciptUrl = '/static/dist/libs/libsH5_20160313.js',
-          styleUrl = '/static/dist/libs/libsH5_20160313.css',
-          $script = '<script src="'+srciptUrl+'"></script>',
-          $css = '<link rel="stylesheet" href="'+styleUrl+'" />';
-      if(!ModelSelection.isLoad){
-        $('head').append($css,$script);
+        srciptUrl = '/static/dist/libs/libsH5_20160313.js',
+        styleUrl = '/static/dist/libs/libsH5_20160313.css',
+        $script = '<script src="' + srciptUrl + '"></script>',
+        $css = '<link rel="stylesheet" href="' + styleUrl + '" />';
+      if (!ModelSelection.isLoad) {
+        $('head').append($css, $script);
         ModelSelection.isLoad = true;
       }
       self.dialog();
       self.controll();
     },
-    controll:function(){
+    controll: function() {
       var self = this;
-      self.$dialog.on('click','.toolsBtn',function(){
+      self.$dialog.on('click', '.toolsBtn', function() {
         self.getSelected();
-      }).on('click','.dialogClose',function(){
+      }).on('click', '.dialogClose', function() {
         self.$dialog.remove();
         self.$dialog = null;
-      }).on('click','.dialogOk',function(){
+      }).on('click', '.dialogOk', function() {
         var setting = self.Settings;
         if (setting.callback && setting.callback.call(this) !== false) {
           self.$dialog.remove();
           self.$dialog = null;
           return self.viewData
         }
-      }).on('click','.rightBar .m-openTree,.rightBar .m-closeTree',function(){
+      }).on('click', '.rightBar .m-openTree,.rightBar .m-closeTree', function() {
         var $this = $(this),
-            $li = $this.closest('.itemNode');
+          $li = $this.closest('.itemNode');
         $this.toggleClass('m-openTree m-closeTree');
         $li.toggleClass('open');
       })
     },
-    dialog:function(){
+    dialog: function() {
       var self = this,
-          Settings = this.Settings,
-          $dialog;
-      if(this.$dialog){
+        Settings = this.Settings,
+        $dialog;
+      if (this.$dialog) {
         $dialog = self.$dialog;
-      }else{
-        $dialog = self.$dialog= $('<div class="modelSelectDialog"></div>');
+      } else {
+        $dialog = self.$dialog = $('<div class="modelSelectDialog"></div>');
         var $body = $('<div class="dialogBody"></div>'),
-            $header = $('<div class="dialogHeader"/>').html('请选择构件<span class="dialogClose" title="关闭"></span> '),
-            $modelView = self.$modelView = $('<div id="modelView" class="model"></div>')
-            $content = $('<div class="dialogContent"><div class="rightBar"><div class="tab"><div class="tabItem">已选构件</div></div><div class="tools"><div class="toolsBtn"><i class="m-checked"></i>选择构件</div><span class="isSecleted">已选<span class="num"></span>个构件</span></div><div class="bim" id="modelTree"></div></div></div>'),
-            $bottom = $('<div class="dialogFooter"/>').html('<input type="button" class="dialogOk dialogBtn" value="' + this.Settings.btnText + '" />');
+          $header = $('<div class="dialogHeader"/>').html('请选择构件<span class="dialogClose" title="关闭"></span> '),
+          $modelView = self.$modelView = $('<div id="modelView" class="model"></div>')
+        $content = $('<div class="dialogContent"><div class="rightBar"><div class="tab"><div class="tabItem">已选构件</div></div><div class="tools"><div class="toolsBtn"><i class="m-checked"></i>选择构件</div><span class="isSecleted">已选<span class="num"></span>个构件</span></div><div class="bim" id="modelTree"></div></div></div>'),
+          $bottom = $('<div class="dialogFooter"/>').html('<input type="button" class="dialogOk dialogBtn" value="' + this.Settings.btnText + '" />');
         $content.prepend($modelView);
-        $body.append($header,$content,$bottom);
+        $body.append($header, $content, $bottom);
       }
       $dialog.append($body);
       $("body").append($dialog);
-      setTimeout(function(){
+
+      if (Project.Settings.type == 'single') {
+        $('.tools').hide();
+      }
+
+      setTimeout(function() {
         self.renderModel();
-      },10);
+      }, 10);
     },
-    renderModel:function(){
-      this.viewer = new bimView({
-        type:'model',
+    renderModel: function() {
+      var _this = this;
+      var viewer = new bimView({
+        type: 'model',
         element: this.$modelView,
         sourceId: this.Settings.sourceId,
         etag: this.Settings.etag,
-        projectId:this.Settings.projectId,
+        projectId: this.Settings.projectId,
         projectVersionId: this.Settings.projectVersionId
       })
+      this.viewer = viewer;
+      Project.Viewer = viewer;
+      viewer.on("click", function(model) {
+        viewer.zoomToSelection();
+        if (Project.Settings.type == 'single') {
+          _this.getSelected();
+          viewer.markers();
+          viewer.viewer.setMarkerState(3);
+        }
+      });
+      $('.view').on('click', function() {
+        if (Project.Settings.type == 'single') {
+          var m=viewer.saveMarkers();
+          if(m &&　m.length>0){
+             viewer.loadMarkers([m.pop()]);
+          }
+        }
+        $(this).mouseup(function(e) {
+          if (3 == e.which) {
+            viewer.loadMarkers(null);
+          }
+        });
+      })
     },
-    getSelected:function(){
+    getSelected: function() {
       var self = this;
-      var viewData = self.viewData || {};
-      bimView.sidebar.getSelected(this.viewer,function(ids){
-        self.viewData = $.extend(true,{},viewData,ids);
+      var viewData = {};
+      if (Project.Settings.type == 'multi') {
+        viewData = self.viewData || {};
+      }
+      bimView.sidebar.getSelected(this.viewer, function(ids) {
+        self.viewData = $.extend(true, {}, viewData, ids);
         var tree = self.renderTree(self.viewData);
         var len = tree.find('.noneSwitch').length;
         self.$dialog.find('.num').text(len);
         $('#modelTree').html(tree);
       });
     },
-    renderTree:function(data){
+    renderTree: function(data) {
       var self = this,
-          rootHtml = $('<ul class="tree"></ul>');
-      $.each(data,function(i,j){
-        var hasChild = typeof j == 'object' ? true :false,
-            icon = hasChild ? 'm-openTree':'noneSwitch',
-            name = hasChild ? i : j;
+        rootHtml = $('<ul class="tree"></ul>');
+      $.each(data, function(i, j) {
+        var hasChild = typeof j == 'object' ? true : false,
+          icon = hasChild ? 'm-openTree' : 'noneSwitch',
+          name = hasChild ? i : j;
         var html = $('<li class="itemNode">\
           <div class="itemContent">\
-            <i class="'+icon+'"></i>\
-            <span class="treeText">'+name+'</span>\
+            <i class="' + icon + '"></i>\
+            <span class="treeText">' + name + '</span>\
           </div>\
         </li>');
-        if(hasChild){
+        if (hasChild) {
           var children = self.renderTree(j);
           html.append(children);
         }
@@ -118,4 +154,4 @@
     }
   }
   win.ModelSelection = ModelSelection;
-})($,window)
+})($, window)
