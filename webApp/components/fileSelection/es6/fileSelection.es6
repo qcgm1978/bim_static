@@ -116,11 +116,11 @@
 		init() {
 
 			//生成Dialog
-			this.buildDialog(); 
+			this.buildDialog();
 
 			if (this.Settings.fileIds) {
 
-				var url=this.Settings.reverseTree;
+				var url = this.Settings.reverseTree;
 
 				if (this.Settings.token) {
 					url += '?' + this.Settings.tokenPars;
@@ -128,7 +128,7 @@
 
 				this.loadData(url + "&fileVersionId=" + this.Settings.fileIds, this.renderRightTree);
 
-				
+
 			}
 
 			if (this.Settings.token) {
@@ -231,7 +231,7 @@
 			this.Settings.$dialog.find(".treeViewScroll").html(html);
 
 			this.Settings.$dialog.find(".leftFile, .contentBox, .rightEnter,.footer").show();
-			this.Settings.$dialog.find(".loading").hide(); 
+			this.Settings.$dialog.find(".loading").hide();
 		},
 
 		// 根
@@ -280,7 +280,7 @@
 			if (item.folder) {
 				sb += '<i class="folderIcon bg"></i>';
 			}
-			 
+
 			var dataItem = $.extend({}, item);
 			delete dataItem.children;
 			sb += '<span  class="text-field overflowEllipsis" data-fileversionid="' + item.fileVersionId + '" data-id="' + item.id + '">' + item.name + '</span> ';
@@ -317,105 +317,8 @@
 			var $dialog = this.Settings.$dialog,
 				that = this;
 
-			//收起展开树 左边
-			$dialog.on("click", ".treeViewBox .nodeSwitch,.fileEnterBox .nodeSwitch", function() {
-				var $this = $(this);
-
-				if ($this.hasClass('on')) {
-					//收起
-					$this.removeClass('on');
-					$this.closest('li').children('ul').hide();
-				} else {
-					//展开
-					$this.addClass('on');
-					$this.closest('li').children('ul').show();
-				}
-
-			});
-
-			//点击树文字
-			$dialog.on("click", ".treeViewBox .text-field", function() {
-
-
-				var $this = $(this),
-					fileVersionId = $this.data("fileversionid"),
-					url = that.Settings.nodeUrl + "?parentId=" + fileVersionId;
-
-				if (that.Settings.token) {
-					url += '&' + that.Settings.tokenPars;
-				}
-
-				$dialog.find(".treeViewBox .text-field").removeClass('selected');
-				$this.addClass('selected');
-
-				$dialog.find(".tbFile .ck").removeClass('selected'); 
-			 
-				$dialog.find(".fileBody").html(' <li class="null">正在加载，请稍候……</li>');
-				 
-				that.loadData(url, that.renderFile);
-
-			});
-
-			//全选
-			$dialog.on("click", ".tbFile .ck", function() {
-
-				var $this = $(this);
-
-				if ($this.hasClass('selected')) {
-					$this.removeClass('selected');
-					$dialog.find(".fileBody .ck:not(.disable)").removeClass('selected');
-				} else {
-					$this.addClass('selected');
-					$dialog.find(".fileBody .ck:not(.disable)").addClass('selected');
-
-				}
-
-			});
-
-			//单选
-			$dialog.on("click", ".fileBody .ck", function() {
-				//禁用
-				if ($(this).hasClass('disable')) {
-					return;
-				}
-				$(this).toggleClass('selected');
-			});
-
-			//点击文件夹
-			$dialog.on("click", ".fileBody span.fileName", function() {
-
-				var id = $(this).closest('li').data("id");
-
-				var $leftItem = $dialog.find(".leftFile span[data-id='" + id + "']");
-
-				if ($leftItem.length > 0) {
-
-					$nodeSwitch = $leftItem.parent().find(".nodeSwitch");
-
-					if ($nodeSwitch.length > 0 && !$nodeSwitch.hasClass('on')) {
-						$nodeSwitch.click();
-					}
-					$leftItem.click();
-				}
-
-			});
-
-			//全选
-			$dialog.on("click", ".rightEnter .btnEnter", function() {
-				that.enterSelect.call(that);
-			
-			});
-
-			//全选
-			$dialog.on("click", ".rightEnter .delFile", function() {
-				$(this).closest("li").remove();
-				$dialog.find(".fileCount").text($dialog.find(".rightEnter .file").length);
-			});
-
-
-
 			//关闭
-			$dialog.on("click", ".close", function() {
+			$dialog.find(".close").click(function() {
 
 				$("#fileSelectionMask").fadeOut('500', function() {
 					$(this).remove();
@@ -427,20 +330,22 @@
 
 				if (that.Settings.closeCallback) {
 					that.Settings.closeCallback.call(this);
-				}
-
-				$(document).unbind('keyup.FileSelection');
+				} 
 
 			});
 
+			$dialog.find(".rightEnter .btnEnter").click(function() {
+				that.enterSelect.call(that);
+			});
+
 			//下载
-			$dialog.on("click", ".btnDownLoad", function() {
+			$dialog.find(".btnDownLoad").click(function() {
 
 				var FileIdArr = [];
 
 				$dialog.find(".contentBox .ck.selected").each(function() {
 					FileIdArr.push($(this).data("fileversionid"));
-				}); 
+				});
 
 				if (FileIdArr.length <= 0) {
 					alert("请选择下载的文件");
@@ -456,7 +361,7 @@
 				//
 			});
 
-			$dialog.on("click", ".footer .btnEnter", function() {
+			$dialog.find(".footer .btnEnter").click(function() {
 				var result = true;
 				if ($.isFunction(that.Settings.callback)) {
 					result = that.Settings.callback.call(this, arguments);
@@ -466,14 +371,246 @@
 				}
 				$dialog.find(".close").trigger('click');
 
-			});
+			});  
+
+			$(document).unbind("keyup.FileSelection");
 
 			//esc 
-			$(document).on("keyup.FileSelection", function(event) {
+			$(document).bind("keyup.FileSelection", function(event) {
 				if (event.keyCode == 27) {
 					$dialog.find(".close").trigger('click');
 				}
 			});
+ 
+
+			//收起展开树 左边
+			// $(".nodeSwitch").live(function() {
+			// 	debugger
+			// 		if ($this.hasClass('on')) {
+			// 			//收起
+			// 			$this.removeClass('on');
+			// 			$this.closest('li').children('ul').hide();
+			// 		} else {
+			// 			//展开
+			// 			$this.addClass('on');
+			// 			$this.closest('li').children('ul').show();
+			// 		}
+			// 	} 
+
+			// );
+
+
+
+			$(".nodeSwitch").die().live("click", function() {
+
+				var $this = $(this);
+
+				if ($this.closest("#fileSelectionDialog").length <= 0) {
+					return;
+				}
+				if ($this.hasClass('on')) {
+					//收起
+					$this.removeClass('on');
+					$this.closest('li').children('ul').hide();
+				} else {
+					//展开
+					$this.addClass('on');
+					$this.closest('li').children('ul').show();
+				}
+			});
+
+			// $dialog.("click", ".treeViewBox .nodeSwitch,.fileEnterBox .nodeSwitch", function() {
+			// 	var $this = $(this);
+
+			// 	if ($this.hasClass('on')) {
+			// 		//收起
+			// 		$this.removeClass('on');
+			// 		$this.closest('li').children('ul').hide();
+			// 	} else {
+			// 		//展开
+			// 		$this.addClass('on');
+			// 		$this.closest('li').children('ul').show();
+			// 	}
+
+			// });
+
+			$(".text-field").die().live("click", function() {
+
+				var $this = $(this),
+					fileVersionId = $this.data("fileversionid"),
+					url = that.Settings.nodeUrl + "?parentId=" + fileVersionId;
+
+
+				if ($this.closest(".treeViewBox").length <= 0) {
+					return;
+				}
+
+				if (that.Settings.token) {
+					url += '&' + that.Settings.tokenPars;
+				}
+
+				$dialog.find(".treeViewBox .text-field").removeClass('selected');
+				$this.addClass('selected');
+
+				$dialog.find(".tbFile .ck").removeClass('selected');
+
+				$dialog.find(".fileBody").html(' <li class="null">正在加载，请稍候……</li>');
+
+				that.loadData(url, that.renderFile);
+
+			});
+
+			//点击树文字
+			// $dialog.on("click", ".treeViewBox .text-field", function() {
+
+
+			// 	var $this = $(this),
+			// 		fileVersionId = $this.data("fileversionid"),
+			// 		url = that.Settings.nodeUrl + "?parentId=" + fileVersionId;
+
+			// 	if (that.Settings.token) {
+			// 		url += '&' + that.Settings.tokenPars;
+			// 	}
+
+			// 	$dialog.find(".treeViewBox .text-field").removeClass('selected');
+			// 	$this.addClass('selected');
+
+			// 	$dialog.find(".tbFile .ck").removeClass('selected'); 
+
+			// 	$dialog.find(".fileBody").html(' <li class="null">正在加载，请稍候……</li>');
+
+			// 	that.loadData(url, that.renderFile);
+
+			// });
+
+			$(".ck").die().live("click", function() {
+
+				var $this = $(this);
+
+				if ($this.closest(".tbFile").length <= 0) {
+					return;
+				}
+
+				if ($this.hasClass('selected')) {
+					$this.removeClass('selected');
+					$dialog.find(".fileBody .ck:not(.disable)").removeClass('selected');
+				} else {
+					$this.addClass('selected');
+					$dialog.find(".fileBody .ck:not(.disable)").addClass('selected');
+
+				}
+
+			});
+
+
+
+			//全选
+			// $dialog.on("click", ".tbFile .ck", function() {
+
+			// 	var $this = $(this);
+
+			// 	if ($this.hasClass('selected')) {
+			// 		$this.removeClass('selected');
+			// 		$dialog.find(".fileBody .ck:not(.disable)").removeClass('selected');
+			// 	} else {
+			// 		$this.addClass('selected');
+			// 		$dialog.find(".fileBody .ck:not(.disable)").addClass('selected');
+
+			// 	}
+
+			// });
+
+			$(".ck").live("click", function() {
+
+				var $this = $(this);
+				if ($this.closest(".fileBody").length <= 0) {
+					return;
+				}
+
+				//禁用
+				if ($(this).hasClass('disable')) {
+					return;
+				}
+				$(this).toggleClass('selected');
+			});
+
+
+			//单选
+			// $dialog.on("click", ".fileBody .ck", function() {
+			// 	//禁用
+			// 	if ($(this).hasClass('disable')) {
+			// 		return;
+			// 	}
+			// 	$(this).toggleClass('selected');
+			// });
+
+			$("span.fileName").die().live("click", function() {
+
+				var id = $(this).closest('li').data("id");
+
+				var $this = $(this);
+				if ($this.closest(".fileBody").length <= 0) {
+					return;
+				}
+
+
+				var $leftItem = $dialog.find(".leftFile span[data-id='" + id + "']");
+
+				if ($leftItem.length > 0) {
+
+					$nodeSwitch = $leftItem.parent().find(".nodeSwitch");
+
+					if ($nodeSwitch.length > 0 && !$nodeSwitch.hasClass('on')) {
+						$nodeSwitch.click();
+					}
+					$leftItem.click();
+				}
+
+			});
+
+			//点击文件夹
+			// $dialog.on("click", ".fileBody span.fileName", function() {
+
+			// 	var id = $(this).closest('li').data("id");
+
+			// 	var $leftItem = $dialog.find(".leftFile span[data-id='" + id + "']");
+
+			// 	if ($leftItem.length > 0) {
+
+			// 		$nodeSwitch = $leftItem.parent().find(".nodeSwitch");
+
+			// 		if ($nodeSwitch.length > 0 && !$nodeSwitch.hasClass('on')) {
+			// 			$nodeSwitch.click();
+			// 		}
+			// 		$leftItem.click();
+			// 	}
+
+			// }); 
+			
+
+			//全选
+			// $dialog.on("click", ".rightEnter .btnEnter", function() {
+			// 	that.enterSelect.call(that);
+
+			// });
+
+			$(".delFile").die().live("click", function() {
+
+				var $this = $(this);
+				if ($this.closest(".rightEnter").length <= 0) {
+					return;
+				}
+
+				$(this).closest("li").remove();
+				$dialog.find(".fileCount").text($dialog.find(".rightEnter .file").length);
+			});
+
+
+			//全选
+			// $dialog.on("click", ".rightEnter .delFile", function() {
+			// 	$(this).closest("li").remove();
+			// 	$dialog.find(".fileCount").text($dialog.find(".rightEnter .file").length);
+			// }); 
 
 
 			//拖拽
@@ -554,7 +691,7 @@
 				if ($item.find(".folder").length > 0) {
 					sb += '<i class="nodeSwitch bg on"></i> <i class="folderIcon bg"></i>';
 				}
-				sb += '<span class="text-field overflowEllipsis " data-size="'+$item.data("size")+'"  data-id="' + id + '" data-fileversionid="' + fileVersionId + '" title="' + $item.find(".fileName").text() + '">' + $item.find(".fileName").text() + '</span> ';
+				sb += '<span class="text-field overflowEllipsis " data-size="' + $item.data("size") + '"  data-id="' + id + '" data-fileversionid="' + fileVersionId + '" title="' + $item.find(".fileName").text() + '">' + $item.find(".fileName").text() + '</span> ';
 				sb += '<i class="bg delFile"></i></div></li>';
 			}
 
@@ -610,7 +747,7 @@
 				if (count > 0) {
 					for (var i = 0; i < count; i++) {
 						item = list[i];
-						trs += '<li data-id="' + item.id + '" data-size="'+item.length+'" data-fileversionid="' + item.fileVersionId + '">';
+						trs += '<li data-id="' + item.id + '" data-size="' + item.length + '" data-fileversionid="' + item.fileVersionId + '">';
 						isLock = item.locked ? "disable" : "";
 						trs += ' <span class="ckAll"> <i class="ck bg ' + isLock + '" data-fileversionid="' + item.fileVersionId + '"></i> </span>';
 						trs += '<span class="name">';
@@ -646,7 +783,7 @@
 				trs += '<li class="null error">获取错误</li>';
 			}
 
-			this.Settings.$dialog.find(".fileBody").html(trs); 
+			this.Settings.$dialog.find(".fileBody").html(trs);
 
 		},
 
@@ -709,7 +846,7 @@
 				}
 				$text = $(this).find(".text-field");
 				FileIdArr.push({
-					size:$text.data("size"),
+					size: $text.data("size"),
 					fileId: $text.data("id"),
 					fileVersionId: $text.data("fileversionid"),
 					fileName: $text.text()
