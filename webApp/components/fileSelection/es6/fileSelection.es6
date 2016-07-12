@@ -231,21 +231,7 @@
 			this.Settings.$dialog.find(".treeViewScroll").html(html);
 
 			this.Settings.$dialog.find(".leftFile, .contentBox, .rightEnter,.footer").show();
-			this.Settings.$dialog.find(".loading").hide();
-
-
-			var opts = {
-				theme: 'minimal-dark',
-				set_width: "100%",
-				set_height: "100%",
-				axis: "xy",
-				keyboard: {
-					enable: true
-				},
-				scrollInertia: 0
-			};
-			//treeViewMar
-			this.Settings.$dialog.find(".treeViewScroll").mCustomScrollbar(opts);
+			this.Settings.$dialog.find(".loading").hide(); 
 		},
 
 		// 根
@@ -294,7 +280,7 @@
 			if (item.folder) {
 				sb += '<i class="folderIcon bg"></i>';
 			}
-
+			 
 			var dataItem = $.extend({}, item);
 			delete dataItem.children;
 			sb += '<span  class="text-field overflowEllipsis" data-fileversionid="' + item.fileVersionId + '" data-id="' + item.id + '">' + item.name + '</span> ';
@@ -343,13 +329,6 @@
 					//展开
 					$this.addClass('on');
 					$this.closest('li').children('ul').show();
-				}
-
-				if ($this.closest(".fileEnterBox").length > 0) {
-					that.bindScroll();
-				} else {
-					var width = that.Settings.$dialog.find(".leftFile .treeViewMarUl")[0].scrollWidth;
-					that.Settings.$dialog.find(".leftFile .treeViewMar").width(width);
 				}
 
 			});
@@ -424,7 +403,7 @@
 			//全选
 			$dialog.on("click", ".rightEnter .btnEnter", function() {
 				that.enterSelect.call(that);
-				that.bindScroll();
+			
 			});
 
 			//全选
@@ -503,43 +482,6 @@
 			// });  
 		},
 
-		//绑定滚动条
-		bindScroll() {
-
-
-			if (this.Settings.$dialog.find(".fileEnterBox .bindScroll").hasClass("mCustomScrollbar")) {
-				return;
-			} else {
-				var width = this.Settings.$dialog.find(".fileEnterBox .treeViewMarUl")[0].scrollWidth;
-				if (width < 220) {
-					width = 220;
-				}
-				this.Settings.$dialog.find(".fileEnterBox .treeViewMar").width(width);
-			}
-
-			var opts = {
-				theme: 'minimal-dark',
-				set_width: "100%",
-				set_height: "100%",
-				axis: "xy",
-				keyboard: {
-					enable: true
-				},
-				scrollInertia: 0
-			};
-
-
-			var width = this.Settings.$dialog.find(".fileEnterBox .treeViewMarUl")[0].scrollWidth;
-			if (width < 220) {
-				width = 220;
-			}
-			this.Settings.$dialog.find(".fileEnterBox .treeViewMar").width(width);
-			this.Settings.$dialog.find(".fileEnterBox .bindScroll").mCustomScrollbar(opts);
-
-
-		},
-
-
 		//确认选择的文件
 		enterSelect() {
 
@@ -612,7 +554,7 @@
 				if ($item.find(".folder").length > 0) {
 					sb += '<i class="nodeSwitch bg on"></i> <i class="folderIcon bg"></i>';
 				}
-				sb += '<span class="text-field overflowEllipsis " data-id="' + id + '" data-fileversionid="' + fileVersionId + '" title="' + $item.find(".fileName").text() + '">' + $item.find(".fileName").text() + '</span> ';
+				sb += '<span class="text-field overflowEllipsis " data-size="'+$item.data("size")+'"  data-id="' + id + '" data-fileversionid="' + fileVersionId + '" title="' + $item.find(".fileName").text() + '">' + $item.find(".fileName").text() + '</span> ';
 				sb += '<i class="bg delFile"></i></div></li>';
 			}
 
@@ -668,7 +610,7 @@
 				if (count > 0) {
 					for (var i = 0; i < count; i++) {
 						item = list[i];
-						trs += '<li data-id="' + item.id + '" data-fileversionid="' + item.fileVersionId + '">';
+						trs += '<li data-id="' + item.id + '" data-size="'+item.length+'" data-fileversionid="' + item.fileVersionId + '">';
 						isLock = item.locked ? "disable" : "";
 						trs += ' <span class="ckAll"> <i class="ck bg ' + isLock + '" data-fileversionid="' + item.fileVersionId + '"></i> </span>';
 						trs += '<span class="name">';
@@ -704,24 +646,7 @@
 				trs += '<li class="null error">获取错误</li>';
 			}
 
-			this.Settings.$dialog.find(".fileBody").html(trs);
-
-
-			var $fileBody = this.Settings.$dialog.find(".fileBodyScroll");
-
-			if (!$fileBody.hasClass("mCustomScrollbar")) {
-				var opts = {
-					theme: 'minimal-dark',
-					set_height: "100%",
-					axis: "y",
-					keyboard: {
-						enable: true
-					},
-					scrollInertia: 0
-				}; 
-				$fileBody.mCustomScrollbar(opts);
-			}
-
+			this.Settings.$dialog.find(".fileBody").html(trs); 
 
 		},
 
@@ -784,6 +709,7 @@
 				}
 				$text = $(this).find(".text-field");
 				FileIdArr.push({
+					size:$text.data("size"),
 					fileId: $text.data("id"),
 					fileVersionId: $text.data("fileversionid"),
 					fileName: $text.text()

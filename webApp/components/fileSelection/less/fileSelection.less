@@ -1,3 +1,7 @@
+/**
+ * @require /components/less/reset.less
+ */
+
 #fileSelectionMask { position: fixed; top: 0px; left: 0px; right: 0px; bottom: 0px; filter: alpha(opacity=50); opacity: .5; background-color: #000; z-index: 9998; }
 #fileSelectionDialog { .bg { background: url(../images/fileSelection.png) no-repeat 0 0; }
 	width: 960px; height: 600px; position: absolute; top: 50%; left: 50%; margin-top: -300px; margin-left: -480px; border: 1px #ccc solid; border-radius: 3px; background-color: #fff; z-index: 9999;
@@ -10,11 +14,13 @@
 		.leftFile, .contentBox, .rightEnter { display: none; }
 		.leftFile { float: left; width: 180px; border-right: 1px #ccc solid;
 			.title { height: 50px; background-color: #eee; text-align: center; line-height: 50px; }
-			.treeViewBox { height: 450px; border-bottom: 1px #ccc solid; }
+			.treeViewBox { height: 450px; border-bottom: 1px #ccc solid; .treeViewScroll { height: 100%; overflow: auto; }}
 		}
 		.rightEnter { float: right; width: 220px;
 			.title { height: 50px; background-color: #ddd; line-height: 50px; }
-			.fileEnterBox { height: 450px; border-bottom: 1px #ccc solid; }
+			.fileEnterBox { height: 450px; border-bottom: 1px #ccc solid;
+				.bindScroll { height: 100%; overflow: auto; }
+			 }
 			.btnEnter { margin-left: 15px;}
 			.fileSelText{margin-left: 12px;}
 			.fileCount { color: red; margin: 0px 2px; }
@@ -45,7 +51,9 @@
 					&.disable { background-position: 0px -60px; }
 				}
 			}
-			.fileBodyScrollBox{height: 449px; width: 558px;}
+			.fileBodyScrollBox{height: 449px; width: 558px;
+				.fileBodyScroll{height: 100%;overflow: auto;overflow-x: hidden;}
+			}
 			.fileBody {  
 				li { text-align: left; text-align: center; border-bottom: 1px #ccc solid; height: 38px; line-height: 38px; background-color: #fff; }
 				.fileName { text-align: left; }
