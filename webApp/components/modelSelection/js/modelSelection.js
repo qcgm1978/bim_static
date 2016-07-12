@@ -1,6 +1,9 @@
 // 业务功能：设置隐患点
 // 逻辑功能: 选择隐患点构件
 (function($,win){
+  var Project={
+      Settings:{}
+  }
   var ModelSelection = function(options) {
 
     //强制new
@@ -14,7 +17,7 @@
 
     //合并参数
     this.Settings = $.extend(defaults, options);
-
+    Project.Settings= this.Settings;
     this.init();
   }
   ModelSelection.prototype = {
