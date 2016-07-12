@@ -408,7 +408,7 @@ App.Console = {
       });
       $("#s1").html("<option value=''>请选择</option>"+str);
     });
-    //6.4
+
     //6.2
     $.ajax({
       url: "platform/api/project"
