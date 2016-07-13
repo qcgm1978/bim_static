@@ -212,7 +212,30 @@
   }
 
 }
-
+#propertyPanel {
+  width: 400px;
+  ul,li{list-style: none;}
+   .projectPropetyContainer { height: 100%; margin-top: -40px; padding-top: 40px;
+        .designProperties { height: 100%; overflow: auto;
+          .attrPlanBox,.attrCostBox,.attrQualityBox{display: none;}
+          .nullTip { background: url(/projects/images/attrSel.png) no-repeat 50% 100%; padding-top: 200px; height: 50px; line-height: 50px; color: #ccc; font-size: 16px; text-align: center; }
+        }
+      }
+      .modle { .modleShowHide { transition: all .5s; background: url(/comm/images/commIcon.png) no-repeat 0px -256px; float: right; margin-right: 12px; margin-top: 6px; height: 14px; width: 14px; cursor: pointer;
+          &.down { transform: rotate(180deg); -ms-transform: rotate(180deg); -moz-transform: rotate(180deg); -webkit-transform: rotate(180deg); -o-transform: rotate(180deg); }
+        }
+        .modleName { font-weight: bold; height: 24px; line-height: 24px; padding-left: 12px;
+          .modleNameText { vertical-align: top; width: 95%; }
+        }
+        .modleList { background-color: #eee; border-top: 1px #ccc solid;
+          .modleItem { border-bottom: 1px #ccc solid;
+            .modleName { width: 25%; display: inline-block; box-sizing: border-box; padding-left: 12px; border-right: 1px #ccc solid; }
+            .modleVal { display: inline-block; width: 72%; box-sizing: border-box; padding-left: 12px; margin-left: -3px; }
+            .modelLink { display: inline-block; padding-left: 12px; color: #3F8CDF; height: 24px; line-height: 24px; }
+          }
+        }
+      }
+}
 
 
 
