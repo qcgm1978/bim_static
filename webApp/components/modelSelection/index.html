@@ -3,27 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <title>模型选择器</title>
-  <script type="text/javascript" src="./libs/jquery-1.12.0.min.js"></script>
   <script type="text/javascript" src="./libs/underscore.1.8.2.js"></script>
   <script src="http://bim.wanda-dev.cn/static/dist/components/modelSelection/js/modelSelection.js"></script>
 </head>
 <body>
 <input type="button" id="model" value="show">
 <script>
-$(function(){
-  $('#model').on('click',function(){
-    var viewer = new ModelSelection({
-
+ var viewer = new ModelSelection({
+      type:'single',//multi,single
       sourceId: '848069790540000',
       etag: "ca4863cf122ac55b5a8e845595aeb7ce",
       projectId:'1',
       projectVersionId: '784306105035931',
-      callback:function(ids){
+      //multi 只有components回调参数
+      callback:function(components,markers){
         console.log(ids);
       }
     });
-  })
-})
 </script>
 </body>
 </html>

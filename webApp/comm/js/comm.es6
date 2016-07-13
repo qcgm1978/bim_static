@@ -9,8 +9,9 @@ App.Comm = {
 		if ($('#iewrapbox').length > 0) {
 			return;
 		}
-		if(navigator.userAgent.indexOf("MSIE 8.0")>0){
-			window.location.href='ie8.html?path='+ window.location.href;
+		//if(navigator.userAgent.indexOf("MSIE 8.0")>0){
+		if("ActiveXObject" in window || window.ActiveXObject){
+			window.location.href='ie.html?path='+ window.location.href;
 			return 
 		}
 		//IE11 以下都是真
