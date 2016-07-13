@@ -23,7 +23,7 @@
 				.bindScroll { height: 100%; overflow: auto; }
 			}
 			.btnEnter { margin-left: 15px; }
-			.fileSelText { margin-left: 12px; }
+			.fileSelText_tmd { margin-left: 12px; }
 			.fileCount { color: red; margin: 0px 2px; }
 			.null { font-size: 18px; padding-top: 100px; color: #ccc; text-align: center; }
 			.ckBg { display: inline-block; width: 14px; height: 14px; background-position: 0px -118px; vertical-align: -1px; }
@@ -40,7 +40,7 @@
 				.op, .divOp { width: 60px; }
 				.date { width: 104px; }
 				.size { width: 82px; }
-				.ck { display: inline-block; width: 14px; height: 14px; background-position: 0px -46px;
+				.ck {vertical-align: middle; display: inline-block; width: 14px; height: 14px; background-position: 0px -46px;
 					&.selected { background-position: 0px -32px; }
 					&.disable { background-position: 0px -74px; }
 				}
@@ -101,7 +101,8 @@
 	.myBtn:hover, .myBtn:focus, .myBtn.focus { color: #333; text-decoration: none; }
 	.myBtn:active, .myBtn.active { background-image: none; outline: 0; -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125); box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125); }
 	.sm { height: 25px; padding: 3px 8px; min-width: 60px; }
-	.myBtn-default { color: #666; background-color: #fff; border-color: #ccc; }
+	.myBtn-default { color: #666; background-color: #fff; border-color: #ccc;    margin: 0;
+    vertical-align: middle; }
 	.myBtn-default:hover { color: #999; border-color: #ccc; }
 	.myBtn-default:active, .myBtn-default.active { color: #666; background-color: #ddd; border-color: #ccc; }
 	.myBtn-default.disabled { background-color: #eee; border-color: #ccc; color: #ccc; }

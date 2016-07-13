@@ -171,7 +171,7 @@
 				count = Settings.fileids.split(",").length;
 			}
 
-			rightEnter += '<span class="fileSelText">已选<span class="fileCount">' + count + '</span>文件</span>';
+			rightEnter += '<span class="fileSelText_tmd">已选<span class="fileCount">' + count + '</span>文件</span>';
 			rightEnter += '</div>';
 			rightEnter += '<div class="fileEnterBox"> <div class="bindScroll"> <div class="treeViewMar"><ul class="treeViewMarUl"><li class="null">未选择</li></ul> </div> </div>	 </div>';
 			$content.find('.rightEnter').html(rightEnter);
