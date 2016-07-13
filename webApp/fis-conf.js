@@ -336,14 +336,26 @@ fis.match('/components/modelSelection/**.{js,es6}',{
 
 //模型 \modelSelection
 fis.match('/components/inspectSelection/index.html',{
-     release: '/static/dist/components/inspectSelection/index.html'
+  release: '/static/dist/components/inspectSelection/index.html'
 });
 fis.match('/components/inspectSelection/libs/**.{js,es6}',{
-     packTo: '/static/dist/components/inspectSelection/libs/libs.js'
+  packTo: '/static/dist/components/inspectSelection/libs/libs.js'
 });
 fis.match('/components/inspectSelection/js/**.{js,es6}',{
-     packTo: '/static/dist/components/inspectSelection/js/inspectSelection.js'
+  packTo: '/static/dist/components/inspectSelection/js/inspectSelection.js'
 });
+
+//模型 \checkpoints
+fis.match('/components/checkpoints/index.html',{
+  release: '/static/dist/components/checkpoints/index.html'
+});
+fis.match('/components/checkpoints/libs/**.{js,es6}',{
+  packTo: '/static/dist/components/checkpoints/libs/libs.js'
+});
+fis.match('/components/checkpoints/js/**.{js,es6}',{
+  packTo: '/static/dist/components/checkpoints/js/checkpoints.js'
+});
+
 // 项
 
 
