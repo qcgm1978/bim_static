@@ -326,6 +326,18 @@ fis.match('/components/fileSelection/es6/**.{es6,js}',{
      packTo: '/static/dist/components/fileSelection/js/fileSelection.js'
 });
 
+
+//模型 \modelSelection
+fis.match('/components/modelSelector/index.html',{
+     release: '/static/dist/components/modelSelector/index.html'
+});
+fis.match('/components/modelSelector/**.{js,es6}',{
+     packTo: '/static/dist/components/modelSelector/js/modelSelector.js'
+});
+
+
+
+
 //模型 \modelSelection
 fis.match('/components/modelSelection/index.html',{
      release: '/static/dist/components/modelSelection/index.html'
