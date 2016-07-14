@@ -355,7 +355,9 @@ fis.match('/components/checkpoints/libs/**.{js,es6}',{
 fis.match('/components/checkpoints/js/**.{js,es6}',{
   packTo: '/static/dist/components/checkpoints/js/checkpoints.js'
 });
-
+fis.match('/components/checkpoints/less/**.{css,less}', {
+  packTo: '/static/dist/components/checkpoints/less/index.css'
+});
 // 项
 
 

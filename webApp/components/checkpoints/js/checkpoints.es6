@@ -79,38 +79,38 @@
         $dialog = self.$dialog;
       } else {
         var strVar = "";
-        strVar += "<div class=\"rightProperty\">";
-        strVar += "            <div class=\"rightPropertyContentBox\">";
-        strVar += "                <div class=\"rightPropertyContent\">";
-        strVar += "                    <div class=\"rightPropertyContent\">";
-        strVar += "                        <div class=\"designPropetyBox\">";
-        strVar += "                            <ul class=\"projectPropetyHeader projectNav\">";
-        strVar += "                                <li data-type=\"attr\" class=\"item selected\">属性<\/li>";
-        strVar += "                            <\/ul>";
-        strVar += "                            <div class=\"qualityContainer projectNavContentBox\">";
-        strVar += "                                ";
-        strVar += "                            <\/div>";
-        strVar += "                        <\/div>";
-        strVar += "                    <\/div>";
-        strVar += "                <\/div>";
-        strVar += "                <div class=\"dragSize\"><\/div>";
-        strVar += "                <div class=\"slideBar\"><i class=\"icon-caret-right\"><\/i><\/div>";
-        strVar += "            <\/div>";
-        strVar += "        <\/div>";
+        //strVar += "<div class=\"rightProperty\">";
+        //strVar += "            <div class=\"rightPropertyContentBox\">";
+        //strVar += "                <div class=\"rightPropertyContent\">";
+        //strVar += "                    <div class=\"rightPropertyContent\">";
+        //strVar += "                        <div class=\"designPropetyBox\">";
+        //strVar += "                            <ul class=\"projectPropetyHeader projectNav\">";
+        //strVar += "                                <li data-type=\"attr\" class=\"item selected\">属性<\/li>";
+        //strVar += "                            <\/ul>";
+        //strVar += "                            <div class=\"qualityContainer projectNavContentBox\">";
+        //strVar += "                                ";
+        //strVar += "                            <\/div>";
+        //strVar += "                        <\/div>";
+        //strVar += "                    <\/div>";
+        //strVar += "                <\/div>";
+        //strVar += "                <div class=\"dragSize\"><\/div>";
+        //strVar += "                <div class=\"slideBar\"><i class=\"icon-caret-right\"><\/i><\/div>";
+        //strVar += "            <\/div>";
+        //strVar += "        <\/div>";
 
         $dialog = self.$dialog = $('<div class="modelSelectDialog"></div>');
         var $body = $('<div class="dialogBody"></div>'),
           //$header = $('<div class="dialogHeader"/>').html('请选择检查点<span class="dialogClose" title="关闭"></span> '),
           $modelView = self.$modelView = $('<div id="modelView" class="model"></div>')
-        $content = $('<div class="dialogContent">' + strVar + '</div>');
+        //$content = $('.projectCotent');
           //$bottom = $('<div class="dialogFooter"/>').html('<input type="button" class="dialogOk dialogBtn" value="' + this.Settings.btnText + '" />');
-        $content.prepend($modelView);
-        $body.append( $content);
+        //$content.prepend($modelView);
+        //$body.append( $content);
       }
       $dialog.append($body);
-      $("body").append($dialog);
+      //$("body").append($dialog);
       setTimeout(function() {
-        //self.renderModel();
+        self.renderModel();
         Project.loadPropertyPanel();
 
       }, 10);
@@ -118,7 +118,7 @@
     renderModel: function() {
       this.viewer = new bimView({
         type: 'model',
-        element: this.$modelView,
+        element: $('.projectCotent'),
         sourceId: this.Settings.sourceId,
         etag: this.Settings.etag,
         projectId: this.Settings.projectId,
@@ -354,7 +354,7 @@
       var temp=JSON.stringify(data);
       temp=JSON.parse(temp);
       this.$el.html(this.template(temp));
-      $('.qualityContainer').html(this.$el);
+      $('.designProperties').html(this.$el);
     }
 
 
@@ -407,13 +407,53 @@
       //this.OpeningAcceptanceOptions = options.OpeningAcceptance;
       var tpl = Project.templateUrl("/components/inspectSelection/tpls/project.quality.property.openingAcceptance.html");
       this.$el.html(tpl);
-      //this.bindEvent();
+      this.bindEvent();
       return this;
 
     },
 
 
+    //事件绑定
+    bindEvent() {
 
+      var that = this,
+          $projectContainer = $("#projectContainer");
+
+      //收起 暂开 属性内容
+      $projectContainer.on("click", ".modleShowHide", function() {
+        $(this).toggleClass("down");
+        var $modleList = $(this).parent().siblings(".modleList");
+        if(!$modleList.length){
+          $modleList = $(this).parent().find(".modleList");
+        }
+        $modleList.slideToggle();
+
+      });
+
+      //收起 暂开 属性 右侧
+      $projectContainer.on("click", ".rightProperty .slideBar", function() {
+
+        App.Comm.navBarToggle($("#projectContainer .rightProperty"), $("#projectContainer .projectCotent"), "right", Project.Viewer);
+      });
+      //拖拽 属性内容 右侧
+      $projectContainer.on("mousedown", ".rightProperty .dragSize", function(event) {
+        App.Comm.dragSize(event, $("#projectContainer .rightProperty"), $("#projectContainer .projectCotent"), "right", Project.Viewer);
+      });
+
+      //tree toggle show  hide
+      $projectContainer.on("click", ".nodeSwitch", function(event) {
+        var $target = $(this);
+
+        if ($target.hasClass("on")) {
+          $target.closest("li").children("ul").hide();
+          $target.removeClass("on");
+        } else {
+          $target.closest("li").children("ul").show();
+          $target.addClass("on");
+        }
+        event.stopPropagation();
+      })
+    },
 
     template: Project.templateUrl("/components/inspectSelection/tpls/project.quality.property.openingAcceptance.body.html"),
 
