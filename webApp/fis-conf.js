@@ -326,6 +326,18 @@ fis.match('/components/fileSelection/es6/**.{es6,js}',{
      packTo: '/static/dist/components/fileSelection/js/fileSelection.js'
 });
 
+
+//模型 \modelSelection
+fis.match('/components/modelSelector/index.html',{
+     release: '/static/dist/components/modelSelector/index.html'
+});
+fis.match('/components/modelSelector/**.{js,es6}',{
+     packTo: '/static/dist/components/modelSelector/js/modelSelector.js'
+});
+
+
+
+
 //模型 \modelSelection
 fis.match('/components/modelSelection/index.html',{
      release: '/static/dist/components/modelSelection/index.html'
@@ -358,7 +370,27 @@ fis.match('/components/checkpoints/libs/**.{js,es6}',{
 fis.match('/components/checkpoints/js/**.{js,es6}',{
   packTo: '/static/dist/components/checkpoints/js/checkpoints.js'
 });
+fis.match('/components/checkpoints/less/**.{css,less}', {
+  packTo: '/static/dist/components/checkpoints/less/index.css'
+});
 
+//模型 \concerns
+fis.match('/components/concerns/index.html',{
+  release: '/static/dist/components/concerns/index.html'
+});
+fis.match('/components/concerns/libs/**.{js,es6}',{
+  packTo: '/static/dist/components/concerns/libs/libs.js'
+});
+fis.match('/components/concerns/js/**.{js,es6}',{
+  packTo: '/static/dist/components/concerns/js/concerns.js'
+});
+fis.match('/components/concerns/less/**.{css,less}', {
+  packTo: '/static/dist/components/concerns/less/index.css'
+});
+fis.match('/components/concerns/tpls/concerns.body.html', {
+  //useHash:true,
+  release: "/static/dist/components/concerns/concerns.body.html"
+});
 // 项
 
 

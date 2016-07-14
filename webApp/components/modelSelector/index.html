@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>模型选择器</title>
+    <script src="http://bim.wanda-dev.cn/static/dist/components/modelSelector/js/modelSelector.js"></script>
+</head>
+
+<body>
+
+    <script type="text/javascript">
+   
+        var viewer = new ModelSelection({
+            type: 'multi', //multi,single
+            sourceId: '848069790540000',
+            etag: "ca4863cf122ac55b5a8e845595aeb7ce",
+            projectId: '1',
+            projectVersionId: '784306105035931',
+            //multi 只有components回调参数
+            callback: function(components, markers) {
+                console.log(ids);
+            }
+        });
+    
+    </script>
+</body>
+
+</html>

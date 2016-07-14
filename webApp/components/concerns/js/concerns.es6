@@ -12,7 +12,8 @@
         fetchQualityOpeningAcceptance: "sixD/{projectId}/{projectVersionId}/acceptance?type=2",
         fetchQualityModelById: "sixD/{projectId}/{versionId}/quality/element",
         fetchDesignProperties: "sixD/{projectId}/{projectVersionId}/property", //设计属性 ?sceneId={sceneId}&elementId={elementId}
-        fetchProjectVersionInfo: "platform/project/{projectId}/version/{projectVersionId}" //项目版本信息
+        fetchProjectVersionInfo: "platform/project/{projectId}/version/{projectVersionId}", //项目版本信息
+        fetchQualityConcerns: "sixD/{projectId}/{projectVersionId}/problem" //隐患
 
       }
     }
@@ -89,7 +90,27 @@
       $dialog.append($body);
       //$("body").append($dialog);
       setTimeout(function() {
-        self.renderModel();
+        $('.designProperties').html(new concerns().render().el);
+        ConcernsCollection.reset();
+        ConcernsCollection.projectId = query.projectId;
+        ConcernsCollection.projectVersionId = query.projectVersionId;
+        ConcernsCollection.fetch({
+          data: {
+            category: "", //类别
+            type: "", //类型
+            status: "", //状态 1:待整改 2:已整改 3:已关闭
+            level: "", //等级 1:一般 2:较大 3:重大 4:特大
+            reporter: "", //填报人
+            startTime: "", //查询时间范围：开始
+            endTime: "", //查询时间范围：结束
+            pageIndex: 1, //第几页，默认第一页
+            pageItemCount: '' //页大小
+          },
+          success: function(data) {
+            console.log(data);
+          }
+        });
+        //self.renderModel();
         Project.getname();
 
       }, 10);
@@ -133,6 +154,37 @@
   var Project = {
     Settings: {},
     templateCache: [],
+    concernsData:{
+      type:['随机','过程检查','开业验收','入伙验收'],
+      report:['','质监','第三方','项目公司','监理单位'],
+      classic:['','实测实量','防水工程','施工质量','安全文明','总包内业资料','材料设备'],
+      specialty:{
+        '1':'建筑',
+        '2':'结构',
+        '3':'设备',
+        '4':'电气',
+        '6':'内装',
+        'def':'炼钢',
+        'abc':'土建'
+      }
+    },
+
+    //客户化数据映射字典
+    mapData: {
+      organizationTypeId: ['', '质监', '第三方', '项目公司', '监理单位'],
+      status: ['', '待整改', '已整改', '已关闭'],
+      statusColor: ['', '#FF2500', '#FFAD25', '#00A648']
+    },
+    //空页面
+    NullPage: {
+      designVerification: '<div class="nullPage concerns"><i class="bg"></i>暂无隐患</div>', //设计检查 质量 隐患
+      planModel: '<div class="nullPage noPlan"><i class="bg"></i>暂无计划节点</div>', //计划 模块化 模拟
+      planPublicity: '<div class="nullPage publicity"><i class="bg"></i>暂无内容</div>', //计划 关注
+      costList: '<div class="nullPage costList"><i class="bg"></i>暂无清单项</div>', //成本 清单
+      costChange: '<div class="nullPage costChange"><i class="bg"></i>暂无变更单</div>', //成本 变更
+      planVerification: '<div class="nullPage planVerification"><i class="bg"></i> <div>您还没有关联校验</div>  <span>点此进行关联校验</span> </div>' //计划成本 关联校验
+    },
+
     //获取模板根据URL
     templateUrl: function(url, notCompile) {
 
@@ -140,6 +192,9 @@
         url = "/static/dist/tpls" + url.substr(1);
       } else if (url.substr(0, 1) == "/") {
         url = "/static/dist/tpls" + url;
+      } else if (url.substr(0, 1) == "*"){
+        url = "/static/dist" + url.substr(1);
+
       }
 
       if (Project.templateCache[url]) {
@@ -267,8 +322,8 @@
 
   }
 
-  	// 属性 collection
-  var propertiesCollection = new(Backbone.Collection.extend({
+  //隐患
+  var ConcernsCollection= new(Backbone.Collection.extend({
 
     model: Backbone.Model.extend({
       defaults: function() {
@@ -278,96 +333,98 @@
       }
     }),
 
-    urlType:"fetchDesignProperties",
+    urlType: "fetchQualityConcerns"
 
-    parse:function(response){
-      if (response.code == 0) {
-        return response;
-      }
-    }
-
-  }));
-  //过程检查
-  var property = new (Backbone.View.extend({
-
-    tagName:"div",
-
-    className:"QualityProperties",
-
-    initialize:function(){
-      //this.listenTo(App.Project.QualityAttr.PropertiesCollection,"add",this.addOne);
-      this.listenTo(propertiesCollection,"add",this.addOne);
-      this.bindEvent();
-    },
-
-      //事件绑定
-      bindEvent() {
-
-        var that = this,
-            $projectContainer = $("#projectContainer");
-
-        //收起 暂开 属性内容
-        $projectContainer.on("click", ".modleShowHide", function() {
-          $(this).toggleClass("down");
-          var $modleList = $(this).parent().siblings(".modleList");
-          if(!$modleList.length){
-            $modleList = $(this).parent().find(".modleList");
-          }
-          $modleList.slideToggle();
-
-        });
-
-        //收起 暂开 属性 右侧
-        $projectContainer.on("click", ".rightProperty .slideBar", function() {
-
-          App.Comm.navBarToggle($("#projectContainer .rightProperty"), $("#projectContainer .projectCotent"), "right", Project.Viewer);
-        });
-        //拖拽 属性内容 右侧
-        $projectContainer.on("mousedown", ".rightProperty .dragSize", function(event) {
-          App.Comm.dragSize(event, $("#projectContainer .rightProperty"), $("#projectContainer .projectCotent"), "right", Project.Viewer);
-        });
-
-        //tree toggle show  hide
-        $projectContainer.on("click", ".nodeSwitch", function(event) {
-          var $target = $(this);
-
-          if ($target.hasClass("on")) {
-            $target.closest("li").children("ul").hide();
-            $target.removeClass("on");
-          } else {
-            $target.closest("li").children("ul").show();
-            $target.addClass("on");
-          }
-          event.stopPropagation();
-        })
-      },
-
-    events:{},
-
-
-    //渲染
-    render:function(){
-
-      this.$el.html('<div class="nullTip">请选择构件</div>');
-
-      return this;
-
-    },
-
-    template:Project.templateUrl("/projects/tpls/project/design/project.design.property.properties.html"),
-
-    //获取数据后处理
-    addOne:function(model){
-      var data=model.toJSON().data;
-      var temp=JSON.stringify(data);
-      temp=JSON.parse(temp);
-      this.$el.html(this.template(temp));
-      $('.designProperties').html(this.$el);
-    }
 
 
   }));
+  //隐患
+  var concerns=Backbone.View.extend({
 
+          tagName:"div",
+
+          className:"QualityConcerns",
+
+          initialize:function(){
+            this.listenTo(ConcernsCollection,"add",this.addOne);
+            //this.listenTo(ConcernsCollection,"reset",this.loading);
+          },
+
+
+          events:{
+            "click .searchToggle":"searchToggle",
+            "click .tbConcernsBody tr": "showInModel",
+            "click .clearSearch": "clearSearch"
+
+          },
+
+
+          //渲染
+          render:function(options){
+
+            //this.ConcernsOptions=options.Concerns;
+
+            var tpl=Project.templateUrl("*/components/concerns/concerns.html");
+
+            this.$el.html(tpl);
+
+            this.bindEvent();
+
+            return this;
+
+          },
+
+
+
+          //事件初始化
+          bindEvent(){
+
+          },
+
+
+
+          template:Project.templateUrl("*/components/concerns/concerns.body.html"),
+
+          //获取数据后处理
+          addOne:function(model){
+            var data=model.toJSON();
+            console.log(data)
+            this.$(".tbConcernsBody tbody").html(this.template(data));
+            this.bindScroll();
+          },
+          //绑定滚动条
+          bindScroll() {
+
+            var $materialequipmentListScroll = this.$(".materialequipmentListScroll");
+
+            if ($materialequipmentListScroll.hasClass('mCustomScrollbar')) {
+              return;
+            }
+
+            $materialequipmentListScroll.mCustomScrollbar({
+              set_height: "100%",
+              theme: 'minimal-dark',
+              axis: 'y',
+              keyboard: {
+                enable: true
+              },
+              scrollInertia: 0
+            });
+          },
+          //加载
+          loading(){
+
+            this.$(".tbConcernsBody tbody").html(App.Project.Settings.loadingTpl);
+            this.searchup();
+
+          },
+
+          //在模型中显示
+          showInModel(){
+            App.Project.showInModel($(event.target).closest("tr"),2);
+          }
+
+        });
 
   win.ModelSelection = ModelSelection;
   win.project = Project;
