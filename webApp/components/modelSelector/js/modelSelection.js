@@ -236,6 +236,7 @@ n.cssHooks[b]=Ua(l.pixelPosition,function(a,c){return c?(c=Sa(a,b),Oa.test(c)?n(
     },
     renderModel: function() {
     bimView.API.baseUrl="http://bim.wanda-dev.cn/";
+
       var _this = this;
       var viewer = new bimView({
         type: 'model',
@@ -337,23 +338,24 @@ n.cssHooks[b]=Ua(l.pixelPosition,function(a,c){return c?(c=Sa(a,b),Oa.test(c)?n(
 		}
 		resizeWebView();
 
-
-		var script='<script type="text/javascript">'+
+		// var script='<script type="text/javascript" src="http://bim.wanda-dev.cn/static/dist/components/modelSelector/js/modelSelector.js"></script>';
+		//   script+='<script type="text/javascript">'+
     
-   //      "var viewer = new ModelSelection({ "+
-	  //       "type: 'multi', //multi, single"+
-	  //      " sourceId: '848069790540000',"+
-	  //      " etag: "ca4863cf122ac55b5a8e845595aeb7ce","+
-	  //      " projectId: '1',"+
-	  //      " projectVersionId: '784306105035931', //multi 只有components回调参数"+
-	  //       "callback: function(components, markers) {"+
-	  //        "   console.log(ids);"+
-	  //       "}"+
-   // " });"+
-   //  "</script>";
+  //       "var viewer = new ModelSelection({ "+
+	 //        "type: 'multi', //multi, single"+
+	 //       " sourceId: '848069790540000',"+
+	 //       " etag: 'ca4863cf122ac55b5a8e845595aeb7ce',"+
+	 //       " projectId: '1',"+
+	 //       " projectVersionId: '784306105035931', //multi 只有components回调参数"+
+	 //        "callback: function(components, markers) {"+
+	 //         "   console.log(ids);"+
+	 //        "}"+
+  //  " });"+
+  //   "</script>";
 		//WebView.url = "http://www.bimface.com";
-		WebView.html = "<html><body>Hello world</body></html>";
+		//WebView.html = "<html><body>Hello world "+script+"</body></html>";
 
+		WebView.url="http://bim.wanda-dev.cn/static/dist/components/modelSelector/model.html";
 		function navigateTo(url) {
 			alert(url);
 
