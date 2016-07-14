@@ -35,13 +35,11 @@
 				styleUrl = '/static/dist/libs/libsH5_20160313.css',
 				$script = '<script src="' + srciptUrl + '"></script>',
 				$css = '<link rel="stylesheet" href="' + styleUrl + '" />',
-				$script2 = '<script src="/static/dist/comm/comm_20160313.js"></script>',
-				$css2 = '<link rel="stylesheet" href="/static/dist/comm/comm_20160313.css" />';
+				$script2 = '<script src="/static/dist/comm/comm_20160313.js"></script>';
 			if (!InspectModelSelection.isLoad) {
-				$('head').append($css, $script, $css2, $script2);
+				$('head').append($css,$script, $script2);
 				InspectModelSelection.isLoad = true;
 			}
-			debugger
 			if(self.Settings.type=="process"){
 				win.App.API.URL.fetchQualityOpeningAcceptance="sixD/{projectId}/{projectVersionId}/acceptance?type=1";
 			}
@@ -100,7 +98,7 @@
 				var $body = $('<div class="dialogBody"></div>'),
 					$header = $('<div class="dialogHeader"/>').html('请选择检查点<span class="dialogClose" title="关闭"></span> '),
 					$modelView = self.$modelView = $('<div id="modelView" class="model"></div>')
-				$content = $('<div class="dialogContent">' + strVar + '</div>'),
+					$content = $('<div class="dialogContent">' + strVar + '</div>'),
 					$bottom = $('<div class="dialogFooter"/>').html('<input type="button" class="dialogOk dialogBtn" value="' + this.Settings.btnText + '" />');
 				$content.prepend($modelView);
 				$body.append($header, $content, $bottom);
@@ -266,23 +264,26 @@
 					pageItemCount: 10 //页大小
 				}
 			}).el);
+			this.loadData();
+		},
 
+		loadData(data){
 			OpeningAcceptanceCollection.reset();
 			OpeningAcceptanceCollection.projectId = this.Settings.projectId;
 			OpeningAcceptanceCollection.projectVersionId = this.Settings.projectVersionId;
 			OpeningAcceptanceCollection.fetch({
-				data: {
+				data: $.extend({},{
 					specialty: "", //专业
 					category: "", //类别 
 					problemCount: "", // 无隐患 1， 有隐患 
 					pageIndex: 1, //第几页，默认第一页
 					pageItemCount: 10 //页大小
-				},
+				},data),
 				success: function(data) {
 					Project.pageInfo(data);
 				}
 			});
-		},
+		}
 	}
 
 	var OpeningAcceptanceCollection = new(Backbone.Collection.extend({
@@ -309,6 +310,8 @@
 		className: "QualityOpeningAcceptance",
 
 		currentDiseaseView: null,
+
+		filters:{},
 
 		initialize: function() {
 			this.listenTo(OpeningAcceptanceCollection, "add", this.addOne);
@@ -337,13 +340,10 @@
 			return this;
 
 		},
-
 		//开业验收过滤条件change事件
 		changeOA(key, val) {
-			Backbone.trigger('qualityFilterDataChange', 'OpeningAcceptanceOptions', key, val);
+			this.filters[key]=val;
 		},
-
-
 
 		//事件初始化
 		bindEvent() {
@@ -352,14 +352,12 @@
 			//隐患
 			this.$(".riskOption").myDropDown({
 				click: function($item) {
-					//  that.OpeningAcceptanceOptions.problemCount = $item.data("status");
-					that.changeOA('problemCount', $item.data("status"))
+					that.changeOA('problemCount', $item.data("status"));
 				}
 			});
 			//类型
 			this.$(".categoryOption").myDropDown({
 				click: function($item) {
-					//that.OpeningAcceptanceOptions.category = $item.text();
 					that.changeOA('category', $item.attr('data-val'))
 				}
 			});
@@ -367,11 +365,13 @@
 			//专业
 			this.$(".specialitiesOption").myDropDown({
 				click: function($item) {
-					//  that.OpeningAcceptanceOptions.specialty = $item.text();
 					that.changeOA('specialty', $item.attr('data-val'))
 				}
 			});
 
+			this.$('.btnFilter').on('click',function(){
+				Project.loadData(that.filters);
+			})
 			//显示搜索结果对应位置
 			this.$(".groupRadio").myRadioCk();
 		},
@@ -398,7 +398,7 @@
 			this.$(".riskOption .text").html('全部')
 			this.$(".categoryOption .text").html('全部')
 			this.$(".specialitiesOption .text").html('全部')
-			Backbone.trigger('qualityFilterDataClear');
+			Project.loadData(null);
 		},
 
 		template: Project.templateUrl("/components/inspectSelection/tpls/project.quality.property.openingAcceptance.body.html"),

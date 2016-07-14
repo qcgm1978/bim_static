@@ -330,9 +330,12 @@ fis.match('/components/fileSelection/es6/**.{es6,js}',{
 fis.match('/components/modelSelection/index.html',{
      release: '/static/dist/components/modelSelection/index.html'
 });
+
 fis.match('/components/modelSelection/**.{js,es6}',{
      packTo: '/static/dist/components/modelSelection/js/modelSelection.js'
 });
+
+
 
 //模型 \modelSelection
 fis.match('/components/inspectSelection/index.html',{
