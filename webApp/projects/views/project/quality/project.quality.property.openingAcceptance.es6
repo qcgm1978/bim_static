@@ -19,7 +19,8 @@ App.Project.QualityOpeningAcceptance = Backbone.View.extend({
 		"click .searchToggle": "searchToggle",
 		"click .clearSearch": "clearSearch",
 		"click .tbOpeningacceptanceBody tr": "showInModel",
-		'click .resultStatusIcon':'showDiseaseList'
+		'click .resultStatusIcon':'showDiseaseList',
+		'click .btnCk':'showSelectMarker'
 		
 	},
 
@@ -70,6 +71,10 @@ App.Project.QualityOpeningAcceptance = Backbone.View.extend({
 
 		//显示搜索结果对应位置
 		this.$(".groupRadio").myRadioCk();
+	},
+
+	showSelectMarker(e){
+		App.Project.isShowMarkers('open',$(e.currentTarget).hasClass('selected'));
 	},
 
 	//显示隐藏搜索

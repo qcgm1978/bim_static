@@ -474,6 +474,8 @@ App.Index = {
 
 					App.Index.Settings.baseModelId = $item.data("basemodelid");
 					App.Index.Settings.differModelId = $item.data("differmodelid");
+					App.Index.Settings.differFileVersionId = differFileVersionId;
+					App.Index.Settings.baseFileVersionId = baseFileVersionId;
 
 					that.renderModelById();
 					that.fetchChangeList(baseFileVersionId, differFileVersionId);

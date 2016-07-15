@@ -5,6 +5,8 @@ App.Project.CostReference = Backbone.View.extend({
 
 	className: "CostReference",
 
+	isExpand:false,
+
 	initialize: function() {
 		this.listenTo(App.Project.CostAttr.ReferenceCollection, "add", this.addOne);
 		this.listenTo(App.Project.CostAttr.ReferenceCollection, "reset", this.reset);
@@ -38,6 +40,11 @@ App.Project.CostReference = Backbone.View.extend({
 		this.$(".tbBody .tbBodyContent").html(this.rootTemplate(data));
 
 		App.Comm.initScroll(this.$(".tbBodyScroll"),"y");
+		if(this.isExpand){
+			this.$('.nodeSwitch').addClass('on');
+			this.$('.nodeSwitch').closest('.node').children("ul").show();
+			this.isExpand=false;
+		}
 	},
 
 	reset() {
@@ -98,12 +105,13 @@ App.Project.CostReference = Backbone.View.extend({
 	search(e){
 		var _this=this;
 		if(e.keyCode==13){
+			var _key=$(e.currentTarget).val();
 			App.Project.CostAttr.ReferenceCollection.reset();
 			App.Project.CostAttr.ReferenceCollection.projectId = App.Project.Settings.projectId;
 			App.Project.CostAttr.ReferenceCollection.projectVersionId = App.Project.Settings.CurrentVersion.id;
 			App.Project.CostAttr.ReferenceCollection.fetch({
 				data:{
-					keyword:$(e.currentTarget).val()
+					keyword:_key
 				},
 				success:function(c,d,x){
 					if(d.data.length<=0){
@@ -111,6 +119,9 @@ App.Project.CostReference = Backbone.View.extend({
 					}
 				}
 			});
+			if(_key){
+				this.isExpand=true;
+			}
 		}
 	}
 

@@ -19,7 +19,8 @@ App.Project.QualityProcessAcceptance = Backbone.View.extend({
 		"click .searchToggle": "searchToggle",
 		"click .clearSearch": "clearSearch",
 		'click .resultStatusIcon':'showDiseaseList',
-		"click .tbProcessAccessBody tr": "showInModel"
+		"click .tbProcessAccessBody tr": "showInModel",
+		'click .btnCk':'showSelectMarker'
 	},
 
 	//过程验收过滤条件change事件
@@ -37,7 +38,9 @@ App.Project.QualityProcessAcceptance = Backbone.View.extend({
 		return this;
 
 	},
-
+	showSelectMarker(e){
+		App.Project.isShowMarkers('process',$(e.currentTarget).hasClass('selected'));
+	},
 	//事件初始化
 	bindEvent() {
 		var that = this;

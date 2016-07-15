@@ -18,7 +18,8 @@ App.Project.QualityConcerns=Backbone.View.extend({
 	events:{
 		"click .searchToggle":"searchToggle",
 		"click .tbConcernsBody tr": "showInModel",
-		"click .clearSearch": "clearSearch"
+		"click .clearSearch": "clearSearch",
+		'click .btnCk':'showSelectMarker'
 	 
 	},
 
@@ -43,6 +44,9 @@ App.Project.QualityConcerns=Backbone.View.extend({
 		Backbone.trigger('qualityFilterDataChange','ConcernsOptions',key,val);
 	},
 
+	showSelectMarker(e){
+		App.Project.isShowMarkers('dis',$(e.currentTarget).hasClass('selected'));
+	},
 	//事件初始化
 	bindEvent(){
 

@@ -36,6 +36,38 @@ App.Project = {
 		statusColor: ['', '#FF2500', '#FFAD25', '#00A648']
 	},
 
+	currentQATab:'other',
+	currentLoadData:{
+		open:null,
+		process:null,
+		dis:null
+	},
+
+	cacheMarkers:function(type,data){
+		this.currentLoadData[type]=data;
+	},
+
+	//是否显示标记
+	//type tab类型 flag 是否显示的标记
+	//type:open process dis other
+	isShowMarkers:function(type,flag){
+		var viewer= App.Project.Settings.Viewer;
+		if(type!='other' && flag){
+			var data=this.currentLoadData[type],
+				result=[];
+			if(_.isArray(data)){
+				_.each(data,function(i){
+					if(i.location.indexOf('boundingBox')!=-1){
+						result.push(i.location);
+					}
+				})
+				viewer.loadMarkers(result);	
+			}
+		}else{
+			viewer.loadMarkers(null);
+		}
+	},
+
 	// 文件 容器
 	FileCollection: new(Backbone.Collection.extend({
 
@@ -820,9 +852,9 @@ App.Project = {
 
 
 		$rightPropertyContent.children('div').hide();
+		App.Project.isShowMarkers('other');
 		//设计
 		if (type == "design") {
-
 			$rightPropertyContent.find(".singlePropetyBox").remove();
 
 			var $designPropetyBox = $rightPropertyContent.find(".designPropetyBox");
@@ -834,7 +866,6 @@ App.Project = {
 			}
 
 		} else if (type == "plan") {
-
 			//计划  
 			var $ProjectPlanPropertyContainer = $rightPropertyContent.find(".ProjectPlanPropertyContainer");
 			if ($ProjectPlanPropertyContainer.length > 0) {
@@ -846,7 +877,6 @@ App.Project = {
 
 
 		} else if (type == "cost") {
-
 			//成本  
 			var $ProjectCostPropetyContainer = $rightPropertyContent.find(".ProjectCostPropetyContainer");
 			if ($ProjectCostPropetyContainer.length > 0) {
@@ -863,6 +893,17 @@ App.Project = {
 			var $ProjectQualityNavContainer = $rightPropertyContent.find(".ProjectQualityNavContainer");
 			if ($ProjectQualityNavContainer.length > 0) {
 				$ProjectQualityNavContainer.show();
+				var item=$ProjectQualityNavContainer.find('.projectNav .selected');
+				if(item && item.length){
+					var t=item.first().data('type');
+					if(t=='processacceptance'){
+						App.Project.isShowMarkers('process',$('.QualityProcessAcceptance .btnCk').hasClass('selected'));
+					}else if(t=='openingacceptance'){
+						App.Project.isShowMarkers('open',$('.QualityOpeningAcceptance .btnCk').hasClass('selected'));
+					}else if(t=='concerns'){
+						App.Project.isShowMarkers('dis',$('.QualityConcerns .btnCk').hasClass('selected'));
+					}
+				}
 			} else {
 				$rightPropertyContent.append(new App.Project.ProjectQualityProperty().render().$el);
 				$("#projectContainer .ProjectQualityNavContainer .projectNav .item:first").click();

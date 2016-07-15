@@ -83,6 +83,8 @@ App.Views = {
 				App.Collections.changeListCollection.projectVersionId =App.Index.Settings.projectVersionId;
 				App.Collections.changeListCollection.fetch({
 					data:{
+						fileVerionId:App.Index.Settings.differFileVersionId,
+						baseFileVerionId:App.Index.Settings.baseFileVersionId,
 						keyword:$(e.currentTarget).val()
 					},
 					success:function(c,d,x){

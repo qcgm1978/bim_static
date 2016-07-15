@@ -77,7 +77,15 @@ App.Project.QualityAttr = {
 			}
 		}),
 
-		urlType: "fetchQualityProcessAcceptance"
+		urlType: "fetchQualityProcessAcceptance",
+
+		parse: function (response) {
+            if (response.message == "success") {
+            	debugger
+            	App.Project.cacheMarkers('process',response.data.items);
+            }
+            return response;
+        }
 
 	})),
 
@@ -108,7 +116,14 @@ App.Project.QualityAttr = {
 			}
 		}),
 
-		urlType: "fetchQualityOpeningAcceptance"
+		urlType: "fetchQualityOpeningAcceptance",
+
+		parse: function (response) {
+            if (response.message == "success") {
+            	App.Project.cacheMarkers('open',response.data.items);
+            }
+            return response;
+        }
 
 	
 
@@ -126,7 +141,14 @@ App.Project.QualityAttr = {
 			}
 		}),
 
-		urlType: "fetchQualityConcerns"
+		urlType: "fetchQualityConcerns",
+
+		parse: function (response) {
+            if (response.message == "success") {
+            	App.Project.cacheMarkers('dis',response.data.items);
+            }
+            return response;
+        }
 
 		
 

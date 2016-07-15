@@ -121,7 +121,7 @@ App.Project.ProjectQualityProperty = Backbone.View.extend({
 			if ($QualityMaterialEquipment.find(".noLoading").length > 0) {
 				isLoadData = true;
 			}
-
+			App.Project.isShowMarkers('other');
 		} else if (type == "processacceptance") {
 			//过程验收
 			var $QualityProcessAcceptance = this.$el.find(".QualityProcessAcceptance");
@@ -131,7 +131,8 @@ App.Project.ProjectQualityProperty = Backbone.View.extend({
 			if ($QualityProcessAcceptance.find(".noLoading").length > 0) {
 				isLoadData = true;
 			}
-
+			App.Project.isShowMarkers('process',$QualityProcessAcceptance.find('.btnCk').hasClass('selected'));
+			App.Project.currentQATab='process';
 		} else if (type == "openingacceptance") {
 			//开业验收
 
@@ -142,8 +143,7 @@ App.Project.ProjectQualityProperty = Backbone.View.extend({
 			if ($QualityOpeningAcceptance.find(".noLoading").length > 0) {
 				isLoadData = true;
 			}
-
-
+			App.Project.isShowMarkers('open',$QualityOpeningAcceptance.find('.btnCk').hasClass('selected'));
 		} else if (type == "concerns") {
 			//隐患
 
@@ -154,10 +154,10 @@ App.Project.ProjectQualityProperty = Backbone.View.extend({
 			if ($QualityConcerns.find(".noLoading").length > 0) {
 				isLoadData = true;
 			}
-
-
+			App.Project.isShowMarkers('dis',$QualityConcerns.find('.btnCk').hasClass('selected'));
 		} else if (type == "poperties") {
 			//属性
+			App.Project.isShowMarkers('other');
 			this.$el.find(".QualityProperties").show().siblings().hide();
 		}
 
