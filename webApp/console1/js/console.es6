@@ -988,7 +988,7 @@ App.Console = {
         projectVersionName      : $('#p12').val().trim(),
         refProjectModelCode       : $('#s11').val(),
         refProjectModelName     : $('#s11 option:selected').text().trim(),
-        projectCode             : $('#s11').val(),
+        projectModelCode             : $('#s11').val(),
         refProjectModelVersionId: $('#s12').val().trim(),
         description             : $('#p13').val().trim(),
         changedFiles            : files,
@@ -1043,7 +1043,7 @@ App.Console = {
       data = {
         workflowId                         : parseInt(9999999 * Math.random()),
         //projectModelChangeAprovalWorkflowId: $('#s51').val().trim(),
-        projectCode: $('#s51').val().trim(),
+        projectModelCode: $('#s51').val().trim(),
         versionId: $('#s511').val().trim(),
         status                             : 8,
         title                              : $('#p51').val().trim()

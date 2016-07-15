@@ -110,7 +110,7 @@
             console.log(data);
           }
         });
-        //self.renderModel();
+        self.renderModel();
         Project.getname();
 
       }, 10);
@@ -129,24 +129,24 @@
 
       this.viewer.on("loaded", function() {
 
-        Project.showInModel(query.acceptanceId,0);
+        //Project.showInModel(query.acceptanceId,0);
       });
 
-      this.viewer.on("click", function(model) {
-        if (!model.intersect) {
-          that.resetProperNull();
-          return;
-        }
-        console.log(model);
-        propertiesCollection.projectId = "1";
-        propertiesCollection.projectVersionId = "784306105035931";
-        propertiesCollection.fetch({
-          data: {
-            elementId: model.intersect.userId,
-            sceneId: model.intersect.object.userData.sceneId
-          }
-        });
-      });
+      //this.viewer.on("click", function(model) {
+      //  if (!model.intersect) {
+      //    that.resetProperNull();
+      //    return;
+      //  }
+      //  console.log(model);
+      //  propertiesCollection.projectId = "1";
+      //  propertiesCollection.projectVersionId = "784306105035931";
+      //  propertiesCollection.fetch({
+      //    data: {
+      //      elementId: model.intersect.userId,
+      //      sceneId: model.intersect.object.userData.sceneId
+      //    }
+      //  });
+      //});
     }
   }
 
@@ -376,10 +376,38 @@
 
 
 
-          //事件初始化
-          bindEvent(){
+    //事件绑定
+    bindEvent() {
 
-          },
+      var that = this,
+          $projectContainer = $("#projectContainer");
+
+
+      //收起 暂开 属性 右侧
+      $projectContainer.on("click", ".rightProperty .slideBar", function() {
+
+        App.Comm.navBarToggle($("#projectContainer .rightProperty"), $("#projectContainer .projectCotent"), "right", Project.Viewer);
+      });
+      //拖拽 属性内容 右侧
+      $projectContainer.on("mousedown", ".rightProperty .dragSize", function(event) {
+        App.Comm.dragSize(event, $("#projectContainer .rightProperty"), $("#projectContainer .projectCotent"), "right", Project.Viewer);
+      });
+
+      ////tree toggle show  hide
+      //$projectContainer.on("click", ".nodeSwitch", function(event) {
+      //  var $target = $(this);
+      //
+      //  if ($target.hasClass("on")) {
+      //    $target.closest("li").children("ul").hide();
+      //    $target.removeClass("on");
+      //  } else {
+      //    $target.closest("li").children("ul").show();
+      //    $target.addClass("on");
+      //  }
+      //  event.stopPropagation();
+      //})
+    },
+
 
 
 
