@@ -327,10 +327,6 @@ fis.match('/components/fileSelection/es6/**.{es6,js}',{
 });
 
 
- 
-
-
-
 
 //模型 \modelSelection
 fis.match('/components/modelSelection/index.html',{
