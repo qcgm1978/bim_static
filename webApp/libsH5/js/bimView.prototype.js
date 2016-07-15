@@ -30,7 +30,13 @@
       var self = this;
       var _opt = options;
       _opt.element.html(_opt._dom.bimBox);
-      CLOUD.GlobalData.MpkWorkerUrl = "/static/dist/js/mpkWorker.min.js";
+      //外部引用
+      if (window.location.href.indexOf("bim.wanda")<0) {
+        CLOUD.GlobalData.MpkWorkerUrl = "http://bim.wanda.cn/static/dist/js/mpkWorker.min.js";
+      }else{
+        CLOUD.GlobalData.MpkWorkerUrl = "/static/dist/js/mpkWorker.min.js";
+      }
+      
       switch(_opt.type){// 判断类型
         case "model":
           self.viewer = bimView.model.model(_opt,self);

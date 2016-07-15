@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>模型选择器</title>
-  <link rel="stylesheet" type="text/css" href="./less/style.less">
-  <script src="http://bim.wanda-dev.cn/static/dist/components/inspectSelection/libs/libs.js"></script>
-  <script src="http://bim.wanda-dev.cn/static/dist/components/inspectSelection/js/inspectSelection.js"></script>
-</head>
-<body>
-<input type="button" id="model" value="show">
-<script>
-var viewer = new InspectModelSelection({
+  <head>
+    <meta charset="UTF-8">
+    <title>模型选择器</title>
+    <link rel="stylesheet" type="text/css" href="./less/style.less">
+    <link rel="stylesheet" type="text/css" href="./less/comm.extend.less">
+    <script src="http://bim.wanda-dev.cn/static/dist/components/inspectSelection/libs/libs.js"></script>
+    <script src="http://bim.wanda-dev.cn/static/dist/components/inspectSelection/js/inspectSelection.js"></script>
+  </head>
+  <body>
+    <script>
+    var viewer = new InspectModelSelection({
       type:"process",//open process
       sourceId: '848069790540000',
       etag: "ca4863cf122ac55b5a8e845595aeb7ce",
@@ -20,6 +20,6 @@ var viewer = new InspectModelSelection({
         console.log(ids);
       }
     });
-</script>
-</body>
+    </script>
+  </body>
 </html>

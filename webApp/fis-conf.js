@@ -315,7 +315,7 @@ fis.match('/services/**.{less,css}', {
 
 fis.match('/components/fileSelection/index.html',{
      release: '/static/dist/components/fileSelection/index.html'
-});
+}); 
 fis.match('/components/fileSelection/libs/**.{js,es6}',{
      packTo: '/static/dist/components/fileSelection/libs/libs.js'
 });
@@ -326,13 +326,22 @@ fis.match('/components/fileSelection/es6/**.{es6,js}',{
      packTo: '/static/dist/components/fileSelection/js/fileSelection.js'
 });
 
+
+
 //模型 \modelSelection
 fis.match('/components/modelSelection/index.html',{
      release: '/static/dist/components/modelSelection/index.html'
 });
+
+fis.match('/components/modelSelection/model.html',{
+     release: '/static/dist/components/modelSelection/model.html'
+}); 
+
 fis.match('/components/modelSelection/**.{js,es6}',{
      packTo: '/static/dist/components/modelSelection/js/modelSelection.js'
 });
+
+
 
 //模型 \modelSelection
 fis.match('/components/inspectSelection/index.html',{
