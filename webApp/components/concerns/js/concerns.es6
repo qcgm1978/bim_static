@@ -96,6 +96,7 @@
         ConcernsCollection.projectVersionId = query.projectVersionId;
         ConcernsCollection.fetch({
           data: {
+            presetPointId:query.acceptanceId,
             category: "", //类别
             type: "", //类型
             status: "", //状态 1:待整改 2:已整改 3:已关闭
@@ -233,9 +234,24 @@
       }
       return theRequest;
     },
-    showInModel: function(id, type) {
-      var _this = this;
+    showInModel: function($target, type) {
+      var _this = this,
+      ids = $target.data('userId'),
+        box = $target.data('box'),
+        location = $target.data('location');
+      if ($target.hasClass("selected")) {
+        return
+        //	$target.parent().find(".selected").removeClass("selected");
+      } else {
+        $target.parent().find(".selected").removeClass("selected");
+        $target.addClass("selected");
+      }
 
+      if (ids && box) {
+        _this.zoomModel(ids, box);
+        _this.showMarks(location);
+        return;
+      }
 
       var data = {
         URLtype: "fetchQualityModelById",
@@ -243,7 +259,8 @@
           type: type,
           projectId: Project.Settings.projectId,
           versionId: Project.Settings.projectVersionId,
-          acceptanceId: id
+          acceptanceId: $target.data("id")
+
         }
       };
       //获取构件ID type 0：开业验收 1：过程验收 2：隐患
@@ -255,11 +272,14 @@
             var location = data.data.location,
               _temp = JSON.parse(location);
             box = _this.formatBBox(_temp.bBox || _temp.boundingBox);
+            console.log(location)
+
             ids = [_temp.userId];
             //$target.data("userId", ids);
             //$target.data("box", box);
             //$target.data("location", location);
             _this.zoomModel(ids, box);
+
             _this.showMarks(location);
           }
         }
@@ -289,6 +309,7 @@
       if (!data) {
         return [];
       }
+      console.log(data)
       var box = [],
         min = data.min,
         minArr = [min.x, min.y, min.z],
@@ -393,19 +414,6 @@
         App.Comm.dragSize(event, $("#projectContainer .rightProperty"), $("#projectContainer .projectCotent"), "right", Project.Viewer);
       });
 
-      ////tree toggle show  hide
-      //$projectContainer.on("click", ".nodeSwitch", function(event) {
-      //  var $target = $(this);
-      //
-      //  if ($target.hasClass("on")) {
-      //    $target.closest("li").children("ul").hide();
-      //    $target.removeClass("on");
-      //  } else {
-      //    $target.closest("li").children("ul").show();
-      //    $target.addClass("on");
-      //  }
-      //  event.stopPropagation();
-      //})
     },
 
 
@@ -449,7 +457,7 @@
 
           //在模型中显示
           showInModel(){
-            App.Project.showInModel($(event.target).closest("tr"),2);
+            Project.showInModel($(event.target).closest("tr"),2);
           }
 
         });

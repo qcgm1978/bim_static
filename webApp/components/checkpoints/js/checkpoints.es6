@@ -108,7 +108,7 @@
 
       this.viewer.on("loaded", function() {
 
-        Project.showInModel(query.acceptanceId,0);
+        Project.showInModel(query.acceptanceId,query.type);
       });
 
       this.viewer.on("click", function(model) {
