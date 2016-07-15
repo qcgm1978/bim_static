@@ -101,7 +101,7 @@
           sceneId: sceneId
         }
       }).done(function(data) {
-        var template = Project.templateUrl(ourl + "/projects/tpls/project/design/project.design.property.properties.html"),
+        var template = Project.templateUrl("/projects/tpls/project/design/project.design.property.properties.html"),
           html = template(data.data);
         $("#propertyPanel .designProperties").html(html);
       });
@@ -144,7 +144,7 @@
 
         $css2 = '<link rel="stylesheet" href="' + ourl + '/static/dist/projects/projects_20160313.css" />';
 
-      $css3 = '<link rel="stylesheet" href="' + ourl + '/static/dist/comm/comm_20160313.css" />';
+        $css3 = '<link rel="stylesheet" href="' + ourl + '/static/dist/comm/comm_20160313.css" />';
 
 
       if (!ModelSelection.isLoad) {

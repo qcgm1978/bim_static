@@ -336,6 +336,9 @@ fis.match('/components/fileSelection/es6/**.{es6,js}',{
 fis.match('/components/modelSelection/index.html',{
      release: '/static/dist/components/modelSelection/index.html'
 });
+fis.match('/components/modelSelection/single.html',{
+     release: '/static/dist/components/modelSelection/single.html'
+});
 
 fis.match('/components/modelSelection/model.html',{
      release: '/static/dist/components/modelSelection/model.html'
@@ -351,12 +354,15 @@ fis.match('/components/modelSelection/**.{js,es6}',{
 fis.match('/components/inspectSelection/index.html',{
   release: '/static/dist/components/inspectSelection/index.html'
 });
-fis.match('/components/inspectSelection/libs/**.{js,es6}',{
-  packTo: '/static/dist/components/inspectSelection/libs/libs.js'
+
+fis.match('/components/inspectSelection/**.{css,less}',{
+  packTo: '/static/dist/components/inspectSelection/css/inspectSelection.css'
 });
-fis.match('/components/inspectSelection/js/**.{js,es6}',{
+fis.match('/components/inspectSelection/**.{js,es6}',{
   packTo: '/static/dist/components/inspectSelection/js/inspectSelection.js'
 });
+
+
 
 //模型 \checkpoints
 fis.match('/components/checkpoints/index.html',{

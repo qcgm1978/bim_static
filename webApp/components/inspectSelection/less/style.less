@@ -1,6 +1,6 @@
 .dialogContent{position: relative;
 	.rightProperty { width: 200px; border: 1px #ddd solid; position: absolute; right: 0px; top: 0px; bottom: 0px; background-color: #fff; z-index: 600;overflow: hidden;
-		.rightPropertyContentBox { height: 100%; position: relative;
+		.rightPropertyContentBox { height: 100%; position: relative;top:-12px;
 			.rightPropertyContent { height: 100%;
 				.rightPropertyContent { height: 100%;
 					.designPropetyBox { height: 100%; }
@@ -43,13 +43,13 @@
 .qualityContainer { position: absolute; top: 40px; bottom: 0px; left: 0px; right: 0px;
 	.QualityProcessAcceptance, .QualityProcessCheck, .QualityOpeningAcceptance, .QualityConcerns, .QualityProperties { min-width: 398px; width: 100%; height: 100%; overflow: auto; }
 }
-.expandArrowIcon { background: url(/static/dist/images/comm/images/commIcon.png) no-repeat 87px -638px !important; }
+.expandArrowIcon { background: url(/static/dist/images/comm/images/commIcon.png) no-repeat 87px -640px !important; }
 .rightProperty { .hedaerSearch { padding: 15px;  width: 188px; overflow: hidden;
 		.searchToggle { cursor: pointer; background: url(/comm/images/commIcon.png) no-repeat 87px -619px; padding-right: 32px; height: 18px; display: inline-block; }
 		.clearSearch { cursor: pointer; color: #006ECF; }
 		.groupRadio { float: right; }
 	}
-	.searchDetail { display: none; position: absolute; height: 182px; background-color: #fff; top: 38px; width: 200px; z-index: 1; border-bottom: 1px #ccc solid;
+	.searchDetail { display: none; position: absolute; height: 182px; background-color: #fff; top: 34px; width: 200px; z-index: 1; border-bottom: 1px #ccc solid;
 		&.processAcceptance { height: 126px; }
 		&.openingacceptance { height: 162px; }
 		&.concernSearch { height: 204px; }
@@ -58,10 +58,11 @@
 		.optionComm { margin-left: 7px;
 			.myDropText { height: 24px; line-height: 21px; width: 178px; }
 			.myDropArrorw { margin-top: 10px; }
-			.myDropList { width: 100%; top: 25px; left: 0px; }
+			.myDropList { width: 100%; top: 23px; left: 0px; }
 		}
 		.optonLine { margin-top: 10px; padding-left: 5px; }
 		.materialEquipment.statusOption, .categoryOption, .specialitiesOption, .operatorOption, .typeOption, .firstDate, .inspectionUnitOption { margin-left: 7px; }
+		.zIndex13 { position: relative; z-index: 13; }
 		.zIndex10 { position: relative; z-index: 10; }
 		.zIndex11 { position: relative; z-index: 11; }
 		.searchName { width: 176px; margin-left: 7px; display: inline-block; border: 1px #ccc solid; height: 24px; vertical-align: top; line-height: 20px; padding-left: 12px; outline: none;
@@ -101,15 +102,15 @@
 	}
 	.tbProcessAccessHeader, .tbProcessAccessBody { width: 100%; min-width: 398px;
 		.manifestIcon { width: 5%; }
-		.category { width: 12%; }
-		.positon { width: 21%; }
+		.category { width: 16%; }
+		.positon { width: 29%; }
 		.ckResult { width: 10%; }
 	}
 	.tbOpeningacceptanceHeader, .tbOpeningacceptanceBody { width: 100%; min-width: 402px;
 		.manifestIcon { width: 5%; }
 		.specialities { width: 21%; }
-		.category { width: 23%; }
-		.positon { width: 34%; }
+		.category { width: 31%; }
+		.positon { width: 47%; }
 		.ckResult { width: 15%; }
 	}
 	.tbConcernsHeader, .tbConcernsBody { width: 100%; min-width: 540px;

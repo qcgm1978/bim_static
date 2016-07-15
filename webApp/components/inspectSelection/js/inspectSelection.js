@@ -1,8 +1,21 @@
+/*
+*@require /components/inspectSelection/libs/jquery-1.12.0.min.js
+*@require /components/inspectSelection/libs/underscore.1.8.2.js
+*@require /components/inspectSelection/libs/backbone.1.1.2.js
+*/
 (function(win) {
+	var ourl="";
+	 var scripts = document.getElementsByTagName('script');
+	  for (var i = 0, size = scripts.length; i < size; i++) {
+	    if (scripts[i].src.indexOf('/static/dist/components/inspectSelection/js/inspectSelection.js') != -1) {
+	      var a = scripts[i].src.replace('/static/dist/components/inspectSelection/js/inspectSelection.js', '');
+	      ourl = a;
+	    }
+	  }
 	win.App = win.App || {};
 	win.App.API = {
 		Settings: {
-			hostname: "/",
+			hostname: ourl+"/",
 			debug: false
 		},
 		URL: {
@@ -31,20 +44,29 @@
 	InspectModelSelection.prototype = {
 		init: function() {
 			var self = this,
-				srciptUrl = '/static/dist/libs/libsH5_20160313.js',
-				styleUrl = '/static/dist/libs/libsH5_20160313.css',
-				$script = '<script src="' + srciptUrl + '"></script>',
-				$css = '<link rel="stylesheet" href="' + styleUrl + '" />',
-				$script2 = '<script src="/static/dist/comm/comm_20160313.js"></script>';
+				srciptUrl =ourl+ '/static/dist/libs/libsH5_20160313.js',
+				commjs=ourl+'/static/dist/comm/comm_20160313.js',
+				libStyle = ourl+'/static/dist/libs/libsH5_20160313.css',
+				myStyle=ourl+'/static/dist/components/inspectSelection/css/inspectSelection.css',
+				$css = '<link rel="stylesheet" href="' + libStyle + '" />',
+				$css2 = '<link rel="stylesheet" href="' + myStyle + '" />';
 			if (!InspectModelSelection.isLoad) {
-				$('head').append($css,$script, $script2);
+				$('head').append($css,$css2);
 				InspectModelSelection.isLoad = true;
 			}
 			if(self.Settings.type=="process"){
 				win.App.API.URL.fetchQualityOpeningAcceptance="sixD/{projectId}/{projectVersionId}/acceptance?type=1";
 			}
-			self.dialog();
-			self.controll();
+
+	      //加载完js后再渲染
+	      $.getScript(srciptUrl, function() {
+	       // bimView.API.baseUrl = ourl + '/';
+	       	 $.getScript(commjs, function() {
+	       	 	self.dialog();
+	        	self.controll();
+	       	 })
+	        
+	      });
 		},
 		controll: function() {
 			var self = this;
@@ -128,14 +150,15 @@
 	var Project = {
 		type: "open",
 		Settings: {},
+		currentPageListData:null,
 		templateCache: [],
 		//获取模板根据URL
 		templateUrl: function(url, notCompile) {
 
 			if (url.substr(0, 1) == ".") {
-				url = "/static/dist/tpls" + url.substr(1);
+				url = ourl+"/static/dist/tpls" + url.substr(1);
 			} else if (url.substr(0, 1) == "/") {
-				url = "/static/dist/tpls" + url;
+				url = ourl+"/static/dist/tpls" + url;
 			}
 
 			if (Project.templateCache[url]) {
@@ -227,6 +250,9 @@
 			}
 			Project.Viewer.loadMarkers(marks);
 		},
+		hideMarks: function() {
+			Project.Viewer.loadMarkers(null);
+		},
 		//通过userid 和 boundingbox 定位模型
 		zoomModel: function(ids, box) {
 			//定位
@@ -238,6 +264,21 @@
 				type: 'userId',
 				ids: ids
 			});
+		},
+
+		showSelectMarkers:function(e,target){
+			var $target=target||$(e.currentTarget);
+			if($target.hasClass('selected')){
+				var array=[];
+				_.each(Project.currentPageListData,function(i){
+					if(i.location.indexOf('boundingBox')!=-1){
+						array.push(i.location);
+					}
+				})
+				Project.showMarks(array);
+			}else{
+				Project.hideMarks();
+			}
 		},
 		//转换bounding box数据
 		formatBBox: function(data) {
@@ -267,7 +308,7 @@
 			this.loadData();
 		},
 
-		loadData(data){
+		loadData(data,page){
 			OpeningAcceptanceCollection.reset();
 			OpeningAcceptanceCollection.projectId = this.Settings.projectId;
 			OpeningAcceptanceCollection.projectVersionId = this.Settings.projectVersionId;
@@ -276,7 +317,7 @@
 					specialty: "", //专业
 					category: "", //类别 
 					problemCount: "", // 无隐患 1， 有隐患 
-					pageIndex: 1, //第几页，默认第一页
+					pageIndex: page||1, //第几页，默认第一页
 					pageItemCount: 10 //页大小
 				},data),
 				success: function(data) {
@@ -297,6 +338,8 @@
 		urlType: "fetchQualityOpeningAcceptance",
 		parse: function(data) {
 			if (data.code == 0) {
+				Project.currentPageListData=data.data.items;
+				Project.showSelectMarkers(null,$('.btnCk'));
 				return data;
 			} else if (data.code == 10004) {
 				window.location.href = data.data;
@@ -322,10 +365,12 @@
 		events: {
 			"click .searchToggle": "searchToggle",
 			"click .clearSearch": "clearSearch",
-			"click .tbOpeningacceptanceBody tr": "showInModel",
+		//	"click .tbOpeningacceptanceBody tr": "showInModel",
 			'click .resultStatusIcon': 'showDiseaseList',
-			'click .tbContainer tr': 'selectInspect'
-
+			'click .tbContainer tr': 'selectInspect',
+			'click .btnCk':'showSelectMarker',
+			'click .pageInfo .next':'nextPage',
+			'click .pageInfo .prev':'prevPage'
 		},
 
 
@@ -351,12 +396,14 @@
 			var that = this;
 			//隐患
 			this.$(".riskOption").myDropDown({
+				zIndex:11,
 				click: function($item) {
 					that.changeOA('problemCount', $item.data("status"));
 				}
 			});
 			//类型
 			this.$(".categoryOption").myDropDown({
+				zIndex:12,
 				click: function($item) {
 					that.changeOA('category', $item.attr('data-val'))
 				}
@@ -364,6 +411,7 @@
 
 			//专业
 			this.$(".specialitiesOption").myDropDown({
+				zIndex:13,
 				click: function($item) {
 					that.changeOA('specialty', $item.attr('data-val'))
 				}
@@ -376,6 +424,11 @@
 			this.$(".groupRadio").myRadioCk();
 		},
 
+		showSelectMarker(e){
+
+			Project.showSelectMarkers(e);
+			
+		},
 		//显示隐藏搜索
 		searchToggle(e) {
 			var $searchDetail = this.$(".searchDetail");
@@ -398,6 +451,7 @@
 			this.$(".riskOption .text").html('全部')
 			this.$(".categoryOption .text").html('全部')
 			this.$(".specialitiesOption .text").html('全部')
+			this.filters={};
 			Project.loadData(null);
 		},
 
@@ -432,7 +486,24 @@
 		showDiseaseList(event) {
 			//App.Project.QualityAttr.showDisease(event,this,'open',2);// showDiseaseList
 			//event.stopPropagation();
-		}
+		},
+		//下一页
+		nextPage(event) {
+			if ($(event.target).hasClass("disable")) {
+				return;
+			}
+			var next = +$el.find(".paginationBottom .pageInfo .curr").text() + 1;
+			Project.loadData(this.filters,next)
+		},
+
+		//上一页
+		prevPage(event) {
+			if ($(event.target).hasClass("disable")) {
+				return;
+			}
+			var prev = +$el.find(".paginationBottom .pageInfo .curr").text() - 1;
+			Project.loadData(this.filters,prev)
+		},
 	});
 	win.InspectModelSelection = InspectModelSelection;
 })(window)
