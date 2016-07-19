@@ -129,8 +129,9 @@
       $('.m-camera').addClass('disabled').attr('disabled','disabled');
 
       this.viewer.on("loaded", function() {
+        Project.zoomModel(Project.ids, Project.box);
 
-        //Project.showInModel(query.acceptanceId,0);
+        Project.showMarks(Project.locations);
       });
 
       //this.viewer.on("click", function(model) {
@@ -290,7 +291,12 @@
       if (!_.isArray(marks)) {
         marks = [marks];
       }
-      Project.Viewer.loadMarkers(marks);
+      try{
+        Project.Viewer.loadMarkers(marks);
+
+      }catch(e){
+        console.log(marks)
+      }
     },
     //通过userid 和 boundingbox 定位模型
     zoomModel: function(ids, box) {
@@ -423,10 +429,25 @@
 
           //获取数据后处理
           addOne:function(model){
-            var data=model.toJSON();
-            console.log(data)
+            var data=model.toJSON(),
+              items = data.data.items,
+                first = items[0]['location'];
+            first = JSON.parse(first);
+            Project.locations=[];
+
             this.$(".tbConcernsBody tbody").html(this.template(data));
-            this.bindScroll();
+            for(var i = 0;i < items.length;i++){
+              var location = items[i]['location'];
+
+              items[i]['location']?Project.locations.push(location):null;
+
+            }
+            Project.box = Project.formatBBox(first['boundingBox']);
+
+            Project.ids = [first['userId']];
+
+
+            //this.bindScroll();
           },
           //绑定滚动条
           bindScroll() {
