@@ -5,6 +5,12 @@ App.Comm = {
 		loginType: "user", // 登录状态 user token
 		pageItemCount: 15 //Math.floor(($("body").height() + 60) / 70) > 10 && Math.floor(($("body").height() + 60) / 70) || 10
 	},
+
+	resetCookie(param){
+		alert(param)
+		debugger
+	},
+
 	isIEModel: function() {
 		if ($('#iewrapbox').length > 0) {
 			return;

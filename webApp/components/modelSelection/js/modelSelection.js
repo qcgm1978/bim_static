@@ -1,8 +1,6 @@
 // 业务功能：设置隐患点
 // 逻辑功能: 选择隐患点构件
-
 (function(win) {
-
   var scripts = document.getElementsByTagName('script');
   for (var i = 0, size = scripts.length; i < size; i++) {
     if (scripts[i].src.indexOf('/static/dist/components/modelSelection/js/modelSelection.js') != -1) {
@@ -164,7 +162,6 @@
 
     },
     controll: function() {
-
       if (this.isIE()) {
         return;
       }

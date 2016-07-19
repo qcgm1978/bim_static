@@ -9,6 +9,7 @@
 		<PARAM NAME="url" VALUE="" />
 			</object>
 			<script type="text/javascript">
+			
 			var LocString = String(window.document.location.href),
 				View=document.getElementById('WebView');
 				function getQueryStr(str) {
@@ -18,6 +19,15 @@
 				}
 				return "";
 				}
+				function navigateTo(url){
+					var aLink = "<a href='"+ url + "' target='_blank' >test</a>";
+					var a = $(aLink).get(0);
+					var e = document.createEvent('MouseEvents');
+					e.initEvent('click', true, true);
+					a.dispatchEvent(e);
+				}
+				View.registerEvent('urlChanged', navigateTo);
+				$('body').html(WebView);
 				View.height=document.body.parentElement.clientHeight+"px";
 				View.url=getQueryStr('path');
 			</script>
