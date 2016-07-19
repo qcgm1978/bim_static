@@ -1,4 +1,3 @@
-;
 (function($, win) {
 
 	var FileSelection = function(options) {
