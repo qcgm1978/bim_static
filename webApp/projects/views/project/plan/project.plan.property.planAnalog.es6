@@ -37,7 +37,9 @@
 
  		if (PlayArr.length>0) {
  			PlayArr.push(-1);
- 		} 
+ 		}
+	  window.ll=PlayArr;
+	  console.log(PlayArr);
  		this.SourcePlay = PlayArr;
  		this.analogCount = this.SourcePlay.length; 
  	},

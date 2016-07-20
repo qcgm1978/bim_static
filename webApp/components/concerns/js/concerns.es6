@@ -9,11 +9,10 @@
       },
 
       URL: {
-        fetchQualityOpeningAcceptance: "sixD/{projectId}/{projectVersionId}/acceptance?type=2",
         fetchQualityModelById: "sixD/{projectId}/{versionId}/quality/element",
-        fetchDesignProperties: "sixD/{projectId}/{projectVersionId}/property", //设计属性 ?sceneId={sceneId}&elementId={elementId}
         fetchProjectVersionInfo: "platform/project/{projectId}/version/{projectVersionId}", //项目版本信息
-        fetchQualityConcerns: "sixD/{projectId}/{projectVersionId}/problem" //隐患
+        fetchQualityConcerns: "sixD/{projectId}/{projectVersionId}/problem" ,//隐患,
+        fetchInfoByprojectCode:"platform/api/project/{projectCode}/meta?token=123"
 
       }
     }
@@ -154,7 +153,7 @@
 
   //Project模型操作方法
   var Project = {
-    Settings: {},
+    Settings: {projectVersionId:1111},
     templateCache: [],
     concernsData:{
       type:['随机','过程检查','开业验收','入伙验收'],
@@ -331,7 +330,7 @@
         URLtype: "fetchProjectVersionInfo",
         data: {
           projectId: query.projectId,
-          projectVersionId: query.projectVersionId
+          projectVersionId: query.projectVersionId || 110
         }
       };
       //获取构件ID type 0：开业验收 1：过程验收 2：隐患
@@ -431,7 +430,7 @@
           addOne:function(model){
             var data=model.toJSON(),
               items = data.data.items,
-                first = items[0]['location'];
+                first = items[0]['location'] ;
             first = JSON.parse(first);
             Project.locations=[];
 
@@ -485,4 +484,6 @@
 
   win.ModelSelection = ModelSelection;
   win.project = Project;
+
+
 })($, window)
