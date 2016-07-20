@@ -283,17 +283,8 @@
 					var result = {},
 						setting = self.Settings;
 					if (val) {
-						_.each(Project.currentPageListData, function(i) {
-							if (i.id == val) {
-								result = {
-									id: i.id,
-									locationName: i.locationName,
-									location: i.location,
-									axis: i.axis
-								}
-							}
-						})
-						if (setting.callback && setting.callback.call(this, result) !== false) {
+						val=JSON.parse(val)
+						if (setting.callback && setting.callback.call(this, val) !== false) {
 							self.$dialog.remove();
 							self.$dialog = null;
 							return self.viewData

@@ -39,8 +39,14 @@
         }
     });
 
-    function getData(){ 
-        return JSON.stringify(viewer.viewData || "");
+    function getData(){
+        var data={
+            components:viewer.viewData,
+            markers:viewer.Project.Setting.markers
+        }
+        var result=JSON.stringify(data); 
+        alert(result);
+        return result;
     }
     </script>
 </body>

@@ -32,8 +32,21 @@
     });
    
     function getData(){ 
-        var d=$('.tbOpeningacceptanceBody tr.selected');
-        return d.data('id');
+        var d=$('.tbOpeningacceptanceBody tr.selected'),
+            id=d.data('id'),
+            result={},
+            data=viewer.Project.currentPageListData;
+        _.each(data, function(i) {
+              if (i.id == id) {
+                result = {
+                  id: i.id,
+                  locationName: i.locationName,
+                  location: i.location,
+                  axis: i.axis
+                }
+              }
+            })
+        return JSON.stringify(result);
     }
 
     </script>
