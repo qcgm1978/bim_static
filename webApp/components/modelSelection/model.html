@@ -23,29 +23,21 @@
     } 
     var Request = GetRequest();  
     var viewer = new ModelSelection({
-       /* type: 'multi', //multi,single
-        sourceId: '848069790540000',
-        etag:  "ca4863cf122ac55b5a8e845595aeb7ce",
-        projectId: '1',
-        projectVersionId: '784306105035931',*/
-        type:Request.type,//open process
+        type:Request.type,
         sourceId: Request.sourceId,
         etag: Request.etag,
         projectId:Request.projectId,
         projectVersionId: Request.projectVersionId,
-        //multi 只有components回调参数
         callback: function(components, markers) {
-            console.log(components);
         }
     });
 
     function getData(){
         var data={
             components:viewer.viewData,
-            markers:viewer.Project.Setting.markers
+            markers:viewer.Project.Settings.markers
         }
         var result=JSON.stringify(data); 
-        alert(result);
         return result;
     }
     </script>
