@@ -4,6 +4,112 @@
  *@require /components/inspectSelection/libs/backbone.1.1.2.js
  */
 (function(win) {
+
+	var strVar1 = "";
+    strVar1 += "<% $.each(data.items,function(i,item){%> ";
+    strVar1 += "    <tr class=\"<%= i%2==0 && 'odd' %>\"  data-id=\"<%=item.id%>\" data-location='<%= item.location?JSON.stringify(item.location):\"\"%>'>";
+    strVar1 += "        <td class=\"manifestIcon\"><i class=\"myIcon-inventory\"><\/i><\/td>";
+    strVar1 += "        <td class=\"category\"><%=item.categoryName%><\/td>";
+    strVar1 += "        <td class=\"positon\"><%=item.locationName%><\/td>";
+    strVar1 += "        <td class=\"ckResult\">";
+    strVar1 += "         <i data-id=\"<%= item.acceptanceId %>\"  data-total=\"<%=item.problemCount%>\" class=\"resultStatusIcon  <%= item.colorStatus == 0 ?'myIcon-circle-green':'myIcon-circle-red'%> \"><\/i>";
+    strVar1 += "             <%=item.problemCount%>/<%=item.checkCount%><\/td>";
+    strVar1 += "    <\/tr>";
+    strVar1 += "<% }) %> ";
+    strVar1 += "<% if(data.items.length<=0){%>";
+    strVar1 += "    <tr>";
+    strVar1 += "        <td colspan=\"9\" class=\"noDataTd\">暂无数据<\/td>";
+    strVar1 += "    <\/tr>";
+    strVar1 += "<%}%>";
+
+    var strVar2 = "";
+    strVar2 += "<div class=\"hedaerSearch\">";
+    strVar2 += "    <span class=\"searchToggle\">选择筛选条件<\/span>";
+    strVar2 += "    <span class=\"clearSearch\">清除条件<\/span>";
+    strVar2 += "    <span class=\"groupRadio\">";
+    strVar2 += "        <label class=\"btnCk\"><i class=\"iconPic\"><\/i>显示搜索结果对应位置<\/label>";
+    strVar2 += "    <\/span>";
+    strVar2 += "<\/div>";
+    strVar2 += "<div class=\"searchDetail openingacceptance\">";
+    strVar2 += "    <div class=\"searchOptons\">";
+    strVar2 += "        <div class=\"optonLine zIndex13\">";
+    strVar2 += "            <div class=\"myDropDown specialitiesOption optionComm\">";
+    strVar2 += "                <span class=\"myDropText\">";
+    strVar2 += "                    <span>专业：<\/span> <span class=\"text\">全部<\/span> <i class=\"myDropArrorw\"><\/i> <\/span>";
+    strVar2 += "                    <ul class=\"myDropList\">";
+    strVar2 += "                        <li class=\"myItem\" data-val=''>全部<\/li>";
+    strVar2 += "                        <li class=\"myItem\" data-val='10'>外装<\/li>";
+    strVar2 += "                        <li class=\"myItem\" data-val='15'>内装<\/li>";
+    strVar2 += "                        <li class=\"myItem\" data-val='45'>采光顶<\/li>";
+    strVar2 += "                        <li class=\"myItem\" data-val='50'>慧云机房<\/li>";
+    strVar2 += "                        <li class=\"myItem\" data-val='55'>冷冻机房<\/li>";
+    strVar2 += "                        <li class=\"myItem\" data-val='60'>消防水泵房<\/li>";
+    strVar2 += "                        <li class=\"myItem\" data-val='75'>发电机房<\/li>";
+    strVar2 += "                        <li class=\"myItem\" data-val='85'>地下车库<\/li>";
+    strVar2 += "                    <\/ul>";
+    strVar2 += "                <\/div>";
+    strVar2 += "            <\/div>";
+    strVar2 += "            <div class=\"optonLine\">";
+    strVar2 += "                <div class=\"myDropDown categoryOption optionComm\">";
+    strVar2 += "                    <span class=\"myDropText\">";
+    strVar2 += "                        <span>类别：<\/span> <span class=\"text\">全部<\/span> <i class=\"myDropArrorw\"><\/i> <\/span>";
+    strVar2 += "                        <ul class=\"myDropList\">";
+    strVar2 += "                            <li class=\"myItem\" data-val=''>全部<\/li>";
+    strVar2 += "                            <li class=\"myItem\" data-val='05'>玻璃幕墙<\/li>";
+    strVar2 += "                            <li class=\"myItem\" data-val='06'>石材/地砖地面<\/li>";
+    strVar2 += "                            <li class=\"myItem\" data-val='07'>车库出入口<\/li>";
+    strVar2 += "                            <li class=\"myItem\" data-val='30'>栏杆扶手<\/li>";
+    strVar2 += "                            <li class=\"myItem\" data-val='40'>标识<\/li>";
+    strVar2 += "                            <li class=\"myItem\" data-val='55'>广告位<\/li>";
+    strVar2 += "                        <\/ul>";
+    strVar2 += "                    <\/div>";
+    strVar2 += "                <\/div>";
+    strVar2 += "                <div class=\"optonLine\">";
+    strVar2 += "                    <div class=\"myDropDown riskOption optionComm\">";
+    strVar2 += "                        <span class=\"myDropText\">";
+    strVar2 += "                            <span>有无隐患：<\/span> <span class=\"text\">全部<\/span> <i class=\"myDropArrorw\"><\/i> <\/span>";
+    strVar2 += "                            <ul class=\"myDropList\">";
+    strVar2 += "                                <li data-status=\"\" class=\"myItem\">全部<\/li>";
+    strVar2 += "                                <li data-status=\"1\" class=\"myItem\">有<\/li>";
+    strVar2 += "                            <\/ul>";
+    strVar2 += "                        <\/div>";
+    strVar2 += "                    <\/div>";
+    strVar2 += "                <\/div>";
+    strVar2 += "                <div class=\"optonLine btnOption\">";
+    strVar2 += "                    <input type=\"button\" class=\"myBtn myBtn-primary btnFilter\" value=\"筛选\" />";
+    strVar2 += "                <\/div>";
+    strVar2 += "            <\/div>";
+    strVar2 += "        <\/div>";
+    strVar2 += "        <div class=\"tbContainer\">";
+    strVar2 += "            <table class=\"tbOpeningacceptanceHeader tbComm\">";
+    strVar2 += "                <thead>";
+    strVar2 += "                    <tr>";
+    strVar2 += "                        <th class=\"manifestIcon\"><\/th>";
+    strVar2 += "                        <th class=\"category\">类别<\/th>";
+    strVar2 += "                        <th class=\"positon\">位置<\/th>";
+    strVar2 += "                        <th class=\"ckResult\">检查结果<\/th>";
+    strVar2 += "                    <\/tr>";
+    strVar2 += "                <\/thead>";
+    strVar2 += "            <\/table>";
+    strVar2 += "            <div class=\"materialequipmentList openingacceptanceList\">";
+    strVar2 += "                <div class=\"materialequipmentListScroll\">";
+    strVar2 += "                    <table class=\"tbOpeningacceptanceBody tbComm\">";
+    strVar2 += "                        <tbody>";
+    strVar2 += "                        <tr class=\"noLoading\"><\/tr>";
+    strVar2 += "                    <\/tbody>";
+    strVar2 += "                <\/table>";
+    strVar2 += "            <\/div>";
+    strVar2 += "        <\/div>";
+    strVar2 += "    <\/div>";
+    strVar2 += "    <div class=\"paginationBottom\">";
+    strVar2 += "        <div class=\"pageInfo\">";
+    strVar2 += "            <span class=\"curr\">0<\/span>/<span class=\"pageCount\">0<\/span>页";
+    strVar2 += "            <span class=\"prev\">上一页<\/span> <span class=\"next\">下一页<\/span>";
+    strVar2 += "        <\/div>";
+    strVar2 += "        <div class=\"sumCount\">共<span class=\"count\">0<\/span>条<\/div>";
+    strVar2 += "        ";
+    strVar2 += "    <\/div>";
+
 	var ourl = "";
 	var scripts = document.getElementsByTagName('script');
 	for (var i = 0, size = scripts.length; i < size; i++) {
@@ -473,7 +579,8 @@
 
 			this.OpeningAcceptanceOptions = options.OpeningAcceptance;
 
-			var tpl = Project.templateUrl("/components/inspectSelection/tpls/project.quality.property.openingAcceptance.html");
+			//var tpl = Project.templateUrl("/components/inspectSelection/tpls/project.quality.property.openingAcceptance.html");
+			var tpl = _.template(strVar2);
 			this.$el.html(tpl);
 			this.bindEvent();
 			return this;
@@ -549,7 +656,8 @@
 			Project.loadData(null);
 		},
 
-		template: Project.templateUrl("/components/inspectSelection/tpls/project.quality.property.openingAcceptance.body.html"),
+	//	template: Project.templateUrl("/components/inspectSelection/tpls/project.quality.property.openingAcceptance.body.html"),
+		template: _.template(strVar1),
 
 		//获取数据后处理
 		addOne: function(model) {
