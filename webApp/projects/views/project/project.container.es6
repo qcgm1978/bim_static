@@ -91,7 +91,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 
 	//展开和收起
 	slideUpAndDown: function(event,_$parent,$current) {
-		var $parent = _$parent||$(event.target).closest('.modle'),
+		var $parent = _$parent||$(event.target).closest('.modle'),classkey,
 			$modleList = $parent.find(".modleList");
 		$modleList=$modleList.length==0?$parent.next():$modleList;
 		_$current=$current||$(event.target);
@@ -102,11 +102,18 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			$modleList.slideUp();
 		}
 		//classkey临时请求数据
-		if (_$current.is('.getdata')) {
-			_$current.removeClass('getdata');
+		if (_$current.is('.getdata') || _$current.find('.modleShowHide').is('.getdata')) {
+			if(_$current.is('.getdata')){
+				classkey = _$current.data('classkey');
+				_$current.removeClass('getdata');
+
+			}else{
+				classkey = _$current.find('.modleShowHide').data('classkey');
+				_$current.find('.modleShowHide').removeClass('getdata');
+			}
 			$modleList.slideDown();
 			$.ajax({
-				url: "platform/setting/extensions/" + App.Project.Settings.projectId + "/" + App.Project.Settings.CurrentVersion.id + "/property?classKey=" + $(event.target).data('classkey') + "&elementId=" + App.Project.Settings.ModelObj.intersect.userId
+				url: "platform/setting/extensions/" + App.Project.Settings.projectId + "/" + App.Project.Settings.CurrentVersion.id + "/property?classKey=" + classkey + "&elementId=" + App.Project.Settings.ModelObj.intersect.userId
 			}).done(function(res) {
 				if (res.code == 0) {
 					var props = res.data.properties;
