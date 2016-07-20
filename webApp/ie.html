@@ -1,35 +1,80 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8">
-		<title>BIM总发包管理平台</title>
-	</head>
-	<body style="margin: 0;padding: 0;overflow: hidden;">
-		<object ID="WebView" style="width: 100%;" CLASSID="CLSID:15A5F85D-A81B-45D1-A03A-6DBC69C891D1">
+
+<head>
+    <meta charset="UTF-8">
+    <title>BIM总发包管理平台</title>
+</head>
+
+<body style="margin: 0;padding: 0;overflow: hidden;" onunload="unLoadEvent()">
+    <!-- <object ID="WebView" style="width: 100%;" CLASSID="CLSID:15A5F85D-A81B-45D1-A03A-6DBC69C891D1">
 		<PARAM NAME="url" VALUE="" />
-			</object>
-			<script type="text/javascript">
-			
-			var LocString = String(window.document.location.href),
-				View=document.getElementById('WebView');
-				function getQueryStr(str) {
-				var rs = new RegExp("(^|)" + str + "=([^&]*)(&|$)", "gi").exec(LocString), tmp;
-				if (tmp =rs) {
-				return tmp[2];
-				}
-				return "";
-				}
-				function navigateTo(url){
-					var aLink = "<a href='"+ url + "' target='_blank' >test</a>";
-					var a = $(aLink).get(0);
-					var e = document.createEvent('MouseEvents');
-					e.initEvent('click', true, true);
-					a.dispatchEvent(e);
-				}
-				View.registerEvent('urlChanged', navigateTo);
-				$('body').html(WebView);
-				View.height=document.body.parentElement.clientHeight+"px";
-				View.url=getQueryStr('path');
-			</script>
-		</body>
-	</html>
+			</object> -->
+	<script src="http://lib.sinaapp.com/js/jquery/1.9.1/jquery-1.9.1.min.js"></script>
+
+    <script type="text/javascript">
+    	 
+	    var WebView = document.createElement("object");
+
+	    WebView.classid = "CLSID:15A5F85D-A81B-45D1-A03A-6DBC69C891D1";
+
+	    var viewport = document.body;
+	    viewport.appendChild(WebView); 
+
+	    var url=getCookie("path") || window.location.href.substring(window.location.href.lastIndexOf("path") + 5);
+
+	    WebView.url = url;
+	    WebView.id="webView";
+	    WebView.registerEvent('urlChanged', navigateTo); 
+	    WebView.height = document.body.parentElement.clientHeight + "px";
+
+	    resizeWebView();
+
+	    delCookie("path");
+
+	    function navigateTo(url) {
+	        var aLink = "<a href='" + url + "' target='_blank' >test</a>";
+	        var a = $(aLink).get(0);
+	        var e = document.createEvent('MouseEvents');
+	        e.initEvent('click', true, true);
+	        a.dispatchEvent(e);
+	    }
+
+	    function resizeWebView() {
+	        WebView.width = viewport.offsetWidth;
+	        WebView.height = viewport.offsetHeight;
+	    } 
+	 
+
+	    //刷新
+	    function unLoadEvent(){
+	    	setCookie("path",webView.url); 
+	    }
+
+	   function setCookie(name, value) {
+			var Days = 0.02,
+				exp = new Date();
+			exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 1000);
+			document.cookie = name + "=" + escape(value) + ";expires=" + exp.toGMTString() + ";path=/";
+		}
+		//获取cookie
+		function getCookie(name) {
+			var arr, reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)");
+			if (arr = document.cookie.match(reg))
+				return unescape(arr[2]);
+			else
+				return null;
+		}
+		//删除cookie
+		function delCookie(name) {
+			var exp = new Date();
+			exp.setTime(exp.getTime() - 31 * 24 * 60 * 60 * 1000);
+			var cval = this.getCookie(name);
+			if (cval != null)
+				document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString() + ";path=/";
+		}
+
+    </script>
+</body>
+
+</html>

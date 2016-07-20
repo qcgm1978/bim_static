@@ -1835,9 +1835,9 @@
 				$.when(this.getFilter(), this.getAnnotation()).done((filterData, annotationData) => {
 
 					filterData = filterData[0];
-					annotationData = annotationData[0];
+					//annotationData = annotationData[0];
 
-					if (filterData.code == 0 && annotationData.code == 0) {
+					if (filterData.code == 0) {
 
 						var filterObj = {
 
@@ -1849,7 +1849,7 @@
 							delete item.cateType;
 						});
 						App.Project.Settings.Viewer.loadComment({
-							list: annotationData.data.annotations,
+							//list: annotationData.data.annotations,
 							filter: filterObj
 						});
 						//隐藏加载
@@ -1888,7 +1888,7 @@
 
 			//获取批注
 			getAnnotation() {
-
+				return true;
 				var data = {
 					URLtype: "getAnnotation",
 					data: {

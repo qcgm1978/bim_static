@@ -619,7 +619,9 @@ App.Index = {
 
 	init() {
 
-		App.Comm.isIEModel();
+		if (App.Comm.isIEModel()) {
+			return;
+		}
 		//初始化参数
 		this.initPars();
 		//事件绑定

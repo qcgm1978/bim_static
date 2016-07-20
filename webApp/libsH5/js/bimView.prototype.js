@@ -52,9 +52,7 @@
         var workerJSBlob = new Blob([data], {
           type: "text/javascript"
         });
-        CLOUD.GlobalData.MpkWorkerUrl = window.URL.createObjectURL(workerJSBlob);
-        console.log(CLOUD.GlobalData.MpkWorkerUrl);
-        debugger
+        CLOUD.GlobalData.MpkWorkerUrl = window.URL.createObjectURL(workerJSBlob); 
       }).fail(function(){
           console.log("get error " + url);
       });

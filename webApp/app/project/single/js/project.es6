@@ -7,37 +7,10 @@ App.Project = {
 		axisHtm: "",
 		modelId: ""
 	},
-	isIEModel: function() {
-		if ($('#iewrapbox').length > 0) {
-			return;
-		}
+	isIEModel: function() { 
 		if("ActiveXObject" in window || window.ActiveXObject){
-			window.location.href='ie.html?path='+ window.location.href;
-			return 
-		}
-		//IE11 以下都是真
-		if (window.ActiveXObject) {
-			$("#topBar").remove();
-			$("body").empty();
-			try{
-				var WebView = document.createElement("object");
-				WebView.classid = "CLSID:15A5F85D-A81B-45D1-A03A-6DBC69C891D1";
-				WebView.url = window.location.href;
-				WebView.id = 'iewrapbox';
-				WebView.width = '100%';
-				WebView.height = '100%';
-				function navigateTo(url){
-					var aLink = "<a href='"+ url + "' target='_blank' >test</a>";
-					var a = $(aLink).get(0);
-					var e = document.createEvent('MouseEvents');
-					e.initEvent('click', true, true);
-					a.dispatchEvent(e);
-				}
-				WebView.registerEvent('urlChanged', navigateTo);
-				$('body').html(WebView);
-			}catch(e){
-				alert('请安装ActiveX插件');
-			}
+			window.location.href='/ie.html?path='+ window.location.href; 
+			return true;
 		}
 	},
 	GetRequest() {
@@ -483,7 +456,11 @@ App.Project = {
 	},
 
 	init() {
-		this.isIEModel();
+		
+		if (this.isIEModel()) {
+			return;
+		}
+		 
 		//渲染模型
 		App.Project.renderModel();
 
