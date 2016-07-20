@@ -12,7 +12,7 @@ App.Project = {
 			return;
 		}
 		if("ActiveXObject" in window || window.ActiveXObject){
-			window.location.href='ie.html?path='+ window.location.href;
+			window.location.href='/ie.html?path='+ window.location.href;
 			return 
 		}
 		//IE11 以下都是真
