@@ -39,6 +39,7 @@
 		//合并参数
 		this.Settings = $.extend(defaults, options);
 		Project.Settings = this.Settings;
+		this.Project=Project;
 		this.init();
 	}
 	InspectModelSelection.prototype = {
@@ -60,7 +61,7 @@
 
 			//加载完js后再渲染
 			$.getScript(srciptUrl, function() {
-				// bimView.API.baseUrl = ourl + '/';
+				bimView.API.baseUrl = ourl + '/';
 				$.getScript(commjs, function() {
 					self.dialog();
 					self.controll();
@@ -173,18 +174,11 @@
 
 				//获取数据
 				WebView.runScript('getData()', function(val) {
-
-					var data = {};
+					var result = {},
+						setting = self.Settings;
 					if (val) {
-						data = JSON.parse(val);
-					}
-
-					var setting = self.Settings;
-					var t = $('.tbOpeningacceptanceBody tr.selected'),
-						result = {};
-					if (t.length == 1) {
 						_.each(Project.currentPageListData, function(i) {
-							if (i.id == t.data('id')) {
+							if (i.id == val) {
 								result = {
 									id: i.id,
 									locationName: i.locationName,
@@ -199,7 +193,6 @@
 							return self.viewData
 						}
 					}
-
 				});
 
 			})
@@ -225,8 +218,8 @@
 				WebView.height = viewport.offsetHeight;
 			}
 			resizeWebView();
-
-			WebView.url = ourl + "/static/dist/components/inspectSelection/model.html";
+			WebView.url = ourl + "/static/dist/components/inspectSelection/model.html?type="+this.Settings.type+"&sourceId="+this.Settings.sourceId+"&etag="+
+			this.Settings.etag+"&projectId="+ this.Settings.projectId+"&projectVersionId="+this.Settings.projectVersionId;
 			WebView.height = "510px";
 			WebView.width = "960px";
 			//window.addEventListener('resize', resizeWebView, false);
@@ -250,6 +243,7 @@
 		type: "open",
 		Settings: {},
 		currentPageListData: null,
+		currentInspectId:null,
 		templateCache: [],
 		//获取模板根据URL
 		templateUrl: function(url, notCompile) {
@@ -350,7 +344,7 @@
 			Project.Viewer.loadMarkers(marks);
 		},
 		hideMarks: function() {
-			Project.Viewer.loadMarkers(null);
+			Project.Viewer && Project.Viewer.loadMarkers(null);
 		},
 		//通过userid 和 boundingbox 定位模型
 		zoomModel: function(ids, box) {
@@ -467,7 +461,7 @@
 			"click .clearSearch": "clearSearch",
 			//	"click .tbOpeningacceptanceBody tr": "showInModel",
 			'click .resultStatusIcon': 'showDiseaseList',
-			'click .tbContainer tr': 'selectInspect',
+			'click .tbOpeningacceptanceBody tr': 'selectInspect',
 			'click .btnCk': 'showSelectMarker',
 			'click .pageInfo .next': 'nextPage',
 			'click .pageInfo .prev': 'prevPage'
@@ -567,6 +561,7 @@
 		//选择检查点
 		selectInspect: function(e) {
 			var $target = $(e.currentTarget);
+			Project.currentInspectId=$target.data('id');
 			$target.parent().find('tr').removeClass('selected');
 			$target.addClass('selected');
 			Project.showInModel($target, 2);

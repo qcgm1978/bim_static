@@ -9,12 +9,30 @@
 
 <body>
     <script type="text/javascript">
+     function GetRequest() {   
+       var url = location.search; //获取url中"?"符后的字串   
+       var theRequest = new Object();   
+       if (url.indexOf("?") != -1) {   
+          var str = url.substr(1);   
+          strs = str.split("&");   
+          for(var i = 0; i < strs.length; i ++) {   
+             theRequest[strs[i].split("=")[0]]=unescape(strs[i].split("=")[1]);   
+          }   
+       }   
+       return theRequest;   
+    } 
+    var Request = GetRequest();  
     var viewer = new ModelSelection({
-        type: 'multi', //multi,single
+       /* type: 'multi', //multi,single
         sourceId: '848069790540000',
-        etag:  "ca4863cf122ac55b5a8e845595aeb7ce",//"21b8481b7e892ec87694259ddaddbfd7" ||
+        etag:  "ca4863cf122ac55b5a8e845595aeb7ce",
         projectId: '1',
-        projectVersionId: '784306105035931',
+        projectVersionId: '784306105035931',*/
+        type:Request.type,//open process
+        sourceId: Request.sourceId,
+        etag: Request.etag,
+        projectId:Request.projectId,
+        projectVersionId: Request.projectVersionId,
         //multi 只有components回调参数
         callback: function(components, markers) {
             console.log(components);
