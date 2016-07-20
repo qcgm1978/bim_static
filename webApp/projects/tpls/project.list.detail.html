@@ -6,7 +6,7 @@
 <span class="proType"><%=App.Projects.projectType[subType]%></span> 
 <span class="proType"><%=App.Projects.projectModel[estateType]%></span> 
 <span class="proRetailing"><%=App.Projects.proRetailing[projectType]%></span>
-<span class="proProvince"><%=province||city%></span>
+<span class="proProvince overflowEllipsis" title="<%=province||city%>"><%=province||city%></span>
 <span class="proCity"><%=region%></span> 
 <span class="proStar"><%= delistingDate ? new Date(delistingDate).format("yyyy-MM-dd"): "" %></span>
 <span class="proEnd"><%= openTime ? new Date(openTime).format("yyyy-MM-dd"):"" %></span>

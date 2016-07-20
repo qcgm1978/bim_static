@@ -186,21 +186,46 @@
 
 
   var ModelSelection = function(options) {
-
+    var _this=this;
     //强制new
     if (!(this instanceof ModelSelection)) {
       return new ModelSelection(options);
     }
-
+    
     var defaults = {
       btnText: '确&nbsp;&nbsp;定'
     }
+    this.Settings = $.extend(defaults, options);
+    if(this.Settings.etag){
+      Project.Settings = this.Settings;
+      this.Project=Project;
+      this.init();
+    }else{
+       $.ajax({
+          url: ourl+"/platform/api/project/"+this.Settings.projectCode+"/meta?token=123"
+        }).done(function(data){
+          if(data.code==0){
+            $.ajax({
+              url: ourl+"/view/"+data.data.projectId+"/"+data.data.versionId+"/init"
+            }).done(function(data){
+              if(data.code==0){
+                _this.Settings=$.extend({},_this.Settings,data.data);
+                Project.Settings = _this.Settings;
+                _this.Project=Project;
+                _this.init();
+              }
+              
+            })
+          }
+        })
+    }
 
-    //合并参数
+   
+    /*//合并参数
     this.Settings = $.extend(defaults, options);
     Project.Settings = this.Settings;
     this.Project=Project;
-    this.init();
+    this.init();*/
   }
 
 
