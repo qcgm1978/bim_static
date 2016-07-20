@@ -240,7 +240,7 @@ var AppRoute = Backbone.Router.extend({
 		//	if (!!window.ActiveXObject || "ActiveXObject" in window){
 		//		window.location.href = "/static/dist/app/todo/remind.html";
 		//	}
-		//}
+		//} 
 		if (App.Comm.isIEModel()) {
 			return;
 		}else{
