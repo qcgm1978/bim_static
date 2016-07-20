@@ -241,10 +241,12 @@ var AppRoute = Backbone.Router.extend({
 		//		window.location.href = "/static/dist/app/todo/remind.html";
 		//	}
 		//}
-		if(!window.ActiveXObject){
+		if (App.Comm.isIEModel()) {
+			return;
+		}else{
 			_.require('/static/dist/libs/libsH5.js');
-		}
-		App.Comm.isIEModel();
+		} 
+		 
 		if (!$._data($(".user > span")[0], "events")) {
 			//绑定用户信息
 			App.TopNav.init();
