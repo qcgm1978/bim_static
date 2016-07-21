@@ -14,19 +14,46 @@
 
     <script type="text/javascript">
     	 
-	    var WebView = document.createElement("object");
+	    var myWebView = document.createElement("object");
 
-	    WebView.classid = "CLSID:15A5F85D-A81B-45D1-A03A-6DBC69C891D1";
+	    myWebView.classid = "CLSID:15A5F85D-A81B-45D1-A03A-6DBC69C891D1";
 
 	    var viewport = document.body;
-	    viewport.appendChild(WebView); 
+	    viewport.appendChild(myWebView); 
 
-	    var url=getCookie("path") || window.location.href.substring(window.location.href.lastIndexOf("path") + 5);
+	    var url=getCookie("path") || window.location.href.substring(window.location.href.lastIndexOf("path") + 5) || window.location.host+"/login.html";
 
-	    WebView.url = url;
-	    WebView.id="webView";
-	    WebView.registerEvent('urlChanged', navigateTo); 
-	    WebView.height = document.body.parentElement.clientHeight + "px";
+	    myWebView.url = url;
+	    myWebView.id="webView";
+	    myWebView.registerEvent('newWindow', navigateTo); 
+
+	    myWebView.registerEvent('urlChanged', function(url){
+	    	//登录后设置 cookie
+	    	myWebView.runScript("document.cookie",function(cookies){
+	    		 //比较cookie
+	    		if (getCookie("userId") != getCookie("userId",cookies)) {
+	    			//登录设置 登出删除
+	    	 		var keys = cookies.match(/[^ =;]+(?=\=)/g);
+	    	 		if (keys && keys.length>1) {
+	    	 			for(var i=0;i<keys.length;i++){
+	    	 				setCookie(keys[i],getCookie(keys[i],cookies));
+	    	 			}
+	    	 		}else{
+	    	 			var keys = document.cookie.match(/[^ =;]+(?=\=)/g);
+	    	 			for(var i=0;i<keys.length;i++){
+	    	 				delCookie(keys[i]);
+	    	 			}
+	    	 		}
+	    	    } 
+	    	 	
+	    	});
+
+	    	
+	    	 //myWebView
+	    });
+
+
+	    myWebView.height = document.body.parentElement.clientHeight + "px";
 
 	    resizeWebView();
 
@@ -41,14 +68,14 @@
 	    }
 
 	    function resizeWebView() {
-	        WebView.width = viewport.offsetWidth;
-	        WebView.height = viewport.offsetHeight;
+	        myWebView.width = viewport.offsetWidth;
+	        myWebView.height = viewport.offsetHeight;
 	    } 
 	 
 
 	    //刷新
 	    function unLoadEvent(){
-	    	setCookie("path",webView.url); 
+	    	setCookie("path",myWebView.url); 
 	    }
 
 	   function setCookie(name, value) {
@@ -58,9 +85,14 @@
 			document.cookie = name + "=" + escape(value) + ";expires=" + exp.toGMTString() + ";path=/";
 		}
 		//获取cookie
-		function getCookie(name) {
+		function getCookie(name,cookis) {
 			var arr, reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)");
-			if (arr = document.cookie.match(reg))
+
+			if (!cookis) {
+				cookis=document.cookie;
+			}
+
+			if (arr = cookis.match(reg))
 				return unescape(arr[2]);
 			else
 				return null;

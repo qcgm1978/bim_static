@@ -180,7 +180,7 @@
         if(res.message == "success"){
           floorsData = res.data.sort(function(a,b){
             return b.sort - a.sort;
-          });
+          }); 
           floorsStatue = true;
           if(axisGridStatue){
             renderMap();
@@ -191,7 +191,7 @@
         type:'get',
         url:bimView.API.fetchAxisGrid,
         etag:self._opt.etag
-      },function(res){
+      },function(res){ 
         axisGridData = JSON.parse(res);
         axisGridStatue = true;
         if(floorsStatue){
