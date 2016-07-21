@@ -7,9 +7,9 @@ App.Project = {
 		axisHtm: "",
 		modelId: ""
 	},
-	isIEModel: function() { 
-		if("ActiveXObject" in window || window.ActiveXObject){
-			window.location.href='/ie.html?path='+ window.location.href; 
+	isIEModel: function() {
+		if ("ActiveXObject" in window || window.ActiveXObject) {
+			window.location.href = '/ie.html?path=' + window.location.href;
 			return true;
 		}
 	},
@@ -123,7 +123,7 @@ App.Project = {
 
 	// 除 dwg以外的格式
 	renderOther(modelId, type) {
-		var _this=this;
+		var _this = this;
 		var typeMap = {
 			rte: 'singleModel',
 			rvt: 'singleModel',
@@ -158,7 +158,7 @@ App.Project = {
 
 		});
 
-		App.Project.Settings.Viewer.on('empty',function(){
+		App.Project.Settings.Viewer.on('empty', function() {
 			$('.tips span').html('无法三维预览，请<a href="javascript:;" onclick="App.Project.downLoad();" style="font-size:20px;text-decoration:underline;color:#CFCFCF;">下载</a>查看');
 		})
 	},
@@ -203,7 +203,7 @@ App.Project = {
 				}
 			}
 
-		}); 
+		});
 
 	},
 
@@ -456,11 +456,11 @@ App.Project = {
 	},
 
 	init() {
-		
+
 		if (this.isIEModel()) {
 			return;
 		}
-		 
+
 		//渲染模型
 		App.Project.renderModel();
 
@@ -469,3 +469,88 @@ App.Project = {
 
 	}
 }
+
+
+;
+(function() {
+
+	//重写批注方法
+	bimView.sidebar.comment = function() {
+		//隐藏工具条
+		$(".bim .modelBar").hide();
+		//开始批注
+		App.Project.Settings.Viewer.comment();
+
+		//禁止 二次 点击
+		if ($("#topSaveTip").length > 0) {
+			return;
+		}
+
+		var topSaveHtml = _.templateUrl('/libsH5/tpls/comment/bimview.top.save.tip.html', true);
+
+		$(".bim .commentBar").append(topSaveHtml);
+
+		//事件初始化
+		SingleComment.initEvent();
+
+
+	}
+
+	var SingleComment = {
+
+		initEvent: function() {
+
+			var $topSaveTip = $("#topSaveTip"),
+				that = this;
+
+			//取消
+			$topSaveTip.on("click", ".btnCanel", function() {
+				App.Project.Settings.Viewer.commentEnd();
+				//显示
+				$(".bim .modelBar").show();
+
+			});
+		}
+
+	}
+
+
+	// extend
+
+	var templateCache = [];
+
+	//获取模板根据URL
+	_.templateUrl = function(url, notCompile) {
+
+		if (url.substr(0, 1) == ".") {
+			url = "/static/dist/tpls" + url.substr(1);
+		} else if (url.substr(0, 1) == "/") {
+			url = "/static/dist/tpls" + url;
+		}
+
+		if (templateCache[url]) {
+			return templateCache[url];
+		}
+
+		var result;
+		$.ajax({
+			url: url,
+			type: 'GET',
+			async: false
+		}).done(function(tpl) {
+			if (notCompile) {
+				result = tpl;
+
+			} else {
+				result = _.template(tpl);
+			}
+
+		});
+
+		templateCache[url] = result;
+
+		return result;
+	}
+
+
+})()
