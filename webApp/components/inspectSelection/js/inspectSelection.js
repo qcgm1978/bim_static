@@ -132,7 +132,7 @@
 
 	//模态框模型选择器对象
 	var InspectModelSelection = function(options) {
-
+		var _this=this;
 		//强制new
 		if (!(this instanceof InspectModelSelection)) {
 			return new InspectModelSelection(options);
@@ -141,12 +141,32 @@
 		var defaults = {
 			btnText: '确&nbsp;&nbsp;定'
 		}
-
 		//合并参数
 		this.Settings = $.extend(defaults, options);
-		Project.Settings = this.Settings;
-		this.Project=Project;
-		this.init();
+
+		if(this.Settings.etag){
+			Project.Settings = _this.Settings;
+			_this.Project=Project;
+			_this.init();
+		}else{
+			$.ajax({
+		      url: ourl+"/platform/api/project/"+this.Settings.projectCode+"/meta?token=123"
+		    }).done(function(data){
+		    	if(data.code==0){
+		    		$.ajax({
+				      url: ourl+"/view/"+data.data.projectId+"/"+data.data.versionId+"/init"
+				    }).done(function(data){
+				    	if(data.code==0){
+				    		_this.Settings=$.extend({},_this.Settings,data.data);
+				    		Project.Settings = _this.Settings;
+							_this.Project=Project;
+							_this.init();
+				    	}
+				    	
+				    })
+		    	}
+		    })
+		}
 	}
 	InspectModelSelection.prototype = {
 		init: function() {
@@ -342,38 +362,6 @@
 		currentPageListData: null,
 		currentInspectId:null,
 		templateCache: [],
-		//获取模板根据URL
-		templateUrl: function(url, notCompile) {
-
-			if (url.substr(0, 1) == ".") {
-				url = ourl + "/static/dist/tpls" + url.substr(1);
-			} else if (url.substr(0, 1) == "/") {
-				url = ourl + "/static/dist/tpls" + url;
-			}
-
-			if (Project.templateCache[url]) {
-				return Project.templateCache[url];
-			}
-
-			var result;
-			$.ajax({
-				url: url,
-				type: 'GET',
-				async: false
-			}).done(function(tpl) {
-				if (notCompile) {
-					result = tpl;
-
-				} else {
-					result = _.template(tpl);
-				}
-
-			});
-
-			Project.templateCache[url] = result;
-
-			return result;
-		},
 		//分页信息
 		pageInfo:function(data) {
 			var $el = $('.modelSelectDialog');
@@ -396,42 +384,14 @@
 		},
 		showInModel: function($target, type) {
 			var _this = this,
-				ids = $target.data('userId'),
-				box = $target.data('box'),
 				location = $target.data('location');
-
-			if (ids && box) {
+			if(location.indexOf('boundingBox')!=-1){
+				var _temp = JSON.parse(location);
+				var box = _this.formatBBox(_temp.bBox || _temp.boundingBox);
+				var ids = [_temp.userId];
 				_this.zoomModel(ids, box);
 				_this.showMarks(location);
-				return;
 			}
-			var data = {
-				URLtype: "fetchQualityModelById",
-				data: {
-					type: type,
-					projectId: Project.Settings.projectId,
-					versionId: Project.Settings.projectVersionId,
-					acceptanceId: $target.data("id")
-				}
-			};
-			//获取构件ID type 0：开业验收 1：过程验收 2：隐患
-			App.Comm.ajax(data, function(data) {
-
-				if (data.code == 0) {
-
-					if (data.data) {
-						var location = data.data.location,
-							_temp = JSON.parse(location);
-						box = _this.formatBBox(_temp.bBox || _temp.boundingBox);
-						ids = [_temp.userId];
-						$target.data("userId", ids);
-						$target.data("box", box);
-						$target.data("location", location);
-						_this.zoomModel(ids, box);
-						_this.showMarks(location);
-					}
-				}
-			});
 		},
 
 		showMarks: function(marks) {
