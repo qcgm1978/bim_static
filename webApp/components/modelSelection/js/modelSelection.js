@@ -95,6 +95,9 @@
     currentId: "",
     sceneId: "",
     components: {},
+    location:{},
+    locationName:{},
+    axis:{},
     //转换bounding box数据
     formatBBox: function(data) {
       if (!data) {
@@ -406,6 +409,12 @@
       //  window.BIV=viewer;
       //模型click事件、选择构件、编辑标记
       viewer.on("click", function(model) {
+        Project.location[model.intersect.userId]=JSON.stringify({
+          boundingBox:model.intersect.object.boundingBox,
+          position:model.intersect.object.position
+        });
+        Project.locationName[model.intersect.userId]='轴'+model.intersect.axisGridInfo.abcName+'-'+model.intersect.axisGridInfo.numeralName;
+        Project.axis[model.intersect.userId]=JSON.stringify(model.intersect.axisGridInfo);
         Project.components[model.intersect.userId] = model.intersect.object.boundingBox;
         if (Project.Settings.type == 'single') {
           // viewer.zoomToSelection();
@@ -469,6 +478,8 @@
         if (hasChild) {
           var children = self.renderTree(j);
           html.append(children);
+        }else{
+          html.find('.del').data('userId',i);
         }
         rootHtml.append(html);
       });

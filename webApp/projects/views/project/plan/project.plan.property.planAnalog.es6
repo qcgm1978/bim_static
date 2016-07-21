@@ -29,10 +29,14 @@
  		this.$(".tbPlan tbody").html(this.template(data));
 
  		var OrderArr = _.sortBy(data.data, "planStartTime"),
- 			PlayArr = []; 
+	      PlayArr = [],
+	      ifOuter = [];
 
- 		$.each(OrderArr, function(i, item) {
+
+	  $.each(OrderArr, function(i, item) {
  			PlayArr.push(item.code);
+		  //item.type=='outer' ?  ifOuter.push(1) : ifOuter.push(0);
+
  		});
 
  		if (PlayArr.length>0) {
@@ -41,7 +45,9 @@
 	  window.ll=PlayArr;
 	  console.log(PlayArr);
  		this.SourcePlay = PlayArr;
- 		this.analogCount = this.SourcePlay.length; 
+ 		this.analogCount = this.SourcePlay.length;
+	  this.ifOuter = ifOuter;
+	  this.toTranslucent = [];
  	},
 
 
@@ -107,13 +113,24 @@
 
  			if (this.PlayArr.length) {
 
- 				var code = this.PlayArr.splice(0, 1),
+ 				var index = this.analogCount - this.PlayArr.length,
+				  code = this.PlayArr.splice(0, 1),
  					$tr = this.$(".planContent tbody tr[data-code='" + code[0] + "']");
 
  				App.Project.Settings.Viewer.filter({
  					type: "plan",
  					ids: this.PlayArr
- 				}); 				
+ 				});
+
+			  if(this.ifOuter[index]){
+				  this.toTranslucent.push(code[0])
+			  }else{
+
+				  App.Project.Settings.Viewer.setOverrider({
+					  type: "plan",
+					  ids: this.toTranslucent
+				  });
+			  }
 
  				var processAnalog = (this.analogCount - this.PlayArr.length) / this.analogCount,
  					sourceWidth = this.$(".progressAnalog .bg").width(),
