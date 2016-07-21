@@ -10256,6 +10256,10 @@ CLOUD.PickHelper.prototype = {
                 
                 if (scope.filter.addSelectedId(userId, intersect.object.userData, true)) {
 
+                    if (cameraEditor.viewer.defaultMiniMap) {
+                        intersect.axisGridInfo = cameraEditor.viewer.defaultMiniMap.getAxisGridInfoByPoint(intersect.point);
+                    }
+
                     scope.onObjectSelected(intersect);
 
                     if (event.altKey) {
@@ -18069,54 +18073,6 @@ CloudViewer = function () {
     //    return isInHouse;
     //}
 
-    //function handleMiniMapEvent(type, event) {
-    //
-    //    var isOverCanvas = false;
-    //
-    //    //for (var name in scope.miniMaps) {
-    //    //    var miniMap = scope.miniMaps[name];
-    //    //
-    //    //    var overCanvas = false;
-    //    //
-    //    //    switch (type) {
-    //    //        case "down":
-    //    //            overCanvas = miniMap.mouseDown(event, function () {
-    //    //                //
-    //    //            });
-    //    //            break;
-    //    //        case "move":
-    //    //            overCanvas = miniMap.mouseMove(event, function () {
-    //    //                miniMap.render();
-    //    //            });
-    //    //            break;
-    //    //        case "up":
-    //    //            overCanvas = miniMap.mouseUp(event, function (point) {
-    //    //                // 飞到指定点
-    //    //                scope.cameraEditor.flyToPointWithParallelEye(point);
-    //    //
-    //    //                // 如何处理小地图与批注的联动???
-    //    //                // 下一步考虑将批注实现成组件
-    //    //                //scope.exitCommentMode();
-    //    //            });
-    //    //            break;
-    //    //        default:
-    //    //            break;
-    //    //    }
-    //    //
-    //    //    if (overCanvas) {
-    //    //        isOverCanvas = true;
-    //    //    }
-    //    //}
-    //
-    //    return isOverCanvas;
-    //}
-
-    ////this.editorManager = new CLOUD.EditorManager(handleViewHouseEvent);
-    //var handleEvents = {
-    //    viewHouse: handleViewHouseEvent,
-    //    miniMap: handleMiniMapEvent
-    //};
-
     this.editorManager = new CLOUD.EditorManager();
 
     this.isMobile = 0;
@@ -18997,7 +18953,7 @@ CloudViewer.prototype = {
             var bBox = this.extensions.markerEditor.getMarkersBoundingBox();
 
             if (bBox) {
-                this.editorManager.zoomToBBox(bBox);
+                this.zoomToBBox(bBox);
             }
 
             this.extensions.markerEditor.updateMarkers();

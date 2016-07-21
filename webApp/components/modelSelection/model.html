@@ -33,12 +33,22 @@
     });
 
     function getData(){
+        var $n=$('#modelTree .del'),
+            c=[];
+        $n.each(function(){
+            var id=$(this).data('userId');
+            c.push({
+                id:id,
+                axis:viewer.Project.axis[id],
+                location:viewer.Project.location[id],
+                locationName:viewer.Project.locationName[id]
+            })
+        })
         var data={
-            components:viewer.viewData,
+            components:c,
             markers:viewer.Project.Settings.markers
         }
         var result=JSON.stringify(data); 
-        alert(result)
         return result;
     }
     </script>
