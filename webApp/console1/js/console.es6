@@ -402,7 +402,7 @@ App.Console = {
 
       $.each(items, function(i, item){
         if(item.projectCode){
-          str += '<option id="' + item.projectCode  + '">' + item.name + '</option>';
+          str += '<option  value="' + item.projectNo + '" id="' + item.projectCode  + '">' + item.name + '</option>';
         }
 
       });
@@ -415,10 +415,9 @@ App.Console = {
     }).done(function(data){
 
       var items = data.data, str = '';
-
       $.each(items, function(i, item){
         if(item.projectCode){
-          str += '<option id="' + item.projectCode  + '">' + item.name + '</option>';
+          str += '<option value="' + item.projectCode +  '" id="' + item.projectCode  + '">' + item.name + '</option>';
         }
 
       });
@@ -450,7 +449,7 @@ App.Console = {
 
       $.each(items, function(i, item){
         if(item.projectCode){
-          str += '<option id="' + item.projectCode  + '">' + item.name + '</option>';
+          str += '<option value="' + item.projectCode + '" id="' + item.projectCode  + '">' + item.name + '</option>';
         }
 
       });
@@ -919,7 +918,7 @@ App.Console = {
 
       $.each(items, function(i, item){
         if(item.projectCode){
-          str += '<option id="' + item.projectCode  + '">' + item.name + '</option>';
+          str += '<option  value="' + item.projectCode + '" id="' + item.projectCode  + '">' + item.name + '</option>';
         }
 
       });
@@ -951,7 +950,7 @@ App.Console = {
 
       $.each(items, function(i, item){
         if(item.projectCode){
-          str += '<option id="' + item.projectCode  + '">' + item.name + '</option>';
+          str += '<option  value="' + item.projectCode + '" id="' + item.projectCode  + '">' + item.name + '</option>';
         }
 
       });
