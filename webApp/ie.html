@@ -21,7 +21,7 @@
 	    var viewport = document.body;
 	    viewport.appendChild(WebView); 
 
-	    var url=getCookie("path") || window.location.href.substring(window.location.href.lastIndexOf("path") + 5);
+	    var url=getCookie("path") || window.location.href.substring(window.location.href.lastIndexOf("path") + 5) || window.location.host+"/login.html";
 
 	    WebView.url = url;
 	    WebView.id="webView";
