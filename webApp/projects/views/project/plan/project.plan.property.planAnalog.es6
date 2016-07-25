@@ -55,7 +55,8 @@
  		if (PlayArr.length>0) {
  			PlayArr.push(-1);
  		}
-	  window.ll=PlayArr;
+	  window.ll=toTranslucent;
+	  window.lll    =ifOuter;
 	  console.log(PlayArr);
  		this.SourcePlay = PlayArr;
  		this.analogCount = this.SourcePlay.length;
@@ -133,13 +134,17 @@
  					type: "plan",
  					ids: this.PlayArr
  				});
+        try{
+	        if(!this.ifOuter[code[0]]['isout']){
+		        App.Project.Settings.Viewer.setOverrider({
+			        type: "plan",
+			        ids: this.toTranslucent.slice(0,this.ifOuter[code[0]]['index'])
+		        });
+	        }
+        }catch(e){
+	        console.log(code[0])
+        }
 
-			  if(!this.ifOuter[code[0]]['isout']){
-				  App.Project.Settings.Viewer.setOverrider({
-					  type: "plan",
-					  ids: this.toTranslucent.slice(0,this.ifOuter[code[0]]['index'])
-				  });
-			  }
 
  				var processAnalog = (this.analogCount - this.PlayArr.length) / this.analogCount,
  					sourceWidth = this.$(".progressAnalog .bg").width(),
