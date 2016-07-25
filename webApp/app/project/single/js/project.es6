@@ -3,6 +3,9 @@ App.Project = {
 	Settings: {
 		projectId: "",
 		projectVersionId: "",
+		fileId: "",
+		fileVersionId: "",
+		suffix: "",
 		famHtml: "",
 		axisHtm: "",
 		modelId: ""
@@ -93,6 +96,9 @@ App.Project = {
 				document.title = data.data.name + "模型预览";
 
 				App.Project.Settings.Model = data;
+				App.Project.Settings.fileId = data.data.id;
+				App.Project.Settings.fileVersionId = data.data.fileVersionId;
+				App.Project.Settings.suffix = data.data.suffix;
 
 				if (data.data.modelId) {
 
@@ -134,6 +140,7 @@ App.Project = {
 			element: $("#modelBox"),
 			etag: modelId,
 			type: typeMap[type],
+			isComment: type == "rvt" && true || false,
 			callback: function(id) {
 				App.Project.renderAttr(id, 1);
 			}
@@ -486,7 +493,7 @@ App.Project = {
 			return;
 		}
 
-		var topSaveHtml = _.templateUrl('/libsH5/tpls/comment/bimview.top.save.tip.html', true);
+		var topSaveHtml = App.Project.templateUrl('/libsH5/tpls/comment/bimview.top.save.tip.html', true);
 
 		$(".bim .commentBar").append(topSaveHtml);
 
@@ -508,48 +515,207 @@ App.Project = {
 				App.Project.Settings.Viewer.commentEnd();
 				//显示
 				$(".bim .modelBar").show();
-
 			});
-		}
 
-	}
+			//保存
+			$topSaveTip.on("click", ".btnSave", function() {
+				that.saveCommentDialog();
+			});
+		},
 
+		//保存批注
+		saveCommentDialog: function() {
+			//批注信息
+			var data = App.Project.Settings.Viewer.saveComment(),
+				pars = {
+					cate: "viewPoint",
+					img: data.image
+				},
+				that = this;
 
-	// extend
+			var dialogHtml = App.Project.templateUrl('/libsH5/tpls/comment/bimview.save.dialog.html')(pars),
+				opts = {
+					title: "保存批注",
+					width: 500,
+					height: 250,
+					cssClass: "saveViewPoint",
+					okClass: "btnWhite",
+					cancelClass: "btnWhite",
+					okText: "保存",
+					closeCallback: function() {
 
-	var templateCache = [];
+						App.Project.Settings.Viewer.commentEnd();
+						//显示
+						$(".bim .modelBar").show();
 
-	//获取模板根据URL
-	_.templateUrl = function(url, notCompile) {
+					},
 
-		if (url.substr(0, 1) == ".") {
-			url = "/static/dist/tpls" + url.substr(1);
-		} else if (url.substr(0, 1) == "/") {
-			url = "/static/dist/tpls" + url;
-		}
+					cancelText: "保存并分享",
 
-		if (templateCache[url]) {
-			return templateCache[url];
-		}
+					message: dialogHtml,
 
-		var result;
-		$.ajax({
-			url: url,
-			type: 'GET',
-			async: false
-		}).done(function(tpl) {
-			if (notCompile) {
-				result = tpl;
+					okCallback: () => {
 
-			} else {
-				result = _.template(tpl);
+						that.saveComment("save", dialog, data);
+						return false;
+					},
+					cancelCallback() {
+						//保存并分享
+						that.saveComment("share", dialog, data);
+						return false;
+					}
+				},
+
+				dialog = new App.Dialog(opts),
+
+				$viewPointType = dialog.element.find(".viewPointType");
+
+			dialog.type = 1;
+			//视点类型
+			$viewPointType.myDropDown({
+				click: function($item) {
+					var type = $item.data("type");
+					if (type == 0) {
+						$viewPointType.find(".modelicon").removeClass('m-unlock').addClass('m-lock');
+					} else {
+						$viewPointType.find(".modelicon").removeClass('m-lock').addClass('m-unlock');
+					}
+
+					dialog.type = type;
+				}
+			});
+
+		},
+
+		//保存批注
+		saveComment(type, dialog, commentData, callback) {
+
+			if (dialog.isSubmit) {
+				return;
+			}
+			var $element = dialog.element,
+				pars = {
+					projectId: App.Project.Settings.projectId,
+					name: dialog.element.find(".name").val().trim(),
+					type: dialog.type,
+					fileId: App.Project.Settings.fileId,
+					fileVersionId: App.Project.Settings.fileVersionId,
+					suffix: App.Project.Settings.suffix,
+					viewPoint: commentData.camera
+				};
+
+			if (!pars.name) {
+				$.tip({
+					message: "请输入批注描述",
+					timeout: 3000,
+					type: "alarm"
+				});
+				return false;
 			}
 
-		});
 
-		templateCache[url] = result;
+			var data = {
+				url: '/sixD/{projectId}/viewPoint',
+				data: JSON.stringify(pars),
+				type: "POST",
+				contentType: "application/json"
+			}
 
-		return result;
+			if (type == "save") {
+				dialog.element.find(".ok").text("保存中");
+			} else {
+				dialog.element.find(".cancel").text("保存中");
+			}
+			//保存中
+			dialog.isSubmit = true;
+
+			//创建
+			App.ajax(data, (data) => {
+
+				if (data.code == 0) {
+
+					data = data.data;
+					//赋值id
+					commentData.id = data.id;
+					//保存 图片 canvas filter
+					$.when(this.saveImage({
+							id: data.id,
+							img: commentData.image
+						}),
+						this.saveAnnotation(commentData)).
+					done((imgData, annotationData) => {
+
+						imgData = imgData[0];
+
+						annotationData = annotationData[0];
+						//成功
+						if (imgData.code == 0 && annotationData.code == 0) {
+
+							//关闭弹出层 取消编辑状态
+							dialog.close();
+							//显示
+							App.Project.Settings.Viewer.commentEnd();
+							//显示
+							$(".bim .modelBar").show();
+
+							$("#topSaveTip .btnCanel").click();
+
+							if ($.isFunction(callback)) {
+								callback(imgData.data);
+							}
+						}
+
+					});
+
+				} else {
+					//失败
+					alert(data.message);
+					if (type == "save") {
+						dialog.element.find(".ok").text("保存");
+					} else {
+						dialog.element.find(".cancel").text("保存并分享");
+					}
+					dialog.isSubmit = false;
+				}
+
+			});
+
+		},
+
+		//保存图片
+		saveImage(data) {
+			//数据
+			var formdata = new FormData();
+			formdata.append("fileName", (+(new Date())) + ".png");
+			formdata.append("size", data.img.length);
+			formdata.append("file", data.img);
+			var url = '/sixD/' + App.Project.Settings.projectId + '/viewPoint/' + data.id + '/pic';
+			return $.ajax({
+				url: url,
+				type: "post",
+				data: formdata,
+				processData: false,
+				contentType: false
+			})
+		},
+		//保存批注数据
+		saveAnnotation(commentData) {
+
+			var pars = {
+					projectId: App.Project.Settings.projectId,
+					viewPointId: commentData.id,
+					annotations: commentData.list
+				},
+				data = {
+					url: "/sixD/{projectId}/viewPoint/{viewPointId}/annotation",
+					type: "POST",
+					contentType: 'application/json',
+					data: JSON.stringify(pars)
+				}
+
+			return App.ajax(data);
+		}
+
 	}
 
 

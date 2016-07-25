@@ -1,36 +1,50 @@
 /**
-  * @require /libsH5/js/bimView.js
-*/
-'use strict'
-;(function($){
+ * @require /libsH5/js/bimView.js
+ */
+'use strict';
+(function($) {
   bimView.model = {
-    model:function(options,obj){
+    model: function(options, obj) {
       var self = this;
       var _opt = options;
       var viewer = new self.BIM(_opt);
-      new bimView.sidebar.init(_opt,obj);
-      obj.on('loaded',function(){
+      new bimView.sidebar.init(_opt, obj);
+      obj.on('loaded', function() {
         $('.modelSidebar').addClass('show');
-        viewer.zoomToBuilding(0,1.15);
+        viewer.zoomToBuilding(0, 1.15);
       });
       return viewer;
     },
-    singleModel:function(options){
+    singleModel: function(options) {
+       
       var self = this;
       var _opt = options;
       var modelBar = $('<div class="modelBar"></div>');
-      $.each(self.singleBar,function(i,item){
-        if(item.type == 'more'){
-          tmpHtml = $('<div class="bar-item '+item.icon+'" title="'+item.title+'" data-id="'+item.fn+'" data-type="'+item.type+'" data-group="'+item.group+'"></div>');
-        }else{
-          tmpHtml = $('<i class="bar-item '+item.icon+'" title="'+item.title+'" data-id="'+item.fn+'" data-type="'+item.type+'" data-group="'+item.group+'"></i>');
+      //批注工具
+      if (options.isComment) {
+        self.singleBar.push({
+          id: 'comment',
+          icon: 'm-camera',
+          title: '快照',
+          fn: 'comment',
+          keyCode: '',
+          type: 'filter',
+          group: '1'
+        });
+      }
+
+      $.each(self.singleBar, function(i, item) {
+        if (item.type == 'more') {
+          tmpHtml = $('<div class="bar-item ' + item.icon + '" title="' + item.title + '" data-id="' + item.fn + '" data-type="' + item.type + '" data-group="' + item.group + '"></div>');
+        } else {
+          tmpHtml = $('<i class="bar-item ' + item.icon + '" title="' + item.title + '" data-id="' + item.fn + '" data-type="' + item.type + '" data-group="' + item.group + '"></i>');
         }
-        bimView.comm.bindEvent.on(item.keyCode,tmpHtml);
-        if(item.subBar&&item.subBar.length>0){
+        bimView.comm.bindEvent.on(item.keyCode, tmpHtml);
+        if (item.subBar && item.subBar.length > 0) {
           var subBar = $('<div class="subBar"></div>')
-          $.each(item.subBar,function(index,barItem){
-            var subItem = $('<i class="bar-item '+barItem.icon+'" title="'+barItem.title+'" data-id="'+barItem.fn+'" data-type="'+barItem.type+'" data-group="'+barItem.group+'"></i>');
-            barItem.keyCode&&bimView.comm.bindEvent.on(barItem.keyCode,subItem);
+          $.each(item.subBar, function(index, barItem) {
+            var subItem = $('<i class="bar-item ' + barItem.icon + '" title="' + barItem.title + '" data-id="' + barItem.fn + '" data-type="' + barItem.type + '" data-group="' + barItem.group + '"></i>');
+            barItem.keyCode && bimView.comm.bindEvent.on(barItem.keyCode, subItem);
             subBar.append(subItem);
           });
           tmpHtml.append(subBar);
@@ -42,21 +56,21 @@
       viewer.disableLoD();
       return viewer;
     },
-    familyModel:function(options){
+    familyModel: function(options) {
       var self = this;
       var _opt = options;
       bimView.comm.ajax({
-        type:'get',
-        url:bimView.API.fetchFamilyType,
-        etag:_opt.etag
-      },function(res){
+        type: 'get',
+        url: bimView.API.fetchFamilyType,
+        etag: _opt.etag
+      }, function(res) {
         var data = JSON.parse(res);
         var modelBar = $('<div class="modelBar"><div class="modelSelect"><span class="cur"></span></div></div>');
         var modelList = $('<ul class="modelList"></ul>');
-        if(_opt.callback)_opt.callback(data.id);
+        if (_opt.callback) _opt.callback(data.id);
         bimView.comm.filterData = [];
-        $.each(data.types,function(i,item){
-          var itemHtml = $('<li class="modelItem" data-id="'+item.id+'" data-type="familyType">'+item.name+'</li>');
+        $.each(data.types, function(i, item) {
+          var itemHtml = $('<li class="modelItem" data-id="' + item.id + '" data-type="familyType">' + item.name + '</li>');
           modelList.append(itemHtml);
           bimView.comm.filterData.push(item.id);
         });
@@ -68,369 +82,350 @@
       viewer.disableLoD();
       return viewer;
     },
-    comment:function(element){
+    comment: function(element) {
       var self = this;
       var modelBar = $('<div class="commentBar"></div>');
-      $.each(self.commentBar,function(i,item){
+      $.each(self.commentBar, function(i, item) {
         var tmpHtml;
-        if(i == 0){
-          tmpHtml = $('<i class="bar-item '+item.icon+' selected" title="'+item.title+'" data-id="'+item.fn+'" data-type="'+item.type+'"></i>');
-        }else{
-          tmpHtml = $('<i class="bar-item '+item.icon+'" title="'+item.title+'" data-id="'+item.fn+'" data-type="'+item.type+'"></i>');
+        if (i == 0) {
+          tmpHtml = $('<i class="bar-item ' + item.icon + ' selected" title="' + item.title + '" data-id="' + item.fn + '" data-type="' + item.type + '"></i>');
+        } else {
+          tmpHtml = $('<i class="bar-item ' + item.icon + '" title="' + item.title + '" data-id="' + item.fn + '" data-type="' + item.type + '"></i>');
         }
-        bimView.comm.bindEvent.on(item.keyCode,tmpHtml);
+        bimView.comm.bindEvent.on(item.keyCode, tmpHtml);
         modelBar.append(tmpHtml);
       });
       element.append(modelBar);
     },
-    BIM:function(options){
+    BIM: function(options) {
       var self = this;
       return self.init(options);
     },
-    dwg:function(options){
+    dwg: function(options) {
 
     },
-    singleBar:[{
-      id:'zoom',
-      icon:'m-zoom',
-      title:'缩放(Z)',
-      fn:'zoom',
-      keyCode:'',
-      type:'pattern',
-      group:'3'
-    },{
-      id:'fit',
-      icon:'m-fit',
-      title:'适应窗口(I)',
-      fn:'fit',
-      keyCode:'',
-      type:'viewer'
-    },
-    {
-      id:'rotate',
-      icon:'m-rotateMouse',
-      title:'动态观察',
-      fn:'rotate',
-      keyCode:'',
-      type:'more',
-      group:'0',
-      subBar:[{
-        id:'rotateMouse',
-        icon:'m-rotateMouse',
-        title:'绕鼠标旋转',
-        fn:'rotateMouse',
-        keyCode:'',
-        type:'rotate',
-        group:'3'
-      },{
-        id:'rotateCamera',
-        icon:'m-rotateCamera',
-        title:'绕观察者旋转',
-        fn:'rotateCamera',
-        keyCode:'',
-        type:'rotate',
-        group:'3'
-      },{
-        id:'rotateObj',
-        icon:'m-rotateObj',
-        title:'绕构件旋转',
-        fn:'rotateObj',
-        keyCode:'',
-        type:'rotate',
-        group:'3'
+    singleBar: [{
+      id: 'zoom',
+      icon: 'm-zoom',
+      title: '缩放(Z)',
+      fn: 'zoom',
+      keyCode: '',
+      type: 'pattern',
+      group: '3'
+    }, {
+      id: 'fit',
+      icon: 'm-fit',
+      title: '适应窗口(I)',
+      fn: 'fit',
+      keyCode: '',
+      type: 'viewer'
+    }, {
+      id: 'rotate',
+      icon: 'm-rotateMouse',
+      title: '动态观察',
+      fn: 'rotate',
+      keyCode: '',
+      type: 'more',
+      group: '0',
+      subBar: [{
+        id: 'rotateMouse',
+        icon: 'm-rotateMouse',
+        title: '绕鼠标旋转',
+        fn: 'rotateMouse',
+        keyCode: '',
+        type: 'rotate',
+        group: '3'
+      }, {
+        id: 'rotateCamera',
+        icon: 'm-rotateCamera',
+        title: '绕观察者旋转',
+        fn: 'rotateCamera',
+        keyCode: '',
+        type: 'rotate',
+        group: '3'
+      }, {
+        id: 'rotateObj',
+        icon: 'm-rotateObj',
+        title: '绕构件旋转',
+        fn: 'rotateObj',
+        keyCode: '',
+        type: 'rotate',
+        group: '3'
       }]
-    },
-    {
-      id:'translucent',
-      icon:'m-translucent',
-      title:'半透明',
-      fn:'translucent',
-      keyCode:'',
-      type:'status',
-      group:'0'
-    },
-    {
-      id:'hideObj',
-      icon:'m-hideObj',
-      title:'隐藏构件',
-      fn:'isolate',
-      keyCode:'',
-      type:'status',
-      group:'0'
-    },{
-      id:'comment',
-      icon:'m-camera',
-      title:'快照',
-      fn:'comment',
-      keyCode:'',
-      type:'filter',
-      group:'1'
+    }, {
+      id: 'translucent',
+      icon: 'm-translucent',
+      title: '半透明',
+      fn: 'translucent',
+      keyCode: '',
+      type: 'status',
+      group: '0'
+    }, {
+      id: 'hideObj',
+      icon: 'm-hideObj',
+      title: '隐藏构件',
+      fn: 'isolate',
+      keyCode: '',
+      type: 'status',
+      group: '0'
     }],
-    modelBar:[{
-      id:'filter',
-      icon:'m-filter',
-      title:'选择器',
-      fn:'filter',
-      keyCode:'',
-      type:'filter',
-      group:'1'
-    },
-    {
-      id:'comment',
-      icon:'m-camera',
-      title:'快照',
-      fn:'comment',
-      keyCode:'',
-      type:'filter',
-      group:'1'
-    },
-    {
-      id:'selected',
-      icon:'m-selected',
-      title:'已选构件',
-      fn:'selected',
-      keyCode:'',
-      type:'filter',
-      group:'1'
-    },
-    {
-      id:'view',
-      icon:'m-view',
-      title:'标准视图',
-      fn:'view',
-      keyCode:'',
-      type:'more',
-      group:'0',
-      subBar:[{
-        id:'home',
-        icon:'m-home',
-        title:'Home',
-        fn:'home',
-        keyCode:'',
-        type:'view',
-        group:'4'
-      },{
-        id:'southEast',
-        icon:'i-southEast',
-        title:'西南方向',
-        fn:'southWest',
-        type:'view',
-        group:'4'
-      },{
-        id:'top',
-        icon:'i-top',
-        title:'上方',
-        fn:'top',
-        type:'view',
-        group:'4'
-      },{
-        id:'bottom',
-        icon:'i-bottom',
-        title:'下方',
-        fn:'bottom',
-        type:'view',
-        group:'4'
-      },{
-        id:'left',
-        icon:'i-left',
-        title:'左方',
-        fn:'left',
-        type:'view',
-        group:'4'
-      },{
-        id:'right',
-        icon:'i-right',
-        title:'右方',
-        fn:'right',
-        type:'view',
-        group:'4'
-      },{
-        id:'front',
-        icon:'i-front',
-        title:'前方',
-        fn:'front',
-        type:'view',
-        group:'4'
-      },{
-        id:'behind',
-        icon:'i-behind',
-        title:'后方',
-        fn:'behind',
-        type:'view',
-        group:'4'
+    modelBar: [{
+      id: 'filter',
+      icon: 'm-filter',
+      title: '选择器',
+      fn: 'filter',
+      keyCode: '',
+      type: 'filter',
+      group: '1'
+    }, {
+      id: 'comment',
+      icon: 'm-camera',
+      title: '快照',
+      fn: 'comment',
+      keyCode: '',
+      type: 'filter',
+      group: '1'
+    }, {
+      id: 'selected',
+      icon: 'm-selected',
+      title: '已选构件',
+      fn: 'selected',
+      keyCode: '',
+      type: 'filter',
+      group: '1'
+    }, {
+      id: 'view',
+      icon: 'm-view',
+      title: '标准视图',
+      fn: 'view',
+      keyCode: '',
+      type: 'more',
+      group: '0',
+      subBar: [{
+        id: 'home',
+        icon: 'm-home',
+        title: 'Home',
+        fn: 'home',
+        keyCode: '',
+        type: 'view',
+        group: '4'
+      }, {
+        id: 'southEast',
+        icon: 'i-southEast',
+        title: '西南方向',
+        fn: 'southWest',
+        type: 'view',
+        group: '4'
+      }, {
+        id: 'top',
+        icon: 'i-top',
+        title: '上方',
+        fn: 'top',
+        type: 'view',
+        group: '4'
+      }, {
+        id: 'bottom',
+        icon: 'i-bottom',
+        title: '下方',
+        fn: 'bottom',
+        type: 'view',
+        group: '4'
+      }, {
+        id: 'left',
+        icon: 'i-left',
+        title: '左方',
+        fn: 'left',
+        type: 'view',
+        group: '4'
+      }, {
+        id: 'right',
+        icon: 'i-right',
+        title: '右方',
+        fn: 'right',
+        type: 'view',
+        group: '4'
+      }, {
+        id: 'front',
+        icon: 'i-front',
+        title: '前方',
+        fn: 'front',
+        type: 'view',
+        group: '4'
+      }, {
+        id: 'behind',
+        icon: 'i-behind',
+        title: '后方',
+        fn: 'behind',
+        type: 'view',
+        group: '4'
       }]
-    },{
-      id:'zoom',
-      icon:'m-zoom',
-      title:'缩放(Z)',
-      fn:'zoom',
-      keyCode:'',
-      type:'pattern',
-      group:'3'
-    },{
-      id:'fit',
-      icon:'m-fit',
-      title:'适应窗口(I)',
-      fn:'fit',
-      keyCode:'',
-      type:'viewer',
-      group:'2'
-    },
-    {
-      id:'rotate',
-      icon:'m-rotateMouse',
-      title:'动态观察',
-      fn:'rotate',
-      keyCode:'',
-      type:'more',
-      group:'0',
-      subBar:[{
-        id:'rotateMouse',
-        icon:'m-rotateMouse',
-        title:'绕鼠标旋转',
-        fn:'rotateMouse',
-        keyCode:'',
-        type:'rotate',
-        group:'3'
-      },{
-        id:'rotateCamera',
-        icon:'m-rotateCamera',
-        title:'绕观察者旋转',
-        fn:'rotateCamera',
-        keyCode:'',
-        type:'rotate',
-        group:'3'
-      },{
-        id:'rotateObj',
-        icon:'m-rotateObj',
-        title:'绕构件旋转',
-        fn:'rotateObj',
-        keyCode:'',
-        type:'rotate',
-        group:'3'
+    }, {
+      id: 'zoom',
+      icon: 'm-zoom',
+      title: '缩放(Z)',
+      fn: 'zoom',
+      keyCode: '',
+      type: 'pattern',
+      group: '3'
+    }, {
+      id: 'fit',
+      icon: 'm-fit',
+      title: '适应窗口(I)',
+      fn: 'fit',
+      keyCode: '',
+      type: 'viewer',
+      group: '2'
+    }, {
+      id: 'rotate',
+      icon: 'm-rotateMouse',
+      title: '动态观察',
+      fn: 'rotate',
+      keyCode: '',
+      type: 'more',
+      group: '0',
+      subBar: [{
+        id: 'rotateMouse',
+        icon: 'm-rotateMouse',
+        title: '绕鼠标旋转',
+        fn: 'rotateMouse',
+        keyCode: '',
+        type: 'rotate',
+        group: '3'
+      }, {
+        id: 'rotateCamera',
+        icon: 'm-rotateCamera',
+        title: '绕观察者旋转',
+        fn: 'rotateCamera',
+        keyCode: '',
+        type: 'rotate',
+        group: '3'
+      }, {
+        id: 'rotateObj',
+        icon: 'm-rotateObj',
+        title: '绕构件旋转',
+        fn: 'rotateObj',
+        keyCode: '',
+        type: 'rotate',
+        group: '3'
       }]
-    },
-    {
-      id:'more',
-      icon:'m-more',
-      title:'更多',
-      fn:'more',
-      keyCode:'',
-      type:'more',
-      group:'0',
-      subBar:[{
-        id:'color',
-        icon:'m-color',
-        title:'颜色',
-        fn:'color-1',
-        keyCode:'',
-        type:'color',
-        group:'0'
-      },
-      {
-        id:'translucent',
-        icon:'m-translucent',
-        title:'半透明',
-        fn:'translucent',
-        keyCode:'',
-        type:'status',
-        group:'0'
-      },
-      {
-        id:'hideObj',
-        icon:'m-hideObj',
-        title:'隐藏构件',
-        fn:'isolate',
-        keyCode:'',
-        type:'status',
-        group:'0'
+    }, {
+      id: 'more',
+      icon: 'm-more',
+      title: '更多',
+      fn: 'more',
+      keyCode: '',
+      type: 'more',
+      group: '0',
+      subBar: [{
+        id: 'color',
+        icon: 'm-color',
+        title: '颜色',
+        fn: 'color-1',
+        keyCode: '',
+        type: 'color',
+        group: '0'
+      }, {
+        id: 'translucent',
+        icon: 'm-translucent',
+        title: '半透明',
+        fn: 'translucent',
+        keyCode: '',
+        type: 'status',
+        group: '0'
+      }, {
+        id: 'hideObj',
+        icon: 'm-hideObj',
+        title: '隐藏构件',
+        fn: 'isolate',
+        keyCode: '',
+        type: 'status',
+        group: '0'
       }]
-    },
-    {
-      id:'hideMap',
-      icon:'m-miniScreen',
-      title:'',
-      fn:'fly',
-      keyCode:'',
-      type:'change'
+    }, {
+      id: 'hideMap',
+      icon: 'm-miniScreen',
+      title: '',
+      fn: 'fly',
+      keyCode: '',
+      type: 'change'
     }],
-    commentBar:[{
-      id:'arrow',
-      icon:'m-arrow',
-      title:'箭头',
-      fn:'0',
-      type:'comment'
-    },{
-      id:'rect',
-      icon:'m-rect',
-      title:'矩形',
-      fn:'1',
-      type:'comment'
-    },{
-      id:'ellipse',
-      icon:'m-ellipse',
-      title:'圆形',
-      fn:'2',
-      type:'comment'
-    },{
-      id:'mark',
-      icon:'m-mark',
-      title:'标记',
-      fn:'3',
-      type:'comment'
-    },{
-      id:'cloud',
-      icon:'m-cloud',
-      title:'云线',
-      fn:'4',
-      type:'comment'
-    },{
-      id:'text',
-      icon:'m-text',
-      title:'文本',
-      fn:'5',
-      type:'comment'
+    commentBar: [{
+      id: 'arrow',
+      icon: 'm-arrow',
+      title: '箭头',
+      fn: '0',
+      type: 'comment'
+    }, {
+      id: 'rect',
+      icon: 'm-rect',
+      title: '矩形',
+      fn: '1',
+      type: 'comment'
+    }, {
+      id: 'ellipse',
+      icon: 'm-ellipse',
+      title: '圆形',
+      fn: '2',
+      type: 'comment'
+    }, {
+      id: 'mark',
+      icon: 'm-mark',
+      title: '标记',
+      fn: '3',
+      type: 'comment'
+    }, {
+      id: 'cloud',
+      icon: 'm-cloud',
+      title: '云线',
+      fn: '4',
+      type: 'comment'
+    }, {
+      id: 'text',
+      icon: 'm-text',
+      title: '文本',
+      fn: '5',
+      type: 'comment'
     }],
-    colorBar:[{
-      id:'color-1',
-      icon:'color-1',
-      fn:'color-1',
-      type:'color'
-    },{
-      id:'color-2',
-      icon:'color-2',
-      fn:'color-2',
-      type:'color'
-    },{
-      id:'color-3',
-      icon:'color-3',
-      fn:'color-3',
-      type:'color'
-    },{
-      id:'color-4',
-      icon:'color-4',
-      fn:'color-4',
-      type:'color'
-    },{
-      id:'color-5',
-      icon:'color-5',
-      fn:'color-5',
-      type:'color'
-    },{
-      id:'color-6',
-      icon:'color-6',
-      fn:'color-6',
-      type:'color'
+    colorBar: [{
+      id: 'color-1',
+      icon: 'color-1',
+      fn: 'color-1',
+      type: 'color'
+    }, {
+      id: 'color-2',
+      icon: 'color-2',
+      fn: 'color-2',
+      type: 'color'
+    }, {
+      id: 'color-3',
+      icon: 'color-3',
+      fn: 'color-3',
+      type: 'color'
+    }, {
+      id: 'color-4',
+      icon: 'color-4',
+      fn: 'color-4',
+      type: 'color'
+    }, {
+      id: 'color-5',
+      icon: 'color-5',
+      fn: 'color-5',
+      type: 'color'
+    }, {
+      id: 'color-6',
+      icon: 'color-6',
+      fn: 'color-6',
+      type: 'color'
     }]
   }
   bimView.model.BIM.prototype = {
-    init:function(options){
+    init: function(options) {
       var _opt = options;
       var viewer = new CloudViewer();
       var viewBox = $('<div class="view"></div>');
       _opt._dom.bimBox.append(viewBox);
       viewer.init(viewBox[0]);
-      viewer.load(_opt.etag,bimView.API.baseUrl + bimView.API.fetchModel);
+      viewer.load(_opt.etag, bimView.API.baseUrl + bimView.API.fetchModel);
       viewer.setRectPickMode();
       return viewer;
     }
