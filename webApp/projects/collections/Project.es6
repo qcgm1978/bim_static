@@ -33,7 +33,27 @@ App.Project = {
 	mapData: {
 		organizationTypeId: ['', '质监', '第三方', '项目公司', '监理单位'],
 		status: ['', '待整改', '已整改', '已关闭'],
-		statusColor: ['', '#FF2500', '#FFAD25', '#00A648']
+		statusColor: ['', '#FF2500', '#FFAD25', '#00A648'],
+		processCategory:['','工程桩','基坑支护','地下防水','梁柱节点','钢结构悬挑构件','幕墙','外保温',
+			'采光顶','步行街吊顶风口','卫生间防水','屋面防水','屋面虹吸雨排','消防泵房','给水泵房',
+			'湿式报警阀室','空调机房','冷冻机房','变配电室','发电机房','慧云机房','电梯机房','电梯底坑',
+			'吊顶','地面','中庭栏杆','竖井'],
+		openCategory:['','幕墙',
+			'采光顶','步行街吊顶风口','卫生间防水','屋面防水','屋面虹吸雨排','消防泵房','给水泵房',
+			'湿式报警阀室','空调机房','冷冻机房','变配电室','发电机房','慧云机房','电梯机房','电梯底坑',
+			'吊顶','地面','中庭栏杆','竖井'],
+		concernsCategory:['','过程检查','过程验收','过程检查'],
+		concernsStatus:['','待整改','已整改','已关闭'],
+		concernsReporter:['','质监中心','第三方','项目公司','监理单位'],
+		concernsLevel:['','特大','重大','较大','一般'],
+		concernsType:['','防水工程','施工质量','安全文明','材料设备'],
+		designSpecial:['','建筑','结构','设备','电气','景观','内装及导视','夜景照明'],
+		designCategory:['','安全类','品质类','功能类'],
+		designStatus:['','待整改','已整改','已关闭'],
+		designUnit:['','设计总包'],
+		deviceSpecial:['','通风空调'],
+		deviceCategory:['','冷冻水','冷却水'],
+		deviceStatus:['','合格','有退场']
 	},
 
 	currentQATab:'other',
@@ -52,6 +72,7 @@ App.Project = {
 	//type:open process dis other
 	isShowMarkers:function(type,flag){
 		var viewer= App.Project.Settings.Viewer;
+		if(!viewer) return;
 		if(type!='other' && flag){
 			var data=this.currentLoadData[type],
 				result=[];

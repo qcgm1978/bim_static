@@ -81,7 +81,6 @@ App.Project.QualityAttr = {
 
 		parse: function (response) {
             if (response.message == "success") {
-            	debugger
             	App.Project.cacheMarkers('process',response.data.items);
             }
             return response;
