@@ -67,10 +67,6 @@ App.Comm = {
 		if(_temp.indexOf(_status)!=-1){
 			return false;
 		}
-		//如果状态不等于4,7,9，并且是族库、标准模型则有所有权限
-		if(s=='family'||s=='model'){
-			return true;
-		}
 
 		//非标、用户权限、不是变更版本才有（创建、重命名、删除）
 		if(type=='create'||type=="rename"||type=="delete"){
@@ -83,7 +79,13 @@ App.Comm = {
 			if(_auth.edit){
 				return true;
 			}
+			return false;
 		}else if(type=="down"){
+			return true;
+		}
+
+		//如果状态不等于4,7,9，并且是族库、标准模型则有所有权限
+		if(s=='family'||s=='model'){
 			return true;
 		}
 		return false;
