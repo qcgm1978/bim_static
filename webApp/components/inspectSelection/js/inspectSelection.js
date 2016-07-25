@@ -188,8 +188,13 @@
 			if (self.Settings.type == "process") {
 				win.App.API.URL.fetchQualityOpeningAcceptance = "sixD/{projectId}/{projectVersionId}/acceptance?type=1";
 			}
-
-			//加载完js后再渲染
+			if (self.isIE()) {
+				$.getScript(commjs, function() {
+					self.dialog();
+					self.controll();
+				})
+				return;
+			}
 			$.getScript(srciptUrl, function() {
 				bimView.API.baseUrl = ourl + '/';
 				$.getScript(commjs, function() {
@@ -200,9 +205,7 @@
 			});
 		},
 		controll: function() {
-			if (this.isIE()) {
-				return;
-			}
+
 			var self = this;
 			self.$dialog.on('click', '.toolsBtn', function() {
 				self.getSelected();
