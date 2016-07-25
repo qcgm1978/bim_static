@@ -438,6 +438,10 @@ App.Index = {
 
 			});
 
+			if (lists.length<=0) {
+				$("#treeContainerBody .loading").text("无变更");
+				return;
+			}
 			var firstData = lists[0].data[0];
 			that.Settings.baseModelId = firstData.baseModelId;
 			that.Settings.differModelId = firstData.differModelId;

@@ -12,16 +12,16 @@
 			</object> -->
 	<script src="http://lib.sinaapp.com/js/jquery/1.9.1/jquery-1.9.1.min.js"></script>
 
-    <script type="text/javascript">
+    <script type="text/javascript"> 
     	 
 	    var myWebView = document.createElement("object");
 
 	    myWebView.classid = "CLSID:15A5F85D-A81B-45D1-A03A-6DBC69C891D1";
 
-	    var viewport = document.body;
-	    viewport.appendChild(myWebView); 
-
-	    var url=getCookie("path") || window.location.href.substring(window.location.href.lastIndexOf("path") + 5) || window.location.host+"/login.html";
+	    var viewport = document.body,cookUrl=getCookie("path");
+	    viewport.appendChild(myWebView);  
+	     
+	    var url= cookUrl && cookUrl.lastIndexOf("/file/data")<=-1 && cookUrl || window.location.href.substring(window.location.href.lastIndexOf("path") + 5) || window.location.host+"/login.html";
 
 	    myWebView.url = url;
 	    myWebView.id="webView";
@@ -52,6 +52,11 @@
 	    	 //myWebView
 	    });
 
+	    //文件下载
+	      myWebView.registerEvent('download', function(url){  
+	      		window.location.href=url;
+	      }); 	
+
 
 	    myWebView.height = document.body.parentElement.clientHeight + "px";
 
@@ -74,7 +79,7 @@
 	 
 
 	    //刷新
-	    function unLoadEvent(){
+	    function unLoadEvent(){ 
 	    	setCookie("path",myWebView.url); 
 	    }
 
