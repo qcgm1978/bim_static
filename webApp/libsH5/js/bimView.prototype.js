@@ -56,7 +56,7 @@
       }).fail(function(){
           console.log("get error " + url);
       });
-
+       
 
       switch (_opt.type) { // 判断类型
         case "model":

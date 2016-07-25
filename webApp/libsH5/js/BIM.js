@@ -157,6 +157,14 @@
       keyCode:'',
       type:'status',
       group:'0'
+    },{
+      id:'comment',
+      icon:'m-camera',
+      title:'快照',
+      fn:'comment',
+      keyCode:'',
+      type:'filter',
+      group:'1'
     }],
     modelBar:[{
       id:'filter',
