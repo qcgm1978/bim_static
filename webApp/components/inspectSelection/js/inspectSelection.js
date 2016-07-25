@@ -132,6 +132,7 @@
 
 	//模态框模型选择器对象
 	var InspectModelSelection = function(options) {
+
 		var _this=this;
 		//强制new
 		if (!(this instanceof InspectModelSelection)) {
@@ -154,13 +155,16 @@
 		    }).done(function(data){
 		    	if(data.code==0){
 		    		$.ajax({
-				      url: ourl+"/view/"+data.data.projectId+"/"+data.data.versionId+"/init"
+				      url: ourl+"/view/"+data.data.projectId+"/"+data.data.versionId+"/init?token=123"
 				    }).done(function(data){
 				    	if(data.code==0){
 				    		_this.Settings=$.extend({},_this.Settings,data.data);
 				    		Project.Settings = _this.Settings;
 							_this.Project=Project;
 							_this.init();
+				    	}else if(data.code==10004){
+				    		//alert();
+				    	//	document.location.href=ourl+"/login.html";
 				    	}
 				    	
 				    })

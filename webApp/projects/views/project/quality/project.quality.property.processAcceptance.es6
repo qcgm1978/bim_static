@@ -32,8 +32,8 @@ App.Project.QualityProcessAcceptance = Backbone.View.extend({
 
 		this.ProcessAcceptanceOptions = options.ProcessAcceptance;
 
-		var tpl = _.templateUrl("/projects/tpls/project/quality/project.quality.property.processAcceptance.html", true);
-		this.$el.html(tpl);
+		var tpl = _.templateUrl("/projects/tpls/project/quality/project.quality.property.processAcceptance.html");
+		this.$el.html(tpl());
 		this.bindEvent();
 		return this;
 

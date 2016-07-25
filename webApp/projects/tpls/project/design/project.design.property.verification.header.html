@@ -13,13 +13,9 @@
              <span>专业：</span> <span class="text">全部</span> <i class="myDropArrorw"></i> </span>
                 <ul class="myDropList">
                     <li class="myItem" data-val=''>全部</li>
-                    <li class="myItem" data-val='1'>建筑</li>
-                    <li class="myItem" data-val='2'>结构</li>
-                    <li class="myItem" data-val='3'>设备</li>
-                    <li class="myItem" data-val='4'>电气</li>
-                    <li class="myItem" data-val='6'>内装</li>
-                    <li class="myItem" data-val='def'>炼钢</li>
-                    <li class="myItem" data-val='abc'>土建</li>
+                    <% _.each(App.Project.mapData.designSpecial,function(item,index){ if(index!=0){%>
+                    <li class="myItem" data-val='<%=index%>'><%=item%></li>
+                    <% } }) %>
                 </ul>
             </div>
             <div class="myDropDown categoryOption optionComm">
@@ -27,12 +23,9 @@
              <span>类别：</span> <span class="text">全部</span> <i class="myDropArrorw"></i> </span>
                 <ul class="myDropList">
                     <li class="myItem" data-val=''>全部</li>
-                    <li class="myItem" data-val='1'>实测实量</li>
-                    <li class="myItem" data-val='2'>防水工程</li>
-                    <li class="myItem" data-val='3'>施工质量</li>
-                    <li class="myItem" data-val='4'>安全文明</li>
-                    <li class="myItem" data-val='5'>总包内业资料</li>
-                    <li class="myItem" data-val='6'>材料设备</li>
+                    <% _.each(App.Project.mapData.designCategory,function(item,index){ if(index!=0){%>
+                    <li class="myItem" data-val='<%=index%>'><%=item%></li>
+                    <% } }) %>
                 </ul>
             </div>
         </div>
@@ -42,9 +35,9 @@
              <span>状态：</span> <span class="text">全部</span> <i class="myDropArrorw"></i> </span>
                 <ul class="myDropList">
                     <li data-status="" class="myItem">全部</li>
-                    <li data-status="1" class="myItem">待整改</li>
-                    <li data-status="2" class="myItem">已整改</li>
-                    <li data-status="3" class="myItem">已关闭</li>
+                    <% _.each(App.Project.mapData.designStatus,function(item,index){ if(index!=0){%>
+                    <li class="myItem" data-val='<%=index%>'><%=item%></li>
+                    <% } }) %>
                 </ul>
             </div>
             <div class="myDropDown materialEquipment inspectionUnitOption optionComm">
@@ -52,10 +45,9 @@
              <span>检查单位：</span> <span class="text">全部</span> <i class="myDropArrorw"></i> </span>
                 <ul class="myDropList">
                     <li class="myItem" data-val=''>全部</li>
-                    <li class="myItem" data-val='1'>质监</li>
-                    <li class="myItem" data-val='2'>第三方</li>
-                    <li class="myItem" data-val='3'>项目公司</li>
-                    <li class="myItem" data-val='4'>监理单位</li>
+                    <% _.each(App.Project.mapData.designUnit,function(item,index){ if(index!=0){%>
+                    <li class="myItem" data-val='<%=index%>'><%=item%></li>
+                    <% } }) %>
                 </ul>
             </div>
         </div>

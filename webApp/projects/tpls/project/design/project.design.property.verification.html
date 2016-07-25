@@ -19,11 +19,11 @@
         </div>
     </td>
     <td class="status"> <span class="status" style="color:<%=App.Project.mapData.statusColor[item.status]%>">
-        <%=App.Project.mapData.status[item.status]%>
+        <%=App.Project.mapData.designStatus[item.status]%>
      </span> </td>
-    <td class="category"> <span class="security"><%=App.Projects.concernsData.classic[item.ratingCategoryId]%></span> </td>
+    <td class="category"> <span class="security"><%=App.Project.mapData.designCategory[item.ratingCategoryId]%></span> </td>
     <td class="specialty"> <span><%= item.specialtyName %></span> </td>
-    <td class="professional"><span><%= App.Projects.concernsData.report[item.organizationTypeId]%></span></td> 
+    <td class="professional"><span><%= App.Project.mapData.designUnit[item.organizationTypeId]%></span></td>
 </tr>
 <% }) %>
 

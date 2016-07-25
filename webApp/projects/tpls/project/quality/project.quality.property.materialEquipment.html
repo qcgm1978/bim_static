@@ -10,12 +10,9 @@
              <span>专业：</span> <span class="text">全部</span> <i class="myDropArrorw"></i> </span>
                 <ul class="myDropList">
                     <li class="myItem" data-val=''>全部</li>
-                    <li class="myItem" data-val='1001'>通风空调</li>
-                    <li class="myItem" data-val='1002'>水暖</li>
-                    <li class="myItem" data-val='1003'>电气</li>
-                    <li class="myItem" data-val='abc'>土建</li>
-                    <li class="myItem" data-val='def'>炼钢</li>
-                    <li class="myItem" data-val='ghi'>计价</li>
+                    <% _.each(App.Project.mapData.deviceSpecial,function(item,index){ if(index!=0){%>
+                    <li class="myItem" data-val='<%=index%>'><%=item%></li>
+                    <% } }) %>
                 </ul>
             </div>
             <div class="myDropDown categoryOption optionComm">
@@ -23,15 +20,9 @@
              <span>类别：</span> <span class="text">全部</span> <i class="myDropArrorw"></i> </span>
                 <ul class="myDropList">
                     <li class="myItem" data-val=''>全部</li>
-                    <li class="myItem" data-val='100'>钢筋</li>
-                    <li class="myItem" data-val='1001'>冷冻水</li>
-                    <li class="myItem" data-val='1001'>冷却水</li>
-                    <li class="myItem" data-val='1002'>锅炉房、换热站工程</li>
-                    <li class="myItem" data-val='1003'>冷水工程</li>
-                    <li class="myItem" data-val='1004'>控制设备</li>
-                    <li class="myItem" data-val='101'>水泥</li>
-                    <li class="myItem" data-val='102'>管道</li>
-                    <li class="myItem" data-val='22'>钢筋</li>
+                    <% _.each(App.Project.mapData.deviceCategory,function(item,index){ if(index!=0){%>
+                    <li class="myItem" data-val='<%=index%>'><%=item%></li>
+                    <% } }) %>
                 </ul>
             </div>
         </div>
@@ -41,8 +32,9 @@
              <span>状态：</span> <span class="text">全部</span> <i class="myDropArrorw"></i> </span>
                 <ul class="myDropList">
                     <li data-status="" class="myItem">全部</li>
-                    <li data-status="1" class="myItem">合格</li>
-                    <li data-status="2" class="myItem">不合格</li>
+                    <% _.each(App.Project.mapData.deviceStatus,function(item,index){ if(index!=0){%>
+                    <li class="myItem" data-val='<%=index%>'><%=item%></li>
+                    <% } }) %>
                 </ul>
             </div>
             <div class="searchName">
