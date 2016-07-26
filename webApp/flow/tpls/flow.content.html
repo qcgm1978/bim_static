@@ -1,21 +1,31 @@
 <div id="flowContainer">
-	<%  _.each(data,function(item){ %>
-		<% if(item.items.length) {%>
-		<fieldset class="classify">
-			<legend><%=item.title%></legend>
-			<ul>
-				<%  _.each(item.items,function(i){ %>
+		<%  _.each(data,function(item){ %>
+			<% if(item.items.length) {%>
+			<fieldset class="classify">
+				<legend><%=item.title%></legend>
+				<ul>
+					<%  _.each(item.items,function(i){ %>
 					<li class="item"> <span class="text" title="<%=i.name%>"><%=i.name%></span>
 						<% if(i.sendUrl){ %>
-							<a href="<%=i.sendUrl%>" target="_blank" class="right">发起</a>
+						<a href="<%=i.sendUrl%>" target="_blank" class="right">发起</a>
 						<% } %>
 						<% if(i.viewUrl){ %>
-							 <a href="<%=i.viewUrl%>" target="_blank" class="right mRightCK">查看</a>
+						<a href="<%=i.viewUrl%>" target="_blank" class="right mRightCK">查看</a>
 						<% } %>
 					</li>
-				<% }) %>
-			</ul>
-		</fieldset>
-		<% } %>
-	<% }) %>
+					<% }) %>
+				</ul>
+			</fieldset>
+			<% } %>
+		<% }) %>
 </div>
+<ul class="flowTabNav">
+	<li class="flowTabItem selected"><a href="javascript:;">Ⅰ立项规划</a></li>
+	<li class="flowTabItem arrowNav"><i></i></li>
+	<li class="flowTabItem"><a href="javascript:;">Ⅱ设计报建</a></li>
+	<li class="flowTabItem arrowNav"><i></i></li>
+	<li class="flowTabItem"><a href="javascript:;">Ⅲ工程建设</a></li>
+	<li class="flowTabItem arrowNav"><i></i></li>
+	<li class="flowTabItem"><a href="javascript:;">Ⅳ移交运营</a></li>
+	<li class="flowMoreBtn"><a href="javascript:;">模块化节点</a></li>
+</ul>

@@ -97,7 +97,6 @@ var AppKeyRoute = Backbone.Router.extend({
 
 	//项目
 	project(projectCode, versionId) {
-
 		//初始化之前 验证
 		this.beforeInit(() => {
 
@@ -226,7 +225,7 @@ var AppKeyRoute = Backbone.Router.extend({
 			URLtype: "appToken",
 			data: {
 				appKey: appKey,
-				token: token
+				token: 123
 			}
 		}
 
