@@ -396,7 +396,7 @@
 
 					var data = this.model.toJSON();
 
-					this.$el.html(this.template(data));
+					this.$el.html(this.template(data)).data("hosttype",data.hostType);
 
 
 					this.bindContent();
@@ -410,7 +410,15 @@
 				//显示批注
 				showComment(event) {
 
-					CommentApi.showComment($(event.target).closest(".item"));
+					var $item=$(event.target).closest(".item");
+
+					//项目批注
+					if ($item.data("hosttype")==0) {
+						CommentApi.showComment($item);
+					}else{ 
+						return false;
+					} 
+					
 
 				},
 

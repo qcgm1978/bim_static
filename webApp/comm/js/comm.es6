@@ -11,6 +11,13 @@ App.Comm = {
 		debugger
 	},
 
+	//批注类型  0: 模型；1：rvt单文件；2：dwg图纸文件
+	hostType:{
+		0:"m-single-model",
+		1:"m-single-rvt",
+		2:"m-single-dwg"
+	},
+
 	//ie预览模型
 	isIEModel: function() { 
 
