@@ -329,3 +329,11 @@ App.AppKeyRoute = new AppKeyRoute();
 
 //开始监听
 Backbone.history.start();
+
+//轮训
+if (!("ActiveXObject" in window) && !window.ActiveXObject) { 
+	//轮训
+	setInterval(function(){
+		App.Comm.checkOnlyCloseWindow();
+	},3000);
+}

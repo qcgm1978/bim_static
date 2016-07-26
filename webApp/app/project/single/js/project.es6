@@ -598,9 +598,6 @@ App.Project = {
 					projectId: App.Project.Settings.projectId,
 					name: dialog.element.find(".name").val().trim(),
 					type: dialog.type,
-					fileId: App.Project.Settings.fileId,
-					fileVersionId: App.Project.Settings.fileVersionId,
-					suffix: App.Project.Settings.suffix,
 					viewPoint: commentData.camera
 				};
 
@@ -613,13 +610,14 @@ App.Project = {
 				return false;
 			}
 
-
-			var data = {
-				url: '/sixD/{projectId}/viewPoint',
-				data: JSON.stringify(pars),
-				type: "POST",
-				contentType: "application/json"
-			}
+			var url = '/sixD/{projectId}/viewPoint?fileId=' + App.Project.Settings.fileId + "&fileVersionId=" +
+				App.Project.Settings.fileVersionId + "&suffix=" + App.Project.Settings.suffix,
+				data = {
+					url: url,
+					data: JSON.stringify(pars),
+					type: "POST",
+					contentType: "application/json"
+				}
 
 			if (type == "save") {
 				dialog.element.find(".ok").text("保存中");
