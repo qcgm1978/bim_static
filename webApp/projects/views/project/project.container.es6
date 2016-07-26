@@ -446,6 +446,10 @@ App.Project.ProjectContainer = Backbone.View.extend({
 
 	//模型渲染
 	renderModel: function() {
+
+		//设置onlymodel
+		App.Comm.setOnlyModel();
+
 		var that = this;
 
 		this.typeContentChange();

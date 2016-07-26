@@ -79,6 +79,9 @@ App.ResourceModel.ListNav = Backbone.View.extend({
 				return;
 			}
 
+			//设置onlymodel
+			App.Comm.setOnlyModel();
+			
 			App.ResourceModel.Settings.DataModel.bind = true;
 
 			App.ResourceModel.Settings.Viewer = new bimView({
