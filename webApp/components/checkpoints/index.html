@@ -78,7 +78,13 @@
         }
       }
     });
-
+    App.Global || (App.Global = {} );
+    if (!("ActiveXObject" in window) && !window.ActiveXObject) {
+      //轮训
+      setInterval(function(){
+        App.Comm.checkOnlyCloseWindow();
+      },3000);
+    }
   })
 </script>
 </body>
