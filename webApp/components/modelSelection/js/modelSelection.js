@@ -244,7 +244,7 @@
 
         $css = '<link rel="stylesheet" href="' + styleUrl + '" />',
 
-        $css2 = '<link rel="stylesheet" href="' + ourl + '/static/dist/projects/projects_20160313.css" />';
+        $css2 = '<link rel="stylesheet" href="' + ourl + '/static/dist/projects/projects_20160313.css" />',
 
         $css3 = '<link rel="stylesheet" href="' + ourl + '/static/dist/comm/comm_20160313.css" />';
 
@@ -337,7 +337,7 @@
         strVar += "                            <\/div>";
         var $body = $('<div class="dialogBody"></div>'),
           $header = $('<div class="dialogHeader"/>').html('请选择构件<span class="dialogClose" title="关闭"></span> '),
-          $modelView = self.$modelView = $('<div id="modelView" class="model"></div>')
+          $modelView = self.$modelView = $('<div id="modelView" class="model"></div>'),
         $content = $('<div class="dialogContent"><div class="rightBar"><div class="tab"><div class="tabItem selected">已选构件</div><div class="tabItem propertyPanel">属性</div></div><div class="tools"><div class="toolsBtn"><i class="m-checked"></i>选择构件</div><span class="isSecleted">已选<span class="num">0</span>个构件</span></div><div class="bim" id="modelTree"></div><div class="bim" id="propertyPanel" style="display:none;">' + strVar + '</div></div></div>'),
           $bottom = $('<div class="dialogFooter"/>').html('<input type="button" class="dialogOk dialogBtn" value="' + this.Settings.btnText + '" />');
         $content.prepend($modelView);

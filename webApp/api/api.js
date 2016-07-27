@@ -304,6 +304,8 @@ App.API = {
 		viewPointCommentViewpoint:"sixD/{projectId}/viewPoint/{viewPointId}/comment/viewpoint",//视点评论视点
 			
 		fileSearch:"doc/{projectId}/{versionId}/file/query", //文件搜索
+
+		projectByCode:"platform/api/project/{code}/meta",
  
 		current:"platform/user/current", //当前用户
 

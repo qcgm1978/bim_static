@@ -97,11 +97,13 @@ var AppKeyRoute = Backbone.Router.extend({
 
 	//项目
 	project(projectCode, versionId) {
+		var _this=this;
 		//初始化之前 验证
 		this.beforeInit(() => {
 
 			_.require('/static/dist/projects/projects.css');
 			_.require('/static/dist/projects/projects.js');
+
 
 			App.Project.Settings = $.extend({}, App.Project.Defaults);
 
@@ -111,7 +113,15 @@ var AppKeyRoute = Backbone.Router.extend({
 
 			App.Project.Settings.type = "token";
 
-			App.Project.init();
+			_this.projectByCode(projectCode,function(data){
+				if(data){
+					App.Project.Settings.projectId = data.projectId;
+					App.Project.init();
+				}
+
+			})
+
+
 
 
 		});
@@ -307,6 +317,23 @@ var AppKeyRoute = Backbone.Router.extend({
 		$(window).on('beforeunload', function() {
 			App.Comm.delCookie("token_cookie")
 		});
+	},
+
+	projectByCode(code,callback){
+		var data = {
+			URLtype: 'projectByCode',
+			data: {
+				token:123,
+				code:code
+			}
+		}
+		App.Comm.ajax(data,function(res){
+			if(res.code==0){
+				callback(res.data);
+			}else{
+				callback(null);
+			}
+		})
 	},
 
 	logout() {
