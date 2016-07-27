@@ -35,30 +35,7 @@
               <li data-type="attr" class="item selected">属性</li>
             </ul>
             <div class="projectPropetyContainer projectNavContentBox">
-              <!--<div class="designChange projectChangeListBox">-->
-                <!--<div class="referenceSearch">-->
-                  <!--<i class=" btnSearch myIcon-search"></i>-->
-                  <!--<input class="txtInput txtSearch" placeholder="请输入搜索内容">-->
-                <!--</div>-->
-                <!--<ul class="contrastTree">-->
-                  <!--<li class="node">-->
-                    <!--<div class="itemContent">-->
-                      <!--<div class="repertoireCode comm">清单编码</div>-->
-                      <!--<div class="repertoireName comm">清单名称</div>-->
-                      <!--<div class="beforeChange comm">变更前</div>-->
-                      <!--<div class="afterChange comm">变更后</div>-->
-                    <!--</div>-->
-                  <!--</li>-->
-                <!--</ul>-->
-                <!--<div id="treeContainerBody">-->
-                  <!--<div class="loading">正在加载，请稍候……</div>-->
-                <!--</div>-->
-                <!--<div class="showChange">-->
-                                        <!--<span class="groupRadio">-->
-                                            <!--<label class="btnCk"><i class="iconPic"></i>显示变更前模型</label>-->
-                                        <!--</span>-->
-                <!--</div>-->
-              <!--</div>-->
+
               <div class="designProperties" >
                 <div class="nullTip">请选择构件</div>
               </div>
@@ -101,7 +78,13 @@
         }
       }
     });
-
+    App.Global || (App.Global = {} );
+    if (!("ActiveXObject" in window) && !window.ActiveXObject) {
+      //轮训
+      setInterval(function(){
+        App.Comm.checkOnlyCloseWindow();
+      },3000);
+    }
   })
 </script>
 </body>
