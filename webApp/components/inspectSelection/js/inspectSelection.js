@@ -9,7 +9,7 @@
     strVar1 += "<% $.each(data.items,function(i,item){%> ";
     strVar1 += "    <tr class=\"<%= i%2==0 && 'odd' %>\"  data-id=\"<%=item.id%>\" data-location='<%= item.location?JSON.stringify(item.location):\"\"%>'>";
     strVar1 += "        <td class=\"manifestIcon\"><i class=\"myIcon-inventory\"><\/i><\/td>";
-    strVar1 += "        <td class=\"category\"><%=item.categoryName%><\/td>";
+    strVar1 += "        <td class=\"category\"><%=item.catetoryName%><\/td>";
     strVar1 += "        <td class=\"positon\"><%=item.locationName%><\/td>";
     strVar1 += "        <td class=\"ckResult\">";
     strVar1 += "         <i data-id=\"<%= item.acceptanceId %>\"  data-total=\"<%=item.problemCount%>\" class=\"resultStatusIcon  <%= item.colorStatus == 0 ?'myIcon-circle-green':'myIcon-circle-red'%> \"><\/i>";
@@ -22,93 +22,75 @@
     strVar1 += "    <\/tr>";
     strVar1 += "<%}%>";
 
-    var strVar2 = "";
-    strVar2 += "<div class=\"hedaerSearch\">";
-    strVar2 += "    <span class=\"searchToggle\">选择筛选条件<\/span>";
-    strVar2 += "    <span class=\"clearSearch\">清除条件<\/span>";
-    strVar2 += "    <span class=\"groupRadio\">";
-    strVar2 += "        <label class=\"btnCk\"><i class=\"iconPic\"><\/i>显示搜索结果对应位置<\/label>";
-    strVar2 += "    <\/span>";
-    strVar2 += "<\/div>";
-    strVar2 += "<div class=\"searchDetail openingacceptance\">";
-    strVar2 += "    <div class=\"searchOptons\">";
-    strVar2 += "        <div class=\"optonLine zIndex13\">";
-    strVar2 += "            <div class=\"myDropDown specialitiesOption optionComm\">";
-    strVar2 += "                <span class=\"myDropText\">";
-    strVar2 += "                    <span>专业：<\/span> <span class=\"text\">全部<\/span> <i class=\"myDropArrorw\"><\/i> <\/span>";
-    strVar2 += "                    <ul class=\"myDropList\">";
-    strVar2 += "                        <li class=\"myItem\" data-val=''>全部<\/li>";
-    strVar2 += "                        <li class=\"myItem\" data-val='10'>外装<\/li>";
-    strVar2 += "                        <li class=\"myItem\" data-val='15'>内装<\/li>";
-    strVar2 += "                        <li class=\"myItem\" data-val='45'>采光顶<\/li>";
-    strVar2 += "                        <li class=\"myItem\" data-val='50'>慧云机房<\/li>";
-    strVar2 += "                        <li class=\"myItem\" data-val='55'>冷冻机房<\/li>";
-    strVar2 += "                        <li class=\"myItem\" data-val='60'>消防水泵房<\/li>";
-    strVar2 += "                        <li class=\"myItem\" data-val='75'>发电机房<\/li>";
-    strVar2 += "                        <li class=\"myItem\" data-val='85'>地下车库<\/li>";
-    strVar2 += "                    <\/ul>";
-    strVar2 += "                <\/div>";
-    strVar2 += "            <\/div>";
-    strVar2 += "            <div class=\"optonLine\">";
-    strVar2 += "                <div class=\"myDropDown categoryOption optionComm\">";
-    strVar2 += "                    <span class=\"myDropText\">";
-    strVar2 += "                        <span>类别：<\/span> <span class=\"text\">全部<\/span> <i class=\"myDropArrorw\"><\/i> <\/span>";
-    strVar2 += "                        <ul class=\"myDropList\">";
-    strVar2 += "                            <li class=\"myItem\" data-val=''>全部<\/li>";
-    strVar2 += "                            <li class=\"myItem\" data-val='05'>玻璃幕墙<\/li>";
-    strVar2 += "                            <li class=\"myItem\" data-val='06'>石材/地砖地面<\/li>";
-    strVar2 += "                            <li class=\"myItem\" data-val='07'>车库出入口<\/li>";
-    strVar2 += "                            <li class=\"myItem\" data-val='30'>栏杆扶手<\/li>";
-    strVar2 += "                            <li class=\"myItem\" data-val='40'>标识<\/li>";
-    strVar2 += "                            <li class=\"myItem\" data-val='55'>广告位<\/li>";
-    strVar2 += "                        <\/ul>";
-    strVar2 += "                    <\/div>";
-    strVar2 += "                <\/div>";
-    strVar2 += "                <div class=\"optonLine\">";
-    strVar2 += "                    <div class=\"myDropDown riskOption optionComm\">";
-    strVar2 += "                        <span class=\"myDropText\">";
-    strVar2 += "                            <span>有无隐患：<\/span> <span class=\"text\">全部<\/span> <i class=\"myDropArrorw\"><\/i> <\/span>";
-    strVar2 += "                            <ul class=\"myDropList\">";
-    strVar2 += "                                <li data-status=\"\" class=\"myItem\">全部<\/li>";
-    strVar2 += "                                <li data-status=\"1\" class=\"myItem\">有<\/li>";
-    strVar2 += "                            <\/ul>";
-    strVar2 += "                        <\/div>";
-    strVar2 += "                    <\/div>";
-    strVar2 += "                <\/div>";
-    strVar2 += "                <div class=\"optonLine btnOption\">";
-    strVar2 += "                    <input type=\"button\" class=\"myBtn myBtn-primary btnFilter\" value=\"筛选\" />";
-    strVar2 += "                <\/div>";
-    strVar2 += "            <\/div>";
-    strVar2 += "        <\/div>";
-    strVar2 += "        <div class=\"tbContainer\">";
-    strVar2 += "            <table class=\"tbOpeningacceptanceHeader tbComm\">";
-    strVar2 += "                <thead>";
-    strVar2 += "                    <tr>";
-    strVar2 += "                        <th class=\"manifestIcon\"><\/th>";
-    strVar2 += "                        <th class=\"category\">类别<\/th>";
-    strVar2 += "                        <th class=\"positon\">位置<\/th>";
-    strVar2 += "                        <th class=\"ckResult\">检查结果<\/th>";
-    strVar2 += "                    <\/tr>";
-    strVar2 += "                <\/thead>";
-    strVar2 += "            <\/table>";
-    strVar2 += "            <div class=\"materialequipmentList openingacceptanceList\">";
-    strVar2 += "                <div class=\"materialequipmentListScroll\">";
-    strVar2 += "                    <table class=\"tbOpeningacceptanceBody tbComm\">";
-    strVar2 += "                        <tbody>";
-    strVar2 += "                        <tr class=\"noLoading\"><\/tr>";
-    strVar2 += "                    <\/tbody>";
-    strVar2 += "                <\/table>";
-    strVar2 += "            <\/div>";
-    strVar2 += "        <\/div>";
-    strVar2 += "    <\/div>";
-    strVar2 += "    <div class=\"paginationBottom\">";
-    strVar2 += "        <div class=\"pageInfo\">";
-    strVar2 += "            <span class=\"curr\">0<\/span>/<span class=\"pageCount\">0<\/span>页";
-    strVar2 += "            <span class=\"prev\">上一页<\/span> <span class=\"next\">下一页<\/span>";
-    strVar2 += "        <\/div>";
-    strVar2 += "        <div class=\"sumCount\">共<span class=\"count\">0<\/span>条<\/div>";
-    strVar2 += "        ";
-    strVar2 += "    <\/div>";
+	var strVar2 = "";
+	strVar2 += "<div class=\"hedaerSearch\">";
+	strVar2 += "    <span class=\"searchToggle\">选择筛选条件<\/span>";
+	strVar2 += "    <span class=\"clearSearch\">清除条件<\/span>";
+	strVar2 += "    <span class=\"groupRadio\">";
+	strVar2 += "        <label class=\"btnCk\"><i class=\"iconPic\"><\/i>显示搜索结果对应位置<\/label>";
+	strVar2 += "    <\/span>";
+	strVar2 += "<\/div>";
+	strVar2 += "<div class=\"searchDetail openingacceptance\">";
+	strVar2 += "    <div class=\"searchOptons\">";
+	strVar2 += "        <div class=\"optonLine zIndex13\">";
+	strVar2 += "            <div class=\"optonLine\">";
+	strVar2 += "                <div class=\"myDropDown categoryOption optionComm\">";
+	strVar2 += "                    <span class=\"myDropText\">";
+	strVar2 += "                        <span>类别：<\/span> <span class=\"text\">全部<\/span> <i class=\"myDropArrorw\"><\/i> <\/span>";
+	strVar2 += "                        <ul class=\"myDropList\">";
+	strVar2 += "                            <li class=\"myItem\" data-val=''>全部<\/li>";
+	strVar2 += "                            <% _.each(userData,function(item,index){ if(index!=0){%>";
+	strVar2 += "                            <li class=\"myItem\" data-val='<%=index%>'><%=item%><\/li>";
+	strVar2 += "                            <% } }) %>";
+	strVar2 += "                        <\/ul>";
+	strVar2 += "                    <\/div>";
+	strVar2 += "                <\/div>";
+	strVar2 += "                <div class=\"optonLine\">";
+	strVar2 += "                    <div class=\"myDropDown riskOption optionComm\">";
+	strVar2 += "                        <span class=\"myDropText\">";
+	strVar2 += "                            <span>状态：<\/span> <span class=\"text\">全部<\/span> <i class=\"myDropArrorw\"><\/i> <\/span>";
+	strVar2 += "                            <ul class=\"myDropList\">";
+	strVar2 += "                                <li class=\"myItem\" data-val=''>全部<\/li>";
+	strVar2 += "                                <li class=\"myItem\" data-val=''>合格<\/li>";
+	strVar2 += "                                <li class=\"myItem\" data-val=''>不合格<\/li>";
+	strVar2 += "                            <\/ul>";
+	strVar2 += "                        <\/div>";
+	strVar2 += "                    <\/div>";
+	strVar2 += "                <\/div>";
+	strVar2 += "                <div class=\"optonLine btnOption\">";
+	strVar2 += "                    <input type=\"button\" class=\"myBtn myBtn-primary btnFilter\" value=\"筛选\" />";
+	strVar2 += "                <\/div>";
+	strVar2 += "            <\/div>";
+	strVar2 += "        <\/div>";
+	strVar2 += "        <div class=\"tbContainer\">";
+	strVar2 += "            <table class=\"tbOpeningacceptanceHeader tbComm\">";
+	strVar2 += "                <thead>";
+	strVar2 += "                    <tr>";
+	strVar2 += "                        <th class=\"manifestIcon\"><\/th>";
+	strVar2 += "                        <th class=\"category\">类别<\/th>";
+	strVar2 += "                        <th class=\"positon\">位置<\/th>";
+	strVar2 += "                        <th class=\"ckResult\">检查结果<\/th>";
+	strVar2 += "                    <\/tr>";
+	strVar2 += "                <\/thead>";
+	strVar2 += "            <\/table>";
+	strVar2 += "            <div class=\"materialequipmentList openingacceptanceList\">";
+	strVar2 += "                <div class=\"materialequipmentListScroll\">";
+	strVar2 += "                    <table class=\"tbOpeningacceptanceBody tbComm\">";
+	strVar2 += "                        <tbody>";
+	strVar2 += "                        <tr class=\"noLoading\"><\/tr>";
+	strVar2 += "                    <\/tbody>";
+	strVar2 += "                <\/table>";
+	strVar2 += "            <\/div>";
+	strVar2 += "        <\/div>";
+	strVar2 += "    <\/div>";
+	strVar2 += "    <div class=\"paginationBottom\">";
+	strVar2 += "        <div class=\"pageInfo\">";
+	strVar2 += "            <span class=\"curr\">0<\/span>/<span class=\"pageCount\">0<\/span>页";
+	strVar2 += "            <span class=\"prev\">上一页<\/span> <span class=\"next\">下一页<\/span>";
+	strVar2 += "        <\/div>";
+	strVar2 += "        <div class=\"sumCount\">共<span class=\"count\">0<\/span>条<\/div>";
+	strVar2 += "        ";
+	strVar2 += "    <\/div>";
 
 	var ourl = "";
 	var scripts = document.getElementsByTagName('script');
@@ -118,6 +100,18 @@
 			ourl = a;
 		}
 	}
+
+	var mapData={
+		processCategory:['','工程桩','基坑支护','地下防水','梁柱节点','钢结构悬挑构件','幕墙','外保温',
+			'采光顶','步行街吊顶风口','卫生间防水','屋面防水','屋面虹吸雨排','消防泵房','给水泵房',
+			'湿式报警阀室','空调机房','冷冻机房','变配电室','发电机房','慧云机房','电梯机房','电梯底坑',
+			'吊顶','地面','中庭栏杆','竖井'],
+		openCategory:['','幕墙',
+			'采光顶','步行街吊顶风口','卫生间防水','屋面防水','屋面虹吸雨排','消防泵房','给水泵房',
+			'湿式报警阀室','空调机房','冷冻机房','变配电室','发电机房','慧云机房','电梯机房','电梯底坑',
+			'吊顶','地面','中庭栏杆','竖井']
+	}
+
 	win.App = win.App || {};
 	win.App.API = {
 		Settings: {
@@ -132,6 +126,7 @@
 
 	//模态框模型选择器对象
 	var InspectModelSelection = function(options) {
+
 		var _this=this;
 		//强制new
 		if (!(this instanceof InspectModelSelection)) {
@@ -154,13 +149,16 @@
 		    }).done(function(data){
 		    	if(data.code==0){
 		    		$.ajax({
-				      url: ourl+"/view/"+data.data.projectId+"/"+data.data.versionId+"/init"
+				      url: ourl+"/view/"+data.data.projectId+"/"+data.data.versionId+"/init?token=123"
 				    }).done(function(data){
 				    	if(data.code==0){
 				    		_this.Settings=$.extend({},_this.Settings,data.data);
 				    		Project.Settings = _this.Settings;
 							_this.Project=Project;
 							_this.init();
+				    	}else if(data.code==10004){
+				    		//alert();
+				    	//	document.location.href=ourl+"/login.html";
 				    	}
 				    	
 				    })
@@ -184,8 +182,13 @@
 			if (self.Settings.type == "process") {
 				win.App.API.URL.fetchQualityOpeningAcceptance = "sixD/{projectId}/{projectVersionId}/acceptance?type=1";
 			}
-
-			//加载完js后再渲染
+			if (self.isIE()) {
+				$.getScript(commjs, function() {
+					self.dialog();
+					self.controll();
+				})
+				return;
+			}
 			$.getScript(srciptUrl, function() {
 				bimView.API.baseUrl = ourl + '/';
 				$.getScript(commjs, function() {
@@ -196,9 +199,7 @@
 			});
 		},
 		controll: function() {
-			if (this.isIE()) {
-				return;
-			}
+
 			var self = this;
 			self.$dialog.on('click', '.toolsBtn', function() {
 				self.getSelected();
@@ -468,7 +469,8 @@
 					category: "", //类别 
 					problemCount: "", // 无隐患 1， 有隐患 
 					pageIndex: page || 1, //第几页，默认第一页
-					pageItemCount: 10 //页大小
+					pageItemCount: 10,//页大小
+					token:123
 				}, data),
 				success: function(data) {
 					Project.pageInfo(data);
@@ -530,9 +532,8 @@
 
 			this.OpeningAcceptanceOptions = options.OpeningAcceptance;
 
-			//var tpl = Project.templateUrl("/components/inspectSelection/tpls/project.quality.property.openingAcceptance.html");
 			var tpl = _.template(strVar2);
-			this.$el.html(tpl);
+			this.$el.html(tpl({userData:Project.Settings.type=='open'?mapData.openCategory:mapData.processCategory}));
 			this.bindEvent();
 			return this;
 
@@ -646,7 +647,7 @@
 			if ($(event.target).hasClass("disable")) {
 				return;
 			}
-			var next = +$el.find(".paginationBottom .pageInfo .curr").text() + 1;
+			var next = +this.$el.find(".paginationBottom .pageInfo .curr").text() + 1;
 			Project.loadData(this.filters, next)
 		},
 
@@ -655,7 +656,7 @@
 			if ($(event.target).hasClass("disable")) {
 				return;
 			}
-			var prev = +$el.find(".paginationBottom .pageInfo .curr").text() - 1;
+			var prev = +this.$el.find(".paginationBottom .pageInfo .curr").text() - 1;
 			Project.loadData(this.filters, prev)
 		}
 	});

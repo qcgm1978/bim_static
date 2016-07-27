@@ -13,10 +13,9 @@
              <span>类别：</span> <span class="text">全部</span> <i class="myDropArrorw"></i> </span>
                 <ul class="myDropList">
                     <li class="myItem" data-val=''>全部</li>
-                    <li class="myItem" data-val='0'>随机</li>
-                    <li class="myItem" data-val='1'>过程检查</li>
-                    <li class="myItem" data-val='2'>开业验收</li>
-                    <li class="myItem" data-val='3'>入伙验收</li>
+                    <% _.each(App.Project.mapData.concernsCategory,function(item,index){ if(index!=0){%>
+                    <li class="myItem" data-val='<%=index%>'><%=item%></li>
+                    <% } }) %>
                 </ul>
             </div>
             <div class="myDropDown statusOption optionComm">
@@ -24,9 +23,9 @@
              <span>状态：</span> <span class="text">全部</span> <i class="myDropArrorw"></i> </span>
                 <ul class="myDropList">
                     <li data-status="" class="myItem">全部</li>
-                    <li data-status="1" class="myItem">待整改</li>
-                    <li data-status="2" class="myItem">已整改</li>
-                    <li data-status="3" class="myItem">已关闭</li>
+                    <% _.each(App.Project.mapData.concernsStatus,function(item,index){ if(index!=0){%>
+                    <li class="myItem" data-val='<%=index%>'><%=item%></li>
+                    <% } }) %>
                 </ul>
             </div>
         </div>
@@ -36,10 +35,9 @@
              <span>填报人：</span> <span class="text">全部</span> <i class="myDropArrorw"></i> </span>
                 <ul class="myDropList">
                     <li class="myItem" data-val=''>全部</li>
-                    <li class="myItem" data-val='1'>质监</li>
-                    <li class="myItem" data-val='2'>第三方</li>
-                    <li class="myItem" data-val='3'>项目公司</li>
-                    <li class="myItem" data-val='4'>监理单位</li>
+                    <% _.each(App.Project.mapData.concernsReporter,function(item,index){ if(index!=0){%>
+                    <li class="myItem" data-val='<%=index%>'><%=item%></li>
+                    <% } }) %>
                 </ul>
             </div>
             <div class="myDropDown gradeOption optionComm">
@@ -47,10 +45,9 @@
              <span>等级：</span> <span class="text">全部</span> <i class="myDropArrorw"></i> </span>
                 <ul class="myDropList">
                     <li data-status="" class="myItem">全部</li>
-                    <li data-status="1" class="myItem">一般</li>
-                    <li data-status="2" class="myItem">较大</li>
-                    <li data-status="3" class="myItem">重大</li>
-                    <li data-status="4" class="myItem">特大</li>
+                    <% _.each(App.Project.mapData.concernsLevel,function(item,index){ if(index!=0){%>
+                    <li class="myItem" data-val='<%=index%>'><%=item%></li>
+                    <% } }) %>
                 </ul>
             </div>
         </div>
@@ -60,12 +57,9 @@
              <span>类型：</span> <span class="text">全部</span> <i class="myDropArrorw"></i> </span>
                 <ul class="myDropList">
                     <li class="myItem" data-val=''>全部</li>
-                    <li class="myItem" data-val='1'>实测实量</li>
-                    <li class="myItem" data-val='2'>防水工程</li>
-                    <li class="myItem" data-val='3'>施工质量</li>
-                    <li class="myItem" data-val='4'>安全文明</li>
-                    <li class="myItem" data-val='5'>总包内业资料</li>
-                    <li class="myItem" data-val='6'>材料设备</li>
+                    <% _.each(App.Project.mapData.concernsCategory,function(item,index){ if(index!=0){%>
+                    <li class="myItem" data-val='<%=index%>'><%=item%></li>
+                    <% } }) %>
                 </ul>
             </div>
         </div>

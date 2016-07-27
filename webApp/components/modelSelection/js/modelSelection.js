@@ -175,7 +175,8 @@
         url: url,
         data: {
           elementId: elementId,
-          sceneId: sceneId
+          sceneId: sceneId,
+          token:'123'
         }
       }).done(function(data) {
         var template =_.template(strVar3),
@@ -185,8 +186,6 @@
     }
 
   }
-
-
 
   var ModelSelection = function(options) {
     var _this=this;
@@ -209,7 +208,7 @@
         }).done(function(data){
           if(data.code==0){
             $.ajax({
-              url: ourl+"/view/"+data.data.projectId+"/"+data.data.versionId+"/init"
+              url: ourl+"/view/"+data.data.projectId+"/"+data.data.versionId+"/init?token=123"
             }).done(function(data){
               if(data.code==0){
                 _this.Settings=$.extend({},_this.Settings,data.data);

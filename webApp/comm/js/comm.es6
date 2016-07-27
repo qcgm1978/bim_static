@@ -6,18 +6,25 @@ App.Comm = {
 		pageItemCount: 15 //Math.floor(($("body").height() + 60) / 70) > 10 && Math.floor(($("body").height() + 60) / 70) || 10
 	},
 
-	resetCookie(param){
+	resetCookie(param) {
 		alert(param)
 		debugger
 	},
 
-	//ie预览模型
-	isIEModel: function() { 
+	//批注类型  0: 模型；1：rvt单文件；2：dwg图纸文件
+	hostType: {
+		0: "m-single-model",
+		1: "m-single-rvt",
+		2: "m-single-dwg"
+	},
 
-		if("ActiveXObject" in window || window.ActiveXObject){
-			window.location.href='/ie.html?path='+ window.location.href; 
+	//ie预览模型
+	isIEModel: function() {
+
+		if ("ActiveXObject" in window || window.ActiveXObject) {
+			window.location.href = '/ie.html?path=' + window.location.href;
 			return true;
-		} 
+		}
 	},
 	//项目版本状态
 	versionStatus: {
@@ -44,46 +51,48 @@ App.Comm = {
 		"9": "已发布"
 	},
 
-	isAuth:function(type,s){
+	isAuth: function(type, s) {
 		if (!App.AuthObj) {
 			return false;
 		}
-		var _subType,_auth,_status,_setting,isChange=false,
-			_temp='4,7,9';
-		if(s=='family'){
-			_auth=App.AuthObj.lib.family;
-			_setting=App.ResourceModel.Settings;
-		}else if(s=='model'){
-			_setting=App.ResourceModel.Settings;
-			_auth=App.AuthObj.lib.model;
-		}else{
-			_setting=App.Project.Settings;
-			_auth=App.AuthObj.project.prjfile;
+		var _subType, _auth, _status, _setting, isChange = false,
+			_temp = '4,7,9';
+		if (s == 'family') {
+			_auth = App.AuthObj.lib.family;
+			_setting = App.ResourceModel.Settings;
+		} else if (s == 'model') {
+			_setting = App.ResourceModel.Settings;
+			_auth = App.AuthObj.lib.model;
+		} else {
+			_setting = App.Project.Settings;
+			_auth = App.AuthObj.project.prjfile;
 		}
-		_subType=_setting.CurrentVersion.subType;
-		_status=_setting.CurrentVersion.status;
-		isChange=_setting.CurrentVersion.name=="初始版本"?false:true;
+		_subType = _setting.CurrentVersion.subType;
+		_status = _setting.CurrentVersion.status;
+		isChange = _setting.CurrentVersion.name == "初始版本" ? false : true;
 		//如果状态等于4,7,9直接禁用
-		if(_temp.indexOf(_status)!=-1){
+		if (_temp.indexOf(_status) != -1) {
 			return false;
-		}
-		//如果状态不等于4,7,9，并且是族库、标准模型则有所有权限
-		if(s=='family'||s=='model'){
-			return true;
 		}
 
 		//非标、用户权限、不是变更版本才有（创建、重命名、删除）
-		if(type=='create'||type=="rename"||type=="delete"){
+		if (type == 'create' || type == "rename" || type == "delete") {
 			//变更版本不能创建、删除、重命名
-			if(_subType==3&&_auth.edit&& !isChange){
+			if (_subType == 3 && _auth.edit && !isChange) {
 				return true;
 			}
 			return false;
-		}else if(type=="upload"){
-			if(_auth.edit){
+		} else if (type == "upload") {
+			if (_auth.edit) {
 				return true;
 			}
-		}else if(type=="down"){
+			return false;
+		} else if (type == "down") {
+			return true;
+		}
+
+		//如果状态不等于4,7,9，并且是族库、标准模型则有所有权限
+		if (s == 'family' || s == 'model') {
 			return true;
 		}
 		return false;
@@ -250,8 +259,8 @@ App.Comm = {
 
 		var exp = new Date(),
 
-			keys =localStorage.getItem("keys") && localStorage.getItem("keys").split(',') || ""; //document.cookie.match(/[^ =;]+(?=\=)/g);
- 
+			keys = localStorage.getItem("keys") && localStorage.getItem("keys").split(',') || ""; //document.cookie.match(/[^ =;]+(?=\=)/g);
+
 		exp.setTime(exp.getTime() + min * 60 * 1000);
 
 		if (keys) {
@@ -486,22 +495,63 @@ App.Comm = {
 			}, _this._userData.timeout || 2000)
 		}
 	}),
-	loadMessageCount:function(param){
-		if(param != undefined){
-			var _=$('#messageCount');
-			_.text(Number(_.text())+param);
+	loadMessageCount: function(param) {
+		if (param != undefined) {
+			var _ = $('#messageCount');
+			_.text(Number(_.text()) + param);
 			return
 		}
-        App.Comm.ajax({
-            URLtype:'fetchIMBoxList',
-            data:{
-                status:0
-            }
-        },function(res){
-            $('#messageCount').html(res.data.totalItemCount);
-        })
+		App.Comm.ajax({
+			URLtype: 'fetchIMBoxList',
+			data: {
+				status: 0
+			}
+		}, function(res) {
+			$('#messageCount').html(res.data.totalItemCount);
+		})
 
-    }
+	},
+
+	//检查是否是唯一的 模型
+	setOnlyModel: function() {
+		var onlyCount = App.Comm.getCookie("onlyCount");
+		if (!onlyCount) {
+			App.Comm.setCookie("onlyCount", 1);
+			App.Global.onlyCount = 1;
+		} else {
+			onlyCount++;
+			App.Comm.setCookie("onlyCount", onlyCount);
+			App.Global.onlyCount = onlyCount;
+		}
+	},
+
+	//关闭窗口
+	checkOnlyCloseWindow: function() {
+
+		var onlyCount = App.Comm.getCookie("onlyCount");
+		//没加载过模型
+		if (!onlyCount || !App.Global.onlyCount) {
+			return;
+		}
+
+		if (onlyCount != App.Global.onlyCount) {
+			if (navigator.userAgent.indexOf("Firefox") != -1 || navigator.userAgent.indexOf("Chrome") != -1) {
+				window.location.href = "about:blank";
+				window.close();
+			} else {
+				window.opener = null;
+				window.open("", "_self");
+				window.close();
+			}
+		}
+
+		//重置 一直累加会溢出
+		if (onlyCount == App.Global.onlyCount && App.Global.onlyCount > 100) {
+			App.Comm.setCookie("onlyCount", 1);
+			App.Global.onlyCount = 1;
+		}
+
+	}
 };
 
 

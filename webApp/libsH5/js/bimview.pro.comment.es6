@@ -395,22 +395,33 @@
 				render() {
 
 					var data = this.model.toJSON();
-
-					this.$el.html(this.template(data));
-
-
+					this.$el.html(this.template(data)).data("hosttype", data.hostType);
 					this.bindContent();
-
-
-
 					return this;
-
 				},
 
 				//显示批注
 				showComment(event) {
 
-					CommentApi.showComment($(event.target).closest(".item"));
+					var $item = $(event.target).closest(".item");
+
+					//项目批注
+					if ($item.data("hosttype") == 0) {
+						CommentApi.showComment($item);
+					} else {
+						//事件会重复冒泡 
+						if (!$item.data("isClick")) {
+							//阻止冒泡 之后 需要恢复 
+							$item.data("isClick", true);
+							$item.find(".linkImg").click();
+							//恢复
+							var timer = setTimeout(function() {
+								clearTimeout(timer);
+								$item.data("isClick", false);
+							}, 10);
+						}
+
+					}
 
 				},
 
@@ -501,6 +512,13 @@
 							$comment.find(".fullLoading").hide();
 						}
 					});
+
+					//只有项目模型 显示 位置 和  批注
+					if ($item.data("hosttype") == 0) {
+						$comment.find(".btnAdress,.btnCommViewPoint").show();
+					} else {
+						$comment.find(".btnAdress,.btnCommViewPoint").hide();
+					}
 
 					event.stopPropagation();
 
@@ -628,7 +646,7 @@
 
 					this.$(".txtReMark").at({
 
-						getData: function(name) { 
+						getData: function(name) {
 
 							//返回数据源
 							var data = {
@@ -654,10 +672,28 @@
 
 				//显示视点
 				viewPointShow(event) {
-					//移除选中
-					$comment.find(".reMarkBox .selected").removeClass("selected");
-					//显示批注
-					CommentApi.showComment($(event.target).closest(".viewPointInfo"));
+
+					var $item = $(event.target).closest(".viewPointInfo");
+					//项目模型
+					if ($comment.find(".remarkCount.current").closest(".item").data("hosttype") == 0) {
+						//移除选中
+						$comment.find(".reMarkBox .selected").removeClass("selected");
+						//显示批注
+						CommentApi.showComment($item);
+					} else {
+						//事件会重复冒泡 
+						if (!$item.data("isClick")) {
+							//阻止冒泡 之后 需要恢复 
+							$item.data("isClick", true);
+							$item.find(".linkImg").click();
+							//恢复
+							var timer = setTimeout(function() {
+								clearTimeout(timer);
+								$item.data("isClick", false);
+							}, 10);
+						}
+					}
+
 				},
 
 				//评论视点
@@ -882,14 +918,13 @@
 							contentType: "application/json"
 						};
 
-
-					if (!pars.text) {
+					//没有文字 且没有附件
+					if (!pars.text && pictures.length <= 0) {
 						$.tip({
 							message: "请输入评论内容",
 							timeout: 3000,
 							type: "alarm"
 						});
-						//alert('请输入评论内容');
 						return;
 					}
 

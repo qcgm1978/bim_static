@@ -1,5 +1,5 @@
 #comment { height: 100%; overflow-y: hidden;
-	.fullLoading {display: none; position: absolute; top: 0px; left: 0px; bottom: 0px; right: 0px; z-index: 1; background-color: #333; text-align: center; line-height: 100px; font-size: 16px; color: #ccc; }
+	.fullLoading { display: none; position: absolute; top: 0px; left: 0px; bottom: 0px; right: 0px; z-index: 1; background-color: #333; text-align: center; line-height: 100px; font-size: 16px; color: #ccc; }
 	.commentListBox { height: 100%; overflow: hidden; }
 	.commentList { height: 100%; position: relative; left: 0px;
 		.navBar { margin-left: 10px;
@@ -12,11 +12,11 @@
 		}
 		.listBox { position: absolute; top: 46px; bottom: 0px; left: 0px; right: 0px; border-top: 1px #666 solid;
 			.item { height: 80px; color: #ccc;
-				.thumbnailImg { float: left; width: 82px; height: 62px; margin: 10px 0px 0px 10px; }
-				.info { margin-left: 100px; padding-top: 9px; }
+				.thumbnailImg { float: left; width: 82px; height: 62px; margin: 10px 0px 0px 5px; }
+				.info { margin-left: 120px; padding-top: 9px; }
 				.title { width: 98%; height: 42px; font-size: 14px; color: #fff; }
 				.desc { margin: 6px 0px 4px 0px; }
-				.name { width: 48px; }
+				.name { width: 42px; }
 				.date { margin-left: 5px; vertical-align: middle; }
 				.remarkCount { float: right; margin-right: 5px; margin-top: 3px;
 					.m-comment { font-family: "modelicon"; }
@@ -25,12 +25,14 @@
 				}
 				&:hover { background-color: rgba(51, 51, 51, .8); }
 				&.selected { background-color: rgba(0, 110, 207, .8); }
+				.iconType { font-family: "modelicon"; float: left; margin-left: 10px; margin-top: 9px; color: #fff; }
 			}
 		}
 	}
 	.projectListBox, .userListBox { height: 100%; }
 	.commentRemark { position: absolute; top: 6px; left: 330px; right: 0px; bottom: 0px; overflow: hidden;
 		i { font-family: "modelicon"; }
+		.iconType { color: #fff; float: left; margin-left: 5px; margin-right: -5px; margin-top: 9px; }
 		.header { height: 49px; border-bottom: 1px #666 solid; line-height: 48px; padding: 0px 10px; }
 		.talkReMark { position: absolute; bottom: 0px; background-color: #444;
 			&.hidden { display: none; }
@@ -43,23 +45,21 @@
 		.reMarkListBox { width: 328px; position: absolute; top: 49px; bottom: 100px; left: 0px; right: 0px; }
 		.viewPointInfo { color: #ccc; padding-bottom: 10px;
 			.thumbnailImg { float: left; width: 82px; height: 62px; margin: 10px 0px 0px 10px; }
-			.info { margin-left: 100px; padding-top: 9px; }
+			.info { margin-left: 120px; padding-top: 9px; }
 			.title { width: 98%; height: 42px; font-size: 14px; color: #fff; }
-			.name { width: 48px; }
+			.name { width: 42px; }
 			.date { margin-left: 5px; vertical-align: middle; }
 			&:hover { background-color: rgba(51, 51, 51, .8); }
 			&.selected { background-color: rgba(0, 110, 207, .8); }
 			.remarkCount { display: none; }
 		}
 		.remarkBox { margin-top: 4px; margin: 10px 10px; border: 1px #666 solid; border-width: 1px 0px; font-size: 14px; padding: 8px 0px; margin-top: 0px; }
-		.iconComment { font-family: "modelicon"; margin-right: 5px; color: #b9b9b9;  font-size: 16px; }
+		.iconComment { font-family: "modelicon"; margin-right: 5px; color: #b9b9b9; font-size: 16px; }
 		.goList { color: #b9b9b9; cursor: pointer; }
 		.iconBack { font-size: 18px; width: 21px; margin: 0px; font-family: "modelicon"; vertical-align: -4px; display: inline-block; }
 		.operators { float: right; cursor: pointer; color: #fff; font-size: 16px;
 			.iconShare { margin-left: 5px; }
-		    i{
-			  font-size: 16px;
-			}
+			i { font-size: 16px; }
 		}
 		.inputBox { width: 310px; margin-left: 8px; color: #333; border-radius: 3px; background-color: #fff; }
 		.txtReMark { width: 100%; border: 0; height: 42px; outline: none; resize: none; padding: 5px;

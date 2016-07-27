@@ -304,3 +304,10 @@ App.Router = new AppRoute();
 
 //开始监听
 Backbone.history.start();
+
+if (!("ActiveXObject" in window) && !window.ActiveXObject) { 
+	//轮训
+	setInterval(function(){
+		App.Comm.checkOnlyCloseWindow();
+	},3000);
+}

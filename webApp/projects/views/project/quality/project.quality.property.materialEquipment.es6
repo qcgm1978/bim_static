@@ -27,9 +27,9 @@ App.Project.QualityMaterialEquipment = Backbone.View.extend({
 
 		this.MaterialEquipmentOptions = options.MaterialEquipmentOptions;
 
-		var tpl = _.templateUrl("/projects/tpls/project/quality/project.quality.property.materialEquipment.html", true);
+		var tpl = _.templateUrl("/projects/tpls/project/quality/project.quality.property.materialEquipment.html");
 
-		this.$el.html(tpl);
+		this.$el.html(tpl());
 
 		this.bindEvent();
 
