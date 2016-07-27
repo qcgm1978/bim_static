@@ -343,6 +343,7 @@
 			//window.addEventListener('resize', resizeWebView, false);
 		},
 		renderModel: function() {
+		//	App.Comm.setOnlyModel();//检查是否是唯一的 模型
 			this.viewer = new bimView({
 				type: 'model',
 				element: this.$modelView,
@@ -353,6 +354,9 @@
 			})
 			Project.Viewer = this.viewer;
 			$('.m-camera').addClass('disabled').attr('disabled', 'disabled');
+			/*setInterval(function(){
+				App.Comm.checkOnlyCloseWindow();
+			},3000);*/
 		}
 	}
 
