@@ -36,7 +36,7 @@
 
 	  $.each(OrderArr, function(i, item) {
  			PlayArr.push(item.code);
-		  if(item.type=='outer'){
+		  if(!item.inner){
 			  ifOuter[item.code] ={
 				  index : toTranslucent.length,
 				  isout : true
