@@ -94,6 +94,10 @@
       }, 10);
     },
     renderModel: function() {
+      //设置onlymodel
+      App.Global || (App.Global = {} );
+      App.Comm.setOnlyModel();
+
       this.viewer = new bimView({
         type: 'model',
         element: $('.projectCotent'),

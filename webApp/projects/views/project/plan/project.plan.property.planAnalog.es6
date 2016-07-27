@@ -30,24 +30,38 @@
 
  		var OrderArr = _.sortBy(data.data, "planStartTime"),
 	      PlayArr = [],
-	      ifOuter = [];
+	      toTranslucent = [],
+	      ifOuter = {};
 
 
 	  $.each(OrderArr, function(i, item) {
  			PlayArr.push(item.code);
-		  //item.type=='outer' ?  ifOuter.push(1) : ifOuter.push(0);
+		  if(!item.inner){
+			  ifOuter[item.code] ={
+				  index : toTranslucent.length,
+				  isout : true
+			  };
+			  toTranslucent.push(item.code)
+		  }else{
+			  ifOuter[item.code] ={
+				  index : toTranslucent.length,
+				  isout : false
+			  };
+		  }
+
 
  		});
 
  		if (PlayArr.length>0) {
  			PlayArr.push(-1);
  		}
-	  window.ll=PlayArr;
+	  window.ll=toTranslucent;
+	  window.lll    =ifOuter;
 	  console.log(PlayArr);
  		this.SourcePlay = PlayArr;
  		this.analogCount = this.SourcePlay.length;
 	  this.ifOuter = ifOuter;
-	  this.toTranslucent = [];
+	  this.toTranslucent = toTranslucent;
  	},
 
 
@@ -113,24 +127,24 @@
 
  			if (this.PlayArr.length) {
 
- 				var index = this.analogCount - this.PlayArr.length,
-				  code = this.PlayArr.splice(0, 1),
+ 				var code = this.PlayArr.splice(0, 1),
  					$tr = this.$(".planContent tbody tr[data-code='" + code[0] + "']");
 
  				App.Project.Settings.Viewer.filter({
  					type: "plan",
  					ids: this.PlayArr
  				});
+        try{
+	        if(!this.ifOuter[code[0]]['isout']){
+		        App.Project.Settings.Viewer.setOverrider({
+			        type: "plan",
+			        ids: this.toTranslucent.slice(0,this.ifOuter[code[0]]['index'])
+		        });
+	        }
+        }catch(e){
+	        console.log(code[0])
+        }
 
-			  if(this.ifOuter[index]){
-				  this.toTranslucent.push(code[0])
-			  }else{
-
-				  App.Project.Settings.Viewer.setOverrider({
-					  type: "plan",
-					  ids: this.toTranslucent
-				  });
-			  }
 
  				var processAnalog = (this.analogCount - this.PlayArr.length) / this.analogCount,
  					sourceWidth = this.$(".progressAnalog .bg").width(),
