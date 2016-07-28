@@ -1015,7 +1015,7 @@ App.Console = {
       data = {
         workflowId                       : parseInt(9999999 * Math.random()),
         //projectModelChangeApplyWorkflowId: $('#s31').val().trim(),
-        projectCode: $('#s31').val().trim(),
+        projectModelCode: $('#s31').val().trim(),
         versionId: $('#s311').val().trim(),
         status                           : 8,
         title                            : $('#p31').val().trim()
