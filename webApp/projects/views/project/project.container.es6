@@ -20,7 +20,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		"click .fileNav .commSpan": "switchFileMoldel",
 		"keyup .projectList .txtSearch": "filterProject",
 		"keyup .projectVersionList .txtSearch": "filterProjectVersion",
-		"click .modleTitleBar":"triggerUpDown",
+		"click .modleTitleBar": "triggerUpDown",
 		"click .modleShowHide": "slideUpAndDown"
 
 	},
@@ -59,42 +59,43 @@ App.Project.ProjectContainer = Backbone.View.extend({
 	},
 
 	//过滤项目版本
-	filterProjectVersion(event,t) {
-		var $target = t||$(event.target),
+	filterProjectVersion(event, t) {
+		var $target = t || $(event.target),
 			val = $target.val().trim(),
-			type=this.currentVersionType||'release';
-			$list = $target.parent().find(".container "+" ."+type+"VersionBox"+" a.item"),
-			$noheader= $target.parent().find('.'+type+'VersionBox'+' .versionNoheader');
+			type = this.currentVersionType || 'release';
+		$list = $target.parent().find(".container " + " ." + type + "VersionBox" + " a.item"),
+			$noheader = $target.parent().find('.' + type + 'VersionBox' + ' .versionNoheader');
 		$noheader.show();
 		$list.show();
 		$list.each(function() {
-				if ($(this).find(".vName").text().indexOf(val) < 0) {
-					$(this).hide();
-				}
-			});
-			$noheader.each(function(){
-				if(!$(this).find('.item').is(':visible')){
+			if ($(this).find(".vName").text().indexOf(val) < 0) {
+				$(this).hide();
+			}
+		});
+		$noheader.each(function() {
+				if (!$(this).find('.item').is(':visible')) {
 					$(this).hide();
 				}
 			})
-		/*if (!val) {
-			$list.show();
-		} else {
-			
-		}*/
+			/*if (!val) {
+				$list.show();
+			} else {
+				
+			}*/
 	},
 
-	triggerUpDown:function(e){
+	triggerUpDown: function(e) {
 		//debugger
-		this.slideUpAndDown(e,$(e.currentTarget),$(e.currentTarget).find('.modleShowHide'));
+		this.slideUpAndDown(e, $(e.currentTarget), $(e.currentTarget).find('.modleShowHide'));
 	},
 
 	//展开和收起
-	slideUpAndDown: function(event,_$parent,$current) {
-		var $parent = _$parent||$(event.target).closest('.modle'),classkey,
+	slideUpAndDown: function(event, _$parent, $current) {
+		var $parent = _$parent || $(event.target).closest('.modle'),
+			classkey,
 			$modleList = $parent.find(".modleList");
-		$modleList=$modleList.length==0?$parent.next():$modleList;
-		_$current=$current||$(event.target);
+		$modleList = $modleList.length == 0 ? $parent.next() : $modleList;
+		_$current = $current || $(event.target);
 		_$current.toggleClass("down");
 		if ($modleList.is(":hidden")) {
 			$modleList.slideDown();
@@ -103,11 +104,11 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		}
 		//classkey临时请求数据
 		if (_$current.is('.getdata') || _$current.find('.modleShowHide').is('.getdata')) {
-			if(_$current.is('.getdata')){
+			if (_$current.is('.getdata')) {
 				classkey = _$current.data('classkey');
 				_$current.removeClass('getdata');
 
-			}else{
+			} else {
 				classkey = _$current.find('.modleShowHide').data('classkey');
 				_$current.find('.modleShowHide').removeClass('getdata');
 			}
@@ -160,7 +161,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 				}
 			});
 		}
-		event.stopPropagation(); 
+		event.stopPropagation();
 	},
 
 	//点击面包靴
@@ -258,14 +259,14 @@ App.Project.ProjectContainer = Backbone.View.extend({
 
 		var $target = $(event.target),
 			type = $target.data("type"),
-			that=this;
-			this.currentVersionType=type;
+			that = this;
+		this.currentVersionType = type;
 		$target.addClass("selected").siblings().removeClass("selected");
 		this.$('.projectVersionList .txtSearch').val('');
-		setTimeout(function(){
-			that.filterProjectVersion(null,that.$('.projectVersionList .txtSearch'));
-		},10)
-		//发布版本
+		setTimeout(function() {
+				that.filterProjectVersion(null, that.$('.projectVersionList .txtSearch'));
+			}, 10)
+			//发布版本
 		if (type == "release") {
 			var $releaseVersionBox = $target.closest(".listContent").find(".releaseVersionBox");
 			if ($releaseVersionBox.length <= 0) {
@@ -457,12 +458,12 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		//渲染模型属性
 		//App.Project.renderModelContentByType();
 		//return;
-		
+
 		var viewer = App.Project.Settings.Viewer = new bimView({
 			type: 'model',
 			element: $("#projectContainer .modelContainerContent"),
 			sourceId: App.Project.Settings.DataModel.sourceId,
-			etag:App.Project.Settings.DataModel.etag, //"a1064f310fa8204efd9d1866ef7370ee" ||
+			etag: App.Project.Settings.DataModel.etag, //"a1064f310fa8204efd9d1866ef7370ee" ||
 			projectId: App.Project.Settings.projectId,
 			projectVersionId: App.Project.Settings.CurrentVersion.id
 		});
@@ -489,8 +490,8 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			//App.Project.Settings.modelId = model.userId;
 			that.viewerPropertyRender();
 			//展开
-	//		$("#projectContainer .rightProperty").css('marginRight', '0');
-	//		$("#projectContainer .rightProperty .icon-caret-left").attr('class', 'icon-caret-right');
+			//		$("#projectContainer .rightProperty").css('marginRight', '0');
+			//		$("#projectContainer .rightProperty .icon-caret-left").attr('class', 'icon-caret-right');
 
 		});
 
@@ -503,6 +504,27 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			});
 
 		}
+
+		if (App.Project.Settings.type == "token" && App.Project.Settings.PlanElement && App.Project.Settings.PlanElement.elements.length > 0) {
+
+			viewer.on("loaded", function() {
+				var data = {
+					type: "userId",
+					ids: App.Project.Settings.PlanElement.elements
+				}
+				//高亮
+				viewer.highlight(data);
+				//半透明
+				viewer.translucent(true);
+
+				var box=App.Project.formatBBox(App.Project.Settings.PlanElement.boundingBox);
+				if(box && box.length){ 
+					App.Project.zoomModel(App.Project.Settings.PlanElement.elements,box);
+				}
+
+			});
+		}
+
 
 	},
 
