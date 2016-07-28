@@ -10,7 +10,14 @@
         <div class="optonLine zIndex13">
             <div class="optonLine">
                 <div class="myDropDown categoryOption optionComm">
-                    <span class="myDropText">
+                    <% if(ruleType) {%>
+                        <span class="myDropText">
+                        <span>类别：</span> <span class="text"><%=userData[ruleType]%></span> <i class="myDropArrorw"></i> </span>
+                        <ul class="myDropList">
+                            <li class="myItem" data-val='<%=ruleType%>'><%=userData[ruleType]%></li>
+                        </ul>
+                    <% }else{%>
+                         <span class="myDropText">
                         <span>类别：</span> <span class="text">全部</span> <i class="myDropArrorw"></i> </span>
                         <ul class="myDropList">
                             <li class="myItem" data-val=''>全部</li>
@@ -18,6 +25,7 @@
                             <li class="myItem" data-val='<%=index%>'><%=item%></li>
                             <% } }) %>
                         </ul>
+                    <% } %>
                     </div>
                 </div>
                 <div class="optonLine">

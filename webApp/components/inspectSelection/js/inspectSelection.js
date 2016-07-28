@@ -36,6 +36,12 @@
 	strVar2 += "            <div class=\"optonLine\">";
 	strVar2 += "                <div class=\"myDropDown categoryOption optionComm\">";
 	strVar2 += "                    <span class=\"myDropText\">";
+	strVar2 += "                        <% if(ruleType){ %>";
+	strVar2 += "                        	<span>类别：<\/span> <span class=\"text\"><%=userData[ruleType]%><\/span> <i class=\"myDropArrorw\"><\/i> <\/span>";
+	strVar2 += "                        <ul class=\"myDropList\">";
+	strVar2 += "                            <li class=\"myItem\" data-val='<%=ruleType%>'><%=userData[ruleType]%><\/li>";
+	strVar2 += "                        <\/ul>";
+	strVar2 += "                        <% }else{%>";
 	strVar2 += "                        <span>类别：<\/span> <span class=\"text\">全部<\/span> <i class=\"myDropArrorw\"><\/i> <\/span>";
 	strVar2 += "                        <ul class=\"myDropList\">";
 	strVar2 += "                            <li class=\"myItem\" data-val=''>全部<\/li>";
@@ -43,6 +49,7 @@
 	strVar2 += "                            <li class=\"myItem\" data-val='<%=index%>'><%=item%><\/li>";
 	strVar2 += "                            <% } }) %>";
 	strVar2 += "                        <\/ul>";
+	strVar2 += "                        <% } %>";
 	strVar2 += "                    <\/div>";
 	strVar2 += "                <\/div>";
 	strVar2 += "                <div class=\"optonLine\">";
@@ -138,7 +145,6 @@
 		}
 		//合并参数
 		this.Settings = $.extend(defaults, options);
-
 		if(this.Settings.etag){
 			Project.Settings = _this.Settings;
 			_this.Project=Project;
@@ -273,14 +279,13 @@
 			}
 			$dialog.append($body);
 			$("body").append($dialog);
-			Project.loadPropertyPanel();
 			if (self.isIE()) {
 				self.activeXObject();
 				$dialog.find(".rightBar").remove();
 				self.ieDialogEvent();
 				return;
 			}
-
+			Project.loadPropertyPanel();
 			setTimeout(function() {
 				self.renderModel();
 			}, 10);
@@ -337,13 +342,13 @@
 			}
 			resizeWebView();
 			WebView.url = ourl + "/static/dist/components/inspectSelection/model.html?type="+this.Settings.type+"&sourceId="+this.Settings.sourceId+"&etag="+
-			this.Settings.etag+"&projectId="+ this.Settings.projectId+"&projectVersionId="+this.Settings.projectVersionId;
+			this.Settings.etag+"&projectId="+ this.Settings.projectId+"&projectVersionId="+this.Settings.projectVersionId+"&ruleType="+this.Settings.ruleType;
 			WebView.height = "510px";
 			WebView.width = "960px";
 			//window.addEventListener('resize', resizeWebView, false);
 		},
 		renderModel: function() {
-			Project.setOnlyModel();//检查是否是唯一的 模型
+		//	Project.setOnlyModel();//检查是否是唯一的 模型
 			this.viewer = new bimView({
 				type: 'model',
 				element: this.$modelView,
@@ -354,9 +359,9 @@
 			})
 			Project.Viewer = this.viewer;
 			$('.m-camera').addClass('disabled').attr('disabled', 'disabled');
-			setInterval(function(){
-			 Project.checkOnlyCloseWindow();
-			},3000);
+		//	setInterval(function(){
+		//	 Project.checkOnlyCloseWindow();
+		//	},3000);
 		}
 	}
 
@@ -452,12 +457,13 @@
 
 		loadPropertyPanel: function() {
 			$('.qualityContainer').append(new QualityOpeningAcceptance().render({
-				OpeningAcceptance: {
+				OpeningAcceptance:{
 					specialty: "", //专业
-					category: "", //类别 
-					problemCount: "", // 无隐患 1， 有隐患 
+					category:Project.Settings.ruleType||'', //类别
+					problemCount: "", // 无隐患 1， 有隐患
 					pageIndex: 1, //第几页，默认第一页
-					pageItemCount: 10 //页大小
+					pageItemCount: 10,//页大小
+					token:123
 				}
 			}).el);
 			this.loadData();
@@ -470,9 +476,9 @@
 			OpeningAcceptanceCollection.fetch({
 				data: $.extend({}, {
 					specialty: "", //专业
-					category: "", //类别 
-					problemCount: "", // 无隐患 1， 有隐患 
-					pageIndex: page || 1, //第几页，默认第一页
+					category:Project.Settings.ruleType||'', //类别
+					problemCount: "", // 无隐患 1， 有隐患
+					pageIndex: page||1, //第几页，默认第一页
 					pageItemCount: 10,//页大小
 					token:123
 				}, data),
@@ -577,7 +583,11 @@
 			this.OpeningAcceptanceOptions = options.OpeningAcceptance;
 
 			var tpl = _.template(strVar2);
-			this.$el.html(tpl({userData:Project.Settings.type=='open'?mapData.openCategory:mapData.processCategory}));
+
+			this.$el.html(tpl({
+				userData:Project.Settings.type=='open'?mapData.openCategory:mapData.processCategory,
+				ruleType:Project.Settings.ruleType
+			}));
 			this.bindEvent();
 			return this;
 
