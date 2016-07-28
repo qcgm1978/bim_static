@@ -27,6 +27,7 @@ var AppRoute = Backbone.Router.extend({
 	//首页主体展示
 
 	bodyContent: function() {
+		if (this.reset()==false) {return;}
 		this.reset();
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".bodyConMenu").addClass('selected');
 		_.require('/static/dist/bodyContent/bodyContent.css');
@@ -35,20 +36,20 @@ var AppRoute = Backbone.Router.extend({
 		$("#pageLoading").hide();
 	},
 
-	logout: function() { 
+	logout: function() {
 		//清除cookie
-		App.Comm.clearCookie(); 
-		
-		App.Comm.setCookie('IS_OWNER_LOGIN', '1'); 
-		 
+		App.Comm.clearCookie();
+
+		App.Comm.setCookie('IS_OWNER_LOGIN', '1');
+
 		localStorage.removeItem("user");
-		
+
 		window.location.href = "/login.html";
 	},
 	//待办
 	todo: function() {
 
-		this.reset();
+		if (this.reset()==false) {return;}
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".todo").addClass('selected');
 		//加载css js
 		_.require('/static/dist/todo/todo.css');
@@ -57,7 +58,7 @@ var AppRoute = Backbone.Router.extend({
 	},
 	//消息中心
 	inbox: function() {
-		this.reset();
+		if (this.reset()==false) {return;}
 		//加载css js
 		_.require('/static/dist/imbox/imbox.css');
 		_.require('/static/dist/imbox/imbox.js');
@@ -70,7 +71,7 @@ var AppRoute = Backbone.Router.extend({
 	},
 	//项目
 	projects: function() {
-		this.reset();
+		if (this.reset()==false) {return;}
 		//销毁上传
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".projects").addClass('selected');
 		//加载css js
@@ -81,11 +82,9 @@ var AppRoute = Backbone.Router.extend({
 	},
 
 	//单个项目
-	project: function(id, versionId) {
+	project: function(id, versionId) { 
 
-
-
-		this.reset();
+		if (this.reset()==false) {return;}
 
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".projects").addClass('selected');
 		_.require('/static/dist/projects/projects.css');
@@ -102,7 +101,7 @@ var AppRoute = Backbone.Router.extend({
 	//直接转到视点
 	projectViewPoint: function(id, versionId, viewPintId) {
 
-		this.reset();
+		if (this.reset()==false) {return;}
 
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".projects").addClass('selected');
 		_.require('/static/dist/projects/projects.css');
@@ -121,7 +120,7 @@ var AppRoute = Backbone.Router.extend({
 
 	//流程
 	flow: function() {
-		this.reset();
+		if (this.reset()==false) {return;}
 		//销毁上传
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".flow").addClass('selected');
 		_.require('/static/dist/flow/flow.css');
@@ -131,7 +130,7 @@ var AppRoute = Backbone.Router.extend({
 
 	//资源库
 	resources: function() {
-		this.reset();
+		if (this.reset()==false) {return;}
 		//销毁上传
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".resources").addClass('selected');
 		_.require('/static/dist/resources/resources.css');
@@ -144,7 +143,7 @@ var AppRoute = Backbone.Router.extend({
 
 	//单个项目
 	resource: function(type) {
-		this.reset();
+		if (this.reset()==false) {return;}
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".resources").addClass('selected');
 		_.require('/static/dist/resources/resources.css');
 		_.require('/static/dist/resources/resources.js');
@@ -154,7 +153,7 @@ var AppRoute = Backbone.Router.extend({
 
 	//项目映射
 	resourceMapping: function(type, optionType) {
-		this.reset();
+		if (this.reset()==false) {return;}
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".resources").addClass('selected');
 		_.require('/static/dist/resources/resources.css');
 		_.require('/static/dist/resources/resources.js');
@@ -167,7 +166,7 @@ var AppRoute = Backbone.Router.extend({
 	},
 
 	resourceModel: function(type, projectId, versionId) {
-		this.reset();
+		if (this.reset()==false) {return;}
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".resources").addClass('selected');
 		_.require('/static/dist/resources/resources.css');
 		_.require('/static/dist/resources/resources.js');
@@ -181,7 +180,7 @@ var AppRoute = Backbone.Router.extend({
 
 	//貌似改掉了
 	console: function(type, step) {
-		this.reset();
+		if (this.reset()==false) {return;}
 		//销毁上传
 		_.require('/static/dist/console/console.css');
 		_.require('/static/dist/console/console.js');
@@ -193,7 +192,7 @@ var AppRoute = Backbone.Router.extend({
 	},
 	//by zzx
 	console1: function(type, step) {
-		this.reset();
+		if (this.reset()==false) {return;}
 		//销毁上传
 		_.require('/static/dist/console1/console.css');
 		_.require('/static/dist/console1/console.js');
@@ -206,7 +205,7 @@ var AppRoute = Backbone.Router.extend({
 
 	//服务-项目管理-项目映射规则
 	servicesMappingRule: function(type, optionType, projectModelId) {
-		this.reset();
+		if (this.reset()==false) {return;}
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".services").addClass('selected');
 		_.require('/static/dist/resources/resources.css');
 		_.require('/static/dist/resources/resources.js');
@@ -221,7 +220,7 @@ var AppRoute = Backbone.Router.extend({
 
 
 	services: function(type, tab) {
-		this.reset();
+		if (this.reset()==false) {return;}
 		$("#pageLoading").hide();
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".services").addClass('selected');
 		_.require('/static/dist/services/services.css');
@@ -232,28 +231,21 @@ var AppRoute = Backbone.Router.extend({
 
 	//重置数据
 	reset: function() {
-		 //判断是否是IE浏览器
-		//var hash = window.location.hash;
-		//if(hash && hash!="#bodyContent"){
-		//	var explorer = window.navigator.userAgent ;
-		//	//ie
-		//	if (!!window.ActiveXObject || "ActiveXObject" in window){
-		//		window.location.href = "/static/dist/app/todo/remind.html";
-		//	}
-		//} 
+		 
 		if (App.Comm.isIEModel()) {
-			return;
-		}else{
+			return false;
+		} else {
 			_.require('/static/dist/libs/libsH5.js');
 		} 
-		 
+
+		//用户信息
+		App.Global.User = JSON.parse(localStorage.getItem("user"));
+		$("#pageLoading").show();
+
 		if (!$._data($(".user > span")[0], "events")) {
 			//绑定用户信息
 			App.TopNav.init();
 		}
-		//用户信息
-		App.Global.User = JSON.parse(localStorage.getItem("user"));
-		$("#pageLoading").show();
 
 		//销毁上传
 		App.Comm.upload.destroy();
@@ -261,7 +253,7 @@ var AppRoute = Backbone.Router.extend({
 
 		if (!App.Global.User || !App.Comm.getCookie('OUTSSO_AuthMAC')) {
 			App.Comm.ajax({
-				URLtype:"current"
+				URLtype: "current"
 			});
 			return;
 			//location.href="/login.html";
@@ -305,9 +297,9 @@ App.Router = new AppRoute();
 //开始监听
 Backbone.history.start();
 
-if (!("ActiveXObject" in window) && !window.ActiveXObject) { 
+if (!("ActiveXObject" in window) && !window.ActiveXObject) {
 	//轮训
-	setInterval(function(){
+	setInterval(function() {
 		App.Comm.checkOnlyCloseWindow();
-	},3000);
+	}, 3000);
 }

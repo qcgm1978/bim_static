@@ -109,8 +109,7 @@ App.Comm = {
 		return '';
 	},
 
-	user: function(key) {
-
+	user: function(key) { 		 
 		if (!App.Global.User) {
 			window.location.href = "/login.html";
 		} else {
@@ -552,6 +551,7 @@ App.Comm = {
 		}
 
 	}
+
 };
 
 

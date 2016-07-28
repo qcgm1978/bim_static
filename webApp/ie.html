@@ -25,7 +25,7 @@
 	     cookUrl.lastIndexOf("about:blank")<=-1 && cookUrl ||
 	    	 window.location.href.substring(window.location.href.lastIndexOf("path") + 5) ||
 	    	  window.location.host+"/login.html";
-	    
+	    console.log(url);
 	    myWebView.url = url;
 	    myWebView.id="webView";
 	    myWebView.registerEvent('newWindow', navigateTo); 
@@ -38,7 +38,13 @@
 				window.close();
 			}		
 	    	//登录后设置 cookie
-	    	myWebView.runScript("document.cookie",function(cookies){
+	    	myWebView.runScript("App.Comm.getCookAndStore()",function(cookStore){
+	    		
+	    		if (!cookStore) {return;}
+
+	    		cookStore=JSON.parse(cookStore);
+
+	    		var cookies=cookStore.cookie,user=cookStore.user;
 	    		 //比较cookie
 	    		if (getCookie("userId") != getCookie("userId",cookies)) {
 	    			//登录设置 登出删除
@@ -46,12 +52,15 @@
 	    	 		if (keys && keys.length>1) {
 	    	 			for(var i=0;i<keys.length;i++){
 	    	 				setCookie(keys[i],getCookie(keys[i],cookies));
-	    	 			}
+	    	 			} 
+	    	 			localStorage.user=user;
+
 	    	 		}else{
 	    	 			var keys = document.cookie.match(/[^ =;]+(?=\=)/g);
 	    	 			for(var i=0;i<keys.length;i++){
 	    	 				delCookie(keys[i]);
 	    	 			}
+	    	 			localStorage.removeItem("user");
 	    	 		}
 	    	    } 
 	    	 	
@@ -111,16 +120,22 @@
 		}
 		//获取cookie
 		function getCookie(name,cookis) {
-			var arr, reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)");
 
-			if (!cookis) {
-				cookis=document.cookie;
+			try{
+
+				var arr, reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)");
+
+				if (!cookis) {
+					cookis=document.cookie;
+				} 
+				if (arr = cookis.match(reg))
+					return unescape(arr[2]);
+				else
+					return null;
+			}catch(e){
+				return '';
 			}
-
-			if (arr = cookis.match(reg))
-				return unescape(arr[2]);
-			else
-				return null;
+			
 		}
 		//删除cookie
 		function delCookie(name) {
