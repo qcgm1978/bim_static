@@ -343,7 +343,7 @@
 			//window.addEventListener('resize', resizeWebView, false);
 		},
 		renderModel: function() {
-		//	App.Comm.setOnlyModel();//检查是否是唯一的 模型
+			Project.setOnlyModel();//检查是否是唯一的 模型
 			this.viewer = new bimView({
 				type: 'model',
 				element: this.$modelView,
@@ -354,9 +354,9 @@
 			})
 			Project.Viewer = this.viewer;
 			$('.m-camera').addClass('disabled').attr('disabled', 'disabled');
-			/*setInterval(function(){
-				App.Comm.checkOnlyCloseWindow();
-			},3000);*/
+			setInterval(function(){
+			 Project.checkOnlyCloseWindow();
+			},3000);
 		}
 	}
 
@@ -480,6 +480,46 @@
 					Project.pageInfo(data);
 				}
 			});
+		},
+		//检查是否是唯一的 模型
+		setOnlyModel: function() {
+			var onlyCount = App.Comm.getCookie("onlyCount");
+			if (!onlyCount) {
+				App.Comm.setCookie("onlyCount", 1);
+				Project.onlyCount = 1;
+			} else {
+				onlyCount++;
+				App.Comm.setCookie("onlyCount", onlyCount);
+				Project.onlyCount = onlyCount;
+			}
+		},
+
+		//关闭窗口
+		checkOnlyCloseWindow: function() {
+
+			var onlyCount = App.Comm.getCookie("onlyCount");
+			//没加载过模型
+			if (!onlyCount || !Project.onlyCount) {
+				return;
+			}
+
+			if (onlyCount != Project.onlyCount) {
+				if (navigator.userAgent.indexOf("Firefox") != -1 || navigator.userAgent.indexOf("Chrome") != -1) {
+					window.location.href = "about:blank";
+					//window.close();
+				} else {
+					window.opener = null;
+					window.open("", "_self");
+					window.close();
+				}
+			}
+
+			//重置 一直累加会溢出
+			if (onlyCount == Project.onlyCount && Project.onlyCount > 100) {
+				App.Comm.setCookie("onlyCount", 1);
+				Project.onlyCount = 1;
+			}
+
 		}
 
 	}
