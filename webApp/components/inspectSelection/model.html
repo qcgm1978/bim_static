@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8">
     <title>模型选择器</title>
-    <script src="http://bim.wanda-dev.cn/static/dist/components/inspectSelection/js/inspectSelection.js"></script>
+    <script src="/static/dist/components/inspectSelection/js/inspectSelection.js"></script>
   </head>
   <body>
     <script>
@@ -18,20 +18,25 @@
           }   
        }   
        return theRequest;   
-    } 
-    var Request = GetRequest();  
+    }
+    var Request = GetRequest();
+    alert(Request.ruleType+","+Request.etag)
     var viewer = new InspectModelSelection({
       type:Request.type,//open process
       sourceId: Request.sourceId,
       etag: Request.etag,
       projectId:Request.projectId,
       projectVersionId: Request.projectVersionId,
+      ruleType:Request.ruleType,
       //res 选择的检查点数据
       callback:function(res){
       }
     });
-   
-    function getData(){ 
+    alert(8);
+    function extProject(){
+        return viewer.Project.Settings;
+    }
+    function getData(){
         var d=$('.tbOpeningacceptanceBody tr.selected'),
             id=d.data('id'),
             result={},
