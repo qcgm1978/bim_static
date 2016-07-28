@@ -6,30 +6,105 @@ var AppKeyRoute = Backbone.Router.extend({
 		'project/:projectCode/version/:versionId': 'project', //项目
 		'project/:projectCode/version/:versionId/differ/std': 'projectDifferStd', // 浏览项目模型与标准模型差异
 		'project/:projectCode/version/:versionId/differ/base': 'projectDifferBase', //浏览变更模型与变更基准模型差异
+		'project/:projectCode/plan/:planId': 'projectPlan',
 		'share/:token': "shareModel", //分享模型
 		'logout': 'logout'
 	},
 
+	//项目计划节点
+	projectPlan(projectId, planId) {
+
+		var _this = this;
+		//初始化之前 验证
+		this.beforeInit(() => {
+
+			_.require('/static/dist/projects/projects.css');
+			_.require('/static/dist/projects/projects.js'); 
+
+			App.Project.Settings = $.extend({}, App.Project.Defaults);
+
+			App.Project.Settings.projectId = projectId;
+
+			App.Project.Settings.planId = planId;
+
+			App.Project.Settings.type = "token";
+
+			_this.fetchLastProjectVersionId(projectId, function(data) { 
+				if (data) {
+					App.Project.Settings.versionId = data.version.id;
+
+					_this.fetchBuildIdByPlanCode(planId,projectId,App.Project.Settings.versionId,function(){
+						App.Project.init();
+					}); 
+					
+				}
+
+			})
+
+		});
+	},
+
+	//获取项目最新版本
+	fetchLastProjectVersionId(projectId, callback) {
+ 
+		var data = {
+			URLtype: 'fetchProjectBaseInfo',
+			data: { 
+				projectId: projectId
+			}
+		} 
+		App.Comm.ajax(data, function(res) {
+			if (res.code == 0) {
+				callback(res.data);
+			} else {
+				callback(null);
+			}
+		})
+	},
+
+	//根据计划节点获取对应的构建
+	fetchBuildIdByPlanCode(planCode,projectId,projectVersionId,callback){
+		App.Comm.ajax({
+			URLtype:"fetchModleIdByCode",
+			data:{
+				projectId:projectId,
+				projectVersionId:projectVersionId,
+				planCode:planCode
+			}
+		},function(data){
+
+			 if (data.code==0) { 
+			 	App.Project.Settings.PlanElement= data.data; //.elements 
+			 } 
+
+			 if ($.isFunction(callback)) {
+			 	callback();
+			 }
+		});
+	},
+
+
+
 	//模型分享
 	shareModel(token) {
-		App.Comm.isIEModel();
+
+		if (App.Comm.isIEModel()) {
+			return;
+		}
 		_.require('/static/dist/projects/projects.css');
 		_.require('/static/dist/projects/projects.js');
 
 		App.Project.Settings = $.extend({}, App.Project.Defaults);
 
-
 		this.parseToken(token, function() {
 			App.Project.init();
 		});
-
-
-
+ 
 	},
 
 	//解析token
 	parseToken(token, callback) {
-		 
+
 		var data = {
 			URLtype: 'parseToken',
 			data: {
@@ -38,30 +113,28 @@ var AppKeyRoute = Backbone.Router.extend({
 		}
 
 		App.Comm.ajax(data, function(data) {
-			   
+
 			if (data.code == 0) {
 
-				data=data.data;
+				data = data.data;
 
-				App.Project.Settings.projectId =data.projectId;
+				App.Project.Settings.projectId = data.projectId;
 
 				App.Project.Settings.versionId = data.projectVersionId;
 
 				App.Project.Settings.type = "token";
 
-				App.Project.Settings.token=data.token;
+				App.Project.Settings.token = data.token;
 
 				$("#topBar").prepend(' <ul class="navHeader"> <li class="item "> <span class="login">立即登录</span> </li></ul>');
 
-				App.Comm.setCookie("token_cookie",data.cookie);
+				App.Comm.setCookie("token_cookie", data.cookie);
 				//回调
 				if ($.isFunction(callback)) {
 					callback();
 				}
 			}
 		});
-
-
 	},
 
 
@@ -97,7 +170,7 @@ var AppKeyRoute = Backbone.Router.extend({
 
 	//项目
 	project(projectCode, versionId) {
-		var _this=this;
+		var _this = this;
 		//初始化之前 验证
 		this.beforeInit(() => {
 
@@ -113,16 +186,13 @@ var AppKeyRoute = Backbone.Router.extend({
 
 			App.Project.Settings.type = "token";
 
-			_this.projectByCode(projectCode,function(data){
-				if(data){
+			_this.projectByCode(projectCode, function(data) {
+				if (data) {
 					App.Project.Settings.projectId = data.projectId;
 					App.Project.init();
 				}
 
 			})
-
-
-
 
 		});
 
@@ -160,11 +230,8 @@ var AppKeyRoute = Backbone.Router.extend({
 			App.ResourceModel.init();
 
 		});
-
-
-
-	},
-
+ 
+	}, 
 
 
 	//资源库
@@ -185,8 +252,7 @@ var AppKeyRoute = Backbone.Router.extend({
 
 		});
 
-	},
-
+	}, 
 
 
 	//重置数据
@@ -201,7 +267,11 @@ var AppKeyRoute = Backbone.Router.extend({
 
 	//加载之前
 	beforeInit(callback) {
-		App.Comm.isIEModel();
+
+		if (App.Comm.isIEModel()) {
+			return;
+		}
+
 		//验证登录
 		this.checkLogin((isLogin) => {
 
@@ -235,11 +305,11 @@ var AppKeyRoute = Backbone.Router.extend({
 			URLtype: "appToken",
 			data: {
 				appKey: appKey,
-				token: 123
+				token: token
 			}
 		}
 
-		App.Comm.ajax(data, function(data) {
+		App.Comm.ajax(data, function(data) { 
 			if (data.code == 0) {
 
 				App.Comm.setCookie("token_cookie", data.data);
@@ -264,8 +334,7 @@ var AppKeyRoute = Backbone.Router.extend({
 	},
 
 	//获取用户信息
-	getUserInfo(fn) {
-
+	getUserInfo(fn) { 
 
 		var that = this;
 
@@ -319,18 +388,24 @@ var AppKeyRoute = Backbone.Router.extend({
 		});
 	},
 
-	projectByCode(code,callback){
+	projectByCode(code, callback) {
+
+		var Request = App.Comm.GetRequest(),
+			appKey = Request.appKey,
+			token = Request.token;
+
 		var data = {
 			URLtype: 'projectByCode',
 			data: {
-				token:123,
-				code:code
+				token: token,
+				code: code
 			}
 		}
-		App.Comm.ajax(data,function(res){
-			if(res.code==0){
+
+		App.Comm.ajax(data, function(res) {
+			if (res.code == 0) {
 				callback(res.data);
-			}else{
+			} else {
 				callback(null);
 			}
 		})
@@ -358,9 +433,9 @@ App.AppKeyRoute = new AppKeyRoute();
 Backbone.history.start();
 
 //轮训
-if (!("ActiveXObject" in window) && !window.ActiveXObject) { 
+if (!("ActiveXObject" in window) && !window.ActiveXObject) {
 	//轮训
-	setInterval(function(){
+	setInterval(function() {
 		App.Comm.checkOnlyCloseWindow();
-	},3000);
+	}, 3000);
 }

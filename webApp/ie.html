@@ -25,7 +25,7 @@
 	     cookUrl.lastIndexOf("about:blank")<=-1 && cookUrl ||
 	    	 window.location.href.substring(window.location.href.lastIndexOf("path") + 5) ||
 	    	  window.location.host+"/login.html";
-	    console.log(url);
+	    
 	    myWebView.url = url;
 	    myWebView.id="webView";
 	    myWebView.registerEvent('newWindow', navigateTo); 
