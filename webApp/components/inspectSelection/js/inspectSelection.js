@@ -163,7 +163,6 @@
 							_this.Project=Project;
 							_this.init();
 				    	}else if(data.code==10004){
-				    		//alert();
 				    	//	document.location.href=ourl+"/login.html";
 				    	}
 				    	
@@ -201,7 +200,6 @@
 					self.dialog();
 					self.controll();
 				})
-
 			});
 		},
 		controll: function() {
@@ -583,7 +581,6 @@
 			this.OpeningAcceptanceOptions = options.OpeningAcceptance;
 
 			var tpl = _.template(strVar2);
-
 			this.$el.html(tpl({
 				userData:Project.Settings.type=='open'?mapData.openCategory:mapData.processCategory,
 				ruleType:Project.Settings.ruleType
