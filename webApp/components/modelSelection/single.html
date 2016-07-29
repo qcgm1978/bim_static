@@ -8,11 +8,12 @@
 <body>
 <input type="button" id="model" value="show">
 <script>
+ jQuery.support.cors = true;
  var viewer = new ModelSelection({
       type:'single',//multi,single
       projectCode:'11130074',
       callback:function(components,markers){
-        console.log(ids);
+          alert(JSON.stringify(components))
       }
     });
 </script>

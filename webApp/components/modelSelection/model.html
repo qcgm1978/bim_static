@@ -9,6 +9,7 @@
 
 <body>
     <script type="text/javascript">
+        jQuery.support.cors = true;
      function GetRequest() {   
        var url = location.search; //获取url中"?"符后的字串   
        var theRequest = new Object();   
@@ -39,6 +40,7 @@
             var id=$(this).data('userId');
             c.push({
                 id:id,
+                fileUniqueId: viewer.Project.fileIds[id]+id.slice(id.indexOf('.')),
                 axis:viewer.Project.axis[id],
                 location:viewer.Project.location[id],
                 locationName:viewer.Project.locationName[id]
