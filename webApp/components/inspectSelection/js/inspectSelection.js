@@ -392,9 +392,18 @@
 		},
 		showInModel: function($target, type) {
 			var _this = this,
-				location = $target.data('location');
-			if(location.indexOf('boundingBox')!=-1){
-				var _temp = JSON.parse(location);
+				id = $target.data('id'),
+				_temp=null,
+				location=null;
+
+			_.each(Project.currentPageListData, function(i) {
+				if(i.id==id){
+					_temp=i.location;
+					location=i.location;
+				}
+			})
+			if(_temp){
+				_temp=JSON.parse(_temp);
 				var box = _this.formatBBox(_temp.bBox || _temp.boundingBox);
 				var ids = [_temp.userId];
 				_this.zoomModel(ids, box);
