@@ -408,6 +408,7 @@
       //  window.BIV=viewer;
       //模型click事件、选择构件、编辑标记
       viewer.on("click", function(model) {
+        debugger
         Project.location[model.intersect.userId]=JSON.stringify({
           boundingBox:model.intersect.object.boundingBox,
           position:model.intersect.object.position

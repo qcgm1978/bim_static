@@ -219,6 +219,7 @@
 						if (i.id == t.data('id')) {
 							result = {
 								id: i.id,
+								fileUniqueId: i.fileId+i.componentId.slice(i.componentId.indexOf('.')),
 								locationName: i.locationName,
 								location: i.location,
 								axis: i.axis
@@ -405,9 +406,9 @@
 			if(_temp){
 				_temp=JSON.parse(_temp);
 				var box = _this.formatBBox(_temp.bBox || _temp.boundingBox);
-				var ids = [_temp.userId];
+				var ids = [_temp.componentId];
 				_this.zoomModel(ids, box);
-				_this.showMarks(location);
+				_this.showMarks(Project.formatMark(location));
 			}
 		},
 
@@ -419,6 +420,14 @@
 		},
 		hideMarks: function() {
 			Project.Viewer && Project.Viewer.loadMarkers(null);
+		},
+
+		formatMark:function(location){
+			var _temp=JSON.parse(location);
+			_temp.shapeType=_temp.shapeType||1;
+			_temp.state=_temp.state||3;
+			_temp.userId=_temp.userId||_temp.componentId;
+			return JSON.stringify(_temp);
 		},
 		//通过userid 和 boundingbox 定位模型
 		zoomModel: function(ids, box) {
@@ -439,7 +448,7 @@
 				var array = [];
 				_.each(Project.currentPageListData, function(i) {
 					if (i.location.indexOf('boundingBox') != -1) {
-						array.push(i.location);
+						array.push(Project.formatMark(i.location));
 					}
 				})
 				Project.showMarks(array);
