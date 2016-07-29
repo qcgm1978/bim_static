@@ -436,6 +436,6 @@ Backbone.history.start();
 if (!("ActiveXObject" in window) && !window.ActiveXObject) {
 	//轮训
 	setInterval(function() {
-		App.Comm.checkOnlyCloseWindow();
+		if (App.Comm && App.Comm.checkOnlyCloseWindow) {App.Comm.checkOnlyCloseWindow();} 
 	}, 3000);
 }
