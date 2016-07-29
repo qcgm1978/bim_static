@@ -41,7 +41,8 @@
         _.each(data, function(i) {
               if (i.id == id) {
                 result = {
-                  id: i.id,
+                  id: i.componentId,
+                  fileUniqueId: i.fileId+i.componentId.slice(i.componentId.indexOf('.')),
                   locationName: i.locationName,
                   location: i.location,
                   axis: i.axis
