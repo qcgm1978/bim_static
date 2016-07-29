@@ -98,7 +98,7 @@ ViewComp.MemberManager = Backbone.View.extend({
 					onClick: function(event, treeId, treeNode) {
 						if(event.target.className.indexOf("button business_ico")!=-1){
 							if(!treeNode.userId && !treeNode.isParent){
-								_this.loadChildren(_this,false,treeNode.orgId,treeNode);
+								_this.loadChildren(_this,treeNode.outer,treeNode.orgId,treeNode);
 							}
 							_this.selectTree.cancelSelectedNode(treeNode);
 						}
@@ -207,7 +207,8 @@ ViewComp.MemberManager = Backbone.View.extend({
 		},function(res){
 			$("#dataLoading").show();
 			if(res.message=="success"){
-				App.Services.projectMember.loadData(App.Services.projectMember.projectMemberMemberCollection,{outer:false},{
+				App.Services.projectMember.loadData(App.Services.projectMember.projectMemberMemberCollection,
+					{outer:App.Comm.user("outer")},{
 					dataPrivilegeId:App.Comm.getCookie("currentPid")
 				});
 				App.Services.maskWindow.close();

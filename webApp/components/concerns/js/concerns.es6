@@ -9,11 +9,10 @@
       },
 
       URL: {
-        fetchQualityOpeningAcceptance: "sixD/{projectId}/{projectVersionId}/acceptance?type=2",
         fetchQualityModelById: "sixD/{projectId}/{versionId}/quality/element",
-        fetchDesignProperties: "sixD/{projectId}/{projectVersionId}/property", //设计属性 ?sceneId={sceneId}&elementId={elementId}
         fetchProjectVersionInfo: "platform/project/{projectId}/version/{projectVersionId}", //项目版本信息
-        fetchQualityConcerns: "sixD/{projectId}/{projectVersionId}/problem" //隐患
+        fetchQualityConcerns: "sixD/{projectId}/{projectVersionId}/problem" ,//隐患,
+        fetchInfoByprojectCode:"platform/api/project/{projectCode}/meta?token=123"
 
       }
     }
@@ -117,6 +116,10 @@
       }, 10);
     },
     renderModel: function() {
+      //设置onlymodel
+      App.Global || (App.Global = {} );
+      App.Comm.setOnlyModel();
+
       this.viewer = new bimView({
         type: 'model',
         element: $('.projectCotent'),
@@ -129,8 +132,9 @@
       $('.m-camera').addClass('disabled').attr('disabled','disabled');
 
       this.viewer.on("loaded", function() {
+        Project.zoomModel(Project.ids, Project.box);
 
-        //Project.showInModel(query.acceptanceId,0);
+        Project.showMarks(Project.locations);
       });
 
       //this.viewer.on("click", function(model) {
@@ -153,7 +157,7 @@
 
   //Project模型操作方法
   var Project = {
-    Settings: {},
+    Settings: {projectVersionId:1111},
     templateCache: [],
     concernsData:{
       type:['随机','过程检查','开业验收','入伙验收'],
@@ -290,7 +294,12 @@
       if (!_.isArray(marks)) {
         marks = [marks];
       }
-      Project.Viewer.loadMarkers(marks);
+      try{
+        Project.Viewer.loadMarkers(marks);
+
+      }catch(e){
+        console.log(marks)
+      }
     },
     //通过userid 和 boundingbox 定位模型
     zoomModel: function(ids, box) {
@@ -325,7 +334,7 @@
         URLtype: "fetchProjectVersionInfo",
         data: {
           projectId: query.projectId,
-          projectVersionId: query.projectVersionId
+          projectVersionId: query.projectVersionId || 110
         }
       };
       //获取构件ID type 0：开业验收 1：过程验收 2：隐患
@@ -423,10 +432,25 @@
 
           //获取数据后处理
           addOne:function(model){
-            var data=model.toJSON();
-            console.log(data)
+            var data=model.toJSON(),
+              items = data.data.items,
+                first = items[0]['location'] ;
+            first = JSON.parse(first);
+            Project.locations=[];
+
             this.$(".tbConcernsBody tbody").html(this.template(data));
-            this.bindScroll();
+            for(var i = 0;i < items.length;i++){
+              var location = items[i]['location'];
+
+              items[i]['location']?Project.locations.push(location):null;
+
+            }
+            Project.box = Project.formatBBox(first['boundingBox']);
+
+            Project.ids = [first['userId']];
+
+
+            //this.bindScroll();
           },
           //绑定滚动条
           bindScroll() {
@@ -464,4 +488,6 @@
 
   win.ModelSelection = ModelSelection;
   win.project = Project;
+
+
 })($, window)

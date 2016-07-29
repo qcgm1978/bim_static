@@ -1,12 +1,12 @@
 var Login = {
 
-	doMain:window.location.host.substring(window.location.host.indexOf(".")),
+	doMain: window.location.host.substring(window.location.host.indexOf(".")),
 
 	setCookie(name, value) {
 		var Days = 0.02,
 			exp = new Date();
 		exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 1000);
-		document.cookie = name + "=" + escape(value) + ";expires=" + exp.toGMTString() + ";domain="+Login.doMain+";path=/";
+		document.cookie = name + "=" + escape(value) + ";expires=" + exp.toGMTString() + ";domain=" + Login.doMain + ";path=/";
 	},
 	//获取cookie
 	getCookie: function(name) {
@@ -22,7 +22,7 @@ var Login = {
 		exp.setTime(exp.getTime() - 31 * 24 * 60 * 60 * 1000);
 		var cval = this.getCookie(name);
 		if (cval != null)
-			document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString() + ";domain="+Login.doMain+";path=/";
+			document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString() + ";domain=" + Login.doMain + ";path=/";
 	},
 
 	//事件绑定
@@ -94,15 +94,15 @@ var Login = {
 		}).done(function(data) {
 			if (data.code == 0) {
 
-				var keys=[];
+				var keys = [];
 				if (data.data && typeof data.data === 'object') {
 					for (var p in data.data) {
 						Login.setCookie(p, data.data[p]);
 						keys.push(p);
 					}
 				}
-				
-				localStorage.setItem("keys",keys.join(','));
+
+				localStorage.setItem("keys", keys.join(','));
 				Login.delCookie("token_cookie");
 				//获取用户信息
 				Login.getUserInfo();
@@ -122,7 +122,7 @@ var Login = {
 	//获取用户信息
 	getUserInfo() {
 		$.ajax({
-			url: '/platform/user/current?t='+(+new Date())			 
+			url: '/platform/user/current?t=' + (+new Date())
 
 		}).done(function(data) {
 
@@ -138,7 +138,7 @@ var Login = {
 			localStorage.setItem("user", JSON.stringify(data.data))
 			Login.setCookie('userId', data.data.userId);
 			Login.setCookie('isOuter', data.data.outer);
-			 
+
 			//记住我
 			if ($(".loginDialog .remember").hasClass("selected")) {
 				Login.rememberMe();
@@ -147,7 +147,7 @@ var Login = {
 			}
 			//是否主动退出标记 2 默认状态 1 为主动退出
 			Login.setCookie('IS_OWNER_LOGIN', '2');
-			
+
 			if (r && r != document.URL) {
 				window.location = decodeURIComponent(r);
 			} else {
@@ -202,6 +202,17 @@ var Login = {
 }
 
 
+var App = {
+	Comm: { 
+		//獲取cook 和 localstore
+		getCookAndStore: function() {
+			return JSON.stringify({
+				cookie: document.cookie,
+				user: localStorage.getItem("user")
+			});
+		}
+	}
+}
 
 /** trim() method for String */
 String.prototype.trim = function() {

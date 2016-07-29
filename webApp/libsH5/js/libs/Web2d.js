@@ -3019,7 +3019,6 @@ CLOUD.Extensions.Annotation = function (editor, id) {
     this.rotation = 0;
 
     this.style = this.getDefaultStyle();
-    this.viewport = {width: 0, height: 0};
     this.shape = null;
     this.selected = false;
     this.highlighted = false;
@@ -3074,7 +3073,7 @@ CLOUD.Extensions.Annotation.prototype = {
         this.setParent(null);
     },
 
-    set: function (position, size, rotation, viewport) {
+    set: function (position, size, rotation) {
 
         this.position.x = position.x;
         this.position.y = position.y;
@@ -3082,10 +3081,6 @@ CLOUD.Extensions.Annotation.prototype = {
         this.size.width = size.width;
         this.size.height = size.height;
         this.rotation = rotation || 0;
-
-        if (viewport) {
-            this.setViewport(viewport);
-        }
 
         this.update();
     },
@@ -3114,7 +3109,7 @@ CLOUD.Extensions.Annotation.prototype = {
 
     getClientPosition: function () {
 
-        return this.editor.worldToClient(this.position);
+        return this.editor.getAnnotationClientPosition(this.position);
     },
 
     resetSize: function (size, position) {
@@ -3129,46 +3124,7 @@ CLOUD.Extensions.Annotation.prototype = {
 
     getClientSize: function () {
 
-        var width, height, xScale, yScale;
-        var containerBound = this.editor.getDomContainerBounds();
-
-        if (this.viewport.width !== 0 && this.viewport.height !== 0) {
-
-            xScale = containerBound.width / this.viewport.width;
-            yScale = containerBound.height / this.viewport.height;
-
-            // 确保图形不变形: 窗口的宽度放大（或缩小）w倍，高度放大（或缩小）h倍。
-            // 当w>=h时，图形的宽度和高度都放大（或缩小）h倍；
-            // 当w<h时, 图形的宽度和高度都放大（或缩小）w倍。
-            if (xScale >= yScale) {
-                xScale = yScale;
-            }else{
-                yScale = xScale;
-            }
-
-            width = Math.floor(xScale * this.size.width + 0.5);
-            height = Math.floor(yScale * this.size.height + 0.5);
-
-        } else {
-
-            xScale = 1;
-            yScale = 1;
-            width = Math.floor(this.size.width + 0.5);
-            height = Math.floor(this.size.height + 0.5);
-        }
-
-        return {xScale: xScale, yScale: yScale, width: width, height: height};
-    },
-
-    setViewport: function (viewport) {
-
-        this.viewport.width = viewport.width;
-        this.viewport.height = viewport.height;
-    },
-
-    getViewport: function () {
-
-        return this.viewport;
+        return this.editor.getAnnotationClientSize(this.size, this.position);
     },
 
     setParent: function (parent) {
@@ -3260,8 +3216,8 @@ CLOUD.Extensions.AnnotationArrow = function (editor, id) {
     CLOUD.Extensions.Annotation.call(this, editor, id);
 
     this.shapeType = CLOUD.Extensions.Annotation.shapeTypes.ARROW;
-    this.head = new THREE.Vector3();
-    this.tail = new THREE.Vector3();
+    this.head = new THREE.Vector2();
+    this.tail = new THREE.Vector2();
     this.disableResizeHeight = true;
     this.size.height = this.style['stroke-width'] * 4; // 箭头固定高度
 
@@ -3290,7 +3246,7 @@ CLOUD.Extensions.AnnotationArrow.prototype.createShape = function () {
     this.shape = CLOUD.Extensions.Utils.Shape2D.createSvgElement('polygon');
 };
 
-CLOUD.Extensions.AnnotationArrow.prototype.setByTailHead = function (tail, head, viewport) {
+CLOUD.Extensions.AnnotationArrow.prototype.setByTailHead = function (tail, head) {
 
     var v0 = new THREE.Vector2(tail.x, tail.y);
     var v1 = new THREE.Vector2(head.x, head.y);
@@ -3301,27 +3257,26 @@ CLOUD.Extensions.AnnotationArrow.prototype.setByTailHead = function (tail, head,
 
     // 计算旋转角度
     this.rotation = Math.acos(dir.dot(new THREE.Vector2(1, 0)));
-    this.rotation = head.y < tail.y ? (Math.PI * 2) - this.rotation : this.rotation;
+    this.rotation = head.y > tail.y ? (Math.PI * 2) - this.rotation : this.rotation;
 
-    this.tail.set(tail.x, tail.y, 0);
-    this.head.set(head.x, head.y, 0);
+    this.tail.set(tail.x, tail.y);
+    this.head.set(head.x, head.y);
 
-    // 计算位置
-    var dx = this.head.x - this.tail.x;
-    var dy = this.head.y - this.tail.y;
-    var posX = this.tail.x + dx * 0.5;
-    var posY = this.tail.y + dy * 0.5;
-    var center = {x: posX, y: posY};
-    var position = this.editor.clientToWorld(center);
-    this.position.x = position.x;
-    this.position.y = position.y;
-    this.position.z = position.z;
+    var depth = tail.z;
 
-    if (viewport) {
-        this.setViewport(viewport);
-    }
+    this.position.x = 0.5 * (this.head.x + this.tail.x);
+    this.position.y = 0.5 * (this.head.y + this.tail.y);
+    this.position.z = depth;
 
     this.update();
+};
+
+CLOUD.Extensions.AnnotationArrow.prototype.getClientSize = function () {
+
+    var size = this.editor.getAnnotationClientSize(this.size, this.position);
+    size.height = this.style['stroke-width'] * 4;
+
+    return size;
 };
 
 CLOUD.Extensions.AnnotationArrow.prototype.resetSize = function (size, position) {
@@ -3329,14 +3284,12 @@ CLOUD.Extensions.AnnotationArrow.prototype.resetSize = function (size, position)
     var dir = new THREE.Vector2(Math.cos(this.rotation), Math.sin(this.rotation));
     dir.multiplyScalar(size.width * 0.5);
 
-    var clientPosition = this.editor.worldToClient(position);
-
-    var center = new THREE.Vector2(clientPosition.x, clientPosition.y);
+    var center = new THREE.Vector2(position.x, position.y);
     var tail = center.clone().sub(dir);
     var head = center.clone().add(dir);
 
-    this.tail.set(tail.x, tail.y, 0);
-    this.head.set(head.x, head.y, 0);
+    this.tail.set(tail.x, tail.y);
+    this.head.set(head.x, head.y);
 
     this.position.x = position.x;
     this.position.y = position.y;
@@ -3347,51 +3300,20 @@ CLOUD.Extensions.AnnotationArrow.prototype.resetSize = function (size, position)
     this.update();
 };
 
-CLOUD.Extensions.AnnotationArrow.prototype.getClientSize = function () {
-
-    var width, height, xScale, yScale;
-    var containerBound = this.editor.getDomContainerBounds();
-
-    if (this.viewport.width !== 0 && this.viewport.height !== 0) {
-
-        xScale = containerBound.width / this.viewport.width;
-        yScale = containerBound.height / this.viewport.height;
-
-        if (xScale >= yScale) {
-            xScale = yScale;
-        }else{
-            yScale = xScale;
-        }
-
-        width = Math.floor(xScale * this.size.width + 0.5);
-        height = this.size.height;
-
-    } else {
-
-        xScale = 1;
-        yScale = 1;
-        width = Math.floor(this.size.width + 0.5);
-        height = this.size.height;
-    }
-
-    return {xScale: xScale, yScale: yScale, width: width, height: height};
-};
 
 CLOUD.Extensions.AnnotationArrow.prototype.resetPosition = function (position) {
 
     var dx = this.head.x - this.tail.x;
     var dy = this.head.y - this.tail.y;
 
+    this.tail.x = position.x - dx * 0.5;
+    this.tail.y = position.y - dy * 0.5;
+    this.head.x = this.tail.x + dx;
+    this.head.y = this.tail.y + dy;
+
     this.position.x = position.x;
     this.position.y = position.y;
     this.position.z = position.z;
-
-    var clientPosition = this.editor.worldToClient(position);
-
-    this.tail.x = clientPosition.x - dx * 0.5;
-    this.tail.y = clientPosition.y - dy * 0.5;
-    this.head.x = this.tail.x + dx;
-    this.head.y = this.tail.y + dy;
 
     this.update();
 };
@@ -3410,11 +3332,9 @@ CLOUD.Extensions.AnnotationArrow.prototype.update = function () {
     var size = this.getClientSize();
     var offsetX = 0.5 * size.width;
     var offsetY = 0.5 * size.height;
-    var positionX = position.x;
-    var positionY = position.y;
 
     this.transformShape = [
-        'translate(', positionX, ',', positionY, ') ',
+        'translate(', position.x, ',', position.y, ') ',
         'rotate(', THREE.Math.radToDeg(this.rotation), ') ',
         'translate(', -offsetX, ',', -offsetY, ') '
     ].join('');
@@ -3435,12 +3355,12 @@ CLOUD.Extensions.AnnotationArrow.prototype.getShapePoints = function () {
     var headLen = halfLen - (2.0 * thickness);
 
     var p1 = [-halfLen, -halfThickness];
-    var p7 = [-halfLen, halfThickness];
-    var p4 = [halfLen, 0];
-    var p3 = [headLen, -thickness];
     var p2 = [headLen, -halfThickness];
-    var p6 = [headLen, halfThickness];
+    var p3 = [headLen, -thickness];
+    var p4 = [halfLen, 0];
     var p5 = [headLen, thickness];
+    var p6 = [headLen, halfThickness];
+    var p7 = [-halfLen, halfThickness];
 
     var points = [p1, p2, p3, p4, p5, p6, p7];
 
@@ -3454,20 +3374,18 @@ CLOUD.Extensions.AnnotationArrow.prototype.getShapePoints = function () {
 
 CLOUD.Extensions.AnnotationArrow.prototype.renderToCanvas = function (ctx) {
 
-    var position = this.getClientPosition();
-    var size = this.getClientSize();
-    var strokeWidth = this.style['stroke-width'] *2;
+    var strokeWidth = this.style['stroke-width'] * 2;
     var strokeColor = this.style['stroke-color'];
     var strokeOpacity = this.style['stroke-opacity'];
 
+    var position = this.getClientPosition();
+    var size = this.getClientSize();
     var offsetX = size.width * 0.5;
     var offsetY = strokeWidth;
-    var posX = position.x;
-    var posY = position.y;
 
     var m1 = new THREE.Matrix4().makeTranslation(-offsetX, -offsetY, 0);
     var m2 = new THREE.Matrix4().makeRotationZ(this.rotation);
-    var m3 = new THREE.Matrix4().makeTranslation(posX, posY, 0);
+    var m3 = new THREE.Matrix4().makeTranslation(position.x, position.y, 0);
     var transform = m3.multiply(m2).multiply(m1);
 
     var points = this.getShapePoints();
@@ -3477,10 +3395,8 @@ CLOUD.Extensions.AnnotationArrow.prototype.renderToCanvas = function (ctx) {
 
     points.forEach(function (point) {
 
-        var x = point[0], y = point[1];
-        var client = new THREE.Vector3(x, y, 0);
-
-        client = client.applyMatrix4(transform);
+        var client = new THREE.Vector3(point[0], point[1], 0);
+        client.applyMatrix4(transform);
         ctx.lineTo(client.x, client.y);
     });
 
@@ -3527,11 +3443,12 @@ CLOUD.Extensions.AnnotationRectangle.prototype.update = function () {
     var fillColor = this.style['fill-color'];
     var fillOpacity = this.style['fill-opacity'];
 
-    var size = this.getClientSize();
     var position = this.getClientPosition();
-
-    var offsetX = Math.max(size.width - strokeWidth, 0) * 0.5;
-    var offsetY = Math.max(size.height - strokeWidth, 0) * 0.5;
+    var size = this.getClientSize();
+    var width = Math.max(size.width - strokeWidth, 0);
+    var height = Math.max(size.height - strokeWidth, 0);
+    var offsetX = 0.5 * width;
+    var offsetY = 0.5 * height;
 
     this.transformShape = [
         'translate(', position.x, ',', position.y, ') ',
@@ -3543,8 +3460,8 @@ CLOUD.Extensions.AnnotationRectangle.prototype.update = function () {
     this.shape.setAttribute('stroke-width', strokeWidth);
     this.shape.setAttribute("stroke", CLOUD.Extensions.Utils.Shape2D.getRGBAString(strokeColor, strokeOpacity));
     this.shape.setAttribute('fill', CLOUD.Extensions.Utils.Shape2D.getRGBAString(fillColor, fillOpacity));
-    this.shape.setAttribute('width', Math.max(size.width - strokeWidth, 0) + '');
-    this.shape.setAttribute('height', Math.max(size.height - strokeWidth, 0) + '');
+    this.shape.setAttribute('width', width + '');
+    this.shape.setAttribute('height', height + '');
 };
 
 CLOUD.Extensions.AnnotationRectangle.prototype.renderToCanvas = function (ctx) {
@@ -3557,8 +3474,8 @@ CLOUD.Extensions.AnnotationRectangle.prototype.renderToCanvas = function (ctx) {
 
     var size = this.getClientSize();
     var position = this.getClientPosition();
-    var width = size.width - strokeWidth;
-    var height = size.height - strokeWidth;
+    var width = Math.max(size.width - strokeWidth, 0);
+    var height = Math.max(size.height - strokeWidth, 0);
 
     ctx.strokeStyle = CLOUD.Extensions.Utils.Shape2D.getRGBAString(strokeColor, strokeOpacity);
     ctx.fillStyle = CLOUD.Extensions.Utils.Shape2D.getRGBAString(fillColor, fillOpacity);
@@ -3664,8 +3581,8 @@ CLOUD.Extensions.AnnotationCircle.prototype.renderToCanvas = function (ctx) {
 
     var position = this.getClientPosition();
     var size = this.getClientSize();
-    var width = size.width - strokeWidth;
-    var height = size.height - strokeWidth;
+    var width = Math.max(size.width - strokeWidth, 0);
+    var height = Math.max(size.height - strokeWidth, 0);
 
     ctx.strokeStyle = CLOUD.Extensions.Utils.Shape2D.getRGBAString(strokeColor, strokeOpacity);
     ctx.fillStyle = CLOUD.Extensions.Utils.Shape2D.getRGBAString(fillColor, fillOpacity);
@@ -3689,12 +3606,12 @@ CLOUD.Extensions.AnnotationCloud = function (editor, id) {
 
     this.shapeType = CLOUD.Extensions.Annotation.shapeTypes.CLOUD;
     this.shapePoints = [];
-    this.shapePath = [];
     this.trackingPoint = {x: 0, y: 0};
     this.isSeal = false; // 是否封口
     this.isTracking = false;
     this.isEnableTrack = false;
-    this.initialSize = {};
+    this.originSize = {width: 1, height:1};
+    this.viewBox = {width: 1000, height: 1000};
 
     this.createShape();
     this.addDomEventListeners();
@@ -3721,26 +3638,22 @@ CLOUD.Extensions.AnnotationCloud.prototype.createShape = function () {
     this.shape = CLOUD.Extensions.Utils.Shape2D.createSvgElement('path');
 };
 
-CLOUD.Extensions.AnnotationCloud.prototype.setByPositions = function (positions, viewport, isSeal) {
+CLOUD.Extensions.AnnotationCloud.prototype.setByPositions = function (positions, isSeal) {
 
     this.positions = positions.concat();
 
     this.isSeal = isSeal || false;
 
-    if (viewport) {
-        this.setViewport(viewport);
-    }
-
     // 计算位置及大小
     this.calculatePosition(true);
 
-    this.initialSize.width = (this.size.width === 0) ? 1 : this.size.width;
-    this.initialSize.height = (this.size.height === 0) ? 1 : this.size.height;
+    this.originSize.width = (this.size.width === 0) ? 1 : this.size.width;
+    this.originSize.height = (this.size.height === 0) ? 1 : this.size.height;
 
     this.update();
 };
 
-CLOUD.Extensions.AnnotationCloud.prototype.set = function (position, size, rotation, viewport, shapePointsStr, initialSize) {
+CLOUD.Extensions.AnnotationCloud.prototype.set = function (position, size, rotation, shapePointsStr, originSize) {
 
     this.position.x = position.x;
     this.position.y = position.y;
@@ -3749,22 +3662,18 @@ CLOUD.Extensions.AnnotationCloud.prototype.set = function (position, size, rotat
     this.size.height = size.height;
     this.rotation = rotation || 0;
 
-    if (viewport) {
-        this.setViewport(viewport);
-    }
+    if (originSize) {
 
-    this.setShapePoints(shapePointsStr);
-
-    if (initialSize) {
-
-        this.initialSize.width = (initialSize.width === 0) ? 1 : initialSize.width;
-        this.initialSize.height = (initialSize.height === 0) ? 1 : initialSize.height;
+        this.originSize.width = (originSize.width === 0) ? 1 : originSize.width;
+        this.originSize.height = (originSize.height === 0) ? 1 : originSize.height;
 
     } else {
 
-        this.initialSize.width = (this.size.width === 0) ? 1 : this.size.width;
-        this.initialSize.height = (this.size.height === 0) ? 1 : this.size.height;
+        this.originSize.width = (this.size.width === 0) ? 1 : this.size.width;
+        this.originSize.height = (this.size.height === 0) ? 1 : this.size.height;
     }
+
+    this.setShapePoints(shapePointsStr);
 
     this.update();
 };
@@ -3790,82 +3699,105 @@ CLOUD.Extensions.AnnotationCloud.prototype.update = function () {
     var fillColor = this.style['fill-color'];
     var fillOpacity = this.style['fill-opacity'];
 
-    var position = this.getClientPosition();
-    var size = this.getClientSize();
-    var scaleX = size.width / this.initialSize.width;
-    var scaleY = size.height / this.initialSize.height;
-
-    this.transformShape = [
-        'translate(', position.x, ',', position.y, ') ',
-        'rotate(', THREE.Math.radToDeg(this.rotation), ') ',
-        'scale(', scaleX, ',', scaleY, ') '
-    ].join('');
-
-    this.shape.setAttribute("transform", this.transformShape);
     this.shape.setAttribute("stroke-width", strokeWidth);
     this.shape.setAttribute("stroke", CLOUD.Extensions.Utils.Shape2D.getRGBAString(strokeColor, strokeOpacity));
     this.shape.setAttribute('fill', CLOUD.Extensions.Utils.Shape2D.getRGBAString(fillColor, fillOpacity));
     this.shape.setAttribute('d', shapePathStr);
 };
 
+CLOUD.Extensions.AnnotationCloud.prototype.worldToViewBox = function (wPoint) {
+
+    var originWidth = this.originSize.width;
+    var originHeight = this.originSize.height;
+    var viewBoxWidth = this.viewBox.width;
+    var viewBoxHeight = this.viewBox.height;
+    var x = Math.floor(wPoint.x / originWidth * viewBoxWidth + 0.5);
+    var y = Math.floor(wPoint.y / originHeight* viewBoxHeight + 0.5);
+
+    return {x: x, y: y };
+};
+
+CLOUD.Extensions.AnnotationCloud.prototype.viewBoxToWorld = function (vPoint) {
+
+    var originWidth = this.originSize.width;
+    var originHeight = this.originSize.height;
+    var viewBoxWidth = this.viewBox.width;
+    var viewBoxHeight = this.viewBox.height;
+    var x = vPoint.x / viewBoxWidth * originWidth;
+    var y = vPoint.y / viewBoxHeight * originHeight;
+
+    return {x: x, y: y };
+};
+
 CLOUD.Extensions.AnnotationCloud.prototype.getPathString = function () {
 
+    //var path = this.shapePoints.map(function(point, i){
+    //    if (i === 0) {
+    //        return ['M'].concat([point.x, point.y]).join(' ');
+    //    } else {
+    //        return ['Q'].concat([point.cx, point.cy, point.x, point.y ]).join(' ');
+    //    }
+    //}).join(' ');
+    //
+    //if (this.isSeal) {
+
+    //    path += 'Z';
+    //}
+    //
+    //return path;
+
+    var scaleX = this.size.width / this.originSize.width;
+    var scaleY = this.size.height / this.originSize.height;
+
+    var m0 = new THREE.Matrix4().makeScale(scaleX, scaleY, 1);
+    var m1 = new THREE.Matrix4().makeRotationZ(-this.rotation);
+    var m2 = new THREE.Matrix4().makeTranslation(this.position.x, this.position.y, this.position.z);
+    var transform = m2.multiply(m1).multiply(m0);
+
+    var scope = this;
+    var pos = new THREE.Vector3();
+    var x, y, cx, cy;
+
     var path = this.shapePoints.map(function(point, i){
+
         if (i === 0) {
-            return ['M'].concat([point.x, point.y]).join(' ');
+
+            pos.x = point.x;
+            pos.y = point.y;
+            pos.z = 0;
+            pos.applyMatrix4(transform);
+            pos = scope.editor.worldToClient(pos);
+            x = pos.x;
+            y = pos.y;
+
+            return ['M'].concat([x, y]).join(' ');
         } else {
-            return ['Q'].concat([point.cx, point.cy, point.x, point.y ]).join(' ');
+
+            pos.x = point.cx;
+            pos.y = point.cy;
+            pos.z = 0;
+            pos.applyMatrix4(transform);
+            pos = scope.editor.worldToClient(pos);
+            cx = pos.x;
+            cy = pos.y;
+
+            pos.x = point.x;
+            pos.y = point.y;
+            pos.z = 0;
+            pos.applyMatrix4(transform);
+            pos = scope.editor.worldToClient(pos);
+            x = pos.x;
+            y = pos.y;
+
+            return ['Q'].concat([cx, cy, x, y ]).join(' ');
         }
     }).join(' ');
 
+    if (this.isSeal) {
+        path += 'Z';
+    }
+
     return path;
-};
-
-// 设置形状点集
-CLOUD.Extensions.AnnotationCloud.prototype.setShapePoints = function (shapeStr) {
-
-    var shapePoints = shapeStr.split(',');
-
-    this.shapePoints = [];
-
-    var x0 = parseFloat(shapePoints[0]);
-    var y0 = parseFloat(shapePoints[1]);
-
-    this.shapePoints.push({x: x0, y: y0});
-
-    for (var i = 2, len = shapePoints.length; i < len; i += 4) {
-
-        var cx = parseFloat(shapePoints[i]);
-        var cy = parseFloat(shapePoints[i + 1]);
-        var x = parseFloat(shapePoints[i + 2]);
-        var y = parseFloat(shapePoints[i + 3]);
-
-        this.shapePoints.push({cx: cx, cy: cy, x: x, y: y});
-    }
-};
-
-// 获得形状点集字符串（用“，”分割）
-CLOUD.Extensions.AnnotationCloud.prototype.getShapePoints = function () {
-
-    var points = [];
-
-    for (var i = 0, len = this.shapePoints.length; i < len; i++) {
-
-        if (i === 0) {
-
-            points.push(this.shapePoints[i].x);
-            points.push(this.shapePoints[i].y);
-
-        } else {
-
-            points.push(this.shapePoints[i].cx);
-            points.push(this.shapePoints[i].cy);
-            points.push(this.shapePoints[i].x);
-            points.push(this.shapePoints[i].y);
-        }
-    }
-
-    return points.join(',');
 };
 
 // 计算控制点
@@ -3880,7 +3812,7 @@ CLOUD.Extensions.AnnotationCloud.prototype.getControlPoint = function (startPoin
     var center = new THREE.Vector2(centerX, centerY);
 
     direction.normalize();
-    direction.rotateAround(new THREE.Vector2(0, 0), -0.5 * Math.PI);
+    direction.rotateAround(new THREE.Vector2(0, 0), 0.5 * Math.PI);
     direction.multiplyScalar(halfLen);
     center.add(direction);
 
@@ -3928,6 +3860,9 @@ CLOUD.Extensions.AnnotationCloud.prototype.calculateShapePath = function () {
     if (len < 1) {
         return;
     }
+
+    // 保存深度
+    this.depth = this.positions[0].z || 0;
 
     if (len === 1) {
 
@@ -4026,17 +3961,14 @@ CLOUD.Extensions.AnnotationCloud.prototype.calculatePosition = function (force) 
     if (force) {
 
         var box = this.getBoundingBox();
-
         var center = box.center();
 
         this.center = {x: center.x, y: center.y};
-        //var size = box.size();
 
-        var position = this.editor.clientToWorld({x: center.x, y: center.y});
-
-        this.position.x  = position.x;
-        this.position.y  = position.y;
-        this.position.z = position.z;
+        // 计算中心点
+        this.position.x  = center.x;
+        this.position.y  = center.y;
+        this.position.z = this.depth || 0;
 
         // 计算相对位置
         this.calculateRelativePosition(center);
@@ -4088,29 +4020,86 @@ CLOUD.Extensions.AnnotationCloud.prototype.setSeal = function (isSeal) {
     this.update();
 };
 
+// 设置形状点集
+CLOUD.Extensions.AnnotationCloud.prototype.setShapePoints = function (shapeStr) {
+
+    var x, y, cx, cy, retPoint;
+    var shapePoints = shapeStr.split(',');
+
+    var x0 = parseInt(shapePoints[0]);
+    var y0 = parseInt(shapePoints[1]);
+    retPoint = this.viewBoxToWorld({x : x0, y: y0});
+    x0 = retPoint.x;
+    y0 = retPoint.y;
+
+    this.shapePoints = [];
+    this.shapePoints.push({x: x0, y: y0});
+
+    for (var i = 2, len = shapePoints.length; i < len; i += 4) {
+
+        cx = parseInt(shapePoints[i]);
+        cy = parseInt(shapePoints[i + 1]);
+        retPoint = this.viewBoxToWorld({x : cx, y: cy});
+        cx = retPoint.x;
+        cy = retPoint.y;
+
+        x = parseInt(shapePoints[i + 2]);
+        y = parseInt(shapePoints[i + 3]);
+        retPoint = this.viewBoxToWorld({x : x, y: y});
+        x = retPoint.x;
+        y = retPoint.y;
+
+        this.shapePoints.push({cx: cx, cy: cy, x: x, y: y});
+    }
+};
+
+// 获得形状点集字符串（用“，”分割）
+CLOUD.Extensions.AnnotationCloud.prototype.getShapePoints = function () {
+
+    var points = [];
+
+    // 转成整型存储以减少存储空间
+    var x, y, cx, cy, retPoint;
+
+    for (var i = 0, len = this.shapePoints.length; i < len; i++) {
+
+        if (i === 0) {
+
+            x = this.shapePoints[i].x;
+            y = this.shapePoints[i].y;
+            retPoint = this.worldToViewBox({x : x, y: y});
+            x = retPoint.x;
+            y = retPoint.y;
+            points.push(x);
+            points.push(y);
+
+        } else {
+
+            cx = this.shapePoints[i].cx;
+            cy = this.shapePoints[i].cy;
+            retPoint = this.worldToViewBox({x : cx, y: cy});
+            cx = retPoint.x;
+            cy = retPoint.y;
+            points.push(cx);
+            points.push(cy);
+
+            x = this.shapePoints[i].x;
+            y = this.shapePoints[i].y;
+            retPoint = this.worldToViewBox({x : x, y: y});
+            x = retPoint.x;
+            y = retPoint.y;
+            points.push(x);
+            points.push(y);
+        }
+    }
+
+    return points.join(',');
+};
+
 CLOUD.Extensions.AnnotationCloud.prototype.renderToCanvas = function (ctx) {
 
     // 小于两个点，不处理
     if (this.shapePoints.length < 2) return;
-
-    function drawCloud(ctx, points) {
-
-        ctx.beginPath();
-
-        for (var i = 0, len = points.length; i < len; i++) {
-
-            if (i === 0) { // 第一个点
-
-                ctx.moveTo(points[i].x, points[i].y);
-
-            } else {
-
-                ctx.quadraticCurveTo(points[i].cx, points[i].cy, points[i].x, points[i].y);
-            }
-        }
-
-        ctx.stroke();
-    }
 
     var strokeWidth = this.style['stroke-width'];
     var strokeColor = this.highlighted ? this.highlightColor : this.style['stroke-color'];
@@ -4122,16 +4111,58 @@ CLOUD.Extensions.AnnotationCloud.prototype.renderToCanvas = function (ctx) {
     ctx.fillStyle = CLOUD.Extensions.Utils.Shape2D.getRGBAString(fillColor, fillOpacity);
     ctx.lineWidth = strokeWidth;
 
-    var position = this.getClientPosition();
-    var size = this.getClientSize();
-    var scaleX = size.width / this.initialSize.width;
-    var scaleY = size.height / this.initialSize.height;
+    var scaleX = this.size.width / this.originSize.width;
+    var scaleY = this.size.height / this.originSize.height;
 
-    ctx.translate(position.x, position.y);
-    ctx.rotate(this.rotation);
-    ctx.scale(scaleX, scaleY);
+    var m0 = new THREE.Matrix4().makeScale(scaleX, scaleY, 1);
+    var m1 = new THREE.Matrix4().makeRotationZ(-this.rotation);
+    var m2 = new THREE.Matrix4().makeTranslation(this.position.x, this.position.y, this.position.z);
+    var transform = m2.multiply(m1).multiply(m0);
 
-    drawCloud(ctx, this.shapePoints);
+    var scope = this;
+
+    ctx.beginPath();
+
+    var pos = new THREE.Vector3();
+    var x, y, cx, cy;
+
+    this.shapePoints.forEach(function(point,i){
+
+        if (i === 0) {
+
+            pos.x = point.x;
+            pos.y = point.y;
+            pos.z = 0;
+            pos.applyMatrix4(transform);
+            pos = scope.editor.worldToClient(pos);
+            x = pos.x;
+            y = pos.y;
+
+            ctx.moveTo(x, y);
+        } else {
+
+            pos.x = point.cx;
+            pos.y = point.cy;
+            pos.z = 0;
+            pos.applyMatrix4(transform);
+            pos = scope.editor.worldToClient(pos);
+            cx = pos.x;
+            cy = pos.y;
+
+            pos.x = point.x;
+            pos.y = point.y;
+            pos.z = 0;
+            pos.applyMatrix4(transform);
+            pos = scope.editor.worldToClient(pos);
+            x = pos.x;
+            y = pos.y;
+
+            ctx.quadraticCurveTo(cx, cy, x, y);
+        }
+
+    });
+
+    ctx.stroke();
 
     if (fillOpacity !== 0) {
         ctx.fill();
@@ -4238,10 +4269,9 @@ CLOUD.Extensions.AnnotationCross.prototype.renderToCanvas = function (ctx) {
     var fillOpacity = this.style['fill-opacity'];
 
     var position = this.getClientPosition();
-    var clientSize = this.getClientSize();
-    var width = clientSize.width - strokeWidth;
-    var height = clientSize.height - strokeWidth;
-    var size = {width: width, height: height};
+    var size = this.getClientSize();
+    var width = Math.max(size.width - strokeWidth, 0);
+    var height = Math.max(size.height - strokeWidth, 0);
 
     ctx.strokeStyle = CLOUD.Extensions.Utils.Shape2D.getRGBAString(strokeColor, strokeOpacity);
     ctx.fillStyle = CLOUD.Extensions.Utils.Shape2D.getRGBAString(fillColor, fillOpacity);
@@ -4254,10 +4284,10 @@ CLOUD.Extensions.AnnotationCross.prototype.renderToCanvas = function (ctx) {
     //ctx.beginPath();
 
     ctx.moveTo(0, 0);
-    ctx.lineTo(size.width, size.height);
+    ctx.lineTo(width, height);
 
-    ctx.moveTo(0, size.height);
-    ctx.lineTo(size.width, 0);
+    ctx.moveTo(0, height);
+    ctx.lineTo(width, 0);
 
     ctx.stroke();
 
@@ -4325,7 +4355,7 @@ CLOUD.Extensions.AnnotationText.prototype.createShape = function () {
     this.backgroundRect = CLOUD.Extensions.Utils.Shape2D.createSvgElement('rect');
 };
 
-CLOUD.Extensions.AnnotationText.prototype.set = function (position, size, rotation, viewport, textString) {
+CLOUD.Extensions.AnnotationText.prototype.set = function (position, size, rotation, textString) {
 
     this.position.x = position.x;
     this.position.y = position.y;
@@ -4335,10 +4365,6 @@ CLOUD.Extensions.AnnotationText.prototype.set = function (position, size, rotati
     this.size.height = size.height;
 
     this.rotation = rotation;
-
-    if(viewport) {
-        this.setViewport(viewport);
-    }
 
     this.setText(textString);
 };
@@ -4443,7 +4469,6 @@ CLOUD.Extensions.AnnotationText.prototype.update = function (forceDirty) {
     this.shape.setAttribute("fill", CLOUD.Extensions.Utils.Shape2D.getRGBAString(strokeColor, strokeOpacity));
 
     var bBox = this.shape.getBBox();
-    //var verticalTransform = ['translate(0, ', (-this.size.y + fontSize), ')'].join('');
     var verticalTransform = ['translate(0, ', fontSize, ')'].join('');
     this.shape.setAttribute("transform", (this.transformShape + verticalTransform));
     //this.shape.setAttribute('clip-path', 'url(#' + this.clipPathId + ')');
@@ -4777,10 +4802,10 @@ CLOUD.Extensions.AnnotationTextArea.prototype.inactive = function () {
 
 CLOUD.Extensions.AnnotationTextArea.prototype.accept = function () {
 
-    var width = parseFloat(this.textArea.style.width);
-    var height = parseFloat(this.textArea.style.height);
     var left = parseFloat(this.textArea.style.left);
     var top = parseFloat(this.textArea.style.top);
+    var width = parseFloat(this.textArea.style.width);
+    var height = parseFloat(this.textArea.style.height);
     var textValues = this.getTextValues();
     var position = {
         x: left + (width * 0.5),
@@ -5009,17 +5034,8 @@ CLOUD.Extensions.AnnotationFrame.prototype.onRepositionDown = function (event) {
     if (this.isDragPoint(event.target) || this.isRotatePoint(event.target)) return;
 
     this.selection.dragging = true;
-
-    var mouse = this.editor.getPointOnDomContainer(event.clientX, event.clientY);
-
-    this.originMouse = mouse;
-
-    var position = this.annotation.getClientPosition();
-
-    this.offset = {
-        x: position.x,
-        y: position.y
-    };
+    this.originMouse = this.editor.getPointOnDomContainer(event.clientX, event.clientY);
+    this.originPosition = this.annotation.getClientPosition();
 
     this.onMouseMove = this.onRepositionMove.bind(this);
     this.onMouseUp = this.onRepositionUp.bind(this);
@@ -5040,15 +5056,21 @@ CLOUD.Extensions.AnnotationFrame.prototype.onRepositionMove = function (event) {
         y: mouse.y - this.originMouse.y
     };
 
-    var x = this.offset.x + movement.x;
-    var y = this.offset.y + movement.y;
+    var x = this.originPosition.x + movement.x;
+    var y = this.originPosition.y + movement.y;
 
     this.updatePosition(x, y, this.selection.rotation);
-    var position = this.editor.clientToWorld({x: x, y: y});
+    var position = this.editor.getAnnotationWorldPosition({x: x, y: y});
     this.annotation.resetPosition(position);
 };
 
 CLOUD.Extensions.AnnotationFrame.prototype.onRepositionUp = function () {
+
+    this.onMouseMove = function () {
+    };
+
+    this.onMouseUp = function () {
+    };
 
     if (!this.selection.dragging) {
         return;
@@ -5157,18 +5179,21 @@ CLOUD.Extensions.AnnotationFrame.prototype.onResizeMove = function (event) {
 
     var matRedoRotation = new THREE.Matrix4().makeRotationZ(this.selection.rotation);
     var actualDelta = translationDelta.applyMatrix4(matRedoRotation);
+    var clientPosition = {x: x + (actualDelta.x * 0.5), y: y + (actualDelta.y * 0.5)};
+    var clientSize = {width: width, height: height};
+    var newPosition = this.editor.getAnnotationWorldPosition(clientPosition);
+    var size = this.editor.getAnnotationWorldSize(clientSize, clientPosition);
 
-    var newPos = new THREE.Vector2(
-        x + (actualDelta.x * 0.5),
-        y + (actualDelta.y * 0.5));
-    newPos = this.editor.clientToWorld(newPos);
-
-    var size = {width: width, height: height};
-
-    this.annotation.resetSize(size, newPos);
+    this.annotation.resetSize(size, newPosition);
 };
 
 CLOUD.Extensions.AnnotationFrame.prototype.onResizeUp = function (event) {
+
+    this.onMouseMove = function () {
+    };
+
+    this.onMouseUp = function () {
+    };
 
     this.selection.resizing = false;
     this.selection.handle.resizingPanel = null;
@@ -5184,7 +5209,7 @@ CLOUD.Extensions.AnnotationFrame.prototype.onRotationDown = function (event) {
 
     this.selection.rotating = true;
 
-    this.offset = this.editor.getPointOnDomContainer(event.clientX, event.clientY);
+    this.originPosition = this.editor.getPointOnDomContainer(event.clientX, event.clientY);
     this.originRotation = this.selection.rotation || 0;
 
     this.onMouseMove = this.onRotationMove.bind(this);
@@ -5201,9 +5226,8 @@ CLOUD.Extensions.AnnotationFrame.prototype.onRotationMove = function (event) {
 
     var mouse = this.editor.getPointOnDomContainer(event.clientX, event.clientY);
     var position = this.annotation.getClientPosition();
-
     var angle1 = CLOUD.Extensions.Utils.Geometric.getAngleBetweenPoints(position, mouse);
-    var angle2 = CLOUD.Extensions.Utils.Geometric.getAngleBetweenPoints(position, this.offset);
+    var angle2 = CLOUD.Extensions.Utils.Geometric.getAngleBetweenPoints(position, this.originPosition);
     var rotation = angle1 - angle2 + this.originRotation;
 
     this.updatePosition(this.selection.x, this.selection.y, rotation);
@@ -5213,9 +5237,15 @@ CLOUD.Extensions.AnnotationFrame.prototype.onRotationMove = function (event) {
 
 CLOUD.Extensions.AnnotationFrame.prototype.onRotationUp = function (event) {
 
+    this.onMouseMove = function () {
+    };
+
+    this.onMouseUp = function () {
+    };
+
     this.selection.rotating = false;
     this.originRotation = null;
-    this.offset = null;
+    this.originPosition = null;
     this.editor.dragAnnotationFrameEnd();
 };
 
@@ -5574,6 +5604,7 @@ CLOUD.Extensions.AnnotationEditor = function (viewer) {
     this.nextAnnotationId = 0;
     this.annotationMinLen = 16;
     this.initialized = false;
+    this.epsilon = 0.0001;
 
     this.onMouseDownBinded = this.onMouseDown.bind(this);
     this.onMouseDoubleClickBinded = this.onMouseDoubleClick.bind(this);
@@ -5743,9 +5774,6 @@ CLOUD.Extensions.AnnotationEditor.prototype.onResize = function () {
     this.bounds.width = bounds.width;
     this.bounds.height = bounds.height;
 
-    //var viewBox = this.getSVGViewBox(this.bounds.width, this.bounds.height);
-
-    //this.svg.setAttribute('viewBox', viewBox);
     this.svg.setAttribute('width', this.bounds.width + '');
     this.svg.setAttribute('height', this.bounds.height + '');
 
@@ -5836,44 +5864,45 @@ CLOUD.Extensions.AnnotationEditor.prototype.mouseDownForArrow = function (event)
 
     var start = this.getPointOnDomContainer(event.clientX, event.clientY);
 
-    var domBounds = this.getDomContainerBounds();
-
     this.originX = start.x;
     this.originY = start.y;
 
     var width = this.annotationMinLen;
-    var head = {x: this.originX, y: this.originY};
-    var tail = {
-        x: Math.round(head.x + Math.cos(Math.PI * 0.25) * width),
-        y: Math.round(head.y + Math.sin(-Math.PI * 0.25) * width)
+    var tail = {x: this.originX, y: this.originY};
+    var head = {
+        x: Math.round(tail.x + Math.cos(Math.PI * 0.25) * width),
+        y: Math.round(tail.y + Math.sin(-Math.PI * 0.25) * width)
     };
 
-    var constrain = function (head, tail, width, bounds) {
+    var constrain = function (tail, head, width, bounds) {
 
-        if (CLOUD.Extensions.Utils.Geometric.isInsideBounds(tail.x, tail.y, bounds)) {
+        if (CLOUD.Extensions.Utils.Geometric.isInsideBounds(head.x, head.y, bounds)) {
             return;
         }
 
-        tail.y = Math.round(head.y + Math.sin(Math.PI * 0.25) * width);
+        head.y = Math.round(tail.y + Math.sin(Math.PI * 0.25) * width);
 
-        if (CLOUD.Extensions.Utils.Geometric.isInsideBounds(tail.x, tail.y, bounds)) {
+        if (CLOUD.Extensions.Utils.Geometric.isInsideBounds(head.x, head.y, bounds)) {
             return;
         }
 
-        tail.x = Math.round(head.y + Math.cos(-Math.PI * 0.25) * width);
+        head.x = Math.round(tail.y + Math.cos(-Math.PI * 0.25) * width);
 
-        if (CLOUD.Extensions.Utils.Geometric.isInsideBounds(tail.x, tail.y, bounds)) {
+        if (CLOUD.Extensions.Utils.Geometric.isInsideBounds(head.x, head.y, bounds)) {
             return;
         }
 
-        tail.y = Math.round(head.y + Math.sin(-Math.PI * 0.25) * width);
+        head.y = Math.round(tail.y + Math.sin(-Math.PI * 0.25) * width);
     };
 
-    constrain(head, tail, width, this.getBounds());
+    constrain(tail, head, width, this.getBounds());
+
+    head = this.getAnnotationWorldPosition(head);
+    tail = this.getAnnotationWorldPosition(tail);
 
     var arrowId = this.generateAnnotationId();
     var arrow = new CLOUD.Extensions.AnnotationArrow(this, arrowId);
-    arrow.setByTailHead(head, tail, domBounds);
+    arrow.setByTailHead(tail, head);
     this.addAnnotation(arrow);
     arrow.created();
 
@@ -5917,10 +5946,11 @@ CLOUD.Extensions.AnnotationEditor.prototype.mouseMoveForArrow = function (event)
     var tail = {x: startX, y: startY};
     var head = {x: endX, y: endY};
 
-    var epsilon = 0.0001;
+    tail = this.getAnnotationWorldPosition(tail);
+    head = this.getAnnotationWorldPosition(head);
 
-    if (Math.abs(arrow.head.x - head.x) >= epsilon || Math.abs(arrow.head.y - head.y) >= epsilon ||
-        Math.abs(arrow.tail.x - tail.x) >= epsilon || Math.abs(arrow.tail.y - tail.y) >= epsilon) {
+    if (Math.abs(arrow.head.x - head.x) >= this.epsilon || Math.abs(arrow.head.y - head.y) >= this.epsilon ||
+        Math.abs(arrow.tail.x - tail.x) >= this.epsilon || Math.abs(arrow.tail.y - tail.y) >= this.epsilon) {
 
         arrow.setByTailHead(tail, head);
     }
@@ -5931,19 +5961,19 @@ CLOUD.Extensions.AnnotationEditor.prototype.mouseDownForRectangle = function (ev
     if (this.selectedAnnotation) return false;
 
     var start = this.getPointOnDomContainer(event.clientX, event.clientY);
-    var domBounds = this.getDomContainerBounds();
     var minLen = this.annotationMinLen;
 
     this.originX = start.x;
     this.originY = start.y;
 
-    var position = {x: start.x, y: start.y};
-    position = this.clientToWorld(position);
-    var size = {width: minLen, height: minLen};
+    var clientPosition = {x: start.x, y: start.y};
+    var clientSize = {width: minLen, height: minLen};
+    var position = this.getAnnotationWorldPosition(clientPosition);
+    var size = this.getAnnotationWorldSize(clientSize, clientPosition);
 
     var id = this.generateAnnotationId();
     var rectangle = new CLOUD.Extensions.AnnotationRectangle(this, id);
-    rectangle.set(position, size, 0, domBounds);
+    rectangle.set(position, size, 0);
     this.addAnnotation(rectangle);
     rectangle.created();
 
@@ -5972,14 +6002,13 @@ CLOUD.Extensions.AnnotationEditor.prototype.mouseMoveForRectangle = function (ev
         endY++;
     }
 
-    var position = {x: (startX + endX) / 2, y: (startY + endY) / 2};
-    position = this.clientToWorld(position);
-    var size = {width: Math.abs(endX - startX), height: Math.abs(endY - startY)};
+    var clientPosition = {x: (startX + endX) / 2, y: (startY + endY) / 2};
+    var clientSize = {width: Math.abs(endX - startX), height: Math.abs(endY - startY)};
+    var position = this.getAnnotationWorldPosition(clientPosition);
+    var size = this.getAnnotationWorldSize(clientSize, clientPosition);
 
-    var epsilon = 0.0001;
-
-    if (Math.abs(rectangle.position.x - position.x) > epsilon || Math.abs(rectangle.size.y - size.y) > epsilon ||
-        Math.abs(rectangle.position.y - position.y) > epsilon || Math.abs(rectangle.size.y - size.y) > epsilon) {
+    if (Math.abs(rectangle.position.x - position.x) > this.epsilon || Math.abs(rectangle.size.y - size.y) > this.epsilon ||
+        Math.abs(rectangle.position.y - position.y) > this.epsilon || Math.abs(rectangle.size.y - size.y) > this.epsilon) {
 
         rectangle.set(position, size);
     }
@@ -5990,19 +6019,19 @@ CLOUD.Extensions.AnnotationEditor.prototype.mouseDownForCircle = function (event
     if (this.selectedAnnotation) return false;
 
     var start = this.getPointOnDomContainer(event.clientX, event.clientY);
-    var domBounds = this.getDomContainerBounds();
 
     this.originX = start.x;
     this.originY = start.y;
 
     var minLen = this.annotationMinLen;
-    var position = {x: start.x, y: start.y};
-    position = this.clientToWorld(position);
-    var size = {width: minLen, height: minLen};
+    var clientPosition = {x: start.x, y: start.y};
+    var clientSize = {width: minLen, height: minLen};
+    var position = this.getAnnotationWorldPosition(clientPosition);
+    var size = this.getAnnotationWorldSize(clientSize, clientPosition);
 
     var id = this.generateAnnotationId();
     var circle = new CLOUD.Extensions.AnnotationCircle(this, id);
-    circle.set(position, size, 0, domBounds);
+    circle.set(position, size, 0);
     this.addAnnotation(circle);
     circle.created();
 
@@ -6020,7 +6049,6 @@ CLOUD.Extensions.AnnotationEditor.prototype.mouseMoveForCircle = function (event
     var circle = this.selectedAnnotation;
     var end = this.getPointOnDomContainer(event.clientX, event.clientY);
     var bounds = this.getBounds();
-
     var startX = this.originX;
     var startY = this.originY;
     var endX = Math.min(Math.max(bounds.x, end.x), bounds.x + bounds.width);
@@ -6031,14 +6059,13 @@ CLOUD.Extensions.AnnotationEditor.prototype.mouseMoveForCircle = function (event
         endY++;
     }
 
-    var position = new THREE.Vector2((startX + endX) / 2, (startY + endY) / 2);
-    position = this.clientToWorld(position);
-    var size ={width: Math.abs(endX - startX), height: Math.abs(endY - startY)};
+    var clientPosition = {x: (startX + endX) / 2, y: (startY + endY) / 2};
+    var clientSize = {width: Math.abs(endX - startX), height: Math.abs(endY - startY)};
+    var position = this.getAnnotationWorldPosition(clientPosition);
+    var size = this.getAnnotationWorldSize(clientSize, clientPosition);
 
-    var epsilon = 0.0001;
-
-    if (Math.abs(circle.position.x - position.x) > epsilon || Math.abs(circle.size.y - size.y) > epsilon ||
-        Math.abs(circle.position.y - position.y) > epsilon || Math.abs(circle.size.y - size.y) > epsilon) {
+    if (Math.abs(circle.position.x - position.x) > this.epsilon || Math.abs(circle.size.y - size.y) > this.epsilon ||
+        Math.abs(circle.position.y - position.y) > this.epsilon || Math.abs(circle.size.y - size.y) > this.epsilon) {
 
         circle.set(position, size);
     }
@@ -6049,19 +6076,19 @@ CLOUD.Extensions.AnnotationEditor.prototype.mouseDownForCross = function (event)
     if (this.selectedAnnotation) return false;
 
     var start = this.getPointOnDomContainer(event.clientX, event.clientY);
-    var domBounds = this.getDomContainerBounds();
 
     this.originX = start.x;
     this.originY = start.y;
 
     var minLen = this.annotationMinLen;
-    var position = {x: start.x, y: start.y};
-    position = this.clientToWorld(position);
-    var size = {width: minLen, height: minLen};
+    var clientPosition = {x: start.x, y: start.y};
+    var clientSize = {width: minLen, height: minLen};
+    var position = this.getAnnotationWorldPosition(clientPosition);
+    var size = this.getAnnotationWorldSize(clientSize, clientPosition);
 
     var id = this.generateAnnotationId();
     var cross = new CLOUD.Extensions.AnnotationCross(this, id);
-    cross.set(position, size, 0, domBounds);
+    cross.set(position, size, 0);
     this.addAnnotation(cross);
     cross.created();
 
@@ -6090,15 +6117,13 @@ CLOUD.Extensions.AnnotationEditor.prototype.mouseMoveForCross = function (event)
         endY++;
     }
 
-    var position = new THREE.Vector2((startX + endX) / 2, (startY + endY) / 2);
-    position = this.clientToWorld(position);
+    var clientPosition = {x: (startX + endX) / 2, y: (startY + endY) / 2};
+    var clientSize = {width: Math.abs(endX - startX), height: Math.abs(endY - startY)};
+    var position = this.getAnnotationWorldPosition(clientPosition);
+    var size = this.getAnnotationWorldSize(clientSize, clientPosition);
 
-    var size ={width: Math.abs(endX - startX), height: Math.abs(endY - startY)};
-
-    var epsilon = 0.0001;
-
-    if (Math.abs(cross.position.x - position.x) > epsilon || Math.abs(cross.size.y - size.y) > epsilon ||
-        Math.abs(cross.position.y - position.y) > epsilon || Math.abs(cross.size.y - size.y) > epsilon) {
+    if (Math.abs(cross.position.x - position.x) > this.epsilon || Math.abs(cross.size.y - size.y) > this.epsilon ||
+        Math.abs(cross.position.y - position.y) > this.epsilon || Math.abs(cross.size.y - size.y) > this.epsilon) {
 
         cross.set(position, size);
     }
@@ -6109,21 +6134,15 @@ CLOUD.Extensions.AnnotationEditor.prototype.mouseDownForCloud = function (event)
     if (this.selectedAnnotation) return false;
 
     var start = this.getPointOnDomContainer(event.clientX, event.clientY);
-    var domBounds = this.getDomContainerBounds();
-
     this.originX = start.x;
     this.originY = start.y;
 
-    //var minLen = this.annotationMinLen;
-    //var position = {x: start.x, y: start.y};
-    //position = this.clientToWorld(position);
-    //var size = {width: minLen, height: minLen};
-
-    this.clientPositions = [{x: start.x, y: start.y}];
+    var position = this.getAnnotationWorldPosition({x: start.x, y: start.y});
+    this.cloudPoints = [position];
 
     var id = this.generateAnnotationId();
     var cloud = new CLOUD.Extensions.AnnotationCloud(this, id);
-    cloud.setByPositions(this.clientPositions, domBounds);
+    cloud.setByPositions(this.cloudPoints);
     cloud.created();
     cloud.enableTrack();
 
@@ -6143,7 +6162,8 @@ CLOUD.Extensions.AnnotationEditor.prototype.mouseMoveForCloud = function (event)
 
     if (cloud.getTrackState()) {
 
-        var position = this.getPointOnDomContainer(event.clientX, event.clientY);
+        var mouse = this.getPointOnDomContainer(event.clientX, event.clientY);
+        var position = this.getAnnotationWorldPosition(mouse);
         cloud.startTrack();
         cloud.setTrackingPoint(position);
     }
@@ -6157,19 +6177,20 @@ CLOUD.Extensions.AnnotationEditor.prototype.mouseUpForCloud = function (event) {
 
     var end = this.getPointOnDomContainer(event.clientX, event.clientY);
     var origin = {x: this.originX, y: this.originY};
-    var epsilon = 1; // 相差一个像素
+    var threshold = 2; // 相差2个像素
 
     // 判断是否同一个点, 同一个点不加入集合
-    if (CLOUD.Extensions.Utils.Geometric.isEqualBetweenPoints(origin, end, epsilon)) return;
+    if (CLOUD.Extensions.Utils.Geometric.isEqualBetweenPoints(origin, end, threshold)) return;
 
-    this.clientPositions.push({x: end.x, y: end.y});
+    var point = this.getAnnotationWorldPosition({x: end.x, y: end.y});
+    this.cloudPoints.push(point);
 
     var cloud = this.selectedAnnotation;
 
     // 先禁止跟踪，在真正响应事件时启用
     cloud.disableTrack();
 
-    var positions = this.clientPositions;
+    var positions = this.cloudPoints;
 
     // 采用计时器来判断是否单击和双击
     function handleMouseUp() {
@@ -6199,14 +6220,12 @@ CLOUD.Extensions.AnnotationEditor.prototype.mouseDoubleClickForCloud = function 
             }
 
             var position = this.getPointOnDomContainer(event.clientX, event.clientY);
+            var point = this.getAnnotationWorldPosition(position);
 
-            this.clientPositions.push({x: position.x, y: position.y});
-
+            this.cloudPoints.push({x: point.x, y: point.y});
             this.selectedAnnotation.finishTrack();
-
             // 结束云图绘制，并封闭云图
-            this.selectedAnnotation.setByPositions(this.clientPositions, null, true);
-
+            this.selectedAnnotation.setByPositions(this.cloudPoints, true);
             this.createAnnotationEnd();
             this.deselectAnnotation();
         }
@@ -6227,28 +6246,22 @@ CLOUD.Extensions.AnnotationEditor.prototype.mouseDownForText = function (event) 
 
     var start = this.getPointOnDomContainer(event.clientX, event.clientY);
     var clientFontSize = 16;
-    var initWidth = clientFontSize * 20;
-    var initHeight = clientFontSize * 4;
+    var originWidth = clientFontSize * 20;
+    var originHeight = clientFontSize * 4;
 
-    var domBounds = this.getDomContainerBounds();
-
-    var size = new THREE.Vector2(initWidth, initHeight);
-
-    var position = new THREE.Vector2(
-        start.x + (initWidth * 0.5),
-        start.y + (initHeight * 0.5));
-
-    position = this.clientToWorld(position);
+    var clientPosition = {x: start.x + 0.5 * originWidth, y: start.y + 0.5 * originHeight};
+    var clientSize = {width: originWidth, height: originHeight};
+    var position = this.getAnnotationWorldPosition(clientPosition);
+    var size = this.getAnnotationWorldSize(clientSize, clientPosition);
 
     var id = this.generateAnnotationId();
     var text = new CLOUD.Extensions.AnnotationText(this, id);
-    text.set(position, size, 0, domBounds, '');
+    text.set(position, size, 0, '');
     this.addAnnotation(text);
     text.created();
     text.forceRedraw();
 
     this.selectedAnnotation = text;
-
     this.annotationTextArea.active(this.selectedAnnotation, true);
 
     return true;
@@ -6278,22 +6291,17 @@ CLOUD.Extensions.AnnotationEditor.prototype.init = function (callbacks) {
 
     if (!this.svg) {
 
-        var svgWidth = this.domElement.offsetWidth;
-        var svgHeight = this.domElement.offsetHeight;
-
-        this.bounds.width = svgWidth;
-        this.bounds.height = svgHeight;
-
-        //var viewBox = this.getSVGViewBox(svgWidth, svgHeight);
+        var rect = this.getDomContainerBounds();
+        this.bounds.width = rect.width;
+        this.bounds.height = rect.height;
 
         this.svg = CLOUD.Extensions.Utils.Shape2D.createSvgElement('svg');
         this.svg.style.position = "absolute";
         this.svg.style.display = "block";
         this.svg.style.left = "0";
         this.svg.style.top = "0";
-        //this.svg.setAttribute('viewBox', viewBox);
-        this.svg.setAttribute('width', svgWidth + '');
-        this.svg.setAttribute('height', svgHeight + '');
+        this.svg.setAttribute('width', rect.width + '');
+        this.svg.setAttribute('height', rect.height + '');
 
         this.domElement.appendChild(this.svg);
 
@@ -6334,7 +6342,7 @@ CLOUD.Extensions.AnnotationEditor.prototype.uninit = function () {
     //this.destroy();
 };
 
-CLOUD.Extensions.AnnotationEditor.prototype.isInitialized = function() {
+CLOUD.Extensions.AnnotationEditor.prototype.isInitialized = function () {
 
     return this.initialized;
 };
@@ -6360,12 +6368,14 @@ CLOUD.Extensions.AnnotationEditor.prototype.destroy = function () {
 
 CLOUD.Extensions.AnnotationEditor.prototype.generateAnnotationId = function () {
 
-    //return ++this.nextAnnotationId;
+    ++this.nextAnnotationId;
 
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-        return v.toString(16);
-    });
+    return this.nextAnnotationId.toString(10);
+
+    //return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+    //    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+    //    return v.toString(16);
+    //});
 };
 
 CLOUD.Extensions.AnnotationEditor.prototype.onExistEditor = function () {
@@ -6382,10 +6392,6 @@ CLOUD.Extensions.AnnotationEditor.prototype.editBegin = function () {
     if (!this.svgGroup) {
         this.svgGroup = CLOUD.Extensions.Utils.Shape2D.createSvgElement('g');
     }
-
-    //if (this.svgGroup.parentNode) {
-    //    this.svgGroup.parentNode.removeChild(this.svgGroup);
-    //}
 
     if (!this.svgGroup.parentNode) {
         this.svg.insertBefore(this.svgGroup, this.svg.firstChild);
@@ -6557,7 +6563,7 @@ CLOUD.Extensions.AnnotationEditor.prototype.deselectAnnotation = function () {
 
 CLOUD.Extensions.AnnotationEditor.prototype.worldToClient = function (wPoint) {
 
-    var size = this.getDomContainerBounds();
+    var rect = this.getDomContainerBounds();
     var camera = this.cameraEditor.object;
     var result = new THREE.Vector3(wPoint.x, wPoint.y, wPoint.z);
 
@@ -6567,8 +6573,8 @@ CLOUD.Extensions.AnnotationEditor.prototype.worldToClient = function (wPoint) {
     result.project(camera);
 
     // 变换到屏幕空间
-    result.x = Math.round(0.5 * (result.x + 1) * size.width);
-    result.y = Math.round(-0.5 * (result.y - 1) * size.height);
+    result.x = Math.floor(0.5 * (result.x + 1) * rect.width + 0.5);
+    result.y = Math.floor(-0.5 * (result.y - 1) * rect.height + 0.5);
     result.z = 0;
 
     return result;
@@ -6581,40 +6587,40 @@ CLOUD.Extensions.AnnotationEditor.prototype.clientToWorld = function (cPoint) {
     var result = new THREE.Vector3();
 
     result.x = cPoint.x / rect.width * 2 - 1;
-    result.y = - cPoint.y / rect.height * 2 + 1;
+    result.y = -cPoint.y / rect.height * 2 + 1;
     result.z = 0;
 
     result.unproject(camera);
-    result.add(camera.position).applyMatrix4(camera.matrixWorldInverse);
-    //result.z = 0;
+    result.add(camera.position).applyMatrix4(camera.matrixWorldInverse);    //result.z = 0;
+
 
     return result;
 };
 
 CLOUD.Extensions.AnnotationEditor.prototype.getAnnotationWorldPosition = function (cPos) {
 
-    return this.clientToWorld(cPos.x, cPos.y);
+    return this.clientToWorld(cPos);
 };
 
 CLOUD.Extensions.AnnotationEditor.prototype.getAnnotationClientPosition = function (wPos) {
 
-    return this.worldToClient(wPos.x, wPos.y, wPos.z);
+    return this.worldToClient(wPos);
 };
 
 CLOUD.Extensions.AnnotationEditor.prototype.getAnnotationWorldSize = function (cSize, cPos) {
 
-    var lt = this.clientToWorld(cPos.x - 0.5 * cSize.x, cPos.y - 0.5 * cSize.y);
-    var rb = this.clientToWorld(cPos.x + 0.5 * cSize.x, cPos.y + 0.5 * cSize.y);
+    var lt = this.clientToWorld({x: cPos.x - 0.5 * cSize.width, y: cPos.y - 0.5 * cSize.height});
+    var rb = this.clientToWorld({x: cPos.x + 0.5 * cSize.width, y: cPos.y + 0.5 * cSize.height});
 
-    return {x: Math.abs(rb.x - lt.x), y: Math.abs(rb.y - lt.y)}
+    return {width: Math.abs(rb.x - lt.x), height: Math.abs(rb.y - lt.y)}
 };
 
 CLOUD.Extensions.AnnotationEditor.prototype.getAnnotationClientSize = function (wSize, wPos) {
 
-    var lt = this.worldToClient(wPos.x - 0.5 * wSize.x, wPos - 0.5 * wSize.y, wPos.z);
-    var rb = this.worldToClient(wPos.x + 0.5 * wSize.x, wPos + 0.5 * wSize.y, wPos.z);
+    var lt = this.worldToClient({x: wPos.x - 0.5 * wSize.width, y: wPos.y - 0.5 * wSize.height, z: wPos.z});
+    var rb = this.worldToClient({x: wPos.x + 0.5 * wSize.width, y: wPos.y + 0.5 * wSize.height, z: wPos.z});
 
-    return {x: Math.abs(rb.x - lt.x), y: Math.abs(rb.y - lt.y)};
+    return {width: Math.abs(rb.x - lt.x), height: Math.abs(rb.y - lt.y)};
 };
 
 CLOUD.Extensions.AnnotationEditor.prototype.getMarkersBoundingBox = function () {
@@ -6639,22 +6645,16 @@ CLOUD.Extensions.AnnotationEditor.prototype.getDomContainerBounds = function () 
     return CLOUD.DomUtil.getContainerOffsetToClient(this.domElement);
 };
 
-CLOUD.Extensions.AnnotationEditor.prototype.getSVGViewBox = function (clientWidth, clientHeight) {
+CLOUD.Extensions.AnnotationEditor.prototype.getViewBox = function (clientWidth, clientHeight) {
 
-    //var lt = this.clientToWorld(0, 0);
-    //var rb = this.clientToWorld(clientWidth, clientHeight);
+    var lt = this.clientToWorld({x: 0, y: 0});
+    var rb = this.clientToWorld({x: clientWidth, y: clientHeight});
+    var left = Math.min(lt.x, rb.x);
+    var top = Math.min(lt.y, rb.y);
+    var right = Math.max(lt.x, rb.x);
+    var bottom = Math.max(lt.y, rb.y);
 
-    //var lt = {x: 0, y: 0};
-    //var rb = {x:clientWidth, y:clientHeight};
-    //
-    //var l = Math.min(lt.x, rb.x);
-    //var t = Math.min(lt.y, rb.y);
-    //var r = Math.max(lt.x, rb.x);
-    //var b = Math.max(lt.y, rb.y);
-    //
-    //return [l, t, r - l, b - t].join(' ');
-
-    return [0, 0, clientWidth, clientHeight].join(' ');
+    return [left, top, right - left, bottom - top].join(' ');
 };
 
 CLOUD.Extensions.AnnotationEditor.prototype.handleTextChange = function (data) {
@@ -6667,10 +6667,10 @@ CLOUD.Extensions.AnnotationEditor.prototype.handleTextChange = function (data) {
         return;
     }
 
-    var position = {x: data.position.x, y: data.position.y};
-    position = this.clientToWorld(position);
-
-    var size = {width: data.width, height: data.height};
+    var clientPosition = {x: data.position.x, y: data.position.y};
+    var clientSize = {width: data.width, height: data.height};
+    var position = this.getAnnotationWorldPosition(clientPosition);
+    var size = this.getAnnotationWorldSize(clientSize, clientPosition);
 
     text.resetSize(size, position);
     text.setText(data.text);
@@ -6813,10 +6813,10 @@ CLOUD.Extensions.AnnotationEditor.prototype.getAnnotationInfoList = function () 
         }
 
         var shapePoints = "";
-        var initialSize = null;
+        var originSize = null;
         if (annotation.shapeType === CLOUD.Extensions.Annotation.shapeTypes.CLOUD) {
             shapePoints = annotation.getShapePoints();
-            initialSize = annotation.initialSize;
+            originSize = annotation.originSize;
         }
 
         var info = {
@@ -6825,9 +6825,8 @@ CLOUD.Extensions.AnnotationEditor.prototype.getAnnotationInfoList = function () 
             position: annotation.position,
             size: annotation.size,
             rotation: annotation.rotation,
-            viewport: annotation.viewport,
             shapePoints: shapePoints,
-            initialSize:initialSize,
+            originSize: originSize,
             text: text
         };
 
@@ -6847,10 +6846,6 @@ CLOUD.Extensions.AnnotationEditor.prototype.loadAnnotations = function (annotati
     // 清除数据
     this.clear();
 
-    //if (this.svgGroup.parentNode) {
-    //    this.svgGroup.parentNode.removeChild(this.svgGroup);
-    //}
-
     if (!this.svgGroup.parentNode) {
         this.svg.insertBefore(this.svgGroup, this.svg.firstChild);
     }
@@ -6863,9 +6858,8 @@ CLOUD.Extensions.AnnotationEditor.prototype.loadAnnotations = function (annotati
         var position = info.position;
         var size = info.size;
         var rotation = info.rotation;
-        var viewport = info.viewport;
         var shapePointsStr = info.shapePoints;
-        var initialSize = info.initialSize;
+        var originSize = info.originSize;
         var text = decodeURIComponent(info.text); // 解码中文
         //var text = info.text; // 解码中文
 
@@ -6873,37 +6867,37 @@ CLOUD.Extensions.AnnotationEditor.prototype.loadAnnotations = function (annotati
 
             case CLOUD.Extensions.Annotation.shapeTypes.ARROW:
                 var arrow = new CLOUD.Extensions.AnnotationArrow(this, id);
-                arrow.set(position, size, rotation, viewport);
+                arrow.set(position, size, rotation);
                 this.addAnnotation(arrow);
                 arrow.created();
                 break;
             case  CLOUD.Extensions.Annotation.shapeTypes.RECTANGLE:
                 var rectangle = new CLOUD.Extensions.AnnotationRectangle(this, id);
-                rectangle.set(position, size, rotation, viewport);
+                rectangle.set(position, size, rotation);
                 this.addAnnotation(rectangle);
                 rectangle.created();
                 break;
             case  CLOUD.Extensions.Annotation.shapeTypes.CIRCLE:
                 var circle = new CLOUD.Extensions.AnnotationCircle(this, id);
-                circle.set(position, size, rotation, viewport);
+                circle.set(position, size, rotation);
                 this.addAnnotation(circle);
                 circle.created();
                 break;
             case  CLOUD.Extensions.Annotation.shapeTypes.CROSS:
                 var cross = new CLOUD.Extensions.AnnotationCross(this, id);
-                cross.set(position, size, rotation, viewport);
+                cross.set(position, size, rotation);
                 this.addAnnotation(cross);
                 cross.created();
                 break;
             case CLOUD.Extensions.Annotation.shapeTypes.CLOUD:
                 var cloud = new CLOUD.Extensions.AnnotationCloud(this, id);
-                cloud.set(position, size, rotation, viewport, shapePointsStr, initialSize);
+                cloud.set(position, size, rotation, shapePointsStr, originSize);
                 this.addAnnotation(cloud);
                 cloud.created();
                 break;
             case  CLOUD.Extensions.Annotation.shapeTypes.TEXT:
                 var textAnnotation = new CLOUD.Extensions.AnnotationText(this, id);
-                textAnnotation.set(position, size, rotation, viewport, text);
+                textAnnotation.set(position, size, rotation, text);
                 this.addAnnotation(textAnnotation);
                 textAnnotation.created();
                 textAnnotation.forceRedraw();
@@ -6963,7 +6957,6 @@ CLOUD.Extensions.AnnotationEditor.prototype.updateAnnotations = function () {
 CLOUD.Extensions.AnnotationEditor.prototype.onCameraChange = function () {
 
     if (this.cameraEditor.cameraDirty) {
-        //this.changeEditorModeCallback(this.domElement);
 
         this.handleCallbacks("changeEditor");
     }

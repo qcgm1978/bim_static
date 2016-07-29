@@ -9,12 +9,11 @@
     <script>
     var viewer = new InspectModelSelection({
       type:"process",//open process
-      sourceId: '848069790540000',
-      etag: "ca4863cf122ac55b5a8e845595aeb7ce",
-      projectId:'1',
-      projectVersionId: '784306105035931',
-      callback:function(ids){
-        console.log(ids);
+      ruleType:'24',//构件分类
+      projectCode:'2196E47F-FACC-45F4-B835-577C7BC65BEB',
+      //res 选择的检查点数据
+      callback:function(res){
+        console.log(res);
       }
     });
     </script>

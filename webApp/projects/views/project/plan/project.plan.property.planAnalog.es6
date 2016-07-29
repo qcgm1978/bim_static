@@ -29,17 +29,39 @@
  		this.$(".tbPlan tbody").html(this.template(data));
 
  		var OrderArr = _.sortBy(data.data, "planStartTime"),
- 			PlayArr = []; 
+	      PlayArr = [],
+	      toTranslucent = [],
+	      ifOuter = {};
 
- 		$.each(OrderArr, function(i, item) {
+
+	  $.each(OrderArr, function(i, item) {
  			PlayArr.push(item.code);
+		  if(!item.inner){
+			  ifOuter[item.code] ={
+				  index : toTranslucent.length,
+				  isout : true
+			  };
+			  toTranslucent.push(item.code)
+		  }else{
+			  ifOuter[item.code] ={
+				  index : toTranslucent.length,
+				  isout : false
+			  };
+		  }
+
+
  		});
 
  		if (PlayArr.length>0) {
  			PlayArr.push(-1);
- 		} 
+ 		}
+	  window.ll=toTranslucent;
+	  window.lll    =ifOuter;
+	  console.log(PlayArr);
  		this.SourcePlay = PlayArr;
- 		this.analogCount = this.SourcePlay.length; 
+ 		this.analogCount = this.SourcePlay.length;
+	  this.ifOuter = ifOuter;
+	  this.toTranslucent = toTranslucent;
  	},
 
 
@@ -111,7 +133,18 @@
  				App.Project.Settings.Viewer.filter({
  					type: "plan",
  					ids: this.PlayArr
- 				}); 				
+ 				});
+        try{
+	        if(!this.ifOuter[code[0]]['isout']){
+		        App.Project.Settings.Viewer.setOverrider({
+			        type: "plan",
+			        ids: this.toTranslucent.slice(0,this.ifOuter[code[0]]['index'])
+		        });
+	        }
+        }catch(e){
+	        console.log(code[0])
+        }
+
 
  				var processAnalog = (this.analogCount - this.PlayArr.length) / this.analogCount,
  					sourceWidth = this.$(".progressAnalog .bg").width(),

@@ -5,19 +5,11 @@
         <td class="positon"><%=item.locationName%></td>
         <td class="ckResult">
          <i data-id="<%= item.acceptanceId %>"  data-total="<%=item.problemCount%>" class="resultStatusIcon  <%= item.colorStatus == 0 ?'myIcon-circle-green':'myIcon-circle-red'%> "></i>
-
              <%=item.problemCount%>/<%=item.checkCount%></td>
     </tr>
 <% }) %> 
-
-
- 
-
-
 <% if(data.items.length<=0){%>
-    
     <tr>
         <td colspan="9" class="noDataTd">暂无数据</td>
     </tr>
-    
 <%}%>

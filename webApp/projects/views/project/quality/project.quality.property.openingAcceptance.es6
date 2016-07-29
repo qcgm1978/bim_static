@@ -53,7 +53,7 @@ App.Project.QualityOpeningAcceptance = Backbone.View.extend({
 				that.changeOA('problemCount', $item.data("status"))
 			}
 		});
-		//列别
+		//类别
 		this.$(".categoryOption").myDropDown({
 			click: function($item) {
 				//that.OpeningAcceptanceOptions.category = $item.text();
@@ -61,8 +61,8 @@ App.Project.QualityOpeningAcceptance = Backbone.View.extend({
 			}
 		});
 
-		//专业
-		this.$(".specialitiesOption").myDropDown({
+		//状态
+		this.$(".statusOption").myDropDown({
 			click: function($item) {
 			//	that.OpeningAcceptanceOptions.specialty = $item.text();
 				that.changeOA('specialty', $item.attr('data-val'))

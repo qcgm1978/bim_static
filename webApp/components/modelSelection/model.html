@@ -9,20 +9,47 @@
 
 <body>
     <script type="text/javascript">
+     function GetRequest() {   
+       var url = location.search; //获取url中"?"符后的字串   
+       var theRequest = new Object();   
+       if (url.indexOf("?") != -1) {   
+          var str = url.substr(1);   
+          strs = str.split("&");   
+          for(var i = 0; i < strs.length; i ++) {   
+             theRequest[strs[i].split("=")[0]]=unescape(strs[i].split("=")[1]);   
+          }   
+       }   
+       return theRequest;   
+    } 
+    var Request = GetRequest();  
     var viewer = new ModelSelection({
-        type: 'multi', //multi,single
-        sourceId: '848069790540000',
-        etag:  "ca4863cf122ac55b5a8e845595aeb7ce",//"21b8481b7e892ec87694259ddaddbfd7" ||
-        projectId: '1',
-        projectVersionId: '784306105035931',
-        //multi 只有components回调参数
+        type:Request.type,
+        sourceId: Request.sourceId,
+        etag: Request.etag,
+        projectId:Request.projectId,
+        projectVersionId: Request.projectVersionId,
         callback: function(components, markers) {
-            console.log(components);
         }
     });
 
-    function getData(){ 
-        return JSON.stringify(viewer.viewData || "");
+    function getData(){
+        var $n=$('#modelTree .del'),
+            c=[];
+        $n.each(function(){
+            var id=$(this).data('userId');
+            c.push({
+                id:id,
+                axis:viewer.Project.axis[id],
+                location:viewer.Project.location[id],
+                locationName:viewer.Project.locationName[id]
+            })
+        })
+        var data={
+            components:c,
+            markers:viewer.Project.Settings.markers
+        }
+        var result=JSON.stringify(data); 
+        return result;
     }
     </script>
 </body>

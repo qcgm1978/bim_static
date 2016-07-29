@@ -9,7 +9,6 @@
       },
 
       URL: {
-        fetchQualityOpeningAcceptance: "sixD/{projectId}/{projectVersionId}/acceptance?type=2",
         fetchQualityModelById: "sixD/{projectId}/{versionId}/quality/element",
         fetchDesignProperties: "sixD/{projectId}/{projectVersionId}/property", //设计属性 ?sceneId={sceneId}&elementId={elementId}
         fetchProjectVersionInfo: "platform/project/{projectId}/version/{projectVersionId}" //项目版本信息
@@ -95,6 +94,10 @@
       }, 10);
     },
     renderModel: function() {
+      //设置onlymodel
+      App.Global || (App.Global = {} );
+      App.Comm.setOnlyModel();
+
       this.viewer = new bimView({
         type: 'model',
         element: $('.projectCotent'),
@@ -186,8 +189,8 @@
         URLtype: "fetchQualityModelById",
         data: {
           type: type,
-          projectId: Project.Settings.projectId,
-          versionId: Project.Settings.projectVersionId,
+          projectId: query.projectId,
+          versionId: query.projectVersionId,
           acceptanceId: id
         }
       };

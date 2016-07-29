@@ -53,19 +53,40 @@
 $(function(){
   window.query = project.GetRequest();
 
+  //获取项目相关信息通过project code
 
-  setTimeout(function(){
-    var viewer = new ModelSelection({
-      sourceId: '848069790540000',
-      etag: "ca4863cf122ac55b5a8e845595aeb7ce",
-      projectId:query.projectId,
-      projectVersionId: query.projectVersionId,
-      type: 1,//检查点类型
-      callback:function(ids){
-        console.log(ids);
+  $.ajax({
+    url: "/platform/api/project/"+query.projectcode+"/meta?token=123"
+  }).done(function(data){
+    if (data.code == 0) {
+
+      if (data.data) {
+        query.projectId = data.data.projectId;
+        query.projectVersionId = data.data.versionId;
+
+            var viewer = new ModelSelection({
+              sourceId: '848069790540000',
+              etag: "ca4863cf122ac55b5a8e845595aeb7ce",
+              projectId:data.data.projectId,
+              projectVersionId: data.data.versionId,
+              type: 1,//检查点类型
+              callback:function(ids){
+                console.log(ids);
+              }
+            });
+
       }
-    });
-  },100);
+    }
+  });
+
+  App.Global || (App.Global = {} );
+  if (!("ActiveXObject" in window) && !window.ActiveXObject) {
+    //轮训
+    setInterval(function(){
+      App.Comm.checkOnlyCloseWindow();
+    },3000);
+  }
+
 })
 </script>
 </body>

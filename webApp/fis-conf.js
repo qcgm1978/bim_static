@@ -350,6 +350,9 @@ fis.match('/components/modelSelection/**.{js,es6}',{
 fis.match('/components/inspectSelection/index.html',{
   release: '/static/dist/components/inspectSelection/index.html'
 });
+fis.match('/components/inspectSelection/model.html',{
+  release: '/static/dist/components/inspectSelection/model.html'
+});
 
 fis.match('/components/inspectSelection/**.{css,less}',{
   packTo: '/static/dist/components/inspectSelection/css/inspectSelection.css'

@@ -21,8 +21,8 @@
 
  		this.VerificationOptions=opts.verOpts;
 
- 		var template = _.templateUrl("/projects/tpls/project/design/project.design.property.verification.header.html", true);
- 		this.$el.html(template);
+ 		var template = _.templateUrl("/projects/tpls/project/design/project.design.property.verification.header.html");
+ 		this.$el.html(template());
  		this.initEvent();
  		return this;
  	},
