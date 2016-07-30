@@ -168,7 +168,7 @@ var dwgViewer = function(options){
     },
 
     //窗口缩放
-    rectZoom: function() {
+    rectZoom: function() { 
       var self = this
       var rect = self.__rect
 
@@ -233,6 +233,7 @@ var dwgViewer = function(options){
 
     //放大
     zoomIn: function(mousePoint) {
+
       var self = this
 
       var zoomScale = (self.__zoomScale * self.__zoomFact) //.toFixed(2)
@@ -532,8 +533,7 @@ var dwgViewer = function(options){
 
 
       self.__viewLeft = viewLeft
-      self.__viewTop = viewTop
-
+      self.__viewTop = viewTop 
       self.__changeViewPos()
     },
 
@@ -824,6 +824,11 @@ dwgViewer.prototype = {
         state = self.dwgView.__state;
     self.dwgView.setState('rectzoom');
   },
+
+  commentInit:function(){
+     
+  },
+
   addControll:function(model,container){
     var self = this;
     var list = $('<ul class="modelList"></ul>');
@@ -834,10 +839,12 @@ dwgViewer.prototype = {
         tmp.trigger('click');
       }
     });
+     
     var modBar = $('<div class="modelBar">'+
     '  <i class="bar-item m-fit2d" data-fn="fit"></i>'+
     '  <i class="bar-item m-zoom" data-fn="zoom"></i>'+
     '  <i class="bar-item m-zoomRect" data-fn="rectZoom"></i>'+
+    ( this._opt.isComment && '<i class="bar-item m-camera" title="快照" data-fn="comment" ></i>' || '')+
     '  <div class="modelSelect">'+
     '    <span class="cur"></span>'+
     '  </div>'+

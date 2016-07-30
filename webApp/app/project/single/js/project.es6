@@ -175,8 +175,9 @@ App.Project = {
 
 		$("#modelBox").addClass("dwg");
 
-		var viewer = new dwgViewer({
+		App.Project.Settings.Viewer = new dwgViewer({
 			element: $("#modelBox"),
+			isComment:true,
 			sourceId: modelId
 		}); 
 
@@ -500,6 +501,12 @@ App.Project = {
 		//事件初始化
 		SingleComment.initEvent();
 
+
+	}
+
+	dwgViewer.prototype.comment=function() {
+		//隐藏工具条
+		$(".bim .modelBar").hide(); 
 
 	}
 

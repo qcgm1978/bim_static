@@ -13,7 +13,7 @@ var AppKeyRoute = Backbone.Router.extend({
 
 	//项目计划节点
 	projectPlan(projectId, planId) {
-
+		 
 		var _this = this;
 		//初始化之前 验证
 		this.beforeInit(() => {
@@ -35,7 +35,13 @@ var AppKeyRoute = Backbone.Router.extend({
 						if (data) {
 							App.Project.Settings.versionId = data.version.id;
 							_this.fetchBuildIdByPlanCode(planId,pid,App.Project.Settings.versionId,function(){
-								App.Project.init();
+								if (App.Project.Settings.PlanElement.elements.length > 0) {
+									App.Project.init();
+								}else{
+									$("#pageLoading").remove();
+									$("#contains").html('<div class="nullTip">该计划节点未找到对应构件</div>')
+								}
+								
 							});
 						}
 					})
@@ -57,7 +63,8 @@ var AppKeyRoute = Backbone.Router.extend({
 			if (res.code == 0) {
 				callback(res.data);
 			} else {
-				callback(null);
+				alert(res.message);
+				return; 
 			}
 		})
 	},
@@ -71,7 +78,7 @@ var AppKeyRoute = Backbone.Router.extend({
 				projectVersionId:projectVersionId,
 				planCode:planCode
 			}
-		},function(data){
+		},function(data){ 
 			 if (data.code==0) {
 			 	App.Project.Settings.PlanElement= data.data; //.elements 
 			 } 
