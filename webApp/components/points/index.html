@@ -17,12 +17,12 @@
 <div id="contains">
   <div class="projectHeader">
     <div class="breadcrumbNav">
-      <span class="projectText">项目</span>
-                <span class="breadItem project relative"> <i class="icon-angle-right"></i>
-           <span class="breadItemText"> <span class="text">--</span> </span>
+      <span class="navname projectText">项目</span>
+                <span class="navname breadItem project relative"> <i class="icon-angle-right"></i>
+           <span class="navname breadItemText"> <span class="text">--</span> </span>
                 </span>
-                <span class="breadItem projectVersion relative"> <i class="icon-angle-right"></i>
-           <span class="breadItemText"> <span class="text"> -- </span> </span>
+                <span class="navname breadItem projectVersion relative"> <i class="icon-angle-right"></i>
+           <span class="navname breadItemText"> <span class="text"> -- </span> </span>
                 </span>
       <span class="changeBtn">查看项目模型</span>
     </div>
@@ -55,7 +55,7 @@
     window.query = project.GetRequest();
 
     //获取项目相关信息通过project code
-
+    $('.navname').hide();
     $.ajax({
       url: "/platform/api/project/"+query.projectCode+"/meta?token=123"
     }).done(function(data){
@@ -120,6 +120,8 @@
     $('.changeBtn').click(function(){
       if($(this).text()=="查看项目模型"){
         $(this).text("查看文件模型");
+        $('.navname').show();
+
         query.viewer = new ModelSelection({
           etag: query.etag,
           sourceId:query.sourceId,
@@ -132,6 +134,8 @@
         });
       }else{
         $(this).text("查看项目模型")
+        $('.navname').hide();
+
         query.viewer = new ModelSelection({
           etag: query.modelId ,
           projectId: query.projectId,
