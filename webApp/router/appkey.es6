@@ -35,7 +35,13 @@ var AppKeyRoute = Backbone.Router.extend({
 						if (data) {
 							App.Project.Settings.versionId = data.version.id;
 							_this.fetchBuildIdByPlanCode(planId,pid,App.Project.Settings.versionId,function(){
-								App.Project.init();
+								if (App.Project.Settings.PlanElement.elements.length > 0) {
+									App.Project.init();
+								}else{
+									$("#pageLoading").remove();
+									$("#contains").html('<div class="nullTip">该计划节点未找到对应构件</div>')
+								}
+								
 							});
 						}
 					})
@@ -72,7 +78,7 @@ var AppKeyRoute = Backbone.Router.extend({
 				projectVersionId:projectVersionId,
 				planCode:planCode
 			}
-		},function(data){
+		},function(data){ 
 			 if (data.code==0) {
 			 	App.Project.Settings.PlanElement= data.data; //.elements 
 			 } 
