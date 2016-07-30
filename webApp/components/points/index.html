@@ -77,17 +77,24 @@
             if (data.code == 0) {
               var  modelId = data.data.modelId;
               query.modelId = modelId;
-              console.log({
-                etag: modelId ,
-                projectId: query.projectId,
-                projectVersionId: query.projectVersionId,
-                type: 'singleModel'
-                });
-              var viewer = new ModelSelection({
+
+//              new bimView({
+//                element: $("#modelBox"),
+//                etag: modelId,
+//                type: typeMap[type],
+//                isComment: type == "rvt" && true || false,
+//                callback: function(id) {
+//                  App.Project.renderAttr(id, 1);
+//                }
+//              });
+//
+
+              query.viewer = new ModelSelection({
                 etag: modelId,
                 projectId: query.projectId,
                 projectVersionId: query.projectVersionId,
                 type: 'singleModel',//检查点类型
+                isSingle:true,
                 callback:function(ids){
                   console.log(ids);
                 }
@@ -118,7 +125,7 @@
           sourceId:query.sourceId,
           projectId: query.projectId,
           projectVersionId: query.projectVersionId,
-          type: 1,
+          type: 'model',
           callback:function(ids){
             console.log(ids);
           }
@@ -129,7 +136,8 @@
           etag: query.modelId ,
           projectId: query.projectId,
           projectVersionId: query.projectVersionId,
-          type: 'singleModel',//检查点类型
+          type: 'singleModel',//检查点类型,
+          isSingle :true,
           callback:function(ids){
             console.log(ids);
           }

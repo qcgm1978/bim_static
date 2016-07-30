@@ -97,12 +97,12 @@
       //设置onlymodel
       App.Global || (App.Global = {} );
       App.Comm.setOnlyModel();
-
       this.viewer = new bimView({
-        type: 'model',
+        type: this.Settings.type ,
         element: $('.projectCotent'),
         sourceId: this.Settings.sourceId,
         etag: this.Settings.etag,
+        isSingle:this.Settings.isSingle?true:false,
         projectId: this.Settings.projectId,
         projectVersionId: this.Settings.projectVersionId
       })
@@ -111,6 +111,7 @@
 
       this.viewer.on("loaded", function() {
         if($('.changeBtn').text()=="查看项目模型"){
+          //$('.m-miniScreen').click();
           $.ajax({
             url: "/sixD/"+query.projectId+'/'+query.projectVersionId+"/bounding/box?sceneId="+query.modelId+"&elementId="+(query.modelId+'.'+query.uid)
           }).done(function(data){
@@ -295,7 +296,6 @@
       Project.Viewer.translucent(true);
       //高亮
       console.log(ids)
-      debugger
       Project.Viewer.highlight({
         type: 'userId',
         ids: ids
