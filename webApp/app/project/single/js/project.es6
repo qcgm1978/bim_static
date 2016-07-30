@@ -178,7 +178,7 @@ App.Project = {
 		var viewer = new dwgViewer({
 			element: $("#modelBox"),
 			sourceId: modelId
-		});
+		}); 
 
 	},
 

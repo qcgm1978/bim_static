@@ -139,8 +139,7 @@ var AppKeyRoute = Backbone.Router.extend({
 	// 浏览变更模型与变更基准模型差异
 	projectDifferBase(projectCode, versionId) {
 		//初始化之前 验证
-		this.beforeInit(() => {
-
+		this.beforeInit(() => { 
 			_.require('/static/dist/app/project/projectChange/index.css');
 			_.require('/static/dist/app/project/projectChange/index.js');
 			var temp = _.templateUrl('/page/tpls/project.change.html', true);
@@ -151,8 +150,7 @@ var AppKeyRoute = Backbone.Router.extend({
 	},
 
 	//浏览项目模型与标准模型差异
-	projectDifferStd(projectCode, versionId) {
-
+	projectDifferStd(projectCode, versionId) { 
 		//初始化之前 验证
 		this.beforeInit(() => {
 
@@ -168,13 +166,13 @@ var AppKeyRoute = Backbone.Router.extend({
 
 	//项目
 	project(projectCode, versionId) {
+
 		var _this = this;
 		//初始化之前 验证
 		this.beforeInit(() => {
-
+ 
 			_.require('/static/dist/projects/projects.css');
-			_.require('/static/dist/projects/projects.js');
-
+			_.require('/static/dist/projects/projects.js'); 
 
 			App.Project.Settings = $.extend({}, App.Project.Defaults);
 
@@ -265,11 +263,10 @@ var AppKeyRoute = Backbone.Router.extend({
 
 	//加载之前
 	beforeInit(callback) {
-
+	 
 		if (App.Comm.isIEModel()) {
 			return;
-		}
-
+		} 
 		//验证登录
 		this.checkLogin((isLogin) => {
 
@@ -286,7 +283,7 @@ var AppKeyRoute = Backbone.Router.extend({
 
 	//检查登录
 	checkLogin(fn) {
-
+	 
 		$("#pageLoading").show();
 
 		App.Comm.Settings.loginType = "token";
@@ -307,7 +304,7 @@ var AppKeyRoute = Backbone.Router.extend({
 			}
 		}
 
-		App.Comm.ajax(data, function(data) { 
+		App.Comm.ajax(data, function(data) {  
 			if (data.code == 0) {
 
 				App.Comm.setCookie("token_cookie", data.data);
@@ -323,6 +320,10 @@ var AppKeyRoute = Backbone.Router.extend({
 				}
 
 			}
+		}).fail(function(data){
+			 if (data.status==400) {
+			 	alert("token过期");
+			 }
 		});
 
 		//} else {
@@ -344,10 +345,10 @@ var AppKeyRoute = Backbone.Router.extend({
 				alert("获取用户信息失败");
 				fn(false);
 				return;
-			}
+			} 
 			localStorage.setItem("user", JSON.stringify(data.data));
 
-			var Autharr = data.data.function,
+			var Autharr = data.data['function'],
 				keys, len;
 			App.AuthObj = {};
 			//遍历权限

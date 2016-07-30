@@ -6591,8 +6591,8 @@ CLOUD.Extensions.AnnotationEditor.prototype.clientToWorld = function (cPoint) {
     result.z = 0;
 
     result.unproject(camera);
-    result.add(camera.position).applyMatrix4(camera.matrixWorldInverse);    //result.z = 0;
-
+    result.add(camera.position).applyMatrix4(camera.matrixWorldInverse);
+    //result.z = 0;
 
     return result;
 };
@@ -6744,9 +6744,6 @@ CLOUD.Extensions.AnnotationEditor.prototype.getScreenSnapshot = function (snapsh
     canvas.height = bounds.height;
 
     var ctx = canvas.getContext('2d');
-    var preSnapshot = new Image();
-    preSnapshot.src = snapshot;
-
     var startColor = this.gradientStartColor;
     var stopColor = this.gradientStopColor;
 
@@ -6768,7 +6765,13 @@ CLOUD.Extensions.AnnotationEditor.prototype.getScreenSnapshot = function (snapsh
     }
 
     // 先绘制之前的图像
-    ctx.drawImage(preSnapshot, 0, 0);
+    if (snapshot) {
+
+        var preSnapshot = new Image();
+        preSnapshot.src = snapshot;
+        ctx.drawImage(preSnapshot, 0, 0);
+    }
+
     // 绘制批注
     this.renderToCanvas(ctx);
 
@@ -6964,3 +6967,546 @@ CLOUD.Extensions.AnnotationEditor.prototype.onCameraChange = function () {
 };
 
 // ---------------------------- 外部 API END ---------------------------- //
+
+var CLOUD = CLOUD || {};
+CLOUD.Extensions = CLOUD.Extensions || {};
+
+CLOUD.Extensions.DwgAnnotationEditor = function (viewer) {
+    "use strict";
+
+    CLOUD.Extensions.AnnotationEditor.call(this, viewer);
+
+    this.pointToScreenCenter = {x: 800, y: 600};
+};
+
+CLOUD.Extensions.DwgAnnotationEditor.prototype = Object.create(CLOUD.Extensions.AnnotationEditor.prototype);
+CLOUD.Extensions.DwgAnnotationEditor.prototype.constructor = CLOUD.Extensions.DwgAnnotationEditor;
+
+CLOUD.Extensions.DwgAnnotationEditor.prototype.onResize = function () {
+
+    var bounds = this.getDomContainerBounds();
+
+    this.bounds.x = 0;
+    this.bounds.y = 0;
+    this.bounds.width = bounds.width;
+    this.bounds.height = bounds.height;
+
+    this.svg.setAttribute('width', this.bounds.width + '');
+    this.svg.setAttribute('height', this.bounds.height + '');
+};
+
+CLOUD.Extensions.DwgAnnotationEditor.prototype.setDomContainer = function (domElement) {
+
+    if (domElement) {
+
+        this.domElement = domElement;
+    }
+};
+
+CLOUD.Extensions.DwgAnnotationEditor.prototype.setPointToScreenCenter = function (point) {
+
+    if (point) {
+
+        this.pointToScreenCenter.x = point.x;
+        this.pointToScreenCenter.y = point.y;
+    }
+};
+
+CLOUD.Extensions.DwgAnnotationEditor.prototype.worldToClient = function (wPoint) {
+
+    var rect = this.getDomContainerBounds();
+    var screenCenter = new THREE.Vector3(rect.width * 0.5, rect.height * 0.5, 0);
+    var result = new THREE.Vector3(wPoint.x, wPoint.y, wPoint.z);
+
+    // 变换到屏幕空间
+    result.x = result.x - this.pointToScreenCenter.x + screenCenter.x;
+    result.y = -result.y - this.pointToScreenCenter.y + screenCenter.y;
+    result.z = 0;
+
+    return result;
+};
+
+CLOUD.Extensions.DwgAnnotationEditor.prototype.clientToWorld = function (cPoint) {
+
+    // Wp - Wc = Sp - Sc ===> Wp = Sp - Sc + Wc
+    var rect = this.getDomContainerBounds();
+    var screenCenter = new THREE.Vector3(rect.width * 0.5, rect.height * 0.5, 0);
+    var result = new THREE.Vector3();
+
+    result.x = cPoint.x - screenCenter.x  + this.pointToScreenCenter.x;
+    result.y = -(cPoint.y - screenCenter.y + this.pointToScreenCenter.y); // 翻转,因为绘制图形参照坐标和屏幕的坐标系不同
+    result.z = 0;
+
+    return result;
+};
+
+CLOUD.Extensions.DwgAnnotationEditor.prototype.onCameraChange = function () {
+
+    this.handleCallbacks("changeEditor");
+
+};
+
+CLOUD.Extensions.Helper2D = function (viewer) {
+
+    this.viewer = viewer;
+    this.dwgDomContainer = null;
+
+    this.annotationMode = {MODEL: 0, DWG: 1};
+    this.currentAnnotationMode = this.annotationMode.MODEL;
+};
+
+CLOUD.Extensions.Helper2D.prototype = {
+
+    constructor: CLOUD.Extensions.Helper2D,
+
+    // canvas转Base64格式png图片
+    canvasToImage: function (dataUrl) {
+
+        var editor;
+        var newDataUrl;
+
+        if (this.isModelAnnotations()) {
+
+            editor = this.annotationEditor;
+
+        } else {
+
+            editor = this.dwgAnnotationEditor;
+        }
+
+        newDataUrl = editor.getScreenSnapshot(dataUrl);
+
+        return newDataUrl;
+
+    },
+
+    // 是否存在批注
+    hasAnnotations: function () {
+
+        return this.annotationEditor || this.dwgAnnotationEditor;
+    },
+
+    // 是否模型批注
+    isModelAnnotations: function () {
+
+        return (this.currentAnnotationMode === this.annotationMode.MODEL);
+    },
+
+    // 是否DWG批注
+    isDwgAnnotations: function () {
+
+        return (this.currentAnnotationMode === this.annotationMode.DWG);
+    },
+
+    // 初始化批注
+    initAnnotation: function () {
+
+        var viewer = this.viewer;
+        var scope = this;
+
+        if (!this.annotationEditor) {
+
+            this.annotationEditor = new CLOUD.Extensions.AnnotationEditor(viewer);
+        }
+
+        if (!this.annotationEditor.isInitialized()) {
+
+            var callbacks = {
+                beginEditCallback: function (domElement) {
+                    viewer.editorManager.unregisterDomEventListeners(domElement);
+                },
+                endEditCallback: function (domElement) {
+                    viewer.editorManager.registerDomEventListeners(domElement);
+                },
+                changeEditorModeCallback: function () {
+                    scope.uninitAnnotationMode();
+                }
+            };
+
+            this.annotationEditor.init(callbacks);
+
+            callbacks = null;
+        }
+    },
+
+    // 卸载批注资源
+    uninitAnnotationMode: function () {
+
+        if (this.annotationEditor && this.annotationEditor.isInitialized()) {
+
+            this.annotationEditor.uninit();
+
+        }
+    },
+
+    // 设置批注背景色
+    setAnnotationBackgroundColor: function (startColor, stopColor) {
+
+        if (this.annotationEditor) {
+
+            this.annotationEditor.setBackgroundColor(startColor, stopColor);
+        }
+    },
+
+    // 开始批注编辑
+    editAnnotationBegin: function () {
+
+        this.currentAnnotationMode = this.annotationMode.MODEL;
+
+        // 如果没有设置批注模式，则自动进入批注模式
+        this.initAnnotation();
+
+        this.annotationEditor.editBegin();
+    },
+
+    // 完成批注编辑
+    editAnnotationEnd: function () {
+
+        if (this.annotationEditor) {
+
+            this.annotationEditor.editEnd();
+
+        }
+    },
+
+    // 设置批注类型
+    setAnnotationType: function (type) {
+
+        if (this.annotationEditor) {
+
+            this.annotationEditor.setAnnotationType(type);
+
+        }
+    },
+
+    // 加载批注列表
+    loadAnnotations: function (annotations) {
+
+        if (annotations) {
+
+            this.initAnnotation();
+            this.annotationEditor.loadAnnotations(annotations);
+        } else {
+            this.uninitAnnotationMode();
+        }
+    },
+
+    // 获得批注对象列表
+    getAnnotationInfoList: function () {
+
+        if (this.annotationEditor) {
+
+            return this.annotationEditor.getAnnotationInfoList();
+
+        }
+
+        return null;
+    },
+
+    // resize
+    resizeAnnotations: function () {
+
+        if (this.annotationEditor && this.annotationEditor.isInitialized()) {
+
+            this.annotationEditor.onResize();
+
+        }
+    },
+
+    // render
+    renderAnnotations: function () {
+
+        if (this.annotationEditor && this.annotationEditor.isInitialized()) {
+
+            this.annotationEditor.onCameraChange();
+
+        }
+    },
+
+    // 初始化DWG批注
+    initDwgAnnotation: function (beginEditCallback, endEditCallback) {
+
+        var viewer = this.viewer;
+        var scope = this;
+        var domElement = this.dwgDomContainer ? this.dwgDomContainer : viewer.domElement;
+
+        if (!this.dwgAnnotationEditor) {
+
+            this.dwgAnnotationEditor = new CLOUD.Extensions.DwgAnnotationEditor(viewer);
+        }
+
+        // 设置父容器
+        this.dwgAnnotationEditor.setDomContainer(domElement);
+
+        if (!this.dwgAnnotationEditor.isInitialized()) {
+
+            var callbacks = {
+                beginEditCallback: beginEditCallback,
+                endEditCallback: endEditCallback,
+                changeEditorModeCallback: function () {
+                    scope.uninitDwgAnnotationMode();
+                }
+            };
+
+            this.dwgAnnotationEditor.init(callbacks);
+
+            callbacks = null;
+        }
+    },
+
+    // 卸载DWG批注资源
+    uninitDwgAnnotationMode: function () {
+
+        if (this.dwgAnnotationEditor && this.dwgAnnotationEditor.isInitialized()) {
+
+            this.dwgAnnotationEditor.uninit();
+
+        }
+    },
+
+    // 设置DWG背景色
+    setDwgAnnotationBackgroundColor: function (startColor, stopColor) {
+
+        if (this.dwgAnnotationEditor) {
+
+            this.dwgAnnotationEditor.setBackgroundColor(startColor, stopColor);
+        }
+    },
+
+    // 开始编辑DWG批注
+    editDwgAnnotationBegin: function (pointToCenter, beginEditCallback, endEditCallback, changeEditorModeCallback) {
+
+        this.currentAnnotationMode = this.annotationMode.DWG;
+
+        // 如果没有设置批注模式，则自动进入批注模式
+        this.initDwgAnnotation(beginEditCallback, endEditCallback, changeEditorModeCallback);
+
+        if (pointToCenter) {
+            this.dwgAnnotationEditor.setPointToScreenCenter(pointToCenter);
+        }
+
+        this.dwgAnnotationEditor.editBegin();
+    },
+
+    // 完成编辑DWG批注
+    editDwgAnnotationEnd: function () {
+
+        if (this.dwgAnnotationEditor) {
+
+            this.dwgAnnotationEditor.editEnd();
+
+        }
+    },
+
+    // 设置DWG批注类型
+    setDwgAnnotationType: function (type) {
+
+        if (this.dwgAnnotationEditor) {
+
+            this.dwgAnnotationEditor.setAnnotationType(type);
+
+        }
+    },
+
+    // 加载DWG批注
+    loadDwgAnnotations: function (annotations, pointToCenter, beginEditCallback, endEditCallback) {
+
+        if (pointToCenter) {
+            this.dwgAnnotationEditor.setPointToScreenCenter(pointToCenter);
+        }
+
+        if (annotations) {
+
+            this.initDwgAnnotation(beginEditCallback, endEditCallback);
+            this.dwgAnnotationEditor.loadAnnotations(annotations);
+        } else {
+            this.uninitDwgAnnotationMode();
+        }
+    },
+
+    // 获得DWG批注对象列表
+    getDwgAnnotationInfoList: function () {
+
+        if (this.dwgAnnotationEditor) {
+
+            return this.dwgAnnotationEditor.getAnnotationInfoList();
+
+        }
+
+        return null;
+    },
+
+    // resize
+    resizeDwgAnnotations: function () {
+
+        if (this.dwgAnnotationEditor && this.dwgAnnotationEditor.isInitialized()) {
+
+            this.dwgAnnotationEditor.onResize();
+
+        }
+    },
+
+    // render
+    renderDwgAnnotations: function () {
+
+        if (this.dwgAnnotationEditor && this.dwgAnnotationEditor.isInitialized()) {
+
+            this.dwgAnnotationEditor.onCameraChange();
+
+        }
+    },
+
+    getDwgScreenSnapshot: function (snapshotCallback) {
+
+        //var dwgDom = this.dwgDomContainer;
+        //
+        //if (dwgDom) {
+        //
+        //    html2canvas(dwgDom, {
+        //        logging: true,
+        //        onrendered: function (canvas) {
+        //
+        //            var dataUrl = canvas.toDataURL("image/png");
+        //            snapshotCallback(dataUrl);
+        //        }
+        //    });
+        //
+        //}
+
+    },
+
+    // 设置DWG批注容器
+    setDwgDomContainer: function (domElement) {
+        this.dwgDomContainer = domElement;
+    },
+
+    // ------------------ 标记 API -- S ------------------ //
+    // 初始化Marker
+    initMarkerEditor: function () {
+
+        var viewer = this.viewer;
+
+        if (!this.markerEditor) {
+
+            this.markerEditor = new CLOUD.Extensions.MarkerEditor(viewer);
+        }
+
+        if (!this.markerEditor.isInitialized()) {
+
+            var callbacks = {
+                beginEditCallback: function (domElement) {
+                    viewer.editorManager.unregisterDomEventListeners(domElement);
+                },
+                endEditCallback: function (domElement) {
+                    viewer.editorManager.registerDomEventListeners(domElement);
+                }
+            };
+
+            this.markerEditor.init(callbacks);
+
+            callbacks = null;
+        }
+    },
+
+    // 卸载Marker
+    uninitMarkerEditor: function () {
+
+        if (this.markerEditor.isInitialized()) {
+
+            this.markerEditor.uninit();
+
+        }
+    },
+
+    // zoom到合适的大小
+    zoomToSelectedMarkers: function () {
+
+        if (this.markerEditor) {
+
+            var bBox = this.markerEditor.getMarkersBoundingBox();
+
+            if (bBox) {
+                this.viewer.zoomToBBox(bBox);
+            }
+
+            this.markerEditor.updateMarkers();
+
+        }
+
+    },
+
+    // 开始编辑Marker
+    editMarkerBegin: function () {
+
+        this.initMarkerEditor();
+        this.initMarkerEditor();
+        this.markerEditor.editBegin();
+    },
+
+    // 结束编辑Marker
+    editMarkerEnd: function () {
+
+        if (this.markerEditor) {
+
+            this.markerEditor.editEnd();
+
+        }
+    },
+
+    // 设置标记状态
+    setMarkerState: function (state) {
+
+        if (this.markerEditor) {
+
+            this.markerEditor.setMarkerState(state);
+
+        }
+    },
+
+    // 加载标记
+    loadMarkers: function (markerInfoList) {
+
+        if (markerInfoList) {
+
+            this.initMarkerEditor();
+            this.markerEditor.loadMarkers(markerInfoList);
+
+        } else {
+
+            this.uninitMarkerEditor();
+        }
+
+    },
+
+    // 获得标记列表
+    getMarkerInfoList: function () {
+
+        if (this.markerEditor) {
+
+            return this.markerEditor.getMarkerInfoList();
+
+        }
+
+        return null;
+    },
+
+    resizeMarkers: function () {
+
+        if (this.markerEditor) {
+
+            return this.markerEditor.onResize();
+
+        }
+    },
+
+    renderMarkers: function () {
+
+        if (this.markerEditor) {
+
+            return this.markerEditor.updateMarkers();
+
+        }
+    }
+
+    // ------------------ 标记 API -- E ------------------ //
+};
