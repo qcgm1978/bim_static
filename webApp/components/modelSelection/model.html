@@ -34,6 +34,10 @@
     });
 
     function getData(){
+
+      alert("执行回调");
+      $(".modelSelectDialog .tabItem ").html("执行回调")
+
         var $n=$('#modelTree .del'),
             c=[];
         $n.each(function(){
@@ -51,6 +55,8 @@
             markers:viewer.Project.Settings.markers
         }
         var result=JSON.stringify(data); 
+         $(".modelSelectDialog .tabItem ").html("执行回调结果："+result)
+         alert("执行回调结果："+result);
         return result;
     }
     </script>

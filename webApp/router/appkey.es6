@@ -76,7 +76,7 @@ var AppKeyRoute = Backbone.Router.extend({
 			data:{
 				projectId:projectId,
 				projectVersionId:projectVersionId,
-				planCode:planCode
+				planItemId:planCode
 			}
 		},function(data){ 
 			 if (data.code==0) {
