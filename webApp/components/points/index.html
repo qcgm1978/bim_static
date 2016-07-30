@@ -113,19 +113,19 @@
     $('.changeBtn').click(function(){
       if($(this).text()=="查看项目模型"){
         $(this).text("查看文件模型");
-        var viewer = new ModelSelection({
+        query.viewer = new ModelSelection({
           etag: query.etag,
           sourceId:query.sourceId,
           projectId: query.projectId,
           projectVersionId: query.projectVersionId,
-          type: 1,//检查点类型
+          type: 1,
           callback:function(ids){
             console.log(ids);
           }
         });
       }else{
         $(this).text("查看项目模型")
-        var viewer = new ModelSelection({
+        query.viewer = new ModelSelection({
           etag: query.modelId ,
           projectId: query.projectId,
           projectVersionId: query.projectVersionId,
