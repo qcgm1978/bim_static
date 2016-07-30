@@ -943,7 +943,7 @@ App.Console = {
     });
     //7.5
     $.ajax({
-      url: "platform/api/workflow/project?status=10"
+      url: "platform/api/workflow/project?status=11"
     }).done(function(data){
 
       var items = data.data, str = '';
