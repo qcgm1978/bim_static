@@ -110,20 +110,73 @@
       $('.m-camera').addClass('disabled').attr('disabled','disabled');
 
       this.viewer.on("loaded", function() {
-        //var fieldid = query.elementId.split('.')[0],
-        //    uid = query.elementId.split('.')[1];
-        //
-        //
-        //$.ajax({
-        //  url: "doc/sixD/api/"+query.projectId+'/'+query.projectVersionId+"?fileId="+fieldid
-        //}).done(function(data){
-        //  if (data.code == 0) {
-        //    console.log(data)
-        //  }
-        //});
+        if($(this).text()=="查看项目模型"){
+          $.ajax({
+            url: "/sixD/"+query.projectId+'/'+query.projectVersionId+"/bounding/box?sceneId="+query.modelId+"&elementId="+(query.modelId+'.'+query.uid)
+          }).done(function(data){
+            console.log(data)
+            if(data.code == 0){
+              var min = data.data.min,
+                  max = data.data.max,
+                  boundingBox = data.data;
+
+              var info = {
+                    id: "",
+                    userId: query.uid,
+                    shapeType: 0,
+                    position: {x:query.x,y:query.y,z:query.z},
+                    boundingBox: boundingBox,
+                    state : query.type
+
+                  },
+                  box = Project.formatBBox(info.boundingBox),
+                  ids = [info.userId];
+              query.box = box;
+              query.ids = ids;
+              query.info = info;
+              Project.zoomModel(ids, box);
+              Project.showMarks(JSON.stringify(info));
+            }
+          });
+        }else{
+          if(query.box){
+            Project.zoomModel(query.ids, query.box);
+            Project.showMarks(JSON.stringify(query.info));
+          }else{
+            $.ajax({
+              url: "/sixD/"+query.projectId+'/'+query.projectVersionId+"/bounding/box?sceneId="+query.modelId+"&elementId="+(query.modelId+'.'+query.uid)
+            }).done(function(data){
+              console.log(data)
+              if(data.code == 0){
+                var min = data.data.min,
+                    max = data.data.max,
+                    boundingBox = data.data;
+
+                var info = {
+                      id: "",
+                      userId: query.uid,
+                      shapeType: 0,
+                      position: {x:query.x,y:query.y,z:query.z},
+                      boundingBox: boundingBox,
+                      state : query.type
+
+                    },
+                    box = Project.formatBBox(info.boundingBox),
+                    ids = [info.userId];
+                query.box = box;
+                query.ids = ids;
+                query.info = info;
+                Project.zoomModel(ids, box);
+                Project.showMarks(JSON.stringify(info));
+              }
+            });
+          }
+
+        }
 
 
-        Project.showInModel(query.acceptanceId,query.type);
+
+        //Project.showInModel(query.acceptanceId,query.type);
       });
 
       this.viewer.on("click", function(model) {
