@@ -1299,13 +1299,22 @@ App.Project = {
 		return sb.toString();
 	},
 
+	formatMark:function(location){
+		var _temp=location;
+		if(typeof location === 'string'){
+			_temp=JSON.parse(location)
+		}
+		_temp.shapeType=_temp.shapeType||1;
+		_temp.state=_temp.state||3;
+		_temp.userId=_temp.userId||_temp.componentId;
+		return JSON.stringify(_temp);
+	},
 	//在模型中显示
 	showInModel: function($target, type) {
 		var _this = this,
 			ids = $target.data('userId'),
 			box = $target.data('box'),
 			location = $target.data('location');
-
 		if ($target.hasClass("selected")) {
 			return
 			//	$target.parent().find(".selected").removeClass("selected");
@@ -1313,13 +1322,21 @@ App.Project = {
 			$target.parent().find(".selected").removeClass("selected");
 			$target.addClass("selected");
 		}
-
 		if (ids && box) {
 			_this.zoomModel(ids, box);
 			_this.showMarks(location);
 			return;
 		}
-		var data = {
+
+		var _temp=location;
+		box = _this.formatBBox(_temp.bBox || _temp.boundingBox);
+		ids = [_temp.userId||_temp.componentId];
+		$target.data("userId", ids);
+		$target.data("box", box);
+		$target.data("location", JSON.stringify(location));
+		_this.zoomModel(ids, box);
+		_this.showMarks(_this.formatMark(location));
+		/*var data = {
 			URLtype: "fetchQualityModelById",
 			data: {
 				type: type,
@@ -1345,7 +1362,7 @@ App.Project = {
 					_this.showMarks(location);
 				}
 			}
-		});
+		});*/
 	},
 
 	showMarks: function(marks) {
