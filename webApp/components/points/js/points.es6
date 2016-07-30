@@ -123,10 +123,10 @@
               var info = {
                     id: "",
                     userId: query.uid,
-                    shapeType: 0,
+                    shapeType: query.type,
                     position: {x:query.x,y:query.y,z:query.z},
                     boundingBox: boundingBox,
-                    state : query.type
+                    state : 0
 
                   },
                   box = Project.formatBBox(info.boundingBox),
@@ -155,10 +155,10 @@
                 var info = {
                       id: "",
                       userId: query.uid,
-                      shapeType: 0,
+                      shapeType: query.type,
                       position: {x:query.x,y:query.y,z:query.z},
                       boundingBox: boundingBox,
-                      state : query.type
+                      state : 0
 
                     },
                     box = Project.formatBBox(info.boundingBox),
