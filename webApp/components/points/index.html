@@ -75,7 +75,7 @@
             url: "/doc/api/"+query.projectId+'/'+query.projectVersionId+"?fileId="+fieldid
           }).done(function(data){
             if (data.code == 0) {
-              var  modelId = data.data.id;
+              var  modelId = data.data.modelId;
               query.modelId = modelId;
               console.log({
                 etag: modelId ,
