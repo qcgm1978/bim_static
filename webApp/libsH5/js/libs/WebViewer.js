@@ -18008,7 +18008,7 @@ CloudViewer = function () {
 
     this.modelManager = new CLOUD.ModelManager();
 
-    this.extensions = {}; // 扩展功能
+    this.extensionHelper = new CLOUD.Extensions.Helper2D(this);
 
     this.viewHouse = null;
 
@@ -18030,48 +18030,6 @@ CloudViewer = function () {
     }
 
     scope.modelManager.addEventListener(CLOUD.EVENTS.ON_LOAD_START, initializeView);
-
-    // 处理ViewHouse交互
-    //function handleViewHouseEvent(type, event) {
-    //
-    //    if (!scope.viewHouse) return false;
-    //
-    //    var isInHouse = false;
-    //
-    //    switch (type) {
-    //        case "down":
-    //            isInHouse = scope.viewHouse.mouseDown(event, function () {
-    //                //
-    //            });
-    //            break;
-    //        case "move":
-    //            isInHouse = scope.viewHouse.mouseMove(event, function (delta) {
-    //                if (delta !== undefined) {
-    //                    scope.cameraEditor.processRotate(delta);
-    //                } else {
-    //                    scope.cameraEditor.updateView();
-    //                }
-    //            });
-    //            break;
-    //        case "up":
-    //            isInHouse = scope.viewHouse.mouseUp(event, function (view, delta) {
-    //                if (delta !== undefined) {
-    //                    scope.cameraEditor.processRotate(delta);
-    //                }
-    //
-    //                // 0代表home，不能用 if (view) 判断
-    //                if (view !== undefined && view !== null) {
-    //                    scope.setStandardView(view);
-    //                }
-    //                //scope.cameraEditor.updateView();
-    //            });
-    //            break;
-    //        default:
-    //            break;
-    //    }
-    //
-    //    return isInHouse;
-    //}
 
     this.editorManager = new CLOUD.EditorManager();
 
@@ -18600,13 +18558,26 @@ CloudViewer.prototype = {
         var mimetype = "image/png";
         var dataUrl = null;
 
-        if (this.extensions.annotationEditor) {
+        if (this.extensionHelper.hasAnnotations()) {
 
             // 在批注模式，底图已经锁定，不用调用render
-            var editor = this.extensions.annotationEditor;
 
-            dataUrl = this.renderer.domElement.toDataURL(mimetype);
-            dataUrl = editor.getScreenSnapshot(dataUrl);
+            if (this.extensionHelper.isModelAnnotations()) {
+
+                dataUrl = this.renderer.domElement.toDataURL(mimetype);
+
+            } else {
+
+                //var snapshotCallback = function(data) {
+                //
+                //    dataUrl = data;
+                //};
+                //
+                //this.extensionHelper.getDwgScreenSnapshot(snapshotCallback);
+            }
+
+            dataUrl = this.extensionHelper.canvasToImage(dataUrl);
+
 
         } else {
 
@@ -18904,254 +18875,107 @@ CloudViewer.prototype = {
 
     // ------------------ 标记 API -- S ------------------ //
 
+    // 设置标记模式，已废弃
     setMarkerMode: function () {
 
-        if (!this.extensions.markerEditor) {
-
-            this.extensions.markerEditor = new CLOUD.Extensions.MarkerEditor(this);
-        }
-
-    },
-
-    // 初始化
-    initMarkerEditor: function() {
-
-        var scope = this;
-
-        if (!this.extensions.markerEditor.isInitialized()) {
-
-            var callbacks = {
-                beginEditCallback: function(domElement){
-                    scope.editorManager.unregisterDomEventListeners(domElement);
-                },
-                endEditCallback: function(domElement){
-                    scope.editorManager.registerDomEventListeners(domElement);
-                }
-            };
-
-            this.extensions.markerEditor.init(callbacks);
-
-            callbacks = null;
-        }
-    },
-
-    // 卸载
-    uninitMarkerEditor: function() {
-
-        if (this.extensions.markerEditor.isInitialized()) {
-
-            this.extensions.markerEditor.uninit();
-
-        }
     },
 
     // zoom到合适的大小
     zoomToSelectedMarkers: function(){
-
-        if (this.extensions.markerEditor) {
-
-            var bBox = this.extensions.markerEditor.getMarkersBoundingBox();
-
-            if (bBox) {
-                this.zoomToBBox(bBox);
-            }
-
-            this.extensions.markerEditor.updateMarkers();
-
-        }
-
+        this.extensionHelper.zoomToSelectedMarkers();
     },
 
     // 开始编辑
     editMarkerBegin: function() {
-
-        this.setMarkerMode();
-        this.initMarkerEditor();
-        this.extensions.markerEditor.editBegin();
+        this.extensionHelper.editMarkerBegin();
     },
 
     // 结束编辑
     editMarkerEnd: function() {
-
-        if (this.extensions.markerEditor) {
-
-            this.extensions.markerEditor.editEnd();
-
-        }
+        this.extensionHelper.editMarkerEnd();
     },
 
     // 设置标记状态
     setMarkerState: function(state) {
-
-        if (this.extensions.markerEditor) {
-
-            this.extensions.markerEditor.setMarkerState(state);
-
-        }
+        this.extensionHelper.setMarkerState(state);
     },
 
     // 加载标记
     loadMarkers: function(markerInfoList) {
-
-        this.setMarkerMode();
-
-        if (markerInfoList) {
-
-            this.initMarkerEditor();
-            this.extensions.markerEditor.loadMarkers(markerInfoList);
-
-        } else {
-
-            this.uninitMarkerEditor();
-        }
-
+        this.extensionHelper.loadMarkers(markerInfoList);
     },
 
     // 获得标记列表
     getMarkerInfoList: function() {
-
-        if (this.extensions.markerEditor) {
-
-            return this.extensions.markerEditor.getMarkerInfoList();
-
-        }
-
-        return null;
+        return this.extensionHelper.getMarkerInfoList();
     },
 
     resizeMarkers: function() {
-
-        if (this.extensions.markerEditor) {
-
-            return this.extensions.markerEditor.onResize();
-
-        }
+        this.extensionHelper.resizeMarkers();
     },
 
     renderMarkers: function() {
-
-        if (this.extensions.markerEditor) {
-
-            return this.extensions.markerEditor.updateMarkers();
-
-        }
+        this.extensionHelper.renderMarkers();
     },
 
     // ------------------ 标记 API -- E ------------------ //
 
     // ------------------ 批注 API -- S ------------------ //
 
+    // 进入批注模式，已废弃
     setCommentMode: function () {
 
-        var scope = this;
-
-        if (!this.extensions.annotationEditor) {
-
-            this.extensions.annotationEditor = new CLOUD.Extensions.AnnotationEditor(this);
-        }
-
-        if (!this.extensions.annotationEditor.isInitialized()) {
-
-            var callbacks = {
-                beginEditCallback: function(domElement){
-                    scope.editorManager.unregisterDomEventListeners(domElement);
-                },
-                endEditCallback: function(domElement){
-                    scope.editorManager.registerDomEventListeners(domElement);
-                },
-                changeEditorModeCallback:function(){
-                    scope.exitCommentMode();
-                }
-            };
-
-            this.extensions.annotationEditor.init(callbacks);
-
-            callbacks = null;
-        }
     },
 
-    exitCommentMode: function () {
-
-        if (this.extensions.annotationEditor&&this.extensions.annotationEditor.isInitialized()) {
-
-            this.extensions.annotationEditor.uninit();
-
-        }
-    },
-
-
+    // 设置背景
     setCommentBackgroundColor: function (startColor, stopColor) {
 
-        if ( this.extensions.annotationEditor) {
-
-            this.extensions.annotationEditor.setBackgroundColor(startColor, stopColor);
-        }
+        this.extensionHelper.setAnnotationBackgroundColor(startColor, stopColor);
     },
 
+    // 开始编辑批注
     editCommentBegin: function() {
 
-        // 如果没有设置批注模式，则自动进入批注模式
-        this.setCommentMode();
-        this.extensions.annotationEditor.editBegin();
+        this.extensionHelper.editAnnotationBegin();
     },
 
+    // 结束编辑批注
     editCommentEnd: function() {
 
-        if (this.extensions.annotationEditor) {
-
-            this.extensions.annotationEditor.editEnd();
-
-        }
+        this.extensionHelper.editAnnotationEnd();
     },
 
+    // 设置批注图形类型
     setCommentType: function(type) {
 
-        if (this.extensions.annotationEditor) {
-
-            this.extensions.annotationEditor.setAnnotationType(type);
-
-        }
+        this.extensionHelper.setAnnotationType(type);
     },
 
-    loadComments: function(commentInfoList) {
+    // 加载批注
+    loadComments: function(annotations) {
 
-        if (commentInfoList) {
-
-            this.setCommentMode();
-            this.extensions.annotationEditor.loadAnnotations(commentInfoList);
-        } else {
-            this.exitCommentMode();
-        }
+        this.extensionHelper.loadAnnotations(annotations);
     },
 
+    // 获得批注对象列表
     getCommentInfoList: function() {
 
-        if (this.extensions.annotationEditor) {
+        return this.extensionHelper.getAnnotationInfoList();
 
-            return this.extensions.annotationEditor.getAnnotationInfoList();
-
-        }
-
-        return null;
     },
 
+    // 窗口resize
     resizeComments: function() {
 
-        if (this.extensions.annotationEditor&&this.extensions.annotationEditor.isInitialized()) {
-
-            this.extensions.annotationEditor.onResize();
-
-        }
+        this.extensionHelper.resizeAnnotations();
+        this.extensionHelper.resizeDwgAnnotations();
     },
 
+    // 重绘
     renderAnnotations: function() {
 
-        if (this.extensions.annotationEditor&&this.extensions.annotationEditor.isInitialized()) {
-
-            this.extensions.annotationEditor.onCameraChange();
-
-        }
-    },
+        this.extensionHelper.renderAnnotations();
+    }
 
     // ------------------ 批注 API -- E ------------------ //
 };

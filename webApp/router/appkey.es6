@@ -347,10 +347,10 @@ var AppKeyRoute = Backbone.Router.extend({
 				alert("获取用户信息失败");
 				fn(false);
 				return;
-			}
+			} 
 			localStorage.setItem("user", JSON.stringify(data.data));
 
-			var Autharr = data.data.function,
+			var Autharr = data.data['function'],
 				keys, len;
 			App.AuthObj = {};
 			//遍历权限
