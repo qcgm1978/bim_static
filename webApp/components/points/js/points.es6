@@ -110,12 +110,12 @@
       $('.m-camera').addClass('disabled').attr('disabled','disabled');
 
       this.viewer.on("loaded", function() {
-        var fieldid = query.elementId.split('.')[0],
-            uid = query.elementId.split('.')[1];
-
-
+        //var fieldid = query.elementId.split('.')[0],
+        //    uid = query.elementId.split('.')[1];
+        //
+        //
         //$.ajax({
-        //  url: "/doc/internal/"+query.projectId+'/'+query.projectVersionId+"?token=123&modelId="+modelid
+        //  url: "doc/sixD/api/"+query.projectId+'/'+query.projectVersionId+"?fileId="+fieldid
         //}).done(function(data){
         //  if (data.code == 0) {
         //    console.log(data)
