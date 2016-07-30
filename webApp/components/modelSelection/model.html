@@ -28,9 +28,7 @@
         sourceId: Request.sourceId,
         etag: Request.etag,
         projectId:Request.projectId,
-        projectVersionId: Request.projectVersionId,
-        callback: function(components, markers) {
-        }
+        projectVersionId: Request.projectVersionId
     });
 
     function getData(){
@@ -50,7 +48,7 @@
             components:c,
             markers:viewer.Project.Settings.markers
         }
-        var result=JSON.stringify(data); 
+        var result=JSON.stringify(data);
         return result;
     }
     </script>

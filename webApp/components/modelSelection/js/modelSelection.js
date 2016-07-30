@@ -433,7 +433,6 @@
         Project.locationName[_userId]='轴'+model.intersect.axisGridInfo.abcName+'-'+model.intersect.axisGridInfo.numeralName;
         Project.axis[_userId]=JSON.stringify(model.intersect.axisGridInfo);
         Project.components[_userId] = model.intersect.object.boundingBox;
-
         $.get(_url+_userId.slice(0,_userId.indexOf('.')),function(data){
           Project.fileIds[_userId]=data.data.id;
         })
@@ -530,7 +529,7 @@
       }
       resizeWebView();
 
-      WebView.url = ourl + "/static/dist/components/modelSelection/model.html?type="+this.Settings.type+"&sourceId="+this.Settings.sourceId+"&etag="+
+      WebView.url = ourl + "/static/dist/components/modelSelection/model.html?t="+new Date().getTime()+"&type="+this.Settings.type+"&sourceId="+this.Settings.sourceId+"&etag="+
       this.Settings.etag+"&projectId="+ this.Settings.projectId+"&projectVersionId="+this.Settings.projectVersionId;
       WebView.height = "510px";
       WebView.width = "960px";
