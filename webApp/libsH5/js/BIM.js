@@ -33,25 +33,25 @@
       }
 
       //简化工具
-      if (options.isSingle) {
-        self.singleBar.push({
-          id: 'comment',
-          icon: 'm-camera',
-          title: '快照',
-          fn: 'comment',
-          keyCode: '',
-          type: 'filter',
-          group: '1'
-        }, {
-          id: 'zoom',
-          icon: 'm-zoom',
-          title: '缩放(Z)',
-          fn: 'zoom',
-          keyCode: '',
-          type: 'pattern',
-          group: '3'
-        });
-      }
+      //if (options.isSingle) {
+      //  self.singleBar.push({
+      //    id: 'comment',
+      //    icon: 'm-camera',
+      //    title: '快照',
+      //    fn: 'comment',
+      //    keyCode: '',
+      //    type: 'filter',
+      //    group: '1'
+      //  }, {
+      //    id: 'zoom',
+      //    icon: 'm-zoom',
+      //    title: '缩放(Z)',
+      //    fn: 'zoom',
+      //    keyCode: '',
+      //    type: 'pattern',
+      //    group: '3'
+      //  });
+      //}
 
       $.each(self.singleBar, function(i, item) {
         if (item.type == 'more') {
