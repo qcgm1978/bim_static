@@ -69,30 +69,71 @@
 
           var fieldid = query.elementId.split('.')[0],
               uid = query.elementId.split('.')[1];
-
+              query.uid = uid;
 
           $.ajax({
-            url: "doc/sixD/api/"+query.projectId+'/'+query.projectVersionId+"?fileId="+fieldid
+            url: "/doc/api/"+query.projectId+'/'+query.projectVersionId+"?fileId="+fieldid
           }).done(function(data){
             if (data.code == 0) {
-              console.log(data)
+              var  modelId = data.data.id;
+              query.modelId = modelId;
+              console.log({
+                etag: modelId ,
+                projectId: query.projectId,
+                projectVersionId: query.projectVersionId,
+                type: 'singleModel'
+                });
+              var viewer = new ModelSelection({
+                etag: modelId,
+                projectId: query.projectId,
+                projectVersionId: query.projectVersionId,
+                type: 'singleModel',//检查点类型
+                callback:function(ids){
+                  console.log(ids);
+                }
+              });
+            }
+          });
+          //获取全模型etag sourceid
+          $.ajax({
+            url: "/view/"+query.projectId+'/'+query.projectVersionId+"/init"
+          }).done(function(data){
+            if (data.code == 0) {
+              query.etag = data.data.etag;
+              query.sourceId = data.data.sourceId;
             }
           });
 
 
 
-//          var viewer = new ModelSelection({
-//            sourceId: '848069790540000',
-//            etag: "9e5dd4025694ba9461bbfebe90a5409d",
-//            projectId:1 || data.data.projectId,
-//            projectVersionId: 784306105035931 || data.data.versionId,
-//            type: 'singleModel',//检查点类型
-//            callback:function(ids){
-//              console.log(ids);
-//            }
-//          });
-
         }
+      }
+    });
+
+    $('.changeBtn').click(function(){
+      if($(this).text()=="查看项目模型"){
+        $(this).text("查看文件模型");
+        var viewer = new ModelSelection({
+          etag: query.etag,
+          sourceId:query.sourceId,
+          projectId: query.projectId,
+          projectVersionId: query.projectVersionId,
+          type: 1,//检查点类型
+          callback:function(ids){
+            console.log(ids);
+          }
+        });
+      }else{
+        $(this).text("查看项目模型")
+        var viewer = new ModelSelection({
+          etag: query.modelId ,
+          projectId: query.projectId,
+          projectVersionId: query.projectVersionId,
+          type: 'singleModel',//检查点类型
+          callback:function(ids){
+            console.log(ids);
+          }
+        });
       }
     });
     App.Global || (App.Global = {} );
