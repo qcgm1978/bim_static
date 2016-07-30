@@ -74,27 +74,33 @@ App.Comm = {
 		if (_temp.indexOf(_status) != -1) {
 			return false;
 		}
+		if(s == 'family' || s == 'model'){
+			if(_auth.edit){
+				return true;
+			}else{
+				return false;
+			}
+		}
 
 		//非标、用户权限、不是变更版本才有（创建、重命名、删除）
 		if (type == 'create' || type == "rename" || type == "delete") {
+
 			//变更版本不能创建、删除、重命名
 			if (_subType == 3 && _auth.edit && !isChange) {
 				return true;
 			}
-			return false;
 		} else if (type == "upload") {
+
 			if (_auth.edit) {
 				return true;
 			}
-			return false;
 		} else if (type == "down") {
 			return true;
 		}
-
-		//如果状态不等于4,7,9，并且是族库、标准模型则有所有权限
+		/*//如果状态不等于4,7,9，并且是族库、标准模型则有所有权限
 		if (s == 'family' || s == 'model') {
 			return true;
-		}
+		}*/
 		return false;
 	},
 
