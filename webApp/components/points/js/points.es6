@@ -110,7 +110,7 @@
       $('.m-camera').addClass('disabled').attr('disabled','disabled');
 
       this.viewer.on("loaded", function() {
-        if($(this).text()=="查看项目模型"){
+        if($('.changeBtn').text()=="查看项目模型"){
           $.ajax({
             url: "/sixD/"+query.projectId+'/'+query.projectVersionId+"/bounding/box?sceneId="+query.modelId+"&elementId="+(query.modelId+'.'+query.uid)
           }).done(function(data){
@@ -121,16 +121,16 @@
                   boundingBox = data.data;
 
               var info = {
-                    id: "",
+                    id: parseInt(10000*Math.random()),
                     userId: query.uid,
-                    shapeType: query.type,
+                    shapeType:parseInt(query.type),
                     position: {x:query.x,y:query.y,z:query.z},
                     boundingBox: boundingBox,
-                    state : 0
+                    state :0
 
                   },
                   box = Project.formatBBox(info.boundingBox),
-                  ids = [info.userId];
+                  ids = [query.modelId+'.'+info.userId];
               query.box = box;
               query.ids = ids;
               query.info = info;
@@ -140,7 +140,7 @@
           });
         }else{
           if(query.box){
-            Project.zoomModel(query.ids, query.box);
+            Project.zoomModel([query.etag+'.'+query.uid], query.box);
             Project.showMarks(JSON.stringify(query.info));
           }else{
             $.ajax({
@@ -153,16 +153,16 @@
                     boundingBox = data.data;
 
                 var info = {
-                      id: "",
+                      id: parseInt(10000*Math.random()),
                       userId: query.uid,
-                      shapeType: query.type,
+                      shapeType:parseInt(query.type),
                       position: {x:query.x,y:query.y,z:query.z},
                       boundingBox: boundingBox,
-                      state : 0
+                      state :0
 
                     },
                     box = Project.formatBBox(info.boundingBox),
-                    ids = [info.userId];
+                    ids = [query.etag+'.'+info.userId];
                 query.box = box;
                 query.ids = ids;
                 query.info = info;
@@ -284,6 +284,7 @@
       if (!_.isArray(marks)) {
         marks = [marks];
       }
+      console.log(marks)
       Project.Viewer.loadMarkers(marks);
     },
     //通过userid 和 boundingbox 定位模型
@@ -293,6 +294,8 @@
       //半透明
       Project.Viewer.translucent(true);
       //高亮
+      console.log(ids)
+      debugger
       Project.Viewer.highlight({
         type: 'userId',
         ids: ids
