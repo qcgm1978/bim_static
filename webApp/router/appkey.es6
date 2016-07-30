@@ -20,27 +20,27 @@ var AppKeyRoute = Backbone.Router.extend({
 
 			_.require('/static/dist/projects/projects.css');
 			_.require('/static/dist/projects/projects.js'); 
-
+			var pid='';
 			App.Project.Settings = $.extend({}, App.Project.Defaults);
 
-			App.Project.Settings.projectId = projectId;
-
+		//	App.Project.Settings.projectId = projectId;
 			App.Project.Settings.planId = planId;
-
 			App.Project.Settings.type = "token";
 
-			_this.fetchLastProjectVersionId(projectId, function(data) { 
+			_this.projectByCode(projectId, function(data) {
 				if (data) {
-					App.Project.Settings.versionId = data.version.id;
-
-					_this.fetchBuildIdByPlanCode(planId,projectId,App.Project.Settings.versionId,function(){
-						App.Project.init();
-					}); 
-					
+					pid=data.projectId;
+					App.Project.Settings.projectId = pid;
+					_this.fetchLastProjectVersionId(pid, function(data) {
+						if (data) {
+							App.Project.Settings.versionId = data.version.id;
+							_this.fetchBuildIdByPlanCode(planId,pid,App.Project.Settings.versionId,function(){
+								App.Project.init();
+							});
+						}
+					})
 				}
-
 			})
-
 		});
 	},
 
@@ -73,11 +73,9 @@ var AppKeyRoute = Backbone.Router.extend({
 				planCode:planCode
 			}
 		},function(data){
-
-			 if (data.code==0) { 
+			 if (data.code==0) {
 			 	App.Project.Settings.PlanElement= data.data; //.elements 
 			 } 
-
 			 if ($.isFunction(callback)) {
 			 	callback();
 			 }

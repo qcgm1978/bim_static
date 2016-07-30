@@ -169,7 +169,7 @@ App.Project.ProjectDesignPropety = Backbone.View.extend({
 						bbox=location.bBox||location.boundingBox;
 					if(bbox){
 						box = App.Project.formatBBox(bbox);
-						ids=[location.userId];
+						ids=[location.userId||location.componentId];
 						$target.data("userId", ids);
 						$target.data("box", box);
 						App.Project.zoomModel(ids,box);

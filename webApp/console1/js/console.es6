@@ -943,7 +943,7 @@ App.Console = {
     });
     //7.5
     $.ajax({
-      url: "platform/api/workflow/project?status=10"
+      url: "platform/api/workflow/project?status=11"
     }).done(function(data){
 
       var items = data.data, str = '';
@@ -956,7 +956,7 @@ App.Console = {
       });
       $("#s51").html("<option value=''>请选择</option>"+str).change(function(){
         $.ajax({
-          url: "platform/api/workflow/project/"+$(this).find('option:selected').attr('id')+"/version?status=10"
+          url: "platform/api/workflow/project/"+$(this).find('option:selected').attr('id')+"/version?status=11"
         }).done(function(data){
 
           var items = data.data, str = '';

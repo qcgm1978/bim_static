@@ -110,6 +110,18 @@
       $('.m-camera').addClass('disabled').attr('disabled','disabled');
 
       this.viewer.on("loaded", function() {
+        //var fieldid = query.elementId.split('.')[0],
+        //    uid = query.elementId.split('.')[1];
+        //
+        //
+        //$.ajax({
+        //  url: "doc/sixD/api/"+query.projectId+'/'+query.projectVersionId+"?fileId="+fieldid
+        //}).done(function(data){
+        //  if (data.code == 0) {
+        //    console.log(data)
+        //  }
+        //});
+
 
         Project.showInModel(query.acceptanceId,query.type);
       });
@@ -188,11 +200,10 @@
       var data = {
         URLtype: "fetchQualityModelById",
         data: {
-          type: type,
+          type: type==0?0:2,
           projectId: query.projectId,
           versionId: query.projectVersionId,
-          acceptanceId: id,
-          position:{x:1,y:2,z:3}
+          acceptanceId: id
         }
       };
       //获取构件ID type 0：开业验收 1：过程验收 2：隐患
