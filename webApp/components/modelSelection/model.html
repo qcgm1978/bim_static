@@ -28,16 +28,10 @@
         sourceId: Request.sourceId,
         etag: Request.etag,
         projectId:Request.projectId,
-        projectVersionId: Request.projectVersionId,
-        callback: function(components, markers) {
-        }
+        projectVersionId: Request.projectVersionId
     });
 
     function getData(){
-
-      alert("执行回调");
-      $(".modelSelectDialog .tabItem ").html("执行回调")
-
         var $n=$('#modelTree .del'),
             c=[];
         $n.each(function(){
@@ -54,9 +48,7 @@
             components:c,
             markers:viewer.Project.Settings.markers
         }
-        var result=JSON.stringify(data); 
-         $(".modelSelectDialog .tabItem ").html("执行回调结果："+result)
-         alert("执行回调结果："+result);
+        var result=JSON.stringify(data);
         return result;
     }
     </script>

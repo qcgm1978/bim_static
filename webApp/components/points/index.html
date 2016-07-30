@@ -17,12 +17,12 @@
 <div id="contains">
   <div class="projectHeader">
     <div class="breadcrumbNav">
-      <span class="projectText">项目</span>
-                <span class="breadItem project relative"> <i class="icon-angle-right"></i>
-           <span class="breadItemText"> <span class="text">--</span> </span>
+      <span class="navname projectText">项目</span>
+                <span class="navname breadItem project relative"> <i class="icon-angle-right"></i>
+           <span class="navname breadItemText"> <span class="text">--</span> </span>
                 </span>
-                <span class="breadItem projectVersion relative"> <i class="icon-angle-right"></i>
-           <span class="breadItemText"> <span class="text"> -- </span> </span>
+                <span class="navname breadItem projectVersion relative"> <i class="icon-angle-right"></i>
+           <span class="navname breadItemText"> <span class="text"> -- </span> </span>
                 </span>
       <span class="changeBtn">查看项目模型</span>
     </div>
@@ -55,7 +55,7 @@
     window.query = project.GetRequest();
 
     //获取项目相关信息通过project code
-
+    $('.navname').hide();
     $.ajax({
       url: "/platform/api/project/"+query.projectCode+"/meta?token=123"
     }).done(function(data){
@@ -77,17 +77,24 @@
             if (data.code == 0) {
               var  modelId = data.data.modelId;
               query.modelId = modelId;
-              console.log({
-                etag: modelId ,
-                projectId: query.projectId,
-                projectVersionId: query.projectVersionId,
-                type: 'singleModel'
-                });
-              var viewer = new ModelSelection({
+
+//              new bimView({
+//                element: $("#modelBox"),
+//                etag: modelId,
+//                type: typeMap[type],
+//                isComment: type == "rvt" && true || false,
+//                callback: function(id) {
+//                  App.Project.renderAttr(id, 1);
+//                }
+//              });
+//
+
+              query.viewer = new ModelSelection({
                 etag: modelId,
                 projectId: query.projectId,
                 projectVersionId: query.projectVersionId,
                 type: 'singleModel',//检查点类型
+                isSingle:true,
                 callback:function(ids){
                   console.log(ids);
                 }
@@ -113,23 +120,28 @@
     $('.changeBtn').click(function(){
       if($(this).text()=="查看项目模型"){
         $(this).text("查看文件模型");
-        var viewer = new ModelSelection({
+        $('.navname').show();
+
+        query.viewer = new ModelSelection({
           etag: query.etag,
           sourceId:query.sourceId,
           projectId: query.projectId,
           projectVersionId: query.projectVersionId,
-          type: 1,//检查点类型
+          type: 'model',
           callback:function(ids){
             console.log(ids);
           }
         });
       }else{
         $(this).text("查看项目模型")
-        var viewer = new ModelSelection({
+        $('.navname').hide();
+
+        query.viewer = new ModelSelection({
           etag: query.modelId ,
           projectId: query.projectId,
           projectVersionId: query.projectVersionId,
-          type: 'singleModel',//检查点类型
+          type: 'singleModel',//检查点类型,
+          isSingle :true,
           callback:function(ids){
             console.log(ids);
           }
