@@ -13,7 +13,7 @@ var AppKeyRoute = Backbone.Router.extend({
 
 	//项目计划节点
 	projectPlan(projectId, planId) {
-
+		 
 		var _this = this;
 		//初始化之前 验证
 		this.beforeInit(() => {
@@ -57,7 +57,8 @@ var AppKeyRoute = Backbone.Router.extend({
 			if (res.code == 0) {
 				callback(res.data);
 			} else {
-				callback(null);
+				alert(res.message);
+				return; 
 			}
 		})
 	},
