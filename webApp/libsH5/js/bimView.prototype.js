@@ -624,7 +624,7 @@
       var viewer = self.viewer;
       var filter = viewer.getFilters();
       if (obj.type == "userId") {
-        filter.setOverriderByUserIds('highlight', obj.ids);
+        filter.setOverriderByUserIds('highlight', obj.ids,"lightBlue");
       } else {
         $.each(obj.ids, function(i, id) {
           filter.setUserOverrider(obj.type, id);

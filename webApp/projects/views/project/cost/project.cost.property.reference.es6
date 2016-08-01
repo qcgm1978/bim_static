@@ -56,6 +56,8 @@ App.Project.CostReference = Backbone.View.extend({
 			ids=$target.data("userId"),
 			box=$target.data("box");
 		if ($target.hasClass("selected")) {
+			App.Project.cancelZoomModel();
+			$target.removeClass("selected");
 			return
 		} else {
 			this.$(".tbBodyScroll").find(".selected").removeClass("selected");
