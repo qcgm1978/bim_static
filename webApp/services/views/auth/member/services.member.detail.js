@@ -31,10 +31,15 @@ App.Services.memberDetail=Backbone.View.extend({
     },
 
     loadMenu:function(e){
+        var _this = this;
         this.cancelBubble(e);
         if(App.Services.queue.que > 1 ){ return}
         if(this.model.get("userId")){return}//用户，可能需要另行处理
-        Backbone.trigger("serviceMemberOrgLoad" ,this.model.get("orgId"));
+        //Backbone.trigger("serviceMemberOrgLoad" ,this.model.get("orgId"));
+        var pre = _.filter($('.ozName'),function(item){
+            return $(item).attr('data-id') == _this.model.get("orgId");
+        });
+        $(pre[0]).trigger('click');
     },
 
     //单个修改

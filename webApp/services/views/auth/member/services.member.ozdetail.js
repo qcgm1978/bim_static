@@ -36,11 +36,12 @@ App.Services.MemberozDetail=Backbone.View.extend({
     },
 
     unfold:function(pram){
-        if(pram == this.$(".ozName").attr("data-id") || typeof pram == "object"){//为右侧触发，参数为父级id
-
-            var _this =  this,container = this.$el.siblings(".childOz");
+        if(pram == parseInt(this.$(".ozName").attr("data-id")) || typeof pram == "object"){//为右侧触发，参数为父级id
+            var _this =  this,
+                container = this.$el.siblings(".childOz");
 
             if(typeof pram == "object") {
+
                 //如果是快速点击，属于误操作，跳过
                 if (!App.Services.queue.permit) {
                     return;
@@ -49,14 +50,17 @@ App.Services.MemberozDetail=Backbone.View.extend({
                     return
                 }
             }
+
             //选择和加载状态
             if (this.$(".ozName span").hasClass("active")) {  //已选（必然已加载），收起
-                this.$(".ozName").removeClass("active").find("span").removeClass("active");
-                App.Services.queue.certificates();
-                //清空右侧列表
-                Backbone.trigger("servicesMemberControlNoSelect");
-                container.hide();
-                return;
+                if(container.html()){
+                    this.$(".ozName").removeClass("active").find("span").removeClass("active");
+                    App.Services.queue.certificates();
+                    //清空右侧列表
+                    Backbone.trigger("servicesMemberControlNoSelect");
+                    container.hide();
+                    return;
+                }
             }else if (container.html()) {   //未选但已加载，选择，显示已加载项
                 if (!container.is(":hidden")) {
                     container.find(".childOz").hide();
@@ -67,7 +71,6 @@ App.Services.MemberozDetail=Backbone.View.extend({
                     this.$(".ozName").removeClass("active");
                     container.find(".ozName").removeClass("active");
                     container.find(".ozName span").removeClass("active");
-                    //Backbone.trigger("servicesMemberControlNoSelect");
                     container.hide();
                     //return;
                 }
