@@ -8,9 +8,9 @@ App.Resources.ArtifactsPlanRuleDetail = Backbone.View.extend({
     template: function(){
         var url = "";
         if(App.ResourceArtifacts.Status.templateId){
-            url = "/resources/tpls/resourcesArtifacts/ruleModel/resources.artifacts.planruledetail.projectx.html"
+            url = "/resources/tpls/resourcesArtifacts/ruleModel/resources.artifacts.planruledetail.projectx.html";
         }else{
-            url = "/resources/tpls/resourcesArtifacts/ruleModel/resources.artifacts.planruledetailx.html"
+            url = "/resources/tpls/resourcesArtifacts/ruleModel/resources.artifacts.planruledetailx.html";
         }
         return _.templateUrl(url)
     },
