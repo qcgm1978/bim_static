@@ -3,7 +3,7 @@
 */
 
 var CLOUD = CLOUD || {};
-CLOUD.Version = "20160628";
+CLOUD.Version = "20160730";
 
 CLOUD.GlobalData = {
     SceneSize: 1000,
@@ -7691,7 +7691,7 @@ CLOUD.Scene.prototype.pickByReck = function () {
                 var state = intersectObjectByBox(frustum, node);
                 if (state === INTERSECTION_STATE.IS_Contains) {
 
-                    if (scope.filter.isVisible(node)) {
+                    if (scope.filter.isVisible(node) && scope.filter.isSelectable(node)) {
 
                         if (selectState === CLOUD.OPSELECTIONTYPE.Remove) {
                             scope.filter.removeSelectedId(node.name);                            
@@ -7759,7 +7759,7 @@ CLOUD.Scene.prototype.pick = function (mouse, camera, callback) {
 
             var meshNode = intersect.object;
 
-            if (scope.filter.isVisible(meshNode)) {
+            if (scope.filter.isVisible(meshNode) && scope.filter.isSelectable(meshNode)) {
 
                 if (meshNode.geometry) {
 
@@ -12647,6 +12647,43 @@ CLOUD.Filter = function () {
         }
 
         return true;
+    };
+
+
+    this.isSelectable = function (object) {
+
+        if (!_sceneOverriderState) {
+            return true;
+        }
+
+        var id = object.name;
+        
+        if (isDemolished(id)) {
+            return true;
+        }
+
+        if (isSelected(id)) {
+            return true;
+        }
+
+        for (var item in materialOverriderByUserId) {
+            var overrider = materialOverriderByUserId[item];
+            if (overrider.ids[id])
+                return true;
+        }
+
+        if (!object.userData)
+            return true;
+
+        for (var item in materialOverriderByUserData) {
+            var overrider = materialOverriderByUserData[item];
+            var material = overrider[object.userData[item]];
+            if (material)
+                return true;
+        }
+
+        return false;
+
     };
 
     // 切换材质
@@ -18555,29 +18592,12 @@ CloudViewer.prototype = {
 
     canvas2image: function () {
 
-        var mimetype = "image/png";
         var dataUrl = null;
 
         if (this.extensionHelper.hasAnnotations()) {
 
             // 在批注模式，底图已经锁定，不用调用render
-
-            if (this.extensionHelper.isModelAnnotations()) {
-
-                dataUrl = this.renderer.domElement.toDataURL(mimetype);
-
-            } else {
-
-                //var snapshotCallback = function(data) {
-                //
-                //    dataUrl = data;
-                //};
-                //
-                //this.extensionHelper.getDwgScreenSnapshot(snapshotCallback);
-            }
-
-            dataUrl = this.extensionHelper.canvasToImage(dataUrl);
-
+            dataUrl = this.extensionHelper.captureAnnotationsScreenSnapshot();
 
         } else {
 
@@ -18585,10 +18605,11 @@ CloudViewer.prototype = {
             // 所有在每次调用前先render一次
             this.render();
 
-            dataUrl = this.renderer.domElement.toDataURL(mimetype);
+            dataUrl = this.renderer.domElement.toDataURL("image/png");
         }
 
         return dataUrl;
+
     },
 
     getFilters: function () {
@@ -18968,7 +18989,6 @@ CloudViewer.prototype = {
     resizeComments: function() {
 
         this.extensionHelper.resizeAnnotations();
-        this.extensionHelper.resizeDwgAnnotations();
     },
 
     // 重绘

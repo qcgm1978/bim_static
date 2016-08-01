@@ -1,34 +1,35 @@
-;/* dwg viewer */
+; /* dwg viewer */
 'use strict';
-var dwgViewer = function(options){
+var dwgViewer = function(options) {
   var self = this;
   var defaults = {
-    element:'',
+    element: '',
     maxLevel: 11,
     ext: 'jpg',
     sourceId: ''
   };
-  self._opt = $.extend({},defaults,options);
-  var serverUrl = '/model/'+self._opt.sourceId + '/manifest.json';
+  self._opt = $.extend({}, defaults, options);
+  var serverUrl = '/model/' + self._opt.sourceId + '/manifest.json';
   $.ajax({
-    url:serverUrl,
-    success:function(res){
+    url: serverUrl,
+    success: function(res) {
       var data = JSON.parse(res);
       data.Views && getDwg(data.Views);
     }
   });
-  var getDwg = function(res){
-    var modelTab=[],currentFile,
-        container = $('<div class="bim"></div>');
-    $.each(res,function(i,item){
+  var getDwg = function(res) {
+    var modelTab = [],
+      currentFile,
+      container = $('<div class="bim"></div>');
+    $.each(res, function(i, item) {
       modelTab.push({
-        name:item.Name,
-        id:item.ID,
-        res:item.Representations
+        name: item.Name,
+        id: item.ID,
+        res: item.Representations
       });
     });
     self._opt.element.append(container);
-    self.addControll(modelTab,container);
+    self.addControll(modelTab, container);
   }
   var dwgView = self.dwgView = {
 
@@ -117,8 +118,113 @@ var dwgViewer = function(options){
 
       var lod = self.__options.lod
       self.__firstImgUrl = lod.url + '/L1/Model_0_0.' + lod.ext,
-      self.fit()
+        self.fit()
       self.__bindEvent()
+      self.__initComment();
+    },
+
+    //初始化批注
+    __initComment: function() {
+
+      //存在 返回
+      if ($("#dwgCommentContainer").length > 0) {
+        return;
+      }
+
+      //批注容器
+      var $dwgCommentContainer = $('<div/>', {
+          id: "dwgCommentContainer"
+        }),
+        toolBarHtml;
+
+      if (App.Project.templateUrl) {
+        toolBarHtml = App.Project.templateUrl('/libsH5/tpls/comment/dwgCommentToolBar.html')
+      }
+
+      $("#modelBox .bim").append($dwgCommentContainer).append(toolBarHtml);
+
+      //设置批注容器
+      var dwgHelper = this.dwgHelper = new CLOUD.Extensions.DwgHelper();
+
+      dwgHelper.setDomContainer($dwgCommentContainer[0]);
+
+      //初始化批注事件
+      this.__initCommentEvent();
+
+    },
+
+    //开始批注
+    commentInit() {
+
+      //清空批注
+      var dwgHelper = this.dwgHelper,
+        $view = $("#modelBox .view"),
+        pos = {
+          y: parseInt($view.css("top")),
+          x: parseInt($view.css("left")),
+        };
+      //清空数据重新开始
+      dwgHelper.clearAnnotations();
+      dwgHelper.editAnnotationBegin(pos);
+      this.pos = pos;
+
+      $("#dwgCommentContainer").css("z-index", 19);
+      $("#modelBox .bim .commentBar").removeClass("hide");
+
+
+    },
+
+    //工具类型
+    __commentToolBarType: {
+      0: CLOUD.Extensions.Annotation.shapeTypes.ARROW,
+      1: CLOUD.Extensions.Annotation.shapeTypes.RECTANGLE,
+      2: CLOUD.Extensions.Annotation.shapeTypes.CIRCLE,
+      3: CLOUD.Extensions.Annotation.shapeTypes.CROSS,
+      4: CLOUD.Extensions.Annotation.shapeTypes.CLOUD,
+      5: CLOUD.Extensions.Annotation.shapeTypes.TEXT
+    },
+
+    //批注事件初始化
+    __initCommentEvent: function() {
+
+      var that = this;
+      //设置不同的工具
+      $("#modelBox .bim .commentBar").on("click", ".bar-item", function() {
+
+        var $this = $(this);
+
+        $this.addClass("selected").siblings().removeClass("selected");
+
+        that.dwgHelper.setAnnotationType(that.__commentToolBarType[$this.data("id")]);
+
+      })
+    },
+
+    //获取批注数据
+    getCommentData: function(callback) {
+
+      var that = this,
+        dwgHelper = this.dwgHelper;
+
+      //获取图片data
+      dwgHelper.canvas2image(function(imgData) {
+
+        //相机位置
+        var camera = JSON.stringify({
+          pos: that.pos,
+          zoomScale: that.__zoomScale
+        });
+
+        var data = {
+          image: imgData,
+          camera: camera
+        }
+
+        if ($.isFunction(callback)) {
+          callback(data);
+        }
+
+      });
 
     },
 
@@ -168,7 +274,7 @@ var dwgViewer = function(options){
     },
 
     //窗口缩放
-    rectZoom: function() { 
+    rectZoom: function() {
       var self = this
       var rect = self.__rect
 
@@ -368,7 +474,7 @@ var dwgViewer = function(options){
       }
 
       self.__zoomStart = zoomStart
-      // $.jps.publish('dwg-zoom')
+        // $.jps.publish('dwg-zoom')
     },
 
     __zoomEvent: function() {
@@ -460,9 +566,9 @@ var dwgViewer = function(options){
               self.drawRect(w, h)
               break
             case 'zoom':
-              if(h>20||h<-20){
-                var newScale = -h/200+scale
-                newScale = newScale<1 ? 1 : newScale;
+              if (h > 20 || h < -20) {
+                var newScale = -h / 200 + scale
+                newScale = newScale < 1 ? 1 : newScale;
                 self.zoom(newScale);
               }
               break
@@ -533,7 +639,7 @@ var dwgViewer = function(options){
 
 
       self.__viewLeft = viewLeft
-      self.__viewTop = viewTop 
+      self.__viewTop = viewTop
       self.__changeViewPos()
     },
 
@@ -616,7 +722,9 @@ var dwgViewer = function(options){
           viewPanel.find('.tile.past').remove()
         }
 
-        var tile = $(_.template(self.__tileTpl)({tile: item}))
+        var tile = $(_.template(self.__tileTpl)({
+          tile: item
+        }))
         viewPanel.append(tile)
           //加载完成需要根据zoomScale来计算当前显示的大小
         var unit = self.__unit
@@ -771,10 +879,10 @@ var dwgViewer = function(options){
   }
 
   dwgView.__tpl = '' +
-    '<div class="mod-dwg">'+
+    '<div class="mod-dwg">' +
     '    <div class="scene">' +
     '        <div class="view"></div>' +
-    '    </div>'+
+    '    </div>' +
     '    <div class="rect"></div>' +
     '</div>';
 
@@ -782,11 +890,11 @@ var dwgViewer = function(options){
     '<img class="tile" data-row="<%= tile.row %>" data-col="<%= tile.col %>" data-level="<%= tile.level %>" src="<%= tile.src %>" style="top:<%= tile.top %>px;left:<%= tile.left %>px;" />'
 }
 dwgViewer.prototype = {
-  render:function(model,element){
+  render: function(model, element) {
     var self = this,
-        currentFile;
-    $.each(model,function(i,file){
-      if(file.MIME == "image/tiles"){
+      currentFile;
+    $.each(model, function(i, file) {
+      if (file.MIME == "image/tiles") {
         return currentFile = file;
       }
     });
@@ -794,86 +902,117 @@ dwgViewer.prototype = {
       lod: {
         maxLevel: parseInt(currentFile.Attributes.DwgLevel, 10),
         ext: currentFile.Attributes.DwgExt || 'jpg',
-        url: "/model/"+ self._opt.sourceId + '/' + currentFile.Path
+        url: "/model/" + self._opt.sourceId + '/' + currentFile.Path
       }
     });
   },
-  fit:function(){
+  fit: function() {
     var self = this;
     self.dwgView.fit();
   },
-  pan:function(){
+  pan: function() {
     var self = this;
     self.dwgView.setState('none');
   },
-  zoom:function(){
+  zoom: function() {
     var self = this;
     // self.dwgView.zoom();
     self.dwgView.setState('zoom');
   },
-  zoomIn:function(){
+  zoomIn: function() {
     var self = this;
     self.dwgView.zoomIn();
   },
-  zoomOut:function(){
+  zoomOut: function() {
     var self = this;
     self.dwgView.zoomOut();
   },
-  rectZoom:function(){
+  rectZoom: function() {
     var self = this,
-        state = self.dwgView.__state;
+      state = self.dwgView.__state;
     self.dwgView.setState('rectzoom');
   },
 
-  commentInit:function(){
-     
-  },
-
-  addControll:function(model,container){
+  addControll: function(model, container) {
     var self = this;
     var list = $('<ul class="modelList"></ul>');
-    $.each(model,function(i,item){
+    $.each(model, function(i, item) {
       var tmp = $('<li class="modelItem"></li>').text(item.name).data(item.res);
       list.append(tmp);
-      if(i == 0){
+      if (i == 0) {
         tmp.trigger('click');
       }
     });
-     
-    var modBar = $('<div class="modelBar">'+
-    '  <i class="bar-item m-fit2d" data-fn="fit"></i>'+
-    '  <i class="bar-item m-zoom" data-fn="zoom"></i>'+
-    '  <i class="bar-item m-zoomRect" data-fn="rectZoom"></i>'+
-    ( this._opt.isComment && '<i class="bar-item m-camera" title="快照" data-fn="comment" ></i>' || '')+
-    '  <div class="modelSelect">'+
-    '    <span class="cur"></span>'+
-    '  </div>'+
-    '</div>');
+
+    var modBar = $('<div class="modelBar">' +
+      '  <i class="bar-item m-fit2d" data-fn="fit"></i>' +
+      '  <i class="bar-item m-zoom" data-fn="zoom"></i>' +
+      '  <i class="bar-item m-zoomRect" data-fn="rectZoom"></i>' +
+      (this._opt.isComment && '<i class="bar-item m-camera" title="快照" data-fn="comment" ></i>' || '') +
+      '  <div class="modelSelect">' +
+      '    <span class="cur"></span>' +
+      '  </div>' +
+      '</div>');
     modBar.find('.modelSelect').append(list);
     container.append(modBar);
-    modBar.on("click",'.modelSelect .cur',function(){
+    modBar.on("click", '.modelSelect .cur', function() {
       $(this).toggleClass('open');
-    }).on("click",'.modelSelect .modelItem',function(){
+    }).on("click", '.modelSelect .modelItem', function() {
       var $this = $(this),
-          val  = $this.text(),
-          $cur = $this.parent().prev(),
-          data = $this.data();
-      self.render(data,container);
+        val = $this.text(),
+        $cur = $this.parent().prev(),
+        data = $this.data();
+      self.render(data, container);
       $cur.text(val).removeClass('open');
-    }).on('click',".bar-item",function(){
+    }).on('click', ".bar-item", function() {
       var $this = $(this),
-          fn = $this.data('fn');
-      if($this.is('.m-fit2d')){
+        fn = $this.data('fn');
+      if ($this.is('.m-fit2d')) {
         self[fn]();
-      }else{
+      } else {
         $this.toggleClass('selected').siblings().removeClass('selected');
-        if($this.is('.selected')){
+        if ($this.is('.selected')) {
           self[fn]();
-        }else{
+        } else {
           self.pan();
         }
       }
     });
+    this.__initCommentEvent();
     modBar.find(".modelItem:last").trigger("click");
+  },
+
+  __initCommentEvent: function() {
+
+    var that = this;
+    //设置不同的工具
+    $("#modelBox .bim").on("click", ".commentBar .btnSave", function() {
+
+      //保存批注
+      if ($.isFunction(that.saveCommentDwg)) {
+        that.saveCommentDwg();
+      }
+
+      that.commentEnd();
+
+    }).on("click", ".commentBar .btnCanel", function() {
+
+      //取消保持
+      if ($.isFunction(that.canelComment)) {
+        that.canelComment();
+      }
+
+      that.commentEnd();
+
+    });
+  },
+
+  //结束批注
+  commentEnd: function() {
+    $("#modelBox .modelBar .m-camera").removeClass("selected");
+    $("#dwgCommentContainer").css("z-index", -1);
+    $("#modelBox .bim .commentBar").addClass("hide");
   }
+
+
 }
