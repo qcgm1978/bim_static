@@ -13,35 +13,35 @@ var AppKeyRoute = Backbone.Router.extend({
 
 	//项目计划节点
 	projectPlan(projectId, planId) {
-		 
+
 		var _this = this;
 		//初始化之前 验证
 		this.beforeInit(() => {
 
 			_.require('/static/dist/projects/projects.css');
-			_.require('/static/dist/projects/projects.js'); 
-			var pid='';
+			_.require('/static/dist/projects/projects.js');
+			var pid = '';
 			App.Project.Settings = $.extend({}, App.Project.Defaults);
 
-		//	App.Project.Settings.projectId = projectId;
+			//	App.Project.Settings.projectId = projectId;
 			App.Project.Settings.planId = planId;
 			App.Project.Settings.type = "token";
 
 			_this.projectByCode(projectId, function(data) {
 				if (data) {
-					pid=data.projectId;
+					pid = data.projectId;
 					App.Project.Settings.projectId = pid;
 					_this.fetchLastProjectVersionId(pid, function(data) {
 						if (data) {
 							App.Project.Settings.versionId = data.version.id;
-							_this.fetchBuildIdByPlanCode(planId,pid,App.Project.Settings.versionId,function(){
+							_this.fetchBuildIdByPlanCode(planId, pid, App.Project.Settings.versionId, function() {
 								if (App.Project.Settings.PlanElement.elements.length > 0) {
 									App.Project.init();
-								}else{
+								} else {
 									$("#pageLoading").remove();
 									$("#contains").html('<div class="nullTip">该计划节点未找到对应构件</div>')
 								}
-								
+
 							});
 						}
 					})
@@ -52,39 +52,39 @@ var AppKeyRoute = Backbone.Router.extend({
 
 	//获取项目最新版本
 	fetchLastProjectVersionId(projectId, callback) {
- 
+
 		var data = {
 			URLtype: 'fetchProjectBaseInfo',
-			data: { 
+			data: {
 				projectId: projectId
 			}
-		} 
+		}
 		App.Comm.ajax(data, function(res) {
 			if (res.code == 0) {
 				callback(res.data);
 			} else {
 				alert(res.message);
-				return; 
+				return;
 			}
 		})
 	},
 
 	//根据计划节点获取对应的构建
-	fetchBuildIdByPlanCode(planCode,projectId,projectVersionId,callback){
+	fetchBuildIdByPlanCode(planCode, projectId, projectVersionId, callback) {
 		App.Comm.ajax({
-			URLtype:"fetchModleIdByCode",
-			data:{
-				projectId:projectId,
-				projectVersionId:projectVersionId,
-				planItemId:planCode
+			URLtype: "fetchModleIdByCode",
+			data: {
+				projectId: projectId,
+				projectVersionId: projectVersionId,
+				planItemId: planCode
 			}
-		},function(data){ 
-			 if (data.code==0) {
-			 	App.Project.Settings.PlanElement= data.data; //.elements 
-			 } 
-			 if ($.isFunction(callback)) {
-			 	callback();
-			 }
+		}, function(data) {
+			if (data.code == 0) {
+				App.Project.Settings.PlanElement = data.data; //.elements 
+			}
+			if ($.isFunction(callback)) {
+				callback();
+			}
 		});
 	},
 
@@ -104,7 +104,7 @@ var AppKeyRoute = Backbone.Router.extend({
 		this.parseToken(token, function() {
 			App.Project.init();
 		});
- 
+
 	},
 
 	//解析token
@@ -146,18 +146,24 @@ var AppKeyRoute = Backbone.Router.extend({
 	// 浏览变更模型与变更基准模型差异
 	projectDifferBase(projectCode, versionId) {
 		//初始化之前 验证
-		this.beforeInit(() => { 
+		this.beforeInit(() => {
 			_.require('/static/dist/app/project/projectChange/index.css');
 			_.require('/static/dist/app/project/projectChange/index.js');
 			var temp = _.templateUrl('/page/tpls/project.change.html', true);
 			$("body").html(temp);
-			App.Index.initApi(projectCode, versionId);
+
+			_this.projectByCode(projectCode, function(data) {
+				if (data) {
+					App.Index.initApi(data.projectId, versionId);
+				}
+
+			});
 
 		});
 	},
 
 	//浏览项目模型与标准模型差异
-	projectDifferStd(projectCode, versionId) { 
+	projectDifferStd(projectCode, versionId) {
 		//初始化之前 验证
 		this.beforeInit(() => {
 
@@ -166,7 +172,12 @@ var AppKeyRoute = Backbone.Router.extend({
 			var temp = _.templateUrl('/page/tpls/model.change.html', true);
 			$("body").html(temp);
 
-			App.Index.initApi(projectCode, versionId, "std");
+			_this.projectByCode(projectCode, function(data) {
+				if (data) {
+					App.Index.initApi(data.projectId, versionId, "std");
+				}
+
+			})
 
 		});
 	},
@@ -177,9 +188,9 @@ var AppKeyRoute = Backbone.Router.extend({
 		var _this = this;
 		//初始化之前 验证
 		this.beforeInit(() => {
- 
+
 			_.require('/static/dist/projects/projects.css');
-			_.require('/static/dist/projects/projects.js'); 
+			_.require('/static/dist/projects/projects.js');
 
 			App.Project.Settings = $.extend({}, App.Project.Defaults);
 
@@ -233,8 +244,8 @@ var AppKeyRoute = Backbone.Router.extend({
 			App.ResourceModel.init();
 
 		});
- 
-	}, 
+
+	},
 
 
 	//资源库
@@ -255,7 +266,7 @@ var AppKeyRoute = Backbone.Router.extend({
 
 		});
 
-	}, 
+	},
 
 
 	//重置数据
@@ -270,10 +281,10 @@ var AppKeyRoute = Backbone.Router.extend({
 
 	//加载之前
 	beforeInit(callback) {
-	 
+
 		if (App.Comm.isIEModel()) {
 			return;
-		} 
+		}
 		//验证登录
 		this.checkLogin((isLogin) => {
 
@@ -290,7 +301,7 @@ var AppKeyRoute = Backbone.Router.extend({
 
 	//检查登录
 	checkLogin(fn) {
-	 
+
 		$("#pageLoading").show();
 
 		App.Comm.Settings.loginType = "token";
@@ -311,7 +322,7 @@ var AppKeyRoute = Backbone.Router.extend({
 			}
 		}
 
-		App.Comm.ajax(data, function(data) {  
+		App.Comm.ajax(data, function(data) {
 			if (data.code == 0) {
 
 				App.Comm.setCookie("token_cookie", data.data);
@@ -327,10 +338,10 @@ var AppKeyRoute = Backbone.Router.extend({
 				}
 
 			}
-		}).fail(function(data){
-			 if (data.status==400) {
-			 	alert("token过期");
-			 }
+		}).fail(function(data) {
+			if (data.status == 400) {
+				alert("token过期");
+			}
 		});
 
 		//} else {
@@ -340,7 +351,7 @@ var AppKeyRoute = Backbone.Router.extend({
 	},
 
 	//获取用户信息
-	getUserInfo(fn) { 
+	getUserInfo(fn) {
 
 		var that = this;
 
@@ -352,7 +363,7 @@ var AppKeyRoute = Backbone.Router.extend({
 				alert("获取用户信息失败");
 				fn(false);
 				return;
-			} 
+			}
 			localStorage.setItem("user", JSON.stringify(data.data));
 
 			var Autharr = data.data['function'],
@@ -442,6 +453,8 @@ Backbone.history.start();
 if (!("ActiveXObject" in window) && !window.ActiveXObject) {
 	//轮训
 	setInterval(function() {
-		if (App.Comm && App.Comm.checkOnlyCloseWindow) {App.Comm.checkOnlyCloseWindow();} 
+		if (App.Comm && App.Comm.checkOnlyCloseWindow) {
+			App.Comm.checkOnlyCloseWindow();
+		}
 	}, 3000);
 }

@@ -177,9 +177,9 @@ App.Project = {
 
 		App.Project.Settings.Viewer = new dwgViewer({
 			element: $("#modelBox"),
-			isComment:true,
+			isComment: true,
 			sourceId: modelId
-		}); 
+		});
 
 	},
 
@@ -504,10 +504,31 @@ App.Project = {
 
 	}
 
-	dwgViewer.prototype.comment=function() {
-		//隐藏工具条
-		$(".bim .modelBar").hide(); 
+	dwgViewer.prototype.comment = function() {
 
+		this.dwgView.commentInit()
+			//隐藏工具条
+		$(".bim .modelBar").hide();
+
+	}
+
+	//取消批注
+	dwgViewer.prototype.canelComment = function() {
+		$(".bim .modelBar").show();
+	}
+
+	//保存批注
+	dwgViewer.prototype.saveCommentDwg = function() {
+		var that = this;
+		this.dwgView.getCommentData(function(data) {
+			data.image = data.image.replace('data:image/png;base64,', '');
+			that.data = data;
+			SingleComment.saveCommentDialog();
+		});
+	}
+
+	dwgViewer.prototype.getData = function() {
+		return this.data;
 	}
 
 	var SingleComment = {
@@ -533,7 +554,7 @@ App.Project = {
 		//保存批注
 		saveCommentDialog: function() {
 			//批注信息
-			var data = App.Project.Settings.Viewer.saveComment(),
+			var data = App.Project.Settings.Viewer.saveComment && App.Project.Settings.Viewer.saveComment() || App.Project.Settings.Viewer.getData(),
 				pars = {
 					cate: "viewPoint",
 					img: data.image
