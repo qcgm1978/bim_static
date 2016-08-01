@@ -447,7 +447,13 @@
         $.ajax({
           url:ourl+'/111/test?key=4'
         })
-       /* $.get(_url+_userId.slice(0,_userId.indexOf('.')),function(data){
+        $.ajax({
+          url:_url+_userId.slice(0,_userId.indexOf('.')),
+          success:function(data){
+            Project.fileIds[_userId]=data.data.id;
+          }
+        })
+        /*$.get(_url+_userId.slice(0,_userId.indexOf('.')),function(data){
           Project.fileIds[_userId]=data.data.id;
         })*/
 

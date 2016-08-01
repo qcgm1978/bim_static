@@ -71,6 +71,7 @@ App.Project = {
 	//type tab类型 flag 是否显示的标记
 	//type:open process dis other
 	isShowMarkers:function(type,flag){
+		var _this=this;
 		var viewer= App.Project.Settings.Viewer;
 		if(!viewer) return;
 		if(type!='other' && flag){
@@ -79,7 +80,7 @@ App.Project = {
 			if(_.isArray(data)){
 				_.each(data,function(i){
 					if(i.location.indexOf('boundingBox')!=-1){
-						result.push(i.location);
+						result.push(_this.formatMark(i.location));
 					}
 				})
 				viewer.loadMarkers(result);	
@@ -1304,8 +1305,8 @@ App.Project = {
 		if(typeof location === 'string'){
 			_temp=JSON.parse(location)
 		}
-		_temp.shapeType=_temp.shapeType||1;
-		_temp.state=_temp.state||3;
+		_temp.shapeType=_temp.shapeType||0;
+		_temp.state=_temp.state||5;
 		_temp.userId=_temp.userId||_temp.componentId;
 		return JSON.stringify(_temp);
 	},
@@ -1322,20 +1323,21 @@ App.Project = {
 			$target.parent().find(".selected").removeClass("selected");
 			$target.addClass("selected");
 		}
-		if (ids && box) {
+		/*if (ids && box) {
 			_this.zoomModel(ids, box);
 			_this.showMarks(location);
 			return;
-		}
+		}*/
 
 		var _temp=location;
 		box = _this.formatBBox(_temp.bBox || _temp.boundingBox);
 		ids = [_temp.userId||_temp.componentId];
-		$target.data("userId", ids);
+		var _loc=_this.formatMark(location);
+		/*$target.data("userId", ids);
 		$target.data("box", box);
-		$target.data("location", JSON.stringify(location));
+		$target.data("location", _loc);*/
 		_this.zoomModel(ids, box);
-		_this.showMarks(_this.formatMark(location));
+		_this.showMarks(_loc);
 		/*var data = {
 			URLtype: "fetchQualityModelById",
 			data: {
