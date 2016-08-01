@@ -42,6 +42,7 @@
               if (i.id == id) {
                 result = {
                   id: i.id,
+                  fileUniqueId: i.fileId+i.componentId.slice(i.componentId.indexOf('.')),
                   locationName: i.locationName,
                   location: i.location,
                   axis: i.axis

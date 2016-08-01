@@ -394,6 +394,24 @@ fis.match('/components/concerns/tpls/concerns.body.html', {
   //useHash:true,
   release: "/static/dist/components/concerns/concerns.body.html"
 });
+
+//模型 \points
+fis.match('/components/points/index.html',{
+  release: '/static/dist/components/points/index.html'
+});
+fis.match('/components/points/libs/**.{js,es6}',{
+  packTo: '/static/dist/components/points/libs/libs.js'
+});
+fis.match('/components/points/js/**.{js,es6}',{
+  packTo: '/static/dist/components/points/js/points.js'
+});
+fis.match('/components/points/less/**.{css,less}', {
+  packTo: '/static/dist/components/points/less/index.css'
+});
+fis.match('/components/points/tpls/points.body.html', {
+  //useHash:true,
+  release: "/static/dist/components/points/points.body.html"
+});
 // 项
 
 

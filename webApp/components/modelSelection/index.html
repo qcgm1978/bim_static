@@ -8,14 +8,10 @@
 <body>
 <input type="button" id="model" value="show">
 <script>
- var viewer = new ModelSelection({
-      type:'multi',//multi,single
-      projectCode:'2196E47F-FACC-45F4-B835-577C7BC65BEB',
-      //multi 只有components回调参数
-      callback:function(components,markers){
-        console.log(ids);
-      }
-    });
+    var res=window.showModalDialog('single.html?t=12223df',{},"dialogWidth:1000px;dialogHeight:600px;");
+    if(res){
+        alert(res)
+    }
 </script>
 </body>
 </html>

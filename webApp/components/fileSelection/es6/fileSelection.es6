@@ -99,6 +99,10 @@
 					alert("验证失败");
 					isVerification = false;
 				}
+			}).fail(function(data) {
+				if (data.status == 400) {
+					alert("token过期");
+				}
 			});
 
 			return isVerification;
@@ -329,7 +333,7 @@
 
 				if (that.Settings.closeCallback) {
 					that.Settings.closeCallback.call(this);
-				} 
+				}
 
 			});
 
@@ -370,7 +374,7 @@
 				}
 				$dialog.find(".close").trigger('click');
 
-			});  
+			});
 
 			$(document).unbind("keyup.FileSelection");
 
@@ -380,7 +384,7 @@
 					$dialog.find(".close").trigger('click');
 				}
 			});
- 
+
 
 			//收起展开树 左边
 			// $(".nodeSwitch").live(function() {
@@ -585,7 +589,7 @@
 			// 	}
 
 			// }); 
-			
+
 
 			//全选
 			// $dialog.on("click", ".rightEnter .btnEnter", function() {

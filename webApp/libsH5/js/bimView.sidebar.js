@@ -232,7 +232,7 @@
           url:bimView.API.fetchComponentById,
           projectId:self._opt.projectId,
           projectVersionId:self._opt.projectVersionId||self._opt.projectId,
-          data:"elementId="+data.join(',')
+          data:"token=123&elementId="+data.join(',')
         },function(data){
           if(data.message == 'success' && data.data.length){
             bimView.comm.renderSelected(data.data);

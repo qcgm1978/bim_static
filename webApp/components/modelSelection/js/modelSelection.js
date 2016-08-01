@@ -97,6 +97,7 @@
     components: {},
     location:{},
     locationName:{},
+    fileIds:{},
     axis:{},
     //转换bounding box数据
     formatBBox: function(data) {
@@ -277,10 +278,25 @@
         self.$dialog = null;
       }).on('click', '.dialogOk', function() {
         var setting = self.Settings;
-        if (setting.callback && setting.callback.call(this, self.viewData, Project.Settings.markers) !== false) {
+
+        var $n=$('#modelTree .del'),
+            c=[];
+        $n.each(function(){
+          var id=$(this).data('userId');
+          c.push({
+            id:id,
+            fileUniqueId:Project.fileIds[id]+id.slice(id.indexOf('.')),
+            axis:Project.axis[id],
+            location:Project.location[id],
+            locationName:Project.locationName[id]
+          })
+        })
+        if(Project.Settings.type=='single'){
+          c=c[0];
+        }
+        if (setting.callback && setting.callback.call(this, c, Project.Settings.markers) !== false) {
           self.$dialog.remove();
           self.$dialog = null;
-          return self.viewData
         }
       }).on('click', '.rightBar .m-openTree,.rightBar .m-closeTree', function() {
         var $this = $(this),
@@ -405,16 +421,22 @@
       })
       this.viewer = viewer;
       Project.Viewer = viewer;
+      var _url=ourl+'/doc/internal/'+this.Settings.projectId+'/'+this.Settings.projectVersionId+'?token=123&modelId=';
       //  window.BIV=viewer;
       //模型click事件、选择构件、编辑标记
       viewer.on("click", function(model) {
-        Project.location[model.intersect.userId]=JSON.stringify({
+        var _userId=model.intersect.userId;
+        Project.location[_userId]=JSON.stringify({
           boundingBox:model.intersect.object.boundingBox,
           position:model.intersect.object.position
         });
-        Project.locationName[model.intersect.userId]='轴'+model.intersect.axisGridInfo.abcName+'-'+model.intersect.axisGridInfo.numeralName;
-        Project.axis[model.intersect.userId]=JSON.stringify(model.intersect.axisGridInfo);
-        Project.components[model.intersect.userId] = model.intersect.object.boundingBox;
+        Project.locationName[_userId]='轴'+model.intersect.axisGridInfo.abcName+'-'+model.intersect.axisGridInfo.numeralName;
+        Project.axis[_userId]=JSON.stringify(model.intersect.axisGridInfo);
+        Project.components[_userId] = model.intersect.object.boundingBox;
+        $.get(_url+_userId.slice(0,_userId.indexOf('.')),function(data){
+          Project.fileIds[_userId]=data.data.id;
+        })
+
         if (Project.Settings.type == 'single') {
           // viewer.zoomToSelection();
           _this.getSelected();
@@ -507,7 +529,7 @@
       }
       resizeWebView();
 
-      WebView.url = ourl + "/static/dist/components/modelSelection/model.html?type="+this.Settings.type+"&sourceId="+this.Settings.sourceId+"&etag="+
+      WebView.url = ourl + "/static/dist/components/modelSelection/model.html?t="+new Date().getTime()+"&type="+this.Settings.type+"&sourceId="+this.Settings.sourceId+"&etag="+
       this.Settings.etag+"&projectId="+ this.Settings.projectId+"&projectVersionId="+this.Settings.projectVersionId;
       WebView.height = "510px";
       WebView.width = "960px";

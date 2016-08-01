@@ -2,17 +2,23 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>模型选择器</title>
+    <meta http-equiv='pragma' content='no-cache'>
+    <meta http-equiv='cache-control' content='no-cache'>
   <script src="http://bim.wanda-dev.cn/static/dist/components/modelSelection/js/modelSelection.js"></script>
 </head>
 <body>
 <input type="button" id="model" value="show">
 <script>
+ jQuery.support.cors = true;
  var viewer = new ModelSelection({
       type:'single',//multi,single
-      projectCode:'2196E47F-FACC-45F4-B835-577C7BC65BEB',
+     elementId:'asd',
+      projectCode:'119b1c19-0c93-4145-b834-a2fcb78af008',
       callback:function(components,markers){
-        console.log(ids);
+          alert(JSON.stringify(components))
+          window.returnValue=JSON.stringify(components)
       }
     });
 </script>

@@ -9,6 +9,7 @@
 
 <body>
     <script type="text/javascript">
+        jQuery.support.cors = true;
      function GetRequest() {   
        var url = location.search; //获取url中"?"符后的字串   
        var theRequest = new Object();   
@@ -27,9 +28,7 @@
         sourceId: Request.sourceId,
         etag: Request.etag,
         projectId:Request.projectId,
-        projectVersionId: Request.projectVersionId,
-        callback: function(components, markers) {
-        }
+        projectVersionId: Request.projectVersionId
     });
 
     function getData(){
@@ -39,6 +38,7 @@
             var id=$(this).data('userId');
             c.push({
                 id:id,
+                fileUniqueId: viewer.Project.fileIds[id]+id.slice(id.indexOf('.')),
                 axis:viewer.Project.axis[id],
                 location:viewer.Project.location[id],
                 locationName:viewer.Project.locationName[id]
@@ -48,7 +48,7 @@
             components:c,
             markers:viewer.Project.Settings.markers
         }
-        var result=JSON.stringify(data); 
+        var result=JSON.stringify(data);
         return result;
     }
     </script>

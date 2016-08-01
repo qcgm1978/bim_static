@@ -21,7 +21,7 @@
 	    var viewport = document.body,cookUrl=getCookie("path");
 	    viewport.appendChild(myWebView);  
 	     
-	    var url= cookUrl && cookUrl.lastIndexOf("/file/data")<=-1 && 
+	    var url= cookUrl && cookUrl.lastIndexOf("/file/data")<=-1 && (new Date()-getCookie("pathDate"))/1000<=2 &&
 	     cookUrl.lastIndexOf("about:blank")<=-1 && cookUrl ||
 	    	 window.location.href.substring(window.location.href.lastIndexOf("path") + 5) ||
 	    	  window.location.host+"/login.html";
@@ -107,7 +107,8 @@
 	    	var url=myWebView.url;
 	    	//不是单页面
 	    	if (url.lastIndexOf("/static/dist/app/")<=-1) {
-	    		setCookie("path",url); 
+	    		setCookie("path",url);
+	    		setCookie("pathDate",+new Date()); 
 	    	}
 	    	
 	    }

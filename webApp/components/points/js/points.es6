@@ -97,12 +97,12 @@
       //设置onlymodel
       App.Global || (App.Global = {} );
       App.Comm.setOnlyModel();
-
       this.viewer = new bimView({
-        type: 'model',
+        type: this.Settings.type ,
         element: $('.projectCotent'),
         sourceId: this.Settings.sourceId,
         etag: this.Settings.etag,
+        isSingle:this.Settings.isSingle?true:false,
         projectId: this.Settings.projectId,
         projectVersionId: this.Settings.projectVersionId
       })
@@ -110,8 +110,74 @@
       $('.m-camera').addClass('disabled').attr('disabled','disabled');
 
       this.viewer.on("loaded", function() {
+        if($('.changeBtn').text()=="查看项目模型"){
+          //$('.m-miniScreen').click();
+          $.ajax({
+            url: "/sixD/"+query.projectId+'/'+query.projectVersionId+"/bounding/box?sceneId="+query.modelId+"&elementId="+(query.modelId+'.'+query.uid)
+          }).done(function(data){
+            console.log(data)
+            if(data.code == 0){
+              var min = data.data.min,
+                  max = data.data.max,
+                  boundingBox = data.data;
 
-        Project.showInModel(query.acceptanceId,query.type);
+              var info = {
+                    id: parseInt(10000*Math.random()),
+                    userId: query.uid,
+                    shapeType:parseInt(query.type),
+                    position: {x:query.x,y:query.y,z:query.z},
+                    boundingBox: boundingBox,
+                    state :0
+
+                  },
+                  box = Project.formatBBox(info.boundingBox),
+                  ids = [query.modelId+'.'+info.userId];
+              query.box = box;
+              query.ids = ids;
+              query.info = info;
+              Project.zoomModel(ids, box);
+              Project.showMarks(JSON.stringify(info));
+            }
+          });
+        }else{
+          if(query.box){
+            Project.zoomModel([query.etag+'.'+query.uid], query.box);
+            Project.showMarks(JSON.stringify(query.info));
+          }else{
+            $.ajax({
+              url: "/sixD/"+query.projectId+'/'+query.projectVersionId+"/bounding/box?sceneId="+query.modelId+"&elementId="+(query.modelId+'.'+query.uid)
+            }).done(function(data){
+              console.log(data)
+              if(data.code == 0){
+                var min = data.data.min,
+                    max = data.data.max,
+                    boundingBox = data.data;
+
+                var info = {
+                      id: parseInt(10000*Math.random()),
+                      userId: query.uid,
+                      shapeType:parseInt(query.type),
+                      position: {x:query.x,y:query.y,z:query.z},
+                      boundingBox: boundingBox,
+                      state :0
+
+                    },
+                    box = Project.formatBBox(info.boundingBox),
+                    ids = [query.etag+'.'+info.userId];
+                query.box = box;
+                query.ids = ids;
+                query.info = info;
+                Project.zoomModel(ids, box);
+                Project.showMarks(JSON.stringify(info));
+              }
+            });
+          }
+
+        }
+
+
+
+        //Project.showInModel(query.acceptanceId,query.type);
       });
 
       this.viewer.on("click", function(model) {
@@ -188,11 +254,10 @@
       var data = {
         URLtype: "fetchQualityModelById",
         data: {
-          type: type,
+          type: type==0?0:2,
           projectId: query.projectId,
           versionId: query.projectVersionId,
-          acceptanceId: id,
-          position:{x:1,y:2,z:3}
+          acceptanceId: id
         }
       };
       //获取构件ID type 0：开业验收 1：过程验收 2：隐患
@@ -220,6 +285,7 @@
       if (!_.isArray(marks)) {
         marks = [marks];
       }
+      console.log(marks)
       Project.Viewer.loadMarkers(marks);
     },
     //通过userid 和 boundingbox 定位模型
@@ -229,6 +295,7 @@
       //半透明
       Project.Viewer.translucent(true);
       //高亮
+      console.log(ids)
       Project.Viewer.highlight({
         type: 'userId',
         ids: ids
