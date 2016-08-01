@@ -39,10 +39,10 @@ App.Resources.ArtifactsTplListItem = Backbone.View.extend({
 
         this.toggleClass();
         //保存状态
-        if(!App.ResourceArtifacts.Status.saved){
-            alert("您还有没保存的");
-            return
-        }
+        //if(!App.ResourceArtifacts.Status.saved){
+        //    alert("您还有没保存的");
+        //    return
+        //}
         if(Auth.moduleMappingRule.view) {
             App.ResourceArtifacts.getPlan();
         }
