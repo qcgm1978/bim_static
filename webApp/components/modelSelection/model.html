@@ -35,10 +35,11 @@
         var $n=$('#modelTree .del'),
             c=[];
         $n.each(function(){
-            var id=$(this).data('userId');
+            var id=$(this).data('userId'),
+                    fileId=viewer.Project.fileIds[id]||"";
             c.push({
                 id:id,
-                fileUniqueId: viewer.Project.fileIds[id]+id.slice(id.indexOf('.')),
+                fileUniqueId: fileId+id.slice(id.indexOf('.')),
                 axis:viewer.Project.axis[id],
                 location:viewer.Project.location[id],
                 locationName:viewer.Project.locationName[id]

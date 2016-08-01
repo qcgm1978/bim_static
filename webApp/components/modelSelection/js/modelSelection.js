@@ -425,17 +425,31 @@
       //  window.BIV=viewer;
       //模型click事件、选择构件、编辑标记
       viewer.on("click", function(model) {
-        var _userId=model.intersect.userId;
+        $.ajax({
+          url:ourl+'/111/test?key=1'
+        })
+        var _userId=model.intersect.userId||"",
+            _obj=model.intersect.object||{};
+        $.ajax({
+          url:ourl+'/111/test?key=2'
+        })
         Project.location[_userId]=JSON.stringify({
-          boundingBox:model.intersect.object.boundingBox,
-          position:model.intersect.object.position
+          boundingBox:_obj.boundingBox,
+          position:_obj.position
         });
+        $.ajax({
+          url:ourl+'/111/test?key=3'
+        })
         Project.locationName[_userId]='轴'+model.intersect.axisGridInfo.abcName+'-'+model.intersect.axisGridInfo.numeralName;
         Project.axis[_userId]=JSON.stringify(model.intersect.axisGridInfo);
-        Project.components[_userId] = model.intersect.object.boundingBox;
-        $.get(_url+_userId.slice(0,_userId.indexOf('.')),function(data){
-          Project.fileIds[_userId]=data.data.id;
+        Project.components[_userId] = _obj.boundingBox;
+        Project.fileIds[_userId]='asdasdsadasdsadasd';
+        $.ajax({
+          url:ourl+'/111/test?key=4'
         })
+       /* $.get(_url+_userId.slice(0,_userId.indexOf('.')),function(data){
+          Project.fileIds[_userId]=data.data.id;
+        })*/
 
         if (Project.Settings.type == 'single') {
           // viewer.zoomToSelection();
