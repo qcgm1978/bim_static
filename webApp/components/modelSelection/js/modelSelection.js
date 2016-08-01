@@ -255,6 +255,12 @@
         ModelSelection.isLoad = true;
       }
 
+      if (self.isIE()) {
+        alert(1)
+        self.dialog();
+        self.controll();
+        return;
+      }
 
       var srciptUrl = ourl + '/static/dist/libs/libsH5_20160313.js';
       //加载完js后再渲染

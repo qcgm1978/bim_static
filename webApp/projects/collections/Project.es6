@@ -1087,7 +1087,7 @@ App.Project = {
 
 			App.Project.fetchPropertData("fetchDesignPropertiesQuality", function(data) {
 				if (data.code == 0) {
-
+					debugger
 					if (data.data.length > 0) {
 						var lis = '';
 						$.each(data.data, function(i, item) {
