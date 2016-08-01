@@ -442,7 +442,7 @@
         Project.locationName[_userId]='轴'+model.intersect.axisGridInfo.abcName+'-'+model.intersect.axisGridInfo.numeralName;
         Project.axis[_userId]=JSON.stringify(model.intersect.axisGridInfo);
         Project.components[_userId] = _obj.boundingBox; 
-        Project.fileIds[_userId]=_obj.name || ''；
+        Project.fileIds[_userId]=_obj.name || '';
 
         if (Project.Settings.type == 'single') {
           //viewer.zoomToSelection();
