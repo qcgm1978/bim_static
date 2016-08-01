@@ -432,10 +432,8 @@
       //模型click事件、选择构件、编辑标记
       viewer.on("click", function(model) {
         var _userId=model.intersect.userId||"",
-            _obj=model.intersect.object||{},
-            fileUrl= _url+_userId.slice(0,_userId.indexOf('.'));
-
-      //  $('#modelTree').html(fileUrl);
+            _obj=model.intersect.object||{}; 
+    
         Project.location[_userId]=JSON.stringify({
           boundingBox:_obj.boundingBox,
           position:_obj.position
@@ -443,18 +441,12 @@
 
         Project.locationName[_userId]='轴'+model.intersect.axisGridInfo.abcName+'-'+model.intersect.axisGridInfo.numeralName;
         Project.axis[_userId]=JSON.stringify(model.intersect.axisGridInfo);
-        Project.components[_userId] = _obj.boundingBox;
-        Project.fileIds[_userId]='asdasdsadasdsadasd';
+        Project.components[_userId] = _obj.boundingBox; 
+        Project.fileIds[_userId]=_obj.name || ''；
 
-        $.ajax({
-          url:fileUrl,
-          success:function(data){
-            Project.fileIds[_userId]=data.data.id;
-          }
-        })
         if (Project.Settings.type == 'single') {
-          // viewer.zoomToSelection();
-          //_this.getSelected();
+          //viewer.zoomToSelection();
+          _this.getSelected();
           viewer.markers();
           viewer.viewer.setMarkerState(3);
         }
