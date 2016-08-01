@@ -255,6 +255,12 @@
         ModelSelection.isLoad = true;
       }
 
+      if (self.isIE()) {
+        alert(1)
+        self.dialog();
+        self.controll();
+        return;
+      }
 
       var srciptUrl = ourl + '/static/dist/libs/libsH5_20160313.js';
       //加载完js后再渲染
@@ -425,45 +431,32 @@
       //  window.BIV=viewer;
       //模型click事件、选择构件、编辑标记
       viewer.on("click", function(model) {
-        $.ajax({
-          url:ourl+'/111/test?key=1'
-        })
         var _userId=model.intersect.userId||"",
-            _obj=model.intersect.object||{};
-        $.ajax({
-          url:ourl+'/111/test?key=2'
-        })
+            _obj=model.intersect.object||{},
+            fileUrl= _url+_userId.slice(0,_userId.indexOf('.'));
+
+      //  $('#modelTree').html(fileUrl);
         Project.location[_userId]=JSON.stringify({
           boundingBox:_obj.boundingBox,
           position:_obj.position
         });
-        $.ajax({
-          url:ourl+'/111/test?key=3'
-        })
+
         Project.locationName[_userId]='轴'+model.intersect.axisGridInfo.abcName+'-'+model.intersect.axisGridInfo.numeralName;
         Project.axis[_userId]=JSON.stringify(model.intersect.axisGridInfo);
         Project.components[_userId] = _obj.boundingBox;
         Project.fileIds[_userId]='asdasdsadasdsadasd';
+
         $.ajax({
-          url:ourl+'/111/test?key=4'
-        })
-        $.ajax({
-          url:_url+_userId.slice(0,_userId.indexOf('.')),
+          url:fileUrl,
           success:function(data){
             Project.fileIds[_userId]=data.data.id;
           }
         })
-        /*$.get(_url+_userId.slice(0,_userId.indexOf('.')),function(data){
-          Project.fileIds[_userId]=data.data.id;
-        })*/
-
         if (Project.Settings.type == 'single') {
           // viewer.zoomToSelection();
-          _this.getSelected();
+          //_this.getSelected();
           viewer.markers();
           viewer.viewer.setMarkerState(3);
-          //  var p={"id":new Date().getTime(),"userId":model.intersect.userId,"shapeType":1,"position":model.intersect.point,"boundingBox":model.intersect.object.boundingBox,"state":3}
-          //  viewer.loadMarkers([JSON.stringify(p)]);
         }
         //debugger
         //渲染属性面板
