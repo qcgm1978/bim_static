@@ -24,7 +24,7 @@
 	    var url= cookUrl && cookUrl.lastIndexOf("/file/data")<=-1 && (new Date()-getCookie("pathDate"))/1000<=2 &&
 	     cookUrl.lastIndexOf("about:blank")<=-1 && cookUrl ||
 	    	 window.location.href.substring(window.location.href.lastIndexOf("path") + 5) ||
-	    	  window.location.host+"/login.html";
+	    	  window.location.host+"/#projects";
 	    
 	    myWebView.url = url;
 	    myWebView.id="webView";

@@ -589,7 +589,7 @@ App.Project = {
 					},
 					cancelCallback() {
 						//保存并分享
-						that.saveComment("share", dialog, data);
+						that.saveComment("share", dialog, data,SingleComment.shareViewPoint);
 						return false;
 					}
 				},
@@ -740,7 +740,58 @@ App.Project = {
 				}
 
 			return App.ajax(data);
-		}
+		},
+
+		//分享视点
+		shareViewPoint(obj) {
+			
+			obj.pic="/"+obj.pic;
+			var data = {
+				url: '/sixD/sharedViewpoint',
+				type: "POST",
+				contentType: 'application/json',
+				data: JSON.stringify({
+					projectId: App.Project.Settings.projectId,
+					projectVersionId: App.Project.Settings.projectVersionId,
+					viewpointId: obj.id
+				})
+			}
+
+			App.ajax(data, function(data) {
+
+				if (data.code == 0) {
+					obj.url = data.data.url;
+					var dialogHtml = App.Project.templateUrl('/libsH5/tpls/comment/bimview.share.dialog.html')(obj),
+						opts = {
+							title: "分享快照",
+							width: 500,
+							height: 250,
+							cssClass: "saveViewPoint",
+							isConfirm: false,
+							message: dialogHtml
+						},
+
+						dialog = new App.Dialog(opts),
+
+						$btnCopy = dialog.element.find(".btnCopy");
+
+					//h5 复制 
+					var clipboard = new Clipboard(".saveViewPoint .btnCopy");
+					clipboard.on('success', function(e) {
+						$.tip({
+							message: "您已经复制了链接地址",
+							timeout: 3000
+						});
+						//alert("您已经复制了链接地址");
+						e.clearSelection();
+					});
+
+				}
+
+
+			});
+
+		},
 
 	}
 
