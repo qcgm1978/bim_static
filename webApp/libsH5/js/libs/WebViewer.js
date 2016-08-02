@@ -3,7 +3,7 @@
 */
 
 var CLOUD = CLOUD || {};
-CLOUD.Version = "20160802";
+CLOUD.Version = "20160730";
 
 CLOUD.GlobalData = {
     SceneSize: 1000,
@@ -27,7 +27,8 @@ CLOUD.GlobalData = {
     ByTargetDistance: false,
     MaxLoadSceneCount: 40,
     UseMpkWorker: true,
-    MpkWorkerUrl: "js/mpkWorker.min.js"
+    MpkWorkerUrl: "js/mpkWorker.min.js",
+    disableAntialias:false
 };
 
 CLOUD.EnumObjectLevel = {
@@ -18346,7 +18347,7 @@ CloudViewer.prototype = {
         this.render();
     },
 
-    init: function (domElement, disableAntialias) {
+    init: function (domElement) {
 
         this.domElement = domElement;
         // window.innerWidth, window.innerHeight
@@ -18354,7 +18355,7 @@ CloudViewer.prototype = {
         var viewportHeight = domElement.offsetHeight;
 
         var settings = { alpha: true, preserveDrawingBuffer: true };
-        if (!disableAntialias)
+        if (!CLOUD.GlobalData.disableAntialias)
             settings.antialias = true;
         // Renderer
         this.renderer = new THREE.WebGLIncrementRenderer(settings);
