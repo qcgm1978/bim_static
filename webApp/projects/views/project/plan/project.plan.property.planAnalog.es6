@@ -193,12 +193,15 @@
  		this.$(".progressAnalog .processBg").width(0);
  		this.$(".progressAnalog .processPos").css("left", 0);
  	},
+
  	showInModle(event) {
 		var $target = event,
 			ids=$target.data("userId"),
 			box=$target.data("box");
 		if ($target.hasClass("selected")) {
 			$target.parent().find(".selected").removeClass("selected");
+			App.Project.cancelZoomModel();
+			return;
 		} else {
 			$target.parent().find(".selected").removeClass("selected");
 			$target.addClass("selected");
