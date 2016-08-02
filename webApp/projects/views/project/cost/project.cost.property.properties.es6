@@ -26,7 +26,7 @@ App.Project.CostProperties=Backbone.View.extend({
 	template:_.templateUrl("/projects/tpls/project/design/project.design.property.properties.html"), 
 
 	//获取数据后处理
-	addOne:function(model){
+	addOne:function(model){ 
 		var data=model.toJSON().data;
 		var temp=JSON.stringify(data);
 		temp=JSON.parse(temp);

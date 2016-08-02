@@ -1105,7 +1105,7 @@ App.Project = {
 
 			App.Project.fetchPropertData("fetchDesignPropertiesQuality", function(data) {
 				if (data.code == 0) {
-					debugger
+					
 					if (data.data.length > 0) {
 						var lis = '';
 						$.each(data.data, function(i, item) {
@@ -1546,9 +1546,9 @@ App.Project = {
 				callback(param);
 			} else {
 				_this.$el.html(_this.template(param));
-				if ($('.design').hasClass('selected')) {
+				//if ($('.design').hasClass('selected')) {
 					App.Project.propertiesOthers.call(_this, "plan|cost|quality|dwg");
-				}
+				//}
 			}
 
 		})
