@@ -58,6 +58,10 @@ fis.match('**.{gif,png,jpg}', {
   release: "/static/dist/images/$0"
 });
 
+fis.match('**.exe', {
+  //useHash:true,
+  release: "/static/dist/$0"
+});
 
 fis.match('comm/**.html', {
   //useHash:true,
