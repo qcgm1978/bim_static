@@ -287,7 +287,8 @@ var AppKeyRoute = Backbone.Router.extend({
 
 		if (App.Comm.isIEModel()) {
 			return;
-		}
+		} 
+
 		//验证登录
 		this.checkLogin((isLogin) => {
 

@@ -236,7 +236,7 @@ var AppRoute = Backbone.Router.extend({
 			return false;
 		} else {
 			_.require('/static/dist/libs/libsH5.js');
-		} 
+		}  
 
 		//用户信息
 		App.Global.User = JSON.parse(localStorage.getItem("user"));
