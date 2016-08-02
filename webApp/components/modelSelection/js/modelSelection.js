@@ -256,7 +256,6 @@
       }
 
       if (self.isIE()) {
-        alert(1)
         self.dialog();
         self.controll();
         return;
@@ -427,7 +426,7 @@
       })
       this.viewer = viewer;
       Project.Viewer = viewer;
-      var _url=ourl+'/doc/internal/'+this.Settings.projectId+'/'+this.Settings.projectVersionId+'?token=123&modelId=';
+      var _url=ourl+'/doc/'+this.Settings.projectId+'/'+this.Settings.projectVersionId+'?token=123&modelId=';
       //  window.BIV=viewer;
       //模型click事件、选择构件、编辑标记
       viewer.on("click", function(model) {
