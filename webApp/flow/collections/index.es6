@@ -5,13 +5,14 @@ App.Flow.Controller={
 	init:function(){
 	
 		//实例化
-		new App.Flow.View();
+		$('#contains').html(new App.Flow.View().render().$el);
+        new App.Flow.NavView();
+        new App.Flow.ContentView();
 		
-		var _collection=this.flowCollection;
-		_collection.fetch({
-			reset:true
-		});
-		
+        this.flowNavCollection.fetch({
+            reset:true
+        })
+
 		$("#pageLoading").hide();
 		
 	},
@@ -31,6 +32,23 @@ App.Flow.Controller={
              }
          }
 	
-	}))
+	})),
+
+    flowNavCollection:new (Backbone.Collection.extend({
+        model: Backbone.Model.extend({
+            defaults: function() {
+                return {
+                    url: ''
+                }
+            }
+        }),
+        urlType: "fetchNavFlow",
+        parse: function(response) {
+            if (response.message == "success") {
+                return response;
+            }
+        }
+
+    }))
 	
 }
