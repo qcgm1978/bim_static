@@ -256,7 +256,6 @@
       }
 
       if (self.isIE()) {
-        alert(1)
         self.dialog();
         self.controll();
         return;
@@ -396,18 +395,19 @@
       })
 
       $dialog.on('click', '.dialogOk', function() {
-
         //获取数据
         WebView.runScript('getData()', function(val) {
           var data = {};
+         /* alert(val);
           if (val) {
             data = JSON.parse(val);
           }
+          alert(JSON.stringify(data));*/
           var setting = self.Settings;
-          if (setting.callback && setting.callback.call(this, data.components, data.markers) !== false) {
+          if (setting.callback && setting.callback.call(this, val, data.markers) !== false) {
             self.$dialog.remove();
             self.$dialog = null;
-            return self.viewData
+            return val;
           }
 
         });
@@ -427,7 +427,7 @@
       })
       this.viewer = viewer;
       Project.Viewer = viewer;
-      var _url=ourl+'/doc/internal/'+this.Settings.projectId+'/'+this.Settings.projectVersionId+'?token=123&modelId=';
+      var _url=ourl+'/doc/'+this.Settings.projectId+'/'+this.Settings.projectVersionId+'?token=123&modelId=';
       //  window.BIV=viewer;
       //模型click事件、选择构件、编辑标记
       viewer.on("click", function(model) {
