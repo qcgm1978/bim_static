@@ -1,0 +1,9 @@
+<% _.each(data,function(item,index){ %>
+<li class="flowTabItem" style="margin-left: -40px;z-index:<%=10-index%>;position: relative;">
+    <div class="tabNavItem navIcon <%=index==0?'arrowSelected':'arrowNoSelected'%>" data-id="<%=item.id%>">
+        <i class="numberFlag numberFlag<%=index+1%>"></i>
+        <span><%=item.name%></span>
+    </div>
+</li>
+<% }) %>
+<li class="flowMoreBtn"><a href="javascript:;">模块化节点</a></li>

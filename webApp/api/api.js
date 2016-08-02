@@ -273,7 +273,9 @@ App.API = {
 		modelBase:'view/{projectId}/{projectVersionId}/comparison?type=base', // 与标准模型对比
 		'attrDwg':'doc/{projectId}/{versionId}/file/tag', //图纸
 		//业务流程
-		fetchFlow:'platform/flow',
+		fetchFlow:'platform/workflow/{phaseId}/category',
+		fetchNavFlow:'platform/workflow/phase',
+		fetchFlowDetail:'platform/workflow/items/{itemName}',
 
 
 		//批注
