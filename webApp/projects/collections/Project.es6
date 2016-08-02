@@ -19,6 +19,14 @@ App.Project = {
 		DataModel: null //渲染模型的数据
 	},
 
+	//计划状态
+	planStatus:{
+		0:'',
+		1:'myIcon-circle-red',
+		2:'myIcon-circle-yellow',
+		3:'myIcon-circle-green'
+	},
+
 	//空页面
 	NullPage: {
 		designVerification: '<div class="nullPage concerns"><i class="bg"></i>暂无隐患</div>', //设计检查 质量 隐患
