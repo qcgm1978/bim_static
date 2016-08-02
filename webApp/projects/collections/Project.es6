@@ -34,58 +34,60 @@ App.Project = {
 		organizationTypeId: ['', '质监', '第三方', '项目公司', '监理单位'],
 		status: ['', '待整改', '已整改', '已关闭'],
 		statusColor: ['', '#FF2500', '#FFAD25', '#00A648'],
-		processCategory:['','工程桩','基坑支护','地下防水','梁柱节点','钢结构悬挑构件','幕墙','外保温',
-			'采光顶','步行街吊顶风口','卫生间防水','屋面防水','屋面虹吸雨排','消防泵房','给水泵房',
-			'湿式报警阀室','空调机房','冷冻机房','变配电室','发电机房','慧云机房','电梯机房','电梯底坑',
-			'吊顶','地面','中庭栏杆','竖井'],
-		openCategory:['','幕墙',
-			'采光顶','步行街吊顶风口','卫生间防水','屋面防水','屋面虹吸雨排','消防泵房','给水泵房',
-			'湿式报警阀室','空调机房','冷冻机房','变配电室','发电机房','慧云机房','电梯机房','电梯底坑',
-			'吊顶','地面','中庭栏杆','竖井'],
-		concernsCategory:['','过程检查','过程验收','过程检查'],
-		concernsStatus:['','待整改','已整改','已关闭'],
-		concernsReporter:['','质监中心','第三方','项目公司','监理单位'],
-		concernsLevel:['','特大','重大','较大','一般'],
-		concernsType:['','防水工程','施工质量','安全文明','材料设备'],
-		designSpecial:['','建筑','结构','设备','电气','景观','内装及导视','夜景照明'],
-		designCategory:['','安全类','品质类','功能类'],
-		designStatus:['','待整改','已整改','已关闭'],
-		designUnit:['','设计总包'],
-		deviceSpecial:['','通风空调'],
-		deviceCategory:['','冷冻水','冷却水'],
-		deviceStatus:['','合格','有退场']
+		processCategory: ['', '工程桩', '基坑支护', '地下防水', '梁柱节点', '钢结构悬挑构件', '幕墙', '外保温',
+			'采光顶', '步行街吊顶风口', '卫生间防水', '屋面防水', '屋面虹吸雨排', '消防泵房', '给水泵房',
+			'湿式报警阀室', '空调机房', '冷冻机房', '变配电室', '发电机房', '慧云机房', '电梯机房', '电梯底坑',
+			'吊顶', '地面', '中庭栏杆', '竖井'
+		],
+		openCategory: ['', '幕墙',
+			'采光顶', '步行街吊顶风口', '卫生间防水', '屋面防水', '屋面虹吸雨排', '消防泵房', '给水泵房',
+			'湿式报警阀室', '空调机房', '冷冻机房', '变配电室', '发电机房', '慧云机房', '电梯机房', '电梯底坑',
+			'吊顶', '地面', '中庭栏杆', '竖井'
+		],
+		concernsCategory: ['', '过程检查', '过程验收', '过程检查'],
+		concernsStatus: ['', '待整改', '已整改', '已关闭'],
+		concernsReporter: ['', '质监中心', '第三方', '项目公司', '监理单位'],
+		concernsLevel: ['', '特大', '重大', '较大', '一般'],
+		concernsType: ['', '防水工程', '施工质量', '安全文明', '材料设备'],
+		designSpecial: ['', '建筑', '结构', '设备', '电气', '景观', '内装及导视', '夜景照明'],
+		designCategory: ['', '安全类', '品质类', '功能类'],
+		designStatus: ['', '待整改', '已整改', '已关闭'],
+		designUnit: ['', '设计总包'],
+		deviceSpecial: ['', '通风空调'],
+		deviceCategory: ['', '冷冻水', '冷却水'],
+		deviceStatus: ['', '合格', '有退场']
 	},
 
-	currentQATab:'other',
-	currentLoadData:{
-		open:null,
-		process:null,
-		dis:null
+	currentQATab: 'other',
+	currentLoadData: {
+		open: null,
+		process: null,
+		dis: null
 	},
 
-	cacheMarkers:function(type,data){
-		this.currentLoadData[type]=data;
+	cacheMarkers: function(type, data) {
+		this.currentLoadData[type] = data;
 	},
 
 	//是否显示标记
 	//type tab类型 flag 是否显示的标记
 	//type:open process dis other
-	isShowMarkers:function(type,flag){
-		var _this=this;
-		var viewer= App.Project.Settings.Viewer;
-		if(!viewer) return;
-		if(type!='other' && flag){
-			var data=this.currentLoadData[type],
-				result=[];
-			if(_.isArray(data)){
-				_.each(data,function(i){
-					if(i.location.indexOf('boundingBox')!=-1){
+	isShowMarkers: function(type, flag) {
+		var _this = this;
+		var viewer = App.Project.Settings.Viewer;
+		if (!viewer) return;
+		if (type != 'other' && flag) {
+			var data = this.currentLoadData[type],
+				result = [];
+			if (_.isArray(data)) {
+				_.each(data, function(i) {
+					if (i.location.indexOf('boundingBox') != -1) {
 						result.push(_this.formatMark(i.location));
 					}
 				})
-				viewer.loadMarkers(result);	
+				viewer.loadMarkers(result);
 			}
-		}else{
+		} else {
 			viewer.loadMarkers(null);
 		}
 	},
@@ -157,10 +159,10 @@ App.Project = {
 					$("#reNameModelProject").addClass('disable').attr('disabled', 'disabled');
 					$("#delModelProject").addClass('disable').attr('disabled', 'disabled');
 				}*/
-				if(!App.Comm.isAuth('rename')){
+				if (!App.Comm.isAuth('rename')) {
 					$("#reNameModelProject").addClass('disable').attr('disabled', 'disabled');
 				}
-				if(!App.Comm.isAuth('delete')){
+				if (!App.Comm.isAuth('delete')) {
 					$("#delModelProject").addClass('disable').attr('disabled', 'disabled');
 				}
 				$item.addClass("selected").siblings().removeClass("selected");
@@ -270,8 +272,8 @@ App.Project = {
 		if ($treeViewMarUl.length <= 0) {
 			data.click = function(event) {
 				var file = $(event.target).data("file");
-				if(file.folder){
-					$('#projectContainer .returnBack').attr('isReturn','1').removeClass('theEnd').html('返回上级');
+				if (file.folder) {
+					$('#projectContainer .returnBack').attr('isReturn', '1').removeClass('theEnd').html('返回上级');
 				}
 				$("#projectContainer .fileContent").empty();
 				App.Project.Settings.fileVersionId = file.fileVersionId;
@@ -487,7 +489,7 @@ App.Project = {
 		});
 	},
 	//初始化
-	init: function() { 
+	init: function() {
 		//加载项目
 		this.fetchProjectDetail();
 
@@ -610,10 +612,10 @@ App.Project = {
 		//var $contains = $("#contains");
 		$("#contains").html(new App.Project.ProjectApp().render().el);
 		var status = App.Project.Settings.CurrentVersion.status;
-		if (status != 9 && status != 4 && status != 7) { 
+		if (status != 9 && status != 4 && status != 7) {
 			//上传
 			App.Project.upload = App.modules.docUpload.init($(document.body));
-		} 
+		}
 
 
 		// 导航文件
@@ -660,7 +662,7 @@ App.Project = {
 		//存在viewpintid
 		if (App.Project.Settings.viewPintId) {
 			$(".fileNav .model").click();
-			
+
 		}
 
 	},
@@ -915,15 +917,15 @@ App.Project = {
 			var $ProjectQualityNavContainer = $rightPropertyContent.find(".ProjectQualityNavContainer");
 			if ($ProjectQualityNavContainer.length > 0) {
 				$ProjectQualityNavContainer.show();
-				var item=$ProjectQualityNavContainer.find('.projectNav .selected');
-				if(item && item.length){
-					var t=item.first().data('type');
-					if(t=='processacceptance'){
-						App.Project.isShowMarkers('process',$('.QualityProcessAcceptance .btnCk').hasClass('selected'));
-					}else if(t=='openingacceptance'){
-						App.Project.isShowMarkers('open',$('.QualityOpeningAcceptance .btnCk').hasClass('selected'));
-					}else if(t=='concerns'){
-						App.Project.isShowMarkers('dis',$('.QualityConcerns .btnCk').hasClass('selected'));
+				var item = $ProjectQualityNavContainer.find('.projectNav .selected');
+				if (item && item.length) {
+					var t = item.first().data('type');
+					if (t == 'processacceptance') {
+						App.Project.isShowMarkers('process', $('.QualityProcessAcceptance .btnCk').hasClass('selected'));
+					} else if (t == 'openingacceptance') {
+						App.Project.isShowMarkers('open', $('.QualityOpeningAcceptance .btnCk').hasClass('selected'));
+					} else if (t == 'concerns') {
+						App.Project.isShowMarkers('dis', $('.QualityConcerns .btnCk').hasClass('selected'));
 					}
 				}
 			} else {
@@ -967,8 +969,8 @@ App.Project = {
 			data.click = function(event) {
 
 				var file = $(event.target).data("file");
-				if(file.folder){
-					$('#projectContainer .returnBack').attr('isReturn','1').removeClass('theEnd').html('返回上级');
+				if (file.folder) {
+					$('#projectContainer .returnBack').attr('isReturn', '1').removeClass('theEnd').html('返回上级');
 				}
 				// 
 				$("#projectContainer .header .ckAll").prop("checked", false);
@@ -1081,7 +1083,7 @@ App.Project = {
 		}
 
 		//质监标准
-		if (0 && type.indexOf("quality") != -1) {
+		if (type.indexOf("quality") != -1) {
 
 			var liTpl = '<li class="modleItem"><div class="modleNameText overflowEllipsis modleName2">varName</div></li>';
 
@@ -1300,14 +1302,14 @@ App.Project = {
 		return sb.toString();
 	},
 
-	formatMark:function(location){
-		var _temp=location;
-		if(typeof location === 'string'){
-			_temp=JSON.parse(location)
+	formatMark: function(location) {
+		var _temp = location;
+		if (typeof location === 'string') {
+			_temp = JSON.parse(location)
 		}
-		_temp.shapeType=_temp.shapeType||0;
-		_temp.state=_temp.state||5;
-		_temp.userId=_temp.userId||_temp.componentId;
+		_temp.shapeType = _temp.shapeType || 0;
+		_temp.state = _temp.state || 5;
+		_temp.userId = _temp.userId || _temp.componentId;
 		return JSON.stringify(_temp);
 	},
 	//在模型中显示
@@ -1329,10 +1331,10 @@ App.Project = {
 			return;
 		}*/
 
-		var _temp=location;
+		var _temp = location;
 		box = _this.formatBBox(_temp.bBox || _temp.boundingBox);
-		ids = [_temp.userId||_temp.componentId];
-		var _loc=_this.formatMark(location);
+		ids = [_temp.userId || _temp.componentId];
+		var _loc = _this.formatMark(location);
 		/*$target.data("userId", ids);
 		$target.data("box", box);
 		$target.data("location", _loc);*/
@@ -1383,6 +1385,16 @@ App.Project = {
 		App.Project.Settings.Viewer.highlight({
 			type: 'userId',
 			ids: ids
+		});
+	},
+
+	//取消zoom
+	cancelZoomModel: function() {
+		App.Project.Settings.Viewer.translucent(false);
+		//高亮
+		App.Project.Settings.Viewer.highlight({
+			type: 'userId',
+			ids: []
 		});
 	},
 
@@ -1479,8 +1491,11 @@ App.Project = {
 			boxArr = boxArr.concat($code.data("box"));
 		});
 
-		App.Project.Settings.Viewer.highlight(Ids);
-		App.Project.Settings.Viewer.zoomToBox(boxArr);
+		if (Ids.length > 0) {
+			App.Project.Settings.Viewer.highlight(Ids);
+			App.Project.Settings.Viewer.zoomToBox(boxArr);
+		}
+
 	},
 
 	userProps: function(param, callback) {

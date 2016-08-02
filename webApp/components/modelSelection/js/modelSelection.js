@@ -431,43 +431,25 @@
       //  window.BIV=viewer;
       //模型click事件、选择构件、编辑标记
       viewer.on("click", function(model) {
-        $.ajax({
-          url:ourl+'/111/test?key=1'
-        })
         var _userId=model.intersect.userId||"",
             _obj=model.intersect.object||{},
             fileUrl= _url+_userId.slice(0,_userId.indexOf('.'));
-
-
-
-
-
         Project.location[_userId]=JSON.stringify({
           boundingBox:_obj.boundingBox,
           position:_obj.position
         });
-        $.ajax({
-          url:ourl+'/111/test?key=3'
-        })
         Project.locationName[_userId]='轴'+model.intersect.axisGridInfo.abcName+'-'+model.intersect.axisGridInfo.numeralName;
         Project.axis[_userId]=JSON.stringify(model.intersect.axisGridInfo);
         Project.components[_userId] = _obj.boundingBox;
         Project.fileIds[_userId]='asdasdsadasdsadasd';
-        $.ajax({
-          url:ourl+'/111/test?key='+fileUrl
-        })
         $.ajax({
           url:fileUrl,
           success:function(data){
             Project.fileIds[_userId]=data.data.id;
           }
         })
-        /*$.get(_url+_userId.slice(0,_userId.indexOf('.')),function(data){
-          Project.fileIds[_userId]=data.data.id;
-        })*/
-
         if (Project.Settings.type == 'single') {
-          // viewer.zoomToSelection();
+          //viewer.zoomToSelection();
           _this.getSelected();
           viewer.markers();
           viewer.viewer.setMarkerState(3);
