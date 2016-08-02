@@ -395,18 +395,19 @@
       })
 
       $dialog.on('click', '.dialogOk', function() {
-
         //获取数据
         WebView.runScript('getData()', function(val) {
           var data = {};
+         /* alert(val);
           if (val) {
             data = JSON.parse(val);
           }
+          alert(JSON.stringify(data));*/
           var setting = self.Settings;
-          if (setting.callback && setting.callback.call(this, data.components, data.markers) !== false) {
+          if (setting.callback && setting.callback.call(this, val, data.markers) !== false) {
             self.$dialog.remove();
             self.$dialog = null;
-            return self.viewData
+            return val;
           }
 
         });

@@ -64,7 +64,15 @@ App.Project = {
 		process: null,
 		dis: null
 	},
-
+	checkStatus:function(color){
+		if(color==1){
+			return 'myIcon-circle-green';
+		}else if(color==2){
+			return 'myIcon-circle-red';
+		}else{
+			return '';
+		}
+	},
 	cacheMarkers: function(type, data) {
 		this.currentLoadData[type] = data;
 	},
@@ -1302,13 +1310,16 @@ App.Project = {
 		return sb.toString();
 	},
 
-	formatMark: function(location) {
-		var _temp = location;
+	formatMark: function(location,color) {
+		var _temp = location,
+			_color='510';
+		color=_color.charAt(color||5)||5;
+
 		if (typeof location === 'string') {
 			_temp = JSON.parse(location)
 		}
 		_temp.shapeType = _temp.shapeType || 0;
-		_temp.state = _temp.state || 5;
+		_temp.state = _temp.state || color;
 		_temp.userId = _temp.userId || _temp.componentId;
 		return JSON.stringify(_temp);
 	},
@@ -1317,7 +1328,8 @@ App.Project = {
 		var _this = this,
 			ids = $target.data('userId'),
 			box = $target.data('box'),
-			location = $target.data('location');
+			location = $target.data('location'),
+			color=$target.data('color');
 		if ($target.hasClass("selected")) {
 			return
 			//	$target.parent().find(".selected").removeClass("selected");
@@ -1334,7 +1346,7 @@ App.Project = {
 		var _temp = location;
 		box = _this.formatBBox(_temp.bBox || _temp.boundingBox);
 		ids = [_temp.userId || _temp.componentId];
-		var _loc = _this.formatMark(location);
+		var _loc = _this.formatMark(location,color);
 		/*$target.data("userId", ids);
 		$target.data("box", box);
 		$target.data("location", _loc);*/

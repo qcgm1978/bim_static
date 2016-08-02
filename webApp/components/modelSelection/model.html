@@ -28,7 +28,10 @@
         sourceId: Request.sourceId,
         etag: Request.etag,
         projectId:Request.projectId,
-        projectVersionId: Request.projectVersionId
+        projectVersionId: Request.projectVersionId,
+        callback:function(){
+
+        }
     });
 
     function getData(){
@@ -39,7 +42,7 @@
                     fileId=viewer.Project.fileIds[id]||"";
             c.push({
                 id:id,
-                fileUniqueId: fileId+id.slice(id.indexOf('.')),
+                fileUniqueId:fileId+id.slice(id.indexOf('.')),
                 axis:viewer.Project.axis[id],
                 location:viewer.Project.location[id],
                 locationName:viewer.Project.locationName[id]
