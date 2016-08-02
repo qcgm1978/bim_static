@@ -31,6 +31,7 @@
  		var OrderArr = _.sortBy(data.data, "planStartTime"),
 	      PlayArr = [],
 	      toTranslucent = [],
+	      inners = [],
 	      ifOuter = {};
 
 
@@ -44,9 +45,10 @@
 			  toTranslucent.push(item.code)
 		  }else{
 			  ifOuter[item.code] ={
-				  index : toTranslucent.length,
+				  index : inners.length,
 				  isout : false
 			  };
+			  inners.push(item.code);
 		  }
 
 
@@ -55,13 +57,15 @@
  		if (PlayArr.length>0) {
  			PlayArr.push(-1);
  		}
-	  window.ll=toTranslucent;
-	  window.lll    =ifOuter;
+	  window.toTranslucent=toTranslucent;
+	  window.ifOuter    =ifOuter;
+	  window.inners    =inners;
 	  console.log(PlayArr);
  		this.SourcePlay = PlayArr;
  		this.analogCount = this.SourcePlay.length;
 	  this.ifOuter = ifOuter;
 	  this.toTranslucent = toTranslucent;
+	  this.inners = inners;
  	},
 
 
@@ -108,6 +112,7 @@
  				ids: this.PlayArr
  			});
 
+		  $('.m-fit').click();
  			//开始模拟
  			this.starAnalog();
 
@@ -136,10 +141,12 @@
  				});
         try{
 	        if(!this.ifOuter[code[0]]['isout']){
-		        App.Project.Settings.Viewer.setOverrider({
+		        App.Project.Settings.Viewer.highlight({
 			        type: "plan",
-			        ids: this.toTranslucent.slice(0,this.ifOuter[code[0]]['index'])
+			        //ids: [code[0]]
+			        ids: this.inners.slice(0,this.ifOuter[code[0]]['index'])
 		        });
+		        console.log(this.ifOuter[code[0]]['index'])
 	        }
         }catch(e){
 	        console.log(code[0])
