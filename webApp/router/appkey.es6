@@ -145,6 +145,7 @@ var AppKeyRoute = Backbone.Router.extend({
 
 	// 浏览变更模型与变更基准模型差异
 	projectDifferBase(projectCode, versionId) {
+		var _this=this;
 		//初始化之前 验证
 		this.beforeInit(() => {
 			_.require('/static/dist/app/project/projectChange/index.css');
@@ -164,6 +165,7 @@ var AppKeyRoute = Backbone.Router.extend({
 
 	//浏览项目模型与标准模型差异
 	projectDifferStd(projectCode, versionId) {
+		var _this=this;
 		//初始化之前 验证
 		this.beforeInit(() => {
 

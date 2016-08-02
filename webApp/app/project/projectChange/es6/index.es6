@@ -436,8 +436,7 @@ App.Index = {
 					});
 				}
 
-			});
-
+			}); 
 			if (lists.length<=0) {
 				$("#treeContainerBody .loading").text("无变更");
 				$("#contains .projectCotent").html('<div class="noChange">无变更</div>');
