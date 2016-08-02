@@ -16,7 +16,8 @@ App.Project.PlanInspection = Backbone.View.extend({
 
 	events: {
 		"click .tbBottom .nodeSwitch": "showNode",
-		"click .subData .code": "showInModel"
+		"click .subData .code": "showInModel",
+		"click .exportList": "exportList"
 	},
 
 
@@ -26,7 +27,20 @@ App.Project.PlanInspection = Backbone.View.extend({
 		return this;
 	},
 
+	//导出列表
+	exportList: function() {
 
+		var data = {
+			URLtype: "downloadPlanVer",
+			data: {
+				projectId: App.Project.Settings.projectId,
+				projectVersionId: App.Project.Settings.versionId
+			}
+		} 
+		
+		window.location.href = App.Comm.getUrlByType(data).url;
+
+	},
 
 	//计划节点未关联图元
 	addOne: function(model) {
@@ -34,7 +48,7 @@ App.Project.PlanInspection = Backbone.View.extend({
 		var data = model.toJSON();
 		var $tbTop = this.$(".tbTop");
 		$tbTop.find("tbody").html(template(data));
-		$tbTop.prev().find(".count").text(data.data.length); 
+		$tbTop.prev().find(".count").text(data.data.length);
 		this.bindScroll();
 	},
 
@@ -44,15 +58,15 @@ App.Project.PlanInspection = Backbone.View.extend({
 		var data = model.toJSON();
 		var $tbBottom = this.$(".tbBottom"),
 			count = data.data && data.data.length || 0;
-		$tbBottom.find("tbody").html(template(data)); 
-		$tbBottom.prev().find(".count").text(count);  
+		$tbBottom.find("tbody").html(template(data));
+		$tbBottom.prev().find(".count").text(count);
 		this.bindScroll();
 	},
 
-	bindScroll(){
+	bindScroll() {
 		this.$('.nullLinkData').hide();
 		this.$('.exportList').show();
-		App.Comm.initScroll(this.$(".contentBody .contentScroll"),"y");
+		App.Comm.initScroll(this.$(".contentBody .contentScroll"), "y");
 	},
 
 	reset() {
@@ -105,10 +119,10 @@ App.Project.PlanInspection = Backbone.View.extend({
 	},
 
 	//在模型中显示
-	showInModel(event) { 
-		App.Project.planCostShowInModel(event); 
+	showInModel(event) {
+		App.Project.planCostShowInModel(event);
 	},
-	 
+
 
 
 });

@@ -3,7 +3,7 @@
 */
 
 var CLOUD = CLOUD || {};
-CLOUD.Version = "20160730";
+CLOUD.Version = "20160802";
 
 CLOUD.GlobalData = {
     SceneSize: 1000,
@@ -12357,13 +12357,13 @@ CLOUD.Filter = function () {
         }
         else {
             
-            var material;
+            var material = null;
             if (materialName) {
                 material = overridedMaterials[materialName];
             }
 
             var overrider = {};
-            overrider.material = material ? material : overridedMaterials.selection;
+            overrider.material = material;
             
             overrider.ids = {};
             for (var ii = 0, len = ids.length; ii < len; ++ii) {
@@ -12391,7 +12391,7 @@ CLOUD.Filter = function () {
         }
         else {
 
-            var material;
+            var material = null;
             if (materialName) {
                 material = overridedMaterials[materialName];
             }
@@ -12399,7 +12399,7 @@ CLOUD.Filter = function () {
             if (!materialOverriderByUserData[name])
                 materialOverriderByUserData[name] = {};
 
-            materialOverriderByUserData[name][value] = material || overridedMaterials.selection;
+            materialOverriderByUserData[name][value] = material;
         }
     };
 
@@ -12678,7 +12678,7 @@ CLOUD.Filter = function () {
         for (var item in materialOverriderByUserData) {
             var overrider = materialOverriderByUserData[item];
             var material = overrider[object.userData[item]];
-            if (material)
+            if (material !== undefined)
                 return true;
         }
 
@@ -12711,7 +12711,7 @@ CLOUD.Filter = function () {
         for (var item in materialOverriderByUserData) {
             var overrider = materialOverriderByUserData[item];
             var material = overrider[object.userData[item]];
-            if (material)
+            if (material !== undefined)
                 return material;
         }
    
@@ -18346,15 +18346,18 @@ CloudViewer.prototype = {
         this.render();
     },
 
-    init: function (domElement) {
+    init: function (domElement, disableAntialias) {
 
         this.domElement = domElement;
         // window.innerWidth, window.innerHeight
         var viewportWidth = domElement.offsetWidth;
         var viewportHeight = domElement.offsetHeight;
 
+        var settings = { alpha: true, preserveDrawingBuffer: true };
+        if (!disableAntialias)
+            settings.antialias = true;
         // Renderer
-        this.renderer = new THREE.WebGLIncrementRenderer({antialias: true, alpha: true, preserveDrawingBuffer: true});
+        this.renderer = new THREE.WebGLIncrementRenderer(settings);
         var renderer = this.renderer;
         renderer.setRenderTicket(0);
 
