@@ -1,9 +1,9 @@
 
 
 <% $.each(data,function(i,item){%>
-<tr class="<%= i%2==0 && 'odd' || '' %>">
-    <td class="ckItem"><i class="myIcon-circle-green"></i></td>
-    <td class="planId"><%= i+1 %></td>
+<tr class="<%= i%2==0 && 'odd' || '' %>"> 
+    <td class="ckItem"><i class="<%=App.Project.planStatus[item.colorStatus]%>"></i></td>
+    <td class="planId"> <a href="<%=item.itemUrl%>" target="_blank"><%= i+1 %></a></td>
     <td class="operationalMatters"> <div class="overflowEllipsis"> <%= item.taskName %> </div> </td>
     <td class="start"><%= item.planStartDate?new Date(item.planStartDate).format('yyyy-MM-dd'):'-' %></td>
     <td class="end"><%= item.planFinishDate?new Date(item.planFinishDate).format('yyyy-MM-dd'):'-' %></td>
