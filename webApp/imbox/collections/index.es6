@@ -23,10 +23,13 @@ App.INBox = {
 
 	read(id,_this){
 		App.Comm.loadMessageCount(-1);
-		window.open(App.API.Settings.hostname+"platform/message/read?id="+id);
+		//window.open(App.API.Settings.hostname+"platform/message/read?id="+id);
 		$(_this).closest('li').remove();
 	//	this.loadData('un');
 		//location.reload();
+
+		//弹窗显示详情
+
 	},
 
 	messageCollection: new(Backbone.Collection.extend({
