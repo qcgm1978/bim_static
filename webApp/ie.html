@@ -84,13 +84,13 @@
             });
 
             //延迟执行 需要加载js
-            var timer=setTimeout(function(){
-                clearTimeout(timer);
-                 //set disableAntialias
-                if (myWebView.url.indexOf("login.html")<=-1) {
-                    myWebView.runScript("CLOUD.GlobalData.disableAntialias=true",function(a){   })
-                }
-            },2000);
+            // var timer=setTimeout(function(){
+            //     clearTimeout(timer);
+            //      //set disableAntialias
+            //     if (myWebView.url.indexOf("login.html")<=-1) {
+            //         myWebView.runScript("CLOUD.GlobalData.disableAntialias=true",function(a){   })
+            //     }
+            // },2000);
 
             //myWebView
         });
