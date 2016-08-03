@@ -351,7 +351,7 @@ var AppKeyRoute = Backbone.Router.extend({
 		//} else {
 		//	fn(true);
 		//}
-		this.cleanCookie();
+		//this.cleanCookie();
 	},
 
 	//获取用户信息
@@ -404,7 +404,7 @@ var AppKeyRoute = Backbone.Router.extend({
 	//退出清除cookie
 	cleanCookie() {
 		//绑定beforeunload事件
-		$(window).on('beforeunload', function() {
+		$(window).on('beforeunload', function() {  
 			App.Comm.delCookie("token_cookie")
 		});
 	},
