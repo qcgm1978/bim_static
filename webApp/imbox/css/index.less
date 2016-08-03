@@ -78,8 +78,9 @@
   .commentRemark { position: absolute; top: 6px; left: 0px; right: 0px; bottom: 0px; overflow: hidden;
 	i { font-family: "modelicon"; }
 	.iconType { color: #fff; float: left; margin-left: 5px; margin-right: -5px; margin-top: 9px; }
-	.header { height: 49px; border-bottom: 1px #666 solid; line-height: 48px; padding: 0px 10px; }
-	.talkReMark { position: absolute; bottom: 0px; background-color: #444;
+	.header { height: 49px; border-bottom: 1px #aaa solid; line-height: 48px; padding: 0px 12px; }
+	.talkReMark { position: absolute; bottom: 0px; background-color: #fff;
+	  width: 100%;
 	  &.hidden { display: none; }
 	}
 	.noLogin { position: absolute; bottom: 0px; color: #fff; padding: 15px; background-color: #444; left: 0px; right: 0px; z-index: 1;
@@ -87,7 +88,7 @@
 		&:hover { text-decoration: underline; }
 	  }
 	}
-	.reMarkListBox { width: 328px; position: absolute; top: 49px; bottom: 100px; left: 0px; right: 0px; }
+	.reMarkListBox { width: 100%; position: absolute; top: 49px; bottom: 100px; left: 0px; right: 0px; }
 	.viewPointInfo { color: #ccc; padding-bottom: 10px;
 	  .thumbnailImg { float: left; width: 82px; height: 62px; margin: 10px 0px 0px 10px; }
 	  .info { margin-left: 120px; padding-top: 9px; }
@@ -98,7 +99,7 @@
 	  &.selected { background-color: rgba(0, 110, 207, .8); }
 	  .remarkCount { display: none; }
 	}
-	.remarkBox { margin-top: 4px; margin: 10px 10px; border: 1px #666 solid; border-width: 1px 0px; font-size: 14px; padding: 8px 0px; margin-top: 0px; }
+	.remarkBox { margin-top: 4px; margin: 10px 12px; border: 1px #aaa solid; border-width: 1px 0px; font-size: 14px; padding: 8px 0px; margin-top: 0px; }
 	.iconComment { font-family: "modelicon"; margin-right: 5px; color: #b9b9b9; font-size: 16px; }
 	.goList { color: #b9b9b9; cursor: pointer; }
 	.iconBack { font-size: 18px; width: 21px; margin: 0px; font-family: "modelicon"; vertical-align: -4px; display: inline-block; }
@@ -106,16 +107,16 @@
 	  display: block;
 
 	}
-	.inputBox { width: 310px; margin-left: 8px; color: #333; border-radius: 3px; background-color: #fff; }
+	.inputBox { width: 576px; margin-left: 12px; color: #333; border-radius: 3px; background-color: #fff;border:1px solid #aaa; }
 	.txtReMark { width: 100%; border: 0; height: 42px; outline: none; resize: none; padding: 5px;
 	  &.input { height: 85px; }
 	}
 	.uploadImg { display: none; }
-	.btnEnter { float: right; margin: 10px 2px 10px 0px; width: 100px; height: 28px; background-color: transparent; outline: 0; border: 1px #fff solid; }
-	.btnIcon { margin-top: 10px; font-size: 16px; cursor: pointer; width: 24px; height: 24px; display: inline-block; text-align: center; background-color: #666; margin-right: 7px;
-	  &.m-img { margin-left: 9px; }
+	.btnEnter { float: right; margin: 10px 12px 10px 0px; width: 100px; height: 28px; background-color: transparent; outline: 0; border: 1px #aaa solid; }
+	.btnIcon { margin-top: 10px; font-size: 16px; cursor: pointer; width: 24px; height: 24px; display: inline-block; text-align: center; background-color: #aaa; margin-right: 7px;
+	  &.m-img { margin-left: 12px; }
 	}
-	.reMarkList { .item { border-bottom: 1px #666 solid; margin: 0px 10px 8px 20px; padding-bottom: 10px;
+	.reMarkList { .item { border-bottom: 1px #aaa solid; margin: 0px 12px 8px 12px; padding-bottom: 10px;
 	  &:hover { .delTalkBox { .delTalk { display: inline; }
 	  }
 	  }
@@ -127,7 +128,7 @@
 	  .singleAttachment { margin: 8px 0px 8px 8px;
 		.linkImg:hover { color: #fff; text-decoration: none; }
 		.img { width: 42px; height: 32px; margin-right: 5px; }
-		.text { vertical-align: top; line-height: 32px; color: #fff; padding: 2px 5px;
+		.text { vertical-align: top; line-height: 32px; color: #333; padding: 2px 5px;
 		  &.selected { background-color: rgba(0, 110, 207, .8); }
 		}
 	  }

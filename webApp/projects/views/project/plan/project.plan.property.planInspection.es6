@@ -121,7 +121,7 @@ App.Project.PlanInspection = Backbone.View.extend({
 	//在模型中显示
 	showInModel(event) {
 		App.Project.planCostShowInModel(event);
-	},
+	}
 
 
 

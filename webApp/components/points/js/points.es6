@@ -111,6 +111,7 @@
 
       this.viewer.on("loaded", function() {
         if($('.changeBtn').text()=="查看项目模型"){
+          //单模型
           //$('.m-miniScreen').click();
           $.ajax({
             url: "/sixD/"+query.projectId+'/'+query.projectVersionId+"/bounding/box?sceneId="+query.modelId+"&elementId="+(query.modelId+'.'+query.uid)
@@ -291,7 +292,13 @@
     //通过userid 和 boundingbox 定位模型
     zoomModel: function(ids, box) {
       //定位
+      debugger
       Project.Viewer.zoomToBox(box);
+      Project.Viewer.translucent(false);
+      Project.Viewer.highlight({
+        type: 'userId',
+        ids: undefined
+      });
       //半透明
       Project.Viewer.translucent(true);
       //高亮

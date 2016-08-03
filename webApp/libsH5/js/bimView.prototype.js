@@ -38,7 +38,7 @@
         url = "http://bim.wanda.cn/static/dist/js/mpkWorker.min.js";
       } else {
         url = "/static/dist/js/mpkWorker.min.js";
-      } 
+      }
 
       $.ajax({
         xhrField: {
@@ -52,11 +52,11 @@
         var workerJSBlob = new Blob([data], {
           type: "text/javascript"
         });
-        CLOUD.GlobalData.MpkWorkerUrl = window.URL.createObjectURL(workerJSBlob); 
-      }).fail(function(){
-          console.log("get error " + url);
+        CLOUD.GlobalData.MpkWorkerUrl = window.URL.createObjectURL(workerJSBlob);
+      }).fail(function() {
+        console.log("get error " + url);
       });
-       
+
 
       switch (_opt.type) { // 判断类型
         case "model":
@@ -619,17 +619,22 @@
       });
       viewer.render();
     },
-    highlight: function(obj) {
+    highlight: function(obj) { 
       // 高亮
       var self = this;
       var viewer = self.viewer;
       var filter = viewer.getFilters();
       if (obj.type == "userId") {
-        filter.setOverriderByUserIds('highlight', obj.ids,"lightBlue");
+        filter.setOverriderByUserIds('highlight', obj.ids, "lightBlue");
       } else {
-        $.each(obj.ids, function(i, id) {
-          filter.setUserOverrider(obj.type, id);
-        });
+        if (obj.ids == undefined) { 
+            filter.setUserOverrider(obj.type, undefined); 
+        } else {
+          $.each(obj.ids, function(i, id) {
+            filter.setUserOverrider(obj.type, id);
+          });
+        }
+
       }
       viewer.render();
     },

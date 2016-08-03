@@ -23,14 +23,14 @@ App.INBox = {
 
 	read(id,_this,projectId,version,shareId){
 		App.Comm.loadMessageCount(-1);
-		window.open(App.API.Settings.hostname+"platform/message/read?id="+id);
+		//window.open(App.API.Settings.hostname+"platform/message/read?id="+id);
 		$(_this).closest('li').remove();
 	//	this.loadData('un');
 		//location.reload();
 
 		//弹窗显示详情
-		//$('#comment').show();
-		//App.INBox.comment.init(id,projectId,version,shareId);
+		$('#comment').show();
+		App.INBox.comment.init(id,projectId,version,shareId,_this);
 	},
 
 	messageCollection: new(Backbone.Collection.extend({
@@ -87,7 +87,7 @@ App.INBox = {
 };
 
 App.INBox.comment = {
-	init : function(id,projectId,version,shareId){
+	init : function(id,projectId,version,shareId,_this){
 		var AppView = new this.CommentView.App().render();
 		App.Project={
 			Settings:{
@@ -99,7 +99,7 @@ App.INBox.comment = {
 		//生成
 		$comment.html(AppView.$el);
 
-		this.maskWindow=new App.Comm.modules.Dialog({title:'新增关键用户',width:600,height:500,isConfirm:false});
+		this.maskWindow=new App.Comm.modules.Dialog({title:'',width:600,height:500,isConfirm:false});
 		$('.mod-dialog .wrapper').html($comment);
 
 
@@ -116,7 +116,7 @@ App.INBox.comment = {
 				$comment.find(".fullLoading").hide();
 			}
 		});
-
+		$('.wrapper .title').text($(_this).text());
 		var $el = $(event.target).closest(".remarkCount"),
 		    id = $el.data("id"),
 		    $item = $el.closest(".item"),
@@ -224,240 +224,7 @@ App.INBox.comment = {
 
 	}),
 
-	  //单个列表
-	  listDetail: Backbone.View.extend({
 
-		  tagName: "li",
-
-		  className: "item",
-
-		  events: {
-			  "click .remarkCount": "viewComments",
-			  "click": "showComment"
-		  },
-
-		  //初始化
-		  initialize() {
-			  this.listenTo(this.model, "destroy", this.remove);
-			  this.listenTo(this.model, "change", this.afterUpdate);
-		  },
-
-		  template: _.templateUrl('/libsH5/tpls/comment/bimview.pro.comment.list.detail.html'),
-
-		  render() {
-
-			  var data = this.model.toJSON();
-			  this.$el.html(this.template(data)).data("hosttype", data.hostType);
-			  this.bindContent();
-			  return this;
-		  },
-
-		  //显示批注
-		  showComment(event) {
-
-			  var $item = $(event.target).closest(".item");
-
-			  //项目批注
-			  if ($item.data("hosttype") == 0) {
-				  CommentApi.showComment($item);
-			  } else {
-				  //事件会重复冒泡
-				  if (!$item.data("isClick")) {
-					  //阻止冒泡 之后 需要恢复
-					  $item.data("isClick", true);
-					  $item.find(".linkImg").click();
-					  //恢复
-					  var timer = setTimeout(function() {
-						  clearTimeout(timer);
-						  $item.data("isClick", false);
-					  }, 10);
-				  }
-
-			  }
-
-		  },
-
-		  //更新后操作
-		  afterUpdate() {
-
-			  var data = this.model.toJSON();
-
-			  if (data.type == 1 && $comment.find(".navBar .project").hasClass("selected") || data.type == 0 && $comment.find(".navBar .user").hasClass("selected")　) {
-
-				  this.$el.html(this.template(data));
-
-				  this.bindContent();
-
-				  return this;
-			  } else {
-				  this.remove();
-			  }
-
-		  },
-
-		  //删除数据
-		  remove() {
-
-			  this.$el.slideUp(function() {
-
-				  var $this = $(this),
-				      $parent = $this.parent();
-
-				  $this.remove();
-
-				  if ($parent.find("li").length <= 0) {
-					  $parent.html('<li class="loading">无数据</li>');
-				  }
-
-			  });
-		  },
-
-		  //查看发表评论
-		  viewComments(event) {
-			  var $el = $(event.target).closest(".remarkCount"),
-			      id = $el.data("id"),
-			      $item = $el.closest(".item"),
-			      creatorId = $item.find(".name").data("creatorid");
-
-			  //批注信息 赋值
-			  $(".commentRemark .viewPointInfo").html($item.html());
-
-			  if (creatorId == (App.Global.User && App.Global.User.userId)) {
-				  $(".commentRemark  .reMarkBox .operators").show();
-			  } else {
-				  $(".commentRemark  .reMarkBox .operators").hide();
-			  }
-
-			  // $comment.find(".commentList").animate({
-			  // 	left: "330px"
-			  // }, 500);
-
-			  $comment.find(".commentList").css('left', '330px');
-
-
-			  // $comment.find(".commentRemark").show().animate({
-			  // 	left: "0px"
-			  // }, 500);
-
-			  $comment.find(".commentRemark").show().css("left", "0px");
-
-			  $el.addClass('current');
-			  //获取数据
-			  CommentCollections.ViewComments.reset();
-			  CommentCollections.ViewComments.projectId = App.Project.Settings.projectId;
-			  CommentCollections.ViewComments.viewPointId = id;
-			  viewPointId = id;
-
-			  //分享
-			  if (App.Project && App.Project.Settings.isShare) {
-				  CommentCollections.ViewComments.urlType = "viewCommentsByToken";
-				  CommentCollections.ViewComments.auth = App.Project.Settings.token;
-			  } else {
-				  CommentCollections.ViewComments.urlType = "viewComments";
-			  }
-
-
-			  CommentCollections.ViewComments.fetch({
-				  success(model, data) {
-					  $(".commentRemark .remarkBox .count").text(data.data.length);
-					  this.$(".reMarkListBox").css("bottom", this.$(".talkReMark").height() + 10);
-					  $comment.find(".fullLoading").hide();
-				  }
-			  });
-
-			  //只有项目模型 显示 位置 和  批注
-			  if ($item.data("hosttype") == 0) {
-				  $comment.find(".btnAdress,.btnCommViewPoint").show();
-			  } else {
-				  $comment.find(".btnAdress,.btnCommViewPoint").hide();
-			  }
-
-			  event.stopPropagation();
-
-		  },
-
-
-		  bindContent() {
-
-			  var that = this;
-
-			  this.$el.contextMenu('viewPointContextPoint', {
-				  theme: "viewPointContext",
-				  shadow: false,
-				  //显示 回调
-				  onShowMenuCallback: function(event) {
-
-					  var $li = $(event.target).closest(".item"),
-					      createId = $li.find(".name").data("creatorid");
-
-					  if (!$li.hasClass("selected")) {
-						  CommentApi.showComment($li);
-					  }
-
-					  //创建者 可以 删除 分享 编辑
-					  if (App.Global.User && App.Global.User.userId == createId && !App.Project.Settings.isShare) {
-						  $("#shareViewPoint,#delViewPoint,#editViewPoint,#reName").show();
-					  } else {
-						  $("#shareViewPoint,#delViewPoint,#editViewPoint,#reName").hide();
-					  }
-
-				  },
-				  //事件绑定
-				  bindings: {
-
-					  downLoadViewPoint(li) {
-						  //下载
-						  window.location.href = $(li).find(".thumbnailImg").prop("src");
-					  },
-
-					  shareViewPoint(li) {
-						  //分享
-						  CommentApi.shareViewPointData($(li));
-
-					  },
-
-					  talkViewPoint(li) {
-						  //评论
-						  $(li).find(".remarkCount").click();
-					  },
-
-					  editViewPoint(li) {
-
-						  CommentApi.editViewPoint($(li));
-						  //修改
-						  //that.editViewPoint(li);
-
-					  },
-
-					  reName(li) {
-						  //修改
-						  CommentApi.reName($(li));
-					  },
-
-					  'delViewPoint': function() {
-
-						  $.confirm("确认删除该视点么？", function() {
-							  that.delViewPoint();
-						  });
-						  // //删除视点
-						  // if ($.confirm("确认删除该视点么？")) {
-						  // 	that.delViewPoint();
-						  // }
-					  }
-
-				  }
-			  });
-		  },
-
-		  //删除试点
-		  delViewPoint() {
-			  var id = this.$(".remarkCount").data("id");
-			  this.model.projectId = App.Project.Settings.projectId;
-			  this.model.viewPointId = id;
-			  this.model.destroy();
-		  }
-
-	  }),
 
 	//评论
 	ReMark: Backbone.View.extend({
