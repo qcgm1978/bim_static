@@ -29,59 +29,65 @@
  		this.$(".tbPlan tbody").html(this.template(data));
 
  		var OrderArr = _.sortBy(data.data, "planStartTime"),
-	      PlayArr = [],
-	      toTranslucent = [],
-	      inners = [],
-	      ifOuter = {};
+ 			PlayArr = [],
+ 			toTranslucent = [],
+ 			inners = [],
+ 			ifOuter = {};
 
 
-	  $.each(OrderArr, function(i, item) {
+ 		$.each(OrderArr, function(i, item) {
  			PlayArr.push(item.code);
-		  if(!item.inner){
-			  ifOuter[item.code] ={
-				  index : toTranslucent.length,
-				  isout : true
-			  };
-			  toTranslucent.push(item.code)
-		  }else{
-			  ifOuter[item.code] ={
-				  index : inners.length,
-				  isout : false
-			  };
-			  inners.push(item.code);
-		  }
+ 			if (!item.inner) {
+ 				ifOuter[item.code] = {
+ 					index: toTranslucent.length,
+ 					isout: true
+ 				};
+ 				toTranslucent.push(item.code)
+ 			} else {
+ 				ifOuter[item.code] = {
+ 					index: inners.length,
+ 					isout: false
+ 				};
+ 				inners.push(item.code);
+ 			}
 
 
  		});
 
- 		if (PlayArr.length>0) {
+ 		if (PlayArr.length > 0) {
  			PlayArr.push(-1);
  		}
-	  window.toTranslucent=toTranslucent;
-	  window.ifOuter    =ifOuter;
-	  window.inners    =inners;
-	  console.log(PlayArr);
+ 		window.toTranslucent = toTranslucent;
+ 		window.ifOuter = ifOuter;
+ 		window.inners = inners;
+
  		this.SourcePlay = PlayArr;
  		this.analogCount = this.SourcePlay.length;
-	  this.ifOuter = ifOuter;
-	  this.toTranslucent = toTranslucent;
-	  this.inners = inners;
+ 		this.ifOuter = ifOuter;
+ 		this.toTranslucent = toTranslucent;
+ 		this.inners = inners;
  	},
 
 
  	//挑选播放
- 	pickPlayAnalog(event) { 
- 		 
+ 	pickPlayAnalog(event) {
+
  		//进度模拟中 不做操作
  		if (this.timer) {
  			return;
  		}
 
+ 		//取消 样式
+ 		App.Project.Settings.Viewer.highlight({
+ 			type: "plan", 
+ 			ids: undefined
+ 		});
+
  		this.showInModle($(event.currentTarget));
 
-
- 		var code = $(event.target).closest("tr").addClass("selected").siblings().removeClass("selected").end().data("code"),
- 		index=this.SourcePlay.indexOf(code);
+ 		//.addClass("selected").siblings().removeClass("selected").end()
+ 		var code = $(event.target).closest("tr").data("code"),
+ 			index = this.SourcePlay.indexOf(code);
 
  		this.PlayArr = this.SourcePlay.slice(index);
 
@@ -89,7 +95,7 @@
 
 
  	//开始模拟
- 	playAnalog(event) {  
+ 	playAnalog(event) {
 
  		var $target = $(event.target);
 
@@ -98,7 +104,7 @@
  			alert("没有模拟数据");
  			return;
  		}
- 		 
+
  		if ($target.hasClass("myIcon-play")) {
 
  			//克隆数据
@@ -112,7 +118,7 @@
  				ids: this.PlayArr
  			});
 
-		  $('.m-fit').click();
+ 			$('.m-fit').click();
  			//开始模拟
  			this.starAnalog();
 
@@ -139,43 +145,43 @@
  					type: "plan",
  					ids: this.PlayArr
  				});
-        try{
-	        if(!this.ifOuter[code[0]]['isout']){
-		        App.Project.Settings.Viewer.highlight({
-			        type: "plan",
-			        //ids: [code[0]]
-			        ids: this.inners.slice(0,this.ifOuter[code[0]]['index'])
-		        });
-		        console.log(this.ifOuter[code[0]]['index'])
-	        }
-        }catch(e){
-	        console.log(code[0])
-        }
+ 				try {
+ 					if (!this.ifOuter[code[0]]['isout']) {
+ 						App.Project.Settings.Viewer.highlight({
+ 							type: "plan",
+ 							//ids: [code[0]]
+ 							ids: this.inners.slice(0, this.ifOuter[code[0]]['index'])
+ 						});
+ 						// console.log(this.ifOuter[code[0]]['index'])
+ 					}
+ 				} catch (e) {
+ 					console.log(code[0])
+ 				}
 
 
  				var processAnalog = (this.analogCount - this.PlayArr.length) / this.analogCount,
  					sourceWidth = this.$(".progressAnalog .bg").width(),
  					width = sourceWidth * processAnalog,
  					$planContent = this.$(".planContent");
- 					 
+
  				//不可以超过最大
  				if (width > sourceWidth) {
  					width = sourceWidth;
  				}
- 				
+
  				//this.showInModle($tr);
 
  				this.$(".progressAnalog .processBg").width(width);
- 				this.$(".progressAnalog .processPos").css("left", width-10);
+ 				this.$(".progressAnalog .processPos").css("left", width - 10);
  				$tr.addClass("selected");
- 				 
+
  				//滚动条位置 
- 				$planContent.scrollTop($tr.index()*36);
+ 				$planContent.scrollTop($tr.index() * 36);
  				//底部文字
  				this.$(".desctionAnalog .analogDate").text($tr.find(".start").text());
  				this.$(".desctionAnalog .analogTitle").text($tr.find(".operationalMatters").text());
 
- 				
+
 
  			} else {
  				//停止模拟
@@ -195,40 +201,40 @@
  	},
 
  	showInModle(event) {
-		var $target = event,
-			ids=$target.data("userId"),
-			box=$target.data("box");
-		if ($target.hasClass("selected")) {
-			$target.parent().find(".selected").removeClass("selected");
-			App.Project.cancelZoomModel();
-			return;
-		} else {
-			$target.parent().find(".selected").removeClass("selected");
-			$target.addClass("selected");
-		}
-		if (box && ids) {
-			App.Project.zoomModel(ids,box);
-			return;
-		}
-		var data = {
-			URLtype: "fetchModleIdByCode",
-			data: {
-				projectId: App.Project.Settings.CurrentVersion.projectId,
-				projectVersionId: App.Project.Settings.CurrentVersion.id,
-				planCode: $target.data("code")
-			}
-		};
-		App.Comm.ajax(data, function(data) {
-			if (data.code == 0) {
-				var box=App.Project.formatBBox(data.data.boundingBox);
-				if(box && box.length){
-					$target.data("userId", data.data.elements);
-					$target.data("box", box);
-					App.Project.zoomModel(data.data.elements,box);
-				}
-			}
-		});
-	}
+ 		var $target = event,
+ 			ids = $target.data("userId"),
+ 			box = $target.data("box");
+ 		if ($target.hasClass("selected")) {
+ 			$target.parent().find(".selected").removeClass("selected");
+ 			App.Project.cancelZoomModel();
+ 			return;
+ 		} else {
+ 			$target.parent().find(".selected").removeClass("selected");
+ 			$target.addClass("selected");
+ 		}
+ 		if (box && ids) {
+ 			App.Project.zoomModel(ids, box);
+ 			return;
+ 		}
+ 		var data = {
+ 			URLtype: "fetchModleIdByCode",
+ 			data: {
+ 				projectId: App.Project.Settings.CurrentVersion.projectId,
+ 				projectVersionId: App.Project.Settings.CurrentVersion.id,
+ 				planCode: $target.data("code")
+ 			}
+ 		};
+ 		App.Comm.ajax(data, function(data) {
+ 			if (data.code == 0) {
+ 				var box = App.Project.formatBBox(data.data.boundingBox);
+ 				if (box && box.length) {
+ 					$target.data("userId", data.data.elements);
+ 					$target.data("box", box);
+ 					App.Project.zoomModel(data.data.elements, box);
+ 				}
+ 			}
+ 		});
+ 	}
 
 
  });
