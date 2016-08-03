@@ -1127,11 +1127,11 @@ App.Project = {
 						var lis = '';
 						$.each(data.data, function(i, item) {
 
-							var _name = item.name;
+							var _name = item.name,url=item.url||'###';
 							if (/标准$/.test(_name)) {
-								_name = '<a href="#">' + _name + '</a>&nbsp;&nbsp;';
+								_name = '<a href="'+url+'" target="_blank">' + _name + '</a>&nbsp;&nbsp;';
 							} else {
-								_name = '<a href="#">' + _name + '质量标准' + '</a>&nbsp;&nbsp;';
+								_name = '<a href="'+url+'" target="_blank">' + _name + '质量标准' + '</a>&nbsp;&nbsp;';
 							}
 
 							lis += liTpl.replace("varName", _name);
