@@ -388,6 +388,7 @@
 				initialize() {
 					this.listenTo(this.model, "destroy", this.remove);
 					this.listenTo(this.model, "change", this.afterUpdate);
+					Backbone.on('delViewPoint', this.delViewPoint, this);
 				},
 
 				template: _.templateUrl('/libsH5/tpls/comment/bimview.pro.comment.list.detail.html'),
@@ -396,7 +397,7 @@
 
 					var data = this.model.toJSON();
 					this.$el.html(this.template(data)).data("hosttype", data.hostType);
-					this.bindContent();
+					//this.bindContent();
 					return this;
 				},
 
@@ -458,6 +459,14 @@
 						}
 
 					});
+
+
+					if (parseInt($comment.find(".commentRemark").css("left")) == 0) {
+						$comment.find(".goList").click();
+					}
+
+
+
 				},
 
 				//查看发表评论
@@ -515,9 +524,11 @@
 
 					//只有项目模型 显示 位置 和  批注
 					if ($item.data("hosttype") == 0) {
-						$comment.find(".btnAdress,.btnCommViewPoint").show();
+						//.btnAdress,
+						$comment.find(".btnCommViewPoint").show();
 					} else {
-						$comment.find(".btnAdress,.btnCommViewPoint").hide();
+						//.btnAdress,
+						$comment.find(".btnCommViewPoint").hide();
 					}
 
 					event.stopPropagation();
@@ -597,12 +608,16 @@
 					});
 				},
 
+
+
 				//删除试点
-				delViewPoint() {
+				delViewPoint(delId) {
 					var id = this.$(".remarkCount").data("id");
-					this.model.projectId = App.Project.Settings.projectId;
-					this.model.viewPointId = id;
-					this.model.destroy();
+					if (delId == id) {
+						this.model.projectId = App.Project.Settings.projectId;
+						this.model.viewPointId = id;
+						this.model.destroy();
+					}
 				}
 
 			}),
@@ -624,6 +639,7 @@
 					"blur .txtReMark": "outReMark", //失去焦点
 					"click .iconShare": "share", //分享
 					"click .iconEdit": "reNameViewPoint", //编辑视点
+					"click .iconDel": "deleteComment",
 					"click .btnAdress": "address", //地址
 					"click .btnCommViewPoint": "commentViewPoint",
 					"click .viewPointInfo .info": "viewPointShow",
@@ -668,6 +684,14 @@
 						}
 					});
 					return this;
+				},
+
+				//删除批注
+				deleteComment(event) {
+					$.confirm("确认删除该视点么？", function() {
+						Backbone.trigger('delViewPoint', $(event.target).closest(".reMarkBox").find(".viewPointInfo .remarkCount").data("id"));
+					});
+
 				},
 
 				//显示视点

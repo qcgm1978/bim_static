@@ -208,3 +208,16 @@ body.lb-disable-scrolling {
   filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=100);
   opacity: 1;
 }
+
+.lb-data .downloadImg{
+      position: fixed;
+    top: 0px; 
+    font-size: 20px;
+    color: #ccc;
+    top: 23px;
+    right: 60px;
+    cursor: pointer;
+}
+.lb-data .downloadImg:hover{
+  color:#fff;
+}
