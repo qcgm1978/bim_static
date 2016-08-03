@@ -197,6 +197,7 @@ App.Project.ProjectQualityProperty = Backbone.View.extend({
 	//初始化 过程验收
 	initOptionsProcessAcceptance() {
 		this.ProcessAcceptanceOptions = {
+			locationName:'',
 			category: "", //类别 
 			problemCount: "", // 无隐患 1， 有隐患 
 			pageIndex: 1, //第几页，默认第一页
@@ -207,6 +208,7 @@ App.Project.ProjectQualityProperty = Backbone.View.extend({
 	//初始化 开业验收
 	initOptionsOpeningAcceptance() {
 		this.OpeningAcceptanceOptions = {
+			locationName:'',
 			specialty: "", //专业
 			category: "", //类别 
 			problemCount: "", // 无隐患 1， 有隐患 

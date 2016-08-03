@@ -46,6 +46,10 @@ App.Project.QualityOpeningAcceptance = Backbone.View.extend({
 	bindEvent() {
 
 		var that = this;
+
+		this.$('.txtLocationName').change(function(){
+			that.changeOA('locationName', $(this).val())
+		})
 		//隐患
 		this.$(".riskOption").myDropDown({
 			click: function($item) {
