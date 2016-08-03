@@ -135,22 +135,40 @@
  				var code = this.PlayArr.splice(0, 1),
  					$tr = this.$(".planContent tbody tr[data-code='" + code[0] + "']");
 
- 				App.Project.Settings.Viewer.filter({
- 					type: "plan",
- 					ids: this.PlayArr
- 				});
-        try{
+
+
 	        if(!this.ifOuter[code[0]]['isout']){
+		        debugger
+		        App.Project.Settings.Viewer.filter({
+			        type: "plan",
+			        ids: this.PlayArr
+		        });
+		        App.Project.Settings.Viewer.translucent(true);
+
+		        App.Project.Settings.Viewer.highlight({
+			        type: "plan",
+			        ids: undefined
+		        });
+
 		        App.Project.Settings.Viewer.highlight({
 			        type: "plan",
 			        //ids: [code[0]]
 			        ids: this.inners.slice(0,this.ifOuter[code[0]]['index'])
 		        });
 		        console.log(this.ifOuter[code[0]]['index'])
+	        }else{
+		        App.Project.Settings.Viewer.translucent(false);
+
+		        App.Project.Settings.Viewer.filter({
+			        type: "plan",
+			        ids: this.PlayArr
+		        });
+		        App.Project.Settings.Viewer.highlight({
+			        type: "plan",
+			        ids: undefined
+		        });
 	        }
-        }catch(e){
-	        console.log(code[0])
-        }
+
 
 
  				var processAnalog = (this.analogCount - this.PlayArr.length) / this.analogCount,
@@ -180,7 +198,12 @@
  			} else {
  				//停止模拟
  				this.stopAnalog();
- 			}
+			  App.Project.Settings.Viewer.translucent(false);
+			  App.Project.Settings.Viewer.highlight({
+				  type: "plan",
+				  ids: undefined
+			  });
+		  }
  		}, 500);
  	},
 
