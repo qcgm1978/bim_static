@@ -81,6 +81,23 @@ App.Project = {
 			return '';
 		}
 	},
+
+	linkSilder:function(type,key){
+		var $check=$('.modelSidebar #'+type+' ul input'),
+			$treeText=$('.modelSidebar #'+type+' ul .treeText');
+		$check.each(function(){
+			if($(this).attr('checked')){
+				$(this).click();
+			}
+		})
+		$treeText.each(function(){
+			var _=$(this).parent().find('input');
+			if(!_.attr('checked') && $(this).text()==key){
+				_.click();
+			}
+		})
+	},
+
 	cacheMarkers: function(type, data) {
 		this.currentLoadData[type] = data;
 	},
@@ -1110,11 +1127,11 @@ App.Project = {
 						var lis = '';
 						$.each(data.data, function(i, item) {
 
-							var _name = item.name;
+							var _name = item.name,url=item.url||'###';
 							if (/标准$/.test(_name)) {
-								_name = '<a href="#">' + _name + '</a>&nbsp;&nbsp;';
+								_name = '<a href="'+url+'" target="_blank">' + _name + '</a>&nbsp;&nbsp;';
 							} else {
-								_name = '<a href="#">' + _name + '质量标准' + '</a>&nbsp;&nbsp;';
+								_name = '<a href="'+url+'" target="_blank">' + _name + '质量标准' + '</a>&nbsp;&nbsp;';
 							}
 
 							lis += liTpl.replace("varName", _name);
@@ -1338,6 +1355,8 @@ App.Project = {
 			box = $target.data('box'),
 			location = $target.data('location'),
 			color=$target.data('color');
+		_this.linkSilder('floor','F02');
+		bimView.bottom();
 		if ($target.hasClass("selected")) {
 			return
 			//	$target.parent().find(".selected").removeClass("selected");
