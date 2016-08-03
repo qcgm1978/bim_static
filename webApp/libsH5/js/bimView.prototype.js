@@ -295,6 +295,7 @@
           parents = $this.parents('.itemNode'),
           flag = $this.prop('checked'),
           filter;
+        console.error('link:'+flag);
         $li.find("input").prop("checked", flag);
         if (type == "sceneId") {
           var filter = bimView.comm.getFilters($("#floors,#specialty"), 'uncheck');

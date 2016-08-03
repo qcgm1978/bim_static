@@ -63,6 +63,7 @@
     $.ajax({
       url: "/platform/api/project/"+query.projectCode+"/meta?token=123"
     }).done(function(data){
+      console.log(data)
       if (data.code == 0) {
 
         if (data.data) {
