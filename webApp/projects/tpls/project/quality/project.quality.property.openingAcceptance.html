@@ -7,22 +7,23 @@
 </div>
 <div class="searchDetail openingacceptance">
     <div class="searchOptons">
-
-    	 <div class="optonLine zIndex10">
-             <div class="myDropDown categoryOption optionComm">
+        <div class="optonLine zIndex10">
+            <div class="searchName">
+                <span>位置：</span>
+                <input type="text" class="txtSearchName txtLocationName filterInputExtra" placeholder="请输入名称关键字"/>
+            </div>
+        </div>
+        <div class="optonLine">
+            <div class="myDropDown categoryOption optionComm">
                 <span class="myDropText">
              <span>类别：</span> <span class="text">全部</span> <i class="myDropArrorw"></i> </span>
-                 <ul class="myDropList">
-                     <li class="myItem" data-val=''>全部</li>
-                     <% _.each(App.Project.mapData.openCategory,function(item,index){ if(index!=0){%>
-                     <li class="myItem" data-val='<%=index%>'><%=item%></li>
-                     <% } }) %>
-                 </ul>
-             </div>
-         
-        </div>
-
-        <div class="optonLine">
+                <ul class="myDropList">
+                    <li class="myItem" data-val=''>全部</li>
+                    <% _.each(App.Project.mapData.openCategory,function(item,index){ if(index!=0){%>
+                    <li class="myItem" data-val='<%=index%>'><%=item%></li>
+                    <% } }) %>
+                </ul>
+            </div>
             <div class="myDropDown riskOption optionComm">
                 <span class="myDropText">
              <span>状态：</span> <span class="text">全部</span> <i class="myDropArrorw"></i> </span>

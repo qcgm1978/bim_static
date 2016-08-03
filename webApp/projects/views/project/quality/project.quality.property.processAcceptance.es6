@@ -44,6 +44,9 @@ App.Project.QualityProcessAcceptance = Backbone.View.extend({
 	//事件初始化
 	bindEvent() {
 		var that = this;
+		this.$('.txtLocationName').change(function(){
+			that.changePA('locationName', $(this).val())
+		})
 		//隐患
 		this.$(".riskOption").myDropDown({
 			click: function($item) {
