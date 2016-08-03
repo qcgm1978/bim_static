@@ -13,7 +13,7 @@ App.API = {
 
 	URL: {
 
-		downloadPlanVer:"sixD/{projectId}/{projectVersionId}/cost/export/zip",//校验下载
+		downloadPlanVer:"sixD/{projectId}/{projectVersionId}/plan/export/zip",//校验下载
 
 		//首页bodyContent数据
 		fetchBodyContentTodos :'platform/todo',
