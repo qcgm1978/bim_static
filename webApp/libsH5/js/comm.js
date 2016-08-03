@@ -166,7 +166,7 @@
             iconStatus = 'noneSwitch';
           }
           if(_opt.isChecked){
-           input = '<input type="checkbox" checked="checkde" />'
+           input = '<input type="checkbox" checked="checked" />'
           }else{
             input = '<input type="checkbox" />'
           }

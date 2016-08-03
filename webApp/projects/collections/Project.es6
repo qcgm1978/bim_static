@@ -83,17 +83,20 @@ App.Project = {
 	},
 
 	linkSilder:function(type,key){
+		if(!key){
+			return
+		}
 		var $check=$('.modelSidebar #'+type+' ul input'),
 			$treeText=$('.modelSidebar #'+type+' ul .treeText');
 		$check.each(function(){
-			if($(this).attr('checked')){
-				$(this).click();
+			if($(this).is(':checked') && $(this).closest('.itemContent').find('.treeText').text()!=key){
+				$(this).trigger('click');
 			}
 		})
 		$treeText.each(function(){
 			var _=$(this).parent().find('input');
-			if(!_.attr('checked') && $(this).text()==key){
-				_.click();
+			if($(this).text()==key && !_.is(':checked')){
+				_.trigger('click');
 			}
 		})
 	},
@@ -1350,13 +1353,11 @@ App.Project = {
 	},
 	//在模型中显示
 	showInModel: function($target, type) {
-		var _this = this,
+		var _this = this,key="",
 			ids = $target.data('userId'),
 			box = $target.data('box'),
 			location = $target.data('location'),
 			color=$target.data('color');
-		_this.linkSilder('floor','F02');
-		bimView.bottom();
 		if ($target.hasClass("selected")) {
 			return
 			//	$target.parent().find(".selected").removeClass("selected");
@@ -1373,6 +1374,18 @@ App.Project = {
 		var _temp = location;
 		box = _this.formatBBox(_temp.bBox || _temp.boundingBox);
 		ids = [_temp.userId || _temp.componentId];
+
+		//过滤所属楼层 start
+		var _floors=App.Project.Settings.Viewer.FloorsData;
+		_.find(_floors,function(item){
+			key=item.floor;
+			return _.contains(item.fileEtags,_temp.componentId.split('.')[0]);
+		})
+		//过滤所属楼层 end
+
+		_this.linkSilder('floors',key);
+		App.Project.Settings.Viewer.bottom();
+
 		var _loc = _this.formatMark(location,color);
 		/*$target.data("userId", ids);
 		$target.data("box", box);

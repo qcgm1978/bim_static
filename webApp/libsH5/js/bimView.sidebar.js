@@ -77,6 +77,7 @@
             data:'fileEtags',
             id:'floors',
           });
+          bimView.prototype.FloorsData=data;
           $('#floors').append(floors);
         });
         bimView.comm.ajax({
