@@ -34,10 +34,13 @@ App.Project.PlanModel = Backbone.View.extend({
 			box=$target.data("box");
 		if ($target.hasClass("selected")) {
 			$target.parent().find(".selected").removeClass("selected");
+			App.Project.cancelZoomModel();
+			return;
 		} else {
 			$target.parent().find(".selected").removeClass("selected");
 			$target.addClass("selected");
-		}
+		} 
+
 		if (box && ids) {
 			App.Project.zoomModel(ids,box);
 			return;
