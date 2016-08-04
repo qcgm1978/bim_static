@@ -10620,6 +10620,15 @@ CLOUD.Extensions.DwgAnnotationEditor.prototype.onCameraChange = function () {
     this.handleCallbacks("changeEditor");
 
 };
+
+CLOUD.Extensions.DwgAnnotationEditor.prototype.setSvgZIndex = function (zIndex) {
+
+    zIndex = zIndex || 18;
+
+    if (this.svg) {
+        this.svg.style.zIndex = zIndex;
+    }
+};
 CLOUD.Extensions.Helper2D = function (viewer) {
 
     this.viewer = viewer;
@@ -10963,6 +10972,7 @@ CLOUD.Extensions.DwgHelper.prototype = {
             };
 
             this.dwgAnnotationEditor.init(callbacks);
+            this.dwgAnnotationEditor.setSvgZIndex();
 
             callbacks = null;
         }

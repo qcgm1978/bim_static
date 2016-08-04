@@ -520,10 +520,11 @@ App.Project = {
 	//保存批注
 	dwgViewer.prototype.saveCommentDwg = function() {
 		var that = this;
-		this.dwgView.getCommentData(function(data) {
+		this.dwgView.getCommentData(function(data) { 
+			 
 			data.image = data.image.replace('data:image/png;base64,', '');
 			that.data = data;
-			SingleComment.saveCommentDialog();
+			SingleComment.saveCommentDialog(); 
 		});
 	}
 
@@ -563,7 +564,7 @@ App.Project = {
 
 			var dialogHtml = App.Project.templateUrl('/libsH5/tpls/comment/bimview.save.dialog.html')(pars),
 				opts = {
-					title: "保存批注",
+					title: "保存快照",
 					width: 500,
 					height: 250,
 					cssClass: "saveViewPoint",
@@ -631,7 +632,7 @@ App.Project = {
 
 			if (!pars.name) {
 				$.tip({
-					message: "请输入批注描述",
+					message: "请输入快照描述",
 					timeout: 3000,
 					type: "alarm"
 				});

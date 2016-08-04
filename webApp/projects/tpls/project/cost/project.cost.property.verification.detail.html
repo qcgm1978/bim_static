@@ -10,9 +10,15 @@
                                  <i class="nodeSwitch on"></i>
                             <%}else{%>
                                  <i class="nodeSwitch none"></i>
-                            <%}%>
+                            <%}%> 
 
-                            <span class="code"><%=current.code%></span>
+                                 <% if(current.url){%>
+                                       <a href="<%= current.url%>" target="_blank">
+                                    <span class="text overflowEllipsis" style="left:<%=mLeft+13%>px;" title='<%= code %>'> <span class="code"><%=current.code%></span> </a>
+                                  <%}else{%>
+                                    <span class="code"><%=current.code%></span> 
+                                  <%}%>
+
                         </td>
                         <td class="listName"><%=current.name%></td>
                      
@@ -31,8 +37,15 @@
                                                  <i class="nodeSwitch on step1"></i>
                                             <%}else{%>
                                                  <i class="nodeSwitch none step1"></i>
-                                            <%}%>
-                                            <span class="code code1"><%=current.code%></span>
+                                            <%}%> 
+
+                                    <% if(current.url){%>
+                                       <a href="<%= current.url%>" target="_blank">
+                                         <span class="code code1"><%=current.code%></span>  </a>
+                                  <%}else{%>
+                                    <span class="code code1"><%=current.code%></span> 
+                                  <%}%>
+
                                     </td>
                                     <td class="listName"><%=current.name%></td>
                                   
@@ -48,8 +61,15 @@
                                                      <i class="nodeSwitch on step2"></i>
                                                 <%}else{%>
                                                      <i class="nodeSwitch none step2"></i>
-                                                <%}%>
-                                                <span class="code code2"><%=current.code%></span>
+                                                <%}%> 
+
+                                 <% if(current.url){%>
+                                       <a href="<%= current.url%>" target="_blank">
+                                         <span class="code code2"><%=current.code%></span>   </a>
+                                  <%}else{%>
+                                     <span class="code code2"><%=current.code%></span> 
+                                  <%}%>
+
                                             </td>
                                             <td class="listName"><%=current.name%></td>
                                            
@@ -66,7 +86,8 @@
                                                             <%}else{%>
                                                                  <i class="nodeSwitch none step3"></i>
                                                             <%}%>
-                                                            <span class="code code3"><%=current.code%></span>
+                                                            <a href="<%= current.url%>" target="_blank">
+                                                             <span class="code code3"><%=current.code%></span></a>
                                                         </td>
                                                         <td class="listName"><%=current.name%></td>
                                                           

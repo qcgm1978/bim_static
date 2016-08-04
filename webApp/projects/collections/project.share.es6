@@ -98,6 +98,14 @@ App.Project.Share = {
 			//绑定登录
 			that.signIn(dialog);
 		});
+
+		//登录
+		dialog.element.find(".txtPwd").on("keyup", function(event) {
+			//绑定登录
+			if (event.keyCode==13) {
+				that.signIn(dialog);
+			}
+		});
 	},
 
 	//登录
