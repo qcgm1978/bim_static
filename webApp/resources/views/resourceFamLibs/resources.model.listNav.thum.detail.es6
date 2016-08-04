@@ -13,8 +13,8 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 		"click .ckMe": "itemSelected",
 		"keyup .txtEdit": "enterCreateNew",
 		"click .txtEdit": "returnPop",
-	//	"click .ckMe": "stopPop",
-		'click .returnBack':'returnBack'
+		//	"click .ckMe": "stopPop",
+		'click .returnBack': 'returnBack'
 
 	},
 
@@ -43,11 +43,11 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 
 	itemSelected(event) {
 		var $target = $(event.target),
-			ck=$target.prop("checked");
-		$target.closest(".item")[ ck? 'addClass' : 'removeClass']('selected');
+			ck = $target.prop("checked");
+		$target.closest(".item")[ck ? 'addClass' : 'removeClass']('selected');
 		event.stopPropagation();
 	},
-	returnBack:function(){
+	returnBack: function() {
 		alert();
 	},
 	//文件或者文件夹点击
@@ -70,7 +70,7 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 				}
 				$leftItem.click();
 			}
-			$('#navContainer .returnBack').removeClass('theEnd').attr('isReturn','1').html('返回上级');
+			$('#navContainer .returnBack').removeClass('theEnd').attr('isReturn', '1').html('返回上级');
 		}
 	},
 
@@ -78,8 +78,8 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 	bindContext: function(event) {
 
 
-		var that = this; 
-		
+		var that = this;
+
 		this.$el.contextMenu('listContextFamily', {
 			//显示 回调
 			onShowMenuCallback: function(event) {
@@ -103,11 +103,11 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 
 				}
 				$item.addClass("selected").siblings().removeClass("selected");
-				
-				if(!App.Comm.isAuth('rename','family')){
+
+				if (!App.Comm.isAuth('rename', 'family')) {
 					$("#reNameModelFamily").addClass('disable').attr('disabled', 'disabled');
 				}
-				if(!App.Comm.isAuth('delete','family')){
+				if (!App.Comm.isAuth('delete', 'family')) {
 					$("#delModelFamily").addClass('disable').attr('disabled', 'disabled');
 				}
 				if ($('#listContextFamily li[class!=disable]').length == 0) {
@@ -121,46 +121,29 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 					//预览
 
 				},
-				'downLoadModel': function(item) {
-					if($('#downLoadModel').is('.disable')){
+				'downLoadModelFamily': function(item) {
+					 
+					if ($('#downLoadModel').is('.disable')) {
 						return ''
 					}
 					//下载
-					var $item = $(item);
-/*					
-					if ($item.find(".folder").length > 0) {
-						//alert("暂不支持文件夹下载");
-						App.ResourceModel.folderDown($item);
-						return;
-					}*/
+					var $item = $(item),
 
-					//下载链接 
-					var fileVersionId = $item.find(".filecKAll").data("fileversionid");
+						fileVersionId = $item.find(".filecKAll").data("fileversionid"); 
 
-					// //请求数据
-					var data = {
-						URLtype: "downLoad",
-						data: {
-							projectId: App.ResourceModel.Settings.CurrentVersion.projectId,
-							projectVersionId: App.ResourceModel.Settings.CurrentVersion.id
-						}
-					};
-
-					var data = App.Comm.getUrlByType(data),
-						url = data.url + "&fileVersionId=" + fileVersionId;
-					window.location.href = url;
+					App.Comm.checkDownLoad(App.ResourceModel.Settings.CurrentVersion.projectId, App.ResourceModel.Settings.CurrentVersion.id, fileVersionId);
 
 				},
-				'delModel': function(item) {
-					if($('#delModel').is('.disable')){
+				'delModelFamily': function(item) {
+					if ($('#delModel').is('.disable')) {
 						return ''
 					}
 					//删除提示
 					App.ResourceModel.delFileDialog($(item));
 
 				},
-				'reNameModel': function(item) {
-					if($('#reNameModel').is('.disable')){
+				'reNameModelFamily': function(item) {
+					if ($('#reNameModel').is('.disable')) {
 						return ''
 					}
 
@@ -290,7 +273,7 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 		var filePath = $item.find(".txtEdit").val().trim(),
 			that = this,
 			$leftSel = $("#resourceFamlibsLeftNav .treeViewMarUl .selected"),
-		parentId = "";
+			parentId = "";
 		if ($leftSel.length > 0) {
 			parentId = $leftSel.data("file").fileVersionId;
 		}

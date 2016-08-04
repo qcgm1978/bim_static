@@ -398,6 +398,10 @@ App.Comm = {
 	//下载
 	checkDownLoad: function(projectId, projectVersionId, fileVersionId) {
 
+		if (!App.Comm.getCookie("OUTSSO_AuthToken")) {
+			$.tip({message:"登录后下载",type:"alarm"});
+			return;
+		}
 
 		var checkData = {
 			URLtype: "checkDownLoad",

@@ -145,7 +145,7 @@
 
     function navigateTo(url) {
         var aLink = "<a href='" + url + "' target='_blank' >test</a>";
-        var a = $(aLink).get(0);
+        var a = $(aLink);
         var e = document.createEvent('MouseEvents');
         e.initEvent('click', true, true);
         a.dispatchEvent(e);
