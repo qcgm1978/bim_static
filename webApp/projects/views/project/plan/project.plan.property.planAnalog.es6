@@ -150,13 +150,13 @@ App.Project.PlanAnalog = Backbone.View.extend({
 					});
 					App.Project.Settings.Viewer.translucent(false);
 
-					App.Project.Settings.Viewer.highlight({
+					App.Project.Settings.Viewer.ignoreTranparent({
 						type: "plan",
 						ids: undefined
 					});
 					App.Project.Settings.Viewer.translucent(true);
 
-					App.Project.Settings.Viewer.highlight({
+					App.Project.Settings.Viewer.ignoreTranparent({
 						type: "plan",
 						//ids: [code[0]]
 						ids: this.inners.slice(0, this.ifOuter[code[0]]['index'])
@@ -165,7 +165,7 @@ App.Project.PlanAnalog = Backbone.View.extend({
 				}else{
 					App.Project.Settings.Viewer.translucent(false);
 
-					App.Project.Settings.Viewer.highlight({
+					App.Project.Settings.Viewer.ignoreTranparent({
 						type: "plan",
 						//ids: [code[0]]
 						ids: undefined
@@ -209,7 +209,7 @@ App.Project.PlanAnalog = Backbone.View.extend({
 				this.stopAnalog();
 				App.Project.Settings.Viewer.translucent(false);
 
-				App.Project.Settings.Viewer.highlight({
+				App.Project.Settings.Viewer.ignoreTranparent({
 					type: "plan",
 					ids: undefined
 				});
@@ -218,7 +218,7 @@ App.Project.PlanAnalog = Backbone.View.extend({
 					ids: undefined
 				});
 			}
-		}, 500);
+		}, 1000);
 	},
 
 	//停止模拟

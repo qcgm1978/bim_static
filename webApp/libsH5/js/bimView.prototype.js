@@ -645,6 +645,25 @@
       }
       viewer.render();
     },
+    ignoreTranparent: function(obj) {
+      // 高亮
+      var self = this;
+      var viewer = self.viewer;
+      var filter = viewer.getFilters();
+      if (obj.type == "userId") {
+        filter.setOverriderByUserIds('highlight', obj.ids,null);
+      } else {
+        if (obj.ids == undefined) {
+          filter.setUserOverrider(obj.type, undefined);
+        } else {
+          $.each(obj.ids, function(i, id) {
+            filter.setUserOverrider(obj.type, id, null);
+          });
+        }
+
+      }
+      viewer.render();
+    },
     downplay: function(obj) {
       var self = this;
       var viewer = self.viewer;
