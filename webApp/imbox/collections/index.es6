@@ -24,6 +24,7 @@ App.INBox = {
 	read(id,_this,projectId,version,shareId){
 		App.Comm.loadMessageCount(-1);
 		//window.open(App.API.Settings.hostname+"platform/message/read?id="+id);
+		this.id = id;
 		$(_this).closest('li').remove();
 	//	this.loadData('un');
 		//location.reload();
@@ -117,13 +118,15 @@ App.INBox.comment = {
 			}
 		});
 		$('.wrapper .title').text($(_this).text());
-		var $el = $(event.target).closest(".remarkCount"),
-		    id = $el.data("id"),
-		    $item = $el.closest(".item"),
-		    creatorId = $item.find(".name").data("creatorid");
+		//获取头部信息
+		$.ajax({
+			url: "/sixD/"+projectId+'/viewPoint/'+viewPointId
+		}).done(function(data){
+			console.log(data)
+			var html = _.templateUrl('./imbox/tpls/comment.remark.list.html')(data.data);
+			$('.viewPointInfo').html(html);
 
-		//批注信息 赋值
-		$(".commentRemark .viewPointInfo").html($item.html());
+		})
 
 	},
   CommentView : {
@@ -247,7 +250,8 @@ App.INBox.comment = {
 			"click .btnAdress": "address", //地址
 			"click .btnCommViewPoint": "commentViewPoint",
 			"click .viewPointInfo .info": "viewPointShow",
-			"click .btnLogin": "login" //登陆
+			"click .btnLogin": "login", //登陆,
+			"click .remarkCount": "go" //跳转,
 		},
 
 		initialize() {
@@ -288,6 +292,13 @@ App.INBox.comment = {
 				}
 			});
 			return this;
+		},
+
+		//跳转
+		go(){
+			window.open(App.API.Settings.hostname+"platform/message/read?id="+App.INBox.id);
+			this.close();
+
 		},
 
 		//显示视点
@@ -402,7 +413,9 @@ App.INBox.comment = {
 		},
 
 		close(){
-			$('.mod-dialog.ui-draggable,.mod-dialog-masklayer').hide();
+			setTimeout(function(){
+				$('.mod-dialog.ui-draggable,.mod-dialog-masklayer,#lightboxOverlay,#lightbox').hide();
+			},100);
 		},
 
 		//图片上传成功

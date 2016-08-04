@@ -102,7 +102,14 @@ var AppKeyRoute = Backbone.Router.extend({
 		App.Project.Settings = $.extend({}, App.Project.Defaults);
 
 		this.parseToken(token, function() {
-			App.Project.init();
+			App.Project.Share.init();
+			if (!App.Comm.getCookie("OUTSSO_AuthToken")) {
+				$("#pageLoading").hide();
+				$("#topBar .login").click();
+			} else {
+				App.Project.init();
+			}
+
 		});
 
 	},
@@ -146,7 +153,7 @@ var AppKeyRoute = Backbone.Router.extend({
 	// 浏览变更模型与变更基准模型差异
 	projectDifferBase(projectCode, versionId) {
 
-		var _this=this;
+		var _this = this;
 		//初始化之前 验证
 		this.beforeInit(() => {
 			_.require('/static/dist/app/project/projectChange/index.css');
@@ -155,7 +162,7 @@ var AppKeyRoute = Backbone.Router.extend({
 			$("body").html(temp);
 
 			_this.projectByCode(projectCode, function(data) {
-				if (data) { 
+				if (data) {
 					App.Index.initApi(data.projectId, versionId);
 				}
 
@@ -166,7 +173,7 @@ var AppKeyRoute = Backbone.Router.extend({
 
 	//浏览项目模型与标准模型差异
 	projectDifferStd(projectCode, versionId) {
-		var _this=this;
+		var _this = this;
 		//初始化之前 验证
 		this.beforeInit(() => {
 
@@ -287,7 +294,7 @@ var AppKeyRoute = Backbone.Router.extend({
 
 		if (App.Comm.isIEModel()) {
 			return;
-		} 
+		}
 
 		//验证登录
 		this.checkLogin((isLogin) => {

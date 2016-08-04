@@ -22,10 +22,10 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 
 	render: function() {
 		var data = this.model.toJSON();
-		data.isSearch=data.isSearch||false;
-		if(data.isSearch){
+		data.isSearch = data.isSearch || false;
+		if (data.isSearch) {
 			$('#resourceListContent .ckAll').hide();
-		}else{
+		} else {
 			$('#resourceListContent .ckAll').show();
 		}
 		this.$el.html(this.template(data)).data("status", data.status);
@@ -58,7 +58,7 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 				}
 				$leftItem.click();
 			}
-			$('#navContainer .returnBack').removeClass('theEnd').attr('isReturn','1').html('返回上级');
+			$('#navContainer .returnBack').removeClass('theEnd').attr('isReturn', '1').html('返回上级');
 		} else {
 
 			//文件直接跳转 不做处理
@@ -93,11 +93,11 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 
 				}
 				$item.addClass("selected").siblings().removeClass("selected");
-				
-				if(!App.Comm.isAuth('rename','model')){
+
+				if (!App.Comm.isAuth('rename', 'model')) {
 					$("#reNameModel").addClass('disable').attr('disabled', 'disabled');
 				}
-				if(!App.Comm.isAuth('delete','model')){
+				if (!App.Comm.isAuth('delete', 'model')) {
 					$("#delModel").addClass('disable').attr('disabled', 'disabled');
 				}
 				if ($('#listContext li[class!=disable]').length == 0) {
@@ -112,36 +112,18 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 
 				},
 				'downLoadModel': function(item) {
-					if($('#downLoadModel').is('.disable')){
+					if ($('#downLoadModel').is('.disable')) {
 						return ''
 					}
 					//下载
-					var $item = $(item);
+					var $item = $(item),
+						fileVersionId = $item.find(".filecKAll").data("fileversionid");
 
-					/*if ($item.find(".folder").length > 0) {
-						alert("暂不支持文件夹下载");
-						return;
-					}*/
-
-					//下载链接 
-					var fileVersionId = $item.find(".filecKAll").data("fileversionid");
-
-					// //请求数据
-					var data = {
-						URLtype: "downLoad",
-						data: {
-							projectId: App.ResourceModel.Settings.CurrentVersion.projectId,
-							projectVersionId: App.ResourceModel.Settings.CurrentVersion.id
-						}
-					};
-
-					var data = App.Comm.getUrlByType(data),
-						url = data.url + "&fileVersionId=" + fileVersionId;
-					window.location.href = url;
+					App.Comm.checkDownLoad(App.ResourceModel.Settings.CurrentVersion.projectId, App.ResourceModel.Settings.CurrentVersion.id, fileVersionId);
 
 				},
 				'delModel': function(item) {
-					if($('#delModel').is('.disable')){
+					if ($('#delModel').is('.disable')) {
 						return ''
 					}
 					//删除提示
@@ -149,7 +131,7 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 
 				},
 				'reNameModel': function(item) {
-					if($('#reNameModel').is('.disable')){
+					if ($('#reNameModel').is('.disable')) {
 						return ''
 					}
 					//重命名
@@ -183,7 +165,7 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 			$prevEdit = $fileContent.find(".txtEdit");
 
 		if ($prevEdit.length > 0) {
-			this.cancelEdit($prevEdit); 
+			this.cancelEdit($prevEdit);
 		}
 
 		var $fileContent = $("#resourceListContent .fileContent");
@@ -267,8 +249,8 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 
 		var filePath = $item.find(".txtEdit").val().trim(),
 			that = this,
-		$leftSel = $("#resourceModelLeftNav .treeViewMarUl .selected"),
-		parentId = "";
+			$leftSel = $("#resourceModelLeftNav .treeViewMarUl .selected"),
+			parentId = "";
 		if ($leftSel.length > 0) {
 			parentId = $leftSel.data("file").fileVersionId;
 		}
@@ -315,7 +297,7 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 				//$("#resourceModelLeftNav .treeViewMarUl span[data-id='" + id + "']").text(name);
 
 
-			}else{
+			} else {
 				alert(data.message);
 			}
 		});

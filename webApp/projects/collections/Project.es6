@@ -29,11 +29,11 @@ App.Project = {
 	},
 
 	//计划状态
-	planStatus:{
-		0:'',
-		1:'myIcon-circle-red',
-		2:'myIcon-circle-yellow',
-		3:'myIcon-circle-green'
+	planStatus: {
+		0: '',
+		1: 'myIcon-circle-red',
+		2: 'myIcon-circle-yellow',
+		3: 'myIcon-circle-green'
 	},
 
 	//空页面
@@ -81,30 +81,30 @@ App.Project = {
 		process: null,
 		dis: null
 	},
-	checkStatus:function(color){
-		if(color==1){
+	checkStatus: function(color) {
+		if (color == 1) {
 			return 'myIcon-circle-green';
-		}else if(color==2){
+		} else if (color == 2) {
 			return 'myIcon-circle-red';
-		}else{
+		} else {
 			return '';
 		}
 	},
 
-	linkSilder:function(type,key){
-		if(!key){
+	linkSilder: function(type, key) {
+		if (!key) {
 			return
 		}
-		var $check=$('.modelSidebar #'+type+' ul input'),
-			$treeText=$('.modelSidebar #'+type+' ul .treeText');
-		$check.each(function(){
-			if($(this).is(':checked') && $(this).closest('.itemContent').find('.treeText').text()!=key){
+		var $check = $('.modelSidebar #' + type + ' ul input'),
+			$treeText = $('.modelSidebar #' + type + ' ul .treeText');
+		$check.each(function() {
+			if ($(this).is(':checked') && $(this).closest('.itemContent').find('.treeText').text() != key) {
 				$(this).trigger('click');
 			}
 		})
-		$treeText.each(function(){
-			var _=$(this).parent().find('input');
-			if($(this).text()==key && !_.is(':checked')){
+		$treeText.each(function() {
+			var _ = $(this).parent().find('input');
+			if ($(this).text() == key && !_.is(':checked')) {
 				_.trigger('click');
 			}
 		})
@@ -221,29 +221,12 @@ App.Project = {
 				'previewModel': function($target) {},
 				'downLoadModelProject': function(item) {
 
-					var $item = $(item);
-					/*
-										if ($item.find(".folder").length > 0) {
-											alert("暂不支持文件夹下载");
-											return;
-										}*/
+					var $item = $(item),
+						//下载链接 
+						fileVersionId = $item.find(".filecKAll").data("fileversionid");
 
-					//下载链接 
-					var fileVersionId = $item.find(".filecKAll").data("fileversionid");
-
-					// //请求数据
-					var data = {
-						URLtype: "downLoad",
-						data: {
-							projectId: App.Project.Settings.CurrentVersion.projectId,
-							projectVersionId: App.Project.Settings.CurrentVersion.id
-						}
-					};
-
-					var data = App.Comm.getUrlByType(data),
-						url = data.url + "&fileVersionId=" + fileVersionId;
-					window.location.href = url;
-
+					App.Comm.checkDownLoad(App.Project.Settings.projectId, App.Project.Settings.CurrentVersion.id, fileVersionId);
+  
 				},
 				'delModelProject': function(item) {
 					var rel = $('#delModelProject'),
@@ -1135,16 +1118,17 @@ App.Project = {
 
 			App.Project.fetchPropertData("fetchDesignPropertiesQuality", function(data) {
 				if (data.code == 0) {
-					
+
 					if (data.data.length > 0) {
 						var lis = '';
 						$.each(data.data, function(i, item) {
 
-							var _name = item.name,url=item.url||'###';
+							var _name = item.name,
+								url = item.url || '###';
 							if (/标准$/.test(_name)) {
-								_name = '<a href="'+url+'" target="_blank">' + _name + '</a>&nbsp;&nbsp;';
+								_name = '<a href="' + url + '" target="_blank">' + _name + '</a>&nbsp;&nbsp;';
 							} else {
-								_name = '<a href="'+url+'" target="_blank">' + _name + '质量标准' + '</a>&nbsp;&nbsp;';
+								_name = '<a href="' + url + '" target="_blank">' + _name + '质量标准' + '</a>&nbsp;&nbsp;';
 							}
 
 							lis += liTpl.replace("varName", _name);
@@ -1348,10 +1332,10 @@ App.Project = {
 		return sb.toString();
 	},
 
-	formatMark: function(location,color) {
+	formatMark: function(location, color) {
 		var _temp = location,
-			_color='510';
-		color=_color.charAt(color||5)||5;
+			_color = '510';
+		color = _color.charAt(color || 5) || 5;
 
 		if (typeof location === 'string') {
 			_temp = JSON.parse(location)
@@ -1369,17 +1353,10 @@ App.Project = {
 			cat=$target.data('cat');
 		if ($target.hasClass("selected")) {
 			return
-			//	$target.parent().find(".selected").removeClass("selected");
 		} else {
 			$target.parent().find(".selected").removeClass("selected");
 			$target.addClass("selected");
 		}
-		/*if (ids && box) {
-			_this.zoomModel(ids, box);
-			_this.showMarks(location);
-			return;
-		}*/
-
 		var _temp = location,
 			_secenId=_temp.componentId.split('.')[0];
 		box = _this.formatBBox(_temp.bBox || _temp.boundingBox);
@@ -1578,7 +1555,7 @@ App.Project = {
 			} else {
 				_this.$el.html(_this.template(param));
 				//if ($('.design').hasClass('selected')) {
-					App.Project.propertiesOthers.call(_this, "plan|cost|quality|dwg");
+				App.Project.propertiesOthers.call(_this, "plan|cost|quality|dwg");
 				//}
 			}
 

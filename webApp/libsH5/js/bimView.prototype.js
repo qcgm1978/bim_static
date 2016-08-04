@@ -391,6 +391,13 @@
       viewer.zoomToBBox(CLOUD.Utils.computeBBox(box), 0.05, 1.2);
       viewer.render();
     },
+    zoomToBuilding: function(margin,ratio) {
+      // 缩放到指定位置
+      var self = this;
+      var viewer = self.viewer;
+      viewer.zoomToBuilding( margin, ratio);
+      viewer.render();
+    },
     zoomToSelection: function(box) {
       // 缩放到当前选中构件
       var self = this;
@@ -631,7 +638,26 @@
             filter.setUserOverrider(obj.type, undefined); 
         } else {
           $.each(obj.ids, function(i, id) {
-            filter.setUserOverrider(obj.type, id);
+            filter.setUserOverrider(obj.type, id, "lightBlue");
+          });
+        }
+
+      }
+      viewer.render();
+    },
+    ignoreTranparent: function(obj) {
+      // 高亮
+      var self = this;
+      var viewer = self.viewer;
+      var filter = viewer.getFilters();
+      if (obj.type == "userId") {
+        filter.setOverriderByUserIds('highlight', obj.ids,null);
+      } else {
+        if (obj.ids == undefined) {
+          filter.setUserOverrider(obj.type, undefined);
+        } else {
+          $.each(obj.ids, function(i, id) {
+            filter.setUserOverrider(obj.type, id, null);
           });
         }
 

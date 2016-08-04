@@ -180,11 +180,11 @@ App.Project.Share = {
 			App.Comm.setCookie('IS_OWNER_LOGIN', '2');
 			//绑定登陆
 			App.Project.Share.bindLogin();
+			App.Project.init();
 			// if (!$._data($("#topBar .login")[0], "events")) {
 			// 	//绑定用户信息
 			// 	App.TopNav.init();
-			// }
-			 
+			// } 
 			dialog.close()
 
 		});

@@ -118,7 +118,7 @@ App.Project.PlanAnalog = Backbone.View.extend({
 				ids: this.PlayArr
 			});
 
-			$('.m-fit').click();
+			App.Project.Settings.Viewer.zoomToBuilding(0.05,1);
 			//开始模拟
 			this.starAnalog();
 
@@ -139,18 +139,29 @@ App.Project.PlanAnalog = Backbone.View.extend({
 			if (this.PlayArr.length) {
 
 				var code = this.PlayArr.splice(0, 1),
-				    $tr = this.$(".planContent tbody tr[data-code='" + code[0] + "']");
+				    $tr = this.$(".planContent tbody tr[data-code='" + code[0] + "']"),
+				    $planContent = this.$(".planContent");
 
+				this.$(".planContent tbody .selected").removeClass('selected');
 
+				$tr.addClass("selected");
+				//滚动条位置
+				$planContent.scrollTop($tr.index() * 30);
 
 				if (!this.ifOuter[code[0]]['isout']) {
 					App.Project.Settings.Viewer.filter({
 						type: "plan",
 						ids: this.PlayArr
 					});
+					App.Project.Settings.Viewer.translucent(false);
+
+					App.Project.Settings.Viewer.ignoreTranparent({
+						type: "plan",
+						ids: undefined
+					});
 					App.Project.Settings.Viewer.translucent(true);
 
-					App.Project.Settings.Viewer.highlight({
+					App.Project.Settings.Viewer.ignoreTranparent({
 						type: "plan",
 						//ids: [code[0]]
 						ids: this.inners.slice(0, this.ifOuter[code[0]]['index'])
@@ -159,7 +170,7 @@ App.Project.PlanAnalog = Backbone.View.extend({
 				}else{
 					App.Project.Settings.Viewer.translucent(false);
 
-					App.Project.Settings.Viewer.highlight({
+					App.Project.Settings.Viewer.ignoreTranparent({
 						type: "plan",
 						//ids: [code[0]]
 						ids: undefined
@@ -176,8 +187,7 @@ App.Project.PlanAnalog = Backbone.View.extend({
 
 				var processAnalog = (this.analogCount - this.PlayArr.length) / this.analogCount,
 				    sourceWidth = this.$(".progressAnalog .bg").width(),
-				    width = sourceWidth * processAnalog,
-				    $planContent = this.$(".planContent");
+				    width = sourceWidth * processAnalog;
 
 				//不可以超过最大
 				if (width > sourceWidth) {
@@ -188,10 +198,8 @@ App.Project.PlanAnalog = Backbone.View.extend({
 
 				this.$(".progressAnalog .processBg").width(width);
 				this.$(".progressAnalog .processPos").css("left", width - 10);
-				$tr.addClass("selected");
 
-				//滚动条位置
-				$planContent.scrollTop($tr.index() * 36);
+
 				//底部文字
 				this.$(".desctionAnalog .analogDate").text($tr.find(".start").text());
 				this.$(".desctionAnalog .analogTitle").text($tr.find(".operationalMatters").text());
@@ -203,7 +211,7 @@ App.Project.PlanAnalog = Backbone.View.extend({
 				this.stopAnalog();
 				App.Project.Settings.Viewer.translucent(false);
 
-				App.Project.Settings.Viewer.highlight({
+				App.Project.Settings.Viewer.ignoreTranparent({
 					type: "plan",
 					ids: undefined
 				});
@@ -212,7 +220,7 @@ App.Project.PlanAnalog = Backbone.View.extend({
 					ids: undefined
 				});
 			}
-		}, 500);
+		}, 1000);
 	},
 
 	//停止模拟
