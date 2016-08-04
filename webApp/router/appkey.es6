@@ -100,13 +100,14 @@ var AppKeyRoute = Backbone.Router.extend({
 		_.require('/static/dist/projects/projects.js');
 
 		App.Project.Settings = $.extend({}, App.Project.Defaults);
-
-		this.parseToken(token, function() {
+		var that = this;
+		this.parseToken(token, function() { 
 			App.Project.Share.init();
 			if (!App.Comm.getCookie("OUTSSO_AuthToken")) {
 				$("#pageLoading").hide();
 				$("#topBar .login").click();
 			} else {
+				that.formatUser();
 				App.Project.init();
 			}
 
@@ -140,7 +141,12 @@ var AppKeyRoute = Backbone.Router.extend({
 
 				$("#topBar").prepend(' <ul class="navHeader"> <li class="item "> <span class="login">立即登录</span> </li></ul>');
 
-				App.Comm.setCookie("token_cookie", data.cookie);
+				if (!App.Comm.getCookie("OUTSSO_AuthToken")) {
+					App.Comm.setCookie("token_cookie", data.cookie);
+				} else {
+					App.Comm.setCookie("token_cookie_me", data.cookie);
+				}
+
 				//回调
 				if ($.isFunction(callback)) {
 					callback();
@@ -336,7 +342,12 @@ var AppKeyRoute = Backbone.Router.extend({
 		App.Comm.ajax(data, function(data) {
 			if (data.code == 0) {
 
-				App.Comm.setCookie("token_cookie", data.data);
+				if (App.Comm.getCookie("OUTSSO_AuthToken")) {
+					App.Comm.setCookie("token_cookie_me", data.data);
+				} else {
+					App.Comm.setCookie("token_cookie", data.data);
+				}
+
 				//获取用户信息
 				that.getUserInfo(fn);
 
@@ -375,36 +386,45 @@ var AppKeyRoute = Backbone.Router.extend({
 				fn(false);
 				return;
 			}
+
 			localStorage.setItem("user", JSON.stringify(data.data));
 
-			var Autharr = data.data['function'],
-				keys, len;
-			App.AuthObj = {};
-			//遍历权限
-			$.each(Autharr, function(i, item) {
-				keys = item.code.split('-');
-				len = keys.length;
-
-				if (len == 1) {
-					App.AuthObj[keys[0]] = true;
-				} else {
-
-					App.AuthObj[keys[0]] = App.AuthObj[keys[0]] || {}
-
-					if (len == 2) {
-						App.AuthObj[keys[0]][keys[1]] = true
-					} else {
-						App.AuthObj[keys[0]][keys[1]] = App.AuthObj[keys[0]][keys[1]] || {}
-						App.AuthObj[keys[0]][keys[1]][keys[2]] = true;
-					}
-
-				}
-			});
+			that.formatUser();
 
 			fn(true);
 
 
 
+		});
+	},
+
+	//格式化用户
+	formatUser() {
+
+		var data = localStorage.getItem("user");
+		App.Global.User = JSON.parse(data);
+		var Autharr = data['function'],
+			keys, len;
+		App.AuthObj = {};
+		//遍历权限
+		$.each(Autharr, function(i, item) {
+			keys = item.code.split('-');
+			len = keys.length;
+
+			if (len == 1) {
+				App.AuthObj[keys[0]] = true;
+			} else {
+
+				App.AuthObj[keys[0]] = App.AuthObj[keys[0]] || {}
+
+				if (len == 2) {
+					App.AuthObj[keys[0]][keys[1]] = true
+				} else {
+					App.AuthObj[keys[0]][keys[1]] = App.AuthObj[keys[0]][keys[1]] || {}
+					App.AuthObj[keys[0]][keys[1]][keys[2]] = true;
+				}
+
+			}
 		});
 	},
 

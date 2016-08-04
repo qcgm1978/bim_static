@@ -11,7 +11,15 @@
      	<%}else{%>
  			<i class="noneSwitch none" style="margin-left:<%=mLeft%>px;"></i>
      	<%}%>  
+
+      <% if(url){%>
+           <a href="<%= url%>" target="_blank">
+        <span class="text overflowEllipsis" style="left:<%=mLeft+13%>px;" title='<%= code %>'><%= code %></span> </a>
+      <%}else{%>
         <span class="text overflowEllipsis" style="left:<%=mLeft+13%>px;" title='<%= code %>'><%= code %></span> 
+      <%}%>
+
+       
       </div>
 
        <span class="listName commItem overflowEllipsis"> <span title="<%= name %>" class="text"><%= name %></span></span> 

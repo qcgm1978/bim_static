@@ -403,7 +403,7 @@
 
 				//显示批注
 				showComment(event) {
-
+					 
 					var $item = $(event.target).closest(".item");
 
 					//项目批注
@@ -1249,7 +1249,7 @@
 
 				if (!pars.name) {
 					$.tip({
-						message: "请输入批注描述",
+						message: "请输入快照描述",
 						timeout: 3000,
 						type: "alarm"
 					});
@@ -1557,7 +1557,7 @@
 
 				if (!pars.name) {
 					$.tip({
-						message: "请输入批注名称",
+						message: "请输入快照名称",
 						timeout: 3000,
 						type: "alarm"
 					});
@@ -1761,7 +1761,7 @@
 
 				if (!pars.name) {
 					$.tip({
-						message: "请输入批注名称",
+						message: "请输入快照名称",
 						timeout: 3000,
 						type: "alarm"
 					});
