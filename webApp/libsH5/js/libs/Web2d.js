@@ -5892,7 +5892,6 @@ CLOUD.Extensions.MarkerBubble.prototype.renderToCanvas = function (ctx) {
 
 
 
-
 CLOUD.Extensions.MarkerEditor = function (viewer) {
     "use strict";
 
@@ -5908,13 +5907,13 @@ CLOUD.Extensions.MarkerEditor = function (viewer) {
     // 隐患已整改：黄色
     // 隐患已关闭：绿色
     // size: 15 * 20
-    this.flagColors = {red: "#ff2129", green: "#85af03", yellow:"#fe9829"};
+    this.flagColors = {red: "#ff2129", green: "#85af03", yellow: "#fe9829"};
 
     // 有隐患：红色
     // 无隐患：绿色
     // 过程验收点、开业验收点的未检出：灰色
     // size: 14 * 20
-    this.bubbleColors = {red: "#f92a24", green: "#86b507", gray:"#ccccca"};
+    this.bubbleColors = {red: "#f92a24", green: "#86b507", gray: "#ccccca"};
 
     this.keys = {
         BACKSPACE: 8,
@@ -5945,7 +5944,7 @@ CLOUD.Extensions.MarkerEditor = function (viewer) {
 
     this.beginEditCallback = null;
     this.endEditCallback = null;
-    this.clickMarkerCallback = null;
+    this.markerClickCallback = null;
 
     this.onMouseDownBinded = this.onMouseDown.bind(this);
     this.onMouseUpBinded = this.onMouseUp.bind(this);
@@ -6079,13 +6078,12 @@ CLOUD.Extensions.MarkerEditor.prototype.onResize = function () {
     this.updateMarkers();
 };
 
-CLOUD.Extensions.MarkerEditor.prototype.init = function(callbacks) {
+CLOUD.Extensions.MarkerEditor.prototype.init = function (callbacks) {
 
     if (callbacks) {
 
         this.beginEditCallback = callbacks.beginEditCallback;
         this.endEditCallback = callbacks.endEditCallback;
-        this.clickMarkerCallback = callbacks.clickCallback;
     }
 
     if (!this.svg) {
@@ -6114,7 +6112,7 @@ CLOUD.Extensions.MarkerEditor.prototype.init = function(callbacks) {
     this.initialized = true;
 };
 
-CLOUD.Extensions.MarkerEditor.prototype.uninit = function() {
+CLOUD.Extensions.MarkerEditor.prototype.uninit = function () {
 
     this.initialized = false;
 
@@ -6138,9 +6136,13 @@ CLOUD.Extensions.MarkerEditor.prototype.uninit = function() {
 
     this.svgGroup = null;
     this.svg = null;
+
+    this.beginEditCallback = null;
+    this.endEditCallback = null;
+    this.markerClickCallback = null;
 };
 
-CLOUD.Extensions.MarkerEditor.prototype.isInitialized = function() {
+CLOUD.Extensions.MarkerEditor.prototype.isInitialized = function () {
 
     return this.initialized;
 };
@@ -6165,7 +6167,7 @@ CLOUD.Extensions.MarkerEditor.prototype.generateMarkerId = function () {
 };
 
 // 清除数据
-CLOUD.Extensions.MarkerEditor.prototype.clear = function() {
+CLOUD.Extensions.MarkerEditor.prototype.clear = function () {
 
     var markers = this.markers;
 
@@ -6182,7 +6184,7 @@ CLOUD.Extensions.MarkerEditor.prototype.clear = function() {
     }
 };
 
-CLOUD.Extensions.MarkerEditor.prototype.updateMarkers = function() {
+CLOUD.Extensions.MarkerEditor.prototype.updateMarkers = function () {
 
     for (var i = 0, len = this.markers.length; i < len; i++) {
         var marker = this.markers[i];
@@ -6190,7 +6192,7 @@ CLOUD.Extensions.MarkerEditor.prototype.updateMarkers = function() {
     }
 };
 
-CLOUD.Extensions.MarkerEditor.prototype.addMarker = function(marker) {
+CLOUD.Extensions.MarkerEditor.prototype.addMarker = function (marker) {
 
     marker.setParent(this.svgGroup);
 
@@ -6225,13 +6227,13 @@ CLOUD.Extensions.MarkerEditor.prototype.selectMarker = function (marker) {
 
     //this.selectedMarker = marker;
 
-    if (this.clickMarkerCallback) {
+    if (this.markerClickCallback) {
 
         if (this.selectedMarker) {
-            this.clickMarkerCallback(this.selectedMarker.toNewObject());
+            this.markerClickCallback(this.selectedMarker.toNewObject());
         } else {
 
-            this.clickMarkerCallback(null);
+            this.markerClickCallback(null);
         }
     }
 
@@ -6246,7 +6248,7 @@ CLOUD.Extensions.MarkerEditor.prototype.deselectMarker = function () {
     }
 };
 
-CLOUD.Extensions.MarkerEditor.prototype.getSceneMatrix = function() {
+CLOUD.Extensions.MarkerEditor.prototype.getSceneMatrix = function () {
 
     var matrix = this.scene.getRootNodeMatrix();
 
@@ -6258,7 +6260,7 @@ CLOUD.Extensions.MarkerEditor.prototype.getSceneMatrix = function() {
     return matrix;
 };
 
-CLOUD.Extensions.MarkerEditor.prototype.getInverseSceneMatrix = function() {
+CLOUD.Extensions.MarkerEditor.prototype.getInverseSceneMatrix = function () {
 
     var sceneMatrix = this.getSceneMatrix();
     var inverseMatrix = new THREE.Matrix4();
@@ -6268,7 +6270,7 @@ CLOUD.Extensions.MarkerEditor.prototype.getInverseSceneMatrix = function() {
     return inverseMatrix;
 };
 
-CLOUD.Extensions.MarkerEditor.prototype.worldToClient = function(wPoint) {
+CLOUD.Extensions.MarkerEditor.prototype.worldToClient = function (wPoint) {
 
     var bounds = this.getDomContainerBounds();
     var camera = this.cameraEditor.object;
@@ -6278,21 +6280,21 @@ CLOUD.Extensions.MarkerEditor.prototype.worldToClient = function(wPoint) {
     result.applyMatrix4(sceneMatrix);
     result.project(camera);
 
-    result.x =  Math.round(0.5 * (result.x + 1) * bounds.width);
-    result.y =  Math.round(-0.5 * (result.y - 1) * bounds.height);
+    result.x = Math.round(0.5 * (result.x + 1) * bounds.width);
+    result.y = Math.round(-0.5 * (result.y - 1) * bounds.height);
     result.z = 0;
 
     return result;
 };
 
-CLOUD.Extensions.MarkerEditor.prototype.clientToWorld = function(cPoint) {
+CLOUD.Extensions.MarkerEditor.prototype.clientToWorld = function (cPoint) {
 
     var bounds = this.getDomContainerBounds();
     var camera = this.cameraEditor.object;
     var result = new THREE.Vector3();
 
     result.x = cPoint.x / bounds.width * 2 - 1;
-    result.y = - cPoint.y / bounds.height * 2 + 1;
+    result.y = -cPoint.y / bounds.height * 2 + 1;
     result.z = 0;
 
     result.unproject(camera);
@@ -6304,19 +6306,19 @@ CLOUD.Extensions.MarkerEditor.prototype.clientToWorld = function(cPoint) {
     return result;
 };
 
-CLOUD.Extensions.MarkerEditor.prototype.clientToViewport = function(cPoint) {
+CLOUD.Extensions.MarkerEditor.prototype.clientToViewport = function (cPoint) {
 
     var bounds = this.getDomContainerBounds();
     var result = new THREE.Vector3();
 
     result.x = cPoint.x / bounds.width * 2 - 1;
-    result.y = - cPoint.y / bounds.height * 2 + 1;
+    result.y = -cPoint.y / bounds.height * 2 + 1;
     result.z = 0;
 
     return result;
 };
 
-CLOUD.Extensions.MarkerEditor.prototype.setMarkerState = function(state) {
+CLOUD.Extensions.MarkerEditor.prototype.setMarkerState = function (state) {
 
     if (state < 0 && state > 5) {
         state = 0;
@@ -6401,7 +6403,7 @@ CLOUD.Extensions.MarkerEditor.prototype.getDomElement = function () {
 
 // ---------------------------- 外部 API BEGIN ---------------------------- //
 
-CLOUD.Extensions.MarkerEditor.prototype.editBegin = function() {
+CLOUD.Extensions.MarkerEditor.prototype.editBegin = function () {
 
     if (this.isEditing) {
         return true;
@@ -6423,7 +6425,7 @@ CLOUD.Extensions.MarkerEditor.prototype.editBegin = function() {
     this.isEditing = true;
 };
 
-CLOUD.Extensions.MarkerEditor.prototype.editEnd = function() {
+CLOUD.Extensions.MarkerEditor.prototype.editEnd = function () {
 
     this.isEditing = false;
 
@@ -6439,7 +6441,7 @@ CLOUD.Extensions.MarkerEditor.prototype.editEnd = function() {
     //this.enableSVGPaint(false);
 };
 
-CLOUD.Extensions.MarkerEditor.prototype.getMarkersBoundingBox = function() {
+CLOUD.Extensions.MarkerEditor.prototype.getMarkersBoundingBox = function () {
 
     if (this.markers.length < 1) return null;
 
@@ -6454,20 +6456,21 @@ CLOUD.Extensions.MarkerEditor.prototype.getMarkersBoundingBox = function() {
 };
 
 // 获得列表
-CLOUD.Extensions.MarkerEditor.prototype.getMarkerInfoList = function() {
+CLOUD.Extensions.MarkerEditor.prototype.getMarkerInfoList = function () {
 
     var markerInfoList = [];
 
     for (var i = 0, len = this.markers.length; i < len; i++) {
 
         var marker = this.markers[i];
+        var tmpId = marker.userId + "_" + i;
         var info = {
-            id: marker.id,
+            id: marker.id || tmpId,
             userId: marker.userId,
             shapeType: marker.shapeType,
             position: marker.position,
             boundingBox: marker.boundingBox,
-            state : marker.state
+            state: marker.state
         };
 
         markerInfoList.push(info);
@@ -6492,7 +6495,8 @@ CLOUD.Extensions.MarkerEditor.prototype.loadMarkers = function (markerInfoList) 
 
         var info = markerInfoList[i];
 
-        var id = info.id;
+        var tmpId = info.userId + "_" + i;
+        var id = info.id || tmpId;
         var userId = info.userId;
         var shapeType = info.shapeType;
         var position = info.position;
@@ -6566,6 +6570,11 @@ CLOUD.Extensions.MarkerEditor.prototype.getMarker = function (id) {
     }
 
     return null;
+};
+
+CLOUD.Extensions.MarkerEditor.prototype.setMarkerClickCallback = function (callback) {
+
+    this.markerClickCallback =  callback;
 };
 
 // ---------------------------- 外部 API END ---------------------------- //
@@ -10614,6 +10623,8 @@ CLOUD.Extensions.DwgAnnotationEditor.prototype.onCameraChange = function () {
 CLOUD.Extensions.Helper2D = function (viewer) {
 
     this.viewer = viewer;
+
+    this.markerClickCallback = null;
 };
 
 CLOUD.Extensions.Helper2D.prototype = {
@@ -10715,7 +10726,7 @@ CLOUD.Extensions.Helper2D.prototype = {
             this.initAnnotation();
             this.annotationEditor.loadAnnotations(annotations);
         } else {
-            this.uninitAnnotationMode();
+            this.uninitAnnotation();
         }
     },
 
@@ -10764,7 +10775,7 @@ CLOUD.Extensions.Helper2D.prototype = {
 
     // ------------------ 标记 API -- S ------------------ //
     // 初始化Marker
-    initMarkerEditor: function (clickCallback) {
+    initMarkerEditor: function () {
 
         var viewer = this.viewer;
 
@@ -10781,13 +10792,16 @@ CLOUD.Extensions.Helper2D.prototype = {
                 },
                 endEditCallback: function (domElement) {
                     viewer.editorManager.registerDomEventListeners(domElement);
-                },
-                clickCallback: clickCallback
+                }
             };
 
             this.markerEditor.init(callbacks);
 
             callbacks = null;
+        }
+
+        if (this.markerClickCallback) {
+            this.markerEditor.setMarkerClickCallback(this.markerClickCallback);
         }
     },
 
@@ -10819,9 +10833,9 @@ CLOUD.Extensions.Helper2D.prototype = {
     },
 
     // 开始编辑Marker
-    editMarkerBegin: function (clickCallback) {
+    editMarkerBegin: function () {
 
-        this.initMarkerEditor(clickCallback);
+        this.initMarkerEditor();
         this.markerEditor.editBegin();
     },
 
@@ -10846,11 +10860,11 @@ CLOUD.Extensions.Helper2D.prototype = {
     },
 
     // 加载标记
-    loadMarkers: function (markerInfoList, clickCallback) {
+    loadMarkers: function (markerInfoList) {
 
         if (markerInfoList) {
 
-            this.initMarkerEditor(clickCallback);
+            this.initMarkerEditor();
             this.markerEditor.loadMarkers(markerInfoList);
 
         } else {
@@ -10897,6 +10911,11 @@ CLOUD.Extensions.Helper2D.prototype = {
             marker.highlight(true);
             this.markerEditor.selectMarker(marker);
         }
+    },
+
+    setMarkerClickCallback: function (callback) {
+
+       this.markerClickCallback = callback;
     }
 
     // ------------------ 标记 API -- E ------------------ //

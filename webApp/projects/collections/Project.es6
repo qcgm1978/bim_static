@@ -1,7 +1,25 @@
 App.Project = {
 
 	markerClick:function(marker){
-		alert();
+		var id=marker.id;
+		if($(".QualityProcessAcceptance").is(":visible")){
+			var tr=$(".QualityProcessAcceptance .tbProcessAccessBody tr");
+			tr.each(function(){
+				if($(this).data('id')==id){
+					tr.removeClass('selected');
+					$(this).addClass("selected");
+				}
+			})
+		}
+		if($(".QualityOpeningAcceptance").is(":visible")){
+			var tr=$(".QualityOpeningAcceptance .tbOpeningacceptanceBody tr");
+			tr.each(function(){
+				if($(this).data('id')==id){
+					tr.removeClass('selected');
+					$(this).addClass("selected");
+				}
+			})
+		}
 	},
 
 	filterRule:{
@@ -127,10 +145,11 @@ App.Project = {
 			if (_.isArray(data)) {
 				_.each(data, function(i) {
 					if (i.location.indexOf('boundingBox') != -1) {
-						result.push(_this.formatMark(i.location));
+						result.push(_this.formatMark(i.location,'',i.id));
 					}
 				})
-				viewer.viewer.initMarkerEditor(App.Project.markerClick);
+				//viewer.viewer.initMarkerEditor(App.Project.markerClick);
+				viewer.viewer.setMarkerClickCallback(App.Project.markerClick);
 				viewer.loadMarkers(result);
 			}
 		} else {
@@ -1332,7 +1351,7 @@ App.Project = {
 		return sb.toString();
 	},
 
-	formatMark: function(location, color) {
+	formatMark: function(location, color,id) {
 		var _temp = location,
 			_color = '510';
 		color = _color.charAt(color || 5) || 5;
@@ -1343,6 +1362,7 @@ App.Project = {
 		_temp.shapeType = _temp.shapeType || 0;
 		_temp.state = _temp.state || color;
 		_temp.userId = _temp.userId || _temp.componentId;
+		_temp.id=id||'';
 		return JSON.stringify(_temp);
 	},
 	//在模型中显示
@@ -1381,7 +1401,10 @@ App.Project = {
 				type:"sceneId"
 			});
 			if(_this.filterRule.floorPlus.indexOf(cat)!=-1){
-
+				App.Project.Settings.Viewer.filter({
+					ids:['10.20.20.03'],
+					type:"classCode"
+				});
 			}
 		}else if(_this.filterRule.floor.indexOf(cat)!=-1){
 			_this.linkSilder('floors',key);

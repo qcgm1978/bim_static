@@ -18948,11 +18948,7 @@ CloudViewer.prototype = {
 
     },
 
-    initMarkerEditor: function (clickCallback) {
-        this.extensionHelper.initMarkerEditor(clickCallback);
-    },
-
-    uninitMarkerEditor: function () {
+    closeMarkerMode: function () {
         this.extensionHelper.uninitMarkerEditor();
     },
 
@@ -18962,8 +18958,8 @@ CloudViewer.prototype = {
     },
 
     // 开始编辑
-    editMarkerBegin: function(clickCallback) {
-        this.extensionHelper.editMarkerBegin(clickCallback);
+    editMarkerBegin: function() {
+        this.extensionHelper.editMarkerBegin();
     },
 
     // 结束编辑
@@ -18977,8 +18973,8 @@ CloudViewer.prototype = {
     },
 
     // 加载标记
-    loadMarkers: function(markerInfoList, clickCallback) {
-        this.extensionHelper.loadMarkers(markerInfoList, clickCallback);
+    loadMarkers: function(markerInfoList) {
+        this.extensionHelper.loadMarkers(markerInfoList);
     },
 
     // 获得标记列表
@@ -18998,6 +18994,12 @@ CloudViewer.prototype = {
     selectMarkerById: function (id) {
 
         this.extensionHelper.selectMarkerById(id);
+    },
+
+    // 设置marker click callback
+    setMarkerClickCallback:function(callback) {
+
+        this.extensionHelper.setMarkerClickCallback(callback);
     },
 
     // ------------------ 标记 API -- E ------------------ //
