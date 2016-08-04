@@ -595,7 +595,7 @@
 
 							'delViewPoint': function() {
 
-								$.confirm("确认删除该视点么？", function() {
+								$.confirm("确认删除该快照么？", function() {
 									that.delViewPoint();
 								});
 								// //删除视点
@@ -688,7 +688,7 @@
 
 				//删除批注
 				deleteComment(event) {
-					$.confirm("确认删除该视点么？", function() {
+					$.confirm("确认删除该快照么？", function() {
 						Backbone.trigger('delViewPoint', $(event.target).closest(".reMarkBox").find(".viewPointInfo .remarkCount").data("id"));
 					});
 
