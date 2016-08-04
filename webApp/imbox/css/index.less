@@ -64,21 +64,27 @@
 		.name { width: 42px; }
 		.date { margin-left: 5px; vertical-align: middle; }
 		.remarkCount { float: right; margin-right: 5px; margin-top: 3px;
+
 		  .m-comment { font-family: "modelicon"; }
 		  &:hover { .text { text-decoration: underline; color: #fff; }
 			cursor: pointer; }
 		}
 		&:hover { background-color: rgba(51, 51, 51, .8); }
 		&.selected { background-color: rgba(0, 110, 207, .8); }
-		.iconType { font-family: "modelicon"; float: left; margin-left: 10px; margin-top: 9px; color: #fff; }
+		.iconType { font-family: "modelicon"; float: left; margin-left: 10px; margin-top: 9px; color: #fff;  }
 	  }
 	}
   }
   .projectListBox, .userListBox { height: 100%; }
-  .commentRemark { position: absolute; top: 6px; left: 0px; right: 0px; bottom: 0px; overflow: hidden;
+  .commentRemark { position: absolute; top: 0px; left: 0px; right: 0px; bottom: 0px; overflow: hidden;
 	i { font-family: "modelicon"; }
-	.iconType { color: #fff; float: left; margin-left: 5px; margin-right: -5px; margin-top: 9px; }
-	.header { height: 49px; border-bottom: 1px #aaa solid; line-height: 48px; padding: 0px 12px; }
+	.iconType { color: #fff; float: left; margin-left: 5px; margin-right: -5px; margin-top: 9px;display: none; }
+	.header { height: 54px; border-bottom: 1px #D2D2D2 solid; line-height: 54px; padding: 0px 12px;
+		.title{
+		  line-height: 54px;
+		  color: #353535;
+		}
+	}
 	.talkReMark { position: absolute; bottom: 0px; background-color: #fff;
 	  width: 100%;
 	  &.hidden { display: none; }
@@ -89,34 +95,45 @@
 	  }
 	}
 	.reMarkListBox { width: 100%; position: absolute; top: 49px; bottom: 100px; left: 0px; right: 0px; }
-	.viewPointInfo { color: #ccc; padding-bottom: 10px;
+	.viewPointInfo { color: #ccc; padding: 16px 0 20px 0;
 	  .thumbnailImg { float: left; width: 82px; height: 62px; margin: 10px 0px 0px 10px; }
 	  .info { margin-left: 120px; padding-top: 9px; }
 	  .title { width: 98%; height: 42px; font-size: 14px; color: #333; }
 	  .name { width: 42px; }
 	  .date { margin-left: 5px; vertical-align: middle; }
-	  &:hover { background-color: #fff; }
+	  &:hover { background-color: transparent; }
 	  &.selected { background-color: rgba(0, 110, 207, .8); }
-	  .remarkCount { display: none; }
+	  .remarkCount { display: block;float: right;
+		border: 1px solid;
+		width: 100px;
+		background: #117EE1;
+		height: 30px;
+		text-align: center;
+		line-height: 30px;
+		margin-right: 14px;
+		cursor: pointer;
+
+	  }
 	}
-	.remarkBox { margin-top: 4px; margin: 10px 12px; border: 1px #aaa solid; border-width: 1px 0px; font-size: 14px; padding: 8px 0px; margin-top: 0px; }
+	.remarkBox { margin-top: 4px; margin: 10px 12px; border: 1px #D2D2D2 solid; border-width: 1px 0px; font-size: 14px; padding: 8px 0px; margin-top: 0px; }
 	.iconComment { font-family: "modelicon"; margin-right: 5px; color: #b9b9b9; font-size: 16px; }
 	.goList { color: #b9b9b9; cursor: pointer; }
 	.iconBack { font-size: 18px; width: 21px; margin: 0px; font-family: "modelicon"; vertical-align: -4px; display: inline-block; }
-	.operators { float: right; cursor: pointer; color: #aaa; font-size: 16px;
+	.operators { float: right; cursor: pointer; color: #cdcdcd; font-size: 16px;
 	  display: block;
 
 	}
-	.inputBox { width: 576px; margin-left: 12px; color: #333; border-radius: 3px; background-color: #fff;border:1px solid #aaa; }
-	.txtReMark { width: 100%; border: 0; height: 42px; outline: none; resize: none; padding: 5px;
+	.inputBox { width: 576px; margin-left: 12px; color: #333; border-radius: 3px; background-color: #fff;border:1px solid #D2D2D2; }
+	.txtReMark { width: 100%; border: 0; height: 30px; outline: none; resize: none; padding: 5px;
 	  &.input { height: 85px; }
 	}
 	.uploadImg { display: none; }
-	.btnEnter { float: right; margin: 10px 12px 10px 0px; width: 100px; height: 28px; background-color: transparent; outline: 0; border: 1px #aaa solid; }
-	.btnIcon { margin-top: 10px; font-size: 16px; cursor: pointer; width: 24px; height: 24px; display: inline-block; text-align: center; background-color: #aaa; margin-right: 7px;
+	.btnEnter { float: right; margin: 10px 12px 10px 0px; width: 80px; height: 28px; background-color: transparent; outline: 0; border: 1px #D2D2D2 solid;
+	  color: #3F3F3F; }
+	.btnIcon { margin-top: 10px; font-size: 16px; cursor: pointer; width: 30px; height: 30px; display: inline-block; text-align: center; background-color: #ddd; margin-right: 7px;
 	  &.m-img { margin-left: 12px; }
 	}
-	.reMarkList { .item { border-bottom: 1px #aaa solid; margin: 0px 12px 8px 12px; padding-bottom: 10px;
+	.reMarkList { .item { border-bottom: 1px #D2D2D2 solid; margin: 0px 12px 8px 12px; padding-bottom: 10px;
 	  &:hover { .delTalkBox { .delTalk { display: inline; }
 	  }
 	  }

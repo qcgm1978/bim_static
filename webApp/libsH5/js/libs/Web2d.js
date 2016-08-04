@@ -3588,7 +3588,7 @@ CLOUD.Extensions.Utils.Shape2D = {
 
         return shape;
     },
-    makeBubble: function (style) {
+    makeBubble: function () {
 
         var path = "m0.0035,-19.88544c-3.838253,0 -6.95,2.581968 -6.95,5.766754c0,3.185555 6.95,13.933247 6.95,13.933247s6.95,-10.747692 6.95,-13.933247c0,-3.184786 -3.11082,-5.766754 -6.95,-5.766754z";
         var shape = this.createSvgElement('path');
@@ -3606,6 +3606,7 @@ CLOUD.AxisGrid = function (viewer) {
     this.isDashedLine = false;
     this.axisGroup = new THREE.Group();
     this.scene = null;
+    this.levelCount = 0;
 };
 
 CLOUD.AxisGrid.prototype = {
@@ -3724,11 +3725,11 @@ CLOUD.AxisGrid.prototype = {
         axisGroup.add(grids);
     },
 
-    setScene: function(scene) {
+    setScene: function (scene) {
         this.scene = scene;
     },
 
-    getDefaultScene : function() {
+    getSceneRootNode: function () {
         var scene = this.viewer.getScene();
         var rootNode = scene.rootNode;
         rootNode.updateMatrixWorld(true);
@@ -3758,7 +3759,7 @@ CLOUD.AxisGrid.prototype = {
         //rootNode.matrixAutoUpdate = false;
 
         if (!this.scene) {
-            var rootNode = this.getDefaultScene();
+            var rootNode = this.getSceneRootNode();
             rootNode.add(this.axisGroup);
         } else {
             this.scene.add(this.axisGroup);
@@ -3768,7 +3769,7 @@ CLOUD.AxisGrid.prototype = {
     removeFromScene: function () {
 
         if (!this.scene) {
-            var rootNode = this.getDefaultScene();
+            var rootNode = this.getSceneRootNode();
             rootNode.remove(this.axisGroup);
         } else {
             this.scene.remove(this.axisGroup);
@@ -3806,7 +3807,10 @@ CLOUD.AxisGrid.prototype = {
         this.setDataFromJsonObject(jsonObj, level);
     },
     setDataFromJsonObject: function (jsonObj, level) {
-        if (level) {
+
+        this.levelCount = jsonObj.Levels.length;
+
+        if (level || (level === 0)) {
             this.setDataByLevel(jsonObj.Grids, jsonObj.Levels, level);
         } else {
             this.setData(jsonObj.Grids, jsonObj.Levels);
@@ -3821,7 +3825,7 @@ CLOUD.AxisGrid.prototype = {
 
         this.setDataByElev(grids, levels[level].elevation);
     },
-    setDataByElev:function(grids, elev) {
+    setDataByElev: function (grids, elev) {
         this.clearData();
         this.initGrid(grids, elev);
         this.addToScene();
@@ -3833,6 +3837,9 @@ CLOUD.AxisGrid.prototype = {
             this.initGrid(grids, levels[i].elevation);
             this.addToScene();
         }
+    },
+    getLevelCount: function () {
+        return this.levelCount;
     }
 };
 CLOUD.MiniMap = function (viewer) {
@@ -4659,7 +4666,7 @@ CLOUD.MiniMap = function (viewer) {
                 "content: '\\25BC';" +
                 "position: absolute;" +
                 "text-align: center;" +
-                "margin: -2px 0 0 0;" +
+                "margin: -4px 0 0 0;" +
                 "top: 100%;" +
                 "left: 0;" +
                 "}";
@@ -5595,23 +5602,18 @@ CLOUD.MiniMap.setFloorPlaneData = function(jsonObj){
     CLOUD.MiniMap.floorPlaneData = jsonObj;
 };
 
-
 CLOUD.Extensions.Marker = function (id, editor) {
 
     this.id = id;
     this.editor = editor;
-
     this.position = new THREE.Vector3();
     this.boundingBox = new THREE.Box3();
-
     this.shape = null;
-    this.shapeOffset = {offsetX : 0, offsetY: 0}; // 屏幕坐标顶点在左上角
-
     this.style = CLOUD.Extensions.Marker.getDefaultStyle();
 
     this.selected = false;
     this.highlighted = false;
-    this.highlightColor = '#faff3c';
+    this.highlightColor = '#000088';
     this.isDisableInteractions = false;
 
     this.onMouseDownBinded = this.onMouseDown.bind(this);
@@ -5630,22 +5632,25 @@ CLOUD.Extensions.Marker.prototype = {
 
     onMouseDown: function (event) {
 
+        event.preventDefault();
+        event.stopPropagation();
+
         this.select();
     },
 
     onMouseOut: function () {
-        this.highlight(false);
+        //this.highlight(false);
     },
 
     onMouseOver: function () {
-        this.highlight(true);
+        //this.highlight(true);
     },
 
-    destroy:function() {
+    destroy: function () {
         this.setParent(null);
     },
 
-    set: function(userId, position, boundingBox, state, style){
+    set: function (userId, position, boundingBox, state, style) {
 
         this.userId = userId;
         this.position.set(position.x, position.y, position.z);
@@ -5682,19 +5687,28 @@ CLOUD.Extensions.Marker.prototype = {
 
     select: function () {
 
-        if (this.selected) {
-            return;
-        }
+        //if (this.selected) {
+        //    return;
+        //}
+        //
+        //this.selected = true;
+        //this.highlighted = false;
+        //this.update();
+        //this.editor.selectMarker(this);
 
-        this.selected = true;
-        this.highlighted = false;
-        this.update();
+
+        if (!this.selected) {
+
+            this.selected = true;
+            this.highlight(true);
+        }
 
         this.editor.selectMarker(this);
     },
 
     deselect: function () {
 
+        this.highlight(false);
         this.selected = false;
     },
 
@@ -5723,27 +5737,29 @@ CLOUD.Extensions.Marker.prototype = {
         return this.editor.worldToClient(this.position);
     },
 
-    getBoundingBox: function(){
+    getBoundingBox: function () {
         return this.boundingBox;
     },
 
+    toNewObject: function () {
+
+        return {
+            id: this.id,
+            userId: this.userId,
+            shapeType: this.shapeType,
+            position: this.position ? this.position.clone() : null,
+            boundingBox: this.boundingBox ? this.boundingBox.clone() : null,
+            state: this.state
+        };
+    },
+
     update: function () {
-
-        var position = this.getClientPosition();
-        var offsetX = position.x + this.shapeOffset.offsetX;
-        var offsetY = position.y + this.shapeOffset.offsetY;
-
-        this.transformShape = [
-            'translate(', offsetX, ',', offsetY, ') '
-        ].join('');
-
-        this.shape.setAttribute("transform", this.transformShape);
     }
 };
 
 CLOUD.Extensions.Marker.shapeTypes = {BUBBLE: 0, FLAG: 1};
 
-CLOUD.Extensions.Marker.getDefaultStyle = function() {
+CLOUD.Extensions.Marker.getDefaultStyle = function () {
     var style = {};
 
     style['stroke-width'] = 2;
@@ -5790,7 +5806,7 @@ CLOUD.Extensions.MarkerFlag.prototype.createShape = function () {
 CLOUD.Extensions.MarkerFlag.prototype.update = function () {
 
     var strokeWidth = this.style['stroke-width'];
-    var strokeColor = this.style['stroke-color'];
+    var strokeColor = this.highlighted ? this.highlightColor : this.style['stroke-color'];
     var strokeOpacity = this.style['stroke-opacity'];
     var fillColor = this.style['fill-color'];
     var fillOpacity = this.style['fill-opacity'];
@@ -5843,13 +5859,13 @@ CLOUD.Extensions.MarkerBubble.prototype.removeDomEventListeners = function () {
 
 CLOUD.Extensions.MarkerBubble.prototype.createShape = function () {
 
-    this.shape = CLOUD.Extensions.Utils.Shape2D.makeBubble(this.style, this.shapeOffset);
+    this.shape = CLOUD.Extensions.Utils.Shape2D.makeBubble();
 };
 
 CLOUD.Extensions.MarkerBubble.prototype.update = function () {
 
     var strokeWidth = this.style['stroke-width'];
-    var strokeColor = this.style['stroke-color'];
+    var strokeColor = this.highlighted ? this.highlightColor : this.style['stroke-color'];
     var strokeOpacity = this.style['stroke-opacity'];
     var fillColor = this.style['fill-color'];
     var fillOpacity = this.style['fill-opacity'];
@@ -5924,13 +5940,12 @@ CLOUD.Extensions.MarkerEditor = function (viewer) {
     this.markerColor = this.flagColors.red;
     this.markerState = 0;
     this.isEditing = false;
+    this.nextMarkerId = 0;
+    this.initialized = false;
 
     this.beginEditCallback = null;
     this.endEditCallback = null;
-
-    this.nextMarkerId = 0;
-
-    this.initialized = false;
+    this.clickMarkerCallback = null;
 
     this.onMouseDownBinded = this.onMouseDown.bind(this);
     this.onMouseUpBinded = this.onMouseUp.bind(this);
@@ -6070,6 +6085,7 @@ CLOUD.Extensions.MarkerEditor.prototype.init = function(callbacks) {
 
         this.beginEditCallback = callbacks.beginEditCallback;
         this.endEditCallback = callbacks.endEditCallback;
+        this.clickMarkerCallback = callbacks.clickCallback;
     }
 
     if (!this.svg) {
@@ -6089,7 +6105,7 @@ CLOUD.Extensions.MarkerEditor.prototype.init = function(callbacks) {
         this.svg.setAttribute('height', svgHeight + '');
 
         this.domElement.appendChild(this.svg);
-        this.enableSVGPaint(false);
+        //this.enableSVGPaint(false);
 
         this.svgGroup = CLOUD.Extensions.Utils.Shape2D.createSvgElement('g');
         this.svg.insertBefore(this.svgGroup, this.svg.firstChild);
@@ -6200,9 +6216,24 @@ CLOUD.Extensions.MarkerEditor.prototype.selectMarker = function (marker) {
     if (this.selectedMarker !== marker) {
 
         this.deselectMarker();
+
+        this.selectedMarker = marker;
+    } else {
+
+        this.deselectMarker();
     }
 
-    this.selectedMarker = marker;
+    //this.selectedMarker = marker;
+
+    if (this.clickMarkerCallback) {
+
+        if (this.selectedMarker) {
+            this.clickMarkerCallback(this.selectedMarker.toNewObject());
+        } else {
+
+            this.clickMarkerCallback(null);
+        }
+    }
 
 };
 
@@ -6385,7 +6416,7 @@ CLOUD.Extensions.MarkerEditor.prototype.editBegin = function() {
     // 注册事件
     this.addDomEventListeners();
     // 允许绘图
-    this.enableSVGPaint(true);
+    //this.enableSVGPaint(true);
 
     this.clear();
 
@@ -6405,7 +6436,7 @@ CLOUD.Extensions.MarkerEditor.prototype.editEnd = function() {
     this.handleCallbacks("endEdit");
 
     // 不允许绘图
-    this.enableSVGPaint(false);
+    //this.enableSVGPaint(false);
 };
 
 CLOUD.Extensions.MarkerEditor.prototype.getMarkersBoundingBox = function() {
@@ -6521,6 +6552,20 @@ CLOUD.Extensions.MarkerEditor.prototype.hideMarkers = function () {
     if (this.svgGroup) {
         this.svgGroup.setAttribute("visibility", "hidden");
     }
+};
+
+CLOUD.Extensions.MarkerEditor.prototype.getMarker = function (id) {
+
+    var markers = this.markers;
+    var count = markers.length;
+
+    for (var i = 0; i < count; ++i) {
+        if (markers[i].id == id) {
+            return markers[i];
+        }
+    }
+
+    return null;
 };
 
 // ---------------------------- 外部 API END ---------------------------- //
@@ -10566,7 +10611,6 @@ CLOUD.Extensions.DwgAnnotationEditor.prototype.onCameraChange = function () {
     this.handleCallbacks("changeEditor");
 
 };
-
 CLOUD.Extensions.Helper2D = function (viewer) {
 
     this.viewer = viewer;
@@ -10710,7 +10754,7 @@ CLOUD.Extensions.Helper2D.prototype = {
     // 截屏 base64格式png图片
     captureAnnotationsScreenSnapshot: function () {
 
-        var dataUrl = this.viewer.renderer.domElement.toDataURL("image/png");
+        var dataUrl = this.viewer.getRenderBufferScreenShot();
         dataUrl = this.annotationEditor.getScreenSnapshot(dataUrl);
 
         return dataUrl;
@@ -10720,7 +10764,7 @@ CLOUD.Extensions.Helper2D.prototype = {
 
     // ------------------ 标记 API -- S ------------------ //
     // 初始化Marker
-    initMarkerEditor: function () {
+    initMarkerEditor: function (clickCallback) {
 
         var viewer = this.viewer;
 
@@ -10737,7 +10781,8 @@ CLOUD.Extensions.Helper2D.prototype = {
                 },
                 endEditCallback: function (domElement) {
                     viewer.editorManager.registerDomEventListeners(domElement);
-                }
+                },
+                clickCallback: clickCallback
             };
 
             this.markerEditor.init(callbacks);
@@ -10774,10 +10819,9 @@ CLOUD.Extensions.Helper2D.prototype = {
     },
 
     // 开始编辑Marker
-    editMarkerBegin: function () {
+    editMarkerBegin: function (clickCallback) {
 
-        this.initMarkerEditor();
-        this.initMarkerEditor();
+        this.initMarkerEditor(clickCallback);
         this.markerEditor.editBegin();
     },
 
@@ -10802,11 +10846,11 @@ CLOUD.Extensions.Helper2D.prototype = {
     },
 
     // 加载标记
-    loadMarkers: function (markerInfoList) {
+    loadMarkers: function (markerInfoList, clickCallback) {
 
         if (markerInfoList) {
 
-            this.initMarkerEditor();
+            this.initMarkerEditor(clickCallback);
             this.markerEditor.loadMarkers(markerInfoList);
 
         } else {
@@ -10843,6 +10887,15 @@ CLOUD.Extensions.Helper2D.prototype = {
 
             return this.markerEditor.updateMarkers();
 
+        }
+    },
+
+    selectMarkerById: function (id) {
+
+        if (this.markerEditor) {
+            var marker = this.markerEditor.getMarker(id);
+            marker.highlight(true);
+            this.markerEditor.selectMarker(marker);
         }
     }
 

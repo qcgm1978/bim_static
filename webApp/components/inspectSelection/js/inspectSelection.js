@@ -34,6 +34,11 @@
 	strVar2 += "    <div class=\"searchOptons\">";
 	strVar2 += "        <div class=\"optonLine zIndex13\">";
 	strVar2 += "            <div class=\"optonLine\">";
+	strVar2 += "<div class=\"searchName\">";
+	strVar2 += "                <span>楼层：<\/span>";
+	strVar2 += "                <input type=\"text\" class=\"txtSearchName txtLocationName filterInputExtra\" placeholder=\"请输入关键字\"/>";
+	strVar2 += "            <\/div>";
+	strVar2 += "            <br>";
 	strVar2 += "                <div class=\"myDropDown categoryOption optionComm\">";
 	strVar2 += "                    <span class=\"myDropText\">";
 	strVar2 += "                        <% if(ruleType){ %>";
@@ -371,6 +376,34 @@
 		currentPageListData: null,
 		currentInspectId:null,
 		templateCache: [],
+		filterRule:{
+			sceneId:'工程桩,基坑支护,地下防水,钢结构悬挑构件,幕墙,采光顶'
+		},
+		//计划状态
+		planStatus:{
+			0:'',
+			1:'myIcon-circle-red',
+			2:'myIcon-circle-yellow',
+			3:'myIcon-circle-green'
+		},
+		linkSilder:function(type,key){
+			if(!key){
+				return
+			}
+			var $check=$('.modelSidebar #'+type+' ul input'),
+				$treeText=$('.modelSidebar #'+type+' ul .treeText');
+			$check.each(function(){
+				if($(this).is(':checked') && $(this).closest('.itemContent').find('.treeText').text()!=key){
+					$(this).trigger('click');
+				}
+			})
+			$treeText.each(function(){
+				var _=$(this).parent().find('input');
+				if($(this).text()==key && !_.is(':checked')){
+					_.trigger('click');
+				}
+			})
+		},
 		//分页信息
 		pageInfo:function(data) {
 			var $el = $('.modelSelectDialog');
@@ -397,6 +430,29 @@
 				_temp=null,
 				location=null;
 
+
+			/*//过滤所属楼层 start
+			var _Viewer=Project.Viewer;
+			var _floors=_Viewer.FloorsData;
+			_.find(_floors,function(item){
+				key=item.floor;
+				return _.contains(item.fileEtags,_secenId);
+			})
+			var  _files=_Viewer.FloorFilesData;
+			if(_this.filterRule.sceneId.indexOf(cat)!=-1){
+				var _hideFileIds=_.filter(_files,function(i){
+					return i!=_secenId;
+				})
+				_Viewer.fileFilter({
+					ids:[_hideFileIds],
+					total:[_secenId],
+					type:"sceneId"
+				});
+			}else{
+				_this.linkSilder('floors',key);
+				_Viewer.bottom();
+			}*/
+			//过滤所属楼层 end
 			_.each(Project.currentPageListData, function(i) {
 				if(i.id==id){
 					_temp=i.location;
@@ -616,6 +672,9 @@
 		bindEvent: function() {
 
 			var that = this;
+			this.$('.txtLocationName').change(function(){
+				that.changeOA('locationName', $(this).val())
+			})
 			//隐患
 			this.$(".riskOption").myDropDown({
 				zIndex: 11,

@@ -23,6 +23,7 @@ App.Flow.NavView=Backbone.View.extend({
 			$target.removeClass('arrowNoSelected');
 			$target.addClass('arrowSelected');
 			var id=$target.data('id');
+			this.$("#flowMoreBtn a").attr('href',$target.data('link'))
 			this.loadContent(id);
 		}
 	},

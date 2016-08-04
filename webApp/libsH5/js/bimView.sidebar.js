@@ -69,7 +69,8 @@
           etag:self._opt.etag,
           sourceId:self._opt.sourceId
         },function(data){
-          var data = data.data;
+          var data = data.data,
+              _temp=[];
           var floors = bimView.comm.viewTree({
             arr:data,
             type:'sceneId',
@@ -77,7 +78,11 @@
             data:'fileEtags',
             id:'floors',
           });
+          $.each(data,function(i,item){
+            _temp=_temp.concat(item.fileEtags);
+          })
           bimView.prototype.FloorsData=data;
+          bimView.prototype.FloorFilesData=_temp;
           $('#floors').append(floors);
         });
         bimView.comm.ajax({
@@ -86,12 +91,15 @@
           etag:self._opt.etag,
           sourceId:self._opt.sourceId
         },function(data){
-          var data = data.data;
+          var data = data.data,
+              _temp=[];
           $.each(data,function(i,item){
             $.each(item.files,function(j,file){
-              self.fileData[file.fileEtag] = item.specialty
+              self.fileData[file.fileEtag] = item.specialty;
+              _temp.push(file.fileEtag)
             })
           })
+          bimView.prototype.SpecialtyFilesData=_temp;
           var specialties = bimView.comm.viewTree({
             arr:data,
             type:'sceneId',
