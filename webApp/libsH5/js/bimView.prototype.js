@@ -631,7 +631,7 @@
             filter.setUserOverrider(obj.type, undefined); 
         } else {
           $.each(obj.ids, function(i, id) {
-            filter.setUserOverrider(obj.type, id);
+            filter.setUserOverrider(obj.type, id, "lightBlue");
           });
         }
 
