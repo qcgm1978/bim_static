@@ -520,10 +520,11 @@ App.Project = {
 	//保存批注
 	dwgViewer.prototype.saveCommentDwg = function() {
 		var that = this;
-		this.dwgView.getCommentData(function(data) {
+		this.dwgView.getCommentData(function(data) { 
+			 
 			data.image = data.image.replace('data:image/png;base64,', '');
 			that.data = data;
-			SingleComment.saveCommentDialog();
+			SingleComment.saveCommentDialog(); 
 		});
 	}
 

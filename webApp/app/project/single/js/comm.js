@@ -323,7 +323,9 @@
             if (e.keyCode == 27 && DialogManager.present) {
                 var dialog = DialogManager.present,
                     element = dialog.element
-
+                if ($.isFunction(dialog.options.closeCallback)) {
+                    dialog.options.closeCallback();
+                }
                 dialog.hide()
             }
         },
