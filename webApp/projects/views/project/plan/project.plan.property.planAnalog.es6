@@ -118,7 +118,7 @@ App.Project.PlanAnalog = Backbone.View.extend({
 				ids: this.PlayArr
 			});
 
-			$('.m-fit').click();
+			App.Project.Settings.Viewer.zoomToBuilding(0.05,1);
 			//开始模拟
 			this.starAnalog();
 
@@ -147,6 +147,12 @@ App.Project.PlanAnalog = Backbone.View.extend({
 					App.Project.Settings.Viewer.filter({
 						type: "plan",
 						ids: this.PlayArr
+					});
+					App.Project.Settings.Viewer.translucent(false);
+
+					App.Project.Settings.Viewer.highlight({
+						type: "plan",
+						ids: undefined
 					});
 					App.Project.Settings.Viewer.translucent(true);
 

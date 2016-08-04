@@ -390,6 +390,13 @@
       viewer.zoomToBBox(CLOUD.Utils.computeBBox(box), 0.05, 1.2);
       viewer.render();
     },
+    zoomToBuilding: function(margin,ratio) {
+      // 缩放到指定位置
+      var self = this;
+      var viewer = self.viewer;
+      viewer.zoomToBuilding( margin, ratio);
+      viewer.render();
+    },
     zoomToSelection: function(box) {
       // 缩放到当前选中构件
       var self = this;
