@@ -9,7 +9,7 @@ App.Comm = {
 	resetCookie(param) {
 		alert(param)
 		debugger
-	},  
+	},
 
 	//批注类型  0: 模型；1：rvt单文件；2：dwg图纸文件
 	hostType: {
@@ -36,13 +36,13 @@ App.Comm = {
 		"6": "审核退回",
 		"7": "待移交",
 		"8": "移交退回",
-		"9": "已移交", 
+		"9": "已移交",
 		"10": "待审核",
 		"11": "审核通过",
 		"12": "审核退回",
 		"13": "待移交",
 		"14": "移交退回"
-	},  
+	},
 
 	//族库和标准模型状态
 	modelStatus: {
@@ -143,7 +143,6 @@ App.Comm = {
 
 		data = App.Comm.getUrlByType(data);
 
-
 		if (data.headers) {
 			data.headers.ReturnUrl = location.href;
 		} else {
@@ -204,7 +203,7 @@ App.Comm = {
 		var temp = data.data;
 
 		if ((typeof temp) == 'string') {
-			temp = JSON.parse(temp);
+			temp = JSON.parse(temp); 
 		}
 		if (urlPars) {
 			for (var i = 0; i < urlPars.length; i++) {
@@ -399,7 +398,10 @@ App.Comm = {
 	checkDownLoad: function(projectId, projectVersionId, fileVersionId) {
 
 		if (!App.Comm.getCookie("OUTSSO_AuthToken")) {
-			$.tip({message:"登录后下载",type:"alarm"});
+			$.tip({
+				message: "登录后下载",
+				type: "alarm"
+			});
 			return;
 		}
 
