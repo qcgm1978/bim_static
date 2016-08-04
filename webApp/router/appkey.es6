@@ -351,7 +351,7 @@ var AppKeyRoute = Backbone.Router.extend({
 		//} else {
 		//	fn(true);
 		//}
-		//this.cleanCookie();
+		this.cleanCookie();
 	},
 
 	//获取用户信息
