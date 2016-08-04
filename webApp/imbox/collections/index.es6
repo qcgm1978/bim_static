@@ -117,13 +117,15 @@ App.INBox.comment = {
 			}
 		});
 		$('.wrapper .title').text($(_this).text());
-		var $el = $(event.target).closest(".remarkCount"),
-		    id = $el.data("id"),
-		    $item = $el.closest(".item"),
-		    creatorId = $item.find(".name").data("creatorid");
+		//获取头部信息
+		$.ajax({
+			url: "/sixD/"+projectId+'/viewPoint/'+viewPointId
+		}).done(function(data){
+			console.log(data)
+			var html = _.templateUrl('/libsH5/tpls/comment/bimview.pro.comment.list.detail.html')(data.data);
+			$('.viewPointInfo').html(html);
 
-		//批注信息 赋值
-		$(".commentRemark .viewPointInfo").html($item.html());
+		})
 
 	},
   CommentView : {
