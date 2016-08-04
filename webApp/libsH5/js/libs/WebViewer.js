@@ -3,7 +3,7 @@
 */
 
 var CLOUD = CLOUD || {};
-CLOUD.Version = "20160730";
+CLOUD.Version = "20160804";
 
 CLOUD.GlobalData = {
     SceneSize: 1000,
@@ -12698,7 +12698,7 @@ CLOUD.Filter = function () {
 
         if (isSelected(id)) {
             return overridedMaterials.selection;
-        }           
+        }
 
         for (var item in materialOverriderByUserId) {
             var overrider = materialOverriderByUserId[item];
@@ -12715,7 +12715,7 @@ CLOUD.Filter = function () {
             if (material !== undefined)
                 return material;
         }
-   
+
         if (_sceneOverriderState) {
             return overridedMaterials.scene;
         }
@@ -18354,19 +18354,9 @@ CloudViewer.prototype = {
         var viewportWidth = domElement.offsetWidth;
         var viewportHeight = domElement.offsetHeight;
 
-        var settings = { alpha: true, preserveDrawingBuffer: true, antialias:true };
-        //if (!CLOUD.GlobalData.disableAntialias)
-        //    settings.antialias = true;
-        try {
-            var canvas = document.createElement('canvas');
-            var webglContext = canvas.getContext('webgl', settings) || canvas.getContext('experimental-webgl', settings);
-            if (!webglContext)
-                settings.antialias = false;
-        }
-        catch (e) {
-            return false;
-        }
-
+        var settings = { alpha: true, preserveDrawingBuffer: true };
+        if (!CLOUD.GlobalData.disableAntialias)
+            settings.antialias = true;
         // Renderer
         this.renderer = new THREE.WebGLIncrementRenderer(settings);
         var renderer = this.renderer;
@@ -18412,7 +18402,6 @@ CloudViewer.prototype = {
             scope.render(true);
         }
         //this.editorManager.registerDomEventListeners(canvas);
-        return true;
     },
 
     registerDomEventListeners : function() {
@@ -18605,6 +18594,48 @@ CloudViewer.prototype = {
         this.getScene().clearAll();
     },
 
+    // 获得render buffer的数据
+    getRenderBufferScreenShot: function () {
+
+        // 在高分屏上toDataURL直接获得图片数据比实际的图片大
+        var dataUrl = this.renderer.domElement.toDataURL("image/png");
+        var canvasWidth = this.renderer.domElement.width;
+        var canvasHeight = this.renderer.domElement.height;
+        var pixelRatio = window.devicePixelRatio || 1;
+        var w = canvasWidth / pixelRatio;
+        var h = canvasHeight / pixelRatio;
+
+        if (!w || !h)
+            return dataUrl;
+
+        var nw, nh, nx = 0, ny = 0;
+
+        if (w > h || (canvasWidth / canvasHeight < w / h)) {
+            nw = w;
+            nh = canvasHeight / canvasWidth * w;
+            ny = h / 2 - nh / 2;
+        }
+        else {
+            nh = h;
+            nw = canvasWidth / canvasHeight * h;
+            nx = w / 2 - nw / 2;
+        }
+
+        var img = new Image();
+        img.src = dataUrl;
+
+        var tmpCanvas = document.createElement("canvas");
+        var ctx = tmpCanvas.getContext("2d");
+        tmpCanvas.width = w;
+        tmpCanvas.height = h;
+
+        ctx.drawImage(img, nx, ny, nw, nh);
+
+        var newURL = tmpCanvas.toDataURL("image/png");
+
+        return newURL;
+    },
+
     canvas2image: function () {
 
         var dataUrl = null;
@@ -18613,14 +18644,15 @@ CloudViewer.prototype = {
 
             // 在批注模式，底图已经锁定，不用调用render
             dataUrl = this.extensionHelper.captureAnnotationsScreenSnapshot();
+            //this.render();
 
         } else {
 
+            dataUrl = this.getRenderBufferScreenShot();
             // 在chrome中多调用几次，会出现图片显示不正常（显示空白，原因是转换的值变得不正常了），
-            // 所有在每次调用前先render一次
+            // 每次获得截图后，缓存数据貌似被清除了
+            // 所以在每次调用后render一次
             this.render();
-
-            dataUrl = this.renderer.domElement.toDataURL("image/png");
         }
 
         return dataUrl;
@@ -18916,14 +18948,22 @@ CloudViewer.prototype = {
 
     },
 
+    initMarkerEditor: function (clickCallback) {
+        this.extensionHelper.initMarkerEditor(clickCallback);
+    },
+
+    uninitMarkerEditor: function () {
+        this.extensionHelper.uninitMarkerEditor();
+    },
+
     // zoom到合适的大小
     zoomToSelectedMarkers: function(){
         this.extensionHelper.zoomToSelectedMarkers();
     },
 
     // 开始编辑
-    editMarkerBegin: function() {
-        this.extensionHelper.editMarkerBegin();
+    editMarkerBegin: function(clickCallback) {
+        this.extensionHelper.editMarkerBegin(clickCallback);
     },
 
     // 结束编辑
@@ -18937,8 +18977,8 @@ CloudViewer.prototype = {
     },
 
     // 加载标记
-    loadMarkers: function(markerInfoList) {
-        this.extensionHelper.loadMarkers(markerInfoList);
+    loadMarkers: function(markerInfoList, clickCallback) {
+        this.extensionHelper.loadMarkers(markerInfoList, clickCallback);
     },
 
     // 获得标记列表
@@ -18954,6 +18994,12 @@ CloudViewer.prototype = {
         this.extensionHelper.renderMarkers();
     },
 
+    // 通过id选中某个标记
+    selectMarkerById: function (id) {
+
+        this.extensionHelper.selectMarkerById(id);
+    },
+
     // ------------------ 标记 API -- E ------------------ //
 
     // ------------------ 批注 API -- S ------------------ //
@@ -18961,6 +19007,11 @@ CloudViewer.prototype = {
     // 进入批注模式，已废弃
     setCommentMode: function () {
 
+    },
+
+    exitCommentMode: function () {
+
+        this.extensionHelper.uninitAnnotation();
     },
 
     // 设置背景

@@ -1,5 +1,14 @@
 App.Project = {
 
+	markerClick:function(marker){
+		alert();
+	},
+
+	filterRule:{
+		file:'工程桩,基坑支护,地下防水,钢结构悬挑构件,幕墙,采光顶',
+		floorPlus:'梁柱节点',
+		floor:'步行街吊顶风口,卫生间防水'
+	},
 	//默认参数
 	Defaults: {
 		type: "user",
@@ -121,6 +130,7 @@ App.Project = {
 						result.push(_this.formatMark(i.location));
 					}
 				})
+				viewer.viewer.initMarkerEditor(App.Project.markerClick);
 				viewer.loadMarkers(result);
 			}
 		} else {
@@ -1354,10 +1364,9 @@ App.Project = {
 	//在模型中显示
 	showInModel: function($target, type) {
 		var _this = this,key="",
-			ids = $target.data('userId'),
-			box = $target.data('box'),
 			location = $target.data('location'),
-			color=$target.data('color');
+			color=$target.data('color'),
+			cat=$target.data('cat');
 		if ($target.hasClass("selected")) {
 			return
 			//	$target.parent().find(".selected").removeClass("selected");
@@ -1371,7 +1380,8 @@ App.Project = {
 			return;
 		}*/
 
-		var _temp = location;
+		var _temp = location,
+			_secenId=_temp.componentId.split('.')[0];
 		box = _this.formatBBox(_temp.bBox || _temp.boundingBox);
 		ids = [_temp.userId || _temp.componentId];
 
@@ -1379,46 +1389,35 @@ App.Project = {
 		var _floors=App.Project.Settings.Viewer.FloorsData;
 		_.find(_floors,function(item){
 			key=item.floor;
-			return _.contains(item.fileEtags,_temp.componentId.split('.')[0]);
+			return _.contains(item.fileEtags,_secenId);
 		})
+		var  _files=App.Project.Settings.Viewer.FloorFilesData;
 		//过滤所属楼层 end
+		if(_this.filterRule.file.indexOf(cat)!=-1||
+			_this.filterRule.floorPlus.indexOf(cat)!=-1){
+			var _hideFileIds=_.filter(_files,function(i){
+				return i!=_secenId;
+			})
+			App.Project.Settings.Viewer.fileFilter({
+				ids:[_hideFileIds],
+				total:[_secenId],
+				type:"sceneId"
+			});
+			if(_this.filterRule.floorPlus.indexOf(cat)!=-1){
 
-		_this.linkSilder('floors',key);
-		App.Project.Settings.Viewer.bottom();
-
+			}
+		}else if(_this.filterRule.floor.indexOf(cat)!=-1){
+			_this.linkSilder('floors',key);
+			App.Project.Settings.Viewer.bottom();
+		}else{
+			_this.linkSilder('floors',key);
+			App.Project.Settings.Viewer.bottom();
+		}
 		var _loc = _this.formatMark(location,color);
-		/*$target.data("userId", ids);
-		$target.data("box", box);
-		$target.data("location", _loc);*/
 		_this.zoomModel(ids, box);
 		_this.showMarks(_loc);
-		/*var data = {
-			URLtype: "fetchQualityModelById",
-			data: {
-				type: type,
-				projectId: App.Project.Settings.CurrentVersion.projectId,
-				versionId: App.Project.Settings.CurrentVersion.id,
-				acceptanceId: $target.data("id")
-			}
-		};
-		//获取构件ID type 0：开业验收 1：过程验收 2：隐患
-		App.Comm.ajax(data, function(data) {
+		App.Project.Settings.Viewer.bottom();
 
-			if (data.code == 0) {
-
-				if (data.data) {
-					var location = data.data.location,
-						_temp = JSON.parse(location);
-					box = _this.formatBBox(_temp.bBox || _temp.boundingBox);
-					ids = [_temp.userId];
-					$target.data("userId", ids);
-					$target.data("box", box);
-					$target.data("location", location);
-					_this.zoomModel(ids, box);
-					_this.showMarks(location);
-				}
-			}
-		});*/
 	},
 
 	showMarks: function(marks) {

@@ -544,7 +544,7 @@
       this.Settings.etag+"&projectId="+ this.Settings.projectId+"&projectVersionId="+this.Settings.projectVersionId;
       WebView.height = "510px";
       WebView.width = "960px";
-      //window.addEventListener('resize', resizeWebView, false);
+    //  window.addEventListener('resize', resizeWebView, false);
     }
   }
   win.ModelSelection = ModelSelection;
