@@ -5911,9 +5911,9 @@ CLOUD.Extensions.MarkerEditor = function (viewer) {
 
     // 有隐患：红色
     // 无隐患：绿色
-    // 过程验收点、开业验收点的未检出：灰色
+    // 过程验收点、开业验收点的未检出：灰色 --> 橙色
     // size: 14 * 20
-    this.bubbleColors = {red: "#f92a24", green: "#86b507", gray: "#ccccca"};
+    this.bubbleColors = {red: "#f92a24", green: "#86b507", gray: "#ff9326"};
 
     this.keys = {
         BACKSPACE: 8,
@@ -10934,6 +10934,7 @@ CLOUD.Extensions.Helper2D.prototype = {
 CLOUD.Extensions.DwgHelper = function () {
 
     this.dwgDomContainer = null;
+    this.AnnotationDomContainer = null;
 };
 
 CLOUD.Extensions.DwgHelper.prototype = {
@@ -10941,15 +10942,23 @@ CLOUD.Extensions.DwgHelper.prototype = {
     constructor: CLOUD.Extensions.DwgHelper,
 
     // 设置DWG批注容器, 在使用批注功能前，需要先设置dom容器
-    setDomContainer: function (domElement) {
-        this.dwgDomContainer = domElement;
+    setDomContainer: function (dwgContainer, annotationContainer) {
+
+        this.dwgDomContainer = dwgContainer;
+
+        if (annotationContainer){
+            this.AnnotationDomContainer = annotationContainer;
+        } else {
+            this.AnnotationDomContainer = dwgContainer;
+        }
+
     },
 
     // 初始化DWG批注
     initAnnotation: function (beginEditCallback, endEditCallback) {
 
         var scope = this;
-        var domElement = this.dwgDomContainer;
+        var domElement = this.AnnotationDomContainer;
 
         if (!this.dwgAnnotationEditor) {
 
@@ -11041,7 +11050,7 @@ CLOUD.Extensions.DwgHelper.prototype = {
             this.initAnnotation(beginEditCallback, endEditCallback);
             this.dwgAnnotationEditor.loadAnnotations(annotations);
         } else {
-            this.uninitAnnotationMode();
+            this.uninitAnnotation();
         }
     },
 

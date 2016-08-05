@@ -12698,7 +12698,7 @@ CLOUD.Filter = function () {
 
         if (isSelected(id)) {
             return overridedMaterials.selection;
-        }
+        }           
 
         for (var item in materialOverriderByUserId) {
             var overrider = materialOverriderByUserId[item];
@@ -12715,7 +12715,7 @@ CLOUD.Filter = function () {
             if (material !== undefined)
                 return material;
         }
-
+   
         if (_sceneOverriderState) {
             return overridedMaterials.scene;
         }
