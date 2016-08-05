@@ -7,7 +7,7 @@ App.Flow.FlowDialog = Backbone.View.extend({
     template: _.templateUrl("/flow/tpls/flow.dialog.html"),
 
     events: {
-        'click .close': 'close'
+        'click .dialogClose': 'close'
     },
 
     close(){

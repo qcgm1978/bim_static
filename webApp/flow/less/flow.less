@@ -2,13 +2,13 @@
 	overflow-y: auto;
 	padding: 10px 30px 30px 30px;
 	position: absolute;
-	top: 100px;
+	top: 142px;
 	left: 0;
 	bottom: 0;
 	.classify { border: 1px #ddd solid;  margin-top: 20px;padding-top: 20px; padding-bottom: 30px; position: relative;border-radius: 5px;
 		.flowBg { background: url('/flow/images/flowIcon.png') no-repeat; }
 		.title { position: absolute; left: 0px; top: -6px; background-color: #fff; text-align: right; padding-right: 12px; padding-left: 33px; }
-		.item { float: left;width: 240px; height: 50px; margin-left: 15px; line-height: 50px; box-sizing: border-box; padding-left: 15px; border-radius: 4px; padding-right: 12px; margin-top: 8px;
+		.item { float: left;width: 240px; height: 50px; margin-left: 15px; line-height: 50px; box-sizing: border-box; padding-left: 15px; border-radius: 4px; padding-right: 12px; margin-top: 8px;cursor: pointer;
 			&:hover { background-color: #D9F3FF;
 				a { display: inline-block; }
 			}
@@ -16,7 +16,9 @@
 				&:hover { text-decoration: underline; }
 			}
 			.mRightCK { margin-right: 7px; }
-			.text { color: #333; font-size: 14px;width: 100%;overflow: hidden;display: inline-block;text-overflow: ellipsis;height: inherit;white-space: nowrap;}
+			.text { color: #333; font-size: 14px;width: 100%;overflow: hidden;display: inline-block;text-overflow: ellipsis;height: inherit;white-space: nowrap;
+				& span{color:#ccc;display: inline;}
+			}
 			.commIcon { display: inline-block; width: 26px; height: 27px; vertical-align: -7px; background-position: 0px -82px; }
 			.modelTrial { }
 			.modificationConfirmation { background-position: 0px -108px; }
@@ -49,8 +51,7 @@
 			padding: 0 20px;
     		width: auto;
 			border-radius: 20px;
-			background: #006ECF;
-			color: #FFF;
+			background: #F5F5F5;
 			height: 28px;
 			line-height: 28px;
 			font-size: 14px;
@@ -63,13 +64,11 @@
 	left:0;
 	right: 0;
 	min-width: 1000px;
-	height: 50px;
-	background-color: #006ECF;
+	height: 92px;
 	margin: 0;
 	border-bottom: 1px solid #DDDDDD;
 	padding-left: 70px;
 	font-family: "Microsoft Yahei";
-	padding-top: 5px;
 	& li {
 		text-align: center;
 		list-style: none;
@@ -81,6 +80,19 @@
 	}
 	& .flowTabItem {
 		float: left;
+		cursor: pointer;
+		& .numberFlag1{
+			background-position: 0 -440px;
+		}
+		& .numberFlag2{
+			background-position: 0 -550px;
+		}
+		& .numberFlag3{
+			background-position: 0 -661px;
+		}
+		& .numberFlag4{
+			background-position: 0 -771px;
+		}
 	}
 
 	& .tabNavItem{
@@ -95,89 +107,41 @@
 		}
 	}
 
-	& .navIcon{
-		background: url("../images/flow-nav-icon.png") no-repeat;
-	}
-	& .arrowSelected{
-		background-position: 0 0;
-		& span{
-			color: #FFF;
-		}
+	& .itemSelected{
 		& .numberFlag1{
-			background-position: 0 -150px;
+			background-position: 0 0;
 		}
 		& .numberFlag2{
-			background-position: 0 -200px;
+			background-position: 0 -110px;
 		}
 		& .numberFlag3{
-			background-position: 0 -250px;
+			background-position: 0 -220px;
 		}
 		& .numberFlag4{
-			background-position: 0 -300px;
+			background-position: 0 -330px;
 		}
 	}
 
-	& .arrowNoSelected{
-		background-position: 0 -100px;
-		&:hover{
-			background-position: 0 -50px;
-			cursor: pointer;
-		}
-		& .numberFlag{
-			margin-left: 20px;
-		}
-		& .numberFlag1{
-			background-position: 0 -350px;
-		}
-		& .numberFlag2{
-			background-position: 0 -400px;
-		}
-		& .numberFlag3{
-			background-position: 0 -450px;
-		}
-		& .numberFlag4{
-			background-position: 0 -500px;
-		}
-	}
+
 	& .arrowHover{
 		background-position: 0 -50px;
 	}
 
 	& .numberFlag{
 		display: inline-block;
-		width: 30px;
-		height: 30px;
-		background: url("../images/flow-nav-icon.png") no-repeat;
+		width: 190px;
+		height: 95px;
+		background: url("../images/flowIcon2.png") no-repeat;
 		float: left;
 		margin-left: 10px;
 	}
 
-	& .selected {
-		& a{
-			color: #333;
-		}
-		border-bottom: none;
-		border-top: 2px solid #006ECF;
-		background-color: #FFFFFF;
-	}
-	& .arrowNav {
-		padding: 0;
-		margin: 10px 0;
-		border: none;
-		& i {
-			background: url("../images/arrow-nav.png");
-			width: 43px;
-			height: 14px;
-			display: inline-block;
-			vertical-align: -3px;
-		}
-	}
 	& .flowMoreBtn {
 		float: right;
 		width: 120px;
 		height: 30px;
 		margin-right: 40px;
-		margin-top: 25px;
+		margin-top: 76px;
 		line-height: 30px;
 		background: #FFFFFF;
 		border-radius: 15px;
@@ -220,17 +184,12 @@
 				font-family: "Microsoft Yahei";
 				font-size: 20px;
 			}
-			& .close{
-				display: inline-block;
-				width: 15px;
-				height:15px;
-				float: right;
-				margin-top: 16px;
-				background: url("../../comm/images/dialogs/close.png");
-				cursor: pointer;
-				&:hover{
-					background: url("../../comm/images/dialogs/close-hover.png");
-				}
+		}
+		& .dialogClose{
+			float: right;
+			cursor: pointer;
+			&:hover{
+				color:#CFCFCF;
 			}
 		}
 		& .flowModalBody{

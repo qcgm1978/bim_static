@@ -1,10 +1,10 @@
 <%  _.each(data,function(item){ %>
 <% if(item.itemNames.length) {%>
 <fieldset class="classify">
-    <legend><%=item.categoryName%></legend>
+    <legend><i class="modelicon m-close"></i><%=item.categoryName%></legend>
     <ul>
         <% _.each(item.itemNames,function(i){ %>
-        <li class="item"><span class="text" title="<%=i%>"><%=i%></span>
+        <li class="item"><span class="text" title="<%=i%>"><%=i.replace('【模块化】','<span>【模块化】</span>')%></span>
         </li>
         <% }) %>
     </ul>

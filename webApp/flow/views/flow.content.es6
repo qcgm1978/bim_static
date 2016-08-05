@@ -7,19 +7,19 @@ App.Flow.ContentView=Backbone.View.extend({
 	template:_.templateUrl("/flow/tpls/flow.content.html",true),
 
 	events:{
-		'click .text':'detail'
+		//'click .text':'detail'
 	},
 	
 	initialize(){
 		this.listenTo(App.Flow.Controller.flowCollection,'reset',this.load);
 	},
 
-	detail(){
+	detail(txt){
 		App.Comm.ajax({
 			URLtype:'fetchFlowDetail',
 			data:{
-				itemName:'I-002总图指标移交',
-				simpleMode:true
+				itemName:txt,
+				simpleMode:false
 			}
 		}).done(function(data){
 			new App.Flow.FlowDialog().render(data.data);
@@ -27,10 +27,14 @@ App.Flow.ContentView=Backbone.View.extend({
 	},
 
 	load:function(m){
+		var _this=this;
 		var data=m.toJSON()[0];
 		var _html=_.template(this.template);
 		this.$el.html(_html(data));
 		$("#flowContainer").html(this.$el);
+		this.$('.text').on('click',function(){
+			_this.detail($(this).attr('title').replace('【模块化】',''));
+		})
 		return this;
 	}
 });

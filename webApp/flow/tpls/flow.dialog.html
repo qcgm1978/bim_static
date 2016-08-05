@@ -1,7 +1,7 @@
 <div class="flowModalDialog">
     <div class="flowModalHeader">
         <span><%=name%></span>
-        <i class="close"></i>
+        <i class="modelicon m-close dialogClose"></i>
     </div>
     <div class="flowModalBody">
         <table>
@@ -12,9 +12,9 @@
                 <td class="title cols">接收单位</td>
             </tr>
             <tr>
-                <td class="content cols"><br><br></td>
-                <td class="content cols"><br><br></td>
-                <td class="content cols"><br><br></td>
+                <td class="content cols"><%=mainOrg%></td>
+                <td class="content cols"><%=subOrg%></td>
+                <td class="content cols"><%=receiveOrg%></td>
             </tr>
             <tr>
                 <td class="title rows" rowspan="2">时间</td>
@@ -23,25 +23,28 @@
                 <td class="title cols">结束</td>
             </tr>
             <tr>
-                <td class="content cols"><br><br></td>
-                <td class="content cols"><br><br></td>
-                <td class="content cols"><br><br></td>
+                <td class="content cols"><%=beginTime%></td>
+                <td class="content cols"><%=period%></td>
+                <td class="content cols"><%=endTime%></td>
             </tr>
             <tr>
                 <td class="title rows">工作成果</td>
-                <td colspan="3"><br><br></td>
+                <td colspan="3"><%=result%></td>
             </tr>
             <tr>
                 <td class="title rows">完成标准</td>
-                <td colspan="3"><br><br></td>
+                <td colspan="3"><%=standard%></td>
             </tr>
             <tr>
                 <td class="title rows">操作细则</td>
-                <td colspan="3"><br><br></td>
+                <td colspan="3"><%=deatilRule%></td>
             </tr>
         </table>
     </div>
     <div class="flowModalBbar">
+        <% _.each(operation,function(item){ %>
+            <a class="flowModalBtn" target="_blank" href="<%=item.url%>" title="<%=item.buttonName%>"><%=item.buttonName%></a>
+        <% }) %>
        <!-- <a class="flowModalBtn">sss</a>
         <a class="flowModalBtn">sss</a>
         <a class="flowModalBtn" title="作按钮排列样式">作按钮排列样式</a>

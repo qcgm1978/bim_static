@@ -198,6 +198,7 @@ App.Project.ProjectQualityProperty = Backbone.View.extend({
 	initOptionsProcessAcceptance() {
 		this.ProcessAcceptanceOptions = {
 			locationName:'',
+			floor:'',
 			category: "", //类别 
 			problemCount: "", // 无隐患 1， 有隐患 
 			pageIndex: 1, //第几页，默认第一页
@@ -209,6 +210,7 @@ App.Project.ProjectQualityProperty = Backbone.View.extend({
 	initOptionsOpeningAcceptance() {
 		this.OpeningAcceptanceOptions = {
 			locationName:'',
+			floor:'',
 			specialty: "", //专业
 			category: "", //类别 
 			problemCount: "", // 无隐患 1， 有隐患 

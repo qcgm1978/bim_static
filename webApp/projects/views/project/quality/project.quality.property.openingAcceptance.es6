@@ -57,6 +57,12 @@ App.Project.QualityOpeningAcceptance = Backbone.View.extend({
 				that.changeOA('problemCount', $item.data("status"))
 			}
 		});
+		this.$(".floorOption").myDropDown({
+			click: function($item) {
+				//	that.OpeningAcceptanceOptions.problemCount = $item.data("status");
+				that.changeOA('floor', $item.data("val"))
+			}
+		});
 		//类别
 		this.$(".categoryOption").myDropDown({
 			click: function($item) {

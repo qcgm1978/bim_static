@@ -47,6 +47,14 @@ App.Project.QualityProcessAcceptance = Backbone.View.extend({
 		this.$('.txtLocationName').change(function(){
 			that.changePA('locationName', $(this).val())
 		})
+
+		this.$(".floorOption").myDropDown({
+			click: function($item) {
+				//	that.OpeningAcceptanceOptions.problemCount = $item.data("status");
+				that.changePA('floor', $item.data("val"))
+			}
+		});
+
 		//隐患
 		this.$(".riskOption").myDropDown({
 			click: function($item) {

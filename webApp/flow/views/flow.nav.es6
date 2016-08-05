@@ -9,7 +9,7 @@ App.Flow.NavView=Backbone.View.extend({
 	template:_.templateUrl("/flow/tpls/flow.nav.html",true),
 
 	events:{
-		'click .tabNavItem':'switchModel'
+		'click .flowTabItem':'switchModel'
 	},
 	
 	initialize(){
@@ -18,10 +18,9 @@ App.Flow.NavView=Backbone.View.extend({
 
 	switchModel(e){
 		var $target=$(e.currentTarget);
-		$('.arrowSelected').removeClass('arrowSelected').addClass('arrowNoSelected');
-		if($target.hasClass('arrowNoSelected')){
-			$target.removeClass('arrowNoSelected');
-			$target.addClass('arrowSelected');
+		if(!$target.hasClass('itemSelected')){
+			$('.itemSelected').removeClass('itemSelected');
+			$target.addClass('itemSelected');
 			var id=$target.data('id');
 			this.$("#flowMoreBtn a").attr('href',$target.data('link'))
 			this.loadContent(id);

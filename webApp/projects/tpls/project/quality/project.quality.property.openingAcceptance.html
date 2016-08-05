@@ -8,10 +8,6 @@
 <div class="searchDetail openingacceptance">
     <div class="searchOptons">
         <div class="optonLine zIndex10">
-            <div class="searchName">
-                <span>楼层：</span>
-                <input type="text" class="txtSearchName txtLocationName filterInputExtra" placeholder="请输入关键字"/>
-            </div>
             <div class="myDropDown categoryOption optionComm">
                 <span class="myDropText">
              <span>类别：</span> <span class="text">全部</span> <i class="myDropArrorw"></i> </span>
@@ -22,9 +18,6 @@
                     <% } }) %>
                 </ul>
             </div>
-        </div>
-        <div class="optonLine">
-
             <div class="myDropDown riskOption optionComm">
                 <span class="myDropText">
              <span>状态：</span> <span class="text">全部</span> <i class="myDropArrorw"></i> </span>
@@ -34,6 +27,23 @@
                     <li class="myItem" data-val=''>不合格</li>
                 </ul>
             </div>
+        </div>
+        <div class="optonLine">
+            <div class="myDropDown floorOption optionComm">
+                <span class="myDropText">
+             <span>楼层：</span> <span class="text">全部</span> <i class="myDropArrorw"></i> </span>
+                <ul class="myDropList">
+                    <li class="myItem" data-val=''>全部</li>
+                    <% _.each(App.Project.Settings.Viewer.FloorsData,function(item,index){%>
+                    <li class="myItem" data-val='<%=item.code%>'><%=item.code%></li>
+                    <% }) %>
+                </ul>
+            </div>
+            <div class="searchName">
+                <span>位置：</span>
+                <input type="text" class="txtSearchName txtLocationName filterInputExtra" placeholder="请输入关键字"/>
+            </div>
+
         </div>
      
    
