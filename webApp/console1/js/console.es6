@@ -94,7 +94,7 @@ App.Console = {
     App.Console.auditSheet1(3, "#s51", 8);
     //4.2
     $.ajax({
-      url: "platform/api/family?status=3"
+      url: "platform/api/family?status=3,6"
     }).done(function(data){
 
       var items = data.data, str = '';
@@ -109,7 +109,7 @@ App.Console = {
     });
     //4.4
     $.ajax({
-      url: "platform/api/family?status=5"
+      url: "platform/api/family?status=5,8"
     }).done(function(data){
 
       var items = data.data, str = '';
@@ -224,7 +224,8 @@ App.Console = {
     this.twoApply(1,'s11','p14');
     //5.2
     $.ajax({
-      url: "platform/api/model"
+      //url: "platform/api/model"
+      url: "platform/api/workflow/model?status=3,6"
     }).done(function(data){
 
       var items = data.data, str = '';
@@ -237,7 +238,8 @@ App.Console = {
       });
       $("#s21").html("<option value=''>请选择</option>"+str).change(function(){
         $.ajax({
-          url: "platform/api/model/"+$(this).find('option:selected').attr('id')+"/version?status=3"
+          //url: "platform/api/model/"+$(this).find('option:selected').attr('id')+"/version?status=3"
+          url: "platform/api/model/"+$(this).find('option:selected').attr('id')+"/version?status=3,6"
         }).done(function(data){
 
           var items = data.data, str = '';
@@ -256,7 +258,9 @@ App.Console = {
     });
     //5.4
     $.ajax({
-      url: "platform/api/model"
+      //url: "platform/api/model"
+             url: "platform/api/workflow/model?status=5,8"
+
     }).done(function(data){
 
       var items = data.data, str = '';
@@ -269,7 +273,7 @@ App.Console = {
       });
       $("#s41").html("<option value=''>请选择</option>"+str).change(function(){
         $.ajax({
-          url: "platform/api/model/"+$(this).find('option:selected').attr('id')+"/version?status=5"
+          url: "platform/api/model/"+$(this).find('option:selected').attr('id')+"/version?status=5,8"
         }).done(function(data){
 
           var items = data.data, str = '';
@@ -411,7 +415,8 @@ App.Console = {
 
     //6.2
     $.ajax({
-      url: "platform/api/project"
+      //url: "platform/api/project"
+      url: "platform/api/workflow/project?status=3,6"
     }).done(function(data){
 
       var items = data.data, str = '';
@@ -423,7 +428,7 @@ App.Console = {
       });
       $("#s21").html("<option value=''>请选择</option>"+str).change(function(){
         $.ajax({
-          url: "platform/api/project/"+$(this).find('option:selected').attr('id')+"/version?status=3"
+          url: "platform/api/workflow/project/"+$(this).find('option:selected').attr('id')+"/version?status=3,6"
         }).done(function(data){
 
           var items = data.data, str = '';
@@ -442,7 +447,7 @@ App.Console = {
     });
     //6.4
     $.ajax({
-      url: "platform/api/project"
+      url: "platform/api/workflow/project?status=5,8"
     }).done(function(data){
 
       var items = data.data, str = '';
@@ -455,7 +460,7 @@ App.Console = {
       });
       $("#s41").html("<option value=''>请选择</option>"+str).change(function(){
         $.ajax({
-          url: "platform/api/project/"+$(this).find('option:selected').attr('id')+"/version?status=5"
+          url: "platform/api/workflow/project/"+$(this).find('option:selected').attr('id')+"/version?status=5,8"
         }).done(function(data){
 
           var items = data.data, str = '';
@@ -911,7 +916,8 @@ App.Console = {
     App.Console.auditSheet1(11, '#s61', 8);
     //7.3
     $.ajax({
-      url: "platform/api/workflow/project?status=10"
+      //url: "platform/api/workflow/project?status=10"
+      url: "platform/api/workflow/project?status=10,12"
     }).done(function(data){
 
       var items = data.data, str = '';
@@ -943,7 +949,9 @@ App.Console = {
     });
     //7.5
     $.ajax({
-      url: "platform/api/workflow/project?status=11"
+      //url: "platform/api/workflow/project?status=11"
+      //url: "api/workflow/project?status=11,12"
+      url: "platform/api/workflow/project?status=11,12"
     }).done(function(data){
 
       var items = data.data, str = '';
