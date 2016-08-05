@@ -1,7 +1,21 @@
 App.Flow=App.Flow||{};
 
 App.Flow.Controller={
-	
+
+    icon:{
+        '成本管理':'m-chengbenguanli',
+        '商管工程':'m-shangguangongcheng',
+        '发展管理':'m-fazhanguanli',
+        '计划管理':'m-jihuaguanli',
+        '设计管理':'m-shejiguanli',
+        '招商管理':'m-zhaoshangguanli',
+        '质量管理':'m-zhiliangguanli'
+    },
+
+    toIcon:function(key){
+      return this.icon[key]||'m-moren';
+    },
+
 	init:function(){
 	
 		//实例化
