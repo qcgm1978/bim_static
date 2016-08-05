@@ -64,6 +64,7 @@ App.Project.QualityProcessAcceptance = Backbone.View.extend({
 		});
 		//列别
 		this.$(".categoryOption").myDropDown({
+			zIndex:20,
 			click: function($item) {
 			//	that.ProcessAcceptanceOptions.category = $item.text();
 				that.changePA('category', $item.attr('data-val'))

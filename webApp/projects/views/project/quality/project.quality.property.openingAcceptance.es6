@@ -65,6 +65,7 @@ App.Project.QualityOpeningAcceptance = Backbone.View.extend({
 		});
 		//类别
 		this.$(".categoryOption").myDropDown({
+			zIndex:20,
 			click: function($item) {
 				//that.OpeningAcceptanceOptions.category = $item.text();
 				that.changeOA('category', $item.attr('data-val'))

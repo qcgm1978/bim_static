@@ -92,12 +92,14 @@
           sourceId:self._opt.sourceId
         },function(data){
           var data = data.data,
-              _temp=[];
+              _temp={};
           $.each(data,function(i,item){
+            var _t=[];
             $.each(item.files,function(j,file){
               self.fileData[file.fileEtag] = item.specialty;
-              _temp.push(file.fileEtag)
+              _t.push(file.fileEtag)
             })
+            _temp[item.specialty]=_t;
           })
           bimView.prototype.SpecialtyFilesData=_temp;
           var specialties = bimView.comm.viewTree({

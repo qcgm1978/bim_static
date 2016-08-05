@@ -25,7 +25,8 @@ App.Project = {
 	filterRule:{
 		file:'工程桩,基坑支护,地下防水,钢结构悬挑构件,幕墙,采光顶',
 		floorPlus:'梁柱节点',
-		floor:'步行街吊顶风口,卫生间防水'
+		floor:'步行街吊顶风口,卫生间防水,外保温',
+		floorSpty:'步行街吊顶风口&暖通#内装,卫生间防水&暖通#内装'
 	},
 	//默认参数
 	Defaults: {
@@ -1370,7 +1371,8 @@ App.Project = {
 		var _this = this,key="",
 			location = $target.data('location'),
 			color=$target.data('color'),
-			cat=$target.data('cat');
+			cat=$target.data('cat'),
+			floorSptys=_this.filterRule.floorSpty.split(',');
 		if ($target.hasClass("selected")) {
 			return
 		} else {
@@ -1388,7 +1390,8 @@ App.Project = {
 			key=item.floor;
 			return _.contains(item.fileEtags,_secenId);
 		})
-		var  _files=App.Project.Settings.Viewer.FloorFilesData;
+		var  _files=App.Project.Settings.Viewer.FloorFilesData,
+			_spFiles=App.Project.Settings.Viewer.SpecialtyFilesData;
 		//过滤所属楼层 end
 		if(_this.filterRule.file.indexOf(cat)!=-1||
 			_this.filterRule.floorPlus.indexOf(cat)!=-1){
@@ -1396,9 +1399,8 @@ App.Project = {
 				return i!=_secenId;
 			})
 			App.Project.Settings.Viewer.fileFilter({
-				ids:[_hideFileIds],
-				total:[_secenId],
-				type:"sceneId"
+				ids:_hideFileIds,
+				total:[_secenId]
 			});
 			if(_this.filterRule.floorPlus.indexOf(cat)!=-1){
 				App.Project.Settings.Viewer.filter({
@@ -1406,17 +1408,35 @@ App.Project = {
 					type:"classCode"
 				});
 			}
+			App.Project.Settings.Viewer.viewer.disableLoD(true);
 		}else if(_this.filterRule.floor.indexOf(cat)!=-1){
 			_this.linkSilder('floors',key);
-			App.Project.Settings.Viewer.bottom();
+			var sp=_.find(floorSptys,function(item){
+				return item.indexOf(cat)!=-1;
+			});
+			var sp=sp.slice(sp.indexOf('&')+1),
+				show=[],
+				hide=[];
+			_.each(_spFiles,function(val,key){
+				if(sp.indexOf(key)!=-1){
+					show=show.concat(val);
+				}else{
+					hide=hide.concat(val);
+				}
+			})
+			App.Project.Settings.Viewer.fileFilter({
+				ids:hide,
+				total:show,
+				type:'sceneId'
+			});
+			App.Project.Settings.Viewer.viewer.disableLoD(true);
 		}else{
 			_this.linkSilder('floors',key);
-			App.Project.Settings.Viewer.bottom();
 		}
 		var _loc = _this.formatMark(location,color);
+		App.Project.Settings.Viewer.bottom();
 		_this.zoomModel(ids, box);
 		_this.showMarks(_loc);
-		App.Project.Settings.Viewer.bottom();
 
 	},
 
@@ -1431,7 +1451,7 @@ App.Project = {
 		//定位
 		App.Project.Settings.Viewer.zoomToBox(box);
 		//半透明
-		App.Project.Settings.Viewer.translucent(true);
+		//App.Project.Settings.Viewer.translucent(true);
 		//高亮
 		App.Project.Settings.Viewer.highlight({
 			type: 'userId',
