@@ -594,8 +594,9 @@ App.INBox.comment = {
 					var $count = $(".commentRemark .remarkBox .count");
 					$count.text(+$count.text() + 1);
 					setTimeout(function(){
-						$('#mCSB_1').scrollTop(9900000);
-					},2000);
+						console.log('scrolltop')
+						$('.mCustomScrollBox').scrollTop(10).scrollTop(9900000);
+					},1000);
 				}
 
 			});
