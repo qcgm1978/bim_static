@@ -22,13 +22,22 @@ App.INBox = {
 	},
 
 	read(id,_this,projectId,version,shareId){
-		App.Comm.loadMessageCount(-1);
 		//window.open(App.API.Settings.hostname+"platform/message/read?id="+id);
+		if($(_this).data('status')==0){
+			App.Comm.loadMessageCount(-1);
+			$(_this).closest('li').remove();
+
+		}
 		this.id = id;
-		$(_this).closest('li').remove();
 	//	this.loadData('un');
 		//location.reload();
+		//发送已读状态
+		$.ajax({
+			url: App.API.Settings.hostname+"platform/message/read?flag=1&id="+id
+		}).done(function(data){
+			//console.log(data)
 
+		});
 		//弹窗显示详情
 		$('#comment').show();
 		App.INBox.comment.init(id,projectId,version,shareId,_this);
@@ -441,6 +450,7 @@ App.INBox.comment = {
 		//删除图片
 		removeImg(event) {
 			$(event.target).closest(".singleImg").remove();
+			this.$(".uploadImgs").empty();
 		},
 
 		//新增数据
@@ -583,6 +593,10 @@ App.INBox.comment = {
 					//评论的数量
 					var $count = $(".commentRemark .remarkBox .count");
 					$count.text(+$count.text() + 1);
+					setTimeout(function(){
+						console.log('scrolltop')
+						$('.mCustomScrollBox').scrollTop(10).scrollTop(9900000);
+					},1000);
 				}
 
 			});
