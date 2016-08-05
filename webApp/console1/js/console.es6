@@ -225,7 +225,7 @@ App.Console = {
     //5.2
     $.ajax({
       //url: "platform/api/model"
-      url: "api/workflow/model?status=3,6"
+      url: "platform/api/workflow/model?status=3,6"
     }).done(function(data){
 
       var items = data.data, str = '';
@@ -239,7 +239,7 @@ App.Console = {
       $("#s21").html("<option value=''>请选择</option>"+str).change(function(){
         $.ajax({
           //url: "platform/api/model/"+$(this).find('option:selected').attr('id')+"/version?status=3"
-          url: "api/model/"+$(this).find('option:selected').attr('id')+"/version?status=3,6"
+          url: "platform/api/model/"+$(this).find('option:selected').attr('id')+"/version?status=3,6"
         }).done(function(data){
 
           var items = data.data, str = '';
@@ -259,7 +259,7 @@ App.Console = {
     //5.4
     $.ajax({
       //url: "platform/api/model"
-             url: "api/workflow/model?status=5,8"
+             url: "platform/api/workflow/model?status=5,8"
 
     }).done(function(data){
 
@@ -273,7 +273,7 @@ App.Console = {
       });
       $("#s41").html("<option value=''>请选择</option>"+str).change(function(){
         $.ajax({
-          url: "api/model/"+$(this).find('option:selected').attr('id')+"/version?status=5,8"
+          url: "platform/api/model/"+$(this).find('option:selected').attr('id')+"/version?status=5,8"
         }).done(function(data){
 
           var items = data.data, str = '';
@@ -416,7 +416,7 @@ App.Console = {
     //6.2
     $.ajax({
       //url: "platform/api/project"
-      url: "api/workflow/project?status=3,6"
+      url: "platform/api/workflow/project?status=3,6"
     }).done(function(data){
 
       var items = data.data, str = '';
@@ -428,7 +428,7 @@ App.Console = {
       });
       $("#s21").html("<option value=''>请选择</option>"+str).change(function(){
         $.ajax({
-          url: "api/workflow/project/"+$(this).find('option:selected').attr('id')+"/version?status=3,6"
+          url: "platform/api/workflow/project/"+$(this).find('option:selected').attr('id')+"/version?status=3,6"
         }).done(function(data){
 
           var items = data.data, str = '';
@@ -447,7 +447,7 @@ App.Console = {
     });
     //6.4
     $.ajax({
-      url: "api/workflow/project?status=5,8"
+      url: "platform/api/workflow/project?status=5,8"
     }).done(function(data){
 
       var items = data.data, str = '';
@@ -460,7 +460,7 @@ App.Console = {
       });
       $("#s41").html("<option value=''>请选择</option>"+str).change(function(){
         $.ajax({
-          url: "api/workflow/project/"+$(this).find('option:selected').attr('id')+"/version?status=5,8"
+          url: "platform/api/workflow/project/"+$(this).find('option:selected').attr('id')+"/version?status=5,8"
         }).done(function(data){
 
           var items = data.data, str = '';
@@ -917,7 +917,7 @@ App.Console = {
     //7.3
     $.ajax({
       //url: "platform/api/workflow/project?status=10"
-      url: "api/workflow/project?status=10,12"
+      url: "platform/api/workflow/project?status=10,12"
     }).done(function(data){
 
       var items = data.data, str = '';
@@ -930,7 +930,7 @@ App.Console = {
       });
       $("#s31").html("<option value=''>请选择</option>"+str).change(function(){
         $.ajax({
-          url: "api/workflow/project/"+$(this).find('option:selected').attr('id')+"/version?status=10"
+          url: "platform/api/workflow/project/"+$(this).find('option:selected').attr('id')+"/version?status=10"
         }).done(function(data){
 
           var items = data.data, str = '';
@@ -950,7 +950,8 @@ App.Console = {
     //7.5
     $.ajax({
       //url: "platform/api/workflow/project?status=11"
-      url: "api/workflow/project?status=11,12"
+      //url: "api/workflow/project?status=11,12"
+      url: "platform/api/workflow/project?status=11,12"
     }).done(function(data){
 
       var items = data.data, str = '';
@@ -963,7 +964,7 @@ App.Console = {
       });
       $("#s51").html("<option value=''>请选择</option>"+str).change(function(){
         $.ajax({
-          url: "api/workflow/project/"+$(this).find('option:selected').attr('id')+"/version?status=11"
+          url: "platform/api/workflow/project/"+$(this).find('option:selected').attr('id')+"/version?status=11"
         }).done(function(data){
 
           var items = data.data, str = '';
