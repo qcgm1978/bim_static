@@ -107,8 +107,15 @@
 
         window.onresize = resizeWebView;
 
-        delCookie("path");
+        delCookie("path");  
+
+        if (window.screen.width>1920) {
+            myWebView.zoomFactor=1.5;
+        } 
+        
+
     } catch (e) {
+         
         if (!isIE()) {
         	var html=templateUrl("/app/oPage/tipIE.html");
             $("body").html(html);
