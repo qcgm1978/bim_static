@@ -509,23 +509,40 @@ App.Project.ProjectContainer = Backbone.View.extend({
 
 			viewer.on("loaded", function() {
 				var data = {
-					type: "userId",
-					ids: App.Project.Settings.PlanElement.elements
-				}
-				//高亮
+						type: "userId",
+						ids: App.Project.Settings.PlanElement.elements
+					}
+					//高亮
 				viewer.highlight(data);
 				//半透明
 				viewer.translucent(true);
 
-				var box=App.Project.formatBBox(App.Project.Settings.PlanElement.boundingBox);
-				if(box && box.length){ 
-					App.Project.zoomModel(App.Project.Settings.PlanElement.elements,box);
+				var box = App.Project.formatBBox(App.Project.Settings.PlanElement.boundingBox);
+				if (box && box.length) {
+					App.Project.zoomModel(App.Project.Settings.PlanElement.elements, box);
 				}
 
 			});
 		}
+ 
+
+		viewer.on("loaded", function() {
+			//加载数据
+			that.loadFiveMajor();
+		});
 
 
+	},
+
+	//只加载5大专业
+	loadFiveMajor() {
+		var $this,test="建筑|结构|幕墙|采光顶|景观";
+		$(".bim .itemNode:first>ul>li>.itemContent>.treeText").each(function(){
+			$this=$(this);
+			if (test.indexOf($this.text())<0) {
+				$this.prev().click();
+			}
+		});
 	},
 
 	//重置 内容为空
