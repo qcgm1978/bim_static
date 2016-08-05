@@ -1408,7 +1408,6 @@ App.Project = {
 					type:"classCode"
 				});
 			}
-			App.Project.Settings.Viewer.viewer.disableLoD(true);
 		}else if(_this.filterRule.floor.indexOf(cat)!=-1){
 			_this.linkSilder('floors',key);
 			var sp=_.find(floorSptys,function(item){
@@ -1429,12 +1428,11 @@ App.Project = {
 				total:show,
 				type:'sceneId'
 			});
-			App.Project.Settings.Viewer.viewer.disableLoD(true);
 		}else{
 			_this.linkSilder('floors',key);
 		}
 		var _loc = _this.formatMark(location,color);
-		App.Project.Settings.Viewer.bottom();
+		App.Project.Settings.Viewer.top();
 		_this.zoomModel(ids, box);
 		_this.showMarks(_loc);
 
