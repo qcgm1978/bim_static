@@ -1432,7 +1432,7 @@ App.Project = {
 			_this.linkSilder('floors',key);
 		}
 		var _loc = _this.formatMark(location,color);
-		App.Project.Settings.Viewer.bottom();
+		App.Project.Settings.Viewer.top();
 		_this.zoomModel(ids, box);
 		_this.showMarks(_loc);
 
