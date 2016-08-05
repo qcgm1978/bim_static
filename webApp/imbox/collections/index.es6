@@ -450,6 +450,7 @@ App.INBox.comment = {
 		//删除图片
 		removeImg(event) {
 			$(event.target).closest(".singleImg").remove();
+			this.$(".uploadImgs").empty();
 		},
 
 		//新增数据
@@ -593,7 +594,8 @@ App.INBox.comment = {
 					var $count = $(".commentRemark .remarkBox .count");
 					$count.text(+$count.text() + 1);
 					setTimeout(function(){
-						$('#mCSB_1').scrollTop(9900000);
+						console.log('scrolltop')
+						$('.mCustomScrollBox').scrollTop(10).scrollTop(9900000);
 					},1000);
 				}
 
