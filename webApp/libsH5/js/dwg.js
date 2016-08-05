@@ -124,20 +124,31 @@ var dwgViewer = function(options) {
     },
 
     //初始化批注
-    __initComment: function() { 
-    
-      var  toolBarHtml;
+    __initComment: function() {
+
+
+      //存在 返回
+      if ($("#dwgCommentContainer").length > 0) {
+        return;
+      }
+
+      //批注容器
+      var $dwgCommentContainer = $('<div/>', {
+          id: "dwgCommentContainer"
+        }),
+        toolBarHtml;
 
       if (App.Project.templateUrl) {
         toolBarHtml = App.Project.templateUrl('/libsH5/tpls/comment/dwgCommentToolBar.html')
       }
 
-      $("#modelBox .bim").append(toolBarHtml);
+      $("#modelBox .bim").append(toolBarHtml).append($dwgCommentContainer);
+
 
       //设置批注容器
       var dwgHelper = this.dwgHelper = new CLOUD.Extensions.DwgHelper();
 
-      dwgHelper.setDomContainer($("#modelBox .bim")[0]);
+      dwgHelper.setDomContainer($("#modelBox .bim .mod-dwg")[0],$dwgCommentContainer[0]);
 
       //初始化批注事件
       this.__initCommentEvent();
@@ -157,8 +168,9 @@ var dwgViewer = function(options) {
       //清空数据重新开始
       dwgHelper.clearAnnotations();
       dwgHelper.editAnnotationBegin(pos);
-      this.pos = pos; 
-     
+      this.pos = pos;
+
+      $("#dwgCommentContainer").css("z-index", 19);
       $("#modelBox .bim .commentBar").removeClass("hide");
 
 
@@ -976,9 +988,8 @@ dwgViewer.prototype = {
 
     var that = this;
     //设置不同的工具
-    $("#modelBox .bim").on("click", ".commentBar .btnSave", function() {
-
-       $("#modelBox .bim .commentBar").addClass("hide");
+    $("#modelBox .bim").on("click", ".commentBar .btnSave", function() { 
+      
       //保存批注
       if ($.isFunction(that.saveCommentDwg)) {
         that.saveCommentDwg();
@@ -1000,10 +1011,11 @@ dwgViewer.prototype = {
 
   //结束批注
   commentEnd: function() {
-     
+
     $("#modelBox .modelBar .m-camera").removeClass("selected");
-    this.dwgView.dwgHelper.editAnnotationEnd(); 
+    this.dwgView.dwgHelper.editAnnotationEnd();
     $("#modelBox .bim .commentBar").addClass("hide");
+    $("#dwgCommentContainer").css("z-index", 19);
   }
 
 

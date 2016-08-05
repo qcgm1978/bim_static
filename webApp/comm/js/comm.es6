@@ -398,10 +398,11 @@ App.Comm = {
 	checkDownLoad: function(projectId, projectVersionId, fileVersionId) {
 
 		if (!App.Comm.getCookie("OUTSSO_AuthToken")) {
-			$.tip({
-				message: "登录后下载",
-				type: "alarm"
-			});
+			// $.tip({
+			// 	message: "登录后下载",
+			// 	type: "alarm"
+			// });
+			window.location.href="http://bim.wanda-dev.cn/login.html";
 			return;
 		}
 

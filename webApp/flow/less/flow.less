@@ -5,6 +5,14 @@
 	top: 142px;
 	left: 0;
 	bottom: 0;
+	& .micon {
+		font-family:"modelicon" !important;
+		font-size:30px;
+		font-style:normal;
+		-webkit-font-smoothing: antialiased;
+		-webkit-text-stroke-width: 0.2px;
+		-moz-osx-font-smoothing: grayscale;
+	}
 	.classify { border: 1px #ddd solid;  margin-top: 20px;padding-top: 20px; padding-bottom: 30px; position: relative;border-radius: 5px;
 		.flowBg { background: url('/flow/images/flowIcon.png') no-repeat; }
 		.title { position: absolute; left: 0px; top: -6px; background-color: #fff; text-align: right; padding-right: 12px; padding-left: 33px; }
@@ -55,6 +63,9 @@
 			height: 28px;
 			line-height: 28px;
 			font-size: 14px;
+			& i{
+				vertical-align: -6px;
+			}
 		}
 	}
 }
