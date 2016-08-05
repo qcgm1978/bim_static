@@ -107,12 +107,9 @@
 
         window.onresize = resizeWebView;
 
-        delCookie("path");  
+        delCookie("path");    
 
-        if (window.screen.width>1920) {
-            myWebView.zoomFactor=1.5;
-        } 
-        
+        myWebView.zoomFactor=window.devicePixelRatio; 
 
     } catch (e) {
          
@@ -159,6 +156,7 @@
     }
 
     function resizeWebView() {
+         myWebView.zoomFactor=window.devicePixelRatio; 
         //重置
        	myWebView.width = 0;
         myWebView.height =0;
