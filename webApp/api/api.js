@@ -275,7 +275,7 @@ App.API = {
 		//业务流程
 		fetchFlow:'platform/workflow/{phaseId}/category',
 		fetchNavFlow:'platform/workflow/phase',
-		fetchFlowDetail:'platform/workflow/items/{itemName}',
+		fetchFlowDetail:'platform/workflow/items/info',
 
 
 		//批注

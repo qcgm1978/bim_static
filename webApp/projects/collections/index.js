@@ -48,9 +48,9 @@
     //项目模式
     projectModel:['--', '创新模式', '直投', '重资产','合作'],
     concernsData:{
-        type:['随机','过程检查','开业验收','入伙验收'],
-        report:['','质监','第三方','项目公司','监理单位'],
-        classic:['','实测实量','防水工程','施工质量','安全文明','总包内业资料','材料设备'],
+        type:['', '过程检查', '过程验收', '开业验收'],
+        report:['', '质监中心', '第三方', '项目公司', '监理单位'],
+        classic:['', '防水工程', '施工质量', '安全文明', '材料设备'],
         specialty:{
             '1':'建筑',
             '2':'结构',
@@ -61,7 +61,6 @@
             'abc':'土建'
         }
     },
-
      ProjectCollection: new(Backbone.Collection.extend({
          model: Backbone.Model.extend({
              defaults: function() {

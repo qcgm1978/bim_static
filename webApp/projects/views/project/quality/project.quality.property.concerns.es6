@@ -64,7 +64,7 @@ App.Project.QualityConcerns=Backbone.View.extend({
 			zIndex: 8,
 			click: function($item) {
 				//	that.ConcernsOptions.status=$item.data("status");
-				that.changeHC('status', $item.data("status"))
+				that.changeHC('status', $item.data("val"))
 			}
 		});
 
@@ -81,7 +81,7 @@ App.Project.QualityConcerns=Backbone.View.extend({
 			zIndex:6,
 			click: function($item) {
 				//	that.ConcernsOptions.level=$item.data("status");
-				that.changeHC('level', $item.data("status"))
+				that.changeHC('level', $item.data("val"))
 			}
 		});
 		//类型
@@ -199,8 +199,21 @@ App.Project.QualityConcerns=Backbone.View.extend({
 	},
 
 	//在模型中显示
-	showInModel(){
-		App.Project.showInModel($(event.target).closest("tr"),2);  
+	showInModel(event){
+		var $target=$(event.target).closest("tr");
+		$.ajax({
+			url: "/platform/api/project/"+$target.data('code')+"/meta?token=123"
+		}).done(function(data){
+			var _fileId=$target.data('uuid').split('.')[0];
+			$.ajax({
+				url: "/doc/api/"+data.data.projectId+'/'+data.data.versionId+"?fileId="+_fileId
+			}).done(function(data){
+				if (data.code == 0) {
+					var  modelId = data.data.modelId;
+					App.Project.showInModel($target,3,modelId+$target.data('uuid').slice($target.data('uuid').indexOf('.')));
+				}
+			})
+		})
 	}
 
 

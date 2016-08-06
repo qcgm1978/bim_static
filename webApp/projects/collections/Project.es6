@@ -126,10 +126,10 @@ App.Project = {
 			'湿式报警阀室', '空调机房', '冷冻机房', '变配电室', '发电机房', '慧云机房', '电梯机房', '电梯底坑',
 			'吊顶', '地面', '中庭栏杆', '竖井'
 		],
-		concernsCategory: ['', '过程检查', '过程验收', '过程检查'],
+		concernsCategory: ['', '过程检查', '过程验收', '开业验收'],
 		concernsStatus: ['', '待整改', '已整改', '已关闭'],
 		concernsReporter: ['', '质监中心', '第三方', '项目公司', '监理单位'],
-		concernsLevel: ['', '特大', '重大', '较大', '一般'],
+		concernsLevel: ['', '一般', '较大', '重大', '特大'],
 		concernsType: ['', '防水工程', '施工质量', '安全文明', '材料设备'],
 		designSpecial: ['', '建筑', '结构', '设备', '电气', '景观', '内装及导视', '夜景照明'],
 		designCategory: ['', '安全类', '品质类', '功能类'],
@@ -1413,12 +1413,14 @@ App.Project = {
 		return JSON.stringify(_temp);
 	},
 	//在模型中显示
-	showInModel: function($target, type) {
-		var _this = this,key="",
+	showInModel: function($target, type,uuid) {
+		debugger
+		var _this = this,key="",componentId=uuid||$target.data('uuid'),
 			location = $target.data('location'),
 			color=$target.data('color'),
 			cat=$target.data('cat'),
 			floorSptys=_this.filterRule.floorSpty.split(',');
+
 		if ($target.hasClass("selected")) {
 			return
 		} else {
@@ -1426,9 +1428,9 @@ App.Project = {
 			$target.addClass("selected");
 		}
 		var _temp = location,
-			_secenId=_temp.componentId.split('.')[0];
-		box = _this.formatBBox(_temp.bBox || _temp.boundingBox);
-		ids = [_temp.userId || _temp.componentId];
+			_secenId=componentId.split('.')[0];
+		box = _this.formatBBox(_temp.boundingBox);
+		ids = [componentId];
 
 		//过滤所属楼层 start
 		var _floors=App.Project.Settings.Viewer.FloorsData;

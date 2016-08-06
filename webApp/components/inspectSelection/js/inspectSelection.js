@@ -34,19 +34,15 @@
 	strVar2 += "    <div class=\"searchOptons\">";
 	strVar2 += "        <div class=\"optonLine zIndex13\">";
 	strVar2 += "            <div class=\"optonLine\">";
-	strVar2 += "<div class=\"searchName\">";
-	strVar2 += "                <span>楼层：<\/span>";
-	strVar2 += "                <input type=\"text\" class=\"txtSearchName txtLocationName filterInputExtra\" placeholder=\"请输入关键字\"/>";
-	strVar2 += "            <\/div>";
-	strVar2 += "            <br>";
 	strVar2 += "                <div class=\"myDropDown categoryOption optionComm\">";
-	strVar2 += "                    <span class=\"myDropText\">";
-	strVar2 += "                        <% if(ruleType){ %>";
-	strVar2 += "                        	<span>类别：<\/span> <span class=\"text\"><%=userData[ruleType]%><\/span> <i class=\"myDropArrorw\"><\/i> <\/span>";
+	strVar2 += "                    <% if(ruleType) {%>";
+	strVar2 += "                        <span class=\"myDropText\">";
+	strVar2 += "                        <span>类别：<\/span> <span class=\"text\"><%=userData[ruleType]%><\/span> <i class=\"myDropArrorw\"><\/i> <\/span>";
 	strVar2 += "                        <ul class=\"myDropList\">";
 	strVar2 += "                            <li class=\"myItem\" data-val='<%=ruleType%>'><%=userData[ruleType]%><\/li>";
 	strVar2 += "                        <\/ul>";
-	strVar2 += "                        <% }else{%>";
+	strVar2 += "                    <% }else{%>";
+	strVar2 += "                         <span class=\"myDropText\">";
 	strVar2 += "                        <span>类别：<\/span> <span class=\"text\">全部<\/span> <i class=\"myDropArrorw\"><\/i> <\/span>";
 	strVar2 += "                        <ul class=\"myDropList\">";
 	strVar2 += "                            <li class=\"myItem\" data-val=''>全部<\/li>";
@@ -54,7 +50,7 @@
 	strVar2 += "                            <li class=\"myItem\" data-val='<%=index%>'><%=item%><\/li>";
 	strVar2 += "                            <% } }) %>";
 	strVar2 += "                        <\/ul>";
-	strVar2 += "                        <% } %>";
+	strVar2 += "                    <% } %>";
 	strVar2 += "                    <\/div>";
 	strVar2 += "                <\/div>";
 	strVar2 += "                <div class=\"optonLine\">";
@@ -69,6 +65,24 @@
 	strVar2 += "                        <\/div>";
 	strVar2 += "                    <\/div>";
 	strVar2 += "                <\/div>";
+	strVar2 += "        <div class=\"optonLine\">";
+	strVar2 += "            <div class=\"myDropDown floorOption optionComm\">";
+	strVar2 += "                <span class=\"myDropText\">";
+	strVar2 += "             <span>楼层：<\/span> <span class=\"text\">全部<\/span> <i class=\"myDropArrorw\"><\/i> <\/span>";
+	strVar2 += "                <ul class=\"myDropList\">";
+	strVar2 += "                    <li class=\"myItem\" data-val=''>全部<\/li>";
+	strVar2 += "                    <% _.each(floorsData,function(item,index){%>";
+	strVar2 += "                    <li class=\"myItem\" data-val='<%=item.code%>'><%=item.code%><\/li>";
+	strVar2 += "                    <% }) %>";
+	strVar2 += "                <\/ul>";
+	strVar2 += "            <\/div>";
+	strVar2 += "        <\/div>";
+	strVar2 += "        <div class=\"optonLine\">";
+	strVar2 += "        <div class=\"searchName\">";
+	strVar2 += "            <span>位置：<\/span>";
+	strVar2 += "            <input type=\"text\" class=\"txtSearchName txtLocationName filterInputExtra\" placeholder=\"请输入关键字\"/>";
+	strVar2 += "        <\/div>";
+	strVar2 += "        <\/div>";
 	strVar2 += "                <div class=\"optonLine btnOption\">";
 	strVar2 += "                    <input type=\"button\" class=\"myBtn myBtn-primary btnFilter\" value=\"筛选\" />";
 	strVar2 += "                <\/div>";
@@ -291,7 +305,6 @@
 				self.ieDialogEvent();
 				return;
 			}
-			Project.loadPropertyPanel();
 			setTimeout(function() {
 				self.renderModel();
 			}, 10);
@@ -369,10 +382,10 @@
 				projectVersionId: this.Settings.projectVersionId
 			})
 			Project.Viewer = this.viewer;
+			this.viewer.on("loaded",function(){
+				Project.loadPropertyPanel();
+			});
 			$('.m-camera').addClass('disabled').attr('disabled', 'disabled');
-			//	setInterval(function(){
-			//	 Project.checkOnlyCloseWindow();
-			//	},3000);
 		}
 	}
 
@@ -436,30 +449,6 @@
 				id = $target.data('id'),
 				_temp = null,
 				location = null;
-
-
-			/*//过滤所属楼层 start
-			var _Viewer=Project.Viewer;
-			var _floors=_Viewer.FloorsData;
-			_.find(_floors,function(item){
-				key=item.floor;
-				return _.contains(item.fileEtags,_secenId);
-			})
-			var  _files=_Viewer.FloorFilesData;
-			if(_this.filterRule.sceneId.indexOf(cat)!=-1){
-				var _hideFileIds=_.filter(_files,function(i){
-					return i!=_secenId;
-				})
-				_Viewer.fileFilter({
-					ids:[_hideFileIds],
-					total:[_secenId],
-					type:"sceneId"
-				});
-			}else{
-				_this.linkSilder('floors',key);
-				_Viewer.bottom();
-			}*/
-			//过滤所属楼层 end
 			_.each(Project.currentPageListData, function(i) {
 				if (i.id == id) {
 					_temp = i.location;
@@ -658,11 +647,11 @@
 
 		//渲染
 		render: function(options) {
-
 			this.OpeningAcceptanceOptions = options.OpeningAcceptance;
 
 			var tpl = _.template(strVar2);
 			this.$el.html(tpl({
+				floorsData:Project.Viewer.FloorsData,
 				userData: Project.Settings.type == 'open' ? mapData.openCategory : mapData.processCategory,
 				ruleType: Project.Settings.ruleType
 			}));
@@ -686,14 +675,20 @@
 			this.$(".riskOption").myDropDown({
 				zIndex: 11,
 				click: function($item) {
-					that.changeOA('problemCount', $item.data("status"));
+					that.changeOA('problemCount', $item.data("val"));
 				}
 			});
 			//类型
 			this.$(".categoryOption").myDropDown({
 				zIndex: 12,
 				click: function($item) {
-					that.changeOA('category', $item.attr('data-val'))
+					that.changeOA('category', $item.data("val"))
+				}
+			});
+
+			this.$(".floorOption").myDropDown({
+				click: function($item) {
+					that.changeOA('floor', $item.data("val"))
 				}
 			});
 
@@ -701,7 +696,7 @@
 			this.$(".specialitiesOption").myDropDown({
 				zIndex: 13,
 				click: function($item) {
-					that.changeOA('specialty', $item.attr('data-val'))
+					that.changeOA('specialty',$item.data("val"))
 				}
 			});
 

@@ -21,7 +21,7 @@
                         <span>类别：</span> <span class="text">全部</span> <i class="myDropArrorw"></i> </span>
                         <ul class="myDropList">
                             <li class="myItem" data-val=''>全部</li>
-                            <% _.each(App.Project.mapData.openCategory,function(item,index){ if(index!=0){%>
+                            <% _.each(userData,function(item,index){ if(index!=0){%>
                             <li class="myItem" data-val='<%=index%>'><%=item%></li>
                             <% } }) %>
                         </ul>
@@ -40,6 +40,24 @@
                         </div>
                     </div>
                 </div>
+        <div class="optonLine">
+            <div class="myDropDown floorOption optionComm">
+                <span class="myDropText">
+             <span>楼层：</span> <span class="text">全部</span> <i class="myDropArrorw"></i> </span>
+                <ul class="myDropList">
+                    <li class="myItem" data-val=''>全部</li>
+                    <% _.each(App.Project.Settings.Viewer.FloorsData,function(item,index){%>
+                    <li class="myItem" data-val='<%=item.code%>'><%=item.code%></li>
+                    <% }) %>
+                </ul>
+            </div>
+        </div>
+        <div class="optonLine">
+        <div class="searchName">
+            <span>位置：</span>
+            <input type="text" class="txtSearchName txtLocationName filterInputExtra" placeholder="请输入关键字"/>
+        </div>
+        </div>
                 <div class="optonLine btnOption">
                     <input type="button" class="myBtn myBtn-primary btnFilter" value="筛选" />
                 </div>
