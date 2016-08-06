@@ -6,21 +6,21 @@
 (function(win) {
 
 	var strVar1 = "";
-    strVar1 += "<% $.each(data.items,function(i,item){%> ";
-    strVar1 += "    <tr class=\"<%= i%2==0 && 'odd' %>\"  data-id=\"<%=item.id%>\" data-location='<%= item.location?JSON.stringify(item.location):\"\"%>'>";
-    strVar1 += "        <td class=\"manifestIcon\"><i class=\"myIcon-inventory\"><\/i><\/td>";
-    strVar1 += "        <td class=\"category\"><%=item.catetoryName%><\/td>";
-    strVar1 += "        <td class=\"positon\"><%=item.locationName%><\/td>";
-    strVar1 += "        <td class=\"ckResult\">";
-    strVar1 += "         <i data-id=\"<%= item.acceptanceId %>\"  data-total=\"<%=item.problemCount%>\" class=\"resultStatusIcon  <%= item.colorStatus == 0 ?'myIcon-circle-green':'myIcon-circle-red'%> \"><\/i>";
-    strVar1 += "             <%=item.problemCount%>/<%=item.checkCount%><\/td>";
-    strVar1 += "    <\/tr>";
-    strVar1 += "<% }) %> ";
-    strVar1 += "<% if(data.items.length<=0){%>";
-    strVar1 += "    <tr>";
-    strVar1 += "        <td colspan=\"9\" class=\"noDataTd\">暂无数据<\/td>";
-    strVar1 += "    <\/tr>";
-    strVar1 += "<%}%>";
+	strVar1 += "<% $.each(data.items,function(i,item){%> ";
+	strVar1 += "    <tr class=\"<%= i%2==0 && 'odd' %>\"  data-id=\"<%=item.id%>\" data-location='<%= item.location?JSON.stringify(item.location):\"\"%>'>";
+	strVar1 += "        <td class=\"manifestIcon\"><i class=\"myIcon-inventory\"><\/i><\/td>";
+	strVar1 += "        <td class=\"category\"><%=item.catetoryName%><\/td>";
+	strVar1 += "        <td class=\"positon\"><%=item.locationName%><\/td>";
+	strVar1 += "        <td class=\"ckResult\">";
+	strVar1 += "         <i data-id=\"<%= item.acceptanceId %>\"  data-total=\"<%=item.problemCount%>\" class=\"resultStatusIcon  <%= item.colorStatus == 0 ?'myIcon-circle-green':'myIcon-circle-red'%> \"><\/i>";
+	strVar1 += "             <%=item.problemCount%>/<%=item.checkCount%><\/td>";
+	strVar1 += "    <\/tr>";
+	strVar1 += "<% }) %> ";
+	strVar1 += "<% if(data.items.length<=0){%>";
+	strVar1 += "    <tr>";
+	strVar1 += "        <td colspan=\"9\" class=\"noDataTd\">暂无数据<\/td>";
+	strVar1 += "    <\/tr>";
+	strVar1 += "<%}%>";
 
 	var strVar2 = "";
 	strVar2 += "<div class=\"hedaerSearch\">";
@@ -113,15 +113,17 @@
 		}
 	}
 
-	var mapData={
-		processCategory:['','工程桩','基坑支护','地下防水','梁柱节点','钢结构悬挑构件','幕墙','外保温',
-			'采光顶','步行街吊顶风口','卫生间防水','屋面防水','屋面虹吸雨排','消防泵房','给水泵房',
-			'湿式报警阀室','空调机房','冷冻机房','变配电室','发电机房','慧云机房','电梯机房','电梯底坑',
-			'吊顶','地面','中庭栏杆','竖井'],
-		openCategory:['','幕墙',
-			'采光顶','步行街吊顶风口','卫生间防水','屋面防水','屋面虹吸雨排','消防泵房','给水泵房',
-			'湿式报警阀室','空调机房','冷冻机房','变配电室','发电机房','慧云机房','电梯机房','电梯底坑',
-			'吊顶','地面','中庭栏杆','竖井']
+	var mapData = {
+		processCategory: ['', '工程桩', '基坑支护', '地下防水', '梁柱节点', '钢结构悬挑构件', '幕墙', '外保温',
+			'采光顶', '步行街吊顶风口', '卫生间防水', '屋面防水', '屋面虹吸雨排', '消防泵房', '给水泵房',
+			'湿式报警阀室', '空调机房', '冷冻机房', '变配电室', '发电机房', '慧云机房', '电梯机房', '电梯底坑',
+			'吊顶', '地面', '中庭栏杆', '竖井'
+		],
+		openCategory: ['', '幕墙',
+			'采光顶', '步行街吊顶风口', '卫生间防水', '屋面防水', '屋面虹吸雨排', '消防泵房', '给水泵房',
+			'湿式报警阀室', '空调机房', '冷冻机房', '变配电室', '发电机房', '慧云机房', '电梯机房', '电梯底坑',
+			'吊顶', '地面', '中庭栏杆', '竖井'
+		]
 	}
 
 	win.App = win.App || {};
@@ -139,41 +141,41 @@
 	//模态框模型选择器对象
 	var InspectModelSelection = function(options) {
 
-		var _this=this;
+		var _this = this;
 		//强制new
 		if (!(this instanceof InspectModelSelection)) {
 			return new InspectModelSelection(options);
 		}
 
 		var defaults = {
-			btnText: '确&nbsp;&nbsp;定'
-		}
-		//合并参数
+				btnText: '确&nbsp;&nbsp;定'
+			}
+			//合并参数
 		this.Settings = $.extend(defaults, options);
-		if(this.Settings.etag){
+		if (this.Settings.etag) {
 			Project.Settings = _this.Settings;
-			_this.Project=Project;
+			_this.Project = Project;
 			_this.init();
-		}else{
+		} else {
 			$.ajax({
-		      url: ourl+"/platform/api/project/"+this.Settings.projectCode+"/meta?token=123"
-		    }).done(function(data){
-		    	if(data.code==0){
-		    		$.ajax({
-				      url: ourl+"/view/"+data.data.projectId+"/"+data.data.versionId+"/init?token=123"
-				    }).done(function(data){
-				    	if(data.code==0){
-				    		_this.Settings=$.extend({},_this.Settings,data.data);
-				    		Project.Settings = _this.Settings;
-							_this.Project=Project;
+				url: ourl + "/platform/api/project/" + this.Settings.projectCode + "/meta?token=123"
+			}).done(function(data) {
+				if (data.code == 0) {
+					$.ajax({
+						url: ourl + "/view/" + data.data.projectId + "/" + data.data.versionId + "/init?token=123"
+					}).done(function(data) {
+						if (data.code == 0) {
+							_this.Settings = $.extend({}, _this.Settings, data.data);
+							Project.Settings = _this.Settings;
+							_this.Project = Project;
 							_this.init();
-				    	}else if(data.code==10004){
-				    	//	document.location.href=ourl+"/login.html";
-				    	}
-				    	
-				    })
-		    	}
-		    })
+						} else if (data.code == 10004) {
+							//	document.location.href=ourl+"/login.html";
+						}
+
+					})
+				}
+			})
 		}
 	}
 	InspectModelSelection.prototype = {
@@ -224,7 +226,7 @@
 						if (i.id == t.data('id')) {
 							result = {
 								id: i.id,
-								fileUniqueId: i.fileId+i.componentId.slice(i.componentId.indexOf('.')),
+								fileUniqueId: i.fileId + i.componentId.slice(i.componentId.indexOf('.')),
 								locationName: i.locationName,
 								location: i.location,
 								axis: i.axis
@@ -313,7 +315,7 @@
 					var result = {},
 						setting = self.Settings;
 					if (val) {
-						val=JSON.parse(val)
+						val = JSON.parse(val)
 						if (setting.callback && setting.callback.call(this, val) !== false) {
 							self.$dialog.remove();
 							self.$dialog = null;
@@ -341,18 +343,23 @@
 			viewport.appendChild(WebView);
 
 			function resizeWebView() {
-				WebView.width = viewport.offsetWidth;
-				WebView.height = viewport.offsetHeight;
+				//重置
+				WebView.zoomFactor = window.devicePixelRatio; 
 			}
-			resizeWebView();
-			WebView.url = ourl + "/static/dist/components/inspectSelection/model.html?type="+this.Settings.type+"&sourceId="+this.Settings.sourceId+"&etag="+
-			this.Settings.etag+"&projectId="+ this.Settings.projectId+"&projectVersionId="+this.Settings.projectVersionId+"&ruleType="+this.Settings.ruleType;
+
+			WebView.url = ourl + "/static/dist/components/inspectSelection/model.html?type=" + this.Settings.type + "&sourceId=" + this.Settings.sourceId + "&etag=" +
+				this.Settings.etag + "&projectId=" + this.Settings.projectId + "&projectVersionId=" + this.Settings.projectVersionId + "&ruleType=" + this.Settings.ruleType;
 			WebView.height = "510px";
 			WebView.width = "960px";
+
+			//窗体变化
+			resizeWebView();
+			WebView.zoomFactor = window.devicePixelRatio;
+			window.onresize = resizeWebView;
 			//window.addEventListener('resize', resizeWebView, false);
 		},
 		renderModel: function() {
-		//	Project.setOnlyModel();//检查是否是唯一的 模型
+			//	Project.setOnlyModel();//检查是否是唯一的 模型
 			this.viewer = new bimView({
 				type: 'model',
 				element: this.$modelView,
@@ -363,9 +370,9 @@
 			})
 			Project.Viewer = this.viewer;
 			$('.m-camera').addClass('disabled').attr('disabled', 'disabled');
-		//	setInterval(function(){
-		//	 Project.checkOnlyCloseWindow();
-		//	},3000);
+			//	setInterval(function(){
+			//	 Project.checkOnlyCloseWindow();
+			//	},3000);
 		}
 	}
 
@@ -374,38 +381,38 @@
 		type: "open",
 		Settings: {},
 		currentPageListData: null,
-		currentInspectId:null,
+		currentInspectId: null,
 		templateCache: [],
-		filterRule:{
-			sceneId:'工程桩,基坑支护,地下防水,钢结构悬挑构件,幕墙,采光顶'
+		filterRule: {
+			sceneId: '工程桩,基坑支护,地下防水,钢结构悬挑构件,幕墙,采光顶'
 		},
 		//计划状态
-		planStatus:{
-			0:'',
-			1:'myIcon-circle-red',
-			2:'myIcon-circle-yellow',
-			3:'myIcon-circle-green'
+		planStatus: {
+			0: '',
+			1: 'myIcon-circle-red',
+			2: 'myIcon-circle-yellow',
+			3: 'myIcon-circle-green'
 		},
-		linkSilder:function(type,key){
-			if(!key){
+		linkSilder: function(type, key) {
+			if (!key) {
 				return
 			}
-			var $check=$('.modelSidebar #'+type+' ul input'),
-				$treeText=$('.modelSidebar #'+type+' ul .treeText');
-			$check.each(function(){
-				if($(this).is(':checked') && $(this).closest('.itemContent').find('.treeText').text()!=key){
+			var $check = $('.modelSidebar #' + type + ' ul input'),
+				$treeText = $('.modelSidebar #' + type + ' ul .treeText');
+			$check.each(function() {
+				if ($(this).is(':checked') && $(this).closest('.itemContent').find('.treeText').text() != key) {
 					$(this).trigger('click');
 				}
 			})
-			$treeText.each(function(){
-				var _=$(this).parent().find('input');
-				if($(this).text()==key && !_.is(':checked')){
+			$treeText.each(function() {
+				var _ = $(this).parent().find('input');
+				if ($(this).text() == key && !_.is(':checked')) {
 					_.trigger('click');
 				}
 			})
 		},
 		//分页信息
-		pageInfo:function(data) {
+		pageInfo: function(data) {
 			var $el = $('.modelSelectDialog');
 			data = data.toJSON()[0].data;
 			$el.find(".paginationBottom .sumCount .count").text(data.totalItemCount);
@@ -427,8 +434,8 @@
 		showInModel: function($target, type) {
 			var _this = this,
 				id = $target.data('id'),
-				_temp=null,
-				location=null;
+				_temp = null,
+				location = null;
 
 
 			/*//过滤所属楼层 start
@@ -454,13 +461,13 @@
 			}*/
 			//过滤所属楼层 end
 			_.each(Project.currentPageListData, function(i) {
-				if(i.id==id){
-					_temp=i.location;
-					location=i.location;
+				if (i.id == id) {
+					_temp = i.location;
+					location = i.location;
 				}
 			})
-			if(_temp){
-				_temp=JSON.parse(_temp);
+			if (_temp) {
+				_temp = JSON.parse(_temp);
 				var box = _this.formatBBox(_temp.bBox || _temp.boundingBox);
 				var ids = [_temp.componentId];
 				_this.zoomModel(ids, box);
@@ -478,11 +485,11 @@
 			Project.Viewer && Project.Viewer.loadMarkers(null);
 		},
 
-		formatMark:function(location){
-			var _temp=JSON.parse(location);
-			_temp.shapeType=_temp.shapeType||1;
-			_temp.state=_temp.state||3;
-			_temp.userId=_temp.userId||_temp.componentId;
+		formatMark: function(location) {
+			var _temp = JSON.parse(location);
+			_temp.shapeType = _temp.shapeType || 1;
+			_temp.state = _temp.state || 3;
+			_temp.userId = _temp.userId || _temp.componentId;
 			return JSON.stringify(_temp);
 		},
 		//通过userid 和 boundingbox 定位模型
@@ -529,13 +536,13 @@
 
 		loadPropertyPanel: function() {
 			$('.qualityContainer').append(new QualityOpeningAcceptance().render({
-				OpeningAcceptance:{
+				OpeningAcceptance: {
 					specialty: "", //专业
-					category:Project.Settings.ruleType||'', //类别
+					category: Project.Settings.ruleType || '', //类别
 					problemCount: "", // 无隐患 1， 有隐患
 					pageIndex: 1, //第几页，默认第一页
-					pageItemCount: 10,//页大小
-					token:123
+					pageItemCount: 10, //页大小
+					token: 123
 				}
 			}).el);
 			this.loadData();
@@ -548,11 +555,11 @@
 			OpeningAcceptanceCollection.fetch({
 				data: $.extend({}, {
 					specialty: "", //专业
-					category:Project.Settings.ruleType||'', //类别
+					category: Project.Settings.ruleType || '', //类别
 					problemCount: "", // 无隐患 1， 有隐患
-					pageIndex: page||1, //第几页，默认第一页
-					pageItemCount: 10,//页大小
-					token:123
+					pageIndex: page || 1, //第几页，默认第一页
+					pageItemCount: 10, //页大小
+					token: 123
 				}, data),
 				success: function(data) {
 					Project.pageInfo(data);
@@ -656,8 +663,8 @@
 
 			var tpl = _.template(strVar2);
 			this.$el.html(tpl({
-				userData:Project.Settings.type=='open'?mapData.openCategory:mapData.processCategory,
-				ruleType:Project.Settings.ruleType
+				userData: Project.Settings.type == 'open' ? mapData.openCategory : mapData.processCategory,
+				ruleType: Project.Settings.ruleType
 			}));
 			this.bindEvent();
 			return this;
@@ -672,10 +679,10 @@
 		bindEvent: function() {
 
 			var that = this;
-			this.$('.txtLocationName').change(function(){
-				that.changeOA('locationName', $(this).val())
-			})
-			//隐患
+			this.$('.txtLocationName').change(function() {
+					that.changeOA('locationName', $(this).val())
+				})
+				//隐患
 			this.$(".riskOption").myDropDown({
 				zIndex: 11,
 				click: function($item) {
@@ -736,7 +743,7 @@
 			Project.loadData(null);
 		},
 
-	//	template: Project.templateUrl("/components/inspectSelection/tpls/project.quality.property.openingAcceptance.body.html"),
+		//	template: Project.templateUrl("/components/inspectSelection/tpls/project.quality.property.openingAcceptance.body.html"),
 		template: _.template(strVar1),
 
 		//获取数据后处理
@@ -749,7 +756,7 @@
 		//选择检查点
 		selectInspect: function(e) {
 			var $target = $(e.currentTarget);
-			Project.currentInspectId=$target.data('id');
+			Project.currentInspectId = $target.data('id');
 			$target.parent().find('tr').removeClass('selected');
 			$target.addClass('selected');
 			Project.showInModel($target, 2);
