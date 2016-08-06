@@ -32,8 +32,7 @@ var AppRoute = Backbone.Router.extend({
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".bodyConMenu").addClass('selected');
 		_.require('/static/dist/bodyContent/bodyContent.css');
 		_.require('/static/dist/bodyContent/bodyContent.js');
-		App.BodyContent.control.init();
-		$("#pageLoading").hide();
+		App.BodyContent.control.init(); 
 	},
 
 	logout: function() {

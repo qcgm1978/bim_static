@@ -411,16 +411,18 @@
 						CommentApi.showComment($item);
 					} else {
 						//事件会重复冒泡 
-						if (!$item.data("isClick")) {
-							//阻止冒泡 之后 需要恢复 
-							$item.data("isClick", true);
-							$item.find(".linkImg").click();
-							//恢复
-							var timer = setTimeout(function() {
-								clearTimeout(timer);
-								$item.data("isClick", false);
-							}, 10);
-						}
+						// if (!$item.data("isClick")) {
+						// 	//阻止冒泡 之后 需要恢复 
+						// 	$item.data("isClick", true);
+						// 	$item.find(".linkImg").click();
+						// 	//恢复
+						// 	var timer = setTimeout(function() {
+						// 		clearTimeout(timer);
+						// 		$item.data("isClick", false);
+						// 	}, 10);
+						// }
+						$item.addClass("selected").siblings().removeClass("selected");
+						return;
 
 					}
 
@@ -706,16 +708,18 @@
 						CommentApi.showComment($item);
 					} else {
 						//事件会重复冒泡 
-						if (!$item.data("isClick")) {
-							//阻止冒泡 之后 需要恢复 
-							$item.data("isClick", true);
-							$item.find(".linkImg").click();
-							//恢复
-							var timer = setTimeout(function() {
-								clearTimeout(timer);
-								$item.data("isClick", false);
-							}, 10);
-						}
+						// if (!$item.data("isClick")) {
+						// 	//阻止冒泡 之后 需要恢复 
+						// 	$item.data("isClick", true);
+						// 	$item.find(".linkImg").click();
+						// 	//恢复
+						// 	var timer = setTimeout(function() {
+						// 		clearTimeout(timer);
+						// 		$item.data("isClick", false);
+						// 	}, 10);
+						// }
+						$item.addClass("selected").siblings().removeClass("selected");
+						return;
 					}
 
 				},
