@@ -208,9 +208,16 @@ App.Project.QualityConcerns=Backbone.View.extend({
 			$.ajax({
 				url: "/doc/api/"+data.data.projectId+'/'+data.data.versionId+"?fileId="+_fileId
 			}).done(function(data){
-				if (data.code == 0) {
+				if (data.code == 0 && data) {
 					var  modelId = data.data.modelId;
-					App.Project.showInModel($target,3,modelId+$target.data('uuid').slice($target.data('uuid').indexOf('.')));
+					var obj={
+						uuid:modelId+$target.data('uuid').slice($target.data('uuid').indexOf('.')),
+						location:{
+							boundingBox:$target.data('location').boundingBox,
+							position:$target.data('axis').position
+						}
+					}
+					App.Project.showInModel($target,3,obj);
 				}
 			})
 		})

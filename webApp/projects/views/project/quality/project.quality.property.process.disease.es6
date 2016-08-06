@@ -15,8 +15,8 @@ App.Project.ProcessDisease=Backbone.View.extend({
 
 	events:{
 		
-		'click .closeBtn':'closeView'
-	//	'click .diseaseItem':'linkModelComponent'
+		'click .closeBtn':'closeView',
+		'click .diseaseItem':'linkModelComponent'
 	
 	},
 
@@ -89,10 +89,29 @@ App.Project.ProcessDisease=Backbone.View.extend({
 	},
 
 	linkModelComponent(e){
-		var _$target=$(e.currentTarget),
-			id=_$target.attr('data-id'),
-			type=_$target.attr('data-type');
-		App.Project.showInModel(_$target,type);
+		var $target=$(e.currentTarget),
+			id=$target.attr('data-id'),
+			type=$target.attr('data-type');
+		$.ajax({
+			url: "/platform/api/project/"+$target.data('code')+"/meta?token=123"
+		}).done(function(data){
+			var _fileId=$target.data('uuid').split('.')[0];
+			$.ajax({
+				url: "/doc/api/"+data.data.projectId+'/'+data.data.versionId+"?fileId="+_fileId
+			}).done(function(data){
+				if (data.code == 0 && data) {
+					var  modelId = data.data.modelId;
+					var obj={
+						uuid:modelId+$target.data('uuid').slice($target.data('uuid').indexOf('.')),
+						location:{
+							boundingBox:$target.data('location').boundingBox,
+							position:$target.data('axis').position
+						}
+					}
+					App.Project.showInModel($target,3,obj);
+				}
+			})
+		})
 	}
 
 });

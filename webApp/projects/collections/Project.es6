@@ -1413,10 +1413,9 @@ App.Project = {
 		return JSON.stringify(_temp);
 	},
 	//在模型中显示
-	showInModel: function($target, type,uuid) {
-		debugger
-		var _this = this,key="",componentId=uuid||$target.data('uuid'),
-			location = $target.data('location'),
+	showInModel: function($target, type,paramObj) {
+		var _this = this,key="",componentId=paramObj?paramObj.uuid:$target.data('uuid'),
+			location = paramObj?paramObj.location:$target.data('location'),
 			color=$target.data('color'),
 			cat=$target.data('cat'),
 			floorSptys=_this.filterRule.floorSpty.split(',');
@@ -1441,8 +1440,8 @@ App.Project = {
 		var  _files=App.Project.Settings.Viewer.FloorFilesData,
 			_spFiles=App.Project.Settings.Viewer.SpecialtyFilesData;
 		//过滤所属楼层 end
-		if(_this.filterRule.file.indexOf(cat)!=-1||
-			_this.filterRule.floorPlus.indexOf(cat)!=-1){
+		if(cat && (_this.filterRule.file.indexOf(cat)!=-1||
+			_this.filterRule.floorPlus.indexOf(cat)!=-1)){
 			var _hideFileIds=_.filter(_files,function(i){
 				return i!=_secenId;
 			})
