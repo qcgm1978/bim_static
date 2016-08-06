@@ -28,6 +28,52 @@ App.Project = {
 		floor:'步行街吊顶风口,卫生间防水,外保温',
 		floorSpty:'步行街吊顶风口&暖通#内装,卫生间防水&暖通#内装'
 	},
+	sigleRule:function(cat){
+		var _this=this,
+			_v=App.Project.Settings.Viewer,
+			_spFiles=_v.SpecialtyFileObjData;
+		if(cat=='地下防水'){
+			var sp='结构',
+				show=[],
+				hide=[];
+			_.each(_spFiles,function(val,key){
+				if(sp==key){
+					_.each(val,function(item){
+						if(item.fileName.indexOf('B02')!=-1){
+							show=[item.fileEtag];
+						}else{
+							hide.push(item.fileEtag);
+						}
+					})
+				}else{
+					_.each(val,function(item){
+						hide.push(item.fileEtag);
+					})
+				}
+			})
+			App.Project.Settings.Viewer.fileFilter({
+				ids:hide,
+				total:show,
+				type:'sceneId'
+			});
+			App.Project.Settings.Viewer.filter({
+				ids:_this.filterCCode('10.20.20.09'),
+				type:"classCode"
+			});
+	//		this.linkSilder('floors','B02');
+		}
+	},
+	filterCCode:function(code){
+		var _class=App.Project.Settings.Viewer.ClassCodeData,
+			hide=[];
+
+		_.each(_class,function(item){
+			if(item.code.indexOf(code)!=0){
+				hide.push(item.code);
+			}
+		})
+		return hide;
+	},
 	//默认参数
 	Defaults: {
 		type: "user",
@@ -1368,6 +1414,7 @@ App.Project = {
 	},
 	//在模型中显示
 	showInModel: function($target, type) {
+		debugger
 		var _this = this,key="",
 			location = $target.data('location'),
 			color=$target.data('color'),
@@ -1402,6 +1449,7 @@ App.Project = {
 				ids:_hideFileIds,
 				total:[_secenId]
 			});
+			_this.sigleRule(cat);
 			if(_this.filterRule.floorPlus.indexOf(cat)!=-1){
 				App.Project.Settings.Viewer.filter({
 					ids:['10.20.20.03'],
@@ -1432,7 +1480,7 @@ App.Project = {
 			_this.linkSilder('floors',key);
 		}
 		var _loc = _this.formatMark(location,color);
-		App.Project.Settings.Viewer.top();
+		//App.Project.Settings.Viewer.top();
 		_this.zoomModel(ids, box);
 		_this.showMarks(_loc);
 
@@ -1447,7 +1495,7 @@ App.Project = {
 	//通过userid 和 boundingbox 定位模型
 	zoomModel: function(ids, box) {
 		//定位
-		App.Project.Settings.Viewer.zoomToBox(box);
+		App.Project.Settings.Viewer.setTopView(box);
 		//半透明
 		//App.Project.Settings.Viewer.translucent(true);
 		//高亮

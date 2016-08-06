@@ -391,6 +391,10 @@
       viewer.zoomToBBox(CLOUD.Utils.computeBBox(box), 0.05, 1.2);
       viewer.render();
     },
+    setTopView: function(box) {
+      var viewer = this.viewer;
+      viewer.setTopView(CLOUD.Utils.computeBBox(box));
+    },
     zoomToBuilding: function(margin,ratio) {
       // 缩放到指定位置
       var self = this;
