@@ -44,7 +44,7 @@ App.Views = {
 			var treeNode = _.templateUrl('/app/project/projectChange/tpls/treeNode.html');
 			var data = model.toJSON();
 			data.treeNode = treeNode;
-
+			console.log(data)
 			this.$el.html(treeRoot(data))
 
 			this.$(".itemContent:even").addClass("odd");

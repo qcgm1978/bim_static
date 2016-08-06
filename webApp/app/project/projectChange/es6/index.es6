@@ -417,7 +417,6 @@ App.Index = {
 			var list = data.data,
 				lists = [],
 				items;
-
 			//生成 二级 目录
 			$.each(list, function(i, item) {
 
@@ -504,7 +503,7 @@ App.Index = {
 			that = this;
 
 		App.Comm.ajax(data, function(data) {
-
+console.log(data)
 			if (data.code == 0) {
 				data = data.data;
 				//有数据
@@ -566,6 +565,30 @@ App.Index = {
 
 	//获取更改清单
 	fetchChangeList: function(baseFileVersionId, differFileVersionId) {
+		var self= this;
+		//获取构件差异对比列表
+		if(App.Index.Settings.comps){
+			this.show(differFileVersionId);
+		}else{
+			$.ajax({
+				url: "/view/"+App.Index.Settings.projectId+"/"+App.Index.Settings.projectVersionId+"/comparison?type=base"
+			}).done(function(data){
+				if(data.code == 0){
+					var datas=data.data,
+					    comparisons={};
+					for(var i=0;i<datas.length;i++){
+						var comps=datas[i]['comparisons'];
+						for(var j=0;j<comps.length;j++){
+							comparisons[comps[j]['currentVersion']]=comps[j]['comparisonId'];
+						}
+					}
+					App.Index.Settings.comps=comparisons;
+
+					self.show(differFileVersionId);
+				}
+			});
+		}
+
 
 		App.Collections.changeListCollection.projectId = App.Index.Settings.projectId;
 		App.Collections.changeListCollection.projectVersionId = App.Index.Settings.projectVersionId;
@@ -587,6 +610,45 @@ App.Index = {
 		$("#treeContainerBody").html(new App.Views.projectChangeListView().render().el);
 
 	},
+
+	//
+	show: function(differFileVersionId){
+		if(App.Index.Settings.comps[differFileVersionId]){
+			$.ajax({
+				url: "/sixD/"+App.Index.Settings.projectId+"/"+App.Index.Settings.projectVersionId+"/comparison/result?comparisonId="+App.Index.Settings.comps[differFileVersionId]
+			}).done(function(data){
+				if (data.code == 0 && data.data.length > 0){
+
+					var editbefore = [], editafter = [], add = [], remove = [];
+					for(var i = 0, obj; i < data.data.length; i++){
+						obj = data.data[i]['results'];
+						for(var j = 0; j < obj.length; j++){
+							if(obj[j]['changeType'] == 1){
+								add.push(obj[j]['currentElementId']);
+							}
+							else if(obj[j]['changeType'] == 2){
+								remove.push(obj[j]['baseElementId']);
+
+							}
+							else if(obj[j]['changeType'] == 8){
+								editafter.push(obj[j]['currentElementId']);
+								editbefore.push(obj[j]['baseElementId']);
+
+							}
+						}
+					}
+
+					App.Index.Settings.Viewer.setOverrider('beforeEdit', editbefore);
+					App.Index.Settings.Viewer.setOverrider('afterEdit', editafter);
+					App.Index.Settings.Viewer.setOverrider('add', add);
+					App.Index.Settings.Viewer.setOverrider('delete', remove);
+				}
+			});
+		}else{
+			console.log('nodatas')
+		}
+	},
+
 
 	//初始化 api
 	initApi(projectId, projectVersionId) {
