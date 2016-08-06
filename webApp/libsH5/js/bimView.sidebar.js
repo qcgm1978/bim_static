@@ -92,16 +92,19 @@
           sourceId:self._opt.sourceId
         },function(data){
           var data = data.data,
-              _temp={};
+              _temp={},_temp2={};
           $.each(data,function(i,item){
-            var _t=[];
+            var _t=[],_t2=[];
             $.each(item.files,function(j,file){
               self.fileData[file.fileEtag] = item.specialty;
-              _t.push(file.fileEtag)
+              _t.push(file.fileEtag);
+              _t2.push(file);
             })
             _temp[item.specialty]=_t;
+            _temp2[item.specialty]=_t2;
           })
           bimView.prototype.SpecialtyFilesData=_temp;
+          bimView.prototype.SpecialtyFileObjData=_temp2;
           var specialties = bimView.comm.viewTree({
             arr:data,
             type:'sceneId',
@@ -141,6 +144,7 @@
             type:'classCode',
             rootName:'分类编码'
           });
+          bimView.prototype.ClassCodeData= data.data;
           $('#classCode').append(classCode);
         });
       }

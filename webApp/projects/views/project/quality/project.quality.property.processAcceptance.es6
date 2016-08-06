@@ -59,7 +59,7 @@ App.Project.QualityProcessAcceptance = Backbone.View.extend({
 		this.$(".riskOption").myDropDown({
 			click: function($item) {
 			//	that.ProcessAcceptanceOptions.problemCount = $item.data("status");
-				that.changePA('problemCount', $item.data("status"))
+				that.changePA('problemCount', $item.data("val"))
 			}
 		});
 		//列别

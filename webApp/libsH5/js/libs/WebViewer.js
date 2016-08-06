@@ -18014,7 +18014,7 @@ CLOUD.EditorManager.prototype = {
 
         } else {
 
-            var box = this.getScene().worldBoundingBox();
+            var box = viewer.getScene().worldBoundingBox();
             var target = camera.setStandardView(stdView, box); // 设置观察视图
 
             // fit all
@@ -18024,6 +18024,25 @@ CLOUD.EditorManager.prototype = {
 
             camera.up.copy(THREE.Object3D.DefaultUp);// 渲染完成后才可以恢复相机up方向
         }
+    },
+
+    setTopView: function (viewer, box, margin, ratio) {
+
+        var camera = viewer.camera;
+        var worldBox = viewer.getScene().worldBoundingBox();
+        var target = camera.setStandardView(CLOUD.EnumStandardView.Top, worldBox); // 设置观察视图
+
+        if (box) {
+            // fit all
+            target = camera.zoomToBBox(box, margin, ratio);
+        } else {
+            target = camera.zoomToBBox(worldBox, margin, ratio);
+        }
+
+        viewer.cameraEditor.updateCamera(target);
+        viewer.render();
+
+        camera.up.copy(THREE.Object3D.DefaultUp);// 渲染完成后才可以恢复相机up方向
     }
 };
 
@@ -18564,6 +18583,16 @@ CloudViewer.prototype = {
     setStandardView: function (stdView, margin) {
         margin = margin || -0.05;
         this.editorManager.setStandardView(stdView, this, margin);
+    },
+
+    setTopView: function (box, margin, ratio) {
+        margin = margin || -0.05;
+
+        if (box) {
+            box.applyMatrix4(this.getScene().rootNode.matrix);
+        }
+
+        this.editorManager.setTopView(this, box, margin, ratio);
     },
 
     lookAt: function (position, target, up) {
