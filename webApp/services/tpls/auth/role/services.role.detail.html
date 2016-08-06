@@ -1,7 +1,6 @@
-
-    <div class="roleEdit">
+     <div class="roleEdit">
         <span  class="explorer">查看</span>
-        <% if (obj.roleId !== 999999) {%>
+        <% if (obj.editable) {%>
         <span  class="modify">修改</span>
         <span  class="delete">删除</span>
         <% } %>

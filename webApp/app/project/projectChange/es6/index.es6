@@ -622,7 +622,7 @@ App.Index = {
 
 	},
 
-	init() {
+	init() { 
 
 		if (App.Comm.isIEModel()) {
 			return;

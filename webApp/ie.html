@@ -5,25 +5,32 @@
     <meta charset="UTF-8">
     <title>BIM总发包管理平台</title>
     <style type="text/css">
-        #newVersion{
-            position: fixed;
-            top:0px;
-            left:0px;
-            font-size: 50px;color:red;
-            z-index: 9999;
-            background-color: #000;
-        }
+    #newVersion {
+        position: fixed;
+        top: 0px;
+        left: 0px;
+        font-size: 50px;
+        color: red;
+        z-index: 9999;
+        background-color: #000;
+    }
     </style>
 </head>
 
 <body style="margin: 0;padding: 0;overflow: hidden;" onunload="unLoadEvent()">
     <!-- <object ID="WebView" style="width: 100%;" CLASSID="CLSID:15A5F85D-A81B-45D1-A03A-6DBC69C891D1">
-		<PARAM NAME="url" VALUE="" />
-			</object> -->
+        <PARAM NAME="url" VALUE="" />
+            </object> -->
     <script src="libs/jquery/jquery-1.12.0.min.js"></script>
     <script type="text/javascript">
     try {
-        var myWebView = document.createElement("object"),currentVersion=1;
+
+        if (!window.devicePixelRatio) {
+           window.devicePixelRatio=1;
+        } 
+
+        var myWebView = document.createElement("object"),
+            currentVersion = 2;
 
         myWebView.classid = "CLSID:15A5F85D-A81B-45D1-A03A-6DBC69C891D1";
 
@@ -31,8 +38,9 @@
             cookUrl = getCookie("path");
         viewport.appendChild(myWebView);
 
-        // if (myWebView.pluginVersion!=currentVersion) { 
-        // }
+        if (myWebView.pluginVersion != currentVersion) { 
+            throw new error("version is old");
+        }
         var url = cookUrl && cookUrl.lastIndexOf("/file/data") <= -1 && (new Date() - getCookie("pathDate")) / 1000 <= 2 &&
             cookUrl.lastIndexOf("about:blank") <= -1 && cookUrl ||
             window.location.href.substring(window.location.href.lastIndexOf("path") + 5) ||
@@ -48,8 +56,8 @@
                 window.opener = null;
                 window.open("", "_self");
                 window.close();
-            }            
-           
+            }
+
 
             //登录后设置 cookie
             myWebView.runScript("App.Comm.getCookAndStore()", function(cookStore) {
@@ -107,17 +115,20 @@
 
         window.onresize = resizeWebView;
 
-        delCookie("path");    
+        delCookie("path");
 
-        myWebView.zoomFactor=window.devicePixelRatio; 
+        myWebView.zoomFactor = window.devicePixelRatio;
 
     } catch (e) {
-         
-        if (!isIE()) {
-        	var html=templateUrl("/app/oPage/tipIE.html");
+
+        if (myWebView.pluginVersion != currentVersion) {
+            var html = templateUrl("/app/oPage/downloadIE.html");
+            $("body").html(html); 
+        }else if (!isIE()) {
+            var html = templateUrl("/app/oPage/tipIE.html");
             $("body").html(html);
-        }else{
-        	var html=templateUrl("/app/oPage/downloadIE.html");
+        } else {
+            var html = templateUrl("/app/oPage/downloadIE.html");
             $("body").html(html);
         }
     }
@@ -125,13 +136,13 @@
 
     function templateUrl(url) {
 
-    	var result;
+        var result;
         $.ajax({
-            url: "/static/dist"+url,
+            url: "/static/dist" + url,
             type: 'GET',
             async: false
-        }).done(function(tpl) { 
-                result = tpl;  
+        }).done(function(tpl) {
+            result = tpl;
         });
 
         return result;
@@ -156,10 +167,10 @@
     }
 
     function resizeWebView() {
-         myWebView.zoomFactor=window.devicePixelRatio; 
+        myWebView.zoomFactor = window.devicePixelRatio;
         //重置
-       	myWebView.width = 0;
-        myWebView.height =0;
+        myWebView.width = 0;
+        myWebView.height = 0;
         var $body = $(document);
         myWebView.width = $body.width();
         myWebView.height = $body.height();
