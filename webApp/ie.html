@@ -17,17 +17,17 @@
     </style>
 </head>
 
-<body style="margin: 0;padding: 0;overflow: hidden;" onunload="unLoadEvent()">
+<body style="margin: 0;padding: 0;overflow: hidden;" onunload="unLoadEvent()" >
     <!-- <object ID="WebView" style="width: 100%;" CLASSID="CLSID:15A5F85D-A81B-45D1-A03A-6DBC69C891D1">
         <PARAM NAME="url" VALUE="" />
             </object> -->
     <script src="libs/jquery/jquery-1.12.0.min.js"></script>
     <script type="text/javascript">
-    try {
 
-        if (!window.devicePixelRatio) {
-           window.devicePixelRatio=1;
-        } 
+     
+
+    var hasDevicePixelRatio=true;
+    try { 
 
         var myWebView = document.createElement("object"),
             currentVersion = 2;
@@ -89,18 +89,7 @@
                     }
                 }
 
-            });
-
-            //延迟执行 需要加载js
-            // var timer=setTimeout(function(){
-            //     clearTimeout(timer);
-            //      //set disableAntialias
-            //     if (myWebView.url.indexOf("login.html")<=-1) {
-            //         myWebView.runScript("CLOUD.GlobalData.disableAntialias=true",function(a){   })
-            //     }
-            // },2000);
-
-            //myWebView
+            }); 
         });
 
         //文件下载
@@ -109,15 +98,14 @@
         });
 
 
-        myWebView.height = document.body.parentElement.clientHeight + "px";
-
-        resizeWebView();
+        myWebView.height = document.body.parentElement.clientHeight + "px"; 
+       
 
         window.onresize = resizeWebView;
 
-        delCookie("path");
+        delCookie("path"); 
 
-        myWebView.zoomFactor = window.devicePixelRatio;
+         resizeWebView(); 
 
     } catch (e) {
 
@@ -167,13 +155,19 @@
     }
 
     function resizeWebView() {
-        myWebView.zoomFactor = window.devicePixelRatio;
+       
         //重置
         myWebView.width = 0;
         myWebView.height = 0;
         var $body = $(document);
         myWebView.width = $body.width();
         myWebView.height = $body.height();
+
+        if (!window.devicePixelRatio) {
+              myWebView.zoomFactor=screen.deviceXDPI / screen.logicalXDPI;
+        }else{
+             myWebView.zoomFactor = window.devicePixelRatio;
+        }
     }
 
 
