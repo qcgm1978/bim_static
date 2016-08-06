@@ -357,7 +357,11 @@
 
 			function resizeWebView() {
 				//重置
-				WebView.zoomFactor = window.devicePixelRatio; 
+				if (window.devicePixelRatio) {
+					WebView.zoomFactor = window.devicePixelRatio;
+				} else {
+					WebView.zoomFactor = screen.deviceXDPI / screen.logicalXDPI;
+				}
 			}
 
 			WebView.url = ourl + "/static/dist/components/inspectSelection/model.html?type=" + this.Settings.type + "&sourceId=" + this.Settings.sourceId + "&etag=" +
@@ -366,10 +370,9 @@
 			WebView.width = "960px";
 
 			//窗体变化
-			resizeWebView();
-			WebView.zoomFactor = window.devicePixelRatio;
 			window.onresize = resizeWebView;
-			//window.addEventListener('resize', resizeWebView, false);
+			resizeWebView(); 
+		 
 		},
 		renderModel: function() {
 			//	Project.setOnlyModel();//检查是否是唯一的 模型

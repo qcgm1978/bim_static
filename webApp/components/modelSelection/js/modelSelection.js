@@ -534,10 +534,16 @@
       var viewport = document.getElementById('modelView');
       viewport.appendChild(WebView);
 
-      function resizeWebView() {
-        WebView.zoomFactor = window.devicePixelRatio; 
+      function resizeWebView() { 
+
+        if (window.devicePixelRatio) {
+          WebView.zoomFactor = window.devicePixelRatio; 
+        } else {
+          WebView.zoomFactor = screen.deviceXDPI / screen.logicalXDPI;
+        } 
+
       }
-      resizeWebView();
+
 
       WebView.url = ourl + "/static/dist/components/modelSelection/model.html?t=" + new Date().getTime() + "&type=" + this.Settings.type + "&sourceId=" + this.Settings.sourceId + "&etag=" +
         this.Settings.etag + "&projectId=" + this.Settings.projectId + "&projectVersionId=" + this.Settings.projectVersionId;
@@ -546,7 +552,10 @@
 
       window.onresize = resizeWebView;
 
-      WebView.zoomFactor = window.devicePixelRatio;
+      resizeWebView();
+
+
+
       //  window.addEventListener('resize', resizeWebView, false);
     }
   }
