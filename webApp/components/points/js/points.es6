@@ -116,7 +116,7 @@
           $.ajax({
             url: "/sixD/"+query.projectId+'/'+query.projectVersionId+"/bounding/box?sceneId="+query.modelId+"&elementId="+(query.modelId+'.'+query.uid)
           }).done(function(data){
-            console.log(data)
+            //console.log(data)
             if(data.code == 0){
               var min = data.data.min,
                   max = data.data.max,
@@ -148,7 +148,7 @@
             $.ajax({
               url: "/sixD/"+query.projectId+'/'+query.projectVersionId+"/bounding/box?sceneId="+query.modelId+"&elementId="+(query.modelId+'.'+query.uid)
             }).done(function(data){
-              console.log(data)
+              //console.log(data)
               if(data.code == 0){
                 var min = data.data.min,
                     max = data.data.max,
@@ -186,7 +186,7 @@
           that.resetProperNull();
           return;
         }
-        console.log(model);
+        //console.log(model);
         propertiesCollection.projectId = "1";
         propertiesCollection.projectVersionId = "784306105035931";
         propertiesCollection.fetch({
@@ -267,7 +267,7 @@
         if (data.code == 0) {
 
           if (data.data) {
-            console.log(data)
+            //console.log(data)
             var location = data.data.location,
               _temp = JSON.parse(location);
             box = _this.formatBBox(_temp.bBox || _temp.boundingBox);
@@ -286,13 +286,12 @@
       if (!_.isArray(marks)) {
         marks = [marks];
       }
-      console.log(marks)
+      //console.log(marks)
       Project.Viewer.loadMarkers(marks);
     },
     //通过userid 和 boundingbox 定位模型
     zoomModel: function(ids, box) {
       //定位
-      debugger
       Project.Viewer.zoomToBox(box);
       Project.Viewer.translucent(false);
       Project.Viewer.highlight({
@@ -302,7 +301,7 @@
       //半透明
       Project.Viewer.translucent(true);
       //高亮
-      console.log(ids)
+      //console.log(ids)
       Project.Viewer.highlight({
         type: 'userId',
         ids: ids
