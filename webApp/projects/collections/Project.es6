@@ -1414,7 +1414,6 @@ App.Project = {
 	},
 	//在模型中显示
 	showInModel: function($target, type) {
-		debugger
 		var _this = this,key="",
 			location = $target.data('location'),
 			color=$target.data('color'),
@@ -1452,7 +1451,7 @@ App.Project = {
 			_this.sigleRule(cat);
 			if(_this.filterRule.floorPlus.indexOf(cat)!=-1){
 				App.Project.Settings.Viewer.filter({
-					ids:['10.20.20.03'],
+					ids:_this.filterCCode('10.20.20.03'),
 					type:"classCode"
 				});
 			}
