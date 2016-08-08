@@ -26,7 +26,6 @@ App.Project.PlanModel = Backbone.View.extend({
 		var data = model.toJSON();
 		this.$(".tbPlan tbody").html(this.template(data));
 	},
-
 	//模型中显示
 	showInModle(event) {
 		var $target = $(event.target).closest("tr"),
@@ -42,7 +41,7 @@ App.Project.PlanModel = Backbone.View.extend({
 		} 
 
 		if (box && ids) {
-			App.Project.zoomModel(ids,box);
+			App.Project.zoomToBox(ids,box);
 			return;
 		}
 		var data = {
@@ -59,7 +58,7 @@ App.Project.PlanModel = Backbone.View.extend({
 				if(box && box.length){
 					$target.data("userId", data.data.elements);
 					$target.data("box", box);
-					App.Project.zoomModel(data.data.elements,box);
+					App.Project.zoomToBox(data.data.elements,box);
 				}
 			}
 		});

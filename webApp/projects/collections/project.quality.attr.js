@@ -23,8 +23,7 @@ App.Project.QualityAttr = {
 			
 		//没有隐患数据,则不打开数据
 		if(Number(isShow)<=0){
-			
-			return 
+			return
 		}
 		if(($('body').height()-$target.offset().top)>=302){
 			_top=$target.offset().top-175+24;

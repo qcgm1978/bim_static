@@ -14,7 +14,7 @@
                     <span>整改日期：</span><span><%= new Date(item.rectifyDate).format('yyyy-MM-dd') %></span>
                 </div>
                 <div class="upCount">
-                    <span>整改次数：</span><span><%=item.rectifyCount%></span><span><a class="detailFont" href="javascript:;" target="_blank"></a></span>
+                    <span>整改次数：</span><span><%=item.rectifyCount%></span><span><a class="detailFont" href="<%=item.url%>" target="_blank"></a></span>
                 </div>
             </div>
         </td>

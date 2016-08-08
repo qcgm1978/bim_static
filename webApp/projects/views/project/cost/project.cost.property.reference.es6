@@ -64,7 +64,7 @@ App.Project.CostReference = Backbone.View.extend({
 			$target.addClass("selected");
 		}
 		if (ids && box) {
-			App.Project.zoomModel(ids,box);
+			App.Project.zoomToBox(ids,box);
 			return;
 		}
 		var data = {
@@ -80,7 +80,7 @@ App.Project.CostReference = Backbone.View.extend({
 				var box=App.Project.formatBBox(data.data.boundingBox);
 				$target.data("userId", data.data.elements);
 				$target.data("box", box);
-				App.Project.zoomModel(data.data.elements,box);
+				App.Project.zoomToBox(data.data.elements,box);
 			}
 		});
 	},

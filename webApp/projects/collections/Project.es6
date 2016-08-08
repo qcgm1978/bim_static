@@ -1509,6 +1509,14 @@ App.Project = {
 			ids: ids
 		});
 	},
+	zoomToBox:function(ids,box){
+		App.Project.Settings.Viewer.zoomToBox(box);
+		App.Project.Settings.Viewer.translucent(true);
+		App.Project.Settings.Viewer.highlight({
+			type: 'userId',
+			ids: ids
+		});
+	},
 
 	//取消zoom
 	cancelZoomModel: function() {
