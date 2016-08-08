@@ -182,6 +182,8 @@ var Login = {
 
 	//验证登录
 	checkLogin:function(){
+
+		
 		$.ajax({
 			url: '/platform/user/current?t=' + (+new Date())
 
