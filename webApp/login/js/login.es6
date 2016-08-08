@@ -176,6 +176,21 @@ var Login = {
 		Login.bindEvent();
 		//是否自动登录
 		Login.isAutoLogin();
+		//验证登录
+		this.checkLogin();
+	},
+
+	//验证登录
+	checkLogin:function(){
+		$.ajax({
+			url: '/platform/user/current?t=' + (+new Date())
+
+		}).done(function(data) {
+			localStorage.setItem("user", JSON.stringify(data.data))
+			Login.setCookie('userId', data.data.userId);
+			Login.setCookie('isOuter', data.data.outer);
+			window.location.href = '/index.html';
+		});
 	},
 
 	//是否自动登录
