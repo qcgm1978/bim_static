@@ -181,14 +181,16 @@ var Login = {
 	},
 
 	//验证登录
-	checkLogin: function() {
-
-
+	checkLogin: function() { 
+		
 		$.ajax({
-			url: '/platform/user/current?t=' + (+new Date())
-
+			url: '/platform/user/current?t=' + (+new Date()) 
 		}).done(function(data) { 
-			data=JSON.parse(data);
+
+			if (typeof(data) =="string") {
+				data=JSON.parse(data);
+			}  
+
 			if (data.code == 0) {
 				localStorage.setItem("user", JSON.stringify(data.data))
 				Login.setCookie('userId', data.data.userId);

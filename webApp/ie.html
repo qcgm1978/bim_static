@@ -97,6 +97,10 @@
             window.location.href = url;
         });
 
+        if (url.indexOf("login.html")>-1) {
+            myWebView.runScript("Login.checkLogin()", function(isLogin) {
+            });
+        } 
 
         myWebView.height = document.body.parentElement.clientHeight + "px"; 
        
