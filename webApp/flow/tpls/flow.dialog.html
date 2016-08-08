@@ -30,11 +30,7 @@
             <tr>
                 <td class="title rows">工作成果</td>
                 <td colspan="3"><%=result%></td>
-            </tr>
-            <tr>
-                <td class="title rows">完成标准</td>
-                <td colspan="3"><%=standard%></td>
-            </tr>
+            </tr> 
             <tr>
                 <td class="title rows">操作细则</td>
                 <td colspan="3"><%=deatilRule%></td>
@@ -43,7 +39,7 @@
     </div>
     <div class="flowModalBbar">
         <% _.each(operation,function(item){ %>
-            <a class="flowModalBtn" target="_blank" href="<%=item.url%>" title="<%=item.buttonName%>"><%=item.buttonName%></a>
+            <a class="flowModalBtn" target="_blank" href="<%=item.buttonName=='下载'?'static/dist/app/oPage/download/'+ item.url:item.url%>" title="<%=item.buttonName%>"><%=item.buttonName%></a>
         <% }) %>
        <!-- <a class="flowModalBtn">sss</a>
         <a class="flowModalBtn">sss</a>
