@@ -1015,7 +1015,7 @@ dwgViewer.prototype = {
     $("#modelBox .modelBar .m-camera").removeClass("selected");
     this.dwgView.dwgHelper.editAnnotationEnd();
     $("#modelBox .bim .commentBar").addClass("hide");
-    $("#dwgCommentContainer").css("z-index", 19);
+    $("#dwgCommentContainer").css("z-index", -1);
   }
 
 
