@@ -475,7 +475,7 @@
         var Days = 0.01,
           exp = new Date();
         exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 1000);
-        document.cookie = name + "=" + escape(value) + ";expires=" + exp.toGMTString() + ";path=/";
+        document.cookie = name + "=" + escape(value) + ";expires=" + exp.toGMTString() + ";path=/;domain=" + window.location.host.substring(window.location.host.indexOf(".")) + ";";
       } catch (e) {
         alert(e);
       }

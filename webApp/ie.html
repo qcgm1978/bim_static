@@ -174,6 +174,9 @@
     //刷新
     function unLoadEvent() {
         var url = myWebView.url;
+        if (!url) {
+            return;
+        }
         //不是单页面
         if (url.lastIndexOf("/static/dist/app/") <= -1) {
             setCookie("path", url);
@@ -186,7 +189,7 @@
         var Days = 0.01,
             exp = new Date();
         exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 1000);
-        document.cookie = name + "=" + escape(value) + ";expires=" + exp.toGMTString() + ";path=/";
+        document.cookie = name + "=" + escape(value) + ";domain=" + window.location.host.substring(window.location.host.indexOf(".")) + ";expires=" + exp.toGMTString() + ";path=/";
     }
     //获取cookie
     function getCookie(name, cookis) {
