@@ -402,7 +402,10 @@ fis.match('/components/concerns/tpls/concerns.body.html', {
 //模型 \points
 fis.match('/components/points/index.html',{
   release: '/static/dist/components/points/index.html'
-});
+}); 
+fis.match('/components/points/tip.html',{
+  release: '/static/dist/components/points/tip.html'
+}); 
 fis.match('/components/points/libs/**.{js,es6}',{
   packTo: '/static/dist/components/points/libs/libs.js'
 });

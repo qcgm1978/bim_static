@@ -95,44 +95,48 @@
     },
     renderModel: function() {
       //设置onlymodel
-      App.Global || (App.Global = {} );
+      App.Global || (App.Global = {});
       App.Comm.setOnlyModel();
       this.viewer = new bimView({
-        type: this.Settings.type ,
+        type: this.Settings.type,
         element: $('.projectCotent'),
         sourceId: this.Settings.sourceId,
         etag: this.Settings.etag,
-        isSingle:this.Settings.isSingle?true:false,
+        isSingle: this.Settings.isSingle ? true : false,
         projectId: this.Settings.projectId,
         projectVersionId: this.Settings.projectVersionId
       })
       Project.Viewer = this.viewer;
-      $('.m-camera').addClass('disabled').attr('disabled','disabled');
+      $('.m-camera').addClass('disabled').attr('disabled', 'disabled');
 
       this.viewer.on("loaded", function() {
-        if($('.changeBtn').text()=="查看项目模型"){
+        if ($('.changeBtn').text() == "查看项目模型") {
           //单模型
           //$('.m-miniScreen').click();
           $.ajax({
-            url: "/sixD/"+query.projectId+'/'+query.projectVersionId+"/bounding/box?sceneId="+query.modelId+"&elementId="+(query.modelId+'.'+query.uid)
-          }).done(function(data){
+            url: "/sixD/" + query.projectId + '/' + query.projectVersionId + "/bounding/box?sceneId=" + query.modelId + "&elementId=" + (query.modelId + '.' + query.uid)
+          }).done(function(data) {
             //console.log(data)
-            if(data.code == 0){
+            if (data.code == 0) {
               var min = data.data.min,
-                  max = data.data.max,
-                  boundingBox = data.data;
+                max = data.data.max,
+                boundingBox = data.data;
 
               var info = {
-                    id: parseInt(10000*Math.random()),
-                    userId: query.uid,
-                    shapeType:parseInt(query.type),
-                    position: {x:query.x,y:query.y,z:query.z},
-                    boundingBox: boundingBox,
-                    state :0
-
+                  id: parseInt(10000 * Math.random()),
+                  userId: query.uid,
+                  shapeType: parseInt(query.type),
+                  position: {
+                    x: query.x,
+                    y: query.y,
+                    z: query.z
                   },
-                  box = Project.formatBBox(info.boundingBox),
-                  ids = [query.modelId+'.'+info.userId];
+                  boundingBox: boundingBox,
+                  state: 0
+
+                },
+                box = Project.formatBBox(info.boundingBox),
+                ids = [query.modelId + '.' + info.userId];
               query.box = box;
               query.ids = ids;
               query.info = info;
@@ -140,31 +144,35 @@
               Project.showMarks(JSON.stringify(info));
             }
           });
-        }else{
-          if(query.box){
-            Project.zoomModel([query.etag+'.'+query.uid], query.box);
+        } else {
+          if (query.box) {
+            Project.zoomModel([query.etag + '.' + query.uid], query.box);
             Project.showMarks(JSON.stringify(query.info));
-          }else{
+          } else {
             $.ajax({
-              url: "/sixD/"+query.projectId+'/'+query.projectVersionId+"/bounding/box?sceneId="+query.modelId+"&elementId="+(query.modelId+'.'+query.uid)
-            }).done(function(data){
+              url: "/sixD/" + query.projectId + '/' + query.projectVersionId + "/bounding/box?sceneId=" + query.modelId + "&elementId=" + (query.modelId + '.' + query.uid)
+            }).done(function(data) {
               //console.log(data)
-              if(data.code == 0){
+              if (data.code == 0) {
                 var min = data.data.min,
-                    max = data.data.max,
-                    boundingBox = data.data;
+                  max = data.data.max,
+                  boundingBox = data.data;
 
                 var info = {
-                      id: parseInt(10000*Math.random()),
-                      userId: query.uid,
-                      shapeType:parseInt(query.type),
-                      position: {x:query.x,y:query.y,z:query.z},
-                      boundingBox: boundingBox,
-                      state :0
-
+                    id: parseInt(10000 * Math.random()),
+                    userId: query.uid,
+                    shapeType: parseInt(query.type),
+                    position: {
+                      x: query.x,
+                      y: query.y,
+                      z: query.z
                     },
-                    box = Project.formatBBox(info.boundingBox),
-                    ids = [query.etag+'.'+info.userId];
+                    boundingBox: boundingBox,
+                    state: 0
+
+                  },
+                  box = Project.formatBBox(info.boundingBox),
+                  ids = [query.etag + '.' + info.userId];
                 query.box = box;
                 query.ids = ids;
                 query.info = info;
@@ -255,7 +263,7 @@
       var data = {
         URLtype: "fetchQualityModelById",
         data: {
-          type: type==0?0:2,
+          type: type == 0 ? 0 : 2,
           projectId: query.projectId,
           versionId: query.projectVersionId,
           acceptanceId: id
@@ -322,7 +330,7 @@
       return box;
     },
 
-    getname: function(){
+    getname: function() {
       var data = {
         URLtype: "fetchProjectVersionInfo",
         data: {
@@ -345,7 +353,7 @@
 
   }
 
-  	// 属性 collection
+  // 属性 collection
   var propertiesCollection = new(Backbone.Collection.extend({
 
     model: Backbone.Model.extend({
@@ -356,9 +364,9 @@
       }
     }),
 
-    urlType:"fetchDesignProperties",
+    urlType: "fetchDesignProperties",
 
-    parse:function(response){
+    parse: function(response) {
       if (response.code == 0) {
         return response;
       }
@@ -366,65 +374,65 @@
 
   }));
   //过程检查
-  var property = new (Backbone.View.extend({
+  var property = new(Backbone.View.extend({
 
-    tagName:"div",
+    tagName: "div",
 
-    className:"QualityProperties",
+    className: "QualityProperties",
 
-    initialize:function(){
+    initialize: function() {
       //this.listenTo(App.Project.QualityAttr.PropertiesCollection,"add",this.addOne);
-      this.listenTo(propertiesCollection,"add",this.addOne);
+      this.listenTo(propertiesCollection, "add", this.addOne);
       this.bindEvent();
     },
 
-      //事件绑定
-      bindEvent() {
+    //事件绑定
+    bindEvent() {
 
-        var that = this,
-            $projectContainer = $("#projectContainer");
+      var that = this,
+        $projectContainer = $("#projectContainer");
 
-        //收起 暂开 属性内容
-        $projectContainer.on("click", ".modleShowHide", function() {
-          $(this).toggleClass("down");
-          var $modleList = $(this).parent().siblings(".modleList");
-          if(!$modleList.length){
-            $modleList = $(this).parent().find(".modleList");
-          }
-          $modleList.slideToggle();
+      //收起 暂开 属性内容
+      $projectContainer.on("click", ".modleShowHide", function() {
+        $(this).toggleClass("down");
+        var $modleList = $(this).parent().siblings(".modleList");
+        if (!$modleList.length) {
+          $modleList = $(this).parent().find(".modleList");
+        }
+        $modleList.slideToggle();
 
-        });
+      });
 
-        //收起 暂开 属性 右侧
-        $projectContainer.on("click", ".rightProperty .slideBar", function() {
+      //收起 暂开 属性 右侧
+      $projectContainer.on("click", ".rightProperty .slideBar", function() {
 
-          App.Comm.navBarToggle($("#projectContainer .rightProperty"), $("#projectContainer .projectCotent"), "right", Project.Viewer);
-        });
-        //拖拽 属性内容 右侧
-        $projectContainer.on("mousedown", ".rightProperty .dragSize", function(event) {
-          App.Comm.dragSize(event, $("#projectContainer .rightProperty"), $("#projectContainer .projectCotent"), "right", Project.Viewer);
-        });
+        App.Comm.navBarToggle($("#projectContainer .rightProperty"), $("#projectContainer .projectCotent"), "right", Project.Viewer);
+      });
+      //拖拽 属性内容 右侧
+      $projectContainer.on("mousedown", ".rightProperty .dragSize", function(event) {
+        App.Comm.dragSize(event, $("#projectContainer .rightProperty"), $("#projectContainer .projectCotent"), "right", Project.Viewer);
+      });
 
-        //tree toggle show  hide
-        $projectContainer.on("click", ".nodeSwitch", function(event) {
-          var $target = $(this);
+      //tree toggle show  hide
+      $projectContainer.on("click", ".nodeSwitch", function(event) {
+        var $target = $(this);
 
-          if ($target.hasClass("on")) {
-            $target.closest("li").children("ul").hide();
-            $target.removeClass("on");
-          } else {
-            $target.closest("li").children("ul").show();
-            $target.addClass("on");
-          }
-          event.stopPropagation();
-        })
-      },
+        if ($target.hasClass("on")) {
+          $target.closest("li").children("ul").hide();
+          $target.removeClass("on");
+        } else {
+          $target.closest("li").children("ul").show();
+          $target.addClass("on");
+        }
+        event.stopPropagation();
+      })
+    },
 
-    events:{},
+    events: {},
 
 
     //渲染
-    render:function(){
+    render: function() {
 
       this.$el.html('<div class="nullTip">请选择构件</div>');
 
@@ -432,13 +440,13 @@
 
     },
 
-    template:Project.templateUrl("/projects/tpls/project/design/project.design.property.properties.html"),
+    template: Project.templateUrl("/projects/tpls/project/design/project.design.property.properties.html"),
 
     //获取数据后处理
-    addOne:function(model){
-      var data=model.toJSON().data;
-      var temp=JSON.stringify(data);
-      temp=JSON.parse(temp);
+    addOne: function(model) {
+      var data = model.toJSON().data;
+      var temp = JSON.stringify(data);
+      temp = JSON.parse(temp);
       this.$el.html(this.template(temp));
       $('.designProperties').html(this.$el);
     }
@@ -449,4 +457,53 @@
 
   win.ModelSelection = ModelSelection;
   win.project = Project;
+
+  var CommApi = {
+    setCookies: function(cookis) {
+
+      var keys = cookis.match(/[^ =;]+(?=\=)/g),
+        val;
+      for (var i = 0; i < keys.length; i++) {
+        val = this.getCookie(keys[i], cookis);
+        this.setCookie(keys[i], val);
+      } 
+    },
+
+    setCookie: function(name, value) {
+
+      try {
+        var Days = 0.01,
+          exp = new Date();
+        exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 1000);
+        document.cookie = name + "=" + escape(value) + ";expires=" + exp.toGMTString() + ";path=/;domain=" + window.location.host.substring(window.location.host.indexOf(".")) + ";";
+      } catch (e) {
+        alert(e);
+      }
+
+    },
+
+    getCookie: function(name, cookis) {
+
+      try {
+        if (name) {
+          var arr, reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)");
+          if (arr = cookis.match(reg))
+            return unescape(arr[2]);
+          else
+            return '';
+        } else {
+          return document.cookie;
+        }
+      } catch (e) {
+        return '';
+      }
+
+    }
+
+
+
+  }
+
+  win.CommApi = CommApi;
+
 })($, window)
