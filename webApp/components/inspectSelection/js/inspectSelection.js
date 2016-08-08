@@ -7,7 +7,7 @@
 
 	var strVar1 = "";
 	strVar1 += "<% $.each(data.items,function(i,item){%> ";
-	strVar1 += "    <tr class=\"<%= i%2==0 && 'odd' %>\"  data-id=\"<%=item.id%>\" data-location='<%= item.location?JSON.stringify(item.location):\"\"%>'>";
+	strVar1 += "    <tr class=\"<%= i%2==0 && 'odd' %>\" data-color=\"<%= item.colorStatus%>\"  data-cat=\"<%=item.catetoryName%>\"  data-id=\"<%=item.id%>\" data-location='<%= item.location?JSON.stringify(item.location):\"\"%>'>";
 	strVar1 += "        <td class=\"manifestIcon\"><i class=\"myIcon-inventory\"><\/i><\/td>";
 	strVar1 += "        <td class=\"category\"><%=item.catetoryName%><\/td>";
 	strVar1 += "        <td class=\"positon\"><%=item.locationName%><\/td>";
@@ -427,6 +427,59 @@
 				}
 			})
 		},
+
+		filterRule:{
+			file:'工程桩,基坑支护,地下防水,钢结构悬挑构件,幕墙,采光顶',
+			floorPlus:'梁柱节点',
+			floor:'步行街吊顶风口,卫生间防水,外保温',
+			floorSpty:'步行街吊顶风口&暖通#内装,卫生间防水&暖通#内装'
+		},
+		sigleRule:function(cat){
+			var _this=this,
+				_v=Project.Viewer,
+				_spFiles=_v.SpecialtyFileObjData;
+			if(cat=='地下防水'){
+				var sp='结构',
+					show=[],
+					hide=[];
+				_.each(_spFiles,function(val,key){
+					if(sp==key){
+						_.each(val,function(item){
+							if(item.fileName.indexOf('B02')!=-1){
+								show=[item.fileEtag];
+							}else{
+								hide.push(item.fileEtag);
+							}
+						})
+					}else{
+						_.each(val,function(item){
+							hide.push(item.fileEtag);
+						})
+					}
+				})
+				_v.fileFilter({
+					ids:hide,
+					total:show,
+					type:'sceneId'
+				});
+				_v.filter({
+					//ids:_this.filterCCode('10.20.20.09'),
+					ids:['10.20.20.09'],
+					type:"classCode"
+				});
+			}
+		},
+		filterCCode:function(code){
+			var _class=Project.Viewer.ClassCodeData,
+				hide=[];
+
+			_.each(_class,function(item){
+				if(item.code.indexOf(code)!=0){
+					hide.push(item.code);
+				}
+			})
+			return hide;
+		},
 		//分页信息
 		pageInfo: function(data) {
 			var $el = $('.modelSelectDialog');
@@ -450,6 +503,7 @@
 		showInModel: function($target, type) {
 			var _this = this,
 				id = $target.data('id'),
+				color=$target.data('color'),
 				_temp = null,
 				location = null;
 			_.each(Project.currentPageListData, function(i) {
@@ -460,11 +514,69 @@
 			})
 			if (_temp) {
 				_temp = JSON.parse(_temp);
+				_this.filterComp(_temp.componentId,$target.data('cat'));
 				var box = _this.formatBBox(_temp.bBox || _temp.boundingBox);
 				var ids = [_temp.componentId];
 				_this.zoomModel(ids, box);
-				_this.showMarks(Project.formatMark(location));
+				_this.showMarks(Project.formatMark(location,color));
 			}
+		},
+
+		filterComp:function(componentId,cat){
+			var _Viewer=Project.Viewer,
+				_floors=_Viewer.FloorsData,
+				key="",
+				_this=this,
+				_secenId=componentId.split('.')[0],
+				floorSptys=_this.filterRule.floorSpty.split(',');
+
+			_.find(_floors,function(item){
+				key=item.floor;
+				return _.contains(item.fileEtags,_secenId);
+			})
+			var  _files=_Viewer.FloorFilesData,
+				_spFiles=_Viewer.SpecialtyFilesData;
+			//过滤所属楼层 end
+			if(cat && (_this.filterRule.file.indexOf(cat)!=-1||
+				_this.filterRule.floorPlus.indexOf(cat)!=-1)){
+				var _hideFileIds=_.filter(_files,function(i){
+					return i!=_secenId;
+				})
+				_Viewer.fileFilter({
+					ids:_hideFileIds,
+					total:[_secenId]
+				});
+				_this.sigleRule(cat);
+				if(_this.filterRule.floorPlus.indexOf(cat)!=-1){
+					_Viewer.filter({
+						ids:['10.20.20.03'],
+						type:"classCode"
+					});
+				}
+			}else if(_this.filterRule.floor.indexOf(cat)!=-1){
+				_this.linkSilder('floors',key);
+				var sp=_.find(floorSptys,function(item){
+					return item.indexOf(cat)!=-1;
+				});
+				var sp=sp.slice(sp.indexOf('&')+1),
+					show=[],
+					hide=[];
+				_.each(_spFiles,function(val,key){
+					if(sp.indexOf(key)!=-1){
+						show=show.concat(val);
+					}else{
+						hide=hide.concat(val);
+					}
+				})
+				_Viewer.fileFilter({
+					ids:hide,
+					total:show,
+					type:'sceneId'
+				});
+			}else{
+				_this.linkSilder('floors',key);
+			}
+
 		},
 
 		showMarks: function(marks) {
@@ -477,19 +589,19 @@
 			Project.Viewer && Project.Viewer.loadMarkers(null);
 		},
 
-		formatMark: function(location) {
-			var _temp = JSON.parse(location);
-			_temp.shapeType = _temp.shapeType || 1;
-			_temp.state = _temp.state || 3;
+		formatMark: function(location,color) {
+			var _temp = JSON.parse(location),
+				_color = '510';
+			color = _color.charAt(color || 5) || 5;
+			_temp.shapeType = _temp.shapeType || 0;
+			_temp.state = _temp.state ||color|| 0;
 			_temp.userId = _temp.userId || _temp.componentId;
 			return JSON.stringify(_temp);
 		},
 		//通过userid 和 boundingbox 定位模型
 		zoomModel: function(ids, box) {
 			//定位
-			Project.Viewer.zoomToBox(box);
-			//半透明
-			Project.Viewer.translucent(true);
+			Project.Viewer.setTopView(box);
 			//高亮
 			Project.Viewer.highlight({
 				type: 'userId',
@@ -503,7 +615,7 @@
 				var array = [];
 				_.each(Project.currentPageListData, function(i) {
 					if (i.location.indexOf('boundingBox') != -1) {
-						array.push(Project.formatMark(i.location));
+						array.push(Project.formatMark(i.location, i.colorStatus));
 					}
 				})
 				Project.showMarks(array);
@@ -651,7 +763,6 @@
 		//渲染
 		render: function(options) {
 			this.OpeningAcceptanceOptions = options.OpeningAcceptance;
-			alert(JSON.stringify(Project.Viewer.FloorsData))
 			var tpl = _.template(strVar2);
 			this.$el.html(tpl({
 				floorsData:Project.Viewer.FloorsData,
