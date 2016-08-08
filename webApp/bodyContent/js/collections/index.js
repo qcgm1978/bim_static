@@ -50,7 +50,7 @@ App.BodyContent.control= {
     },
 
     post:function(id){
-        $('#pageLoading').hide();
+        
         $('#dataLoading').hide();
         $("#topBar li").hide();
 

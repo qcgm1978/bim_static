@@ -3,7 +3,7 @@
 
 <% obj.data && $.each(data,function(i,item){%>
            
-    <tr class="itemClick" class="<%= i%2==0 &&'odd' || '' %>" data-code="<%=item.code%>">
+    <tr  class="itemClick <%=item.relateModel?'odd':''%>" data-code="<%=item.code%>">
 
         <td class="ckItem"><i class="<%=App.Project.planStatus[item.progress]%>"></i></td>
         <td class="planId"> <a href="<%=item.url%>" target="_blank"> <%= item.no %> </a> </td>

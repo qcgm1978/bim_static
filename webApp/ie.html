@@ -61,7 +61,7 @@
 
             //登录后设置 cookie
             myWebView.runScript("App.Comm.getCookAndStore()", function(cookStore) {
-
+                
                 if (!cookStore) {
                     return;
                 }
@@ -186,7 +186,7 @@
     }
 
     function setCookie(name, value) {
-        var Days = 0.01,
+        var Days = 7,
             exp = new Date();
         exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 1000);
         document.cookie = name + "=" + escape(value) + ";domain=" + window.location.host.substring(window.location.host.indexOf(".")) + ";expires=" + exp.toGMTString() + ";path=/";
