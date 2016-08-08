@@ -1398,7 +1398,7 @@ App.Project = {
 		return sb.toString();
 	},
 
-	formatMark: function(location, color,id) {
+	formatMark: function(location, color,id,shaType) {
 		var _temp = location,
 			_color = '510';
 		color = _color.charAt(color || 5) || 5;
@@ -1406,7 +1406,7 @@ App.Project = {
 		if (typeof location === 'string') {
 			_temp = JSON.parse(location)
 		}
-		_temp.shapeType = _temp.shapeType || 0;
+		_temp.shapeType = _temp.shapeType||shaType || 0;
 		_temp.state = _temp.state || color;
 		_temp.userId = _temp.userId || _temp.componentId;
 		_temp.id=id||'';
@@ -1452,7 +1452,7 @@ App.Project = {
 			_this.sigleRule(cat);
 			if(_this.filterRule.floorPlus.indexOf(cat)!=-1){
 				App.Project.Settings.Viewer.filter({
-					ids:_this.filterCCode('10.20.20.03'),
+					ids:['10.20.20.03'],
 					type:"classCode"
 				});
 			}
@@ -1479,7 +1479,12 @@ App.Project = {
 		}else{
 			_this.linkSilder('floors',key);
 		}
-		var _loc = _this.formatMark(location,color);
+		var _loc="";
+		if(type==3){
+			_loc = _this.formatMark(location,2,'',1);
+		}else{
+			_loc = _this.formatMark(location,color);
+		}
 		//App.Project.Settings.Viewer.top();
 		_this.zoomModel(ids, box);
 		_this.showMarks(_loc);

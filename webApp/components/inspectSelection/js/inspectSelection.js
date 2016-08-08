@@ -651,7 +651,7 @@
 		//渲染
 		render: function(options) {
 			this.OpeningAcceptanceOptions = options.OpeningAcceptance;
-
+			alert(JSON.stringify(Project.Viewer.FloorsData))
 			var tpl = _.template(strVar2);
 			this.$el.html(tpl({
 				floorsData:Project.Viewer.FloorsData,
