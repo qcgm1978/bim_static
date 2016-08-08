@@ -187,7 +187,8 @@ var Login = {
 		$.ajax({
 			url: '/platform/user/current?t=' + (+new Date())
 
-		}).done(function(data) {
+		}).done(function(data) { 
+			data=JSON.parse(data);
 			if (data.code == 0) {
 				localStorage.setItem("user", JSON.stringify(data.data))
 				Login.setCookie('userId', data.data.userId);
