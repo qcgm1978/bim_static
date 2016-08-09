@@ -309,7 +309,7 @@ App.API = {
 			
 		fileSearch:"doc/{projectId}/{versionId}/file/query", //文件搜索
 
-		projectByCode:"platform/api/project/{code}/meta",
+		projectByCode:"platform/api/project/{code}/meta?appKey={appKey}",
  
 		current:"platform/user/current", //当前用户
 

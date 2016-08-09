@@ -53,7 +53,9 @@ App.ResourcesNav.App = Backbone.View.extend({
 
 	//获取标准模型库数据
 	fetchStandardLibs: function() {
-
+		this.$('.breadcrumbNav').append($('<div class="btns-flow stand"><a href="http://vendor.wanda-dev.cn/mkh-uat/WfForms/StandardForm.aspx?wfid=BIM_SMD001">标准模型研发指令</a>'
+			+'<a href="http://vendor.wanda-dev.cn/mkh-uat/WfForms/StandardForm.aspx?wfid=BIM_SMA001">标准模型报审</a>'
+			+'<a href="http://vendor.wanda-dev.cn/mkh-uat/WfForms/StandardForm.aspx?wfid=BIM_SMP001">标准模型发布</a></div>'));
 		//标准模型库
 		this.$el.append(new App.ResourcesNav.StandardLibs().render().el);
 		//重置 和 加载数据
@@ -104,8 +106,11 @@ App.ResourcesNav.App = Backbone.View.extend({
 		});
 	},
 
-	//获取标准模型库数据
+	//获取族库数据
 	fetchFamLibs: function() {
+		this.$('.breadcrumbNav').append($('<div class="btns-flow"><a href="http://vendor.wanda-dev.cn/mkh-uat/WfForms/StandardForm.aspx?wfid=BIM_FD001">族库研发指令</a>'
+			+'<a href="http://vendor.wanda-dev.cn/mkh-uat/WfForms/StandardForm.aspx?wfid=BIM_FA001">族库报审</a>'
+			+'<a href="http://vendor.wanda-dev.cn/mkh-uat/WfForms/StandardForm.aspx?wfid=BIM_FP001">族库发布</a></div>'));
 
 		//标准模型库
 		this.$el.append(new App.ResourcesNav.FamLibs().render().el);
