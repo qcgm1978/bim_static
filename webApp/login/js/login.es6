@@ -97,16 +97,26 @@ var Login = {
 		}).done(function(data) {
 			if (data.code == 0) {
 
-				var keys = [];
+				Login.delCookie("token_cookie");
+
+				var keys = [],
+					lastKey = "AuthUser_AuthToken", lastValue;
 				if (data.data && typeof data.data === 'object') {
 					for (var p in data.data) {
-						Login.setCookie(p, data.data[p]);
-						keys.push(p);
+						if (p == lastKey) {
+							lastValue = data.data[p];
+						} else {
+							Login.setCookie(p, data.data[p]);
+							keys.push(p);
+						}
+
 					}
-				}
+				}  
+				 
+				localStorage.setItem("AuthUser_AuthToken", lastValue);
 
 				localStorage.setItem("keys", keys.join(','));
-				Login.delCookie("token_cookie");
+
 				//获取用户信息
 				Login.getUserInfo();
 
@@ -184,17 +194,28 @@ var Login = {
 	},
 
 	//
-	checkLoginBefore: function(cookies) {
-		
+	checkLoginBefore: function(cookies) { 
+
 		if (cookies) {
+
+			var lastKey = "AuthUser_AuthToken", lastValue;
+
 			var keys = cookies.match(/[^ =;]+(?=\=)/g),
 				val;
-			for (var i = 0; i < keys.length; i++) { 
+			for (var i = 0; i < keys.length; i++) {
+
 				val = Login.getCookie(keys[i], cookies);
-				Login.setCookie(keys[i], val);
+
+				if (keys[i] == lastKey) {
+					lastValue = val;
+				} else {
+					Login.setCookie(keys[i], val);
+				}
+
 			}
+			lastValue && Login.setCookie(lastKey, lastValue);
 		}
-		 
+
 	},
 
 	//验证登录
@@ -247,7 +268,8 @@ var App = {
 		getCookAndStore: function() {
 			return JSON.stringify({
 				cookie: document.cookie,
-				user: localStorage.getItem("user")
+				user: localStorage.getItem("user"),  
+				data:localStorage.getItem("AuthUser_AuthToken")
 			});
 		}
 	}
