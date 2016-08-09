@@ -311,7 +311,9 @@
       var imboxLeft = 0;
       if($('.imboxNavWrap').length>0){
         var po = $('.commentRemark').offset();
+        //var po = $('.at').offset();
         top += po.top-35;
+        //top += po.top;
         imboxLeft += po.left+18;
       }
 
