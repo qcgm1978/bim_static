@@ -108,12 +108,11 @@ var Login = {
 						} else {
 							Login.setCookie(p, data.data[p]);
 							keys.push(p);
-						}
-
+						} 
 					}
 				}  
 				 
-				localStorage.setItem("AuthUser_AuthToken", lastValue);
+				localStorage.setItem("AuthUser_AuthToken", lastValue); 
 
 				localStorage.setItem("keys", keys.join(','));
 

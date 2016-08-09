@@ -71,22 +71,19 @@
                 //比较cookie
                 if (getCookie("OUTSSO_AuthMAC") != getCookie("OUTSSO_AuthMAC", cookies)) {
                     //登录设置 登出删除
-                    var keys = cookies.match(/[^ =;]+(?=\=)/g);
-
-                    if (keys && keys.length > 5) {
-
-                        var key, value;
-
-                        for (var i = 0; i < keys.length; i++) {
-
+                    var keys = cookies.match(/[^ =;]+(?=\=)/g),
+                    lastKey = "AuthUser_AuthToken",
+                            lastValue=cookStore.data;  
+                            
+                    if (keys && keys.length > 5) { 
+                        var key, value; 
+                        for (var i = 0; i < keys.length; i++) { 
                             key = keys[i];
                             value = getCookie(keys[i], cookies);
-                            setCookie(key, value);
-
-                        }
-
-                        var lastKey = "AuthUser_AuthToken",
-                            lastValue=cookStore.data;  
+                            if (key!=lastKey) {
+                                 setCookie(key, value);
+                            }  
+                        } 
 
                         lastValue &&　setCookie(lastKey, lastValue);　
 
