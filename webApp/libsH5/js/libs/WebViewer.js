@@ -151,7 +151,7 @@ CLOUD.Utils = {
         return bbox;
     },
 
-    // �ϲ�box
+    // 合并box
     mergeBBox : function(boxs) {
 
         if (boxs.length < 1) return null;
@@ -9415,21 +9415,180 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
         
     };
 
+    //this.update = function () {
+    //
+    //    return function (forceRender, updateRenderList) {
+    //
+    //        var position = this.object.position;
+    //        var pivot = this.pivot !== null ? this.pivot : this.target;
+    //
+    //        if (state !== STATE.NONE) {
+    //            this.cameraDirty = true;
+    //        }
+    //
+    //        if (state == STATE.ROTATE) {
+    //
+    //            var eye = this.target.clone().sub(position);
+    //            var eyeDistance = eye.length();
+    //
+    //            var viewVec = position.clone().sub(pivot);
+    //            var viewLength = viewVec.length();
+    //            viewVec.normalize();
+    //            var viewTrf = null;
+    //            var camDir = this.object.getWorldDirection();
+    //
+    //            if (Math.abs(thetaDelta) > Math.abs(phiDelta)) {
+    //
+    //                var rightDir = camDir.clone().cross(this.object.up);
+    //                if (rightDir.lengthSq() > 0.001) {
+    //
+    //                    viewTrf = new THREE.Quaternion().setFromAxisAngle(this.object.up, thetaDelta);
+    //
+    //                    var newViewDir = viewVec.clone().applyQuaternion(viewTrf);
+    //                    newViewDir.normalize();
+    //
+    //                    position.copy(pivot).add(newViewDir.multiplyScalar(viewLength));
+    //
+    //                    camDir.applyQuaternion(viewTrf);
+    //                    camDir.normalize();
+    //
+    //                    // 保持相机到目标点的距离不变
+    //                    var newTarget = new THREE.Vector3();
+    //                    //newTarget.copy(position).add(camDir.multiplyScalar(viewLength));
+    //                    newTarget.copy(position).add(camDir.multiplyScalar(eyeDistance));
+    //
+    //                    this.target.copy(newTarget);
+    //                    this.object.realUp.copy(rightDir).cross(camDir);
+    //                }
+    //
+    //            }
+    //            else if (Math.abs(phiDelta) > 0.01) {
+    //
+    //                var abortRotation = false;
+    //                var rightDir = camDir.clone().cross(this.object.up);
+    //                if (rightDir.lengthSq() < 0.001) {
+    //
+    //                    var shouldAbortRotation = function (realUp) {
+    //                        if (Math.abs(camDir.dot(new THREE.Vector3(0, 1, 0)) - 1) < 0.001) {
+    //                            if (phiDelta > 0)
+    //                                return true;
+    //                            rightDir = camDir.clone().cross(realUp);
+    //
+    //                            //console.log("BOTTOM");
+    //                        }
+    //
+    //                        if (Math.abs(camDir.dot(new THREE.Vector3(0, -1, 0)) - 1) < 0.001) {
+    //                            if (phiDelta < 0)
+    //                                return true;
+    //
+    //                            rightDir = camDir.clone().cross(realUp);
+    //                            //console.log("TOP");
+    //                        }
+    //
+    //                        return false;
+    //                    }
+    //                    abortRotation = shouldAbortRotation(this.object.realUp);
+    //                }
+    //
+    //                if (!abortRotation) {
+    //                    viewTrf = new THREE.Quaternion().setFromAxisAngle(rightDir, phiDelta);
+    //
+    //                    var newViewDir = viewVec.clone().applyQuaternion(viewTrf);
+    //                    newViewDir.normalize();
+    //
+    //                    position.copy(pivot).add(newViewDir.multiplyScalar(viewLength));
+    //
+    //                    camDir.applyQuaternion(viewTrf);
+    //                    camDir.normalize();
+    //
+    //                    // 保持相机到目标点的距离不变
+    //                    var newTarget = new THREE.Vector3();
+    //                    //newTarget.copy(position).add(camDir.multiplyScalar(viewLength));
+    //                    newTarget.copy(position).add(camDir.multiplyScalar(eyeDistance));
+    //
+    //                    this.object.realUp.copy(rightDir).cross(camDir);
+    //                    this.target.copy(newTarget);
+    //                } else {
+    //                    console.log("abortRotation");
+    //                }
+    //            }
+    //        }
+    //
+    //        //if (Math.abs(scale - 1) > 0.001) {
+    //        //
+    //        //    //var eye = this.target.clone().sub(position);
+    //        //    //var lastLength = eye.length();
+    //        //    //var currLength = lastLength * scale;
+    //        //    //var deltaStep = currLength - lastLength;
+    //        //    //var dollyVec = eye.clone().normalize();
+    //        //    //dollyVec.multiplyScalar(deltaStep);
+    //        //    //position.add(dollyVec);
+    //        //    //
+    //        //    //this.target.addVectors(position, eye);
+    //        //}
+    //
+    //        if (state === STATE.PAN) {
+    //            //var disOffset = this.target.clone().sub(this.object.position);
+    //            this.target.add(pan);
+    //            this.object.position.add(pan);
+    //            //this.object.position.copy(this.target).sub(disOffset);
+    //        }
+    //
+    //        // lookAt使用realUp
+    //        var tmpUp = new THREE.Vector3();
+    //        tmpUp.copy(this.object.up);
+    //        this.object.up.copy(this.object.realUp);
+    //        this.object.lookAt(this.target);
+    //        this.object.up.copy(tmpUp);
+    //
+    //        thetaDelta = 0;
+    //        phiDelta = 0;
+    //        scale = 1;
+    //        pan.set(0, 0, 0);
+    //
+    //        if (forceRender) {
+    //            //console.log("CameraEditor.forceRender");
+    //            if (updateRenderList !== undefined) {
+    //                this.viewer.editorManager.isUpdateRenderList = updateRenderList;
+    //            }
+    //
+    //            onChange();
+    //
+    //            this.cameraDirty = false;
+    //
+    //            lastPosition.copy(this.object.position);
+    //            lastQuaternion.copy(this.object.quaternion);
+    //        } else {
+    //
+    //            // update condition is:
+    //            // min(camera displacement, camera rotation in radians)^2 > EPS
+    //            // using small-angle approximation cos(x/2) = 1 - x^2 / 8
+    //
+    //            if (lastPosition.distanceToSquared(this.object.position) > EPS
+    //                || 8 * (1 - lastQuaternion.dot(this.object.quaternion)) > EPS) {
+    //
+    //                //console.log("CameraEditor.render");
+    //                onChange();
+    //
+    //                this.cameraDirty = false;
+    //
+    //                lastPosition.copy(this.object.position);
+    //                lastQuaternion.copy(this.object.quaternion);
+    //            }
+    //        }
+    //
+    //
+    //
+    //    }
+    //
+    //}();
+
     this.update = function () {
 
         return function (forceRender, updateRenderList) {
 
             var position = this.object.position;
             var pivot = this.pivot !== null ? this.pivot : this.target;
-
-            //// 绕场景中心旋转
-            //var target = this.target;
-            //
-            //if (this.viewer.getScene().rootNode.boundingBox ) {
-            //    var bBox = this.viewer.getScene().worldBoundingBox();
-            //    target = bBox.center();
-            //}
-            //
 
             if (state !== STATE.NONE) {
                 this.cameraDirty = true;
@@ -9446,12 +9605,40 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
                 var viewTrf = null;
                 var camDir = this.object.getWorldDirection();
 
+                //var camDir2 = eye.clone().normalize();
+
+                //console.log("----------------------");
+                //console.log("up->", [this.object.up.x, this.object.up.y, this.object.up.z]);
+                //console.log("realUp->", [this.object.realUp.x, this.object.realUp.y, this.object.realUp.z]);
+                //console.log("camDir->", [camDir.x, camDir.y, camDir.z, camDir2.x, camDir2.y, camDir2.z]);
+
+                var snapToAxis = function(v) {
+                    var absv = new THREE.Vector3(Math.abs(v.x), Math.abs(v.y), Math.abs(v.z));
+
+                    if (absv.x > absv.y && absv.x > absv.z)
+                        v.set(v.x > 0 ? 1 : -1, 0, 0);
+                    else if (absv.y > absv.x && absv.y > absv.z)
+                        v.set(0, v.y > 0 ? 1 : -1, 0);
+                    else
+                        v.set(0, 0, v.z > 0 ? 1 : -1);
+
+                    return v;
+                };
+
                 if (Math.abs(thetaDelta) > Math.abs(phiDelta)) {
 
-                    var rightDir = camDir.clone().cross(this.object.up);
+                    //var rightDir = camDir.clone().cross(this.object.up);
+                    var up = this.object.up;
+                    //var up = snapToAxis(this.object.realUp);
+                    var rightDir = camDir.clone().cross(up);
+
+                    //if (rightDir.lengthSq() <= 0.001) {
+                    //    up = this.object.realUp;
+                    //}
+
                     if (rightDir.lengthSq() > 0.001) {
 
-                        viewTrf = new THREE.Quaternion().setFromAxisAngle(this.object.up, thetaDelta);
+                        viewTrf = new THREE.Quaternion().setFromAxisAngle(up, thetaDelta);
 
                         var newViewDir = viewVec.clone().applyQuaternion(viewTrf);
                         newViewDir.normalize();
@@ -9467,39 +9654,76 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
                         newTarget.copy(position).add(camDir.multiplyScalar(eyeDistance));
 
                         this.target.copy(newTarget);
-                        this.object.realUp.copy(rightDir).cross(camDir);
+                        //this.object.realUp.copy(rightDir).cross(camDir);
+                        //this.object.realUp.normalize();
+
+                        this.object.realUp = up.clone().applyQuaternion(viewTrf).normalize();
+
+                        console.log("update 1.1");
+                    } else {
+
+                        up = camDir.normalize();
+
+                        viewTrf = new THREE.Quaternion().setFromAxisAngle(up, thetaDelta);
+
+                        //var newViewDir = viewVec.clone().applyQuaternion(viewTrf);
+                        //newViewDir.normalize();
+
+                        //position.copy(pivot).add(newViewDir.multiplyScalar(viewLength));
+                        //
+                        //camDir.applyQuaternion(viewTrf);
+                        //camDir.normalize();
+                        //
+                        //// 保持相机到目标点的距离不变
+                        //var newTarget = new THREE.Vector3();
+                        ////newTarget.copy(position).add(camDir.multiplyScalar(viewLength));
+                        //newTarget.copy(position).add(camDir.multiplyScalar(eyeDistance));
+                        //
+                        //this.target.copy(newTarget);
+                        ////this.object.realUp.copy(rightDir).cross(camDir);
+                        ////this.object.realUp.normalize();
+
+                        this.object.realUp.applyQuaternion(viewTrf).normalize();
+
+                        console.log("update 1.2");
                     }
 
                 }
-                else if (Math.abs(phiDelta) > 0.01) {
+                //else if (Math.abs(phiDelta) > 0.01) {
+                else {
 
                     var abortRotation = false;
-                    var rightDir = camDir.clone().cross(this.object.up);
-                    if (rightDir.lengthSq() < 0.001) {
+                    //var rightDir = camDir.clone().cross(this.object.up);
+                    //if (rightDir.lengthSq() < 0.001) {
+                    //
+                    //    var shouldAbortRotation = function (realUp) {
+                    //        if (Math.abs(camDir.dot(new THREE.Vector3(0, 1, 0)) - 1) < 0.001) {
+                    //            //if (phiDelta > 0)
+                    //            //    return true;
+                    //            rightDir = camDir.clone().cross(realUp);
+                    //
+                    //            //console.log("BOTTOM");
+                    //        }
+                    //
+                    //        if (Math.abs(camDir.dot(new THREE.Vector3(0, -1, 0)) - 1) < 0.001) {
+                    //            //if (phiDelta < 0)
+                    //            //    return true;
+                    //
+                    //            rightDir = camDir.clone().cross(realUp);
+                    //            //console.log("TOP");
+                    //        }
+                    //
+                    //        return false;
+                    //    };
+                    //
+                    //    abortRotation = shouldAbortRotation(this.object.realUp);
+                    //}
 
-                        var shouldAbortRotation = function (realUp) {
-                            if (Math.abs(camDir.dot(new THREE.Vector3(0, 1, 0)) - 1) < 0.001) {
-                                if (phiDelta > 0)
-                                    return true;
-                                rightDir = camDir.clone().cross(realUp);
+                    //var up = snapToAxis(this.object.realUp);
+                    var up = this.object.realUp;
+                    var rightDir = camDir.clone().cross(up);
 
-                                //console.log("BOTTOM");
-                            }
-
-                            if (Math.abs(camDir.dot(new THREE.Vector3(0, -1, 0)) - 1) < 0.001) {
-                                if (phiDelta < 0)
-                                    return true;
-
-                                rightDir = camDir.clone().cross(realUp);
-                                //console.log("TOP");
-                            }
-
-                            return false;
-                        }
-                        abortRotation = shouldAbortRotation(this.object.realUp);
-                    }
-
-                    if (!abortRotation) {
+                    //if (!abortRotation) {
                         viewTrf = new THREE.Quaternion().setFromAxisAngle(rightDir, phiDelta);
 
                         var newViewDir = viewVec.clone().applyQuaternion(viewTrf);
@@ -9515,24 +9739,28 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
                         //newTarget.copy(position).add(camDir.multiplyScalar(viewLength));
                         newTarget.copy(position).add(camDir.multiplyScalar(eyeDistance));
 
-                        this.object.realUp.copy(rightDir).cross(camDir);
-                        this.target.copy(newTarget);
-                    }
-                }
-            }
+                    this.object.realUp = up.clone().applyQuaternion(viewTrf).normalize();
 
-            //if (Math.abs(scale - 1) > 0.001) {
-            //
-            //    //var eye = this.target.clone().sub(position);
-            //    //var lastLength = eye.length();
-            //    //var currLength = lastLength * scale;
-            //    //var deltaStep = currLength - lastLength;
-            //    //var dollyVec = eye.clone().normalize();
-            //    //dollyVec.multiplyScalar(deltaStep);
-            //    //position.add(dollyVec);
-            //    //
-            //    //this.target.addVectors(position, eye);
-            //}
+                    //this.object.realUp.copy(rightDir).cross(camDir);
+                    //this.object.realUp.normalize();
+
+                    //this.object.realUp = up;
+                    //this.object.realUp.applyQuaternion(viewTrf);
+                    //this.object.realUp.normalize();
+
+                    //console.log("-----------------------------");
+
+                        this.target.copy(newTarget);
+                    //} else {
+                    //    console.log("abortRotation");
+                    //}
+
+                    console.log("update 2");
+                }
+                //else {
+                //    console.log("update 3");
+                //}
+            }
 
             if (state === STATE.PAN) {
                 //var disOffset = this.target.clone().sub(this.object.position);
