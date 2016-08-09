@@ -69,14 +69,14 @@ App.Comm = {
 		var _subType, _auth, _status, _setting, isChange = false,
 			_temp = '4,7,9';
 		if (s == 'family') {
-			_auth = App.AuthObj.lib && App.AuthObj.lib.family;
-			_setting = App.ResourceModel.Settings;
+			_auth = App.AuthObj.lib && App.AuthObj.lib.family || {};
+			_setting = App.ResourceModel.Settings|| {};
 		} else if (s == 'model') {
-			_setting = App.ResourceModel.Settings;
-			_auth = App.AuthObj.lib && App.AuthObj.lib.model;
+			_setting = App.ResourceModel.Settings|| {};
+			_auth = App.AuthObj.lib && App.AuthObj.lib.model|| {};
 		} else {
-			_setting = App.Project.Settings;
-			_auth = App.AuthObj.project && App.AuthObj.project.prjfile;
+			_setting = App.Project.Settings|| {};
+			_auth = App.AuthObj.project && App.AuthObj.project.prjfile|| {};
 		}
 		_subType = _setting.CurrentVersion.subType;
 		_status = _setting.CurrentVersion.status;

@@ -102,7 +102,10 @@ var AppKeyRoute = Backbone.Router.extend({
 		App.Project.Settings = $.extend({}, App.Project.Defaults);
 		var that = this;
 		this.parseToken(token, function() { 
+			 
+			//分享的事件
 			App.Project.Share.init();
+
 			if (!App.Comm.getCookie("OUTSSO_AuthToken")) {
 				$("#pageLoading").hide();
 				$("#topBar .login").click();
@@ -141,11 +144,11 @@ var AppKeyRoute = Backbone.Router.extend({
 
 				$("#topBar").prepend(' <ul class="navHeader"> <li class="item "> <span class="login">立即登录</span> </li></ul>');
 
-				if (!App.Comm.getCookie("OUTSSO_AuthToken")) {
-					App.Comm.setCookie("token_cookie", data.cookie);
-				} else {
-					App.Comm.setCookie("token_cookie_me", data.cookie);
-				}
+				// if (!App.Comm.getCookie("OUTSSO_AuthToken")) {
+				// 	App.Comm.setCookie("token_cookie", data.cookie);
+				// } else {
+				// 	App.Comm.setCookie("token_cookie_me", data.cookie);
+				// }
 
 				//回调
 				if ($.isFunction(callback)) {
@@ -403,7 +406,7 @@ var AppKeyRoute = Backbone.Router.extend({
 
 		var data = localStorage.getItem("user");
 		App.Global.User = JSON.parse(data);
-		var Autharr = data['function'],
+		var Autharr = App.Global.User['function'],
 			keys, len;
 		App.AuthObj = {};
 		//遍历权限

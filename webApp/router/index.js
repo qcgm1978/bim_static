@@ -27,12 +27,14 @@ var AppRoute = Backbone.Router.extend({
 	//首页主体展示
 
 	bodyContent: function() {
-		if (this.reset()==false) {return;}
+		if (this.reset() == false) {
+			return;
+		}
 		this.reset();
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".bodyConMenu").addClass('selected');
 		_.require('/static/dist/bodyContent/bodyContent.css');
 		_.require('/static/dist/bodyContent/bodyContent.js');
-		App.BodyContent.control.init(); 
+		App.BodyContent.control.init();
 	},
 
 	logout: function() {
@@ -48,7 +50,9 @@ var AppRoute = Backbone.Router.extend({
 	//待办
 	todo: function() {
 
-		if (this.reset()==false) {return;}
+		if (this.reset() == false) {
+			return;
+		}
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".todo").addClass('selected');
 		//加载css js
 		_.require('/static/dist/todo/todo.css');
@@ -57,7 +61,9 @@ var AppRoute = Backbone.Router.extend({
 	},
 	//消息中心
 	inbox: function() {
-		if (this.reset()==false) {return;}
+		if (this.reset() == false) {
+			return;
+		}
 		//加载css js
 		_.require('/static/dist/imbox/imbox.css');
 		_.require('/static/dist/imbox/imbox.js');
@@ -70,7 +76,9 @@ var AppRoute = Backbone.Router.extend({
 	},
 	//项目
 	projects: function() {
-		if (this.reset()==false) {return;}
+		if (this.reset() == false) {
+			return;
+		}
 		//销毁上传
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".projects").addClass('selected');
 		//加载css js
@@ -81,9 +89,11 @@ var AppRoute = Backbone.Router.extend({
 	},
 
 	//单个项目
-	project: function(id, versionId) { 
+	project: function(id, versionId) {
 
-		if (this.reset()==false) {return;}
+		if (this.reset() == false) {
+			return;
+		}
 
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".projects").addClass('selected');
 		_.require('/static/dist/projects/projects.css');
@@ -100,7 +110,9 @@ var AppRoute = Backbone.Router.extend({
 	//直接转到视点
 	projectViewPoint: function(id, versionId, viewPintId) {
 
-		if (this.reset()==false) {return;}
+		if (this.reset() == false) {
+			return;
+		}
 
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".projects").addClass('selected');
 		_.require('/static/dist/projects/projects.css');
@@ -119,7 +131,9 @@ var AppRoute = Backbone.Router.extend({
 
 	//流程
 	flow: function() {
-		if (this.reset()==false) {return;}
+		if (this.reset() == false) {
+			return;
+		}
 		//销毁上传
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".flow").addClass('selected');
 		_.require('/static/dist/flow/flow.css');
@@ -129,7 +143,9 @@ var AppRoute = Backbone.Router.extend({
 
 	//资源库
 	resources: function() {
-		if (this.reset()==false) {return;}
+		if (this.reset() == false) {
+			return;
+		}
 		//销毁上传
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".resources").addClass('selected');
 		_.require('/static/dist/resources/resources.css');
@@ -142,7 +158,9 @@ var AppRoute = Backbone.Router.extend({
 
 	//单个项目
 	resource: function(type) {
-		if (this.reset()==false) {return;}
+		if (this.reset() == false) {
+			return;
+		}
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".resources").addClass('selected');
 		_.require('/static/dist/resources/resources.css');
 		_.require('/static/dist/resources/resources.js');
@@ -152,7 +170,9 @@ var AppRoute = Backbone.Router.extend({
 
 	//项目映射
 	resourceMapping: function(type, optionType) {
-		if (this.reset()==false) {return;}
+		if (this.reset() == false) {
+			return;
+		}
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".resources").addClass('selected');
 		_.require('/static/dist/resources/resources.css');
 		_.require('/static/dist/resources/resources.js');
@@ -165,7 +185,9 @@ var AppRoute = Backbone.Router.extend({
 	},
 
 	resourceModel: function(type, projectId, versionId) {
-		if (this.reset()==false) {return;}
+		if (this.reset() == false) {
+			return;
+		}
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".resources").addClass('selected');
 		_.require('/static/dist/resources/resources.css');
 		_.require('/static/dist/resources/resources.js');
@@ -179,7 +201,9 @@ var AppRoute = Backbone.Router.extend({
 
 	//貌似改掉了
 	console: function(type, step) {
-		if (this.reset()==false) {return;}
+		if (this.reset() == false) {
+			return;
+		}
 		//销毁上传
 		_.require('/static/dist/console/console.css');
 		_.require('/static/dist/console/console.js');
@@ -191,7 +215,9 @@ var AppRoute = Backbone.Router.extend({
 	},
 	//by zzx
 	console1: function(type, step) {
-		if (this.reset()==false) {return;}
+		if (this.reset() == false) {
+			return;
+		}
 		//销毁上传
 		_.require('/static/dist/console1/console.css');
 		_.require('/static/dist/console1/console.js');
@@ -204,7 +230,9 @@ var AppRoute = Backbone.Router.extend({
 
 	//服务-项目管理-项目映射规则
 	servicesMappingRule: function(type, optionType, projectModelId) {
-		if (this.reset()==false) {return;}
+		if (this.reset() == false) {
+			return;
+		}
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".services").addClass('selected');
 		_.require('/static/dist/resources/resources.css');
 		_.require('/static/dist/resources/resources.js');
@@ -219,7 +247,9 @@ var AppRoute = Backbone.Router.extend({
 
 
 	services: function(type, tab) {
-		if (this.reset()==false) {return;}
+		if (this.reset() == false) {
+			return;
+		}
 		$("#pageLoading").hide();
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".services").addClass('selected');
 		_.require('/static/dist/services/services.css');
@@ -230,15 +260,24 @@ var AppRoute = Backbone.Router.extend({
 
 	//重置数据
 	reset: function() {
-		 
+
 		if (App.Comm.isIEModel()) {
 			return false;
 		} else {
 			_.require('/static/dist/libs/libsH5.js');
-		}  
 
-		//用户信息
-		App.Global.User = JSON.parse(localStorage.getItem("user"));
+		}
+
+		var user = localStorage.getItem("user");
+
+		if (user!="undefined") {
+			//用户信息
+			App.Global.User = JSON.parse(user);
+		}else{
+			return;
+		}
+
+
 		$("#pageLoading").show();
 
 		if (!$._data($(".user > span")[0], "events")) {

@@ -181,17 +181,22 @@ var Login = {
 	},
 
 	//验证登录
-	checkLogin:function(){
-
+	checkLogin: function() { 
 		
 		$.ajax({
-			url: '/platform/user/current?t=' + (+new Date())
+			url: '/platform/user/current?t=' + (+new Date()) 
+		}).done(function(data) { 
 
-		}).done(function(data) {
-			localStorage.setItem("user", JSON.stringify(data.data))
-			Login.setCookie('userId', data.data.userId);
-			Login.setCookie('isOuter', data.data.outer);
-			window.location.href = '/index.html';
+			if (typeof(data) =="string") {
+				data=JSON.parse(data);
+			}  
+
+			if (data.code == 0) {
+				localStorage.setItem("user", JSON.stringify(data.data))
+				Login.setCookie('userId', data.data.userId);
+				Login.setCookie('isOuter', data.data.outer);
+				window.location.href = '/index.html';
+			}
 		});
 	},
 
@@ -220,7 +225,7 @@ var Login = {
 
 
 var App = {
-	Comm: { 
+	Comm: {
 		//獲取cook 和 localstore
 		getCookAndStore: function() {
 			return JSON.stringify({
