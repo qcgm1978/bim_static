@@ -52,6 +52,7 @@ App.BodyContent.control= {
     post:function(id){
         
         $('#dataLoading').hide();
+        $('#pageLoading').hide();
         $("#topBar li").hide();
 
         new App.BodyContent.postDetailView();
