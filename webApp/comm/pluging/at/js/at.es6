@@ -313,7 +313,7 @@
 
           var po = $('.commentRemark').offset(),
 
-          top = pos.top>75?$('.talkReMark').offset().top:$('.talkReMark').offset().top+pos.top-75;
+          top = pos.top>75?$('.talkReMark').offset().top+75:$('.talkReMark').offset().top+pos.top;
           imboxLeft += po.left+18;
           console.log( pos.top,$('.talkReMark').offset().top)
 
