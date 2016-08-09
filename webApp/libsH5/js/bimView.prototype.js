@@ -393,7 +393,7 @@
     },
     setTopView: function(box) {
       var viewer = this.viewer;
-      viewer.setTopView(CLOUD.Utils.computeBBox(box));
+      viewer.setTopView(CLOUD.Utils.computeBBox(box),5);
     },
     zoomToBuilding: function(margin,ratio) {
       // 缩放到指定位置

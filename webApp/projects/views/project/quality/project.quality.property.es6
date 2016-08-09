@@ -254,7 +254,7 @@ App.Project.ProjectQualityProperty = Backbone.View.extend({
 			App.Project.QualityAttr.MaterialEquipmentCollection.fetch({
 				data: that.MaterialEquipmentOptions,
 				success: function(data) {
-					that.pageInfo.call(that, data);
+					that.pageInfo.call(that, data,type);
 				}
 
 			});
@@ -268,7 +268,7 @@ App.Project.ProjectQualityProperty = Backbone.View.extend({
 			App.Project.QualityAttr.ProcessAcceptanceCollection.fetch({
 				data: that.ProcessAcceptanceOptions,
 				success: function(data) {
-					that.pageInfo.call(that, data);
+					that.pageInfo.call(that, data,type);
 				}
 			});
 		} else if (type == "openingacceptance") {
@@ -280,7 +280,7 @@ App.Project.ProjectQualityProperty = Backbone.View.extend({
 			App.Project.QualityAttr.OpeningAcceptanceCollection.fetch({
 				data: that.OpeningAcceptanceOptions,
 				success: function(data) {
-					that.pageInfo.call(that, data);
+					that.pageInfo.call(that, data,type);
 				}
 			});
 
@@ -293,7 +293,7 @@ App.Project.ProjectQualityProperty = Backbone.View.extend({
 			App.Project.QualityAttr.ConcernsCollection.fetch({
 				data: that.ConcernsOptions,
 				success: function(data) {
-					that.pageInfo.call(that, data);
+					that.pageInfo.call(that, data,type);
 				}
 			});
 
@@ -346,8 +346,8 @@ App.Project.ProjectQualityProperty = Backbone.View.extend({
 		this.getData(1);
 	},
 
-	getContainer() {
-		var type = App.Project.Settings.property;
+	getContainer(tabType) {
+		var type = tabType||App.Project.Settings.property;
 		var $el;
 		if (type == "materialequipment") {
 			//材料设备
@@ -370,9 +370,9 @@ App.Project.ProjectQualityProperty = Backbone.View.extend({
 	},
 
 	//分页信息
-	pageInfo(data) {
+	pageInfo(data,type) {
 
-		var $el = this.getContainer();
+		var $el = this.getContainer(type);
 
 		data = data.toJSON()[0].data;
 		$el.find(".paginationBottom .sumCount .count").text(data.totalItemCount);

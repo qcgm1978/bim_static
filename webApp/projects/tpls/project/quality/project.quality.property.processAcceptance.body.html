@@ -5,7 +5,7 @@
         <td class="positon"><%=item.locationName%></td>
         <td class="ckResult">
    <i data-id="<%= item.id %>" data-total="<%=item.problemCount%>" class="resultStatusIcon <%=App.Project.checkStatus(item.colorStatus)%>"></i>
-        <%=item.problemCount%>/<%=item.checkCount%></td>
+        <%=App.Project.formatPointPlace(item.problemCount,item.checkCount)%></td>
     </tr>
 <% }) %> 
 
