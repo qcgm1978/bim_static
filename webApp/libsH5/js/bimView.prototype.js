@@ -29,16 +29,22 @@
     init: function(options) {
       var self = this;
       var _opt = options;
-      _opt.element.html(_opt._dom.bimBox);
-
+      _opt.element.html(_opt._dom.bimBox); 
 
       var url;
-      //外部引用
-      if (window.location.href.indexOf("bim.wanda") < 0) {
-        url = "http://bim.wanda.cn/static/dist/js/mpkWorker.min.js";
-      } else {
-        url = "/static/dist/js/mpkWorker.min.js";
-      }
+       
+      if (window.location.host.indexOf(".wanda") > 0 ) {
+        url = "http://"+window.location.host+"/static/dist/js/mpkWorker.min.js";
+      }else{
+        url = "http://bim.wanda-dev.cn/static/dist/js/mpkWorker.min.js";
+      } 
+
+      // //外部引用
+      // if (window.location.href.indexOf("wanda.") < 0 ) {
+      //   url = "http://bim.wanda.cn/static/dist/js/mpkWorker.min.js";
+      // } else {
+      //   url = "/static/dist/js/mpkWorker.min.js";
+      // }
 
       $.ajax({
         xhrField: {
