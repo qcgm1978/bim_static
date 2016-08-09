@@ -18597,7 +18597,8 @@ CloudViewer.prototype = {
     },
 
     setTopView: function (box, margin, ratio) {
-        margin = margin || -0.05;
+        margin = margin || 0.05;
+        ratio = ratio || 1.0;
 
         if (box) {
             box.applyMatrix4(this.getScene().rootNode.matrix);

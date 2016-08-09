@@ -131,6 +131,7 @@
             children:'categories',
             childrenType:'json',
           });
+          bimView.prototype.ComponentTypeFilesData=data;
           $('#category').append(category);
         });
         bimView.comm.ajax({

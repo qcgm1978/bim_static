@@ -31,6 +31,7 @@ App.Project.QualityAttr = {
 			_top=$target.offset().top-300-175+24;
 			_flag='down';
 		}
+		_top=_top<=10?10:_top;
 		var p={
 				top:_top+'px',
 				zIndex:this.zindex()
