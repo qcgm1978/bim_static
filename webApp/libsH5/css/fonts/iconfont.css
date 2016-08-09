@@ -1,10 +1,10 @@
 
 @font-face {font-family: "modelicon";
-  src: url('iconfont.eot?t=1470382909'); /* IE9*/
-  src: url('iconfont.eot?t=1470382909#iefix') format('embedded-opentype'), /* IE6-IE8 */
-  url('iconfont.woff?t=1470382909') format('woff'), /* chrome, firefox */
-  url('iconfont.ttf?t=1470382909') format('truetype'), /* chrome, firefox, opera, Safari, Android, iOS 4.2+*/
-  url('iconfont.svg?t=1470382909#modelicon') format('svg'); /* iOS 4.1- */
+  src: url('iconfont.eot?t=1470728191'); /* IE9*/
+  src: url('iconfont.eot?t=1470728191#iefix') format('embedded-opentype'), /* IE6-IE8 */
+  url('iconfont.woff?t=1470728191') format('woff'), /* chrome, firefox */
+  url('iconfont.ttf?t=1470728191') format('truetype'), /* chrome, firefox, opera, Safari, Android, iOS 4.2+*/
+  url('iconfont.svg?t=1470728191#modelicon') format('svg'); /* iOS 4.1- */
 }
 
 .modelicon {
@@ -70,3 +70,4 @@
 .m-zhaoshangguanli:before { content: "\e635"; }
 .m-zhiliangguanli:before { content: "\e633"; }
 .m-moren:before { content: "\e636"; }
+.m-jingyingguanli32:before { content: "\e638"; }

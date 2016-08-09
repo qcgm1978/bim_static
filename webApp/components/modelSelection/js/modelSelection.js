@@ -441,7 +441,6 @@
         Project.locationName[_userId] = '轴' + model.intersect.axisGridInfo.abcName + '-' + model.intersect.axisGridInfo.numeralName;
         Project.axis[_userId] = JSON.stringify(model.intersect.axisGridInfo);
         Project.components[_userId] = _obj.boundingBox;
-        Project.fileIds[_userId] = 'asdasdsadasdsadasd';
         $.ajax({
           url: fileUrl,
           success: function(data) {
@@ -453,10 +452,8 @@
           _this.getSelected();
           viewer.markers();
           viewer.viewer.setMarkerState(3);
-          //  var p={"id":new Date().getTime(),"userId":model.intersect.userId,"shapeType":1,"position":model.intersect.point,"boundingBox":model.intersect.object.boundingBox,"state":3}
           //  viewer.loadMarkers([JSON.stringify(p)]);
         }
-        //debugger
         //渲染属性面板
         Project.sceneId = model.intersect.object.userData.sceneId;
         Project.renderAttr(model.intersect.userId, Project.sceneId);

@@ -151,6 +151,27 @@ CLOUD.Utils = {
         return bbox;
     },
 
+    // �ϲ�box
+    mergeBBox : function(boxs) {
+
+        if (boxs.length < 1) return null;
+
+        var bBox = new THREE.Box3();
+        var max = new THREE.Vector3();
+        var min = new THREE.Vector3();
+        var box = new THREE.Box3();
+
+        for (var i = 0, len = boxs.length; i < len; i++) {
+
+            max.set(boxs[i].max.x, boxs[i].max.y, boxs[i].max.z);
+            min.set(boxs[i].min.x, boxs[i].min.y, boxs[i].min.z);
+            box.set(min, max);
+            bBox.union(box);
+        }
+
+        return bBox;
+    },
+
     parseTransform: function (node, objJson, trf) {
 
         var updateMatrix = false;
