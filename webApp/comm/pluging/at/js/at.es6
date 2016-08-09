@@ -308,19 +308,33 @@
         top -= this.Settings.atList.height() + 30;
       }
       //在窗口中打开时加上窗口的LEFT TOP
-      var imboxLeft = 0;
+      var imboxLeft = 0,self=this;
       if($('.imboxNavWrap').length>0){
-        var po = $('.commentRemark').offset();
-        //var po = $('.at').offset();
 
-        top += 13;
-        imboxLeft += po.left+18;
+          var po = $('.commentRemark').offset(),
+              val=self.Settings.atDiv.find('.at').offset().top- $('.talkReMark').offset().top,
+              val1=self.Settings.atDiv.offset().top-$('.talkReMark').offset().top;
+          //if(val1<5){
+          //  console.log("atdiv",self.Settings.atDiv.offset().top,"talk",$('.talkReMark').offset().top,val)
+          //  top =val>75?$('.talkReMark').offset().top+85:$('.talkReMark').offset().top+val+20;
+          //}else{
+          //  top =val<70?$('.talkReMark').offset().top+20:$('.talkReMark').offset().top+val+20;
+          //
+          //}
+          top = pos.top>75?$('.talkReMark').offset().top:$('.talkReMark').offset().top+pos.top-75;
+          imboxLeft += po.left+18;
+
+
+
+
       }
+        this.Settings.atList.css({
+          top: top,
+          left: pos.left + 6 +imboxLeft
+        }).show();
 
-      this.Settings.atList.css({
-        top: top,
-        left: pos.left + 6 +imboxLeft
-      }).show();
+
+
 
     }
 
