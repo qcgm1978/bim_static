@@ -4,7 +4,7 @@
     $.fn.at = function(opts) {
 
       $(this).each(function() {
-        new at($(this), opts);
+       window.ats= new at($(this), opts);
       });
 
     }
@@ -307,10 +307,17 @@
       if (top + this.Settings.atList.height() > $("body").height()) {
         top -= this.Settings.atList.height() + 30;
       }
+      //在窗口中打开时加上窗口的LEFT TOP
+      var imboxLeft = 0;
+      if($('.imboxNavWrap').length>0){
+        var po = $('.commentRemark').offset();
+        top += po.top-35;
+        imboxLeft += po.left+18;
+      }
 
       this.Settings.atList.css({
         top: top,
-        left: pos.left + 6
+        left: pos.left + 6 +imboxLeft
       }).show();
 
     }
