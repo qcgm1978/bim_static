@@ -246,7 +246,7 @@ App.Project.PlanAnalog = Backbone.View.extend({
 			$target.addClass("selected");
 		}
 		if (box && ids) {
-			App.Project.zoomModel(ids, box);
+			App.Project.zoomToBox(ids, box);
 			return;
 		}
 		var data = {
@@ -263,7 +263,7 @@ App.Project.PlanAnalog = Backbone.View.extend({
 				if (box && box.length) {
 					$target.data("userId", data.data.elements);
 					$target.data("box", box);
-					App.Project.zoomModel(data.data.elements, box);
+					App.Project.zoomToBox(data.data.elements, box);
 				}
 			}
 		});
