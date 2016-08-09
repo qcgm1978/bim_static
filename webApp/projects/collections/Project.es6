@@ -1609,6 +1609,7 @@ App.Project = {
 
 		//已有分类、过滤规则
 		if(_this.filterRule.file.indexOf(cat)!=-1){
+			_this.recoverySilder();
 			var _hideFileIds=_.filter(_files,function(i){
 				return i!=_secenId;
 			})
