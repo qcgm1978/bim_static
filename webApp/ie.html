@@ -17,17 +17,14 @@
     </style>
 </head>
 
-<body style="margin: 0;padding: 0;overflow: hidden;" onunload="unLoadEvent()" >
+<body style="margin: 0;padding: 0;overflow: hidden;" onunload="unLoadEvent()">
     <!-- <object ID="WebView" style="width: 100%;" CLASSID="CLSID:15A5F85D-A81B-45D1-A03A-6DBC69C891D1">
         <PARAM NAME="url" VALUE="" />
             </object> -->
     <script src="libs/jquery/jquery-1.12.0.min.js"></script>
     <script type="text/javascript">
-
-     
-
-    var hasDevicePixelRatio=true;
-    try { 
+    var hasDevicePixelRatio = true;
+    try {
 
         var myWebView = document.createElement("object"),
             currentVersion = 3;
@@ -38,7 +35,7 @@
             cookUrl = getCookie("path");
         viewport.appendChild(myWebView);
 
-        if (myWebView.pluginVersion != currentVersion) { 
+        if (myWebView.pluginVersion != currentVersion) {
             throw new error("version is old");
         }
         var url = cookUrl && cookUrl.lastIndexOf("/file/data") <= -1 && (new Date() - getCookie("pathDate")) / 1000 <= 2 &&
@@ -61,7 +58,7 @@
 
             //登录后设置 cookie
             myWebView.runScript("App.Comm.getCookAndStore()", function(cookStore) {
-                
+
                 if (!cookStore) {
                     return;
                 }
@@ -89,7 +86,7 @@
                     }
                 }
 
-            }); 
+            });
         });
 
         //文件下载
@@ -97,26 +94,35 @@
             window.location.href = url;
         });
 
-        if (url.indexOf("login.html")>-1) {
-            myWebView.runScript("Login.checkLogin()", function(isLogin) {
-            });
-        } 
+        if (url.indexOf("login.html") > -1) {
 
-        myWebView.height = document.body.parentElement.clientHeight + "px"; 
-       
+            var timer = setTimeout(function() {
+                
+                clearTimeout(timer);
+
+                myWebView.runScript('Login.checkLoginBefore("' + document.cookie + '")', function(isLogin) {});
+                myWebView.runScript('Login.checkLogin()', function(isLogin) {});
+
+            });
+
+
+        }
+
+        myWebView.height = document.body.parentElement.clientHeight + "px";
+
 
         window.onresize = resizeWebView;
 
-        delCookie("path"); 
+        delCookie("path");
 
-         resizeWebView(); 
+        resizeWebView();
 
     } catch (e) {
 
         if (myWebView.pluginVersion != currentVersion) {
             var html = templateUrl("/app/oPage/downloadIE.html");
-            $("body").html(html); 
-        }else if (!isIE()) {
+            $("body").html(html);
+        } else if (!isIE()) {
             var html = templateUrl("/app/oPage/tipIE.html");
             $("body").html(html);
         } else {
@@ -159,18 +165,18 @@
     }
 
     function resizeWebView() {
-       
+
         //重置
-        myWebView.width = 0;
-        myWebView.height = 0;
+        myWebView.width = "0";
+        myWebView.height = "0";
         var $body = $(document);
-        myWebView.width = $body.width();
-        myWebView.height = $body.height();
+        myWebView.width = $body.width() + "";
+        myWebView.height = $body.height() + "";
 
         if (!window.devicePixelRatio) {
-              myWebView.zoomFactor=screen.deviceXDPI / screen.logicalXDPI;
-        }else{
-             myWebView.zoomFactor = window.devicePixelRatio;
+            myWebView.zoomFactor = screen.deviceXDPI / screen.logicalXDPI;
+        } else {
+            myWebView.zoomFactor = window.devicePixelRatio;
         }
     }
 
