@@ -68,7 +68,7 @@
                 var cookies = cookStore.cookie,
                     user = cookStore.user;
                 //比较cookie
-                if (getCookie("userId") != getCookie("userId", cookies)) {
+                //if (getCookie("userId") != getCookie("userId", cookies)) {
                     //登录设置 登出删除
                     var keys = cookies.match(/[^ =;]+(?=\=)/g);
                     if (keys && keys.length > 1) {
@@ -84,7 +84,7 @@
                         }
                         localStorage.removeItem("user");
                     }
-                }
+                //}
 
             });
         });
