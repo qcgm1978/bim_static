@@ -3,7 +3,7 @@
 */
 
 var CLOUD = CLOUD || {};
-CLOUD.Version = "20160804";
+CLOUD.Version = "20160808";
 
 CLOUD.GlobalData = {
     SceneSize: 1000,
@@ -18373,9 +18373,19 @@ CloudViewer.prototype = {
         var viewportWidth = domElement.offsetWidth;
         var viewportHeight = domElement.offsetHeight;
 
-        var settings = { alpha: true, preserveDrawingBuffer: true };
-        if (!CLOUD.GlobalData.disableAntialias)
-            settings.antialias = true;
+        var settings = { alpha: true, preserveDrawingBuffer: true, antialias:true };
+        //if (!CLOUD.GlobalData.disableAntialias)
+        //    settings.antialias = true;
+        try {
+            var canvas = document.createElement('canvas');
+            var webglContext = canvas.getContext('webgl', settings) || canvas.getContext('experimental-webgl', settings);
+            if (!webglContext)
+                settings.antialias = false;
+        }
+        catch (e) {
+            return false;
+        }
+
         // Renderer
         this.renderer = new THREE.WebGLIncrementRenderer(settings);
         var renderer = this.renderer;
@@ -18421,6 +18431,7 @@ CloudViewer.prototype = {
             scope.render(true);
         }
         //this.editorManager.registerDomEventListeners(canvas);
+        return true;
     },
 
     registerDomEventListeners : function() {
