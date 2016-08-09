@@ -112,18 +112,15 @@
 
                 clearTimeout(timer);
 
-                myWebView.runScript('Login.checkLoginBefore("' + document.cookie + '")', function(isLogin) {});
-                myWebView.runScript('Login.checkLogin()', function(isLogin) {});
+               myWebView.runScript('Login.checkLoginBefore("' + document.cookie + '")', function(isLogin) {});
+               myWebView.runScript('Login.checkLogin()', function(isLogin) {});
 
             });
 
 
-        }
+        } 
 
-        myWebView.height = document.body.parentElement.clientHeight + "px";
-
-
-        window.onresize = resizeWebView;
+       window.onresize = resizeWebView;
 
         delCookie("path");
 
@@ -179,11 +176,11 @@
     function resizeWebView() {
 
         //重置
-        myWebView.width = "0";
-        myWebView.height = "0";
-        var $body = $(document);
-        myWebView.width = $body.width() + "";
-        myWebView.height = $body.height() + "";
+         myWebView.width = "100";
+         myWebView.height = "100";
+         var $body = $(document);
+         myWebView.width = $body.width() + "";
+         myWebView.height = $body.height() + "";
 
         if (!window.devicePixelRatio) {
             myWebView.zoomFactor = screen.deviceXDPI / screen.logicalXDPI;
