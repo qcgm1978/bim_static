@@ -31,14 +31,21 @@
       var _opt = options;
       _opt.element.html(_opt._dom.bimBox);
 
-
-      var url;
-      //外部引用
-      if (window.location.href.indexOf("bim.wanda") < 0) {
-        url = "http://bim.wanda.cn/static/dist/js/mpkWorker.min.js";
-      } else {
+      var url,
+        host = window.location.host;
+         
+      if (host == "bim.wanda-dev.cn" || host == "bim-uat.wanda-dev.cn" || host == "bim.wanda.cn") {
         url = "/static/dist/js/mpkWorker.min.js";
-      }
+      } else {
+        url = "http://bim.wanda.cn/static/dist/js/mpkWorker.min.js";
+      } 
+
+      // //外部引用
+      // if (window.location.href.indexOf("wanda.") < 0 ) {
+      //   url = "http://bim.wanda.cn/static/dist/js/mpkWorker.min.js";
+      // } else {
+      //   url = "/static/dist/js/mpkWorker.min.js";
+      // }
 
       $.ajax({
         xhrField: {
@@ -295,7 +302,7 @@
           parents = $this.parents('.itemNode'),
           flag = $this.prop('checked'),
           filter;
-        console.error('link:'+flag);
+        console.error('link:' + flag);
         $li.find("input").prop("checked", flag);
         if (type == "sceneId") {
           var filter = bimView.comm.getFilters($("#floors,#specialty"), 'uncheck');
@@ -400,11 +407,11 @@
         viewer.setTopView(CLOUD.Utils.computeBBox(box),scal||3);
       }
     },
-    zoomToBuilding: function(margin,ratio) {
+    zoomToBuilding: function(margin, ratio) {
       // 缩放到指定位置
       var self = this;
       var viewer = self.viewer;
-      viewer.zoomToBuilding( margin, ratio);
+      viewer.zoomToBuilding(margin, ratio);
       viewer.render();
     },
     zoomToSelection: function(box) {
@@ -635,7 +642,7 @@
       });
       viewer.render();
     },
-    highlight: function(obj) { 
+    highlight: function(obj) {
       // 高亮
       var self = this;
       var viewer = self.viewer;
@@ -643,8 +650,8 @@
       if (obj.type == "userId") {
         filter.setOverriderByUserIds('highlight', obj.ids, "lightBlue");
       } else {
-        if (obj.ids == undefined) { 
-            filter.setUserOverrider(obj.type, undefined); 
+        if (obj.ids == undefined) {
+          filter.setUserOverrider(obj.type, undefined);
         } else {
           $.each(obj.ids, function(i, id) {
             filter.setUserOverrider(obj.type, id, "lightBlue");
@@ -660,7 +667,7 @@
       var viewer = self.viewer;
       var filter = viewer.getFilters();
       if (obj.type == "userId") {
-        filter.setOverriderByUserIds('highlight', obj.ids,null);
+        filter.setOverriderByUserIds('highlight', obj.ids, null);
       } else {
         if (obj.ids == undefined) {
           filter.setUserOverrider(obj.type, undefined);

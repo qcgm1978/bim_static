@@ -95,7 +95,7 @@
 	  }
 	}
 	.reMarkListBox { width: 100%; position: absolute; top: 55px; bottom: 100px; left: 0px; right: 0px; }
-	.viewPointInfo { color: #ccc; padding: 16px 0 20px 0;
+	.viewPointInfo { color: #ccc; padding: 11px 0 20px 0;
 	  .thumbnailImg { float: left; width: 82px; height: 62px; margin: 10px 0px 0px 10px; }
 	  .info { margin-left: 120px; padding-top: 9px; }
 	  .title { width: 98%; height: 42px; font-size: 14px; color: #333; }
@@ -133,8 +133,12 @@
 	.uploadImg { display: none; }
 	.btnEnter { float: right; margin: 10px 12px 10px 0px; width: 80px; height: 28px; background-color: transparent; outline: 0; border: 1px #D2D2D2 solid;
 	  color: #3F3F3F; }
-	.btnIcon { margin-top: 10px; font-size: 23px; cursor: pointer; width: 30px; height: 30px; display: inline-block; text-align: center; background-color: #ddd; margin-right: 7px;
-	  &.m-img { margin-left: 12px; }
+	.btnIcon { margin-top: 10px; font-size: 23px; cursor: pointer; width: 27px; height: 27px; display: inline-block; text-align: center; background-color: #ddd; margin-right: 7px;
+	  &.m-img { margin-left: 12px;
+	  &:before{
+		position: relative;
+		top: -1px;}
+	  }
 	}
 	.reMarkList { .item { border-bottom: 1px #D2D2D2 solid; margin: 0px 12px 8px 12px; padding-bottom: 10px;
 	  &:hover { .delTalkBox { .delTalk { display: inline; }

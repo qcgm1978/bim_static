@@ -1016,6 +1016,7 @@ dwgViewer.prototype = {
     this.dwgView.dwgHelper.editAnnotationEnd();
     $("#modelBox .bim .commentBar").addClass("hide");
     $("#dwgCommentContainer").css("z-index", -1);
+    App.Project.Settings.Viewer.pan();
   }
 
 

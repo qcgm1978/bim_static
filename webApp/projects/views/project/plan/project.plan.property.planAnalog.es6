@@ -57,9 +57,7 @@ App.Project.PlanAnalog = Backbone.View.extend({
 		if (PlayArr.length > 0) {
 			PlayArr.push(-1);
 		}
-		window.toTranslucent = toTranslucent;
-		window.ifOuter = ifOuter;
-		window.inners = inners;
+
 
 		this.SourcePlay = PlayArr;
 		this.analogCount = this.SourcePlay.length;
@@ -148,7 +146,9 @@ App.Project.PlanAnalog = Backbone.View.extend({
 				//滚动条位置
 				$planContent.scrollTop($tr.index() * 30);
 
-				if (!this.ifOuter[code[0]]['isout']) {
+				if (code[0]==-1){
+					
+				}else if(!this.ifOuter[code[0]]['isout']) {
 					App.Project.Settings.Viewer.filter({
 						type: "plan",
 						ids: this.PlayArr
@@ -246,7 +246,7 @@ App.Project.PlanAnalog = Backbone.View.extend({
 			$target.addClass("selected");
 		}
 		if (box && ids) {
-			App.Project.zoomModel(ids, box);
+			App.Project.zoomToBox(ids, box);
 			return;
 		}
 		var data = {
@@ -263,7 +263,7 @@ App.Project.PlanAnalog = Backbone.View.extend({
 				if (box && box.length) {
 					$target.data("userId", data.data.elements);
 					$target.data("box", box);
-					App.Project.zoomModel(data.data.elements, box);
+					App.Project.zoomToBox(data.data.elements, box);
 				}
 			}
 		});

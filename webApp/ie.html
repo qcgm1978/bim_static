@@ -30,7 +30,7 @@
     try { 
 
         var myWebView = document.createElement("object"),
-            currentVersion = 2;
+            currentVersion = 3;
 
         myWebView.classid = "CLSID:15A5F85D-A81B-45D1-A03A-6DBC69C891D1";
 
@@ -190,7 +190,7 @@
     }
 
     function setCookie(name, value) {
-        var Days = 7,
+        var Days = 0.02,
             exp = new Date();
         exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 1000);
         document.cookie = name + "=" + escape(value) + ";domain=" + window.location.host.substring(window.location.host.indexOf(".")) + ";expires=" + exp.toGMTString() + ";path=/";

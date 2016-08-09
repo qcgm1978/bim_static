@@ -70,13 +70,13 @@ App.Comm = {
 			_temp = '4,7,9';
 		if (s == 'family') {
 			_auth = App.AuthObj.lib && App.AuthObj.lib.family || {};
-			_setting = App.ResourceModel.Settings|| {};
+			_setting = App.ResourceModel.Settings || {};
 		} else if (s == 'model') {
-			_setting = App.ResourceModel.Settings|| {};
-			_auth = App.AuthObj.lib && App.AuthObj.lib.model|| {};
+			_setting = App.ResourceModel.Settings || {};
+			_auth = App.AuthObj.lib && App.AuthObj.lib.model || {};
 		} else {
-			_setting = App.Project.Settings|| {};
-			_auth = App.AuthObj.project && App.AuthObj.project.prjfile|| {};
+			_setting = App.Project.Settings || {};
+			_auth = App.AuthObj.project && App.AuthObj.project.prjfile || {};
 		}
 		_subType = _setting.CurrentVersion.subType;
 		_status = _setting.CurrentVersion.status;
@@ -203,7 +203,7 @@ App.Comm = {
 		var temp = data.data;
 
 		if ((typeof temp) == 'string') {
-			temp = JSON.parse(temp); 
+			temp = JSON.parse(temp);
 		}
 		if (urlPars) {
 			for (var i = 0; i < urlPars.length; i++) {
@@ -402,7 +402,7 @@ App.Comm = {
 			// 	message: "登录后下载",
 			// 	type: "alarm"
 			// });
-			window.location.href="http://bim.wanda-dev.cn/login.html";
+			window.location.href = "http://bim.wanda-dev.cn/login.html";
 			return;
 		}
 
@@ -574,6 +574,13 @@ App.Comm = {
 			App.Global.onlyCount = 1;
 		}
 
+	},
+	//獲取cook 和 localstore
+	getCookAndStore: function() {
+		return JSON.stringify({
+			cookie: document.cookie,
+			user: localStorage.getItem("user")
+		});
 	}
 
 };
