@@ -1012,7 +1012,7 @@ dwgViewer.prototype = {
   //结束批注
   commentEnd: function() {
 
-    $("#modelBox .modelBar .m-camera").removeClass("selected");
+    //$("#modelBox .modelBar .m-camera").removeClass("selected");
     this.dwgView.dwgHelper.editAnnotationEnd();
     $("#modelBox .bim .commentBar").addClass("hide");
     $("#dwgCommentContainer").css("z-index", -1);
