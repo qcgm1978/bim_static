@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>BIM总发包管理平台</title>
+    <meta http-equiv="pragma" content="no-cache">
     <style type="text/css">
     #newVersion {
         position: fixed;
@@ -68,13 +69,27 @@
                 var cookies = cookStore.cookie,
                     user = cookStore.user;
                 //比较cookie
-                //if (getCookie("userId") != getCookie("userId", cookies)) {
+                if (getCookie("OUTSSO_AuthMAC") != getCookie("OUTSSO_AuthMAC", cookies)) {
                     //登录设置 登出删除
                     var keys = cookies.match(/[^ =;]+(?=\=)/g);
-                    if (keys && keys.length > 1) {
+
+                    if (keys && keys.length > 5) {
+
+                        var key, value;
+
                         for (var i = 0; i < keys.length; i++) {
-                            setCookie(keys[i], getCookie(keys[i], cookies));
+
+                            key = keys[i];
+                            value = getCookie(keys[i], cookies);
+                            setCookie(key, value);
+
                         }
+
+                        var lastKey = "AuthUser_AuthToken",
+                            lastValue=cookStore.data;  
+
+                        lastValue &&　setCookie(lastKey, lastValue);　
+
                         localStorage.user = user;
 
                     } else {
@@ -84,7 +99,7 @@
                         }
                         localStorage.removeItem("user");
                     }
-                //}
+                }
 
             });
         });
@@ -97,7 +112,7 @@
         if (url.indexOf("login.html") > -1) {
 
             var timer = setTimeout(function() {
-                
+
                 clearTimeout(timer);
 
                 myWebView.runScript('Login.checkLoginBefore("' + document.cookie + '")', function(isLogin) {});
@@ -196,7 +211,7 @@
     }
 
     function setCookie(name, value) {
-        var Days = 0.02,
+        var Days = 1,
             exp = new Date();
         exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 1000);
         document.cookie = name + "=" + escape(value) + ";domain=" + window.location.host.substring(window.location.host.indexOf(".")) + ";expires=" + exp.toGMTString() + ";path=/";
@@ -226,7 +241,7 @@
         exp.setTime(exp.getTime() - 31 * 24 * 60 * 60 * 1000);
         var cval = this.getCookie(name);
         if (cval != null)
-            document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString() + ";path=/";
+            document.cookie = name + "=" + cval + ";domain=" + window.location.host.substring(window.location.host.indexOf(".")) + ";expires=" + exp.toGMTString() + ";path=/";
     }
     </script>
 </body>
