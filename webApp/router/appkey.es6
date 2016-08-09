@@ -448,6 +448,7 @@ var AppKeyRoute = Backbone.Router.extend({
 		var data = {
 			URLtype: 'projectByCode',
 			data: {
+				appKey:appKey,
 				token: token,
 				code: code
 			}
