@@ -320,9 +320,7 @@
 				this.$dialog.remove();
 				this.$dialog = null;
 			})
-
 			$dialog.on('click', '.dialogOk', function() {
-
 				//获取数据
 				WebView.runScript('getData()', function(val) {
 					var result = {},

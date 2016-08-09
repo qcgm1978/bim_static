@@ -6,7 +6,7 @@
   <title>模型选择器</title>
     <meta http-equiv='pragma' content='no-cache'>
     <meta http-equiv='cache-control' content='no-cache'>
-  <script src="http://bim.wanda-dev.cn/static/dist/components/modelSelection/js/modelSelection.js"></script>
+  <script src="http://bim-uat.wanda-dev.cn/static/dist/components/modelSelection/js/modelSelection.js"></script>
 </head>
 <body>
 <input type="button" id="model" value="show">
@@ -14,7 +14,7 @@
  jQuery.support.cors = true;
  var viewer = new ModelSelection({
       type:'single',//multi,single
-      projectCode:'119b1c19-0c93-4145-b834-a2fcb78af008',
+      projectCode:'18dc7a80-257a-4b44-b1f1-1c1db4af5987',
       callback:function(components,markers){
           alert(components)
           window.returnValue=JSON.stringify(components)
