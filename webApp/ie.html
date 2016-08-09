@@ -165,13 +165,21 @@
         }
     }
 
-    function navigateTo(url) {
-        var aLink = "<a href='" + url + "' target='_blank' >test</a>";
-        var a = $(aLink)[0];
-        var e = document.createEvent('MouseEvents');
-        e.initEvent('click', true, true);
-        a.dispatchEvent(e);
+  function navigateTo(url){ 
+        
+        if(document.createEvent !== undefined ){
+            var aLink = "<a href='"+ url + "' target='_blank' >test</a>";
+            var a = $(aLink).get(0);
+            var e = document.createEvent('MouseEvents');
+            e.initEvent('click', true, true);
+            a.dispatchEvent(e);
+        }
+        else{
+            window.open(url);
+        }
+
     }
+
 
     function resizeWebView() {
 
