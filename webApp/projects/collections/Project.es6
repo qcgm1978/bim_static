@@ -1671,10 +1671,11 @@ App.Project = {
 	//取消zoom
 	cancelZoomModel: function() {
 		App.Project.Settings.Viewer.translucent(false);
-		//高亮
-		App.Project.Settings.Viewer.highlight({
-			type: 'userId',
-			ids: []
+
+		App.Project.Settings.Viewer.ignoreTranparent({
+			type: "plan",
+			//ids: [code[0]]
+			ids: undefined
 		});
 	},
 
@@ -1772,8 +1773,12 @@ App.Project = {
 		});
 
 		if (Ids.length > 0) {
-			App.Project.Settings.Viewer.highlight(Ids);
 			App.Project.Settings.Viewer.zoomToBox(boxArr);
+			App.Project.Settings.Viewer.translucent(true)
+			App.Project.Settings.Viewer.highlight({
+				type: 'userId',
+				ids: Ids
+			});
 		}
 
 	},
