@@ -712,7 +712,10 @@ App.Project = {
 			App.Project.upload = App.modules.docUpload.init($(document.body));
 		}
 
-
+		//api 页面 默认加载模型
+		if (App.Project.Settings.type == "token") {
+			$("#projectContainer").find(".fileContainer").hide().end().find(".modelContainer").show(); 
+		}
 		// 导航文件
 		App.Project.fetchFileNav();
 		//导航模型
@@ -746,12 +749,13 @@ App.Project = {
 
 		//api 页面 默认加载模型
 		if (App.Project.Settings.type == "token") {
+			$("#projectContainer").find(".fileContainer").hide().end().find(".modelContainer").show();
 			$(".fileNav .model").click();
 			//分享
-			if (window.location.href.indexOf("share") > 10) {
-				//初始化分享
-				App.Project.Share.init();
-			}
+			// if (window.location.href.indexOf("share") > 10) {
+			// 	//初始化分享
+			// 	App.Project.Share.init();
+			// }
 		}
 
 		//存在viewpintid
@@ -771,6 +775,7 @@ App.Project = {
 			var ProjectTab = App.Comm.AuthConfig.Project,
 				$projectTab = $(".projectContainerApp .projectHeader .projectTab");
 
+				 
 			//设计
 			//if (projectAuth.design) {
 			//	$projectTab.append(ProjectTab.DesignTab.tab);

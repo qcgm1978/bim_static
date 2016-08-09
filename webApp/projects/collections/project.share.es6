@@ -22,6 +22,7 @@ App.Project.Share = {
 
 			//设置权限
 			App.Project.setPropertyByAuth();
+
 			//销毁上传
 			App.Comm.upload.destroy();
 
@@ -29,11 +30,11 @@ App.Project.Share = {
 
 			App.TopNav.init();
 
-			var $comment=$("#comment");
+			var $comment = $("#comment");
 			//评论 登录状态
-			if ($comment.find(".btnLogin").length>0) {
+			if ($comment.find(".btnLogin").length > 0) {
 				$comment.find(".noLogin").remove();
-				$comment.find(".talkReMark").removeClass("hidden");				 
+				$comment.find(".talkReMark").removeClass("hidden");
 			}
 
 			return;
@@ -89,7 +90,7 @@ App.Project.Share = {
 				message: dialogHtml
 			},
 
-			that=this,
+			that = this,
 
 			dialog = new App.Comm.modules.Dialog(opts);
 
@@ -102,7 +103,7 @@ App.Project.Share = {
 		//登录
 		dialog.element.find(".txtPwd").on("keyup", function(event) {
 			//绑定登录
-			if (event.keyCode==13) {
+			if (event.keyCode == 13) {
 				that.signIn(dialog);
 			}
 		});
@@ -146,14 +147,18 @@ App.Project.Share = {
 		}).done(function(data) {
 
 			if (data.code == 0) {
-				//写cookie
+				//写cookie 
+				var keys = [];
 				if (data.data && typeof data.data === 'object') {
 					for (var p in data.data) {
 						App.Comm.setCookie(p, data.data[p]);
+						keys.push(p);
 					}
-				}	
-				
-				App.Comm.delCookie("token_cookie");		
+				}
+
+				localStorage.setItem("keys", keys.join(','));
+
+				App.Comm.delCookie("token_cookie");
 				//获取用户信息
 				App.Project.Share.getUserInfo(dialog);
 
@@ -169,7 +174,8 @@ App.Project.Share = {
 	//获取用户信息
 	getUserInfo(dialog) {
 
-		var $el = dialog.element,that=this;
+		var $el = dialog.element,
+			that = this;
 
 		$.ajax({
 			url: '/platform/user/current'
@@ -188,6 +194,7 @@ App.Project.Share = {
 			App.Comm.setCookie('IS_OWNER_LOGIN', '2');
 			//绑定登陆
 			App.Project.Share.bindLogin();
+
 			App.Project.init();
 			// if (!$._data($("#topBar .login")[0], "events")) {
 			// 	//绑定用户信息
