@@ -6013,16 +6013,53 @@ CLOUD.Extensions.MarkerEditor.prototype.onMouseUp = function (event) {
 
                 if (userId === "") return;
 
-                var bBox = intersect.object.boundingBox;
+                var inverseScaleMatrix = scope.getInverseSceneMatrix();
+                var boundingBox = intersect.object.boundingBox;
+                var bBox = new THREE.Box3();
 
-                if (!bBox) {
-                    intersect.object.geometry.computeBoundingBox();
-                    bBox = intersect.object.geometry.boundingBox;
+                if (intersect.object.geometry instanceof THREE.BoxGeometry) {
+
+                    //intersect.object.geometry.computeBoundingBox();
+                    //bBox = intersect.object.geometry.boundingBox;
+                    //bBox.applyMatrix4(intersect.object.matrixWorld);
+                    //bBox.applyMatrix4( inverseScaleMatrix);
+
+                    if (boundingBox) {
+
+                        bBox = boundingBox.clone();
+
+                        var position = new THREE.Vector3();
+                        var quaternion = new THREE.Quaternion();
+                        var scale = new THREE.Vector3();
+                        var objMatrix = intersect.object.matrix;
+                        objMatrix.decompose( position, quaternion, scale );
+
+                        // 计算包围盒
+                        var invScale = new THREE.Vector3(1 /scale.x, 1 / scale.y, 1 / scale.z );
+                        bBox.min.multiply(invScale);
+                        bBox.max.multiply(invScale);
+
+                    } else {
+                        intersect.object.geometry.computeBoundingBox();
+                        bBox = intersect.object.geometry.boundingBox;
+                    }
+
+                    bBox.applyMatrix4(intersect.object.matrixWorld);
+                    bBox.applyMatrix4( inverseScaleMatrix);
+
+                } else {
+
+                    if (!boundingBox) {
+                        intersect.object.geometry.computeBoundingBox();
+                        boundingBox = intersect.object.geometry.boundingBox;
+                    }
+
+                    bBox = boundingBox.clone();
                 }
 
+                // 计算世界点
                 var position = intersect.point.clone();
-                var inverseMatrix = scope.getInverseSceneMatrix();
-                position.applyMatrix4(inverseMatrix);
+                position.applyMatrix4(inverseScaleMatrix);
 
                 var markerId = scope.generateMarkerId();
                 var marker;
@@ -10832,7 +10869,7 @@ CLOUD.Extensions.Helper2D.prototype = {
             var bBox = this.markerEditor.getMarkersBoundingBox();
 
             if (bBox) {
-                this.viewer.zoomToBBox(bBox);
+                this.viewer.zoomToBBox(bBox, 0.05);
             }
 
             this.markerEditor.updateMarkers();

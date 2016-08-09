@@ -9,7 +9,8 @@ App.Flow.Controller={
         '计划管理':'m-jihuaguanli',
         '设计管理':'m-shejiguanli',
         '招商管理':'m-zhaoshangguanli',
-        '质量管理':'m-zhiliangguanli'
+        '质量管理':'m-zhiliangguanli',
+        '经营管理':'m-jingyingguanli32'
     },
 
     toIcon:function(key){
