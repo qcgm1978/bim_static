@@ -1,5 +1,5 @@
 <% $.each(data.items,function(i,item){%> 
-    <tr class="<%= i%2==0 && 'odd' %>" data-id="<%=item.id%>" data-code="<%=item.projectCode%>"    data-uuid="<%=item.componentId%>" data-location='<%= item.location %>' data-axis='<%= item.axis%>' data-color='<%=item.status%>' data-cat="">
+    <tr class="<%= i%2==0 && 'odd' %>" data-id="<%=item.id%>" data-code="<%=item.projectCode%>"    data-uuid="<%=item.componentId%>" data-location='<%= item.location %>' data-axis='<%= item.axis%>' data-color='<%=item.status%>' data-cat="item.catetoryName">
 
         <td class="concernInfo">
 
