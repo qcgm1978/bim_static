@@ -4,7 +4,7 @@
     $.fn.at = function(opts) {
 
       $(this).each(function() {
-       window.ats= new at($(this), opts);
+       new at($(this), opts);
       });
 
     }
