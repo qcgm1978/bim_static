@@ -9,9 +9,12 @@ var Login = {
 		document.cookie = name + "=" + escape(value) + ";expires=" + exp.toGMTString() + ";domain=" + Login.doMain + ";path=/";
 	},
 	//获取cookie
-	getCookie: function(name) {
+	getCookie: function(name, cookis) {
 		var arr, reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)");
-		if (arr = document.cookie.match(reg))
+
+		var cooks = cookis || document.cookie;
+
+		if (arr = cooks.match(reg))
 			return unescape(arr[2]);
 		else
 			return null;
@@ -180,16 +183,30 @@ var Login = {
 		this.checkLogin();
 	},
 
-	//验证登录
-	checkLogin: function() { 
+	//
+	checkLoginBefore: function(cookies) {
 		
-		$.ajax({
-			url: '/platform/user/current?t=' + (+new Date()) 
-		}).done(function(data) { 
+		if (cookies) {
+			var keys = cookies.match(/[^ =;]+(?=\=)/g),
+				val;
+			for (var i = 0; i < keys.length; i++) { 
+				val = Login.getCookie(keys[i], cookies);
+				Login.setCookie(keys[i], val);
+			}
+		}
+		 
+	},
 
-			if (typeof(data) =="string") {
-				data=JSON.parse(data);
-			}  
+	//验证登录
+	checkLogin: function() {
+
+		$.ajax({
+			url: '/platform/user/current?t=' + (+new Date())
+		}).done(function(data) {
+
+			if (typeof(data) == "string") {
+				data = JSON.parse(data);
+			}
 
 			if (data.code == 0) {
 				localStorage.setItem("user", JSON.stringify(data.data))
