@@ -3,13 +3,14 @@
   <head>
     <meta charset="UTF-8">
     <title>模型选择器</title>
-      <script src="http://bim.wanda-dev.cn/static/dist/components/inspectSelection/js/inspectSelection.js"></script>
+      <script src="http://bim-uat.wanda-dev.cn/static/dist/components/inspectSelection/js/inspectSelection.js"></script>
   </head>
   <body>
     <script>
-    function GetRequest() {   
-       var url = location.search; //获取url中"?"符后的字串   
-       var theRequest = new Object();   
+    function GetRequest() {
+
+       var url = location.search; //获取url中"?"符后的字串
+       var theRequest = new Object();
        if (url.indexOf("?") != -1) {   
           var str = url.substr(1);   
           strs = str.split("&");   
