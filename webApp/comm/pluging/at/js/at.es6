@@ -312,18 +312,10 @@
       if($('.imboxNavWrap').length>0){
 
           var po = $('.commentRemark').offset(),
-              val=self.Settings.atDiv.find('.at').offset().top- $('.talkReMark').offset().top,
-              val1=self.Settings.atDiv.offset().top-$('.talkReMark').offset().top;
-          //if(val1<5){
-          //  console.log("atdiv",self.Settings.atDiv.offset().top,"talk",$('.talkReMark').offset().top,val)
-          //  top =val>75?$('.talkReMark').offset().top+85:$('.talkReMark').offset().top+val+20;
-          //}else{
-          //  top =val<70?$('.talkReMark').offset().top+20:$('.talkReMark').offset().top+val+20;
-          //
-          //}
+
           top = pos.top>75?$('.talkReMark').offset().top:$('.talkReMark').offset().top+pos.top-75;
           imboxLeft += po.left+18;
-
+          console.log( pos.top,$('.talkReMark').offset().top)
 
 
 
