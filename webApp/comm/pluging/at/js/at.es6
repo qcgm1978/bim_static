@@ -312,8 +312,8 @@
       if($('.imboxNavWrap').length>0){
         var po = $('.commentRemark').offset();
         //var po = $('.at').offset();
-        top += po.top-35;
-        //top += po.top;
+
+        top += 13;
         imboxLeft += po.left+18;
       }
 
