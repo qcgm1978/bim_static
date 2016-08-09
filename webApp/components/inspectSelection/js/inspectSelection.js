@@ -220,8 +220,7 @@
 					self.dialog();
 					self.controll();
 				})
-			});
-			alert(bimView.API.baseUrl)
+			}); 
 		},
 		controll: function() {
 

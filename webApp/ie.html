@@ -71,22 +71,19 @@
                 //比较cookie
                 if (getCookie("OUTSSO_AuthMAC") != getCookie("OUTSSO_AuthMAC", cookies)) {
                     //登录设置 登出删除
-                    var keys = cookies.match(/[^ =;]+(?=\=)/g);
-
-                    if (keys && keys.length > 5) {
-
-                        var key, value;
-
-                        for (var i = 0; i < keys.length; i++) {
-
+                    var keys = cookies.match(/[^ =;]+(?=\=)/g),
+                    lastKey = "AuthUser_AuthToken",
+                            lastValue=cookStore.data;  
+                            
+                    if (keys && keys.length > 5) { 
+                        var key, value; 
+                        for (var i = 0; i < keys.length; i++) { 
                             key = keys[i];
                             value = getCookie(keys[i], cookies);
-                            setCookie(key, value);
-
-                        }
-
-                        var lastKey = "AuthUser_AuthToken",
-                            lastValue=cookStore.data;  
+                            if (key!=lastKey) {
+                                 setCookie(key, value);
+                            }  
+                        } 
 
                         lastValue &&　setCookie(lastKey, lastValue);　
 
@@ -115,18 +112,15 @@
 
                 clearTimeout(timer);
 
-                myWebView.runScript('Login.checkLoginBefore("' + document.cookie + '")', function(isLogin) {});
-                myWebView.runScript('Login.checkLogin()', function(isLogin) {});
+               myWebView.runScript('Login.checkLoginBefore("' + document.cookie + '")', function(isLogin) {});
+               myWebView.runScript('Login.checkLogin()', function(isLogin) {});
 
             });
 
 
-        }
+        } 
 
-        myWebView.height = document.body.parentElement.clientHeight + "px";
-
-
-        window.onresize = resizeWebView;
+       window.onresize = resizeWebView;
 
         delCookie("path");
 
@@ -171,22 +165,30 @@
         }
     }
 
-    function navigateTo(url) {
-        var aLink = "<a href='" + url + "' target='_blank' >test</a>";
-        var a = $(aLink)[0];
-        var e = document.createEvent('MouseEvents');
-        e.initEvent('click', true, true);
-        a.dispatchEvent(e);
+  function navigateTo(url){ 
+        
+        if(document.createEvent !== undefined ){
+            var aLink = "<a href='"+ url + "' target='_blank' >test</a>";
+            var a = $(aLink).get(0);
+            var e = document.createEvent('MouseEvents');
+            e.initEvent('click', true, true);
+            a.dispatchEvent(e);
+        }
+        else{
+            window.open(url);
+        }
+
     }
+
 
     function resizeWebView() {
 
         //重置
-        myWebView.width = "0";
-        myWebView.height = "0";
-        var $body = $(document);
-        myWebView.width = $body.width() + "";
-        myWebView.height = $body.height() + "";
+         myWebView.width = "100";
+         myWebView.height = "100";
+         var $body = $(document);
+         myWebView.width = $body.width() + "";
+         myWebView.height = $body.height() + "";
 
         if (!window.devicePixelRatio) {
             myWebView.zoomFactor = screen.deviceXDPI / screen.logicalXDPI;
