@@ -398,9 +398,14 @@
       viewer.zoomToBBox(CLOUD.Utils.computeBBox(box), 0.05, 1.2);
       viewer.render();
     },
-    setTopView: function(box) {
+
+    setTopView: function(box,isMeger,scal) {
       var viewer = this.viewer;
-      viewer.setTopView(CLOUD.Utils.computeBBox(box), 5);
+      if(isMeger){
+        viewer.setTopView(CLOUD.Utils.mergeBBox(box));
+      }else{
+        viewer.setTopView(CLOUD.Utils.computeBBox(box),scal||3);
+      }
     },
     zoomToBuilding: function(margin, ratio) {
       // 缩放到指定位置
