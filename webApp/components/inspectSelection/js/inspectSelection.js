@@ -126,7 +126,6 @@
 			ourl = a;
 		}
 	}
-
 	var mapData = {
 		processCategory: ['', '工程桩', '基坑支护', '地下防水', '梁柱节点', '钢结构悬挑构件', '幕墙', '外保温',
 			'采光顶', '步行街吊顶风口', '卫生间防水', '屋面防水', '屋面虹吸雨排', '消防泵房', '给水泵房',
@@ -222,6 +221,7 @@
 					self.controll();
 				})
 			});
+			alert(bimView.API.baseUrl)
 		},
 		controll: function() {
 
@@ -363,7 +363,6 @@
 					WebView.zoomFactor = screen.deviceXDPI / screen.logicalXDPI;
 				}
 			}
-
 			WebView.url = ourl + "/static/dist/components/inspectSelection/model.html?type=" + this.Settings.type + "&sourceId=" + this.Settings.sourceId + "&etag=" +
 				this.Settings.etag + "&projectId=" + this.Settings.projectId + "&projectVersionId=" + this.Settings.projectVersionId + "&ruleType=" + this.Settings.ruleType;
 			WebView.height = "510px";

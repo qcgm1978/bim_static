@@ -40,13 +40,15 @@ App.Project = {
 			_spFiles=_v.SpecialtyFileObjData,//专业文件数据对象
 			_ctFiles=_v.ComponentTypeFilesData;//结构类型数据对象
 		if(cat=='地下防水'){
-			var sp='结构',
+			this.linkSilder('floors',floor);
+			this.linkSilderSpecial('specialty','WDGC-Q-ST-'+floor+'.rvt,WDGC-Q-ST-垫层防水层.rvt');
+			/*var sp='结构',
 				show=[],
 				hide=[];
 			_.each(_spFiles,function(val,key){
 				if(sp==key){
 					_.each(val,function(item){
-						if(item.fileName.indexOf('B02')!=-1){
+						if(item.fileName.indexOf(floor)!=-1){
 							show=[item.fileEtag];
 						}else{
 							hide.push(item.fileEtag);
@@ -62,11 +64,11 @@ App.Project = {
 				ids:hide,
 				total:show,
 				type:'sceneId'
-			});
-			App.Project.Settings.Viewer.filter({
+			});*/
+		/*	App.Project.Settings.Viewer.filter({
 				ids:_this.filterCCode('10.20.20.09'),
 				type:"classCode"
-			});
+			});*/
 			//this.linkSilder('floors',floor);
 		}
 		if(cat=='梁柱节点'){
@@ -1635,6 +1637,7 @@ App.Project = {
 				type:'sceneId'
 			});*/
 		}else if(_this.filterRule.single.indexOf(cat)!=-1){
+			_this.recoverySilder();
 			_this.sigleRule(cat,key);
 		}else{
 			_this.linkSilder('floors',key);
