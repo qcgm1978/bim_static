@@ -217,11 +217,14 @@ var AppKeyRoute = Backbone.Router.extend({
 
 			App.Project.Settings.versionId = versionId;
 
-			App.Project.Settings.type = "token";
+			App.Project.Settings.type = "token";   
 
 			_this.projectByCode(projectCode, function(data) {
 				if (data) {
 					App.Project.Settings.projectId = data.projectId;
+					var Request = App.Comm.GetRequest();
+					//加载类型
+					App.Project.Settings.loadType=Request.type;
 					App.Project.init();
 				}
 
@@ -435,7 +438,7 @@ var AppKeyRoute = Backbone.Router.extend({
 	cleanCookie() {
 		//绑定beforeunload事件
 		$(window).on('beforeunload', function() {
-			App.Comm.delCookie("token_cookie")
+			//App.Comm.delCookie("token_cookie")
 		});
 	},
 
