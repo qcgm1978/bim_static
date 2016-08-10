@@ -531,10 +531,10 @@ App.Project.ProjectContainer = Backbone.View.extend({
 				//半透明
 				viewer.translucent(true);
 
-				var box = App.Project.formatBBox(App.Project.Settings.PlanElement.boundingBox);
-				if (box && box.length) {
-					App.Project.zoomToBox(App.Project.Settings.PlanElement.elements, box);
-				}
+				//var box = App.Project.formatBBox(App.Project.Settings.PlanElement.boundingBox);
+				//if (box && box.length) {
+				//	App.Project.zoomToBox(App.Project.Settings.PlanElement.elements, box);
+				//}
 			});
 		}
 
