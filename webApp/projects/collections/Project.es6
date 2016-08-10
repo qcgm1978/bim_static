@@ -817,7 +817,7 @@ App.Project = {
 		}
 
 		//api 页面 默认加载模型
-		if (App.Project.Settings.type == "token") {
+		if (App.Project.Settings.type == "token" && App.Project.Settings.loadType=="model") {
 			$("#projectContainer").find(".fileContainer").hide().end().find(".modelContainer").show(); 
 		}
 		// 导航文件
@@ -852,8 +852,7 @@ App.Project = {
 		this.setPropertyByAuth();
 
 		//api 页面 默认加载模型
-		if (App.Project.Settings.type == "token") {
-			$("#projectContainer").find(".fileContainer").hide().end().find(".modelContainer").show();
+		if (App.Project.Settings.type == "token" && App.Project.Settings.loadType=="model") { 
 			$(".fileNav .model").click();
 			//分享
 			// if (window.location.href.indexOf("share") > 10) {

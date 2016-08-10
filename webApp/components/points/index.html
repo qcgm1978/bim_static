@@ -132,7 +132,7 @@
                     var fieldid = query.elementId.split('.')[0],
                         uid = query.elementId.split('.')[1];
                     query.uid = uid;
-
+                     
                     $.ajax({
                         url: "/doc/api/" + query.projectId + '/' + query.projectVersionId + "?fileId=" + fieldid
                     }).done(function(data) {
@@ -210,7 +210,10 @@
         if (!("ActiveXObject" in window) && !window.ActiveXObject) {
             //轮训
             setInterval(function() {
-                App.Comm.checkOnlyCloseWindow();
+                if (App.Comm && $.isFunction( App.Comm.checkOnlyCloseWindow)) {
+                     App.Comm.checkOnlyCloseWindow();
+                }
+               
             }, 3000);
         }
     })
