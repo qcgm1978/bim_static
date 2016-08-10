@@ -27,11 +27,7 @@ App.Project = {
 		//单文件：过滤出检查点所在构件所在的文件
 		file:'工程桩,基坑支护,钢结构悬挑构件,幕墙,采光顶',
 		//单独类型：singleRule
-		single:'梁柱节点,地下防水,步行街吊顶风口,卫生间防水',
-		//根据楼层过滤
-		floor:'外保温'
-		//楼层有专业类型
-		//floorSpty:'步行街吊顶风口&暖通#内装,卫生间防水&暖通#内装'
+		single:'梁柱节点,地下防水,步行街吊顶风口,卫生间防水,外保温'
 	},
 
 	marginRule:{
@@ -141,11 +137,11 @@ App.Project = {
 			this.linkSilderSpecial('specialty','WDGC-Q-ST-'+floor+'.rvt');
 			this.linkSilderCategory('category','楼板')
 		}
-		if(cat==''){
-			/*App.Project.Settings.Viewer.filter({
-				ids:_this.filterCCode('10.20.20.09'),
+		if(cat=='外保温'){
+			App.Project.Settings.Viewer.filter({
+				ids:_this.filterCCode(['10.10.20.03.06.20.10.30.03','(10.10.30.03.09.06']),
 				type:"classCode"
-			})*/
+			})
 		}
 		if(cat=='步行街吊顶风口'||cat=='卫生间防水'){
 			this.linkSilder('floors',floor);
@@ -155,11 +151,15 @@ App.Project = {
 	filterCCode:function(code){
 		var _class=App.Project.Settings.Viewer.ClassCodeData,
 			hide=[];
-
-		_.each(_class,function(item){
-			if(item.code.indexOf(code)!=0){
-				hide.push(item.code);
+			if(typeof code =='string'){
+				code=[code];
 			}
+		_.each(_class,function(item){
+			_.each(code,function(i){
+				if(item.code.indexOf(i)!=0){
+					hide.push(item.code);
+				}
+			})
 		})
 		return hide;
 	},
@@ -1670,6 +1670,15 @@ App.Project = {
 			});*/
 		}else if(_this.filterRule.single.indexOf(cat)!=-1){
 			_this.recoverySilder();
+			if(cat=='外保温'){
+				var _hideFileIds=_.filter(_files,function(i){
+					return i!=_secenId;
+				})
+				App.Project.Settings.Viewer.fileFilter({
+					ids:_hideFileIds,
+					total:[_secenId]
+				});
+			}
 			_this.sigleRule(cat,key);
 		}else{
 			_this.linkSilder('floors',key);

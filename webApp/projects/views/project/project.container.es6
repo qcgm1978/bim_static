@@ -123,6 +123,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 							str += App.Project.properCostTree(props[i]['value']);
 
 						} else if (props[i]['type'] == 'list') {
+							str += '<li class="modleItem"><span class="modleName overflowEllipsis"><div class="modleNameText overflowEllipsis">' + props[i]['property'] + '</div></span> <span class="modleVal rEnd"></span> </li>';
 
 							if (props[i]['elementType'] && props[i]['elementType'] == 'link') {
 								for (var j = 0; j < props[i]['value'].length; j++) {
@@ -532,9 +533,8 @@ App.Project.ProjectContainer = Backbone.View.extend({
 
 				var box = App.Project.formatBBox(App.Project.Settings.PlanElement.boundingBox);
 				if (box && box.length) {
-					App.Project.zoomModel(App.Project.Settings.PlanElement.elements, box);
+					App.Project.zoomToBox(App.Project.Settings.PlanElement.elements, box);
 				}
-
 			});
 		}
 
