@@ -832,6 +832,8 @@
 				//删除图片
 				removeImg(event) {
 					$(event.target).closest(".singleImg").remove();
+					$('.uploadImg').val('');
+
 				},
 
 				//新增数据
@@ -929,6 +931,22 @@
 						pictures.push($(this).data("id"));
 					});
 
+					var texts=this.$(".txtReMark").val().trim().split('@'),
+					    textsUniq=[],
+					    atUserArrs=[];
+					for(var i=1;i<texts.length;i++){
+						_.contains(textsUniq,texts[i].slice(0,2))?'':textsUniq.push(texts[i].slice(0,2));
+					}
+
+					for(var j=0;j<textsUniq.length;j++){
+						for(var k=0;k<atUserArr.length;k++){
+							if(atUserArr[k]['userName'].indexOf(textsUniq[j])>-1){
+								atUserArrs.push(atUserArr[k]);
+								break;
+							}
+						}
+
+					}
 					//其余参数
 					var pars = {
 							projectId: App.Project.Settings.projectId,
@@ -936,7 +954,7 @@
 							text: this.$(".txtReMark").val().trim(),
 							projectVersionId: +App.Project.Settings.versionId,
 							attachments: pictures,
-							receivers: atUserArr,
+							receivers: atUserArrs,
 							auth: App.Project.Settings.token
 						},
 						data = {

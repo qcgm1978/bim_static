@@ -3,17 +3,16 @@
   <head>
     <meta charset="UTF-8">
     <title>模型选择器</title>
-    <script src="http://bim-uat.wanda-dev.cn/static/dist/components/inspectSelection/js/inspectSelection.js"></script>
+    <script src="/static/dist/components/inspectSelection/js/inspectSelection.js"></script>
   </head>
   <body>
     <script>
       jQuery.support.cors = true;
     var viewer = new InspectModelSelection({
       type:"process",//open process
-      ruleType:'',//构件分类
-      appKey:"",
-      token:"",
-      projectCode:'18dc7a80-257a-4b44-b1f1-1c1db4af5987',
+      ruleType:'',//构件分类 
+       projectCode:'119b1c19-0c93-4145-b834-a2fcb78af008',
+      //projectCode:'18dc7a80-257a-4b44-b1f1-1c1db4af5987',
      // projectCode:'119b1c19-0c93-4145-b834-a2fcb78af008',
       //res 选择的检查点数据
       callback:function(res){
