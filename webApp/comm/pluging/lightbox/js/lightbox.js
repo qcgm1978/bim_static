@@ -79,7 +79,8 @@
   // Attach event handlers to the new DOM elements. click click click
   Lightbox.prototype.build = function() {
     var self = this;
-    $('<div id="lightboxOverlay" class="lightboxOverlay"></div><div id="lightbox" class="lightbox"><div class="lb-outerContainer"><div class="lb-container"><img class="lb-image" src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" /><div class="lb-nav"><a class="lb-prev" href="" ></a><a class="lb-next" href="" ></a></div><div class="lb-loader"><a class="lb-cancel"></a></div></div></div><div class="lb-dataContainer"><div class="lb-data"><div class="lb-details"><span class="lb-caption"></span></div><div class="lb-closeContainer"><span class="downloadImg">下载</span> <a class="lb-close"></a></div></div></div></div>').appendTo($('body'));
+    //$('<div id="lightboxOverlay" class="lightboxOverlay"></div><div id="lightbox" class="lightbox"><div class="lb-outerContainer"><div class="lb-container"><img class="lb-image" src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" /><div class="lb-nav"><a class="lb-prev" href="" ></a><a class="lb-next" href="" ></a></div><div class="lb-loader"><a class="lb-cancel"></a></div></div></div><div class="lb-dataContainer"><div class="lb-data"><div class="lb-details"><span class="lb-caption"></span></div><div class="lb-closeContainer"><span class="downloadImg">下载</span> <a class="lb-close"></a></div></div></div></div>').appendTo($('body'));
+    $('<div id="lightboxOverlay" class="lightboxOverlay"></div><div id="lightbox" class="lightbox"><div class="lb-outerContainer"><div class="lb-container"><img class="lb-image" src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" /><div class="lb-nav"></div><div class="lb-loader"><a class="lb-cancel"></a></div></div></div><div class="lb-dataContainer"><div class="lb-data"><div class="lb-details"><span class="lb-caption"></span></div><div class="lb-closeContainer"><span class="downloadImg">下载</span> <a class="lb-close"></a></div></div></div></div>').appendTo($('body'));
 
     // Cache jQuery objects
     this.$lightbox       = $('#lightbox');
@@ -113,23 +114,23 @@
       return false;
     });
 
-    this.$lightbox.find('.lb-prev').on('click', function() {
-      if (self.currentImageIndex === 0) {
-        self.changeImage(self.album.length - 1);
-      } else {
-        self.changeImage(self.currentImageIndex - 1);
-      }
-      return false;
-    });
-
-    this.$lightbox.find('.lb-next').on('click', function() {
-      if (self.currentImageIndex === self.album.length - 1) {
-        self.changeImage(0);
-      } else {
-        self.changeImage(self.currentImageIndex + 1);
-      }
-      return false;
-    });
+    //this.$lightbox.find('.lb-prev').on('click', function() {
+    //  if (self.currentImageIndex === 0) {
+    //    self.changeImage(self.album.length - 1);
+    //  } else {
+    //    self.changeImage(self.currentImageIndex - 1);
+    //  }
+    //  return false;
+    //});
+    //
+    //this.$lightbox.find('.lb-next').on('click', function() {
+    //  if (self.currentImageIndex === self.album.length - 1) {
+    //    self.changeImage(0);
+    //  } else {
+    //    self.changeImage(self.currentImageIndex + 1);
+    //  }
+    //  return false;
+    //});
 
     this.$lightbox.find('.lb-loader, .lb-close').on('click', function() {
       self.end();

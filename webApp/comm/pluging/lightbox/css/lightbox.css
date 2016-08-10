@@ -99,7 +99,7 @@ body.lb-disable-scrolling {
 .lb-prev, .lb-next {
   height: 100%;
   cursor: pointer;
-  display: block;
+  display: none;
 }
 
 .lb-nav a.lb-prev {
