@@ -1609,6 +1609,7 @@ App.Project = {
 
 		//已有分类、过滤规则
 		if(_this.filterRule.file.indexOf(cat)!=-1){
+			_this.recoverySilder();
 			var _hideFileIds=_.filter(_files,function(i){
 				return i!=_secenId;
 			})
@@ -1617,6 +1618,7 @@ App.Project = {
 				total:[_secenId]
 			});
 		}else if(_this.filterRule.floor.indexOf(cat)!=-1){
+			_this.recoverySilder();
 			_this.linkSilder('floors',key);
 			/*var sp=_.find(floorSptys,function(item){
 				return item.indexOf(cat)!=-1;
