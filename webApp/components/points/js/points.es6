@@ -459,6 +459,50 @@
   win.project = Project;
 
   var CommApi = {
+
+    checkLogin: function(appkey, token) {
+
+      var isOk = false;
+      //获取当前用户验证登录状态
+      $.ajax({
+        url: '/platform/user/current?t=' + (+new Date()),
+        async: false
+      }).done(function(data) {
+
+        if (typeof(data) == "string") {
+          data = JSON.parse(data);
+        }
+        //登录成功
+        if (data.code == 0) {
+          isOk = true;
+        } else {
+          //token 验证
+          $.ajax({
+            url: "/platform/token",
+            data: {
+              appKey: appkey,
+              token: token
+            },
+            async: false
+          }).done(function(data) {
+            if (data.code == 0) {
+              CommApi.setCookie("token_cookie", data.data);
+              isOk = true;
+            } else {
+              alert("验证失败");
+            }
+          }).fail(function(data) {
+            if (data.status == 400) {
+              alert("token过期");
+            }
+          }); 
+        }
+      });
+
+      return isOk;
+
+    },
+
     setCookies: function(cookis) {
 
       var keys = cookis.match(/[^ =;]+(?=\=)/g),
@@ -466,7 +510,7 @@
       for (var i = 0; i < keys.length; i++) {
         val = this.getCookie(keys[i], cookis);
         this.setCookie(keys[i], val);
-      } 
+      }
     },
 
     setCookie: function(name, value) {
@@ -475,7 +519,7 @@
         var Days = 0.01,
           exp = new Date();
         exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 1000);
-        document.cookie = name + "=" + value+ ";expires=" + exp.toGMTString() + ";path=/;domain=" + window.location.host.substring(window.location.host.indexOf(".")) + ";";
+        document.cookie = name + "=" + value + ";expires=" + exp.toGMTString() + ";path=/;domain=" + window.location.host.substring(window.location.host.indexOf(".")) + ";";
       } catch (e) {
         alert(e);
       }
@@ -498,6 +542,15 @@
         return '';
       }
 
+    },
+
+    //删除cookie
+    delCookie: function(name) {
+      var exp = new Date();
+      exp.setTime(exp.getTime() - 31 * 24 * 60 * 60 * 1000);
+      var cval = this.getCookie(name);
+      if (cval != null)
+        document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString() + ";domain=" + window.location.host.substring(window.location.host.indexOf(".")) + ";path=/";
     }
 
 

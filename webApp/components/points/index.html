@@ -1,205 +1,220 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <title>BIM发包总管理平台</title>
-  <link rel="styleSheet" href="/topNav/css/topNav.less" />
-  <link rel="styleSheet" href="/comm/css/treeView.less" />
-  <link rel="styleSheet" href="./less/index.css" />
-  <link rel="stylesheet" type="text/css" href="./less/style.less">
-  <script src="/static/dist/components/points/libs/libs.js"></script>
-  <script src="/static/dist/components/points/js/points.js"></script>
+    <meta charset="UTF-8">
+    <title>BIM发包总管理平台</title>
+    <link rel="styleSheet" href="/topNav/css/topNav.less" />
+    <link rel="styleSheet" href="/comm/css/treeView.less" />
+    <link rel="styleSheet" href="./less/index.css" />
+    <link rel="stylesheet" type="text/css" href="./less/style.less">
+    <script src="/static/dist/components/points/libs/libs.js"></script>
+    <script src="/static/dist/components/points/js/points.js"></script>
 </head>
+
 <body>
-<div id="topBar">
-  <div class="logo"><span class="text"></span></div>
-</div>
-<div id="contains">
-  <div class="projectHeader">
-    <div class="breadcrumbNav">
-      <span class="navname projectText">项目</span>
+    <div id="topBar">
+        <div class="logo"><span class="text"></span></div>
+    </div>
+    <div id="contains">
+        <div class="projectHeader">
+            <div class="breadcrumbNav">
+                <span class="navname projectText">项目</span>
                 <span class="navname breadItem project relative"> <i class="icon-angle-right"></i>
            <span class="navname breadItemText"> <span class="text">--</span> </span>
                 </span>
                 <span class="navname breadItem projectVersion relative"> <i class="icon-angle-right"></i>
            <span class="navname breadItemText"> <span class="text"> -- </span> </span>
                 </span>
-      <span class="changeBtn">查看项目模型</span>
-    </div>
-  </div>
-  <div id="projectContainer">
-    <div class="rightProperty">
-      <div class="rightPropertyContentBox">
-        <div class="rightPropertyContent">
-          <div class="designPropetyBox">
-            <ul class="projectPropetyHeader projectNav">
-              <li data-type="attr" class="item selected">属性</li>
-            </ul>
-            <div class="projectPropetyContainer projectNavContentBox">
-
-              <div class="designProperties" >
-                <div class="nullTip">请选择构件</div>
-              </div>
+                <span class="changeBtn">查看项目模型</span>
             </div>
-          </div>
         </div>
-        <div class="dragSize"></div>
-        <div class="slideBar"><i class="icon-caret-right"></i></div>
-      </div>
+        <div id="projectContainer">
+            <div class="rightProperty">
+                <div class="rightPropertyContentBox">
+                    <div class="rightPropertyContent">
+                        <div class="designPropetyBox">
+                            <ul class="projectPropetyHeader projectNav">
+                                <li data-type="attr" class="item selected">属性</li>
+                            </ul>
+                            <div class="projectPropetyContainer projectNavContentBox">
+                                <div class="designProperties">
+                                    <div class="nullTip">请选择构件</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dragSize"></div>
+                    <div class="slideBar"><i class="icon-caret-right"></i></div>
+                </div>
+            </div>
+            <div class="projectCotent"></div>
+        </div>
     </div>
-    <div class="projectCotent"></div>
-  </div>
-</div>
-<script>
-  $(function(){
+    <script>
+    $(function() {
 
-    if ("ActiveXObject" in window || window.ActiveXObject) { 
+        if ("ActiveXObject" in window || window.ActiveXObject) {
 
-      window.myWebView = document.createElement("object"),currentVersion=1;
+            window.myWebView = document.createElement("object"), currentVersion = 1;
 
-      myWebView.classid = "CLSID:15A5F85D-A81B-45D1-A03A-6DBC69C891D1";
+            myWebView.classid = "CLSID:15A5F85D-A81B-45D1-A03A-6DBC69C891D1";
 
-      var viewport = document.body;
-          
-      viewport.appendChild(myWebView); 
-        
-         
-       myWebView.url ="http://"+window.location.host+ "/static/dist/components/points/tip.html";
-      
-       var url =  window.location.href; 
+            var viewport = document.body;
 
-        setTimeout(function(){
-            myWebView.runscript('CommApi.setCookies("'+document.cookie+'")',function(){});
-            myWebView.url = url;    
-            $("#topBar,#contains").remove(); 
-        },200); 
-        
-        myWebView.id = "webView"; 
-        window.onresize = resizeWebView;
+            viewport.appendChild(myWebView);
 
-        resizeWebView();
 
-        return false;
-      //window.location.href = '/ie.html?path=' + window.location.href;
-      //return true;
-    }
+            myWebView.url = "http://" + window.location.host + "/static/dist/components/points/tip.html";
 
-    function resizeWebView() {
-         
-        //重置
-        myWebView.width = "10";
-        myWebView.height ="10";
-        var $body = $(document);
-        myWebView.width = $body.width();
-        myWebView.height = $body.height();
+            var url = window.location.href;
 
-        if (!window.devicePixelRatio) {
-            myWebView.zoomFactor=screen.deviceXDPI / screen.logicalXDPI;
-        }else{
-            myWebView.zoomFactor = window.devicePixelRatio;
+            setTimeout(function() {
+                myWebView.runscript('CommApi.setCookies("' + document.cookie + '")', function() {});
+                myWebView.url = url;
+                $("#topBar,#contains").remove();
+            }, 200);
+
+            myWebView.id = "webView";
+            window.onresize = resizeWebView;
+
+            resizeWebView();
+
+            return false;
+            //window.location.href = '/ie.html?path=' + window.location.href;
+            //return true;
         }
-    }
 
-    window.query = project.GetRequest();
+        function resizeWebView() {
 
-    //获取项目相关信息通过project code
-    $('.navname').hide();
+            //重置
+            myWebView.width = "10";
+            myWebView.height = "10";
+            var $body = $(document);
+            myWebView.width = $body.width();
+            myWebView.height = $body.height();
 
-    if (!query.projectCode) {
-       alert("缺少参数projectCode");
-       return;
-    }
-
-    $.ajax({
-      url: "/platform/api/project/"+query.projectCode+"/meta?token=123"
-    }).done(function(data){ 
-
-      if (data.code == 0) {
-
-        if (data.data) {
-          query.projectId = data.data.projectId;
-          query.projectVersionId = data.data.versionId; 
-
-          var modelId = query.elementId.split('.')[0],
-              uid = query.elementId.split('.')[1];
-              query.uid = uid; 
-
-             // "doc/"+query.projectId+"/+query.projectVersionId+/file/meta"
-          $.ajax({
-            url: "/doc/api/"+query.projectId+'/'+query.projectVersionId+"?fileId="+fieldid
-          }).done(function(data){
-            if (data.code == 0) {
-
-             
-
-              var  modelId = data.data.modelId;
-              query.modelId = modelId; 
-
-              query.viewer = new ModelSelection({
-                etag: modelId,
-                projectId: query.projectId,
-                projectVersionId: query.projectVersionId,
-                type: 'singleModel',//检查点类型
-                isSingle:true,
-                callback:function(ids){
-                    //  console.log(ids);
-                }
-              });
+            if (!window.devicePixelRatio) {
+                myWebView.zoomFactor = screen.deviceXDPI / screen.logicalXDPI;
+            } else {
+                myWebView.zoomFactor = window.devicePixelRatio;
             }
-          });
-          //获取全模型etag sourceid
-          $.ajax({
-            url: "/view/"+query.projectId+'/'+query.projectVersionId+"/init"
-          }).done(function(data){
-            if (data.code == 0) {
-              query.etag = data.data.etag;
-              query.sourceId = data.data.sourceId;
-            }
-          }); 
-
         }
-      }
-    });
 
-    $('.changeBtn').click(function(){
-      if($(this).text()=="查看项目模型"){
-        $(this).text("查看文件模型");
-        $('.navname').show();
+        window.query = project.GetRequest();
 
-        query.viewer = new ModelSelection({
-          etag: query.etag,
-          sourceId:query.sourceId,
-          projectId: query.projectId,
-          projectVersionId: query.projectVersionId,
-          type: 'model',
-          callback:function(ids){
-//            console.log(ids);
-          }
-        });
-      }else{
-        $(this).text("查看项目模型")
+        //获取项目相关信息通过project code
         $('.navname').hide();
 
-        query.viewer = new ModelSelection({
-          etag: query.modelId ,
-          projectId: query.projectId,
-          projectVersionId: query.projectVersionId,
-          type: 'singleModel',//检查点类型,
-          isSingle :true,
-          callback:function(ids){
-//            console.log(ids);
-          }
+        var appKey = query.appkey || "18fbec1ae3da477fb47d842a53164b14",
+            token = query.token || "abc3f4a29812170851a0c7ecb6853644abbc902af4b4e57636f27c35bec6628b15e908ae402e0a9034a25d72c17888256dce64f713c532348de5d78acfef88c76b670ed8abcaf44df638ba8ecd2768c93a8fe01b63bb1204014a5efb168a2a9a520bc09d70d8f2afbed49d95c982b73456b476ad825f1ac9";  
+
+        if (!query.projectCode) {
+            alert("缺少参数projectCode");
+            return;
+        }
+
+        //验证用户登录
+        if (!CommApi.checkLogin(appKey,token)) {
+            return;
+        }  
+
+        $.ajax({
+            url: "/platform/api/project/" + query.projectCode + "/meta?token=123"
+        }).done(function(data) {
+
+            if (data.code == 0) {
+
+                if (data.data) {
+                    query.projectId = data.data.projectId;
+                    query.projectVersionId = data.data.versionId;
+
+                    var fieldid = query.elementId.split('.')[0],
+                        uid = query.elementId.split('.')[1];
+                    query.uid = uid;
+
+                    $.ajax({
+                        url: "/doc/api/" + query.projectId + '/' + query.projectVersionId + "?fileId=" + fieldid
+                    }).done(function(data) {
+                        if (data.code == 0) {
+
+                            var modelId = data.data && data.data.modelId;
+                            query.modelId = modelId;
+
+                            if (!modelId) {
+                                alert("获取单模型id出错");
+                            } else {　
+
+                                query.viewer = new ModelSelection({
+                                    etag: modelId,
+                                    projectId: query.projectId,
+                                    projectVersionId: query.projectVersionId,
+                                    type: 'singleModel', //检查点类型
+                                    isSingle: true,
+                                    callback: function(ids) {
+                                        //  console.log(ids);
+                                    }
+                                });
+                            }
+                        }
+                    });
+                    //获取全模型etag sourceid
+                    $.ajax({
+                        url: "/view/" + query.projectId + '/' + query.projectVersionId + "/init"
+                    }).done(function(data) {
+                        if (data.code == 0) {
+                            query.etag = data.data.etag;
+                            query.sourceId = data.data.sourceId;
+                        }
+                    });
+
+                }
+            }
         });
-      }
-    });
-    App.Global || (App.Global = {} );
-    if (!("ActiveXObject" in window) && !window.ActiveXObject) {
-      //轮训
-      setInterval(function(){
-        App.Comm.checkOnlyCloseWindow();
-      },3000);
-    }
-  })
-</script>
+
+        $('.changeBtn').click(function() {
+            if ($(this).text() == "查看项目模型") {
+                $(this).text("查看文件模型");
+                $('.navname').show();
+
+                query.viewer = new ModelSelection({
+                    etag: query.etag,
+                    sourceId: query.sourceId,
+                    projectId: query.projectId,
+                    projectVersionId: query.projectVersionId,
+                    type: 'model',
+                    callback: function(ids) {
+                        //            console.log(ids);
+                    }
+                });
+            } else {
+                $(this).text("查看项目模型")
+                $('.navname').hide();
+
+                query.viewer = new ModelSelection({
+                    etag: query.modelId,
+                    projectId: query.projectId,
+                    projectVersionId: query.projectVersionId,
+                    type: 'singleModel', //检查点类型,
+                    isSingle: true,
+                    callback: function(ids) {
+                        //            console.log(ids);
+                    }
+                });
+            }
+        }); 
+
+
+
+        App.Global || (App.Global = {});
+        if (!("ActiveXObject" in window) && !window.ActiveXObject) {
+            //轮训
+            setInterval(function() {
+                App.Comm.checkOnlyCloseWindow();
+            }, 3000);
+        }
+    })
+    </script>
 </body>
+
 </html>
