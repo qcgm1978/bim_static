@@ -17,6 +17,7 @@ App.Project.PlanInspection = Backbone.View.extend({
 	events: {
 		"click .tbBottom .nodeSwitch": "showNode",
 		"click .subData .code": "showInModel",
+		"click .businessMatters": "cancelZoomModel",
 		"click .exportList": "exportList"
 	},
 
@@ -117,7 +118,10 @@ App.Project.PlanInspection = Backbone.View.extend({
 		});
 
 	},
-
+	cancelZoomModel:function(){
+	//	App.Project.Settings.Viewer.fit();
+		App.Project.cancelZoomModel();
+	},
 	//在模型中显示
 	showInModel(event) {
 		App.Project.planCostShowInModel(event);
