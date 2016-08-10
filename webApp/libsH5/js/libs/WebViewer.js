@@ -9422,15 +9422,6 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
             var position = this.object.position;
             var pivot = this.pivot !== null ? this.pivot : this.target;
 
-            //// 绕场景中心旋转
-            //var target = this.target;
-            //
-            //if (this.viewer.getScene().rootNode.boundingBox ) {
-            //    var bBox = this.viewer.getScene().worldBoundingBox();
-            //    target = bBox.center();
-            //}
-            //
-
             if (state !== STATE.NONE) {
                 this.cameraDirty = true;
             }
@@ -19037,6 +19028,11 @@ CloudViewer.prototype = {
     // 加载标记
     loadMarkers: function(markerInfoList) {
         this.extensionHelper.loadMarkers(markerInfoList);
+    },
+
+    // 加载标记
+    loadMarkersFromIntersect: function(intersect, shapeType, state) {
+        this.extensionHelper.loadMarkersFromIntersect(intersect, shapeType, state);
     },
 
     // 获得标记列表
