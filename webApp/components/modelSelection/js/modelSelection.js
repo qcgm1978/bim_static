@@ -196,7 +196,9 @@
     }
 
     var defaults = {
-      btnText: '确&nbsp;&nbsp;定'
+      btnText: '确&nbsp;&nbsp;定',
+      appKey: "18fbec1ae3da477fb47d842a53164b14",
+      token: "abc3f4a29812170851a0c7ecb6853644abbc902af4b4e57636f27c35bec6628b15e908ae402e0a9034a25d72c17888256dce64f713c532348de5d78acfef88c76b670ed8abcaf44df638ba8ecd2768c93a8fe01b63bb1204014a5efb168a2a9a520bc09d70d8f2afbed49d95c982b73456b476ad825f1ac9"
     }
 
 
@@ -207,6 +209,7 @@
     }
 
     this.Settings.token_cookie = "token=" + options.token + "&appKey=" + options.appKey + "&t=" + new Date().getTime();
+    this.Settings.token_cookie = "";
 
     if (this.Settings.etag) {
       Project.Settings = this.Settings;
