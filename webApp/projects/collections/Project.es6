@@ -1711,7 +1711,7 @@ App.Project = {
 			type: "plan",
 			//ids: [code[0]]
 			ids: undefined
-		});
+		}); 
 	},
 
 	//定位到模型
