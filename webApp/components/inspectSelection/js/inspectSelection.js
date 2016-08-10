@@ -168,6 +168,7 @@
 		if (this.Settings.etag) {
 			Project.Settings = _this.Settings;
 			_this.Project = Project;
+			ourl=options.host||ourl;
 			_this.init();
 		} else {
 			$.ajax({
