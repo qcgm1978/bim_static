@@ -60,6 +60,8 @@ App.Project.PlanModel = Backbone.View.extend({
 					$target.data("box", box);
 					App.Project.zoomToBox(data.data.elements,box);
 				}
+			}else{
+				App.Project.cancelZoomModel();
 			}
 		});
 	}
