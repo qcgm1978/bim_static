@@ -511,30 +511,14 @@
         if (Project.Settings.type == 'single') {
           //viewer.zoomToSelection();
           _this.getSelected();
-          //  viewer.loadMarkers([JSON.stringify(p)]);
+          var m = viewer.saveMarkers();
+          viewer.loadMarkers(m);
+          Project.Settings.markers=m;
         }
         //渲染属性面板
         Project.sceneId = model.intersect.object.userData.sceneId;
         Project.renderAttr(model.intersect.userId, Project.sceneId);
       });
-      $('.view').on('click', function() {
-        if (Project.Settings.type == 'single') {
-          viewer.markers();
-          viewer.viewer.setMarkerState(3);
-          var m = viewer.saveMarkers();
-          if (m && 　m.length > 0) {
-            viewer.loadMarkers([m.pop()]);
-            Project.Settings.markers = viewer.saveMarkers();
-          }
-          viewer.markerEnd();
-        }
-        /*$(this).mouseup(function(e) {
-          if (3 == e.which) {
-            viewer.loadMarkers(null);
-
-          }
-        });*/
-      })
     },
     getSelected: function() {
       var self = this;
