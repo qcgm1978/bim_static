@@ -480,12 +480,25 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			})
 		});
 
-		viewer.on("click", function(model) {
+		viewer.on("click", function(model) { 
+			 
+			  
+			//取消计划高亮
+			var result = that.cancelhighlightPlan();
+
 			App.Project.Settings.ModelObj = null;
 			if (!model.intersect) {
 				that.resetProperNull();
 				return;
 			}
+
+			// if (result) {
+			// 	viewer.highlight({
+			// 		type: 'userId',
+			// 		ids: [model.intersect.userId]
+			// 	});
+			// }
+
 
 			App.Project.Settings.ModelObj = model;
 			//App.Project.Settings.modelId = model.userId;
@@ -520,12 +533,11 @@ App.Project.ProjectContainer = Backbone.View.extend({
 
 				var box = App.Project.formatBBox(App.Project.Settings.PlanElement.boundingBox);
 				if (box && box.length) {
-					App.Project.zoomModel(App.Project.Settings.PlanElement.elements, box);
+					App.Project.zoomToBox(App.Project.Settings.PlanElement.elements, box);
 				}
-
 			});
 		}
- 
+
 
 		viewer.on("loaded", function() {
 			//加载数据
@@ -535,11 +547,66 @@ App.Project.ProjectContainer = Backbone.View.extend({
 
 	},
 
+	//取消高亮
+	cancelhighlightPlan() {
+
+		var result = false;
+
+		if ($(".projectHeader .plan").hasClass("selected")) {
+
+			if (!$(".projectPlanNav .item[data-type='model']").hasClass("selected")) {
+				//计划 模块化
+				var $select = $("#projectContainer .planContainer .planModel").find(".selected");
+				if ($select.length > 0) {
+					$select.click();
+					result = true;
+				}
+			}
+
+			if (!$(".projectPlanNav .item[data-type='analog']").hasClass("selected")) {
+				//进度模拟的时候点击其他的
+				var $play = $("#projectContainer .planContainer .planAnalog .playOrPause");
+				if ($play.hasClass("myIcon-pause")) {
+					$play.click();
+					result = true;
+				}
+
+				var $select = $("#projectContainer .planContainer .planAnalog").find(".selected");
+				if ($select.length > 0) {
+					$select.click();
+					result = true;
+				}
+			}
+		} else {
+			//计划 模块化
+			var $select = $("#projectContainer .planContainer .planModel").find(".selected");
+			if ($select.length > 0) {
+				$select.click();
+				result = true;
+			}
+			//进度模拟的时候点击其他的
+			var $play = $("#projectContainer .planContainer .planAnalog .playOrPause");
+			if ($play.hasClass("myIcon-pause")) {
+				$play.click();
+				result = true;
+			}
+
+			var $select = $("#projectContainer .planContainer .planAnalog").find(".selected");
+			if ($select.length > 0) {
+				$select.click();
+				result = true;
+			}
+		}
+
+		return result;
+
+	},
+
 	//只加载5大专业
-	loadFiveMajor() { 
-		var $this,test=/建筑|结构|幕墙|采光顶|景观|内装和导识/;
-		$(".bim .itemNode:first>ul>li>.itemContent>.treeText").each(function(){ 
-			$this=$(this);
+	loadFiveMajor() {
+		var $this, test = /建筑|结构|幕墙|采光顶|景观|内装和导识/;
+		$(".bim .itemNode:first>ul>li>.itemContent>.treeText").each(function() {
+			$this = $(this);
 			if (!test.test($this.text())) {
 				$this.prev().click();
 			}

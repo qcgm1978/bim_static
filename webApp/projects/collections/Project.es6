@@ -27,11 +27,30 @@ App.Project = {
 		//单文件：过滤出检查点所在构件所在的文件
 		file:'工程桩,基坑支护,钢结构悬挑构件,幕墙,采光顶',
 		//单独类型：singleRule
-		single:'梁柱节点,地下防水,步行街吊顶风口,卫生间防水',
-		//根据楼层过滤
-		floor:'外保温'
-		//楼层有专业类型
-		//floorSpty:'步行街吊顶风口&暖通#内装,卫生间防水&暖通#内装'
+		single:'梁柱节点,地下防水,步行街吊顶风口,卫生间防水,外保温'
+	},
+
+	marginRule:{
+		'基坑支护':{
+			margin:0.2,
+			ratio:1.0
+		},
+		'梁柱节点':{
+			margin:0.8,
+			ratio:2.0
+		},
+		'外保温':{
+			margin:0.5,
+			ratio:1.0
+		},
+		'地下防水':{
+			margin:1,
+			ratio:1.0
+		},
+		'幕墙':{
+			margin:1,
+			ratio:1.0
+		}
 	},
 	//单独类型、自定义过滤规则
 	sigleRule:function(cat,floor){
@@ -118,6 +137,12 @@ App.Project = {
 			this.linkSilderSpecial('specialty','WDGC-Q-ST-'+floor+'.rvt');
 			this.linkSilderCategory('category','楼板')
 		}
+		if(cat=='外保温'){
+			App.Project.Settings.Viewer.filter({
+				ids:_this.filterCCode(['10.10.20.03.06.20.10.30.03','(10.10.30.03.09.06']),
+				type:"classCode"
+			})
+		}
 		if(cat=='步行街吊顶风口'||cat=='卫生间防水'){
 			this.linkSilder('floors',floor);
 			this.linkSilderSpecial('specialty',['WDGC-Q-AC-'+floor+'.rvt','WDGC-Q-IN&DS-'+floor+'.rvt'].join(','))
@@ -126,11 +151,15 @@ App.Project = {
 	filterCCode:function(code){
 		var _class=App.Project.Settings.Viewer.ClassCodeData,
 			hide=[];
-
-		_.each(_class,function(item){
-			if(item.code.indexOf(code)!=0){
-				hide.push(item.code);
+			if(typeof code =='string'){
+				code=[code];
 			}
+		_.each(_class,function(item){
+			_.each(code,function(i){
+				if(item.code.indexOf(i)!=0){
+					hide.push(item.code);
+				}
+			})
 		})
 		return hide;
 	},
@@ -1560,6 +1589,7 @@ App.Project = {
 			location = paramObj?paramObj.location:$target.data('location'), //位置信息
 			color=$target.data('color'), //标记颜色
 			cat=$target.data('cat'), //构件分类
+			marginRule=_this.marginRule[cat]||{},
 			_files=App.Project.Settings.Viewer.FloorFilesData;//文件ID数据对象
 			//floorSptys=_this.filterRule.floorSpty.split(',');
 		if ($target.hasClass("selected")) {
@@ -1579,7 +1609,7 @@ App.Project = {
 		}else{
 			_loc = _this.formatMark(location,'543'.charAt(color));
 		}
-		_this.zoomModel(ids, box);
+		_this.zoomModel(ids, box,marginRule.margin,marginRule.ratio);
 		_this.showMarks(_loc);
 
 		//过滤所属楼层 start
@@ -1640,6 +1670,15 @@ App.Project = {
 			});*/
 		}else if(_this.filterRule.single.indexOf(cat)!=-1){
 			_this.recoverySilder();
+			if(cat=='外保温'){
+				var _hideFileIds=_.filter(_files,function(i){
+					return i!=_secenId;
+				})
+				App.Project.Settings.Viewer.fileFilter({
+					ids:_hideFileIds,
+					total:[_secenId]
+				});
+			}
 			_this.sigleRule(cat,key);
 		}else{
 			_this.linkSilder('floors',key);
@@ -1653,9 +1692,9 @@ App.Project = {
 		App.Project.Settings.Viewer.loadMarkers(marks);
 	},
 	//通过userid 和 boundingbox 定位模型
-	zoomModel: function(ids, box) {
+	zoomModel: function(ids, box,margin,ratio) {
 		//定位
-		App.Project.Settings.Viewer.setTopView(box);
+		App.Project.Settings.Viewer.setTopView(box,false,margin,ratio);
 		//半透明
 		//App.Project.Settings.Viewer.translucent(true);
 		//高亮
@@ -1681,7 +1720,7 @@ App.Project = {
 			type: "plan",
 			//ids: [code[0]]
 			ids: undefined
-		});
+		}); 
 	},
 
 	//定位到模型

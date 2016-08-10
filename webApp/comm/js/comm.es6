@@ -242,7 +242,7 @@ App.Comm = {
 		var Days = 0.02,
 			exp = new Date();
 		exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 1000);
-		document.cookie = name + "=" + escape(value) + ";expires=" + exp.toGMTString() + ";domain=" + App.Comm.doMain + ";path=/";
+		document.cookie = name + "=" + value + ";expires=" + exp.toGMTString() + ";domain=" + App.Comm.doMain + ";path=/";
 	},
 	//获取cookie
 	getCookie: function(name) {

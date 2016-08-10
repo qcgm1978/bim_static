@@ -464,10 +464,13 @@ var AppKeyRoute = Backbone.Router.extend({
 	},
 
 	logout() {
-		App.Comm.delCookie('OUTSSO_AuthToken');
+		
 		App.Comm.delCookie('AuthUser_AuthNum');
 		App.Comm.delCookie('AuthUser_AuthMAC');
+		App.Comm.delCookie('OUTSSO_AuthToken');
 		App.Comm.delCookie('OUTSSO_AuthNum');
+		App.Comm.delCookie('token_cookie');
+		App.Comm.delCookie('token_cookie_me');		
 		App.Comm.delCookie('OUTSSO_AuthMAC');
 		App.Comm.delCookie('IS_OWNER_LOGIN');
 		window.location.href = "/login.html";

@@ -201,6 +201,7 @@
     this.Settings = $.extend(defaults, options);
     if (this.Settings.etag) {
       Project.Settings = this.Settings;
+      ourl=options.host||ourl;
       this.Project = Project;
       this.init();
     } else {

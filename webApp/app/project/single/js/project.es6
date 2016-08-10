@@ -482,8 +482,16 @@ App.Project = {
 ;
 (function() {
 
+	if (typeof (bimView)=="undefined") {
+		bimView={
+			sidebar:{
+
+			}
+		}
+	}
+
 	//重写批注方法
-	bimView.sidebar.comment = function() {
+	  bimView.sidebar.comment = function() {
 		//隐藏工具条
 		$(".bim .modelBar").hide();
 		//开始批注
@@ -502,6 +510,12 @@ App.Project = {
 		SingleComment.initEvent();
 
 
+	}
+
+	if (typeof (dwgViewer)=="undefined") {
+		dwgViewer={
+			prototype:{}
+		};
 	}
 
 	dwgViewer.prototype.comment = function() {
