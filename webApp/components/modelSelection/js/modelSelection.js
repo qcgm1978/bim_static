@@ -551,7 +551,7 @@
           icon = hasChild ? 'm-openTree' : 'noneSwitch',
           name = hasChild ? i : j,
           isDel = hasChild ? 'nodel' : 'del';
-        var html = $('<li class="itemNode">\
+        var html = $('<li class="itemNode open">\
           <div class="itemContent" data-userId="' + i + '">\
             <i class="' + icon + '"></i>\
             <span class="treeText">' + name + '</span>\
