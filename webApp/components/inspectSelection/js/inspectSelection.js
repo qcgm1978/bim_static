@@ -169,8 +169,10 @@
 			Project.Settings = _this.Settings;
 			_this.Project = Project;
 			ourl=options.host||ourl;
+			this.initCookie(ourl,options.appKey,options.token);
 			_this.init();
 		} else {
+			this.initCookie(ourl,options.appKey,options.token);
 			$.ajax({
 				url: ourl + "/platform/api/project/" + this.Settings.projectCode + "/meta?token=123"
 			}).done(function(data) {
@@ -193,6 +195,40 @@
 		}
 	}
 	InspectModelSelection.prototype = {
+		initCookie:function(ourl,appKey,token) {
+			var that = this,
+				isVerification = false,
+				url = ourl+ "/platform/token";
+			$.ajax({
+				url: url,
+				data: {
+					appKey: appKey,
+					token: token
+				},
+				async: false
+			}).done(function(data) {
+				if (data.code == 0) {
+					that.setCookie("token_cookie", data.data);
+					alert( data.data)
+					isVerification = true;
+				} else {
+					alert("验证失败");
+					isVerification = false;
+				}
+			}).fail(function(data) {
+				if (data.status == 400) {
+					alert("token过期");
+				}
+			});
+			return isVerification;
+		},
+
+		setCookie:function(name, value) {
+			var Days = 30,
+				exp = new Date();
+			exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 1000);
+			document.cookie = name + "=" + value + ";expires=" + exp.toGMTString() + ";path=/";
+		},
 		init: function() {
 			var self = this,
 				srciptUrl = ourl + '/static/dist/libs/libsH5_20160313.js',
@@ -362,7 +398,8 @@
 				}
 			}
 			WebView.url = ourl + "/static/dist/components/inspectSelection/model.html?type=" + this.Settings.type + "&sourceId=" + this.Settings.sourceId + "&etag=" +
-				this.Settings.etag + "&projectId=" + this.Settings.projectId + "&projectVersionId=" + this.Settings.projectVersionId + "&ruleType=" + this.Settings.ruleType;
+				this.Settings.etag + "&projectId=" + this.Settings.projectId + "&projectVersionId=" + this.Settings.projectVersionId + "&ruleType=" + this.Settings.ruleType+"&appKey="+
+				this.Settings.appKey+"&token="+this.Settings.token;
 			WebView.height = "510px";
 			WebView.width = "960px";
 
