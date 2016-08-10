@@ -120,7 +120,7 @@
         }  
 
         $.ajax({
-            url: "/platform/api/project/" + query.projectCode + "/meta?token=123"
+            url: "/platform/api/project/" + query.projectCode + "/meta"
         }).done(function(data) {
 
             if (data.code == 0) {
