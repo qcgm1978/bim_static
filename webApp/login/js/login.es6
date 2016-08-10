@@ -99,20 +99,13 @@ var Login = {
 
 				Login.delCookie("token_cookie");
 
-				var keys = [],
-					lastKey = "AuthUser_AuthToken", lastValue;
+				var keys = [];
 				if (data.data && typeof data.data === 'object') {
 					for (var p in data.data) {
-						if (p == lastKey) {
-							lastValue = data.data[p];
-						} else {
-							Login.setCookie(p, data.data[p]);
-							keys.push(p);
-						} 
+						Login.setCookie(p, data.data[p]);
+						keys.push(p);
 					}
-				}  
-				 
-				localStorage.setItem("AuthUser_AuthToken", lastValue); 
+				}
 
 				localStorage.setItem("keys", keys.join(','));
 
@@ -193,11 +186,12 @@ var Login = {
 	},
 
 	//
-	checkLoginBefore: function(cookies) { 
+	checkLoginBefore: function(cookies) {
 
 		if (cookies) {
 
-			var lastKey = "AuthUser_AuthToken", lastValue;
+			var lastKey = "AuthUser_AuthToken",
+				lastValue;
 
 			var keys = cookies.match(/[^ =;]+(?=\=)/g),
 				val;
@@ -267,8 +261,7 @@ var App = {
 		getCookAndStore: function() {
 			return JSON.stringify({
 				cookie: document.cookie,
-				user: localStorage.getItem("user"),  
-				data:localStorage.getItem("AuthUser_AuthToken")
+				user: localStorage.getItem("user")				
 			});
 		}
 	}
