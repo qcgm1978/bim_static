@@ -118,49 +118,35 @@
 
         if (data.data) {
           query.projectId = data.data.projectId;
-          query.projectVersionId = data.data.versionId;
+          query.projectVersionId = data.data.versionId; 
 
-
-          
           var modelId = query.elementId.split('.')[0],
               uid = query.elementId.split('.')[1];
-              query.uid = uid;
+              query.uid = uid; 
 
+             // "doc/"+query.projectId+"/+query.projectVersionId+/file/meta"
+          $.ajax({
+            url: "/doc/api/"+query.projectId+'/'+query.projectVersionId+"?fileId="+fieldid
+          }).done(function(data){
+            if (data.code == 0) {
 
-               query.viewer = new ModelSelection({
+             
+
+              var  modelId = data.data.modelId;
+              query.modelId = modelId; 
+
+              query.viewer = new ModelSelection({
                 etag: modelId,
                 projectId: query.projectId,
                 projectVersionId: query.projectVersionId,
                 type: 'singleModel',//检查点类型
                 isSingle:true,
                 callback:function(ids){
- 
+                    //  console.log(ids);
                 }
               });
-
-             // "doc/"+query.projectId+"/+query.projectVersionId+/file/meta"
-          // $.ajax({
-          //   url: "/doc/api/"+query.projectId+'/'+query.projectVersionId+"?fileId="+fieldid
-          // }).done(function(data){
-          //   if (data.code == 0) {
-
-          //     if (true) {}
-
-          //     var  modelId = data.data.modelId;
-          //     query.modelId = modelId; 
-
-          //     query.viewer = new ModelSelection({
-          //       etag: modelId,
-          //       projectId: query.projectId,
-          //       projectVersionId: query.projectVersionId,
-          //       type: 'singleModel',//检查点类型
-          //       isSingle:true,
-          //       callback:function(ids){
-          //           //  console.log(ids);
-          //       }
-          //     });
-          //   }
-          // });
+            }
+          });
           //获取全模型etag sourceid
           $.ajax({
             url: "/view/"+query.projectId+'/'+query.projectVersionId+"/init"
