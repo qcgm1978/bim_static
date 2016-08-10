@@ -481,6 +481,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 
 		viewer.on("click", function(model) { 
 			 
+			  
 			//取消计划高亮
 			var result = that.cancelhighlightPlan();
 
@@ -490,12 +491,12 @@ App.Project.ProjectContainer = Backbone.View.extend({
 				return;
 			}
 
-			if (result) {
-				viewer.highlight({
-					type: 'userId',
-					ids: [model.intersect.userId]
-				});
-			}
+			// if (result) {
+			// 	viewer.highlight({
+			// 		type: 'userId',
+			// 		ids: [model.intersect.userId]
+			// 	});
+			// }
 
 
 			App.Project.Settings.ModelObj = model;
