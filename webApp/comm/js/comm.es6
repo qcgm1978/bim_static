@@ -579,8 +579,7 @@ App.Comm = {
 	getCookAndStore: function() {
 		return JSON.stringify({
 			cookie: document.cookie,
-			user: localStorage.getItem("user"),
-			data:localStorage.getItem("AuthUser_AuthToken")
+			user: localStorage.getItem("user")			
 		});
 	}
 
