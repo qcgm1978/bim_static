@@ -121,42 +121,46 @@
           query.projectVersionId = data.data.versionId;
 
 
-
-          var fieldid = query.elementId.split('.')[0],
+          
+          var modelId = query.elementId.split('.')[0],
               uid = query.elementId.split('.')[1];
               query.uid = uid;
 
-             // "doc/"+query.projectId+"/+query.projectVersionId+/file/meta"
-          $.ajax({
-            url: "/doc/api/"+query.projectId+'/'+query.projectVersionId+"?fileId="+fieldid
-          }).done(function(data){
-            if (data.code == 0) {
-              var  modelId = data.data.modelId;
-              query.modelId = modelId;
 
-//              new bimView({
-//                element: $("#modelBox"),
-//                etag: modelId,
-//                type: typeMap[type],
-//                isComment: type == "rvt" && true || false,
-//                callback: function(id) {
-//                  App.Project.renderAttr(id, 1);
-//                }
-//              });
-//
-
-              query.viewer = new ModelSelection({
+               query.viewer = new ModelSelection({
                 etag: modelId,
                 projectId: query.projectId,
                 projectVersionId: query.projectVersionId,
                 type: 'singleModel',//检查点类型
                 isSingle:true,
                 callback:function(ids){
-//                  console.log(ids);
+ 
                 }
               });
-            }
-          });
+
+             // "doc/"+query.projectId+"/+query.projectVersionId+/file/meta"
+          // $.ajax({
+          //   url: "/doc/api/"+query.projectId+'/'+query.projectVersionId+"?fileId="+fieldid
+          // }).done(function(data){
+          //   if (data.code == 0) {
+
+          //     if (true) {}
+
+          //     var  modelId = data.data.modelId;
+          //     query.modelId = modelId; 
+
+          //     query.viewer = new ModelSelection({
+          //       etag: modelId,
+          //       projectId: query.projectId,
+          //       projectVersionId: query.projectVersionId,
+          //       type: 'singleModel',//检查点类型
+          //       isSingle:true,
+          //       callback:function(ids){
+          //           //  console.log(ids);
+          //       }
+          //     });
+          //   }
+          // });
           //获取全模型etag sourceid
           $.ajax({
             url: "/view/"+query.projectId+'/'+query.projectVersionId+"/init"
@@ -165,9 +169,7 @@
               query.etag = data.data.etag;
               query.sourceId = data.data.sourceId;
             }
-          });
-
-
+          }); 
 
         }
       }
