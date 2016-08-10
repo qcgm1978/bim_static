@@ -33,6 +33,29 @@ App.Project = {
 		//楼层有专业类型
 		//floorSpty:'步行街吊顶风口&暖通#内装,卫生间防水&暖通#内装'
 	},
+
+	marginRule:{
+		'基坑支护':{
+			margin:0.2,
+			ratio:1.0
+		},
+		'梁柱节点':{
+			margin:0.8,
+			ratio:2.0
+		},
+		'外保温':{
+			margin:0.5,
+			ratio:1.0
+		},
+		'地下防水':{
+			margin:1,
+			ratio:1.0
+		},
+		'幕墙':{
+			margin:1,
+			ratio:1.0
+		}
+	},
 	//单独类型、自定义过滤规则
 	sigleRule:function(cat,floor){
 		var _this=this,
@@ -117,6 +140,12 @@ App.Project = {
 			this.linkSilder('floors',floor);
 			this.linkSilderSpecial('specialty','WDGC-Q-ST-'+floor+'.rvt');
 			this.linkSilderCategory('category','楼板')
+		}
+		if(cat==''){
+			/*App.Project.Settings.Viewer.filter({
+				ids:_this.filterCCode('10.20.20.09'),
+				type:"classCode"
+			})*/
 		}
 		if(cat=='步行街吊顶风口'||cat=='卫生间防水'){
 			this.linkSilder('floors',floor);
@@ -1560,6 +1589,7 @@ App.Project = {
 			location = paramObj?paramObj.location:$target.data('location'), //位置信息
 			color=$target.data('color'), //标记颜色
 			cat=$target.data('cat'), //构件分类
+			marginRule=_this.marginRule[cat]||{},
 			_files=App.Project.Settings.Viewer.FloorFilesData;//文件ID数据对象
 			//floorSptys=_this.filterRule.floorSpty.split(',');
 		if ($target.hasClass("selected")) {
@@ -1579,7 +1609,7 @@ App.Project = {
 		}else{
 			_loc = _this.formatMark(location,'543'.charAt(color));
 		}
-		_this.zoomModel(ids, box);
+		_this.zoomModel(ids, box,marginRule.margin,marginRule.ratio);
 		_this.showMarks(_loc);
 
 		//过滤所属楼层 start
@@ -1653,9 +1683,9 @@ App.Project = {
 		App.Project.Settings.Viewer.loadMarkers(marks);
 	},
 	//通过userid 和 boundingbox 定位模型
-	zoomModel: function(ids, box) {
+	zoomModel: function(ids, box,margin,ratio) {
 		//定位
-		App.Project.Settings.Viewer.setTopView(box);
+		App.Project.Settings.Viewer.setTopView(box,false,margin,ratio);
 		//半透明
 		//App.Project.Settings.Viewer.translucent(true);
 		//高亮

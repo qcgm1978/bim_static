@@ -399,12 +399,12 @@
       viewer.render();
     },
 
-    setTopView: function(box,isMeger,scal) {
+    setTopView: function(box,isMeger,margin,ratio) {
       var viewer = this.viewer;
       if(isMeger){
         viewer.setTopView(CLOUD.Utils.mergeBBox(box));
       }else{
-        viewer.setTopView(CLOUD.Utils.computeBBox(box),scal||3);
+        viewer.setTopView(CLOUD.Utils.computeBBox(box),margin||1.0,ratio||1);
       }
     },
     zoomToBuilding: function(margin, ratio) {
