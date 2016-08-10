@@ -27,7 +27,8 @@ App.Project = {
 		//单文件：过滤出检查点所在构件所在的文件
 		file:'工程桩,基坑支护,钢结构悬挑构件,幕墙,采光顶',
 		//单独类型：singleRule
-		single:'梁柱节点,地下防水,步行街吊顶风口,卫生间防水,外保温'
+		single:'梁柱节点,地下防水,步行街吊顶风口,卫生间防水,外保温',
+		floor:''
 	},
 
 	marginRule:{
@@ -139,7 +140,7 @@ App.Project = {
 		}
 		if(cat=='外保温'){
 			App.Project.Settings.Viewer.filter({
-				ids:_this.filterCCode(['10.10.20.03.06.20.10.30.03','(10.10.30.03.09.06']),
+				ids:_this.filterCCode(['10.10.20.03.06.20.10.30.03','10.10.30.03.09.06']),
 				type:"classCode"
 			})
 		}
@@ -1670,7 +1671,7 @@ App.Project = {
 			});*/
 		}else if(_this.filterRule.single.indexOf(cat)!=-1){
 			_this.recoverySilder();
-			if(cat=='外保温'){
+			/*if(cat=='外保温'){
 				var _hideFileIds=_.filter(_files,function(i){
 					return i!=_secenId;
 				})
@@ -1678,7 +1679,7 @@ App.Project = {
 					ids:_hideFileIds,
 					total:[_secenId]
 				});
-			}
+			}*/
 			_this.sigleRule(cat,key);
 		}else{
 			_this.linkSilder('floors',key);
