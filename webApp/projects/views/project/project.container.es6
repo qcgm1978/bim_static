@@ -532,9 +532,8 @@ App.Project.ProjectContainer = Backbone.View.extend({
 
 				var box = App.Project.formatBBox(App.Project.Settings.PlanElement.boundingBox);
 				if (box && box.length) {
-					App.Project.zoomModel(App.Project.Settings.PlanElement.elements, box);
+					App.Project.zoomToBox(App.Project.Settings.PlanElement.elements, box);
 				}
-
 			});
 		}
 
