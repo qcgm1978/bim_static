@@ -188,34 +188,44 @@
   }
 
   var ModelSelection = function(options) {
+
     var _this = this;
     //强制new
     if (!(this instanceof ModelSelection)) {
       return new ModelSelection(options);
     }
 
-
-
     var defaults = {
-      btnText: '确&nbsp;&nbsp;定'
+      btnText: '确&nbsp;&nbsp;定',
+      appKey: "18fbec1ae3da477fb47d842a53164b14",
+      token: "abc3f4a29812170851a0c7ecb6853644abbc902af4b4e57636f27c35bec6628b15e908ae402e0a9034a25d72c17888256dce64f713c532348de5d78acfef88c76b670ed8abcaf44df638ba8ecd2768c93a8fe01b63bb1204014a5efb168a2a9a520bc09d70d8f2afbed49d95c982b73456b476ad825f1ac9"
     }
+
+
     this.Settings = $.extend(defaults, options);
+    //设置cookie
+    if (options.appKey && options.token && !this.initCookie(this.Settings.host || ourl, options.appKey, options.token)) {
+      return;
+    }
+
+    this.Settings.token_cookie = "token=" + options.token + "&appKey=" + options.appKey + "&t=" + new Date().getTime();
+    this.Settings.token_cookie = "";
+
     if (this.Settings.etag) {
       Project.Settings = this.Settings;
-      ourl=options.host||ourl;
-      //设置cookie
-      this.initCookie(ourl,options.appKey,options.token);
+      ourl = options.host || ourl;
       this.Project = Project;
       this.init();
+
     } else {
-      //设置cookie
-      this.initCookie(ourl,options.appKey,options.token);
+
       $.ajax({
-        url: ourl + "/platform/api/project/" + this.Settings.projectCode + "/meta?t="+new Date().getTime()
+        url: ourl + "/platform/api/project/" + this.Settings.projectCode + "/meta?" + _this.Settings.token_cookie
       }).done(function(data) {
         if (data.code == 0) {
+
           $.ajax({
-            url: ourl + "/view/" + data.data.projectId + "/" + data.data.versionId + "/init"
+            url: ourl + "/view/" + data.data.projectId + "/" + data.data.versionId + "/init?" + _this.Settings.token_cookie
           }).done(function(data) {
             if (data.code == 0) {
               _this.Settings = $.extend({}, _this.Settings, data.data);
@@ -227,6 +237,8 @@
           })
         }
       })
+
+
     }
 
 
@@ -241,10 +253,10 @@
 
   ModelSelection.prototype = {
 
-    initCookie:function(ourl,appKey,token) {
+    initCookie: function(ourl, appKey, token) {
       var that = this,
-          isVerification = false,
-          url = ourl+ "/platform/token";
+        isVerification = false,
+        url = ourl + "/platform/token";
       $.ajax({
         url: url,
         data: {
@@ -255,7 +267,7 @@
       }).done(function(data) {
         if (data.code == 0) {
           that.setCookie("token_cookie", data.data);
-          alert( data.data)
+          that.Settings.token_cookie = "token=" + data.data;
           isVerification = true;
         } else {
           alert("验证失败");
@@ -269,11 +281,24 @@
       return isVerification;
     },
 
-    setCookie:function(name, value) {
+    setCookie: function(name, value) {
       var Days = 30,
-          exp = new Date();
+        host = this.Settings.host || ourl,
+        exp = new Date(),
+        doMain = host.substring(host.indexOf("."));
       exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 1000);
-      document.cookie = name + "=" + value + ";expires=" + exp.toGMTString() + ";path=/";
+      document.cookie = name + "=" + value + ";domain=" + doMain + ";expires=" + exp.toGMTString() + ";path=/";
+    },
+    //删除cookie
+    delCookie: function(name) {
+      var exp = new Date(),
+        host = this.Settings.host || ourl,
+        doMain = host.substring(host.indexOf("."));
+
+      exp.setTime(exp.getTime() - 31 * 24 * 60 * 60 * 1000);
+      var cval = this.getCookie(name);
+      if (cval != null)
+        document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString() + ";domain=" + doMain + ";path=/";
     },
 
     //初始化
@@ -322,6 +347,8 @@
       }).on('click', '.dialogClose', function() {
         self.$dialog.remove();
         self.$dialog = null;
+        self.delCookie(delCookie);
+
       }).on('click', '.dialogOk', function() {
         var setting = self.Settings;
 
@@ -431,8 +458,9 @@
         $dialog = this.$dialog;
 
       $dialog.on('click', '.dialogClose', function() {
-        this.$dialog.remove();
-        this.$dialog = null;
+        $dialog.remove();
+        $dialog = null;
+        self.delCookie(delCookie);
       })
 
       $dialog.on('click', '.dialogOk', function() {
@@ -463,7 +491,7 @@
       })
       this.viewer = viewer;
       Project.Viewer = viewer;
-      var _url = ourl + '/doc/' + this.Settings.projectId + '/' + this.Settings.projectVersionId + '?token=123&modelId=';
+      var _url = ourl + '/doc/' + this.Settings.projectId + '/' + this.Settings.projectVersionId + '?' + _this.Settings.token_cookie + '&modelId=';
       //  window.BIV=viewer;
       //模型click事件、选择构件、编辑标记
       viewer.on("click", function(model) {
@@ -486,29 +514,14 @@
         if (Project.Settings.type == 'single') {
           //viewer.zoomToSelection();
           _this.getSelected();
-          viewer.markers();
-          viewer.viewer.setMarkerState(3);
-          //  viewer.loadMarkers([JSON.stringify(p)]);
+          var m = viewer.saveMarkers();
+          viewer.loadMarkers(m);
+          Project.Settings.markers=m;
         }
         //渲染属性面板
         Project.sceneId = model.intersect.object.userData.sceneId;
         Project.renderAttr(model.intersect.userId, Project.sceneId);
       });
-      $('.view').on('click', function() {
-        if (Project.Settings.type == 'single') {
-          var m = viewer.saveMarkers();
-          if (m && 　m.length > 0) {
-            viewer.loadMarkers([m.pop()]);
-            Project.Settings.markers = viewer.saveMarkers();
-          }
-        }
-        $(this).mouseup(function(e) {
-          if (3 == e.which) {
-            viewer.loadMarkers(null);
-            viewer.markerEnd();
-          }
-        });
-      })
     },
     getSelected: function() {
       var self = this;
@@ -567,19 +580,19 @@
       var viewport = document.getElementById('modelView');
       viewport.appendChild(WebView);
 
-      function resizeWebView() { 
+      function resizeWebView() {
 
         if (window.devicePixelRatio) {
-          WebView.zoomFactor = window.devicePixelRatio; 
+          WebView.zoomFactor = window.devicePixelRatio;
         } else {
           WebView.zoomFactor = screen.deviceXDPI / screen.logicalXDPI;
-        } 
+        }
 
       }
 
       WebView.url = ourl + "/static/dist/components/modelSelection/model.html?t=" + new Date().getTime() + "&type=" + this.Settings.type + "&sourceId=" + this.Settings.sourceId + "&etag=" +
-        this.Settings.etag + "&projectId=" + this.Settings.projectId + "&projectVersionId=" + this.Settings.projectVersionId+"&appKey="+
-      this.Settings.appKey+"&token="+this.Settings.token;
+        this.Settings.etag + "&projectId=" + this.Settings.projectId + "&projectVersionId=" + this.Settings.projectVersionId + "&appKey=" +
+        this.Settings.appKey + "&token=" + this.Settings.token;
       WebView.height = "510px";
       WebView.width = "960px";
 
