@@ -176,8 +176,7 @@
         url: url,
         data: {
           elementId: elementId,
-          sceneId: sceneId,
-          token: '123'
+          sceneId: sceneId
         }
       }).done(function(data) {
         var template = _.template(strVar3),
@@ -195,6 +194,8 @@
       return new ModelSelection(options);
     }
 
+
+
     var defaults = {
       btnText: '确&nbsp;&nbsp;定'
     }
@@ -202,15 +203,19 @@
     if (this.Settings.etag) {
       Project.Settings = this.Settings;
       ourl=options.host||ourl;
+      //设置cookie
+      this.initCookie(ourl,options.appKey,options.token);
       this.Project = Project;
       this.init();
     } else {
+      //设置cookie
+      this.initCookie(ourl,options.appKey,options.token);
       $.ajax({
-        url: ourl + "/platform/api/project/" + this.Settings.projectCode + "/meta?token=123"
+        url: ourl + "/platform/api/project/" + this.Settings.projectCode + "/meta?t="+new Date().getTime()
       }).done(function(data) {
         if (data.code == 0) {
           $.ajax({
-            url: ourl + "/view/" + data.data.projectId + "/" + data.data.versionId + "/init?token=123"
+            url: ourl + "/view/" + data.data.projectId + "/" + data.data.versionId + "/init"
           }).done(function(data) {
             if (data.code == 0) {
               _this.Settings = $.extend({}, _this.Settings, data.data);
@@ -235,6 +240,41 @@
 
 
   ModelSelection.prototype = {
+
+    initCookie:function(ourl,appKey,token) {
+      var that = this,
+          isVerification = false,
+          url = ourl+ "/platform/token";
+      $.ajax({
+        url: url,
+        data: {
+          appKey: appKey,
+          token: token
+        },
+        async: false
+      }).done(function(data) {
+        if (data.code == 0) {
+          that.setCookie("token_cookie", data.data);
+          alert( data.data)
+          isVerification = true;
+        } else {
+          alert("验证失败");
+          isVerification = false;
+        }
+      }).fail(function(data) {
+        if (data.status == 400) {
+          alert("token过期");
+        }
+      });
+      return isVerification;
+    },
+
+    setCookie:function(name, value) {
+      var Days = 30,
+          exp = new Date();
+      exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 1000);
+      document.cookie = name + "=" + value + ";expires=" + exp.toGMTString() + ";path=/";
+    },
 
     //初始化
     init: function() {
@@ -399,11 +439,6 @@
         //获取数据
         WebView.runScript('getData()', function(val) {
           var data = {};
-          /* alert(val);
-           if (val) {
-             data = JSON.parse(val);
-           }
-           alert(JSON.stringify(data));*/
           var setting = self.Settings;
           if (setting.callback && setting.callback.call(this, val, data.markers) !== false) {
             self.$dialog.remove();
@@ -542,9 +577,9 @@
 
       }
 
-
       WebView.url = ourl + "/static/dist/components/modelSelection/model.html?t=" + new Date().getTime() + "&type=" + this.Settings.type + "&sourceId=" + this.Settings.sourceId + "&etag=" +
-        this.Settings.etag + "&projectId=" + this.Settings.projectId + "&projectVersionId=" + this.Settings.projectVersionId;
+        this.Settings.etag + "&projectId=" + this.Settings.projectId + "&projectVersionId=" + this.Settings.projectVersionId+"&appKey="+
+      this.Settings.appKey+"&token="+this.Settings.token;
       WebView.height = "510px";
       WebView.width = "960px";
 
