@@ -203,13 +203,19 @@
 
 
     this.Settings = $.extend(defaults, options);
+
     //设置cookie
-    if (options.appKey && options.token && !this.initCookie(this.Settings.host || ourl, options.appKey, options.token)) {
+    if (this.Settings.appKey && this.Settings.token && !this.initCookie(this.Settings.host || ourl, this.Settings.appKey, this.Settings.token)) {
       return;
     }
 
-    this.Settings.token_cookie = "token=" + options.token + "&appKey=" + options.appKey + "&t=" + new Date().getTime();
-    this.Settings.token_cookie = "";
+    if (this.Settings.appKey && this.Settings.token) {
+      this.Settings.token_cookie = "token=" + this.Settings.token + "&appKey=" + this.Settings.appKey + "&t=" + new Date().getTime();
+    } else {
+      this.Settings.token_cookie = "";
+    }
+
+
 
     if (this.Settings.etag) {
       Project.Settings = this.Settings;
@@ -267,7 +273,6 @@
       }).done(function(data) {
         if (data.code == 0) {
           that.setCookie("token_cookie", data.data);
-          that.Settings.token_cookie = "token=" + data.data;
           isVerification = true;
         } else {
           alert("验证失败");

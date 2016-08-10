@@ -161,24 +161,38 @@
 		}
 
 		var defaults = {
-				btnText: '确&nbsp;&nbsp;定'
-			}
-			//合并参数
+			btnText: '确&nbsp;&nbsp;定',
+			appKey: "18fbec1ae3da477fb47d842a53164b14",
+			token: "abc3f4a29812170851a0c7ecb6853644abbc902af4b4e57636f27c35bec6628b15e908ae402e0a9034a25d72c17888256dce64f713c532348de5d78acfef88c76b670ed8abcaf44df638ba8ecd2768c93a8fe01b63bb1204014a5efb168a2a9a520bc09d70d8f2afbed49d95c982b73456b476ad825f1ac9"
+		}
+
+		//合并参数
 		this.Settings = $.extend(defaults, options);
+
+		 
+		//设置cookie
+		if (this.Settings.appKey && this.Settings.token && !this.initCookie(this.Settings.host || ourl, this.Settings.appKey, this.Settings.token)) {
+			return;
+		}
+
+		if (this.Settings.appKey && this.Settings.token) {
+			this.Settings.token_cookie = "token=" + this.Settings.token + "&appKey=" + this.Settings.appKey + "&t=" + new Date().getTime();
+		} else {
+			this.Settings.token_cookie = "";
+		}
+
 		if (this.Settings.etag) {
 			Project.Settings = _this.Settings;
 			_this.Project = Project;
-			ourl=options.host||ourl;
-			this.initCookie(ourl,options.appKey,options.token);
+			ourl = options.host || ourl;
 			_this.init();
 		} else {
-			this.initCookie(ourl,options.appKey,options.token);
 			$.ajax({
-				url: ourl + "/platform/api/project/" + this.Settings.projectCode + "/meta?token=123"
+				url: ourl + "/platform/api/project/" + this.Settings.projectCode + "/meta?" + _this.Settings.token_cookie
 			}).done(function(data) {
 				if (data.code == 0) {
 					$.ajax({
-						url: ourl + "/view/" + data.data.projectId + "/" + data.data.versionId + "/init?token=123"
+						url: ourl + "/view/" + data.data.projectId + "/" + data.data.versionId + "/init?" + _this.Settings.token_cookie
 					}).done(function(data) {
 						if (data.code == 0) {
 							_this.Settings = $.extend({}, _this.Settings, data.data);
@@ -188,17 +202,17 @@
 						} else if (data.code == 10004) {
 							//	document.location.href=ourl+"/login.html";
 						}
-
 					})
 				}
 			})
 		}
 	}
 	InspectModelSelection.prototype = {
-		initCookie:function(ourl,appKey,token) {
+
+		initCookie: function(ourl, appKey, token) {
 			var that = this,
 				isVerification = false,
-				url = ourl+ "/platform/token";
+				url = ourl + "/platform/token";
 			$.ajax({
 				url: url,
 				data: {
@@ -209,7 +223,6 @@
 			}).done(function(data) {
 				if (data.code == 0) {
 					that.setCookie("token_cookie", data.data);
-					alert( data.data)
 					isVerification = true;
 				} else {
 					alert("验证失败");
@@ -223,11 +236,24 @@
 			return isVerification;
 		},
 
-		setCookie:function(name, value) {
+		setCookie: function(name, value) {
 			var Days = 30,
-				exp = new Date();
+				host = this.Settings.host || ourl,
+				exp = new Date(),
+				doMain = host.substring(host.indexOf("."));
 			exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 1000);
-			document.cookie = name + "=" + value + ";expires=" + exp.toGMTString() + ";path=/";
+			document.cookie = name + "=" + value + ";domain=" + doMain + ";expires=" + exp.toGMTString() + ";path=/";
+		},
+		//删除cookie
+		delCookie: function(name) {
+			var exp = new Date(),
+				host = this.Settings.host || ourl,
+				doMain = host.substring(host.indexOf("."));
+
+			exp.setTime(exp.getTime() - 31 * 24 * 60 * 60 * 1000);
+			var cval = this.getCookie(name);
+			if (cval != null)
+				document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString() + ";domain=" + doMain + ";path=/";
 		},
 		init: function() {
 			var self = this,
@@ -257,7 +283,7 @@
 					self.dialog();
 					self.controll();
 				})
-			}); 
+			});
 		},
 		controll: function() {
 
@@ -398,15 +424,15 @@
 				}
 			}
 			WebView.url = ourl + "/static/dist/components/inspectSelection/model.html?type=" + this.Settings.type + "&sourceId=" + this.Settings.sourceId + "&etag=" +
-				this.Settings.etag + "&projectId=" + this.Settings.projectId + "&projectVersionId=" + this.Settings.projectVersionId + "&ruleType=" + this.Settings.ruleType+"&appKey="+
-				this.Settings.appKey+"&token="+this.Settings.token;
+				this.Settings.etag + "&projectId=" + this.Settings.projectId + "&projectVersionId=" + this.Settings.projectVersionId + "&ruleType=" + this.Settings.ruleType + "&appKey=" +
+				this.Settings.appKey + "&token=" + this.Settings.token;
 			WebView.height = "510px";
 			WebView.width = "960px";
 
 			//窗体变化
 			window.onresize = resizeWebView;
-			resizeWebView(); 
-		 
+			resizeWebView();
+
 		},
 		renderModel: function() {
 			//	Project.setOnlyModel();//检查是否是唯一的 模型
@@ -419,7 +445,7 @@
 				projectVersionId: this.Settings.projectVersionId
 			})
 			Project.Viewer = this.viewer;
-			this.viewer.on("loaded",function(){
+			this.viewer.on("loaded", function() {
 				Project.loadPropertyPanel();
 			});
 			$('.m-camera').addClass('disabled').attr('disabled', 'disabled');
@@ -462,53 +488,53 @@
 			})
 		},
 
-		filterRule:{
-			file:'工程桩,基坑支护,地下防水,钢结构悬挑构件,幕墙,采光顶',
-			floorPlus:'梁柱节点',
-			floor:'步行街吊顶风口,卫生间防水,外保温',
-			floorSpty:'步行街吊顶风口&暖通#内装,卫生间防水&暖通#内装'
+		filterRule: {
+			file: '工程桩,基坑支护,地下防水,钢结构悬挑构件,幕墙,采光顶',
+			floorPlus: '梁柱节点',
+			floor: '步行街吊顶风口,卫生间防水,外保温',
+			floorSpty: '步行街吊顶风口&暖通#内装,卫生间防水&暖通#内装'
 		},
-		sigleRule:function(cat){
-			var _this=this,
-				_v=Project.Viewer,
-				_spFiles=_v.SpecialtyFileObjData;
-			if(cat=='地下防水'){
-				var sp='结构',
-					show=[],
-					hide=[];
-				_.each(_spFiles,function(val,key){
-					if(sp==key){
-						_.each(val,function(item){
-							if(item.fileName.indexOf('B02')!=-1){
-								show=[item.fileEtag];
-							}else{
+		sigleRule: function(cat) {
+			var _this = this,
+				_v = Project.Viewer,
+				_spFiles = _v.SpecialtyFileObjData;
+			if (cat == '地下防水') {
+				var sp = '结构',
+					show = [],
+					hide = [];
+				_.each(_spFiles, function(val, key) {
+					if (sp == key) {
+						_.each(val, function(item) {
+							if (item.fileName.indexOf('B02') != -1) {
+								show = [item.fileEtag];
+							} else {
 								hide.push(item.fileEtag);
 							}
 						})
-					}else{
-						_.each(val,function(item){
+					} else {
+						_.each(val, function(item) {
 							hide.push(item.fileEtag);
 						})
 					}
 				})
 				_v.fileFilter({
-					ids:hide,
-					total:show,
-					type:'sceneId'
+					ids: hide,
+					total: show,
+					type: 'sceneId'
 				});
 				_v.filter({
 					//ids:_this.filterCCode('10.20.20.09'),
-					ids:['10.20.20.09'],
-					type:"classCode"
+					ids: ['10.20.20.09'],
+					type: "classCode"
 				});
 			}
 		},
-		filterCCode:function(code){
-			var _class=Project.Viewer.ClassCodeData,
-				hide=[];
+		filterCCode: function(code) {
+			var _class = Project.Viewer.ClassCodeData,
+				hide = [];
 
-			_.each(_class,function(item){
-				if(item.code.indexOf(code)!=0){
+			_.each(_class, function(item) {
+				if (item.code.indexOf(code) != 0) {
 					hide.push(item.code);
 				}
 			})
@@ -537,7 +563,7 @@
 		showInModel: function($target, type) {
 			var _this = this,
 				id = $target.data('id'),
-				color=$target.data('color'),
+				color = $target.data('color'),
 				_temp = null,
 				location = null;
 			_.each(Project.currentPageListData, function(i) {
@@ -548,67 +574,67 @@
 			})
 			if (_temp) {
 				_temp = JSON.parse(_temp);
-				_this.filterComp(_temp.componentId,$target.data('cat'));
+				_this.filterComp(_temp.componentId, $target.data('cat'));
 				var box = _this.formatBBox(_temp.bBox || _temp.boundingBox);
 				var ids = [_temp.componentId];
 				_this.zoomModel(ids, box);
-				_this.showMarks(Project.formatMark(location,color));
+				_this.showMarks(Project.formatMark(location, color));
 			}
 		},
 
-		filterComp:function(componentId,cat){
-			var _Viewer=Project.Viewer,
-				_floors=_Viewer.FloorsData,
-				key="",
-				_this=this,
-				_secenId=componentId.split('.')[0],
-				floorSptys=_this.filterRule.floorSpty.split(',');
+		filterComp: function(componentId, cat) {
+			var _Viewer = Project.Viewer,
+				_floors = _Viewer.FloorsData,
+				key = "",
+				_this = this,
+				_secenId = componentId.split('.')[0],
+				floorSptys = _this.filterRule.floorSpty.split(',');
 
-			_.find(_floors,function(item){
-				key=item.floor;
-				return _.contains(item.fileEtags,_secenId);
+			_.find(_floors, function(item) {
+				key = item.floor;
+				return _.contains(item.fileEtags, _secenId);
 			})
-			var  _files=_Viewer.FloorFilesData,
-				_spFiles=_Viewer.SpecialtyFilesData;
+			var _files = _Viewer.FloorFilesData,
+				_spFiles = _Viewer.SpecialtyFilesData;
 			//过滤所属楼层 end
-			if(cat && (_this.filterRule.file.indexOf(cat)!=-1||
-				_this.filterRule.floorPlus.indexOf(cat)!=-1)){
-				var _hideFileIds=_.filter(_files,function(i){
-					return i!=_secenId;
+			if (cat && (_this.filterRule.file.indexOf(cat) != -1 ||
+					_this.filterRule.floorPlus.indexOf(cat) != -1)) {
+				var _hideFileIds = _.filter(_files, function(i) {
+					return i != _secenId;
 				})
 				_Viewer.fileFilter({
-					ids:_hideFileIds,
-					total:[_secenId]
+					ids: _hideFileIds,
+					total: [_secenId]
 				});
 				_this.sigleRule(cat);
-				if(_this.filterRule.floorPlus.indexOf(cat)!=-1){
+				if (_this.filterRule.floorPlus.indexOf(cat) != -1) {
 					_Viewer.filter({
-						ids:['10.20.20.03'],
-						type:"classCode"
+						ids: ['10.20.20.03'],
+						type: "classCode"
 					});
 				}
-			}else if(_this.filterRule.floor.indexOf(cat)!=-1){
-				_this.linkSilder('floors',key);
-				var sp=_.find(floorSptys,function(item){
-					return item.indexOf(cat)!=-1;
+			} else if (_this.filterRule.floor.indexOf(cat) != -1) {
+				_this.linkSilder('floors', key);
+				var sp = _.find(floorSptys, function(item) {
+					return item.indexOf(cat) != -1;
 				});
-				var sp=sp.slice(sp.indexOf('&')+1),
-					show=[],
-					hide=[];
-				_.each(_spFiles,function(val,key){
-					if(sp.indexOf(key)!=-1){
-						show=show.concat(val);
-					}else{
-						hide=hide.concat(val);
+				var sp = sp.slice(sp.indexOf('&') + 1),
+					show = [],
+					hide = [];
+				_.each(_spFiles, function(val, key) {
+					if (sp.indexOf(key) != -1) {
+						show = show.concat(val);
+					} else {
+						hide = hide.concat(val);
 					}
 				})
 				_Viewer.fileFilter({
-					ids:hide,
-					total:show,
-					type:'sceneId'
+					ids: hide,
+					total: show,
+					type: 'sceneId'
 				});
-			}else{
-				_this.linkSilder('floors',key);
+			} else {
+				_this.linkSilder('floors', key);
 			}
 
 		},
@@ -623,12 +649,12 @@
 			Project.Viewer && Project.Viewer.loadMarkers(null);
 		},
 
-		formatMark: function(location,color) {
+		formatMark: function(location, color) {
 			var _temp = JSON.parse(location),
 				_color = '510';
 			color = _color.charAt(color || 5) || 5;
 			_temp.shapeType = _temp.shapeType || 0;
-			_temp.state = _temp.state ||color|| 0;
+			_temp.state = _temp.state || color || 0;
 			_temp.userId = _temp.userId || _temp.componentId;
 			return JSON.stringify(_temp);
 		},
@@ -799,7 +825,7 @@
 			this.OpeningAcceptanceOptions = options.OpeningAcceptance;
 			var tpl = _.template(strVar2);
 			this.$el.html(tpl({
-				floorsData:Project.Viewer.FloorsData,
+				floorsData: Project.Viewer.FloorsData,
 				userData: Project.Settings.type == 'open' ? mapData.openCategory : mapData.processCategory,
 				ruleType: Project.Settings.ruleType
 			}));
@@ -844,7 +870,7 @@
 			this.$(".specialitiesOption").myDropDown({
 				zIndex: 13,
 				click: function($item) {
-					that.changeOA('specialty',$item.data("val"))
+					that.changeOA('specialty', $item.data("val"))
 				}
 			});
 
