@@ -511,8 +511,6 @@
         if (Project.Settings.type == 'single') {
           //viewer.zoomToSelection();
           _this.getSelected();
-          viewer.markers();
-          viewer.viewer.setMarkerState(3);
           //  viewer.loadMarkers([JSON.stringify(p)]);
         }
         //渲染属性面板
@@ -521,18 +519,21 @@
       });
       $('.view').on('click', function() {
         if (Project.Settings.type == 'single') {
+          viewer.markers();
+          viewer.viewer.setMarkerState(3);
           var m = viewer.saveMarkers();
           if (m && 　m.length > 0) {
             viewer.loadMarkers([m.pop()]);
             Project.Settings.markers = viewer.saveMarkers();
           }
+          viewer.markerEnd();
         }
-        $(this).mouseup(function(e) {
+        /*$(this).mouseup(function(e) {
           if (3 == e.which) {
             viewer.loadMarkers(null);
-            viewer.markerEnd();
+
           }
-        });
+        });*/
       })
     },
     getSelected: function() {

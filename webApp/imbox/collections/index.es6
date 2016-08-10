@@ -451,6 +451,7 @@ App.INBox.comment = {
 		removeImg(event) {
 			$(event.target).closest(".singleImg").remove();
 			$('.uppic').empty();
+			$('.uploadImg').val('');
 		},
 
 		//新增数据
