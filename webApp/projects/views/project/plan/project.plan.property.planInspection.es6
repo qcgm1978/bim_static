@@ -17,7 +17,6 @@ App.Project.PlanInspection = Backbone.View.extend({
 	events: {
 		"click .tbBottom .nodeSwitch": "showNode",
 		"click .subData .code": "showInModel",
-		"click .businessMatters": "cancelZoomModel",
 		"click .exportList": "exportList"
 	},
 
