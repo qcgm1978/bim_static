@@ -5647,6 +5647,8 @@ CLOUD.Extensions.Marker.prototype = {
     },
 
     destroy: function () {
+        this.removeDomEventListeners();
+        this.deselect();
         this.setParent(null);
     },
 
@@ -5754,6 +5756,39 @@ CLOUD.Extensions.Marker.prototype = {
     },
 
     update: function () {
+
+        var strokeWidth = this.style['stroke-width'];
+        var strokeColor = this.highlighted ? this.highlightColor : this.style['stroke-color'];
+        var strokeOpacity = this.style['stroke-opacity'];
+        var fillColor = this.style['fill-color'];
+        var fillOpacity = this.style['fill-opacity'];
+
+        var position = this.getClientPosition();
+
+        if (!position) {
+
+            this.shape.style.display = "none";
+            return;
+        }
+
+        if (this.shape.style.display !== '') {
+
+            this.shape.style.display = '';
+        }
+
+        var offsetX = position.x;
+        var offsetY = position.y;
+
+        var transformShape = [
+            'translate(', offsetX, ',', offsetY, ') '
+        ].join('');
+
+        this.shape.setAttribute("transform", transformShape);
+        this.shape.setAttribute("stroke-width", strokeWidth);
+        this.shape.setAttribute("stroke", strokeColor);
+        this.shape.setAttribute("stroke-opacity", strokeOpacity);
+        this.shape.setAttribute('fill', fillColor);
+        this.shape.setAttribute('fill-opacity', fillOpacity);
     }
 };
 
@@ -5803,30 +5838,6 @@ CLOUD.Extensions.MarkerFlag.prototype.createShape = function () {
     this.shape = CLOUD.Extensions.Utils.Shape2D.makeFlag();
 };
 
-CLOUD.Extensions.MarkerFlag.prototype.update = function () {
-
-    var strokeWidth = this.style['stroke-width'];
-    var strokeColor = this.highlighted ? this.highlightColor : this.style['stroke-color'];
-    var strokeOpacity = this.style['stroke-opacity'];
-    var fillColor = this.style['fill-color'];
-    var fillOpacity = this.style['fill-opacity'];
-
-    var position = this.getClientPosition();
-    var offsetX = position.x;
-    var offsetY = position.y;
-
-    var transformShape = [
-        'translate(', offsetX, ',', offsetY, ') '
-    ].join('');
-
-    this.shape.setAttribute("transform", transformShape);
-    this.shape.setAttribute("stroke-width", strokeWidth);
-    this.shape.setAttribute("stroke", strokeColor);
-    this.shape.setAttribute("stroke-opacity", strokeOpacity);
-    this.shape.setAttribute('fill', fillColor);
-    this.shape.setAttribute('fill-opacity', fillOpacity);
-};
-
 CLOUD.Extensions.MarkerFlag.prototype.renderToCanvas = function (ctx) {
 
 };
@@ -5862,42 +5873,23 @@ CLOUD.Extensions.MarkerBubble.prototype.createShape = function () {
     this.shape = CLOUD.Extensions.Utils.Shape2D.makeBubble();
 };
 
-CLOUD.Extensions.MarkerBubble.prototype.update = function () {
-
-    var strokeWidth = this.style['stroke-width'];
-    var strokeColor = this.highlighted ? this.highlightColor : this.style['stroke-color'];
-    var strokeOpacity = this.style['stroke-opacity'];
-    var fillColor = this.style['fill-color'];
-    var fillOpacity = this.style['fill-opacity'];
-
-    var position = this.getClientPosition();
-    var offsetX = position.x;
-    var offsetY = position.y;
-
-    var transformShape = [
-        'translate(', offsetX, ',', offsetY, ') '
-    ].join('');
-
-    this.shape.setAttribute("transform", transformShape);
-    this.shape.setAttribute("stroke-width", strokeWidth);
-    this.shape.setAttribute("stroke", strokeColor);
-    this.shape.setAttribute("stroke-opacity", strokeOpacity);
-    this.shape.setAttribute('fill', fillColor);
-    this.shape.setAttribute('fill-opacity', fillOpacity);
-};
-
 CLOUD.Extensions.MarkerBubble.prototype.renderToCanvas = function (ctx) {
 
 };
 
 
 
+
 CLOUD.Extensions.MarkerEditor = function (viewer) {
     "use strict";
 
-    this.cameraEditor = viewer.cameraEditor;
-    this.scene = viewer.getScene();
-    this.domElement = viewer.domElement;
+    CLOUD.OrbitEditor.call(this, viewer.cameraEditor, viewer.getScene(), viewer.domElement);
+
+    //this.cameraEditor = viewer.cameraEditor;
+    //this.scene = viewer.getScene();
+    //this.domElement = viewer.domElement;
+
+    this.filter = this.scene.filter;
 
     this.markers = [];
 
@@ -5950,14 +5942,56 @@ CLOUD.Extensions.MarkerEditor = function (viewer) {
     this.onMouseUpBinded = this.onMouseUp.bind(this);
     this.onKeyDownBinded = this.onKeyDown.bind(this);
     this.onKeyUpBinded = this.onKeyUp.bind(this);
+
+    this.onMouseMoveBinded = this.onMouseMove.bind(this);
+    this.onMouseWheelBinded = this.onMouseWheel.bind(this);
+
+    this.currentMarker = null;
 };
+
+CLOUD.Extensions.MarkerEditor.prototype = Object.create(CLOUD.OrbitEditor.prototype);
+CLOUD.Extensions.MarkerEditor.prototype.constructor = CLOUD.Extensions.MarkerEditor;
+
+//CLOUD.Extensions.MarkerEditor.prototype.addDomEventListeners_1 = function () {
+//
+//    if (this.svg) {
+//
+//        this.svg.addEventListener('mousedown', this.onMouseDownBinded, false);
+//        this.svg.addEventListener('mouseup', this.onMouseUpBinded, false);
+//
+//        window.addEventListener('mousemove', this.onMouseMoveBinded, false);
+//        window.addEventListener('mouseup', this.onMouseUpBinded, false);
+//
+//        window.addEventListener('keydown', this.onKeyDownBinded, false);
+//        window.addEventListener('keyup', this.onKeyUpBinded, false);
+//    }
+//};
+//
+//CLOUD.Extensions.MarkerEditor.prototype.removeDomEventListeners_1 = function () {
+//
+//    if (this.svg) {
+//
+//        this.svg.removeEventListener('mousedown', this.onMouseDownBinded, false);
+//        this.svg.removeEventListener('mouseup', this.onMouseUpBinded, false);
+//
+//        window.removeEventListener('mousemove', this.onMouseMoveBinded, false);
+//        window.removeEventListener('mouseup', this.onMouseUpBinded, false);
+//
+//        window.removeEventListener('keydown', this.onKeyDownBinded, false);
+//        window.removeEventListener('keyup', this.onKeyUpBinded, false);
+//    }
+//
+//};
 
 CLOUD.Extensions.MarkerEditor.prototype.addDomEventListeners = function () {
 
     if (this.svg) {
 
         this.svg.addEventListener('mousedown', this.onMouseDownBinded, false);
-        this.svg.addEventListener('mouseup', this.onMouseUpBinded, false);
+        this.svg.addEventListener('mousewheel', this.onMouseWheelBinded, false);
+
+        window.addEventListener('mousemove', this.onMouseMoveBinded, false);
+        window.addEventListener('mouseup', this.onMouseUpBinded, false);
 
         window.addEventListener('keydown', this.onKeyDownBinded, false);
         window.addEventListener('keyup', this.onKeyUpBinded, false);
@@ -5969,15 +6003,19 @@ CLOUD.Extensions.MarkerEditor.prototype.removeDomEventListeners = function () {
     if (this.svg) {
 
         this.svg.removeEventListener('mousedown', this.onMouseDownBinded, false);
-        this.svg.removeEventListener('mouseup', this.onMouseUpBinded, false);
+        this.svg.removeEventListener('mousewheel', this.onMouseWheelBinded, false);
+
+        window.removeEventListener('mousemove', this.onMouseMoveBinded, false);
+        window.removeEventListener('mouseup', this.onMouseUpBinded, false);
 
         window.removeEventListener('keydown', this.onKeyDownBinded, false);
         window.removeEventListener('keyup', this.onKeyUpBinded, false);
     }
-
 };
 
 CLOUD.Extensions.MarkerEditor.prototype.onMouseDown = function (event) {
+
+    CLOUD.OrbitEditor.prototype.onMouseDown.call(this, event);
 
     if (this.selectedMarker && event.target === this.svg) {
 
@@ -5987,31 +6025,56 @@ CLOUD.Extensions.MarkerEditor.prototype.onMouseDown = function (event) {
 
 CLOUD.Extensions.MarkerEditor.prototype.onMouseUp = function (event) {
 
-    var cameraEditor = this.cameraEditor;
+    var scope = this;
 
-    if (cameraEditor.enabled === false)
-        return;
+    if (this.oldMouseX == event.clientX && this.oldMouseY == event.clientY) {
 
-    if (this.selectedMarker) {
-        return;
-    }
+        var cameraEditor = this.cameraEditor;
 
-    event.preventDefault();
+        if (cameraEditor.enabled === false)
+            return;
 
-    if (event.button === THREE.MOUSE.LEFT) {
+        if (this.selectedMarker) {
+            return;
+        }
 
-        var scope = this;
-        var point = this.getPointOnDomContainer(event.clientX, event.clientY);
-        var normalizedPoint = this.clientToViewport(point);
+        event.preventDefault();
 
-        scope.scene.pick(normalizedPoint, cameraEditor.object, function (intersect) {
+        if (event.button === THREE.MOUSE.LEFT) {
 
-            if (intersect) {
+            var point = this.getPointOnDomContainer(event.clientX, event.clientY);
+            var normalizedPoint = this.clientToViewport(point);
+
+            scope.scene.pick(normalizedPoint, cameraEditor.object, function (intersect) {
+
+                if (!intersect) {
+
+                    if (scope.filter.setSelectedIds()) {
+                        cameraEditor.updateView(true);
+                    }
+
+                    if (scope.currentMarker) {
+                        scope.deleteMarker(scope.currentMarker);
+                    }
+
+                    return;
+                }
 
                 var userId = "";
                 userId = intersect.userId || userId;
 
                 if (userId === "") return;
+
+                // 高亮构件
+                //if (!event.ctrlKey) {
+                //    scope.filter.setSelectedIds();
+                //}
+
+                scope.filter.setSelectedIds();
+                scope.filter.addSelectedId(userId, intersect.object.userData, true);
+                cameraEditor.updateView(true);
+
+                // 加入检查点
 
                 var inverseScaleMatrix = scope.getInverseSceneMatrix();
                 var boundingBox = intersect.object.boundingBox;
@@ -6028,14 +6091,14 @@ CLOUD.Extensions.MarkerEditor.prototype.onMouseUp = function (event) {
 
                         bBox = boundingBox.clone();
 
-                        var position = new THREE.Vector3();
-                        var quaternion = new THREE.Quaternion();
-                        var scale = new THREE.Vector3();
+                        var objPosition = new THREE.Vector3();
+                        var objQuaternion = new THREE.Quaternion();
+                        var objScale = new THREE.Vector3();
                         var objMatrix = intersect.object.matrix;
-                        objMatrix.decompose( position, quaternion, scale );
+                        objMatrix.decompose( objPosition, objQuaternion, objScale );
 
                         // 计算包围盒
-                        var invScale = new THREE.Vector3(1 /scale.x, 1 / scale.y, 1 / scale.z );
+                        var invScale = new THREE.Vector3(1 /objScale.x, 1 / objScale.y, 1 / objScale.z );
                         bBox.min.multiply(invScale);
                         bBox.max.multiply(invScale);
 
@@ -6064,6 +6127,10 @@ CLOUD.Extensions.MarkerEditor.prototype.onMouseUp = function (event) {
                 var markerId = scope.generateMarkerId();
                 var marker;
 
+                if (scope.currentMarker) {
+                    scope.deleteMarker(scope.currentMarker);
+                }
+
                 if (scope.markerType === 1) {
 
                     marker = new CLOUD.Extensions.MarkerBubble(markerId, scope);
@@ -6076,33 +6143,55 @@ CLOUD.Extensions.MarkerEditor.prototype.onMouseUp = function (event) {
                 var style = CLOUD.Extensions.Marker.getDefaultStyle();
                 style['fill-color'] = scope.markerColor;
                 marker.set(userId, position, bBox, scope.markerState, style);
-                scope.addMarker(marker);
-            }
-        });
+
+                scope.currentMarker = marker;
+                scope.addMarker(scope.currentMarker);
+            });
+        }
     }
 
+    CLOUD.OrbitEditor.prototype.onMouseUp.call(this, event);
+};
+
+CLOUD.Extensions.MarkerEditor.prototype.onMouseMove = function(event) {
+
+    CLOUD.OrbitEditor.prototype.onMouseMove.call(this, event);
+
+    this.updateMarkers();
+};
+
+CLOUD.Extensions.MarkerEditor.prototype.onMouseWheel = function (event) {
+
+    CLOUD.OrbitEditor.prototype.onMouseWheel.call(this, event);
+    this.updateMarkers();
 };
 
 CLOUD.Extensions.MarkerEditor.prototype.onKeyDown = function (event) {
 
+    //CLOUD.OrbitEditor.prototype.onKeyDown.call(this, event);
 };
 
 CLOUD.Extensions.MarkerEditor.prototype.onKeyUp = function (event) {
 
-    if (!this.isEditing) {
-        return;
+    //if (!this.isEditing) {
+    //    return;
+    //}
+
+    if (this.isEditing) {
+
+        switch (event.keyCode) {
+            case this.keys.DELETE:
+                if (this.selectedMarker) {
+                    this.selectedMarker.delete();
+                    this.deselectMarker();
+                }
+                break;
+            default :
+                break;
+        }
     }
 
-    switch (event.keyCode) {
-        case this.keys.DELETE:
-            if (this.selectedMarker) {
-                this.selectedMarker.delete();
-                this.deselectMarker();
-            }
-            break;
-        default :
-            break;
-    }
+    //CLOUD.OrbitEditor.prototype.onKeyUp.call(this, event);
 };
 
 CLOUD.Extensions.MarkerEditor.prototype.onResize = function () {
@@ -6316,6 +6405,11 @@ CLOUD.Extensions.MarkerEditor.prototype.worldToClient = function (wPoint) {
 
     result.applyMatrix4(sceneMatrix);
     result.project(camera);
+
+    // 裁剪不在相机范围的值
+    if (Math.abs(result.z) > 1) {
+        return null;
+    }
 
     result.x = Math.round(0.5 * (result.x + 1) * bounds.width);
     result.y = Math.round(-0.5 * (result.y - 1) * bounds.height);
