@@ -548,7 +548,7 @@
         rootHtml = $('<ul class="tree"></ul>');
       $.each(data, function(i, j) {
         var hasChild = typeof j == 'object' ? true : false,
-          icon = hasChild ? 'm-openTree' : 'noneSwitch',
+          icon = hasChild ? 'm-closeTree' : 'noneSwitch',
           name = hasChild ? i : j,
           isDel = hasChild ? 'nodel' : 'del';
         var html = $('<li class="itemNode open">\
