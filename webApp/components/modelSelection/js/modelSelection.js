@@ -494,6 +494,9 @@
         projectId: this.Settings.projectId,
         projectVersionId: this.Settings.projectVersionId
       })
+      viewer.on('loaded',function(){
+       // viewer.markers();
+      })
       this.viewer = viewer;
       Project.Viewer = viewer;
       var _url = ourl + '/doc/' + this.Settings.projectId + '/' + this.Settings.projectVersionId + '?' + _this.Settings.token_cookie + '&modelId=';
