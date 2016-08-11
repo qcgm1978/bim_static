@@ -218,8 +218,14 @@ App.Project = {
 		})
 		$treeText.each(function() {
 			var _ = $(this).parent().find('input');
-			if ($(this).text() == key && !_.is(':checked')) {
-				_.trigger('click');
+			if(key){
+				if ($(this).text() == key && !_.is(':checked')) {
+					_.trigger('click');
+				}
+			}else{
+				if (!_.is(':checked')) {
+					_.trigger('click');
+				}
 			}
 		})
 	},
