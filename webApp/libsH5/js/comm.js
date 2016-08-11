@@ -173,7 +173,12 @@
           if(_opt.isSelected){
            span = '<span class="treeText selected">'+itemName+'</span>'
           }else{
-            span = '<span class="treeText">'+itemName+'</span>'
+            if(_opt.type=='classCode'){
+              span = '<span class="treeText" title="'+item['code']+'">'+itemName+'</span>'
+            }else{
+              span = '<span class="treeText">'+itemName+'</span>'
+            }
+
           }
           var tmpHtml = $('<li class="itemNode" data-type="'+type+'">\
             <div class="itemContent">\
