@@ -88,22 +88,26 @@
 					appKey: this.Settings.appKey,
 					token: this.Settings.token
 				},
-				async: false
-			}).done(function(data) {
-				if (data.code == 0) {
+				async: false,
 
-					that.setCookie("token_cookie", data.data);
-					that.Settings.token_cookie = data.data;
-					isVerification = true;
-				} else {
-					alert("验证失败");
-					isVerification = false;
+				success: function(data) {
+					if (data.code == 0) {
+
+						that.setCookie("token_cookie", data.data);
+						that.Settings.token_cookie = data.data;
+						isVerification = true;
+					} else {
+						alert("验证失败");
+						isVerification = false;
+					}
+				},
+
+				error: function(data) {
+					if (data.status == 400) {
+						alert("token过期");
+					}
 				}
-			}).fail(function(data) {
-				if (data.status == 400) {
-					alert("token过期");
-				}
-			});
+			})
 
 			return isVerification;
 
@@ -199,23 +203,21 @@
 
 			var that = this;
 			$.ajax({
-				url: url
-			}).done(function(data) {
-
-				if ($.type(data) == "string") {
-					// to json
-					if (JSON && JSON.parse) {
-						data = JSON.parse(data);
-					} else {
-						data = $.parseJSON(data);
+				url: url,
+				success: function(data) {
+					if ($.type(data) == "string") {
+						// to json
+						if (JSON && JSON.parse) {
+							data = JSON.parse(data);
+						} else {
+							data = $.parseJSON(data);
+						}
+					}
+					if ($.isFunction(callback)) {
+						callback.call(that, data);
 					}
 				}
-				if ($.isFunction(callback)) {
-					callback.call(that, data);
-				}
-				//that.renderTree(data);
-
-			});
+			})
 
 		},
 

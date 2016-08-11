@@ -25,7 +25,7 @@
     <script src="libs/jquery/jquery-1.12.0.min.js"></script>
     <script type="text/javascript">
     var hasDevicePixelRatio = true;
-    try {
+    try { 
 
         var myWebView = document.createElement("object"),
             currentVersion = 4;
@@ -77,12 +77,12 @@
                     //登录设置 登出删除
                     var keys = cookies.match(/[^ =;]+(?=\=)/g);
 
-                    if (keys && keys.length > 5) {
+                    if (getCookie("OUTSSO_AuthToken", cookies) != null) {
                         var key, value;
                         for (var i = 0; i < keys.length; i++) {
                             key = keys[i];
                             value = getCookie(keys[i], cookies);
-                            setCookie(key, value);
+                            value && setCookie(key, value);
                         }
 
                         localStorage.user = user;
@@ -101,7 +101,26 @@
 
         //文件下载
         myWebView.registerEvent('download', function(url) { 
-            window.location.href = url;
+
+            //未登录 没有token_cookie
+            if (getCookie("token_cookie") == null && getCookie("OUTSSO_AuthToken") == null) {
+
+                //获取 webview cookie
+                myWebView.runScript("document.cookie", function(cooks) {
+                    var token_cookie = getCookie("token_cookie", cooks);
+                    if (token_cookie) {
+                        setCookie("token_cookie", token_cookie);
+                        window.location.href = url;
+                    }else{
+                         throw new error("version is old");
+                    }
+
+                });
+
+            } else {
+                window.location.href = url;
+            }
+
         });
 
         if (url.indexOf("login.html") > -1) {
@@ -109,9 +128,8 @@
             myWebView.registerEvent('loadFinished', function(isReady) {
 
                 myWebView.runScript('Login.checkLoginBefore("' + document.cookie + '")', function(isLogin) {
-                    myWebView.runScript('Login.checkLogin()', function(isLogin) { 
-                    });
-                });  
+                    myWebView.runScript('Login.checkLogin()', function(isLogin) {});
+                });
             });
 
         }
@@ -122,8 +140,7 @@
 
         resizeWebView();
 
-    } catch (e) {
-
+    } catch (e) { 
         if (myWebView.pluginVersion != currentVersion) {
             var html = templateUrl("/app/oPage/downloadIE.html");
             $("body").html(html);
@@ -131,7 +148,7 @@
             var html = templateUrl("/app/oPage/tipIE.html");
             $("body").html(html);
         } else {
-            var html = templateUrl("/app/oPage/downloadIE.html");
+            var html = templateUrl("/app/oPage/error.html");
             $("body").html(html);
         }
     }
@@ -161,7 +178,7 @@
         }
     }
 
-    function navigateTo(url) { 
+    function navigateTo(url) {
         if (document.createEvent !== undefined) {
             var aLink = "<a href='" + url + "' target='_blank' >test</a>";
             var a = $(aLink).get(0);
