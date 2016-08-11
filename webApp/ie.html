@@ -101,9 +101,9 @@
 
         //文件下载
         myWebView.registerEvent('download', function(url) { 
-
+            
             //未登录 没有token_cookie
-            if (getCookie("token_cookie") == null && getCookie("OUTSSO_AuthToken") == null) {
+            if (getCookie("token_cookie") == null && (getCookie("OUTSSO_AuthToken") == null  ||  getCookie("OUTSSO_AuthToken")=="null" )) {
 
                 //获取 webview cookie
                 myWebView.runScript("document.cookie", function(cooks) {

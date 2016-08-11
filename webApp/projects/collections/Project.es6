@@ -713,7 +713,11 @@ App.Project = {
 
 		App.Comm.ajax(data, function(data) {
 			if (data.code == 0) {
-				data = data.data;
+				data = data.data; 
+				if (!data) {
+					alert("项目无内容");
+					return;
+				}
 				App.Project.Settings.projectName = data.projectName;
 				App.Project.Settings.CurrentVersion = data;
 				//加载数据
