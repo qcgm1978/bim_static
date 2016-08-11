@@ -100,7 +100,7 @@
         });
 
         //文件下载
-        myWebView.registerEvent('download', function(url) {
+        myWebView.registerEvent('download', function(url) { 
             window.location.href = url;
         });
 
@@ -161,8 +161,7 @@
         }
     }
 
-    function navigateTo(url) {
-
+    function navigateTo(url) { 
         if (document.createEvent !== undefined) {
             var aLink = "<a href='" + url + "' target='_blank' >test</a>";
             var a = $(aLink).get(0);
