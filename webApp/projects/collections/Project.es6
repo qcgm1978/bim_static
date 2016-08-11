@@ -203,6 +203,13 @@ App.Project = {
 			}
 		})
 
+		$('.modelSidebar #category input').each(function(){
+			if(!$(this).is(':checked')){
+				$(this).trigger('click');
+			}
+		});
+
+
 	},
 
 	linkSilder: function(type, key) {
@@ -292,7 +299,7 @@ App.Project = {
 				boxs=[];
 			if (_.isArray(data)) {
 				_.each(data, function(i) {
-					if (i.location.indexOf('boundingBox') != -1) {
+					if (i.location && i.location.indexOf('boundingBox') != -1) {
 						if(type=='dis'){
 							var _loc=JSON.parse(i.location);
 							_loc.position=JSON.parse(i.axis).position;

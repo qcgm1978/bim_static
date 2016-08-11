@@ -54,7 +54,7 @@ App.Services.projectMember.projects = Backbone.View.extend({
 		$("#projectList .project").removeClass("active");
 		$li.addClass("active");
 		App.Comm.setCookie("currentPid", pid);
-		App.Comm.setCookie("currentProjectName", name);
+		App.Comm.setCookie("currentProjectName", escape(escape(name)));
 		App.Services.projectMember.loadData(App.Services.projectMember.projectMemberMemberCollection, {
 			outer: App.Comm.user("outer")
 		}, {
