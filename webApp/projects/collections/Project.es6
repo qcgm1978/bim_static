@@ -203,6 +203,13 @@ App.Project = {
 			}
 		})
 
+		$('.modelSidebar #category input').each(function(){
+			if(!$(this).is(':checked')){
+				$(this).trigger('click');
+			}
+		});
+
+
 	},
 
 	linkSilder: function(type, key) {
