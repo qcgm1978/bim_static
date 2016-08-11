@@ -553,12 +553,13 @@ App.INBox.comment = {
 				textsUniq=[],
 				  atUserArrs=[];
 			for(var i=1;i<texts.length;i++){
-				_.contains(textsUniq,texts[i].slice(0,2))?'':textsUniq.push(texts[i].slice(0,2));
+				_.contains(textsUniq,texts[i].split(' ')[0])?'':textsUniq.push(texts[i].split(' ')[0]);
 			}
 
 			for(var j=0;j<textsUniq.length;j++){
 				for(var k=0;k<atUserArr.length;k++){
-					if(atUserArr[k]['userName'].indexOf(textsUniq[j])>-1){
+					if(atUserArr[k]['userName']==textsUniq[j]){
+						//if(atUserArr[k]['userName'].indexOf(textsUniq[j])>-1){
 						atUserArrs.push(atUserArr[k]);
 						break;
 					}
