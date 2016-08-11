@@ -494,9 +494,6 @@
         projectId: this.Settings.projectId,
         projectVersionId: this.Settings.projectVersionId
       })
-      viewer.on('loaded',function(){
-       // viewer.markers();
-      })
       this.viewer = viewer;
       Project.Viewer = viewer;
       var _url = ourl + '/doc/' + this.Settings.projectId + '/' + this.Settings.projectVersionId + '?' + _this.Settings.token_cookie + '&modelId=';
@@ -521,10 +518,10 @@
         })
         if (Project.Settings.type == 'single') {
           //viewer.zoomToSelection();
-          _this.getSelected();
+          viewer.viewer.loadMarkersFromIntersect(model.intersect,1,3);
           var m = viewer.saveMarkers();
-          viewer.loadMarkers(m);
           Project.Settings.markers=m;
+          _this.getSelected();
         }
         //渲染属性面板
         Project.sceneId = model.intersect.object.userData.sceneId;
@@ -551,10 +548,10 @@
         rootHtml = $('<ul class="tree"></ul>');
       $.each(data, function(i, j) {
         var hasChild = typeof j == 'object' ? true : false,
-          icon = hasChild ? 'm-openTree' : 'noneSwitch',
+          icon = hasChild ? 'm-closeTree' : 'noneSwitch',
           name = hasChild ? i : j,
           isDel = hasChild ? 'nodel' : 'del';
-        var html = $('<li class="itemNode">\
+        var html = $('<li class="itemNode open">\
           <div class="itemContent" data-userId="' + i + '">\
             <i class="' + icon + '"></i>\
             <span class="treeText">' + name + '</span>\

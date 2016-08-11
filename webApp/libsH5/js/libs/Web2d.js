@@ -5879,17 +5879,12 @@ CLOUD.Extensions.MarkerBubble.prototype.renderToCanvas = function (ctx) {
 
 
 
-
 CLOUD.Extensions.MarkerEditor = function (viewer) {
     "use strict";
 
-    CLOUD.OrbitEditor.call(this, viewer.cameraEditor, viewer.getScene(), viewer.domElement);
-
-    //this.cameraEditor = viewer.cameraEditor;
-    //this.scene = viewer.getScene();
-    //this.domElement = viewer.domElement;
-
-    this.filter = this.scene.filter;
+    this.cameraEditor = viewer.cameraEditor;
+    this.scene = viewer.getScene();
+    this.domElement = viewer.domElement;
 
     this.markers = [];
 
@@ -5942,56 +5937,14 @@ CLOUD.Extensions.MarkerEditor = function (viewer) {
     this.onMouseUpBinded = this.onMouseUp.bind(this);
     this.onKeyDownBinded = this.onKeyDown.bind(this);
     this.onKeyUpBinded = this.onKeyUp.bind(this);
-
-    this.onMouseMoveBinded = this.onMouseMove.bind(this);
-    this.onMouseWheelBinded = this.onMouseWheel.bind(this);
-
-    this.currentMarker = null;
 };
-
-CLOUD.Extensions.MarkerEditor.prototype = Object.create(CLOUD.OrbitEditor.prototype);
-CLOUD.Extensions.MarkerEditor.prototype.constructor = CLOUD.Extensions.MarkerEditor;
-
-//CLOUD.Extensions.MarkerEditor.prototype.addDomEventListeners_1 = function () {
-//
-//    if (this.svg) {
-//
-//        this.svg.addEventListener('mousedown', this.onMouseDownBinded, false);
-//        this.svg.addEventListener('mouseup', this.onMouseUpBinded, false);
-//
-//        window.addEventListener('mousemove', this.onMouseMoveBinded, false);
-//        window.addEventListener('mouseup', this.onMouseUpBinded, false);
-//
-//        window.addEventListener('keydown', this.onKeyDownBinded, false);
-//        window.addEventListener('keyup', this.onKeyUpBinded, false);
-//    }
-//};
-//
-//CLOUD.Extensions.MarkerEditor.prototype.removeDomEventListeners_1 = function () {
-//
-//    if (this.svg) {
-//
-//        this.svg.removeEventListener('mousedown', this.onMouseDownBinded, false);
-//        this.svg.removeEventListener('mouseup', this.onMouseUpBinded, false);
-//
-//        window.removeEventListener('mousemove', this.onMouseMoveBinded, false);
-//        window.removeEventListener('mouseup', this.onMouseUpBinded, false);
-//
-//        window.removeEventListener('keydown', this.onKeyDownBinded, false);
-//        window.removeEventListener('keyup', this.onKeyUpBinded, false);
-//    }
-//
-//};
 
 CLOUD.Extensions.MarkerEditor.prototype.addDomEventListeners = function () {
 
     if (this.svg) {
 
         this.svg.addEventListener('mousedown', this.onMouseDownBinded, false);
-        this.svg.addEventListener('mousewheel', this.onMouseWheelBinded, false);
-
-        window.addEventListener('mousemove', this.onMouseMoveBinded, false);
-        window.addEventListener('mouseup', this.onMouseUpBinded, false);
+        this.svg.addEventListener('mouseup', this.onMouseUpBinded, false);
 
         window.addEventListener('keydown', this.onKeyDownBinded, false);
         window.addEventListener('keyup', this.onKeyUpBinded, false);
@@ -6003,19 +5956,15 @@ CLOUD.Extensions.MarkerEditor.prototype.removeDomEventListeners = function () {
     if (this.svg) {
 
         this.svg.removeEventListener('mousedown', this.onMouseDownBinded, false);
-        this.svg.removeEventListener('mousewheel', this.onMouseWheelBinded, false);
-
-        window.removeEventListener('mousemove', this.onMouseMoveBinded, false);
-        window.removeEventListener('mouseup', this.onMouseUpBinded, false);
+        this.svg.removeEventListener('mouseup', this.onMouseUpBinded, false);
 
         window.removeEventListener('keydown', this.onKeyDownBinded, false);
         window.removeEventListener('keyup', this.onKeyUpBinded, false);
     }
+
 };
 
 CLOUD.Extensions.MarkerEditor.prototype.onMouseDown = function (event) {
-
-    CLOUD.OrbitEditor.prototype.onMouseDown.call(this, event);
 
     if (this.selectedMarker && event.target === this.svg) {
 
@@ -6025,60 +5974,41 @@ CLOUD.Extensions.MarkerEditor.prototype.onMouseDown = function (event) {
 
 CLOUD.Extensions.MarkerEditor.prototype.onMouseUp = function (event) {
 
-    var scope = this;
+    var cameraEditor = this.cameraEditor;
 
-    if (this.oldMouseX == event.clientX && this.oldMouseY == event.clientY) {
+    if (cameraEditor.enabled === false)
+        return;
 
-        var cameraEditor = this.cameraEditor;
+    if (this.selectedMarker) {
+        return;
+    }
 
-        if (cameraEditor.enabled === false)
-            return;
+    event.preventDefault();
 
-        if (this.selectedMarker) {
-            return;
-        }
+    if (event.button === THREE.MOUSE.LEFT) {
 
-        event.preventDefault();
+        var scope = this;
+        var point = this.getPointOnDomContainer(event.clientX, event.clientY);
+        var normalizedPoint = this.clientToViewport(point);
 
-        if (event.button === THREE.MOUSE.LEFT) {
+        scope.scene.pick(normalizedPoint, cameraEditor.object, function (intersect) {
 
-            var point = this.getPointOnDomContainer(event.clientX, event.clientY);
-            var normalizedPoint = this.clientToViewport(point);
-
-            scope.scene.pick(normalizedPoint, cameraEditor.object, function (intersect) {
-
-                if (!intersect) {
-
-                    if (scope.filter.setSelectedIds()) {
-                        cameraEditor.updateView(true);
-                    }
-
-                    if (scope.currentMarker) {
-                        scope.deleteMarker(scope.currentMarker);
-                    }
-
-                    return;
-                }
+            if (intersect) {
 
                 var userId = "";
                 userId = intersect.userId || userId;
 
                 if (userId === "") return;
 
-                // 高亮构件
-                //if (!event.ctrlKey) {
-                //    scope.filter.setSelectedIds();
-                //}
-
-                scope.filter.setSelectedIds();
-                scope.filter.addSelectedId(userId, intersect.object.userData, true);
-                cameraEditor.updateView(true);
-
-                // 加入检查点
-
                 var inverseScaleMatrix = scope.getInverseSceneMatrix();
                 var boundingBox = intersect.object.boundingBox;
-                var bBox = new THREE.Box3();
+
+                if (!boundingBox) {
+                    intersect.object.geometry.computeBoundingBox();
+                    boundingBox = intersect.object.geometry.boundingBox;
+                }
+
+                var bBox = boundingBox.clone();
 
                 if (intersect.object.geometry instanceof THREE.BoxGeometry) {
 
@@ -6087,37 +6017,18 @@ CLOUD.Extensions.MarkerEditor.prototype.onMouseUp = function (event) {
                     //bBox.applyMatrix4(intersect.object.matrixWorld);
                     //bBox.applyMatrix4( inverseScaleMatrix);
 
-                    if (boundingBox) {
+                    var position = new THREE.Vector3();
+                    var quaternion = new THREE.Quaternion();
+                    var scale = new THREE.Vector3();
+                    var objMatrix = intersect.object.matrix;
+                    objMatrix.decompose( position, quaternion, scale );
 
-                        bBox = boundingBox.clone();
-
-                        var objPosition = new THREE.Vector3();
-                        var objQuaternion = new THREE.Quaternion();
-                        var objScale = new THREE.Vector3();
-                        var objMatrix = intersect.object.matrix;
-                        objMatrix.decompose( objPosition, objQuaternion, objScale );
-
-                        // 计算包围盒
-                        var invScale = new THREE.Vector3(1 /objScale.x, 1 / objScale.y, 1 / objScale.z );
-                        bBox.min.multiply(invScale);
-                        bBox.max.multiply(invScale);
-
-                    } else {
-                        intersect.object.geometry.computeBoundingBox();
-                        bBox = intersect.object.geometry.boundingBox;
-                    }
-
+                    // 计算世界包围盒
+                    var invScale = new THREE.Vector3(1 /scale.x, 1 / scale.y, 1 / scale.z );
+                    bBox.min.multiply(invScale);
+                    bBox.max.multiply(invScale);
                     bBox.applyMatrix4(intersect.object.matrixWorld);
                     bBox.applyMatrix4( inverseScaleMatrix);
-
-                } else {
-
-                    if (!boundingBox) {
-                        intersect.object.geometry.computeBoundingBox();
-                        boundingBox = intersect.object.geometry.boundingBox;
-                    }
-
-                    bBox = boundingBox.clone();
                 }
 
                 // 计算世界点
@@ -6126,10 +6037,6 @@ CLOUD.Extensions.MarkerEditor.prototype.onMouseUp = function (event) {
 
                 var markerId = scope.generateMarkerId();
                 var marker;
-
-                if (scope.currentMarker) {
-                    scope.deleteMarker(scope.currentMarker);
-                }
 
                 if (scope.markerType === 1) {
 
@@ -6143,55 +6050,33 @@ CLOUD.Extensions.MarkerEditor.prototype.onMouseUp = function (event) {
                 var style = CLOUD.Extensions.Marker.getDefaultStyle();
                 style['fill-color'] = scope.markerColor;
                 marker.set(userId, position, bBox, scope.markerState, style);
-
-                scope.currentMarker = marker;
-                scope.addMarker(scope.currentMarker);
-            });
-        }
+                scope.addMarker(marker);
+            }
+        });
     }
 
-    CLOUD.OrbitEditor.prototype.onMouseUp.call(this, event);
-};
-
-CLOUD.Extensions.MarkerEditor.prototype.onMouseMove = function(event) {
-
-    CLOUD.OrbitEditor.prototype.onMouseMove.call(this, event);
-
-    this.updateMarkers();
-};
-
-CLOUD.Extensions.MarkerEditor.prototype.onMouseWheel = function (event) {
-
-    CLOUD.OrbitEditor.prototype.onMouseWheel.call(this, event);
-    this.updateMarkers();
 };
 
 CLOUD.Extensions.MarkerEditor.prototype.onKeyDown = function (event) {
 
-    //CLOUD.OrbitEditor.prototype.onKeyDown.call(this, event);
 };
 
 CLOUD.Extensions.MarkerEditor.prototype.onKeyUp = function (event) {
 
-    //if (!this.isEditing) {
-    //    return;
-    //}
-
-    if (this.isEditing) {
-
-        switch (event.keyCode) {
-            case this.keys.DELETE:
-                if (this.selectedMarker) {
-                    this.selectedMarker.delete();
-                    this.deselectMarker();
-                }
-                break;
-            default :
-                break;
-        }
+    if (!this.isEditing) {
+        return;
     }
 
-    //CLOUD.OrbitEditor.prototype.onKeyUp.call(this, event);
+    switch (event.keyCode) {
+        case this.keys.DELETE:
+            if (this.selectedMarker) {
+                this.selectedMarker.delete();
+                this.deselectMarker();
+            }
+            break;
+        default :
+            break;
+    }
 };
 
 CLOUD.Extensions.MarkerEditor.prototype.onResize = function () {
@@ -6666,6 +6551,93 @@ CLOUD.Extensions.MarkerEditor.prototype.loadMarkers = function (markerInfoList) 
     this.setMarkerState(currMarkerState);
 };
 
+// 加载
+CLOUD.Extensions.MarkerEditor.prototype.loadMarkersFromIntersect = function (intersect, shapeType, state) {
+
+    if (!this.svgGroup.parentNode) {
+        this.svg.insertBefore(this.svgGroup, this.svg.firstChild);
+    }
+
+    // 清除数据
+    this.clear();
+
+    var currMarkerState = this.markerState;
+
+    var id = intersect.userId;
+    var userId = intersect.userId;
+    var inverseScaleMatrix = this.getInverseSceneMatrix();
+
+    // 计算位置
+    var position = intersect.point.clone();
+    position.applyMatrix4(inverseScaleMatrix);
+
+    // 计算包围盒
+    var bBox = intersect.object.boundingBox;
+    var boundingBox = new THREE.Box3();
+
+    if (intersect.object.geometry instanceof THREE.BoxGeometry) {
+
+        //intersect.object.geometry.computeBoundingBox();
+        //bBox = intersect.object.geometry.boundingBox;
+        //bBox.applyMatrix4(intersect.object.matrixWorld);
+        //bBox.applyMatrix4( inverseScaleMatrix);
+
+        if (bBox) {
+
+            boundingBox = bBox.clone();
+
+            var objPosition = new THREE.Vector3();
+            var objQuaternion = new THREE.Quaternion();
+            var objScale = new THREE.Vector3();
+            var objMatrix = intersect.object.matrix;
+            objMatrix.decompose( objPosition, objQuaternion, objScale );
+
+            // 计算包围盒
+            var invScale = new THREE.Vector3(1 /objScale.x, 1 / objScale.y, 1 / objScale.z );
+            boundingBox.min.multiply(invScale);
+            boundingBox.max.multiply(invScale);
+
+        } else {
+            intersect.object.geometry.computeBoundingBox();
+            boundingBox = intersect.object.geometry.boundingBox;
+        }
+
+        boundingBox.applyMatrix4(intersect.object.matrixWorld);
+        boundingBox.applyMatrix4( inverseScaleMatrix);
+
+    } else {
+
+        if (!bBox) {
+            intersect.object.geometry.computeBoundingBox();
+            bBox = intersect.object.geometry.boundingBox;
+        }
+
+        boundingBox = bBox.clone();
+    }
+
+    this.setMarkerState(state);
+
+    var style = CLOUD.Extensions.Marker.getDefaultStyle();
+    style['fill-color'] = this.markerColor;
+
+    switch (shapeType) {
+
+        case CLOUD.Extensions.Marker.shapeTypes.FLAG:
+            var flag = new CLOUD.Extensions.MarkerFlag(id, this);
+            flag.set(userId, position, boundingBox, state, style);
+            this.addMarker(flag);
+            break;
+        case  CLOUD.Extensions.Marker.shapeTypes.BUBBLE:
+            var bubble = new CLOUD.Extensions.MarkerBubble(id, this);
+            bubble.set(userId, position, boundingBox, state, style);
+            this.addMarker(bubble);
+            break;
+    }
+
+    this.markerState = currMarkerState;
+    this.setMarkerState(currMarkerState);
+};
+
 // 卸载
 CLOUD.Extensions.MarkerEditor.prototype.unloadMarkers = function () {
 
@@ -6709,7 +6681,6 @@ CLOUD.Extensions.MarkerEditor.prototype.setMarkerClickCallback = function (callb
 };
 
 // ---------------------------- 外部 API END ---------------------------- //
-
 
 
 CLOUD.Extensions.Annotation = function (editor, id) {
@@ -11006,6 +10977,21 @@ CLOUD.Extensions.Helper2D.prototype = {
 
             this.initMarkerEditor();
             this.markerEditor.loadMarkers(markerInfoList);
+
+        } else {
+
+            this.uninitMarkerEditor();
+        }
+
+    },
+
+    // 加载标记
+    loadMarkersFromIntersect: function (intersect, shapeType, state) {
+
+        if (intersect) {
+
+            this.initMarkerEditor();
+            this.markerEditor.loadMarkersFromIntersect(intersect, shapeType, state);
 
         } else {
 

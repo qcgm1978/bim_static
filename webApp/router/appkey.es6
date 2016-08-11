@@ -101,8 +101,8 @@ var AppKeyRoute = Backbone.Router.extend({
 
 		App.Project.Settings = $.extend({}, App.Project.Defaults);
 		var that = this;
-		this.parseToken(token, function() { 
-			 
+		this.parseToken(token, function() {
+
 			//分享的事件
 			App.Project.Share.init();
 
@@ -222,6 +222,9 @@ var AppKeyRoute = Backbone.Router.extend({
 			_this.projectByCode(projectCode, function(data) {
 				if (data) {
 					App.Project.Settings.projectId = data.projectId;
+					var Request = App.Comm.GetRequest();
+					//加载类型
+					App.Project.Settings.loadType = Request.type;
 					App.Project.init();
 				}
 
@@ -343,18 +346,31 @@ var AppKeyRoute = Backbone.Router.extend({
 		}
 
 		App.Comm.ajax(data, function(data) {
+			
 			if (data.code == 0) {
 
-				if (App.Comm.getCookie("OUTSSO_AuthToken")) {
-					App.Comm.setCookie("token_cookie_me", data.data);
-				} else {
-					App.Comm.setCookie("token_cookie", data.data);
-				}
+				var token_cookie = data.data;
+
+				$.ajax({
+					url: '/platform/user/current?t=' + (+new Date()),
+					async: false
+				}).done(function(data) {
+
+					if (typeof(data) == "string") {
+						data = JSON.parse(data);
+					}
+					if (data.code == 0) {
+						App.Comm.setCookie("token_cookie_me", token_cookie);
+					} else {
+						App.Comm.setCookie("token_cookie", token_cookie);
+					}
+				});
 
 				//获取用户信息
 				that.getUserInfo(fn);
 
 			} else {
+
 				if (data.code == 10004) {
 					window.location.href = data.data;
 				} else {
@@ -435,7 +451,7 @@ var AppKeyRoute = Backbone.Router.extend({
 	cleanCookie() {
 		//绑定beforeunload事件
 		$(window).on('beforeunload', function() {
-			App.Comm.delCookie("token_cookie")
+			//App.Comm.delCookie("token_cookie")
 		});
 	},
 
@@ -448,7 +464,7 @@ var AppKeyRoute = Backbone.Router.extend({
 		var data = {
 			URLtype: 'projectByCode',
 			data: {
-				appKey:appKey,
+				appKey: appKey,
 				token: token,
 				code: code
 			}
@@ -464,13 +480,13 @@ var AppKeyRoute = Backbone.Router.extend({
 	},
 
 	logout() {
-		
+
 		App.Comm.delCookie('AuthUser_AuthNum');
 		App.Comm.delCookie('AuthUser_AuthMAC');
 		App.Comm.delCookie('OUTSSO_AuthToken');
 		App.Comm.delCookie('OUTSSO_AuthNum');
 		App.Comm.delCookie('token_cookie');
-		App.Comm.delCookie('token_cookie_me');		
+		App.Comm.delCookie('token_cookie_me');
 		App.Comm.delCookie('OUTSSO_AuthMAC');
 		App.Comm.delCookie('IS_OWNER_LOGIN');
 		window.location.href = "/login.html";
