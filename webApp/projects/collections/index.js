@@ -115,9 +115,7 @@
          App.Projects.initEvent();
 
          //初始化滚动条
-         App.Projects.initScroll();
-
-         
+         App.Projects.initScroll(); 
 
      },
 

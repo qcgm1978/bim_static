@@ -225,6 +225,7 @@ var AppKeyRoute = Backbone.Router.extend({
 					var Request = App.Comm.GetRequest();
 					//加载类型
 					App.Project.Settings.loadType = Request.type;
+				
 					App.Project.init();
 				}
 
@@ -350,7 +351,7 @@ var AppKeyRoute = Backbone.Router.extend({
 			if (data.code == 0) {
 
 				var token_cookie = data.data;
-
+				
 				$.ajax({
 					url: '/platform/user/current?t=' + (+new Date()),
 					async: false
@@ -359,11 +360,13 @@ var AppKeyRoute = Backbone.Router.extend({
 					if (typeof(data) == "string") {
 						data = JSON.parse(data);
 					}
-					if (data.code == 0) {
+					if (data.code == 0) { 
 						App.Comm.setCookie("token_cookie_me", token_cookie);
 					} else {
 						App.Comm.setCookie("token_cookie", token_cookie);
 					}
+				}).fail(function(){
+					App.Comm.setCookie("token_cookie", token_cookie);
 				});
 
 				//获取用户信息

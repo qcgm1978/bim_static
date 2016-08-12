@@ -56,8 +56,8 @@ App.Index = {
 		this.bindTreeScroll();
 
 		// 加载变更模型
-		$(".showChange .checkboxGroup input:checkbox").on("change", function() { 
-			
+		$(".showChange .checkboxGroup input:checkbox").on("change", function() {
+
 			var changeModel = App.Index.Settings.changeModel;
 			var viewer = App.Index.Settings.Viewer;
 			var flag = $(this).prop("checked");
@@ -256,7 +256,7 @@ App.Index = {
 		if (App.Comm.isIEModel()) {
 			return;
 		}
-		 
+
 		//非api 调用
 		if (this.Settings.type != 'api') {
 			//初始化参数
@@ -345,6 +345,7 @@ App.Project.Model = {
 		},
 
 		addList: function(model) {
+
 			var data = model.toJSON();
 			var comparisonId = App.Index.Settings.referenceId;
 			var isload = false;
@@ -376,9 +377,14 @@ App.Project.Model = {
 				App.Index.renderModel(file.currentModel);
 				App.Index.Settings.currentModel = file.currentModel;
 				App.Index.Settings.baseModel = file.baseModel;
+				data.selected = [0, 0]
 			}
 			if (data.data.length > 0) {
-				this.$el.html(this.template(data));
+				try {
+					this.$el.html(this.template(data));
+				} catch (e) {
+					this.$el.html("数据加载错误");
+				}
 			} else {
 				this.$el.html("没有变更")
 			}

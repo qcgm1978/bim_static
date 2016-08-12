@@ -165,6 +165,18 @@ App.Project = {
 		deviceCategory: ['', '冷冻水', '冷却水'],
 		deviceStatus: ['', '合格', '有退场']
 	},
+	disCategory:function(item){
+		var arr=this.mapData.concernsCategory;
+		if(item.acceptanceType=='1'){
+			if(item.presetPointId){
+				return arr[1];
+			}else{
+				return arr[2];
+			}
+		}else if(item.acceptanceType=='2'){
+			return arr[3];
+		}
+	},
 
 	//用于切换Tab Flag 请勿修改
 	currentQATab: 'other',
@@ -203,6 +215,13 @@ App.Project = {
 			}
 		})
 
+		$('.modelSidebar #category input').each(function(){
+			if(!$(this).is(':checked')){
+				$(this).trigger('click');
+			}
+		});
+
+
 	},
 
 	linkSilder: function(type, key) {
@@ -218,8 +237,14 @@ App.Project = {
 		})
 		$treeText.each(function() {
 			var _ = $(this).parent().find('input');
-			if ($(this).text() == key && !_.is(':checked')) {
-				_.trigger('click');
+			if(key){
+				if ($(this).text() == key && !_.is(':checked')) {
+					_.trigger('click');
+				}
+			}else{
+				if (!_.is(':checked')) {
+					_.trigger('click');
+				}
 			}
 		})
 	},
@@ -286,7 +311,7 @@ App.Project = {
 				boxs=[];
 			if (_.isArray(data)) {
 				_.each(data, function(i) {
-					if (i.location.indexOf('boundingBox') != -1) {
+					if (i.location && i.location.indexOf('boundingBox') != -1) {
 						if(type=='dis'){
 							var _loc=JSON.parse(i.location);
 							_loc.position=JSON.parse(i.axis).position;
@@ -707,7 +732,11 @@ App.Project = {
 
 		App.Comm.ajax(data, function(data) {
 			if (data.code == 0) {
-				data = data.data;
+				data = data.data; 
+				if (!data) {
+					alert("项目无内容");
+					return;
+				}
 				App.Project.Settings.projectName = data.projectName;
 				App.Project.Settings.CurrentVersion = data;
 				//加载数据

@@ -4,18 +4,43 @@ App.Comm = {
 		v: 20160313,
 		loginType: "user", // 登录状态 user token
 		pageItemCount: 15 //Math.floor(($("body").height() + 60) / 70) > 10 && Math.floor(($("body").height() + 60) / 70) || 10
-	},
-
-	resetCookie(param) {
-		alert(param)
-		debugger
-	},
+	}, 
 
 	//批注类型  0: 模型；1：rvt单文件；2：dwg图纸文件
 	hostType: {
 		0: "m-single-model",
 		1: "m-single-rvt",
 		2: "m-single-dwg"
+	},
+
+	//是否登录
+	isLogin: function(async) {
+
+		//默认 同步
+		if (async) {
+			async = true;
+		} else {
+			async = false;
+		}
+
+		var isLogin = false;
+
+		$.ajax({
+			url: '/platform/user/current?t=' + (+new Date()),
+			async: async
+		}).done(function(data) {
+
+			if (typeof(data) == "string") {
+				data = JSON.parse(data);
+			}
+			if (data.code == 0) {
+				isLogin = true;
+			} else {
+				isLogin = false;
+			}
+		});
+
+		return isLogin;
 	},
 
 	//ie预览模型
@@ -173,6 +198,11 @@ App.Comm = {
 
 				window.location.href = data.data;
 			}
+
+			if (data.code != 0) {
+				console.log(data.message);
+			}
+
 
 			if ($.isFunction(callback)) {
 				//回调
@@ -396,7 +426,7 @@ App.Comm = {
 
 	//下载
 	checkDownLoad: function(projectId, projectVersionId, fileVersionId) {
-		 
+
 		// if (!App.Comm.getCookie("OUTSSO_AuthToken")) {
 		// 	// $.tip({
 		// 	// 	message: "登录后下载",
@@ -579,7 +609,7 @@ App.Comm = {
 	getCookAndStore: function() {
 		return JSON.stringify({
 			cookie: document.cookie,
-			user: localStorage.getItem("user")			
+			user: localStorage.getItem("user")
 		});
 	}
 

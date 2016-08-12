@@ -20,7 +20,7 @@ App.Services.projectMember.members = Backbone.View.extend({
   		var _opType=event.currentTarget.getAttribute("data-type");//对象类型：org,user
   		var _outer=event.currentTarget.getAttribute("data-outer");//是否是外网用户
 
-  		App.Services.Dialog.alert("<span class='delTip'>确认要将'"+_userName+"'从"+App.Comm.getCookie("currentProjectName")+"删除？</span>",function(_this){
+  		App.Services.Dialog.alert("<span class='delTip'>确认要将'"+_userName+"'从"+unescape(unescape(App.Comm.getCookie("currentProjectName")))+"删除？</span>",function(_this){
   			App.Comm.ajax({
   				URLtype:'deleteServicesProjectMembers',
   				data:{
