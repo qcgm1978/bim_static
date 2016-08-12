@@ -204,7 +204,7 @@ App.Project = {
 	},
 
 	recoverySilder:function(){
-		var show='建筑,结构,景观,幕墙,采光顶,内装&标识',
+		var show='建筑,结构,景观,幕墙,采光顶,内装&标识,内装&导识',
 			hide='暖通,电气,智能化,给排水';
 		var $sp = $('.modelSidebar #specialty>.tree>li');
 		App.Project.Settings.Viewer.fileFilter({
