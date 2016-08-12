@@ -147,6 +147,7 @@ App.Index = {
 				data: {
 					projectId: App.Index.Settings.projectId,
 					projectVersionId: App.Index.Settings.projectVersionId,
+					fileVerionId: App.Index.Settings.differFileVersionId,
 					costCode: $target.data("code")
 				}
 			};

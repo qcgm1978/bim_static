@@ -75,6 +75,9 @@ App.Project.PlanAnalog = Backbone.View.extend({
 			return;
 		}
 
+		//高亮钱取消
+		App.Project.cancelZoomModel();
+
 		//取消 样式
 		App.Project.Settings.Viewer.highlight({
 			type: "plan",

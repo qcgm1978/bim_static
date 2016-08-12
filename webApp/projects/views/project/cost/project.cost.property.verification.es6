@@ -16,7 +16,7 @@ App.Project.CostVerification = Backbone.View.extend({
 
 	events: {
 		"click .tbVerificationCate .nodeSwitch": "showNode",
-		"click .tbVerification .nodeSwitch":"nodeSwitch",
+		"click .tbVerficationContentContent .nodeSwitch": "nodeSwitch",
 		"click .subData .code": "showInModel"
 	},
 
@@ -29,14 +29,20 @@ App.Project.CostVerification = Backbone.View.extend({
 
 	},
 
+	rootTemplate: _.templateUrl("/projects/tpls/project/cost/project.cost.property.verification.detail.root.html"),
+
+	itemTemplate: _.templateUrl("/projects/tpls/project/cost/project.cost.property.verification.detail.root.item.html"),
+
 	//获取数据后处理
 	addOne: function(model) {
-		var template = _.templateUrl("/projects/tpls/project/cost/project.cost.property.verification.detail.html"),
-			data = model.toJSON(),
-			$tbTop = this.$(".tbTop");
 
-		$tbTop.find("tbody").html(template(data));
-		$tbTop.prev().find(".count").text(data.data.length);
+		var data = model.toJSON(),
+			$tbTop = this.$(".tbTop");
+		data.treeNode = this.itemTemplate,
+			$target = this.$(".tbVerficationContentContent");
+
+		$target.html(this.rootTemplate(data));
+		$target.prev().find(".count").text(data.data.length);
 
 	},
 
@@ -97,63 +103,22 @@ App.Project.CostVerification = Backbone.View.extend({
 	},
 	//在模型中显示
 	showInModel(event) {
-		App.Project.planCostShowInModel(event);  
+		App.Project.planCostShowInModel(event);
 	},
 
 	//收起展开
 	nodeSwitch(event) {
-		 
+
 		var $target = $(event.target),
+			$node = $target.closest(".node");
 
-			$tr = $target.closest("tr"),
-			isOpen = $target.hasClass("on");
-
-		if ($tr.hasClass("stepOne")) {
-			//展开
-			if (isOpen) {
-				$tr.nextUntil(".stepOne").hide();
-				$target.removeClass("on");
-			} else {
-				$tr.nextUntil(".stepOne").show();
-				$target.addClass("on");
-			}
-		}
-
-		if ($tr.hasClass("stepTwo")) {
-
-			var nextUntilStepOne = $tr.nextUntil(".stepTwo"),
-				isExists = false;
-
-			nextUntilStepOne.each(function() {
-				if ($(this).hasClass(".stepOne")) {
-					isExists = true;
-					return false;
-				}
-			}); 
-
-			if (isExists) {
-				//展开
-				if (isOpen) {
-					$tr.nextUntil(".stepOne").hide();
-				} else {
-					$tr.nextUntil(".stepOne").show();
-				}
-			} else {
-				nextUntilStepOne.splice(-1);
-				if (isOpen) {
-					nextUntilStepOne.hide();
-				}else{
-					nextUntilStepOne.show();
-				} 
-			} 
-		} 
-
-		if (isOpen) {
+		if ($target.hasClass("on")) {
 			$target.removeClass("on");
+			$node.children("ul").hide();
 		} else {
 			$target.addClass("on");
+			$node.children("ul").show();
 		}
-
 		event.stopPropagation();
 
 	}

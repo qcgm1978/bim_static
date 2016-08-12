@@ -26,7 +26,7 @@ App.Views = {
 		className: "changeListBox",
 
 		events: {
-			"click #mCSB_1_container": "showInModle"
+			//"click .mCSB_container": "showInModle"
 		},
 
 		//初始化
@@ -58,11 +58,16 @@ App.Views = {
 
 		//模型中显示
 		showInModle(event) {
+			if(!$(event.target).parent().hasClass('.repertoireName')){
+
+				return
+			}
+			var that = this;
 			var $target = $(event.target).closest(".itemContent"),
 			    ids=$target.data("userId"),
 			    box=$target.data("box");
 			if ($target.hasClass("selected")) {
-				App.Project.cancelZoomModel();
+				that.cancelZoomModel();
 				$target.removeClass("selected");
 				return
 			} else {
@@ -70,23 +75,28 @@ App.Views = {
 				$target.addClass("selected");
 			}
 			if (ids && box) {
-				App.Project.zoomToBox(ids,box);
+				that.zoomToBox(ids,box);
 				return;
 			}
 			var data = {
 				URLtype: "fetchCostModleIdByCode",
 				data: {
-					projectId: App.Project.Settings.CurrentVersion.projectId,
-					projectVersionId: App.Project.Settings.CurrentVersion.id,
+					projectId: App.Index.Settings.projectId,
+					projectVersionId: App.Index.Settings.projectVersionId,
+					fileVerionId: App.Index.Settings.differFileVersionId,
 					costCode: $target.data("code")
 				}
 			};
 			App.Comm.ajax(data, function(data) {
 				if (data.code == 0) {
-					var box=App.Project.formatBBox(data.data.boundingBox);
+					console.log(data.data.boundingBox)
+					if(data.data.boundingBox==null){
+						return
+					}
+					var box=that.formatBBox(data.data.boundingBox);
 					$target.data("userId", data.data.elements);
 					$target.data("box", box);
-					App.Project.zoomToBox(data.data.elements,box);
+					that.zoomToBox(data.data.elements,box);
 				}
 			});
 		},
@@ -133,9 +143,41 @@ App.Views = {
 					}
 				});
 			}
-		}
- 
+		},
+		//转换bounding box数据
+		formatBBox: function(data) {
+			if (!data) {
+				return [];
+			}
+			var box = [],
+			    min = data.min,
+			    minArr = [min.x, min.y, min.z],
+			    max = data.max,
+			    maxArr = [max.x, max.y, max.z];
+			box.push(minArr);
+			box.push(maxArr);
+			return box;
+		},
 
+		zoomToBox:function(ids,box){
+			App.Index.Settings.Viewer.zoomToBox(box);
+			App.Index.Settings.Viewer.translucent(true);
+			App.Index.Settings.Viewer.highlight({
+				type: 'userId',
+				ids: ids
+			});
+		},
+
+		//取消zoom
+		cancelZoomModel: function() {
+			App.Index.Settings.Viewer.translucent(false);
+
+			App.Index.Settings.Viewer.ignoreTranparent({
+				type: "plan",
+				//ids: [code[0]]
+				ids: undefined
+			});
+		}
 	})
 
 }

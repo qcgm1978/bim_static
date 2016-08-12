@@ -90,5 +90,19 @@ App.Services = {
 				$serviceNav.find(".project").remove();
 			}
 		}
+		//判断是否是空页面
+		this.isNullPage();
+	},
+
+	isNullPage(){	
+
+		var $page=$(".servicesIndexBox"); 
+		//空页面
+		if ($page.find(".item").length<=0) {
+			$page.html(_.templateUrl('/services/tpls/nullPage.html'),true);
+		}
+
 	}
+
+
 };

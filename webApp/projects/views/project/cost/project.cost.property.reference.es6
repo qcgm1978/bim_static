@@ -51,7 +51,7 @@ App.Project.CostReference = Backbone.View.extend({
 		this.$(".tbBody .tbBodyContent").html(App.Project.Settings.loadingTpl);
 	},
 	//模型中显示
-	showInModle(event) {
+	showInModle(event) {debugger
 		var $target = $(event.target).closest(".item"),
 			ids=$target.data("userId"),
 			box=$target.data("box");
