@@ -212,7 +212,7 @@ App.Index = {
 					//	type: "userId",
 					//	ids: Ids
 					//});
-
+debugger
 					var box=App.Index.formatBBox(data.data.boundingBox);
 					$target.data("userId", data.data.elements);
 					$target.data("box", box);
