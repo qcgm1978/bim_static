@@ -157,7 +157,7 @@ App.Index = {
 
 					$target.data("cate", data.data);
 
-					if (data.data.elements.length <= 0) {
+					if (data.data.elements.length <= 0 || !data.data.boundingBox) {
 						return;
 					}
 

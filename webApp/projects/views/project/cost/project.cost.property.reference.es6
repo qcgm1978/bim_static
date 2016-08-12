@@ -51,7 +51,7 @@ App.Project.CostReference = Backbone.View.extend({
 		this.$(".tbBody .tbBodyContent").html(App.Project.Settings.loadingTpl);
 	},
 	//模型中显示
-	showInModle(event) {debugger
+	showInModle(event) {
 		var $target = $(event.target).closest(".item"),
 			ids=$target.data("userId"),
 			box=$target.data("box");
@@ -77,6 +77,10 @@ App.Project.CostReference = Backbone.View.extend({
 		};
 		App.Comm.ajax(data, function(data) {
 			if (data.code == 0) {
+				if(!data.data.boundingBox){
+					App.Project.cancelZoomModel();
+					return
+				}
 				var box=App.Project.formatBBox(data.data.boundingBox);
 				$target.data("userId", data.data.elements);
 				$target.data("box", box);
