@@ -40,7 +40,40 @@ App.Index = {
 			OT: "其他专业"
 		}
 	},
+	//转换bounding box数据
+	formatBBox: function(data) {
+		if (!data) {
+			return [];
+		}
+		var box = [],
+		    min = data.min,
+		    minArr = [min.x, min.y, min.z],
+		    max = data.max,
+		    maxArr = [max.x, max.y, max.z];
+		box.push(minArr);
+		box.push(maxArr);
+		return box;
+	},
 
+	zoomToBox:function(ids,box){
+		App.Index.Settings.Viewer.zoomToBox(box);
+		App.Index.Settings.Viewer.translucent(true);
+		App.Index.Settings.Viewer.highlight({
+			type: 'userId',
+			ids: ids
+		});
+	},
+
+	//取消zoom
+	cancelZoomModel: function() {
+		App.Index.Settings.Viewer.translucent(false);
+
+		App.Index.Settings.Viewer.ignoreTranparent({
+			type: "plan",
+			//ids: [code[0]]
+			ids: undefined
+		});
+	},
 
 	//事件绑定
 	bindEvent() {
@@ -113,33 +146,33 @@ App.Index = {
 
 			var Ids = [];
 
-			if ($target.data("cate")) {
-
-				$target.closest(".treeRoot").find(".selected").each(function() {
-					Ids = $.merge(Ids, $(this).data("cate").elements)
-				});
-
-				//没有构建id 返回
-				if (Ids.length <= 0) {
-					return;
-				}
-
-				var box1 = [],
-					boundingBox = $(this).data("cate").boundingBox,
-					max = boundingBox.max,
-					min = boundingBox.min;
-				box1.push([max.x, max.y, max.z], [min.x, min.y, min.z]);
-
-				//App.Index.Settings.Viewer.setSelectedIds(Ids);
-				App.Index.Settings.Viewer.zoomToBox(box1);
-				App.Index.Settings.Viewer.highlight({
-					type: "userId",
-					ids: Ids
-				});
-
-
-				return;
-			}
+			//if ($target.data("cate")) {
+      //
+			//	$target.closest(".treeRoot").find(".selected").each(function() {
+			//		Ids = $.merge(Ids, $(this).data("cate").elements)
+			//	});
+      //
+			//	//没有构建id 返回
+			//	if (Ids.length <= 0) {
+			//		return;
+			//	}
+      //
+			//	var box1 = [],
+			//		boundingBox = $(this).data("cate").boundingBox,
+			//		max = boundingBox.max,
+			//		min = boundingBox.min;
+			//	box1.push([max.x, max.y, max.z], [min.x, min.y, min.z]);
+      //
+			//	//App.Index.Settings.Viewer.setSelectedIds(Ids);
+			//	App.Index.Settings.Viewer.zoomToBox(box1);
+			//	App.Index.Settings.Viewer.highlight({
+			//		type: "userId",
+			//		ids: Ids
+			//	});
+      //
+      //
+			//	return;
+			//}
 
 
 			var data = {
@@ -157,25 +190,33 @@ App.Index = {
 
 					$target.data("cate", data.data);
 
-					if (data.data.elements.length <= 0 || !data.data.boundingBox) {
+					if (data.data.elements.length <= 0) {
 						return;
 					}
-
+					if ( !data.data.boundingBox) {
+						App.Index.cancelZoomModel();
+						return;
+					}
 					$target.closest(".treeRoot").find(".selected").each(function() {
 						Ids = $.merge(Ids, $(this).data("cate").elements);
 					});
 
-					var box1 = [],
-						max = data.data.boundingBox.max,
-						min = data.data.boundingBox.min;
-					box1.push([max.x, max.y, max.z], [min.x, min.y, min.z]);
+					//var box1 = [],
+					//	max = data.data.boundingBox.max,
+					//	min = data.data.boundingBox.min;
+					//box1.push([max.x, max.y, max.z], [min.x, min.y, min.z]);
 
 					//App.Index.Settings.Viewer.setSelectedIds(Ids);
-					App.Index.Settings.Viewer.zoomToBox(box1);
-					App.Index.Settings.Viewer.highlight({
-						type: "userId",
-						ids: Ids
-					});
+					//App.Index.Settings.Viewer.zoomToBox(box1);
+					//App.Index.Settings.Viewer.highlight({
+					//	type: "userId",
+					//	ids: Ids
+					//});
+
+					var box=App.Index.formatBBox(data.data.boundingBox);
+					$target.data("userId", data.data.elements);
+					$target.data("box", box);
+					App.Index.zoomToBox(data.data.elements,box);
 
 				}
 			});
