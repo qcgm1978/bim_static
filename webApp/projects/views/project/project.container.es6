@@ -605,7 +605,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 
 	//只加载5大专业
 	loadFiveMajor() {
-		var $this, test = /建筑|结构|幕墙|采光顶|景观|内装&标识/;
+		var $this, test = /建筑|结构|幕墙|采光顶|景观|内装&标识|内装&导识/;
 		$(".bim .itemNode:first>ul>li>.itemContent>.treeText").each(function() {
 			$this = $(this);
 			if (!test.test($this.text())) {

@@ -17,7 +17,7 @@
                         </td>
                         <td class="listName"> <div class=" overWidth"> <%=current.name%> </div>
                              </td>
-                        <td class="listCount"><div class="overflowEllipsis overWidth"><%=current.totalQuantity%><%=current.unit%></div></td>  
+                        <td class="listCount"><div  title="<%=current.totalQuantity%><%=current.unit%>"  class="overflowEllipsis overWidth"><%=current.totalQuantity%><%=current.unit%></div></td>
                     </tr>
 
                      <% if(current.children){%>
@@ -39,7 +39,7 @@
                                     </td>
                                     <td class="listName"><div class=" overWidth">
                                     <%=current.name%></div></td>
-                                    <td class="listCount"><div class="overflowEllipsis overWidth">
+                                    <td class="listCount"><div  title="<%=current.totalQuantity%><%=current.unit%>"  class="overflowEllipsis overWidth">
                                     <%=current.totalQuantity%><%=current.unit%></div></td>  
                                 </tr>
 
@@ -59,7 +59,7 @@
                                             </td>
                                             <td class="listName"><div class=" overWidth">
                                             <%=current.name%></div></td>
-                                            <td class="listCount"><div class="overflowEllipsis overWidth">
+                                            <td class="listCount"><div title="<%=current.totalQuantity%><%=current.unit%>" class="overflowEllipsis overWidth">
                                             <%=current.totalQuantity%><%=current.unit%></div></td>  
                                         </tr>
 
@@ -79,7 +79,7 @@
                                                         <td class="listName"><div class=" overWidth">
                                                         <%=current.name%></div></td>
                                                         <td class="listCount">
-                                                        <div class="overflowEllipsis overWidth"><%=current.totalQuantity%><%=current.unit%></div></td>  
+                                                        <div title="<%=current.totalQuantity%><%=current.unit%>" class="overflowEllipsis overWidth"><%=current.totalQuantity%><%=current.unit%></div></td>
                                                     </tr>  
                                                  <%}%>
 

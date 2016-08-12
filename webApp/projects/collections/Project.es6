@@ -75,7 +75,7 @@ App.Project = {
 			_spFiles = _v.SpecialtyFileObjData, //专业文件数据对象
 			_ctFiles = _v.ComponentTypeFilesData; //结构类型数据对象
 		if (cat == '地下防水') {
-			this.linkSilder('floors', floor);
+			this.linkSilder('floors', '');
 			this.linkSilderSpecial('specialty', 'WDGC-Q-ST-垫层防水层.rvt');
 		}
 		if (cat == '梁柱节点') {
@@ -204,7 +204,7 @@ App.Project = {
 	},
 
 	recoverySilder:function(){
-		var show='建筑,结构,景观,幕墙,采光顶,内装&标识',
+		var show='建筑,结构,景观,幕墙,采光顶,内装&标识,内装&导识',
 			hide='暖通,电气,智能化,给排水';
 		var $sp = $('.modelSidebar #specialty>.tree>li');
 		App.Project.Settings.Viewer.fileFilter({
@@ -1395,6 +1395,10 @@ App.Project = {
 
 				}
 				that.$el.find(".attrClassBox").html(str);
+
+				setTimeout(function(){
+					that.$el.find(".attrClassBox").find('[data-classkey=4]').click();
+				},1000)
 			}
 		});
 		//App.Project.fetchClassPropertData(function(res) {
