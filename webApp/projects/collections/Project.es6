@@ -200,7 +200,7 @@ App.Project = {
 	recoverySilder:function(){
 		var show='建筑,结构,景观,幕墙,采光顶,内装&标识',
 			hide='暖通,电气,智能化,给排水';
-		var $treeText = $('.modelSidebar #specialty > .tree >li .treeText');
+		var $sp = $('.modelSidebar #specialty>.tree>li');
 
 		App.Project.Settings.Viewer.fileFilter({
 			ids:[],
@@ -211,18 +211,19 @@ App.Project = {
 			type:"classCode"
 		})
 
-		$treeText.each(function() {
-			var _ = $(this).parent().find('input');
-			if (show.indexOf($(this).text()) != -1) {
-				if (_.is(':checked')) {
-					_.trigger('click');
+		$sp.each(function() {
+			var _input=$(this).find('input:first'),
+				_text=$(this).find('.treeText:first').text();
+			if (show.indexOf(_text) != -1) {
+				if (_input.is(':checked')) {
+					_input.trigger('click');
 				}
-				_.trigger('click');
-			} else if (hide.indexOf($(this).text()) != -1) {
-				if (!_.is(':checked')) {
-					_.trigger('click');
+				_input.trigger('click');
+			} else if (hide.indexOf(_text) != -1) {
+				if (!_input.is(':checked')) {
+					_input.trigger('click');
 				}
-				_.trigger('click');
+				_input.trigger('click');
 			}
 		})
 
@@ -231,13 +232,8 @@ App.Project = {
 				$(this).trigger('click');
 			}
 		});
-		$('.modelSidebar #classCode .treeText').each(function(){
-			if($(this).text()=='分类编码'){
-				var _input=$(this).parent().find('input');
-				_input.trigger('click');
-				_input.trigger('click');
-			}
-		});
+		var classCode = bimView.comm.getFilters($("#classCode"),'uncheck');
+		App.Project.Settings.Viewer.filter(classCode);
 	},
 
 
