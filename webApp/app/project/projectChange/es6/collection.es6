@@ -26,7 +26,7 @@ App.Views = {
 		className: "changeListBox",
 
 		events: {
-			"click .mCSB_container": "showInModle"
+			//"click .mCSB_container": "showInModle"
 		},
 
 		//初始化
@@ -58,7 +58,7 @@ App.Views = {
 
 		//模型中显示
 		showInModle(event) {
-			if(!$(event.target).parent().is('.repertoireName')){
+			if(!$(event.target).parent().hasClass('.repertoireName')){
 
 				return
 			}
