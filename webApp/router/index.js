@@ -268,6 +268,9 @@ var AppRoute = Backbone.Router.extend({
 
 		}
 
+		App.Comm.delCookie("token_cookie");
+		App.Comm.delCookie("token_cookie_me");
+
 		var user = localStorage.getItem("user");
 
 		if (user!="undefined") {
