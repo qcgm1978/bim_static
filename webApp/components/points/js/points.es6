@@ -97,6 +97,7 @@
       //设置onlymodel
       App.Global || (App.Global = {});
       App.Comm.setOnlyModel();
+      console.log(this.Settings.etag)
       this.viewer = new bimView({
         type: this.Settings.type,
         element: $('.projectCotent'),
@@ -146,7 +147,7 @@
           });
         } else {
           if (query.box) {
-            Project.zoomModel([query.etag + '.' + query.uid], query.box);
+            Project.zoomModel([query.modelId + '.' + query.uid], query.box);
             Project.showMarks(JSON.stringify(query.info));
           } else {
             $.ajax({
@@ -172,7 +173,7 @@
 
                   },
                   box = Project.formatBBox(info.boundingBox),
-                  ids = [query.etag + '.' + info.userId];
+                  ids = [query.modelId + '.' + info.userId];
                 query.box = box;
                 query.ids = ids;
                 query.info = info;
