@@ -26,9 +26,9 @@ App.Project = {
 		var arr = this.mapData.concernsCategory;
 		if (item.acceptanceType == '1') {
 			if (item.presetPointId) {
-				return arr[1];
-			} else {
 				return arr[2];
+			} else {
+				return arr[1];
 			}
 		} else if (item.acceptanceType == '2') {
 			return arr[3];
