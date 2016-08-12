@@ -105,11 +105,10 @@ App.Project.QualityConcerns=Backbone.View.extend({
 				format: 'yyyy-mm-dd',
 				minView: 'month'
 			}).on("changeDate",function(ev){
-			//	that.MaterialEquipmentOptions.startTime = ev.date.format("yyyy-MM-dd");
-				var _dateStr=new Date(ev.date.getTime()+24*60*60*1000).format('yyyy-MM-dd');
+				var _dateStr=new Date(ev.date.getTime()).format('yyyy-MM-dd');
  				that.$('#dateEnd2').datetimepicker('setStartDate',_dateStr);
- 				that.$('#dateEnd2').val(_dateStr);
-				that.changeHC('startTime',new Date(ev.date.format("yyyy-MM-dd")+ ' 00:00:00').getTime())
+ 				that.$('#dateEnd2').val();
+				that.changeHC('startTime',ev.date.getTime()-8*60*60*1000);
 			});
 	//	});
 
@@ -121,8 +120,7 @@ App.Project.QualityConcerns=Backbone.View.extend({
 				format: 'yyyy-mm-dd',
 				minView: 'month'
 			}).on("changeDate",function(ev){
-			//	that.MaterialEquipmentOptions.endTime = ev.date.format("yyyy-MM-dd");
-				that.changeHC('endTime',new Date(ev.date.format("yyyy-MM-dd")+ ' 23:59:59').getTime())
+				that.changeHC('endTime',ev.date.getTime()-8*60*60*1000);
 			});
 //		});
 

@@ -97,15 +97,18 @@ App.Project = {
 	},
 	filterCCode: function(code) {
 		var _class = App.Project.Settings.Viewer.ClassCodeData,
+			_all=[];
 			hide = [];
 		if (typeof code == 'string') {
 			code = [code];
 		}
 		_.each(_class, function(item) {
-			_.each(code, function(i) {
-				if (item.code.indexOf(i) != 0) {
-					hide.push(item.code);
+			_.find(code, function(i) {
+				if (item.code.indexOf(i) == 0) {
+					return true;
 				}
+				hide.push(item.code);
+				return false;
 			})
 		})
 		return hide;
@@ -204,7 +207,6 @@ App.Project = {
 		var show='建筑,结构,景观,幕墙,采光顶,内装&标识',
 			hide='暖通,电气,智能化,给排水';
 		var $sp = $('.modelSidebar #specialty>.tree>li');
-
 		App.Project.Settings.Viewer.fileFilter({
 			ids:[],
 			total:App.Project.Settings.Viewer.FloorFilesData
@@ -213,7 +215,6 @@ App.Project = {
 			ids:[],
 			type:"classCode"
 		})
-
 		$sp.each(function() {
 			var _input=$(this).find('input:first'),
 				_text=$(this).find('.treeText:first').text();
