@@ -1,93 +1,106 @@
 App.Project = {
 
-	markerClick:function(marker){
-		var id=marker.id;
-		if($(".QualityProcessAcceptance").is(":visible")){
-			var tr=$(".QualityProcessAcceptance .tbProcessAccessBody tr");
-			tr.each(function(){
-				if($(this).data('id')==id){
+	markerClick: function(marker) {
+		var id = marker.id;
+		if ($(".QualityProcessAcceptance").is(":visible")) {
+			var tr = $(".QualityProcessAcceptance .tbProcessAccessBody tr");
+			tr.each(function() {
+				if ($(this).data('id') == id) {
 					tr.removeClass('selected');
 					$(this).addClass("selected");
 				}
 			})
 		}
-		if($(".QualityOpeningAcceptance").is(":visible")){
-			var tr=$(".QualityOpeningAcceptance .tbOpeningacceptanceBody tr");
-			tr.each(function(){
-				if($(this).data('id')==id){
+		if ($(".QualityOpeningAcceptance").is(":visible")) {
+			var tr = $(".QualityOpeningAcceptance .tbOpeningacceptanceBody tr");
+			tr.each(function() {
+				if ($(this).data('id') == id) {
 					tr.removeClass('selected');
 					$(this).addClass("selected");
 				}
 			})
+		}
+	},
+
+	disCategory: function(item) {
+		var arr = this.mapData.concernsCategory;
+		if (item.acceptanceType == '1') {
+			if (item.presetPointId) {
+				return arr[1];
+			} else {
+				return arr[2];
+			}
+		} else if (item.acceptanceType == '2') {
+			return arr[3];
 		}
 	},
 
 	//过滤规则
-	filterRule:{
+	filterRule: {
 		//单文件：过滤出检查点所在构件所在的文件
-		file:'工程桩,基坑支护,钢结构悬挑构件,幕墙,采光顶',
+		file: '工程桩,基坑支护,钢结构悬挑构件,幕墙,采光顶',
 		//单独类型：singleRule
-		single:'梁柱节点,地下防水,步行街吊顶风口,卫生间防水,外保温',
-		floor:''
+		single: '梁柱节点,地下防水,步行街吊顶风口,卫生间防水,外保温',
+		floor: ''
 	},
 
-	marginRule:{
-		'基坑支护':{
-			margin:0.2,
-			ratio:1.0
+	marginRule: {
+		'基坑支护': {
+			margin: 0.2,
+			ratio: 1.0
 		},
-		'梁柱节点':{
-			margin:0.8,
-			ratio:2.0
+		'梁柱节点': {
+			margin: 0.8,
+			ratio: 2.0
 		},
-		'外保温':{
-			margin:0.5,
-			ratio:1.0
+		'外保温': {
+			margin: 0.5,
+			ratio: 1.0
 		},
-		'地下防水':{
-			margin:1,
-			ratio:1.0
+		'地下防水': {
+			margin: 1,
+			ratio: 1.0
 		},
-		'幕墙':{
-			margin:1,
-			ratio:1.0
+		'幕墙': {
+			margin: 1,
+			ratio: 1.0
 		}
 	},
 	//单独类型、自定义过滤规则
-	sigleRule:function(cat,floor){
-		var _this=this,
-			_v=App.Project.Settings.Viewer,
-			_spFiles=_v.SpecialtyFileObjData,//专业文件数据对象
-			_ctFiles=_v.ComponentTypeFilesData;//结构类型数据对象
-		if(cat=='地下防水'){
-			this.linkSilder('floors',floor);
-			this.linkSilderSpecial('specialty','WDGC-Q-ST-垫层防水层.rvt');
+	sigleRule: function(cat, floor) {
+		var _this = this,
+			_v = App.Project.Settings.Viewer,
+			_spFiles = _v.SpecialtyFileObjData, //专业文件数据对象
+			_ctFiles = _v.ComponentTypeFilesData; //结构类型数据对象
+		if (cat == '地下防水') {
+			this.linkSilder('floors', floor);
+			this.linkSilderSpecial('specialty', 'WDGC-Q-ST-垫层防水层.rvt');
 		}
-		if(cat=='梁柱节点'){
-			this.linkSilder('floors',floor);
-			this.linkSilderSpecial('specialty','WDGC-Q-ST-'+floor+'.rvt');
-			this.linkSilderCategory('category','楼板')
+		if (cat == '梁柱节点') {
+			this.linkSilder('floors', floor);
+			this.linkSilderSpecial('specialty', 'WDGC-Q-ST-' + floor + '.rvt');
+			this.linkSilderCategory('category', '楼板')
 		}
-		if(cat=='外保温'){
+		if (cat == '外保温') {
 			App.Project.Settings.Viewer.filter({
-				ids:_this.filterCCode(['10.10.20.03.06.20.10','10.10.30.03.09']),
-				type:"classCode"
+				ids: _this.filterCCode(['10.10.20.03.06.20.10', '10.10.30.03.09']),
+				type: "classCode"
 			})
 		}
-		if(cat=='步行街吊顶风口'||cat=='卫生间防水'){
-			this.linkSilder('floors',floor);
-			this.linkSilderSpecial('specialty',['WDGC-Q-AC-'+floor+'.rvt','WDGC-Q-IN&DS-'+floor+'.rvt'].join(','))
+		if (cat == '步行街吊顶风口' || cat == '卫生间防水') {
+			this.linkSilder('floors', floor);
+			this.linkSilderSpecial('specialty', ['WDGC-Q-AC-' + floor + '.rvt', 'WDGC-Q-IN&DS-' + floor + '.rvt'].join(','))
 		}
 	},
-	filterCCode:function(code){
-		var _class=App.Project.Settings.Viewer.ClassCodeData,
-			hide=[];
-			if(typeof code =='string'){
-				code=[code];
-			}
-		_.each(_class,function(item){
-			_.each(code,function(i){
-				if(item.code.indexOf(i)!=0){
+	filterCCode: function(code) {
+		var _class = App.Project.Settings.Viewer.ClassCodeData,
+			hide = [];
+		if (typeof code == 'string') {
+			code = [code];
+		}
+		_.each(_class, function(item) {
+			_.each(code, function(i) {
+				if (item.code.indexOf(i) != 0) {
 					hide.push(item.code);
 				}
 			})
@@ -120,11 +133,11 @@ App.Project = {
 		2: 'myIcon-circle-yellow',
 		3: 'myIcon-circle-green'
 	},
-	formatPointPlace:function(p,t){
-		if(p==0 &&　t==0){
+	formatPointPlace: function(p, t) {
+		if (p == 0 && 　t == 0) {
 			return '--';
-		}else{
-			return p+"/"+t;
+		} else {
+			return p + "/" + t;
 		}
 	},
 	//空页面
@@ -165,18 +178,6 @@ App.Project = {
 		deviceCategory: ['', '冷冻水', '冷却水'],
 		deviceStatus: ['', '合格', '有退场']
 	},
-	disCategory:function(item){
-		var arr=this.mapData.concernsCategory;
-		if(item.acceptanceType=='1'){
-			if(item.presetPointId){
-				return arr[1];
-			}else{
-				return arr[2];
-			}
-		}else if(item.acceptanceType=='2'){
-			return arr[3];
-		}
-	},
 
 	//用于切换Tab Flag 请勿修改
 	currentQATab: 'other',
@@ -196,42 +197,47 @@ App.Project = {
 		}
 	},
 
-	recoverySilder:function(){
-		var show='建筑,结构,景观,幕墙,采光顶,内装&标识',
-			hide='暖通,电气,智能化,给排水';
+	recoverySilder: function() {
+		var show = '建筑,结构,景观,幕墙,采光顶,内装&标识',
+			hide = '暖通,电气,智能化,给排水';
 		var $treeText = $('.modelSidebar #specialty ul .treeText');
+
+		App.Project.Settings.Viewer.fileFilter({
+			ids: [],
+			total: App.Project.Settings.Viewer.FloorFilesData
+		});
+		App.Project.Settings.Viewer.filter({
+			ids: [],
+			type: "classCode"
+		})
+
 		$treeText.each(function() {
 			var _ = $(this).parent().find('input');
-			if (show.indexOf($(this).text())!=-1) {
-				if(_.is(':checked')){
+			if (show.indexOf($(this).text()) != -1) {
+				if (_.is(':checked')) {
 					_.trigger('click');
 				}
 				_.trigger('click');
-			}else if(hide.indexOf($(this).text())!=-1){
-				if(!_.is(':checked')){
+			} else if (hide.indexOf($(this).text()) != -1) {
+				if (!_.is(':checked')) {
 					_.trigger('click');
 				}
 				_.trigger('click');
 			}
 		})
 
-		$('.modelSidebar #category input').each(function(){
-			if(!$(this).is(':checked')){
+		$('.modelSidebar #category input').each(function() {
+			if (!$(this).is(':checked')) {
 				$(this).trigger('click');
 			}
 		});
-
-		App.Project.Settings.Viewer.fileFilter({
-			ids:[],
-			total:App.Project.Settings.Viewer.FloorFilesData
+		$('.modelSidebar #category input').each(function() {
+			if (!$(this).is(':checked')) {
+				$(this).trigger('click');
+			}
 		});
-		App.Project.Settings.Viewer.filter({
-			ids:[],
-			type:"classCode"
-		})
-
-
 	},
+
 
 	linkSilder: function(type, key) {
 		if (!key) {
@@ -246,11 +252,11 @@ App.Project = {
 		})
 		$treeText.each(function() {
 			var _ = $(this).parent().find('input');
-			if(key){
+			if (key) {
 				if ($(this).text() == key && !_.is(':checked')) {
 					_.trigger('click');
 				}
-			}else{
+			} else {
 				if (!_.is(':checked')) {
 					_.trigger('click');
 				}
@@ -271,7 +277,7 @@ App.Project = {
 		})
 		$treeText.each(function() {
 			var _ = $(this).parent().find('input');
-			if (key.indexOf($(this).text())!=-1) {
+			if (key.indexOf($(this).text()) != -1) {
 				_.trigger('click');
 			}
 		})
@@ -314,26 +320,26 @@ App.Project = {
 		var viewer = App.Project.Settings.Viewer;
 		if (!viewer) return;
 		if (type != 'other' && flag) {
-			var shaType=type=='dis'?1:0;
+			var shaType = type == 'dis' ? 1 : 0;
 			var data = this.currentLoadData[type],
 				result = [],
-				boxs=[];
+				boxs = [];
 			if (_.isArray(data)) {
 				_.each(data, function(i) {
 					if (i.location && i.location.indexOf('boundingBox') != -1) {
-						if(type=='dis'){
-							var _loc=JSON.parse(i.location);
-							_loc.position=JSON.parse(i.axis).position;
-							result.push(_this.formatMark(_loc,"S021".charAt(i.status),i.id,1));
+						if (type == 'dis') {
+							var _loc = JSON.parse(i.location);
+							_loc.position = JSON.parse(i.axis).position;
+							result.push(_this.formatMark(_loc, "S021".charAt(i.status), i.id, 1));
 							boxs.push(_loc.boundingBox);
-						}else{
-							var _loc=JSON.parse(i.location);
+						} else {
+							var _loc = JSON.parse(i.location);
 							boxs.push(_loc.boundingBox);
-							result.push(_this.formatMark(i.location,'543'.charAt(i.colorStatus),i.id));
+							result.push(_this.formatMark(i.location, '543'.charAt(i.colorStatus), i.id));
 						}
 					}
 				})
-				App.Project.Settings.Viewer.setTopView(boxs,true);
+				App.Project.Settings.Viewer.setTopView(boxs, true);
 				viewer.viewer.setMarkerClickCallback(App.Project.markerClick);
 				viewer.loadMarkers(result);
 			}
@@ -430,7 +436,7 @@ App.Project = {
 						fileVersionId = $item.find(".filecKAll").data("fileversionid");
 
 					App.Comm.checkDownLoad(App.Project.Settings.projectId, App.Project.Settings.CurrentVersion.id, fileVersionId);
-  
+
 				},
 				'delModelProject': function(item) {
 					var rel = $('#delModelProject'),
@@ -741,7 +747,7 @@ App.Project = {
 
 		App.Comm.ajax(data, function(data) {
 			if (data.code == 0) {
-				data = data.data; 
+				data = data.data;
 				if (!data) {
 					alert("项目无内容");
 					return;
@@ -855,8 +861,8 @@ App.Project = {
 		}
 
 		//api 页面 默认加载模型
-		if (App.Project.Settings.type == "token" && App.Project.Settings.loadType=="model") {
-			$("#projectContainer").find(".fileContainer").hide().end().find(".modelContainer").show(); 
+		if (App.Project.Settings.type == "token" && App.Project.Settings.loadType == "model") {
+			$("#projectContainer").find(".fileContainer").hide().end().find(".modelContainer").show();
 		}
 		// 导航文件
 		App.Project.fetchFileNav();
@@ -890,7 +896,7 @@ App.Project = {
 		this.setPropertyByAuth();
 
 		//api 页面 默认加载模型
-		if (App.Project.Settings.type == "token" && App.Project.Settings.loadType=="model") { 
+		if (App.Project.Settings.type == "token" && App.Project.Settings.loadType == "model") {
 			$(".fileNav .model").click();
 			//分享
 			// if (window.location.href.indexOf("share") > 10) {
@@ -916,7 +922,7 @@ App.Project = {
 			var ProjectTab = App.Comm.AuthConfig.Project,
 				$projectTab = $(".projectContainerApp .projectHeader .projectTab");
 
-				 
+
 			//设计
 			//if (projectAuth.design) {
 			//	$projectTab.append(ProjectTab.DesignTab.tab);
@@ -1383,9 +1389,6 @@ App.Project = {
 
 				}
 				that.$el.find(".attrClassBox").html(str);
-				setTimeout(function(){
-					that.$el.find(".attrClassBox").find('[data-classkey=4]').click();
-				},1000)
 			}
 		});
 		//App.Project.fetchClassPropertData(function(res) {
@@ -1548,27 +1551,27 @@ App.Project = {
 	},
 	//1 红色 2 橙色 3绿色
 	//color 2 红色 1绿色 0 黄|橙
-	formatMark: function(location, color,id,shaType) {
+	formatMark: function(location, color, id, shaType) {
 		var _temp = location;
 		if (typeof location === 'string') {
 			_temp = JSON.parse(location)
 		}
-		_temp.shapeType = Number(_temp.shapeType||shaType || 0);
-		_temp.state = Number(_temp.state || color||0);
+		_temp.shapeType = Number(_temp.shapeType || shaType || 0);
+		_temp.state = Number(_temp.state || color || 0);
 		_temp.userId = _temp.userId || _temp.componentId;
-		_temp.id=id||'';
+		_temp.id = id || '';
 		return JSON.stringify(_temp);
 	},
 	//在模型中显示(开业验收、过程验收、隐患)
-	showInModel: function($target, type,paramObj) {
+	showInModel: function($target, type, paramObj) {
 		var _this = this,
-			key="",//楼层关键字
-			componentId=paramObj?paramObj.uuid:$target.data('uuid'), //构件ID
-			location = paramObj?paramObj.location:$target.data('location'), //位置信息
-			color=$target.data('color'), //标记颜色
-			cat=$target.data('cat'), //构件分类
-			marginRule=_this.marginRule[cat]||{},
-			_files=App.Project.Settings.Viewer.FloorFilesData;//文件ID数据对象
+			key = "", //楼层关键字
+			componentId = paramObj ? paramObj.uuid : $target.data('uuid'), //构件ID
+			location = paramObj ? paramObj.location : $target.data('location'), //位置信息
+			color = $target.data('color'), //标记颜色
+			cat = $target.data('cat'), //构件分类
+			marginRule = _this.marginRule[cat] || {},
+			_files = App.Project.Settings.Viewer.FloorFilesData; //文件ID数据对象
 		if ($target.hasClass("selected")) {
 			return
 		} else {
@@ -1576,57 +1579,57 @@ App.Project = {
 			$target.addClass("selected");
 		}
 		var _temp = location,
-			_loc="",
-			_secenId=componentId.split('.')[0], //用于过滤文件ID
+			_loc = "",
+			_secenId = componentId.split('.')[0], //用于过滤文件ID
 			box = _this.formatBBox(_temp.boundingBox),
 			ids = [componentId];
-		if(type==3){//隐患
-			_loc = _this.formatMark(location,'S021'.charAt(color),'',1);
-		}else{
-			_loc = _this.formatMark(location,'543'.charAt(color));
+		if (type == 3) { //隐患
+			_loc = _this.formatMark(location, 'S021'.charAt(color), '', 1);
+		} else {
+			_loc = _this.formatMark(location, '543'.charAt(color));
 		}
-		_this.zoomModel(ids, box,marginRule.margin,marginRule.ratio);
+		_this.zoomModel(ids, box, marginRule.margin, marginRule.ratio);
 		_this.showMarks(_loc);
 
 		//过滤所属楼层 start
-		var _floors=App.Project.Settings.Viewer.FloorsData;
-		_.find(_floors,function(item){
-			if(_.contains(item.fileEtags,_secenId)){
-				key=item.floor;
-				return true;
-			}
-		})
-		//过滤所属楼层 end
+		var _floors = App.Project.Settings.Viewer.FloorsData;
+		_.find(_floors, function(item) {
+				if (_.contains(item.fileEtags, _secenId)) {
+					key = item.floor;
+					return true;
+				}
+			})
+			//过滤所属楼层 end
 
 		//没有分类的时候 只过滤单文件 start
-		if(!cat){
+		if (!cat) {
 			_this.recoverySilder();
-			_this.linkSilder('floors',key);
-			var _hideFileIds=_.filter(_files,function(i){
-				return i!=_secenId;
+			_this.linkSilder('floors', key);
+			var _hideFileIds = _.filter(_files, function(i) {
+				return i != _secenId;
 			})
 			App.Project.Settings.Viewer.fileFilter({
-				ids:_hideFileIds,
-				total:[_secenId]
+				ids: _hideFileIds,
+				total: [_secenId]
 			});
 			return;
 		}
 		//没有分类的时候 只过滤单文件 end
 
 		//已有分类、过滤规则
-		if(_this.filterRule.file.indexOf(cat)!=-1){
+		if (_this.filterRule.file.indexOf(cat) != -1) {
 			_this.recoverySilder();
-			var _hideFileIds=_.filter(_files,function(i){
-				return i!=_secenId;
+			var _hideFileIds = _.filter(_files, function(i) {
+				return i != _secenId;
 			})
 			App.Project.Settings.Viewer.fileFilter({
-				ids:_hideFileIds,
-				total:[_secenId]
+				ids: _hideFileIds,
+				total: [_secenId]
 			});
-		}else if(_this.filterRule.floor.indexOf(cat)!=-1){
+		} else if (_this.filterRule.floor.indexOf(cat) != -1) {
 			_this.recoverySilder();
-			_this.linkSilder('floors',key);
-		}else if(_this.filterRule.single.indexOf(cat)!=-1){
+			_this.linkSilder('floors', key);
+		} else if (_this.filterRule.single.indexOf(cat) != -1) {
 			_this.recoverySilder();
 			/*if(cat=='外保温'){
 				var _hideFileIds=_.filter(_files,function(i){
@@ -1637,10 +1640,9 @@ App.Project = {
 					total:[_secenId]
 				});
 			}*/
-			_this.sigleRule(cat,key);
-		}else{
-			_this.recoverySilder();
-			_this.linkSilder('floors',key);
+			_this.sigleRule(cat, key);
+		} else {
+			_this.linkSilder('floors', key);
 		}
 	},
 
@@ -1651,9 +1653,9 @@ App.Project = {
 		App.Project.Settings.Viewer.loadMarkers(marks);
 	},
 	//通过userid 和 boundingbox 定位模型
-	zoomModel: function(ids, box,margin,ratio) {
+	zoomModel: function(ids, box, margin, ratio) {
 		//定位
-		App.Project.Settings.Viewer.setTopView(box,false,margin,ratio);
+		App.Project.Settings.Viewer.setTopView(box, false, margin, ratio);
 		//半透明
 		//App.Project.Settings.Viewer.translucent(true);
 		//高亮
@@ -1662,7 +1664,7 @@ App.Project = {
 			ids: ids
 		});
 	},
-	zoomToBox:function(ids,box){
+	zoomToBox: function(ids, box) {
 		App.Project.Settings.Viewer.zoomToBox(box);
 		App.Project.Settings.Viewer.translucent(true);
 		App.Project.Settings.Viewer.highlight({
@@ -1679,7 +1681,7 @@ App.Project = {
 			type: "plan",
 			//ids: [code[0]]
 			ids: undefined
-		}); 
+		});
 	},
 
 	//定位到模型
@@ -1710,6 +1712,12 @@ App.Project = {
 
 			if ($parent.hasClass("selected")) {
 				$target.closest("table").find(".selected").removeClass("selected");
+				App.Project.Settings.Viewer.translucent(false)
+				App.Project.Settings.Viewer.highlight({
+					type: 'userId',
+					ids: []
+				});
+				return;
 			} else {
 				$target.closest("table").find(".selected").removeClass("selected");
 				$target.parent().addClass("selected");
