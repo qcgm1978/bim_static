@@ -25,6 +25,10 @@ App.Views = {
 
 		className: "changeListBox",
 
+		events: {
+			"click #mCSB_1_container": "showInModle"
+		},
+
 		//初始化
 		initialize() {
 			this.listenTo(App.Collections.changeListCollection, "add", this.addOne);
@@ -50,6 +54,41 @@ App.Views = {
 			this.$(".itemContent:even").addClass("odd");
 
 			this.bindScroll();//绑定滚动条
+		},
+
+		//模型中显示
+		showInModle(event) {
+			var $target = $(event.target).closest(".itemContent"),
+			    ids=$target.data("userId"),
+			    box=$target.data("box");
+			if ($target.hasClass("selected")) {
+				App.Project.cancelZoomModel();
+				$target.removeClass("selected");
+				return
+			} else {
+				this.$(".mCSB_container").find(".selected").removeClass("selected");
+				$target.addClass("selected");
+			}
+			if (ids && box) {
+				App.Project.zoomToBox(ids,box);
+				return;
+			}
+			var data = {
+				URLtype: "fetchCostModleIdByCode",
+				data: {
+					projectId: App.Project.Settings.CurrentVersion.projectId,
+					projectVersionId: App.Project.Settings.CurrentVersion.id,
+					costCode: $target.data("code")
+				}
+			};
+			App.Comm.ajax(data, function(data) {
+				if (data.code == 0) {
+					var box=App.Project.formatBBox(data.data.boundingBox);
+					$target.data("userId", data.data.elements);
+					$target.data("box", box);
+					App.Project.zoomToBox(data.data.elements,box);
+				}
+			});
 		},
 
 		resetData(){

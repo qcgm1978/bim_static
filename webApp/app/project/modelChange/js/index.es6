@@ -75,7 +75,7 @@ App.Index = {
 		App.Index.Settings.projectId = Request.projectId;
 		App.Index.Settings.projectVersionId = Request.projectVersionId;
 		App.Index.Settings.referenceId = Request.modificationId;
-		App.Index.Settings.comparisonType = Request.type;
+		App.Index.Settings.comparisonType = Request.type;debugger
 	},
 
 	//获取url 参数
@@ -157,7 +157,8 @@ App.Index = {
 			url: url,
 			data: {
 				elementId: App.Index.Settings.ModelObj.intersect.userId,
-				sceneId: modelId
+				sceneId: App.Index.Settings.ModelObj.intersect.userId.split('.')[0]
+				//sceneId: modelId
 			}
 		}).done(function(data) {
 			var template = _.templateUrl("/projects/tpls/project/design/project.design.property.properties.html");
@@ -214,6 +215,7 @@ App.Index = {
 					comparisonId = $item.data('id');
 				App.Index.Settings.currentModel = currentModel;
 				App.Index.Settings.baseModel = baseModel;
+				App.Index.Settings.comparisonId = comparisonId;
 
 
 				App.Index.Settings.changeModel = changeModel;
@@ -268,7 +270,16 @@ App.Index = {
 		if (App.Index.Settings.comparisonType) {
 			//默认std 
 			if (App.Index.Settings.comparisonType == "base") {
-				App.Project.Collection.changeList.urlType = "modelBase";
+				App.Project.Collection.changeList.urlType = "modelBase";debugger
+				//获取版本中文名称
+				$.ajax({
+					url: "/platform/project/"+App.Index.Settings.projectId+"/version/"+App.Index.Settings.referenceId
+				}).done(function(data){
+					console.log(data)
+					if(data.code==0){
+						App.Index.Settings.versionName = data.data.name;
+					}
+				})
 			}
 			//变更获取
 			this.fetchChange();
