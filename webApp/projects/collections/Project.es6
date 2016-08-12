@@ -1374,6 +1374,9 @@ App.Project = {
 
 				}
 				that.$el.find(".attrClassBox").html(str);
+				setTimeout(function(){
+					that.$el.find(".attrClassBox").find('[data-classkey=4]').click();
+				},1000)
 			}
 		});
 		//App.Project.fetchClassPropertData(function(res) {
