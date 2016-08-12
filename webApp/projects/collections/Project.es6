@@ -1682,6 +1682,10 @@ App.Project = {
 			//ids: [code[0]]
 			ids: undefined
 		});
+		App.Project.Settings.Viewer.filter({
+			type: "plan",
+			ids: undefined
+		});
 	},
 
 	//定位到模型

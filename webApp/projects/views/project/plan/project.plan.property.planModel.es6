@@ -31,9 +31,12 @@ App.Project.PlanModel = Backbone.View.extend({
 		var $target = $(event.target).closest("tr"),
 			ids=$target.data("userId"),
 			box=$target.data("box");
+
+		//高亮钱取消
+		App.Project.cancelZoomModel();
+
 		if ($target.hasClass("selected")) {
-			$target.parent().find(".selected").removeClass("selected");
-			App.Project.cancelZoomModel();
+			$target.parent().find(".selected").removeClass("selected"); 
 			return;
 		} else {
 			$target.parent().find(".selected").removeClass("selected");
