@@ -75,7 +75,7 @@ App.Project = {
 			_spFiles = _v.SpecialtyFileObjData, //专业文件数据对象
 			_ctFiles = _v.ComponentTypeFilesData; //结构类型数据对象
 		if (cat == '地下防水') {
-			this.linkSilder('floors', floor);
+			this.linkSilder('floors', '');
 			this.linkSilderSpecial('specialty', 'WDGC-Q-ST-垫层防水层.rvt');
 		}
 		if (cat == '梁柱节点') {
