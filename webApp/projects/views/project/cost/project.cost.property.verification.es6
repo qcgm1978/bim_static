@@ -89,11 +89,12 @@ App.Project.CostVerification = Backbone.View.extend({
 				cateId: $target.data("cateid")
 			}
 		}
-
+      $tr.after('<tr><td class="subData loading">正在加载，请稍候……</td></tr>');
 		App.Comm.ajax(data, function(data) {
 
 			if (data.code == 0) {
 				var tpl = _.templateUrl("/projects/tpls/project/plan/project.plan.property.inspection.detail.cate.detail.html");
+				$tr.next().remove();
 				$tr.after(tpl(data));
 				$target.addClass("on");
 			}

@@ -2,7 +2,7 @@
 <%if(obj.data){%>
 <% $.each(data,function(i,item){ %>
 
-
+ <% if(item.cateName){%> 
  <tr class="odd">
     <td>
         <i data-cateid="<%=item.cateId%>" class="nodeSwitch"></i>
@@ -10,6 +10,7 @@
     </td>
    
 </tr>
+<%}%>
 
          <%})%>
 <%}else{%>

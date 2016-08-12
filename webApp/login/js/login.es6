@@ -28,6 +28,24 @@ var Login = {
 			document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString() + ";domain=" + Login.doMain + ";path=/";
 	},
 
+	//cookie名称
+	cookieNames: function(cookies) {
+
+		var items = cookies.split("; ");
+
+		var names = [],
+			len = items.length,
+			str, pos;
+
+		for (var i = 0, i < len; i++) {
+			str = items[i];
+			pos = str.indexOf('=');
+			names.push(str.substring(0, pos));
+		}
+		return names;
+	},
+
+
 	//事件绑定
 	bindEvent() {
 		var $remeber = $("#mainBox .remember");
