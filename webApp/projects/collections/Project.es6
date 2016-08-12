@@ -165,6 +165,18 @@ App.Project = {
 		deviceCategory: ['', '冷冻水', '冷却水'],
 		deviceStatus: ['', '合格', '有退场']
 	},
+	disCategory:function(item){
+		var arr=this.mapData.concernsCategory;
+		if(item.acceptanceType=='1'){
+			if(item.presetPointId){
+				return arr[1];
+			}else{
+				return arr[2];
+			}
+		}else if(item.acceptanceType=='2'){
+			return arr[3];
+		}
+	},
 
 	//用于切换Tab Flag 请勿修改
 	currentQATab: 'other',
