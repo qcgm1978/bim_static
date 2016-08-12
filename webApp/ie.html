@@ -80,7 +80,7 @@
                 //比较cookie
                 if (getCookie("OUTSSO_AuthToken") != getCookie("OUTSSO_AuthToken", cookies)) {
                     //登录设置 登出删除
-                    var keys = cookies.match(/[^ =;]+(?=\=)/g);
+                    var keys =  cookieNames(cookies);//  cookies.match(/[^ =;]+(?=\=)/g);
 
                     if (keys.length > 4) {
                         var key, value;
@@ -93,7 +93,7 @@
                         localStorage.user = user;
 
                     } else {
-                        keys = document.cookie.match(/[^ =;]+(?=\=)/g);
+                        keys = cookieNames(document.cookie); // .match(/[^ =;]+(?=\=)/g);
                         for (var i = 0; i < keys.length; i++) {
                             delCookie(keys[i]);
                         }
@@ -171,6 +171,23 @@
             var html = templateUrl("/app/oPage/error.html");
             $("body").html(html);
         }
+    }
+
+
+    function cookieNames(cookies) {
+
+        var items = cookies.split("; ");
+
+        var names = [],
+            len = items.length,
+            str, pos;
+
+        for (var i = 0; i < len; i++) {
+            str = items[i];
+            pos = str.indexOf('=');
+            names.push(str.substring(0, pos));
+        }
+        return names;
     }
 
 
@@ -253,7 +270,7 @@
         document.cookie = name + "=" + value + ";domain=" + window.location.host.substring(window.location.host.indexOf(".")) + ";expires=" + exp.toGMTString() + ";path=/";
     }
     //获取cookie
-    function getCookie(name, cookis) {
+    function getCookie(key, cookis) {
 
         var cooks = cookis || document.cookie,
             items = cooks.split("; "),
