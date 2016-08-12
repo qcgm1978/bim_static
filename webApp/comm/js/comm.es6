@@ -275,7 +275,7 @@ App.Comm = {
 		document.cookie = name + "=" + value + ";expires=" + exp.toGMTString() + ";domain=" + App.Comm.doMain + ";path=/";
 	},
 	//获取cookie
-	getCookie: function(name,cookis) { 
+	getCookie: function(key,cookis) { 
 
 		var cooks = cookis || document.cookie, 
 			items = cooks.split("; "), 
