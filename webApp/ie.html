@@ -28,7 +28,7 @@
     try { 
 
         var myWebView = document.createElement("object"),
-            currentVersion = 4;
+            currentVersion = 4,isLoad=false;
 
         myWebView.classid = "CLSID:15A5F85D-A81B-45D1-A03A-6DBC69C891D1";
 
@@ -53,6 +53,10 @@
         myWebView.registerEvent('newWindow', navigateTo);
 
         myWebView.registerEvent('urlChanged', function(url) {
+
+            if (!isLoad) {
+                return;
+            }
 
             if (myWebView.url == "about:blank") {
                 window.opener = null;
@@ -137,7 +141,11 @@
             myWebView.registerEvent('loadFinished', function(isReady) {
 
                 myWebView.runScript('Login.checkLoginBefore("' + document.cookie + '")', function(cookie) {
+
+                    isLoad=true;
+
                     myWebView.runScript('Login.checkLogin()', function(isLogin) {
+
                         //var a;
                     });
                 });
