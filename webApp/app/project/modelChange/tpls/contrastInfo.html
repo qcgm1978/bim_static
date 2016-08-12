@@ -7,7 +7,7 @@
     <tr class="title">
       <td></td>
       <td><%= versionname%></td>
-      <td>标准模型</td>
+      <td><%= App.Index.Settings.comparisonType == "base" ? (App.Index.Settings.comparisonName?App.Index.Settings.comparisonName:"比对模型") :"标准模型"%></td>
     </tr>
     <!--<tr>-->
       <!--<td>构件名称</td>-->
