@@ -225,6 +225,10 @@ App.Project = {
 			ids:[],
 			total:App.Project.Settings.Viewer.FloorFilesData
 		});
+		App.Project.Settings.Viewer.filter({
+			ids:[],
+			type:"classCode"
+		})
 
 
 	},
@@ -1632,6 +1636,7 @@ App.Project = {
 			}*/
 			_this.sigleRule(cat,key);
 		}else{
+			_this.recoverySilder();
 			_this.linkSilder('floors',key);
 		}
 	},
