@@ -138,6 +138,7 @@ App.Index = {
 
 			if ($target.hasClass("selected")) {
 				$target.closest(".treeRoot").find(".selected").removeClass("selected");
+				App.Index.cancelZoomModel();
 				//$target.removeClass("selected");
 			} else {
 				$target.closest(".treeRoot").find(".selected").removeClass("selected");

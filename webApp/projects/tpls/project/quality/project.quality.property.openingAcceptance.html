@@ -14,7 +14,7 @@
                 <ul class="myDropList">
                     <li class="myItem" data-val=''>全部</li>
                     <% _.each(App.Project.mapData.openCategory,function(item,index){ if(index!=0){%>
-                    <li class="myItem" data-val='<%=index%>'><%=item%></li>
+                    <li class="myItem" data-val='<%=App.Project.mapData.openCategoryId[index]%>'><%=item%></li>
                     <% } }) %>
                 </ul>
             </div>
