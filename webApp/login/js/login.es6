@@ -190,24 +190,14 @@ var Login = {
 
 		if (cookies) {
 
-			var lastKey = "AuthUser_AuthToken",
-				lastValue;
-
 			var keys = cookies.match(/[^ =;]+(?=\=)/g),
 				val;
 			for (var i = 0; i < keys.length; i++) {
-
 				val = Login.getCookie(keys[i], cookies);
-
-				if (keys[i] == lastKey) {
-					lastValue = val;
-				} else {
-					Login.setCookie(keys[i], val);
-				}
-
+				Login.setCookie(keys[i], val);
 			}
-			lastValue && Login.setCookie(lastKey, lastValue);
 		}
+		return document.cookie;
 
 	},
 
@@ -229,6 +219,8 @@ var Login = {
 				window.location.href = '/index.html';
 			}
 		});
+
+		return "comm";
 	},
 
 	//是否自动登录
@@ -261,7 +253,7 @@ var App = {
 		getCookAndStore: function() {
 			return JSON.stringify({
 				cookie: document.cookie,
-				user: localStorage.getItem("user")				
+				user: localStorage.getItem("user")
 			});
 		}
 	}
