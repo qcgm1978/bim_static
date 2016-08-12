@@ -197,18 +197,18 @@ App.Project = {
 		}
 	},
 
-	recoverySilder: function() {
-		var show = '建筑,结构,景观,幕墙,采光顶,内装&标识',
-			hide = '暖通,电气,智能化,给排水';
-		var $treeText = $('.modelSidebar #specialty ul .treeText');
+	recoverySilder:function(){
+		var show='建筑,结构,景观,幕墙,采光顶,内装&标识',
+			hide='暖通,电气,智能化,给排水';
+		var $treeText = $('.modelSidebar #specialty > .tree >li .treeText');
 
 		App.Project.Settings.Viewer.fileFilter({
-			ids: [],
-			total: App.Project.Settings.Viewer.FloorFilesData
+			ids:[],
+			total:App.Project.Settings.Viewer.FloorFilesData
 		});
 		App.Project.Settings.Viewer.filter({
-			ids: [],
-			type: "classCode"
+			ids:[],
+			type:"classCode"
 		})
 
 		$treeText.each(function() {
@@ -231,9 +231,11 @@ App.Project = {
 				$(this).trigger('click');
 			}
 		});
-		$('.modelSidebar #category input').each(function() {
-			if (!$(this).is(':checked')) {
-				$(this).trigger('click');
+		$('.modelSidebar #classCode .treeText').each(function(){
+			if($(this).text()=='分类编码'){
+				var _input=$(this).parent().find('input');
+				_input.trigger('click');
+				_input.trigger('click');
 			}
 		});
 	},
@@ -1631,18 +1633,10 @@ App.Project = {
 			_this.linkSilder('floors', key);
 		} else if (_this.filterRule.single.indexOf(cat) != -1) {
 			_this.recoverySilder();
-			/*if(cat=='外保温'){
-				var _hideFileIds=_.filter(_files,function(i){
-					return i!=_secenId;
-				})
-				App.Project.Settings.Viewer.fileFilter({
-					ids:_hideFileIds,
-					total:[_secenId]
-				});
-			}*/
-			_this.sigleRule(cat, key);
-		} else {
-			_this.linkSilder('floors', key);
+			_this.sigleRule(cat,key);
+		}else{
+			_this.recoverySilder();
+			_this.linkSilder('floors',key);
 		}
 	},
 
