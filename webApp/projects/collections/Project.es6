@@ -221,6 +221,11 @@ App.Project = {
 			}
 		});
 
+		App.Project.Settings.Viewer.fileFilter({
+			ids:[],
+			total:App.Project.Settings.Viewer.FloorFilesData
+		});
+
 
 	},
 
