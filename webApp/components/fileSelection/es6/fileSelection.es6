@@ -116,8 +116,10 @@
 		setCookie(name, value) {
 			var Days = 30,
 				exp = new Date();
-			exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 1000);
-			document.cookie = name + "=" + value + ";expires=" + exp.toGMTString() + ";path=/";
+			exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 1000),
+			doMain=window.location.host.substring(window.location.host.indexOf("."));
+
+			document.cookie = name + "=" + value + ";domain=" + doMain + ";expires=" + exp.toGMTString() + ";path=/";
 		},
 		//初始化
 		init() {
