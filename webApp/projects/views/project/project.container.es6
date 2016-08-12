@@ -127,7 +127,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 
 							if (props[i]['elementType'] && props[i]['elementType'] == 'link') {
 								for (var j = 0; j < props[i]['value'].length; j++) {
-									str += '<li class="modleItem"><div class="modleNameText overflowEllipsis modleName2"><a href="' + props[i]['value'][j]['value'] + '">' + props[i]['value'][j]['name'] + '</a>&nbsp;&nbsp;</div></li>';
+									str += '<li class="modleItem"><div class="modleNameText overflowEllipsis modleName2"><a target="_blank" href="' + props[i]['value'][j]['value'] + '">' + props[i]['value'][j]['name'] + '</a>&nbsp;&nbsp;</div></li>';
 
 								}
 							} else {
