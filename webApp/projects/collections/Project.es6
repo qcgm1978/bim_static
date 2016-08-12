@@ -874,8 +874,8 @@ App.Project = {
 			App.Project.upload = App.modules.docUpload.init($(document.body));
 		}
 
-		//api 页面 默认加载模型
-		if (App.Project.Settings.type == "token" && App.Project.Settings.loadType == "model") {
+		//api 页面 默认加载模型 && App.Project.Settings.loadType == "model"
+		if (App.Project.Settings.type == "token" ) {
 			$("#projectContainer").find(".fileContainer").hide().end().find(".modelContainer").show();
 		}
 		// 导航文件
@@ -909,8 +909,8 @@ App.Project = {
 		//设置项目可查看的属性
 		this.setPropertyByAuth();
 
-		//api 页面 默认加载模型
-		if (App.Project.Settings.type == "token" && App.Project.Settings.loadType == "model") {
+		//api 页面 默认加载模型 && App.Project.Settings.loadType == "model"
+		if (App.Project.Settings.type == "token" ) {
 			$(".fileNav .model").click();
 			//分享
 			// if (window.location.href.indexOf("share") > 10) {

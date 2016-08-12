@@ -125,12 +125,23 @@
 
         if (url.indexOf("login.html") > -1) {
 
-            myWebView.registerEvent('loadFinished', function(isReady) {
-
-                myWebView.runScript('Login.checkLoginBefore("' + document.cookie + '")', function(isLogin) {
-                    myWebView.runScript('Login.checkLogin()', function(isLogin) {});
+            var timer=setTimeout(function(){
+                clearTimeout(timer);
+                myWebView.runScript('Login.checkLoginBefore("' + document.cookie + '")', function(cookie) {
+                    myWebView.runScript('Login.checkLogin()', function(isLogin) {
+                        //var a;
+                    });
                 });
-            });
+            },1000)
+
+            // myWebView.registerEvent('loadFinished', function(isReady) {
+
+            //     myWebView.runScript('Login.checkLoginBefore("' + document.cookie + '")', function(cookie) {
+            //         myWebView.runScript('Login.checkLogin()', function(isLogin) {
+            //             //var a;
+            //         });
+            //     });
+            // });
 
         }
 
