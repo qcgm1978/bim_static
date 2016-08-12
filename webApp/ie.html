@@ -92,7 +92,7 @@
                         localStorage.user = user;
 
                     } else {
-                       
+                        keys = document.cookie.match(/[^ =;]+(?=\=)/g);
                         for (var i = 0; i < keys.length; i++) {
                             delCookie(keys[i]);
                         }
