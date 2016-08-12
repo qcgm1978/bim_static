@@ -32,6 +32,8 @@ App.Project = {
 			}
 		} else if (item.acceptanceType == '2') {
 			return arr[3];
+		}else{
+			return ''
 		}
 	},
 
@@ -86,6 +88,7 @@ App.Project = {
 				ids: _this.filterCCode(['10.10.20.03.06.20.10', '10.10.30.03.09']),
 				type: "classCode"
 			})
+			this.linkSilder('floors', floor);
 		}
 		if (cat == '步行街吊顶风口' || cat == '卫生间防水') {
 			this.linkSilder('floors', floor);
@@ -232,7 +235,11 @@ App.Project = {
 				$(this).trigger('click');
 			}
 		});
+		var specialty = bimView.comm.getFilters($("#specialty,#floors"),'uncheck');
+		var category = bimView.comm.getFilters($("#category"),'uncheck');
 		var classCode = bimView.comm.getFilters($("#classCode"),'uncheck');
+		App.Project.Settings.Viewer.fileFilter(specialty);
+		App.Project.Settings.Viewer.filter(category);
 		App.Project.Settings.Viewer.filter(classCode);
 	},
 
