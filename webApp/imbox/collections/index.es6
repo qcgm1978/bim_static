@@ -443,6 +443,7 @@ App.INBox.comment = {
 						find(".imgName").text(data.description).addClass("upload").end().
 						find(".delUploadImg").show().end().
 						data("id", data.id).removeClass("uploading");
+						$('.uploadImg').val('');
 				}
 			});
 		},
@@ -451,7 +452,7 @@ App.INBox.comment = {
 		removeImg(event) {
 			$(event.target).closest(".singleImg").remove();
 			$('.uppic').empty();
-			$('.uploadImg').val('');
+			
 		},
 
 		//新增数据

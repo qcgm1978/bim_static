@@ -825,14 +825,14 @@
 							find(".imgName").text(data.description).addClass("upload").end().
 							find(".delUploadImg").show().end().
 							data("id", data.id).removeClass("uploading");
+							$('.uploadImg').val('');
 						}
 					});
 				},
 
 				//删除图片
 				removeImg(event) {
-					$(event.target).closest(".singleImg").remove();
-					$('.uploadImg').val('');
+					$(event.target).closest(".singleImg").remove(); 
 
 				},
 

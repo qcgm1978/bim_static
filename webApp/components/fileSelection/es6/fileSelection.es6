@@ -6,7 +6,7 @@
 		if (!(this instanceof FileSelection)) {
 			return new FileSelection(options);
 		}
-
+		jQuery.support.cors = true;
 		//默认参数
 		var defaults = {
 			appKey: "",
