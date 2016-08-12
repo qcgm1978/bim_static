@@ -40,9 +40,9 @@ App.Project = {
 	//过滤规则
 	filterRule: {
 		//单文件：过滤出检查点所在构件所在的文件
-		file: '工程桩,基坑支护,钢结构悬挑构件,幕墙,采光顶',
+		file: '工程桩,基坑支护,钢结构悬挑构件,幕墙',
 		//单独类型：singleRule
-		single: '梁柱节点,地下防水,步行街吊顶风口,卫生间防水,外保温',
+		single: '梁柱节点,地下防水,步行街吊顶风口,卫生间防水,外保温,采光顶',
 		floor: ''
 	},
 
@@ -66,6 +66,10 @@ App.Project = {
 		'幕墙': {
 			margin: 1,
 			ratio: 1.0
+		},
+		'采光顶': {
+			margin: 0.3,
+			ratio: 1.0
 		}
 	},
 	//单独类型、自定义过滤规则
@@ -82,6 +86,10 @@ App.Project = {
 			this.linkSilder('floors', floor);
 			this.linkSilderSpecial('specialty', 'WDGC-Q-ST-' + floor + '.rvt');
 			this.linkSilderCategory('category', '楼板')
+		}
+		if (cat == '采光顶') {
+			this.linkSilder('floors', '');
+			this.linkSilderSpecial('specialty', '采光顶');
 		}
 		if (cat == '外保温') {
 			App.Project.Settings.Viewer.filter({
@@ -868,8 +876,8 @@ App.Project = {
 			App.Project.upload = App.modules.docUpload.init($(document.body));
 		}
 
-		//api 页面 默认加载模型
-		if (App.Project.Settings.type == "token" && App.Project.Settings.loadType == "model") {
+		//api 页面 默认加载模型 && App.Project.Settings.loadType == "model"
+		if (App.Project.Settings.type == "token" ) {
 			$("#projectContainer").find(".fileContainer").hide().end().find(".modelContainer").show();
 		}
 		// 导航文件
@@ -903,8 +911,8 @@ App.Project = {
 		//设置项目可查看的属性
 		this.setPropertyByAuth();
 
-		//api 页面 默认加载模型
-		if (App.Project.Settings.type == "token" && App.Project.Settings.loadType == "model") {
+		//api 页面 默认加载模型 && App.Project.Settings.loadType == "model"
+		if (App.Project.Settings.type == "token" ) {
 			$(".fileNav .model").click();
 			//分享
 			// if (window.location.href.indexOf("share") > 10) {

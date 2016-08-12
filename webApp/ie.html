@@ -28,7 +28,7 @@
     try { 
 
         var myWebView = document.createElement("object"),
-            currentVersion = 4;
+            currentVersion = 4,isLoad=false;
 
         myWebView.classid = "CLSID:15A5F85D-A81B-45D1-A03A-6DBC69C891D1";
 
@@ -54,6 +54,10 @@
 
         myWebView.registerEvent('urlChanged', function(url) {
 
+            if (!isLoad) {
+                return;
+            }
+
             if (myWebView.url == "about:blank") {
                 window.opener = null;
                 window.open("", "_self");
@@ -77,7 +81,7 @@
                     //登录设置 登出删除
                     var keys = cookies.match(/[^ =;]+(?=\=)/g);
 
-                    if (getCookie("OUTSSO_AuthToken", cookies) != null) {
+                    if (keys.length>4) {
                         var key, value;
                         for (var i = 0; i < keys.length; i++) {
                             key = keys[i];
@@ -88,7 +92,7 @@
                         localStorage.user = user;
 
                     } else {
-                        var keys = document.cookie.match(/[^ =;]+(?=\=)/g);
+                        keys = document.cookie.match(/[^ =;]+(?=\=)/g);
                         for (var i = 0; i < keys.length; i++) {
                             delCookie(keys[i]);
                         }
@@ -125,10 +129,25 @@
 
         if (url.indexOf("login.html") > -1) {
 
+            // var timer=setTimeout(function(){
+            //     clearTimeout(timer);
+            //     myWebView.runScript('Login.checkLoginBefore("' + document.cookie + '")', function(cookie) {
+            //         myWebView.runScript('Login.checkLogin()', function(isLogin) {
+            //             //var a;
+            //         });
+            //     });
+            // },1000)
+
             myWebView.registerEvent('loadFinished', function(isReady) {
 
-                myWebView.runScript('Login.checkLoginBefore("' + document.cookie + '")', function(isLogin) {
-                    myWebView.runScript('Login.checkLogin()', function(isLogin) {});
+                myWebView.runScript('Login.checkLoginBefore("' + document.cookie + '")', function(cookie) {
+
+                    isLoad=true;
+
+                    myWebView.runScript('Login.checkLogin()', function(isLogin) {
+
+                        //var a;
+                    });
                 });
             });
 
@@ -179,6 +198,9 @@
     }
 
     function navigateTo(url) {
+
+        url=encodeURI(url);
+        
         if (document.createEvent !== undefined) {
             var aLink = "<a href='" + url + "' target='_blank' >test</a>";
             var a = $(aLink).get(0);
