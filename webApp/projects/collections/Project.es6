@@ -22,6 +22,19 @@ App.Project = {
 		}
 	},
 
+	disCategory: function(item) {
+		var arr = this.mapData.concernsCategory;
+		if (item.acceptanceType == '1') {
+			if (item.presetPointId) {
+				return arr[1];
+			} else {
+				return arr[2];
+			}
+		} else if (item.acceptanceType == '2') {
+			return arr[3];
+		}
+	},
+
 	//过滤规则
 	filterRule: {
 		//单文件：过滤出检查点所在构件所在的文件
@@ -188,6 +201,16 @@ App.Project = {
 		var show = '建筑,结构,景观,幕墙,采光顶,内装&标识',
 			hide = '暖通,电气,智能化,给排水';
 		var $treeText = $('.modelSidebar #specialty ul .treeText');
+
+		App.Project.Settings.Viewer.fileFilter({
+			ids: [],
+			total: App.Project.Settings.Viewer.FloorFilesData
+		});
+		App.Project.Settings.Viewer.filter({
+			ids: [],
+			type: "classCode"
+		})
+
 		$treeText.each(function() {
 			var _ = $(this).parent().find('input');
 			if (show.indexOf($(this).text()) != -1) {
@@ -208,9 +231,13 @@ App.Project = {
 				$(this).trigger('click');
 			}
 		});
-
-
+		$('.modelSidebar #category input').each(function() {
+			if (!$(this).is(':checked')) {
+				$(this).trigger('click');
+			}
+		});
 	},
+
 
 	linkSilder: function(type, key) {
 		if (!key) {
