@@ -75,7 +75,7 @@ App.Index = {
 		App.Index.Settings.projectId = Request.projectId;
 		App.Index.Settings.projectVersionId = Request.projectVersionId;
 		App.Index.Settings.referenceId = Request.modificationId;
-		App.Index.Settings.comparisonType = Request.type;debugger
+		App.Index.Settings.comparisonType = Request.type;
 	},
 
 	//获取url 参数
@@ -270,7 +270,7 @@ App.Index = {
 		if (App.Index.Settings.comparisonType) {
 			//默认std 
 			if (App.Index.Settings.comparisonType == "base") {
-				App.Project.Collection.changeList.urlType = "modelBase";debugger
+				App.Project.Collection.changeList.urlType = "modelBase";
 				//获取版本中文名称
 				$.ajax({
 					url: "/platform/project/"+App.Index.Settings.projectId+"/version/"+App.Index.Settings.referenceId
@@ -315,6 +315,23 @@ App.Index = {
 					//变更获取
 					this.fetchChange();
 				}
+
+				var data1 = {
+					URLtype: "fetchProjectDetail",
+					data: {
+						projectId: data.referenceId,
+						versionId: data.referenceVersionId
+					}
+				};
+
+				App.Comm.ajax(data1, (data) => {
+					if (data.code == 0) {
+						data = data.data;
+
+						App.Index.Settings.comparisonName = data.name
+
+					}
+				});
 			}
 		});
 	}
