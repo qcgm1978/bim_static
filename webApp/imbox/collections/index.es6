@@ -9,7 +9,7 @@ App.INBox = {
 		$("#contains").html(new App.INBox.NavView().render().$el);
 		$("#contains").append(new App.INBox.imboxContainerView().render().$el);
 		this.loadData('un');
-		App.Common.loadMessageCount();
+		App.Comm.loadMessageCount();
 		// this.messageCollection.fetch({
 		// 	reset:true,
 		// 	data:{
