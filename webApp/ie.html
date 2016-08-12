@@ -25,10 +25,11 @@
     <script src="libs/jquery/jquery-1.12.0.min.js"></script>
     <script type="text/javascript">
     var hasDevicePixelRatio = true;
-    try { 
+    try {
 
         var myWebView = document.createElement("object"),
-            currentVersion = 4,isLoad=false;
+            currentVersion = 4,
+            isLoad = false;
 
         myWebView.classid = "CLSID:15A5F85D-A81B-45D1-A03A-6DBC69C891D1";
 
@@ -81,7 +82,7 @@
                     //登录设置 登出删除
                     var keys = cookies.match(/[^ =;]+(?=\=)/g);
 
-                    if (keys.length>4) {
+                    if (keys.length > 4) {
                         var key, value;
                         for (var i = 0; i < keys.length; i++) {
                             key = keys[i];
@@ -104,10 +105,10 @@
         });
 
         //文件下载
-        myWebView.registerEvent('download', function(url) { 
-            
+        myWebView.registerEvent('download', function(url) {
+
             //未登录 没有token_cookie
-            if (getCookie("token_cookie") == null && (getCookie("OUTSSO_AuthToken") == null  ||  getCookie("OUTSSO_AuthToken")=="null" )) {
+            if (getCookie("token_cookie") == null && (getCookie("OUTSSO_AuthToken") == null || getCookie("OUTSSO_AuthToken") == "null")) {
 
                 //获取 webview cookie
                 myWebView.runScript("document.cookie", function(cooks) {
@@ -115,8 +116,8 @@
                     if (token_cookie) {
                         setCookie("token_cookie", token_cookie);
                         window.location.href = url;
-                    }else{
-                         throw new error("version is old");
+                    } else {
+                        throw new error("version is old");
                     }
 
                 });
@@ -142,7 +143,7 @@
 
                 myWebView.runScript('Login.checkLoginBefore("' + document.cookie + '")', function(cookie) {
 
-                    isLoad=true;
+                    isLoad = true;
 
                     myWebView.runScript('Login.checkLogin()', function(isLogin) {
 
@@ -159,7 +160,7 @@
 
         resizeWebView();
 
-    } catch (e) { 
+    } catch (e) {
         if (myWebView.pluginVersion != currentVersion) {
             var html = templateUrl("/app/oPage/downloadIE.html");
             $("body").html(html);
@@ -199,8 +200,8 @@
 
     function navigateTo(url) {
 
-        url=encodeURI(url);
-        
+        url = encodeURI(url);
+
         if (document.createEvent !== undefined) {
             var aLink = "<a href='" + url + "' target='_blank' >test</a>";
             var a = $(aLink).get(0);
@@ -254,20 +255,25 @@
     //获取cookie
     function getCookie(name, cookis) {
 
-        try {
+        var cooks = cookis || document.cookie,
+            items = cooks.split("; "),
+            result,
+            len = items.length,
+            str, pos;
 
-            var arr, reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)");
+        for (var i = 0; i < len; i++) {
 
-            if (!cookis) {
-                cookis = document.cookie;
+            str = items[i];
+            pos = str.indexOf('=');
+
+            name = str.substring(0, pos);
+
+            if (name == key) {
+                result = str.substring(pos + 1);
+                break;
             }
-            if (arr = cookis.match(reg))
-                return arr[2];
-            else
-                return null;
-        } catch (e) {
-            return '';
         }
+        return result;
 
     }
     //删除cookie

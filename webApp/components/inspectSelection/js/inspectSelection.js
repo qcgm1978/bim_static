@@ -251,7 +251,7 @@
 				doMain = host.substring(host.indexOf("."));
 
 			exp.setTime(exp.getTime() - 31 * 24 * 60 * 60 * 1000);
-			var cval = this.getCookie(name);
+			var cval = App.Comm.getCookie(name);
 			if (cval != null)
 				document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString() + ";domain=" + doMain + ";path=/";
 		},

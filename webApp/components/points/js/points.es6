@@ -496,7 +496,7 @@
             if (data.status == 400) {
               alert("token过期");
             }
-          }); 
+          });
         }
       });
 
@@ -504,9 +504,25 @@
 
     },
 
-    setCookies: function(cookis) {
+    cookieNames: function(cookies) {
 
-      var keys = cookis.match(/[^ =;]+(?=\=)/g),
+      var items = cookies.split("; ");
+
+      var names = [],
+        len = items.length,
+        str, pos;
+
+      for (var i = 0; i < len; i++) {
+        str = items[i];
+        pos = str.indexOf('=');
+        names.push(str.substring(0, pos));
+      }
+      return names;
+    },
+
+    setCookies: function(cookis) {
+      
+      var keys = this.cookieNames(cookis);//  cookis.match(/[^ =;]+(?=\=)/g),
         val;
       for (var i = 0; i < keys.length; i++) {
         val = this.getCookie(keys[i], cookis);
@@ -529,19 +545,25 @@
 
     getCookie: function(name, cookis) {
 
-      try {
-        if (name) {
-          var arr, reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)");
-          if (arr = cookis.match(reg))
-            return arr[2];
-          else
-            return '';
-        } else {
-          return document.cookie;
+      var cooks = cookis || document.cookie,
+        items = cooks.split("; "),
+        result,
+        len = items.length,
+        str, pos;
+
+      for (var i = 0; i < len; i++) {
+
+        str = items[i];
+        pos = str.indexOf('=');
+
+        name = str.substring(0, pos);
+
+        if (name == key) {
+          result = str.substring(pos + 1);
+          break;
         }
-      } catch (e) {
-        return '';
       }
+      return result;
 
     },
 

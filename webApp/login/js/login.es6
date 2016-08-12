@@ -9,15 +9,29 @@ var Login = {
 		document.cookie = name + "=" + value + ";expires=" + exp.toGMTString() + ";domain=" + Login.doMain + ";path=/";
 	},
 	//获取cookie
-	getCookie: function(name, cookis) {
-		var arr, reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)");
+	getCookie: function(key, cookis) { 
 
-		var cooks = cookis || document.cookie;
+		var cooks = cookis || document.cookie, 
+			items = cooks.split("; "), 
+			result,
+			len = items.length,
+			str, pos;
 
-		if (arr = cooks.match(reg))
-			return unescape(arr[2]);
-		else
-			return null;
+		for (var i = 0; i < len; i++) {
+
+			str = items[i];
+			pos = str.indexOf('=');
+
+			name=str.substring(0,pos);
+
+			if (name == key) {
+				result = str.substring(pos+1);
+				break;
+			}
+		}
+
+		return result; 
+	 
 	},
 	//删除cookie
 	delCookie: function(name) {
@@ -37,7 +51,7 @@ var Login = {
 			len = items.length,
 			str, pos;
 
-		for (var i = 0, i < len; i++) {
+		for (var i = 0;i < len; i++) {
 			str = items[i];
 			pos = str.indexOf('=');
 			names.push(str.substring(0, pos));
@@ -117,15 +131,13 @@ var Login = {
 
 				Login.delCookie("token_cookie");
 
-				var keys = [];
 				if (data.data && typeof data.data === 'object') {
 					for (var p in data.data) {
 						Login.setCookie(p, data.data[p]);
-						keys.push(p);
 					}
 				}
 
-				localStorage.setItem("keys", keys.join(','));
+				debugger
 
 				//获取用户信息
 				Login.getUserInfo();
@@ -208,8 +220,8 @@ var Login = {
 
 		if (cookies) {
 
-			var keys = cookies.match(/[^ =;]+(?=\=)/g),
-				val;
+			var keys = Login.cookieNames(cookies);
+			val;
 			for (var i = 0; i < keys.length; i++) {
 				val = Login.getCookie(keys[i], cookies);
 				Login.setCookie(keys[i], val);

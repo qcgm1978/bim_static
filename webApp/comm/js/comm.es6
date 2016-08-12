@@ -275,12 +275,28 @@ App.Comm = {
 		document.cookie = name + "=" + value + ";expires=" + exp.toGMTString() + ";domain=" + App.Comm.doMain + ";path=/";
 	},
 	//获取cookie
-	getCookie: function(name) {
-		var arr, reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)");
-		if (arr = document.cookie.match(reg))
-			return unescape(arr[2]);
-		else
-			return null;
+	getCookie: function(name,cookis) { 
+
+		var cooks = cookis || document.cookie, 
+			items = cooks.split("; "), 
+			result,
+			len = items.length,
+			str, pos;
+
+		for (var i = 0; i < len; i++) {
+
+			str = items[i];
+			pos = str.indexOf('=');
+
+			name=str.substring(0,pos);
+
+			if (name == key) {
+				result = str.substring(pos+1);
+				break;
+			}
+		} 
+		return result;  
+	 
 	},
 	//删除cookie
 	delCookie: function(name) {
@@ -292,19 +308,37 @@ App.Comm = {
 	},
 
 	clearCookie() {
-		var keys = document.cookie.match(/[^ =;]+(?=\=)/g);
+		var keys =this.cookieNames(document.cookie); //  document.cookie.match(/[^ =;]+(?=\=)/g);
 		if (keys) {
 			for (var i = keys.length; i--;)
 				document.cookie = keys[i] + "=0;expires=" + new Date(0).toUTCString() + ";domain=" + App.Comm.doMain + ";path=/";
 		}
 	},
 
+		//cookie名称
+	cookieNames: function(cookies) {
+
+		var items = cookies.split("; ");
+
+		var names = [],
+			len = items.length,
+			str, pos;
+
+		for (var i = 0;i < len; i++) {
+			str = items[i];
+			pos = str.indexOf('=');
+			names.push(str.substring(0, pos));
+		}
+		return names;
+	},
+
+
 	//设置cookie 时间
 	setCookieTime(min) {
 
 		var exp = new Date(),
 
-			keys = localStorage.getItem("keys") && localStorage.getItem("keys").split(',') || ""; //document.cookie.match(/[^ =;]+(?=\=)/g);
+			keys =  this.cookieNames(document.cookie);   
 
 		exp.setTime(exp.getTime() + min * 60 * 1000);
 
