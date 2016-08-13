@@ -9,13 +9,14 @@ var Login = {
 		document.cookie = name + "=" + value + ";expires=" + exp.toGMTString() + ";domain=" + Login.doMain + ";path=/";
 	},
 	//获取cookie
-	getCookie: function(key, cookis) { 
+	getCookie: function(key, cookis) {    
 
 		var cooks = cookis || document.cookie, 
 			items = cooks.split("; "), 
 			result,
 			len = items.length,
 			str, pos;
+ 
 
 		for (var i = 0; i < len; i++) {
 
@@ -24,12 +25,14 @@ var Login = {
 
 			name=str.substring(0,pos);
 
+			 
+
 			if (name == key) {
 				result = str.substring(pos+1);
 				break;
 			}
-		}
-
+		} 
+		 
 		return result; 
 	 
 	},
@@ -45,7 +48,7 @@ var Login = {
 	//cookie名称
 	cookieNames: function(cookies) {
 
-		var items = cookies.split("; ");
+		var items = cookies.split("; "); 
 
 		var names = [],
 			len = items.length,
@@ -53,9 +56,10 @@ var Login = {
 
 		for (var i = 0;i < len; i++) {
 			str = items[i];
-			pos = str.indexOf('=');
+			pos = str.indexOf('='); 
 			names.push(str.substring(0, pos));
-		}
+		} 
+
 		return names;
 	},
 
@@ -135,10 +139,7 @@ var Login = {
 					for (var p in data.data) {
 						Login.setCookie(p, data.data[p]);
 					}
-				}
-
-				debugger
-
+				} 
 				//获取用户信息
 				Login.getUserInfo();
 
@@ -183,11 +184,17 @@ var Login = {
 			//是否主动退出标记 2 默认状态 1 为主动退出
 			Login.setCookie('IS_OWNER_LOGIN', '2');
 
+
+			 
 			if (r && r != document.URL) {
-				window.location = decodeURIComponent(r);
+				window.location = decodeURIComponent(r); 
 			} else {
 				window.location.href = '/index.html';
 			}
+
+			//window.location.href='/static/dist/app/oPage/download/IEH5Agent.exe?commType=loginIn';
+				
+
 		});
 	},
 
@@ -219,14 +226,19 @@ var Login = {
 	checkLoginBefore: function(cookies) {
 
 		if (cookies) {
+			
+			var keys = Login.cookieNames(cookies),
+			val;  
 
-			var keys = Login.cookieNames(cookies);
-			val;
-			for (var i = 0; i < keys.length; i++) {
-				val = Login.getCookie(keys[i], cookies);
-				Login.setCookie(keys[i], val);
+			for (var i = 0; i < keys.length; i++) { 
+
+				val = Login.getCookie(keys[i], cookies);  
+
+				val &&　Login.setCookie(keys[i], val);
+
 			}
 		}
+
 		return document.cookie;
 
 	},

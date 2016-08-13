@@ -55,9 +55,9 @@
 
         myWebView.registerEvent('urlChanged', function(url) {
 
-            if (!isLoad) {
-                return;
-            }
+            // if (!isLoad) {
+            //     return;
+            // }
 
             if (myWebView.url == "about:blank") {
                 window.opener = null;
@@ -106,6 +106,13 @@
 
         //文件下载
         myWebView.registerEvent('download', function(url) {
+
+            // var pos=url.indexOf("commType");
+            // if (pos>-1) {
+            //     var commType=url.substring(pos+9);
+            //     //alert(commType);
+            //     return;
+            // }
 
             //未登录 没有token_cookie
             if (getCookie("token_cookie") == null && (getCookie("OUTSSO_AuthToken") == null || getCookie("OUTSSO_AuthToken") == "null")) {
