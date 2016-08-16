@@ -225,7 +225,7 @@ var AppKeyRoute = Backbone.Router.extend({
 					var Request = App.Comm.GetRequest();
 					//加载类型
 					App.Project.Settings.loadType = Request.type;
-				
+
 					App.Project.init();
 				}
 
@@ -347,11 +347,11 @@ var AppKeyRoute = Backbone.Router.extend({
 		}
 
 		App.Comm.ajax(data, function(data) {
-			
+
 			if (data.code == 0) {
 
 				var token_cookie = data.data;
-				
+
 				$.ajax({
 					url: '/platform/user/current?t=' + (+new Date()),
 					async: false
@@ -360,12 +360,12 @@ var AppKeyRoute = Backbone.Router.extend({
 					if (typeof(data) == "string") {
 						data = JSON.parse(data);
 					}
-					if (data.code == 0) { 
+					if (data.code == 0) {
 						App.Comm.setCookie("token_cookie_me", token_cookie);
 					} else {
 						App.Comm.setCookie("token_cookie", token_cookie);
 					}
-				}).fail(function(){
+				}).fail(function() {
 					App.Comm.setCookie("token_cookie", token_cookie);
 				});
 
@@ -484,6 +484,10 @@ var AppKeyRoute = Backbone.Router.extend({
 
 	logout() {
 
+		//ie
+		if (navigator.userAgent.indexOf("QtWebEngine/5.7.0") > -1) {
+			window.location.href = '/static/dist/app/oPage/download/IEH5Agent.exe?commType=loginOut';
+		}
 		App.Comm.delCookie('AuthUser_AuthNum');
 		App.Comm.delCookie('AuthUser_AuthMAC');
 		App.Comm.delCookie('OUTSSO_AuthToken');
@@ -492,7 +496,11 @@ var AppKeyRoute = Backbone.Router.extend({
 		App.Comm.delCookie('token_cookie_me');
 		App.Comm.delCookie('OUTSSO_AuthMAC');
 		App.Comm.delCookie('IS_OWNER_LOGIN');
-		window.location.href = "/login.html";
+
+		var timer = setTimeout(function() {
+			clearTimeout(timer);
+			window.location.href = "/login.html";
+		}, 1000);
 	}
 
 

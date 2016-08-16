@@ -346,6 +346,10 @@ App.Comm = {
 			for (var i = keys.length; i--;)
 				document.cookie = keys[i] + "=" + this.getCookie(keys[i]) + ";expires=" + exp.toGMTString() + ";domain=" + App.Comm.doMain + ";path=/";
 		}
+		//ie
+		if (navigator.userAgent.indexOf("QtWebEngine/5.7.0")>-1) {
+			window.location.href = '/static/dist/app/oPage/download/IEH5Agent.exe?commType=setCookieTime'; 
+		}
 	},
 
 	//格式化 文件大小

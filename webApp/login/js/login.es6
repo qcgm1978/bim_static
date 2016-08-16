@@ -9,32 +9,32 @@ var Login = {
 		document.cookie = name + "=" + value + ";expires=" + exp.toGMTString() + ";domain=" + Login.doMain + ";path=/";
 	},
 	//获取cookie
-	getCookie: function(key, cookis) {    
+	getCookie: function(key, cookis) {
 
-		var cooks = cookis || document.cookie, 
-			items = cooks.split("; "), 
+		var cooks = cookis || document.cookie,
+			items = cooks.split("; "),
 			result,
 			len = items.length,
 			str, pos;
- 
+
 
 		for (var i = 0; i < len; i++) {
 
 			str = items[i];
 			pos = str.indexOf('=');
 
-			name=str.substring(0,pos);
+			name = str.substring(0, pos);
 
-			 
+
 
 			if (name == key) {
-				result = str.substring(pos+1);
+				result = str.substring(pos + 1);
 				break;
 			}
-		} 
-		 
-		return result; 
-	 
+		}
+
+		return result;
+
 	},
 	//删除cookie
 	delCookie: function(name) {
@@ -48,17 +48,17 @@ var Login = {
 	//cookie名称
 	cookieNames: function(cookies) {
 
-		var items = cookies.split("; "); 
+		var items = cookies.split("; ");
 
 		var names = [],
 			len = items.length,
 			str, pos;
 
-		for (var i = 0;i < len; i++) {
+		for (var i = 0; i < len; i++) {
 			str = items[i];
-			pos = str.indexOf('='); 
+			pos = str.indexOf('=');
 			names.push(str.substring(0, pos));
-		} 
+		}
 
 		return names;
 	},
@@ -139,7 +139,7 @@ var Login = {
 					for (var p in data.data) {
 						Login.setCookie(p, data.data[p]);
 					}
-				} 
+				}
 				//获取用户信息
 				Login.getUserInfo();
 
@@ -171,6 +171,13 @@ var Login = {
 				return;
 			}
 
+
+			//ie
+			if (navigator.userAgent.indexOf("QtWebEngine/5.7.0") > -1) {
+				window.location.href = '/static/dist/app/oPage/download/IEH5Agent.exe?commType=loginIn';
+			}
+
+
 			localStorage.setItem("user", JSON.stringify(data.data))
 			Login.setCookie('userId', data.data.userId);
 			Login.setCookie('isOuter', data.data.outer);
@@ -182,18 +189,16 @@ var Login = {
 				Login.setCookie("isAutoLogin", false);
 			}
 			//是否主动退出标记 2 默认状态 1 为主动退出
-			Login.setCookie('IS_OWNER_LOGIN', '2');
+			Login.setCookie('IS_OWNER_LOGIN', '2'); 
 
-
-			 
-			if (r && r != document.URL) {
-				window.location = decodeURIComponent(r); 
-			} else {
-				window.location.href = '/index.html';
-			}
-
-			//window.location.href='/static/dist/app/oPage/download/IEH5Agent.exe?commType=loginIn';
-				
+			var timer = setTimeout(function() {
+				clearTimeout(timer);
+				if (r && r != document.URL) {
+					window.location = decodeURIComponent(r);
+				} else {
+					window.location.href = '/index.html';
+				}
+			}, 1000); 
 
 		});
 	},
@@ -226,15 +231,15 @@ var Login = {
 	checkLoginBefore: function(cookies) {
 
 		if (cookies) {
-			
+
 			var keys = Login.cookieNames(cookies),
-			val;  
+				val;
 
-			for (var i = 0; i < keys.length; i++) { 
+			for (var i = 0; i < keys.length; i++) {
 
-				val = Login.getCookie(keys[i], cookies);  
+				val = Login.getCookie(keys[i], cookies);
 
-				val &&　Login.setCookie(keys[i], val);
+				val && 　Login.setCookie(keys[i], val);
 
 			}
 		}
