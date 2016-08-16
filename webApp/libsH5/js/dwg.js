@@ -14,19 +14,24 @@ var dwgViewer = function(options) {
     url: serverUrl,
     success: function(res) {
       var data = JSON.parse(res);
-      data.Views && getDwg(data.Views);
+      var defaultView = data.Metadata.DefaultView;
+      data.Views && getDwg(data.Views,defaultView);
     }
   });
-  var getDwg = function(res) {
+  var getDwg = function(res,defaultView) {
     var modelTab = [],
       currentFile,
       container = $('<div class="bim"></div>');
     $.each(res, function(i, item) {
-      modelTab.push({
+      var tempObj = {
         name: item.Name,
         id: item.ID,
         res: item.Representations
-      });
+      };
+      if(item.ID == defaultView){
+        tempObj.isDefault = true;
+      }
+      modelTab.push(tempObj);
     });
     self._opt.element.append(container);
     self.addControll(modelTab, container);
@@ -941,7 +946,8 @@ dwgViewer.prototype = {
     $.each(model, function(i, item) {
       var tmp = $('<li class="modelItem"></li>').text(item.name).data(item.res);
       list.append(tmp);
-      if (i == 0) {
+      if(item.isDefault){
+        tmp.attr('data-default','true');
         tmp.trigger('click');
       }
     });
@@ -981,15 +987,15 @@ dwgViewer.prototype = {
       }
     });
     this.__initCommentEvent();
-    modBar.find(".modelItem:last").trigger("click");
+    modBar.find('[data-default]').trigger("click");
   },
 
   __initCommentEvent: function() {
 
     var that = this;
     //设置不同的工具
-    $("#modelBox .bim").on("click", ".commentBar .btnSave", function() { 
-      
+    $("#modelBox .bim").on("click", ".commentBar .btnSave", function() {
+
       //保存批注
       if ($.isFunction(that.saveCommentDwg)) {
         that.saveCommentDwg();
