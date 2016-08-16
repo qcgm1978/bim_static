@@ -189,7 +189,7 @@ var Login = {
 				Login.setCookie("isAutoLogin", false);
 			}
 			//是否主动退出标记 2 默认状态 1 为主动退出
-			Login.setCookie('IS_OWNER_LOGIN', '2'); 
+			Login.setCookie('IS_OWNER_LOGIN', '2');
 
 			var timer = setTimeout(function() {
 				clearTimeout(timer);
@@ -198,7 +198,7 @@ var Login = {
 				} else {
 					window.location.href = '/index.html';
 				}
-			}, 1000); 
+			}, 1000);
 
 		});
 	},
@@ -223,12 +223,29 @@ var Login = {
 		Login.bindEvent();
 		//是否自动登录
 		Login.isAutoLogin();
-		//验证登录
-		this.checkLogin();
+
+		if (navigator.userAgent.indexOf("QtWebEngine/5.7.0") <= -1) {
+			//验证登录
+			this.checkLogin();
+		}
+
+	},
+
+	clearCookie() {
+
+		var keys = Login.cookieNames(document.cookie);
+
+		if (keys) {
+			for (var i = keys.length; i--;) {
+				Login.delCookie(keys[i]);
+			}
+		}
 	},
 
 	//
 	checkLoginBefore: function(cookies) {
+
+		Login.clearCookie();
 
 		if (cookies) {
 
@@ -250,7 +267,7 @@ var Login = {
 
 	//验证登录
 	checkLogin: function() {
-
+		alert(1)
 		$.ajax({
 			url: '/platform/user/current?t=' + (+new Date())
 		}).done(function(data) {

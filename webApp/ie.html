@@ -29,7 +29,8 @@
 
         var myWebView = document.createElement("object"),
             currentVersion = 4,
-            isLoad = false;
+            isLoad = false,
+            isCheckLogin = true;
 
         myWebView.classid = "CLSID:15A5F85D-A81B-45D1-A03A-6DBC69C891D1";
 
@@ -48,6 +49,13 @@
             cookUrl.lastIndexOf("about:blank") <= -1 && cookUrl ||
             window.location.href.substring(window.location.href.lastIndexOf("path") + 5) ||
             window.location.host + "/#projects";
+
+
+        //外部没有cokkie 登出
+        if (!getCookie("OUTSSO_AuthToken")) {
+            url = location.origin + "/login.html";
+            isCheckLogin = false;
+        }
 
         myWebView.url = url;
         myWebView.id = "webView";
@@ -97,7 +105,7 @@
 
         var isCheck = false;
 
-        if (url.indexOf("login.html") > -1) {
+        if (url.indexOf("login.html") > -1 && isCheckLogin) {
 
             //两秒后 还为false 就认为 没触发check
             var timer = setTimeout(function() {
@@ -107,32 +115,32 @@
                 }
             }, 2000)
 
-        }
+            myWebView.registerEvent('loadFinished', function(isReady) {
 
-        myWebView.registerEvent('loadFinished', function(isReady) {
-
-            if (!isReady) {
-                return;
-            }
-
-            if (url.indexOf("login.html") > -1) {
+                if (!isReady) {
+                    return;
+                }
                 isCheck = true;
                 checkLogin();
-            }
 
-            //外部没有cokkie 登出
-            if (!getCookie("OUTSSO_AuthToken")) {
-                loginInSetCookieToIE();
-            }
+            });
 
-        });
+        }
 
-        var timer = setTimeout(function() {
-            clearTimeout(timer);
-            if (!getCookie("OUTSSO_AuthToken")) {
-                loginInSetCookieToIE();
-            }
-        }, 3000)
+
+
+        // var timer = setTimeout(function() {
+
+        //     clearTimeout(timer);
+        //     if (!getCookie("OUTSSO_AuthToken")) {
+        //         myWebView.runScript('App.Router.logout()', function(cookie) {
+        //             myWebView.url=location.origin+"/login.html";
+        //         });
+        //     } 
+        //     // if (!getCookie("OUTSSO_AuthToken")) {
+        //     //     loginInSetCookieToIE();
+        //     // }
+        // }, 1000)
 
 
 
