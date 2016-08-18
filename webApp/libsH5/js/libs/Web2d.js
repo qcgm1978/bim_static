@@ -6613,6 +6613,36 @@ CLOUD.Extensions.MarkerEditor.prototype.loadMarkersFromIntersect = function (int
         }
 
         boundingBox = bBox.clone();
+
+        var matList = [];
+        var parent = intersect.object.parent;
+
+        while (parent) {
+
+            if ( (parent instanceof CLOUD.SubScene) || (parent instanceof CLOUD.Cell)) {
+                break;
+            }
+
+            matList.push(parent.matrix);
+
+            parent = parent.parent;
+        }
+
+        var matTmp = new THREE.Matrix4();
+
+        if (matList.length > 0) {
+
+            matTmp = matList[matList.length - 1];
+
+            for ( var i = matList.length - 2; i >= 0; --i) {
+                matTmp.multiply( matList[i] );
+            }
+        }
+
+        var objMatrixWorld = new THREE.Matrix4();
+        objMatrixWorld.multiplyMatrices( matTmp, intersect.object.matrix );
+
+        boundingBox.applyMatrix4(objMatrixWorld);
     }
 
     this.setMarkerState(state);

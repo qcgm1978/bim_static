@@ -545,7 +545,7 @@ App.Index = {
 			that = this;
 
 		App.Comm.ajax(data, function(data) {
-console.log(data)
+ 
 			if (data.code == 0) {
 				data = data.data;
 				//有数据

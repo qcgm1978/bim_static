@@ -275,9 +275,11 @@ App.Index = {
 				$.ajax({
 					url: "/platform/project/"+App.Index.Settings.projectId+"/version/"+App.Index.Settings.referenceId
 				}).done(function(data){
-					console.log(data)
+					 
 					if(data.code==0){
-						App.Index.Settings.versionName = data.data.name;
+						if (data.data) {
+						　App.Index.Settings.versionName = data.data.name; 
+						}
 					}
 				})
 			}
@@ -427,8 +429,7 @@ App.Project.Model = {
 			return this;
 		},
 		addDetail: function(model) {
-			var data = model.toJSON();
-			console.log(data)
+			var data = model.toJSON(); 
 			if (data.message == 'success' && data.data.length > 0) {
 				this.$el.html(this.template(data));
 				var editbefore = [],

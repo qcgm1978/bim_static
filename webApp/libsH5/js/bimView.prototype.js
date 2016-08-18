@@ -116,6 +116,10 @@
           self.pub('click', res);
         },
         empty: function(res) {
+          //非 0  不用处理
+          if (res.target.triangleCount>0) {
+            return;
+          }
           _opt._dom.bimBox.html('<div class="tips"><i class="icon"></i><span>无法三维预览，请下载查看</span></div>');
           self.pub('empty', res);
         }

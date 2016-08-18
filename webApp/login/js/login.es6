@@ -172,6 +172,7 @@ var Login = {
 			}
 
 			localStorage.setItem("user", JSON.stringify(data.data))
+            Login.setCookie('OUTSSO_LoginId', data.data.userId); 
 			Login.setCookie('userId', data.data.userId);
 			Login.setCookie('isOuter', data.data.outer);
 
