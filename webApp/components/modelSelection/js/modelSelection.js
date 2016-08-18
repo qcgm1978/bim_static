@@ -502,14 +502,16 @@
       viewer.on("click", function(model) {
         var _userId = model.intersect.userId || "",
           _obj = model.intersect.object || {},
+          _boundingBox=model.intersect.worldBoundingBox,
+          _position=model.intersect.worldPosition;
           fileUrl = _url + _userId.slice(0, _userId.indexOf('.'));
         Project.location[_userId] = JSON.stringify({
-          boundingBox: _obj.boundingBox,
-          position: _obj.position
+          boundingBox: _boundingBox,
+          position: _position
         });
         Project.locationName[_userId] = '轴' + model.intersect.axisGridInfo.abcName + '-' + model.intersect.axisGridInfo.numeralName;
         Project.axis[_userId] = JSON.stringify(model.intersect.axisGridInfo);
-        Project.components[_userId] = _obj.boundingBox;
+        Project.components[_userId] = _boundingBox;
         $.ajax({
           url: fileUrl,
           success: function(data) {

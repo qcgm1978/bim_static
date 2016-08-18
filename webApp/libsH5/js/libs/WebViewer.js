@@ -10254,6 +10254,9 @@ CLOUD.PickHelper.prototype = {
 
             var  userId = intersect.userId;
 
+            // 将位置和包围转换到世界系
+            scope.intersectToWorld(intersect);
+
             // 双击构件变半透明，再双击取消半透明状态
             if (isDoubleClick) {
 
@@ -10290,6 +10293,102 @@ CLOUD.PickHelper.prototype = {
 
         });
  
+    },
+
+    // 将位置和包围盒转换到世界系
+    intersectToWorld : function(intersect) {
+
+        // 注意：不确定相对坐标位置是否被其他模块使用，暂时先采用新的变量来保存世界坐标下的位置及包围盒
+        // 最好是在求交点的时候，包围盒就和位置一起进行坐标变换, 就可以免除这里的计算了
+        var sceneMatrix = this.scene.getRootNodeMatrix();
+
+        if (!sceneMatrix) {
+            sceneMatrix = new THREE.Matrix4();
+        }
+
+        var inverseScaleMatrix = new THREE.Matrix4();
+        inverseScaleMatrix.getInverse(sceneMatrix);
+
+        // 计算世界坐标下的位置
+        var worldPosition = intersect.point.clone();
+        worldPosition.applyMatrix4(inverseScaleMatrix);
+        intersect.worldPosition = worldPosition;
+
+        // 计算世界坐标下的包围盒
+        var bBox = intersect.object.boundingBox;
+        var boundingBox = new THREE.Box3();
+
+        if (intersect.object.geometry instanceof THREE.BoxGeometry) {
+
+            //intersect.object.geometry.computeBoundingBox();
+            //bBox = intersect.object.geometry.boundingBox;
+            //bBox.applyMatrix4(intersect.object.matrixWorld);
+            //bBox.applyMatrix4( inverseScaleMatrix);
+
+            if (bBox) {
+
+                boundingBox = bBox.clone();
+
+                var objPosition = new THREE.Vector3();
+                var objQuaternion = new THREE.Quaternion();
+                var objScale = new THREE.Vector3();
+                var objMatrix = intersect.object.matrix;
+                objMatrix.decompose( objPosition, objQuaternion, objScale );
+
+                // 计算包围盒
+                var invScale = new THREE.Vector3(1 /objScale.x, 1 / objScale.y, 1 / objScale.z );
+                boundingBox.min.multiply(invScale);
+                boundingBox.max.multiply(invScale);
+
+            } else {
+                intersect.object.geometry.computeBoundingBox();
+                boundingBox = intersect.object.geometry.boundingBox;
+            }
+
+            boundingBox.applyMatrix4(intersect.object.matrixWorld);
+            boundingBox.applyMatrix4( inverseScaleMatrix);
+
+        } else {
+
+            if (!bBox) {
+                intersect.object.geometry.computeBoundingBox();
+                bBox = intersect.object.geometry.boundingBox;
+            }
+
+            boundingBox = bBox.clone();
+
+            var matList = [];
+            var parent = intersect.object.parent;
+
+            while (parent) {
+
+                if ( (parent instanceof CLOUD.SubScene) || (parent instanceof CLOUD.Cell)) {
+                    break;
+                }
+
+                matList.push(parent.matrix);
+
+                parent = parent.parent;
+            }
+
+            var matTmp = new THREE.Matrix4();
+
+            if (matList.length > 0) {
+
+                matTmp = matList[matList.length - 1];
+
+                for ( var i = matList.length - 2; i >= 0; --i) {
+                    matTmp.multiply( matList[i] );
+                }
+            }
+
+            var objMatrixWorld = new THREE.Matrix4();
+            objMatrixWorld.multiplyMatrices( matTmp, intersect.object.matrix );
+
+            boundingBox.applyMatrix4(objMatrixWorld);
+        }
+
+        intersect.worldBoundingBox = boundingBox;
     },
 
     showPickedInformation : function (intersect, cx, cy) {

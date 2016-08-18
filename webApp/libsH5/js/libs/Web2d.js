@@ -6551,6 +6551,93 @@ CLOUD.Extensions.MarkerEditor.prototype.loadMarkers = function (markerInfoList) 
     this.setMarkerState(currMarkerState);
 };
 
+//// 将位置和包围盒转换到世界系
+//CLOUD.Extensions.MarkerEditor.prototype.intersectToWorld = function (intersect) {
+//
+    //var inverseScaleMatrix = this.getInverseSceneMatrix();
+    //
+    //// 计算位置
+    //var worldPosition = intersect.point.clone();
+    //worldPosition.applyMatrix4(inverseScaleMatrix);
+    //intersect.worldPosition = worldPosition;
+    //
+    //// 计算包围盒
+    //var bBox = intersect.object.boundingBox;
+    //var boundingBox = new THREE.Box3();
+    //
+    //if (intersect.object.geometry instanceof THREE.BoxGeometry) {
+    //
+    //    //intersect.object.geometry.computeBoundingBox();
+    //    //bBox = intersect.object.geometry.boundingBox;
+    //    //bBox.applyMatrix4(intersect.object.matrixWorld);
+    //    //bBox.applyMatrix4( inverseScaleMatrix);
+    //
+    //    if (bBox) {
+    //
+    //        boundingBox = bBox.clone();
+    //
+    //        var objPosition = new THREE.Vector3();
+    //        var objQuaternion = new THREE.Quaternion();
+    //        var objScale = new THREE.Vector3();
+    //        var objMatrix = intersect.object.matrix;
+    //        objMatrix.decompose( objPosition, objQuaternion, objScale );
+    //
+    //        // 计算包围盒
+    //        var invScale = new THREE.Vector3(1 /objScale.x, 1 / objScale.y, 1 / objScale.z );
+    //        boundingBox.min.multiply(invScale);
+    //        boundingBox.max.multiply(invScale);
+    //
+    //    } else {
+    //        intersect.object.geometry.computeBoundingBox();
+    //        boundingBox = intersect.object.geometry.boundingBox;
+    //    }
+    //
+    //    boundingBox.applyMatrix4(intersect.object.matrixWorld);
+    //    boundingBox.applyMatrix4( inverseScaleMatrix);
+    //
+    //} else {
+    //
+    //    if (!bBox) {
+    //        intersect.object.geometry.computeBoundingBox();
+    //        bBox = intersect.object.geometry.boundingBox;
+    //    }
+    //
+    //    boundingBox = bBox.clone();
+    //
+    //    var matList = [];
+    //    var parent = intersect.object.parent;
+    //
+    //    while (parent) {
+    //
+    //        if ( (parent instanceof CLOUD.SubScene) || (parent instanceof CLOUD.Cell)) {
+    //            break;
+    //        }
+    //
+    //        matList.push(parent.matrix);
+    //
+    //        parent = parent.parent;
+    //    }
+    //
+    //    var matTmp = new THREE.Matrix4();
+    //
+    //    if (matList.length > 0) {
+    //
+    //        matTmp = matList[matList.length - 1];
+    //
+    //        for ( var i = matList.length - 2; i >= 0; --i) {
+    //            matTmp.multiply( matList[i] );
+    //        }
+    //    }
+    //
+    //    var objMatrixWorld = new THREE.Matrix4();
+    //    objMatrixWorld.multiplyMatrices( matTmp, intersect.object.matrix );
+    //
+    //    boundingBox.applyMatrix4(objMatrixWorld);
+    //}
+    //
+    //intersect.worldBoundingBox = boundingBox;
+//};
+
 // 加载
 CLOUD.Extensions.MarkerEditor.prototype.loadMarkersFromIntersect = function (intersect, shapeType, state) {
 
@@ -6565,85 +6652,8 @@ CLOUD.Extensions.MarkerEditor.prototype.loadMarkersFromIntersect = function (int
 
     var id = intersect.userId;
     var userId = intersect.userId;
-    var inverseScaleMatrix = this.getInverseSceneMatrix();
-
-    // 计算位置
-    var position = intersect.point.clone();
-    position.applyMatrix4(inverseScaleMatrix);
-
-    // 计算包围盒
-    var bBox = intersect.object.boundingBox;
-    var boundingBox = new THREE.Box3();
-
-    if (intersect.object.geometry instanceof THREE.BoxGeometry) {
-
-        //intersect.object.geometry.computeBoundingBox();
-        //bBox = intersect.object.geometry.boundingBox;
-        //bBox.applyMatrix4(intersect.object.matrixWorld);
-        //bBox.applyMatrix4( inverseScaleMatrix);
-
-        if (bBox) {
-
-            boundingBox = bBox.clone();
-
-            var objPosition = new THREE.Vector3();
-            var objQuaternion = new THREE.Quaternion();
-            var objScale = new THREE.Vector3();
-            var objMatrix = intersect.object.matrix;
-            objMatrix.decompose( objPosition, objQuaternion, objScale );
-
-            // 计算包围盒
-            var invScale = new THREE.Vector3(1 /objScale.x, 1 / objScale.y, 1 / objScale.z );
-            boundingBox.min.multiply(invScale);
-            boundingBox.max.multiply(invScale);
-
-        } else {
-            intersect.object.geometry.computeBoundingBox();
-            boundingBox = intersect.object.geometry.boundingBox;
-        }
-
-        boundingBox.applyMatrix4(intersect.object.matrixWorld);
-        boundingBox.applyMatrix4( inverseScaleMatrix);
-
-    } else {
-
-        if (!bBox) {
-            intersect.object.geometry.computeBoundingBox();
-            bBox = intersect.object.geometry.boundingBox;
-        }
-
-        boundingBox = bBox.clone();
-
-        var matList = [];
-        var parent = intersect.object.parent;
-
-        while (parent) {
-
-            if ( (parent instanceof CLOUD.SubScene) || (parent instanceof CLOUD.Cell)) {
-                break;
-            }
-
-            matList.push(parent.matrix);
-
-            parent = parent.parent;
-        }
-
-        var matTmp = new THREE.Matrix4();
-
-        if (matList.length > 0) {
-
-            matTmp = matList[matList.length - 1];
-
-            for ( var i = matList.length - 2; i >= 0; --i) {
-                matTmp.multiply( matList[i] );
-            }
-        }
-
-        var objMatrixWorld = new THREE.Matrix4();
-        objMatrixWorld.multiplyMatrices( matTmp, intersect.object.matrix );
-
-        boundingBox.applyMatrix4(objMatrixWorld);
-    }
+    var position = intersect.worldPosition || intersect.object.point;
+    var boundingBox = intersect.worldBoundingBox || intersect.object.boundingBox;
 
     this.setMarkerState(state);
 
