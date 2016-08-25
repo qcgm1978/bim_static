@@ -278,18 +278,21 @@ var AppRoute = Backbone.Router.extend({
 		App.Comm.delCookie("token_cookie_me");
 
 		var user = localStorage.getItem("user");
-		//别的系统重新登录过，刷新用户
-		if (user.userId !=App.Comm.getCookie("userId")) {
-			App.Comm.getUserInfo();
-			user = localStorage.getItem("user");
-		}
 
-		if (user != "undefined") {
+
+		if (user) {
 			//用户信息
 			App.Global.User = JSON.parse(user);
 		} else {
 			return;
 		}
+
+		//别的系统重新登录过，刷新用户
+		if (user.userId !=App.Comm.getCookie("userId")) {
+			App.Comm.getUserInfo();
+			user = localStorage.getItem("user");
+		}
+ 
 
 
 		$("#pageLoading").show();
