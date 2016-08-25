@@ -482,12 +482,9 @@ var AppKeyRoute = Backbone.Router.extend({
 		})
 	},
 
-	logout() {
+	logout() { 
 
-		//ie
-		if (navigator.userAgent.indexOf("QtWebEngine/5.7.0") > -1) {
-			window.location.href = '/static/dist/app/oPage/download/IEH5Agent.exe?commType=loginOut';
-		}
+		App.Comm.dispatchIE('/?commType=loginOut'); 
 		App.Comm.delCookie('AuthUser_AuthNum');
 		App.Comm.delCookie('AuthUser_AuthMAC');
 		App.Comm.delCookie('OUTSSO_AuthToken');
@@ -495,12 +492,9 @@ var AppKeyRoute = Backbone.Router.extend({
 		App.Comm.delCookie('token_cookie');
 		App.Comm.delCookie('token_cookie_me');
 		App.Comm.delCookie('OUTSSO_AuthMAC');
-		App.Comm.delCookie('IS_OWNER_LOGIN');
+		App.Comm.delCookie('IS_OWNER_LOGIN');  
+		window.location.href = "/login.html";
 
-		var timer = setTimeout(function() {
-			clearTimeout(timer);
-			window.location.href = "/login.html";
-		}, 1000);
 	}
 
 

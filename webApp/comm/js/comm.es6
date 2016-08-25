@@ -4,7 +4,7 @@ App.Comm = {
 		v: 20160313,
 		loginType: "user", // 登录状态 user token
 		pageItemCount: 15 //Math.floor(($("body").height() + 60) / 70) > 10 && Math.floor(($("body").height() + 60) / 70) || 10
-	}, 
+	},
 
 	//批注类型  0: 模型；1：rvt单文件；2：dwg图纸文件
 	hostType: {
@@ -141,7 +141,15 @@ App.Comm = {
 	},
 
 	//格式化 状态
-	formatStatus: function(status, type) {
+	formatStatus: function(status, type,createId) {
+
+		if (status==3 || status==10) {
+			if (App.Global.User.userId==createId) {
+				return '待审核';
+			}else{
+				return '锁定';
+			}
+		}
 
 		if (type == 1) {
 			return App.Comm.versionStatus[status] || '';
@@ -275,10 +283,10 @@ App.Comm = {
 		document.cookie = name + "=" + value + ";expires=" + exp.toGMTString() + ";domain=" + App.Comm.doMain + ";path=/";
 	},
 	//获取cookie
-	getCookie: function(key,cookis) { 
+	getCookie: function(key, cookis) {
 
-		var cooks = cookis || document.cookie, 
-			items = cooks.split("; "), 
+		var cooks = cookis || document.cookie,
+			items = cooks.split("; "),
 			result,
 			len = items.length,
 			str, pos;
@@ -288,15 +296,15 @@ App.Comm = {
 			str = items[i];
 			pos = str.indexOf('=');
 
-			name=str.substring(0,pos);
+			name = str.substring(0, pos);
 
 			if (name == key) {
-				result = str.substring(pos+1);
+				result = str.substring(pos + 1);
 				break;
 			}
-		} 
-		return result;  
-	 
+		}
+		return result;
+
 	},
 	//删除cookie
 	delCookie: function(name) {
@@ -308,14 +316,14 @@ App.Comm = {
 	},
 
 	clearCookie() {
-		var keys =this.cookieNames(document.cookie); //  document.cookie.match(/[^ =;]+(?=\=)/g);
+		var keys = this.cookieNames(document.cookie); //  document.cookie.match(/[^ =;]+(?=\=)/g);
 		if (keys) {
 			for (var i = keys.length; i--;)
 				document.cookie = keys[i] + "=0;expires=" + new Date(0).toUTCString() + ";domain=" + App.Comm.doMain + ";path=/";
 		}
 	},
 
-		//cookie名称
+	//cookie名称
 	cookieNames: function(cookies) {
 
 		var items = cookies.split("; ");
@@ -324,7 +332,7 @@ App.Comm = {
 			len = items.length,
 			str, pos;
 
-		for (var i = 0;i < len; i++) {
+		for (var i = 0; i < len; i++) {
 			str = items[i];
 			pos = str.indexOf('=');
 			names.push(str.substring(0, pos));
@@ -338,7 +346,7 @@ App.Comm = {
 
 		var exp = new Date(),
 
-			keys =  this.cookieNames(document.cookie);   
+			keys = this.cookieNames(document.cookie);
 
 		exp.setTime(exp.getTime() + min * 60 * 1000);
 
@@ -346,10 +354,9 @@ App.Comm = {
 			for (var i = keys.length; i--;)
 				document.cookie = keys[i] + "=" + this.getCookie(keys[i]) + ";expires=" + exp.toGMTString() + ";domain=" + App.Comm.doMain + ";path=/";
 		}
-		//ie
-		if (navigator.userAgent.indexOf("QtWebEngine/5.7.0")>-1) {
-			window.location.href = '/static/dist/app/oPage/download/IEH5Agent.exe?commType=setCookieTime'; 
-		}
+
+		App.Comm.dispatchIE('?commType=setCookieTime'); 
+		 
 	},
 
 	//格式化 文件大小
@@ -649,6 +656,21 @@ App.Comm = {
 			cookie: document.cookie,
 			user: localStorage.getItem("user")
 		});
+	},
+	//发布ie的消息
+	dispatchIE(url, callback) {
+
+		if (navigator.userAgent.indexOf("QtWebEngine/5.7.0") > -1) {
+			if (url) {
+				window.open(url);
+			}
+
+			if ($.isFunction(callback)) {
+				callback();
+			}
+
+		}
+
 	}
 
 };

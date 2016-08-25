@@ -156,7 +156,7 @@ App.Project.Share = {
 					}
 				}
 
-				localStorage.setItem("keys", keys.join(','));
+				//localStorage.setItem("keys", keys.join(','));
 
 				App.Comm.delCookie("token_cookie");
 				//获取用户信息
@@ -187,6 +187,9 @@ App.Project.Share = {
 				$el.find(".btnLogin").val("立即登录").data("islogin", false);
 				return;
 			}
+
+			App.Comm.dispatchIE('/?commType=loginIn');
+
 			localStorage.setItem("user", JSON.stringify(data.data));
 			App.Comm.setCookie('userId', data.data.userId);
 			App.Comm.setCookie('isOuter', data.data.outer);

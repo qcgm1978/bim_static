@@ -37,6 +37,7 @@ var AppRoute = Backbone.Router.extend({
 		App.BodyContent.control.init();
 	},
 
+
 	logout: function() {
 
 		//清除cookie
@@ -47,14 +48,9 @@ var AppRoute = Backbone.Router.extend({
 		localStorage.removeItem("user");
 
 		//ie
-		if (navigator.userAgent.indexOf("QtWebEngine/5.7.0") > -1) {
-			window.location.href = '/static/dist/app/oPage/download/IEH5Agent.exe?commType=loginOut';
-		} 
-		
-		var timer = setTimeout(function() {
-			clearTimeout(timer);
-			window.location.href = "/login.html";
-		}, 1000);
+		App.Comm.dispatchIE('/?commType=loginOut'); 
+
+		window.location.href = "/login.html";
 
 	},
 	//待办
