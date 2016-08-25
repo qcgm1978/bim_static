@@ -37,7 +37,9 @@ var AppRoute = Backbone.Router.extend({
 		App.BodyContent.control.init();
 	},
 
+
 	logout: function() {
+
 		//清除cookie
 		App.Comm.clearCookie();
 
@@ -45,7 +47,11 @@ var AppRoute = Backbone.Router.extend({
 
 		localStorage.removeItem("user");
 
+		//ie
+		App.Comm.dispatchIE('/?commType=loginOut'); 
+
 		window.location.href = "/login.html";
+
 	},
 	//待办
 	todo: function() {
@@ -272,11 +278,16 @@ var AppRoute = Backbone.Router.extend({
 		App.Comm.delCookie("token_cookie_me");
 
 		var user = localStorage.getItem("user");
+		//别的系统重新登录过，刷新用户
+		if (user.userId !=App.Comm.getCookie("userId")) {
+			App.Comm.getUserInfo();
+			user = localStorage.getItem("user");
+		}
 
-		if (user!="undefined") {
+		if (user != "undefined") {
 			//用户信息
 			App.Global.User = JSON.parse(user);
-		}else{
+		} else {
 			return;
 		}
 

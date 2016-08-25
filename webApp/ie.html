@@ -29,15 +29,15 @@
 
         var myWebView = document.createElement("object"),
             currentVersion = 4,
-            isLoad = false;
+            isCheckLogin = false,
+            viewport = document.body,
+            cookUrl = getCookie("path");
 
         myWebView.classid = "CLSID:15A5F85D-A81B-45D1-A03A-6DBC69C891D1";
 
-        var viewport = document.body,
-            cookUrl = getCookie("path");
         viewport.appendChild(myWebView);
 
-        if (myWebView.pluginVersion != currentVersion) {
+        if (myWebView.pluginVersion < currentVersion) {
 
             if (confirm("发现新版本，是否更新？")) {
                 throw new error("version is old");
@@ -49,15 +49,21 @@
             window.location.href.substring(window.location.href.lastIndexOf("path") + 5) ||
             window.location.host + "/#projects";
 
+
+        //外部没有cokkie 登出
+        if (!getCookie("OUTSSO_AuthToken")) {
+            url = location.origin + "/login.html";
+            isCheckLogin = true;
+        }
+
         myWebView.url = url;
+
         myWebView.id = "webView";
+
         myWebView.registerEvent('newWindow', navigateTo);
 
         myWebView.registerEvent('urlChanged', function(url) {
 
-            // if (!isLoad) {
-            //     return;
-            // }
 
             if (myWebView.url == "about:blank") {
                 window.opener = null;
@@ -65,54 +71,10 @@
                 window.close();
             }
 
-
-            //登录后设置 cookie
-            myWebView.runScript("App.Comm.getCookAndStore()", function(cookStore) {
-
-                if (!cookStore) {
-                    return;
-                }
-
-                cookStore = JSON.parse(cookStore);
-
-                var cookies = cookStore.cookie,
-                    user = cookStore.user;
-                //比较cookie
-                if (getCookie("OUTSSO_AuthToken") != getCookie("OUTSSO_AuthToken", cookies)) {
-                    //登录设置 登出删除
-                    var keys =  cookieNames(cookies);//  cookies.match(/[^ =;]+(?=\=)/g);
-
-                    if (keys.length > 4) {
-                        var key, value;
-                        for (var i = 0; i < keys.length; i++) {
-                            key = keys[i];
-                            value = getCookie(keys[i], cookies);
-                            value && setCookie(key, value);
-                        }
-
-                        localStorage.user = user;
-
-                    } else {
-                        keys = cookieNames(document.cookie); // .match(/[^ =;]+(?=\=)/g);
-                        for (var i = 0; i < keys.length; i++) {
-                            delCookie(keys[i]);
-                        }
-                        localStorage.removeItem("user");
-                    }
-                }
-
-            });
         });
 
         //文件下载
         myWebView.registerEvent('download', function(url) {
-
-            // var pos=url.indexOf("commType");
-            // if (pos>-1) {
-            //     var commType=url.substring(pos+9);
-            //     //alert(commType);
-            //     return;
-            // }
 
             //未登录 没有token_cookie
             if (getCookie("token_cookie") == null && (getCookie("OUTSSO_AuthToken") == null || getCookie("OUTSSO_AuthToken") == "null")) {
@@ -135,37 +97,53 @@
 
         });
 
-        if (url.indexOf("login.html") > -1) {
 
-            // var timer=setTimeout(function(){
-            //     clearTimeout(timer);
-            //     myWebView.runScript('Login.checkLoginBefore("' + document.cookie + '")', function(cookie) {
-            //         myWebView.runScript('Login.checkLogin()', function(isLogin) {
-            //             //var a;
-            //         });
-            //     });
-            // },1000)
+        if (url.indexOf("login.html") > -1 && !isCheckLogin) {
 
-            myWebView.registerEvent('loadFinished', function(isReady) {
-
-                myWebView.runScript('Login.checkLoginBefore("' + document.cookie + '")', function(cookie) {
-
-                    isLoad = true;
-
-                    myWebView.runScript('Login.checkLogin()', function(isLogin) {
-
-                        //var a;
-                    });
-                });
-            });
+            //两秒后 还为false 就认为 没触发check
+            var timer = setTimeout(function() {
+                clearTimeout(timer);
+                if (!isCheckLogin) {
+                    isCheckLogin = true;
+                    checkLogin();
+                }
+            }, 2000);
 
         }
+
+        myWebView.registerEvent('loadFinished', function(isReady) {
+
+            if (url.indexOf("login.html") > -1 && !isCheckLogin) {
+
+                if (!isReady) {
+                    return;
+                }
+
+                if (!isCheckLogin) {
+                    isCheckLogin = true;
+                    checkLogin();
+                }
+            }
+
+            if (url.indexOf("login.html") <= -1) {
+                myWebView.runScript('App.Comm.checkCookie("' + document.cookie + '")', function(cookie) {
+
+                });
+            } 
+
+        });
+
+
+
+
 
         window.onresize = resizeWebView;
 
         delCookie("path");
 
         resizeWebView();
+
+
 
     } catch (e) {
         if (myWebView.pluginVersion != currentVersion) {
@@ -179,6 +157,102 @@
             $("body").html(html);
         }
     }
+
+    //检查登录
+    function checkLogin() {
+
+        myWebView.runScript('Login.checkLoginBefore("' + document.cookie + '")', function(cookie) {
+            myWebView.runScript('Login.checkLogin()', function(isLogin) {});
+        });
+    }
+
+    //解析url
+    function GetRequest(url) {
+
+        var theRequest = new Object(),
+
+            pos = url.indexOf("?");
+
+        if (pos != -1) {
+            var str = url.substr(pos + 1);
+            strs = str.split("&");
+            for (var i = 0; i < strs.length; i++) {
+                theRequest[strs[i].split("=")[0]] = unescape(strs[i].split("=")[1]);
+            }
+        }
+        return theRequest;
+    }
+
+    //登录
+    function commTypeExec(url) {
+
+        var Request = GetRequest(url);
+
+        if (Request.commType == "loginIn") {
+            //登录后设置ie的cookie
+            loginInSetCookieToIE();
+        } else if (Request.commType == "loginOut") {
+            cleanCookie();
+        } else if (Request.commType == "setCookieTime") {
+            //延时cookie
+            setCookieTime(120);
+        }
+    }
+
+    //登录后设置ie的cookie
+    function loginInSetCookieToIE() {
+
+        myWebView.runScript("App.Comm.getCookAndStore()", function(cookStore) {
+
+            if (!cookStore) {
+                return;
+            }
+
+            cookStore = JSON.parse(cookStore);
+
+            var cookies = cookStore.cookie,
+                user = cookStore.user,
+                keys = cookieNames(cookies);
+
+            var key, value;
+            for (var i = 0; i < keys.length; i++) {
+                key = keys[i];
+                value = getCookie(keys[i], cookies);
+                value && setCookie(key, value);
+            }
+
+            localStorage.user = user;
+
+
+        });
+    }
+
+    //清空cookie
+    function cleanCookie() {
+        var keys = cookieNames(document.cookie);
+        for (var i = 0; i < keys.length; i++) {
+            delCookie(keys[i]);
+        }
+        localStorage.removeItem("user");
+    }
+
+    //设置cookie 时间
+    function setCookieTime(min) {
+
+        var exp = new Date(),
+
+            keys = cookieNames(document.cookie);
+
+        exp.setTime(exp.getTime() + min * 60 * 1000),
+
+            doMain = window.location.host.substring(window.location.host.indexOf("."));
+
+        if (keys) {
+            for (var i = keys.length; i--;)
+                document.cookie = keys[i] + "=" + this.getCookie(keys[i]) + ";expires=" + exp.toGMTString() + ";domain=" + doMain + ";path=/";
+        }
+    }
+
 
 
     function cookieNames(cookies) {
@@ -223,6 +297,13 @@
     }
 
     function navigateTo(url) {
+
+        var pos = url.indexOf("commType");
+        if (pos > -1) {
+            //处理commtype
+            commTypeExec(url);
+            return;
+        }
 
         url = encodeURI(url);
 
@@ -302,6 +383,7 @@
     }
     //删除cookie
     function delCookie(name) {
+
         var exp = new Date();
         exp.setTime(exp.getTime() - 31 * 24 * 60 * 60 * 1000);
         var cval = this.getCookie(name);
