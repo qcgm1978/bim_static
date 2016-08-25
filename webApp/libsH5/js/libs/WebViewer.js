@@ -9189,6 +9189,7 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
     var dollyStart = new THREE.Vector2();
     var dollyEnd = new THREE.Vector2();
     var dollyDelta = new THREE.Vector2();
+    var dollyCenter = new THREE.Vector2();
 
     //var theta;
     //var phi;
@@ -9204,6 +9205,8 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
     var state = STATE.NONE;
 
     var lastTrackingPoint;
+
+    var lastEvent;
 
     this.IsIdle = function () {
         return state === STATE.NONE;
@@ -9579,6 +9582,93 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
 
         }
 
+    }();
+
+    this.touchUpdate = function () {
+
+        return function (forceRender, updateRenderList) {
+            var position = this.object.position;
+            var pivot = this.pivot !== null ? this.pivot : this.target;
+
+            if (state !== STATE.NONE) {
+                this.cameraDirty = true;
+            }
+
+            if (state == STATE.ROTATE) {
+                var eye = this.target.clone().sub(position);
+                var eyeDistance = eye.length();
+
+                var viewVec = position.clone().sub(pivot);
+                var viewLength = viewVec.length();
+                viewVec.normalize();
+                var viewTrf = null;
+                var camDir = this.object.getWorldDirection();
+
+                var rightDir = camDir.clone().cross(this.object.up);
+                if (rightDir.lengthSq() > 0.001) {
+
+                    viewTrf = new THREE.Quaternion().setFromAxisAngle(this.object.up, thetaDelta);
+
+                    var newViewDir = viewVec.clone().applyQuaternion(viewTrf);
+                    newViewDir.normalize();
+
+                    position.copy(pivot).add(newViewDir.multiplyScalar(viewLength));
+
+                    camDir.applyQuaternion(viewTrf);
+                    camDir.normalize();
+
+                    // 保持相机到目标点的距离不变
+                    var newTarget = new THREE.Vector3();
+                    //newTarget.copy(position).add(camDir.multiplyScalar(viewLength));
+                    newTarget.copy(position).add(camDir.multiplyScalar(viewLength));
+
+                    this.target.copy(newTarget);
+                    this.object.realUp.copy(rightDir).cross(camDir);
+                }
+            }
+
+            this.target.add(pan);
+            this.object.position.add(pan);
+
+            // lookAt使用realUp
+            var tmpUp = new THREE.Vector3();
+            tmpUp.copy(this.object.up);
+            this.object.up.copy(this.object.realUp);
+            this.object.lookAt(this.target);
+            this.object.up.copy(tmpUp);
+
+            thetaDelta = 0;
+            phiDelta = 0;
+            scale = 1;
+            pan.set(0, 0, 0);
+
+            if (forceRender) {
+                //console.log("CameraEditor.forceRender");
+                if (updateRenderList !== undefined) {
+                    this.viewer.editorManager.isUpdateRenderList = updateRenderList;
+                }
+
+                onChange();
+
+                this.cameraDirty = false;
+
+                lastPosition.copy(this.object.position);
+                lastQuaternion.copy(this.object.quaternion);
+            }
+            else {
+                if (lastPosition.distanceToSquared(this.object.position) > EPS
+                    || 8 * (1 - lastQuaternion.dot(this.object.quaternion)) > EPS) {
+
+                    //console.log("CameraEditor.render");
+                    onChange();
+
+                    this.cameraDirty = false;
+
+                    lastPosition.copy(this.object.position);
+                    lastQuaternion.copy(this.object.quaternion);
+                }
+            }
+        }
     }();
 
     this.setState = function (val) {
@@ -10178,6 +10268,180 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
         
         failback();
     };
+
+    this.touchStartHandler = function(event) {
+        switch ( event.touches.length ) {
+
+            case 1:	// one-fingered touch: rotate
+                if ( this.noRotate === true ) return;
+                handleTouchStartRotate( event );
+                state = STATE.ROTATE;
+                break;
+
+            case 2:	// two-fingered touch: dolly
+                if ( this.noZoom === true ) return;
+                handleTouchStartDolly( event );
+                handleTouchStartPan( event );
+                state = STATE.DOLLY;
+
+                lastEvent = event;
+
+                break;
+
+            // case 3: // three-fingered touch: pan
+            //     if ( this.noPan === true ) return;
+            //     handleTouchStartPan( event );
+            //     state = STATE.PAN;
+            //     break;
+
+            default:
+                state = STATE.NONE;
+        }
+
+        //this.update();
+    }
+
+    this.touchMoveHandler = function(event) {
+        switch ( event.touches.length ) {
+            case 1: // one-fingered touch: rotate
+                if ( this.noRotate === true ) return;
+                if ( state !== STATE.ROTATE ) return; // is this needed?...
+
+                handleTouchMoveRotate( event );
+                break;
+
+            case 2: // two-fingered touch: dolly
+                if ( this.noZoom === true ) return;
+                if ( state !== STATE.DOLLY ) return; // is this needed?...
+
+                handleTouchMoveDollyOrPan(event);
+                lastEvent = event;
+
+                // handleTouchMoveDolly( event );
+                //
+                // var center = scope.mapWindowToViewport(dollyCenter.x, dollyCenter.y);
+                // var centerPosition = scope.getHitPoint(center.x, center.y);
+                // if (centerPosition != null)
+                //     this.pivot = centerPosition;
+                //
+                // handleTouchMovePan( event );
+                break;
+
+            // case 3: // three-fingered touch: pan
+            //     if ( scope.noPan === true ) return;
+            //     if ( state !== STATE.PAN ) return; // is this needed?...
+            //
+            //     handleTouchMovePan( event );
+            //     break;
+
+            default:
+                state = STATE.NONE;
+        }
+
+        this.touchUpdate();
+    }
+
+    this.touchEndHandler = function(event) {
+        state = STATE.NONE;
+    }
+
+    function handleTouchStartRotate( event ) {
+        //console.log( 'handleTouchStartRotate' );
+        rotateStart.set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY );
+    }
+
+    function handleTouchStartDolly ( event ) {
+        //console.log( 'handleTouchStartDolly' );
+        var dx = event.touches[ 0 ].pageX - event.touches[ 1 ].pageX;
+        var dy = event.touches[ 0 ].pageY - event.touches[ 1 ].pageY;
+
+        var distance = Math.sqrt( dx * dx + dy * dy );
+        dollyStart.set( 0, distance );
+    }
+
+    function handleTouchStartPan ( event ) {
+        //console.log( 'handleTouchStartPan' );
+        //var cx = (event.touches[0].pageX + event.touches[1].pageX + event.touches[2].pageX) / 3;
+        //var cy = (event.touches[0].pageY + event.touches[1].pageY + event.touches[2].pageY) / 3;
+        var cx = (event.touches[0].pageX + event.touches[1].pageX) * 0.5;
+        var cy = (event.touches[0].pageY + event.touches[1].pageY) * 0.5;
+        panStart.set( cx, cy );
+    }
+
+    function handleTouchMoveRotate( event ) {
+        //console.log( 'handleTouchMoveRotate' );
+        rotateEnd.set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY );
+        rotateDelta.subVectors( rotateEnd, rotateStart );
+
+        var element = scope.domElement === document ? scope.domElement.body : scope.domElement;
+
+        thetaDelta -=  2 * Math.PI * rotateDelta.x / element.clientWidth * scope.rotateSpeed;
+        phiDelta -=  2 * Math.PI * rotateDelta.y / element.clientHeight * scope.rotateSpeed;
+
+        rotateStart.copy( rotateEnd );
+
+        scope.pan( 0, rotateDelta.y );
+    }
+
+    function handleTouchMoveDollyOrPan(event) {
+        var touch0DeltaX = lastEvent.touches[0].pageX - event.touches[0].pageX;
+        var touch0DeltaY = lastEvent.touches[0].pageY - event.touches[0].pageY;
+        var touch1DeltaX = lastEvent.touches[1].pageX - event.touches[1].pageX;
+        var touch1DeltaY = lastEvent.touches[1].pageY - event.touches[1].pageY;
+
+        if (touch0DeltaX * touch1DeltaX >= 0 && touch0DeltaY * touch1DeltaY >= 0) {
+            handleTouchMovePan(event);
+        }
+        else {
+            handleTouchMoveDolly(event);
+
+            var center = scope.mapWindowToViewport(dollyCenter.x, dollyCenter.y);
+            var centerPosition = scope.getHitPoint(center.x, center.y);
+            if (centerPosition != null)
+                scope.pivot = centerPosition;
+        }
+    }
+
+    function handleTouchMoveDolly( event ) {
+        //console.log( 'handleTouchMoveDolly' );
+        var dx = event.touches[ 0 ].pageX - event.touches[ 1 ].pageX;
+        var dy = event.touches[ 0 ].pageY - event.touches[ 1 ].pageY;
+
+        var distance = Math.sqrt( dx * dx + dy * dy );
+        dollyEnd.set( 0, distance );
+        dollyDelta.subVectors( dollyEnd, dollyStart );
+
+        scope.zoomSpeed = 0.8;
+
+        if ( dollyDelta.y > 0 ) {
+            scale /=  getZoomScale();
+        }
+        else if ( dollyDelta.y < 0 ) {
+            scale *= getZoomScale();
+        }
+        dollyStart.copy( dollyEnd );
+
+        dollyCenter.x = (event.touches[ 0 ].pageX + event.touches[ 1 ].pageX) * 0.5;
+        dollyCenter.y = (event.touches[ 0 ].pageY + event.touches[ 1 ].pageY) * 0.5;
+
+        scope.dollyByPoint(dollyCenter.x, dollyCenter.y);
+    }
+
+    function handleTouchMovePan( event ) {
+        //console.log( 'handleTouchMovePan' );
+        //var cx = (event.touches[0].pageX + event.touches[1].pageX + event.touches[2].pageX) / 3;
+        //var cy = (event.touches[0].pageY + event.touches[1].pageY + event.touches[2].pageY) / 3;
+        var cx = (event.touches[0].pageX + event.touches[1].pageX) * 0.5;
+        var cy = (event.touches[0].pageY + event.touches[1].pageY) * 0.5;
+        panEnd.set( cx, cy );
+
+        panDelta.subVectors( panEnd, panStart );
+
+        scope.pan( panDelta.x, panDelta.y );
+
+        panStart.copy( panEnd );
+    }
+
 };
 CLOUD.PickHelper = function (scene, cameraEditor, onObjectSelected) {
     "use strict";
@@ -10797,9 +11061,7 @@ CLOUD.OrbitEditor.prototype.touchstart = function (event) {
     var camera_scope = this.cameraEditor;
     if (camera_scope.enabled === false) return;
 
-    CloudTouch.proxy.touchsHandler(camera_scope, event);
-    var input = camera_scope.session.prevInput;
-    camera_scope.processTouch(input);
+    camera_scope.touchStartHandler(event);
 };
 
 CLOUD.OrbitEditor.prototype.touchmove = function (event) {
@@ -10810,21 +11072,16 @@ CLOUD.OrbitEditor.prototype.touchmove = function (event) {
     event.preventDefault();
     event.stopPropagation();
 
-    CloudTouch.proxy.touchsHandler(camera_scope, event);
-    var input = camera_scope.session.prevInput;
-    camera_scope.processTouch(input);
+    camera_scope.touchMoveHandler(event);
 };
 
 CLOUD.OrbitEditor.prototype.touchend = function( /* event */ ) {
     var camera_scope = this.cameraEditor;
     if ( camera_scope.enabled === false ) return;
 
-    CloudTouch.proxy.touchsHandler(camera_scope, event);
-    var input = camera_scope.session.prevInput;
-    camera_scope.processTouch(input);
+    camera_scope.touchEndHandler(event);
 
     //scope.dispatchEvent( endEvent );
-     camera_scope.endOperation();
 };
 CLOUD.PickEditor = function (object, scene, domElement) {
     "use strict";
@@ -16456,9 +16713,12 @@ CLOUD.SceneLoader.prototype = {
             }
         }
 
-        function handle_symbol_instance(parent, objJSON, symbolJSON, userData, localUserId, level, trf, nodeId) {
+        function handle_symbol_instance(parent, objJSON, symbolJSON, userData, localUserId, level, trf, nodeId, overrideMaterialId) {
 
             var object;
+
+            if (overrideMaterialId !== undefined)
+                objJSON.materialId = overrideMaterialId;
 
             if (symbolJSON.nodeType === "GroupNode") {
 
@@ -16467,7 +16727,7 @@ CLOUD.SceneLoader.prototype = {
 
                 //handle_children(parent, symbolJSON.children, level + 1, objJSON.userId, userData, object.matrix);
 
-                handle_children(object, symbolJSON.children, level + 1, localUserId, userData);
+                handle_children(object, symbolJSON.children, level + 1, localUserId, userData, objJSON.materialId);
                 object.userData = userData;
                 parent.add(object);
             }
@@ -16521,7 +16781,7 @@ CLOUD.SceneLoader.prototype = {
                     CLOUD.GeomUtil.parseNodeProperties(object, objJSON, nodeId, trf);
                     object.userData = userData;
 
-                    handle_symbol_instance(object, symbolJSON, symbolSymbolJSON, userData, localUserId, level + 1, null, nodeId);
+                    handle_symbol_instance(object, symbolJSON, symbolSymbolJSON, userData, localUserId, level + 1, null, nodeId, objJSON.materialId);
                     parent.add(object);
                 }
                 else {
@@ -16533,7 +16793,7 @@ CLOUD.SceneLoader.prototype = {
             return object;
         };
        
-        function handle_children(parent, children, level, userId, userData, trf) {
+        function handle_children(parent, children, level, userId, userData, trf, overridedMaterialId) {
 
             for (var nodeId in children) {
 
@@ -16541,7 +16801,10 @@ CLOUD.SceneLoader.prototype = {
 
                 // override userId
                 if (userId !== undefined)
-                    objJSON.userId = userId;                
+                    objJSON.userId = userId;
+
+                if (overridedMaterialId !== undefined)
+                    objJSON.materialId = overridedMaterialId;
 
                 if (objJSON.userData) {
                     userData = objJSON.userData;
@@ -16632,7 +16895,7 @@ CLOUD.SceneLoader.prototype = {
                     //handle_children(parent, objJSON.children, level + 1, localUserId, userData, object.matrix);
 
 
-                    handle_children(object, objJSON.children, level + 1, localUserId, userData);
+                    handle_children(object, objJSON.children, level + 1, localUserId, userData, undefined, objJSON.materialId);
                     object.userData = userData;
                     parent.add(object);
 
@@ -16676,7 +16939,7 @@ CLOUD.SceneLoader.prototype = {
                     var symbolJSON = client.findSymbol(objJSON.symbolId);
                     if (symbolJSON) {
 
-                        object = handle_symbol_instance(parent, objJSON, symbolJSON, userData, localUserId, level + 1, trf, nodeId);
+                        object = handle_symbol_instance(parent, objJSON, symbolJSON, userData, localUserId, level + 1, trf, nodeId, objJSON.materialId);
                     }
 
                 }
@@ -18141,7 +18404,7 @@ CLOUD.EditorManager.prototype = {
 
         var camera = viewer.camera;
         var worldBox = viewer.getScene().worldBoundingBox();
-        var target = camera.setStandardView(CLOUD.EnumStandardView.Top, worldBox); // 设置观察视图
+        var target = camera.setStandardView(CLOUD.EnumStandardView.ISO, worldBox); // 设置观察视图
 
         if (box) {
             // fit all
@@ -18175,13 +18438,9 @@ CloudViewer = function () {
     this.updateRenderListEnabled = true; // 是否启用渲染队列更新
 
     this.modelManager = new CLOUD.ModelManager();
-
     this.extensionHelper = new CLOUD.Extensions.Helper2D(this);
 
     this.viewHouse = null;
-
-    this.miniMaps = {};
-    this.defaultMiniMap = null;
 
     this.tmpBox = new THREE.Box3();
     var scope = this;
@@ -18286,7 +18545,7 @@ CloudViewer.prototype = {
             this.requestRenderCount = 0;
         //console.log(this.requestRenderCount);
         if (this.rendering) {
-            
+
             return;
         }
 
@@ -18308,11 +18567,11 @@ CloudViewer.prototype = {
 
         // 启用渲染队列更新
         if (scope.updateRenderListEnabled//&& !scope.editorManager.isFlyMode()
-            ) {
+        ) {
             // 设置更新状态
             scope.renderer.setObjectListUpdateState(scope.editorManager.isUpdateRenderList);
             if (scope.editorManager.isUpdateRenderList) {
-               
+
                 if (CLOUD.GlobalData.ByTargetDistance)
                     ignoreLoad = false;
                 //console.time("prepare");
@@ -18334,7 +18593,7 @@ CloudViewer.prototype = {
         scope.renderer.setFilterObject(scene.filter);
 
         function incrementRender(callId, autoClear) {
-           
+
             var renderId = callId;
 
             return function () {
@@ -18347,23 +18606,23 @@ CloudViewer.prototype = {
                 //console.timeEnd("Render" + renderId);
 
                 if (!isRenderFinish && renderId == scope.requestRenderCount) {
-                   
+
                     //console.log("  :" + renderId);
                     requestAnimationFrame(incrementRender(renderId, false));
                 }
                 else {
-   
+
                     scope.rendering = false;
-                    
+
                     if (renderId != scope.requestRenderCount) {
-                         scope.render(true);
+                        scope.render(true);
                     }
                     else {
                         //console.time("gc" + renderId);
                         //scope.modelManager.collectionGarbage();
                         //console.timeEnd("gc" + renderId);
                     }
-                        
+
                 }
             }
         }
@@ -18372,7 +18631,7 @@ CloudViewer.prototype = {
         if (scope.incrementRenderEnabled && scope.renderer.IncrementRender) {
 
             requestAnimationFrame(incrementRender(scope.requestRenderCount, true));
-            
+
         } else { // 正常绘制
 
             scope.renderer.autoClear = true;
@@ -18380,7 +18639,7 @@ CloudViewer.prototype = {
             scope.rendering = false;
         }
 
-        this.renderViewHouse();
+        //this.renderViewHouse();
 
         // 刷新扩展绘制
         this.renderExtensions();
@@ -18459,7 +18718,7 @@ CloudViewer.prototype = {
     // 主场景面板鼠标运动状态
     // 主场景面板的mouse move 和 mouse up 注册在 window 上，
     // 当鼠标从主场景移动到其他元素上时，不响应其他元素的事件
-    isMouseMoving:function(){
+    isMouseMoving: function () {
 
         return this.editorManager.isMouseMoving();
     },
@@ -18484,7 +18743,7 @@ CloudViewer.prototype = {
         var viewportWidth = domElement.offsetWidth;
         var viewportHeight = domElement.offsetHeight;
 
-        var settings = { alpha: true, preserveDrawingBuffer: true, antialias:true };
+        var settings = {alpha: true, preserveDrawingBuffer: true, antialias: true};
         //if (!CLOUD.GlobalData.disableAntialias)
         //    settings.antialias = true;
         try {
@@ -18509,8 +18768,8 @@ CloudViewer.prototype = {
         // Added by xmh begin 允许获得焦点，
         // 将键盘事件注册到父容器（之前注册到window上会存在各种联动问题），鼠标点击父容器，激活canvas
         //renderer.domElement.tabIndex = 0;
-        renderer.domElement.setAttribute('tabindex','0');
-        renderer.domElement.setAttribute('id','cloud-main-canvas');
+        renderer.domElement.setAttribute('tabindex', '0');
+        renderer.domElement.setAttribute('id', 'cloud-main-canvas');
         // Added by xmh end
 
         domElement.appendChild(renderer.domElement);
@@ -18540,18 +18799,19 @@ CloudViewer.prototype = {
 
         this.modelManager.onUpdateViewer = function () {
             scope.render(true);
-        }
+        };
+
         //this.editorManager.registerDomEventListeners(canvas);
         return true;
     },
 
-    registerDomEventListeners : function() {
+    registerDomEventListeners: function () {
         if (this.domElement) {
             this.editorManager.registerDomEventListeners(this.domElement);
         }
     },
 
-    unregisterDomEventListeners : function() {
+    unregisterDomEventListeners: function () {
         if (this.domElement) {
             this.editorManager.unregisterDomEventListeners(this.domElement);
         }
@@ -18583,10 +18843,10 @@ CloudViewer.prototype = {
             CLOUD.GlobalData.ShowCellBox = false;
         }
 
-        return scope.modelManager.load({databagId: databagId, serverUrl: serverUrl, debug: debug, byBox:byBox});
+        return scope.modelManager.load({databagId: databagId, serverUrl: serverUrl, debug: debug, byBox: byBox});
     },
 
-    loadOutside: function(){
+    loadOutside: function () {
 
         this.modelManager.loadBuidingOutside(this.camera);
     },
@@ -18635,8 +18895,8 @@ CloudViewer.prototype = {
         this.editorManager.setFlyMode(bShowControlPanel, this);
     },
 
-    resizeFlyCross: function() {
-        if ( this.editorManager && this.editorManager.editor === this.editorManager.flyEditor) {
+    resizeFlyCross: function () {
+        if (this.editorManager && this.editorManager.editor === this.editorManager.flyEditor) {
             this.editorManager.flyEditor.resize();
         }
     },
@@ -18670,7 +18930,7 @@ CloudViewer.prototype = {
     },
 
     zoomToSelection: function (margin, ratio) {
-        
+
         var box = this.renderer.computeSelectionBBox();
         if (box == null || box.empty()) {
             box = this.getScene().worldBoundingBox();
@@ -18693,7 +18953,7 @@ CloudViewer.prototype = {
         else {
             box.applyMatrix4(this.getScene().rootNode.matrix);
         }
-       
+
         var target = this.camera.zoomToBBox(box, margin, ratio);
         this.cameraEditor.updateCamera(target, true);
 
@@ -18832,7 +19092,7 @@ CloudViewer.prototype = {
         var totalVisibleCount = 0;
 
         var totalCount = 0;
-        if(len > 0){
+        if (len > 0) {
             var clients = this.modelManager.clients;
             for (var name in clients) {
                 var nodeCounter = clients[name].index.sceneNodeCounter;
@@ -18881,7 +19141,7 @@ CloudViewer.prototype = {
     },
 
     // 扩展功能的 render
-    renderExtensions: function() {
+    renderExtensions: function () {
 
         // 刷新小地图
         this.renderMiniMap();
@@ -18892,7 +19152,7 @@ CloudViewer.prototype = {
     },
 
     // 扩展功能的 resize
-    resizeExtensions: function(width, height, isMobile) {
+    resizeExtensions: function (width, height, isMobile) {
 
         this.resizeViewHouse(width, height, isMobile);
 
@@ -18903,7 +19163,7 @@ CloudViewer.prototype = {
 
     // ------------------ ViewHouse API -- S ------------------ //
     // 外部初始化，由外部决定需不需要 ViewHouse 功能
-    initViewHouse: function(domElement) {
+    initViewHouse: function (domElement) {
 
         if (!this.viewHouse) {
             this.viewHouse = new CLOUD.ViewHouse(this);
@@ -18920,7 +19180,7 @@ CloudViewer.prototype = {
     },
 
     // 设置 ViewHouse 可见性
-    setViewHouseVisibility: function(visible) {
+    setViewHouseVisibility: function (visible) {
 
         if (this.viewHouse) {
             this.viewHouse.visible = visible;
@@ -18928,7 +19188,7 @@ CloudViewer.prototype = {
     },
 
     // 绘制 ViewHouse
-    renderViewHouse: function(){
+    renderViewHouse: function () {
 
         if (this.viewHouse) {
             this.viewHouse.render();
@@ -18936,7 +19196,7 @@ CloudViewer.prototype = {
     },
 
     // 重设置viewhouse大小
-    resizeViewHouse: function(width, height, isMobile) {
+    resizeViewHouse: function (width, height, isMobile) {
 
         if (this.viewHouse) {
             this.viewHouse.resize(width, height, isMobile);
@@ -18945,150 +19205,76 @@ CloudViewer.prototype = {
     // ------------------ ViewHouse API -- E ------------------ //
 
     // ------------------ 小地图API -- S ------------------ //
-    createMiniMap:function(name, domElement, width, height, styleOptions, callbackCameraChanged, callbackClickOnAxisGrid){
+    createMiniMap: function (name, domElement, width, height, styleOptions, callbackCameraChanged, callbackClickOnAxisGrid) {
 
-        var miniMap = this.miniMaps[name];
-
-        if (!miniMap) {
-            miniMap = this.miniMaps[name] = new CLOUD.MiniMap(this);
-            miniMap.setCameraChangedCallback(callbackCameraChanged);
-            miniMap.setClickOnAxisGridCallback(callbackClickOnAxisGrid);
-        }
-
-        domElement = domElement || this.domElement;
-
-        if (domElement) {
-            // 初始化小地图
-            miniMap.init(domElement, width, height, styleOptions);
-        }
-
-        if (!this.defaultMiniMap) {
-            this.defaultMiniMap = this.miniMaps[name];
-        }
-
-        //return this.miniMaps[name];
+        this.extensionHelper.createMiniMap(name, domElement, width, height, styleOptions, callbackCameraChanged, callbackClickOnAxisGrid);
     },
 
-    destroyMiniMap:function(name){
+    destroyMiniMap: function (name) {
 
-        var miniMap = this.miniMaps[name];
-
-        if (miniMap) {
-
-            miniMap.uninit();
-
-            if (this.defaultMiniMap === miniMap) {
-                this.defaultMiniMap = null;
-            }
-
-            delete this.miniMaps[name];
-        }
+        this.extensionHelper.destroyMiniMap(name);
     },
 
     removeMiniMap: function (name) {
 
-        var miniMap = this.miniMaps[name];
-
-        if (miniMap) {
-            miniMap.remove();
-
-            //delete this.miniMaps[name];
-        }
+        this.extensionHelper.removeMiniMap(name);
     },
 
     appendMiniMap: function (name) {
 
-        var miniMap = this.miniMaps[name];
-
-        if (miniMap) {
-            miniMap.append();
-        }
+        this.extensionHelper.appendMiniMap(name);
     },
 
-    getMiniMap: function(name) {
+    getMiniMap: function (name) {
 
-        return this.miniMaps[name];
+        return this.extensionHelper.getMiniMap(name);
     },
 
     // 绘制小地图
-    renderMiniMap: function(){
+    renderMiniMap: function () {
 
-        for (var name in this.miniMaps) {
-            var miniMap = this.miniMaps[name];
-
-            if (miniMap) {
-                miniMap.render();
-            }
-        }
+        this.extensionHelper.renderMiniMap();
     },
 
     // 设置平面图
-    setFloorPlaneData: function(jsonObj) {
+    setFloorPlaneData: function (jsonObj) {
 
-        CLOUD.MiniMap.setFloorPlaneData(jsonObj);
+        this.extensionHelper.setFloorPlaneData(jsonObj);
     },
 
-    generateFloorPlane: function(name, changeView) {
-        var miniMap = this.miniMaps[name];
-
-        if (miniMap) {
-            miniMap.generateFloorPlane(changeView);
-        }
+    generateFloorPlane: function (name, changeView) {
+        this.extensionHelper.generateFloorPlane(name, changeView);
     },
 
     // 设置轴网数据
-    setAxisGridData:function(jsonObj, level) {
+    setAxisGridData: function (jsonObj, level) {
 
-        CLOUD.MiniMap.setAxisGridData(jsonObj);
+        this.extensionHelper.setAxisGridData(jsonObj, level);
     },
 
-    generateAxisGrid: function(name) {
-        var miniMap = this.miniMaps[name];
-
-        if (miniMap) {
-            miniMap.generateAxisGrid();
-        }
+    generateAxisGrid: function (name) {
+        this.extensionHelper.generateAxisGrid(name);
     },
 
     // 是否显示隐藏轴网
-    showAxisGrid:function(name, show) {
+    showAxisGrid: function (name, show) {
 
-        var miniMap = this.miniMaps[name];
-
-        if (miniMap) {
-            if (show) {
-                miniMap.showAxisGird();
-            } else {
-                miniMap.hideAxisGird();
-            }
-        }
+        this.extensionHelper.showAxisGrid(name, show);
     },
 
-    enableAxisGridEvent: function(name, enable){
+    enableAxisGridEvent: function (name, enable) {
 
-        var miniMap = this.miniMaps[name];
-
-        if (miniMap) {
-            miniMap.enableMouseEvent(enable);
-        }
+        this.extensionHelper.enableAxisGridEvent(name, enable);
     },
 
-    enableMiniMapCameraNode:function(name, enable){
+    enableMiniMapCameraNode: function (name, enable) {
 
-        var miniMap = this.miniMaps[name];
-
-        if (miniMap) {
-            miniMap.enableCameraNode(enable);
-        }
+        this.extensionHelper.enableMiniMapCameraNode(name, enable);
     },
 
-    flyBypAxisGridNumber:function(name, abcName, numeralName){
+    flyBypAxisGridNumber: function (name, abcName, numeralName) {
 
-        var miniMap = this.miniMaps[name];
-
-        if (miniMap) {
-            miniMap.flyByAxisGridNumber(abcName, numeralName);
-        }
+        this.extensionHelper.flyBypAxisGridNumber(name, abcName, numeralName);
     },
 
     // ------------------ 小地图API -- E ------------------ //
@@ -19104,46 +19290,46 @@ CloudViewer.prototype = {
         this.extensionHelper.uninitMarkerEditor();
     },
 
-    // zoom到合适的大小
-    zoomToSelectedMarkers: function(){
-        this.extensionHelper.zoomToSelectedMarkers();
+    // 开始编辑，已废弃
+    editMarkerBegin: function () {
+
     },
 
-    // 开始编辑
-    editMarkerBegin: function() {
-        this.extensionHelper.editMarkerBegin();
+    // 结束编辑，已废弃
+    editMarkerEnd: function () {
+
     },
 
-    // 结束编辑
-    editMarkerEnd: function() {
-        this.extensionHelper.editMarkerEnd();
-    },
+    // 设置标记状态，已废弃
+    setMarkerState: function (state) {
 
-    // 设置标记状态
-    setMarkerState: function(state) {
-        this.extensionHelper.setMarkerState(state);
     },
 
     // 加载标记
-    loadMarkers: function(markerInfoList) {
+    loadMarkers: function (markerInfoList) {
         this.extensionHelper.loadMarkers(markerInfoList);
     },
 
     // 加载标记
-    loadMarkersFromIntersect: function(intersect, shapeType, state) {
+    loadMarkersFromIntersect: function (intersect, shapeType, state) {
         this.extensionHelper.loadMarkersFromIntersect(intersect, shapeType, state);
     },
 
     // 获得标记列表
-    getMarkerInfoList: function() {
+    getMarkerInfoList: function () {
         return this.extensionHelper.getMarkerInfoList();
     },
 
-    resizeMarkers: function() {
+    // zoom到合适的大小
+    zoomToSelectedMarkers: function () {
+        this.extensionHelper.zoomToSelectedMarkers();
+    },
+
+    resizeMarkers: function () {
         this.extensionHelper.resizeMarkers();
     },
 
-    renderMarkers: function() {
+    renderMarkers: function () {
         this.extensionHelper.renderMarkers();
     },
 
@@ -19154,7 +19340,7 @@ CloudViewer.prototype = {
     },
 
     // 设置marker click callback
-    setMarkerClickCallback:function(callback) {
+    setMarkerClickCallback: function (callback) {
 
         this.extensionHelper.setMarkerClickCallback(callback);
     },
@@ -19180,44 +19366,44 @@ CloudViewer.prototype = {
     },
 
     // 开始编辑批注
-    editCommentBegin: function() {
+    editCommentBegin: function () {
 
         this.extensionHelper.editAnnotationBegin();
     },
 
     // 结束编辑批注
-    editCommentEnd: function() {
+    editCommentEnd: function () {
 
         this.extensionHelper.editAnnotationEnd();
     },
 
     // 设置批注图形类型
-    setCommentType: function(type) {
+    setCommentType: function (type) {
 
         this.extensionHelper.setAnnotationType(type);
     },
 
     // 加载批注
-    loadComments: function(annotations) {
+    loadComments: function (annotations) {
 
         this.extensionHelper.loadAnnotations(annotations);
     },
 
     // 获得批注对象列表
-    getCommentInfoList: function() {
+    getCommentInfoList: function () {
 
         return this.extensionHelper.getAnnotationInfoList();
 
     },
 
     // 窗口resize
-    resizeComments: function() {
+    resizeComments: function () {
 
         this.extensionHelper.resizeAnnotations();
     },
 
     // 重绘
-    renderAnnotations: function() {
+    renderAnnotations: function () {
 
         this.extensionHelper.renderAnnotations();
     }
