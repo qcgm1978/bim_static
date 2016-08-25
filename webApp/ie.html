@@ -37,7 +37,7 @@
 
         viewport.appendChild(myWebView);
 
-        if (myWebView.pluginVersion != currentVersion) {
+        if (myWebView.pluginVersion < currentVersion) {
 
             if (confirm("发现新版本，是否更新？")) {
                 throw new error("version is old");
@@ -47,18 +47,18 @@
         var url = cookUrl && cookUrl.lastIndexOf("/file/data") <= -1 && (new Date() - getCookie("pathDate")) / 1000 <= 2 &&
             cookUrl.lastIndexOf("about:blank") <= -1 && cookUrl ||
             window.location.href.substring(window.location.href.lastIndexOf("path") + 5) ||
-            window.location.host + "/#projects"; 
-           
+            window.location.host + "/#projects";
+
 
         //外部没有cokkie 登出
         if (!getCookie("OUTSSO_AuthToken")) {
-            url = location.origin + "/login.html"; 
+            url = location.origin + "/login.html";
             isCheckLogin = true;
-        } 
+        }
 
-        myWebView.url = url; 
+        myWebView.url = url;
 
-        myWebView.id = "webView";  
+        myWebView.id = "webView";
 
         myWebView.registerEvent('newWindow', navigateTo);
 
@@ -107,9 +107,13 @@
                     isCheckLogin = true;
                     checkLogin();
                 }
-            }, 2000)
+            }, 2000);
 
-            myWebView.registerEvent('loadFinished', function(isReady) {
+        }
+
+        myWebView.registerEvent('loadFinished', function(isReady) {
+
+            if (url.indexOf("login.html") > -1 && !isCheckLogin) {
 
                 if (!isReady) {
                     return;
@@ -119,10 +123,19 @@
                     isCheckLogin = true;
                     checkLogin();
                 }
+            }
 
-            });
+            if (url.indexOf("login.html") <= -1) {
+                myWebView.runScript('App.Comm.checkCookie("' + document.cookie + '")', function(cookie) {
 
-        }
+                });
+            } 
+
+        });
+
+
+
+
 
         window.onresize = resizeWebView;
 
@@ -215,7 +228,7 @@
     }
 
     //清空cookie
-    function cleanCookie() { 
+    function cleanCookie() {
         var keys = cookieNames(document.cookie);
         for (var i = 0; i < keys.length; i++) {
             delCookie(keys[i]);
@@ -370,7 +383,7 @@
     }
     //删除cookie
     function delCookie(name) {
-         
+
         var exp = new Date();
         exp.setTime(exp.getTime() - 31 * 24 * 60 * 60 * 1000);
         var cval = this.getCookie(name);

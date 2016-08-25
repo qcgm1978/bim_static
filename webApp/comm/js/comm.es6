@@ -141,12 +141,12 @@ App.Comm = {
 	},
 
 	//格式化 状态
-	formatStatus: function(status, type,createId) {
+	formatStatus: function(status, type, createId) {
 
-		if (status==3 || status==10) {
-			if (App.Global.User.userId==createId) {
+		if (status == 3 || status == 10) {
+			if (App.Global.User.userId == createId) {
 				return '待审核';
-			}else{
+			} else {
 				return '锁定';
 			}
 		}
@@ -355,8 +355,34 @@ App.Comm = {
 				document.cookie = keys[i] + "=" + this.getCookie(keys[i]) + ";expires=" + exp.toGMTString() + ";domain=" + App.Comm.doMain + ";path=/";
 		}
 
-		App.Comm.dispatchIE('?commType=setCookieTime'); 
-		 
+		App.Comm.dispatchIE('?commType=setCookieTime');
+
+	},
+
+	//校验cookie
+	checkCookie(cookies) {
+
+		//用户重新登录了
+		if (App.Comm.getCookie("userId") != App.Comm.getCookie("userId", cookies)) { 
+			
+			App.Comm.clearCookie();
+
+			if (cookies) {
+				var keys = App.Comm.cookieNames(cookies),
+					val;
+				for (var i = 0; i < keys.length; i++) {
+
+					val = App.Comm.getCookie(keys[i], cookies);
+
+					val && App.Comm.setCookie(keys[i], val);
+				}
+			} 
+			App.Comm.getUserInfo();
+			window.location.reload();
+
+		}
+
+
 	},
 
 	//格式化 文件大小
@@ -671,7 +697,24 @@ App.Comm = {
 
 		}
 
-	}
+	},
+
+	//获取用户信息
+	getUserInfo() {
+		$.ajax({
+			url: '/platform/user/current?t=' + (+new Date()),
+			async: false,
+		}).done(function(data) {
+			//失败
+			if (data.code != 0) {
+				return;
+			}
+			//ie
+			App.Comm.dispatchIE('/?commType=loginIn');
+			localStorage.setItem("user", JSON.stringify(data.data));
+
+		});
+	},
 
 };
 
