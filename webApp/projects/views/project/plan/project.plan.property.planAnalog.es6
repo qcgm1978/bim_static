@@ -32,25 +32,35 @@ App.Project.PlanAnalog = Backbone.View.extend({
 		    PlayArr = [],
 		    toTranslucent = [],
 		    inners = [],
-		    ifOuter = {};
+		    ifOuter = {},
+		    allPlayArr=[];
 
 
 		$.each(OrderArr, function(i, item) {
-			PlayArr.push(item.code);
-			if (!item.inner) {
-				ifOuter[item.code] = {
-					index: toTranslucent.length,
-					isout: true
-				};
-				toTranslucent.push(item.code)
-			} else {
-				ifOuter[item.code] = {
-					index: inners.length,
-					isout: false
-				};
-				inners.push(item.code);
-			}
 
+			if(item.join){
+				PlayArr.push(item.code);
+				if (!item.inner ) {
+					ifOuter[item.code] = {
+						index: toTranslucent.length,
+						isout: true
+					};
+					toTranslucent.push(item.code)
+				} else {
+					ifOuter[item.code] = {
+						index: inners.length,
+						isout: false
+					};
+					inners.push(item.code);
+				}
+
+				ifOuter[item.code]['join']=item.join;
+				ifOuter[item.code]['demerge']=item.demerge;
+
+			}else{
+				allPlayArr.push(item.code);
+
+			}
 
 		});
 
@@ -64,6 +74,11 @@ App.Project.PlanAnalog = Backbone.View.extend({
 		this.ifOuter = ifOuter;
 		this.toTranslucent = toTranslucent;
 		this.inners = inners;
+		window.ifOuter = ifOuter;
+		window.SourcePlay = PlayArr;
+		this.allPlayArr = allPlayArr;
+		window.toTranslucent = toTranslucent;
+		window.inners = inners;
 	},
 
 
@@ -116,7 +131,7 @@ App.Project.PlanAnalog = Backbone.View.extend({
 			//隐藏全部
 			App.Project.Settings.Viewer.filter({
 				type: "plan",
-				ids: this.PlayArr
+				ids: this.PlayArr.concat(this.allPlayArr)
 			});
 
 			App.Project.Settings.Viewer.zoomToBuilding(0.05,1);
@@ -137,10 +152,100 @@ App.Project.PlanAnalog = Backbone.View.extend({
 
 		this.timer = setInterval(() => {
 
+			//判断是否需要拆分
+			if(this.demerge ){
+				if(this.floorNum<6){
+					$('#floors .tree input').eq(this.floorNum).trigger('click');
+					this.floorNum++;
+					return
+				}else{
+					this.demerge=false;
+					var tree = $('#specialty>ul.tree>li').eq(1);
+					if(!tree.find('input').eq(7).prop('checked')){
+						tree.find('input').eq(7).trigger('click');
+
+					}
+					if(!tree.find('input').eq(13).prop('checked')){
+						tree.find('input').eq(13).trigger('click');
+
+					}
+				}
+			}else{
+				if (this.PlayArr[0]==-1){
+					//停止模拟
+					this.stopAnalog();
+					App.Project.Settings.Viewer.translucent(false);
+
+					App.Project.Settings.Viewer.ignoreTranparent({
+						type: "plan",
+						ids: undefined
+					});
+					App.Project.Settings.Viewer.filter({
+						type: "plan",
+						ids: undefined
+					});
+					if(!$('#floors>div input').prop('checked')){
+						$('#floors>div input').trigger('click');
+					}
+					this.PlayArr=[];
+					return
+				}
+				if(this.ifOuter[this.PlayArr[0]]['demerge']){
+					this.demerge=true;
+					this.floorNum=2;
+					if($('#floors>div input').prop('checked')){
+						$('#floors>div input').trigger('click');
+					}else{
+						$('#floors>div input').trigger('click').trigger('click');
+
+					}
+					$('#floors .tree input').eq(1).trigger('click');
+					$('#floors .tree input').eq(0).trigger('click');
+					$('#floors .tree input').eq(6).trigger('click');
+					var tree = $('#specialty>ul.tree>li').eq(1);
+					if(tree.find('input').eq(7).prop('checked')){
+						tree.find('input').eq(7).trigger('click');
+
+					}
+					if(tree.find('input').eq(13).prop('checked')){
+						tree.find('input').eq(13).trigger('click');
+
+					}
+
+				}
+			}
+
+			if(this.PlayArr.length==this.analogCount){
+				App.Project.Settings.Viewer.translucent(false);
+				debugger
+				App.Project.Settings.Viewer.ignoreTranparent({
+					type: "plan",
+					//ids: [code[0]]
+					ids: undefined
+				});
+				debugger
+				App.Project.Settings.Viewer.filter({
+					type: "plan",
+					ids: this.PlayArr.concat(this.allPlayArr)
+				});
+
+debugger
+			}
+			var self = this;
+			var judge = function(code){
+				if(!self.ifOuter[code[0]]['join']){
+					code = self.PlayArr.splice(0, 1);
+					judge(code);
+				}
+			};
 			if (this.PlayArr.length) {
 
-				var code = this.PlayArr.splice(0, 1),
-				    $tr = this.$(".planContent tbody tr[data-code='" + code[0] + "']"),
+
+
+				var code = this.PlayArr.splice(0, 1);
+
+				judge(code);
+				var $tr = this.$(".planContent tbody tr[data-code='" + code[0] + "']"),
 				    $planContent = this.$(".planContent");
 
 				this.$(".planContent tbody .selected").removeClass('selected');
@@ -149,12 +254,14 @@ App.Project.PlanAnalog = Backbone.View.extend({
 				//滚动条位置
 				$planContent.scrollTop($tr.index() * 30);
 
+
+
 				if (code[0]==-1){
 					
 				}else if(!this.ifOuter[code[0]]['isout']) {
 					App.Project.Settings.Viewer.filter({
 						type: "plan",
-						ids: this.PlayArr
+						ids: this.PlayArr.concat(this.allPlayArr)
 					});
 					App.Project.Settings.Viewer.translucent(false);
 
@@ -167,7 +274,7 @@ App.Project.PlanAnalog = Backbone.View.extend({
 					App.Project.Settings.Viewer.ignoreTranparent({
 						type: "plan",
 						//ids: [code[0]]
-						ids: this.inners.slice(0, this.ifOuter[code[0]]['index'])
+						ids: this.inners.slice(0, this.ifOuter[code[0]]['index']).concat(this.allPlayArr)
 					});
 
 				}else{
@@ -181,7 +288,7 @@ App.Project.PlanAnalog = Backbone.View.extend({
 
 					App.Project.Settings.Viewer.filter({
 						type: "plan",
-						ids: this.PlayArr
+						ids: this.PlayArr.concat(this.allPlayArr)
 					});
 				}
 
@@ -222,8 +329,12 @@ App.Project.PlanAnalog = Backbone.View.extend({
 					type: "plan",
 					ids: undefined
 				});
+
+				if(!$('#floors>div input').prop('checked')){
+					$('#floors>div input').trigger('click');
+				}
 			}
-		}, 1000);
+		}, 2000);
 	},
 
 	//停止模拟
