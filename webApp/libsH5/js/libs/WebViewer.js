@@ -3,7 +3,7 @@
 */
 
 var CLOUD = CLOUD || {};
-CLOUD.Version = "20160808";
+CLOUD.Version = "20160825";
 
 CLOUD.GlobalData = {
     SceneSize: 1000,
@@ -16727,7 +16727,7 @@ CLOUD.SceneLoader.prototype = {
 
                 //handle_children(parent, symbolJSON.children, level + 1, objJSON.userId, userData, object.matrix);
 
-                handle_children(object, symbolJSON.children, level + 1, localUserId, userData, objJSON.materialId);
+                handle_children(object, symbolJSON.children, level + 1, localUserId, userData, undefined, objJSON.materialId);
                 object.userData = userData;
                 parent.add(object);
             }

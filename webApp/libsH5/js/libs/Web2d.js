@@ -6206,64 +6206,22 @@ CLOUD.Extensions.MarkerEditor.prototype.getMarkerColor = function (shape, state)
     return markerColor;
 };
 
-// 根据Pick对象信息获得markerInfo
-CLOUD.Extensions.MarkerEditor.prototype.getMarkerInfoByIntersect = function(intersect, shapeType, state) {
+// 根据Pick对象信息创建标记
+CLOUD.Extensions.MarkerEditor.prototype.createMarkerByIntersect = function(intersect, shapeType, state) {
 
-    if (!intersect) {
-        return null;
-    }
+    var id = intersect.userId;
+    var userId = intersect.userId;
+    var position = intersect.worldPosition || intersect.object.point;
+    var boundingBox = intersect.worldBoundingBox || intersect.object.boundingBox;
 
-    var userId = intersect.userId || "";
-
-    if (userId === "") {
-        return null;
-    }
-
-    var inverseScaleMatrix = this.getInverseSceneMatrix();
-    var boundingBox = intersect.object.boundingBox;
-
-    if (!boundingBox) {
-
-        intersect.object.geometry.computeBoundingBox();
-        boundingBox = intersect.object.geometry.boundingBox;
-    }
-
-    var bBox = boundingBox.clone();
-
-    if (intersect.object.geometry instanceof THREE.BoxGeometry) {
-
-        var objPosition = new THREE.Vector3();
-        var objQuaternion = new THREE.Quaternion();
-        var objScale = new THREE.Vector3();
-        var objMatrix = intersect.object.matrix;
-        objMatrix.decompose( objPosition, objQuaternion, objScale );
-
-        // 计算世界包围盒
-        var invScale = new THREE.Vector3(1 /objScale.x, 1 / objScale.y, 1 / objScale.z );
-        bBox.min.multiply(invScale);
-        bBox.max.multiply(invScale);
-        bBox.applyMatrix4(intersect.object.matrixWorld);
-        bBox.applyMatrix4( inverseScaleMatrix);
-    }
-
-    // 计算世界点
-    var position = intersect.point.clone();
-    position.applyMatrix4(inverseScaleMatrix);
-
-    return {
-        id: userId,
+    var markerInfo = {
+        id: id,
         userId: userId,
         position: position,
         boundingBox: boundingBox,
         shapeType: shapeType,
         state: state
-    }
-};
-
-// 根据Pick对象信息创建标记
-CLOUD.Extensions.MarkerEditor.prototype.createMarkerByIntersect = function(intersect, shapeType, state) {
-
-    var markerInfo = this.getMarkerInfoByIntersect(intersect, shapeType, state);
+    };
 
     this.createMarker(markerInfo);
 };
