@@ -88,7 +88,13 @@ App.Project.PlanModel = Backbone.View.extend({
 				type: "plan",
 				ids: codesToFilter
 			});
+			App.Project.Settings.Viewer.translucent(true);
 
+			App.Project.Settings.Viewer.highlight({
+				type: "plan",
+				ids: [$target.data("code")]
+			});
+			return
 		}
 
 		if (box && ids) {
