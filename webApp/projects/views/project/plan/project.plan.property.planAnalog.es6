@@ -33,11 +33,12 @@ App.Project.PlanAnalog = Backbone.View.extend({
 		    toTranslucent = [],
 		    inners = [],
 		    ifOuter = {},
+			  allCodes = [],
 		    allPlayArr=[];
 
 
 		$.each(OrderArr, function(i, item) {
-
+      allCodes.push(item.code)
 			if(item.join){
 				PlayArr.push(item.code);
 				if (!item.inner ) {
@@ -74,11 +75,7 @@ App.Project.PlanAnalog = Backbone.View.extend({
 		this.ifOuter = ifOuter;
 		this.toTranslucent = toTranslucent;
 		this.inners = inners;
-		window.ifOuter = ifOuter;
-		window.SourcePlay = PlayArr;
 		this.allPlayArr = allPlayArr;
-		window.toTranslucent = toTranslucent;
-		window.inners = inners;
 	},
 
 
@@ -217,34 +214,34 @@ App.Project.PlanAnalog = Backbone.View.extend({
 
 			if(this.PlayArr.length==this.analogCount){
 				App.Project.Settings.Viewer.translucent(false);
-				debugger
+
 				App.Project.Settings.Viewer.ignoreTranparent({
 					type: "plan",
 					//ids: [code[0]]
 					ids: undefined
 				});
-				debugger
+
 				App.Project.Settings.Viewer.filter({
 					type: "plan",
 					ids: this.PlayArr.concat(this.allPlayArr)
 				});
 
-debugger
+
 			}
 			var self = this;
-			var judge = function(code){
-				if(!self.ifOuter[code[0]]['join']){
-					code = self.PlayArr.splice(0, 1);
-					judge(code);
-				}
-			};
+			//var judge = function(code){
+			//	if(!self.ifOuter[code[0]]['join']){
+			//		code = self.PlayArr.splice(0, 1);
+			//		judge(code);
+			//	}
+			//};
 			if (this.PlayArr.length) {
 
 
 
 				var code = this.PlayArr.splice(0, 1);
 
-				judge(code);
+				//judge(code);
 				var $tr = this.$(".planContent tbody tr[data-code='" + code[0] + "']"),
 				    $planContent = this.$(".planContent");
 
