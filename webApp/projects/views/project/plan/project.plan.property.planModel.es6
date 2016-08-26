@@ -48,7 +48,10 @@ App.Project.PlanModel = Backbone.View.extend({
 	//切换显示此节点关联模型
 	switch(){
 		if($('.planModel .itemClick.selected').length>0){
-			this.showInModle('',$('.planModel .itemClick.selected'));
+			var self = this;
+			setTimeout(function(){
+				self.showInModle('',$('.planModel .itemClick.selected'));
+			},100)
 		}
 	},
 	//模型中显示
@@ -64,10 +67,16 @@ App.Project.PlanModel = Backbone.View.extend({
 
 		//高亮钱取消
 		App.Project.cancelZoomModel();
-		App.Project.Settings.Viewer.filter({
+		App.Project.Settings.Viewer.translucent(false);
+
+		App.Project.Settings.Viewer.highlight({
 			type: "plan",
 			ids: undefined
 		});
+		//App.Project.Settings.Viewer.filter({
+		//	type: "plan",
+		//	ids: undefined
+		//});
     if(!$el){
 	    if ($target.hasClass("selected")) {
 		    $target.parent().find(".selected").removeClass("selected");
@@ -88,6 +97,7 @@ App.Project.PlanModel = Backbone.View.extend({
 				type: "plan",
 				ids: codesToFilter
 			});
+
 			App.Project.Settings.Viewer.translucent(true);
 
 			App.Project.Settings.Viewer.highlight({
