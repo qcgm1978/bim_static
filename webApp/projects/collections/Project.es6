@@ -246,6 +246,11 @@ App.Project = {
 				$(this).trigger('click');
 			}
 		});
+		$('.modelSidebar #floors input').each(function() {
+			if (!$(this).is(':checked')) {
+				$(this).trigger('click');
+			}
+		});
 		var specialty = bimView.comm.getFilters($("#specialty,#floors"),'uncheck');
 		var category = bimView.comm.getFilters($("#category"),'uncheck');
 		var classCode = bimView.comm.getFilters($("#classCode"),'uncheck');
