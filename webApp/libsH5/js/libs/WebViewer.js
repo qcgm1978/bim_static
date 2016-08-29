@@ -3,7 +3,7 @@
 */
 
 var CLOUD = CLOUD || {};
-CLOUD.Version = "20160825";
+CLOUD.Version = "20160829";
 
 CLOUD.GlobalData = {
     SceneSize: 1000,
@@ -9191,8 +9191,8 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
     var dollyDelta = new THREE.Vector2();
     var dollyCenter = new THREE.Vector2();
 
-    //var theta;
-    //var phi;
+    var theta;
+    var phi;
     var phiDelta = 0;
     var thetaDelta = 0;
     var scale = 1;
@@ -9577,54 +9577,79 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
                     lastQuaternion.copy(this.object.quaternion);
                 }
             }
-
-
-
         }
 
     }();
 
+    this.clamp = function ( value, min, max ) {
+        return Math.max( min, Math.min( max, value ) );
+    }
+
+    this.setThetaPhiFromeVector3 =  function (vec3, radius) {
+        theta = Math.atan2( vec3.x, vec3.z ); // equator angle around y-up axis
+        phi = Math.acos( this.clamp( vec3.y / radius, - 1, 1 ) ); // polar angle
+    };
+
+    this.setOffsetFromSpherical = function(offset, radius) {
+        var sinPhiRadius = Math.sin( phi ) * radius;
+        offset.x = sinPhiRadius * Math.sin( theta );
+        offset.y = Math.cos( phi ) * radius;
+        offset.z = sinPhiRadius * Math.cos( theta );
+    }
+
+    this.getDirFromPositionAndTarget = function (quat, position, target, fix) {
+        var distance = position.clone().sub(target).length();
+        var quatInverse = quat.clone().inverse();
+
+        var offset = new THREE.Vector3();
+        offset.copy( position ).sub( target );
+        offset.applyQuaternion( quat );
+
+        scope.setThetaPhiFromeVector3(offset, distance);
+
+        theta += thetaDelta;
+        phi += phiDelta;
+
+        if (fix) {
+            theta = this.clamp( theta, scope.minAzimuthAngle, scope.maxAzimuthAngle);
+            var tempPhi = this.clamp(phi, scope.minPolarAngle + EPS, scope.maxPolarAngle - EPS);//Math.max( scope.minPolarAngle + EPS, Math.min( scope.maxPolarAngle - EPS, phi ) );
+            phiDelta += tempPhi - phi;
+            phi = tempPhi;
+        }
+
+        scope.setOffsetFromSpherical(offset, distance);
+
+        offset.applyQuaternion( quatInverse );
+
+        return offset;
+    }
+
     this.touchUpdate = function () {
+        var quat = new THREE.Quaternion().setFromUnitVectors( scope.object.up, new THREE.Vector3( 0, 1, 0 ) );
+
+        var lastPosition = new THREE.Vector3();
+        var lastQuaternion = new THREE.Quaternion();
 
         return function (forceRender, updateRenderList) {
-            var position = this.object.position;
-            var pivot = this.pivot !== null ? this.pivot : this.target;
-
             if (state !== STATE.NONE) {
                 this.cameraDirty = true;
             }
 
             if (state == STATE.ROTATE) {
-                var eye = this.target.clone().sub(position);
-                var eyeDistance = eye.length();
+                var position = this.object.position;
 
-                var viewVec = position.clone().sub(pivot);
-                var viewLength = viewVec.length();
-                viewVec.normalize();
-                var viewTrf = null;
-                var camDir = this.object.getWorldDirection();
+                var camDir = this.getDirFromPositionAndTarget(quat, position, this.target, true);
 
-                var rightDir = camDir.clone().cross(this.object.up);
-                if (rightDir.lengthSq() > 0.001) {
-
-                    viewTrf = new THREE.Quaternion().setFromAxisAngle(this.object.up, thetaDelta);
-
-                    var newViewDir = viewVec.clone().applyQuaternion(viewTrf);
-                    newViewDir.normalize();
-
-                    position.copy(pivot).add(newViewDir.multiplyScalar(viewLength));
-
-                    camDir.applyQuaternion(viewTrf);
-                    camDir.normalize();
-
-                    // 保持相机到目标点的距离不变
-                    var newTarget = new THREE.Vector3();
-                    //newTarget.copy(position).add(camDir.multiplyScalar(viewLength));
-                    newTarget.copy(position).add(camDir.multiplyScalar(viewLength));
-
-                    this.target.copy(newTarget);
-                    this.object.realUp.copy(rightDir).cross(camDir);
+                if (this.pivot !== null) {
+                    var offset = this.getDirFromPositionAndTarget(quat, position, this.pivot, false);
+                    position.copy( this.pivot ).add( offset );
+                    camDir.setLength(offset.length());
+                    this.target.copy(position.clone().sub(camDir));
                 }
+                else {
+                    position.copy( this.target ).add( camDir );
+                }
+
             }
 
             this.target.add(pan);
@@ -10278,61 +10303,39 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
                 state = STATE.ROTATE;
                 break;
 
-            case 2:	// two-fingered touch: dolly
-                if ( this.noZoom === true ) return;
-                handleTouchStartDolly( event );
-                handleTouchStartPan( event );
-                state = STATE.DOLLY;
-
-                lastEvent = event;
-
+            case 2:	// two-fingered touch: dolly and pan
+                if ( this.noZoom !== true) {
+                    handleTouchStartDolly(event);
+                }
+                if (this.noPan !== true) {
+                    handleTouchStartPan(event);
+                }
                 break;
-
-            // case 3: // three-fingered touch: pan
-            //     if ( this.noPan === true ) return;
-            //     handleTouchStartPan( event );
-            //     state = STATE.PAN;
-            //     break;
 
             default:
                 state = STATE.NONE;
         }
-
-        //this.update();
     }
 
     this.touchMoveHandler = function(event) {
         switch ( event.touches.length ) {
             case 1: // one-fingered touch: rotate
-                if ( this.noRotate === true ) return;
-                if ( state !== STATE.ROTATE ) return; // is this needed?...
-
-                handleTouchMoveRotate( event );
+                if ( this.noRotate !== true ){
+                    handleTouchMoveRotate( event );
+                }
                 break;
 
-            case 2: // two-fingered touch: dolly
-                if ( this.noZoom === true ) return;
-                if ( state !== STATE.DOLLY ) return; // is this needed?...
+            case 2: // two-fingered touch: dolly or pan
+                if ( this.noZoom !== true) {
+                    handleTouchMoveDolly(event);
+                    state = STATE.DOLLY;
+                }
+                if (this.noPan !== true) {
+                    handleTouchMovePan(event);
+                    state = STATE.PAN;
+                }
 
-                handleTouchMoveDollyOrPan(event);
-                lastEvent = event;
-
-                // handleTouchMoveDolly( event );
-                //
-                // var center = scope.mapWindowToViewport(dollyCenter.x, dollyCenter.y);
-                // var centerPosition = scope.getHitPoint(center.x, center.y);
-                // if (centerPosition != null)
-                //     this.pivot = centerPosition;
-                //
-                // handleTouchMovePan( event );
                 break;
-
-            // case 3: // three-fingered touch: pan
-            //     if ( scope.noPan === true ) return;
-            //     if ( state !== STATE.PAN ) return; // is this needed?...
-            //
-            //     handleTouchMovePan( event );
-            //     break;
 
             default:
                 state = STATE.NONE;
@@ -10342,35 +10345,45 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
     }
 
     this.touchEndHandler = function(event) {
-        state = STATE.NONE;
+        switch ( event.touches.length ) {
+            // case 1:
+            //     if ( this.noRotate !== true ){
+            //         handleTouchMoveRotate( event );
+            //     }
+            //     break;
+
+            default:
+                state = STATE.NONE;
+        }
     }
 
     function handleTouchStartRotate( event ) {
         //console.log( 'handleTouchStartRotate' );
-        rotateStart.set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY );
+
+        rotateStart.set( event.touches[ 0 ].clientX, event.touches[ 0 ].clientY );
     }
 
     function handleTouchStartDolly ( event ) {
         //console.log( 'handleTouchStartDolly' );
-        var dx = event.touches[ 0 ].pageX - event.touches[ 1 ].pageX;
-        var dy = event.touches[ 0 ].pageY - event.touches[ 1 ].pageY;
 
-        var distance = Math.sqrt( dx * dx + dy * dy );
-        dollyStart.set( 0, distance );
+        var dx = event.touches[ 0 ].clientX - event.touches[ 1 ].clientX;
+        var dy = event.touches[ 0 ].clientY - event.touches[ 1 ].clientY;
+
+        dollyStart.set( 0, Math.sqrt( dx * dx + dy * dy ) );
     }
 
     function handleTouchStartPan ( event ) {
         //console.log( 'handleTouchStartPan' );
-        //var cx = (event.touches[0].pageX + event.touches[1].pageX + event.touches[2].pageX) / 3;
-        //var cy = (event.touches[0].pageY + event.touches[1].pageY + event.touches[2].pageY) / 3;
-        var cx = (event.touches[0].pageX + event.touches[1].pageX) * 0.5;
-        var cy = (event.touches[0].pageY + event.touches[1].pageY) * 0.5;
-        panStart.set( cx, cy );
+
+        var cx = (event.touches[0].clientX + event.touches[1].clientX) * 0.5;
+        var cy = (event.touches[0].clientY + event.touches[1].clientY) * 0.5;
+        panStart.set(cx, cy);
     }
 
     function handleTouchMoveRotate( event ) {
         //console.log( 'handleTouchMoveRotate' );
-        rotateEnd.set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY );
+
+        rotateEnd.set( event.touches[ 0 ].clientX, event.touches[ 0 ].clientY );
         rotateDelta.subVectors( rotateEnd, rotateStart );
 
         var element = scope.domElement === document ? scope.domElement.body : scope.domElement;
@@ -10379,37 +10392,19 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
         phiDelta -=  2 * Math.PI * rotateDelta.y / element.clientHeight * scope.rotateSpeed;
 
         rotateStart.copy( rotateEnd );
-
-        scope.pan( 0, rotateDelta.y );
-    }
-
-    function handleTouchMoveDollyOrPan(event) {
-        var touch0DeltaX = lastEvent.touches[0].pageX - event.touches[0].pageX;
-        var touch0DeltaY = lastEvent.touches[0].pageY - event.touches[0].pageY;
-        var touch1DeltaX = lastEvent.touches[1].pageX - event.touches[1].pageX;
-        var touch1DeltaY = lastEvent.touches[1].pageY - event.touches[1].pageY;
-
-        if (touch0DeltaX * touch1DeltaX >= 0 && touch0DeltaY * touch1DeltaY >= 0) {
-            handleTouchMovePan(event);
-        }
-        else {
-            handleTouchMoveDolly(event);
-
-            var center = scope.mapWindowToViewport(dollyCenter.x, dollyCenter.y);
-            var centerPosition = scope.getHitPoint(center.x, center.y);
-            if (centerPosition != null)
-                scope.pivot = centerPosition;
-        }
     }
 
     function handleTouchMoveDolly( event ) {
         //console.log( 'handleTouchMoveDolly' );
-        var dx = event.touches[ 0 ].pageX - event.touches[ 1 ].pageX;
-        var dy = event.touches[ 0 ].pageY - event.touches[ 1 ].pageY;
+
+        var dx = event.touches[ 0 ].clientX - event.touches[ 1 ].clientX;
+        var dy = event.touches[ 0 ].clientY - event.touches[ 1 ].clientY;
 
         var distance = Math.sqrt( dx * dx + dy * dy );
         dollyEnd.set( 0, distance );
         dollyDelta.subVectors( dollyEnd, dollyStart );
+
+        if (Math.abs(dollyDelta.y) < 3) return;
 
         scope.zoomSpeed = 0.8;
 
@@ -10421,27 +10416,34 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
         }
         dollyStart.copy( dollyEnd );
 
-        dollyCenter.x = (event.touches[ 0 ].pageX + event.touches[ 1 ].pageX) * 0.5;
-        dollyCenter.y = (event.touches[ 0 ].pageY + event.touches[ 1 ].pageY) * 0.5;
+        dollyCenter.x = (event.touches[ 0 ].clientX + event.touches[ 1 ].clientX) * 0.5;
+        dollyCenter.y = (event.touches[ 0 ].clientY + event.touches[ 1 ].clientY) * 0.5;
 
         scope.dollyByPoint(dollyCenter.x, dollyCenter.y);
+
+        var center = scope.mapWindowToViewport(dollyCenter.x, dollyCenter.y);
+        var centerPosition = scope.getHitPoint(center.x, center.y);
+        if (centerPosition != null)
+            scope.pivot = centerPosition;
     }
 
     function handleTouchMovePan( event ) {
         //console.log( 'handleTouchMovePan' );
-        //var cx = (event.touches[0].pageX + event.touches[1].pageX + event.touches[2].pageX) / 3;
-        //var cy = (event.touches[0].pageY + event.touches[1].pageY + event.touches[2].pageY) / 3;
-        var cx = (event.touches[0].pageX + event.touches[1].pageX) * 0.5;
-        var cy = (event.touches[0].pageY + event.touches[1].pageY) * 0.5;
-        panEnd.set( cx, cy );
 
+        var cx = (event.touches[0].clientX + event.touches[1].clientX) * 0.5;
+        var cy = (event.touches[0].clientY + event.touches[1].clientY) * 0.5;
+        panEnd.set( cx, cy );
         panDelta.subVectors( panEnd, panStart );
 
-        scope.pan( panDelta.x, panDelta.y );
+        if (Math.abs(panDelta.x) < 3 && Math.abs(panDelta.y) < 3) return;
+
+        worldDimension = scope.getWorldDimension(cx, cy);
+        panDeltaBasedWorld.set(0, 0, 0);
+
+        scope.panOnWorld();
 
         panStart.copy( panEnd );
     }
-
 };
 CLOUD.PickHelper = function (scene, cameraEditor, onObjectSelected) {
     "use strict";
@@ -10536,10 +10538,10 @@ CLOUD.PickHelper.prototype = {
                 
                 if (scope.filter.addSelectedId(userId, intersect.object.userData, true)) {
 
-                    if (cameraEditor.viewer.defaultMiniMap) {
-                        intersect.axisGridInfo = cameraEditor.viewer.defaultMiniMap.getAxisGridInfoByPoint(intersect.point);
+                    if (cameraEditor.viewer.extensionHelper.defaultMiniMap) {
+                        intersect.axisGridInfo = cameraEditor.viewer.extensionHelper.defaultMiniMap.getAxisGridInfoByPoint(intersect.point);
                     }
-
+                    
                     scope.onObjectSelected(intersect);
 
                     if (event.altKey) {
@@ -10756,8 +10758,8 @@ CLOUD.PickHelper.prototype = {
 
         var axisGridInfo = null;
 
-        if (viewer.defaultMiniMap) {
-            axisGridInfo = viewer.defaultMiniMap.getAxisGridInfoByPoint(intersect.point);
+        if (viewer.extensionHelper.defaultMiniMap) {
+            axisGridInfo = viewer.extensionHelper.defaultMiniMap.getAxisGridInfoByPoint(intersect.point);
         }
 
         // 加些样式
@@ -10769,7 +10771,7 @@ CLOUD.PickHelper.prototype = {
 
         if (axisGridInfo) {
 
-            html += "<span>&#9830;&nbsp;&nbsp;Position</span><ul style='width:340px;list-style:none'>";
+            html += "</br><span>&#9830;&nbsp;&nbsp;Position</span><ul style='width:340px;list-style:none'>";
             html += "<li style='border-left:1px solid #ccc;border-top:1px solid #ccc;float:left;width:80px;height:33px;text-align:left;line-height:33px'>X</li>";
             html += "<li style='border-left:1px solid #ccc;border-top:1px solid #ccc;float:left;width:200px;height:33px;text-align:left;line-height:33px;border-right: 1px solid #ccc'>" + axisGridInfo.position.x + "</li>";
             html += "<li style='border-left:1px solid #ccc;border-top:1px solid #ccc;float:left;width:80px;height:33px;text-align:left;line-height:33px'>Y</li>";
@@ -10778,7 +10780,7 @@ CLOUD.PickHelper.prototype = {
             html += "<li style='border:1px solid #ccc;float:left;width:200px;height:33px;text-align:left;line-height:33px'>" + axisGridInfo.position.z + "</li>";
             html += "</ul>";
 
-            html += "<span>&#9830;&nbsp;&nbsp;Axis Grid Information</span><ul style='width:340px;list-style:none'>";
+            html += "</br><span>&#9830;&nbsp;&nbsp;Axis Grid Information</span><ul style='width:340px;list-style:none'>";
             html += "<li style='border-left:1px solid #ccc;border-top:1px solid #ccc;float:left;width:80px;height:33px;text-align:left;line-height:33px'>distanceX</li>";
             html += "<li style='border-left:1px solid #ccc;border-top:1px solid #ccc;float:left;width:200px;height:33px;text-align:left;line-height:33px;border-right: 1px solid #ccc'>(" + axisGridInfo.numeralName + ", " + axisGridInfo.offsetX + ")</li>";
             html += "<li style='border-left:1px solid #ccc;border-top:1px solid #ccc;float:left;width:80px;height:33px;text-align:left;line-height:33px;border-bottom: 1px solid #ccc'>distanceY</li>";
@@ -10786,7 +10788,7 @@ CLOUD.PickHelper.prototype = {
             html += "</ul>";
         } else {
 
-            html += "<span>&#9830;&nbsp;&nbsp;Other</span><ul style='width:340px;list-style:none'>";
+            html += "</br><span>&#9830;&nbsp;&nbsp;Other</span><ul style='width:340px;list-style:none'>";
             html += "<li style='border-left:1px solid #ccc;border-top:1px solid #ccc;float:left;width:80px;height:33px;text-align:left;line-height:33px;border-bottom: 1px solid #ccc'>message</li>";
             html += "<li style='border:1px solid #ccc;float:left;width:200px;height:33px;text-align:left;line-height:33px'><span style='color: red'> not exist axis grid!!!</span></li>";
             html += "</ul>";
@@ -12548,7 +12550,7 @@ CLOUD.Filter = function () {
 
     var overridedMaterials = {};
     overridedMaterials.selection = CLOUD.MaterialUtil.createHilightMaterial();
-    overridedMaterials.scene = CLOUD.MaterialUtil.createPhongMaterial({ color: 0x888888, opacity: 0.3, transparent: true, side: THREE.DoubleSide });
+    overridedMaterials.scene = CLOUD.MaterialUtil.createPhongMaterial({ color: 0x888888, opacity: 0.1, transparent: true, side: THREE.DoubleSide });
     overridedMaterials.darkRed = CLOUD.MaterialUtil.createPhongMaterial({color: 0xA02828, opacity: 1, transparent: false, side: THREE.DoubleSide });
     overridedMaterials.lightBlue = CLOUD.MaterialUtil.createPhongMaterial({ color: 0x1377C0, opacity: 1, transparent: false, side: THREE.DoubleSide });
     overridedMaterials.black = CLOUD.MaterialUtil.createPhongMaterial({ color: 0x0, opacity: 0.3, transparent: true, side: THREE.DoubleSide });
