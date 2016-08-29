@@ -16470,7 +16470,7 @@ CLOUD.SubSceneLoader.prototype = {
         var resource = client.cache;
         var level = subScene.level;
 
-        function handle_children(parent, children, userId, userData, trf) {
+        function handle_children(parent, children, userId, userData, trf, overridedMaterialId) {
 
             for (var nodeId in children) {
 
@@ -16482,6 +16482,8 @@ CLOUD.SubSceneLoader.prototype = {
 
                 if (objJSON.userData)
                     userData = objJSON.userData;
+
+                var materialId = overridedMaterialId || objJSON.materialId;
 
                 var object;
           
@@ -16501,7 +16503,7 @@ CLOUD.SubSceneLoader.prototype = {
                     object = new CLOUD.Group();
                     CLOUD.GeomUtil.parseNodeProperties(object, objJSON, nodeId, trf);
 
-                    handle_children(parent, objJSON.children, userId, userData, object.matrix);
+                    handle_children(parent, objJSON.children, userId, userData, object.matrix, materialId);
 
                 }
                 else if (objJSON.nodeType == "MeshNode") {
@@ -16509,7 +16511,7 @@ CLOUD.SubSceneLoader.prototype = {
                     if (resource.bOutOfLimitation == true)
                         continue;
 
-                    var matObj = client.findMaterial(objJSON.materialId, false);
+                    var matObj = client.findMaterial(materialId, false);
 
                     object = new CLOUD.Mesh(CLOUD.GeomUtil.EmptyGeometry, matObj, objJSON.meshId);
                     CLOUD.GeomUtil.parseNodeProperties(object, objJSON, nodeId, trf);
@@ -16521,7 +16523,7 @@ CLOUD.SubSceneLoader.prototype = {
                 }
                 else if (objJSON.nodeType == "PGeomNode") {
 
-                    var matObj = client.findMaterial(objJSON.materialId, false);
+                    var matObj = client.findMaterial(materialId, false);
                     object = object = CLOUD.GeomUtil.parsePGeomNodeInstance(objJSON, matObj, trf);
 
                     if (object) {
@@ -16544,13 +16546,13 @@ CLOUD.SubSceneLoader.prototype = {
                             object = new CLOUD.Group();
                             CLOUD.GeomUtil.parseNodeProperties(object, objJSON, nodeId, trf);
 
-                            handle_children(parent, symbolJSON.children, objJSON.userId, userData, object.matrix);
+                            handle_children(parent, symbolJSON.children, objJSON.userId, userData, object.matrix, materialId);
 
                         }
                         else if (symbolJSON.nodeType === "MeshNode") {
 
-                            var materialId = objJSON.materialId || symbolJSON.materialId;
-                            var matObj = client.findMaterial(materialId, false);
+                            var newMaterialId = materialId || symbolJSON.materialId;
+                            var matObj = client.findMaterial(newMaterialId, false);
 
                             object = new CLOUD.Mesh(CLOUD.GeomUtil.EmptyGeometry, matObj, symbolJSON.meshId);
                             CLOUD.GeomUtil.parseNodeProperties(object, objJSON, nodeId, trf);
@@ -16560,8 +16562,8 @@ CLOUD.SubSceneLoader.prototype = {
                         }
                         else if (symbolJSON.nodeType === "PGeomNode") {
 
-                            var materialId = objJSON.materialId || symbolJSON.materialId;
-                            var matObj = client.findMaterial(materialId, false);
+                            var newMaterialId = materialId || symbolJSON.materialId;
+                            var matObj = client.findMaterial(newMaterialId, false);
 
                             var trfLocal = new THREE.Matrix4();
                             if (objJSON.matrix) {
@@ -16590,7 +16592,7 @@ CLOUD.SubSceneLoader.prototype = {
                         continue;
                     }
 
-                    var matObj = client.findMaterial(objJSON.materialId, true);
+                    var matObj = client.findMaterial(materialId, true);
 
                     object = new CLOUD.Mesh(undefined, matObj, objJSON.meshId);
                     CLOUD.GeomUtil.parseNodeProperties(object, objJSON, nodeId);
@@ -16717,9 +16719,6 @@ CLOUD.SceneLoader.prototype = {
 
             var object;
 
-            if (overrideMaterialId !== undefined)
-                objJSON.materialId = overrideMaterialId;
-
             if (symbolJSON.nodeType === "GroupNode") {
 
                 object = new CLOUD.Group();
@@ -16727,13 +16726,13 @@ CLOUD.SceneLoader.prototype = {
 
                 //handle_children(parent, symbolJSON.children, level + 1, objJSON.userId, userData, object.matrix);
 
-                handle_children(object, symbolJSON.children, level + 1, localUserId, userData, undefined, objJSON.materialId);
+                handle_children(object, symbolJSON.children, level + 1, localUserId, userData, undefined, overrideMaterialId);
                 object.userData = userData;
                 parent.add(object);
             }
             else if (symbolJSON.nodeType === "MeshNode") {
 
-                var materialId = objJSON.materialId || symbolJSON.materialId;
+                var materialId = overrideMaterialId || symbolJSON.materialId;
                 var matObj = client.findMaterial(materialId, false);
 
                 object = new CLOUD.Mesh(CLOUD.GeomUtil.EmptyGeometry, matObj, symbolJSON.meshId);
@@ -16748,7 +16747,7 @@ CLOUD.SceneLoader.prototype = {
             }
             else if (symbolJSON.nodeType === "PGeomNode") {
 
-                var materialId = objJSON.materialId || symbolJSON.materialId;
+                var materialId = overrideMaterialId || symbolJSON.materialId;
                 var matObj = client.findMaterial(materialId, false);
 
                 var trfLocal = new THREE.Matrix4();
@@ -16781,7 +16780,9 @@ CLOUD.SceneLoader.prototype = {
                     CLOUD.GeomUtil.parseNodeProperties(object, objJSON, nodeId, trf);
                     object.userData = userData;
 
-                    handle_symbol_instance(object, symbolJSON, symbolSymbolJSON, userData, localUserId, level + 1, null, nodeId, objJSON.materialId);
+                    var newMaterialId = overrideMaterialId || symbolJSON.materialId;
+
+                    handle_symbol_instance(object, symbolJSON, symbolSymbolJSON, userData, localUserId, level + 1, null, nodeId, newMaterialId);
                     parent.add(object);
                 }
                 else {
@@ -16803,8 +16804,7 @@ CLOUD.SceneLoader.prototype = {
                 if (userId !== undefined)
                     objJSON.userId = userId;
 
-                if (overridedMaterialId !== undefined)
-                    objJSON.materialId = overridedMaterialId;
+                var materialId = overridedMaterialId || objJSON.materialId;
 
                 if (objJSON.userData) {
                     userData = objJSON.userData;
@@ -16895,7 +16895,7 @@ CLOUD.SceneLoader.prototype = {
                     //handle_children(parent, objJSON.children, level + 1, localUserId, userData, object.matrix);
 
 
-                    handle_children(object, objJSON.children, level + 1, localUserId, userData, undefined, objJSON.materialId);
+                    handle_children(object, objJSON.children, level + 1, localUserId, userData, undefined, materialId);
                     object.userData = userData;
                     parent.add(object);
 
@@ -16904,7 +16904,7 @@ CLOUD.SceneLoader.prototype = {
                     if (resource.bOutOfLimitation == true)
                         continue;
                         
-                    var matObj = client.findMaterial(objJSON.materialId, false);
+                    var matObj = client.findMaterial(materialId, false);
 
                     object = new CLOUD.Mesh(CLOUD.GeomUtil.EmptyGeometry, matObj, objJSON.meshId);
                     CLOUD.GeomUtil.parseNodeProperties(object, objJSON, nodeId, trf);
@@ -16918,7 +16918,7 @@ CLOUD.SceneLoader.prototype = {
                 }
                 else if (objJSON.nodeType == "PGeomNode") {
 
-                    var matObj = client.findMaterial(objJSON.materialId, false);
+                    var matObj = client.findMaterial(materialId, false);
                     object = CLOUD.GeomUtil.parsePGeomNodeInstance(objJSON, matObj, trf);
 
                     if (object) {
@@ -16939,7 +16939,7 @@ CLOUD.SceneLoader.prototype = {
                     var symbolJSON = client.findSymbol(objJSON.symbolId);
                     if (symbolJSON) {
 
-                        object = handle_symbol_instance(parent, objJSON, symbolJSON, userData, localUserId, level + 1, trf, nodeId, objJSON.materialId);
+                        object = handle_symbol_instance(parent, objJSON, symbolJSON, userData, localUserId, level + 1, trf, nodeId, materialId);
                     }
 
                 }
@@ -16948,7 +16948,7 @@ CLOUD.SceneLoader.prototype = {
                         continue;
                     }
 
-                    var matObj = client.findMaterial(objJSON.materialId, true);
+                    var matObj = client.findMaterial(materialId, true);
 
                     object = new CLOUD.Mesh(undefined, matObj, objJSON.meshId);
                     CLOUD.GeomUtil.parseNodeProperties(object, objJSON, nodeId);
