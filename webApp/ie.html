@@ -52,7 +52,7 @@
 
         //外部没有cokkie 登出
         if (!getCookie("OUTSSO_AuthToken")) {
-            url = location.origin + "/login.html";
+            url = location.protocol+"//"+location.host + "/login.html";
             isCheckLogin = true;
         }
 

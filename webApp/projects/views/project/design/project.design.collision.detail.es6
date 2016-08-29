@@ -40,6 +40,9 @@ App.Project.DesignCollisionDetail=Backbone.View.extend({
   },
 
   setCollisionPoint:function(event){
+
+    App.Project.recoverySilder();
+
     var self = this,
         that = $(event.target).closest("tr"),
         flag = that.is('.selected'),

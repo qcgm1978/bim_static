@@ -68,7 +68,7 @@ App.Project = {
 			ratio: 1.0
 		},
 		'采光顶': {
-			margin: 0.3,
+			margin: 3,
 			ratio: 1.0
 		}
 	},
@@ -213,6 +213,7 @@ App.Project = {
 		}
 	},
 
+	//过滤器还原（计划[模块化、模拟],质量[开业、过程、隐患],设计[碰撞]）
 	recoverySilder:function(){
 		var show='建筑,结构,景观,幕墙,采光顶,内装&标识,内装&导识',
 			hide='暖通,电气,智能化,给排水';
@@ -225,6 +226,12 @@ App.Project = {
 			ids:[],
 			type:"classCode"
 		})
+		App.Project.Settings.Viewer.filter({
+			type: "plan",
+			ids: []
+		});
+		App.Project.Settings.Viewer.translucent(false);
+
 		$sp.each(function() {
 			var _input=$(this).find('input:first'),
 				_text=$(this).find('.treeText:first').text();
@@ -1589,6 +1596,9 @@ App.Project = {
 	},
 	//在模型中显示(开业验收、过程验收、隐患)
 	showInModel: function($target, type, paramObj) {
+
+		App.Project.recoverySilder();
+
 		var _this = this,
 			key = "", //楼层关键字
 			componentId = paramObj ? paramObj.uuid : $target.data('uuid'), //构件ID
@@ -1628,7 +1638,6 @@ App.Project = {
 
 		//没有分类的时候 只过滤单文件 start
 		if (!cat) {
-			_this.recoverySilder();
 			_this.linkSilder('floors', key);
 			var _hideFileIds = _.filter(_files, function(i) {
 				return i != _secenId;
@@ -1643,7 +1652,6 @@ App.Project = {
 
 		//已有分类、过滤规则
 		if (_this.filterRule.file.indexOf(cat) != -1) {
-			_this.recoverySilder();
 			var _hideFileIds = _.filter(_files, function(i) {
 				return i != _secenId;
 			})
@@ -1652,13 +1660,10 @@ App.Project = {
 				total: [_secenId]
 			});
 		} else if (_this.filterRule.floor.indexOf(cat) != -1) {
-			_this.recoverySilder();
 			_this.linkSilder('floors', key);
 		} else if (_this.filterRule.single.indexOf(cat) != -1) {
-			_this.recoverySilder();
 			_this.sigleRule(cat,key);
 		}else{
-			_this.recoverySilder();
 			_this.linkSilder('floors',key);
 		}
 	},

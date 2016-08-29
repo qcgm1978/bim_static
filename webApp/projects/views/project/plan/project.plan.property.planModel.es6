@@ -57,6 +57,9 @@ App.Project.PlanModel = Backbone.View.extend({
 	},
 	//模型中显示
 	showInModle(event,$el) {
+
+		App.Project.recoverySilder();
+
 		var $target,ids,box;
 		if($el){
 			$target = $el;
