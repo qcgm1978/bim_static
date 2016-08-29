@@ -81,7 +81,6 @@ App.Project.PlanAnalog = Backbone.View.extend({
 
 	//挑选播放
 	pickPlayAnalog(event) {
-
 		//进度模拟中 不做操作
 		if (this.timer) {
 			return;
