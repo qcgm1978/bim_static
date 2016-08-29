@@ -28,6 +28,7 @@ App.Project.PlanModel = Backbone.View.extend({
 		var data = model.toJSON();
 		this.$(".tbPlan tbody").html(this.template(data));
 		var codes = [];
+		$('.planSearch .treeCheckbox input').prop('checked',false);
 
 		$.each(data.data, function(i, item) {
 
@@ -70,7 +71,7 @@ App.Project.PlanModel = Backbone.View.extend({
 		App.Project.Settings.Viewer.translucent(false);
 
 		App.Project.Settings.Viewer.highlight({
-			type: "plan",
+			type: 'userId',
 			ids: undefined
 		});
 		//App.Project.Settings.Viewer.filter({
@@ -98,12 +99,12 @@ App.Project.PlanModel = Backbone.View.extend({
 				ids: codesToFilter
 			});
 
-			App.Project.Settings.Viewer.translucent(true);
-
-			App.Project.Settings.Viewer.highlight({
-				type: "plan",
-				ids: [$target.data("code")]
-			});
+			//App.Project.Settings.Viewer.translucent(true);
+      //
+			//App.Project.Settings.Viewer.highlight({
+			//	type: "plan",
+			//	ids: [$target.data("code")]
+			//});
 			//App.Project.Settings.Viewer.zoomToBuilding(0.05,1);
 			return
 		}
