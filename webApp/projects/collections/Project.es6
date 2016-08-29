@@ -1,14 +1,14 @@
 App.Project = {
 
 	markerClick: function(marker) {
-		var id = marker? marker.userId:"";
+		var id = marker? marker.id:"";
 		if ($(".QualityProcessAcceptance").is(":visible")) {
 			var tr = $(".QualityProcessAcceptance .tbProcessAccessBody tr");
 			tr.each(function() {
 				if(!id){
 					tr.removeClass('selected');
 				}else{
-					if ($(this).data('uuid') == id) {
+					if ($(this).data('id') == id) {
 						tr.removeClass('selected');
 						$(this).addClass("selected");
 					}
@@ -21,7 +21,7 @@ App.Project = {
 				if(!id){
 					tr.removeClass('selected');
 				}else{
-					if ($(this).data('uuid') == id) {
+					if ($(this).data('id') == id) {
 						tr.removeClass('selected');
 						$(this).addClass("selected");
 					}
