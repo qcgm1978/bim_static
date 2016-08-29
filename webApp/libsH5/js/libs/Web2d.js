@@ -6233,7 +6233,7 @@ CLOUD.Extensions.MarkerEditor.prototype.createMarker = function(markerInfo) {
     var style = CLOUD.Extensions.Marker.getDefaultStyle();
     style['fill-color'] = this.getMarkerColor(markerInfo.shapeType, markerInfo.state);
 
-    var markerId = this.generateMarkerId();
+    var markerId = markerInfo.id;   //this.generateMarkerId();
     var marker;
 
     if (CLOUD.Extensions.Marker.shapeTypes.BUBBLE === markerInfo.shapeType) {

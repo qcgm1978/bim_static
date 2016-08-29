@@ -10541,7 +10541,7 @@ CLOUD.PickHelper.prototype = {
                     if (cameraEditor.viewer.extensionHelper.defaultMiniMap) {
                         intersect.axisGridInfo = cameraEditor.viewer.extensionHelper.defaultMiniMap.getAxisGridInfoByPoint(intersect.point);
                     }
-                    
+
                     scope.onObjectSelected(intersect);
 
                     if (event.altKey) {

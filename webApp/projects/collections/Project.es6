@@ -1,7 +1,8 @@
 App.Project = {
 
 	markerClick: function(marker) {
-		var id = marker? marker.id:"";
+		var id = marker? marker.id:"",
+			userId=marker? marker.userId:"";
 		if ($(".QualityProcessAcceptance").is(":visible")) {
 			var tr = $(".QualityProcessAcceptance .tbProcessAccessBody tr");
 			tr.each(function() {
@@ -28,10 +29,10 @@ App.Project = {
 				}
 			})
 		}
-		if(id){
+		if(userId){
 			App.Project.Settings.Viewer.highlight({
 				type: 'userId',
-				ids: [id]
+				ids: [userId]
 			});
 		}else{
 			App.Project.Settings.Viewer.highlight({
