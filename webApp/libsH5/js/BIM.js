@@ -127,7 +127,7 @@
     singleBar: [{
       id: 'zoom',
       icon: 'm-zoom',
-      title: '缩放(Z)',
+      title: '缩放',
       fn: 'zoom',
       keyCode: '',
       type: 'pattern',
@@ -135,7 +135,7 @@
     }, {
       id: 'fit',
       icon: 'm-fit',
-      title: '适应窗口(I)',
+      title: '适应窗口',
       fn: 'fit',
       keyCode: '',
       type: 'viewer'
@@ -282,7 +282,7 @@
     }, {
       id: 'zoom',
       icon: 'm-zoom',
-      title: '缩放(Z)',
+      title: '缩放',
       fn: 'zoom',
       keyCode: '',
       type: 'pattern',
@@ -290,7 +290,7 @@
     }, {
       id: 'fit',
       icon: 'm-fit',
-      title: '适应窗口(I)',
+      title: '适应窗口',
       fn: 'fit',
       keyCode: '',
       type: 'viewer',
