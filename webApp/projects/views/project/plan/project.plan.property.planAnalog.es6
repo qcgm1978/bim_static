@@ -189,6 +189,7 @@ App.Project.PlanAnalog = Backbone.View.extend({
 				if(this.ifOuter[this.PlayArr[0]]['demerge']){
 					this.demerge=true;
 					this.floorNum=2;
+					this.PlayArr.push(this.SourcePlay[0]);
 					if($('#floors>div input').prop('checked')){
 						$('#floors>div input').trigger('click');
 					}else{
