@@ -64,6 +64,14 @@ App.Project.CostReference = Backbone.View.extend({
 			$target.addClass("selected");
 		}
 		if (ids && box) {
+			if(App.Project.Settings.checkBoxIsClick){
+				App.Project.Settings.Viewer.filter({
+					type: "plan",
+					ids: undefined
+				});
+				App.Project.Settings.checkBoxIsClick = false;
+			}
+
 			App.Project.zoomToBox(ids,box);
 			return;
 		}
@@ -84,6 +92,13 @@ App.Project.CostReference = Backbone.View.extend({
 				var box=App.Project.formatBBox(data.data.boundingBox);
 				$target.data("userId", data.data.elements);
 				$target.data("box", box);
+				if(App.Project.Settings.checkBoxIsClick){
+					App.Project.Settings.Viewer.filter({
+						type: "plan",
+						ids: undefined
+					});
+					App.Project.Settings.checkBoxIsClick = false;
+				}
 				App.Project.zoomToBox(data.data.elements,box);
 			}
 		});
