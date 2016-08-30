@@ -189,15 +189,15 @@ App.Project.PlanAnalog = Backbone.View.extend({
 				if(this.ifOuter[this.PlayArr[0]]['demerge']){
 					this.demerge=true;
 					this.floorNum=2;
-					this.PlayArr.push(this.SourcePlay[0]);
+					this.PlayArr.push(this.SourcePlay[0],this.SourcePlay[1],this.SourcePlay[2],this.SourcePlay[3]);
 					if($('#floors>div input').prop('checked')){
 						$('#floors>div input').trigger('click');
 					}else{
 						$('#floors>div input').trigger('click').trigger('click');
 
 					}
-					$('#floors .tree input').eq(1).trigger('click');
-					$('#floors .tree input').eq(0).trigger('click');
+					//$('#floors .tree input').eq(1).trigger('click');
+					//$('#floors .tree input').eq(0).trigger('click');
 					$('#floors .tree input').eq(6).trigger('click');
 					var tree = $('#specialty>ul.tree>li').eq(1);
 					if(tree.find('input').eq(7).prop('checked')){
@@ -228,13 +228,8 @@ App.Project.PlanAnalog = Backbone.View.extend({
 
 
 			}
-			var self = this;
-			//var judge = function(code){
-			//	if(!self.ifOuter[code[0]]['join']){
-			//		code = self.PlayArr.splice(0, 1);
-			//		judge(code);
-			//	}
-			//};
+
+
 			if (this.PlayArr.length) {
 
 
