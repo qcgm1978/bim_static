@@ -3,7 +3,7 @@
 */
 
 var CLOUD = CLOUD || {};
-CLOUD.Version = "20160825";
+CLOUD.Version = "20160829";
 
 CLOUD.GlobalData = {
     SceneSize: 1000,
@@ -10537,6 +10537,10 @@ CLOUD.PickHelper.prototype = {
                 }
                 
                 if (scope.filter.addSelectedId(userId, intersect.object.userData, true)) {
+
+                    if (cameraEditor.viewer.extensionHelper.defaultMiniMap) {
+                        intersect.axisGridInfo = cameraEditor.viewer.extensionHelper.defaultMiniMap.getAxisGridInfoByPoint(intersect.point);
+                    }
 
                     scope.onObjectSelected(intersect);
 

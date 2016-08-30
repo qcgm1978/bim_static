@@ -381,7 +381,8 @@
 
 				events: {
 					"click .remarkCount": "viewComments",
-					"click": "showComment"
+					"click": "showComment",
+					"keydown": "delComment",
 				},
 
 				//初始化
@@ -397,13 +398,40 @@
 
 					var data = this.model.toJSON();
 					this.$el.html(this.template(data)).data("hosttype", data.hostType);
+					this.$el.attr('tabindex', 1);
 					//this.bindContent();
 					return this;
 				},
 
+				delComment(event) {
+
+					if (event.keyCode == 46) {
+						var $item = $(event.target).closest(".item");
+
+						if ($item.hasClass("selected") && parseInt($comment.find(".commentRemark ").css("left")) == 330) {
+
+							var creatorId = $item.find(".name").data("creatorid");
+
+							if (creatorId == (App.Global.User && App.Global.User.userId)) {
+								$.confirm("确认删除该快照么？", function() {
+									Backbone.trigger('delViewPoint', $item.find(".remarkCount").data("id"));
+								});
+							} else {
+								$.tip({
+									type: 'alarm',
+									message: '您无权限删除该批注'
+								});
+							}
+
+						}
+
+					}
+
+				},
+
 				//显示批注
 				showComment(event) {
-					 
+
 					var $item = $(event.target).closest(".item");
 
 					//项目批注
@@ -832,7 +860,7 @@
 
 				//删除图片
 				removeImg(event) {
-					$(event.target).closest(".singleImg").remove(); 
+					$(event.target).closest(".singleImg").remove();
 
 				},
 
@@ -931,16 +959,16 @@
 						pictures.push($(this).data("id"));
 					});
 
-					var texts=this.$(".txtReMark").val().trim().split('@'),
-					    textsUniq=[],
-					    atUserArrs=[];
-					for(var i=1;i<texts.length;i++){
-						_.contains(textsUniq,texts[i].split(' ')[0])?'':textsUniq.push(texts[i].split(' ')[0]);
+					var texts = this.$(".txtReMark").val().trim().split('@'),
+						textsUniq = [],
+						atUserArrs = [];
+					for (var i = 1; i < texts.length; i++) {
+						_.contains(textsUniq, texts[i].split(' ')[0]) ? '' : textsUniq.push(texts[i].split(' ')[0]);
 					}
 
-					for(var j=0;j<textsUniq.length;j++){
-						for(var k=0;k<atUserArr.length;k++){
-							if(atUserArr[k]['userName']==textsUniq[j]){
+					for (var j = 0; j < textsUniq.length; j++) {
+						for (var k = 0; k < atUserArr.length; k++) {
+							if (atUserArr[k]['userName'] == textsUniq[j]) {
 								//if(atUserArr[k]['userName'].indexOf(textsUniq[j])>-1){
 								atUserArrs.push(atUserArr[k]);
 								break;

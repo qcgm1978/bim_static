@@ -1,24 +1,44 @@
 App.Project = {
 
 	markerClick: function(marker) {
-		var id = marker.id;
+		var id = marker? marker.id:"",
+			userId=marker? marker.userId:"";
 		if ($(".QualityProcessAcceptance").is(":visible")) {
 			var tr = $(".QualityProcessAcceptance .tbProcessAccessBody tr");
 			tr.each(function() {
-				if ($(this).data('id') == id) {
+				if(!id){
 					tr.removeClass('selected');
-					$(this).addClass("selected");
+				}else{
+					if ($(this).data('id') == id) {
+						tr.removeClass('selected');
+						$(this).addClass("selected");
+					}
 				}
 			})
 		}
 		if ($(".QualityOpeningAcceptance").is(":visible")) {
 			var tr = $(".QualityOpeningAcceptance .tbOpeningacceptanceBody tr");
 			tr.each(function() {
-				if ($(this).data('id') == id) {
+				if(!id){
 					tr.removeClass('selected');
-					$(this).addClass("selected");
+				}else{
+					if ($(this).data('id') == id) {
+						tr.removeClass('selected');
+						$(this).addClass("selected");
+					}
 				}
 			})
+		}
+		if(userId){
+			App.Project.Settings.Viewer.highlight({
+				type: 'userId',
+				ids: [userId]
+			});
+		}else{
+			App.Project.Settings.Viewer.highlight({
+				type: 'userId',
+				ids: undefined
+			});
 		}
 	},
 

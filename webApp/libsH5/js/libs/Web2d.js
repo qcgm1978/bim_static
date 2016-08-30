@@ -5780,8 +5780,7 @@ CLOUD.Extensions.Marker.prototype = {
             userId: this.userId,
             shapeType: this.shapeType,
             position: this.position ? this.position.clone() : null,
-            boundingBox: this.boundingBox ? this.boundingBox.clone() : null,
-            state: this.state
+            boundingBox: this.boundingBox ? this.boundingBox.clone() : null
         };
     },
 
@@ -6234,7 +6233,7 @@ CLOUD.Extensions.MarkerEditor.prototype.createMarker = function(markerInfo) {
     var style = CLOUD.Extensions.Marker.getDefaultStyle();
     style['fill-color'] = this.getMarkerColor(markerInfo.shapeType, markerInfo.state);
 
-    var markerId = this.generateMarkerId();
+    var markerId = markerInfo.id;   //this.generateMarkerId();
     var marker;
 
     if (CLOUD.Extensions.Marker.shapeTypes.BUBBLE === markerInfo.shapeType) {
@@ -10619,7 +10618,7 @@ CLOUD.Extensions.Helper2D.prototype = {
     // 卸载Marker
     uninitMarkerEditor: function () {
 
-        if (this.markerEditor.isInitialized()) {
+        if (this.markerEditor && this.markerEditor.isInitialized()) {
 
             this.markerEditor.uninit();
 
