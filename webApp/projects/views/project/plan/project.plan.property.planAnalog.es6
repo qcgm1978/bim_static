@@ -157,14 +157,7 @@ App.Project.PlanAnalog = Backbone.View.extend({
 				}else{
 					this.demerge=false;
 					var tree = $('#specialty>ul.tree>li').eq(1);
-					//if(!tree.find('input').eq(7).prop('checked')){
-					//	tree.find('input').eq(7).trigger('click');
-          //
-					//}
-					//if(!tree.find('input').eq(13).prop('checked')){
-					//	tree.find('input').eq(13).trigger('click');
-          //
-					//}
+
 				}
 			}else{
 				if (this.PlayArr[0]==-1){
@@ -195,8 +188,9 @@ App.Project.PlanAnalog = Backbone.View.extend({
 				}
 				if(this.ifOuter[this.PlayArr[0]]['demerge']){
 					this.demerge=true;
+					this.flag=true;
 					this.floorNum=3;
-					this.PlayArr.push(this.SourcePlay[0],this.SourcePlay[1],this.SourcePlay[2],this.SourcePlay[3]);
+					//this.PlayArr.push(this.SourcePlay[0],this.SourcePlay[1],this.SourcePlay[2],this.SourcePlay[3]);
 					if($('#floors>div input').prop('checked')){
 						$('#floors>div input').trigger('click');
 					}else{
@@ -314,37 +308,75 @@ App.Project.PlanAnalog = Backbone.View.extend({
 				if (code[0]==-1){
 
 				}else if(!this.ifOuter[code[0]]['isout']) {
-					App.Project.Settings.Viewer.filter({
-						type: "plan",
-						ids: this.PlayArr.concat(this.allPlayArr)
-					});
-					App.Project.Settings.Viewer.translucent(false);
+					if(this.flag){
+						App.Project.Settings.Viewer.filter({
+							type: "plan",
+							ids: this.PlayArr.concat(this.allPlayArr).concat(this.SourcePlay.slice(0,4))
+						});
+						App.Project.Settings.Viewer.translucent(false);
 
-					App.Project.Settings.Viewer.ignoreTranparent({
-						type: "plan",
-						ids: undefined
-					});
-					App.Project.Settings.Viewer.translucent(true);
+						App.Project.Settings.Viewer.ignoreTranparent({
+							type: "plan",
+							ids: undefined
+						});
+						App.Project.Settings.Viewer.translucent(true);
 
-					App.Project.Settings.Viewer.ignoreTranparent({
-						type: "plan",
-						//ids: [code[0]]
-						ids: this.inners.slice(0, this.ifOuter[code[0]]['index']).concat(this.allPlayArr)
-					});
+						App.Project.Settings.Viewer.ignoreTranparent({
+							type: "plan",
+							//ids: [code[0]]
+							ids: this.inners.slice(0, this.ifOuter[code[0]]['index']).concat(this.allPlayArr).concat(this.SourcePlay.slice(0,4))
+						});
+					}else{
+						App.Project.Settings.Viewer.filter({
+							type: "plan",
+							ids: this.PlayArr.concat(this.allPlayArr)
+						});
+						App.Project.Settings.Viewer.translucent(false);
+
+						App.Project.Settings.Viewer.ignoreTranparent({
+							type: "plan",
+							ids: undefined
+						});
+						App.Project.Settings.Viewer.translucent(true);
+
+						App.Project.Settings.Viewer.ignoreTranparent({
+							type: "plan",
+							//ids: [code[0]]
+							ids: this.inners.slice(0, this.ifOuter[code[0]]['index']).concat(this.allPlayArr)
+						});
+					}
+
+
 
 				}else{
-					App.Project.Settings.Viewer.translucent(false);
+					if(this.flag){
+						App.Project.Settings.Viewer.translucent(false);
 
-					App.Project.Settings.Viewer.ignoreTranparent({
-						type: "plan",
-						//ids: [code[0]]
-						ids: undefined
-					});
+						App.Project.Settings.Viewer.ignoreTranparent({
+							type: "plan",
+							//ids: [code[0]]
+							ids: undefined
+						});
 
-					App.Project.Settings.Viewer.filter({
-						type: "plan",
-						ids: this.PlayArr.concat(this.allPlayArr)
-					});
+						App.Project.Settings.Viewer.filter({
+							type: "plan",
+							ids: this.PlayArr.concat(this.allPlayArr).concat(this.SourcePlay.slice(0,4))
+						});
+					}else{
+						App.Project.Settings.Viewer.translucent(false);
+
+						App.Project.Settings.Viewer.ignoreTranparent({
+							type: "plan",
+							//ids: [code[0]]
+							ids: undefined
+						});
+
+						App.Project.Settings.Viewer.filter({
+							type: "plan",
+							ids: this.PlayArr.concat(this.allPlayArr)
+						});
+					}
+
 				}
 
 
@@ -396,6 +428,7 @@ App.Project.PlanAnalog = Backbone.View.extend({
 	stopAnalog() {
 		clearInterval(this.timer);
 		this.timer = null;
+		this.flag=false;
 		this.$(".planContent tbody tr").removeClass("selected");
 		this.$(".playOrPause").toggleClass("myIcon-play myIcon-pause");
 		this.$(".progressAnalog .processBg").width(0);
