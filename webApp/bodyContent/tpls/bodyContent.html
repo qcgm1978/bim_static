@@ -2,19 +2,34 @@
 	
 	<div id="layoutTodo" class="indexLayout">
 		<!-- 代办-->
-	    <div class="conTodo">
-	        <div class="conHeader"><a class="linkBarIcon more" href="#todo" target="_blank"  title="更多"></a><i></i><span>待办(<label id="todoCounter">0</label>)</span></div><!--数量需写入-->
+	    <div class="conMonth">
+	        <div class="conHeader">
+				<a class="linkBarIcon more" href="#todo" target="_blank"  title="更多"></a>
+				<span class="active" data-type="todoTab">待办(<label id="todoCounter">0</label>)</span>
+				<span data-type="doneTab">已办(<label id="doneCounter">0</label>)</span>
+			</div><!--数量需写入-->
 	        <div class="article" id="todoContainer">
-                <table>
+                <table id="todos">
                     <thead class="listHeader">
                         <td>待办事项</td>
                         <td width="68px">发起人</td>
                         <td width="155px">接收时间</td>
                     </thead>
-                    <tbody  class="conBody" id="todos">
-                        
+                    <tbody  class="conBody">
+
                     </tbody>
+
                 </table>
+				<table  style="display: none;" id="dones">
+					<thead class="listHeader">
+					<td>已办事项</td>
+					<td width="68px">待办人</td>
+					<td width="155px">待办时间</td>
+					</thead>
+					<tbody  class="conBody">
+
+					</tbody>
+				</table>
 	        </div>
 	    </div>
 	</div>

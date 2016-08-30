@@ -14,17 +14,23 @@ App.BodyContent.control = {
         new App.BodyContent.App().render(); //渲染框架
 
         this.viewCacheTodo = this.viewCacheTodo || new App.BodyContent.todosList();
+        this.viewCacheDone = this.viewCacheDone || new App.BodyContent.doneList();
         this.viewCacheMonthEnd = this.viewCacheMonthEnd || new App.BodyContent.monthEndList();
         this.viewCacheMonthStart = this.viewCacheMonthStart || new App.BodyContent.monthStartList();
         this.viewCacheProclamation = this.viewCacheProclamation || new App.BodyContent.proclamationList();
 
-        $(".conMonth .article table").append(this.viewCacheMonthEnd.render().el);
-        $(".conMonth .article table").append(this.viewCacheMonthStart.render().el);
+        $("#layoutMonth .article table").append(this.viewCacheMonthEnd.render().el)
+            .append(this.viewCacheMonthStart.render().el);
 
         $("#proclamation").append(this.viewCacheProclamation.render().el);
 
         this.loadData(this.todoCollection, {
             status: 1,
+            pageIndex: 1,
+            pageItemCount: 6
+        });
+        this.loadData(this.doneCollection, {
+            status: 2,
             pageIndex: 1,
             pageItemCount: 6
         });
@@ -46,17 +52,21 @@ App.BodyContent.control = {
         //切换 计划开始 结束
         $(".conMonth .conHeader span").on("click", function() {
 
+            var _type=$(this).data("type");
+
             if ($(this).hasClass("active")) return; 
 
             $(this).addClass("active").siblings("span").removeClass("active");
 
-            if ($(this).data("type") == "start") {
+
+
+            if ( _type== "start") {
 
                 $("#endTaskContainer thead .startTime").text("计划开始日期");
                 $("#monthStart").show();
                 $("#monthEnd").hide();
 
-            } else {
+            } else if(_type=="end") {
 
                 $("#endTaskContainer thead .startTime").text("计划结束日期");
                 $(this).css({
@@ -65,6 +75,12 @@ App.BodyContent.control = {
                 $("#monthStart").hide();
                 $("#monthEnd").show();
 
+            }else if(_type=="todoTab") {
+                $("#todos").show();
+                $("#dones").hide();
+            }else if(_type=="doneTab") {
+                $("#todos").hide();
+                $("#dones").show();
             }
 
         });
@@ -111,6 +127,22 @@ App.BodyContent.control = {
             }
         }
     })),
+
+    doneCollection: new(Backbone.Collection.extend({
+        model: App.BodyContent.model,
+        urlType: "fetchBodyContentTodos",
+        parse: function(response) {
+            if (response.message == "success") {
+                var _data = response.data.items;
+                try {
+                    $("#doneCounter").text(_data.length);
+                } catch (e) {}
+                return _data;
+            }
+        }
+    })),
+
+
 
     slideCollection: new(Backbone.Collection.extend({
         model: App.BodyContent.model,

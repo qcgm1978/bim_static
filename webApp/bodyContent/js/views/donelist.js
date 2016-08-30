@@ -1,7 +1,7 @@
 /*
  * @require /bodyContent/js/view/todos.js
  */
-App.BodyContent.todosList = Backbone.View.extend({
+App.BodyContent.doneList = Backbone.View.extend({
 
     _items:0,
 
@@ -15,9 +15,9 @@ App.BodyContent.todosList = Backbone.View.extend({
 
     initialize : function(){
         var _this=this;
-        this.listenTo(App.BodyContent.control.todoCollection,"add",this.addOne);
-        this.listenTo(App.BodyContent.control.todoCollection,"reset",function(){
-            $("#todos tbody").empty();
+        this.listenTo(App.BodyContent.control.doneCollection,"add",this.addOne);
+        this.listenTo(App.BodyContent.control.doneCollection,"reset",function(){
+            $("#dones tbody").empty();
             _this._items=0;
          });
         this.render();
@@ -33,6 +33,6 @@ App.BodyContent.todosList = Backbone.View.extend({
         if(this._items%2==1){
             el.addClass('odd');
         }
-        $("#todos tbody").append(el);
+        $("#dones tbody").append(el);
     }
 });
