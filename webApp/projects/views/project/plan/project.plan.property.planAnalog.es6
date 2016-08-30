@@ -150,21 +150,21 @@ App.Project.PlanAnalog = Backbone.View.extend({
 
 			//判断是否需要拆分
 			if(this.demerge ){
-				if(this.floorNum<6){
+				if(this.floorNum<7){
 					$('#floors .tree input').eq(this.floorNum).trigger('click');
 					this.floorNum++;
 					return
 				}else{
 					this.demerge=false;
 					var tree = $('#specialty>ul.tree>li').eq(1);
-					if(!tree.find('input').eq(7).prop('checked')){
-						tree.find('input').eq(7).trigger('click');
-
-					}
-					if(!tree.find('input').eq(13).prop('checked')){
-						tree.find('input').eq(13).trigger('click');
-
-					}
+					//if(!tree.find('input').eq(7).prop('checked')){
+					//	tree.find('input').eq(7).trigger('click');
+          //
+					//}
+					//if(!tree.find('input').eq(13).prop('checked')){
+					//	tree.find('input').eq(13).trigger('click');
+          //
+					//}
 				}
 			}else{
 				if (this.PlayArr[0]==-1){
@@ -184,11 +184,18 @@ App.Project.PlanAnalog = Backbone.View.extend({
 						$('#floors>div input').trigger('click');
 					}
 					this.PlayArr=[];
+					if($('#specialty>div input').prop('checked')){
+						$('#specialty>div input').trigger('click').trigger('click');
+
+					}else{
+						$('#specialty>div input').trigger('click');
+
+					}
 					return
 				}
 				if(this.ifOuter[this.PlayArr[0]]['demerge']){
 					this.demerge=true;
-					this.floorNum=2;
+					this.floorNum=3;
 					this.PlayArr.push(this.SourcePlay[0],this.SourcePlay[1],this.SourcePlay[2],this.SourcePlay[3]);
 					if($('#floors>div input').prop('checked')){
 						$('#floors>div input').trigger('click');
@@ -196,16 +203,72 @@ App.Project.PlanAnalog = Backbone.View.extend({
 						$('#floors>div input').trigger('click').trigger('click');
 
 					}
-					//$('#floors .tree input').eq(1).trigger('click');
+					$('#floors .tree input').eq(2).trigger('click');
 					//$('#floors .tree input').eq(0).trigger('click');
-					$('#floors .tree input').eq(6).trigger('click');
+					//$('#floors .tree input').eq(6).trigger('click');
+					//专业隐藏
 					var tree = $('#specialty>ul.tree>li').eq(1);
+
 					if(tree.find('input').eq(7).prop('checked')){
 						tree.find('input').eq(7).trigger('click');
 
 					}
-					if(tree.find('input').eq(13).prop('checked')){
-						tree.find('input').eq(13).trigger('click');
+					if(tree.find('input').eq(1).prop('checked')){
+						tree.find('input').eq(1).trigger('click');
+
+					}
+					if(tree.find('input').eq(2).prop('checked')){
+						tree.find('input').eq(2).trigger('click');
+
+					}
+					if(tree.find('input').eq(8).prop('checked')){
+						tree.find('input').eq(8).trigger('click');
+
+					}
+					if(tree.find('input').eq(9).prop('checked')){
+						tree.find('input').eq(9).trigger('click');
+
+					}
+					if(tree.find('input').eq(10).prop('checked')){
+						tree.find('input').eq(10).trigger('click');
+
+					}
+					if(tree.find('input').eq(11).prop('checked')){
+						tree.find('input').eq(11).trigger('click');
+
+					}
+					if(tree.find('input').eq(12).prop('checked')){
+						tree.find('input').eq(12).trigger('click');
+
+					}
+					//建筑隐藏
+					var tree = $('#specialty>ul.tree>li').eq(0);
+
+					if(tree.find('input').eq(1).prop('checked')){
+						tree.find('input').eq(1).trigger('click');
+
+					}
+					if(tree.find('input').eq(2).prop('checked')){
+						tree.find('input').eq(2).trigger('click');
+
+					}
+					if(tree.find('input').eq(3).prop('checked')){
+						tree.find('input').eq(3).trigger('click');
+
+					}
+					if(tree.find('input').eq(4).prop('checked')){
+						tree.find('input').eq(4).trigger('click');
+
+					}
+					//内饰隐藏
+					var tree = $('#specialty>ul.tree>li').eq(7);
+
+					if(tree.find('input').eq(1).prop('checked')){
+						tree.find('input').eq(1).trigger('click');
+
+					}
+					if(tree.find('input').eq(2).prop('checked')){
+						tree.find('input').eq(2).trigger('click');
 
 					}
 
@@ -249,7 +312,7 @@ App.Project.PlanAnalog = Backbone.View.extend({
 
 
 				if (code[0]==-1){
-					
+
 				}else if(!this.ifOuter[code[0]]['isout']) {
 					App.Project.Settings.Viewer.filter({
 						type: "plan",
