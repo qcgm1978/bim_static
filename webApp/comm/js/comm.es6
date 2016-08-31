@@ -140,17 +140,17 @@ App.Comm = {
 		return false;
 	},
 
-	//格式化 状态
-	formatStatus: function(status, type, createId) {
+	//格式化 状态  type 1  project  2 resource
+	formatStatus: function(status, type, createId, locked) {
 
-		if (status == 3 || status == 10) {
-			if (App.Global.User.userId == createId) {
-				return '待审核';
-			} else {
+		//项目  非初始 锁定
+		if (type == 1 && App.Project.Settings.CurrentVersion.name != '初始版本' && locked) { 
+			if (App.Global.User.userId != createId) {
 				return '锁定';
-			}
-		}
+			}  
+		} 
 
+		
 		if (type == 1) {
 			return App.Comm.versionStatus[status] || '';
 		} else if (type == 2) {
@@ -363,8 +363,8 @@ App.Comm = {
 	checkCookie(cookies) {
 
 		//用户重新登录了
-		if (App.Comm.getCookie("userId") != App.Comm.getCookie("userId", cookies)) { 
-			
+		if (App.Comm.getCookie("userId") != App.Comm.getCookie("userId", cookies)) {
+
 			App.Comm.clearCookie();
 
 			if (cookies) {
@@ -376,7 +376,7 @@ App.Comm = {
 
 					val && App.Comm.setCookie(keys[i], val);
 				}
-			} 
+			}
 			App.Comm.getUserInfo();
 			window.location.reload();
 

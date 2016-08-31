@@ -37,7 +37,7 @@
 </span>
 
 
-<span class="fileStatus inlineBlock"><%= folder?'': App.Comm.formatStatus(status,2,creatorId) %></span>
+<span class="fileStatus inlineBlock"><%= folder?'': App.Comm.formatStatus(status,2,creatorId,locked) %></span>
 <span class="fileOp inlineBlock"><%= creatorName %></span>
 <span class="fileSize inlineBlock"><%=length?App.Comm.formatSize(length):""%></span>
 <span class="fileDate inlineBlock"><%= createTime?new Date(createTime).format("yyyy-MM-dd"):"" %></span>

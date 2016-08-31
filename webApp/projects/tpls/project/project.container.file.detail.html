@@ -39,10 +39,9 @@
  <a href="/static/dist/app/project/modelChange/index.html?id=<%=fileVersionId%>&projectId=<%=App.Project.Settings.projectId%>&projectVersionId=<%=App.Project.Settings.CurrentVersion.id%>&modificationId=<%=modificationId%>&type=<%=App.Project.Settings.projectId==App.Project.Settings.CurrentVersion.id?'std':'base'%>" target="_blank" class="changeContrast inlineBlock">有</a>
 <%}else{%>
 	<span class="changeContrast inlineBlock"></span>
-<%}%>
-
-
-<span class="fileStatus inlineBlock"><%= folder?'':App.Comm.formatStatus(status,1,creatorId) %></span>
+<%}%> 
+ 
+<span class="fileStatus inlineBlock"><%= folder?'':App.Comm.formatStatus(status,1,creatorId,locked) %></span>
 <span class="fileOp inlineBlock"><%= creatorName %></span>
 <span class="fileSize inlineBlock"><%=App.Comm.formatSize(length)%></span>
 <span class="fileDate inlineBlock"><%= new Date(createTime).format("yyyy-MM-dd") %></span>
