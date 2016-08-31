@@ -233,7 +233,7 @@ App.Project = {
 		}
 	},
 
-	//过滤器还原（计划[模块化、模拟],质量[开业、过程、隐患],设计[碰撞]）
+	//过滤器还原（计划[模块化、模拟],质量[开业、过程、隐患],设计[碰撞],成本[清单、校验]）
 	recoverySilder:function(){
 		var show='建筑,结构,景观,幕墙,采光顶,内装&标识,内装&导识',
 			hide='暖通,电气,智能化,给排水';
@@ -1617,9 +1617,6 @@ App.Project = {
 	},
 	//在模型中显示(开业验收、过程验收、隐患)
 	showInModel: function($target, type, paramObj) {
-
-		App.Project.recoverySilder();
-
 		var _this = this,
 			key = "", //楼层关键字
 			componentId = paramObj ? paramObj.uuid : $target.data('uuid'), //构件ID
@@ -1634,6 +1631,7 @@ App.Project = {
 			$target.parent().find(".selected").removeClass("selected");
 			$target.addClass("selected");
 		}
+		App.Project.recoverySilder();
 		var _temp = location,
 			_loc = "",
 			_secenId = componentId.split('.')[0], //用于过滤文件ID
