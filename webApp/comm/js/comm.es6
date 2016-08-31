@@ -143,13 +143,13 @@ App.Comm = {
 	//格式化 状态
 	formatStatus: function(status, type, createId) {
 
-		if (status == 3 || status == 10) {
-			if (App.Global.User.userId == createId) {
-				return '待审核';
-			} else {
-				return '锁定';
-			}
-		}
+		// if (status == 3 || status == 10) {
+		// 	if (App.Global.User.userId == createId) {
+		// 		return '待审核';
+		// 	} else {
+		// 		return '锁定';
+		// 	}
+		// }
 
 		if (type == 1) {
 			return App.Comm.versionStatus[status] || '';
