@@ -82,6 +82,7 @@ var AppRoute = Backbone.Router.extend({
 	},
 	//项目
 	projects: function() {
+
 		if (this.reset() == false) {
 			return;
 		}
@@ -95,7 +96,7 @@ var AppRoute = Backbone.Router.extend({
 	},
 
 	//单个项目
-	project: function(id, versionId) {
+	project: function(id, versionId) { 
 
 		if (this.reset() == false) {
 			return;

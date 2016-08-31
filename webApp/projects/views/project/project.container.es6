@@ -13,7 +13,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 
 	events: {
 		"click .breadItem": "breadItemClick", //点击头部导航  项目  版本  列表 模型
-		"click .projectList .projectBox .item": "beforeChangeProject", //切换项目 之前 处理
+		"click .projectList .projectBox .item,.projectVersionList .container .item": "beforeChangeProject", //切换项目 之前 处理
 		"click .slideBar": "navBarShowAndHide",
 		"mousedown .dragSize": "dragSize",
 		"click .projectVersionList .nav .item": "changeVersionTab",
@@ -120,10 +120,10 @@ App.Project.ProjectContainer = Backbone.View.extend({
 					var props = res.data.properties;
 					for (var str = '', i = 0; i < props.length; i++) {
 						if (res.data.className == '成本管理' || (props[i]['type'] == 'tree')) {
-							try{
+							try {
 								str += App.Project.properCostTree(props[i]['value']);
 
-							}catch(e){
+							} catch (e) {
 								_$current.parent().siblings('.modleList').html(App.Project.costDataHtml);
 								return
 							}
@@ -154,7 +154,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 
 					if (res.data.className == '成本管理') {
 						//_$current.parent().append(str);
-							_$current.parent().siblings('.modleList').html(str);
+						_$current.parent().siblings('.modleList').html(str);
 
 
 
@@ -212,7 +212,8 @@ App.Project.ProjectContainer = Backbone.View.extend({
 	},
 
 	//跳转之前
-	beforeChangeProject(event) {
+	beforeChangeProject(event) {  
+		 
 		var $target = $(event.target).closest(".item"),
 			href = $target.prop("href");
 
@@ -221,6 +222,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			return false;
 		}
 
+		location.reload();
 	},
 
 	//加载分组项目
@@ -471,7 +473,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			type: 'model',
 			element: $("#projectContainer .modelContainerContent"),
 			sourceId: App.Project.Settings.DataModel.sourceId,
-			etag:App.Project.Settings.DataModel.etag, //"f3159e36f65d275ab67867a2187f857c" ||
+			etag: App.Project.Settings.DataModel.etag, //"f3159e36f65d275ab67867a2187f857c" ||
 			projectId: App.Project.Settings.projectId,
 			projectVersionId: App.Project.Settings.CurrentVersion.id
 		});
@@ -487,9 +489,9 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			})
 		});
 
-		viewer.on("click", function(model) { 
-			 
-			  
+		viewer.on("click", function(model) {
+
+
 			//取消计划高亮
 			var result = that.cancelhighlightPlan();
 
@@ -542,7 +544,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 				//if (box && box.length) {
 				//	App.Project.zoomToBox(App.Project.Settings.PlanElement.elements, box);
 				//}
-				viewer.zoomToBuilding(0.05,1);
+				viewer.zoomToBuilding(0.05, 1);
 			});
 		}
 
