@@ -24,9 +24,9 @@
 		this.Settings = $.extend(defaults, options);
 
 		//查看时禁用
-		if (this.Settings.fileIds) {
-			this.Settings.isEnable = false;
-		}
+		// if (this.Settings.fileIds) {
+		// 	this.Settings.isEnable = false;
+		// }
 
 		// if (!this.Settings.appKey) {
 		// 	alert("缺少参数appKey");
@@ -92,8 +92,7 @@
 
 				success: function(data) {
 					if (data.code == 0) {
-
-						that.setCookie("token_cookie", data.data);
+						//that.setCookie("token_cookie", data.data);
 						that.Settings.token_cookie = data.data;
 						isVerification = true;
 					} else {
@@ -117,7 +116,7 @@
 			var Days = 30,
 				exp = new Date();
 			exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 1000),
-			doMain=window.location.host.substring(window.location.host.indexOf("."));
+				doMain = window.location.host.substring(window.location.host.indexOf("."));
 
 			document.cookie = name + "=" + value + ";domain=" + doMain + ";expires=" + exp.toGMTString() + ";path=/";
 		},
@@ -174,10 +173,10 @@
 
 			if (Settings.isEnable) {
 				rightEnter += '<button class="btnEnter myBtn myBtn-default"><i class="bg ckBg"></i> 选择文件</button> ';
-			}
+			} 
 			var count = 0;
-			if (Settings.fileids) {
-				count = Settings.fileids.split(",").length;
+			if (Settings.fileIds) {
+				count = Settings.fileIds.split(",").length;
 			}
 
 			rightEnter += '<span class="fileSelText_tmd">已选<span class="fileCount">' + count + '</span>文件</span>';
@@ -226,19 +225,21 @@
 		//生成左侧树
 		renderRightTree(data) {
 			var html = this.treeRoot(data);
-			$(".rightEnter .fileEnterBox").html(html);
-			console.log(data);
+			$(".rightEnter .fileEnterBox .bindScroll").html(html);
+			$(".rightEnter .fileEnterBox .item-content.file").find(".nodeSwitch").remove();
+			if (this.Settings.isEnable) {
+				$(".rightEnter .fileEnterBox .item-content").append('<i class="bg delFile"></i>'); 
+			}
 		},
 
 		//渲染tree
 		renderTree(data) {
 
 			var html = this.treeRoot(data);
-
 			this.Settings.$dialog.find(".treeViewScroll").html(html);
-
 			this.Settings.$dialog.find(".leftFile, .contentBox, .rightEnter,.footer").show();
 			this.Settings.$dialog.find(".loading").hide();
+
 		},
 
 		// 根
@@ -350,7 +351,7 @@
 
 				var FileIdArr = [];
 
-				$dialog.find(".contentBox .ck.selected").each(function() {
+				$dialog.find(".fileBodyScrollBox .ck.selected").each(function() {
 					FileIdArr.push($(this).data("fileversionid"));
 				});
 
