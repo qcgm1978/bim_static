@@ -50,6 +50,7 @@ App.Project.PlanModel = Backbone.View.extend({
 	switch(){
 		if($('.planModel .itemClick.selected').length>0){
 			var self = this;
+			App.Project.Settings.checkBoxIsClick = true;
 			setTimeout(function(){
 				self.showInModle('',$('.planModel .itemClick.selected'));
 			},100)
