@@ -634,6 +634,16 @@
       viewer.render();
       callback && callback();
     },
+    // 模型过滤器
+    filterByUserIds: function(ids, callback) {
+      // ids:[id,id,id]
+      var self = this;
+      var viewer = self.viewer;
+      var filter = viewer.getFilters();
+      filter.setFilterByUserIds(ids);
+      viewer.render();
+      callback && callback();
+    },
     fileFilter: function(obj) {
       var self = this;
       var viewer = self.viewer;
