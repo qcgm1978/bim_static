@@ -115,7 +115,7 @@ App.Project.PlanModel = Backbone.View.extend({
 
 		if (box && ids) {
 			if($('.planSearch .treeCheckbox input').prop('checked')){
-
+				App.Project.Settings.checkBoxIsClick = true;
 				App.Project.Settings.Viewer.filterByUserIds(ids);
 
 				return
@@ -161,7 +161,7 @@ App.Project.PlanModel = Backbone.View.extend({
 					$target.data("userId", data.data.elements);
 					$target.data("box", box);
 					if($('.planSearch .treeCheckbox input').prop('checked')){
-
+						App.Project.Settings.checkBoxIsClick = true;
 						App.Project.Settings.Viewer.filterByUserIds(data.data.elements);
 
 						return

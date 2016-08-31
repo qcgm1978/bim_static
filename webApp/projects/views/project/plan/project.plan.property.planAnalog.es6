@@ -94,7 +94,11 @@ App.Project.PlanAnalog = Backbone.View.extend({
 			type: "plan",
 			ids: undefined
 		});
+		if(App.Project.Settings.checkBoxIsClick){
+			App.Project.Settings.Viewer.filterByUserIds(undefined);
 
+			App.Project.Settings.checkBoxIsClick = false;
+		}
 		this.showInModle($(event.currentTarget));
 
 		//.addClass("selected").siblings().removeClass("selected").end()
@@ -109,6 +113,11 @@ App.Project.PlanAnalog = Backbone.View.extend({
 	//开始模拟
 	playAnalog(event) {
 
+		if(App.Project.Settings.checkBoxIsClick){
+			App.Project.Settings.Viewer.filterByUserIds(undefined);
+
+			App.Project.Settings.checkBoxIsClick = false;
+		}
 		var $target = $(event.target);
 
 		//没有模拟数据
