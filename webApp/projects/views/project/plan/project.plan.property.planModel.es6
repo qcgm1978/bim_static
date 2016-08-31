@@ -93,27 +93,33 @@ App.Project.PlanModel = Backbone.View.extend({
     }
 
 
-		if($('.planSearch .treeCheckbox input').prop('checked')){
-
-			var codesToFilter = _.filter(this.codes,function(num){return num!=$target.data("code")});
-			App.Project.Settings.Viewer.translucent(false);
-
-			App.Project.Settings.Viewer.filter({
-				type: "plan",
-				ids: codesToFilter
-			});
-
-			//App.Project.Settings.Viewer.translucent(true);
-      //
-			//App.Project.Settings.Viewer.highlight({
-			//	type: "plan",
-			//	ids: [$target.data("code")]
-			//});
-			//App.Project.Settings.Viewer.zoomToBuilding(0.05,1);
-			return
-		}
+		//if($('.planSearch .treeCheckbox input').prop('checked')){
+    //
+		//	var codesToFilter = _.filter(this.codes,function(num){return num!=$target.data("code")});
+		//	App.Project.Settings.Viewer.translucent(false);
+    //
+		//	App.Project.Settings.Viewer.filter({
+		//		type: "plan",
+		//		ids: codesToFilter
+		//	});
+    //
+		//	//App.Project.Settings.Viewer.translucent(true);
+     // //
+		//	//App.Project.Settings.Viewer.highlight({
+		//	//	type: "plan",
+		//	//	ids: [$target.data("code")]
+		//	//});
+		//	//App.Project.Settings.Viewer.zoomToBuilding(0.05,1);
+		//	return
+		//}
 
 		if (box && ids) {
+			if($('.planSearch .treeCheckbox input').prop('checked')){
+				App.Project.Settings.checkBoxIsClick = true;
+				App.Project.Settings.Viewer.filterByUserIds(ids);
+
+				return
+			}
 			if($el){
 				App.Project.Settings.Viewer.translucent(false);
 
@@ -122,10 +128,12 @@ App.Project.PlanModel = Backbone.View.extend({
 					//ids: [code[0]]
 					ids: undefined
 				});
-				App.Project.Settings.Viewer.filter({
-					type: "plan",
-					ids: undefined
-				});
+				//App.Project.Settings.Viewer.filter({
+				//	type: "plan",
+				//	ids: undefined
+				//});
+				App.Project.Settings.Viewer.filterByUserIds(undefined);
+
 				App.Project.Settings.Viewer.translucent(true);
 				App.Project.Settings.Viewer.highlight({
 					type: 'userId',
@@ -152,6 +160,12 @@ App.Project.PlanModel = Backbone.View.extend({
 				if(box && box.length){
 					$target.data("userId", data.data.elements);
 					$target.data("box", box);
+					if($('.planSearch .treeCheckbox input').prop('checked')){
+						App.Project.Settings.checkBoxIsClick = true;
+						App.Project.Settings.Viewer.filterByUserIds(data.data.elements);
+
+						return
+					}
 					if($el){
 						App.Project.Settings.Viewer.translucent(false);
 
@@ -160,10 +174,12 @@ App.Project.PlanModel = Backbone.View.extend({
 							//ids: [code[0]]
 							ids: undefined
 						});
-						App.Project.Settings.Viewer.filter({
-							type: "plan",
-							ids: undefined
-						});
+						//App.Project.Settings.Viewer.filter({
+						//	type: "plan",
+						//	ids: undefined
+						//});
+						App.Project.Settings.Viewer.filterByUserIds(undefined);
+
 						App.Project.Settings.Viewer.translucent(true);
 						App.Project.Settings.Viewer.highlight({
 							type: 'userId',

@@ -12606,6 +12606,7 @@ CLOUD.Filter = function () {
         return _hideUnselected;
     };
 
+    // only show the nodes with the specified ids. 
     this.setFilterByUserIds = function (ids) {
 
         if (ids) {
@@ -12930,7 +12931,7 @@ CLOUD.Filter = function () {
     this.isVisible = function (node) {
 
         var id = node.name;
-        if (visibilityFilter.ids && (visibilityFilter.ids[id] === 0)) {
+        if (visibilityFilter.ids && visibilityFilter.ids[id] === undefined) {
             return false;
         }
 
