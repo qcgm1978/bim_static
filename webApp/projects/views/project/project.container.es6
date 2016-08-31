@@ -120,7 +120,13 @@ App.Project.ProjectContainer = Backbone.View.extend({
 					var props = res.data.properties;
 					for (var str = '', i = 0; i < props.length; i++) {
 						if (res.data.className == '成本管理' || (props[i]['type'] == 'tree')) {
-							str += App.Project.properCostTree(props[i]['value']);
+							try{
+								str += App.Project.properCostTree(props[i]['value']);
+
+							}catch(e){
+								_$current.parent().siblings('.modleList').html(App.Project.costDataHtml);
+								return
+							}
 
 						} else if (props[i]['type'] == 'list') {
 							str += '<li class="modleItem"><span class="modleName overflowEllipsis"><div class="modleNameText overflowEllipsis">' + props[i]['property'] + '</div></span> <span class="modleVal rEnd"></span> </li>';
@@ -146,10 +152,11 @@ App.Project.ProjectContainer = Backbone.View.extend({
 
 					}
 
-
 					if (res.data.className == '成本管理') {
 						//_$current.parent().append(str);
-						_$current.parent().siblings('.modleList').html(str);
+							_$current.parent().siblings('.modleList').html(str);
+
+
 
 					} else {
 						_$current.parent().siblings('.modleList').html(str);

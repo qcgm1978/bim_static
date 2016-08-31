@@ -1371,7 +1371,8 @@ App.Project = {
 				if (data.code == 0) {
 					if (data.data.length > 0) {
 						var html = App.Project.properCostTree(data.data);
-						that.$el.find(".attrCostBox").show().find(".modle").append(html);
+						//that.$el.find(".attrCostBox").show().find(".modle").append(html);
+						App.Project.costDataHtml = html;
 					}
 				}
 			});
@@ -1488,7 +1489,7 @@ App.Project = {
 
 		App.Comm.ajax(data, (data) => {
 			if (data.code == 0) {
-				debugger
+				//debugger
 				if (data.data.length > 0) {
 					var lis = '';
 					$.each(data.data, function(i, item) {
