@@ -9,7 +9,9 @@ App.Services.MemberNav=Backbone.View.extend({
     template:_.templateUrl("/services/tpls/auth/member/services.member.nav.html"),
     events:{
         "click #outer":'outer',
-        "click #inner":'inner'
+        "click #inner":'inner',
+        " .searchContent":"search",
+        "click .search_result":"chooseOrg"
     },
     render:function(){
         this.$el.html(this.template);
@@ -17,9 +19,14 @@ App.Services.MemberNav=Backbone.View.extend({
     },
     initialize:function(){
         //默认根据角色权限加载  adm用户加载全部，keyMem用户只显示项目管理.
-        Backbone.on("serviceMemberTopSelectStatus",this.serviceMemberTopSelectStatus,this)
+        Backbone.on("serviceMemberTopSelectStatus",this.serviceMemberTopSelectStatus,this);
+        Backbone.on("serviceMemberResetSearchContent",this.serviceMemberResetSearchContent,this)
     },
+    //清除搜索内容
+    serviceMemberResetSearchContent:function(){
 
+    },
+    //
     serviceMemberTopSelectStatus:function(){
         this.$(".inner span").removeClass("active");
         this.$(".outer span").removeClass("active");
@@ -96,6 +103,25 @@ App.Services.MemberNav=Backbone.View.extend({
             App.Services.Member.memLoadingStatus = false;
         }).done(function(){
             App.Services.queue.next();
+        });
+    },
+    //搜索模块
+    search:function(url,fn){
+
+    },
+    //选择搜索
+    chooseOrg:function(e){
+        var _this = this;
+        var ele = e.target || e.srcElement;
+        var chosenOz = $(ele).attr("data-code");
+        //查看外部还是内部，递归查找上级，保证ajax完成后再执行查找
+        $.ajax({
+            url:'',
+            type:'',
+            data:'',
+            success:function(res){
+
+            }
         });
     }
 });

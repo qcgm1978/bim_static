@@ -123,3 +123,53 @@ App.Services.exetor = function(_this){
         }
     }
 };
+
+//搜索后递归查找组织，param，当前说选项模型
+App.Services.memSearchParentOz = function(present){
+    var pre = JSON.parse(present);
+    var parentId = {
+        parentId : pre.parentId,
+        outer:pre.outer,
+        includeUsers:true
+    };
+    $.ajax({
+        url:App.API.URL.searchServicesMember,
+        type:'GET',
+        data:JSON.stringify(parentId),
+        success:function(res){
+            if(res.data && res.data.length){
+
+                if(!res.data[0].parentId){//没有父项，请求结束
+                    return
+                }
+
+                //右侧处理方案，都加载搜索项上一级组织，如何判断是上级组织
+                //存储数据
+                //拿到第一个数据的parent
+                App.Services.memSearchParentOz(present);
+            }else{
+                //无结果
+            }
+        },
+        error:function(e){
+        }
+    })
+};
+
+//search result
+App.Services.memSearchResult = function(arr) {
+    var frag = document.createDocumentFragment();
+    if(typeof arr == 'string'){
+        arr = JSON.parse(arr)
+    }
+    if (typeof arr == 'array' && arr.length) {
+        //排序
+        for (var i = 0; i < arr.length; i++) {
+            if(arr[i]){
+                var li = $('<li class="search_result" data-code="'+ arr[i].toString() +' ">'+arr[i].name + '（'+ arr[i].parentname + "）"+'</li>');
+                frag.appendChild(li);
+            }
+        }
+        return frag;
+    }
+};
