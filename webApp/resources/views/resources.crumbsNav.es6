@@ -71,6 +71,10 @@ App.ResourceCrumbsNav = Backbone.View.extend({
 	},
 
 	stopPropagation(event) {
+
+		$("#pageLoading").show();
+		location.reload();
+
 		//this.$(".projectVersionList").hide();
 		event.stopPropagation();
 	},
@@ -83,7 +87,7 @@ App.ResourceCrumbsNav = Backbone.View.extend({
 	},
 
 	//切换 文件 模型 浏览器
-	switchFileMoldel(event) { 
+	switchFileMoldel(event) {
 
 		var $target = $(event.target),
 			type = $target.data("type");
@@ -110,7 +114,7 @@ App.ResourceCrumbsNav = Backbone.View.extend({
 			}
 			//隐藏下拉
 			$target.addClass("selected").siblings().removeClass("selected");
-		} 
+		}
 	},
 
 	//获取模型id

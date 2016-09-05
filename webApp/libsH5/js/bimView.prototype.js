@@ -87,6 +87,9 @@
       bimView.comm.bindEvent.init();
       self.pub("start");
     },
+    destroy:function(){
+        this.viewer.destroy();
+    },
     regesiterEvent: function(options) {
       var self = this;
       var _opt = options;

@@ -212,8 +212,8 @@ App.Project.ProjectContainer = Backbone.View.extend({
 	},
 
 	//跳转之前
-	beforeChangeProject(event) {  
-		 
+	beforeChangeProject(event) {
+
 		var $target = $(event.target).closest(".item"),
 			href = $target.prop("href");
 
@@ -222,7 +222,19 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			return false;
 		}
 
-		location.reload();
+		App.count = App.count || 1;
+		//destroy 清除不干净 没5次 reload page
+		if (App.count > 4) {
+			$("#pageLoading").show();
+			location.reload();
+		} else {
+			App.count ++;
+			if ($target.prop("href") != location.href && App.Project.Settings.Viewer) {
+				App.Project.Settings.Viewer.destroy();
+				App.Project.Settings.Viewer = null;
+			}
+
+		}
 	},
 
 	//加载分组项目

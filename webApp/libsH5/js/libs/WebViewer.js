@@ -816,7 +816,12 @@ CLOUD.GeomUtil = {
 
     EmptyGeometry: new THREE.Geometry(),
     UnitCylinderInstance: new THREE.CylinderGeometry(1, 1, 1, 8, 1, false),
-    UnitBoxInstance : new THREE.BoxGeometry(1, 1, 1)
+    UnitBoxInstance: new THREE.BoxGeometry(1, 1, 1),
+
+    destroyUnitInstances: function () {
+        CLOUD.GeomUtil.UnitCylinderInstance.dispose();
+        CLOUD.GeomUtil.UnitBoxInstance.dispose();
+    }
 };
 THREE.CombinedCamera = function (width, height, fov, near, far, orthoNear, orthoFar) {
 
@@ -1142,6 +1147,11 @@ CLOUD.RenderGroup = function () {
         }
     }
 
+    this.destroy = function () {
+        opaqueObjects = [];
+        transparentObjects = [];
+    };
+
     this.restart = function () {
         renderingIdx = 0;
         opaqueFinished = false;
@@ -1315,6 +1325,17 @@ CLOUD.OrderedRenderer = function () {
 
     this.updateObjectList = function (isUpdate) {
         _isUpdateObjectList = isUpdate;
+    };
+
+    this.destroy = function () {
+
+        for (var ii = 0, len = renderGroups.length; ii < len; ++ii) {
+            var group = renderGroups[ii];
+            if (group !== undefined) {
+                group.destroy();
+            }
+        }
+
     };
 
     this.restart  = function() {
@@ -1916,8 +1937,10 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
 
     // shadow map
 
-    var shadowMap = new THREE.WebGLShadowMap( this, lights, objects );
+    //var shadowMap = new THREE.WebGLShadowMap( this, lights, objects );
 
+    // LIWEI: Shadow is disabled here.
+    var shadowMap = new THREE.WebGLShadowMap(this, lights);
     this.shadowMap = shadowMap;
 
 
@@ -5239,6 +5262,16 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
     // Rendering
     var _orderedRenderer = new CLOUD.OrderedRenderer();
 
+    this.destroy = function () {
+
+        CLOUD.GeomUtil.destroyUnitInstances();
+        //LIWEI: WebGLObjects has no method to clear the cached geometries, so recreate it.
+        objects = new THREE.WebGLObjects(_gl, properties, this.info);
+        _orderedRenderer.destroy();
+
+        properties.clear();
+    };
+
     this.IncrementRender = function ( scene, camera, renderTarget, forceClear ) {
 
         if ( camera instanceof THREE.Camera === false ) {
@@ -7056,7 +7089,22 @@ CLOUD.Client = function (modelManager, serverUrl, databagId, texturePath) {
 };
 
 CLOUD.Client.prototype = {
-    constructor: CLOUD.Client,    
+    constructor: CLOUD.Client,
+
+    destroy: function () {
+
+        this.cache = {
+            geometries: {},
+            face_materials: {},
+            materials: {},
+            textures: {},
+            instancedMaterials: {}
+        };
+
+        this.meshIds = {}; 
+        this.mkpIndex = null; 
+        this.symbolIndex = null;
+    },
 
     projectUrl: function () {
         return this.serverUrl + this.databagId + "/index.json";
@@ -7498,6 +7546,14 @@ CLOUD.Scene = function () {
 CLOUD.Scene.prototype = Object.create(CLOUD.Group.prototype);
 CLOUD.Scene.prototype.constructor = CLOUD.Scene;
 
+CLOUD.Scene.prototype.destroy = function () {
+
+    this.clearAll();
+    this.rootNode = new CLOUD.Group();
+    this.rootNode.sceneRoot = true;
+    this.innerBoundingBox = new THREE.Box3();
+
+};
 
 CLOUD.Scene.prototype.clearAll = function () {
     this.rootNode.children = [];
@@ -9208,6 +9264,11 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
 
     var lastEvent;
 
+
+    this.destroy = function () {
+        this.viewer = null;
+    };
+
     this.IsIdle = function () {
         return state === STATE.NONE;
     };
@@ -9325,6 +9386,49 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
         }
 
     }();
+
+    this.dolly = function () {
+        var center = scope.mapWindowToViewport(dollyCenter.x, dollyCenter.y);
+        var centerPosition = scope.getHitPoint(center.x, center.y);
+        if (centerPosition != null) {
+            scope.pivot = centerPosition;
+
+            if (Math.abs(scale - 1.0) < EPS) {
+                return;
+            }
+
+            var minDistance = this.minDistance;
+            var factor = 2 - scale; // 1 - (scale - 1)
+
+            var cameraPos = this.object.position;
+            var eye = this.getWorldEye();
+
+            var dir = new THREE.Vector3();
+            dir.subVectors(centerPosition, cameraPos);
+
+            var distance = dir.length();
+
+            var newCameraPos = new THREE.Vector3();
+
+            if (this.enablePassThrough && scale > 1.0 && distance < minDistance) {
+                // 以minDistance为步进穿透物体
+                var offsetVec = dir.clone().normalize();
+                offsetVec.normalize().multiplyScalar(minDistance);
+                newCameraPos.addVectors(offsetVec, cameraPos);
+            }
+            else{
+
+                dir.multiplyScalar(-factor);
+                newCameraPos.addVectors(dir, centerPosition);
+            }
+
+            this.object.position.copy(newCameraPos);
+            this.target.copy(eye.add(newCameraPos));
+        }
+        else{
+            scope.dollyByCenter();
+        }
+    }
 
     this.dollyIn = function (dollyScale) {
         if (dollyScale === undefined) {
@@ -9634,6 +9738,7 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
             if (state !== STATE.NONE) {
                 this.cameraDirty = true;
             }
+
 
             if (state == STATE.ROTATE) {
                 var position = this.object.position;
@@ -10419,12 +10524,7 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
         dollyCenter.x = (event.touches[ 0 ].clientX + event.touches[ 1 ].clientX) * 0.5;
         dollyCenter.y = (event.touches[ 0 ].clientY + event.touches[ 1 ].clientY) * 0.5;
 
-        scope.dollyByPoint(dollyCenter.x, dollyCenter.y);
-
-        var center = scope.mapWindowToViewport(dollyCenter.x, dollyCenter.y);
-        var centerPosition = scope.getHitPoint(center.x, center.y);
-        if (centerPosition != null)
-            scope.pivot = centerPosition;
+        scope.dolly();
     }
 
     function handleTouchMovePan( event ) {
@@ -10462,7 +10562,14 @@ CLOUD.PickHelper = function (scene, cameraEditor, onObjectSelected) {
 
 CLOUD.PickHelper.prototype = {
 
-    constructor: CLOUD.PickHelper,     
+    constructor: CLOUD.PickHelper,
+
+    destroy : function(){
+        this.cameraEditor = null;
+        this.scene = null;
+        this.filter = null;
+        this.onObjectSelected = null;
+    },
     
     click: function (event) {
         var scope = this;
@@ -10832,6 +10939,10 @@ CLOUD.OrbitEditor = function (cameraEditor, scene, domElement) {
 CLOUD.OrbitEditor.prototype = Object.create(THREE.EventDispatcher.prototype);
 CLOUD.OrbitEditor.prototype.constructor = CLOUD.OrbitEditor;
 
+CLOUD.OrbitEditor.prototype.destroy = function () {
+
+}
+
 CLOUD.OrbitEditor.prototype.onExistEditor = function () {
 };
 
@@ -11152,6 +11263,15 @@ CLOUD.RectPickEditor = function (slaveEditor, onSelectionChanged) {
 CLOUD.RectPickEditor.prototype = {
 
     onstructor: CLOUD.RectPickEditor,
+
+    destroy: function () {
+
+        this.onObjectSelected = null;
+        this.slaveEditor = null;
+
+        this.pickHelper.destroy();
+        this.pickHelper = null;
+    },
 
     getDomElement : function () {
         return this.slaveEditor.domElement;
@@ -11801,6 +11921,11 @@ CLOUD.FlyEditor = function (cameraEditor, scene, domElement) {
 
 CLOUD.FlyEditor.prototype = {
     constructor: CLOUD.FlyEditor,
+
+    destroy : function () {
+
+    },
+
     handleEvent: function (event) {
         if (typeof this[event.type] == 'function') {
             this[event.type](event);
@@ -17806,6 +17931,19 @@ CLOUD.ModelManager.prototype = Object.create(THREE.LoadingManager.prototype);
 
 CLOUD.ModelManager.prototype.constructor = CLOUD.ModelManager;
 
+CLOUD.ModelManager.prototype.destroy = function () {
+
+    this.scene.destroy();
+
+    for (var name in this.clients) {
+        this.clients[name].destroy();
+    }
+    this.clients = {};
+
+    this.vertexCount = 0;
+    this.triangleCount = 0;
+};
+
 CLOUD.ModelManager.prototype.updateLights = function (camera) {
 
     var headLamp = this.headLamp;
@@ -18038,6 +18176,9 @@ THREE.EventDispatcher.prototype.apply(CLOUD.ModelManager.prototype);
 CLOUD.EditorManager = function () {
 
     this.editor = null;
+
+    this.editors = {};
+
     this.animationDuration = 500;// 500毫秒
     this.animationFrameTime = 13; // 周期性执行或调用函数之间的时间间隔，以毫秒计
     this.enableAnimation = true; // 是否允许动画
@@ -18190,9 +18331,22 @@ CLOUD.EditorManager.prototype = {
 
     constructor: CLOUD.EditorManager,
 
+    destroy : function(){
+
+        this.editor = null;
+        for (var name in this.editors) {
+            var editor = this.editors[name];
+            editor.destroy();
+        }
+        this.editors = {};
+
+    },
+
     updateEditor: function (camera) {
-        if (this.clipEditor !== undefined) {
-            this.clipEditor.update(camera);
+
+        var clipEditor = this.editors["clipEditor"];
+        if (clipEditor !== undefined) {
+            clipEditor.update(camera);
         }
     },
 
@@ -18210,104 +18364,120 @@ CLOUD.EditorManager.prototype = {
     },
 
     getClipEditor : function(viewer){
-        if (this.clipEditor === undefined) {
-            this.clipEditor = new CLOUD.ClipEditor(viewer.cameraEditor, viewer.getScene(), viewer.domElement);
+        var clipEditor = this.editors["clipEditor"];
+        if (clipEditor !== undefined) {
+            clipEditor = new CLOUD.ClipEditor(viewer.cameraEditor, viewer.getScene(), viewer.domElement);
+            this.editors["clipEditor"] = clipEditor;
         }
 
-        return this.clipEditor;
+        return clipEditor;
     },
 
     setPickMode: function (viewer) {
         var scope = this;
 
-        if(this.pickEditor === undefined){
-            var pickEditor = new CLOUD.PickEditor(viewer.cameraEditor, viewer.getScene(), viewer.domElement);
+        var pickEditor = this.editors["pickEditor"];
+
+        if (pickEditor === undefined) {
+
+            pickEditor = new CLOUD.PickEditor(viewer.cameraEditor, viewer.getScene(), viewer.domElement);
             pickEditor.onObjectSelected = function (intersect) {
                 viewer.modelManager.dispatchEvent({ type: CLOUD.EVENTS.ON_SELECTION_CHANGED, intersect: intersect })
             };
-            this.pickEditor = pickEditor;
+            this.editors["pickEditor"] = pickEditor;
         }
 
-
-        scope.setEditor(this.pickEditor);
+        scope.setEditor(pickEditor);
     },
 
-    setRectPickMode: function (viewer, orbitBySelection) {
-        var scope = this;
+    getOrbitEditor: function (viewer) {
 
-        if (this.orbitEditor === undefined) {
-            this.orbitEditor = new CLOUD.OrbitEditor(viewer.cameraEditor, viewer.getScene(), viewer.domElement);
+        var orbitEditor = this.editors["orbitEditor"];
+        if (orbitEditor === undefined) {
+            orbitEditor = new CLOUD.OrbitEditor(viewer.cameraEditor, viewer.getScene(), viewer.domElement);
+            this.editors["orbitEditor"] = orbitEditor;
         }
 
-        if (this.rectPickEditor === undefined) {
+        return orbitEditor;
+    },
 
-            var rectPickEditor = new CLOUD.RectPickEditor(this.orbitEditor,
+    getRectPickEditor: function (viewer) {
+
+        var rectPickEditor = this.editors["rectPickEditor"];
+        if (rectPickEditor === undefined) {
+
+            rectPickEditor = new CLOUD.RectPickEditor(this.getOrbitEditor(viewer),
                 function (intersect) {
                     viewer.modelManager.dispatchEvent({ type: CLOUD.EVENTS.ON_SELECTION_CHANGED, intersect: intersect });
                 });
             rectPickEditor.onUpdateUI = function (obj) {
                 viewer.modelManager.dispatchEvent({ type: CLOUD.EVENTS.ON_UPDATE_SELECTION_UI, data: obj })
             };
-            this.rectPickEditor = rectPickEditor;
+            this.editors["rectPickEditor"] = rectPickEditor;
         }
+
+        return rectPickEditor;
+    },
+
+    setRectPickMode: function (viewer, orbitBySelection) {
+        var scope = this;
+
+        var orbitEditor = this.getOrbitEditor(viewer);
+        var rectPickEditor = this.getRectPickEditor(viewer);
         
-        this.orbitEditor.orbitBySelection = orbitBySelection || false;
-        scope.setEditor(this.rectPickEditor, this.orbitEditor);
+        orbitEditor.orbitBySelection = orbitBySelection || false;
+        scope.setEditor(rectPickEditor, orbitEditor);
     },
     setOrbitMode: function (viewer) {
         var scope = this;
 
-        if(this.orbitEditor === undefined){
-            this.orbitEditor = new CLOUD.OrbitEditor(viewer.cameraEditor, viewer.getScene(), viewer.domElement);
-        }
+        var orbitEditor = this.getOrbitEditor(viewer);
 
-        scope.setEditor(this.orbitEditor);
+        scope.setEditor(orbitEditor);
     },
 
     setZoomMode: function (viewer) {
         var scope = this;
 
-        if(this.zoomEditor === undefined){
-            this.zoomEditor = new CLOUD.ZoomEditor(viewer.cameraEditor, viewer.getScene(), viewer.domElement);
+        var zoomEditor = this.editors["zoomEditor"];
+        if (zoomEditor === undefined) {
+            zoomEditor = new CLOUD.ZoomEditor(viewer.cameraEditor, viewer.getScene(), viewer.domElement);
+            this.editors["zoomEditor"] = zoomEditor;
         }
 
-        scope.setEditor(this.zoomEditor);
+        scope.setEditor(zoomEditor);
     },
 
     setPanMode: function (viewer) {
         var scope = this;
 
-        if(this.panEditor === undefined){
-            this.panEditor = new CLOUD.PanEditor(viewer.cameraEditor, viewer.getScene(), viewer.domElement);
+        var panEditor = this.editors["panEditor"];
+        if (panEditor === undefined) {
+            panEditor = new CLOUD.PanEditor(viewer.cameraEditor, viewer.getScene(), viewer.domElement);
+            this.editors["panEditor"] = panEditor;
         }
 
-        scope.setEditor(this.panEditor);
+        scope.setEditor(panEditor);
     },
 
     setFlyMode: function (bShowControlPanel, viewer) {
         var scope = this;
 
-        if(this.flyEditor === undefined){
-            this.flyEditor = new CLOUD.FlyEditor(viewer.cameraEditor, viewer.getScene(), viewer.domElement);
-        }
-        if (this.rectPickEditor === undefined) {
-
-            var rectPickEditor = new CLOUD.RectPickEditor(this.flyEditor, function (intersect) {
-                viewer.modelManager.dispatchEvent({ type: CLOUD.EVENTS.ON_SELECTION_CHANGED, intersect: intersect })
-            });
-            rectPickEditor.onUpdateUI = function (obj) {
-                viewer.modelManager.dispatchEvent({ type: CLOUD.EVENTS.ON_UPDATE_SELECTION_UI, data: obj })
-            };
-            this.rectPickEditor = rectPickEditor;
+        var flyEditor = this.editors["flyEditor"];
+        if (flyEditor === undefined) {
+            flyEditor = new CLOUD.FlyEditor(viewer.cameraEditor, viewer.getScene(), viewer.domElement);
+            this.editors["flyEditor"] = flyEditor;
         }
 
-        scope.setEditor(this.rectPickEditor, this.flyEditor);
-        this.flyEditor.showControlPanel(bShowControlPanel);
-        this.flyEditor.activate();
+        var rectPickEditor = this.getRectPickEditor(viewer);
+
+        scope.setEditor(rectPickEditor, flyEditor);
+        flyEditor.showControlPanel(bShowControlPanel);
+        flyEditor.activate();
     },
 
     isFlyMode: function() {
-        if (this.editor === this.flyEditor) {
+        if (this.editor === this.editors["flyEditor"]) {
             return true;
         }
 
@@ -18480,6 +18650,25 @@ CloudViewer = function () {
 CloudViewer.prototype = {
 
     constructor: CloudViewer,
+
+    destroy: function () {
+
+        this.editorManager.unregisterDomEventListeners(this.domElement);
+
+        this.domElement.removeChild(this.domElement.childNodes[0]);
+        
+        this.extensionHelper.destroy();
+
+        this.editorManager.destroy();
+
+        this.renderer.destroy();
+        this.modelManager.destroy();
+
+        this.renderer = null;
+        this.modelManager = null;
+        this.editorManager = null;
+
+    },
 
     // 设置图片资源的路径。默认在“images/”
     setImageResPath: function (path) {
