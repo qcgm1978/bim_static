@@ -202,7 +202,7 @@ App.Project.ProjectQualityProperty = Backbone.View.extend({
 			category: "", //类别 
 			problemCount: "", // 无隐患 1， 有隐患 
 			pageIndex: 1, //第几页，默认第一页
-			pageItemCount: App.Comm.Settings.pageItemCount //页大小
+			pageItemCount: App.Comm.Settings.pageSize //页大小
 		};
 	},
 
@@ -215,7 +215,7 @@ App.Project.ProjectQualityProperty = Backbone.View.extend({
 			category: "", //类别 
 			problemCount: "", // 无隐患 1， 有隐患 
 			pageIndex: 1, //第几页，默认第一页
-			pageItemCount: App.Comm.Settings.pageItemCount //页大小
+			pageItemCount: App.Comm.Settings.pageSize //页大小
 		};
 	},
 
@@ -234,6 +234,72 @@ App.Project.ProjectQualityProperty = Backbone.View.extend({
 		};
 	},
 
+	getDataFromCache(pageIndex){
+
+		var type = App.Project.Settings.property,
+			pageSize = App.Comm.Settings.pageItemCount,
+			that = this,
+			projectId = App.Project.Settings.projectId,
+			projectVersionId = App.Project.Settings.CurrentVersion.id;
+
+		if (type == "materialequipment") {
+
+			this.MaterialEquipmentOptions.pageIndex = pageIndex;
+			//材料设备
+			App.Project.QualityAttr.MaterialEquipmentCollection.reset();
+			App.Project.QualityAttr.MaterialEquipmentCollection.projectId = projectId;
+			App.Project.QualityAttr.MaterialEquipmentCollection.projectVersionId = projectVersionId;
+			App.Project.QualityAttr.MaterialEquipmentCollection.fetch({
+				data: that.MaterialEquipmentOptions,
+				success: function(data) {
+					that.pageInfo.call(that, data,type);
+				}
+
+			});
+
+		} else if (type == "processacceptance") {
+			this.ProcessAcceptanceOptions.pageIndex = pageIndex;
+			//过程验收
+			App.Project.QualityAttr.ProcessAcceptanceCollection.reset();
+			var data=App.Project.catchPageData('process',{
+				pageNum:pageIndex
+			})
+			App.Project.QualityAttr.ProcessAcceptanceCollection.push({data:data});
+			that.pageInfo.call(that, data,type,true);
+		} else if (type == "openingacceptance") {
+			this.OpeningAcceptanceOptions.pageIndex = pageIndex;
+			//开业验收
+			App.Project.QualityAttr.OpeningAcceptanceCollection.reset();
+			/*App.Project.QualityAttr.OpeningAcceptanceCollection.projectId = projectId;
+			App.Project.QualityAttr.OpeningAcceptanceCollection.projectVersionId = projectVersionId;
+			App.Project.QualityAttr.OpeningAcceptanceCollection.fetch({
+				data: that.OpeningAcceptanceOptions,
+				success: function(data) {
+					that.pageInfo.call(that, data,type);
+				}
+			});*/
+
+			var data=App.Project.catchPageData('open',{
+				pageNum:pageIndex
+			})
+			App.Project.QualityAttr.OpeningAcceptanceCollection.push({data:data});
+			that.pageInfo.call(that, data,type,true);
+
+		} else if (type == "concerns") {
+			this.ConcernsOptions.pageIndex = pageIndex;
+			//隐患
+			App.Project.QualityAttr.ConcernsCollection.reset();
+			App.Project.QualityAttr.ConcernsCollection.projectId = projectId;
+			App.Project.QualityAttr.ConcernsCollection.projectVersionId = projectVersionId;
+			App.Project.QualityAttr.ConcernsCollection.fetch({
+				data: that.ConcernsOptions,
+				success: function(data) {
+					that.pageInfo.call(that, data,type);
+				}
+			});
+		}
+
+	},
 
 	//获取材料设备
 	getData(pageIndex, projectId, projectVersionId) {
@@ -304,12 +370,19 @@ App.Project.ProjectQualityProperty = Backbone.View.extend({
 
 	//下一页
 	nextPage(event) {
+
 		if ($(event.target).hasClass("disable")) {
 			return;
 		}
 		var $el = this.getContainer();
 		var next = +$el.find(".paginationBottom .pageInfo .curr").text() + 1;
-		this.getData(next);
+
+		var type=App.Project.Settings.property;
+		if(type == "processacceptance"||type == "openingacceptance") {
+			this.getDataFromCache(next);
+		} else{
+			this.getData(next);
+		}
 	},
 
 	//上一页
@@ -319,7 +392,12 @@ App.Project.ProjectQualityProperty = Backbone.View.extend({
 		}
 		var $el = this.getContainer();
 		var prev = +$el.find(".paginationBottom .pageInfo .curr").text() - 1;
-		this.getData(prev);
+		var type=App.Project.Settings.property;
+		if(type == "processacceptance"||type == "openingacceptance") {
+			this.getDataFromCache(prev);
+		} else{
+			this.getData(prev);
+		}
 	},
 
 	//帅选
@@ -370,11 +448,12 @@ App.Project.ProjectQualityProperty = Backbone.View.extend({
 	},
 
 	//分页信息
-	pageInfo(data,type) {
+	pageInfo(data,type,isObject) {
 
 		var $el = this.getContainer(type);
-
-		data = data.toJSON()[0].data;
+		if(!isObject){
+			data = data.toJSON()[0].data;
+		}
 		$el.find(".paginationBottom .sumCount .count").text(data.totalItemCount);
 		$el.find(".paginationBottom .pageInfo .curr").text(data.pageIndex);
 		$el.find(".paginationBottom .pageInfo .pageCount").text(data.pageCount);

@@ -83,6 +83,8 @@ App.Project.QualityAttr = {
             if (response.message == "success") {
             	App.Project.cacheMarkers('process',response.data.items);
             }
+			var data=App.Project.catchPageData('process');
+			response.data=data;
             return response;
         }
 
@@ -121,11 +123,10 @@ App.Project.QualityAttr = {
             if (response.message == "success") {
             	App.Project.cacheMarkers('open',response.data.items);
             }
+			var data=App.Project.catchPageData('open');
+			response.data=data;
             return response;
         }
-
-	
-
 	})),
 
 
