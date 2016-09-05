@@ -9,7 +9,7 @@ App.Project.ProjectApp = Backbone.View.extend({
 		"click .projectTab .item": "SwitchProjectNav"
 	},
 
-	render: function() {
+	render: function() { 
 		//nav
 		this.$el.html(new App.Project.ProjectContainer().render().$el); 
 		return this;

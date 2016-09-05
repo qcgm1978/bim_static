@@ -961,7 +961,7 @@ App.Project = {
 
 	// 加载数据
 	loadData: function() {
-
+		 
 		//var $contains = $("#contains");
 		$("#contains").html(new App.Project.ProjectApp().render().el);
 		var status = App.Project.Settings.CurrentVersion.status;
