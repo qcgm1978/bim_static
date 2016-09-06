@@ -99,10 +99,13 @@ App.Services.Member ={
                 if(fn && typeof fn == "function"){
                     fn(response);
                 }
+                //设置...
+                _.each($("#blendList .roles span"),function(item){
+                    App.Services.exetor($(item));
+                });
             }
         });
     },
-
     //以下缓存和重置POST的数据
     saveMemData:function(obj){
         App.Services.memberWindowData = obj;

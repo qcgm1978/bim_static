@@ -124,36 +124,60 @@ App.Services.exetor = function(_this){
     }
 };
 
-//搜索后递归查找组织，param，当前说选项模型
-App.Services.memSearchParentOz = function(present){
-    var pre = JSON.parse(present);
-    var parentId = {
-        parentId : pre.parentId,
-        outer:pre.outer,
-        includeUsers:true
-    };
-    $.ajax({
-        url:App.API.URL.searchServicesMember,
-        type:'GET',
-        data:JSON.stringify(parentId),
-        success:function(res){
-            if(res.data && res.data.length){
+//使用
+//App.Services.createNode.init
+//App.Services.createNode.trigger(arr,includeUsers);
+App.Services.memSearchParentOz = {
+    count : null,
+    trigger :function(arr,includeUsers){
+        var _this = this,preOg = null; //要写入的元素
 
-                if(!res.data[0].parentId){//没有父项，请求结束
-                    return
-                }
-
-                //右侧处理方案，都加载搜索项上一级组织，如何判断是上级组织
-                //存储数据
-                //拿到第一个数据的parent
-                App.Services.memSearchParentOz(present);
-            }else{
-                //无结果
-            }
-        },
-        error:function(e){
+        if(!this.count){//如果层级数组没有耗尽，最后一个包含includeUsers?右侧单独处理
+            includeUsers = true;
         }
-    })
+        $.ajax({
+            url:App.API.URL.fetchServicesMemberOuterList + "&parentId=" + arr[_this.count].id  + "&includeUsers=" + includeUsers ,
+            type:'GET',
+            data : '',
+            success:function(res){
+                //要判断是外部还是内部，要查找当前的组织id，并插入到相应的位置
+                if(res.data && res.data.length){
+                    var tree = App.Services.tree(res.data);
+                    if(_this.count == 0){   //是顶层组织，则元素等于inner或outer，如果非顶层则过滤查找id相同的唯一组织
+                        if(!arr[_this.count].outer){
+                            preOg = $("#inner").siblings(".childOz");
+                        }else{
+                            preOg = $("#outer").siblings(".childOz");
+                        }
+                    }else{
+                        var container = _.filter($(".ozName"),function(item){
+                            return parseInt($(item).attr("data-id")) == arr[_this.count].id
+                        });
+                        preOg = container[0].siblings(".childOz");
+                    }
+                    preOg.html(tree)
+                }
+                //后面还有继续请求
+                if(_this.count < arr.length){
+                    App.Services.memSearchParentOz.trigger(arr,includeUsers);//继续请求子节点
+                    _this.count++;
+                }else{
+                    //触发点击父项事件，查找
+                    if(_this.count == 1){
+                        var father = _.filter($(".ozName"),function(item){
+                            return parseInt($(item).attr("data-id")) == arr[1].id
+                        });
+                        father[0].click();
+                    }
+                    _this.count = 0; //重置
+                }
+            }
+        })
+    },
+    //倒计数
+    init:function(arr){
+        this.count = 0;
+    }
 };
 
 //search result
@@ -162,14 +186,15 @@ App.Services.memSearchResult = function(arr) {
     if(typeof arr == 'string'){
         arr = JSON.parse(arr)
     }
-    if (typeof arr == 'array' && arr.length) {
+    if (arr.length) {
         //排序
         for (var i = 0; i < arr.length; i++) {
             if(arr[i]){
-                var li = $('<li class="search_result" data-code="'+ arr[i].toString() +' ">'+arr[i].name + '（'+ arr[i].parentname + "）"+'</li>');
-                frag.appendChild(li);
+                var li = $("<li class='search_result' data-code='"+JSON.stringify(arr[i]) +"'>"+arr[i].name + '（'+ (arr[i].parentname || '无组织')+ '）'+'</li>');
+                $(frag).append(li);
             }
         }
         return frag;
     }
 };
+
