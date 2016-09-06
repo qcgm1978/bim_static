@@ -132,10 +132,25 @@ App.Project.ProjectContainer = Backbone.View.extend({
 							str += '<li class="modleItem"><span class="modleName overflowEllipsis"><div class="modleNameText overflowEllipsis">' + props[i]['property'] + '</div></span> <span class="modleVal rEnd"></span> </li>';
 
 							if (props[i]['elementType'] && props[i]['elementType'] == 'link') {
+								var type1 = '',
+									type2 = '';
 								for (var j = 0; j < props[i]['value'].length; j++) {
-									str += '<li class="modleItem"><div class="modleNameText overflowEllipsis modleName2"><a target="_blank" href="' + props[i]['value'][j]['value'] + '">' + props[i]['value'][j]['name'] + '</a>&nbsp;&nbsp;</div></li>';
+									if(props[i]['value'][j]['unit'] && props[i]['value'][j]['unit'].slice(0,2)=="01"){
+
+										type1 += '<li class="modleItem"><div class="modleNameText overflowEllipsis modleName2"><a target="_blank" href="' + props[i]['value'][j]['value'] + '">' + props[i]['value'][j]['name'] + '</a>&nbsp;&nbsp;</div></li>';
+									}else if(props[i]['value'][j]['unit'] && props[i]['value'][j]['unit'].slice(0,2)=="02"){
+
+										type2 += '<li class="modleItem"><div class="modleNameText overflowEllipsis modleName2"><a target="_blank" href="' + props[i]['value'][j]['value'] + '">' + props[i]['value'][j]['name'] + '</a>&nbsp;&nbsp;</div></li>';
+
+									}else{
+										str += '<li class="modleItem"><div class="modleNameText overflowEllipsis modleName2"><a target="_blank" href="' + props[i]['value'][j]['value'] + '">' + props[i]['value'][j]['name'] + '</a>&nbsp;&nbsp;</div></li>';
+
+									}
 
 								}
+								type1 ? str +=('<li class="modleItem"><span class="modleName overflowEllipsis"><div class="modleNameText overflowEllipsis">过程验收</div></span> <span class="modleVal rEnd"></span> </li>'+ type1 ):'';
+								type2 ? str +=('<li class="modleItem"><span class="modleName overflowEllipsis"><div class="modleNameText overflowEllipsis">开业验收</div></span> <span class="modleVal rEnd"></span> </li>'+ type2 ):'';
+
 							} else {
 								str += '<li class="modleItem"><div class="modleNameText overflowEllipsis modleName2">' + props[i]['property'] + '</div></li>';
 								for (var j = 0; j < props[i]['value'].length; j++) {
