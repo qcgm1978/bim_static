@@ -121,7 +121,6 @@ App.Services.MemberNav=Backbone.View.extend({
     search:function(e){
         var ele = e.target || e.srcElement;
         if(!this.texter){return}
-        console.log(e.keyCode);
 
         if((e.keyCode > 47 && e.keyCode  < 91) || e.keyCode == 8 || e.keyCode == 32 || e.keyCode == 13 || (e.keyCode  < 112 && e.keyCode >95)){ //字母 退格 空格 回车 小键盘
             var content = $(ele).val();
@@ -171,7 +170,7 @@ App.Services.MemberNav=Backbone.View.extend({
 
 
                         //获取直接父项列表，用于右侧展示 //先获取再点击左侧
-                        _this.getFurtherData(parentCode.id);  //父项id错误！
+                        _this.getFurtherData(parentCode.id);  //父项id错误！倒数第二个
 
 
                         //获取其他层级

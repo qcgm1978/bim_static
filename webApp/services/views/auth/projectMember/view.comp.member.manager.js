@@ -19,7 +19,9 @@ ViewComp.MemberManager = Backbone.View.extend({
 		"click a[name='selectBtn']": "addOption",
 		"mouseover .ztree li a": "showDelete",
 		"mouseout .ztree li a": "hideDelete",
-		'click #grandBtn':'grand'
+		'click #grandBtn':'grand',
+		"click .searchBtn":"search",
+		"click .closeicon":"clearSearch"
 	},
 	initialize:function(){
 		
@@ -61,11 +63,11 @@ ViewComp.MemberManager = Backbone.View.extend({
 		
 		//自定义渲染树节点
 		newNodes.forEach(function(i){
-			var $del=$("<span  class='showDelete'></span>");
+			var $del=$("<span  class='showDelete'><i></i></span>");
 			//绑定删除事件
 			$del.on("click",function(){
 				_this.deleteOption(i);
-			})
+			});
 			$("#selectedTree #"+i.tId+"_a").append($del);
 		})
 	},
@@ -110,7 +112,7 @@ ViewComp.MemberManager = Backbone.View.extend({
 					showLine: false,
 					showTitle:false
 				}
-		};
+			};
 		if(parentId){
 			_getData={
 				outer:outer,
@@ -126,28 +128,24 @@ ViewComp.MemberManager = Backbone.View.extend({
 			data:_getData
 		},function(res){
 			if(res.message==="success"){
-				var zNodes=[];
+				var zNodes=[],
+					 _org=res.data.org||[],
+					_user=res.data.user||[],
+					_newOrg=[];
 				if(url=='fetchServiceKeyUserInfo'){
-					var _org=res.data.org||[],
-						_user=res.data.user||[],
-						_newOrg=[];
 					_org.forEach(function(i){
 						i.iconSkin='business';
-						i.name=i.name+'<label style="margin-left:40px;color:#ccc;">('+i.namePath+')</label>';
-					})
+						i.name=i.name+'<i style="color:#999999;">（'+i.namePath+'）</i>';
+					});
 					zNodes=_org.concat(_user);
 				}else{
-					var _org=res.data.org||[],
-						_user=res.data.user||[],
-						_newOrg=[];
 					_org.forEach(function(i){
 						i.iconSkin='business';
 						_newOrg.push(i);
-					})
+					});
 					zNodes=_newOrg.concat(_user);
 				}
-				
-				
+
 				if(!treeNode){
 					_this.selectTree = $.fn.zTree.init($("#selectTree"), setting, zNodes);
 				}else{
@@ -179,7 +177,7 @@ ViewComp.MemberManager = Backbone.View.extend({
 		        "orgId":[],
 		        "userId":[]
 		    }
-		}
+		};
 		
 		var nodes=this.selectedTree.getNodes();
 		_.each(nodes,function(n){
@@ -197,7 +195,7 @@ ViewComp.MemberManager = Backbone.View.extend({
 				}
 			}
 			
-		})
+		});
 		
 		App.Comm.ajax({
 			URLtype:'putServicesProjectMembers',
@@ -220,5 +218,61 @@ ViewComp.MemberManager = Backbone.View.extend({
 			$("#dataLoading").hide();
 		})
 
+	},
+	//搜索模块
+	search:function(e){
+		var _this = this,content = $("#searchContent").val();
+		if(!content){return}
+		var pid=App.Comm.getCookie('currentPid');
+
+		var treeNode = null,
+			setting = {
+				callback: {
+					beforeClick:function(){
+					},
+					onClick: function(event, treeId, treeNode) {
+						if(event.target.className.indexOf("button business_ico")!=-1){
+							if(!treeNode.userId && !treeNode.isParent){
+								_this.loadChildren(_this,treeNode.outer,treeNode.orgId,treeNode);
+							}
+							_this.selectTree.cancelSelectedNode(treeNode);
+						}
+					}
+				},
+				view: {
+					selectedMulti: true,
+					nameIsHTML:true,
+					showLine: false,
+					showTitle:false
+				}
+			};
+
+		url=App.API.URL.searchServicesAuthDataSearch + pid + "/search?key=" + content;  //url需更换
+
+		$.ajax({
+			url:url,
+			type:"GET",
+			data:{},
+			success:function(res){
+				if(res.message==="success"){
+					var zNodes= res.data || [];
+					zNodes.forEach(function(i){
+						i.iconSkin='business';
+						i.name=i.name+'<i style="color:#999999;">（'+i.parentname+'）</i>';
+					});
+					if(!treeNode){
+						_this.selectTree = $.fn.zTree.init($("#selectTree"), setting, zNodes);
+					}else{
+						_this.selectTree.addNodes(treeNode,zNodes);
+					}
+				}
+				clearMask();
+			}
+		});
+	},
+	//重置
+	clearSearch:function(e){
+		var ele = $(e.target);
+		ele.siblings("input").val("");
 	}
-})
+});
