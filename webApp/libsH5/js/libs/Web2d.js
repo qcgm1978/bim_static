@@ -6208,7 +6208,7 @@ CLOUD.Extensions.MarkerEditor.prototype.getMarkerColor = function (shape, state)
 // 根据Pick对象信息创建标记
 CLOUD.Extensions.MarkerEditor.prototype.createMarkerByIntersect = function(intersect, shapeType, state) {
 
-    var id = intersect.userId;
+    var id = this.generateMarkerId();//intersect.userId;
     var userId = intersect.userId;
     var position = intersect.worldPosition || intersect.object.point;
     var boundingBox = intersect.worldBoundingBox || intersect.object.boundingBox;
@@ -10451,6 +10451,13 @@ CLOUD.Extensions.Helper2D = function (viewer) {
 CLOUD.Extensions.Helper2D.prototype = {
 
     constructor: CLOUD.Extensions.Helper2D,
+
+    destroy: function () {
+
+        // TODO: clear other resources.
+
+        this.viewer = null;
+    },
 
     // ------------------ 批注 API -- S ------------------ //
 

@@ -132,10 +132,25 @@ App.Project.ProjectContainer = Backbone.View.extend({
 							str += '<li class="modleItem"><span class="modleName overflowEllipsis"><div class="modleNameText overflowEllipsis">' + props[i]['property'] + '</div></span> <span class="modleVal rEnd"></span> </li>';
 
 							if (props[i]['elementType'] && props[i]['elementType'] == 'link') {
+								var type1 = '',
+									type2 = '';
 								for (var j = 0; j < props[i]['value'].length; j++) {
-									str += '<li class="modleItem"><div class="modleNameText overflowEllipsis modleName2"><a target="_blank" href="' + props[i]['value'][j]['value'] + '">' + props[i]['value'][j]['name'] + '</a>&nbsp;&nbsp;</div></li>';
+									if(props[i]['value'][j]['unit'] && props[i]['value'][j]['unit'].slice(0,2)=="01"){
+
+										type1 += '<li class="modleItem"><div class="modleNameText overflowEllipsis modleName2"><a target="_blank" href="' + props[i]['value'][j]['value'] + '">' + props[i]['value'][j]['name'] + '</a>&nbsp;&nbsp;</div></li>';
+									}else if(props[i]['value'][j]['unit'] && props[i]['value'][j]['unit'].slice(0,2)=="02"){
+
+										type2 += '<li class="modleItem"><div class="modleNameText overflowEllipsis modleName2"><a target="_blank" href="' + props[i]['value'][j]['value'] + '">' + props[i]['value'][j]['name'] + '</a>&nbsp;&nbsp;</div></li>';
+
+									}else{
+										str += '<li class="modleItem"><div class="modleNameText overflowEllipsis modleName2"><a target="_blank" href="' + props[i]['value'][j]['value'] + '">' + props[i]['value'][j]['name'] + '</a>&nbsp;&nbsp;</div></li>';
+
+									}
 
 								}
+								type1 ? str +=('<li class="modleItem"><span class="modleName overflowEllipsis"><div class="modleNameText overflowEllipsis">过程验收</div></span> <span class="modleVal rEnd"></span> </li>'+ type1 ):'';
+								type2 ? str +=('<li class="modleItem"><span class="modleName overflowEllipsis"><div class="modleNameText overflowEllipsis">开业验收</div></span> <span class="modleVal rEnd"></span> </li>'+ type2 ):'';
+
 							} else {
 								str += '<li class="modleItem"><div class="modleNameText overflowEllipsis modleName2">' + props[i]['property'] + '</div></li>';
 								for (var j = 0; j < props[i]['value'].length; j++) {
@@ -151,11 +166,12 @@ App.Project.ProjectContainer = Backbone.View.extend({
 						}
 
 					}
+					//_$current.parent().siblings('.modleList').html(str);
 
-					if (res.data.className == '成本管理') {
+					if (res.data.className == '质量管理') {
 						//_$current.parent().append(str);
-						_$current.parent().siblings('.modleList').html(str);
-
+						//_$current.parent().siblings('.modleList').html(str);
+						$('.attrClassBox [data-classkey=4]').parent().siblings('.modleList').html(str);
 
 
 					} else {
@@ -212,8 +228,8 @@ App.Project.ProjectContainer = Backbone.View.extend({
 	},
 
 	//跳转之前
-	beforeChangeProject(event) {  
-		 
+	beforeChangeProject(event) {
+
 		var $target = $(event.target).closest(".item"),
 			href = $target.prop("href");
 
@@ -222,7 +238,19 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			return false;
 		}
 
-		location.reload();
+		App.count = App.count || 1;
+		//destroy 清除不干净 没5次 reload page
+		if (App.count > 4) {
+			$("#pageLoading").show();
+			location.reload();
+		} else {
+			App.count ++;
+			if ($target.prop("href") != location.href && App.Project.Settings.Viewer) {
+				App.Project.Settings.Viewer.destroy();
+				App.Project.Settings.Viewer = null;
+			}
+
+		}
 	},
 
 	//加载分组项目

@@ -1,3 +1,7 @@
+"use strict";
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+
 App.ResourceCrumbsNav = Backbone.View.extend({
 
 	tagName: "div",
@@ -15,7 +19,7 @@ App.ResourceCrumbsNav = Backbone.View.extend({
 
 	template: _.templateUrl('/resources/tpls/resources.crumbsNav.html'),
 
-	render: function() {
+	render: function render() {
 
 		this.$el.html(this.template);
 
@@ -23,16 +27,16 @@ App.ResourceCrumbsNav = Backbone.View.extend({
 	},
 
 	//点击
-	itemClick(event) {
+	itemClick: function itemClick(event) {
 
 		var $projectVersionList = $(event.target).closest('.resourcesList').find(".projectVersionList"),
-			type = App.ResourceModel.Settings.type;
+		    type = App.ResourceModel.Settings.type;
 		//标准模型
 		if (type == "standardLibs") {
 
 			App.Comm.ajax({
 				URLtype: "fetchStandardLibs"
-			}, function(data) {
+			}, function (data) {
 
 				var detail = _.templateUrl("/resources/tpls/resources.crumbsNav.navDetail.html");
 				$projectVersionList.find(".listResource").html(detail(data));
@@ -42,35 +46,32 @@ App.ResourceCrumbsNav = Backbone.View.extend({
 
 			App.Comm.ajax({
 				URLtype: "fetchFamLibs"
-			}, function(data) {
+			}, function (data) {
 
 				var detail = _.templateUrl("/resources/tpls/resources.crumbsNav.navDetail.html");
 				$projectVersionList.find(".listResource").html(detail(data));
 				$projectVersionList.show();
 			});
 		}
-
 	},
 
+
 	//切换项目版本
-	standardLibsVersion(event) {
+	standardLibsVersion: function standardLibsVersion(event) {
 
 		App.Comm.ajax({
 			URLtype: "fetchStandardVersion",
 			data: {
 				projectId: App.ResourceModel.Settings.CurrentVersion.projectId
 			}
-		}, function(data) {
+		}, function (data) {
 
 			var detail = _.templateUrl("/resources/tpls/resources.crumbsNav.nav.version.Detail.html");
 
 			this.$(".standardLibsVersion .projectVersionList").html(detail(data)).show();
-
 		});
-
 	},
-
-	stopPropagation(event) {
+	stopPropagation: function stopPropagation(event) {
 
 		$("#pageLoading").show();
 		location.reload();
@@ -80,17 +81,18 @@ App.ResourceCrumbsNav = Backbone.View.extend({
 	},
 
 
-	//切换 file model 
-	toggleSwitchFileModel(event) {
+	//切换 file model
+	toggleSwitchFileModel: function toggleSwitchFileModel(event) {
 
 		$(event.target).closest('.fileModelNav').find(".fileModelList").show();
 	},
 
+
 	//切换 文件 模型 浏览器
-	switchFileMoldel(event) {
+	switchFileMoldel: function switchFileMoldel(event) {
 
 		var $target = $(event.target),
-			type = $target.data("type");
+		    type = $target.data("type");
 
 		App.ResourceModel.Settings.leftType = type;
 
@@ -101,7 +103,7 @@ App.ResourceCrumbsNav = Backbone.View.extend({
 			$target.addClass("selected").siblings().removeClass("selected");
 		} else {
 
-			if (!typeof(Worker)) {
+			if (!(typeof Worker === "undefined" ? "undefined" : _typeof(Worker))) {
 				alert("请使用现代浏览器查看模型");
 				return;
 			}
@@ -117,8 +119,9 @@ App.ResourceCrumbsNav = Backbone.View.extend({
 		}
 	},
 
+
 	//获取模型id
-	fetchModelIdByResource: function(errCb) {
+	fetchModelIdByResource: function fetchModelIdByResource(errCb) {
 
 		var that = this;
 		var data = {
@@ -127,14 +130,14 @@ App.ResourceCrumbsNav = Backbone.View.extend({
 				projectId: App.ResourceModel.Settings.CurrentVersion.projectId,
 				projectVersionId: App.ResourceModel.Settings.CurrentVersion.id
 			}
-		}
+		};
 
 		// App.ResourceModel.Settings.modelId = "e0c63f125d3b5418530c78df2ba5aef1";
 		// this.renderModel();
 		// return;
 
 		//获取模型
-		App.Comm.ajax(data, (data) => {
+		App.Comm.ajax(data, function (data) {
 
 			if (data.message == "success") {
 
@@ -150,9 +153,7 @@ App.ResourceCrumbsNav = Backbone.View.extend({
 			} else {
 				alert(data.message);
 			}
-
 		});
-	},
-
+	}
 
 });
