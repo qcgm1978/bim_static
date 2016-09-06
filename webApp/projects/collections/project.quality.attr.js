@@ -147,6 +147,8 @@ App.Project.QualityAttr = {
             if (response.message == "success") {
             	App.Project.cacheMarkers('dis',response.data.items);
             }
+			var data=App.Project.catchPageData('dis');
+			response.data=data;
             return response;
         }
 
