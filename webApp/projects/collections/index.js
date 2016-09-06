@@ -37,6 +37,8 @@
         return true;
     },
 
+
+
     //项目业态
     proRetailing: {
         "8": '综合体',

@@ -1,33 +1,46 @@
 App.Project = {
 
+	//检查点标记点击事件
 	markerClick: function(marker) {
 		var id = marker? marker.id:"",
-			userId=marker? marker.userId:"";
+			userId=marker? marker.userId:"",
+			data={};
+
 		if ($(".QualityProcessAcceptance").is(":visible")) {
-			var tr = $(".QualityProcessAcceptance .tbProcessAccessBody tr");
-			tr.each(function() {
-				if(!id){
-					tr.removeClass('selected');
+			if(id){
+				var tr = $(".QualityProcessAcceptance .tbProcessAccessBody tr[data-id='"+id+"']");
+				if(tr.length>0){
+					tr.addClass('selected');
 				}else{
-					if ($(this).data('id') == id) {
-						tr.removeClass('selected');
-						$(this).addClass("selected");
-					}
+					data=App.Project.catchPageData('process',{id:id});
+					App.Project.qualityTab.ProcessAcceptanceOptions.pageIndex = data.pageIndex;
+					App.Project.QualityAttr.ProcessAcceptanceCollection.reset();
+					App.Project.QualityAttr.ProcessAcceptanceCollection.push({data:data});
+					App.Project.qualityTab.pageInfo.call(App.Project.qualityTab, data,'processacceptance',true);
+					tr = $(".QualityProcessAcceptance .tbProcessAccessBody tr[data-id='"+id+"']");
+					tr.addClass("selected");
 				}
-			})
+			}else{
+				$(".QualityProcessAcceptance .tbProcessAccessBody tr").removeClass('selected');
+			}
 		}
 		if ($(".QualityOpeningAcceptance").is(":visible")) {
-			var tr = $(".QualityOpeningAcceptance .tbOpeningacceptanceBody tr");
-			tr.each(function() {
-				if(!id){
-					tr.removeClass('selected');
+			if(id){
+				var tr = $(".QualityOpeningAcceptance .tbOpeningacceptanceBody tr[data-id='"+id+"']");
+				if(tr.length>0){
+					tr.addClass('selected');
 				}else{
-					if ($(this).data('id') == id) {
-						tr.removeClass('selected');
-						$(this).addClass("selected");
-					}
+					data=App.Project.catchPageData('open',{id:id});
+					App.Project.qualityTab.OpeningAcceptanceOptions.pageIndex = data.pageIndex;
+					App.Project.QualityAttr.OpeningAcceptanceCollection.reset();
+					App.Project.QualityAttr.OpeningAcceptanceCollection.push({data:data});
+					App.Project.qualityTab.pageInfo.call(App.Project.qualityTab, data,'openingacceptance',true);
+					tr = $(".QualityOpeningAcceptance .tbOpeningacceptanceBody tr[data-id='"+id+"']");
+					tr.addClass("selected");
 				}
-			})
+			}else{
+				$(".QualityProcessAcceptance .tbProcessAccessBody tr").removeClass('selected');
+			}
 		}
 		if(userId){
 			App.Project.Settings.Viewer.highlight({
@@ -42,6 +55,7 @@ App.Project = {
 		}
 	},
 
+	//隐患类型数据客户化
 	disCategory: function(item) {
 		var arr = this.mapData.concernsCategory;
 		if (item.acceptanceType == '1') {
@@ -66,6 +80,7 @@ App.Project = {
 		floor: ''
 	},
 
+	//缩放规则
 	marginRule: {
 		'基坑支护': {
 			margin: 0.2,
@@ -167,6 +182,7 @@ App.Project = {
 		2: 'myIcon-circle-yellow',
 		3: 'myIcon-circle-green'
 	},
+	//格式化占位符
 	formatPointPlace: function(p, t) {
 		if (p == 0 && 　t == 0) {
 			return '--';
@@ -174,6 +190,10 @@ App.Project = {
 			return p + "/" + t;
 		}
 	},
+
+
+
+
 	//空页面
 	NullPage: {
 		designVerification: '<div class="nullPage concerns"><i class="bg"></i>暂无隐患</div>', //设计检查 质量 隐患
@@ -367,6 +387,9 @@ App.Project = {
 		var _this = this;
 		var viewer = App.Project.Settings.Viewer;
 		if (!viewer) return;
+
+		_this.recoverySilder();
+
 		if (type != 'other' && flag) {
 			var shaType = type == 'dis' ? 1 : 0;
 			var data = this.currentLoadData[type],
@@ -395,6 +418,45 @@ App.Project = {
 			viewer.loadMarkers(null);
 		}
 	},
+
+
+	//获取当前检查点所在位置(页码),和当前页码所在的数据队列
+	//pageNum pageSize id
+	catchPageData:function(type,param){
+		var start=0,end=0,result={},list=[],counter=0,
+			opts=$.extend({},{
+				id:"",
+				pageSize:20,
+				pageNum:1
+			},param),
+			data=this.currentLoadData[type],
+			_len=data.length;
+		if(opts.id){
+			for(var i=0,size=_len;i<size;i++){
+				if(data[i].id==opts.id){
+					counter=i;
+					break
+				}
+			}
+			opts.pageNum=Math.ceil(counter/opts.pageSize)||1;
+		}
+		start=(opts.pageNum-1)*opts.pageSize;
+		end=opts.pageNum*opts.pageSize;
+		end=end<_len?end:_len;
+		for(;start<end;start++){
+			list.push(data[start]);
+		}
+		result={
+			items:list,
+			pageCount:Math.ceil(_len/opts.pageSize),
+			pageItemCount:opts.pageSize,
+			pageIndex:opts.pageNum,
+			totalItemCount:_len
+
+		}
+		return result;
+	},
+	//从缓存获取数据
 
 	// 文件 容器
 	FileCollection: new(Backbone.Collection.extend({
@@ -1224,7 +1286,8 @@ App.Project = {
 					}
 				}
 			} else {
-				$rightPropertyContent.append(new App.Project.ProjectQualityProperty().render().$el);
+				App.Project.qualityTab=new App.Project.ProjectQualityProperty().render();
+				$rightPropertyContent.append(App.Project.qualityTab.$el);
 				$("#projectContainer .ProjectQualityNavContainer .projectNav .item:first").click();
 			}
 
@@ -1638,9 +1701,9 @@ App.Project = {
 			box = _this.formatBBox(_temp.boundingBox),
 			ids = [componentId];
 		if (type == 3) { //隐患
-			_loc = _this.formatMark(location, 'S021'.charAt(color), '', 1);
+			_loc = _this.formatMark(location, 'S021'.charAt(color), $target.data('id'), 1);
 		} else {
-			_loc = _this.formatMark(location, '543'.charAt(color));
+			_loc = _this.formatMark(location, '543'.charAt(color),$target.data('id'));
 		}
 		_this.zoomModel(ids, box, marginRule.margin, marginRule.ratio);
 		_this.showMarks(_loc);
