@@ -48,9 +48,12 @@ App.API = {
 		putServicesProjectMembers:"platform/auth/dataPrivilege/grant",//添加项目成员
 		deleteServicesProjectMembers:"platform/auth/{memberType}/{userId}/dataPrivilege",//删除项目成员
 
+		searchServicesMember:'platform/auth/userororg?name=',  //搜索成员
+		searchServicesMemberResult:'platform/auth/ancestororgs?',//选择搜索结果  type=1
+		searchServicesAuthDataSearch:'platform/auth/keyUser/',//权限数据
+
 		checkDelAuth:"platform/auth/keyUser/user/check",//删除项目成员
 
-		
 		//项目详细信息-创建
 		fetchProjectCreateBaseHole:'platform/pit/createPit',
 		fetchProjectCreateFloor:'platform/building/createBuilding',

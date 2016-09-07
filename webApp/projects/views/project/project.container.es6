@@ -166,11 +166,12 @@ App.Project.ProjectContainer = Backbone.View.extend({
 						}
 
 					}
+					//_$current.parent().siblings('.modleList').html(str);
 
-					if (res.data.className == '成本管理') {
+					if (res.data.className == '质量管理') {
 						//_$current.parent().append(str);
-						_$current.parent().siblings('.modleList').html(str);
-
+						//_$current.parent().siblings('.modleList').html(str);
+						$('.attrClassBox [data-classkey=4]').parent().siblings('.modleList').html(str);
 
 
 					} else {

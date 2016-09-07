@@ -230,7 +230,7 @@ App.Project.ProjectQualityProperty = Backbone.View.extend({
 			startTime: "", //查询时间范围：开始
 			endTime: "", //查询时间范围：结束
 			pageIndex: 1, //第几页，默认第一页
-			pageItemCount: App.Comm.Settings.pageItemCount //页大小 
+			pageItemCount: App.Comm.Settings.pageSize //页大小
 		};
 	},
 
@@ -270,15 +270,6 @@ App.Project.ProjectQualityProperty = Backbone.View.extend({
 			this.OpeningAcceptanceOptions.pageIndex = pageIndex;
 			//开业验收
 			App.Project.QualityAttr.OpeningAcceptanceCollection.reset();
-			/*App.Project.QualityAttr.OpeningAcceptanceCollection.projectId = projectId;
-			App.Project.QualityAttr.OpeningAcceptanceCollection.projectVersionId = projectVersionId;
-			App.Project.QualityAttr.OpeningAcceptanceCollection.fetch({
-				data: that.OpeningAcceptanceOptions,
-				success: function(data) {
-					that.pageInfo.call(that, data,type);
-				}
-			});*/
-
 			var data=App.Project.catchPageData('open',{
 				pageNum:pageIndex
 			})
@@ -289,14 +280,11 @@ App.Project.ProjectQualityProperty = Backbone.View.extend({
 			this.ConcernsOptions.pageIndex = pageIndex;
 			//隐患
 			App.Project.QualityAttr.ConcernsCollection.reset();
-			App.Project.QualityAttr.ConcernsCollection.projectId = projectId;
-			App.Project.QualityAttr.ConcernsCollection.projectVersionId = projectVersionId;
-			App.Project.QualityAttr.ConcernsCollection.fetch({
-				data: that.ConcernsOptions,
-				success: function(data) {
-					that.pageInfo.call(that, data,type);
-				}
-			});
+			var data=App.Project.catchPageData('dis',{
+				pageNum:pageIndex
+			})
+			App.Project.QualityAttr.ConcernsCollection.push({data:data});
+			that.pageInfo.call(that, data,type,true);
 		}
 
 	},
@@ -378,7 +366,8 @@ App.Project.ProjectQualityProperty = Backbone.View.extend({
 		var next = +$el.find(".paginationBottom .pageInfo .curr").text() + 1;
 
 		var type=App.Project.Settings.property;
-		if(type == "processacceptance"||type == "openingacceptance") {
+		if(type == "processacceptance"||type == "openingacceptance"||
+			type=="concerns") {
 			this.getDataFromCache(next);
 		} else{
 			this.getData(next);
@@ -393,7 +382,8 @@ App.Project.ProjectQualityProperty = Backbone.View.extend({
 		var $el = this.getContainer();
 		var prev = +$el.find(".paginationBottom .pageInfo .curr").text() - 1;
 		var type=App.Project.Settings.property;
-		if(type == "processacceptance"||type == "openingacceptance") {
+		if(type == "processacceptance"||type == "openingacceptance"||
+			type=="concerns") {
 			this.getDataFromCache(prev);
 		} else{
 			this.getData(prev);
