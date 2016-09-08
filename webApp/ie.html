@@ -44,6 +44,7 @@
             }
 
         }
+
         var url = cookUrl && cookUrl.lastIndexOf("/file/data") <= -1 && (new Date() - getCookie("pathDate")) / 1000 <= 2 &&
             cookUrl.lastIndexOf("about:blank") <= -1 && cookUrl ||
             window.location.href.substring(window.location.href.lastIndexOf("path") + 5) ||
@@ -55,6 +56,8 @@
             url = location.protocol+"//"+location.host + "/login.html";
             isCheckLogin = true;
         }
+
+
 
         myWebView.url = url;
 
@@ -96,40 +99,47 @@
             }
 
         });
-
-
-        if (url.indexOf("login.html") > -1 && !isCheckLogin) {
-
+        console.log(0)
+        console.log(isCheckLogin)
+        console.log(myWebView.url.indexOf("login.html") > -1)
+        if (myWebView.url.indexOf("login.html") > -1 && !isCheckLogin) {
+            console.log(100)
             //两秒后 还为false 就认为 没触发check
             var timer = setTimeout(function() {
                 clearTimeout(timer);
+                console.log("2")
+                console.log(isCheckLogin)
                 if (!isCheckLogin) {
                     isCheckLogin = true;
+                    console.log("1")
                     checkLogin();
                 }
-            }, 2000);
+            }, 1);
 
         }
 
         myWebView.registerEvent('loadFinished', function(isReady) {
 
-            if (url.indexOf("login.html") > -1 && !isCheckLogin) {
-
+            console.log(3)
+            console.log(isCheckLogin)
+            if (myWebView.url.indexOf("login.html") > -1 && !isCheckLogin) {
+                console.log(4)
                 if (!isReady) {
                     return;
                 }
-
+                console.log(5)
                 if (!isCheckLogin) {
+                    console.log(6)
                     isCheckLogin = true;
                     checkLogin();
                 }
             }
 
-            if (url.indexOf("login.html") <= -1) {
+            if (myWebView.url.indexOf("login.html") <= -1) {
                 myWebView.runScript('App.Comm.checkCookie("' + document.cookie + '")', function(cookie) {
-
+                    console.log(cookie);
                 });
-            } 
+            }
 
         });
 
@@ -160,7 +170,8 @@
 
     //检查登录
     function checkLogin() {
-
+        console.log("login")
+        console.log(document.cookie)
         myWebView.runScript('Login.checkLoginBefore("' + document.cookie + '")', function(cookie) {
             myWebView.runScript('Login.checkLogin()', function(isLogin) {});
         });

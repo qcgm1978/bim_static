@@ -135,7 +135,7 @@ App.BodyContent.control = {
             if (response.message == "success") {
                 var _data = response.data.items;
                 try {
-                    $("#doneCounter").text(_data.length);
+                    $("#doneCounter").text(response.data.totalItemCount);
                 } catch (e) {}
                 return _data;
             }

@@ -146,7 +146,7 @@ App.Comm = {
 
 		//项目  非初始 锁定
 		if (type == 1 && App.Project.Settings.CurrentVersion.name != '初始版本' && locked) { 
-			if (App.Global.User.userId != createId) {
+			if (App.Global.User.userId != createId && createId) {
 				return '锁定';
 			}  
 		} 
