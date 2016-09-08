@@ -21,12 +21,24 @@ App.Services.memberDetail=Backbone.View.extend({
     initialize:function(){
         this.model.set({"checked":false},{silent:true});//预设选择状态
         this.listenTo(this.model, 'change:role', this.render);
+        Backbone.on("serviceMemberSearchSelect",this.searchSelect,this);
     },
     cancelBubble:function(event){
         if(event.stopPropagation){
             event.stopPropagation();
         }else{
             window.cancelBubble = true;
+        }
+    },
+    searchSelect:function(id){
+        if(this.model.get("userId")){
+            if(this.model.get("userId") == id){
+                this.selected();
+            }
+        }else if(this.model.get("orgId")){
+            if(this.model.get("orgId") == id){
+                this.selected()
+            }
         }
     },
 

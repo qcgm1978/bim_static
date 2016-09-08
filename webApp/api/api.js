@@ -41,7 +41,7 @@ App.API = {
 		fetchServicesNewRole:'platform/auth/role',//新增角色
 		fetchServiceMemberList:'platform/auth/org',
 		saveServicesRole:'platform/auth/role/grant',//赋予角色
-		fetchServicesMemberList:'platform/auth/org?outer={outer}',//组织-品牌／公司／成员列表
+		fetchServicesMemberList:'platform/auth/org?',//组织-品牌／公司／成员列表
 		fetchServicesMemberOuterList:'platform/auth/org?outer=true',//外部组织-品牌／公司／成员列表
 		fetchServicesMemberInnerList:'platform/auth/org?outer=false',//内部-组织／成员列表
 		deleteServicesRoleSingle:"platform/role?",//删除角色
@@ -181,7 +181,7 @@ App.API = {
 
 		//陈本
 		fetchCostReference: "sixD/{projectId}/{projectVersionId}/cost/summary", // 清单
-		fetchCostChange: "platform/auditSheet?type=9", // 变更
+		fetchCostChange: "platform/auditSheet?type=9", // 变更    变更列表   9默认，所有列表    13  仅审核通过和确认列表
 		fetchCostVerification: "sixD/{projectId}/{projectVersionId}/cost/summary?noElement=true", // 效验
 		fetchCostVerificationCate: "sixD/{projectId}/{projectVersionId}/cost/nocost/cate", // 效验 图元未关联清单 类型
 		fetchCostVerificationCateDetail: "sixD/{projectId}/{projectVersionId}/cost/nocost/element", // ?cateId={cateId}图元未关联清单 详情

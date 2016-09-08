@@ -221,9 +221,10 @@ ViewComp.MemberManager = Backbone.View.extend({
 	},
 	//搜索模块
 	search:function(e){
-		var _this = this,content = $("#searchContent").val();
+		var _this = this, url,content = $("#searchContent").val();
 		if(!content){return}
-		var pid=App.Comm.getCookie('currentPid');
+		var uid=App.Comm.user('userId');
+
 
 		var treeNode = null,
 			setting = {
@@ -247,8 +248,7 @@ ViewComp.MemberManager = Backbone.View.extend({
 				}
 			};
 
-		url=App.API.URL.searchServicesAuthDataSearch + pid + "/search?key=" + content;  //url需更换
-
+		url=App.API.URL.searchServicesAuthDataSearch + uid + "/search?key=" + content;  // 头像不对
 		$.ajax({
 			url:url,
 			type:"GET",

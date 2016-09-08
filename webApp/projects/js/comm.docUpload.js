@@ -105,9 +105,9 @@
 
                 //上传失败
                 uploadError: function(file) {
-                    alert('上传失败:' + file.message + '。文件：' + file.file.name)
+                    alert('上传失败。'  + '文件：' + file.file.name + "已锁定！锁定人是：" +  "");  //+ file.message
                 }
-            })
+            });
             self.updateQuotaInfo()
         },
 
