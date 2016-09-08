@@ -3,7 +3,7 @@
 */
 
 var CLOUD = CLOUD || {};
-CLOUD.Version = "20160829";
+CLOUD.Version = "20160907";
 
 CLOUD.GlobalData = {
     SceneSize: 1000,
@@ -8249,7 +8249,7 @@ CLOUD.Scene.prototype.prepareScene = function () {
                         object.inFrustum = false;
                     }
 
-                    object.update(camera);
+                    object.update(camera);   
                 }
                 else {
                     object.visible = false;
@@ -8871,10 +8871,15 @@ CLOUD.Cell.prototype.update = function () {
     var v1 = new THREE.Vector3();
 
     return function (camera) {
+        
         var scope = this;            
 
         var shouldShow = scope.level === undefined;
 
+        if (CLOUD.GlobalData.GarbageCollection ===  false && scope.visible) {           
+            shouldShow = true;
+        }   
+        
         if (!shouldShow) {
             
             //shouldShow = scope.level > (CLOUD.GlobalData.SubSceneVisibleDistance * CLOUD.GlobalData.CellVisibleLOD);
@@ -8984,10 +8989,15 @@ CLOUD.SubScene.prototype.update = function () {
     return function (camera) {
 
         var scope = this;
-
+        
         var distance = 0;
 
         var needLoad = false;
+        
+        if (CLOUD.GlobalData.GarbageCollection ===  false && scope.visible) {           
+            needLoad = true;
+        }   
+        
         if (CLOUD.GlobalData.ByTargetDistance) {
             if (scope.worldBoundingBox.containsPoint(camera.target)) {
                 needLoad = true;
