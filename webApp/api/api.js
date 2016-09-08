@@ -106,7 +106,7 @@ App.API = {
 		fetchProjects: "platform/project?type=3", //项目列表
 		fetchManageProjects: "platform/projectManager/project", //项目列表
 		fetchProjectBaseInfo: "platform/project/{projectId}", //项目列表
-		fetchFileList: "doc/{projectId}/{projectVersionId}/file/children", //获取文件列表  ?fileId={parentId}
+		fetchFileList: "doc/{projectId}/{projectVersionId}/file/children", //获取文件列表  ?fileId={parentId}  //相应
 		fetchDesignFileNav: "doc/{projectId}/{projectVersionId}/file/tree", //项目设计文件导航
 		fetchDesignModelNav: "dataJson/project/project.design.model.json", //项目设计模型导航
 		fetchProjectDetail: 'platform/project/{projectId}/version/{versionId}', //获取项目 详细信息  包含最新版本
