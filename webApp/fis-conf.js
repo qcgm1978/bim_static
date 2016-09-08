@@ -44,7 +44,7 @@ fis.match('*.less', {
   rExt: '.css'
 });
 
-
+var gg;
 //es6 编译
 fis.match('*.es6', {
   release: "/static/dist/$0",
