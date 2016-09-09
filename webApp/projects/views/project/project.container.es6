@@ -525,7 +525,32 @@ App.Project.ProjectContainer = Backbone.View.extend({
 
 			App.Project.Settings.ModelObj = null;
 			if (!model.intersect) {
-				that.resetProperNull();
+				var selectedIds = App.Project.Settings.Viewer.getSelectedIds();
+				if(selectedIds && Object.keys(selectedIds).length==1){
+					var obj;
+					for(var i in selectedIds){
+						obj = {
+							userId : i,
+							sceneId : selectedIds[i]['sceneId']
+						}
+					}
+					App.Project.Settings.ModelObj = {
+						intersect: {
+							userId:obj.userId,
+							object:{
+								userData:{
+									sceneId:obj.sceneId
+								}
+							}
+						}
+
+					}
+					that.viewerPropertyRender();
+
+
+				}else{
+					that.resetProperNull();
+				}
 				return;
 			}
 
