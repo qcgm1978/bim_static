@@ -126,13 +126,10 @@
         myWebView.registerEvent('loadFinished', function(isReady) {
 
             if (myWebView.url.indexOf("login.html") > -1 && !isCheckLogin) {
-                console.log(4)
                 if (!isReady) {
                     return;
                 }
-                console.log(5)
                 if (!isCheckLogin) {
-                    console.log(6)
                     isCheckLogin = true;
                     checkLogin();
                 }
