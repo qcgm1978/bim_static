@@ -573,7 +573,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 								userId : uid,
 								sceneId : info['sceneId']
 							};
-					
+
 						App.Project.Settings.ModelObj = {
 							intersect: {
 								userId:obj.userId,
