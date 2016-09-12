@@ -148,7 +148,7 @@ App.Services.MemberNav=Backbone.View.extend({
                 outer:pre.outer
             };
             $.ajax({
-                url: App.API.URL.searchServicesMemberResult+pre.id+"&type=" + type,  //  App.API.URL.searchServicesMemberResult
+                url: App.API.URL.searchServicesMemberResult+"id="+pre.id+"&type=" + type,  //  App.API.URL.searchServicesMemberResult
                 type:'GET',
                 data : parentCode,
                 success:function(res){
