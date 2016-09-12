@@ -104,7 +104,13 @@
                 },
 
                 //上传失败
-                uploadError: function(file) {
+                uploadError: function(file,a,b,c,d,e) {
+                    console.log(file);
+                    console.log(a);
+                    console.log(b);
+                    console.log(c);
+                    console.log(d);
+                    console.log(e);
                     debugger;
                     alert('上传失败。'  + '文件：' + file.file.name + "已锁定！锁定人是：" +  "");  //+ file.message
                 }
