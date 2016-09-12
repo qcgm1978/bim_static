@@ -104,15 +104,15 @@
                 },
 
                 //上传失败
-                uploadError: function(file,a,b,c,d,e) {
-                    console.log(file);
-                    console.log(a);
-                    console.log(b);
-                    console.log(c);
-                    console.log(d);
-                    console.log(e);
+                uploadError: function(file) {
+                    var  lockerName = file.message.match(/\[(.|)+\]/);
+                    var user = file.message.test(/user/);
+                    if(user > 0){
+                        alert('上传失败。'  + '文件：' + file.file.name + "已锁定！锁定人是：" +  lockerName);  //+ file.message
+                    }else{
+                        alert('上传失败。'  + '版本已经发布，不能上传');  //
+                    }
                     debugger;
-                    alert('上传失败。'  + '文件：' + file.file.name + "已锁定！锁定人是：" +  "");  //+ file.message
                 }
             });
             self.updateQuotaInfo()
