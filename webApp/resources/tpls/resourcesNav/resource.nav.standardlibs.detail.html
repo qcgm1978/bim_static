@@ -9,7 +9,7 @@
     <span class="lastModifiedDate"><%=  lastModifyTime?new Date(lastModifyTime).format("yyyy-MM-dd"):'--'%>	</span>
     <span class="introduction">
         <% if (obj.version.desc) {%>
-        <b title="obj.version.desc"><%=  obj.version.desc %></b>
+        <b title="<%= obj.version.desc %>"><%=  obj.version.desc %></b>
         <% }else {%>
         <i>ÔÝÎÞËµÃ÷</i>
         <%}%>
