@@ -32,8 +32,8 @@ var AppRoute = Backbone.Router.extend({
 		}
 		this.reset();
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".bodyConMenu").addClass('selected');
-		_.require(__uri('/static/dist/bodyContent/bodyContent.css'));
-		_.require(__uri('/static/dist/bodyContent/bodyContent.js'));
+		_.require('/static/dist/bodyContent/bodyContent.css');
+		_.require('/static/dist/bodyContent/bodyContent.js');
 		App.BodyContent.control.init();
 	},
 
@@ -48,7 +48,7 @@ var AppRoute = Backbone.Router.extend({
 		localStorage.removeItem("user");
 
 		//ie
-		App.Comm.dispatchIE('/?commType=loginOut'); 
+		App.Comm.dispatchIE('/?commType=loginOut');
 
 		window.location.href = "/login.html";
 
@@ -61,8 +61,8 @@ var AppRoute = Backbone.Router.extend({
 		}
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".todo").addClass('selected');
 		//加载css js
-		_.require(__uri('/static/dist/todo/todo.css'));
-		_.require(__uri('/static/dist/todo/todo.js'));
+		_.require('/static/dist/todo/todo.css');
+		_.require('/static/dist/todo/todo.js');
 		App.Todo.init();
 	},
 	//消息中心
@@ -71,13 +71,13 @@ var AppRoute = Backbone.Router.extend({
 			return;
 		}
 		//加载css js
-		_.require(__uri('/static/dist/imbox/imbox.css'));
-		_.require(__uri('/static/dist/imbox/imbox.js'));
+		_.require('/static/dist/imbox/imbox.css');
+		_.require('/static/dist/imbox/imbox.js');
 		App.INBox.init();
 	},
 	postDetail: function(id) {
-		_.require(__uri('/static/dist/bodyContent/bodyContent.css'));
-		_.require(__uri('/static/dist/bodyContent/bodyContent.js'));
+		_.require('/static/dist/bodyContent/bodyContent.css');
+		_.require('/static/dist/bodyContent/bodyContent.js');
 		App.BodyContent.control.post(id);
 	},
 	//项目
@@ -89,22 +89,22 @@ var AppRoute = Backbone.Router.extend({
 		//销毁上传
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".projects").addClass('selected');
 		//加载css js
-		_.require(__uri('/static/dist/projects/projects.css'));
-		_.require(__uri('/static/dist/projects/projects.js'));
+		_.require('/static/dist/projects/projects.css');
+		_.require('/static/dist/projects/projects.js');
 		App.Projects.init();
 
 	},
 
 	//单个项目
-	project: function(id, versionId) { 
+	project: function(id, versionId) {
 
 		if (this.reset() == false) {
 			return;
 		}
 
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".projects").addClass('selected');
-		_.require(__uri('/static/dist/projects/projects.css'));
-		_.require(__uri('/static/dist/projects/projects.js'));
+		_.require('/static/dist/projects/projects.css');
+		_.require('/static/dist/projects/projects.js');
 
 		App.Project.Settings = $.extend({}, App.Project.Defaults);
 
@@ -122,8 +122,8 @@ var AppRoute = Backbone.Router.extend({
 		}
 
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".projects").addClass('selected');
-		_.require(__uri('/static/dist/projects/projects.css'));
-		_.require(__uri('/static/dist/projects/projects.js'));
+		_.require('/static/dist/projects/projects.css');
+		_.require('/static/dist/projects/projects.js');
 
 		App.Project.Settings = $.extend({}, App.Project.Defaults);
 
@@ -143,8 +143,8 @@ var AppRoute = Backbone.Router.extend({
 		}
 		//销毁上传
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".flow").addClass('selected');
-		_.require(__uri('/static/dist/flow/flow.css'));
-		_.require(__uri('/static/dist/flow/flow.js'));
+		_.require('/static/dist/flow/flow.css');
+		_.require('/static/dist/flow/flow.js');
 		App.Flow.Controller.init();
 	},
 
@@ -155,8 +155,8 @@ var AppRoute = Backbone.Router.extend({
 		}
 		//销毁上传
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".resources").addClass('selected');
-		_.require(__uri('/static/dist/resources/resources.css'));
-		_.require(__uri('/static/dist/resources/resources.js'));
+		_.require('/static/dist/resources/resources.css');
+		_.require('/static/dist/resources/resources.js');
 		App.Resources.init();
 		$("#pageLoading").hide();
 		//$("#contains").html("resources");
@@ -169,8 +169,8 @@ var AppRoute = Backbone.Router.extend({
 			return;
 		}
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".resources").addClass('selected');
-		_.require(__uri('/static/dist/resources/resources.css'));
-		_.require(__uri('/static/dist/resources/resources.js'));
+		_.require('/static/dist/resources/resources.css');
+		_.require('/static/dist/resources/resources.js');
 		App.ResourcesNav.Settings.type = type;
 		App.ResourcesNav.init();
 	},
@@ -181,8 +181,8 @@ var AppRoute = Backbone.Router.extend({
 			return;
 		}
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".resources").addClass('selected');
-		_.require(__uri('/static/dist/resources/resources.css'));
-		_.require(__uri('/static/dist/resources/resources.js'));
+		_.require('/static/dist/resources/resources.css');
+		_.require('/static/dist/resources/resources.js');
 		App.ResourcesNav.Settings.type = type;
 		App.ResourcesNav.Settings.optionType = optionType;
 		App.ResourceArtifacts.Status.type = 1;
@@ -196,8 +196,8 @@ var AppRoute = Backbone.Router.extend({
 			return;
 		}
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".resources").addClass('selected');
-		_.require(__uri('/static/dist/resources/resources.css'));
-		_.require(__uri('/static/dist/resources/resources.js'));
+		_.require('/static/dist/resources/resources.css');
+		_.require('/static/dist/resources/resources.js');
 		App.ResourcesNav.Settings.type = App.ResourceModel.Settings.type = type;
 		App.ResourceModel.Settings.CurrentVersion = {};
 		App.ResourceModel.Settings.projectId = projectId;
@@ -212,8 +212,8 @@ var AppRoute = Backbone.Router.extend({
 			return;
 		}
 		//销毁上传
-		_.require(__uri('/static/dist/console/console.css'));
-		_.require(__uri('/static/dist/console/console.js'));
+		_.require('/static/dist/console/console.css');
+		_.require('/static/dist/console/console.js');
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".console").addClass('selected');
 		App.Console.Settings.type = type;
 		App.Console.Settings.step = step;
@@ -226,8 +226,8 @@ var AppRoute = Backbone.Router.extend({
 			return;
 		}
 		//销毁上传
-		_.require(__uri('/static/dist/console1/console.css'));
-		_.require(__uri('/static/dist/console1/console.js'));
+		_.require('/static/dist/console1/console.css');
+		_.require('/static/dist/console1/console.js');
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".console").addClass('selected');
 		App.Console.Settings.type = type;
 		App.Console.Settings.step = step;
@@ -241,8 +241,8 @@ var AppRoute = Backbone.Router.extend({
 			return;
 		}
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".services").addClass('selected');
-		_.require(__uri('/static/dist/resources/resources.css'));
-		_.require(__uri('/static/dist/resources/resources.js'));
+		_.require('/static/dist/resources/resources.css');
+		_.require('/static/dist/resources/resources.js');
 		App.ResourcesNav.Settings.type = type;
 		App.ResourcesNav.Settings.optionType = optionType;
 		App.ResourceArtifacts.Status.projectId = optionType;
@@ -259,8 +259,8 @@ var AppRoute = Backbone.Router.extend({
 		}
 		$("#pageLoading").hide();
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".services").addClass('selected');
-		_.require(__uri('/static/dist/services/services.css'));
-		_.require(__uri('/static/dist/services/services.js'));
+		_.require('/static/dist/services/services.css');
+		_.require('/static/dist/services/services.js');
 		$("#bottomBar").hide(); //隐藏脚部
 		App.Services.init(type, tab);
 	},
@@ -271,7 +271,7 @@ var AppRoute = Backbone.Router.extend({
 		if (App.Comm.isIEModel()) {
 			return false;
 		} else {
-			_.require(__uri('/static/dist/libs/libsH5.js'));
+			_.require('/static/dist/libs/libsH5.js');
 
 		}
 
@@ -293,7 +293,7 @@ var AppRoute = Backbone.Router.extend({
 			App.Comm.getUserInfo();
 			user = localStorage.getItem("user");
 		}
- 
+
 
 
 		$("#pageLoading").show();
@@ -316,7 +316,7 @@ var AppRoute = Backbone.Router.extend({
 		}
 
 		var Autharr = App.Global.User && App.Global.User["function"],
-			keys, len;
+		    keys, len;
 		App.AuthObj = {};
 		//遍历权限
 		$.each(Autharr, function(i, item) {
