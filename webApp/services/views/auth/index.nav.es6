@@ -11,7 +11,8 @@ App.Services.AuthNav = Backbone.View.extend({
 		"click .memCtrl" : "memCtrl",
 		"click .roleManager" : "roleManager",
 		"click .keyUser" : "keyUser",
-		"click .projectMember" : "projectMember"
+		"click .projectMember" : "projectMember",
+		"click .serviceBody":"hideAllMenu"
 	},
 	render:function(){
 		var user = JSON.parse(localStorage.user || "{}"),
@@ -22,11 +23,13 @@ App.Services.AuthNav = Backbone.View.extend({
 		return this;
 	},
 //面包屑
-
 	initialize:function(){
 		Backbone.on('loadProjectMemberEvent',this.projectMember,this);
 		this.breadCrumb(this.$el.find(".memCtrl"));
 
+	},
+	hideAllMenu:function(){
+		Backbone.trigger("hideSearchMenu");
 	},
 	breadCrumb : function(el){
 		//debugger;
@@ -34,7 +37,6 @@ App.Services.AuthNav = Backbone.View.extend({
 		$el.addClass("active").siblings("li").removeClass("active");
 		App.Services.Member.memLoadingStatus = true;
 	},
-
 	memCtrl : function(){
 		$(".serviceBody").empty();
 		$("#blendList").addClass("services_loading");

@@ -22,11 +22,15 @@ App.Services.MemberNav=Backbone.View.extend({
     initialize:function(){
         //默认根据角色权限加载  adm用户加载全部，keyMem用户只显示项目管理.
         Backbone.on("serviceMemberTopSelectStatus",this.serviceMemberTopSelectStatus,this);
-        Backbone.on("serviceMemberResetSearchContent",this.serviceMemberResetSearchContent,this)
+        Backbone.on("serviceMemberResetSearchContent",this.serviceMemberResetSearchContent,this);
+        Backbone.on("hideSearchMenu",this.hideSearchMenu,this)
     },
     //清除搜索内容
     serviceMemberResetSearchContent:function(){
 
+    },
+    hideSearchMenu:function(){
+        this.$(".memberSearch ul").hide();
     },
     //
     serviceMemberTopSelectStatus:function(){
@@ -110,6 +114,7 @@ App.Services.MemberNav=Backbone.View.extend({
     search:function(e){
         var ele = e.target || e.srcElement;
 
+
         if( (e.keyCode > 47 && e.keyCode  < 58) || e.keyCode == 8 || e.keyCode == 32 || e.keyCode == 13 || (e.keyCode  < 112 && e.keyCode >95)){ //退格 空格 回车 小键盘  (e.keyCode > 57&& e.keyCode  < 91) || 字母
             var content = $(ele).val();
             if(!content){
@@ -145,6 +150,7 @@ App.Services.MemberNav=Backbone.View.extend({
         var chosenOz = $(ele).attr("data-code");
         if(chosenOz){
             var pre = JSON.parse(chosenOz);
+            App.Services.memSearchParentOz.id = pre.id;
             var type = pre.type;
             App.Services.MemberType = !pre.outer ? "inner" : "outer";//切换外部/内部状态
             var parentCode = {

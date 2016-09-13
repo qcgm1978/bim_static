@@ -21,7 +21,7 @@ App.Services.memberDetail=Backbone.View.extend({
     initialize:function(){
         this.model.set({"checked":false},{silent:true});//预设选择状态
         this.listenTo(this.model, 'change:role', this.render);
-        Backbone.on("serviceMemberSearchSelect",this.searchSelect,this);
+        Backbone.on("serviceMemberSearchSelect",this.serviceMemberSearchSelect,this);
     },
     cancelBubble:function(event){
         if(event.stopPropagation){
@@ -30,7 +30,7 @@ App.Services.memberDetail=Backbone.View.extend({
             window.cancelBubble = true;
         }
     },
-    searchSelect:function(id){
+    serviceMemberSearchSelect:function(id){
         if(this.model.get("userId")){
             if(this.model.get("userId") == id){
                 this.$(".sele").click();
@@ -41,7 +41,6 @@ App.Services.memberDetail=Backbone.View.extend({
             }
         }
     },
-
     loadMenu:function(e){
         var _this = this;
         this.cancelBubble(e);
