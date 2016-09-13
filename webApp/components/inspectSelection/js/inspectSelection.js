@@ -118,6 +118,84 @@
 	strVar2 += "        ";
 	strVar2 += "    <\/div>";
 
+	var strVar3 = "";
+	strVar3 += "<% var count=obj.length,item; %>";
+	strVar3 += "    <% for(var i=0;i<count;i++){ %>";
+	strVar3 += "        <% item=obj[i];if(item.group=='设计'){continue}else if(item.group=='构件名称'){ %>";
+	strVar3 += "           <div class=\"modle\">";
+	strVar3 += "               <ul class=\"modleList\">";
+	strVar3 += "                   <li class=\"modleItem\">";
+	strVar3 += "                       <span class=\"modleName\"><div class=\"modleNameText overflowEllipsis\">构件名称<\/div><\/span> <span class=\"modleVal overflowEllipsis\"><%=item.items[0]['value']%><\/span>";
+	strVar3 += "                   <\/li>";
+	strVar3 += "               <\/ul>";
+	strVar3 += "           <\/div>";
+	strVar3 += "";
+	strVar3 += "        <% }else{%>";
+	strVar3 += "";
+	strVar3 += "            <div class=\"modle\">";
+	strVar3 += "                <div class=\"modleTitleBar\">";
+	strVar3 += "                    <i class=\"modleShowHide down\"><\/i>";
+	strVar3 += "                    <h1 class=\"modleName overflowEllipsis\"><%= item.group%><\/h1>";
+	strVar3 += "                <\/div>";
+	strVar3 += "                <ul class=\"modleList\">";
+	strVar3 += "                    <% var subItems=item.items,subCount=subItems.length,subItem %>";
+	strVar3 += "                        <% for(var j=0;j<subCount;j++){ %>";
+	strVar3 += "                            <% subItem=subItems[j];  %>";
+	strVar3 += "                                <li class=\"modleItem\">";
+	strVar3 += "                                    <span class=\"modleName\"><div title='<%=subItem.name%>' class=\"modleNameText overflowEllipsis\"><%=subItem.name%><\/div><\/span> <span class=\"modleVal overflowEllipsis\"><%=subItem.value%><%=subItem.unit%><\/span>";
+	strVar3 += "                                <\/li>";
+	strVar3 += "                        <% } %>";
+	strVar3 += "                <\/ul>";
+	strVar3 += "            <\/div>";
+	strVar3 += "        <% } %>";
+	strVar3 += "    <% } %>";
+	strVar3 += "<div class=\"fordesign\"><\/div>";
+	strVar3 += "<div class=\"attrPlanBox\">";
+	strVar3 += "    <div class=\"modle\">";
+	strVar3 += "        <i class=\"modleShowHide down\"><\/i>";
+	strVar3 += "        <h1 class=\"modleName\">计划<\/h1>";
+	strVar3 += "        <ul class=\"modleList\">";
+	strVar3 += "            <li class=\"modleItem\">";
+	strVar3 += "                <span class=\"modleName overflowEllipsis\"><div class=\"modleNameText overflowEllipsis\">业务事项<\/div><\/span> <span class=\"modleVal name\"> <\/span>";
+	strVar3 += "            <\/li>";
+	strVar3 += "            <li class=\"modleItem\">";
+	strVar3 += "                <span class=\"modleName overflowEllipsis\"><div class=\"modleNameText overflowEllipsis\">计划开始<\/div><\/span> <span class=\"modleVal strat\"><\/span>";
+	strVar3 += "            <\/li>";
+	strVar3 += "            <li class=\"modleItem\">";
+	strVar3 += "                <span class=\"modleName overflowEllipsis\"><div class=\"modleNameText overflowEllipsis\">计划结束<\/div><\/span> <span class=\"modleVal end\"><\/span>";
+	strVar3 += "            <\/li>";
+	strVar3 += "            <li class=\"modleItem\">";
+	strVar3 += "                <span class=\"modleName overflowEllipsis\"><div class=\"modleNameText overflowEllipsis\">实际结束<\/div><\/span> <span class=\"modleVal rEnd\"><\/span>";
+	strVar3 += "            <\/li>";
+	strVar3 += "        <\/ul>";
+	strVar3 += "    <\/div>";
+	strVar3 += "<\/div>";
+	strVar3 += "<div class=\"attrCostBox\">";
+	strVar3 += " <div class=\"modle\">";
+	strVar3 += "     <i class=\"modleShowHide down\"><\/i>";
+	strVar3 += "     <h1 class=\"modleName\">成本<\/h1>";
+	strVar3 += " <\/div>";
+	strVar3 += " ";
+	strVar3 += "<\/div>";
+	strVar3 += "<div class=\"attrQualityBox\">";
+	strVar3 += "    <div class=\"modle\">";
+	strVar3 += "        <i class=\"modleShowHide\"><\/i>";
+	strVar3 += "        <h1 class=\"modleName\">质检标准<\/h1>";
+	strVar3 += "        <ul class=\"modleList\">";
+	strVar3 += "        <\/ul>";
+	strVar3 += "    <\/div>";
+	strVar3 += "<\/div>";
+	strVar3 += "";
+	strVar3 += "<div class=\"attrDwgBox\">";
+	strVar3 += "    <div class=\"modle\">";
+	strVar3 += "        <i class=\"modleShowHide\"><\/i>";
+	strVar3 += "        <h1 class=\"modleName\">图纸<\/h1>";
+	strVar3 += "        <ul class=\"modleList\">";
+	strVar3 += "        <\/ul>";
+	strVar3 += "    <\/div>";
+	strVar3 += "<\/div>";
+	strVar3 += "<div class=\"attrClassBox\"><\/div>";
+
 	var ourl = "";
 	var scripts = document.getElementsByTagName('script');
 	for (var i = 0, size = scripts.length; i < size; i++) {
@@ -150,6 +228,275 @@
 			fetchQualityModelById: "sixD/{projectId}/{versionId}/quality/element"
 		}
 	};
+
+
+	var ModelFilter = {
+		//过滤规则
+		filterRule: {
+			//单文件：过滤出检查点所在构件所在的文件
+			file: '工程桩,基坑支护,钢结构悬挑构件,幕墙',
+			//单独类型：singleRule
+			single: '梁柱节点,地下防水,步行街吊顶风口,卫生间防水,外保温,采光顶',
+			floor: ''
+		},
+
+		//缩放规则
+		marginRule: {
+			'基坑支护': {
+				margin: 0.2,
+				ratio: 1.0
+			},
+			'梁柱节点': {
+				margin: 0.8,
+				ratio: 2.0
+			},
+			'外保温': {
+				margin: 0.5,
+				ratio: 1.0
+			},
+			'地下防水': {
+				margin: 1,
+				ratio: 1.0
+			},
+			'幕墙': {
+				margin: 1,
+				ratio: 1.0
+			},
+			'采光顶': {
+				margin: 3,
+				ratio: 1.0
+			}
+		},
+		//过滤器还原（计划[模块化、模拟],质量[开业、过程、隐患],设计[碰撞],成本[清单、校验]）
+		recoverySilder: function () {
+			var show = '建筑,结构,景观,幕墙,采光顶,内装&标识,内装&导识',
+				hide = '暖通,电气,智能化,给排水',
+				_View = Project.Viewer;
+			var $sp = $('.modelSidebar #specialty>.tree>li');
+			_View.fileFilter({
+				ids: [],
+				total: _View.FloorFilesData
+			});
+			_View.filter({
+				ids: [],
+				type: "classCode"
+			});
+			_View.filter({
+				type: "plan",
+				ids: []
+			});
+			_View.translucent(false);
+
+			$sp.each(function () {
+				var _input = $(this).find('input:first'),
+					_text = $(this).find('.treeText:first').text();
+				if (show.indexOf(_text) != -1) {
+					if (_input.is(':checked')) {
+						_input.trigger('click');
+					}
+					_input.trigger('click');
+				} else if (hide.indexOf(_text) != -1) {
+					if (!_input.is(':checked')) {
+						_input.trigger('click');
+					}
+					_input.trigger('click');
+				}
+			});
+
+			$('.modelSidebar #category input').each(function () {
+				if (!$(this).is(':checked')) {
+					$(this).trigger('click');
+				}
+			});
+			$('.modelSidebar #floors input').each(function () {
+				if (!$(this).is(':checked')) {
+					$(this).trigger('click');
+				}
+			});
+			var specialty = bimView.comm.getFilters($("#specialty,#floors"), 'uncheck');
+			var category = bimView.comm.getFilters($("#category"), 'uncheck');
+			var classCode = bimView.comm.getFilters($("#classCode"), 'uncheck');
+			_View.fileFilter(specialty);
+			_View.filter(category);
+			_View.filter(classCode);
+		},
+
+
+		linkSilder: function (type, key) {
+			if (!key) {
+				return
+			}
+			var $check = $('.modelSidebar #' + type + ' ul input'),
+				$treeText = $('.modelSidebar #' + type + ' ul .treeText');
+			$check.each(function () {
+				if ($(this).is(':checked') && $(this).closest('.itemContent').find('.treeText').text() != key) {
+					$(this).trigger('click');
+				}
+			});
+			$treeText.each(function () {
+				var _ = $(this).parent().find('input');
+				if (key) {
+					if ($(this).text() == key && !_.is(':checked')) {
+						_.trigger('click');
+					}
+				} else {
+					if (!_.is(':checked')) {
+						_.trigger('click');
+					}
+				}
+			})
+		},
+		linkSilderSpecial: function (type, key) {
+			if (!key) {
+				return
+			}
+			var $check = $('.modelSidebar #' + type + ' input'),
+				$treeText = $('.modelSidebar #' + type + ' .treeText');
+			this.recoverySilder();
+			$check.each(function () {
+				if ($(this).is(':checked')) {
+					$(this).trigger('click');
+				}
+			})
+			$treeText.each(function () {
+				var _ = $(this).parent().find('input');
+				if (key.indexOf($(this).text()) != -1) {
+					_.trigger('click');
+				}
+			})
+		},
+		linkSilderCategory: function (type, key) {
+			if (!key) {
+				return
+			}
+			var $check = $('.modelSidebar #' + type + ' input'),
+				$treeText = $('.modelSidebar #' + type + ' .treeText');
+			$check.each(function () {
+				if (!$(this).is(':checked')) {
+					$(this).trigger('click');
+				}
+			});
+			$treeText.each(function () {
+				var _ = $(this).parent().find('input');
+				if ($(this).text() == key) {
+					_.trigger('click');
+				}
+			});
+		},
+
+		//转换bounding box数据
+		formatBBox: function (data) {
+			if (!data) {
+				return [];
+			}
+			var box = [],
+				min = data.min,
+				minArr = [min.x, min.y, min.z],
+				max = data.max,
+				maxArr = [max.x, max.y, max.z];
+			box.push(minArr);
+			box.push(maxArr);
+			return box;
+		},
+
+		//1 红色 2 橙色 3绿色
+		//color 2 红色 1绿色 0 黄|橙
+		formatMark: function (location, color, id, shaType) {
+			var _temp = location;
+			if (typeof location === 'string') {
+				_temp = JSON.parse(location)
+			}
+			_temp.shapeType = Number(_temp.shapeType || shaType || 0);
+			_temp.state = Number(_temp.state || color || 0);
+			_temp.userId = _temp.userId || _temp.componentId;
+			_temp.id = id || '';
+			return JSON.stringify(_temp);
+		},
+
+		showMarks: function (marks) {
+			var _View = Project.Viewer;
+			if (!_.isArray(marks)) {
+				marks = [marks];
+			}
+			_View.loadMarkers(marks);
+		},
+		//通过userid 和 boundingbox 定位模型
+		zoomModel: function (ids, box, margin, ratio) {
+			var _View = Project.Viewer;
+			//定位
+			_View.setTopView(box, false, margin, ratio);
+			//高亮
+			_View.highlight({
+				type: 'userId',
+				ids: ids
+			});
+		},
+		filter: function ($target, componentId, location,cat, type) {
+			var _this = this;
+			var _View = Project.Viewer;
+			var _temp = location,
+				_loc = "",
+				key = "",
+				color=$target.data('color'),
+				_secenId = componentId.split('.')[0], //用于过滤文件ID
+				box = _this.formatBBox(_temp.boundingBox),
+				marginRule = _this.marginRule[cat] || {},
+				_files = _View.FloorFilesData,
+				ids = [componentId];
+			if (type == 3) { //隐患
+				_loc = _this.formatMark(location, 'S021'.charAt(color), $target.data('id'), 1);
+			} else {
+				_loc = _this.formatMark(location, '543'.charAt(color), $target.data('id'));
+			}
+			_this.recoverySilder();
+			_this.zoomModel(ids, box, marginRule.margin, marginRule.ratio);
+			_this.showMarks(_loc);
+
+			//过滤所属楼层 start
+			var _floors = _View.FloorsData;
+			_.find(_floors, function (item) {
+				if (_.contains(item.fileEtags, _secenId)) {
+					key = item.floor;
+					return true;
+				}
+			});
+			//过滤所属楼层 end
+
+			//没有分类的时候 只过滤单文件 start
+			if (!cat) {
+				_this.linkSilder('floors', key);
+				var _hideFileIds = _.filter(_files, function (i) {
+					return i != _secenId;
+				});
+				_View.fileFilter({
+					ids: _hideFileIds,
+					total: [_secenId]
+				});
+				return;
+			}
+			//没有分类的时候 只过滤单文件 end
+
+			//已有分类、过滤规则
+			if (_this.filterRule.file.indexOf(cat) != -1) {
+				var _hideFileIds = _.filter(_files, function (i) {
+					return i != _secenId;
+				});
+				_View.fileFilter({
+					ids: _hideFileIds,
+					total: [_secenId]
+				});
+			} else if (_this.filterRule.floor.indexOf(cat) != -1) {
+				_this.linkSilder('floors', key);
+			} else if (_this.filterRule.single.indexOf(cat) != -1) {
+				_this.sigleRule(cat, key);
+			} else {
+				_this.linkSilder('floors', key);
+			}
+		}
+
+	}
+
+
 
 	//模态框模型选择器对象
 	var InspectModelSelection = function(options) {
@@ -263,6 +610,7 @@
 				myStyle = ourl + '/static/dist/components/inspectSelection/css/inspectSelection.css',
 				$css = '<link rel="stylesheet" href="' + libStyle + '" />',
 				$css2 = '<link rel="stylesheet" href="' + myStyle + '" />';
+				$css3 = '<link rel="stylesheet" href="' + myStyle + '" />';
 			if (!InspectModelSelection.isLoad) {
 				$('head').append($css, $css2);
 				InspectModelSelection.isLoad = true;
@@ -321,6 +669,16 @@
 					$li = $this.closest('.itemNode');
 				$this.toggleClass('m-openTree m-closeTree');
 				$li.toggleClass('open');
+			}).on('click', 'li.item', function() {
+				$('li.item').removeClass('selected');
+				$(this).addClass('selected');
+				if ($(this).hasClass('propertyPanel')) {
+					$("#presetPointPanel").hide();
+					$("#propertyPanel").show();
+				} else {
+					$("#presetPointPanel").show();
+					$("#propertyPanel").hide();
+				}
 			})
 		},
 		dialog: function() {
@@ -330,6 +688,14 @@
 			if (this.$dialog) {
 				$dialog = self.$dialog;
 			} else {
+
+				var strVar1 = "";
+				strVar1 += "<div class=\"projectPropetyContainer projectNavContentBox\">";
+				strVar1 += "                                <div class=\"designProperties\">";
+				strVar1 += "                                    <div class=\"nullTip\">请选择构件<\/div>";
+				strVar1 += "                                <\/div>";
+				strVar1 += "                            <\/div>";
+
 				var strVar = "";
 				strVar += "<div class=\"rightProperty\">";
 				strVar += "            <div class=\"rightPropertyContentBox\">";
@@ -338,9 +704,13 @@
 				strVar += "                        <div class=\"designPropetyBox\">";
 				strVar += "                            <ul class=\"projectPropetyHeader projectNav\">";
 				strVar += "                                <li data-type=\"attr\" class=\"item selected\">检查点<\/li>";
+				strVar += "                                <li data-type=\"attr\" class=\"item propertyPanel\">属性<\/li>";
 				strVar += "                            <\/ul>";
-				strVar += "                            <div class=\"qualityContainer projectNavContentBox\">";
+				strVar += "                            <div id=\"presetPointPanel\" class=\"qualityContainer projectNavContentBox\">";
 				strVar += "                                ";
+				strVar += "                            <\/div>";
+				strVar += "                            <div class=\"bim\" id=\"propertyPanel\" style=\"display:none;\">";
+				strVar += strVar1;
 				strVar += "                            <\/div>";
 				strVar += "                        <\/div>";
 				strVar += "                    <\/div>";
@@ -429,6 +799,12 @@
 			WebView.height = "510px";
 			WebView.width = "960px";
 
+			WebView.registerEvent('newWindow', function(url){
+				if(/test$/.test(url)){
+					Project.Settings.test.call(this);
+				}
+			});
+
 			//窗体变化
 			window.onresize = resizeWebView;
 			resizeWebView();
@@ -436,7 +812,8 @@
 		},
 		renderModel: function() {
 			//	Project.setOnlyModel();//检查是否是唯一的 模型
-			this.viewer = new bimView({
+			var _this=this;
+			var viewer = new bimView({
 				type: 'model',
 				element: this.$modelView,
 				sourceId: this.Settings.sourceId,
@@ -444,21 +821,159 @@
 				projectId: this.Settings.projectId,
 				projectVersionId: this.Settings.projectVersionId
 			})
-			Project.Viewer = this.viewer;
-			this.viewer.on("loaded", function() {
+			var _url = ourl + '/doc/' + this.Settings.projectId + '/' + this.Settings.projectVersionId + '?' + _this.Settings.token_cookie + '&modelId=';
+			viewer.on("click", function(model) {
+
+
+				var _userId = model.intersect.userId || "",
+					_axisObj = model.intersect.axisGridInfo || {},
+					_boundingBox=model.intersect.worldBoundingBox,
+					_position=model.intersect.worldPosition,
+				fileUrl = _url + _userId.slice(0, _userId.indexOf('.'));
+
+				Project.sceneId = model.intersect.object.userData.sceneId;
+				Project.renderAttr(_userId, Project.sceneId);
+				if(Project.mode=="readOnly"){
+					return
+				}
+
+				Project.currentUserId=_userId;
+				Project.location[_userId] = JSON.stringify({
+					boundingBox: _boundingBox,
+					position: _position
+				});
+				Project.locationName[_userId] = '轴' + _axisObj.abcName + '-' + _axisObj.numeralName;
+				Project.axis[_userId] = JSON.stringify(_axisObj);
+				Project.components[_userId] = _boundingBox;
+				$.ajax({
+					url: fileUrl,
+					success: function(data) {
+						Project.fileIds[_userId] = data.data.id;
+					}
+				})
+
+				if (Project.mode == 'preset' || !Project.mode) {
+
+					viewer.viewer.loadMarkersFromIntersect(model.intersect,1,3);
+					var m = viewer.saveMarkers();
+					Project.Settings.markers=m;
+
+					Project.showStatus(Project.presetPointShowData,{
+						id:_userId,
+						marker: m[0]
+					})
+				}
+				//渲染属性面板
+				Project.sceneId = model.intersect.object.userData.sceneId;
+			});
+
+			Project.Viewer = viewer;
+
+			viewer.on("loaded", function() {
 				Project.loadPropertyPanel();
 			});
+
 			$('.m-camera').addClass('disabled').attr('disabled', 'disabled');
+
+			window._Project=Project;
+		},
+
+		showInModel:function(param){
+			var p=JSON.stringify(param);
+			WebView.runScript("allIn('"+p+"')",function(val){
+
+			})
 		}
+
 	}
 
 	//Project模型操作方法
 	var Project = {
+		isSelect:true,
+		//显示隐患和预设点
+		//presetId componetId location
+		allIn: function (param) {
+			var self = this,
+				view = Project.Viewer;
+			param = param || {};
+			view.loadMarkers(null);
+			if (param.presetId) {
+				self.showPresetPoint(param.presetId);
+			}
+			if (param.componentId && param.location) {
+				self.showRiskComponent(param.componentId, param.location);
+			}
+		},
+		//清除隐患构件信息 -- 解绑隐患
+		clearRisk: function () {
+			var view = Project.Viewer;
+			view.highlight({
+				type: "userId",
+				ids: undefined
+			})
+			view.loadMarkers(null);
+		},
+		//显示隐患构件信息 -- 绑定隐患
+		showRiskComponent: function (componentId, location) {
+			var view = Project.Viewer;
+			view.highlight({
+				type: "userId",
+				ids: [componentId]
+			});
+			view.loadMarkers(Project.formatMark(location));
+		},
+		//显示预设点信息 --绑定预设点
+		showPresetPoint: function (presetId) {
+			var data = Project.catchPageData(null, {
+				id: presetId
+			})
+			Project.ProcessAcceptanceCollection.push({data: data});
+			Project.pageInfo(data, true);
+			$(".QualityProcessAcceptance .tbProcessAccessBody tr[data-id='" + presetId + "']").click()
+		},
+
+		//清除模型中显示的预设点信息 -- 解绑预设点
+		clearPresetPoint: function () {
+			var view = Project.Viewer;
+			view.highlight({
+				type: "userId",
+				ids: undefined
+			})
+			view.loadMarkers(null);
+			view.fit();
+		},
+
+		showStatus:function(presetData,riskData){
+			var ids=[],
+				markers=[];
+			if(presetData){
+				ids.push(presetData.id);
+				markers.push(presetData.marker);
+			}
+			if(riskData){
+				ids.push(riskData.id);
+				markers.push(riskData.marker);
+			}
+			var view = Project.Viewer;
+			view.highlight({
+				type: "userId",
+				ids: ids
+			})
+			view.loadMarkers(markers);
+		},
+
 		type: "open",
 		Settings: {},
 		currentPageListData: null,
 		currentInspectId: null,
 		templateCache: [],
+
+		components: {},
+		location: {},
+		locationName: {},
+		fileIds: {},
+		axis: {},
+		currentUserId:'',
 		filterRule: {
 			sceneId: '工程桩,基坑支护,地下防水,钢结构悬挑构件,幕墙,采光顶'
 		},
@@ -468,66 +983,6 @@
 			1: 'myIcon-circle-red',
 			2: 'myIcon-circle-yellow',
 			3: 'myIcon-circle-green'
-		},
-		linkSilder: function(type, key) {
-			if (!key) {
-				return
-			}
-			var $check = $('.modelSidebar #' + type + ' ul input'),
-				$treeText = $('.modelSidebar #' + type + ' ul .treeText');
-			$check.each(function() {
-				if ($(this).is(':checked') && $(this).closest('.itemContent').find('.treeText').text() != key) {
-					$(this).trigger('click');
-				}
-			})
-			$treeText.each(function() {
-				var _ = $(this).parent().find('input');
-				if ($(this).text() == key && !_.is(':checked')) {
-					_.trigger('click');
-				}
-			})
-		},
-
-		filterRule: {
-			file: '工程桩,基坑支护,地下防水,钢结构悬挑构件,幕墙,采光顶',
-			floorPlus: '梁柱节点',
-			floor: '步行街吊顶风口,卫生间防水,外保温',
-			floorSpty: '步行街吊顶风口&暖通#内装,卫生间防水&暖通#内装'
-		},
-		sigleRule: function(cat) {
-			var _this = this,
-				_v = Project.Viewer,
-				_spFiles = _v.SpecialtyFileObjData;
-			if (cat == '地下防水') {
-				var sp = '结构',
-					show = [],
-					hide = [];
-				_.each(_spFiles, function(val, key) {
-					if (sp == key) {
-						_.each(val, function(item) {
-							if (item.fileName.indexOf('B02') != -1) {
-								show = [item.fileEtag];
-							} else {
-								hide.push(item.fileEtag);
-							}
-						})
-					} else {
-						_.each(val, function(item) {
-							hide.push(item.fileEtag);
-						})
-					}
-				})
-				_v.fileFilter({
-					ids: hide,
-					total: show,
-					type: 'sceneId'
-				});
-				_v.filter({
-					//ids:_this.filterCCode('10.20.20.09'),
-					ids: ['10.20.20.09'],
-					type: "classCode"
-				});
-			}
 		},
 		filterCCode: function(code) {
 			var _class = Project.Viewer.ClassCodeData,
@@ -540,10 +995,55 @@
 			})
 			return hide;
 		},
+
+		dispatchIE:function(url) {
+			if (navigator.userAgent.indexOf("QtWebEngine/5.7.0") > -1) {
+				window.open(url);
+			}
+		},
+
+		//获取当前检查点所在位置(页码),和当前页码所在的数据队列
+		//pageNum pageSize id
+		catchPageData:function(type,param){
+			var start=0,end=0,result={},list=[],counter=0,
+				opts=$.extend({},{
+					id:"",
+					pageSize:20,
+					pageNum:1
+				},param),
+				data=Project.currentPageListData,
+				_len=data.length;
+			if(opts.id){
+				for(var i=0,size=_len;i<size;i++){
+					if(data[i].id==opts.id){
+						counter=i;
+						break
+					}
+				}
+				opts.pageNum=Math.ceil(counter/opts.pageSize)||1;
+			}
+			start=(opts.pageNum-1)*opts.pageSize;
+			end=opts.pageNum*opts.pageSize;
+			end=end<_len?end:_len;
+			for(;start<end;start++){
+				list.push(data[start]);
+			}
+			result={
+				items:list,
+				pageCount:Math.ceil(_len/opts.pageSize),
+				pageItemCount:opts.pageSize,
+				pageIndex:opts.pageNum,
+				totalItemCount:_len
+			}
+			return result;
+		},
+
 		//分页信息
-		pageInfo: function(data) {
+		pageInfo: function(data,isObject) {
 			var $el = $('.modelSelectDialog');
-			data = data.toJSON()[0].data;
+			if(!isObject){
+				data = data.toJSON()[0].data;
+			}
 			$el.find(".paginationBottom .sumCount .count").text(data.totalItemCount);
 			$el.find(".paginationBottom .pageInfo .curr").text(data.pageIndex);
 			$el.find(".paginationBottom .pageInfo .pageCount").text(data.pageCount);
@@ -560,81 +1060,60 @@
 				$el.find(".paginationBottom .pageInfo .next").removeClass('disable');
 			}
 		},
+		renderAttr: function(elementId, sceneId) {
+			var url = ourl + "/sixD/" + Project.Settings.projectId + "/" + Project.Settings.projectVersionId + "/property",
+				that = this;
+			$.ajax({
+				url: url,
+				data: {
+					elementId: elementId,
+					sceneId: sceneId
+				}
+			}).done(function (data) {
+				var template = _.template(strVar3),
+					html = template(data.data);
+				$("#propertyPanel .designProperties").html(html);
+			});
+		},
 		showInModel: function($target, type) {
+			if( Project.mode && Project.mode !== 'risk' && !Project.isSelect){
+				return
+			}
 			var _this = this,
 				id = $target.data('id'),
 				color = $target.data('color'),
 				_temp = null,
-				location = null;
+				location = null,
+				item=null;
 			_.each(Project.currentPageListData, function(i) {
 				if (i.id == id) {
 					_temp = i.location;
 					location = i.location;
+					item=i;
 				}
 			})
 			if (_temp) {
 				_temp = JSON.parse(_temp);
-				_this.filterComp(_temp.componentId, $target.data('cat'));
+				ModelFilter.filter($target,_temp.componentId,location,$target.data('cat'),2)
 				var box = _this.formatBBox(_temp.bBox || _temp.boundingBox);
 				var ids = [_temp.componentId];
 				_this.zoomModel(ids, box);
 				_this.showMarks(Project.formatMark(location, color));
 			}
-		},
-
-		filterComp: function(componentId, cat) {
-			var _Viewer = Project.Viewer,
-				_floors = _Viewer.FloorsData,
-				key = "",
-				_this = this,
-				_secenId = componentId.split('.')[0],
-				floorSptys = _this.filterRule.floorSpty.split(',');
-
-			_.find(_floors, function(item) {
-				key = item.floor;
-				return _.contains(item.fileEtags, _secenId);
-			})
-			var _files = _Viewer.FloorFilesData,
-				_spFiles = _Viewer.SpecialtyFilesData;
-			//过滤所属楼层 end
-			if (cat && (_this.filterRule.file.indexOf(cat) != -1 ||
-					_this.filterRule.floorPlus.indexOf(cat) != -1)) {
-				var _hideFileIds = _.filter(_files, function(i) {
-					return i != _secenId;
-				})
-				_Viewer.fileFilter({
-					ids: _hideFileIds,
-					total: [_secenId]
-				});
-				_this.sigleRule(cat);
-				if (_this.filterRule.floorPlus.indexOf(cat) != -1) {
-					_Viewer.filter({
-						ids: ['10.20.20.03'],
-						type: "classCode"
-					});
+			Project.isSelect=false;
+			if(item){
+				Project.presetPoint={
+					location:_temp,
+					id:id,
+					fileUniqueId:item.fileId + item.componentId.slice(item.componentId.indexOf('.')),
+					axis:item.axis,
+					locationName:item.locationName
 				}
-			} else if (_this.filterRule.floor.indexOf(cat) != -1) {
-				_this.linkSilder('floors', key);
-				var sp = _.find(floorSptys, function(item) {
-					return item.indexOf(cat) != -1;
-				});
-				var sp = sp.slice(sp.indexOf('&') + 1),
-					show = [],
-					hide = [];
-				_.each(_spFiles, function(val, key) {
-					if (sp.indexOf(key) != -1) {
-						show = show.concat(val);
-					} else {
-						hide = hide.concat(val);
-					}
-				})
-				_Viewer.fileFilter({
-					ids: hide,
-					total: show,
-					type: 'sceneId'
-				});
-			} else {
-				_this.linkSilder('floors', key);
+				Project.presetPointShowData={
+					id:item.componentId,
+					marker:Project.formatMark(location, color)
+				}
+				Project.showStatus(Project.presetPointShowData,Project.currentRiskShowData)
 			}
 
 		},
@@ -650,7 +1129,7 @@
 		},
 
 		formatMark: function(location, color) {
-			var _temp = JSON.parse(location),
+			var _temp = typeof location === 'string'?JSON.parse(location):location,
 				_color = '510';
 			color = _color.charAt(color || 5) || 5;
 			_temp.shapeType = _temp.shapeType || 0;
@@ -672,13 +1151,15 @@
 		showSelectMarkers: function(e, target) {
 			var $target = target || $(e.currentTarget);
 			if ($target.hasClass('selected')) {
-				var array = [];
+				var array = [],boxs=[];
 				_.each(Project.currentPageListData, function(i) {
 					if (i.location.indexOf('boundingBox') != -1) {
 						array.push(Project.formatMark(i.location, i.colorStatus));
+						boxs.push(JSON.parse(i.location).boundingBox);
 					}
 				})
 				Project.showMarks(array);
+				Project.Viewer.setTopView(boxs, true);
 			} else {
 				Project.hideMarks();
 			}
@@ -705,8 +1186,7 @@
 					category: Project.Settings.ruleType || '', //类别
 					problemCount: "", // 无隐患 1， 有隐患
 					pageIndex: 1, //第几页，默认第一页
-					pageItemCount: 10, //页大小
-					token: 123
+					pageItemCount: 9999
 				}
 			}).el);
 			this.loadData();
@@ -722,13 +1202,21 @@
 					category: Project.Settings.ruleType || '', //类别
 					problemCount: "", // 无隐患 1， 有隐患
 					pageIndex: page || 1, //第几页，默认第一页
-					pageItemCount: 10, //页大小
-					token: 123
+					pageItemCount: 9999
 				}, data),
 				success: function(data) {
 					Project.pageInfo(data);
 				}
 			});
+		},
+
+		loadDataFromCache:function(index){
+			OpeningAcceptanceCollection.reset();
+			var data=Project.catchPageData('process',{
+				pageNum:index
+			})
+			OpeningAcceptanceCollection.push({data:data});
+			Project.pageInfo(data,true);
 		},
 		//检查是否是唯一的 模型
 		setOnlyModel: function() {
@@ -786,13 +1274,15 @@
 			if (data.code == 0) {
 				Project.currentPageListData = data.data.items;
 				Project.showSelectMarkers(null, $('.btnCk'));
+				var _data=Project.catchPageData();
+				data.data=_data;
 				return data;
 			} else if (data.code == 10004) {
 				window.location.href = data.data;
 			}
 		}
 	}))
-
+	Project.OpeningAcceptanceCollection=OpeningAcceptanceCollection;
 	var QualityOpeningAcceptance = Backbone.View.extend({
 		tagName: "div",
 
@@ -905,6 +1395,8 @@
 		},
 		//清空搜索条件
 		clearSearch: function() {
+			Project.dispatchIE("/?commType=test");
+
 			this.$(".riskOption .text").html('全部')
 			this.$(".categoryOption .text").html('全部')
 			this.$(".specialitiesOption .text").html('全部')
@@ -952,7 +1444,8 @@
 				return;
 			}
 			var next = +this.$el.find(".paginationBottom .pageInfo .curr").text() + 1;
-			Project.loadData(this.filters, next)
+			//Project.loadData(this.filters, next)
+			Project.loadDataFromCache(next);
 		},
 
 		//上一页
@@ -961,7 +1454,7 @@
 				return;
 			}
 			var prev = +this.$el.find(".paginationBottom .pageInfo .curr").text() - 1;
-			Project.loadData(this.filters, prev)
+			Project.loadDataFromCache(prev);
 		}
 	});
 	win.InspectModelSelection = InspectModelSelection;
