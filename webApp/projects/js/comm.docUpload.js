@@ -105,14 +105,27 @@
 
                 //上传失败
                 uploadError: function(file) {
-                    var  lockerName = file.message.match(/\[(.|)+\]/);
-                    var user = file.message.test(/user/);
-                    if(user > 0){
-                        alert('上传失败。'  + '文件：' + file.file.name + "已锁定！锁定人是：" +  lockerName);  //+ file.message
+                    var  lockerId = file.message.match(/\[(.|)+\]/);
+                    console.log(file.message);
+                    var user = /user/.test(file.message.test);
+                    if(user){
+                        $.ajax({
+                            url:App.API.URL.fetchServicesUserName + lockerId +"?outer=false",
+                            type:"GET",
+                            success:function(res){
+                                if(res.success){
+                                    alert('上传失败。'  + '文件：' + file.file.name + "已锁定！锁定人是：" +  res.data.name);  //+ file.message
+                                }
+                            },
+                            error:function(err){
+                            }
+                        });
+
+
                     }else{
                         alert('上传失败。'  + '版本已经发布，不能上传');  //
                     }
-                    debugger;
+                    //debugger;
                 }
             });
             self.updateQuotaInfo()

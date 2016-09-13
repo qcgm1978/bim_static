@@ -54,6 +54,9 @@ App.API = {
 
 		checkDelAuth:"platform/auth/keyUser/user/check",//删除项目成员
 
+		//单独
+		fetchServicesUserName:"platform/auth/user/",
+
 		//项目详细信息-创建
 		fetchProjectCreateBaseHole:'platform/pit/createPit',
 		fetchProjectCreateFloor:'platform/building/createBuilding',
