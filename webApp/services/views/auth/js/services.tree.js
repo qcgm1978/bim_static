@@ -160,13 +160,16 @@ App.Services.memSearchParentOz = {
                     if(_this.count == arr.length - 1){   //是顶层组织，则元素等于inner或outer，如果非顶层则过滤查找id相同的唯一组织
                         if(!arr[_this.count].outer){
                             preOg = $("#inner").siblings(".childOz");
+                            $("#outer").siblings(".childOz").hide();
                         }else{
                             preOg = $("#outer").siblings(".childOz");
+                            $("#inner").siblings(".childOz").show();
                         }
                     }else{
                         preOg = $(container[0]).closest("li").find(".childOz");
                     }
-                    preOg.html(tree)
+                    preOg.html(tree);
+                    preOg.show();
                 }
                 _this.count--;
             }

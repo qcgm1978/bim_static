@@ -110,8 +110,11 @@ App.Services.MemberNav=Backbone.View.extend({
     search:function(e){
         var ele = e.target || e.srcElement;
 
-        if((e.keyCode > 47 && e.keyCode  < 91) || e.keyCode == 8 || e.keyCode == 32 || e.keyCode == 13 || (e.keyCode  < 112 && e.keyCode >95)){ //字母 退格 空格 回车 小键盘
+        if( (e.keyCode > 47 && e.keyCode  < 58) || e.keyCode == 8 || e.keyCode == 32 || e.keyCode == 13 || (e.keyCode  < 112 && e.keyCode >95)){ //退格 空格 回车 小键盘  (e.keyCode > 57&& e.keyCode  < 91) || 字母
             var content = $(ele).val();
+            if(!content){
+                return
+            }
             $.ajax({
                 url:App.API.URL.searchServicesMember  + content,   //App.API.URL.searchServicesMember + content
                 type:'GET',
@@ -148,7 +151,7 @@ App.Services.MemberNav=Backbone.View.extend({
                 outer:pre.outer
             };
             $.ajax({
-                url: App.API.URL.searchServicesMemberResult+pre.id+"&type=" + type,  //  App.API.URL.searchServicesMemberResult
+                url: App.API.URL.searchServicesMemberResult+"id="+pre.id+"&type=" + type,  //  App.API.URL.searchServicesMemberResult
                 type:'GET',
                 data : parentCode,
                 success:function(res){

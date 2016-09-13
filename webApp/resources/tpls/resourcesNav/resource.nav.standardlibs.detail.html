@@ -7,5 +7,12 @@
     <span class="designUnit"><%= designUnit || '--' %>	</span>
     <span class="createDate"><%=  new Date(createTime).format("yyyy-MM-dd")%>	</span>
     <span class="lastModifiedDate"><%=  lastModifyTime?new Date(lastModifyTime).format("yyyy-MM-dd"):'--'%>	</span>
+    <span class="introduction">
+        <% if (obj.version.desc) {%>
+        <b title="<%= obj.version.desc %>"><%=  obj.version.desc %></b>
+        <% }else {%>
+        <i>ÔÝÎÞËµÃ÷</i>
+        <%}%>
+    </span>
 </li>
  
