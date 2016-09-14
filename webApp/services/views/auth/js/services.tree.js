@@ -141,6 +141,7 @@ App.Services.memSearchParentOz = {
             return $(item).attr("data-id") == arr[_this.count].id
         });
         if(_this.count == 0){
+            $("#ozList").removeClass("services_loading");
             includeUsers = true;
             $(container[0]).click();
             Backbone.trigger("serviceMemberSearchSelect",App.Services.memSearchParentOz.id);
