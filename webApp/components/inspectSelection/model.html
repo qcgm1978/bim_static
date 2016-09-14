@@ -68,7 +68,7 @@
         if (param.presetId && (!param.componentId && !param.location)) {
             type = "preset";
             viewer.Project.mode = type;
-            showPresetPoint(param.presetId);
+            showPresetPoint(param.presetId,true);
         }
         if (!param.presetId && (param.componentId && param.location)) {
             type = "risk";
@@ -77,8 +77,8 @@
         }
 
         if(param.presetId && param.componentId && param.location){
-            showPresetPoint(param.presetId);
             showRiskComponent(param.componentId, param.location);
+            showPresetPoint(param.presetId);
         }
 
         return type;
@@ -103,9 +103,15 @@
             id:componentId,
             marker:JSON.stringify(location)
         }
+        viewer.ModelFilter.recoverySilder();
         view.loadMarkers([JSON.stringify(location)]);
     }
-    function showPresetPoint(presetId) {
+    function showPresetPoint(presetId,isClearRisk) {
+
+        if(isClearRisk){
+            viewer.Project.currentRiskShowData=null;
+        }
+
         var data = viewer.Project.catchPageData(null, {
             id: presetId
         });

@@ -715,7 +715,7 @@ App.Comm = {
 			localStorage.setItem("user", JSON.stringify(data.data));
 
 		});
-	},
+	}
 
 };
 

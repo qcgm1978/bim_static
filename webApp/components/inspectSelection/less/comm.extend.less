@@ -1,4 +1,17 @@
+.modelExtend{
+  margin-top: 560px;
+  position: fixed;
+  z-index: 99;
+}
 .modelSelectDialog {
+
+  & .dialogBody{
+    position: relative;
+    transform: inherit;
+    left: 0;
+    top:0;
+  }
+
   & .dialogClose{background:url(/static/dist/images/comm/images/tree.png) 0 -200px no-repeat;margin-top: 8px;width: 20px;height: 20px;}
   ul,li{list-style: none;padding: 0;margin:0;}
   /*!/comm/css/comm.less*/

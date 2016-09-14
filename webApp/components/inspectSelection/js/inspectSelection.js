@@ -531,6 +531,7 @@
 		if (this.Settings.etag) {
 			Project.Settings = _this.Settings;
 			_this.Project = Project;
+			_this.ModelFilter=ModelFilter;
 			ourl = options.host || ourl;
 			_this.init();
 		} else {
@@ -623,6 +624,7 @@
 					self.dialog();
 					self.controll();
 				})
+
 				return;
 			}
 			$.getScript(srciptUrl, function() {
@@ -636,6 +638,13 @@
 		controll: function() {
 
 			var self = this;
+
+			if (self.isIE()) {
+				self.$dialog.find('.dialogFooter').hide();
+			}else{
+				self.$dialog.find('.dialogHeader').hide();
+			}
+
 			self.$dialog.on('click', '.toolsBtn', function() {
 				self.getSelected();
 			}).on('click', '.dialogClose', function() {
@@ -749,8 +758,8 @@
 				$dialog = this.$dialog;
 
 			$dialog.on('click', '.dialogClose', function() {
-				this.$dialog.remove();
-				this.$dialog = null;
+				self.$dialog.remove();
+				self.$dialog = null;
 			})
 			$dialog.on('click', '.dialogOk', function() {
 				//获取数据
@@ -875,13 +884,24 @@
 
 			$('.m-camera').addClass('disabled').attr('disabled', 'disabled');
 
-			window._Project=Project;
 		},
 
 		showInModel:function(param){
 			var p=JSON.stringify(param);
 			WebView.runScript("allIn('"+p+"')",function(val){
 
+			})
+		},
+
+		data:function(){
+			var self=this;
+			WebView.runScript("getData()",function(val){
+				if(val){
+					val=JSON.parse(val);
+				}
+				self.Settings.callback.call(this, val)
+				self.$dialog.remove();
+				self.$dialog = null;
 			})
 		}
 
@@ -1094,7 +1114,11 @@
 			})
 			if (_temp) {
 				_temp = JSON.parse(_temp);
-				ModelFilter.filter($target,_temp.componentId,location,$target.data('cat'),2)
+				if( Project.mode !== 'risk'){
+					ModelFilter.filter($target,_temp.componentId,location,$target.data('cat'),2)
+				}else{
+					ModelFilter.recoverySilder();
+				}
 				var box = _this.formatBBox(_temp.bBox || _temp.boundingBox);
 				var ids = [_temp.componentId];
 				_this.zoomModel(ids, box);

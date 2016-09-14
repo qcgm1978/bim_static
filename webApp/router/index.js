@@ -150,6 +150,7 @@ var AppRoute = Backbone.Router.extend({
 
 	//资源库
 	resources: function() {
+
 		if (this.reset() == false) {
 			return;
 		}
@@ -285,7 +286,8 @@ var AppRoute = Backbone.Router.extend({
 			//用户信息
 			App.Global.User = JSON.parse(user);
 		} else {
-			return;
+			location.href="/login.html";
+			return false;
 		}
 
 		//别的系统重新登录过，刷新用户
