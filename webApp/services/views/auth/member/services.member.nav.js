@@ -93,7 +93,6 @@ App.Services.MemberNav=Backbone.View.extend({
             if(response.data.user && response.data.user.length){
                 collection.add(response.data.user);
             }
-
             if (response.data.org && response.data.org.length) {
                 collection.add(response.data.org);
                 //外部和内部单选
@@ -107,25 +106,17 @@ App.Services.MemberNav=Backbone.View.extend({
             App.Services.queue.next();
         });
     },
-
-    searchEnd:function(e){
-        var ele = e.target || e.srcElement;
-        this.texter = false;
-    },
-
-    searchStart:function(e){
-        var ele = e.target || e.srcElement;
-        this.texter = true;
-    },
     //搜索模块
     search:function(e){
         var ele = e.target || e.srcElement;
-        if(!this.texter){return}
 
-        if((e.keyCode > 47 && e.keyCode  < 91) || e.keyCode == 8 || e.keyCode == 32 || e.keyCode == 13 || (e.keyCode  < 112 && e.keyCode >95)){ //字母 退格 空格 回车 小键盘
+        if( (e.keyCode > 47 && e.keyCode  < 58) || e.keyCode == 8 || e.keyCode == 32 || e.keyCode == 13 || (e.keyCode  < 112 && e.keyCode >95)){ //退格 空格 回车 小键盘  (e.keyCode > 57&& e.keyCode  < 91) || 字母
             var content = $(ele).val();
+            if(!content){
+                return
+            }
             $.ajax({
-                url:App.API.URL.searchServicesMember + content ,   //App.API.URL.searchServicesMember
+                url:App.API.URL.searchServicesMember  + content,   //App.API.URL.searchServicesMember + content
                 type:'GET',
                 data:'',
                 success:function(res){
@@ -154,25 +145,18 @@ App.Services.MemberNav=Backbone.View.extend({
         var chosenOz = $(ele).attr("data-code");
         if(chosenOz){
             var pre = JSON.parse(chosenOz);
+            var type = pre.type;
             App.Services.MemberType = !pre.outer ? "inner" : "outer";//切换外部/内部状态
             var parentCode = {
-                id : pre.id,
-                outer:pre.outer,
-                type:chosenOz.type
+                outer:pre.outer
             };
-
             $.ajax({
-                url: App.API.URL.searchServicesMemberResult,
+                url: App.API.URL.searchServicesMemberResult+"id="+pre.id+"&type=" + type,  //  App.API.URL.searchServicesMemberResult
                 type:'GET',
                 data : parentCode,
                 success:function(res){
                     if(res.data && res.data.length){
-
-
                         //获取直接父项列表，用于右侧展示 //先获取再点击左侧
-                        _this.getFurtherData(parentCode.id);  //父项id错误！倒数第二个
-
-
                         //获取其他层级
                         if(res.data.length != 1){ //当存在父项组织时
                             App.Services.memSearchParentOz.init(res.data);
@@ -180,29 +164,12 @@ App.Services.MemberNav=Backbone.View.extend({
                         }
                     }else{
                         //无结果
+                        alert("没有所属组织，无法定位到相关信息！");
                     }
                 },
                 error:function(e){
                 }
             })
         }
-    },
-    //取得搜索结果直接父项列表
-    getFurtherData:function(furtherId){
-        $(".servicesMemScrollContent").addClass("services_loading");
-        //区分内部还是外部用户
-        var collection = App.Services.MemberType == "inner" ? App.Services.Member.innerCollection : App.Services.Member.outerCollection,  //内部还是外部需要传入参数
-            data = {
-                parentId : furtherId,
-                outer : App.Services.MemberType != "inner",
-                includeUsers : true
-            };
-
-        App.Services.Member.loadData(collection,data,function(res){
-            console.log(collection);
-            //重新排序结果，设置为用户在前
-            //设置内容为已选，此处需要传入搜索结果当前用户id
-            $(".servicesMemScrollContent").removeClass("services_loading");
-        });
     }
 });

@@ -105,9 +105,16 @@
 
                 //上传失败
                 uploadError: function(file) {
-                    alert('上传失败:' + file.message + '。文件：' + file.file.name)
+                    var  lockerName = file.message.match(/\[(.|)+\]/);
+                    var user = file.message.test(/user/);
+                    if(user > 0){
+                        alert('上传失败。'  + '文件：' + file.file.name + "已锁定！锁定人是：" +  lockerName);  //+ file.message
+                    }else{
+                        alert('上传失败。'  + '版本已经发布，不能上传');  //
+                    }
+                    debugger;
                 }
-            })
+            });
             self.updateQuotaInfo()
         },
 

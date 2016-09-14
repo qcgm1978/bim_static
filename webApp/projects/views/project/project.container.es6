@@ -521,12 +521,97 @@ App.Project.ProjectContainer = Backbone.View.extend({
 
 
 			//取消计划高亮
-			var result = that.cancelhighlightPlan();
+			var result = that.cancelhighlightPlan(),
+			    selectedIds = App.Project.Settings.Viewer.getSelectedIds();
+
 
 			App.Project.Settings.ModelObj = null;
 			if (!model.intersect) {
-				that.resetProperNull();
+
+				if(selectedIds){
+					var obj,
+						arr = [];
+
+					if(Object.keys(selectedIds).length==1){
+						for(var i in selectedIds){
+							obj = {
+								userId : i,
+								sceneId : selectedIds[i]['sceneId']
+							}
+						}
+						App.Project.Settings.ModelObj = {
+							intersect: {
+								userId:obj.userId,
+								object:{
+									userData:{
+										sceneId:obj.sceneId
+									}
+								}
+							}
+
+						};
+						that.viewerPropertyRender();
+
+
+					}else{
+						for(var i in selectedIds){
+							if(arr[0]){
+								if(arr[0] != selectedIds[i]['classCode'] ){
+									that.resetProperNull();
+									return;
+								}
+
+							}else{
+								arr[0] = selectedIds[i]['classCode']
+							}
+						}
+
+						var uid = Object.keys(selectedIds)[0],
+							info = selectedIds[uid];
+
+							obj = {
+								userId : uid,
+								sceneId : info['sceneId']
+							};
+
+						App.Project.Settings.ModelObj = {
+							intersect: {
+								userId:obj.userId,
+								object:{
+									userData:{
+										sceneId:obj.sceneId
+									}
+								}
+							}
+
+						};
+						that.viewerPropertyRender();
+
+					}
+				}else{
+					that.resetProperNull();
+
+				}
+
 				return;
+			}else if(Object.keys(selectedIds).length>1){
+
+					var arr = [];
+
+
+						for(var i in selectedIds){
+							if(arr[0]){
+								if(arr[0] != selectedIds[i]['classCode'] ){
+									that.resetProperNull();
+									return;
+								}
+
+							}else{
+								arr[0] = selectedIds[i]['classCode']
+							}
+						}
+
+
 			}
 
 			// if (result) {
@@ -659,11 +744,11 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			$el;
 		if (property == "poperties") {
 
-			if (projectNav == "design") {
-				//设计
-				$el = $(".rightPropertyContentBox .designProperties");
+			//if (projectNav == "design") {
+			//	//设计
+			//	$el = $(".rightPropertyContentBox .designProperties");
 
-			} else if (projectNav == "cost") {
+			if (projectNav == "cost") {
 				//成本
 				$el = $(".rightPropertyContentBox .CostProperties");
 
@@ -673,6 +758,9 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			} else if (projectNav == "plan") {
 				//计划
 				$el = $(".rightPropertyContentBox .planProperties");
+			}else{
+				//设计  或者没有选中任何一栏时的默认属性页
+				$el = $(".rightPropertyContentBox .designProperties");
 			}
 		}
 		if ($el) {

@@ -98,10 +98,10 @@ App.Todo = {
 
 	//只是加载数据  不分页
 	onlyLoadData: function() {
-	 
+		App.Todo.TodoCollection.reset();
 		App.Todo.TodoCollection.fetch({
 			data: {
-				status: App.Todo.Settings.type == "commission" ? 0 : 1,
+				status: App.Todo.Settings.type == "commission" ? 1 : 2,
 				pageIndex: App.Todo.Settings.pageIndex,
 				pageItemCount: App.Comm.Settings.pageItemCount
 			}

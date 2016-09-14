@@ -57,8 +57,6 @@
             isCheckLogin = true;
         }
 
-
-
         myWebView.url = url;
 
         myWebView.id = "webView";
@@ -99,11 +97,7 @@
             }
 
         });
-        console.log(0)
-        console.log(isCheckLogin)
-        console.log(myWebView.url.indexOf("login.html") > -1)
         if (myWebView.url.indexOf("login.html") > -1 && !isCheckLogin) {
-            console.log(100)
             //两秒后 还为false 就认为 没触发check
             var timer = setTimeout(function() {
                 clearTimeout(timer);
@@ -116,20 +110,26 @@
                 }
             }, 1);
 
+            myWebView.runScript('App.Comm.checkCookie("' + document.cookie + '")', function(cookie) {
+                console.log(cookie);
+            });
         }
+
+        var cookieClearInterval=setInterval(function(){
+            if (!getCookie("OUTSSO_AuthToken")) {
+                myWebView.runScript("App.Comm.clearCookie()",function(){
+                   // clearInterval(cookieClearInterval);
+                })
+            }
+        },2000)
 
         myWebView.registerEvent('loadFinished', function(isReady) {
 
-            console.log(3)
-            console.log(isCheckLogin)
             if (myWebView.url.indexOf("login.html") > -1 && !isCheckLogin) {
-                console.log(4)
                 if (!isReady) {
                     return;
                 }
-                console.log(5)
                 if (!isCheckLogin) {
-                    console.log(6)
                     isCheckLogin = true;
                     checkLogin();
                 }

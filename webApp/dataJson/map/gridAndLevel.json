@@ -1,664 +1,465 @@
 {
-	"Grids": [{
-		"name": "1",
-		"start": {
-			"Z": 0,
-			"Y": -56846.119398632174,
-			"X": -122781.73324776237
-		},
-		"end": {
-			"Z": 0,
-			"Y": 83010.568765861142,
-			"X": -122781.73324776237
-		},
-		"minZ": -8704.8000000000011,
-		"maxZ": 29738.400000000005
-	}, {
-		"name": "2",
-		"start": {
-			"Z": 0,
-			"Y": -56846.119398632174,
-			"X": -114381.73324776237
-		},
-		"end": {
-			"Z": 0,
-			"Y": 83010.568765861171,
-			"X": -114381.73324776237
-		},
-		"minZ": -8704.8000000000011,
-		"maxZ": 29738.400000000005
-	}, {
-		"name": "3",
-		"start": {
-			"Z": 0,
-			"Y": -56846.119398632174,
-			"X": -105981.73324776237
-		},
-		"end": {
-			"Z": 0,
-			"Y": 83010.568765861142,
-			"X": -105981.73324776237
-		},
-		"minZ": -8704.8000000000011,
-		"maxZ": 29738.400000000005
-	}, {
-		"name": "4",
-		"start": {
-			"Z": 0,
-			"Y": -56846.119398632174,
-			"X": -97581.733247762371
-		},
-		"end": {
-			"Z": 0,
-			"Y": 83010.568765861142,
-			"X": -97581.733247762371
-		},
-		"minZ": -8704.8000000000011,
-		"maxZ": 29738.400000000005
-	}, {
-		"name": "5",
-		"start": {
-			"Z": 0,
-			"Y": -56846.119398632174,
-			"X": -89181.733247762386
-		},
-		"end": {
-			"Z": 0,
-			"Y": 83010.568765861142,
-			"X": -89181.733247762386
-		},
-		"minZ": -8704.8000000000011,
-		"maxZ": 29738.400000000005
-	}, {
-		"name": "6",
-		"start": {
-			"Z": 0,
-			"Y": -56846.119398632174,
-			"X": -80781.733247762386
-		},
-		"end": {
-			"Z": 0,
-			"Y": 83010.568765861142,
-			"X": -80781.733247762386
-		},
-		"minZ": -8704.8000000000011,
-		"maxZ": 29738.400000000005
-	}, {
-		"name": "7",
-		"start": {
-			"Z": 0,
-			"Y": -56846.119398632174,
-			"X": -72381.733247762386
-		},
-		"end": {
-			"Z": 0,
-			"Y": 83010.568765861142,
-			"X": -72381.733247762386
-		},
-		"minZ": -8704.8000000000011,
-		"maxZ": 29738.400000000005
-	}, {
-		"name": "8",
-		"start": {
-			"Z": 0,
-			"Y": -56846.119398632174,
-			"X": -63981.733247762393
-		},
-		"end": {
-			"Z": 0,
-			"Y": 83010.568765861142,
-			"X": -63981.733247762393
-		},
-		"minZ": -8704.8000000000011,
-		"maxZ": 29738.400000000005
-	}, {
-		"name": "9",
-		"start": {
-			"Z": 0,
-			"Y": -56846.119398632174,
-			"X": -55581.733247762393
-		},
-		"end": {
-			"Z": 0,
-			"Y": 83010.568765861142,
-			"X": -55581.733247762393
-		},
-		"minZ": -8704.8000000000011,
-		"maxZ": 29738.400000000005
-	}, {
-		"name": "10",
-		"start": {
-			"Z": 0,
-			"Y": -56846.119398632174,
-			"X": -47181.7332477624
-		},
-		"end": {
-			"Z": 0,
-			"Y": 83010.568765861142,
-			"X": -47181.7332477624
-		},
-		"minZ": -8704.8000000000011,
-		"maxZ": 29738.400000000005
-	}, {
-		"name": "11",
-		"start": {
-			"Z": 0,
-			"Y": -56846.119398632174,
-			"X": -38781.7332477624
-		},
-		"end": {
-			"Z": 0,
-			"Y": 83010.568765861142,
-			"X": -38781.7332477624
-		},
-		"minZ": -8704.8000000000011,
-		"maxZ": 29738.400000000005
-	}, {
-		"name": "12",
-		"start": {
-			"Z": 0,
-			"Y": -56846.119398632174,
-			"X": -30381.733247762408
-		},
-		"end": {
-			"Z": 0,
-			"Y": 83010.568765861142,
-			"X": -30381.733247762408
-		},
-		"minZ": -8704.8000000000011,
-		"maxZ": 29738.400000000005
-	}, {
-		"name": "13",
-		"start": {
-			"Z": 0,
-			"Y": -56846.119398632174,
-			"X": -21981.733247762411
-		},
-		"end": {
-			"Z": 0,
-			"Y": 83010.568765861142,
-			"X": -21981.733247762411
-		},
-		"minZ": -8704.8000000000011,
-		"maxZ": 29738.400000000005
-	}, {
-		"name": "14",
-		"start": {
-			"Z": 0,
-			"Y": -56846.119398632174,
-			"X": -13581.733247762415
-		},
-		"end": {
-			"Z": 0,
-			"Y": 83010.568765861142,
-			"X": -13581.733247762415
-		},
-		"minZ": -8704.8000000000011,
-		"maxZ": 29738.400000000005
-	}, {
-		"name": "15",
-		"start": {
-			"Z": 0,
-			"Y": -56846.119398632174,
-			"X": -5181.7332477624177
-		},
-		"end": {
-			"Z": 0,
-			"Y": 83010.568765861142,
-			"X": -5181.7332477624177
-		},
-		"minZ": -8704.8000000000011,
-		"maxZ": 29738.400000000005
-	}, {
-		"name": "16",
-		"start": {
-			"Z": 0,
-			"Y": -56846.119398632174,
-			"X": 3218.2667522375782
-		},
-		"end": {
-			"Z": 0,
-			"Y": 83010.568765861142,
-			"X": 3218.2667522375782
-		},
-		"minZ": -8704.8000000000011,
-		"maxZ": 29738.400000000005
-	}, {
-		"name": "17",
-		"start": {
-			"Z": 0,
-			"Y": -56846.119398632174,
-			"X": 11618.266752237574
-		},
-		"end": {
-			"Z": 0,
-			"Y": 83010.568765861142,
-			"X": 11618.266752237574
-		},
-		"minZ": -8704.8000000000011,
-		"maxZ": 29738.400000000005
-	}, {
-		"name": "18",
-		"start": {
-			"Z": 0,
-			"Y": -56846.119398632174,
-			"X": 20018.26675223757
-		},
-		"end": {
-			"Z": 0,
-			"Y": 83010.5687658611,
-			"X": 20018.26675223757
-		},
-		"minZ": -8704.8000000000011,
-		"maxZ": 29738.400000000005
-	}, {
-		"name": "19",
-		"start": {
-			"Z": 0,
-			"Y": -56846.119398632174,
-			"X": 28418.266752237567
-		},
-		"end": {
-			"Z": 0,
-			"Y": 83010.568765861142,
-			"X": 28418.266752237567
-		},
-		"minZ": -8704.8000000000011,
-		"maxZ": 29738.400000000005
-	}, {
-		"name": "20",
-		"start": {
-			"Z": 0,
-			"Y": -56846.119398632174,
-			"X": 36818.266752237563
-		},
-		"end": {
-			"Z": 0,
-			"Y": 83010.568765861142,
-			"X": 36818.266752237563
-		},
-		"minZ": -8704.8000000000011,
-		"maxZ": 29738.400000000005
-	}, {
-		"name": "21",
-		"start": {
-			"Z": 0,
-			"Y": -56846.119398632174,
-			"X": 45218.266752237556
-		},
-		"end": {
-			"Z": 0,
-			"Y": 83010.568765861142,
-			"X": 45218.266752237556
-		},
-		"minZ": -8704.8000000000011,
-		"maxZ": 29738.400000000005
-	}, {
-		"name": "22",
-		"start": {
-			"Z": 0,
-			"Y": -56846.119398632174,
-			"X": 53618.266752237556
-		},
-		"end": {
-			"Z": 0,
-			"Y": 83010.568765861142,
-			"X": 53618.266752237556
-		},
-		"minZ": -8704.8000000000011,
-		"maxZ": 29738.400000000005
-	}, {
-		"name": "23",
-		"start": {
-			"Z": 0,
-			"Y": -56846.119398632174,
-			"X": 62018.266752237549
-		},
-		"end": {
-			"Z": 0,
-			"Y": 83010.568765861142,
-			"X": 62018.266752237549
-		},
-		"minZ": -8704.8000000000011,
-		"maxZ": 29738.400000000005
-	}, {
-		"name": "24",
-		"start": {
-			"Z": 0,
-			"Y": -56846.119398632174,
-			"X": 70418.266752237541
-		},
-		"end": {
-			"Z": 0,
-			"Y": 83010.568765861142,
-			"X": 70418.266752237541
-		},
-		"minZ": -8704.8000000000011,
-		"maxZ": 29738.400000000005
-	}, {
-		"name": "25",
-		"start": {
-			"Z": 0,
-			"Y": -56846.119398632174,
-			"X": 78818.266752237541
-		},
-		"end": {
-			"Z": 0,
-			"Y": 83010.568765861142,
-			"X": 78818.266752237541
-		},
-		"minZ": -8704.8000000000011,
-		"maxZ": 29738.400000000005
-	}, {
-		"name": "26",
-		"start": {
-			"Z": 0,
-			"Y": -56846.119398632174,
-			"X": 87218.266752237541
-		},
-		"end": {
-			"Z": 0,
-			"Y": 83010.568765861142,
-			"X": 87218.266752237541
-		},
-		"minZ": -8704.8000000000011,
-		"maxZ": 29738.400000000005
-	}, {
-		"name": "27",
-		"start": {
-			"Z": 0,
-			"Y": -56846.119398632174,
-			"X": 95618.266752237541
-		},
-		"end": {
-			"Z": 0,
-			"Y": 83010.568765861142,
-			"X": 95618.266752237541
-		},
-		"minZ": -8704.8000000000011,
-		"maxZ": 29738.400000000005
-	}, {
-		"name": "28",
-		"start": {
-			"Z": 0,
-			"Y": -56846.119398632174,
-			"X": 104018.26675223753
-		},
-		"end": {
-			"Z": 0,
-			"Y": 83010.568765861142,
-			"X": 104018.26675223753
-		},
-		"minZ": -8704.8000000000011,
-		"maxZ": 29738.400000000005
-	}, {
-		"name": "29",
-		"start": {
-			"Z": 0,
-			"Y": -56846.119398632174,
-			"X": 112418.26675223753
-		},
-		"end": {
-			"Z": 0,
-			"Y": 83010.568765861142,
-			"X": 112418.26675223753
-		},
-		"minZ": -8704.8000000000011,
-		"maxZ": 29738.400000000005
-	}, {
-		"name": "30",
-		"start": {
-			"Z": 0,
-			"Y": -60549.5721770129,
-			"X": 120818.26675223753
-		},
-		"end": {
-			"Z": 0,
-			"Y": 78951.587651707378,
-			"X": 120818.26675223753
-		},
-		"minZ": -8704.8000000000011,
-		"maxZ": 29738.400000000005
-	}, {
-		"name": "A",
-		"start": {
-			"Z": 0,
-			"Y": -40885.474527311831,
-			"X": 134515.27005341483
-		},
-		"end": {
-			"Z": 0,
-			"Y": -40885.47452731098,
-			"X": -130254.83498694068
-		},
-		"minZ": -15498.899594752425,
-		"maxZ": 29738.400000000005
-	}, {
-		"name": "B",
-		"start": {
-			"Z": 0,
-			"Y": -32485.474527310947,
-			"X": 134515.27005341495
-		},
-		"end": {
-			"Z": 0,
-			"Y": -32485.474527310096,
-			"X": -130254.83498694065
-		},
-		"minZ": -15498.899594752425,
-		"maxZ": 29738.400000000005
-	}, {
-		"name": "C",
-		"start": {
-			"Z": 0,
-			"Y": -24085.474527310071,
-			"X": 134515.27005341495
-		},
-		"end": {
-			"Z": 0,
-			"Y": -24085.474527309216,
-			"X": -130254.83498694065
-		},
-		"minZ": -15498.899594752425,
-		"maxZ": 29738.400000000005
-	}, {
-		"name": "D",
-		"start": {
-			"Z": 0,
-			"Y": -15685.474527309187,
-			"X": 134515.27005341498
-		},
-		"end": {
-			"Z": 0,
-			"Y": -15685.474527308334,
-			"X": -130254.83498694061
-		},
-		"minZ": -15498.899594752425,
-		"maxZ": 29738.400000000005
-	}, {
-		"name": "E",
-		"start": {
-			"Z": 0,
-			"Y": -7285.4745273083081,
-			"X": 134515.270053415
-		},
-		"end": {
-			"Z": 0,
-			"Y": -7285.474527307455,
-			"X": -130254.83498694058
-		},
-		"minZ": -15498.899594752425,
-		"maxZ": 29738.400000000005
-	}, {
-		"name": "F",
-		"start": {
-			"Z": 0,
-			"Y": 1114.5254726925712,
-			"X": 134515.27005341504
-		},
-		"end": {
-			"Z": 0,
-			"Y": 1114.5254726934245,
-			"X": -130254.83498694054
-		},
-		"minZ": -15498.899594752425,
-		"maxZ": 29738.400000000005
-	}, {
-		"name": "G",
-		"start": {
-			"Z": 0,
-			"Y": 9514.52547269345,
-			"X": 134515.27005341509
-		},
-		"end": {
-			"Z": 0,
-			"Y": 9514.525472694304,
-			"X": -130254.83498694051
-		},
-		"minZ": -15498.899594752425,
-		"maxZ": 29738.400000000005
-	}, {
-		"name": "H",
-		"start": {
-			"Z": 0,
-			"Y": 17914.525472694331,
-			"X": 134515.27005341509
-		},
-		"end": {
-			"Z": 0,
-			"Y": 17914.525472695186,
-			"X": -130254.83498694051
-		},
-		"minZ": -15498.899594752425,
-		"maxZ": 29738.400000000009
-	}, {
-		"name": "J",
-		"start": {
-			"Z": 0,
-			"Y": 26314.525472695208,
-			"X": 134515.27005341512
-		},
-		"end": {
-			"Z": 0,
-			"Y": 26314.525472696063,
-			"X": -130254.83498694048
-		},
-		"minZ": -15498.899594752425,
-		"maxZ": 29738.400000000005
-	}, {
-		"name": "K",
-		"start": {
-			"Z": 0,
-			"Y": 34714.525472688918,
-			"X": 134515.27005341515
-		},
-		"end": {
-			"Z": 0,
-			"Y": 34714.525472689769,
-			"X": -130254.83498694043
-		},
-		"minZ": -15498.899594752425,
-		"maxZ": 29738.400000000005
-	}, {
-		"name": "L",
-		"start": {
-			"Z": 0,
-			"Y": 43114.525472682624,
-			"X": 134515.27005341518
-		},
-		"end": {
-			"Z": 0,
-			"Y": 43114.525472683476,
-			"X": -130254.8349869404
-		},
-		"minZ": -15498.899594752425,
-		"maxZ": 29738.400000000005
-	}, {
-		"name": "M",
-		"start": {
-			"Z": 0,
-			"Y": 51514.525472676331,
-			"X": 134515.27005341521
-		},
-		"end": {
-			"Z": 0,
-			"Y": 51514.525472677182,
-			"X": -130254.83498694038
-		},
-		"minZ": -15498.899594752425,
-		"maxZ": 29738.400000000005
-	}, {
-		"name": "N",
-		"start": {
-			"Z": 0,
-			"Y": 59914.525472670037,
-			"X": 134515.27005341524
-		},
-		"end": {
-			"Z": 0,
-			"Y": 59914.525472670888,
-			"X": -130254.83498694033
-		},
-		"minZ": -15498.899594752425,
-		"maxZ": 29738.400000000005
-	}, {
-		"name": "P",
-		"start": {
-			"Z": 0,
-			"Y": 68314.525472688954,
-			"X": 134515.27005341524
-		},
-		"end": {
-			"Z": 0,
-			"Y": 68314.5254726898,
-			"X": -130254.83498694033
-		},
-		"minZ": -15498.899594752425,
-		"maxZ": 29738.400000000005
-	}, {
-		"name": "Q",
-		"start": {
-			"Z": 0,
-			"Y": 72664.525472688954,
-			"X": 134515.27005341524
-		},
-		"end": {
-			"Z": 0,
-			"Y": 72664.525472689813,
-			"X": -130254.83498694032
-		},
-		"minZ": -8704.8,
-		"maxZ": 28238.399999999998
-	}],
-	"Levels": [{
-		"name": "F01_±0.000",
-		"elevation": 0
-	}, {
-		"name": "F02_+5400",
-		"elevation": 5400
-	}, {
-		"name": "F03_+10800",
-		"elevation": 10800
-	}, {
-		"name": "F04_+15900",
-		"elevation": 15900
-	}, {
-		"name": "F05_+21000",
-		"elevation": 21000
-	}, {
-		"name": "屋面_+23850",
-		"elevation": 23850
-	}, {
-		"name": "25800",
-		"elevation": 25800
-	}, {
-		"name": "B01_-4600",
-		"elevation": -4600
-	}, {
-		"name": "B02_-8400",
-		"elevation": -8400
-	}, {
-		"name": "女儿墙_+18600",
-		"elevation": 18600
-	}]
+  "messageId": "9abb527a1dcc4b10b426b6e75258318c",
+  "messageType": null,
+  "timestamp": 1473664804820,
+  "code": 0,
+  "message": "success",
+  "data": {
+    "items": [
+      {
+        "projectNo": "BZZK2016111",
+        "id": 892125080355008,
+        "name": "族库研发0009",
+        "createTime": 1470655729000,
+        "updateTime": null,
+        "type": 2,
+        "version": {
+          "byProjectRef": false,
+          "id": 892125080355008,
+          "projectId": 892125080355008,
+          "projectName": "族库研发0009",
+          "projectNo": "BZZK2016111",
+          "subType": 0,
+          "name": "族库研发0009",
+          "desc": null,
+          "createTime": 1470655729000,
+          "creatorId": null,
+          "creatorName": null,
+          "type": 0,
+          "status": 3,
+          "latest": true,
+          "modelId": null,
+          "modelStatus": -1,
+          "referenceId": null,
+          "referenceVersionId": null
+        },
+        "designUnit": "安徽省建筑设计研究院有限责任公司",
+        "lastModifyTime": 1470655729000
+      },
+      {
+        "projectNo": "BZZK2016085",
+        "id": 889774157390016,
+        "name": "0805族库",
+        "createTime": 1470368751000,
+        "updateTime": null,
+        "type": 2,
+        "version": {
+          "byProjectRef": false,
+          "id": 889774157390016,
+          "projectId": 889774157390016,
+          "projectName": "0805族库",
+          "projectNo": "BZZK2016085",
+          "subType": 0,
+          "name": "0805族库",
+          "desc": null,
+          "createTime": 1470368751000,
+          "creatorId": null,
+          "creatorName": null,
+          "type": 0,
+          "status": 4,
+          "latest": true,
+          "modelId": null,
+          "modelStatus": -1,
+          "referenceId": null,
+          "referenceVersionId": null
+        },
+        "designUnit": "中国建筑第八工程局有限公司",
+        "lastModifyTime": 1470368751000
+      },
+      {
+        "projectNo": "BZZK2016084",
+        "id": 889053100433600,
+        "name": "0804族库1",
+        "createTime": 1470280731000,
+        "updateTime": null,
+        "type": 2,
+        "version": {
+          "byProjectRef": false,
+          "id": 889053100433600,
+          "projectId": 889053100433600,
+          "projectName": "0804族库1",
+          "projectNo": "BZZK2016084",
+          "subType": 0,
+          "name": "0804族库1",
+          "desc": null,
+          "createTime": 1470280731000,
+          "creatorId": null,
+          "creatorName": null,
+          "type": 0,
+          "status": 4,
+          "latest": true,
+          "modelId": null,
+          "modelStatus": -1,
+          "referenceId": null,
+          "referenceVersionId": null
+        },
+        "designUnit": "中国建筑第八工程局有限公司",
+        "lastModifyTime": 1470280890000
+      },
+      {
+        "projectNo": "BZZK20160804",
+        "id": 889042778685632,
+        "name": "2016版族库0804",
+        "createTime": 1470279471000,
+        "updateTime": null,
+        "type": 2,
+        "version": {
+          "byProjectRef": false,
+          "id": 889042778685632,
+          "projectId": 889042778685632,
+          "projectName": "2016版族库0804",
+          "projectNo": "BZZK20160804",
+          "subType": 0,
+          "name": "2016版族库0804",
+          "desc": null,
+          "createTime": 1470279471000,
+          "creatorId": null,
+          "creatorName": null,
+          "type": 0,
+          "status": 3,
+          "latest": true,
+          "modelId": null,
+          "modelStatus": -1,
+          "referenceId": null,
+          "referenceVersionId": null
+        },
+        "designUnit": "中国建筑第八工程局有限公司",
+        "lastModifyTime": 1470280195000
+      },
+      {
+        "projectNo": "BZZK2016002",
+        "id": 887018222518464,
+        "name": "族库接口测试—1",
+        "createTime": 1470032333000,
+        "updateTime": null,
+        "type": 2,
+        "version": {
+          "byProjectRef": false,
+          "id": 887018222518464,
+          "projectId": 887018222518464,
+          "projectName": "族库接口测试—1",
+          "projectNo": "BZZK2016002",
+          "subType": 0,
+          "name": "族库接口测试—1",
+          "desc": null,
+          "createTime": 1470032333000,
+          "creatorId": null,
+          "creatorName": null,
+          "type": 1,
+          "status": 9,
+          "latest": true,
+          "modelId": null,
+          "modelStatus": -1,
+          "referenceId": null,
+          "referenceVersionId": null
+        },
+        "designUnit": "中国建筑第四工程局有限公司",
+        "lastModifyTime": 1470032694000
+      },
+      {
+        "projectNo": "BZZK20160801",
+        "id": 886936138531008,
+        "name": "2016版族库0801",
+        "createTime": 1470022313000,
+        "updateTime": null,
+        "type": 2,
+        "version": {
+          "byProjectRef": false,
+          "id": 886936138531008,
+          "projectId": 886936138531008,
+          "projectName": "2016版族库0801",
+          "projectNo": "BZZK20160801",
+          "subType": 0,
+          "name": "2016版族库0801",
+          "desc": null,
+          "createTime": 1470022313000,
+          "creatorId": null,
+          "creatorName": null,
+          "type": 1,
+          "status": 9,
+          "latest": true,
+          "modelId": null,
+          "modelStatus": -1,
+          "referenceId": null,
+          "referenceVersionId": null
+        },
+        "designUnit": "中国建筑第二工程局有限公司",
+        "lastModifyTime": 1470022313000
+      },
+      {
+        "projectNo": "BZZK201672",
+        "id": 885676401696960,
+        "name": "族库测试123",
+        "createTime": 1469868536000,
+        "updateTime": null,
+        "type": 2,
+        "version": {
+          "byProjectRef": false,
+          "id": 885676401696960,
+          "projectId": 885676401696960,
+          "projectName": "族库测试123",
+          "projectNo": "BZZK201672",
+          "subType": 0,
+          "name": "族库测试123",
+          "desc": null,
+          "createTime": 1469868536000,
+          "creatorId": null,
+          "creatorName": null,
+          "type": 1,
+          "status": 9,
+          "latest": true,
+          "modelId": null,
+          "modelStatus": -1,
+          "referenceId": null,
+          "referenceVersionId": null
+        },
+        "designUnit": "中国建筑第八工程局有限公司",
+        "lastModifyTime": 1469868637000
+      },
+      {
+        "projectNo": "BZZK201670",
+        "id": 885675903033536,
+        "name": "族库0728测试—01",
+        "createTime": 1469868476000,
+        "updateTime": null,
+        "type": 2,
+        "version": {
+          "byProjectRef": false,
+          "id": 885675903033536,
+          "projectId": 885675903033536,
+          "projectName": "族库0728测试—01",
+          "projectNo": "BZZK201670",
+          "subType": 0,
+          "name": "族库0728测试—01",
+          "desc": null,
+          "createTime": 1469868476000,
+          "creatorId": null,
+          "creatorName": null,
+          "type": 0,
+          "status": 4,
+          "latest": true,
+          "modelId": null,
+          "modelStatus": -1,
+          "referenceId": null,
+          "referenceVersionId": null
+        },
+        "designUnit": "中国建筑第四工程局有限公司",
+        "lastModifyTime": 1469868476000
+      },
+      {
+        "projectNo": "BZZK201671",
+        "id": 884759699374272,
+        "name": "2016版族库（weil）",
+        "createTime": 1469756634000,
+        "updateTime": null,
+        "type": 2,
+        "version": {
+          "byProjectRef": false,
+          "id": 884759699374272,
+          "projectId": 884759699374272,
+          "projectName": "2016版族库（weil）",
+          "projectNo": "BZZK201671",
+          "subType": 0,
+          "name": "2016版族库（weil）",
+          "desc": null,
+          "createTime": 1469756634000,
+          "creatorId": null,
+          "creatorName": null,
+          "type": 0,
+          "status": 3,
+          "latest": true,
+          "modelId": null,
+          "modelStatus": -1,
+          "referenceId": null,
+          "referenceVersionId": null
+        },
+        "designUnit": "中国建筑第四工程局有限公司",
+        "lastModifyTime": 1469756634000
+      },
+      {
+        "projectNo": "BZZK201669",
+        "id": 884169880551616,
+        "name": "族库test4_0728",
+        "createTime": 1469684635000,
+        "updateTime": null,
+        "type": 2,
+        "version": {
+          "byProjectRef": false,
+          "id": 884169880551616,
+          "projectId": 884169880551616,
+          "projectName": "族库test4_0728",
+          "projectNo": "BZZK201669",
+          "subType": 0,
+          "name": "族库test4_0728",
+          "desc": null,
+          "createTime": 1469684635000,
+          "creatorId": null,
+          "creatorName": null,
+          "type": 1,
+          "status": 9,
+          "latest": true,
+          "modelId": null,
+          "modelStatus": -1,
+          "referenceId": null,
+          "referenceVersionId": null
+        },
+        "designUnit": "中国建筑第二工程局有限公司",
+        "lastModifyTime": 1469685067000
+      },
+      {
+        "projectNo": "BZZK201667",
+        "id": 884095661695168,
+        "name": "族库test2",
+        "createTime": 1469675575000,
+        "updateTime": null,
+        "type": 2,
+        "version": {
+          "byProjectRef": false,
+          "id": 884095661695168,
+          "projectId": 884095661695168,
+          "projectName": "族库test2",
+          "projectNo": "BZZK201667",
+          "subType": 0,
+          "name": "族库test2",
+          "desc": null,
+          "createTime": 1469675575000,
+          "creatorId": null,
+          "creatorName": null,
+          "type": 0,
+          "status": 6,
+          "latest": true,
+          "modelId": null,
+          "modelStatus": -1,
+          "referenceId": null,
+          "referenceVersionId": null
+        },
+        "designUnit": "中国建筑第二工程局有限公司",
+        "lastModifyTime": 1469676580000
+      },
+      {
+        "projectNo": "BZZK201666",
+        "id": 884090842751168,
+        "name": "011",
+        "createTime": 1469674987000,
+        "updateTime": null,
+        "type": 2,
+        "version": {
+          "byProjectRef": false,
+          "id": 884090842751168,
+          "projectId": 884090842751168,
+          "projectName": "011",
+          "projectNo": "BZZK201666",
+          "subType": 0,
+          "name": "011",
+          "desc": null,
+          "createTime": 1469674987000,
+          "creatorId": null,
+          "creatorName": null,
+          "type": 0,
+          "status": 5,
+          "latest": true,
+          "modelId": null,
+          "modelStatus": -1,
+          "referenceId": null,
+          "referenceVersionId": null
+        },
+        "designUnit": "中国建筑第二工程局有限公司",
+        "lastModifyTime": 1469674987000
+      },
+      {
+        "projectNo": "BZZK201665",
+        "id": 884090815258816,
+        "name": "624版族成果",
+        "createTime": 1469674983000,
+        "updateTime": null,
+        "type": 2,
+        "version": {
+          "byProjectRef": false,
+          "id": 884090815258816,
+          "projectId": 884090815258816,
+          "projectName": "624版族成果",
+          "projectNo": "BZZK201665",
+          "subType": 0,
+          "name": "624版族成果",
+          "desc": null,
+          "createTime": 1469674983000,
+          "creatorId": null,
+          "creatorName": null,
+          "type": 0,
+          "status": 3,
+          "latest": true,
+          "modelId": null,
+          "modelStatus": -1,
+          "referenceId": null,
+          "referenceVersionId": null
+        },
+        "designUnit": "大连同泰建设工程有限公司",
+        "lastModifyTime": 1469674983000
+      },
+      {
+        "projectNo": "BZZK201651",
+        "id": 882805417099456,
+        "name": "族库--jiangq002",
+        "createTime": 1469518074000,
+        "updateTime": null,
+        "type": 2,
+        "version": {
+          "byProjectRef": false,
+          "id": 882805417099456,
+          "projectId": 882805417099456,
+          "projectName": "族库--jiangq002",
+          "projectNo": "BZZK201651",
+          "subType": 0,
+          "name": "族库--jiangq002",
+          "desc": null,
+          "createTime": 1469518074000,
+          "creatorId": null,
+          "creatorName": null,
+          "type": 1,
+          "status": 9,
+          "latest": true,
+          "modelId": null,
+          "modelStatus": -1,
+          "referenceId": null,
+          "referenceVersionId": null
+        },
+        "designUnit": "",
+        "lastModifyTime": 1469518176000
+      },
+      {
+        "projectNo": "BZZK201650",
+        "id": 882796569960640,
+        "name": "族库测试-jiangq001",
+        "createTime": 1469516994000,
+        "updateTime": null,
+        "type": 2,
+        "version": {
+          "byProjectRef": false,
+          "id": 882796569960640,
+          "projectId": 882796569960640,
+          "projectName": "族库测试-jiangq001",
+          "projectNo": "BZZK201650",
+          "subType": 0,
+          "name": "族库测试-jiangq001",
+          "desc": null,
+          "createTime": 1469516994000,
+          "creatorId": null,
+          "creatorName": null,
+          "type": 0,
+          "status": 3,
+          "latest": true,
+          "modelId": null,
+          "modelStatus": -1,
+          "referenceId": null,
+          "referenceVersionId": null
+        },
+        "designUnit": null,
+        "lastModifyTime": 1469516994000
+      }
+    ],
+    "totalItemCount": 35,
+    "pageItemCount": 15,
+    "pageIndex": 1,
+    "pageCount": 3
+  }
 }

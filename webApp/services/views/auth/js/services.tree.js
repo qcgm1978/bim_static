@@ -2,6 +2,7 @@
  * @require  /services/views/auth/member/services.member.list.js
  * */
 App.Services.tree = function(data){
+
     var ele  = $("<ul></ul>");
     for(var i =0 ; i < data.data.org.length ; i++){
         var model = Backbone.Model.extend({
@@ -39,10 +40,10 @@ App.Services.queue = {
     present : [],
     //许可证发放，400ms后发放一个许可证，避免点击过快
     certificates:function(){
-        this.permit = false;
-        setTimeout(function(){
-            App.Services.queue.permit = true;
-        },400);
+        this.permit = true;
+        //setTimeout(function(){
+        //    App.Services.queue.permit = true;
+        //},400);
     },
     //验证并向队列添加执行函数
     promise:function(fn,_this){
@@ -123,60 +124,68 @@ App.Services.exetor = function(_this){
         }
     }
 };
-
-//使用
+//使用，搜索列表
 //App.Services.createNode.init
 //App.Services.createNode.trigger(arr,includeUsers);
 App.Services.memSearchParentOz = {
+    reset:function(){
+        this.count = null;
+        this.arr = [];
+    },
     count : null,
+    arr:[],
+    id:'',
     trigger :function(arr,includeUsers){
-        var _this = this,preOg = null; //要写入的元素
+        var _this = this,preOg = null,container; //要写入的元素
+        container = _.filter($(".ozName"),function(item){
+            return $(item).attr("data-id") == arr[_this.count].id
+        });
 
-        if(!this.count){//如果层级数组没有耗尽，最后一个包含includeUsers?右侧单独处理
+        if(_this.count == 1){
             includeUsers = true;
+            App.Services.memSearchParentOz.id = arr[0].id;
+            $(container[0]).click();
+            this.reset();
+            return
         }
+
         $.ajax({
-            url:App.API.URL.fetchServicesMemberOuterList + "&parentId=" + arr[_this.count].id  + "&includeUsers=" + includeUsers ,
+            url:App.API.URL.fetchServicesMemberList+ "outer="+ arr[_this.count].outer + "&parentId=" + arr[_this.count].id  + "&includeUsers=" + includeUsers ,
             type:'GET',
             data : '',
             success:function(res){
                 //要判断是外部还是内部，要查找当前的组织id，并插入到相应的位置
-                if(res.data && res.data.length){
-                    var tree = App.Services.tree(res.data);
-                    if(_this.count == 0){   //是顶层组织，则元素等于inner或outer，如果非顶层则过滤查找id相同的唯一组织
+                if(res.data.org && res.data.org.length){
+                    var tree = App.Services.tree(res);
+                    if(_this.count == arr.length - 1){   //是顶层组织，则元素等于inner或outer，如果非顶层则过滤查找id相同的唯一组织
                         if(!arr[_this.count].outer){
                             preOg = $("#inner").siblings(".childOz");
+                            $("#outer").siblings(".childOz").hide();
                         }else{
                             preOg = $("#outer").siblings(".childOz");
+                            $("#inner").siblings(".childOz").show();
                         }
                     }else{
-                        var container = _.filter($(".ozName"),function(item){
-                            return parseInt($(item).attr("data-id")) == arr[_this.count].id
-                        });
-                        preOg = container[0].siblings(".childOz");
+                        preOg = $(container[0]).closest("li").find(".childOz");
                     }
-                    preOg.html(tree)
+                    preOg.html(tree);
+                    preOg.show();
                 }
-                //后面还有继续请求
-                if(_this.count < arr.length){
-                    App.Services.memSearchParentOz.trigger(arr,includeUsers);//继续请求子节点
-                    _this.count++;
-                }else{
-                    //触发点击父项事件，查找
-                    if(_this.count == 1){
-                        var father = _.filter($(".ozName"),function(item){
-                            return parseInt($(item).attr("data-id")) == arr[1].id
-                        });
-                        father[0].click();
-                    }
-                    _this.count = 0; //重置
-                }
+                _this.count--;
+            }
+        }).done(function(res){
+            //后面还有继续请求
+            if( _this.count > 0 ){
+                App.Services.memSearchParentOz.trigger(arr,includeUsers);//继续请求子节点
+            }else{
+                _this.reset(); //重置
             }
         })
     },
     //倒计数
     init:function(arr){
-        this.count = 0;
+        this.count = arr.length - 1;
+        this.arr = arr;
     }
 };
 
