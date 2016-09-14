@@ -24,6 +24,7 @@ App.Services.MemberNav=Backbone.View.extend({
         Backbone.on("serviceMemberTopSelectStatus",this.serviceMemberTopSelectStatus,this);
         Backbone.on("serviceMemberResetSearchContent",this.serviceMemberResetSearchContent,this);
         Backbone.on("hideSearchMenu",this.hideSearchMenu,this)
+
     },
     //清除搜索内容
     serviceMemberResetSearchContent:function(){
@@ -149,6 +150,7 @@ App.Services.MemberNav=Backbone.View.extend({
         var chosenOz = $(ele).attr("data-code");
         if(chosenOz){
             var pre = JSON.parse(chosenOz);
+            App.Services.memSearchParentOz.id = pre.id;
             var type = pre.type;
             App.Services.MemberType = !pre.outer ? "inner" : "outer";//切换外部/内部状态
             var parentCode = {
