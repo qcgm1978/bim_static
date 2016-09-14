@@ -55,6 +55,7 @@
             module:null
         }
         App.modules = {};
+        App.pkg = {};
         </script>
 
 
@@ -65,7 +66,33 @@
         <script type="text/javascript" src="/topNav/js/topNav.es6"></script>
         <script type="text/javascript" src="/commH5/pluging/clipboard/clipboard.js"></script>
         <script type="text/javascript" src="/libsH5/js/libs/three.js"></script> 
-        <script type="text/javascript" src="/router/appkey.es6"></script>
+        <!--<script type="text/javascript" src="/router/appkey.es6"></script>-->
+    <script>
+        var x                   = new XMLHttpRequest();
+        x.open('GET', '../map.json', true);
+        x.send('bb');
+        x.onreadystatechange    = function(s){
+            if(x.readyState == 4){
+                var r = x.response,
+                    obj=JSON.parse(r),
+                    pkg = obj.pkg,
+                    index_js = document.createElement('script');
+
+                for(var i in pkg){
+                    if(pkg[i]['uri']){
+                        var url = pkg[i]['uri'].slice(0,pkg[i]['uri'].indexOf('_'));
+                        App.pkg[url+'.'+pkg[i]['type']] = pkg[i]['uri'];
+                    }
+                }
+                console.log(App.pkg)
+
+                index_js.setAttribute('src',__uri('/router/appkey.es6'));
+
+                document.body.appendChild(index_js);
+
+            }
+        };
+    </script>
 </body>
 
 
