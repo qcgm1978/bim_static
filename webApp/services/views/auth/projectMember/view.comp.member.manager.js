@@ -21,7 +21,8 @@ ViewComp.MemberManager = Backbone.View.extend({
 		"mouseout .ztree li a": "hideDelete",
 		'click #grandBtn':'grand',
 		"click .searchBtn":"search",
-		"click .closeicon":"clearSearch"
+		"click .closeicon":"clearSearch",
+		"keyup #searchContent":"searchCli"
 	},
 	initialize:function(){
 		
@@ -225,7 +226,6 @@ ViewComp.MemberManager = Backbone.View.extend({
 		if(!content){return}
 		var uid=App.Comm.user('userId');
 
-
 		var treeNode = null,
 			setting = {
 				callback: {
@@ -259,6 +259,11 @@ ViewComp.MemberManager = Backbone.View.extend({
 					zNodes.forEach(function(i){
 						i.iconSkin='business';
 						i.name=i.name+'<i style="color:#999999;">（'+i.parentname+'）</i>';
+						if(i.type == 1){
+							i.userId = i.id
+						}else{
+							i.orgId  = i.id
+						}
 					});
 					if(!treeNode){
 						_this.selectTree = $.fn.zTree.init($("#selectTree"), setting, zNodes);
@@ -274,5 +279,11 @@ ViewComp.MemberManager = Backbone.View.extend({
 	clearSearch:function(e){
 		var ele = $(e.target);
 		ele.siblings("input").val("");
+		this.initView();
+	},
+	searchCli:function(e){
+		if(e.keyCode == 13){
+			this.search();
+		}
 	}
 });
