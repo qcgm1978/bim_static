@@ -106,8 +106,8 @@
                 //上传失败
                 uploadError: function(file) {
                     console.log(file.message);
-                    var  lockerId = file.message.match(/\[(.|)+\]/);
-                    var user = /user/.test(file.message.test);
+                    var  lockerId = (file.message.match(/\[(.|)+\]/))[0].replace(/(\[|\])/g,'');
+                    var user = /user/.test(file.message);
                     if(user){
                         $.ajax({
                             url:App.API.URL.fetchServicesUserName + lockerId +"?outer=false",

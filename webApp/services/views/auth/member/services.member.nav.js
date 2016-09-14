@@ -114,7 +114,6 @@ App.Services.MemberNav=Backbone.View.extend({
     search:function(e){
         var ele = e.target || e.srcElement;
 
-
         if( (e.keyCode > 47 && e.keyCode  < 58) || e.keyCode == 8 || e.keyCode == 32 || e.keyCode == 13 || (e.keyCode  < 112 && e.keyCode >95)){ //退格 空格 回车 小键盘  (e.keyCode > 57&& e.keyCode  < 91) || 字母
             var content = $(ele).val();
             if(!content){
@@ -150,7 +149,6 @@ App.Services.MemberNav=Backbone.View.extend({
         var chosenOz = $(ele).attr("data-code");
         if(chosenOz){
             var pre = JSON.parse(chosenOz);
-            App.Services.memSearchParentOz.id = pre.id;
             var type = pre.type;
             App.Services.MemberType = !pre.outer ? "inner" : "outer";//切换外部/内部状态
             var parentCode = {
