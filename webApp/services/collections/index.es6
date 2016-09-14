@@ -59,12 +59,13 @@ App.Services = {
 	setAuth(){
 		var $serviceNav = $(".servicesIndexBox .servicesIndex"),
 		    user = JSON.parse(localStorage.user || "{}"),
-		    isKeyUser = user.isKeyUser || false;
+		    isKeyUser = user.isKeyUser || false,
+			_AuthObj=App.AuthObj||{};
 
-		if (!App.AuthObj.service) {
+		if (_AuthObj && !_AuthObj.service) {
 			$serviceNav.remove();
 		} else {
-			var Auth = App.AuthObj.service;
+			var Auth = _AuthObj.service||{};
 			 
 			if (!Auth.app) {
 				$serviceNav.find(".application").remove();
