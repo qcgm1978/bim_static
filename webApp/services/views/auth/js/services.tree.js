@@ -140,15 +140,14 @@ App.Services.memSearchParentOz = {
         container = _.filter($(".ozName"),function(item){
             return $(item).attr("data-id") == arr[_this.count].id
         });
-
-        if(_this.count == 1){
+        if(_this.count == 0){
+            $("#ozList").removeClass("services_loading");
             includeUsers = true;
-            App.Services.memSearchParentOz.id = arr[0].id;
             $(container[0]).click();
+            Backbone.trigger("serviceMemberSearchSelect",App.Services.memSearchParentOz.id);
             this.reset();
             return
         }
-
         $.ajax({
             url:App.API.URL.fetchServicesMemberList+ "outer="+ arr[_this.count].outer + "&parentId=" + arr[_this.count].id  + "&includeUsers=" + includeUsers ,
             type:'GET',
@@ -175,7 +174,7 @@ App.Services.memSearchParentOz = {
             }
         }).done(function(res){
             //后面还有继续请求
-            if( _this.count > 0 ){
+            if( _this.count >= 0 ){
                 App.Services.memSearchParentOz.trigger(arr,includeUsers);//继续请求子节点
             }else{
                 _this.reset(); //重置

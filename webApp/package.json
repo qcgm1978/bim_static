@@ -6,7 +6,8 @@
   "devDependencies": {
     "fis-parser-babel-6.x": "^1.0.0",
     "fis-parser-less": "^0.1.3",
-    "fis3-postpackager-loader": "^1.3.13"
+    "fis3-postpackager-loader": "^1.3.13",
+    "fis3-deploy-local-deliver":""
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

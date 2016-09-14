@@ -50,7 +50,8 @@ _.require = function(url) {
 	var index = url.lastIndexOf(".");
 	var type = url.substring(index + 1);
 
-	url = url.substring(0, index) + "_" + App.Comm.Settings.v + "." + type;
+
+	url = App.pkg[url];
 
 	//加载过不再加载
 	if (App.Comm.requireCache.indexOf(url) == -1) {

@@ -22,11 +22,16 @@ App.Services.MemberNav=Backbone.View.extend({
     initialize:function(){
         //默认根据角色权限加载  adm用户加载全部，keyMem用户只显示项目管理.
         Backbone.on("serviceMemberTopSelectStatus",this.serviceMemberTopSelectStatus,this);
-        Backbone.on("serviceMemberResetSearchContent",this.serviceMemberResetSearchContent,this)
+        Backbone.on("serviceMemberResetSearchContent",this.serviceMemberResetSearchContent,this);
+        Backbone.on("hideSearchMenu",this.hideSearchMenu,this)
+
     },
     //清除搜索内容
     serviceMemberResetSearchContent:function(){
 
+    },
+    hideSearchMenu:function(){
+        this.$(".memberSearch ul").hide();
     },
     //
     serviceMemberTopSelectStatus:function(){
@@ -110,11 +115,22 @@ App.Services.MemberNav=Backbone.View.extend({
     search:function(e){
         var ele = e.target || e.srcElement;
 
+        //为回车键加以条件判断是否是选择
+        var pre = this.$(".memberSearch li");
+        var active  =_.filter(pre,function(item){
+            return $(item).hasClass("active");
+        });
+
         if( (e.keyCode > 47 && e.keyCode  < 58) || e.keyCode == 8 || e.keyCode == 32 || e.keyCode == 13 || (e.keyCode  < 112 && e.keyCode >95)){ //退格 空格 回车 小键盘  (e.keyCode > 57&& e.keyCode  < 91) || 字母
             var content = $(ele).val();
             if(!content){
                 return
             }
+            //
+            if(active.length && e.keyCode == 13){
+                $(active[0]).click();
+            }
+
             $.ajax({
                 url:App.API.URL.searchServicesMember  + content,   //App.API.URL.searchServicesMember + content
                 type:'GET',
@@ -132,6 +148,30 @@ App.Services.MemberNav=Backbone.View.extend({
         }else if(e.keyCode == 38 || e.keyCode == 40){  //38向上  40向下
             //查询当前是否有选中，未选中，设置为0，选中  38设置为减一，40设置为加一，注意头尾的处理
             //光标上下选择
+            var index = $(active[0]).index();
+
+            if(e.keyCode == 38){
+                if(active.length){
+                    if(index == 0){
+                        pre.each(function(item){$(this).removeClass("active")});
+                    }else{
+                        pre.eq(index).removeClass("active").prev().addClass("active");
+                    }
+                }else{
+                    pre.eq(pre.length - 1).addClass("active");
+                }
+            }else if(e.keyCode == 40){
+                if(!active.length){
+                    pre.eq(0).addClass("active");
+                }else {
+                    if(index == pre.length - 1){
+                        pre.each(function(item){$(this).removeClass("active")});
+                    }else{
+                        pre.eq(index).removeClass("active").next().addClass("active");
+                    }
+                }
+            }
+
         }else{
             //额外的按键处理
         }
@@ -141,10 +181,13 @@ App.Services.MemberNav=Backbone.View.extend({
         var _this = this;
         var ele = e.target || e.srcElement;
         $(ele).closest("ul").hide();
+
         //添加状态
         var chosenOz = $(ele).attr("data-code");
+        $("#ozList").addClass("services_loading");
         if(chosenOz){
             var pre = JSON.parse(chosenOz);
+            App.Services.memSearchParentOz.id = pre.id;
             var type = pre.type;
             App.Services.MemberType = !pre.outer ? "inner" : "outer";//切换外部/内部状态
             var parentCode = {
@@ -165,6 +208,7 @@ App.Services.MemberNav=Backbone.View.extend({
                     }else{
                         //无结果
                         alert("没有所属组织，无法定位到相关信息！");
+                        $("#ozList").removeClass("services_loading");
                     }
                 },
                 error:function(e){

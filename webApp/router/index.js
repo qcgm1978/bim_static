@@ -48,7 +48,7 @@ var AppRoute = Backbone.Router.extend({
 		localStorage.removeItem("user");
 
 		//ie
-		App.Comm.dispatchIE('/?commType=loginOut'); 
+		App.Comm.dispatchIE('/?commType=loginOut');
 
 		window.location.href = "/login.html";
 
@@ -96,7 +96,7 @@ var AppRoute = Backbone.Router.extend({
 	},
 
 	//单个项目
-	project: function(id, versionId) { 
+	project: function(id, versionId) {
 
 		if (this.reset() == false) {
 			return;
@@ -293,7 +293,7 @@ var AppRoute = Backbone.Router.extend({
 			App.Comm.getUserInfo();
 			user = localStorage.getItem("user");
 		}
- 
+
 
 
 		$("#pageLoading").show();
@@ -316,7 +316,7 @@ var AppRoute = Backbone.Router.extend({
 		}
 
 		var Autharr = App.Global.User && App.Global.User["function"],
-			keys, len;
+		    keys, len;
 		App.AuthObj = {};
 		//遍历权限
 		$.each(Autharr, function(i, item) {
