@@ -3,9 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <title>模型选择器</title>
+    <script src="http://cdn.bootcss.com/jquery/1.9.1/jquery.min.js"></script>
     <script src="http://bim.wanda-dev.cn/static/dist/components/inspectSelection/js/inspectSelection.js"></script>
 </head>
 <body>
+
+    <div class="modelExtend">
+        <button mtype="1">绑定检查点</button>
+        <button mtype="3">绑定隐患</button>
+        <button mtype="5">显示全部</button>
+        <button mtype="2">解绑检查点</button>
+        <button mtype="4">解绑隐患</button>
+        <button mtype="6">确定</button>
+    </div>
+
+</body>
 <script>
     jQuery.support.cors = true;
     var viewer = new InspectModelSelection({
@@ -14,39 +26,117 @@
         projectCode: '119b1c19-0c93-4145-b834-a2fcb78af008',
         token: "abc3f4a29812170895927cc4251f18ed9cdee85deefe5bfa1e111cbce731a82320f770accf5187a6ed32acdda6a77d9933107a6f56c7f286608d72ea06d0e352c767f0c914da28a0cf76906c8df40b1351e0b7ada75c92368585cbe9fc9b0be1d185fd2c6eda269f36011a17f83f33c43cf17db17e79413b",
         appKey: "18fbec1ae3da477fb47d842a53164b14",
-        test: function () {
-        },
         callback: function (res) {
-            console.log(JSON.stringify(res))
+            //res 返回的检查点、隐患数据
+            alert(res);
         }
     });
 
-    /*viewer.showInModel({
-        componentId: "3e3af932cc4382e96862e352bdf05d70.91d0b3bb-43c7-42cf-b6ca-03aadcfadb51-002a8041",
-        location: [{
-            "id": "1",
-            "userId": "3e3af932cc4382e96862e352bdf05d70.91d0b3bb-43c7-42cf-b6ca-03aadcfadb51-002a8041",
-            "shapeType": 1,
-            "position": {
-                "x": -34354.52768018726,
-                "y": -44230.49790435081,
-                "z": 18171.458337469983
-            },
-            "boundingBox": {
-                "min": {
-                    "x": -42645.28652412156,
-                    "y": -44230.53426907837,
-                    "z": 11650.198901505288
-                },
-                "max": {
-                    "x": -28481.30755515964,
-                    "y": -44220.46154021126,
-                    "z": 21550.198399551195
-                }
-            }
-        }]
-    })*/
+    $(function(){
 
+        $("button").on("click",function(){
+
+            var t=$(this).attr("mtype");
+            if(t==1){
+                viewer.showInModel({presetId:'885462361907456'})
+            }
+            if(t==2){
+                viewer.showInModel({
+                    presetId:'',
+                    componentId: "3e3af932cc4382e96862e352bdf05d70.91d0b3bb-43c7-42cf-b6ca-03aadcfadb51-002a8041",
+                    location: {
+                        "id": "1",
+                        "userId": "3e3af932cc4382e96862e352bdf05d70.91d0b3bb-43c7-42cf-b6ca-03aadcfadb51-002a8041",
+                        "shapeType": 1,
+                        "position": {
+                            "x": -34354.52768018726,
+                            "y": -44230.49790435081,
+                            "z": 18171.458337469983
+                        },
+                        "boundingBox": {
+                            "min": {
+                                "x": -42645.28652412156,
+                                "y": -44230.53426907837,
+                                "z": 11650.198901505288
+                            },
+                            "max": {
+                                "x": -28481.30755515964,
+                                "y": -44220.46154021126,
+                                "z": 21550.198399551195
+                            }
+                        }
+                    }
+                })
+            }
+            if(t==3){
+                viewer.showInModel({
+                    componentId: "3e3af932cc4382e96862e352bdf05d70.91d0b3bb-43c7-42cf-b6ca-03aadcfadb51-002a8041",
+                    location: {
+                        "id": "1",
+                        "userId": "3e3af932cc4382e96862e352bdf05d70.91d0b3bb-43c7-42cf-b6ca-03aadcfadb51-002a8041",
+                        "shapeType": 1,
+                        "position": {
+                            "x": -34354.52768018726,
+                            "y": -44230.49790435081,
+                            "z": 18171.458337469983
+                        },
+                        "boundingBox": {
+                            "min": {
+                                "x": -42645.28652412156,
+                                "y": -44230.53426907837,
+                                "z": 11650.198901505288
+                            },
+                            "max": {
+                                "x": -28481.30755515964,
+                                "y": -44220.46154021126,
+                                "z": 21550.198399551195
+                            }
+                        }
+                    }
+                })
+            }
+            if(t==4){
+                viewer.showInModel({
+                    presetId:'885462361907456',
+                    componentId: "",
+                    location:null
+                })
+            }
+            if(t==5){
+                viewer.showInModel({
+                    presetId:'885462361907456',
+                    componentId: "3e3af932cc4382e96862e352bdf05d70.91d0b3bb-43c7-42cf-b6ca-03aadcfadb51-002a8041",
+                    location: {
+                        "id": "1",
+                        "userId": "3e3af932cc4382e96862e352bdf05d70.91d0b3bb-43c7-42cf-b6ca-03aadcfadb51-002a8041",
+                        "shapeType": 1,
+                        "position": {
+                            "x": -34354.52768018726,
+                            "y": -44230.49790435081,
+                            "z": 18171.458337469983
+                        },
+                        "boundingBox": {
+                            "min": {
+                                "x": -42645.28652412156,
+                                "y": -44230.53426907837,
+                                "z": 11650.198901505288
+                            },
+                            "max": {
+                                "x": -28481.30755515964,
+                                "y": -44220.46154021126,
+                                "z": 21550.198399551195
+                            }
+                        }
+                    }
+                })
+            }
+
+            if(t==6){
+                viewer.data();
+            }
+
+        })
+
+    })
 </script>
-</body>
 </html>
