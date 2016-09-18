@@ -5,11 +5,10 @@
     <meta charset="utf-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>BIM发包总管理平台</title>
-    <link rel="styleSheet" href="/static/dist/libs/commLibCss_6d64d7b.css" />
-    <link rel="stylesheet" type="text/css" href="/static/dist/comm/comm_ae4bc06.css" />
-    <link rel="styleSheet" href="/static/dist/topNav/css/topNav_51e26f7.css" />
-    <link rel="stylesheet" href="/static/dist/bodyContent/bodyContent_811f9c6.css" />
-    <link rel="styleSheet" href="/static/dist/libs/libsH5_1fe59aa.css" />
+    <link rel="styleSheet" href="/libs/jquery/jquery.mCustomScrollbar.css" />
+    <link rel="styleSheet" href="/comm/css/treeView.less" />
+    <link rel="styleSheet" href="/topNav/css/topNav.less" />
+    <link rel="stylesheet" href="/bodyContent/css/bottomBar.less"/>
 </head>
 
 <body>
@@ -46,9 +45,10 @@
         <div class="tool">
             <a href="#/logout">退出</a>
         </div>
-    </div> 
-        <!--<script type="text/javascript" src="/router/appkey.es6"></script>-->
-<script type="text/javascript">
+    </div>
+
+
+    <script type="text/javascript">
         var App = {};
         //缓存全局属性
         App.Global={
@@ -57,13 +57,17 @@
         App.modules = {};
         App.pkg = {};
         </script>
-<script type="text/javascript" src="/static/dist/libs/commLib_cad4585.js"></script>
-<script type="text/javascript" src="/static/dist/api/api_616e05d.js"></script>
-<script type="text/javascript" src="/static/dist/comm/comm_321e4b3.js"></script>
-<script type="text/javascript" src="/static/dist/topNav/js/topNav_7e96e6f.js"></script>
-<script type="text/javascript" src="/static/dist/commH5/commH5_e6207a2.js"></script>
-<script type="text/javascript" src="/static/dist/libs/libsH5_eaa0c29.js"></script>
-<script>
+
+
+        <script type="text/javascript" src="/libs/underscore.1.8.2.js"></script>
+        <link rel="styleSheet" href="/libsH5/css/modelStyle.less" />
+        <script type="text/javascript" src="/api/api.js"></script>
+        <script type="text/javascript" src="/comm/js/comm.es6"></script>
+        <script type="text/javascript" src="/topNav/js/topNav.es6"></script>
+        <script type="text/javascript" src="/commH5/pluging/clipboard/clipboard.js"></script>
+        <script type="text/javascript" src="/libsH5/js/libs/three.js"></script> 
+        <!--<script type="text/javascript" src="/router/appkey.es6"></script>-->
+    <script>
         var x                   = new XMLHttpRequest();
         x.open('GET', '../map.json', true);
         x.send('bb');
@@ -82,7 +86,7 @@
                 }
                 console.log(App.pkg)
 
-                index_js.setAttribute('src','/static/dist/router/appkey_e2f7e30.js');
+                index_js.setAttribute('src',__uri('/router/appkey.es6'));
 
                 document.body.appendChild(index_js);
 
