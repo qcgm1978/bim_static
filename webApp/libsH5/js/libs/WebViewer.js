@@ -3,15 +3,14 @@
 */
 
 var CLOUD = CLOUD || {};
-CLOUD.Version = "20160907";
+CLOUD.Version = "20160909";
 
 CLOUD.GlobalData = {
     SceneSize: 1000,
     SceneScale: 2,
     LengthUnitScale : 1000,
-    MinBoxSize : new THREE.Vector3(500, 500, 500),
-    MaxTriangle: 40000000,
-    MaxVertex: 35000000,
+    MinBoxSize: new THREE.Vector3(500, 500, 500),
+
     UseArrayBuffer: true,
     TextureResRoot: 'images/',
     ShowSubSceneBox: false,
@@ -26,9 +25,14 @@ CLOUD.GlobalData = {
     GarbageCollection: true,
     ByTargetDistance: false,
     MaxLoadSceneCount: 40,
+
     UseMpkWorker: true,
     MpkWorkerUrl: "js/mpkWorker.min.js",
-    disableAntialias:false
+    disableAntialias: false,
+
+    EnableDemolishByDClick: true,
+
+    ZipResourcePostfix : ""
 };
 
 CLOUD.EnumObjectLevel = {
@@ -6385,10 +6389,12 @@ CLOUD.Camera = function (width, height, fov, near, far, orthoNear, orthoFar) {
 
     THREE.CombinedCamera.call(this, width, height, fov, near, far, orthoNear, orthoFar);
 
+    this.realUp = this.up.clone(); //
+
     this.positionPlane = new THREE.Plane();
     this.projScreenMatrix = new THREE.Matrix4();
-
     this.viewProjInverse = new THREE.Matrix4();
+
 };
 
 CLOUD.Camera.prototype = Object.create(THREE.CombinedCamera.prototype);
@@ -6774,287 +6780,6 @@ CLOUD.Camera.prototype.screenToWorld = function (cx, cy, domElement, target) {
 
     return ray.intersectPlane(plane, target);
 };
-CLOUD.ClipWidget = function (plane, center) {
-    THREE.Object3D.call(this);
-
-    this.uniforms = CloudShaderLib.phong_cust_clip.uniforms;
-    this.uniforms.vClipPlane.value.copy(plane);
-    this.clipplane = new THREE.Vector4();
-    this.clipplane.copy(plane);
-    this.center = new THREE.Vector3();
-    this.center.copy(center);
-
-    this.size = 0.4;
-    this.raycaster = new CLOUD.Raycaster();
-
-    var planegeo = new THREE.PlaneBufferGeometry(16, 16, 1, 1);
-    planegeo.dynamic = true;
-    var plane = new THREE.Mesh(planegeo, new THREE.MeshPhongMaterial({ opacity: 0.3, transparent: true, side: THREE.DoubleSide, color: 0x6699cc }));
-
-    var geometry = new THREE.BufferGeometry();
-    var material = new THREE.LineBasicMaterial({ vertexColors: THREE.VertexColors });
-
-    var segments = 6;
-    var positions = new Float32Array(segments * 3);
-    var colors = new Float32Array(segments * 3);
-
-    {
-        // positions
-        positions[0] = 0;
-        positions[1] = 0;
-        positions[2] = 0;
-
-        positions[3] = this.size;
-        positions[4] = 0;
-        positions[5] = 0;
-
-        positions[6] = 0;
-        positions[7] = 0;
-        positions[8] = 0;
-
-        positions[9] = 0;
-        positions[10] = this.size;
-        positions[11] = 0;
-
-        positions[12] = 0;
-        positions[13] = 0;
-        positions[14] = 0;
-
-        positions[15] = 0;
-        positions[16] = 0;
-        positions[17] = this.size;
-
-        // colors
-        colors[0] = 1;
-        colors[1] = 0;
-        colors[2] = 0;
-
-        colors[3] = 1;
-        colors[4] = 0;
-        colors[5] = 0;
-
-        colors[6] = 0;
-        colors[7] = 1;
-        colors[8] = 0;
-
-        colors[9] = 0;
-        colors[10] = 1;
-        colors[11] = 0;
-
-        colors[12] = 0;
-        colors[13] = 0;
-        colors[14] = 1;
-
-        colors[15] = 0;
-        colors[16] = 0;
-        colors[17] = 1;
-    }
-
-    geometry.addAttribute('position', new THREE.BufferAttribute(positions, 3));
-    geometry.addAttribute('color', new THREE.BufferAttribute(colors, 3));
-
-    geometry.computeBoundingSphere();
-
-    var halfPi = 1.57;
-    var axis = new THREE.Line(geometry, material, THREE.LineSegments);
-    var arrowZ = new THREE.Mesh(new THREE.CylinderGeometry(0, 0.03, 0.1, 6, 1, false), new THREE.MeshBasicMaterial({ color: 0x0000ff }));
-    arrowZ.rotation.x = halfPi;
-    arrowZ.position.z = this.size;
-    var torusX = new THREE.Mesh(new THREE.TorusGeometry(0.06, 0.01, 4, 8), new THREE.MeshBasicMaterial({ color: 0xff0000 }));
-    torusX.rotation.y = halfPi;
-    torusX.position.x = this.size * 0.85;
-    var torusY = new THREE.Mesh(new THREE.TorusGeometry(0.06, 0.01, 4, 8), new THREE.MeshBasicMaterial({ color: 0x00ff00 }));
-    torusY.rotation.x = halfPi;
-    torusY.position.y = this.size * 0.85;
-    var coord = new THREE.Object3D();
-    coord.add(axis);
-    coord.add(torusX);
-    coord.add(torusY);
-    coord.add(arrowZ);
-
-    this.visible = false;
-    this.add(plane);
-    this.coord = coord;
-    this.add(coord);
-
-    this.XYZ = [torusX, torusY, arrowZ];
-    this.axis = null;
-
-    var worldPosition = new THREE.Vector3();
-    var worldRotation = new THREE.Euler();
-    var tempMatrix = new THREE.Matrix4();
-    var camPosition = new THREE.Vector3();
-    var camRotation = new THREE.Euler();
-
-    var tempQuaternion = new THREE.Quaternion();
-    var unitX = new THREE.Vector3(1, 0, 0);
-    var unitY = new THREE.Vector3(0, 1, 0);
-
-    this.onUpdateClipPlane = function (enabled, clipplane, m) {
-        CloudShaderLib.base_cust_clip.uniforms.iClipPlane.value = enabled;
-        if (clipplane !== undefined) {
-            CloudShaderLib.base_cust_clip.uniforms.vClipPlane.value.copy(clipplane);
-        }
-        if (m !== undefined) {
-            CloudShaderLib.base_cust_clip.uniforms.vClipPlane.value.applyMatrix4(m);
-        }
-    }
-
-    this.enable = function (enable, visible) {
-        this.visible = visible;
-        this.uniforms.iClipPlane.value = enable ? 1 : 0;
-
-        this.onUpdateClipPlane(this.isEnabled());
-    }
-    this.isEnabled = function () {
-        return this.uniforms.iClipPlane.value == 1;
-    }
-    this.horizon = function (enable) {
-        if (enable) {
-            this.quaternion.setFromAxisAngle(unitX, -halfPi);
-            this.position.copy(this.center);
-        } else {
-            this.quaternion.setFromAxisAngle(unitX, 0);
-            this.position.copy(this.center);
-        }
-        this.recaculateClipplane();
-    }
-    this.update = function (camera) {
-        coord = this.coord;
-
-        this.updateMatrixWorld();
-        worldPosition.setFromMatrixPosition(this.matrixWorld);
-        worldRotation.setFromRotationMatrix(tempMatrix.extractRotation(this.matrixWorld));
-
-        camera.updateMatrixWorld();
-        camPosition.setFromMatrixPosition(camera.matrixWorld);
-        camRotation.setFromRotationMatrix(tempMatrix.extractRotation(camera.matrixWorld));
-
-        scale = worldPosition.distanceTo(camPosition) / 6 * this.size;
-        coord.scale.set(scale, scale, scale);
-    }
-
-    this.recaculateClipplane = function () {
-        this.updateMatrix();
-        var m = new THREE.Matrix4();
-        m.getInverse(this.matrix);
-        m.transpose();
-        this.uniforms.vClipPlane.value.copy(this.clipplane);
-        this.uniforms.vClipPlane.value.applyMatrix4(m);
-
-        this.onUpdateClipPlane(this.isEnabled(), this.clipplane, m);
-    }
-    this.position.copy(this.center);
-    this.recaculateClipplane();
-
-    var offsetOld = 0;
-    this.offset = function (offset) {
-        if (offset == offsetOld) {
-            return;
-        }
-        dist = offset - offsetOld;
-
-        offsetOld = offset;
-
-        tmpClipplane = this.uniforms.vClipPlane.value;
-        offsetVector = new THREE.Vector3(tmpClipplane.x * dist, tmpClipplane.y * dist, tmpClipplane.z * dist);
-        this.position.add(offsetVector);
-
-        tmpClipplane.w -= dist;
-
-        this.onUpdateClipPlane(this.isEnabled(), tmpClipplane);
-    }
-
-    var rotXOld = 0;
-    this.rotX = function (rot) {
-        if (rot == rotXOld) {
-            return;
-        }
-        angle = rot - rotXOld;
-
-        rotXOld = rot;
-        tempQuaternion.setFromAxisAngle(unitX, angle);
-        this.quaternion.multiply(tempQuaternion);
-
-        this.recaculateClipplane();
-    }
-
-    var rotYOld = 0;
-    this.rotY = function (rot) {
-        if (rot == rotYOld) {
-            return;
-        }
-        angle = rot - rotYOld;
-
-        rotYOld = rot;
-        tempQuaternion.setFromAxisAngle(unitY, angle);
-        this.quaternion.multiply(tempQuaternion);
-
-        this.recaculateClipplane();
-    }
-
-    this.snap = function (mouse, camera) {
-        this.raycaster.setFromCamera(mouse, camera);
-        var intersects = this.raycaster.intersectObjects(this.XYZ);
-
-        if (intersects.length > 0) {
-            axis = intersects[0].object;
-            axis.color = axis.material.color;
-            axis.material.color.set(0xffffff);
-            this.axis = axis;
-        } else if (this.axis != null) {
-            this.axis.material.color.set(this.axis.color);
-            this.axis = null;
-        }
-    };
-
-    this.backup = function () {
-        var ret = new Object();
-        ret.quaternion = this.quaternion.clone();
-        ret.position = this.position.clone();
-        return ret;
-    };
-
-    this.restore = function (status, offset, rotx, roty) {
-        offsetOld = offset;
-        rotXOld = rotx;
-        rotYOld = roty;
-        this.quaternion.copy(status.quaternion);
-        this.position.copy(status.position);
-        this.recaculateClipplane();
-    };
-
-    this.onMouseUp = function (event) {
-        if (this.axis != null) {
-            this.axis.material.color.set(this.axis.color);
-            this.axis = null;
-        }
-        return true;
-    };
-
-    this.onMouseDown = function (event) {
-        if (this.axis !== null) {
-        }
-        return true;
-    };
-
-    this.onMouseMove = function (mouse, camera) {
-        this.snap(mouse, camera);
-    };
-
-    this.hitTest = function(ray){
-        var plane = new THREE.Plane();
-        var v4 = this.uniforms.vClipPlane.value;
-        plane.setComponents(v4.x, v4.y, v4.z, v4.w);
-
-        return { sign: ray.direction.dot(plane.normal) < 0, distance: ray.distanceToPlane(plane) };
-    };
-};
-
-CLOUD.ClipWidget.prototype = Object.create(THREE.Object3D.prototype);
-CLOUD.ClipWidget.prototype.constructor = CLOUD.ClipWidget;
-
-
 CLOUD.Client = function (modelManager, serverUrl, databagId, texturePath) {
     "use strict";
     //this.serverUrl = "http://172.16.244.67:9980/project/";
@@ -7111,27 +6836,27 @@ CLOUD.Client.prototype = {
     },
 
     sceneUrl: function (sceneId) {
-        return this.serverUrl + this.databagId + "/scene/" + sceneId;
+        return this.serverUrl + this.databagId + "/scene/" + sceneId + CLOUD.GlobalData.ZipResourcePostfix;
     },
 
     mpkIndexUrl: function () {
-        return this.serverUrl + this.databagId + "/mpk/index";
+        return this.serverUrl + this.databagId + "/mpk/index" + CLOUD.GlobalData.ZipResourcePostfix;
     },
 
     symbolIndexUrl: function () {
-        return this.serverUrl + this.databagId + "/symbol/index";
+        return this.serverUrl + this.databagId + "/symbol/index" + CLOUD.GlobalData.ZipResourcePostfix;
     },
 
     mpkUrl : function(mpkId){
-        return this.serverUrl + this.databagId + "/mpk/" + mpkId;
+        return this.serverUrl + this.databagId + "/mpk/" + mpkId + CLOUD.GlobalData.ZipResourcePostfix;
     },
 
     submeshUrl: function (geometryId) {
-        return this.serverUrl + this.databagId + "/midx/" + geometryId;
+        return this.serverUrl + this.databagId + "/midx/" + geometryId + CLOUD.GlobalData.ZipResourcePostfix;
     },
 
     materialUrl: function (materialId) {
-        return this.serverUrl + this.databagId + "/material/" + materialId;
+        return this.serverUrl + this.databagId + "/material/" + materialId + CLOUD.GlobalData.ZipResourcePostfix;
     },
 
     getTexturePath: function(){
@@ -7549,13 +7274,14 @@ CLOUD.Scene.prototype.constructor = CLOUD.Scene;
 CLOUD.Scene.prototype.destroy = function () {
 
     this.clearAll();
-    this.rootNode = new CLOUD.Group();
-    this.rootNode.sceneRoot = true;
     this.innerBoundingBox = new THREE.Box3();
 
 };
 
 CLOUD.Scene.prototype.clearAll = function () {
+
+    this.filter.clear();
+    this.autoUpdate = false;
     this.rootNode.children = [];
     this.rootNode.boundingBox = null;
 };
@@ -7578,7 +7304,7 @@ CLOUD.Scene.prototype.getRootNodeMatrix = function () {
         return this.rootNode.matrix.clone();
     }
 
-    return null;
+    return new THREE.Matrix4();
 };
 
 // 获得场景 root node 包围盒
@@ -8403,6 +8129,193 @@ CLOUD.Scene.prototype.getTrackingPointFromBoundingBox = function (direction, ray
     plane.setFromNormalAndCoplanarPoint(direction, coplanarPoint);
 
     return ray.intersectPlane(plane);
+};
+
+CLOUD.Scene.prototype.getNearDepthByRect = function () {
+
+    var box = new THREE.Box3();
+    var nearDepth = Infinity;
+    var projectScreenMatrix = new THREE.Matrix4();
+    var projectPosition = new THREE.Vector3();
+
+    // 计算最近的深度
+    function calcNearDepth(object) {
+
+        projectPosition.setFromMatrixPosition( object.matrixWorld );
+        projectPosition.applyProjection( projectScreenMatrix );
+
+        var depth = projectPosition.z;
+
+        if (depth < nearDepth && depth >= 0 && depth <= 1)   {
+
+            nearDepth = depth;
+        }
+    }
+
+    function intersectObjectByBox(frustum, object) {
+
+        if (object.boundingBox && !(object instanceof THREE.Mesh)) {
+
+            box.copy(object.boundingBox);
+            box.applyMatrix4(object.matrixWorld);
+        }
+        else {
+
+            var geometry = object.geometry;
+
+            if (geometry.boundingBox === null)
+                geometry.computeBoundingBox();
+
+            box.copy(geometry.boundingBox);
+            box.applyMatrix4(object.matrixWorld);
+
+            //var objMatrixWorld = scope.getObjectMatrixWorld(object);
+            //box.applyMatrix4(objMatrixWorld);
+        }
+
+        return frustum.intersectsBox(box);
+    }
+
+    return function (frustum, camera) {
+
+        nearDepth = Infinity;
+
+        projectScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
+
+        function frustumTest(node) {
+
+            if (node.worldBoundingBox) {
+
+                if (!frustum.intersectsBox(node.worldBoundingBox)) {
+                    return;
+                }
+
+                // 计算最近的深度
+                calcNearDepth(node);
+            }
+
+            if (node.userData) {
+
+                if (!intersectObjectByBox(frustum, node)) {
+                    return;
+                }
+
+                // 计算最近的深度
+                calcNearDepth(node);
+            }
+
+            var children = node.children;
+            if (!children)
+                return;
+
+            for (var i = 0, l = children.length; i < l; i++) {
+                var child = children[i];
+                if (child.visible) {
+                    frustumTest(child);
+                }
+            }
+        }
+
+        var children = this.rootNode.children;
+        for (var i = 0, l = children.length; i < l; i++) {
+            var child = children[i];
+            if (child.visible) {
+                frustumTest(child);
+            }
+        }
+
+        return nearDepth;
+    }
+
+}();
+
+// 获得未进行矩阵变换的对象的世界矩阵
+CLOUD.Scene.prototype.getObjectMatrixWorld = function (object) {
+
+    var matList = [];
+    var parent = object.parent;
+
+    while (parent) {
+
+        if ( (parent instanceof CLOUD.SubScene) || (parent instanceof CLOUD.Cell)) {
+            break;
+        }
+
+        matList.push(parent.matrix);
+
+        parent = parent.parent;
+    }
+
+    var matTmp = new THREE.Matrix4();
+
+    if (matList.length > 0) {
+
+        matTmp = matList[matList.length - 1];
+
+        for ( var i = matList.length - 2; i >= 0; --i) {
+            matTmp.multiply( matList[i] );
+        }
+    }
+
+    var objMatrixWorld = new THREE.Matrix4();
+    objMatrixWorld.multiplyMatrices( matTmp, object.matrix );
+
+    return objMatrixWorld;
+};
+
+// 获得未进行矩阵变换的对象的世界包围盒
+CLOUD.Scene.prototype.getObjectBoundingBoxWorld = function (object) {
+
+    // 计算世界坐标下的包围盒
+    var boxTmp = object.boundingBox;
+    var boxRet = new THREE.Box3();
+
+    // 特殊类型处理
+    if (object.geometry instanceof THREE.BoxGeometry) {
+
+        if (boxTmp) {
+
+            var objPosition = new THREE.Vector3();
+            var objQuaternion = new THREE.Quaternion();
+            var objScale = new THREE.Vector3();
+            var objMatrix = object.matrix;
+            objMatrix.decompose( objPosition, objQuaternion, objScale );
+
+            // 抽取缩放系数
+            var invScale = new THREE.Vector3(1 /objScale.x, 1 / objScale.y, 1 / objScale.z );
+
+            // 计算包围盒
+            boxRet = boxTmp.clone();
+            boxRet.min.multiply(invScale);
+            boxRet.max.multiply(invScale);
+
+        } else {
+            object.geometry.computeBoundingBox();
+            boxRet = object.geometry.boundingBox;
+        }
+
+        var sceneMatrix = this.getRootNodeMatrix();
+        var inverseMatrix = new THREE.Matrix4();
+        inverseMatrix.getInverse(sceneMatrix);
+
+        boxRet.applyMatrix4(object.matrixWorld);
+        boxRet.applyMatrix4( inverseMatrix);
+
+    } else {
+
+        if (!boxTmp) {
+            object.geometry.computeBoundingBox();
+            boxTmp = object.geometry.boundingBox;
+        }
+
+        boxRet = boxTmp.clone();
+
+        var objMatrixWorld = this.getObjectMatrixWorld(object);
+
+        boxRet.applyMatrix4(objMatrixWorld);
+    }
+
+    return boxRet;
 };
 
 CLOUD.Mesh = function (geometry, material, meshId) {
@@ -9235,7 +9148,27 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
 
     // The four arrow keys
     //this.keys = {LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40};
-    this.keys = {ALT:18, BACKSPACE: 8, LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40, A: 65, D: 68, E: 69, Q: 81, S: 83, W: 87, PLUS: 187, SUB: 189, ZERO:48 };
+    this.keys = {
+        ALT: 18,
+        BACKSPACE: 8,
+        LEFT: 37,
+        UP: 38,
+        RIGHT: 39,
+        BOTTOM: 40,
+        A: 65,
+        D: 68,
+        E: 69,
+        Q: 81,
+        S: 83,
+        W: 87,
+        PLUS: 187,
+        SUB: 189,
+        ZERO: 48
+    };
+
+    // 限制Z轴, 因为做过场景旋转，故场景Z轴其实对应坐标Y轴
+    this.isConstrainedAxisZ = false;
+    var _zAxisUp = new THREE.Vector3(0, 1, 0);
 
     var scope = this;
     var EPS = 0.000001;
@@ -9281,6 +9214,13 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
 
     this.IsIdle = function () {
         return state === STATE.NONE;
+    };
+
+    // 锁定Z轴
+    this.lockAxisZ = function (isLock) {
+
+        this.isConstrainedAxisZ = isLock;
+
     };
 
     this.updateView = function (updateRenderList) {
@@ -9426,7 +9366,7 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
                 offsetVec.normalize().multiplyScalar(minDistance);
                 newCameraPos.addVectors(offsetVec, cameraPos);
             }
-            else{
+            else {
 
                 dir.multiplyScalar(-factor);
                 newCameraPos.addVectors(dir, centerPosition);
@@ -9435,7 +9375,7 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
             this.object.position.copy(newCameraPos);
             this.target.copy(eye.add(newCameraPos));
         }
-        else{
+        else {
             scope.dollyByCenter();
         }
     }
@@ -9466,7 +9406,7 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
         var factor = 2 - scale; // 1 - (scale - 1)
 
         var cameraPos = this.object.position;
-       var eye = this.getWorldEye();
+        var eye = this.getWorldEye();
         var dollyPoint = this.getTrackingPoint(cx, cy);
 
         var dir = new THREE.Vector3();
@@ -9529,7 +9469,7 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
         if (!noRest) {
             scope.reset();
         }
-        
+
     };
 
     this.update = function () {
@@ -9538,6 +9478,7 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
 
             var position = this.object.position;
             var pivot = this.pivot !== null ? this.pivot : this.target;
+            var scope = this;
 
             if (state !== STATE.NONE) {
                 this.cameraDirty = true;
@@ -9545,108 +9486,167 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
 
             if (state == STATE.ROTATE) {
 
+                //            var eye = this.target.clone().sub(position);
+                //            var eyeDistance = eye.length();
+                //
+                //            var viewVec = position.clone().sub(pivot);
+                //            var viewLength = viewVec.length();
+                //            viewVec.normalize();
+                //            var viewTrf = null;
+                //            var camDir = this.object.getWorldDirection();
+                //
+                //            console.log("up", [this.object.up.x, this.object.up.y, this.object.up.z]);
+                //
+                //            // 水平旋转
+                //            if (Math.abs(thetaDelta) > Math.abs(phiDelta)) {
+                //
+                //                var rightDir = camDir.clone().cross(this.object.up);
+                //                if (rightDir.lengthSq() > 0.001) {
+                //
+                //                    viewTrf = new THREE.Quaternion().setFromAxisAngle(this.object.up, thetaDelta);
+                //
+                //                    var newViewDir = viewVec.clone().applyQuaternion(viewTrf);
+                //                    newViewDir.normalize();
+                //
+                //                    position.copy(pivot).add(newViewDir.multiplyScalar(viewLength));
+                //
+                //                    camDir.applyQuaternion(viewTrf);
+                //                    camDir.normalize();
+                //
+                //                    // 保持相机到目标点的距离不变
+                //                    var newTarget = new THREE.Vector3();
+                //                    //newTarget.copy(position).add(camDir.multiplyScalar(viewLength));
+                //                    newTarget.copy(position).add(camDir.multiplyScalar(eyeDistance));
+                //
+                //                    this.target.copy(newTarget);
+                //                    this.object.realUp.copy(rightDir).cross(camDir);
+                //                }
+                //
+                //            }
+                //            else if (Math.abs(phiDelta) > 0.01) { // 垂直旋转
+                //
+                //                var abortRotation = false;
+                //                var rightDir = camDir.clone().cross(this.object.up);
+                //                if (rightDir.lengthSq() < 0.001) {
+                //
+                //                    var shouldAbortRotation = function (realUp) {
+                //                        if (Math.abs(camDir.dot(new THREE.Vector3(0, 1, 0)) - 1) < 0.001) {
+                //                            if (phiDelta > 0)
+                //                                return true;
+                //                            rightDir = camDir.clone().cross(realUp);
+                //
+                //                            //console.log("BOTTOM");
+                //                        }
+                //
+                //                        if (Math.abs(camDir.dot(new THREE.Vector3(0, -1, 0)) - 1) < 0.001) {
+                //                            if (phiDelta < 0)
+                //                                return true;
+                //
+                //                            rightDir = camDir.clone().cross(realUp);
+                //                            //console.log("TOP");
+                //                        }
+                //
+                //                        return false;
+                //                    }
+                //                    abortRotation = shouldAbortRotation(this.object.realUp);
+                //                }
+                //
+                //                if (!abortRotation) {
+                //                    viewTrf = new THREE.Quaternion().setFromAxisAngle(rightDir, phiDelta);
+                //
+                //                    var newViewDir = viewVec.clone().applyQuaternion(viewTrf);
+                //                    newViewDir.normalize();
+                //
+                //                    position.copy(pivot).add(newViewDir.multiplyScalar(viewLength));
+                //
+                //                    camDir.applyQuaternion(viewTrf);
+                //                    camDir.normalize();
+                //
+                //                    // 保持相机到目标点的距离不变
+                //                    var newTarget = new THREE.Vector3();
+                //                    //newTarget.copy(position).add(camDir.multiplyScalar(viewLength));
+                //                    newTarget.copy(position).add(camDir.multiplyScalar(eyeDistance));
+                //
+                //                    this.object.realUp.copy(rightDir).cross(camDir);
+                //                    this.target.copy(newTarget);
+                //                }
+                //            }
+
                 var eye = this.target.clone().sub(position);
                 var eyeDistance = eye.length();
-
                 var viewVec = position.clone().sub(pivot);
                 var viewLength = viewVec.length();
-                viewVec.normalize();
                 var viewTrf = null;
                 var camDir = this.object.getWorldDirection();
 
-                if (Math.abs(thetaDelta) > Math.abs(phiDelta)) {
+                viewVec.normalize();
 
-                    var rightDir = camDir.clone().cross(this.object.up);
-                    if (rightDir.lengthSq() > 0.001) {
+                // 调整相机位置
+                var adjustCameraPosition = function (trf) {
 
-                        viewTrf = new THREE.Quaternion().setFromAxisAngle(this.object.up, thetaDelta);
+                    var newTarget = new THREE.Vector3(); // 新目标点
+                    var newViewDir = viewVec.clone().applyQuaternion(trf).normalize();
 
-                        var newViewDir = viewVec.clone().applyQuaternion(viewTrf);
-                        newViewDir.normalize();
+                    // 相机新位置
+                    position.copy(pivot).add(newViewDir.multiplyScalar(viewLength));
 
-                        position.copy(pivot).add(newViewDir.multiplyScalar(viewLength));
+                    // 保持相机到目标点的距离不变
+                    camDir.applyQuaternion(trf).normalize();
+                    newTarget.copy(position).add(camDir.multiplyScalar(eyeDistance));
+                    // 相机目标点位置
+                    scope.target.copy(newTarget);
+                };
 
-                        camDir.applyQuaternion(viewTrf);
-                        camDir.normalize();
+                var up = this.object.realUp || this.object.up;
+                var rightDir = camDir.clone().cross(up).normalize();
+                var realUp = rightDir.clone().cross(camDir).normalize();
+                this.object.realUp.copy(realUp);
 
-                        // 保持相机到目标点的距离不变
-                        var newTarget = new THREE.Vector3();
-                        //newTarget.copy(position).add(camDir.multiplyScalar(viewLength));
-                        newTarget.copy(position).add(camDir.multiplyScalar(eyeDistance));
+                var rotAxis;
 
-                        this.target.copy(newTarget);
-                        this.object.realUp.copy(rightDir).cross(camDir);
+                // 锁定Z轴
+                if (this.isConstrainedAxisZ) {
+
+                    // 水平旋转
+                    if (Math.abs(thetaDelta) > Math.abs(phiDelta)) {
+
+                        rotAxis = _zAxisUp;
+                        viewTrf = new THREE.Quaternion().setFromAxisAngle(rotAxis, thetaDelta);
+                        adjustCameraPosition(viewTrf);
+                        this.object.realUp.applyQuaternion(viewTrf).normalize();
+
+                    }
+
+                } else {
+
+                    // 水平旋转
+                    if (Math.abs(thetaDelta) > Math.abs(phiDelta)) {
+
+                        // remark: this.object.up 的使用有些奇怪，大多数都被置成了 THREE.Object3D.DefaultUp，后续需要在重新考虑下
+                        // 当this.object.up为THREE.Object3D.DefaultUp时，其实水平旋转就是锁定了Z轴的旋转(模型的Z轴对应场景的Y轴)
+                        rotAxis = this.object.up.clone().normalize();
+                        viewTrf = new THREE.Quaternion().setFromAxisAngle(rotAxis, thetaDelta);
+                        adjustCameraPosition(viewTrf);
+                        this.object.realUp.applyQuaternion(viewTrf).normalize();
+
+                    } else if (Math.abs(phiDelta) > 0.01) { // 垂直旋转
+
+                        rotAxis = camDir.clone().cross(up).normalize();
+                        viewTrf = new THREE.Quaternion().setFromAxisAngle(rotAxis, phiDelta);
+                        adjustCameraPosition(viewTrf);
+                        this.object.realUp.applyQuaternion(viewTrf).normalize();
+
                     }
 
                 }
-                else if (Math.abs(phiDelta) > 0.01) {
 
-                    var abortRotation = false;
-                    var rightDir = camDir.clone().cross(this.object.up);
-                    if (rightDir.lengthSq() < 0.001) {
-
-                        var shouldAbortRotation = function (realUp) {
-                            if (Math.abs(camDir.dot(new THREE.Vector3(0, 1, 0)) - 1) < 0.001) {
-                                if (phiDelta > 0)
-                                    return true;
-                                rightDir = camDir.clone().cross(realUp);
-
-                                //console.log("BOTTOM");
-                            }
-
-                            if (Math.abs(camDir.dot(new THREE.Vector3(0, -1, 0)) - 1) < 0.001) {
-                                if (phiDelta < 0)
-                                    return true;
-
-                                rightDir = camDir.clone().cross(realUp);
-                                //console.log("TOP");
-                            }
-
-                            return false;
-                        }
-                        abortRotation = shouldAbortRotation(this.object.realUp);
-                    }
-
-                    if (!abortRotation) {
-                        viewTrf = new THREE.Quaternion().setFromAxisAngle(rightDir, phiDelta);
-
-                        var newViewDir = viewVec.clone().applyQuaternion(viewTrf);
-                        newViewDir.normalize();
-
-                        position.copy(pivot).add(newViewDir.multiplyScalar(viewLength));
-
-                        camDir.applyQuaternion(viewTrf);
-                        camDir.normalize();
-
-                        // 保持相机到目标点的距离不变
-                        var newTarget = new THREE.Vector3();
-                        //newTarget.copy(position).add(camDir.multiplyScalar(viewLength));
-                        newTarget.copy(position).add(camDir.multiplyScalar(eyeDistance));
-
-                        this.object.realUp.copy(rightDir).cross(camDir);
-                        this.target.copy(newTarget);
-                    }
-                }
             }
 
-            //if (Math.abs(scale - 1) > 0.001) {
-            //
-            //    //var eye = this.target.clone().sub(position);
-            //    //var lastLength = eye.length();
-            //    //var currLength = lastLength * scale;
-            //    //var deltaStep = currLength - lastLength;
-            //    //var dollyVec = eye.clone().normalize();
-            //    //dollyVec.multiplyScalar(deltaStep);
-            //    //position.add(dollyVec);
-            //    //
-            //    //this.target.addVectors(position, eye);
-            //}
-
             if (state === STATE.PAN) {
-                //var disOffset = this.target.clone().sub(this.object.position);
+
                 this.target.add(pan);
                 this.object.position.add(pan);
-                //this.object.position.copy(this.target).sub(disOffset);
+
             }
 
             // lookAt使用realUp
@@ -9695,20 +9695,20 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
 
     }();
 
-    this.clamp = function ( value, min, max ) {
-        return Math.max( min, Math.min( max, value ) );
-    }
-
-    this.setThetaPhiFromeVector3 =  function (vec3, radius) {
-        theta = Math.atan2( vec3.x, vec3.z ); // equator angle around y-up axis
-        phi = Math.acos( this.clamp( vec3.y / radius, - 1, 1 ) ); // polar angle
+    this.clamp = function (value, min, max) {
+        return Math.max(min, Math.min(max, value));
     };
 
-    this.setOffsetFromSpherical = function(offset, radius) {
-        var sinPhiRadius = Math.sin( phi ) * radius;
-        offset.x = sinPhiRadius * Math.sin( theta );
-        offset.y = Math.cos( phi ) * radius;
-        offset.z = sinPhiRadius * Math.cos( theta );
+    this.setThetaPhiFromeVector3 = function (vec3, radius) {
+        theta = Math.atan2(vec3.x, vec3.z); // equator angle around y-up axis
+        phi = Math.acos(this.clamp(vec3.y / radius, -1, 1)); // polar angle
+    };
+
+    this.setOffsetFromSpherical = function (offset, radius) {
+        var sinPhiRadius = Math.sin(phi) * radius;
+        offset.x = sinPhiRadius * Math.sin(theta);
+        offset.y = Math.cos(phi) * radius;
+        offset.z = sinPhiRadius * Math.cos(theta);
     }
 
     this.getDirFromPositionAndTarget = function (quat, position, target, fix) {
@@ -9716,8 +9716,8 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
         var quatInverse = quat.clone().inverse();
 
         var offset = new THREE.Vector3();
-        offset.copy( position ).sub( target );
-        offset.applyQuaternion( quat );
+        offset.copy(position).sub(target);
+        offset.applyQuaternion(quat);
 
         scope.setThetaPhiFromeVector3(offset, distance);
 
@@ -9725,7 +9725,7 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
         phi += phiDelta;
 
         if (fix) {
-            theta = this.clamp( theta, scope.minAzimuthAngle, scope.maxAzimuthAngle);
+            theta = this.clamp(theta, scope.minAzimuthAngle, scope.maxAzimuthAngle);
             var tempPhi = this.clamp(phi, scope.minPolarAngle + EPS, scope.maxPolarAngle - EPS);//Math.max( scope.minPolarAngle + EPS, Math.min( scope.maxPolarAngle - EPS, phi ) );
             phiDelta += tempPhi - phi;
             phi = tempPhi;
@@ -9733,13 +9733,13 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
 
         scope.setOffsetFromSpherical(offset, distance);
 
-        offset.applyQuaternion( quatInverse );
+        offset.applyQuaternion(quatInverse);
 
         return offset;
     }
 
     this.touchUpdate = function () {
-        var quat = new THREE.Quaternion().setFromUnitVectors( scope.object.up, new THREE.Vector3( 0, 1, 0 ) );
+        var quat = new THREE.Quaternion().setFromUnitVectors(scope.object.up, new THREE.Vector3(0, 1, 0));
 
         var lastPosition = new THREE.Vector3();
         var lastQuaternion = new THREE.Quaternion();
@@ -9757,12 +9757,12 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
 
                 if (this.pivot !== null) {
                     var offset = this.getDirFromPositionAndTarget(quat, position, this.pivot, false);
-                    position.copy( this.pivot ).add( offset );
+                    position.copy(this.pivot).add(offset);
                     camDir.setLength(offset.length());
                     this.target.copy(position.clone().sub(camDir));
                 }
                 else {
-                    position.copy( this.target ).add( camDir );
+                    position.copy(this.target).add(camDir);
                 }
 
             }
@@ -10058,7 +10058,7 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
         var dim = this.getContainerDimensions();
         target.set(cx - dim.left, dim.height - (cy - dim.top));
     };
-   
+
     this.computeFrustum = function () {
 
         var projectionMatrix = new THREE.Matrix4();
@@ -10303,7 +10303,7 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
     };
 
     // 获取相机到场景包围盒8个顶点的最大距离对应点所在平面与所给射线的交点
-    this.getTrackingPointFromBoundingBox = function(direction, ray) {
+    this.getTrackingPointFromBoundingBox = function (direction, ray) {
 
         var scene = this.viewer.getScene();
         return scene.getTrackingPointFromBoundingBox(direction, ray);
@@ -10405,21 +10405,21 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
             this.pivot = box.center(this.pivot);
             return;
         }
-        
+
         failback();
     };
 
-    this.touchStartHandler = function(event) {
-        switch ( event.touches.length ) {
+    this.touchStartHandler = function (event) {
+        switch (event.touches.length) {
 
             case 1:	// one-fingered touch: rotate
-                if ( this.noRotate === true ) return;
-                handleTouchStartRotate( event );
+                if (this.noRotate === true) return;
+                handleTouchStartRotate(event);
                 state = STATE.ROTATE;
                 break;
 
             case 2:	// two-fingered touch: dolly and pan
-                if ( this.noZoom !== true) {
+                if (this.noZoom !== true) {
                     handleTouchStartDolly(event);
                 }
                 if (this.noPan !== true) {
@@ -10432,16 +10432,16 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
         }
     }
 
-    this.touchMoveHandler = function(event) {
-        switch ( event.touches.length ) {
+    this.touchMoveHandler = function (event) {
+        switch (event.touches.length) {
             case 1: // one-fingered touch: rotate
-                if ( this.noRotate !== true ){
-                    handleTouchMoveRotate( event );
+                if (this.noRotate !== true) {
+                    handleTouchMoveRotate(event);
                 }
                 break;
 
             case 2: // two-fingered touch: dolly or pan
-                if ( this.noZoom !== true) {
+                if (this.noZoom !== true) {
                     handleTouchMoveDolly(event);
                     state = STATE.DOLLY;
                 }
@@ -10459,8 +10459,8 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
         this.touchUpdate();
     }
 
-    this.touchEndHandler = function(event) {
-        switch ( event.touches.length ) {
+    this.touchEndHandler = function (event) {
+        switch (event.touches.length) {
             // case 1:
             //     if ( this.noRotate !== true ){
             //         handleTouchMoveRotate( event );
@@ -10472,22 +10472,22 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
         }
     }
 
-    function handleTouchStartRotate( event ) {
+    function handleTouchStartRotate(event) {
         //console.log( 'handleTouchStartRotate' );
 
-        rotateStart.set( event.touches[ 0 ].clientX, event.touches[ 0 ].clientY );
+        rotateStart.set(event.touches[0].clientX, event.touches[0].clientY);
     }
 
-    function handleTouchStartDolly ( event ) {
+    function handleTouchStartDolly(event) {
         //console.log( 'handleTouchStartDolly' );
 
-        var dx = event.touches[ 0 ].clientX - event.touches[ 1 ].clientX;
-        var dy = event.touches[ 0 ].clientY - event.touches[ 1 ].clientY;
+        var dx = event.touches[0].clientX - event.touches[1].clientX;
+        var dy = event.touches[0].clientY - event.touches[1].clientY;
 
-        dollyStart.set( 0, Math.sqrt( dx * dx + dy * dy ) );
+        dollyStart.set(0, Math.sqrt(dx * dx + dy * dy));
     }
 
-    function handleTouchStartPan ( event ) {
+    function handleTouchStartPan(event) {
         //console.log( 'handleTouchStartPan' );
 
         var cx = (event.touches[0].clientX + event.touches[1].clientX) * 0.5;
@@ -10495,55 +10495,55 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
         panStart.set(cx, cy);
     }
 
-    function handleTouchMoveRotate( event ) {
+    function handleTouchMoveRotate(event) {
         //console.log( 'handleTouchMoveRotate' );
 
-        rotateEnd.set( event.touches[ 0 ].clientX, event.touches[ 0 ].clientY );
-        rotateDelta.subVectors( rotateEnd, rotateStart );
+        rotateEnd.set(event.touches[0].clientX, event.touches[0].clientY);
+        rotateDelta.subVectors(rotateEnd, rotateStart);
 
         var element = scope.domElement === document ? scope.domElement.body : scope.domElement;
 
-        thetaDelta -=  2 * Math.PI * rotateDelta.x / element.clientWidth * scope.rotateSpeed;
-        phiDelta -=  2 * Math.PI * rotateDelta.y / element.clientHeight * scope.rotateSpeed;
+        thetaDelta -= 2 * Math.PI * rotateDelta.x / element.clientWidth * scope.rotateSpeed;
+        phiDelta -= 2 * Math.PI * rotateDelta.y / element.clientHeight * scope.rotateSpeed;
 
-        rotateStart.copy( rotateEnd );
+        rotateStart.copy(rotateEnd);
     }
 
-    function handleTouchMoveDolly( event ) {
+    function handleTouchMoveDolly(event) {
         //console.log( 'handleTouchMoveDolly' );
 
-        var dx = event.touches[ 0 ].clientX - event.touches[ 1 ].clientX;
-        var dy = event.touches[ 0 ].clientY - event.touches[ 1 ].clientY;
+        var dx = event.touches[0].clientX - event.touches[1].clientX;
+        var dy = event.touches[0].clientY - event.touches[1].clientY;
 
-        var distance = Math.sqrt( dx * dx + dy * dy );
-        dollyEnd.set( 0, distance );
-        dollyDelta.subVectors( dollyEnd, dollyStart );
+        var distance = Math.sqrt(dx * dx + dy * dy);
+        dollyEnd.set(0, distance);
+        dollyDelta.subVectors(dollyEnd, dollyStart);
 
         if (Math.abs(dollyDelta.y) < 3) return;
 
         scope.zoomSpeed = 0.8;
 
-        if ( dollyDelta.y > 0 ) {
-            scale /=  getZoomScale();
+        if (dollyDelta.y > 0) {
+            scale /= getZoomScale();
         }
-        else if ( dollyDelta.y < 0 ) {
+        else if (dollyDelta.y < 0) {
             scale *= getZoomScale();
         }
-        dollyStart.copy( dollyEnd );
+        dollyStart.copy(dollyEnd);
 
-        dollyCenter.x = (event.touches[ 0 ].clientX + event.touches[ 1 ].clientX) * 0.5;
-        dollyCenter.y = (event.touches[ 0 ].clientY + event.touches[ 1 ].clientY) * 0.5;
+        dollyCenter.x = (event.touches[0].clientX + event.touches[1].clientX) * 0.5;
+        dollyCenter.y = (event.touches[0].clientY + event.touches[1].clientY) * 0.5;
 
         scope.dolly();
     }
 
-    function handleTouchMovePan( event ) {
+    function handleTouchMovePan(event) {
         //console.log( 'handleTouchMovePan' );
 
         var cx = (event.touches[0].clientX + event.touches[1].clientX) * 0.5;
         var cy = (event.touches[0].clientY + event.touches[1].clientY) * 0.5;
-        panEnd.set( cx, cy );
-        panDelta.subVectors( panEnd, panStart );
+        panEnd.set(cx, cy);
+        panDelta.subVectors(panEnd, panStart);
 
         if (Math.abs(panDelta.x) < 3 && Math.abs(panDelta.y) < 3) return;
 
@@ -10552,7 +10552,7 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
 
         scope.panOnWorld();
 
-        panStart.copy( panEnd );
+        panStart.copy(panEnd);
     }
 };
 CLOUD.PickHelper = function (scene, cameraEditor, onObjectSelected) {
@@ -10628,7 +10628,7 @@ CLOUD.PickHelper.prototype = {
 
                 if (scope.filter.setSelectedIds()) {
                     cameraEditor.updateView(true);
-                    scope.onObjectSelected(null);
+                    scope.onObjectSelected(null, false);
                 }
 
                 scope.showPickedInformation(null);
@@ -10643,9 +10643,11 @@ CLOUD.PickHelper.prototype = {
             // 双击构件变半透明，再双击取消半透明状态
             if (isDoubleClick) {
 
-                scope.filter.addDemolishId(userId, true);
-                cameraEditor.updateView(true);
-
+                if (CLOUD.GlobalData.EnableDemolishByDClick) {
+                     scope.filter.addDemolishId(userId, true);
+                     cameraEditor.updateView(true);                     
+                }
+                scope.onObjectSelected(intersect, true);
             }
             else {
 
@@ -10659,7 +10661,7 @@ CLOUD.PickHelper.prototype = {
                         intersect.axisGridInfo = cameraEditor.viewer.extensionHelper.defaultMiniMap.getAxisGridInfoByPoint(intersect.point);
                     }
 
-                    scope.onObjectSelected(intersect);
+                    scope.onObjectSelected(intersect, false);
 
                     if (event.altKey) {
                         scope.showPickedInformation(intersect, screenX, screenY);
@@ -10669,7 +10671,7 @@ CLOUD.PickHelper.prototype = {
                 }
                 else {
                     scope.showPickedInformation(null);
-                    scope.onObjectSelected(null);
+                    scope.onObjectSelected(null, false);
                 }
                 cameraEditor.updateView(true);
             }
@@ -11213,8 +11215,8 @@ CLOUD.PickEditor = function (object, scene, domElement) {
     // Customize the mouse buttons
     //this.mouseButtons = { ORBIT: THREE.MOUSE.RIGHT, PAN: THREE.MOUSE.MIDDLE, ZOOM: THREE.MOUSE.RIGHT };
     var scope = this;
-    this.pickHelper = new CLOUD.PickHelper(scene, this.cameraEditor, function (select) {
-        scope.onObjectSelected(select);
+    this.pickHelper = new CLOUD.PickHelper(scene, this.cameraEditor, function (select, doubleClick) {
+        scope.onObjectSelected(select, doubleClick);
     });
 };
 
@@ -11264,8 +11266,8 @@ CLOUD.RectPickEditor = function (slaveEditor, onSelectionChanged) {
     this.slaveEditor = slaveEditor;
 
     var scope = this;
-    this.pickHelper = new CLOUD.PickHelper(slaveEditor.scene, slaveEditor.cameraEditor, function (select) {
-        scope.onObjectSelected(select);
+    this.pickHelper = new CLOUD.PickHelper(slaveEditor.scene, slaveEditor.cameraEditor, function (select, doubleClick) {
+        scope.onObjectSelected(select, doubleClick);
     });
 };
 
@@ -11404,7 +11406,7 @@ CLOUD.RectPickEditor.prototype = {
 
                     var scope = this;
                     slaveEditor.scene.pickByReck(this.frustum, state, function () {
-                        scope.onObjectSelected();
+                        scope.onObjectSelected(null, false);
                     });
                     slaveEditor.cameraEditor.updateView(true);
 
@@ -11432,6 +11434,195 @@ CLOUD.ZoomEditor = function ( object, scene, domElement ) {
 CLOUD.ZoomEditor.prototype = Object.create( CLOUD.OrbitEditor.prototype );
 CLOUD.ZoomEditor.prototype.constructor = CLOUD.ZoomEditor;
 
+
+CLOUD.RectZoomEditor = function (cameraEditor, scene, domElement) {
+
+    CLOUD.OrbitEditor.call(this, cameraEditor, scene, domElement);
+
+    this.startPt = new THREE.Vector2();
+    this.endPt = new THREE.Vector2();
+    this.frustum = new THREE.Frustum();
+};
+
+CLOUD.RectZoomEditor.prototype = Object.create(CLOUD.OrbitEditor.prototype);
+CLOUD.RectZoomEditor.prototype.constructor = CLOUD.RectZoomEditor;
+
+CLOUD.RectZoomEditor.prototype.updateFrustum = function(updateUI) {
+
+    var x1 = this.startPt.x;
+    var x2 = this.endPt.x;
+    var y1 = this.startPt.y;
+    var y2 = this.endPt.y;
+
+    if (x1 > x2) {
+
+        var tmp1 = x1;
+        x1 = x2;
+        x2 = tmp1;
+
+    }
+
+    if (y1 > y2) {
+
+        var tmp2 = y1;
+        y1 = y2;
+        y2 = tmp2;
+
+    }
+
+    if (x2 - x1 == 0 || y2 - y1 == 0)
+        return false;
+
+    var dim = this.cameraEditor.getContainerDimensions();
+
+    this.cameraEditor.computeFrustum(x1, x2, y1, y2, this.frustum, dim);
+
+    if (updateUI) {
+
+        this.onUpdateUI({
+            visible: true,
+            dir: this.startPt.x < this.endPt.x,
+            left: (x1 - dim.left),
+            top: (y1 - dim.top),
+            width: (x2 - x1),
+            height: (y2 - y1)
+        });
+    }
+
+    return true;
+};
+
+CLOUD.RectZoomEditor.prototype.onMouseDown = function(event) {
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (event.button === THREE.MOUSE.LEFT) {
+
+        this.startPt.set(event.clientX, event.clientY);
+    }
+
+    return this.processMouseDown(event);
+};
+
+CLOUD.RectZoomEditor.prototype.onMouseMove = function(event) {
+
+    event.preventDefault();
+
+    if (event.button === THREE.MOUSE.LEFT) {
+
+        this.endPt.set(event.clientX, event.clientY);
+        this.updateFrustum(true);
+        return true;
+    }
+
+    this.processMouseMove(event);
+};
+
+CLOUD.RectZoomEditor.prototype.onMouseUp = function(event) {
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    this.onUpdateUI({visible: false});
+
+    if (event.button === THREE.MOUSE.LEFT) {
+
+        if (this.startPt.x == event.clientX && this.startPt.y == event.clientY) {
+
+            return true;
+        }
+        else {
+
+            this.endPt.set(event.clientX, event.clientY);
+
+            if (!this.updateFrustum()) {
+                return false;
+            }
+
+            var closeDepth = this.scene.getNearDepthByRect(this.frustum, this.cameraEditor.object);
+
+            if (closeDepth !== Infinity){
+                this.zoomToRectangle(closeDepth);
+            }
+
+            return true;
+        }
+
+    }
+
+    return this.processMouseUp(event);
+};
+
+
+CLOUD.RectZoomEditor.prototype.zoomToRectangle = function(closeDepth) {
+
+    var scope = this;
+    var camera = this.cameraEditor.object;
+    var target = this.cameraEditor.target;
+    var cameraPos = camera.position;
+    var near = camera.near;
+    var dim = this.cameraEditor.getContainerDimensions();
+    var x1 = scope.startPt.x - dim.left;
+    var x2 = scope.endPt.x - dim.left;
+    var y1 = scope.startPt.y - dim.top;
+    var y2 = scope.endPt.y - dim.top;
+
+    var rcZoom = {};
+    rcZoom.left = Math.min(x1, x2);
+    rcZoom.top = Math.min(y1, y2);
+    rcZoom.right = Math.max(x1, x2);
+    rcZoom.bottom = Math.max(y1, y2);
+
+    var rCenter = new THREE.Vector3((x1 + x2) / 2, (y1 + y2) / 2, closeDepth);
+    var rCorner = new THREE.Vector3(rcZoom.left, rcZoom.top, closeDepth);
+
+    var wCenter = this.clientToWorld(rCenter);
+    var wCorner = this.clientToWorld(rCorner);
+    var dvec = wCenter.clone().sub(wCorner);
+    var newDist = dvec.length();
+
+    if (newDist < near) {
+        //console.log("new dist", [newDist, near]);
+        newDist = near;
+    }
+
+    var dirEye = target.clone().sub(cameraPos);
+    var distance = dirEye.length();
+    dirEye.normalize();
+
+    var newPos = wCenter.clone();
+    newPos.sub(dirEye.clone().multiplyScalar(newDist));
+    cameraPos.copy(newPos);
+    target.copy(newPos).add(dirEye.clone().multiplyScalar(distance));
+
+    this.cameraEditor.updateView(true);
+};
+
+CLOUD.RectZoomEditor.prototype.worldToClient = function (wPoint) {
+
+    var camera = this.cameraEditor.object;
+    var result = new THREE.Vector3(wPoint.x, wPoint.y, wPoint.z);
+
+    result.project(camera);
+
+    return result;
+};
+
+CLOUD.RectZoomEditor.prototype.clientToWorld = function (cPoint) {
+
+    var rect = this.cameraEditor.getContainerDimensions();
+    var camera = this.cameraEditor.object;
+    var result = new THREE.Vector3();
+
+    result.x = cPoint.x / rect.width * 2 - 1;
+    result.y = -cPoint.y / rect.height * 2 + 1;
+    result.z = cPoint.z;
+
+    result.unproject(camera);
+
+    return result;
+};
 CLOUD.PanEditor = function (object, scene, domElement) {
     "use strict";
     CLOUD.OrbitEditor.call(this, object, scene, domElement);
@@ -12452,121 +12643,6 @@ CLOUD.FlyEditor.prototype = {
         this.ui.showControlPanel(isShow);
     }
 };
-
-
-CLOUD.ClipEditor = function (object, scene, domElement) {
-    CLOUD.OrbitEditor.call(this, object, scene, domElement);
-
-    var clipWidget = scene.getClipWidget();
-    this.mouseButtons = { ORBIT: THREE.MOUSE.LEFT, PAN: THREE.MOUSE.MIDDLE, ZOOM: THREE.MOUSE.RIGHT };
-
-    this.toggle = function (enable, visible) {
-        if (CloudShaderLib === undefined) {
-            return;
-        }
-
-        clipWidget.enable(enable, visible);
-    };
-
-    this.visible = function (enable) {
-        if (CloudShaderLib === undefined) {
-            return;
-        }
-
-        clipWidget.visible = enable;
-    };
-
-    this.horizon = function (enable) {
-        if (CloudShaderLib === undefined) {
-            return;
-        }
-
-        clipWidget.horizon(enable);
-    };
-
-    this.set = function (offset) {
-        if (CloudShaderLib === undefined) {
-            return;
-        }
-
-        clipWidget.offset(offset);
-    };
-
-    this.rotX = function (rot) {
-        if (CloudShaderLib === undefined) {
-            return;
-        }
-
-        clipWidget.rotX(rot);
-    };
-
-    this.rotY = function (rot) {
-        if (CloudShaderLib === undefined) {
-            return;
-        }
-
-        clipWidget.rotY(rot);
-    };
-
-    this.update = function (camera) {
-        if (clipWidget === undefined)
-            return;
-        clipWidget.update(camera);
-    };
-
-    this.backup = function () {
-        if (CloudShaderLib === undefined) {
-            return null;
-        }
-
-        return clipWidget.backup();
-    };
-
-    this.restore = function (status, offset, rotx, roty) {
-        if (CloudShaderLib === undefined) {
-            return;
-        }
-
-        return clipWidget.restore(status, offset, rotx, roty);
-    }
-};
-CLOUD.ClipEditor.prototype = Object.create(CLOUD.OrbitEditor.prototype);
-CLOUD.ClipEditor.prototype.constructor = CLOUD.ClipEditor;
-
-/*
-// conflict with default camera mouse event processor
-CLOUD.ClipEditor.prototype.onMouseUp = function ( event ) {
-	clipWidget.onMouseUp();
-
-	var camera_scope = this.cameraEditor;
-	if ( camera_scope.enabled === false ) return false;
-
-	if ( camera_scope.IsIdle() === true ) {
-		return false;
-	}
-	camera_scope.endOperation();
-	return true;
-};
-
-CLOUD.ClipEditor.prototype.onMouseDown = function ( event ) {
-	clipWidget.onMouseDown();
-
-	this.processMouseDown(event);
-};
-
-CLOUD.ClipEditor.prototype.onMouseMove = function ( event ) {
-	mouse = this.cameraEditor.mapWindowToViewport(event.clientX, event.clientY);
-
-	clipWidget.onMouseMove(mouse, this.cameraEditor.object);
-
-	var camera_scope = this.cameraEditor;
-	if ( camera_scope.enabled === false ) return;
-
-	event.preventDefault();
-
-	camera_scope.process(event.clientX, event.clientY);
-};
-*/
 CLOUD.CameraAnimator = function () {
 
     var _duration = 500;// 500毫秒
@@ -12705,6 +12781,18 @@ CLOUD.Filter = function () {
     var selectionBoundingBox = new THREE.Box3();
     var selectionSet = null;
     var demolishSet = null;
+
+
+    this.clear = function () {
+        visibilityFilter = {};
+        fileFilter = {};
+        _sceneOverriderState = false;
+        _hideUnselected = false;
+        materialOverriderByUserId = {};
+        materialOverriderByUserData = {};
+        selectionSet = null;
+        demolishSet = null;
+    };
 
     //DEBUG API
     this.getVisibleFilter = function () {
@@ -13240,7 +13328,42 @@ CLOUD.Filter = function () {
 
     this.isSelectionSetEmpty = function() {
         return !hasSelection();
-    }
+    };
+
+    // 半透明已选构件
+    this.selectedTransparent = function() {
+
+    };
+
+    // 半透明其它构件
+    this.selectedTransparentOthers = function() {
+
+    };
+
+    // 取消所有半透明
+    this.cancelTransparentAll = function() {
+
+    };
+
+    // 隐藏其它构件
+    this.selectedHideOthers = function() {
+
+    };
+
+    // 隐藏选中构件
+    this.selectedHide = function() {
+
+    };
+
+    // 显示选中构件
+    this.selectedShow = function() {
+
+    };
+
+    // 显示所有构件
+    this.showAll = function() {
+
+    };
 };
 
 CLOUD.MaterialLoader = function ( showStatus ) {
@@ -18183,13 +18306,13 @@ CLOUD.ModelManager.prototype.prepareResource = function (renderId, load) {
 
 THREE.EventDispatcher.prototype.apply(CLOUD.ModelManager.prototype);
 // handleViewHouseEvent
-CLOUD.EditorManager = function () {
+CLOUD.EditorManager = function() {
 
     this.editor = null;
 
     this.editors = {};
 
-    this.animationDuration = 500;// 500毫秒
+    this.animationDuration = 500; // 500毫秒
     this.animationFrameTime = 13; // 周期性执行或调用函数之间的时间间隔，以毫秒计
     this.enableAnimation = true; // 是否允许动画
     this.isUpdateRenderList = true; // 是否更新渲染列表
@@ -18197,26 +18320,31 @@ CLOUD.EditorManager = function () {
     var scope = this;
     var _canMouseMoveOperation = false; // 是否可以进行mouseMove相关操作
 
-    function touchmove( event ) {
+    function touchmove(event) {
         scope.editor.touchmove(event);
     }
-    function touchstart( event ) {
+
+    function touchstart(event) {
         scope.editor.touchstart(event);
     }
+
     function touchend(event) {
         scope.editor.touchend(event);
     }
-    function onKeyDown( event ) {
+
+    function onKeyDown(event) {
         scope.editor.onKeyDown(event);
     }
-    function onKeyUp( event ) {
+
+    function onKeyUp(event) {
         scope.editor.onKeyUp(event);
     }
-    function onMouseWheel( event ) {
+
+    function onMouseWheel(event) {
         scope.editor.onMouseWheel(event);
     }
 
-    function onMouseDown( event ) {
+    function onMouseDown(event) {
 
         // 每次按下鼠标激活canvas
         setFocuse();
@@ -18232,7 +18360,7 @@ CLOUD.EditorManager = function () {
         scope.editor.onMouseDown(event);
     }
 
-    function onMouseMove( event ) {
+    function onMouseMove(event) {
 
         var isAnimating = scope.isAnimating();
 
@@ -18288,50 +18416,50 @@ CLOUD.EditorManager = function () {
         return _canMouseMoveOperation;
     };
 
-    this.registerDomEventListeners = function (domElement) {
+    this.registerDomEventListeners = function(domElement) {
 
-        domElement.addEventListener( 'contextmenu', function ( event ) { event.preventDefault(); }, false );
-        domElement.addEventListener( 'mousedown', onMouseDown, false );
-        domElement.addEventListener( 'mousewheel', onMouseWheel, false );
-        domElement.addEventListener( 'DOMMouseScroll', onMouseWheel, false ); // firefox
-        domElement.addEventListener( 'dblclick',  onMouseDoubleClick, false);
+        domElement.addEventListener('contextmenu', function(event) { event.preventDefault(); }, false);
+        domElement.addEventListener('mousedown', onMouseDown, false);
+        domElement.addEventListener('mousewheel', onMouseWheel, false);
+        domElement.addEventListener('DOMMouseScroll', onMouseWheel, false); // firefox
+        domElement.addEventListener('dblclick', onMouseDoubleClick, false);
 
         // 注册在document上会影响dbgUI的resize事件
         window.addEventListener('mousemove', onMouseMove, false);
         window.addEventListener('mouseup', onMouseUp, false);
 
-        domElement.addEventListener( 'touchstart', touchstart, false );
-        domElement.addEventListener( 'touchend', touchend, false );
-        domElement.addEventListener( 'touchmove', touchmove, false );
+        domElement.addEventListener('touchstart', touchstart, false);
+        domElement.addEventListener('touchend', touchend, false);
+        domElement.addEventListener('touchmove', touchmove, false);
 
         //window.addEventListener( 'keydown', onKeyDown, false );
         //window.addEventListener( 'keyup', onKeyUp, false );
-        domElement.addEventListener( 'keydown', onKeyDown, false );
-        domElement.addEventListener( 'keyup', onKeyUp, false );
+        domElement.addEventListener('keydown', onKeyDown, false);
+        domElement.addEventListener('keyup', onKeyUp, false);
 
         setFocuse();
     };
 
-    this.unregisterDomEventListeners = function (domElement) {
+    this.unregisterDomEventListeners = function(domElement) {
 
-        domElement.removeEventListener( 'contextmenu', function ( event ) { event.preventDefault(); }, false );
-        domElement.removeEventListener( 'mousedown', onMouseDown, false );
-        domElement.removeEventListener( 'mousewheel', onMouseWheel, false );
-        domElement.removeEventListener( 'DOMMouseScroll', onMouseWheel, false ); // firefox
-        domElement.removeEventListener( 'dblclick',  onMouseDoubleClick, false);
+        domElement.removeEventListener('contextmenu', function(event) { event.preventDefault(); }, false);
+        domElement.removeEventListener('mousedown', onMouseDown, false);
+        domElement.removeEventListener('mousewheel', onMouseWheel, false);
+        domElement.removeEventListener('DOMMouseScroll', onMouseWheel, false); // firefox
+        domElement.removeEventListener('dblclick', onMouseDoubleClick, false);
 
         // 注册在document上会影响dbgUI的resize事件
         window.removeEventListener('mousemove', onMouseMove, false);
         window.removeEventListener('mouseup', onMouseUp, false);
 
-        domElement.removeEventListener( 'touchstart', touchstart, false );
-        domElement.removeEventListener( 'touchend', touchend, false );
-        domElement.removeEventListener( 'touchmove', touchmove, false );
+        domElement.removeEventListener('touchstart', touchstart, false);
+        domElement.removeEventListener('touchend', touchend, false);
+        domElement.removeEventListener('touchmove', touchmove, false);
 
         //window.removeEventListener( 'keydown', onKeyDown, false );
         //window.removeEventListener( 'keyup', onKeyUp, false );
-        domElement.removeEventListener( 'keydown', onKeyDown, false );
-        domElement.removeEventListener( 'keyup', onKeyUp, false );
+        domElement.removeEventListener('keydown', onKeyDown, false);
+        domElement.removeEventListener('keyup', onKeyUp, false);
     };
 
 };
@@ -18341,7 +18469,7 @@ CLOUD.EditorManager.prototype = {
 
     constructor: CLOUD.EditorManager,
 
-    destroy : function(){
+    destroy: function() {
 
         this.editor = null;
         for (var name in this.editors) {
@@ -18352,15 +18480,7 @@ CLOUD.EditorManager.prototype = {
 
     },
 
-    updateEditor: function (camera) {
-
-        var clipEditor = this.editors["clipEditor"];
-        if (clipEditor !== undefined) {
-            clipEditor.update(camera);
-        }
-    },
-
-    setEditor : function (newEditor, slaveEditor) {
+    setEditor: function(newEditor, slaveEditor) {
 
         if (this.editor !== null) {
             this.editor.onExistEditor();
@@ -18370,20 +18490,10 @@ CLOUD.EditorManager.prototype = {
             newEditor.slaveEditor = slaveEditor;
 
         this.editor = newEditor;
-        
+
     },
 
-    getClipEditor : function(viewer){
-        var clipEditor = this.editors["clipEditor"];
-        if (clipEditor !== undefined) {
-            clipEditor = new CLOUD.ClipEditor(viewer.cameraEditor, viewer.getScene(), viewer.domElement);
-            this.editors["clipEditor"] = clipEditor;
-        }
-
-        return clipEditor;
-    },
-
-    setPickMode: function (viewer) {
+    setPickMode: function(viewer) {
         var scope = this;
 
         var pickEditor = this.editors["pickEditor"];
@@ -18391,8 +18501,8 @@ CLOUD.EditorManager.prototype = {
         if (pickEditor === undefined) {
 
             pickEditor = new CLOUD.PickEditor(viewer.cameraEditor, viewer.getScene(), viewer.domElement);
-            pickEditor.onObjectSelected = function (intersect) {
-                viewer.modelManager.dispatchEvent({ type: CLOUD.EVENTS.ON_SELECTION_CHANGED, intersect: intersect })
+            pickEditor.onObjectSelected = function (intersect, doubleClick) {
+                viewer.modelManager.dispatchEvent({ type: CLOUD.EVENTS.ON_SELECTION_CHANGED, intersect: intersect, click: doubleClick ? 2 : 1 })
             };
             this.editors["pickEditor"] = pickEditor;
         }
@@ -18400,7 +18510,7 @@ CLOUD.EditorManager.prototype = {
         scope.setEditor(pickEditor);
     },
 
-    getOrbitEditor: function (viewer) {
+    getOrbitEditor: function(viewer) {
 
         var orbitEditor = this.editors["orbitEditor"];
         if (orbitEditor === undefined) {
@@ -18411,16 +18521,16 @@ CLOUD.EditorManager.prototype = {
         return orbitEditor;
     },
 
-    getRectPickEditor: function (viewer) {
+    getRectPickEditor: function(viewer) {
 
         var rectPickEditor = this.editors["rectPickEditor"];
         if (rectPickEditor === undefined) {
 
             rectPickEditor = new CLOUD.RectPickEditor(this.getOrbitEditor(viewer),
-                function (intersect) {
-                    viewer.modelManager.dispatchEvent({ type: CLOUD.EVENTS.ON_SELECTION_CHANGED, intersect: intersect });
+                function (intersect, doubleClick) {
+                    viewer.modelManager.dispatchEvent({ type: CLOUD.EVENTS.ON_SELECTION_CHANGED, intersect: intersect, click: doubleClick ? 2 : 1 });
                 });
-            rectPickEditor.onUpdateUI = function (obj) {
+            rectPickEditor.onUpdateUI = function(obj) {
                 viewer.modelManager.dispatchEvent({ type: CLOUD.EVENTS.ON_UPDATE_SELECTION_UI, data: obj })
             };
             this.editors["rectPickEditor"] = rectPickEditor;
@@ -18429,16 +18539,32 @@ CLOUD.EditorManager.prototype = {
         return rectPickEditor;
     },
 
-    setRectPickMode: function (viewer, orbitBySelection) {
+    setRectPickMode: function(viewer, orbitBySelection) {
         var scope = this;
 
         var orbitEditor = this.getOrbitEditor(viewer);
         var rectPickEditor = this.getRectPickEditor(viewer);
-        
+
         orbitEditor.orbitBySelection = orbitBySelection || false;
         scope.setEditor(rectPickEditor, orbitEditor);
     },
-    setOrbitMode: function (viewer) {
+
+    setRectZoomMode: function (viewer) {
+        var scope = this;
+
+        var editor = this.editors["rectZoomEditor"];
+        if (editor === undefined) {
+            editor = new CLOUD.RectZoomEditor(viewer.cameraEditor, viewer.getScene(), viewer.domElement);
+            editor.onUpdateUI = function (obj) {
+                viewer.modelManager.dispatchEvent({ type: CLOUD.EVENTS.ON_UPDATE_SELECTION_UI, data: obj })
+            };
+            this.editors["rectZoomEditor"] = editor;
+        }
+
+        scope.setEditor(editor);
+    },
+
+    setOrbitMode: function(viewer) {
         var scope = this;
 
         var orbitEditor = this.getOrbitEditor(viewer);
@@ -18446,7 +18572,7 @@ CLOUD.EditorManager.prototype = {
         scope.setEditor(orbitEditor);
     },
 
-    setZoomMode: function (viewer) {
+    setZoomMode: function(viewer) {
         var scope = this;
 
         var zoomEditor = this.editors["zoomEditor"];
@@ -18458,7 +18584,7 @@ CLOUD.EditorManager.prototype = {
         scope.setEditor(zoomEditor);
     },
 
-    setPanMode: function (viewer) {
+    setPanMode: function(viewer) {
         var scope = this;
 
         var panEditor = this.editors["panEditor"];
@@ -18470,7 +18596,7 @@ CLOUD.EditorManager.prototype = {
         scope.setEditor(panEditor);
     },
 
-    setFlyMode: function (bShowControlPanel, viewer) {
+    setFlyMode: function(bShowControlPanel, viewer) {
         var scope = this;
 
         var flyEditor = this.editors["flyEditor"];
@@ -18494,7 +18620,7 @@ CLOUD.EditorManager.prototype = {
         return false;
     },
 
-    zoomIn: function (factor, viewer) {
+    zoomIn: function(factor, viewer) {
         //if(factor === undefined){
         //    factor = viewer.camera.zoom * 1.1;
         //}
@@ -18504,7 +18630,7 @@ CLOUD.EditorManager.prototype = {
         //this.camera.setZoom(factor);
 
         // 放大，factor > 0
-        if(factor === undefined){
+        if (factor === undefined) {
             factor = 0.1;
         }
 
@@ -18516,7 +18642,7 @@ CLOUD.EditorManager.prototype = {
 
     },
 
-    zoomOut: function (factor, viewer) {
+    zoomOut: function(factor, viewer) {
 
         //if(factor === undefined){
         //    factor = viewer.camera.zoom * 0.9;
@@ -18529,7 +18655,7 @@ CLOUD.EditorManager.prototype = {
         // 思路：保持相机FOV和目标点位置不变，调整相机位置达到缩放的目的
         //this.camera.setZoom(factor);
 
-        if(factor === undefined){
+        if (factor === undefined) {
             factor = 0.1;
         }
 
@@ -18543,7 +18669,7 @@ CLOUD.EditorManager.prototype = {
         viewer.cameraEditor.zoom(factor);
     },
 
-    zoomAll: function (viewer, margin, ratio) {
+    zoomAll: function(viewer, margin, ratio) {
         var box = viewer.getScene().worldBoundingBox();
         var target = viewer.camera.zoomToBBox(box, margin, ratio);
         viewer.cameraEditor.updateCamera(target);
@@ -18551,11 +18677,11 @@ CLOUD.EditorManager.prototype = {
         viewer.render();
     },
 
-    isAnimating: function () {
+    isAnimating: function() {
         return (this.enableAnimation && this.animator && this.animator.isPlaying());
     },
 
-    setStandardView: function (stdView, viewer, margin) {
+    setStandardView: function(stdView, viewer, margin) {
 
         var camera = viewer.camera;
 
@@ -18579,11 +18705,11 @@ CLOUD.EditorManager.prototype = {
             viewer.cameraEditor.updateCamera(target);
             viewer.render();
 
-            camera.up.copy(THREE.Object3D.DefaultUp);// 渲染完成后才可以恢复相机up方向
+            camera.up.copy(THREE.Object3D.DefaultUp); // 渲染完成后才可以恢复相机up方向
         }
     },
 
-    setTopView: function (viewer, box, margin, ratio) {
+    setTopView: function(viewer, box, margin, ratio) {
 
         var camera = viewer.camera;
         var worldBox = viewer.getScene().worldBoundingBox();
@@ -18599,14 +18725,508 @@ CLOUD.EditorManager.prototype = {
         viewer.cameraEditor.updateCamera(target);
         viewer.render();
 
-        camera.up.copy(THREE.Object3D.DefaultUp);// 渲染完成后才可以恢复相机up方向
+        camera.up.copy(THREE.Object3D.DefaultUp); // 渲染完成后才可以恢复相机up方向
     }
 };
+CLOUD.ClipWidget = function (plane, center) {
+    THREE.Object3D.call(this);
+
+    this.uniforms = CloudShaderLib.phong_cust_clip.uniforms;
+    this.uniforms.vClipPlane.value.copy(plane);
+    this.clipplane = new THREE.Vector4();
+    this.clipplane.copy(plane);
+    this.center = new THREE.Vector3();
+    this.center.copy(center);
+
+    this.size = 0.4;
+    this.raycaster = new CLOUD.Raycaster();
+
+    var planegeo = new THREE.PlaneBufferGeometry(16, 16, 1, 1);
+    planegeo.dynamic = true;
+    var plane = new THREE.Mesh(planegeo, new THREE.MeshPhongMaterial({ opacity: 0.3, transparent: true, side: THREE.DoubleSide, color: 0x6699cc }));
+
+    var geometry = new THREE.BufferGeometry();
+    var material = new THREE.LineBasicMaterial({ vertexColors: THREE.VertexColors });
+
+    var segments = 6;
+    var positions = new Float32Array(segments * 3);
+    var colors = new Float32Array(segments * 3);
+
+    {
+        // positions
+        positions[0] = 0;
+        positions[1] = 0;
+        positions[2] = 0;
+
+        positions[3] = this.size;
+        positions[4] = 0;
+        positions[5] = 0;
+
+        positions[6] = 0;
+        positions[7] = 0;
+        positions[8] = 0;
+
+        positions[9] = 0;
+        positions[10] = this.size;
+        positions[11] = 0;
+
+        positions[12] = 0;
+        positions[13] = 0;
+        positions[14] = 0;
+
+        positions[15] = 0;
+        positions[16] = 0;
+        positions[17] = this.size;
+
+        // colors
+        colors[0] = 1;
+        colors[1] = 0;
+        colors[2] = 0;
+
+        colors[3] = 1;
+        colors[4] = 0;
+        colors[5] = 0;
+
+        colors[6] = 0;
+        colors[7] = 1;
+        colors[8] = 0;
+
+        colors[9] = 0;
+        colors[10] = 1;
+        colors[11] = 0;
+
+        colors[12] = 0;
+        colors[13] = 0;
+        colors[14] = 1;
+
+        colors[15] = 0;
+        colors[16] = 0;
+        colors[17] = 1;
+    }
+
+    geometry.addAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geometry.addAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+    geometry.computeBoundingSphere();
+
+    var halfPi = 1.57;
+    var axis = new THREE.Line(geometry, material, THREE.LineSegments);
+    var arrowZ = new THREE.Mesh(new THREE.CylinderGeometry(0, 0.03, 0.1, 6, 1, false), new THREE.MeshBasicMaterial({ color: 0x0000ff }));
+    arrowZ.rotation.x = halfPi;
+    arrowZ.position.z = this.size;
+    var torusX = new THREE.Mesh(new THREE.TorusGeometry(0.06, 0.01, 4, 8), new THREE.MeshBasicMaterial({ color: 0xff0000 }));
+    torusX.rotation.y = halfPi;
+    torusX.position.x = this.size * 0.85;
+    var torusY = new THREE.Mesh(new THREE.TorusGeometry(0.06, 0.01, 4, 8), new THREE.MeshBasicMaterial({ color: 0x00ff00 }));
+    torusY.rotation.x = halfPi;
+    torusY.position.y = this.size * 0.85;
+    var coord = new THREE.Object3D();
+    coord.add(axis);
+    coord.add(torusX);
+    coord.add(torusY);
+    coord.add(arrowZ);
+
+    this.visible = false;
+    this.add(plane);
+    this.coord = coord;
+    this.add(coord);
+
+    this.XYZ = [torusX, torusY, arrowZ];
+    this.axis = null;
+
+    var worldPosition = new THREE.Vector3();
+    var worldRotation = new THREE.Euler();
+    var tempMatrix = new THREE.Matrix4();
+    var camPosition = new THREE.Vector3();
+    var camRotation = new THREE.Euler();
+
+    var tempQuaternion = new THREE.Quaternion();
+    var unitX = new THREE.Vector3(1, 0, 0);
+    var unitY = new THREE.Vector3(0, 1, 0);
+
+    this.onUpdateClipPlane = function (enabled, clipplane, m) {
+        CloudShaderLib.base_cust_clip.uniforms.iClipPlane.value = enabled;
+        if (clipplane !== undefined) {
+            CloudShaderLib.base_cust_clip.uniforms.vClipPlane.value.copy(clipplane);
+        }
+        if (m !== undefined) {
+            CloudShaderLib.base_cust_clip.uniforms.vClipPlane.value.applyMatrix4(m);
+        }
+    }
+
+    this.enable = function (enable, visible) {
+        this.visible = visible;
+        this.uniforms.iClipPlane.value = enable ? 1 : 0;
+
+        this.onUpdateClipPlane(this.isEnabled());
+    }
+    this.isEnabled = function () {
+        return this.uniforms.iClipPlane.value == 1;
+    }
+    this.horizon = function (enable) {
+        if (enable) {
+            this.quaternion.setFromAxisAngle(unitX, -halfPi);
+            this.position.copy(this.center);
+        } else {
+            this.quaternion.setFromAxisAngle(unitX, 0);
+            this.position.copy(this.center);
+        }
+        this.recaculateClipplane();
+    }
+    this.update = function (camera) {
+        coord = this.coord;
+
+        this.updateMatrixWorld();
+        worldPosition.setFromMatrixPosition(this.matrixWorld);
+        worldRotation.setFromRotationMatrix(tempMatrix.extractRotation(this.matrixWorld));
+
+        camera.updateMatrixWorld();
+        camPosition.setFromMatrixPosition(camera.matrixWorld);
+        camRotation.setFromRotationMatrix(tempMatrix.extractRotation(camera.matrixWorld));
+
+        scale = worldPosition.distanceTo(camPosition) / 6 * this.size;
+        coord.scale.set(scale, scale, scale);
+    }
+
+    this.recaculateClipplane = function () {
+        this.updateMatrix();
+        var m = new THREE.Matrix4();
+        m.getInverse(this.matrix);
+        m.transpose();
+        this.uniforms.vClipPlane.value.copy(this.clipplane);
+        this.uniforms.vClipPlane.value.applyMatrix4(m);
+
+        this.onUpdateClipPlane(this.isEnabled(), this.clipplane, m);
+    }
+    this.position.copy(this.center);
+    this.recaculateClipplane();
+
+    var offsetOld = 0;
+    this.offset = function (offset) {
+        if (offset == offsetOld) {
+            return;
+        }
+        dist = offset - offsetOld;
+
+        offsetOld = offset;
+
+        tmpClipplane = this.uniforms.vClipPlane.value;
+        offsetVector = new THREE.Vector3(tmpClipplane.x * dist, tmpClipplane.y * dist, tmpClipplane.z * dist);
+        this.position.add(offsetVector);
+
+        tmpClipplane.w -= dist;
+
+        this.onUpdateClipPlane(this.isEnabled(), tmpClipplane);
+    }
+
+    var rotXOld = 0;
+    this.rotX = function (rot) {
+        if (rot == rotXOld) {
+            return;
+        }
+        angle = rot - rotXOld;
+
+        rotXOld = rot;
+        tempQuaternion.setFromAxisAngle(unitX, angle);
+        this.quaternion.multiply(tempQuaternion);
+
+        this.recaculateClipplane();
+    }
+
+    var rotYOld = 0;
+    this.rotY = function (rot) {
+        if (rot == rotYOld) {
+            return;
+        }
+        angle = rot - rotYOld;
+
+        rotYOld = rot;
+        tempQuaternion.setFromAxisAngle(unitY, angle);
+        this.quaternion.multiply(tempQuaternion);
+
+        this.recaculateClipplane();
+    }
+
+    this.snap = function (mouse, camera) {
+        this.raycaster.setFromCamera(mouse, camera);
+        var intersects = this.raycaster.intersectObjects(this.XYZ);
+
+        if (intersects.length > 0) {
+            axis = intersects[0].object;
+            axis.color = axis.material.color;
+            axis.material.color.set(0xffffff);
+            this.axis = axis;
+        } else if (this.axis != null) {
+            this.axis.material.color.set(this.axis.color);
+            this.axis = null;
+        }
+    };
+
+    this.backup = function () {
+        var ret = new Object();
+        ret.quaternion = this.quaternion.clone();
+        ret.position = this.position.clone();
+        return ret;
+    };
+
+    this.restore = function (status, offset, rotx, roty) {
+        offsetOld = offset;
+        rotXOld = rotx;
+        rotYOld = roty;
+        this.quaternion.copy(status.quaternion);
+        this.position.copy(status.position);
+        this.recaculateClipplane();
+    };
+
+    this.onMouseUp = function (event) {
+        if (this.axis != null) {
+            this.axis.material.color.set(this.axis.color);
+            this.axis = null;
+        }
+        return true;
+    };
+
+    this.onMouseDown = function (event) {
+        if (this.axis !== null) {
+        }
+        return true;
+    };
+
+    this.onMouseMove = function (mouse, camera) {
+        this.snap(mouse, camera);
+    };
+
+    this.hitTest = function(ray){
+        var plane = new THREE.Plane();
+        var v4 = this.uniforms.vClipPlane.value;
+        plane.setComponents(v4.x, v4.y, v4.z, v4.w);
+
+        return { sign: ray.direction.dot(plane.normal) < 0, distance: ray.distanceToPlane(plane) };
+    };
+};
+
+CLOUD.ClipWidget.prototype = Object.create(THREE.Object3D.prototype);
+CLOUD.ClipWidget.prototype.constructor = CLOUD.ClipWidget;
 
 
 
 
-CloudViewer = function () {
+CLOUD.ClipEditor = function (object, scene, domElement) {
+    CLOUD.OrbitEditor.call(this, object, scene, domElement);
+
+    var clipWidget = scene.getClipWidget();
+    this.mouseButtons = { ORBIT: THREE.MOUSE.LEFT, PAN: THREE.MOUSE.MIDDLE, ZOOM: THREE.MOUSE.RIGHT };
+
+    this.toggle = function (enable, visible) {
+        if (CloudShaderLib === undefined) {
+            return;
+        }
+
+        clipWidget.enable(enable, visible);
+    };
+
+    this.visible = function (enable) {
+        if (CloudShaderLib === undefined) {
+            return;
+        }
+
+        clipWidget.visible = enable;
+    };
+
+    this.horizon = function (enable) {
+        if (CloudShaderLib === undefined) {
+            return;
+        }
+
+        clipWidget.horizon(enable);
+    };
+
+    this.set = function (offset) {
+        if (CloudShaderLib === undefined) {
+            return;
+        }
+
+        clipWidget.offset(offset);
+    };
+
+    this.rotX = function (rot) {
+        if (CloudShaderLib === undefined) {
+            return;
+        }
+
+        clipWidget.rotX(rot);
+    };
+
+    this.rotY = function (rot) {
+        if (CloudShaderLib === undefined) {
+            return;
+        }
+
+        clipWidget.rotY(rot);
+    };
+
+    this.update = function (camera) {
+        if (clipWidget === undefined)
+            return;
+        clipWidget.update(camera);
+    };
+
+    this.backup = function () {
+        if (CloudShaderLib === undefined) {
+            return null;
+        }
+
+        return clipWidget.backup();
+    };
+
+    this.restore = function (status, offset, rotx, roty) {
+        if (CloudShaderLib === undefined) {
+            return;
+        }
+
+        return clipWidget.restore(status, offset, rotx, roty);
+    }
+};
+CLOUD.ClipEditor.prototype = Object.create(CLOUD.OrbitEditor.prototype);
+CLOUD.ClipEditor.prototype.constructor = CLOUD.ClipEditor;
+
+/*
+// conflict with default camera mouse event processor
+CLOUD.ClipEditor.prototype.onMouseUp = function ( event ) {
+	clipWidget.onMouseUp();
+
+	var camera_scope = this.cameraEditor;
+	if ( camera_scope.enabled === false ) return false;
+
+	if ( camera_scope.IsIdle() === true ) {
+		return false;
+	}
+	camera_scope.endOperation();
+	return true;
+};
+
+CLOUD.ClipEditor.prototype.onMouseDown = function ( event ) {
+	clipWidget.onMouseDown();
+
+	this.processMouseDown(event);
+};
+
+CLOUD.ClipEditor.prototype.onMouseMove = function ( event ) {
+	mouse = this.cameraEditor.mapWindowToViewport(event.clientX, event.clientY);
+
+	clipWidget.onMouseMove(mouse, this.cameraEditor.object);
+
+	var camera_scope = this.cameraEditor;
+	if ( camera_scope.enabled === false ) return;
+
+	event.preventDefault();
+
+	camera_scope.process(event.clientX, event.clientY);
+};
+*/
+CLOUD.ClipPlaneService = function(viewer) {
+    this.viewer = viewer;
+};
+
+CLOUD.ClipPlaneService.prototype = {
+
+    construtor: CLOUD.ClipPlaneService,
+
+    destroy: function() {
+        this.viewer = null;
+    },
+
+
+    update: function(camera) {
+
+        var viewer = this.viewer;
+        var clipEditor = viewer.editorManager.editors["clipEditor"];
+        if (clipEditor !== undefined) {
+            clipEditor.update(camera);
+        }
+
+    },
+    
+    getClipEditor: function() {
+
+        var viewer = this.viewer;
+        var clipEditor = viewer.editorManager.editors["clipEditor"];
+        if (clipEditor !== undefined) {
+            clipEditor = new CLOUD.ClipEditor(viewer.cameraEditor, viewer.getScene(), viewer.domElement);
+            viewer.editorManager.editors["clipEditor"] = clipEditor;
+        }
+
+        return clipEditor;
+    },
+
+    // 关闭/开启切面功能，同时设置可见性
+    clipToggle: function(enable, visible) {
+
+        var viewer = this.viewer;
+        var clipEditor = this.getClipEditor();
+        clipEditor.toggle(enable, visible);
+
+    },
+
+    // 显示/隐藏切面
+    clipVisible: function(enable) {
+
+        var clipEditor = this.getClipEditor();
+        clipEditor.visible(enable);
+
+    },
+
+    // 设置切面为水平/竖直模式
+    // 这是一个辅助函数，是对下面旋转功能的封装，保存/恢复状态不需记录/设定
+    clipHorizon: function(enable) {
+
+        var clipEditor = this.getClipEditor();
+        clipEditor.horizon(enable);
+
+    },
+
+    // 沿切面局部坐标移动切面(Z轴)
+    clipSetPlane: function(offset) {
+
+        var clipEditor = this.getClipEditor();
+
+        clipEditor.set(offset);
+
+    },
+
+    // 以切面局部坐标X轴为轴旋转切面
+    clipRotPlaneX: function(rot) {
+
+        var clipEditor = this.getClipEditor();
+        clipEditor.rotX(rot);
+    },
+
+    // 以切面局部坐标Y轴为轴旋转切面
+    clipRotPlaneY: function(rot) {
+
+        var clipEditor = this.getClipEditor();
+        clipEditor.rotY(rot);
+
+    },
+
+    // 保存切面状态，切面的位置及旋转状态数据的Object
+    // 为减少依赖切面开启、可见状态未包含
+    backupClipplane: function() {
+
+        var clipEditor = this.getClipEditor();
+        return clipEditor.backup();
+    },
+
+    // 恢复切面状态
+    // 输入之前从backupClipplane保存的切面状态对象status，以及界面记录的偏移offset、X+Y轴选转量rotx+roty
+    // 注意：offset+rotx+roty是界面状态，内部仅作初始值记录，界面更改后用新值与旧值计算增量控制切面
+    restoreClipplane: function(status, offset, rotx, roty) {
+
+        var clipEditor = this.getClipEditor();
+        clipEditor.restore(status, offset, rotx, roty);
+    },
+}
+CloudViewer = function() {
     "use strict";
 
     this.domElement = null;
@@ -18622,6 +19242,7 @@ CloudViewer = function () {
 
     this.modelManager = new CLOUD.ModelManager();
     this.extensionHelper = new CLOUD.Extensions.Helper2D(this);
+    this.Services = {};
 
     this.viewHouse = null;
 
@@ -18651,8 +19272,7 @@ CloudViewer = function () {
         this.isMobile = 2;
     } else if (u.indexOf('Windows Phone') > -1) {
         this.isMobile = 3;
-    }
-    else {
+    } else {
 
     }
 };
@@ -18661,13 +19281,19 @@ CloudViewer.prototype = {
 
     constructor: CloudViewer,
 
-    destroy: function () {
+    destroy: function() {
 
         this.editorManager.unregisterDomEventListeners(this.domElement);
 
         this.domElement.removeChild(this.domElement.childNodes[0]);
-        
+
         this.extensionHelper.destroy();
+
+        for (var id in this.Services) {
+            var service = this.Services[id];
+            service.destroy();
+        }
+        this.Services = {};
 
         this.editorManager.destroy();
 
@@ -18681,20 +19307,20 @@ CloudViewer.prototype = {
     },
 
     // 设置图片资源的路径。默认在“images/”
-    setImageResPath: function (path) {
+    setImageResPath: function(path) {
         CLOUD.GlobalData.TextureResRoot = path;
     },
 
-    getScene: function () {
+    getScene: function() {
         return this.modelManager.scene;
     },
 
-    setIncrementRenderEnabled: function (enable) {
+    setIncrementRenderEnabled: function(enable) {
         this.incrementRenderEnabled = enable;
     },
 
     // 设置每帧的最大耗时
-    setLimitFrameTime: function (limitTime) {
+    setLimitFrameTime: function(limitTime) {
         if (this.incrementRenderEnabled) {
 
             if (limitTime <= 0) {
@@ -18705,13 +19331,13 @@ CloudViewer.prototype = {
         }
     },
 
-    resetIncrementRender: function () {
+    resetIncrementRender: function() {
         if (this.incrementRenderEnabled) {
             this.renderer.resetIncrementRender();
         }
     },
 
-    calculateNearFar: function () {
+    calculateNearFar: function() {
 
         var scene = this.getScene();
 
@@ -18730,8 +19356,7 @@ CloudViewer.prototype = {
             if (this.camera.inside || !this.enableCameraNearFar) {
                 ////CLOUD.GlobalData.SceneSize * 20.0
                 this.camera.setNearFar(0.1, 20000.0);
-            }
-            else {
+            } else {
                 var delta = 0.001;
                 var Znear = (length * length + length * delta) / ((1 << 24) * delta);
                 ////CLOUD.GlobalData.SceneSize * 10.0
@@ -18741,7 +19366,7 @@ CloudViewer.prototype = {
         }
     },
 
-    render: function (ignoreLoad) {
+    render: function(ignoreLoad) {
         ++this.requestRenderCount;
         if (this.requestRenderCount > 10000)
             this.requestRenderCount = 0;
@@ -18764,11 +19389,15 @@ CloudViewer.prototype = {
         // 重置增量绘制状态
         this.resetIncrementRender();
 
-        this.editorManager.updateEditor(camera);
+        for (var sid in this.Services) {
+            var service = this.Services[sid];
+            service.update(camera);
+        }
+
         this.modelManager.updateLights(camera);
 
         // 启用渲染队列更新
-        if (scope.updateRenderListEnabled//&& !scope.editorManager.isFlyMode()
+        if (scope.updateRenderListEnabled //&& !scope.editorManager.isFlyMode()
         ) {
             // 设置更新状态
             scope.renderer.setObjectListUpdateState(scope.editorManager.isUpdateRenderList);
@@ -18784,8 +19413,7 @@ CloudViewer.prototype = {
                 CLOUD.GlobalData.ByTargetDistance = false;
                 CLOUD.GlobalData.MaxLoadSceneCount = 40;
             }
-        }
-        else {
+        } else {
             this.modelManager.prepareScene(camera, this.requestRenderCount, ignoreLoad);
             this.calculateNearFar();
         }
@@ -18798,7 +19426,7 @@ CloudViewer.prototype = {
 
             var renderId = callId;
 
-            return function () {
+            return function() {
 
                 var renderer = scope.renderer;
                 renderer.autoClear = autoClear;
@@ -18811,15 +19439,13 @@ CloudViewer.prototype = {
 
                     //console.log("  :" + renderId);
                     requestAnimationFrame(incrementRender(renderId, false));
-                }
-                else {
+                } else {
 
                     scope.rendering = false;
 
                     if (renderId != scope.requestRenderCount) {
                         scope.render(true);
-                    }
-                    else {
+                    } else {
                         //console.time("gc" + renderId);
                         //scope.modelManager.collectionGarbage();
                         //console.timeEnd("gc" + renderId);
@@ -18847,85 +19473,7 @@ CloudViewer.prototype = {
         this.renderExtensions();
     },
 
-    setEditorDefault: function () {
-        this.setPickMode();
-    },
-
-    // 关闭/开启切面功能，同时设置可见性
-    clipToggle: function (enable, visible) {
-        var clipEditor = this.editorManager.getClipEditor(this);
-        clipEditor.toggle(enable, visible);
-
-        this.render();
-    },
-
-    // 显示/隐藏切面
-    clipVisible: function (enable) {
-        var clipEditor = this.editorManager.getClipEditor(this);
-        clipEditor.visible(enable);
-
-        this.render();
-    },
-
-    // 设置切面为水平/竖直模式
-    // 这是一个辅助函数，是对下面旋转功能的封装，保存/恢复状态不需记录/设定
-    clipHorizon: function (enable) {
-        var clipEditor = this.editorManager.getClipEditor(this);
-        clipEditor.horizon(enable);
-
-        this.render();
-    },
-
-    // 沿切面局部坐标移动切面(Z轴)
-    clipSetPlane: function (offset) {
-        var clipEditor = this.editorManager.getClipEditor(this);
-
-        clipEditor.set(offset);
-
-        this.render();
-    },
-
-    // 以切面局部坐标X轴为轴旋转切面
-    clipRotPlaneX: function (rot) {
-        var clipEditor = this.editorManager.getClipEditor(this);
-        clipEditor.rotX(rot);
-
-        this.render();
-    },
-
-    // 以切面局部坐标Y轴为轴旋转切面
-    clipRotPlaneY: function (rot) {
-        var clipEditor = this.editorManager.getClipEditor(this);
-        clipEditor.rotY(rot);
-
-        this.render();
-    },
-
-    // 保存切面状态，切面的位置及旋转状态数据的Object
-    // 为减少依赖切面开启、可见状态未包含
-    backupClipplane: function () {
-        var clipEditor = this.editorManager.getClipEditor(this);
-        return clipEditor.backup();
-    },
-
-    // 恢复切面状态
-    // 输入之前从backupClipplane保存的切面状态对象status，以及界面记录的偏移offset、X+Y轴选转量rotx+roty
-    // 注意：offset+rotx+roty是界面状态，内部仅作初始值记录，界面更改后用新值与旧值计算增量控制切面
-    restoreClipplane: function (status, offset, rotx, roty) {
-        var clipEditor = this.editorManager.getClipEditor(this);
-        clipEditor.restore(status, offset, rotx, roty);
-        this.render();
-    },
-
-    // 主场景面板鼠标运动状态
-    // 主场景面板的mouse move 和 mouse up 注册在 window 上，
-    // 当鼠标从主场景移动到其他元素上时，不响应其他元素的事件
-    isMouseMoving: function () {
-
-        return this.editorManager.isMouseMoving();
-    },
-
-    resize: function (width, height) {
+    resize: function(width, height) {
         this.camera.setSize(width, height);
         this.camera.updateProjectionMatrix();
 
@@ -18938,14 +19486,14 @@ CloudViewer.prototype = {
         this.render();
     },
 
-    init: function (domElement) {
+    init: function(domElement) {
 
         this.domElement = domElement;
         // window.innerWidth, window.innerHeight
         var viewportWidth = domElement.offsetWidth;
         var viewportHeight = domElement.offsetHeight;
 
-        var settings = {alpha: true, preserveDrawingBuffer: true, antialias: true};
+        var settings = { alpha: true, preserveDrawingBuffer: true, antialias: true };
         //if (!CLOUD.GlobalData.disableAntialias)
         //    settings.antialias = true;
         try {
@@ -18953,8 +19501,7 @@ CloudViewer.prototype = {
             var webglContext = canvas.getContext('webgl', settings) || canvas.getContext('experimental-webgl', settings);
             if (!webglContext)
                 settings.antialias = false;
-        }
-        catch (e) {
+        } catch (e) {
             return false;
         }
 
@@ -18989,7 +19536,7 @@ CloudViewer.prototype = {
         this.camera = camera;
 
         var scope = this;
-        this.cameraEditor = new CLOUD.CameraEditor(this, camera, domElement, function () {
+        this.cameraEditor = new CLOUD.CameraEditor(this, camera, domElement, function() {
             scope.render();
         });
 
@@ -18999,7 +19546,7 @@ CloudViewer.prototype = {
         // Register Events
         this.editorManager.registerDomEventListeners(this.domElement);
 
-        this.modelManager.onUpdateViewer = function () {
+        this.modelManager.onUpdateViewer = function() {
             scope.render(true);
         };
 
@@ -19007,37 +19554,28 @@ CloudViewer.prototype = {
         return true;
     },
 
-    registerDomEventListeners: function () {
+    registerDomEventListeners: function() {
         if (this.domElement) {
             this.editorManager.registerDomEventListeners(this.domElement);
         }
     },
 
-    unregisterDomEventListeners: function () {
+    unregisterDomEventListeners: function() {
         if (this.domElement) {
             this.editorManager.unregisterDomEventListeners(this.domElement);
         }
     },
 
-    registerEventListener: function (type, callback) {
+    registerEventListener: function(type, callback) {
         this.modelManager.addEventListener(type, callback);
     },
 
-    setMeshLimitation: function (maxTriCount, maxVertexCount) {
-        CLOUD.GlobalData.MaxTriangle = maxTriCount;
-        CLOUD.GlobalData.MaxVertex = maxVertexCount;
-    },
-
-    // Should enable for IE
-    setUseArrayBuffer: function (bEnable) {
-        CLOUD.GlobalData.UseArrayBuffer = bEnable;
-    },
 
     /**
      * Load all
      * @return the databag client.
      */
-    load: function (databagId, serverUrl, debug, byBox) {
+    load: function(databagId, serverUrl, debug, byBox) {
 
         var scope = this;
         if (debug) {
@@ -19045,10 +19583,22 @@ CloudViewer.prototype = {
             CLOUD.GlobalData.ShowCellBox = false;
         }
 
-        return scope.modelManager.load({databagId: databagId, serverUrl: serverUrl, debug: debug, byBox: byBox});
+        return scope.modelManager.load({ databagId: databagId, serverUrl: serverUrl, debug: debug, byBox: byBox });
     },
 
-    loadOutside: function () {
+    unloadAll: function() {
+
+        this.renderer.destroy();
+        this.modelManager.destroy();
+
+    },
+
+    clearAll: function () {
+
+        this.getScene().clearAll();
+    },
+
+    loadOutside: function() {
 
         this.modelManager.loadBuidingOutside(this.camera);
     },
@@ -19057,72 +19607,86 @@ CloudViewer.prototype = {
      * Load databag index only
      * callback is called when loading is finished.
      */
-    loadIndex: function (databagId, serverUrl, debug, callback) {
+    loadIndex: function(databagId, serverUrl, debug, callback) {
         var scope = this;
         if (debug) {
             CLOUD.GlobalData.ShowSubSceneBox = true;
             CLOUD.GlobalData.ShowCellBox = false;
         }
 
-        scope.modelManager.loadIndex({databagId: databagId, serverUrl: serverUrl, debug: debug}, callback);
+        scope.modelManager.loadIndex({ databagId: databagId, serverUrl: serverUrl, debug: debug }, callback);
     },
 
     /**
      * show or hide scene by databag client.
      */
-    showScene: function (client, bVisibles) {
+    showScene: function(client, bVisibles) {
         this.getScene().showSceneNodes(client, bVisibles);
     },
 
-    setPickMode: function (orbitBySelection) {
+    setEditorDefault: function () {
+        this.setPickMode();
+    },
+
+    setPickMode: function(orbitBySelection) {
         this.editorManager.setRectPickMode(this, orbitBySelection);
         //this.editorManager.setPickMode(this);
     },
-    setRectPickMode: function (orbitBySelection) {
+    setRectPickMode: function(orbitBySelection) {
         this.editorManager.setRectPickMode(this, orbitBySelection);
     },
-    setOrbitMode: function () {
+    setRectZoomMode: function() {
+        this.editorManager.setRectZoomMode(this);
+    },
+    setOrbitMode: function() {
         this.editorManager.setOrbitMode(this);
     },
 
-    setZoomMode: function () {
+    setZoomMode: function() {
         this.editorManager.setZoomMode(this);
     },
 
-    setPanMode: function () {
+    setPanMode: function() {
         this.editorManager.setPanMode(this);
     },
 
-    setFlyMode: function (bShowControlPanel) {
+    setFlyMode: function(bShowControlPanel) {
         this.editorManager.setFlyMode(bShowControlPanel, this);
     },
 
-    resizeFlyCross: function () {
+    // 锁定Z轴
+    lockAxisZ: function(isLock) {
+
+        if (this.cameraEditor) {
+            this.cameraEditor.lockAxisZ(isLock);
+        }
+    },
+
+    resizeFlyCross: function() {
         if (this.editorManager && this.editorManager.editor === this.editorManager.flyEditor) {
             this.editorManager.flyEditor.resize();
         }
     },
 
-    zoomIn: function (factor) {
+    zoomIn: function(factor) {
         this.editorManager.zoomIn(factor, this);
     },
 
-    zoomOut: function (factor) {
+    zoomOut: function(factor) {
         this.editorManager.zoomOut(factor, this);
     },
 
-    zoomAll: function (margin, ratio) {
+    zoomAll: function(margin, ratio) {
         margin = margin || -0.05;
         this.editorManager.zoomAll(this, margin, ratio);
     },
 
-    zoomToBuilding: function (margin, ratio) {
+    zoomToBuilding: function(margin, ratio) {
 
         var box = this.getScene().innerBoundingBox;
         if (box.empty()) {
             this.zoomAll();
-        }
-        else {
+        } else {
             var target = this.camera.zoomToBBox(box, margin, ratio);
 
             this.cameraEditor.updateCamera(target);
@@ -19131,14 +19695,13 @@ CloudViewer.prototype = {
         }
     },
 
-    zoomToSelection: function (margin, ratio) {
+    zoomToSelection: function(margin, ratio) {
 
         var box = this.renderer.computeSelectionBBox();
         if (box == null || box.empty()) {
             box = this.getScene().worldBoundingBox();
             margin = margin || -0.05; // give bounding box a margin 0.05 by default.
-        }
-        else {
+        } else {
             margin = margin || 0.05; // give bounding box a margin 0.05 by default.
         }
         var target = this.camera.zoomToBBox(box, margin, ratio);
@@ -19147,12 +19710,11 @@ CloudViewer.prototype = {
         this.render();
     },
 
-    zoomToBBox: function (box, margin, ratio) {
+    zoomToBBox: function(box, margin, ratio) {
         margin = margin || -0.05;
         if (!box) {
             box = this.getScene().worldBoundingBox();
-        }
-        else {
+        } else {
             box.applyMatrix4(this.getScene().rootNode.matrix);
         }
 
@@ -19164,12 +19726,12 @@ CloudViewer.prototype = {
 
     },
 
-    setStandardView: function (stdView, margin) {
+    setStandardView: function(stdView, margin) {
         margin = margin || -0.05;
         this.editorManager.setStandardView(stdView, this, margin);
     },
 
-    setTopView: function (box, margin, ratio) {
+    setTopView: function(box, margin, ratio) {
         margin = margin || 0.05;
         ratio = ratio || 1.0;
 
@@ -19180,7 +19742,7 @@ CloudViewer.prototype = {
         this.editorManager.setTopView(this, box, margin, ratio);
     },
 
-    lookAt: function (position, target, up) {
+    lookAt: function(position, target, up) {
         var dir = new THREE.Vector3();
         dir.subVectors(target, position);
 
@@ -19190,26 +19752,21 @@ CloudViewer.prototype = {
     },
 
     // transform
-    transformCamera: function (camera) {
+    transformCamera: function(camera) {
         return CLOUD.CameraUtil.transformCamera(camera, this.modelManager.scene);
     },
 
-    getCamera: function () {
+    getCamera: function() {
         return this.cameraEditor.getCameraInfo();
     },
 
-    setCamera: function (jsonStr) {
+    setCamera: function(jsonStr) {
         var camInfo = CLOUD.CameraUtil.parseCameraInfo(jsonStr);
         this.lookAt(camInfo.position, camInfo.target, camInfo.up);
     },
 
-    clearAll: function () {
-
-        this.getScene().clearAll();
-    },
-
     // 获得render buffer的数据
-    getRenderBufferScreenShot: function () {
+    getRenderBufferScreenShot: function() {
 
         // 在高分屏上toDataURL直接获得图片数据比实际的图片大
         var dataUrl = this.renderer.domElement.toDataURL("image/png");
@@ -19222,14 +19779,14 @@ CloudViewer.prototype = {
         if (!w || !h)
             return dataUrl;
 
-        var nw, nh, nx = 0, ny = 0;
+        var nw, nh, nx = 0,
+            ny = 0;
 
         if (w > h || (canvasWidth / canvasHeight < w / h)) {
             nw = w;
             nh = canvasHeight / canvasWidth * w;
             ny = h / 2 - nh / 2;
-        }
-        else {
+        } else {
             nh = h;
             nw = canvasWidth / canvasHeight * h;
             nx = w / 2 - nw / 2;
@@ -19250,7 +19807,7 @@ CloudViewer.prototype = {
         return newURL;
     },
 
-    canvas2image: function () {
+    canvas2image: function() {
 
         var dataUrl = null;
 
@@ -19273,23 +19830,22 @@ CloudViewer.prototype = {
 
     },
 
-    getFilters: function () {
+    getFilters: function() {
         return this.getScene().filter;
     },
 
-    disableLoD: function (force) {
+    disableLoD: function(force) {
         if (force) {
             CLOUD.GlobalData.SubSceneVisibleLOD = 100000000;
             CLOUD.GlobalData.CellVisibleLOD = 100000000;
-        }
-        else {
+        } else {
             CLOUD.GlobalData.SubSceneVisibleLOD = 1000;
             CLOUD.GlobalData.CellVisibleLOD = 1000;
         }
         this.enableCameraNearFar = false;
     },
 
-    adjustSceneLoD: function (sceneIds) {
+    adjustSceneLoD: function(sceneIds) {
         var len = sceneIds.length;
         var totalVisibleCount = 0;
 
@@ -19312,27 +19868,23 @@ CloudViewer.prototype = {
         if (totalCount == 0) {
             CLOUD.GlobalData.SubSceneVisibleLOD = 10;
             CLOUD.GlobalData.CellVisibleLOD = 15;
-        }
-        else if (totalCount < 10000) {
+        } else if (totalCount < 10000) {
             CLOUD.GlobalData.SubSceneVisibleLOD = 200;
             CLOUD.GlobalData.CellVisibleLOD = 200;
             CLOUD.GlobalData.ScreenCullLOD = 0.0001;
             CLOUD.GlobalData.GarbageCollection = false;
 
-        }
-        else if (totalCount < 100000) {
+        } else if (totalCount < 100000) {
             CLOUD.GlobalData.SubSceneVisibleLOD = 100;
             CLOUD.GlobalData.CellVisibleLOD = 150;
             CLOUD.GlobalData.ScreenCullLOD = 0.0001;
             CLOUD.GlobalData.GarbageCollection = false;
-        }
-        else if (totalCount < 200000) {
+        } else if (totalCount < 200000) {
             CLOUD.GlobalData.SubSceneVisibleLOD = 50;
             CLOUD.GlobalData.CellVisibleLOD = 100;
             CLOUD.GlobalData.ScreenCullLOD = 0.0002;
             CLOUD.GlobalData.GarbageCollection = true;
-        }
-        else {
+        } else {
             CLOUD.GlobalData.SubSceneVisibleLOD = 10;
             CLOUD.GlobalData.CellVisibleLOD = 15;
             CLOUD.GlobalData.ScreenCullLOD = 0.0002;
@@ -19343,7 +19895,7 @@ CloudViewer.prototype = {
     },
 
     // 扩展功能的 render
-    renderExtensions: function () {
+    renderExtensions: function() {
 
         // 刷新小地图
         this.renderMiniMap();
@@ -19354,7 +19906,7 @@ CloudViewer.prototype = {
     },
 
     // 扩展功能的 resize
-    resizeExtensions: function (width, height, isMobile) {
+    resizeExtensions: function(width, height, isMobile) {
 
         this.resizeViewHouse(width, height, isMobile);
 
@@ -19365,7 +19917,7 @@ CloudViewer.prototype = {
 
     // ------------------ ViewHouse API -- S ------------------ //
     // 外部初始化，由外部决定需不需要 ViewHouse 功能
-    initViewHouse: function (domElement) {
+    initViewHouse: function(domElement) {
 
         if (!this.viewHouse) {
             this.viewHouse = new CLOUD.ViewHouse(this);
@@ -19382,7 +19934,7 @@ CloudViewer.prototype = {
     },
 
     // 设置 ViewHouse 可见性
-    setViewHouseVisibility: function (visible) {
+    setViewHouseVisibility: function(visible) {
 
         if (this.viewHouse) {
             this.viewHouse.visible = visible;
@@ -19390,7 +19942,7 @@ CloudViewer.prototype = {
     },
 
     // 绘制 ViewHouse
-    renderViewHouse: function () {
+    renderViewHouse: function() {
 
         if (this.viewHouse) {
             this.viewHouse.render();
@@ -19398,7 +19950,7 @@ CloudViewer.prototype = {
     },
 
     // 重设置viewhouse大小
-    resizeViewHouse: function (width, height, isMobile) {
+    resizeViewHouse: function(width, height, isMobile) {
 
         if (this.viewHouse) {
             this.viewHouse.resize(width, height, isMobile);
@@ -19407,74 +19959,74 @@ CloudViewer.prototype = {
     // ------------------ ViewHouse API -- E ------------------ //
 
     // ------------------ 小地图API -- S ------------------ //
-    createMiniMap: function (name, domElement, width, height, styleOptions, callbackCameraChanged, callbackClickOnAxisGrid) {
+    createMiniMap: function(name, domElement, width, height, styleOptions, callbackCameraChanged, callbackClickOnAxisGrid) {
 
         this.extensionHelper.createMiniMap(name, domElement, width, height, styleOptions, callbackCameraChanged, callbackClickOnAxisGrid);
     },
 
-    destroyMiniMap: function (name) {
+    destroyMiniMap: function(name) {
 
         this.extensionHelper.destroyMiniMap(name);
     },
 
-    removeMiniMap: function (name) {
+    removeMiniMap: function(name) {
 
         this.extensionHelper.removeMiniMap(name);
     },
 
-    appendMiniMap: function (name) {
+    appendMiniMap: function(name) {
 
         this.extensionHelper.appendMiniMap(name);
     },
 
-    getMiniMap: function (name) {
+    getMiniMap: function(name) {
 
         return this.extensionHelper.getMiniMap(name);
     },
 
     // 绘制小地图
-    renderMiniMap: function () {
+    renderMiniMap: function() {
 
         this.extensionHelper.renderMiniMap();
     },
 
     // 设置平面图
-    setFloorPlaneData: function (jsonObj) {
+    setFloorPlaneData: function(jsonObj) {
 
         this.extensionHelper.setFloorPlaneData(jsonObj);
     },
 
-    generateFloorPlane: function (name, changeView) {
+    generateFloorPlane: function(name, changeView) {
         this.extensionHelper.generateFloorPlane(name, changeView);
     },
 
     // 设置轴网数据
-    setAxisGridData: function (jsonObj, level) {
+    setAxisGridData: function(jsonObj, level) {
 
         this.extensionHelper.setAxisGridData(jsonObj, level);
     },
 
-    generateAxisGrid: function (name) {
+    generateAxisGrid: function(name) {
         this.extensionHelper.generateAxisGrid(name);
     },
 
     // 是否显示隐藏轴网
-    showAxisGrid: function (name, show) {
+    showAxisGrid: function(name, show) {
 
         this.extensionHelper.showAxisGrid(name, show);
     },
 
-    enableAxisGridEvent: function (name, enable) {
+    enableAxisGridEvent: function(name, enable) {
 
         this.extensionHelper.enableAxisGridEvent(name, enable);
     },
 
-    enableMiniMapCameraNode: function (name, enable) {
+    enableMiniMapCameraNode: function(name, enable) {
 
         this.extensionHelper.enableMiniMapCameraNode(name, enable);
     },
 
-    flyBypAxisGridNumber: function (name, abcName, numeralName) {
+    flyBypAxisGridNumber: function(name, abcName, numeralName) {
 
         this.extensionHelper.flyBypAxisGridNumber(name, abcName, numeralName);
     },
@@ -19484,65 +20036,65 @@ CloudViewer.prototype = {
     // ------------------ 标记 API -- S ------------------ //
 
     // 设置标记模式，已废弃
-    setMarkerMode: function () {
+    setMarkerMode: function() {
 
     },
 
-    closeMarkerMode: function () {
+    closeMarkerMode: function() {
         this.extensionHelper.uninitMarkerEditor();
     },
 
     // 开始编辑，已废弃
-    editMarkerBegin: function () {
+    editMarkerBegin: function() {
 
     },
 
     // 结束编辑，已废弃
-    editMarkerEnd: function () {
+    editMarkerEnd: function() {
 
     },
 
     // 设置标记状态，已废弃
-    setMarkerState: function (state) {
+    setMarkerState: function(state) {
 
     },
 
     // 加载标记
-    loadMarkers: function (markerInfoList) {
+    loadMarkers: function(markerInfoList) {
         this.extensionHelper.loadMarkers(markerInfoList);
     },
 
     // 加载标记
-    loadMarkersFromIntersect: function (intersect, shapeType, state) {
+    loadMarkersFromIntersect: function(intersect, shapeType, state) {
         this.extensionHelper.loadMarkersFromIntersect(intersect, shapeType, state);
     },
 
     // 获得标记列表
-    getMarkerInfoList: function () {
+    getMarkerInfoList: function() {
         return this.extensionHelper.getMarkerInfoList();
     },
 
     // zoom到合适的大小
-    zoomToSelectedMarkers: function () {
+    zoomToSelectedMarkers: function() {
         this.extensionHelper.zoomToSelectedMarkers();
     },
 
-    resizeMarkers: function () {
+    resizeMarkers: function() {
         this.extensionHelper.resizeMarkers();
     },
 
-    renderMarkers: function () {
+    renderMarkers: function() {
         this.extensionHelper.renderMarkers();
     },
 
     // 通过id选中某个标记
-    selectMarkerById: function (id) {
+    selectMarkerById: function(id) {
 
         this.extensionHelper.selectMarkerById(id);
     },
 
     // 设置marker click callback
-    setMarkerClickCallback: function (callback) {
+    setMarkerClickCallback: function(callback) {
 
         this.extensionHelper.setMarkerClickCallback(callback);
     },
@@ -19552,60 +20104,60 @@ CloudViewer.prototype = {
     // ------------------ 批注 API -- S ------------------ //
 
     // 进入批注模式，已废弃
-    setCommentMode: function () {
+    setCommentMode: function() {
 
     },
 
-    exitCommentMode: function () {
+    exitCommentMode: function() {
 
         this.extensionHelper.uninitAnnotation();
     },
 
     // 设置背景
-    setCommentBackgroundColor: function (startColor, stopColor) {
+    setCommentBackgroundColor: function(startColor, stopColor) {
 
         this.extensionHelper.setAnnotationBackgroundColor(startColor, stopColor);
     },
 
     // 开始编辑批注
-    editCommentBegin: function () {
+    editCommentBegin: function() {
 
         this.extensionHelper.editAnnotationBegin();
     },
 
     // 结束编辑批注
-    editCommentEnd: function () {
+    editCommentEnd: function() {
 
         this.extensionHelper.editAnnotationEnd();
     },
 
     // 设置批注图形类型
-    setCommentType: function (type) {
+    setCommentType: function(type) {
 
         this.extensionHelper.setAnnotationType(type);
     },
 
     // 加载批注
-    loadComments: function (annotations) {
+    loadComments: function(annotations) {
 
         this.extensionHelper.loadAnnotations(annotations);
     },
 
     // 获得批注对象列表
-    getCommentInfoList: function () {
+    getCommentInfoList: function() {
 
         return this.extensionHelper.getAnnotationInfoList();
 
     },
 
     // 窗口resize
-    resizeComments: function () {
+    resizeComments: function() {
 
         this.extensionHelper.resizeAnnotations();
     },
 
     // 重绘
-    renderAnnotations: function () {
+    renderAnnotations: function() {
 
         this.extensionHelper.renderAnnotations();
     }
