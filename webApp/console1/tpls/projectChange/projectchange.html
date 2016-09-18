@@ -38,12 +38,12 @@
           <input type="text" class="form-control" id="p13" value="变更说明信息">
         </div>
       </div>
-      <div class="form-group">
-        <label for="inputPassword3" class="col-sm-2 control-label">变更文件</label>
-        <div class="col-sm-10">
-          <input type="text" class="form-control" id="p14" value="{'fileId'}">
-        </div>
-      </div>
+      <!--<div class="form-group">-->
+        <!--<label for="inputPassword3" class="col-sm-2 control-label">变更文件</label>-->
+        <!--<div class="col-sm-10">-->
+          <!--<input type="text" class="form-control" id="p14" value="{'fileId'}">-->
+        <!--</div>-->
+      <!--</div>-->
 
       <div class="form-group">
         <div class="col-sm-10">
@@ -62,7 +62,8 @@
             "initiator": {"userId":"123","loginId":"gongcen"},
             "auditor": [{"userId":"123","loginId":"gongcen"}],
             "confirmor": [{"userId":"123","loginId":"gongcen"}],
-            "receiver": [{"userId":"123","loginId":"gongcen"}]
+            "receiver": [{"userId":"123","loginId":"gongcen"}],
+            "changedFiles":[{"fileId":"文件ID","fileName":"文件名","versionId":"版本ID"}]
           }
 
                     </textarea>
@@ -73,7 +74,7 @@ projectVersionName	新变更版本名称	string
 refProjectModelCode	基准项目模型ID	string
 refProjectModelName	基准项目模型名称	string
 refProjectModelVersionId	基准项目模型版本Id	long
-changedFiles	变更文件集合	Array	数据实体为ProjectModelChangeFiles
+
 description	变更说明	string
 auditFinishTime	表单审核时间	long
 createTime	创建时间	long
@@ -81,7 +82,8 @@ status	审批状态	int	8发起；16审批通过；（4驳回；32撤销；128�
 ProjectModelChangeFiles实体
 参数	参数说明	类型	备注
 fileId	变更文件ID	long
-
+changedFiles	变更文件集合	多个以逗号隔开如：
+    [{"fileId":"文件ID","fileName":"文件名","versionId":"版本ID"},{"fileId":"文件ID","fileName":"文件名","versionId":"版本ID"}]
                     </textarea>
                                         <textarea name="" id="result1" cols="30" rows="30">
 
