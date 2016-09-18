@@ -144,7 +144,6 @@ App.Services.memSearchParentOz = {
             $("#ozList").removeClass("services_loading");
             includeUsers = true;
             $(container[0]).click();
-            Backbone.trigger("serviceMemberSearchSelect",App.Services.memSearchParentOz.id);
             this.reset();
             return
         }
