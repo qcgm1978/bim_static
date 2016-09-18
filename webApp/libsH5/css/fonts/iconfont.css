@@ -71,3 +71,14 @@
 .m-chengbenguanli:before { content: "\e63d"; }
 .m-jihuaguanli:before { content: "\e63e"; }
 .m-zhiliangguanli:before { content: "\e63f"; }
+
+.m-zooms:before { content: "\e62c"; }
+.m-kuangsuo:before { content: "\e60c"; }
+.m-isolation:before { content: "\e632"; }
+.m-xuanban:before { content: "\e62d"; }
+.m-weixuanban:before { content: "\e62f"; }
+.m-hideSelected:before { content: "\e633"; }
+.m-hideNotSelected:before { content: "\e634"; }
+.m-showAll:before { content: "\e635"; }
+.m-lockAxisZ:before { content: "\e63c"; }
+

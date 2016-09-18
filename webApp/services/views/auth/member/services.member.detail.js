@@ -31,7 +31,6 @@ App.Services.memberDetail=Backbone.View.extend({
         }
     },
     serviceMemberSearchSelect:function(id){
-
         if(this.model.get("userId")){
             if(this.model.get("userId") == id){
                 this.$(".sele").click();

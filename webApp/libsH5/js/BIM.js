@@ -280,22 +280,38 @@
         group: '4'
       }]
     }, {
-      id: 'zoom',
-      icon: 'm-zoom',
-      title: '缩放',
-      fn: 'zoom',
-      keyCode: '',
-      type: 'pattern',
-      group: '3'
-    }, {
-      id: 'fit',
-      icon: 'm-fit',
-      title: '适应窗口',
-      fn: 'fit',
-      keyCode: '',
-      type: 'viewer',
-      group: '2'
-    }, {
+        id: 'zooms',
+        icon: 'm-zooms',
+        title: '缩放集合',
+        fn: 'zooms',
+        keyCode: '',
+        type: 'more',
+        group: '0',
+        subBar: [ {
+          id: 'fit',
+          icon: 'm-fit',
+          title: '适应窗口',
+          fn: 'fit',
+          keyCode: '',
+          type: 'viewer',
+          group: '2'
+        },{
+          id: 'zoom',
+          icon: 'm-zoom',
+          title: '缩放',
+          fn: 'zoom',
+          keyCode: '',
+          type: 'pattern',
+          group: '3'
+        }, {
+          id: 'kuangsuo',
+          icon: 'm-kuangsuo',
+          title: '框选缩放',
+          fn: 'setRectZoomMode',
+          type: 'mode',
+          group: '3'
+        }]
+      }, {
       id: 'rotate',
       icon: 'm-rotateMouse',
       title: '动态观察',
@@ -329,6 +345,52 @@
         group: '3'
       }]
     }, {
+      id: 'isolation',
+      icon: 'm-isolation',
+      title: '隔离',
+      fn: 'isolation',
+      keyCode: '',
+      type: 'more',
+      group: '0',
+      subBar: [ {
+        id: 'xuanban',
+        icon: 'm-xuanban',
+        title: '选中构件半透明',
+        fn: 'fit',
+        keyCode: '',
+        type: 'viewer',
+        group: '2'
+      },{
+        id: 'weixuanban',
+        icon: 'm-weixuanban',
+        title: '未选中构件半透明',
+        fn: 'zoom',
+        keyCode: '',
+        type: 'pattern',
+        group: '3'
+      }, {
+        id: 'hideSelected',
+        icon: 'm-hideSelected',
+        title: '隐藏选中构件',
+        fn: 'behind',
+        type: 'view',
+        group: '4'
+      }, {
+        id: 'hideNotSelected',
+        icon: 'm-hideNotSelected',
+        title: '隐藏未选中构件',
+        fn: 'isolate',
+        type: 'view',
+        group: '4'
+      }, {
+        id: 'showAll',
+        icon: 'm-showAll',
+        title: '显示全部模型',
+        fn: 'behind',
+        type: 'view',
+        group: '4'
+      }]
+    }, {
       id: 'more',
       icon: 'm-more',
       title: '更多',
@@ -344,23 +406,32 @@
         keyCode: '',
         type: 'color',
         group: '0'
-      }, {
-        id: 'translucent',
-        icon: 'm-translucent',
-        title: '半透明',
-        fn: 'translucent',
+      },{
+        id: 'lockAxisZ',
+        icon: 'm-lockAxisZ',
+        title: 'z轴锁定',
+        fn: 'lockAxisZ',
         keyCode: '',
-        type: 'status',
-        group: '0'
-      }, {
-        id: 'hideObj',
-        icon: 'm-hideObj',
-        title: '隐藏构件',
-        fn: 'isolate',
-        keyCode: '',
-        type: 'status',
+        type: 'mode',
         group: '0'
       }]
+    //  , {
+    //  id: 'translucent',
+    //  icon: 'm-translucent',
+    //  title: '半透明',
+    //  fn: 'translucent',
+    //  keyCode: '',
+    //  type: 'status',
+    //  group: '0'
+    //}, {
+    //  id: 'hideObj',
+    //  icon: 'm-hideObj',
+    //  title: '隐藏构件',
+    //  fn: 'isolate',
+    //  keyCode: '',
+    //  type: 'status',
+    //  group: '0'
+    //}
     }, {
       id: 'hideMap',
       icon: 'm-miniScreen',

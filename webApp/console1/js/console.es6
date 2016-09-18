@@ -983,12 +983,12 @@ App.Console = {
     });
     var data;
     $("#submit4").click(function(){
-      //var files = [],i,
-      //  ids = $('#p14').val().trim().split(',');
-      //for(i = 0; i<ids.length;i++){
-      //  files.push({"fileId":ids[i]})
-      //}
-      //console.log(files)
+      var files = [],i,
+        ids = $('#p14').val().trim().split(',');
+      for(i = 0; i<ids.length;i++){
+        files.push({"fileId":ids[i]})
+      }
+      console.log(files)
       data = {
         title                   : $('#p11').val().trim(),
         workflowId              : parseInt(9999999 * Math.random()),
@@ -998,7 +998,7 @@ App.Console = {
         projectModelCode             : $('#s11').val(),
         refProjectModelVersionId: $('#s12').val().trim(),
         description             : $('#p13').val().trim(),
-        //changedFiles            : files,
+        changedFiles            : files,
         status                  : 8
       };
       App.Console.apply(1, 1017, data);
