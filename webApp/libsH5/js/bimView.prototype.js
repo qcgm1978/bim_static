@@ -193,7 +193,7 @@
               $this.siblings().removeClass('selected');
             }
             if (isSelected) {
-              self[fn](false);
+              fn=='setRectZoomMode'?self.rotateMouse():self[fn](false);
             } else {
               self[fn](true);
             }
