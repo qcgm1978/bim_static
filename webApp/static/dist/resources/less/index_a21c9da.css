@@ -1,0 +1,436 @@
+.servicesIndexBox {
+  height: 100%;
+  background-color: #eee;
+  padding: 30px 0px;
+  overflow-y: auto;
+}
+.servicesIndexBox .servicesIndex {
+  width: 1000px;
+  margin: 0 auto;
+  padding: 0px 150px 80px 150px;
+  background-color: #fff;
+}
+.servicesIndexBox .servicesIndex .item {
+  text-align: center;
+  float: left;
+  width: 33%;
+  margin-top: 80px;
+}
+.servicesIndexBox .servicesIndex .item .iconBg {
+  background: url(/static/dist/images/resources/images/index.png) no-repeat;
+  width: 120px;
+  height: 120px;
+  margin: 0 auto;
+}
+.servicesIndexBox .servicesIndex .item .iconBg.famLibs {
+  background-position: 0px -121px;
+}
+.servicesIndexBox .servicesIndex .item .iconBg.qualityStandardLibs {
+  background-position: 0px -242px;
+}
+.servicesIndexBox .servicesIndex .item .iconBg.manifestLibs {
+  background-position: 0px -363px;
+}
+.servicesIndexBox .servicesIndex .item .iconBg.artifactsMapRule {
+  background-position: 0px -484px;
+}
+.servicesIndexBox .servicesIndex .item .iconBg.device {
+  background-position: 0px -605px;
+}
+.servicesIndexBox .servicesIndex .item .iconBg.planCode {
+  background-position: 0px -726px;
+}
+.servicesIndexBox .servicesIndex .item .bg {
+  margin: 0 auto;
+  width: 120px;
+  height: 122px;
+  background: url('/static/dist/images/services/images/index.png') 0px 1px no-repeat;
+}
+.servicesIndexBox .servicesIndex .item .text {
+  margin-top: 30px;
+  font-size: 18px;
+  color: #666;
+}
+.servicesIndexBox .servicesIndex .item a {
+  text-decoration: none;
+  display: inline-block;
+}
+.servicesIndexBox .servicesIndex .item.project .bg {
+  background-position: 0px -120px;
+}
+.servicesIndexBox .servicesIndex .item.application .bg {
+  background-position: 0px -241px;
+}
+.servicesIndexBox .servicesIndex .item.systen .bg {
+  background-position: 0px -362px;
+}
+.servicesIndexBox .servicesIndex .item.log .bg {
+  background-position: 0px -483px;
+}
+.servicesIndexBox .servicesIndex .item.updatePwd .bg {
+  background-position: 0px -604px;
+}
+.servicesIndexBox .servicesIndex .item.workbook .bg {
+  background-position: 0px -725px;
+}
+.servicesIndexBox .servicesIndex .item.issue .bg {
+  background-position: 0px -846px;
+}
+.servicesIndexBox .servicesIndex .item.device .bg {
+  background-position: 0px -967px;
+}
+.servicesIndexBox .servicesIndex .item.planCode .bg {
+  background-position: 0px -1088px;
+}
+.resourceCrumbsNav {
+  height: 37px;
+  background-color: #f5f5f5;
+  border-bottom: 1px #ccc solid;
+  position: relative;
+  z-index: 999;
+}
+#standardLibs,
+#famLibs {
+  height: 100%;
+  margin-top: -40px;
+  position: relative;
+  padding: 70px 40px 0px 40px;
+}
+#standardLibs .standar .loading,
+#famLibs .standar .loading {
+  text-align: center;
+  color: #ccc;
+  line-height: 40px;
+}
+#standardLibs .standar .item,
+#famLibs .standar .item {
+  font-size: 14px;
+  height: 46px;
+  line-height: 45px;
+  border-bottom: 1px #ccc solid;
+  color: #333;
+  text-align: center;
+}
+#standardLibs .standar.standarHeader .item,
+#famLibs .standar.standarHeader .item {
+  height: 36px;
+  line-height: 36px;
+  border: 1px #ccc solid;
+  border-width: 1px 0px;
+  background-color: #eee;
+  color: #999;
+}
+#standardLibs .standar span,
+#famLibs .standar span {
+  float: left;
+  vertical-align: middle;
+  font-size: 14px;
+}
+#standardLibs .standar .title,
+#famLibs .standar .title {
+  width: 32%;
+  text-align: left;
+  padding-left: 30px;
+}
+#standardLibs .standar .title img,
+#famLibs .standar .title img {
+  height: 38px;
+  vertical-align: top;
+  margin-top: 3px;
+  margin-right: 12px;
+}
+#standardLibs .standar .title .text,
+#famLibs .standar .title .text {
+  margin-left: 68px;
+}
+#standardLibs .standar .designUnit,
+#famLibs .standar .designUnit {
+  width: 30%;
+}
+#standardLibs .standar .createDate,
+#famLibs .standar .createDate {
+  width: 13%;
+}
+#standardLibs .standar .lastModifiedDate,
+#famLibs .standar .lastModifiedDate {
+  width: 13%;
+}
+#standardLibs .standar .introduction,
+#famLibs .standar .introduction {
+  width: 10%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+#standardLibs .standar .introduction b,
+#famLibs .standar .introduction b {
+  font-weight: normal;
+}
+#standardLibs .standar .introduction i,
+#famLibs .standar .introduction i {
+  color: #bbbbbb;
+}
+.standarBody {
+  position: absolute;
+  left: 40px;
+  right: 40px;
+  top: 106px;
+  bottom: 0px;
+}
+.standarBody .standarPagination {
+  float: right;
+}
+.standarBody .sumDesc {
+  margin-top: 20px;
+}
+#resourceModelLeftNav {
+  z-index: 99;
+  background-color: #fff;
+  position: absolute;
+  top: 87px;
+  bottom: 0px;
+  left: 0px;
+  border: 1px #ccc solid;
+  border-width: 0px 1px;
+  width: 238px;
+}
+#resourceModelLeftNav .projectNavFileContainer {
+  height: 100%;
+  margin-top: -40px;
+  padding-top: 40px;
+}
+#resourceModelLeftNav .modelTreeBox {
+  display: none;
+  height: 100%;
+}
+#resourceListContent {
+  margin-left: 10px;
+  position: absolute;
+  bottom: 20px;
+  top: 124px;
+  right: 0;
+  left: 227px;
+}
+#resourceListContent .fileBody {
+  margin-top: -51px;
+  padding-top: 40px;
+  height: 100%;
+}
+#resourceListContent .fileBody .btnEnter {
+  margin-left: 5px;
+  margin-right: 5px;
+  cursor: pointer;
+}
+#navContainer {
+  margin-left: 237px;
+  height: 100%;
+  margin-top: -40px;
+  padding-top: 40px;
+}
+#navContainer .iconTip {
+  display: inline-block;
+  width: 22px;
+  vertical-align: top;
+  height: 20px;
+  background: url('/static/dist/images/projects/images/nullPage.png') no-repeat 0px -879px;
+}
+#navContainer.hideLeft {
+  margin-left: 0px;
+}
+#navContainer .listContent {
+  height: 100%;
+}
+#navContainer .topBar {
+  padding: 10px;
+}
+#navContainer .topBar .btnNormal {
+  margin-right: 7px;
+}
+#navContainer .topBar .btnNewFolder {
+  margin-left: 5px;
+}
+#navContainer .topBar .btnNewFolder .myIcon-createFolder {
+  height: 17px;
+  margin-top: -2px;
+}
+#navContainer .topBar .fileSearchBox {
+  float: right;
+  position: relative;
+}
+#navContainer .topBar .clearSearch {
+  cursor: pointer;
+  display: none;
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  left: 180px;
+  top: 8px;
+  background: url('/static/dist/images/comm/images/commIcon.png') no-repeat -40px -440px;
+}
+#navContainer .topBar #txtFileSearch {
+  width: 200px;
+  vertical-align: top;
+  margin-right: -5px;
+  outline: none;
+  position: relative;
+}
+#navContainer .topBar .searchCount {
+  display: none;
+  height: 27px;
+  line-height: 26px;
+}
+#navContainer .topBar .searchCount .count {
+  color: #ff4c4c;
+}
+#navContainer .modelContentBox {
+  height: 100%;
+  display: none;
+}
+#navContainer .modelContentBox .modelContent {
+  height: 100%;
+  overflow: hidden;
+}
+#navContainer .modelAttr {
+  margin-right: -394px;
+  display: none;
+  width: 396px;
+  border: 1px #ddd solid;
+  position: fixed;
+  right: 0px;
+  top: 87px;
+  bottom: 0px;
+  background-color: #fff;
+  z-index: 600;
+}
+#navContainer .modelAttr .dragSize {
+  left: -5px;
+  display: block;
+}
+#navContainer .modelAttr .slideBar {
+  display: block;
+  left: -15px;
+  top: 40px;
+}
+#navContainer .modelAttr .attrContentBox {
+  height: 100%;
+  margin-top: -40px;
+  padding-top: 40px;
+}
+#navContainer .modelAttr .attrContentBox .attrContent {
+  height: 100%;
+  overflow: auto;
+  min-width: 396px;
+}
+#navContainer .modelAttr .nullTip {
+  background: url(/static/dist/images/projects/images/attrSel.png) no-repeat 50% 100%;
+  padding-top: 200px;
+  height: 50px;
+  line-height: 50px;
+  color: #ccc;
+  font-size: 16px;
+  text-align: center;
+}
+#navContainer .modelAttr .modle .modleShowHide {
+  transition: all .5s;
+  background: url(/static/dist/images/comm/images/commIcon.png) no-repeat 0px -256px;
+  float: right;
+  margin-right: 12px;
+  margin-top: 6px;
+  height: 14px;
+  width: 14px;
+  cursor: pointer;
+}
+#navContainer .modelAttr .modle .modleShowHide.down {
+  transform: rotate(180deg);
+  -ms-transform: rotate(180deg);
+  -moz-transform: rotate(180deg);
+  -webkit-transform: rotate(180deg);
+  -o-transform: rotate(180deg);
+}
+#navContainer .modelAttr .modle .modleName {
+  font-weight: bold;
+  height: 24px;
+  line-height: 24px;
+  padding-left: 12px;
+}
+#navContainer .modelAttr .modle .modleName .modleNameText {
+  vertical-align: top;
+  width: 95%;
+}
+#navContainer .modelAttr .modle .modleList {
+  background-color: #eee;
+  border-top: 1px #ccc solid;
+}
+#navContainer .modelAttr .modle .modleList .modleItem {
+  border-bottom: 1px #ccc solid;
+}
+#navContainer .modelAttr .modle .modleList .modleItem .modleName {
+  width: 25%;
+  display: inline-block;
+  box-sizing: border-box;
+  padding-left: 12px;
+  border-right: 1px #ccc solid;
+}
+#navContainer .modelAttr .modle .modleList .modleItem .modleVal {
+  display: inline-block;
+  width: 72%;
+  box-sizing: border-box;
+  padding-left: 12px;
+  margin-left: -3px;
+}
+#navContainer .modelAttr .modle .modleList .modleItem .modelLink {
+  display: inline-block;
+  padding-left: 12px;
+  color: #3F8CDF;
+  height: 24px;
+  line-height: 24px;
+}
+#resourceFamlibsLeftNav .projectNav,
+#resourceModelLeftNav .projectNav {
+  min-width: 236px;
+  display: none;
+}
+#resourceFamlibsLeftNav .text-field,
+#resourceModelLeftNav .text-field {
+  max-width: 135px;
+}
+.fileTree .loading {
+  color: #ccc;
+  font-size: 14px;
+  margin-top: 30px;
+  text-align: center;
+}
+#listContext {
+  display: none;
+}
+.jqContextMenu #listContext {
+  display: block;
+}
+#listContextFamily {
+  display: none;
+}
+.jqContextMenu #listContextFamily {
+  display: block;
+}
+#contains .btns-flow {
+  float: right;
+  margin-right: 40px;
+  margin-top: 1px;
+}
+#contains .btns-flow a {
+  cursor: pointer;
+  display: inline-block;
+  border: 1px solid #ccc;
+  width: 80px;
+  height: 24px;
+  text-align: center;
+  line-height: 24px;
+  margin-left: 12px;
+  color: #666;
+}
+#contains .btns-flow a:link {
+  text-decoration: none;
+}
+.stand a {
+  width: 103px!important;
+}

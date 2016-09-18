@@ -1,0 +1,29 @@
+.confirm .wrapper .content {
+  background-color: #333;
+  color: #fff;
+}
+.confirm .operator {
+  text-align: center;
+  margin-top: 25px;
+}
+.confirm .operator .btnCanel {
+  margin-left: 10px;
+}
+.confirm .myBtn {
+  border: 1px #ccc solid;
+}
+.confirm i {
+  font-family: "modelicon";
+}
+.confirm .iconTip {
+  display: table-cell;
+  vertical-align: middle;
+  font-size: 24px;
+  width: 34px;
+}
+.confirm .tipText {
+  display: table-cell;
+  word-wrap: break-word;
+  word-break: break-all;
+  vertical-align: middle;
+}

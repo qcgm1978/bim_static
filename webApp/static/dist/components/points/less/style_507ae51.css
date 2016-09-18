@@ -1,0 +1,889 @@
+.dialogContent {
+  position: relative;
+}
+.dialogContent .rightProperty {
+  width: 400px;
+  border: 1px #ddd solid;
+  position: absolute;
+  right: 0px;
+  top: 0px;
+  bottom: 0px;
+  background-color: #fff;
+  z-index: 600;
+  overflow: hidden;
+}
+.dialogContent .rightProperty .rightPropertyContentBox {
+  height: 100%;
+  position: relative;
+}
+.dialogContent .rightProperty .rightPropertyContentBox .rightPropertyContent {
+  height: 100%;
+}
+.dialogContent .rightProperty .rightPropertyContentBox .rightPropertyContent .rightPropertyContent {
+  height: 100%;
+}
+.dialogContent .rightProperty .rightPropertyContentBox .rightPropertyContent .rightPropertyContent .designPropetyBox {
+  height: 100%;
+}
+.dialogContent .rightProperty .rightPropertyContentBox .slideBar {
+  right: inherit;
+  display: block;
+  left: -15px;
+  top: 40px;
+}
+.dialogContent .rightProperty .rightPropertyContentBox .dragSize {
+  left: -5px;
+  right: inherit;
+  display: block;
+}
+.dialogContent .rightProperty .rightPropertyContentBox .projectPropetyContainer {
+  height: 100%;
+  margin-top: -40px;
+  padding-top: 40px;
+}
+.dialogContent .rightProperty .rightPropertyContentBox .projectPropetyContainer .designProperties {
+  height: 100%;
+  overflow: auto;
+}
+.dialogContent .rightProperty .rightPropertyContentBox .projectPropetyContainer .designProperties .attrPlanBox,
+.dialogContent .rightProperty .rightPropertyContentBox .projectPropetyContainer .designProperties .attrCostBox,
+.dialogContent .rightProperty .rightPropertyContentBox .projectPropetyContainer .designProperties .attrQualityBox {
+  display: none;
+}
+.dialogContent .rightProperty .rightPropertyContentBox .projectPropetyContainer .designProperties .nullTip {
+  background: url(/static/dist/images/projects/images/attrSel.png) no-repeat 50% 100%;
+  padding-top: 200px;
+  height: 50px;
+  line-height: 50px;
+  color: #ccc;
+  font-size: 16px;
+  text-align: center;
+}
+.dialogContent .rightProperty .rightPropertyContentBox .modle .modleShowHide {
+  transition: all .5s;
+  background: url(/static/dist/images/comm/images/commIcon.png) no-repeat 0px -256px;
+  float: right;
+  margin-right: 12px;
+  margin-top: 6px;
+  height: 14px;
+  width: 14px;
+  cursor: pointer;
+}
+.dialogContent .rightProperty .rightPropertyContentBox .modle .modleShowHide.down {
+  transform: rotate(180deg);
+  -ms-transform: rotate(180deg);
+  -moz-transform: rotate(180deg);
+  -webkit-transform: rotate(180deg);
+  -o-transform: rotate(180deg);
+}
+.dialogContent .rightProperty .rightPropertyContentBox .modle .modleName {
+  font-weight: bold;
+  height: 24px;
+  line-height: 24px;
+  padding-left: 12px;
+}
+.dialogContent .rightProperty .rightPropertyContentBox .modle .modleName .modleNameText {
+  vertical-align: top;
+  width: 95%;
+}
+.dialogContent .rightProperty .rightPropertyContentBox .modle .modleList {
+  background-color: #eee;
+  border-top: 1px #ccc solid;
+}
+.dialogContent .rightProperty .rightPropertyContentBox .modle .modleList .modleItem {
+  border-bottom: 1px #ccc solid;
+}
+.dialogContent .rightProperty .rightPropertyContentBox .modle .modleList .modleItem .modleName {
+  width: 25%;
+  display: inline-block;
+  box-sizing: border-box;
+  padding-left: 12px;
+  border-right: 1px #ccc solid;
+}
+.dialogContent .rightProperty .rightPropertyContentBox .modle .modleList .modleItem .modleVal {
+  display: inline-block;
+  width: 72%;
+  box-sizing: border-box;
+  padding-left: 12px;
+  margin-left: -3px;
+}
+.dialogContent .rightProperty .rightPropertyContentBox .modle .modleList .modleItem .modelLink {
+  display: inline-block;
+  padding-left: 12px;
+  color: #3F8CDF;
+  height: 24px;
+  line-height: 24px;
+}
+.disabled {
+  color: #808080 !important;
+}
+.disabled:hover {
+  border: none;
+  cursor: text;
+}
+/* 质量 */
+.qualityContainer {
+  position: absolute;
+  top: 40px;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
+}
+.qualityContainer .QualityProcessAcceptance,
+.qualityContainer .QualityProcessCheck,
+.qualityContainer .QualityOpeningAcceptance,
+.qualityContainer .QualityConcerns,
+.qualityContainer .QualityProperties {
+  min-width: 398px;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+}
+.expandArrowIcon {
+  background: url(/static/dist/images/comm/images/commIcon.png) no-repeat 87px -638px !important;
+}
+.rightProperty .hedaerSearch {
+  padding: 15px;
+  width: 100%;
+  overflow: hidden;
+}
+.rightProperty .hedaerSearch .searchToggle {
+  cursor: pointer;
+  background: url(/static/dist/images/comm/images/commIcon.png) no-repeat 87px -619px;
+  padding-right: 32px;
+  height: 18px;
+  display: inline-block;
+}
+.rightProperty .hedaerSearch .clearSearch {
+  cursor: pointer;
+  color: #006ECF;
+}
+.rightProperty .hedaerSearch .groupRadio {
+  float: right;
+}
+.rightProperty .searchDetail {
+  display: none;
+  position: absolute;
+  height: 182px;
+  background-color: #fff;
+  top: 38px;
+  width: 200px;
+  z-index: 1;
+  border-bottom: 1px #ccc solid;
+}
+.rightProperty .searchDetail.processAcceptance {
+  height: 126px;
+}
+.rightProperty .searchDetail.openingacceptance {
+  height: 162px;
+}
+.rightProperty .searchDetail.concernSearch {
+  height: 204px;
+}
+.rightProperty .searchDetail.concernList {
+  width: 540px;
+}
+.rightProperty .searchDetail .searchOptons {
+  border-top: 1px #ccc solid;
+  margin: 0 5px;
+}
+.rightProperty .searchDetail .optionComm {
+  margin-left: 7px;
+}
+.rightProperty .searchDetail .optionComm .myDropText {
+  height: 24px;
+  line-height: 21px;
+  width: 178px;
+}
+.rightProperty .searchDetail .optionComm .myDropArrorw {
+  margin-top: 10px;
+}
+.rightProperty .searchDetail .optionComm .myDropList {
+  width: 100%;
+  top: 25px;
+  left: 0px;
+}
+.rightProperty .searchDetail .optonLine {
+  margin-top: 10px;
+  padding-left: 5px;
+}
+.rightProperty .searchDetail .materialEquipment.statusOption,
+.rightProperty .searchDetail .categoryOption,
+.rightProperty .searchDetail .specialitiesOption,
+.rightProperty .searchDetail .operatorOption,
+.rightProperty .searchDetail .typeOption,
+.rightProperty .searchDetail .firstDate,
+.rightProperty .searchDetail .inspectionUnitOption {
+  margin-left: 7px;
+}
+.rightProperty .searchDetail .zIndex10 {
+  position: relative;
+  z-index: 10;
+}
+.rightProperty .searchDetail .zIndex11 {
+  position: relative;
+  z-index: 11;
+}
+.rightProperty .searchDetail .searchName {
+  width: 176px;
+  margin-left: 7px;
+  display: inline-block;
+  border: 1px #ccc solid;
+  height: 24px;
+  vertical-align: top;
+  line-height: 20px;
+  padding-left: 12px;
+  outline: none;
+}
+.rightProperty .searchDetail .searchName .txtSearchName {
+  width: 120px;
+  border: 0;
+  outline: none;
+}
+.rightProperty .searchDetail .dateBox {
+  display: inline-block;
+  position: relative;
+}
+.rightProperty .searchDetail .dateBox input {
+  height: 24px;
+  line-height: 24px;
+  padding-left: 8px;
+  border: 1px #ccc solid;
+  width: 178px;
+  padding-right: 30px;
+  box-sizing: border-box;
+}
+.rightProperty .searchDetail .dateBox #dateEnd {
+  width: 178px;
+}
+.rightProperty .searchDetail .btnOption {
+  padding-right: 5px;
+  text-align: right;
+}
+.rightProperty .searchDetail .btnOption input {
+  margin-top: 10px;
+}
+.rightProperty .searchDetail .iconCal {
+  background: url(/static/dist/images/comm/images/commIcon.png) no-repeat 6px -236px;
+  position: absolute;
+  right: 1px;
+  width: 28px;
+  height: 22px;
+  top: 1px;
+  background-color: #eee;
+  border-left: 1px #ccc solid;
+}
+.rightProperty .tbMaterialequipmentBody,
+.rightProperty .tbMaterialequipmentHeader {
+  width: 100%;
+  min-width: 580px;
+}
+.rightProperty .tbMaterialequipmentBody .manifestIcon,
+.rightProperty .tbMaterialequipmentHeader .manifestIcon {
+  width: 5%;
+  text-align: center;
+}
+.rightProperty .tbMaterialequipmentBody .manifestIcon .myIcon-inventory,
+.rightProperty .tbMaterialequipmentHeader .manifestIcon .myIcon-inventory {
+  display: inline-block;
+  width: 11px;
+}
+.rightProperty .tbMaterialequipmentBody .specialities,
+.rightProperty .tbMaterialequipmentHeader .specialities {
+  width: 12%;
+}
+.rightProperty .tbMaterialequipmentBody .category,
+.rightProperty .tbMaterialequipmentHeader .category {
+  width: 12%;
+}
+.rightProperty .tbMaterialequipmentBody .name,
+.rightProperty .tbMaterialequipmentHeader .name {
+  width: 19%;
+}
+.rightProperty .tbMaterialequipmentBody .batches,
+.rightProperty .tbMaterialequipmentHeader .batches {
+  width: 6%;
+}
+.rightProperty .tbMaterialequipmentBody .status,
+.rightProperty .tbMaterialequipmentHeader .status {
+  width: 7%;
+}
+.rightProperty .tbMaterialequipmentBody .hasBeenCount,
+.rightProperty .tbMaterialequipmentHeader .hasBeenCount {
+  width: 9%;
+}
+.rightProperty .tbMaterialequipmentBody .sumCount,
+.rightProperty .tbMaterialequipmentHeader .sumCount {
+  width: 9%;
+}
+.rightProperty .tbMaterialequipmentBody .lastDate,
+.rightProperty .tbMaterialequipmentHeader .lastDate {
+  width: 20%;
+}
+.rightProperty .tbContainer {
+  position: absolute;
+  top: 45px;
+  bottom: 32px;
+  left: 0px;
+  right: 0px;
+  overflow: auto;
+}
+.rightProperty .tbContainer .materialequipmentList {
+  margin-top: -31px;
+  padding-top: 30px;
+  height: 100%;
+  min-width: 580px;
+  width: 100%;
+}
+.rightProperty .tbContainer .processAccessList,
+.rightProperty .tbContainer .openingacceptanceList {
+  min-width: 402px;
+  position: relative;
+}
+.rightProperty .tbContainer .concernList {
+  min-width: 540px;
+}
+.rightProperty .tbContainer tr.selected,
+.rightProperty .tbContainer tr:hover {
+  background-color: #A8DBFD;
+  cursor: pointer;
+}
+.rightProperty .tbComm td,
+.rightProperty .tbComm th {
+  border: 1px #ccc solid;
+  text-align: center;
+}
+.rightProperty .tbComm th {
+  height: 28px;
+  line-height: 28px;
+}
+.rightProperty .tbComm td {
+  height: 25px;
+  line-height: 25px;
+  word-wrap: break-word;
+  word-break: break-all;
+}
+.rightProperty .tbProcessAccessHeader,
+.rightProperty .tbProcessAccessBody {
+  width: 100%;
+  min-width: 398px;
+}
+.rightProperty .tbProcessAccessHeader .manifestIcon,
+.rightProperty .tbProcessAccessBody .manifestIcon {
+  width: 5%;
+}
+.rightProperty .tbProcessAccessHeader .category,
+.rightProperty .tbProcessAccessBody .category {
+  width: 12%;
+}
+.rightProperty .tbProcessAccessHeader .positon,
+.rightProperty .tbProcessAccessBody .positon {
+  width: 21%;
+}
+.rightProperty .tbProcessAccessHeader .ckResult,
+.rightProperty .tbProcessAccessBody .ckResult {
+  width: 10%;
+}
+.rightProperty .tbOpeningacceptanceHeader,
+.rightProperty .tbOpeningacceptanceBody {
+  width: 100%;
+  min-width: 402px;
+}
+.rightProperty .tbOpeningacceptanceHeader .manifestIcon,
+.rightProperty .tbOpeningacceptanceBody .manifestIcon {
+  width: 5%;
+}
+.rightProperty .tbOpeningacceptanceHeader .specialities,
+.rightProperty .tbOpeningacceptanceBody .specialities {
+  width: 21%;
+}
+.rightProperty .tbOpeningacceptanceHeader .category,
+.rightProperty .tbOpeningacceptanceBody .category {
+  width: 23%;
+}
+.rightProperty .tbOpeningacceptanceHeader .positon,
+.rightProperty .tbOpeningacceptanceBody .positon {
+  width: 34%;
+}
+.rightProperty .tbOpeningacceptanceHeader .ckResult,
+.rightProperty .tbOpeningacceptanceBody .ckResult {
+  width: 15%;
+}
+.rightProperty .tbConcernsHeader,
+.rightProperty .tbConcernsBody {
+  width: 100%;
+  min-width: 540px;
+}
+.rightProperty .tbConcernsHeader .concernInfo,
+.rightProperty .tbConcernsBody .concernInfo {
+  width: 44%;
+}
+.rightProperty .tbConcernsHeader .category,
+.rightProperty .tbConcernsBody .category {
+  width: 12%;
+}
+.rightProperty .tbConcernsHeader .status,
+.rightProperty .tbConcernsBody .status {
+  width: 10%;
+}
+.rightProperty .tbConcernsHeader .grade,
+.rightProperty .tbConcernsBody .grade {
+  width: 8%;
+}
+.rightProperty .tbConcernsHeader .operator,
+.rightProperty .tbConcernsBody .operator {
+  width: 14%;
+}
+.rightProperty .tbConcernsHeader .type,
+.rightProperty .tbConcernsBody .type {
+  width: 11%;
+}
+.rightProperty .tbConcernsHeader td,
+.rightProperty .tbConcernsBody td {
+  height: 98px;
+  line-height: 98px;
+}
+.rightProperty .tbConcernsBody .concernInfo {
+  line-height: 1.5;
+  vertical-align: top;
+  padding: 10px 0 0 10px;
+}
+.rightProperty .tbConcernsBody .ckImg {
+  float: left;
+  width: 68px;
+  height: 68px;
+}
+.rightProperty .tbConcernsBody .ckHeader {
+  margin-left: 80px;
+  text-align: left;
+}
+.rightProperty .tbConcernsBody .ckHeader .detailicon {
+  float: right;
+  width: 15px;
+  height: 15px;
+  background: url(/static/dist/images/comm/images/commIcon.png) no-repeat;
+  background-position: 0 -660px;
+}
+.rightProperty .tbConcernsBody .ckName {
+  margin-bottom: 6px;
+}
+.rightProperty .tbComm .noDataTd,
+.rightProperty .tbComm .loadingTd {
+  height: 60px;
+  line-height: 60px;
+  text-align: center;
+  color: #ccc;
+  font-size: 16px;
+  border: 0;
+}
+.rightProperty .paginationBottom {
+  position: absolute;
+  bottom: 0px;
+  height: 30px;
+  left: 0px;
+  right: 0px;
+  line-height: 30px;
+}
+.rightProperty .paginationBottom .pageInfo,
+.rightProperty .paginationBottom .sumCount {
+  float: right;
+}
+.rightProperty .paginationBottom .sumCount {
+  margin-right: 15px;
+}
+.rightProperty .paginationBottom .prev {
+  margin-left: 10px;
+}
+.rightProperty .paginationBottom .next {
+  margin-right: 15px;
+  margin-left: 6px;
+}
+.rightProperty .paginationBottom .prev,
+.rightProperty .paginationBottom .next {
+  cursor: pointer;
+  color: #006ECF;
+}
+.rightProperty .paginationBottom .prev:hover,
+.rightProperty .paginationBottom .next:hover {
+  text-decoration: underline;
+}
+.rightProperty .paginationBottom .prev.disable,
+.rightProperty .paginationBottom .next.disable {
+  color: #ccc;
+  text-decoration: none;
+  cursor: default;
+}
+.modelSelectDialog .dialogBody {
+  width: 100%;
+}
+.projectHeader {
+  height: 37px;
+  background-color: #f5f5f5;
+  border-bottom: 1px #ccc solid;
+  position: relative;
+  z-index: 999;
+}
+.projectHeader .changeBtn {
+  display: inline-block;
+  border: 1px #ccc solid;
+  cursor: pointer;
+  float: right;
+  height: 27px;
+  padding: 0px 12px;
+  text-align: center;
+  line-height: 27px;
+  margin-top: 4px;
+  margin-right: 21px;
+}
+#projectContainer {
+  height: 100%;
+  margin-top: -37px;
+  padding-top: 37px;
+  position: relative;
+}
+#projectContainer .leftNav {
+  float: left;
+  width: 238px;
+  border: 1px #ccc solid;
+  position: absolute;
+  top: 36px;
+  bottom: 0px;
+  background-color: #fff;
+}
+#projectContainer .leftNav .leftNavContent {
+  height: 100%;
+}
+#projectContainer .leftNav .projectNavContentBox {
+  margin-top: 1px;
+  position: absolute;
+  top: 40px;
+  width: 100%;
+  bottom: 0px;
+}
+#projectContainer .leftNav .projectNavContentBox .projectModelNavContent {
+  display: none;
+}
+#projectContainer .leftNav .projectNav .item {
+  cursor: default;
+}
+#projectContainer .leftNav .projectNav .item:hover {
+  border-color: #ddd;
+  color: #666;
+}
+#projectContainer .leftNav .slideBar {
+  display: block;
+}
+#projectContainer .leftNav .dragSize {
+  display: block;
+}
+#projectContainer .rightProperty {
+  width: 398px;
+  border: 1px #ddd solid;
+  position: fixed;
+  right: 0px;
+  top: 86px;
+  bottom: 0px;
+  background-color: #fff;
+  z-index: 600;
+}
+#projectContainer .rightProperty .rightPropertyContentBox {
+  height: 100%;
+  position: relative;
+}
+#projectContainer .rightProperty .rightPropertyContentBox .rightPropertyContent {
+  height: 100%;
+}
+#projectContainer .rightProperty .rightPropertyContentBox .rightPropertyContent .designPropetyBox {
+  height: 100%;
+}
+#projectContainer .rightProperty .rightPropertyContentBox .rightPropertyContent .designPropetyBox .projectPropetyContainer {
+  height: 100%;
+  margin-top: -40px;
+  padding-top: 40px;
+}
+#projectContainer .rightProperty .rightPropertyContentBox .rightPropertyContent .designPropetyBox .designChange {
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+#projectContainer .rightProperty .rightPropertyContentBox .slideBar {
+  right: inherit;
+  display: block;
+  left: -15px;
+  top: 40px;
+}
+#projectContainer .rightProperty .rightPropertyContentBox .dragSize {
+  left: -5px;
+  right: inherit;
+  display: block;
+}
+#projectContainer .rightProperty .designProperties {
+  height: 100%;
+  overflow: auto;
+}
+#projectContainer .rightProperty .designProperties .nullTip {
+  background: url(/static/dist/images/projects/images/attrSel.png) no-repeat 50% 100%;
+  padding-top: 200px;
+  height: 50px;
+  line-height: 50px;
+  color: #ccc;
+  font-size: 16px;
+  text-align: center;
+}
+#projectContainer .rightProperty .modle .modleShowHide {
+  transition: all .5s;
+  background: url(/static/dist/images/comm/images/commIcon.png) no-repeat 0px -256px;
+  float: right;
+  margin-right: 12px;
+  margin-top: 6px;
+  height: 14px;
+  width: 14px;
+  cursor: pointer;
+}
+#projectContainer .rightProperty .modle .modleShowHide.down {
+  transform: rotate(180deg);
+  -ms-transform: rotate(180deg);
+  -moz-transform: rotate(180deg);
+  -webkit-transform: rotate(180deg);
+  -o-transform: rotate(180deg);
+  margin-right: 14px;
+}
+#projectContainer .rightProperty .modle .modleName {
+  font-weight: bold;
+  height: 24px;
+  line-height: 24px;
+  padding-left: 12px;
+}
+#projectContainer .rightProperty .modle .modleName .modleNameText {
+  vertical-align: top;
+  width: 95%;
+}
+#projectContainer .rightProperty .modle .modleList {
+  background-color: #eee;
+  border-top: 1px #ccc solid;
+}
+#projectContainer .rightProperty .modle .modleList .modleItem {
+  border-bottom: 1px #ccc solid;
+}
+#projectContainer .rightProperty .modle .modleList .modleItem .modleName {
+  width: 25%;
+  display: inline-block;
+  box-sizing: border-box;
+  padding-left: 12px;
+  border-right: 1px #ccc solid;
+}
+#projectContainer .rightProperty .modle .modleList .modleItem .modleVal {
+  display: inline-block;
+  width: 72%;
+  box-sizing: border-box;
+  padding-left: 12px;
+  margin-left: -3px;
+}
+#projectContainer .rightProperty .modle .modleList .modleItem .modelLink {
+  display: inline-block;
+  padding-left: 12px;
+  color: #3F8CDF;
+  height: 24px;
+  line-height: 24px;
+}
+#projectContainer .projectCotent {
+  position: relative;
+  height: 100%;
+}
+#projectContainer .projectCotent .fileContainer {
+  padding: 10px;
+  height: 100%;
+  box-sizing: border-box;
+}
+#projectContainer .projectCotent .fileContainer .fileContainerScroll {
+  position: absolute;
+  top: 75px;
+  bottom: 0px;
+  left: 10px;
+  right: 10px;
+}
+#projectContainer .projectCotent .fileContainer .modelContainer {
+  height: 500px;
+  position: relative;
+}
+#projectContainer .projectCotent .modelContainer {
+  height: 100%;
+  display: none;
+}
+#projectContainer .projectCotent .modelContainer .modelContainerScroll {
+  height: 100%;
+}
+#projectContainer .projectCotent .modelContainer .modelContainerScroll .modelContainerContent {
+  height: 100%;
+}
+#projectContainer .projectCotent .modelContainer .move {
+  height: 100%;
+}
+.rightTree {
+  padding: 10px 8px;
+}
+.rightTree .rightTreeView {
+  padding-left: 0;
+}
+#treeContainerBody {
+  position: absolute;
+  top: 171px;
+  left: 0px;
+  right: 0px;
+  bottom: 50px;
+  overflow-y: auto;
+}
+.changeListBox .loadings {
+  height: 300px;
+  line-height: 300px;
+  text-align: center;
+  font-size: 16px;
+  color: #ccc;
+}
+.projectChangeListBox .referenceSearch {
+  padding: 11px;
+  position: relative;
+  padding-right: 8px;
+}
+.projectChangeListBox .loading {
+  padding-top: 150px;
+  font-size: 16px;
+  text-align: center;
+  color: #ccc;
+}
+.projectChangeListBox .txtSearch {
+  width: 100%;
+  min-width: 376px;
+  padding-left: 30px;
+}
+.projectChangeListBox .btnSearch {
+  position: absolute;
+  top: 21px;
+  left: 20px;
+}
+.projectChangeListBox .contrastTree .nodeSwitch {
+  background: url(/static/dist/images/comm/images/commIcon.png) no-repeat 0px -39px;
+  display: inline-block;
+  width: 12px;
+  height: 10px;
+  line-height: 8px;
+  vertical-align: top;
+  text-align: center;
+  cursor: pointer;
+  margin-top: 8px;
+  margin-right: 2px;
+}
+.projectChangeListBox .contrastTree .nodeSwitch.on {
+  background-position: 0px -49px;
+}
+.projectChangeListBox .contrastTree .nullChange {
+  height: 50px;
+  line-height: 50px;
+  text-align: center;
+  color: #ccc;
+  font-size: 16px;
+}
+.projectChangeListBox .contrastTree .odd {
+  background-color: #eee;
+}
+.projectChangeListBox .contrastTree .noneSwitch {
+  display: inline-block;
+  width: 11px;
+}
+.projectChangeListBox .contrastTree .node .itemContent {
+  height: 28px;
+  border: 1px #ccc solid;
+  line-height: 26px;
+}
+.projectChangeListBox .contrastTree .node .itemContent.selected {
+  background-color: #A8DBFD;
+}
+.projectChangeListBox .contrastTree .node .comm {
+  float: left;
+  text-align: center;
+  position: relative;
+}
+.projectChangeListBox .contrastTree .node .comm .text {
+  left: 6px;
+  position: absolute;
+  right: 2px;
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.projectChangeListBox .contrastTree .node .repertoireCode {
+  width: 25%;
+  border-right: 1px #ccc solid;
+}
+.projectChangeListBox .contrastTree .node .repertoireName {
+  width: 42%;
+  border-right: 1px #ccc solid;
+}
+.projectChangeListBox .contrastTree .node .beforeChange {
+  width: 16%;
+  border-right: 1px #ccc solid;
+}
+.projectChangeListBox .contrastTree .node .afterChange {
+  width: 16%;
+}
+.projectChangeListBox .contrastTreeSub {
+  display: none;
+}
+.projectChangeListBox .treeContent .node .itemContent {
+  border-top: 0px;
+}
+.projectChangeListBox .treeContent .node .comm {
+  text-align: left;
+  height: 25px;
+}
+.projectChangeListBox .showChange {
+  position: absolute;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  height: 50px;
+  line-height: 48px;
+  background-color: #ddd;
+  padding-left: 20px;
+}
+#projectContainer .rightProperty .modleItem .changeValue {
+  height: 24px;
+  line-height: 24px;
+  display: inline-block;
+  box-sizing: border-box;
+  padding-left: 12px;
+  margin-left: -3px;
+}
+#projectContainer .rightProperty .modleItem .changeValue .modleNameText {
+  vertical-align: top;
+}
+#projectContainer .rightProperty .modleItem .beforeChange {
+  width: 40%;
+  border-right: 1px #ccc solid;
+}
+#projectContainer .rightProperty .modleItem .afterChange {
+  width: 34%;
+}
+#projectContainer .rightProperty .changeColor {
+  color: #CE566F;
+}
+.projectChangeListBox .specialitiesOption {
+  width: 100%;
+  min-width: 398px;
+  padding: 10px;
+  border-bottom: 1px #ccc solid;
+}
+.projectChangeListBox .specialitiesOption .myDropText {
+  width: 100%;
+}
+.projectChangeListBox .specialitiesOption .myDropList {
+  display: block;
+  width: auto;
+  left: 10px;
+  right: 10px;
+}
+.projectChangeListBox .specialitiesOption .myDropList .myItem {
+  height: 28px;
+  line-height: 28px;
+}

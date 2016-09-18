@@ -1,0 +1,293 @@
+body {
+  background-color: #f3f3f3;
+  min-height: 500px;
+  min-width: 1000px;
+}
+#projectContainer {
+  position: absolute;
+  top: 90px;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
+  min-height: 200px;
+  overflow: hidden;
+  overflow-y: auto;
+}
+#projectContainer .rightProperty {
+  display: none;
+  width: 398px;
+  border: 1px #ddd solid;
+  position: absolute;
+  right: 0px;
+  top: 0px;
+  bottom: 0px;
+  background-color: #fff;
+  z-index: 600;
+}
+#projectContainer .rightProperty .rightPropertyContentBox {
+  height: 100%;
+  position: relative;
+}
+#projectContainer .rightProperty .rightPropertyContentBox .rightPropertyContent {
+  height: 100%;
+}
+#projectContainer .rightProperty .rightPropertyContentBox .rightPropertyContent .rightPropertyContent {
+  height: 100%;
+}
+#projectContainer .rightProperty .rightPropertyContentBox .rightPropertyContent .rightPropertyContent .designPropetyBox {
+  height: 100%;
+}
+#projectContainer .rightProperty .rightPropertyContentBox .slideBar {
+  right: inherit;
+  display: block;
+  left: -15px;
+  top: 40px;
+}
+#projectContainer .rightProperty .rightPropertyContentBox .dragSize {
+  left: -5px;
+  right: inherit;
+  display: block;
+}
+#projectContainer .rightProperty .rightPropertyContentBox .projectPropetyContainer {
+  height: 100%;
+  margin-top: -40px;
+  padding-top: 40px;
+}
+#projectContainer .rightProperty .rightPropertyContentBox .projectPropetyContainer .designProperties {
+  height: 100%;
+  overflow: auto;
+}
+#projectContainer .rightProperty .rightPropertyContentBox .projectPropetyContainer .designProperties .attrPlanBox,
+#projectContainer .rightProperty .rightPropertyContentBox .projectPropetyContainer .designProperties .attrCostBox,
+#projectContainer .rightProperty .rightPropertyContentBox .projectPropetyContainer .designProperties .attrQualityBox {
+  display: none;
+}
+#projectContainer .rightProperty .rightPropertyContentBox .projectPropetyContainer .designProperties .nullTip {
+  background: url(/static/dist/images/projects/images/attrSel.png) no-repeat 50% 100%;
+  padding-top: 200px;
+  height: 50px;
+  line-height: 50px;
+  color: #ccc;
+  font-size: 16px;
+  text-align: center;
+}
+#projectContainer .rightProperty .rightPropertyContentBox .modle .modleShowHide {
+  transition: all .5s;
+  background: url(/static/dist/images/comm/images/commIcon.png) no-repeat 1px -256px;
+  float: right;
+  margin-right: 12px;
+  margin-top: 6px;
+  height: 14px;
+  width: 14px;
+  cursor: pointer;
+}
+#projectContainer .rightProperty .rightPropertyContentBox .modle .modleShowHide.down {
+  transform: rotate(180deg);
+  -ms-transform: rotate(180deg);
+  -moz-transform: rotate(180deg);
+  -webkit-transform: rotate(180deg);
+  -o-transform: rotate(180deg);
+}
+#projectContainer .rightProperty .rightPropertyContentBox .modle .modleName {
+  font-weight: bold;
+  height: 24px;
+  line-height: 24px;
+  padding-left: 12px;
+}
+#projectContainer .rightProperty .rightPropertyContentBox .modle .modleName .modleNameText {
+  vertical-align: top;
+  width: 95%;
+}
+#projectContainer .rightProperty .rightPropertyContentBox .modle .modleList {
+  background-color: #eee;
+  border-top: 1px #ccc solid;
+}
+#projectContainer .rightProperty .rightPropertyContentBox .modle .modleList .modleItem {
+  border-bottom: 1px #ccc solid;
+}
+#projectContainer .rightProperty .rightPropertyContentBox .modle .modleList .modleItem .modleName {
+  width: 25%;
+  display: inline-block;
+  box-sizing: border-box;
+  padding-left: 12px;
+  border-right: 1px #ccc solid;
+}
+#projectContainer .rightProperty .rightPropertyContentBox .modle .modleList .modleItem .modleVal {
+  display: inline-block;
+  width: 72%;
+  box-sizing: border-box;
+  padding-left: 12px;
+  margin-left: -3px;
+}
+#projectContainer .rightProperty .rightPropertyContentBox .modle .modleList .modleItem .modelLink {
+  display: inline-block;
+  padding-left: 12px;
+  color: #3F8CDF;
+  height: 24px;
+  line-height: 24px;
+}
+#modelBox {
+  height: 100%;
+  margin-right: 400px;
+  position: relative;
+}
+#modelBox.dwg {
+  margin-right: 0px;
+}
+.header {
+  height: 40px;
+  line-height: 40px;
+  background-color: #f5f5f5;
+  font-size: 14px;
+  color: #000;
+  border: 1px #ccc solid;
+}
+.header .name {
+  margin-left: 30px;
+}
+.header .downLoad {
+  color: #fff;
+  font-size: 14px;
+  float: right;
+  margin-right: 10px;
+  width: 105px;
+  height: 100%;
+  background-color: #117EE1;
+  text-align: center;
+  cursor: pointer;
+}
+.header .downLoad:hover {
+  background-color: #439EF1;
+}
+#topBar {
+  height: 50px;
+  background-color: #005BAC;
+  color: #fff;
+  padding: 0 20px;
+  min-width: 1000px;
+  position: relative;
+  z-index: 999;
+}
+#topBar .logo {
+  height: 50px;
+  background: url('/static/dist/images/topNav/images/logo.png') no-repeat 0px 10px;
+  padding-left: 129px;
+}
+#topBar .logo .text {
+  font-weight: bold;
+  font-size: 20px;
+  display: inline-block;
+  vertical-align: top;
+  margin-top: 13px;
+  border-left: 1px #ccc solid;
+  padding-left: 16px;
+  margin-left: 16px;
+}
+.attrDwgBox {
+  display: none;
+}
+.saveViewPoint .wrapper .header,
+.saveViewPoint .wrapper .content,
+.saveViewPoint .wrapper .footer {
+  background-color: #333;
+  border-color: #5A5A5A;
+}
+.saveViewPoint .wrapper .header .title {
+  color: #fff;
+  font-weight: normal;
+}
+.saveViewPoint .wrapper .btnWhite {
+  background-color: #333;
+  border-color: #555;
+  color: #EBEBEB;
+}
+.saveViewPoint .wrapper .img {
+  width: 82px;
+  height: 62px;
+  background-color: #fff;
+  float: left;
+}
+.saveViewPoint .wrapper .form {
+  margin-left: 100px;
+}
+.saveViewPoint .wrapper .form .name {
+  width: 360px;
+  height: 31px;
+  padding-left: 7px;
+  padding-top: 7px;
+  border: 0;
+  outline: none;
+  margin-bottom: 20px;
+}
+.saveViewPoint .wrapper .form .name.mHeight {
+  height: 62px;
+}
+.saveViewPoint .wrapper .form .desc {
+  resize: none;
+  height: 60px;
+  width: 360px;
+  padding: 5px;
+  margin-bottom: 20px;
+}
+.saveViewPoint .wrapper .form .modelicon {
+  color: #ccc;
+  font-size: 18px;
+  vertical-align: -2px;
+  margin-right: 5px;
+}
+.saveViewPoint .wrapper .info {
+  color: #fff;
+  margin-left: 104px;
+  color: #b9b9b9;
+}
+.saveViewPoint .wrapper .info .name {
+  height: 42px;
+  font-size: 14px;
+  margin-bottom: 5px;
+  width: 98%;
+  color: #fff;
+}
+.saveViewPoint .wrapper .info .desc {
+  margin-bottom: 5px;
+  width: 98%;
+}
+.saveViewPoint .wrapper .info .userName {
+  display: inline-block;
+  width: 60px;
+  margin-right: 10px;
+  vertical-align: bottom;
+}
+.saveViewPoint .wrapper .shareLink {
+  border-top: 1px #666 solid;
+  margin-top: 15px;
+}
+.saveViewPoint .wrapper .shareLink .tipText {
+  color: #fff;
+  font-size: 14px;
+  margin-top: 10px;
+  margin-bottom: 15px;
+}
+.saveViewPoint .wrapper .shareLink .linkUrl {
+  border: 0;
+  width: 351px;
+  padding-left: 7px;
+  font-size: 16px;
+  padding: 4px 5px;
+  outline: none;
+}
+.saveViewPoint .wrapper .shareLink .btnCopy {
+  border: 1px #fff solid;
+  background-color: transparent;
+  color: #fff;
+  height: 32px;
+  vertical-align: top;
+  width: 84px;
+  margin-left: 18px;
+}
+.mod-dialog .header .title {
+  line-height: 44px;
+}
+.saveViewPoint .wrapper .content .shareLink .linkUrl {
+  height: 25px;
+  width: 330px;
+}

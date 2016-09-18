@@ -1,0 +1,24 @@
+#console {
+  height: 100%;
+  overflow: auto;
+  padding: 40px;
+}
+#console .table .title h2 {
+  font-size: 36px;
+}
+.consoleBox {
+  height: 100%;
+  overflow: auto;
+}
+.consoleBox .consoleHeader {
+  font-size: 36px;
+  text-align: center;
+  padding: 15px;
+}
+.consoleBox .consoleContainer .form-horizontal {
+  width: 1000px;
+  margin: 0 auto;
+}
+#treeContainer {
+  padding-left: 100px;
+}

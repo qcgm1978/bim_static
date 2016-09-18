@@ -1,0 +1,1565 @@
+/*!/resources/less/artifacts.less*/
+.pozero {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+}
+.bd-1-c {
+  border: 1px solid #cccccc;
+}
+.clear {
+  clear: both;
+}
+.pdR60 {
+  padding-right: 60px;
+}
+.mgR10 {
+  margin-right: 10px;
+}
+.mgR5 {
+  margin-right: 5px;
+}
+.artifactsNav {
+  background-color: #eeeeee;
+  padding-top: 9px;
+  height: 38px;
+  border-bottom: 1px solid #cccccc;
+  padding-left: 20px;
+  clear: both;
+}
+.artifactsNav li {
+  border-top: 2px solid #eeeeee;
+  float: left;
+  line-height: 27px;
+  height: 29px;
+  width: 98px;
+  text-align: center;
+  margin-bottom: -1px;
+  cursor: pointer;
+}
+.artifactsNav li.active {
+  display: block;
+  border-top: 2px solid #006ecf;
+  border-left: 1px solid #cccccc;
+  border-right: 1px solid #cccccc;
+  border-bottom: 1px solid #eeeeee;
+  background-color: #ffffff;
+}
+.artifactsNav a:link,
+.artifactsNav a:hover,
+.artifactsNav a:visited,
+.artifactsNav a:active {
+  color: #333333;
+  text-decoration: none;
+  cursor: pointer;
+}
+.artifactsNav .projectName {
+  font-size: 14px;
+  float: right;
+  padding-right: 24px;
+}
+#artifacts {
+  position: absolute;
+  top: 87px;
+  z-index: 2;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+.artifactsContent {
+  position: absolute;
+  top: 58px;
+  left: 20px;
+  right: 20px;
+  bottom: 20px;
+  font-size: 12px;
+}
+.artifactsContent .plans,
+.artifactsContent .qualifyC {
+  width: 304px;
+  padding-right: 20px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+}
+.artifactsContent .qualifyC {
+  display: none;
+}
+.artifactsContent .plans li {
+  line-height: 28px;
+  border-bottom: 1px solid #cccccc;
+  padding: 0 17px 0 13px;
+  cursor: pointer;
+  font-size: 12px;
+}
+.artifactsContent .qualityMenu li {
+  line-height: 28px;
+  cursor: pointer;
+  font-size: 12px;
+}
+.qualityMenu .item,
+.qualityMenu .item {
+  border-bottom: 1px solid #cccccc;
+}
+.qualityMenu li .item {
+  padding-left: 14px;
+}
+.qualityMenuListGC li li .item,
+.qualityMenuListKY li li .item {
+  padding-left: 28px;
+}
+.qualityMenuListGC li li li .item,
+.qualityMenuListKY li li li .item {
+  padding-left: 42px;
+}
+.qualityMenuListGC li .item .name,
+.qualityMenuListKY li .item .name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-right: 40px;
+}
+.qualityMenu .item .fold {
+  float: right;
+  width: 40px;
+  height: 27px;
+  position: relative;
+}
+.qualityMenu .item .fold:after {
+  content: "";
+  position: absolute;
+  width: 15px;
+  height: 7px;
+  right: 15px;
+  top: 12px;
+  background: url('/static/dist/images/comm/images/commIcon.png') 0 -260px no-repeat;
+  background-size: 80px auto;
+}
+.qualityMenu .item .fold.active:after {
+  background-position: -40px -380px;
+}
+.qualityMenu .item .count {
+  padding-right: 14px;
+}
+.artifactsContent .plans li .right,
+.qualityMenu .item .count {
+  color: #666666;
+  margin-left: 5px;
+}
+.artifactsContent .plans li.active,
+.qualityMenu .item.active {
+  background-color: #a8dbfd;
+}
+.artifactsContent .artifactsList {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  border: 1px solid #cccccc;
+  right: 20px;
+}
+.artifactsList .plcon {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  top: 39px;
+}
+.artifactsList .plcon .list {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+}
+.artifactsContent .plans h2,
+.artifactsContent .rules h2 {
+  line-height: 38px;
+  padding-left: 13px;
+  font-size: 14px;
+  background-color: #eeeeee;
+  border-bottom: 1px solid #cccccc;
+}
+.artifactsContent .plans li .left {
+  margin-right: 10px;
+}
+.artifactsContent .plans li .name {
+  margin-right: 20px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.artifactsContent .rules h2 .name {
+  margin-right: 10px;
+}
+.artifactsContent .rules h2 span.artiCouter {
+  padding-left: 5px;
+}
+.artifactsContent .rules {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 304px;
+  border: 1px solid #cccccc;
+}
+.artifactsContent .rules li {
+  line-height: 38px;
+  border-bottom: 1px solid #cccccc;
+  font-size: 12px;
+  clear: both;
+}
+.artifactsContent .rules li .left {
+  margin-right: 20px;
+  font-size: 14px;
+}
+.artifactsContent li .getDetail {
+  padding: 0 40px 0 20px;
+  position: relative;
+  color: #6d6d6d;
+}
+.artifactsContent li .desc {
+  cursor: pointer;
+  font-size: 14px;
+  color: #6d6d6d;
+}
+.artifactsContent li .getDetail.active {
+  color: #006ecf;
+}
+.newPlanRule {
+  position: relative;
+  padding: 0 20px 0 22px;
+  color: #006ecf;
+  cursor: pointer;
+}
+.newPlanRule:before {
+  position: absolute;
+  content: "";
+  width: 14px;
+  height: 14px;
+  left: 0;
+  top: 12px;
+  background: transparent url('/static/dist/images/comm/images/commIcon.png') left top no-repeat;
+  background-position: -40px -80px;
+}
+.artifactsContent .rules .ruleTitle {
+  padding: 0 14px;
+}
+.artifactsContent .rules .conlist {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  top: 39px;
+}
+/*修改规则*/
+.ruleDetail.modelRelate .title {
+  top: 0;
+}
+.ruleDetail.modelRelate div {
+  line-height: 44px;
+}
+.ruleDetail.modelRelate .mapRule {
+  padding-top: 0;
+}
+.ruleDetail input {
+  outline: none;
+}
+.ruleDetail input.alert,
+.ruleDetail .typeCode input.alert,
+.ruleDetail .conR input.alert {
+  box-shadow: 0 0 2px red;
+  border-color: red;
+}
+.ruleDetail .mapRule {
+  line-height: 40px;
+  padding-top: 5px;
+  position: relative;
+}
+.ruleDetail {
+  border-top: 1px solid #cccccc;
+  display: none;
+}
+.ruleDetail li {
+  clear: both;
+}
+.ruleDetail li:after {
+  content: '';
+  display: block;
+  clear: both;
+}
+.ruleDetail {
+  background-color: #eeeeee;
+  padding: 0 14px;
+}
+.ruleDetail .title {
+  width: 90px;
+  text-align: right;
+  padding-right: 10px;
+  position: absolute;
+  top: 5px;
+  left: 0;
+}
+.ruleDetail .conR {
+  margin-left: 85px;
+  position: relative;
+}
+.ruleDetail .conR ul {
+  display: none;
+  position: absolute;
+  z-index: 10;
+  left: 0;
+  top: 38px;
+  width: 540px;
+  background-color: #ffffff;
+  border: solid #cccccc;
+  border-width: 0 1px 1px 1px;
+}
+.ruleDetail .conR ul li {
+  line-height: 25px;
+  padding: 0 12px;
+  cursor: pointer;
+}
+.ruleDetail .conR ul li span {
+  float: left;
+  width: 120px;
+}
+.ruleDetail .conR ul li:hover,
+.ruleDetail .conR ul li.active {
+  background-color: #a8dbfd;
+}
+.ruleDetail .conR input {
+  height: 30px;
+  line-height: 28px;
+  border: 1px solid #cccccc;
+  margin-right: 9px;
+  padding-left: 10px;
+  width: 140px;
+}
+.ruleDetail .conR input.last {
+  margin-right: 0;
+}
+.ruleDetail .typeCode {
+  line-height: 49px;
+  border-bottom: 1px solid #cccccc;
+  position: relative;
+}
+.ruleDetail .typeCode input {
+  width: 540px;
+  position: relative;
+  z-index: 3;
+  opacity: 0;
+  background: transparent;
+  border-color: #eeeeee ;
+  height: 30px;
+  line-height: 28px;
+}
+.ruleDetail .conR .chide {
+  position: absolute;
+  background-color: #ffffff;
+  display: block;
+  z-index: 2;
+  width: 540px;
+  left: 0;
+  top: 9px;
+  height: 30px;
+  line-height: 28px;
+  border: 1px solid #cccccc;
+  margin-right: 9px;
+  padding-left: 5px;
+}
+.ruleDetail .typeCode input.active {
+  border-color: #cccccc ;
+  background: #ffffff;
+}
+.ruleDetail .conR .choose {
+  position: absolute;
+  left: 480px;
+  width: 60px;
+  height: 100%;
+  top: 0;
+  padding-left: 20px;
+  z-index: 5;
+  cursor: pointer;
+  color: #006ecf;
+}
+.ruleDetail .myDropDown .myDropText {
+  width: 100px;
+  padding: 0;
+  margin-right: 9px;
+  height: 30px;
+  position: relative;
+  background-color: #ffffff;
+}
+.ruleDetail .myDropText .text {
+  font-size: 12px;
+}
+.ruleDetail .text {
+  display: block;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  z-index: 3;
+  padding: 0 12px;
+}
+.ruleDetail .ioside .myDropText {
+  width: 47px;
+  margin-right: 0;
+  position: relative;
+  padding: 0px;
+}
+.ruleDetail .myDropArrorw {
+  position: absolute;
+  top: -1px;
+  right: 5px;
+  z-index: 0;
+}
+.ruleDetail .leftten {
+  float: left;
+}
+.addNewRule {
+  font-size: 12px;
+  color: #006ecf;
+  cursor: pointer;
+}
+.conR .eIn {
+  width: 280px;
+}
+.ruleDetail .conR .eIn input {
+  width: 100%;
+}
+.ruleDetail .ioside input {
+  width: 89px;
+  border-left: none;
+}
+.ruleDetail .myDropDown {
+  background-color: transparent;
+  z-index: auto;
+}
+.ruleDetail .myDropDown .myDropList {
+  width: 100px;
+  left: 0;
+  z-index: 10;
+  top: 30px;
+}
+.ruleDetail .myDropList .myItem {
+  border-bottom: none;
+}
+.ruleDetail .eIn,
+.ruleDetail .ioside {
+  display: none;
+  float: left;
+}
+.ruleDetail .eIn.active,
+.ruleDetail .ioside.active {
+  display: block;
+}
+.ruleDetail .conR dd {
+  clear: both;
+  height: 40px;
+  padding: 5px 0;
+}
+.ruleDetail .delRule {
+  float: left;
+  position: relative;
+  width: 28px;
+  height: 28px;
+  margin-top: 5px;
+  cursor: pointer;
+}
+.ruleDetail .delRule:before {
+  content: '';
+  position: absolute;
+  width: 13px ;
+  height: 13px;
+  top: 8px;
+  left: 7px;
+  background: transparent url('/static/dist/images/comm/images/commIcon.png') -40px -120px no-repeat;
+  background-size: 80px auto;
+}
+.saveRule {
+  float: left;
+  background-color: #0572d0;
+  color: #ffffff;
+  width: 80px;
+  height: 30px;
+  line-height: 30px;
+  text-align: center;
+  cursor: pointer;
+}
+.saveRule:hover {
+  background-color: #1584e3;
+}
+.deleteRule {
+  float: left;
+  background-color: #ffffff;
+  border: 1px solid #cccccc;
+  color: #6d6d6d;
+  width: 80px;
+  height: 30px;
+  line-height: 30px;
+  text-align: center;
+  cursor: pointer;
+}
+.controlRule {
+  padding: 10px 0 0 75px;
+  height: 50px;
+  border-top: 1px solid #cccccc;
+}
+.ruleDetail .ioside .myDropList {
+  width: 47px;
+}
+.resourcesAlert .alertInfo {
+  height: 110px;
+  line-height: 22px;
+  padding: 20px 0 20px 60px;
+  position: relative;
+}
+.resourcesAlert .alertInfo:before {
+  content: '';
+  position: absolute;
+  background: transparent url('/static/dist/images/services/images/service_ico.png') 0 0 no-repeat;
+  vertical-align: middle;
+  width: 32px;
+  height: 32px;
+  background-position: 0 -300px;
+  left: 10px;
+  top: 20px;
+}
+.resourcesAlert .confirm {
+  text-align: center;
+}
+.resourcesAlert .alertRole {
+  text-align: center;
+  display: none;
+}
+.resourcesAlert .confirm input {
+  outline: none;
+}
+/*导航*/
+.resourcesMappingRule {
+  position: absolute;
+  right: 0;
+  top: 50px;
+  width: 190px;
+  height: 37px;
+  z-index: 1002;
+}
+.resourcesMappingRule a {
+  margin-right: 27px;
+  border-bottom: 2px solid #ffffff;
+  float: right;
+  margin-top: 6px;
+}
+.resourcesMappingRule a.active {
+  border-bottom: 2px solid #006ecf;
+}
+.resourcesMappingRule a,
+.resourcesMappingRule a:link,
+.resourcesMappingRule a:active,
+.resourcesMappingRule a:visited {
+  color: #333333;
+  text-decoration: none;
+  line-height: 28px;
+  font-size: 14px;
+}
+/*分类编码弹窗选择*/
+.artifactsPlanWindowRule {
+  position: absolute;
+  left: 20px;
+  top: 20px;
+  right: 20px;
+  bottom: 60px;
+  border: 1px solid #cccccc;
+  overflow: hidden;
+}
+.artifactsPlanWindowRule .concc {
+  position: absolute;
+  left: 10px;
+  top: 2px;
+  right: 10px;
+  bottom: 5px;
+  overflow: auto;
+}
+.resourcesArtifactTree li {
+  line-height: 25px;
+  clear: both;
+}
+.resourcesArtifactTree .childList {
+  display: none;
+  margin-left: 15px;
+}
+.ruleNodeName i {
+  float: left;
+  width: 9px;
+  height: 9px;
+  margin: 10px 5px 0 0;
+}
+.ruleNodeName i.hasChild {
+  background: url('/static/dist/images/comm/images/tree.png') 0 -9px no-repeat;
+  background-size: 20px auto;
+  cursor: pointer;
+}
+.ruleNodeName i.hasChild {
+  background-position: 0 -20px;
+}
+.ruleNodeName i.hasChild.active {
+  background-position: 0 0;
+}
+.ruleNodeName span.name {
+  float: left;
+  padding: 0 5px;
+  line-height: 25px;
+  cursor: pointer;
+}
+.ruleNodeName span.name.active {
+  background-color: #a8dbfd;
+}
+.windowSubmit {
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
+  background-color: #0572d0;
+  color: #ffffff;
+  width: 80px;
+  height: 30px;
+  line-height: 30px;
+  text-align: center;
+  cursor: pointer;
+}
+.windowSubmit:hover {
+  background-color: #0572d0;
+}
+.qualityProcess {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 20px;
+  height: 40px;
+  border: 1px solid #cccccc;
+  line-height: 38px;
+  overflow: hidden;
+  background-color: #ffffff;
+}
+.qualityProcess div {
+  padding: 0 17px 0 13px;
+  cursor: pointer;
+}
+.qualityProcess .present {
+  position: relative;
+}
+.qualityProcess .present:after {
+  content: '';
+  position: absolute;
+  width: 8px;
+  height: 4px;
+  right: 8px;
+  top: 17px;
+  background: url('/static/dist/images/comm/images/commIcon.png') 0 0 no-repeat;
+  background-size: 80px auto;
+}
+.qualityProcess.active {
+  height: 80px;
+  z-index: 3;
+}
+.qualityProcess.active .present:after {
+  background-position: 0 -10px;
+}
+.qualityProcess .pro:hover {
+  background-color: #a8dbfd;
+}
+.qualityMenu {
+  position: absolute;
+  left: 0;
+  top: 0px;
+  right: 0px;
+  bottom: 0;
+  border: 1px solid #cccccc;
+}
+.services_loading:after {
+  content: '';
+  position: absolute;
+  z-index: 999999;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: #ffffff url('/static/dist/images/comm/images/load.gif') center center no-repeat;
+  background-size: 48px 48px;
+}
+.qualityCon {
+  height: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+}
+.qualityMenuCont {
+  position: absolute;
+  top: 50px;
+  right: 20px;
+  left: 0;
+  bottom: 0;
+}
+/*规则模板*/
+.artifactsTplFrame {
+  left: 0;
+  position: absolute;
+  top: 87px;
+  right: 0;
+  bottom: 0;
+  border-bottom: 1px solid #cccccc;
+}
+.tplListContainer {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 20px;
+  width: 241px;
+  border: solid #cccccc;
+  border-width: 0 1px 1px 0;
+}
+.tplListContainer h2 {
+  line-height: 37px;
+  border-bottom: 1px solid #cccccc;
+  font-size: 14px;
+  padding-left: 14px;
+}
+.tplListContainer .newPlanRule {
+  font-size: 12px;
+}
+.tplListContainer .tplCon {
+  position: absolute;
+  left: 0;
+  top: 38px;
+  right: 0;
+  bottom: 0;
+}
+.tplListContainer .tplCon .list {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  bottom: 20px;
+}
+.tplListContainer .tplCon li {
+  line-height: 38px;
+  border-bottom: 1px solid #cccccc;
+  padding-left: 14px;
+  cursor: pointer;
+}
+.tplListContainer .tplCon li.active {
+  background-color: #a8dbfd;
+}
+.artifactsWindowTpl {
+  position: absolute;
+  top: 65px;
+  left: 20px;
+  right: 20px;
+  bottom: 70px;
+}
+.artifactsWindowTpl h2 {
+  line-height: 44px;
+  font-size: 14px;
+}
+.artifactsWindowTpl input {
+  width: 100%;
+  -webkit-appearance: none;
+  border: 1px solid #cccccc;
+  padding: 0 10px;
+  outline: none;
+  line-height: 28px;
+}
+.tplContent {
+  position: absolute;
+  left: 241px;
+  top: 0;
+  right: 0;
+  bottom: 20px;
+  border-bottom: 1px solid #cccccc;
+}
+.tplContent .cont {
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  top: 0;
+  bottom: 0;
+}
+.tplContent .content {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+}
+.tplContent .default {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  padding-top: 100px;
+  text-align: center;
+  font-size: 14px;
+  color: #9d9d9d;
+  z-index: 2;
+  background-color: #ffffff;
+}
+.tplDetailTitle {
+  line-height: 49px;
+  font-size: 14px;
+}
+.tplDetailTitle span {
+  float: right;
+  color: #0572d0;
+  position: relative;
+  margin-right: 34px;
+  padding-left: 17px;
+}
+.tplDetailTitle span:before {
+  content: "";
+  position: absolute;
+  width: 13px;
+  height: 13px;
+  top: 17px;
+  left: 0;
+  background: url('/static/dist/images/comm/images/commIcon.png') left top no-repeat;
+  background-size: 80px auto;
+}
+.tplDetailTitle span.delete:before {
+  background-position: -40px -120px;
+}
+.tplDetailTitle span.edit:before {
+  background-position: -40px -100px;
+}
+.tplDetailCon {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  top: 49px;
+}
+.tplDetailCon .newPlanRule {
+  display: none;
+}
+#artifacts.tpl {
+  top: 0;
+}
+#artifacts.tpl .artifactsNav {
+  border: 1px solid #cccccc;
+}
+.tplDetailEdit {
+  display: none;
+}
+.tplDetailTitle span,
+.tplDetailTitle input {
+  cursor: pointer;
+}
+.tplDetailTitle .myBtn {
+  margin-top: 10px;
+}
+.tplDetailTitle .inputter {
+  margin-right: 182px;
+}
+.tplDetailTitle input.tplName {
+  margin-top: 10px;
+  border: 1px solid #cccccc;
+  line-height: 28px;
+  width: 100%;
+  padding-left: 10px;
+}
+.tplDetailTitle .myBtn-primary {
+  margin-right: 10px;
+}
+.tplDetailTitle h2 {
+  padding-left: 10px;
+  line-height: 49px;
+}
+/*单选框*/
+.artifactsContent .ruleCheck {
+  display: none;
+}
+.artifactsContent.edit .ruleCheck {
+  display: block;
+}
+.artifactsContent .ruleCheck {
+  position: relative;
+  float: left;
+  width: 15px;
+  height: 15px;
+  margin-right: 5px;
+  background: url('/static/dist/images/comm/images/tree.png') left top no-repeat;
+  background-position: 0 -80px;
+  border: 1px solid #cccccc;
+  margin-top: 8px;
+}
+.artifactsContent .ruleCheck.all {
+  background-position: 0 -40px;
+}
+.artifactsContent .ruleCheck.half {
+  background-position: 0 -60px;
+}
+.artifactsContent .ruleContentRuleList .ruleCheck {
+  margin: 10px 10px 0 0;
+}
+/*缺省*/
+.artifactsContent .default {
+  display: none;
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+}
+.artifactsContent .default span {
+  position: absolute;
+  width: 200px;
+  padding-left: 40px;
+  height: 58px;
+  font-size: 14px;
+  line-height: 29px;
+  margin-left: -100px;
+}
+.artifactsContent .default span:before {
+  content: '';
+  position: absolute;
+  background: transparent url('/static/dist/images/services/images/service_ico.png') 0 0 no-repeat;
+  vertical-align: middle;
+  width: 32px;
+  height: 32px;
+  background-position: 0 -300px;
+  left: 0;
+  top: 0;
+}
+.artifactsContent .default span p {
+  cursor: pointer;
+  color: #0572d0;
+  font-size: 12px;
+}
+.artifactsProjectBreadCrumb {
+  line-height: 36px;
+  padding-left: 20px;
+  height: 37px;
+  border-bottom: 1px solid #cccccc;
+}
+.artifactsProjectBreadCrumb span {
+  display: inline-block;
+  padding-right: 25px;
+  position: relative;
+}
+.artifactsProjectBreadCrumb span:not(:last-child):after {
+  content: '';
+  position: absolute;
+  width: 4px;
+  height: 7px;
+  top: 17px;
+  right: 12px;
+  background: transparent url('/static/dist/images/comm/images/service_ico.png') 0 0 no-repeat;
+  background-position: 0 -640px;
+}
+.qualityMenuListGC,
+.qualityMenuListKY {
+  display: none;
+}
+.artifactsContent.explorer .tplShow {
+  display: none;
+}
+.artifactsTplFrame .ruleContentRuleList dd {
+  padding: 0;
+}
+#tplName {
+  cursor: text;
+}
+
+/*!/resources/less/FamLibs.less*/
+#resourceFamlibsLeftNav {
+  z-index: 99;
+  background-color: #fff;
+  position: absolute;
+  top: 87px;
+  bottom: 0px;
+  left: 0px;
+  border: 1px #ccc solid;
+  border-width: 0px 1px;
+  width: 238px;
+}
+#resourceFamlibsLeftNav .projectNav .item {
+  cursor: default;
+}
+#resourceFamlibsLeftNav .projectNav .item:hover {
+  border-color: #ddd;
+  color: #666;
+}
+#resourceFamlibsLeftNav .projectNavFileContainer {
+  height: 100%;
+  margin-top: -40px;
+  padding-top: 40px;
+}
+#resourceThumContent {
+  margin-left: 10px;
+  border-top: 1px solid #ccc;
+  position: absolute;
+  bottom: 20px;
+  top: 134px;
+  right: 0;
+  left: 228px;
+}
+#resourceThumContent .thumBody {
+  height: 100%;
+}
+#resourceThumContent .hr {
+  border-color: #ccc;
+}
+#resourceThumContent .thumContent .fileName a {
+  word-break: break-all;
+}
+#resourceThumContent .thumContent .item {
+  height: 160px;
+  padding: 15px;
+  text-align: center;
+  float: left;
+  width: 128px;
+  position: relative;
+  margin-right: 10px;
+}
+#resourceThumContent .thumContent .item:hover {
+  background-color: #EBFAFF;
+}
+#resourceThumContent .thumContent .item .ckMe {
+  position: absolute;
+  left: 12px;
+  top: 0px;
+  display: none;
+  top: 7px;
+}
+#resourceThumContent .thumContent .item:hover .ckMe {
+  display: block;
+}
+#resourceThumContent .thumContent .item .text:hover {
+  text-decoration: underline;
+  cursor: pointer;
+}
+#resourceThumContent .thumContent .item .textFolder:hover {
+  text-decoration: none;
+  cursor: pointer;
+}
+#resourceThumContent .thumContent .item .txtEdit {
+  width: 98px;
+  margin-bottom: 10px;
+}
+#resourceThumContent .thumContent .item .btnEnter {
+  float: right;
+  cursor: pointer;
+}
+#resourceThumContent .thumContent .item .btnCalcel {
+  float: right;
+  margin-right: 10px;
+}
+#resourceThumContent .thumContent .item.selected {
+  background-color: #A8DBFD;
+}
+#resourceThumContent .thumContent .item.selected .ckMe {
+  display: block;
+}
+#resourceThumContent .thumContent .item .thumbnailImg {
+  width: 105px;
+  height: 75px;
+  display: block;
+  margin-bottom: 8px;
+}
+#resourceThumContent .thumContent .item .fileName .text {
+  word-break: break-all;
+  overflow: hidden;
+  display: block;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.projectVersionList .listResource {
+  padding: 10px;
+}
+.projectVersionList .listResource .itemA {
+  display: block;
+  height: 24px;
+  line-height: 24px;
+  padding-left: 15px;
+  font-size: 12px;
+  color: #333;
+  vertical-align: middle;
+  width: 218px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.projectVersionList .listResource .itemA:hover {
+  background-color: #D8F3FF;
+  text-decoration: none;
+}
+.resourceCrumbsNav .breadcrumbNav .breadItem .projectVersionList {
+  width: 250px;
+  overflow: auto;
+}
+.standardLibsVersion .projectVersionList {
+  padding: 10px;
+}
+.standardLibsVersion .projectVersionList .itemA {
+  display: block;
+  height: 24px;
+  line-height: 24px;
+  padding-left: 15px;
+  font-size: 12px;
+  color: #333;
+}
+.standardLibsVersion .projectVersionList .itemA:hover {
+  background-color: #D8F3FF;
+  text-decoration: none;
+}
+
+/*!/resources/less/index.less*/
+.servicesIndexBox {
+  height: 100%;
+  background-color: #eee;
+  padding: 30px 0px;
+  overflow-y: auto;
+}
+.servicesIndexBox .servicesIndex {
+  width: 1000px;
+  margin: 0 auto;
+  padding: 0px 150px 80px 150px;
+  background-color: #fff;
+}
+.servicesIndexBox .servicesIndex .item {
+  text-align: center;
+  float: left;
+  width: 33%;
+  margin-top: 80px;
+}
+.servicesIndexBox .servicesIndex .item .iconBg {
+  background: url(/static/dist/images/resources/images/index.png) no-repeat;
+  width: 120px;
+  height: 120px;
+  margin: 0 auto;
+}
+.servicesIndexBox .servicesIndex .item .iconBg.famLibs {
+  background-position: 0px -121px;
+}
+.servicesIndexBox .servicesIndex .item .iconBg.qualityStandardLibs {
+  background-position: 0px -242px;
+}
+.servicesIndexBox .servicesIndex .item .iconBg.manifestLibs {
+  background-position: 0px -363px;
+}
+.servicesIndexBox .servicesIndex .item .iconBg.artifactsMapRule {
+  background-position: 0px -484px;
+}
+.servicesIndexBox .servicesIndex .item .iconBg.device {
+  background-position: 0px -605px;
+}
+.servicesIndexBox .servicesIndex .item .iconBg.planCode {
+  background-position: 0px -726px;
+}
+.servicesIndexBox .servicesIndex .item .bg {
+  margin: 0 auto;
+  width: 120px;
+  height: 122px;
+  background: url('/static/dist/images/services/images/index.png') 0px 1px no-repeat;
+}
+.servicesIndexBox .servicesIndex .item .text {
+  margin-top: 30px;
+  font-size: 18px;
+  color: #666;
+}
+.servicesIndexBox .servicesIndex .item a {
+  text-decoration: none;
+  display: inline-block;
+}
+.servicesIndexBox .servicesIndex .item.project .bg {
+  background-position: 0px -120px;
+}
+.servicesIndexBox .servicesIndex .item.application .bg {
+  background-position: 0px -241px;
+}
+.servicesIndexBox .servicesIndex .item.systen .bg {
+  background-position: 0px -362px;
+}
+.servicesIndexBox .servicesIndex .item.log .bg {
+  background-position: 0px -483px;
+}
+.servicesIndexBox .servicesIndex .item.updatePwd .bg {
+  background-position: 0px -604px;
+}
+.servicesIndexBox .servicesIndex .item.workbook .bg {
+  background-position: 0px -725px;
+}
+.servicesIndexBox .servicesIndex .item.issue .bg {
+  background-position: 0px -846px;
+}
+.servicesIndexBox .servicesIndex .item.device .bg {
+  background-position: 0px -967px;
+}
+.servicesIndexBox .servicesIndex .item.planCode .bg {
+  background-position: 0px -1088px;
+}
+.resourceCrumbsNav {
+  height: 37px;
+  background-color: #f5f5f5;
+  border-bottom: 1px #ccc solid;
+  position: relative;
+  z-index: 999;
+}
+#standardLibs,
+#famLibs {
+  height: 100%;
+  margin-top: -40px;
+  position: relative;
+  padding: 70px 40px 0px 40px;
+}
+#standardLibs .standar .loading,
+#famLibs .standar .loading {
+  text-align: center;
+  color: #ccc;
+  line-height: 40px;
+}
+#standardLibs .standar .item,
+#famLibs .standar .item {
+  font-size: 14px;
+  height: 46px;
+  line-height: 45px;
+  border-bottom: 1px #ccc solid;
+  color: #333;
+  text-align: center;
+}
+#standardLibs .standar.standarHeader .item,
+#famLibs .standar.standarHeader .item {
+  height: 36px;
+  line-height: 36px;
+  border: 1px #ccc solid;
+  border-width: 1px 0px;
+  background-color: #eee;
+  color: #999;
+}
+#standardLibs .standar span,
+#famLibs .standar span {
+  float: left;
+  vertical-align: middle;
+  font-size: 14px;
+}
+#standardLibs .standar .title,
+#famLibs .standar .title {
+  width: 32%;
+  text-align: left;
+  padding-left: 30px;
+}
+#standardLibs .standar .title img,
+#famLibs .standar .title img {
+  height: 38px;
+  vertical-align: top;
+  margin-top: 3px;
+  margin-right: 12px;
+}
+#standardLibs .standar .title .text,
+#famLibs .standar .title .text {
+  margin-left: 68px;
+}
+#standardLibs .standar .designUnit,
+#famLibs .standar .designUnit {
+  width: 30%;
+}
+#standardLibs .standar .createDate,
+#famLibs .standar .createDate {
+  width: 13%;
+}
+#standardLibs .standar .lastModifiedDate,
+#famLibs .standar .lastModifiedDate {
+  width: 13%;
+}
+#standardLibs .standar .introduction,
+#famLibs .standar .introduction {
+  width: 10%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+#standardLibs .standar .introduction b,
+#famLibs .standar .introduction b {
+  font-weight: normal;
+}
+#standardLibs .standar .introduction i,
+#famLibs .standar .introduction i {
+  color: #bbbbbb;
+}
+.standarBody {
+  position: absolute;
+  left: 40px;
+  right: 40px;
+  top: 106px;
+  bottom: 0px;
+}
+.standarBody .standarPagination {
+  float: right;
+}
+.standarBody .sumDesc {
+  margin-top: 20px;
+}
+#resourceModelLeftNav {
+  z-index: 99;
+  background-color: #fff;
+  position: absolute;
+  top: 87px;
+  bottom: 0px;
+  left: 0px;
+  border: 1px #ccc solid;
+  border-width: 0px 1px;
+  width: 238px;
+}
+#resourceModelLeftNav .projectNavFileContainer {
+  height: 100%;
+  margin-top: -40px;
+  padding-top: 40px;
+}
+#resourceModelLeftNav .modelTreeBox {
+  display: none;
+  height: 100%;
+}
+#resourceListContent {
+  margin-left: 10px;
+  position: absolute;
+  bottom: 20px;
+  top: 124px;
+  right: 0;
+  left: 227px;
+}
+#resourceListContent .fileBody {
+  margin-top: -51px;
+  padding-top: 40px;
+  height: 100%;
+}
+#resourceListContent .fileBody .btnEnter {
+  margin-left: 5px;
+  margin-right: 5px;
+  cursor: pointer;
+}
+#navContainer {
+  margin-left: 237px;
+  height: 100%;
+  margin-top: -40px;
+  padding-top: 40px;
+}
+#navContainer .iconTip {
+  display: inline-block;
+  width: 22px;
+  vertical-align: top;
+  height: 20px;
+  background: url('/static/dist/images/projects/images/nullPage.png') no-repeat 0px -879px;
+}
+#navContainer.hideLeft {
+  margin-left: 0px;
+}
+#navContainer .listContent {
+  height: 100%;
+}
+#navContainer .topBar {
+  padding: 10px;
+}
+#navContainer .topBar .btnNormal {
+  margin-right: 7px;
+}
+#navContainer .topBar .btnNewFolder {
+  margin-left: 5px;
+}
+#navContainer .topBar .btnNewFolder .myIcon-createFolder {
+  height: 17px;
+  margin-top: -2px;
+}
+#navContainer .topBar .fileSearchBox {
+  float: right;
+  position: relative;
+}
+#navContainer .topBar .clearSearch {
+  cursor: pointer;
+  display: none;
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  left: 180px;
+  top: 8px;
+  background: url('/static/dist/images/comm/images/commIcon.png') no-repeat -40px -440px;
+}
+#navContainer .topBar #txtFileSearch {
+  width: 200px;
+  vertical-align: top;
+  margin-right: -5px;
+  outline: none;
+  position: relative;
+}
+#navContainer .topBar .searchCount {
+  display: none;
+  height: 27px;
+  line-height: 26px;
+}
+#navContainer .topBar .searchCount .count {
+  color: #ff4c4c;
+}
+#navContainer .modelContentBox {
+  height: 100%;
+  display: none;
+}
+#navContainer .modelContentBox .modelContent {
+  height: 100%;
+  overflow: hidden;
+}
+#navContainer .modelAttr {
+  margin-right: -394px;
+  display: none;
+  width: 396px;
+  border: 1px #ddd solid;
+  position: fixed;
+  right: 0px;
+  top: 87px;
+  bottom: 0px;
+  background-color: #fff;
+  z-index: 600;
+}
+#navContainer .modelAttr .dragSize {
+  left: -5px;
+  display: block;
+}
+#navContainer .modelAttr .slideBar {
+  display: block;
+  left: -15px;
+  top: 40px;
+}
+#navContainer .modelAttr .attrContentBox {
+  height: 100%;
+  margin-top: -40px;
+  padding-top: 40px;
+}
+#navContainer .modelAttr .attrContentBox .attrContent {
+  height: 100%;
+  overflow: auto;
+  min-width: 396px;
+}
+#navContainer .modelAttr .nullTip {
+  background: url(/static/dist/images/projects/images/attrSel.png) no-repeat 50% 100%;
+  padding-top: 200px;
+  height: 50px;
+  line-height: 50px;
+  color: #ccc;
+  font-size: 16px;
+  text-align: center;
+}
+#navContainer .modelAttr .modle .modleShowHide {
+  transition: all .5s;
+  background: url(/static/dist/images/comm/images/commIcon.png) no-repeat 0px -256px;
+  float: right;
+  margin-right: 12px;
+  margin-top: 6px;
+  height: 14px;
+  width: 14px;
+  cursor: pointer;
+}
+#navContainer .modelAttr .modle .modleShowHide.down {
+  transform: rotate(180deg);
+  -ms-transform: rotate(180deg);
+  -moz-transform: rotate(180deg);
+  -webkit-transform: rotate(180deg);
+  -o-transform: rotate(180deg);
+}
+#navContainer .modelAttr .modle .modleName {
+  font-weight: bold;
+  height: 24px;
+  line-height: 24px;
+  padding-left: 12px;
+}
+#navContainer .modelAttr .modle .modleName .modleNameText {
+  vertical-align: top;
+  width: 95%;
+}
+#navContainer .modelAttr .modle .modleList {
+  background-color: #eee;
+  border-top: 1px #ccc solid;
+}
+#navContainer .modelAttr .modle .modleList .modleItem {
+  border-bottom: 1px #ccc solid;
+}
+#navContainer .modelAttr .modle .modleList .modleItem .modleName {
+  width: 25%;
+  display: inline-block;
+  box-sizing: border-box;
+  padding-left: 12px;
+  border-right: 1px #ccc solid;
+}
+#navContainer .modelAttr .modle .modleList .modleItem .modleVal {
+  display: inline-block;
+  width: 72%;
+  box-sizing: border-box;
+  padding-left: 12px;
+  margin-left: -3px;
+}
+#navContainer .modelAttr .modle .modleList .modleItem .modelLink {
+  display: inline-block;
+  padding-left: 12px;
+  color: #3F8CDF;
+  height: 24px;
+  line-height: 24px;
+}
+#resourceFamlibsLeftNav .projectNav,
+#resourceModelLeftNav .projectNav {
+  min-width: 236px;
+  display: none;
+}
+#resourceFamlibsLeftNav .text-field,
+#resourceModelLeftNav .text-field {
+  max-width: 135px;
+}
+.fileTree .loading {
+  color: #ccc;
+  font-size: 14px;
+  margin-top: 30px;
+  text-align: center;
+}
+#listContext {
+  display: none;
+}
+.jqContextMenu #listContext {
+  display: block;
+}
+#listContextFamily {
+  display: none;
+}
+.jqContextMenu #listContextFamily {
+  display: block;
+}
+#contains .btns-flow {
+  float: right;
+  margin-right: 40px;
+  margin-top: 1px;
+}
+#contains .btns-flow a {
+  cursor: pointer;
+  display: inline-block;
+  border: 1px solid #ccc;
+  width: 80px;
+  height: 24px;
+  text-align: center;
+  line-height: 24px;
+  margin-left: 12px;
+  color: #666;
+}
+#contains .btns-flow a:link {
+  text-decoration: none;
+}
+.stand a {
+  width: 103px!important;
+}

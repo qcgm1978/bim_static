@@ -1,0 +1,508 @@
+.model {
+  width: 100%;
+  height: 100%;
+}
+.modelView {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+.modelView .modelBar {
+  width: 328px;
+  position: absolute;
+  left: 0;
+  bottom: 0;
+}
+.modelView .modelBar.open {
+  top: 0;
+}
+.modelView .modelBar .modelMap {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  border: 2px solid #333;
+  border-top: none;
+  height: 220px;
+  background: #333;
+}
+.modelView .modelBar .modelMap .map {
+  height: 180px;
+  background: #fff;
+}
+.modelView .modelBar .modelMap .bar {
+  height: 35px;
+  padding: 5px;
+  color: #fff;
+}
+.modelView .modelBar .modelMap .bar .floors {
+  float: right;
+  width: 80px;
+  height: 25px;
+  background: #333;
+  position: relative;
+  font-size: 14px;
+  cursor: pointer;
+}
+.modelView .modelBar .modelMap .bar .floors .current-floor {
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0 5px;
+  line-height: 24px;
+  position: relative;
+  border: 1px solid #979797;
+}
+.modelView .modelBar .modelMap .bar .floors .current-floor:after {
+  content: '';
+  display: block;
+  width: 8px;
+  height: 4px;
+  background: url(/static/dist/images/comm/images/tree.png) no-repeat 0 -120px;
+  position: absolute;
+  top: 10px;
+  right: 3px;
+  transition: all .5s;
+}
+.modelView .modelBar .modelMap .bar .floors .current-floor.open:after {
+  transform: rotate(-180deg);
+}
+.modelView .modelBar .modelMap .bar .floors .selectFloor {
+  display: none;
+  position: absolute;
+  width: 100%;
+  left: 0;
+  bottom: 100%;
+  background: #333;
+  border: 1px solid #979797;
+  border-bottom: none;
+  z-index: 9;
+}
+.modelView .modelBar .modelMap .bar .floors .selectFloor li {
+  height: 20px;
+  line-height: 20px;
+  padding: 0 8px;
+}
+.modelView .modelBar .modelMap .bar .floors .selectFloor li:hover {
+  background: #000;
+}
+.modelView .modelBar .modelMap .bar .floors .open + .selectFloor {
+  display: block;
+}
+.modelView .modelBar .modelMap .bar .axisGrid {
+  float: left;
+  width: 230px;
+  height: 25px;
+  line-height: 25px;
+  padding: 0 10px;
+  cursor: pointer;
+}
+.modelView .modelBar .modelMap .bar .axisGrid .gridIcon {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-right: 5px;
+  background: url(/static/dist/images/comm/images/tree.png) no-repeat 0 -140px;
+  vertical-align: text-bottom;
+}
+.modelView .modelBar .modelTools {
+  position: absolute;
+  left: 0;
+  bottom: 220px;
+  height: 40px;
+  padding: 0 2px;
+  width: 100%;
+  background: #333;
+}
+.modelView .modelBar .modelTools .bar-group {
+  position: relative;
+  float: left;
+}
+.modelView .modelBar .modelTools .subBar {
+  display: none;
+  position: absolute;
+  left: 0;
+  bottom: 100%;
+  margin-bottom: 1px;
+  background: #333;
+}
+.modelView .modelBar .modelTools .selected + .subBar {
+  display: block;
+}
+.modelView .modelBar .modelTools .bar-item {
+  display: block;
+  float: left;
+  width: 34px;
+  height: 34px;
+  cursor: pointer;
+  border: 1px solid #333;
+  margin: 3px;
+  background: url(/static/dist/images/comm/images/bar.png) no-repeat;
+}
+.modelView .modelBar .modelTools .bar-item:hover {
+  border: 1px solid #666;
+}
+.modelView .modelBar .modelTools .bar-item.selected {
+  background-color: #000;
+  border: 1px solid #000;
+}
+.modelView .modelBar .modelTools .bar-filter {
+  background-position: 0 -1152px;
+}
+.modelView .modelBar .modelTools .bar-filter.selected {
+  background-position: -32px -1152px;
+}
+.modelView .modelBar .modelTools .bar-selected {
+  background-position: 0 -1184px;
+}
+.modelView .modelBar .modelTools .bar-selected.selected {
+  background-position: -32px -1184px;
+}
+.modelView .modelBar .modelTools .bar-fit {
+  background-position: 0 -128px;
+}
+.modelView .modelBar .modelTools .bar-fit.selected {
+  background-position: -32px -128px;
+}
+.modelView .modelBar .modelTools .bar-home {
+  background-position: 0 -896px;
+}
+.modelView .modelBar .modelTools .bar-home.selected {
+  background-position: -32px -896px;
+}
+.modelView .modelBar .modelTools .bar-eye {
+  background-position: 0 -1184px;
+}
+.modelView .modelBar .modelTools .bar-eye.selected {
+  background-position: -32px -1184px;
+}
+.modelView .modelBar .modelTools .bar-zoom {
+  background-position: 0 -1248px;
+}
+.modelView .modelBar .modelTools .bar-zoom.selected {
+  background-position: -32px -1248px;
+}
+.modelView .modelBar .modelTools .bar-grid {
+  background-position: 0 -1216px;
+}
+.modelView .modelBar .modelTools .bar-grid.selected {
+  background-position: -32px -1216px;
+}
+.modelView .modelBar .modelTools .bar-select {
+  background-position: 0 0;
+}
+.modelView .modelBar .modelTools .bar-select.selected {
+  background-position: -32px 0;
+}
+.modelView .modelBar .modelTools .bar-handle {
+  background-position: 0 -32px;
+}
+.modelView .modelBar .modelTools .bar-handle.selected {
+  background-position: -32px -32px;
+}
+.modelView .modelBar .modelTools .bar-rotate {
+  background-position: 0 -160px;
+}
+.modelView .modelBar .modelTools .bar-rotate.selected {
+  background-position: -32px -160px;
+}
+.modelView .modelBar .modelTools .bar-fly {
+  background-position: 0 -224px;
+}
+.modelView .modelBar .modelTools .bar-fly.selected {
+  background-position: -32px -224px;
+}
+.modelView .modelBar .modelTools .bar-viewpoint {
+  background-position: 0 -1120px;
+}
+.modelView .modelBar .modelTools .bar-viewpoint.selected {
+  background-position: -32px -1120px;
+}
+.modelView .modelBar .modelTools .bar-comment {
+  background-position: 0 -608px;
+}
+.modelView .modelBar .modelTools .bar-comment.selected {
+  background-position: -32px -608px;
+}
+.modelView .modelBar .modelTools .bar-opacity {
+  background-position: 0 -1280px;
+}
+.modelView .modelBar .modelTools .bar-opacity.selected {
+  background-position: -32px -1280px;
+}
+.modelView .modelBar .modelTools .bar-more {
+  background-position: 0 -1312px;
+}
+.modelView .modelBar .modelTools .bar-more.selected {
+  background-position: -32px -1312px;
+}
+.modelView .modelBar .modelTree {
+  display: none;
+  color: #fff;
+  position: absolute;
+  width: 100%;
+  top: 0;
+  bottom: 260px;
+  background-color: rgba(0, 0, 0, 0.75);
+  overflow: auto;
+}
+.modelView .modelBar .modelTree .tree {
+  padding-left: 10px;
+}
+.modelView .modelBar .modelTree .subTree {
+  padding-left: 16px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -o-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.modelView .modelBar .modelTree .subTree {
+  display: none;
+}
+.modelView .modelBar .modelTree .item-content {
+  height: 18px;
+  line-height: 18px;
+  margin-top: 6px;
+}
+.modelView .modelBar .modelTree .item-content .nodeSwitch {
+  display: inline-block;
+  margin-right: 2px;
+  width: 9px;
+  height: 9px;
+  background: url(/static/dist/images/comm/images/tree.png) no-repeat 0 -20px;
+  vertical-align: middle;
+}
+.modelView .modelBar .modelTree .item-content .noneSwitch {
+  display: inline-block;
+  margin-right: 2px;
+  width: 9px;
+  height: 9px;
+}
+.modelView .modelBar .modelTree .item-content .viewpoint {
+  display: inline-block;
+  width: 12px;
+  height: 11px;
+  background: url(/static/dist/images/comm/images/tree.png) no-repeat 0 -100px;
+  vertical-align: middle;
+}
+.modelView .modelBar .modelTree .item-content.open .nodeSwitch {
+  background-position: 0 0;
+}
+.modelView .modelBar .modelTree .item-content.open + .subTree {
+  display: block;
+}
+.modelView .modelBar .modelTree .treeCheckbox input[type=checkbox] {
+  display: none;
+}
+.modelView .modelBar .modelTree .treeCheckbox input + .lbl {
+  display: inline-block;
+  width: 13px;
+  height: 13px;
+  background: url(/static/dist/images/comm/images/tree.png) no-repeat 0 -80px;
+  vertical-align: text-bottom;
+}
+.modelView .modelBar .modelTree .treeCheckbox input:checked + .lbl {
+  background-position: 0 -40px;
+}
+.modelView .modelBar .modelTree .tree-text {
+  vertical-align: middle;
+  line-height: 14px;
+  padding: 0 3px;
+  cursor: pointer;
+}
+.modelView .modelBar .modelTree .tree-text.selected {
+  background: #006ECF;
+}
+.modelView .modelBar .modelTree .modeSnapshot {
+  height: 100%;
+  padding-top: 43px;
+}
+.modelView .modelBar .modelTree .modelTab {
+  width: 100%;
+  height: 41px;
+  margin: -43px 0 2px;
+  border-bottom: 1px solid #333;
+  color: #fff;
+  padding: 0 10px 0 20px;
+  font-size: 14px;
+}
+.modelView .modelBar .modelTree .modelTab:after {
+  content: '';
+  display: table;
+  clear: both;
+}
+.modelView .modelBar .modelTree .modelTab .modelTabItem {
+  display: block;
+  float: left;
+  height: 40px;
+  padding: 11px 15px 9px;
+  line-height: 20px;
+  cursor: pointer;
+}
+.modelView .modelBar .modelTree .modelTab .modelTabItem.selected {
+  height: 43px;
+  margin-bottom: -3px;
+  border-bottom: 3px solid #006ecf;
+}
+.modelView .modelBar .modelTree .modelTab .modelTabBtn {
+  height: 24px;
+  font-size: 12px;
+  float: right;
+  margin: 10px 0 6px;
+  padding: 0 5px;
+  border: 1px solid #999;
+  background: none;
+  outline: none;
+}
+.modelView .modelBar .modelTree .modelTab .modelIconView {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  background: url(/static/dist/images/comm/images/tree.png) 0 -100px no-repeat;
+  vertical-align: middle;
+}
+.modelView .modelBar .modelTree .modelTabBox {
+  height: 100%;
+}
+.modelView .modelBar .modelTree .modelTabBox .mobelTabContainer {
+  display: none;
+  height: 100%;
+  overflow: auto;
+}
+.modelView .modelBar .modelTree .modelTabBox .mobelTabContainer.selected {
+  display: block;
+}
+.modelView .modelBar .modelTree .modelTabBox .viewpointList .listItem {
+  padding: 10px 20px;
+  line-height: 1.5;
+}
+.modelView .modelBar .modelTree .modelTabBox .viewpointList .listItem:hover {
+  background-color: rgba(0, 110, 207, 0.8);
+}
+.modelView .modelBar .modelTree .modelTabBox .viewpointList .listItem .itemContent:after {
+  content: '';
+  display: table;
+  clear: both;
+}
+.modelView .modelBar .modelTree .modelTabBox .viewpointList .listItem .img {
+  float: left;
+  width: 80px;
+  height: 60px;
+  background: #fff;
+}
+.modelView .modelBar .modelTree .modelTabBox .viewpointList .listItem .context {
+  margin-left: 90px;
+}
+.modelView .modelBar .modelTree .modelTabBox .viewpointList .listItem .name {
+  color: #fff;
+  font-size: 14px;
+}
+.modelView .modelBar .modelTree .modelTabBox .viewpointList .listItem .summary {
+  color: #666;
+  font-size: 12px;
+}
+.modelView .menu {
+  position: absolute;
+  display: none;
+  width: 50px;
+  background: #333;
+  border: 1px solid #666;
+}
+.modelView .menu .item {
+  display: block;
+  line-height: 22px;
+  font-size: 12px;
+  color: #fff;
+  padding: 0 5px;
+  cursor: pointer;
+}
+.modelView .menu .item:hover {
+  background: #444;
+}
+.modelView .menu.in {
+  display: block;
+}
+.modelInput {
+  width: 100%;
+  height: 30px;
+  font-size: 14px;
+  padding: 0 5px;
+  outline: none;
+  border: 1px solid #ccc;
+}
+.modelInput.error {
+  border-color: #f00;
+}
+.modPop {
+  display: none;
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0);
+  z-index: 999;
+}
+.modPop .modDialog {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 9;
+  background: #333;
+  color: #fff;
+  font-size: 12px;
+}
+.modPop .modDialog .modHeader {
+  height: 50px;
+  padding: 15px 24px;
+  line-height: 20px;
+  position: relative;
+}
+.modPop .modDialog .modHeader .modClose {
+  position: absolute;
+  width: 30px;
+  text-align: center;
+  padding: 5px;
+  right: 9px;
+  top: 10px;
+  cursor: pointer;
+}
+.modPop .modDialog .modBody {
+  width: 600px;
+  height: 360px;
+  background: #fff;
+  position: relative;
+  border: 4px solid #333;
+}
+.modPop .modDialog .modFooter {
+  text-align: right;
+  padding: 10px 13px 20px;
+  box-shadow: 0 3px 3px #666;
+}
+.modPop .modDialog .modFooter .modLabel {
+  margin-right: 20px;
+}
+.modPop .modDialog .modFooter .modInput {
+  height: 30px;
+  width: 60px;
+  background: #fff;
+  border: 1px solid #fff;
+  text-align: center;
+  color: #333;
+  outline: none;
+}
+.modPop .modDialog .modFooter .modInput.error {
+  border: 1px solid #f00;
+}
+.modPop .modDialog .modFooter .submit {
+  width: 80px;
+  height: 30px;
+  text-align: center;
+  border: 1px solid #fff;
+  background: #333;
+  vertical-align: top;
+  outline: none;
+}

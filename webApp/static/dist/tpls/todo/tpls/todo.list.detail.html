@@ -1,0 +1,17 @@
+ 
+ 
+
+<div class="title"> <a href="<%= pcUrl %>" target="_blank"> <%= title %> </a> </div>
+
+ <div class="operator">
+ 	 <span class="text">发起人:</span>  <span><%= initiatorName|| '--' %> </span>
+ </div>
+
+<div class="date">
+	
+	<span class="text receiveTime"><%= type=='commission'?'接收时间：':'更新时间：' %></span> <span><%= receiveTime?new Date(receiveTime).format("yyyy-MM-dd"):'----/--/--' %> </span>  
+</div>
+
+ <% if(status==1 &&  type=='commission' ){%>
+ 	<span class="newMsg"></span>
+ <% } %>

@@ -1,0 +1,616 @@
+.designCollision {
+  height: 100%;
+}
+.designCollSetting {
+  font-size: 14px;
+}
+.designCollSetting .collLabel {
+  display: table;
+  width: 100%;
+  margin-bottom: 10px;
+}
+.designCollSetting .collLabel .labelName {
+  width: 1%;
+  white-space: nowrap;
+  display: table-cell;
+  padding-right: 5px;
+}
+.designCollSetting .collLabel .labelInput {
+  width: 100%;
+  height: 30px;
+  padding: 0 5px;
+  border: 1px solid #ccc;
+  border-radius: 0;
+  outline: none;
+}
+.designCollSetting .collLabel .error {
+  border-color: #f00;
+}
+.designCollSetting .formTree {
+  padding: 10px;
+}
+.designCollSetting .formTree:after {
+  content: '';
+  display: table;
+  clear: both;
+}
+.designCollSetting .formTree .panel {
+  width: 50%;
+  float: left;
+  height: 270px;
+  border: 1px solid #ccc;
+  margin-left: -10px;
+  position: relative;
+}
+.designCollSetting .formTree .panel .panelHead {
+  position: absolute;
+  padding: 5px;
+  background: #fff;
+  left: 10px;
+  top: -13px;
+  color: #999;
+}
+.designCollSetting .formTree .panel + .panel {
+  float: right;
+  margin-right: -10px;
+}
+.designCollSetting .formTree .tree {
+  margin: 20px 0 10px;
+  padding: 0 10px;
+  height: 240px;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+.designCollSetting .formTree .tree .treeView {
+  padding-left: 10px;
+}
+.designCollSetting .formTree .tree .treeView .itemContent {
+  display: block;
+  padding: 4px 0;
+}
+.designCollSetting .formTree .tree .treeView .itemContent .nodeSwitch {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 5px;
+  background: url(/static/dist/images/comm/images/commIcon.png) no-repeat 0 -39px;
+}
+.designCollSetting .formTree .tree .treeView .itemContent .fileIcon {
+  display: inline-block;
+  width: 16px;
+  height: 13px;
+  margin-right: 5px;
+  background: url(/static/dist/images/comm/images/commIcon.png) no-repeat 0 -500px;
+}
+.designCollSetting .formTree .tree .treeView .itemContent .inputCheckbox {
+  float: right;
+}
+.designCollSetting .formTree .tree .treeView .itemContent.open .nodeSwitch {
+  background-position: 0 -49px;
+}
+.designCollSetting .formTree .tree .treeView .itemContent.open + .subTree {
+  display: block;
+}
+.designCollSetting .formTree .tree .treeView .subTree {
+  padding-left: 15px;
+  display: none;
+  font-size: 12px;
+}
+.designCollSetting .formTree .itemNode.file {
+  margin-bottom: 9px;
+}
+.rightProperty .designVerification {
+  height: 100%;
+}
+.rightProperty .modle .modleTitleBar {
+  border-bottom: 1px #ccc solid;
+}
+.rightProperty .modle .modleTitleBar:hover {
+  cursor: pointer;
+}
+.rightProperty .modle .modleShowHide {
+  transition: all .5s;
+  background: url(/static/dist/images/comm/images/commIcon.png) no-repeat 0px -256px;
+  float: right;
+  margin-right: 12px;
+  margin-top: 6px;
+  height: 14px;
+  width: 14px;
+  cursor: pointer;
+}
+.rightProperty .modle .modleShowHide.down {
+  transform: rotate(180deg);
+  -ms-transform: rotate(180deg);
+  -moz-transform: rotate(180deg);
+  -webkit-transform: rotate(180deg);
+  -o-transform: rotate(180deg);
+}
+.rightProperty .modle .modleName {
+  font-weight: bold;
+  height: 24px;
+  line-height: 24px;
+  padding-left: 12px;
+}
+.rightProperty .modle .modleName .modleNameText {
+  vertical-align: top;
+  width: 95%;
+}
+.rightProperty .modle .modleList {
+  background-color: #eee;
+}
+.rightProperty .modle .modleList .modleItem {
+  border-bottom: 1px #ccc solid;
+}
+.rightProperty .modle .modleList .modleItem .modleName {
+  width: 25%;
+  display: inline-block;
+  box-sizing: border-box;
+  padding-left: 12px;
+  border-right: 1px #ccc solid;
+}
+.rightProperty .modle .modleList .modleItem .modleVal {
+  display: inline-block;
+  width: 72%;
+  box-sizing: border-box;
+  padding-left: 12px;
+  margin-left: -3px;
+}
+.rightProperty .modle .modleList .modleItem .modelLink {
+  display: inline-block;
+  padding-left: 12px;
+  color: #3F8CDF;
+  height: 24px;
+  line-height: 24px;
+}
+.rightProperty .ckBox {
+  overflow: auto;
+  height: 100%;
+}
+.rightProperty .ckBox .ckTable {
+  min-width: 500px;
+  width: 100%;
+}
+.rightProperty .ckBox .ckTable th {
+  height: 24px;
+  line-height: 24px;
+  text-align: center;
+}
+.rightProperty .ckBox .ckTable td,
+.rightProperty .ckBox .ckTable th {
+  border: 1px #ccc solid;
+}
+.rightProperty .ckBox .ckTable .issue {
+  width: 55%;
+}
+.rightProperty .ckBox .ckTable .status {
+  width: 11%;
+}
+.rightProperty .ckBox .ckTable .category {
+  width: 10%;
+}
+.rightProperty .ckBox .ckTable .specialty {
+  width: 12%;
+}
+.rightProperty .ckBox .ckTable .professional {
+  width: 12%;
+}
+.rightProperty .ckBox tbody td {
+  padding-top: 10px;
+  padding-bottom: 10px;
+  vertical-align: middle;
+  text-align: center;
+}
+.rightProperty .ckBox tbody .issue {
+  text-align: left;
+}
+.rightProperty .ckBox tbody .issue .ckImg {
+  float: left;
+  padding: 0px 10px;
+  background: #fff;
+}
+.rightProperty .ckBox tbody .issue .ckHeader {
+  margin-left: 84px;
+}
+.rightProperty .ckBox tbody .issue .ckHeader .detailicon {
+  float: right;
+  width: 15px;
+  height: 15px;
+  background: url(/static/dist/images/comm/images/commIcon.png) no-repeat;
+  background-position: 0 -660px;
+}
+.rightProperty .collBox {
+  height: 100%;
+  position: relative;
+  padding-bottom: 40px;
+}
+.rightProperty .collBox .collTips {
+  text-align: center;
+  padding-top: 50px;
+  font-size: 14px;
+}
+.rightProperty .collBox .collTips .nothingIcon {
+  width: 80px;
+  height: 80px;
+  display: inline-block;
+  background: url(/static/dist/images/projects/images/collision.png) no-repeat;
+  background-position: 0 0;
+}
+.rightProperty .collBox .collTips .runningIcon {
+  width: 80px;
+  height: 80px;
+  display: inline-block;
+  background: url(/static/dist/images/projects/images/collision.png) no-repeat;
+  background-position: 0 -80px;
+}
+.rightProperty .collBox .collTips .failedIcon {
+  width: 80px;
+  height: 80px;
+  display: inline-block;
+  background: url(/static/dist/images/projects/images/collision.png) no-repeat;
+  background-position: 0 -160px;
+}
+.rightProperty .collBox .collTips p {
+  margin: 1em 0;
+  color: #ccc;
+}
+.rightProperty .collBox .collTips a {
+  color: #006ecf;
+}
+.rightProperty .collBox .tfoot {
+  position: absolute;
+  width: 100%;
+  bottom: 41px;
+}
+.rightProperty .collBox .tfoot .th {
+  padding: 0 10px;
+  background: #e4e4e4;
+  text-align: right;
+  height: 20px;
+  line-height: 20px;
+}
+.rightProperty .collBox .tfoot .pointTotal {
+  float: left;
+}
+.rightProperty .collBox .tfoot a {
+  color: #006ecf;
+  text-decoration: none;
+}
+.rightProperty .collBox .tfoot a.disabled {
+  color: #ccc;
+}
+.rightProperty .collBox .tfoot .cur {
+  color: #006ecf;
+}
+.rightProperty .collBox .tfoot .nextPage,
+.rightProperty .collBox .tfoot .prePage,
+.rightProperty .collBox .tfoot .pages,
+.rightProperty .collBox .tfoot .cur {
+  float: right;
+}
+.rightProperty .collBox .tfoot .pages,
+.rightProperty .collBox .tfoot .prePage {
+  margin-right: 4px;
+}
+.rightProperty .collBox .ckTable {
+  width: 100%;
+  min-width: 390px;
+  margin-top: -1px;
+}
+.rightProperty .collBox .ckTable th {
+  height: 24px;
+  line-height: 24px;
+  text-align: center;
+}
+.rightProperty .collBox .ckTable td,
+.rightProperty .collBox .ckTable th {
+  border: 1px #ccc solid;
+}
+.rightProperty .collBox .ckTable .collList {
+  width: 85%;
+}
+.rightProperty .collBox .ckTable .collLev {
+  width: 15%;
+  min-width: 50px;
+}
+.rightProperty .collBox .ckTable .selected {
+  background: #cef0ff;
+}
+.rightProperty .collBox .ckTable tbody td {
+  padding-top: 10px;
+  padding-bottom: 10px;
+  vertical-align: middle;
+  text-align: center;
+}
+.rightProperty .collBox .ckTable tbody .collList {
+  text-align: left;
+  position: relative;
+}
+.rightProperty .collBox .ckTable tbody .collList .ckImg {
+  float: left;
+  height: 56px;
+  padding: 0 10px;
+}
+.rightProperty .collBox .ckTable tbody .collList .ckImg img {
+  display: block;
+  width: 80px;
+  height: 56px;
+}
+.rightProperty .collBox .ckTable tbody .collList .ckImg img:hover {
+  width: 200px;
+  height: 140px;
+  position: absolute;
+  z-index: 99;
+  border: 1px solid #ccc;
+  left: -1px;
+  top: -42px;
+}
+.rightProperty .collBox .ckTable tbody .collList .ckHeader {
+  margin-left: 100px;
+}
+.rightProperty .collBox .ckTable tbody .collList .ckHeader .ckName {
+  color: #000;
+}
+.rightProperty .collBox .ckTable tbody .collList .ckHeader .date {
+  color: #ccc;
+  margin-top: 10px;
+}
+.rightProperty .collBox .ckTable tbody .collList .ckHeader .detailicon {
+  float: right;
+  width: 15px;
+  height: 15px;
+  background: url(/static/dist/images/comm/images/commIcon.png) no-repeat;
+  background-position: 0 -660px;
+}
+.rightProperty .collBox .ckTable tfoot th {
+  padding: 0 10px;
+  background: #e4e4e4;
+  text-align: right;
+}
+.rightProperty .collBox .ckTable tfoot .pointTotal {
+  float: left;
+}
+.rightProperty .collBox .ckTable tfoot a {
+  color: #006ecf;
+  text-decoration: none;
+}
+.rightProperty .collBox .ckTable tfoot a.disabled {
+  color: #ccc;
+}
+.rightProperty .collBox .ckTable tfoot .cur {
+  color: #006ecf;
+}
+.rightProperty .detailList {
+  height: 100%;
+  overflow: hidden;
+  padding: 46px 0 0;
+}
+.rightProperty .collHead {
+  position: absolute;
+  border-bottom: 1px solid #ccc;
+  left: 0;
+  top: 0;
+  width: 100%;
+  background: #fff;
+  z-index: 2;
+}
+.rightProperty .collHead:after {
+  content: '';
+  display: table;
+  clear: both;
+}
+.rightProperty .collHead .filterBox {
+  padding: 10px 80px 10px 10px;
+  border-left: 1px solid #ccc;
+  border-right: 1px solid #ccc;
+  position: relative;
+  height: 100%;
+}
+.rightProperty .collHead .filterBox .selectBox {
+  display: block;
+  position: relative;
+}
+.rightProperty .collHead .filterBox .selectBox .inputBox {
+  display: block;
+}
+.rightProperty .collHead .filterBox .selectBox .inputBox:after {
+  width: 8px;
+  height: 4px;
+  content: '';
+  display: block;
+  background: url(/static/dist/images/comm/images/commIcon.png) no-repeat;
+  background-position: 0 0;
+  position: absolute;
+  right: 10px;
+  top: 10px;
+}
+.rightProperty .collHead .filterBox .currColl {
+  width: 100%;
+  height: 25px;
+  outline: none;
+  padding-left: 10px;
+}
+.rightProperty .collHead .filterBox .addButton {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  width: 60px;
+  height: 25px;
+  text-align: center;
+  line-height: 25px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+}
+.rightProperty .collHead .filterBox .addButton .addIcon {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  background: url(/static/dist/images/comm/images/commIcon.png) no-repeat;
+  background-position: 0 -420px;
+  vertical-align: text-top;
+}
+.rightProperty .collHead .filterBox .collSelect {
+  display: none;
+  width: 100%;
+  position: absolute;
+  z-index: 2;
+  left: 0px;
+  top: 25px;
+  padding-top: 10px;
+  border: 1px solid #ccc;
+  border-top: none;
+  background: #fff;
+  overflow: auto;
+  max-height: 240px;
+}
+.rightProperty .collHead .filterBox .collSelect .serch input {
+  width: 100%;
+  height: 25px;
+  outline: none;
+}
+.rightProperty .collHead .filterBox .collSelect .tips {
+  padding-bottom: 10px;
+}
+.rightProperty .collHead .filterBox .collSelect .collList .collItem {
+  height: 24px;
+  padding: 5px 74px 5px 10px;
+  overflow: hidden;
+  cursor: pointer;
+}
+.rightProperty .collHead .filterBox .collSelect .collList .collItem:hover {
+  background-color: #cef0ff;
+}
+.rightProperty .collHead .filterBox .collSelect .collList .collItem.selected {
+  background-color: #cef0ff;
+}
+.rightProperty .collHead .filterBox .collSelect .collList .collName {
+  display: block;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.rightProperty .collHead .filterBox .collSelect .collList .collStatus {
+  width: 64px;
+  color: #b2b2b2;
+  text-align: right;
+  margin-right: -64px;
+  float: right;
+}
+.rightProperty .collHead .filterBox .collSelect .collPage {
+  width: 100%;
+  border-top: 1px solid #ccc;
+  padding: 5px 0;
+  display: table;
+}
+.rightProperty .collHead .filterBox .collSelect .collPage .totalNum {
+  display: table-cell;
+  width: 15%;
+}
+.rightProperty .collHead .filterBox .collSelect .collPage .page {
+  display: table-cell;
+  width: 85%;
+  text-align: right;
+}
+.rightProperty .collHead .filterBox .collSelect .collPage .page .currPage {
+  margin: 0 5px;
+}
+.rightProperty .collHead .filterBox .collSelect .collPage .page .currPage .curr {
+  color: #006dce;
+}
+.rightProperty .collHead .filterBox .collSelect .collPage .page a {
+  color: #006dce;
+  margin: 0 5px;
+}
+.rightProperty .collHead .filterBox .collSelect .collPage .page a.disabled {
+  color: #ccc;
+}
+.rightProperty .collHead .level {
+  width: 15%;
+  padding: 10px 0;
+  min-width: 50px;
+  line-height: 25px;
+  text-align: center;
+  float: left;
+}
+.rightProperty .collFooter {
+  position: absolute;
+  height: 40px;
+  padding-top: 5px;
+  left: 0;
+  bottom: 0;
+  background: #fff;
+  z-index: 2;
+  width: 100%;
+}
+.rightProperty .collFooter .viewSetting,
+.rightProperty .collFooter .export {
+  height: 30px;
+  margin-left: 10px;
+  display: inline-block;
+  padding: 5px 10px;
+  border: 1px solid #ccc;
+  line-height: 18px;
+}
+.rightProperty .collFooter .settingIcon,
+.rightProperty .collFooter .exportIcon {
+  display: inline-block;
+  background: url(/static/dist/images/comm/images/commIcon.png) no-repeat;
+  vertical-align: text-bottom;
+}
+.rightProperty .collFooter .settingIcon {
+  width: 12px;
+  height: 12px;
+  background-position: 0 -440px;
+}
+.rightProperty .collFooter .exportIcon {
+  width: 16px;
+  height: 15px;
+  background-position: 0 -460px;
+}
+.rightProperty .planBox {
+  position: absolute;
+  top: 62px;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
+}
+.rightProperty .planBox .planContent {
+  height: 100%;
+}
+.rightProperty .planBox .planContent .tbPlan {
+  border: 1px #ccc solid;
+  width: 100%;
+  min-width: 398px;
+}
+.rightProperty .planBox .planContent .tbPlan th,
+.rightProperty .planBox .planContent .tbPlan td {
+  border: 1px #ccc solid;
+}
+.rightProperty .planBox .planContent .tbPlan th {
+  text-align: center;
+  height: 28px;
+  line-height: 28px;
+}
+.rightProperty .planBox .planContent .tbPlan td {
+  height: 24px;
+  line-height: 24px;
+}
+.rightProperty .planBox .planContent .tbPlan tbody td {
+  box-sizing: border-box;
+  padding-left: 8px;
+}
+.rightProperty .planBox .planContent .ckItem {
+  width: 7%;
+}
+.rightProperty .planBox .planContent .planId {
+  width: 9%;
+}
+.rightProperty .planBox .planContent .operationalMatters {
+  width: 40%;
+}
+.rightProperty .planBox .planContent .start {
+  width: 20%;
+}
+.rightProperty .planBox .planContent .end {
+  width: 20%;
+}

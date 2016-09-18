@@ -1,0 +1,91 @@
+#applicationManager {
+  height: 100%;
+}
+#applicationManager .serviceHeader {
+  border-bottom: 1px #ccc solid;
+}
+#applicationManager .appContainer {
+  height: 100%;
+  margin-top: -42px;
+  padding: 62px 20px 20px 20px;
+}
+#applicationManager .appContainer .topBar {
+  height: 38px;
+  line-height: 38px;
+  font-size: 14px;
+  padding-left: 15px;
+}
+#applicationManager .appContainer .topBar .create {
+  margin-left: 25px;
+}
+#applicationManager .appContent {
+  height: 100%;
+  border: 1px #ccc solid;
+}
+#applicationManager .appList .name {
+  width: 8%;
+  border-right: 1px #ccc solid;
+}
+#applicationManager .appList .desc {
+  width: 10%;
+  border-right: 1px #ccc solid;
+}
+#applicationManager .appList .appKey {
+  width: 29%;
+  border-right: 1px #ccc solid;
+}
+#applicationManager .appList .appSecret {
+  width: 35%;
+  border-right: 1px #ccc solid;
+}
+#applicationManager .appList .status {
+  width: 6%;
+  border-right: 1px #ccc solid;
+}
+#applicationManager .appList .op {
+  width: 11%;
+}
+#applicationManager .appList .op i {
+  cursor: pointer;
+}
+#applicationManager .appList .left {
+  padding-left: 15px;
+}
+#applicationManager .listHeader {
+  background-color: #eee;
+  height: 28px;
+  line-height: 27px;
+  border: 1px #ccc solid;
+  border-width: 1px 0px;
+}
+#applicationManager .appListContainer {
+  height: 100%;
+  margin-top: -66px;
+  padding-top: 66px;
+}
+#applicationManager .reset {
+  float: right;
+  margin-right: 10px;
+  display: none;
+}
+#applicationManager .listBody .item {
+  height: 38px;
+  line-height: 38px;
+  border-bottom: 1px #ccc solid;
+}
+#applicationManager .listBody .item:hover .reset {
+  display: block;
+}
+#applicationManager .listBody .item.disabled {
+  color: #ccc;
+}
+.addNewApp .txtAppTitle,
+.addNewApp .txtAppDesc,
+.addNewApp .txtAppKey {
+  width: 558px;
+  margin: 10px 0px 20px 0px;
+}
+.addNewApp .txtAppDesc {
+  height: 85px;
+  resize: none;
+}

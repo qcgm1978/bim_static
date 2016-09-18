@@ -1,0 +1,19 @@
+     <div class="roleEdit">
+        <span  class="explorer">查看</span>
+        <% if (obj.editable) {%>
+        <span  class="modify">修改</span>
+        <span  class="delete">删除</span>
+        <% } %>
+    </div>
+
+<div class="sele">
+    <div class="left">
+            <span class="rohead"></span>
+            <span><%= name %></span>
+    </div>
+    <div class="fun">
+        <% if (obj.functions ) { for( var i = 0 ; i < obj.functions.length ; i++) {%>
+        <span class="<%= obj.functions[i].id==1 ?  'adm' : '' %>" title="<%= obj.functions[i].name %>"><%= obj.functions[i].name %></span>
+        <% } } else{ %>暂无数据<%}%>
+    </div>
+</div>

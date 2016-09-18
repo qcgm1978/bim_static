@@ -1,0 +1,121 @@
+<div class="bodyContent">
+	
+	<div id="layoutTodo" class="indexLayout">
+		<!-- 代办-->
+	    <div class="conMonth">
+	        <div class="conHeader">
+				<a  href="#todo" target="_blank"  title="更多">更多</a>
+				<span class="active" data-type="todoTab">待办(<label id="todoCounter">0</label>)</span>
+				<span data-type="doneTab">已办(<label id="doneCounter">0</label>)</span>
+			</div><!--数量需写入-->
+	        <div class="article" id="todoContainer">
+                <table id="todos">
+                    <thead class="listHeader">
+                        <td>待办事项</td>
+                        <td width="68px">发起人</td>
+                        <td width="155px">接收时间</td>
+                    </thead>
+                    <tbody  class="conBody">
+
+                    </tbody>
+
+                </table>
+				<table  style="display: none;" id="dones">
+					<thead class="listHeader">
+					<td>已办事项</td>
+					<td width="68px">发起人</td>
+					<td width="155px">接收时间</td>
+					</thead>
+					<tbody  class="conBody">
+
+					</tbody>
+				</table>
+	        </div>
+	    </div>
+	</div>
+	<div id="layoutSlide" class="indexLayout">
+		<div>
+			<div class="conHeader"><i></i><span id="slideTitle"></span></div>
+			<div class="mmhSlider">
+		    </div>
+		</div>		
+	</div>
+	<div id="layoutMonth" class="indexLayout">
+		<div class="conMonth">
+            <div class="conHeader">
+              	<a href="javascript:;"  title="更多">更多</a>
+                <span class="active" data-type="end"><i class="planEndIcon"></i>本月到期</span>
+                <span data-type="start"><i class="planStartIcon"></i>本月开始</span>
+            </div>
+            <div class="article"  id="endTaskContainer">
+                <table>
+                    <thead>
+                        <tr>
+                            <td><span class="title">计划名称</span></td>
+                            <td>业务事项</td>
+                            <td><span class="level">级别</span></td>
+                            <td><span class="startTime">计划结束日期</span></td>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+	</div>
+	<div id="layoutPost" class="indexLayout">
+		 <!--公告-->
+        <div class="conPro">
+            <div class="conHeader">
+                <!-- <a href="javascript:;"  class="linkBarIcon more" title="更多"></a> -->
+                <i></i>
+                <span>公告</span>
+            </div>
+            <div class="article"  id="postContainer">
+                 <table>
+                    <thead class="listHeader">
+                        <td>标题</th>
+                        <td width="100px">时间</th>
+                    </thead>
+                    <tbody  class="conBody pro" id="proclamation">
+                        
+                    </tbody>
+                </table>
+            </div>
+        </div>
+	</div>
+	<div id="bottomBar">
+    	<div class="linkBar">
+    		<ul>
+    			<li>
+    				<a  href="javascript:;" target="_blank" class="link">快速通道</a>
+    			</li>
+    			<li>
+    				<!-- <i class="linkBarIcon ico"></i> -->
+    				<a  href="javascript:;" target="_blank" class="link">集团官网</a>
+    			</li>
+    			<li>
+    				<!-- <i class="linkBarIcon module"></i> -->
+    				<a  href="javascript:;"  target="_blank" class="link">计划模块化</a>
+    			</li>
+    			<li>
+    				<!-- <i class="linkBarIcon book"></i> -->
+    				<a  href="javascript:;" target="_blank" class="link">图文档系统</a>
+    			</li>
+    			<li>
+    				<!-- <i class="linkBarIcon money"></i> -->
+    				<a  href="javascript:;" target="_blank" class="link">成本管理系统</a>
+    			</li>
+    			<li>
+    				<!-- <i class="linkBarIcon check"></i> -->
+    				<a  href="http://quality-uat.wanda-dev.cn" target="_blank" class="link">质量管理系统</a>
+    			</li>
+    			<li>
+    				<!-- <i class="linkBarIcon plat"></i> -->
+    				<a href="javascript:;" target="_blank" class="link">招采平台</a>
+    			</li>
+    		</ul>
+    	</div>
+    	<div class="info">
+    		大连万达商业地产股份有限公司 &copy; 2016 WANDA版权所有
+    	</div>
+    </div>
+</div>

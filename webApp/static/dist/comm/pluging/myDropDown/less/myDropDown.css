@@ -1,0 +1,81 @@
+.myDropDown {
+  display: inline-block;
+  position: relative;
+  background-color: #fff;
+  z-index: 9;
+}
+.myDropDown .myDropText {
+  width: 146px;
+  padding: 0px 12px;
+  display: inline-block;
+  box-sizing: border-box;
+  line-height: 28px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+}
+.myDropDown .myDropText.disabled {
+  background-color: #eee;
+}
+.myDropDown .myDropText .text {
+  font-size: 12px;
+}
+.myDropDown .myDropArrorw {
+  float: right;
+  width: 10px;
+  background: url(/static/dist/images/comm/images/commIcon.png) no-repeat;
+  height: 10px;
+  margin-top: 14px;
+}
+.myDropDown .myDropArrorw.down {
+  background-position: 0px -10px;
+}
+.myDropDown .myDropList {
+  position: absolute;
+  background-color: #fff;
+  width: 146px;
+  border: 1px #ddd solid;
+  left: 0px;
+  display: none;
+  max-height: 250px;
+  overflow: auto;
+  top: 39px;
+  box-sizing: border-box;
+}
+.myDropDown .myDropList .myItem {
+  height: 25px;
+  line-height: 25px;
+  padding: 0px 12px;
+  cursor: default;
+}
+.myDropDown .myDropList .myItem:hover {
+  background-color: #9fd8fd;
+}
+.myDropDown .myDropList .loading {
+  line-height: 60px;
+  text-align: center;
+  font-size: 14px;
+  color: #ccc;
+}
+.myDropDown .myDropList .myItemGroup {
+  line-height: 28px;
+  background-color: #f5f5f5;
+  cursor: default;
+  padding: 0px 5px;
+}
+.myDropDown.black {
+  background-color: #333;
+}
+.myDropDown.black .myDropText {
+  border-color: #666;
+  color: #eee;
+}
+.myDropDown.black .myDropList {
+  top: 29px;
+  display: block;
+  color: #ffffff;
+  background-color: #333333;
+  border-color: #666;
+}
+.myDropDown.black .myDropList .myItem:hover {
+  background-color: #666;
+}

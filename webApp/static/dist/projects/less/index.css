@@ -1,0 +1,348 @@
+a:hover {
+  color: #408cdf;
+  cursor: pointer;
+}
+.projectSearch {
+  margin-top: 20px;
+  margin-left: 20px;
+}
+.projectSearch .searchHeadText {
+  position: relative;
+  height: 24px;
+  margin-right: 105px;
+}
+.projectSearch .searchHeadText span {
+  position: absolute;
+  margin-top: -4px;
+}
+.projectSearch .searchHeadText .vLine {
+  position: absolute;
+  left: 52px;
+  right: 2px;
+  border-top: 1px #ddd solid;
+  top: 6px;
+}
+.projectSearch input {
+  border: 1px solid #ccc;
+}
+.projectSearch .txtSearch {
+  width: 165px;
+}
+.projectSearch .btnSearch {
+  background-color: #117EE1;
+  display: inline-block;
+  width: 80px;
+  height: 30px;
+  text-align: center;
+  line-height: 30px;
+  color: #fff;
+  margin-left: 80px;
+  letter-spacing: 10px;
+  padding-left: 9px;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+.projectSearch .btnSearch:hover {
+  background-color: #439EF1;
+}
+.projectSearch .btnClear {
+  margin-left: 20px;
+}
+.projectSearch .seniorSearch {
+  float: right;
+  margin-right: 19px;
+  width: 78px;
+  cursor: pointer;
+  margin-top: -58px;
+}
+.projectSearch .seniorSearch i {
+  font-size: 16px;
+  margin-left: 5px;
+  vertical-align: -2px;
+}
+.projectSearch .seniorSearch.down {
+  margin-top: -228px;
+}
+.projectSearch .advancedQueryConditions {
+  display: none;
+}
+.projectSearch .advancedQueryConditions .item {
+  height: 50px;
+  line-height: 50px;
+}
+.projectSearch .advancedQueryConditions .item .searchLabel {
+  width: 66px;
+  margin-left: 10px;
+  display: inline-block;
+}
+.projectSearch .dateBox {
+  display: inline-block;
+  position: relative;
+}
+.projectSearch .dateBox .iconCal {
+  background: url(../comm/images/commIcon.png) no-repeat 6px -232px;
+  position: absolute;
+  right: 1px;
+  width: 28px;
+  height: 28px;
+  top: 11px;
+  background-color: #eee;
+  border-left: 1px #ccc solid;
+}
+.projectSearch .dateBox input {
+  height: 30px;
+  line-height: 30px;
+  padding-left: 8px;
+  broder: 1px #ddd solid;
+  width: 180px;
+  padding-right: 30px;
+}
+.projectSearch .moreSeachText,
+.projectSearch .myDropText {
+  width: 180px;
+}
+.projectSearch .myDropList {
+  width: 180px;
+}
+.displayModeBox {
+  position: relative;
+  margin-left: 20px;
+  margin-right: 20px;
+  height: 30px;
+  margin-top: 20px;
+}
+.displayModeBox .vLine {
+  position: absolute;
+  left: 52px;
+  right: 2px;
+  border-top: 1px #ddd solid;
+  top: 11px;
+}
+.displayModeBox .proText {
+  line-height: 20px;
+}
+.displayModeBox .model {
+  float: right;
+  width: auto;
+}
+.displayModeBox .model .item {
+  float: left;
+  padding: 5px 7px;
+  border: 1px #ddd solid;
+  cursor: pointer;
+  background-color: #F2F2F2;
+  color: #333;
+}
+.displayModeBox .model .item.selected {
+  background-color: #DADADA;
+}
+.displayModeBox .model .list {
+  border-bottom-left-radius: 3px;
+  border-top-left-radius: 3px;
+  border-right-width: 0;
+}
+.displayModeBox .model .map {
+  border-top-right-radius: 3px;
+  border-bottom-right-radius: 3px;
+}
+#projectModes {
+  position: absolute;
+  left: 0px;
+  right: 0px;
+  top: 184px;
+  bottom: 0px;
+}
+#projectModes .proListSite {
+  position: relative;
+  height: 100%;
+}
+#projectModes .proListContent {
+  position: absolute;
+  top: 40px;
+  left: 20px;
+  right: 20px;
+  bottom: 40px;
+}
+#projectModes .pagingBox {
+  position: absolute;
+  bottom: 0px;
+  left: 20px;
+  right: 20px;
+  line-height: 40px;
+}
+#projectModes .pagingBox .sumDesc {
+  float: left;
+  margin-left: 20px;
+}
+#projectModes .pagingBox .listPagination {
+  float: right;
+  margin-right: 20px;
+}
+#projectModes .pagingBox .pagination {
+  margin: 0px;
+}
+#projectModes .proListBox .loading,
+#projectModes .proListBoxHeader .loading {
+  font-size: 14px;
+  color: #ccc;
+  text-align: center;
+}
+#projectModes .proListBox .loading div,
+#projectModes .proListBoxHeader .loading div {
+  margin-top: 20px;
+}
+#projectModes .proListBox span,
+#projectModes .proListBoxHeader span {
+  display: inline-block;
+  vertical-align: top;
+  font-size: 14px;
+}
+#projectModes .proListBox span a,
+#projectModes .proListBoxHeader span a {
+  font-size: 14px;
+}
+#projectModes .proListBox .header,
+#projectModes .proListBoxHeader .header,
+#projectModes .proListBox .item,
+#projectModes .proListBoxHeader .item {
+  height: 36px;
+  border: 1px #ddd solid;
+  border-width: 1px 0px;
+  background-color: #EEE;
+  line-height: 36px;
+  margin: 0px 20px;
+  color: #999;
+}
+#projectModes .proListBox .header .proImg,
+#projectModes .proListBoxHeader .header .proImg,
+#projectModes .proListBox .item .proImg,
+#projectModes .proListBoxHeader .item .proImg {
+  width: 7%;
+}
+#projectModes .proListBox .header .proName,
+#projectModes .proListBoxHeader .header .proName,
+#projectModes .proListBox .item .proName,
+#projectModes .proListBoxHeader .item .proName {
+  width: 24%;
+}
+#projectModes .proListBox .header .proType,
+#projectModes .proListBoxHeader .header .proType,
+#projectModes .proListBox .item .proType,
+#projectModes .proListBoxHeader .item .proType {
+  width: 10%;
+}
+#projectModes .proListBox .header .proRetailing,
+#projectModes .proListBoxHeader .header .proRetailing,
+#projectModes .proListBox .item .proRetailing,
+#projectModes .proListBoxHeader .item .proRetailing {
+  width: 11%;
+}
+#projectModes .proListBox .header .proProvince,
+#projectModes .proListBoxHeader .header .proProvince,
+#projectModes .proListBox .item .proProvince,
+#projectModes .proListBoxHeader .item .proProvince {
+  width: 6%;
+}
+#projectModes .proListBox .header .proCity,
+#projectModes .proListBoxHeader .header .proCity,
+#projectModes .proListBox .item .proCity,
+#projectModes .proListBoxHeader .item .proCity {
+  width: 6%;
+}
+#projectModes .proListBox .header .proStar,
+#projectModes .proListBoxHeader .header .proStar,
+#projectModes .proListBox .item .proStar,
+#projectModes .proListBoxHeader .item .proStar {
+  width: 11%;
+}
+#projectModes .proListBox .header .proEnd,
+#projectModes .proListBoxHeader .header .proEnd,
+#projectModes .proListBox .item .proEnd,
+#projectModes .proListBoxHeader .item .proEnd {
+  width: 11%;
+}
+#projectModes .proListBox .item,
+#projectModes .proListBoxHeader .item {
+  margin-right: 0;
+  margin-left: 0px;
+  background-color: #fff;
+  border-bottom: 1px #ddd solid;
+  height: 46px;
+  line-height: 46px;
+  border-top: 0;
+  margin: 0;
+  color: #666;
+}
+#projectModes .proListBox .item .proImg,
+#projectModes .proListBoxHeader .item .proImg {
+  text-align: center;
+}
+#projectModes .proListBox .item .proImg img,
+#projectModes .proListBoxHeader .item .proImg img {
+  margin-top: 4px;
+}
+#projectModes .proListBox .item .proOp a,
+#projectModes .proListBoxHeader .item .proOp a {
+  color: #006CCD;
+}
+#projectModes.projectModesDown {
+  top: 355px;
+}
+.proMapBox {
+  height: 100%;
+  overflow: hidden;
+}
+.proMapBox .proMapScroll {
+  height: 100%;
+  height: 600PX;
+}
+#container {
+  height: 600px;
+  width: 80%;
+  margin-left: 20px;
+}
+#container .potitionControl {
+  width: 20px;
+  height: 20px;
+  background-color: red;
+  border-radius: 50%;
+  cursor: pointer;
+}
+#mapProjects {
+  position: absolute;
+  width: 398px;
+  background-color: #fff;
+  border: 1px #ddd solid;
+  z-index: 10;
+}
+#mapProjects a {
+  color: #006CCD;
+}
+#mapProjects .proInfo {
+  height: 48px;
+  margin-top: 10px;
+  padding-left: 10px;
+  border-bottom: 1px #ddd solid;
+}
+#mapProjects .header {
+  height: 30px;
+  padding-left: 10px;
+  line-height: 30px;
+}
+#mapProjects .header .close {
+  float: right;
+  margin-right: 10px;
+  cursor: pointer;
+}
+#listContext {
+  display: none;
+}
+.jqContextMenu #listContext {
+  display: block;
+}
+#listContextProject {
+  display: none;
+}
+.jqContextMenu #listContextProject {
+  display: block;
+}

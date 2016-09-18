@@ -1,0 +1,1507 @@
+/*!/libsH5/css/modelStyle.less*/
+.bim {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+  background: #fff;
+}
+.bim.color-1 {
+  background: #fff;
+}
+.bim.color-2 {
+  background: #ccc;
+}
+.bim.color-3 {
+  background: #4a4a4a;
+}
+.bim.color-4 {
+  background: #000;
+}
+.bim.color-5 {
+  background: #748BA6;
+}
+.bim.color-6 {
+  background: #273749;
+}
+.bim .comment .modelSidebar {
+  display: none;
+}
+.bim .comment .modelBar {
+  display: none;
+}
+.bim .comment .view {
+  cursor: default;
+}
+.bim .tips {
+  color: #cfcfcf;
+  margin: 100px auto 0;
+  text-align: center;
+}
+.bim .tips .icon {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  background: url('/static/dist/images/libsH5/images/tip-icon.png') 0 84px repeat-y;
+  vertical-align: middle;
+}
+.bim .tips span {
+  font-size: 20px;
+  vertical-align: middle;
+}
+.bim .selection {
+  position: absolute;
+  z-index: 9;
+  border: 1px solid #03c;
+  background: #000;
+}
+.bim .loading {
+  position: absolute;
+  width: 100%;
+  height: 6px;
+  left: 0;
+  top: 0;
+  background: #ccc;
+  overflow: hidden;
+}
+.bim .progress {
+  display: block;
+  background: #358BD4;
+  height: 6px;
+  width: 0;
+}
+.bim .modelLoading {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  padding: 16px;
+  line-height: 28px;
+  text-align: center;
+  font-size: 12px;
+  color: #7eb2da;
+  margin: -32px 0 0 -32px;
+  width: 64px;
+  height: 64px;
+  background: url(/static/dist/images/libsH5/images/loading-blue-64.gif) no-repeat;
+}
+.bim .view {
+  width: 100%;
+  height: 100%;
+  /*cursor:url('../images/rotate.png'),default;*/
+}
+.bim .fly {
+  cursor: crosshair;
+}
+.bim .zoom {
+  cursor: url('/static/dist/images/libsH5/images/zoom.png'), default;
+}
+.bim .commentBar {
+  position: absolute;
+  z-index: 20;
+  background: #333;
+  left: 50%;
+  bottom: 10px;
+  transform: translate(-50%, 0);
+}
+.bim .modelBar {
+  position: absolute;
+  z-index: 20;
+  background: #333;
+  left: 10px;
+  bottom: 10px;
+}
+.bim .modelSelect {
+  float: left;
+  margin: 5px;
+  position: relative;
+  color: #fff;
+}
+.bim .modelSelect .cur {
+  cursor: pointer;
+  display: block;
+  width: 100px;
+  height: 30px;
+  line-height: 28px;
+  padding: 0 20px 0 5px;
+  border: 1px solid #666;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.bim .modelSelect .cur:after {
+  content: '';
+  position: absolute;
+  display: block;
+  border-top: 4px solid #fff;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  right: 5px;
+  top: 12px;
+  transition: all .5s;
+}
+.bim .modelSelect .cur.open:after {
+  transform: rotate(-180deg);
+}
+.bim .modelSelect .modelList {
+  display: none;
+  position: absolute;
+  width: 100%;
+  bottom: 100%;
+  background: #333;
+  border: 1px solid #666;
+  border-bottom: none;
+}
+.bim .modelSelect .open + .modelList {
+  display: block;
+}
+.bim .modelSelect .modelItem {
+  height: 30px;
+  line-height: 28px;
+  padding: 0 5px;
+  cursor: pointer;
+  list-style: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.bim .bar-item {
+  float: left;
+  display: block;
+  width: 34px;
+  height: 34px;
+  border: 1px solid #333;
+  margin: 3px 2px;
+  color: #fff;
+  position: relative;
+  line-height: 1;
+  font-family: "modelicon" !important;
+  font-size: 32px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-stroke-width: 0.2px;
+  -moz-osx-font-smoothing: grayscale;
+}
+.bim .bar-item:hover {
+  border: 1px solid #666;
+}
+.bim .bar-item.selected {
+  background-color: #000;
+}
+.bim .m-color {
+  background: none;
+}
+.bim .m-color:before {
+  content: '';
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  margin: 6px;
+  background: #ccc;
+  border: 2px solid #fff;
+  border-radius: 1000px;
+}
+.bim .m-color.color-1:before {
+  background: #fff;
+}
+.bim .m-color.color-2:before {
+  background: #ccc;
+}
+.bim .m-color.color-3:before {
+  background: #4a4a4a;
+}
+.bim .m-color.color-4:before {
+  background: #000;
+}
+.bim .m-color.color-5:before {
+  background: #748BA6;
+}
+.bim .m-color.color-6:before {
+  background: #273749;
+}
+.bim .m-fullScreen,
+.bim .m-miniScreen {
+  position: relative;
+  width: 20px;
+  border: none;
+}
+.bim .m-fullScreen:hover,
+.bim .m-miniScreen:hover {
+  border: none;
+}
+.bim .m-fullScreen:before,
+.bim .m-miniScreen:before {
+  position: relative;
+  z-index: 2;
+  color: #ccc;
+  margin: 0 -6px;
+}
+.bim .m-fullScreen:after,
+.bim .m-miniScreen:after {
+  width: 17px;
+  height: 17px;
+  background: #666;
+  content: '';
+  display: block;
+  position: absolute;
+  left: 1px;
+  top: 7px;
+  border-radius: 1000px;
+}
+.bim .modelSidebar {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 328px;
+  transition: all .5s;
+  transform: translate(-100%, 0);
+}
+.bim .modelSidebar.open {
+  top: 0;
+}
+.bim .modelSidebar.open .modelFilter {
+  display: block;
+}
+.bim .modelSidebar.show {
+  transform: translate(0, 0);
+}
+.bim .modelSidebar.hideMap .modelMap {
+  bottom: -220px;
+}
+.bim .modelSidebar.hideMap .modelFilter {
+  bottom: 40px;
+}
+.bim .modelSidebar .toolsBar {
+  width: 100%;
+  height: 40px;
+  position: relative;
+  background: #333;
+}
+.bim .modelSidebar .modelMap {
+  width: 100%;
+  height: 260px;
+  background: rgba(34, 34, 34, 0.85);
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  z-index: 2;
+}
+.bim .modelSidebar .modelMap .map {
+  height: 180px;
+  margin: 0 2px;
+  border-top: 1px solid #999;
+  border-bottom: 1px solid #999;
+}
+.bim .modelSidebar .modelMap .axisGrid {
+  margin: 5px;
+  float: right;
+  max-width: 240px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: right;
+  color: #fff;
+  line-height: 30px;
+  cursor: pointer;
+}
+.bim .modelSidebar .modelMap .axisGrid:before {
+  content: '\e619';
+  font-family: 'modelicon';
+  display: inline;
+  margin-right: 3px;
+  font-size: 16px;
+  vertical-align: middle;
+}
+.bim .modelSidebar .modelMap .modelSelect .cur {
+  width: 60px;
+}
+.bim .modelSidebar .modelFilter {
+  width: 100%;
+  display: none;
+  position: absolute;
+  top: 0;
+  bottom: 260px;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.75);
+  overflow: hidden;
+}
+.bim .modelSidebar .modelTab {
+  height: 100%;
+  overflow: auto;
+}
+.bim .modelSidebar .headTab {
+  height: 41px;
+  padding: 0 20px;
+  border-bottom: 1px solid #333;
+  font-size: 14px;
+  margin-bottom: 2px;
+}
+.bim .modelSidebar .headTab .tabItem {
+  padding: 10px 13px;
+  line-height: 20px;
+  display: inline-block;
+}
+.bim .modelSidebar .headTab .tabItem.cur {
+  border-bottom: 3px solid #006ecf;
+  margin-bottom: -2px;
+}
+.bim .modelSidebar .selectTree {
+  padding: 5px 10px 48px;
+  margin-bottom: -43px;
+  height: 100%;
+  overflow: auto;
+}
+.bim .subBar {
+  display: none;
+  position: absolute;
+  bottom: 100%;
+  margin-bottom: 6px;
+  left: -4px;
+  background: #333;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+.bim .subBar .bar-item {
+  display: inline-block;
+  float: none;
+  vertical-align: top;
+}
+.bim .subBar [class^='bar-item i-'] {
+  background: url(/static/dist/images/libsH5/images/subBar.png) no-repeat;
+}
+.bim .subBar .i-southEast {
+  background-position: 0 0;
+}
+.bim .subBar .i-top {
+  background-position: 0 -32px;
+}
+.bim .subBar .i-bottom {
+  background-position: 0 -64px;
+}
+.bim .subBar .i-left {
+  background-position: 0 -96px;
+}
+.bim .subBar .i-right {
+  background-position: 0 -128px;
+}
+.bim .subBar .i-front {
+  background-position: 0 -160px;
+}
+.bim .subBar .i-behind {
+  background-position: 0 -192px;
+}
+.bim .selected .subBar {
+  display: block;
+}
+.bim .modelTab {
+  overflow: auto;
+}
+.bim .tree {
+  list-style: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+  padding-left: 10px;
+}
+.bim .tree [class^='m-'] {
+  font-family: "modelicon" !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-stroke-width: 0.2px;
+  -moz-osx-font-smoothing: grayscale;
+}
+.bim .tree .itemNode .selected {
+  background: #339933;
+}
+.bim .tree .itemNode .itemContent {
+  padding: 5px 0;
+  height: 28px;
+  line-height: 18px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.bim .tree .itemNode .itemContent i {
+  vertical-align: middle;
+}
+.bim .tree .itemNode .itemContent i.del {
+  cursor: pointer;
+  margin-left: 20px;
+  width: 20px;
+  height: 20px;
+  display: none;
+  background: url(/static/dist/images/libsH5/images/service_ico.png) no-repeat 0 -280px;
+  vertical-align: -10px;
+}
+.bim .tree .itemNode .itemContent .treeText {
+  padding: 3px;
+  cursor: pointer;
+}
+.bim .tree .itemNode .itemContent .selected {
+  background: #006ecf;
+}
+.bim .tree .itemNode .noneSwitch {
+  width: 16px;
+  height: 16px;
+  display: inline-block;
+}
+.bim .tree .treeCheckbox {
+  display: inline-block;
+  vertical-align: middle;
+}
+.bim .tree .treeCheckbox input {
+  display: none;
+}
+.bim .tree .treeCheckbox .m-lbl {
+  display: block;
+  width: 16px;
+  overflow: hidden;
+}
+.bim .tree .treeCheckbox .m-lbl:before {
+  content: '';
+  display: inline-block;
+  width: 13px;
+  height: 13px;
+  background: #fff;
+}
+.bim .tree .treeCheckbox input:checked + .m-lbl:after {
+  content: "\e615";
+  color: #417ae6;
+  line-height: 12px;
+  margin-left: -15px;
+}
+.bim .tree .tree {
+  display: none;
+  padding-left: 15px;
+}
+.bim .tree .open > .tree {
+  display: block;
+}
+.bim .mod-dwg {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: #000;
+  overflow: hidden;
+}
+.bim .mod-dwg .scene {
+  position: relative;
+}
+.bim .mod-dwg .view {
+  position: relative;
+}
+.bim .mod-dwg .tile {
+  position: absolute;
+  width: 512px;
+  height: 512px;
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  z-index: 2;
+}
+.bim .mod-dwg .rect {
+  position: absolute;
+  border: 2px solid #fff;
+  z-index: 9;
+}
+.modelDialog {
+  position: fixed;
+  z-index: 9;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.5);
+}
+.dialogBody {
+  width: 500px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background: #333;
+  color: #fff;
+}
+.dialogBody .dialogHeader {
+  padding: 10px 21px;
+  border-bottom: 1px solid #666;
+  font-size: 16px;
+  line-height: 30px;
+}
+.dialogBody .dialogHeader .dialogClose {
+  float: right;
+  font-size: 16px;
+  cursor: pointer;
+}
+.dialogBody .dialogFooter {
+  padding: 20px;
+  text-align: right;
+  border-top: 1px solid #666;
+}
+.dialogBody .dialogFooter .dialogBtn {
+  width: 80px;
+  height: 30px;
+  font-size: 14px;
+  margin-left: 20px;
+  border: 1px solid #fff;
+  background: #333;
+  outline: none;
+}
+.dialogBody .colorBar {
+  height: 115px;
+  margin: 20px 10px;
+}
+.dialogBody .colorBar .bar-item {
+  display: inline-block;
+  width: 58px;
+  height: 58px;
+  padding: 3px;
+  border-radius: 1000px;
+  margin: 11px;
+  position: relative;
+  border: 2px solid transparent;
+}
+.dialogBody .colorBar .bar-item:before {
+  display: block;
+  width: 48px;
+  height: 48px;
+  content: '';
+  border-radius: 1000px;
+  border: 2px solid #fff;
+}
+.dialogBody .colorBar .bar-item.selected {
+  border: 2px solid #006ECF;
+}
+.dialogBody .colorBar .bar-item.selected:after {
+  content: "\e615";
+  display: block;
+  position: absolute;
+  font-family: "modelicon" !important;
+  color: #006ECF;
+  font-size: 32px;
+  margin: 3px 9px;
+}
+.dialogBody .colorBar .color-1:before {
+  background: #fff;
+}
+.dialogBody .colorBar .color-2:before {
+  background: #ccc;
+}
+.dialogBody .colorBar .color-3:before {
+  background: #4a4a4a;
+}
+.dialogBody .colorBar .color-4:before {
+  background: #000;
+}
+.dialogBody .colorBar .color-5:before {
+  background: #748BA6;
+}
+.dialogBody .colorBar .color-6:before {
+  background: #273749;
+}
+.dialogBody #map {
+  width: 100%;
+  height: 440px;
+}
+.dialogBody .dialogLabel {
+  line-height: 30px;
+  margin-right: 10px;
+  font-size: 16px;
+}
+.dialogBody .dialogLabel .dialogInput {
+  width: 60px;
+  height: 30px;
+  border: none;
+  background: #fff;
+  text-align: center;
+  outline: none;
+  color: #000;
+}
+.modelSelectDialog {
+  font-size: 12px;
+  position: fixed;
+  z-index: 9;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  background: rgba(255, 255, 255, 0);
+}
+.modelSelectDialog .dialogClose {
+  background: url(/static/dist/images/comm/images/tree.png) 0 -200px no-repeat;
+  margin-top: 8px;
+  width: 20px;
+  height: 20px;
+}
+.modelSelectDialog *,
+.modelSelectDialog *:after,
+.modelSelectDialog *:before {
+  box-sizing: border-box;
+}
+.modelSelectDialog .dialogBody {
+  width: 960px;
+  background: #fff;
+  color: #797979;
+  border: 1px solid #eaeaea;
+  border-radius: 3px;
+}
+.modelSelectDialog .dialogBody .dialogHeader {
+  border-bottom: 1px solid #eaeaea;
+}
+.modelSelectDialog .dialogBody .dialogHeader .dialogClose {
+  color: #d6d6d6;
+  font-size: 24px;
+}
+.modelSelectDialog .dialogBody .dialogContent:after {
+  content: '';
+  display: table;
+  clear: both;
+}
+.modelSelectDialog .dialogBody .dialogContent .model {
+  width: 760px;
+  height: 500px;
+  float: left;
+  border-right: 1px solid #d6d6d6;
+}
+.modelSelectDialog .dialogBody .dialogContent .rightBar {
+  width: 198px;
+  float: right;
+  height: 100%;
+}
+.modelSelectDialog .dialogBody .dialogContent .rightBar .tab {
+  height: 40px;
+  padding: 7px 12px 0;
+  background: #e3e3e3;
+  border-bottom: 1px solid #d6d6d6;
+  font-size: 12px;
+}
+.modelSelectDialog .dialogBody .dialogContent .rightBar .tabItem {
+  width: 80px;
+  text-align: center;
+  line-height: 30px;
+  height: 33px;
+  display: inline-block;
+  cursor: pointer;
+}
+.modelSelectDialog .dialogBody .dialogContent .rightBar .tabItem.selected {
+  border-top: 2px solid #4C8CE9;
+  border-left: 1px solid #d6d6d6;
+  border-right: 1px solid #d6d6d6;
+  background: #fff;
+  cursor: default;
+}
+.modelSelectDialog .dialogBody .dialogContent .rightBar .tools {
+  padding: 10px;
+  border-bottom: 1px solid #d6d6d6;
+}
+.modelSelectDialog .dialogBody .dialogContent .rightBar .tools .toolsBtn {
+  cursor: pointer;
+  width: 80px;
+  height: 30px;
+  padding: 0 6px;
+  line-height: 28px;
+  border: 1px solid #d6d6d6;
+  float: left;
+}
+.modelSelectDialog .dialogBody .dialogContent .rightBar .tools .m-checked {
+  display: inline-block;
+  width: 13px;
+  height: 13px;
+  color: #85B200;
+  font-family: 'modelicon';
+  border: 1px solid #85B200;
+  margin-right: 3px;
+}
+.modelSelectDialog .dialogBody .dialogContent .rightBar .tools .m-checked:before {
+  display: block;
+  line-height: 13px;
+  margin-left: -1px;
+}
+.modelSelectDialog .dialogBody .dialogContent .rightBar .tools .isSecleted {
+  float: right;
+  line-height: 30px;
+}
+.modelSelectDialog .dialogBody .dialogContent .rightBar .tools .isSecleted .num {
+  color: #f60;
+  margin: 0 2px;
+}
+.modelSelectDialog .dialogBody .dialogContent .rightBar .tools:after {
+  clear: both;
+  content: '';
+  display: table;
+}
+.modelSelectDialog .dialogBody .dialogContent .rightBar .bim {
+  height: 409px;
+  overflow: auto;
+}
+.modelSelectDialog .dialogBody .dialogFooter {
+  padding: 10px 20px 20px;
+  border-top: 1px solid #eaeaea;
+}
+.modelSelectDialog .dialogBody .dialogFooter .dialogBtn {
+  color: #fff;
+  background: #117EE1;
+}
+#propertyPanel ul,
+#propertyPanel li {
+  list-style: none;
+}
+#propertyPanel .projectPropetyContainer {
+  height: 100%;
+  margin-top: -40px;
+  padding-top: 40px;
+}
+#propertyPanel .projectPropetyContainer .designProperties {
+  height: 100%;
+  overflow: auto;
+}
+#propertyPanel .projectPropetyContainer .designProperties .attrPlanBox,
+#propertyPanel .projectPropetyContainer .designProperties .attrCostBox,
+#propertyPanel .projectPropetyContainer .designProperties .attrQualityBox {
+  display: none;
+}
+#propertyPanel .projectPropetyContainer .designProperties .nullTip {
+  background: url(/static/dist/images/projects/images/attrSel.png) no-repeat 50% 100%;
+  padding-top: 200px;
+  height: 50px;
+  line-height: 50px;
+  color: #ccc;
+  font-size: 16px;
+  text-align: center;
+}
+#propertyPanel .modle .modleShowHide {
+  transition: all .5s;
+  background: url(/static/dist/images/comm/images/commIcon.png) no-repeat 0px -256px;
+  float: right;
+  margin-right: 12px;
+  margin-top: 6px;
+  height: 14px;
+  width: 14px;
+  cursor: pointer;
+}
+#propertyPanel .modle .modleShowHide.down {
+  transform: rotate(180deg);
+  -ms-transform: rotate(180deg);
+  -moz-transform: rotate(180deg);
+  -webkit-transform: rotate(180deg);
+  -o-transform: rotate(180deg);
+}
+#propertyPanel .modle .modleName {
+  font-weight: bold;
+  height: 24px;
+  line-height: 24px;
+  padding-left: 12px;
+}
+#propertyPanel .modle .modleName .modleNameText {
+  vertical-align: top;
+  width: 95%;
+}
+#propertyPanel .modle .modleList {
+  background-color: #eee;
+  border-top: 1px #ccc solid;
+}
+#propertyPanel .modle .modleList .modleItem {
+  border-bottom: 1px #ccc solid;
+}
+#propertyPanel .modle .modleList .modleItem .modleName {
+  width: 25%;
+  display: inline-block;
+  box-sizing: border-box;
+  padding-left: 12px;
+  border-right: 1px #ccc solid;
+}
+#propertyPanel .modle .modleList .modleItem .modleVal {
+  display: inline-block;
+  width: 72%;
+  box-sizing: border-box;
+  padding-left: 12px;
+  margin-left: -3px;
+}
+#propertyPanel .modle .modleList .modleItem .modelLink {
+  display: inline-block;
+  padding-left: 12px;
+  color: #3F8CDF;
+  height: 24px;
+  line-height: 24px;
+}
+
+/*!/libsH5/css/bimview.pro.comment.less*/
+#comment {
+  height: 100%;
+  overflow-y: hidden;
+}
+#comment .fullLoading {
+  display: none;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  bottom: 0px;
+  right: 0px;
+  z-index: 1;
+  background-color: #333;
+  text-align: center;
+  line-height: 100px;
+  font-size: 16px;
+  color: #ccc;
+}
+#comment .commentListBox {
+  height: 100%;
+  overflow: hidden;
+}
+#comment .commentList {
+  height: 100%;
+  position: relative;
+  left: 0px;
+}
+#comment .commentList .navBar {
+  margin-left: 10px;
+}
+#comment .commentList .navBar .item {
+  float: left;
+  height: 45px;
+  line-height: 45px;
+  color: #ccc;
+  width: 80px;
+  text-align: center;
+  border-bottom: 2px transparent solid;
+  cursor: pointer;
+}
+#comment .commentList .navBar .item.selected {
+  color: #fff;
+  border-bottom-color: #005BAC;
+}
+#comment .commentList .navBar .item.save {
+  width: 76px;
+  border: 1px #959A94 solid;
+  height: 25px;
+  line-height: 24px;
+  margin-top: 12px;
+  float: right;
+  margin-right: 10px;
+}
+#comment .commentList .navBar .item.save .iconSave {
+  font-family: "modelicon";
+  vertical-align: -3px;
+  font-size: 18px;
+  margin: 0;
+  padding: 0;
+  width: 18px;
+  color: #b9b9b9;
+}
+#comment .commentList .listBox {
+  position: absolute;
+  top: 46px;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
+  border-top: 1px #666 solid;
+}
+#comment .commentList .listBox .item {
+  height: 80px;
+  color: #ccc;
+}
+#comment .commentList .listBox .item .thumbnailImg {
+  float: left;
+  width: 82px;
+  height: 62px;
+  margin: 10px 0px 0px 5px;
+}
+#comment .commentList .listBox .item .info {
+  margin-left: 120px;
+  padding-top: 9px;
+}
+#comment .commentList .listBox .item .title {
+  width: 98%;
+  height: 42px;
+  font-size: 14px;
+  color: #fff;
+}
+#comment .commentList .listBox .item .desc {
+  margin: 6px 0px 4px 0px;
+}
+#comment .commentList .listBox .item .name {
+  width: 42px;
+}
+#comment .commentList .listBox .item .date {
+  margin-left: 5px;
+  vertical-align: middle;
+}
+#comment .commentList .listBox .item .remarkCount {
+  float: right;
+  margin-right: 5px;
+  margin-top: 3px;
+}
+#comment .commentList .listBox .item .remarkCount .m-comment {
+  font-family: "modelicon";
+}
+#comment .commentList .listBox .item .remarkCount:hover {
+  cursor: pointer;
+}
+#comment .commentList .listBox .item .remarkCount:hover .text {
+  text-decoration: underline;
+  color: #fff;
+}
+#comment .commentList .listBox .item:hover {
+  background-color: rgba(51, 51, 51, 0.8);
+}
+#comment .commentList .listBox .item.selected {
+  background-color: rgba(0, 110, 207, 0.8);
+}
+#comment .commentList .listBox .item .iconType {
+  font-family: "modelicon";
+  float: left;
+  margin-left: 10px;
+  margin-top: 9px;
+  color: #fff;
+}
+#comment .projectListBox,
+#comment .userListBox {
+  height: 100%;
+}
+#comment .commentRemark {
+  position: absolute;
+  top: 6px;
+  left: 330px;
+  right: 0px;
+  bottom: 0px;
+  overflow: hidden;
+}
+#comment .commentRemark i {
+  font-family: "modelicon";
+}
+#comment .commentRemark .icon-trash {
+  font-family: FontAwesome;
+}
+#comment .commentRemark .iconDel {
+  margin-right: 5px;
+}
+#comment .commentRemark .iconType {
+  color: #fff;
+  float: left;
+  margin-left: 5px;
+  margin-right: -5px;
+  margin-top: 9px;
+}
+#comment .commentRemark .header {
+  height: 49px;
+  border-bottom: 1px #666 solid;
+  line-height: 48px;
+  padding: 0px 10px;
+}
+#comment .commentRemark .talkReMark {
+  position: absolute;
+  bottom: 0px;
+  background-color: #444;
+  width: 100%;
+  padding-right: 10px;
+}
+#comment .commentRemark .talkReMark.hidden {
+  display: none;
+}
+#comment .commentRemark .noLogin {
+  position: absolute;
+  bottom: 0px;
+  color: #fff;
+  padding: 15px;
+  background-color: #444;
+  left: 0px;
+  right: 0px;
+  z-index: 1;
+}
+#comment .commentRemark .noLogin .btnLogin {
+  cursor: pointer;
+}
+#comment .commentRemark .noLogin .btnLogin:hover {
+  text-decoration: underline;
+}
+#comment .commentRemark .reMarkListBox {
+  width: 328px;
+  position: absolute;
+  top: 49px;
+  bottom: 100px;
+  left: 0px;
+  right: 0px;
+}
+#comment .commentRemark .viewPointInfo {
+  color: #ccc;
+  padding-bottom: 10px;
+}
+#comment .commentRemark .viewPointInfo .thumbnailImg {
+  float: left;
+  width: 82px;
+  height: 62px;
+  margin: 10px 0px 0px 10px;
+}
+#comment .commentRemark .viewPointInfo .info {
+  margin-left: 120px;
+  padding-top: 9px;
+}
+#comment .commentRemark .viewPointInfo .title {
+  width: 98%;
+  height: 42px;
+  font-size: 14px;
+  color: #fff;
+}
+#comment .commentRemark .viewPointInfo .name {
+  width: 42px;
+}
+#comment .commentRemark .viewPointInfo .date {
+  margin-left: 5px;
+  vertical-align: middle;
+}
+#comment .commentRemark .viewPointInfo:hover {
+  background-color: rgba(51, 51, 51, 0.8);
+}
+#comment .commentRemark .viewPointInfo.selected {
+  background-color: rgba(0, 110, 207, 0.8);
+}
+#comment .commentRemark .viewPointInfo .remarkCount {
+  display: none;
+}
+#comment .commentRemark .remarkBox {
+  margin-top: 4px;
+  margin: 10px 10px;
+  border: 1px #666 solid;
+  border-width: 1px 0px;
+  font-size: 14px;
+  padding: 8px 0px;
+  margin-top: 0px;
+}
+#comment .commentRemark .iconComment {
+  font-family: "modelicon";
+  margin-right: 5px;
+  color: #b9b9b9;
+  font-size: 16px;
+}
+#comment .commentRemark .goList {
+  color: #b9b9b9;
+  cursor: pointer;
+}
+#comment .commentRemark .iconBack {
+  font-size: 18px;
+  width: 21px;
+  margin: 0px;
+  font-family: "modelicon";
+  vertical-align: -4px;
+  display: inline-block;
+}
+#comment .commentRemark .operators {
+  float: right;
+  cursor: pointer;
+  color: #fff;
+  font-size: 16px;
+}
+#comment .commentRemark .operators .iconShare {
+  margin-left: 5px;
+}
+#comment .commentRemark .operators i {
+  font-size: 16px;
+}
+#comment .commentRemark .inputBox {
+  width: 310px;
+  margin-left: 8px;
+  color: #333;
+  border-radius: 3px;
+  background-color: #fff;
+}
+#comment .commentRemark .txtReMark {
+  width: 100%;
+  border: 0;
+  height: 42px;
+  outline: none;
+  resize: none;
+  padding: 5px;
+}
+#comment .commentRemark .txtReMark.input {
+  height: 85px;
+}
+#comment .commentRemark .uploadImg {
+  display: none;
+}
+#comment .commentRemark .btnEnter {
+  float: right;
+  margin: 10px 2px 10px 0px;
+  width: 100px;
+  height: 28px;
+  background-color: transparent;
+  outline: 0;
+  border: 1px #fff solid;
+}
+#comment .commentRemark .btnIcon {
+  margin-top: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  width: 24px;
+  height: 24px;
+  display: inline-block;
+  text-align: center;
+  background-color: #666;
+  margin-right: 7px;
+}
+#comment .commentRemark .btnIcon.m-img {
+  margin-left: 9px;
+}
+#comment .commentRemark .reMarkList .item {
+  border-bottom: 1px #666 solid;
+  margin: 0px 10px 8px 20px;
+  padding-bottom: 10px;
+}
+#comment .commentRemark .reMarkList .item:hover .delTalkBox .delTalk {
+  display: inline;
+}
+#comment .commentRemark .reMarkList .item .userInfo {
+  margin-top: 5px;
+}
+#comment .commentRemark .reMarkList .item .userImg {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+}
+#comment .commentRemark .reMarkList .item .userName {
+  margin-left: 5px;
+  vertical-align: 3px;
+}
+#comment .commentRemark .reMarkList .item .date {
+  float: right;
+  color: #999;
+}
+#comment .commentRemark .reMarkList .item .content {
+  margin: 5px 0px 0px 25px;
+}
+#comment .commentRemark .reMarkList .item .singleAttachment {
+  margin: 8px 0px 8px 25px;
+}
+#comment .commentRemark .reMarkList .item .singleAttachment .linkImg:hover {
+  color: #fff;
+  text-decoration: none;
+}
+#comment .commentRemark .reMarkList .item .singleAttachment .img {
+  width: 42px;
+  height: 32px;
+  margin-right: 5px;
+}
+#comment .commentRemark .reMarkList .item .singleAttachment .text {
+  line-height: 32px;
+  color: #fff;
+  padding: 2px 5px;
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 210px;
+  vertical-align: top;
+}
+#comment .commentRemark .reMarkList .item .singleAttachment .text.selected {
+  background-color: rgba(0, 110, 207, 0.8);
+}
+#comment .commentRemark .reMarkList .item .delTalkBox {
+  height: 20px;
+  text-align: right;
+}
+#comment .commentRemark .reMarkList .item .delTalkBox .delTalk {
+  display: none;
+  cursor: pointer;
+}
+#comment .commentRemark .reMarkList .item .delTalkBox .delTalk:hover {
+  text-decoration: underline;
+}
+#comment .commentRemark .singleImg {
+  height: 42px;
+  line-height: 44px;
+  background-color: #eee;
+  color: #999;
+  margin-bottom: 5px;
+}
+#comment .commentRemark .singleImg .talkImg {
+  width: 42px;
+  height: 30px;
+  border: 1px #ccc solid;
+  vertical-align: top;
+  margin: 7px 0px 7px 7px;
+  display: none;
+}
+#comment .commentRemark .singleImg .imgName {
+  margin-left: 7px;
+  width: 220px;
+}
+#comment .commentRemark .singleImg .imgName.upload {
+  colro: #666;
+}
+#comment .commentRemark .singleImg .delUploadImg {
+  float: right;
+  cursor: pointer;
+  margin-right: 10px;
+  display: none;
+}
+#comment .loading {
+  position: static;
+  background-color: transparent;
+  color: #fff;
+  font-size: 16px;
+  text-align: center;
+  height: 100px;
+}
+#topSaveTip {
+  float: left;
+  background-color: #fff;
+  height: 40px;
+  line-height: 40px;
+  padding-left: 1px;
+  color: #fff;
+}
+#topSaveTip .content {
+  background-color: #333;
+  padding-right: 15px;
+}
+#topSaveTip .btnSave {
+  display: inline-block;
+  background-color: #fff;
+  color: #006ECF;
+  width: 62px;
+  height: 26px;
+  line-height: 25px;
+  text-align: center;
+  border-radius: 3px;
+  margin-left: 10px;
+  margin-right: 15px;
+  cursor: pointer;
+  vertical-align: 1px;
+}
+#topSaveTip .btnCanel {
+  cursor: pointer;
+}
+.saveViewPoint .wrapper .header,
+.saveViewPoint .wrapper .content,
+.saveViewPoint .wrapper .footer {
+  background-color: #333;
+  border-color: #5A5A5A;
+}
+.saveViewPoint .wrapper .header .title {
+  color: #fff;
+  font-weight: normal;
+}
+.saveViewPoint .wrapper .btnWhite {
+  background-color: #333;
+  border-color: #555;
+  color: #EBEBEB;
+}
+.saveViewPoint .wrapper .img {
+  width: 82px;
+  height: 62px;
+  background-color: #fff;
+  float: left;
+}
+.saveViewPoint .wrapper .form {
+  margin-left: 100px;
+}
+.saveViewPoint .wrapper .form .name {
+  width: 360px;
+  height: 31px;
+  padding-left: 7px;
+  padding-top: 7px;
+  border: 0;
+  outline: none;
+  margin-bottom: 20px;
+}
+.saveViewPoint .wrapper .form .name.mHeight {
+  height: 62px;
+}
+.saveViewPoint .wrapper .form .desc {
+  resize: none;
+  height: 60px;
+  width: 360px;
+  padding: 5px;
+  margin-bottom: 20px;
+}
+.saveViewPoint .wrapper .form .modelicon {
+  color: #ccc;
+  font-size: 18px;
+  vertical-align: -2px;
+  margin-right: 5px;
+}
+.saveViewPoint .wrapper .info {
+  color: #fff;
+  margin-left: 104px;
+  color: #b9b9b9;
+}
+.saveViewPoint .wrapper .info .name {
+  height: 42px;
+  font-size: 14px;
+  margin-bottom: 5px;
+  width: 98%;
+  color: #fff;
+}
+.saveViewPoint .wrapper .info .desc {
+  margin-bottom: 5px;
+  width: 98%;
+}
+.saveViewPoint .wrapper .info .userName {
+  display: inline-block;
+  width: 60px;
+  margin-right: 10px;
+  vertical-align: bottom;
+}
+.saveViewPoint .wrapper .shareLink {
+  border-top: 1px #666 solid;
+  margin-top: 15px;
+}
+.saveViewPoint .wrapper .shareLink .tipText {
+  color: #fff;
+  font-size: 14px;
+  margin-top: 10px;
+  margin-bottom: 15px;
+}
+.saveViewPoint .wrapper .shareLink .linkUrl {
+  border: 0;
+  width: 351px;
+  padding-left: 7px;
+  font-size: 16px;
+  padding: 4px 5px;
+  outline: none;
+}
+.saveViewPoint .wrapper .shareLink .btnCopy {
+  border: 1px #fff solid;
+  background-color: transparent;
+  color: #fff;
+  height: 32px;
+  vertical-align: top;
+  width: 84px;
+  margin-left: 18px;
+}
+.viewPointContext.jqContextMenu {
+  background-color: #333;
+  color: #fff;
+  width: 80px;
+  border: 0;
+}
+.viewPointContext.jqContextMenu li {
+  padding-left: 15px;
+  cursor: pointer;
+}
+.viewPointContext.jqContextMenu li:hover {
+  background-color: transparent;
+}
+#viewPointContextPoint {
+  display: none;
+}
+.jqContextMenu #viewPointContextPoint {
+  display: block;
+}
+#comment .mCustomScrollbar .mCSB_scrollTools_vertical .mCSB_draggerContainer {
+  background-color: transparent;
+}
+
+/*!/libsH5/css/dwg.comment.less*/
+#dwgCommentContainer {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  z-index: -1;
+}
+.bim .commentBar.hide {
+  display: none;
+}
+#dwgCommentToolBar {
+  position: absolute;
+  z-index: 20;
+  background: #333;
+  left: 50%;
+  bottom: 10px;
+  transform: translate(-50%, 0);
+}
+#dwgCommentToolBar .bar-item {
+  float: left;
+  display: block;
+  width: 34px;
+  height: 34px;
+  border: 1px solid #333;
+  margin: 3px 2px;
+  color: #fff;
+  position: relative;
+  line-height: 1;
+  font-family: "modelicon" !important;
+  font-size: 32px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-stroke-width: 0.2px;
+  -moz-osx-font-smoothing: grayscale;
+}
+#dwgCommentToolBar .bar-item.selected {
+  background-color: #000;
+}
+
+/*!/libsH5/css/fonts/iconfont.css*/
+
+@font-face {font-family: "modelicon";
+  src: url('/static/dist/comm/libsH5/css/fonts/iconfont.eot?t=1470817039'); /* IE9*/
+  src: url('/static/dist/comm/libsH5/css/fonts/iconfont.eot?t=1470817039#iefix') format('embedded-opentype'), /* IE6-IE8 */
+  url('/static/dist/comm/libsH5/css/fonts/iconfont.woff?t=1470817039') format('woff'), /* chrome, firefox */
+  url('/static/dist/comm/libsH5/css/fonts/iconfont.ttf?t=1470817039') format('truetype'), /* chrome, firefox, opera, Safari, Android, iOS 4.2+*/
+  url('/static/dist/comm/libsH5/css/fonts/iconfont.svg?t=1470817039#modelicon') format('svg'); /* iOS 4.1- */
+}
+
+.modelicon {
+  font-family:"modelicon" !important;
+  font-size:16px;
+  font-style:normal;
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-stroke-width: 0.2px;
+  -moz-osx-font-smoothing: grayscale;
+}
+.m-rect:before { content: "\e600"; }
+.m-filter:before { content: "\e601"; }
+.m-selected:before { content: "\e602"; }
+.m-zoom:before { content: "\e603"; }
+.m-ellipse:before { content: "\e604"; }
+.m-fit:before { content: "\e605"; }
+.m-home:before { content: "\e606"; }
+.m-camera:before { content: "\e607"; }
+.m-more:before { content: "\e608"; }
+.m-fit2d:before { content: "\e609"; }
+.m-arrow:before { content: "\e60b"; }
+.m-mark:before { content: "\e60d"; }
+.m-text:before { content: "\e60e"; }
+.m-fly:before { content: "\e60f"; }
+.m-miniScreen:before { content: "\e610"; }
+.m-fullScreen:before { content: "\e611"; }
+.m-translucent:before { content: "\e612"; }
+.m-closeTree:before { content: "\e613"; }
+.m-openTree:before { content: "\e614"; }
+.m-checked:before { content: "\e615"; }
+.m-part:before { content: "\e616"; }
+.m-saveCamera:before { content: "\e617"; }
+.m-open:before { content: "\e618"; }
+.m-axis:before { content: "\e619"; }
+.m-download:before { content: "\e61a"; }
+.m-share:before { content: "\e61b"; }
+.m-save:before { content: "\e61c"; }
+.m-unlock:before { content: "\e61d"; }
+.m-lock:before { content: "\e61e"; }
+.m-close:before { content: "\e61f"; }
+.m-comment:before { content: "\e620"; }
+.m-goBack:before { content: "\e621"; }
+.m-rotateMouse:before { content: "\e623"; }
+.m-rotateCamera:before { content: "\e624"; }
+.m-rotateObj:before { content: "\e625"; }
+.m-hideObj:before { content: "\e626"; }
+.m-view:before { content: "\e627"; }
+.m-rotate:before { content: "\e628"; }
+.m-cloud:before { content: "\e629"; }
+.m-edit:before { content: "\e62a"; }
+.m-img:before { content: "\e622"; }
+.m-address:before { content: "\e62b"; }
+.m-zoomRect:before { content: "\e60c"; }
+.m-tip:before { content: "\e60a"; }
+.m-single-model:before { content: "\e631"; }
+.m-single-dwg:before { content: "\e630"; }
+.m-single-rvt:before { content: "\e62e"; }
+.m-moren:before { content: "\e636"; }
+.m-jingyingguanli32:before { content: "\e638"; }
+.m-shangguangongcheng:before { content: "\e637"; }
+.m-zhaoshangguanli:before { content: "\e639"; }
+.m-shejiguanli:before { content: "\e63a"; }
+.m-fazhanguanli:before { content: "\e63b"; }
+.m-chengbenguanli:before { content: "\e63d"; }
+.m-jihuaguanli:before { content: "\e63e"; }
+.m-zhiliangguanli:before { content: "\e63f"; }

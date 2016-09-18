@@ -1,0 +1,51 @@
+.nullPage {
+  line-height: 50px;
+  color: #ccc;
+  font-size: 16px;
+  text-align: center;
+}
+.nullPage .bg {
+  height: 74px;
+  background: url('/static/dist/images/projects/images/nullPage.png') no-repeat center -327px;
+  display: block;
+  margin-top: 147px;
+}
+.nullPage.noPlan .bg {
+  background-position: 156px -400px;
+}
+.nullPage.publicity .bg {
+  display: inline-block;
+  width: 29px;
+  height: 20px;
+  background-position: 0px -878px;
+  vertical-align: -3px;
+  margin: 0px;
+  padding: 0px;
+}
+.nullPage.costList {
+  background: #fff;
+}
+.nullPage.costList .bg {
+  background-position: 156px -482px;
+  background-color: #fff;
+  margin-top: 30px;
+}
+.nullPage.costChange .bg {
+  background-position: 156px -568px;
+}
+.nullLinkData {
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  box-sizing: border-box;
+  padding-top: 140px;
+  position: absolute;
+  top: 51px;
+  background: #EEE;
+}
+.nullLinkData .iconLinkBg {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto;
+  background: url('/static/dist/images/projects/images/nullPage.png') no-repeat 0 -800px;
+}

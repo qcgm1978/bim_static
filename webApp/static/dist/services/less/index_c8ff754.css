@@ -1,0 +1,95 @@
+.servicesIndexBox {
+  height: 100%;
+  background-color: #eee;
+  padding: 30px 0px;
+  overflow-y: auto;
+}
+.servicesIndexBox .servicesIndex {
+  width: 1000px;
+  margin: 0 auto;
+  padding: 0px 150px 80px 150px;
+  background-color: #fff;
+}
+.servicesIndexBox .servicesIndex .item {
+  text-align: center;
+  float: left;
+  width: 33%;
+  margin-top: 80px;
+}
+.servicesIndexBox .servicesIndex .item .bg {
+  margin: 0 auto;
+  width: 120px;
+  height: 122px;
+  background: url('/static/dist/images/services/images/index.png') 0px 1px no-repeat;
+}
+.servicesIndexBox .servicesIndex .item .text {
+  margin-top: 30px;
+  font-size: 18px;
+  color: #666;
+}
+.servicesIndexBox .servicesIndex .item a {
+  text-decoration: none;
+}
+.servicesIndexBox .servicesIndex .item.project .bg {
+  background-position: 0px -120px;
+}
+.servicesIndexBox .servicesIndex .item.application .bg {
+  background-position: 0px -241px;
+}
+.servicesIndexBox .servicesIndex .item.systen .bg {
+  background-position: 0px -362px;
+}
+.servicesIndexBox .servicesIndex .item.log .bg {
+  background-position: 0px -483px;
+}
+.servicesIndexBox .servicesIndex .item.updatePwd .bg {
+  background-position: 0px -604px;
+}
+.servicesIndexBox .servicesIndex .item.workbook .bg {
+  background-position: 0px -725px;
+}
+.servicesIndexBox .servicesIndex .item.issue .bg {
+  background-position: 0px -846px;
+}
+.serviceHeader {
+  position: relative;
+  z-index: 1;
+}
+.serviceHeader .crumbs {
+  border-top: 1px solid #ccc;
+  padding-left: 20px;
+  height: 40px;
+}
+.serviceHeader .crumbs .item {
+  float: left;
+  line-height: 40px;
+  height: 40px;
+}
+.serviceHeader .crumbs .iconLeft {
+  margin: 16px 15px 0px 15px;
+  width: 5px;
+  vertical-align: top;
+}
+.serviceHeader .serviceNav {
+  background-color: #eee;
+  border: 1px solid #ccc;
+  border-width: 1px 0px;
+  padding-top: 8px;
+  height: 38px;
+  padding-left: 20px;
+}
+.serviceHeader .serviceNav .item {
+  border-top: 2px solid #eee;
+  float: left;
+  line-height: 27px;
+  height: 29px;
+  width: 98px;
+  text-align: center;
+  cursor: pointer;
+}
+.serviceHeader .serviceNav .item.selected {
+  border: 1px #ccc solid;
+  border-top: 2px solid #006ecf;
+  border-bottom-color: #fff;
+  background-color: #fff;
+}

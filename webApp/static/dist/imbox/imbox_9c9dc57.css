@@ -1,0 +1,728 @@
+/*!/imbox/css/index.less*/
+.imboxNavWrap .header {
+  height: 40px;
+  border-bottom: 1px solid #ccc;
+  line-height: 40px;
+  padding-left: 20px;
+  background-color: #f5f5f5;
+  font-size: 14px;
+  color: #6E6E6E;
+}
+.imboxNavWrap .imboxNav {
+  min-width: 1000px;
+  margin: 0 20px;
+  height: 45px;
+  border-bottom: 1px #ccc solid;
+}
+.imboxNavWrap .imboxNav ul li {
+  float: left;
+  list-style-type: none;
+  font-size: 14px;
+  width: 130px;
+  height: 36px;
+  line-height: 36px;
+  text-align: center;
+  margin-top: 10px;
+  cursor: pointer;
+  color: #CCCCCC;
+}
+.imboxNavWrap .imboxNav ul li.selected {
+  background-color: #fff;
+  border: 1px #ccc solid;
+  border-bottom: 1px #fff solid;
+  border-top: 2px solid #06c;
+  color: #6E6E6E;
+}
+#imboxContent {
+  height: 100%;
+  padding-bottom: 40px;
+}
+#imboxContent ul {
+  border: 1px solid #ccc;
+  border-top: none;
+  margin: 0 20px;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 80px;
+  top: 134px;
+  border-bottom: none;
+}
+#imboxContent li {
+  height: 50px;
+  line-height: 50px;
+  margin: 0 20px;
+  border-bottom: 1px solid #ccc;
+  box-sizing: border-box;
+  font-size: 14px;
+}
+#imboxContent li .title {
+  width: 48%;
+  display: inline-block;
+}
+#imboxContent li .title i {
+  background: url('/static/dist/images/imbox/images/icon.png') -28px -400px no-repeat;
+  width: 40px;
+  height: 20px;
+  display: inline-block;
+  vertical-align: -10px;
+}
+#imboxContent li .time {
+  width: 48%;
+  display: inline-block;
+  text-align: right;
+  float: right;
+}
+#imboxContent .page {
+  height: 70px;
+  position: absolute;
+  bottom: 10px;
+  right: 20px;
+  left: 20px;
+  border: 1px solid #ccc;
+  border-top: none;
+}
+#imboxContent .alreadyBox {
+  display: none;
+}
+#imboxContent .noData {
+  width: 100%;
+  display: inline-block;
+  text-align: center;
+  padding-top: 100px;
+  color: #ccc;
+  font-size: 20px;
+}
+#imboxContent .noData .tip {
+  background: url('/static/dist/images/imbox/images/icon.png') no-repeat -40px -260px;
+  width: 40px;
+  height: 40px;
+  display: inline-block;
+  vertical-align: -17px;
+  margin-right: 20px;
+}
+#imboxContent .detail-box {
+  position: absolute;
+  display: none;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+}
+.todoDetailView {
+  height: 48px;
+  line-height: 48px;
+  border: 1px #ccc solid;
+  margin: 10px 25px 0px 12px;
+  position: relative;
+}
+.todoDetailView .title {
+  padding-left: 15px;
+  width: 59%;
+  float: left;
+}
+.todoDetailView .operator {
+  float: left;
+  width: 22%;
+}
+.todoDetailView .date {
+  float: left;
+  width: 18%;
+  text-align: right;
+  padding-right: 30px;
+}
+.todoDetailView .newMsg {
+  position: absolute;
+  right: 0px;
+  top: 0px;
+  bottom: 0px;
+  width: 30px;
+  background: url(/static/dist/images/todo/images/new.png) no-repeat;
+}
+.pagination {
+  float: right;
+  margin-right: 21px;
+}
+.sumDesc {
+  float: left;
+  margin-top: 20px;
+  margin-left: 13px;
+}
+#comment {
+  overflow-y: hidden;
+  position: absolute;
+  background: #fff;
+  width: 100%;
+  height: 500px;
+}
+#comment .fullLoading {
+  display: none;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  bottom: 0px;
+  right: 0px;
+  z-index: 1;
+  background-color: #333;
+  text-align: center;
+  line-height: 100px;
+  font-size: 16px;
+  color: #ccc;
+}
+#comment .commentListBox {
+  height: 100%;
+  overflow: hidden;
+}
+#comment .commentList {
+  height: 100%;
+  position: relative;
+  left: 0px;
+}
+#comment .commentList .navBar {
+  margin-left: 10px;
+}
+#comment .commentList .navBar .item {
+  float: left;
+  height: 45px;
+  line-height: 45px;
+  color: #ccc;
+  width: 80px;
+  text-align: center;
+  border-bottom: 2px transparent solid;
+  cursor: pointer;
+}
+#comment .commentList .navBar .item.selected {
+  color: #fff;
+  border-bottom-color: #005BAC;
+}
+#comment .commentList .navBar .item.save {
+  width: 76px;
+  border: 1px #959A94 solid;
+  height: 25px;
+  line-height: 24px;
+  margin-top: 12px;
+  float: right;
+  margin-right: 10px;
+}
+#comment .commentList .navBar .item.save .iconSave {
+  font-family: "modelicon";
+  vertical-align: -3px;
+  font-size: 18px;
+  margin: 0;
+  padding: 0;
+  width: 18px;
+  color: #b9b9b9;
+}
+#comment .commentList .listBox {
+  position: absolute;
+  top: 46px;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
+  border-top: 1px #666 solid;
+}
+#comment .commentList .listBox .item {
+  height: 80px;
+  color: #ccc;
+}
+#comment .commentList .listBox .item .thumbnailImg {
+  float: left;
+  width: 82px;
+  height: 62px;
+  margin: 10px 0px 0px 5px;
+}
+#comment .commentList .listBox .item .info {
+  margin-left: 120px;
+  padding-top: 9px;
+}
+#comment .commentList .listBox .item .title {
+  width: 98%;
+  height: 42px;
+  font-size: 14px;
+  color: #fff;
+}
+#comment .commentList .listBox .item .desc {
+  margin: 6px 0px 4px 0px;
+}
+#comment .commentList .listBox .item .name {
+  width: 42px;
+}
+#comment .commentList .listBox .item .date {
+  margin-left: 5px;
+  vertical-align: middle;
+}
+#comment .commentList .listBox .item .remarkCount {
+  float: right;
+  margin-right: 5px;
+  margin-top: 3px;
+}
+#comment .commentList .listBox .item .remarkCount .m-comment {
+  font-family: "modelicon";
+}
+#comment .commentList .listBox .item .remarkCount:hover {
+  cursor: pointer;
+}
+#comment .commentList .listBox .item .remarkCount:hover .text {
+  text-decoration: underline;
+  color: #fff;
+}
+#comment .commentList .listBox .item:hover {
+  background-color: rgba(51, 51, 51, 0.8);
+}
+#comment .commentList .listBox .item.selected {
+  background-color: rgba(0, 110, 207, 0.8);
+}
+#comment .commentList .listBox .item .iconType {
+  font-family: "modelicon";
+  float: left;
+  margin-left: 10px;
+  margin-top: 9px;
+  color: #fff;
+}
+#comment .projectListBox,
+#comment .userListBox {
+  height: 100%;
+}
+#comment .commentRemark {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  overflow: hidden;
+}
+#comment .commentRemark i {
+  font-family: "modelicon";
+}
+#comment .commentRemark .iconType {
+  color: #fff;
+  float: left;
+  margin-left: 5px;
+  margin-right: -5px;
+  margin-top: 9px;
+  display: none;
+}
+#comment .commentRemark .header {
+  height: 54px;
+  border-bottom: 1px #D2D2D2 solid;
+  line-height: 54px;
+  padding: 0px 12px;
+}
+#comment .commentRemark .header .title {
+  line-height: 54px;
+  color: #353535;
+}
+#comment .commentRemark .talkReMark {
+  position: absolute;
+  bottom: 0px;
+  background-color: #fff;
+  width: 100%;
+}
+#comment .commentRemark .talkReMark.hidden {
+  display: none;
+}
+#comment .commentRemark .noLogin {
+  position: absolute;
+  bottom: 0px;
+  color: #fff;
+  padding: 15px;
+  background-color: #444;
+  left: 0px;
+  right: 0px;
+  z-index: 1;
+}
+#comment .commentRemark .noLogin .btnLogin {
+  cursor: pointer;
+}
+#comment .commentRemark .noLogin .btnLogin:hover {
+  text-decoration: underline;
+}
+#comment .commentRemark .reMarkListBox {
+  width: 100%;
+  position: absolute;
+  top: 55px;
+  bottom: 100px;
+  left: 0px;
+  right: 0px;
+}
+#comment .commentRemark .viewPointInfo {
+  color: #ccc;
+  padding: 11px 0 20px 0;
+}
+#comment .commentRemark .viewPointInfo .thumbnailImg {
+  float: left;
+  width: 82px;
+  height: 62px;
+  margin: 10px 0px 0px 10px;
+}
+#comment .commentRemark .viewPointInfo .info {
+  margin-left: 120px;
+  padding-top: 9px;
+}
+#comment .commentRemark .viewPointInfo .title {
+  width: 98%;
+  height: 42px;
+  font-size: 14px;
+  color: #333;
+}
+#comment .commentRemark .viewPointInfo .name {
+  width: 42px;
+}
+#comment .commentRemark .viewPointInfo .date {
+  margin-left: 5px;
+  vertical-align: middle;
+}
+#comment .commentRemark .viewPointInfo:hover {
+  background-color: transparent;
+}
+#comment .commentRemark .viewPointInfo.selected {
+  background-color: rgba(0, 110, 207, 0.8);
+}
+#comment .commentRemark .viewPointInfo .remarkCount {
+  display: block;
+  float: right;
+  border: 1px solid;
+  width: 100px;
+  background: #117EE1;
+  height: 30px;
+  text-align: center;
+  line-height: 30px;
+  margin-right: 14px;
+  cursor: pointer;
+  color: #fff;
+}
+#comment .commentRemark .remarkBox {
+  margin-top: 4px;
+  margin: 10px 12px;
+  border: 1px #D2D2D2 solid;
+  border-width: 1px 0px;
+  font-size: 14px;
+  padding: 8px 0px;
+  margin-top: 0px;
+}
+#comment .commentRemark .iconComment {
+  font-family: "modelicon";
+  margin-right: 5px;
+  color: #b9b9b9;
+  font-size: 16px;
+}
+#comment .commentRemark .goList {
+  color: #b9b9b9;
+  cursor: pointer;
+}
+#comment .commentRemark .iconBack {
+  font-size: 18px;
+  width: 21px;
+  margin: 0px;
+  font-family: "modelicon";
+  vertical-align: -4px;
+  display: inline-block;
+}
+#comment .commentRemark .operators {
+  float: right;
+  cursor: pointer;
+  color: #cdcdcd;
+  font-size: 16px;
+  display: block;
+  height: 15px;
+  width: 15px;
+  background: url('/static/dist/images/services/images/service_ico.png') 0 -360px no-repeat;
+  margin: 19px 0px 0 0;
+}
+#comment .commentRemark .inputBox {
+  width: 576px;
+  margin-left: 12px;
+  color: #333;
+  border-radius: 3px;
+  background-color: #fff;
+  border: 1px solid #D2D2D2;
+}
+#comment .commentRemark .txtReMark {
+  width: 100%;
+  border: 0;
+  height: 30px;
+  outline: none;
+  resize: none;
+  padding: 5px;
+}
+#comment .commentRemark .txtReMark.input {
+  height: 85px;
+}
+#comment .commentRemark .uploadImg {
+  display: none;
+}
+#comment .commentRemark .btnEnter {
+  float: right;
+  margin: 10px 12px 10px 0px;
+  width: 80px;
+  height: 28px;
+  background-color: transparent;
+  outline: 0;
+  border: 1px #D2D2D2 solid;
+  color: #3F3F3F;
+}
+#comment .commentRemark .btnIcon {
+  margin-top: 10px;
+  font-size: 23px;
+  cursor: pointer;
+  width: 27px;
+  height: 27px;
+  display: inline-block;
+  text-align: center;
+  background-color: #ddd;
+  margin-right: 7px;
+}
+#comment .commentRemark .btnIcon.m-img {
+  margin-left: 12px;
+}
+#comment .commentRemark .btnIcon.m-img:before {
+  position: relative;
+  top: -1px;
+}
+#comment .commentRemark .reMarkList .item {
+  border-bottom: 1px #D2D2D2 solid;
+  margin: 0px 12px 8px 12px;
+  padding-bottom: 10px;
+}
+#comment .commentRemark .reMarkList .item:hover .delTalkBox .delTalk {
+  display: inline;
+}
+#comment .commentRemark .reMarkList .item .userInfo {
+  margin-top: 5px;
+}
+#comment .commentRemark .reMarkList .item .userImg {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+}
+#comment .commentRemark .reMarkList .item .userName {
+  margin-left: 5px;
+  vertical-align: 3px;
+}
+#comment .commentRemark .reMarkList .item .date {
+  float: right;
+  color: #999;
+}
+#comment .commentRemark .reMarkList .item .content {
+  margin: 5px 0px 0px 0px;
+  padding: 20px 20px 20px 24px;
+}
+#comment .commentRemark .reMarkList .item .singleAttachment {
+  margin: 8px 0px 8px 20px;
+}
+#comment .commentRemark .reMarkList .item .singleAttachment .linkImg:hover {
+  color: #fff;
+  text-decoration: none;
+}
+#comment .commentRemark .reMarkList .item .singleAttachment .img {
+  width: 42px;
+  height: 32px;
+  margin-right: 5px;
+}
+#comment .commentRemark .reMarkList .item .singleAttachment .text {
+  vertical-align: top;
+  line-height: 32px;
+  color: #333;
+  padding: 2px 5px;
+}
+#comment .commentRemark .reMarkList .item .singleAttachment .text.selected {
+  background-color: rgba(0, 110, 207, 0.8);
+}
+#comment .commentRemark .reMarkList .item .delTalkBox {
+  height: 20px;
+  text-align: right;
+}
+#comment .commentRemark .reMarkList .item .delTalkBox .delTalk {
+  display: none;
+  cursor: pointer;
+}
+#comment .commentRemark .reMarkList .item .delTalkBox .delTalk:hover {
+  text-decoration: underline;
+}
+#comment .commentRemark .singleImg {
+  height: 42px;
+  line-height: 44px;
+  background-color: #eee;
+  color: #999;
+  margin-bottom: 5px;
+}
+#comment .commentRemark .singleImg .talkImg {
+  width: 42px;
+  height: 30px;
+  border: 1px #ccc solid;
+  vertical-align: top;
+  margin: 7px 0px 7px 7px;
+  display: none;
+}
+#comment .commentRemark .singleImg .imgName {
+  margin-left: 7px;
+  width: 220px;
+}
+#comment .commentRemark .singleImg .imgName.upload {
+  colro: #666;
+}
+#comment .commentRemark .singleImg .delUploadImg {
+  float: right;
+  cursor: pointer;
+  margin-right: 10px;
+  display: none;
+}
+#comment .loading {
+  position: static;
+  background-color: transparent;
+  color: #fff;
+  font-size: 16px;
+  text-align: center;
+  height: 100px;
+}
+#topSaveTip {
+  float: left;
+  background-color: #fff;
+  height: 40px;
+  line-height: 40px;
+  padding-left: 1px;
+  color: #fff;
+}
+#topSaveTip .content {
+  background-color: #333;
+  padding-right: 15px;
+}
+#topSaveTip .btnSave {
+  display: inline-block;
+  background-color: #fff;
+  color: #006ECF;
+  width: 62px;
+  height: 26px;
+  line-height: 25px;
+  text-align: center;
+  border-radius: 3px;
+  margin-left: 10px;
+  margin-right: 15px;
+  cursor: pointer;
+  vertical-align: 1px;
+}
+#topSaveTip .btnCanel {
+  cursor: pointer;
+}
+.saveViewPoint .wrapper .header,
+.saveViewPoint .wrapper .content,
+.saveViewPoint .wrapper .footer {
+  background-color: #333;
+  border-color: #5A5A5A;
+}
+.saveViewPoint .wrapper .header .title {
+  color: #fff;
+  font-weight: normal;
+}
+.saveViewPoint .wrapper .btnWhite {
+  background-color: #333;
+  border-color: #555;
+  color: #EBEBEB;
+}
+.saveViewPoint .wrapper .img {
+  width: 82px;
+  height: 62px;
+  background-color: #fff;
+  float: left;
+}
+.saveViewPoint .wrapper .form {
+  margin-left: 100px;
+}
+.saveViewPoint .wrapper .form .name {
+  width: 360px;
+  height: 31px;
+  padding-left: 7px;
+  padding-top: 7px;
+  border: 0;
+  outline: none;
+  margin-bottom: 20px;
+}
+.saveViewPoint .wrapper .form .name.mHeight {
+  height: 62px;
+}
+.saveViewPoint .wrapper .form .desc {
+  resize: none;
+  height: 60px;
+  width: 360px;
+  padding: 5px;
+  margin-bottom: 20px;
+}
+.saveViewPoint .wrapper .form .modelicon {
+  color: #ccc;
+  font-size: 18px;
+  vertical-align: -2px;
+  margin-right: 5px;
+}
+.saveViewPoint .wrapper .info {
+  color: #fff;
+  margin-left: 104px;
+  color: #b9b9b9;
+}
+.saveViewPoint .wrapper .info .name {
+  height: 42px;
+  font-size: 14px;
+  margin-bottom: 5px;
+  width: 98%;
+  color: #fff;
+}
+.saveViewPoint .wrapper .info .desc {
+  margin-bottom: 5px;
+  width: 98%;
+}
+.saveViewPoint .wrapper .info .userName {
+  display: inline-block;
+  width: 60px;
+  margin-right: 10px;
+  vertical-align: bottom;
+}
+.saveViewPoint .wrapper .shareLink {
+  border-top: 1px #666 solid;
+  margin-top: 15px;
+}
+.saveViewPoint .wrapper .shareLink .tipText {
+  color: #fff;
+  font-size: 14px;
+  margin-top: 10px;
+  margin-bottom: 15px;
+}
+.saveViewPoint .wrapper .shareLink .linkUrl {
+  border: 0;
+  width: 351px;
+  padding-left: 7px;
+  font-size: 16px;
+  padding: 4px 5px;
+  outline: none;
+}
+.saveViewPoint .wrapper .shareLink .btnCopy {
+  border: 1px #fff solid;
+  background-color: transparent;
+  color: #fff;
+  height: 32px;
+  vertical-align: top;
+  width: 84px;
+  margin-left: 18px;
+}
+.viewPointContext.jqContextMenu {
+  background-color: #333;
+  color: #fff;
+  width: 80px;
+  border: 0;
+}
+.viewPointContext.jqContextMenu li {
+  padding-left: 15px;
+  cursor: pointer;
+}
+.viewPointContext.jqContextMenu li:hover {
+  background-color: transparent;
+}
+#viewPointContextPoint {
+  display: none;
+}
+.jqContextMenu #viewPointContextPoint {
+  display: block;
+}
+#comment .mCustomScrollbar .mCSB_scrollTools_vertical .mCSB_draggerContainer {
+  background-color: transparent;
+}
+ul.reMarkList {
+  padding-bottom: 70px;
+}

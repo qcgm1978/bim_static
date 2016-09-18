@@ -1,0 +1,7 @@
+<% _.each(data,function(item){%>
+<% var url=item.targetUrl.split('/'),projectId=url[url.length-3], version=url[url.length-2] %>
+<li>
+	<span class="title"><% if(item.status !== 1) {%><i></i><% } %><a data-status="<%= item.status %>" href='javascript:;' onclick="App.INBox.read(<%=item.id%>,this,<%=projectId%>,<%=version%>,<%=item.shareId%>)" target='_blank'><%=item.content%></a></span>
+	<span class="time"><%=item.createStmp?new Date(item.createStmp).format('yyyy-MM-dd hh:mm:ss'):'--'%></span>
+</li>
+<% }) %>
