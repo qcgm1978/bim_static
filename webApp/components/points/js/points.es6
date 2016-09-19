@@ -40,7 +40,7 @@
         srciptUrl = '/static/dist/libs/libsH5_20160313.js',
         styleUrl = '/static/dist/libs/libsH5_20160313.css',
         $script = '<script src="' + srciptUrl + '"></script>',
-        $css = '<link rel="stylesheet" href="' + styleUrl + '" />';
+        $css = '<link rel="stylesheet" href="' + styleUrl + '" />',
       $script2 = '<script src="/static/dist/comm/comm_20160313.js"></script>',
         $css2 = '<link rel="stylesheet" href="/static/dist//comm/comm_20160313.css" />';
       if (!ModelSelection.isLoad) {
@@ -249,7 +249,7 @@
       var url = location.search; //获取url中"?"符后的字串
       var theRequest = new Object();
       if (url.indexOf("?") != -1) {
-        var str = url.substr(1);
+        var str = url.substr(1),
         strs = str.split("&");
         for (var i = 0; i < strs.length; i++) {
           theRequest[strs[i].split("=")[0]] = unescape(strs[i].split("=")[1]);
