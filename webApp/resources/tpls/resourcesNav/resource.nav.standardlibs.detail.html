@@ -8,10 +8,10 @@
     <span class="createDate"><%=  new Date(createTime).format("yyyy-MM-dd")%>	</span>
     <span class="lastModifiedDate"><%=  lastModifyTime?new Date(lastModifyTime).format("yyyy-MM-dd"):'--'%>	</span>
     <span class="introduction">
-        <% if (obj.version.desc) {%>
+        <% if (obj.version && obj.version.desc) {%>
         <b title="<%= obj.version.desc %>"><%=  obj.version.desc %></b>
         <% }else {%>
-        <i>ÔÝÎÞËµÃ÷</i>
+        <i>æš‚æ— è¯´æ˜Ž</i>
         <%}%>
     </span>
 </li>

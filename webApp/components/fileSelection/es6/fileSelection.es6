@@ -9,8 +9,8 @@
 		jQuery.support.cors = true;
 		//默认参数
 		var defaults = {
-			appKey: "",
-			token: "",
+			appKey: "18fbec1ae3da477fb47d842a53164b14",
+			token: "abc3f4a2981217088aed5ecf8ede5b6397eed0795978449bda40a6987f9d6f7b0d061e9c8ad279d740ef797377b4995eb55766ccf753691161e73c592cf2416f9744adce39e1c37623a794a245027e79cd3573e7938aff5b4913fe3ed4dbea6d5be4693d85fe52f972e47e6da4617a508e5948f65135c63f",
 			btnText: "确&nbsp;定",
 			isEnable: true, // 是否启用  如果不启用 只可以查看 不能选择 
 			fileIds: "", // fileids 有值时，默认isEndable 为 false

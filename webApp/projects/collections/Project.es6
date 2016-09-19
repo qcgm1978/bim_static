@@ -76,7 +76,7 @@ App.Project = {
 		//单文件：过滤出检查点所在构件所在的文件
 		file: '工程桩,基坑支护,钢结构悬挑构件,幕墙',
 		//单独类型：singleRule
-		single: '梁柱节点,地下防水,步行街吊顶风口,卫生间防水,外保温,采光顶',
+		single: '梁柱节点,地下防水,步行街吊顶风口,卫生间防水,外保温,采光顶,屋面防水,屋面虹吸雨排,消防泵房',
 		floor: ''
 	},
 
@@ -137,7 +137,50 @@ App.Project = {
 			this.linkSilder('floors', floor);
 			this.linkSilderSpecial('specialty', ['WDGC-Q-AC-' + floor + '.rvt', 'WDGC-Q-IN&DS-' + floor + '.rvt'].join(','))
 		}
+
+		if(cat=='屋面防水'||cat=="屋面虹吸雨排"){
+			//TODO 测试
+			floor=[];
+			var _s=['结构'];
+			_.each(App.Project.Settings.Viewer.FloorsData,function(item,index){
+				if(index>=2 && item.code!='OT'){
+					floor.push(item.floor);
+				}
+				_s.push("WDGC-Q-AR-"+item.code+'.rvt');
+				if(cat=="屋面虹吸雨排"){
+					_s.push("WDGC-Q-PL-"+item.code+'.rvt');
+				}
+			})
+			this.linkSilder('floors', floor);
+			this.linkSilderSpecial('specialty', _s);
+		}
+
+		if(cat=="消防泵房"){
+			//TODO 测试
+			var _s=['WDGC-Q-AR-'+floor+".rvt",'WDGC-Q-PL-'+floor+".rvt"];
+			this.linkSilder('floors', floor);
+			this.linkSilderSpecial('specialty', _s);
+			App.Project.Settings.Viewer.filter({
+				ids: _this.filterCCode(['10.10.30.03.21']),
+				type: "classCode"
+			})
+		}
+		if(cat=="消防泵房"){
+			//TODO 测试
+			var _s=['WDGC-Q-AR-'+floor+".rvt",'WDGC-Q-PL-'+floor+".rvt"];
+			this.linkSilder('floors', floor);
+			this.linkSilderSpecial('specialty', _s);
+			App.Project.Settings.Viewer.filter({
+				ids: _this.filterCCode(['10.10.30.03.21']),
+				type: "classCode"
+			})
+		}
 	},
+	//分类过滤
+	catFilter:function(cat){
+
+	},
+
 	filterCCode: function(code) {
 		var _class = App.Project.Settings.Viewer.ClassCodeData,
 			_all=[];
@@ -319,14 +362,20 @@ App.Project = {
 			}
 		})
 		$treeText.each(function() {
-			var _ = $(this).parent().find('input');
+			var _this = $(this).parent().find('input');
 			if (key) {
-				if ($(this).text() == key && !_.is(':checked')) {
-					_.trigger('click');
+				if(_.isArray(key)){
+					if (key.join('||').indexOf($(this).text())!==-1 && !_this.is(':checked')) {
+						_this.trigger('click');
+					}
+				}else{
+					if ($(this).text() == key && !_this.is(':checked')) {
+						_this.trigger('click');
+					}
 				}
 			} else {
-				if (!_.is(':checked')) {
-					_.trigger('click');
+				if (!_this.is(':checked')) {
+					_this.trigger('click');
 				}
 			}
 		})
@@ -335,6 +384,7 @@ App.Project = {
 		if (!key) {
 			return
 		}
+		debugger
 		var $check = $('.modelSidebar #' + type + ' input'),
 			$treeText = $('.modelSidebar #' + type + ' .treeText');
 		this.recoverySilder();
@@ -387,10 +437,8 @@ App.Project = {
 		var _this = this;
 		var viewer = App.Project.Settings.Viewer;
 		if (!viewer) return;
-
-		_this.recoverySilder();
-
 		if (type != 'other' && flag) {
+			_this.recoverySilder();
 			var shaType = type == 'dis' ? 1 : 0;
 			var data = this.currentLoadData[type],
 				result = [],
