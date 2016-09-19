@@ -450,26 +450,26 @@ fis.match('/components/fileSelection/index.html',{
   release: '/static/dist/components/fileSelection/index.html'
 });
 fis.match('/components/fileSelection/libs/**.{js,es6}',{
-  packTo: '/static/dist/components/fileSelection/libs/libs.js'
+  packTo: '/static/dist/components/fileSelection/libs/libs_'+v+'.js'
 });
-fis.match('/static/dist/components/fileSelection/libs/libs.js', {
-  useHash: true,
-  release: '/static/dist/components/fileSelection/libs/libs.js'
-});
+//fis.match('/static/dist/components/fileSelection/libs/libs.js', {
+//  useHash: true,
+//  release: '/static/dist/components/fileSelection/libs/libs.js'
+//});
 fis.match('/components/fileSelection/**.{less,css}',{
-  packTo: '/static/dist/components/fileSelection/css/fileSelection.css'
+  packTo: '/static/dist/components/fileSelection/css/fileSelection_'+v+'.css'
 });
-fis.match('/static/dist/components/fileSelection/css/fileSelection.css', {
-  useHash: true,
-  release: '/static/dist/components/fileSelection/css/fileSelection.css'
-});
+//fis.match('/static/dist/components/fileSelection/css/fileSelection.css', {
+//  useHash: true,
+//  release: '/static/dist/components/fileSelection/css/fileSelection.css'
+//});
 fis.match('/components/fileSelection/es6/**.{es6,js}',{
-  packTo: '/static/dist/components/fileSelection/js/fileSelection.js'
+  packTo: '/static/dist/components/fileSelection/js/fileSelection_'+v+'.js'
 });
-fis.match('/static/dist/components/fileSelection/js/fileSelection.js', {
-  useHash: true,
-  release: '/static/dist/components/fileSelection/js/fileSelection.js'
-});
+//fis.match('/static/dist/components/fileSelection/js/fileSelection.js', {
+//  useHash: true,
+//  release: '/static/dist/components/fileSelection/js/fileSelection.js'
+//});
 
 
 
@@ -486,12 +486,12 @@ fis.match('/components/modelSelection/model.html',{
 });
 
 fis.match('/components/modelSelection/**.{js,es6}',{
-  packTo: '/static/dist/components/modelSelection/js/modelSelection.js'
+  packTo: '/static/dist/components/modelSelection/js/modelSelection_'+v+'.js'
 });
-fis.match('/static/dist/components/modelSelection/js/modelSelection.js', {
-  useHash: true,
-  release: '/static/dist/components/modelSelection/js/modelSelection.js'
-});
+//fis.match('/static/dist/components/modelSelection/js/modelSelection.js', {
+//  useHash: true,
+//  release: '/static/dist/components/modelSelection/js/modelSelection.js'
+//});
 
 
 //模型 \modelSelection
@@ -503,19 +503,19 @@ fis.match('/components/inspectSelection/model.html',{
 });
 
 fis.match('/components/inspectSelection/**.{css,less}',{
-  packTo: '/static/dist/components/inspectSelection/css/inspectSelection.css'
+  packTo: '/static/dist/components/inspectSelection/css/inspectSelection_'+v+'.css'
 });
-fis.match('/static/dist/components/inspectSelection/css/inspectSelection.css', {
-  useHash: true,
-  release: '/static/dist/components/inspectSelection/css/inspectSelection.css'
-});
+//fis.match('/static/dist/components/inspectSelection/css/inspectSelection.css', {
+//  useHash: true,
+//  release: '/static/dist/components/inspectSelection/css/inspectSelection.css'
+//});
 fis.match('/components/inspectSelection/**.{js,es6}',{
-  packTo: '/static/dist/components/inspectSelection/js/inspectSelection.js'
+  packTo: '/static/dist/components/inspectSelection/js/inspectSelection_'+v+'.js'
 });
-fis.match('/static/dist/components/inspectSelection/js/inspectSelection.js', {
-  useHash: true,
-  release: '/static/dist/components/inspectSelection/js/inspectSelection.js'
-});
+//fis.match('/static/dist/components/inspectSelection/js/inspectSelection.js', {
+//  useHash: true,
+//  release: '/static/dist/components/inspectSelection/js/inspectSelection.js'
+//});
 
 
 //模型 \checkpoints
@@ -558,26 +558,27 @@ fis.match('/components/points/tip.html',{
   release: '/static/dist/components/points/tip.html'
 });
 fis.match('/components/points/libs/**.{js,es6}',{
-  packTo: '/static/dist/components/points/libs/libs.js'
+  packTo: '/static/dist/components/points/libs/libs_'+v+'.js'
 });
-fis.match('/static/dist/components/points/libs/libs.js', {
-  useHash: true,
-  release: '/static/dist/components/points/libs/libs.js'
-});
-fis.match('/components/points/js/**.{js,es6}',{
-  packTo: '/static/dist/components/points/js/points.js'
-});
-fis.match('/static/dist/components/points/js/points.js', {
-  useHash: true,
-  release: '/static/dist/components/points/js/points.js'
+//fis.match('/static/dist/components/points/libs/libs.js', {
+//  useHash: true,
+//  release: '/static/dist/components/points/libs/libs.js'
+//});
+//fis.match('/components/points/js/**.{js,es6}',{
+//  //useHash:false,
+//  packTo: '/static/dist/components/points/js/points_'+v+'.js'
+//});
+fis.match('/components/points/js/points.es6', {
+  useHash: false,
+  release: '/static/dist/components/points/js/points_'+v+'.js'
 });
 fis.match('/components/points/less/**.{css,less}', {
-  packTo: '/static/dist/components/points/less/index.css'
+  packTo: '/static/dist/components/points/less/index_'+v+'.css'
 });
-fis.match('/static/dist/components/points/less/index.css', {
-  useHash: true,
-  release: '/static/dist/components/points/less/index.css'
-});
+//fis.match('/static/dist/components/points/less/index.css', {
+//  useHash: true,
+//  release: '/static/dist/components/points/less/index.css'
+//});
 fis.match('/components/points/tpls/points.body.html', {
   //useHash:true,
   release: "/static/dist/components/points/points.body.html"
