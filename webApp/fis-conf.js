@@ -190,44 +190,44 @@ fis.match('/static/dist/libs/commLibCss.css', {
 
 //合并裤文件
 fis.match('/libsH5/**.{js,es6}', {
-  packTo: '/static/dist/libs/libsH5.js'
+  packTo: '/static/dist/libs/libsH5_'+v+'.js'
 });
 
-fis.match('/static/dist/libs/libsH5.js', {
-  useHash:true,
-  release: '/static/dist/libs/libsH5.js'
-});
+//fis.match('/static/dist/libs/libsH5.js', {
+//  useHash:true,
+//  release: '/static/dist/libs/libsH5.js'
+//});
 fis.match('/libsH5/**.{less,css}', {
-  packTo: '/static/dist/libs/libsH5.css'
+  packTo: '/static/dist/libs/libsH5_'+v+'.css'
 });
 
-fis.match('/static/dist/libs/libsH5.css', {
-  useHash:true,
-  release: '/static/dist/libs/libsH5.css'
-});
+//fis.match('/static/dist/libs/libsH5.css', {
+//  useHash:true,
+//  release: '/static/dist/libs/libsH5.css'
+//});
 
 //合并公共样式文件
 fis.match('/comm/**.{less,css}', {
   useHash: false,
-  packTo: '/static/dist/comm/comm.css'
+  packTo: '/static/dist/comm/comm_'+v+'.css'
 });
 
-fis.match('/static/dist/comm/comm.css', {
-  useHash:true,
-  release: '/static/dist/comm/comm.css'
-});
+//fis.match('/static/dist/comm/comm.css', {
+//  useHash:true,
+//  release: '/static/dist/comm/comm.css'
+//});
 
 //合并公共文件
 fis.match('/comm/**.{js,es6}', {
   useHash: false,
   //useHash:true,
-  packTo: '/static/dist/comm/comm.js'
+  packTo: '/static/dist/comm/comm_'+v+'.js'
 });
 
-fis.match('/static/dist/comm/comm.js', {
-  useHash:true,
-  release: '/static/dist/comm/comm.js'
-});
+//fis.match('/static/dist/comm/comm.js', {
+//  useHash:true,
+//  release: '/static/dist/comm/comm.js'
+//});
 
 
 //合并公共样式文件
@@ -486,7 +486,7 @@ fis.match('/components/modelSelection/model.html',{
 });
 
 fis.match('/components/modelSelection/**.{js,es6}',{
-  packTo: '/static/dist/components/modelSelection/js/modelSelection_'+v+'.js'
+  packTo: '/static/dist/components/modelSelection/js/modelSelection.js'
 });
 //fis.match('/static/dist/components/modelSelection/js/modelSelection.js', {
 //  useHash: true,
@@ -494,7 +494,7 @@ fis.match('/components/modelSelection/**.{js,es6}',{
 //});
 
 
-//模型 \modelSelection
+//模型
 fis.match('/components/inspectSelection/index.html',{
   release: '/static/dist/components/inspectSelection/index.html'
 });
@@ -503,14 +503,14 @@ fis.match('/components/inspectSelection/model.html',{
 });
 
 fis.match('/components/inspectSelection/**.{css,less}',{
-  packTo: '/static/dist/components/inspectSelection/css/inspectSelection_'+v+'.css'
+  packTo: '/static/dist/components/inspectSelection/css/inspectSelection.css'
 });
 //fis.match('/static/dist/components/inspectSelection/css/inspectSelection.css', {
 //  useHash: true,
 //  release: '/static/dist/components/inspectSelection/css/inspectSelection.css'
 //});
 fis.match('/components/inspectSelection/**.{js,es6}',{
-  packTo: '/static/dist/components/inspectSelection/js/inspectSelection_'+v+'.js'
+  packTo: '/static/dist/components/inspectSelection/js/inspectSelection.js'
 });
 //fis.match('/static/dist/components/inspectSelection/js/inspectSelection.js', {
 //  useHash: true,
@@ -558,7 +558,7 @@ fis.match('/components/points/tip.html',{
   release: '/static/dist/components/points/tip.html'
 });
 fis.match('/components/points/libs/**.{js,es6}',{
-  packTo: '/static/dist/components/points/libs/libs_'+v+'.js'
+  packTo: '/static/dist/components/points/libs/libs.js'
 });
 //fis.match('/static/dist/components/points/libs/libs.js', {
 //  useHash: true,
@@ -570,10 +570,10 @@ fis.match('/components/points/libs/**.{js,es6}',{
 //});
 fis.match('/components/points/js/points.es6', {
   useHash: false,
-  release: '/static/dist/components/points/js/points_'+v+'.js'
+  release: '/static/dist/components/points/js/points.js'
 });
 fis.match('/components/points/less/**.{css,less}', {
-  packTo: '/static/dist/components/points/less/index_'+v+'.css'
+  packTo: '/static/dist/components/points/less/index.css'
 });
 //fis.match('/static/dist/components/points/less/index.css', {
 //  useHash: true,
