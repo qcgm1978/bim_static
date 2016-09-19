@@ -185,6 +185,20 @@
               self[fn]();
             }
             break;
+          case "mode":
+            $this.toggleClass('selected');
+            if ($this.closest('.toolsBar').length > 0) {
+              $this.closest('.toolsBar').find('[data-group=' + group + ']').not($this).removeClass('selected');
+            } else {
+              $this.siblings().removeClass('selected');
+            }
+            if (isSelected) {
+              fn=='setRectZoomMode'?self.rotateMouse():self[fn](false);
+            } else {
+              self[fn](true);
+            }
+
+            break;
           case "rotate":
             var className = $this.attr('class'),
               $parent = $this.parent().parent();
@@ -396,6 +410,20 @@
       self._dom.bimBox.find(".view").attr('class', 'view zoom');
       self.pub('zoom');
       self.viewer.setZoomMode();
+    },
+    // 模型操作模式
+    lockAxisZ: function(isLock) {
+      // Z轴锁定模式
+      var self = this;
+      self.pub('lockAxisZ');
+      self.viewer.lockAxisZ(isLock);
+    },
+    // 模型操作模式
+    setRectZoomMode: function(isLock) {
+      // 框选缩放
+      var self = this;
+      self.pub('setRectZoomMode');
+      self.viewer.setRectZoomMode();
     },
     zoomToBox: function(box) {
       // 缩放到指定位置

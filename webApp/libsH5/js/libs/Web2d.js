@@ -4349,9 +4349,17 @@ CLOUD.MiniMap = function (viewer) {
         return false;
     };
 
+    // 主场景面板鼠标运动状态
+    // 主场景面板的mouse move 和 mouse up 注册在 window 上，
+    // 当鼠标从主场景移动到其他元素上时，不响应其他元素的事件
+    this.isMouseMoving = function() {
+
+        return this.viewer.editorManager.isMouseMoving();
+    },
+
     this.onMouseDown = function (event) {
 
-        if (this.viewer.isMouseMoving()) {
+        if (this.isMouseMoving()) {
             return;
         }
 
@@ -4360,7 +4368,7 @@ CLOUD.MiniMap = function (viewer) {
 
     this.onMouseMove = function (event) {
 
-        if (this.viewer.isMouseMoving()) {
+        if (this.isMouseMoving()) {
             return;
         }
 
