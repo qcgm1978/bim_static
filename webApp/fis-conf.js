@@ -457,14 +457,14 @@ fis.match('/components/fileSelection/libs/**.{js,es6}',{
 //  release: '/static/dist/components/fileSelection/libs/libs.js'
 //});
 fis.match('/components/fileSelection/**.{less,css}',{
-  packTo: '/static/dist/components/fileSelection/css/fileSelection_'+v+'.css'
+  packTo: '/static/dist/components/fileSelection/css/fileSelection.css'
 });
 //fis.match('/static/dist/components/fileSelection/css/fileSelection.css', {
 //  useHash: true,
 //  release: '/static/dist/components/fileSelection/css/fileSelection.css'
 //});
 fis.match('/components/fileSelection/es6/**.{es6,js}',{
-  packTo: '/static/dist/components/fileSelection/js/fileSelection_'+v+'.js'
+  packTo: '/static/dist/components/fileSelection/js/fileSelection.js'
 });
 //fis.match('/static/dist/components/fileSelection/js/fileSelection.js', {
 //  useHash: true,
