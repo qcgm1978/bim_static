@@ -73,7 +73,7 @@
             <!--<script type="text/javascript" src="./router/index.js"></script>-->
         <script>
             var x                   = new XMLHttpRequest();
-            x.open('GET', 'map.json', true);
+            x.open('GET', 'map.json?t='+Math.round(Math.random()*9999), true);
             x.send('bb');
             x.onreadystatechange    = function(s){
                 if(x.readyState == 4){
