@@ -11,10 +11,13 @@ App.Project.ProjectPlanProperty = Backbone.View.extend({
 		"change .selDate": "changeDate",
 		'change .dateStar':'loadPlanModelData',
 		'change .dateEnd':'loadPlanModelData',
-		'click .clearFormLink':'clearSearch'
+		'click .clearSearch':'clearSearch',
+		"click .btnFilter": "loadPlanModelData"
 	},
 
 	planType:'1',
+
+	businessName:'',
 
 	render: function() {
 
@@ -72,8 +75,11 @@ App.Project.ProjectPlanProperty = Backbone.View.extend({
 		this.$('.planTimeType').myDropDown({
 			click: function($item) {
 				_this.planType=$item.attr('data-val');
-				_this.loadPlanModelData();
 			}
+		});
+
+		this.$('.txtBusinessName').on('change',function(){
+			_this.businessName=$(this).val();
 		});
 
 		this.$('.dateStar').datetimepicker({
@@ -112,11 +118,12 @@ App.Project.ProjectPlanProperty = Backbone.View.extend({
 			data:{
 				startTime:_start,
 				endTime:_end,
-				type:this.planType
+				type:this.planType,
+				businessItem:this.businessName
 			}
 		});
 	},
-	
+
 	clearSearch(){
 		this.$('.dateStar').val('');
 		this.$('.dateEnd').val('');

@@ -6,12 +6,36 @@ App.Project.PlanModel = Backbone.View.extend({
 
 	initialize: function() {
 		this.listenTo(App.Project.PlanAttr.PlanModelCollection, "add", this.addOne);
+		this.listenTo(App.Project.PlanAttr.PlanModelCollection, "reset", this.loading);
 	},
 
 	events: {
+		"click .searchToggle": "searchToggle",
 		"click .tbPlan tr.itemClick": "showInModle",
 		"click .treeCheckbox": "switch"
+	},
+	clearSearch() {
+		this.$(".categoryOption .text").html('全部')
+		this.$(".categoryOption .text").html('全部')
+		Backbone.trigger('qualityFilterDataClear');
+	},
+	//显示隐藏搜索
+	searchToggle(e) {
+		var $searchDetail = this.$(".searchDetail");
+		if ($searchDetail.is(":animated")) {
+			return;
+		}
+		$(e.currentTarget).toggleClass('expandArrowIcon');
+		$searchDetail.slideToggle();
+	},
 
+	searchup() {
+		var $searchDetail = this.$(".searchDetail");
+		if ($searchDetail.is(":animated")) {
+			return;
+		}
+		this.$('.searchToggle').removeClass('expandArrowIcon');
+		$searchDetail.slideUp();
 	},
 
 	render: function() {
@@ -22,6 +46,10 @@ App.Project.PlanModel = Backbone.View.extend({
 
 	template: _.templateUrl("/projects/tpls/project/plan/project.plan.property.planAnalog.detail.html"),
 
+
+	loading:function(){
+		this.searchup();
+	},
 
 	addOne: function(model) {
 

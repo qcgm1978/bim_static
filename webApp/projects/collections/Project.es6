@@ -76,7 +76,10 @@ App.Project = {
 		//单文件：过滤出检查点所在构件所在的文件
 		file: '工程桩,基坑支护,钢结构悬挑构件,幕墙',
 		//单独类型：singleRule
-		single: '梁柱节点,地下防水,步行街吊顶风口,卫生间防水,外保温,采光顶,屋面防水,屋面虹吸雨排,消防泵房',
+		single: '梁柱节点,地下防水,步行街吊顶风口,卫生间防水,外保温,采光顶,屋面防水,屋面虹吸雨排,消防泵房,给水泵房,湿式报警阀室,空调机房,冷冻机房,变配电室,发电机房,慧云机房,电梯机房,电梯底坑,吊顶,地面,中庭栏杆,竖井',
+
+		concat:'屋面防水,屋面虹吸雨排,消防泵房,给水泵房,湿式报警阀室,空调机房,冷冻机房,变配电室,发电机房,慧云机房,电梯机房,电梯底坑,吊顶,地面,中庭栏杆,竖井',
+
 		floor: ''
 	},
 
@@ -112,7 +115,9 @@ App.Project = {
 		var _this = this,
 			_v = App.Project.Settings.Viewer,
 			_spFiles = _v.SpecialtyFileObjData, //专业文件数据对象
-			_ctFiles = _v.ComponentTypeFilesData; //结构类型数据对象
+			_ctFiles = _v.ComponentTypeFilesData,//结构类型数据对象
+			_specialFilterFiles=[],
+			_hideCode=[];
 		if (cat == '地下防水') {
 			this.linkSilder('floors', '');
 			this.linkSilderSpecial('specialty', 'WDGC-Q-ST-垫层防水层.rvt');
@@ -138,47 +143,108 @@ App.Project = {
 			this.linkSilderSpecial('specialty', ['WDGC-Q-AC-' + floor + '.rvt', 'WDGC-Q-IN&DS-' + floor + '.rvt'].join(','))
 		}
 
-		if(cat=='屋面防水'||cat=="屋面虹吸雨排"){
-			//TODO 测试
-			floor=[];
-			var _s=['结构'];
-			_.each(App.Project.Settings.Viewer.FloorsData,function(item,index){
-				if(index>=2 && item.code!='OT'){
-					floor.push(item.floor);
+		//新增的
+
+		if(App.Project.filterRule.concat.indexOf(cat)!=-1){
+			if(cat=='屋面防水'){
+				_specialFilterFiles=this.specialNameFilter('建筑',false,'构造柱')
+					.concat(['结构']);
+				floor=['F01','F02','F03'];
+				_hideCode=null;
+			}
+			if(cat=='屋面虹吸雨排'){
+				_specialFilterFiles=this.specialNameFilter('建筑',false,'构造柱')
+					.concat(['结构','给排水']);
+				floor=['F01','F02','F03'];
+				_hideCode=null;
+			}
+
+			if(cat=="消防泵房"){
+				_specialFilterFiles=this.specialNameFilter('建筑',false,'构造柱')
+					.concat(this.specialNameFilter('给排水',true,'消防水泵房'));
+			}
+			if(cat=="给水泵房"){
+				_specialFilterFiles=this.specialNameFilter('建筑',false,'构造柱')
+					.concat(this.specialNameFilter('给排水',true,'生活水泵房'));
+			}
+			if(cat=="湿式报警阀室"){
+				_specialFilterFiles=this.specialNameFilter('建筑',false,'构造柱')
+					.concat(['给排水']);
+			}
+			if(cat=="空调机房"){
+				_specialFilterFiles=this.specialNameFilter('建筑',false,'构造柱');
+			}
+			if(cat=="冷冻机房"){
+				_specialFilterFiles=this.specialNameFilter('建筑',false,'构造柱')
+					.concat(this.specialNameFilter('暖通',true,'制冷机房'))
+					.concat(this.specialNameFilter('暖通',true,'超市空调水泵房'));
+			}
+
+			if(cat=="变配电室"||cat=="发电机房"){
+				_specialFilterFiles=this.specialNameFilter('建筑',false,'构造柱')
+					.concat(this.specialNameFilter('电气',true,'配电所'));
+
+			}
+
+			if(cat=="慧云机房"){
+				_specialFilterFiles=this.specialNameFilter('建筑',false,'构造柱')
+					.concat(['智能化']);
+			}
+
+			if(cat=="电梯机房"){
+				_specialFilterFiles=this.specialNameFilter('建筑',false,'构造柱')
+					.concat(['结构']);
+				floor=['F01','F02','F03'];
+				_hideCode=null;
+			}
+
+			if(cat=="电梯底坑"){
+				_specialFilterFiles=['结构'];
+				_hideCode=['10.20.20.03','10.20.20.06'];
+			}
+
+			if(cat=="吊顶" || cat=="地面" || cat=="中庭栏杆"){
+				_specialFilterFiles=this.specialNameFilter('建筑',false,'构造柱')
+					.concat(['内装','内装&标识','内装&导视']);
+				_hideCode=null;
+				if(cat!="吊顶"){
+					_hideCode=['10.10.30.03.21'];
 				}
-				_s.push("WDGC-Q-AR-"+item.code+'.rvt');
-				if(cat=="屋面虹吸雨排"){
-					_s.push("WDGC-Q-PL-"+item.code+'.rvt');
-				}
-			})
+			}
+
+			if(cat=="竖井"){
+				_specialFilterFiles=['建筑','结构','给排水','暖通','电气','智能化'];
+				_hideCode= ['10.10.30.03.21','10.20.20.03'];
+			}
 			this.linkSilder('floors', floor);
-			this.linkSilderSpecial('specialty', _s);
+			this.linkSilderSpecial('specialty', _specialFilterFiles);
+			if(_hideCode){
+				App.Project.Settings.Viewer.filter({
+					ids: _hideCode,
+					type: "classCode"
+				})
+			}
 		}
 
-		if(cat=="消防泵房"){
-			//TODO 测试
-			var _s=['WDGC-Q-AR-'+floor+".rvt",'WDGC-Q-PL-'+floor+".rvt"];
-			this.linkSilder('floors', floor);
-			this.linkSilderSpecial('specialty', _s);
-			App.Project.Settings.Viewer.filter({
-				ids: _this.filterCCode(['10.10.30.03.21']),
-				type: "classCode"
-			})
-		}
-		if(cat=="消防泵房"){
-			//TODO 测试
-			var _s=['WDGC-Q-AR-'+floor+".rvt",'WDGC-Q-PL-'+floor+".rvt"];
-			this.linkSilder('floors', floor);
-			this.linkSilderSpecial('specialty', _s);
-			App.Project.Settings.Viewer.filter({
-				ids: _this.filterCCode(['10.10.30.03.21']),
-				type: "classCode"
-			})
-		}
 	},
 	//分类过滤
-	catFilter:function(cat){
-
+	specialNameFilter:function(name,isClude,extName){
+		var result=[];
+		var data=App.Project.Settings.Viewer.SpecialtyFileObjData;
+		if(isClude){
+			_.each(data[name],function(item){
+				if(item.fileName.indexOf(extName)!=-1){
+					result.push(item.fileName)
+				}
+			})
+		}else{
+			_.each(data[name],function(item){
+				if(item.fileName.indexOf(extName)==-1){
+					result.push(item.fileName)
+				}
+			})
+		}
+		return result;
 	},
 
 	filterCCode: function(code) {
@@ -363,40 +429,41 @@ App.Project = {
 		})
 		$treeText.each(function() {
 			var _this = $(this).parent().find('input');
-			if (key) {
-				if(_.isArray(key)){
-					if (key.join('||').indexOf($(this).text())!==-1 && !_this.is(':checked')) {
-						_this.trigger('click');
-					}
-				}else{
-					if ($(this).text() == key && !_this.is(':checked')) {
-						_this.trigger('click');
-					}
+			if(_.isArray(key)){
+				if (key.join('||').indexOf($(this).text())!==-1 && !_this.is(':checked')) {
+					_this.trigger('click');
 				}
-			} else {
-				if (!_this.is(':checked')) {
+			}else{
+				if ($(this).text() == key && !_this.is(':checked')) {
 					_this.trigger('click');
 				}
 			}
 		})
 	},
-	linkSilderSpecial: function(type, key) {
+	linkSilderSpecial: function(type, key,ext) {
 		if (!key) {
 			return
 		}
-		debugger
 		var $check = $('.modelSidebar #' + type + ' input'),
 			$treeText = $('.modelSidebar #' + type + ' .treeText');
-		this.recoverySilder();
 		$check.each(function() {
 			if ($(this).is(':checked')) {
 				$(this).trigger('click');
 			}
 		})
 		$treeText.each(function() {
-			var _ = $(this).parent().find('input');
-			if (key.indexOf($(this).text()) != -1) {
-				_.trigger('click');
+			var _$this=$(this)
+			var _this = _$this.parent().find('input');
+			if(ext){
+				var _exts=ext.split(',');
+				_.each(function(item){
+					if (_$this.text().indexOf(item) != -1) {
+						_this.trigger('click');
+					}
+				})
+			}
+			if (key.indexOf(_$this.text()) != -1) {
+				_this.trigger('click');
 			}
 		})
 	},
