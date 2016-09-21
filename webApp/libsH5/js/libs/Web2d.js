@@ -1,3 +1,348 @@
+// 如果独立web2d,这个通用库需要提出来
+var CLOUD = CLOUD || {};
+CLOUD.DomUtil = CLOUD.DomUtil || {
+        /**
+         * split string on whitespace
+         * @param {String} str
+         * @returns {Array} words
+         */
+        splitStr: function (str) {
+            return str.trim().split(/\s+/g);
+        },
+
+        /**
+         * get the container offset relative to client
+         * @param {object} domElement
+         * @returns {object}
+         */
+        getContainerOffsetToClient: function (domElement) {
+            var offsetObj;
+
+            // 获取相对于视口(客户区域)的偏移量
+            var getOffsetSum = function (ele) {
+                var top = 0, left = 0;
+
+                // 遍历父元素,获取相对与document的偏移量
+                while (ele) {
+                    top += ele.offsetTop;
+                    left += ele.offsetLeft;
+                    ele = ele.offsetParent;
+                }
+
+                // 只处理document的滚动条(一般也用不着内部滚动条)
+                var body = document.body,
+                    docElem = document.documentElement;
+
+                //获取页面的scrollTop,scrollLeft(兼容性写法)
+                var scrollTop = window.pageYOffset || docElem.scrollTop || body.scrollTop,
+                    scrollLeft = window.pageXOffset || docElem.scrollLeft || body.scrollLeft;
+
+                // 减掉滚动距离，获得相对于客户区域的偏移量
+                top -= scrollTop;
+                left -= scrollLeft;
+
+                return {
+                    top: top,
+                    left: left
+                }
+            };
+
+            // 获取相对于视口(客户区域)的偏移量(viewpoint), 不加页面的滚动量(scroll)
+            var getOffsetRect = function (ele) {
+                // getBoundingClientRect返回一个矩形对象，包含四个属性：left、top、right和bottom。分别表示元素各边与页面上边和左边的距离。
+                //注意：IE、Firefox3+、Opera9.5、Chrome、Safari支持，在IE中，默认坐标从(2,2)开始计算，导致最终距离比其他浏览器多出两个像素，我们需要做个兼容。
+                var box = ele.getBoundingClientRect();
+                var body = document.body, docElem = document.documentElement;
+
+                //获取页面的scrollTop,scrollLeft(兼容性写法)
+                //var scrollTop = window.pageYOffset || docElem.scrollTop || body.scrollTop,
+                //    scrollLeft = window.pageXOffset || docElem.scrollLeft || body.scrollLeft;
+                var clientTop = docElem.clientTop || body.clientTop,
+                    clientLeft = docElem.clientLeft || body.clientLeft;
+                var top = box.top - clientTop,
+                    left = box.left - clientLeft;
+
+                return {
+                    //Math.round 兼容火狐浏览器bug
+                    top: Math.round(top),
+                    left: Math.round(left)
+                }
+            };
+
+            //获取元素相对于页面的偏移
+            var getOffset = function (ele) {
+                if (ele.getBoundingClientRect) {
+                    return getOffsetRect(ele);
+                } else {
+                    return getOffsetSum(ele);
+                }
+            };
+
+            if (domElement != document) {
+
+                // 这种方式的目的是为了让外部直接传入clientX,clientY,然后计算出相对父容器的offsetX,offsetY值,
+                // 即 offsetX = clientX - offsetV.left, offsetY = clientY - offsetV.top
+                var offsetV = getOffset(domElement);
+
+                // domElement.offsetLeft（offsetTop）是相对父容器的偏移量，如果用相对坐标表示，直接传回0
+                //offset	: [ domElement.offsetLeft,  domElement.offsetTop ]
+                offsetObj = {
+                    width: domElement.offsetWidth,
+                    height: domElement.offsetHeight,
+                    left: offsetV.left,
+                    top: offsetV.top
+                }
+
+            } else {
+
+                offsetObj = {
+                    width: window.innerWidth,
+                    height: window.innerHeight,
+                    left: 0,
+                    top: 0
+                }
+            }
+
+            return offsetObj;
+        },
+
+        /**
+         * set css class name
+         * @param {String} id
+         * @param {String} cssName
+         * @returns
+         */
+        setClassName: function (id, cssName) {
+            var dom = document.getElementById(id);
+            if (dom) {
+                dom.className = cssName;
+            }
+        },
+
+        /**
+         * add css class name
+         * @param {String} id
+         * @param {String} cssName
+         * @returns
+         */
+        addClassName: function (id, cssName) {
+            var a, b, c;
+            var i, j;
+            var s = /\s+/;
+            var dom = document.getElementById(id);
+            if (dom) {
+
+                b = dom;
+
+                if (cssName && typeof cssName == "string") {
+                    a = cssName.split(s);
+
+                    // 如果节点是元素节点，则 nodeType 属性将返回 1。
+                    // 如果节点是属性节点，则 nodeType 属性将返回 2。
+                    if (b.nodeType === 1) {
+                        if (!b.className && a.length === 1) {
+                            b.className = cssName;
+                        } else {
+                            c = " " + b.className + " ";
+
+                            for (i = 0, j = a.length; i < j; ++i) {
+                                c.indexOf(" " + a[i] + " ") < 0 && (c += a[0] + " ");
+                            }
+
+                            b.className = String.trim(c);
+                        }
+                    }
+                }
+            }
+        },
+
+        /**
+         * remove css class name
+         * @param {String} id
+         * @param {String} cssName
+         * @returns
+         */
+        removeClassName: function (id, className) {
+            var a, b, c;
+            var i, j;
+            var s = /\s+/;
+            var dom = document.getElementById(id);
+            if (dom) {
+                c = dom;
+
+                if (className && typeof className == "string") {
+                    a = (className || "").split(s);
+
+                    if (c.nodeType === 1 && c.className) {
+                        b = (" " + c.className + " ").replace(O, " ");
+                        for (i = 0, j = a.length; i < j; i++) {
+                            while (b.indexOf(" " + a[i] + " ") >= 0) {
+                                b = b.replace(" " + a[i] + " ", " ");
+                            }
+                        }
+                        c.className = className ? String.trim(b) : ""
+                    }
+                }
+            }
+        },
+
+        /**
+         * show or hide element
+         * @param {String} id
+         * @param {Boolean} isShow
+         * @returns
+         */
+        showOrHideElement: function (id, isShow) {
+            var dom = document.getElementById(id);
+            if (dom) {
+                if (isShow) {
+                    dom.style.display = "";
+                } else {
+                    dom.style.display = "none";
+                }
+            }
+        },
+        getStyleString: function
+            (style) {
+
+            var elements = [];
+
+            for (var key in style) {
+
+                var val = style[key];
+
+                elements.push(key);
+                elements.push(':');
+                elements.push(val);
+                elements.push('; ');
+            }
+
+            return elements.join('');
+        },
+        cloneStyle: function (style) {
+
+            var clone = {};
+
+            for (var key in style) {
+                clone[key] = style[key];
+            }
+
+            return clone;
+        },
+        removeStyleAttribute: function (style, attrs) {
+
+            if (!Array.isArray(attrs)) {
+                attrs = [attrs];
+            }
+
+            attrs.forEach(function (key) {
+                if (key in style) {
+                    delete style[key];
+                }
+            });
+        },
+        trimRight: function (text) {
+
+            if (text.length === 0) {
+                return "";
+            }
+
+            var lastNonSpace = text.length - 1;
+
+            for (var i = lastNonSpace; i >= 0; --i) {
+                if (text.charAt(i) !== ' ') {
+                    lastNonSpace = i;
+                    break;
+                }
+            }
+
+            return text.substr(0, lastNonSpace + 1);
+        },
+        trimLeft: function (text) {
+
+            if (text.length === 0) {
+                return "";
+            }
+
+            var firstNonSpace = 0;
+
+            for (var i = 0; i < text.length; ++i) {
+                if (text.charAt(i) !== ' ') {
+                    firstNonSpace = i;
+                    break;
+                }
+            }
+
+            return text.substr(firstNonSpace);
+        },
+        matchesSelector: function (domElem, selector) {
+
+            if (domElem.matches) {
+                return domElem.matches(selector);
+            }
+
+            if (domElem.matchesSelector) {
+                return domElem.matchesSelector(selector);
+            }
+
+            if (domElem.webkitMatchesSelector) {
+                return domElem.webkitMatchesSelector(selector);
+            }
+
+            if (domElem.msMatchesSelector) {
+                return domElem.msMatchesSelector(selector);
+            }
+
+            if (domElem.mozMatchesSelector) {
+                return domElem.mozMatchesSelector(selector);
+            }
+
+            if (domElem.oMatchesSelector) {
+                return domElem.oMatchesSelector(selector);
+            }
+
+            if (domElem.querySelectorAll) {
+
+                var matches = (domElem.document || domElem.ownerDocument).querySelectorAll(selector),
+                    i = 0;
+
+                while (matches[i] && matches[i] !== element) i++;
+
+                return matches[i] ? true : false;
+            }
+
+            return false;
+        },
+        toTranslate3d: function (x, y) {
+
+            return 'translate3d(' + x + 'px,' + y + 'px,0)';
+        },
+        setCursorStyle: function (element, direction) {
+
+            var cursor;
+
+            switch (direction) {
+                case 'n':
+                case 's':
+                    cursor = 'ns-resize';
+                    break;
+                case 'w':
+                case 'e':
+                    cursor = 'ew-resize';
+                    break;
+                case 'ne':
+                case 'sw':
+                    cursor = 'nesw-resize';
+                    break;
+                case 'nw':
+                case 'se':
+                    cursor = 'nwse-resize';
+                    break;
+            }
+
+            element.style.cursor = cursor;
+        }
+    };
 /*
   html2canvas 0.5.0-beta3 <http://html2canvas.hertzen.com>
   Copyright (c) 2016 Niklas von Hertzen
@@ -10448,6 +10793,60 @@ CLOUD.Extensions.DwgAnnotationEditor.prototype.setSvgZIndex = function (zIndex) 
         this.svg.style.zIndex = zIndex;
     }
 };
+var CLOUD = CLOUD || {};
+CLOUD.Extensions = CLOUD.Extensions || {};
+
+CLOUD.Extensions.FreeAnnotationEditor = function (domElement) {
+    "use strict";
+
+    CLOUD.Extensions.AnnotationEditor.call(this, domElement);
+};
+
+CLOUD.Extensions.FreeAnnotationEditor.prototype = Object.create(CLOUD.Extensions.AnnotationEditor.prototype);
+CLOUD.Extensions.FreeAnnotationEditor.prototype.constructor = CLOUD.Extensions.FreeAnnotationEditor;
+
+CLOUD.Extensions.FreeAnnotationEditor.prototype.onResize = function () {
+
+    var bounds = this.getDomContainerBounds();
+
+    this.bounds.x = 0;
+    this.bounds.y = 0;
+    this.bounds.width = bounds.width;
+    this.bounds.height = bounds.height;
+
+    this.svg.setAttribute('width', this.bounds.width + '');
+    this.svg.setAttribute('height', this.bounds.height + '');
+};
+
+CLOUD.Extensions.FreeAnnotationEditor.prototype.worldToClient = function (wPoint) {
+
+    var result = new THREE.Vector3();
+
+    // 变换到屏幕空间
+    result.x = wPoint.x;
+    result.y = -wPoint.y;
+    result.z = 0;
+
+    return result;
+};
+
+CLOUD.Extensions.FreeAnnotationEditor.prototype.clientToWorld = function (cPoint) {
+
+    var result = new THREE.Vector3();
+
+    result.x = cPoint.x;
+    result.y = -cPoint.y ; // 翻转,因为绘制图形参照坐标和屏幕的坐标系不同
+    result.z = 0;
+
+    return result;
+};
+
+CLOUD.Extensions.FreeAnnotationEditor.prototype.onCameraChange = function () {
+
+    this.handleCallbacks("changeEditor");
+};
+
+
 CLOUD.Extensions.Helper2D = function (viewer) {
 
     this.viewer = viewer;
@@ -11089,6 +11488,167 @@ CLOUD.Extensions.DwgHelper.prototype = {
         //};
 
         this.captureAnnotationsScreenSnapshot(snapshotCallback);
+    }
+
+};
+
+CLOUD.Extensions.FreeAnnotationHelper = function () {
+
+    this.domElement = null;
+    this.beginEditCallback = null;
+    this.endEditCallback = null;
+    this.stateChangeCallback = null;
+};
+
+CLOUD.Extensions.FreeAnnotationHelper.prototype = {
+
+    constructor: CLOUD.Extensions.FreeAnnotationHelper,
+
+    // 卸载资源
+    destroy: function() {
+
+        this.domElement = null;
+        this.beginEditCallback = null;
+        this.endEditCallback = null;
+        this.stateChangeCallback = null;
+    },
+
+    // 设置批注容器, 在使用批注功能前设置
+    setDomContainer: function (domElement) {
+
+        this.domElement = domElement;
+    },
+
+    // 设置回调, 在使用批注功能前，根据需要设置（如果需要设置，在初始化之前设置）
+    setEditCallback: function(beginEditCallback, endEditCallback, stateChangeCallback) {
+
+        this.beginEditCallback = beginEditCallback;
+        this.endEditCallback = endEditCallback;
+        this.stateChangeCallback = stateChangeCallback;
+    },
+
+    // 初始化批注
+    initAnnotation: function () {
+
+        if (!this.domElement) {
+            console.log("please set annotation dom element container!");
+            return;
+        }
+
+        if (!this.annotationEditor) {
+
+            this.annotationEditor = new CLOUD.Extensions.FreeAnnotationEditor(this.domElement);
+
+        }
+
+        if (!this.annotationEditor.isInitialized()) {
+
+            var callbacks = {
+                beginEditCallback: this.beginEditCallback,
+                endEditCallback: this.endEditCallback,
+                changeEditorModeCallback: this.stateChangeCallback
+            };
+
+            this.annotationEditor.init(callbacks);
+
+            callbacks = null;
+        }
+    },
+
+    // 卸载批注资源
+    uninitAnnotation: function () {
+
+        if (this.annotationEditor && this.annotationEditor.isInitialized()) {
+
+            this.annotationEditor.uninit();
+        }
+    },
+
+    // 设置背景色
+    setAnnotationBackgroundColor: function (startColor, stopColor) {
+
+        if (this.annotationEditor) {
+
+            this.annotationEditor.setBackgroundColor(startColor, stopColor);
+        }
+    },
+
+    // 开始编辑批注
+    editAnnotationBegin: function () {
+
+        // 如果没有设置批注模式，则自动进入批注模式
+        this.initAnnotation();
+
+        this.annotationEditor.editBegin();
+    },
+
+    // 完成编辑批注
+    editAnnotationEnd: function () {
+
+        if (this.annotationEditor) {
+
+            this.annotationEditor.editEnd();
+
+        }
+    },
+
+    // 设置批注类型
+    setAnnotationType: function (type) {
+
+        if (this.annotationEditor) {
+
+            this.annotationEditor.setAnnotationType(type);
+
+        }
+    },
+
+    // 加载批注
+    loadAnnotations: function (annotations) {
+
+        if (annotations) {
+
+            this.initAnnotation();
+            this.annotationEditor.loadAnnotations(annotations);
+        } else {
+            this.uninitAnnotation();
+        }
+    },
+
+    // 获得批注对象列表
+    getAnnotationInfoList: function () {
+
+        if (this.annotationEditor) {
+
+            return this.annotationEditor.getAnnotationInfoList();
+
+        }
+
+        return null;
+    },
+
+    // resize
+    resizeAnnotations: function () {
+
+        if (this.annotationEditor && this.annotationEditor.isInitialized()) {
+
+            this.annotationEditor.onResize();
+        }
+    },
+
+    // 相机变化处理
+    dealCameraChange: function () {
+
+        if (this.annotationEditor && this.annotationEditor.isInitialized()) {
+
+            this.annotationEditor.onCameraChange();
+
+        }
+    },
+
+    // 截屏 base64格式png图片
+    captureAnnotationsScreenSnapshot: function (dataUrl) {
+
+        return this.annotationEditor.getScreenSnapshot(dataUrl);
     }
 
 };

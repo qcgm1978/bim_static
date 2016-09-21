@@ -356,23 +356,23 @@
         id: 'xuanban',
         icon: 'm-xuanban',
         title: '选中构件半透明',
-        fn: 'fit',
+        fn: 'setTranslucentSelected',
         keyCode: '',
-        type: 'viewer',
+        type: 'view',
         group: '2'
       },{
         id: 'weixuanban',
         icon: 'm-weixuanban',
         title: '未选中构件半透明',
-        fn: 'zoom',
+        fn: 'setTranslucentUnselected',
         keyCode: '',
-        type: 'pattern',
+        type: 'view',
         group: '3'
       }, {
         id: 'hideSelected',
         icon: 'm-hideSelected',
         title: '隐藏选中构件',
-        fn: 'behind',
+        fn: 'setHideSelected',
         type: 'view',
         group: '4'
       }, {
@@ -386,7 +386,7 @@
         id: 'showAll',
         icon: 'm-showAll',
         title: '显示全部模型',
-        fn: 'behind',
+        fn: 'showAll',
         type: 'view',
         group: '4'
       }]
