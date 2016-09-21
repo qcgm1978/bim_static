@@ -220,7 +220,7 @@ App.Project = {
 			this.linkSilderSpecial('specialty', _specialFilterFiles);
 			if(_hideCode){
 				App.Project.Settings.Viewer.filter({
-					ids: _hideCode,
+					ids: _this.filterHideCode(_hideCode),
 					type: "classCode"
 				})
 			}
@@ -261,6 +261,22 @@ App.Project = {
 				}
 				hide.push(item.code);
 				return false;
+			})
+		})
+		return hide;
+	},
+	filterHideCode: function(code) {
+		var _class = App.Project.Settings.Viewer.ClassCodeData,
+			_all=[];
+		hide = [];
+		if (typeof code == 'string') {
+			code = [code];
+		}
+		_.each(_class, function(item) {
+			_.find(code, function(i) {
+				if (item.code.indexOf(i) == 0) {
+					hide.push(item.code);
+				}
 			})
 		})
 		return hide;
