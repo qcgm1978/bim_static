@@ -29,6 +29,10 @@
 		span { font-size: 12px; }
 		.userBg { float: left; width: 35px; height: 35px; background: url('/topNav/images/user.png') no-repeat; margin-top: 9px; margin-right: 5px; }
 	}
+	.menuNav{
+		padding-top: 16px;
+		margin-left: 20px;
+	}
 	.login { display: block; height: 49px; line-height: 49px; cursor: pointer; }
 }
 //remind.html for ie
@@ -131,3 +135,41 @@
   background-repeat: no-repeat;
   background-attachment: scroll;
 }
+
+.onlineNav {
+	width: 140px;
+	border:1px solid #ccc;
+	background: #EEE;
+	position: fixed;
+	top:45px;
+	right: 20px;
+	z-index: 99900;
+	display: none;
+	& ul,li{
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		text-align: center;
+	}
+	& li {
+		height: 32px;
+		line-height: 32px;
+		color: #666;
+		font-size: 14px;
+		font-family:"Microsoft YaHei";
+		& i{
+			color: #ccc;
+		}
+	}
+	& .split{
+		height: 8px;
+		line-height: 0px;
+		& div{
+			display: inline-block;
+			width: 80%;
+			border-top:1px solid #ccc;
+		}
+	}
+}
+
+
