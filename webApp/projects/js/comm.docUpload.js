@@ -105,15 +105,15 @@
 
                 //上传失败
                 uploadError: function(file) {
-                    console.log(file.message);
-                    var  lockerId = (file.message.match(/\[(.|)+\]/))[0].replace(/(\[|\])/g,'');
+                    var message=file.message;
+                    var lockerId =message.match(/[0-9]+/g).pop();
                     var user = /user/.test(file.message);
                     if(user){
                         $.ajax({
                             url:App.API.URL.fetchServicesUserName + lockerId +"?outer=false",
                             type:"GET",
                             success:function(res){
-                                if(res.success){
+                                if(res.code==0 && res.data){
                                     alert('上传失败。'  + '文件：' + file.file.name + "已锁定！锁定人是：" +  res.data.name);  //+ file.message
                                 }
                             },

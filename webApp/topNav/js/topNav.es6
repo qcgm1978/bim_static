@@ -26,8 +26,14 @@ App.TopNav = {
 			e.stopPropagation();
 		})
 
+		$('.menuNav').click(function(e){
+			$('.onlineNav').show();
+			e.stopPropagation();
+		})
+
 		$(document).on('click', function(e) {
 			$('.userinfo').hide();
+			$('.onlineNav').hide();
 		})
 	}
 

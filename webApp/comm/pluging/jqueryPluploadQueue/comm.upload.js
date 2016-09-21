@@ -60,7 +60,6 @@
             var self = upload
             options.init = {
                 FilesAdded: function(up, files) {
-                    debugger
                     if (!options.canUploadFile()) {
                         //jquery.plupload.quere.js b绑定了 FilesAdded 这个时候文件已经存在了，所以 要删除
                         App.isUploading = false;
