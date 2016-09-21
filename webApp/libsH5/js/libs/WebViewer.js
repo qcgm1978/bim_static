@@ -5895,17 +5895,31 @@ For three.js r73
 CloudUniformsLib = {
     cust_clip: {
         iClipPlane: { type: "i", value: 0 },
-        vClipPlane: { type: "v4", value: new THREE.Vector4(0, 0, 1, 0) }
+        vClipPlane: { type: "v4v", value: new Array(new THREE.Vector4(), new THREE.Vector4(), new THREE.Vector4(), new THREE.Vector4(), new THREE.Vector4(), new THREE.Vector4()) }
     },
     cus_Instanced:{
         transformMatrix: { type: "m4", value: new THREE.Matrix4() }
     }
 };
 CloudShaderChunk = {
-    cust_clip_pars_vertex: "#ifdef USE_CUSTOMCLIP\n\n    uniform vec4 vClipPlane; \n\n    uniform int iClipPlane; \n\n    varying float fClipDistance;\n\n#endif\n",
-    cust_clip_pars_fragment: "#ifdef USE_CUSTOMCLIP\n\n    uniform int iClipPlane; \n\n    varying float fClipDistance;\n\n#endif\n",
-    cust_clip_vertex: "#ifdef USE_CUSTOMCLIP\n\n    if(iClipPlane >0) {\n        fClipDistance = dot(worldPosition.xyz, vClipPlane.xyz) + vClipPlane.w;\n    }\n#endif\n",
-    cust_clip_fragment: "#ifdef USE_CUSTOMCLIP\n\n    if(iClipPlane >0 && fClipDistance > 0.0) {\n\n        discard;\n\n    }\n\n#endif\n",
+    cust_clip_pars_vertex: "#ifdef USE_CUSTOMCLIP\n\n    uniform vec4 vClipPlane[6]; \n\n    uniform int iClipPlane; \n\n    varying float fClipDistance[6];\n\n#endif\n",
+    cust_clip_pars_fragment: "#ifdef USE_CUSTOMCLIP\n\n    uniform int iClipPlane; \n\n    varying float fClipDistance[6];\n\n#endif\n",
+
+    cust_clip_vertex:
+    "#ifdef USE_CUSTOMCLIP\n\n" +
+    " for(int i = 0; i < 6; i++) {\n" +
+    "     if (i < iClipPlane)\n" +
+    "         fClipDistance[i] = dot(worldPosition.xyz, vClipPlane[i].xyz) + vClipPlane[i].w;\n" +
+    "  }\n" +
+    "#endif\n",
+
+    cust_clip_fragment:
+        "#ifdef USE_CUSTOMCLIP\n\n" +
+        "for(int i = 0; i < 6; i++) {\n\n" +
+        "    if (i < iClipPlane)\n" +
+        "       if (fClipDistance[i] > 0.0) discard;\n\n" +
+        "}\n\n" +
+        "#endif\n",
 
     cust_Instanced_pars_vertex:"#ifdef USE_CUST_INSTANCED\n\n    attribute vec4 componentV1;\nattribute vec4 componentV2;\nattribute vec4 componentV3;\nattribute vec4 componentV4;\n#endif\n",
     cust_Instanced_normal_vertex:"#ifdef USE_CUST_INSTANCED\n\n\tmat4 modelTransMatrix = mat4(componentV1, componentV2, componentV3,componentV4);\n\t objectNormal = inverseTransformDirection(objectNormal, modelTransMatrix);\n#endif\n",
@@ -7260,6 +7274,8 @@ CLOUD.Scene = function () {
 
     this.clipWidget = null;
 
+    this.clipPlanes = null;
+
     var len = CLOUD.GlobalData.SceneSize * 0.5;
     this.innerBoundingBox = new THREE.Box3();
 
@@ -7593,6 +7609,20 @@ CLOUD.Scene.prototype.getClipWidget = function(){
     }
 
     return this.clipWidget;
+};
+
+CLOUD.Scene.prototype.getClipPlanes = function(){
+
+    if (this.clipPlanes == null) {
+        var bbox = new THREE.Box3();
+        bbox.copy(this.rootNode.boundingBox);
+        bbox.applyMatrix4(this.rootNode.matrix);
+
+        this.clipPlanes = new CLOUD.ClipPlanes(bbox.size(), bbox.center());
+        this.add(this.clipPlanes);
+    }
+
+    return this.clipPlanes;
 };
 
 CLOUD.Scene.prototype.traverseIf = function (callback) {
@@ -8021,7 +8051,7 @@ CLOUD.Scene.prototype.prepareOutside = function (camera) {
 
         return false;
     });
-}
+};
 
 CLOUD.Scene.prototype.collectionGarbage = function () {
 
@@ -8044,7 +8074,7 @@ CLOUD.Scene.prototype.collectionGarbage = function () {
     });
 
     this.garbageCount = 0;
-}
+};
 
 CLOUD.Scene.prototype.getHitPoint = function (x, y, camera) {
 
@@ -9163,7 +9193,8 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
         W: 87,
         PLUS: 187,
         SUB: 189,
-        ZERO: 48
+        ZERO: 48,
+        ESC: 27
     };
 
     // 限制Z轴, 因为做过场景旋转，故场景Z轴其实对应坐标Y轴
@@ -10644,7 +10675,7 @@ CLOUD.PickHelper.prototype = {
             if (isDoubleClick) {
 
                 if (CLOUD.GlobalData.EnableDemolishByDClick) {
-                     scope.filter.addDemolishId(userId, true);
+                     scope.filter.addDemolishId(userId, false);
                      cameraEditor.updateView(true);                     
                 }
                 scope.onObjectSelected(intersect, true);
@@ -11180,6 +11211,14 @@ CLOUD.OrbitEditor.prototype.onKeyUp = function (event) {
 
     var camera_scope = this.cameraEditor;
     if (camera_scope.enabled === false || camera_scope.noKeys === true || camera_scope.noPan === true) return;
+
+    //switch (event.keyCode) {
+    //    case camera_scope.keys.ESC:
+    //        this.scene.filter.cancelSelected();
+    //        break;
+    //    default :
+    //        break
+    //}
 };
 
 CLOUD.OrbitEditor.prototype.touchstart = function (event) {
@@ -12752,235 +12791,250 @@ CLOUD.CameraAnimator = function () {
 
 CLOUD.Filter = function () {
 
-    var visibilityFilter = {};
+    var _visibilityFilter = {}; // 可见过滤器
+    var _fileFilter = {}; // 文件过滤器
 
-    var fileFilter = {};
+    var _sceneOverriderState = false; // 场景半透明
+    var _hideUnselected = false; // 未选中构件隐藏
+    var _hideSelected = false; // 选中构件隐藏
+    var _translucentUnselected = false; // 未选中构件半透明
+    var _translucentSelected = false; // 选中构件半透明
 
-    var _sceneOverriderState = false;
-    var _hideUnselected = false;
-
-    var overridedMaterials = {};
-    overridedMaterials.selection = CLOUD.MaterialUtil.createHilightMaterial();
-    overridedMaterials.scene = CLOUD.MaterialUtil.createPhongMaterial({ color: 0x888888, opacity: 0.1, transparent: true, side: THREE.DoubleSide });
-    overridedMaterials.darkRed = CLOUD.MaterialUtil.createPhongMaterial({color: 0xA02828, opacity: 1, transparent: false, side: THREE.DoubleSide });
-    overridedMaterials.lightBlue = CLOUD.MaterialUtil.createPhongMaterial({ color: 0x1377C0, opacity: 1, transparent: false, side: THREE.DoubleSide });
-    overridedMaterials.black = CLOUD.MaterialUtil.createPhongMaterial({ color: 0x0, opacity: 0.3, transparent: true, side: THREE.DoubleSide });
-
+    // 内置材质库
+    var _overridedMaterials = {};
+    _overridedMaterials.selection = CLOUD.MaterialUtil.createHilightMaterial();
+    _overridedMaterials.scene = CLOUD.MaterialUtil.createPhongMaterial({ color: 0x888888, opacity: 0.1, transparent: true, side: THREE.DoubleSide });
+    _overridedMaterials.darkRed = CLOUD.MaterialUtil.createPhongMaterial({color: 0xA02828, opacity: 1, transparent: false, side: THREE.DoubleSide });
+    _overridedMaterials.lightBlue = CLOUD.MaterialUtil.createPhongMaterial({ color: 0x1377C0, opacity: 1, transparent: false, side: THREE.DoubleSide });
+    _overridedMaterials.black = CLOUD.MaterialUtil.createPhongMaterial({ color: 0x0, opacity: 0.3, transparent: true, side: THREE.DoubleSide });
     // Green
-    overridedMaterials.add = CLOUD.MaterialUtil.createPhongMaterial({ color: 0x00FF00, opacity: 1, transparent: true, side: THREE.DoubleSide });
+    _overridedMaterials.add = CLOUD.MaterialUtil.createPhongMaterial({ color: 0x00FF00, opacity: 1, transparent: true, side: THREE.DoubleSide });
     // Red
-    overridedMaterials.delete = CLOUD.MaterialUtil.createPhongMaterial({ color: 0xFF0000, opacity: 0.5, transparent: true, side: THREE.DoubleSide });
+    _overridedMaterials.delete = CLOUD.MaterialUtil.createPhongMaterial({ color: 0xFF0000, opacity: 0.5, transparent: true, side: THREE.DoubleSide });
     // Yellow
-    overridedMaterials.beforeEdit = CLOUD.MaterialUtil.createPhongMaterial({ color: 0xFABD05, opacity: 0.5, transparent: true, side: THREE.DoubleSide });
-    overridedMaterials.afterEdit = CLOUD.MaterialUtil.createPhongMaterial({ color: 0xFABD05, opacity: 1, transparent: true, side: THREE.DoubleSide });
+    _overridedMaterials.beforeEdit = CLOUD.MaterialUtil.createPhongMaterial({ color: 0xFABD05, opacity: 0.5, transparent: true, side: THREE.DoubleSide });
+    _overridedMaterials.afterEdit = CLOUD.MaterialUtil.createPhongMaterial({ color: 0xFABD05, opacity: 1, transparent: true, side: THREE.DoubleSide });
 
-    var materialOverriderByUserId = {};
+    var _materialOverriderByUserId = {}; // _materialOverriderByUserId.name.value
+    var _materialOverriderByUserData = {}; // _materialOverriderByUserData.name.value
 
-    var materialOverriderByUserData = {};
+    var _selectionBoundingBox = new THREE.Box3(); // 选中构件的包围盒
 
-    var selectionBoundingBox = new THREE.Box3();
-    var selectionSet = null;
-    var demolishSet = null;
-
+    var _selectionSet = null; // 选中的构件集合
+    var _demolishSet = null; // 半透明的构件集合，是通过选择对象获得的构件集合，和场景半透明不同。
 
     this.clear = function () {
-        visibilityFilter = {};
-        fileFilter = {};
+        _visibilityFilter = {};
+        _fileFilter = {};
         _sceneOverriderState = false;
         _hideUnselected = false;
-        materialOverriderByUserId = {};
-        materialOverriderByUserData = {};
-        selectionSet = null;
-        demolishSet = null;
+        _hideSelected = false;
+        _materialOverriderByUserId = {};
+        _materialOverriderByUserData = {};
+        _selectionSet = null;
+        _demolishSet = null;
     };
 
     //DEBUG API
     this.getVisibleFilter = function () {
-        return visibilityFilter;
+        return _visibilityFilter;
     };
 
     this.getFileFilter = function () {
-        return fileFilter;
+        return _fileFilter;
     };
 
     this.getOverriderByUserId = function () {
-        return materialOverriderByUserId;
+        return _materialOverriderByUserId;
     };
 
     this.getOverriderByUserData = function () {
-        return materialOverriderByUserData;
+        return _materialOverriderByUserData;
     };
 
     this.getSelectionSet = function () {
-        return selectionSet;
+        return _selectionSet;
     };
 
     this.getDemolishSet = function () {
-        return demolishSet;
+        return _demolishSet;
     };
 
     ////////////////////////////////////////////////////////////////////
     // Visbililty Filter API
-    this.setHideUnselected = function(enabled){
-        _hideUnselected = enabled;
-    };
-
-    this.isHideUnselected = function () {
-        return _hideUnselected;
-    };
 
     // only show the nodes with the specified ids. 
     this.setFilterByUserIds = function (ids) {
 
         if (ids) {
-            visibilityFilter.ids = {};
+            _visibilityFilter.ids = {};
             for (var ii = 0, len = ids.length; ii < len; ++ii) {
-                visibilityFilter.ids[ids[ii]] = true;
+                _visibilityFilter.ids[ids[ii]] = true;
             }
         }
         else {
-            delete visibilityFilter.ids;
+            delete _visibilityFilter.ids;
         }
 
     };
 
+    // 将ID集合加入到可见容器中
     this.addFilterByUserIds = function (ids) {
 
         if (!ids)
             return;
 
-        if (!visibilityFilter.ids)
-            visibilityFilter.ids = {};
+        if (!_visibilityFilter.ids)
+            _visibilityFilter.ids = {};
 
         for (var ii = 0, len = ids.length; ii < len; ++ii) {
-            visibilityFilter.ids[ids[ii]] = true;
+            _visibilityFilter.ids[ids[ii]] = true;
         }
     };
 
+    // 将值为value的ID加入到名字为name的可见容器中
     this.addUserFilter = function (name, value) {
 
-        if (visibilityFilter[name] === undefined) {
-            visibilityFilter[name] = {};
+        if (_visibilityFilter[name] === undefined) {
+            _visibilityFilter[name] = {};
         }
-            
 
-        visibilityFilter[name][value] = true;
+        _visibilityFilter[name][value] = true;
     };
 
+    // 获得名字为name的可见过滤器对象
     this.getUserFilter = function (name) {
-        return visibilityFilter[name];
-    }
+        return _visibilityFilter[name];
+    };
 
+    // 从名字为name的可见过滤器中移除值为value的ID
     this.removeUserFilter = function (name, value) {
-   
-        if (!visibilityFilter[name])
+
+        if (!_visibilityFilter[name])
             return;
 
         if(value === undefined){
-            delete visibilityFilter[name];
+            delete _visibilityFilter[name];
         }
         else {
 
-            if (visibilityFilter[name][value]) {
-                delete visibilityFilter[name][value];
+            if (_visibilityFilter[name][value]) {
+                delete _visibilityFilter[name][value];
             }
 
-            if (Object.getOwnPropertyNames(visibilityFilter[name]).length == 0) {
-                delete visibilityFilter[name];
+            if (Object.getOwnPropertyNames(_visibilityFilter[name]).length == 0) {
+                delete _visibilityFilter[name];
             }
 
         }
-    }
+    };
 
+    // 清除可见过滤器
     this.clearUserFilters = function () {
-        visibilityFilter = {};
-    }
+        _visibilityFilter = {};
+    };
 
+    // 增加文件id到文件过滤器中
     this.addFileFilter = function (fileId) {
-        fileFilter[fileId] = 0;
-    }
+        _fileFilter[fileId] = 0;
+    };
 
+    // 从文件过滤器中移除文件id
     this.removeFileFilter = function (fileId) {
         if (fileId === undefined) {
-            fileFilter = {};
+            _fileFilter = {};
         }
         else {
-            if (fileFilter[fileId] !== undefined) {
-                delete fileFilter[fileId];
+            if (_fileFilter[fileId] !== undefined) {
+                delete _fileFilter[fileId];
             }
         }
-    }
+    };
 
+    // 判断文件过滤器中是否存在文件ID
     this.hasFileFilter = function (fileId) {
-        return fileFilter[fileId] !== undefined;
-    }
+        return _fileFilter[fileId] !== undefined;
+    };
+
     ////////////////////////////////////////////////////////////////////
     // material overrider API
+
+    // 是否启用场景材质，用于场景半透明
     this.enableSceneOverrider = function (enable) {
         _sceneOverriderState = enable;
     };
 
+    // 场景材质启用状态 -- true: 启用， false: 禁用
     this.isSceneOverriderEnabled = function () {
         return _sceneOverriderState;
     };
 
+    // 设置材质
+    // 如果存在名为materialName的材质，则修改材质颜色；
+    // 如果不存在名为materialName的材质，则创建一个新材质
     this.setOverriderMaterial = function (materialName, color) {
-        var material = overridedMaterials[materialName];
+        var material = _overridedMaterials[materialName];
         if (material) {
             material.color = color;
             return material;
         }
         else {
             material = CLOUD.MaterialUtil.createHilightMaterial({color: color});
-            overridedMaterials[materialName] = material;
+            _overridedMaterials[materialName] = material;
             return material;
         }
     };
 
+    // 通过id集合设置材质
     this.setOverriderByUserIds = function (name, ids, materialName) {
+
+        // 如果名字未定义，则清空材质过滤器数据
         if (name === undefined) {
-            materialOverriderByUserId = {};
+            _materialOverriderByUserId = {};
             return;
         }
-           
+
+        // 如果id集合未定义，则删除名为name材质
         if (ids === undefined) {
 
-            if (materialOverriderByUserId[name]) {
-                delete materialOverriderByUserId[name];
+            if (_materialOverriderByUserId[name]) {
+                delete _materialOverriderByUserId[name];
             }
-           
+
         }
         else {
-            
+
             var material = null;
             if (materialName) {
-                material = overridedMaterials[materialName];
+                material = _overridedMaterials[materialName];
             }
+
+            // 有问题， material可能为null
 
             var overrider = {};
             overrider.material = material;
-            
+
             overrider.ids = {};
             for (var ii = 0, len = ids.length; ii < len; ++ii) {
                 overrider.ids[ids[ii]] = true;
             }
 
-            materialOverriderByUserId[name] = overrider;
+            _materialOverriderByUserId[name] = overrider;
         }
-        
+
     };
 
     this.setUserOverrider = function (name, value, materialName) {
         if (name === undefined) {
-            materialOverriderByUserData = {};
+            _materialOverriderByUserData = {};
             return;
         }
-          
+
 
         if (value === undefined) {
 
-            if (materialOverriderByUserData[name]) {
-                delete materialOverriderByUserData[name];
+            if (_materialOverriderByUserData[name]) {
+                delete _materialOverriderByUserData[name];
             }
 
         }
@@ -12988,120 +13042,124 @@ CLOUD.Filter = function () {
 
             var material = null;
             if (materialName) {
-                material = overridedMaterials[materialName];
+                material = _overridedMaterials[materialName];
             }
 
-            if (!materialOverriderByUserData[name])
-                materialOverriderByUserData[name] = {};
+            if (!_materialOverriderByUserData[name])
+                _materialOverriderByUserData[name] = {};
 
-            materialOverriderByUserData[name][value] = material;
+            _materialOverriderByUserData[name][value] = material;
         }
     };
 
+    // 从名为name的自定义材质过滤器中移除
     this.removeUserOverrider = function (name, value) {
 
         if (name === undefined) {
-            materialOverriderByUserData = {};
+            _materialOverriderByUserData = {};
             return;
         }
-            
 
-        if (!materialOverriderByUserData[name])
+        if (!_materialOverriderByUserData[name])
             return;
 
         if (value === undefined) {
-            delete materialOverriderByUserData[name];
+            delete _materialOverriderByUserData[name];
         }
         else {
-            delete materialOverriderByUserData[name][value];
+            delete _materialOverriderByUserData[name][value];
         }
 
     };
-
 
     ////////////////////////////////////////////////////////////////
     // 设置selectionSet的颜色
+
     this.setSelectionMaterial = function (color) {
-        overridedMaterials.selection.color = color;
+        _overridedMaterials.selection.color = color;
     };
 
+    // 设置选中构件集合
     this.setSelectedIds = function (ids) {
 
         if (ids && ids.length > 0) {
-            selectionSet = {};
+            _selectionSet = {};
             for (var ii = 0, len = ids.length; ii < len; ++ii) {
-                selectionSet[ids[ii]] = true;
+                _selectionSet[ids[ii]] = true;
             }
             return true;
         }
 
-        if (selectionSet) {
-            selectionSet = null;
+        if (_selectionSet) {
+            _selectionSet = null;
             return true;
         }
-  
+
         return false;
     };
 
+    // 增加选中构件
     this.addSelectedIds = function (ids) {
 
         if (!ids)
             return;
 
-        if (!selectionSet){
-            selectionSet = {};
+        if (!_selectionSet){
+            _selectionSet = {};
         }
-            
+
         for (var ii = 0, len = ids.length; ii < len; ++ii) {
-            selectionSet[ids[ii]] = true;
+            _selectionSet[ids[ii]] = true;
         }
 
     };
 
+    // 移除某个选中构件
     this.removeSelectedId = function (id) {
-        if (selectionSet && selectionSet[id]) {
+        if (_selectionSet && _selectionSet[id]) {
 
-            delete selectionSet[id];
+            delete _selectionSet[id];
 
             var count = 0;
-            for (var name in selectionSet) {
+            for (var name in _selectionSet) {
                 ++count;
                 break;
             }
 
             if (count == 0)
-                selectionSet = null;
+                _selectionSet = null;
 
             return true;
         }
         return false;
     };
 
+    // 增加或移除某个选中构件
     this.addSelectedId = function (id, value, removeIfExist) {
-        if (!selectionSet) {
-            selectionSet = {};
+        if (!_selectionSet) {
+            _selectionSet = {};
         }
 
         if (removeIfExist && this.removeSelectedId(id)) {
-                return false;
+            return false;
         }
 
-        selectionSet[id] = value || true;
+        _selectionSet[id] = value || true;
         return true;
     };
-    
-    //demolishSet
+
+    //_demolishSet
 
     this.setDemolishIds = function (ids) {
 
         if (ids && ids.length > 0) {
-            demolishSet = {};
+            _demolishSet = {};
             for (var ii = 0, len = ids.length; ii < len; ++ii) {
-                demolishSet[ids[ii]] = true;
+                _demolishSet[ids[ii]] = true;
             }
         }
         else {
-            demolishSet = null;
+            _demolishSet = null;
         }
     };
 
@@ -13110,104 +13168,141 @@ CLOUD.Filter = function () {
         if (!ids)
             return;
 
-        if (!demolishSet) {
-            demolishSet = {};
+        if (!_demolishSet) {
+            _demolishSet = {};
         }
 
 
         for (var ii = 0, len = ids.length; ii < len; ++ii) {
-            demolishSet[ids[ii]] = true;
+            _demolishSet[ids[ii]] = true;
         }
 
     };
 
     this.addDemolishId = function (id, removeIfExist) {
-        if (!demolishSet) {
-            demolishSet = {};
+        if (!_demolishSet) {
+            _demolishSet = {};
         }
 
         if (removeIfExist) {
-            if (demolishSet[id]) {
+            if (_demolishSet[id]) {
 
-                delete demolishSet[id];
-           
+                delete _demolishSet[id];
+
                 var count = 0;
-                for (var name in demolishSet) {
+                for (var name in _demolishSet) {
                     ++count;
                     break;
                 }
 
                 if (count == 0)
-                    demolishSet = null;
+                    _demolishSet = null;
 
                 return false;
             }
         }
 
-        demolishSet[id] = true;
+        _demolishSet[id] = true;
         return true;
     };
 
 
     ////////////////////////////////////////////////////////////////
-    // 判断是否可见
+    // 判断是否可见, true: 可见， 否则 不可见
     this.isVisible = function (node) {
 
         var id = node.name;
-        if (visibilityFilter.ids && visibilityFilter.ids[id] === undefined) {
+        if (_visibilityFilter.ids && _visibilityFilter.ids[id] === undefined) {
             return false;
         }
 
         if (!node.userData)
             return true;
 
-        for (var item in visibilityFilter) {
+        for (var item in _visibilityFilter) {
 
             var userValue = node.userData[item];
-            if(userValue && visibilityFilter[item][userValue] !== undefined ){
+            if(userValue && _visibilityFilter[item][userValue] !== undefined ){
                 return false;
             }
         }
 
+        // 隐藏未选中构件
         if (_hideUnselected) {
 
-            if (selectionSet && selectionSet[id])
+            if (_selectionSet && _selectionSet[id])
                 return true;
 
             return false;
+
         }
-        
+
+        if (_hideSelected){
+
+            // 隐藏选中构件
+            if (_selectionSet && _selectionSet[id])
+                return false;
+
+            return true;
+        }
+
         return true;
     };
 
-
     function hasSelection() {
 
-        return selectionSet != null;
-    };
+        return _selectionSet != null;
+    }
 
-    // 判断是否选中
+    // 判断构件是否选中
     function isSelected (id) {
 
-        if (selectionSet && selectionSet[id] !== undefined) {
+        if (_selectionSet && _selectionSet[id] !== undefined) {
             return true;
         }
 
         return false;
-    };
+    }
 
+    // 判断构件是否双击选中
     function isDemolished(id) {
 
-        if (demolishSet && demolishSet[id]) {
+        if (_demolishSet && _demolishSet[id]) {
             return true;
         }
 
         return false;
-    };
+    }
 
+    // 判断构件是否半透明
+    function isTranslucent(id) {
+
+        if (_selectionSet) {
+
+            // 半透明未选中构件
+            if (_translucentUnselected) {
+
+                if (_selectionSet[id])
+                    return false;
+
+                return true;
+            }
+
+            // 半透明选中构件
+            if (_translucentSelected){
+
+                if (_selectionSet[id])
+                    return true;
+
+                return false;
+            }
+        }
+
+        return false;
+    }
 
     // 计算选中对象的包围盒
-    this.computeSelectionBox = function (renderList) {                
+    this.computeSelectionBox = function (renderList) {
 
         if (!hasSelection())
             return false;
@@ -13227,15 +13322,15 @@ CLOUD.Filter = function () {
                     object.geometry.computeBoundingBox();
                 }
                 var box =  object.geometry.boundingBox;
-                
+
                 if (box) {
                     var box2 = box.clone();
                     if (object.matrixWorld) {
                         box2.applyMatrix4(object.matrixWorld);
                     }
 
-                    selectionBoundingBox.expandByPoint(box2.min);
-                    selectionBoundingBox.expandByPoint(box2.max);
+                    _selectionBoundingBox.expandByPoint(box2.min);
+                    _selectionBoundingBox.expandByPoint(box2.max);
                 }
             }
 
@@ -13244,7 +13339,7 @@ CLOUD.Filter = function () {
         return true;
     };
 
-
+    // 对象是否可以被pick -- true: 对象可以被pick，false: 对象不可以pick
     this.isSelectable = function (object) {
 
         if (!_sceneOverriderState) {
@@ -13252,17 +13347,21 @@ CLOUD.Filter = function () {
         }
 
         var id = object.name;
-        
-        if (isDemolished(id)) {
+
+        // 是否双击选中构件
+        if (!isDemolished(id)) {
             return true;
         }
 
+        // 是否选中对象
         if (isSelected(id)) {
-            return true;
+            if (!isTranslucent(id))
+                return true;
         }
 
-        for (var item in materialOverriderByUserId) {
-            var overrider = materialOverriderByUserId[item];
+        //
+        for (var item in _materialOverriderByUserId) {
+            var overrider = _materialOverriderByUserId[item];
             if (overrider.ids[id])
                 return true;
         }
@@ -13270,15 +13369,14 @@ CLOUD.Filter = function () {
         if (!object.userData)
             return true;
 
-        for (var item in materialOverriderByUserData) {
-            var overrider = materialOverriderByUserData[item];
+        for (var item in _materialOverriderByUserData) {
+            var overrider = _materialOverriderByUserData[item];
             var material = overrider[object.userData[item]];
             if (material !== undefined)
                 return true;
         }
 
         return false;
-
     };
 
     // 切换材质
@@ -13286,16 +13384,24 @@ CLOUD.Filter = function () {
 
         var id = object.name;
 
+        // 半透明
         if (isDemolished(id)) {
-            return overridedMaterials.scene;
+            return _overridedMaterials.scene;
         }
 
-        if (isSelected(id)) {
-            return overridedMaterials.selection;
-        }           
+        if (isTranslucent(id)) {
+            return _overridedMaterials.scene;
+        }
 
-        for (var item in materialOverriderByUserId) {
-            var overrider = materialOverriderByUserId[item];
+        // 选中
+        if (isSelected(id)) {
+
+            return _overridedMaterials.selection;
+        }
+
+        // 是否在ID集合材质过滤器中
+        for (var item in _materialOverriderByUserId) {
+            var overrider = _materialOverriderByUserId[item];
             if (overrider.ids[id])
                 return overrider.material;
         }
@@ -13303,15 +13409,17 @@ CLOUD.Filter = function () {
         if (!object.userData)
             return null;
 
-        for (var item in materialOverriderByUserData) {
-            var overrider = materialOverriderByUserData[item];
+        // 自定义材质过滤器
+        for (var item in _materialOverriderByUserData) {
+            var overrider = _materialOverriderByUserData[item];
             var material = overrider[object.userData[item]];
             if (material !== undefined)
                 return material;
         }
-   
+
+        // 场景材质
         if (_sceneOverriderState) {
-            return overridedMaterials.scene;
+            return _overridedMaterials.scene;
         }
 
         return null;
@@ -13319,51 +13427,135 @@ CLOUD.Filter = function () {
 
     // 重置包围盒
     this.resetSelectionBox = function() {
-        selectionBoundingBox.makeEmpty();
+        _selectionBoundingBox.makeEmpty();
     };
 
+    // 获得选中对象包围盒
     this.getSelectionBox = function() {
-        return selectionBoundingBox;
+        return _selectionBoundingBox;
     };
 
+    // 空容器
     this.isSelectionSetEmpty = function() {
         return !hasSelection();
     };
 
-    // 半透明已选构件
-    this.selectedTransparent = function() {
+    // ------------------- 隔离功能（隐藏／半透明）S ------------------- //
 
+    // 未选中的构件隐藏设置
+    this.setHideUnselected = function(enabled){
+        _hideUnselected = enabled;
+
+        // 如果上一次隐藏了选中构造
+        if (enabled && _hideSelected)
+            _hideSelected = false;
     };
 
-    // 半透明其它构件
-    this.selectedTransparentOthers = function() {
+    // 是否隐藏未选中的构件
+    this.isHideUnselected = function () {
+        return _hideUnselected;
+    };
 
+    // 选中构件隐藏设置
+    this.setHideSelected = function(enabled){
+        _hideSelected = enabled;
+
+        // 如果上一次隐藏了未选中构造
+        if (enabled && _hideUnselected)
+            _hideUnselected = false;
+    };
+
+    // 是否隐藏选中构件
+    this.isHideSelected = function () {
+        return _hideSelected;
+    };
+
+    // 已选构件半透明状态设置
+    this.setTranslucentSelected = function(enabled) {
+
+        _translucentSelected = enabled;
+
+        if (enabled && _translucentUnselected) {
+
+            _translucentUnselected = false;
+        }
+    };
+
+    // 是否半透明已选构件
+    this.isTranslucentSelected = function () {
+        return _translucentSelected;
+    };
+
+    // 未选构件半透明状态设置
+    this.setTranslucentUnselected = function(enabled) {
+
+        _translucentUnselected = enabled;
+
+        if (enabled && _translucentSelected) {
+
+            _translucentSelected = false;
+        }
+    };
+
+    // 是否半透明其它构件
+    this.isTranslucentUnSelected = function () {
+        return _translucentUnselected;
     };
 
     // 取消所有半透明
-    this.cancelTransparentAll = function() {
+    this.cancelTranslucentAll = function() {
+
+        // 取消双击半透明
+        if (_demolishSet) {
+
+            for (var id in _demolishSet) {
+
+                if (_demolishSet[id]) {
+
+                    delete _demolishSet[id];
+
+                }
+            }
+
+            _demolishSet = null;
+
+        }
+
+        if (_translucentUnselected)
+            _translucentUnselected = false;
+
+        if (_translucentSelected)
+            _translucentSelected = false;
+
+        // 全场景半透明
+        if (_sceneOverriderState) {
+            _sceneOverriderState = false;
+        }
+    };
+
+    // 取消选中构件
+    this.cancelSelected = function() {
+
+        if (_selectionSet) {
+
+            for (var id in _selectionSet) {
+                delete _selectionSet[id];
+            }
+
+            _selectionSet = null;
+        }
 
     };
 
-    // 隐藏其它构件
-    this.selectedHideOthers = function() {
+    // 恢复所有构件
+    this.revertAll = function() {
 
+        this.setHideUnselected(false);
+        this.setHideSelected(false);
+        this.cancelTranslucentAll();
     };
 
-    // 隐藏选中构件
-    this.selectedHide = function() {
-
-    };
-
-    // 显示选中构件
-    this.selectedShow = function() {
-
-    };
-
-    // 显示所有构件
-    this.showAll = function() {
-
-    };
+    // ------------------- 隔离功能（隐藏／半透明）E ------------------- //
 };
 
 CLOUD.MaterialLoader = function ( showStatus ) {
@@ -17133,6 +17325,8 @@ CLOUD.SceneLoader.prototype = {
                         object.leaf = 1;
 
                         object.client = client;
+                        if (objJSON.nodeCount)
+                            object.nodeCount = objJSON.nodeCount;
 
                         CLOUD.GeomUtil.parseSceneNode(object, objJSON, scope.manager, level);
 
@@ -18732,11 +18926,12 @@ CLOUD.ClipWidget = function (plane, center) {
     THREE.Object3D.call(this);
 
     this.uniforms = CloudShaderLib.phong_cust_clip.uniforms;
-    this.uniforms.vClipPlane.value.copy(plane);
-    this.clipplane = new THREE.Vector4();
-    this.clipplane.copy(plane);
-    this.center = new THREE.Vector3();
-    this.center.copy(center);
+
+    this.uniforms.vClipPlane.value[0] = plane.clone();
+
+    this.clipplane = plane.clone();
+
+    this.center = center.clone();
 
     this.size = 0.4;
     this.raycaster = new CLOUD.Raycaster();
@@ -18847,10 +19042,10 @@ CLOUD.ClipWidget = function (plane, center) {
     this.onUpdateClipPlane = function (enabled, clipplane, m) {
         CloudShaderLib.base_cust_clip.uniforms.iClipPlane.value = enabled;
         if (clipplane !== undefined) {
-            CloudShaderLib.base_cust_clip.uniforms.vClipPlane.value.copy(clipplane);
+            CloudShaderLib.base_cust_clip.uniforms.vClipPlane.value[0] = clipplane.clone();
         }
         if (m !== undefined) {
-            CloudShaderLib.base_cust_clip.uniforms.vClipPlane.value.applyMatrix4(m);
+            CloudShaderLib.base_cust_clip.uniforms.vClipPlane.value[0].applyMatrix4(m);
         }
     }
 
@@ -18893,8 +19088,8 @@ CLOUD.ClipWidget = function (plane, center) {
         var m = new THREE.Matrix4();
         m.getInverse(this.matrix);
         m.transpose();
-        this.uniforms.vClipPlane.value.copy(this.clipplane);
-        this.uniforms.vClipPlane.value.applyMatrix4(m);
+        this.uniforms.vClipPlane.value[0] = this.clipplane.clone();
+        this.uniforms.vClipPlane.value[0].applyMatrix4(m);
 
         this.onUpdateClipPlane(this.isEnabled(), this.clipplane, m);
     }
@@ -18910,7 +19105,7 @@ CLOUD.ClipWidget = function (plane, center) {
 
         offsetOld = offset;
 
-        tmpClipplane = this.uniforms.vClipPlane.value;
+        tmpClipplane = this.uniforms.vClipPlane.value[0];
         offsetVector = new THREE.Vector3(tmpClipplane.x * dist, tmpClipplane.y * dist, tmpClipplane.z * dist);
         this.position.add(offsetVector);
 
@@ -18998,7 +19193,7 @@ CLOUD.ClipWidget = function (plane, center) {
 
     this.hitTest = function(ray){
         var plane = new THREE.Plane();
-        var v4 = this.uniforms.vClipPlane.value;
+        var v4 = this.uniforms.vClipPlane.value[0];
         plane.setComponents(v4.x, v4.y, v4.z, v4.w);
 
         return { sign: ray.direction.dot(plane.normal) < 0, distance: ray.distanceToPlane(plane) };
@@ -19143,6 +19338,7 @@ CLOUD.ClipPlaneService.prototype = {
         var clipEditor = viewer.editorManager.editors["clipEditor"];
         if (clipEditor !== undefined) {
             clipEditor.update(camera);
+            viewer.render();
         }
 
     },
@@ -19151,10 +19347,12 @@ CLOUD.ClipPlaneService.prototype = {
 
         var viewer = this.viewer;
         var clipEditor = viewer.editorManager.editors["clipEditor"];
-        if (clipEditor !== undefined) {
+        if (clipEditor === undefined) {
             clipEditor = new CLOUD.ClipEditor(viewer.cameraEditor, viewer.getScene(), viewer.domElement);
             viewer.editorManager.editors["clipEditor"] = clipEditor;
         }
+
+        this.update(viewer.camera);
 
         return clipEditor;
     },
@@ -19199,6 +19397,7 @@ CLOUD.ClipPlaneService.prototype = {
 
         var clipEditor = this.getClipEditor();
         clipEditor.rotX(rot);
+
     },
 
     // 以切面局部坐标Y轴为轴旋转切面
@@ -19215,6 +19414,7 @@ CLOUD.ClipPlaneService.prototype = {
 
         var clipEditor = this.getClipEditor();
         return clipEditor.backup();
+
     },
 
     // 恢复切面状态
@@ -19224,6 +19424,7 @@ CLOUD.ClipPlaneService.prototype = {
 
         var clipEditor = this.getClipEditor();
         clipEditor.restore(status, offset, rotx, roty);
+
     },
 }
 CloudViewer = function() {

@@ -786,6 +786,38 @@
       filter.setHideUnselected(!filter.isHideUnselected());
       viewer.render();
     },
+    showAll: function() {
+      //恢复
+      var self = this;
+      var viewer = self.viewer;
+      var filter = viewer.getFilters();
+      filter.revertAll();
+      viewer.render();
+    },
+    setHideSelected: function() {
+      //隐藏选中构件
+      var self = this;
+      var viewer = self.viewer;
+      var filter = viewer.getFilters();
+      filter.setHideSelected(!filter.isHideSelected());
+      viewer.render();
+    },
+    setTranslucentSelected : function() {
+      //半透明选中构件
+      var self = this;
+      var viewer = self.viewer;
+      var filter = viewer.getFilters();
+      filter.setTranslucentSelected(!filter.isTranslucentSelected());
+      viewer.render();
+    },
+    setTranslucentUnselected : function() {
+      //半透明未选中构件
+      var self = this;
+      var viewer = self.viewer;
+      var filter = viewer.getFilters();
+      filter.setTranslucentUnselected(!filter.isTranslucentUnSelected());
+      viewer.render();
+    },
     initMap: function(options) {
       var defaults = {
           element: '',
