@@ -783,7 +783,8 @@
       var self = this;
       var viewer = self.viewer;
       var filter = viewer.getFilters();
-      filter.setHideUnselected(!filter.isHideUnselected());
+      //filter.setHideUnselected(!filter.isHideUnselected());
+      filter.setHideUnselected(true);
       viewer.render();
     },
     showAll: function() {
@@ -799,7 +800,8 @@
       var self = this;
       var viewer = self.viewer;
       var filter = viewer.getFilters();
-      filter.setHideSelected(!filter.isHideSelected());
+      //filter.setHideSelected(!filter.isHideSelected());
+      filter.setHideSelected(true);
       viewer.render();
     },
     setTranslucentSelected : function() {
@@ -807,7 +809,9 @@
       var self = this;
       var viewer = self.viewer;
       var filter = viewer.getFilters();
-      filter.setTranslucentSelected(!filter.isTranslucentSelected());
+      //filter.setTranslucentSelected(!filter.isTranslucentSelected());
+      filter.setTranslucentSelected(true);
+
       viewer.render();
     },
     setTranslucentUnselected : function() {
@@ -815,7 +819,8 @@
       var self = this;
       var viewer = self.viewer;
       var filter = viewer.getFilters();
-      filter.setTranslucentUnselected(!filter.isTranslucentUnSelected());
+      //filter.setTranslucentUnselected(!filter.isTranslucentUnSelected());
+      filter.setTranslucentUnselected(true);
       viewer.render();
     },
     initMap: function(options) {
