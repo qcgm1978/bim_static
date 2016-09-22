@@ -1080,7 +1080,10 @@ App.Console = {
         datainit[g] = obj[g];
 
       }
-
+      if(datainit['initiator']&&datainit['initiator']['userId']==123){
+        var userId = JSON.parse(localStorage.user)['userId'];
+        datainit['initiator']['userId'] = datainit['auditor'][0]['userId'] = datainit['confirmor'][0]['userId'] = datainit['receiver'][0]['userId'] = userId;
+      }
       var data = {
         "msgContent"   : JSON.stringify({
           "messageId"  : "411a109141d6473c83a86aa0480d6610",
