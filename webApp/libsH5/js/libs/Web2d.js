@@ -6755,7 +6755,7 @@ CLOUD.Extensions.Annotation = function (editor, id) {
     this.size = {width: 0, height: 0};
     this.rotation = 0;
 
-    this.style = this.getDefaultStyle();
+    this.style = editor.annotationStyle || this.getDefaultStyle();
     this.shape = null;
     this.selected = false;
     this.highlighted = false;
@@ -9344,6 +9344,7 @@ CLOUD.Extensions.AnnotationEditor = function (domElement, cameraEditor) {
     this.annotationMinLen = 16;
     this.initialized = false;
     this.epsilon = 0.0001;
+    this.annotationStyle = null;
 
     this.onMouseDownBinded = this.onMouseDown.bind(this);
     this.onMouseDoubleClickBinded = this.onMouseDoubleClick.bind(this);
@@ -11598,6 +11599,25 @@ CLOUD.Extensions.FreeAnnotationHelper.prototype = {
         if (this.annotationEditor) {
 
             this.annotationEditor.setAnnotationType(type);
+
+        }
+    },
+
+    //    var style = {};
+    //style['stroke-width'] = 3;
+    //style['stroke-color'] = '#ff0000';
+    //style['stroke-opacity'] = 1.0;
+    //style['fill-color'] = '#ff0000';
+    //style['fill-opacity'] = 0.0;
+    //style['font-family'] = 'Arial';
+    //style['font-size'] = 16;
+    //style['font-style'] = '';
+    //style['font-weight'] = '';
+    setAnnotationStyle: function(style) {
+
+        if (this.annotationEditor) {
+
+            this.annotationEditor.setAnnotationStyle(style);
 
         }
     },

@@ -12821,7 +12821,277 @@ CLOUD.Filter = function () {
     var _selectionBoundingBox = new THREE.Box3(); // 选中构件的包围盒
 
     var _selectionSet = null; // 选中的构件集合
-    var _demolishSet = null; // 半透明的构件集合，是通过选择对象获得的构件集合，和场景半透明不同。
+    var _demolishSet = null; // 现在用于双击半透明构件的集合
+
+    // 为保存前一次状态，加入四个集合
+    var _hideUnselectionSet = null; // 隐藏 [未选中] 构件的集合（使用选中的构件集合反转表示未选中集合）
+    var _hideSelectionSet = null; // 隐藏 [选中] 构件的集合
+    var _translucentUnselectionSet = null; // 半透明 [未选中] 构件的集合
+    var _translucentSelectionSet = null; // 半透明 [选中] 构件的集合
+
+    function hasSelection() {
+
+        return _selectionSet != null;
+    }
+
+    //// 增加到未隐藏容器
+    //function addToHideUnselectedSet(id) {
+    //
+    //    if (!_hideUnselectionSet) {
+    //        _hideUnselectionSet = {};
+    //    }
+    //
+    //    _hideUnselectionSet[id] = true;
+    //}
+
+    // 清除未隐藏容器
+    function clearHideUnselectionSet() {
+
+        if (_hideUnselectionSet) {
+
+            for (var id in _hideUnselectionSet) {
+                delete _hideUnselectionSet[id];
+            }
+
+            _hideUnselectionSet = null;
+        }
+    }
+
+    //
+    function pushToHideUnselectionSet() {
+
+        if (_selectionSet) {
+
+            if (!_hideUnselectionSet) {
+
+                _hideUnselectionSet = {};
+            }
+
+            for (var id in _selectionSet) {
+
+                if (_hideUnselectionSet[id] !== _selectionSet[id]) {
+                    _hideUnselectionSet[id] = _selectionSet[id];
+                }
+            }
+        }
+    }
+
+    //// 增加到隐藏容器
+    //function addToHideSelectionSet(id) {
+    //
+    //    if (!_hideSelectionSet) {
+    //        _hideSelectionSet = {};
+    //    }
+    //
+    //    _hideSelectionSet[id] = true;
+    //}
+
+    // 清除隐藏容器
+    function clearHideSelectionSet() {
+
+        if (_hideSelectionSet) {
+
+            for (var id in _hideSelectionSet) {
+                delete _hideSelectionSet[id];
+            }
+
+            _hideSelectionSet = null;
+        }
+    }
+
+    //
+    function pushToHideSelectionSet() {
+
+        if (_selectionSet) {
+
+            if (!_hideSelectionSet) {
+
+                _hideSelectionSet = {};
+            }
+
+            for (var id in _selectionSet) {
+
+                if (_hideSelectionSet[id] !== _selectionSet[id]) {
+                    _hideSelectionSet[id] = _selectionSet[id];
+                }
+            }
+        }
+    }
+
+    //// 增加到未半透明容器
+    //function addToTranslucentUnselectionSet(id) {
+    //
+    //    if (!_translucentUnselectionSet) {
+    //        _translucentUnselectionSet = {};
+    //    }
+    //
+    //    _translucentUnselectionSet[id] = true;
+    //}
+
+    // 清除未半透明容器
+    function clearTranslucentUnselectionSet() {
+
+        if (_translucentUnselectionSet) {
+
+            for (var id in _translucentUnselectionSet) {
+                delete _translucentUnselectionSet[id];
+            }
+
+            _translucentUnselectionSet = null;
+        }
+    }
+
+    //
+    function pushToTranslucentUnselectionSet() {
+
+        if (_selectionSet) {
+
+            if (!_translucentUnselectionSet) {
+
+                _translucentUnselectionSet = {};
+            }
+
+            for (var id in _selectionSet) {
+
+                if (_translucentUnselectionSet[id] !== _selectionSet[id]) {
+                    _translucentUnselectionSet[id] = _selectionSet[id];
+                }
+            }
+        }
+    }
+
+    //// 增加到半透明容器
+    //function addToTranslucentSelectionSet(id) {
+    //
+    //    if (!_translucentSelectionSet) {
+    //        _translucentSelectionSet = {};
+    //    }
+    //
+    //    _translucentSelectionSet[id] = true;
+    //}
+
+    // 清除未半透明容器
+    function clearTranslucentSelectionSet() {
+
+        if (_translucentSelectionSet) {
+
+            for (var id in _translucentSelectionSet) {
+                delete _translucentSelectionSet[id];
+            }
+
+            _translucentSelectionSet = null;
+        }
+    }
+
+    function pushToTranslucentSelectionSet() {
+
+        if (_selectionSet) {
+
+            if (!_translucentSelectionSet) {
+
+                _translucentSelectionSet = {};
+            }
+
+            for (var id in _selectionSet) {
+
+                if (_translucentSelectionSet[id] !== _selectionSet[id]) {
+                    _translucentSelectionSet[id] = _selectionSet[id];
+                }
+            }
+        }
+    }
+
+    function resetSelectionState() {
+
+        if (_hideUnselected)
+            _hideUnselected = false;
+
+        if (_hideSelected)
+            _hideSelected = false;
+
+        if (_translucentUnselected)
+            _translucentUnselected = false;
+
+        if (_translucentSelected)
+            _translucentSelected = false;
+
+        // 全场景半透明
+        if (_sceneOverriderState) {
+            _sceneOverriderState = false;
+        }
+    }
+
+    // 判断构件是否选中
+    function isSelected (id) {
+
+        if (_selectionSet && _selectionSet[id] !== undefined) {
+            return true;
+        }
+
+        return false;
+    }
+
+    // 判断构件是否双击选中
+    function isDemolished(id) {
+
+        if (_demolishSet && _demolishSet[id]) {
+            return true;
+        }
+
+        return false;
+    }
+
+    function isTranslucentFromTranslucentSelectedSet(id) {
+
+        if (_translucentSelectionSet && _translucentSelectionSet[id]) {
+            return true;
+        }
+
+        return false;
+    }
+
+    function isTranslucentFromTranslucentUnselectedSet(id) {
+
+        // 如果ID不在未半透明构件集，则该构件半透明
+        if (_translucentUnselectionSet && !_translucentUnselectionSet[id]) {
+            return true;
+        }
+
+        return false;
+    }
+
+    // 判断构件是否半透明
+    function isTranslucent(id) {
+
+        if (isTranslucentFromTranslucentSelectedSet(id)) {
+            return true;
+        }
+
+        if (isTranslucentFromTranslucentUnselectedSet(id)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    function isVisibleFromHideSeletedSet (id) {
+
+        if (_hideSelectionSet && _hideSelectionSet[id]) {
+            return false;
+        }
+
+        return true;
+    }
+
+    function isVisibleFromHideUnseletedSet (id) {
+
+        // 如果ID不在未选中构件集，则该构件隐藏
+        if (_hideUnselectionSet && !_hideUnselectionSet[id]) {
+            return false;
+        }
+
+        return true;
+    }
 
     this.clear = function () {
         _visibilityFilter = {};
@@ -12829,33 +13099,45 @@ CLOUD.Filter = function () {
         _sceneOverriderState = false;
         _hideUnselected = false;
         _hideSelected = false;
+        _translucentUnselected = false;
+        _translucentSelected = false;
         _materialOverriderByUserId = {};
         _materialOverriderByUserData = {};
         _selectionSet = null;
         _demolishSet = null;
+        _hideUnselectionSet = null;
+        _hideSelectionSet = null;
+        _translucentUnselectionSet = null;
+        _translucentSelectionSet = null;
     };
 
     //DEBUG API
+    // 获得可见过滤器
     this.getVisibleFilter = function () {
         return _visibilityFilter;
     };
 
+    // 获得文件可见过滤器
     this.getFileFilter = function () {
         return _fileFilter;
     };
 
+    // 获得材质过滤器
     this.getOverriderByUserId = function () {
         return _materialOverriderByUserId;
     };
 
+    // 获得自定义材质过滤器
     this.getOverriderByUserData = function () {
         return _materialOverriderByUserData;
     };
 
+    // 获得选中构件集合
     this.getSelectionSet = function () {
         return _selectionSet;
     };
 
+    // 获得双击选中构件集合
     this.getDemolishSet = function () {
         return _demolishSet;
     };
@@ -12878,7 +13160,7 @@ CLOUD.Filter = function () {
 
     };
 
-    // 将ID集合加入到可见容器中
+    // 将ID集合加入到可见过滤器中
     this.addFilterByUserIds = function (ids) {
 
         if (!ids)
@@ -12892,7 +13174,7 @@ CLOUD.Filter = function () {
         }
     };
 
-    // 将值为value的ID加入到名字为name的可见容器中
+    // 将值为value的ID加入到名字为name的可见过滤器中
     this.addUserFilter = function (name, value) {
 
         if (_visibilityFilter[name] === undefined) {
@@ -12902,7 +13184,7 @@ CLOUD.Filter = function () {
         _visibilityFilter[name][value] = true;
     };
 
-    // 获得名字为name的可见过滤器对象
+    // 获得名字为name的可见对象集
     this.getUserFilter = function (name) {
         return _visibilityFilter[name];
     };
@@ -13007,9 +13289,11 @@ CLOUD.Filter = function () {
             var material = null;
             if (materialName) {
                 material = _overridedMaterials[materialName];
-            }
+            }else {
 
-            // 有问题， material可能为null
+                // 有问题， material可能为null
+                console.log("the material that material name is [" + materialName + "] not exist!");
+            }
 
             var overrider = {};
             overrider.material = material;
@@ -13024,12 +13308,12 @@ CLOUD.Filter = function () {
 
     };
 
+    // 设置自定义材质过滤器数据
     this.setUserOverrider = function (name, value, materialName) {
         if (name === undefined) {
             _materialOverriderByUserData = {};
             return;
         }
-
 
         if (value === undefined) {
 
@@ -13073,8 +13357,8 @@ CLOUD.Filter = function () {
     };
 
     ////////////////////////////////////////////////////////////////
-    // 设置selectionSet的颜色
 
+    // 设置构件选中的颜色
     this.setSelectionMaterial = function (color) {
         _overridedMaterials.selection.color = color;
     };
@@ -13083,26 +13367,32 @@ CLOUD.Filter = function () {
     this.setSelectedIds = function (ids) {
 
         if (ids && ids.length > 0) {
+
+            this.clearSelectionSet();
+
             _selectionSet = {};
+
             for (var ii = 0, len = ids.length; ii < len; ++ii) {
                 _selectionSet[ids[ii]] = true;
             }
+
             return true;
         }
 
         if (_selectionSet) {
-            _selectionSet = null;
+
+            this.clearSelectionSet();
+
             return true;
         }
 
         return false;
     };
 
-    // 增加选中构件
+    // 增加选中构件集合
     this.addSelectedIds = function (ids) {
 
-        if (!ids)
-            return;
+        if (!ids) return;
 
         if (!_selectionSet){
             _selectionSet = {};
@@ -13116,22 +13406,31 @@ CLOUD.Filter = function () {
 
     // 移除某个选中构件
     this.removeSelectedId = function (id) {
+
         if (_selectionSet && _selectionSet[id]) {
 
             delete _selectionSet[id];
 
-            var count = 0;
-            for (var name in _selectionSet) {
-                ++count;
-                break;
-            }
-
-            if (count == 0)
+            if (this.isNullSelectionSet())
                 _selectionSet = null;
+
 
             return true;
         }
         return false;
+    };
+
+    // 清除选择集
+    this.clearSelectionSet = function() {
+
+        if (_selectionSet) {
+
+            for (var id in _selectionSet) {
+                delete _selectionSet[id];
+            }
+
+            _selectionSet = null;
+        }
     };
 
     // 增加或移除某个选中构件
@@ -13141,19 +13440,47 @@ CLOUD.Filter = function () {
         }
 
         if (removeIfExist && this.removeSelectedId(id)) {
+
             return false;
         }
 
         _selectionSet[id] = value || true;
+
+        return true;
+    };
+
+    // 是否空选择集
+    this.isNullSelectionSet = function() {
+
+        //var count = 0;
+        //for (var name in _selectionSet) {
+        //    ++count;
+        //    break;
+        //}
+        //
+        //if (count == 0)
+        //    return true;
+        //
+        //return false;
+
+        for (var id in _selectionSet) {
+           return false;
+        }
+
         return true;
     };
 
     //_demolishSet
 
+    // 设置ID集合
     this.setDemolishIds = function (ids) {
 
         if (ids && ids.length > 0) {
+
+            this.clearDemolishSet();
+
             _demolishSet = {};
+
             for (var ii = 0, len = ids.length; ii < len; ++ii) {
                 _demolishSet[ids[ii]] = true;
             }
@@ -13163,6 +13490,7 @@ CLOUD.Filter = function () {
         }
     };
 
+    // 增加ID集合
     this.addDemolishIds = function (ids) {
 
         if (!ids)
@@ -13179,7 +13507,9 @@ CLOUD.Filter = function () {
 
     };
 
+    // 增加单个ID
     this.addDemolishId = function (id, removeIfExist) {
+
         if (!_demolishSet) {
             _demolishSet = {};
         }
@@ -13189,13 +13519,7 @@ CLOUD.Filter = function () {
 
                 delete _demolishSet[id];
 
-                var count = 0;
-                for (var name in _demolishSet) {
-                    ++count;
-                    break;
-                }
-
-                if (count == 0)
+                if (this.isNullDemolishSet())
                     _demolishSet = null;
 
                 return false;
@@ -13206,6 +13530,34 @@ CLOUD.Filter = function () {
         return true;
     };
 
+    // 是否空选择集
+    this.isNullDemolishSet = function() {
+
+        for (var id in _demolishSet) {
+            return false;
+        }
+
+        return true;
+    };
+
+    // 清空容器
+    this.clearDemolishSet = function() {
+
+        if (_demolishSet) {
+
+            for (var id in _demolishSet) {
+
+                if (_demolishSet[id]) {
+
+                    delete _demolishSet[id];
+
+                }
+            }
+
+            _demolishSet = null;
+
+        }
+    };
 
     ////////////////////////////////////////////////////////////////
     // 判断是否可见, true: 可见， 否则 不可见
@@ -13227,79 +13579,16 @@ CLOUD.Filter = function () {
             }
         }
 
-        // 隐藏未选中构件
-        if (_hideUnselected) {
-
-            if (_selectionSet && _selectionSet[id])
-                return true;
-
+        if (!isVisibleFromHideSeletedSet(id)) {
             return false;
-
         }
 
-        if (_hideSelected){
-
-            // 隐藏选中构件
-            if (_selectionSet && _selectionSet[id])
-                return false;
-
-            return true;
+        if (!isVisibleFromHideUnseletedSet(id)) {
+            return false;
         }
 
         return true;
     };
-
-    function hasSelection() {
-
-        return _selectionSet != null;
-    }
-
-    // 判断构件是否选中
-    function isSelected (id) {
-
-        if (_selectionSet && _selectionSet[id] !== undefined) {
-            return true;
-        }
-
-        return false;
-    }
-
-    // 判断构件是否双击选中
-    function isDemolished(id) {
-
-        if (_demolishSet && _demolishSet[id]) {
-            return true;
-        }
-
-        return false;
-    }
-
-    // 判断构件是否半透明
-    function isTranslucent(id) {
-
-        if (_selectionSet) {
-
-            // 半透明未选中构件
-            if (_translucentUnselected) {
-
-                if (_selectionSet[id])
-                    return false;
-
-                return true;
-            }
-
-            // 半透明选中构件
-            if (_translucentSelected){
-
-                if (_selectionSet[id])
-                    return true;
-
-                return false;
-            }
-        }
-
-        return false;
-    }
 
     // 计算选中对象的包围盒
     this.computeSelectionBox = function (renderList) {
@@ -13342,22 +13631,19 @@ CLOUD.Filter = function () {
     // 对象是否可以被pick -- true: 对象可以被pick，false: 对象不可以pick
     this.isSelectable = function (object) {
 
-        if (!_sceneOverriderState) {
-            return true;
-        }
+        // 场景半透明不能pick
+        if (_sceneOverriderState)
+            return false;
 
         var id = object.name;
 
-        // 是否双击选中构件
-        if (!isDemolished(id)) {
-            return true;
-        }
+        // 双击半透明不能pick
+        if (isDemolished(id))
+            return false;
 
-        // 是否选中对象
-        if (isSelected(id)) {
-            if (!isTranslucent(id))
-                return true;
-        }
+        // 半透明不能pick
+        if (isTranslucent(id))
+            return false;
 
         //
         for (var item in _materialOverriderByUserId) {
@@ -13376,7 +13662,7 @@ CLOUD.Filter = function () {
                 return true;
         }
 
-        return false;
+        return true;
     };
 
     // 切换材质
@@ -13384,12 +13670,17 @@ CLOUD.Filter = function () {
 
         var id = object.name;
 
-        // 半透明
         if (isDemolished(id)) {
             return _overridedMaterials.scene;
         }
 
-        if (isTranslucent(id)) {
+        // 半透明
+        if (isTranslucentFromTranslucentSelectedSet(id)) {
+            return _overridedMaterials.scene;
+        }
+
+        // 半透明
+        if (isTranslucentFromTranslucentUnselectedSet(id)) {
             return _overridedMaterials.scene;
         }
 
@@ -13443,12 +13734,26 @@ CLOUD.Filter = function () {
     // ------------------- 隔离功能（隐藏／半透明）S ------------------- //
 
     // 未选中的构件隐藏设置
-    this.setHideUnselected = function(enabled){
+    this.setHideUnselected = function (enabled) {
+
         _hideUnselected = enabled;
 
         // 如果上一次隐藏了选中构造
-        if (enabled && _hideSelected)
-            _hideSelected = false;
+        if (enabled) {
+
+            pushToHideUnselectionSet();
+
+            // 如果上一次隐藏了选中构造
+            if (_hideSelected)
+                _hideSelected = false;
+
+            if (_translucentUnselected)
+                _translucentUnselected = false;
+
+            if (_translucentSelected)
+                _translucentSelected = false;
+        }
+
     };
 
     // 是否隐藏未选中的构件
@@ -13457,12 +13762,26 @@ CLOUD.Filter = function () {
     };
 
     // 选中构件隐藏设置
-    this.setHideSelected = function(enabled){
+    this.setHideSelected = function (enabled) {
+
         _hideSelected = enabled;
 
-        // 如果上一次隐藏了未选中构造
-        if (enabled && _hideUnselected)
-            _hideUnselected = false;
+        if (enabled) {
+
+            pushToHideSelectionSet();
+            this.clearSelectionSet();
+
+            // 如果上一次隐藏了未选中构造
+            if (_hideUnselected)
+                _hideUnselected = false;
+
+            if (_translucentUnselected)
+                _translucentUnselected = false;
+
+            if (_translucentSelected)
+                _translucentSelected = false;
+        }
+
     };
 
     // 是否隐藏选中构件
@@ -13475,10 +13794,22 @@ CLOUD.Filter = function () {
 
         _translucentSelected = enabled;
 
-        if (enabled && _translucentUnselected) {
+        if (enabled) {
 
-            _translucentUnselected = false;
+            pushToTranslucentSelectionSet();
+
+            this.clearSelectionSet();
+
+            if (_hideUnselected)
+                _hideUnselected = false;
+
+            if (_hideSelected)
+                _hideSelected = false;
+
+            if (_translucentUnselected)
+                _translucentUnselected = false;
         }
+
     };
 
     // 是否半透明已选构件
@@ -13491,10 +13822,21 @@ CLOUD.Filter = function () {
 
         _translucentUnselected = enabled;
 
-        if (enabled && _translucentSelected) {
+        if (enabled) {
 
-            _translucentSelected = false;
+            pushToTranslucentUnselectionSet();
+
+            // 如果上一次隐藏了未选中构造
+            if (_hideUnselected)
+                _hideUnselected = false;
+
+            if (_hideSelected)
+                _hideSelected = false;
+
+            if (_translucentSelected)
+                _translucentSelected = false;
         }
+
     };
 
     // 是否半透明其它构件
@@ -13531,28 +13873,19 @@ CLOUD.Filter = function () {
         if (_sceneOverriderState) {
             _sceneOverriderState = false;
         }
-    };
-
-    // 取消选中构件
-    this.cancelSelected = function() {
-
-        if (_selectionSet) {
-
-            for (var id in _selectionSet) {
-                delete _selectionSet[id];
-            }
-
-            _selectionSet = null;
-        }
 
     };
 
     // 恢复所有构件
     this.revertAll = function() {
 
-        this.setHideUnselected(false);
-        this.setHideSelected(false);
-        this.cancelTranslucentAll();
+        this.clearDemolishSet();
+        this.clearSelectionSet();
+        clearHideSelectionSet();
+        clearHideUnselectionSet();
+        clearTranslucentSelectionSet();
+        clearTranslucentUnselectionSet();
+        resetSelectionState();
     };
 
     // ------------------- 隔离功能（隐藏／半透明）E ------------------- //
