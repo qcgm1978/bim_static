@@ -422,6 +422,7 @@
     setRectZoomMode: function(isLock) {
       // 框选缩放
       var self = this;
+      self._dom.bimBox.find(".view").attr('class', 'view');
       self.pub('setRectZoomMode');
       self.viewer.setRectZoomMode();
     },
