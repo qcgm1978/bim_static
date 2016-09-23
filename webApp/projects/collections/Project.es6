@@ -1,5 +1,9 @@
 App.Project = {
 
+	currentProsCat:"",
+	currentOpenCat:"",
+	currentCheckFloor:"",
+
 	//检查点标记点击事件
 	markerClick: function(marker) {
 		var id = marker? marker.id:"",
@@ -110,14 +114,37 @@ App.Project = {
 			ratio: 1.0
 		}
 	},
+	sigleFileRule:function(cat){
+		if(cat=="工程桩"){
+			this.linkSilderCategory('category', '绿色地形');
+		}
+		if(cat=="幕墙"){
+			this.linkSilderSpecial('specialty', '幕墙');
+		}
+	},
 	//单独类型、自定义过滤规则
-	sigleRule: function(cat, floor) {
+	sigleRule: function(cat, floor,secendIds) {
 		var _this = this,
 			_v = App.Project.Settings.Viewer,
 			_spFiles = _v.SpecialtyFileObjData, //专业文件数据对象
 			_ctFiles = _v.ComponentTypeFilesData,//结构类型数据对象
+			_files = App.Project.Settings.Viewer.FloorFilesData,
 			_specialFilterFiles=[],
 			_hideCode=[];
+
+		if (_this.filterRule.file.indexOf(cat) != -1) {
+			var _hideFileIds = _.filter(_files, function(i) {
+				return secendIds.indexOf(i)==-1;
+			});
+			_this.sigleFileRule(cat);
+			App.Project.Settings.Viewer.fileFilter({
+				ids: _hideFileIds,
+				total: secendIds
+			});
+			return ;
+		}
+
+
 		if (cat == '地下防水') {
 			this.linkSilder('floors', '');
 			this.linkSilderSpecial('specialty', 'WDGC-Q-ST-垫层防水层.rvt');
@@ -525,9 +552,11 @@ App.Project = {
 			var shaType = type == 'dis' ? 1 : 0;
 			var data = this.currentLoadData[type],
 				result = [],
-				boxs = [];
+				boxs = [],
+				scenceIds=[];
 			if (_.isArray(data)) {
 				_.each(data, function(i) {
+					scenceIds.push(i.componentId.split('.')[0]);
 					if (i.location && i.location.indexOf('boundingBox') != -1) {
 						if (type == 'dis') {
 							var _loc = JSON.parse(i.location);
@@ -541,6 +570,15 @@ App.Project = {
 						}
 					}
 				})
+
+				if(type=="process" && _this.currentProsCat && data.length){
+					_this.recoverySilder();
+					_this.sigleRule(_this.currentProsCat,_this.currentCheckFloor,scenceIds);
+				}
+				if(type=="open" && _this.currentOpenCat && data.length){
+					_this.recoverySilder();
+					_this.sigleRule(_this.currentOpenCat,_this.currentCheckFloor,scenceIds);
+				}
 				App.Project.Settings.Viewer.setTopView(boxs, true);
 				viewer.viewer.setMarkerClickCallback(App.Project.markerClick);
 				viewer.loadMarkers(result);
@@ -1796,6 +1834,7 @@ App.Project = {
 
 		return sb.toString();
 	},
+
 	//1 红色 2 橙色 3绿色
 	//color 2 红色 1绿色 0 黄|橙
 	formatMark: function(location, color, id, shaType) {
@@ -1867,13 +1906,12 @@ App.Project = {
 		if (_this.filterRule.file.indexOf(cat) != -1) {
 			var _hideFileIds = _.filter(_files, function(i) {
 				return i != _secenId;
-			})
+			});
+			_this.sigleFileRule(cat);
 			App.Project.Settings.Viewer.fileFilter({
 				ids: _hideFileIds,
 				total: [_secenId]
 			});
-		} else if (_this.filterRule.floor.indexOf(cat) != -1) {
-			_this.linkSilder('floors', key);
 		} else if (_this.filterRule.single.indexOf(cat) != -1) {
 			_this.sigleRule(cat,key);
 		}else{

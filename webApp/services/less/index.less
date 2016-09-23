@@ -21,6 +21,136 @@
 		}
 	}
 }
+
+
+.onlineServices{
+	height: 100%;
+	background: #EEEEEE;
+	.osIcon {background-image: url("/services/images/onlineServer.png"); display: block;}
+	.pic_1 {background-position: -0px -0px; width: 20px; height: 20px; }
+	.pic_3 {background-position: -22px -0px; width: 20px; height: 20px; }
+	.pic_4 {background-position: -44px -0px; width: 20px; height: 20px; }
+	.pic_5 {background-position: -66px -0px; width: 20px; height: 20px; }
+	.pic_6 {background-position: -88px -0px; width: 20px; height: 20px; }
+	.pic_7 {background-position: -110px -0px; width: 20px; height: 20px; }
+	.pic_8 {background-position: -132px -0px; width: 20px; height: 20px; }
+	.pic_9 {background-position: -154px -0px; width: 20px; height: 20px; }
+	.pic_10 {background-position: -176px -0px; width: 20px; height: 20px; }
+	.pic_11 {background-position: -198px -0px; width: 20px; height: 20px; }
+	.pic_12 {background-position: -220px -0px; width: 20px; height: 20px; }
+	.pic_12 {background-position: -242px -0px; width: 64px; height: 64px; }
+	.pic_13 {background-position: -308px -0px; width: 64px; height: 64px; }
+	.xwOnline{
+		position: absolute;
+		top: 65px;
+		left: 20px;
+		bottom: 20px;
+		right: 300px;
+		border:1px solid #CCC;
+	}
+	.onlineSide{
+		position: absolute;
+		width: 260px;
+		top: 65px;
+		bottom: 20px;
+		right: 20px;
+
+		& .tilePanel{
+			color:#006DCE;
+			width: 100%;
+			background: #FFF;
+			margin-bottom: 20px;
+			& .header{
+				color:#333;
+				padding: 0 15px;
+				font-weight: bold;
+				font-size: 14px;
+				height: 40px;
+				line-height: 40px;
+				border-bottom: 1px solid #CCC;
+				& span{
+					display: inline-block;
+				}
+				& i{
+					display: inline-block;
+					vertical-align: -6px;
+					margin-right: 5px;
+				}
+				& .tools{
+					float: right;
+					& a{
+						color:#006DCE;
+						font-family: "Microsoft YaHei";
+						font-size: 12px;
+						text-decoration: none;
+					}
+				}
+			}
+			& .content{
+				padding: 10px 15px;
+
+				& .resourceList{
+					& li{
+						height: 24px;
+						line-height: 24px;
+						& a{
+							font-weight: bold;
+							font-size: 14px;
+							color:#006DCE;
+						}
+					}
+				}
+
+				.tileIcon{
+					width: 100px;
+					height: 100px;
+					float: left;
+					text-align: center;
+					&  .icon{
+						width: 64px;
+						height: 64px;
+						margin: 0 auto;
+					}
+					& span{
+						margin-top: 10px;
+						display: inline-block;
+						font-size: 12px;
+					}
+				}
+			}
+		}
+		& .wxPanel{
+			& .content{
+				text-align: center;
+			}
+			& img{
+				margin-top: 20px;
+				width: 100px;
+			}
+			height: 220px;
+		}
+		& .resourcePanel{
+			height: 220px;
+		}
+		& .toolPanel{
+			height: 120px;
+		}
+	}
+}
+
+#small-robot-input-div,
+#small-robot-output-div{
+	border: none !important;
+	& input{
+		outline:none;
+	}
+}
+#small-robot-toolbar-div{
+	border:none !important;
+	border-top:1px dotted #CCC !important;
+	border-bottom:1px dotted #CCC !important;
+}
+
 .serviceHeader { position: relative; z-index: 1;
 	.crumbs { border-top: 1px solid #ccc; padding-left: 20px; height: 40px;
 		.item { float: left; line-height: 40px; height: 40px; }
