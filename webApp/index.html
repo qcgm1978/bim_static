@@ -9,6 +9,7 @@
     <link rel="styleSheet" href="./comm/css/treeView.less"/>
     <link rel="styleSheet" href="./topNav/css/topNav.less"/>
     <link rel="stylesheet" href="./bodyContent/css/bottomBar.less"/>
+    <script src="http://xiaowan.wanda.cn/wdrobot/rjfiles/js/small-robot.js"></script>
 </head>
 <body>
 <div id="topBar">
@@ -20,12 +21,13 @@
         <li class="item resources"><a href="#resources">基础资源</a></li>
         <li class="item services"><a href="#services">在线服务</a></li>
         <li class="user">
-            <div class="userBg hoverClass"></div>
-            <span class="hoverClass">您好，</span> <span class="userName hoverClass"> <span id="loginName"
-                                                                                         class="text hoverClass">zhongping</span> <i
-                class="icon-angle-down hoverClass"></i></span></li>
-        <li class="imbox"><a href="#inbox" target="_blank"><i></i><span id='messageCount'></span></a></li>
-        <!--<li class="menuNav"><i class="icon-angle-down hoverClass"></i></li>-->
+            <img class="userBg hoverClass" src="/topNav/images/user.png">
+            <span class="hoverClass">您好，</span> <span id="loginName" class="userName hoverClass"></span><i
+                class="icon-angle-down hoverClass"></i></li>
+        <!--<li class="imbox"><a href="#inbox" target="_blank"><i></i><span id='messageCount'></span></a></li>-->
+        <li class="menuNav"><i class="icon-online-more hoverClass"></i><span class="edgeNum count">
+    <span class="messageCounter">0</span>
+</span></li>
     </ul>
     <div class="logo"><span class="text"></span></div>
 </div>
@@ -61,18 +63,27 @@
 <div class="onlineNav">
     <ul>
         <li>
-            <span>小万机器人</span>
+            <i class="osIcon pic_6"></i>
+            <span>
+                <a href="#inbox" target="_blank">我的消息(<span class='messageCounter'></span>)</a>
+            </span>
         </li>
         <li class="split">
             <div></div>
         </li>
         <li>
-            <span>资源下载</span>
+            <i class="osIcon pic_3"></i>
+            <span>建议反馈</span>
+        </li>
+        <li>
+            <i class="osIcon pic_10"></i>
+            <span>在线培训</span>
         </li>
         <li class="split">
             <div></div>
         </li>
         <li>
+            <i class="osIcon pic_4"></i>
             <span>
                 <a href="#services/auth" target="_blank">
                     <div class="text">权限管理</div>
@@ -80,6 +91,7 @@
             </span>
         </li>
         <li>
+            <i class="osIcon pic_10"></i>
             <span>
                  <a href="#services/project" target="_blank">
                      <div class="text">项目管理 </div>
@@ -87,6 +99,7 @@
             </span>
         </li>
         <li>
+            <i class="osIcon pic_11"></i>
             <span>
                  <a href="#services/application" target="_blank">
                      <div class="text">应用管理 </div>
@@ -94,6 +107,7 @@
             </span>
         </li>
         <li>
+            <i class="osIcon pic_8"></i>
             <span>
                 <a href="#services/system" target="_blank">
                     <div class="text">系统管理 </div>
@@ -101,6 +115,7 @@
             </span>
         </li>
         <li>
+            <i class="osIcon pic_5"></i>
             <span>
                 <a href="static/dist/app/todo/index.html" target="_blank">
                     <div class="text">日志管理 </div>

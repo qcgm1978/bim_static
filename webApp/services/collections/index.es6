@@ -53,8 +53,33 @@ App.Services = {
 			//设置权限
 			this.setAuth();
 			$("#pageLoading").hide();
+			this.initXW();
 		}
 	},
+	//初始化小万机器人
+	initXW:function(){
+		var key='91EAC57B-45C0-4729-B6DE-1CBB9C71607D';
+		var welcomeQuestion='测试图片';
+		var remindMsg='输入文字提问';
+		var inputTooLongMsg='输入过长';
+		$ibot.run('small-robot-div', null,'小万',key,welcomeQuestion,remindMsg,inputTooLongMsg, {
+			'width' : $("#robotDiv").width()-400,
+			'height' : $("#contains").height()-36,
+			'btnWidth' : 70,
+			'btnHeight' : 30,
+			'inputDivHeight':75,
+			'toolbarDivHight':40,
+			'toolbarContentDivHeight':35,
+			'toolbarContentDivWidth':150,
+			'toolbarContentDivMarginLeft':20,
+			'inputLength':100,
+			// 为解决跨域问题，这里在hosts配置了127.0.0.1为ibot.xiaoi.com,在访问页面的时候可以用127.0.0.1
+			'robotAskUrl':'http://xiaowan.wanda.cn/wdrobot/appAsk?t='+new Date().getTime(),
+			'robotQuestionUrl':'http://xiaowan.wanda.cn/wdrobot/appQuestion?t='+new Date().getTime()
+		});
+
+	},
+
 	//权限设置
 	setAuth(){
 		var $serviceNav = $(".servicesIndexBox .servicesIndex"),

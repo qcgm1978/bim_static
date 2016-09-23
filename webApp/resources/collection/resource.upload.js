@@ -74,7 +74,6 @@
 				//上传成功
 				fileUploaded: function(response, file) {
 
-
 					var data = JSON.parse(response.response),
 						type = App.ResourceModel.Settings.type,
 						models = App.ResourceModel.FileCollection.models,
@@ -118,9 +117,11 @@
 
 				  //上传文件后操作
                 afterCreateNewFolder(data) {
-
+					console.log(JSON.stringify(data));
+					console.log("=================");
+					console.log(JSON.stringify(data.parentId));
+					console.log("=================");
                     App.ResourceModel.afterCreateNewFolder(data, data.parentId);
-
                     if (data.children) {
 
                         var count=data.children.length;

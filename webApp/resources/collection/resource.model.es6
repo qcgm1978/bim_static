@@ -377,9 +377,7 @@ App.ResourceModel = {
 		if ($treeViewMarUl.length <= 0) {
 			$treeViewMar.html($(navHtml).find(".treeViewMarUl"));
 		} else {
-
 			if (parentId) {
-
 				var $span = $treeViewMarUl.find("span[data-id='" + parentId + "']");
 				if ($span.length > 0) {
 					var $li = $span.closest('li');

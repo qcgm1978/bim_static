@@ -622,8 +622,16 @@ App.Comm = {
 	}),
 	loadMessageCount: function(param) {
 		if (param != undefined) {
-			var _ = $('#messageCount');
-			_.text(Number(_.text()) + param);
+			var _ = $('.messageCounter');
+			var _c=Number(_.text()) + param;
+			_.text(_c);
+			if(_c<=0){
+				_.first().hide();
+			}else{
+				_.first().show();
+			}
+
+
 			return
 		}
 		App.Comm.ajax({
@@ -632,7 +640,12 @@ App.Comm = {
 				status: 0
 			}
 		}, function(res) {
-			$('#messageCount').html(res.data.totalItemCount);
+			$('.messageCounter').html(res.data.totalItemCount);
+			if(res.data.totalItemCount==0){
+				$('.messageCounter').first().hide();
+			}else{
+				$('.messageCounter').first().show();
+			}
 		})
 
 	},

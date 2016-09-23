@@ -10,6 +10,7 @@ App.TopNav = {
 			$("#uiPosition").html(_userInfo.position);
 			$("#uiPartment").html(_userInfo.org ? _userInfo.org[0].name : '');//
 			$("#uiLogo").attr('src', _userInfo.photoUrl);
+			$('#topBar .user .userBg').attr("src",_userInfo.photoUrl);
 		}else{
 			return;
 		}

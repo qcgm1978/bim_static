@@ -44,12 +44,21 @@
       bimView.sidebar.loadMap();
     },
     filter:function(isSelected,viewer){
+
       var self = this;
       self.fileData = self.fileData || {};
       if(isSelected){
         self.el._dom.sidebar.addClass('open')
         self.el._dom.sidebar.find('#filter').show().siblings().hide();
         if(viewer){
+
+          if(App.Project.currentQATab=="process"||
+              App.Project.currentQATab=="open"||
+              App.Project.currentQATab=="dis")
+          {
+            return
+          }
+
           var specialty = bimView.comm.getFilters($("#specialty,#floors"),'uncheck');
           var category = bimView.comm.getFilters($("#category"),'uncheck');
           var classCode = bimView.comm.getFilters($("#classCode"),'uncheck');
