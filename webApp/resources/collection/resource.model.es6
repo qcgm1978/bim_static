@@ -392,7 +392,7 @@ App.ResourceModel = {
 						$noneSwitch.toggleClass('noneSwitch nodeSwitch on');
 					}
 
-					var $newLi = $(navHtml).find(".treeViewMarUl li").removeClass("rootNode").addClass('itemNode');
+					var $newLi = $(navHtml).find(".treeViewMarUl li").eq(0).removeClass("rootNode").addClass('itemNode');
 					$li.find(".treeViewSub").prepend($newLi);
 				}
 
