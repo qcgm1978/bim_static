@@ -43,13 +43,15 @@
     </div>
     <div class="flowModalBbar">
         <% _.each(operation,function(item){ %>
-            <% if(item.user=='内网用户' && item.funRange!='外网功能') {%>
+
+        <a class="flowModalBtn" target="_blank" href="<%=item.buttonName=='下载'?'static/dist/app/oPage/download/'+ item.url:item.url%>" title="<%=item.buttonName%>"><%=item.buttonName%></a>
+           <!-- <% if(user=='内网用户' && funRange!='外网功能') {%>
                 <a class="flowModalBtn" target="_blank" href="<%=item.buttonName=='下载'?'static/dist/app/oPage/download/'+ item.url:item.url%>" title="<%=item.buttonName%>"><%=item.buttonName%></a>
-            <%} else if(item.user=='外网用户' && item.funRange!='内网功能') {%>
+            <%} else if(user=='外网用户' && funRange!='内网功能') {%>
                 <a class="flowModalBtn" target="_blank" href="<%=item.buttonName=='下载'?'static/dist/app/oPage/download/'+ item.url:item.url%>" title="<%=item.buttonName%>"><%=item.buttonName%></a>
             <%} else {%>
                 <a class="flowModalBtn" style="background: #CCC;" target="_blank" href="javascript:;" title="<%=item.buttonName%>"><%=item.buttonName%></a>
-            <%}%>
+            <%}%>-->
         <% }) %>
        <!-- <a class="flowModalBtn">sss</a>
         <a class="flowModalBtn">sss</a>

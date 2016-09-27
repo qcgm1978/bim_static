@@ -84,6 +84,20 @@ App.BodyContent.control = {
             }
 
         });
+        this.initEvent();
+    },
+
+    initEvent:function(){
+        var _userInfo = JSON.parse(localStorage.getItem("user"));
+        $('.linkNavItem').on('click',function(){
+            if(_userInfo.outer){
+                alert('没有操作权限')
+            }else{
+                var url=$(this).attr('murl');
+                window.open(url,'_blank');
+            }
+
+        })
 
     },
 

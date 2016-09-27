@@ -36,6 +36,7 @@ App.TopNav = {
 			$('.userinfo').hide();
 			$('.onlineNav').hide();
 		})
+
 	}
 
 };
