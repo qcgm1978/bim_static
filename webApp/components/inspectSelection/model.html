@@ -43,15 +43,25 @@
 
         var result = {
             presetPoint: viewer.Project.presetPoint,
-            risk: {
-                components: {
-                    id: userId,
-                    fileUniqueId: fileId + userId.slice(userId.indexOf('.')),
-                    axis: viewer.Project.axis[userId],
-                    location: viewer.Project.location[userId],
-                    locationName: viewer.Project.locationName[userId]
-                },
-                markers: viewer.Project.Settings.markers
+            risk: {}
+        }
+        if(userId){
+           result.risk={
+               components: {
+                   id: userId,
+                   fileUniqueId: fileId + userId.slice(userId.indexOf('.')),
+                   axis: viewer.Project.axis[userId],
+                   location: viewer.Project.location[userId],
+                   locationName: viewer.Project.locationName[userId]
+               },
+               markers: viewer.Project.Settings.markers
+           }
+        }else{
+            result.risk={
+                components:{
+                    id:viewer.Project.currentRiskShowData.id,
+                    markers:viewer.Project.currentRiskShowData.marker
+                }
             }
         }
         return JSON.stringify(result);
