@@ -9,12 +9,14 @@
 <body>
 
     <div class="modelExtend">
+        <button mtype="7">啥也没</button>
         <button mtype="1">绑定检查点</button>
         <button mtype="3">绑定隐患</button>
         <button mtype="5">显示全部</button>
         <button mtype="2">解绑检查点</button>
         <button mtype="4">解绑隐患</button>
         <button mtype="6">确定</button>
+
     </div>
 
 </body>
@@ -28,7 +30,7 @@
         appKey: "18fbec1ae3da477fb47d842a53164b14",
         callback: function (res) {
             //res 返回的检查点、隐患数据
-            alert(res);
+            alert(JSON.stringify(res));
         }
     });
 
@@ -37,6 +39,9 @@
         $("button").on("click",function(){
 
             var t=$(this).attr("mtype");
+            if(t==7){
+                viewer.showInModel({presetId:''})
+            }
             if(t==1){
                 viewer.showInModel({presetId:'885462361907456'})
             }

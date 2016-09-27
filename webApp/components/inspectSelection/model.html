@@ -81,6 +81,10 @@
             showPresetPoint(param.presetId);
         }
 
+        if(!param.presetId && !param.componentId && !param.location ){
+            type="edit";
+            viewer.Project.mode = type;
+        }
         return type;
     }
 

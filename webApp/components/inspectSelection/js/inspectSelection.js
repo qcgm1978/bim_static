@@ -861,7 +861,7 @@
 					}
 				})
 
-				if (Project.mode == 'preset' || !Project.mode) {
+				if (Project.mode == 'preset'||Project.mode == 'edit' || !Project.mode) {
 
 					viewer.viewer.loadMarkersFromIntersect(model.intersect,1,3);
 					var m = viewer.saveMarkers();
@@ -1096,7 +1096,7 @@
 			});
 		},
 		showInModel: function($target, type) {
-			if( Project.mode && Project.mode !== 'risk' && !Project.isSelect){
+			if( Project.mode && Project.mode !== 'risk' && Project.mode!=='edit' && !Project.isSelect){
 				return
 			}
 			var _this = this,
