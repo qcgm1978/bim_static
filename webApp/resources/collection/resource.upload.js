@@ -108,7 +108,7 @@
 					}
 
 					if(data.data.folder){
-						this.afterCreateNewFolder(data.data);
+						//this.afterCreateNewFolder(data.data);
 						//App.ResourceModel.afterCreateNewFolder(data.data, parentId);
 					}
 					
@@ -118,9 +118,9 @@
 				  //上传文件后操作
                 afterCreateNewFolder(data) {
 					console.log(JSON.stringify(data));
-					console.log("=================");
-					console.log(JSON.stringify(data.parentId));
-					console.log("=================");
+					//console.log("=================");
+					//console.log(JSON.stringify(data.parentId));
+					//console.log("=================");
                     App.ResourceModel.afterCreateNewFolder(data, data.parentId);
                     if (data.children) {
 
