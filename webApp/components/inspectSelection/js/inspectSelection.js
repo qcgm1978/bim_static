@@ -769,8 +769,6 @@
 					if (val) {
 						val = JSON.parse(val)
 						if (setting.callback && setting.callback.call(this, val) !== false) {
-							self.$dialog.remove();
-							self.$dialog = null;
 							return self.viewData
 						}
 					}
@@ -900,8 +898,6 @@
 					val=JSON.parse(val);
 				}
 				self.Settings.callback.call(this, val)
-				self.$dialog.remove();
-				self.$dialog = null;
 			})
 		}
 
