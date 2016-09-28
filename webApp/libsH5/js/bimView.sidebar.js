@@ -114,6 +114,7 @@
           })
           bimView.prototype.SpecialtyFilesData=_temp;
           bimView.prototype.SpecialtyFileObjData=_temp2;
+          bimView.prototype.SpecialtyFileSrcData=data;
           var specialties = bimView.comm.viewTree({
             arr:data,
             type:'sceneId',

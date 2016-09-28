@@ -175,6 +175,8 @@
           }else{
             if(_opt.type=='classCode'){
               span = '<span class="treeText" title="'+item['code']+'">'+itemName+'</span>'
+            }else if(_opt.name=="specialty"){
+              span = '<span class="treeText" mcode="'+item['specialtyCode']+'">'+itemName+'</span>'
             }else{
               span = '<span class="treeText">'+itemName+'</span>'
             }
@@ -183,7 +185,7 @@
           var tmpHtml = $('<li class="itemNode" data-type="'+type+'">\
             <div class="itemContent">\
             <i class="'+iconStatus+'"></i>\
-            <label class="treeCheckbox">'+input+'<span class="m-lbl"></span></label>'+span + '\
+            <label class="treeCheckbox">'+input+'<span class="m-lbl"><span class="tempStatus"></span></span></label>'+span + '\
           </div></li>');
           tmpHtml.data('userData',data);
           if(item[_opt.children]&&typeof item[_opt.children] =="object"){

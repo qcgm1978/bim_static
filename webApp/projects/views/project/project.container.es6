@@ -731,7 +731,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		$(".bim .itemNode:first>ul>li>.itemContent>.treeText").each(function() {
 			$this = $(this);
 			if (!test.test($this.text())) {
-				$this.prev().click();
+				$this.prev().find('input').click();
 			}
 		});
 	},

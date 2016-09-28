@@ -59,7 +59,7 @@ App.Services = {
 	//初始化小万机器人
 	initXW:function(){
 		var key='91EAC57B-45C0-4729-B6DE-1CBB9C71607D';
-		var welcomeQuestion='测试图片';
+		var welcomeQuestion='';
 		var remindMsg='输入文字提问';
 		var inputTooLongMsg='输入过长';
 		$ibot.run('small-robot-div', null,'小万',key,welcomeQuestion,remindMsg,inputTooLongMsg, {

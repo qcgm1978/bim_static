@@ -1123,7 +1123,7 @@
 			Project.isSelect=false;
 			if(item){
 				Project.presetPoint={
-					location:_temp,
+					location:location,
 					id:id,
 					fileUniqueId:item.fileId + item.componentId.slice(item.componentId.indexOf('.')),
 					axis:item.axis,
