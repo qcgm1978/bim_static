@@ -591,6 +591,9 @@ App.Project = {
 				_this.trigger('click');
 			}
 		})
+		_.each(ext,function(i){
+			$(".treeText[mcode='"+i+"']").prev().find('input').prop("checked", 'checked');
+		})
 	},
 	linkSilderCategory: function(type, key) {
 		if (!key) {
