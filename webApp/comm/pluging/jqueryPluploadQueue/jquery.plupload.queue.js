@@ -122,10 +122,13 @@
                         statusTitle = _("Upload Complete");
                         statusText = '';
                         if (App.ResourcesNav.Settings.type == "standardLibs") {
+                            $('#resourceModelLeftNav').remove();
                             $("#contains").append(new App.ResourceModel.LeftNav().render().el);
                         }else if (App.ResourcesNav.Settings.type == "famLibs") {
+                            $('#resourceFamlibsLeftNav').remove();
                             $("#contains").append(new App.ResourceFamLibs.leftNav().render().el);
                         }else if($("#projectContainer").length>0){
+                            $('#projectContainer .leftNav').remove();
                             $("#projectContainer").prepend(new App.Project.leftNav().render().el);
                         }
                     } else {
