@@ -58,8 +58,12 @@ App.Services = {
 	},
 	//初始化小万机器人
 	initXW:function(){
-		var key='91EAC57B-45C0-4729-B6DE-1CBB9C71607D';
-		var welcomeQuestion='';
+		//设计角色：4F88E20D-BD8F-43E2-857B-A94F5828662D
+		//计划角色：C2E3CC70-7481-403D-8554-87F2B8501D16
+		//成本角色：17EBA967-A8FF-475D-B9C4-1B7E4AB71692
+		//质量角色：9CBE6DC9-7DAC-4A9B-89D1-0F7C68EECB80
+		var key='17EBA967-A8FF-475D-B9C4-1B7E4AB71692';
+		var welcomeQuestion='hello';
 		var remindMsg='输入文字提问';
 		var inputTooLongMsg='输入过长';
 		$ibot.run('small-robot-div', null,'小万',key,welcomeQuestion,remindMsg,inputTooLongMsg, {
