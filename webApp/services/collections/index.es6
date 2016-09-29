@@ -82,6 +82,12 @@ App.Services = {
 			'robotQuestionUrl':'http://xiaowan.wanda.cn/wdrobot/appQuestion?t='+new Date().getTime()
 		});
 
+		$(window).resize(function() {
+			var url=window.location.href;
+			if(url=="http://bim.wanda-dev.cn/#services"){
+				window.location.reload();
+			}
+		});
 	},
 
 	//权限设置
