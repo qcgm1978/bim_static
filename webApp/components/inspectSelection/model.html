@@ -32,6 +32,7 @@
         token: Request.token,
         appKey: Request.appKey,
         host: 'http://' + location.host,
+        height:Request.height,
         //res 选择的检查点数据
         callback: function (res) {
         }
@@ -40,7 +41,6 @@
     function getData() {
         var userId = viewer.Project.currentUserId,
                 fileId = viewer.Project.fileIds[userId] || "";
-
         var result = {
             presetPoint: viewer.Project.presetPoint,
             risk: {}
@@ -57,12 +57,15 @@
                markers: viewer.Project.Settings.markers
            }
         }else{
-            result.risk={
-                components:{
-                    id:viewer.Project.currentRiskShowData.id,
-                    markers:viewer.Project.currentRiskShowData.marker
+            if(viewer.Project.currentRiskShowData){
+                result.risk={
+                    components:{
+                        id:viewer.Project.currentRiskShowData.id,
+                        markers:viewer.Project.currentRiskShowData.marker
+                    }
                 }
             }
+
         }
         return JSON.stringify(result);
     }
@@ -76,22 +79,26 @@
         viewer.Project.isSelect = true;
         view.loadMarkers(null);
         if (param.presetId && (!param.componentId && !param.location)) {
+            alert(1)
             type = "preset";
             viewer.Project.mode = type;
             showPresetPoint(param.presetId,true);
         }
         if (!param.presetId && (param.componentId && param.location)) {
+            alert(2)
             type = "risk";
             viewer.Project.mode = type;
             showRiskComponent(param.componentId, param.location);
         }
 
         if(param.presetId && param.componentId && param.location){
+            alert(3)
             showRiskComponent(param.componentId, param.location);
             showPresetPoint(param.presetId);
         }
 
         if(!param.presetId && !param.componentId && !param.location ){
+            alert(4)
             type="edit";
             viewer.Project.mode = type;
         }

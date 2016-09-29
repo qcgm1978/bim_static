@@ -736,7 +736,7 @@
 				$content = $('<div class="dialogContent">' + strVar + '</div>'),
 					$bottom = $('<div class="dialogFooter"/>').html('<input type="button" class="dialogOk dialogBtn" value="' + this.Settings.btnText + '" />');
 				$content.prepend($modelView);
-				$body.append($header, $content, $bottom);
+				$body.append($content);
 			}
 			$dialog.append($body);
 			$("body").append($dialog);
@@ -802,9 +802,9 @@
 			}
 			WebView.url = ourl + "/static/dist/components/inspectSelection/model.html?type=" + this.Settings.type + "&sourceId=" + this.Settings.sourceId + "&etag=" +
 				this.Settings.etag + "&projectId=" + this.Settings.projectId + "&projectVersionId=" + this.Settings.projectVersionId + "&ruleType=" + this.Settings.ruleType + "&appKey=" +
-				this.Settings.appKey + "&token=" + this.Settings.token;
+				this.Settings.appKey + "&token=" + this.Settings.token + "&height=" + this.Settings.height;
 			WebView.height = "510px";
-			WebView.width = "960px";
+			WebView.width = this.Settings.width||"960px";
 
 			WebView.registerEvent('newWindow', function(url){
 				if(/test$/.test(url)){
@@ -879,9 +879,10 @@
 			viewer.on("loaded", function() {
 				Project.loadPropertyPanel();
 			});
-
+			var _w=this.Settings.width||'960px',
+				_h=this.Settings.height||'500px';
 			$('.m-camera').addClass('disabled').attr('disabled', 'disabled');
-
+			$('.modelSelectDialog .dialogBody .dialogContent .model').height(_h);
 		},
 
 		showInModel:function(param){
@@ -894,10 +895,12 @@
 		data:function(){
 			var self=this;
 			WebView.runScript("getData()",function(val){
+				alert(val)
 				if(val){
 					val=JSON.parse(val);
 				}
-				self.Settings.callback.call(this, val)
+				self.Settings.callback.call(this, val);
+				return val;
 			})
 		}
 
