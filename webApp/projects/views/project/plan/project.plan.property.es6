@@ -82,42 +82,65 @@ App.Project.ProjectPlanProperty = Backbone.View.extend({
 			_this.businessName=$(this).val();
 		});
 
-		this.$('.dateStar').datetimepicker({
+		this.$('.dateStar1').datetimepicker({
              language: 'zh-CN',
              autoclose: true,
              format: 'yyyy-mm-dd',
              minView: 'month'
          }).on("changeDate", function(ev) {
 			var _dateStr=new Date(ev.date.getTime()+24*60*60*1000).format('yyyy-MM-dd');
-			_this.$('.dateEnd').datetimepicker('setStartDate',_dateStr);
-			_this.$('.dateEnd').val('');
+			_this.$('.dateEnd1').datetimepicker('setStartDate',_dateStr);
+			_this.$('.dateEnd1').val('');
 		});
-         this.$('.dateEnd').datetimepicker({
+         this.$('.dateEnd1').datetimepicker({
              language: 'zh-CN',
              autoclose: true,
              format: 'yyyy-mm-dd',
              minView: 'month'
          });
+
+		this.$('.dateStar2').datetimepicker({
+			language: 'zh-CN',
+			autoclose: true,
+			format: 'yyyy-mm-dd',
+			minView: 'month'
+		}).on("changeDate", function(ev) {
+			var _dateStr=new Date(ev.date.getTime()+24*60*60*1000).format('yyyy-MM-dd');
+			_this.$('.dateEnd2').datetimepicker('setStartDate',_dateStr);
+			_this.$('.dateEnd2').val('');
+		});
+		this.$('.dateEnd2').datetimepicker({
+			language: 'zh-CN',
+			autoclose: true,
+			format: 'yyyy-mm-dd',
+			minView: 'month'
+		});
          this.$(".dateBox .iconCal").click(function() {
 			$(this).next().focus();
 		});
 	},
 
 	loadPlanModelData(){
-		var _start=this.$('.dateStar').val(),
-			_end=this.$('.dateEnd').val(),
+		var _start1=this.$('.dateStar1').val(),
+			_end1=this.$('.dateEnd1').val(),
+			_start2=this.$('.dateStar2').val(),
+			_end2=this.$('.dateEnd2').val(),
 			projectId = App.Project.Settings.projectId,
 			projectVersionId = App.Project.Settings.CurrentVersion.id;
 
-		_start=_start?new Date(_start+' 00:00:00').getTime():'';
-		_end=_end?new Date(_end+' 23:59:59').getTime():'';
+		_start1=_start1?new Date(_start1+' 00:00:00').getTime():'';
+		_end1=_end1?new Date(_end1+' 23:59:59').getTime():'';
+		_start2=_start2?new Date(_start2+' 00:00:00').getTime():'';
+		_end2=_end2?new Date(_end2+' 23:59:59').getTime():'';
 		App.Project.PlanAttr.PlanModelCollection.reset();
 		App.Project.PlanAttr.PlanModelCollection.projectId = projectId;
 		App.Project.PlanAttr.PlanModelCollection.projectVersionId = projectVersionId;
 		App.Project.PlanAttr.PlanModelCollection.fetch({
 			data:{
-				startTime:_start,
-				endTime:_end,
+				startTime1:_start1,
+				endTime1:_end1,
+				startTime2:_start2,
+				endTime2:_end2,
 				type:this.planType,
 				businessItem:this.businessName
 			}
@@ -125,8 +148,10 @@ App.Project.ProjectPlanProperty = Backbone.View.extend({
 	},
 
 	clearSearch(){
-		this.$('.dateStar').val('');
-		this.$('.dateEnd').val('');
+		this.$('.dateStar1').val('');
+		this.$('.dateEnd1').val('');
+		this.$('.dateStar2').val('');
+		this.$('.dateEnd2').val('');
 		this.$('.planTimeType .text').html('计划开始');
 		this.planType='1';
 		this.loadPlanModelData();
