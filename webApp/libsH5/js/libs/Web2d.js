@@ -3943,250 +3943,6 @@ CLOUD.Extensions.Utils.Shape2D = {
     }
 };
 
-CLOUD.AxisGrid = function (viewer) {
-
-    this.viewer = viewer;
-    this.fillColor = 0xff0000;
-    this.lineWidth = 2;
-    this.isDashedLine = false;
-    this.axisGroup = new THREE.Group();
-    this.scene = null;
-    this.levelCount = 0;
-};
-
-CLOUD.AxisGrid.prototype = {
-    constructor: CLOUD.AxisGrid,
-    initGrid: function (grids, elevation) {
-
-        var len = grids.length;
-
-        if (len < 1) {
-            return;
-        }
-
-        var color = this.fillColor;
-        var linewidth = this.lineWidth;
-        var axisGroup = this.axisGroup;
-        var fontParameters = {
-            size: 8,
-            height: 1,
-            curveSegments: 2,
-            font: "helvetiker"
-        };
-
-        var fontSizeScalar = 100;
-        var innerRadius = 1000, outerRadius = 1100;
-        var materialGrid;
-        var meshMaterial = new THREE.MeshBasicMaterial({color: color, overdraw: 0.0/*, side: THREE.DoubleSide*/});
-        var geometryGrid = new THREE.Geometry();
-
-        for (var i = 0; i < len; i++) {
-
-            var name = grids[i].name;
-            var start = new THREE.Vector3(grids[i].start.X, grids[i].start.Y, elevation);
-            var end = new THREE.Vector3(grids[i].end.X, grids[i].end.Y, elevation);
-
-            // --------------- 网格顶点 --------------- //
-            geometryGrid.vertices.push(start.clone(), end.clone());
-
-            // --------------- 文字包围圆 --------------- //
-            var dir = new THREE.Vector3();
-            dir.subVectors(end, start);
-            dir.normalize();
-            dir.multiplyScalar(outerRadius);
-
-            var textStart = start.clone().sub(dir); // 开始点延伸
-            var textEnd = end.clone().add(dir); // 终点延伸
-
-            var geometryRing = new THREE.RingGeometry(innerRadius, outerRadius);
-            var meshS = new THREE.Mesh(geometryRing, meshMaterial);
-            //meshS.name = "ring-left-" + name;
-            meshS.translateX(textStart.x);
-            meshS.translateY(textStart.y);
-            meshS.translateZ(elevation);
-
-            var meshE = new THREE.Mesh(geometryRing, meshMaterial);
-            //meshE.name = "ring-right-" + name;
-            meshE.translateX(textEnd.x);
-            meshE.translateY(textEnd.y);
-            meshE.translateZ(elevation);
-
-            // 加入到容器
-            axisGroup.add(meshS);
-            axisGroup.add(meshE);
-
-            // --------------- 文字 --------------- //
-            var textGeo = new THREE.TextGeometry(grids[i].name, fontParameters);
-
-            for (var j = 0, size = textGeo.vertices.length; j < size; j++) {
-                textGeo.vertices[j].multiplyScalar(fontSizeScalar);
-            }
-
-            textGeo.computeBoundingBox();
-            var centerOffsetX = -0.5 * ( textGeo.boundingBox.max.x - textGeo.boundingBox.min.x );
-            var centerOffsetY = -0.5 * ( textGeo.boundingBox.max.y - textGeo.boundingBox.min.y );
-
-            var startMesh = new THREE.Mesh(textGeo, meshMaterial);
-            startMesh.name = name;
-            startMesh.position.x = textStart.x + centerOffsetX;
-            startMesh.position.y = textStart.y + centerOffsetY;
-            startMesh.position.z = elevation;
-
-            var endMesh = new THREE.Mesh(textGeo, meshMaterial);
-            endMesh.name = name;
-            endMesh.position.x = textEnd.x + centerOffsetX;
-            endMesh.position.y = textEnd.y + centerOffsetY;
-            endMesh.position.z = elevation;
-
-            axisGroup.add(startMesh);
-            axisGroup.add(endMesh);
-        }
-
-        if (this.isDashedLine) {
-            geometryGrid.computeLineDistances();
-            var dashSize = geometryGrid.lineDistances[1] - geometryGrid.lineDistances[0];
-            dashSize *= 0.02;
-            var gapSize = dashSize * 0.5;
-            materialGrid = new THREE.LineDashedMaterial({
-                color: color,
-                dashSize: dashSize,
-                gapSize: gapSize,
-                linewidth: linewidth
-            });
-        } else {
-            materialGrid = new THREE.LineBasicMaterial({
-                color: color,
-                linewidth: linewidth
-            });
-        }
-
-        // --------------- 网格 --------------- //
-
-        geometryGrid.computeBoundingBox();
-
-        var grids = new THREE.LineSegments(geometryGrid, materialGrid);
-
-        grids.name = "grids";
-        axisGroup.add(grids);
-    },
-
-    setScene: function (scene) {
-        this.scene = scene;
-    },
-
-    getSceneRootNode: function () {
-        var scene = this.viewer.getScene();
-        var rootNode = scene.rootNode;
-        rootNode.updateMatrixWorld(true);
-        rootNode.matrixAutoUpdate = false;
-
-        return rootNode;
-    },
-
-    getWorldBoundingBox: function () {
-        //var box = new THREE.Box3();
-        //var rootNode = this.getRootNode();
-        //
-        //if (rootNode.boundingBox) {
-        //    box.copy(rootNode.boundingBox);
-        //    box.applyMatrix4(rootNode.matrix);
-        //
-        //    return box;
-        //}
-
-        return null;
-    },
-
-    addToScene: function () {
-        //var scene = this.viewer.getScene();
-        //var rootNode = scene.rootNode;
-        //rootNode.updateMatrixWorld(true);
-        //rootNode.matrixAutoUpdate = false;
-
-        if (!this.scene) {
-            var rootNode = this.getSceneRootNode();
-            rootNode.add(this.axisGroup);
-        } else {
-            this.scene.add(this.axisGroup);
-        }
-
-    },
-    removeFromScene: function () {
-
-        if (!this.scene) {
-            var rootNode = this.getSceneRootNode();
-            rootNode.remove(this.axisGroup);
-        } else {
-            this.scene.remove(this.axisGroup);
-        }
-
-    },
-    setVisibility: function (visible) {
-        if (this.axisGroup.visible != visible) {
-            this.axisGroup.visible = visible;
-            this.refresh();
-        }
-    },
-    /**
-     * @brief 更新轴网
-     */
-    refresh: function () {
-        this.viewer.render(); // 刷新
-    },
-    clearData: function () {
-        //var start, end, elapse;
-        //start = Date.now();
-        //for (var i = 0, len = this.axisGroup.children.length; i < len; i++) {
-        //    this.axisGroup.children[i] = null;
-        //}
-        //
-        //end = Date.now();
-        //elapse = end - start;
-        //
-        //console.log("clearData elapsed time:" + elapse);
-
-        this.axisGroup.children = [];
-    },
-    setDataFromJsonString: function (jsonStr, level) {
-        var jsonObj = JSON.parse(jsonStr);
-        this.setDataFromJsonObject(jsonObj, level);
-    },
-    setDataFromJsonObject: function (jsonObj, level) {
-
-        this.levelCount = jsonObj.Levels.length;
-
-        if (level || (level === 0)) {
-            this.setDataByLevel(jsonObj.Grids, jsonObj.Levels, level);
-        } else {
-            this.setData(jsonObj.Grids, jsonObj.Levels);
-        }
-    },
-    setDataByLevel: function (grids, levels, level) {
-        if (level > levels.length) {
-            level = levels.length - 1;
-        } else if (level < 0) {
-            level = 0;
-        }
-
-        this.setDataByElev(grids, levels[level].elevation);
-    },
-    setDataByElev: function (grids, elev) {
-        this.clearData();
-        this.initGrid(grids, elev);
-        this.addToScene();
-    },
-    setData: function (grids, levels) {
-        this.clearData();
-
-        for (var i = 0, len = levels.length; i < len; i++) {
-            this.initGrid(grids, levels[i].elevation);
-            this.addToScene();
-        }
-    },
-    getLevelCount: function () {
-        return this.levelCount;
-    }
-};
 CLOUD.MiniMap = function (viewer) {
 
     this.viewer = viewer;
@@ -8488,7 +8244,7 @@ CLOUD.Extensions.AnnotationTextArea.prototype.setStyle = function (style) {
     this.textAreaStyle['font-size'] = style['font-size'] + 'px';
     this.textAreaStyle['font-weight'] = style['font-weight'];
     this.textAreaStyle['font-style'] = style['font-style'];
-    this.textAreaStyle['color'] = style['fill-color'];
+    this.textAreaStyle['color'] = style['stroke-color'];
 
     var styleStr = CLOUD.DomUtil.getStyleString(this.textAreaStyle);
     this.textArea.setAttribute('style', styleStr);
@@ -10570,6 +10326,7 @@ CLOUD.Extensions.AnnotationEditor.prototype.getAnnotationInfoList = function () 
             rotation: annotation.rotation,
             shapePoints: shapePoints,
             originSize: originSize,
+            //style: annotation.style, //
             text: text
         };
 
@@ -10603,44 +10360,51 @@ CLOUD.Extensions.AnnotationEditor.prototype.loadAnnotations = function (annotati
         var rotation = info.rotation;
         var shapePointsStr = info.shapePoints;
         var originSize = info.originSize;
-        var text = decodeURIComponent(info.text); // 解码中文
         //var text = info.text; // 解码中文
+        var text = decodeURIComponent(info.text); // 解码中文
+        //var style = info.style ? info.style : this.annotationStyle;
 
         switch (shapeType) {
 
             case CLOUD.Extensions.Annotation.shapeTypes.ARROW:
                 var arrow = new CLOUD.Extensions.AnnotationArrow(this, id);
                 arrow.set(position, size, rotation);
+                //arrow.setStyle(style);
                 this.addAnnotation(arrow);
                 arrow.created();
                 break;
             case  CLOUD.Extensions.Annotation.shapeTypes.RECTANGLE:
                 var rectangle = new CLOUD.Extensions.AnnotationRectangle(this, id);
                 rectangle.set(position, size, rotation);
+                //rectangle.setStyle(style);
                 this.addAnnotation(rectangle);
                 rectangle.created();
                 break;
             case  CLOUD.Extensions.Annotation.shapeTypes.CIRCLE:
                 var circle = new CLOUD.Extensions.AnnotationCircle(this, id);
                 circle.set(position, size, rotation);
+                //circle.setStyle(style);
                 this.addAnnotation(circle);
                 circle.created();
                 break;
             case  CLOUD.Extensions.Annotation.shapeTypes.CROSS:
                 var cross = new CLOUD.Extensions.AnnotationCross(this, id);
                 cross.set(position, size, rotation);
+                //cross.setStyle(style);
                 this.addAnnotation(cross);
                 cross.created();
                 break;
             case CLOUD.Extensions.Annotation.shapeTypes.CLOUD:
                 var cloud = new CLOUD.Extensions.AnnotationCloud(this, id);
                 cloud.set(position, size, rotation, shapePointsStr, originSize);
+                //cloud.setStyle(style);
                 this.addAnnotation(cloud);
                 cloud.created();
                 break;
             case  CLOUD.Extensions.Annotation.shapeTypes.TEXT:
                 var textAnnotation = new CLOUD.Extensions.AnnotationText(this, id);
                 textAnnotation.set(position, size, rotation, text);
+                //textAnnotation.setStyle(style);
                 this.addAnnotation(textAnnotation);
                 textAnnotation.created();
                 textAnnotation.forceRedraw();
@@ -10848,289 +10612,24 @@ CLOUD.Extensions.FreeAnnotationEditor.prototype.onCameraChange = function () {
 };
 
 
-CLOUD.Extensions.Helper2D = function (viewer) {
+CLOUD.Extensions.MiniMapHelper = function (viewer) {
 
     this.viewer = viewer;
     this.miniMaps = {};
     this.defaultMiniMap = null;
-    this.markerClickCallback = null;
 };
 
-CLOUD.Extensions.Helper2D.prototype = {
+CLOUD.Extensions.MiniMapHelper.prototype = {
 
-    constructor: CLOUD.Extensions.Helper2D,
+    constructor: CLOUD.Extensions.MiniMapHelper,
 
     destroy: function () {
 
         // TODO: clear other resources.
 
         this.viewer = null;
-    },
-
-    // ------------------ 批注 API -- S ------------------ //
-
-    // 是否存在批注
-    hasAnnotations: function () {
-
-        return this.annotationEditor && this.annotationEditor.isInitialized();
-    },
-
-    // 初始化批注
-    initAnnotation: function () {
-
-        var viewer = this.viewer;
-        var scope = this;
-
-        if (!this.annotationEditor) {
-
-            this.annotationEditor = new CLOUD.Extensions.AnnotationEditor(viewer.domElement, viewer.cameraEditor);
-        }
-
-        if (!this.annotationEditor.isInitialized()) {
-
-            var callbacks = {
-                beginEditCallback: function (domElement) {
-                    viewer.editorManager.unregisterDomEventListeners(domElement);
-                },
-                endEditCallback: function (domElement) {
-                    viewer.editorManager.registerDomEventListeners(domElement);
-                },
-                changeEditorModeCallback: function () {
-                    scope.uninitAnnotation();
-                }
-            };
-
-            this.annotationEditor.init(callbacks);
-
-            callbacks = null;
-        }
-    },
-
-    // 卸载批注资源
-    uninitAnnotation: function () {
-
-        if (this.annotationEditor && this.annotationEditor.isInitialized()) {
-
-            this.annotationEditor.uninit();
-
-        }
-    },
-
-    // 设置批注背景色
-    setAnnotationBackgroundColor: function (startColor, stopColor) {
-
-        if (this.annotationEditor) {
-
-            this.annotationEditor.setBackgroundColor(startColor, stopColor);
-        }
-    },
-
-    // 开始批注编辑
-    editAnnotationBegin: function () {
-
-        // 如果没有设置批注模式，则自动进入批注模式
-        this.initAnnotation();
-
-        this.annotationEditor.editBegin();
-    },
-
-    // 完成批注编辑
-    editAnnotationEnd: function () {
-
-        if (this.annotationEditor) {
-
-            this.annotationEditor.editEnd();
-
-        }
-    },
-
-    // 设置批注类型
-    setAnnotationType: function (type) {
-
-        if (this.annotationEditor) {
-
-            this.annotationEditor.setAnnotationType(type);
-
-        }
-    },
-
-    // 加载批注列表
-    loadAnnotations: function (annotations) {
-
-        if (annotations) {
-
-            this.initAnnotation();
-            this.annotationEditor.loadAnnotations(annotations);
-        } else {
-            this.uninitAnnotation();
-        }
-    },
-
-    // 获得批注对象列表
-    getAnnotationInfoList: function () {
-
-        if (this.annotationEditor) {
-
-            return this.annotationEditor.getAnnotationInfoList();
-
-        }
-
-        return null;
-    },
-
-    // resize
-    resizeAnnotations: function () {
-
-        if (this.annotationEditor && this.annotationEditor.isInitialized()) {
-
-            this.annotationEditor.onResize();
-
-        }
-    },
-
-    // render
-    renderAnnotations: function () {
-
-        if (this.annotationEditor && this.annotationEditor.isInitialized()) {
-
-            this.annotationEditor.onCameraChange();
-
-        }
-    },
-
-    // 截屏 base64格式png图片
-    captureAnnotationsScreenSnapshot: function () {
-
-        var dataUrl = this.viewer.getRenderBufferScreenShot();
-        dataUrl = this.annotationEditor.getScreenSnapshot(dataUrl);
-
-        return dataUrl;
-    },
-
-    // ------------------ 批注 API -- E ------------------ //
-
-    // ------------------ 标记 API -- S ------------------ //
-    // 初始化Marker
-    initMarkerEditor: function () {
-
-        var viewer = this.viewer;
-
-        if (!this.markerEditor) {
-
-            this.markerEditor = new CLOUD.Extensions.MarkerEditor(viewer);
-        }
-
-        if (!this.markerEditor.isInitialized()) {
-
-            this.markerEditor.init();
-        }
-
-        if (this.markerClickCallback) {
-            this.markerEditor.setMarkerClickCallback(this.markerClickCallback);
-        }
-    },
-
-    // 卸载Marker
-    uninitMarkerEditor: function () {
-
-        if (this.markerEditor && this.markerEditor.isInitialized()) {
-
-            this.markerEditor.uninit();
-
-        }
-    },
-
-    // zoom到合适的大小
-    zoomToSelectedMarkers: function () {
-
-        if (this.markerEditor) {
-
-            var bBox = this.markerEditor.getMarkersBoundingBox();
-
-            if (bBox) {
-                this.viewer.zoomToBBox(bBox, 0.05);
-            }
-
-            this.markerEditor.updateMarkers();
-
-        }
-
-    },
-
-    // 加载标记
-    loadMarkers: function (markerInfoList) {
-
-        if (markerInfoList) {
-
-            this.initMarkerEditor();
-            this.markerEditor.loadMarkers(markerInfoList);
-
-        } else {
-
-            this.uninitMarkerEditor();
-        }
-
-    },
-
-    // 加载标记
-    loadMarkersFromIntersect: function (intersect, shapeType, state) {
-
-        if (intersect) {
-
-            this.initMarkerEditor();
-            this.markerEditor.loadMarkersFromIntersect(intersect, shapeType, state);
-
-        } else {
-
-            this.uninitMarkerEditor();
-        }
-
-    },
-
-    // 获得标记列表
-    getMarkerInfoList: function () {
-
-        if (this.markerEditor) {
-
-            return this.markerEditor.getMarkerInfoList();
-
-        }
-
-        return null;
-    },
-
-    resizeMarkers: function () {
-
-        if (this.markerEditor) {
-
-            return this.markerEditor.onResize();
-
-        }
-    },
-
-    renderMarkers: function () {
-
-        if (this.markerEditor) {
-
-            return this.markerEditor.updateMarkers();
-
-        }
-    },
-
-    // 根据id选择marker
-    selectMarkerById: function (id) {
-
-        if (this.markerEditor) {
-            var marker = this.markerEditor.getMarker(id);
-            marker.highlight(true);
-            this.markerEditor.selectMarker(marker);
-        }
-    },
-
-    // 设置marker click 回调
-    setMarkerClickCallback: function (callback) {
-
-       this.markerClickCallback = callback;
+        this.miniMaps = {};
+        this.defaultMiniMap = null;
     },
 
     // ------------------ 小地图API -- S ------------------ //
@@ -11283,6 +10782,146 @@ CLOUD.Extensions.Helper2D.prototype = {
     // ------------------ 小地图API -- E ------------------ //
 };
 
+CLOUD.Extensions.MarkerHelper = function (viewer) {
+
+    this.viewer = viewer;
+    this.markerClickCallback = null;
+};
+
+CLOUD.Extensions.MarkerHelper.prototype = {
+
+    constructor: CLOUD.Extensions.MarkerHelper,
+
+    destroy: function () {
+
+        this.viewer = null;
+        this.markerClickCallback = null;
+    },
+
+    // 初始化Marker
+    initMarkerEditor: function () {
+
+        var viewer = this.viewer;
+
+        if (!this.markerEditor) {
+
+            this.markerEditor = new CLOUD.Extensions.MarkerEditor(viewer);
+        }
+
+        if (!this.markerEditor.isInitialized()) {
+
+            this.markerEditor.init();
+        }
+
+        if (this.markerClickCallback) {
+            this.markerEditor.setMarkerClickCallback(this.markerClickCallback);
+        }
+    },
+
+    // 卸载Marker
+    uninitMarkerEditor: function () {
+
+        if (this.markerEditor && this.markerEditor.isInitialized()) {
+
+            this.markerEditor.uninit();
+
+        }
+    },
+
+    // zoom到合适的大小
+    zoomToSelectedMarkers: function () {
+
+        if (this.markerEditor) {
+
+            var bBox = this.markerEditor.getMarkersBoundingBox();
+
+            if (bBox) {
+                this.viewer.zoomToBBox(bBox, 0.05);
+            }
+
+            this.markerEditor.updateMarkers();
+
+        }
+
+    },
+
+    // 加载标记
+    loadMarkers: function (markerInfoList) {
+
+        if (markerInfoList) {
+
+            this.initMarkerEditor();
+            this.markerEditor.loadMarkers(markerInfoList);
+
+        } else {
+
+            this.uninitMarkerEditor();
+        }
+
+    },
+
+    // 加载标记
+    loadMarkersFromIntersect: function (intersect, shapeType, state) {
+
+        if (intersect) {
+
+            this.initMarkerEditor();
+            this.markerEditor.loadMarkersFromIntersect(intersect, shapeType, state);
+
+        } else {
+
+            this.uninitMarkerEditor();
+        }
+
+    },
+
+    // 获得标记列表
+    getMarkerInfoList: function () {
+
+        if (this.markerEditor) {
+
+            return this.markerEditor.getMarkerInfoList();
+
+        }
+
+        return null;
+    },
+
+    resizeMarkers: function () {
+
+        if (this.markerEditor) {
+
+            return this.markerEditor.onResize();
+
+        }
+    },
+
+    renderMarkers: function () {
+
+        if (this.markerEditor) {
+
+            return this.markerEditor.updateMarkers();
+
+        }
+    },
+
+    // 根据id选择marker
+    selectMarkerById: function (id) {
+
+        if (this.markerEditor) {
+            var marker = this.markerEditor.getMarker(id);
+            marker.highlight(true);
+            this.markerEditor.selectMarker(marker);
+        }
+    },
+
+    // 设置marker click 回调
+    setMarkerClickCallback: function (callback) {
+
+        this.markerClickCallback = callback;
+    }
+
+};
 
 CLOUD.Extensions.DwgHelper = function () {
 
@@ -11493,12 +11132,176 @@ CLOUD.Extensions.DwgHelper.prototype = {
 
 };
 
+CLOUD.Extensions.AnnotationHelper = function (viewer) {
+
+    this.viewer = viewer;
+};
+
+CLOUD.Extensions.AnnotationHelper.prototype = {
+
+    constructor: CLOUD.Extensions.AnnotationHelper,
+
+    destroy: function () {
+
+        this.viewer = null;
+    },
+
+    // 是否存在批注
+    hasAnnotations: function () {
+
+        return this.annotationEditor && this.annotationEditor.isInitialized();
+    },
+
+    // 初始化批注
+    initAnnotation: function () {
+
+        var viewer = this.viewer;
+        var scope = this;
+
+        if (!this.annotationEditor) {
+
+            this.annotationEditor = new CLOUD.Extensions.AnnotationEditor(viewer.domElement, viewer.cameraEditor);
+        }
+
+        if (!this.annotationEditor.isInitialized()) {
+
+            var callbacks = {
+                beginEditCallback: function (domElement) {
+                    viewer.editorManager.unregisterDomEventListeners(domElement);
+                },
+                endEditCallback: function (domElement) {
+                    viewer.editorManager.registerDomEventListeners(domElement);
+                },
+                changeEditorModeCallback: function () {
+                    scope.uninitAnnotation();
+                }
+            };
+
+            this.annotationEditor.init(callbacks);
+
+            callbacks = null;
+        }
+    },
+
+    // 卸载批注资源
+    uninitAnnotation: function () {
+
+        if (this.annotationEditor && this.annotationEditor.isInitialized()) {
+
+            this.annotationEditor.uninit();
+
+        }
+    },
+
+    // 设置批注背景色
+    setAnnotationBackgroundColor: function (startColor, stopColor) {
+
+        if (this.annotationEditor) {
+
+            this.annotationEditor.setBackgroundColor(startColor, stopColor);
+        }
+    },
+
+    // 开始批注编辑
+    editAnnotationBegin: function () {
+
+        // 如果没有设置批注模式，则自动进入批注模式
+        this.initAnnotation();
+
+        this.annotationEditor.editBegin();
+    },
+
+    // 完成批注编辑
+    editAnnotationEnd: function () {
+
+        if (this.annotationEditor) {
+
+            this.annotationEditor.editEnd();
+
+        }
+    },
+
+    // 设置批注类型
+    setAnnotationType: function (type) {
+
+        if (this.annotationEditor) {
+
+            this.annotationEditor.setAnnotationType(type);
+
+        }
+    },
+
+    // 加载批注列表
+    loadAnnotations: function (annotations) {
+
+        if (annotations) {
+
+            this.initAnnotation();
+            this.annotationEditor.loadAnnotations(annotations);
+        } else {
+            this.uninitAnnotation();
+        }
+    },
+
+    // 获得批注对象列表
+    getAnnotationInfoList: function () {
+
+        if (this.annotationEditor) {
+
+            return this.annotationEditor.getAnnotationInfoList();
+
+        }
+
+        return null;
+    },
+
+    // resize
+    resizeAnnotations: function () {
+
+        if (this.annotationEditor && this.annotationEditor.isInitialized()) {
+
+            this.annotationEditor.onResize();
+
+        }
+    },
+
+    // render
+    renderAnnotations: function () {
+
+        if (this.annotationEditor && this.annotationEditor.isInitialized()) {
+
+            this.annotationEditor.onCameraChange();
+
+        }
+    },
+
+    // 截屏 base64格式png图片
+    captureAnnotationsScreenSnapshot: function () {
+
+        var dataUrl = this.viewer.getRenderBufferScreenShot();
+        dataUrl = this.annotationEditor.getScreenSnapshot(dataUrl);
+
+        return dataUrl;
+    }
+
+};
 CLOUD.Extensions.FreeAnnotationHelper = function () {
 
     this.domElement = null;
     this.beginEditCallback = null;
     this.endEditCallback = null;
     this.stateChangeCallback = null;
+    this.defaultStyle = {
+        'stroke-width': 3,
+        'stroke-color': '#ff0000',
+        'stroke-opacity': 1.0,
+        'fill-color': '#ff0000',
+        'fill-opacity': 0.0,
+        'font-family': 'Arial',
+        'font-size': 16,
+        'font-style': '',
+        'font-weight': ''
+    };
 };
 
 CLOUD.Extensions.FreeAnnotationHelper.prototype = {
@@ -11506,7 +11309,7 @@ CLOUD.Extensions.FreeAnnotationHelper.prototype = {
     constructor: CLOUD.Extensions.FreeAnnotationHelper,
 
     // 卸载资源
-    destroy: function() {
+    destroy: function () {
 
         this.domElement = null;
         this.beginEditCallback = null;
@@ -11521,7 +11324,7 @@ CLOUD.Extensions.FreeAnnotationHelper.prototype = {
     },
 
     // 设置回调, 在使用批注功能前，根据需要设置（如果需要设置，在初始化之前设置）
-    setEditCallback: function(beginEditCallback, endEditCallback, stateChangeCallback) {
+    setEditCallback: function (beginEditCallback, endEditCallback, stateChangeCallback) {
 
         this.beginEditCallback = beginEditCallback;
         this.endEditCallback = endEditCallback;
@@ -11603,21 +11406,19 @@ CLOUD.Extensions.FreeAnnotationHelper.prototype = {
         }
     },
 
-    //    var style = {};
-    //style['stroke-width'] = 3;
-    //style['stroke-color'] = '#ff0000';
-    //style['stroke-opacity'] = 1.0;
-    //style['fill-color'] = '#ff0000';
-    //style['fill-opacity'] = 0.0;
-    //style['font-family'] = 'Arial';
-    //style['font-size'] = 16;
-    //style['font-style'] = '';
-    //style['font-weight'] = '';
-    setAnnotationStyle: function(style) {
+    setAnnotationStyle: function (style) {
 
         if (this.annotationEditor) {
 
-            this.annotationEditor.setAnnotationStyle(style);
+            for (var attr in style) {
+
+                if (attr in this.defaultStyle) {
+                    this.defaultStyle[attr] = style[attr];
+                }
+
+            }
+
+            this.annotationEditor.setAnnotationStyle(this.defaultStyle);
 
         }
     },
@@ -11670,5 +11471,4 @@ CLOUD.Extensions.FreeAnnotationHelper.prototype = {
 
         return this.annotationEditor.getScreenSnapshot(dataUrl);
     }
-
 };
