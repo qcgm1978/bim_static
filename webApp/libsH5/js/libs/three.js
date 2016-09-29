@@ -25377,10 +25377,7 @@ THREE.WebGLGeometries = function ( gl, properties, info ) {
 		var geometry = event.target;
 		var buffergeometry = geometries[ geometry.id ];
 
-		deleteAttributes(buffergeometry.attributes);
-		if (buffergeometry.index) {
-		    deleteAttribute(buffergeometry.index);
-		}
+		deleteAttributes( buffergeometry.attributes );
 
 		geometry.removeEventListener( 'dispose', onGeometryDispose );
 
@@ -25462,11 +25459,7 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 		// TODO: Avoid updating twice (when using shadowMap). Maybe add frame counter.
 
-	    var geometry = geometries.get(object);
-
-	    if (geometry.ticket === this.renderTicket)
-	        return geometry;
-	    geometry.ticket = this.renderTicket;
+		var geometry = geometries.get( object );
 
 		if ( object.geometry instanceof THREE.Geometry ) {
 

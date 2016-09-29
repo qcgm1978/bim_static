@@ -1097,6 +1097,233 @@ CLOUD.BBoxNode.prototype.updateBBox = function (boundingBox) {
     this.geometry.computeBoundingSphere();
     this.matrixAutoUpdate = false;
 };
+THREE.WebGLObjectsExt = function (gl, properties, info) {
+
+    var geometries = new THREE.WebGLGeometries(gl, properties, info);
+
+    //
+
+    function update(object) {
+
+        // TODO: Avoid updating twice (when using shadowMap). Maybe add frame counter.
+
+        var geometry = geometries.get(object);
+
+        if (geometry.ticket === this.renderTicket)
+            return geometry;
+
+        geometry.ticket = this.renderTicket;
+
+        if (object.geometry instanceof THREE.Geometry) {
+
+            geometry.updateFromObject(object);
+
+        }
+
+        var index = geometry.index;
+        var attributes = geometry.attributes;
+
+        if (index !== null) {
+
+            updateAttribute(index, gl.ELEMENT_ARRAY_BUFFER);
+
+        }
+
+        for (var name in attributes) {
+
+            updateAttribute(attributes[name], gl.ARRAY_BUFFER);
+
+        }
+
+        // morph targets
+
+        var morphAttributes = geometry.morphAttributes;
+
+        for (var name in morphAttributes) {
+
+            var array = morphAttributes[name];
+
+            for (var i = 0, l = array.length; i < l; i++) {
+
+                updateAttribute(array[i], gl.ARRAY_BUFFER);
+
+            }
+
+        }
+
+        return geometry;
+
+    }
+
+    function updateAttribute(attribute, bufferType) {
+
+        var data = ( attribute instanceof THREE.InterleavedBufferAttribute ) ? attribute.data : attribute;
+
+        var attributeProperties = properties.get(data);
+
+        if (attributeProperties.__webglBuffer === undefined) {
+
+            createBuffer(attributeProperties, data, bufferType);
+
+        } else if (attributeProperties.version !== data.version) {
+
+            updateBuffer(attributeProperties, data, bufferType);
+
+        }
+
+    }
+
+    function createBuffer(attributeProperties, data, bufferType) {
+
+        attributeProperties.__webglBuffer = gl.createBuffer();
+        gl.bindBuffer(bufferType, attributeProperties.__webglBuffer);
+
+        var usage = data.dynamic ? gl.DYNAMIC_DRAW : gl.STATIC_DRAW;
+
+        gl.bufferData(bufferType, data.array, usage);
+
+        attributeProperties.version = data.version;
+
+    }
+
+    function updateBuffer(attributeProperties, data, bufferType) {
+
+        gl.bindBuffer(bufferType, attributeProperties.__webglBuffer);
+
+        if (data.dynamic === false || data.updateRange.count === -1) {
+
+            // Not using update ranges
+
+            gl.bufferSubData(bufferType, 0, data.array);
+
+        } else if (data.updateRange.count === 0) {
+
+            console.error('THREE.WebGLObjects.updateBuffer: dynamic THREE.BufferAttribute marked as needsUpdate but updateRange.count is 0, ensure you are using set methods or updating manually.');
+
+        } else {
+
+            gl.bufferSubData(bufferType, data.updateRange.offset * data.array.BYTES_PER_ELEMENT,
+                data.array.subarray(data.updateRange.offset, data.updateRange.offset + data.updateRange.count));
+
+            data.updateRange.count = 0; // reset range
+
+        }
+
+        attributeProperties.version = data.version;
+
+    }
+
+    function getAttributeBuffer(attribute) {
+
+        if (attribute instanceof THREE.InterleavedBufferAttribute) {
+
+            return properties.get(attribute.data).__webglBuffer;
+
+        }
+
+        return properties.get(attribute).__webglBuffer;
+
+    }
+
+    function getWireframeAttribute(geometry) {
+
+        var property = properties.get(geometry);
+
+        if (property.wireframe !== undefined) {
+
+            return property.wireframe;
+
+        }
+
+        var indices = [];
+
+        var index = geometry.index;
+        var attributes = geometry.attributes;
+        var position = attributes.position;
+
+        // console.time( 'wireframe' );
+
+        if (index !== null) {
+
+            var edges = {};
+            var array = index.array;
+
+            for (var i = 0, l = array.length; i < l; i += 3) {
+
+                var a = array[i + 0];
+                var b = array[i + 1];
+                var c = array[i + 2];
+
+                if (checkEdge(edges, a, b)) indices.push(a, b);
+                if (checkEdge(edges, b, c)) indices.push(b, c);
+                if (checkEdge(edges, c, a)) indices.push(c, a);
+
+            }
+
+        } else {
+
+            var array = attributes.position.array;
+
+            for (var i = 0, l = ( array.length / 3 ) - 1; i < l; i += 3) {
+
+                var a = i + 0;
+                var b = i + 1;
+                var c = i + 2;
+
+                indices.push(a, b, b, c, c, a);
+
+            }
+
+        }
+
+        // console.timeEnd( 'wireframe' );
+
+        var TypeArray = position.count > 65535 ? Uint32Array : Uint16Array;
+        var attribute = new THREE.BufferAttribute(new TypeArray(indices), 1);
+
+        updateAttribute(attribute, gl.ELEMENT_ARRAY_BUFFER);
+
+        property.wireframe = attribute;
+
+        return attribute;
+
+    }
+
+    function checkEdge(edges, a, b) {
+
+        if (a > b) {
+
+            var tmp = a;
+            a = b;
+            b = tmp;
+
+        }
+
+        var list = edges[a];
+
+        if (list === undefined) {
+
+            edges[a] = [b];
+            return true;
+
+        } else if (list.indexOf(b) === -1) {
+
+            list.push(b);
+            return true;
+
+        }
+
+        return false;
+
+    }
+
+    this.getAttributeBuffer = getAttributeBuffer;
+    this.getWireframeAttribute = getWireframeAttribute;
+
+    this.update = update;
+
+};
+
 
 CLOUD.RenderGroup = function () {
 
@@ -1886,7 +2113,7 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
 
     var state = new THREE.WebGLState( _gl, extensions, paramThreeToGL );
     var properties = new THREE.WebGLProperties();
-    var objects = new THREE.WebGLObjects( _gl, properties, this.info );
+    var objects = new THREE.WebGLObjectsExt( _gl, properties, this.info );
     var programCache = new THREE.WebGLPrograms( this, capabilities );
 
     this.info.programs = programCache.programs;
@@ -2927,7 +3154,7 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
 
 		if ( object.visible === false ) return;
 
-		if ( ( object.channels.mask & camera.channels.mask ) !== 0 ) {
+		if ( ( object.channels && object.channels.mask & camera.channels.mask ) !== 0 ) {
 
 			if ( object instanceof THREE.Light ) {
 
@@ -3009,11 +3236,24 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
 
         var children = object.children;
 
-		for ( var i = 0, l = children.length; i < l; i ++ ) {
+        //if (!children) {
+        //    console.log("null");
+        //}
 
-			projectObject( children[ i ], camera );
+        if (children) {
 
+            for ( var i = 0, l = children.length; i < l; i ++ ) {
+
+                projectObject( children[ i ], camera );
+
+            }
         }
+
+        //for ( var i = 0, l = children.length; i < l; i ++ ) {
+        //
+			//projectObject( children[ i ], camera );
+        //
+        //}
 
     }
 
@@ -5270,7 +5510,7 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
 
         CLOUD.GeomUtil.destroyUnitInstances();
         //LIWEI: WebGLObjects has no method to clear the cached geometries, so recreate it.
-        objects = new THREE.WebGLObjects(_gl, properties, this.info);
+        objects = new THREE.WebGLObjectsExt(_gl, properties, this.info);
         _orderedRenderer.destroy();
 
         properties.clear();
@@ -7321,6 +7561,23 @@ CLOUD.Scene.prototype.getRootNodeMatrix = function () {
     }
 
     return new THREE.Matrix4();
+};
+
+// 获得场景 root node 旋转角度(Euler)
+CLOUD.Scene.prototype.getRootNodeRotation = function () {
+
+    if (this.rootNode.matrix) {
+
+        var rotMat = new THREE.Matrix4();
+        rotMat.extractRotation(this.rootNode.matrix);
+
+        var rotation = new THREE.Euler();
+        rotation.setFromRotationMatrix( rotMat );
+
+        return rotation;
+    }
+
+    return null;
 };
 
 // 获得场景 root node 包围盒
@@ -13686,10 +13943,6 @@ CLOUD.Filter = function () {
     // 对象是否可以被pick -- true: 对象可以被pick，false: 对象不可以pick
     this.isSelectable = function (object) {
 
-        // 场景半透明不能pick
-        if (_sceneOverriderState)
-            return false;
-
         var id = object.name;
 
         // 半透明不能pick
@@ -13712,6 +13965,10 @@ CLOUD.Filter = function () {
             if (material !== undefined)
                 return true;
         }
+
+        // 场景半透明不能pick
+        if (_sceneOverriderState)
+            return false;
 
         return true;
     };
@@ -19085,6 +19342,19 @@ CLOUD.EditorManager.prototype = {
         scope.setEditor(panEditor);
     },
 
+    setClipPlanesMode : function (viewer) {
+        var scope = this;
+
+        var clipPlanes = this.editors["clipPlanesEditor"];
+        if (clipPlanes === undefined) {
+            clipPlanes = new CLOUD.ClipPlanesEditor(viewer.cameraEditor, viewer.getScene(), viewer.domElement);
+            this.editors["clipPlanesEditor"] = clipPlanes;
+            clipPlanes.update(viewer.camera);
+        }
+
+        scope.setEditor(clipPlanes);
+    },
+
     setFlyMode: function(bShowControlPanel, viewer) {
         var scope = this;
 
@@ -19614,6 +19884,363 @@ CLOUD.ClipEditor.prototype.onMouseMove = function ( event ) {
 	camera_scope.process(event.clientX, event.clientY);
 };
 */
+CLOUD.ClipPlanes = function (size, center) {
+    THREE.Object3D.call(this);
+
+    var faceName = [];
+    faceName.push("clipPlane_right");
+    faceName.push("clipPlane_left");
+    faceName.push("clipPlane_top");
+    faceName.push("clipPlane_bottom");
+    faceName.push("clipPlane_front");
+    faceName.push("clipPlane_back");
+
+    this.cubeSize = size.clone();
+    this.center = center.clone();
+
+    this.visible = false;
+    this.rotatable = false;
+
+    this.selectIndex = null;
+
+    this.planeOffset = new Array(6);
+
+    this.uniforms = CloudShaderLib.phong_cust_clip.uniforms;
+
+    this.getPlaneNormal = function (face) {
+        var planeNormal = new THREE.Vector4();
+        var index = Math.floor(face / 2);
+        var mod = face % 2;
+        planeNormal.setComponent(index, Math.pow(-1, mod));
+        planeNormal["w"] = -this.cubeSize.getComponent(index) * 0.5;
+        this.planeOffset[i] = 0;
+        return planeNormal;
+    };
+
+    this.planeMaterial = new THREE.MeshPhongMaterial({ opacity: 0.3, transparent: true, side: THREE.DoubleSide, color: 0x6699cc });
+    this.planeHighLightMatrial = new THREE.MeshPhongMaterial({ opacity: 0.3, transparent: true, side: THREE.DoubleSide, color: 0x00FF80 });
+    this.initPlaneModel = function (face) {
+        var index = Math.floor(face / 2);
+        var mod = face % 2;
+
+        var width = (index == 0 ? this.cubeSize.z : this.cubeSize.x);
+        var height = (index == 1) ? this.cubeSize.z : this.cubeSize.y;
+
+        var plane = new THREE.PlaneGeometry(width, height);
+        var planeMesh = new THREE.Mesh(plane, this.planeMaterial.clone());
+        planeMesh.name = faceName[face];
+        planeMesh.position.setComponent(index, Math.pow(-1, mod) * this.cubeSize.getComponent(index) * 0.5);
+        if (index == 0) planeMesh.rotation.y = Math.pow(-1, mod) * Math.PI * 0.5;
+        else if (index == 1) planeMesh.rotation.x = Math.pow(-1, mod) * Math.PI * 0.5;
+        //else if (index == 2 && mod == 0) planeMesh.rotation.x = Math.PI;
+
+        this.add(planeMesh);
+    };
+
+    for (var i = 0; i < 6; ++i) {
+        this.uniforms.vClipPlane.value[i] = this.getPlaneNormal(i);
+        this.initPlaneModel(i);
+    }
+
+    this.clipplanes = this.uniforms.vClipPlane.value.slice(0);
+
+    this.position.copy(center);
+
+    this.enable = function (enable, visible) {
+        this.visible = visible;
+        this.uniforms.iClipPlane.value = enable ? 6 : 0;
+    };
+
+    this.reset = function () {
+        for (var i = 0; i < 6; ++i) {
+            this.planeOffset[i] = 0;
+        }
+        this.position.copy(this.center);
+        this.scale.copy(new THREE.Vector3(1.0, 1.0, 1.0));
+        this.quaternion.copy(new THREE.Quaternion());
+        this.update();
+    };
+
+    this.update = function () {
+        this.updateMatrixWorld();
+        var m = new THREE.Matrix4();
+        m.getInverse(this.matrix);
+        m.transpose();
+        for (var i = 0; i < 6; ++i) {
+            this.uniforms.vClipPlane.value[i] = this.clipplanes[i].clone().applyMatrix4(m);
+        }
+    };
+
+    this.offset = function (face, offset) {
+        var index = Math.floor(face / 2);
+        this.planeOffset[face] += offset;
+
+        var centerOffset = new THREE.Vector3();
+        for (var i = 0; i < 6; ++i) {
+            var normal = this.clipplanes[i].clone();
+            var planeOffset = this.planeOffset[i];
+            var deltaOffset = new THREE.Vector3(normal.x * planeOffset, normal.y * planeOffset, normal.z * planeOffset);
+            centerOffset.add(deltaOffset);
+        }
+
+        var scale = 1 + (centerOffset.getComponent(index) / this.cubeSize.getComponent(index));
+        if (scale > 0.0 && scale < 1.01) {
+            this.scale.setComponent(index, scale);
+            this.position.copy(this.center);
+            for (var i = 0; i < 6; ++i) {
+                var tempClipPlane = this.uniforms.vClipPlane.value[i].clone();
+                var tempNormal = new THREE.Vector3(tempClipPlane.x, tempClipPlane.y, tempClipPlane.z);
+                tempNormal.normalize();
+                var deltaOffset = this.planeOffset[i];
+                var offsetVector = new THREE.Vector3(tempNormal.x * deltaOffset, tempNormal.y * deltaOffset, tempNormal.z * deltaOffset);
+                if (i % 2 == 1) {
+                    this.position.sub(offsetVector.multiplyScalar(0.5));
+                }
+                else {
+                    this.position.add(offsetVector.multiplyScalar(0.5));
+                }
+            }
+
+            this.update();
+        }
+        else {
+            this.planeOffset[face] -= offset;
+        }
+    };
+
+    var tempQuaternion = new THREE.Quaternion();
+
+    var unitX = new THREE.Vector3(1.0, 0.0, 0.0);
+    this.rotX = function (rot) {
+        tempQuaternion.setFromAxisAngle(unitX, rot);
+        this.quaternion.multiply(tempQuaternion);
+        this.update();
+    };
+
+    var unitY = new THREE.Vector3(0.0, 1.0, 0.0);
+    this.rotY = function (rot) {
+        tempQuaternion.setFromAxisAngle(unitY, rot);
+        this.quaternion.multiply(tempQuaternion);
+        this.update();
+    };
+
+    this.highLight = function () {
+        if (this.selectIndex == null)
+            return;
+        this.children[this.selectIndex].material = this.planeHighLightMatrial.clone();
+    };
+    
+    this.cancelHighLight = function () {
+        if (this.selectIndex == null)
+            return;
+        this.children[this.selectIndex].material = this.planeMaterial.clone();
+        this.selectIndex = null;
+    };
+};
+
+CLOUD.ClipPlanes.prototype = Object.create(THREE.Object3D.prototype);
+CLOUD.ClipPlanes.prototype.constructor = CLOUD.ClipPlanes;
+
+CLOUD.ClipPlanes.prototype.raycast = (function () {
+    return function (raycaster, intersects) {
+        var planeIntersects = [];
+        var selectPlane;
+        for (var i = 0, l = this.children.length; i < l; i++) {
+            intersectObject(this.children[i], raycaster, planeIntersects, true);
+            if (planeIntersects.length > 0) {
+                if (!selectPlane)
+                {
+                    selectPlane = planeIntersects.pop();
+                    this.selectIndex = i;
+                }
+                else {
+                    var plane = planeIntersects.pop();
+                    if (plane.distance < selectPlane.distance) {
+                        selectPlane = plane;
+                        this.selectIndex = i;
+                    }
+                }
+            }
+        }
+
+        if (!selectPlane)
+            //intersects.push(selectPlane);
+        //else
+            this.selectIndex = null;
+
+        return false;
+    };
+}());
+CLOUD.ClipPlanesEditor = function (object, scene, domElement) {
+    CLOUD.OrbitEditor.call(this, object, scene, domElement);
+
+    this.scene = scene;
+    var clipPlanes = scene.getClipPlanes();
+
+    this.intersectPoint = null;
+    this.selectIndex = null;
+    this.normal = null;
+    this.plane = null;
+
+    this.toggle = function (enable, visible) {
+        if (CloudShaderLib === undefined) {
+            return;
+        }
+
+        clipPlanes.enable(enable, visible);
+    };
+
+    this.visible = function (enable) {
+        if (CloudShaderLib === undefined) {
+            return;
+        }
+
+        clipPlanes.visible = enable;
+    };
+
+    this.rotatable = function (enable) {
+        if (CloudShaderLib === undefined) {
+            return;
+        }
+
+        clipPlanes.rotatable = enable;
+    };
+
+    this.reset = function () {
+        if (CloudShaderLib === undefined) {
+            return;
+        }
+
+        clipPlanes.reset();
+    };
+
+    this.getPickPoint = function (cx, cy) {
+        var canvasContainer = this.cameraEditor.getContainerDimensions();
+        // 规范化开始点
+        var canvasX = cx - canvasContainer.left;
+        var canvasY = cy - canvasContainer.top;
+        // 规范化到[-1, 1]
+        var normalizedX = (canvasX / canvasContainer.width) * 2.0 - 1.0;
+        var normalizedY = ((canvasContainer.height - canvasY) / canvasContainer.height) * 2.0 - 1.0;
+
+        var raycaster = new CLOUD.Raycaster();
+        raycaster.setFromCamera(new THREE.Vector2(normalizedX, normalizedY), this.cameraEditor.object);
+
+        var point = raycaster.ray.intersectPlane(this.plane);
+        return point;
+    };
+
+    this.getSelectIndex = function () {
+        return clipPlanes.selectIndex;
+    };
+
+    this.isRotate = function () {
+        return clipPlanes.rotatable;
+    };
+
+    this.getPlane = function() {
+        this.normal = clipPlanes.uniforms.vClipPlane.value[this.selectIndex ].clone();
+
+        var plane = clipPlanes.uniforms.vClipPlane.value[(this.selectIndex + 2) % 6].clone();
+        var normal = new THREE.Vector3(plane.x, plane.y, plane.z);
+        plane = new THREE.Plane();
+        plane.setFromNormalAndCoplanarPoint(normal, this.intersectPoint);
+        return plane;
+    };
+
+    this.offset = function (offset) {
+        if (this.selectIndex % 2 == 1) {
+            clipPlanes.offset(this.selectIndex, -offset * 0.1);
+        }
+        else {
+            clipPlanes.offset(this.selectIndex, offset * 0.1);
+        }
+    };
+
+    this.rotate = function (cx, cy) {
+        if (this.selectIndex == 2 || this.selectIndex == 3) {
+            clipPlanes.rotX(cy / 180 * Math.PI * 0.1);
+        }
+        else {
+            clipPlanes.rotY(cx / 180 * Math.PI * 0.1);
+        }
+    };
+    
+    this.update = function (camera) {
+        if (clipPlanes === undefined)
+            return;
+        clipPlanes.update(camera);
+    };
+    
+    this.cancelHighLight = function () {
+        if (clipPlanes === undefined)
+            return;
+        clipPlanes.cancelHighLight();
+    };
+    
+    this.highLight = function () {
+        if (clipPlanes === undefined)
+            return;
+        clipPlanes.highLight();
+    };
+};
+
+CLOUD.ClipPlanesEditor.prototype = Object.create(CLOUD.OrbitEditor.prototype);
+CLOUD.ClipPlanesEditor.prototype.constructor = CLOUD.ClipPlanesEditor;
+
+var lastEvent;
+CLOUD.ClipPlanesEditor.prototype.processMouseDown = function (event) {
+    if (event.button === THREE.MOUSE.LEFT) {
+        lastEvent = event;
+        this.intersectPoint = this.cameraEditor.getTrackingPoint(event.clientX, event.clientY);
+        this.selectIndex = this.getSelectIndex();
+    }
+
+    if (this.selectIndex != null) {
+        this.plane = this.getPlane();
+        this.highLight();
+        this.cameraEditor.viewer.editorManager.isUpdateRenderList = true;
+        this.cameraEditor.update(true);
+    }
+    else {
+        CLOUD.OrbitEditor.prototype.processMouseDown.call(this, event);
+    }
+};
+
+CLOUD.ClipPlanesEditor.prototype.processMouseUp = function (event) {
+    this.intersectPoint = null;
+    this.selectIndex = null;
+    this.normal = null;
+    this.plane = null;
+
+    CLOUD.OrbitEditor.prototype.processMouseUp.call(this, event);
+
+    this.cameraEditor.viewer.editorManager.isUpdateRenderList = true;
+    this.cancelHighLight();
+    this.cameraEditor.update(true);
+};
+
+
+CLOUD.ClipPlanesEditor.prototype.processMouseMove = function (event) {
+    if (this.selectIndex != null) {
+        if (!this.isRotate()) {
+            var point = this.getPickPoint(event.clientX, event.clientY);
+            var dir = new THREE.Vector3();
+            dir.subVectors(point, this.intersectPoint);
+            this.offset(dir.dot(this.normal) * dir.length());
+            this.intersectPoint = point;
+            //this.highLight();
+        }
+        else {
+            this.rotate(event.clientX - lastEvent.clientX, event.clientY - lastEvent.clientY);
+            lastEvent = event;
+        }
+        this.cameraEditor.update(true);
+    }
+    else {
+        CLOUD.OrbitEditor.prototype.processMouseMove.call(this, event);
+    }
+};
 CLOUD.ClipPlaneService = function(viewer) {
     this.viewer = viewer;
 };
@@ -19636,6 +20263,11 @@ CLOUD.ClipPlaneService.prototype = {
             viewer.render();
         }
 
+        var clipPlanesEditor = viewer.editorManager.editors["clipPlanesEditor"];
+        if (clipPlanesEditor !== undefined) {
+            clipPlanesEditor.update(camera);
+            viewer.render();
+        }
     },
     
     getClipEditor: function() {
@@ -19650,6 +20282,20 @@ CLOUD.ClipPlaneService.prototype = {
         this.update(viewer.camera);
 
         return clipEditor;
+    },
+
+    getClipPlanesEditor: function() {
+
+        var viewer = this.viewer;
+        var clipPlanesEditor = viewer.editorManager.editors["clipPlanesEditor"];
+        if (clipPlanesEditor === undefined) {
+            clipPlanesEditor = new CLOUD.ClipPlanesEditor(viewer.cameraEditor, viewer.getScene(), viewer.domElement);
+            viewer.editorManager.editors["clipPlanesEditor"] = clipPlanesEditor;
+        }
+
+        this.update(viewer.camera);
+
+        return clipPlanesEditor;
     },
 
     // 关闭/开启切面功能，同时设置可见性
@@ -19721,7 +20367,491 @@ CLOUD.ClipPlaneService.prototype = {
         clipEditor.restore(status, offset, rotx, roty);
 
     },
+
+
+    clipPlanesToggle: function(enable, visible) {
+
+        var viewer = this.viewer;
+        var clipPlanesEditor = this.getClipPlanesEditor();
+        clipPlanesEditor.toggle(enable, visible);
+
+    },
+
+    // 显示/隐藏切面
+    clipPlanesVisible: function(enable) {
+
+        var clipPlanesEditor = this.getClipPlanesEditor();
+        clipPlanesEditor.visible(enable);
+
+    },
+
+    clipPlanesRotatable: function(enable) {
+
+        var clipPlanesEditor = this.getClipPlanesEditor();
+        clipPlanesEditor.rotatable(enable);
+
+    },
+
+    clipPlanesReset: function(enable) {
+
+        var clipPlanesEditor = this.getClipPlanesEditor();
+        clipPlanesEditor.reset();
+
+    },
 }
+CLOUD.ExtensionHelper = function (viewer) {
+
+    this.viewer = viewer;
+    this.miniMaps = {};
+    this.defaultMiniMap = null;
+    this.markerClickCallback = null;
+};
+
+CLOUD.ExtensionHelper.prototype = {
+
+    constructor: CLOUD.ExtensionHelper,
+
+    destroy: function () {
+
+        // TODO: clear other resources.
+
+        this.viewer = null;
+    },
+
+    // ------------------ 批注 API -- S ------------------ //
+
+    // 是否存在批注
+    hasAnnotations: function () {
+
+        return this.annotationEditor && this.annotationEditor.isInitialized();
+    },
+
+    // 初始化批注
+    initAnnotation: function () {
+
+        var viewer = this.viewer;
+        var scope = this;
+
+        if (!this.annotationEditor) {
+
+            this.annotationEditor = new CLOUD.Extensions.AnnotationEditor(viewer.domElement, viewer.cameraEditor);
+        }
+
+        if (!this.annotationEditor.isInitialized()) {
+
+            var callbacks = {
+                beginEditCallback: function (domElement) {
+                    viewer.editorManager.unregisterDomEventListeners(domElement);
+                },
+                endEditCallback: function (domElement) {
+                    viewer.editorManager.registerDomEventListeners(domElement);
+                },
+                changeEditorModeCallback: function () {
+                    scope.uninitAnnotation();
+                }
+            };
+
+            this.annotationEditor.init(callbacks);
+
+            callbacks = null;
+        }
+    },
+
+    // 卸载批注资源
+    uninitAnnotation: function () {
+
+        if (this.annotationEditor && this.annotationEditor.isInitialized()) {
+
+            this.annotationEditor.uninit();
+
+        }
+    },
+
+    // 设置批注背景色
+    setAnnotationBackgroundColor: function (startColor, stopColor) {
+
+        if (this.annotationEditor) {
+
+            this.annotationEditor.setBackgroundColor(startColor, stopColor);
+        }
+    },
+
+    // 开始批注编辑
+    editAnnotationBegin: function () {
+
+        // 如果没有设置批注模式，则自动进入批注模式
+        this.initAnnotation();
+
+        this.annotationEditor.editBegin();
+    },
+
+    // 完成批注编辑
+    editAnnotationEnd: function () {
+
+        if (this.annotationEditor) {
+
+            this.annotationEditor.editEnd();
+
+        }
+    },
+
+    // 设置批注类型
+    setAnnotationType: function (type) {
+
+        if (this.annotationEditor) {
+
+            this.annotationEditor.setAnnotationType(type);
+
+        }
+    },
+
+    // 加载批注列表
+    loadAnnotations: function (annotations) {
+
+        if (annotations) {
+
+            this.initAnnotation();
+            this.annotationEditor.loadAnnotations(annotations);
+        } else {
+            this.uninitAnnotation();
+        }
+    },
+
+    // 获得批注对象列表
+    getAnnotationInfoList: function () {
+
+        if (this.annotationEditor) {
+
+            return this.annotationEditor.getAnnotationInfoList();
+
+        }
+
+        return null;
+    },
+
+    // resize
+    resizeAnnotations: function () {
+
+        if (this.annotationEditor && this.annotationEditor.isInitialized()) {
+
+            this.annotationEditor.onResize();
+
+        }
+    },
+
+    // render
+    renderAnnotations: function () {
+
+        if (this.annotationEditor && this.annotationEditor.isInitialized()) {
+
+            this.annotationEditor.onCameraChange();
+
+        }
+    },
+
+    // 截屏 base64格式png图片
+    captureAnnotationsScreenSnapshot: function () {
+
+        var dataUrl = this.viewer.getRenderBufferScreenShot();
+        dataUrl = this.annotationEditor.getScreenSnapshot(dataUrl);
+
+        return dataUrl;
+    },
+
+    // ------------------ 批注 API -- E ------------------ //
+
+    // ------------------ 标记 API -- S ------------------ //
+    // 初始化Marker
+    initMarkerEditor: function () {
+
+        var viewer = this.viewer;
+
+        if (!this.markerEditor) {
+
+            this.markerEditor = new CLOUD.Extensions.MarkerEditor(viewer);
+        }
+
+        if (!this.markerEditor.isInitialized()) {
+
+            this.markerEditor.init();
+        }
+
+        if (this.markerClickCallback) {
+            this.markerEditor.setMarkerClickCallback(this.markerClickCallback);
+        }
+    },
+
+    // 卸载Marker
+    uninitMarkerEditor: function () {
+
+        if (this.markerEditor && this.markerEditor.isInitialized()) {
+
+            this.markerEditor.uninit();
+
+        }
+    },
+
+    // zoom到合适的大小
+    zoomToSelectedMarkers: function () {
+
+        if (this.markerEditor) {
+
+            var bBox = this.markerEditor.getMarkersBoundingBox();
+
+            if (bBox) {
+                this.viewer.zoomToBBox(bBox, 0.05);
+            }
+
+            this.markerEditor.updateMarkers();
+
+        }
+
+    },
+
+    // 加载标记
+    loadMarkers: function (markerInfoList) {
+
+        if (markerInfoList) {
+
+            this.initMarkerEditor();
+            this.markerEditor.loadMarkers(markerInfoList);
+
+        } else {
+
+            this.uninitMarkerEditor();
+        }
+
+    },
+
+    // 加载标记
+    loadMarkersFromIntersect: function (intersect, shapeType, state) {
+
+        if (intersect) {
+
+            this.initMarkerEditor();
+            this.markerEditor.loadMarkersFromIntersect(intersect, shapeType, state);
+
+        } else {
+
+            this.uninitMarkerEditor();
+        }
+
+    },
+
+    // 获得标记列表
+    getMarkerInfoList: function () {
+
+        if (this.markerEditor) {
+
+            return this.markerEditor.getMarkerInfoList();
+
+        }
+
+        return null;
+    },
+
+    resizeMarkers: function () {
+
+        if (this.markerEditor) {
+
+            return this.markerEditor.onResize();
+
+        }
+    },
+
+    renderMarkers: function () {
+
+        if (this.markerEditor) {
+
+            return this.markerEditor.updateMarkers();
+
+        }
+    },
+
+    // 根据id选择marker
+    selectMarkerById: function (id) {
+
+        if (this.markerEditor) {
+            var marker = this.markerEditor.getMarker(id);
+            marker.highlight(true);
+            this.markerEditor.selectMarker(marker);
+        }
+    },
+
+    // 设置marker click 回调
+    setMarkerClickCallback: function (callback) {
+
+        this.markerClickCallback = callback;
+    },
+
+    // ------------------ 小地图API -- S ------------------ //
+    createMiniMap:function(name, domElement, width, height, styleOptions, callbackCameraChanged, callbackClickOnAxisGrid){
+
+        var miniMap = this.miniMaps[name];
+
+        if (!miniMap) {
+            miniMap = this.miniMaps[name] = new CLOUD.MiniMap(this.viewer);
+            miniMap.setCameraChangedCallback(callbackCameraChanged);
+            miniMap.setClickOnAxisGridCallback(callbackClickOnAxisGrid);
+        }
+
+        domElement = domElement || this.viewer.domElement;
+
+        if (domElement) {
+            // 初始化小地图
+            miniMap.init(domElement, width, height, styleOptions);
+        }
+
+        if (!this.defaultMiniMap) {
+            this.defaultMiniMap = this.miniMaps[name];
+        }
+
+        //return this.miniMaps[name];
+    },
+
+    destroyMiniMap:function(name){
+
+        var miniMap = this.miniMaps[name];
+
+        if (miniMap) {
+
+            miniMap.uninit();
+
+            if (this.defaultMiniMap === miniMap) {
+                this.defaultMiniMap = null;
+            }
+
+            delete this.miniMaps[name];
+        }
+    },
+
+    removeMiniMap: function (name) {
+
+        var miniMap = this.miniMaps[name];
+
+        if (miniMap) {
+            miniMap.remove();
+
+            //delete this.miniMaps[name];
+        }
+    },
+
+    appendMiniMap: function (name) {
+
+        var miniMap = this.miniMaps[name];
+
+        if (miniMap) {
+            miniMap.append();
+        }
+    },
+
+    getMiniMap: function(name) {
+
+        return this.miniMaps[name];
+    },
+
+    // 绘制小地图
+    renderMiniMap: function(){
+
+        for (var name in this.miniMaps) {
+            var miniMap = this.miniMaps[name];
+
+            if (miniMap) {
+                miniMap.render();
+            }
+        }
+    },
+
+    // 设置平面图
+    setFloorPlaneData: function(jsonObj) {
+
+        CLOUD.MiniMap.setFloorPlaneData(jsonObj);
+    },
+
+    generateFloorPlane: function(name, changeView) {
+        var miniMap = this.miniMaps[name];
+
+        if (miniMap) {
+            miniMap.generateFloorPlane(changeView);
+        }
+    },
+
+    // 设置轴网数据
+    setAxisGridData:function(jsonObj, level) {
+
+        CLOUD.MiniMap.setAxisGridData(jsonObj);
+    },
+
+    generateAxisGrid: function(name) {
+        var miniMap = this.miniMaps[name];
+
+        if (miniMap) {
+            miniMap.generateAxisGrid();
+        }
+    },
+
+    // 是否显示隐藏轴网
+    showAxisGrid:function(name, show) {
+
+        var miniMap = this.miniMaps[name];
+
+        if (miniMap) {
+            if (show) {
+                miniMap.showAxisGird();
+            } else {
+                miniMap.hideAxisGird();
+            }
+        }
+    },
+
+    enableAxisGridEvent: function(name, enable){
+
+        var miniMap = this.miniMaps[name];
+
+        if (miniMap) {
+            miniMap.enableMouseEvent(enable);
+        }
+    },
+
+    enableMiniMapCameraNode:function(name, enable){
+
+        var miniMap = this.miniMaps[name];
+
+        if (miniMap) {
+            miniMap.enableCameraNode(enable);
+        }
+    },
+
+    flyBypAxisGridNumber:function(name, abcName, numeralName){
+
+        var miniMap = this.miniMaps[name];
+
+        if (miniMap) {
+            miniMap.flyByAxisGridNumber(abcName, numeralName);
+        }
+    },
+
+    // ------------------ 小地图API -- E ------------------ //
+
+    // 扩展功能的 resize
+    resizeExtensions: function() {
+
+        this.resizeMarkers();
+        this.resizeAnnotations();
+    },
+
+    // 扩展功能的 render
+    renderExtensions: function() {
+
+        // 刷新小地图
+        this.renderMiniMap();
+        // 刷新标记点
+        this.renderMarkers();
+        // 刷新批注
+        this.renderAnnotations();
+    }
+};
+
 CloudViewer = function() {
     "use strict";
 
@@ -19737,10 +20867,8 @@ CloudViewer = function() {
     this.updateRenderListEnabled = true; // 是否启用渲染队列更新
 
     this.modelManager = new CLOUD.ModelManager();
-    this.extensionHelper = new CLOUD.Extensions.Helper2D(this);
+    this.extensionHelper = new CLOUD.ExtensionHelper(this);
     this.Services = {};
-
-    this.viewHouse = null;
 
     this.tmpBox = new THREE.Box3();
     var scope = this;
@@ -19749,7 +20877,7 @@ CloudViewer = function() {
 
     function initializeView() {
 
-        scope.setViewHouseVisibility(true);
+        //scope.setViewHouseVisibility(true);
 
         scope.zoomAll();
         // run once
@@ -19945,6 +21073,8 @@ CloudViewer.prototype = {
                         //console.time("gc" + renderId);
                         //scope.modelManager.collectionGarbage();
                         //console.timeEnd("gc" + renderId);
+
+                        //scope.renderViewHouse();
                     }
 
                 }
@@ -19966,7 +21096,7 @@ CloudViewer.prototype = {
         //this.renderViewHouse();
 
         // 刷新扩展绘制
-        this.renderExtensions();
+        this.extensionHelper.renderExtensions();
     },
 
     resize: function(width, height) {
@@ -19977,7 +21107,7 @@ CloudViewer.prototype = {
 
         this.resizeFlyCross(); // 重设fly模式下十字光标位置
 
-        this.resizeExtensions(width, height, this.isMobile);
+        this.extensionHelper.resizeExtensions();
 
         this.render();
     },
@@ -20148,6 +21278,10 @@ CloudViewer.prototype = {
 
     setFlyMode: function(bShowControlPanel) {
         this.editorManager.setFlyMode(bShowControlPanel, this);
+    },
+
+    setClipPlanesMode : function () {
+        this.editorManager.setClipPlanesMode(this);
     },
 
     // 锁定Z轴
@@ -20390,68 +21524,68 @@ CloudViewer.prototype = {
         }
     },
 
-    // 扩展功能的 render
-    renderExtensions: function() {
+    //// 扩展功能的 render
+    //renderExtensions: function() {
+    //
+    //    // 刷新小地图
+    //    this.renderMiniMap();
+    //    // 刷新标记点
+    //    this.renderMarkers();
+    //    // 刷新批注
+    //    this.renderAnnotations();
+    //},
 
-        // 刷新小地图
-        this.renderMiniMap();
-        // 刷新标记点
-        this.renderMarkers();
-        // 刷新批注
-        this.renderAnnotations();
-    },
-
-    // 扩展功能的 resize
-    resizeExtensions: function(width, height, isMobile) {
-
-        this.resizeViewHouse(width, height, isMobile);
-
-        this.resizeMarkers();
-
-        this.resizeComments();
-    },
+    //// 扩展功能的 resize
+    //resizeExtensions: function(width, height, isMobile) {
+    //
+    //    this.resizeViewHouse(width, height, isMobile);
+    //
+    //    this.resizeMarkers();
+    //
+    //    this.resizeComments();
+    //},
 
     // ------------------ ViewHouse API -- S ------------------ //
-    // 外部初始化，由外部决定需不需要 ViewHouse 功能
-    initViewHouse: function(domElement) {
-
-        if (!this.viewHouse) {
-            this.viewHouse = new CLOUD.ViewHouse(this);
-        }
-
-        this.setViewHouseVisibility(false);
-
-        domElement = domElement || this.domElement;
-
-        if (domElement) {
-            // 初始化 ViewHouse
-            this.viewHouse.init(domElement);
-        }
-    },
-
-    // 设置 ViewHouse 可见性
-    setViewHouseVisibility: function(visible) {
-
-        if (this.viewHouse) {
-            this.viewHouse.visible = visible;
-        }
-    },
-
-    // 绘制 ViewHouse
-    renderViewHouse: function() {
-
-        if (this.viewHouse) {
-            this.viewHouse.render();
-        }
-    },
-
-    // 重设置viewhouse大小
-    resizeViewHouse: function(width, height, isMobile) {
-
-        if (this.viewHouse) {
-            this.viewHouse.resize(width, height, isMobile);
-        }
-    },
+    //// 外部初始化，由外部决定需不需要 ViewHouse 功能
+    //initViewHouse: function(domElement) {
+    //
+    //    if (!this.viewHouse) {
+    //        this.viewHouse = new CLOUD.ViewHouse(this);
+    //    }
+    //
+    //    this.setViewHouseVisibility(false);
+    //
+    //    domElement = domElement || this.domElement;
+    //
+    //    if (domElement) {
+    //        // 初始化 ViewHouse
+    //        this.viewHouse.init(domElement);
+    //    }
+    //},
+    //
+    //// 设置 ViewHouse 可见性
+    //setViewHouseVisibility: function(visible) {
+    //
+    //    if (this.viewHouse) {
+    //        this.viewHouse.visible = visible;
+    //    }
+    //},
+    //
+    //// 绘制 ViewHouse
+    //renderViewHouse: function() {
+    //
+    //    if (this.viewHouse) {
+    //        this.viewHouse.render();
+    //    }
+    //},
+    //
+    //// 重设置viewhouse大小
+    //resizeViewHouse: function(width, height, isMobile) {
+    //
+    //    if (this.viewHouse) {
+    //        this.viewHouse.resize(width, height, isMobile);
+    //    }
+    //},
     // ------------------ ViewHouse API -- E ------------------ //
 
     // ------------------ 小地图API -- S ------------------ //
@@ -20480,11 +21614,11 @@ CloudViewer.prototype = {
         return this.extensionHelper.getMiniMap(name);
     },
 
-    // 绘制小地图
-    renderMiniMap: function() {
-
-        this.extensionHelper.renderMiniMap();
-    },
+    //// 绘制小地图
+    //renderMiniMap: function() {
+    //
+    //    this.extensionHelper.renderMiniMap();
+    //},
 
     // 设置平面图
     setFloorPlaneData: function(jsonObj) {
@@ -20575,13 +21709,13 @@ CloudViewer.prototype = {
         this.extensionHelper.zoomToSelectedMarkers();
     },
 
-    resizeMarkers: function() {
-        this.extensionHelper.resizeMarkers();
-    },
+    //resizeMarkers: function() {
+    //    this.extensionHelper.resizeMarkers();
+    //},
 
-    renderMarkers: function() {
-        this.extensionHelper.renderMarkers();
-    },
+    //renderMarkers: function() {
+    //    this.extensionHelper.renderMarkers();
+    //},
 
     // 通过id选中某个标记
     selectMarkerById: function(id) {
@@ -20644,19 +21778,19 @@ CloudViewer.prototype = {
 
         return this.extensionHelper.getAnnotationInfoList();
 
-    },
-
-    // 窗口resize
-    resizeComments: function() {
-
-        this.extensionHelper.resizeAnnotations();
-    },
-
-    // 重绘
-    renderAnnotations: function() {
-
-        this.extensionHelper.renderAnnotations();
     }
+    //
+    //// 窗口resize
+    //resizeComments: function() {
+    //
+    //    this.extensionHelper.resizeAnnotations();
+    //},
+    //
+    //// 重绘
+    //renderAnnotations: function() {
+    //
+    //    this.extensionHelper.renderAnnotations();
+    //}
 
     // ------------------ 批注 API -- E ------------------ //
 };
