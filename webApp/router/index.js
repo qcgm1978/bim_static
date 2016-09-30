@@ -272,6 +272,11 @@ var AppRoute = Backbone.Router.extend({
 		if (App.Comm.isIEModel()) {
 			return false;
 		} else {
+			if (App.Project && App.Project.Settings && App.Project.Settings.Viewer) {
+				App.Project.Settings.Viewer.destroy();
+				App.Project.Settings.Viewer = null;
+			}
+
 			_.require('/static/dist/libs/libsH5.js');
 
 		}
