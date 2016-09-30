@@ -132,6 +132,7 @@
                         }else if($("#projectContainer").length>0){
                             $('#projectContainer .leftNav').remove();
                             $("#projectContainer").prepend(new App.Project.leftNav().render().el);
+                            App.Project.fetchFileNav();
                         }
 
                     } else {
