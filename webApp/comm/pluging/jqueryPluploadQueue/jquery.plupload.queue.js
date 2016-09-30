@@ -121,6 +121,11 @@
                     if (uploader.total.uploaded === uploader.files.length) {
                         statusTitle = _("Upload Complete");
                         statusText = '';
+                        App.ids = [];
+                        App.selectedid = $('.treeViewMar .selected').data('id');
+                        $('.treeViewMar .on').each(function(i,item){
+                            App.ids.push($(this).siblings('span').data('id'));
+                        });
                         if(App.ResourcesNav){
                             if (App.ResourcesNav.Settings.type == "standardLibs") {
                                 $('#resourceModelLeftNav').remove();
@@ -134,6 +139,13 @@
                             $("#projectContainer").prepend(new App.Project.leftNav().render().el);
                             App.Project.fetchFileNav();
                         }
+                        App.cb=function (){
+                            $('span[data-id='+App.selectedid+']').addClass('selected');
+                            $.each(App.ids,function(i,item){
+                                $('span[data-id='+item+']').siblings('.nodeSwitch').click();
+                            })
+                        }
+
 
                     } else {
                         statusTitle = _('Start upload');

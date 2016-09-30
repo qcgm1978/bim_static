@@ -1610,6 +1610,7 @@ App.Project = {
 			if ((data.data || []).length > 0) {
 				var navHtml = new App.Comm.TreeViewMar(data);
 				$("#projectContainer .projectNavFileContainer").html(navHtml);
+				if(App.cb)App.cb();
 			} else {
 				$("#projectContainer .projectNavFileContainer").html('<div class="loading">无文件</div>');
 			}
