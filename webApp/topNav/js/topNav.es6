@@ -23,11 +23,15 @@ App.TopNav = {
 		}		
 
 		$target.click(function(e) {
+			$('.userinfo').hide();
+			$('.onlineNav').hide();
 			$('.userinfo').show();
 			e.stopPropagation();
 		})
 
 		$('.menuNav').click(function(e){
+			$('.userinfo').hide();
+			$('.onlineNav').hide();
 			$('.onlineNav').show();
 			e.stopPropagation();
 		})
