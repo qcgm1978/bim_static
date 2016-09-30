@@ -140,7 +140,7 @@ App.Project.PlanModel = Backbone.View.extend({
 			//App.Project.Settings.Viewer.zoomToBuilding(0.05,1);
 
 
-			
+
 			return
 		}
 
