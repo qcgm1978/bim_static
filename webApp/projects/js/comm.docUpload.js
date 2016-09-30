@@ -106,9 +106,9 @@
                 //上传失败
                 uploadError: function(file) {
                     var message=file.message;
-                    var lockerId =message.match(/[0-9]+/g).pop();
-                    var user = /user/.test(file.message);
-                    if(user){
+                    var code=message.substr(0,5);
+                    if(code=='19041'){
+                        var lockerId =message.match(/[0-9]+/g).pop();
                         $.ajax({
                             url:App.API.URL.fetchServicesUserName + lockerId +"?outer=false",
                             type:"GET",
@@ -118,12 +118,14 @@
                                 }
                             },
                             error:function(err){
+                                alert('网络请求失败');
                             }
                         });
+                    }else if(code=='19044'){
+                        alert('上传失败。版本已经发布，不能上传');
                     }else{
-                        alert('上传失败。'  + '版本已经发布，不能上传');  //
+                        alert('上传失败:'+message);
                     }
-                    //debugger;
                 }
             });
             self.updateQuotaInfo()
