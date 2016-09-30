@@ -79,26 +79,22 @@
         viewer.Project.isSelect = true;
         view.loadMarkers(null);
         if (param.presetId && (!param.componentId && !param.location)) {
-            alert(1)
             type = "preset";
             viewer.Project.mode = type;
             showPresetPoint(param.presetId,true);
         }
         if (!param.presetId && (param.componentId && param.location)) {
-            alert(2)
             type = "risk";
             viewer.Project.mode = type;
             showRiskComponent(param.componentId, param.location);
         }
 
         if(param.presetId && param.componentId && param.location){
-            alert(3)
             showRiskComponent(param.componentId, param.location);
             showPresetPoint(param.presetId);
         }
 
         if(!param.presetId && !param.componentId && !param.location ){
-            alert(4)
             type="edit";
             viewer.Project.mode = type;
         }
