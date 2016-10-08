@@ -190,7 +190,7 @@ fis.match('/static/dist/libs/commLibCss.css', {
 
 //合并裤文件
 fis.match('/libsH5/**.{js,es6}', {
-  packTo: '/static/dist/libs/libsH5_'+v+'.js'
+  packTo: '/static/dist/libs/libsH5_'+v+'.js?t='+Math.round(Math.random()*9999)
 });
 
 //fis.match('/static/dist/libs/libsH5.js', {
@@ -198,7 +198,7 @@ fis.match('/libsH5/**.{js,es6}', {
 //  release: '/static/dist/libs/libsH5.js'
 //});
 fis.match('/libsH5/**.{less,css}', {
-  packTo: '/static/dist/libs/libsH5_'+v+'.css'
+  packTo: '/static/dist/libs/libsH5_'+v+'.css?t='+Math.round(Math.random()*9999)
 });
 
 //fis.match('/static/dist/libs/libsH5.css', {
@@ -209,7 +209,7 @@ fis.match('/libsH5/**.{less,css}', {
 //合并公共样式文件
 fis.match('/comm/**.{less,css}', {
   useHash: false,
-  packTo: '/static/dist/comm/comm_'+v+'.css'
+  packTo: '/static/dist/comm/comm_'+v+'.css?t='+Math.round(Math.random()*9999)
 });
 
 //fis.match('/static/dist/comm/comm.css', {
@@ -221,7 +221,7 @@ fis.match('/comm/**.{less,css}', {
 fis.match('/comm/**.{js,es6}', {
   useHash: false,
   //useHash:true,
-  packTo: '/static/dist/comm/comm_'+v+'.js'
+  packTo: '/static/dist/comm/comm_'+v+'.js?t='+Math.round(Math.random()*9999)
 });
 
 //fis.match('/static/dist/comm/comm.js', {
