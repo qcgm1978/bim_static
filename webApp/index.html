@@ -137,13 +137,14 @@
 <script type="text/javascript" src="./libs/underscore.1.8.2.js"></script>
 <link rel="styleSheet" href="./libsH5/css/modelStyle.less"/>
 <script type="text/javascript" src="./api/api.js"></script>
-<script type="text/javascript" src="./comm/js/comm.es6"></script>
+<script type="text/javascript" src="/static/dist/comm/comm_20160313.js?t=123"></script>
 <script type="text/javascript" src="./topNav/js/topNav.es6"></script>
 <script type="text/javascript" src="./commH5/pluging/clipboard/clipboard.js"></script>
 <!--<script type="text/javascript" src="./router/index.js"></script>-->
 <script>
     var x = new XMLHttpRequest();
-    x.open('GET', 'map.json?t=' + Math.round(Math.random() * 9999), true);
+    App.time = Math.round(Math.random() * 9999);
+    x.open('GET', 'map.json?t=' + App.time, true);
     x.send('bb');
     x.onreadystatechange = function (s) {
         if (x.readyState == 4) {

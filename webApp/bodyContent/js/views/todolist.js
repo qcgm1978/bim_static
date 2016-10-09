@@ -34,5 +34,6 @@ App.BodyContent.todosList = Backbone.View.extend({
             el.addClass('odd');
         }
         $("#todos tbody").append(el);
+        $('.loading1').hide();
     }
 });

@@ -18,7 +18,6 @@ App.BodyContent.control = {
         this.viewCacheMonthEnd = this.viewCacheMonthEnd || new App.BodyContent.monthEndList();
         this.viewCacheMonthStart = this.viewCacheMonthStart || new App.BodyContent.monthStartList();
         this.viewCacheProclamation = this.viewCacheProclamation || new App.BodyContent.proclamationList();
-
         $("#layoutMonth .article table").append(this.viewCacheMonthEnd.render().el)
             .append(this.viewCacheMonthStart.render().el);
 
