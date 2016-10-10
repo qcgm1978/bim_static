@@ -15,7 +15,8 @@
 			isEnable: true, // 是否启用  如果不启用 只可以查看 不能选择 
 			fileIds: "", // fileids 有值时，默认isEndable 为 false
 			mask: true,
-			http: "http://bim.wanda-dev.cn",
+			//http: "http://bim.wanda-dev.cn",
+			http: '',
 			closeCallback: null,
 			callback: null
 		}

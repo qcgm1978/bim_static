@@ -106,8 +106,8 @@
         //获取项目相关信息通过project code
         $('.navname').hide();
 
-        var appKey = query.appKey || "18fbec1ae3da477fb47d842a53164b14",
-            token = query.token || "abc3f4a29812170851a0c7ecb6853644abbc902af4b4e57636f27c35bec6628b15e908ae402e0a9034a25d72c17888256dce64f713c532348de5d78acfef88c76b670ed8abcaf44df638ba8ecd2768c93a8fe01b63bb1204014a5efb168a2a9a520bc09d70d8f2afbed49d95c982b73456b476ad825f1ac9";  
+        var appKey = query.appKey,
+            token = query.token ;
 
         if (!query.projectCode) {
             alert("缺少参数projectCode");
