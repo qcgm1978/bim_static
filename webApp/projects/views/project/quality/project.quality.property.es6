@@ -319,15 +319,15 @@ App.Project.ProjectQualityProperty = Backbone.View.extend({
 			App.Project.QualityAttr.ProcessAcceptanceCollection.reset();
 			App.Project.QualityAttr.ProcessAcceptanceCollection.projectId = projectId;
 			App.Project.QualityAttr.ProcessAcceptanceCollection.projectVersionId = projectVersionId;
+
+			if(that.ProcessAcceptanceOptions.category){
+				App.Project.currentProsCat=App.Project.mapData.processCategory[that.ProcessAcceptanceOptions.category];
+				App.Project.currentProsCheckFloor=that.ProcessAcceptanceOptions.floor;
+			}
+
 			App.Project.QualityAttr.ProcessAcceptanceCollection.fetch({
 				data: that.ProcessAcceptanceOptions,
 				success: function(data) {
-
-					if(that.ProcessAcceptanceOptions.category){
-						App.Project.currentProsCat=App.Project.mapData.processCategory[that.ProcessAcceptanceOptions.category];
-						App.Project.currentCheckFloor=that.ProcessAcceptanceOptions.floor;
-					}
-
 					that.pageInfo.call(that, data,type);
 				}
 			});
@@ -337,14 +337,17 @@ App.Project.ProjectQualityProperty = Backbone.View.extend({
 			App.Project.QualityAttr.OpeningAcceptanceCollection.reset();
 			App.Project.QualityAttr.OpeningAcceptanceCollection.projectId = projectId;
 			App.Project.QualityAttr.OpeningAcceptanceCollection.projectVersionId = projectVersionId;
+
+			if(that.OpeningAcceptanceOptions.category){
+				App.Project.currentOpenCat=App.Project.mapData.openCategory[that.OpeningAcceptanceOptions.category];
+				App.Project.currentOpenCheckFloor=that.OpeningAcceptanceOptions.floor;
+
+			}
+
 			App.Project.QualityAttr.OpeningAcceptanceCollection.fetch({
 				data: that.OpeningAcceptanceOptions,
 				success: function(data) {
-					if(that.OpeningAcceptanceOptions.category){
-						App.Project.currentOpenCat=App.Project.mapData.openCategory[that.OpeningAcceptanceOptions.category];
-						App.Project.currentCheckFloor=that.OpeningAcceptanceOptions.floor;
 
-					}
 					that.pageInfo.call(that, data,type);
 				}
 			});

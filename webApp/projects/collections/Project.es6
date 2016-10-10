@@ -2,7 +2,8 @@ App.Project = {
 
 	currentProsCat:"",
 	currentOpenCat:"",
-	currentCheckFloor:"",
+	currentOpenCheckFloor:"",
+	currentProsCheckFloor:"",
 
 	//检查点标记点击事件
 	markerClick: function(marker) {
@@ -658,11 +659,12 @@ App.Project = {
 
 				if(type=="process" && _this.currentProsCat && data.length){
 					_this.recoverySilder();
-					_this.sigleRule(_this.currentProsCat,_this.currentCheckFloor,scenceIds);
+					_this.sigleRule(_this.currentProsCat,_this.currentProsCheckFloor,scenceIds);
 				}
+
 				if(type=="open" && _this.currentOpenCat && data.length){
 					_this.recoverySilder();
-					_this.sigleRule(_this.currentOpenCat,_this.currentCheckFloor,scenceIds);
+					_this.sigleRule(_this.currentOpenCat,_this.currentOpenCheckFloor,scenceIds);
 				}
 				App.Project.Settings.Viewer.setTopView(boxs, true);
 				viewer.viewer.setMarkerClickCallback(App.Project.markerClick);
