@@ -206,7 +206,7 @@ App.BodyContent.control = {
         collection.fetch({
             data: data,
             success: function(collection, response, options) {
-                $("#pageLoading").hide();
+                //$("#pageLoading").hide();
                 var _$container = null;
                 //轮播插件是jquery对象、所以直接加载显示、不经过Backbone
                 if (collection == App.BodyContent.control.slideCollection && response.message == "success") {

@@ -35,6 +35,7 @@ var AppRoute = Backbone.Router.extend({
 		_.require('/static/dist/bodyContent/bodyContent.css');
 		_.require('/static/dist/bodyContent/bodyContent.js');
 		App.BodyContent.control.init();
+		$("#pageLoading").hide();
 	},
 
 
