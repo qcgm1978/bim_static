@@ -144,7 +144,24 @@
         });
 
 
+        document.onkeydown = function(e){
+            if(e.ctrlKey == 1){
 
+                if(document.all){
+                    k=e.keyCode
+                }
+                else{
+                    k=e.which
+                }
+                if(k==86){
+                    //WebView.runCommand('paste');
+                }
+                if(k==67){
+                    myWebView.runCommand('copy');
+                }
+
+            }
+        }
 
 
         window.onresize = resizeWebView;
