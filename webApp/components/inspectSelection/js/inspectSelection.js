@@ -480,6 +480,18 @@
 			}
 			return result;
 		},
+		getFloors:function(name){
+			var array=[];
+			_.each(Project.Viewer.FloorsData,function(item,index){
+				if(!name){
+					array.push(item.code);
+				}else
+				if(name && item.code.indexOf(name)!=-1){
+					array.push(item.code);
+				}
+			})
+			return array;
+		},
 		sigleRule: function(cat, floor,secendIds) {
 			var _this = this,
 				_v = Project.Viewer,
