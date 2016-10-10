@@ -234,9 +234,11 @@
 		//过滤规则
 		filterRule: {
 			//单文件：过滤出检查点所在构件所在的文件
-			file: '工程桩,基坑支护,钢结构悬挑构件,幕墙',
 			//单独类型：singleRule
-			single: '梁柱节点,地下防水,步行街吊顶风口,卫生间防水,外保温,采光顶',
+			single: '梁柱节点,地下防水,步行街吊顶风口,卫生间防水,外保温,采光顶,工程桩,基坑支护,钢结构悬挑构件,幕墙,屋面防水,屋面虹吸雨排,消防泵房,给水泵房,湿式报警阀室,空调机房,冷冻机房,变配电室,发电机房,慧云机房,电梯机房,电梯底坑,吊顶,地面,中庭栏杆,竖井',
+
+			concat:'采光顶,地下防水,步行街吊顶风口,卫生间防水,外保温,钢结构悬挑构件,幕墙,工程桩,基坑支护,屋面防水,屋面虹吸雨排,消防泵房,给水泵房,湿式报警阀室,空调机房,冷冻机房,变配电室,发电机房,慧云机房,电梯机房,电梯底坑,吊顶,地面,中庭栏杆,竖井',
+
 			floor: ''
 		},
 
@@ -431,8 +433,238 @@
 				ids: ids
 			});
 		},
+		filterHideCode: function(code,flag) {
+			var _class = Project.Viewer.ClassCodeData;
+			hide = [];
+			if (typeof code == 'string') {
+				code = [code];
+			}
+			var count=code.length;
+			_.each(_class, function(item) {
+				var temp=0;
+				_.find(code, function(i) {
+					if(flag){
+						if (item.code.indexOf(i) != 0) {
+							temp++;
+						}
+					}else{
+						if (item.code.indexOf(i) == 0) {
+							temp++;
+						}
+					}
+				})
+				if(count==temp){
+					hide.push(item.code);
+				}
+			})
+			return hide;
+		},
+		filterSingleFiles:function(type,name,include){
+			var _this=this;
+			var data=Project.Viewer.SpecialtyFileSrcData;
+			var result=[];
+			_.each(data,function(item){
+				if(item.specialtyCode==type){
+					result=result.concat(_.pluck(item.files,'fileName'));
+				}
+			})
+			if(name){
+				var t=_.filter(result,function(item){
+					if(include){
+						return name.indexOf(_this.subStringer(item))!=-1;
+					}else{
+						return name.indexOf(_this.subStringer(item))==-1;
+					}
+				})
+				result=t;
+			}
+			return result;
+		},
+		sigleRule: function(cat, floor,secendIds) {
+			var _this = this,
+				_v = Project.Viewer,
+				_specialFilterFiles=[],
+				_extArray=[],
+				_hideCode=null;
+
+			if (cat == '梁柱节点') {
+				_this.linkSilder('floors', floor);
+				_this.linkSilderSpecial('specialty', ['WDGC-Q-ST-' + floor + '.rvt'],['ST']);
+				_this.linkSilderCategory('category', '楼板')
+				return
+			}
+
+			//新增的
+			if(_this.filterRule.concat.indexOf(cat)!=-1){
+				if (cat == '采光顶') {
+					_specialFilterFiles=_this.filterSingleFiles('LR');
+					_extArray=[''];
+				}
+				if(cat=="工程桩"){
+					_specialFilterFiles=['WDGC-Q-ST-基础.rvt'];
+					_extArray=['ST'];
+					_hideCode=['10.01'];
+				}
+				if(cat=="基坑支护"){
+					_specialFilterFiles=['WDGC-Q-ST-基坑支护.rvt'];
+					_extArray=['ST'];
+					_hideCode=['10.01'];
+				}
+				if(cat=="幕墙"||cat=="钢结构悬挑构件"||cat=="外保温"){
+					_specialFilterFiles=_this.filterSingleFiles('CW&LI');
+					_extArray=['CW&LI'];
+					_hideCode=null;
+					if(cat=="外保温"){
+						Project.Viewer.filter({
+							ids: _this.filterHideCode(['10.10.20.03.06.20.10'],true),
+							type: "classCode"
+						})
+					}
+				}
+
+				if (cat == '步行街吊顶风口') {
+					_specialFilterFiles=_this.filterSingleFiles('IN&GS')
+						.concat(_this.filterSingleFiles('AC'));
+					_extArray=['IN&GS','AC'];
+					_hideCode=['10.10.30.03.21'];
+				}
+
+				if (cat == '卫生间防水') {
+					_specialFilterFiles=_this.filterSingleFiles('IN&GS');
+					_specialFilterFiles.push('WDGC-Q-AR-'+floor+'.rvt');
+					_specialFilterFiles.push('WDGC-Q-AR-'+floor+'-RF.rvt');
+					_extArray=['IN&GS','AR'];
+					_hideCode=['10.10.30.03.21'];
+				}
+
+				if (cat == '地下防水') {
+					_specialFilterFiles=['WDGC-Q-ST-垫层防水层.rvt'];
+					_specialFilterFiles.push('WDGC-Q-ST-'+_this.getFloors("B")[0]+'.rvt');
+					_.each(_this.getFloors("B"),function(item){
+						_specialFilterFiles.push('WDGC-Q-AR-'+item+'.rvt');
+					})
+					_extArray=['ST','AR'];
+					floor=_this.getFloors("B");
+
+					Project.Viewer.filter({
+						ids: _this.filterHideCode(['10.20.20.09', '10.10.20.03.06.40'],true),
+						type: "classCode"
+					})
+				}
+
+				if(cat=='屋面防水'|| cat=="电梯机房"){
+					_specialFilterFiles=_this.filterSingleFiles('ST');
+					floor=_this.getFloors().slice(4);
+
+					_extArray=['ST','AR'];
+					_.each(_this.getFloors(),function(item){
+						_specialFilterFiles.push('WDGC-Q-AR-'+item+'.rvt');
+						_specialFilterFiles.push('WDGC-Q-AR-'+item+'-RF.rvt');
+					})
+				}
+				if(cat=='屋面虹吸雨排'){
+					_specialFilterFiles=_this.filterSingleFiles('ST');
+					floor=_this.getFloors().slice(4);
+					_.each(_this.getFloors(),function(item){
+						_specialFilterFiles.push('WDGC-Q-AR-'+item+'.rvt');
+					})
+					_extArray=['ST','AR','PL'];
+					_specialFilterFiles=_specialFilterFiles.concat(_this.filterSingleFiles('PL',['生活水泵房','消防水泵房','水泵房','市政']));
+				}
+				if(cat=="消防泵房"||cat=="给水泵房"||cat=="湿式报警阀室"){
+					_specialFilterFiles=_this.filterSingleFiles('PL');
+					_.each(_this.getFloors(),function(item){
+						_specialFilterFiles.push('WDGC-Q-AR-'+item+'.rvt');
+						_specialFilterFiles.push('WDGC-Q-AR-'+floor+'-RF.rvt');
+					})
+					//	.concat(['WDGC-Q-AR-'+floor+'.rvt','WDGC-Q-AR-'+floor+'-RF.rvt']);
+					_hideCode=['10.10.30.03.21'];
+					_extArray=['AR','PL'];
+				}
+				if(cat=="空调机房"){
+					_specialFilterFiles=_this.filterSingleFiles('AC');
+					_.each(_this.getFloors(),function(item){
+						_specialFilterFiles.push('WDGC-Q-AR-'+item+'.rvt');
+						_specialFilterFiles.push('WDGC-Q-AR-'+floor+'-RF.rvt');
+					})
+					//	.concat(['WDGC-Q-AR-'+floor+'.rvt','WDGC-Q-AR-'+floor+'-RF.rvt']);
+					_hideCode=['10.10.30.03.21'];
+					_extArray=['AC','AR'];
+				}
+				if(cat=="冷冻机房"){
+					_specialFilterFiles=_this.filterSingleFiles('AC');
+					_.each(_this.getFloors(),function(item){
+						_specialFilterFiles.push('WDGC-Q-AR-'+item+'.rvt');
+						_specialFilterFiles.push('WDGC-Q-AR-'+floor+'-RF.rvt');
+					})
+					//.concat(['WDGC-Q-AR-'+floor+'.rvt','WDGC-Q-AR-'+floor+'-RF.rvt']);
+					_hideCode=['10.10.30.03.21'];
+					_extArray=['AC','AR'];
+				}
+
+				if(cat=="变配电室"||cat=="发电机房"){
+					_specialFilterFiles=_this.filterSingleFiles('EL');
+					_.each(_this.getFloors(),function(item){
+						_specialFilterFiles.push('WDGC-Q-AR-'+item+'.rvt');
+						_specialFilterFiles.push('WDGC-Q-AR-'+floor+'-RF.rvt');
+					})
+					//.concat(['WDGC-Q-AR-'+floor+'.rvt','WDGC-Q-AR-'+floor+'-RF.rvt']);
+					_hideCode=['10.10.30.03.21'];
+					_extArray=['EL','AR'];
+				}
+
+				if(cat=="慧云机房"){
+					_specialFilterFiles=_this.filterSingleFiles('TE');
+					_.each(_this.getFloors(),function(item){
+						_specialFilterFiles.push('WDGC-Q-AR-'+item+'.rvt');
+						_specialFilterFiles.push('WDGC-Q-AR-'+floor+'-RF.rvt');
+					})
+					_hideCode=['10.10.30.03.21'];
+					_extArray=['TE','AR'];
+				}
+
+				if(cat=="电梯底坑"){
+					_specialFilterFiles=_this.filterSingleFiles('ST');
+					_hideCode=['10.20.20.03','10.20.20.06'];
+					_extArray=['ST'];
+				}
+
+				if(cat=="吊顶" || cat=="地面" || cat=="中庭栏杆"){
+					_specialFilterFiles=_this.filterSingleFiles('IN&GS');
+					_.each(_this.getFloors(),function(item){
+						_specialFilterFiles.push('WDGC-Q-AR-'+item+'.rvt');
+						_specialFilterFiles.push('WDGC-Q-AR-'+floor+'-RF.rvt');
+					})
+					_hideCode=null;
+					if(cat!="吊顶"){
+						_hideCode=['10.10.30.03.21'];
+					}
+					_extArray=['IN&GS','AR'];
+				}
+
+				if(cat=="竖井"){
+					_specialFilterFiles=_this.filterSingleFiles('ST')
+						.concat(_this.filterSingleFiles('PL'))
+						.concat(_this.filterSingleFiles('AC'))
+						.concat(_this.filterSingleFiles('EL'))
+						.concat(_this.filterSingleFiles('TE'))
+						.concat(['WDGC-Q-AR-'+floor+'.rvt','WDGC-Q-AR-'+floor+'-RF.rvt']);
+					_hideCode= ['10.10.30.03.21','10.20.20.03'];
+					_extArray=['ST','AR','PL','AC','EL','TE'];
+				}
+				_this.linkSilder('floors', floor);
+				_this.linkSilderSpecial('specialty', _specialFilterFiles,_extArray);
+				if(_hideCode){
+					Project.Viewer.filter({
+						ids: _this.filterHideCode(_hideCode),
+						type: "classCode"
+					})
+				}
+			}
+
+		},
 		filter: function ($target, componentId, location,cat, type) {
-			var _this = this;
+			var _this = ModelFilter;
 			var _View = Project.Viewer;
 			var _temp = location,
 				_loc = "",
@@ -475,8 +707,13 @@
 				return;
 			}
 			//没有分类的时候 只过滤单文件 end
+			if (_this.filterRule.single.indexOf(cat) != -1) {
+				_this.sigleRule(cat,key);
+			}else{
+				_this.linkSilder('floors',key);
+			}
 
-			//已有分类、过滤规则
+			/*//已有分类、过滤规则
 			if (_this.filterRule.file.indexOf(cat) != -1) {
 				var _hideFileIds = _.filter(_files, function (i) {
 					return i != _secenId;
@@ -491,7 +728,7 @@
 				_this.sigleRule(cat, key);
 			} else {
 				_this.linkSilder('floors', key);
-			}
+			}*/
 		}
 
 	}
