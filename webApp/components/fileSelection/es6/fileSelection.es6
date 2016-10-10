@@ -16,7 +16,7 @@
 			fileIds: "", // fileids 有值时，默认isEndable 为 false
 			mask: true,
 			//http: "http://bim.wanda-dev.cn",
-			http: location.host,
+			http: '',
 			closeCallback: null,
 			callback: null
 		}
