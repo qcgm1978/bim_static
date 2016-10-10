@@ -183,7 +183,7 @@ App.Project = {
 				_hideCode=null;
 				if(cat=="外保温"){
 					App.Project.Settings.Viewer.filter({
-						ids: _this.filterCCode(['10.10.20.03.06.20.10']),
+						ids: _this.filterHideCode(['10.10.20.03.06.20.10'],true),
 						type: "classCode"
 					})
 				}
@@ -212,9 +212,9 @@ App.Project = {
 				})
 				_extArray=['ST','AR'];
 				floor=_this.getFloors("B");
-				_hideCode=null;
+
 				App.Project.Settings.Viewer.filter({
-					ids: _this.filterCCode(['10.20.20.09', '10.10.20.03.06.40']),
+					ids: _this.filterHideCode(['10.20.20.09', '10.10.20.03.06.40'],true),
 					type: "classCode"
 				})
 			}
@@ -224,7 +224,7 @@ App.Project = {
 				floor=_this.getFloors().slice(4);
 
 				_extArray=['ST','AR'];
-				_.each(floor,function(item){
+				_.each(_this.getFloors(),function(item){
 					_specialFilterFiles.push('WDGC-Q-AR-'+item+'.rvt');
 					_specialFilterFiles.push('WDGC-Q-AR-'+item+'-RF.rvt');
 				})
@@ -232,42 +232,60 @@ App.Project = {
 			if(cat=='屋面虹吸雨排'){
 				_specialFilterFiles=_this.filterSingleFiles('ST');
 				floor=_this.getFloors().slice(4);
-				_.each(floor,function(item){
+				_.each(_this.getFloors(),function(item){
 					_specialFilterFiles.push('WDGC-Q-AR-'+item+'.rvt');
 				})
 				_extArray=['ST','AR','PL'];
 				_specialFilterFiles=_specialFilterFiles.concat(_this.filterSingleFiles('PL',['生活水泵房','消防水泵房','水泵房','市政']));
 			}
-
 			if(cat=="消防泵房"||cat=="给水泵房"||cat=="湿式报警阀室"){
-				_specialFilterFiles=_this.filterSingleFiles('PL')
-					.concat(['WDGC-Q-AR-'+floor+'.rvt','WDGC-Q-AR-'+floor+'-RF.rvt']);
+				_specialFilterFiles=_this.filterSingleFiles('PL');
+				_.each(_this.getFloors(),function(item){
+						_specialFilterFiles.push('WDGC-Q-AR-'+item+'.rvt');
+						_specialFilterFiles.push('WDGC-Q-AR-'+floor+'-RF.rvt');
+					})
+				//	.concat(['WDGC-Q-AR-'+floor+'.rvt','WDGC-Q-AR-'+floor+'-RF.rvt']);
 				_hideCode=['10.10.30.03.21'];
 				_extArray=['AR','PL'];
 			}
 			if(cat=="空调机房"){
-				_specialFilterFiles=_this.filterSingleFiles('AC')
-					.concat(['WDGC-Q-AR-'+floor+'.rvt','WDGC-Q-AR-'+floor+'-RF.rvt']);
+				_specialFilterFiles=_this.filterSingleFiles('AC');
+				_.each(_this.getFloors(),function(item){
+						_specialFilterFiles.push('WDGC-Q-AR-'+item+'.rvt');
+						_specialFilterFiles.push('WDGC-Q-AR-'+floor+'-RF.rvt');
+					})
+				//	.concat(['WDGC-Q-AR-'+floor+'.rvt','WDGC-Q-AR-'+floor+'-RF.rvt']);
 				_hideCode=['10.10.30.03.21'];
 				_extArray=['AC','AR'];
 			}
 			if(cat=="冷冻机房"){
-				_specialFilterFiles=_this.filterSingleFiles('AC')
-					.concat(['WDGC-Q-AR-'+floor+'.rvt','WDGC-Q-AR-'+floor+'-RF.rvt']);
+				_specialFilterFiles=_this.filterSingleFiles('AC');
+				_.each(_this.getFloors(),function(item){
+						_specialFilterFiles.push('WDGC-Q-AR-'+item+'.rvt');
+						_specialFilterFiles.push('WDGC-Q-AR-'+floor+'-RF.rvt');
+					})
+				//.concat(['WDGC-Q-AR-'+floor+'.rvt','WDGC-Q-AR-'+floor+'-RF.rvt']);
 				_hideCode=['10.10.30.03.21'];
 				_extArray=['AC','AR'];
 			}
 
 			if(cat=="变配电室"||cat=="发电机房"){
-				_specialFilterFiles=_this.filterSingleFiles('EL')
-					.concat(['WDGC-Q-AR-'+floor+'.rvt','WDGC-Q-AR-'+floor+'-RF.rvt']);
+				_specialFilterFiles=_this.filterSingleFiles('EL');
+				_.each(_this.getFloors(),function(item){
+						_specialFilterFiles.push('WDGC-Q-AR-'+item+'.rvt');
+						_specialFilterFiles.push('WDGC-Q-AR-'+floor+'-RF.rvt');
+					})
+					//.concat(['WDGC-Q-AR-'+floor+'.rvt','WDGC-Q-AR-'+floor+'-RF.rvt']);
 				_hideCode=['10.10.30.03.21'];
 				_extArray=['EL','AR'];
 			}
 
 			if(cat=="慧云机房"){
-				_specialFilterFiles=_this.filterSingleFiles('TE')
-					.concat(['WDGC-Q-AR-'+floor+'.rvt','WDGC-Q-AR-'+floor+'-RF.rvt']);
+				_specialFilterFiles=_this.filterSingleFiles('TE');
+				_.each(_this.getFloors(),function(item){
+						_specialFilterFiles.push('WDGC-Q-AR-'+item+'.rvt');
+						_specialFilterFiles.push('WDGC-Q-AR-'+floor+'-RF.rvt');
+					})
 				_hideCode=['10.10.30.03.21'];
 				_extArray=['TE','AR'];
 			}
@@ -279,8 +297,11 @@ App.Project = {
 			}
 
 			if(cat=="吊顶" || cat=="地面" || cat=="中庭栏杆"){
-				_specialFilterFiles=_this.filterSingleFiles('IN&GS')
-					.concat(['WDGC-Q-AR-'+floor+'.rvt','WDGC-Q-AR-'+floor+'-RF.rvt']);
+				_specialFilterFiles=_this.filterSingleFiles('IN&GS');
+				_.each(_this.getFloors(),function(item){
+						_specialFilterFiles.push('WDGC-Q-AR-'+item+'.rvt');
+						_specialFilterFiles.push('WDGC-Q-AR-'+floor+'-RF.rvt');
+					})
 				_hideCode=null;
 				if(cat!="吊顶"){
 					_hideCode=['10.10.30.03.21'];
@@ -376,24 +397,28 @@ App.Project = {
 		return hide;
 	},
 	filterHideCode: function(code,flag) {
-		var _class = App.Project.Settings.Viewer.ClassCodeData,
-			_all=[];
+		var _class = App.Project.Settings.Viewer.ClassCodeData;
 		hide = [];
 		if (typeof code == 'string') {
 			code = [code];
 		}
+		var count=code.length;
 		_.each(_class, function(item) {
+			var temp=0;
 			_.find(code, function(i) {
 				if(flag){
 					if (item.code.indexOf(i) != 0) {
-						hide.push(item.code);
+						temp++;
 					}
 				}else{
 					if (item.code.indexOf(i) == 0) {
-						hide.push(item.code);
+						temp++;
 					}
 				}
 			})
+			if(count==temp){
+				hide.push(item.code);
+			}
 		})
 		return hide;
 	},
@@ -669,6 +694,10 @@ App.Project = {
 				App.Project.Settings.Viewer.setTopView(boxs, true);
 				viewer.viewer.setMarkerClickCallback(App.Project.markerClick);
 				viewer.loadMarkers(result);
+				App.Project.Settings.Viewer.highlight({
+					type: 'userId',
+					ids: undefined
+				});
 			}
 		} else {
 			viewer.loadMarkers(null);
@@ -1947,6 +1976,11 @@ App.Project = {
 			marginRule = _this.marginRule[cat] || {},
 			_files = App.Project.Settings.Viewer.FloorFilesData; //文件ID数据对象
 		if ($target.hasClass("selected")) {
+			$target.parent().find(".selected").removeClass("selected");
+			App.Project.Settings.Viewer.highlight({
+				type: 'userId',
+				ids: undefined
+			});
 			return
 		} else {
 			$target.parent().find(".selected").removeClass("selected");
