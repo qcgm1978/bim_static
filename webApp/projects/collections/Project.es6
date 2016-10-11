@@ -209,12 +209,13 @@ App.Project = {
 				_specialFilterFiles.push('WDGC-Q-ST-'+_this.getFloors("B")[0]+'.rvt');
 				_.each(_this.getFloors("B"),function(item){
 					_specialFilterFiles.push('WDGC-Q-AR-'+item+'.rvt');
+					_specialFilterFiles.push('WDGC-Q-AR-'+item+'-RF.rvt');
 				})
 				_extArray=['ST','AR'];
 				floor=_this.getFloors("B");
-
+				floor.push('其它');
 				App.Project.Settings.Viewer.filter({
-					ids: _this.filterHideCode(['10.20.20.09', '10.10.20.03.06.40'],true),
+					ids: _this.filterHideCode(['10.20.20.09', '10.10.20.03.06.40','10.20.20.30.15'],true),
 					type: "classCode"
 				})
 			}
@@ -234,6 +235,7 @@ App.Project = {
 				floor=_this.getFloors().slice(4);
 				_.each(_this.getFloors(),function(item){
 					_specialFilterFiles.push('WDGC-Q-AR-'+item+'.rvt');
+					_specialFilterFiles.push('WDGC-Q-AR-'+item+'-RF.rvt');
 				})
 				_extArray=['ST','AR','PL'];
 				_specialFilterFiles=_specialFilterFiles.concat(_this.filterSingleFiles('PL',['生活水泵房','消防水泵房','水泵房','市政']));
@@ -242,7 +244,7 @@ App.Project = {
 				_specialFilterFiles=_this.filterSingleFiles('PL');
 				_.each(_this.getFloors(),function(item){
 						_specialFilterFiles.push('WDGC-Q-AR-'+item+'.rvt');
-						_specialFilterFiles.push('WDGC-Q-AR-'+floor+'-RF.rvt');
+						_specialFilterFiles.push('WDGC-Q-AR-'+item+'-RF.rvt');
 					})
 				//	.concat(['WDGC-Q-AR-'+floor+'.rvt','WDGC-Q-AR-'+floor+'-RF.rvt']);
 				_hideCode=['10.10.30.03.21'];
@@ -252,7 +254,7 @@ App.Project = {
 				_specialFilterFiles=_this.filterSingleFiles('AC');
 				_.each(_this.getFloors(),function(item){
 						_specialFilterFiles.push('WDGC-Q-AR-'+item+'.rvt');
-						_specialFilterFiles.push('WDGC-Q-AR-'+floor+'-RF.rvt');
+						_specialFilterFiles.push('WDGC-Q-AR-'+item+'-RF.rvt');
 					})
 				//	.concat(['WDGC-Q-AR-'+floor+'.rvt','WDGC-Q-AR-'+floor+'-RF.rvt']);
 				_hideCode=['10.10.30.03.21'];
@@ -262,7 +264,7 @@ App.Project = {
 				_specialFilterFiles=_this.filterSingleFiles('AC');
 				_.each(_this.getFloors(),function(item){
 						_specialFilterFiles.push('WDGC-Q-AR-'+item+'.rvt');
-						_specialFilterFiles.push('WDGC-Q-AR-'+floor+'-RF.rvt');
+						_specialFilterFiles.push('WDGC-Q-AR-'+item+'-RF.rvt');
 					})
 				//.concat(['WDGC-Q-AR-'+floor+'.rvt','WDGC-Q-AR-'+floor+'-RF.rvt']);
 				_hideCode=['10.10.30.03.21'];
@@ -273,7 +275,7 @@ App.Project = {
 				_specialFilterFiles=_this.filterSingleFiles('EL');
 				_.each(_this.getFloors(),function(item){
 						_specialFilterFiles.push('WDGC-Q-AR-'+item+'.rvt');
-						_specialFilterFiles.push('WDGC-Q-AR-'+floor+'-RF.rvt');
+						_specialFilterFiles.push('WDGC-Q-AR-'+item+'-RF.rvt');
 					})
 					//.concat(['WDGC-Q-AR-'+floor+'.rvt','WDGC-Q-AR-'+floor+'-RF.rvt']);
 				_hideCode=['10.10.30.03.21'];
@@ -284,7 +286,7 @@ App.Project = {
 				_specialFilterFiles=_this.filterSingleFiles('TE');
 				_.each(_this.getFloors(),function(item){
 						_specialFilterFiles.push('WDGC-Q-AR-'+item+'.rvt');
-						_specialFilterFiles.push('WDGC-Q-AR-'+floor+'-RF.rvt');
+						_specialFilterFiles.push('WDGC-Q-AR-'+item+'-RF.rvt');
 					})
 				_hideCode=['10.10.30.03.21'];
 				_extArray=['TE','AR'];
@@ -300,7 +302,7 @@ App.Project = {
 				_specialFilterFiles=_this.filterSingleFiles('IN&GS');
 				_.each(_this.getFloors(),function(item){
 						_specialFilterFiles.push('WDGC-Q-AR-'+item+'.rvt');
-						_specialFilterFiles.push('WDGC-Q-AR-'+floor+'-RF.rvt');
+						_specialFilterFiles.push('WDGC-Q-AR-'+item+'-RF.rvt');
 					})
 				_hideCode=null;
 				if(cat!="吊顶"){
