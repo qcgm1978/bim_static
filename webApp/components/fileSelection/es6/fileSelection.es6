@@ -166,7 +166,7 @@
 			var sb = '<ul class="tbFile"><li><span class="ckAll"> <i class="ck  bg"></i> </span> ';
 			sb += '<span class="name"><button class="btnDownLoad myBtn myBtn-default"><i class="bg downBg"></i>下载选中文件</button></span> ';
 			sb += '<span class="status">状态</span>  <span class="op">操作人</span>  ';
-			sb += '<span class="size">大小</span> <span class="date">时间</span>';
+			sb += '<span class="size">大小</span> <span class="mmhDate">时间</span>';
 			sb += '</li></ul> <div class="fileBodyScrollBox"><div class="fileBodyScroll"><ul class="fileBody"> <li class="null">暂无数据</li> </ul></div></div>';
 			$content.find('.contentBox').html(sb);
 
@@ -292,7 +292,7 @@
 
 			var dataItem = $.extend({}, item);
 			delete dataItem.children;
-			sb += '<span  class="text-field overflowEllipsis" data-fileversionid="' + item.fileVersionId + '" data-id="' + item.id + '">' + item.name + '</span> ';
+			sb += '<span  class="text-field overflowEllipsis" data-size="'+item.length+'" data-fileversionid="' + item.fileVersionId + '" data-id="' + item.id + '">' + item.name + '</span> ';
 
 			sb += '</div>';
 
@@ -780,7 +780,7 @@
 						op = item.creatorName ? item.creatorName : "";
 						trs += '<span class="op"><span class="overflowEllipsis opName">' + op + '</span></span>';
 						trs += '<span class="size">' + this.formatSize(item.length) + '</span>';
-						trs += '<span class="date">' + new Date(item.createTime).format("yyyy-MM-dd") + '</span>';
+						trs += '<span class="mmhDate">' + new Date(item.createTime).format("yyyy-MM-dd") + '</span>';
 						trs += '</li>';
 					}
 

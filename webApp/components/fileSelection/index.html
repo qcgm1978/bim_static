@@ -9,30 +9,50 @@
 <body>
 	
  <button id="show">show</button>
+ <button id="show2">show2 </button>
 
 	<script type="text/javascript" src="http://cdn.bootcss.com/jquery/1.6.1/jquery.min.js"></script>
 	<script type="text/javascript" src="./es6/fileSelection.es6"></script>
 
 	<script type="text/javascript">
-	var Files;
+	var Files,Files2;
 		$("#show").click(function(){
 			Files=FileSelection({
 				appKey:"99a3d82442594d3e8446108e21f6fb61",
 				token:"123",
 				isDrag:true,
 				//isEnable:false,
-				projectId:879149920944320,
-				projectVersionId:884079818694848,
+				projectId:894182440723040,
+				projectVersionId:894182440723040,
 				closeCallback:function(){
 					console.log(1)
 				},
-				fileIds:"894832536830304,894832556712288", //逗号隔开
+				fileIds:"", //逗号隔开
 				callback:function(a){
 					debugger
 				}
 				
 			});
 		});
+
+	$("#show2").click(function(){
+		Files2=FileSelection({
+			appKey:"99a3d82442594d3e8446108e21f6fb61",
+			token:"123",
+			isDrag:true,
+			//isEnable:false,
+			projectId:894182440723040,
+			projectVersionId:894182440723040,
+			closeCallback:function(){
+				console.log(1)
+			},
+			fileIds:"894824520786272", //逗号隔开
+			callback:function(a){
+				debugger
+			}
+
+		});
+	});
 	</script>
 </body>
 </html>

@@ -53,9 +53,21 @@ App.Services = {
 			//设置权限
 			this.setAuth();
 			$("#pageLoading").hide();
+			this.initEvent();
+
 			this.initXW();
 		}
 	},
+
+	initEvent:function(){
+		$('.tileIcon').on('click',function(){
+			var name=$(this).attr('name');
+			if(name=='suggest'){
+				App.Services.SuggestView();
+			}
+		})
+	},
+
 	//初始化小万机器人
 	initXW:function(){
 		//设计角色：4F88E20D-BD8F-43E2-857B-A94F5828662D
