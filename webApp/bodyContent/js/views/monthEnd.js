@@ -12,6 +12,7 @@ App.BodyContent.monthEndView = Backbone .View.extend({
 
     render : function(){
         this.$el.html(this.template(this.model.toJSON()));
+        $('.loading2').hide();
         return this;
     },
     
