@@ -137,10 +137,8 @@
 
         });
 
-
-        document.onkeydown = function(e){
+        document.attachEvent("onkeydown", function(e){
             if(e.ctrlKey == 1){
-
                 if(document.all){
                     k=e.keyCode
                 }
@@ -153,10 +151,8 @@
                 if(k==67){
                     myWebView.runCommand('copy');
                 }
-
             }
-        }
-
+        })
 
         window.onresize = resizeWebView;
 

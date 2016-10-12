@@ -166,7 +166,11 @@
             iconStatus = 'noneSwitch';
           }
           if(_opt.isChecked){
-           input = '<input type="checkbox" checked="checked" />'
+            if(item.code=='10.01'){
+              input = '<input type="checkbox" checked="checked" id="class-code-1001"/>'
+            }else{
+              input = '<input type="checkbox" checked="checked" />'
+            }
           }else{
             input = '<input type="checkbox" />'
           }

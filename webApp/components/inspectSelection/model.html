@@ -87,6 +87,8 @@
         if (!param.presetId && (param.componentId && param.location)) {
             type = "risk";
             viewer.Project.mode = type;
+            viewer.Project.presetPointShowData=null;
+            viewer.Project.presetPoint=null;
             showRiskComponent(param.componentId, param.location);
         }
 
@@ -135,6 +137,11 @@
         var data = viewer.Project.catchPageData(null, {
             id: presetId
         });
+
+        if(viewer.Project.presetPointShowData.marker){
+            viewer.Project.Viewer.loadMarkers([viewer.Project.presetPointShowData.marker]);
+        }
+
         viewer.Project.OpeningAcceptanceCollection.push({data: data});
         viewer.Project.pageInfo(data, true);
         var t = $("tr[data-id='" + presetId + "']");
