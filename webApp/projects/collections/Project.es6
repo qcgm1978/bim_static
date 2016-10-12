@@ -12,6 +12,7 @@ App.Project = {
 			data={};
 
 		if ($(".QualityProcessAcceptance").is(":visible")) {
+			$(".QualityProcessAcceptance .tbProcessAccessBody tr").removeClass('selected');
 			if(id){
 				var tr = $(".QualityProcessAcceptance .tbProcessAccessBody tr[data-id='"+id+"']");
 				if(tr.length>0){
@@ -25,11 +26,10 @@ App.Project = {
 					tr = $(".QualityProcessAcceptance .tbProcessAccessBody tr[data-id='"+id+"']");
 					tr.addClass("selected");
 				}
-			}else{
-				$(".QualityProcessAcceptance .tbProcessAccessBody tr").removeClass('selected');
 			}
 		}
 		if ($(".QualityOpeningAcceptance").is(":visible")) {
+			$(".QualityProcessAcceptance .tbProcessAccessBody tr").removeClass('selected');
 			if(id){
 				var tr = $(".QualityOpeningAcceptance .tbOpeningacceptanceBody tr[data-id='"+id+"']");
 				if(tr.length>0){
@@ -43,8 +43,6 @@ App.Project = {
 					tr = $(".QualityOpeningAcceptance .tbOpeningacceptanceBody tr[data-id='"+id+"']");
 					tr.addClass("selected");
 				}
-			}else{
-				$(".QualityProcessAcceptance .tbProcessAccessBody tr").removeClass('selected');
 			}
 		}
 		if(userId){
@@ -155,9 +153,14 @@ App.Project = {
 			_hideCode=null;
 
 		if (cat == '梁柱节点') {
+			_specialFilterFiles=_this.filterSingleFiles('ST');
+			_extArray=['ST'];
 			this.linkSilder('floors', floor);
-			this.linkSilderSpecial('specialty', ['WDGC-Q-ST-' + floor + '.rvt'],['ST']);
-			this.linkSilderCategory('category', '楼板')
+			this.linkSilderSpecial('specialty', _specialFilterFiles,_extArray);
+			App.Project.Settings.Viewer.filter({
+				ids: _this.filterHideCode(['10.20.20.03']),
+				type: "classCode"
+			})
 			return
 		}
 
@@ -418,9 +421,16 @@ App.Project = {
 					}
 				}
 			})
-			if(count==temp){
-				hide.push(item.code);
+			if(flag){
+				if(count==temp){
+					hide.push(item.code);
+				}
+			}else{
+				if(temp==1){
+					hide.push(item.code);
+				}
 			}
+
 		})
 		return hide;
 	},
@@ -687,11 +697,13 @@ App.Project = {
 				if(type=="process" && _this.currentProsCat && data.length){
 					_this.recoverySilder();
 					_this.sigleRule(_this.currentProsCat,_this.currentProsCheckFloor,scenceIds);
+					$(".QualityProcessAcceptance .tbProcessAccessBody tr").removeClass('selected');
 				}
 
 				if(type=="open" && _this.currentOpenCat && data.length){
 					_this.recoverySilder();
 					_this.sigleRule(_this.currentOpenCat,_this.currentOpenCheckFloor,scenceIds);
+					$(".QualityProcessAcceptance .tbProcessAccessBody tr").removeClass('selected');
 				}
 				App.Project.Settings.Viewer.setTopView(boxs, true);
 				viewer.viewer.setMarkerClickCallback(App.Project.markerClick);

@@ -93,8 +93,10 @@ App.Project.QualityProcessAcceptance = Backbone.View.extend({
  	},
 	//清空搜索条件
 	clearSearch() {
-		this.$(".categoryOption .text").html('全部')
-		this.$(".categoryOption .text").html('全部')
+		this.$(".riskOption .text").html('全部')
+		this.$(".specialitiesOption .text").html('全部')
+		this.$(".categoryOption .text").html('全部');
+		this.$(".txtLocationName").val('');
 		Backbone.trigger('qualityFilterDataClear');
 	},
 

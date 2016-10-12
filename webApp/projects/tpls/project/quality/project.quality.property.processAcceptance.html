@@ -37,7 +37,7 @@
                 <ul class="myDropList">
                     <li class="myItem" data-val=''>全部</li>
                     <% _.each(App.Project.Settings.Viewer.FloorsData,function(item,index){%>
-                    <li class="myItem" data-val='<%=item.code%>'><%=item.code%></li>
+                    <li class="myItem" data-val="<%=item.code=='OT'?'其它':item.code%>"><%=item.code=='OT'?'其它':item.code%></li>
                     <% }) %>
                 </ul>
             </div>
