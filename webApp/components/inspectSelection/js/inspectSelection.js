@@ -3,6 +3,7 @@
  *@require /components/inspectSelection/libs/underscore.1.8.2.js
  *@require /components/inspectSelection/libs/backbone.1.1.2.js
  */
+
 (function(win) {
 
 	var strVar1 = "";
@@ -231,6 +232,7 @@
 
 
 	var ModelFilter = {
+
 		//过滤规则
 		filterRule: {
 			//单文件：过滤出检查点所在构件所在的文件
@@ -982,8 +984,8 @@
 				$dialog = self.$dialog = $('<div class="modelSelectDialog"></div>');
 				var $body = $('<div class="dialogBody"></div>'),
 					$header = $('<div class="dialogHeader"/>').html('请选择检查点<span class="dialogClose" title="关闭"></span> '),
-					$modelView = self.$modelView = $('<div id="modelView" class="model"></div>')
-				$content = $('<div class="dialogContent">' + strVar + '</div>'),
+					$modelView = self.$modelView = $('<div id="modelView" class="model" style="width:'+this.Settings.width+';height:'+this.Settings.height+'"></div>'),
+				$content = $('<div class="dialogContent"  style="width:'+this.Settings.width+';height:'+this.Settings.height+'">' + strVar + '</div>'),
 					$bottom = $('<div class="dialogFooter"/>').html('<input type="button" class="dialogOk dialogBtn" value="' + this.Settings.btnText + '" />');
 				$content.prepend($modelView);
 				$body.append($content);
@@ -994,11 +996,7 @@
 				self.activeXObject();
 				$dialog.find(".rightBar").remove();
 				$dialog.find(".rightProperty").remove();
-				var _w=this.Settings.width||'960px',
-					_h=this.Settings.height||'500px';
 				$('.m-camera').addClass('disabled').attr('disabled', 'disabled');
-				$('.modelSelectDialog .dialogBody').height(_h);
-				$('.modelSelectDialog .dialogBody .dialogContent .model').height(_h);
 				self.ieDialogEvent();
 				return;
 			}
@@ -1058,9 +1056,9 @@
 			}
 			WebView.url = ourl + "/static/dist/components/inspectSelection/model.html?type=" + this.Settings.type + "&sourceId=" + this.Settings.sourceId + "&etag=" +
 				this.Settings.etag + "&projectId=" + this.Settings.projectId + "&projectVersionId=" + this.Settings.projectVersionId + "&ruleType=" + this.Settings.ruleType + "&appKey=" +
-				this.Settings.appKey + "&token=" + this.Settings.token + "&height=" + this.Settings.height;
+				this.Settings.appKey + "&token=" + this.Settings.token + "&height=" + this.Settings.height+ "&width=" + this.Settings.width;
 			WebView.height = this.Settings.height||"510px";
-			WebView.width = "960px";
+			WebView.width =  this.Settings.width||"960px";
 
 			WebView.registerEvent('newWindow', function(url){
 				if(/test$/.test(url)){
@@ -1129,17 +1127,13 @@
 				//渲染属性面板
 				Project.sceneId = model.intersect.object.userData.sceneId;
 			});
-
 			Project.Viewer = viewer;
-
 			viewer.on("loaded", function() {
 				Project.loadPropertyPanel();
+				viewer.resize();
 			});
-			var _w=this.Settings.width||'960px',
-				_h=this.Settings.height||'500px';
-			$('.m-camera').addClass('disabled').attr('disabled', 'disabled');
-			$('.modelSelectDialog .dialogBody').height(_h);
-			$('.modelSelectDialog .dialogBody .dialogContent .model').height(_h);
+
+			Project.Viewer.viewer.setMarkerClickCallback(abcd);
 		},
 
 		showInModel:function(param){
@@ -1407,13 +1401,14 @@
 			Project.Viewer && Project.Viewer.loadMarkers(null);
 		},
 
-		formatMark: function(location, color) {
+		formatMark: function(location, color,id) {
 			var _temp = typeof location === 'string'?JSON.parse(location):location,
 				_color = '510';
 			color = _color.charAt(color || 5) || 5;
 			_temp.shapeType = _temp.shapeType || 0;
 			_temp.state = _temp.state || color || 0;
 			_temp.userId = _temp.userId || _temp.componentId;
+			_temp.id=id||'';
 			return JSON.stringify(_temp);
 		},
 		//通过userid 和 boundingbox 定位模型
@@ -1433,7 +1428,7 @@
 				var array = [],boxs=[];
 				_.each(Project.currentPageListData, function(i) {
 					if (i.location.indexOf('boundingBox') != -1) {
-						array.push(Project.formatMark(i.location, i.colorStatus));
+						array.push(Project.formatMark(i.location, i.colorStatus, i.id));
 						boxs.push(JSON.parse(i.location).boundingBox);
 					}
 				})

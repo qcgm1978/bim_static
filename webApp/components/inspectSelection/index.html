@@ -5,6 +5,8 @@
     <title>模型选择器</title>
     <script src="http://cdn.bootcss.com/jquery/1.9.1/jquery.min.js"></script>
     <script src="http://bim.wanda-dev.cn/static/dist/components/inspectSelection/js/inspectSelection.js"></script>
+    <style>
+    </style>
 </head>
 <body>
 
@@ -25,10 +27,12 @@
     var viewer = new InspectModelSelection({
         type: "process",//open process
         ruleType: '',//构件分类
-        height:'500px',
-        projectCode:"184df75d-244f-434e-b16c-b8a3f27874c4",
-        token:"4aeba9fa8574d9a72b8936493bdb3aea9ea795aad8898380166ed5034a1ae0ec555c53727c4ecf5ce4ff47303ab55fae",
-        appKey:"60e8a1d9fc1d44d7b6a4cf85ae2987ed",
+        height:"500px",
+        width:'1200px',
+        //projectCode:"184df75d-244f-434e-b16c-b8a3f27874c4",
+        projectCode:'11130156',
+        //token:"4aeba9fa8574d9a72b8936493bdb3aea9ea795aad8898380166ed5034a1ae0ec555c53727c4ecf5ce4ff47303ab55fae",
+       // appKey:"60e8a1d9fc1d44d7b6a4cf85ae2987ed",
         callback: function (res) {
             //res 返回的检查点、隐患数据
             alert(JSON.stringify(res));
@@ -48,7 +52,7 @@
                 })
             }
             if (t == 1) {
-                viewer.showInModel({presetId: '885462361907456'})
+                viewer.showInModel({presetId: '894191605588260'})
             }
             if (t == 2) {
                 viewer.showInModel({
@@ -107,14 +111,14 @@
             }
             if (t == 4) {
                 viewer.showInModel({
-                    presetId: '885462361907456',
+                    presetId: '894191605588260',
                     componentId: "",
                     location: null
                 })
             }
             if (t == 5) {
                 viewer.showInModel({
-                    presetId: '885462361907456',
+                    presetId: '894191605588260',
                     componentId: "3e3af932cc4382e96862e352bdf05d70.91d0b3bb-43c7-42cf-b6ca-03aadcfadb51-002a8041",
                     location: {
                         "id": "1",
