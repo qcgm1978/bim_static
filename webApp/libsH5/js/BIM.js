@@ -172,23 +172,71 @@
         type: 'rotate',
         group: '3'
       }]
-    }, {
-      id: 'translucent',
-      icon: 'm-translucent',
-      title: '半透明',
-      fn: 'translucent',
+    },{
+      id: 'isolation',
+      icon: 'm-isolation',
+      title: '隔离',
+      fn: 'isolation',
       keyCode: '',
-      type: 'status',
-      group: '0'
-    }, {
-      id: 'hideObj',
-      icon: 'm-hideObj',
-      title: '隐藏构件',
-      fn: 'isolate',
-      keyCode: '',
-      type: 'status',
-      group: '0'
-    }],
+      type: 'more',
+      group: '0',
+      subBar: [ {
+        id: 'xuanban',
+        icon: 'm-xuanban',
+        title: '选中构件半透明',
+        fn: 'setTranslucentSelected',
+        keyCode: '',
+        type: 'view',
+        group: '2'
+      },{
+        id: 'weixuanban',
+        icon: 'm-weixuanban',
+        title: '未选中构件半透明',
+        fn: 'setTranslucentUnselected',
+        keyCode: '',
+        type: 'view',
+        group: '3'
+      }, {
+        id: 'hideSelected',
+        icon: 'm-hideSelected',
+        title: '隐藏选中构件',
+        fn: 'setHideSelected',
+        type: 'view',
+        group: '4'
+      }, {
+        id: 'hideNotSelected',
+        icon: 'm-hideNotSelected',
+        title: '隐藏未选中构件',
+        fn: 'isolate',
+        type: 'view',
+        group: '4'
+      }, {
+        id: 'showAll',
+        icon: 'm-showAll',
+        title: '显示全部模型',
+        fn: 'showAll',
+        type: 'view',
+        group: '4'
+      }]
+    }
+    //  {
+    //  id: 'translucent',
+    //  icon: 'm-translucent',
+    //  title: '半透明',
+    //  fn: 'translucent',
+    //  keyCode: '',
+    //  type: 'status',
+    //  group: '0'
+    //}, {
+    //  id: 'hideObj',
+    //  icon: 'm-hideObj',
+    //  title: '隐藏构件',
+    //  fn: 'isolate',
+    //  keyCode: '',
+    //  type: 'status',
+    //  group: '0'
+    //}
+    ],
     modelBar: [{
       id: 'filter',
       icon: 'm-filter',
