@@ -9,7 +9,7 @@
 
 <div class="date">
 	
-	<span class="text receiveTime"><%= type=='commission'?'接收时间：':'更新时间：' %></span> <span><%= receiveTime?new Date(receiveTime).format("yyyy-MM-dd"):'----/--/--' %> </span>  
+	<span class="text receiveTime"><%= type=='commission'?'接收时间：':'更新时间：' %></span> <span><%= receiveTime?new Date(receiveTime).format("yyyy-MM-dd hh:mm:ss"):'----/--/--' %> </span>
 </div>
 
  <% if(status==1 &&  type=='commission' ){%>

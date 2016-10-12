@@ -322,9 +322,9 @@ App.Project.ProjectQualityProperty = Backbone.View.extend({
 
 			if(that.ProcessAcceptanceOptions.category){
 				App.Project.currentProsCat=App.Project.mapData.processCategory[that.ProcessAcceptanceOptions.category];
-				App.Project.currentOpenCheckFloor=that.ProcessAcceptanceOptions.floor;
+				App.Project.currentProsCheckFloor=that.ProcessAcceptanceOptions.floor;
 				if('外保温'.indexOf(App.Project.currentProsCat)!=-1){
-					App.Project.currentOpenCheckFloor=App.Project.currentOpenCheckFloor+','+'其它';
+					App.Project.currentProsCheckFloor=App.Project.currentProsCheckFloor+','+'其它';
 				}
 			}
 

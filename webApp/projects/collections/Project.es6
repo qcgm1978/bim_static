@@ -50,11 +50,13 @@ App.Project = {
 				type: 'userId',
 				ids: [userId]
 			});
+			App.Project.Settings.Viewer.viewer.getFilters().setSelectedIds([userId]);
 		}else{
 			App.Project.Settings.Viewer.highlight({
 				type: 'userId',
 				ids: undefined
 			});
+			App.Project.Settings.Viewer.viewer.getFilters().setSelectedIds();
 		}
 	},
 
@@ -184,6 +186,7 @@ App.Project = {
 				_specialFilterFiles=_this.filterSingleFiles('CW&LI');
 				_extArray=['CW&LI'];
 				_hideCode=null;
+				floor=floor.split(',');
 				if(cat=="外保温"){
 					App.Project.Settings.Viewer.filter({
 						ids: _this.filterHideCode(['10.10.20.03.06.20.10'],true),

@@ -663,11 +663,12 @@ App.Project.ProjectContainer = Backbone.View.extend({
 
 
 		viewer.on("loaded", function() {
-			debugger
-			$("#class-code-1001").trigger('click');
 			//加载数据
 			that.loadFiveMajor();
-
+			viewer.filter({
+				ids: ['10.01'],
+				type: "classCode"
+			})
 		});
 
 

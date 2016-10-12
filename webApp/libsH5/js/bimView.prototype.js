@@ -738,7 +738,7 @@
       }
       viewer.render();
     },
-    setSelectedIds: function() {
+    setSelectedIds: function(ids) {
       var self = this;
       var viewer = self.viewer;
       viewer.setSelectedIds(ids);
