@@ -33,6 +33,7 @@
         appKey: Request.appKey,
         host: 'http://' + location.host,
         height:Request.height,
+        width:Request.width,
         //res 选择的检查点数据
         callback: function (res) {
         }
@@ -95,6 +96,8 @@
         }
 
         if(!param.presetId && !param.componentId && !param.location ){
+
+
             type="edit";
             viewer.Project.mode = type;
         }
@@ -145,6 +148,40 @@
         })
         view.loadMarkers(null);
         view.fit();
+    }
+
+
+    function abcd(marker){
+            var id = marker? marker.id:"",
+                    userId=marker? marker.userId:"",
+                    data={},
+                    Project=viewer.Project;
+            $(".QualityProcessAcceptance .tbProcessAccessBody tr").removeClass('selected');
+            if(id){
+                var tr = $("tr[data-id='"+id+"']");
+                if(tr.length>0){
+                    tr.addClass('selected');
+                }else{
+                    data=Project.catchPageData('process',{id:id});
+                    Project.OpeningAcceptanceCollection.reset();
+                    Project.OpeningAcceptanceCollection.push({data: data});
+                    Project.pageInfo(data, true);
+                    tr = $("tr[data-id='"+id+"']");
+                    tr.addClass("selected");
+                }
+            }
+
+            if(userId){
+                Project.Viewer.highlight({
+                    type: 'userId',
+                    ids: [userId]
+                });
+            }else{
+                Project.Viewer.highlight({
+                    type: 'userId',
+                    ids: undefined
+                });
+            }
     }
 </script>
 </body>
