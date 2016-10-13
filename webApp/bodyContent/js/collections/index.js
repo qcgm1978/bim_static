@@ -242,8 +242,9 @@ App.BodyContent.control = {
                 }
                 //空数据提示视图
                 if (!collection.models.length) {
+
                     if (collection == App.BodyContent.control.todoCollection) {
-                        _$container = $("#todoContainer");
+                        _$container = $("#todos");
                     }
                     if (collection == App.BodyContent.control.monthEndCollection) {
                         _$container = $("#endTaskContainer");
@@ -251,8 +252,16 @@ App.BodyContent.control = {
                     if (collection == App.BodyContent.control.proCollection) {
                         _$container = $("#postContainer");
                     }
+                    if (collection == App.BodyContent.control.doneCollection) {
+                        _$container = $("#dones");
+                    }
                     _$container && _$container.html("<span class='noDataTip'>暂无内容</span>")
                 }
+                if (collection == App.BodyContent.control.todoCollection) {
+                    $('.loading1').hide();
+
+                }
+
             }
         });
     }
