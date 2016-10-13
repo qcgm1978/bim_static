@@ -137,22 +137,50 @@
 
         });
 
-        document.attachEvent("onkeydown", function(e){
-            if(e.ctrlKey == 1){
-                if(document.all){
-                    k=e.keyCode
+        var isIE = function (ver) {
+            var b = document.createElement('b')
+
+            b.innerHTML = '<!--[if IE ' + ver + ']><i></i><![endif]-->'
+
+            return b.getElementsByTagName('i').length === 1
+        }
+
+        if(isIE(10) ||isIE(9) ||isIE(8) ||isIE(7) || isIE(6)){
+            document.attachEvent("onkeydown", function(e){
+                if(e.ctrlKey == 1){
+                    if(document.all){
+                        k=e.keyCode
+                    }
+                    else{
+                        k=e.which
+                    }
+                    if(k==86){
+                        //WebView.runCommand('paste');
+                    }
+                    if(k==67){
+                        myWebView.runCommand('copy');
+                    }
                 }
-                else{
-                    k=e.which
-                }
-                if(k==86){
-                    //WebView.runCommand('paste');
-                }
-                if(k==67){
-                    myWebView.runCommand('copy');
+            })
+        }else{
+            document.onKeydown=function(e){
+                if(e.ctrlKey == 1){
+                    if(document.all){
+                        k=e.keyCode
+                    }
+                    else{
+                        k=e.which
+                    }
+                    if(k==86){
+                        //WebView.runCommand('paste');
+                    }
+                    if(k==67){
+                        myWebView.runCommand('copy');
+                    }
                 }
             }
-        })
+        }
+
 
         window.onresize = resizeWebView;
 
