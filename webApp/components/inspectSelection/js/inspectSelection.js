@@ -1152,12 +1152,101 @@
 				self.Settings.callback.call(this, val);
 				return val;
 			})
+		},
+
+		allIn:function(param) {
+			var _this=this;
+			var view = Project.Viewer,
+				type = "readOnly";
+			//param = JSON.parse(param);
+			param = param || {};
+			Project.mode = type;
+			Project.isSelect = true;
+			view.loadMarkers(null);
+			if (param.presetId && (!param.componentId && !param.location)) {
+				type = "preset";
+				Project.mode = type;
+				_this.showPresetPoint(param.presetId,true);
+			}
+			if (!param.presetId && (param.componentId && param.location)) {
+				type = "risk";
+				Project.mode = type;
+				Project.presetPointShowData=null;
+				Project.presetPoint=null;
+				_this.showRiskComponent(param.componentId, param.location);
+			}
+
+			if(param.presetId && param.componentId && param.location){
+				_this.showRiskComponent(param.componentId, param.location);
+				_this.showPresetPoint(param.presetId);
+			}
+
+			if(!param.presetId && !param.componentId && !param.location ){
+				type="edit";
+				Project.mode = type;
+			}
+			return type;
+		},
+
+		clearRisk:function() {
+			var view = Project.Viewer;
+			view.highlight({
+				type: "userId",
+				ids: undefined
+			})
+			view.loadMarkers(null);
+		},
+
+		showRiskComponent:function(componentId, location) {
+			if(typeof location === 'string'){
+				location=JSON.parse(location);
+			}
+			var view = Project.Viewer;
+			view.highlight({
+				type: "userId",
+				ids: [componentId]
+			});
+			Project.currentRiskShowData={
+				id:componentId,
+				marker:JSON.stringify(location)
+			}
+			view.loadMarkers([JSON.stringify(location)]);
+		},
+		showPresetPoint:function(presetId,isClearRisk) {
+
+			if(isClearRisk){
+				Project.currentRiskShowData=null;
+			}
+
+			var data = Project.catchPageData(null, {
+				id: presetId
+			});
+
+
+			if(Project.presetPointShowData && Project.presetPointShowData.marker){
+				viewer.Project.Viewer.loadMarkers([viewer.Project.presetPointShowData.marker]);
+			}
+
+			Project.OpeningAcceptanceCollection.push({data: data});
+			Project.pageInfo(data, true);
+			var t = $("tr[data-id='" + presetId + "']");
+			t.trigger('click');
+		},
+		clearPresetPoint:function() {
+			var view = Project.Viewer;
+			view.highlight({
+				type: "userId",
+				ids: undefined
+			})
+			view.loadMarkers(null);
+			view.fit();
 		}
 
 	}
 
 	//Project模型操作方法
 	var Project = {
+		presetPointShowData:null,
 		isSelect:true,
 		//显示隐患和预设点
 		//presetId componetId location
