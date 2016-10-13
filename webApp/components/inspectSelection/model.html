@@ -82,6 +82,7 @@
         if (param.presetId && (!param.componentId && !param.location)) {
             type = "preset";
             viewer.Project.mode = type;
+            view.viewer.getFilters().setSelectedIds();
             showPresetPoint(param.presetId,true);
         }
         if (!param.presetId && (param.componentId && param.location)) {
@@ -89,6 +90,11 @@
             viewer.Project.mode = type;
             viewer.Project.presetPointShowData=null;
             viewer.Project.presetPoint=null;
+            $(".QualityProcessAcceptance .tbProcessAccessBody tr").removeClass('selected');
+            view.highlight({
+                type: "userId",
+                ids: undefined
+            })
             showRiskComponent(param.componentId, param.location);
         }
 
@@ -98,8 +104,12 @@
         }
 
         if(!param.presetId && !param.componentId && !param.location ){
-
-
+            $(".tbOpeningacceptanceBody tr").removeClass('selected');
+            view.highlight({
+                type: "userId",
+                ids: undefined
+            });
+            view.viewer.getFilters().setSelectedIds();
             type="edit";
             viewer.Project.mode = type;
         }
@@ -128,7 +138,6 @@
             id:componentId,
             marker:JSON.stringify(location)
         }
-        viewer.ModelFilter.recoverySilder();
         view.loadMarkers([JSON.stringify(location)]);
     }
     function showPresetPoint(presetId,isClearRisk) {
