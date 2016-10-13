@@ -56,6 +56,7 @@
         }
         App.modules = {};
         App.pkg = {};
+        App.time = Math.round(Math.random() * 9999);
         </script>
 
 
@@ -63,12 +64,18 @@
         <link rel="styleSheet" href="/libsH5/css/modelStyle.less" />
         <script type="text/javascript" src="/api/api.js"></script>
         <!--<script type="text/javascript" src="/comm/js/comm.es6"></script>-->
-        <script type="text/javascript" src="/static/dist/comm/comm_20160313.js?t=123"></script>
+        <script>
+            document.write('<script src="/static/dist/comm/comm_20160313.js?t='+App.time+'"><'+'/script>')
+        </script>
+        <!--<script type="text/javascript" src="/static/dist/comm/comm_20160313.js?t=123"></script>-->
 
         <script type="text/javascript" src="/topNav/js/topNav.es6"></script>
         <script type="text/javascript" src="/commH5/pluging/clipboard/clipboard.js"></script>
         <!--<script type="text/javascript" src="/libsH5/js/libs/three.js"></script> -->
-        <script type="text/javascript" src="/static/dist/libs/libsH5_20160313.js?t=123"></script>
+        <script>
+            document.write('<script src="/static/dist/libs/libsH5_20160313.js?t='+App.time+'"><'+'/script>')
+        </script>
+        <!--<script type="text/javascript" src="/static/dist/libs/libsH5_20160313.js?t=123"></script>-->
 
     <!--<script type="text/javascript" src="/router/appkey.es6"></script>-->
     <script>

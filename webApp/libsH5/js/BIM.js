@@ -218,7 +218,7 @@
         type: 'view',
         group: '4'
       }]
-    }
+    },
     //  {
     //  id: 'translucent',
     //  icon: 'm-translucent',
@@ -236,6 +236,22 @@
     //  type: 'status',
     //  group: '0'
     //}
+      {
+        id: 'kuangsuo',
+        icon: 'm-kuangsuo',
+        title: '框选缩放',
+        fn: 'setRectZoomMode',
+        type: 'mode',
+        group: '3'
+      }, {
+        id: 'lockAxisZ',
+        icon: 'm-lockAxisZ',
+        title: 'z轴锁定',
+        fn: 'lockAxisZ',
+        keyCode: '',
+        type: 'mode',
+        group: '0'
+      }
     ],
     modelBar: [{
       id: 'filter',
