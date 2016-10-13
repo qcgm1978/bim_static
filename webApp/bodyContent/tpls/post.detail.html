@@ -2,7 +2,10 @@
 <div class="wrapper">
 
 	<div class="title">
-		<span><%= title %></span>
+		<span>
+			<%= title %>
+			<p><%= new Date(updateStmp).format("yyyy-M-d ") %> <b></b>  <%= deptName %> <b></b> <%= operator %></p>
+		</span>
 	</div>
 	<hr>
 	<div class="content"><%= content %></div>
