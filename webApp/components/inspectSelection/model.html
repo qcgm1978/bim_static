@@ -90,7 +90,7 @@
             viewer.Project.mode = type;
             viewer.Project.presetPointShowData=null;
             viewer.Project.presetPoint=null;
-            $(".QualityProcessAcceptance .tbProcessAccessBody tr").removeClass('selected');
+            $(".tbOpeningacceptanceBody tr").removeClass('selected');
             view.highlight({
                 type: "userId",
                 ids: undefined
@@ -110,6 +110,11 @@
                 ids: undefined
             });
             view.viewer.getFilters().setSelectedIds();
+
+            viewer.Project.presetPointShowData=null;
+            viewer.Project.presetPoint=null;
+            viewer.Project.currentRiskShowData=null;
+            viewer.Project.currentUserId=null;
             type="edit";
             viewer.Project.mode = type;
         }

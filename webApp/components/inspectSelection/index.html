@@ -43,13 +43,15 @@
 
             var t = $(this).attr("mtype");
 
+            //啥也没（同时解绑检查点、隐患）
             if (t == 1) {
                 viewer.showInModel({});
             }
+            //只绑定检查点（也等于解绑隐患）
             if (t == 2) {
                 viewer.showInModel({presetId: '936062989484321'})
             }
-
+            //绑定隐患(如果有检查点数据、要传回)
             if (t == 3) {
                 viewer.showInModel({
                     presetId: "936062989484321",
@@ -67,6 +69,7 @@
                 })
             }
 
+            //解绑检查点(如果有隐患数据、要传回)
             if (t == 4) {
                 viewer.showInModel({
                     presetId: "",
@@ -84,6 +87,7 @@
                 })
             }
 
+            //解绑隐患（同时保持检查点的数据）
             if (t == 5) {
                 viewer.showInModel({
                     presetId: "936062989484321",

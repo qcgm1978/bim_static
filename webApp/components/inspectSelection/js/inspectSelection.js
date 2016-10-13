@@ -332,41 +332,46 @@
 			}
 			var $check = $('.modelSidebar #' + type + ' ul input'),
 				$treeText = $('.modelSidebar #' + type + ' ul .treeText');
-			$check.each(function () {
+			$check.each(function() {
 				if ($(this).is(':checked') && $(this).closest('.itemContent').find('.treeText').text() != key) {
 					$(this).trigger('click');
 				}
-			});
-			$treeText.each(function () {
-				var _ = $(this).parent().find('input');
-				if (key) {
-					if ($(this).text() == key && !_.is(':checked')) {
-						_.trigger('click');
+			})
+			$treeText.each(function() {
+				var _this = $(this).parent().find('input');
+				if(_.isArray(key)){
+					if (key.join('||').indexOf($(this).text())!==-1 && !_this.is(':checked')) {
+						_this.trigger('click');
 					}
-				} else {
-					if (!_.is(':checked')) {
-						_.trigger('click');
+				}else{
+					if ($(this).text() == key && !_this.is(':checked')) {
+						_this.trigger('click');
 					}
 				}
 			})
 		},
-		linkSilderSpecial: function (type, key) {
+		linkSilderSpecial: function(type, key,ext) {
 			if (!key) {
 				return
 			}
-			var $check = $('.modelSidebar #' + type + ' input'),
+			ext=ext||['AR'];
+			var $check = $('.modelSidebar #' + type + '>ul input'),
 				$treeText = $('.modelSidebar #' + type + ' .treeText');
-			this.recoverySilder();
-			$check.each(function () {
+			$check.each(function() {
 				if ($(this).is(':checked')) {
 					$(this).trigger('click');
 				}
 			})
-			$treeText.each(function () {
-				var _ = $(this).parent().find('input');
-				if (key.indexOf($(this).text()) != -1) {
-					_.trigger('click');
+
+			$treeText.each(function() {
+				var _$this=$(this)
+				var _this = _$this.parent().find('input');
+				if (key.indexOf(_$this.text()) != -1 && _$this.text().indexOf('.rvt')!=-1) {
+					_this.trigger('click');
 				}
+			})
+			_.each(ext,function(i){
+				$(".treeText[mcode='"+i+"']").prev().find('input').prop("checked", 'checked');
 			})
 		},
 		linkSilderCategory: function (type, key) {
@@ -455,8 +460,14 @@
 						}
 					}
 				})
-				if(count==temp){
-					hide.push(item.code);
+				if(flag){
+					if(count==temp){
+						hide.push(item.code);
+					}
+				}else{
+					if(temp==1){
+						hide.push(item.code);
+					}
 				}
 			})
 			return hide;
@@ -502,9 +513,14 @@
 				_hideCode=null;
 
 			if (cat == '梁柱节点') {
+				_specialFilterFiles=_this.filterSingleFiles('ST');
+				_extArray=['ST'];
 				_this.linkSilder('floors', floor);
-				_this.linkSilderSpecial('specialty', ['WDGC-Q-ST-' + floor + '.rvt'],['ST']);
-				_this.linkSilderCategory('category', '楼板')
+				_this.linkSilderSpecial('specialty', _specialFilterFiles,_extArray);
+				_v.filter({
+					ids: _this.filterHideCode(['10.20.20.03']),
+					type: "classCode"
+				})
 				return
 			}
 
@@ -528,6 +544,7 @@
 					_specialFilterFiles=_this.filterSingleFiles('CW&LI');
 					_extArray=['CW&LI'];
 					_hideCode=null;
+					floor=floor.split(',');
 					if(cat=="外保温"){
 						Project.Viewer.filter({
 							ids: _this.filterHideCode(['10.10.20.03.06.20.10'],true),
@@ -1559,6 +1576,15 @@
 			OpeningAcceptanceCollection.reset();
 			OpeningAcceptanceCollection.projectId = this.Settings.projectId;
 			OpeningAcceptanceCollection.projectVersionId = this.Settings.projectVersionId;
+
+			//if(this.filters){
+			//	App.Project.currentProsCat=App.Project.mapData.processCategory[that.ProcessAcceptanceOptions.category];
+			//	App.Project.currentProsCheckFloor=that.ProcessAcceptanceOptions.floor;
+			//	if('外保温'.indexOf(App.Project.currentProsCat)!=-1){
+			//		App.Project.currentProsCheckFloor=App.Project.currentProsCheckFloor+','+'其它';
+			//	}
+			//}
+
 			OpeningAcceptanceCollection.fetch({
 				data: $.extend({}, {
 					specialty: "", //专业
@@ -1759,10 +1785,10 @@
 		//清空搜索条件
 		clearSearch: function() {
 			Project.dispatchIE("/?commType=test");
-
-			this.$(".riskOption .text").html('全部')
-			this.$(".categoryOption .text").html('全部')
-			this.$(".specialitiesOption .text").html('全部')
+			this.$(".riskOption .text").html('全部');
+			this.$(".categoryOption .text").html('全部');
+			this.$(".floorOption .text").html('全部');
+			this.$(".txtLocationName").val('');
 			this.filters = {};
 			Project.loadData(null);
 		},
