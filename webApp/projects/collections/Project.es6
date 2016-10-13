@@ -160,7 +160,7 @@ App.Project = {
 			this.linkSilder('floors', floor);
 			this.linkSilderSpecial('specialty', _specialFilterFiles,_extArray);
 			App.Project.Settings.Viewer.filter({
-				ids: _this.filterHideCode(['10.20.20.03']),
+				ids: _this.filterHideCode(['10.20.20.03','10.01']),
 				type: "classCode"
 			})
 			return
@@ -1377,7 +1377,8 @@ App.Project = {
 			},
 			scrollInertia: 0
 		});
-
+		$("#projectContainer").find(".projectFileNavContent").css('height','100%');
+		$("#projectContainer .mCSB_container").css('height','100%');
 		$("#projectContainer").find(".projectModelNavContent").mCustomScrollbar({
 			set_height: "100%",
 			set_width: "100%",
