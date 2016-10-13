@@ -1,0 +1,7 @@
+<% _.each(data,function(item){%>
+<li>
+	<span class="title" onclick="App.Suggest.show(this);" data-id="<%=item.id%>"><%=item.title%></span>
+	<span class="user"><%=item.createName%></span>
+	<span class="time"><%= item.createTime?new Date(item.createTime).format("yyyy-MM-dd hh:mm:ss"):'--' %></span>
+</li>
+<% }) %>

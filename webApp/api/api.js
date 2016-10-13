@@ -319,6 +319,10 @@ App.API = {
  
 		current:"platform/user/current", //当前用户
 
+		serviceCommitSuggest:'platform/advice/feedback/write',
+		serviceSuggestHistory:'platform/advice/feedback/selectAll',
+		serviceQuerySuggest:'platform/advice/feedback/select/{adviceId}',
+
 		test: ""
 	},
 

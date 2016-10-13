@@ -129,6 +129,10 @@ fis.match('imbox/**.html', {
   //useHash:true,
   release: "/static/dist/tpls/$0"
 });
+fis.match('suggest/**.html', {
+  //useHash:true,
+  release: "/static/dist/tpls/$0"
+});
 fis.match('app/**.html', {
   //useHash:true,
   release: "/static/dist/$0"
@@ -333,6 +337,26 @@ fis.match('/static/dist/imbox/imbox.css', {
   useHash:true,
   release: '/static/dist/imbox/imbox.css'
 });
+
+//建议反馈
+
+fis.match('/suggest/**.{js,es6}', {
+  //useHash:true,
+  packTo: '/static/dist/suggest/suggest.js'
+});
+fis.match('/static/dist/suggest/suggest.js', {
+  useHash:true,
+  release: '/static/dist/suggest/suggest.js'
+});
+fis.match('/suggest/**.{less,css}', {
+  //useHash:true,
+  packTo: '/static/dist/suggest/suggest.css'
+});
+fis.match('/static/dist/suggest/suggest.css', {
+  useHash:true,
+  release: '/static/dist/suggest/suggest.css'
+});
+
 fis.match('/router/**.{js,es6}', {
   useHash:true,
   //packTo: '/static/dist/$0'

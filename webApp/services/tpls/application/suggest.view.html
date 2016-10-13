@@ -2,24 +2,26 @@
     <table>
         <tr>
             <td>
-                <input type="text">
+                <input type="text" id="sugTitle">
             </td>
         </tr>
         <tr>
             <td>
-                <textarea name="" id="" cols="30" rows="10"></textarea>
+                <textarea name="" id="sugDescr" cols="30" rows="10"></textarea>
             </td>
         </tr>
         <tr>
-            <td>
+            <td class="textRow">
                 <span class="label">附件</span>
                 <a href="javascript:;" class="alink upload">上传附件</a>
-                <hr>
+                <form id="uploadSuggestForm" action="/platform/advice/feedback/upload" method="post" target="upload-iframe-suggest" enctype="multipart/form-data" encoding="multipart/form-data">
+                    <input id="inputSuggestFile" name="file" type="file" style="display: none"/>
+                </form>
+                <iframe id="uploadIframeSuggest" name="upload-iframe-suggest" border="0" width="0" height="0" style="width: 0;height: 0; display: none;"></iframe>
             </td>
         </tr>
         <tr>
-            <td>
-                <div><a href="#" class="alink list">附件.txt</a></div>
+            <td class="attachList">
             </td>
         </tr>
     </table>

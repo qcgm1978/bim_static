@@ -22,7 +22,8 @@ var AppRoute = Backbone.Router.extend({
 		'list/:id': 'list',
 		'bodyContent': 'bodyContent',
 		'logout': 'logout',
-		"post/detail/:id": 'postDetail'
+		"post/detail/:id": 'postDetail',
+		'suggest':'suggest'
 	},
 	//首页主体展示
 
@@ -75,6 +76,15 @@ var AppRoute = Backbone.Router.extend({
 		_.require('/static/dist/imbox/imbox.css');
 		_.require('/static/dist/imbox/imbox.js');
 		App.INBox.init();
+	},
+
+	suggest:function(){
+		if (this.reset() == false) {
+			return;
+		}
+		_.require('/static/dist/suggest/suggest.css');
+		_.require('/static/dist/suggest/suggest.js');
+		App.Suggest.init();
 	},
 	postDetail: function(id) {
 		_.require('/static/dist/bodyContent/bodyContent.css');

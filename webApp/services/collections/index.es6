@@ -63,7 +63,7 @@ App.Services = {
 		$('.tileIcon').on('click',function(){
 			var name=$(this).attr('name');
 			if(name=='suggest'){
-				App.Services.SuggestView();
+				App.Services.SuggestView.init();
 			}
 		})
 	},
