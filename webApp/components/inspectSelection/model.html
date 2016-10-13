@@ -116,6 +116,9 @@
     }
 
     function showRiskComponent(componentId, location) {
+        if(typeof location === 'string'){
+            location=JSON.parse(location);
+        }
         var view = viewer.Project.Viewer;
         view.highlight({
             type: "userId",
@@ -138,7 +141,8 @@
             id: presetId
         });
 
-        if(viewer.Project.presetPointShowData.marker){
+
+        if(viewer.Project.presetPointShowData && viewer.Project.presetPointShowData.marker){
             viewer.Project.Viewer.loadMarkers([viewer.Project.presetPointShowData.marker]);
         }
 
