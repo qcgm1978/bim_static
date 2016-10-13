@@ -37,12 +37,13 @@
   ModelSelection.prototype = {
     init: function() {
       var self = this,
-        srciptUrl = '/static/dist/libs/libsH5_20160313.js',
-        styleUrl = '/static/dist/libs/libsH5_20160313.css',
+          time = Math.round(Math.random() * 9999),
+        srciptUrl = '/static/dist/libs/libsH5_20160313.js?t='+time,
+        styleUrl = '/static/dist/libs/libsH5_20160313.css?t='+time,
         $script = '<script src="' + srciptUrl + '"></script>',
         $css = '<link rel="stylesheet" href="' + styleUrl + '" />',
-      $script2 = '<script src="/static/dist/comm/comm_20160313.js"></script>',
-        $css2 = '<link rel="stylesheet" href="/static/dist//comm/comm_20160313.css" />';
+      $script2 = '<script src="/static/dist/comm/comm_20160313.js?t='+time+'"></script>',
+        $css2 = '<link rel="stylesheet" href="/static/dist/comm/comm_20160313.css?t='+time+'" />';
       if (!ModelSelection.isLoad) {
         $('head').append($css, $script, $css2, $script2);
         ModelSelection.isLoad = true;
