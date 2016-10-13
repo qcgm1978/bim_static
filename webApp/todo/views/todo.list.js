@@ -6,6 +6,8 @@ App.Todo.TodoListView=Backbone.View.extend({
 
 	className:'todoList',
 
+	currentRenderCount:1,
+
 	// 重写初始化
 	initialize:function(){ 
 		this.listenTo(App.Todo.TodoCollection, 'reset', this.resetDom);  
@@ -28,22 +30,37 @@ App.Todo.TodoListView=Backbone.View.extend({
 
 	},
 
-	addOne:function(model){ 
+	addOne:function(model){
 		//渲染单个view
 	    var view=new App.Todo.TodoDetailView({model:model});
-	    
+		if(this.currentRenderCount<=1){
+			this.$el.find('.'+App.Todo.Settings.type+'Lists').empty();
+		}
+		this.currentRenderCount++;
 	    if (App.Todo.Settings.type=="commission") {
 			this.$el.find('.commissionLists').append(view.render().el); 
 			this.bindScroll("commissionLists");
+
+			if(this.currentRenderCount>=model.collection.length){
+				$("#todoContent").find(".commissionListPagination").show();
+				$("#todoContent").find(".sumDesc").show();
+			}
+
 	    }else{
 	    	this.$el.find('.alreadyLists').append(view.render().el); 
 	    	this.bindScroll();
+
+			if(this.currentRenderCount>=model.collection.length){
+				$("#todoContent").find(".alreadyListPagination").show();
+				$("#todoContent").find(".sumDesc").show();
+			}
 	    }
-    	
+
 	} ,
 
 	resetDom:function(){
-		this.$el.find('.'+App.Todo.Settings.type+'Lists').empty();
+		this.currentRenderCount=1;
+		this.$el.find('.'+App.Todo.Settings.type+'Lists').html('<span class="noData"><i class="tip"></i>正在加载...</span>');
 	},
 	emptyDom:function(){
 		this.$el.find('.'+App.Todo.Settings.type+'Lists').html('<span class="noData"><i class="tip"></i>暂无'+(App.Todo.Settings.type=='already'?'已':'待')+'办</span>');

@@ -46,6 +46,11 @@ App.Todo = {
 
 	//加载数据
 	loadData: function() {
+
+			$("#todoContent").find(".commissionListPagination").hide();
+			$("#todoContent").find(".alreadyListPagination").hide();
+			$("#todoContent").find(".sumDesc").hide();
+
 		//数据重置
 		App.Todo.TodoCollection.reset();
 		// load list
