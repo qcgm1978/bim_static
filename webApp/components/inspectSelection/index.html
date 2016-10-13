@@ -43,15 +43,17 @@
 
             var t = $(this).attr("mtype");
 
+            //啥也没（同时解绑检查点、隐患）
             if (t == 1) {
-                viewer.allIn({});
+                viewer.showInModel({});
             }
+            //只绑定检查点（也等于解绑隐患）
             if (t == 2) {
-                viewer.allIn({presetId: '936062989484321'})
+                viewer.showInModel({presetId: '936062989484321'})
             }
-
+            //绑定隐患(如果有检查点数据、要传回)
             if (t == 3) {
-                viewer.allIn({
+                viewer.showInModel({
                     presetId: "936062989484321",
                     componentId: "6fd298fd9534b2f8fa81fc4c9c4de027.0d9d7d7c-1653-41d2-992b-405a02cbd02d-0003121c",
                     location: {
@@ -67,8 +69,9 @@
                 })
             }
 
+            //解绑检查点(如果有隐患数据、要传回)
             if (t == 4) {
-                viewer.allIn({
+                viewer.showInModel({
                     presetId: "",
                     componentId: "6fd298fd9534b2f8fa81fc4c9c4de027.0d9d7d7c-1653-41d2-992b-405a02cbd02d-0003121c",
                     location: {
@@ -84,8 +87,9 @@
                 })
             }
 
+            //解绑隐患（同时保持检查点的数据）
             if (t == 5) {
-                viewer.allIn({
+                viewer.showInModel({
                     presetId: "936062989484321",
                     componentId: "",
                     location: ""

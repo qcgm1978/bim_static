@@ -27,6 +27,8 @@ App.Services.SuggestView = {
                 })
                 if(id){
                     _this.initData(self,id);
+                }else{
+                    self.find('.footer').prepend('<a style="float:left;" href="/#suggest" target="_blank">历史反馈</a>');
                 }
             }
         }
