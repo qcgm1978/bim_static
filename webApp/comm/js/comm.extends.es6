@@ -7,13 +7,19 @@
 
 App.Comm.templateCache = [];
 
+var time;
+if(App && App.time){
+	time = App.time
+}else{
+	time = Math.round(Math.random() * 9999);
+}
 //获取模板根据URL
 _.templateUrl = function(url, notCompile) {
 
 	if (url.substr(0, 1) == ".") {
 		url = "/static/dist/tpls" + url.substr(1);
 	} else if (url.substr(0, 1) == "/") {
-		url = "/static/dist/tpls" + url;
+		url = "/static/dist/tpls" + url + '?t=' + time;
 	}
 
 	if (App.Comm.templateCache[url]) {
