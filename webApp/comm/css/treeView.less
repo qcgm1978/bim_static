@@ -3,14 +3,36 @@
  */
 
 /* treeView  */
-.projectNavFileContainer{
-  overflow-x: scroll;
-  height: 100%;
-  .overflowEllipsis{
-	overflow: visible;
+.projectContainerApp{
+  .projectNavFileContainer{
+	overflow-x: scroll;
+	height: 100%;
+	.overflowEllipsis{
+	  overflow: visible;
+	}
   }
 }
-#mCSB_1_container,#mCSB_3_container{
+#resourceFamlibsLeftNav{
+  .projectNavFileContainer{
+	height: 100%;
+	.overflowEllipsis{
+	  overflow: visible;
+	}
+  }
+  .mCSB_container{
+	overflow: scroll;
+  }
+}
+
+
+
+#resourceModelLeftNav {
+  .mCSB_container{
+	overflow-x: scroll!important;
+	overflow-y: auto!important;
+  }
+}
+.mCustomScrollBox,.mCSB_container{
   height: 100%;
 }
 .projectNavFileContainer,.projectChangeListBox { // .tree-view { .tliLine { position: absolute; border-left: 1px #ccc solid; left: 6px; z-index: 1; top: 0px; bottom: 0px; }
