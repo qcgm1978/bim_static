@@ -307,7 +307,7 @@ var AppRoute = Backbone.Router.extend({
 		}
 
 		//别的系统重新登录过，刷新用户
-		if (user.userId !=App.Comm.getCookie("userId")) {
+		if (App.Global.User.userId !=App.Comm.getCookie("userId")) {
 			App.Comm.getUserInfo();
 			user = localStorage.getItem("user");
 		}

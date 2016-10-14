@@ -154,6 +154,7 @@ App.Project.ProjectPlanProperty = Backbone.View.extend({
 		this.$('.dateEnd2').val('');
 		this.$('.planContainer .filterInputExtra').val('');
 		this.$('.planTimeType .text').html('计划开始');
+		this.businessName='';
 		this.planType='1';
 		this.loadPlanModelData();
 	},

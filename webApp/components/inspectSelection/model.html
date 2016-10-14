@@ -98,13 +98,20 @@
                 type: "userId",
                 ids: undefined
             })
-            showRiskComponent(param.componentId, param.location);
+
+            getModelId(param.componentId,function(id){
+                showRiskComponent(id, param.location);
+            })
+
+           // showRiskComponent(param.componentId, param.location);
         }
 
         if(param.presetId && param.componentId && param.location){
             viewer.Project.isSelect = 'once';
-            showRiskComponent(param.componentId, param.location);
-            showPresetPoint(param.presetId);
+            getModelId(param.componentId,function(id){
+                showRiskComponent(id, param.location);
+                showPresetPoint(param.presetId);
+            })
         }
 
         if(!param.presetId && !param.componentId && !param.location ){
@@ -136,23 +143,21 @@
     }
 
     function showRiskComponent(componentId, location) {
-        getModelId(componentId,function(id){
             if(typeof location === 'string'){
                 location=JSON.parse(location);
             }
-            location.userId=id;
+            location.userId=componentId;
             location=JSON.stringify(location);
             var view = viewer.Project.Viewer;
             view.highlight({
                 type: "userId",
-                ids: [id]
+                ids: [componentId]
             });
             viewer.Project.currentRiskShowData={
                 id:componentId,
                 marker:location
             }
             view.loadMarkers([location]);
-        });
     }
 
     function getModelId(componentId,callback){
@@ -210,7 +215,7 @@
                     userId=marker? marker.userId:"",
                     data={},
                     Project=viewer.Project;
-            $(".QualityProcessAcceptance .tbProcessAccessBody tr").removeClass('selected');
+            $(".tbOpeningacceptanceBody tr").removeClass('selected');
             if(id){
                 var tr = $("tr[data-id='"+id+"']");
                 if(tr.length>0){
@@ -225,15 +230,24 @@
                 }
             }
 
+            var array=[];
+            if(viewer.Project.currentRiskShowData){
+                array.push(viewer.Project.currentRiskShowData.id);
+            }
+            if(viewer.Project.presetPointShowData){
+                array.push(viewer.Project.currentRiskShowData.id);
+            }
+
             if(userId){
+                array.push(userId);
                 Project.Viewer.highlight({
                     type: 'userId',
-                    ids: [userId]
+                    ids: array
                 });
             }else{
                 Project.Viewer.highlight({
                     type: 'userId',
-                    ids: undefined
+                    ids: array
                 });
             }
     }
