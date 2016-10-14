@@ -155,7 +155,15 @@ App.Project = {
 			_hideCode=null;
 
 		if (cat == '梁柱节点') {
-			_specialFilterFiles=['WDGC-Q-ST-'+floor+'.rvt'];
+			if(!floor){
+				floor=_this.getFloors();
+				_specialFilterFiles=[];
+				_.each(floor,function(item){
+					_specialFilterFiles.push('WDGC-Q-ST-'+item+'.rvt');
+				})
+			}else{
+				_specialFilterFiles=['WDGC-Q-ST-'+floor+'.rvt'];
+			}
 			_extArray=['ST'];
 			this.linkSilder('floors', floor);
 			this.linkSilderSpecial('specialty', _specialFilterFiles,_extArray);
