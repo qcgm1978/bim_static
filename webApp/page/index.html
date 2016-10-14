@@ -56,7 +56,7 @@
         }
         App.modules = {};
         App.pkg = {};
-        App.time = new Date();
+        App.time = +new Date();
         </script>
 
 
@@ -80,7 +80,7 @@
     <!--<script type="text/javascript" src="/router/appkey.es6"></script>-->
     <script>
         var x                   = new XMLHttpRequest();
-        x.open('GET', '../map.json?t='+new Date(), true);
+        x.open('GET', '../map.json?t='+(+new Date()), true);
         x.send('bb');
         x.onreadystatechange    = function(s){
             if(x.readyState == 4){

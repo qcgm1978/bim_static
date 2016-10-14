@@ -11,7 +11,7 @@ var time;
 if(App && App.time){
 	time = App.time
 }else{
-	time = new Date();
+	time = +new Date();
 }
 //获取模板根据URL
 _.templateUrl = function(url, notCompile) {
