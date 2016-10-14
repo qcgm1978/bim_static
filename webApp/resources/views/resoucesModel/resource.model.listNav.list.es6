@@ -23,9 +23,7 @@ App.ResourceModel.ListContent = Backbone.View.extend({
 	render: function() {
 
 		this.$el.html(this.template);
-		this.$el.find('.cachetest').click(function(){
-			alert('test')
-		})
+
 		return this;
 	},
 
