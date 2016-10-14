@@ -999,7 +999,7 @@
 				strVar += "        <\/div>";
 
 				$dialog = self.$dialog = $('<div class="modelSelectDialog"></div>');
-				var $body = $('<div class="dialogBody"></div>'),
+				var $body = $('<div class="dialogBody"  style="width:'+this.Settings.width+';height:'+this.Settings.height+'"></div>'),
 					$header = $('<div class="dialogHeader"/>').html('请选择检查点<span class="dialogClose" title="关闭"></span> '),
 					$modelView = self.$modelView = $('<div id="modelView" class="model" style="width:'+this.Settings.width+';height:'+this.Settings.height+'"></div>'),
 				$content = $('<div class="dialogContent"  style="width:'+this.Settings.width+';height:'+this.Settings.height+'">' + strVar + '</div>'),
