@@ -1208,6 +1208,28 @@
 			return type;
 		},
 
+
+		getModelId:function(componentId,callback){
+			var ids=componentId.split('.');
+			var _fileId=ids[0],
+				userId=ids[1];
+			alert(_host+"/doc/api/" + Project.Settings.projectId + '/' +  Project.Settings.projectVersionId + "?fileId=" +_fileId)
+			$.ajax({
+				url: '',
+			}).done(function(data) {
+				alert(data)
+				if (data.code == 0) {
+					var modelId = data.data && data.data.modelId;
+					if(modelId){
+						componentId=modelId+'.'+userId;
+						callback(componentId);
+					}
+				}else{
+					alert('获取构件ID失败');
+				}
+			});
+		},
+
 		clearRisk:function() {
 			var view = Project.Viewer;
 			view.highlight({
@@ -1218,6 +1240,8 @@
 		},
 
 		showRiskComponent:function(componentId, location) {
+			this.getModelId(componentId,function(){});
+			return
 			if(typeof location === 'string'){
 				location=JSON.parse(location);
 			}
@@ -1267,7 +1291,7 @@
 	//Project模型操作方法
 	var Project = {
 		presetPointShowData:null,
-		isSelect:true,
+		isSelect:'open',
 		//显示隐患和预设点
 		//presetId componetId location
 		allIn: function (param) {
