@@ -200,7 +200,7 @@ var Login = {
 			if (r && r != document.URL) {
 				window.location = decodeURIComponent(r);
 			} else {
-				window.location.href = '/index.html';
+				window.location.href = '/index.html?t='+new Date();
 			} 
 
 		});
@@ -284,7 +284,7 @@ var Login = {
 				localStorage.setItem("user", JSON.stringify(data.data))
 				Login.setCookie('userId', data.data.userId);
 				Login.setCookie('isOuter', data.data.outer);
-				window.location.href = '/index.html';
+				window.location.href = '/index.html?t='+new Date();
 			}
 		});
 
