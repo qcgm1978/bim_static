@@ -3,7 +3,7 @@
 */
 
 var CLOUD = CLOUD || {};
-CLOUD.Version = "20160909";
+CLOUD.Version = "20161009";
 
 CLOUD.GlobalData = {
     SceneSize: 1000,
@@ -6506,7 +6506,7 @@ CLOUD.MaterialUtil = {
 
     createHilightMaterial: function () {
 
-        return this.createPhongMaterial({ color: 0x000088, opacity: 0.8, side:THREE.DoubleSide, transparent: false });
+        return this.createPhongMaterial({ color: 0x003BBD, opacity: 0.5, side: THREE.DoubleSide, transparent: true });
     }
 };
 
@@ -11642,7 +11642,7 @@ CLOUD.RectPickEditor.prototype = {
     onMouseDown :   function (event) {
 
         event.preventDefault();
-        event.stopPropagation();
+        //event.stopPropagation();
 
         if (event.button === THREE.MOUSE.LEFT) {
 
@@ -11669,7 +11669,7 @@ CLOUD.RectPickEditor.prototype = {
     onMouseUp : function (event) {
 
         event.preventDefault();
-        event.stopPropagation();
+        //event.stopPropagation();
         var slaveEditor = this.slaveEditor;
 
         this.onUpdateUI({ visible: false });
@@ -12954,7 +12954,7 @@ CLOUD.CameraAnimator = function () {
         _frameTime = frameTime;
     };
 
-    this.setStandardView = function (stdView, viewer, margin) {
+    this.setStandardView = function (stdView, viewer, margin, callback) {
 
         _isPlaying = false; // 无动画，将状态置成 false
 
@@ -12964,6 +12964,9 @@ CLOUD.CameraAnimator = function () {
             var target = viewer.camera.zoomToBBox(box, margin);
             viewer.cameraEditor.updateCamera(target);
             viewer.render();
+
+            // 增加回调
+            callback && callback();
         };
 
         var camera = viewer.camera;
@@ -13049,12 +13052,10 @@ CLOUD.CameraAnimator = function () {
 CLOUD.Filter = function () {
 
     var _visibilityFilter = {}; // 可见过滤器
+
     var _fileFilter = {}; // 文件过滤器
 
     var _sceneOverriderState = false; // 场景半透明
-    var _hideUnselected = false; // 未选中构件隐藏
-    var _hideAll = false; // 隐藏所有
-    var _translucentAll = false; // 半透明所有
 
     // 内置材质库
     var _overridedMaterials = {};
@@ -13120,8 +13121,6 @@ CLOUD.Filter = function () {
     var _demolishSet = null; // 现在用于双击半透明构件的集合
 
     // 为保存前一次状态，加入四个集合
-    var _hideUnselectionSet = null; // 隐藏 [未选中] 构件的集合（使用选中的构件集合反转表示未选中集合）
-    var _hideSelectionSet = null; // 隐藏 [选中] 构件的集合
     var _translucentUnselectionSet = null; // 半透明 [未选中] 构件的集合
     var _translucentSelectionSet = null; // 半透明 [选中] 构件的集合
 
@@ -13130,201 +13129,36 @@ CLOUD.Filter = function () {
         return _selectionSet != null;
     }
 
-    // 增加到【隐藏未选中】集合
-    function addToHideUnselectedSet(id) {
 
-        if (!_hideUnselectionSet) {
-            _hideUnselectionSet = {};
-        }
-
-        _hideUnselectionSet[id] = true;
-    }
-
-    // 清除【隐藏未选中】集合
-    function clearHideUnselectionSet() {
-
-        if (_hideUnselectionSet) {
-
-            for (var id in _hideUnselectionSet) {
-                delete _hideUnselectionSet[id];
-            }
-
-            _hideUnselectionSet = null;
-        }
-    }
-
-    // 将选中构件ID集合加入到【隐藏未选中】集合中
+    // 将选中构件ID集合加入到【隐藏未选中】集合中  - 显示选中的
     function pushToHideUnselectionSet() {
 
-        // 对于隐藏未选中对象，直接复制一份
-        if (_selectionSet) {
+        _visibilityFilter.visibleIds = _selectionSet;
 
-            clearHideUnselectionSet();
-
-            _hideUnselectionSet = {};
-
-            for (var id in _selectionSet) {
-                _hideUnselectionSet[id] = _selectionSet[id];
-            }
-        } else {
-
-            // 如果没有对象选中，则隐藏所有的
-            // 因为采用了一键恢复，这里可以简单的用一个状态控制
-
-            _hideAll = true;
-        }
-    }
-
-    // 增加到【隐藏选中】集合
-    function addToHideSelectionSet(id) {
-
-        if (!_hideSelectionSet) {
-            _hideSelectionSet = {};
-        }
-
-        _hideSelectionSet[id] = true;
-    }
-
-    // 清除【隐藏选中】集合
-    function clearHideSelectionSet() {
-
-        if (_hideSelectionSet) {
-
-            for (var id in _hideSelectionSet) {
-                delete _hideSelectionSet[id];
-            }
-
-            _hideSelectionSet = null;
-        }
     }
 
     // 将选中构件ID集合加入到【隐藏选中】集合中
     function pushToHideSelectionSet() {
 
-        // 对于隐藏选中对象，需要一条条插入到隐藏容器中
-        if (_selectionSet) {
+        _visibilityFilter.invisibleIds = _selectionSet;
 
-            if (!_hideSelectionSet) {
-
-                _hideSelectionSet = {};
-            }
-
-            for (var id in _selectionSet) {
-
-                if (_hideSelectionSet[id] !== _selectionSet[id]) {
-                    _hideSelectionSet[id] = _selectionSet[id];
-                }
-
-            }
-
-        }
     }
 
-    // 增加到【半透明未选中】集合
-    function addToTranslucentUnselectionSet(id) {
-
-        if (!_translucentUnselectionSet) {
-            _translucentUnselectionSet = {};
-        }
-
-        _translucentUnselectionSet[id] = true;
-    }
-
-    // 清除【半透明未选中】集合
-    function clearTranslucentUnselectionSet() {
-
-        if (_translucentUnselectionSet) {
-
-            for (var id in _translucentUnselectionSet) {
-                delete _translucentUnselectionSet[id];
-            }
-
-            _translucentUnselectionSet = null;
-        }
-    }
 
     // 将选中构件ID集合加入到【半透明未选中】集合中
     function pushToTranslucentUnselectionSet() {
 
-        if (_selectionSet) {
+         _translucentUnselectionSet = _selectionSet;
 
-            clearTranslucentUnselectionSet();
-
-            _translucentUnselectionSet = {};
-
-            for (var id in _selectionSet) {
-                _translucentUnselectionSet[id] = _selectionSet[id];
-            }
-        } else {
-
-            // 如果没有对象选中，则半透明所有的
-            // 因为采用了一键恢复，这里可以简单的用一个状态控制
-
-            _translucentAll = true;
-        }
-    }
-
-    // 增加到【半透明选中】集合中
-    function addToTranslucentSelectionSet(id) {
-
-        if (!_translucentSelectionSet) {
-            _translucentSelectionSet = {};
-        }
-
-        _translucentSelectionSet[id] = true;
-    }
-
-    // 清除未【半透明选中】集合中
-    function clearTranslucentSelectionSet() {
-
-        if (_translucentSelectionSet) {
-
-            for (var id in _translucentSelectionSet) {
-                delete _translucentSelectionSet[id];
-            }
-
-            _translucentSelectionSet = null;
-        }
     }
 
     // 将选中构件ID集合加入到【半透明选中】集合中
     function pushToTranslucentSelectionSet() {
 
-        if (_selectionSet) {
+        _translucentSelectionSet = _selectionSet;
 
-            if (!_translucentSelectionSet) {
-
-                _translucentSelectionSet = {};
-            }
-
-            for (var id in _selectionSet) {
-
-                if (_translucentSelectionSet[id] !== _selectionSet[id]) {
-                    _translucentSelectionSet[id] = _selectionSet[id];
-                }
-            }
-        }
     }
 
-    // 重置状态
-    function resetSelectionState() {
-
-        if (_hideAll) {
-            _hideAll = false;
-        }
-
-        if (_translucentAll) {
-            _translucentAll = false;
-        }
-
-        if (_hideUnselected)
-            _hideUnselected = false;
-
-        // 全场景半透明
-        if (_sceneOverriderState) {
-            _sceneOverriderState = false;
-        }
-    }
 
     // 判断构件是否选中
     function isSelected(id) {
@@ -13346,18 +13180,18 @@ CLOUD.Filter = function () {
         return false;
     }
 
-    // 是否半透明【半透明选中】
-    function isTranslucentFromTranslucentSelectedSet(id) {
+
+    // 判断构件是否半透明
+    function isTranslucent(id) {
+
+        //双击半透明不能pick
+        if (isDemolished(id)) {
+            return true;
+        }
 
         if (_translucentSelectionSet && _translucentSelectionSet[id]) {
             return true;
         }
-
-        return false;
-    }
-
-    // 是否半透明【半透明未选中】
-    function isTranslucentFromTranslucentUnselectedSet(id) {
 
         // 如果ID不在未半透明构件集，则该构件半透明
         if (_translucentUnselectionSet && !_translucentUnselectionSet[id]) {
@@ -13367,63 +13201,16 @@ CLOUD.Filter = function () {
         return false;
     }
 
-    // 判断构件是否半透明
-    function isTranslucent(id) {
 
-        if (_translucentAll) {
-            return true;
-        }
-
-        //双击半透明不能pick
-        if (isDemolished(id)) {
-            return true;
-        }
-
-        if (isTranslucentFromTranslucentSelectedSet(id)) {
-            return true;
-        }
-
-        if (isTranslucentFromTranslucentUnselectedSet(id)) {
-            return true;
-        }
-
-        return false;
-    }
-
-    // 是否可见【隐藏选中】
-    function isVisibleFromHideSeletedSet(id) {
-
-        if (_hideSelectionSet && _hideSelectionSet[id]) {
-            return false;
-        }
-
-        return true;
-    }
-
-    // 是否可见【隐藏未选中】
-    function isVisibleFromHideUnseletedSet(id) {
-
-        // 如果ID不在未选中构件集，则该构件隐藏
-        if (_hideUnselectionSet && !_hideUnselectionSet[id]) {
-            return false;
-        }
-
-        return true;
-    }
 
     this.clear = function () {
         _visibilityFilter = {};
         _fileFilter = {};
         _sceneOverriderState = false;
-        _hideUnselected = false;
-        _hideAll = false;
-        _translucentAll = false;
         _materialOverriderByUserId = {};
         _materialOverriderByUserData = {};
         _selectionSet = null;
         _demolishSet = null;
-        _hideUnselectionSet = null;
-        _hideSelectionSet = null;
         _translucentUnselectionSet = null;
         _translucentSelectionSet = null;
     };
@@ -13462,17 +13249,47 @@ CLOUD.Filter = function () {
     ////////////////////////////////////////////////////////////////////
     // Visbililty Filter API
 
+    this.setVisibleConditions = function(conditions){
+        
+        _visibilityFilter.conditions = conditions;
+
+    };
+
     // only show the nodes with the specified ids. 
-    this.setFilterByUserIds = function (ids) {
+    this.showByUserIds = function (ids) {
 
         if (ids) {
-            _visibilityFilter.ids = {};
+            _visibilityFilter.visibleIds = {};
+            var visibleIds = _visibilityFilter.visibleIds;
             for (var ii = 0, len = ids.length; ii < len; ++ii) {
-                _visibilityFilter.ids[ids[ii]] = true;
+                visibleIds[ids[ii]] = true;
             }
         }
         else {
-            delete _visibilityFilter.ids;
+            delete _visibilityFilter.visibleIds;
+        }
+
+    };
+    // to remove
+    this.setFilterByUserIds = function (ids) {
+        this.showByUserIds(ids);
+    };
+
+
+    // hide by the ids.
+    this.hideByUserIds = function (ids) {
+
+        if (ids) {
+            if (!_visibilityFilter.invisibleIds)
+                _visibilityFilter.invisibleIds = {};
+
+            var invisibleIds = _visibilityFilter.invisibleIds;
+            for (var ii = 0, len = ids.length; ii < len; ++ii) {
+                invisibleIds[ids[ii]] = true;
+            }
+        }
+        else {
+            delete _visibilityFilter.invisibleIds;
         }
 
     };
@@ -13483,46 +13300,59 @@ CLOUD.Filter = function () {
         if (!ids)
             return;
 
-        if (!_visibilityFilter.ids)
-            _visibilityFilter.ids = {};
+        if (!_visibilityFilter.visibleIds)
+            _visibilityFilter.visibleIds = {};
 
+        var visibleIds = _visibilityFilter.visibleIds;
         for (var ii = 0, len = ids.length; ii < len; ++ii) {
-            _visibilityFilter.ids[ids[ii]] = true;
+            visibleIds[ids[ii]] = true;
         }
     };
 
     // 将值为value的ID加入到名字为name的可见过滤器中
     this.addUserFilter = function (name, value) {
 
-        if (_visibilityFilter[name] === undefined) {
-            _visibilityFilter[name] = {};
+        var filters = _visibilityFilter.filters;
+        if (filters === undefined) {
+            _visibilityFilter.filters = {};
+            filters = _visibilityFilter.filters;
         }
 
-        _visibilityFilter[name][value] = true;
+        if (filters[name] === undefined) {
+            filters[name] = {};
+        }
+
+        filters[name][value] = true;
     };
 
     // 获得名字为name的可见对象集
     this.getUserFilter = function (name) {
-        return _visibilityFilter[name];
+        if(_visibilityFilter.filters)
+            return _visibilityFilter.filters[name];
+        return undefined;
     };
 
     // 从名字为name的可见过滤器中移除值为value的ID
     this.removeUserFilter = function (name, value) {
 
-        if (!_visibilityFilter[name])
+        var filters = _visibilityFilter.filters;
+        if (!filters)
+            return;
+
+        if (!filters[name])
             return;
 
         if (value === undefined) {
-            delete _visibilityFilter[name];
+            delete filters[name];
         }
         else {
 
-            if (_visibilityFilter[name][value]) {
-                delete _visibilityFilter[name][value];
+            if (filters[name][value]) {
+                delete filters[name][value];
             }
 
-            if (Object.getOwnPropertyNames(_visibilityFilter[name]).length == 0) {
-                delete _visibilityFilter[name];
+            if (Object.getOwnPropertyNames(filters[name]).length == 0) {
+                delete filters[name];
             }
 
         }
@@ -13530,7 +13360,7 @@ CLOUD.Filter = function () {
 
     // 清除可见过滤器
     this.clearUserFilters = function () {
-        _visibilityFilter = {};
+        _visibilityFilter = {};        
     };
 
     // 增加文件id到文件过滤器中
@@ -13740,16 +13570,8 @@ CLOUD.Filter = function () {
     // 清除选择集
     this.clearSelectionSet = function () {
 
-        if (_selectionSet) {
+        _selectionSet = null;
 
-            // 需要delete 属性么？？？ 直接赋null值，对内存有影响么？
-
-            for (var id in _selectionSet) {
-                delete _selectionSet[id];
-            }
-
-            _selectionSet = null;
-        }
     };
 
     // 增加或移除某个选中构件
@@ -13851,51 +13673,65 @@ CLOUD.Filter = function () {
     // 清空容器
     this.clearDemolishSet = function () {
 
-        if (_demolishSet) {
+        _demolishSet = null;
 
-            for (var id in _demolishSet) {
-
-                if (_demolishSet[id]) {
-
-                    delete _demolishSet[id];
-
-                }
-            }
-
-            _demolishSet = null;
-
-        }
     };
 
     ////////////////////////////////////////////////////////////////
     // 判断是否可见, true: 可见， 否则 不可见
     this.isVisible = function (node) {
 
-        if (_hideAll) {
+        var id = node.name;
+
+        if (_visibilityFilter.visibleIds && _visibilityFilter.visibleIds[id] === undefined) {
             return false;
         }
 
-        var id = node.name;
-        if (_visibilityFilter.ids && _visibilityFilter.ids[id] === undefined) {
+        if (_visibilityFilter.invisibleIds && _visibilityFilter.invisibleIds[id]) {
             return false;
         }
 
         if (!node.userData)
             return true;
 
-        for (var item in _visibilityFilter) {
+        var filters = _visibilityFilter.filters;
+        if (filters) {
+            for (var item in filters) {
 
-            var userValue = node.userData[item];
-            if (userValue && _visibilityFilter[item][userValue] !== undefined) {
-                return false;
+                var userValue = node.userData[item];
+                if (userValue && filters[item][userValue] !== undefined) {
+                    return false;
+                }
             }
         }
 
-        if (!isVisibleFromHideSeletedSet(id)) {
-            return false;
-        }
+        var conditions = _visibilityFilter.conditions;
+        if (conditions) {
 
-        if (!isVisibleFromHideUnseletedSet(id)) {
+            var len = conditions.length;
+            if (len == 0)  // hide if visible array is empty
+                return false;
+
+            var userData = node.userData;
+
+            function matchCondition(condition) {
+                
+                for (var item in condition) {
+                    if (condition[item] != userData[item])
+                        return false;
+                }
+
+                return true;
+            }
+
+            
+            for (var idx = 0; idx < len; ++idx) {     
+                if (matchCondition(conditions[idx])) {
+                    return true;
+                }
+            }
+
+            // hide if not match.
             return false;
         }
 
@@ -14036,8 +13872,6 @@ CLOUD.Filter = function () {
     // 未选中的构件隐藏设置
     this.setHideUnselected = function (enabled) {
 
-        _hideUnselected = enabled;
-
         // 如果上一次隐藏了选中构造
         if (enabled) {
             pushToHideUnselectionSet();
@@ -14047,7 +13881,7 @@ CLOUD.Filter = function () {
 
     // 是否隐藏未选中的构件
     this.isHideUnselected = function () {
-        return _hideUnselected;
+        return _visibilityFilter.visibleIds !== undefined;
     };
 
     // 选中构件隐藏设置
@@ -14056,7 +13890,6 @@ CLOUD.Filter = function () {
         if (enabled) {
 
             pushToHideSelectionSet();
-            this.clearSelectionSet();
         }
     };
 
@@ -14066,7 +13899,6 @@ CLOUD.Filter = function () {
         if (enabled) {
 
             pushToTranslucentSelectionSet();
-            this.clearSelectionSet();
         }
 
     };
@@ -14085,26 +13917,25 @@ CLOUD.Filter = function () {
     this.cancelTranslucentAll = function () {
 
         // 全场景半透明
-        if (_sceneOverriderState) {
-            _sceneOverriderState = false;
-        }
+        _sceneOverriderState = false;
 
-        this.clearDemolishSet();
-        clearTranslucentSelectionSet();
-        clearTranslucentUnselectionSet();
+        _demolishSet = null;
 
+        _translucentSelectionSet = null;
+        _translucentUnselectionSet = null;
     };
 
     // 恢复所有构件
     this.revertAll = function () {
 
-        this.clearDemolishSet();
-        this.clearSelectionSet();
-        clearHideSelectionSet();
-        clearHideUnselectionSet();
-        clearTranslucentSelectionSet();
-        clearTranslucentUnselectionSet();
-        resetSelectionState();
+        _demolishSet = null;
+        _selectionSet = null;
+        
+        _visibilityFilter = {};
+
+        _translucentSelectionSet = null;
+        _translucentUnselectionSet = null;
+        _sceneOverriderState = false;
     };
 
     // ------------------- 隔离功能（隐藏／半透明）E ------------------- //
@@ -19440,7 +19271,7 @@ CLOUD.EditorManager.prototype = {
         return (this.enableAnimation && this.animator && this.animator.isPlaying());
     },
 
-    setStandardView: function(stdView, viewer, margin) {
+    setStandardView: function(stdView, viewer, margin, callback) {
 
         var camera = viewer.camera;
 
@@ -19452,7 +19283,7 @@ CLOUD.EditorManager.prototype = {
 
             this.animator.setDuration(this.animationDuration);
             this.animator.setFrameTime(this.animationFrameTime);
-            this.animator.setStandardView(stdView, viewer, margin);
+            this.animator.setStandardView(stdView, viewer, margin, callback);
 
         } else {
 
@@ -19463,6 +19294,9 @@ CLOUD.EditorManager.prototype = {
             target = viewer.camera.zoomToBBox(box, margin);
             viewer.cameraEditor.updateCamera(target);
             viewer.render();
+
+            // 是否回调
+            callback && callback();
 
             camera.up.copy(THREE.Object3D.DefaultUp); // 渲染完成后才可以恢复相机up方向
         }
@@ -19951,6 +19785,41 @@ CLOUD.ClipPlanes = function (size, center) {
         this.uniforms.iClipPlane.value = enable ? 6 : 0;
     };
 
+    ClipPlanesInfo = function (enable, visible, rotatable, planeOffset, position, scale, quaternion) {
+        this.enable = enable;
+        this.visible = visible;
+        this.rotatable = rotatable;
+        this.planeOffset = planeOffset.slice(0);
+        this.position = position;
+        this.scale = scale;
+        this.quaternion = quaternion;
+    };
+
+    this.store = function () {
+        var clipPlanesInfo = new ClipPlanesInfo(this.uniforms.iClipPlane.value ? true : false, this.visible, this.rotatable, this.planeOffset, this.position, this.scale, this.quaternion);
+        return JSON.stringify(clipPlanesInfo);
+    };
+
+    this.restore = function (clipPlanesInfo) {
+        var info = JSON.parse(clipPlanesInfo);
+
+        this.enable(info.enable, info.visible);
+        this.rotatable = info.rotatable;
+
+        for (var i = 0; i < 6; ++i) {
+            this.planeOffset[i] = info.planeOffset[i];
+        }
+        this.position.copy(info.position);
+        this.scale.copy(info.scale);
+
+        this.quaternion._w = info.quaternion._w;
+        this.quaternion._x = info.quaternion._x;
+        this.quaternion._y = info.quaternion._y;
+        this.quaternion._z = info.quaternion._z;
+
+        this.update();
+    };
+
     this.reset = function () {
         for (var i = 0; i < 6; ++i) {
             this.planeOffset[i] = 0;
@@ -20074,6 +19943,7 @@ CLOUD.ClipPlanes.prototype.raycast = (function () {
 CLOUD.ClipPlanesEditor = function (object, scene, domElement) {
     CLOUD.OrbitEditor.call(this, object, scene, domElement);
 
+    this.cameraEditor = object;
     this.scene = scene;
     var clipPlanes = scene.getClipPlanes();
 
@@ -20081,6 +19951,8 @@ CLOUD.ClipPlanesEditor = function (object, scene, domElement) {
     this.selectIndex = null;
     this.normal = null;
     this.plane = null;
+
+    this.offsetSpeed = 0.02;
 
     this.toggle = function (enable, visible) {
         if (CloudShaderLib === undefined) {
@@ -20104,6 +19976,22 @@ CLOUD.ClipPlanesEditor = function (object, scene, domElement) {
         }
 
         clipPlanes.rotatable = enable;
+    };
+
+    this.store = function () {
+        if (CloudShaderLib === undefined) {
+            return;
+        }
+
+        return clipPlanes.store();
+    };
+
+    this.restore = function (clipPlanesInfo) {
+        if (CloudShaderLib === undefined) {
+            return;
+        }
+
+        clipPlanes.restore(clipPlanesInfo);
     };
 
     this.reset = function () {
@@ -20140,6 +20028,7 @@ CLOUD.ClipPlanesEditor = function (object, scene, domElement) {
 
     this.getPlane = function() {
         this.normal = clipPlanes.uniforms.vClipPlane.value[this.selectIndex ].clone();
+        //this.normal = this.cameraEditor.object.getWorldDirection().negate();
 
         var plane = clipPlanes.uniforms.vClipPlane.value[(this.selectIndex + 2) % 6].clone();
         var normal = new THREE.Vector3(plane.x, plane.y, plane.z);
@@ -20150,10 +20039,10 @@ CLOUD.ClipPlanesEditor = function (object, scene, domElement) {
 
     this.offset = function (offset) {
         if (this.selectIndex % 2 == 1) {
-            clipPlanes.offset(this.selectIndex, -offset * 0.1);
+            clipPlanes.offset(this.selectIndex, -offset  * this.offsetSpeed);
         }
         else {
-            clipPlanes.offset(this.selectIndex, offset * 0.1);
+            clipPlanes.offset(this.selectIndex, offset  * this.offsetSpeed);
         }
     };
 
@@ -20243,6 +20132,7 @@ CLOUD.ClipPlanesEditor.prototype.processMouseMove = function (event) {
 };
 CLOUD.ClipPlaneService = function(viewer) {
     this.viewer = viewer;
+    this.clipPlanesInfo = null;
 };
 
 CLOUD.ClipPlaneService.prototype = {
@@ -20392,6 +20282,20 @@ CLOUD.ClipPlaneService.prototype = {
 
     },
 
+    clipPlanesStore: function(enable) {
+
+        var clipPlanesEditor = this.getClipPlanesEditor();
+        this.clipPlanesInfo = clipPlanesEditor.store();
+
+    },
+
+    clipPlanesRestore: function(enable) {
+
+        var clipPlanesEditor = this.getClipPlanesEditor();
+        clipPlanesEditor.restore(this.clipPlanesInfo);
+
+    },
+
     clipPlanesReset: function(enable) {
 
         var clipPlanesEditor = this.getClipPlanesEditor();
@@ -20415,6 +20319,13 @@ CLOUD.ExtensionHelper.prototype = {
 
         // TODO: clear other resources.
 
+        this.uninitAnnotation();
+        this.uninitMarkerEditor();
+        this.destroyAllMiniMap();
+
+        this.annotationEditor = null;
+        this.markerEditor = null;
+        this.markerClickCallback = null;
         this.viewer = null;
     },
 
@@ -20725,6 +20636,14 @@ CLOUD.ExtensionHelper.prototype = {
         }
     },
 
+    destroyAllMiniMap:function(){
+
+        for(var name in this.miniMaps) {
+
+            this.destroyMiniMap(name);
+        }
+    },
+
     removeMiniMap: function (name) {
 
         var miniMap = this.miniMaps[name];
@@ -20888,17 +20807,17 @@ CloudViewer = function() {
 
     this.editorManager = new CLOUD.EditorManager();
 
-    this.isMobile = 0;
-    var u = navigator.userAgent;
-    if (u.indexOf('Android') > -1) {
-        this.isMobile = 1;
-    } else if (u.indexOf('iPhone') > -1) {
-        this.isMobile = 2;
-    } else if (u.indexOf('Windows Phone') > -1) {
-        this.isMobile = 3;
-    } else {
-
-    }
+    //this.isMobile = 0;
+    //var u = navigator.userAgent;
+    //if (u.indexOf('Android') > -1) {
+    //    this.isMobile = 1;
+    //} else if (u.indexOf('iPhone') > -1) {
+    //    this.isMobile = 2;
+    //} else if (u.indexOf('Windows Phone') > -1) {
+    //    this.isMobile = 3;
+    //} else {
+    //
+    //}
 };
 
 CloudViewer.prototype = {
@@ -20906,6 +20825,8 @@ CloudViewer.prototype = {
     constructor: CloudViewer,
 
     destroy: function() {
+
+        this.removeAllRenderCallback();
 
         this.editorManager.unregisterDomEventListeners(this.domElement);
 
@@ -20929,6 +20850,67 @@ CloudViewer.prototype = {
         this.editorManager = null;
 
     },
+
+    // ------ 管理外部插件的render S -------------- //
+
+    // 注册render回调函数
+    addRenderCallback: function (callback) {
+
+        if (!this.renderCallbacks) {
+            this.renderCallbacks = [];
+        }
+
+        this.renderCallbacks.push(callback);
+    },
+
+    // 取消注册
+    removeRenderCallback: function (callback) {
+
+        if (!this.renderCallbacks) return;
+
+        var renderCallbacks = this.renderCallbacks;
+        var index = renderCallbacks.indexOf(callback);
+
+        if (index !== -1) {
+
+            renderCallbacks.splice(index, 1);
+
+        }
+
+    },
+
+    // 取消所有注册
+    removeAllRenderCallback: function () {
+
+        if (!this.renderCallbacks) return;
+
+        var renderCallbacks = this.renderCallbacks;
+
+        for (var i = 0, length = renderCallbacks.length; i < length; i++) {
+
+            renderCallbacks.splice(0, 1);
+
+        }
+
+        this.renderCallbacks = null;
+    },
+
+    // 响应render
+    onRenderCallback: function () {
+
+        if (!this.renderCallbacks) return;
+
+        var renderCallbacks = this.renderCallbacks;
+
+        for (var i = 0, length = renderCallbacks.length; i < length; i++) {
+
+            renderCallbacks[i]();
+
+        }
+
+    },
+
+    // ------ 管理外部插件的render E -------------- //
 
     // 设置图片资源的路径。默认在“images/”
     setImageResPath: function(path) {
@@ -21093,7 +21075,7 @@ CloudViewer.prototype = {
             scope.rendering = false;
         }
 
-        //this.renderViewHouse();
+        //scope.onRenderCallback();
 
         // 刷新扩展绘制
         this.extensionHelper.renderExtensions();
@@ -21154,8 +21136,6 @@ CloudViewer.prototype = {
             console.warn('THREE.WebGLIncrementRenderer.IncrementRender: undefined!');
         }
 
-        //this.initViewHouse(domElement);
-
         // Camera
         //var camera = new CLOUD.Camera(viewportWidth, viewportHeight, 45, 0.01, CLOUD.GlobalData.SceneSize * 20, -CLOUD.GlobalData.SceneSize, CLOUD.GlobalData.SceneSize);
         var camera = new CLOUD.Camera(viewportWidth, viewportHeight, 45, 0.1, CLOUD.GlobalData.SceneSize * 20.0, -CLOUD.GlobalData.SceneSize, CLOUD.GlobalData.SceneSize);
@@ -21164,6 +21144,7 @@ CloudViewer.prototype = {
         var scope = this;
         this.cameraEditor = new CLOUD.CameraEditor(this, camera, domElement, function() {
             scope.render();
+            scope.onRenderCallback();
         });
 
         this.lookAt(new THREE.Vector3(-CLOUD.GlobalData.SceneSize * 0.5, CLOUD.GlobalData.SceneSize * 0.3, CLOUD.GlobalData.SceneSize), new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 1, 0));
@@ -21174,6 +21155,7 @@ CloudViewer.prototype = {
 
         this.modelManager.onUpdateViewer = function() {
             scope.render(true);
+            scope.onRenderCallback();
         };
 
         //this.editorManager.registerDomEventListeners(canvas);
@@ -21356,9 +21338,9 @@ CloudViewer.prototype = {
 
     },
 
-    setStandardView: function(stdView, margin) {
+    setStandardView: function(stdView, margin, callback) {
         margin = margin || -0.05;
-        this.editorManager.setStandardView(stdView, this, margin);
+        this.editorManager.setStandardView(stdView, this, margin, callback);
     },
 
     setTopView: function(box, margin, ratio) {
@@ -21396,7 +21378,7 @@ CloudViewer.prototype = {
     },
 
     // 获得render buffer的数据
-    getRenderBufferScreenShot: function() {
+    getRenderBufferScreenShot: function(backgroundClr) {
 
         // 在高分屏上toDataURL直接获得图片数据比实际的图片大
         var dataUrl = this.renderer.domElement.toDataURL("image/png");
@@ -21430,6 +21412,11 @@ CloudViewer.prototype = {
         tmpCanvas.width = w;
         tmpCanvas.height = h;
 
+        if (backgroundClr) {
+            ctx.fillStyle = backgroundClr;
+            ctx.fillRect(0, 0, w, h);
+        }
+
         ctx.drawImage(img, nx, ny, nw, nh);
 
         var newURL = tmpCanvas.toDataURL("image/png");
@@ -21437,7 +21424,7 @@ CloudViewer.prototype = {
         return newURL;
     },
 
-    canvas2image: function() {
+    canvas2image: function (backgroundClr) {
 
         var dataUrl = null;
 
@@ -21449,7 +21436,7 @@ CloudViewer.prototype = {
 
         } else {
 
-            dataUrl = this.getRenderBufferScreenShot();
+            dataUrl = this.getRenderBufferScreenShot(backgroundClr);
             // 在chrome中多调用几次，会出现图片显示不正常（显示空白，原因是转换的值变得不正常了），
             // 每次获得截图后，缓存数据貌似被清除了
             // 所以在每次调用后render一次
@@ -21524,70 +21511,6 @@ CloudViewer.prototype = {
         }
     },
 
-    //// 扩展功能的 render
-    //renderExtensions: function() {
-    //
-    //    // 刷新小地图
-    //    this.renderMiniMap();
-    //    // 刷新标记点
-    //    this.renderMarkers();
-    //    // 刷新批注
-    //    this.renderAnnotations();
-    //},
-
-    //// 扩展功能的 resize
-    //resizeExtensions: function(width, height, isMobile) {
-    //
-    //    this.resizeViewHouse(width, height, isMobile);
-    //
-    //    this.resizeMarkers();
-    //
-    //    this.resizeComments();
-    //},
-
-    // ------------------ ViewHouse API -- S ------------------ //
-    //// 外部初始化，由外部决定需不需要 ViewHouse 功能
-    //initViewHouse: function(domElement) {
-    //
-    //    if (!this.viewHouse) {
-    //        this.viewHouse = new CLOUD.ViewHouse(this);
-    //    }
-    //
-    //    this.setViewHouseVisibility(false);
-    //
-    //    domElement = domElement || this.domElement;
-    //
-    //    if (domElement) {
-    //        // 初始化 ViewHouse
-    //        this.viewHouse.init(domElement);
-    //    }
-    //},
-    //
-    //// 设置 ViewHouse 可见性
-    //setViewHouseVisibility: function(visible) {
-    //
-    //    if (this.viewHouse) {
-    //        this.viewHouse.visible = visible;
-    //    }
-    //},
-    //
-    //// 绘制 ViewHouse
-    //renderViewHouse: function() {
-    //
-    //    if (this.viewHouse) {
-    //        this.viewHouse.render();
-    //    }
-    //},
-    //
-    //// 重设置viewhouse大小
-    //resizeViewHouse: function(width, height, isMobile) {
-    //
-    //    if (this.viewHouse) {
-    //        this.viewHouse.resize(width, height, isMobile);
-    //    }
-    //},
-    // ------------------ ViewHouse API -- E ------------------ //
-
     // ------------------ 小地图API -- S ------------------ //
     createMiniMap: function(name, domElement, width, height, styleOptions, callbackCameraChanged, callbackClickOnAxisGrid) {
 
@@ -21613,12 +21536,6 @@ CloudViewer.prototype = {
 
         return this.extensionHelper.getMiniMap(name);
     },
-
-    //// 绘制小地图
-    //renderMiniMap: function() {
-    //
-    //    this.extensionHelper.renderMiniMap();
-    //},
 
     // 设置平面图
     setFloorPlaneData: function(jsonObj) {
@@ -21709,14 +21626,6 @@ CloudViewer.prototype = {
         this.extensionHelper.zoomToSelectedMarkers();
     },
 
-    //resizeMarkers: function() {
-    //    this.extensionHelper.resizeMarkers();
-    //},
-
-    //renderMarkers: function() {
-    //    this.extensionHelper.renderMarkers();
-    //},
-
     // 通过id选中某个标记
     selectMarkerById: function(id) {
 
@@ -21779,18 +21688,6 @@ CloudViewer.prototype = {
         return this.extensionHelper.getAnnotationInfoList();
 
     }
-    //
-    //// 窗口resize
-    //resizeComments: function() {
-    //
-    //    this.extensionHelper.resizeAnnotations();
-    //},
-    //
-    //// 重绘
-    //renderAnnotations: function() {
-    //
-    //    this.extensionHelper.renderAnnotations();
-    //}
 
     // ------------------ 批注 API -- E ------------------ //
 };

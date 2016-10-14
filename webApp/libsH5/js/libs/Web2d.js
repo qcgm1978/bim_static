@@ -1,5 +1,8 @@
 // 如果独立web2d,这个通用库需要提出来
 var CLOUD = CLOUD || {};
+
+CLOUD.Version2D = "20161009";
+
 CLOUD.DomUtil = CLOUD.DomUtil || {
         /**
          * split string on whitespace
@@ -4313,8 +4316,12 @@ CLOUD.MiniMap = function (viewer) {
         // 计算轴网包围盒
         for (var i = 0, len = grids.length; i < len; i++) {
 
-            var start = new THREE.Vector2(grids[i].start.X, grids[i].start.Y);
-            var end = new THREE.Vector2(grids[i].end.X, grids[i].end.Y);
+            var grid = grids[i];
+            var startPt = grid.start || grid.Start;
+            var endPt = grid.end || grid.End;
+
+            var start = new THREE.Vector2(startPt.X, startPt.Y);
+            var end = new THREE.Vector2(endPt.X, endPt.Y);
 
             _axisGridBox2D.expandByPoint(start);
             _axisGridBox2D.expandByPoint(end);
@@ -4353,9 +4360,14 @@ CLOUD.MiniMap = function (viewer) {
 
         for (i = 0; i < len; i++) {
 
-            var name = grids[i].name;
-            var start = new THREE.Vector2(grids[i].start.X, grids[i].start.Y);
-            var end = new THREE.Vector2(grids[i].end.X, grids[i].end.Y);
+            var grid = grids[i];
+
+            var name = grid.name;
+            var startPt = grid.start || grid.Start;
+            var endPt = grid.end || grid.End;
+
+            var start = new THREE.Vector2(startPt.X, startPt.Y);
+            var end = new THREE.Vector2(endPt.X, endPt.Y);
 
             worldToNormalizedPoint(start);
             normalizedPointToScreen(start);
@@ -4946,12 +4958,15 @@ CLOUD.MiniMap = function (viewer) {
         var boxCenter = bBox2D.center();
         var scaleX = _svgWidth / axisGridBoxSize.x;
         var scaleY = _svgHeight / axisGridBoxSize.y;
-        var width = boxSize.x * scaleX;
-        var height = boxSize.y * scaleY;
-        var offset = boxCenter.clone().sub(axisGridCenter);
 
-        offset.x *= scaleX;
-        offset.y *= -scaleY;
+        var scale = Math.min(scaleX, scaleY);
+
+        var width = boxSize.x * scale;
+        var height = boxSize.y * scale;
+        //var offset = boxCenter.clone().sub(axisGridCenter);
+
+        //offset.x *= scale;
+        //offset.y *= -scale;
 
         if (!_axisGridBox2D.containsBox(bBox2D)) {
             console.warn('the bounding-box of axis-grid is not contains the bounding-box of floor-plane!');
@@ -4965,7 +4980,7 @@ CLOUD.MiniMap = function (viewer) {
         _svgNode.setAttribute("height", height + "");
         _svgNode.setAttribute("x", (-0.5 * width) + "");
         _svgNode.setAttribute("y", (-0.5 * height) + "");
-        _svgNode.setAttribute("transform", 'translate(' + offset.x + ',' + offset.y + ')');
+        //_svgNode.setAttribute("transform", 'translate(' + offset.x + ',' + offset.y + ')');
     };
 
     // 重设轴网大小
@@ -7509,7 +7524,7 @@ CLOUD.Extensions.AnnotationCloud.prototype.setSeal = function (isSeal) {
 
     this.isSeal = isSeal;
 
-    this.calculatePosition(true);
+    this.calculatePosition(false);
     this.update();
 };
 
@@ -9242,8 +9257,8 @@ CLOUD.Extensions.AnnotationEditor.prototype.onKeyUp = function (event) {
             if (this.annotationType === CLOUD.Extensions.Annotation.shapeTypes.CLOUD) {
 
                 // 结束云图绘制，不封闭云图
-                this.selectedAnnotation.setSeal(false);
                 this.selectedAnnotation.finishTrack();
+                this.selectedAnnotation.setSeal(false);
                 this.createAnnotationEnd();
                 this.deselectAnnotation();
             }
