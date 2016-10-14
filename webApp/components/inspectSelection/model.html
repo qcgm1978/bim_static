@@ -22,6 +22,8 @@
     }
     var Request = GetRequest();
 
+    var _host='http://' + location.host;
+
     var viewer = new InspectModelSelection({
         type: Request.type,//open process
         sourceId: Request.sourceId,
@@ -31,7 +33,7 @@
         ruleType: Request.ruleType,
         token: Request.token,
         appKey: Request.appKey,
-        host: 'http://' + location.host,
+        host: _host,
         height:Request.height,
         width:Request.width,
         //res 选择的检查点数据
@@ -134,20 +136,44 @@
     }
 
     function showRiskComponent(componentId, location) {
-        if(typeof location === 'string'){
-            location=JSON.parse(location);
-        }
-        var view = viewer.Project.Viewer;
-        view.highlight({
-            type: "userId",
-            ids: [componentId]
+        getModelId(componentId,function(id){
+            if(typeof location === 'string'){
+                location=JSON.parse(location);
+            }
+            location.userId=id;
+            location=JSON.stringify(location);
+            var view = viewer.Project.Viewer;
+            view.highlight({
+                type: "userId",
+                ids: [id]
+            });
+            viewer.Project.currentRiskShowData={
+                id:componentId,
+                marker:location
+            }
+            view.loadMarkers([location]);
         });
-        viewer.Project.currentRiskShowData={
-            id:componentId,
-            marker:JSON.stringify(location)
-        }
-        view.loadMarkers([JSON.stringify(location)]);
     }
+
+    function getModelId(componentId,callback){
+        var ids=componentId.split('.');
+        var _fileId=ids[0],
+                userId=ids[1];
+        $.ajax({
+            url: _host+"/doc/api/" + Request.projectId + '/' + Request.projectVersionId + "?fileId=" +_fileId,
+        }).done(function(data) {
+            if (data.code == 0) {
+                var modelId = data.data && data.data.modelId;
+                if(modelId){
+                    componentId=modelId+'.'+userId;
+                    callback(componentId);
+                }
+            }else{
+                alert('获取构件ID失败');
+            }
+        });
+    }
+
     function showPresetPoint(presetId,isClearRisk) {
 
         if(isClearRisk){
