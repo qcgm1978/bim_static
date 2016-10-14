@@ -513,12 +513,20 @@
 				_hideCode=null;
 
 			if (cat == '梁柱节点') {
-				_specialFilterFiles=_this.filterSingleFiles('ST');
+				if(!floor){
+					floor=_this.getFloors();
+					_specialFilterFiles=[];
+					_.each(floor,function(item){
+						_specialFilterFiles.push('WDGC-Q-ST-'+item+'.rvt');
+					})
+				}else{
+					_specialFilterFiles=['WDGC-Q-ST-'+floor+'.rvt'];
+				}
 				_extArray=['ST'];
 				_this.linkSilder('floors', floor);
 				_this.linkSilderSpecial('specialty', _specialFilterFiles,_extArray);
-				_v.filter({
-					ids: _this.filterHideCode(['10.20.20.03']),
+				Project.Viewer.filter({
+					ids: _this.filterHideCode(['10.20.20.03','10.01']),
 					type: "classCode"
 				})
 				return
@@ -1291,6 +1299,8 @@
 	//Project模型操作方法
 	var Project = {
 		presetPointShowData:null,
+		currentSearchFloor:'',
+		currentSearchCat:'',
 		isSelect:'open',
 		currentHightLight:[],
 		//显示隐患和预设点
@@ -1565,6 +1575,11 @@
 				})
 				Project.showMarks(array);
 				Project.Viewer.setTopView(boxs, true);
+				ModelFilter.recoverySilder();
+				if(Project.currentSearchCat){
+					ModelFilter.sigleRule(Project.currentSearchCat,Project.currentSearchFloor);
+					$(".tbOpeningacceptanceBody tr").removeClass('selected');
+				}
 			} else {
 				Project.hideMarks();
 			}
@@ -1609,6 +1624,10 @@
 			//		App.Project.currentProsCheckFloor=App.Project.currentProsCheckFloor+','+'其它';
 			//	}
 			//}
+			if(data){
+				Project.currentSearchFloor=data.floor;
+				Project.currentSearchCat=data.category?mapData.processCategory[data.category]:'';
+			}
 
 			OpeningAcceptanceCollection.fetch({
 				data: $.extend({}, {
@@ -1832,8 +1851,10 @@
 		selectInspect: function(e) {
 			var $target = $(e.currentTarget);
 			Project.currentInspectId = $target.data('id');
-			$target.parent().find('tr').removeClass('selected');
-			$target.addClass('selected');
+			if(Project.isSelect!='close'){
+				$target.parent().find('tr').removeClass('selected');
+				$target.addClass('selected');
+			}
 			Project.showInModel($target, 2);
 		},
 		//加载
