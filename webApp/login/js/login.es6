@@ -146,7 +146,7 @@ var Login = {
 			} else {
 
 				//登录失败
-				$("#mainBox .errorMSG").addClass('show').find(".tip").text("登录失败:" + data.message);
+				$("#mainBox .errorMSG").addClass('show').find(".tip").text("登录失败:用户名密码错误" );
 				$("#btnLogin").val("立即登录").data("islogin", false);
 
 			}
