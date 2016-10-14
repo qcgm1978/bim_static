@@ -155,7 +155,7 @@ App.Project = {
 			_hideCode=null;
 
 		if (cat == '梁柱节点') {
-			_specialFilterFiles=_this.filterSingleFiles('ST');
+			_specialFilterFiles=['WDGC-Q-ST-'+floor+'.rvt'];
 			_extArray=['ST'];
 			this.linkSilder('floors', floor);
 			this.linkSilderSpecial('specialty', _specialFilterFiles,_extArray);
@@ -186,8 +186,8 @@ App.Project = {
 				_specialFilterFiles=_this.filterSingleFiles('CW&LI');
 				_extArray=['CW&LI'];
 				_hideCode=null;
-				floor=floor.split(',');
 				if(cat=="外保温"){
+					floor=floor.split(',');
 					App.Project.Settings.Viewer.filter({
 						ids: _this.filterHideCode(['10.10.20.03.06.20.10'],true),
 						type: "classCode"

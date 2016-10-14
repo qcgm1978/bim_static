@@ -77,17 +77,18 @@
         param = JSON.parse(param);
         param = param || {};
         viewer.Project.mode = type;
-        viewer.Project.isSelect = true;
         view.loadMarkers(null);
         if (param.presetId && (!param.componentId && !param.location)) {
             type = "preset";
             viewer.Project.mode = type;
+            viewer.Project.isSelect = 'once';
             view.viewer.getFilters().setSelectedIds();
             showPresetPoint(param.presetId,true);
         }
         if (!param.presetId && (param.componentId && param.location)) {
             type = "risk";
             viewer.Project.mode = type;
+            viewer.Project.isSelect = 'open';
             viewer.Project.presetPointShowData=null;
             viewer.Project.presetPoint=null;
             $(".tbOpeningacceptanceBody tr").removeClass('selected');
@@ -99,6 +100,7 @@
         }
 
         if(param.presetId && param.componentId && param.location){
+            viewer.Project.isSelect = 'once';
             showRiskComponent(param.componentId, param.location);
             showPresetPoint(param.presetId);
         }
@@ -115,6 +117,7 @@
             viewer.Project.presetPoint=null;
             viewer.Project.currentRiskShowData=null;
             viewer.Project.currentUserId=null;
+            viewer.Project.isSelect = 'open';
             type="edit";
             viewer.Project.mode = type;
         }
