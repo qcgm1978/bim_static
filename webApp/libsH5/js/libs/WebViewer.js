@@ -32,7 +32,9 @@ CLOUD.GlobalData = {
 
     EnableDemolishByDClick: true,
 
-    ZipResourcePostfix : ""
+    ZipResourcePostfix: "",
+
+    SelectionColor : { color: 0x003BBD, opacity: 0.5, side: THREE.DoubleSide, transparent: true }
 };
 
 CLOUD.EnumObjectLevel = {
@@ -6506,7 +6508,7 @@ CLOUD.MaterialUtil = {
 
     createHilightMaterial: function () {
 
-        return this.createPhongMaterial({ color: 0x003BBD, opacity: 0.5, side: THREE.DoubleSide, transparent: true });
+        return this.createPhongMaterial(CLOUD.GlobalData.SelectionColor);
     }
 };
 

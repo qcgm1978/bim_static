@@ -23,8 +23,8 @@ App.ResourceModel.ListContent = Backbone.View.extend({
 	render: function() {
 
 		this.$el.html(this.template);
-		this.$el.find('.cachetest').click(function(){
-			alert('3:24')
+		this.$el.find('.cachetests').click(function(){
+			alert('5:44')
 		})
 		return this;
 	},
