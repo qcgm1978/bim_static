@@ -31,7 +31,7 @@ var AppRoute = Backbone.Router.extend({
 		if (this.reset() == false) {
 			return;
 		}
-		this.reset();
+		//this.reset();
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".bodyConMenu").addClass('selected');
 		_.require('/static/dist/bodyContent/bodyContent.css');
 		_.require('/static/dist/bodyContent/bodyContent.js');
