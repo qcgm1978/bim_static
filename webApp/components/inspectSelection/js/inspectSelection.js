@@ -1178,15 +1178,16 @@
 			//param = JSON.parse(param);
 			param = param || {};
 			Project.mode = type;
-			Project.isSelect = true;
 			view.loadMarkers(null);
 			if (param.presetId && (!param.componentId && !param.location)) {
 				type = "preset";
 				Project.mode = type;
+				Project.isSelect = 'once';
 				_this.showPresetPoint(param.presetId,true);
 			}
 			if (!param.presetId && (param.componentId && param.location)) {
 				type = "risk";
+				Project.isSelect = 'open';
 				Project.mode = type;
 				Project.presetPointShowData=null;
 				Project.presetPoint=null;
@@ -1194,12 +1195,14 @@
 			}
 
 			if(param.presetId && param.componentId && param.location){
+				Project.isSelect = 'once';
 				_this.showRiskComponent(param.componentId, param.location);
 				_this.showPresetPoint(param.presetId);
 			}
 
 			if(!param.presetId && !param.componentId && !param.location ){
 				type="edit";
+				Project.isSelect = 'open';
 				Project.mode = type;
 			}
 			return type;
@@ -1450,51 +1453,48 @@
 				$("#propertyPanel .designProperties").html(html);
 			});
 		},
-		showInModel: function($target, type) {
-			if( Project.mode && Project.mode !== 'risk' && Project.mode!=='edit' && !Project.isSelect){
-				return
+		showInModel: function ($target, type) {
+			if (Project.isSelect == 'open' || Project.isSelect == 'once') {
+				var _this = this,
+					id = $target.data('id'),
+					color = $target.data('color'),
+					_temp = null,
+					location = null,
+					item = null;
+				_.each(Project.currentPageListData, function (i) {
+					if (i.id == id) {
+						_temp = i.location;
+						location = i.location;
+						item = i;
+					}
+				})
+				if (_temp) {
+					_temp = JSON.parse(_temp);
+					ModelFilter.filter($target, _temp.componentId, location, $target.data('cat'), 2)
+					//ModelFilter.recoverySilder();
+					var box = _this.formatBBox(_temp.bBox || _temp.boundingBox);
+					 var ids = [_temp.componentId];
+					 _this.zoomModel(ids, box);
+					 _this.showMarks(Project.formatMark(location, color));
+				}
+				if (item) {
+					Project.presetPoint = {
+						location: location,
+						id: id,
+						fileUniqueId: item.fileId + item.componentId.slice(item.componentId.indexOf('.')),
+						axis: item.axis,
+						locationName: item.locationName
+					}
+					Project.presetPointShowData = {
+						id: item.componentId,
+						marker: Project.formatMark(location, color)
+					}
+					Project.showStatus(Project.presetPointShowData, Project.currentRiskShowData)
+				}
+				if (Project.isSelect == 'once') {
+					Project.isSelect = 'close';
+				}
 			}
-			var _this = this,
-				id = $target.data('id'),
-				color = $target.data('color'),
-				_temp = null,
-				location = null,
-				item=null;
-			_.each(Project.currentPageListData, function(i) {
-				if (i.id == id) {
-					_temp = i.location;
-					location = i.location;
-					item=i;
-				}
-			})
-			if (_temp) {
-				_temp = JSON.parse(_temp);
-				if( Project.mode !== 'risk'){
-					ModelFilter.filter($target,_temp.componentId,location,$target.data('cat'),2)
-				}else{
-					ModelFilter.recoverySilder();
-				}
-				var box = _this.formatBBox(_temp.bBox || _temp.boundingBox);
-				var ids = [_temp.componentId];
-				_this.zoomModel(ids, box);
-				_this.showMarks(Project.formatMark(location, color));
-			}
-			Project.isSelect=false;
-			if(item){
-				Project.presetPoint={
-					location:location,
-					id:id,
-					fileUniqueId:item.fileId + item.componentId.slice(item.componentId.indexOf('.')),
-					axis:item.axis,
-					locationName:item.locationName
-				}
-				Project.presetPointShowData={
-					id:item.componentId,
-					marker:Project.formatMark(location, color)
-				}
-				Project.showStatus(Project.presetPointShowData,Project.currentRiskShowData)
-			}
-
 		},
 
 		showMarks: function(marks) {
