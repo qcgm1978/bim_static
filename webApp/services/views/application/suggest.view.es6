@@ -17,13 +17,13 @@ App.Services.SuggestView = {
                 var self=this;
                 self.find('.upload').on("click", function () {
                     $('#inputSuggestFile').click();
-                    $('#uploadIframeSuggest').on('load', function () {
-                        var data = JSON.parse(this.contentDocument.body.innerText);
-                        _this.afterUpload(data,self);
-                    })
-                    $('#inputSuggestFile').on('change', function () {
-                        $('#uploadSuggestForm').submit();
-                    })
+                })
+                self.find('#uploadIframeSuggest').on('load', function () {
+                    var data = JSON.parse(this.contentDocument.body.innerText);
+                    _this.afterUpload(data,self);
+                })
+                self.find('#inputSuggestFile').on('change', function () {
+                    self.find('#uploadSuggestForm').submit();
                 })
                 if(id){
                     _this.initData(self,id);
@@ -41,7 +41,6 @@ App.Services.SuggestView = {
     },
 
     afterUpload:function(res,_this){
-
         if(res.code==0){
             _this.find('.attachList').append('<div><a data-id="'+res.data.attachmentId+'" href="javascript:;" onclick="App.Services.SuggestView.download(this);" class="alink listItem">'+res.data.attachmentName+'</a></div>');
         }
