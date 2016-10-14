@@ -1292,6 +1292,7 @@
 	var Project = {
 		presetPointShowData:null,
 		isSelect:'open',
+		currentHightLight:[],
 		//显示隐患和预设点
 		//presetId componetId location
 		allIn: function (param) {
@@ -1499,7 +1500,7 @@
 					var box = _this.formatBBox(_temp.bBox || _temp.boundingBox);
 					 var ids = [_temp.componentId];
 					 _this.zoomModel(ids, box);
-					 _this.showMarks(Project.formatMark(location, color));
+					 _this.showMarks(Project.formatMark(location, color,id));
 				}
 				if (item) {
 					Project.presetPoint = {
@@ -1511,7 +1512,7 @@
 					}
 					Project.presetPointShowData = {
 						id: item.componentId,
-						marker: Project.formatMark(location, color)
+						marker: Project.formatMark(location, color,id)
 					}
 					Project.showStatus(Project.presetPointShowData, Project.currentRiskShowData)
 				}
