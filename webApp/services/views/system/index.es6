@@ -23,10 +23,10 @@ App.Services.System=Backbone.View.extend({
 			$container.append(tabs.bizCategary.tab);
 
 		}
-		if (Auth.workflow) {
-			$container.append(tabs.workflow.tab);
-
-		}
+		//if (Auth.workflow) {
+		//	$container.append(tabs.workflow.tab);
+    //
+		//}
 		if (Auth.extendedAttribute) {
 			$container.append(tabs.extendedAttribute.tab);
 
