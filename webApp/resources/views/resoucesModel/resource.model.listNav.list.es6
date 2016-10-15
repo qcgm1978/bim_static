@@ -23,9 +23,7 @@ App.ResourceModel.ListContent = Backbone.View.extend({
 	render: function() {
 
 		this.$el.html(this.template);
-		this.$el.find('.cachetestss').click(function(){
-			alert('6:00')
-		})
+
 		return this;
 	},
 
