@@ -1882,6 +1882,7 @@
 
 
 						dialog.close();
+						$(".remarkCount_" + dialog.id).closest('.info').find('.title').text(pars.name);
 					} else {
 
 						alert(data.message);

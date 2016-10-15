@@ -52,7 +52,7 @@ var AppRoute = Backbone.Router.extend({
 		//ie
 		App.Comm.dispatchIE('/?commType=loginOut');
 
-		window.location.href = "/login.html";
+		window.location.href = "/login.html?t="+(+new Date());
 
 	},
 	//待办
@@ -302,7 +302,7 @@ var AppRoute = Backbone.Router.extend({
 			//用户信息
 			App.Global.User = JSON.parse(user);
 		} else {
-			location.href="/login.html";
+			location.href="/login.html?t="+(+new Date());
 			return false;
 		}
 

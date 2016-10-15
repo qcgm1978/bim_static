@@ -162,7 +162,7 @@ App.Comm = {
 
 	user: function(key) {
 		if (!App.Global.User) {
-			window.location.href = "/login.html";
+			window.location.href = "/login.html?t="+(+new Date());
 		} else {
 			return App.Global.User[key];
 		}

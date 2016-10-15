@@ -493,7 +493,7 @@ var AppKeyRoute = Backbone.Router.extend({
 		App.Comm.delCookie('token_cookie_me');
 		App.Comm.delCookie('OUTSSO_AuthMAC');
 		App.Comm.delCookie('IS_OWNER_LOGIN');  
-		window.location.href = "/login.html";
+		window.location.href = "/login.html?t="+(+new Date());
 
 	}
 
