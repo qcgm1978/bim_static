@@ -2008,6 +2008,7 @@ App.Project = {
 			_files = App.Project.Settings.Viewer.FloorFilesData; //文件ID数据对象
 		if ($target.hasClass("selected")) {
 			$target.parent().find(".selected").removeClass("selected");
+			App.Project.Settings.Viewer.loadMarkers();
 			App.Project.Settings.Viewer.highlight({
 				type: 'userId',
 				ids: undefined

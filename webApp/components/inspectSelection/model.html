@@ -209,13 +209,43 @@
         view.fit();
     }
 
+    function fromCache(id){
+        var _temp,loc,item;
+        _.each(viewer.Project.currentPageListData, function (i) {
+            if (i.id == id) {
+                _temp = i.location;
+                loc = i.location;
+                item = i;
+            }
+        })
+        if (item) {
+            viewer.Project.presetPoint = {
+                location: loc,
+                id: id,
+                fileUniqueId: item.fileId + item.componentId.slice(item.componentId.indexOf('.')),
+                axis: item.axis,
+                locationName: item.locationName
+            }
+            viewer.Project.presetPointShowData = {
+                id: item.componentId,
+                marker: viewer.Project.formatMark(loc, color,id)
+            }
+        }
+    }
 
     function abcd(marker){
             var id = marker? marker.id:"",
                     userId=marker? marker.userId:"",
                     data={},
                     Project=viewer.Project;
+
+            if(Project.isSelect=='close'){
+                return 
+            }
+
             $(".tbOpeningacceptanceBody tr").removeClass('selected');
+
+
             if(id){
                 var tr = $("tr[data-id='"+id+"']");
                 if(tr.length>0){
@@ -231,11 +261,12 @@
             }
 
             var array=[];
-            if(viewer.Project.currentRiskShowData){
-                array.push(viewer.Project.currentRiskShowData.id);
+            if(Project.currentRiskShowData){
+                array.push(Project.currentRiskShowData.id);
             }
-            if(viewer.Project.presetPointShowData){
-                array.push(viewer.Project.currentRiskShowData.id);
+
+            if(Project.presetPointShowData && Project.isSelect=='close'){
+                array.push(Project.presetPointShowData.id);
             }
 
             if(userId){

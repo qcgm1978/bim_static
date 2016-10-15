@@ -1140,16 +1140,17 @@
 					}
 				})
 
+
 				if (Project.mode == 'preset'||Project.mode == 'edit' || !Project.mode) {
 
 					viewer.viewer.loadMarkersFromIntersect(model.intersect,1,3);
 					var m = viewer.saveMarkers();
 					Project.Settings.markers=m;
-
-					Project.showStatus(Project.presetPointShowData,{
+					Project.currentRiskShowData={
 						id:_userId,
 						marker: m[0]
-					})
+					}
+					Project.showStatus(Project.presetPointShowData,Project.currentRiskShowData);
 				}
 				//渲染属性面板
 				Project.sceneId = model.intersect.object.userData.sceneId;
@@ -1558,6 +1559,7 @@
 		},
 		hideMarks: function() {
 			Project.Viewer && Project.Viewer.loadMarkers(null);
+			Project.showStatus(Project.presetPointShowData, Project.currentRiskShowData);
 		},
 
 		formatMark: function(location, color,id) {
@@ -1596,11 +1598,11 @@
 				ModelFilter.recoverySilder();
 				if(Project.currentSearchCat){
 					ModelFilter.sigleRule(Project.currentSearchCat,Project.currentSearchFloor);
-					$(".tbOpeningacceptanceBody tr").removeClass('selected');
 				}
 			} else {
 				Project.hideMarks();
 			}
+			$(".tbOpeningacceptanceBody tr").removeClass('selected');
 		},
 		//转换bounding box数据
 		formatBBox: function(data) {
@@ -1881,8 +1883,16 @@
 			var $target = $(e.currentTarget);
 			Project.currentInspectId = $target.data('id');
 			if(Project.isSelect!='close'){
-				$target.parent().find('tr').removeClass('selected');
-				$target.addClass('selected');
+				if ($target.hasClass("selected")) {
+					$target.parent().find(".selected").removeClass("selected");
+					Project.presetPoint=null;
+					Project.presetPointShowData=null;
+					Project.showStatus(Project.presetPointShowData, Project.currentRiskShowData);
+					return
+				} else {
+					$target.parent().find(".selected").removeClass("selected");
+					$target.addClass("selected");
+				}
 			}
 			Project.showInModel($target, 2);
 		},
