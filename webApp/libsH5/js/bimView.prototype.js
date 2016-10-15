@@ -64,7 +64,7 @@
         console.log("get error " + url);
       });
 
-      CLOUD.GlobalData.SelectionColor = { color: 0x0000FF, opacity: 0.5, side: THREE.DoubleSide, transparent: false };
+      CLOUD.GlobalData.SelectionColor = { color: 0x0000FF, opacity: 1, side: THREE.DoubleSide, transparent: false };
       switch (_opt.type) { // 判断类型
         case "model":
           self.viewer = bimView.model.model(_opt, self);

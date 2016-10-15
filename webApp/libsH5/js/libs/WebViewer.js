@@ -13135,14 +13135,35 @@ CLOUD.Filter = function () {
     // 将选中构件ID集合加入到【隐藏未选中】集合中  - 显示选中的
     function pushToHideUnselectionSet() {
 
-        _visibilityFilter.visibleIds = _selectionSet;
+        if (_selectionSet) {
+            _visibilityFilter.visibleIds = {};
+            var ids =  _visibilityFilter.visibleIds;
+            for (var id in _selectionSet) {
+                ids[id] = _selectionSet[id];
+            }
+            
+        }
+        else {
+            //_visibilityFilter.visibleIds = null;
+        }
+        
 
     }
 
     // 将选中构件ID集合加入到【隐藏选中】集合中
     function pushToHideSelectionSet() {
 
-        _visibilityFilter.invisibleIds = _selectionSet;
+        if (_selectionSet) {
+            _visibilityFilter.invisibleIds = {};
+            var ids = _visibilityFilter.invisibleIds;
+            for (var id in _selectionSet) {
+                ids[id] = _selectionSet[id];
+            }
+
+        }
+        else {
+            _visibilityFilter.invisibleIds = null;
+        }
 
     }
 
@@ -13150,14 +13171,32 @@ CLOUD.Filter = function () {
     // 将选中构件ID集合加入到【半透明未选中】集合中
     function pushToTranslucentUnselectionSet() {
 
-         _translucentUnselectionSet = _selectionSet;
+        if (_selectionSet) {
+            _translucentUnselectionSet = {};
+            for (var id in _selectionSet) {
+                _translucentUnselectionSet[id] = _selectionSet[id];
+            }
+
+        }
+        else {
+            //_translucentUnselectionSet = null;
+        }
 
     }
 
     // 将选中构件ID集合加入到【半透明选中】集合中
     function pushToTranslucentSelectionSet() {
 
-        _translucentSelectionSet = _selectionSet;
+        if (_selectionSet) {
+            _translucentSelectionSet = {};
+            for (var id in _selectionSet) {
+                _translucentSelectionSet[id] = _selectionSet[id];
+            }
+
+        }
+        else {
+            _translucentSelectionSet = null;
+        }
 
     }
 
