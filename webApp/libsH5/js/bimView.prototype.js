@@ -741,7 +741,8 @@
     setSelectedIds: function(ids) {
       var self = this;
       var viewer = self.viewer;
-      viewer.setSelectedIds(ids);
+      var filters = viewer.getFilters();
+      filters.setSelectedIds(ids);
     },
     getSelectedIds: function() {
       var self = this;
