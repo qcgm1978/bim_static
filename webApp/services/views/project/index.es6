@@ -36,29 +36,29 @@
 	  }
 
 		//映射规则
-		if (Auth.mappingRule) {
-			$container.append(tabs.mappingRule.tab);
+		//if (Auth.mappingRule) {
+		//	$container.append(tabs.mappingRule.tab);
+    //
+		//}
 
-		}
 
 
-
-	  if (Auth.designInfo) {
-		  $container.append(tabs.designInfo.tab);
-
-		  this.viewProjectBaseHole = new App.Services.ProjectDetail.BaseHole();
-		  this.viewProjectFloor = new App.Services.ProjectDetail.Floor();
-		  this.viewProjectSection = new App.Services.ProjectDetail.Section();
-		  this.viewProjectPile = new App.Services.ProjectDetail.Pile();
-
-		  this.$(".projectContainer .projectFloor").html(this.viewProjectFloor.render().el);
-
-		  this.$(".projectContainer .projectBaseHole").html(this.viewProjectBaseHole.render().el);
-
-		  this.$(".projectContainer .projectSection").html(this.viewProjectSection.render().el);
-
-		  this.$(".projectContainer .projectPile").html(this.viewProjectPile.render().el);
-	  }
+	  //if (Auth.designInfo) {
+		 // $container.append(tabs.designInfo.tab);
+    //
+		 // this.viewProjectBaseHole = new App.Services.ProjectDetail.BaseHole();
+		 // this.viewProjectFloor = new App.Services.ProjectDetail.Floor();
+		 // this.viewProjectSection = new App.Services.ProjectDetail.Section();
+		 // this.viewProjectPile = new App.Services.ProjectDetail.Pile();
+    //
+		 // this.$(".projectContainer .projectFloor").html(this.viewProjectFloor.render().el);
+    //
+		 // this.$(".projectContainer .projectBaseHole").html(this.viewProjectBaseHole.render().el);
+    //
+		 // this.$(".projectContainer .projectSection").html(this.viewProjectSection.render().el);
+    //
+		 // this.$(".projectContainer .projectPile").html(this.viewProjectPile.render().el);
+	  //}
 
 
 
