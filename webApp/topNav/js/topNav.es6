@@ -29,6 +29,13 @@ App.TopNav = {
 			e.stopPropagation();
 		})
 
+		$(".user i").click(function(e) {
+			$('.userinfo').hide();
+			$('.onlineNav').hide();
+			$('.userinfo').show();
+			e.stopPropagation();
+		})
+
 		$('.menuNav').click(function(e){
 			$('.userinfo').hide();
 			$('.onlineNav').hide();
