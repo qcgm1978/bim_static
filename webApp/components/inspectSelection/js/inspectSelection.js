@@ -12,9 +12,9 @@
 	strVar1 += "        <td class=\"manifestIcon\"><i class=\"myIcon-inventory\"><\/i><\/td>";
 	strVar1 += "        <td class=\"category\"><%=item.catetoryName%><\/td>";
 	strVar1 += "        <td class=\"positon\"><%=item.locationName%><\/td>";
-	strVar1 += "        <td class=\"ckResult\">";
+/*	strVar1 += "        <td class=\"ckResult\">";
 	strVar1 += "         <i data-id=\"<%= item.acceptanceId %>\"  data-total=\"<%=item.problemCount%>\" class=\"resultStatusIcon  <%= item.colorStatus == 0 ?'myIcon-circle-green':'myIcon-circle-red'%> \"><\/i>";
-	strVar1 += "             <%=item.problemCount%>/<%=item.checkCount%><\/td>";
+	strVar1 += "             <%=item.problemCount%>/<%=item.checkCount%><\/td>";*/
 	strVar1 += "    <\/tr>";
 	strVar1 += "<% }) %> ";
 	strVar1 += "<% if(data.items.length<=0){%>";
@@ -96,7 +96,7 @@
 	strVar2 += "                        <th class=\"manifestIcon\"><\/th>";
 	strVar2 += "                        <th class=\"category\">类别<\/th>";
 	strVar2 += "                        <th class=\"positon\">位置<\/th>";
-	strVar2 += "                        <th class=\"ckResult\">检查结果<\/th>";
+/*	strVar2 += "                        <th class=\"ckResult\">检查结果<\/th>";*/
 	strVar2 += "                    <\/tr>";
 	strVar2 += "                <\/thead>";
 	strVar2 += "            <\/table>";
@@ -225,7 +225,7 @@
 			debug: false
 		},
 		URL: {
-			fetchQualityOpeningAcceptance: "sixD/{projectId}/{projectVersionId}/acceptance?type=2",
+			fetchQualityOpeningAcceptance: "sixD/{projectId}/{projectVersionId}/acceptance",
 			fetchQualityModelById: "sixD/{projectId}/{versionId}/quality/element"
 		}
 	};
@@ -511,7 +511,7 @@
 				_specialFilterFiles=[],
 				_extArray=[],
 				_hideCode=null;
-
+			floor=floor||'';
 			if (cat == '梁柱节点') {
 				if(!floor){
 					floor=_this.getFloors();
@@ -701,6 +701,8 @@
 					})
 				}
 			}
+
+			Project.BIMFilter=Project.Viewer.viewer.getFilters();
 
 		},
 		filter: function ($target, componentId, location,cat, type) {
@@ -1156,9 +1158,24 @@
 			viewer.on("loaded", function() {
 				Project.loadPropertyPanel();
 				viewer.resize();
+				Project.BIMFilter=Project.Viewer.viewer.getFilters();
 			});
 
 			Project.Viewer.viewer.setMarkerClickCallback(abcd);
+
+			$(document).on('mousedown',function(event){
+				if(event.button == 2 && (Project.mode =='preset' || Project.mode=='edit')){
+					event.preventDefault();
+					if(Project.BIMFilter){
+						Project.BIMFilter.clearSelectionSet();
+					}else{
+						Project.Viewer.viewer.getFilters().clearSelectionSet();
+					}
+					Project.currentUserId=null;
+					Project.showStatus(Project.presetPointShowData,null);
+					return false;
+				}
+			})
 		},
 
 		showInModel:function(param){
@@ -1303,6 +1320,7 @@
 		currentSearchCat:'',
 		isSelect:'open',
 		currentHightLight:[],
+		BIMFilter:null,
 		//显示隐患和预设点
 		//presetId componetId location
 		allIn: function (param) {
@@ -1602,6 +1620,8 @@
 		loadPropertyPanel: function() {
 			$('.qualityContainer').append(new QualityOpeningAcceptance().render({
 				OpeningAcceptance: {
+					locationName:'',
+					type:Project.Settings.type=='open'?2:1,
 					specialty: "", //专业
 					category: Project.Settings.ruleType || '', //类别
 					problemCount: "", // 无隐患 1， 有隐患
@@ -1625,12 +1645,21 @@
 			//	}
 			//}
 			if(data){
-				Project.currentSearchFloor=data.floor;
 				Project.currentSearchCat=data.category?mapData.processCategory[data.category]:'';
+				if('外保温'.indexOf(Project.currentSearchCat)!=-1){
+					Project.currentSearchFloor='其它';
+					if(data.floor){
+						Project.currentSearchFloor+=','+data.floor;
+					}
+				}else{
+					Project.currentSearchFloor=data.floor;
+				}
 			}
 
 			OpeningAcceptanceCollection.fetch({
 				data: $.extend({}, {
+					locationName:'',
+					type:Project.Settings.type=='open'?2:1,
 					specialty: "", //专业
 					category: Project.Settings.ruleType || '', //类别
 					problemCount: "", // 无隐患 1， 有隐患
