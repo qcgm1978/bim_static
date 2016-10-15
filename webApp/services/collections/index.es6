@@ -54,8 +54,7 @@ App.Services = {
 			this.setAuth();
 			$("#pageLoading").hide();
 			this.initEvent();
-
-			this.initXW();
+			this.loadXW();
 		}
 	},
 
@@ -68,6 +67,22 @@ App.Services = {
 		})
 	},
 
+	loadXW:function(){
+		if (window['$ibot']) {
+			App.Services.initXW();
+			return
+		}
+		$("<link>")
+			.attr({
+				rel: "stylesheet",
+				type: "text/css",
+				href: "http://xiaowan.wanda.cn/wdrobot/rjfiles/css/robot.css"
+			})
+			.appendTo("head");
+		$.getScript('http://xiaowan.wanda.cn/wdrobot/rjfiles/js/robot.js', function (a) {
+			App.Services.initXW();
+		});
+	},
 	//初始化小万机器人
 	initXW:function(){
 		//设计角色：4F88E20D-BD8F-43E2-857B-A94F5828662D

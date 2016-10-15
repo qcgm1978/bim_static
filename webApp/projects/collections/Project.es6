@@ -544,8 +544,8 @@ App.Project = {
 
 	//过滤器还原（计划[模块化、模拟],质量[开业、过程、隐患],设计[碰撞],成本[清单、校验]）
 	recoverySilder:function(){
-		var show='建筑,结构,景观,幕墙,采光顶',
-			hide='暖通,电气,智能化,给排水';
+		var show='建筑,结构,景观,幕墙,采光顶,景观&导识,幕墙&泛光',
+			hide='暖通,电气,智能化,给排水,内装,内装&导识';
 		var $sp = $('.modelSidebar #specialty>.tree>li');
 		App.Project.Settings.Viewer.fileFilter({
 			ids:[],
@@ -593,6 +593,11 @@ App.Project = {
 		App.Project.Settings.Viewer.fileFilter(specialty);
 		App.Project.Settings.Viewer.filter(category);
 		App.Project.Settings.Viewer.filter(classCode);
+
+		App.Project.Settings.Viewer.filter({
+			ids:['10.01'],
+			type:"classCode"
+		})
 	},
 
 
