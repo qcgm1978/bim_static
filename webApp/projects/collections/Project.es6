@@ -695,17 +695,19 @@ App.Project = {
 				scenceIds=[];
 			if (_.isArray(data)) {
 				_.each(data, function(i) {
-					scenceIds.push(i.componentId.split('.')[0]);
-					if (i.location && i.location.indexOf('boundingBox') != -1) {
-						if (type == 'dis') {
-							var _loc = JSON.parse(i.location);
-							_loc.position = JSON.parse(i.axis).position;
-							result.push(_this.formatMark(_loc, "S021".charAt(i.status), i.id, 1));
-							boxs.push(_loc.boundingBox);
-						} else {
-							var _loc = JSON.parse(i.location);
-							boxs.push(_loc.boundingBox);
-							result.push(_this.formatMark(i.location, '543'.charAt(i.colorStatus), i.id));
+					if(i.componentId){
+						scenceIds.push(i.componentId.split('.')[0]);
+						if (i.location && i.location.indexOf('boundingBox') != -1) {
+							if (type == 'dis') {
+								var _loc = JSON.parse(i.location);
+								_loc.position = JSON.parse(i.axis).position;
+								result.push(_this.formatMark(_loc, "S021".charAt(i.status), i.id, 1));
+								boxs.push(_loc.boundingBox);
+							} else {
+								var _loc = JSON.parse(i.location);
+								boxs.push(_loc.boundingBox);
+								result.push(_this.formatMark(i.location, '543'.charAt(i.colorStatus), i.id));
+							}
 						}
 					}
 				})
@@ -2008,6 +2010,7 @@ App.Project = {
 			_files = App.Project.Settings.Viewer.FloorFilesData; //文件ID数据对象
 		if ($target.hasClass("selected")) {
 			$target.parent().find(".selected").removeClass("selected");
+			App.Project.Settings.Viewer.loadMarkers();
 			App.Project.Settings.Viewer.highlight({
 				type: 'userId',
 				ids: undefined

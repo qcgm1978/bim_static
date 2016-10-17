@@ -358,6 +358,12 @@ var AppRoute = Backbone.Router.extend({
 		});
 		App.Comm.loadMessageCount();
 
+		$('#indexSuggestItem').on('click',function(){
+			_.require('/static/dist/services/services.css');
+			_.require('/static/dist/services/services.js');
+			App.Services.SuggestView.init();
+		})
+
 	}
 
 

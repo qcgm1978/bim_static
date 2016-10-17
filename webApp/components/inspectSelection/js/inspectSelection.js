@@ -271,6 +271,19 @@
 				ratio: 1.0
 			}
 		},
+
+		fileFilter:function(id){
+			this.recoverySilder();
+			var _files = Project.Viewer.FloorFilesData;
+			var _hideFileIds = _.filter(_files, function(i) {
+				return i != id;
+			});
+			Project.Viewer.fileFilter({
+				ids: _hideFileIds,
+				total: [id]
+			});
+
+		},
 		//过滤器还原（计划[模块化、模拟],质量[开业、过程、隐患],设计[碰撞],成本[清单、校验]）
 		recoverySilder: function () {
 			var show = '建筑,结构,景观,幕墙,采光顶,内装&标识,内装&导识',
@@ -1140,16 +1153,17 @@
 					}
 				})
 
+
 				if (Project.mode == 'preset'||Project.mode == 'edit' || !Project.mode) {
 
 					viewer.viewer.loadMarkersFromIntersect(model.intersect,1,3);
 					var m = viewer.saveMarkers();
 					Project.Settings.markers=m;
-
-					Project.showStatus(Project.presetPointShowData,{
+					Project.currentRiskShowData={
 						id:_userId,
 						marker: m[0]
-					})
+					}
+					Project.showStatus(Project.presetPointShowData,Project.currentRiskShowData);
 				}
 				//渲染属性面板
 				Project.sceneId = model.intersect.object.userData.sceneId;
@@ -1321,6 +1335,7 @@
 		isSelect:'open',
 		currentHightLight:[],
 		BIMFilter:null,
+		ModelFilter:ModelFilter,
 		//显示隐患和预设点
 		//presetId componetId location
 		allIn: function (param) {
@@ -1558,6 +1573,7 @@
 		},
 		hideMarks: function() {
 			Project.Viewer && Project.Viewer.loadMarkers(null);
+			Project.showStatus(Project.presetPointShowData, Project.currentRiskShowData);
 		},
 
 		formatMark: function(location, color,id) {
@@ -1596,11 +1612,11 @@
 				ModelFilter.recoverySilder();
 				if(Project.currentSearchCat){
 					ModelFilter.sigleRule(Project.currentSearchCat,Project.currentSearchFloor);
-					$(".tbOpeningacceptanceBody tr").removeClass('selected');
 				}
 			} else {
 				Project.hideMarks();
 			}
+			$(".tbOpeningacceptanceBody tr").removeClass('selected');
 		},
 		//转换bounding box数据
 		formatBBox: function(data) {
@@ -1881,8 +1897,16 @@
 			var $target = $(e.currentTarget);
 			Project.currentInspectId = $target.data('id');
 			if(Project.isSelect!='close'){
-				$target.parent().find('tr').removeClass('selected');
-				$target.addClass('selected');
+				if ($target.hasClass("selected")) {
+					$target.parent().find(".selected").removeClass("selected");
+					Project.presetPoint=null;
+					Project.presetPointShowData=null;
+					Project.showStatus(Project.presetPointShowData, Project.currentRiskShowData);
+					return
+				} else {
+					$target.parent().find(".selected").removeClass("selected");
+					$target.addClass("selected");
+				}
 			}
 			Project.showInModel($target, 2);
 		},

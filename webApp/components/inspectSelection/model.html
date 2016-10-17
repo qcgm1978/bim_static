@@ -99,9 +99,11 @@
                 ids: undefined
             })
 
-            getModelId(param.componentId,function(id){
-                showRiskComponent(id, param.location);
+            getModelId(param.componentId,function(id,sid){
+                showRiskComponent(id, param.location,sid);
             })
+
+
 
            // showRiskComponent(param.componentId, param.location);
         }
@@ -142,7 +144,7 @@
         view.loadMarkers(null);
     }
 
-    function showRiskComponent(componentId, location) {
+    function showRiskComponent(componentId, location,sid) {
             if(typeof location === 'string'){
                 location=JSON.parse(location);
             }
@@ -158,6 +160,10 @@
                 marker:location
             }
             view.loadMarkers([location]);
+
+            if(viewer.Project.mode=='risk'){
+                viewer.Project.ModelFilter.fileFilter(sid);
+            }
     }
 
     function getModelId(componentId,callback){
@@ -171,7 +177,7 @@
                 var modelId = data.data && data.data.modelId;
                 if(modelId){
                     componentId=modelId+'.'+userId;
-                    callback(componentId);
+                    callback(componentId,modelId);
                 }
             }else{
                 alert('获取构件ID失败');
@@ -209,13 +215,43 @@
         view.fit();
     }
 
+    function fromCache(id){
+        var _temp,loc,item;
+        _.each(viewer.Project.currentPageListData, function (i) {
+            if (i.id == id) {
+                _temp = i.location;
+                loc = i.location;
+                item = i;
+            }
+        })
+        if (item) {
+            viewer.Project.presetPoint = {
+                location: loc,
+                id: id,
+                fileUniqueId: item.fileId + item.componentId.slice(item.componentId.indexOf('.')),
+                axis: item.axis,
+                locationName: item.locationName
+            }
+            viewer.Project.presetPointShowData = {
+                id: item.componentId,
+                marker: viewer.Project.formatMark(loc, color,id)
+            }
+        }
+    }
 
     function abcd(marker){
             var id = marker? marker.id:"",
                     userId=marker? marker.userId:"",
                     data={},
                     Project=viewer.Project;
+
+            if(Project.isSelect=='close'){
+                return
+            }
+
             $(".tbOpeningacceptanceBody tr").removeClass('selected');
+
+
             if(id){
                 var tr = $("tr[data-id='"+id+"']");
                 if(tr.length>0){
@@ -231,11 +267,12 @@
             }
 
             var array=[];
-            if(viewer.Project.currentRiskShowData){
-                array.push(viewer.Project.currentRiskShowData.id);
+            if(Project.currentRiskShowData){
+                array.push(Project.currentRiskShowData.id);
             }
-            if(viewer.Project.presetPointShowData){
-                array.push(viewer.Project.currentRiskShowData.id);
+
+            if(Project.presetPointShowData && Project.isSelect=='close'){
+                array.push(Project.presetPointShowData.id);
             }
 
             if(userId){

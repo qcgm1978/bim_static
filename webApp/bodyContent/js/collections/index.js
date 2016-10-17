@@ -97,13 +97,6 @@ App.BodyContent.control = {
             }
 
         })
-
-        $('#indexSuggestItem').on('click',function(){
-            _.require('/static/dist/services/services.css');
-            _.require('/static/dist/services/services.js');
-            App.Services.SuggestView.init();
-        })
-
     },
 
     post: function(id) {
