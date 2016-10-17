@@ -88,7 +88,7 @@
         x.send('bb');
         x.onreadystatechange    = function(s){
             if(x.readyState == 4){
-                var r = x.response,
+                var r = x.response|| s.responseText,
                     obj=JSON.parse(r),
                     pkg = obj.pkg,
                     index_js = document.createElement('script');
