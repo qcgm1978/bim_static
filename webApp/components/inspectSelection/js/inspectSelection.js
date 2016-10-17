@@ -271,6 +271,19 @@
 				ratio: 1.0
 			}
 		},
+
+		fileFilter:function(id){
+			this.recoverySilder();
+			var _files = Project.Viewer.FloorFilesData;
+			var _hideFileIds = _.filter(_files, function(i) {
+				return i != id;
+			});
+			Project.Viewer.fileFilter({
+				ids: _hideFileIds,
+				total: [id]
+			});
+
+		},
 		//过滤器还原（计划[模块化、模拟],质量[开业、过程、隐患],设计[碰撞],成本[清单、校验]）
 		recoverySilder: function () {
 			var show = '建筑,结构,景观,幕墙,采光顶,内装&标识,内装&导识',
@@ -1322,6 +1335,7 @@
 		isSelect:'open',
 		currentHightLight:[],
 		BIMFilter:null,
+		ModelFilter:ModelFilter,
 		//显示隐患和预设点
 		//presetId componetId location
 		allIn: function (param) {

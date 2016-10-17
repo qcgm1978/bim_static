@@ -99,9 +99,11 @@
                 ids: undefined
             })
 
-            getModelId(param.componentId,function(id){
-                showRiskComponent(id, param.location);
+            getModelId(param.componentId,function(id,sid){
+                showRiskComponent(id, param.location,sid);
             })
+
+
 
            // showRiskComponent(param.componentId, param.location);
         }
@@ -142,7 +144,7 @@
         view.loadMarkers(null);
     }
 
-    function showRiskComponent(componentId, location) {
+    function showRiskComponent(componentId, location,sid) {
             if(typeof location === 'string'){
                 location=JSON.parse(location);
             }
@@ -158,6 +160,10 @@
                 marker:location
             }
             view.loadMarkers([location]);
+
+            if(viewer.Project.mode=='risk'){
+                viewer.Project.ModelFilter.fileFilter(sid);
+            }
     }
 
     function getModelId(componentId,callback){
@@ -171,7 +177,7 @@
                 var modelId = data.data && data.data.modelId;
                 if(modelId){
                     componentId=modelId+'.'+userId;
-                    callback(componentId);
+                    callback(componentId,modelId);
                 }
             }else{
                 alert('获取构件ID失败');
