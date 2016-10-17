@@ -20,7 +20,8 @@ App.Projects.searchView = Backbone.View.extend({
 		"click .seniorSearch": "seniorSearch",
 		"click .btnSearch": "searchProject",
 		"click .btnClear": "clearSearch",
-		"change .txtSearch":"linkSearchWord"
+		"change .txtSearch":"linkSearchWord",
+		"keydown .txtInput":"enterSearch"
 	},
 
 	template: _.templateUrl("/projects/tpls/project.search.html"),
@@ -108,6 +109,12 @@ App.Projects.searchView = Backbone.View.extend({
 		this.$('.moreSeachText').val('');
 		App.Projects.Settings.pageIndex=1;
 		App.Projects.loadData(this.formData); 
+	},
+
+	enterSearch:function(e){
+		if(e && e.keyCode=='13'){
+			this.searchProject();
+		}
 	},
 
 	//显示隐藏高级收缩
