@@ -112,6 +112,10 @@ App.Project = {
 		'采光顶': {
 			margin: 3,
 			ratio: 1.0
+		},
+		'地面': {
+			margin: 0.01,
+			ratio: 1.0
 		}
 	},
 	sigleFileRule:function(cat){
