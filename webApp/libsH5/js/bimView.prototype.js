@@ -395,7 +395,11 @@
         _viewBox = self._dom.bimBox,
         _width = width || _viewBox.width(),
         _height = height || _viewBox.height();
-      self.viewer.resize(_width, _height);
+
+        if (!$("#projectContainer .modelContainer").is(":hidden")) {
+          self.viewer.resize(_width, _height);
+        } 
+
     },
     fit: function() {
       // 缩放到选择构件
