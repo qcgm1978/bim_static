@@ -65,6 +65,11 @@ App.Services = {
 				App.Services.SuggestView.init();
 			}
 		})
+
+		$('ul.resourceList a').on('click',function(){
+			var id=$(this).data('id');
+			window.open(id,'_blank');
+		})
 	},
 
 	loadXW:function(){
@@ -112,7 +117,7 @@ App.Services = {
 		$(window).resize(function() {
 			var url=window.location.href;
 			if(url=="http://bim.wanda-dev.cn/#services"){
-				window.location.reload();
+				//window.location.reload();
 			}
 		});
 	},
