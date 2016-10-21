@@ -4,7 +4,7 @@
            <div class="modle">
                <ul class="modleList">
                    <li class="modleItem">
-                       <span class="modleName"><div class="modleNameText overflowEllipsis">构件名称</div></span> <span class="modleVal overflowEllipsis"><%=item.items[0]['value']%></span>
+                       <span class="modleName" ><div class="modleNameText overflowEllipsis">构件名称</div></span> <span class="modleVal overflowEllipsis" title='<%=item.items[0]["value"]%>'><%=item.items[0]['value']%></span>
                    </li>
                </ul>
            </div>
@@ -21,7 +21,7 @@
                         <% for(var j=0;j<subCount;j++){ %>
                             <% subItem=subItems[j];  %>
                                 <li class="modleItem">
-                                    <span class="modleName"><div title='<%=subItem.name%>' class="modleNameText overflowEllipsis"><%=subItem.name%></div></span> <span class="modleVal overflowEllipsis"><%=subItem.value%><%=subItem.unit%></span>
+                                    <span class="modleName"><div title='<%=subItem.name%>' class="modleNameText overflowEllipsis"><%=subItem.name%></div></span> <span class="modleVal overflowEllipsis" title="<%=subItem.value%><%=subItem.unit%>"><%=subItem.value%><%=subItem.unit%></span>
                                 </li>
                         <% } %>
                 </ul>

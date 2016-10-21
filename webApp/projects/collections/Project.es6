@@ -45,6 +45,26 @@ App.Project = {
 				}
 			}
 		}
+		if ($(".QualityConcerns").is(":visible")) {
+			$(".QualityConcerns .tbConcernsBody tr").removeClass('selected');
+			if(id){
+				var tr = $(".QualityOpeningAcceptance .tbOpeningacceptanceBody tr[data-id='"+id+"']");
+				if(tr.length>0){
+					tr.addClass('selected');
+				}else{
+					data=App.Project.catchPageData('dis',{id:id});
+					App.Project.qualityTab.ConcernsOptions.pageIndex = data.pageIndex;
+					App.Project.QualityAttr.ConcernsCollection.reset();
+					App.Project.QualityAttr.ConcernsCollection.push({data:data});
+					App.Project.qualityTab.pageInfo.call(App.Project.qualityTab, data,'concerns',true);
+					tr = $(".QualityConcerns .tbConcernsBody tr[data-id='"+id+"']");
+					tr.addClass("selected");
+				}
+			}
+		}
+
+
+
 		if(userId){
 			App.Project.Settings.Viewer.highlight({
 				type: 'userId',
@@ -200,6 +220,11 @@ App.Project = {
 				_hideCode=null;
 				if(cat=="外保温"){
 					floor=floor.split(',');
+					_.each(_this.getFloors("F"),function(item){
+						_specialFilterFiles.push('WDGC-Q-AR-'+item+'.rvt');
+						_specialFilterFiles.push('WDGC-Q-AR-'+item+'-RF.rvt');
+					})
+
 					App.Project.Settings.Viewer.filter({
 						ids: _this.filterHideCode(['10.10.20.03.06.20.10'],true),
 						type: "classCode"
@@ -216,8 +241,15 @@ App.Project = {
 
 			if (cat == '卫生间防水') {
 				_specialFilterFiles=_this.filterSingleFiles('IN&GS');
-				_specialFilterFiles.push('WDGC-Q-AR-'+floor+'.rvt');
-				_specialFilterFiles.push('WDGC-Q-AR-'+floor+'-RF.rvt');
+				if(floor){
+					_specialFilterFiles.push('WDGC-Q-AR-'+floor+'.rvt');
+					_specialFilterFiles.push('WDGC-Q-AR-'+floor+'-RF.rvt');
+				}else{
+					_.each(_this.getFloors(),function(item){
+						_specialFilterFiles.push('WDGC-Q-AR-'+item+'.rvt');
+						_specialFilterFiles.push('WDGC-Q-AR-'+item+'-RF.rvt');
+					})
+				}
 				_extArray=['IN&GS','AR'];
 				_hideCode=['10.10.30.03.21'];
 			}
@@ -335,7 +367,17 @@ App.Project = {
 					.concat(_this.filterSingleFiles('AC'))
 					.concat(_this.filterSingleFiles('EL'))
 					.concat(_this.filterSingleFiles('TE'))
-					.concat(['WDGC-Q-AR-'+floor+'.rvt','WDGC-Q-AR-'+floor+'-RF.rvt']);
+
+				if(floor){
+					_specialFilterFiles.push('WDGC-Q-AR-'+floor+'.rvt');
+					_specialFilterFiles.push('WDGC-Q-AR-'+floor+'-RF.rvt');
+				}else{
+					_.each(_this.getFloors(),function(item){
+						_specialFilterFiles.push('WDGC-Q-AR-'+item+'.rvt');
+						_specialFilterFiles.push('WDGC-Q-AR-'+item+'-RF.rvt');
+					})
+				}
+
 				_hideCode= ['10.10.30.03.21','10.20.20.03'];
 				_extArray=['ST','AR','PL','AC','EL','TE'];
 			}

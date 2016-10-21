@@ -170,7 +170,16 @@ App.Services = {
 			$page.html(_.templateUrl('/services/tpls/nullPage.html'),true);
 		}
 
-	}
+	},
 
+	ruleInit(){
+
+		var view=Backbone.View.extend({
+			tagName: "div",
+			id: "applicationManager",
+			template: _.templateUrl('/services/tpls/application/index.html', true),
+		})
+
+	}
 
 };
