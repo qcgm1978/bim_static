@@ -18,8 +18,7 @@
         <div class="myDropDown pickProjectType">
             <span class="myDropText">  <span class="text">请选择类别</span> <i class="myDropArrorw"></i> </span>
             <ul class="myDropList">
-                <li class="myItem" data-val=''>全部</li>
-                <% _.each(App.Services.Log.chooseTypes,function(item,i){ if(i!=0) { %>
+                <% _.each(App.Services.Log.chooseTypes,function(item,i){ if(1) { %>
                 <li class="myItem" data-val='<%= i %>'><%=item%></li>
                 <% }}) %>
             </ul>

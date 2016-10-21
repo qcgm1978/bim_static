@@ -170,7 +170,119 @@ App.Services = {
 			$page.html(_.templateUrl('/services/tpls/nullPage.html'),true);
 		}
 
-	}
+	},
+
+	logCollection: new(Backbone.Collection.extend({
+		model: Backbone.Model.extend({
+			defaults: function() {
+				return {
+					url: ''
+				}
+			}
+		}),
+
+		urlType: "fetchProjects",
+
+		parse: function(response) {
+			if (response.message == "success") {
+				if(response.data.items && response.data.items.length){
+					App.Services._cache=response.data.items||[];
+					return response.data.items;
+				}else{
+					Backbone.trigger('servicesListNullData');
+					return [];
+				}
+			}
+		}
+
+
+	})),
+
+	Settings: {
+		projectId: "",
+		projectName: "",
+		type: "list",
+		isInitMap: false,
+		initBodyEvent: false,
+		pageIndex: 1
+	},
+
+	//加载数据
+	loadData: function(params) {
+
+		var _data={
+			name: "",
+			projectType:"", //项目类型
+			estateType: "", //项目模式
+			province: "", //所属省份
+			region: "", //分区
+			complete: "", //是否完成
+			open: "", //是否开业
+			openTimeStart: "",
+			openTimEnd: "",
+			pageIndex: App.Projects.Settings.pageIndex,
+			pageItemCount: App.Comm.Settings.pageItemCount
+
+		};
+		//初始化用户参数
+		_data=$.extend({},_data,params);
+		$("#projectModes .proListBox").empty(); //清空数据
+		App.Projects.ProjectCollection.reset();
+		App.Projects.ProjectCollection.project = "project";
+
+		//拉取数据
+		App.Projects.ProjectCollection.fetch({
+
+			data: _data,
+
+			success: function(collection, response, options) {
+				$("#pageLoading").hide();
+				var $content = $("#projectModes"),
+				    pageCount = response.data.totalItemCount;
+
+
+				$content.find(".sumDesc").html('共 ' + pageCount + ' 个项目');
+
+				$content.find(".listPagination").empty().pagination(pageCount, {
+					items_per_page: response.data.pageItemCount,
+					current_page: response.data.pageIndex - 1,
+					num_edge_entries: 3, //边缘页数
+					num_display_entries: 5, //主体页数
+					link_to: 'javascript:void(0);',
+					itemCallback: function(pageIndex) {
+						//加载数据
+						App.Projects.Settings.pageIndex = pageIndex + 1;
+						App.Projects.onlyLoadData(params);
+					},
+					prev_text: "上一页",
+					next_text: "下一页"
+
+				});
+			}
+
+		});
+	},
+
+	//只是加载数据
+	onlyLoadData: function(params) {
+		var _data= {
+			pageIndex: App.Projects.Settings.pageIndex,
+			pageItemCount: App.Comm.Settings.pageItemCount,
+			name: "",
+			estateType: "",
+			province: "",
+			region: "",
+			complete: "",
+			open: "",
+			openTimeStart: "",
+			openTimEnd: ""
+		}
+		App.Projects.ProjectCollection.reset();
+		App.Projects.ProjectCollection.fetch({
+			data:$.extend({},_data,params)
+		});
+	},
+
 
 
 };

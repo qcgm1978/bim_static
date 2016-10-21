@@ -1,7 +1,7 @@
 #logContainer{
   border-top: 1px solid #ccc;
 }
-.logSearch { margin-top: 10px; margin-left: 20px;
+.logSearch { margin-left: 20px;
   .searchHeadText { position: relative; height: 24px; margin-right: 105px;
     & span { position: absolute; margin-top: -4px; }
     .vLine { position: absolute; left: 52px; right: 2px; border-top: 1px #ddd solid; top: 6px; }
@@ -31,4 +31,36 @@
   }
   & .moreSeachText, & .myDropText { width: 180px; }
   & .myDropList { width: 180px; }
+}
+
+#logModes { position: absolute; left: 0px; right: 0px; top: 142px; bottom: 0px;
+  .proListSite { position: relative; height: 100%; }
+  .proListContent { position: absolute; top: 40px; left: 20px; right: 20px; bottom: 40px; }
+  .pagingBox{position: absolute;bottom: 0px;left:20px;right: 20px;line-height: 40px;
+    .sumDesc { float: left; margin-left: 20px; }
+    .listPagination { float: right; margin-right: 20px; }
+    .pagination {margin: 0px;}
+  }
+  .proListBox, .proListBoxHeader { .loading { font-size: 14px; color: #ccc; text-align: center;
+    & div { margin-top: 20px; }
+  }
+    span { display: inline-block; vertical-align: top;font-size: 14px; a{font-size: 14px;}}
+    .header, .item { height: 36px; border: 1px #ddd solid; border-width: 1px 0px; background-color: #EEE; line-height: 36px; margin: 0px 20px;color: #999;
+      .logTime { width: 15%;  padding-left: 15px; }
+      .logType { width: 10%; }
+      .logName { width: 26%; }
+      .operator { width: 10%; }
+      .action { width: 34%; }
+
+    }
+    .item { margin-right: 0;margin-left: 0px; background-color: #fff; border-bottom: 1px #ddd solid; height: 46px; line-height: 46px; border-top: 0;margin:0;color: #666;
+      .proImg { text-align: center;
+        img { margin-top: 4px; }
+      }
+      .proOp { a { color: #006CCD; }
+      }
+    }
+  }
+
+  &.projectModesDown { top: 355px; }
 }
