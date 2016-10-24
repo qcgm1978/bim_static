@@ -274,7 +274,11 @@ var AppRoute = Backbone.Router.extend({
 		_.require('/static/dist/services/services.css');
 		_.require('/static/dist/services/services.js');
 		$("#bottomBar").hide(); //隐藏脚部
-		App.Services.init(type, tab);
+		if(type=='rule'){
+			App.Services.ruleInit();
+		}else{
+			App.Services.init(type, tab);
+		}
 	},
 
 	//重置数据

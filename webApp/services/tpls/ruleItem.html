@@ -1,0 +1,46 @@
+    <h2><%=name%></h2>
+    <fieldset>
+        <legend><label>专业<a href="javascript:;" data-type="spe" class="newLabel">[新增]</a></label></legend>
+        <div class="specialRuleContainer">
+            <select>
+                <option value="">请选择专业</option>
+                <% _.each(special,function(item){ %>
+                <option value="<%=item.specialtyCode%>"><%=item.specialty%></option>
+                <% }) %>
+            </select>
+            <select>
+                <option value="">请选择条件</option>
+                <option value="saab">包含</option>
+                <option value="opel">不包含</option>
+                <option value="opel">只等于</option>
+            </select>
+            <input type="text" placeholder="请输入文件规则...">
+        </div>
+    </fieldset>
+    <fieldset>
+        <legend><label>楼层<a href="javascript:;" data-type="flo" class="newLabel">[新增]</a></label></legend>
+        <div class="floorRuleContainer">
+            <div>
+                <select>
+                    <option value="">请选择条件</option>
+                    <option value="saab">大于</option>
+                    <option value="opel">等于</option>
+                    <option value="opel">小于</option>
+                    <option value="opel">小于等于</option>
+                    <option value="opel">大于等于</option>
+                </select>
+                <input type="text" placeholder="请输入楼层规则...">
+            </div>
+        </div>
+    </fieldset>
+    <fieldset>
+        <legend><label>分类编码</label></legend>
+        <div>
+            <select>
+                <option value="">请选择条件</option>
+                <option value="saab">显示</option>
+                <option value="opel">隐藏</option>
+            </select>
+            <input type="text" placeholder="请输入文件编码规则...">
+        </div>
+    </fieldset>

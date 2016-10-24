@@ -1,12 +1,8 @@
-<div class="ruleSetting">
-    <ul class="typeList">
-        <li></li>
-    </ul>
-    <div>
-        <form>
+<ul class="typelist">
+    <% _.each(type,function(item,index){ %>
+    <li class="ruleTypeItem" data-id="ruleType_<%=index%>"><%=item%></li>
+    <% }) %>
+</ul>
+<div class="formLabel">
 
-
-
-        </form>
-    </div>
 </div>

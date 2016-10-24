@@ -220,6 +220,7 @@ App.Project = {
 				_hideCode=null;
 				if(cat=="外保温"){
 					floor=floor.split(',');
+					floor=floor.concat(_this.getFloors("F"));
 					_.each(_this.getFloors("F"),function(item){
 						_specialFilterFiles.push('WDGC-Q-AR-'+item+'.rvt');
 						_specialFilterFiles.push('WDGC-Q-AR-'+item+'-RF.rvt');
@@ -229,6 +230,7 @@ App.Project = {
 						ids: _this.filterHideCode(['10.10.20.03.06.20.10'],true),
 						type: "classCode"
 					})
+					_extArray=['AR'];
 				}
 			}
 
