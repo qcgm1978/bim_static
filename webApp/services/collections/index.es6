@@ -308,5 +308,202 @@ App.Services = {
 		});
 	},
 
+	ruleInit(){
 
+		var processCategory=['工程桩', '基坑支护', '地下防水', '梁柱节点', '钢结构悬挑构件', '幕墙', '外保温',
+		                     '采光顶', '步行街吊顶风口', '卫生间防水', '屋面防水', '屋面虹吸雨排', '消防泵房', '给水泵房',
+		                     '湿式报警阀室', '空调机房', '冷冻机房', '变配电室', '发电机房', '慧云机房', '电梯机房', '电梯底坑',
+		                     '吊顶', '地面', '中庭栏杆', '竖井'
+		];
+
+		var special = [
+			{
+				specialty: "建筑",
+				specialtyCode: "AR",
+				sort: 0,
+				files: []
+			},
+			{
+				specialty: "结构",
+				specialtyCode: "ST",
+				sort: 1,
+				files: []
+			},
+			{
+				specialty: "暖通",
+				specialtyCode: "AC",
+				sort: 2,
+				files: []
+			},
+			{
+				specialty: "电气",
+				specialtyCode: "EL",
+				sort: 3,
+				files: []
+			},
+			{
+				specialty: "智能化",
+				specialtyCode: "TE",
+				sort: 4,
+				files: []
+			},
+			{
+				specialty: "给排水",
+				specialtyCode: "PL",
+				sort: 5,
+				files: []
+			},
+			{
+				specialty: "采光顶",
+				specialtyCode: "LR",
+				sort: 15,
+				files: []
+			},
+			{
+				specialty: "内装&导识",
+				specialtyCode: "IN&GS",
+				sort: 17,
+				files: []
+			},
+			{
+				specialty: "景观&导识",
+				specialtyCode: "LC&GS",
+				sort: 19,
+				files: []
+			},
+			{
+				specialty: "幕墙&泛光",
+				specialtyCode: "CW&LI",
+				sort: 21,
+				files: []
+			}
+		]
+
+		var floorCondition=[{name:'等于',code:'='},{name:'大于',code:'>'},{name:'小于',code:'<'},{name:'大于等于',code:'>='},{name:'小于等于',code:'<='}];
+		var fileCondition=[{name:'包含',code:'like'},{name:'不包含',code:'unlike'},{name:'只等于',code:'='}];
+		//过滤规则
+		var RuleView=Backbone.View.extend({
+			className:'modelFilterRule',
+			template: _.templateUrl('/services/tpls/rule.html'),
+			event:{
+				'click .ruleTypeItem':"selectItem"
+			},
+			render:function(data){
+				this.$el.html(this.template(data));
+				$('#contains').html(this.$el);
+				this.initEvent();
+				return this;
+			},
+
+			initEvent:function(){
+				var _this=this,
+				    _$items=_this.$('.ruleTypeItem');
+				_$items.on('click',function(event){
+					_this.selectItem(event,_$items);
+				})
+
+				_$items.eq(0).trigger('click');
+			},
+
+			getData:function(val){
+
+
+
+			},
+
+			selectItem:function(event,_$items){
+				var _this=this,
+				    _$target=$(event.target),
+				    $forms=_this.$('.formLabel').children(),
+				    $el=_this.$('.formLabel .'+_$target.data('id'));
+				if(!_$target.hasClass('selected')){
+					_$items.removeClass('selected');
+					_$target.addClass('selected');
+					if($el.length){
+						$forms.hide();
+						$el.show();
+					}else{
+
+						$.ajax({
+							url:'/sixD/checkPointRule?token=123&checkPointType='+encodeURI(_$target.text()),
+							success:function(res){
+								if(res.code==0){
+									$forms.hide();
+									var view=new RuleItemView({
+										className:_$target.data('id')
+									}).render({
+											name:_$target.text(),
+											special:special,
+											floorCondition:floorCondition,
+											fileCondition:fileCondition,
+											data:res.data
+										});
+									_this.$('.formLabel').append(view.$el);
+								}
+							}
+						})
+					}
+				}
+
+			}
+		})
+
+		var SpeRuleItem=Backbone.View.extend({
+			className:'ruleItemWrap',
+			template: _.templateUrl('/services/tpls/specialRuleItem.html'),
+			render:function(data){
+				this.$el.html(this.template(data));
+				return this;
+			}
+		})
+		var FloRuleItem=Backbone.View.extend({
+			className:'ruleItemWrap',
+			template: _.templateUrl('/services/tpls/floorRuleItem.html'),
+			render:function(data){
+				this.$el.html(this.template(data));
+				return this;
+			}
+		})
+
+		var RuleItemView=Backbone.View.extend({
+			template: _.templateUrl('/services/tpls/ruleItem.html'),
+			render:function(data){
+				this.$el.html(this.template(data));
+				return this;
+			},
+			events:{
+				'click .newLabel':'addRule'
+			},
+
+
+			addRule:function(e){
+				var _$target=$(e.target),
+				    type=_$target.data('type');
+				if(type=="spe"){
+					var view=new SpeRuleItem().render({
+						special:special
+					})
+					this.$('.specialRuleContainer').append(view.$el);
+				}else if(type=='flo'){
+					var view=new FloRuleItem().render();
+					this.$('.floorRuleContainer').append(view.$el);
+				}
+
+			},
+
+			initEvent:function(){
+				var _this=this,
+				    _$item=_this.$('.ruleTyleItem');
+				_$item.on('click',function(event){
+					_$item.removeClass('selected');
+					$(event.target).addClass('selected')
+				})
+			}
+		})
+
+		new RuleView().render({
+			type:processCategory
+		});
+
+	}
 };
