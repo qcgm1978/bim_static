@@ -1,46 +1,56 @@
-    <h2><%=name%></h2>
-    <fieldset>
-        <legend><label>专业<a href="javascript:;" data-type="spe" class="newLabel">[新增]</a></label></legend>
-        <div class="specialRuleContainer">
-            <select>
+<h2><%=name%></h2>
+<fieldset>
+    <legend><label>专业<a href="javascript:;" data-type="spe" class="newLabel">[新增]</a></label></legend>
+    <div class="specialRuleContainer">
+        <% _.each(data.specRule,function(rule){ %>
+        <div class="ruleItemWrap">
+            <select name="specail">
                 <option value="">请选择专业</option>
                 <% _.each(special,function(item){ %>
-                <option value="<%=item.specialtyCode%>"><%=item.specialty%></option>
+                <option <%=rule.specCode==item.specialtyCode?'selected':''%> value="<%=item.specialtyCode%>"><%=item.specialty%></option>
                 <% }) %>
             </select>
-            <select>
+            <select name="condition">
                 <option value="">请选择条件</option>
-                <option value="saab">包含</option>
-                <option value="opel">不包含</option>
-                <option value="opel">只等于</option>
+                <% _.each(fileCondition,function(item){ %>
+                <option <%=rule.fileOperator==item.code?'selected':''%> value="<%=item.code%>"><%=item.name%></option>
+                <% }) %>
             </select>
-            <input type="text" placeholder="请输入文件规则...">
+            <input name="specialValue" value="<%=rule.filename%>" type="text" placeholder="请输入文件规则...">
+            <a href="javascript:;" onclick="$(this).parent().remove();">删除</a>
         </div>
-    </fieldset>
-    <fieldset>
-        <legend><label>楼层<a href="javascript:;" data-type="flo" class="newLabel">[新增]</a></label></legend>
-        <div class="floorRuleContainer">
-            <div>
-                <select>
-                    <option value="">请选择条件</option>
-                    <option value="saab">大于</option>
-                    <option value="opel">等于</option>
-                    <option value="opel">小于</option>
-                    <option value="opel">小于等于</option>
-                    <option value="opel">大于等于</option>
-                </select>
-                <input type="text" placeholder="请输入楼层规则...">
-            </div>
-        </div>
-    </fieldset>
-    <fieldset>
-        <legend><label>分类编码</label></legend>
-        <div>
-            <select>
+        <% }) %>
+    </div>
+</fieldset>
+<fieldset>
+    <legend><label>楼层<a href="javascript:;" data-type="flo" class="newLabel">[新增]</a></label></legend>
+    <div class="floorRuleContainer">
+        <% _.each(data.floorRule,function(rule){%>
+        <div class="ruleItemWrap">
+            <select name="condition">
                 <option value="">请选择条件</option>
-                <option value="saab">显示</option>
-                <option value="opel">隐藏</option>
+                <% _.each(floorCondition,function(item){ %>
+                <option <%=rule.floorOperator==item.code?'selected':''%> value="<%=item.code%>"><%=item.name%></option>
+                <% }) %>
             </select>
-            <input type="text" placeholder="请输入文件编码规则...">
+            <input name="floorValue" value="<%=rule.floor%>" type="text" placeholder="请输入楼层规则...">
+            <a href="javascript:;" onclick="$(this).parent().remove();">删除</a>
         </div>
-    </fieldset>
+        <% }) %>
+    </div>
+</fieldset>
+<fieldset>
+    <legend><label>分类编码</label></legend>
+    <% _.each(data.codeRule,function(rule){%>
+    <div class="classCodeWrap">
+        <select name="condition">
+            <option <%= rule.visible === true?'selected':'' %> value=true>显示</option>
+            <option <%= rule.visible === false?'selected':'' %> value=false>隐藏</option>
+        </select>
+        <input name="ccodeValue" value="<%=rule.code.join(',')%>" type="text" placeholder="请输入文件编码规则...">
+    </div>
+    <% }) %>
+</fieldset>
+<div class="btnBar">
+    <a href="javascript:;" class="mmh-btn confirm">应用规则</a>
+</div>

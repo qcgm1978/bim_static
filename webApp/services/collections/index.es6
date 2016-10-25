@@ -419,27 +419,44 @@ App.Services = {
 				if(!_$target.hasClass('selected')){
 					_$items.removeClass('selected');
 					_$target.addClass('selected');
+					$forms.remove();
 					if($el.length){
-						$forms.hide();
 						$el.show();
 					}else{
-
 						$.ajax({
 							url:'/sixD/checkPointRule?token=123&checkPointType='+encodeURI(_$target.text()),
 							success:function(res){
-								if(res.code==0){
-									$forms.hide();
-									var view=new RuleItemView({
-										className:_$target.data('id')
-									}).render({
-											name:_$target.text(),
-											special:special,
-											floorCondition:floorCondition,
-											fileCondition:fileCondition,
-											data:res.data
-										});
-									_this.$('.formLabel').append(view.$el);
+								if(res.data){
+									if(res.data.floorRule.length==0){
+										res.data.floorRule.push({
+											floorOperator: "",
+											floor: ""
+										})
+									}
+									if(res.data.specRule.length==0){
+										res.data.specRule.push({
+											specCode: "",
+											fileOperator: "",
+											filename: ""
+										})
+									}
+									if(res.data.codeRule.length==0){
+										res.data.codeRule.push({
+											visible: -1,
+											code: []
+										})
+									}
 								}
+								var view=new RuleItemView({
+									className:_$target.data('id')
+								}).render({
+									name:_$target.text(),
+									special:special,
+									floorCondition:floorCondition,
+									fileCondition:fileCondition,
+									data:res.data
+								});
+								_this.$('.formLabel').append(view.$el);
 							}
 						})
 					}
@@ -472,23 +489,85 @@ App.Services = {
 				return this;
 			},
 			events:{
-				'click .newLabel':'addRule'
+				'click .newLabel':'addRule',
+				'click .confirm':'applyRule'
 			},
 
 
 			addRule:function(e){
 				var _$target=$(e.target),
-				    type=_$target.data('type');
+					type=_$target.data('type');
 				if(type=="spe"){
 					var view=new SpeRuleItem().render({
-						special:special
+						special:special,
+						floorCondition:floorCondition,
+						fileCondition:fileCondition
 					})
 					this.$('.specialRuleContainer').append(view.$el);
 				}else if(type=='flo'){
-					var view=new FloRuleItem().render();
+					var view=new FloRuleItem().render({
+						special:special,
+						floorCondition:floorCondition,
+						fileCondition:fileCondition
+					});
 					this.$('.floorRuleContainer').append(view.$el);
 				}
 
+			},
+
+			applyRule:function(){
+				var data={
+					"checkPointType": this.$('h2').text(),
+					"floorRule": [],
+					"specRule": [],
+					"codeRule": []
+				}
+
+				var $spe=this.$('.specialRuleContainer .ruleItemWrap'),
+					$flo=this.$('.floorRuleContainer .ruleItemWrap'),
+					$ccode=this.$('.classCodeWrap');
+				$spe.each(function(index,d){
+					var dom=$(d);
+					data.specRule.push({
+						"specCode": dom.find('select[name="specail"]').val(),
+						"fileOperator": dom.find('select[name="condition"]').val(),
+						"filename": dom.find('input[name="specialValue"]').val()
+					})
+				})
+
+				$flo.each(function(){
+					var dom=$(this);
+					data.floorRule.push({
+						"floorOperator": dom.find('select[name="condition"]').val(),
+						"floor": dom.find('input[name="floorValue"]').val()
+					})
+				})
+
+				data.codeRule.push({
+					visible:!!$ccode.find('select[name="condition"]').val(),
+					code: $ccode.find('input[name="ccodeValue"]').val().split(',')
+				})
+
+				if(data.specRule.length){
+					$.ajax({
+						url:'/sixD/checkPointRule?token=123',
+						contentType:"application/json",
+						type:"post",
+						data:JSON.stringify(data),
+						success:function(res){
+							if(res.code==0){
+								$.tip({message:'操作成功'})
+							}else{
+								$.tip({message:'操作失败',type:'alarm'})
+							}
+
+						},
+
+						error:function(){
+							$.tip({message:'操作失败',type:'alarm'})
+						}
+					})
+				}
 			},
 
 			initEvent:function(){
