@@ -156,12 +156,108 @@ App.Project = {
 
 		App.Project.Settings.modelId = modelId;
 		App.Project.Settings.Viewer.on("click", function(model) {
+
+			var selectedIds = App.Project.Settings.Viewer.getSelectedIds();
+
 			if (!model.intersect) {
 				App.Project.renderAttr(App.Project.Settings.typeId, 2);
+
+				if(selectedIds){
+					var obj,
+					    arr = [];
+
+					if(Object.keys(selectedIds).length==1){
+						for(var i in selectedIds){
+							obj = {
+								userId : i,
+								sceneId : selectedIds[i]['sceneId']
+							}
+						}
+						//App.Project.Settings.ModelObj = {
+						//	intersect: {
+						//		userId:obj.userId,
+						//		object:{
+						//			userData:{
+						//				sceneId:obj.sceneId
+						//			}
+						//		}
+						//	}
+            //
+						//};
+						//that.viewerPropertyRender();
+						App.Project.renderAttr(obj.userId);
+
+
+					}else{
+						for(var i in selectedIds){
+							if(arr[0]){
+								if(arr[0] != selectedIds[i]['classCode'] ){
+									$('.designProperties').html('<div class="nullTip">请选择构件</div>');
+									return;
+								}
+
+							}else{
+								arr[0] = selectedIds[i]['classCode']
+							}
+						}
+
+						var uid = Object.keys(selectedIds)[0],
+						    info = selectedIds[uid];
+
+						obj = {
+							userId : uid,
+							sceneId : info['sceneId']
+						};
+
+						//App.Project.Settings.ModelObj = {
+						//	intersect: {
+						//		userId:obj.userId,
+						//		object:{
+						//			userData:{
+						//				sceneId:obj.sceneId
+						//			}
+						//		}
+						//	}
+            //
+						//};
+						App.Project.renderAttr(obj.userId);
+
+
+					}
+				}else{
+					$('.designProperties').html('<div class="nullTip">请选择构件</div>');
+
+				}
+
+				$('.designProperties').html('<div class="nullTip">请选择构件</div>');
+
 				return;
+			}else if(Object.keys(selectedIds).length>1){
+
+				var arr = [];
+
+
+				for(var i in selectedIds){
+					if(arr[0]){
+						if(arr[0] != selectedIds[i]['classCode'] ){
+							$('.designProperties').html('<div class="nullTip">请选择构件</div>');
+
+							return;
+						}
+
+					}else{
+						arr[0] = selectedIds[i]['classCode']
+					}
+				}
+
+
 			}
 			//渲染属性
 			App.Project.renderAttr(model.intersect.userId);
+
+
+
+
 
 		});
 
@@ -587,9 +683,9 @@ App.Project = {
 					okText: "保存",
 					closeCallback: function() {
 
-						App.Project.Settings.Viewer.commentEnd();
+						//App.Project.Settings.Viewer.commentEnd();
 						//显示
-						$(".bim .modelBar").show();
+						//$(".bim .modelBar").show();
 
 					},
 
