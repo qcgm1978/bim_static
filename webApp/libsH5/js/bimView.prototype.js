@@ -234,6 +234,15 @@
             $this.addClass('selected').siblings().removeClass('selected');
             self.setCommentType(fn);
             break;
+          case "comment-color":
+            $this.addClass('selected').siblings().removeClass('selected');
+            var  parent= $this.parent().parent(),
+                 precolor = parent.data('color'),
+              colors = $this.data('color'),
+              param = $this.data('param');
+            parent.attr('data-color',colors);
+            self.setCommentStyle({'stroke-color': param,'fil-color':param });
+            break;
           case "color":
             var bar = bimView.model.colorBar;
             var content = $('<div class="colorBar"></div>')
@@ -589,6 +598,8 @@
       var self = this;
       var viewer = self.viewer;
       var modelBgColor = self._dom.bimBox.css('background-color');
+      //还原颜色
+      viewer.setCommentStyle({'stroke-color': 'red','fil-color':'red' });
       self._dom.bimBox.addClass('comment');
       viewer.editCommentBegin();
       viewer.setCommentBackgroundColor(modelBgColor);
@@ -615,6 +626,11 @@
       var self = this;
       var viewer = self.viewer;
       viewer.setCommentType(type);
+    },
+    setCommentStyle: function(style) {
+      var self = this;
+      var viewer = self.viewer;
+      viewer.setCommentStyle(style);
     },
     saveComment: function() {
       // 保存批注

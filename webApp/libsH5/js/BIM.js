@@ -109,10 +109,23 @@
         var tmpHtml;
         if (i == 0) {
           tmpHtml = $('<i class="bar-item ' + item.icon + ' selected" title="' + item.title + '" data-id="' + item.fn + '" data-type="' + item.type + '"></i>');
+        }else if (item.type == 'more') {
+          tmpHtml = $('<div class="bar-item ' + item.icon + '" title="' + item.title + '" data-id="' + item.fn + '" data-type="' + item.type+ '" data-color="' + item.icon + '" data-group="' + item.group + '"></div>');
         } else {
           tmpHtml = $('<i class="bar-item ' + item.icon + '" title="' + item.title + '" data-id="' + item.fn + '" data-type="' + item.type + '"></i>');
         }
+
         bimView.comm.bindEvent.on(item.keyCode, tmpHtml);
+        if (item.subBar && item.subBar.length > 0) {
+          var subBar = $('<div class="subBar"></div>')
+          $.each(item.subBar, function(index, barItem) {
+            var subItem = $('<i class="bar-item ' + barItem.icon + '" title="' + barItem.title + '" data-id="' + barItem.fn+ '" data-color="' + barItem.icon+ '" data-param="' + barItem.color + '" data-type="' + barItem.type + '" data-group="' + barItem.group + '"></i>');
+            barItem.keyCode && bimView.comm.bindEvent.on(barItem.keyCode, subItem);
+            subBar.append(subItem);
+          });
+          tmpHtml.append(subBar);
+        }
+
         modelBar.append(tmpHtml);
       });
       element.append(modelBar);
@@ -540,6 +553,78 @@
       title: '文本',
       fn: '5',
       type: 'comment'
+    }, {
+      id: 'more',
+      icon: 'm-red',
+      title: '更多',
+      fn: '',
+      keyCode: '',
+      type: 'more',
+      group: '0',
+      subBar: [{
+        id: '6',
+        icon: 'm-red',
+        color: 'red',
+        title: '颜色',
+        fn: '6',
+        keyCode: '',
+        type: 'comment-color',
+        group: '0'
+      },{
+        id: '6',
+        icon: 'm-pink',
+        color: '#F647AB',
+        title: '颜色',
+        fn: '6',
+        keyCode: '',
+        type: 'comment-color',
+        group: '0'
+      },{
+        id: '6',
+        icon: 'm-blue',
+        color: '#0084EB',
+        title: '颜色',
+        fn: '6',
+        keyCode: '',
+        type: 'comment-color',
+        group: '0'
+      },{
+        id: '6',
+        icon: 'm-green',
+        color: '#79D433',
+        title: '颜色',
+        fn: '6',
+        keyCode: '',
+        type: 'comment-color',
+        group: '0'
+      },{
+        id: '6',
+        icon: 'm-yellow',
+        color: '#FFE730',
+        title: '颜色',
+        fn: '6',
+        keyCode: '',
+        type: 'comment-color',
+        group: '0'
+      },{
+        id: '6',
+        icon: 'm-golden',
+        color: '#FF8826',
+        title: '颜色',
+        fn: '6',
+        keyCode: '',
+        type: 'comment-color',
+        group: '0'
+      },{
+        id: '6',
+        icon: 'm-white',
+        color: '#fff',
+        title: '颜色',
+        fn: '6',
+        keyCode: '',
+        type: 'comment-color',
+        group: '0'
+      }]
     }],
     colorBar: [{
       id: 'color-1',

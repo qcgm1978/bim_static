@@ -20,7 +20,8 @@ App.Services.Log=Backbone.View.extend({
 
 		this.$('#logContainer').append(new App.Services.ContentMode().render().$el);
 
-		App.Services.logCollection.fetch();
+		App.Services.loadData();
+
 
 		return this;
 	}

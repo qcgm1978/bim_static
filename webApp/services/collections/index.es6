@@ -220,24 +220,24 @@ App.Services = {
 			open: "", //是否开业
 			openTimeStart: "",
 			openTimEnd: "",
-			pageIndex: App.Projects.Settings.pageIndex,
+			pageIndex: App.Services.Settings.pageIndex,
 			pageItemCount: App.Comm.Settings.pageItemCount
 
 		};
 		//初始化用户参数
 		_data=$.extend({},_data,params);
-		$("#projectModes .proListBox").empty(); //清空数据
-		App.Projects.ProjectCollection.reset();
-		App.Projects.ProjectCollection.project = "project";
+		$("#logModes .proListBox").empty(); //清空数据
+		App.Services.logCollection.reset();
+		App.Services.logCollection.project = "project";
 
 		//拉取数据
-		App.Projects.ProjectCollection.fetch({
+		App.Services.logCollection.fetch({
 
 			data: _data,
 
 			success: function(collection, response, options) {
 				$("#pageLoading").hide();
-				var $content = $("#projectModes"),
+				var $content = $("#logModes"),
 				    pageCount = response.data.totalItemCount;
 
 
@@ -251,13 +251,15 @@ App.Services = {
 					link_to: 'javascript:void(0);',
 					itemCallback: function(pageIndex) {
 						//加载数据
-						App.Projects.Settings.pageIndex = pageIndex + 1;
-						App.Projects.onlyLoadData(params);
+						App.Services.Settings.pageIndex = pageIndex + 1;
+						App.Services.onlyLoadData(params);
 					},
 					prev_text: "上一页",
 					next_text: "下一页"
 
 				});
+				App.Services.initScroll();
+
 			}
 
 		});
@@ -266,7 +268,7 @@ App.Services = {
 	//只是加载数据
 	onlyLoadData: function(params) {
 		var _data= {
-			pageIndex: App.Projects.Settings.pageIndex,
+			pageIndex: App.Services.Settings.pageIndex,
 			pageItemCount: App.Comm.Settings.pageItemCount,
 			name: "",
 			estateType: "",
@@ -277,12 +279,34 @@ App.Services = {
 			openTimeStart: "",
 			openTimEnd: ""
 		}
-		App.Projects.ProjectCollection.reset();
-		App.Projects.ProjectCollection.fetch({
+		App.Services.logCollection.reset();
+		App.Services.logCollection.fetch({
 			data:$.extend({},_data,params)
 		});
 	},
 
+	//初始化滚动条
+	initScroll: function() {
+		$("#logModes").find(".proListBoxScroll").mCustomScrollbar({
+			set_height: "100%",
+			theme: 'minimal-dark',
+			axis: 'y',
+			keyboard: {
+				enable: true
+			},
+			scrollInertia: 0
+		});
+
+		$("#logModes").find(".proMapScroll").mCustomScrollbar({
+			set_height: "100%",
+			theme: 'minimal-dark',
+			axis: 'y',
+			keyboard: {
+				enable: true
+			},
+			scrollInertia: 0
+		});
+	},
 
 
 };
