@@ -1,0 +1,40 @@
+
+
+<div class="advancedQueryConditions">
+    <div class="item">
+
+        <!--<span class="searchLabel">开业时间：</span>-->
+        <div class="firstDate dateBox start" style="position: relative;">
+            <i class="iconCal add-on"></i>
+            <input  readonly="true" placeholder="开始时间" id="dateStar" class="span2" type="text">
+
+        </div>
+        <!--<span class="searchLabel">—至—</span>-->
+        <div class="firstDate dateBox">
+            <i class="iconCal"></i>
+            <input readonly="true" placeholder="结束时间" id="dateEnd" class="span2" type="text">
+        </div>
+
+        <div class="myDropDown pickProjectType">
+            <span class="myDropText">  <span class="text">请选择类别</span> <i class="myDropArrorw"></i> </span>
+            <ul class="myDropList">
+                <% _.each(App.Services.Log.chooseTypes,function(item,i){ if(1) { %>
+                <li class="myItem" data-val='<%= i %>'><%=item%></li>
+                <% }}) %>
+            </ul>
+        </div>
+
+            <input type="text" placeholder="请输入项目名称" class="txtInput moreSeachText" />
+
+            <input type="text" placeholder="请输入用户名或账号" class="txtInput moreSeachText" />
+
+        <span class="btnSearch">筛选</span>
+        <a class="btnClear">清空筛选条件</a>
+
+    </div>
+
+
+
+
+</div>
+

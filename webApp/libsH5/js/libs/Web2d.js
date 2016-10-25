@@ -4327,18 +4327,53 @@ CLOUD.MiniMap = function (viewer) {
             _axisGridBox2D.expandByPoint(end);
         }
 
+        var center = _axisGridBox2D.center();
+        var oldSize = _axisGridBox2D.size();
+        var newSize = new THREE.Vector2();
         var offset = 4;
 
-        if (_isShowAxisGrid) {
+        //
+        //if (_isShowAxisGrid) {
+        //
+        //    //var center = _axisGridBox2D.center();
+        //    //var oldSize = _axisGridBox2D.size();
+        //    //var newSize = new THREE.Vector2();
+        //    newSize.x = oldSize.x * _svgWidth / (_svgWidth - 4.0 * (_axisGridNumberCircleRadius + offset));
+        //    newSize.y = oldSize.y * _svgHeight / (_svgHeight - 4.0 * (_axisGridNumberCircleRadius + offset));
+        //
+        //    _axisGridBox2D.setFromCenterAndSize(center, newSize);
+        //}
 
-            var center = _axisGridBox2D.center();
-            var oldSize = _axisGridBox2D.size();
-            var newSize = new THREE.Vector2();
-            newSize.x = oldSize.x * _svgWidth / (_svgWidth - 4.0 * (_axisGridNumberCircleRadius + offset));
-            newSize.y = oldSize.y * _svgHeight / (_svgHeight - 4.0 * (_axisGridNumberCircleRadius + offset));
+        // 扩展边框盒
+        var svgAspect = _svgWidth / _svgHeight;
+        var boxAspect = oldSize.x / oldSize.y;
 
-            _axisGridBox2D.setFromCenterAndSize(center, newSize);
+        var newWidth = oldSize.x;
+        var newHeight = oldSize.y;
+
+        // 横向边较长 - 上下扩展
+        if (boxAspect > svgAspect) {
+
+            // 显示轴号，则先扩展横向边长，再求纵向边长
+            if (_isShowAxisGrid) {
+                newWidth = oldSize.x * _svgWidth / (_svgWidth - 4.0 * (_axisGridNumberCircleRadius + offset));
+            }
+
+            newHeight = newWidth / svgAspect;
+
+        } else if (boxAspect < svgAspect) { // 左右扩展
+
+            // 显示轴号，则先扩展纵向边长，再求横向边长
+            if (_isShowAxisGrid) {
+                newHeight = oldSize.y * _svgHeight / (_svgHeight - 4.0 * (_axisGridNumberCircleRadius + offset));
+            }
+
+            newWidth = newHeight * svgAspect;
         }
+
+        newSize.set(newWidth, newHeight);
+
+        _axisGridBox2D.setFromCenterAndSize(center, newSize);
     }
 
     // 计算轴网交叉点
@@ -4468,7 +4503,7 @@ CLOUD.MiniMap = function (viewer) {
     this.isMouseMoving = function() {
 
         return this.viewer.editorManager.isMouseMoving();
-    },
+    };
 
     this.onMouseDown = function (event) {
 
@@ -4956,17 +4991,18 @@ CLOUD.MiniMap = function (viewer) {
         var axisGridCenter = _axisGridBox2D.center();
         var boxSize = bBox2D.size();
         var boxCenter = bBox2D.center();
-        var scaleX = _svgWidth / axisGridBoxSize.x;
-        var scaleY = _svgHeight / axisGridBoxSize.y;
-
-        var scale = Math.min(scaleX, scaleY);
-
+        //var scaleX = _svgWidth / axisGridBoxSize.x;
+        //var scaleY = _svgHeight / axisGridBoxSize.y;
+        ////var scale = Math.min(scaleX, scaleY);
+        //var scale = Math.max(scaleX, scaleY);
+        // 保持比例
+        var scale = _svgWidth / axisGridBoxSize.x;
         var width = boxSize.x * scale;
         var height = boxSize.y * scale;
-        //var offset = boxCenter.clone().sub(axisGridCenter);
+        var offset = boxCenter.clone().sub(axisGridCenter);
 
-        //offset.x *= scale;
-        //offset.y *= -scale;
+        offset.x *= scale;
+        offset.y *= -scale;
 
         if (!_axisGridBox2D.containsBox(bBox2D)) {
             console.warn('the bounding-box of axis-grid is not contains the bounding-box of floor-plane!');
@@ -4980,7 +5016,7 @@ CLOUD.MiniMap = function (viewer) {
         _svgNode.setAttribute("height", height + "");
         _svgNode.setAttribute("x", (-0.5 * width) + "");
         _svgNode.setAttribute("y", (-0.5 * height) + "");
-        //_svgNode.setAttribute("transform", 'translate(' + offset.x + ',' + offset.y + ')');
+        _svgNode.setAttribute("transform", 'translate(' + offset.x + ',' + offset.y + ')');
     };
 
     // 重设轴网大小
@@ -8116,12 +8152,16 @@ CLOUD.Extensions.AnnotationText.prototype.renderToCanvas = function (ctx) {
     var position = this.getClientPosition();
     var size = this.getClientSize();
 
+    // 对应超出文本区域的文字的处理：使用包围盒
+    var bBox = this.shape.getBBox();
+    var sizeBox = {width: bBox.width, height: bBox.height};
+
     ctx.save();
     ctx.fillStyle = CLOUD.Extensions.Utils.Shape2D.getRGBAString(fillColor, fillOpacity);
     ctx.translate(position.x, position.y);
 
     if (fillOpacity !== 0) {
-        ctx.fillRect(-0.5 * size.width, -0.5 * size.height, size.width, size.height);
+        ctx.fillRect(-0.5 * sizeBox.width, -0.5 * sizeBox.height, sizeBox.width, sizeBox.height);
     }
 
     ctx.restore();
@@ -8136,7 +8176,7 @@ CLOUD.Extensions.AnnotationText.prototype.renderToCanvas = function (ctx) {
 
     ctx.font = fontStyle + " " + fontWeight + " " + fontSize + "px " + fontFamily;
     ctx.globalAlpha = fontOpacity;
-    renderTextLines(ctx, this.currTextLines, lineHeight, size.height);
+    renderTextLines(ctx, this.currTextLines, lineHeight, sizeBox.height);
 };
 
 
@@ -8176,6 +8216,7 @@ CLOUD.Extensions.AnnotationTextArea.prototype.onKeyDown = function () {
     var keyCode = event.keyCode;
     var shiftDown = event.shiftKey;
 
+    // 回车键
     if (!shiftDown && keyCode === 13) {
         event.preventDefault();
         this.accept();
@@ -10341,7 +10382,7 @@ CLOUD.Extensions.AnnotationEditor.prototype.getAnnotationInfoList = function () 
             rotation: annotation.rotation,
             shapePoints: shapePoints,
             originSize: originSize,
-            //style: annotation.style, //
+            style: annotation.style, //
             text: text
         };
 
@@ -10377,49 +10418,49 @@ CLOUD.Extensions.AnnotationEditor.prototype.loadAnnotations = function (annotati
         var originSize = info.originSize;
         //var text = info.text; // 解码中文
         var text = decodeURIComponent(info.text); // 解码中文
-        //var style = info.style ? info.style : this.annotationStyle;
+        var style = info.style ? info.style : this.annotationStyle;
 
         switch (shapeType) {
 
             case CLOUD.Extensions.Annotation.shapeTypes.ARROW:
                 var arrow = new CLOUD.Extensions.AnnotationArrow(this, id);
                 arrow.set(position, size, rotation);
-                //arrow.setStyle(style);
+                arrow.setStyle(style);
                 this.addAnnotation(arrow);
                 arrow.created();
                 break;
             case  CLOUD.Extensions.Annotation.shapeTypes.RECTANGLE:
                 var rectangle = new CLOUD.Extensions.AnnotationRectangle(this, id);
                 rectangle.set(position, size, rotation);
-                //rectangle.setStyle(style);
+                rectangle.setStyle(style);
                 this.addAnnotation(rectangle);
                 rectangle.created();
                 break;
             case  CLOUD.Extensions.Annotation.shapeTypes.CIRCLE:
                 var circle = new CLOUD.Extensions.AnnotationCircle(this, id);
                 circle.set(position, size, rotation);
-                //circle.setStyle(style);
+                circle.setStyle(style);
                 this.addAnnotation(circle);
                 circle.created();
                 break;
             case  CLOUD.Extensions.Annotation.shapeTypes.CROSS:
                 var cross = new CLOUD.Extensions.AnnotationCross(this, id);
                 cross.set(position, size, rotation);
-                //cross.setStyle(style);
+                cross.setStyle(style);
                 this.addAnnotation(cross);
                 cross.created();
                 break;
             case CLOUD.Extensions.Annotation.shapeTypes.CLOUD:
                 var cloud = new CLOUD.Extensions.AnnotationCloud(this, id);
                 cloud.set(position, size, rotation, shapePointsStr, originSize);
-                //cloud.setStyle(style);
+                cloud.setStyle(style);
                 this.addAnnotation(cloud);
                 cloud.created();
                 break;
             case  CLOUD.Extensions.Annotation.shapeTypes.TEXT:
                 var textAnnotation = new CLOUD.Extensions.AnnotationText(this, id);
                 textAnnotation.set(position, size, rotation, text);
-                //textAnnotation.setStyle(style);
+                textAnnotation.setStyle(style);
                 this.addAnnotation(textAnnotation);
                 textAnnotation.created();
                 textAnnotation.forceRedraw();
@@ -11150,6 +11191,18 @@ CLOUD.Extensions.DwgHelper.prototype = {
 CLOUD.Extensions.AnnotationHelper = function (viewer) {
 
     this.viewer = viewer;
+
+    this.defaultStyle = {
+        'stroke-width': 3,
+        'stroke-color': '#ff0000',
+        'stroke-opacity': 1.0,
+        'fill-color': '#ff0000',
+        'fill-opacity': 0.0,
+        'font-family': 'Arial',
+        'font-size': 16,
+        'font-style': '',
+        'font-weight': ''
+    };
 };
 
 CLOUD.Extensions.AnnotationHelper.prototype = {
@@ -11242,6 +11295,24 @@ CLOUD.Extensions.AnnotationHelper.prototype = {
         if (this.annotationEditor) {
 
             this.annotationEditor.setAnnotationType(type);
+
+        }
+    },
+
+    // 设置批注风格
+    setAnnotationStyle: function (style) {
+
+        if (this.annotationEditor) {
+
+            for (var attr in style) {
+
+                if (attr in this.defaultStyle) {
+                    this.defaultStyle[attr] = style[attr];
+                }
+
+            }
+
+            this.annotationEditor.setAnnotationStyle(this.defaultStyle);
 
         }
     },

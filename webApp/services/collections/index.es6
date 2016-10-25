@@ -172,12 +172,148 @@ App.Services = {
 
 	},
 
+	logCollection: new(Backbone.Collection.extend({
+		model: Backbone.Model.extend({
+			defaults: function() {
+				return {
+					url: ''
+				}
+			}
+		}),
+
+		urlType: "fetchProjects",
+
+		parse: function(response) {
+			if (response.message == "success") {
+				if(response.data.items && response.data.items.length){
+					App.Services._cache=response.data.items||[];
+					return response.data.items;
+				}else{
+					Backbone.trigger('servicesListNullData');
+					return [];
+				}
+			}
+		}
+
+
+	})),
+
+	Settings: {
+		projectId: "",
+		projectName: "",
+		type: "list",
+		isInitMap: false,
+		initBodyEvent: false,
+		pageIndex: 1
+	},
+
+	//加载数据
+	loadData: function(params) {
+
+		var _data={
+			name: "",
+			projectType:"", //项目类型
+			estateType: "", //项目模式
+			province: "", //所属省份
+			region: "", //分区
+			complete: "", //是否完成
+			open: "", //是否开业
+			openTimeStart: "",
+			openTimEnd: "",
+			pageIndex: App.Services.Settings.pageIndex,
+			pageItemCount: App.Comm.Settings.pageItemCount
+
+		};
+		//初始化用户参数
+		_data=$.extend({},_data,params);
+		$("#logModes .proListBox").empty(); //清空数据
+		App.Services.logCollection.reset();
+		App.Services.logCollection.project = "project";
+
+		//拉取数据
+		App.Services.logCollection.fetch({
+
+			data: _data,
+
+			success: function(collection, response, options) {
+				$("#pageLoading").hide();
+				var $content = $("#logModes"),
+				    pageCount = response.data.totalItemCount;
+
+
+				$content.find(".sumDesc").html('共 ' + pageCount + ' 个项目');
+
+				$content.find(".listPagination").empty().pagination(pageCount, {
+					items_per_page: response.data.pageItemCount,
+					current_page: response.data.pageIndex - 1,
+					num_edge_entries: 3, //边缘页数
+					num_display_entries: 5, //主体页数
+					link_to: 'javascript:void(0);',
+					itemCallback: function(pageIndex) {
+						//加载数据
+						App.Services.Settings.pageIndex = pageIndex + 1;
+						App.Services.onlyLoadData(params);
+					},
+					prev_text: "上一页",
+					next_text: "下一页"
+
+				});
+				App.Services.initScroll();
+
+			}
+
+		});
+	},
+
+	//只是加载数据
+	onlyLoadData: function(params) {
+		var _data= {
+			pageIndex: App.Services.Settings.pageIndex,
+			pageItemCount: App.Comm.Settings.pageItemCount,
+			name: "",
+			estateType: "",
+			province: "",
+			region: "",
+			complete: "",
+			open: "",
+			openTimeStart: "",
+			openTimEnd: ""
+		}
+		App.Services.logCollection.reset();
+		App.Services.logCollection.fetch({
+			data:$.extend({},_data,params)
+		});
+	},
+
+	//初始化滚动条
+	initScroll: function() {
+		$("#logModes").find(".proListBoxScroll").mCustomScrollbar({
+			set_height: "100%",
+			theme: 'minimal-dark',
+			axis: 'y',
+			keyboard: {
+				enable: true
+			},
+			scrollInertia: 0
+		});
+
+		$("#logModes").find(".proMapScroll").mCustomScrollbar({
+			set_height: "100%",
+			theme: 'minimal-dark',
+			axis: 'y',
+			keyboard: {
+				enable: true
+			},
+			scrollInertia: 0
+		});
+	},
+
 	ruleInit(){
 
 		var processCategory=['工程桩', '基坑支护', '地下防水', '梁柱节点', '钢结构悬挑构件', '幕墙', '外保温',
-			'采光顶', '步行街吊顶风口', '卫生间防水', '屋面防水', '屋面虹吸雨排', '消防泵房', '给水泵房',
-			'湿式报警阀室', '空调机房', '冷冻机房', '变配电室', '发电机房', '慧云机房', '电梯机房', '电梯底坑',
-			'吊顶', '地面', '中庭栏杆', '竖井'
+		                     '采光顶', '步行街吊顶风口', '卫生间防水', '屋面防水', '屋面虹吸雨排', '消防泵房', '给水泵房',
+		                     '湿式报警阀室', '空调机房', '冷冻机房', '变配电室', '发电机房', '慧云机房', '电梯机房', '电梯底坑',
+		                     '吊顶', '地面', '中庭栏杆', '竖井'
 		];
 
 		var special = [
@@ -261,7 +397,7 @@ App.Services = {
 
 			initEvent:function(){
 				var _this=this,
-					_$items=_this.$('.ruleTypeItem');
+				    _$items=_this.$('.ruleTypeItem');
 				_$items.on('click',function(event){
 					_this.selectItem(event,_$items);
 				})
@@ -277,9 +413,9 @@ App.Services = {
 
 			selectItem:function(event,_$items){
 				var _this=this,
-					_$target=$(event.target),
-					$forms=_this.$('.formLabel').children(),
-					$el=_this.$('.formLabel .'+_$target.data('id'));
+				    _$target=$(event.target),
+				    $forms=_this.$('.formLabel').children(),
+				    $el=_this.$('.formLabel .'+_$target.data('id'));
 				if(!_$target.hasClass('selected')){
 					_$items.removeClass('selected');
 					_$target.addClass('selected');
@@ -321,7 +457,6 @@ App.Services = {
 									data:res.data
 								});
 								_this.$('.formLabel').append(view.$el);
-
 							}
 						})
 					}
@@ -433,12 +568,11 @@ App.Services = {
 						}
 					})
 				}
-
 			},
 
 			initEvent:function(){
 				var _this=this,
-					_$item=_this.$('.ruleTyleItem');
+				    _$item=_this.$('.ruleTyleItem');
 				_$item.on('click',function(event){
 					_$item.removeClass('selected');
 					$(event.target).addClass('selected')
@@ -451,5 +585,4 @@ App.Services = {
 		});
 
 	}
-
 };
