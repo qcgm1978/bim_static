@@ -528,46 +528,49 @@ App.Services = {
 					$ccode=this.$('.classCodeWrap');
 				$spe.each(function(index,d){
 					var dom=$(d);
-					data.specRule.push({
-						"specCode": dom.find('select[name="specail"]').val(),
-						"fileOperator": dom.find('select[name="condition"]').val(),
-						"filename": dom.find('input[name="specialValue"]').val()
-					})
+					if(dom.find('select[name="specail"]').val()) {
+						data.specRule.push({
+							"specCode": dom.find('select[name="specail"]').val(),
+							"fileOperator": dom.find('select[name="condition"]').val(),
+							"filename": dom.find('input[name="specialValue"]').val()
+						})
+					}
 				})
 
 				$flo.each(function(){
 					var dom=$(this);
-					data.floorRule.push({
-						"floorOperator": dom.find('select[name="condition"]').val(),
-						"floor": dom.find('input[name="floorValue"]').val()
-					})
+					if(dom.find('select[name="condition"]').val()
+						&& dom.find('input[name="floorValue"]').val()){
+						data.floorRule.push({
+							"floorOperator": dom.find('select[name="condition"]').val(),
+							"floor": dom.find('input[name="floorValue"]').val()
+						})
+					}
 				})
 
 				data.codeRule.push({
-					visible:!!$ccode.find('select[name="condition"]').val(),
+					visible:$ccode.find('select[name="condition"]').val()=='true'?true:false,
 					code: $ccode.find('input[name="ccodeValue"]').val().split(',')
 				})
 
-				if(data.specRule.length){
-					$.ajax({
-						url:'/sixD/checkPointRule?token=123',
-						contentType:"application/json",
-						type:"post",
-						data:JSON.stringify(data),
-						success:function(res){
-							if(res.code==0){
-								$.tip({message:'操作成功'})
-							}else{
-								$.tip({message:'操作失败',type:'alarm'})
-							}
-
-						},
-
-						error:function(){
+				$.ajax({
+					url:'/sixD/checkPointRule?token=123',
+					contentType:"application/json",
+					type:"post",
+					data:JSON.stringify(data),
+					success:function(res){
+						if(res.code==0){
+							$.tip({message:'操作成功'})
+						}else{
 							$.tip({message:'操作失败',type:'alarm'})
 						}
-					})
-				}
+
+					},
+
+					error:function(){
+						$.tip({message:'操作失败',type:'alarm'})
+					}
+				})
 			},
 
 			initEvent:function(){
