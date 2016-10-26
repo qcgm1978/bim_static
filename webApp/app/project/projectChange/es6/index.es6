@@ -368,7 +368,7 @@ App.Index = {
 	attrDwg: function() {
 
 		var modelId = App.Index.Settings.ModelObj.intersect.userId.split('.')[0],
-			data = {
+			datas = {
 				URLtype: 'attrDwg',
 				data: {
 					projectId: App.Index.Settings.projectId,
@@ -377,10 +377,11 @@ App.Index = {
 				}
 			},
 
-			liTpl = '<li class="modleItem"><a data-id="<%=id%>" href="/static/dist/app/project/single/filePreview.html?id={id}&projectId=' + App.Project.Settings.projectId + '&projectVersionId=' + App.Project.Settings.CurrentVersion.id + '" target="_blank" ><div class="modleNameText overflowEllipsis modleName2">varName</div></a></li>';
+			//liTpl = '<li class="modleItem"><a data-id="<%=id%>" href="/static/dist/app/project/single/filePreview.html?id={id}&projectId=' + App.Project.Settings.projectId + '&projectVersionId=' + App.Project.Settings.CurrentVersion.id + '" target="_blank" ><div class="modleNameText overflowEllipsis modleName2">varName</div></a></li>';
+			  liTpl = '<li class="modleItem"><a data-id="<%=id%>" href="/static/dist/app/project/single/filePreview.html?id={id}&projectId=' + App.Index.Settings.projectId + '&projectVersionId=' + App.Index.Settings.projectVersionId + '" target="_blank" ><div class="modleNameText overflowEllipsis modleName2">varName</div></a></li>';
 
 
-		App.Comm.ajax(data, (data) => {
+		App.Comm.ajax(datas, (data) => {
 			if (data.code == 0) {
 
 				if (data.data.length > 0) {
@@ -414,7 +415,7 @@ App.Index = {
 		App.Comm.ajax(data, function(data) {
 			var treeRoot = _.templateUrl('/app/project/projectChange/tpls/treeRoot.html');
 			var treeNode = _.templateUrl('/app/project/projectChange/tpls/treeNode.html');
-			data.treeNode = treeNode; 
+			data.treeNode = treeNode;
 			$(".designProperties .attrCostBox .modleList").append(treeRoot(data));
 			$(".attrCostBox li .itemContent").addClass("odd");
 		});

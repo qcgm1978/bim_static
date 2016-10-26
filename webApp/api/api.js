@@ -56,6 +56,8 @@ App.API = {
 
 		checkDelAuth:"platform/auth/keyUser/user/check",//删除项目成员
 
+		fetchLog:"platform/auditlog",//删除项目成员
+
 		//单独
 		fetchServicesUserName:"platform/auth/user/",
 

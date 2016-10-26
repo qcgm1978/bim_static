@@ -599,9 +599,10 @@
       var viewer = self.viewer;
       var modelBgColor = self._dom.bimBox.css('background-color');
       //还原颜色
-      viewer.setCommentStyle({'stroke-color': 'red','fil-color':'red' });
       self._dom.bimBox.addClass('comment');
       viewer.editCommentBegin();
+      //viewer.setCommentStyle({'stroke-color': 'red','fil-color':'red' });
+
       viewer.setCommentBackgroundColor(modelBgColor);
       if (data) {
         var newList = [];

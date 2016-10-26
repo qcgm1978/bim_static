@@ -172,6 +172,10 @@ App.Services = {
 
 	},
 
+	logData : {
+		moduleType : ["项目","族库","标准模型","权限管理","项目管理","应用管理","系统管理","模型"]
+	},
+
 	logCollection: new(Backbone.Collection.extend({
 		model: Backbone.Model.extend({
 			defaults: function() {
@@ -181,7 +185,7 @@ App.Services = {
 			}
 		}),
 
-		urlType: "fetchProjects",
+		urlType: "fetchLog",
 
 		parse: function(response) {
 			if (response.message == "success") {
