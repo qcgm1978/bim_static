@@ -13,6 +13,8 @@ App.API = {
 
 	URL: {
 
+		modelFilterRule:'sixD/checkPointRule/{projectId}/{projectVersionId}/checkPointRule',
+
 		downloadPlanVer:"sixD/{projectId}/{projectVersionId}/plan/export/zip",//校验下载
 
 		//首页bodyContent数据
