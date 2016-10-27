@@ -57,7 +57,7 @@ App.Services.searchView = Backbone.View.extend({
       _this.formData.opTimeStart=$(this).val();
     })
     this.$('#dateEnd').on('change',function(){
-      _this.formData.opTimEnd=$(this).val();
+      _this.formData.opTimeEnd=$(this).val();
     })
 
     return this;
