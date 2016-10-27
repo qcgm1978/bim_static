@@ -17,7 +17,8 @@ App.INBox.imboxContainerView=Backbone.View.extend({
         var _data=item.toJSON()[0];
 		var _html=_.templateUrl('./imbox/tpls/list.html');
         if(!_data.items.length){
-            return 
+            this.$('.commissionLists').html('<span class="noData"><i class="tip"></i>没有消息</span>');
+            return
         }
 		this.$('.commissionLists').html(_html({data:_data.items}));
         this.$(".commissionListPagination").empty().pagination(_data.totalItemCount, {
@@ -40,6 +41,7 @@ App.INBox.imboxContainerView=Backbone.View.extend({
 		var _html=_.templateUrl('./imbox/tpls/list.html');
 
          if(!_data.items.length){
+             this.$('.alreadyLists').html('<span class="noData"><i class="tip"></i>没有消息</span>');
             return 
         }
 

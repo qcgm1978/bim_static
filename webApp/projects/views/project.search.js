@@ -21,6 +21,7 @@ App.Projects.searchView = Backbone.View.extend({
 		"click .btnSearch": "searchProject",
 		"click .btnClear": "clearSearch",
 		"change .txtSearch":"linkSearchWord",
+		"change .moreSeachText":"linkSearchWord",
 		"keydown .txtInput":"enterSearch"
 	},
 
@@ -59,7 +60,7 @@ App.Projects.searchView = Backbone.View.extend({
 		this.$(".pickProvince").myDropDown({
 			zIndex:96,
 			click:function($item){
-				_this.formData.province=encodeURI($item.text());
+				_this.formData.province=encodeURI($item.attr('data-val'));
 			}
 		});
 		this.$(".pickOpening").myDropDown({

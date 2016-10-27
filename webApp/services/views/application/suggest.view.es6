@@ -11,7 +11,7 @@ App.Services.SuggestView = {
             message: tpl,
             okCallback: function(){
                 var _self=this;
-                _this.commit(_self);
+                return _this.commit(_self);
             },
             readyFn: function () {
                 var self=this;
@@ -55,6 +55,12 @@ App.Services.SuggestView = {
             "createName": user.name,//上传人姓名
             "attachmentList": []
         }
+
+        if(data.title.trim().length<=0){
+            $.tip({message:'标题不能为空',type:'alarm'});
+            return false
+        }
+
         _this.find('.attachList a').each(function(){
             data.attachmentList.push({
                 id:$(this).data('id')
@@ -66,8 +72,11 @@ App.Services.SuggestView = {
             contentType:"application/json",
             data:JSON.stringify(data)
         },function(data){
+            $.tip({message:'操作成功'});
             _this.close();
         })
+
+        return false
     },
 
     initData:function(_this,id){

@@ -5,6 +5,7 @@ App.Project = {
 	currentOpenCheckFloor:"",
 	currentProsCheckFloor:"",
 
+
 	//检查点标记点击事件
 	markerClick: function(marker) {
 		var id = marker? marker.id:"",
@@ -176,7 +177,46 @@ App.Project = {
 			_files = App.Project.Settings.Viewer.FloorFilesData,
 			_specialFilterFiles=[],
 			_extArray=[],
+			_codeFlag=false,
 			_hideCode=null;
+
+		if(_.isArray(floor)){
+			floor=floor.join(',');
+		}
+
+		App.Comm.ajax({
+			URLtype:"modelFilterRule",
+			data:{
+				token:123,
+				sourceId: App.Project.Settings.DataModel.sourceId,
+				etag: App.Project.Settings.DataModel.etag,
+				projectId: App.Project.Settings.projectId,
+				projectVersionId: App.Project.Settings.CurrentVersion.id,
+				checkPointType:cat,
+				floor:floor
+			}
+		}).done(function(res){
+			if(res.code==0 && res.data){
+				var _t=res.data.code;
+				_specialFilterFiles=res.data.file;
+				_extArray=res.data.specCode;
+				if(_t && _t.length){
+					_hideCode=_t.code;
+					_codeFlag=_t.visible;
+				}
+				floor=_.pluck(res.data.floor, 'floor');
+			}
+			_this.linkSilder('floors', floor);
+			_this.linkSilderSpecial('specialty', _specialFilterFiles,_extArray);
+			if(_hideCode){
+				App.Project.Settings.Viewer.filter({
+					ids: _this.filterHideCode(_hideCode,_codeFlag),
+					type: "classCode"
+				})
+			}
+		})
+
+		return
 
 		if (cat == '梁柱节点') {
 			if(!floor){
@@ -460,6 +500,8 @@ App.Project = {
 		})
 		return hide;
 	},
+
+	//flag true 显示 false 隐藏
 	filterHideCode: function(code,flag) {
 		var _class = App.Project.Settings.Viewer.ClassCodeData;
 		hide = [];
