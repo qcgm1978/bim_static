@@ -13262,7 +13262,8 @@ CLOUD.Filter = function () {
     var _frozenSetInvert = null; // 半透明未在该集合的构件
 
     var _overriderByIds = {}; // 材质过滤器
-    var _overriderByData = {}; // 自定义材质过滤器
+    var _overriderByData = {}; // 自定义材质覆盖
+    var _overriderCondition = null;//组合条件的材质覆盖
 
     var _selectionSet = null; // 选中的构件集合
 
@@ -13282,6 +13283,10 @@ CLOUD.Filter = function () {
         obj.overriderByIds = _overriderByIds;
         obj.overriderByData = _overriderByData;
 
+        if (_overriderCondition) {
+            obj.overriderCondition = _overriderCondition;
+        }
+
         if (_selectionSet) {
             obj.selectionSet = _selectionSet;
         }
@@ -13300,6 +13305,11 @@ CLOUD.Filter = function () {
             _frozenSetInvert = obj.frozenSetInvert;
         _overrideByIds = obj.overriderByIds;
         _overriderByData = obj.overriderByData;
+
+        if (obj.overriderCondition) {
+            _overriderCondition = obj.overriderCondition;
+        }
+
         if (obj.selectionSet != undefined)
             _selectionSet = obj.selectionSet;
 
@@ -13385,7 +13395,8 @@ CLOUD.Filter = function () {
         _overriderByData = {};
         _selectionSet = null;
         _frozenSet = null;
-        _frozenSetInvert  = null;
+        _frozenSetInvert = null;
+        _overriderCondition = null;
     };
 
     //DEBUG API
@@ -13606,17 +13617,8 @@ CLOUD.Filter = function () {
         }
         else {
 
-            var material = null;
-            if (materialName) {
-                material = _overridedMaterials[materialName];
-            } else {
-
-                // 有问题， material可能为null
-                console.log("the material that material name is [" + materialName + "] not exist!");
-            }
-
             var overrider = {};
-            overrider.material = material;
+            overrider.material = materialName;
 
             overrider.ids = {};
             for (var ii = 0, len = ids.length; ii < len; ++ii) {
@@ -13644,15 +13646,10 @@ CLOUD.Filter = function () {
         }
         else {
 
-            var material = null;
-            if (materialName) {
-                material = _overridedMaterials[materialName];
-            }
-
             if (!_overriderByData[name])
                 _overriderByData[name] = {};
 
-            _overriderByData[name][value] = material;
+            _overriderByData[name][value] = materialName;
         }
     };
 
@@ -13674,6 +13671,13 @@ CLOUD.Filter = function () {
             delete _overriderByData[name][value];
         }
 
+    };
+
+
+    // conditions: the condition array
+    // condition = {condition:{levelName:'f01'}, material:name}
+    this.setConditionOverrider = function (conditions) {
+        _overriderCondition = conditions;
     };
 
     ////////////////////////////////////////////////////////////////
@@ -14014,18 +14018,41 @@ CLOUD.Filter = function () {
         for (var item in _overriderByIds) {
             var overrider = _overriderByIds[item];
             if (overrider.ids[id])
-                return overrider.material;
+                return _overridedMaterials[overrider.material];
         }
 
-        if (!object.userData)
+        var userData = object.userData;
+        if (!userData)
             return null;
 
         // 自定义材质过滤器
         for (var item in _overriderByData) {
             var overrider = _overriderByData[item];
-            var material = overrider[object.userData[item]];
+            var materialName = overrider[userData[item]];
+            var material = _overridedMaterials[materialName];
             if (material !== undefined)
                 return material;
+        }
+
+        if (_overriderCondition) {
+
+            function matchCondition(condition) {
+
+                for (var item in condition) {
+                    if (condition[item] != userData[item])
+                        return false;
+                }
+
+                return true;
+            }
+
+            for (var ii = 0, len = _overriderCondition.length; ii < len; ++ii) {
+                var item = _overriderCondition[ii];
+                if (matchCondition(item.condition)){
+                    return _overridedMaterials[item.material];
+                }                    
+            }
+
         }
 
         // 场景材质
@@ -19364,6 +19391,9 @@ CLOUD.EditorManager.prototype = {
                 function (intersect, doubleClick) {
                     viewer.modelManager.dispatchEvent({ type: CLOUD.EVENTS.ON_SELECTION_CHANGED, intersect: intersect, click: doubleClick ? 2 : 1 });
                 });
+            clipPlanes.onUpdateUI = function(obj) {
+                viewer.modelManager.dispatchEvent({ type: CLOUD.EVENTS.ON_UPDATE_SELECTION_UI, data: obj })
+            };
             this.editors["clipPlanesEditor"] = clipPlanes;
             clipPlanes.update(viewer.camera);
         }
@@ -20156,6 +20186,11 @@ CLOUD.ClipPlanesEditor = function (object, scene, domElement, onSelectionChanged
 
     var clipPlanes = scene.getClipPlanes();
 
+    this.startPt = new THREE.Vector2();
+    this.endPt = new THREE.Vector2();
+
+    this.frustum = new THREE.Frustum();
+
     this.intersectPoint = null;
     this.selectIndex = null;
     this.normal = null;
@@ -20244,8 +20279,8 @@ CLOUD.ClipPlanesEditor = function (object, scene, domElement, onSelectionChanged
         return clipPlanes.rotatable;
     };
 
-    this.getPlane = function() {
-        this.normal = clipPlanes.uniforms.vClipPlane.value[this.selectIndex ].clone();
+    this.getPlane = function () {
+        this.normal = clipPlanes.uniforms.vClipPlane.value[this.selectIndex].clone();
         //this.normal = this.cameraEditor.object.getWorldDirection().negate();
 
         var plane = clipPlanes.uniforms.vClipPlane.value[(this.selectIndex + 2) % 6].clone();
@@ -20257,10 +20292,10 @@ CLOUD.ClipPlanesEditor = function (object, scene, domElement, onSelectionChanged
 
     this.offset = function (offset) {
         if (this.selectIndex % 2 == 1) {
-            clipPlanes.offset(this.selectIndex, -offset  * this.offsetSpeed);
+            clipPlanes.offset(this.selectIndex, -offset * this.offsetSpeed);
         }
         else {
-            clipPlanes.offset(this.selectIndex, offset  * this.offsetSpeed);
+            clipPlanes.offset(this.selectIndex, offset * this.offsetSpeed);
         }
     };
 
@@ -20272,19 +20307,19 @@ CLOUD.ClipPlanesEditor = function (object, scene, domElement, onSelectionChanged
             clipPlanes.rotY(cx / 180 * Math.PI * 0.1);
         }
     };
-    
+
     this.update = function (camera) {
         if (clipPlanes === undefined)
             return;
         clipPlanes.update(camera);
     };
-    
+
     this.cancelHighLight = function () {
         if (clipPlanes === undefined)
             return;
         clipPlanes.cancelHighLight();
     };
-    
+
     this.highLight = function () {
         if (clipPlanes === undefined)
             return;
@@ -20295,9 +20330,46 @@ CLOUD.ClipPlanesEditor = function (object, scene, domElement, onSelectionChanged
 CLOUD.ClipPlanesEditor.prototype = Object.create(CLOUD.OrbitEditor.prototype);
 CLOUD.ClipPlanesEditor.prototype.constructor = CLOUD.ClipPlanesEditor;
 
-var lastEvent;
+CLOUD.ClipPlanesEditor.prototype.updateFrustum = function (updateUI) {
+
+    var x1 = this.startPt.x;
+    var x2 = this.endPt.x;
+    var y1 = this.startPt.y;
+    var y2 = this.endPt.y;
+
+    if (x1 > x2) {
+
+        var tmp1 = x1;
+        x1 = x2;
+        x2 = tmp1;
+
+    }
+
+    if (y1 > y2) {
+
+        var tmp2 = y1;
+        y1 = y2;
+        y2 = tmp2;
+
+    }
+
+    if (x2 - x1 == 0 || y2 - y1 == 0)
+        return false;
+
+    var helper = this.cameraEditor;
+    var dim = helper.getContainerDimensions();
+
+    helper.computeFrustum(x1, x2, y1, y2, this.frustum, dim);
+
+    if (updateUI) {
+        this.onUpdateUI({visible: true, dir: this.startPt.x < this.endPt.x, left: (x1 - dim.left), top: (y1 - dim.top), width: (x2 - x1), height: (y2 - y1)});
+    }
+
+    return true;
+};
+
 CLOUD.ClipPlanesEditor.prototype.processMouseDown = function (event) {
-    lastEvent = event;
+    this.startPt.set(event.clientX, event.clientY);
 
     if (!this.enablePick && event.button === THREE.MOUSE.LEFT) {
         this.intersectPoint = this.cameraEditor.getTrackingPoint(event.clientX, event.clientY);
@@ -20321,9 +20393,40 @@ CLOUD.ClipPlanesEditor.prototype.processMouseUp = function (event) {
     this.normal = null;
     this.plane = null;
 
+    this.onUpdateUI({visible: false});
+
     if (this.enablePick && event.button === THREE.MOUSE.LEFT) {
-        if (lastEvent.clientX == event.clientX && lastEvent.clientY == event.clientY) {
+        if (this.startPt.x == event.clientX && this.startPt.y == event.clientY) {
             this.pickHelper.click(event);
+        }
+        else {
+            var allowRectPick = event.shiftKey || event.ctrlKey || event.altKey;
+            if (allowRectPick) {
+
+                this.endPt.set(event.clientX, event.clientY);
+                if (!this.updateFrustum()) {
+                    this.pickHelper.click(event);
+                    return false;
+                }
+
+                var state = CLOUD.OPSELECTIONTYPE.Clear;
+
+                if (event.ctrlKey) {
+                    state = CLOUD.OPSELECTIONTYPE.Add;
+                }
+                else if (event.altKey) {
+                    state = CLOUD.OPSELECTIONTYPE.Remove;
+                }
+
+
+                var scope = this;
+                this.scene.pickByReck(this.frustum, state, function () {
+                    scope.onObjectSelected(null, false);
+                });
+                this.cameraEditor.updateView(true);
+
+                return true;
+            }
         }
     }
 
@@ -20338,6 +20441,13 @@ CLOUD.ClipPlanesEditor.prototype.processMouseUp = function (event) {
 
 
 CLOUD.ClipPlanesEditor.prototype.processMouseMove = function (event) {
+    var allowRectPick = event.shiftKey || event.ctrlKey || event.altKey;
+    if (allowRectPick && event.button === THREE.MOUSE.LEFT) {
+        this.endPt.set(event.clientX, event.clientY);
+        this.updateFrustum(true);
+        return true;
+    }
+
     if (this.selectIndex != null) {
         if (!this.isRotate()) {
             var point = this.getPickPoint(event.clientX, event.clientY);
@@ -20345,11 +20455,10 @@ CLOUD.ClipPlanesEditor.prototype.processMouseMove = function (event) {
             dir.subVectors(point, this.intersectPoint);
             this.offset(dir.dot(this.normal) * dir.length());
             this.intersectPoint = point;
-            //this.highLight();
         }
         else {
-            this.rotate(event.clientX - lastEvent.clientX, event.clientY - lastEvent.clientY);
-            lastEvent = event;
+            this.rotate(event.clientX - this.startPt.x, event.clientY - this.startPt.y);
+            this.startPt.set(event.clientX, event.clientY);
         }
         this.cameraEditor.update(true);
     }
@@ -20537,21 +20646,9 @@ CLOUD.ClipPlaneService.prototype = {
 CLOUD.ExtensionHelper = function (viewer) {
 
     this.viewer = viewer;
-    this.miniMaps = {};
-    this.defaultMiniMap = null;
-    this.markerClickCallback = null;
-
-    this.defaultStyle = {
-        'stroke-width': 3,
-        'stroke-color': '#ff0000',
-        'stroke-opacity': 1.0,
-        'fill-color': '#ff0000',
-        'fill-opacity': 0.0,
-        'font-family': 'Arial',
-        'font-size': 16,
-        'font-style': '',
-        'font-weight': ''
-    };
+    this.annotationHelper = new CLOUD.Extensions.AnnotationHelper(viewer);
+    this.markerHelper = new CLOUD.Extensions.MarkerHelper(viewer);
+    this.miniMapHelper = new CLOUD.Extensions.MiniMapHelper(viewer);
 };
 
 CLOUD.ExtensionHelper.prototype = {
@@ -20561,14 +20658,9 @@ CLOUD.ExtensionHelper.prototype = {
     destroy: function () {
 
         // TODO: clear other resources.
-
-        this.uninitAnnotation();
-        this.uninitMarkerEditor();
-        this.destroyAllMiniMap();
-
-        this.annotationEditor = null;
-        this.markerEditor = null;
-        this.markerClickCallback = null;
+        this.annotationHelper.destroy();
+        this.markerHelper.destroy();
+        this.miniMapHelper.destroy();
         this.viewer = null;
     },
 
@@ -20577,157 +20669,79 @@ CLOUD.ExtensionHelper.prototype = {
     // 是否存在批注
     hasAnnotations: function () {
 
-        return this.annotationEditor && this.annotationEditor.isInitialized();
+        return this.annotationHelper.hasAnnotations();
     },
 
     // 初始化批注
     initAnnotation: function () {
 
-        var viewer = this.viewer;
-        var scope = this;
-
-        if (!this.annotationEditor) {
-
-            this.annotationEditor = new CLOUD.Extensions.AnnotationEditor(viewer.domElement, viewer.cameraEditor);
-        }
-
-        if (!this.annotationEditor.isInitialized()) {
-
-            var callbacks = {
-                beginEditCallback: function (domElement) {
-                    viewer.editorManager.unregisterDomEventListeners(domElement);
-                },
-                endEditCallback: function (domElement) {
-                    viewer.editorManager.registerDomEventListeners(domElement);
-                },
-                changeEditorModeCallback: function () {
-                    scope.uninitAnnotation();
-                }
-            };
-
-            this.annotationEditor.init(callbacks);
-
-            callbacks = null;
-        }
+        this.annotationHelper.initAnnotation();
     },
 
     // 卸载批注资源
     uninitAnnotation: function () {
 
-        if (this.annotationEditor && this.annotationEditor.isInitialized()) {
-
-            this.annotationEditor.uninit();
-
-        }
+        this.annotationHelper.uninitAnnotation();
     },
 
     // 设置批注背景色
     setAnnotationBackgroundColor: function (startColor, stopColor) {
 
-        if (this.annotationEditor) {
-
-            this.annotationEditor.setBackgroundColor(startColor, stopColor);
-        }
+        this.annotationHelper.setAnnotationBackgroundColor(startColor, stopColor);
     },
 
     // 开始批注编辑
     editAnnotationBegin: function () {
 
-        // 如果没有设置批注模式，则自动进入批注模式
-        this.initAnnotation();
-
-        this.annotationEditor.editBegin();
+        this.annotationHelper.editAnnotationBegin();
     },
 
     // 完成批注编辑
     editAnnotationEnd: function () {
 
-        if (this.annotationEditor) {
-
-            this.annotationEditor.editEnd();
-
-        }
+        this.annotationHelper.editAnnotationEnd();
     },
 
     // 设置批注类型
     setAnnotationType: function (type) {
 
-        if (this.annotationEditor) {
-
-            this.annotationEditor.setAnnotationType(type);
-
-        }
+        this.annotationHelper.setAnnotationType(type);
     },
 
     // 设置批注风格
     setAnnotationStyle: function (style) {
 
-        if (this.annotationEditor) {
-
-            for (var attr in style) {
-
-                if (attr in this.defaultStyle) {
-                    this.defaultStyle[attr] = style[attr];
-                }
-
-            }
-
-            this.annotationEditor.setAnnotationStyle(this.defaultStyle);
-
-        }
+        this.annotationHelper.setAnnotationStyle(style);
     },
 
     // 加载批注列表
     loadAnnotations: function (annotations) {
 
-        if (annotations) {
-
-            this.initAnnotation();
-            this.annotationEditor.loadAnnotations(annotations);
-        } else {
-            this.uninitAnnotation();
-        }
+        this.annotationHelper.loadAnnotations(annotations);
     },
 
     // 获得批注对象列表
     getAnnotationInfoList: function () {
 
-        if (this.annotationEditor) {
-
-            return this.annotationEditor.getAnnotationInfoList();
-
-        }
-
-        return null;
+        return this.annotationHelper.getAnnotationInfoList();
     },
 
     // resize
     resizeAnnotations: function () {
 
-        if (this.annotationEditor && this.annotationEditor.isInitialized()) {
-
-            this.annotationEditor.onResize();
-
-        }
+        this.annotationHelper.resizeAnnotations();
     },
 
     // render
     renderAnnotations: function () {
 
-        if (this.annotationEditor && this.annotationEditor.isInitialized()) {
-
-            this.annotationEditor.onCameraChange();
-
-        }
+        this.annotationHelper.renderAnnotations();
     },
 
     // 截屏 base64格式png图片
     captureAnnotationsScreenSnapshot: function () {
 
-        var dataUrl = this.viewer.getRenderBufferScreenShot();
-        dataUrl = this.annotationEditor.getScreenSnapshot(dataUrl);
-
-        return dataUrl;
+        return this.annotationHelper.captureAnnotationsScreenSnapshot();
     },
 
     // ------------------ 批注 API -- E ------------------ //
@@ -20736,292 +20750,158 @@ CLOUD.ExtensionHelper.prototype = {
     // 初始化Marker
     initMarkerEditor: function () {
 
-        var viewer = this.viewer;
-
-        if (!this.markerEditor) {
-
-            this.markerEditor = new CLOUD.Extensions.MarkerEditor(viewer);
-        }
-
-        if (!this.markerEditor.isInitialized()) {
-
-            this.markerEditor.init();
-        }
-
-        if (this.markerClickCallback) {
-            this.markerEditor.setMarkerClickCallback(this.markerClickCallback);
-        }
+        this.markerHelper.initMarkerEditor();
     },
 
     // 卸载Marker
     uninitMarkerEditor: function () {
 
-        if (this.markerEditor && this.markerEditor.isInitialized()) {
-
-            this.markerEditor.uninit();
-
-        }
+        this.markerHelper.uninitMarkerEditor();
     },
 
     // zoom到合适的大小
     zoomToSelectedMarkers: function () {
 
-        if (this.markerEditor) {
-
-            var bBox = this.markerEditor.getMarkersBoundingBox();
-
-            if (bBox) {
-                this.viewer.zoomToBBox(bBox, 0.05);
-            }
-
-            this.markerEditor.updateMarkers();
-
-        }
+        this.markerHelper.zoomToSelectedMarkers();
 
     },
 
     // 加载标记
     loadMarkers: function (markerInfoList) {
 
-        if (markerInfoList) {
-
-            this.initMarkerEditor();
-            this.markerEditor.loadMarkers(markerInfoList);
-
-        } else {
-
-            this.uninitMarkerEditor();
-        }
+        this.markerHelper.loadMarkers(markerInfoList);
 
     },
 
     // 加载标记
     loadMarkersFromIntersect: function (intersect, shapeType, state) {
 
-        if (intersect) {
-
-            this.initMarkerEditor();
-            this.markerEditor.loadMarkersFromIntersect(intersect, shapeType, state);
-
-        } else {
-
-            this.uninitMarkerEditor();
-        }
+        this.markerHelper.loadMarkersFromIntersect(intersect, shapeType, state);
 
     },
 
     // 获得标记列表
     getMarkerInfoList: function () {
 
-        if (this.markerEditor) {
-
-            return this.markerEditor.getMarkerInfoList();
-
-        }
-
-        return null;
+        return this.markerHelper.getMarkerInfoList();
     },
 
     resizeMarkers: function () {
 
-        if (this.markerEditor) {
-
-            return this.markerEditor.onResize();
-
-        }
+        this.markerHelper.resizeMarkers();
     },
 
     renderMarkers: function () {
 
-        if (this.markerEditor) {
-
-            return this.markerEditor.updateMarkers();
-
-        }
+        this.markerHelper.renderMarkers();
     },
 
     // 根据id选择marker
     selectMarkerById: function (id) {
 
-        if (this.markerEditor) {
-            var marker = this.markerEditor.getMarker(id);
-            marker.highlight(true);
-            this.markerEditor.selectMarker(marker);
-        }
+        this.markerHelper.selectMarkerById(id);
     },
 
     // 设置marker click 回调
     setMarkerClickCallback: function (callback) {
 
-        this.markerClickCallback = callback;
+        this.markerHelper.setMarkerClickCallback(callback);
     },
 
     // ------------------ 小地图API -- S ------------------ //
-    createMiniMap:function(name, domElement, width, height, styleOptions, callbackCameraChanged, callbackClickOnAxisGrid){
+    createMiniMap: function (name, domElement, width, height, styleOptions, callbackCameraChanged, callbackClickOnAxisGrid) {
 
-        var miniMap = this.miniMaps[name];
-
-        if (!miniMap) {
-            miniMap = this.miniMaps[name] = new CLOUD.MiniMap(this.viewer);
-            miniMap.setCameraChangedCallback(callbackCameraChanged);
-            miniMap.setClickOnAxisGridCallback(callbackClickOnAxisGrid);
-        }
-
-        domElement = domElement || this.viewer.domElement;
-
-        if (domElement) {
-            // 初始化小地图
-            miniMap.init(domElement, width, height, styleOptions);
-        }
-
-        if (!this.defaultMiniMap) {
-            this.defaultMiniMap = this.miniMaps[name];
-        }
-
-        //return this.miniMaps[name];
+        this.miniMapHelper.createMiniMap(name, domElement, width, height, styleOptions, callbackCameraChanged, callbackClickOnAxisGrid);
     },
 
-    destroyMiniMap:function(name){
+    destroyMiniMap: function (name) {
 
-        var miniMap = this.miniMaps[name];
-
-        if (miniMap) {
-
-            miniMap.uninit();
-
-            if (this.defaultMiniMap === miniMap) {
-                this.defaultMiniMap = null;
-            }
-
-            delete this.miniMaps[name];
-        }
+        this.miniMapHelper.destroyMiniMap(name);
     },
 
-    destroyAllMiniMap:function(){
+    destroyAllMiniMap: function () {
 
-        for(var name in this.miniMaps) {
-
-            this.destroyMiniMap(name);
-        }
+        this.miniMapHelper.destroyAllMiniMap();
     },
 
     removeMiniMap: function (name) {
 
-        var miniMap = this.miniMaps[name];
-
-        if (miniMap) {
-            miniMap.remove();
-
-            //delete this.miniMaps[name];
-        }
+        this.miniMapHelper.removeMiniMap(name);
     },
 
     appendMiniMap: function (name) {
 
-        var miniMap = this.miniMaps[name];
-
-        if (miniMap) {
-            miniMap.append();
-        }
+        this.miniMapHelper.appendMiniMap(name);
     },
 
-    getMiniMap: function(name) {
+    getMiniMaps: function () {
 
-        return this.miniMaps[name];
+        return this.miniMapHelper.getMiniMaps();
+    },
+
+    getMiniMap: function (name) {
+
+        return this.miniMapHelper.getMiniMap(name);
     },
 
     // 绘制小地图
-    renderMiniMap: function(){
+    renderMiniMap: function () {
 
-        for (var name in this.miniMaps) {
-            var miniMap = this.miniMaps[name];
-
-            if (miniMap) {
-                miniMap.render();
-            }
-        }
+        this.miniMapHelper.renderMiniMap();
     },
 
     // 设置平面图
-    setFloorPlaneData: function(jsonObj) {
+    setFloorPlaneData: function (jsonObj) {
 
-        CLOUD.MiniMap.setFloorPlaneData(jsonObj);
+        this.miniMapHelper.setFloorPlaneData(jsonObj);
     },
 
-    generateFloorPlane: function(name, changeView) {
-        var miniMap = this.miniMaps[name];
-
-        if (miniMap) {
-            miniMap.generateFloorPlane(changeView);
-        }
+    generateFloorPlane: function (name, changeView) {
+        this.miniMapHelper.generateFloorPlane(name, changeView);
     },
 
     // 设置轴网数据
-    setAxisGridData:function(jsonObj, level) {
+    setAxisGridData: function (jsonObj, level) {
 
-        CLOUD.MiniMap.setAxisGridData(jsonObj);
+        this.miniMapHelper.setAxisGridData(jsonObj, level);
     },
 
-    generateAxisGrid: function(name) {
-        var miniMap = this.miniMaps[name];
-
-        if (miniMap) {
-            miniMap.generateAxisGrid();
-        }
+    generateAxisGrid: function (name) {
+        this.miniMapHelper.generateAxisGrid(name);
     },
 
     // 是否显示隐藏轴网
-    showAxisGrid:function(name, show) {
+    showAxisGrid: function (name, show) {
 
-        var miniMap = this.miniMaps[name];
-
-        if (miniMap) {
-            if (show) {
-                miniMap.showAxisGird();
-            } else {
-                miniMap.hideAxisGird();
-            }
-        }
+        this.miniMapHelper.showAxisGrid(name, show);
     },
 
-    enableAxisGridEvent: function(name, enable){
+    enableAxisGridEvent: function (name, enable) {
 
-        var miniMap = this.miniMaps[name];
-
-        if (miniMap) {
-            miniMap.enableMouseEvent(enable);
-        }
+        this.miniMapHelper.enableAxisGridEvent(name, enable);
     },
 
-    enableMiniMapCameraNode:function(name, enable){
+    enableMiniMapCameraNode: function (name, enable) {
 
-        var miniMap = this.miniMaps[name];
-
-        if (miniMap) {
-            miniMap.enableCameraNode(enable);
-        }
+        this.miniMapHelper.enableMiniMapCameraNode(name, enable);
     },
 
-    flyBypAxisGridNumber:function(name, abcName, numeralName){
+    flyBypAxisGridNumber: function (name, abcName, numeralName) {
 
-        var miniMap = this.miniMaps[name];
-
-        if (miniMap) {
-            miniMap.flyByAxisGridNumber(abcName, numeralName);
-        }
+        this.miniMapHelper.flyBypAxisGridNumber(name, abcName, numeralName);
     },
 
     // ------------------ 小地图API -- E ------------------ //
 
     // 扩展功能的 resize
-    resizeExtensions: function() {
+    resizeExtensions: function () {
 
         this.resizeMarkers();
         this.resizeAnnotations();
     },
 
     // 扩展功能的 render
-    renderExtensions: function() {
+    renderExtensions: function () {
 
         // 刷新小地图
         this.renderMiniMap();
@@ -21196,6 +21076,19 @@ CloudViewer.prototype = {
             }
 
             CLOUD.GlobalData.LimitFrameTime = limitTime;
+        }
+    },
+
+    // 限制帧率
+    limitFrameRate:function(frameRate) {
+
+        if (this.incrementRenderEnabled) {
+
+            if (frameRate <= 0) {
+                frameRate = 4;
+            }
+
+            CLOUD.GlobalData.LimitFrameTime = 1000 / frameRate;
         }
     },
 

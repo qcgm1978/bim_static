@@ -6562,7 +6562,7 @@ CLOUD.Extensions.Annotation = function (editor, id) {
     this.size = {width: 0, height: 0};
     this.rotation = 0;
 
-    this.style = editor.annotationStyle || this.getDefaultStyle();
+    this.style = editor.annotationStyle ? CLOUD.DomUtil.cloneStyle(editor.annotationStyle) : this.getDefaultStyle();
     this.shape = null;
     this.selected = false;
     this.highlighted = false;
@@ -8012,7 +8012,7 @@ CLOUD.Extensions.AnnotationText.prototype.update = function (forceDirty) {
     this.shape.setAttribute("font-style", this.style['font-style']);
     this.shape.setAttribute("fill", CLOUD.Extensions.Utils.Shape2D.getRGBAString(strokeColor, strokeOpacity));
 
-    var bBox = this.shape.getBBox();
+    //var bBox = this.shape.getBBox();
     var verticalTransform = ['translate(0, ', fontSize, ')'].join('');
     this.shape.setAttribute("transform", (this.transformShape + verticalTransform));
     //this.shape.setAttribute('clip-path', 'url(#' + this.clipPathId + ')');
@@ -8026,6 +8026,10 @@ CLOUD.Extensions.AnnotationText.prototype.update = function (forceDirty) {
         this.rebuildTextSvg();
         this.textDirty = false;
     }
+
+    var bBox = this.shape.getBBox();
+
+    this.shapeBox = bBox;
 
     this.clipRect.setAttribute('x', "0");
     this.clipRect.setAttribute('y', bBox.y + '');
@@ -8153,8 +8157,8 @@ CLOUD.Extensions.AnnotationText.prototype.renderToCanvas = function (ctx) {
     var size = this.getClientSize();
 
     // 对应超出文本区域的文字的处理：使用包围盒
-    var bBox = this.shape.getBBox();
-    var sizeBox = {width: bBox.width, height: bBox.height};
+    //var bBox = this.shape.getBBox();
+    var sizeBox = {width: this.shapeBox.width, height: this.shapeBox.height};
 
     ctx.save();
     ctx.fillStyle = CLOUD.Extensions.Utils.Shape2D.getRGBAString(fillColor, fillOpacity);
@@ -10683,6 +10687,7 @@ CLOUD.Extensions.MiniMapHelper.prototype = {
 
         // TODO: clear other resources.
 
+        this.destroyAllMiniMap();
         this.viewer = null;
         this.miniMaps = {};
         this.defaultMiniMap = null;
@@ -10729,6 +10734,14 @@ CLOUD.Extensions.MiniMapHelper.prototype = {
         }
     },
 
+    destroyAllMiniMap:function(){
+
+        for(var name in this.miniMaps) {
+
+            this.destroyMiniMap(name);
+        }
+    },
+
     removeMiniMap: function (name) {
 
         var miniMap = this.miniMaps[name];
@@ -10747,6 +10760,10 @@ CLOUD.Extensions.MiniMapHelper.prototype = {
         if (miniMap) {
             miniMap.append();
         }
+    },
+
+    getMiniMaps: function() {
+        return this.miniMaps;
     },
 
     getMiniMap: function(name) {
@@ -10850,8 +10867,10 @@ CLOUD.Extensions.MarkerHelper.prototype = {
 
     destroy: function () {
 
-        this.viewer = null;
+        this.uninitMarkerEditor();
+        this.markerEditor = null;
         this.markerClickCallback = null;
+        this.viewer = null;
     },
 
     // 初始化Marker
@@ -11211,6 +11230,8 @@ CLOUD.Extensions.AnnotationHelper.prototype = {
 
     destroy: function () {
 
+        this.uninitAnnotation();
+        this.annotationEditor = null;
         this.viewer = null;
     },
 
