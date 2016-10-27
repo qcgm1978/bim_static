@@ -10,7 +10,7 @@ App.Services.listView=Backbone.View.extend({
 		"click .aProName":"beforeBreak"
 	},
 
-	template:_.templateUrl("/Services/tpls/log/log.list.detail.html"),
+	template:_.templateUrl("/services/tpls/log/log.list.detail.html"),
 
 	render:function(){
 		//渲染数据
