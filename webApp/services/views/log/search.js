@@ -5,19 +5,14 @@ App.Services.searchView = Backbone.View.extend({
   className: 'logSearch',
 
   formData:{
-    name:"",
-    projectType:"",
-    estateType: "",
-    province: "",
-    region: "",
-    complete: "",
-    open: "",
-    openTimeStart: "",
-    openTimEnd: ""
+    moduleType:"",
+    entityName: "",
+    operator: "",
+    opTimeStart:"",
+    opTimeEnd:""
   },
   //
   events: {
-    "click .seniorSearch": "seniorSearch",
     "click .btnSearch": "searchProject",
     "click .btnClear": "clearSearch",
     "change .txtSearch":"linkSearchWord",
@@ -35,38 +30,11 @@ App.Services.searchView = Backbone.View.extend({
     this.$(".pickProjectType").myDropDown({
       zIndex:99,
       click:function($item){
-        _this.formData.subType=$item.attr('data-val');
-      }
-    });
-    this.$(".pickCategory").myDropDown({
-      zIndex:98,
-      click:function($item){
-        _this.formData.estateType=$item.attr('data-val');
-      }
-    });
-    this.$(".projectStatus").myDropDown({
-      zIndex:98,
-      click:function($item){
-        _this.formData.projectType=$item.attr('data-val');
-      }
-    });
-    this.$(".pickManager").myDropDown({
-      zIndex:97,
-      click:function($item){
-        _this.formData.region=encodeURI($item.attr('data-val'));
-      }
-    });
-    this.$(".pickProvince").myDropDown({
-      zIndex:96,
-      click:function($item){
-        _this.formData.province=encodeURI($item.text());
+        _this.formData.moduleType=$item.attr('data-val');
       }
     });
 
 
-    this.$('.btnRadio').on('click',function(){
-      _this.formData.complete=$(this).attr('data-val');
-    })
     this.$('#dateStar').datetimepicker({
       language: 'zh-CN',
       autoclose: true,
@@ -86,10 +54,10 @@ App.Services.searchView = Backbone.View.extend({
 
     });
     this.$('#dateStar').on('change',function(){
-      _this.formData.openTimeStart=$(this).val();
+      _this.formData.opTimeStart=$(this).val();
     })
     this.$('#dateEnd').on('change',function(){
-      _this.formData.openTimEnd=$(this).val();
+      _this.formData.opTimeEnd=$(this).val();
     })
 
     return this;
@@ -98,29 +66,22 @@ App.Services.searchView = Backbone.View.extend({
 
   clearSearch:function(){
     this.formData={
-      name:"",
-      projectType:"",
-      estateType: "",
-      province: "",
-      region: "",
-      complete: "",
-      open: "",
-      openTimeStart: "",
-      openTimEnd: ""
+      moduleType:"",
+      opTime:"",
+      entityName: "",
+      operator: "",
+      opContent: "",
+      opTimeStart:"",
+      opTimeEnd:""
     };
     this.$(".pickProjectType .text").html('请选择');
-    this.$(".pickCategory .text").html('请选择');
-    this.$(".pickManager .text").html('请选择');
-    this.$(".pickProvince .text").html('请选择');
-    this.$(".pickOpening .text").html('请选择');
 
     this.$(".btnRadio").removeClass('selected');
     this.$('#dateStar').val('');
     this.$('#dateEnd').val('');
-    this.$(".quickSearch .txtSearch").val('');
     this.$('.moreSeachText').val('');
-    App.Projects.Settings.pageIndex=1;
-    App.Projects.loadData(this.formData);
+    App.Services.Settings.pageIndex=1;
+    App.Services.loadData(this.formData);
   },
 
   enterSearch:function(e){
@@ -151,11 +112,12 @@ App.Services.searchView = Backbone.View.extend({
   },
   //搜索项目
   searchProject: function() {
-    var quickSearchName =encodeURI($(".quickSearch .txtSearch").val().trim()),
-        moreSearchName =encodeURI($('.moreSeachText').val().trim());
-    this.formData.name=moreSearchName||quickSearchName||'';
-    App.Projects.Settings.pageIndex=1;
-    App.Projects.loadData(this.formData);
+    var name =$("#name").val().trim(),
+        account =$("#account").val().trim();
+    this.formData.entityName=name;
+    this.formData.operator=account;
+    App.Services.Settings.pageIndex=1;
+    App.Services.loadData(this.formData);
 
   },
 

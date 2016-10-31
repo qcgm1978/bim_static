@@ -564,7 +564,7 @@
       subBar: [{
         id: '6',
         icon: 'm-red',
-        color: 'red',
+        color: '#DA0015',
         title: '颜色',
         fn: '6',
         keyCode: '',
@@ -618,7 +618,7 @@
       },{
         id: '6',
         icon: 'm-white',
-        color: '#fff',
+        color: '#ffffff',
         title: '颜色',
         fn: '6',
         keyCode: '',

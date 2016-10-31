@@ -15,18 +15,18 @@
             <input readonly="true" placeholder="结束时间" id="dateEnd" class="span2" type="text">
         </div>
 
-        <div class="myDropDown pickProjectType">
+        <div  class="myDropDown pickProjectType">
             <span class="myDropText">  <span class="text">请选择类别</span> <i class="myDropArrorw"></i> </span>
             <ul class="myDropList">
                 <% _.each(App.Services.Log.chooseTypes,function(item,i){ if(1) { %>
-                <li class="myItem" data-val='<%= i %>'><%=item%></li>
+                <li class="myItem" data-val='<%= App.Services.logData.moduleType.indexOf(item)+1 %>'><%=item%></li>
                 <% }}) %>
             </ul>
         </div>
 
-            <input type="text" placeholder="请输入项目名称" class="txtInput moreSeachText" />
+            <input id="name" type="text" placeholder="请输入项目名称" class="txtInput moreSeachText" />
 
-            <input type="text" placeholder="请输入用户名或账号" class="txtInput moreSeachText" />
+            <input id="account" type="text" placeholder="请输入用户名或账号" class="txtInput moreSeachText" />
 
         <span class="btnSearch">筛选</span>
         <a class="btnClear">清空筛选条件</a>

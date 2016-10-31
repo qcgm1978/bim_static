@@ -3,7 +3,7 @@
 <% for(var i in data){ %>
 <% if(data[i]['name']){ %>
 <li class="project fa"  data-id=<%= data[i]['id'] %>>
-<h3  data-id=<%= data[i]['id'] %>  ><%= data[i]['name'] %></h3>
+<h3  data-id=<%= data[i]['id'] %> title=<%= data[i]['name'] %> ><%= data[i]['name'] %></h3>
 <p><%= data[i]['designUnit'] %><span><%= new Date(data[i]['createTime']).Format("yyyy-MM-dd")%></span></p>
 </li>
 <% } %>

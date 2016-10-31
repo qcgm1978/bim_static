@@ -598,6 +598,8 @@
       var self = this;
       var viewer = self.viewer;
       var modelBgColor = self._dom.bimBox.css('background-color');
+      //收起属性页
+      $('.slideBar .icon-caret-right').click();
       //还原颜色
       self._dom.bimBox.addClass('comment');
       viewer.editCommentBegin();

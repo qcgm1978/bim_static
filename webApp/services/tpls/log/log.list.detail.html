@@ -1,6 +1,6 @@
  
 
-<span class="logTime"><%= opTime %></span>
+<span class="logTime"><%= new Date(opTime).format('yyyy-MM-dd') %></span>
 <span class="logType" ><%=App.Services.logData.moduleType[moduleType-1]%></span>
 <span class="logName"><%=entityName%></span>
 <span class="operator"><%= operator %></span>
