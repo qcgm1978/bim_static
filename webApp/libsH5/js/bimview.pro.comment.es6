@@ -1194,6 +1194,10 @@
 						title = "保存批注";
 					}
 
+					//////
+					//App.Project.Settings.Viewer.viewer.extensionHelper.annotationHelper.annotationEditor.removeDomEventListeners();
+
+
 					var dialogHtml = _.templateUrl('/libsH5/tpls/comment/bimview.save.dialog.html')(pars),
 
 						opts = {
@@ -1209,6 +1213,8 @@
 									App.Project.Settings.Viewer.commentEnd();
 									//收起导航
 									$(".modelSidebar").addClass("show open");
+								} else{
+									//App.Project.Settings.Viewer.viewer.extensionHelper.annotationHelper.annotationEditor.addDomEventListeners();///
 								}
 							},
 

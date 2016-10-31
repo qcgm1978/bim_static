@@ -9232,7 +9232,8 @@ CLOUD.Extensions.AnnotationEditor.prototype.onMouseDown = function (event) {
 
 CLOUD.Extensions.AnnotationEditor.prototype.onMouseMove = function (event) {
 
-    event.preventDefault();
+    // mark: 对应注册到window上的事件，如果调用会取消事件的默认动作，导致document上其他元素（例如textarea)的行为出现问题（例如，鼠标移动无法选择文本）
+    //event.preventDefault();
     event.stopPropagation();
 
     if (this.annotationFrame.isActive()) {
@@ -9248,7 +9249,8 @@ CLOUD.Extensions.AnnotationEditor.prototype.onMouseMove = function (event) {
 
 CLOUD.Extensions.AnnotationEditor.prototype.onMouseUp = function (event) {
 
-    event.preventDefault();
+    // mark: 对应注册到window上的事件，如果调用会取消事件的默认动作，导致document上其他元素（例如textarea)的行为出现问题（例如，鼠标移动无法选择文本）
+    //event.preventDefault();
     event.stopPropagation();
 
     // 批注编辑结束

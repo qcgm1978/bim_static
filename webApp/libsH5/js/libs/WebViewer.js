@@ -11786,6 +11786,33 @@ CLOUD.RectPickEditor.prototype = {
         this.slaveEditor.onMouseWheel(evt);
     }
 };
+
+CLOUD.RectPickEditor.prototype.touchstart = function (event) {
+    var camera_scope = this.slaveEditor;
+    if (camera_scope.enabled === false) return;
+
+    this.startPt.set(event.touches[0].clientX, event.touches[0].clientY);
+
+    camera_scope.touchstart(event);
+};
+
+CLOUD.RectPickEditor.prototype.touchmove = function (event) {
+    var scope = this;
+    var camera_scope = this.slaveEditor;
+    if (camera_scope.enabled === false) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    camera_scope.touchmove(event);
+};
+
+CLOUD.RectPickEditor.prototype.touchend = function( event ) {
+    var camera_scope = this.slaveEditor;
+    if ( camera_scope.enabled === false ) return;
+
+    camera_scope.touchend(event);
+};
 CLOUD.ZoomEditor = function ( object, scene, domElement ) {
 	CLOUD.OrbitEditor.call( this,  object, scene, domElement );
 	
@@ -11836,7 +11863,7 @@ CLOUD.RectZoomEditor.prototype.updateFrustum = function(updateUI) {
 
     var dim = this.cameraEditor.getContainerDimensions();
 
-    this.cameraEditor.computeFrustum(x1, x2, y1, y2, this.frustum, dim);
+    //this.cameraEditor.computeFrustum(x1, x2, y1, y2, this.frustum, dim);
 
     if (updateUI) {
 
@@ -11901,13 +11928,13 @@ CLOUD.RectZoomEditor.prototype.onMouseUp = function(event) {
                 return false;
             }
 
-            var closeDepth = this.scene.getNearDepthByRect(this.frustum, this.cameraEditor.object);
+            //var closeDepth = this.scene.getNearDepthByRect(this.frustum, this.cameraEditor.object);
 
-            if (closeDepth !== Infinity){
-                this.zoomToRectangle(closeDepth);
-            }
+            //if (closeDepth !== Infinity){
+            //    this.zoomToRectangle(closeDepth);
+            //}
 
-            //this.zoomToRectangle();
+            this.zoomToRectangle();
 
             return true;
         }
@@ -11917,129 +11944,118 @@ CLOUD.RectZoomEditor.prototype.onMouseUp = function(event) {
     return this.processMouseUp(event);
 };
 
-CLOUD.RectZoomEditor.prototype.zoomToRectangle = function(closeDepth) {
-
-    var scope = this;
-    var camera = this.cameraEditor.object;
-    var target = this.cameraEditor.target;
-    var cameraPos = camera.position;
-    var near = camera.near;
-    var dim = this.cameraEditor.getContainerDimensions();
-    var x1 = scope.startPt.x - dim.left;
-    var x2 = scope.endPt.x - dim.left;
-    var y1 = scope.startPt.y - dim.top;
-    var y2 = scope.endPt.y - dim.top;
-
-    var rcZoom = {};
-    rcZoom.left = Math.min(x1, x2);
-    rcZoom.top = Math.min(y1, y2);
-    rcZoom.right = Math.max(x1, x2);
-    rcZoom.bottom = Math.max(y1, y2);
-
-    var rCenter = new THREE.Vector3((x1 + x2) / 2, (y1 + y2) / 2, closeDepth);
-    var rCorner = new THREE.Vector3(rcZoom.left, rcZoom.top, closeDepth);
-
-    var wCenter = this.clientToWorld(rCenter);
-    var wCorner = this.clientToWorld(rCorner);
-    var dvec = wCenter.clone().sub(wCorner);
-    var newDist = dvec.length();
-
-    if (newDist < near) {
-        //console.log("new dist", [newDist, near]);
-        newDist = near;
-    }
-
-    var dirEye = target.clone().sub(cameraPos);
-    var distance = dirEye.length();
-    dirEye.normalize();
-
-    var newPos = wCenter.clone();
-    newPos.sub(dirEye.clone().multiplyScalar(newDist));
-    cameraPos.copy(newPos);
-    target.copy(newPos).add(dirEye.clone().multiplyScalar(distance));
-
-    this.cameraEditor.updateView(true);
-};
-
-//CLOUD.RectZoomEditor.prototype.zoomToRectangle = function () {
+//CLOUD.RectZoomEditor.prototype.zoomToRectangle = function(closeDepth) {
 //
 //    var scope = this;
 //    var camera = this.cameraEditor.object;
 //    var target = this.cameraEditor.target;
+//    var cameraPos = camera.position;
+//    var near = camera.near;
+//    var dim = this.cameraEditor.getContainerDimensions();
+//    var x1 = scope.startPt.x - dim.left;
+//    var x2 = scope.endPt.x - dim.left;
+//    var y1 = scope.startPt.y - dim.top;
+//    var y2 = scope.endPt.y - dim.top;
 //
-//    var canvasBounds = this.cameraEditor.getContainerDimensions();
-//    var x1 = scope.startPt.x - canvasBounds.left;
-//    var x2 = scope.endPt.x - canvasBounds.left;
-//    var y1 = scope.startPt.y - canvasBounds.top;
-//    var y2 = scope.endPt.y - canvasBounds.top;
-//    var rectWidth = Math.abs(x2 - x1);
-//    var rectHeight = Math.abs(y1 - y2);
+//    var rcZoom = {};
+//    rcZoom.left = Math.min(x1, x2);
+//    rcZoom.top = Math.min(y1, y2);
+//    rcZoom.right = Math.max(x1, x2);
+//    rcZoom.bottom = Math.max(y1, y2);
 //
-//    if (rectWidth === 0 || rectHeight === 0)  return;
+//    var rCenter = new THREE.Vector3((x1 + x2) / 2, (y1 + y2) / 2, closeDepth);
+//    var rCorner = new THREE.Vector3(rcZoom.left, rcZoom.top, closeDepth);
 //
-//    var rCenter = new THREE.Vector2((x1 + x2) / 2, (y1 + y2) / 2);
-//    var normalizeCenterX = rCenter.x / canvasBounds.width * 2 - 1;
-//    var normalizeCenterY = -rCenter.y / canvasBounds.height * 2 + 1;
-//    var normalizeCenter = new THREE.Vector2(normalizeCenterX, normalizeCenterY);
+//    var wCenter = this.clientToWorld(rCenter);
+//    var wCorner = this.clientToWorld(rCorner);
+//    var dvec = wCenter.clone().sub(wCorner);
+//    var newDist = dvec.length();
 //
-//    var eye = camera.position.clone();
-//    var dirEye = target.clone().sub(eye);
-//    var distEye2Target = dirEye.length();
-//    //dirEye.normalize();
-//
-//    var dirRight = this.cameraEditor.getWorldRight();
-//    var dirUp = this.cameraEditor.getWorldUp();
-//    //var dirUp = camera.realUp;
-//    //var dirRight = dirEye.clone().cross(dirUp);
-//    //dirUp = dirRight.cross(dirEye).normalize();
-//
-//    var pivot = this.scene.hitTest(normalizeCenter, camera);
-//
-//    if (!pivot) {
-//
-//        var halfFrustumHeight = distEye2Target * Math.tan(THREE.Math.degToRad(camera.fov * 0.5));
-//        var halfFrustumWidth = halfFrustumHeight * camera.aspect;
-//
-//        var rightLength = rCenter.x * 2 * halfFrustumWidth / canvasBounds.width;
-//        var distCenter2Right = rightLength - halfFrustumWidth;
-//
-//        var upLength = rCenter.y * 2 * halfFrustumHeight / canvasBounds.height;
-//        var distCenter2Up = upLength - halfFrustumHeight;
-//
-//        dirUp = dirUp.multiplyScalar(distCenter2Up);
-//        dirRight = dirRight.normalize().multiplyScalar(distCenter2Right);
-//
-//        var rayOri = eye.clone();
-//        var rayDirection = dirEye.clone();
-//
-//        rayDirection.add(dirUp);
-//        rayDirection.add(dirRight);
-//
-//        pivot = rayOri.add(rayDirection);
+//    if (newDist < near) {
+//        //console.log("new dist", [newDist, near]);
+//        newDist = near;
 //    }
 //
+//    var dirEye = target.clone().sub(cameraPos);
+//    var distance = dirEye.length();
 //    dirEye.normalize();
 //
-//    var scaleFactor = rectWidth / rectHeight > canvasBounds.width / canvasBounds.height ? canvasBounds.width / rectWidth : canvasBounds.height / rectHeight;
-//    var distEye2Pivot = pivot.distanceTo(eye);
-//    var zoomDist = distEye2Pivot / scaleFactor;
+//    var newPos = wCenter.clone();
+//    newPos.sub(dirEye.clone().multiplyScalar(newDist));
+//    cameraPos.copy(newPos);
+//    target.copy(newPos).add(dirEye.clone().multiplyScalar(distance));
 //
-//    var zNear = camera.near;
-//    if (zoomDist < zNear) {
-//        console.log("zoomDist < zNear");
-//        zoomDist = zNear;
-//    }
-//
-//    var zoomDir = eye.clone().sub(pivot).normalize().multiplyScalar(zoomDist);
-//    //var zoomDir = dirEye.clone().negate().multiplyScalar(zoomDist);
-//    eye = pivot.clone().add(zoomDir);
-//
-//    camera.position.copy(eye);
-//    target.copy(eye).add(zoomDir.clone().negate().normalize().multiplyScalar(distEye2Target));
-//
-//    scope.cameraEditor.updateView(true);
-//
+//    this.cameraEditor.updateView(true);
 //};
+
+CLOUD.RectZoomEditor.prototype.zoomToRectangle = function () {
+
+    var scope = this;
+    var camera = this.cameraEditor.object;
+    var target = this.cameraEditor.target;
+    var zNear = camera.near;
+
+    var canvasBounds = this.cameraEditor.getContainerDimensions();
+    var startX = scope.startPt.x - canvasBounds.left;
+    var startY = scope.startPt.y - canvasBounds.top;
+    var endX = scope.endPt.x - canvasBounds.left;
+    var endY = scope.endPt.y - canvasBounds.top;
+    var rectWidth = Math.abs(endX - startX);
+    var rectHeight = Math.abs(startY - endY);
+
+    if (rectWidth === 0 || rectHeight === 0)  return;
+
+    var rCenter = new THREE.Vector2((startX + endX) / 2, (startY + endY) / 2);
+    var normalizeCenterX = rCenter.x / canvasBounds.width * 2 - 1;
+    var normalizeCenterY = -rCenter.y / canvasBounds.height * 2 + 1;
+    var normalizeCenter = new THREE.Vector2(normalizeCenterX, normalizeCenterY);
+
+    var eye = camera.position.clone();
+    var dirEyeToTarget = target.clone().sub(eye);
+    var distEyeToTarget = dirEyeToTarget.length();
+
+    var dirRight = this.cameraEditor.getWorldRight();
+    var dirUp = this.cameraEditor.getWorldUp();
+    var pivot = this.scene.hitTest(normalizeCenter, camera);
+
+    if (!pivot) {
+
+        //var halfFrustumHeight = distEyeToTarget * Math.tan(THREE.Math.degToRad(camera.fov * 0.5));
+        var halfFrustumHeight = zNear * Math.tan(THREE.Math.degToRad(camera.fov * 0.5));
+        var halfFrustumWidth = halfFrustumHeight * camera.aspect;
+        var rightWidth = rCenter.x * 2 * halfFrustumWidth / canvasBounds.width;
+        var distCenterToRight = rightWidth - halfFrustumWidth;
+        var upHeight = rCenter.y * 2 * halfFrustumHeight / canvasBounds.height;
+        var distCenterToUp = upHeight - halfFrustumHeight;
+
+        dirRight.normalize().multiplyScalar(distCenterToRight);
+        dirUp.multiplyScalar(distCenterToUp);
+
+        var dirRay = dirEyeToTarget.clone().add(dirUp).add(dirRight);
+
+        pivot = eye.clone().add(dirRay);
+    }
+
+    dirEyeToTarget.normalize();
+
+    var scaleFactor = rectWidth / rectHeight > canvasBounds.width / canvasBounds.height ? rectWidth / canvasBounds.width : rectHeight / canvasBounds.height;
+    var distEyeToPivot = pivot.distanceTo(eye);
+    var distZoom = distEyeToPivot * scaleFactor;
+
+    //if (zoomDist < zNear) {
+    //    console.log("zoomDist < zNear");
+    //    zoomDist = zNear;
+    //}
+
+    //var zoomDir = eye.clone().sub(pivot).normalize().multiplyScalar(zoomDist);
+    var dirZoom = dirEyeToTarget.clone().negate().multiplyScalar(distZoom);
+
+    eye = pivot.clone().add(dirZoom);
+    camera.position.copy(eye);
+    target.copy(eye).add(dirZoom.clone().negate().normalize().multiplyScalar(distEyeToTarget));
+    scope.cameraEditor.updateView(true);
+
+};
 
 CLOUD.RectZoomEditor.prototype.worldToClient = function (wPoint) {
 
@@ -20060,7 +20076,14 @@ CLOUD.ClipPlanes = function (size, center) {
 
     this.offset = function (face, offset) {
         var index = Math.floor(face / 2);
+        var mod = face % 2;
         this.planeOffset[face] += offset;
+        if (mod == 0 && this.planeOffset[face] > 0) {
+            this.planeOffset[face] = 0;
+        }
+        else if (mod == 1 && this.planeOffset[face] < 0) {
+            this.planeOffset[face] = 0;
+        }
 
         var centerOffset = new THREE.Vector3();
         for (var i = 0; i < 6; ++i) {
@@ -20393,9 +20416,9 @@ CLOUD.ClipPlanesEditor.prototype.processMouseUp = function (event) {
     this.normal = null;
     this.plane = null;
 
-    this.onUpdateUI({visible: false});
-
     if (this.enablePick && event.button === THREE.MOUSE.LEFT) {
+        this.onUpdateUI({visible: false});
+
         if (this.startPt.x == event.clientX && this.startPt.y == event.clientY) {
             this.pickHelper.click(event);
         }
@@ -20646,9 +20669,9 @@ CLOUD.ClipPlaneService.prototype = {
 CLOUD.ExtensionHelper = function (viewer) {
 
     this.viewer = viewer;
-    this.annotationHelper = new CLOUD.Extensions.AnnotationHelper(viewer);
-    this.markerHelper = new CLOUD.Extensions.MarkerHelper(viewer);
-    this.miniMapHelper = new CLOUD.Extensions.MiniMapHelper(viewer);
+    this.annotationHelper = null;
+    this.markerHelper = null;
+    this.miniMapHelper = null;
 };
 
 CLOUD.ExtensionHelper.prototype = {
@@ -20658,9 +20681,21 @@ CLOUD.ExtensionHelper.prototype = {
     destroy: function () {
 
         // TODO: clear other resources.
-        this.annotationHelper.destroy();
-        this.markerHelper.destroy();
-        this.miniMapHelper.destroy();
+        if (this.annotationHelper) {
+            this.annotationHelper.destroy();
+            this.annotationHelper = null;
+        }
+
+        if (this.markerHelper) {
+            this.markerHelper.destroy();
+            this.markerHelper = null;
+        }
+
+        if (this.miniMapHelper) {
+            this.miniMapHelper.destroy();
+            this.miniMapHelper = null;
+        }
+
         this.viewer = null;
     },
 
@@ -20669,11 +20704,22 @@ CLOUD.ExtensionHelper.prototype = {
     // 是否存在批注
     hasAnnotations: function () {
 
-        return this.annotationHelper.hasAnnotations();
+        if (this.annotationHelper) {
+
+            return this.annotationHelper.hasAnnotations();
+        }
+
+        return false;
+
     },
 
     // 初始化批注
     initAnnotation: function () {
+
+        if (!this.annotationHelper) {
+
+            this.annotationHelper = new CLOUD.Extensions.AnnotationHelper(this.viewer);
+        }
 
         this.annotationHelper.initAnnotation();
     },
@@ -20681,17 +20727,26 @@ CLOUD.ExtensionHelper.prototype = {
     // 卸载批注资源
     uninitAnnotation: function () {
 
-        this.annotationHelper.uninitAnnotation();
+        if (this.annotationHelper) {
+            this.annotationHelper.uninitAnnotation();
+        }
     },
 
     // 设置批注背景色
     setAnnotationBackgroundColor: function (startColor, stopColor) {
 
-        this.annotationHelper.setAnnotationBackgroundColor(startColor, stopColor);
+        if (this.annotationHelper) {
+            this.annotationHelper.setAnnotationBackgroundColor(startColor, stopColor);
+        }
     },
 
     // 开始批注编辑
     editAnnotationBegin: function () {
+
+        if (!this.annotationHelper) {
+
+            this.annotationHelper = new CLOUD.Extensions.AnnotationHelper(this.viewer);
+        }
 
         this.annotationHelper.editAnnotationBegin();
     },
@@ -20699,23 +20754,34 @@ CLOUD.ExtensionHelper.prototype = {
     // 完成批注编辑
     editAnnotationEnd: function () {
 
-        this.annotationHelper.editAnnotationEnd();
+        if (this.annotationHelper) {
+            this.annotationHelper.editAnnotationEnd();
+        }
     },
 
     // 设置批注类型
     setAnnotationType: function (type) {
 
-        this.annotationHelper.setAnnotationType(type);
+        if (this.annotationHelper) {
+            this.annotationHelper.setAnnotationType(type);
+        }
     },
 
     // 设置批注风格
     setAnnotationStyle: function (style) {
 
-        this.annotationHelper.setAnnotationStyle(style);
+        if (this.annotationHelper) {
+            this.annotationHelper.setAnnotationStyle(style);
+        }
     },
 
     // 加载批注列表
     loadAnnotations: function (annotations) {
+
+        if (!this.annotationHelper) {
+
+            this.annotationHelper = new CLOUD.Extensions.AnnotationHelper(this.viewer);
+        }
 
         this.annotationHelper.loadAnnotations(annotations);
     },
@@ -20723,25 +20789,37 @@ CLOUD.ExtensionHelper.prototype = {
     // 获得批注对象列表
     getAnnotationInfoList: function () {
 
-        return this.annotationHelper.getAnnotationInfoList();
+        if (this.annotationHelper) {
+            return this.annotationHelper.getAnnotationInfoList();
+        }
+
+        return null;
     },
 
     // resize
     resizeAnnotations: function () {
 
-        this.annotationHelper.resizeAnnotations();
+        if (this.annotationHelper) {
+            this.annotationHelper.resizeAnnotations();
+        }
     },
 
     // render
     renderAnnotations: function () {
 
-        this.annotationHelper.renderAnnotations();
+        if (this.annotationHelper) {
+            this.annotationHelper.renderAnnotations();
+        }
     },
 
     // 截屏 base64格式png图片
     captureAnnotationsScreenSnapshot: function () {
 
-        return this.annotationHelper.captureAnnotationsScreenSnapshot();
+        if (this.annotationHelper) {
+            return this.annotationHelper.captureAnnotationsScreenSnapshot();
+        }
+
+        return null;
     },
 
     // ------------------ 批注 API -- E ------------------ //
@@ -20750,145 +20828,223 @@ CLOUD.ExtensionHelper.prototype = {
     // 初始化Marker
     initMarkerEditor: function () {
 
+        if (!this.markerHelper) {
+            this.markerHelper = new CLOUD.Extensions.MarkerHelper(this.viewer);
+        }
+
         this.markerHelper.initMarkerEditor();
     },
 
     // 卸载Marker
     uninitMarkerEditor: function () {
 
-        this.markerHelper.uninitMarkerEditor();
+        if (this.markerHelper) {
+            this.markerHelper.uninitMarkerEditor();
+        }
     },
 
     // zoom到合适的大小
     zoomToSelectedMarkers: function () {
 
-        this.markerHelper.zoomToSelectedMarkers();
+        if (this.markerHelper) {
+            this.markerHelper.zoomToSelectedMarkers();
+        }
 
     },
 
     // 加载标记
     loadMarkers: function (markerInfoList) {
 
-        this.markerHelper.loadMarkers(markerInfoList);
+        if (!this.markerHelper) {
+            this.markerHelper = new CLOUD.Extensions.MarkerHelper(this.viewer);
+        }
+
+        if (this.markerHelper) {
+            this.markerHelper.loadMarkers(markerInfoList);
+        }
 
     },
 
     // 加载标记
     loadMarkersFromIntersect: function (intersect, shapeType, state) {
 
-        this.markerHelper.loadMarkersFromIntersect(intersect, shapeType, state);
+        if (!this.markerHelper) {
+            this.markerHelper = new CLOUD.Extensions.MarkerHelper(this.viewer);
+        }
+
+        if (this.markerHelper) {
+            this.markerHelper.loadMarkersFromIntersect(intersect, shapeType, state);
+        }
 
     },
 
     // 获得标记列表
     getMarkerInfoList: function () {
 
-        return this.markerHelper.getMarkerInfoList();
+        if (this.markerHelper) {
+            return this.markerHelper.getMarkerInfoList();
+        }
+
+        return null;
     },
 
     resizeMarkers: function () {
 
-        this.markerHelper.resizeMarkers();
+        if (this.markerHelper) {
+            this.markerHelper.resizeMarkers();
+        }
     },
 
     renderMarkers: function () {
 
-        this.markerHelper.renderMarkers();
+        if (this.markerHelper) {
+            this.markerHelper.renderMarkers();
+        }
+
     },
 
     // 根据id选择marker
     selectMarkerById: function (id) {
 
-        this.markerHelper.selectMarkerById(id);
+        if (this.markerHelper) {
+            this.markerHelper.selectMarkerById(id);
+        }
     },
 
     // 设置marker click 回调
     setMarkerClickCallback: function (callback) {
 
-        this.markerHelper.setMarkerClickCallback(callback);
+        if (this.markerHelper) {
+            this.markerHelper.setMarkerClickCallback(callback);
+        }
     },
 
     // ------------------ 小地图API -- S ------------------ //
     createMiniMap: function (name, domElement, width, height, styleOptions, callbackCameraChanged, callbackClickOnAxisGrid) {
+
+        if (!this.miniMapHelper) {
+            this.miniMapHelper = new CLOUD.Extensions.MiniMapHelper(this.viewer);
+        }
 
         this.miniMapHelper.createMiniMap(name, domElement, width, height, styleOptions, callbackCameraChanged, callbackClickOnAxisGrid);
     },
 
     destroyMiniMap: function (name) {
 
-        this.miniMapHelper.destroyMiniMap(name);
+        if (this.miniMapHelper) {
+            this.miniMapHelper.destroyMiniMap(name);
+        }
     },
 
     destroyAllMiniMap: function () {
 
-        this.miniMapHelper.destroyAllMiniMap();
+        if (this.miniMapHelper) {
+            this.miniMapHelper.destroyAllMiniMap();
+        }
     },
 
     removeMiniMap: function (name) {
 
-        this.miniMapHelper.removeMiniMap(name);
+        if (this.miniMapHelper) {
+            this.miniMapHelper.removeMiniMap(name);
+        }
     },
 
     appendMiniMap: function (name) {
 
-        this.miniMapHelper.appendMiniMap(name);
+        if (this.miniMapHelper) {
+            this.miniMapHelper.appendMiniMap(name);
+        }
     },
 
     getMiniMaps: function () {
 
-        return this.miniMapHelper.getMiniMaps();
+        if (this.miniMapHelper) {
+            return this.miniMapHelper.getMiniMaps();
+        }
+
+        return null;
     },
 
     getMiniMap: function (name) {
 
-        return this.miniMapHelper.getMiniMap(name);
+        if (this.miniMapHelper) {
+
+            return this.miniMapHelper.getMiniMap(name);
+        }
+
+        return null;
     },
 
     // 绘制小地图
     renderMiniMap: function () {
 
-        this.miniMapHelper.renderMiniMap();
+        if (this.miniMapHelper) {
+            this.miniMapHelper.renderMiniMap();
+        }
+
     },
 
     // 设置平面图
     setFloorPlaneData: function (jsonObj) {
 
+        if (!this.miniMapHelper) {
+            this.miniMapHelper = new CLOUD.Extensions.MiniMapHelper(this.viewer);
+        }
+
         this.miniMapHelper.setFloorPlaneData(jsonObj);
     },
 
     generateFloorPlane: function (name, changeView) {
-        this.miniMapHelper.generateFloorPlane(name, changeView);
+
+        if (this.miniMapHelper) {
+            this.miniMapHelper.generateFloorPlane(name, changeView);
+        }
     },
 
     // 设置轴网数据
     setAxisGridData: function (jsonObj, level) {
 
+        if (!this.miniMapHelper) {
+            this.miniMapHelper = new CLOUD.Extensions.MiniMapHelper(this.viewer);
+        }
+
         this.miniMapHelper.setAxisGridData(jsonObj, level);
     },
 
     generateAxisGrid: function (name) {
-        this.miniMapHelper.generateAxisGrid(name);
+        if (this.miniMapHelper) {
+            this.miniMapHelper.generateAxisGrid(name);
+        }
     },
 
     // 是否显示隐藏轴网
     showAxisGrid: function (name, show) {
 
-        this.miniMapHelper.showAxisGrid(name, show);
+        if (this.miniMapHelper) {
+            this.miniMapHelper.showAxisGrid(name, show);
+        }
     },
 
     enableAxisGridEvent: function (name, enable) {
 
-        this.miniMapHelper.enableAxisGridEvent(name, enable);
+        if (this.miniMapHelper) {
+            this.miniMapHelper.enableAxisGridEvent(name, enable);
+        }
     },
 
     enableMiniMapCameraNode: function (name, enable) {
 
-        this.miniMapHelper.enableMiniMapCameraNode(name, enable);
+        if (this.miniMapHelper) {
+            this.miniMapHelper.enableMiniMapCameraNode(name, enable);
+        }
     },
 
     flyBypAxisGridNumber: function (name, abcName, numeralName) {
 
-        this.miniMapHelper.flyBypAxisGridNumber(name, abcName, numeralName);
+        if (this.miniMapHelper) {
+            this.miniMapHelper.flyBypAxisGridNumber(name, abcName, numeralName);
+        }
     },
 
     // ------------------ 小地图API -- E ------------------ //

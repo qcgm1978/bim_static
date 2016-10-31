@@ -1,5 +1,5 @@
 
-debugger
+
 App.Services.listView=Backbone.View.extend({
 
 	tagName:'li',
@@ -14,7 +14,7 @@ App.Services.listView=Backbone.View.extend({
 
 	render:function(){
 		//渲染数据
-		var data=this.model.toJSON();debugger
+		var data=this.model.toJSON();
 		this.$el.html(this.template(data)).attr("cid",this.model.cid);
 		return this;
 	},
