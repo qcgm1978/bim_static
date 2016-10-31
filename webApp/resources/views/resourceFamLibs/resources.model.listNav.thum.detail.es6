@@ -313,6 +313,10 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 				App.ResourceModel.afterCreateNewFolder(data.data, parentId);
 				//tree name
 				//$("#resourceModelLeftNav .treeViewMarUl span[data-id='" + id + "']").text(name); 
+			}else{
+				if(data.code=='19007'){
+					$.tip({type:'alarm',message:'文件夹已经存在、无法重复创建'})
+				}
 			}
 		});
 

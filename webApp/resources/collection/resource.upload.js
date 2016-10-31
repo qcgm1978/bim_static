@@ -79,11 +79,13 @@
 						models = App.ResourceModel.FileCollection.models,
 						$leftSel=$("#resourceFamlibsLeftNav .treeViewMarUl .selected"),
 						parentId="",
+						collection=null,
 						has = false;
 					if (type == "famLibs") {
 						models = App.ResourceModel.FileThumCollection.models;
+					}else if(type=="standardLibs"){
+						models = App.ResourceModel.FileCollection.models;
 					}
-
 
 					$.each(models, function(index, model) {
 						if (model.toJSON().id == data.data.id) {
@@ -97,35 +99,31 @@
 						data.data.isAdd = true;
 						if (type == "famLibs") {
 							App.ResourceModel.FileThumCollection.add(data.data);
+							collection=App.ResourceModel.FileThumCollection;
 						} else if (type == "standardLibs") {
+							collection=App.ResourceModel.FileCollection;
 							App.ResourceModel.FileCollection.add(data.data);
 						}
 
 					}
 
 					if ($leftSel.length > 0) {
-						parentId = $leftSel.data("file").fileVersionId;
+						parentId = App.ResourceModel.Settings.fileVersionId;
 					}
 
 					if(data.data.folder){
-						//this.afterCreateNewFolder(data.data);
+						this.afterCreateNewFolder(data.data);
 						//App.ResourceModel.afterCreateNewFolder(data.data, parentId);
 					}
-					
+
 					//$.jps.publish('add-upload-file', response, file)
 				},
 
 				  //上传文件后操作
                 afterCreateNewFolder(data) {
-					console.log(JSON.stringify(data));
-					//console.log("=================");
-					//console.log(JSON.stringify(data.parentId));
-					//console.log("=================");
                     App.ResourceModel.afterCreateNewFolder(data, data.parentId);
                     if (data.children) {
-
                         var count=data.children.length;
-
                         for(var i=0;i<count;i++){
                             this.afterCreateNewFolder(data.children[i]);
                         }

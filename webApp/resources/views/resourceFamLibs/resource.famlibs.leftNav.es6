@@ -1,3 +1,4 @@
+//族库
 App.ResourceFamLibs.leftNav = Backbone.View.extend({
 
 	tagName: "div",

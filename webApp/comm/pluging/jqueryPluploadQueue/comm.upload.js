@@ -238,7 +238,8 @@
                     var files = e.originalEvent.dataTransfer.files,
                         items = e.originalEvent.dataTransfer.items 
                     if (items) {
-                        var allFiles = []
+                        var allFiles = [],
+                            onlyFile=0;
                         for (var i = 0; i < items.length; i++) {
                             if (items[i].kind !== 'file') continue
                             self.__showUploadModal()
@@ -247,6 +248,7 @@
                                 self.__readFile(entry, function(file) {
                                     allFiles.push(file)
                                 })
+                                onlyFile++;
                             } else if (entry.isDirectory) {
                                 self.__showUploadModal()
                                 var a = 1

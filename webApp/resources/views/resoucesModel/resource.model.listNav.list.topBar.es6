@@ -57,6 +57,8 @@
  			$parent.click();
  		} else {
  			$(e.currentTarget).attr('isReturn', '0').addClass('theEnd').html('全部文件');
+			$('#'+id+' .treeViewMarUl .selected').removeClass('selected');
+			App.ResourceModel.Settings.fileVersionId='';
  			if (type == "standardLibs") {
  				App.ResourceModel.FileCollection.projectId = App.ResourceModel.Settings.CurrentVersion.projectId;
  				App.ResourceModel.FileCollection.projectVersionId = App.ResourceModel.Settings.CurrentVersion.id;

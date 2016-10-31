@@ -330,7 +330,7 @@ App.ResourceModel = {
 			iconType: 1
 		};
 
-		//窜仔
+		//存在的时候、不做任何操作
 		if ($treeViewMar.find('span[data-id="' + file.id + '"]').length > 0) {
 			return;
 		}
@@ -401,6 +401,15 @@ App.ResourceModel = {
 			}
 		}
 
+		if(App.ResourcesNav) {
+			if (App.ResourcesNav.Settings.type == "standardLibs") {
+				$('#resourceModelLeftNav').remove();
+				$("#contains").append(new App.ResourceModel.LeftNav().render().el);
+			} else if (App.ResourcesNav.Settings.type == "famLibs") {
+				$('#resourceFamlibsLeftNav').remove();
+				$("#contains").append(new App.ResourceFamLibs.leftNav().render().el);
+			}
+		}
 	},
 
 	afterRemoveFolder(file) {
