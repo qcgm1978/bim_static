@@ -57,12 +57,8 @@ App.Project.PlanModel = Backbone.View.extend({
 		this.$(".tbPlan tbody").html(this.template(data));
 		var codes = [];
 		$('.planSearch .treeCheckbox input').prop('checked',false);
-
 		$.each(data.data, function(i, item) {
-
 			item.code?codes.push(item.code):'';
-
-
 		});
 		if (codes.length > 0) {
 			codes.push(-1);
@@ -87,7 +83,7 @@ App.Project.PlanModel = Backbone.View.extend({
 	//模型中显示
 	showInModle(event,$el) {
 
-		App.Project.recoverySilder();
+	//	App.Project.recoverySilder();
 
 		var $target,ids,box;
 		if($el){

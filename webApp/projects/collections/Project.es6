@@ -5,6 +5,55 @@ App.Project = {
 	currentOpenCheckFloor:"",
 	currentProsCheckFloor:"",
 
+	presetClickEvent(userId) {
+		var projectNav = App.Project.Settings.projectNav,
+			property = App.Project.Settings.property;
+
+		//属性，四个tab 都一样
+		if (((projectNav == "design" || projectNav == "cost" || projectNav == "quality" || projectNav == "plan" || projectNav == '') && property == "poperties")) {
+
+			App.Project.DesignAttr.PropertiesCollection.projectId = App.Project.Settings.projectId;
+			App.Project.DesignAttr.PropertiesCollection.projectVersionId = App.Project.Settings.CurrentVersion.id;
+			App.Project.DesignAttr.PropertiesCollection.fetch({
+				data: {
+					elementId: userId,
+					sceneId: userId.split('.')[0]
+				}
+			});
+		}
+	},
+
+	resetProperNull() {
+
+		var projectNav = App.Project.Settings.projectNav,
+			property = App.Project.Settings.property,
+			$el;
+		if (property == "poperties") {
+
+			//if (projectNav == "design") {
+			//	//设计
+			//	$el = $(".rightPropertyContentBox .designProperties");
+
+			if (projectNav == "cost") {
+				//成本
+				$el = $(".rightPropertyContentBox .CostProperties");
+
+			} else if (projectNav == "quality") {
+				//质量
+				$el = $(".rightPropertyContentBox .QualityProperties");
+			} else if (projectNav == "plan") {
+				//计划
+				$el = $(".rightPropertyContentBox .planProperties");
+			}else{
+				//设计  或者没有选中任何一栏时的默认属性页
+				$el = $(".rightPropertyContentBox .designProperties");
+			}
+		}
+		if ($el) {
+			$el.html('<div class="nullTip">请选择构件</div>');
+		}
+
+	},
 
 	//检查点标记点击事件
 	markerClick: function(marker) {
@@ -64,21 +113,27 @@ App.Project = {
 			}
 		}
 
-
-
 		if(userId){
 			App.Project.Settings.Viewer.highlight({
 				type: 'userId',
 				ids: [userId]
 			});
 			App.Project.Settings.Viewer.viewer.getFilters().setSelectedIds([userId]);
+
+			App.Project.presetClickEvent(userId);
+
 		}else{
 			App.Project.Settings.Viewer.highlight({
 				type: 'userId',
 				ids: undefined
 			});
 			App.Project.Settings.Viewer.viewer.getFilters().setSelectedIds();
+			App.Project.resetProperNull();
 		}
+	},
+
+	checkSelectComponent:function(userId){
+		App.Project.Settings.Viewer.viewer.getFilters().setSelectedIds([userId]);
 	},
 
 	//隐患类型数据客户化
@@ -1599,6 +1654,7 @@ App.Project = {
 			$parent.click();
 		} else {
 			$(e.currentTarget).attr('isReturn', '0').addClass('theEnd').html('全部文件');
+			$('#projectContainer .treeViewMarUl .selected').removeClass('selected');
 			App.Project.FileCollection.projectId = App.Project.Settings.projectId;
 			App.Project.FileCollection.projectVersionId = App.Project.Settings.CurrentVersion.id;
 			App.Project.FileCollection.reset();
