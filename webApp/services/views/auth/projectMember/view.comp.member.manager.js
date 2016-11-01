@@ -42,12 +42,18 @@ ViewComp.MemberManager = Backbone.View.extend({
 			_view.loadChildren(_view,false,null);
 		
 		this.selectedTree = $.fn.zTree.init($("#selectedTree"), {
+			data:{
+				key:{
+					title:"tip"
+				}
+			},
 			view: {
 				showLine: false,
+				showTitle:true,
 				nameIsHTML:true
 			}
 		}, []);
-		
+
 	//	App.Comm.initScroll(this.$('.userSelecter .scrollWrap>ul'),"y");
 	},
 
@@ -55,13 +61,13 @@ ViewComp.MemberManager = Backbone.View.extend({
 	addOption: function() {
 		var _this=this;
 		var nodes= _this.selectTree.getSelectedNodes();
-			
+
 		_.each(nodes,function(n){
 			n.children=[];
 		})
-		
+
 		var newNodes=_this.selectedTree.addNodes(null,nodes);
-		
+
 		//自定义渲染树节点
 		newNodes.forEach(function(i){
 			var $del=$("<span  class='showDelete'><i></i></span>");
@@ -72,7 +78,7 @@ ViewComp.MemberManager = Backbone.View.extend({
 			$("#selectedTree #"+i.tId+"_a").append($del);
 		})
 	},
-	
+
 	//删除节点
 	deleteOption:function(i){
 		this.selectedTree.removeNode(i);
@@ -82,12 +88,12 @@ ViewComp.MemberManager = Backbone.View.extend({
 	showDelete: function(e) {
 		$(e.currentTarget).find(".showDelete").show();
 	},
-	
+
 	//隐藏删除按钮
 	hideDelete: function(e) {
 		$(e.currentTarget).find(".showDelete").hide();
 	},
-	
+
 	loadChildren:function(_this,outer,parentId,treeNode){
 		_this.$(".scrollWrap").mmhMask();
 		var url="fetchServiceKeyUserInfo",
@@ -95,6 +101,11 @@ ViewComp.MemberManager = Backbone.View.extend({
 				uid:App.Comm.user('userId')
 			},
 			setting = {
+				data:{
+					key:{
+						title:"tip"
+					}
+				},
 				callback: {
 					beforeClick:function(){
 					},
@@ -111,7 +122,7 @@ ViewComp.MemberManager = Backbone.View.extend({
 					selectedMulti: true,
 					nameIsHTML:true,
 					showLine: false,
-					showTitle:false
+					showTitle:true
 				}
 			};
 		if(parentId){
@@ -122,7 +133,7 @@ ViewComp.MemberManager = Backbone.View.extend({
 			}
 			url='fetchServiceMemberList';
 		}
-		
+
 		App.Comm.ajax({
 			URLtype:url,
 			type:"get",
@@ -136,17 +147,21 @@ ViewComp.MemberManager = Backbone.View.extend({
 				if(url=='fetchServiceKeyUserInfo'){
 					_org.forEach(function(i){
 						i.iconSkin='business';
+						i.tip= i.name+"("+i.namePath+")";
 						i.name=i.name+'<i style="color:#999999;">（'+i.namePath+'）</i>';
 					});
 					zNodes=_org.concat(_user);
 				}else{
 					_org.forEach(function(i){
 						i.iconSkin='business';
+						i.tip= i.name;
 						_newOrg.push(i);
 					});
 					zNodes=_newOrg.concat(_user);
 				}
-
+				zNodes.forEach(function(i){
+					i.tip= i.tip|| i.name;
+				})
 				if(!treeNode){
 					_this.selectTree = $.fn.zTree.init($("#selectTree"), setting, zNodes);
 				}else{
