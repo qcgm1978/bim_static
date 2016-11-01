@@ -6,6 +6,21 @@ App.Project = {
 	currentProsCheckFloor:"",
 
 	presetClickEvent(userId) {
+
+		var sceneId=userId.split('.')[0];
+
+		App.Project.Settings.ModelObj = {
+			intersect: {
+				userId:userId,
+				object:{
+					userData:{
+						sceneId:sceneId
+					}
+				}
+			}
+
+		};
+
 		var projectNav = App.Project.Settings.projectNav,
 			property = App.Project.Settings.property;
 
@@ -17,10 +32,12 @@ App.Project = {
 			App.Project.DesignAttr.PropertiesCollection.fetch({
 				data: {
 					elementId: userId,
-					sceneId: userId.split('.')[0]
+					sceneId: sceneId
 				}
 			});
 		}
+
+
 	},
 
 	resetProperNull() {

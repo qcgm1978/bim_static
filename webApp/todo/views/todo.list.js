@@ -43,7 +43,7 @@ App.Todo.TodoListView=Backbone.View.extend({
 
 			if(this.currentRenderCount>=model.collection.length){
 				$("#todoContent").find(".commissionListPagination").show();
-				$("#todoContent").find(".sumDesc").show();
+				$("#todoContent").find(".commissionBottom .sumDesc").show();
 			}
 
 	    }else{
@@ -52,7 +52,7 @@ App.Todo.TodoListView=Backbone.View.extend({
 
 			if(this.currentRenderCount>=model.collection.length){
 				$("#todoContent").find(".alreadyListPagination").show();
-				$("#todoContent").find(".sumDesc").show();
+				$("#todoContent").find(".alreadyBottom .sumDesc").show();
 			}
 	    }
 
@@ -84,7 +84,7 @@ App.Todo.TodoListView=Backbone.View.extend({
 
 		//代办滚动条
 		$el.mCustomScrollbar({
-			set_height: "100%",
+			set_height: "95%",
 			theme: 'minimal-dark',
 			axis: 'y',
 			keyboard: {
