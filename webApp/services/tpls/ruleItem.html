@@ -47,7 +47,7 @@
             <option <%= rule.visible === true?'selected':'' %> value=true>显示</option>
             <option <%= rule.visible === false?'selected':'' %> value=false>隐藏</option>
         </select>
-        <input name="ccodeValue" value="<%=rule.code.join(',')%>" type="text" placeholder="请输入文件编码规则...">
+        <input name="ccodeValue" value="<%=rule.code?rule.code.join(','):''%>" type="text" placeholder="请输入文件编码规则...">
     </div>
     <% }) %>
 </fieldset>

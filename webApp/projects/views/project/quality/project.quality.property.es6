@@ -157,7 +157,7 @@ App.Project.ProjectQualityProperty = Backbone.View.extend({
 			App.Project.isShowMarkers('dis',$QualityConcerns.find('.btnCk').hasClass('selected'));
 		} else if (type == "poperties") {
 			//属性
-			App.Project.isShowMarkers('other');
+			//App.Project.isShowMarkers('pro');
 			this.$el.find(".QualityProperties").show().siblings().hide();
 		}
 

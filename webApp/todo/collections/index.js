@@ -71,10 +71,10 @@ App.Todo = {
 				//todo 分页
 				if (App.Todo.Settings.type == "commission") {
 					$el = $content.find(".commissionListPagination");
-					$content.find(".sumDesc").html('共 '+pageCount+' 条待办事项');
+					$content.find(".commissionBottom .sumDesc").html('共 '+pageCount+' 条待办事项');
 				} else {
 					$el = $content.find(".alreadyListPagination");
-					$content.find(".sumDesc").html('共 '+pageCount+' 条已办事项');
+					$content.find(".alreadyBottom .sumDesc").html('共 '+pageCount+' 条已办事项');
 				}
 
 
