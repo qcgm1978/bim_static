@@ -22,6 +22,7 @@ App.Project.DesignProperties=Backbone.View.extend({
 		//渲染数据
 		var data=model.toJSON().data;
 		var temp=JSON.stringify(data);
+		console.log(data);
 		temp=JSON.parse(temp);
 		App.Project.userProps.call(this,temp);
 	}
