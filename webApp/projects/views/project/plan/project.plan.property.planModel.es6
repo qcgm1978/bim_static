@@ -116,10 +116,10 @@ App.Project.PlanModel = Backbone.View.extend({
 	    }
     }
 
-
+		var targetCode = $target.data("code");
 		if($('.planModel .treeCheckbox input').prop('checked')){
 
-			var codesToFilter = _.filter(this.codes,function(num){return num!=$target.data("code")});
+			var codesToFilter = _.filter(this.codes,function(num){return num!=targetCode});
 			App.Project.Settings.Viewer.translucent(false);
 
 			App.Project.Settings.Viewer.filter({
