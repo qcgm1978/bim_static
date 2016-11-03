@@ -6,6 +6,21 @@ App.Project = {
 	currentProsCheckFloor:"",
 
 	presetClickEvent(userId) {
+
+		var sceneId=userId.split('.')[0];
+
+		App.Project.Settings.ModelObj = {
+			intersect: {
+				userId:userId,
+				object:{
+					userData:{
+						sceneId:sceneId
+					}
+				}
+			}
+
+		};
+
 		var projectNav = App.Project.Settings.projectNav,
 			property = App.Project.Settings.property;
 
@@ -17,10 +32,12 @@ App.Project = {
 			App.Project.DesignAttr.PropertiesCollection.fetch({
 				data: {
 					elementId: userId,
-					sceneId: userId.split('.')[0]
+					sceneId: sceneId
 				}
 			});
 		}
+
+
 	},
 
 	resetProperNull() {
@@ -255,15 +272,13 @@ App.Project = {
 				var _t=res.data.code;
 				_specialFilterFiles=res.data.file;
 				_extArray=res.data.specCode;
-				if(_t && _t.length){
-					_hideCode=_t.code;
-					_codeFlag=_t.visible;
-				}
+				_hideCode=_t.code;
+				_codeFlag=_t.visible;
 				floor=_.pluck(res.data.floor, 'floor');
 			}
 			_this.linkSilder('floors', floor);
 			_this.linkSilderSpecial('specialty', _specialFilterFiles,_extArray);
-			if(_hideCode){
+			if(_hideCode && _hideCode.length ){
 				App.Project.Settings.Viewer.filter({
 					ids: _this.filterHideCode(_hideCode,_codeFlag),
 					type: "classCode"

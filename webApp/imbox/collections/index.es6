@@ -685,7 +685,7 @@ App.INBox.comment = {
 		//删除评论
 		delTalk(event) {
 
-			$.confirm('确认删除该评论么？', () => {
+			$.confirmPlus('确认删除该评论么？', () => {
 				var $el = $(event.target),
 				    id = $el.data("id");
 
