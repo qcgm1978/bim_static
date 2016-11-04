@@ -2031,7 +2031,6 @@ App.Project = {
 			liTpl = '<li class="modleItem"><a data-id="<%=id%>" href="/static/dist/app/project/single/filePreview.html?id={id}&projectId=' + App.Project.Settings.projectId + '&projectVersionId=' + App.Project.Settings.CurrentVersion.id + '" target="_blank" ><div class="modleNameText overflowEllipsis modleName2">varName</div></a></li>';
 
 		App.Comm.ajax(data, (data) => {
-			alert(8);
 			if (data.code == 0) {
 				//debugger
 				if (data.data.length > 0) {
