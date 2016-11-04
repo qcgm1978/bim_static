@@ -156,6 +156,8 @@
     图纸模型功能：快照图片下载
     场景：IE10
     write by wuweiwei
+    函数名：_innerfun_DownloadImageForIE,_innerfun_DownloadCheck
+    未使用
     */
     var _innerfun_DownloadImageForIE = function(url){
         frm = document.createElement("IFRAME");
