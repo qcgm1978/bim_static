@@ -177,7 +177,7 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 	},
 	//修改名称 或者创建
 	enterEditNameOrCreateNew: function(event) {
-
+		
 		var $item = $(event.target).closest(".item");
 
 		//创建
