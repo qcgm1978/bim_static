@@ -94,14 +94,17 @@ App.Project.PlanModel = Backbone.View.extend({
 		ids=$target.data("userId");
 		box=$target.data("box");
 
-		//高亮钱取消
-		App.Project.cancelZoomModel();
-		App.Project.Settings.Viewer.translucent(false);
+		if(App.Project.Settings.isHighlight ){
+			//高亮钱取消
+			//App.Project.cancelZoomModel();
+			App.Project.Settings.Viewer.translucent(false);
 
-		App.Project.Settings.Viewer.highlight({
-			type: 'userId',
-			ids: undefined
-		});
+			App.Project.Settings.Viewer.highlight({
+				type: 'userId',
+				ids: undefined
+			});
+		}
+
 		//App.Project.Settings.Viewer.filter({
 		//	type: "plan",
 		//	ids: undefined
@@ -116,33 +119,14 @@ App.Project.PlanModel = Backbone.View.extend({
 	    }
     }
 
-		var targetCode = $target.data("code");
-		if($('.planModel .treeCheckbox input').prop('checked')){
+		var targetCode = $target.data("code"),
+		    checked = $('.planModel .treeCheckbox input').prop('checked');
 
-			var codesToFilter = _.filter(this.codes,function(num){return num!=targetCode});
-			App.Project.Settings.Viewer.translucent(false);
-
-			App.Project.Settings.Viewer.filter({
-				type: "plan",
-				ids: codesToFilter
-			});
-
-			//App.Project.Settings.Viewer.translucent(true);
-      //
-			//App.Project.Settings.Viewer.highlight({
-			//	type: "plan",
-			//	ids: [$target.data("code")]
-			//});
-			//App.Project.Settings.Viewer.zoomToBuilding(0.05,1);
-
-
-
-			return
-		}
 
 		if (box && ids) {
-			if($('.planSearch .treeCheckbox input').prop('checked')){
+			if(checked){
 				App.Project.Settings.checkBoxIsClick = true;
+				App.Project.Settings.Viewer.translucent(false);
 				App.Project.Settings.Viewer.filterByUserIds(ids);
 
 				return
@@ -171,6 +155,8 @@ App.Project.PlanModel = Backbone.View.extend({
 
 
 			}
+			App.Project.Settings.isHighlight = true;
+
 			return;
 		}
 		var data = {
@@ -187,8 +173,9 @@ App.Project.PlanModel = Backbone.View.extend({
 				if(box && box.length){
 					$target.data("userId", data.data.elements);
 					$target.data("box", box);
-					if($('.planSearch .treeCheckbox input').prop('checked')){
+					if(checked){
 						App.Project.Settings.checkBoxIsClick = true;
+						App.Project.Settings.Viewer.translucent(false);
 						App.Project.Settings.Viewer.filterByUserIds(data.data.elements);
 
 						return
@@ -216,6 +203,8 @@ App.Project.PlanModel = Backbone.View.extend({
 						App.Project.zoomToBox(data.data.elements,box);
 
 					}
+					App.Project.Settings.isHighlight = true;
+
 				}
 			}else{
 				App.Project.cancelZoomModel();
@@ -223,3 +212,16 @@ App.Project.PlanModel = Backbone.View.extend({
 		});
 	}
 });
+
+//if(checked){
+//
+//	var codesToFilter = _.filter(this.codes,function(num){return num!=targetCode});
+//	App.Project.Settings.Viewer.translucent(false);
+//
+//	App.Project.Settings.Viewer.filter({
+//		type: "plan",
+//		ids: codesToFilter
+//	});
+//
+//	return
+//}
