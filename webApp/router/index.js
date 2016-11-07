@@ -165,7 +165,7 @@ var AppRoute = Backbone.Router.extend({
 		if (this.reset() == false) {
 			return;
 		}
-		//销毁上传
+		//如果用户已经是登录状态了 就执行下面的代码
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".resources").addClass('selected');
 		_.require('/static/dist/resources/resources.css');
 		_.require('/static/dist/resources/resources.js');

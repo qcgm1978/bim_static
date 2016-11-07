@@ -2,12 +2,13 @@
   "name": "wanda",
   "version": "1.0.0",
   "description": "backbone for wanda project",
-  "main": "fis-conf.js", 
+  "main": "fis-conf.js",
   "devDependencies": {
     "fis-parser-babel-6.x": "^1.0.0",
     "fis-parser-less": "^0.1.3",
-    "fis3-postpackager-loader": "^1.3.13",
-    "fis3-deploy-local-deliver":""
+    "fis3": "^3.3.29",
+    "fis3-deploy-local-deliver": "",
+    "fis3-postpackager-loader": "^1.3.13"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
