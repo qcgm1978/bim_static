@@ -541,7 +541,21 @@ fis.match('/components/inspectSelection/**.{js,es6}',{
 //  release: '/static/dist/components/inspectSelection/js/inspectSelection.js'
 //});
 
+//设备模型组件
+fis.match('/components/device/index.html',{
+  release: '/static/dist/components/device/index.html'
+});
+fis.match('/components/device/modal.html',{
+  release: '/static/dist/components/device/modal.html'
+});
 
+fis.match('/components/device/**.{css,less}',{
+  packTo: '/static/dist/components/device/css/device.css'
+});
+
+fis.match('/components/device/**.{js,es6}',{
+  packTo: '/static/dist/components/device/js/device.js'
+});
 //模型 \checkpoints
 //fis.match('/components/checkpoints/index.html',{
 //  release: '/static/dist/components/checkpoints/index.html'

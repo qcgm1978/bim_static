@@ -98,7 +98,7 @@ ViewComp.MemberManager = Backbone.View.extend({
 		var newNodes=_this.selectedTree.addNodes(null,nodes);
 		//自定义渲染树节点
 		newNodes.forEach(function(i){
-			var $del=$("<span  class='showDelete'><i></i></span>");
+			var $del=$("<span title=''  class='showDelete'><i></i></span>");
 			//绑定删除事件
 			$del.on("click",function(){
 				_this.deleteOption(i);

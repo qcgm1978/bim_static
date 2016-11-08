@@ -4,6 +4,8 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 
 	className: "item",
 
+	isLoad:false,
+
 	template: _.templateUrl("/resources/tpls/resourceModel/resource.model.list.nav.detail.html"),
 
 	initialize: function() {
@@ -177,9 +179,11 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 	},
 	//修改名称 或者创建
 	enterEditNameOrCreateNew: function(event) {
-		
+		if(this.isLoad){
+			return
+		}
+		this.isLoad=true;
 		var $item = $(event.target).closest(".item");
-
 		//创建
 		if ($item.hasClass('createNew')) {
 			this.createNewFolder($item);
@@ -208,6 +212,7 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 		};
 
 		App.Comm.ajax(data, function(data) {
+			this.isLoad=false;
 			if (data.code == 0) {
 				var models = App.ResourceModel.FileCollection.models,
 					id = data.data.id;
@@ -231,8 +236,7 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 
 
 			} else {
-
-				alert("修改失败");
+				$.tip({message:"修改失败",type:'alarm'});
 				//取消
 				var $prevEdit = $item.find(".txtEdit");
 				if ($prevEdit.length > 0) {
@@ -267,6 +271,7 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 		};
 
 		App.Comm.ajax(data, function(data) {
+			this.isLoad=false;
 			if (data.code == 0) {
 
 				var id = data.data.id,
@@ -298,7 +303,11 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 
 
 			} else {
-				alert(data.message);
+				if(data.code=='19007'){
+					$.tip({type:'alarm',message:'文件夹已经存在、无法重复创建'})
+				}else if(data.code=='10000'){
+					$.tip({type:'alarm',message:'系统错误'})
+				}
 			}
 		});
 

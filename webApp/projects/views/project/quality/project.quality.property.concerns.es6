@@ -207,7 +207,7 @@ App.Project.QualityConcerns=Backbone.View.extend({
 				$.ajax({
 					url: "/doc/api/"+data.data.projectId+'/'+data.data.versionId+"?fileId="+_fileId
 				}).done(function(data){
-					if (data.code == 0 && data) {
+					if (data.code == 0 && data.data) {
 						var  modelId = data.data.modelId;
 						var obj={
 							uuid:modelId+$target.data('uuid').slice($target.data('uuid').indexOf('.')),
@@ -217,8 +217,12 @@ App.Project.QualityConcerns=Backbone.View.extend({
 							}
 						}
 						App.Project.showInModel($target,3,obj);
+					}else{
+						$.tip({message:'隐患对应的构件不存在',type:'alarm'});
 					}
 				})
+			}else{
+				$.tip({message:'数据格式非法',type:'alarm'});
 			}
 		})
 	}
