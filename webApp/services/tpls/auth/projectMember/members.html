@@ -12,4 +12,8 @@
 	<div class="remove" data-outer="<%= item.outer %>" data-type="<% if(item.org){ %>org<% }else{ %>user<% } %>" data-user="<%= item.id %>" data-userName="<%= item.name %>"><i style="background:url('/static/dist/images/services/images/service_ico.png')no-repeat 0 -280px"></i>移除</div>
 </li>
 <% }) %>
+
+<% if(data.length==0){ %>
+<li class="noDataText2">暂无项目成员，请点击“添加成员”按钮!</li>
+<%}%>
 </ul>
