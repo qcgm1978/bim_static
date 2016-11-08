@@ -10982,6 +10982,15 @@ CLOUD.Extensions.MarkerHelper.prototype = {
         }
     },
 
+    getMarkersBoundingBox: function() {
+
+        if (this.markerEditor) {
+
+            return this.markerEditor.getMarkersBoundingBox();
+
+        }
+    },
+
     // 根据id选择marker
     selectMarkerById: function (id) {
 

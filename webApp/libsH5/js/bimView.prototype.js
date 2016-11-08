@@ -33,7 +33,6 @@
 
       var url,
         host = window.location.host;
-         
       if (host == "bim.wanda-dev.cn" || host == "bim-uat.wanda-dev.cn" || host == "bim.wanda.cn") {
         url = "/static/dist/js/mpkWorker.min.js";
       } else {
@@ -446,7 +445,13 @@
       viewer.zoomToBBox(CLOUD.Utils.computeBBox(box), 0.05, 1.2);
       viewer.render();
     },
-
+    zoomToBBoxWithOuterBox: function (box, outerBox, margin, ratio){
+      var viewer = this.viewer;
+      box=box[0].join(',')+","+ box[1].join(',');
+      box=box.split(',');
+      viewer.zoomToBBoxWithOuterBox(CLOUD.Utils.box3FromArray(box),
+          CLOUD.Utils.mergeBBox(outerBox),margin,ratio);
+    },
     setTopView: function(box,isMeger,margin,ratio) {
       var viewer = this.viewer;
       if(isMeger){

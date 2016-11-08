@@ -5,6 +5,8 @@ App.Project = {
 	currentOpenCheckFloor:"",
 	currentProsCheckFloor:"",
 
+	isSettedMarkerClick:false,
+
 	presetClickEvent(userId) {
 
 		var sceneId=userId.split('.')[0];
@@ -833,10 +835,31 @@ App.Project = {
 		if (type == 'process') {
 			App.Project.isShowMarkers(type, $('.QualityProcessAcceptance .btnCk').hasClass('selected'));
 		} else if (type == 'open') {
-			App.Project.isShowMarkers('open', $('.QualityOpeningAcceptance .btnCk').hasClass('selected'));
+			App.Project.isShowMarkers(type, $('.QualityOpeningAcceptance .btnCk').hasClass('selected'));
 		} else if (type == 'dis') {
-			App.Project.isShowMarkers('dis', $('.QualityConcerns .btnCk').hasClass('selected'));
+			App.Project.isShowMarkers(type, $('.QualityConcerns .btnCk').hasClass('selected'));
 		}
+	},
+
+
+	getBoxs:function(type){
+		var boxs=[],
+			typeMap={
+				'concerns':'dis',
+				'processacceptance':'process',
+				'openingacceptance':'open',
+			},
+			type=typeMap[type];
+			data = this.currentLoadData[type];
+		_.each(data, function(i) {
+			if(i.componentId){
+				if (i.location && i.location.indexOf('boundingBox') != -1) {
+					var _loc = JSON.parse(i.location);
+					boxs.push(_loc.boundingBox);
+				}
+			}
+		})
+		return boxs;
 	},
 
 	//是否显示标记
@@ -892,7 +915,7 @@ App.Project = {
 				});
 			}
 		} else {
-			viewer.loadMarkers(null);
+			//viewer.loadMarkers(null);
 		}
 	},
 
@@ -1336,7 +1359,8 @@ App.Project = {
 			if (data.code == 0) {
 				data = data.data;
 				if (!data) {
-					alert("项目无内容");
+					$.tip({message:'项目无内容',type:'alarm'});
+					document.location.href='/index.html';
 					return;
 				}
 				App.Project.Settings.projectName = data.projectName;
@@ -1438,7 +1462,6 @@ App.Project = {
 
 	// 加载数据
 	loadData: function() {
-		 
 		//var $contains = $("#contains");
 		$("#contains").html(new App.Project.ProjectApp().render().el);
 		var status = App.Project.Settings.CurrentVersion.status;
@@ -1782,7 +1805,6 @@ App.Project = {
 
 	//设计导航
 	fetchFileNav: function() {
-
 		//请求数据
 		var data = {
 			URLtype: "fetchDesignFileNav",
@@ -1835,13 +1857,11 @@ App.Project = {
 			if ((data.data || []).length > 0) {
 				var navHtml = new App.Comm.TreeViewMar(data);
 				$("#projectContainer .projectNavFileContainer").html(navHtml);
+				App.Project.initScroll();
 				if(App.cb)App.cb();
 			} else {
 				$("#projectContainer .projectNavFileContainer").html('<div class="loading">无文件</div>');
 			}
-
-
-
 			$("#pageLoading").hide();
 		});
 
@@ -2237,15 +2257,18 @@ App.Project = {
 	},
 
 	showMarks: function(marks) {
+		var v=App.Project.Settings.Viewer;
 		if (!_.isArray(marks)) {
 			marks = [marks];
 		}
-		App.Project.Settings.Viewer.loadMarkers(marks);
+		v.viewer.setMarkerClickCallback(App.Project.markerClick);
+		v.loadMarkers(marks);
 	},
 	//通过userid 和 boundingbox 定位模型
 	zoomModel: function(ids, box, margin, ratio) {
 		//定位
-		App.Project.Settings.Viewer.setTopView(box, false, margin, ratio);
+	//	App.Project.Settings.Viewer.setTopView(box, false, margin, ratio);
+		App.Project.Settings.Viewer.zoomToBBoxWithOuterBox(box,this.getBoxs(App.Project.Settings.property, margin, ratio));
 		//半透明
 		//App.Project.Settings.Viewer.translucent(true);
 		//高亮

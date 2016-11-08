@@ -1,0 +1,47 @@
+body{
+  margin: 0;
+  padding: 0;
+}
+.deviceSelector{
+  width: 1000px;
+  height: 500px;
+  position: relative;
+  border:1px solid #cccccc;
+  overflow: hidden;
+  &.ieExtend{
+    border:none;
+  }
+  & #modelCanvas{
+    position: absolute;
+    top:0;
+    right: 300px;
+    bottom: 0;
+    box-sizing: border-box;
+    border:1px solid #cccccc;
+  }
+  & .rightSilderBar{
+    width: 300px;
+    position: absolute;
+    top:0;
+    right: 0;
+    bottom: 0;
+    box-sizing: border-box;
+    border-left:1px solid #cccccc;
+    background-color: #FFF;
+    & .before{
+      display: block;
+      position: absolute;
+      left: -22px;
+      top: 40px;
+      width: 22px;
+      height: 42px;
+      border: 1px solid #cccccc;
+      padding: 5px 4px;
+      color: #3399FF;
+      cursor: pointer;
+      &:hover{
+        background: #cccccc;
+      }
+    }
+  }
+}

@@ -5522,7 +5522,7 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
 
         if ( camera instanceof THREE.Camera === false ) {
 
-            console.error( 'THREE.WebGLIncrementRenderer.IncrementRender: camera is not an instance of THREE.Camera.' );
+            // console.error( 'THREE.WebGLIncrementRenderer.IncrementRender: camera is not an instance of THREE.Camera.' );
             return;
         }
 
@@ -6889,7 +6889,16 @@ CLOUD.Camera.prototype.setStandardView = function (stdView, bbox) {
     return target;
 };
 
-CLOUD.Camera.prototype.zoomToBBox = function (bound, margin, ratio) {
+/**
+ * 缩放到指定的包围盒范围
+ *
+ * @param {THREE.Box3} bound - 包围盒
+ * @param {Float} margin - 包围盒缩放比例, 缺省值: 0.05
+ * @param {Float} ratio - 相机与中心距离的拉伸比例, 缺省值: 1.0
+ * @param {THREE.Vector3} direction - 相机观察方向
+ */
+CLOUD.Camera.prototype.zoomToBBox = function (bound, margin, ratio, direction) {
+
     ratio = ratio || 1.0;
     margin = margin || 0.05;
 
@@ -6898,7 +6907,7 @@ CLOUD.Camera.prototype.zoomToBBox = function (bound, margin, ratio) {
     
     bbox.expandByScalar(bound.size().length() * margin);
 
-    var dir = this.getWorldDirection();
+    var dir = direction ? direction : this.getWorldDirection();
     var up = this.up;
     var aspect = this.aspect;
     var halfFov = THREE.Math.degToRad(this.fov * 0.5); // 转成弧度
@@ -11305,8 +11314,7 @@ CLOUD.OrbitEditor.prototype = Object.create(THREE.EventDispatcher.prototype);
 CLOUD.OrbitEditor.prototype.constructor = CLOUD.OrbitEditor;
 
 CLOUD.OrbitEditor.prototype.destroy = function () {
-
-}
+};
 
 CLOUD.OrbitEditor.prototype.onExistEditor = function () {
 };
@@ -11556,7 +11564,7 @@ CLOUD.OrbitEditor.prototype.touchmove = function (event) {
     if (camera_scope.enabled === false) return;
 
     event.preventDefault();
-    event.stopPropagation();
+    //event.stopPropagation();
 
     camera_scope.touchMoveHandler(event);
 };
@@ -12056,6 +12064,87 @@ CLOUD.RectZoomEditor.prototype.zoomToRectangle = function () {
     scope.cameraEditor.updateView(true);
 
 };
+
+//CLOUD.RectZoomEditor.prototype.zoomToRectangle = function () {
+//
+//    var scope = this;
+//    var camera = this.cameraEditor.object;
+//    var target = this.cameraEditor.target;
+//    var zNear = camera.near;
+//
+//    var canvasBounds = this.cameraEditor.getContainerDimensions();
+//    var startX = scope.startPt.x - canvasBounds.left;
+//    var startY = scope.startPt.y - canvasBounds.top;
+//    var endX = scope.endPt.x - canvasBounds.left;
+//    var endY = scope.endPt.y - canvasBounds.top;
+//    var rectWidth = Math.abs(endX - startX);
+//    var rectHeight = Math.abs(startY - endY);
+//
+//    if (rectWidth === 0 || rectHeight === 0)  return;
+//
+//    var rCenter = new THREE.Vector2((startX + endX) / 2, (startY + endY) / 2);
+//    var normalizeCenterX = rCenter.x / canvasBounds.width * 2 - 1;
+//    var normalizeCenterY = -rCenter.y / canvasBounds.height * 2 + 1;
+//    var normalizeCenter = new THREE.Vector2(normalizeCenterX, normalizeCenterY);
+//
+//    var eye = camera.position.clone();
+//    var dirEyeToTarget = target.clone().sub(eye);
+//    var distEyeToTarget = dirEyeToTarget.length();
+//
+//    var dirRight = this.cameraEditor.getWorldRight();
+//    var dirUp = this.cameraEditor.getWorldUp();
+//    var pivot = this.scene.hitTest(normalizeCenter, camera);
+//
+//    if (!pivot) {
+//
+//        ////var halfFrustumHeight = distEyeToTarget * Math.tan(THREE.Math.degToRad(camera.fov * 0.5));
+//        //var halfFrustumHeight = zNear * Math.tan(THREE.Math.degToRad(camera.fov * 0.5));
+//        //var halfFrustumWidth = halfFrustumHeight * camera.aspect;
+//        //var rightWidth = rCenter.x * 2 * halfFrustumWidth / canvasBounds.width;
+//        //var distCenterToRight = rightWidth - halfFrustumWidth;
+//        //var upHeight = rCenter.y * 2 * halfFrustumHeight / canvasBounds.height;
+//        //var distCenterToUp = upHeight - halfFrustumHeight;
+//        //
+//        //dirRight.normalize().multiplyScalar(distCenterToRight);
+//        //dirUp.multiplyScalar(distCenterToUp);
+//        //
+//        //var dirRay = dirEyeToTarget.clone().add(dirUp).add(dirRight);
+//
+//        //pivot = eye.clone().add(dirRay);
+//
+//        //var buffer = new Uint8Array(4 * rectWidth * rectHeight);
+//        //this.cameraEditor.viewer.renderer.readRenderTargetPixels(this.cameraEditor.viewer.renderTarget, startX, startY, rectWidth, rectHeight, buffer);
+//
+//        //if ()
+//        //
+//        //var closeDepth =
+//        //var wCenter = new THREE.Vector3((rCenter.x, rCenter.y, closeDepth);
+//
+//    }
+//
+//    var buffer = new Uint8Array(4 * rectWidth * rectHeight);
+//    this.cameraEditor.viewer.renderer.readRenderTargetPixels(this.cameraEditor.viewer.renderTarget, startX, startY, rectWidth, rectHeight, buffer);
+//
+//    dirEyeToTarget.normalize();
+//
+//    var scaleFactor = rectWidth / rectHeight > canvasBounds.width / canvasBounds.height ? rectWidth / canvasBounds.width : rectHeight / canvasBounds.height;
+//    var distEyeToPivot = pivot.distanceTo(eye);
+//    var distZoom = distEyeToPivot * scaleFactor;
+//
+//    //if (zoomDist < zNear) {
+//    //    console.log("zoomDist < zNear");
+//    //    zoomDist = zNear;
+//    //}
+//
+//    //var zoomDir = eye.clone().sub(pivot).normalize().multiplyScalar(zoomDist);
+//    var dirZoom = dirEyeToTarget.clone().negate().multiplyScalar(distZoom);
+//
+//    eye = pivot.clone().add(dirZoom);
+//    camera.position.copy(eye);
+//    target.copy(eye).add(dirZoom.clone().negate().normalize().multiplyScalar(distEyeToTarget));
+//    scope.cameraEditor.updateView(true);
+//
+//};
 
 CLOUD.RectZoomEditor.prototype.worldToClient = function (wPoint) {
 
@@ -19119,6 +19208,8 @@ CLOUD.EditorManager = function() {
     this.enableAnimation = true; // 是否允许动画
     this.isUpdateRenderList = true; // 是否更新渲染列表
 
+    this.movePad = null;
+
     var scope = this;
     var _canMouseMoveOperation = false; // 是否可以进行mouseMove相关操作
 
@@ -19285,11 +19376,18 @@ CLOUD.EditorManager.prototype = {
     setEditor: function(newEditor, slaveEditor) {
 
         if (this.editor !== null) {
+            if (this.editor == this.editors['orbitEditor']) {
+                //this.movePad.hideOverlay();
+            }
             this.editor.onExistEditor();
         }
 
         if (slaveEditor)
             newEditor.slaveEditor = slaveEditor;
+
+        if (newEditor == this.editors['orbitEditor']) {
+            //this.movePad.showOverlay();
+        }
 
         this.editor = newEditor;
 
@@ -19318,6 +19416,9 @@ CLOUD.EditorManager.prototype = {
         if (orbitEditor === undefined) {
             orbitEditor = new CLOUD.OrbitEditor(viewer.cameraEditor, viewer.getScene(), viewer.domElement);
             this.editors["orbitEditor"] = orbitEditor;
+            if (this.movePad == null) {
+                //this.movePad = new CLOUD.MovePad(viewer);
+            }
         }
 
         return orbitEditor;
@@ -20032,7 +20133,7 @@ CLOUD.ClipPlanes = function (size, center) {
     };
 
     this.store = function () {
-        return new ClipPlanesInfo(this.uniforms.iClipPlane.value ? true : false, this.visible, this.rotatable, this.planeOffset, this.position, this.scale, this.quaternion);
+        return new ClipPlanesInfo(this.uniforms.iClipPlane.value ? true : false, this.visible, this.rotatable, this.planeOffset, this.position.clone(), this.scale.clone(), this.quaternion.clone());
     };
 
     this.restore = function (info) {
@@ -20046,10 +20147,7 @@ CLOUD.ClipPlanes = function (size, center) {
         this.position.copy(info.position);
         this.scale.copy(info.scale);
 
-        this.quaternion._w = info.quaternion._w;
-        this.quaternion._x = info.quaternion._x;
-        this.quaternion._y = info.quaternion._y;
-        this.quaternion._z = info.quaternion._z;
+        this.quaternion.copy(info.quaternion);
 
         this.update();
     };
@@ -20078,11 +20176,17 @@ CLOUD.ClipPlanes = function (size, center) {
         var index = Math.floor(face / 2);
         var mod = face % 2;
         this.planeOffset[face] += offset;
-        if (mod == 0 && this.planeOffset[face] > 0) {
-            this.planeOffset[face] = 0;
+
+        var size = this.cubeSize.getComponent(index) * 0.5;
+        if (mod == 0 && this.planeOffset[face] > size) {
+            this.planeOffset[face] -= offset;
+            offset = size - this.planeOffset[face];
+            this.planeOffset[face] = size;
         }
-        else if (mod == 1 && this.planeOffset[face] < 0) {
-            this.planeOffset[face] = 0;
+        else if (mod == 1 && this.planeOffset[face] < -size) {
+            this.planeOffset[face] -= offset;
+            offset = -size - this.planeOffset[face];
+            this.planeOffset[face] = -size;
         }
 
         var centerOffset = new THREE.Vector3();
@@ -20094,21 +20198,18 @@ CLOUD.ClipPlanes = function (size, center) {
         }
 
         var scale = 1 + (centerOffset.getComponent(index) / this.cubeSize.getComponent(index));
-        if (scale > 0.0 && scale < 1.01) {
+        if (scale > 0.0 && scale < 2.0) {
             this.scale.setComponent(index, scale);
-            this.position.copy(this.center);
-            for (var i = 0; i < 6; ++i) {
-                var tempClipPlane = this.uniforms.vClipPlane.value[i].clone();
-                var tempNormal = new THREE.Vector3(tempClipPlane.x, tempClipPlane.y, tempClipPlane.z);
-                tempNormal.normalize();
-                var deltaOffset = this.planeOffset[i];
-                var offsetVector = new THREE.Vector3(tempNormal.x * deltaOffset, tempNormal.y * deltaOffset, tempNormal.z * deltaOffset);
-                if (i % 2 == 1) {
-                    this.position.sub(offsetVector.multiplyScalar(0.5));
-                }
-                else {
-                    this.position.add(offsetVector.multiplyScalar(0.5));
-                }
+            var tempClipPlane = this.uniforms.vClipPlane.value[face].clone();
+            var tempNormal = new THREE.Vector3(tempClipPlane.x, tempClipPlane.y, tempClipPlane.z);
+            tempNormal.normalize();
+            var deltaOffset = offset;
+            var offsetVector = new THREE.Vector3(tempNormal.x * deltaOffset, tempNormal.y * deltaOffset, tempNormal.z * deltaOffset);
+            if (face % 2 == 1) {
+                this.position.sub(offsetVector.multiplyScalar(0.5));
+            }
+            else {
+                this.position.add(offsetVector.multiplyScalar(0.5));
             }
 
             this.update();
@@ -20146,6 +20247,8 @@ CLOUD.ClipPlanes = function (size, center) {
         this.children[this.selectIndex].material = this.planeMaterial.clone();
         this.selectIndex = null;
     };
+
+    this.update();
 };
 
 CLOUD.ClipPlanes.prototype = Object.create(THREE.Object3D.prototype);
@@ -20911,12 +21014,23 @@ CLOUD.ExtensionHelper.prototype = {
         }
     },
 
+    getMarkersBoundingBox: function() {
+
+        if (this.markerHelper) {
+            return this.markerHelper.getMarkersBoundingBox();
+        }
+
+        return null;
+    },
+
     // 设置marker click 回调
     setMarkerClickCallback: function (callback) {
 
-        if (this.markerHelper) {
-            this.markerHelper.setMarkerClickCallback(callback);
+        if (!this.markerHelper) {
+            this.markerHelper = new CLOUD.Extensions.MarkerHelper(this.viewer);
         }
+
+        this.markerHelper.setMarkerClickCallback(callback);
     },
 
     // ------------------ 小地图API -- S ------------------ //
@@ -21635,7 +21749,9 @@ CloudViewer.prototype = {
     },
 
     zoomToBBox: function (box, margin, ratio) {
+
         margin = margin || -0.05;
+
         if (!box) {
             box = this.getScene().worldBoundingBox();
         } else {
@@ -21647,6 +21763,91 @@ CloudViewer.prototype = {
 
         CLOUD.GlobalData.ByTargetDistance = true;
         this.render();
+    },
+
+    /**
+     * 根据观察方向缩放到指定包围盒范围
+     *
+     * @param {THREE.Box3} box - 包围盒
+     * @param {THREE.Vector3} direction - 观察方向（从包围盒中心指向某个参考点）
+     * @param {Float} margin - 包围盒缩放比例, 缺省值: 0.05
+     * @param {Float} ratio - 相机与中心距离的拉伸比例, 缺省值: 1.0
+     */
+    zoomToBBoxByDirection: function (box, direction, margin, ratio) {
+
+        margin = margin || -0.05;
+
+        if (!direction) {
+
+            this.zoomToBBox(box, margin, ratio);
+            return;
+        }
+
+        if (direction && box) {
+
+            var zoomBox = box.clone();
+            var refPoint = zoomBox.center().clone().add(direction);
+
+            zoomBox.applyMatrix4(this.getScene().rootNode.matrix);
+            refPoint.applyMatrix4(this.getScene().rootNode.matrix);
+
+            var newDirection = refPoint.clone().sub(zoomBox.center());
+            var target;
+
+            if (newDirection.length() >  0.0001) {
+                newDirection.normalize();
+                target = this.camera.zoomToBBox(zoomBox, margin, ratio, newDirection);
+            } else {
+                target = this.camera.zoomToBBox(zoomBox, margin, ratio);
+            }
+
+            this.cameraEditor.updateCamera(target, true);
+            CLOUD.GlobalData.ByTargetDistance = true;
+            this.render();
+        }
+
+    },
+
+    /**
+     * 根据外围大包围盒和指定包围盒缩放到指定包围盒范围
+     *
+     * @param {THREE.Box3} box - 指定构件包围盒
+     * @param {THREE.Box3} outerBox - 外围大包围盒
+     * @param {Float} margin - 包围盒缩放比例, 缺省值: 0.05
+     * @param {Float} ratio - 相机与中心距离的拉伸比例, 缺省值: 1.0
+     */
+    zoomToBBoxWithOuterBox: function (box, outerBox, margin, ratio) {
+
+        margin = margin || -0.05;
+
+        if (!outerBox) {
+
+            this.zoomToBBox(box, margin, ratio);
+            return;
+        }
+
+        if (outerBox && box) {
+
+            var zoomBox = box.clone();
+            var refPoint = outerBox.center();
+
+            zoomBox.applyMatrix4(this.getScene().rootNode.matrix);
+            refPoint.applyMatrix4(this.getScene().rootNode.matrix);
+
+            var newDirection = refPoint.clone().sub(zoomBox.center());
+            var target;
+
+            if (newDirection.length() >  0.0001) {
+                newDirection.normalize();
+                target = this.camera.zoomToBBox(zoomBox, margin, ratio, newDirection);
+            } else {
+                target = this.camera.zoomToBBox(zoomBox, margin, ratio);
+            }
+
+            this.cameraEditor.updateCamera(target, true);
+            CLOUD.GlobalData.ByTargetDistance = true;
+            this.render();
+        }
 
     },
 
