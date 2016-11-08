@@ -806,7 +806,7 @@ App.Project = {
 
 				} else {
 					//失败
-					alert(data.message);
+					alert('超过了最大字数512'||data.message);
 					if (type == "save") {
 						dialog.element.find(".ok").text("保存");
 					} else {
