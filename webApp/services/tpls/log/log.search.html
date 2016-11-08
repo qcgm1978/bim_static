@@ -18,8 +18,11 @@
         <div  class="myDropDown pickProjectType">
             <span class="myDropText">  <span class="text">请选择类别</span> <i class="myDropArrorw"></i> </span>
             <ul class="myDropList">
-                <% _.each(App.Services.Log.chooseTypes,function(item,i){ if(1) { %>
+                <% _.each(App.Services.Log.chooseTypes,function(item,i){ if(item=='全部') { %>
+                <li class="myItem" data-val=''><%=item%></li>
+                <% }else{ %>
                 <li class="myItem" data-val='<%= App.Services.logData.moduleType.indexOf(item)+1 %>'><%=item%></li>
+
                 <% }}) %>
             </ul>
         </div>
@@ -28,7 +31,7 @@
 
             <input id="account" type="text" placeholder="请输入用户名或账号" class="txtInput moreSeachText" />
 
-        <span class="btnSearch">筛选</span>
+        <span class="btnSearch"><i></i>筛选</span>
         <a class="btnClear">清空筛选条件</a>
 
     </div>

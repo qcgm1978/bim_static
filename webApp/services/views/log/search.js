@@ -41,7 +41,7 @@ App.Services.searchView = Backbone.View.extend({
       format: 'yyyy-mm-dd',
       minView: 'month'
     }).on("changeDate", function(ev) {
-      var _dateStr=new Date(ev.date.getTime()+24*60*60*1000).format('yyyy-MM-dd');
+      var _dateStr=new Date(ev.date.getTime()-24*60*60*1000).format('yyyy-MM-dd');
       _this.$('#dateEnd').datetimepicker('setStartDate',_dateStr);
       _this.$('#dateEnd1').val('');
     });
@@ -74,7 +74,7 @@ App.Services.searchView = Backbone.View.extend({
       opTimeStart:"",
       opTimeEnd:""
     };
-    this.$(".pickProjectType .text").html('请选择');
+    this.$(".pickProjectType .text").html('请选择类别');
 
     this.$(".btnRadio").removeClass('selected');
     this.$('#dateStar').val('');
