@@ -118,7 +118,7 @@
                     isUploading = true;
                 },
                 FileUploaded: function(up, file, response) {
-                     
+                    /*[基础资源]-->[上传文件]完成后*/
                     try {
                         options.fileUploaded(response, file)
                     } catch (e) {

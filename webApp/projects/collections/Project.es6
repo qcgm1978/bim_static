@@ -1462,7 +1462,6 @@ App.Project = {
 
 	// 加载数据
 	loadData: function() {
-		 
 		//var $contains = $("#contains");
 		$("#contains").html(new App.Project.ProjectApp().render().el);
 		var status = App.Project.Settings.CurrentVersion.status;
@@ -1806,7 +1805,6 @@ App.Project = {
 
 	//设计导航
 	fetchFileNav: function() {
-
 		//请求数据
 		var data = {
 			URLtype: "fetchDesignFileNav",
@@ -1859,13 +1857,11 @@ App.Project = {
 			if ((data.data || []).length > 0) {
 				var navHtml = new App.Comm.TreeViewMar(data);
 				$("#projectContainer .projectNavFileContainer").html(navHtml);
+				App.Project.initScroll();
 				if(App.cb)App.cb();
 			} else {
 				$("#projectContainer .projectNavFileContainer").html('<div class="loading">无文件</div>');
 			}
-
-
-
 			$("#pageLoading").hide();
 		});
 

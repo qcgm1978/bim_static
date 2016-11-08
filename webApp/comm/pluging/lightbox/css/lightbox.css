@@ -17,6 +17,10 @@ body.lb-disable-scrolling {
   filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=80);
   opacity: 0.8;
   display: none;
+  width: auto!important;
+  height: auto!important;
+  right:0;
+  bottom:0;
 }
 
 .lightbox {

@@ -5522,7 +5522,7 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
 
         if ( camera instanceof THREE.Camera === false ) {
 
-            console.error( 'THREE.WebGLIncrementRenderer.IncrementRender: camera is not an instance of THREE.Camera.' );
+            // console.error( 'THREE.WebGLIncrementRenderer.IncrementRender: camera is not an instance of THREE.Camera.' );
             return;
         }
 

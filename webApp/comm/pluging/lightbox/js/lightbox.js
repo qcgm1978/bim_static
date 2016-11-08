@@ -138,8 +138,42 @@
     });
 
     this.$lightbox.find('.lb-loader, .downloadImg').on('click', function(event) {
-          window.location.href=$(event.target).closest("#lightbox").find("img.lb-image").prop("src");
+        var url = $(event.target).closest("#lightbox").find("img.lb-image").prop("src");
+        window.location.href=url;
+        /*
+        if(navigator.userAgent.indexOf("QtWebEngine")>0)
+        {
+            _innerfun_DownloadImageForIE(url);
+        }
+        else
+        {
+            window.location.href=url;
+        }
+        */
     }); 
+
+    /*
+    图纸模型功能：快照图片下载
+    场景：IE10
+    write by wuweiwei
+    函数名：_innerfun_DownloadImageForIE,_innerfun_DownloadCheck
+    未使用
+    */
+    var _innerfun_DownloadImageForIE = function(url){
+        frm = document.createElement("IFRAME");
+        frm.style.display = "none";
+        document.body.appendChild(frm);
+        frm.contentWindow.location.href = url;
+        timer =  setInterval(_innerfun_DownloadCheck,200);
+    }
+    var _innerfun_DownloadCheck = function(){
+        if( frm.contentWindow.document.readyState =="complete")
+        {
+            frm.contentWindow.document.execCommand("SaveAs");
+           clearInterval(timer);
+        }
+        document.body.removeChild(frm);
+    }
   };
 
   // Show overlay and lightbox. If the image is part of a set, add siblings to album array.

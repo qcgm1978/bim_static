@@ -31,12 +31,12 @@ App.Views = {
 
 		//初始化
 		initialize() {
+			
 			this.listenTo(App.Collections.changeListCollection, "add", this.addOne);
 			this.listenTo(App.Collections.changeListCollection, "reset", this.resetData);
 		}, 
 		//渲染
 		render() {
-
 			this.$el.html('<div class="loadings">正在加载，请稍候……</div>');
 			$('.txtSearch').on('keydown',this.search);
 			return this;
