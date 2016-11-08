@@ -243,12 +243,9 @@ App.Project = {
 		return array;
 	},
 	//单独类型、自定义过滤规则
-	sigleRule: function(cat, floor,secendIds) {
+	sigleRule: function(cat, floor,callback) {
 		var _this = this,
 			_v = App.Project.Settings.Viewer,
-			_spFiles = _v.SpecialtyFileObjData, //专业文件数据对象
-			_ctFiles = _v.ComponentTypeFilesData,//结构类型数据对象
-			_files = App.Project.Settings.Viewer.FloorFilesData,
 			_specialFilterFiles=[],
 			_extArray=[],
 			_codeFlag=false,
@@ -285,6 +282,10 @@ App.Project = {
 					ids: _this.filterHideCode(_hideCode,_codeFlag),
 					type: "classCode"
 				})
+			}
+
+			if(callback && _.isFunction(callback)){
+				callback(res.data.margin,res.data.ratio);
 			}
 		})
 
@@ -670,8 +671,7 @@ App.Project = {
 			'湿式报警阀室', '空调机房', '冷冻机房', '变配电室', '发电机房', '慧云机房', '电梯机房', '电梯底坑',
 			'吊顶', '地面', '中庭栏杆', '竖井'
 		],
-		openCategoryId: ['',6,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26
-		],
+		openCategoryId: ['',6,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26],
 		concernsCategory: ['', '过程检查', '过程验收', '开业验收'],
 		concernsStatus: ['', '待整改', '已整改', '已关闭'],
 		concernsReporter: ['', '质监中心', '第三方', '项目公司', '监理单位'],
@@ -1359,8 +1359,22 @@ App.Project = {
 			if (data.code == 0) {
 				data = data.data;
 				if (!data) {
-					$.tip({message:'项目无内容',type:'alarm'});
-					document.location.href='/index.html';
+					$('#pageLoading').hide();
+					var opts = {
+						title: "提示",
+						width: 601,
+						isConfirm: false,
+						isAlert: true,
+						cssClass: "addNewApp",
+						message: '项目无内容、点击确认返回首页',
+						okCallback: () => {
+							document.location.href='/index.html';
+							return false;
+						}
+					}
+
+					var dialog = new App.Comm.modules.Dialog(opts);
+
 					return;
 				}
 				App.Project.Settings.projectName = data.projectName;
@@ -2212,7 +2226,6 @@ App.Project = {
 		} else {
 			_loc = _this.formatMark(location, '543'.charAt(color),$target.data('id'));
 		}
-		_this.zoomModel(ids, box, marginRule.margin, marginRule.ratio);
 		_this.showMarks(_loc);
 
 		//过滤所属楼层 start
@@ -2238,19 +2251,10 @@ App.Project = {
 			return;
 		}
 		//没有分类的时候 只过滤单文件 end
-
-		//已有分类、过滤规则
-		/*if (_this.filterRule.file.indexOf(cat) != -1) {
-			var _hideFileIds = _.filter(_files, function(i) {
-				return i != _secenId;
+		if (_this.filterRule.single.indexOf(cat) != -1) {
+			_this.sigleRule(cat,key,function(margin,ratio){
+				_this.zoomModel(ids, box, margin||marginRule.margin, ratio||marginRule.ratio);
 			});
-			_this.sigleFileRule(cat);
-			App.Project.Settings.Viewer.fileFilter({
-				ids: _hideFileIds,
-				total: [_secenId]
-			});
-		} else */if (_this.filterRule.single.indexOf(cat) != -1) {
-			_this.sigleRule(cat,key);
 		}else{
 			_this.linkSilder('floors',key);
 		}

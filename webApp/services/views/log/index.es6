@@ -30,4 +30,4 @@ App.Services.Log=Backbone.View.extend({
 
 
 });
-App.Services.Log.chooseTypes = ["项目","族库","标准模型","权限管理","项目管理","应用管理","系统管理","模型"];
+App.Services.Log.chooseTypes = ["项目","族库","标准模型","权限管理","项目管理","应用管理","系统管理","模型","全部"];

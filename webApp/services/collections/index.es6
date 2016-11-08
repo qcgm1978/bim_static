@@ -524,8 +524,38 @@ App.Services = {
 					"checkPointType": this.$('h2').text(),
 					"floorRule": [],
 					"specRule": [],
-					"codeRule": []
+					"codeRule": [],
+					"margin":'',
+					"ratio":''
 				}
+
+				var marginValue=this.$('input[name="margin"]').val(),
+					ratioValue=this.$('input[name="ratio"]').val();
+
+				if(marginValue.length){
+					if(!(/^(-?\d+)(\.\d+)?$/.test(marginValue))){
+						$.tip({message:'模型显示Margin比例输入不正确',type:'alarm'})
+						return
+					}
+				}
+
+				if(marginValue.length){
+					if(!(/^(-?\d+)(\.\d+)?$/.test(marginValue))){
+						$.tip({message:'模型显示Margin比例输入不正确',type:'alarm'})
+						return
+					}
+
+				}
+				if(ratioValue.length){
+					if(!(/^(-?\d+)(\.\d+)?$/.test(ratioValue))){
+						$.tip({message:'模型显示Ratio比例输入不正确',type:'alarm'})
+						return
+					}
+				}
+
+
+				data.margin=marginValue;
+				data.ratio=ratioValue;
 
 				var $spe=this.$('.specialRuleContainer .ruleItemWrap'),
 					$flo=this.$('.floorRuleContainer .ruleItemWrap'),
