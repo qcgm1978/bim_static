@@ -2,6 +2,8 @@
  *@require /components/device/libs/jquery-1.12.0.min.js
  *@require /components/device/libs/underscore.1.8.2.js
  *@require /components/device/libs/backbone.1.1.2.js
+ *@require /components/device/libs/mock-min.js
+ *@require /components/device/libs/jquery.pagination.js
  */
 
 (function (win) {
@@ -15,7 +17,8 @@
         }
     }
     var Project = {
-        Settings: null
+        Settings: null,
+        data:null
     };
 
     function DeviceSelection(options) {
@@ -66,6 +69,7 @@
                         if (data.code == 0) {
                             _this.Settings = $.extend({}, _this.Settings, data.data);
                             Project.Settings = _this.Settings;
+                            Project.data=_this.Settings.data;
                             _this.Project = Project;
                             _this.init();
                         } else if (data.code == 10004) {
@@ -134,6 +138,11 @@
             }
         },
 
+        setData:function(data){
+            Project.data=data;
+            this.loadComponentList.call(this);
+        },
+
         isIE: function () {
             if (!!window.ActiveXObject || "ActiveXObject" in window)
                 return true;
@@ -166,6 +175,11 @@
             //窗体变化
             window.onresize = resizeWebView;
             resizeWebView();
+            var data=JSON.stringify(this.Settings.data);
+           setTimeout(function(){
+               WebView.runScript("init('"+data+"')", function() {
+               });
+           },1000)
         },
 
         loadLib: function () {
@@ -188,14 +202,32 @@
                     strVar += "    <div class=\"rightSilderBar\">";
                     strVar += "        <div class=\"before closeBtn\">关闭<\/div>";
                     strVar += "        <div class=\"headerBar\"><\/div>";
-                    strVar += "        <div class=\"contentbar\"><\/div>";
-                    strVar += "        <div class=\"footBar\"><\/div>";
+                    strVar += "        <div class=\"contentbar\">";
+                    strVar += "<table  cellspacing=\"0\" >";
+                    strVar += "                <thead>";
+                    strVar += "                <tr>";
+                    strVar += "                    <th class=\"checkbox\"><\/th>";
+                    strVar += "                    <th>构件编码<\/th>";
+                    strVar += "                <\/tr>";
+                    strVar += "                <\/thead>";
+                    strVar += "                <tbody class=\"contentList\">";
+                    strVar += "                <tr>";
+                    strVar += "                    <td class=\"checkbox\">";
+                    strVar += "                        <input type=\"checkbox\">";
+                    strVar += "                    <\/td>";
+                    strVar += "                    <td><\/td>";
+                    strVar += "                <\/tr>";
+                    strVar += "                <\/tbody>";
+                    strVar += "            <\/table>";
+                    strVar += "    <\/div>";
+                    strVar += "        <div class=\"footBar\"><div class=\"footPage\"><div class=\"sumDesc\"></div><div class=\"listPagination\"><\/div><\/div><div class=\"footTool\"><a class=\"mmh-btn confirm\">确认<\/a><\/div><\/div>";
                     strVar += "    <\/div>";
                     $('#deviceSelector').append(strVar);
+                    self.loadComponentList();
                 }
-
                 self.initEvent();
-                self.loadModal();
+              //  self.loadComponentList();
+              //  self.loadModal();
             })
         },
 
@@ -203,7 +235,7 @@
             $('.deviceSelector .before').click(function () {
                 if ($(this).hasClass('closeBtn')) {
                     $('.deviceSelector .rightSilderBar').animate({
-                        "right": '-300px'
+                        "right": '-400px'
                     }, 500)
                     $(this).removeClass('closeBtn');
                     $(this).html("展开");
@@ -215,9 +247,23 @@
                     $(this).html("关闭");
                 }
             })
+
+            $(".listPagination").empty().pagination(30, {
+                items_per_page: 10,
+                current_page: 1,
+                num_edge_entries: 3, //边缘页数
+                num_display_entries: 5, //主体页数
+                link_to: 'javascript:void(0);',
+                itemCallback: function(pageIndex) {
+                },
+                prev_text: "上一页",
+                next_text: "下一页"
+
+            });
         },
 
         loadModal: function () {
+            var _this=this;
             var viewer = new bimView({
                 type: 'model',
                 element: $('#modelView'),
@@ -226,8 +272,25 @@
                 projectId: this.Settings.projectId,
                 projectVersionId: this.Settings.projectVersionId
             })
+
             viewer.on("loaded", function () {
+                _this.loadComponentList.call(_this);
             });
+        },
+
+        loadComponentList:function(){
+
+            var data=Project.data||[];
+            var strVar = "";
+            _.each(data,function(item){
+                strVar += " <tr>";
+                strVar += "                    <td class=\"checkbox\">";
+                strVar += "                        <input type=\"checkbox\">";
+                strVar += "                    <\/td>";
+                strVar += "                    <td  class=\"colItem\">"+item.uniqueId+"<\/td>";
+                strVar += "                <\/tr>";
+            })
+            $('.contentList').append(strVar);
         }
     }
     win.DeviceSelection = DeviceSelection;

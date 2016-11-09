@@ -12,7 +12,24 @@
     <div class="rightSilderBar">
         <div class="before closeBtn">关闭</div>
         <div class="headerBar"></div>
-        <div class="contentbar"></div>
+        <div class="contentbar">
+            <table  cellspacing="0" >
+                <thead>
+                <tr>
+                    <th class="checkbox"></th>
+                    <th>构件编码</th>
+                </tr>
+                </thead>
+                <tbody class="contentList">
+                <tr>
+                    <td class="checkbox">
+                        <input type="checkbox">
+                    </td>
+                    <td class="colItem"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
         <div class="footBar"></div>
     </div>
 </div>
@@ -52,7 +69,9 @@
         }
     });
 
-
+    function init(data){
+        viewer.setData(JSON.parse(data));
+    }
 
 </script>
 </body>
