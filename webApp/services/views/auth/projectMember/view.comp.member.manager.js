@@ -47,6 +47,11 @@ ViewComp.MemberManager = Backbone.View.extend({
 					title:"tip"
 				}
 			},
+			edit:{
+				enable:true,
+				showRemoveBtn:true,
+				showRenameBtn:false
+			},
 			view: {
 				showLine: false,
 				showTitle:true,
@@ -88,14 +93,14 @@ ViewComp.MemberManager = Backbone.View.extend({
 		})
 		var filterAddArrs = this.filterAddOption(newNodesGet,nodes);
 		var newNodes = _this.selectedTree.addNodes(null,filterAddArrs);
-		newNodes.forEach(function(i){
-			var $del=$("<span title=''  class='showDelete'><i></i></span>");
-			//绑定删除事件
-			$del.on("click",function(){
-				_this.deleteOption(i);
-			});
-			$("#selectedTree #"+i.tId+"_a").append($del);
-		})
+		// newNodes.forEach(function(i){
+		// 	var $del=$("<span title=''  class='showDelete'><i></i></span>");
+		// 	//绑定删除事件
+		// 	$del.on("click",function(){
+		// 		_this.deleteOption(i);
+		// 	});
+		// 	$("#selectedTree #"+i.tId+"_a").append($del);
+		// })
 	},
 
 	//删除节点
@@ -126,17 +131,6 @@ ViewComp.MemberManager = Backbone.View.extend({
 					}
 				},
 				callback: {
-					beforeClick:function(){
-
-					},
-					onClick: function(event, treeId, treeNode) {
-						// if(event.target.className.indexOf("button business_ico")!=-1){
-						// 	if(!treeNode.userId && !treeNode.isParent){
-						// 		_this.loadChildren(_this,treeNode.outer,treeNode.orgId,treeNode);
-						// 	}
-						// 	_this.selectTree.cancelSelectedNode(treeNode);
-						// }
-					},
 					beforeDblClick:function(){
 						return true;
 					},
@@ -146,14 +140,6 @@ ViewComp.MemberManager = Backbone.View.extend({
 						}else if(treeNode.userId){
 							_this.addOption();
 						}
-						// if(event.target.className.indexOf("business_ico")!=-1){
-						// 	if(!treeNode.userId && !treeNode.isParent){
-						// 		_this.loadChildren(_this,treeNode.outer,treeNode.orgId,treeNode);
-						// 	}
-						// 	// _this.selectTree.cancelSelectedNode(treeNode);
-						// }else if(treeNode.userId){
-						// 	_this.addOption();
-						// }
 					}
 				},
 				view: {
