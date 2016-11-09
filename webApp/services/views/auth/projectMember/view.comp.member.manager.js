@@ -39,7 +39,7 @@ ViewComp.MemberManager = Backbone.View.extend({
 		//缓存当前View实例对象
 		var _view = this;
 		//树插件初始化配置
-			_view.loadChildren(_view,false,null);
+		_view.loadChildren(_view,false,null);
 		
 		this.selectedTree = $.fn.zTree.init($("#selectedTree"), {
 			data:{
@@ -216,7 +216,7 @@ ViewComp.MemberManager = Backbone.View.extend({
 	/**
 	 * 添加项目成员
 	 */
-	grand:function(){
+	grand:function(){//选好成员之后点击确定执行的方法
 		$("#dataLoading").show();
 		var pid=App.Comm.getCookie('currentPid');
 		var url=App.API.URL.putServicesProjectMembers;
