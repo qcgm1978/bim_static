@@ -82,6 +82,7 @@ ViewComp.MemberManager = Backbone.View.extend({
 		var _this = this,
 			newNodesGet = _this.selectedTree.getNodes(),
 			nodes = _this.selectTree.getSelectedNodes();
+		if(nodes.length<=0) return;
 		_.each(nodes,function(n){
 			n.children=[];
 		})
