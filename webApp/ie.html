@@ -32,9 +32,11 @@
     <script src="libs/jquery/jquery-1.12.0.min.js"></script>
     <script type="text/javascript">
     var hasDevicePixelRatio = true;
+    var myWebView;
+    var isShare = false;   //模型分享，执行一次
     try {
 
-        var myWebView = document.createElement("object"),
+        myWebView = document.createElement("object"),
             currentVersion = 5,
             isCheckLogin = false,
             viewport = document.body,
@@ -99,6 +101,12 @@
                 });
 
             } else {
+                var bool = location.href.indexOf(".png")>0 || location.href.indexOf(".jpg")>0 || location.href.indexOf(".gif");
+                if(bool)
+                {
+                    downLoadForIE.DownLoad(url);
+                    return;
+                }
                 window.location.href = url;
             }
 
@@ -350,7 +358,11 @@
     }
 
     function navigateTo(url) {
-
+        if(!isShare)
+        {
+            snapView();
+            isShare = true;
+        }
         var pos = url.indexOf("commType");
         if (pos > -1) {
             //处理commtype
@@ -443,6 +455,52 @@
         if (cval != null)
             document.cookie = name + "=" + cval + ";domain=" + window.location.host.substring(window.location.host.indexOf(".")) + ";expires=" + exp.toGMTString() + ";path=/";
     }
+
+    /*
+    add by wuweiwei
+    功能:未登录用户查看快照
+    */
+    var snapView = function(){
+        var reg = /path=.{1,}/;
+        var str="",url,urlar;
+        try
+        {
+            urlar = (reg.exec(location.href));
+            url = urlar[0].replace("path=","");
+            if(url.indexOf("share")>0)
+            {
+                myWebView.url = url; //"http://bim.wanda-dev.cn/index.html?t=1478660027944#flow";
+            }
+        }
+        catch(e)
+        {;}
+
+    };
+    snapView();
+
+
+    /*
+    write by wuweiwei
+    功能:提供IE环境下下载图片
+    */
+    var downLoadForIE = {
+        DownLoad : function(url){
+            frm = document.createElement("IFRAME");
+            frm.style.display = "none";
+            document.body.appendChild(frm);
+            frm.contentWindow.location.href = url
+            timer =  setInterval(this.checkload,200);
+        },
+        checkload : function(){
+            if( frm.contentWindow.document.readyState =="complete")
+            {
+                frm.contentWindow.document.execCommand("SaveAs");
+               clearInterval(timer)
+            }
+            document.body.removeChild(frm);
+        }
+    };
+
     </script>
 </body>
 
