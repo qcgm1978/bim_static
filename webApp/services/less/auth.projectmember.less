@@ -88,10 +88,9 @@
   & .column2 { padding: 10px; vertical-align: middle; }
   & .column3 { vertical-align: top; width: 50%; background: #FAFAFA; max-width: 100px;}
   & .ztree li span.button.switch { display: none; }
-
-
+  
   .ztree { padding: 0; }
-  .ztree li{overflow: hidden;white-space: nowrap;text-overflow: ellipsis;position: relative;}
+  .ztree li{position: relative;}
   .ztree li a { width: 100%; padding-left: 6px;
     &:hover { text-decoration: none; }
   }
@@ -102,12 +101,63 @@
   .ztree li span.button.ico_open, .ztree li span.button.business_ico_open { vertical-align: -8px; background: url(../images/service_ico.png); background-position: -1px -80px; }
   .ztree li span.button.ico_close, .ztree li span.button.business_ico_close, .ztree li span.button.business_ico_docu { vertical-align: -8px; background: url(../images/service_ico.png); background-position: 1px -100px; }
   #selectedTree { padding: 0; }
-  #selectedTree.ztree li>a { border-bottom: 1px solid #CCC; padding-right: 32px;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;}
-
+  #selectedTree.ztree li>a { 
+    border-bottom: 1px solid #CCC; 
+    padding-right: 16px; 
+    display: inline-block;
+    padding-top: 10px;
+    & span{
+      display: inline-block;
+      float: left;
+      line-height: 16px;
+      &.business_ico_docu{
+        margin-right: 2px;
+        background-position: 1px -99px;
+      }
+    }
+    &.curSelectedNode{
+      & span.remove{
+        display: none;
+      }
+    }
+  }
+  & #selectedTree li a span.node_name{
+    display: inline-block;
+    width: 190px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  & #selectedTree li a span.button.remove{
+    float: right;
+    display: inline-block;
+    margin-left: 0px;
+    margin-top: 2px;
+    margin-right: 0;
+    width: 12px;
+    height: 13px;
+  }
+  & #selectedTree li:hover a {
+    &.curSelectedNode{
+      & span.remove{
+        display: block;
+      }
+    }
+  }
+  & #selectedTree li:hover a span.button.remove{
+    background: url(/static/dist/images/services/images/service_ico.png) no-repeat 0 -280px;
+  }
 }
 #selectedTree .showDelete { z-index: 2;position: absolute; right: 6px; top: 9px;background-color: #ffffff; width: 20px; height: 20px; display: none;  }
 #selectedTree .showDelete i{ display: inline-block;margin-left: 4px; margin-top: 3px; width: 12px; height: 13px; background:  url(../images/service_ico.png) no-repeat 0 -280px; }
-
+#selectTree>li a{
+  width: 100%;
+  display: inline-block;
+  overflow: hidden;white-space: nowrap;text-overflow: ellipsis;
+  & span.business_ico_docu{
+      margin-right: 2px;
+    }
+}
 /*修改ztree样式*/
 
 
