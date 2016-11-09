@@ -56,19 +56,37 @@ ViewComp.MemberManager = Backbone.View.extend({
 
 	//	App.Comm.initScroll(this.$('.userSelecter .scrollWrap>ul'),"y");
 	},
-
+	//防止重复添加和添加成员和部门
+	filterAddOption:function(addedOptions,toBeAddOptions){
+		var addArrs = [];
+		if(addedOptions.length>0){
+			for(var i=0,toBeAddOptionsLen=toBeAddOptions.length-1;i<=toBeAddOptionsLen;i++){
+				let flag=true;
+				for(var j=0,addedOptionsLen=addedOptions.length-1;j<=addedOptionsLen;j++){
+					if(addedOptions[j].tip == toBeAddOptions[i].tip){
+						flag=false;
+						break;
+					}
+				}
+				if(flag){
+					addArrs.push(toBeAddOptions[i]);
+				}
+			}
+			return addArrs;
+		}else{
+			return toBeAddOptions;
+		}
+	},
 	//选择节点
 	addOption: function() {
-		var _this=this;
-		var nodes= _this.selectTree.getSelectedNodes();
-
+		var _this = this,
+			newNodesGet = _this.selectedTree.getNodes(),
+			nodes = _this.selectTree.getSelectedNodes();
 		_.each(nodes,function(n){
 			n.children=[];
 		})
-
-		var newNodes=_this.selectedTree.addNodes(null,nodes);
-
-		//自定义渲染树节点
+		var filterAddArrs = this.filterAddOption(newNodesGet,nodes);
+		var newNodes = _this.selectedTree.addNodes(null,filterAddArrs);
 		newNodes.forEach(function(i){
 			var $del=$("<span title=''  class='showDelete'><i></i></span>");
 			//绑定删除事件
@@ -108,14 +126,33 @@ ViewComp.MemberManager = Backbone.View.extend({
 				},
 				callback: {
 					beforeClick:function(){
+
 					},
 					onClick: function(event, treeId, treeNode) {
-						if(event.target.className.indexOf("button business_ico")!=-1){
-							if(!treeNode.userId && !treeNode.isParent){
-								_this.loadChildren(_this,treeNode.outer,treeNode.orgId,treeNode);
-							}
-							_this.selectTree.cancelSelectedNode(treeNode);
+						// if(event.target.className.indexOf("button business_ico")!=-1){
+						// 	if(!treeNode.userId && !treeNode.isParent){
+						// 		_this.loadChildren(_this,treeNode.outer,treeNode.orgId,treeNode);
+						// 	}
+						// 	_this.selectTree.cancelSelectedNode(treeNode);
+						// }
+					},
+					beforeDblClick:function(){
+						return true;
+					},
+					onDblClick: function(event, treeId, treeNode) {
+						if(!treeNode.userId && !treeNode.isParent){
+							_this.loadChildren(_this,treeNode.outer,treeNode.orgId,treeNode);
+						}else if(treeNode.userId){
+							_this.addOption();
 						}
+						// if(event.target.className.indexOf("business_ico")!=-1){
+						// 	if(!treeNode.userId && !treeNode.isParent){
+						// 		_this.loadChildren(_this,treeNode.outer,treeNode.orgId,treeNode);
+						// 	}
+						// 	// _this.selectTree.cancelSelectedNode(treeNode);
+						// }else if(treeNode.userId){
+						// 	_this.addOption();
+						// }
 					}
 				},
 				view: {
