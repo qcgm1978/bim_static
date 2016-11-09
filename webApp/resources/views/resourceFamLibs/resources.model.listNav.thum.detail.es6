@@ -321,7 +321,7 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 				//$("#resourceModelLeftNav .treeViewMarUl span[data-id='" + id + "']").text(name); 
 			}else{
 				if(data.code=='19007'){
-					$.tip({type:'alarm',message:'文件夹已经存在、无法重复创建'})
+					$.tip({type:'alarm',message:data.message})
 				}else if(data.code=='10000'){
 					$.tip({type:'alarm',message:'系统错误'})
 				}
@@ -338,7 +338,7 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 			var model = App.ResourceModel.FileThumCollection.last();
 			model.stopListening();
 			model.trigger('destroy', model, model.collection);
-			App.ResourceModel.FileThumCollection.models.pop();
+			//App.ResourceModel.FileThumCollection.models.pop();
 			//删除页面元素
 			$item.remove();
 		} else {

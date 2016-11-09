@@ -317,7 +317,7 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 			var model = App.ResourceModel.FileCollection.last();
 			model.stopListening();
 			model.trigger('destroy', model, model.collection);
-			App.ResourceModel.FileCollection.models.pop();
+		//	App.ResourceModel.FileCollection.models.pop();
 			//删除页面元素
 			$item.remove();
 		} else {
