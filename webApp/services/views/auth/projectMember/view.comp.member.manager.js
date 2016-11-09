@@ -53,6 +53,7 @@ ViewComp.MemberManager = Backbone.View.extend({
 				showRenameBtn:false
 			},
 			view: {
+				selectedMulti: false,
 				showLine: false,
 				showTitle:true,
 				nameIsHTML:true
@@ -92,15 +93,7 @@ ViewComp.MemberManager = Backbone.View.extend({
 			n.children=[];
 		})
 		var filterAddArrs = this.filterAddOption(newNodesGet,nodes);
-		var newNodes = _this.selectedTree.addNodes(null,filterAddArrs);
-		// newNodes.forEach(function(i){
-		// 	var $del=$("<span title=''  class='showDelete'><i></i></span>");
-		// 	//绑定删除事件
-		// 	$del.on("click",function(){
-		// 		_this.deleteOption(i);
-		// 	});
-		// 	$("#selectedTree #"+i.tId+"_a").append($del);
-		// })
+		_this.selectedTree.addNodes(null,filterAddArrs);
 	},
 
 	//删除节点
