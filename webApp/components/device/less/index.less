@@ -1,34 +1,73 @@
-body{
+body {
   margin: 0;
   padding: 0;
 }
-.deviceSelector{
+
+.pagination a {
+  text-decoration: none;
+  border: solid 1px #ccc;
+  color: #666;
+}
+
+.pagination a:hover {
+  border-color: #0075df;
+  color:#0075df;
+}
+
+.pagination a,
+.pagination span {
+  display: inline-block;
+  vertical-align: middle;
+  padding:0px 5px;
+  margin-right: 5px;
+  margin-bottom: 5px;
+  min-width: 1em;
+  height: 25px;
+  line-height: 25px;
+  text-align: center;
+}
+
+.pagination .current {
+  background: #418cdf;
+  color: #fff;
+  border: solid 1px #408cdf;
+}
+
+.pagination .current.prev,
+.pagination .current.next {
+  color: #ccc;
+  border-color: #ccc;
+  background: #eee;
+}
+
+
+.deviceSelector {
   width: 1000px;
   height: 500px;
   position: relative;
-  border:1px solid #cccccc;
+  border: 1px solid #cccccc;
   overflow: hidden;
-  &.ieExtend{
-    border:none;
+  &.ieExtend {
+    border: none;
   }
-  & #modelCanvas{
+  & #modelCanvas {
     position: absolute;
-    top:0;
-    right: 300px;
+    top: 0;
+    right: 400px;
     bottom: 0;
     box-sizing: border-box;
-    border:1px solid #cccccc;
+    border: 1px solid #cccccc;
   }
-  & .rightSilderBar{
-    width: 300px;
+  & .rightSilderBar {
+    width: 400px;
     position: absolute;
-    top:0;
+    top: 0;
     right: 0;
     bottom: 0;
     box-sizing: border-box;
-    border-left:1px solid #cccccc;
+    border-left: 1px solid #cccccc;
     background-color: #FFF;
-    & .before{
+    & .before {
       display: block;
       position: absolute;
       left: -22px;
@@ -39,8 +78,101 @@ body{
       padding: 5px 4px;
       color: #3399FF;
       cursor: pointer;
-      &:hover{
+      &:hover {
         background: #cccccc;
+      }
+    }
+    & .headerBar {
+      height: 40px;
+      background-color: #CCC;
+    }
+    & .contentbar {
+      position: absolute;
+      top: 40px;
+      left: 0;
+      right: 0;
+      bottom: 80px;
+      background-color: #f0f0f0;
+
+      & table {
+        width: 400px;
+        font-size: 12px;
+        font-family: "Microsoft YaHei";
+        padding: 0;
+        margin: 0;
+        & td,& th {
+          height: 30px;
+          border-top:1px solid #ccc;
+          border-left:1px solid #ccc;
+        }
+        & th {
+          line-height: 28px;
+          border-bottom: 1px solid #CFCFCF;
+        }
+        & tr{
+          &:nth-child(even) {
+            background: #E6E6FA;
+          }
+          &:nth-child(odd) {
+            background: #FFF
+          }
+        }
+        & tbody{
+          position: absolute;
+          bottom: 0;
+          top: 30px;
+          overflow: auto;
+          width: 400px;
+        }
+        & .checkbox{
+          width: 30px;
+          padding-left: 5px;
+        }
+        & .colItem{
+          padding: 5px 10px;
+          width: 352px;
+        }
+      }
+    }
+
+    & .footBar {
+      position: absolute;
+      height: 80px;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      line-height: 40px;
+      border-top: 1px solid #ccc;
+      text-align: right;
+      & .footPage{
+        padding-right: 10px;
+      }
+      & .footTool{
+        background: #ccc;
+        height: 40px;
+        padding-right: 10px;
+        .mmh-btn{
+          display: inline-block;
+          width: 80px;
+          height: 32px;
+          text-align: center;
+          line-height: 32px;
+          &:hover{
+            cursor: pointer;
+            background:inherit;
+            opacity: 0.5;
+          }
+
+          &.confirm{
+            background:#418cdf;
+            color: #FFF;
+          }
+
+          &.none{
+            border:1px solid #CCC;
+            color: #ccc;
+          }
+        }
       }
     }
   }
