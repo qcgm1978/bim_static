@@ -4,6 +4,7 @@
  *@require /components/device/libs/backbone.1.1.2.js
  *@require /components/device/libs/mock-min.js
  *@require /components/device/libs/jquery.pagination.js
+ *@require /components/device/libs/jquery.nicescroll.min.js
  */
 
 (function (win) {
@@ -17,9 +18,51 @@
         }
     }
     var Project = {
+        pageSize:20,
+        pageNum:1,
         Settings: null,
         data:null
     };
+
+    var Tools={
+        //获取当前检查点所在位置(页码),和当前页码所在的数据队列
+        //pageNum pageSize id
+        catchPageData:function(param){
+            var start=0,end=0,result={},list=[],counter=0,
+                opts=$.extend({},{
+                    id:"",
+                    pageSize:Project.pageSize,
+                    pageNum:1
+                },param),
+                data=Project.data,
+                _len=data.length;
+            if(opts.id){
+                for(var i=0,size=_len;i<size;i++){
+                    if(data[i].id==opts.id){
+                        counter=i;
+                        break
+                    }
+                }
+                opts.pageNum=Math.ceil(counter/opts.pageSize)||1;
+            }
+            start=(opts.pageNum-1)*opts.pageSize;
+            end=opts.pageNum*opts.pageSize;
+            end=end<_len?end:_len;
+            for(;start<end;start++){
+                list.push(data[start]);
+            }
+            result={
+                items:list,
+                pageCount:Math.ceil(_len/opts.pageSize),
+                pageItemCount:opts.pageSize,
+                pageIndex:opts.pageNum,
+                totalItemCount:_len
+
+            }
+            return result;
+        }
+    }
+
 
     function DeviceSelection(options) {
         var _this = this;
@@ -140,7 +183,6 @@
 
         setData:function(data){
             Project.data=data;
-            this.loadComponentList.call(this);
         },
 
         isIE: function () {
@@ -211,23 +253,14 @@
                     strVar += "                <\/tr>";
                     strVar += "                <\/thead>";
                     strVar += "                <tbody class=\"contentList\">";
-                    strVar += "                <tr>";
-                    strVar += "                    <td class=\"checkbox\">";
-                    strVar += "                        <input type=\"checkbox\">";
-                    strVar += "                    <\/td>";
-                    strVar += "                    <td><\/td>";
-                    strVar += "                <\/tr>";
                     strVar += "                <\/tbody>";
                     strVar += "            <\/table>";
                     strVar += "    <\/div>";
-                    strVar += "        <div class=\"footBar\"><div class=\"footPage\"><div class=\"sumDesc\"></div><div class=\"listPagination\"><\/div><\/div><div class=\"footTool\"><a class=\"mmh-btn confirm\">确认<\/a><\/div><\/div>";
+                    strVar += "        <div class=\"footBar\"><div class=\"footPage\"><div class=\"sumDesc\"></div><div class=\"listPagination\">正在加载...<\/div><\/div><div class=\"footTool\"><a class=\"mmh-btn confirm\">确认<\/a><\/div><\/div>";
                     strVar += "    <\/div>";
                     $('#deviceSelector').append(strVar);
-                    self.loadComponentList();
                 }
-                self.initEvent();
-              //  self.loadComponentList();
-              //  self.loadModal();
+                self.loadModal();
             })
         },
 
@@ -247,19 +280,26 @@
                     $(this).html("关闭");
                 }
             })
+        },
 
-            $(".listPagination").empty().pagination(30, {
-                items_per_page: 10,
-                current_page: 1,
-                num_edge_entries: 3, //边缘页数
-                num_display_entries: 5, //主体页数
+        pageInfo:function(param){
+            var _this=this;
+            $(".listPagination").empty().pagination(param.totalItemCount, {
+                items_per_page: param.pageItemCount,
+                current_page: param.pageIndex-1,
+                num_edge_entries: 2, //边缘页数
+                num_display_entries: 3, //主体页数
                 link_to: 'javascript:void(0);',
                 itemCallback: function(pageIndex) {
+                    _this.loadComponentList({
+                        pageNum:pageIndex+1
+                    });
                 },
                 prev_text: "上一页",
                 next_text: "下一页"
-
             });
+
+            $('.footPage').css('textAlign','right');
         },
 
         loadModal: function () {
@@ -272,15 +312,16 @@
                 projectId: this.Settings.projectId,
                 projectVersionId: this.Settings.projectVersionId
             })
-
             viewer.on("loaded", function () {
                 _this.loadComponentList.call(_this);
+                _this.initEvent();
             });
         },
 
-        loadComponentList:function(){
+        loadComponentList:function(param){
 
-            var data=Project.data||[];
+            var result=Tools.catchPageData(param);
+            var data=result.items;
             var strVar = "";
             _.each(data,function(item){
                 strVar += " <tr>";
@@ -290,8 +331,16 @@
                 strVar += "                    <td  class=\"colItem\">"+item.uniqueId+"<\/td>";
                 strVar += "                <\/tr>";
             })
-            $('.contentList').append(strVar);
+            $('.contentList').empty().append(strVar);
+            this.pageInfo(result);
+            $('.contentList').niceScroll({
+                cursorcolor:"#CFCFCF",
+                cursoropacitymin: 0.5,
+                cursoropacitymax: 0.5
+            })
         }
     }
+
+
     win.DeviceSelection = DeviceSelection;
 }(window))
