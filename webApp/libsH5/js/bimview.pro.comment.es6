@@ -1312,6 +1312,14 @@
 					});
 					//alert("请输入批注名称");
 					return false;
+				}else if(pars.name.length>512){
+					$.tip({
+						message: "超出最大字数512",
+						timeout: 3000,
+						type: "alarm"
+					});
+					return false;
+
 				}
 
 

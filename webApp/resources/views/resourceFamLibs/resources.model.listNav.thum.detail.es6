@@ -5,6 +5,8 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 
 	className: "item",
 
+	isLoad:false,
+
 	//事件绑定
 	events: {
 		"click .boxText": "fileClick",
@@ -198,7 +200,10 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 
 	//修改名称 或者创建
 	enterEditNameOrCreateNew: function(event) {
-
+		if(this.isLoad){
+			return
+		}
+		this.isLoad=true;
 		var $item = $(event.target).closest(".item");
 
 		//创建
@@ -231,6 +236,8 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 		};
 
 		App.Comm.ajax(data, function(data) {
+
+			that.isLoad=false;
 			if (data.message == "success") {
 				var models = App.ResourceModel.FileThumCollection.models,
 					id = data.data.id;
@@ -269,7 +276,7 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 	//创建文件夹
 	createNewFolder: function($item) {
 
-
+		that.isLoad=false;
 		var filePath = $item.find(".txtEdit").val().trim(),
 			that = this,
 			$leftSel = $("#resourceFamlibsLeftNav .treeViewMarUl .selected"),
@@ -291,7 +298,6 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 
 		App.Comm.ajax(data, function(data) {
 			if (data.message == "success") {
-
 				var id = data.data.id,
 					isExists = false;
 
@@ -316,6 +322,8 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 			}else{
 				if(data.code=='19007'){
 					$.tip({type:'alarm',message:'文件夹已经存在、无法重复创建'})
+				}else if(data.code=='10000'){
+					$.tip({type:'alarm',message:'系统错误'})
 				}
 			}
 		});
