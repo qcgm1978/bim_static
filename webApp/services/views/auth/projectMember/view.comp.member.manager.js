@@ -39,7 +39,7 @@ ViewComp.MemberManager = Backbone.View.extend({
 		//缓存当前View实例对象
 		var _view = this;
 		//树插件初始化配置
-			_view.loadChildren(_view,false,null);
+		_view.loadChildren(_view,false,null);
 		
 		this.selectedTree = $.fn.zTree.init($("#selectedTree"), {
 			data:{
@@ -47,7 +47,13 @@ ViewComp.MemberManager = Backbone.View.extend({
 					title:"tip"
 				}
 			},
+			edit:{
+				enable:true,
+				showRemoveBtn:true,
+				showRenameBtn:false
+			},
 			view: {
+				selectedMulti: false,
 				showLine: false,
 				showTitle:true,
 				nameIsHTML:true
@@ -82,19 +88,12 @@ ViewComp.MemberManager = Backbone.View.extend({
 		var _this = this,
 			newNodesGet = _this.selectedTree.getNodes(),
 			nodes = _this.selectTree.getSelectedNodes();
+		if(nodes.length<=0) return;
 		_.each(nodes,function(n){
 			n.children=[];
 		})
 		var filterAddArrs = this.filterAddOption(newNodesGet,nodes);
-		var newNodes = _this.selectedTree.addNodes(null,filterAddArrs);
-		newNodes.forEach(function(i){
-			var $del=$("<span title=''  class='showDelete'><i></i></span>");
-			//绑定删除事件
-			$del.on("click",function(){
-				_this.deleteOption(i);
-			});
-			$("#selectedTree #"+i.tId+"_a").append($del);
-		})
+		_this.selectedTree.addNodes(null,filterAddArrs);
 	},
 
 	//删除节点
@@ -125,17 +124,6 @@ ViewComp.MemberManager = Backbone.View.extend({
 					}
 				},
 				callback: {
-					beforeClick:function(){
-
-					},
-					onClick: function(event, treeId, treeNode) {
-						// if(event.target.className.indexOf("button business_ico")!=-1){
-						// 	if(!treeNode.userId && !treeNode.isParent){
-						// 		_this.loadChildren(_this,treeNode.outer,treeNode.orgId,treeNode);
-						// 	}
-						// 	_this.selectTree.cancelSelectedNode(treeNode);
-						// }
-					},
 					beforeDblClick:function(){
 						return true;
 					},
@@ -145,14 +133,6 @@ ViewComp.MemberManager = Backbone.View.extend({
 						}else if(treeNode.userId){
 							_this.addOption();
 						}
-						// if(event.target.className.indexOf("business_ico")!=-1){
-						// 	if(!treeNode.userId && !treeNode.isParent){
-						// 		_this.loadChildren(_this,treeNode.outer,treeNode.orgId,treeNode);
-						// 	}
-						// 	// _this.selectTree.cancelSelectedNode(treeNode);
-						// }else if(treeNode.userId){
-						// 	_this.addOption();
-						// }
 					}
 				},
 				view: {
@@ -215,7 +195,7 @@ ViewComp.MemberManager = Backbone.View.extend({
 	/**
 	 * 添加项目成员
 	 */
-	grand:function(){
+	grand:function(){//选好成员之后点击确定执行的方法
 		$("#dataLoading").show();
 		var pid=App.Comm.getCookie('currentPid');
 		var url=App.API.URL.putServicesProjectMembers;

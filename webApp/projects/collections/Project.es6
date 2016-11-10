@@ -2253,7 +2253,12 @@ App.Project = {
 		//没有分类的时候 只过滤单文件 end
 		if (_this.filterRule.single.indexOf(cat) != -1) {
 			_this.sigleRule(cat,key,function(margin,ratio){
-				_this.zoomModel(ids, box, margin||marginRule.margin, ratio||marginRule.ratio);
+				if(cat=="幕墙"||cat=='外保温'){
+					_this.zoomModel(ids, box, margin||marginRule.margin, ratio||marginRule.ratio);
+				}else{
+					_this.zoomModelOther(ids, box, margin||marginRule.margin, ratio||marginRule.ratio);
+				}
+
 			});
 		}else{
 			_this.linkSilder('floors',key);
@@ -2273,6 +2278,18 @@ App.Project = {
 		//定位
 	//	App.Project.Settings.Viewer.setTopView(box, false, margin, ratio);
 		App.Project.Settings.Viewer.zoomToBBoxWithOuterBox(box,this.getBoxs(App.Project.Settings.property, margin, ratio));
+		//半透明
+		//App.Project.Settings.Viewer.translucent(true);
+		//高亮
+		App.Project.Settings.Viewer.highlight({
+			type: 'userId',
+			ids: ids
+		});
+	},
+
+	zoomModelOther: function(ids, box, margin, ratio) {
+		//定位
+		App.Project.Settings.Viewer.setTopView(box, false, margin, ratio);
 		//半透明
 		//App.Project.Settings.Viewer.translucent(true);
 		//高亮

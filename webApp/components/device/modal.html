@@ -12,8 +12,33 @@
     <div class="rightSilderBar">
         <div class="before closeBtn">关闭</div>
         <div class="headerBar"></div>
-        <div class="contentbar"></div>
-        <div class="footBar"></div>
+        <div class="contentbar">
+            <table  cellspacing="0" >
+                <thead>
+                <tr>
+                    <th class="checkbox"></th>
+                    <th>构件编码</th>
+                </tr>
+                </thead>
+                <tbody class="contentList">
+                <!--<tr>
+                    <td class="checkbox">
+                        <input type="checkbox">
+                    </td>
+                    <td class="colItem"></td>
+                </tr>-->
+                </tbody>
+            </table>
+        </div>
+        <div class="footBar">
+            <div class="footPage">
+                <div class="sumDesc"></div>
+                <div class="listPagination">正在加载...</div>
+            </div>
+            <div class="footTool">
+                <a class="mmh-btn confirm">确认</a>
+            </div>
+        </div>
     </div>
 </div>
 <script>
@@ -52,7 +77,9 @@
         }
     });
 
-
+    function init(data){
+        viewer.setData(JSON.parse(data));
+    }
 
 </script>
 </body>

@@ -2,6 +2,9 @@
  *@require /components/device/libs/jquery-1.12.0.min.js
  *@require /components/device/libs/underscore.1.8.2.js
  *@require /components/device/libs/backbone.1.1.2.js
+ *@require /components/device/libs/mock-min.js
+ *@require /components/device/libs/jquery.pagination.js
+ *@require /components/device/libs/jquery.nicescroll.min.js
  */
 
 (function (win) {
@@ -15,8 +18,51 @@
         }
     }
     var Project = {
-        Settings: null
+        pageSize:20,
+        pageNum:1,
+        Settings: null,
+        data:null
     };
+
+    var Tools={
+        //获取当前检查点所在位置(页码),和当前页码所在的数据队列
+        //pageNum pageSize id
+        catchPageData:function(param){
+            var start=0,end=0,result={},list=[],counter=0,
+                opts=$.extend({},{
+                    id:"",
+                    pageSize:Project.pageSize,
+                    pageNum:1
+                },param),
+                data=Project.data,
+                _len=data.length;
+            if(opts.id){
+                for(var i=0,size=_len;i<size;i++){
+                    if(data[i].id==opts.id){
+                        counter=i;
+                        break
+                    }
+                }
+                opts.pageNum=Math.ceil(counter/opts.pageSize)||1;
+            }
+            start=(opts.pageNum-1)*opts.pageSize;
+            end=opts.pageNum*opts.pageSize;
+            end=end<_len?end:_len;
+            for(;start<end;start++){
+                list.push(data[start]);
+            }
+            result={
+                items:list,
+                pageCount:Math.ceil(_len/opts.pageSize),
+                pageItemCount:opts.pageSize,
+                pageIndex:opts.pageNum,
+                totalItemCount:_len
+
+            }
+            return result;
+        }
+    }
+
 
     function DeviceSelection(options) {
         var _this = this;
@@ -66,6 +112,7 @@
                         if (data.code == 0) {
                             _this.Settings = $.extend({}, _this.Settings, data.data);
                             Project.Settings = _this.Settings;
+                            Project.data=_this.Settings.data;
                             _this.Project = Project;
                             _this.init();
                         } else if (data.code == 10004) {
@@ -134,6 +181,10 @@
             }
         },
 
+        setData:function(data){
+            Project.data=data;
+        },
+
         isIE: function () {
             if (!!window.ActiveXObject || "ActiveXObject" in window)
                 return true;
@@ -166,6 +217,11 @@
             //窗体变化
             window.onresize = resizeWebView;
             resizeWebView();
+            var data=JSON.stringify(this.Settings.data);
+           setTimeout(function(){
+               WebView.runScript("init('"+data+"')", function() {
+               });
+           },1000)
         },
 
         loadLib: function () {
@@ -188,13 +244,22 @@
                     strVar += "    <div class=\"rightSilderBar\">";
                     strVar += "        <div class=\"before closeBtn\">关闭<\/div>";
                     strVar += "        <div class=\"headerBar\"><\/div>";
-                    strVar += "        <div class=\"contentbar\"><\/div>";
-                    strVar += "        <div class=\"footBar\"><\/div>";
+                    strVar += "        <div class=\"contentbar\">";
+                    strVar += "<table  cellspacing=\"0\" >";
+                    strVar += "                <thead>";
+                    strVar += "                <tr>";
+                    strVar += "                    <th class=\"checkbox\"><\/th>";
+                    strVar += "                    <th>构件编码<\/th>";
+                    strVar += "                <\/tr>";
+                    strVar += "                <\/thead>";
+                    strVar += "                <tbody class=\"contentList\">";
+                    strVar += "                <\/tbody>";
+                    strVar += "            <\/table>";
+                    strVar += "    <\/div>";
+                    strVar += "        <div class=\"footBar\"><div class=\"footPage\"><div class=\"sumDesc\"></div><div class=\"listPagination\">正在加载...<\/div><\/div><div class=\"footTool\"><a class=\"mmh-btn confirm\">确认<\/a><\/div><\/div>";
                     strVar += "    <\/div>";
                     $('#deviceSelector').append(strVar);
                 }
-
-                self.initEvent();
                 self.loadModal();
             })
         },
@@ -203,7 +268,7 @@
             $('.deviceSelector .before').click(function () {
                 if ($(this).hasClass('closeBtn')) {
                     $('.deviceSelector .rightSilderBar').animate({
-                        "right": '-300px'
+                        "right": '-400px'
                     }, 500)
                     $(this).removeClass('closeBtn');
                     $(this).html("展开");
@@ -217,7 +282,28 @@
             })
         },
 
+        pageInfo:function(param){
+            var _this=this;
+            $(".listPagination").empty().pagination(param.totalItemCount, {
+                items_per_page: param.pageItemCount,
+                current_page: param.pageIndex-1,
+                num_edge_entries: 2, //边缘页数
+                num_display_entries: 3, //主体页数
+                link_to: 'javascript:void(0);',
+                itemCallback: function(pageIndex) {
+                    _this.loadComponentList({
+                        pageNum:pageIndex+1
+                    });
+                },
+                prev_text: "上一页",
+                next_text: "下一页"
+            });
+
+            $('.footPage').css('textAlign','right');
+        },
+
         loadModal: function () {
+            var _this=this;
             var viewer = new bimView({
                 type: 'model',
                 element: $('#modelView'),
@@ -227,8 +313,34 @@
                 projectVersionId: this.Settings.projectVersionId
             })
             viewer.on("loaded", function () {
+                _this.loadComponentList.call(_this);
+                _this.initEvent();
             });
+        },
+
+        loadComponentList:function(param){
+
+            var result=Tools.catchPageData(param);
+            var data=result.items;
+            var strVar = "";
+            _.each(data,function(item){
+                strVar += " <tr>";
+                strVar += "                    <td class=\"checkbox\">";
+                strVar += "                        <input type=\"checkbox\">";
+                strVar += "                    <\/td>";
+                strVar += "                    <td  class=\"colItem\">"+item.uniqueId+"<\/td>";
+                strVar += "                <\/tr>";
+            })
+            $('.contentList').empty().append(strVar);
+            this.pageInfo(result);
+            $('.contentList').niceScroll({
+                cursorcolor:"#CFCFCF",
+                cursoropacitymin: 0.5,
+                cursoropacitymax: 0.5
+            })
         }
     }
+
+
     win.DeviceSelection = DeviceSelection;
 }(window))

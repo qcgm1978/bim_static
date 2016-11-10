@@ -2,13 +2,24 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>材料设备模型组件</title>
     <link rel="stylesheet" href="http://bim.wanda-dev.cn/static/dist/components/device/css/device.css">
     <script src="http://bim.wanda-dev.cn/static/dist/components/device/js/device.js"></script>
 </head>
 <body>
     <script>
+        var data=[];
+        var Random = Mock.Random;
+        for(var i= 0;i<=2000;i++){
+            data.push({
+                fileName:"",
+                revitFileId:"",
+                uniqueId: Random.guid(),//构件编码
+                boundingbox:""
+            })
+        }
         new DeviceSelection({
+            data:data,
             height: "580px",
             width:"1200px",
             projectCode: '20000282',

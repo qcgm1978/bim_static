@@ -212,7 +212,7 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 		};
 
 		App.Comm.ajax(data, function(data) {
-			this.isLoad=false;
+			that.isLoad=false;
 			if (data.code == 0) {
 				var models = App.ResourceModel.FileCollection.models,
 					id = data.data.id;
@@ -271,14 +271,10 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 		};
 
 		App.Comm.ajax(data, function(data) {
-			this.isLoad=false;
+			that.isLoad=false;
 			if (data.code == 0) {
-
 				var id = data.data.id,
 					isExists = false;
-
-
-
 				$.each(App.ResourceModel.FileCollection.models, function(i, item) {
 					if (item.id == id) {
 						isExists = true;
@@ -321,7 +317,7 @@ App.ResourceModel.ListNavDetail = Backbone.View.extend({
 			var model = App.ResourceModel.FileCollection.last();
 			model.stopListening();
 			model.trigger('destroy', model, model.collection);
-			App.ResourceModel.FileCollection.models.pop();
+		//	App.ResourceModel.FileCollection.models.pop();
 			//删除页面元素
 			$item.remove();
 		} else {
