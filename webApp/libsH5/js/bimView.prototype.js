@@ -863,6 +863,7 @@
       var filter = viewer.getFilters();
       //filter.setTranslucentUnselected(!filter.isTranslucentUnSelected());
       filter.setTranslucentUnselected(true);
+      filter.enableSceneOverrider(true);
       viewer.render();
     },
     initMap: function(options) {

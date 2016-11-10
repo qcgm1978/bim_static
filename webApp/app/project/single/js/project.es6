@@ -155,10 +155,24 @@ App.Project = {
 		})
 
 		App.Project.Settings.modelId = modelId;
+		App.Project.Settings.Viewer.on("loaded", function() {
+
+			$('#lockAxisZ').show();
+		});
+
 		App.Project.Settings.Viewer.on("click", function(model) {
 
-			var selectedIds = App.Project.Settings.Viewer.getSelectedIds();
+			var selectedIds = App.Project.Settings.Viewer.getSelectedIds(),
+			    viewer = App.Project.Settings.Viewer,
+			    isIsolateState = viewer.viewer.getFilters().isIsolateState(),
+			    selectedIds = viewer.getSelectedIds();
+			if(isIsolateState){
+				$('#isolation').show();
+			}else{
+				$('#isolation').hide();
 
+
+			}
 			if (!model.intersect) {
 				App.Project.renderAttr(App.Project.Settings.typeId, 2);
 

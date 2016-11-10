@@ -20,6 +20,8 @@
       return false;
     }
     _opt._dom = self._dom = {
+      lockAxis : $('<div id="lockAxisZ"><i class="m-lockAxisZ" data-id=""></i><span>z轴未锁定</span></div>'),
+      isolation : $('<div id="isolation"><i class="bar-item m-xuanban" title="选中构件半透明" data-id="setTranslucentSelected" data-type="view" data-group="2"></i><i class="bar-item m-weixuanban" title="未选中构件半透明" data-id="setTranslucentUnselected" data-type="view" data-group="3"></i><i class="bar-item m-hideSelected" title="隐藏选中构件" data-id="setHideSelected" data-type="view" data-group="4"></i><i class="bar-item m-hideNotSelected" title="隐藏未选中构件" data-id="isolate" data-type="view" data-group="4"></i><i class="bar-item m-showAll" title="显示全部模型" data-id="showAll" data-type="view" data-group="4"></i></div>'),
       bimBox:$('<div class="bim"></div>'),
       loading:$('<div class="loading"></div>'),
       progress:$('<div class="progress"></div>'),
