@@ -67,7 +67,7 @@ ViewComp.MemberManager = Backbone.View.extend({
 		var addArrs = [];
 		if(addedOptions.length>0){
 			for(var i=0,toBeAddOptionsLen=toBeAddOptions.length-1;i<=toBeAddOptionsLen;i++){
-				let flag=true;
+				var flag=true;
 				for(var j=0,addedOptionsLen=addedOptions.length-1;j<=addedOptionsLen;j++){
 					if(addedOptions[j].tip == toBeAddOptions[i].tip){
 						flag=false;
