@@ -40,26 +40,26 @@ ViewComp.MemberManager = Backbone.View.extend({
 		var _view = this;
 		//树插件初始化配置
 		_view.loadChildren(_view,false,null);
-		
-		this.selectedTree = $.fn.zTree.init($("#selectedTree"), {
-			data:{
-				key:{
-					title:"tip"
+		if(data !== "clearSearch"){
+			this.selectedTree = $.fn.zTree.init($("#selectedTree"), {
+				data:{
+					key:{
+						title:"tip"
+					}
+				},
+				edit:{
+					enable:true,
+					showRemoveBtn:true,
+					showRenameBtn:false
+				},
+				view: {
+					selectedMulti: false,
+					showLine: false,
+					showTitle:true,
+					nameIsHTML:true
 				}
-			},
-			edit:{
-				enable:true,
-				showRemoveBtn:true,
-				showRenameBtn:false
-			},
-			view: {
-				selectedMulti: false,
-				showLine: false,
-				showTitle:true,
-				nameIsHTML:true
-			}
-		}, []);
-
+			}, []);
+		}
 	//	App.Comm.initScroll(this.$('.userSelecter .scrollWrap>ul'),"y");
 	},
 	//防止重复添加和添加成员和部门
@@ -254,21 +254,27 @@ ViewComp.MemberManager = Backbone.View.extend({
 	},
 	//搜索模块
 	search:function(e){
-		var _this = this, url,content = $("#searchContent").val();
+		var _this = this, 
+			url,
+			content = $("#searchContent").val();
 		if(!content){return}
 		var uid=App.Comm.user('userId');
-
 		var treeNode = null,
 			setting = {
+				data:{
+					key:{
+						title:"tip"
+					}
+				},
 				callback: {
-					beforeClick:function(){
+					beforeDblClick:function(){
+						return true;
 					},
-					onClick: function(event, treeId, treeNode) {
-						if(event.target.className.indexOf("button business_ico")!=-1){
-							if(!treeNode.userId && !treeNode.isParent){
-								_this.loadChildren(_this,treeNode.outer,treeNode.orgId,treeNode);
-							}
-							_this.selectTree.cancelSelectedNode(treeNode);
+					onDblClick: function(event, treeId, treeNode) {
+						if(!treeNode.userId && !treeNode.isParent){
+							_this.loadChildren(_this,treeNode.outer,treeNode.orgId,treeNode);
+						}else if(treeNode.userId){
+							_this.addOption();
 						}
 					}
 				},
@@ -311,7 +317,7 @@ ViewComp.MemberManager = Backbone.View.extend({
 	clearSearch:function(e){
 		var ele = $(e.target);
 		ele.siblings("input").val("");
-		this.initView();
+		this.initView('clearSearch');
 	},
 	searchCli:function(e){
 		if(e.keyCode == 13){
