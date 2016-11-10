@@ -521,8 +521,16 @@ App.Project.ProjectContainer = Backbone.View.extend({
 
 			//取消计划高亮
 			var result = that.cancelhighlightPlan(),
-			    selectedIds = App.Project.Settings.Viewer.getSelectedIds();
+			    viewer = App.Project.Settings.Viewer,
+			    isIsolateState = viewer.viewer.getFilters().isIsolateState(),
+			    selectedIds = viewer.getSelectedIds();
+			if(isIsolateState){
+				$('#isolation').show();
+			}else{
+				$('#isolation').hide();
 
+
+			}
 
 			App.Project.Settings.ModelObj = null;
 			if (!model.intersect) {
@@ -667,7 +675,8 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			viewer.filter({
 				ids: ['10.01'],
 				type: "classCode"
-			})
+			});
+			$('#lockAxisZ').show();
 		});
 
 

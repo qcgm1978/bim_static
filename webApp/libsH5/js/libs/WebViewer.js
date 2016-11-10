@@ -3,7 +3,7 @@
 */
 
 var CLOUD = CLOUD || {};
-CLOUD.Version = "20161009";
+CLOUD.Version = "20161109";
 
 CLOUD.GlobalData = {
     SceneSize: 1000,
@@ -5522,7 +5522,7 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
 
         if ( camera instanceof THREE.Camera === false ) {
 
-            // console.error( 'THREE.WebGLIncrementRenderer.IncrementRender: camera is not an instance of THREE.Camera.' );
+            console.error( 'THREE.WebGLIncrementRenderer.IncrementRender: camera is not an instance of THREE.Camera.' );
             return;
         }
 
@@ -11871,7 +11871,7 @@ CLOUD.RectZoomEditor.prototype.updateFrustum = function(updateUI) {
 
     var dim = this.cameraEditor.getContainerDimensions();
 
-    //this.cameraEditor.computeFrustum(x1, x2, y1, y2, this.frustum, dim);
+    this.cameraEditor.computeFrustum(x1, x2, y1, y2, this.frustum, dim);
 
     if (updateUI) {
 
@@ -11936,12 +11936,6 @@ CLOUD.RectZoomEditor.prototype.onMouseUp = function(event) {
                 return false;
             }
 
-            //var closeDepth = this.scene.getNearDepthByRect(this.frustum, this.cameraEditor.object);
-
-            //if (closeDepth !== Infinity){
-            //    this.zoomToRectangle(closeDepth);
-            //}
-
             this.zoomToRectangle();
 
             return true;
@@ -11996,75 +11990,6 @@ CLOUD.RectZoomEditor.prototype.onMouseUp = function(event) {
 //    this.cameraEditor.updateView(true);
 //};
 
-CLOUD.RectZoomEditor.prototype.zoomToRectangle = function () {
-
-    var scope = this;
-    var camera = this.cameraEditor.object;
-    var target = this.cameraEditor.target;
-    var zNear = camera.near;
-
-    var canvasBounds = this.cameraEditor.getContainerDimensions();
-    var startX = scope.startPt.x - canvasBounds.left;
-    var startY = scope.startPt.y - canvasBounds.top;
-    var endX = scope.endPt.x - canvasBounds.left;
-    var endY = scope.endPt.y - canvasBounds.top;
-    var rectWidth = Math.abs(endX - startX);
-    var rectHeight = Math.abs(startY - endY);
-
-    if (rectWidth === 0 || rectHeight === 0)  return;
-
-    var rCenter = new THREE.Vector2((startX + endX) / 2, (startY + endY) / 2);
-    var normalizeCenterX = rCenter.x / canvasBounds.width * 2 - 1;
-    var normalizeCenterY = -rCenter.y / canvasBounds.height * 2 + 1;
-    var normalizeCenter = new THREE.Vector2(normalizeCenterX, normalizeCenterY);
-
-    var eye = camera.position.clone();
-    var dirEyeToTarget = target.clone().sub(eye);
-    var distEyeToTarget = dirEyeToTarget.length();
-
-    var dirRight = this.cameraEditor.getWorldRight();
-    var dirUp = this.cameraEditor.getWorldUp();
-    var pivot = this.scene.hitTest(normalizeCenter, camera);
-
-    if (!pivot) {
-
-        //var halfFrustumHeight = distEyeToTarget * Math.tan(THREE.Math.degToRad(camera.fov * 0.5));
-        var halfFrustumHeight = zNear * Math.tan(THREE.Math.degToRad(camera.fov * 0.5));
-        var halfFrustumWidth = halfFrustumHeight * camera.aspect;
-        var rightWidth = rCenter.x * 2 * halfFrustumWidth / canvasBounds.width;
-        var distCenterToRight = rightWidth - halfFrustumWidth;
-        var upHeight = rCenter.y * 2 * halfFrustumHeight / canvasBounds.height;
-        var distCenterToUp = upHeight - halfFrustumHeight;
-
-        dirRight.normalize().multiplyScalar(distCenterToRight);
-        dirUp.multiplyScalar(distCenterToUp);
-
-        var dirRay = dirEyeToTarget.clone().add(dirUp).add(dirRight);
-
-        pivot = eye.clone().add(dirRay);
-    }
-
-    dirEyeToTarget.normalize();
-
-    var scaleFactor = rectWidth / rectHeight > canvasBounds.width / canvasBounds.height ? rectWidth / canvasBounds.width : rectHeight / canvasBounds.height;
-    var distEyeToPivot = pivot.distanceTo(eye);
-    var distZoom = distEyeToPivot * scaleFactor;
-
-    //if (zoomDist < zNear) {
-    //    console.log("zoomDist < zNear");
-    //    zoomDist = zNear;
-    //}
-
-    //var zoomDir = eye.clone().sub(pivot).normalize().multiplyScalar(zoomDist);
-    var dirZoom = dirEyeToTarget.clone().negate().multiplyScalar(distZoom);
-
-    eye = pivot.clone().add(dirZoom);
-    camera.position.copy(eye);
-    target.copy(eye).add(dirZoom.clone().negate().normalize().multiplyScalar(distEyeToTarget));
-    scope.cameraEditor.updateView(true);
-
-};
-
 //CLOUD.RectZoomEditor.prototype.zoomToRectangle = function () {
 //
 //    var scope = this;
@@ -12097,33 +12022,21 @@ CLOUD.RectZoomEditor.prototype.zoomToRectangle = function () {
 //
 //    if (!pivot) {
 //
-//        ////var halfFrustumHeight = distEyeToTarget * Math.tan(THREE.Math.degToRad(camera.fov * 0.5));
-//        //var halfFrustumHeight = zNear * Math.tan(THREE.Math.degToRad(camera.fov * 0.5));
-//        //var halfFrustumWidth = halfFrustumHeight * camera.aspect;
-//        //var rightWidth = rCenter.x * 2 * halfFrustumWidth / canvasBounds.width;
-//        //var distCenterToRight = rightWidth - halfFrustumWidth;
-//        //var upHeight = rCenter.y * 2 * halfFrustumHeight / canvasBounds.height;
-//        //var distCenterToUp = upHeight - halfFrustumHeight;
-//        //
-//        //dirRight.normalize().multiplyScalar(distCenterToRight);
-//        //dirUp.multiplyScalar(distCenterToUp);
-//        //
-//        //var dirRay = dirEyeToTarget.clone().add(dirUp).add(dirRight);
+//        //var halfFrustumHeight = distEyeToTarget * Math.tan(THREE.Math.degToRad(camera.fov * 0.5));
+//        var halfFrustumHeight = zNear * Math.tan(THREE.Math.degToRad(camera.fov * 0.5));
+//        var halfFrustumWidth = halfFrustumHeight * camera.aspect;
+//        var rightWidth = rCenter.x * 2 * halfFrustumWidth / canvasBounds.width;
+//        var distCenterToRight = rightWidth - halfFrustumWidth;
+//        var upHeight = rCenter.y * 2 * halfFrustumHeight / canvasBounds.height;
+//        var distCenterToUp = upHeight - halfFrustumHeight;
 //
-//        //pivot = eye.clone().add(dirRay);
+//        dirRight.normalize().multiplyScalar(distCenterToRight);
+//        dirUp.multiplyScalar(distCenterToUp);
 //
-//        //var buffer = new Uint8Array(4 * rectWidth * rectHeight);
-//        //this.cameraEditor.viewer.renderer.readRenderTargetPixels(this.cameraEditor.viewer.renderTarget, startX, startY, rectWidth, rectHeight, buffer);
+//        var dirRay = dirEyeToTarget.clone().add(dirUp).add(dirRight);
 //
-//        //if ()
-//        //
-//        //var closeDepth =
-//        //var wCenter = new THREE.Vector3((rCenter.x, rCenter.y, closeDepth);
-//
+//        pivot = eye.clone().add(dirRay);
 //    }
-//
-//    var buffer = new Uint8Array(4 * rectWidth * rectHeight);
-//    this.cameraEditor.viewer.renderer.readRenderTargetPixels(this.cameraEditor.viewer.renderTarget, startX, startY, rectWidth, rectHeight, buffer);
 //
 //    dirEyeToTarget.normalize();
 //
@@ -12145,6 +12058,107 @@ CLOUD.RectZoomEditor.prototype.zoomToRectangle = function () {
 //    scope.cameraEditor.updateView(true);
 //
 //};
+
+CLOUD.RectZoomEditor.prototype.zoomToRectangle = function () {
+
+    var camera = this.cameraEditor.object;
+    var target = this.cameraEditor.target;
+    var zNear = camera.near;
+
+    var canvasBounds = this.cameraEditor.getContainerDimensions();
+    var startX = this.startPt.x - canvasBounds.left;
+    var startY = this.startPt.y - canvasBounds.top;
+    var endX = this.endPt.x - canvasBounds.left;
+    var endY = this.endPt.y - canvasBounds.top;
+    var rectWidth = Math.abs(endX - startX);
+    var rectHeight = Math.abs(startY - endY);
+
+    if (rectWidth === 0 || rectHeight === 0)  return;
+
+    var rectCenter = new THREE.Vector2((startX + endX) / 2, (startY + endY) / 2);
+    var normalizeCenterX = rectCenter.x / canvasBounds.width * 2 - 1;
+    var normalizeCenterY = -rectCenter.y / canvasBounds.height * 2 + 1;
+    var normalizeCenter = new THREE.Vector2(normalizeCenterX, normalizeCenterY);
+
+    var eye = camera.position.clone();
+    var dirEyeToTarget = target.clone().sub(eye);
+    var distEyeToTarget = dirEyeToTarget.length();
+
+    var dirZoom;
+
+    var pivot = this.scene.hitTest(normalizeCenter, camera);
+
+    if (pivot) {
+
+        var scaleFactor = rectWidth / rectHeight > canvasBounds.width / canvasBounds.height ? rectWidth / canvasBounds.width : rectHeight / canvasBounds.height;
+        var distEyeToPivot = pivot.distanceTo(eye);
+        var distZoom = distEyeToPivot * scaleFactor;
+
+        dirEyeToTarget.normalize();
+        //dirZoom = eye.clone().sub(pivot).normalize().multiplyScalar(zoomDist);
+        dirZoom = dirEyeToTarget.clone().negate().multiplyScalar(distZoom);
+
+    } else {
+
+        var rcZoom = {};
+        rcZoom.left = Math.min(startX, endX);
+        rcZoom.top = Math.min(startY, endY);
+        rcZoom.right = Math.max(startX, endX);
+        rcZoom.bottom = Math.max(startY, endY);
+
+        var closeDepth = this.scene.getNearDepthByRect(this.frustum, camera);
+
+        if (closeDepth !== Infinity){
+
+            var rCenter = new THREE.Vector3((startX + endX) / 2, (startY + endY) / 2, closeDepth);
+            var rCorner = new THREE.Vector3(rcZoom.left, rcZoom.top, closeDepth);
+            var wCenter = this.clientToWorld(rCenter);
+            var wCorner = this.clientToWorld(rCorner);
+            var distZoom = wCenter.clone().sub(wCorner).length();
+
+            //if (distZoom < zNear) {
+            //    //console.log("new dist", [newDist, near]);
+            //    distZoom = zNear;
+            //}
+
+            pivot = wCenter.clone();
+            dirEyeToTarget.normalize();
+            dirZoom = dirEyeToTarget.clone().negate().multiplyScalar(distZoom);
+
+        } else {
+
+            var halfFrustumHeight = zNear * Math.tan(THREE.Math.degToRad(camera.fov * 0.5));
+            var halfFrustumWidth = halfFrustumHeight * camera.aspect;
+            var rightWidth = rectCenter.x * 2 * halfFrustumWidth / canvasBounds.width;
+            var distCenterToRight = rightWidth - halfFrustumWidth;
+            var upHeight = rectCenter.y * 2 * halfFrustumHeight / canvasBounds.height;
+            var distCenterToUp = upHeight - halfFrustumHeight;
+            var dirRight = this.cameraEditor.getWorldRight();
+            var dirUp = this.cameraEditor.getWorldUp();
+
+            dirRight.normalize().multiplyScalar(distCenterToRight);
+            dirUp.multiplyScalar(distCenterToUp);
+
+            var dirRay = dirEyeToTarget.clone().add(dirUp).add(dirRight);
+
+            pivot = eye.clone().add(dirRay);
+
+            var scaleFactor = rectWidth / rectHeight > canvasBounds.width / canvasBounds.height ? rectWidth / canvasBounds.width : rectHeight / canvasBounds.height;
+            var distEyeToPivot = pivot.distanceTo(eye);
+            var distZoom = distEyeToPivot * scaleFactor;
+
+            dirEyeToTarget.normalize();
+            //dirZoom = eye.clone().sub(pivot).normalize().multiplyScalar(zoomDist);
+            dirZoom = dirEyeToTarget.clone().negate().multiplyScalar(distZoom);
+        }
+
+    }
+
+    eye = pivot.clone().add(dirZoom);
+    camera.position.copy(eye);
+    target.copy(eye).sub(dirZoom.clone().normalize().multiplyScalar(distEyeToTarget));
+    this.cameraEditor.updateView(true);
+};
 
 CLOUD.RectZoomEditor.prototype.worldToClient = function (wPoint) {
 
@@ -13301,7 +13315,8 @@ CLOUD.CameraAnimator = function () {
 
 
 /**
- * 
+ * 材质状态：
+ *  构件 ： 选择、高亮、半透明、隔离
  */
 CLOUD.Filter = function () {
 
@@ -13364,7 +13379,9 @@ CLOUD.Filter = function () {
 
     var _overriderByScene = false; // 场景半透明
     var _frozenSet = null; // 现在用于临时半透明构件的集合
-    var _frozenSetInvert = null; // 半透明未在该集合的构件
+
+    var _isolateSet = null; // 隔离：半透明未在该集合的构件
+    var _isolateCondition = null;//组合条件的隔离
 
     var _overriderByIds = {}; // 材质过滤器
     var _overriderByData = {}; // 自定义材质覆盖
@@ -13376,15 +13393,20 @@ CLOUD.Filter = function () {
 
     this.saveState = function () {
         var obj = {};
+        obj.version = 1;
         obj.filter = _filter;
         obj.fileFilter = _fileFilter;
         obj.overriderByScene = _overriderByScene;
         if (_frozenSet) {
             obj.frozenSet = _frozenSet;
         }
-        if (_frozenSetInvert) {
-            obj.frozenSetInvert = _frozenSetInvert;
+        if (_isolateSet) {
+            obj.isolateSet = _isolateSet;
         }
+        if (_isolateCondition) {
+            obj.isolateCondition = _isolateCondition;
+        }
+
         obj.overriderByIds = _overriderByIds;
         obj.overriderByData = _overriderByData;
 
@@ -13406,8 +13428,11 @@ CLOUD.Filter = function () {
         _overriderByScene = obj.overriderByScene;
         if (obj.frozenSet != undefined)
             _frozenSet = obj.frozenSet;
-        if (obj.frozenSetInvert != undefined)
-            _frozenSetInvert = obj.frozenSetInvert;
+        if (obj.isolateSet != undefined)
+            _isolateSet = obj.isolateSet;
+        if (obj.isolateCondition != undefined)
+            _isolateCondition = obj.isolateCondition;
+
         _overrideByIds = obj.overriderByIds;
         _overriderByData = obj.overriderByData;
 
@@ -13442,10 +13467,18 @@ CLOUD.Filter = function () {
     }
 
     // 将选中构件ID集合加入到【隐藏选中】集合中
-    function pushToHideSelectionSet() {
+    // 存在需要连续对其他构件隐藏的需求，加入清理状态, 默认不清除之前的数据
+    function pushToHideSelectionSet(clear) {
 
         if (_selectionSet) {
-            _filter.invisibleIds = {};
+            //_filter.invisibleIds = {};
+
+            if (clear) {
+                _filter.invisibleIds = {};
+            } else {
+                _filter.invisibleIds = _filter.invisibleIds || {}; // 连续对其他构件隐藏
+            }
+
             var ids = _filter.invisibleIds;
             for (var id in _selectionSet) {
                 ids[id] = _selectionSet[id];
@@ -13463,23 +13496,32 @@ CLOUD.Filter = function () {
     function pushToTranslucentUnselectionSet() {
 
         if (_selectionSet) {
-            _frozenSetInvert  = {};
+            _isolateSet  = {};
+
             for (var id in _selectionSet) {
-                _frozenSetInvert [id] = _selectionSet[id];
+                _isolateSet [id] = _selectionSet[id];
             }
 
         }
         else {
-            //_frozenSetInvert  = null;
+            //_isolateSet  = null;
         }
                                                                                                                                      
     }
 
     // 将选中构件ID集合加入到【半透明选中】集合中
-    function pushToTranslucentSelectionSet() {
+    // 存在连续对其他构件半透明的需求，加入清理状态, 默认不清除之前的数据
+    function pushToTranslucentSelectionSet(clear) {
 
         if (_selectionSet) {
-            _frozenSet = {};
+            //_frozenSet = {};
+
+            if (clear) {
+                _frozenSet = {};
+            } else {
+                _frozenSet = _frozenSet || {}; // 连续对其他构件半透明
+            }
+
             for (var id in _selectionSet) {
                 _frozenSet[id] = _selectionSet[id];
             }
@@ -13500,7 +13542,8 @@ CLOUD.Filter = function () {
         _overriderByData = {};
         _selectionSet = null;
         _frozenSet = null;
-        _frozenSetInvert = null;
+        _isolateSet = null;
+        _isolateCondition = null;
         _overriderCondition = null;
     };
 
@@ -13537,7 +13580,7 @@ CLOUD.Filter = function () {
 
     ////////////////////////////////////////////////////////////////////
     // Visbililty Filter API
-
+    // conditions: {{'levelId':'F01'},{'categoryId':'21'}}
     this.setVisibleConditions = function(conditions){
         
         _filter.conditions = conditions;
@@ -13785,6 +13828,7 @@ CLOUD.Filter = function () {
         _overriderCondition = conditions;
     };
 
+
     ////////////////////////////////////////////////////////////////
 
     // 设置构件选中的颜色
@@ -13957,6 +14001,56 @@ CLOUD.Filter = function () {
 
     };
 
+    // conditions: {{'levelName':'F01'},{'categoryId':'21'}}
+    this.setIsolateCondition = function (conditions) {
+        _isolateCondition = conditions;
+    };
+
+    this.setIsolateByUserIds = function (ids) {
+
+        if (ids && ids.length > 0) {
+
+            _isolateSet = {};
+
+            for (var ii = 0, len = ids.length; ii < len; ++ii) {
+                _isolateSet[ids[ii]] = true;
+            }
+        }
+        else {
+            _isolateSet = null;
+        }
+    };
+
+    // 是否空集
+    this.isNullIsolateSet = function () {
+
+        for (var id in _isolateSet) {
+            return false;
+        }
+
+        return true;
+    };
+
+    // 可见集合是否为空
+    this.isNullVisibleSet = function() {
+
+        for (var id in _filter.visibleIds) {
+            return false;
+        }
+
+        return true;
+    };
+
+    // 不可见集合是否为空
+    this.isNullInVisibleSet = function() {
+
+        for (var id in _filter.invisibleIds) {
+            return false;
+        }
+
+        return true;
+    };
+
     ////////////////////////////////////////////////////////////////
     // 判断是否可见, true: 可见， 否则 不可见
     this.isVisible = function (node) {
@@ -14070,8 +14164,8 @@ CLOUD.Filter = function () {
             return false;
         }
 
-        // 如果ID不在未半透明构件集，则该构件半透明
-        if (_frozenSetInvert && !_frozenSetInvert[id]) {
+        // 如果ID没有被隔离，则不能被选择
+        if (_isolateSet && !_isolateSet[id]) {
             return false;
         }
 
@@ -14082,12 +14176,35 @@ CLOUD.Filter = function () {
                 return true;
         }
 
-        if (!object.userData)
+        var userData = object.userData;
+        if (!userData)
             return true;
 
+         // 隔离
+        if (_isolateCondition) {
+
+            function matchIsoCondition(condition) {
+
+                for (var item in condition) {
+                    if (condition[item] != userData[item])
+                        return false;
+                }
+
+                return true;
+            }
+
+            for (var ii = 0, len = _isolateCondition.length; ii < len; ++ii) {
+                var item = _isolateCondition[ii];
+                if (matchIsoCondition(item)) {
+                    return true;
+                }
+            }
+        }
+
+        // OTHER
         for (var item in _overriderByData) {
             var overrider = _overriderByData[item];
-            var material = overrider[object.userData[item]];
+            var material = overrider[userData[item]];
             if (material !== undefined)
                 return true;
         }
@@ -14102,6 +14219,10 @@ CLOUD.Filter = function () {
     // 切换材质
     this.getOverridedMaterial = function (object) {
 
+        if (object.customTag) {
+            return null;
+        }
+
         var id = object.name;
 
         // 半透明
@@ -14109,10 +14230,6 @@ CLOUD.Filter = function () {
             return _overridedMaterials.scene;
         }
 
-        //不在此列表中的半透明
-        if(_frozenSetInvert  && !_frozenSetInvert [id]){
-            return _overridedMaterials.scene;
-        }
 
         // 选中
         if (_selectionSet && _selectionSet[id] !== undefined) {
@@ -14160,6 +14277,32 @@ CLOUD.Filter = function () {
 
         }
 
+        if (_isolateCondition) {
+
+            function matchIsoCondition(condition) {
+
+                for (var item in condition) {
+                    if (condition[item] != userData[item])
+                        return false;
+                }
+
+                return true;
+            }
+
+            for (var ii = 0, len = _isolateCondition.length; ii < len; ++ii) {
+                var item = _isolateCondition[ii];
+                if (matchIsoCondition(item)) {
+                    return null;
+                }
+            }
+        }
+
+        //隔离
+        if (_isolateSet && _isolateSet[id]){
+            return null;
+        }
+
+
         // 场景材质
         if (_overriderByScene) {
             return _overridedMaterials.scene;
@@ -14201,20 +14344,20 @@ CLOUD.Filter = function () {
     };
 
     // 选中构件隐藏设置
-    this.setHideSelected = function (enabled) {
+    this.setHideSelected = function (enabled, clear) {
 
         if (enabled) {
 
-            pushToHideSelectionSet();
+            pushToHideSelectionSet(clear);
         }
     };
 
     // 已选构件半透明状态设置
-    this.setTranslucentSelected = function (enabled) {
+    this.setTranslucentSelected = function (enabled, clear) {
 
         if (enabled) {
 
-            pushToTranslucentSelectionSet();
+            pushToTranslucentSelectionSet(clear);
         }
 
     };
@@ -14237,7 +14380,7 @@ CLOUD.Filter = function () {
 
         _frozenSet = null;
 
-        _frozenSetInvert  = null;
+        _isolateSet  = null;
     };
 
     // 恢复所有构件
@@ -14248,8 +14391,15 @@ CLOUD.Filter = function () {
         
         _filter = {};
 
-        _frozenSetInvert  = null;
+        _isolateSet  = null;
         _overriderByScene = false;
+    };
+
+    // 是否处于隔离状态
+    // 构件被选中，构件被隔离都表示处于隔离状态
+    this.isIsolateState = function() {
+
+        return !this.isNullSelectionSet() || !this.isNullDemolishSet() || !this.isNullIsolateSet() || !this.isNullVisibleSet() || !this.isNullInVisibleSet() || _overriderByScene;
     };
 
     // ------------------- 隔离功能（隐藏／半透明）E ------------------- //
@@ -20147,7 +20297,10 @@ CLOUD.ClipPlanes = function (size, center) {
         this.position.copy(info.position);
         this.scale.copy(info.scale);
 
-        this.quaternion.copy(info.quaternion);
+        this.quaternion._w = info.quaternion._w;
+        this.quaternion._x = info.quaternion._x;
+        this.quaternion._y = info.quaternion._y;
+        this.quaternion._z = info.quaternion._z;
 
         this.update();
     };
