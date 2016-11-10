@@ -299,6 +299,15 @@ App.Index = {
 
 		App.Index.Settings.Viewer.on("click", function(model) {
 
+			var  viewer = App.Index.Settings.Viewer,
+			    isIsolateState = viewer.viewer.getFilters().isIsolateState();
+			if(isIsolateState){
+				$('#isolation').show();
+			}else{
+				$('#isolation').hide();
+
+
+			}
 			App.Index.Settings.ModelObj = null;
 			if (!model.intersect) {
 				return;
@@ -314,6 +323,8 @@ App.Index = {
 		}); 
 
 		App.Index.Settings.Viewer.on("loaded",function(){
+
+			$('#lockAxisZ').show();
 
 			var $btnCk=$(".showChange .groupRadio .btnCk");
 			if (!$btnCk.hasClass("selected")) {
