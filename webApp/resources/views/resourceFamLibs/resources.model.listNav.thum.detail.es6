@@ -283,6 +283,11 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 			parentId = "";
 		if ($leftSel.length > 0) {
 			parentId = $leftSel.data("file").fileVersionId;
+			/*
+			write by wuweiwei
+			描述:当新建文件夹后,左侧树会重新加载;所以需要这里保存当前文件夹的父文件夹id
+			*/
+			App.ResourceModel.Settings.currentParentId = $leftSel.data("id");
 		}
 		// //请求数据
 		var data = {
