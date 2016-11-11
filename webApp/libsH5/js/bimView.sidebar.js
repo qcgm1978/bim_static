@@ -9,6 +9,8 @@
       var self = this;
       var modelBgColor = bimView.comm.getModelBgColor();
       self._dom={
+        lockAxis : $('<div id="lockAxisZ"><i class="m-lockAxisZ" data-id=""></i><span>z轴未锁定</span></div>'),
+        isolation : $('<div id="isolation"><i class="bar-item m-xuanban" title="选中构件半透明" data-id="setTranslucentSelected" data-type="view" data-group="2"></i><i class="bar-item m-weixuanban" title="未选中构件半透明" data-id="setTranslucentUnselected" data-type="view" data-group="3"></i><i class="bar-item m-hideSelected" title="隐藏选中构件" data-id="setHideSelected" data-type="view" data-group="4"></i><i class="bar-item m-hideNotSelected" title="隐藏未选中构件" data-id="isolate" data-type="view" data-group="4"></i><i class="bar-item m-showAll" title="显示全部模型" data-id="showAll" data-type="view" data-group="4"></i></div>'),
         sidebar : $('<div class="modelSidebar"> <div class="modelMap"> <div class="map"></div> </div> <div class="modelFilter"> <div id="filter" class="modelTab"> <ul class="tree"> <li class="itemNode" id="specialty" data-type="sceneId"> <div class="itemContent"> <i class="m-openTree"></i> <label class="treeCheckbox"> <input type="checkbox" checked="true"> <span class="m-lbl"></span> </label> <span class="treeText">专业</span> </div> </li> <li class="itemNode" id="floors" data-type="sceneId"> <div class="itemContent"> <i class="m-openTree"></i> <label class="treeCheckbox"> <input type="checkbox" checked="true"> <span class="m-lbl"></span> </label> <span class="treeText">楼层</span> </div> </li> <li class="itemNode" id="category" data-type="categoryId"> <div class="itemContent"> <i class="m-openTree"></i> <label class="treeCheckbox"> <input type="checkbox" checked="true"> <span class="m-lbl"></span> </label> <span class="treeText">构件类型</span> </div> </li> <li class="itemNode" id="classCode" data-type="classCode"> <div class="itemContent"> <i class="m-openTree"></i> <label class="treeCheckbox"> <input type="checkbox" checked="true"> <span class="m-lbl"></span> </label> <span class="treeText">分类编码</span> </div> </li> </ul> </div> <div id="comment" class="modelTab"></div> <div id="selected" class="modelTab"><div class="headTab"><div class="tabItem cur">当前选中</div></div><div class="selectTree"></div></div> </div> </div>'),
         modelBar : $('<div class="toolsBar"></div>'),
         mapBar:$('<div class="footBar"><div class="modelSelect"><span class="cur"></span><div class="modelList"></div></div><div class="axisGrid"></div></div>')
@@ -38,6 +40,7 @@
       });
       self._dom.sidebar.find('.modelMap').prepend(self._dom.modelBar);
       bimBox.addClass(modelBgColor);
+      bimBox.append(self._dom.lockAxis,self._dom.isolation);
       bimBox.append(self._dom.sidebar);
       bimView.isLoad = false;
       bimView.sidebar.filter();

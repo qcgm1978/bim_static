@@ -157,6 +157,16 @@
     },
     controll: function() {
       var self = this;
+      $('#lockAxisZ').click(function(){
+        var selected = $(this).is('.selected');
+        $(this).toggleClass('selected');
+        if(selected){
+          $(this).find('span').text('z轴未锁定')
+        }else{
+          $(this).find('span').text('z轴已锁定')
+        }
+        self.lockAxisZ(!selected);
+      });
       self._dom.bimBox.on('click', '.bar-item', function() {
         // 工具条对应功能
         var $this = $(this),
@@ -824,6 +834,8 @@
       var filter = viewer.getFilters();
       filter.revertAll();
       viewer.render();
+      $('#isolation').hide();
+
     },
     setHideSelected: function() {
       //隐藏选中构件
@@ -851,6 +863,7 @@
       var filter = viewer.getFilters();
       //filter.setTranslucentUnselected(!filter.isTranslucentUnSelected());
       filter.setTranslucentUnselected(true);
+      filter.enableSceneOverrider(true);
       viewer.render();
     },
     initMap: function(options) {

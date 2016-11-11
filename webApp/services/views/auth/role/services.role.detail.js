@@ -87,7 +87,8 @@ App.Services.roleDetail=Backbone.View.extend({
 
     //删除角色
     delete:function() {
-        var frame = new App.Services.windowAlert().render().el,alertInfo = '确认要删除角色 "' + (this.model.get("name") ||  "未知")+ '"？';
+        var frame = new App.Services.windowAlert().render().el,
+            alertInfo = '确认要删除角色 "' + (this.model.get("name") ||  "未知")+ '"？';
         App.Services.deleteRoleInfo = this.model;//将model携带至弹窗view
         App.Services.alertWindow = new App.Comm.modules.Dialog({
             title: "",

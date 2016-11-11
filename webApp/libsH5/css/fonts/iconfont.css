@@ -75,12 +75,14 @@
 .m-zooms:before { content: "\e62c"; }
 .m-kuangsuo:before { content: "\e60c"; }
 .m-isolation:before { content: "\e632"; }
-.m-xuanban:before { content: "\e62d"; }
+.m-xuanban:before { content: "\e6eb"; }
+//.m-xuanban:before { content: "\e62d"; }
 .m-weixuanban:before { content: "\e62f"; }
 .m-hideSelected:before { content: "\e633"; }
 .m-hideNotSelected:before { content: "\e634"; }
-.m-showAll:before { content: "\e635"; }
-.m-lockAxisZ:before { content: "\e63c"; }
+.m-showAll:before { content: "\e6ef"; }
+.m-lockAxisZ:before { content: "\e6ee"; }
+#lockAxisZ.selected >i:before { content: "\e63c" !important; }
 
 [data-color=m-red]:before {
   content: "";
