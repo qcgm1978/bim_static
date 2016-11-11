@@ -323,9 +323,6 @@ App.Project.ProjectQualityProperty = Backbone.View.extend({
 			if(that.ProcessAcceptanceOptions.category){
 				App.Project.currentProsCat=App.Project.mapData.processCategory[that.ProcessAcceptanceOptions.category];
 				App.Project.currentProsCheckFloor=that.ProcessAcceptanceOptions.floor;
-				if('外保温、幕墙、钢结构悬挑构件'.indexOf(App.Project.currentProsCat)!=-1){
-					App.Project.currentProsCheckFloor=App.Project.currentProsCheckFloor+','+'其它';
-				}
 			}
 
 			App.Project.QualityAttr.ProcessAcceptanceCollection.fetch({

@@ -97,6 +97,36 @@ App.BodyContent.control = {
             }
 
         })
+
+        this.initAuth(_userInfo);
+    },
+
+    initAuth:function(user){
+
+        var isKeyUser = user.isKeyUser || false;
+        var _AuthObj=App.AuthObj||{};
+        var Auth = _AuthObj.service||{};
+
+        if (!Auth.app) {
+            $('#auth-app').remove();
+        }
+
+        if (!Auth.auth && !isKeyUser) {
+            $('#auth-auth').remove();
+        }
+
+        if (!Auth.log) {
+            $('#auth-log').remove();
+        }
+
+
+        if (!Auth.sys) {
+            $('#auth-sys').remove();
+        }
+
+        if (!Auth.project) {
+            $('#auth-project').remove();
+        }
     },
 
     post: function(id) {

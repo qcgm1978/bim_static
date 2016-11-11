@@ -21,7 +21,15 @@
         pageSize:20,
         pageNum:1,
         Settings: null,
-        data:null
+        data:null,
+        dataCore:{
+          list:[]
+        },
+        dispatchIE:function(url) {
+            if (navigator.userAgent.indexOf("QtWebEngine/5.7.0") > -1) {
+                window.open(url);
+            }
+        },
     };
 
     var Tools={
@@ -184,7 +192,9 @@
         setData:function(data){
             Project.data=data;
         },
-
+        getData:function(){
+            return Project.dataCore;
+        },
         isIE: function () {
             if (!!window.ActiveXObject || "ActiveXObject" in window)
                 return true;
@@ -193,6 +203,7 @@
         },
         //activeXObject 渲染模型
         activeXObject: function () {
+            var _this=this;
             WebView = document.createElement("object");
             WebView.classid = "CLSID:15A5F85D-A81B-45D1-A03A-6DBC69C891D1";
 
@@ -217,6 +228,18 @@
             //窗体变化
             window.onresize = resizeWebView;
             resizeWebView();
+
+            WebView.registerEvent('newWindow', function(url){
+                if(/onData$/.test(url)){
+                    WebView.runScript('getData()',function(data){
+                        Project.Settings.callback.call(this,JSON.parse(data));
+                    })
+                }
+                if(/onSelect$/.test(url)){
+                    Project.Settings.callback.call(this,{});
+                }
+            });
+
             var data=JSON.stringify(this.Settings.data);
            setTimeout(function(){
                WebView.runScript("init('"+data+"')", function() {
@@ -260,11 +283,17 @@
                     strVar += "    <\/div>";
                     $('#deviceSelector').append(strVar);
                 }
+                setTimeout(function(){
+                    self.loadComponentList();
+                    self.initEvent();
+                },1000)
+                return
                 self.loadModal();
             })
         },
 
         initEvent: function () {
+            var _self=this;
             $('.deviceSelector .before').click(function () {
                 if ($(this).hasClass('closeBtn')) {
                     $('.deviceSelector .rightSilderBar').animate({
@@ -279,6 +308,26 @@
                     $(this).addClass('closeBtn');
                     $(this).html("关闭");
                 }
+            })
+
+            $('.contentList').on('click',function(event){
+                if(event.target.className=='checkBoxInput'){
+                    var $target=$(event.target),
+                        flag=$target.is(':checked');
+                    if(flag){
+                        $target.closest('tr').addClass('selected');
+                    }else{
+                        $target.closest('tr').removeClass('selected');
+                    }
+                }
+            })
+
+            $('.confirm').click(function(){
+                Project.dataCore.list=[];
+                $('.contentList tr.selected').each(function(){
+                    Project.dataCore.list.push($(this).find('.colItem').text());
+                })
+                Project.dispatchIE("/?commType=onData");
             })
         },
 
@@ -326,7 +375,7 @@
             _.each(data,function(item){
                 strVar += " <tr>";
                 strVar += "                    <td class=\"checkbox\">";
-                strVar += "                        <input type=\"checkbox\">";
+                strVar += "                        <input class=\"checkBoxInput\" type=\"checkbox\">";
                 strVar += "                    <\/td>";
                 strVar += "                    <td  class=\"colItem\">"+item.uniqueId+"<\/td>";
                 strVar += "                <\/tr>";
