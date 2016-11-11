@@ -33,7 +33,11 @@ App.Services.searchView = Backbone.View.extend({
         _this.formData.moduleType=$item.attr('data-val');
       }
     });
-
+    setTimeout(function(){
+      $(".calendar").click(function() {
+        $(this).next().focus();
+      });
+    },3000);
 
     this.$('#dateStar').datetimepicker({
       language: 'zh-CN',

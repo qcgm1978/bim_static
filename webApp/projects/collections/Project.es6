@@ -841,13 +841,27 @@ App.Project = {
 		}
 	},
 
+	parseFilterFloor:function(type){
+		var data=this.currentLoadData[type],
+			floors='其它';
+		_.each(data,function(i){
+			var t=i.locationName||'';
+			if(t){
+				var f=t.substr(0,t.indexOf(';'));
+				if(floors.indexOf(f)==-1){
+					floors+=","+f;
+				}
+			}
+		})
+		return floors;
+	},
 
 	getBoxs:function(type){
 		var boxs=[],
 			typeMap={
 				'concerns':'dis',
 				'processacceptance':'process',
-				'openingacceptance':'open',
+				'openingacceptance':'open'
 			},
 			type=typeMap[type];
 			data = this.currentLoadData[type];
@@ -897,13 +911,29 @@ App.Project = {
 
 				if(type=="process" && _this.currentProsCat && data.length){
 					_this.recoverySilder();
-					_this.sigleRule(_this.currentProsCat,_this.currentProsCheckFloor,scenceIds);
+					var _floor=_this.currentProsCheckFloor;
+					if(!_floor){
+						_floor=_this.parseFilterFloor(type);
+					}else{
+						if('外保温、幕墙、钢结构悬挑构件'.indexOf(_this.currentProsCat)!=-1){
+							_floor=_floor+','+'其它';
+						}
+					}
+					_this.sigleRule(_this.currentProsCat,_floor,scenceIds);
 					$(".QualityProcessAcceptance .tbProcessAccessBody tr").removeClass('selected');
 				}
 
 				if(type=="open" && _this.currentOpenCat && data.length){
 					_this.recoverySilder();
-					_this.sigleRule(_this.currentOpenCat,_this.currentOpenCheckFloor,scenceIds);
+					var _floor=_this.currentOpenCheckFloor;
+					if(!_floor){
+						_floor=_this.parseFilterFloor(type);
+					}else{
+						if('外保温、幕墙、钢结构悬挑构件'.indexOf(_this.currentOpenCat)!=-1){
+							_floor=_floor+','+'其它';
+						}
+					}
+					_this.sigleRule(_this.currentOpenCat,_floor,scenceIds);
 					$(".QualityProcessAcceptance .tbProcessAccessBody tr").removeClass('selected');
 				}
 				App.Project.Settings.Viewer.setTopView(boxs, true);
@@ -2256,7 +2286,7 @@ App.Project = {
 				if(cat=="幕墙"||cat=='外保温'){
 					_this.zoomModel(ids, box, margin||marginRule.margin, ratio||marginRule.ratio);
 				}else{
-					_this.zoomModelOther(ids, box, margin||marginRule.margin, ratio||marginRule.ratio);
+					_this.zoomModelOther(ids, box, margin||marginRule.margin, ratio||marginRule.ratio,location);
 				}
 
 			});
@@ -2287,7 +2317,45 @@ App.Project = {
 		});
 	},
 
-	zoomModelOther: function(ids, box, margin, ratio) {
+	offset:function(location){
+		var offset,
+			boxPt,
+			p=location.position,
+			max=location.boundingBox.max,
+			min=location.boundingBox.min;
+		boxPt={
+			x:(max.x+min.x)/2,
+			y:(max.y+min.y)/2,
+			z:(max.x+min.z)/2
+		}
+		offset={
+			x:p.x-boxPt.x,
+			y:p.y-boxPt.y,
+			z:p.z-boxPt.z
+		}
+		return offset;
+	},
+
+	newBBox:function(location){
+		var box,
+			offset=this.offset(location),
+			old=location.boundingBox;
+		box={
+			max:{
+				x:old.max.x+offset.x,
+				y:old.max.y+offset.y,
+				z:old.max.z+offset.z
+			},
+			min:{
+				x:old.min.x+offset.x,
+				y:old.min.y+offset.y,
+				z:old.min.z+offset.z
+			}
+		}
+		return box;
+	},
+
+	zoomModelOther: function(ids, box, margin, ratio,location) {
 		//定位
 		App.Project.Settings.Viewer.setTopView(box, false, margin, ratio);
 		//半透明
