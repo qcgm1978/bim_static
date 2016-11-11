@@ -50,7 +50,7 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 		event.stopPropagation();
 	},
 	returnBack: function() {
-		alert();
+		//alert();
 	},
 	//文件或者文件夹点击
 	fileClick: function(event) {
