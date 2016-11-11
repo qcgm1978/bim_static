@@ -275,7 +275,7 @@ App.ResourceModel.ThumDetail = Backbone.View.extend({
 
 	//创建文件夹
 	createNewFolder: function($item) {
-
+		var that = this;
 		that.isLoad=false;
 		var filePath = $item.find(".txtEdit").val().trim(),
 			that = this,
