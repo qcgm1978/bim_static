@@ -964,7 +964,7 @@ App.Project = {
 		if(opts.id){
 			for(var i=0,size=_len;i<size;i++){
 				if(data[i].id==opts.id){
-					counter=i;
+					counter=i+1;
 					break
 				}
 			}

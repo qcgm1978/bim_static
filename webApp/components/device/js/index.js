@@ -47,7 +47,7 @@
             if(opts.id){
                 for(var i=0,size=_len;i<size;i++){
                     if(data[i].id==opts.id){
-                        counter=i;
+                        counter=i+1;
                         break
                     }
                 }
@@ -284,12 +284,38 @@
                     $('#deviceSelector').append(strVar);
                 }
 
-                setTimeout(function(){
-                    self.loadComponentList();
-                    self.initEvent();
-                },1000)
-                return
-                self.loadModal();
+                var data=[];
+                _.each(Project.data,function(item){
+                    item.fileName&&data.push(item.fileName);
+                })
+                data= _.uniq(data);
+                $.ajax({
+                    url:'/doc/api/fileNames',
+                    type:'post',
+                    contentType:'application/json',
+                    data:JSON.stringify({
+                        "projectId":Project.Settings.projectId,//项目id
+                        "projectVersionId":Project.Settings.projectVersionId,//项目版本Id
+                        "fileNames":data
+                    }),
+                    success:function(res){
+                        if(res.code==0){
+                            _.each(Project.data,function(item){
+                                var _temp=_.find(res.data, function(i){
+                                    return i.fileName==item.fileName;
+                                });
+                                if(_temp){
+                                    item.componentId= _temp.modelId+"."+item.uniqueId;
+                                   // item.componentId= 'a2e03fbc9984306fd90b9b939ae3b37d.5b7e29a9-6026-41d3-ad72-1b10d59c4b02-002aa916';
+                                }else{
+                                    item.componentId= "";
+                                }
+                            })
+                            self.loadModal();
+                        }
+                    }
+                })
+
             })
         },
 
@@ -319,15 +345,28 @@
                     var list=Project.data;
                     var obj = _.find(list, function(item){ return item.id==val; });
                     if(flag){
-                        $target.closest('tr').addClass('selected');
+                      //  $target.closest('tr').removeClass('preview').addClass('selected');
                         Project.dataCore.list.push(obj);
                     }else{
-                        $target.closest('tr').removeClass('selected');
+                     //   $target.closest('tr').removeClass('preview').removeClass('selected');
                         Project.dataCore.list=_.reject(Project.dataCore.list, function(item){
                             return val == item.id;
                         });
                     }
+                   // _self.showInModel();
+                }else if(event.target.nodeName=='TR'){
+                    debugger
+                    var $target=$(event.target);
+                    $target.toggleClass('preview');
+                    if($target.hasClass('preview')){
+                        var list=Project.data;
+                        var val=$target.data('item');
+                        var item = _.find(list, function(item){ return item.id==val; });
+                        var box=item.boundingbox||item.boundingBox;
+                        App.Project.Settings.Viewer.setTopView( _self.formatBBox(box), false);
+                    }
                 }
+
             })
 
             $('.confirm').click(function(){
@@ -368,7 +407,26 @@
             viewer.on("loaded", function () {
                 _this.loadComponentList.call(_this);
                 _this.initEvent();
+                _this.showInModel(true);
             });
+
+            viewer.viewer.setMarkerClickCallback(function(marker){
+                var id = marker? marker.id:"",
+                    userId=marker? marker.userId:"",
+                    data={};
+                if(id){
+                    _this.loadComponentList({id:id});
+                    var t=$('tr[data-item="'+id+'"]');
+                    if(t.length){
+                        t.addClass('preview');
+                    }
+                    Project.viewer.getFilters().setSelectedIds([userId]);
+                }else{
+                    var t=$('tr.preview').removeClass('preview');;
+                }
+            });
+
+            Project.Viewer=viewer;
         },
 
         loadComponentList:function(param){
@@ -379,9 +437,9 @@
             _.each(data,function(item){
                 var _flag=_.find(list,function(listItem){return listItem.id==item.id });
                 if(_flag){
-                    strVar += " <tr data-item="+item.id+"  class=\"selected\">";
+                    strVar += " <tr data-item="+item.id+" data-cid="+item.componentId+"  class=\"selected\">";
                 }else{
-                    strVar += " <tr data-item="+item.id+">";
+                    strVar += " <tr data-item="+item.id+" data-cid="+item.componentId+">";
                 }
                 strVar += "                    <td class=\"checkbox\">";
                 if(_flag){
@@ -401,6 +459,56 @@
                 cursoropacitymin: 0.5,
                 cursoropacitymax: 0.5
             })
+        },
+        formatMark: function(location, color, id, shaType) {
+            var _temp = location;
+            if (typeof location === 'string') {
+                _temp = JSON.parse(location)
+            }
+            _temp.shapeType = Number(_temp.shapeType || shaType || 0);
+            _temp.state = Number(_temp.state || color || 0);
+            _temp.userId = _temp.userId || _temp.componentId;
+            _temp.id = id || '';
+            return JSON.stringify(_temp);
+        },
+        formatBBox: function(data) {
+            if (!data) {
+                return [];
+            }
+            var box = [],
+                min = data.min,
+                minArr = [min.x, min.y, min.z],
+                max = data.max,
+                maxArr = [max.x, max.y, max.z];
+            box.push(minArr);
+            box.push(maxArr);
+            return box;
+        },
+        zoom:function(ids,markers){
+            Project.Viewer.loadMarkers(markers);
+            Project.Viewer.translucent(true);
+            Project.Viewer.highlight({
+                type: 'userId',
+                ids: ids
+            });
+        },
+
+        showInModel:function(isAll){
+            var _this=this;
+            var list=isAll?Project.data:Project.dataCore.list,
+                markers=[],
+                ids=[];
+            _.each(list,function(item){
+                var box=item.boundingbox||item.boundingBox;
+                var location={
+                    componentId:item.componentId,
+                    position : box.max,
+                    boundingBox:box
+                }
+                ids.push(item.componentId);
+                markers.push(_this.formatMark(location,0,item.id));
+            })
+            _this.zoom(ids,markers);
         }
     }
 
