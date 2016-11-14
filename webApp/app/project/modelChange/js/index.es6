@@ -121,6 +121,16 @@ App.Index = {
 		viewer.on("click", function(model) {
 			App.Index.Settings.ModelObj = null;
 
+			var viewer = App.Index.Settings.Viewer,
+			    isIsolateState = viewer.viewer.getFilters().isIsolateState();
+			if(isIsolateState){
+				$('#isolation').show();
+			}else{
+				$('#isolation').hide();
+
+
+			}
+
 			if (!model.intersect) {
 				$("#projectContainer .designProperties").html(' <div class="nullTip">请选择构件</div>');
 				return;
@@ -134,6 +144,9 @@ App.Index = {
 
 		//加载完成后加载
 		viewer.on("loaded", function() {
+
+			$('#lockAxisZ').show();
+
 			if (!$(".showChange .checkboxGroup input:checkbox").prop('checked')) {
 				$(".showChange .checkboxGroup input:checkbox").trigger('click');
 			}
