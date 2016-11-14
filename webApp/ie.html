@@ -493,17 +493,23 @@
             this.frm = document.createElement("IFRAME");
             this.frm.style.display = "none";
             document.body.appendChild(this.frm);
-            this.frm.contentWindow.location.href = url
+            this.frm.contentWindow.location.href = url;
             this.timer =  setInterval(this.checkload,200);
         },
         checkload : function(){
-            var frm = this.frm;
-            if( frm.contentWindow.document.readyState =="complete")
+            var frm = downLoadForIE.frm;
+            try
             {
-                frm.contentWindow.document.execCommand("SaveAs");
-               clearInterval(this.timer)
+                if( frm.contentWindow.document.readyState =="complete")
+                {
+                    frm.contentWindow.document.execCommand("SaveAs");
+                   clearInterval(this.timer)
+                }
+                document.body.removeChild(frm);                
             }
-            document.body.removeChild(frm);
+            catch(e)
+            {;}
+
         }
     };
 
