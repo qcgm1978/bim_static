@@ -65,9 +65,25 @@ App.ResourceFamLibs.leftNav = Backbone.View.extend({
 
 			$("#pageLoading").hide();
 
+			that.setCurrentParent();
+
+		});
+	} , 
+
+	setCurrentParent : function(){
+		var $left = $("#resourceFamlibsLeftNav .treeViewMarUl");
+		var $span = $left.find("span");
+		if(App.ResourceModel.Settings.currentParentId==undefined)
+		{
+			return;
+		}
+		$span.each(function(index){
+			if($(this).data("id")==App.ResourceModel.Settings.currentParentId)
+			{
+				$(this).addClass("selected");
+				return;
+			}
 		});
 	}
-
-
 
 });
