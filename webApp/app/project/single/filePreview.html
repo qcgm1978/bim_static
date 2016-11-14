@@ -5,7 +5,14 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>模型预览</title>
-    <link rel="styleSheet" href="/comm/css/treeView.less" />
+    <script type="text/javascript">
+        var App = {};
+        App.time = +new Date();
+    </script>
+    <!--<link rel="styleSheet" href="/comm/css/treeView.less" />-->
+    <script>
+        document.write('<link rel="styleSheet" href="/static/dist/comm/comm_20160313.css?t='+App.time+'"/>')
+    </script>
     <link rel="styleSheet" href="./less/project.less" />
 </head>
 
@@ -40,11 +47,12 @@
         </div>
         <div id="modelBox"></div>
     </div>
-    <script type="text/javascript">
-    var App = {};
-    </script>
+
     <script type="text/javascript" src="/libs/jquery/jquery-1.12.0.min.js"></script>
-    <script type="text/javascript" src="/libsH5/js/libs/three.js"></script>
+    <!--<script type="text/javascript" src="/libsH5/js/libs/three.js"></script>-->
+    <script>
+        document.write('<script src="/static/dist/libs/libsH5_20160313.js?' + App.time + '"><'+'/script>')
+    </script>
     <script type="text/javascript" src="./js/project.es6"></script>
     <link rel="styleSheet" href="/libsH5/css/modelStyle.less" />
     <script type="text/javascript" src="/api/api.js"></script>
