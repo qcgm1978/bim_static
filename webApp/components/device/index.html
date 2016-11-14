@@ -8,29 +8,55 @@
 </head>
 <body>
     <script>
-        var data=[];
-        var Random = Mock.Random;
-        for(var i= 0;i<=2000;i++){
-            data.push({
-                id:'uuid_'+i,
-                fileName:"WDGC-Q-TE-F02-ELV.rvt",//文件名称
-                revitFileId:"",//文件ID
-                uniqueId: i==1?"0d9d7d7c-1653-41d2-992b-405a02cbd02d-000311e0":Random.guid(),//构件编码
-                boundingbox:  {
-                    "min" : {
-                        "x" : -122431.734375,
-                        "y" : 60264.5234375,
-                        "z" : -50
-                    },
-                    "max" : {
-                        "x" : -123131.7265625,
-                        "y" : 59564.5234375,
-                        "z" : -4899.99951171875
-                    }
+        var data=[{
+            fileName:"WDGC-Q-ST-基础.rvt",//文件名称
+            revitFileId:"048f7312796d85eda6c800602e6fc9c9",//文件ID
+            uniqueId: "0d9d7d7c-1653-41d2-992b-405a02cbd02d-000311e0",
+            boundingbox: {
+                "min" : {
+                    "x" : -4781.154296875,
+                    "y" : 60440.47265625,
+                    "z" : -9160
+                },
+                "max" : {
+                    "x" : -5581.154296875,
+                    "y" : 59640.47265625,
+                    "z" : -29259.998046875
                 }
-                //componentId: modelId.uniqueId
-            })
-        }
+            }
+        },{
+            fileName:"WDGC-Q-ST-B01.rvt",//文件名称
+            revitFileId:"72cda601e045bdc77576a5589e43f9c1",//文件ID
+            uniqueId: "3909c2cb-03f4-4fc0-934c-754bf06a756e-00099618",
+            boundingbox: {
+                "min" : {
+                    "x" : -122431.734375,
+                    "y" : 60264.5234375,
+                    "z" : -50
+                },
+                "max" : {
+                    "x" : -123131.7265625,
+                    "y" : 59564.5234375,
+                    "z" : -4899.99951171875
+                }
+            }
+        },{
+            fileName:"WDGC-Q-PL-F02.rvt",//文件名称
+            revitFileId:"ff0402f57d49241819fa245e3239777b",//文件ID
+            uniqueId: "6c0fd922-7f0b-4c97-a77e-f35c72d33e7e-0023af3b",
+            boundingbox: {
+                "min" : {
+                    "x" : 119838.0703125,
+                    "y" : 4144.0263671875,
+                    "z" : 10800.0009765625
+                },
+                "max" : {
+                    "x" : 119679.0625,
+                    "y" : 3985.02197265625,
+                    "z" : 10040.3125
+                }
+            }
+        }];
         //构件id: modelId.uniqueId
         //modeId:通过接口获取(P:fileName,projectId...)
 

@@ -300,7 +300,9 @@
                     }),
                     success:function(res){
                         if(res.code==0){
+                            var count=1;
                             _.each(Project.data,function(item){
+                                item.id='rid_uuid_'+count;
                                 var _temp=_.find(res.data, function(i){
                                     return i.fileName==item.fileName;
                                 });
@@ -310,6 +312,7 @@
                                 }else{
                                     item.componentId= "";
                                 }
+                                count++;
                             })
                             self.loadModal();
                         }
@@ -354,16 +357,21 @@
                         });
                     }
                    // _self.showInModel();
-                }else if(event.target.nodeName=='TR'){
-                    debugger
+                }
+
+                if(event.target.className=='colItem'){
                     var $target=$(event.target);
-                    $target.toggleClass('preview');
+                    $target=$target.closest('tr');
                     if($target.hasClass('preview')){
+                        $target.removeClass('preview');
+                    }else{
+                        $('.contentList tr.preview').removeClass('preview');
+                        $target.addClass('preview');
                         var list=Project.data;
                         var val=$target.data('item');
                         var item = _.find(list, function(item){ return item.id==val; });
                         var box=item.boundingbox||item.boundingBox;
-                        App.Project.Settings.Viewer.setTopView( _self.formatBBox(box), false);
+                        Project.Viewer.setTopView( _self.formatBBox(box), false);
                     }
                 }
 
