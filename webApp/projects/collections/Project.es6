@@ -847,9 +847,9 @@ App.Project = {
 		_.each(data,function(i){
 			var t=i.locationName||'';
 			if(t){
-				var f=t.substr(0,t.indexOf(';'));
+				var f=t.match(/[A-Z][0-9]{2}/)||[];
 				if(floors.indexOf(f)==-1){
-					floors+=","+f;
+					floors+=","+f.join(',');
 				}
 			}
 		})
@@ -964,7 +964,7 @@ App.Project = {
 		if(opts.id){
 			for(var i=0,size=_len;i<size;i++){
 				if(data[i].id==opts.id){
-					counter=i;
+					counter=i+1;
 					break
 				}
 			}
