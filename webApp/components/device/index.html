@@ -12,12 +12,17 @@
         var Random = Mock.Random;
         for(var i= 0;i<=2000;i++){
             data.push({
-                fileName:"",
-                revitFileId:"",
+                id:'uuid_'+i,
+                fileName:"",//文件名称
+                revitFileId:"",//文件ID
                 uniqueId: Random.guid(),//构件编码
                 boundingbox:""
+                //componentId: modelId.uniqueId
             })
         }
+        //构件id: modelId.uniqueId
+        //modeId:通过接口获取(P:fileName,projectId...)
+
         new DeviceSelection({
             data:data,
             height: "580px",

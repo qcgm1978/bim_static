@@ -283,6 +283,7 @@
                     strVar += "    <\/div>";
                     $('#deviceSelector').append(strVar);
                 }
+
                 setTimeout(function(){
                     self.loadComponentList();
                     self.initEvent();
@@ -314,19 +315,22 @@
                 if(event.target.className=='checkBoxInput'){
                     var $target=$(event.target),
                         flag=$target.is(':checked');
+                    var val=$target.closest('tr').data('item');
+                    var list=Project.data;
+                    var obj = _.find(list, function(item){ return item.id==val; });
                     if(flag){
                         $target.closest('tr').addClass('selected');
+                        Project.dataCore.list.push(obj);
                     }else{
                         $target.closest('tr').removeClass('selected');
+                        Project.dataCore.list=_.reject(Project.dataCore.list, function(item){
+                            return val == item.id;
+                        });
                     }
                 }
             })
 
             $('.confirm').click(function(){
-                Project.dataCore.list=[];
-                $('.contentList tr.selected').each(function(){
-                    Project.dataCore.list.push($(this).find('.colItem').text());
-                })
                 Project.dispatchIE("/?commType=onData");
             })
         },
@@ -368,20 +372,30 @@
         },
 
         loadComponentList:function(param){
-
             var result=Tools.catchPageData(param);
             var data=result.items;
-            var strVar = "";
+            var strVar = "",
+                list=Project.dataCore.list;
             _.each(data,function(item){
-                strVar += " <tr>";
+                var _flag=_.find(list,function(listItem){return listItem.id==item.id });
+                if(_flag){
+                    strVar += " <tr data-item="+item.id+"  class=\"selected\">";
+                }else{
+                    strVar += " <tr data-item="+item.id+">";
+                }
                 strVar += "                    <td class=\"checkbox\">";
-                strVar += "                        <input class=\"checkBoxInput\" type=\"checkbox\">";
+                if(_flag){
+                    strVar += "                        <input checked=\"checked\" class=\"checkBoxInput\" type=\"checkbox\">";
+                }else{
+                    strVar += "                        <input class=\"checkBoxInput\" type=\"checkbox\">";
+                }
                 strVar += "                    <\/td>";
                 strVar += "                    <td  class=\"colItem\">"+item.uniqueId+"<\/td>";
                 strVar += "                <\/tr>";
             })
             $('.contentList').empty().append(strVar);
             this.pageInfo(result);
+
             $('.contentList').niceScroll({
                 cursorcolor:"#CFCFCF",
                 cursoropacitymin: 0.5,
