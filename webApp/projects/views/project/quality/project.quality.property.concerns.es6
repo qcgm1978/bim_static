@@ -200,7 +200,7 @@ App.Project.QualityConcerns=Backbone.View.extend({
 	showInModel(event){
 		var $target=$(event.target).closest("tr");
 		$.ajax({
-			url: "/platform/api/project/"+$target.data('code')+"/meta?token=123"
+			url: "/platform/api/project/"+$target.data('code')+"/meta"
 		}).done(function(data){
 			var _fileId=$target.data('uuid').split('.')[0];
 			if(_fileId){
