@@ -98,7 +98,7 @@ App.Project = {
 			}
 		}
 		if ($(".QualityOpeningAcceptance").is(":visible")) {
-			$(".QualityProcessAcceptance .tbProcessAccessBody tr").removeClass('selected');
+			$(".QualityOpeningAcceptance .tbOpeningacceptanceBody tr").removeClass('selected');
 			if(id){
 				var tr = $(".QualityOpeningAcceptance .tbOpeningacceptanceBody tr[data-id='"+id+"']");
 				if(tr.length>0){
@@ -897,7 +897,6 @@ App.Project = {
 						if (i.location && i.location.indexOf('boundingBox') != -1) {
 							if (type == 'dis') {
 								var _loc = JSON.parse(i.location);
-								_loc.position = JSON.parse(i.axis).position;
 								result.push(_this.formatMark(_loc, "S021".charAt(i.status), i.id, 1));
 								boxs.push(_loc.boundingBox);
 							} else {
@@ -964,7 +963,7 @@ App.Project = {
 		if(opts.id){
 			for(var i=0,size=_len;i<size;i++){
 				if(data[i].id==opts.id){
-					counter=i;
+					counter=i+1;
 					break
 				}
 			}
@@ -1087,6 +1086,7 @@ App.Project = {
 					_this.delFile($item);
 				},
 				'reNameModelProject': function(item) {
+					debugger
 					//重命名
 					let $reNameModel = $("#reNameModelProject");
 					//不可重命名状态
@@ -1100,7 +1100,7 @@ App.Project = {
 					}
 					var $item = $(item),
 						$fileName = $item.find(".fileName"),
-						text = $item.find(".text").hide().text().trim();
+						text = $fileName.find(".text").hide().text().trim();
 					$fileName.append('<input type="text" value="' + text + '" class="txtEdit txtInput" /> <span class="btnEnter myIcon-enter"></span><span class="btnCalcel pointer myIcon-cancel"></span>');
 				}
 			}

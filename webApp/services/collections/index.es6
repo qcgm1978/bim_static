@@ -39,6 +39,9 @@ App.Services = {
 				//问题反馈
 				viewer=new App.Services.Issue();
 			}
+			else if(type == "more"){
+				App.Services.initMorePage();
+			}
 
 			$("#contains").html(viewer.render().el);
 			$("#pageLoading").hide();
@@ -621,5 +624,10 @@ App.Services = {
 			type:processCategory
 		});
 
+	} , 
+
+	initMorePage : function(){
+		var html = _.templateUrl();
+		$("#contains").html();
 	}
 };
