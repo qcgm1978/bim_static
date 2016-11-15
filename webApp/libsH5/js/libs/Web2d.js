@@ -6695,6 +6695,12 @@ CLOUD.Extensions.Annotation.prototype = {
         return CLOUD.DomUtil.cloneStyle(this.style);
     },
 
+    updateStyle: function(style) {
+
+        this.style = CLOUD.DomUtil.cloneStyle(style);
+        this.update();
+    },
+
     update: function () {
     },
 
@@ -7026,6 +7032,8 @@ CLOUD.Extensions.AnnotationRectangle.prototype.renderToCanvas = function (ctx) {
     ctx.lineWidth = strokeWidth;
     ctx.translate(position.x, position.y);
     ctx.rotate(this.rotation);
+
+    ctx.beginPath();
 
     if (fillOpacity !== 0) {
         ctx.fillRect(width / -2, height / -2, width, height);
@@ -7768,10 +7776,12 @@ CLOUD.Extensions.AnnotationCross.prototype.update = function () {
 
     this.shape.setAttribute('transform', this.transformShape);
     this.shape.setAttribute('stroke-width', strokeWidth);
-    this.shape.setAttribute('stroke',strokeColor);
-    this.shape.setAttribute('stroke-opacity',strokeOpacity);
-    this.shape.setAttribute('fill', fillColor);
-    this.shape.setAttribute('fill-opacity', fillOpacity);
+    //this.shape.setAttribute('stroke',strokeColor);
+    //this.shape.setAttribute('stroke-opacity',strokeOpacity);
+    //this.shape.setAttribute('fill', fillColor);
+    //this.shape.setAttribute('fill-opacity', fillOpacity);
+    this.shape.setAttribute("stroke", CLOUD.Extensions.Utils.Shape2D.getRGBAString(strokeColor, strokeOpacity));
+    this.shape.setAttribute('fill', CLOUD.Extensions.Utils.Shape2D.getRGBAString(fillColor, fillOpacity));
     this.shape.setAttribute('d', this.getPath().join(' '));
 };
 
@@ -7825,7 +7835,7 @@ CLOUD.Extensions.AnnotationCross.prototype.renderToCanvas = function (ctx) {
     ctx.rotate(this.rotation);
     ctx.translate(-0.5 * width, -0.5 * height);
 
-    //ctx.beginPath();
+    ctx.beginPath();
 
     ctx.moveTo(0, 0);
     ctx.lineTo(width, height);
@@ -8224,6 +8234,7 @@ CLOUD.Extensions.AnnotationTextArea.prototype.onKeyDown = function () {
     if (!shiftDown && keyCode === 13) {
         event.preventDefault();
         this.accept();
+        this.editor.resetCurrentAnnotationText();
     }
 };
 
@@ -9310,12 +9321,7 @@ CLOUD.Extensions.AnnotationEditor.prototype.onKeyUp = function (event) {
                 this.deselectAnnotation();
             }
 
-            if (this.annotationType === CLOUD.Extensions.Annotation.shapeTypes.TEXT) {
-
-                if (this.annotationTextArea.isActive()) {
-                    this.annotationTextArea.accept();
-                }
-            }
+            this.forceAnnotationTextComplete();
 
             break;
         default :
@@ -9341,6 +9347,11 @@ CLOUD.Extensions.AnnotationEditor.prototype.onResize = function () {
 CLOUD.Extensions.AnnotationEditor.prototype.handleMouseEvent = function (event, type) {
 
     var mode = this.annotationType;
+
+    // 对文本批注的处理
+    if (type === "down" && this.forceAnnotationTextComplete())  {
+        return;
+    }
 
     switch (mode) {
 
@@ -9792,11 +9803,9 @@ CLOUD.Extensions.AnnotationEditor.prototype.mouseDoubleClickForCloud = function 
 
 CLOUD.Extensions.AnnotationEditor.prototype.mouseDownForText = function (event) {
 
-    if (this.annotationTextArea.isActive()) {
-
-        this.annotationTextArea.accept();
-        return;
-    }
+    //if (this.forceAnnotationTextComplete() ) {
+    //    return;
+    //}
 
     if (this.selectedAnnotation) {
         return;
@@ -9813,7 +9822,8 @@ CLOUD.Extensions.AnnotationEditor.prototype.mouseDownForText = function (event) 
     var size = this.getAnnotationWorldSize(clientSize, clientPosition);
 
     var id = this.generateAnnotationId();
-    var text = new CLOUD.Extensions.AnnotationText(this, id);
+    //var text = new CLOUD.Extensions.AnnotationText(this, id);
+    var text = this.currentAnnotationText =  new CLOUD.Extensions.AnnotationText(this, id);
     text.set(position, size, 0, '');
     this.addAnnotation(text);
     text.created();
@@ -9831,9 +9841,11 @@ CLOUD.Extensions.AnnotationEditor.prototype.mouseDoubleClickForText = function (
 
         if (this.selectedAnnotation && (this.selectedAnnotation.shapeType === CLOUD.Extensions.Annotation.shapeTypes.TEXT)) {
 
+            this.currentAnnotationText = annotation;
             this.selectedAnnotation.hide();
             this.deselectAnnotation();
             this.annotationTextArea.active(annotation, false);
+
         }
     }
 };
@@ -9907,20 +9919,17 @@ CLOUD.Extensions.AnnotationEditor.prototype.isInitialized = function () {
 
 CLOUD.Extensions.AnnotationEditor.prototype.destroy = function () {
 
-    if (this.annotationTextArea) {
-
-        if (this.annotationTextArea.isActive()) {
-
-            this.annotationTextArea.accept();
-        }
-    }
-
+    this.forceAnnotationTextComplete();
     this.deselectAnnotation();
 
     if (this.annotationFrame) {
 
         this.annotationFrame.destroy();
         this.annotationFrame = null;
+    }
+
+    if (this.currentAnnotationText) {
+        this.currentAnnotationText = null;
     }
 };
 
@@ -9971,9 +9980,7 @@ CLOUD.Extensions.AnnotationEditor.prototype.editEnd = function () {
 
     this.isEditing = false;
 
-    if (this.annotationTextArea && this.annotationTextArea.isActive()) {
-        this.annotationTextArea.accept();
-    }
+    this.forceAnnotationTextComplete();
 
     if (this.svgGroup && this.svgGroup.parentNode) {
         //this.svg.removeChild(this.svgGroup);
@@ -10036,6 +10043,8 @@ CLOUD.Extensions.AnnotationEditor.prototype.clear = function () {
 };
 
 CLOUD.Extensions.AnnotationEditor.prototype.setAnnotationType = function (type) {
+
+    this.forceAnnotationTextComplete();
 
     this.annotationType = type;
 
@@ -10290,6 +10299,34 @@ CLOUD.Extensions.AnnotationEditor.prototype.enableSVGPaint = function (enable) {
 
 };
 
+// 强制结束文本批注的编辑
+CLOUD.Extensions.AnnotationEditor.prototype.forceAnnotationTextComplete = function () {
+
+    //if (this.annotationType === CLOUD.Extensions.Annotation.shapeTypes.TEXT) {
+
+        if (this.annotationTextArea && this.annotationTextArea.isActive()) {
+
+            this.annotationTextArea.accept();
+
+            if (this.currentAnnotationText) {
+                this.currentAnnotationText = null;
+            }
+
+            return true;
+        }
+    //}
+
+    return false;
+};
+
+// 强制结束文本批注的编辑
+CLOUD.Extensions.AnnotationEditor.prototype.resetCurrentAnnotationText = function () {
+
+    if (this.currentAnnotationText) {
+        this.currentAnnotationText = null;
+    }
+};
+
 // ---------------------------- 外部 API BEGIN ---------------------------- //
 
 // 屏幕快照
@@ -10351,14 +10388,7 @@ CLOUD.Extensions.AnnotationEditor.prototype.setBackgroundColor = function (start
 CLOUD.Extensions.AnnotationEditor.prototype.getAnnotationInfoList = function () {
 
     // 强行完成
-
-    if (this.annotationType === CLOUD.Extensions.Annotation.shapeTypes.TEXT) {
-
-        if (this.annotationTextArea.isActive()) {
-            this.annotationTextArea.accept();
-        }
-    }
-
+    this.forceAnnotationTextComplete();
     this.createAnnotationEnd();
     this.deselectAnnotation();
 
@@ -10505,9 +10535,25 @@ CLOUD.Extensions.AnnotationEditor.prototype.hideAnnotations = function () {
 };
 
 // 设置批注风格（边框色，填充色，字体大小等等）
-CLOUD.Extensions.AnnotationEditor.prototype.setAnnotationStyle = function (style) {
+CLOUD.Extensions.AnnotationEditor.prototype.setAnnotationStyle = function (style, updateText) {
 
     this.annotationStyle = CLOUD.DomUtil.cloneStyle(style);
+
+    if (updateText) {
+
+        //if (this.annotationType === CLOUD.Extensions.Annotation.shapeTypes.TEXT) {
+
+            // 对文本特殊处理
+            if (this.currentAnnotationText) {
+                this.currentAnnotationText.updateStyle(style);
+
+                if (this.annotationTextArea) {
+                    this.annotationTextArea.setStyle(style);
+                }
+            }
+       // }
+    }
+
 };
 
 // 更新所有批注
@@ -11332,7 +11378,7 @@ CLOUD.Extensions.AnnotationHelper.prototype = {
     },
 
     // 设置批注风格
-    setAnnotationStyle: function (style) {
+    setAnnotationStyle: function (style, updateText) {
 
         if (this.annotationEditor) {
 
@@ -11344,8 +11390,7 @@ CLOUD.Extensions.AnnotationHelper.prototype = {
 
             }
 
-            this.annotationEditor.setAnnotationStyle(this.defaultStyle);
-
+            this.annotationEditor.setAnnotationStyle(this.defaultStyle, updateText);
         }
     },
 
@@ -11524,7 +11569,7 @@ CLOUD.Extensions.FreeAnnotationHelper.prototype = {
         }
     },
 
-    setAnnotationStyle: function (style) {
+    setAnnotationStyle: function (style, updateText) {
 
         if (this.annotationEditor) {
 
@@ -11536,7 +11581,7 @@ CLOUD.Extensions.FreeAnnotationHelper.prototype = {
 
             }
 
-            this.annotationEditor.setAnnotationStyle(this.defaultStyle);
+            this.annotationEditor.setAnnotationStyle(this.defaultStyle, updateText);
 
         }
     },

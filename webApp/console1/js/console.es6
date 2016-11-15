@@ -47,7 +47,62 @@ App.Console = {
     }
 
   },
+  fn : {},
+  search(){
+    var tpl = _.templateUrl('/console1/tpls/search.html', true);
+    $("#contains").append(tpl);
+    //remove
+    $('#search_person').on('click','i',function(e){
+      $(e.target).parent().remove();
+    });
+    $('#search_person .btn').click(function(e){
+      var account = $('.wrap input').val();
+      $.ajax({
+        url    : "platform/loginUser/"+account
+      }).done(function(data){
+        if(data.code == 0){
+          $('#results').html('').append('<li name='+data.data.name+' loginId='+data.data.loginName+' uId='+data.data.userId+' ondragstart="drag(event)" draggable="true">'+data.data.name+'</li>')
+        }
 
+      });
+    });
+    window.drop=function(e){
+      var loginId=e.dataTransfer.getData('loginId'),
+          uId=e.dataTransfer.getData('uId'),
+          name=e.dataTransfer.getData('name');
+      $(e.currentTarget).append('<div draggable="true" ondragstart="drag(event)" class="name" name='+name+' uId='+uId+' loginId='+loginId+'>'+name+'<i>X</i></div>')
+
+    }
+    $('.boxs').on('dragover',function(e){
+      e.preventDefault();
+    })
+    window.drag=function(ev){
+      console.log(ev)
+      ev.dataTransfer.setData("loginId", ev.target.getAttribute('loginId'));
+      ev.dataTransfer.setData("uId", ev.target.getAttribute('uId'));
+      ev.dataTransfer.setData("name", ev.target.getAttribute('name'));
+    }
+  },
+  getPerson(index){
+    var obj = {},
+        arr = [],
+        boxs = $('.boxs');
+    if (index==0){
+      var ele = boxs.eq(0).find('.name').eq(0);
+      return {
+        userId : ele.attr('uid'),
+        loginId: ele.attr('loginid')
+      };
+    }else{
+
+        var ele = boxs.eq(index).find('.name');
+      console.log(ele)
+        ele.each(function(index,ele){
+          arr.push({userId:$(ele).attr('uid'),loginId:$(ele).attr('loginid')})
+        });
+        return arr;
+    }
+  },
   ajaxPost(data, callback) {
 
     var stringData = JSON.stringify(data.data);
@@ -69,6 +124,7 @@ App.Console = {
   fam(){
     var tpl = _.templateUrl('/console1/tpls/fam/fam.html', true);
     $("#contains").html(tpl);
+    this.search();
     $.ajax({
       url: "platform/project?type=2&versionStatus=9&pageItemCount=100000"
     }).done(function(data){
@@ -83,45 +139,53 @@ App.Console = {
       });
       $("#p11").html('<option value="">请选择</option>'+str);
     });
-    //获取族库研发指令表单
-    //App.Console.auditSheet1(1, "#s21", 16);
+    this.fn['4.3']=function(){
+      //获取族库审核审批单
+      App.Console.auditSheet1(2, "#s31", 8);
+    }
 
-    //获取族库审核审批单
-    App.Console.auditSheet1(2, "#s31", 8);
     //App.Console.auditSheet1(2, "#s41", 16);
+    this.fn['4.5']=function(){
+      //获取族库发版审批单
+      App.Console.auditSheet1(3, "#s51", 8);
+    }
 
-    //获取族库发版审批单
-    App.Console.auditSheet1(3, "#s51", 8);
     //4.2
-    $.ajax({
-      url: "platform/api/family?status=3,6"
-    }).done(function(data){
+    this.fn['4.2']=function(){
+      $.ajax({
+        url: "platform/api/family?status=3,6"
+      }).done(function(data){
 
-      var items = data.data, str = '';
+        var items = data.data, str = '';
 
-      $.each(items, function(i, item){
-        if(item.code){
-          str += '<option id="' + item.code  + '">' + item.name + '</option>';
-        }
+        $.each(items, function(i, item){
+          if(item.code){
+            str += '<option id="' + item.code  + '">' + item.name + '</option>';
+          }
 
+        });
+        $("#s21").html("<option value=''>请选择</option>"+str);
       });
-      $("#s21").html("<option value=''>请选择</option>"+str);
-    });
+    }
+
     //4.4
-    $.ajax({
-      url: "platform/api/family?status=5,8"
-    }).done(function(data){
+    this.fn['4.4']=function(){
+      $.ajax({
+        url: "platform/api/family?status=5,8"
+      }).done(function(data){
 
-      var items = data.data, str = '';
+        var items = data.data, str = '';
 
-      $.each(items, function(i, item){
-        if(item.code){
-          str += '<option id="' + item.code  + '">' + item.name + '</option>';
-        }
+        $.each(items, function(i, item){
+          if(item.code){
+            str += '<option id="' + item.code  + '">' + item.name + '</option>';
+          }
 
+        });
+        $("#s41").html("<option value=''>请选择</option>"+str);
       });
-      $("#s41").html("<option value=''>请选择</option>"+str);
-    });
+    }
+
 
     $("#submit1").click(function(){
       var data       = {
@@ -142,10 +206,10 @@ App.Console = {
             "status"           : 16,
             "workflowId"       : parseInt(9999999 * Math.random()),
             "title"            : $("#p12").val().trim(),
-            "initiator"        : JSON.parse($("#p14").val().trim()),
-            "auditor"          : JSON.parse($("#p15").val().trim()),
-            "confirmor"        : JSON.parse($("#p16").val().trim()),
-            "receiver"         : JSON.parse($("#p17").val().trim())
+            "initiator"        : App.Console.getPerson(0),
+            "auditor"          : App.Console.getPerson(1),
+            "confirmor"        : App.Console.getPerson(2),
+            "receiver"         : App.Console.getPerson(3)
           }
         }),
         "msgCreateTime": 1461727280227,
@@ -166,9 +230,15 @@ App.Console = {
         workflowId             : parseInt(9999999 * Math.random()),
         //familyDevelopWorkflowId: $('#s21').val().trim(),
         familyCode: $('#s21').val().trim(),
-        title                  : $("#p21").val().trim()
+        title                  : $("#p21").val().trim(),
+        description            : $("#p22").val().trim(),
+        "initiator"        : App.Console.getPerson(0),
+        "auditor"          : App.Console.getPerson(1),
+        "confirmor"        : App.Console.getPerson(2),
+        "receiver"         : App.Console.getPerson(3)
+
       };
-      App.Console.apply(1, 1003, data);
+      App.Console.quest(1, 1003, data);
     });
 
     $("#submit3").click(function(){
@@ -195,7 +265,11 @@ App.Console = {
         workflowId             : parseInt(9999999 * Math.random()),
         //familyAprovalWorkflowId: $('#s41').val().trim(),
         familyCode: $('#s41').val().trim(),
-        title                  : $("#p41").val().trim()
+        title                  : $("#p41").val().trim(),
+        "initiator"        : App.Console.getPerson(0),
+        "auditor"          : App.Console.getPerson(1),
+        "confirmor"        : App.Console.getPerson(2),
+        "receiver"         : App.Console.getPerson(3)
 
       };
       App.Console.apply(3, 1005, data);
@@ -599,7 +673,205 @@ App.Console = {
 
     });
   },
+  //项目变更
+  projectChange() {
+    var tpl = _.templateUrl('/console1/tpls/projectChange/projectchange.html', true);
+    $("#contains").html(tpl);
+    $.ajax({
+      url: "platform/project?type=3&pageItemCount=100000"
+    }).done(function(data){
 
+      var items = data.data.items, str = '';
+
+      $.each(items, function(i, item){
+        if(item.id){
+
+          str += '<option id="' + item.id + '" value="' + item.projectNo + '">' + item.name + '</option>';
+        }
+
+      });
+      $("#s11").html("<option value=''>请选择</option>"+str).change(function(){
+        $.ajax({
+          url: "platform/project/" + $(this).find('option:selected').attr('id') + "/version"
+        }).done(function(data){
+
+          var items = data.data, str = '';
+
+          $.each(items, function(i, item){
+            if(item.id){
+
+              str += '<option  value="' + item.id + '">' + item.name + '</option>';
+            }
+
+          });
+          $("#s12").html(str);
+
+        });
+      });
+    });
+    App.Console.auditSheet1(9, '#s21', 8);
+    //App.Console.auditSheet1(9, '#s31', 16);
+    App.Console.auditSheet1(10, '#s41', 8);
+    //App.Console.auditSheet1(10, '#s51', 16);
+    App.Console.auditSheet1(11, '#s61', 8);
+    //7.3
+    $.ajax({
+      //url: "platform/api/workflow/project?status=10"
+      url: "platform/api/workflow/project?status=10,12"
+    }).done(function(data){
+
+      var items = data.data, str = '';
+
+      $.each(items, function(i, item){
+        if(item.projectCode){
+          str += '<option  value="' + item.projectCode + '" id="' + item.projectCode  + '">' + item.name + '</option>';
+        }
+
+      });
+      $("#s31").html("<option value=''>请选择</option>"+str).change(function(){
+        $.ajax({
+          url: "platform/api/workflow/project/"+$(this).find('option:selected').attr('id')+"/version?status=10"
+        }).done(function(data){
+
+          var items = data.data, str = '';
+
+          $.each(items, function(i, item){
+            if(item.id){
+
+              str += '<option  value="' + item.id + '">' + item.name + '</option>';
+            }
+
+          });
+          $("#s311").html(str);
+
+        });
+      });
+    });
+    //7.5
+    $.ajax({
+      //url: "platform/api/workflow/project?status=11"
+      //url: "api/workflow/project?status=11,12"
+      url: "platform/api/workflow/project?status=11,12"
+    }).done(function(data){
+
+      var items = data.data, str = '';
+
+      $.each(items, function(i, item){
+        if(item.projectCode){
+          str += '<option  value="' + item.projectCode + '" id="' + item.projectCode  + '">' + item.name + '</option>';
+        }
+
+      });
+      $("#s51").html("<option value=''>请选择</option>"+str).change(function(){
+        $.ajax({
+          url: "platform/api/workflow/project/"+$(this).find('option:selected').attr('id')+"/version?status=11"
+        }).done(function(data){
+
+          var items = data.data, str = '';
+
+          $.each(items, function(i, item){
+            if(item.id){
+
+              str += '<option  value="' + item.id + '">' + item.name + '</option>';
+            }
+
+          });
+          $("#s511").html(str);
+
+        });
+      });
+    });
+    var data;
+    $("#submit4").click(function(){
+      //var files = [],i,
+      //  ids = $('#p14').val().trim().split(',');
+      //for(i = 0; i<ids.length;i++){
+      //  files.push({"fileId":ids[i]})
+      //}
+      //console.log(files)
+      data = {
+        title                   : $('#p11').val().trim(),
+        workflowId              : parseInt(9999999 * Math.random()),
+        projectVersionName      : $('#p12').val().trim(),
+        refProjectModelCode       : $('#s11').val(),
+        refProjectModelName     : $('#s11 option:selected').text().trim(),
+        projectModelCode             : $('#s11').val(),
+        refProjectModelVersionId: $('#s12').val().trim(),
+        description             : $('#p13').val().trim(),
+        //changedFiles            : files,
+        status                  : 8
+      };
+      App.Console.apply(1, 1017, data);
+    });
+    $("#submit5").click(function(){
+      data = {
+        workflowId: $('#s21').val().trim(),
+        status    : 16,
+        title     : $('#p21').val().trim()
+      };
+      App.Console.apply(2, 1018, data);
+    });
+    $("#submit55").click(function(){
+      data = {
+        workflowId: $('#s21').val().trim(),
+        status    : 4,
+        title     : $('#p21').val().trim()
+      };
+      App.Console.apply(2, 1018, data);
+    });
+    $("#submit6").click(function(){
+      data = {
+        workflowId                       : parseInt(9999999 * Math.random()),
+        //projectModelChangeApplyWorkflowId: $('#s31').val().trim(),
+        projectModelCode: $('#s31').val().trim(),
+        versionId: $('#s311').val().trim(),
+        status                           : 8,
+        title                            : $('#p31').val().trim()
+      };
+      App.Console.apply(3, 1019, data);
+    });
+    $("#submit7").click(function(){
+      data = {
+        workflowId: $('#s41').val().trim(),
+        status    : 16,
+        title     : $('#p41').val().trim()
+      };
+      App.Console.apply(4, 1020, data);
+    });
+    $("#submit77").click(function(){
+      data = {
+        workflowId: $('#s41').val().trim(),
+        status    : 4,
+        title     : $('#p41').val().trim()
+      };
+      App.Console.apply(4, 1020, data);
+    });
+    $("#submit8").click(function(){
+      data = {
+        workflowId                         : parseInt(9999999 * Math.random()),
+        //projectModelChangeAprovalWorkflowId: $('#s51').val().trim(),
+        projectModelCode: $('#s51').val().trim(),
+        versionId: $('#s511').val().trim(),
+        status                             : 8,
+        title                              : $('#p51').val().trim()
+      };
+      App.Console.apply(5, 1021, data);
+    });
+    $("#submit9").click(function(){
+      data = {
+        workflowId: $('#s61').val().trim(),
+        status    : 16
+      };
+      App.Console.apply(6, 1022, data);
+    });
+    $("#submit99").click(function(){
+      data = {
+        workflowId: $('#s61').val().trim(),
+        status    : 4
+      };
+      App.Console.apply(6, 1022, data);
+    });
+  },
   //质量监测
   qualityMonitoring(){
     var Settings = App.Console.Settings;
@@ -632,7 +904,8 @@ App.Console = {
       App.Console.qm4();
 
     }
-  }, //获取项目列表
+  },
+  //获取项目列表
   getProjects(Type, cb){
     $.ajax({
       url: "/platform/project?type=" + Type
@@ -640,7 +913,8 @@ App.Console = {
 
       cb(data)
     });
-  }, //获取项目质量材料设备列表
+  },
+  //获取项目质量材料设备列表
   qm1(){
     $.ajax({
       url: "/platform/mapping/project?type=3"
@@ -873,203 +1147,49 @@ App.Console = {
 
     });
 
-  }, //项目变更
-  projectChange() {
-    var tpl = _.templateUrl('/console1/tpls/projectChange/projectchange.html', true);
-    $("#contains").html(tpl);
+  },
+  quest(index, num, obj, type){
+    var datainit = JSON.parse($('#data' + index).val());
+    if(typeof obj != 'undefined'){
+      console.log(datainit)
+      for(var g in obj){
+        datainit[g] = obj[g];
+
+      }
+
+
+      var data = {
+        "msgContent"   : JSON.stringify({
+          "messageId"  : "411a109141d6473c83a86aa0480d6610",
+          "messageType": (type == '1' ? "QUALITY-" :(type=='2'?"COST-": "PLAN-")) + num,
+          "message"    : "是",
+          "timestamp"  : (new Date).getTime(),
+          "code"       : 0,
+          "data"       : type == 1 ? new Array(datainit) : datainit
+
+        }),
+        "msgCreateTime": 1461727280227,
+        "msgId"        : "b2e5b467ef214f6196ac3f826017806e",
+        "msgSendTime"  : 0,
+        "srcMsgType"   : (type == '1' ? "QUALITY-" :(type=='2'?"COST-": "PLAN-")) + "BIM",
+        "retryTimes"   : 0,
+        "status"       : 0,
+        "sysCode"      : "1"
+      };
+    }
+
     $.ajax({
-      url: "platform/project?type=3&pageItemCount=100000"
+      url    : type == 1 ? "sixD/internal/message" : "platform/internal/message",
+      data   : JSON.stringify(data),
+      headers: {
+        "Content-Type": "application/json"
+      },
+      type   : "POST"
     }).done(function(data){
+      $("#result" + index).val(JSON.stringify(data))
+      console.log(data);
+      alert(data.message || data.code)
 
-      var items = data.data.items, str = '';
-
-      $.each(items, function(i, item){
-        if(item.id){
-
-          str += '<option id="' + item.id + '" value="' + item.projectNo + '">' + item.name + '</option>';
-        }
-
-      });
-      $("#s11").html("<option value=''>请选择</option>"+str).change(function(){
-        $.ajax({
-          url: "platform/project/" + $(this).find('option:selected').attr('id') + "/version"
-        }).done(function(data){
-
-          var items = data.data, str = '';
-
-          $.each(items, function(i, item){
-            if(item.id){
-
-              str += '<option  value="' + item.id + '">' + item.name + '</option>';
-            }
-
-          });
-          $("#s12").html(str);
-
-        });
-      });
-    });
-    App.Console.auditSheet1(9, '#s21', 8);
-    //App.Console.auditSheet1(9, '#s31', 16);
-    App.Console.auditSheet1(10, '#s41', 8);
-    //App.Console.auditSheet1(10, '#s51', 16);
-    App.Console.auditSheet1(11, '#s61', 8);
-    //7.3
-    $.ajax({
-      //url: "platform/api/workflow/project?status=10"
-      url: "platform/api/workflow/project?status=10,12"
-    }).done(function(data){
-
-      var items = data.data, str = '';
-
-      $.each(items, function(i, item){
-        if(item.projectCode){
-          str += '<option  value="' + item.projectCode + '" id="' + item.projectCode  + '">' + item.name + '</option>';
-        }
-
-      });
-      $("#s31").html("<option value=''>请选择</option>"+str).change(function(){
-        $.ajax({
-          url: "platform/api/workflow/project/"+$(this).find('option:selected').attr('id')+"/version?status=10"
-        }).done(function(data){
-
-          var items = data.data, str = '';
-
-          $.each(items, function(i, item){
-            if(item.id){
-
-              str += '<option  value="' + item.id + '">' + item.name + '</option>';
-            }
-
-          });
-          $("#s311").html(str);
-
-        });
-      });
-    });
-    //7.5
-    $.ajax({
-      //url: "platform/api/workflow/project?status=11"
-      //url: "api/workflow/project?status=11,12"
-      url: "platform/api/workflow/project?status=11,12"
-    }).done(function(data){
-
-      var items = data.data, str = '';
-
-      $.each(items, function(i, item){
-        if(item.projectCode){
-          str += '<option  value="' + item.projectCode + '" id="' + item.projectCode  + '">' + item.name + '</option>';
-        }
-
-      });
-      $("#s51").html("<option value=''>请选择</option>"+str).change(function(){
-        $.ajax({
-          url: "platform/api/workflow/project/"+$(this).find('option:selected').attr('id')+"/version?status=11"
-        }).done(function(data){
-
-          var items = data.data, str = '';
-
-          $.each(items, function(i, item){
-            if(item.id){
-
-              str += '<option  value="' + item.id + '">' + item.name + '</option>';
-            }
-
-          });
-          $("#s511").html(str);
-
-        });
-      });
-    });
-    var data;
-    $("#submit4").click(function(){
-      //var files = [],i,
-      //  ids = $('#p14').val().trim().split(',');
-      //for(i = 0; i<ids.length;i++){
-      //  files.push({"fileId":ids[i]})
-      //}
-      //console.log(files)
-      data = {
-        title                   : $('#p11').val().trim(),
-        workflowId              : parseInt(9999999 * Math.random()),
-        projectVersionName      : $('#p12').val().trim(),
-        refProjectModelCode       : $('#s11').val(),
-        refProjectModelName     : $('#s11 option:selected').text().trim(),
-        projectModelCode             : $('#s11').val(),
-        refProjectModelVersionId: $('#s12').val().trim(),
-        description             : $('#p13').val().trim(),
-        //changedFiles            : files,
-        status                  : 8
-      };
-      App.Console.apply(1, 1017, data);
-    });
-    $("#submit5").click(function(){
-      data = {
-        workflowId: $('#s21').val().trim(),
-        status    : 16,
-        title     : $('#p21').val().trim()
-      };
-      App.Console.apply(2, 1018, data);
-    });
-    $("#submit55").click(function(){
-      data = {
-        workflowId: $('#s21').val().trim(),
-        status    : 4,
-        title     : $('#p21').val().trim()
-      };
-      App.Console.apply(2, 1018, data);
-    });
-    $("#submit6").click(function(){
-      data = {
-        workflowId                       : parseInt(9999999 * Math.random()),
-        //projectModelChangeApplyWorkflowId: $('#s31').val().trim(),
-        projectModelCode: $('#s31').val().trim(),
-        versionId: $('#s311').val().trim(),
-        status                           : 8,
-        title                            : $('#p31').val().trim()
-      };
-      App.Console.apply(3, 1019, data);
-    });
-    $("#submit7").click(function(){
-      data = {
-        workflowId: $('#s41').val().trim(),
-        status    : 16,
-        title     : $('#p41').val().trim()
-      };
-      App.Console.apply(4, 1020, data);
-    });
-    $("#submit77").click(function(){
-      data = {
-        workflowId: $('#s41').val().trim(),
-        status    : 4,
-        title     : $('#p41').val().trim()
-      };
-      App.Console.apply(4, 1020, data);
-    });
-    $("#submit8").click(function(){
-      data = {
-        workflowId                         : parseInt(9999999 * Math.random()),
-        //projectModelChangeAprovalWorkflowId: $('#s51').val().trim(),
-        projectModelCode: $('#s51').val().trim(),
-        versionId: $('#s511').val().trim(),
-        status                             : 8,
-        title                              : $('#p51').val().trim()
-      };
-      App.Console.apply(5, 1021, data);
-    });
-    $("#submit9").click(function(){
-      data = {
-        workflowId: $('#s61').val().trim(),
-        status    : 16
-      };
-      App.Console.apply(6, 1022, data);
-    });
-    $("#submit99").click(function(){
-      data = {
-        workflowId: $('#s61').val().trim(),
-        status    : 4
-      };
-      App.Console.apply(6, 1022, data);
     });
   },
   apply(index, num, obj, type){
@@ -1183,7 +1303,7 @@ App.Console = {
       console.log(data)
       if(data.code == 0){
         alert("成功");
-        window.location.reload();
+        //window.location.reload();
       }
 
     });
@@ -1203,7 +1323,7 @@ App.Console = {
           }
 
         });
-        $(selector).append(str);
+        $(selector).html(str);
       }
     });
   },
