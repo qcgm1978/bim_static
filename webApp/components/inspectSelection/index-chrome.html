@@ -38,7 +38,12 @@
         callback: function (res) {
             $('#test').val(JSON.stringify(res))
         },
-        withCheckpoint : false
+        withCheckpoint : false  
+        /*
+        withCheckpoint参数可选,默认为true
+        withCheckpoint = false 隐藏检查点页签
+        withCheckpoint = true  显示检查点页签
+        */
     });
 
 

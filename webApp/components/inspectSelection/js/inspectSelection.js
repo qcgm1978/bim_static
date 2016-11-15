@@ -853,6 +853,7 @@
 		}
 	}
 	InspectModelSelection.prototype = {
+		/*隐藏检查点页签*/
 		hideCheckpoint : function(){
 			var $tab = this.$dialog.find(".projectPropetyHeader");
 			var $tabLi = $tab.find("li");
@@ -861,6 +862,7 @@
 			$("#presetPointPanel").hide();
 			$("#propertyPanel").show();						
 		},
+		/*显示检查点页签*/
 		showCheckpoint : function(){
 			var $tab = this.$dialog.find(".projectPropetyHeader");
 			var $tabLi = $tab.find("li");
