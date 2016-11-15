@@ -2278,6 +2278,7 @@ App.Project = {
 				ids: _hideFileIds,
 				total: [_secenId]
 			});
+			_this.zoomModelOther(ids, box);
 			return;
 		}
 		//没有分类的时候 只过滤单文件 end
