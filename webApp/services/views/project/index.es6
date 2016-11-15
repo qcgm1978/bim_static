@@ -143,47 +143,47 @@
 
 
  		
- 		//加载基坑数据
- 		this.viewProjectBaseHole.setUserData({
- 			projectId:_projectId
- 		});
- 		let collectionBasehole=App.Services.ProjectCollection.ProjecDetailBaseHoleCollection;
- 		collectionBasehole.projectId=_projectId;
- 		collectionBasehole.reset();
- 		collectionBasehole.fetch({
- 			success(child, data) {
+ 		//加载基坑数据 张延凯---注释了这里的代码 如果有其他问题可以去掉注释
+ 		// this.viewProjectBaseHole.setUserData({
+ 		// 	projectId:_projectId
+ 		// });
+ 		// let collectionBasehole=App.Services.ProjectCollection.ProjecDetailBaseHoleCollection;
+ 		// collectionBasehole.projectId=_projectId;
+ 		// collectionBasehole.reset();
+ 		// collectionBasehole.fetch({
+ 		// 	success(child, data) {
  				
- 				App.Services.ProjectCollection.datas.pitData=data.data.pits;
- 				//加载楼层信息数据
-		 		_this.viewProjectFloor.setUserData({
-		 			projectId:_projectId
-		 		});
-		 		let collectionFloor=App.Services.ProjectCollection.ProjecDetailFloorCollection;
-		 		collectionFloor.projectId=_projectId;
-		 		collectionFloor.reset();
-		 		collectionFloor.fetch();
+ 		// 		App.Services.ProjectCollection.datas.pitData=data.data.pits;
+ 		// 		//加载楼层信息数据
+		 // 		_this.viewProjectFloor.setUserData({
+		 // 			projectId:_projectId
+		 // 		});
+		 // 		let collectionFloor=App.Services.ProjectCollection.ProjecDetailFloorCollection;
+		 // 		collectionFloor.projectId=_projectId;
+		 // 		collectionFloor.reset();
+		 // 		collectionFloor.fetch();
 		 		
-		 		//加载剖面信息
-		 		_this.viewProjectSection.setUserData({
-		 			projectId:_projectId
-		 		});
-		 		let collectionSection=App.Services.ProjectCollection.ProjecDetailSectionCollection;
-		 		collectionSection.projectId=_projectId;
-		 		collectionSection.reset();
-		 		collectionSection.fetch();
+		 // 		//加载剖面信息
+		 // 		_this.viewProjectSection.setUserData({
+		 // 			projectId:_projectId
+		 // 		});
+		 // 		let collectionSection=App.Services.ProjectCollection.ProjecDetailSectionCollection;
+		 // 		collectionSection.projectId=_projectId;
+		 // 		collectionSection.reset();
+		 // 		collectionSection.fetch();
 		 		
-		 		//加载桩信息
-		 		_this.viewProjectPile.setUserData({
-		 			projectId:_projectId
-		 		});
-		 		let collectionPile=App.Services.ProjectCollection.ProjecDetailPileCollection;
-		 		collectionPile.projectId=_projectId;
-		 		collectionPile.fetch({
-		 			reset:true
-		 		});
+		 // 		//加载桩信息
+		 // 		_this.viewProjectPile.setUserData({
+		 // 			projectId:_projectId
+		 // 		});
+		 // 		let collectionPile=App.Services.ProjectCollection.ProjecDetailPileCollection;
+		 // 		collectionPile.projectId=_projectId;
+		 // 		collectionPile.fetch({
+		 // 			reset:true
+		 // 		});
  				
- 			}
- 		});
+ 		// 	}
+ 		// });
  		
  		
  		
