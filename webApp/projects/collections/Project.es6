@@ -897,7 +897,6 @@ App.Project = {
 						if (i.location && i.location.indexOf('boundingBox') != -1) {
 							if (type == 'dis') {
 								var _loc = JSON.parse(i.location);
-								_loc.position = JSON.parse(i.axis).position;
 								result.push(_this.formatMark(_loc, "S021".charAt(i.status), i.id, 1));
 								boxs.push(_loc.boundingBox);
 							} else {
@@ -1087,6 +1086,7 @@ App.Project = {
 					_this.delFile($item);
 				},
 				'reNameModelProject': function(item) {
+					debugger
 					//重命名
 					let $reNameModel = $("#reNameModelProject");
 					//不可重命名状态
@@ -1100,7 +1100,7 @@ App.Project = {
 					}
 					var $item = $(item),
 						$fileName = $item.find(".fileName"),
-						text = $item.find(".text").hide().text().trim();
+						text = $fileName.find(".text").hide().text().trim();
 					$fileName.append('<input type="text" value="' + text + '" class="txtEdit txtInput" /> <span class="btnEnter myIcon-enter"></span><span class="btnCalcel pointer myIcon-cancel"></span>');
 				}
 			}
@@ -2278,6 +2278,7 @@ App.Project = {
 				ids: _hideFileIds,
 				total: [_secenId]
 			});
+			_this.zoomModelOther(ids, box);
 			return;
 		}
 		//没有分类的时候 只过滤单文件 end

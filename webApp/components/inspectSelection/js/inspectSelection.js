@@ -792,6 +792,9 @@
 
 	//模态框模型选择器对象
 	var InspectModelSelection = function(options) {
+		/*
+		options.withCheckpoint = false|true ; // default is true ; 功能:当为false时隐藏“检查点”页签
+		*/
 
 		var _this = this;
 		//强制new
@@ -804,6 +807,8 @@
 			appKey: "18fbec1ae3da477fb47d842a53164b14",
 			token: "abc3f4a2981217088aed5ecf8ede5b6397eed0795978449bda40a6987f9d6f7b0d061e9c8ad279d740ef797377b4995eb55766ccf753691161e73c592cf2416f9744adce39e1c37623a794a245027e79cd3573e7938aff5b4913fe3ed4dbea6d5be4693d85fe52f972e47e6da4617a508e5948f65135c63f"
 		}
+
+		this.withCheckpoint = options.withCheckpoint==undefined ? true : options.withCheckpoint;
 
 		//合并参数
 		this.Settings = $.extend(defaults, options);
@@ -848,7 +853,23 @@
 		}
 	}
 	InspectModelSelection.prototype = {
-
+		hideCheckpoint : function(){
+			var $tab = this.$dialog.find(".projectPropetyHeader");
+			var $tabLi = $tab.find("li");
+			$tabLi[0].style.display="none";
+			$($tabLi[1]).addClass("selected");
+			$("#presetPointPanel").hide();
+			$("#propertyPanel").show();						
+		},
+		showCheckpoint : function(){
+			var $tab = this.$dialog.find(".projectPropetyHeader");
+			var $tabLi = $tab.find("li");
+			$tabLi[0].style.display="block";
+			$($tabLi[0]).removeClass("selected");
+			$($tabLi[1]).addClass("selected");
+			$("#presetPointPanel").hide();
+			$("#propertyPanel").show();					
+		},
 		initCookie: function(ourl, appKey, token) {
 			var that = this,
 				isVerification = false,
@@ -915,6 +936,11 @@
 				$.getScript(commjs, function() {
 					self.dialog();
 					self.controll();
+					/*隐藏检查点页签*/
+					if(!self.withCheckpoint)
+					{
+						self.hideCheckpoint();
+					}
 				})
 
 				return;
@@ -924,6 +950,11 @@
 				$.getScript(commjs, function() {
 					self.dialog();
 					self.controll();
+					/*隐藏检查点页签*/
+					if(!self.withCheckpoint)
+					{
+						self.hideCheckpoint();
+					}
 				})
 			});
 		},
