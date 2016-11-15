@@ -87,7 +87,7 @@ App.Console = {
     var obj = {},
         arr = [],
         boxs = $('.boxs');
-    if (index==1){
+    if (index==0){
       var ele = boxs.eq(0).find('.name').eq(0);
       return {
         userId : ele.attr('uid'),
@@ -95,7 +95,7 @@ App.Console = {
       };
     }else{
 
-        var ele = boxs.eq(index-1).find('.name');
+        var ele = boxs.eq(index).find('.name');
       console.log(ele)
         ele.each(function(index,ele){
           arr.push({userId:$(ele).attr('uid'),loginId:$(ele).attr('loginid')})
@@ -1303,7 +1303,7 @@ App.Console = {
       console.log(data)
       if(data.code == 0){
         alert("成功");
-        window.location.reload();
+        //window.location.reload();
       }
 
     });
