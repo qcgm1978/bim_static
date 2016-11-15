@@ -17,6 +17,8 @@
     <button mtype="4">解绑检查点</button>
     <button mtype="5">解绑隐患</button>
     <button mtype="6">确定</button>
+    <button mtype="7">显示检查点页签</button>
+    <button mtype="8">隐藏检查点页签</button>
     <textarea name="" id="test" cols="30" rows="10"></textarea>
 </div>
 
@@ -28,12 +30,15 @@
         ruleType: '',//构件分类
         height:"380px",
         //projectCode:"184df75d-244f-434e-b16c-b8a3f27874c4",
-        projectCode:'11130156',
-        token:"4aeba9fa8574d9a76f943a6b11477e7c64e54205179c8ef1d5f1e500fc5d60cd1691e8de8dc13ca683719b4869d6f1f8cb4b39d10b09dd10",
+        projectCode:'20000282',
+        //token:"4aeba9fa8574d9a76f943a6b11477e7c64e54205179c8ef1d5f1e500fc5d60cd1691e8de8dc13ca683719b4869d6f1f8cb4b39d10b09dd10",
+        token : "4aeba9fa8574d9a704453d760171a1fde94812671e2f2a37ca0d26f91c63d001e7b42a4a1ad4aaff0cd0e360cb0f60fa650833130c13f2056d9fce17a9569a4942b39cec528fac5785bcfe9cf6cb03910ed2bd605c5863ce85b2b57b32eb8744c9645dc78be2e3b7cb1b4530efb538c85438a67e0db6069e",
+            appKey: "60e8a1d9fc1d44d7b6a4cf85ae2987ed",
         appKey:"60e8a1d9fc1d44d7b6a4cf85ae2987ed",
         callback: function (res) {
             $('#test').val(JSON.stringify(res))
-        }
+        },
+        withCheckpoint : false
     });
 
 
@@ -72,11 +77,21 @@
                     presetId: "936062989484321",
                     componentId:"",
                     location:""
-                })
+                }) 
             }
 
             if (t == 6) {
                 viewer.data();
+            }
+
+            if(t == 7)
+            {
+                viewer.showCheckpoint();
+            }
+
+            if(t == 8)
+            {
+                viewer.hideCheckpoint();
             }
 
         })
