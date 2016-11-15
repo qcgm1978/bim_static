@@ -213,7 +213,7 @@ App.Project.QualityConcerns=Backbone.View.extend({
 							uuid:modelId+$target.data('uuid').slice($target.data('uuid').indexOf('.')),
 							location:{
 								boundingBox:$target.data('location').boundingBox,
-								position:$target.data('axis').position
+								position:$target.data('location').position
 							}
 						}
 						App.Project.showInModel($target,3,obj);
