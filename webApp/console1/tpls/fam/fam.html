@@ -1,3 +1,4 @@
+
 <div class="consoleBox"><div class="consoleHeader">
     4.1	族库研发指令表单审批通过</div>
 <div class="consoleContainer">
@@ -24,30 +25,30 @@
                 </select>
             </div>
         </div>
-      <div class="form-group">
-        <label for="inputPassword3" class="col-sm-2 control-label">发起人</label>
-        <div class="col-sm-10">
-          <input type="text" class="form-control" id="p14" value='{"userId":"123","loginId":"gongcen"}'>
-        </div>
-      </div>
-      <div class="form-group">
-        <label for="inputPassword3" class="col-sm-2 control-label">审核人</label>
-        <div class="col-sm-10">
-          <input type="text" class="form-control" id="p15" value='[{"userId":"123","loginId":"gongcen"}]'>
-        </div>
-      </div>
-      <div class="form-group">
-        <label for="inputPassword3" class="col-sm-2 control-label">确认人</label>
-        <div class="col-sm-10">
-          <input type="text" class="form-control" id="p16" value='[{"userId":"123","loginId":"gongcen"}]'>
-        </div>
-      </div>
-      <div class="form-group">
-        <label for="inputPassword3" class="col-sm-2 control-label">接收人</label>
-        <div class="col-sm-10">
-          <input type="text" class="form-control" id="p17" value='[{"userId":"123","loginId":"gongcen"}]'>
-        </div>
-      </div>
+      <!--<div class="form-group">-->
+        <!--<label for="inputPassword3" class="col-sm-2 control-label">发起人</label>-->
+        <!--<div class="col-sm-10">-->
+          <!--<input type="text" class="form-control" id="p14" value='{"userId":"123","loginId":"gongcen"}'>-->
+        <!--</div>-->
+      <!--</div>-->
+      <!--<div class="form-group">-->
+        <!--<label for="inputPassword3" class="col-sm-2 control-label">审核人</label>-->
+        <!--<div class="col-sm-10">-->
+          <!--<input type="text" class="form-control" id="p15" value='[{"userId":"123","loginId":"gongcen"}]'>-->
+        <!--</div>-->
+      <!--</div>-->
+      <!--<div class="form-group">-->
+        <!--<label for="inputPassword3" class="col-sm-2 control-label">确认人</label>-->
+        <!--<div class="col-sm-10">-->
+          <!--<input type="text" class="form-control" id="p16" value='[{"userId":"123","loginId":"gongcen"}]'>-->
+        <!--</div>-->
+      <!--</div>-->
+      <!--<div class="form-group">-->
+        <!--<label for="inputPassword3" class="col-sm-2 control-label">接收人</label>-->
+        <!--<div class="col-sm-10">-->
+          <!--<input type="text" class="form-control" id="p17" value='[{"userId":"123","loginId":"gongcen"}]'>-->
+        <!--</div>-->
+      <!--</div>-->
         <div class="form-group">
             <div class="col-sm-offset-2 col-sm-10">
                 <button type="button" id="submit1" class="btn btn-primary">提交</button>
@@ -59,13 +60,19 @@
 
 
 <div class="consoleBox"><div class="consoleHeader">
-    4.2 族库报审表单发起</div>
+    4.2 族库报审表单发起<span class="btn btn-primary" onclick="App.Console.fn['4.2']()">更新</span></div>
     <div class="consoleContainer">
         <form class="form-horizontal">
           <div class="form-group">
             <label for="inputPassword3" class="col-sm-2 control-label">流程标题</label>
             <div class="col-sm-10">
               <input type="text" class="form-control" id="p21" value="族库报审表单">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="inputPassword3" class="col-sm-2 control-label">描述</label>
+            <div class="col-sm-10">
+              <input type="text" class="form-control" id="p22" value="申请说明">
             </div>
           </div>
           <div class="form-group">
@@ -121,7 +128,7 @@ status	审批状态	int	8发起；16审批通过；（4驳回；32撤销；128�
 </div>
 
 <div class="consoleBox"><div class="consoleHeader">
-    4.3	族库报审表单状态变化（审批通过、驳回等</div>
+    4.3	族库报审表单状态变化（审批通过、驳回等<span class="btn btn-primary" onclick="App.Console.fn['4.3']()">更新</span></div>
     <div class="consoleContainer">
         <form class="form-horizontal">
 
@@ -177,7 +184,7 @@ status	审批状态	int	8发起；16审批通过；（4驳回；32撤销；128�
     </div>
 </div>
 <div class="consoleBox"><div class="consoleHeader">
-    4.4	族库发布表单发起</div>
+    4.4	族库发布表单发起<span class="btn btn-primary" onclick="App.Console.fn['4.4']()">更新</span></div>
     <div class="consoleContainer">
         <form class="form-horizontal">
           <div class="form-group">
@@ -237,7 +244,7 @@ createTime	表单创建时间	long
     </div>
 </div>
 <div class="consoleBox"><div class="consoleHeader">
-    4.5	族库发布表单状态变化（审批通过、驳回等）</div>
+    4.5	族库发布表单状态变化（审批通过、驳回等）<span class="btn btn-primary" onclick="App.Console.fn['4.5']()">更新</span></div>
     <div class="consoleContainer">
         <form class="form-horizontal">
           <div class="form-group">

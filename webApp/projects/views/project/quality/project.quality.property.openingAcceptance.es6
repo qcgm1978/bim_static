@@ -110,6 +110,7 @@ App.Project.QualityOpeningAcceptance = Backbone.View.extend({
 		this.$(".riskOption .text").html('全部')
 		this.$(".categoryOption .text").html('全部')
 		this.$(".specialitiesOption .text").html('全部')
+		this.$(".floorOption .text").html('全部')
 		this.$(".txtLocationName").val('');
 		Backbone.trigger('qualityFilterDataClear');
 	},

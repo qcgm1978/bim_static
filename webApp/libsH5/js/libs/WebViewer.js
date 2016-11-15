@@ -1735,7 +1735,7 @@ CLOUD.OrderedRenderer = function () {
                         }
                     }
 
-                    // ���ʹ���
+                    // 材质过滤
                     var material = getOverridedMaterial(object);
                     material = material || object.material;
                     
@@ -1905,8 +1905,30 @@ CLOUD.OrderedRenderer = function () {
         }
 
         return _filterObject.getSelectionBox();
-    }
-}
+    };
+
+    this.computeRenderObjectsBox = function () {
+        var box = new THREE.Box3();
+        for (var ii = renderGroups.length - 1; ii >= 0; --ii) {
+            var group = renderGroups[ii];
+            if (group !== undefined) {
+                var opaqueBox = _filterObject.computeRenderObjectsBox(group.getOpaqueObjects());
+                if (!opaqueBox.empty()) {
+                    box.expandByPoint(opaqueBox.min);
+                    box.expandByPoint(opaqueBox.max);
+                }
+
+                var transparentBox = _filterObject.computeRenderObjectsBox(group.getTransparentObjects());
+                if (!transparentBox.empty()) {
+                    box.expandByPoint(transparentBox.min);
+                    box.expandByPoint(transparentBox.max);
+                }
+            }
+        }
+
+        return box;
+    };
+};
 
 /**
  * @author supereggbert / http://www.paulbrunt.co.uk/
@@ -5579,6 +5601,10 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
         return _orderedRenderer.computeSelectionBBox();
     };
 
+    this.computeRenderObjectsBox = function () {
+        return _orderedRenderer.computeRenderObjectsBox();
+    };
+
     this.setRenderTicket = function (ticket) {        
         objects.renderTicket = ticket;
     };
@@ -7796,6 +7822,11 @@ CLOUD.Scene.prototype.pickByReck = function () {
         var count = 0;
 
         function frustumTest(node) {
+
+            if (node instanceof CLOUD.Group) {
+                if (node.fileId && scope.filter.hasFileFilter(node.fileId))
+                    return;
+            }
 
             if (node.worldBoundingBox) {
 
@@ -10989,10 +11020,9 @@ CLOUD.PickHelper.prototype = {
             if (!intersect) {
 
                 if (scope.filter.setSelectedIds()) {
-                    cameraEditor.updateView(true);
-                    scope.onObjectSelected(null, false);
+                    cameraEditor.updateView(true);                    
                 }
-
+                scope.onObjectSelected(null, false);
                 scope.showPickedInformation(null);
                 return;
             }
@@ -11343,6 +11373,10 @@ CLOUD.OrbitEditor.prototype.delayHandle = function () {
     camera_scope.viewer.editorManager.isUpdateRenderList = false;
 };
 
+// 增加一个对外部定义事件的处理
+CLOUD.OrbitEditor.prototype.fireEvent = function (event) {
+    this.cameraEditor.viewer.modelManager.dispatchEvent(event);
+};
 
 CLOUD.OrbitEditor.prototype.processMouseDown = function (event) {
 
@@ -11544,7 +11578,9 @@ CLOUD.OrbitEditor.prototype.onKeyUp = function (event) {
 
     switch (event.keyCode) {
         case camera_scope.keys.ESC:
+            // 对构件的特殊处理，严重依赖业务，需要考虑更灵活的实现
             this.scene.filter.clearSelectionSet();
+            this.fireEvent({ type: CLOUD.EVENTS.ON_SELECTION_CHANGED, intersect: null, click: 1 });
             break;
         default :
             break
@@ -13375,7 +13411,7 @@ CLOUD.Filter = function () {
 
     // SERIALIZATION BEGIN
     var _filter = {}; // 可见过滤器
-    var _fileFilter = {}; // 文件过滤器
+    var _fileFilter = {}; // 文件过滤器。在这里面的fileId将不可见。
 
     var _overriderByScene = false; // 场景半透明
     var _frozenSet = null; // 现在用于临时半透明构件的集合
@@ -13837,6 +13873,7 @@ CLOUD.Filter = function () {
     };
 
     // 设置选中构件集合
+    // 如果选择集有变化，返回true
     this.setSelectedIds = function (ids) {
 
         if (ids && ids.length > 0) {
@@ -14069,14 +14106,15 @@ CLOUD.Filter = function () {
             return false;
         }
 
-        if (!node.userData)
+        var userData = node.userData;
+        if (!userData)
             return true;
 
         var filters = _filter.filters;
         if (filters) {
             for (var item in filters) {
 
-                var userValue = node.userData[item];
+                var userValue = userData[item];
                 if (userValue && filters[item][userValue] !== undefined) {
                     return false;
                 }
@@ -14090,7 +14128,7 @@ CLOUD.Filter = function () {
             if (len == 0)  // hide if visible array is empty
                 return false;
 
-            var userData = node.userData;
+            
 
             function matchCondition(condition) {
                 
@@ -14152,6 +14190,40 @@ CLOUD.Filter = function () {
         }
 
         return true;
+    };
+
+    this.computeRenderObjectsBox = function (renderList) {
+        var boundingBox = new THREE.Box3();
+        for (var ii = 0; ii < renderList.length; ++ii) {
+            var object = renderList[ii].object;
+            if (!this.isVisible(object)) {
+                continue;
+            }
+
+            if (object.customTag) {
+                continue;
+            }
+
+            if (!object.geometry) {
+                console.log("empty geometry!");
+                continue;
+            }
+            if (object.geometry.boundingBox == null) {
+                object.geometry.computeBoundingBox();
+            }
+
+            var box = object.geometry.boundingBox;
+            if (box) {
+                var box2 = box.clone();
+                if (object.matrixWorld) {
+                    box2.applyMatrix4(object.matrixWorld);
+                }
+
+                boundingBox.expandByPoint(box2.min);
+                boundingBox.expandByPoint(box2.max);
+            }
+        }
+        return boundingBox;
     };
 
     // 对象是否可以被pick -- true: 对象可以被pick，false: 对象不可以pick
@@ -20223,13 +20295,17 @@ CLOUD.ClipPlanes = function (size, center) {
 
     this.uniforms = CloudShaderLib.phong_cust_clip.uniforms;
 
+    this.clipplanes = null;
+
+    this.calculation = true;
+
     this.getPlaneNormal = function (face) {
         var planeNormal = new THREE.Vector4();
         var index = Math.floor(face / 2);
         var mod = face % 2;
         planeNormal.setComponent(index, Math.pow(-1, mod));
         planeNormal["w"] = -this.cubeSize.getComponent(index) * 0.5;
-        this.planeOffset[i] = 0;
+        this.planeOffset[face] = 0;
         return planeNormal;
     };
 
@@ -20254,14 +20330,7 @@ CLOUD.ClipPlanes = function (size, center) {
         this.add(planeMesh);
     };
 
-    for (var i = 0; i < 6; ++i) {
-        this.uniforms.vClipPlane.value[i] = this.getPlaneNormal(i);
-        this.initPlaneModel(i);
-    }
 
-    this.clipplanes = this.uniforms.vClipPlane.value.slice(0);
-
-    this.position.copy(center);
 
     this.enable = function (enable, visible) {
         this.visible = visible;
@@ -20272,24 +20341,31 @@ CLOUD.ClipPlanes = function (size, center) {
         return this.uniforms.iClipPlane.value == 0 ? false : true;
     };
 
-    ClipPlanesInfo = function (enable, visible, rotatable, planeOffset, position, scale, quaternion) {
+    ClipPlanesInfo = function (enable, visible, rotatable, calculation, planeOffset, position, scale, quaternion, cubeSize, center) {
         this.enable = enable;
         this.visible = visible;
         this.rotatable = rotatable;
+        this.calculation = calculation;
         this.planeOffset = planeOffset.slice(0);
         this.position = position;
         this.scale = scale;
         this.quaternion = quaternion;
+        this.cubeSize = cubeSize;
+        this.center = center;
     };
 
     this.store = function () {
-        return new ClipPlanesInfo(this.uniforms.iClipPlane.value ? true : false, this.visible, this.rotatable, this.planeOffset, this.position.clone(), this.scale.clone(), this.quaternion.clone());
+        return new ClipPlanesInfo(this.uniforms.iClipPlane.value ? true : false, this.visible, this.rotatable, this.calculation, this.planeOffset, this.position.clone(), this.scale.clone(), this.quaternion.clone(),
+            this.cubeSize.clone(), this.center.clone());
     };
 
     this.restore = function (info) {
+        this.calculation = true;
+        this.calculationPlanes(info.cubeSize, info.center);
 
         this.enable(info.enable, info.visible);
         this.rotatable = info.rotatable;
+        this.calculation = info.calculation;
 
         for (var i = 0; i < 6; ++i) {
             this.planeOffset[i] = info.planeOffset[i];
@@ -20306,6 +20382,7 @@ CLOUD.ClipPlanes = function (size, center) {
     };
 
     this.reset = function () {
+        this.calculation = true;
         for (var i = 0; i < 6; ++i) {
             this.planeOffset[i] = 0;
         }
@@ -20313,6 +20390,27 @@ CLOUD.ClipPlanes = function (size, center) {
         this.scale.copy(new THREE.Vector3(1.0, 1.0, 1.0));
         this.quaternion.copy(new THREE.Quaternion());
         this.update();
+    };
+
+    this.calculationPlanes  = function (size, center) {
+        if (!this.calculation) return;
+
+        this.cubeSize.copy(size);
+        this.center.copy(center);
+
+        var size = this.children.length;
+        for (var i = size - 1; i >= 0; --i) {
+            this.remove(this.children[i]);
+        }
+
+        for (var i = 0; i < 6; ++i) {
+            this.uniforms.vClipPlane.value[i] = this.getPlaneNormal(i);
+            this.initPlaneModel(i);
+        }
+
+        this.clipplanes = this.uniforms.vClipPlane.value.slice(0);
+
+        this.reset();
     };
 
     this.update = function () {
@@ -20326,6 +20424,8 @@ CLOUD.ClipPlanes = function (size, center) {
     };
 
     this.offset = function (face, offset) {
+        this.calculation = false;
+
         var index = Math.floor(face / 2);
         var mod = face % 2;
         this.planeOffset[face] += offset;
@@ -20376,6 +20476,7 @@ CLOUD.ClipPlanes = function (size, center) {
 
     var unitX = new THREE.Vector3(1.0, 0.0, 0.0);
     this.rotX = function (rot) {
+        this.calculation = false;
         tempQuaternion.setFromAxisAngle(unitX, rot);
         this.quaternion.multiply(tempQuaternion);
         this.update();
@@ -20383,6 +20484,7 @@ CLOUD.ClipPlanes = function (size, center) {
 
     var unitY = new THREE.Vector3(0.0, 1.0, 0.0);
     this.rotY = function (rot) {
+        this.calculation = false;
         tempQuaternion.setFromAxisAngle(unitY, rot);
         this.quaternion.multiply(tempQuaternion);
         this.update();
@@ -20401,7 +20503,7 @@ CLOUD.ClipPlanes = function (size, center) {
         this.selectIndex = null;
     };
 
-    this.update();
+    this.calculationPlanes(size, center);
 };
 
 CLOUD.ClipPlanes.prototype = Object.create(THREE.Object3D.prototype);
@@ -20419,7 +20521,6 @@ CLOUD.ClipPlanes.prototype.hitTest = function (raycaster) {
         plane.setComponents(v4.x, v4.y, v4.z, v4.w);
         minDistance = ray.distanceToPlane(plane);
         minSign = ray.direction.dot(plane.normal) < 0;
-        //this.selectIndex = null;
     }
 
     return {sign: minSign, distance: minDistance};
@@ -20447,8 +20548,6 @@ CLOUD.ClipPlanes.prototype.raycast = (function () {
         }
 
         if (!selectPlane)
-        //intersects.push(selectPlane);
-        //else
             this.selectIndex = null;
 
         return false;
@@ -21372,6 +21471,8 @@ CloudViewer = function () {
 
     this.editorManager = new CLOUD.EditorManager();
 
+    this.callbacks = {};
+
     //this.isMobile = 0;
     //var u = navigator.userAgent;
     //if (u.indexOf('Android') > -1) {
@@ -21391,7 +21492,7 @@ CloudViewer.prototype = {
 
     destroy: function () {
 
-        this.removeAllRenderCallback();
+        this.removeAllCallbacks();
 
         this.editorManager.unregisterDomEventListeners(this.domElement);
 
@@ -21416,63 +21517,104 @@ CloudViewer.prototype = {
 
     },
 
+    // ------ 注册自定义回调函数 S -------------- //
+    // 注册回调函数
+    addCallbacks: function (type, callback) {
+
+        var list = this.callbacks[type];
+
+        if (!list) {
+            list = [];
+            this.callbacks[type] = list;
+        }
+
+        if (list.indexOf(callback) === -1) {
+            list.push(callback);
+        }
+    },
+
+    // 取消注册
+    removeCallbacks: function (type, callback) {
+
+        var list = this.callbacks[type];
+
+        if (!list) {
+            return;
+        }
+
+        var index = list.indexOf(callback);
+
+        if (index !== -1) {
+            list.splice(index, 1);
+        }
+    },
+
+    // 取消所有注册
+    removeAllCallbacks: function () {
+
+        for (var type in this.callbacks) {
+
+            var list = this.callbacks[type];
+
+            for (var i = 0, length = list.length; i < length; i++) {
+                list.splice(0, 1);
+            }
+        }
+
+        for (var type in this.callbacks) {
+
+            delete this.callbacks[type];
+        }
+
+        this.callbacks = {};
+    },
+
+    // 响应render
+    onCallbacks: function (type) {
+
+        var list = this.callbacks[type];
+
+        if (!list) {
+            return;
+        }
+
+        for (var i = 0, length = list.length; i < length; i++) {
+            list[i]();
+        }
+    },
+
+    // ------ 注册自定义回调函数 E -------------- //
+
     // ------ 管理外部插件的render S -------------- //
 
     // 注册render回调函数
     addRenderCallback: function (callback) {
-
-        if (!this.renderCallbacks) {
-            this.renderCallbacks = [];
-        }
-
-        this.renderCallbacks.push(callback);
+        this.addCallbacks("render", callback);
     },
 
     // 取消注册
     removeRenderCallback: function (callback) {
-
-        if (!this.renderCallbacks) return;
-
-        var renderCallbacks = this.renderCallbacks;
-        var index = renderCallbacks.indexOf(callback);
-
-        if (index !== -1) {
-
-            renderCallbacks.splice(index, 1);
-
-        }
-
+        this.removeCallbacks("render", callback);
     },
 
-    // 取消所有注册
-    removeAllRenderCallback: function () {
-
-        if (!this.renderCallbacks) return;
-
-        var renderCallbacks = this.renderCallbacks;
-
-        for (var i = 0, length = renderCallbacks.length; i < length; i++) {
-
-            renderCallbacks.splice(0, 1);
-
-        }
-
-        this.renderCallbacks = null;
-    },
-
-    // 响应render
+    // 响应render Finished
     onRenderCallback: function () {
+        this.onCallbacks("render");
+    },
 
-        if (!this.renderCallbacks) return;
+    // 注册render Finished回调函数
+    addRenderFinishedCallback: function (callback) {
+        this.addCallbacks("renderFinished", callback);
+    },
 
-        var renderCallbacks = this.renderCallbacks;
+    // 取消注册
+    removeRenderFinishedCallback: function (callback) {
+        this.removeCallbacks("renderFinished", callback);
+    },
 
-        for (var i = 0, length = renderCallbacks.length; i < length; i++) {
-
-            renderCallbacks[i]();
-
-        }
-
+    // 响应render Finished
+    onRenderFinishedCallback: function () {
+        this.onCallbacks("renderFinished");
     },
 
     // ------ 管理外部插件的render E -------------- //
@@ -21503,7 +21645,7 @@ CloudViewer.prototype = {
     },
 
     // 限制帧率
-    limitFrameRate:function(frameRate) {
+    limitFrameRate: function (frameRate) {
 
         if (this.incrementRenderEnabled) {
 
@@ -21551,16 +21693,20 @@ CloudViewer.prototype = {
     },
 
     render: function (ignoreLoad) {
+
         ++this.requestRenderCount;
+
         if (this.requestRenderCount > 10000)
             this.requestRenderCount = 0;
-        //console.log(this.requestRenderCount);
-        if (this.rendering) {
 
+        //console.log(this.requestRenderCount);
+
+        if (this.rendering) {
             return;
         }
 
         this.rendering = true;
+
         if (ignoreLoad)
             this.renderIterator += 1;
         else
@@ -21635,6 +21781,9 @@ CloudViewer.prototype = {
                         //console.timeEnd("gc" + renderId);
 
                         //scope.renderViewHouse();
+
+                        // 结束后回调函数
+                        scope.onRenderFinishedCallback();
                     }
 
                 }
@@ -21651,6 +21800,9 @@ CloudViewer.prototype = {
             scope.renderer.autoClear = true;
             scope.renderer.render(scene, camera);
             scope.rendering = false;
+
+            // 结束后回调函数
+            scope.onRenderFinishedCallback();
         }
 
         //scope.onRenderCallback();
@@ -21947,7 +22099,7 @@ CloudViewer.prototype = {
             var newDirection = refPoint.clone().sub(zoomBox.center());
             var target;
 
-            if (newDirection.length() >  0.0001) {
+            if (newDirection.length() > 0.0001) {
                 newDirection.normalize();
                 target = this.camera.zoomToBBox(zoomBox, margin, ratio, newDirection);
             } else {
@@ -21990,7 +22142,7 @@ CloudViewer.prototype = {
             var newDirection = refPoint.clone().sub(zoomBox.center());
             var target;
 
-            if (newDirection.length() >  0.0001) {
+            if (newDirection.length() > 0.0001) {
                 newDirection.normalize();
                 target = this.camera.zoomToBBox(zoomBox, margin, ratio, newDirection);
             } else {
@@ -22414,7 +22566,14 @@ CloudViewer.prototype = {
 
         return this.extensionHelper.getAnnotationInfoList();
 
-    }
+    },
 
+
+    recalculationPlanes: function () {
+        var scene = this.getScene();
+        var box = this.renderer.computeRenderObjectsBox();
+        scene.getClipPlanes().calculationPlanes(box.size(), box.center());
+        this.render();
+    }
     // ------------------ 批注 API -- E ------------------ //
 };

@@ -39,6 +39,11 @@ App.Services.ProjectMapping=Backbone.View.extend({
 	    		projectName:data.qualityProjectName,
 	    		code:data.qualityProjectCode,
 	    		op:"<a class='alink' href='javascript:;'>"+(data.qualityProjectCode?'修改':'关联')+"</a>"
+	    	},{
+	    		module:'设计',
+	    		projectName:data.designProjectName,
+	    		code:data.designProjectCode,
+	    		op:"<a class='alink' href='javascript:;'>"+(data.designProjectCode?'修改':'关联')+"</a>"
 	    	}];
 		}
     	

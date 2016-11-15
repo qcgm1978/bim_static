@@ -199,29 +199,40 @@ App.Project.QualityConcerns=Backbone.View.extend({
 	//在模型中显示
 	showInModel(event){
 		var $target=$(event.target).closest("tr");
+		var uuid=$target.data('uuid');
+		var _fileId=uuid.split('.')[0];
+		var location=$target.data('location');
+		if(!uuid || !_fileId){
+			$.tip({message:'该隐患未关联到模型的构件',type:'alarm'});
+			return
+		}
+		if(!location.position || !location.boundingBox){
+			$.tip({message:'该隐患无位置信息',type:'alarm'});
+			return
+		}
+
 		$.ajax({
 			url: "/platform/api/project/"+$target.data('code')+"/meta"
 		}).done(function(data){
-			var _fileId=$target.data('uuid').split('.')[0];
-			if(_fileId){
+			if(data.code==0){
 				$.ajax({
 					url: "/doc/api/"+data.data.projectId+'/'+data.data.versionId+"?fileId="+_fileId
 				}).done(function(data){
 					if (data.code == 0 && data.data) {
 						var  modelId = data.data.modelId;
 						var obj={
-							uuid:modelId+$target.data('uuid').slice($target.data('uuid').indexOf('.')),
+							uuid:modelId+uuid.slice(uuid.indexOf('.')),
 							location:{
-								boundingBox:$target.data('location').boundingBox,
-								position:$target.data('location').position
+								boundingBox:location.boundingBox,
+								position:location.position
 							}
 						}
 						App.Project.showInModel($target,3,obj);
 					}else{
-						$.tip({message:'隐患对应的构件不存在',type:'alarm'});
+						$.tip({message:'文件对应的模型ID不存在',type:'alarm'});
 					}
 				})
-			}else{
+			}else if(data.code=='18000'){
 				$.tip({message:'数据格式非法',type:'alarm'});
 			}
 		})
