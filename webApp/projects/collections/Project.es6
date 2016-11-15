@@ -98,7 +98,7 @@ App.Project = {
 			}
 		}
 		if ($(".QualityOpeningAcceptance").is(":visible")) {
-			$(".QualityProcessAcceptance .tbProcessAccessBody tr").removeClass('selected');
+			$(".QualityOpeningAcceptance .tbOpeningacceptanceBody tr").removeClass('selected');
 			if(id){
 				var tr = $(".QualityOpeningAcceptance .tbOpeningacceptanceBody tr[data-id='"+id+"']");
 				if(tr.length>0){
