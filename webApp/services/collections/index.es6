@@ -40,7 +40,10 @@ App.Services = {
 				viewer=new App.Services.Issue();
 			}
 			else if(type == "more"){
-				App.Services.initMorePage();
+				viewer = new App.Services.More();
+				$(document.getElementsByTagName("body")[0]).html(viewer.render().el);
+				viewer.bindEvent();
+				return;
 			}
 
 			$("#contains").html(viewer.render().el);
@@ -624,10 +627,5 @@ App.Services = {
 			type:processCategory
 		});
 
-	} , 
-
-	initMorePage : function(){
-		var html = _.templateUrl();
-		$("#contains").html();
 	}
 };
