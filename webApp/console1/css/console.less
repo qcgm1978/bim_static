@@ -13,7 +13,7 @@
 	}
 .col-sm-10 {
   textarea{
-	display: none;
+	//display: none;
   }
 }
 #search_person{
@@ -22,11 +22,15 @@
   padding: 15px;
   width: 20%;
   right: 0;
-  height: 200px;
-  border: 1px solid #000;
+  height: 274px;
   top: 62px;
+  border: 1px dashed #ccc;
+
+  &:hover{
+
+  }
   label{
-	padding: 0 0 0 20px;
+	//padding: 0 0 0 20px;
   }
   .bottom{
 	display: inline-block;
@@ -56,8 +60,16 @@
 	}
   }
   .boxs{
-	border: 1px solid #333;
 	min-height: 20px;
+	height: 34px;
+	padding: 6px 0px;
+	font-size: 14px;
+	line-height: 1.42857143;
+	color: #555;
+	background-color: #fff;
+	background-image: none;
+	border: 1px solid #ccc;
+	border-radius: 4px;
   }
   .name{
 	padding-left: 8px;
@@ -85,6 +97,7 @@
   position: relative;
   background: #fff;
   border: 1px solid #888;
+  border-top: 0px;
   li{
 	width: 100%;
 	height: 20px;

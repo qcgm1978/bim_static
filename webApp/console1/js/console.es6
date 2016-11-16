@@ -125,6 +125,7 @@ App.Console = {
     var tpl = _.templateUrl('/console1/tpls/fam/fam.html', true);
     $("#contains").html(tpl);
     this.search();
+    $('textarea').hide();
     $.ajax({
       url: "platform/project?type=2&versionStatus=9&pageItemCount=100000"
     }).done(function(data){
@@ -243,7 +244,11 @@ App.Console = {
 
     $("#submit3").click(function(){
       var data = {
-        workflowId: $('#s31').val().trim()
+        workflowId: $('#s31').val().trim(),
+        "initiator"        : App.Console.getPerson(0),
+        "auditor"          : App.Console.getPerson(1),
+        "confirmor"        : App.Console.getPerson(2),
+        "receiver"         : App.Console.getPerson(3)
         //title: $("#p31").val().trim()
 
       };
@@ -253,7 +258,11 @@ App.Console = {
     $("#submit33").click(function(){
       var data = {
         workflowId: $('#s31').val().trim(),
-        status    : 4
+        status    : 4,
+        "initiator"        : App.Console.getPerson(0),
+        "auditor"          : App.Console.getPerson(1),
+        "confirmor"        : App.Console.getPerson(2),
+        "receiver"         : App.Console.getPerson(3)
         //title: $("#p31").val().trim()
 
       };
@@ -277,7 +286,11 @@ App.Console = {
     });
     $("#submit5").click(function(){
       var data = {
-        workflowId: $('#s51').val().trim()
+        workflowId: $('#s51').val().trim(),
+        "initiator"        : App.Console.getPerson(0),
+        "auditor"          : App.Console.getPerson(1),
+        "confirmor"        : App.Console.getPerson(2),
+        "receiver"         : App.Console.getPerson(3)
       };
       App.Console.apply(4, 1006, data);
 
@@ -285,7 +298,11 @@ App.Console = {
     $("#submit55").click(function(){
       var data = {
         workflowId: $('#s51').val().trim(),
-        status    : 4
+        status    : 4,
+        "initiator"        : App.Console.getPerson(0),
+        "auditor"          : App.Console.getPerson(1),
+        "confirmor"        : App.Console.getPerson(2),
+        "receiver"         : App.Console.getPerson(3)
 
       };
       App.Console.apply(4, 1006, data);
@@ -295,83 +312,113 @@ App.Console = {
   standardModel(){
     var tpl = _.templateUrl('/console1/tpls/standardModel/standardmodel.html', true);
     $("#contains").html(tpl);
+    this.search();
+    $('textarea').hide();
     this.twoApply(1,'s11','p14');
+    $.ajax({
+      url: "platform/project?type=2&versionStatus=9&pageItemCount=100000"
+    }).done(function(data){
+
+      var items = data.data.items, str = '';
+
+      $.each(items, function(i, item){
+        if(item.version){
+          str += '<option versionid="' + item.version.id + '" value="' + item.projectNo + '">' + item.name + '</option>';
+        }
+
+      });
+      $("#s12").html('<option value="">请选择</option>'+str);
+    });
     //5.2
-    $.ajax({
-      //url: "platform/api/model"
-      url: "platform/api/workflow/model?status=3,6"
-    }).done(function(data){
+    this.fn['5.2']=function(){
+      $.ajax({
+        //url: "platform/api/model"
+        url: "platform/api/workflow/model?status=3,6"
+      }).done(function(data){
 
-      var items = data.data, str = '';
+        var items = data.data, str = '';
 
-      $.each(items, function(i, item){
-        if(item.code){
-          str += '<option id="' + item.code  + '">' + item.name + '</option>';
-        }
-
-      });
-      $("#s21").html("<option value=''>请选择</option>"+str).change(function(){
-        $.ajax({
-          //url: "platform/api/model/"+$(this).find('option:selected').attr('id')+"/version?status=3"
-          url: "platform/api/model/"+$(this).find('option:selected').attr('id')+"/version?status=3,6"
-        }).done(function(data){
-
-          var items = data.data, str = '';
-
-          $.each(items, function(i, item){
-            if(item.id){
-
-              str += '<option  value="' + item.id + '">' + item.name + '</option>';
-            }
-
-          });
-          $("#s211").html(str);
+        $.each(items, function(i, item){
+          if(item.code){
+            str += '<option id="' + item.code  + '">' + item.name + '</option>';
+          }
 
         });
+        $("#s21").html("<option value=''>请选择</option>"+str).change(function(){
+          $.ajax({
+            //url: "platform/api/model/"+$(this).find('option:selected').attr('id')+"/version?status=3"
+            url: "platform/api/model/"+$(this).find('option:selected').attr('id')+"/version?status=3,6"
+          }).done(function(data){
+
+            var items = data.data, str = '';
+
+            $.each(items, function(i, item){
+              if(item.id){
+
+                str += '<option  value="' + item.id + '">' + item.name + '</option>';
+              }
+
+            });
+            $("#s211").html(str);
+
+          });
+        });
       });
-    });
+    }
     //5.4
-    $.ajax({
-      //url: "platform/api/model"
-             url: "platform/api/workflow/model?status=5,8"
+    this.fn['5.4']=function(){
+      //5.4
+      $.ajax({
+        //url: "platform/api/model"
+        url: "platform/api/workflow/model?status=5,8"
 
-    }).done(function(data){
+      }).done(function(data){
 
-      var items = data.data, str = '';
+        var items = data.data, str = '';
 
-      $.each(items, function(i, item){
-        if(item.code){
-          str += '<option id="' + item.code  + '">' + item.name + '</option>';
-        }
-
-      });
-      $("#s41").html("<option value=''>请选择</option>"+str).change(function(){
-        $.ajax({
-          url: "platform/api/model/"+$(this).find('option:selected').attr('id')+"/version?status=5,8"
-        }).done(function(data){
-
-          var items = data.data, str = '';
-
-          $.each(items, function(i, item){
-            if(item.id){
-
-              str += '<option  value="' + item.id + '">' + item.name + '</option>';
-            }
-
-          });
-          $("#s411").html(str);
+        $.each(items, function(i, item){
+          if(item.code){
+            str += '<option id="' + item.code  + '">' + item.name + '</option>';
+          }
 
         });
+        $("#s41").html("<option value=''>请选择</option>"+str).change(function(){
+          $.ajax({
+            url: "platform/api/model/"+$(this).find('option:selected').attr('id')+"/version?status=5,8"
+          }).done(function(data){
+
+            var items = data.data, str = '';
+
+            $.each(items, function(i, item){
+              if(item.id){
+
+                str += '<option  value="' + item.id + '">' + item.name + '</option>';
+              }
+
+            });
+            $("#s411").html(str);
+
+          });
+        });
       });
-    });
+    }
+
     //获取研发标准模型指令审批单
     //App.Console.auditSheet1(4, "#s21", 16);
-    //获取标准模型报审表单
-    App.Console.auditSheet1(5, "#s31", 8);
-    //App.Console.auditSheet1(5, "#s41", 16);
-    //获取标准模型发布表单
-    App.Console.auditSheet1(6, "#s51", 8);
 
+    //5.3
+    this.fn['5.3']=function(){
+      //获取标准模型报审表单
+      App.Console.auditSheet1(5, "#s31", 8);
+    }
+
+    //App.Console.auditSheet1(5, "#s41", 16);
+
+    //5.5
+    this.fn['5.5']=function(){
+      //获取标准模型发布表单
+      App.Console.auditSheet1(6, "#s51", 8);
+    }
 
 
     $("#submit1").click(function(){
@@ -383,10 +430,18 @@ App.Console = {
         modelCode        : $('#p11').val().trim(),
         modelName        : $('#p12').val().trim(),
         modelVersionName : $('#p13').val().trim(),
-        title            : $("#p10").val().trim()
+        familyCode       : $('#s12').val().trim(),
+        familyName       : $('#s12 option:selected').text().trim(),
+        title            : $("#p10").val().trim(),
+        designer         : $("#p15").val().trim(),
+        description      : $("#p16").val().trim(),
+        "initiator"        : App.Console.getPerson(0),
+        "auditor"          : App.Console.getPerson(1),
+        "confirmor"        : App.Console.getPerson(2),
+        "receiver"         : App.Console.getPerson(3)
 
       };
-      App.Console.apply(1, 1007, data);
+      App.Console.quest(1, 1007, data);
 
     });
 
@@ -396,16 +451,25 @@ App.Console = {
         //standardModelDevelopWorkflowId: $('#s21').val().trim(),
         modelCode: $('#s21').val().trim(),
         versionId: $('#s211').val().trim(),
-        title                         : $("#p21").val().trim()
+        title                         : $("#p21").val().trim(),
+        description        : $("#p22").val().trim(),
+        "initiator"        : App.Console.getPerson(0),
+        "auditor"          : App.Console.getPerson(1),
+        "confirmor"        : App.Console.getPerson(2),
+        "receiver"         : App.Console.getPerson(3)
 
       };
-      App.Console.apply(2, 1008, data);
+      App.Console.quest(2, 1008, data);
     });
 
     $("#submit3").click(function(){
       var data = {
         //workflowId:parseInt(9999999*Math.random()),
-        workflowId: $('#s31').val().trim()
+        workflowId: $('#s31').val().trim(),
+        "initiator"        : App.Console.getPerson(0),
+        "auditor"          : App.Console.getPerson(1),
+        "confirmor"        : App.Console.getPerson(2),
+        "receiver"         : App.Console.getPerson(3)
         //title: $("#p31").val().trim()
 
       };
@@ -415,7 +479,11 @@ App.Console = {
     $("#submit33").click(function(){
       var data = {
         status    : 4,
-        workflowId: $('#s31').val().trim()
+        workflowId: $('#s31').val().trim(),
+        "initiator"        : App.Console.getPerson(0),
+        "auditor"          : App.Console.getPerson(1),
+        "confirmor"        : App.Console.getPerson(2),
+        "receiver"         : App.Console.getPerson(3)
         //title: $("#p31").val().trim()
 
       };
@@ -429,15 +497,24 @@ App.Console = {
         //standardModelAprovalWorkflowId: $('#s41').val().trim(),
         modelCode: $('#s41').val().trim(),
         versionId: $('#s411').val().trim(),
-        title                         : $("#p41").val().trim()
+        title                         : $("#p41").val().trim(),
+        description        : $("#p42").val().trim(),
+        "initiator"        : App.Console.getPerson(0),
+        "auditor"          : App.Console.getPerson(1),
+        "confirmor"        : App.Console.getPerson(2),
+        "receiver"         : App.Console.getPerson(3)
       };
-      App.Console.apply(4, 1010, data);
+      App.Console.quest(4, 1010, data);
 
     });
     $("#submit5").click(function(){
       var data = {
         //workflowId:parseInt(9999999*Math.random()),
-        workflowId: $('#s51').val().trim()
+        workflowId: $('#s51').val().trim(),
+        "initiator"        : App.Console.getPerson(0),
+        "auditor"          : App.Console.getPerson(1),
+        "confirmor"        : App.Console.getPerson(2),
+        "receiver"         : App.Console.getPerson(3)
       };
       App.Console.apply(5, 1011, data);
 
@@ -445,7 +522,11 @@ App.Console = {
     $("#submit55").click(function(){
       var data = {
         status    : 4,
-        workflowId: $('#s51').val().trim()
+        workflowId: $('#s51').val().trim(),
+        "initiator"        : App.Console.getPerson(0),
+        "auditor"          : App.Console.getPerson(1),
+        "confirmor"        : App.Console.getPerson(2),
+        "receiver"         : App.Console.getPerson(3)
       };
       App.Console.apply(5, 1011, data);
 
@@ -454,6 +535,8 @@ App.Console = {
   project(){
     var tpl = _.templateUrl('/console1/tpls/project/project.html', true);
     $("#contains").html(tpl);
+    this.search();
+    $('textarea').hide();
     $.ajax({
       url: "platform/project?type=1"
     }).done(function(data){
@@ -472,92 +555,109 @@ App.Console = {
 
     });
     //6.1
-    $.ajax({
-      url: "platform/api/project?uninit=1"
-    }).done(function(data){
+    this.fn['6.1']=function(){
+      //$.ajax({
+      //  url: "platform/api/project?uninit=1"
+      //}).done(function(data){
+      //
+      //  var items = data.data, str = '';
+      //
+      //  $.each(items, function(i, item){
+      //    if(item.projectCode){
+      //      str += '<option  value="' + item.projectNo + '" id="' + item.projectCode  + '">' + item.name + '</option>';
+      //    }
+      //
+      //  });
+      //  $("#s1").html("<option value=''>请选择</option>"+str);
+      //});
+    }
 
-      var items = data.data, str = '';
-
-      $.each(items, function(i, item){
-        if(item.projectCode){
-          str += '<option  value="' + item.projectNo + '" id="' + item.projectCode  + '">' + item.name + '</option>';
-        }
-
-      });
-      $("#s1").html("<option value=''>请选择</option>"+str);
-    });
 
     //6.2
-    $.ajax({
-      //url: "platform/api/project"
-      url: "platform/api/workflow/project?status=3,6"
-    }).done(function(data){
+    this.fn['6.2']=function(){
+      $.ajax({
+        //url: "platform/api/project"
+        url: "platform/api/workflow/project?status=3,6"
+      }).done(function(data){
 
-      var items = data.data, str = '';
-      $.each(items, function(i, item){
-        if(item.projectCode){
-          str += '<option value="' + item.projectCode +  '" id="' + item.projectCode  + '">' + item.name + '</option>';
-        }
-
-      });
-      $("#s21").html("<option value=''>请选择</option>"+str).change(function(){
-        $.ajax({
-          url: "platform/api/workflow/project/"+$(this).find('option:selected').attr('id')+"/version?status=3,6"
-        }).done(function(data){
-
-          var items = data.data, str = '';
-
-          $.each(items, function(i, item){
-            if(item.id){
-
-              str += '<option  value="' + item.id + '">' + item.name + '</option>';
-            }
-
-          });
-          $("#s211").html(str);
+        var items = data.data, str = '';
+        $.each(items, function(i, item){
+          if(item.projectCode){
+            str += '<option value="' + item.projectCode +  '" id="' + item.projectCode  + '">' + item.name + '</option>';
+          }
 
         });
+        $("#s21").html("<option value=''>请选择</option>"+str).change(function(){
+          $.ajax({
+            url: "platform/api/workflow/project/"+$(this).find('option:selected').attr('id')+"/version?status=3,6"
+          }).done(function(data){
+
+            var items = data.data, str = '';
+
+            $.each(items, function(i, item){
+              if(item.id){
+
+                str += '<option  value="' + item.id + '">' + item.name + '</option>';
+              }
+
+            });
+            $("#s211").html(str);
+
+          });
+        });
       });
-    });
+    }
+
     //6.4
-    $.ajax({
-      url: "platform/api/workflow/project?status=5,8"
-    }).done(function(data){
+    this.fn['6.4']=function(){
+      $.ajax({
+        url: "platform/api/workflow/project?status=5,8"
+      }).done(function(data){
 
-      var items = data.data, str = '';
+        var items = data.data, str = '';
 
-      $.each(items, function(i, item){
-        if(item.projectCode){
-          str += '<option value="' + item.projectCode + '" id="' + item.projectCode  + '">' + item.name + '</option>';
-        }
-
-      });
-      $("#s41").html("<option value=''>请选择</option>"+str).change(function(){
-        $.ajax({
-          url: "platform/api/workflow/project/"+$(this).find('option:selected').attr('id')+"/version?status=5,8"
-        }).done(function(data){
-
-          var items = data.data, str = '';
-
-          $.each(items, function(i, item){
-            if(item.id){
-
-              str += '<option  value="' + item.id + '">' + item.name + '</option>';
-            }
-
-          });
-          $("#s411").html(str);
+        $.each(items, function(i, item){
+          if(item.projectCode){
+            str += '<option value="' + item.projectCode + '" id="' + item.projectCode  + '">' + item.name + '</option>';
+          }
 
         });
+        $("#s41").html("<option value=''>请选择</option>"+str).change(function(){
+          $.ajax({
+            url: "platform/api/workflow/project/"+$(this).find('option:selected').attr('id')+"/version?status=5,8"
+          }).done(function(data){
+
+            var items = data.data, str = '';
+
+            $.each(items, function(i, item){
+              if(item.id){
+
+                str += '<option  value="' + item.id + '">' + item.name + '</option>';
+              }
+
+            });
+            $("#s411").html(str);
+
+          });
+        });
       });
-    });
+    }
+    //6.3
+    this.fn['6.3']=function(){
+      //8获取
+      App.Console.auditSheet1(7, "#s31", 8);
+    }
+
     //20获取
     //App.Console.auditSheet1(20, "#s21", 16);
-    //8获取
-    App.Console.auditSheet1(7, "#s31", 8);
+
     //App.Console.auditSheet1(7, "#s41", 16);
-    //9获取
-    App.Console.auditSheet1(8, "#s51", 8);
+    //6.5
+    this.fn['6.5']=function(){
+
+      App.Console.auditSheet1(8, "#s51", 8);
+    }
+
     $("#submit0").click(function() {
       var data = {
         type: 3,
@@ -571,10 +671,10 @@ App.Console = {
         //versionName: “2016 版”, //版本名称，适用于标准模型。非空字段
         designUnit: $("#launchDepartment").val().trim(),
         subType: $("#s01").val().trim(),
-        "initiator"        : JSON.parse($("#p14").val().trim()),
-        "auditor"          : JSON.parse($("#p15").val().trim()),
-        "confirmor"        : JSON.parse($("#p16").val().trim()),
-        "receiver"         : JSON.parse($("#p17").val().trim())
+        "initiator"        : App.Console.getPerson(0),
+        "auditor"          : App.Console.getPerson(1),
+        "confirmor"        : App.Console.getPerson(2),
+        "receiver"         : App.Console.getPerson(3)
       };
 
 
@@ -602,7 +702,11 @@ App.Console = {
         workflowId : parseInt(9999999 * Math.random()),
         projectCode: $('#p11').val().trim(),
         projectName: $('#p12').val().trim(),
-        title      : $("#p13").val().trim()
+        title      : $("#p13").val().trim(),
+        "initiator"        : App.Console.getPerson(0),
+        "auditor"          : App.Console.getPerson(1),
+        "confirmor"        : App.Console.getPerson(2),
+        "receiver"         : App.Console.getPerson(3)
         //modelCode:$('#p11').val().trim(),
         //modelName:$('#s11').val().trim(),
         //modelVersionName:$('#p13').val().trim()
@@ -617,7 +721,12 @@ App.Console = {
         //projectModelInstructionsWorkflowId: $('#s21').val().trim(),
         projectCode: $('#s21').val().trim(),
         versionId  : $('#s211').val().trim(),
-        title                             : $("#p21").val().trim()
+        title                             : $("#p21").val().trim(),
+        description        : $("#p22").val().trim(),
+        "initiator"        : App.Console.getPerson(0),
+        "auditor"          : App.Console.getPerson(1),
+        "confirmor"        : App.Console.getPerson(2),
+        "receiver"         : App.Console.getPerson(3)
 
       };
       App.Console.apply(2, 1013, data);
@@ -626,7 +735,11 @@ App.Console = {
     $("#submit3").click(function(){
       var data = {
         //workflowId:parseInt(9999999*Math.random()),
-        workflowId: $('#s31').val().trim()
+        workflowId: $('#s31').val().trim(),
+        "initiator"        : App.Console.getPerson(0),
+        "auditor"          : App.Console.getPerson(1),
+        "confirmor"        : App.Console.getPerson(2),
+        "receiver"         : App.Console.getPerson(3)
         //title: $("#p31").val().trim()
       };
       App.Console.apply(3, 1014, data);
@@ -635,7 +748,11 @@ App.Console = {
     $("#submit33").click(function(){
       var data = {
         status    : 4,
-        workflowId: $('#s31').val().trim()
+        workflowId: $('#s31').val().trim(),
+        "initiator"        : App.Console.getPerson(0),
+        "auditor"          : App.Console.getPerson(1),
+        "confirmor"        : App.Console.getPerson(2),
+        "receiver"         : App.Console.getPerson(3)
         //title: $("#p31").val().trim()
 
       };
@@ -648,7 +765,12 @@ App.Console = {
         //projectModelAprovalWorkflowId: $('#s41').val().trim(),
         projectCode: $('#s41').val().trim(),
         versionId  : $('#s411').val().trim(),
-        title                        : $("#p41").val().trim()
+        title                        : $("#p41").val().trim(),
+        description        : $("#p42").val().trim(),
+        "initiator"        : App.Console.getPerson(0),
+        "auditor"          : App.Console.getPerson(1),
+        "confirmor"        : App.Console.getPerson(2),
+        "receiver"         : App.Console.getPerson(3)
 
       };
       App.Console.apply(4, 1015, data);
@@ -657,7 +779,11 @@ App.Console = {
     $("#submit5").click(function(){
       var data = {
         //workflowId:parseInt(9999999*Math.random()),
-        workflowId: $('#s51').val().trim()
+        workflowId: $('#s51').val().trim(),
+        "initiator"        : App.Console.getPerson(0),
+        "auditor"          : App.Console.getPerson(1),
+        "confirmor"        : App.Console.getPerson(2),
+        "receiver"         : App.Console.getPerson(3)
 
       };
       App.Console.apply(5, 1016, data);
@@ -666,7 +792,11 @@ App.Console = {
     $("#submit55").click(function(){
       var data = {
         status    : 4,
-        workflowId: $('#s51').val().trim()
+        workflowId: $('#s51').val().trim(),
+        "initiator"        : App.Console.getPerson(0),
+        "auditor"          : App.Console.getPerson(1),
+        "confirmor"        : App.Console.getPerson(2),
+        "receiver"         : App.Console.getPerson(3)
 
       };
       App.Console.apply(5, 1016, data);
