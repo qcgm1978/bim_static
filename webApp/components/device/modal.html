@@ -10,7 +10,7 @@
 <div id="deviceSelector" class="deviceSelector ieExtend">
     <div id="modelView" class="model"></div>
     <div class="rightSilderBar">
-        <div class="before closeBtn">关闭</div>
+        <div class="before">展开</div>
         <div class="headerBar"></div>
         <div class="contentbar">
             <table  cellspacing="0" >
@@ -64,6 +64,7 @@
     })
     var viewer=null;
     function init(data){
+        data=JSON.parse(data);
         viewer = new DeviceSelection({
             sourceId: Request.sourceId,
             etag: Request.etag,
@@ -74,17 +75,22 @@
             host: _host,
             height:Request.height,
             width:Request.width,
+            data:data.data,
+            selectedData:data.selectedData,
             //res 选择的检查点数据
             callback: function (res) {
             }
         });
-        viewer.setData(JSON.parse(data));
     }
 
     function getData(){
         return JSON.stringify(viewer.getData());
     }
-
+    window.onload=function(){
+        if (navigator.userAgent.indexOf("QtWebEngine/5.7.0") > -1) {
+            window.open("/?commType=onLoad");
+        }
+    }
 </script>
 </body>
 </html>
