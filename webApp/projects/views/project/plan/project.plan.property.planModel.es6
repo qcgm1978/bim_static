@@ -52,8 +52,9 @@ App.Project.PlanModel = Backbone.View.extend({
 	},
 
 	addOne: function(model) {
-
+		console.log('model',model);
 		var data = model.toJSON();
+		console.log('data',data);
 		this.$(".tbPlan tbody").html(this.template(data));
 		var codes = [];
 		$('.planSearch .treeCheckbox input').prop('checked',false);
