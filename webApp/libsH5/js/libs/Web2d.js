@@ -10583,18 +10583,19 @@ CLOUD.Extensions.AnnotationEditor.prototype.onCameraChange = function () {
 var CLOUD = CLOUD || {};
 CLOUD.Extensions = CLOUD.Extensions || {};
 
-CLOUD.Extensions.DwgAnnotationEditor = function (domElement) {
+CLOUD.Extensions.Annotation2DEditor = function (domElement) {
     "use strict";
 
     CLOUD.Extensions.AnnotationEditor.call(this, domElement);
 
-    this.pointToScreenCenter = {x: 800, y: 600};
+    this.absoluteBasePoint = {x: 0, y: 0};
+    this.zoomFactor = {x: 1.0, y: 1.0};
 };
 
-CLOUD.Extensions.DwgAnnotationEditor.prototype = Object.create(CLOUD.Extensions.AnnotationEditor.prototype);
-CLOUD.Extensions.DwgAnnotationEditor.prototype.constructor = CLOUD.Extensions.DwgAnnotationEditor;
+CLOUD.Extensions.Annotation2DEditor.prototype = Object.create(CLOUD.Extensions.AnnotationEditor.prototype);
+CLOUD.Extensions.Annotation2DEditor.prototype.constructor = CLOUD.Extensions.Annotation2DEditor;
 
-CLOUD.Extensions.DwgAnnotationEditor.prototype.onResize = function () {
+CLOUD.Extensions.Annotation2DEditor.prototype.onResize = function () {
 
     var bounds = this.getDomContainerBounds();
 
@@ -10607,7 +10608,7 @@ CLOUD.Extensions.DwgAnnotationEditor.prototype.onResize = function () {
     this.svg.setAttribute('height', this.bounds.height + '');
 };
 
-CLOUD.Extensions.DwgAnnotationEditor.prototype.setDomContainer = function (domElement) {
+CLOUD.Extensions.Annotation2DEditor.prototype.setDomContainer = function (domElement) {
 
     if (domElement) {
 
@@ -10615,50 +10616,66 @@ CLOUD.Extensions.DwgAnnotationEditor.prototype.setDomContainer = function (domEl
     }
 };
 
-CLOUD.Extensions.DwgAnnotationEditor.prototype.setPointToScreenCenter = function (point) {
+// 设置绝对基点
+CLOUD.Extensions.Annotation2DEditor.prototype.setAbsoluteBasePoint = function (point) {
 
     if (point) {
 
-        this.pointToScreenCenter.x = point.x;
-        this.pointToScreenCenter.y = point.y;
+        this.absoluteBasePoint.x = point.x;
+        this.absoluteBasePoint.y = point.y;
     }
 };
 
-CLOUD.Extensions.DwgAnnotationEditor.prototype.worldToClient = function (wPoint) {
+// 设置缩放因子
+CLOUD.Extensions.Annotation2DEditor.prototype.setZoomFactor = function (factorX, factorY) {
+
+    factorX = factorX || 1.0;
+    factorY = factorY || 1.0;
+    this.zoomFactor.x = factorX;
+    this.zoomFactor.y = factorY;
+
+};
+
+CLOUD.Extensions.Annotation2DEditor.prototype.worldToClient = function (wPoint) {
+
+    // (Wp - Wc) * zoomFactor = Sp - Sc ===> Sp = (Wp - Wc) * zoomFactor + Sc
 
     var rect = this.getDomContainerBounds();
     var screenCenter = new THREE.Vector3(rect.width * 0.5, rect.height * 0.5, 0);
     var result = new THREE.Vector3(wPoint.x, wPoint.y, wPoint.z);
 
     // 变换到屏幕空间
-    result.x = result.x - this.pointToScreenCenter.x + screenCenter.x;
-    result.y = -result.y - this.pointToScreenCenter.y + screenCenter.y;
+    result.x = (result.x - this.absoluteBasePoint.x) * this.zoomFactor.x + screenCenter.x;
+    result.y = (-result.y - this.absoluteBasePoint.y) * this.zoomFactor.y + screenCenter.y;
     result.z = 0;
 
     return result;
 };
 
-CLOUD.Extensions.DwgAnnotationEditor.prototype.clientToWorld = function (cPoint) {
+CLOUD.Extensions.Annotation2DEditor.prototype.clientToWorld = function (cPoint) {
 
     // Wp - Wc = Sp - Sc ===> Wp = Sp - Sc + Wc
+    // (Wp - Wc) * zoomFactor = Sp - Sc ===> Wp = (Sp - Sc) / zoomFactor + Wc
     var rect = this.getDomContainerBounds();
     var screenCenter = new THREE.Vector3(rect.width * 0.5, rect.height * 0.5, 0);
     var result = new THREE.Vector3();
+    var invFactorX = 1 / this.zoomFactor.x;
+    var invFactorY = 1 / this.zoomFactor.y;
 
-    result.x = cPoint.x - screenCenter.x  + this.pointToScreenCenter.x;
-    result.y = -(cPoint.y - screenCenter.y + this.pointToScreenCenter.y); // 翻转,因为绘制图形参照坐标和屏幕的坐标系不同
+    result.x = (cPoint.x - screenCenter.x) * invFactorX  + this.absoluteBasePoint.x;
+    result.y = -((cPoint.y - screenCenter.y) * invFactorY + this.absoluteBasePoint.y); // 翻转,因为绘制图形参照坐标和屏幕的坐标系不同
     result.z = 0;
 
     return result;
 };
 
-CLOUD.Extensions.DwgAnnotationEditor.prototype.onCameraChange = function () {
+CLOUD.Extensions.Annotation2DEditor.prototype.onCameraChange = function () {
 
     this.handleCallbacks("changeEditor");
 
 };
 
-CLOUD.Extensions.DwgAnnotationEditor.prototype.setSvgZIndex = function (zIndex) {
+CLOUD.Extensions.Annotation2DEditor.prototype.setSvgZIndex = function (zIndex) {
 
     zIndex = zIndex || 18;
 
@@ -11057,23 +11074,31 @@ CLOUD.Extensions.MarkerHelper.prototype = {
 
 CLOUD.Extensions.DwgHelper = function () {
 
-    this.dwgDomContainer = null;
-    this.AnnotationDomContainer = null;
+    this.pdfContainer = null;
+    this.annotationContainer = null;
 };
 
 CLOUD.Extensions.DwgHelper.prototype = {
 
     constructor: CLOUD.Extensions.DwgHelper,
 
+    destroy: function () {
+
+        this.uninitAnnotation();
+        this.editor = null;
+        this.pdfContainer = null;
+        this.annotationContainer = null;
+    },
+
     // 设置DWG批注容器, 在使用批注功能前，需要先设置dom容器
     setDomContainer: function (dwgContainer, annotationContainer) {
 
-        this.dwgDomContainer = dwgContainer;
+        this.pdfContainer = dwgContainer;
 
         if (annotationContainer){
-            this.AnnotationDomContainer = annotationContainer;
+            this.annotationContainer = annotationContainer;
         } else {
-            this.AnnotationDomContainer = dwgContainer;
+            this.annotationContainer = dwgContainer;
         }
 
     },
@@ -11082,19 +11107,19 @@ CLOUD.Extensions.DwgHelper.prototype = {
     initAnnotation: function (beginEditCallback, endEditCallback) {
 
         var scope = this;
-        var domElement = this.AnnotationDomContainer;
+        var domElement = this.annotationContainer;
 
-        if (!this.dwgAnnotationEditor) {
+        if (!this.editor) {
 
-            this.dwgAnnotationEditor = new CLOUD.Extensions.DwgAnnotationEditor(domElement);
+            this.editor = new CLOUD.Extensions.Annotation2DEditor(domElement);
 
         } else {
 
             // 设置父容器
-            this.dwgAnnotationEditor.setDomContainer(domElement);
+            this.editor.setDomContainer(domElement);
         }
 
-        if (!this.dwgAnnotationEditor.isInitialized()) {
+        if (!this.editor.isInitialized()) {
 
             var callbacks = {
                 beginEditCallback: beginEditCallback,
@@ -11104,8 +11129,8 @@ CLOUD.Extensions.DwgHelper.prototype = {
                 }
             };
 
-            this.dwgAnnotationEditor.init(callbacks);
-            this.dwgAnnotationEditor.setSvgZIndex();
+            this.editor.init(callbacks);
+            this.editor.setSvgZIndex();
 
             callbacks = null;
         }
@@ -11114,18 +11139,18 @@ CLOUD.Extensions.DwgHelper.prototype = {
     // 卸载DWG批注资源
     uninitAnnotation: function () {
 
-        if (this.dwgAnnotationEditor && this.dwgAnnotationEditor.isInitialized()) {
+        if (this.editor && this.editor.isInitialized()) {
 
-            this.dwgAnnotationEditor.uninit();
+            this.editor.uninit();
         }
     },
 
     // 设置DWG背景色
     setAnnotationBackgroundColor: function (startColor, stopColor) {
 
-        if (this.dwgAnnotationEditor) {
+        if (this.editor) {
 
-            this.dwgAnnotationEditor.setBackgroundColor(startColor, stopColor);
+            this.editor.setBackgroundColor(startColor, stopColor);
         }
     },
 
@@ -11136,18 +11161,18 @@ CLOUD.Extensions.DwgHelper.prototype = {
         this.initAnnotation(beginEditCallback, endEditCallback);
 
         if (pointToCenter) {
-            this.dwgAnnotationEditor.setPointToScreenCenter(pointToCenter);
+            this.editor.setAbsoluteBasePoint(pointToCenter);
         }
 
-        this.dwgAnnotationEditor.editBegin();
+        this.editor.editBegin();
     },
 
     // 完成编辑DWG批注
     editAnnotationEnd: function () {
 
-        if (this.dwgAnnotationEditor) {
+        if (this.editor) {
 
-            this.dwgAnnotationEditor.editEnd();
+            this.editor.editEnd();
 
         }
     },
@@ -11155,9 +11180,9 @@ CLOUD.Extensions.DwgHelper.prototype = {
     // 设置DWG批注类型
     setAnnotationType: function (type) {
 
-        if (this.dwgAnnotationEditor) {
+        if (this.editor) {
 
-            this.dwgAnnotationEditor.setAnnotationType(type);
+            this.editor.setAnnotationType(type);
 
         }
     },
@@ -11166,13 +11191,13 @@ CLOUD.Extensions.DwgHelper.prototype = {
     loadAnnotations: function (annotations, pointToCenter, beginEditCallback, endEditCallback) {
 
         if (pointToCenter) {
-            this.dwgAnnotationEditor.setPointToScreenCenter(pointToCenter);
+            this.editor.setAbsoluteBasePoint(pointToCenter);
         }
 
         if (annotations) {
 
             this.initAnnotation(beginEditCallback, endEditCallback);
-            this.dwgAnnotationEditor.loadAnnotations(annotations);
+            this.editor.loadAnnotations(annotations);
         } else {
             this.uninitAnnotation();
         }
@@ -11181,9 +11206,9 @@ CLOUD.Extensions.DwgHelper.prototype = {
     // 获得DWG批注对象列表
     getAnnotationInfoList: function () {
 
-        if (this.dwgAnnotationEditor) {
+        if (this.editor) {
 
-            return this.dwgAnnotationEditor.getAnnotationInfoList();
+            return this.editor.getAnnotationInfoList();
 
         }
 
@@ -11193,9 +11218,9 @@ CLOUD.Extensions.DwgHelper.prototype = {
     // resize
     resizeAnnotations: function () {
 
-        if (this.dwgAnnotationEditor && this.dwgAnnotationEditor.isInitialized()) {
+        if (this.editor && this.editor.isInitialized()) {
 
-            this.dwgAnnotationEditor.onResize();
+            this.editor.onResize();
 
         }
     },
@@ -11203,9 +11228,9 @@ CLOUD.Extensions.DwgHelper.prototype = {
     // 清除批注
     clearAnnotations: function () {
 
-        if (this.dwgAnnotationEditor && this.dwgAnnotationEditor.isInitialized()) {
+        if (this.editor && this.editor.isInitialized()) {
 
-            this.dwgAnnotationEditor.onCameraChange();
+            this.editor.onCameraChange();
 
         }
     },
@@ -11214,8 +11239,8 @@ CLOUD.Extensions.DwgHelper.prototype = {
     captureAnnotationsScreenSnapshot: function (snapshotCallback) {
 
         var scope = this;
-        var isInitialized = this.dwgAnnotationEditor && this.dwgAnnotationEditor.isInitialized();
-        var dwgDom = this.dwgDomContainer;
+        var isInitialized = this.editor && this.editor.isInitialized();
+        var dwgDom = this.pdfContainer;
 
         if (!dwgDom || !isInitialized) {
 
@@ -11229,7 +11254,7 @@ CLOUD.Extensions.DwgHelper.prototype = {
             onrendered: function (canvas) {
 
                 var dataUrl = canvas.toDataURL("image/png");
-                dataUrl = scope.dwgAnnotationEditor.getScreenSnapshot(dataUrl);
+                dataUrl = scope.editor.getScreenSnapshot(dataUrl);
                 snapshotCallback(dataUrl);
             }
         });
@@ -11264,6 +11289,241 @@ CLOUD.Extensions.DwgHelper.prototype = {
 
 };
 
+CLOUD.Extensions.PdfAnnotationHelper = function (domContainer) {
+
+    this.annotationContainer = domContainer;
+    this.defaultStyle = {
+        'stroke-width': 3,
+        'stroke-color': '#ff0000',
+        'stroke-opacity': 1.0,
+        'fill-color': '#ff0000',
+        'fill-opacity': 0.0,
+        'font-family': 'Arial',
+        'font-size': 16,
+        'font-style': '',
+        'font-weight': ''
+    };
+
+};
+
+CLOUD.Extensions.PdfAnnotationHelper.prototype = {
+
+    constructor: CLOUD.Extensions.PdfAnnotationHelper,
+
+    destroy: function () {
+
+        this.uninitAnnotation();
+        this.editor = null;
+        this.annotationContainer = null;
+        this.beginEditCallback = null;
+        this.endEditCallback = null;
+        this.stateChangeCallback = null;
+        this.defaultStyle = null;
+
+    },
+
+    // 设置批注容器, 在使用批注功能前，需要先设置dom容器
+    setDomContainer: function (domContainer) {
+
+        this.annotationContainer = domContainer;
+
+    },
+
+    // 设置回调, 在使用批注功能前，根据需要设置（如果需要设置，在初始化之前设置）
+    setEditCallback: function (beginEditCallback, endEditCallback, stateChangeCallback) {
+
+        this.beginEditCallback = beginEditCallback;
+        this.endEditCallback = endEditCallback;
+        this.stateChangeCallback = stateChangeCallback;
+
+    },
+
+    // 初始化, 不用显示调用
+    initAnnotation: function () {
+
+        var scope = this;
+        var domElement = this.annotationContainer;
+
+        if (!this.editor) {
+
+            this.editor = new CLOUD.Extensions.Annotation2DEditor(domElement);
+
+        } else {
+
+            // 设置父容器
+            this.editor.setDomContainer(domElement);
+
+        }
+
+        if (!this.editor.isInitialized()) {
+
+            var callbacks = {
+                beginEditCallback: scope.beginEditCallback,
+                endEditCallback: scope.endEditCallback,
+                changeEditorModeCallback: scope.stateChangeCallback
+            };
+
+            this.editor.init(callbacks);
+
+            callbacks = null;
+        }
+
+    },
+
+    // 卸载
+    uninitAnnotation: function () {
+
+        if (this.editor && this.editor.isInitialized()) {
+
+            this.editor.uninit();
+
+        }
+
+    },
+
+    // 设置背景色
+    setAnnotationBackgroundColor: function (startColor, stopColor) {
+
+        // 如果初始化，则自动初始化
+        this.initAnnotation();
+        this.editor.setBackgroundColor(startColor, stopColor);
+
+    },
+
+    // 开始编辑
+    editAnnotationBegin: function (pointToCenter, zoomFactor) {
+
+        // 如果初始化，则自动初始化
+        this.initAnnotation();
+
+        if (pointToCenter) {
+
+            this.editor.setAbsoluteBasePoint(pointToCenter);
+
+        }
+
+        if (zoomFactor) {
+
+            this.editor.setZoomFactor(zoomFactor.x, zoomFactor.y);
+
+        }
+
+        this.editor.editBegin();
+
+    },
+
+    // 完成编辑
+    editAnnotationEnd: function () {
+
+        if (this.editor) {
+
+            this.editor.editEnd();
+
+        }
+
+    },
+
+    // 设置批注类型
+    setAnnotationType: function (type) {
+
+        // 如果初始化，则自动初始化
+        this.initAnnotation();
+        this.editor.setAnnotationType(type);
+
+    },
+
+    // 设置批注风格
+    setAnnotationStyle: function (style, updateText) {
+
+        // 如果初始化，则自动初始化
+        this.initAnnotation();
+
+        for (var attr in style) {
+
+            if (attr in this.defaultStyle) {
+
+                this.defaultStyle[attr] = style[attr];
+
+            }
+
+        }
+
+        this.editor.setAnnotationStyle(this.defaultStyle, updateText);
+
+    },
+
+    // 加载批注
+    loadAnnotations: function (annotations, pointToCenter, zoomFactor) {
+
+        if (pointToCenter) {
+
+            this.editor.setAbsoluteBasePoint(pointToCenter);
+
+        }
+
+        if (zoomFactor) {
+
+            this.editor.setZoomFactor(zoomFactor.x, zoomFactor.y);
+
+        }
+
+        if (annotations) {
+
+            // 如果初始化，则自动初始化
+            this.initAnnotation();
+            this.editor.loadAnnotations(annotations);
+
+        } else {
+
+            this.uninitAnnotation();
+
+        }
+
+    },
+
+    // 获得批注对象列表
+    getAnnotationInfoList: function () {
+
+        if (this.editor) {
+
+            return this.editor.getAnnotationInfoList();
+
+        }
+
+        return null;
+
+    },
+
+    // resize
+    resizeAnnotations: function () {
+
+        if (this.editor && this.editor.isInitialized()) {
+
+            this.editor.onResize();
+
+        }
+
+    },
+
+    // 状态变化
+    onStateChange: function () {
+
+        if (this.editor && this.editor.isInitialized()) {
+
+            this.editor.onCameraChange();
+
+        }
+
+    },
+
+    // 截屏 base64格式png图片
+    captureAnnotationsScreenSnapshot: function (dataUrl) {
+
+        return this.editor.getScreenSnapshot(dataUrl);
+    }
+
+};
+
 CLOUD.Extensions.AnnotationHelper = function (viewer) {
 
     this.viewer = viewer;
@@ -11288,14 +11548,14 @@ CLOUD.Extensions.AnnotationHelper.prototype = {
     destroy: function () {
 
         this.uninitAnnotation();
-        this.annotationEditor = null;
+        this.editor = null;
         this.viewer = null;
     },
 
     // 是否存在批注
     hasAnnotations: function () {
 
-        return this.annotationEditor && this.annotationEditor.isInitialized();
+        return this.editor && this.editor.isInitialized();
     },
 
     // 初始化批注
@@ -11304,12 +11564,12 @@ CLOUD.Extensions.AnnotationHelper.prototype = {
         var viewer = this.viewer;
         var scope = this;
 
-        if (!this.annotationEditor) {
+        if (!this.editor) {
 
-            this.annotationEditor = new CLOUD.Extensions.AnnotationEditor(viewer.domElement, viewer.cameraEditor);
+            this.editor = new CLOUD.Extensions.AnnotationEditor(viewer.domElement, viewer.cameraEditor);
         }
 
-        if (!this.annotationEditor.isInitialized()) {
+        if (!this.editor.isInitialized()) {
 
             var callbacks = {
                 beginEditCallback: function (domElement) {
@@ -11323,7 +11583,7 @@ CLOUD.Extensions.AnnotationHelper.prototype = {
                 }
             };
 
-            this.annotationEditor.init(callbacks);
+            this.editor.init(callbacks);
 
             callbacks = null;
         }
@@ -11332,9 +11592,9 @@ CLOUD.Extensions.AnnotationHelper.prototype = {
     // 卸载批注资源
     uninitAnnotation: function () {
 
-        if (this.annotationEditor && this.annotationEditor.isInitialized()) {
+        if (this.editor && this.editor.isInitialized()) {
 
-            this.annotationEditor.uninit();
+            this.editor.uninit();
 
         }
     },
@@ -11342,9 +11602,9 @@ CLOUD.Extensions.AnnotationHelper.prototype = {
     // 设置批注背景色
     setAnnotationBackgroundColor: function (startColor, stopColor) {
 
-        if (this.annotationEditor) {
+        if (this.editor) {
 
-            this.annotationEditor.setBackgroundColor(startColor, stopColor);
+            this.editor.setBackgroundColor(startColor, stopColor);
         }
     },
 
@@ -11354,15 +11614,15 @@ CLOUD.Extensions.AnnotationHelper.prototype = {
         // 如果没有设置批注模式，则自动进入批注模式
         this.initAnnotation();
 
-        this.annotationEditor.editBegin();
+        this.editor.editBegin();
     },
 
     // 完成批注编辑
     editAnnotationEnd: function () {
 
-        if (this.annotationEditor) {
+        if (this.editor) {
 
-            this.annotationEditor.editEnd();
+            this.editor.editEnd();
 
         }
     },
@@ -11370,9 +11630,9 @@ CLOUD.Extensions.AnnotationHelper.prototype = {
     // 设置批注类型
     setAnnotationType: function (type) {
 
-        if (this.annotationEditor) {
+        if (this.editor) {
 
-            this.annotationEditor.setAnnotationType(type);
+            this.editor.setAnnotationType(type);
 
         }
     },
@@ -11380,7 +11640,7 @@ CLOUD.Extensions.AnnotationHelper.prototype = {
     // 设置批注风格
     setAnnotationStyle: function (style, updateText) {
 
-        if (this.annotationEditor) {
+        if (this.editor) {
 
             for (var attr in style) {
 
@@ -11390,7 +11650,7 @@ CLOUD.Extensions.AnnotationHelper.prototype = {
 
             }
 
-            this.annotationEditor.setAnnotationStyle(this.defaultStyle, updateText);
+            this.editor.setAnnotationStyle(this.defaultStyle, updateText);
         }
     },
 
@@ -11400,7 +11660,7 @@ CLOUD.Extensions.AnnotationHelper.prototype = {
         if (annotations) {
 
             this.initAnnotation();
-            this.annotationEditor.loadAnnotations(annotations);
+            this.editor.loadAnnotations(annotations);
         } else {
             this.uninitAnnotation();
         }
@@ -11409,9 +11669,9 @@ CLOUD.Extensions.AnnotationHelper.prototype = {
     // 获得批注对象列表
     getAnnotationInfoList: function () {
 
-        if (this.annotationEditor) {
+        if (this.editor) {
 
-            return this.annotationEditor.getAnnotationInfoList();
+            return this.editor.getAnnotationInfoList();
 
         }
 
@@ -11421,9 +11681,9 @@ CLOUD.Extensions.AnnotationHelper.prototype = {
     // resize
     resizeAnnotations: function () {
 
-        if (this.annotationEditor && this.annotationEditor.isInitialized()) {
+        if (this.editor && this.editor.isInitialized()) {
 
-            this.annotationEditor.onResize();
+            this.editor.onResize();
 
         }
     },
@@ -11431,9 +11691,9 @@ CLOUD.Extensions.AnnotationHelper.prototype = {
     // render
     renderAnnotations: function () {
 
-        if (this.annotationEditor && this.annotationEditor.isInitialized()) {
+        if (this.editor && this.editor.isInitialized()) {
 
-            this.annotationEditor.onCameraChange();
+            this.editor.onCameraChange();
 
         }
     },
@@ -11442,7 +11702,7 @@ CLOUD.Extensions.AnnotationHelper.prototype = {
     captureAnnotationsScreenSnapshot: function () {
 
         var dataUrl = this.viewer.getRenderBufferScreenShot();
-        dataUrl = this.annotationEditor.getScreenSnapshot(dataUrl);
+        dataUrl = this.editor.getScreenSnapshot(dataUrl);
 
         return dataUrl;
     }
@@ -11474,6 +11734,8 @@ CLOUD.Extensions.FreeAnnotationHelper.prototype = {
     // 卸载资源
     destroy: function () {
 
+        this.uninitAnnotation();
+        this.editor = null;
         this.domElement = null;
         this.beginEditCallback = null;
         this.endEditCallback = null;
@@ -11502,13 +11764,13 @@ CLOUD.Extensions.FreeAnnotationHelper.prototype = {
             return;
         }
 
-        if (!this.annotationEditor) {
+        if (!this.editor) {
 
-            this.annotationEditor = new CLOUD.Extensions.FreeAnnotationEditor(this.domElement);
+            this.editor = new CLOUD.Extensions.FreeAnnotationEditor(this.domElement);
 
         }
 
-        if (!this.annotationEditor.isInitialized()) {
+        if (!this.editor.isInitialized()) {
 
             var callbacks = {
                 beginEditCallback: this.beginEditCallback,
@@ -11516,7 +11778,7 @@ CLOUD.Extensions.FreeAnnotationHelper.prototype = {
                 changeEditorModeCallback: this.stateChangeCallback
             };
 
-            this.annotationEditor.init(callbacks);
+            this.editor.init(callbacks);
 
             callbacks = null;
         }
@@ -11525,18 +11787,18 @@ CLOUD.Extensions.FreeAnnotationHelper.prototype = {
     // 卸载批注资源
     uninitAnnotation: function () {
 
-        if (this.annotationEditor && this.annotationEditor.isInitialized()) {
+        if (this.editor && this.editor.isInitialized()) {
 
-            this.annotationEditor.uninit();
+            this.editor.uninit();
         }
     },
 
     // 设置背景色
     setAnnotationBackgroundColor: function (startColor, stopColor) {
 
-        if (this.annotationEditor) {
+        if (this.editor) {
 
-            this.annotationEditor.setBackgroundColor(startColor, stopColor);
+            this.editor.setBackgroundColor(startColor, stopColor);
         }
     },
 
@@ -11546,15 +11808,15 @@ CLOUD.Extensions.FreeAnnotationHelper.prototype = {
         // 如果没有设置批注模式，则自动进入批注模式
         this.initAnnotation();
 
-        this.annotationEditor.editBegin();
+        this.editor.editBegin();
     },
 
     // 完成编辑批注
     editAnnotationEnd: function () {
 
-        if (this.annotationEditor) {
+        if (this.editor) {
 
-            this.annotationEditor.editEnd();
+            this.editor.editEnd();
 
         }
     },
@@ -11562,16 +11824,16 @@ CLOUD.Extensions.FreeAnnotationHelper.prototype = {
     // 设置批注类型
     setAnnotationType: function (type) {
 
-        if (this.annotationEditor) {
+        if (this.editor) {
 
-            this.annotationEditor.setAnnotationType(type);
+            this.editor.setAnnotationType(type);
 
         }
     },
 
     setAnnotationStyle: function (style, updateText) {
 
-        if (this.annotationEditor) {
+        if (this.editor) {
 
             for (var attr in style) {
 
@@ -11581,7 +11843,7 @@ CLOUD.Extensions.FreeAnnotationHelper.prototype = {
 
             }
 
-            this.annotationEditor.setAnnotationStyle(this.defaultStyle, updateText);
+            this.editor.setAnnotationStyle(this.defaultStyle, updateText);
 
         }
     },
@@ -11592,7 +11854,7 @@ CLOUD.Extensions.FreeAnnotationHelper.prototype = {
         if (annotations) {
 
             this.initAnnotation();
-            this.annotationEditor.loadAnnotations(annotations);
+            this.editor.loadAnnotations(annotations);
         } else {
             this.uninitAnnotation();
         }
@@ -11601,9 +11863,9 @@ CLOUD.Extensions.FreeAnnotationHelper.prototype = {
     // 获得批注对象列表
     getAnnotationInfoList: function () {
 
-        if (this.annotationEditor) {
+        if (this.editor) {
 
-            return this.annotationEditor.getAnnotationInfoList();
+            return this.editor.getAnnotationInfoList();
 
         }
 
@@ -11613,18 +11875,18 @@ CLOUD.Extensions.FreeAnnotationHelper.prototype = {
     // resize
     resizeAnnotations: function () {
 
-        if (this.annotationEditor && this.annotationEditor.isInitialized()) {
+        if (this.editor && this.editor.isInitialized()) {
 
-            this.annotationEditor.onResize();
+            this.editor.onResize();
         }
     },
 
     // 相机变化处理
     dealCameraChange: function () {
 
-        if (this.annotationEditor && this.annotationEditor.isInitialized()) {
+        if (this.editor && this.editor.isInitialized()) {
 
-            this.annotationEditor.onCameraChange();
+            this.editor.onCameraChange();
 
         }
     },
@@ -11632,6 +11894,6 @@ CLOUD.Extensions.FreeAnnotationHelper.prototype = {
     // 截屏 base64格式png图片
     captureAnnotationsScreenSnapshot: function (dataUrl) {
 
-        return this.annotationEditor.getScreenSnapshot(dataUrl);
+        return this.editor.getScreenSnapshot(dataUrl);
     }
 };

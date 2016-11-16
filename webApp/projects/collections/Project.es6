@@ -268,6 +268,9 @@ App.Project = {
 			}
 		}).done(function(res){
 			if(res.code==0 && res.data){
+
+				App.Project.recoverySilder();
+
 				var _t=res.data.code;
 				_specialFilterFiles=res.data.file;
 				_extArray=res.data.specCode;
@@ -909,7 +912,6 @@ App.Project = {
 				})
 
 				if(type=="process" && _this.currentProsCat && data.length){
-					_this.recoverySilder();
 					var _floor=_this.currentProsCheckFloor;
 					if(!_floor){
 						_floor=_this.parseFilterFloor(type);
@@ -923,7 +925,6 @@ App.Project = {
 				}
 
 				if(type=="open" && _this.currentOpenCat && data.length){
-					_this.recoverySilder();
 					var _floor=_this.currentOpenCheckFloor;
 					if(!_floor){
 						_floor=_this.parseFilterFloor(type);
@@ -2245,7 +2246,7 @@ App.Project = {
 			$target.parent().find(".selected").removeClass("selected");
 			$target.addClass("selected");
 		}
-		App.Project.recoverySilder();
+
 		var _temp = location,
 			_loc = "",
 			_secenId = componentId.split('.')[0], //用于过滤文件ID
@@ -2270,6 +2271,7 @@ App.Project = {
 
 		//没有分类的时候 只过滤单文件 start
 		if (!cat) {
+			App.Project.recoverySilder();
 			_this.linkSilder('floors', key);
 			var _hideFileIds = _.filter(_files, function(i) {
 				return i != _secenId;
@@ -2292,6 +2294,7 @@ App.Project = {
 
 			});
 		}else{
+			App.Project.recoverySilder();
 			_this.linkSilder('floors',key);
 		}
 	},

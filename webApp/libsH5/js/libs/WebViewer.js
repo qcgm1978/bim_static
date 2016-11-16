@@ -13643,6 +13643,24 @@ CLOUD.Filter = function () {
         this.showByUserIds(ids);
     };
 
+    this.removeShownUserIds = function (ids) {
+        if (!_filter.visibleIds)
+            return;
+
+        var visibleIds = _filter.visibleIds;
+        for (var ii = 0, len = ids.length; ii < len; ++ii) {
+            delete visibleIds[ids[ii]];
+        }
+
+        // check if empty
+        for (var name in visibleIds) {
+            return;
+        }
+
+        delete _filter.visibleIds;
+
+    };
+
 
     // hide by the ids.
     this.hideByUserIds = function (ids) {
@@ -13659,6 +13677,24 @@ CLOUD.Filter = function () {
         else {
             delete _filter.invisibleIds;
         }
+
+    };
+
+    this.removeHiddenUserIds = function (ids) {
+        if (!_filter.invisibleIds)
+            return;
+
+        var invisibleIds = _filter.invisibleIds;
+        for (var ii = 0, len = ids.length; ii < len; ++ii) {
+            delete invisibleIds[ids[ii]];
+        }
+
+        // check if empty
+        for (var name in invisibleIds) {
+            return;
+        }
+
+        delete _filter.invisibleIds;
 
     };
 
@@ -21471,7 +21507,12 @@ CloudViewer = function () {
 
     this.editorManager = new CLOUD.EditorManager();
 
+    this.isRecalculationPlanes = false;
+    this.calculationPlanesBind = this.calculationPlanes.bind(this);
+
     this.callbacks = {};
+
+    this.addRenderFinishedCallback(this.calculationPlanesBind);
 
     //this.isMobile = 0;
     //var u = navigator.userAgent;
@@ -22101,12 +22142,14 @@ CloudViewer.prototype = {
 
             if (newDirection.length() > 0.0001) {
                 newDirection.normalize();
+                // 先调整相机up方向,使得一直朝上
+                this.camera.realUp.copy(THREE.Object3D.DefaultUp);
                 target = this.camera.zoomToBBox(zoomBox, margin, ratio, newDirection);
             } else {
                 target = this.camera.zoomToBBox(zoomBox, margin, ratio);
             }
 
-            this.cameraEditor.updateCamera(target, true);
+            this.cameraEditor.updateCamera(target);
             CLOUD.GlobalData.ByTargetDistance = true;
             this.render();
         }
@@ -22144,12 +22187,15 @@ CloudViewer.prototype = {
 
             if (newDirection.length() > 0.0001) {
                 newDirection.normalize();
+
+                // 先调整相机up方向,使得一直朝上
+                this.camera.realUp.copy(THREE.Object3D.DefaultUp);
                 target = this.camera.zoomToBBox(zoomBox, margin, ratio, newDirection);
             } else {
                 target = this.camera.zoomToBBox(zoomBox, margin, ratio);
             }
 
-            this.cameraEditor.updateCamera(target, true);
+            this.cameraEditor.updateCamera(target);
             CLOUD.GlobalData.ByTargetDistance = true;
             this.render();
         }
@@ -22568,12 +22614,20 @@ CloudViewer.prototype = {
 
     },
 
+    calculationPlanes : function () {
+        if (this.isRecalculationPlanes) {
+            this.isRecalculationPlanes = false;
+            
+            var scene = this.getScene();
+            var box = this.renderer.computeRenderObjectsBox();
+            scene.getClipPlanes().calculationPlanes(box.size(), box.center());
+            this.render();
+        }
+    },
 
     recalculationPlanes: function () {
-        var scene = this.getScene();
-        var box = this.renderer.computeRenderObjectsBox();
-        scene.getClipPlanes().calculationPlanes(box.size(), box.center());
-        this.render();
+        this.isRecalculationPlanes = true;
     }
+
     // ------------------ 批注 API -- E ------------------ //
 };

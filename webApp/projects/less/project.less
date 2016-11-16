@@ -439,7 +439,19 @@
 	.tbProcessAccessHeader, .tbProcessAccessBody { width: 100%; min-width: 398px;
 		.manifestIcon { width: 5%; }
 		.category { width: 12%; }
-		.positon { width: 21%; }
+		.positon { width: 21%;
+			position: relative;
+			& div{
+				display: inline-block;
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				position: absolute;
+				left: 0;
+				top: 3px;
+				right: 0;
+			}
+		}
 		.ckResult { width: 10%; }
 	}
 	.tbOpeningacceptanceHeader, .tbOpeningacceptanceBody { width: 100%; min-width: 398px;
