@@ -68,6 +68,22 @@
 
             }
             return result;
+        },
+
+        //格式化已选数据
+        formatSelectedData:function(){
+            Project.dataCore.list=[];
+            if(Project.Settings.selectedData){
+                _.each(Project.Settings.selectedData,function(item){
+                    var d=_.find(Project.Settings.data,function(c){
+                        return (c.fileName==item.fileName && c.uniqueId==item.uniqueId);
+                    })
+                    if(d){
+                        Project.dataCore.list.push(d);
+                    }
+                })
+            }
+            return Project.dataCore.list;
         }
     }
 
@@ -98,6 +114,7 @@
         if (this.Settings.etag) {
             ourl = options.host || ourl;
             Project.Settings = _this.Settings;
+            Project.data=Project.Settings.data;
             _this.init();
         } else {
             var strVar = "";
@@ -229,6 +246,12 @@
             window.onresize = resizeWebView;
             resizeWebView();
 
+
+            var data=JSON.stringify({
+                data:this.Settings.data,
+                selectedData:this.Settings.selectedData
+            });
+
             WebView.registerEvent('newWindow', function(url){
                 if(/onData$/.test(url)){
                     WebView.runScript('getData()',function(data){
@@ -238,13 +261,17 @@
                 if(/onSelect$/.test(url)){
                     Project.Settings.callback.call(this,{});
                 }
+                if(/onLoad$/.test(url)){
+                    WebView.runScript("init('"+data+"')", function() {
+                    });
+                }
             });
 
-            var data=JSON.stringify(this.Settings.data);
-           setTimeout(function(){
+
+          /* setTimeout(function(){
                WebView.runScript("init('"+data+"')", function() {
                });
-           },1000)
+           },1000)*/
         },
 
         loadLib: function () {
@@ -265,7 +292,7 @@
                     var strVar = "";
                     strVar += "<div id=\"modelView\" class=\"model\"><\/div>";
                     strVar += "    <div class=\"rightSilderBar\">";
-                    strVar += "        <div class=\"before closeBtn\">关闭<\/div>";
+                    strVar += "        <div class=\"before\">展开<\/div>";
                     strVar += "        <div class=\"headerBar\"><\/div>";
                     strVar += "        <div class=\"contentbar\">";
                     strVar += "<table  cellspacing=\"0\" >";
@@ -314,6 +341,7 @@
                                 }
                                 count++;
                             })
+                            Tools.formatSelectedData();
                             self.loadModal();
                         }
                     }
@@ -416,6 +444,7 @@
                 _this.loadComponentList.call(_this);
                 _this.initEvent();
                 _this.showInModel(true);
+                $('#modelView .modelSidebar').addClass('hideMap');
             });
 
             viewer.viewer.setMarkerClickCallback(function(marker){
@@ -444,11 +473,7 @@
                 list=Project.dataCore.list;
             _.each(data,function(item){
                 var _flag=_.find(list,function(listItem){return listItem.id==item.id });
-                if(_flag){
-                    strVar += " <tr data-item="+item.id+" data-cid="+item.componentId+"  class=\"selected\">";
-                }else{
-                    strVar += " <tr data-item="+item.id+" data-cid="+item.componentId+">";
-                }
+                strVar += " <tr data-item="+item.id+" data-cid="+item.componentId+">";
                 strVar += "                    <td class=\"checkbox\">";
                 if(_flag){
                     strVar += "                        <input checked=\"checked\" class=\"checkBoxInput\" type=\"checkbox\">";

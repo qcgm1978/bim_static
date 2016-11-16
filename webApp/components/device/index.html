@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>材料设备模型组件</title>
-    <link rel="stylesheet" href="http://bim.wanda-dev.cn/static/dist/components/device/css/device.css">
+    <link rel="stylesheet" href="http://bim-uat.wanda-dev.cn/static/dist/components/device/css/device.css">
     <script src="http://bim-uat.wanda-dev.cn/static/dist/components/device/js/device.js"></script>
 </head>
 <body>
@@ -57,12 +57,22 @@
                 }
             }
         }];
+
+
+        var selectedData=[{
+            fileName:"WDGC-Q-ST-基础.rvt",//文件名称
+            uniqueId: "0d9d7d7c-1653-41d2-992b-405a02cbd02d-000311e0"
+        },{
+            fileName:"WDGC-Q-PL-F02.rvt",//文件名称
+            uniqueId: "6c0fd922-7f0b-4c97-a77e-f35c72d33e7e-0023af3b"
+        }]
         //构件id: modelId.uniqueId
         //modeId:通过接口获取(P:fileName,projectId...)
 
         //初始化模型组件
         new DeviceSelection({
             data:data,//构件数据列表、必须的
+            selectedData:selectedData,
             height: "580px",//模型高度
             width:"1200px",//模型宽度
             projectCode: '20000305',//项目ProjectCode
