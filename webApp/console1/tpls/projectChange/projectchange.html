@@ -38,6 +38,19 @@
           <input type="text" class="form-control" id="p13" value="变更说明信息">
         </div>
       </div>
+
+      <div class="form-group">
+        <label for="inputPassword3" class="col-sm-2 control-label">创建时间</label>
+        <div class="col-sm-10">
+          <input type="text" class="form-control" id="p14" value="20161118">
+        </div>
+      </div>
+      <div class="form-group">
+        <label id="p16" for="inputPassword3" class="col-sm-2 control-label btn-danger">选择变更文件</label>
+        <div class="col-sm-10">
+          <input type="text" class="form-control" id="p15" value="">
+        </div>
+      </div>
       <!--<div class="form-group">-->
         <!--<label for="inputPassword3" class="col-sm-2 control-label">变更文件ID集合(以逗号隔开)</label>-->
         <!--<div class="col-sm-10">-->
@@ -102,7 +115,7 @@ changedFiles	变更文件集合	格式为[{"fileId":"1","fileName":"2","versionI
   </div>
 </div>
 <div class="consoleBox"><div class="consoleHeader">
-  7.2	项目模型变更申请表审批（通过、驳回等）</div>
+  7.2	项目模型变更申请表审批（通过、驳回等）<span class="btn btn-primary" onclick="App.Console.fn['7.2']()">更新</span></div>
   <div class="consoleContainer">
     <form class="form-horizontal">
       <div class="form-group">
@@ -166,7 +179,7 @@ status	审批状态	int	8发起；16审批通过；（4驳回；32撤销；128�
 </div>
 
 <div class="consoleBox"><div class="consoleHeader">
-  7.3	项目模型变更报审表单发起</div>
+  7.3	项目模型变更报审表单发起<span class="btn btn-primary" onclick="App.Console.fn['7.3']()">更新</span></div>
   <div class="consoleContainer">
     <form class="form-horizontal">
       <div class="form-group">
@@ -237,7 +250,7 @@ fileId	签出变更文件ID	guid
 </div>
 
 <div class="consoleBox"><div class="consoleHeader">
-  7.4	项目模型变更报审表单状态变化（审批通过、驳回等）</div>
+  7.4	项目模型变更报审表单状态变化（审批通过、驳回等）<span class="btn btn-primary" onclick="App.Console.fn['7.4']()">更新</span></div>
   <div class="consoleContainer">
     <form class="form-horizontal">
       <div class="form-group">
@@ -302,7 +315,7 @@ fileId	签出变更文件ID	guid
 </div>
 
 <div class="consoleBox"><div class="consoleHeader">
-  7.5	项目模型变更移交表单发起</div>
+  7.5	项目模型变更移交表单发起<span class="btn btn-primary" onclick="App.Console.fn['7.5']()">更新</span></div>
   <div class="consoleContainer">
     <form class="form-horizontal">
       <div class="form-group">
@@ -372,7 +385,7 @@ status	审批状态	int	8发起；16审批通过；（4驳回；32撤销；128�
 </div>
 
 <div class="consoleBox"><div class="consoleHeader">
-  7.6	项目模型变更移交表单状态变化（审批通过、驳回等）</div>
+  7.6	项目模型变更移交表单状态变化（审批通过、驳回等）<span class="btn btn-primary" onclick="App.Console.fn['7.6']()">更新</span></div>
   <div class="consoleContainer">
     <form class="form-horizontal">
       <div class="form-group">
@@ -432,11 +445,7 @@ status	审批状态	int	8发起；16审批通过；（4驳回；32撤销；128�
   </div>
 </div>
 <link rel="stylesheet" href="/static/dist/components/fileSelection/css/fileSelection.css">
-<script>
-// setTimeout(function(){
-   document.write('<script type="text/javascript" src="http://cdn.bootcss.com/jquery/1.6.1/jquery.min.js"></'+'script>')
-// },2000)
-</script>
+<script type="text/javascript" src="http://cdn.bootcss.com/jquery/1.6.1/jquery.min.js"></script>
 
 
-<script type="text/javascript" src="/static/dist/components/fileSelection/js/fileSelection.js"></script>
+
