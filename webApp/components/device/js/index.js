@@ -44,6 +44,7 @@
                 },param),
                 data=Project.data,
                 _len=data.length;
+
             if(opts.id){
                 for(var i=0,size=_len;i<size;i++){
                     if(data[i].id==opts.id){
@@ -295,7 +296,7 @@
                     strVar += "        <div class=\"before\">展开<\/div>";
                     strVar += "        <div class=\"headerBar\"><\/div>";
                     strVar += "        <div class=\"contentbar\">";
-                    strVar += "<table  cellspacing=\"0\" >";
+                    strVar += "            <table  cellspacing=\"0\" >";
                     strVar += "                <thead>";
                     strVar += "                <tr>";
                     strVar += "                    <th class=\"checkbox\"><\/th>";
@@ -331,7 +332,7 @@
                             _.each(Project.data,function(item){
                                 item.id='rid_uuid_'+count;
                                 var _temp=_.find(res.data, function(i){
-                                    return i.fileName==item.fileName;
+                                    return i.fileName.toUpperCase()==item.fileName.toUpperCase();
                                 });
                                 if(_temp){
                                     item.componentId= _temp.modelId+"."+item.uniqueId;
@@ -518,12 +519,14 @@
             return box;
         },
         zoom:function(ids,markers){
+            alert(JSON.stringify(ids));
             Project.Viewer.loadMarkers(markers);
             Project.Viewer.translucent(true);
             Project.Viewer.highlight({
                 type: 'userId',
                 ids: ids
             });
+            Project.Viewer.viewer.getFilters().setSelectedIds(ids);
         },
 
         showInModel:function(isAll){

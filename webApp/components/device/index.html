@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <title>材料设备模型组件</title>
-    <link rel="stylesheet" href="http://bim-uat.wanda-dev.cn/static/dist/components/device/css/device.css">
-    <script src="http://bim-uat.wanda-dev.cn/static/dist/components/device/js/device.js"></script>
+    <link rel="stylesheet" href="http://bim.wanda-dev.cn/static/dist/components/device/css/device.css">
+    <script src="http://bim.wanda-dev.cn/static/dist/components/device/js/device.js"></script>
 </head>
 <body>
+    <!--
     <script>
         var data=[{
-            fileName:"WDGC-Q-ST-基础.rvt",//文件名称
+            fileName:"WDGC-Q-ST-基础1.rvt",//文件名称
             revitFileId:"048f7312796d85eda6c800602e6fc9c9",//文件ID
             uniqueId: "0d9d7d7c-1653-41d2-992b-405a02cbd02d-000311e0",
             boundingbox: {
@@ -25,7 +26,7 @@
                 }
             }
         },{
-            fileName:"WDGC-Q-ST-B01.rvt",//文件名称
+            fileName:"WDGC-Q-ST-B011.rvt",//文件名称
             revitFileId:"72cda601e045bdc77576a5589e43f9c1",//文件ID
             uniqueId: "3909c2cb-03f4-4fc0-934c-754bf06a756e-00099618",
             boundingbox: {
@@ -41,7 +42,7 @@
                 }
             }
         },{
-            fileName:"WDGC-Q-PL-F02.rvt",//文件名称
+            fileName:"WDGC-Q-PL-F021.rvt",//文件名称
             revitFileId:"ff0402f57d49241819fa245e3239777b",//文件ID
             uniqueId: "6c0fd922-7f0b-4c97-a77e-f35c72d33e7e-0023af3b",
             boundingbox: {
@@ -59,13 +60,7 @@
         }];
 
 
-        var selectedData=[{
-            fileName:"WDGC-Q-ST-基础.rvt",//文件名称
-            uniqueId: "0d9d7d7c-1653-41d2-992b-405a02cbd02d-000311e0"
-        },{
-            fileName:"WDGC-Q-PL-F02.rvt",//文件名称
-            uniqueId: "6c0fd922-7f0b-4c97-a77e-f35c72d33e7e-0023af3b"
-        }]
+        var selectedData=null;
         //构件id: modelId.uniqueId
         //modeId:通过接口获取(P:fileName,projectId...)
 
@@ -84,6 +79,42 @@
                 alert(JSON.stringify(res))
             }
         })
+    </script>
+    -->
+    <script>
+
+        var allData1 =
+                "[{\"uniqueId\":\"ceace8ff-9ddf-407f-8d83-7bcfc0822cf5-000f0e93\",\"revitFileId\":\"5d68b36c-be08-47fe-bbbc-7113ee36b953\",\"fileName\":\"wdgc-q-ar-b01.rvt\",\"boundingBox\":\"{\\\"min\\\": {\\\"x\\\": 138699.909370379, \\\"y\\\": 68000.0072305046,\\\"z\\\": -5200},\\\"max\\\": {\\\"x\\\": 146999.90937048, \\\"y\\\": 70220.3813176992,\\\"z\\\": -1100.00000000199}}\"},{\"uniqueId\":\"32a74e01-cd56-4e90-bb0f-2e4aedd52101-000f2a81\",\"revitFileId\":\"5d68b36c-be08-47fe-bbbc-7113ee36b953\",\"fileName\":\"wdgc-q-ar-b01.rvt\",\"boundingBox\":\"{\\\"min\\\": {\\\"x\\\": 163799.966934208, \\\"y\\\": 59079.6276530248,\\\"z\\\": -5200},\\\"max\\\": {\\\"x\\\": 172099.966934208, \\\"y\\\": 61300.0017398412,\\\"z\\\": -1100.00000000199}}\"}]"; //obj.AllComData;
+        var allData2 = JSON.parse(allData1);
+        var selectData = []; //JSON.parse(obj.AllSelectComData);
+
+        var ad = [];
+
+        for (var i = 0; i < allData2.length; i++) {
+            var mm = allData2[i];
+            var m = new Object();
+            var p = { fileName: mm.fileName, revitFileId: mm.revitFileId, uniqueId: mm.uniqueId, boundingbox: JSON.parse(mm.boundingBox) };
+            ad[i] = p;
+        }
+        var allData = ad;
+
+        //初始化模型组件
+        new DeviceSelection({
+            data: allData,//构件数据列表、必须的
+            //已选的构件列表[{fileName:'',uniqueId:''}]
+            selectedData: selectData,
+            height: "580px", //模型高度
+            width: "1300px", //模型宽度
+            projectCode:"36CAA07C-4C7D-4C95-84AE-FB56F53F0DC3",//"@ViewData["ProjectCode"]", //项目ProjectCode
+            token: "4aeba9fa8574d9a704453d760171a1fde94812671e2f2a37ca0d26f91c63d001e7b42a4a1ad4aaff0cd0e360cb0f60fa650833130c13f2056d9fce17a9569a4942b39cec528fac5785bcfe9cf6cb03910ed2bd605c5863ce85b2b57b32eb8744c9645dc78be2e3b7cb1b4530efb538c85438a67e0db6069e",
+            appKey: "60e8a1d9fc1d44d7b6a4cf85ae2987ed",
+            callback: function(res) {
+                //回调函数
+                //用户点击确认时、执行的回调、传回数据
+                alert(JSON.stringify(res))
+            }
+        });
+
     </script>
 </body>
 </html>
