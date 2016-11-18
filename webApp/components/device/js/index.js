@@ -96,7 +96,9 @@
         }
         var defaults = {
             appKey: "18fbec1ae3da477fb47d842a53164b14",
-            token: "abc3f4a2981217088aed5ecf8ede5b6397eed0795978449bda40a6987f9d6f7b0d061e9c8ad279d740ef797377b4995eb55766ccf753691161e73c592cf2416f9744adce39e1c37623a794a245027e79cd3573e7938aff5b4913fe3ed4dbea6d5be4693d85fe52f972e47e6da4617a508e5948f65135c63f"
+            token: "abc3f4a2981217088aed5ecf8ede5b6397eed0795978449bda40a6987f9d6f7b0d061e9c8ad279d740ef797377b4995eb55766ccf753691161e73c592cf2416f9744adce39e1c37623a794a245027e79cd3573e7938aff5b4913fe3ed4dbea6d5be4693d85fe52f972e47e6da4617a508e5948f65135c63f",
+            isShowConfirm:true
+
         }
 
         //合并参数
@@ -250,7 +252,8 @@
 
             var data=JSON.stringify({
                 data:this.Settings.data,
-                selectedData:this.Settings.selectedData
+                selectedData:this.Settings.selectedData,
+                setting:this.Settings
             });
 
             WebView.registerEvent('newWindow', function(url){
@@ -312,6 +315,9 @@
                     $('#deviceSelector').append(strVar);
                 }
 
+                self.initStyle();
+                self.initEvent();
+                return
                 var data=[];
                 _.each(Project.data,function(item){
                     item.fileName&&data.push(item.fileName);
@@ -343,12 +349,20 @@
                                 count++;
                             })
                             Tools.formatSelectedData();
-                            self.loadModal();
+                           // self.loadModal();
                         }
                     }
                 })
 
             })
+        },
+
+        initStyle:function(){
+            if(!this.Settings.isShowConfirm){
+                $('.deviceSelector .rightSilderBar .contentbar ').css('bottom','40px')
+                $('.deviceSelector .rightSilderBar .footBar ').css('bottom','-40px')
+                $('.footTool').hide();
+            }
         },
 
         initEvent: function () {
@@ -519,7 +533,6 @@
             return box;
         },
         zoom:function(ids,markers){
-            alert(JSON.stringify(ids));
             Project.Viewer.loadMarkers(markers);
             Project.Viewer.translucent(true);
             Project.Viewer.highlight({
