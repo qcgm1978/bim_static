@@ -21855,9 +21855,9 @@ CloudViewer.prototype = {
     resize: function (width, height) {
         this.camera.setSize(width, height);
         this.camera.updateProjectionMatrix();
-
+        try{
         this.renderer.setSize(width, height);
-
+        }catch(e){;}
         this.resizeFlyCross(); // 重设fly模式下十字光标位置
 
         this.extensionHelper.resizeExtensions();
