@@ -86,6 +86,8 @@ App.Project.PlanAnalog = Backbone.View.extend({
 			return;
 		}
 
+		App.Project.recoverySilder();
+		App.Project.Settings.Viewer.loadMarkers(null);
 		//高亮钱取消
 		App.Project.cancelZoomModel();
 

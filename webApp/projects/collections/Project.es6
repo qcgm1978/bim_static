@@ -2414,7 +2414,6 @@ App.Project = {
 
 	//计划成本 校验 在模型中 显示
 	planCostShowInModel: function(event) {
-
 		var $target = $(event.target),
 			$parent = $target.parent();
 

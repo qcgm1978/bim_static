@@ -318,7 +318,28 @@ App.Services = {
 		});
 	},
 
+	initRuleDomEvent(){
+
+		$('#recoveryRuleBtn').on('click',function(){
+			$('#filteRuleFile').click();
+		})
+		$('#uploadIframeFilteRule').on('load', function () {
+			var data = JSON.parse(this.contentDocument.body.innerText);
+			if(data.code==0){
+				$.tip({message:"恢复成功",type:'success'});
+				document.location.reload();
+			}else{
+				$.tip({message:"恢复失败",type:'alarm'});
+			}
+		})
+		$('#filteRuleFile').on('change', function () {
+			$('#filteRuleForm').submit();
+		})
+	},
+
 	ruleInit(){
+
+
 
 		var processCategory=['工程桩', '基坑支护', '地下防水', '梁柱节点', '钢结构悬挑构件', '幕墙', '外保温',
 		                     '采光顶', '步行街吊顶风口', '卫生间防水', '屋面防水', '屋面虹吸雨排', '消防泵房', '给水泵房',
@@ -402,6 +423,7 @@ App.Services = {
 				this.$el.html(this.template(data));
 				$('#contains').html(this.$el);
 				this.initEvent();
+				App.Services.initRuleDomEvent();
 				return this;
 			},
 
