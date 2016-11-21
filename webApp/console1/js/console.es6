@@ -230,7 +230,7 @@ App.Console = {
       var data = {
         workflowId             : parseInt(9999999 * Math.random()),
         //familyDevelopWorkflowId: $('#s21').val().trim(),
-        familyCode: $('#s21').val().trim(),
+        familyCode: $('#s21 option:selected').attr('id').trim(),
         title                  : $("#p21").val().trim(),
         description            : $("#p22").val().trim(),
         "initiator"        : App.Console.getPerson(0),
