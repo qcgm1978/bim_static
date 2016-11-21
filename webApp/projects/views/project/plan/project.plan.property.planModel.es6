@@ -84,7 +84,8 @@ App.Project.PlanModel = Backbone.View.extend({
 	//模型中显示
 	showInModle(event,$el) {
 
-	//	App.Project.recoverySilder();
+		App.Project.recoverySilder();
+		App.Project.Settings.Viewer.loadMarkers(null);
 
 		var $target,ids,box;
 		if($el){
