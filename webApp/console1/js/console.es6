@@ -556,20 +556,20 @@ App.Console = {
     });
     //6.1
     this.fn['6.1']=function(){
-      //$.ajax({
-      //  url: "platform/api/project?uninit=1"
-      //}).done(function(data){
-      //
-      //  var items = data.data, str = '';
-      //
-      //  $.each(items, function(i, item){
-      //    if(item.projectCode){
-      //      str += '<option  value="' + item.projectNo + '" id="' + item.projectCode  + '">' + item.name + '</option>';
-      //    }
-      //
-      //  });
-      //  $("#s1").html("<option value=''>请选择</option>"+str);
-      //});
+      $.ajax({
+        url: "platform/api/project?uninit=1"
+      }).done(function(data){
+
+        var items = data.data, str = '';
+
+        $.each(items, function(i, item){
+          if(item.projectCode){
+            str += '<option  value="' + item.projectNo + '" id="' + item.projectCode  + '">' + item.name + '</option>';
+          }
+
+        });
+        $("#s1").html("<option value=''>请选择</option>"+str);
+      });
     }
 
 
@@ -692,7 +692,7 @@ App.Console = {
 
         if (data.message == "success") {
           alert("成功");
-          window.location.reload();
+          //window.location.reload();
         }
 
       });
@@ -700,8 +700,8 @@ App.Console = {
     $("#submit1").click(function(){
       var data = {
         workflowId : parseInt(9999999 * Math.random()),
-        projectCode: $('#p11').val().trim(),
-        projectName: $('#p12').val().trim(),
+        projectCode: $('#s1 option:selected').attr('id').trim(),
+        projectName: $('#s1').val().trim(),
         title      : $("#p13").val().trim(),
         "initiator"        : App.Console.getPerson(0),
         "auditor"          : App.Console.getPerson(1),
