@@ -797,7 +797,7 @@
 		*/
 
 		var _this = this;
-		//强制new
+		/*强制new*/
 		if (!(this instanceof InspectModelSelection)) {
 			return new InspectModelSelection(options);
 		}
@@ -810,11 +810,11 @@
 
 		this.withCheckpoint = options.withCheckpoint==undefined ? true : options.withCheckpoint;
 
-		//合并参数
+		/*合并参数*/
 		this.Settings = $.extend(defaults, options);
 
 		 
-		//设置cookie
+		/*设置cookie*/
 		if (this.Settings.appKey && this.Settings.token && !this.initCookie(this.Settings.host || ourl, this.Settings.appKey, this.Settings.token)) {
 			return;
 		}

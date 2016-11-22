@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <title>模型选择器</title>
     <script src="http://cdn.bootcss.com/jquery/1.9.1/jquery.min.js"></script>
-    <script src="http://bim.wanda-dev.cn/static/dist/components/inspectSelection/js/inspectSelection.js"></script>
+    <!--<script src="http://bim.wanda-dev.cn/static/dist/components/inspectSelection/js/inspectSelection.js"></script>-->
+    <script src="http://bim-uat.wanda-dev.cn/static/dist/components/inspectSelection/js/inspectSelection.js"></script>
 </head>
 <body>
 
@@ -28,11 +29,18 @@
         width:"1200px",
         //projectCode:"184df75d-244f-434e-b16c-b8a3f27874c4",
         projectCode: '20000282',
-        token: "4aeba9fa8574d9a76f943a6b11477e7c64e54205179c8ef1d5f1e500fc5d60cd1691e8de8dc13ca683719b4869d6f1f8cb4b39d10b09dd10",
+        /*token: "4aeba9fa8574d9a76f943a6b11477e7c64e54205179c8ef1d5f1e500fc5d60cd1691e8de8dc13ca683719b4869d6f1f8cb4b39d10b09dd10",*/
+        token : "4aeba9fa8574d9a704453d760171a1fde94812671e2f2a37ca0d26f91c63d001e7b42a4a1ad4aaff0cd0e360cb0f60fa650833130c13f2056d9fce17a9569a4942b39cec528fac5785bcfe9cf6cb03910ed2bd605c5863ce85b2b57b32eb8744c9645dc78be2e3b7cb1b4530efb538c85438a67e0db6069e",
         appKey: "60e8a1d9fc1d44d7b6a4cf85ae2987ed",
         callback: function (res) {
             $('#test').val(JSON.stringify(res))
-        }
+        },
+        withCheckpoint : false
+        /*
+        withCheckpoint参数可选,默认为true
+        withCheckpoint = false 隐藏检查点页签
+        withCheckpoint = true  显示检查点页签
+        */
     });
 
 

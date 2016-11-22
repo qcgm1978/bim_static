@@ -230,7 +230,7 @@ App.Console = {
       var data = {
         workflowId             : parseInt(9999999 * Math.random()),
         //familyDevelopWorkflowId: $('#s21').val().trim(),
-        familyCode: $('#s21').val().trim(),
+        familyCode: $('#s21 option:selected').attr('id').trim(),
         title                  : $("#p21").val().trim(),
         description            : $("#p22").val().trim(),
         "initiator"        : App.Console.getPerson(0),
@@ -273,7 +273,7 @@ App.Console = {
       var data = {
         workflowId             : parseInt(9999999 * Math.random()),
         //familyAprovalWorkflowId: $('#s41').val().trim(),
-        familyCode: $('#s41').val().trim(),
+        familyCode: $('#s41 option:selected').attr('id').trim(),
         title                  : $("#p41").val().trim(),
         "initiator"        : App.Console.getPerson(0),
         "auditor"          : App.Console.getPerson(1),
@@ -314,7 +314,7 @@ App.Console = {
     $("#contains").html(tpl);
     this.search();
     $('textarea').hide();
-    this.twoApply(1,'s11','p14');
+    this.twoApply(1,'s11','p14',9);
     $.ajax({
       url: "platform/project?type=2&versionStatus=9&pageItemCount=100000"
     }).done(function(data){
@@ -495,7 +495,7 @@ App.Console = {
       var data = {
         workflowId                    : parseInt(9999999 * Math.random()),
         //standardModelAprovalWorkflowId: $('#s41').val().trim(),
-        modelCode: $('#s41').val().trim(),
+        modelCode: $('#s41 option:selected').attr('id').trim(),
         versionId: $('#s411').val().trim(),
         title                         : $("#p41").val().trim(),
         description        : $("#p42").val().trim(),
@@ -537,6 +537,7 @@ App.Console = {
     $("#contains").html(tpl);
     this.search();
     $('textarea').hide();
+    this.twoApply(1,'s02','s03',9);
     $.ajax({
       url: "platform/project?type=1"
     }).done(function(data){
@@ -556,20 +557,20 @@ App.Console = {
     });
     //6.1
     this.fn['6.1']=function(){
-      //$.ajax({
-      //  url: "platform/api/project?uninit=1"
-      //}).done(function(data){
-      //
-      //  var items = data.data, str = '';
-      //
-      //  $.each(items, function(i, item){
-      //    if(item.projectCode){
-      //      str += '<option  value="' + item.projectNo + '" id="' + item.projectCode  + '">' + item.name + '</option>';
-      //    }
-      //
-      //  });
-      //  $("#s1").html("<option value=''>请选择</option>"+str);
-      //});
+      $.ajax({
+        url: "platform/api/project?uninit=1"
+      }).done(function(data){
+
+        var items = data.data, str = '';
+
+        $.each(items, function(i, item){
+          if(item.projectCode){
+            str += '<option  value="' + item.projectNo + '" id="' + item.projectCode  + '">' + item.name + '</option>';
+          }
+
+        });
+        $("#s1").html("<option value=''>请选择</option>"+str);
+      });
     }
 
 
@@ -665,6 +666,9 @@ App.Console = {
         name: $("#famTitle").val().trim(),
         projectType: 2,
         estateType: 1,
+        refModelCode     : $('#s02').val(),
+        refModelVersionId: $('#s03').val(),
+        refModelName     : $('#s02 option:selected').text(),
         province: "上海市",
         region: "管理分区", //管理分区，最大长度32。非空
         openTime: $("#devDate").val().trim(), //开业时间
@@ -692,7 +696,7 @@ App.Console = {
 
         if (data.message == "success") {
           alert("成功");
-          window.location.reload();
+          //window.location.reload();
         }
 
       });
@@ -700,8 +704,8 @@ App.Console = {
     $("#submit1").click(function(){
       var data = {
         workflowId : parseInt(9999999 * Math.random()),
-        projectCode: $('#p11').val().trim(),
-        projectName: $('#p12').val().trim(),
+        projectCode: $('#s1 option:selected').attr('id').trim(),
+        projectName: $('#s1').val().trim(),
         title      : $("#p13").val().trim(),
         "initiator"        : App.Console.getPerson(0),
         "auditor"          : App.Console.getPerson(1),
@@ -1552,7 +1556,7 @@ App.Console = {
     });
   },
 
-  twoApply(type,tagid,versionid){
+  twoApply(type,tagid,versionid,status){
     $.ajax({
       url: "platform/project?type="+type+"&pageItemCount=100000"
     }).done(function(data){
@@ -1568,7 +1572,7 @@ App.Console = {
 
       $("#"+tagid).html("<option value=''>请选择</option>"+str).change(function(){
         $.ajax({
-          url: "platform/project/" + $(this).find('option:selected').attr('id') + "/version"
+          url: "platform/project/" + $(this).find('option:selected').attr('id') + "/version?"+(status&&('status='+status))
         }).done(function(data){
 
           var items = data.data, str = '';

@@ -602,8 +602,9 @@ App.Project.ProjectContainer = Backbone.View.extend({
 
 				return;
 			}else if(Object.keys(selectedIds).length>1){
-
-					var arr = [];
+				that.resetProperNull();
+				return;
+					/*var arr = [];
 
 
 						for(var i in selectedIds){
@@ -616,7 +617,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 							}else{
 								arr[0] = selectedIds[i]['classCode']
 							}
-						}
+						}*/
 
 
 			}
