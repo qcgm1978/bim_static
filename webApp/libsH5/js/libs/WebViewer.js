@@ -11049,8 +11049,9 @@ CLOUD.PickHelper.prototype = {
                 
                 if (scope.filter.addSelectedId(userId, intersect.object.userData, true)) {
 
-                    if (cameraEditor.viewer.extensionHelper.defaultMiniMap) {
-                        intersect.axisGridInfo = cameraEditor.viewer.extensionHelper.defaultMiniMap.getAxisGridInfoByPoint(intersect.point);
+                    var defaultMiniMap = cameraEditor.viewer.extensionHelper.getDefaultMiniMap();
+                    if (defaultMiniMap) {
+                        intersect.axisGridInfo = defaultMiniMap.getAxisGridInfoByPoint(intersect.point);
                     }
 
                     scope.onObjectSelected(intersect, false);
@@ -11265,13 +11266,7 @@ CLOUD.PickHelper.prototype = {
             this.debugInfoDiv.addEventListener('dblclick', hideDiv, false);
         }
 
-        var viewer = this.cameraEditor.viewer;
-
-        var axisGridInfo = null;
-
-        if (viewer.extensionHelper.defaultMiniMap) {
-            axisGridInfo = viewer.extensionHelper.defaultMiniMap.getAxisGridInfoByPoint(intersect.point);
-        }
+        var axisGridInfo = intersect.axisGridInfo;
 
         // 加些样式
         var html = "";
@@ -21449,6 +21444,15 @@ CLOUD.ExtensionHelper.prototype = {
         }
     },
 
+    getDefaultMiniMap: function () {
+
+        if (this.miniMapHelper) {
+            return this.miniMapHelper.defaultMiniMap;
+        }
+
+        return null;
+    },
+
     // ------------------ 小地图API -- E ------------------ //
 
     // 扩展功能的 resize
@@ -21524,6 +21528,9 @@ CloudViewer = function () {
     //    this.isMobile = 3;
     //} else {
     //
+
+
+
     //}
 };
 
@@ -21846,7 +21853,7 @@ CloudViewer.prototype = {
             scope.onRenderFinishedCallback();
         }
 
-        //scope.onRenderCallback();
+        scope.onRenderCallback();
 
         // 刷新扩展绘制
         this.extensionHelper.renderExtensions();
@@ -21915,7 +21922,7 @@ CloudViewer.prototype = {
         var scope = this;
         this.cameraEditor = new CLOUD.CameraEditor(this, camera, domElement, function () {
             scope.render();
-            scope.onRenderCallback();
+            //scope.onRenderCallback();
         });
 
         //this.lookAt(new THREE.Vector3(-CLOUD.GlobalData.SceneSize * 0.5, CLOUD.GlobalData.SceneSize * 0.3, CLOUD.GlobalData.SceneSize), new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 1, 0));
@@ -21927,7 +21934,7 @@ CloudViewer.prototype = {
 
         this.modelManager.onUpdateViewer = function () {
             scope.render(true);
-            scope.onRenderCallback();
+            //scope.onRenderCallback();
         };
 
         //this.editorManager.registerDomEventListeners(canvas);
