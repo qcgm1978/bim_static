@@ -273,7 +273,7 @@ App.Console = {
       var data = {
         workflowId             : parseInt(9999999 * Math.random()),
         //familyAprovalWorkflowId: $('#s41').val().trim(),
-        familyCode: $('#s41').val().trim(),
+        familyCode: $('#s41 option:selected').attr('id').trim(),
         title                  : $("#p41").val().trim(),
         "initiator"        : App.Console.getPerson(0),
         "auditor"          : App.Console.getPerson(1),
@@ -314,7 +314,7 @@ App.Console = {
     $("#contains").html(tpl);
     this.search();
     $('textarea').hide();
-    this.twoApply(1,'s11','p14');
+    this.twoApply(1,'s11','p14',9);
     $.ajax({
       url: "platform/project?type=2&versionStatus=9&pageItemCount=100000"
     }).done(function(data){
@@ -495,7 +495,7 @@ App.Console = {
       var data = {
         workflowId                    : parseInt(9999999 * Math.random()),
         //standardModelAprovalWorkflowId: $('#s41').val().trim(),
-        modelCode: $('#s41').val().trim(),
+        modelCode: $('#s41 option:selected').attr('id').trim(),
         versionId: $('#s411').val().trim(),
         title                         : $("#p41").val().trim(),
         description        : $("#p42").val().trim(),
@@ -537,6 +537,7 @@ App.Console = {
     $("#contains").html(tpl);
     this.search();
     $('textarea').hide();
+    this.twoApply(1,'s02','s03',9);
     $.ajax({
       url: "platform/project?type=1"
     }).done(function(data){
@@ -665,6 +666,9 @@ App.Console = {
         name: $("#famTitle").val().trim(),
         projectType: 2,
         estateType: 1,
+        refModelCode     : $('#s02').val(),
+        refModelVersionId: $('#s03').val(),
+        refModelName     : $('#s02 option:selected').text(),
         province: "上海市",
         region: "管理分区", //管理分区，最大长度32。非空
         openTime: $("#devDate").val().trim(), //开业时间
@@ -1552,7 +1556,7 @@ App.Console = {
     });
   },
 
-  twoApply(type,tagid,versionid){
+  twoApply(type,tagid,versionid,status){
     $.ajax({
       url: "platform/project?type="+type+"&pageItemCount=100000"
     }).done(function(data){
@@ -1568,7 +1572,7 @@ App.Console = {
 
       $("#"+tagid).html("<option value=''>请选择</option>"+str).change(function(){
         $.ajax({
-          url: "platform/project/" + $(this).find('option:selected').attr('id') + "/version"
+          url: "platform/project/" + $(this).find('option:selected').attr('id') + "/version?"+(status&&('status='+status))
         }).done(function(data){
 
           var items = data.data, str = '';
