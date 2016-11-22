@@ -247,22 +247,24 @@ App.Project = {
 
 				return;
 			}else if(Object.keys(selectedIds).length>1){
+				$('.designProperties').html('<div class="nullTip">请选择构件</div>');
 
-				var arr = [];
+				return;
+				// var arr = [];
 
 
-				for(var i in selectedIds){
-					if(arr[0]){
-						if(arr[0] != selectedIds[i]['classCode'] ){
-							$('.designProperties').html('<div class="nullTip">请选择构件</div>');
+				// for(var i in selectedIds){
+				// 	if(arr[0]){
+				// 		if(arr[0] != selectedIds[i]['classCode'] ){
+				// 			$('.designProperties').html('<div class="nullTip">请选择构件</div>');
 
-							return;
-						}
+				// 			return;
+				// 		}
 
-					}else{
-						arr[0] = selectedIds[i]['classCode']
-					}
-				}
+				// 	}else{
+				// 		arr[0] = selectedIds[i]['classCode']
+				// 	}
+				// }
 
 
 			}

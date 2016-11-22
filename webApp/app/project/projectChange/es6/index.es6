@@ -298,26 +298,28 @@ App.Index = {
 
 
 		App.Index.Settings.Viewer.on("click", function(model) {
-
-			var  viewer = App.Index.Settings.Viewer,
+			var viewer = App.Index.Settings.Viewer,
+				selectedIds = viewer.getSelectedIds(),
 			    isIsolateState = viewer.viewer.getFilters().isIsolateState();
 			if(isIsolateState){
 				$('#isolation').show();
 			}else{
 				$('#isolation').hide();
-
-
 			}
 			App.Index.Settings.ModelObj = null;
 			if (!model.intersect) {
+				$("#projectContainer .designProperties").html(' <div class="nullTip">请选择构件</div>');
 				return;
 			}
-
-
 			App.Index.Settings.ModelObj = model;
 			//属性
 			if (App.Index.Settings.property == "attr") {
-				App.Index.renderAttr(App.Index.Settings.ModelObj);
+				if(Object.keys(selectedIds).length>1){
+					$("#projectContainer .designProperties").html(' <div class="nullTip">请选择构件</div>');
+					return;
+				}else{
+					App.Index.renderAttr(App.Index.Settings.ModelObj);
+				}
 			}
 
 		}); 
@@ -426,6 +428,7 @@ App.Index = {
 		App.Comm.ajax(data, function(data) {
 			var treeRoot = _.templateUrl('/app/project/projectChange/tpls/treeRoot.html');
 			var treeNode = _.templateUrl('/app/project/projectChange/tpls/treeNode.html');
+			// console.log(data,"data");
 			data.treeNode = treeNode;
 			$(".designProperties .attrCostBox .modleList").append(treeRoot(data));
 			$(".attrCostBox li .itemContent").addClass("odd");
