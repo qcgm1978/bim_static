@@ -1374,7 +1374,28 @@ App.Console = {
       App.Console.apply(2,1003, data,2);
 
     });
+   //uploadtest
+    var choose = document.getElementById('choose');
+    FileAPI.event.on(choose, 'change', function (evt){
+      var files = FileAPI.getFiles(evt); // Retrieve file list
 
+      FileAPI.filterFiles(files, function (file, info/**Object*/){
+
+        return  false;
+      }, function (files/**Array*/, rejected/**Array*/){
+        if( files.length ){
+
+
+          // Uploading Files
+          FileAPI.upload({
+            url: 'http://bim-uat.wanda-dev.cn:9090/platform/mock/costfile?token=123',
+            files: { images: files },
+            progress: function (evt){ /* ... */ },
+            complete: function (err, xhr){ console.logxhr }
+          });
+        }
+      });
+    });
   },
   quest(index, num, obj, type){
     var datainit = JSON.parse($('#data' + index).val());

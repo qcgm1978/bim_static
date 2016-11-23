@@ -459,10 +459,10 @@ App.Index = {
 	fetchFileType() {
 
 		var data = {
-				URLtype: "fileList",
+				URLtype: "modelBase",//  fileList
 				data: {
 					projectId: App.Index.Settings.projectId,
-					versionId: App.Index.Settings.projectVersionId
+					projectVersionId: App.Index.Settings.projectVersionId
 				}
 			},
 			that = this;
@@ -471,42 +471,57 @@ App.Index = {
 
 		App.Comm.ajax(data, function(data) {
 
-			var list = data.data,
-				lists = [],
-				items;
-			//生成 二级 目录
-			$.each(list, function(i, item) {
+			//var list = data.data[0].comparisons,
+			//	lists = [],
+			//	items;
+			//debugger
+			////生成 二级 目录
+			//$.each(list, function(i, item) {
+            //
+			//	debugger
+			//	item.specialty = App.Index.Settings.FileType[item.specialty];
+            //
+			//	items = _.findWhere(lists, {
+			//		"specialty": item.specialty
+			//	});
+            //
+			//	if (items) {
+			//		items.data.push(item);
+			//	} else {
+			//		lists.push({
+			//			"specialty": item.specialty,
+			//			data: [item]
+			//		});
+			//	}
+            //
+			//});
 
-				item.specialty = App.Index.Settings.FileType[item.specialty];
-
-				items = _.findWhere(lists, {
-					"specialty": item.specialty
-				});
-
-				if (items) {
-					items.data.push(item);
-				} else {
-					lists.push({
-						"specialty": item.specialty,
-						data: [item]
-					});
+			//优化  设置颜色不在 获取数据
+			var datas=data.data,
+					comparisons={};
+			for(var i=0;i<datas.length;i++){
+				var comps=datas[i]['comparisons'];
+				for(var j=0;j<comps.length;j++){
+					comparisons[comps[j]['currentVersion']]=comps[j]['comparisonId'];
 				}
+			}
+			App.Index.Settings.comps=comparisons;
 
-			}); 
+			var lists=data.data;
 			if (lists.length<=0) {
 				$("#treeContainerBody .loading").text("无变更");
 				$("#contains .projectCotent").html('<div class="noChange">无变更</div>');
 				return;
 			}
-			var firstData = lists[0].data[0];
-			that.Settings.baseModelId = firstData.baseModelId;
-			that.Settings.differModelId = firstData.differModelId;
+			var firstData = lists[0].comparisons[0];
+			that.Settings.baseModelId = firstData.output.replace("_output","");
+			that.Settings.differModelId = firstData.currentModel;
 
 			//渲染模型
 			that.renderModelById();
 
 			//变更获取
-			that.fetchChangeList(firstData.baseFileVersionId, firstData.differFileVersionId);
+			that.fetchChangeList(firstData.baseVersion, firstData.currentVersion);
 
 			var template = _.templateUrl("/app/project/projectChange/tpls/fileList.html");
 
@@ -624,37 +639,37 @@ App.Index = {
 	fetchChangeList: function(baseFileVersionId, differFileVersionId) {
 		var self= this;
 		//获取构件差异对比列表
-		if(App.Index.Settings.comps){
-			this.show(differFileVersionId);
-		}else{
-			$.ajax({
-				url: "/view/"+App.Index.Settings.projectId+"/"+App.Index.Settings.projectVersionId+"/comparison?type=base"
-			}).done(function(data){
-				if(data.code == 0){
-					var datas=data.data,
-					    comparisons={};
-					for(var i=0;i<datas.length;i++){
-						var comps=datas[i]['comparisons'];
-						for(var j=0;j<comps.length;j++){
-							comparisons[comps[j]['currentVersion']]=comps[j]['comparisonId'];
-						}
-					}
-					App.Index.Settings.comps=comparisons;
+		this.show(differFileVersionId);
 
-					self.show(differFileVersionId);
-				}
-			});
-		}
+		//不在获取
+		//if(App.Index.Settings.comps){
+		//	this.show(differFileVersionId);
+		//}else{
+		//	$.ajax({
+		//		url: "/view/"+App.Index.Settings.projectId+"/"+App.Index.Settings.projectVersionId+"/comparison?type=base"
+		//	}).done(function(data){
+		//		if(data.code == 0){
+		//			var datas=data.data,
+		//			    comparisons={};
+		//			for(var i=0;i<datas.length;i++){
+		//				var comps=datas[i]['comparisons'];
+		//				for(var j=0;j<comps.length;j++){
+		//					comparisons[comps[j]['currentVersion']]=comps[j]['comparisonId'];
+		//				}
+		//			}
+		//			App.Index.Settings.comps=comparisons;
+        //
+		//			self.show(differFileVersionId);
+		//		}
+		//	});
+		//}
 
-
+		//设置改变列表 参数
 		App.Collections.changeListCollection.projectId = App.Index.Settings.projectId;
 		App.Collections.changeListCollection.projectVersionId = App.Index.Settings.projectVersionId;
-
-
-
 		App.Index.Settings.baseFileVersionId = baseFileVersionId;
 		App.Index.Settings.differFileVersionId = differFileVersionId;
-
+		//获取数据
 		App.Collections.changeListCollection.reset();
 		App.Collections.changeListCollection.fetch({
 			data: {
@@ -662,7 +677,6 @@ App.Index = {
 				fileVerionId: differFileVersionId
 			}
 		});
-
 
 		$("#treeContainerBody").html(new App.Views.projectChangeListView().render().el);
 
