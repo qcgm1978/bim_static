@@ -2311,7 +2311,7 @@ App.Project = {
 	zoomModel: function(ids, box, margin, ratio) {
 		//定位
 	//	App.Project.Settings.Viewer.setTopView(box, false, margin, ratio);
-		App.Project.Settings.Viewer.zoomToBBoxWithOuterBox(box,this.getBoxs(App.Project.Settings.property, margin, ratio));
+		App.Project.Settings.Viewer.zoomToBBoxWithOuterBox(box,this.getBoxs(App.Project.Settings.property), margin, ratio);
 		//半透明
 		//App.Project.Settings.Viewer.translucent(true);
 		//高亮
