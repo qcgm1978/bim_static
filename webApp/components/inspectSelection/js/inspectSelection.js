@@ -855,10 +855,10 @@
 	InspectModelSelection.prototype = {
 		/*隐藏检查点页签*/
 		hideCheckpoint : function(){
-			var $tab = this.$dialog.find(".projectPropetyHeader");
-			var $tabLi = $tab.find("li");
 			try
 			{
+				var $tab = this.$dialog.find(".projectPropetyHeader");
+				var $tabLi = $tab.find("li");
 				$tabLi[0].style.display="none";
 				$($tabLi[1]).addClass("selected");
 				$("#presetPointPanel").hide();
