@@ -1412,6 +1412,7 @@ App.Console = {
                 $('.ready').append('<div data-path="'+data.data.filePath+'"><span>'+$('#description').val()+'</span><i>X</i></div>')
               }else {
                 alert('上传失败')
+
               }
             }
           });
