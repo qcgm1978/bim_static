@@ -1403,7 +1403,7 @@ App.Console = {
           // Uploading Files
           FileAPI.upload({
             url: '/platform/mock/costfile?token=123',
-            files: { images: files },
+            files: { file: files },
             progress: function (evt){ /* ... */ },
             complete: function (err, xhr){
               var data = JSON.parse(xhr.response);
