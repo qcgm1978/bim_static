@@ -857,10 +857,15 @@
 		hideCheckpoint : function(){
 			var $tab = this.$dialog.find(".projectPropetyHeader");
 			var $tabLi = $tab.find("li");
-			$tabLi[0].style.display="none";
-			$($tabLi[1]).addClass("selected");
-			$("#presetPointPanel").hide();
-			$("#propertyPanel").show();						
+			try
+			{
+				$tabLi[0].style.display="none";
+				$($tabLi[1]).addClass("selected");
+				$("#presetPointPanel").hide();
+				$("#propertyPanel").show();					
+			}
+			catch(e){;}
+					
 		},
 		/*显示检查点页签*/
 		showCheckpoint : function(){
@@ -947,6 +952,7 @@
 
 				return;
 			}
+
 			$.getScript(srciptUrl, function() {
 				bimView.API.baseUrl = ourl + '/';
 				$.getScript(commjs, function() {
@@ -1019,6 +1025,7 @@
 			var self = this,
 				Settings = this.Settings,
 				$dialog;
+
 			if (this.$dialog) {
 				$dialog = self.$dialog;
 			} else {
@@ -1037,15 +1044,51 @@
 				strVar += "                    <div class=\"rightPropertyContent\">";
 				strVar += "                        <div class=\"designPropetyBox\">";
 				strVar += "                            <ul class=\"projectPropetyHeader projectNav\">";
-				strVar += "                                <li data-type=\"attr\" class=\"item selected\">检查点<\/li>";
-				strVar += "                                <li data-type=\"attr\" class=\"item propertyPanel\">属性<\/li>";
+
+				if(self.Settings.withCheckpoint=="true")
+				{
+					strVar += "                                <li data-type=\"attr\" class=\"item selected\">检查点<\/li>";
+					strVar += "                                <li data-type=\"attr\" class=\"item propertyPanel\">属性<\/li>";
+				}
+				else if(self.Settings.withCheckpoint=="undefined")
+				{
+					strVar += "                                <li data-type=\"attr\" class=\"item selected\">检查点<\/li>";
+					strVar += "                                <li data-type=\"attr\" class=\"item propertyPanel\">属性<\/li>";
+				}
+				else
+				{
+					strVar += "                                <li data-type=\"attr\" class=\"item\" style=\"display:none;\">检查点<\/li>";
+					strVar += "                                <li data-type=\"attr\" class=\"item propertyPanel selected\">属性<\/li>";					
+				}
 				strVar += "                            <\/ul>";
-				strVar += "                            <div id=\"presetPointPanel\" class=\"qualityContainer projectNavContentBox\">";
-				strVar += "                                ";
-				strVar += "                            <\/div>";
-				strVar += "                            <div class=\"bim\" id=\"propertyPanel\" style=\"display:none;\">";
-				strVar += strVar1;
-				strVar += "                            <\/div>";
+
+				if(self.Settings.withCheckpoint=="true")
+				{
+					strVar += "                            <div id=\"presetPointPanel\" class=\"qualityContainer projectNavContentBox\">";
+					strVar += "                                ";
+					strVar += "                            <\/div>";
+					strVar += "                            <div class=\"bim\" id=\"propertyPanel\" style=\"display:none;\">";
+					strVar += strVar1;
+					strVar += "                            <\/div>";
+				}
+				else if(self.Settings.withCheckpoint=="undefined")
+				{
+					strVar += "                            <div id=\"presetPointPanel\" class=\"qualityContainer projectNavContentBox\">";
+					strVar += "                                ";
+					strVar += "                            <\/div>";
+					strVar += "                            <div class=\"bim\" id=\"propertyPanel\" style=\"display:none;\">";
+					strVar += strVar1;
+					strVar += "                            <\/div>";					
+				}
+				else
+				{
+					strVar += "                            <div id=\"presetPointPanel\" class=\"qualityContainer projectNavContentBox\" style=\"display:none;\">";
+					strVar += "                                ";
+					strVar += "                            <\/div>";
+					strVar += "                            <div class=\"bim\" id=\"propertyPanel\" style=\"display:block;\">";
+					strVar += strVar1;
+					strVar += "                            <\/div>";
+				}
 				strVar += "                        <\/div>";
 				strVar += "                    <\/div>";
 				strVar += "                <\/div>";
@@ -1129,7 +1172,7 @@
 			}
 			WebView.url = ourl + "/static/dist/components/inspectSelection/model.html?type=" + this.Settings.type + "&sourceId=" + this.Settings.sourceId + "&etag=" +
 				this.Settings.etag + "&projectId=" + this.Settings.projectId + "&projectVersionId=" + this.Settings.projectVersionId + "&ruleType=" + this.Settings.ruleType + "&appKey=" +
-				this.Settings.appKey + "&token=" + this.Settings.token + "&height=" + this.Settings.height+ "&width=" + this.Settings.width;
+				this.Settings.appKey + "&token=" + this.Settings.token + "&height=" + this.Settings.height+ "&width=" + this.Settings.width + "&withCheckpoint=" + this.Settings.withCheckpoint;
 			WebView.height = this.Settings.height||"510px";
 			WebView.width =  this.Settings.width||"960px";
 
@@ -1978,5 +2021,6 @@
 			Project.loadDataFromCache(prev);
 		}
 	});
+	
 	win.InspectModelSelection = InspectModelSelection;
 })(window)
