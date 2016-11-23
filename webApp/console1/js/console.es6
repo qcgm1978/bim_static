@@ -1356,7 +1356,7 @@ App.Console = {
         arr.push({
           "type": 1,
           "description":$(item).find('span').text(),
-          "url": $(item).data('path')
+          "url": location.host+'/platform/mock/costfile?token=123&filePath='+$(item).data('path')
         })
       })
 
@@ -1369,17 +1369,27 @@ App.Console = {
 
       };
       console.log(data)
-      return null;
+
       App.Console.apply(1,1001, data,2);
 
 
     });
 
     $("#submit2").click(function(){
+      var div = $('#form2 div'),arr = [];
+      div.each(function(index,item){
+        console.log(item,index)
+        arr.push({
+          "type": 1,
+          "description":$(item).find('span').text(),
+          "url": location.host+'/platform/mock/costfile?token=123&filePath='+$(item).data('path')
+        })
+      })
       var data  = {
         //projectCode       : $('#s11').val().trim(),
         workflowCode: parseInt(9999999 * Math.random()),
         title:$('#p21').val().trim(),
+        costAttachments : arr,
         designFlowCode:parseInt(9999999 * Math.random())
         //type:$('#s22').val().trim()
 
@@ -1409,7 +1419,7 @@ App.Console = {
               var data = JSON.parse(xhr.response);
               console.log(data)
               if(data.code==0){
-                $('.ready').append('<div data-path="'+data.data.filePath+'"><span>'+$('#description').val()+'</span><i>X</i></div>')
+                $('#form1').append('<div data-path="'+data.data.filePath+'"><span>'+$('#description').val()+'</span><i>X</i></div>')
               }else {
                 alert('上传失败')
 
@@ -1418,6 +1428,37 @@ App.Console = {
             }
           });
         }
+
+    });
+
+
+    var choose1 = document.getElementById('choose1');
+    FileAPI.event.on(choose1, 'change', function (evt){
+      var files = FileAPI.getFiles(evt); // Retrieve file list
+      console.log(files)
+
+
+      if( files.length ){
+
+        console.log(files)
+        // Uploading Files
+        FileAPI.upload({
+          url: '/platform/mock/costfile?token=123',
+          files: { file: files },
+          progress: function (evt){ /* ... */ },
+          complete: function (err, xhr){
+            var data = JSON.parse(xhr.response);
+            console.log(data)
+            if(data.code==0){
+              $('#form2').append('<div data-path="'+data.data.filePath+'"><span>'+$('#description1').val()+'</span><i>X</i></div>')
+            }else {
+              alert('上传失败')
+
+
+            }
+          }
+        });
+      }
 
     });
   },
