@@ -449,7 +449,7 @@ App.Console = {
       var data = {
         workflowId                    : parseInt(9999999 * Math.random()),
         //standardModelDevelopWorkflowId: $('#s21').val().trim(),
-        modelCode: $('#s21').val().trim(),
+        modelCode: $('#s21 option:selected').attr('id').trim(),
         versionId: $('#s211').val().trim(),
         title                         : $("#p21").val().trim(),
         description        : $("#p22").val().trim(),
@@ -1327,7 +1327,7 @@ App.Console = {
       var str = '', datas = data.data;
 
       $.each(datas, function(index, data){
-        console.log(data);
+        //console.log(data);
         str += "<option value=" + data.projectCode + ">" + data.projectName + "</option>";
       });
 
@@ -1350,13 +1350,26 @@ App.Console = {
     //});
 
     $("#submit1").click(function(){
+      var div = $('#form1 div'),arr = [];
+      div.each(function(item,index){
+        console.log(item,index)
+        arr.push({
+          "type": 1,
+          "description":$(item).text(),
+          "url": $(item).data('path')
+        })
+      })
+
       var data  = {
         //projectCode       : $('#s11').val().trim(),
         workflowCode: parseInt(9999999 * Math.random()),
+        costAttachments : arr,
         title:$('#p11').val().trim()
         //type:$('#s12').val().trim(),
 
       };
+      console.log(data)
+      return null;
       App.Console.apply(1,1001, data,2);
 
 
@@ -1375,26 +1388,35 @@ App.Console = {
 
     });
    //uploadtest
+    $('.ready').on('click','i',function(e){
+      $(this).parent().remove();
+    })
     var choose = document.getElementById('choose');
     FileAPI.event.on(choose, 'change', function (evt){
       var files = FileAPI.getFiles(evt); // Retrieve file list
+      console.log(files)
 
-      FileAPI.filterFiles(files, function (file, info/**Object*/){
 
-        return  false;
-      }, function (files/**Array*/, rejected/**Array*/){
         if( files.length ){
 
-
+          console.log(files)
           // Uploading Files
           FileAPI.upload({
-            url: 'http://bim-uat.wanda-dev.cn:9090/platform/mock/costfile?token=123',
+            url: '/platform/mock/costfile?token=123',
             files: { images: files },
             progress: function (evt){ /* ... */ },
-            complete: function (err, xhr){ console.logxhr }
+            complete: function (err, xhr){
+              var data = JSON.parse(xhr.response);
+              console.log(data)
+              if(data.code==0){
+                $('.ready').append('<div data-path="'+data.data.filePath+'">'+$('#description').val()+' <i>X</i></div>')
+              }else {
+                alert('上传失败')
+              }
+            }
           });
         }
-      });
+
     });
   },
   quest(index, num, obj, type){
