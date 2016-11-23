@@ -2185,7 +2185,7 @@ App.Project = {
 		sb.Append('</div></span>');
 		sb.Append(' <span class="modleVal overflowEllipsis" title="' + item.name + '"> ' + item.name + '</span> ');
 		if (item.totalQuantity) {
-			sb.Append('<span class="modelCostVal  overflowEllipsis" title="' + item.totalQuantity + '&nbsp;' + item.unit + '">' + Number(item.totalQuantity).toFixed(4) + '&nbsp;' + item.unit + '</span>');
+			sb.Append('<span class="modelCostVal  overflowEllipsis" title="' + Number(item.totalQuantity).toFixed(2) + '&nbsp;' + item.unit + '">' + Number(item.totalQuantity).toFixed(2) + '&nbsp;' + item.unit + '</span>');
 		}
 		//递归
 		if (item.children && item.children.length > 0) {
