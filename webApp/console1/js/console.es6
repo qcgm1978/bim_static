@@ -1351,11 +1351,11 @@ App.Console = {
 
     $("#submit1").click(function(){
       var div = $('#form1 div'),arr = [];
-      div.each(function(item,index){
+      div.each(function(index,item){
         console.log(item,index)
         arr.push({
           "type": 1,
-          "description":$(item).text(),
+          "description":$(item).find('span').text(),
           "url": $(item).data('path')
         })
       })
@@ -1409,7 +1409,7 @@ App.Console = {
               var data = JSON.parse(xhr.response);
               console.log(data)
               if(data.code==0){
-                $('.ready').append('<div data-path="'+data.data.filePath+'">'+$('#description').val()+' <i>X</i></div>')
+                $('.ready').append('<div data-path="'+data.data.filePath+'"><span>'+$('#description').val()+'</span><i>X</i></div>')
               }else {
                 alert('上传失败')
               }

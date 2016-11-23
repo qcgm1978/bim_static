@@ -786,6 +786,24 @@ CLOUD.GeomUtil = {
 
     }(),
 
+    parseHermitePipe: function (objJSON) {
+
+        var reg = new RegExp("'", "g");
+        var params = objJSON.params;
+        params = params.replace(reg, '"');
+        params = JSON.parse(params);
+        var points = [];
+        for (var ii = 0, len = params.ctrlPts.length/3; ii < len; ++ii) {
+            var pt = new THREE.Vector3();
+            pt.fromArray(params.ctrlPts, ii * 3);
+            points.push(pt);
+        }
+        var extrudePath = new THREE.CatmullRomCurve3(points);
+        var tube = new THREE.TubeGeometry(extrudePath, 5, params.radius, 6, false);
+
+        return tube;
+    },
+
     parsePGeomNodeInstance: function (objJSON, matObj, trf) {
 
         var object;
@@ -804,6 +822,9 @@ CLOUD.GeomUtil = {
 
             CLOUD.GeomUtil.parseBoxNode(object, objJSON);
 
+        }
+        else if (objJSON.geomType == "hermitepipe") {
+            object = new THREE.Mesh(CLOUD.GeomUtil.parseHermitePipe(objJSON), matObj);
         }
         else {
             console.log("unknonw geometry!");
@@ -18160,7 +18181,7 @@ CLOUD.SceneLoader.prototype = {
                 if (trf) {
                     trfLocal.multiplyMatrices(trf, trfLocal.clone());
                 }
-
+                
                 object = CLOUD.GeomUtil.parsePGeomNodeInstance(symbolJSON, matObj, trfLocal);
 
                 if (object) {
