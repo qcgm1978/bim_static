@@ -536,8 +536,9 @@ App.Console = {
     var tpl = _.templateUrl('/console1/tpls/project/project.html', true);
     $("#contains").html(tpl);
     this.search();
+    var self = this;
     $('textarea').hide();
-    this.twoApply(1,'s02','s03',9);
+
     $.ajax({
       url: "platform/project?type=1"
     }).done(function(data){
@@ -557,6 +558,21 @@ App.Console = {
     });
     //6.1
     this.fn['6.1']=function(){
+      self.twoApply(1,'s02','s03',9);
+      $.ajax({
+        url: "platform/project?type=2&versionStatus=9&pageItemCount=100000"
+      }).done(function(data){
+
+        var items = data.data.items, str = '';
+
+        $.each(items, function(i, item){
+          if(item.version){
+            str += '<option versionid="' + item.version.id + '" value="' + item.projectNo + '">' + item.name + '</option>';
+          }
+
+        });
+        $("#s12").html('<option value="">请选择</option>'+str);
+      });
       $.ajax({
         url: "platform/api/project?uninit=1"
       }).done(function(data){
@@ -668,9 +684,7 @@ App.Console = {
         estateType: 1,
         //refModelCode     : $('#s02').val(),
         //refModelVersionId: $('#s03').val(),
-        referenceId     : $('#s02 option:selected').attr('id'),
-        referenceVersionId: $('#s03').val(),
-        refModelName     : $('#s02 option:selected').text(),
+
         province: "上海市",
         region: "管理分区", //管理分区，最大长度32。非空
         openTime: $("#devDate").val().trim(), //开业时间
@@ -707,8 +721,13 @@ App.Console = {
       var data = {
         workflowId : parseInt(9999999 * Math.random()),
         projectCode: $('#s1 option:selected').attr('id').trim(),
-        projectName: $('#s1').val().trim(),
+        projectName: $('#s1 option:selected').text().trim(),
         title      : $("#p13").val().trim(),
+        modelCode     : $('#s02').val(),
+        modelVersionId: $('#s03').val(),
+        modelName     : $('#s02 option:selected').text(),
+        familyCode       : $('#s12').val().trim(),
+        familyName       : $('#s12 option:selected').text().trim(),
         "initiator"        : App.Console.getPerson(0),
         "auditor"          : App.Console.getPerson(1),
         "confirmor"        : App.Console.getPerson(2),
