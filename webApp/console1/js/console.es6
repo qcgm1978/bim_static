@@ -666,8 +666,10 @@ App.Console = {
         name: $("#famTitle").val().trim(),
         projectType: 2,
         estateType: 1,
-        refModelCode     : $('#s02').val(),
-        refModelVersionId: $('#s03').val(),
+        //refModelCode     : $('#s02').val(),
+        //refModelVersionId: $('#s03').val(),
+        referenceId     : $('#s02 option:selected').attr('id'),
+        referenceVersionId: $('#s03').val(),
         refModelName     : $('#s02 option:selected').text(),
         province: "上海市",
         region: "管理分区", //管理分区，最大长度32。非空
