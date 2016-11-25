@@ -995,12 +995,12 @@ App.Console = {
       });
     });
     $("#submit4").click(function(){
-      //var files = [],i,
-      //  ids = $('#p14').val().trim().split(',');
-      //for(i = 0; i<ids.length;i++){
-      //  files.push({"fileId":ids[i]})
-      //}
-      //console.log(files)
+      var files = [],i,
+        ids = JSON.parse($('#p15').val().trim());
+      for(i = 0; i<ids.length;i++){
+        ids[i]['versionId']=ids[i]['fileVersionId']
+      }
+      console.log(files)
       data = {
         title                   : $('#p11').val().trim(),
         workflowId              : parseInt(9999999 * Math.random()),
@@ -1011,7 +1011,7 @@ App.Console = {
         refProjectModelVersionId: $('#s12').val().trim(),
         description             : $('#p13').val().trim(),
         createTime             : $('#p14').val().trim(),
-        changedFiles            : JSON.parse($('#p15').val().trim()),
+        changedFiles            : ids,
         status                  : 8,
         "initiator"        : App.Console.getPerson(0),
         "auditor"          : App.Console.getPerson(1),
