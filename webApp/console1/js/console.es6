@@ -449,7 +449,7 @@ App.Console = {
       var data = {
         workflowId                    : parseInt(9999999 * Math.random()),
         //standardModelDevelopWorkflowId: $('#s21').val().trim(),
-        modelCode: $('#s21').val().trim(),
+        modelCode: $('#s21 option:selected').attr('id').trim(),
         versionId: $('#s211').val().trim(),
         title                         : $("#p21").val().trim(),
         description        : $("#p22").val().trim(),
@@ -536,8 +536,9 @@ App.Console = {
     var tpl = _.templateUrl('/console1/tpls/project/project.html', true);
     $("#contains").html(tpl);
     this.search();
+    var self = this;
     $('textarea').hide();
-    this.twoApply(1,'s02','s03',9);
+
     $.ajax({
       url: "platform/project?type=1"
     }).done(function(data){
@@ -557,6 +558,21 @@ App.Console = {
     });
     //6.1
     this.fn['6.1']=function(){
+      self.twoApply(1,'s02','s03',9);
+      $.ajax({
+        url: "platform/project?type=2&versionStatus=9&pageItemCount=100000"
+      }).done(function(data){
+
+        var items = data.data.items, str = '';
+
+        $.each(items, function(i, item){
+          if(item.version){
+            str += '<option versionid="' + item.version.id + '" value="' + item.projectNo + '">' + item.name + '</option>';
+          }
+
+        });
+        $("#s12").html('<option value="">请选择</option>'+str);
+      });
       $.ajax({
         url: "platform/api/project?uninit=1"
       }).done(function(data){
@@ -666,9 +682,9 @@ App.Console = {
         name: $("#famTitle").val().trim(),
         projectType: 2,
         estateType: 1,
-        refModelCode     : $('#s02').val(),
-        refModelVersionId: $('#s03').val(),
-        refModelName     : $('#s02 option:selected').text(),
+        //refModelCode     : $('#s02').val(),
+        //refModelVersionId: $('#s03').val(),
+
         province: "上海市",
         region: "管理分区", //管理分区，最大长度32。非空
         openTime: $("#devDate").val().trim(), //开业时间
@@ -705,8 +721,13 @@ App.Console = {
       var data = {
         workflowId : parseInt(9999999 * Math.random()),
         projectCode: $('#s1 option:selected').attr('id').trim(),
-        projectName: $('#s1').val().trim(),
+        projectName: $('#s1 option:selected').text().trim(),
         title      : $("#p13").val().trim(),
+        modelCode     : $('#s02').val(),
+        modelVersionId: $('#s03').val(),
+        modelName     : $('#s02 option:selected').text(),
+        familyCode       : $('#s12').val().trim(),
+        familyName       : $('#s12 option:selected').text().trim(),
         "initiator"        : App.Console.getPerson(0),
         "auditor"          : App.Console.getPerson(1),
         "confirmor"        : App.Console.getPerson(2),
@@ -974,12 +995,12 @@ App.Console = {
       });
     });
     $("#submit4").click(function(){
-      //var files = [],i,
-      //  ids = $('#p14').val().trim().split(',');
-      //for(i = 0; i<ids.length;i++){
-      //  files.push({"fileId":ids[i]})
-      //}
-      //console.log(files)
+      var files = [],i,
+        ids = JSON.parse($('#p15').val().trim());
+      for(i = 0; i<ids.length;i++){
+        ids[i]['versionId']=ids[i]['fileVersionId']
+      }
+      console.log(files)
       data = {
         title                   : $('#p11').val().trim(),
         workflowId              : parseInt(9999999 * Math.random()),
@@ -990,7 +1011,7 @@ App.Console = {
         refProjectModelVersionId: $('#s12').val().trim(),
         description             : $('#p13').val().trim(),
         createTime             : $('#p14').val().trim(),
-        changedFiles            : JSON.parse($('#p15').val().trim()),
+        changedFiles            : ids,
         status                  : 8,
         "initiator"        : App.Console.getPerson(0),
         "auditor"          : App.Console.getPerson(1),
@@ -1322,16 +1343,16 @@ App.Console = {
     var tpl = _.templateUrl('/console1/tpls/cost/cost.html', true);
     $("#contains").html(tpl);
     $.ajax({
-      url: "/platform/mapping/project?type=2"
+      url: "/platform/project/cost/mapping"
     }).done(function(data){
       var str = '', datas = data.data;
 
       $.each(datas, function(index, data){
-        console.log(data);
+        //console.log(data);
         str += "<option value=" + data.projectCode + ">" + data.projectName + "</option>";
       });
 
-      $('#s11').append(str)
+      $('#s11,#s21').append(str)
 
     });
 
@@ -1350,23 +1371,48 @@ App.Console = {
     //});
 
     $("#submit1").click(function(){
+      var div = $('#form1 div'),arr = [];
+      div.each(function(index,item){
+        console.log(item,index)
+        arr.push({
+          "type": 1,
+          "description":$(item).find('span').text(),
+          "url": location.host+'/platform/mock/costfile?token=123&filePath='+$(item).data('path')
+        })
+      })
+
       var data  = {
         //projectCode       : $('#s11').val().trim(),
         workflowCode: parseInt(9999999 * Math.random()),
+        costAttachments : arr,
+        projectCode:$('#s11').val().trim(),
         title:$('#p11').val().trim()
         //type:$('#s12').val().trim(),
 
       };
+      console.log(data)
+
       App.Console.apply(1,1001, data,2);
 
 
     });
 
     $("#submit2").click(function(){
+      var div = $('#form2 div'),arr = [];
+      div.each(function(index,item){
+        console.log(item,index)
+        arr.push({
+          "type": 1,
+          "description":$(item).find('span').text(),
+          "url": location.host+'/platform/mock/costfile?token=123&filePath='+$(item).data('path')
+        })
+      })
       var data  = {
         //projectCode       : $('#s11').val().trim(),
         workflowCode: parseInt(9999999 * Math.random()),
         title:$('#p21').val().trim(),
+        costAttachments : arr,
+        projectCode:$('#s21').val().trim(),
         designFlowCode:parseInt(9999999 * Math.random())
         //type:$('#s22').val().trim()
 
@@ -1374,7 +1420,70 @@ App.Console = {
       App.Console.apply(2,1003, data,2);
 
     });
+   //uploadtest
+    $('.ready').on('click','i',function(e){
+      $(this).parent().remove();
+    })
+    var choose = document.getElementById('choose');
+    FileAPI.event.on(choose, 'change', function (evt){
+      var files = FileAPI.getFiles(evt); // Retrieve file list
+      console.log(files)
 
+
+        if( files.length ){
+
+          console.log(files)
+          // Uploading Files
+          FileAPI.upload({
+            url: '/platform/mock/costfile?token=123',
+            files: { file: files },
+            progress: function (evt){ /* ... */ },
+            complete: function (err, xhr){
+              var data = JSON.parse(xhr.response);
+              console.log(data)
+              if(data.code==0){
+                $('#form1').append('<div data-path="'+data.data.filePath+'"><span>'+$('#description').val()+'</span><i>X</i></div>')
+              }else {
+                alert('上传失败')
+
+
+              }
+            }
+          });
+        }
+
+    });
+
+
+    var choose1 = document.getElementById('choose1');
+    FileAPI.event.on(choose1, 'change', function (evt){
+      var files = FileAPI.getFiles(evt); // Retrieve file list
+      console.log(files)
+
+
+      if( files.length ){
+
+        console.log(files)
+        // Uploading Files
+        FileAPI.upload({
+          url: '/platform/mock/costfile?token=123',
+          files: { file: files },
+          progress: function (evt){ /* ... */ },
+          complete: function (err, xhr){
+            var data = JSON.parse(xhr.response);
+            console.log(data)
+            if(data.code==0){
+              $('#form2').append('<div data-path="'+data.data.filePath+'"><span>'+$('#description1').val()+'</span><i>X</i></div>')
+            }else {
+              alert('上传失败')
+
+
+            }
+          }
+        });
+      }
+
+    });
   },
   quest(index, num, obj, type){
     var datainit = JSON.parse($('#data' + index).val());

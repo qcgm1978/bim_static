@@ -2183,9 +2183,9 @@ App.Project = {
 		}
 		sb.Append(item.code);
 		sb.Append('</div></span>');
-		sb.Append(' <span class="modleVal overflowEllipsis" title="' + item.name + '"> ' + item.name + '</span> ');
+		sb.Append(' <span class="modleVal overflowEllipsis" title="' + item.name + '"> ' + item.name + '</span> ');//Number(item.totalQuantity).toFixed(4)
 		if (item.totalQuantity) {
-			sb.Append('<span class="modelCostVal  overflowEllipsis" title="' + item.totalQuantity + '&nbsp;' + item.unit + '">' + Number(item.totalQuantity).toFixed(4) + '&nbsp;' + item.unit + '</span>');
+			sb.Append('<span class="modelCostVal  overflowEllipsis" title="' + item.totalQuantity + '&nbsp;' + item.unit + '">' + item.totalQuantity + '&nbsp;' + item.unit + '</span>');
 		}
 		//递归
 		if (item.children && item.children.length > 0) {
