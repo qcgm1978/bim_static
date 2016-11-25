@@ -823,9 +823,9 @@ CLOUD.GeomUtil = {
             CLOUD.GeomUtil.parseBoxNode(object, objJSON);
 
         }
-        else if (objJSON.geomType == "hermitepipe") {
-            object = new THREE.Mesh(CLOUD.GeomUtil.parseHermitePipe(objJSON), matObj);
-        }
+        //else if (objJSON.geomType == "hermitepipe") {
+        //    object = new THREE.Mesh(CLOUD.GeomUtil.parseHermitePipe(objJSON), matObj);
+        //}
         else {
             console.log("unknonw geometry!");
             return object;
