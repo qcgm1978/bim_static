@@ -15,7 +15,8 @@ App.Services.ProjectLink=Backbone.View.extend({
 	template:_.templateUrl('/services/tpls/project/project.list.html',true),
 	
 	initialize(data){
-		this.userData=data.userData
+		this.userData=data.userData;
+		this.codeId=data.userData.codeId;
 	},
 
 	render(){
@@ -23,9 +24,8 @@ App.Services.ProjectLink=Backbone.View.extend({
 		_this.loadData(function(data){
 			
 			_this.projectData=data;
-		
 			var _tpl=_.template(_this.template);
-			_this.$el.html(_tpl(data));
+			_this.$el.html(_tpl({data:data,codeId:_this.codeId}));
 		});
 		return this;
 	},
@@ -43,9 +43,10 @@ App.Services.ProjectLink=Backbone.View.extend({
 		})
 	},
 	
-	selectProject:function(e){
-		$(e.currentTarget).toggleClass('selected');
-		$(e.currentTarget).find('.checkClass').toggleClass('unCheckClass');
+	selectProject:function(e){//张延凯修改
+		$(e.currentTarget).siblings().removeClass('selected').end().toggleClass('selected');
+		// $(e.currentTarget).toggleClass('selected');//之前的代码
+		// $(e.currentTarget).find('.checkClass').toggleClass('unCheckClass');//之前的代码
 	},
 	
 	linkProject:function(){
@@ -58,29 +59,48 @@ App.Services.ProjectLink=Backbone.View.extend({
 		var _result={
 				    'projectId':projectId
 				}
-		if($li.length>0){
-			_result[type]=$li.first().attr('data-code');
-			App.Comm.ajax({
-				URLtype:'putProjectLink',
-				type:'PUT',
-				contentType:'application/json',
-				data:JSON.stringify(_result)
-			},function(data){
-				$("#dataLoading").hide();
-				App.Global.module.close();
-				let collectionMap=App.Services.ProjectCollection.ProjecMappingCollection;
-		 		collectionMap.projectId=projectId;
-		 		collectionMap.fetch({
-		 			reset:true,
-		 			success(child, data) {}
-		 		});
-			}).fail(function(){
-				$("#dataLoading").hide();
-			})
-		}else{
+		//张延凯修改
+		_result[type]=$li.length>0?$li.first().attr('data-code'):"";
+		App.Comm.ajax({
+			URLtype:'putProjectLink',
+			type:'PUT',
+			contentType:'application/json',
+			data:JSON.stringify(_result)
+		},function(data){
 			$("#dataLoading").hide();
 			App.Global.module.close();
-		}
+			let collectionMap=App.Services.ProjectCollection.ProjecMappingCollection;
+	 		collectionMap.projectId=projectId;
+	 		collectionMap.fetch({
+	 			reset:true,
+	 			success(child, data) {}
+	 		});
+		}).fail(function(){
+			$("#dataLoading").hide();
+		})
+		// if($li.length>0){//张延凯修改
+		// 	_result[type]=$li.first().attr('data-code');
+		// 	App.Comm.ajax({
+		// 		URLtype:'putProjectLink',
+		// 		type:'PUT',
+		// 		contentType:'application/json',
+		// 		data:JSON.stringify(_result)
+		// 	},function(data){
+		// 		$("#dataLoading").hide();
+		// 		App.Global.module.close();
+		// 		let collectionMap=App.Services.ProjectCollection.ProjecMappingCollection;
+		//  		collectionMap.projectId=projectId;
+		//  		collectionMap.fetch({
+		//  			reset:true,
+		//  			success(child, data) {}
+		//  		});
+		// 	}).fail(function(){
+		// 		$("#dataLoading").hide();
+		// 	})
+		// }else{
+		// 	$("#dataLoading").hide();
+		// 	App.Global.module.close();
+		// }
 	},
 	
 	updateList(e){

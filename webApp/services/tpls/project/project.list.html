@@ -3,8 +3,8 @@
 </div>
 <div class="projectLinkContent">
 	<table>
-		<% _.each(data,function(item){%>
-		<tr data-code='<%= item.projectCode %>'>
+		<% _.each(data.data,function(item){%>
+		<tr data-code='<%= item.projectCode %>' class='<%= obj.codeId==item.projectCode?"selected":"" %>'>
 			<td>
 				<i class="checkClass"></i>
 			</td>
