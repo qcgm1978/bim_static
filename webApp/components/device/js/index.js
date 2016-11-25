@@ -534,7 +534,8 @@
             box.push(maxArr);
             return box;
         },
-        zoom:function(ids,markers){
+        zoom:function(ids,markers,boxs){
+            Project.Viewer.setTopView(boxs, true);
             Project.Viewer.loadMarkers(markers);
             Project.Viewer.translucent(true);
             Project.Viewer.highlight({
@@ -548,7 +549,8 @@
             var _this=this;
             var list=isAll?Project.data:Project.dataCore.list,
                 markers=[],
-                ids=[];
+                ids=[],
+                boxs=[];
             _.each(list,function(item){
                 var box=item.boundingbox||item.boundingBox;
                 var location={
@@ -558,8 +560,9 @@
                 }
                 ids.push(item.componentId);
                 markers.push(_this.formatMark(location,0,item.id));
+                boxs.push(box);
             })
-            _this.zoom(ids,markers);
+            _this.zoom(ids,markers,boxs);
         }
     }
 
