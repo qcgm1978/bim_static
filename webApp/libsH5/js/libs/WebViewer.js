@@ -3,7 +3,7 @@
 */
 
 var CLOUD = CLOUD || {};
-CLOUD.Version = "20161109";
+CLOUD.Version = "20161125";
 
 CLOUD.GlobalData = {
     SceneSize: 1000,
@@ -21,7 +21,7 @@ CLOUD.GlobalData = {
     RayTracingDeep: 10,
     SubSceneVisibleLOD: 10,
     ScreenCullLOD: 0.0002,
-    LimitFrameTime: 250,
+    LimitFrameTime: 100,
     GarbageCollection: true,
     ByTargetDistance: false,
     MaxLoadSceneCount: 40,

@@ -9172,7 +9172,10 @@ CLOUD.Extensions.AnnotationEditor = function (domElement, cameraEditor) {
     this.initialized = false;
     this.epsilon = 0.0001;
     this.annotationStyle = null;
+    this.isDblClickCloseCloud = false;
+    this.mouseButtons = { LEFT: 0, MIDDLE: 1, RIGHT: 2 };
 
+    this.onContextMenuBinded = this.onContextMenu.bind(this);
     this.onMouseDownBinded = this.onMouseDown.bind(this);
     this.onMouseDoubleClickBinded = this.onMouseDoubleClick.bind(this);
     this.onMouseMoveBinded = this.onMouseMove.bind(this);
@@ -9187,6 +9190,7 @@ CLOUD.Extensions.AnnotationEditor.prototype.addDomEventListeners = function () {
 
         this.svg.addEventListener('mousedown', this.onMouseDownBinded, false);
         this.svg.addEventListener('dblclick', this.onMouseDoubleClickBinded, false);
+        this.svg.addEventListener('contextmenu', this.onContextMenuBinded, false);
 
         window.addEventListener('mousemove', this.onMouseMoveBinded, false);
         window.addEventListener('mouseup', this.onMouseUpBinded, false);
@@ -9204,6 +9208,7 @@ CLOUD.Extensions.AnnotationEditor.prototype.removeDomEventListeners = function (
 
         this.svg.removeEventListener('mousedown', this.onMouseDownBinded, false);
         this.svg.removeEventListener('dblclick', this.onMouseDoubleClickBinded, false);
+        this.svg.removeEventListener('contextmenu', this.onContextMenuBinded, false);
 
         window.removeEventListener('mousemove', this.onMouseMoveBinded, false);
         window.removeEventListener('mouseup', this.onMouseUpBinded, false);
@@ -9221,23 +9226,32 @@ CLOUD.Extensions.AnnotationEditor.prototype.onFocus = function () {
     }
 };
 
+CLOUD.Extensions.AnnotationEditor.prototype.onContextMenu = function (event) {
+
+    event.preventDefault();
+};
+
+
 CLOUD.Extensions.AnnotationEditor.prototype.onMouseDown = function (event) {
 
     event.preventDefault();
     event.stopPropagation();
 
-    if (this.annotationFrame.isActive()) {
+    if (event.button === this.mouseButtons.LEFT) {
 
-        this.annotationFrame.setAnnotation(this.selectedAnnotation);
+        if (this.annotationFrame.isActive()) {
 
-        return;
-    }
+            this.annotationFrame.setAnnotation(this.selectedAnnotation);
 
-    this.handleMouseEvent(event, "down");
+            return;
+        }
 
-    if (!this.isCreating && event.target === this.svg) {
+        this.handleMouseEvent(event, "down");
 
-        this.selectAnnotation(null);
+        if (!this.isCreating && event.target === this.svg) {
+
+            this.selectAnnotation(null);
+        }
     }
 };
 
@@ -9247,15 +9261,19 @@ CLOUD.Extensions.AnnotationEditor.prototype.onMouseMove = function (event) {
     //event.preventDefault();
     event.stopPropagation();
 
-    if (this.annotationFrame.isActive()) {
+    if (event.button === this.mouseButtons.LEFT) {
 
-        this.annotationFrame.onMouseMove(event);
-        this.annotationFrame.setAnnotation(this.selectedAnnotation);
+        if (this.annotationFrame.isActive()) {
 
-        return;
+            this.annotationFrame.onMouseMove(event);
+            this.annotationFrame.setAnnotation(this.selectedAnnotation);
+
+            return;
+        }
+
+        this.handleMouseEvent(event, "move");
     }
 
-    this.handleMouseEvent(event, "move");
 };
 
 CLOUD.Extensions.AnnotationEditor.prototype.onMouseUp = function (event) {
@@ -9287,7 +9305,10 @@ CLOUD.Extensions.AnnotationEditor.prototype.onMouseDoubleClick = function (event
         return;
     }
 
-    this.mouseDoubleClickForCloud(event);
+    if (this.isDblClickCloseCloud) {
+        this.mouseDoubleClickForCloud(event);
+    }
+
     this.mouseDoubleClickForText(event, annotation);
 };
 
@@ -9738,43 +9759,122 @@ CLOUD.Extensions.AnnotationEditor.prototype.mouseMoveForCloud = function (event)
     }
 };
 
+//CLOUD.Extensions.AnnotationEditor.prototype.mouseUpForCloud = function (event) {
+//
+//    if (!this.selectedAnnotation || !this.isCreating) {
+//        return;
+//    }
+//
+//    var end = this.getPointOnDomContainer(event.clientX, event.clientY);
+//    var origin = {x: this.originX, y: this.originY};
+//    var threshold = 2; // 相差2个像素
+//
+//    // 判断是否同一个点, 同一个点不加入集合
+//    if (CLOUD.Extensions.Utils.Geometric.isEqualBetweenPoints(origin, end, threshold)) return;
+//
+//    var point = this.getAnnotationWorldPosition({x: end.x, y: end.y});
+//    this.cloudPoints.push(point);
+//
+//    var cloud = this.selectedAnnotation;
+//
+//    // 先禁止跟踪，在真正响应事件时启用
+//    cloud.disableTrack();
+//
+//    var positions = this.cloudPoints;
+//
+//    // 采用计时器来判断是否单击和双击
+//    function handleMouseUp() {
+//
+//        cloud.finishTrack();
+//        cloud.setByPositions(positions);
+//        cloud.enableTrack();
+//    }
+//
+//    if (this.timerId) {
+//        clearTimeout(this.timerId);
+//    }
+//
+//    // 延迟300ms以判断是否单击
+//    this.timerId = setTimeout(handleMouseUp, 300);
+//};
+//
+//CLOUD.Extensions.AnnotationEditor.prototype.mouseDoubleClickForCloud = function (event) {
+//
+//    if (this.isCreating && this.selectedAnnotation) {
+//
+//        if (this.selectedAnnotation.shapeType === CLOUD.Extensions.Annotation.shapeTypes.CLOUD) {
+//
+//            // 清除定时器
+//            if (this.timerId) {
+//                clearTimeout(this.timerId);
+//            }
+//
+//            var position = this.getPointOnDomContainer(event.clientX, event.clientY);
+//            var point = this.getAnnotationWorldPosition(position);
+//
+//            this.cloudPoints.push({x: point.x, y: point.y});
+//            this.selectedAnnotation.finishTrack();
+//            // 结束云图绘制，并封闭云图
+//            this.selectedAnnotation.setByPositions(this.cloudPoints, true);
+//            this.createAnnotationEnd();
+//            this.deselectAnnotation();
+//        }
+//    }
+//};
+
 CLOUD.Extensions.AnnotationEditor.prototype.mouseUpForCloud = function (event) {
 
-    if (!this.selectedAnnotation || !this.isCreating) {
-        return;
+    if (event.button === this.mouseButtons.LEFT) {
+
+        if (!this.selectedAnnotation || !this.isCreating) {
+            return;
+        }
+
+        var end = this.getPointOnDomContainer(event.clientX, event.clientY);
+        var origin = {x: this.originX, y: this.originY};
+        var threshold = 2; // 相差2个像素
+
+        // 判断是否同一个点, 同一个点不加入集合
+        if (CLOUD.Extensions.Utils.Geometric.isEqualBetweenPoints(origin, end, threshold)) return;
+
+        var point = this.getAnnotationWorldPosition({x: end.x, y: end.y});
+        this.cloudPoints.push(point);
+
+        var cloud = this.selectedAnnotation;
+
+        // 先禁止跟踪，在真正响应事件时启用
+        cloud.disableTrack();
+
+        var positions = this.cloudPoints;
+
+        // 采用计时器来判断是否单击和双击
+        function handleMouseUp() {
+
+            cloud.finishTrack();
+            cloud.setByPositions(positions);
+            cloud.enableTrack();
+        }
+
+        if (this.isDblClickCloseCloud) {
+
+            if (this.timerId) {
+                clearTimeout(this.timerId);
+            }
+
+            // 延迟300ms以判断是否单击
+            this.timerId = setTimeout(handleMouseUp, 300);
+
+        } else {
+
+            handleMouseUp();
+
+        }
+
+    } else if (event.button === this.mouseButtons.RIGHT) {
+
+        this.mouseDoubleClickForCloud(event);
     }
 
-    var end = this.getPointOnDomContainer(event.clientX, event.clientY);
-    var origin = {x: this.originX, y: this.originY};
-    var threshold = 2; // 相差2个像素
-
-    // 判断是否同一个点, 同一个点不加入集合
-    if (CLOUD.Extensions.Utils.Geometric.isEqualBetweenPoints(origin, end, threshold)) return;
-
-    var point = this.getAnnotationWorldPosition({x: end.x, y: end.y});
-    this.cloudPoints.push(point);
-
-    var cloud = this.selectedAnnotation;
-
-    // 先禁止跟踪，在真正响应事件时启用
-    cloud.disableTrack();
-
-    var positions = this.cloudPoints;
-
-    // 采用计时器来判断是否单击和双击
-    function handleMouseUp() {
-
-        cloud.finishTrack();
-        cloud.setByPositions(positions);
-        cloud.enableTrack();
-    }
-
-    if (this.timerId) {
-        clearTimeout(this.timerId);
-    }
-
-    // 延迟300ms以判断是否单击
-    this.timerId = setTimeout(handleMouseUp, 300);
 };
 
 CLOUD.Extensions.AnnotationEditor.prototype.mouseDoubleClickForCloud = function (event) {
@@ -9783,9 +9883,12 @@ CLOUD.Extensions.AnnotationEditor.prototype.mouseDoubleClickForCloud = function 
 
         if (this.selectedAnnotation.shapeType === CLOUD.Extensions.Annotation.shapeTypes.CLOUD) {
 
-            // 清除定时器
-            if (this.timerId) {
-                clearTimeout(this.timerId);
+            if (this.isDblClickCloseCloud) {
+
+                // 清除定时器
+                if (this.timerId) {
+                    clearTimeout(this.timerId);
+                }
             }
 
             var position = this.getPointOnDomContainer(event.clientX, event.clientY);
@@ -10578,6 +10681,11 @@ CLOUD.Extensions.AnnotationEditor.prototype.onCameraChange = function () {
 
 };
 
+CLOUD.Extensions.AnnotationEditor.prototype.enableDblClickCloseCloud = function (enable) {
+
+    this.isDblClickCloseCloud = enable;
+};
+
 // ---------------------------- 外部 API END ---------------------------- //
 
 var CLOUD = CLOUD || {};
@@ -11303,7 +11411,7 @@ CLOUD.Extensions.PdfAnnotationHelper = function (domContainer) {
         'font-style': '',
         'font-weight': ''
     };
-
+    this.isDblClickCloseCloud = true;
 };
 
 CLOUD.Extensions.PdfAnnotationHelper.prototype = {
@@ -11354,6 +11462,8 @@ CLOUD.Extensions.PdfAnnotationHelper.prototype = {
             this.editor.setDomContainer(domElement);
 
         }
+
+        this.editor.enableDblClickCloseCloud(this.isDblClickCloseCloud);
 
         if (!this.editor.isInitialized()) {
 
@@ -11516,6 +11626,13 @@ CLOUD.Extensions.PdfAnnotationHelper.prototype = {
 
     },
 
+    // 特殊处理 - 是否允许双击关闭云图批注
+    enableDblClickCloseCloud: function(enable) {
+
+        this.isDblClickCloseCloud = enable;
+
+    },
+
     // 截屏 base64格式png图片
     captureAnnotationsScreenSnapshot: function (dataUrl) {
 
@@ -11539,6 +11656,7 @@ CLOUD.Extensions.AnnotationHelper = function (viewer) {
         'font-style': '',
         'font-weight': ''
     };
+    this.isDblClickCloseCloud = true;
 };
 
 CLOUD.Extensions.AnnotationHelper.prototype = {
@@ -11568,6 +11686,8 @@ CLOUD.Extensions.AnnotationHelper.prototype = {
 
             this.editor = new CLOUD.Extensions.AnnotationEditor(viewer.domElement, viewer.cameraEditor);
         }
+
+        this.editor.enableDblClickCloseCloud(this.isDblClickCloseCloud);
 
         if (!this.editor.isInitialized()) {
 
@@ -11698,6 +11818,13 @@ CLOUD.Extensions.AnnotationHelper.prototype = {
         }
     },
 
+    // 特殊处理 - 是否允许双击关闭云图批注
+    enableDblClickCloseCloud: function(enable) {
+
+        this.isDblClickCloseCloud = enable;
+
+    },
+
     // 截屏 base64格式png图片
     captureAnnotationsScreenSnapshot: function () {
 
@@ -11725,6 +11852,7 @@ CLOUD.Extensions.FreeAnnotationHelper = function () {
         'font-style': '',
         'font-weight': ''
     };
+    this.isDblClickCloseCloud = false;
 };
 
 CLOUD.Extensions.FreeAnnotationHelper.prototype = {
@@ -11769,6 +11897,8 @@ CLOUD.Extensions.FreeAnnotationHelper.prototype = {
             this.editor = new CLOUD.Extensions.FreeAnnotationEditor(this.domElement);
 
         }
+
+        this.editor.enableDblClickCloseCloud(this.isDblClickCloseCloud);
 
         if (!this.editor.isInitialized()) {
 
@@ -11889,6 +12019,13 @@ CLOUD.Extensions.FreeAnnotationHelper.prototype = {
             this.editor.onCameraChange();
 
         }
+    },
+
+    // 特殊处理 - 是否允许双击关闭云图批注
+    enableDblClickCloseCloud: function(enable) {
+
+        this.isDblClickCloseCloud = enable;
+
     },
 
     // 截屏 base64格式png图片
