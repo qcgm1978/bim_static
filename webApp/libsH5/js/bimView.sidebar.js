@@ -209,7 +209,7 @@
         url:bimView.API.fetchFloorsMap,
         etag:self._opt.etag,
         sourceId:self._opt.sourceId
-      },function(res){
+      },function(res){debugger
         if(res.message == "success"){
           floorsData = res.data.sort(function(a,b){
             return b.sort - a.sort;
