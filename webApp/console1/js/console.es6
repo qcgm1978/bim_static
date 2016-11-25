@@ -1343,7 +1343,7 @@ App.Console = {
     var tpl = _.templateUrl('/console1/tpls/cost/cost.html', true);
     $("#contains").html(tpl);
     $.ajax({
-      url: "/platform/mapping/project?type=2"
+      url: "/platform/project/cost/mapping"
     }).done(function(data){
       var str = '', datas = data.data;
 
@@ -1352,7 +1352,7 @@ App.Console = {
         str += "<option value=" + data.projectCode + ">" + data.projectName + "</option>";
       });
 
-      $('#s11').append(str)
+      $('#s11,#s21').append(str)
 
     });
 
@@ -1385,6 +1385,7 @@ App.Console = {
         //projectCode       : $('#s11').val().trim(),
         workflowCode: parseInt(9999999 * Math.random()),
         costAttachments : arr,
+        projectCode:$('#s11').val().trim(),
         title:$('#p11').val().trim()
         //type:$('#s12').val().trim(),
 
@@ -1411,6 +1412,7 @@ App.Console = {
         workflowCode: parseInt(9999999 * Math.random()),
         title:$('#p21').val().trim(),
         costAttachments : arr,
+        projectCode:$('#s21').val().trim(),
         designFlowCode:parseInt(9999999 * Math.random())
         //type:$('#s22').val().trim()
 
