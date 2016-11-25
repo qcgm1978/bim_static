@@ -1342,6 +1342,8 @@ App.Console = {
   cost(){
     var tpl = _.templateUrl('/console1/tpls/cost/cost.html', true);
     $("#contains").html(tpl);
+    $('textarea').hide();
+
     $.ajax({
       url: "/platform/project/cost/mapping"
     }).done(function(data){
