@@ -1358,19 +1358,7 @@ App.Console = {
 
     });
 
-    //$.ajax({
-    //  url: "/platform/project/1/version"
-    //}).done(function(data){
-    //  var str = '', datas = data.data;
-    //
-    //  $.each(datas, function(index, data){
-    //    console.log(data)
-    //    str += "<option value=" + data.id + ">" + data.name + "</option>";
-    //  });
-    //
-    //  $('.versionList').append(str)
-    //
-    //});
+
 
     $("#submit1").click(function(){
       var div = $('#form1 div'),arr = [];
