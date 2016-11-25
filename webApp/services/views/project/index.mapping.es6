@@ -33,17 +33,17 @@ App.Services.ProjectMapping=Backbone.View.extend({
 	    		module:'成本',
 	    		projectName:data.costProjectName,
 	    		code:data.costProjectCode,
-	    		op:"<a class='aedit' href='javascript:;'>"+(data.costProjectCode?'修改':'关联')+"</a>"
+	    		op:"<a class='aedit' data-code="+data.costProjectCode+" href='javascript:;'>"+(data.costProjectCode?'修改':'关联')+"</a>"
 	    	},{
 	    		module:'质监',
 	    		projectName:data.qualityProjectName,
 	    		code:data.qualityProjectCode,
-	    		op:"<a class='alink' href='javascript:;'>"+(data.qualityProjectCode?'修改':'关联')+"</a>"
+	    		op:"<a class='alink' data-code="+data.qualityProjectCode+" href='javascript:;'>"+(data.qualityProjectCode?'修改':'关联')+"</a>"
 	    	},{
 	    		module:'设计',
 	    		projectName:data.designProjectName,
 	    		code:data.designProjectCode,
-	    		op:"<a class='alink' href='javascript:;'>"+(data.designProjectCode?'修改':'关联')+"</a>"
+	    		op:"<a class='alink' data-code="+data.designProjectCode+" href='javascript:;'>"+(data.designProjectCode?'修改':'关联')+"</a>"
 	    	}];
 		}
     	
@@ -65,7 +65,8 @@ App.Services.ProjectMapping=Backbone.View.extend({
 		var el=new App.Services.ProjectLink({
 			userData:{
 				projectId:_userData.projectId,
-				type:type
+				type:type,
+				codeId:$(event.currentTarget).data('code')
 			}
 		}).render().el;
 		App.Global.module=new App.Comm.modules.Dialog({title:title,width:600,height:500,isConfirm:true,okCallback:function(){
