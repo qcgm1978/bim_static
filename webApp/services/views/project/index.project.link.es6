@@ -114,7 +114,7 @@ App.Services.ProjectLink=Backbone.View.extend({
 			return i.projectName.indexOf(t)!==-1;
 		})
 		var _tpl=_.template(this.template);
-		this.$el.html(_tpl({data:r}));
+		this.$el.html(_tpl({data:{data:r},codeId:this.codeId}));
 	}
 
 });
