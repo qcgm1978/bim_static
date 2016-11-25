@@ -17,6 +17,7 @@
             ourl = a;
         }
     }
+    window.App={};
     var Project = {
         pageSize:20,
         pageNum:1,
@@ -315,9 +316,10 @@
                     $('#deviceSelector').append(strVar);
                 }
 
-                self.initStyle();
-                self.initEvent();
-                return
+
+                 self.initStyle();
+              //  self.initEvent();
+               // return
                 var data=[];
                 _.each(Project.data,function(item){
                     item.fileName&&data.push(item.fileName);
@@ -349,7 +351,7 @@
                                 count++;
                             })
                             Tools.formatSelectedData();
-                           // self.loadModal();
+                            self.loadModal();
                         }
                     }
                 })
