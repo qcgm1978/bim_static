@@ -54,7 +54,7 @@
     controll: function() {
       var self = this;
       $('#lockAxisZ').click(function(){
-        console.log('gg')
+
         var selected = $(this).is('.selected');
         $(this).toggleClass('selected');
         if(selected){
@@ -204,6 +204,7 @@
       });
 
       this.viewer.on("click", function(model) {
+
         var viewer = Project.Viewer,
             isIsolateState = viewer.viewer.getFilters().isIsolateState();
         if(isIsolateState){
@@ -214,7 +215,7 @@
 
         }
         if (!model.intersect) {
-          that.resetProperNull();
+          //that.resetProperNull();
           return;
         }
         //console.log(model);
