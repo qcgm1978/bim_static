@@ -251,7 +251,7 @@ App.Index = {
 
 	//api 接口 初始化
 	initApi(projectId, projectVersionId) {
-		debugger
+
 		this.Settings.projectId = projectId;
 		this.Settings.projectVersionId = projectVersionId;
 

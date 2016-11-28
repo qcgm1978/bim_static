@@ -90,9 +90,22 @@ App.ResourceModel.ListNav = Backbone.View.extend({
 				etag:App.ResourceModel.Settings.DataModel.etag, //"a1064f310fa8204efd9d1866ef7370ee" ||
 				projectId: App.ResourceModel.Settings.CurrentVersion.projectId
 			});
+            //加载完成后加载
+			App.ResourceModel.Settings.Viewer.on("loaded", function() {
 
+				$('#lockAxisZ').show();
+
+			});
 			App.ResourceModel.Settings.Viewer.on("click", function(model) {
+				var viewer = App.ResourceModel.Settings.Viewer,
+						isIsolateState = viewer.viewer.getFilters().isIsolateState();
+				if(isIsolateState){
+					$('#isolation').show();
+				}else{
+					$('#isolation').hide();
 
+
+				}
 				if (!model.intersect) {
 					$("#navContainer .attrContent").html('<div class="nullTip">请选择构件</div>');
 					return;
