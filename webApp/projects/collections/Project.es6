@@ -149,6 +149,15 @@ App.Project = {
 			App.Project.Settings.Viewer.viewer.getFilters().setSelectedIds();
 			App.Project.resetProperNull();
 		}
+		var viewer = App.Project.Settings.Viewer,
+				isIsolateState = viewer.viewer.getFilters().isIsolateState();
+		if(isIsolateState){
+			$('#isolation').show();
+		}else{
+			$('#isolation').hide();
+
+
+		}
 	},
 
 	checkSelectComponent:function(userId){
