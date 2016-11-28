@@ -152,7 +152,7 @@ var AppRoute = Backbone.Router.extend({
 		if (this.reset() == false) {
 			return;
 		}
-		//销毁上传
+		//业务流程的栏目 执行的js
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".flow").addClass('selected');
 		_.require('/static/dist/flow/flow.css');
 		_.require('/static/dist/flow/flow.js');

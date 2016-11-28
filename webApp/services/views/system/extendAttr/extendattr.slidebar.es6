@@ -22,7 +22,6 @@ App.Services.System.ExtendAttrSlideBar = Backbone.View.extend({
 		App.Services.SystemCollection.CategoryCollection.fetch({
 			success: function() { 
 				var $first = that.$(".flowSliderUl .item:first");
-
 				if ($first.length > 0) {
 					$first.click();
 				} else {
@@ -41,7 +40,6 @@ App.Services.System.ExtendAttrSlideBar = Backbone.View.extend({
 		var view = new App.Services.System.extendAttrSlideBarDetail({
 			model: model
 		});
-
 		this.$(".flowSliderUl .loading").remove();
 
 		this.$(".flowSliderUl").append(view.render().el);

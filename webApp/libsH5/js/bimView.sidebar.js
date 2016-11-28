@@ -202,6 +202,7 @@
     loadMap:function(){
       var self = this,
           floorsStatue = axisGridStatue = false,
+          mapMaxBox,
           floorsData,
           axisGridData;
       bimView.comm.ajax({
@@ -213,9 +214,16 @@
         if(res.message == "success"){
           floorsData = res.data.sort(function(a,b){
             return b.sort - a.sort;
-          }); 
+          });
+          for(var i= 0,xarr=[],yarr=[];i<floorsData.length;i++){
+            xarr.push(floorsData[i]['boundingBox']['Max']['X'],floorsData[i]['boundingBox']['Min']['X']);
+            yarr.push(floorsData[i]['boundingBox']['Max']['Y'],floorsData[i]['boundingBox']['Min']['Y']);
+          }
+          mapMaxBox = [_.min(xarr),_.min(yarr),_.max(xarr),_.max(yarr)];
+          console.log(mapMaxBox);
           floorsStatue = true;
           if(axisGridStatue){
+            axisGridData.mapMaxBox = mapMaxBox;
             renderMap();
           }
         }
@@ -228,6 +236,7 @@
         axisGridData = JSON.parse(res);
         axisGridStatue = true;
         if(floorsStatue){
+          axisGridData.mapMaxBox = mapMaxBox;
           renderMap();
         }
       });
