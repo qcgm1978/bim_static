@@ -923,6 +923,7 @@ App.Project = {
 
 				if(type=="process" && _this.currentProsCat && data.length){
 					var _floor=_this.currentProsCheckFloor;
+					var marginRule = _this.marginRule[_this.currentProsCat] || {};
 					if(!_floor){
 						_floor=_this.parseFilterFloor(type);
 					}else{
@@ -930,12 +931,13 @@ App.Project = {
 							_floor=_floor+','+'其它';
 						}
 					}
-					_this.sigleRule(_this.currentProsCat,_floor,scenceIds);
+					_this.sigleRule(_this.currentProsCat,_floor,scenceIds,function(margin,ratio){
+					//	App.Project.Settings.Viewer.setTopView(boxs, false,margin||marginRule.margin, ratio||marginRule.ratio);
+					});
 					$(".QualityProcessAcceptance .tbProcessAccessBody tr").removeClass('selected');
-				}
-
-				if(type=="open" && _this.currentOpenCat && data.length){
+				}else if(type=="open" && _this.currentOpenCat && data.length){
 					var _floor=_this.currentOpenCheckFloor;
+					var marginRule = _this.marginRule[_this.currentOpenCat] || {};
 					if(!_floor){
 						_floor=_this.parseFilterFloor(type);
 					}else{
@@ -943,7 +945,9 @@ App.Project = {
 							_floor=_floor+','+'其它';
 						}
 					}
-					_this.sigleRule(_this.currentOpenCat,_floor,scenceIds);
+					_this.sigleRule(_this.currentOpenCat,_floor,scenceIds,function(margin,ratio){
+					//	App.Project.Settings.Viewer.setTopView(boxs, false,margin||marginRule.margin, ratio||marginRule.ratio);
+					});
 					$(".QualityProcessAcceptance .tbProcessAccessBody tr").removeClass('selected');
 				}
 				App.Project.Settings.Viewer.setTopView(boxs, true);
@@ -958,7 +962,6 @@ App.Project = {
 			//viewer.loadMarkers(null);
 		}
 	},
-
 
 	//获取当前检查点所在位置(页码),和当前页码所在的数据队列
 	//pageNum pageSize id

@@ -42,7 +42,7 @@
         </table>
     </div>
     <div class="flowModalBbar">
-        <% _.each(operation,function(item){ %>
+        <% _.each(operation.reverse(),function(item){ %>
 
         <a class="flowModalBtn" target="_blank" href="<%=item.buttonName=='下载'?'static/dist/app/oPage/download/'+ item.url:item.url%>" title="<%=item.buttonName%>"><%=item.buttonName%></a>
            <!-- <% if(user=='内网用户' && funRange!='外网功能') {%>
