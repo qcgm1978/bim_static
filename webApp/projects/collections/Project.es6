@@ -72,6 +72,7 @@ App.Project = {
 			$el.html('<div class="nullTip">请选择构件</div>');
 		}
 
+
 	},
 
 	//检查点标记点击事件
@@ -148,6 +149,15 @@ App.Project = {
 			});
 			App.Project.Settings.Viewer.viewer.getFilters().setSelectedIds();
 			App.Project.resetProperNull();
+		}
+		var viewer = App.Project.Settings.Viewer,
+				isIsolateState = viewer.viewer.getFilters().isIsolateState();
+		if(isIsolateState){
+			$('#isolation').show();
+		}else{
+			$('#isolation').hide();
+
+
 		}
 	},
 
