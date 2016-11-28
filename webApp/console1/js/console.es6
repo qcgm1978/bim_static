@@ -1351,10 +1351,33 @@ App.Console = {
 
       $.each(datas, function(index, data){
         //console.log(data);
-        str += "<option value=" + data.projectCode + ">" + data.projectName + "</option>";
+        str += "<option id=" + data.id + " value=" + data.projectCode + ">" + data.projectName + "</option>";
       });
+      $('#s11,#s21').append(str);
 
-      $('#s11,#s21').append(str)
+        $("#s21").change(function(){
+          $.ajax({
+            url: "platform/project/" + $(this).find('option:selected').attr('id') + "/version"
+          }).done(function(data){
+
+            var items = data.data, str = '';
+
+            $.each(items, function(i, item){
+              if(item.id){
+
+                str += '<option  value="' + item.id + '">' + item.name + '</option>';
+              }
+
+            });
+            $("#s22").html(str);
+
+          });
+        });
+
+
+
+
+
 
     });
 
@@ -1367,7 +1390,7 @@ App.Console = {
         arr.push({
           "type": 1,
           "description":$(item).find('span').text(),
-          "url": location.host+'/platform/mock/costfile?token=123&filePath='+$(item).data('path')
+          "url": location.origin+'/platform/mock/costfile?token=123&filePath='+$(item).data('path')
         })
       })
 
@@ -1394,7 +1417,7 @@ App.Console = {
         arr.push({
           "type": 1,
           "description":$(item).find('span').text(),
-          "url": location.host+'/platform/mock/costfile?token=123&filePath='+$(item).data('path')
+          "url": location.origin+'/platform/mock/costfile?token=123&filePath='+$(item).data('path')
         })
       })
       var data  = {
@@ -1564,7 +1587,7 @@ App.Console = {
       console.log(data);
       if(location.port!=81){
         setTimeout(function(){
-          window.location.reload();
+          alert('成功')
         }, 2500);
       }
 
