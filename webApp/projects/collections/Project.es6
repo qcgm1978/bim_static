@@ -72,6 +72,7 @@ App.Project = {
 			$el.html('<div class="nullTip">请选择构件</div>');
 		}
 
+
 	},
 
 	//检查点标记点击事件
