@@ -54,8 +54,8 @@
 <fieldset>
     <legend><label>模型显示比例</label></legend>
     <div class="modelMarginWrap">
-        <input name="margin" value="" type="number" placeholder="请输入模型显示Margin比例..."><em>(注:请输入数字格式的数据)</em><br><br>
-        <input name="ratio" value="" type="number" placeholder="请输入模型Ratio比例..."><em>(注:请输入数字格式的数据)</em>
+        <input name="margin" value="<%= data.margin||'' %>" type="number" placeholder="请输入模型显示Margin比例..."><em>(注:请输入数字格式的数据,默认值:<%=processCategoryMR[name]?processCategoryMR[name].margin:'0.05'%>)</em><br><br>
+        <input name="ratio" value="<%= data.ratio||'' %>" type="number" placeholder="请输入模型Ratio比例..."><em>(注:请输入数字格式的数据,默认值:<%=processCategoryMR[name]?processCategoryMR[name].ratio:'1.0'%>)</em>
     </div>
 </fieldset>
 <div class="btnBar">

@@ -35,9 +35,11 @@ App.Services.System.CategoryManager = Backbone.View.extend({
 		//重置
 		App.Services.SystemCollection.CategoryCollection.reset();
 		//获取数据
-		App.Services.SystemCollection.CategoryCollection.fetch({success:function(models,data){
+		App.Services.SystemCollection.CategoryCollection.fetch({
+			success:function(models,data){
 				this.$(".textSum .count").text(data.data.items.length);
-		}});
+			}
+		});
 	},
 
 	//新增分类 弹出层

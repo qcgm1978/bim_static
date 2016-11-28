@@ -38,8 +38,7 @@ App.Services = {
 			}else if(type=="issue"){
 				//问题反馈
 				viewer=new App.Services.Issue();
-			}
-			else if(type == "more"){
+			}else if(type == "more"){
 				viewer = new App.Services.More();
 				$(document.getElementsByTagName("body")[0]).html(viewer.render().el);
 				viewer.bindEvent();
@@ -346,6 +345,36 @@ App.Services = {
 		                     '湿式报警阀室', '空调机房', '冷冻机房', '变配电室', '发电机房', '慧云机房', '电梯机房', '电梯底坑',
 		                     '吊顶', '地面', '中庭栏杆', '竖井'
 		];
+		var processCategoryMR={
+			'基坑支护': {
+				margin: 0.2,
+				ratio: 1.0
+			},
+			'梁柱节点': {
+				margin: 0.8,
+				ratio: 2.0
+			},
+			'外保温': {
+				margin: 0.5,
+				ratio: 1.0
+			},
+			'地下防水': {
+				margin: 1,
+				ratio: 1.0
+			},
+			'幕墙': {
+				margin: 1,
+				ratio: 1.0
+			},
+			'采光顶': {
+				margin: 3,
+				ratio: 1.0
+			},
+			'地面': {
+				margin: 0.01,
+				ratio: 1.0
+			}
+		};
 
 		var special = [
 			{
@@ -486,6 +515,7 @@ App.Services = {
 									special:special,
 									floorCondition:floorCondition,
 									fileCondition:fileCondition,
+									processCategoryMR:processCategoryMR,
 									data:res.data
 								});
 								_this.$('.formLabel').append(view.$el);

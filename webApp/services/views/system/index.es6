@@ -18,7 +18,6 @@ App.Services.System=Backbone.View.extend({
 		var $container = this.$el.find('.serviceNav'),
 		    tabs = App.Comm.AuthConfig.Service.system,
 		    Auth = App.AuthObj.service.sys;
-
 		if (Auth.bizCategary) {
 			$container.append(tabs.bizCategary.tab);
 
