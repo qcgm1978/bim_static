@@ -38,8 +38,7 @@ App.Services = {
 			}else if(type=="issue"){
 				//问题反馈
 				viewer=new App.Services.Issue();
-			}
-			else if(type == "more"){
+			}else if(type == "more"){
 				viewer = new App.Services.More();
 				$(document.getElementsByTagName("body")[0]).html(viewer.render().el);
 				viewer.bindEvent();
