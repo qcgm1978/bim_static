@@ -90,7 +90,6 @@
                 },
                 BeforeUpload: function(up, file) {
                     if (options.getUploadedBytesUrl && (file.size > options.skipCheckSize && typeof file.uploadedBytes === 'undefined')) {
-                       
                         up.stop()
                         $.getJSON(options.getUploadedBytesUrl(file.parentId), {
                             name: file.name,
@@ -116,6 +115,7 @@
                 },
                 UploadFile: function(up, file) {
                     isUploading = true;
+                    self.maskTree.createMask();
                 },
                 FileUploaded: function(up, file, response) {
                     /*[基础资源]-->[上传文件]完成后*/
@@ -126,7 +126,6 @@
                     }
                 },
                 UploadComplete: function(up, file) {
-                     
                     isUploading = false
                     self.container.addClass('uploaded-completed')
                     if (options.fileUploadCompleted) {
@@ -402,6 +401,35 @@
             return {
                 browseButtonId: 'html5-uploadfile-btn',
                 browseDirButtonId: 'html5-uploaddir-btn'
+            }
+        }
+        ,
+        maskTree : { 
+            /*
+            write by wuweiwei
+            在上传文件夹时，给左侧树生成mask,防止用户点击文件夹
+            */
+            createMask : function(){
+                this.mask = document.createElement("div");
+                this.mask.style.position = "absolute";
+                this.mask.style.top = "0";
+                this.mask.style.left = "0";
+                this.mask.style.right = "0";
+                this.mask.style.bottom = "0";
+                this.mask.style.backgroundColor="#FFF";
+                try
+                {
+                    this.mask.style.filter = "alpha(opacity=0)";
+                }
+                catch(e){;}
+                try
+                {
+                    this.mask.style.opacity = "0";
+                }
+                catch(e){;}
+                var resourceFamlibsLeftNav = $("#resourceFamlibsLeftNav .projectNavFileContainer")[0];
+                $(resourceFamlibsLeftNav).css("position","relative");
+                resourceFamlibsLeftNav.appendChild(this.mask);
             }
         }
     }
