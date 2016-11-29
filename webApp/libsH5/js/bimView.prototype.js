@@ -833,10 +833,10 @@
       var viewer = self.viewer;
       var filter = viewer.getFilters();
       filter.revertAll();
-      //self.filter({
-      //  ids:['10.01'],
-      //  type:"classCode"
-      //})
+      self.filter({
+        ids:['10.01'],
+        type:"classCode"
+      })
       viewer.render();
       $('#isolation').hide();
 
