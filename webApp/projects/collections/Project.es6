@@ -2097,6 +2097,7 @@ App.Project = {
 
 		var modelId = App.Project.Settings.ModelObj.intersect.userId.split('.')[0],
 			that = this,
+			attrDwgBoxDom,modleShowHide,modleListDom,
 			data = {
 				URLtype: 'attrDwg',
 				data: {
@@ -2116,7 +2117,18 @@ App.Project = {
 					$.each(data.data, function(i, item) {
 						lis += liTpl.replace("varName", item.name).replace('{id}', item.id);
 					});
-					that.$el.find(".attrDwgBox").show().find(".modleList").html(lis);
+					//start 张延凯修改 初始化的时候视图的默认关闭状态
+					attrDwgBoxDom = $("#projectContainer .attrDwgBox");
+					attrDwgBoxDom.show();
+					modleShowHide = attrDwgBoxDom.find(".modleShowHide");
+					modleListDom = attrDwgBoxDom.find(".modleList");
+					modleListDom.html(lis);
+					modleListDom.css("display",'none');
+					if(modleShowHide.hasClass('down')){
+						modleShowHide.removeClass('down');
+					}
+					//end 张延凯修改 初始化的时候视图的默认关闭状态
+					that.$el.find(".attrDwgBox").show().find(".modleList").html(lis);//张延凯修改 图纸默认隐藏
 				}
 			}
 		});

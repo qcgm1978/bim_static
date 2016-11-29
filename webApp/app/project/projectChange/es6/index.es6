@@ -402,6 +402,7 @@ App.Index = {
 					$.each(data.data, function(i, item) {
 						lis += liTpl.replace("varName", item.name).replace('{id}', item.id);
 					});
+					
 					$("#projectContainer .dwgBox").show().find(".modleList").html(lis);
 				}
 			}
