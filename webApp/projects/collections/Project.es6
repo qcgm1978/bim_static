@@ -2118,7 +2118,7 @@ App.Project = {
 						lis += liTpl.replace("varName", item.name).replace('{id}', item.id);
 					});
 					//start 张延凯修改 初始化的时候视图的默认关闭状态
-					attrDwgBoxDom = $("#projectContainer .attrDwgBox");
+					attrDwgBoxDom = that.$el.find(".attrDwgBox");
 					attrDwgBoxDom.show();
 					modleShowHide = attrDwgBoxDom.find(".modleShowHide");
 					modleListDom = attrDwgBoxDom.find(".modleList");
@@ -2128,7 +2128,7 @@ App.Project = {
 						modleShowHide.removeClass('down');
 					}
 					//end 张延凯修改 初始化的时候视图的默认关闭状态
-					that.$el.find(".attrDwgBox").show().find(".modleList").html(lis);//张延凯修改 图纸默认隐藏
+					// that.$el.find(".attrDwgBox").show().find(".modleList").html(lis);//张延凯修改 图纸默认隐藏
 				}
 			}
 		});
