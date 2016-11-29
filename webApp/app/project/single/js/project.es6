@@ -299,13 +299,13 @@ App.Project = {
 	attrDwg: function() {
 
 		var that = this,
-
+			attrDwgBoxDom,modleShowHide,modleListDom,
 			url = '/doc/' + App.Project.Settings.projectId + '/' + App.Project.Settings.projectVersionId + '/file/tag',
 
 			liTpl = '<li class="modleItem"><a data-id="<%=id%>" href="/static/dist/app/project/single/filePreview.html?id={id}&projectId=' + App.Project.Settings.projectId + '&projectVersionId=' + App.Project.Settings.projectVersionId + '" target="_blank" ><div class="modleNameText overflowEllipsis modleName2">varName</div></a></li>';
 
 		that = this;
-
+		
 		$.ajax({
 			url: url,
 			data: {
@@ -319,7 +319,18 @@ App.Project = {
 					$.each(data.data, function(i, item) {
 						lis += liTpl.replace("varName", item.name).replace('{id}', item.id);
 					});
-					$("#projectContainer .attrDwgBox").show().find(".modleList").html(lis);
+					//start 张延凯修改 初始化的时候视图的默认关闭状态
+					attrDwgBoxDom = $("#projectContainer .attrDwgBox");
+					attrDwgBoxDom.show();
+					modleShowHide = attrDwgBoxDom.find(".modleShowHide");
+					modleListDom = attrDwgBoxDom.find(".modleList");
+					modleListDom.html(lis);
+					modleListDom.css("display",'none');
+					if(modleShowHide.hasClass('down')){
+						modleShowHide.removeClass('down');
+					}
+					//end 张延凯修改 初始化的时候视图的默认关闭状态
+					// $("#projectContainer .attrDwgBox").show().find(".modleList").html(lis);//张延凯修改
 				}
 			}
 
