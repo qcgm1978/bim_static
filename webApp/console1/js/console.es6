@@ -1351,10 +1351,9 @@ App.Console = {
 
       $.each(datas, function(index, data){
         //console.log(data);
-        str += "<option value=" + data.projectCode + ">" + data.projectName + "</option>";
+        str += "<option id=" + data.id + " value=" + data.projectCode + ">" + data.projectName + "</option>";
       });
-
-      $('#s11,#s21').append(str)
+      $('#s11,#s21').append(str);
 
     });
 
@@ -1367,7 +1366,7 @@ App.Console = {
         arr.push({
           "type": 1,
           "description":$(item).find('span').text(),
-          "url": location.host+'/platform/mock/costfile?token=123&filePath='+$(item).data('path')
+          "url": location.origin+'/platform/mock/costfile?token=123&filePath='+$(item).data('path')
         })
       })
 
@@ -1394,7 +1393,7 @@ App.Console = {
         arr.push({
           "type": 1,
           "description":$(item).find('span').text(),
-          "url": location.host+'/platform/mock/costfile?token=123&filePath='+$(item).data('path')
+          "url": location.origin+'/platform/mock/costfile?token=123&filePath='+$(item).data('path')
         })
       })
       var data  = {
@@ -1564,7 +1563,7 @@ App.Console = {
       console.log(data);
       if(location.port!=81){
         setTimeout(function(){
-          window.location.reload();
+          alert('成功')
         }, 2500);
       }
 

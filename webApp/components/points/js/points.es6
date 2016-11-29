@@ -53,6 +53,17 @@
     },
     controll: function() {
       var self = this;
+      $('#lockAxisZ').click(function(){
+
+        var selected = $(this).is('.selected');
+        $(this).toggleClass('selected');
+        if(selected){
+          $(this).find('span').text('z轴未锁定')
+        }else{
+          $(this).find('span').text('z轴已锁定')
+        }
+        self.lockAxisZ(!selected);
+      });
       self.$dialog.on('click', '.toolsBtn', function() {
         self.getSelected();
       }).on('click', '.dialogClose', function() {
@@ -112,6 +123,7 @@
       $('.m-camera').addClass('disabled').attr('disabled', 'disabled');
 
       this.viewer.on("loaded", function() {
+        $('#lockAxisZ').show();
         if ($('.changeBtn').text() == "查看项目模型") {
           //单模型
           //$('.m-miniScreen').click();
@@ -192,8 +204,18 @@
       });
 
       this.viewer.on("click", function(model) {
+
+        var viewer = Project.Viewer,
+            isIsolateState = viewer.viewer.getFilters().isIsolateState();
+        if(isIsolateState){
+          $('#isolation').show();
+        }else{
+          $('#isolation').hide();
+
+
+        }
         if (!model.intersect) {
-          that.resetProperNull();
+          //that.resetProperNull();
           return;
         }
         //console.log(model);
