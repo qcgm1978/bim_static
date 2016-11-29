@@ -1355,30 +1355,6 @@ App.Console = {
       });
       $('#s11,#s21').append(str);
 
-        $("#s21").change(function(){
-          $.ajax({
-            url: "platform/project/" + $(this).find('option:selected').attr('id') + "/version"
-          }).done(function(data){
-
-            var items = data.data, str = '';
-
-            $.each(items, function(i, item){
-              if(item.id){
-
-                str += '<option  value="' + item.id + '">' + item.name + '</option>';
-              }
-
-            });
-            $("#s22").html(str);
-
-          });
-        });
-
-
-
-
-
-
     });
 
 
