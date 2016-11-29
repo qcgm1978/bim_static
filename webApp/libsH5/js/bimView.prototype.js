@@ -415,7 +415,7 @@
         _height = height || _viewBox.height();
 
         if (!$("#projectContainer .modelContainer").is(":hidden")) {
-          self.viewer.resize(_width, _height);
+          self.viewer.renderer?self.viewer.resize(_width, _height):null;
         } 
 
     },
