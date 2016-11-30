@@ -106,6 +106,7 @@
       }, 10);
     },
     renderModel: function() {
+      App.Comm.navBarToggle($("#projectContainer .rightProperty"), $("#projectContainer .projectCotent"), "right", Project.Viewer);
       //设置onlymodel
       App.Global || (App.Global = {});
       App.Comm.setOnlyModel();
@@ -324,7 +325,7 @@
     //通过userid 和 boundingbox 定位模型
     zoomModel: function(ids, box) {
       //定位
-      Project.Viewer.zoomToBox(box);
+      Project.Viewer.zoomToBox(box,0.5);
       Project.Viewer.translucent(false);
       Project.Viewer.highlight({
         type: 'userId',
@@ -450,8 +451,6 @@
         }
         event.stopPropagation();
       })
-
-      App.Comm.navBarToggle($("#projectContainer .rightProperty"), $("#projectContainer .projectCotent"), "right", Project.Viewer);
     },
 
     events: {},
