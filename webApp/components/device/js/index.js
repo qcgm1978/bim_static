@@ -416,7 +416,7 @@
                         var val=$target.data('item');
                         var item = _.find(list, function(item){ return item.id==val; });
                         var box=item.boundingbox||item.boundingBox;
-                        Project.Viewer.setTopView( _self.formatBBox(box), false);
+                        Project.Viewer.setTopView( _self.formatBBox(box), false,0.5);
                     }
                 }
 
