@@ -115,7 +115,7 @@
                 },
                 UploadFile: function(up, file) {
                     isUploading = true;
-                    self.maskTree.createMask();
+                    /*self.maskTree.createMask();*/
                 },
                 FileUploaded: function(up, file, response) {
                     /*[基础资源]-->[上传文件]完成后*/
@@ -427,9 +427,12 @@
                     this.mask.style.opacity = "0";
                 }
                 catch(e){;}
-                var resourceFamlibsLeftNav = $("#resourceFamlibsLeftNav .projectNavFileContainer")[0];
-                $(resourceFamlibsLeftNav).css("position","relative");
-                resourceFamlibsLeftNav.appendChild(this.mask);
+                try
+                {
+                    var resourceFamlibsLeftNav = $(".projectNavFileContainer")[0];
+                    $(resourceFamlibsLeftNav).css("position","relative");
+                    resourceFamlibsLeftNav.appendChild(this.mask);   
+                }catch(e){;}
             }
         }
     }
