@@ -1249,6 +1249,7 @@
 				Project.loadPropertyPanel();
 				viewer.resize();
 				Project.BIMFilter=Project.Viewer.viewer.getFilters();
+				$('#modelView .modelSidebar').addClass('hideMap');
 			});
 
 			Project.Viewer.viewer.setMarkerClickCallback(abcd);
