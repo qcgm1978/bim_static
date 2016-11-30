@@ -1249,6 +1249,7 @@
 				Project.loadPropertyPanel();
 				viewer.resize();
 				Project.BIMFilter=Project.Viewer.viewer.getFilters();
+				$('#modelView .modelSidebar').addClass('hideMap');
 			});
 
 			Project.Viewer.viewer.setMarkerClickCallback(abcd);
@@ -1330,7 +1331,8 @@
 				userId=ids[1];
 			alert(_host+"/doc/api/" + Project.Settings.projectId + '/' +  Project.Settings.projectVersionId + "?fileId=" +_fileId)
 			$.ajax({
-				url: '',
+				/*url: '',*/
+				url:_host+"/doc/api/" + Project.Settings.projectId + '/' +  Project.Settings.projectVersionId + "?fileId=" +_fileId
 			}).done(function(data) {
 				alert(data)
 				if (data.code == 0) {
