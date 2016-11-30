@@ -343,7 +343,9 @@ App.Project = {
 
 	//获取模板根据URL
 	templateUrl: function(url, notCompile) {
-
+        if(!App.time){
+			App.time=+new Date();
+		}
 		if (url.substr(0, 1) == ".") {
 			url = "/static/dist/tpls" + url.substr(1);
 		} else if (url.substr(0, 1) == "/") {
@@ -356,7 +358,7 @@ App.Project = {
 
 		var result;
 		$.ajax({
-			url: url,
+			url: url+'?t='+App.time,
 			type: 'GET',
 			async: false
 		}).done(function(tpl) {
