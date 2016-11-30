@@ -190,7 +190,6 @@ var dwgViewer = function(options) {
       4: CLOUD.Extensions.Annotation.shapeTypes.CLOUD,
       5: CLOUD.Extensions.Annotation.shapeTypes.TEXT
     },
-
     //批注事件初始化
     __initCommentEvent: function() {
 
@@ -201,8 +200,21 @@ var dwgViewer = function(options) {
         var $this = $(this);
 
         $this.addClass("selected").siblings().removeClass("selected");
+        var fn = $this.data('id'),
+            group = $this.data('group'),
+            type = $this.data('type');
+        if(type == "comment-color"){
+          $this.addClass('selected').siblings().removeClass('selected');
+          var  parent= $this.parent().parent(),
+              precolor = parent.data('color'),
+              colors = $this.data('color'),
+              param = $this.data('param');
+          parent.attr('data-color',colors);
+          that.dwgHelper.setCommentStyle({'stroke-color': param,'fil-color':param });
+        }else{
+          that.dwgHelper.setAnnotationType(that.__commentToolBarType[$this.data("id")]);
 
-        that.dwgHelper.setAnnotationType(that.__commentToolBarType[$this.data("id")]);
+        }
 
       })
     },
