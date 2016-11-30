@@ -448,11 +448,11 @@
       self.pub('setRectZoomMode');
       self.viewer.setRectZoomMode();
     },
-    zoomToBox: function(box) {
+    zoomToBox: function(box,margin,ratio) {
       // 缩放到指定位置
       var self = this;
       var viewer = self.viewer;
-      viewer.zoomToBBox(CLOUD.Utils.computeBBox(box), 0.05, 1.2);
+      viewer.zoomToBBox(CLOUD.Utils.computeBBox(box), margin||0.05, ratio||1.2);
       viewer.render();
     },
     zoomToBBoxWithOuterBox: function (box, outerBox, margin, ratio){

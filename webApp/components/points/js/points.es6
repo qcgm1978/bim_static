@@ -450,6 +450,8 @@
         }
         event.stopPropagation();
       })
+
+      App.Comm.navBarToggle($("#projectContainer .rightProperty"), $("#projectContainer .projectCotent"), "right", Project.Viewer);
     },
 
     events: {},
