@@ -152,7 +152,6 @@ var dwgViewer = function(options) {
 
       //设置批注容器
       var dwgHelper = this.dwgHelper = new CLOUD.Extensions.DwgHelper();
-
       dwgHelper.setDomContainer($("#modelBox .bim .mod-dwg")[0],$dwgCommentContainer[0]);
 
       //初始化批注事件
@@ -188,9 +187,10 @@ var dwgViewer = function(options) {
       2: CLOUD.Extensions.Annotation.shapeTypes.CIRCLE,
       3: CLOUD.Extensions.Annotation.shapeTypes.CROSS,
       4: CLOUD.Extensions.Annotation.shapeTypes.CLOUD,
-      5: CLOUD.Extensions.Annotation.shapeTypes.TEXT
-    },
+      5: CLOUD.Extensions.Annotation.shapeTypes.TEXT,
+      6: CLOUD.Extensions.Annotation.shapeTypes.COLOR
 
+    },
     //批注事件初始化
     __initCommentEvent: function() {
 
@@ -201,8 +201,22 @@ var dwgViewer = function(options) {
         var $this = $(this);
 
         $this.addClass("selected").siblings().removeClass("selected");
+        var fn = $this.data('id'),
+            group = $this.data('group'),
+            type = $this.data('type');
+        if(type == "comment-color"){
+          $this.addClass('selected').siblings().removeClass('selected');
+          var  parent= $this.parent().parent(),
+              precolor = parent.data('color'),
+              colors = $this.data('color'),
+              param = $this.data('param');
+          parent.attr('data-color',colors);
+          that.dwgHelper.setAnnotationStyle({'stroke-color': param,'fil-color':param });
 
-        that.dwgHelper.setAnnotationType(that.__commentToolBarType[$this.data("id")]);
+        }else{
+          that.dwgHelper.setAnnotationType(that.__commentToolBarType[$this.data("id")]);
+
+        }
 
       })
     },

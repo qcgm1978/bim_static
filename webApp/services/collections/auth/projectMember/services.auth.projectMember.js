@@ -100,7 +100,7 @@ App.Services.projectMember = {
 				_member=_.map(_member,function(item){
 					return item={
 						name:item.name,
-						project:item.org[0].namePath,
+						project:item.org[0]?item.org[0].namePath:null,
 						id:item.id, //成员ID
 						outer:item.outer
 					}
