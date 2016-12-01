@@ -16,9 +16,6 @@ var CommProject={
         if(_.isArray(_floors)){
             _floors=floor.join(',');
         }
-        $.ajax({
-            url:
-        })
         App.Comm.ajax({
             URLtype:"modelFilterRule",
             data:{
