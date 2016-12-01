@@ -4986,9 +4986,9 @@ CLOUD.MiniMap = function (viewer) {
         _isLoadedAxisGrid = true;
 
         var grids;
-        //var mapMaxBox = jsonObj.mapMaxBox;
+        var mapMaxBox = jsonObj.mapMaxBox;
 
-        var mapMaxBox = [-142017.73324847443, -61671.47449311853, 145168.2667521564, 74664.52937894061];
+        //var mapMaxBox = [-142017.73324847443, -61671.47449311853, 145168.2667521564, 74664.52937894061];
 
         if (recalculate && mapMaxBox) {
 
