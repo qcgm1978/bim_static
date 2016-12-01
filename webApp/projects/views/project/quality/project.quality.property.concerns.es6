@@ -216,6 +216,8 @@ App.Project.QualityConcerns=Backbone.View.extend({
 			if (data.code == 0 && data.data) {
 				var  modelId = data.data.modelId;
 				var obj={
+					specialty:data.data.specialty,
+					fileName:data.data.name,
 					uuid:modelId+uuid.slice(uuid.indexOf('.')),
 					location:{
 						boundingBox:location.boundingBox,
