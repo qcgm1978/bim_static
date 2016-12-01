@@ -34,6 +34,8 @@ CLOUD.GlobalData = {
 
     ZipResourcePostfix: "",
 
+    GPUMemoryBudget: 900 * 1048576, //  单位 : 字节
+
     SelectionColor : { color: 0x003BBD, opacity: 0.5, side: THREE.DoubleSide, transparent: true }
 };
 
@@ -132,6 +134,11 @@ CLOUD.EVENTS = {
 
     ON_SELECTION_CHANGED: 100,
     ON_UPDATE_SELECTION_UI: 101,
+};
+
+CLOUD.PrimitiveCount = {
+    vertexCount: 0,
+    triangleCount: 0
 };
 
 CLOUD.Utils = {
@@ -619,6 +626,483 @@ CLOUD.DomUtil = {
         element.style.cursor = cursor;
     }
 };
+/**
+ * @author Mugen87 / https://github.com/Mugen87
+ */
+
+THREE.CylinderBufferGeometry = function ( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength ) {
+
+	THREE.BufferGeometry.call( this );
+
+	this.type = 'CylinderBufferGeometry';
+
+	this.parameters = {
+		radiusTop: radiusTop,
+		radiusBottom: radiusBottom,
+		height: height,
+		radialSegments: radialSegments,
+		heightSegments: heightSegments,
+		openEnded: openEnded,
+		thetaStart: thetaStart,
+		thetaLength: thetaLength
+	};
+
+	radiusTop = radiusTop !== undefined ? radiusTop : 20;
+	radiusBottom = radiusBottom !== undefined ? radiusBottom : 20;
+	height = height !== undefined ? height : 100;
+
+	radialSegments = Math.floor( radialSegments )  || 8;
+	heightSegments = Math.floor( heightSegments ) || 1;
+
+	openEnded = openEnded !== undefined ? openEnded : false;
+	thetaStart = thetaStart !== undefined ? thetaStart : 0;
+	thetaLength = thetaLength !== undefined ? thetaLength : 2 * Math.PI;
+
+	// used to calculate buffer length
+
+	var vertexCount = calculateVertexCount();
+	var indexCount = calculateIndexCount();
+
+	// buffers
+
+	var indices = new THREE.BufferAttribute( new ( indexCount > 65535 ? Uint32Array : Uint16Array )( indexCount ) , 1 );
+	var vertices = new THREE.BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
+	var normals = new THREE.BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
+	var uvs = new THREE.BufferAttribute( new Float32Array( vertexCount * 2 ), 2 );
+
+	// helper variables
+
+	var index = 0, indexOffset = 0, indexArray = [], halfHeight = height / 2;
+
+	// generate geometry
+
+	generateTorso();
+
+	if( openEnded === false ) {
+
+		if( radiusTop > 0 ) {
+
+			generateCap( true );
+
+		}
+
+		if( radiusBottom > 0 ) {
+
+			generateCap( false );
+
+		}
+
+	}
+
+	// build geometry
+
+	this.setIndex( indices );
+	this.addAttribute( 'position', vertices );
+	this.addAttribute( 'normal', normals );
+	this.addAttribute( 'uv', uvs );
+
+	// helper functions
+
+	function calculateVertexCount () {
+
+		var count = ( radialSegments + 1 ) * ( heightSegments + 1 );
+
+		if ( openEnded === false ) {
+
+			count += ( ( radialSegments + 1 ) * 2 ) + ( radialSegments * 2 );
+
+		}
+
+		return count;
+
+	}
+
+	function calculateIndexCount () {
+
+		var count = radialSegments * heightSegments * 2 * 3;
+
+		if ( openEnded === false ) {
+
+			count += radialSegments * 2 * 3;
+
+		}
+
+		return count;
+
+	}
+
+	function generateTorso () {
+
+		var x, y;
+		var normal = new THREE.Vector3();
+		var vertex = new THREE.Vector3();
+
+		// this will be used to calculate the normal
+		var tanTheta = ( radiusBottom - radiusTop ) / height;
+
+		// generate vertices, normals and uvs
+
+		for ( y = 0; y <= heightSegments; y ++ ) {
+
+			var indexRow = [];
+
+			var v = y / heightSegments;
+
+			// calculate the radius of the current row
+			var radius = v * ( radiusBottom - radiusTop ) + radiusTop;
+
+			for ( x = 0; x <= radialSegments; x ++ ) {
+
+				var u = x / radialSegments;
+
+				// vertex
+				vertex.x = radius * Math.sin( u * thetaLength + thetaStart );
+				vertex.y = - v * height + halfHeight;
+				vertex.z = radius * Math.cos( u * thetaLength + thetaStart );
+				vertices.setXYZ( index, vertex.x, vertex.y, vertex.z );
+
+				// normal
+				normal.copy( vertex );
+
+				// handle special case if radiusTop/radiusBottom is zero
+				if( ( radiusTop === 0  && y === 0 ) || ( radiusBottom === 0  && y === heightSegments ) ) {
+
+					normal.x = Math.sin( u * thetaLength + thetaStart );
+					normal.z = Math.cos( u * thetaLength + thetaStart );
+
+				}
+
+				normal.setY( Math.sqrt( normal.x * normal.x + normal.z * normal.z ) * tanTheta ).normalize();
+				normals.setXYZ( index, normal.x, normal.y, normal.z );
+
+				// uv
+				uvs.setXY( index, u, 1 - v );
+
+				// save index of vertex in respective row
+				indexRow.push( index );
+
+				// increase index
+				index ++;
+
+			}
+
+			// now save vertices of the row in our index array
+			indexArray.push( indexRow );
+
+		}
+
+		// generate indices
+
+		for ( x = 0; x < radialSegments; x ++ ) {
+
+			for ( y = 0; y < heightSegments; y ++ ) {
+
+				// we use the index array to access the correct indices
+				var i1 = indexArray[ y ][ x ];
+				var i2 = indexArray[ y + 1 ][ x ];
+				var i3 = indexArray[ y + 1 ][ x + 1 ];
+				var i4 = indexArray[ y ][ x + 1 ];
+
+				// face one
+				indices.setX( indexOffset, i1 ); indexOffset++;
+				indices.setX( indexOffset, i2 ); indexOffset++;
+				indices.setX( indexOffset, i4 ); indexOffset++;
+
+				// face two
+				indices.setX( indexOffset, i2 ); indexOffset++;
+				indices.setX( indexOffset, i3 ); indexOffset++;
+				indices.setX( indexOffset, i4 ); indexOffset++;
+
+			}
+
+		}
+
+	}
+
+	function generateCap ( top ) {
+
+		var x, centerIndexStart, centerIndexEnd;
+		var uv = new THREE.Vector2();
+		var vertex = new THREE.Vector3();
+
+		var radius = ( top === true ) ? radiusTop : radiusBottom;
+		var sign = ( top === true ) ? 1 : - 1;
+
+		// save the index of the first center vertex
+		centerIndexStart = index;
+
+		// first we generate the center vertex data of the cap.
+		// because the geometry needs one set of uvs per face,
+		// we must generate a center vertex per face/segment
+
+		for ( x = 1; x <= radialSegments; x ++ ) {
+
+			// vertex
+			vertices.setXYZ( index, 0, halfHeight * sign, 0 );
+
+			// normal
+			normals.setXYZ( index, 0, sign, 0 );
+
+			// uv
+			if( top === true ) {
+
+				uv.x = x / radialSegments;
+				uv.y = 0;
+
+			} else {
+
+				uv.x = ( x - 1 ) / radialSegments;
+				uv.y = 1;
+
+			}
+
+			uvs.setXY( index, uv.x, uv.y );
+
+			// increase index
+			index++;
+
+		}
+
+		// save the index of the last center vertex
+		centerIndexEnd = index;
+
+		// now we generate the surrounding vertices, normals and uvs
+
+		for ( x = 0; x <= radialSegments; x ++ ) {
+
+			var u = x / radialSegments;
+
+			// vertex
+			vertex.x = radius * Math.sin( u * thetaLength + thetaStart );
+			vertex.y = halfHeight * sign;
+			vertex.z = radius * Math.cos( u * thetaLength + thetaStart );
+			vertices.setXYZ( index, vertex.x, vertex.y, vertex.z );
+
+			// normal
+			normals.setXYZ( index, 0, sign, 0 );
+
+			// uv
+			uvs.setXY( index, u, ( top === true ) ? 1 : 0 );
+
+			// increase index
+			index ++;
+
+		}
+
+		// generate indices
+
+		for ( x = 0; x < radialSegments; x ++ ) {
+
+			var c = centerIndexStart + x;
+			var i = centerIndexEnd + x;
+
+			if( top === true ) {
+
+				// face top
+				indices.setX( indexOffset, i ); indexOffset++;
+				indices.setX( indexOffset, i + 1 ); indexOffset++;
+				indices.setX( indexOffset, c ); indexOffset++;
+
+			} else {
+
+				// face bottom
+				indices.setX( indexOffset, i + 1); indexOffset++;
+				indices.setX( indexOffset, i ); indexOffset++;
+				indices.setX( indexOffset, c ); indexOffset++;
+
+			}
+
+		}
+
+	}
+
+};
+
+THREE.CylinderBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
+THREE.CylinderBufferGeometry.prototype.constructor = THREE.CylinderBufferGeometry;
+
+/**
+ * @author Mugen87 / https://github.com/Mugen87
+ */
+
+THREE.BoxBufferGeometry = function ( width, height, depth, widthSegments, heightSegments, depthSegments ) {
+
+	THREE.BufferGeometry.call( this );
+
+	this.type = 'BoxBufferGeometry';
+
+	this.parameters = {
+		width: width,
+		height: height,
+		depth: depth,
+		widthSegments: widthSegments,
+		heightSegments: heightSegments,
+		depthSegments: depthSegments
+	};
+
+	var scope = this;
+
+	// segments
+	widthSegments = Math.floor( widthSegments ) || 1;
+	heightSegments = Math.floor( heightSegments ) || 1;
+	depthSegments = Math.floor( depthSegments ) || 1;
+
+	// these are used to calculate buffer length
+	var vertexCount = calculateVertexCount( widthSegments, heightSegments, depthSegments );
+	var indexCount = ( vertexCount / 4 ) * 6;
+
+	// buffers
+	var indices = new ( indexCount > 65535 ? Uint32Array : Uint16Array )( indexCount );
+	var vertices = new Float32Array( vertexCount * 3 );
+	var normals = new Float32Array( vertexCount * 3 );
+	var uvs = new Float32Array( vertexCount * 2 );
+
+	// offset variables
+	var vertexBufferOffset = 0;
+	var uvBufferOffset = 0;
+	var indexBufferOffset = 0;
+	var numberOfVertices = 0;
+
+	// group variables
+	var groupStart = 0;
+
+	// build each side of the box geometry
+	buildPlane( 'z', 'y', 'x', - 1, - 1, depth, height,   width,  depthSegments, heightSegments, 0 ); // px
+	buildPlane( 'z', 'y', 'x',   1, - 1, depth, height, - width,  depthSegments, heightSegments, 1 ); // nx
+	buildPlane( 'x', 'z', 'y',   1,   1, width, depth,    height, widthSegments, depthSegments,  2 ); // py
+	buildPlane( 'x', 'z', 'y',   1, - 1, width, depth,  - height, widthSegments, depthSegments,  3 ); // ny
+	buildPlane( 'x', 'y', 'z',   1, - 1, width, height,   depth,  widthSegments, heightSegments, 4 ); // pz
+	buildPlane( 'x', 'y', 'z', - 1, - 1, width, height, - depth,  widthSegments, heightSegments, 5 ); // nz
+
+	// build geometry
+	this.setIndex( new THREE.BufferAttribute( indices, 1 ) );
+	this.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+	this.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
+	this.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
+
+	// helper functions
+
+	function calculateVertexCount ( w, h, d ) {
+
+		var segments = 0;
+
+		// calculate the amount of segments for each side
+		segments += w * h * 2; // xy
+		segments += w * d * 2; // xz
+		segments += d * h * 2; // zy
+
+		return segments * 4; // four vertices per segments
+
+	}
+
+	function buildPlane ( u, v, w, udir, vdir, width, height, depth, gridX, gridY, materialIndex ) {
+
+		var segmentWidth	= width / gridX;
+		var segmentHeight = height / gridY;
+
+		var widthHalf = width / 2;
+		var heightHalf = height / 2;
+		var depthHalf = depth / 2;
+
+		var gridX1 = gridX + 1;
+		var gridY1 = gridY + 1;
+
+		var vertexCounter = 0;
+		var groupCount = 0;
+
+		var vector = new THREE.Vector3();
+
+		// generate vertices, normals and uvs
+
+		for ( var iy = 0; iy < gridY1; iy ++ ) {
+
+			var y = iy * segmentHeight - heightHalf;
+
+			for ( var ix = 0; ix < gridX1; ix ++ ) {
+
+				var x = ix * segmentWidth - widthHalf;
+
+				// set values to correct vector component
+				vector[ u ] = x * udir;
+				vector[ v ] = y * vdir;
+				vector[ w ] = depthHalf;
+
+				// now apply vector to vertex buffer
+				vertices[ vertexBufferOffset ] = vector.x;
+				vertices[ vertexBufferOffset + 1 ] = vector.y;
+				vertices[ vertexBufferOffset + 2 ] = vector.z;
+
+				// set values to correct vector component
+				vector[ u ] = 0;
+				vector[ v ] = 0;
+				vector[ w ] = depth > 0 ? 1 : - 1;
+
+				// now apply vector to normal buffer
+				normals[ vertexBufferOffset ] = vector.x;
+				normals[ vertexBufferOffset + 1 ] = vector.y;
+				normals[ vertexBufferOffset + 2 ] = vector.z;
+
+				// uvs
+				uvs[ uvBufferOffset ] = ix / gridX;
+				uvs[ uvBufferOffset + 1 ] = 1 - ( iy / gridY );
+
+				// update offsets and counters
+				vertexBufferOffset += 3;
+				uvBufferOffset += 2;
+				vertexCounter += 1;
+
+			}
+
+		}
+
+		// 1. you need three indices to draw a single face
+		// 2. a single segment consists of two faces
+		// 3. so we need to generate six (2*3) indices per segment
+
+		for ( iy = 0; iy < gridY; iy ++ ) {
+
+			for ( ix = 0; ix < gridX; ix ++ ) {
+
+				// indices
+				var a = numberOfVertices + ix + gridX1 * iy;
+				var b = numberOfVertices + ix + gridX1 * ( iy + 1 );
+				var c = numberOfVertices + ( ix + 1 ) + gridX1 * ( iy + 1 );
+				var d = numberOfVertices + ( ix + 1 ) + gridX1 * iy;
+
+				// face one
+				indices[ indexBufferOffset ] = a;
+				indices[ indexBufferOffset + 1 ] = b;
+				indices[ indexBufferOffset + 2 ] = d;
+
+				// face two
+				indices[ indexBufferOffset + 3 ] = b;
+				indices[ indexBufferOffset + 4 ] = c;
+				indices[ indexBufferOffset + 5 ] = d;
+
+				// update offsets and counters
+				indexBufferOffset += 6;
+				groupCount += 6;
+
+			}
+
+		}
+
+		// add a group to the geometry. this will ensure multi material support
+		scope.addGroup( groupStart, groupCount, materialIndex );
+
+		// calculate new start value for groups
+		groupStart += groupCount;
+
+		// update total number of vertices
+		numberOfVertices += vertexCounter;
+
+	}
+
+};
+
+THREE.BoxBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
+THREE.BoxBufferGeometry.prototype.constructor = THREE.BoxBufferGeometry;
+
 
 CLOUD.GeomUtil = {
 
@@ -801,7 +1285,11 @@ CLOUD.GeomUtil = {
         var extrudePath = new THREE.CatmullRomCurve3(points);
         var tube = new THREE.TubeGeometry(extrudePath, 5, params.radius, 6, false);
 
-        return tube;
+        var bufferObj = new THREE.BufferGeometry();
+        bufferObj.fromGeometry(tube);
+        return bufferObj;
+
+        //return tube;
     },
 
     parsePGeomNodeInstance: function (objJSON, matObj, trf) {
@@ -842,13 +1330,20 @@ CLOUD.GeomUtil = {
     },
 
     EmptyGeometry: new THREE.Geometry(),
-    UnitCylinderInstance: new THREE.CylinderGeometry(1, 1, 1, 8, 1, false),
-    UnitBoxInstance: new THREE.BoxGeometry(1, 1, 1),
+    UnitCylinderInstance: new THREE.CylinderBufferGeometry(1, 1, 1, 8, 1, false),
+    UnitBoxInstance: new THREE.BoxBufferGeometry(1, 1, 1),
+
+    initializeUnitInstances: function(){
+        //THREE.Mesh.prototype.unload = function () {
+        //    this.geometry.dispose();
+        //};
+    },
 
     destroyUnitInstances: function () {
         CLOUD.GeomUtil.UnitCylinderInstance.dispose();
         CLOUD.GeomUtil.UnitBoxInstance.dispose();
     }
+
 };
 THREE.CombinedCamera = function (width, height, fov, near, far, orthoNear, orthoFar) {
 
@@ -8766,8 +9261,13 @@ CLOUD.Mesh.prototype.unload = function () {
     if (geometry.refCount <= 0) {
 
         geometry.refCount = 0;
-        if (geometry.symbol === undefined)
+        if (geometry.symbol === undefined) {
+
+            CLOUD.PrimitiveCount.vertexCount -= geometry.getAttribute("position").count;
+            CLOUD.PrimitiveCount.triangleCount -= geometry.getIndex().count;
+
             geometry.dispose();
+        }
     }
 }
 
@@ -8781,6 +9281,9 @@ CLOUD.Mesh.prototype.load = function () {
 
     if (this.loaded == 0) {
         this.geometry.refCount += 1;
+
+        CLOUD.PrimitiveCount.vertexCount += this.geometry.getAttribute("position").count;
+        CLOUD.PrimitiveCount.triangleCount += this.geometry.getIndex().count;
     }
 
     this.loaded = 1; 
@@ -19240,6 +19743,9 @@ CLOUD.ModelManager.prototype.destroy = function () {
 
     this.vertexCount = 0;
     this.triangleCount = 0;
+
+    CLOUD.PrimitiveCount.vertexCount = 0;
+    CLOUD.PrimitiveCount.triangleCount = 0;
 };
 
 CLOUD.ModelManager.prototype.updateLights = function (camera) {
@@ -19257,9 +19763,18 @@ CLOUD.ModelManager.prototype.prepareScene = function (camera, renderId, ignoreLo
 
     // update scene
     //this.scene.prepareSceneBox(camera);
+
     this.scene.prepareScene(camera);
-    
-    this.prepareResource(renderId, !ignoreLoad);
+
+    //var geometriesSize = 0;
+    //geometriesSize += CLOUD.PrimitiveCount.vertexCount * 24; // 字节 4 * 3 * 2 (vertex + normal)
+    //geometriesSize += CLOUD.PrimitiveCount.triangleCount * 12; // 字节 4 * 3
+
+    //console.log("2-0", geometriesSize);
+
+    //if (geometriesSize  < CLOUD.GlobalData.GPUMemoryBudget) {
+        this.prepareResource(renderId, !ignoreLoad);
+    //}
 };
 
 CLOUD.ModelManager.prototype.loadBuidingOutside = function (camera) {
@@ -19309,7 +19824,7 @@ CLOUD.ModelManager.prototype.loadIndex = function (parameters, callback) {
     }
     client.slave = count > 1;
 
-    var sceneLoader = this.sceneLoader;
+    // var sceneLoader = this.sceneLoader;
 
     var idxLoader = new CLOUD.IndexLoader(true, this);
     idxLoader.load(client, function () {
@@ -21912,6 +22427,7 @@ CloudViewer.prototype = {
             return false;
         }
 
+        CLOUD.GeomUtil.initializeUnitInstances();
         // Renderer
         this.renderer = new THREE.WebGLIncrementRenderer(settings);
         var renderer = this.renderer;
