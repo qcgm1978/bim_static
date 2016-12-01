@@ -470,6 +470,10 @@
         viewer.setTopView(CLOUD.Utils.computeBBox(box),margin||1.0,ratio||1);
       }
     },
+    setAllView: function(box,margin,ratio) {
+      var viewer = this.viewer;
+      viewer.setTopView(CLOUD.Utils.mergeBBox(box),margin||1.0,ratio||1);
+    },
     zoomToBuilding: function(margin, ratio) {
       // 缩放到指定位置
       var self = this;

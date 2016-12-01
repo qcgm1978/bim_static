@@ -416,7 +416,7 @@
                         var val=$target.data('item');
                         var item = _.find(list, function(item){ return item.id==val; });
                         var box=item.boundingbox||item.boundingBox;
-                        Project.Viewer.setTopView( _self.formatBBox(box), false,0.5);
+                        Project.Viewer.zoomToBox( _self.formatBBox(box));
                     }
                 }
 
@@ -535,7 +535,7 @@
             return box;
         },
         zoom:function(ids,markers,boxs){
-            Project.Viewer.setTopView(boxs, true);
+            Project.Viewer.setAllView(boxs,0.01);
             Project.Viewer.loadMarkers(markers);
             Project.Viewer.translucent(true);
             Project.Viewer.highlight({
