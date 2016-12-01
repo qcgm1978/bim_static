@@ -399,6 +399,7 @@ var dwgViewer = function(options) {
       var lod = options.lod
       var minisite = self.__minisite
 
+
       if (zoomScale <= 1) {
         zoomScale = 1
         curLevel = 1
@@ -426,6 +427,7 @@ var dwgViewer = function(options) {
         var item = $(this)
 
         var level = item.data('level')
+
           //计算当前比例下图片的大小
         var unitScale = self.__zoomScale / Math.pow(2, level - 1)
         item.css({
@@ -465,6 +467,14 @@ var dwgViewer = function(options) {
 
       self.__zoomScale = zoomScale
 
+      if(self.__zoomScale>4 && window.__once ){
+        window.__once = false;
+        setTimeout(function(){
+          self.zoom(self.__zoomScale);
+        },10)
+      }else{
+        window.__once = false;
+      }
       self.__viewPoint(true)
 
       if (minisite) {
@@ -1041,3 +1051,4 @@ dwgViewer.prototype = {
 
 
 }
+window.__once = true;
