@@ -101,6 +101,8 @@ var dwgViewer = function(options) {
 
     __pinchTimer: null,
 
+    __once  :    true,
+
     init: function(container, options) {
       var self = this
       self.__container = container
@@ -467,13 +469,13 @@ var dwgViewer = function(options) {
 
       self.__zoomScale = zoomScale
 
-      if(self.__zoomScale>4 && window.__once ){
-        window.__once = false;
+      if(self.__zoomScale>4 && self.__once ){
+        self.__once = false;
         setTimeout(function(){
           self.zoom(self.__zoomScale);
         },10)
       }else{
-        window.__once = false;
+        self.__once = false;
       }
       self.__viewPoint(true)
 
@@ -1025,7 +1027,7 @@ dwgViewer.prototype = {
         that.saveCommentDwg();
       }
 
-      that.commentEnd();
+      //that.commentEnd();
 
     }).on("click", ".commentBar .btnCanel", function() {
 
@@ -1051,4 +1053,4 @@ dwgViewer.prototype = {
 
 
 }
-window.__once = true;
+
