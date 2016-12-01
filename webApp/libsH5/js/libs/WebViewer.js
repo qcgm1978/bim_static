@@ -3,7 +3,7 @@
 */
 
 var CLOUD = CLOUD || {};
-CLOUD.Version = "20161125";
+CLOUD.Version = "20161201";
 
 CLOUD.GlobalData = {
     SceneSize: 1000,
@@ -1292,7 +1292,7 @@ CLOUD.GeomUtil = {
         //return tube;
     },
 
-    parsePGeomNodeInstance: function (objJSON, matObj, trf) {
+    parsePGeomNodeInstance: function (objJSON, matObj, trf, unloadable) {
 
         var object;
 
@@ -1326,6 +1326,12 @@ CLOUD.GeomUtil = {
             object.matrixAutoUpdate = false;
         }
 
+        //if (unloadable) {
+        //    object.unload = function () {
+        //        this.geometry.dispose();
+        //    };
+        //}
+
         return object;
     },
 
@@ -1334,9 +1340,7 @@ CLOUD.GeomUtil = {
     UnitBoxInstance: new THREE.BoxBufferGeometry(1, 1, 1),
 
     initializeUnitInstances: function(){
-        //THREE.Mesh.prototype.unload = function () {
-        //    this.geometry.dispose();
-        //};
+
     },
 
     destroyUnitInstances: function () {
@@ -18451,7 +18455,7 @@ CLOUD.SubSceneLoader.prototype = {
                 else if (objJSON.nodeType == "PGeomNode") {
 
                     var matObj = client.findMaterial(materialId, false);
-                    object = object = CLOUD.GeomUtil.parsePGeomNodeInstance(objJSON, matObj, trf);
+                    object = object = CLOUD.GeomUtil.parsePGeomNodeInstance(objJSON, matObj, trf, true);
 
                     if (object) {
 
@@ -18500,7 +18504,7 @@ CLOUD.SubSceneLoader.prototype = {
                                 trfLocal.multiplyMatrices(trf, trfLocal.clone());
                             }
 
-                            object = CLOUD.GeomUtil.parsePGeomNodeInstance(symbolJSON, matObj, trfLocal);
+                            object = CLOUD.GeomUtil.parsePGeomNodeInstance(symbolJSON, matObj, trfLocal, true);
 
                             if (object) {
 
