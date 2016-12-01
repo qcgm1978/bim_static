@@ -85,10 +85,14 @@
 
 .mod-dialog .wrapper .content {
     padding: 20px;
-    background-color: #FFFFFF;
+    /*background-color: #FFFFFF;*/
     box-sizing: content-box;
-}
 
+    color: #fff;
+}
+.box .content{
+    background-color: #333;
+}
 .mod-dialog .wrapper .footer {
     padding: 0 20px;
     border-top: 1px solid #ccc;
