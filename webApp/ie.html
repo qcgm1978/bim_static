@@ -61,15 +61,14 @@
             window.location.href.substring(window.location.href.lastIndexOf("path") + 5) ||
             window.location.host + "/#projects";
 
-
         //外部没有cokkie 登出
-        if (!getCookie("OUTSSO_AuthToken")) {
+        if (!getCookie("OUTSSO_AuthToken") && url.indexOf("appKey")<0) {
             url = location.protocol+"//"+location.host + "/login.html?t="+(+new Date());
             isCheckLogin = true;
         }
 
         myWebView.url = url;
-debugger
+
         myWebView.id = "webView";
 
         myWebView.registerEvent('newWindow', navigateTo);
