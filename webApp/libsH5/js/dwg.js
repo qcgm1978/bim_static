@@ -101,6 +101,8 @@ var dwgViewer = function(options) {
 
     __pinchTimer: null,
 
+    __once  :    true,
+
     init: function(container, options) {
       var self = this
       self.__container = container
@@ -152,7 +154,6 @@ var dwgViewer = function(options) {
 
       //设置批注容器
       var dwgHelper = this.dwgHelper = new CLOUD.Extensions.DwgHelper();
-
       dwgHelper.setDomContainer($("#modelBox .bim .mod-dwg")[0],$dwgCommentContainer[0]);
 
       //初始化批注事件
@@ -188,7 +189,9 @@ var dwgViewer = function(options) {
       2: CLOUD.Extensions.Annotation.shapeTypes.CIRCLE,
       3: CLOUD.Extensions.Annotation.shapeTypes.CROSS,
       4: CLOUD.Extensions.Annotation.shapeTypes.CLOUD,
-      5: CLOUD.Extensions.Annotation.shapeTypes.TEXT
+      5: CLOUD.Extensions.Annotation.shapeTypes.TEXT,
+      6: CLOUD.Extensions.Annotation.shapeTypes.COLOR
+
     },
     //批注事件初始化
     __initCommentEvent: function() {
@@ -210,7 +213,8 @@ var dwgViewer = function(options) {
               colors = $this.data('color'),
               param = $this.data('param');
           parent.attr('data-color',colors);
-          that.dwgHelper.setCommentStyle({'stroke-color': param,'fil-color':param });
+          that.dwgHelper.setAnnotationStyle({'stroke-color': param,'fil-color':param });
+
         }else{
           that.dwgHelper.setAnnotationType(that.__commentToolBarType[$this.data("id")]);
 
@@ -397,6 +401,7 @@ var dwgViewer = function(options) {
       var lod = options.lod
       var minisite = self.__minisite
 
+
       if (zoomScale <= 1) {
         zoomScale = 1
         curLevel = 1
@@ -424,6 +429,7 @@ var dwgViewer = function(options) {
         var item = $(this)
 
         var level = item.data('level')
+
           //计算当前比例下图片的大小
         var unitScale = self.__zoomScale / Math.pow(2, level - 1)
         item.css({
@@ -463,6 +469,14 @@ var dwgViewer = function(options) {
 
       self.__zoomScale = zoomScale
 
+      if(self.__zoomScale>4 && self.__once ){
+        self.__once = false;
+        setTimeout(function(){
+          self.zoom(self.__zoomScale);
+        },10)
+      }else{
+        self.__once = false;
+      }
       self.__viewPoint(true)
 
       if (minisite) {
@@ -1013,7 +1027,7 @@ dwgViewer.prototype = {
         that.saveCommentDwg();
       }
 
-      that.commentEnd();
+      //that.commentEnd();
 
     }).on("click", ".commentBar .btnCanel", function() {
 
@@ -1039,3 +1053,4 @@ dwgViewer.prototype = {
 
 
 }
+

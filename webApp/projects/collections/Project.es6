@@ -2297,14 +2297,15 @@ App.Project = {
 		//没有分类的时候 只过滤单文件 start
 		if (!cat) {
 			App.Project.recoverySilder();
-			_this.linkSilder('floors', key);
-			var _hideFileIds = _.filter(_files, function(i) {
+			//_this.linkSilder('floors', key);
+			/*var _hideFileIds = _.filter(_files, function(i) {
 				return i != _secenId;
 			})
 			App.Project.Settings.Viewer.fileFilter({
 				ids: _hideFileIds,
 				total: [_secenId]
-			});
+			});*/
+			_this.linkSilderSpecial('specialty', [paramObj.fileName],[paramObj.specialty]);
 			_this.zoomModelOther(ids, box);
 			return;
 		}

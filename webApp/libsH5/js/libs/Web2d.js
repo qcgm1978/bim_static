@@ -4004,6 +4004,7 @@ CLOUD.MiniMap = function (viewer) {
 
     var _isNormalizeMousePoint = false;
     var _isChangeView = false;
+    var _axisGridExpandSize = 100; // 100mm
 
     // ------------- 这些算法可以独立成单独文件 S ------------- //
 
@@ -4306,6 +4307,96 @@ CLOUD.MiniMap = function (viewer) {
     function transformWorldPoint(point) {
         var sceneMatrix = scope.getMainSceneMatrix();
         point.applyMatrix4(sceneMatrix);
+    }
+
+    // 调整轴网
+    function adjustAxisGrid(grids, mapMaxBox) {
+
+        var newBox2D = new THREE.Box2();
+        var newGrids = [];
+        var specifiedMaxBox = new THREE.Box2(new THREE.Vector2(mapMaxBox[0], mapMaxBox[1]), new THREE.Vector2(mapMaxBox[2], mapMaxBox[3]));
+
+        var horizLineElements = []; // 水平线集合
+        var verticalLineElements = []; // 垂直线集
+
+        var i = 0, j = 0, len = grids.length;
+
+        // 计算轴网包围盒
+        for (i = 0; i < len; i++) {
+
+            var grid = grids[i];
+            var startPt = grid.start || grid.Start;
+            var endPt = grid.end || grid.End;
+            var start = new THREE.Vector2(startPt.X, startPt.Y);
+            var end = new THREE.Vector2(endPt.X, endPt.Y);
+            var dir = end.clone().sub(start).normalize();
+
+            if (Math.abs(dir.x) >= Math.abs(dir.y)) {
+                // 水平方向线条
+                horizLineElements.push({v1: start, v2: end});
+            } else {
+                // 垂直方向线条
+                verticalLineElements.push({v1: start, v2: end});
+            }
+
+        }
+
+        // 计算交点
+        var horizLineElementsLen = horizLineElements.length;
+        var verticalLineElementsLen = verticalLineElements.length;
+        var horizLine, verticalLine;
+        var p1, p2, p3, p4;
+
+        for (i = 0; i < horizLineElementsLen; i++) {
+            horizLine = horizLineElements[i];
+            p1 = horizLine.v1.clone();
+            p2 = horizLine.v2.clone();
+
+            for (j = 0; j < verticalLineElementsLen; j++) {
+                verticalLine = verticalLineElements[j];
+                p3 = verticalLine.v1.clone();
+                p4 = verticalLine.v2.clone();
+
+                // 获得交点
+                var interPoint = getInterPoint(p1, p2, p3, p4);
+
+                newBox2D.expandByPoint(interPoint);
+            }
+        }
+
+        newBox2D.union(specifiedMaxBox);
+         // 扩展大小
+        newBox2D.expandByScalar(_axisGridExpandSize);
+
+        // 计算轴网包围盒
+        for (i = 0; i < len; i++) {
+
+            var grid = grids[i];
+            var name = grid.name;
+            var startPt = grid.start || grid.Start;
+            var endPt = grid.end || grid.End;
+
+            var start = new THREE.Vector2(startPt.X, startPt.Y);
+            var end = new THREE.Vector2(endPt.X, endPt.Y);
+
+            var dir = end.clone().sub(start).normalize();
+
+            if (Math.abs(dir.x) >= Math.abs(dir.y)) {
+                // 水平方向线条
+                start.x = newBox2D.max.x;
+                end.x = newBox2D.min.x;
+                newGrids.push({name: name, start: {X: start.x, Y: start.y}, end: {X: end.x, Y: end.y}});
+
+            } else {
+                // 垂直方向线条
+                start.y = newBox2D.min.y;
+                end.y = newBox2D.max.y;
+                newGrids.push({name: name, start: {X: start.x, Y: start.y}, end: {X: end.x, Y: end.y}});
+            }
+
+        }
+
+        return newGrids;
     }
 
     // 计算轴网包围盒
@@ -4873,14 +4964,18 @@ CLOUD.MiniMap = function (viewer) {
     };
 
     // 构造轴网
-    this.generateAxisGrid = function() {
+    this.generateAxisGrid = function(recalculate) {
+
+        if (recalculate == undefined) {
+
+            recalculate = true;
+        }
 
         var jsonObj = CLOUD.MiniMap.axisGridData;
 
         if (!jsonObj)  return;
 
-        var grids = jsonObj.Grids;
-        var len = grids.length;
+        var len = jsonObj.Grids.length;
 
         if (len < 1) {
 
@@ -4889,6 +4984,19 @@ CLOUD.MiniMap = function (viewer) {
         }
 
         _isLoadedAxisGrid = true;
+
+        var grids;
+        var mapMaxBox = jsonObj.mapMaxBox;
+
+        //var mapMaxBox = [-142017.73324847443, -61671.47449311853, 145168.2667521564, 74664.52937894061];
+
+        if (recalculate && mapMaxBox) {
+
+            grids = adjustAxisGrid(jsonObj.Grids, mapMaxBox);
+        } else {
+
+            grids = jsonObj.Grids;
+        }
 
         this.initAxisGird(grids);
 
@@ -9172,7 +9280,7 @@ CLOUD.Extensions.AnnotationEditor = function (domElement, cameraEditor) {
     this.initialized = false;
     this.epsilon = 0.0001;
     this.annotationStyle = null;
-    this.isDblClickCloseCloud = false;
+    this.isDblClickCloseCloud = true;
     this.mouseButtons = { LEFT: 0, MIDDLE: 1, RIGHT: 2 };
 
     this.onContextMenuBinded = this.onContextMenu.bind(this);
@@ -11184,6 +11292,19 @@ CLOUD.Extensions.DwgHelper = function () {
 
     this.pdfContainer = null;
     this.annotationContainer = null;
+
+    this.defaultStyle = {
+        'stroke-width': 3,
+        'stroke-color': '#ff0000',
+        'stroke-opacity': 1.0,
+        'fill-color': '#ff0000',
+        'fill-opacity': 0.0,
+        'font-family': 'Arial',
+        'font-size': 16,
+        'font-style': '',
+        'font-weight': ''
+    };
+    this.isDblClickCloseCloud = true;
 };
 
 CLOUD.Extensions.DwgHelper.prototype = {
@@ -11226,6 +11347,8 @@ CLOUD.Extensions.DwgHelper.prototype = {
             // 设置父容器
             this.editor.setDomContainer(domElement);
         }
+
+        this.editor.enableDblClickCloseCloud(this.isDblClickCloseCloud);
 
         if (!this.editor.isInitialized()) {
 
@@ -11295,6 +11418,23 @@ CLOUD.Extensions.DwgHelper.prototype = {
         }
     },
 
+    setAnnotationStyle: function (style, updateText) {
+
+        if (this.editor) {
+
+            for (var attr in style) {
+
+                if (attr in this.defaultStyle) {
+                    this.defaultStyle[attr] = style[attr];
+                }
+
+            }
+
+            this.editor.setAnnotationStyle(this.defaultStyle, updateText);
+
+        }
+    },
+
     // 加载DWG批注
     loadAnnotations: function (annotations, pointToCenter, beginEditCallback, endEditCallback) {
 
@@ -11341,6 +11481,13 @@ CLOUD.Extensions.DwgHelper.prototype = {
             this.editor.onCameraChange();
 
         }
+    },
+
+    // 特殊处理 - 是否允许双击关闭云图批注
+    enableDblClickCloseCloud: function(enable) {
+
+        this.isDblClickCloseCloud = enable;
+
     },
 
     // DWG截屏 base64格式png图片

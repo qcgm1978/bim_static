@@ -1247,7 +1247,6 @@
 			Project.Viewer = viewer;
 			viewer.on("loaded", function() {
 				Project.loadPropertyPanel();
-				viewer.resize();
 				Project.BIMFilter=Project.Viewer.viewer.getFilters();
 				$('#modelView .modelSidebar').addClass('hideMap');
 			});

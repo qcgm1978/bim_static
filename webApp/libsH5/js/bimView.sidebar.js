@@ -220,6 +220,7 @@
             yarr.push(floorsData[i]['boundingBox']['Max']['Y'],floorsData[i]['boundingBox']['Min']['Y']);
           }
           mapMaxBox = [_.min(xarr),_.min(yarr),_.max(xarr),_.max(yarr)];
+          //mapMaxBox = [_.min(xarr),-2500,1700,1700];
           console.log(mapMaxBox);
           floorsStatue = true;
           if(axisGridStatue){
