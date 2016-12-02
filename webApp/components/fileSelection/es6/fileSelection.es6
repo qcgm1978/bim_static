@@ -170,7 +170,7 @@
 			sb += '</li></ul> <div class="fileBodyScrollBox"><div class="fileBodyScroll"><ul class="fileBody"> <li class="null">暂无数据</li> </ul></div></div>';
 			$content.find('.contentBox').html(sb);
 
-			var rightEnter = '<div class="title">';
+			var rightEnter = '<div class="fileSelection-title">';
 
 			if (Settings.isEnable) {
 				rightEnter += '<button class="btnEnter myBtn myBtn-default"><!--<i class="bg ckBg"></i>--> 选择文件</button> ';
