@@ -261,6 +261,7 @@ App.Index = {
 
 		//初始化
 		this.init();
+
 	},
 
 

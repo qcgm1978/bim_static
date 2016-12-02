@@ -222,7 +222,8 @@ CLOUD.Utils = {
             node.matrix = localTrf;
         }
         node.matrixAutoUpdate = false;
-        node.boundingBox = CLOUD.Utils.box3FromArray(objJson.bbox);
+        if(node.boundingBox !== undefined)
+            node.boundingBox = CLOUD.Utils.box3FromArray(objJson.bbox);
     },
 
     parseRootNode: function (scene, data) {
@@ -1239,9 +1240,6 @@ CLOUD.GeomUtil = {
             geometryNode.position.copy(startPt).addScaledVector(dir, len * 0.5);
             geometryNode.updateMatrix();
             geometryNode.matrixAutoUpdate = false;
-            //geometryNode.boundingBox = 
-            if (!geometryNode.geometry.boundingBox)
-                geometryNode.geometry.computeBoundingBox();
         }
 
     }(),
@@ -1312,7 +1310,8 @@ CLOUD.GeomUtil = {
 
         }
         else if (objJSON.geomType == "hermitepipe") {
-            object = new THREE.Mesh(CLOUD.GeomUtil.parseHermitePipe(objJSON), matObj);
+            var geometry = CLOUD.GeomUtil.parseHermitePipe(objJSON);
+            object = new THREE.Mesh(geometry, matObj);
         }
         else {
             console.log("unknonw geometry!");
@@ -1340,12 +1339,86 @@ CLOUD.GeomUtil = {
     UnitBoxInstance: new THREE.BoxBufferGeometry(1, 1, 1),
 
     initializeUnitInstances: function(){
-
+        if (!CLOUD.GeomUtil.UnitCylinderInstance.boundingBox)
+            CLOUD.GeomUtil.UnitCylinderInstance.computeBoundingBox();
+        if (!CLOUD.GeomUtil.UnitBoxInstance.boundingBox)
+            CLOUD.GeomUtil.UnitBoxInstance.computeBoundingBox();
     },
 
     destroyUnitInstances: function () {
         CLOUD.GeomUtil.UnitCylinderInstance.dispose();
         CLOUD.GeomUtil.UnitBoxInstance.dispose();
+    },
+
+    toMeshWorldPosition: function(position, sceneMatrix) {
+
+        if (!sceneMatrix) {
+            sceneMatrix = new THREE.Matrix4();
+        }
+
+        var inverseScaleMatrix = new THREE.Matrix4();
+        inverseScaleMatrix.getInverse(sceneMatrix);
+
+        // 计算世界坐标下的位置
+        var worldPosition = position.clone();
+        worldPosition.applyMatrix4(inverseScaleMatrix);
+
+        return worldPosition;
+    },
+
+    // 遍历父节点获得当前mesh的世界矩阵
+    getMeshWorldMatrix: function(mesh) {
+
+        var matList = [];
+        var parent = mesh.parent;
+
+        while (parent) {
+
+            if ( (parent instanceof CLOUD.SubScene) || (parent instanceof CLOUD.Cell)) {
+                break;
+            }
+
+            matList.push(parent.matrix);
+
+            parent = parent.parent;
+        }
+
+        var matTmp = new THREE.Matrix4();
+
+        if (matList.length > 0) {
+
+            matTmp = matList[matList.length - 1];
+
+            for ( var i = matList.length - 2; i >= 0; --i) {
+                matTmp.multiply( matList[i] );
+            }
+        }
+
+        var objMatrixWorld = new THREE.Matrix4();
+        objMatrixWorld.multiplyMatrices( matTmp, mesh.matrix );
+
+        return objMatrixWorld;
+    },
+
+    getMeshWorldBoundingBox:function(mesh, sceneMatrix) {
+
+        // 计算世界坐标下的包围盒
+        var bBox = mesh.boundingBox;
+        if (!bBox) {
+            if(!mesh.geometry.boundingBox){
+                mesh.geometry.computeBoundingBox();
+            }
+            bBox = mesh.geometry.boundingBox;
+        }
+
+        var boundingBox = bBox.clone();
+
+        boundingBox.applyMatrix4(mesh.matrixWorld);
+        var inverseScaleMatrix = new THREE.Matrix4();
+        inverseScaleMatrix.getInverse(sceneMatrix);
+        boundingBox.applyMatrix4(inverseScaleMatrix);
+
+        return boundingBox;
     }
 
 };
@@ -10678,6 +10751,8 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
                             adjustCameraPosition(viewTrf);
                             this.object.realUp.applyQuaternion(viewTrf).normalize();
 
+                            // 旋转180度时，up的y值应该反向，否则移动会反
+                            this.adjustCameraUp();
                         }
 
                     }
@@ -11184,6 +11259,41 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
         rotation.setFromQuaternion(quat2, undefined, false);
 
         return rotation;
+    };
+
+    this.adjustCameraUp = function() {
+
+        if (this.object.realUp.y > 0) {
+
+            this.object.up = new THREE.Vector3(0, 1, 0);
+
+        } else  if (this.object.realUp.y < 0){
+
+            this.object.up = new THREE.Vector3(0, -1, 0);
+
+        } else {
+
+            if (this.object.realUp.x > 0) {
+
+                this.object.up = new THREE.Vector3(1, 0, 0);
+
+            } else if (this.object.realUp.x < 0) {
+
+                this.object.up = new THREE.Vector3(-1, 0, 0);
+
+            } else {
+
+                if (this.object.realUp.z > 0) {
+
+                    this.object.up = new THREE.Vector3(0, 0, 1);
+
+                } else if (this.object.realUp.z < 0) {
+
+                    this.object.up = new THREE.Vector3(0, 0, -1);
+                }
+            }
+        }
+
     };
 
     this.getWorldEye = function () {
@@ -11731,93 +11841,10 @@ CLOUD.PickHelper.prototype = {
         // 最好是在求交点的时候，包围盒就和位置一起进行坐标变换, 就可以免除这里的计算了
         var sceneMatrix = this.scene.getRootNodeMatrix();
 
-        if (!sceneMatrix) {
-            sceneMatrix = new THREE.Matrix4();
-        }
-
-        var inverseScaleMatrix = new THREE.Matrix4();
-        inverseScaleMatrix.getInverse(sceneMatrix);
-
-        // 计算世界坐标下的位置
-        var worldPosition = intersect.point.clone();
-        worldPosition.applyMatrix4(inverseScaleMatrix);
-        intersect.worldPosition = worldPosition;
-
-        // 计算世界坐标下的包围盒
-        var bBox = intersect.object.boundingBox;
-        var boundingBox = new THREE.Box3();
-
-        if (intersect.object.geometry instanceof THREE.BoxGeometry) {
-
-            //intersect.object.geometry.computeBoundingBox();
-            //bBox = intersect.object.geometry.boundingBox;
-            //bBox.applyMatrix4(intersect.object.matrixWorld);
-            //bBox.applyMatrix4( inverseScaleMatrix);
-
-            if (bBox) {
-
-                boundingBox = bBox.clone();
-
-                var objPosition = new THREE.Vector3();
-                var objQuaternion = new THREE.Quaternion();
-                var objScale = new THREE.Vector3();
-                var objMatrix = intersect.object.matrix;
-                objMatrix.decompose( objPosition, objQuaternion, objScale );
-
-                // 计算包围盒
-                var invScale = new THREE.Vector3(1 /objScale.x, 1 / objScale.y, 1 / objScale.z );
-                boundingBox.min.multiply(invScale);
-                boundingBox.max.multiply(invScale);
-
-            } else {
-                intersect.object.geometry.computeBoundingBox();
-                boundingBox = intersect.object.geometry.boundingBox;
-            }
-
-            boundingBox.applyMatrix4(intersect.object.matrixWorld);
-            boundingBox.applyMatrix4( inverseScaleMatrix);
-
-        } else {
-
-            if (!bBox) {
-                intersect.object.geometry.computeBoundingBox();
-                bBox = intersect.object.geometry.boundingBox;
-            }
-
-            boundingBox = bBox.clone();
-
-            var matList = [];
-            var parent = intersect.object.parent;
-
-            while (parent) {
-
-                if ( (parent instanceof CLOUD.SubScene) || (parent instanceof CLOUD.Cell)) {
-                    break;
-                }
-
-                matList.push(parent.matrix);
-
-                parent = parent.parent;
-            }
-
-            var matTmp = new THREE.Matrix4();
-
-            if (matList.length > 0) {
-
-                matTmp = matList[matList.length - 1];
-
-                for ( var i = matList.length - 2; i >= 0; --i) {
-                    matTmp.multiply( matList[i] );
-                }
-            }
-
-            var objMatrixWorld = new THREE.Matrix4();
-            objMatrixWorld.multiplyMatrices( matTmp, intersect.object.matrix );
-
-            boundingBox.applyMatrix4(objMatrixWorld);
-        }
-
-        intersect.worldBoundingBox = boundingBox;
+        // 获得世界坐标下的位置
+        intersect.worldPosition = CLOUD.GeomUtil.toMeshWorldPosition(intersect.point, sceneMatrix);
+        // 获得世界坐标下的包围盒
+        intersect.worldBoundingBox = CLOUD.GeomUtil.getMeshWorldBoundingBox(intersect.object, sceneMatrix);
     },
 
     showPickedInformation : function (intersect, cx, cy) {
