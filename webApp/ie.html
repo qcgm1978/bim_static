@@ -37,6 +37,7 @@
     var hasDevicePixelRatio = true;
     var myWebView;
     var isShare = false;   //模型分享，执行一次
+
     try {
 
         myWebView = document.createElement("object"),
@@ -68,13 +69,10 @@
         }
 
         myWebView.url = url;
-
         myWebView.id = "webView";
-
         myWebView.registerEvent('newWindow', navigateTo);
 
         myWebView.registerEvent('urlChanged', function(url) {
-
 
             if (myWebView.url == "about:blank") {
                 window.opener = null;
@@ -135,6 +133,8 @@
         },2000)
 
         myWebView.registerEvent('loadFinished', function(isReady) {
+
+
 
             if (myWebView.url.indexOf("login.html") > -1 && !isCheckLogin) {
                 if (!isReady) {

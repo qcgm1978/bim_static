@@ -43,7 +43,6 @@ App.Comm = {
 
 		return isLogin;
 	},
-
 	//ie预览模型
 	isIEModel: function() {
 
@@ -269,7 +268,6 @@ App.Comm = {
 		} else {
 			data.url += '?t=' + (+new Date);
 		}
-
 		return data;
 
 	},
