@@ -146,7 +146,8 @@
                 }
             }
 
-            if (myWebView.url.indexOf("login.html") <= -1) {
+
+            if (myWebView.url.indexOf("login.html") <= -1 && url.indexOf("appKey")<0 ) { 
                 myWebView.runScript('App.Comm.checkCookie("' + document.cookie + '")', function(cookie) {
                     console.log(cookie);
                 });
