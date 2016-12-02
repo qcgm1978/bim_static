@@ -75,6 +75,7 @@
     }
 
     function allIn(param) {
+        clearCache();
         var view = viewer.Project.Viewer,
                 type = "readOnly";
         param = JSON.parse(param);
@@ -118,22 +119,39 @@
         }
 
         if(!param.presetId && !param.componentId && !param.location ){
-            $(".tbOpeningacceptanceBody tr").removeClass('selected');
+            type="edit";
+            /*$(".tbOpeningacceptanceBody tr").removeClass('selected');
             view.highlight({
                 type: "userId",
                 ids: undefined
             });
-            view.viewer.getFilters().setSelectedIds();
 
+            view.viewer.getFilters().setSelectedIds();
             viewer.Project.presetPointShowData=null;
             viewer.Project.presetPoint=null;
             viewer.Project.currentRiskShowData=null;
             viewer.Project.currentUserId=null;
             viewer.Project.isSelect = 'open';
-            type="edit";
-            viewer.Project.mode = type;
+            viewer.Project.mode = type;*/
+            clearCache();
         }
         return type;
+    }
+
+    function clearCache(){
+        var view = viewer.Project.Viewer;
+        $(".tbOpeningacceptanceBody tr").removeClass('selected');
+        view.highlight({
+            type: "userId",
+            ids: undefined
+        });
+        view.viewer.getFilters().setSelectedIds();
+        viewer.Project.presetPointShowData=null;
+        viewer.Project.presetPoint=null;
+        viewer.Project.currentRiskShowData=null;
+        viewer.Project.currentUserId=null;
+        viewer.Project.isSelect = 'open';
+        viewer.Project.mode = 'edit';
     }
 
     function clearRisk() {

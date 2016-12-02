@@ -29,13 +29,13 @@
         height: "580px",
         width:"1200px",
         //projectCode:"184df75d-244f-434e-b16c-b8a3f27874c4",
-        projectCode: 'edbae83a-8a9f-4dfa-9588-18d7d33f71b6',
+        projectCode: '11130163',
         token:"4aeba9fa8574d9a7f5e6ff2fbc54cd5cf45d7f3949df6bdf1f5c49f4349baa01a76b19a3118007e98a2546f76a1e5c7c6dff6a0b87795a92",
         appKey: "60e8a1d9fc1d44d7b6a4cf85ae2987ed",
         callback: function (res) {
             $('#test').val(JSON.stringify(res))
         },
-        withCheckpoint : false
+        withCheckpoint : true
         /*
         withCheckpoint参数可选,默认为true
         withCheckpoint = false 隐藏检查点页签
@@ -56,21 +56,33 @@
             }
             //只绑定检查点（也等于解绑隐患）
             if (t == 2) {
-                viewer.showInModel({presetId: '936062989484321'})
+                viewer.showInModel({presetId: '972653965157858'})
             }
             //绑定隐患(如果有检查点数据、要传回)
             if (t == 3) {
                 viewer.showInModel({
-                    presetId: "936062989484321",
-                    componentId: "936042431030784.0d9d7d7c-1653-41d2-992b-405a02cbd02d-0003121c",
+                    presetId: "972653965157858",
+                    componentId: "972045783590400.440486e4-4a1a-47df-99d1-bfad7c77533f-0011e290",
                     location: {
                         "id": "1",
-                        "userId": "936042431030784.0d9d7d7c-1653-41d2-992b-405a02cbd02d-0003121c",
+                        "userId": "972045783590400.440486e4-4a1a-47df-99d1-bfad7c77533f-0011e290",
                         "shapeType": 1,
-                        "position": {"x": -5786.177826889158, "y": 17389.052775642333, "z": -10793.108887104183},
-                        "boundingBox": {
-                            "min": {"x": -5925.93017578125, "y": 17043.36921875, "z": -22480},
-                            "max": {"x": -4325.93017578125, "y": 18615.02921875, "z": -9380}
+                        "position" : {
+                            "x" : 200320.078125,
+                            "y" : 4000.06591796875,
+                            "z" : -2729.999755859375
+                        },
+                        "boundingBox" : {
+                            "min" : {
+                                "x" : 200570.09375,
+                                "y" : 4100.06591796875,
+                                "z" : -2729.999755859375
+                            },
+                            "max" : {
+                                "x" : 200070.09375,
+                                "y" : 3900.06591796875,
+                                "z" : -5479.99951171875
+                            }
                         }
                     }
                 })
@@ -80,15 +92,27 @@
             if (t == 4) {
                 viewer.showInModel({
                     presetId: "",
-                    componentId: "936042431030784.0d9d7d7c-1653-41d2-992b-405a02cbd02d-0003121c",
+                    componentId: "972045783590400.440486e4-4a1a-47df-99d1-bfad7c77533f-0011e290",
                     location: {
                         "id": "1",
-                        "userId": "936042431030784.0d9d7d7c-1653-41d2-992b-405a02cbd02d-0003121c",
+                        "userId": "972045783590400.440486e4-4a1a-47df-99d1-bfad7c77533f-0011e290",
                         "shapeType": 1,
-                        "position": {"x": -5786.177826889158, "y": 17389.052775642333, "z": -10793.108887104183},
-                        "boundingBox": {
-                            "min": {"x": -5925.93017578125, "y": 17043.36921875, "z": -22480},
-                            "max": {"x": -4325.93017578125, "y": 18615.02921875, "z": -9380}
+                        "position" : {
+                            "x" : 200320.078125,
+                            "y" : 4000.06591796875,
+                            "z" : -2729.999755859375
+                        },
+                        "boundingBox" : {
+                            "min" : {
+                                "x" : 200570.09375,
+                                "y" : 4100.06591796875,
+                                "z" : -2729.999755859375
+                            },
+                            "max" : {
+                                "x" : 200070.09375,
+                                "y" : 3900.06591796875,
+                                "z" : -5479.99951171875
+                            }
                         }
                     }
                 })
@@ -97,7 +121,7 @@
             //解绑隐患（同时保持检查点的数据）
             if (t == 5) {
                 viewer.showInModel({
-                    presetId: "936062989484321",
+                    presetId: "972653965157858",
                     componentId: "",
                     location: ""
                 })
