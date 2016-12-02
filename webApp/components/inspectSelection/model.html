@@ -75,6 +75,7 @@
     }
 
     function allIn(param) {
+        alert(param);
         clearCache();
         var view = viewer.Project.Viewer,
                 type = "readOnly";
@@ -164,12 +165,14 @@
     }
 
     function showRiskComponent(componentId, location,sid) {
+            var view = viewer.Project.Viewer;
             if(typeof location === 'string'){
                 location=JSON.parse(location);
             }
+            var box = viewer.Project.formatBBox(location.boundingBox);
+            view.zoomToBox(box);
             location.userId=componentId;
             location=JSON.stringify(location);
-            var view = viewer.Project.Viewer;
             view.highlight({
                 type: "userId",
                 ids: [componentId]
@@ -179,7 +182,6 @@
                 marker:location
             }
             view.loadMarkers([location]);
-
             if(viewer.Project.mode=='risk'){
                 viewer.Project.ModelFilter.fileFilter(sid);
             }
