@@ -96,6 +96,7 @@
 .tree-checkbox .box { display: inline-block; width: 13px; height: 13px; background: url(./images/tree.png) no-repeat; background-position: 0 -60px; }
 .tree-checkbox input:checked + .box { background-position: 0 -40px; }
 .contrastInfo{
+	color: #333;
   .close{
 	cursor: pointer;
   }
@@ -109,12 +110,16 @@
 	width: 100%;
 	padding: 0 13px;
 	border-bottom: 1px solid #ccc;
+	& h3{
+		font-size: inherit;
+		line-height: inherit;
+	}
 	.close{
 	  width: 18px;
 	  height: 18px;
 	  font-size: 18px;
 	  line-height: 18px;
-	  color: #ccc;
+	  color: #333;
 	  position: absolute;
 	  top: 13px;
 	  right: 13px;
@@ -125,12 +130,13 @@
 	height: 30px;
 	border: 1px solid #CCCCCC;
 	font-size: 16px;
-	line-height: 30px;
 	text-align: center;
 	position: absolute;
 	bottom: 14px;
 	right: 22px;
 	color: #888;
+	opacity: 1;
+	font-weight: normal;
   }
   .contents{
 	width: 100%;
