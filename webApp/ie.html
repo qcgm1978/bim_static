@@ -146,7 +146,8 @@
                 }
             }
 
-            if (myWebView.url.indexOf("login.html") <= -1) {
+
+            if (myWebView.url.indexOf("login.html") <= -1 && url.indexOf("appKey")<0 ) { 
                 myWebView.runScript('App.Comm.checkCookie("' + document.cookie + '")', function(cookie) {
                     console.log(cookie);
                 });
@@ -473,14 +474,18 @@
             {
                 myWebView.url = url; //"http://bim.wanda-dev.cn/index.html?t=1478660027944#flow";
             }else if(url.indexOf("/page")>0){
-                myWebView.url = url;
+                //secend trigger
+//                myWebView.url = url;
             }
         }
         catch(e)
         {;}
 
     };
+
     snapView();
+
+
 
 
     /*
