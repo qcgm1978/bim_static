@@ -85,7 +85,7 @@ App.Project.ProcessDisease=Backbone.View.extend({
 
 	linkModelComponent(e){
 		e.stopPropagation();
-		var $target=$(e.currentTarget),
+		/*var $target=$(e.currentTarget),
 			id=$target.attr('data-id'),
 			type=$target.attr('data-type');
 		$.ajax({
@@ -108,6 +108,37 @@ App.Project.ProcessDisease=Backbone.View.extend({
 						App.Project.showInModel($target,3,obj);
 					}
 				})
+			}
+		})*/
+		var $target=$(e.currentTarget);
+		var uuid=$target.data('uuid');
+		var _fileId=uuid.split('.')[0];
+		var location=$target.data('location');
+		if(!uuid || !_fileId){
+			$.tip({message:'该隐患未关联到模型的构件',type:'alarm'});
+			return
+		}
+		if(!location.position || !location.boundingBox){
+			$.tip({message:'该隐患无位置信息',type:'alarm'});
+			return
+		}
+		$.ajax({
+			url: "/doc/api/"+App.Project.Settings.CurrentVersion.projectId+'/'+App.Project.Settings.CurrentVersion.id+"?fileId="+_fileId
+		}).done(function(data){
+			if (data.code == 0 && data.data) {
+				var  modelId = data.data.modelId;
+				var obj={
+					specialty:data.data.specialty,
+					fileName:data.data.name,
+					uuid:modelId+uuid.slice(uuid.indexOf('.')),
+					location:{
+						boundingBox:location.boundingBox,
+						position:location.position
+					}
+				}
+				App.Project.showInModel($target,3,obj);
+			}else{
+				$.tip({message:'文件对应的模型ID不存在',type:'alarm'});
 			}
 		})
 	}
