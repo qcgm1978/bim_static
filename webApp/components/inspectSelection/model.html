@@ -21,27 +21,35 @@
         return theRequest;
     }
     var Request = GetRequest();
-
+    var viewer=null;
     var _host='http://' + location.host;
-
-    var viewer = new InspectModelSelection({
-        type: Request.type,//open process
-        sourceId: Request.sourceId,
-        etag: Request.etag,
-        projectId: Request.projectId,
-        projectVersionId: Request.projectVersionId,
-        ruleType: Request.ruleType,
-        token: Request.token,
-        appKey: Request.appKey,
-        host: _host,
-        height:Request.height,
-        width:Request.width,
-        withCheckpoint:Request.withCheckpoint,
-        //res 选择的检查点数据
-        callback: function (res) {
+    $.ajax({
+        url:_host+'/doc/'+Request.projectId+'/'+Request.projectVersionId+'/project/fileList',
+        success:function(res){
+            if(res.code==0){
+                viewer = new InspectModelSelection({
+                    type: Request.type,//open process
+                    sourceId: Request.sourceId,
+                    etag: Request.etag,
+                    projectId: Request.projectId,
+                    projectVersionId: Request.projectVersionId,
+                    ruleType: Request.ruleType,
+                    token: Request.token,
+                    appKey: Request.appKey,
+                    host: _host,
+                    height:Request.height,
+                    width:Request.width,
+                    fileData:res.data,
+                    withCheckpoint:Request.withCheckpoint,
+                    callback: function (res) {
+                    }
+                });
+            }
+        },
+        error:function(){
+            alert('模型加载失败');
         }
-    });
-
+    })
     function getData() {
         var userId = viewer.Project.currentUserId,
                 fileId = viewer.Project.fileIds[userId] || "";
