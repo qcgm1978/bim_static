@@ -369,6 +369,7 @@ var AppKeyRoute = Backbone.Router.extend({
 					App.Comm.setCookie("token_cookie", token_cookie);
 				});
 
+				
 				//获取用户信息
 				that.getUserInfo(fn);
 
