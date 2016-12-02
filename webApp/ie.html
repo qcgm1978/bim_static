@@ -37,9 +37,7 @@
     var hasDevicePixelRatio = true;
     var myWebView;
     var isShare = false;   //模型分享，执行一次
-    for (var i= 0,sum=0;i<99999;i++){
-        sum+=i;
-    }
+
     try {
 
         myWebView = document.createElement("object"),
@@ -475,6 +473,8 @@
             if(url.indexOf("share")>0)
             {
                 myWebView.url = url; //"http://bim.wanda-dev.cn/index.html?t=1478660027944#flow";
+            }else if(url.indexOf("/page")>0){
+                myWebView.url = url;
             }
         }
         catch(e)
