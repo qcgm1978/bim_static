@@ -173,7 +173,7 @@
 			var rightEnter = '<div class="title">';
 
 			if (Settings.isEnable) {
-				rightEnter += '<button class="btnEnter myBtn myBtn-default"><i class="bg ckBg"></i> 选择文件</button> ';
+				rightEnter += '<button class="btnEnter myBtn myBtn-default"><!--<i class="bg ckBg"></i>--> 选择文件</button> ';
 			} 
 			var count = 0;
 			if (Settings.fileIds) {
