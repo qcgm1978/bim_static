@@ -62,7 +62,7 @@
             window.location.host + "/#projects";
 
         //外部没有cokkie 登出
-        if (!getCookie("OUTSSO_AuthToken") && url.indexOf("appKey")<0) {
+        if (!getCookie("OUTSSO_AuthToken") && url.indexOf("appKey")<0) {alert(url)
             url = location.protocol+"//"+location.host + "/login.html?t="+(+new Date());
             isCheckLogin = true;
         }

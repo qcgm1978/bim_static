@@ -13,6 +13,7 @@ App.Project = {
 	isIEModel: function() {
 		if ("ActiveXObject" in window || window.ActiveXObject) {
 			window.location.href = '/ie.html?path=' + window.location.href;
+			//window.location.href = '/ie.html?t='+App.time+'&path=' + window.location.href;
 			return true;
 		}
 	},
