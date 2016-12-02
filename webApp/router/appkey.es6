@@ -352,22 +352,30 @@ var AppKeyRoute = Backbone.Router.extend({
 
 				var token_cookie = data.data;
 
-				$.ajax({
-					url: '/platform/user/current?t=' + (+new Date()),
-					async: false
-				}).done(function(data) {
+				var isLogin=App.Comm.getCookie("OUTSSO_AuthToken");
 
-					if (typeof(data) == "string") {
-						data = JSON.parse(data);
-					}
-					if (data.code == 0) {
-						App.Comm.setCookie("token_cookie_me", token_cookie);
-					} else {
-						App.Comm.setCookie("token_cookie", token_cookie);
-					}
-				}).fail(function() {
+				if (isLogin) {
+					App.Comm.setCookie("token_cookie_me", token_cookie);
+				}else{
 					App.Comm.setCookie("token_cookie", token_cookie);
-				});
+				}
+
+				// $.ajax({
+				// 	url: '/platform/user/current?t=' + (+new Date()),
+				// 	async: false
+				// }).done(function(data) {
+
+				// 	if (typeof(data) == "string") {
+				// 		data = JSON.parse(data);
+				// 	}
+				// 	if (data.code == 0) {
+				// 		App.Comm.setCookie("token_cookie_me", token_cookie);
+				// 	} else {
+				// 		App.Comm.setCookie("token_cookie", token_cookie);
+				// 	}
+				// }).fail(function() {
+				// 	App.Comm.setCookie("token_cookie", token_cookie);
+				// });
 
 				
 				//获取用户信息
