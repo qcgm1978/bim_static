@@ -24,7 +24,7 @@
     var viewer=null;
     var _host='http://' + location.host;
     $.ajax({
-        url:_host+'/doc/'+Request.projectId+'/'+Request.projectVersionId+'/project/fileList',
+        url:_host+'/doc/'+Request.projectId+'/'+Request.projectVersionId+'/project/fileList?appKey='+Request.appKey+"&token="+Request.token,
         success:function(res){
             if(res.code==0){
                 viewer = new InspectModelSelection({
@@ -209,7 +209,7 @@
         var _fileId=ids[0],
                 userId=ids[1];
         $.ajax({
-            url: _host+"/doc/api/" + Request.projectId + '/' + Request.projectVersionId + "?fileId=" +_fileId,
+            url: _host+"/doc/api/" + Request.projectId + '/' + Request.projectVersionId + "?fileId=" +_fileId+'&appKey='+Request.appKey+"&token="+Request.token,
         }).done(function(data) {
             if (data.code == 0) {
                 var modelId = data.data && data.data.modelId;
