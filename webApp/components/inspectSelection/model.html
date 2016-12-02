@@ -83,6 +83,7 @@
     }
 
     function allIn(param) {
+        alert(param)
         clearCache();
         var view = viewer.Project.Viewer,
                 type = "readOnly";
@@ -143,6 +144,7 @@
             viewer.Project.mode = type;*/
             clearCache();
         }
+        alert(type)
         return type;
     }
 
@@ -227,6 +229,8 @@
         if(viewer.Project.presetPointShowData && viewer.Project.presetPointShowData.marker){
             viewer.Project.Viewer.loadMarkers([viewer.Project.presetPointShowData.marker]);
         }
+
+        alert(presetId)
 
         viewer.Project.OpeningAcceptanceCollection.push({data: data});
         viewer.Project.pageInfo(data, true);
