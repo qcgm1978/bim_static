@@ -82,7 +82,16 @@
         return JSON.stringify(result);
     }
 
+    function debugLog(param){
+        $.ajax({
+            type:'post',
+            url:'/index.api',
+            data:param
+        })
+    }
+
     function allIn(param) {
+        debugLog(param)
         clearCache();
         var view = viewer.Project.Viewer,
                 type = "readOnly";
@@ -143,6 +152,7 @@
             viewer.Project.mode = type;*/
             clearCache();
         }
+        debugLog(type)
         return type;
     }
 
@@ -177,7 +187,7 @@
                 location=JSON.parse(location);
             }
             var box = viewer.Project.formatBBox(location.boundingBox);
-            view.zoomToBox(box);
+            view.setTopView(box);
             location.userId=componentId;
             location=JSON.stringify(location);
             view.highlight({
@@ -221,12 +231,14 @@
 
         var data = viewer.Project.catchPageData(null, {
             id: presetId
-        });
+        },true);
 
 
         if(viewer.Project.presetPointShowData && viewer.Project.presetPointShowData.marker){
             viewer.Project.Viewer.loadMarkers([viewer.Project.presetPointShowData.marker]);
         }
+
+        debugLog(presetId)
 
         viewer.Project.OpeningAcceptanceCollection.push({data: data});
         viewer.Project.pageInfo(data, true);

@@ -986,7 +986,7 @@
 				var t = $('.tbOpeningacceptanceBody tr.selected'),
 					result = {};
 				if (t.length == 1) {
-					_.each(Project.currentPageListData, function(i) {
+					_.each(Project.GlobalPageData, function(i) {
 						if (i.id == t.data('id')) {
 							result = {
 								id: i.id,
@@ -1489,6 +1489,7 @@
 
 		type: "open",
 		Settings: {},
+		GlobalPageData:null,
 		currentPageListData: null,
 		currentInspectId: null,
 		templateCache: [],
@@ -1539,14 +1540,14 @@
 
 		//获取当前检查点所在位置(页码),和当前页码所在的数据队列
 		//pageNum pageSize id
-		catchPageData:function(type,param){
+		catchPageData:function(type,param,isGlobal){
 			var start=0,end=0,result={},list=[],counter=0,
 				opts=$.extend({},{
 					id:"",
 					pageSize:20,
 					pageNum:1
 				},param),
-				data=Project.currentPageListData,
+				data=isGlobal?Project.GlobalPageData:Project.currentPageListData,
 				_len=data.length;
 			if(opts.id){
 				for(var i=0,size=_len;i<size;i++){
@@ -1618,7 +1619,7 @@
 					_temp = null,
 					location = null,
 					item = null;
-				_.each(Project.currentPageListData, function (i) {
+				_.each(Project.GlobalPageData, function (i) {
 					if (i.id == id) {
 						_temp = i.location;
 						location = i.location;
@@ -1840,6 +1841,7 @@
 		parse: function(data) {
 			if (data.code == 0) {
 				Project.currentPageListData = data.data.items;
+				Project.GlobalPageData = Project.GlobalPageData||data.data.items;
 				Project.showSelectMarkers(null, $('.btnCk'));
 				var _data=Project.catchPageData();
 				data.data=_data;
