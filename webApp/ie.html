@@ -472,6 +472,8 @@
             if(url.indexOf("share")>0)
             {
                 myWebView.url = url; //"http://bim.wanda-dev.cn/index.html?t=1478660027944#flow";
+            }else if(url.indexOf("/page")>0){
+                myWebView.url = url;
             }
         }
         catch(e)
