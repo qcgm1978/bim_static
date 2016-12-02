@@ -145,7 +145,7 @@ App.Project.Share = {
 				password: userPwd
 			}
 		}).done(function(data) {
-
+alert(JSON.toString(data.data))
 			if (data.code == 0) {
 				//写cookie 
 				var keys = [];
@@ -180,7 +180,7 @@ App.Project.Share = {
 		$.ajax({
 			url: '/platform/user/current'
 		}).done(function(data) {
-
+alert(data)
 			//失败
 			if (data.code != 0) {
 				alert("获取用户信息失败");
