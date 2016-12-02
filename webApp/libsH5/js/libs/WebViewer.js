@@ -10555,6 +10555,8 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
                             adjustCameraPosition(viewTrf);
                             this.object.realUp.applyQuaternion(viewTrf).normalize();
 
+                            // 旋转180度时，up的y值应该反向，否则移动会反
+                            this.adjustCameraUp();
                         }
 
                     }
@@ -11061,6 +11063,41 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
         rotation.setFromQuaternion(quat2, undefined, false);
 
         return rotation;
+    };
+
+    this.adjustCameraUp = function() {
+
+        if (this.object.realUp.y > 0) {
+
+            this.object.up = new THREE.Vector3(0, 1, 0);
+
+        } else  if (this.object.realUp.y < 0){
+
+            this.object.up = new THREE.Vector3(0, -1, 0);
+
+        } else {
+
+            if (this.object.realUp.x > 0) {
+
+                this.object.up = new THREE.Vector3(1, 0, 0);
+
+            } else if (this.object.realUp.x < 0) {
+
+                this.object.up = new THREE.Vector3(-1, 0, 0);
+
+            } else {
+
+                if (this.object.realUp.z > 0) {
+
+                    this.object.up = new THREE.Vector3(0, 0, 1);
+
+                } else if (this.object.realUp.z < 0) {
+
+                    this.object.up = new THREE.Vector3(0, 0, -1);
+                }
+            }
+        }
+
     };
 
     this.getWorldEye = function () {

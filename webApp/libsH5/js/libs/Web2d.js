@@ -3958,6 +3958,7 @@ CLOUD.MiniMap = function (viewer) {
     this.callbackCameraChanged = null;
     this.callbackClickOnAxisGrid = null;
     this.initialized = false;
+    this.axisGirds = null;
 
     var scope = this;
     var _mapContainer;
@@ -4372,7 +4373,7 @@ CLOUD.MiniMap = function (viewer) {
         for (i = 0; i < len; i++) {
 
             var grid = grids[i];
-            var name = grid.name;
+            var name = grid.name || grid.Name;
             var startPt = grid.start || grid.Start;
             var endPt = grid.end || grid.End;
 
@@ -4488,7 +4489,7 @@ CLOUD.MiniMap = function (viewer) {
 
             var grid = grids[i];
 
-            var name = grid.name;
+            var name = grid.name || grid.Name;
             var startPt = grid.start || grid.Start;
             var endPt = grid.end || grid.End;
 
@@ -4768,6 +4769,11 @@ CLOUD.MiniMap = function (viewer) {
             _mapContainer = null;
             _svg = null;
             _svgGroupForAxisGrid = null;
+
+            this.domContainer = null;
+            this.callbackCameraChanged = null;
+            this.callbackClickOnAxisGrid = null;
+            this.axisGirds = null;
         }
 
     };
@@ -4988,15 +4994,16 @@ CLOUD.MiniMap = function (viewer) {
         var grids;
         var mapMaxBox = jsonObj.mapMaxBox;
 
-        //var mapMaxBox = [-142017.73324847443, -61671.47449311853, 145168.2667521564, 74664.52937894061];
-
         if (recalculate && mapMaxBox) {
 
             grids = adjustAxisGrid(jsonObj.Grids, mapMaxBox);
+
         } else {
 
             grids = jsonObj.Grids;
         }
+
+        this.axisGirds = grids;
 
         this.initAxisGird(grids);
 
@@ -5130,7 +5137,7 @@ CLOUD.MiniMap = function (viewer) {
     // 重设轴网大小
     this.resizeClientAxisGrid = function() {
 
-        var grids = CLOUD.MiniMap.axisGridData.Grids;
+        var grids = this.axisGirds || CLOUD.MiniMap.axisGridData.Grids;
 
         this.initAxisGird(grids);
 

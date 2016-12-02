@@ -145,7 +145,7 @@ App.Project.Share = {
 				password: userPwd
 			}
 		}).done(function(data) {
-alert(JSON.toString(data.data))
+
 			if (data.code == 0) {
 				//写cookie 
 				var keys = [];
@@ -180,7 +180,7 @@ alert(JSON.toString(data.data))
 		$.ajax({
 			url: '/platform/user/current'
 		}).done(function(data) {
-alert(data)
+
 			//失败
 			if (data.code != 0) {
 				alert("获取用户信息失败");
@@ -189,9 +189,13 @@ alert(data)
 			}
 
 			App.Comm.dispatchIE('/?commType=loginIn');
-
+			//alert(App.Comm.getCookie('OUTSSO_AuthMAC'))
 			localStorage.setItem("user", JSON.stringify(data.data));
+			//alert(App.Comm.getCookie('OUTSSO_AuthMAC'))
+
 			App.Comm.setCookie('userId', data.data.userId);
+			//alert(App.Comm.getCookie('OUTSSO_AuthMAC'))
+
 			App.Comm.setCookie('isOuter', data.data.outer);
 			//是否主动退出标记 2 默认状态 1 为主动退出
 			App.Comm.setCookie('IS_OWNER_LOGIN', '2');
@@ -204,7 +208,7 @@ alert(data)
 			// 	App.TopNav.init();
 			// } 
 			dialog.close()
-
+			//alert(App.Comm.getCookie('OUTSSO_AuthMAC'))
 		});
 	}
 
