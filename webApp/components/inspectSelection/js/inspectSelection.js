@@ -1206,7 +1206,8 @@
 					_axisObj = model.intersect.axisGridInfo || {},
 					_boundingBox=model.intersect.worldBoundingBox,
 					_position=model.intersect.worldPosition,
-				fileUrl = _url + _userId.slice(0, _userId.indexOf('.'));
+					_modelId=_userId.slice(0, _userId.indexOf('.')),
+				fileUrl = _url + _modelId;
 
 				Project.sceneId = model.intersect.object.userData.sceneId;
 				Project.renderAttr(_userId, Project.sceneId);
@@ -1222,12 +1223,13 @@
 				Project.locationName[_userId] = '轴' + _axisObj.abcName + '-' + _axisObj.numeralName;
 				Project.axis[_userId] = JSON.stringify(_axisObj);
 				Project.components[_userId] = _boundingBox;
-				$.ajax({
+				/*$.ajax({
 					url: fileUrl,
 					success: function(data) {
 						Project.fileIds[_userId] = data.data.id;
 					}
-				})
+				})*/
+				Project.fileIds[_userId]=Project.filterFileId(_modelId);
 
 
 				if (Project.mode == 'preset'||Project.mode == 'edit' || !Project.mode) {
@@ -1500,6 +1502,16 @@
 		filterRule: {
 			sceneId: '工程桩,基坑支护,地下防水,钢结构悬挑构件,幕墙,采光顶'
 		},
+
+		filterFileId:function(modelId){
+			var data=Project.Settings.fileData;
+			var result=_.findWhere(data,{modelId:modelId});
+			if(result){
+				return result.fileId;
+			}
+			return '';
+		},
+
 		//计划状态
 		planStatus: {
 			0: '',
