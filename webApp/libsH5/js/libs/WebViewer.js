@@ -3,7 +3,7 @@
 */
 
 var CLOUD = CLOUD || {};
-CLOUD.Version = "20161201";
+CLOUD.Version = "20161202";
 
 CLOUD.GlobalData = {
     SceneSize: 1000,
@@ -1619,9 +1619,128 @@ CLOUD.BBoxNode.prototype.updateBBox = function (boundingBox) {
     this.geometry.computeBoundingSphere();
     this.matrixAutoUpdate = false;
 };
+/**
+* @author mrdoob / http://mrdoob.com/
+*/
+
+THREE.WebGLGeometriesExt = function ( gl, properties, info ) {
+
+	var geometries = {};
+
+	function get( object ) {
+
+		var geometry = object.geometry;
+
+		if ( geometries[ geometry.id ] !== undefined ) {
+
+			return geometries[ geometry.id ];
+
+		}
+
+		geometry.addEventListener( 'dispose', onGeometryDispose );
+
+		var buffergeometry;
+
+		if ( geometry instanceof THREE.BufferGeometry ) {
+
+			buffergeometry = geometry;
+
+		} else if ( geometry instanceof THREE.Geometry ) {
+
+			if ( geometry._bufferGeometry === undefined ) {
+
+				geometry._bufferGeometry = new THREE.BufferGeometry().setFromObject( object );
+
+			}
+
+			buffergeometry = geometry._bufferGeometry;
+
+		}
+
+		geometries[ geometry.id ] = buffergeometry;
+
+		info.memory.geometries ++;
+
+		return buffergeometry;
+
+	}
+
+	function onGeometryDispose( event ) {
+
+		var geometry = event.target;
+		var buffergeometry = geometries[ geometry.id ];
+
+		deleteAttributes( buffergeometry.attributes );
+		if (buffergeometry.index) {
+		    deleteAttribute(buffergeometry.index);
+		}
+		geometry.removeEventListener( 'dispose', onGeometryDispose );
+
+		delete geometries[ geometry.id ];
+
+		var property = properties.get( geometry );
+		if ( property.wireframe ) deleteAttribute( property.wireframe );
+
+		info.memory.geometries --;
+
+	}
+
+	function getAttributeBuffer( attribute ) {
+
+		if ( attribute instanceof THREE.InterleavedBufferAttribute ) {
+
+			return properties.get( attribute.data ).__webglBuffer;
+
+		}
+
+		return properties.get( attribute ).__webglBuffer;
+
+	}
+
+	function deleteAttribute( attribute ) {
+
+		var buffer = getAttributeBuffer( attribute );
+
+		if ( buffer !== undefined ) {
+
+			gl.deleteBuffer( buffer );
+			removeAttributeBuffer( attribute );
+
+		}
+
+	}
+
+	function deleteAttributes( attributes ) {
+
+		for ( var name in attributes ) {
+
+			deleteAttribute( attributes[ name ] );
+
+		}
+
+	}
+
+	function removeAttributeBuffer( attribute ) {
+
+		if ( attribute instanceof THREE.InterleavedBufferAttribute ) {
+
+			properties.delete( attribute.data );
+
+		} else {
+
+			properties.delete( attribute );
+
+		}
+
+	}
+
+	this.get = get;
+
+};
+
 THREE.WebGLObjectsExt = function (gl, properties, info) {
 
-    var geometries = new THREE.WebGLGeometries(gl, properties, info);
+    var geometries = new THREE.WebGLGeometriesExt(gl, properties, info);
 
     //
 
@@ -3165,7 +3284,7 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
         var program = setProgram( camera, lights, fog, material, object );
 
         var updateBuffers = false;
-        var geometryProgram = geometry.id + '_' + program.id + '_' + material.wireframe;
+        var geometryProgram = geometry.id + program.id + material.wireframe;
 
         if ( geometryProgram !== _currentGeometryProgram ) {
 
@@ -3174,74 +3293,74 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
 
         }
 
-        // morph targets
+        //// morph targets
 
-        var morphTargetInfluences = object.morphTargetInfluences;
+        //var morphTargetInfluences = object.morphTargetInfluences;
 
-        if ( morphTargetInfluences !== undefined ) {
+        //if ( morphTargetInfluences !== undefined ) {
 
-            var activeInfluences = [];
+        //    var activeInfluences = [];
 
-            for ( var i = 0, l = morphTargetInfluences.length; i < l; i ++ ) {
+        //    for ( var i = 0, l = morphTargetInfluences.length; i < l; i ++ ) {
 
-                var influence = morphTargetInfluences[ i ];
-                activeInfluences.push( [ influence, i ] );
+        //        var influence = morphTargetInfluences[ i ];
+        //        activeInfluences.push( [ influence, i ] );
 
-            }
+        //    }
 
-            activeInfluences.sort( numericalSort );
+        //    activeInfluences.sort( numericalSort );
 
-            if ( activeInfluences.length > 8 ) {
+        //    if ( activeInfluences.length > 8 ) {
 
-                activeInfluences.length = 8;
+        //        activeInfluences.length = 8;
 
-            }
+        //    }
 
-            var morphAttributes = geometry.morphAttributes;
+        //    var morphAttributes = geometry.morphAttributes;
 
-            for ( var i = 0, l = activeInfluences.length; i < l; i ++ ) {
+        //    for ( var i = 0, l = activeInfluences.length; i < l; i ++ ) {
 
-                var influence = activeInfluences[ i ];
-                morphInfluences[ i ] = influence[ 0 ];
+        //        var influence = activeInfluences[ i ];
+        //        morphInfluences[ i ] = influence[ 0 ];
 
-                if ( influence[ 0 ] !== 0 ) {
+        //        if ( influence[ 0 ] !== 0 ) {
 
-                    var index = influence[ 1 ];
+        //            var index = influence[ 1 ];
 
-                    if ( material.morphTargets === true && morphAttributes.position ) geometry.addAttribute( 'morphTarget' + i, morphAttributes.position[ index ] );
-                    if ( material.morphNormals === true && morphAttributes.normal ) geometry.addAttribute( 'morphNormal' + i, morphAttributes.normal[ index ] );
+        //            if ( material.morphTargets === true && morphAttributes.position ) geometry.addAttribute( 'morphTarget' + i, morphAttributes.position[ index ] );
+        //            if ( material.morphNormals === true && morphAttributes.normal ) geometry.addAttribute( 'morphNormal' + i, morphAttributes.normal[ index ] );
 
-                } else {
+        //        } else {
 
-                    if ( material.morphTargets === true ) geometry.removeAttribute( 'morphTarget' + i );
-                    if ( material.morphNormals === true ) geometry.removeAttribute( 'morphNormal' + i );
+        //            if ( material.morphTargets === true ) geometry.removeAttribute( 'morphTarget' + i );
+        //            if ( material.morphNormals === true ) geometry.removeAttribute( 'morphNormal' + i );
 
-                }
+        //        }
 
-            }
+        //    }
 
-            var uniforms = program.getUniforms();
+        //    var uniforms = program.getUniforms();
 
-            if ( uniforms.morphTargetInfluences !== null ) {
+        //    if ( uniforms.morphTargetInfluences !== null ) {
 
-                _gl.uniform1fv( uniforms.morphTargetInfluences, morphInfluences );
+        //        _gl.uniform1fv( uniforms.morphTargetInfluences, morphInfluences );
 
-            }
+        //    }
 
-            updateBuffers = true;
+        //    updateBuffers = true;
 
-        }
+        //}
 
         //
 
         var index = geometry.index;
         var position = geometry.attributes.position;
 
-        if ( material.wireframe === true ) {
+        //if ( material.wireframe === true ) {
 
-            index = objects.getWireframeAttribute( geometry );
+        //    index = objects.getWireframeAttribute( geometry );
 
-        }
+        //}
 
         var renderer;
 
@@ -3353,18 +3472,18 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
 
         var extension;
 
-        if ( geometry instanceof THREE.InstancedBufferGeometry ) {
+        //if ( geometry instanceof THREE.InstancedBufferGeometry ) {
 
-            extension = extensions.get( 'ANGLE_instanced_arrays' );
+        //    extension = extensions.get( 'ANGLE_instanced_arrays' );
 
-            if ( extension === null ) {
+        //    if ( extension === null ) {
 
-				console.error( 'THREE.WebGLRenderer.setupVertexAttributes: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
-                return;
+		//		console.error( 'THREE.WebGLRenderer.setupVertexAttributes: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
+        //        return;
 
-            }
+        //    }
 
-        }
+        //}
 
         if ( startIndex === undefined ) startIndex = 0;
 
@@ -3389,44 +3508,48 @@ THREE.WebGLIncrementRenderer = function ( parameters ) {
                     var size = geometryAttribute.itemSize;
                     var buffer = objects.getAttributeBuffer( geometryAttribute );
 
-                    if ( geometryAttribute instanceof THREE.InterleavedBufferAttribute ) {
+                    //if ( geometryAttribute instanceof THREE.InterleavedBufferAttribute ) {
 
-                        var data = geometryAttribute.data;
-                        var stride = data.stride;
-                        var offset = geometryAttribute.offset;
+                    //    var data = geometryAttribute.data;
+                    //    var stride = data.stride;
+                    //    var offset = geometryAttribute.offset;
 
-                        if ( data instanceof THREE.InstancedInterleavedBuffer ) {
+                    //    if ( data instanceof THREE.InstancedInterleavedBuffer ) {
 
-                            state.enableAttributeAndDivisor( programAttribute, data.meshPerAttribute, extension );
+                    //        state.enableAttributeAndDivisor( programAttribute, data.meshPerAttribute, extension );
 
-                            if ( geometry.maxInstancedCount === undefined ) {
+                    //        if ( geometry.maxInstancedCount === undefined ) {
 
-                                geometry.maxInstancedCount = data.meshPerAttribute * data.count;
+                    //            geometry.maxInstancedCount = data.meshPerAttribute * data.count;
 
-                            }
+                    //        }
 
-                        } else {
+                    //    } else {
 
-                            state.enableAttribute( programAttribute );
+                    //        state.enableAttribute( programAttribute );
 
-                        }
+                    //    }
 
-                        _gl.bindBuffer( _gl.ARRAY_BUFFER, buffer );
-                        _gl.vertexAttribPointer( programAttribute, size, _gl.FLOAT, false, stride * data.array.BYTES_PER_ELEMENT, ( startIndex * stride + offset ) * data.array.BYTES_PER_ELEMENT );
+                    //    _gl.bindBuffer( _gl.ARRAY_BUFFER, buffer );
+                    //    _gl.vertexAttribPointer( programAttribute, size, _gl.FLOAT, false, stride * data.array.BYTES_PER_ELEMENT, ( startIndex * stride + offset ) * data.array.BYTES_PER_ELEMENT );
 
-                    } else {
+                    //}
+                    //else
+                    {
 
-                        if ( geometryAttribute instanceof THREE.InstancedBufferAttribute ) {
+                        //if ( geometryAttribute instanceof THREE.InstancedBufferAttribute ) {
 
-                            state.enableAttributeAndDivisor( programAttribute, geometryAttribute.meshPerAttribute, extension );
+                        //    state.enableAttributeAndDivisor( programAttribute, geometryAttribute.meshPerAttribute, extension );
 
-                            if ( geometry.maxInstancedCount === undefined ) {
+                        //    if ( geometry.maxInstancedCount === undefined ) {
 
-                                geometry.maxInstancedCount = geometryAttribute.meshPerAttribute * geometryAttribute.count;
+                        //        geometry.maxInstancedCount = geometryAttribute.meshPerAttribute * geometryAttribute.count;
 
-                            }
+                        //    }
 
-                        } else {
+                        //}
+                        //else
+                        {
 
                             state.enableAttribute( programAttribute );
 
@@ -10555,8 +10678,6 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
                             adjustCameraPosition(viewTrf);
                             this.object.realUp.applyQuaternion(viewTrf).normalize();
 
-                            // 旋转180度时，up的y值应该反向，否则移动会反
-                            this.adjustCameraUp();
                         }
 
                     }
@@ -11063,41 +11184,6 @@ CLOUD.CameraEditor = function (viewer, camera, domElement, onChange) {
         rotation.setFromQuaternion(quat2, undefined, false);
 
         return rotation;
-    };
-
-    this.adjustCameraUp = function() {
-
-        if (this.object.realUp.y > 0) {
-
-            this.object.up = new THREE.Vector3(0, 1, 0);
-
-        } else  if (this.object.realUp.y < 0){
-
-            this.object.up = new THREE.Vector3(0, -1, 0);
-
-        } else {
-
-            if (this.object.realUp.x > 0) {
-
-                this.object.up = new THREE.Vector3(1, 0, 0);
-
-            } else if (this.object.realUp.x < 0) {
-
-                this.object.up = new THREE.Vector3(-1, 0, 0);
-
-            } else {
-
-                if (this.object.realUp.z > 0) {
-
-                    this.object.up = new THREE.Vector3(0, 0, 1);
-
-                } else if (this.object.realUp.z < 0) {
-
-                    this.object.up = new THREE.Vector3(0, 0, -1);
-                }
-            }
-        }
-
     };
 
     this.getWorldEye = function () {
@@ -22450,6 +22536,8 @@ CloudViewer.prototype = {
     },
 
     init: function (domElement) {
+
+        console.log("Web3D: " + CLOUD.Version);
 
         this.domElement = domElement;
         // window.innerWidth, window.innerHeight
