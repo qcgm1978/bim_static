@@ -267,6 +267,7 @@
                     Project.Settings.callback.call(this,{});
                 }
                 if(/onLoad$/.test(url)){
+
                     WebView.runScript("init('"+data+"')", function() {
                     });
                 }

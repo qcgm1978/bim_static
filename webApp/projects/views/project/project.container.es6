@@ -497,6 +497,12 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		//App.Project.renderModelContentByType();
 		//return;
 
+		if (App.Project && App.Project.Settings && App.Project.Settings.Viewer) {
+			App.Project.Settings.Viewer.destroy();
+			App.Project.Settings.Viewer = null;
+		}
+
+
 		var viewer = App.Project.Settings.Viewer = new bimView({
 			type: 'model',
 			element: $("#projectContainer .modelContainerContent"),
