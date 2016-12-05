@@ -3,7 +3,7 @@
 */
 
 var CLOUD = CLOUD || {};
-CLOUD.Version = "20161202";
+CLOUD.Version = "20161203";
 
 CLOUD.GlobalData = {
     SceneSize: 1000,
@@ -1749,7 +1749,7 @@ THREE.WebGLGeometriesExt = function ( gl, properties, info ) {
 		}
 		geometry.removeEventListener( 'dispose', onGeometryDispose );
 
-		delete geometries[ geometry.id ];
+		geometries[geometry.id] = undefined;
 
 		var property = properties.get( geometry );
 		if ( property.wireframe ) deleteAttribute( property.wireframe );
@@ -2198,6 +2198,7 @@ CLOUD.RenderGroup = function () {
             else {
                 geometry = null;
             }
+
             if (object.loaded === 0) {
                 object.load();
             }
@@ -2301,20 +2302,6 @@ CLOUD.OrderedRenderer = function () {
         _filterObject = filter;
     }
 
-    function isVisibleForFilter(object) {
-
-        return _filterObject && _filterObject.isVisible(object);
-    }
-
-    function getOverridedMaterial(object) {
-
-        if (_filterObject) {
-            return _filterObject.getOverridedMaterial(object);
-        }
-
-        return null;
-    }
-
     function prepareNewFrame() {
 
         ++_cullTicket;
@@ -2393,12 +2380,8 @@ CLOUD.OrderedRenderer = function () {
         if (!inFrustum)
             inFrustum = object.inFrustum;
 
-        if (object instanceof CLOUD.Group) {
-            
-            if (_filterObject && object.fileId) {
-                if (_filterObject.hasFileFilter(object.fileId))
-                    return true;
-            }
+        if (object.fileId && _filterObject.hasFileFilter(object.fileId) ) {
+             return true;
         }
         else if (object._cullTicket != _cullTicket /*&& (object.channels.mask & camera.channels.mask) !== 0*/) {
 
@@ -2415,7 +2398,7 @@ CLOUD.OrderedRenderer = function () {
 
                 if (inFrustum || _frustum.intersectsObject(object) === true) {
 
-                    if (!isVisibleForFilter(object)) {
+                    if (!_filterObject.isVisible(object)) {
                         return true;
                     }
 
@@ -2448,7 +2431,7 @@ CLOUD.OrderedRenderer = function () {
                     }
 
                     // 材质过滤
-                    var material = getOverridedMaterial(object);
+                    var material = _filterObject.getOverridedMaterial(object);
                     material = material || object.material;
                     
 
@@ -8799,7 +8782,7 @@ CLOUD.Scene.prototype.prepareSceneBox = function () {
                 }
                 else {
                     if (object.inFrustum)
-                        delete object.inFrustum;
+                        object.inFrustum = undefined;
                 }
 
                 return true;
