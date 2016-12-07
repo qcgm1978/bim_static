@@ -252,6 +252,31 @@ App.Project = {
 		})
 		return array;
 	},
+	/**
+	 * 模型过滤规则
+	 * @param cat
+	 * @param floor
+	 * @param callback
+     */
+	commSingleRule:function(cat, floor,callback){
+		var typeMap= {
+			'concerns': 'dis',
+			'processacceptance': 'process',
+			'openingacceptance': 'open'
+		};
+		CommProject.init({
+			viewer:App.Project.Settings.Viewer,
+			data:this.currentLoadData[typeMap[App.Project.Settings.property]],
+			sourceId: App.Project.Settings.DataModel.sourceId,
+			etag: App.Project.Settings.DataModel.etag,
+			projectId: App.Project.Settings.projectId,
+			projectVersionId: App.Project.Settings.CurrentVersion.id,
+			markerClick:App.Project.markerClick
+		}).filter({
+			cat:cat,
+			floors:floor
+		},callback);
+	},
 	//单独类型、自定义过滤规则
 	sigleRule: function(cat, floor,callback) {
 		var _this = this,
@@ -931,7 +956,7 @@ App.Project = {
 							_floor=_floor+','+'其它';
 						}
 					}
-					_this.sigleRule(_this.currentProsCat,_floor,scenceIds,function(margin,ratio){
+					_this.commSingleRule(_this.currentProsCat,_floor,scenceIds,function(margin,ratio){
 					//	App.Project.Settings.Viewer.setTopView(boxs, false,margin||marginRule.margin, ratio||marginRule.ratio);
 					});
 					$(".QualityProcessAcceptance .tbProcessAccessBody tr").removeClass('selected');
@@ -945,7 +970,7 @@ App.Project = {
 							_floor=_floor+','+'其它';
 						}
 					}
-					_this.sigleRule(_this.currentOpenCat,_floor,scenceIds,function(margin,ratio){
+					_this.commSingleRule(_this.currentOpenCat,_floor,scenceIds,function(margin,ratio){
 					//	App.Project.Settings.Viewer.setTopView(boxs, false,margin||marginRule.margin, ratio||marginRule.ratio);
 					});
 					$(".QualityProcessAcceptance .tbProcessAccessBody tr").removeClass('selected');
@@ -2251,6 +2276,25 @@ App.Project = {
 	},
 	//在模型中显示(开业验收、过程验收、隐患)
 	showInModel: function($target, type, paramObj) {
+
+		var typeMap= {
+			'concerns': 'dis',
+			'processacceptance': 'process',
+			'openingacceptance': 'open'
+		};
+
+		CommProject.init({
+			viewer:App.Project.Settings.Viewer,
+			data:this.currentLoadData[typeMap[App.Project.Settings.property]],
+			sourceId: App.Project.Settings.DataModel.sourceId,
+			etag: App.Project.Settings.DataModel.etag,
+			projectId: App.Project.Settings.projectId,
+			projectVersionId: App.Project.Settings.CurrentVersion.id,
+			markerClick:App.Project.markerClick
+		}).showInModel($target, type, paramObj);
+
+		return
+
 		var _this = this,
 			key = "", //楼层关键字
 			componentId = paramObj ? paramObj.uuid : $target.data('uuid'), //构件ID
