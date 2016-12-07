@@ -759,6 +759,7 @@
 						folder = item.folder ? "folder" : "";
 						trs += '<li data-id="' + item.id + '" data-size="' + item.length + '" data-fileversionid="' + item.fileVersionId + '">';
 						isLock = item.locked ? "disable" : "";
+						/* modify and add by wuweiwei [if else] */
 						if(folder)
 						{
 							trs += ' <span class="ckAll"> </span>';
