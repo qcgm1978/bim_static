@@ -756,11 +756,19 @@
 				if (count > 0) {
 					for (var i = 0; i < count; i++) {
 						item = list[i];
+						folder = item.folder ? "folder" : "";
 						trs += '<li data-id="' + item.id + '" data-size="' + item.length + '" data-fileversionid="' + item.fileVersionId + '">';
 						isLock = item.locked ? "disable" : "";
-						trs += ' <span class="ckAll"> <i class="ck bg ' + isLock + '" data-fileversionid="' + item.fileVersionId + '"></i> </span>';
+						if(folder)
+						{
+							trs += ' <span class="ckAll"> </span>';
+						}
+						else
+						{
+							trs += ' <span class="ckAll"> <i class="ck bg ' + isLock + '" data-fileversionid="' + item.fileVersionId + '"></i> </span>';
+						}
+						
 						trs += '<span class="name">';
-						folder = item.folder ? "folder" : "";
 						trs += '<i class="fileType bg ' + folder + '"></i>';
 						if (folder) {
 							trs += '<span class="overflowEllipsis fileName">' + item.name + '</span>';
