@@ -11,7 +11,8 @@
       URL: {
         fetchQualityModelById: "sixD/{projectId}/{versionId}/quality/element",
         fetchDesignProperties: "sixD/{projectId}/{projectVersionId}/property", //设计属性 ?sceneId={sceneId}&elementId={elementId}
-        fetchProjectVersionInfo: "platform/project/{projectId}/version/{projectVersionId}" //项目版本信息
+        fetchProjectVersionInfo: "platform/project/{projectId}/version/{projectVersionId}", //项目版本信息,
+        attrDwg:'doc/{projectId}/{versionId}/file/tag'//图纸
 
       }
     }
@@ -208,6 +209,7 @@
 
         var viewer = Project.Viewer,
             isIsolateState = viewer.viewer.getFilters().isIsolateState();
+
         if(isIsolateState){
           $('#isolation').show();
         }else{
@@ -219,6 +221,7 @@
           //that.resetProperNull();
           return;
         }
+        Project.intersect = model.intersect;
         //console.log(model);
         propertiesCollection.projectId = "1";
         propertiesCollection.projectVersionId = "784306105035931";
@@ -374,8 +377,50 @@
           }
         }
       });
-    }
+    },
+    //模型属性 dwg 图纸
+    attrDwg: function() {
 
+      var modelId = Project.intersect.userId.split('.')[0],
+          that = this,
+          attrDwgBoxDom,modleShowHide,modleListDom,
+          data = {
+            URLtype: 'attrDwg',
+            data: {
+              projectId: query.projectId,
+              versionId: query.projectVersionId,
+              modelId: modelId
+            }
+          },
+
+          liTpl = '<li class="modleItem"><a data-id="<%=id%>" href="/static/dist/app/project/single/filePreview.html?id={id}&projectId=' + query.projectId + '&projectVersionId=' + query.projectVersionId + '" target="_blank" ><div class="modleNameText overflowEllipsis modleName2">varName</div></a></li>';
+
+      App.Comm.ajax(data, (data) => {
+        if (data.code == 0) {
+          //debugger
+          if (data.data.length > 0) {
+            var lis = '';
+            $.each(data.data, function(i, item) {
+              lis += liTpl.replace("varName", item.name).replace('{id}', item.id);
+            });
+            //start 张延凯修改 初始化的时候视图的默认关闭状态
+            attrDwgBoxDom = $(".attrDwgBox");
+            attrDwgBoxDom.show();
+            modleShowHide = attrDwgBoxDom.find(".modleShowHide");
+            modleListDom = attrDwgBoxDom.find(".modleList");
+            modleListDom.html(lis);
+            modleListDom.css("display",'none');
+            if(modleShowHide.hasClass('down')){
+              modleShowHide.removeClass('down');
+            }
+            //end 张延凯修改 初始化的时候视图的默认关闭状态
+            // that.$el.find(".attrDwgBox").show().find(".modleList").html(lis);//张延凯修改 图纸默认隐藏
+          }
+        }
+      });
+
+
+    }
   }
 
   // 属性 collection
@@ -474,6 +519,7 @@
       temp = JSON.parse(temp);
       this.$el.html(this.template(temp));
       $('.designProperties').html(this.$el);
+      Project.attrDwg();
     }
 
 
