@@ -109,16 +109,15 @@ App.Project.PlanModel = Backbone.View.extend({
 		//	type: "plan",
 		//	ids: undefined
 		//});
-		if (!$el) {
-			if ($target.hasClass("selected")) {
-				$target.parent().find(".selected").removeClass("selected");
-				return;
-			} else {
-				$target.parent().find(".selected").removeClass("selected");
-				$target.addClass("selected");
-			}
-		}
-
+	    if(!$el){
+		    if ($target.hasClass("selected")) {
+			    $target.parent().find(".selected").removeClass("selected");
+			    return;
+		    } else {
+			    $target.parent().find(".selected").removeClass("selected");
+			    $target.addClass("selected");
+		    }
+	    }
 		var targetCode = $target.data("code"),
 			checked = $('.planModel .treeCheckbox input').prop('checked');
 
