@@ -47,19 +47,17 @@ App.Project.PlanModel = Backbone.View.extend({
 	template: _.templateUrl("/projects/tpls/project/plan/project.plan.property.planAnalog.detail.html"),
 
 
-	loading:function(){
+	loading: function() {
 		this.searchup();
 	},
 
 	addOne: function(model) {
-		console.log('model',model);
 		var data = model.toJSON();
-		console.log('data',data);
 		this.$(".tbPlan tbody").html(this.template(data));
 		var codes = [];
-		$('.planSearch .treeCheckbox input').prop('checked',false);
+		$('.planSearch .treeCheckbox input').prop('checked', false);
 		$.each(data.data, function(i, item) {
-			item.code?codes.push(item.code):'';
+			item.code ? codes.push(item.code) : '';
 		});
 		if (codes.length > 0) {
 			codes.push(-1);
@@ -72,31 +70,31 @@ App.Project.PlanModel = Backbone.View.extend({
 		this.codes = codes;
 	},
 	//切换显示此节点关联模型
-	switch(){
-		if($('.planModel .itemClick.selected').length>0){
+	switch () {
+		if ($('.planModel .itemClick.selected').length > 0) {
 			var self = this;
 			App.Project.Settings.checkBoxIsClick = true;
-			setTimeout(function(){
-				self.showInModle('',$('.planModel .itemClick.selected'));
-			},100)
+			setTimeout(function() {
+				self.showInModle('', $('.planModel .itemClick.selected'));
+			}, 100)
 		}
 	},
 	//模型中显示
-	showInModle(event,$el) {
+	showInModle(event, $el) {
 
 		App.Project.recoverySilder();
 		App.Project.Settings.Viewer.loadMarkers(null);
 
-		var $target,ids,box;
-		if($el){
+		var $target, ids, box;
+		if ($el) {
 			$target = $el;
-		}else{
+		} else {
 			$target = $(event.target).closest("tr");
 		}
-		ids=$target.data("userId");
-		box=$target.data("box");
+		ids = $target.data("userId");
+		box = $target.data("box");
 
-		if(App.Project.Settings.isHighlight ){
+		if (App.Project.Settings.isHighlight) {
 			//高亮钱取消
 			//App.Project.cancelZoomModel();
 			App.Project.Settings.Viewer.translucent(false);
@@ -111,29 +109,30 @@ App.Project.PlanModel = Backbone.View.extend({
 		//	type: "plan",
 		//	ids: undefined
 		//});
-    if(!$el){
-	    if ($target.hasClass("selected")) {
-		    $target.parent().find(".selected").removeClass("selected");
-		    return;
-	    } else {
-		    $target.parent().find(".selected").removeClass("selected");
-		    $target.addClass("selected");
-	    }
-    }
+		if (!$el) {
+			if ($target.hasClass("selected")) {
+				$target.parent().find(".selected").removeClass("selected");
+				return;
+			} else {
+				$target.parent().find(".selected").removeClass("selected");
+				$target.addClass("selected");
+			}
+		}
 
 		var targetCode = $target.data("code"),
-		    checked = $('.planModel .treeCheckbox input').prop('checked');
+			checked = $('.planModel .treeCheckbox input').prop('checked');
 
 
 		if (box && ids) {
-			if(checked){
+			console.log(box);
+			console.log(ids);
+			if (checked) {
 				App.Project.Settings.checkBoxIsClick = true;
 				App.Project.Settings.Viewer.translucent(false);
 				App.Project.Settings.Viewer.filterByUserIds(ids);
-
 				return
 			}
-			if($el){
+			if ($el) {
 				App.Project.Settings.Viewer.translucent(false);
 
 				App.Project.Settings.Viewer.ignoreTranparent({
@@ -152,8 +151,8 @@ App.Project.PlanModel = Backbone.View.extend({
 					type: 'userId',
 					ids: ids
 				});
-			}else{
-				App.Project.zoomToBox(ids,box);
+			} else {
+				App.Project.zoomToBox(ids, box);
 
 
 			}
@@ -171,18 +170,18 @@ App.Project.PlanModel = Backbone.View.extend({
 		};
 		App.Comm.ajax(data, function(data) {
 			if (data.code == 0) {
-				var box=App.Project.formatBBox(data.data.boundingBox);
-				if(box && box.length){
+				var box = App.Project.formatBBox(data.data.boundingBox);
+				if (box && box.length) {
 					$target.data("userId", data.data.elements);
 					$target.data("box", box);
-					if(checked){
+					if (checked) {
 						App.Project.Settings.checkBoxIsClick = true;
 						App.Project.Settings.Viewer.translucent(false);
 						App.Project.Settings.Viewer.filterByUserIds(data.data.elements);
 
 						return
 					}
-					if($el){
+					if ($el) {
 						App.Project.Settings.Viewer.translucent(false);
 
 						App.Project.Settings.Viewer.ignoreTranparent({
@@ -201,14 +200,14 @@ App.Project.PlanModel = Backbone.View.extend({
 							type: 'userId',
 							ids: data.data.elements
 						});
-					}else{
-						App.Project.zoomToBox(data.data.elements,box);
+					} else {
+						App.Project.zoomToBox(data.data.elements, box);
 
 					}
 					App.Project.Settings.isHighlight = true;
 
 				}
-			}else{
+			} else {
 				App.Project.cancelZoomModel();
 			}
 		});
