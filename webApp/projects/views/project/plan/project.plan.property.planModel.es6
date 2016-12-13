@@ -120,7 +120,7 @@ App.Project.PlanModel = Backbone.View.extend({
 			if ($target.hasClass("selected")) {
 				$target.parent().find(".selected").removeClass("selected");
 				if(App.Project.Settings.checkBoxIsClick){
-					App.Project.recoverySilder();//左侧筛选树是否初始化 
+					App.Project.recoverySilder();//左侧筛选树是否初始化//（zhangyankai修改） 
 				}
 				return;
 			} else {
