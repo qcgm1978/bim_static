@@ -89,8 +89,7 @@ App.Project.PlanModel = Backbone.View.extend({
 	},
 	//模型中显示
 	showInModle(event, $el) {
-
-		App.Project.recoverySilder();
+		
 		App.Project.Settings.Viewer.loadMarkers(null);
 
 		var $target, ids, box;
@@ -120,6 +119,9 @@ App.Project.PlanModel = Backbone.View.extend({
 		if (!$el) {
 			if ($target.hasClass("selected")) {
 				$target.parent().find(".selected").removeClass("selected");
+				if(App.Project.Settings.checkBoxIsClick){
+					App.Project.recoverySilder();//左侧筛选树是否初始化 
+				}
 				return;
 			} else {
 				$target.parent().find(".selected").removeClass("selected");
