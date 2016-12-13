@@ -305,6 +305,10 @@ var CommProject = {
                     type: 'userId',
                     ids: undefined
                 });
+                /*add by wuweiwei begin*/
+                _this.recoverySilder();
+                this._$viewer.viewer.zoomOut(30);
+                /*add by wuweiwei end */
                 return
             } else {
                 $target.parent().find(".selected").removeClass("selected");
