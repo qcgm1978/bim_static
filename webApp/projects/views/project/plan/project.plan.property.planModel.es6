@@ -71,6 +71,14 @@ App.Project.PlanModel = Backbone.View.extend({
 	},
 	//切换显示此节点关联模型
 	switch () {
+		/* add by wuweiwei begin */
+		var $check = $('.planModel .treeCheckbox input');
+		if(!$check[0].checked)
+		{
+			App.Project.Settings.checkBoxIsClick = false;
+			return;
+		}
+		/* end */
 		if ($('.planModel .itemClick.selected').length > 0) {
 			var self = this;
 			App.Project.Settings.checkBoxIsClick = true;
@@ -121,10 +129,7 @@ App.Project.PlanModel = Backbone.View.extend({
 		var targetCode = $target.data("code"),
 			checked = $('.planModel .treeCheckbox input').prop('checked');
 
-
 		if (box && ids) {
-			console.log(box);
-			console.log(ids);
 			if (checked) {
 				App.Project.Settings.checkBoxIsClick = true;
 				App.Project.Settings.Viewer.translucent(false);
