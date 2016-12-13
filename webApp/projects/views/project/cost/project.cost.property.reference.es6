@@ -52,7 +52,7 @@ App.Project.CostReference = Backbone.View.extend({
 	},
 	//模型中显示
 	showInModle(event) {
-		App.Project.recoverySilder();
+		// App.Project.recoverySilder();//zhangyankai修改
 		var $target = $(event.target).closest(".item"),
 			ids=$target.data("userId"),
 			box=$target.data("box");
