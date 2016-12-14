@@ -307,12 +307,26 @@ var CommProject = {
                 });
                 /*add by wuweiwei begin*/
                 _this.recoverySilder();
-                this._$viewer.viewer.zoomOut(30);
+                _viewer.viewer.zoomOut(20);
+                /*
+                box = _this.formatBBox(location.boundingBox);
+                this._$viewer.zoomToBox(box,0.5);
+                */
                 /*add by wuweiwei end */
                 return
             } else {
+                var $quality_btnCk = $("#projectContainer .qualityContainer .btnCk");
+                try
+                {
+                    if($quality_btnCk.hasClass("selected"))
+                    {
+                        $quality_btnCk.removeClass("selected");
+                    }                
+                }catch(e){;}
+
                 $target.parent().find(".selected").removeClass("selected");
                 $target.addClass("selected");
+
             }
         }
 
