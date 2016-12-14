@@ -73,8 +73,7 @@ App.Project.PlanModel = Backbone.View.extend({
 	switch () {
 		/* add by wuweiwei begin */
 		var $check = $('.planModel .treeCheckbox input');
-		if(!$check[0].checked)
-		{
+		if (!$check[0].checked) {
 			App.Project.Settings.checkBoxIsClick = false;
 			return;
 		}
@@ -89,9 +88,7 @@ App.Project.PlanModel = Backbone.View.extend({
 	},
 	//模型中显示
 	showInModle(event, $el) {
-		
 		App.Project.Settings.Viewer.loadMarkers(null);
-
 		var $target, ids, box;
 		if ($el) {
 			$target = $el;
@@ -100,58 +97,45 @@ App.Project.PlanModel = Backbone.View.extend({
 		}
 		ids = $target.data("userId");
 		box = $target.data("box");
-
 		if (App.Project.Settings.isHighlight) {
 			//高亮钱取消
-			//App.Project.cancelZoomModel();
 			App.Project.Settings.Viewer.translucent(false);
-
 			App.Project.Settings.Viewer.highlight({
 				type: 'userId',
 				ids: undefined
 			});
 		}
-
-		//App.Project.Settings.Viewer.filter({
-		//	type: "plan",
-		//	ids: undefined
-		//});
+		var targetCode = $target.data("code"),
+			checked = $('.planModel .treeCheckbox input').prop('checked');
 		if (!$el) {
 			if ($target.hasClass("selected")) {
 				$target.parent().find(".selected").removeClass("selected");
-				if(App.Project.Settings.checkBoxIsClick){
-					App.Project.recoverySilder();//左侧筛选树是否初始化//（zhangyankai修改） 
-				}
+				App.Project.Settings.Viewer.filterByUserIds(undefined);
+				App.Project.Settings.Viewer.translucent(false);
+				App.Project.Settings.Viewer.highlight({
+					type: 'userId',
+					ids: undefined
+				});
 				return;
-			} else {
+			}else{
 				$target.parent().find(".selected").removeClass("selected");
 				$target.addClass("selected");
+				if (!$target.hasClass("odd")){
+					var arr = checked?[]:"";
+					App.Project.Settings.Viewer.filterByUserIds(arr);
+					return;
+				}
 			}
 		}
-		var targetCode = $target.data("code"),
-			checked = $('.planModel .treeCheckbox input').prop('checked');
-
 		if (box && ids) {
 			if (checked) {
 				App.Project.Settings.checkBoxIsClick = true;
 				App.Project.Settings.Viewer.translucent(false);
 				App.Project.Settings.Viewer.filterByUserIds(ids);
-				return
+				return;
 			}
 			if ($el) {
-				App.Project.Settings.Viewer.translucent(false);
-
-				App.Project.Settings.Viewer.ignoreTranparent({
-					type: "plan",
-					//ids: [code[0]]
-					ids: undefined
-				});
-				//App.Project.Settings.Viewer.filter({
-				//	type: "plan",
-				//	ids: undefined
-				//});
 				App.Project.Settings.Viewer.filterByUserIds(undefined);
-
 				App.Project.Settings.Viewer.translucent(true);
 				App.Project.Settings.Viewer.highlight({
 					type: 'userId',
@@ -159,12 +143,15 @@ App.Project.PlanModel = Backbone.View.extend({
 				});
 			} else {
 				App.Project.zoomToBox(ids, box);
-
-
 			}
 			App.Project.Settings.isHighlight = true;
-
 			return;
+		}else{
+			if (!$target.hasClass("odd")){
+				var arr = checked?[]:"";
+				App.Project.Settings.Viewer.filterByUserIds(arr);
+				return;
+			}
 		}
 		var data = {
 			URLtype: "fetchModleIdByCode",
@@ -177,6 +164,12 @@ App.Project.PlanModel = Backbone.View.extend({
 		App.Comm.ajax(data, function(data) {
 			if (data.code == 0) {
 				var box = App.Project.formatBBox(data.data.boundingBox);
+				App.Project.Settings.Viewer.filterByUserIds(undefined);
+				App.Project.Settings.Viewer.translucent(false);
+				App.Project.Settings.Viewer.highlight({
+					type: 'userId',
+					ids: undefined
+				});
 				if (box && box.length) {
 					$target.data("userId", data.data.elements);
 					$target.data("box", box);
@@ -184,23 +177,15 @@ App.Project.PlanModel = Backbone.View.extend({
 						App.Project.Settings.checkBoxIsClick = true;
 						App.Project.Settings.Viewer.translucent(false);
 						App.Project.Settings.Viewer.filterByUserIds(data.data.elements);
-
 						return
 					}
 					if ($el) {
 						App.Project.Settings.Viewer.translucent(false);
-
 						App.Project.Settings.Viewer.ignoreTranparent({
 							type: "plan",
-							//ids: [code[0]]
 							ids: undefined
 						});
-						//App.Project.Settings.Viewer.filter({
-						//	type: "plan",
-						//	ids: undefined
-						//});
 						App.Project.Settings.Viewer.filterByUserIds(undefined);
-
 						App.Project.Settings.Viewer.translucent(true);
 						App.Project.Settings.Viewer.highlight({
 							type: 'userId',
@@ -208,10 +193,8 @@ App.Project.PlanModel = Backbone.View.extend({
 						});
 					} else {
 						App.Project.zoomToBox(data.data.elements, box);
-
 					}
 					App.Project.Settings.isHighlight = true;
-
 				}
 			} else {
 				App.Project.cancelZoomModel();
@@ -219,16 +202,3 @@ App.Project.PlanModel = Backbone.View.extend({
 		});
 	}
 });
-
-//if(checked){
-//
-//	var codesToFilter = _.filter(this.codes,function(num){return num!=targetCode});
-//	App.Project.Settings.Viewer.translucent(false);
-//
-//	App.Project.Settings.Viewer.filter({
-//		type: "plan",
-//		ids: codesToFilter
-//	});
-//
-//	return
-//}

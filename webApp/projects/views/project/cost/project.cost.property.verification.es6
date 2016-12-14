@@ -104,7 +104,7 @@ App.Project.CostVerification = Backbone.View.extend({
 	},
 	//在模型中显示
 	showInModel(event) {
-		App.Project.recoverySilder();
+		// App.Project.recoverySilder();//不要刷新左侧筛选树
 		App.Project.planCostShowInModel(event);
 	},
 
