@@ -315,8 +315,18 @@ var CommProject = {
                 /*add by wuweiwei end */
                 return
             } else {
+                var $quality_btnCk = $("#projectContainer .qualityContainer .btnCk");
+                try
+                {
+                    if($quality_btnCk.hasClass("selected"))
+                    {
+                        $quality_btnCk.removeClass("selected");
+                    }                
+                }catch(e){;}
+
                 $target.parent().find(".selected").removeClass("selected");
                 $target.addClass("selected");
+
             }
         }
 

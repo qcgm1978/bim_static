@@ -42,7 +42,7 @@ App.Project.QualityProcessAcceptance = Backbone.View.extend({
 		var bool = $(e.currentTarget).hasClass('selected');
 		if(!bool)
 		{
-
+			App.Project.Settings.Viewer.loadMarkers(); 
 			return;
 		}
 		App.Project.isShowMarkers('process',$(e.currentTarget).hasClass('selected'));
