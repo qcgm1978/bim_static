@@ -283,7 +283,7 @@ var AppRoute = Backbone.Router.extend({
 
 	initAuth:function(user){
 
-		$('.linkNavItem').on('click',function(){
+		$('.linkNavItem').off('click').on('click',function(){
 			if(user.outer){
 				alert('没有操作权限')
 			}else{
