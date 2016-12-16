@@ -81,77 +81,75 @@ App.Project = {
 			userId=marker? marker.userId:"",
 			data={};
 
-		if ($(".QualityProcessAcceptance").is(":visible")) {
-			$(".QualityProcessAcceptance .tbProcessAccessBody tr").removeClass('selected');
-			if(id){
-				var tr = $(".QualityProcessAcceptance .tbProcessAccessBody tr[data-id='"+id+"']");
-				if(tr.length>0){
-					tr.addClass('selected');
-				}else{
-					data=App.Project.catchPageData('process',{id:id});
-					App.Project.qualityTab.ProcessAcceptanceOptions.pageIndex = data.pageIndex;
-					App.Project.QualityAttr.ProcessAcceptanceCollection.reset();
-					App.Project.QualityAttr.ProcessAcceptanceCollection.push({data:data});
-					App.Project.qualityTab.pageInfo.call(App.Project.qualityTab, data,'processacceptance',true);
-					tr = $(".QualityProcessAcceptance .tbProcessAccessBody tr[data-id='"+id+"']");
-					tr.addClass("selected");
-				}
-			}
-		}
-		if ($(".QualityOpeningAcceptance").is(":visible")) {
-			$(".QualityOpeningAcceptance .tbOpeningacceptanceBody tr").removeClass('selected');
-			if(id){
-				var tr = $(".QualityOpeningAcceptance .tbOpeningacceptanceBody tr[data-id='"+id+"']");
-				if(tr.length>0){
-					tr.addClass('selected');
-				}else{
-					data=App.Project.catchPageData('open',{id:id});
-					App.Project.qualityTab.OpeningAcceptanceOptions.pageIndex = data.pageIndex;
-					App.Project.QualityAttr.OpeningAcceptanceCollection.reset();
-					App.Project.QualityAttr.OpeningAcceptanceCollection.push({data:data});
-					App.Project.qualityTab.pageInfo.call(App.Project.qualityTab, data,'openingacceptance',true);
-					tr = $(".QualityOpeningAcceptance .tbOpeningacceptanceBody tr[data-id='"+id+"']");
-					tr.addClass("selected");
-				}
-			}
-		}
-		if ($(".QualityConcerns").is(":visible")) {
-			$(".QualityConcerns .tbConcernsBody tr").removeClass('selected');
-			if(id){
-				var tr = $(".QualityOpeningAcceptance .tbOpeningacceptanceBody tr[data-id='"+id+"']");
-				if(tr.length>0){
-					tr.addClass('selected');
-				}else{
-					data=App.Project.catchPageData('dis',{id:id});
-					App.Project.qualityTab.ConcernsOptions.pageIndex = data.pageIndex;
-					App.Project.QualityAttr.ConcernsCollection.reset();
-					App.Project.QualityAttr.ConcernsCollection.push({data:data});
-					App.Project.qualityTab.pageInfo.call(App.Project.qualityTab, data,'concerns',true);
-					tr = $(".QualityConcerns .tbConcernsBody tr[data-id='"+id+"']");
-					tr.addClass("selected");
-				}
-			}
-		}
-
+		// if ($(".QualityProcessAcceptance").is(":visible")) {
+		// 	$(".QualityProcessAcceptance .tbProcessAccessBody tr").removeClass('selected');
+		// 	if(id){
+		// 		var tr = $(".QualityProcessAcceptance .tbProcessAccessBody tr[data-id='"+id+"']");
+		// 		if(tr.length>0){
+		// 			tr.addClass('selected');
+		// 		}else{
+		// 			data=App.Project.catchPageData('process',{id:id});//内存中取数据
+		// 			App.Project.qualityTab.ProcessAcceptanceOptions.pageIndex = data.pageIndex;
+		// 			App.Project.QualityAttr.ProcessAcceptanceCollection.reset();
+		// 			App.Project.QualityAttr.ProcessAcceptanceCollection.push({data:data});
+		// 			App.Project.qualityTab.pageInfo.call(App.Project.qualityTab, data,'processacceptance',true);
+		// 			tr = $(".QualityProcessAcceptance .tbProcessAccessBody tr[data-id='"+id+"']");
+		// 			tr.addClass("selected");
+		// 		}
+		// 	}
+		// }
+		// if ($(".QualityOpeningAcceptance").is(":visible")) {
+		// 	$(".QualityOpeningAcceptance .tbOpeningacceptanceBody tr").removeClass('selected');
+		// 	if(id){
+		// 		var tr = $(".QualityOpeningAcceptance .tbOpeningacceptanceBody tr[data-id='"+id+"']");
+		// 		if(tr.length>0){
+		// 			tr.addClass('selected');
+		// 		}else{
+		// 			data=App.Project.catchPageData('open',{id:id});
+		// 			App.Project.qualityTab.OpeningAcceptanceOptions.pageIndex = data.pageIndex;
+		// 			App.Project.QualityAttr.OpeningAcceptanceCollection.reset();
+		// 			App.Project.QualityAttr.OpeningAcceptanceCollection.push({data:data});
+		// 			App.Project.qualityTab.pageInfo.call(App.Project.qualityTab, data,'openingacceptance',true);
+		// 			tr = $(".QualityOpeningAcceptance .tbOpeningacceptanceBody tr[data-id='"+id+"']");
+		// 			tr.addClass("selected");
+		// 		}
+		// 	}
+		// }
+		// if ($(".QualityConcerns").is(":visible")) {
+		// 	$(".QualityConcerns .tbConcernsBody tr").removeClass('selected');
+		// 	if(id){
+		// 		var tr = $(".QualityOpeningAcceptance .tbOpeningacceptanceBody tr[data-id='"+id+"']");
+		// 		if(tr.length>0){
+		// 			tr.addClass('selected');
+		// 		}else{
+		// 			data=App.Project.catchPageData('dis',{id:id});
+		// 			App.Project.qualityTab.ConcernsOptions.pageIndex = data.pageIndex;
+		// 			App.Project.QualityAttr.ConcernsCollection.reset();
+		// 			App.Project.QualityAttr.ConcernsCollection.push({data:data});
+		// 			App.Project.qualityTab.pageInfo.call(App.Project.qualityTab, data,'concerns',true);
+		// 			tr = $(".QualityConcerns .tbConcernsBody tr[data-id='"+id+"']");
+		// 			tr.addClass("selected");
+		// 		}
+		// 	}
+		// }
 		if(userId){
 			App.Project.Settings.Viewer.highlight({
 				type: 'userId',
 				ids: [userId]
 			});
-			App.Project.Settings.Viewer.viewer.getFilters().setSelectedIds([userId]);
-
-			App.Project.presetClickEvent(userId);
-
+			App.Project.Settings.Viewer.viewer.getFilters().setSelectedIds([userId]);//选中与否
+			App.Project.presetClickEvent(userId);//点击气泡 加载当前的属性
 		}else{
-			App.Project.Settings.Viewer.highlight({
-				type: 'userId',
-				ids: undefined
-			});
-			App.Project.Settings.Viewer.viewer.getFilters().setSelectedIds();
-			App.Project.resetProperNull();
+			// App.Project.Settings.Viewer.highlight({
+			// 	type: 'userId',
+			// 	ids: undefined
+			// });
+			App.Project.Settings.Viewer.viewer.getFilters().setSelectedIds();//选中与否
+			App.Project.resetProperNull();//清空属性面板的内容
+			App.Project.Settings.Viewer.viewer.render();
 		}
 		var viewer = App.Project.Settings.Viewer,
-				isIsolateState = viewer.viewer.getFilters().isIsolateState();
+			isIsolateState = viewer.viewer.getFilters().isIsolateState();
 		if(isIsolateState){
 			$('#isolation').show();
 		}else{
