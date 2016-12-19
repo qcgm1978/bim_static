@@ -111,8 +111,8 @@ App.Project.PlanModel = Backbone.View.extend({
 			if ($target.hasClass("selected")) {
 				$target.parent().find(".selected").removeClass("selected");
 				App.Project.Settings.Viewer.filterByUserIds(undefined);
-				App.Project.Settings.Viewer.translucent(false);
-				App.Project.Settings.Viewer.highlight({
+				App.Project.Settings.Viewer.translucent(false);//是否透明除当前构件的构件
+				App.Project.Settings.Viewer.highlight({// 高亮显示当前点击的构件
 					type: 'userId',
 					ids: undefined
 				});
