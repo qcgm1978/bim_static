@@ -306,8 +306,11 @@ var CommProject = {
                     ids: undefined
                 });
                 /*add by wuweiwei begin*/
-                _this.recoverySilder();
-                _viewer.viewer.zoomOut(20);
+                if(App.Project.Settings.projectNav=="quality")
+                {
+                    _this.recoverySilder();
+                    _viewer.viewer.zoomOut(20);
+                }
                 /*
                 box = _this.formatBBox(location.boundingBox);
                 this._$viewer.zoomToBox(box,0.5);

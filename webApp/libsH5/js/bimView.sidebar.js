@@ -169,6 +169,10 @@
       }
     },
 
+    /*
+    联动filter过滤树的复选框
+    add by wuweiwei
+    */
     scanFilterTreeCheckState : function(curDom){
       /*扫描左侧小地图树的复选框,并设计是全选还是部分选中*/
       this.treeCheckCount++;
