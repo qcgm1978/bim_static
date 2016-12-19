@@ -86,7 +86,7 @@ App.Project.PlanAnalog = Backbone.View.extend({
 			return;
 		}
 
-		App.Project.recoverySilder();
+		// App.Project.recoverySilder();//初始化左侧筛选树的方法
 		App.Project.Settings.Viewer.loadMarkers(null);
 		//高亮钱取消
 		App.Project.cancelZoomModel();

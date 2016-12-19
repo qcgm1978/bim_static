@@ -281,6 +281,48 @@ var AppRoute = Backbone.Router.extend({
 		}
 	},
 
+	initAuth:function(user){
+
+		$('.linkNavItem').off('click').on('click',function(){
+			if(user.outer){
+				alert('没有操作权限')
+			}else{
+				var url=$(this).attr('murl');
+				window.open(url,'_blank');
+			}
+
+		})
+
+		var isKeyUser = user.isKeyUser || false;
+		var _AuthObj=App.AuthObj||{};
+		var Auth = _AuthObj.service||{};
+
+		if (!Auth.app) {
+			$('#auth-app').remove();
+		}
+
+		if (!Auth.auth && !isKeyUser) {
+			$('#auth-auth').remove();
+		}
+
+		if (!Auth.log) {
+			$('#auth-log').remove();
+		}
+
+
+		if (!Auth.sys) {
+			$('#auth-sys').remove();
+		}
+
+		if (!Auth.project) {
+			$('#auth-project').remove();
+		}
+
+
+	},
+
+
+
 	//重置数据
 	reset: function() {
 
@@ -371,11 +413,8 @@ var AppRoute = Backbone.Router.extend({
 			_.require('/static/dist/services/services.js');
 			App.Services.SuggestView.init();
 		})
-
+		this.initAuth(App.Global.User);
 	}
-
-
-
 });
 
 

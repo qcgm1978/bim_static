@@ -83,7 +83,7 @@ App.BodyContent.control = {
             }
 
         });
-        this.initEvent();
+       // this.initEvent();
     },
 
     initEvent:function(){
