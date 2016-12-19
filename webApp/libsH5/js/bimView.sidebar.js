@@ -5,6 +5,7 @@
 'use strict'
 ;(function($){
   bimView.sidebar = {
+    treeCheckCount:0,
     init:function(options,obj){
       var self = this;
       var modelBgColor = bimView.comm.getModelBgColor();
@@ -131,7 +132,7 @@
             data:'fileEtag',
             id:'specialty',
           });
-          $('#specialty').append(specialties);
+          $('#specialty').append(specialties);          
         });
         bimView.comm.ajax({
           type:'get',
@@ -167,6 +168,121 @@
         });
       }
     },
+
+    scanFilterTreeCheckState : function(curDom){
+      /*扫描左侧小地图树的复选框,并设计是全选还是部分选中*/
+      this.treeCheckCount++;
+      if(this.treeCheckCount<=5)
+      {
+        return;
+      }
+      var i,$m_lbl,chkState;
+      var checkAfter = document.defaultView.getComputedStyle(curDom , "after");/*当前复选框after*/
+      var parentUl = curDom.parentNode.parentNode.parentNode.parentNode;
+      var type = parentUl.className; /*ul dom class have root or leaf*/
+      type = type.indexOf("root")>0 ? "root" : "leaf";
+      $m_lbl = $(parentUl).prev().find(".m-lbl"); /*父级 checkbox*/
+      var $root_mlbl;
+      var scanCheckBox = function(parentNode){ 
+          /*
+          param:parentNode is ul
+          return:有一个未勾选返回false
+
+          */
+          var $m_lbl;
+          var $lis = $(parentNode).find("li");
+          var i,len = $lis.length , $m_lbl;
+          for(i=0;i<len;i++)
+          {
+              $m_lbl = $($lis[i]).find(".m-lbl");
+              checkAfter = document.defaultView.getComputedStyle($m_lbl[0] , "after");
+              if(checkAfter.content=="") /*未勾选*/
+              {
+                  return false;
+              }
+          }
+          return true;
+      }
+      var scanCheckBox2 = function(parentNode){ 
+          /*
+          param:parentNode is ul
+          return: 全部未勾选,返回false
+          */
+          var $m_lbl;
+          var $lis = $(parentNode).find("li");
+          var i,len = $lis.length , $m_lbl;
+          for(i=0;i<len;i++)
+          {
+              $m_lbl = $($lis[i]).find(".m-lbl");
+              checkAfter = document.defaultView.getComputedStyle($m_lbl[0] , "after");
+              if(checkAfter.content!="") /*勾选*/
+              {
+                  return true;
+              }
+          }
+          return false;
+      }
+
+      if(type=="root" || type=="leaf")
+      {
+          if(checkAfter.content=="") /*未勾选当前复选框*/
+          {
+              if(!$m_lbl.hasClass("m-lbl-2"))
+              {
+                  $m_lbl.addClass("m-lbl-2");
+              }
+
+              if(type=="leaf")
+              {
+                  $root_mlbl = $(parentUl).parent().parent().prev().find(".m-lbl");
+                  if(!$root_mlbl.hasClass("m-lbl-2"))
+                  {
+                      $root_mlbl.addClass("m-lbl-2");
+                  }
+              }
+          }
+          else /*勾选当前复选框*/
+          {
+              $(curDom).removeClass("m-lbl-2");
+              chkState = scanCheckBox(parentUl);
+              if(chkState)
+              {
+                  $m_lbl.removeClass("m-lbl-2");
+                  $m_lbl.prev().prop("checked",true);
+              }
+              else
+              {
+                  if(!$m_lbl.hasClass("m-lbl-2"))
+                  {
+                      $m_lbl.addClass("m-lbl-2");
+                      $m_lbl.prev().prop("checked",true);
+                  }
+              }
+              if(type=="leaf")
+              {
+                  var parentUl_root = $(parentUl).parent().parent();
+                  $root_mlbl = $(parentUl).parent().parent().prev().find(".m-lbl");
+                  chkState = scanCheckBox(parentUl_root);
+                  if(chkState)
+                  {
+                      $root_mlbl.removeClass("m-lbl-2");
+                      $root_mlbl.prev().prop("checked",true);
+                  }
+                  else
+                  {
+                      if(!$root_mlbl.hasClass("m-lbl-2"))
+                      {
+                          $root_mlbl.addClass("m-lbl-2");
+                          $root_mlbl.prev().prop("checked",true);
+                      }             
+                  }
+
+              }          
+          }
+      }
+      /* end if type=="root"||"leaf" */
+    },
+
     comment:function(isSelected,viewer){ 
       var self = this;
       self.el._dom.sidebar.find('#comment').show().siblings().hide();

@@ -684,6 +684,9 @@ App.Project.ProjectContainer = Backbone.View.extend({
 				type: "classCode"
 			});
 			$('#lockAxisZ').show();
+			
+			/*add by wuweiwei init filter checkbox state*/
+			$($("#specialty .itemContent")[0]).find(".m-lbl").addClass("m-lbl-2");
 		});
 
 

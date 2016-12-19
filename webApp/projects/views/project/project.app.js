@@ -27,6 +27,7 @@ App.Project.ProjectApp = Backbone.View.extend({
 		if (App.Project.Settings.fetchNavType != "file") { 
 			//根据类型渲染数据
 			App.Project.renderModelContentByType();  
+
 		} 
 	}
 	

@@ -333,7 +333,7 @@
           });
           $li.append(children);
         }
-      }).on('change', 'input', function() {
+      }).on('change', 'input', function(e) {
         //filter变化
         var $this = $(this),
           $li = $this.closest('.itemNode'),
@@ -349,6 +349,11 @@
           filter = bimView.comm.getFilters(parents, 'uncheck');
           self.filter(filter);
         }
+        /*add by wuweiwei set filter checkbox state*/
+        //console.log($(e.target).next()[0]);
+        //console.log(document.defaultView.getComputedStyle($(e.target).next()[0] , "after").content);
+        bimView.sidebar.scanFilterTreeCheckState($(e.target).next()[0]);
+
       }).on('click', '#filter .treeText', function() {
         // 选中高亮
         var $this = $(this),

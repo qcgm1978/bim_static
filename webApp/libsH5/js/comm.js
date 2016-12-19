@@ -143,9 +143,17 @@
       },
       _opt = $.extend({},defualts,options);
       return renderTree(_opt.arr,_opt.name,_opt.dataType);
-      function renderTree(arr,name,dataType,prefix){
+      function renderTree(arr,name,dataType,prefix,isleaf){
         if(arr.length == 0) return;
-        var tree = $('<ul class="tree"></ul>');
+        var tree;
+        if(isleaf==undefined)  /* modify by wuweiwei:class="tree root" 与 class="tree leaf" 中 root&leaf 是方便DOM操作 */
+        {
+          tree = $('<ul class="tree root"></ul>');
+        }
+        else if(isleaf=="isleaf")
+        {
+          tree = $('<ul class="tree leaf"></ul>');
+        }
         $.each(arr,function(i,item){
           var type = _opt.type,
               itemName,data,iconStatus,input,span;
@@ -182,14 +190,27 @@
             }
 
           }
-          var tmpHtml = $('<li class="itemNode" data-type="'+type+'">\
-            <div class="itemContent">\
-            <i class="'+iconStatus+'"></i>\
-            <label class="treeCheckbox">'+input+'<span class="m-lbl"><span class="tempStatus"></span></span></label>'+span + '\
-          </div></li>');
+          var tmpHtml;
+          if(isleaf==undefined)  /* modify by wuweiwei:class = m-lbl-root & m-lbl-leaf 是方便DOM操作 */
+          {
+            tmpHtml = $('<li class="itemNode" data-type="'+type+'">\
+              <div class="itemContent">\
+              <i class="'+iconStatus+'"></i>\
+              <label class="treeCheckbox">'+input+'<span class="m-lbl m-lbl-root"><span class="tempStatus"></span></span></label>'+span + '\
+            </div></li>');
+          }
+          else if(isleaf=="isleaf")
+          {
+            tmpHtml = $('<li class="itemNode" data-type="'+type+'">\
+              <div class="itemContent">\
+              <i class="'+iconStatus+'"></i>\
+              <label class="treeCheckbox">'+input+'<span class="m-lbl m-lbl-leaf"><span class="tempStatus"></span></span></label>'+span + '\
+            </div></li>');
+          }
+
           tmpHtml.data('userData',data);
           if(item[_opt.children]&&typeof item[_opt.children] =="object"){
-            var children = renderTree(item[_opt.children],_opt.childrenName,_opt.childrenType,item[_opt.code]);
+            var children = renderTree(item[_opt.children],_opt.childrenName,_opt.childrenType,item[_opt.code],"isleaf");
             tmpHtml.append(children);
           }
           tree.append(tmpHtml);

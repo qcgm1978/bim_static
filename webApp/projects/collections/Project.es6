@@ -1603,7 +1603,7 @@ App.Project = {
 			$(".fileNav .model").click();
 
 		}
-
+		
 	},
 
 	//设置 可以查看的属性

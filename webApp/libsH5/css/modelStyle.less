@@ -115,7 +115,13 @@
       .m-lbl{display:block;width:16px;overflow:hidden;
         &:before{content:'';display:inline-block;width:13px;height:13px;background:#fff;}
       }
+      /*add by wuweiwei*/
+      .m-lbl-2{display:block;width:16px;overflow:hidden;
+        &:before{content:'';display:inline-block;width:13px;height:13px;background:#fff;}
+      }
       input:checked + .m-lbl:after{content: "\e615";color:#417ae6;line-height:12px;margin-left:-15px;}
+      input:checked + .m-lbl-2:after{content: "\e616";color:#417ae6;line-height:12px;margin-left:-15px;} /*add by wuweiwei*/
+      .m-lbl-2:after{content: "\e616";color:#417ae6;line-height:12px;margin-left:-15px;} /*add by wuweiwei*/
     }
     .tree{display:none;padding-left:15px;}
     .open>.tree {display:block;}
