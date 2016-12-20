@@ -23,6 +23,7 @@ App.Project.ProjectApp = Backbone.View.extend({
 		//样式处理
 		$el.addClass('selected').siblings().removeClass('selected');
 		App.Project.Settings.projectNav = $el.data("type");
+		
 		//非文件导航 设计 计划 成本 质量
 		if (App.Project.Settings.fetchNavType != "file") { 
 			//根据类型渲染数据

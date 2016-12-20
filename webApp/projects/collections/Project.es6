@@ -2280,7 +2280,7 @@ App.Project = {
 			'processacceptance': 'process',
 			'openingacceptance': 'open'
 		};
-
+		App.Project.Settings.property = "processacceptance"; /*add by wuweiwei*/
 		CommProject.init({
 			viewer:App.Project.Settings.Viewer,
 			data:this.currentLoadData[typeMap[App.Project.Settings.property]],
