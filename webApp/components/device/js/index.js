@@ -463,7 +463,14 @@
                 _this.initEvent();
                 _this.showInModel(true);
                 $('#modelView .modelSidebar').addClass('hideMap');
+                $('#isolation').show();/*add by wangbing*/
             });
+
+            viewer.on('click',function(){
+
+                $('#isolation').show();
+
+            })
 
             viewer.viewer.setMarkerClickCallback(function(marker){
                 var id = marker? marker.id:"",
