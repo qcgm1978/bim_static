@@ -52,7 +52,13 @@ App.Project.CostReference = Backbone.View.extend({
 	},
 	//模型中显示
 	showInModle(event) {
-		// App.Project.recoverySilder();//zhangyankai修改
+		$(event.target).parents('.rightPropertyContent').find(".planContainer").find(".selected").removeClass('selected');
+		$(event.target).parents('.rightPropertyContent').find(".qualityContainer").find(".selected").removeClass('selected');
+		App.Project.Settings.isModelCostChange = true;
+		if(App.Project.Settings.isModelChange){//zhangyankai 修改如果操作了质量然后直接返回成本 则会初始化模型和筛选树
+			CommProject.recoverySilder();
+			App.Project.Settings.isModelChange=false;
+		}
 		var $target = $(event.target).closest(".item"),
 			ids=$target.data("userId"),
 			box=$target.data("box");

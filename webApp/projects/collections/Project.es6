@@ -2274,7 +2274,8 @@ App.Project = {
 	},
 	//在模型中显示(开业验收、过程验收、隐患)
 	showInModel: function($target, type, paramObj) {
-
+		$(event.target).parents('.rightPropertyContent').find(".planContainer").find(".selected").removeClass('selected');
+		App.Project.Settings.isModelChange = true;//add zhangyankai控制什么时候初始化左侧和模型初始化
 		var typeMap= {
 			'concerns': 'dis',
 			'processacceptance': 'process',

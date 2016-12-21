@@ -123,7 +123,20 @@ App.Project.PlanInspection = Backbone.View.extend({
 	},
 	//在模型中显示
 	showInModel(event) {
-		// App.Project.recoverySilder();
+		// App.Project.recoverySilder();modify zhangyankai
+		$(event.target).parents('.rightPropertyContent').find(".planContainer").find(".selected").removeClass('selected');
+		$(event.target).parents('.rightPropertyContent').find(".qualityContainer").find(".selected").removeClass('selected');
+		if(App.Project.Settings.isModelCostChange){//zhangyankai 修改 如果是操作了成本 直接返回计划 就不会初始化 只是会全部显示
+			App.Project.cancelZoomModel();
+			App.Project.Settings.Viewer.filterByUserIds(undefined);
+			App.Project.Settings.isModelChange=false;
+			App.Project.Settings.isModelCostChange=false;
+		}
+		if(App.Project.Settings.isModelChange){//zhangyankai 修改如果操作了质量然后直接返回计划 则会初始化模型和筛选树
+			CommProject.recoverySilder();
+			App.Project.Settings.isModelChange=false;
+			App.Project.Settings.isModelCostChange=false;
+		}
 		App.Project.Settings.Viewer.loadMarkers(null);
 		App.Project.planCostShowInModel(event);
 	}

@@ -105,6 +105,13 @@ App.Project.CostVerification = Backbone.View.extend({
 	//在模型中显示
 	showInModel(event) {
 		// App.Project.recoverySilder();//不要刷新左侧筛选树
+		$(event.target).parents('.rightPropertyContent').find(".planContainer").find(".selected").removeClass('selected');
+		$(event.target).parents('.rightPropertyContent').find(".qualityContainer").find(".selected").removeClass('selected');
+		App.Project.Settings.isModelCostChange = true;
+		if(App.Project.Settings.isModelChange){//zhangyankai 修改如果操作了质量然后直接返回成本 则会初始化模型和筛选树
+			CommProject.recoverySilder();
+			App.Project.Settings.isModelChange=false;
+		}
 		App.Project.planCostShowInModel(event);
 	},
 
