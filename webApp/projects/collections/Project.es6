@@ -1834,6 +1834,16 @@ App.Project = {
 			var $ProjectPlanPropertyContainer = $rightPropertyContent.find(".ProjectPlanPropertyContainer");
 			if ($ProjectPlanPropertyContainer.length > 0) {
 				$ProjectPlanPropertyContainer.show();
+
+				/*add by wuweiwei at 2016-12-21 16:00*/
+				var item = $ProjectPlanPropertyContainer.find('.projectNav .selected');
+				if(item && item.length)
+				{
+					var t = item.first().data('type');
+					App.Project.Settings.property = t;
+				}
+				/*end wuweiwei*/
+
 			} else {
 				$rightPropertyContent.append(new App.Project.ProjectPlanProperty().render().$el);
 				$("#projectContainer .ProjectPlanPropertyContainer .projectNav .item:first").click();
@@ -1845,6 +1855,16 @@ App.Project = {
 			var $ProjectCostPropetyContainer = $rightPropertyContent.find(".ProjectCostPropetyContainer");
 			if ($ProjectCostPropetyContainer.length > 0) {
 				$ProjectCostPropetyContainer.show();
+
+				/*add by wuweiwei at 2016-12-21 16:00*/
+				var item = $ProjectCostPropetyContainer.find('.projectNav .selected');
+				if(item && item.length)
+				{
+					var t = item.first().data('type');
+					App.Project.Settings.property = t;
+				}
+				/*end wuweiwei*/
+
 			} else {
 				$rightPropertyContent.append(new App.Project.ProjectCostProperty().render().$el);
 				$("#projectContainer .ProjectCostPropetyContainer .projectNav .item:first").click();
@@ -1860,6 +1880,7 @@ App.Project = {
 				var item = $ProjectQualityNavContainer.find('.projectNav .selected');
 				if (item && item.length) {
 					var t = item.first().data('type');
+					App.Project.Settings.property = t; /*add by wuweiwei at 2016-12-21 16:00*/
 					if (t == 'processacceptance') {
 						App.Project.isShowMarkers('process', $('.QualityProcessAcceptance .btnCk').hasClass('selected'));
 					} else if (t == 'openingacceptance') {
@@ -2281,7 +2302,7 @@ App.Project = {
 			'processacceptance': 'process',
 			'openingacceptance': 'open'
 		};
-		App.Project.Settings.property = "processacceptance"; /*add by wuweiwei*/
+
 		CommProject.init({
 			viewer:App.Project.Settings.Viewer,
 			data:this.currentLoadData[typeMap[App.Project.Settings.property]],
