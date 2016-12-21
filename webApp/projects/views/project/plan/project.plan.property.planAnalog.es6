@@ -81,8 +81,6 @@ App.Project.PlanAnalog = Backbone.View.extend({
 
 	//挑选播放
 	pickPlayAnalog(event) {
-		$(event.target).parents('.rightPropertyContent').find(".planContainer").find(".selected").removeClass('selected');
-		$(event.target).parents('.rightPropertyContent').find(".qualityContainer").find(".selected").removeClass('selected');
 		//进度模拟中 不做操作
 		if (this.timer) {
 			return;
@@ -469,7 +467,9 @@ App.Project.PlanAnalog = Backbone.View.extend({
 			App.Project.cancelZoomModel();
 			return;
 		} else {
-			$target.parent().find(".selected").removeClass("selected");
+			$target.parents('.rightPropertyContent').find(".planContainer").find(".selected").removeClass('selected');
+			$target.parents('.rightPropertyContent').find(".qualityContainer").find(".selected").removeClass('selected');
+			// $target.parent().find(".selected").removeClass("selected");
 			$target.addClass("selected");
 		}
 		if (box && ids) {

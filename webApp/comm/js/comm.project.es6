@@ -324,8 +324,9 @@ var CommProject = {
                         $quality_btnCk.removeClass("selected");
                     }                
                 }catch(e){;}
-
-                $target.parent().find(".selected").removeClass("selected");
+                $target.parents('.rightPropertyContent').find(".qualityContainer").find(".selected").removeClass('selected');
+                $target.parents('.rightPropertyContent').find(".planContainer").find(".selected").removeClass('selected');
+                // $target.parent().find(".selected").removeClass("selected");
                 $target.addClass("selected");
 
             }

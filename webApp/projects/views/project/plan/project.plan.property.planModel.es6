@@ -88,8 +88,6 @@ App.Project.PlanModel = Backbone.View.extend({
 	},
 	//模型中显示
 	showInModle(event, $el) {
-		$(event.target).parents('.rightPropertyContent').find(".planContainer").find(".selected").removeClass('selected');
-		$(event.target).parents('.rightPropertyContent').find(".qualityContainer").find(".selected").removeClass('selected');
 		App.Project.Settings.Viewer.loadMarkers(null);
 		if(App.Project.Settings.isModelCostChange || !$(event.target).hasClass("odd")){//zhangyankai 修改 如果是操作了成本 直接返回计划 就不会初始化 只是会全部显示
 			App.Project.cancelZoomModel();
@@ -132,7 +130,9 @@ App.Project.PlanModel = Backbone.View.extend({
 				});
 				return;
 			}else{
-				$target.parent().find(".selected").removeClass("selected");
+				$target.parents('.rightPropertyContent').find(".planContainer").find(".selected").removeClass('selected');
+				$target.parents('.rightPropertyContent').find(".qualityContainer").find(".selected").removeClass('selected');
+				// $target.parent().find(".selected").removeClass("selected");
 				$target.addClass("selected");
 				if (!$target.hasClass("odd")){
 					var arr = checked?[]:"";

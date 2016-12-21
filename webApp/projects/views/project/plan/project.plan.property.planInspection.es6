@@ -124,8 +124,6 @@ App.Project.PlanInspection = Backbone.View.extend({
 	//在模型中显示
 	showInModel(event) {
 		// App.Project.recoverySilder();modify zhangyankai
-		$(event.target).parents('.rightPropertyContent').find(".planContainer").find(".selected").removeClass('selected');
-		$(event.target).parents('.rightPropertyContent').find(".qualityContainer").find(".selected").removeClass('selected');
 		if(App.Project.Settings.isModelCostChange){//zhangyankai 修改 如果是操作了成本 直接返回计划 就不会初始化 只是会全部显示
 			App.Project.cancelZoomModel();
 			App.Project.Settings.Viewer.filterByUserIds(undefined);
