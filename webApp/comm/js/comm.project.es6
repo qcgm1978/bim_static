@@ -309,14 +309,10 @@ var CommProject = {
                 if(App.Project.Settings.projectNav=="quality")
                 {
                     _this.recoverySilder();
-                    _viewer.viewer.zoomOut(10);
+                    _viewer.viewer.zoomOut(5);
                     //box = _this.formatBBox(location.boundingBox);
                     //this._$viewer.zoomToBox(box,0.5);
                 }
-                /*
-                box = _this.formatBBox(location.boundingBox);
-                this._$viewer.zoomToBox(box,0.5);
-                */
                 /*add by wuweiwei end */
                 return
             } else {
