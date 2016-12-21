@@ -85,6 +85,13 @@ App.Project.QualityOpeningAcceptance = Backbone.View.extend({
 	},
 
 	showSelectMarker(e){
+		var bool = $(e.currentTarget).hasClass('selected');
+		if(!bool)
+		{
+			App.Project.Settings.Viewer.loadMarkers();
+			CommProject.recoverySilder(); /*add by wuweiwei at 2016-12-21*/
+			return;
+		}
 		App.Project.isShowMarkers('open',$(e.currentTarget).hasClass('selected'));
 	},
 

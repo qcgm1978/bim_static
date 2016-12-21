@@ -43,6 +43,7 @@ App.Project.QualityProcessAcceptance = Backbone.View.extend({
 		if(!bool)
 		{
 			App.Project.Settings.Viewer.loadMarkers(); 
+			CommProject.recoverySilder(); /*add by wuweiwei at 2016-12-21*/
 			return;
 		}
 		App.Project.isShowMarkers('process',$(e.currentTarget).hasClass('selected'));
