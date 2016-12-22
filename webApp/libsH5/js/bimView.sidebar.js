@@ -239,14 +239,21 @@
               if(!scanCheckBox2(parentUl))
               {
                   $m_lbl.prev().prop("checked",false);
+                  $m_lbl.removeClass("m-lbl-2");
               }
 
               if(type=="leaf")
               {
                   $root_mlbl = $(parentUl).parent().parent().prev().find(".m-lbl");
+                  var parentUl_root = $(parentUl).parent().parent();
                   if(!$root_mlbl.hasClass("m-lbl-2"))
                   {
                       $root_mlbl.addClass("m-lbl-2");
+                  }
+                  if(!scanCheckBox2(parentUl_root))
+                  {
+                      $root_mlbl.prev().prop("checked",false);
+                      $root_mlbl.removeClass("m-lbl-2");
                   }
               }
           }
