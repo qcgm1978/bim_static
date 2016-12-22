@@ -6312,7 +6312,6 @@ CLOUD.Extensions.MarkerEditor.prototype.selectMarker = function (marker) {
 
     // click 回调
     if (this.markerClickCallback) {
-
         if (this.selectedMarker) {
             this.markerClickCallback(this.selectedMarker.toNewObject());
         } else {

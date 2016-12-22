@@ -80,7 +80,6 @@ App.Project = {
 		var id = marker? marker.id:"",
 			userId=marker? marker.userId:"",
 			data={};
-
 		// if ($(".QualityProcessAcceptance").is(":visible")) {
 		// 	$(".QualityProcessAcceptance .tbProcessAccessBody tr").removeClass('selected');
 		// 	if(id){

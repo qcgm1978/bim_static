@@ -215,13 +215,15 @@ App.Project.QualityConcerns=Backbone.View.extend({
 		}).done(function(data){
 			if (data.code == 0 && data.data) {
 				var  modelId = data.data.modelId;
+				
 				var obj={
 					specialty:data.data.specialty,
 					fileName:data.data.name,
 					uuid:modelId+uuid.slice(uuid.indexOf('.')),
 					location:{
 						boundingBox:location.boundingBox,
-						position:location.position
+						position:location.position,
+						componentId:modelId+uuid.slice(uuid.indexOf('.'))
 					}
 				}
 				App.Project.showInModel($target,3,obj);
