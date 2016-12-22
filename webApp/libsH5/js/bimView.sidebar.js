@@ -235,6 +235,11 @@
               {
                   $m_lbl.addClass("m-lbl-2");
               }
+              console.log(scanCheckBox2(parentUl));
+              if(!scanCheckBox2(parentUl))
+              {
+                  $m_lbl.prev().prop("checked",false);
+              }
 
               if(type=="leaf")
               {
