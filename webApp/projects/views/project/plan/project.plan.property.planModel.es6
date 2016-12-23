@@ -89,7 +89,7 @@ App.Project.PlanModel = Backbone.View.extend({
 	//模型中显示
 	showInModle(event, $el) {
 		App.Project.Settings.Viewer.loadMarkers(null);
-		if(App.Project.Settings.isModelCostChange || !$(event.target).hasClass("odd")){//zhangyankai 修改 如果是操作了成本 直接返回计划 就不会初始化 只是会全部显示
+		if(App.Project.Settings.isModelCostChange && !$(event.target).hasClass("odd")){//zhangyankai 修改 如果是操作了成本 直接返回计划 就不会初始化 只是会全部显示
 			App.Project.cancelZoomModel();
 			App.Project.Settings.Viewer.filterByUserIds(undefined);
 			App.Project.Settings.isModelChange=false;
