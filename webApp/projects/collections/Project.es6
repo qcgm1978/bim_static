@@ -1571,8 +1571,11 @@ App.Project = {
 
 
 		//初始化滚动条
-		App.Project.initScroll();
-
+		try
+		{
+			App.Project.initScroll($("#projectContainer .fileContainer .mCSB_container"),"y");
+		}catch(e){;}
+		
 		//事件初始化
 		App.Project.initEvent();
 
