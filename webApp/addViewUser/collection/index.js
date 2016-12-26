@@ -1,6 +1,7 @@
 App.AddViewUser = {
 	init:function(){
 		$("#contains").empty();
-		new App.AddViewUser.AddViewUserV.render(); //渲染框架
+		var AddViewUserV = new App.AddViewUser.AddViewUserV(); //渲染框架
+		AddViewUserV.render();
 	}
 };
