@@ -1,3 +1,30 @@
+
 <div class="addViewUserContent">
-	123456789
+	<div class="viewUserTopTab">
+		<ul id="viewUlTab">
+			<% if(obj.state.selectedIndex == 'userList'){ %>
+				<li data-type="userList" class="selected">用户列表</li>
+				<li data-type="userSet">用户配置</li>
+			<% }else{ %>
+				<li data-type="userList">用户列表</li>
+				<li data-type="userSet" class="selected">用户配置</li>
+			<% } %>
+		</ul>
+	</div>
+	<div class="viewUserContent" id="viewShowBox">
+		<% if(obj.state.showIndex == 'userList'){ %>
+			<div data-type="userList" class="viewUserList" style="display: block;">
+				<a id="addViewUserBtn">
+					<i style="background:url('/static/dist/images/services/images/service_ico.png')no-repeat 0 -220px"></i>添加成员
+				</a>
+				<div class="viewUserListBox">
+					<div class="nullViewUserList">还没有浏览用户，请点击添加按钮添加</div>
+				</div>
+			</div>
+			<div data-type="userSet" class="viewUserSet"></div>
+		<% }else{ %>
+			<div data-type="userList" class="viewUserList"></div>
+			<div data-type="userSet" class="viewUserSet" style="display: block;"></div>
+		<% } %>
+	</div>
 </div>
