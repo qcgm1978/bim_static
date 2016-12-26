@@ -23,8 +23,20 @@ var AppRoute = Backbone.Router.extend({
 		'bodyContent': 'bodyContent',
 		'logout': 'logout',
 		"post/detail/:id": 'postDetail',
-		'suggest':'suggest'
+		'suggest':'suggest',
+		'addViewUser':'addViewUser',
 	},
+	//start 添加浏览用户的路由方法
+	addViewUser:function(){
+		if (this.reset() == false) {
+			return;
+		}
+		_.require('/static/dist/addViewUser/viewUser.css');
+		_.require('/static/dist/addViewUser/viewUser.js');
+		App.AddViewUser.init();
+		$("#pageLoading").hide();
+	},
+	//end 添加浏览用户的路由方法
 	//首页主体展示
 
 	bodyContent: function() {
