@@ -37,6 +37,7 @@ var AppRoute = Backbone.Router.extend({
 		_.require('/static/dist/bodyContent/bodyContent.js');
 		App.BodyContent.control.init();
 		$("#pageLoading").hide();
+		this.DemoEnv();
 	},
 
 
@@ -414,6 +415,12 @@ var AppRoute = Backbone.Router.extend({
 			App.Services.SuggestView.init();
 		})
 		this.initAuth(App.Global.User);
+	},
+
+	/*演示环境*/
+	DemoEnv : function(args){
+		console.log($("#topBar .navHeader .flow")[0]);
+		console.log($("#topBar .onlineNav ul li")[0]);
 	}
 });
 
