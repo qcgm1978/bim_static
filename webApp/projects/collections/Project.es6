@@ -1603,7 +1603,7 @@ App.Project = {
 			$(".fileNav .model").click();
 
 		}
-		
+		window.Global.DemoEnv("projectDocBtn"); /*add by wuweiwei*/
 	},
 
 	//设置 可以查看的属性
@@ -2631,7 +2631,10 @@ App.Project = {
 				App.Project.propertiesOthers.call(_this, "plan|cost|quality|dwg");
 				//}
 			}
-
+			setTimeout(function(){
+				window.Global.DemoEnv("designLink");
+			},500);
+			
 		})
 	},
 

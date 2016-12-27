@@ -124,6 +124,7 @@ var AppRoute = Backbone.Router.extend({
 
 		App.Project.Settings.versionId = versionId;
 		App.Project.init();
+		this.DemoEnv("projectDocBtn");
 	},
 
 	//直接转到视点
@@ -417,11 +418,50 @@ var AppRoute = Backbone.Router.extend({
 		this.initAuth(App.Global.User);
 	},
 
-	/*演示环境*/
-	DemoEnv : function(args){
-		console.log($("#topBar .navHeader .flow")[0]);
-		console.log($("#topBar .onlineNav ul li")[0]);
+	/*
+	演示环境
+	write by wuweiwei
+	*/
+	DemoEnv : function(type){
+		/*
+		type = "hideMenu"
+		type = "projectDocBtn"
+		type = "designLink"
+		被调用:
+		E:\JavaProject\bim_static\webApp\projects\collections\Project.es6 - loaddata()
+		bodyContent:function(){}
+		*/
+		var $popMenu , popMenuLen , $a;
+		if(type=="hideMenu" || type==undefined)
+		{
+			$("#topBar .navHeader .flow").hide();
+			$popMenu = $(".onlineNav ul li");
+			$popMenu.each(function(index){
+				if(index!=0)
+				{
+					this.style.display = "none";
+				}
+			});
+		}
+		if(type=="projectDocBtn")
+		{
+			$("#contains .opBox span").each(function(){
+				$(this).addClass("disable");
+			});
+		}
+
+		if(type=="designLink")
+		{
+			$a = $("#contains .rightProperty .designProperties .attrDwgBox a");
+			//console.log("www:",$a[10]);
+			$a.each(function(index){
+				$(this).removeAttr("href");
+			});
+		}
+		window.Global = {};
+		window.Global.DemoEnv = this.DemoEnv;
 	}
+
 });
 
 
