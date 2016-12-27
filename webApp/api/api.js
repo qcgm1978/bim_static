@@ -327,7 +327,9 @@ App.API = {
 		serviceSuggestHistory:'platform/advice/feedback/selectAll',
 		serviceQuerySuggest:'platform/advice/feedback/select/{adviceId}',
 
-		test: ""
+		test: "",
+		getViewUserList:"platform/testuser",//获取浏览用户的列表
+		getProjectsList:"platform/testuser/allProject",//获取浏览用户的列表
 	},
 
 	DEBUGURL: {
@@ -451,9 +453,9 @@ App.API = {
 		appResetSecret:"platform/app/{id}",//重新生成 Secret
 		appUpdate:"platform/app",//更新 id, name desc
 
-		test: ""
-
-
+		test: "",
+		//addViewUser API
+		getViewUserList:"platform/testuser",//获取浏览用户的列表
 
 	}
 

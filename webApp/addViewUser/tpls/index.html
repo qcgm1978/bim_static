@@ -1,4 +1,3 @@
-
 <div class="addViewUserContent">
 	<div class="viewUserTopTab">
 		<ul id="viewUlTab">
@@ -18,13 +17,67 @@
 					<i style="background:url('/static/dist/images/services/images/service_ico.png')no-repeat 0 -220px"></i>添加成员
 				</a>
 				<div class="viewUserListBox">
-					<div class="nullViewUserList">还没有浏览用户，请点击添加按钮添加</div>
+					<%  if(obj.state.userListData.length>0) {%>
+						<table>
+							<thead>
+								<tr>
+									<td>用户名</td>
+									<td>账号前缀</td>
+									<td>账号名字</td>
+									<td>账号密码</td>
+									<td>账号操作</td>
+								</tr>
+							</thead>
+							<tbody>
+								<% _.each(obj.state.userListData,function(item){%>
+									<tr>
+										<td><%= item.userName %></td>
+										<td><%= item.accountPrefix %></td>
+										<td><%= item.accountName %></td>
+										<td><%= item.accountPassWord %></td>
+										<td>
+											<a href="javascript:;" data-id='<%= item.id %>' class="viewUserItem viewUserEdite">编辑</a>
+											<a href="javascript:;" data-id='<%= item.id %>' class="viewUserItem viewUserDelete">删除</a>
+										</td>
+									</tr>
+								<% }) %>
+							</tbody>
+						</table>
+					<% }else{ %>
+						<div class="nullViewUserList">还没有浏览用户，请点击添加按钮添加</div>
+					<% } %>
 				</div>
 			</div>
-			<div data-type="userSet" class="viewUserSet"></div>
 		<% }else{ %>
-			<div data-type="userList" class="viewUserList"></div>
-			<div data-type="userSet" class="viewUserSet" style="display: block;"></div>
+			<div data-type="userSet" class="viewUserSet" style="display: block;">
+				<a id="addViewUserBtn">
+					<i style="background:url('/static/dist/images/services/images/service_ico.png')no-repeat 0 -220px"></i>添加前缀
+				</a>
+				<div class="viewUserSetBox">
+					<% if(obj.state.userSetData.length>0) {%>
+						<table>
+							<thead>
+								<tr>
+									<td>用户前缀</td>
+									<td>前缀操作</td>
+								</tr>
+							</thead>
+							<tbody>
+								<% _.each(obj.state.userSetData,function(item){%>
+									<tr>
+										<td>eg:<%= item.name %></td>
+										<td>
+											<a href="javascript:;" class="viewUserSetDelete">删除</a>
+										</td>
+									</tr>
+								<% }) %>
+							</tbody>
+						</table>
+					<% }else{ %>
+						<div class="nullViewUserSetList">还没有添加前缀，请点击按钮添加</div>
+					<% } %>
+				</div>
+			</div>
 		<% } %>
 	</div>
 </div>
