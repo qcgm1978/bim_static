@@ -329,7 +329,12 @@ App.API = {
 
 		test: "",
 		getViewUserList:"platform/testuser",//获取浏览用户的列表
-		getProjectsList:"platform/testuser/allProject",//获取浏览用户的列表
+		checkUser:"platform/testuser/check",//检查用户是否存在
+		addViewUser:"platform/testuser",//添加用户
+		deleteViewUser:"platform/testuser/del",//删除用户
+		updateViewUser:"platform/testuser",//删除用户
+		getProjectsList:"platform/testuser/allProject",//获取全部项目的列表
+		getViewUserInfo:"platform/testuser/loginId",//获取全部项目的列表
 	},
 
 	DEBUGURL: {

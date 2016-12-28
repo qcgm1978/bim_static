@@ -229,7 +229,11 @@
 				line-height: 25px;
 				width:50%;
 				float: left;
+				padding-right: 10px;
 				cursor: default;
+				white-space:nowrap;
+				overflow:hidden;
+				text-overflow:ellipsis;
 				label{
 					display: inline-block;
 					width: 13px;
@@ -242,6 +246,28 @@
     			}
 			}
 		}
+	}
+}
+.deleteViewUserBox{
+	height: 100%;
+	width: 100%;
+	text-align: center;
+	font-size: 16px;
+	position: relative;
+	p{
+	    width: 100%;
+	    height: 30px;
+	    line-height: 30px;
+	}
+	button{
+		width: 100%;
+		height: 30px;
+		line-height: 30px;
+		background: none;
+		border: 0;
+		position: absolute;
+		bottom: 0;
+		left: 0;
 	}
 }
 /*end 添加用户样式代码**/

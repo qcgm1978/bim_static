@@ -1,29 +1,61 @@
 <div class="addViewUserBox">
-	<div class="addViewUserInput">
-		<label>账号名称</label>
-		<div class="inputBox">
-			<input type="text" id="accrentName" name="accrentName" placeholder="请输入账号名称" />
+	<% if(obj.state.nameInfo){%>
+		<div class="addViewUserInput">
+			<label>用户名称</label>
+			<div class="inputBox">
+				<input type="text" id="userName" name="accrentName" value="<%= obj.state.nameInfo.username %>" placeholder="请输入用户名称" />
+			</div>
 		</div>
-	</div>
-	<div class="addViewUserInput">
-		<label>账号密码</label>
-		<div class="inputBox">
-			<input type="text" id="accrentPassWord" name="accrentPassWord" placeholder="请输入账号密码" />
+		<div class="addViewUserInput">
+			<label>账号名称</label>
+			<div class="inputBox">
+				<input type="text" id="accrentName" name="accrentName" value="<%= obj.state.nameInfo.loginid %>" placeholder="请输入账号名称" />
+			</div>
 		</div>
-	</div>
+		<div class="addViewUserInput">
+			<label>账号密码</label>
+			<div class="inputBox">
+				<input type="text" id="accrentPassWord" name="accrentPassWord" value="<%= obj.state.nameInfo.pwd %>" placeholder="请输入账号密码" />
+			</div>
+		</div>
+	<% } else{%>
+		<div class="addViewUserInput">
+			<label>用户名称</label>
+			<div class="inputBox">
+				<input type="text" id="userName" name="accrentName" placeholder="请输入用户名称" />
+			</div>
+		</div>
+		<div class="addViewUserInput">
+			<label>账号名称</label>
+			<div class="inputBox">
+				<input type="text" id="accrentName" name="accrentName" placeholder="请输入账号名称" />
+			</div>
+		</div>
+		<div class="addViewUserInput">
+			<label>账号密码</label>
+			<div class="inputBox">
+				<input type="text" id="accrentPassWord" name="accrentPassWord" placeholder="请输入账号密码" />
+			</div>
+		</div>
+	<% } %>
 	<div class="addViewUserInput">
 		<label>项目名称</label>
 		<div class="inputBox">
 			<ul class="projectUlBox">
-				<li>
-					<label class="selectCheckBox"></label>项目名称一
-				</li>
-				<li>
-					<label class=""></label>项目名称二
-				</li>
-				<li>
-					<label class=""></label>项目名称三
-				</li>
+				<% if(obj.state.projectsData.length>0) {%>
+					<% _.each(obj.state.projectsData,function(item){%>
+						<li>
+							<span title="<%= item.name %>">
+								<% if(item.selected){ %>
+									<label data-projectId="<%= item.projectId %>" class="selectCheckBox"></label>
+								<% }else{ %>
+									<label data-projectId="<%= item.projectId %>"></label>
+								<% }%>
+								<%= item.name %>
+							</span>
+						</li>
+					<%})%>
+				<%}%>
 			</ul>
 		</div>
 	</div>
