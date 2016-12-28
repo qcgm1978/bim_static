@@ -96,6 +96,10 @@ fis.match('/static/dist/services/services.css', {
   useHash: true,
   release: '/static/dist/services/services.css'
 });
+//addViewUser用户管理页面
+fis.match('addViewUser/tpls/**.html', {
+  release: "/static/dist/tpls/$0"
+});
 //首页主体
 fis.match('bodyContent/tpls/**.html', {
   //useHash:true,
@@ -257,7 +261,21 @@ fis.match('/static/dist/commH5/commH5.js', {
   useHash:true,
   release: '/static/dist/commH5/commH5.js'
 });
-
+//添加用户管理页面
+fis.match('/addViewUser/**.{js,es6}', {
+  packTo: '/static/dist/addViewUser/viewUser.js'
+});
+fis.match('/static/dist/addViewUser/viewUser.js', {
+  useHash:true,
+  release: '/static/dist/addViewUser/viewUser.js'
+});
+fis.match('/addViewUser/**.{css,less}', {
+  packTo: '/static/dist/addViewUser/viewUser.css'
+});
+fis.match('/static/dist/addViewUser/viewUser.css', {
+  useHash:true,
+  release: '/static/dist/addViewUser/viewUser.css'
+});
 //bodyContent
 fis.match('/bodyContent/**.{less,css}', {
   //useHash: false,
