@@ -25,8 +25,8 @@ App.AddViewUser.AddViewUserDialogV = Backbone.View.extend({
 				data: _data,
 				success: function(collection, response, options) {
 					if(response.data == "exist"){
-						alert('账号名称已存在!')
 						accrentName.focus();
+						// alert('账号名称已存在!')
 						return;
 					}
 				}

@@ -45,8 +45,8 @@ App.AddViewUser.AddViewUserV = Backbone.View.extend({
 		    isAlert: false,
 		    message: ifrem
 		})
-		$("#deleteBtn").off("click")
-		$("#deleteBtn").on("click",function(){
+		$(".deleteBtn").off("click")
+		$(".deleteBtn").on("click",function(){
 			_this.deleteUserFun(deleteId,viewUserDeleteDialog);
 		})
 	},
