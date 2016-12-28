@@ -172,7 +172,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 						//_$current.parent().append(str);
 						//_$current.parent().siblings('.modleList').html(str);
 						$('.attrClassBox [data-classkey=4]').parent().siblings('.modleList').html(str);
-
+						window.Global.DemoEnv("designLink");
 
 					} else {
 						_$current.parent().siblings('.modleList').html(str);
@@ -425,9 +425,8 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			}
 			//隐藏下拉
 			$target.addClass("selected").siblings().removeClass("selected");
-
 		}
-
+		window.Global.DemoEnv("modelTab"); //add by wuweiwei
 	},
 
 	//切换

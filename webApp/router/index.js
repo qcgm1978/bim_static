@@ -49,6 +49,7 @@ var AppRoute = Backbone.Router.extend({
 		_.require('/static/dist/bodyContent/bodyContent.js');
 		App.BodyContent.control.init();
 		$("#pageLoading").hide();
+		window.Global.DemoEnv();
 	},
 
 
@@ -115,7 +116,7 @@ var AppRoute = Backbone.Router.extend({
 		_.require('/static/dist/projects/projects.css');
 		_.require('/static/dist/projects/projects.js');
 		App.Projects.init();
-
+		window.Global.DemoEnv();
 	},
 
 	//单个项目
@@ -135,6 +136,7 @@ var AppRoute = Backbone.Router.extend({
 
 		App.Project.Settings.versionId = versionId;
 		App.Project.init();
+		window.Global.DemoEnv("projectDocBtn");
 	},
 
 	//直接转到视点
@@ -184,7 +186,7 @@ var AppRoute = Backbone.Router.extend({
 		App.Resources.init();
 		$("#pageLoading").hide();
 		//$("#contains").html("resources");
-
+		window.Global.DemoEnv();
 	},
 
 	//单个项目
@@ -197,6 +199,7 @@ var AppRoute = Backbone.Router.extend({
 		_.require('/static/dist/resources/resources.js');
 		App.ResourcesNav.Settings.type = type;
 		App.ResourcesNav.init();
+		window.Global.DemoEnv();
 	},
 
 	//项目映射
@@ -213,6 +216,7 @@ var AppRoute = Backbone.Router.extend({
 		new App.ResourcesNav.App().render();
 		App.ResourceArtifacts.resetPreRule();
 		$("#pageLoading").hide();
+		window.Global.DemoEnv();
 	},
 
 	resourceModel: function(type, projectId, versionId) {
@@ -227,6 +231,7 @@ var AppRoute = Backbone.Router.extend({
 		App.ResourceModel.Settings.projectId = projectId;
 		App.ResourceModel.Settings.versionId = versionId;
 		App.ResourceModel.init();
+		window.Global.DemoEnv();
 	},
 
 
@@ -291,6 +296,7 @@ var AppRoute = Backbone.Router.extend({
 		}else{
 			App.Services.init(type, tab);
 		}
+		window.Global.DemoEnv();
 	},
 
 	initAuth:function(user){
@@ -427,9 +433,72 @@ var AppRoute = Backbone.Router.extend({
 		})
 		this.initAuth(App.Global.User);
 	}
+
 });
 
+window.Global = {
+	DemoEnv : function(type){
+	/*
+	演示环境
+	write by wuweiwei
+	*/
+		/*
+		type = "hideMenu"
+		type = "projectDocBtn"
+		type = "designLink"
+		被调用:
+		E:\JavaProject\bim_static\webApp\projects\collections\Project.es6 - loaddata()
+		bodyContent:function(){}
+		*/
+		var $popMenu , popMenuLen , $a;
+		if(App.Comm.getCookie("isDemoEnv")!="yes")
+		{
+			return;
+		}
 
+		$("#topBar .navHeader .flow").hide();
+		$popMenu = $(".onlineNav ul li");
+		$popMenu.each(function(index){
+			if(index!=0)
+			{
+				this.style.display = "none";
+			}
+		});
+		/*隐藏头像登录等信息*/
+		var $topBar = $("#topBar");
+		$topBar.find("img").css("display","none");
+		var $userinfo = $(".userinfo");
+		$userinfo.find("img").css("display","none");
+		$userinfo.find(".info").css("width","200px");
+		$("#uiPosition").html("");
+		$("#uiPartment").html("演示用户组");
+		
+		if(type=="projectDocBtn")
+		{
+			$("#contains .opBox span").each(function(){
+				$(this).addClass("disable");
+			});
+
+		}
+		if(type=="modelTab")
+		{
+			$("#contains ul.projectTab li").each(function(){
+				if($(this).data("type")!="design")
+				{
+					$(this).css("display","none");
+				}
+			});
+		}
+
+		if(type=="designLink")
+		{
+			$a = $("#contains .rightProperty .designProperties .attrClassBox a");
+			$a.each(function(index){
+				$(this).removeAttr("href");
+			});
+		}
+	}
+};
 
 App.Router = new AppRoute();
 

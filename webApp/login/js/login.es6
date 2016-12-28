@@ -139,10 +139,10 @@ var Login = {
 					for (var p in data.data) {
 						Login.setCookie(p, data.data[p]);
 					}
+					Login.isDemoUser(data); //判断是否演示用户
 				}
 				//获取用户信息
 				Login.getUserInfo();
-
 			} else {
 
 				//登录失败
@@ -151,8 +151,17 @@ var Login = {
 
 			}
 		})
+	},
 
-
+	//判断是否演示用户(即demo用户)
+	isDemoUser : function(data){
+		for (var p in data.data) {
+			if(data.data[p]==1 || data.data[p]=="1")
+			{
+				Login.setCookie("isDemoEnv","yes");
+				return;
+			}
+		}
 	},
 
 	//发布ie的消息
