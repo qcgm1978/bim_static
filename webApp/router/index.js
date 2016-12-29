@@ -40,6 +40,12 @@ var AppRoute = Backbone.Router.extend({
 	//首页主体展示
 
 	bodyContent: function() {
+		if(App.Comm.getCookie("isDemoEnv")=="yes")
+		{
+			window.Global.DemoEnv();
+			return;
+		}
+		
 		if (this.reset() == false) {
 			return;
 		}
@@ -49,7 +55,6 @@ var AppRoute = Backbone.Router.extend({
 		_.require('/static/dist/bodyContent/bodyContent.js');
 		App.BodyContent.control.init();
 		$("#pageLoading").hide();
-		window.Global.DemoEnv();
 	},
 
 
