@@ -455,8 +455,15 @@ window.Global = {
 		{
 			return;
 		}
+		if(window.location.href.indexOf("/projects")==-1)
+		{
+			window.location.href = "#/projects";
+		}
 
 		$("#topBar .navHeader .flow").hide();
+		$("#topBar .navHeader .bodyConMenu").hide();
+		$("#topBar .navHeader .resources").hide();
+		$("#topBar .navHeader .services").hide();
 		$popMenu = $(".onlineNav ul li");
 		$popMenu.each(function(index){
 			if(index!=0)
