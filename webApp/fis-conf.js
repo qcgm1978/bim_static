@@ -320,6 +320,11 @@ fis.match('/static/dist/login/login.css', {
   release: '/static/dist/login/login.css'
 });
 
+fis.match('/libs/jquery/jquery-1.12.0.min.js', {
+  //useHash:true,
+  packTo: '/static/dist/login/jquery-1.12.0.min.js'
+});
+
 
 // 代办
 fis.match('/todo/**.{js,es6}', {
