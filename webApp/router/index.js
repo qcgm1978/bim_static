@@ -94,6 +94,7 @@ var AppRoute = Backbone.Router.extend({
 		_.require('/static/dist/imbox/imbox.css');
 		_.require('/static/dist/imbox/imbox.js');
 		App.INBox.init();
+		window.Global.DemoEnv();
 	},
 
 	suggest:function(){
