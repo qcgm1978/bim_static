@@ -702,7 +702,8 @@
   bimView.model.BIM.prototype = {
     init: function(options) {
       var _opt = options;
-      var viewer = new CloudViewer();
+      //var viewer = new CloudViewer();
+      var viewer = new CLOUD.Viewer();
       var viewBox = $('<div class="view"></div>');
       _opt._dom.bimBox.append(viewBox);
       viewer.init(viewBox[0]);
