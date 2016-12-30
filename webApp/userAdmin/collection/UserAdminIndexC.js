@@ -4,6 +4,36 @@ App.userAdmin = {
 		var UserAdminIndexV = new App.userAdmin.UserAdminIndexV(); //渲染框架
 		UserAdminIndexV.render();
 	},
+	getViewUserPrefixC:new(Backbone.Collection.extend({//获取配置前缀的方法的collection方法
+		model: Backbone.Model.extend({
+			defaults: function() {
+				return {
+					title: ''
+				}
+			}
+		}),
+		urlType: "getViewUserPrefix",
+		parse: function(response) {
+			if (response.message == "success") {
+				return response.data;
+			}
+		}
+	})),
+	updateViewUserPrefixC:new(Backbone.Collection.extend({//更新配置前缀的collection方法
+		model: Backbone.Model.extend({
+			defaults: function() {
+				return {
+					title: ''
+				}
+			}
+		}),
+		urlType: "getViewUserPrefix",
+		parse: function(response) {
+			if (response.message == "success") {
+				return response.data;
+			}
+		}
+	})),
 	checkUserC:new(Backbone.Collection.extend({//检查账号名是否存在的collection方法
 		model: Backbone.Model.extend({
 			defaults: function() {

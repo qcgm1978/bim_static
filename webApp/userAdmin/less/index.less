@@ -68,7 +68,7 @@
     		    	top: 2px;
     		    }
     		}
-    		.nullViewUserList,.nullViewUserSetList{
+    		.nullViewUserList{
 				position: fixed;
 				width: 280px;
 				height: 30px;
@@ -130,44 +130,41 @@
 			}
 		}
 		.viewUserSet{
+			width: 100%;
+			height: 100%;
 			.viewUserSetBox{
 				width: 100%;
 				height: 100%;
-				position: relative;
-				z-index: 8;
-				margin-top: -38px;
-	    		padding-top: 54px;
-	    		table{
-	    			width: 100%;
-	    			border: #aaa solid 1px;
-	    			thead{
-	    				background-color: #ccc;
-	    				tr td{
-	    					border-right: #aaa solid 1px;
-	    					font-size: 16px;
-	    				}
-	    			}
-	    			tbody tr td{
-	    				font-size: 14px;
-	    			}
-	    		}
-	    		table tr td{
-	    			height: 48px;
-	    			line-height: 48px;
-	    			color: #333;
-	    			text-align: left;
-	    			border-bottom: #aaa solid 1px;
-	    			border-right: #aaa solid 1px;
-	    			padding-left: 16px;
-	    			a.viewUserSetDelete{
-	    				border: 0;
-	    				display: inline;
-	    				&:hover{
-	    					color: #408cdf;
-	    					text-decoration: underline;
-	    				}
-	    			}
-	    		}
+				.userAdminPrefixBox{
+					width: 100%;
+					height: 100%;
+					h2{
+						font-size: 16px;
+						color: #333;
+						line-height: 25px;
+						height: 25px;
+					}
+					.userAdminPrefixInputBox{
+						width: 100%;
+						margin: 24px 0;
+						&>label{
+							float: left;
+							height: 23px;
+							line-height: 23px;
+							width: 50px;
+							text-align: right;
+							padding-right: 16px;
+						}
+						&>input{
+							float: left;
+							width: 100px;
+							height:25px;
+							line-height: 25px;
+							padding: 0 8px;
+							margin-right: 16px;
+						}
+					}
+				}
 			}
 		}
 	}

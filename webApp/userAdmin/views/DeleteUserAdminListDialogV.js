@@ -25,7 +25,7 @@ App.userAdmin.DeleteUserAdminListDialogV = Backbone.View.extend({
 		App.Comm.ajax(data,function(result){
 			if(result.data == "ok"){
 				var UserAdminIndexV = new App.userAdmin.UserAdminIndexV;
-		       		UserAdminIndexV.getViewUserListFun();
+		       		UserAdminIndexV.renderUserAdminListDom();
 				App.userAdmin.UserAdminListV.Dialog.close();
 			}
 		})
