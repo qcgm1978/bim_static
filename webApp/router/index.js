@@ -461,7 +461,7 @@ window.Global = {
 		{
 			return;
 		}
-		if(window.location.href.indexOf("projects")==-1 || window.location.href.indexOf("inbox")==-1)
+		if(window.location.href.indexOf("projects")==-1 && window.location.href.indexOf("inbox")==-1)
 		{
 			window.location.href = "#projects";
 		}
