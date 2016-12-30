@@ -1,15 +1,15 @@
 <div class="addViewUserBox">
 	<div class="addViewUserInput">
+		<label>登录账号</label>
+		<div class="inputBox">
+			<input readOnly type="text" id="accrentName" value="<%= obj.state.loginid %>"/>
+		</div>
+	</div>
+	<div class="addViewUserInput">
 		<label>用户名称</label>
 		<div class="inputBox">
 			<input type="text" id="userName" value="<%= obj.state.username %>" placeholder="请输入用户名称" />
 			<div class="errorBox"></div>
-		</div>
-	</div>
-	<div class="addViewUserInput">
-		<label>账号名称</label>
-		<div class="inputBox">
-			<input readOnly type="text" id="accrentName" value="<%= obj.state.loginid %>"/>
 		</div>
 	</div>
 	<div class="addViewUserInput">

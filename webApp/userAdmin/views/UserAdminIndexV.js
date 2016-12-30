@@ -1,55 +1,37 @@
 App.userAdmin.UserAdminIndexV = Backbone.View.extend({
-	default:{
-		state:{
-			selectedIndex:"userList",
-			showIndex:"userList",
-			userListData:[],
-			userSetData:[{
-				name:"ys"
-			}],
-		},
-		pageIndex:1
-	},
 	el:$("#contains"),
 	template:_.templateUrl("/userAdmin/tpls/index.html"),
 	events: {
- 		"click .viewUserTopTab li": "switchTab",
+ 		"click #viewUlTab li": "switchTab",
  		"click #addViewUserBtn": "addViewUserFun",
  	},
 	render:function(){
-		this.$el.html(this.template({state:this.default.state}));
-		this.getViewUserListFun();//第一次进入 获取用户列表的方法
+		this.$el.html(this.template());
+		$("#viewUlTab").find("li").eq(0).addClass("selected");
+		$("#viewShowBox > div").eq(0).css("display","block");
+		this.renderUserAdminListDom();//显示用户列表
 		return this;
-	},
-	getViewUserListFun:function(){//获取浏览用户列表的方法
-		var _this = this;
-	    var _data = {
-	    	pageIndex:this.default.pageIndex,
-	    	pageItemCount:App.Comm.Settings.pageItemCount
-	    }
-	    this.$el.find(".viewUserListBox").html('<div class="demoLoading">正在加载...</div>');
-	    App.userAdmin.getViewUserListC.fetch({
-			data: _data,
-			success: function(collection, response, options) {
-				if(response.code == 0){
-					_this.default.state.userListData = response.data.items;
-					_this.renderDom();
-				}
-			}
-		})
 	},
 	switchTab:function(event){
 		var target = $(event.target);
 		if(!target.hasClass('selected')){
-			this.default.state.selectedIndex = target.data('type');
-			this.default.state.showIndex = target.data('type');
-			this.renderDom();
+			target.siblings().removeClass('selected').end().addClass('selected');
+			if(target.data('type') == "userList"){
+				this.renderUserAdminListDom();//显示用户列表
+			}else if(target.data('type') == "userSet"){
+				this.renderAddPrefixDom();//配置前缀
+			}
 		}
 	},
-	renderDom:function(){//渲染页面的方法
+	renderAddPrefixDom:function(){//tab切换效果
+		$("#viewShowBox").find("div.viewUserSet").siblings().css("display","none").end().css("display","block");
+		var UserAdminSetPrefixV = new App.userAdmin.UserAdminSetPrefixV;
+		this.$el.find(".viewUserSetBox").html(UserAdminSetPrefixV.render().el);
+	},
+	renderUserAdminListDom:function(){//渲染页面的方法
+		$("#viewShowBox").find("div.viewUserList").siblings().css("display","none").end().css("display","block");
 		var UserAdminListV = new App.userAdmin.UserAdminListV;
-		this.$el.find(".viewUserListBox").html('');
-		this.$el.find(".viewUserListBox").append(UserAdminListV.render(this.default.state.userListData).el);
+		this.$el.find(".viewUserListBox").html(UserAdminListV.render().el);
 	},
 	addViewUserFun:function(evt){//添加用户列表的方法
 		var addDialogEle = new App.userAdmin.AddUserAdminDialogV;

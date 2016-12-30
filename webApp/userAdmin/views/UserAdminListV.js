@@ -1,12 +1,31 @@
 App.userAdmin.UserAdminListV = Backbone.View.extend({
+	default:{
+		pageIndex:1
+	},
 	template:_.templateUrl("/userAdmin/tpls/userAdminListV.html"),
 	events: {
  		"click .viewUserEdite": "editViewUserFun",
  		"click .viewUserDelete": "deleteViewUserFun",
  	},
-	render:function(model){
-		this.$el.html(this.template({state:model}));
+	render:function(){
+		this.getViewUserListFun();//第一次进入 获取用户列表的方法
 		return this;
+	},
+	getViewUserListFun:function(){//获取浏览用户列表的方法
+		var _this = this;
+	    var _data = {
+	    	pageIndex:this.default.pageIndex,
+	    	pageItemCount:App.Comm.Settings.pageItemCount
+	    }
+	    App.userAdmin.getViewUserListC.fetch({
+			data: _data,
+			success: function(collection, response, options) {
+				if(response.code == 0){
+					_this.$el.html("");
+					_this.$el.html(_this.template({state:response.data.items}));
+				}
+			}
+		})
 	},
 	editViewUserFun:function(evt){//编辑用户列表
 		var target = $(evt.target);

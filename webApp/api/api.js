@@ -335,6 +335,7 @@ App.API = {
 		updateViewUser:"platform/testuser",//删除用户
 		getProjectsList:"platform/testuser/allProject",//获取全部项目的列表
 		getViewUserInfo:"platform/testuser/loginId",//获取全部项目的列表
+		getViewUserPrefix:"platform/testuser/prefix",//获取获取用户前缀的方法
 	},
 
 	DEBUGURL: {
