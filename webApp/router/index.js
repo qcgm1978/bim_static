@@ -24,16 +24,16 @@ var AppRoute = Backbone.Router.extend({
 		'logout': 'logout',
 		"post/detail/:id": 'postDetail',
 		'suggest':'suggest',
-		'addViewUser':'addViewUser',
+		'userAdmin':'userAdmin',
 	},
 	//start 添加浏览用户的路由方法
-	addViewUser:function(){
+	userAdmin:function(){
 		if (this.reset() == false) {
 			return;
 		}
-		_.require('/static/dist/addViewUser/viewUser.css');
-		_.require('/static/dist/addViewUser/viewUser.js');
-		App.AddViewUser.init();
+		_.require('/static/dist/userAdmin/viewUser.css');
+		_.require('/static/dist/userAdmin/viewUser.js');
+		App.UserAdminC.init();
 		$("#pageLoading").hide();
 	},
 	//end 添加浏览用户的路由方法

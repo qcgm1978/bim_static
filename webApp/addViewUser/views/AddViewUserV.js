@@ -55,7 +55,7 @@ App.AddViewUser.AddViewUserV = Backbone.View.extend({
 		}
 	},
 	addViewUserFun:function(evt){//添加用户列表的方法
-		var dialogEle = new App.AddViewUser.AddViewUserDialogV;
+		var dialogEle = new App.AddViewUser.AddViewUserListDialogV;
 		dialogEle = dialogEle.render().el;
 		//初始化窗口
 		App.AddViewUser.AddViewUserV.closeDialog = new App.Comm.modules.Dialog({

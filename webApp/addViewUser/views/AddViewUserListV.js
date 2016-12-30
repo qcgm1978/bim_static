@@ -10,27 +10,20 @@ App.AddViewUser.AddViewUserListV = Backbone.View.extend({
 	},
 	editViewUserFun:function(evt){//编辑用户列表
 		var target = $(evt.target);
-		var dialogEle = new App.AddViewUser.AddViewUserDialogV;
+		var dialogEle = new App.AddViewUser.EditViewUserListDialogV;
 		var editId = target.data("loginid");
-	    var _data = {
-	    	loginId:editId,
-	    }
-	    App.AddViewUser.getViewUserInfoC.fetch({
-			data: _data,
-			success: function(collection, response, options) {
-				dialogEle = dialogEle.render(response.data).el;
-				//初始化窗口
-				App.AddViewUser.AddViewUserV.closeDialog = new App.Comm.modules.Dialog({
-				    title:"编辑用户",
-				    width:400,
-				    height:300,
-				    isConfirm:false,
-				    isAlert:false,
-				    closeCallback:function(){},
-				    message:dialogEle
-				});
-			}
-		})
+		dialogEle = dialogEle.render(editId).el;
+		//初始化窗口
+		App.AddViewUser.AddViewUserListDialogV.Dialog = new App.Comm.modules.Dialog({
+		    title:"编辑用户",
+		    width:400,
+		    height:300,
+		    isConfirm:false,
+		    isAlert:false,
+		    closeCallback:function(){},
+		    message:dialogEle
+		});
+	    
 	},
 	deleteViewUserFun:function(evt){//删除浏览用户的列表的方法
 		var _this =  this;
