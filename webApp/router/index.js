@@ -31,9 +31,9 @@ var AppRoute = Backbone.Router.extend({
 		if (this.reset() == false) {
 			return;
 		}
-		_.require('/static/dist/userAdmin/viewUser.css');
-		_.require('/static/dist/userAdmin/viewUser.js');
-		App.UserAdminC.init();
+		_.require('/static/dist/userAdmin/userAdmin.css');
+		_.require('/static/dist/userAdmin/userAdmin.js');
+		App.userAdmin.init();
 		$("#pageLoading").hide();
 	},
 	//end 添加浏览用户的路由方法

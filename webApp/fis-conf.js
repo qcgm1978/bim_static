@@ -96,8 +96,8 @@ fis.match('/static/dist/services/services.css', {
   useHash: true,
   release: '/static/dist/services/services.css'
 });
-//addViewUser用户管理页面
-fis.match('addViewUser/tpls/**.html', {
+//userAdmin用户管理页面
+fis.match('userAdmin/tpls/**.html', {
   release: "/static/dist/tpls/$0"
 });
 //首页主体
@@ -262,19 +262,19 @@ fis.match('/static/dist/commH5/commH5.js', {
   release: '/static/dist/commH5/commH5.js'
 });
 //添加用户管理页面
-fis.match('/addViewUser/**.{js,es6}', {
-  packTo: '/static/dist/addViewUser/viewUser.js'
+fis.match('/userAdmin/**.{js,es6}', {
+  packTo: '/static/dist/userAdmin/userAdmin.js'
 });
-fis.match('/static/dist/addViewUser/viewUser.js', {
+fis.match('/static/dist/userAdmin/userAdmin.js', {
   useHash:true,
-  release: '/static/dist/addViewUser/viewUser.js'
+  release: '/static/dist/userAdmin/userAdmin.js'
 });
-fis.match('/addViewUser/**.{css,less}', {
-  packTo: '/static/dist/addViewUser/viewUser.css'
+fis.match('/userAdmin/**.{css,less}', {
+  packTo: '/static/dist/userAdmin/userAdmin.css'
 });
-fis.match('/static/dist/addViewUser/viewUser.css', {
+fis.match('/static/dist/userAdmin/userAdmin.css', {
   useHash:true,
-  release: '/static/dist/addViewUser/viewUser.css'
+  release: '/static/dist/userAdmin/userAdmin.css'
 });
 //bodyContent
 fis.match('/bodyContent/**.{less,css}', {
