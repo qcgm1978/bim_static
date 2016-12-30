@@ -116,8 +116,8 @@ App.userAdmin.EditUserAdminListDialogV = Backbone.View.extend({
 		    data:JSON.stringify(_data),
 		    success:function(response){
 		       if(response.data == "ok"){
-		       		var UserAdminListV = new App.userAdmin.UserAdminListV;
-			       		UserAdminListV.getViewUserListFun();
+		       		var UserAdminIndexV = new App.userAdmin.UserAdminIndexV;
+		       		UserAdminIndexV.renderUserAdminListDom();
 					App.userAdmin.UserAdminListV.EditDialog.close();
 	       		}
 		    }

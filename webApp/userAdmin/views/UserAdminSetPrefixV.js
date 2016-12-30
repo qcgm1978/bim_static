@@ -39,8 +39,9 @@ App.userAdmin.UserAdminSetPrefixV = Backbone.View.extend({
 		    contentType:"application/json",
 		    data:JSON.stringify(data),
 		    success:function(response){
-		       if(response.data == "ok"){
-		       		_this.$el.html(_this.template({state:response.data}));
+		       if(response.code == 0){
+	       			var UserAdminIndexV = new App.userAdmin.UserAdminIndexV;
+       	       		UserAdminIndexV.renderAddPrefixDom();
 	       		}
 		    }
 		});

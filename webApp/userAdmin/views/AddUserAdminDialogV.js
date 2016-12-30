@@ -133,9 +133,8 @@ App.userAdmin.AddUserAdminDialogV = Backbone.View.extend({
 		var saveViewUser = new saveViewUserDataModel;
 		saveViewUser.save().success(function(response){
 			if(response.data == "ok"){
-				var UserAdminListV = new App.userAdmin.UserAdminListV;
-					
-		       		UserAdminListV.getViewUserListFun();
+				var UserAdminIndexV = new App.userAdmin.UserAdminIndexV;
+		       		UserAdminIndexV.renderUserAdminListDom();
 				App.userAdmin.UserAdminIndexV.AddDialog.close();
 			}
 	    })  
