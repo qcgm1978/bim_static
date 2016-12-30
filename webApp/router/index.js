@@ -460,9 +460,9 @@ window.Global = {
 		{
 			return;
 		}
-		if(window.location.href.indexOf("/projects")==-1)
+		if(window.location.href.indexOf("projects")==-1)
 		{
-			window.location.href = "#/projects";
+			window.location.href = "#projects";
 		}
 
 		$("#topBar .navHeader .flow").hide();

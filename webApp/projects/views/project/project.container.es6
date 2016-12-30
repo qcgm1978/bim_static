@@ -406,7 +406,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 				//上传
 				App.Project.upload = App.modules.docUpload.init($(document.body));
 			} else {
-				$(".fileContainer .btnFileUpload").hide();
+				//$(".fileContainer .btnFileUpload").hide(); note by wuweiwei
 			}
 			//隐藏下拉
 			$target.addClass("selected").siblings().removeClass("selected");
