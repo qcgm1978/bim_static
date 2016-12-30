@@ -1,0 +1,55 @@
+<div class="addViewUserContent">
+	<div class="viewUserTopTab">
+		<ul id="viewUlTab">
+			<% if(obj.state.selectedIndex == 'userList'){ %>
+				<li data-type="userList" class="selected">用户列表</li>
+				<li data-type="userSet">用户配置</li>
+			<% }else{ %>
+				<li data-type="userList">用户列表</li>
+				<li data-type="userSet" class="selected">用户配置</li>
+			<% } %>
+		</ul>
+	</div>
+	<div class="viewUserContent" id="viewShowBox">
+		<% if(obj.state.showIndex == 'userList'){ %>
+			<div data-type="userList" class="viewUserList" style="display: block;">
+				<a id="addViewUserBtn">
+					<i style="background:url('/static/dist/images/services/images/service_ico.png')no-repeat 0 -220px"></i>添加成员
+				</a>
+				<div class="viewUserListBox">
+					
+				</div>
+			</div>
+		<% }else{ %>
+			<div data-type="userSet" class="viewUserSet" style="display: block;">
+				<a id="addViewUserBtn">
+					<i style="background:url('/static/dist/images/services/images/service_ico.png')no-repeat 0 -220px"></i>添加前缀
+				</a>
+				<div class="viewUserSetBox">
+					<% if(obj.state.userSetData.length>0) {%>
+						<table>
+							<thead>
+								<tr>
+									<td>用户前缀</td>
+									<td>前缀操作</td>
+								</tr>
+							</thead>
+							<tbody>
+								<% _.each(obj.state.userSetData,function(item){%>
+									<tr>
+										<td>eg:<%= item.name %></td>
+										<td>
+											<a href="javascript:;" class="viewUserSetDelete">删除</a>
+										</td>
+									</tr>
+								<% }) %>
+							</tbody>
+						</table>
+					<% }else{ %>
+						<div class="nullViewUserSetList">还没有添加前缀，请点击按钮添加</div>
+					<% } %>
+				</div>
+			</div>
+		<% } %>
+	</div>
+</div>

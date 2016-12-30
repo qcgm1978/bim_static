@@ -1,0 +1,32 @@
+<div class="addViewUserBox">
+	<div class="addViewUserInput">
+		<label>用户名称</label>
+		<div class="inputBox">
+			<input type="text" id="userName" value="<%= obj.state.username %>" placeholder="请输入用户名称" />
+			<div class="errorBox"></div>
+		</div>
+	</div>
+	<div class="addViewUserInput">
+		<label>账号名称</label>
+		<div class="inputBox">
+			<input readOnly type="text" id="accrentName" value="<%= obj.state.loginid %>"/>
+		</div>
+	</div>
+	<div class="addViewUserInput">
+		<label>账号密码</label>
+		<div class="inputBox">
+			<input type="text" id="accrentPassWord" value="<%= obj.state.pwd %>" placeholder="请输入账号密码" />
+			<div class="errorBox"></div>
+		</div>
+	</div>
+	<div class="addViewUserInput">
+		<label>项目名称</label>
+		<div class="inputBox dialogProjectList">
+			
+		</div>
+	</div>
+	<div class="addViewUserInput">
+		<label></label>
+		<button class="button">确定</button>
+	</div>
+</div>

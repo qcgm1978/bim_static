@@ -33,7 +33,7 @@ var AppRoute = Backbone.Router.extend({
 		}
 		_.require('/static/dist/userAdmin/userAdmin.css');
 		_.require('/static/dist/userAdmin/userAdmin.js');
-		App.userAdmin.userAdminIndexC.init();
+		App.userAdmin.init();
 		$("#pageLoading").hide();
 	},
 	//end 添加浏览用户的路由方法
