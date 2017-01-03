@@ -226,7 +226,8 @@
 		},
 		URL: {
 			fetchQualityOpeningAcceptance: "sixD/{projectId}/{projectVersionId}/acceptance",
-			fetchQualityModelById: "sixD/{projectId}/{versionId}/quality/element"
+			fetchQualityModelById: "sixD/{projectId}/{versionId}/quality/element",
+			modelFilterRule:'sixD/checkPointRule/{projectId}/{projectVersionId}/checkPointRule'
 		}
 	};
 
@@ -719,6 +720,21 @@
 
 		},
 		filter: function ($target, componentId, location,cat, type) {
+			var _commProject=CommProject.init({
+				data:Project.currentPageListData,
+				viewer:Project.Viewer,
+				sourceId: Project.Settings.sourceId,
+				etag: Project.Settings.etag,
+				projectId: Project.Settings.projectId,
+				projectVersionId: Project.Settings.projectVersionId,
+				//markerClick:abcd
+			});
+			_commProject.showInModel($target,type,{
+				uuid:componentId,
+				location:location,
+				selected:true
+			});
+			return
 			var _this = ModelFilter;
 			var _View = Project.Viewer;
 			var _temp = location,
@@ -726,18 +742,18 @@
 				key = "",
 				color=$target.data('color'),
 				_secenId = componentId.split('.')[0], //用于过滤文件ID
-				box = _this.formatBBox(_temp.boundingBox),
-				marginRule = _this.marginRule[cat] || {},
+				box = _commProject.formatBBox(_temp.boundingBox),
+				marginRule = _commProject.marginRule[cat] || {},
 				_files = _View.FloorFilesData,
 				ids = [componentId];
 			if (type == 3) { //隐患
-				_loc = _this.formatMark(location, 'S021'.charAt(color), $target.data('id'), 1);
+				_loc = _commProject.formatMark(location, 'S021'.charAt(color), $target.data('id'), 1);
 			} else {
-				_loc = _this.formatMark(location, '543'.charAt(color), $target.data('id'));
+				_loc = _commProject.formatMark(location, '543'.charAt(color), $target.data('id'));
 			}
-			_this.recoverySilder();
-			_this.zoomModel(ids, box, marginRule.margin, marginRule.ratio);
-			_this.showMarks(_loc);
+			_commProject.recoverySilder();
+			_commProject.zoomModel(ids, box, marginRule.margin, marginRule.ratio);
+			_commProject.showMarks(_loc);
 
 			//过滤所属楼层 start
 			var _floors = _View.FloorsData;
@@ -751,7 +767,7 @@
 
 			//没有分类的时候 只过滤单文件 start
 			if (!cat) {
-				_this.linkSilder('floors', key);
+				_commProject.linkSilder('floors', key);
 				var _hideFileIds = _.filter(_files, function (i) {
 					return i != _secenId;
 				});
@@ -763,27 +779,14 @@
 			}
 			//没有分类的时候 只过滤单文件 end
 			if (_this.filterRule.single.indexOf(cat) != -1) {
-				_this.sigleRule(cat,key);
+				_commProject.filter({
+					cat:cat,
+					floors:key
+				},function(){});
+			//	_this.sigleRule(cat,key);
 			}else{
-				_this.linkSilder('floors',key);
+				_commProject.linkSilder('floors',key);
 			}
-
-			/*//已有分类、过滤规则
-			if (_this.filterRule.file.indexOf(cat) != -1) {
-				var _hideFileIds = _.filter(_files, function (i) {
-					return i != _secenId;
-				});
-				_View.fileFilter({
-					ids: _hideFileIds,
-					total: [_secenId]
-				});
-			} else if (_this.filterRule.floor.indexOf(cat) != -1) {
-				_this.linkSilder('floors', key);
-			} else if (_this.filterRule.single.indexOf(cat) != -1) {
-				_this.sigleRule(cat, key);
-			} else {
-				_this.linkSilder('floors', key);
-			}*/
 		}
 
 	}
@@ -937,7 +940,7 @@
 				InspectModelSelection.isLoad = true;
 			}
 			if (self.Settings.type == "process") {
-				win.App.API.URL.fetchQualityOpeningAcceptance = "sixD/{projectId}/{projectVersionId}/acceptance?type=1";
+				win.App.API.URL.fetchQualityOpeningAcceptance = "sixD/{projectId}/{projectVersionId}/acceptance?type=1&token=123";
 			}
 			if (self.isIE()) {
 				$.getScript(commjs, function() {
@@ -958,11 +961,12 @@
 				$.getScript(commjs, function() {
 					self.dialog();
 					self.controll();
-					/*隐藏检查点页签*/
+					/*/!*隐藏检查点页签*!/
 					if(!self.withCheckpoint)
 					{
 						self.hideCheckpoint();
-					}
+					}*/
+					self.showCheckpoint();
 				})
 			});
 		},
@@ -1628,7 +1632,7 @@
 				})
 				if (_temp) {
 					_temp = JSON.parse(_temp);
-					ModelFilter.filter($target, _temp.componentId, location, $target.data('cat'), 2)
+					ModelFilter.filter($target, _temp.componentId, _temp, $target.data('cat'), 2)
 					//ModelFilter.recoverySilder();
 					var box = _this.formatBBox(_temp.bBox || _temp.boundingBox);
 					 var ids = [_temp.componentId];
@@ -1701,7 +1705,18 @@
 				Project.Viewer.setTopView(boxs, true);
 				ModelFilter.recoverySilder();
 				if(Project.currentSearchCat){
-					ModelFilter.sigleRule(Project.currentSearchCat,Project.currentSearchFloor);
+					//ModelFilter.sigleRule(Project.currentSearchCat,Project.currentSearchFloor);
+					CommProject.init({
+						data:Project.currentPageListData,
+						viewer:Project.Viewer,
+						sourceId: Project.Settings.sourceId,
+						etag: Project.Settings.etag,
+						projectId: Project.Settings.projectId,
+						projectVersionId: Project.Settings.projectVersionId
+					}).filter({
+						cat:Project.currentSearchCat,
+						floors:Project.currentSearchFloor
+					});
 				}
 			} else {
 				Project.hideMarks();
