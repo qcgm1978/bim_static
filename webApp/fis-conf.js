@@ -185,6 +185,9 @@ fis.match('/static/dist/libs/commLib.js', {
   useHash:true,
   release: '/static/dist/libs/commLib.js'
 });
+fis.match('/static/dist/libs/commLib.js', {
+  release: '/static/dist/libs/commLib.js'
+});
 
 fis.match('/libs/**.css', {
   packTo: '/static/dist/libs/commLibCss.css'
