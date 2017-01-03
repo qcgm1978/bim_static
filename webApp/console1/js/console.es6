@@ -1345,13 +1345,14 @@ App.Console = {
     $('textarea').hide();
 
     $.ajax({
-      url: "/platform/project/cost/mapping"
+      // url: "/platform/project/cost/mapping",
+      url: "/platform/project/list/all/cost"
     }).done(function(data){
       var str = '', datas = data.data;
 
       $.each(datas, function(index, data){
         //console.log(data);
-        str += "<option id=" + data.id + " value=" + data.projectCode + ">" + data.projectName + "</option>";
+        str += "<option designFlowCode=" + data.projectCode + " projectId=" + data.projectId + " id=" + data.id + " value=" + data.projectCode + ">" + data.projectName + "</option>";
       });
       $('#s11,#s21').append(str);
 
@@ -1362,7 +1363,6 @@ App.Console = {
     $("#submit1").click(function(){
       var div = $('#form1 div'),arr = [];
       div.each(function(index,item){
-        console.log(item,index)
         arr.push({
           "type": 1,
           "description":$(item).find('span').text(),
@@ -1371,25 +1371,19 @@ App.Console = {
       })
 
       var data  = {
-        //projectCode       : $('#s11').val().trim(),
         workflowCode: parseInt(9999999 * Math.random()),
         costAttachments : arr,
         projectCode:$('#s11').val().trim(),
+        designFlowCode:$('#s11 option:selected').attr('designFlowCode').trim(),
+        projectId:$('#s11 option:selected').attr('projectId').trim(),
         title:$('#p11').val().trim()
-        //type:$('#s12').val().trim(),
-
       };
-      console.log(data)
-
       App.Console.apply(1,1001, data,2);
-
-
     });
 
     $("#submit2").click(function(){
       var div = $('#form2 div'),arr = [];
       div.each(function(index,item){
-        console.log(item,index)
         arr.push({
           "type": 1,
           "description":$(item).find('span').text(),
@@ -1397,13 +1391,13 @@ App.Console = {
         })
       })
       var data  = {
-        //projectCode       : $('#s11').val().trim(),
         workflowCode: parseInt(9999999 * Math.random()),
         title:$('#p21').val().trim(),
         costAttachments : arr,
         projectCode:$('#s21').val().trim(),
+        designFlowCode:$('#s21 option:selected').attr('designFlowCode').trim(),
+        projectId:$('#s21 option:selected').attr('projectId').trim(),
         designFlowCode:parseInt(9999999 * Math.random())
-        //type:$('#s22').val().trim()
 
       };
       App.Console.apply(2,1003, data,2);
@@ -1416,57 +1410,40 @@ App.Console = {
     var choose = document.getElementById('choose');
     FileAPI.event.on(choose, 'change', function (evt){
       var files = FileAPI.getFiles(evt); // Retrieve file list
-      console.log(files)
-
-
-        if( files.length ){
-
-          console.log(files)
-          // Uploading Files
-          FileAPI.upload({
-            url: '/platform/mock/costfile?token=123',
-            files: { file: files },
-            progress: function (evt){ /* ... */ },
-            complete: function (err, xhr){
-              var data = JSON.parse(xhr.response);
-              console.log(data)
-              if(data.code==0){
-                $('#form1').append('<div data-path="'+data.data.filePath+'"><span>'+$('#description').val()+'</span><i>X</i></div>')
-              }else {
-                alert('上传失败')
-
-
-              }
+      if(files.length ){
+        // Uploading Files
+        FileAPI.upload({
+          url: '/platform/mock/costfile?token=123',
+          files: { file: files },
+          progress: function (evt){ /* ... */ },
+          filecomplete:function(err,xhr,file){
+            var data = JSON.parse(xhr.response);
+            if(data.code==0){
+              $('#form1').append('<div data-path="'+data.data.filePath+'"><span>'+file.name+'</span></div>')
+            }else {
+              alert('上传失败')
             }
-          });
-        }
-
+          }
+        });
+      }
     });
 
 
     var choose1 = document.getElementById('choose1');
     FileAPI.event.on(choose1, 'change', function (evt){
       var files = FileAPI.getFiles(evt); // Retrieve file list
-      console.log(files)
-
-
       if( files.length ){
-
-        console.log(files)
         // Uploading Files
         FileAPI.upload({
           url: '/platform/mock/costfile?token=123',
           files: { file: files },
           progress: function (evt){ /* ... */ },
-          complete: function (err, xhr){
+          filecomplete:function(err,xhr,file){
             var data = JSON.parse(xhr.response);
-            console.log(data)
             if(data.code==0){
-              $('#form2').append('<div data-path="'+data.data.filePath+'"><span>'+$('#description1').val()+'</span><i>X</i></div>')
+              $('#form2').append('<div data-path="'+data.data.filePath+'"><span>'+file.name+'</span></div>')
             }else {
               alert('上传失败')
-
-
             }
           }
         });
