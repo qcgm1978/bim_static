@@ -661,9 +661,14 @@ App.Console = {
         },
         type: "POST"
       }).done(function(data) {
-        if (data.message == "success") {
-          alert("成功");
-          //window.location.reload();
+        if (data.code == "1") {
+          if (data.message == "projectNo repeat!") {
+            alert("项目编号重复");
+          }
+        }else{
+          if (data.message == "success") {
+            alert("成功");
+          }
         }
       });
     });
