@@ -1,0 +1,60 @@
+<% console.log(obj) %><!-- <%= obj.statusName %> -->
+<h2><%= obj.statusName %></h2>
+<table>
+	<thead>
+		<tr>
+			<td>任务总数</td>
+			<td>任务下载个数</td>
+			<td>任务正在执行个数</td>
+			<td>任务失败个数</td>
+			<td>在执行队列中个数</td>
+			<td>任务准备个数</td>
+			<td>任务完成个数</td>
+			<td>任务上传个数</td>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td><%= obj.total %></td>
+			<td><%= obj.downloadCount %></td>
+			<td><%= obj.executeCount %></td>
+			<td><%= obj.failedCount %></td>
+			<td><%= obj.queueCount %></td>
+			<td><%= obj.readyCount %></td>
+			<td><%= obj.completeCount %></td>
+			<td><%= obj.uploadCount %></td>
+		</tr>
+	</tbody>
+</table>
+
+<% if(obj.statusCode == "fail"){ %>
+<% if(obj.failItem.length>0){ %>
+<div class="failItemBox">
+	<h2>错误文件列表：</h2>
+	<table>
+		<thead>
+			<tr>
+				<td>错误文件ID</td>
+				<td>错误文件名字</td>
+				<td>错误文件状态</td>
+				<td>错误文件类型</td>
+			</tr>
+		</thead>
+	</table>
+	<div class="fileStateFail">
+		<table>
+			<tbody>
+			<% _.each(obj.failItem,function(item){%>
+				<tr>
+					<td><%= item.source_id %></td>
+					<td><%= item.source_name %></td>
+					<td><%= item.status %></td>
+					<td><%= item.type %></td>
+				</tr>
+			<%})%>
+			</tbody>
+		</table>
+	</div>
+</div>
+<%}%>
+<%}%>

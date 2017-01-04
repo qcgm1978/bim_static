@@ -1,53 +1,147 @@
 
 <div class="consoleBox">
-  <div class="consoleHeader">
-    6.0 项目研发</div>
+  <div class="consoleHeader">6.1确定项目类型</div>
   <div class="consoleContainer">
     <form class="form-horizontal">
       <div class="form-group">
-        <label for="inputtext3" class="col-sm-2 control-label">标题</label>
+        <label for="inputtext3" class="col-sm-2 control-label">流程标题</label>
         <div class="col-sm-10">
           <input type="text" class="form-control" id="title" value="2016版项目研发指令审批单">
         </div>
       </div>
       <div class="form-group">
-        <label for="inputPassword3" class="col-sm-2 control-label">新版项目编号</label>
+        <label for="inputPassword3" class="col-sm-2 control-label">项目编号</label>
         <div class="col-sm-10">
           <input type="text" class="form-control" id="number" value="【BZZK201601】">
         </div>
       </div>
       <div class="form-group">
-        <label for="inputPassword3" class="col-sm-2 control-label">新版项目名称</label>
+        <label for="inputPassword3" class="col-sm-2 control-label">项目名称</label>
         <div class="col-sm-10">
           <input type="text" class="form-control" id="famTitle" value="2016版项目">
         </div>
       </div>
-      <div class="form-group" style="display: none;">
-        <label for="inputPassword3" class="col-sm-2 control-label" >新版项目版本名称</label>
-        <div class="col-sm-10">
-          <input type="text" class="form-control" id="versionName" value="2016版">
-        </div>
-      </div>
       <div class="form-group">
-        <label for="inputPassword3" class="col-sm-2 control-label">研发说明</label>
-        <div class="col-sm-10">
-          <input type="text" class="form-control" id="devDesc" value="2016版项目">
-        </div>
-      </div>
-      <div class="form-group">
-        <label for="inputPassword3" class="col-sm-2 control-label">研发完成日期</label>
-        <div class="col-sm-10">
-          <input type="text" class="form-control" id="devDate" value="2016-6-6">
-        </div>
-      </div>
-      <div class="form-group">
-        <label for="inputPassword3" class="col-sm-2 control-label">标类</label>
+        <label for="inputPassword3" class="col-sm-2 control-label">项目类型</label>
         <div class="col-sm-10">
           <select class="form-control referenceResources" id="s01">
             <option value="1">全标</option>
             <option value="2">类标</option>
             <option value="3">非标</option>
           </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="inputPassword3" class="col-sm-2 control-label">项目模式</label>
+        <div class="col-sm-10">
+          <select class="form-control referenceResources" id="projectModel">
+            <option value="1">创新模式</option>
+            <option value="2">直投</option>
+            <option value="3">开发</option>
+            <option value="4">合作</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="inputPassword3" class="col-sm-2 control-label">项目业态</label>
+        <div class="col-sm-10">
+          <select class="form-control referenceResources" id="projectFormat">
+            <option value="1">综合体</option>
+            <option value="2">纯酒店</option>
+            <option value="3">文化旅游</option>
+            <option value="4">独立物业</option>
+            <option value="5">非万影城</option>
+            <option value="6">境外</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="inputPassword3" class="col-sm-2 control-label">发起部门</label>
+        <div class="col-sm-10">
+          <input type="text" class="form-control" id="launchDepartment" value="设计中心-BIM一体化组">
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="inputPassword3" class="col-sm-2 control-label">省份</label>
+        <div class="col-sm-10">
+          <select class="form-control referenceResources" id="province">
+            <option value="1" selected>北京市</option>
+            <option value="2">天津市</option>
+            <option value="3">上海市</option>
+            <option value="4">重庆市</option>
+            <option value="5">河北省</option>
+            <option value="6">山西省</option>
+            <option value="7">辽宁省</option>
+            <option value="8">吉林省</option>
+            <option value="9">黑龙江省</option>
+            <option value="10">江苏省</option>
+            <option value="11">浙江省</option>
+            <option value="12">安徽省</option>
+            <option value="13">福建省</option>
+            <option value="14">江西省</option>
+            <option value="15">山东省</option>
+            <option value="16">河南省</option>
+            <option value="17">湖北省</option>
+            <option value="18">湖南省</option>
+            <option value="19">广东省</option>
+            <option value="20">海南省</option>
+            <option value="21">四川省</option>
+            <option value="22">贵州省</option>
+            <option value="23">云南省</option>
+            <option value="24">陕西省</option>
+            <option value="25">甘肃省</option>
+            <option value="26">青海省</option>
+            <option value="27">台湾省</option>
+            <option value="28">内蒙古自治区</option>
+            <option value="29">广西壮族自治区</option>
+            <option value="30">宁夏回族自治区</option>
+            <option value="31">西藏自治区</option>
+            <option value="32">新疆维吾尔族自治区</option>
+            <option value="33">香港特别行政区</option>
+            <option value="34">澳门特别行政区</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="inputPassword3" class="col-sm-2 control-label">管理分区</label>
+        <div class="col-sm-10">
+          <select class="form-control referenceResources" id="adminZone">
+            <option value="1">北区</option>
+            <option value="2">中区</option>
+            <option value="3">南区</option>
+            <option value="4">文旅</option>
+            <option value="5">境外</option>
+          </select>
+        </div>
+      </div>
+      <!-- <div class="form-group" style="display: none;">
+        <label for="inputPassword3" class="col-sm-2 control-label" >新版项目版本名称</label>
+        <div class="col-sm-10">
+          <input type="text" class="form-control" id="versionName" value="2016版">
+        </div>
+      </div> -->
+      <div class="form-group">
+        <label for="inputPassword3" class="col-sm-2 control-label">研发完成日期</label>
+        <div class="col-sm-10">
+          <input type="text" class="form-control" id="devDate">
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="inputPassword3" class="col-sm-2 control-label">摘牌日</label>
+        <div class="col-sm-10">
+          <input type="text" class="form-control" id="delistDate">
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="inputPassword3" class="col-sm-2 control-label">开业日</label>
+        <div class="col-sm-10">
+          <input type="text" class="form-control" id="openDate">
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="inputPassword3" class="col-sm-2 control-label">研发说明</label>
+        <div class="col-sm-10">
+          <input type="text" class="form-control" id="devDesc" value="2016版项目">
         </div>
       </div>
 
@@ -103,23 +197,48 @@
     </form>
   </div>
 </div>
-<div class="consoleBox"><div class="consoleHeader">
-  6.1	项目模型研发指令表单审批通过<span class="btn btn-primary" onclick="App.Console.fn['6.1']()">更新</span></div>
+<div class="consoleBox">
+  <div class="consoleHeader">6.2方案成果移交<span class="btn btn-primary" onclick="App.Console.fn['6.1']()">更新</span></div>
   <div class="consoleContainer">
     <form class="form-horizontal">
-      <!--<div class="form-group">-->
-        <!--<label for="inputPassword3" class="col-sm-2 control-label">项目编码</label>-->
-        <!--<div class="col-sm-10">-->
-          <!--<input type="text" class="form-control" id="p11" value="">-->
-        <!--</div>-->
-      <!--</div>-->
       <div class="form-group">
-        <label for="inputPassword3" class="col-sm-2 control-label">项目模型列表</label>
+        <label for="inputPassword3" class="col-sm-2 control-label">流程标题</label>
+        <div class="col-sm-10">
+          <input type="text" class="form-control" id="p13" value="流程标题">
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="inputPassword3" class="col-sm-2 control-label">项目列表</label>
         <div class="col-sm-10">
           <select class="form-control referenceResources" id="s1">
             <option value="0">请选择</option>
           </select>
         </div>
+      </div>
+      <div class="form-group">
+          <label for="inputPassword3" class="col-sm-2 control-label">族库</label>
+          <div class="col-sm-10">
+              <select class="form-control" id="s12">
+                  <option value="">请选择</option>
+              </select>
+          </div>
+      </div>
+      <div class="form-group">
+          <label for="inputPassword3" class="col-sm-2 control-label">标准模型</label>
+          <div class="col-sm-10">
+              <select class="form-control" id="s02">
+                  <option value="">请选择</option>
+              </select>
+          </div>
+      </div>
+      <div class="form-group">
+          <label for="inputPassword3" class="col-sm-2 control-label">标准模型版本</label>
+          <div class="col-sm-10">
+
+              <select class="form-control" id="s03">
+                  <!--<option value="">请选择</option>-->
+              </select>
+          </div>
       </div>
       <!--<div class="form-group">-->
         <!--<label for="inputPassword3" class="col-sm-2 control-label">项目名称</label>-->
@@ -127,37 +246,14 @@
           <!--<input type="text" class="form-control" id="p12" value="">-->
         <!--</div>-->
       <!--</div>-->
-      <div class="form-group">
-        <label for="inputPassword3" class="col-sm-2 control-label">流程标题</label>
-        <div class="col-sm-10">
-          <input type="text" class="form-control" id="p13" value="项目模型研发指令表单">
-        </div>
-      </div>
-        <div class="form-group">
-            <label for="inputPassword3" class="col-sm-2 control-label">参考标准模型</label>
-            <div class="col-sm-10">
-                <select class="form-control" id="s02">
-                    <option value="">请选择</option>
-                </select>
-            </div>
-        </div>
-        <div class="form-group">
-            <label for="inputPassword3" class="col-sm-2 control-label">标准模型版本</label>
-            <div class="col-sm-10">
-
-                <select class="form-control" id="s03">
-                    <!--<option value="">请选择</option>-->
-                </select>
-            </div>
-        </div>
-        <div class="form-group">
-            <label for="inputPassword3" class="col-sm-2 control-label">参考族库</label>
-            <div class="col-sm-10">
-                <select class="form-control" id="s12">
-                    <option value="">请选择</option>
-                </select>
-            </div>
-        </div>
+      <!--<div class="form-group">-->
+        <!--<label for="inputPassword3" class="col-sm-2 control-label">项目编码</label>-->
+        <!--<div class="col-sm-10">-->
+          <!--<input type="text" class="form-control" id="p11" value="">-->
+        <!--</div>-->
+      <!--</div>-->
+        
+        
       <div class="form-group">
         <!--<label for="inputPassword3" class="col-sm-2 control-label"></label>-->
         <div class="col-sm-10">
@@ -218,30 +314,22 @@ createTime	表单创建时间	long
   </div>
 </div>
 
-<div class="consoleBox"><div class="consoleHeader">
-  6.2	项目模型报审表单发起<span class="btn btn-primary" onclick="App.Console.fn['6.2']()">更新</span></div>
+<div class="consoleBox">
+  <div class="consoleHeader">6.3设计审核文件提交<span class="btn btn-primary" onclick="App.Console.fn['6.2']()">更新</span></div>
   <div class="consoleContainer">
     <form class="form-horizontal">
       <div class="form-group">
-        <label for="inputPassword3" class="col-sm-2 control-label">项目模型研发指令表单</label>
+        <label for="inputPassword3" class="col-sm-2 control-label">流程标题</label>
+        <div class="col-sm-10">
+          <input type="text" class="form-control" id="p21" value="流程标题">
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="inputPassword3" class="col-sm-2 control-label">项目列表</label>
         <div class="col-sm-10">
           <select class="form-control referenceResources" id="s21">
             <option value="0">请选择</option>
           </select>
-        </div>
-      </div>
-      <div class="form-group">
-        <label for="inputPassword3" class="col-sm-2 control-label">项目模型版本</label>
-        <div class="col-sm-10">
-          <select class="form-control referenceResources" id="s211">
-            <option value="0">请选择</option>
-          </select>
-        </div>
-      </div>
-      <div class="form-group">
-        <label for="inputPassword3" class="col-sm-2 control-label">流程标题</label>
-        <div class="col-sm-10">
-          <input type="text" class="form-control" id="p21" value="项目模型报审表单发起">
         </div>
       </div>
       <div class="form-group">
@@ -296,24 +384,24 @@ status	审批状态	int	8发起；16审批通过；（4驳回；32撤销；128�
     </form>
   </div>
 </div>
-<div class="consoleBox"><div class="consoleHeader">
-  6.3	项目模型报审表单状态变化（审批通过、驳回等)<span class="btn btn-primary" onclick="App.Console.fn['6.3']()">更新</span></div>
+<div class="consoleBox">
+  <div class="consoleHeader">6.4设计审核文件审核<span class="btn btn-primary" onclick="App.Console.fn['6.3']()">更新</span></div>
   <div class="consoleContainer">
     <form class="form-horizontal">
       <div class="form-group">
-        <label for="inputPassword3" class="col-sm-2 control-label">项目模型报审表单</label>
+        <label for="inputPassword3" class="col-sm-2 control-label">流程标题</label>
+        <div class="col-sm-10">
+          <input type="text" class="form-control" id="p30" value="流程标题">
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="inputPassword3" class="col-sm-2 control-label">项目列表</label>
         <div class="col-sm-10">
           <select class="form-control referenceResources" id="s31">
             <option value="0">请选择</option>
           </select>
         </div>
       </div>
-      <!--<div class="form-group">-->
-        <!--<label for="inputPassword3" class="col-sm-2 control-label">流程标题</label>-->
-        <!--<div class="col-sm-10">-->
-          <!--<input type="text" class="form-control" id="p31" value="">-->
-        <!--</div>-->
-      <!--</div>-->
       <div class="form-group">
         <!--<label for="inputPassword3" class="col-sm-2 control-label"></label>-->
         <div class="col-sm-10">
@@ -357,30 +445,22 @@ status	审批状态	int	8发起；16审批通过；（4驳回；32撤销；128�
     </form>
   </div>
 </div>
-<div class="consoleBox"><div class="consoleHeader">
-  6.4	项目模型移交表单发起<span class="btn btn-primary" onclick="App.Console.fn['6.4']()">更新</span></div>
+<div class="consoleBox">
+  <div class="consoleHeader">6.5项目BIM模型及施工图审核<span class="btn btn-primary" onclick="App.Console.fn['6.4']()">更新</span></div>
   <div class="consoleContainer">
     <form class="form-horizontal">
       <div class="form-group">
-        <label for="inputPassword3" class="col-sm-2 control-label">项目模型报审表单</label>
+        <label for="inputPassword3" class="col-sm-2 control-label">流程标题</label>
+        <div class="col-sm-10">
+          <input type="text" class="form-control" id="p41" value="流程标题">
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="inputPassword3" class="col-sm-2 control-label">项目列表</label>
         <div class="col-sm-10">
           <select class="form-control referenceResources" id="s41">
             <option value="0">请选择</option>
           </select>
-        </div>
-      </div>
-      <div class="form-group">
-        <label for="inputPassword3" class="col-sm-2 control-label">项目模型版本</label>
-        <div class="col-sm-10">
-          <select class="form-control referenceResources" id="s411">
-            <option value="0">请选择</option>
-          </select>
-        </div>
-      </div>
-      <div class="form-group">
-        <label for="inputPassword3" class="col-sm-2 control-label">流程标题</label>
-        <div class="col-sm-10">
-          <input type="text" class="form-control" id="p41" value="项目模型移交表单">
         </div>
       </div>
       <div class="form-group">
@@ -435,12 +515,17 @@ status	审批状态	int	8发起；16审批通过；（4驳回；32撤销；128�
     </form>
   </div>
 </div>
-<div class="consoleBox"><div class="consoleHeader">
-  6.5	项目模型移交表单状态变化（审批通过、驳回等)<span class="btn btn-primary" onclick="App.Console.fn['6.5']()">更新</span></div>
+<div class="consoleBox"><div class="consoleHeader">6.6项目BIM模型及施工图移交<span class="btn btn-primary" onclick="App.Console.fn['6.5']()">更新</span></div>
   <div class="consoleContainer">
     <form class="form-horizontal">
       <div class="form-group">
-        <label for="inputPassword3" class="col-sm-2 control-label">项目模型移交表单</label>
+        <label for="inputPassword3" class="col-sm-2 control-label">流程标题</label>
+        <div class="col-sm-10">
+          <input type="text" class="form-control" id="p50" value="流程标题">
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="inputPassword3" class="col-sm-2 control-label">项目列表</label>
         <div class="col-sm-10">
           <select class="form-control referenceResources" id="s51">
             <option value="0">请选择</option>
@@ -490,3 +575,19 @@ status	审批状态	int	8发起；16审批通过；（4驳回；32撤销；128�
     </form>
   </div>
 </div>
+<script type="text/javascript">
+  var devDate = $("#devDate");
+  var delistDate = $("#delistDate");
+  var openDate = $("#openDate");
+  var myDate = new Date();
+  var myDates = myDate.getDate();
+  var day = myDate.setDate(myDates+14);
+  var newDay = new Date(day);
+  var newYear = newDay.getFullYear();
+  var newMonth = newDay.getMonth()+1;
+  var newDay = newDay.getDate();
+  var currentDate = newYear + '-' + newMonth + '-' + newDay;
+  devDate.val(currentDate)
+  delistDate.val(currentDate)
+  openDate.val(currentDate)
+</script>
