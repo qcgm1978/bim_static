@@ -16,6 +16,7 @@ App.Project.FileContainer = Backbone.View.extend({
 	events: {
 		"click .header .ckAll": "ckAll",
 		"click .btnFileSearch": "fileSearch",
+		"click .btnFileState": "btnFileStateFun",
 		"click .clearSearch": "clearSearch",
 		"keyup #txtFileSearch":"enterSearch"
 
@@ -83,6 +84,21 @@ App.Project.FileContainer = Backbone.View.extend({
 		}
 	},
 
+	//文件转换状态的方法
+	btnFileStateFun(){//add zhangyankai
+		var projectId = App.Project.Settings.projectId;
+		var versionId = App.Project.Settings.versionId;
+		var addDialogEleDom = new App.Project.FileContainer.FileStatus().render(projectId,versionId).el;
+		var fileStateDialog = new App.Comm.modules.Dialog({
+		    title:"模型转换状态",
+		    width:800,
+		    height:700,
+		    isConfirm:false,
+		    isAlert:false,
+		    closeCallback:function(){},
+		    message:addDialogEleDom
+		});
+	},
 	//搜索
 	fileSearch() {
 
