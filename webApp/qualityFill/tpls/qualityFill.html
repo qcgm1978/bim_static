@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!--<meta http-equiv="pragma" content="no-cache"> -->
+    <META HTTP-EQUIV="pragma" CONTENT="no-cache">
+    <META HTTP-EQUIV="Cache-Control" CONTENT="no-store, must-revalidate">
+    <title>BIM总发包管理平台- 隐患填报模拟</title>
+    <link rel="styleSheet" href="/static/dist/qualityFill/css/quality.css" />
+    <script src="http://cdn.bootcss.com/jquery/1.9.1/jquery.min.js"></script>
+    <script src="/static/dist/components/inspectSelection/js/inspectSelection.js"></script>
+    <script src="/static/dist/qualityFill/js/template.min.js"></script>
+</head>
+<body>
+
+<div class="container">
+    <div id="grid" class="grid">
+        <table border="0" cellpadding="0" cellspacing="0">
+            <thead>
+                <tr>
+                    <td class="chk"><input type="checkbox" name="chk" class="chkAll"/></td>
+                    <td class="w150">类别</td>
+                    <td class="w190">分部</td>
+                    <td class="w190">分项</td>
+                    <td>预设点</td>
+                    <td class="w150">检查结果</td>
+                    <td class="w190">隐患</td>
+                    <td>构建位置</td>
+                </tr>
+            </thead>
+            <tbody id="gridContainer">
+                <tr>
+                    <td class="chk"><input type="checkbox" name="chk" class="checkbox"/></td>
+                    <td class="w150">
+                        <select class="type">
+                            <option>工程桩</option>
+                            <option>基坑支护</option>
+                            <option>地下防水</option>
+                            <option>梁柱节点</option>
+                            <option>钢结构悬挑构件</option>
+                            <option>幕墙</option>
+                            <option>外保温</option>
+                            <option>采光顶</option>
+                            <option>步行街吊顶风口</option>
+                            <option>卫生间防水</option>
+                            <option>屋面防水</option>
+                            <option>屋面虹吸雨排</option>
+                            <option>消防泵房</option>
+                            <option>给水泵房</option>
+                            <option>湿式报警阀室</option>
+                            <option>空调机房</option>
+                            <option>冷冻机房</option>
+                            <option>变配电室</option>
+                            <option>发电机房</option>
+                            <option>慧云机房</option>
+                            <option>电梯机房</option>
+                            <option>电梯底坑</option>
+                            <option>吊顶</option>
+                            <option>地面</option>
+                            <option>中庭栏杆</option>
+                            <option>竖井</option>
+                        </select>
+                    </td>
+                    <td class="w190"><input type="text" name="part1" class="w180 input_part1"/></td>
+                    <td class="w190"><input type="text" name="part2" class="w180 input_part2"/></td>
+                    <td>
+                        <span class="ready-pos" data-readypos=""></span>
+                        <span class="linkBtn-ready-pos"></span>
+                    </td>
+                    <td>
+                    <select class="select-result w150">
+                        <option>合格</option>
+                        <option>不合格</option>
+                    </select>
+                    </td>
+                    <td class="w190"><input type="text" name="part2" class="w180 input_part3"/></td>
+                    <td>
+                        <span class="pos" data-pos=""></span>
+                        <span class="linkBtn-pos"></span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="options">
+        <button id="btn_add">添加</button>
+        <button id="btn_delete">删除</button>
+    </div>
+</div>
+
+</body>
+</html>
+<script type="text/javascript">
+
+/*
+template.repeat({
+    repeatId:".app-myapp",    //可以使用 repeatElement:$(".app-myapp")[0],
+    data:data,
+    count:3,
+    type:"cover"         
+    //可选择参数 type="cover" 覆盖; type="insert" 加载到现有数据前面; type="append" 加载到现有数据的后面
+});
+*/
+
+var readyPosState = ["绑定预设点","解绑"];
+var posState = ["绑定构建位置","解绑"];
+
+var initComponent = function(){
+    jQuery.support.cors = true;
+    var viewer = new InspectModelSelection({
+        type: "process",//open process
+        ruleType: '',//构件分类
+        height: "500px",
+        width:"1200px",
+        //projectCode: '36caa07c-4c7d-4c95-84ae-fb56f53f0dc3',  //projectNo
+        projectCode : "edbae83a-8a9f-4dfa-9588-18d7d33f71b6",
+        /*
+        token:"4aeba9fa8574d9a7f5e6ff2fbc54cd5cf45d7f3949df6bdf1f5c49f4349baa01a76b19a3118007e98a2546f76a1e5c7c6dff6a0b87795a92",
+        appKey: "60e8a1d9fc1d44d7b6a4cf85ae2987ed",
+        */
+        appKey: "60e8a1d9fc1d44d7b6a4cf85ae2987ed",
+        token: "4aeba9fa8574d9a768aa3aba59e72c0bbe4990ba9d63f1d97d8139fe57b9b84d855bb56f3b437c42ac9454501cfac6e88764578b07e256dcd793183be0b561627222bea5cb3420fee5242fdabfef8ad39dcc2e271e1f0452322fbd98c9681359d23c02b79118bb99773001ea2ba359553023d7ef8b317995",
+        callback: function (res) {
+            $('#test').val(JSON.stringify(res))
+        },
+        withCheckpoint : true
+    });        
+}
+
+var Event = {
+    rowDOM : [],
+    deleteRow : function(){
+        var i;
+        var $gridContainer = $("#gridContainer");
+        for(i=0;i<this.rowDOM.length;i++)
+        {
+            $gridContainer[0].removeChild(this.rowDOM[i]);
+        }
+    },
+    checkRow : function(checkbox){
+        var trDOM = checkbox.parentNode.parentNode;
+        this.rowDOM.push(trDOM);
+    },
+    bindEvent : function(){
+        var th = this;
+        this.lineHTML = '<tr><td class="chk"><input type="checkbox" name="chk" class="checkbox"/></td>'+
+                        '<td>{select-type}</td>'+
+                        '<td><input type="text" name="part1" class="w180 input_part1"/></td>'+
+                        '<td><input type="text" name="part2" class="w180 input_part2"/></td>'+
+                        '<td>{ready-pos}</td>'+
+                        '<td>{select-result}</td>'+
+                        '<td><input type="text" name="part2" class="w180 input_part3"/></td>'+
+                        '<td>{pos}</td>'+
+                        '</tr>';
+        this.selectTypeHTML ='<select class="select-type">'+
+                                '<option>工程桩</option>'+
+                                '<option>基坑支护</option>'+
+                                '<option>地下防水</option>'+
+                                '<option>梁柱节点</option>'+
+                                '<option>钢结构悬挑构件</option>'+
+                                '<option>幕墙</option>'+
+                                '<option>外保温</option>'+
+                                '<option>采光顶</option>'+
+                                '<option>步行街吊顶风口</option>'+
+                                '<option>卫生间防水</option>'+
+                                '<option>屋面防水</option>'+
+                                '<option>屋面虹吸雨排</option>'+
+                                '<option>消防泵房</option>'+
+                                '<option>给水泵房</option>'+
+                                '<option>湿式报警阀室</option>'+
+                                '<option>空调机房</option>'+
+                                '<option>冷冻机房</option>'+
+                                '<option>变配电室</option>'+
+                                '<option>发电机房</option>'+
+                                '<option>慧云机房</option>'+
+                                '<option>电梯机房</option>'+
+                                '<option>电梯底坑</option>'+
+                                '<option>吊顶</option>'+
+                                '<option>地面</option>'+
+                                '<option>中庭栏杆</option>'+
+                                '<option>竖井</option>'+
+                            '</select>';
+        this.selectResultHTML = '<select class="select-result w150"><option>合格</option><option>不合格</option></select>';
+        this.readyPosHTML = '<span class="ready-pos" data-readypos=""></span><span class="linkBtn-ready-pos">{ready-pos-state}</span>';
+        this.posHTML =      '<span class="pos" data-pos=""></span><span class="linkBtn-pos">{pos-state}</span>';
+
+        $(".chkAll").on("click",function(){
+            if($(this).prop("checked"))
+            {
+                $(".checkbox").prop("checked",true);
+            }
+            else
+            {
+                $(".checkbox").prop("checked",false);
+            }
+        });
+
+        $("#btn_add").on("click",function(){
+            th.lineHTML = th.lineHTML.replace("{select-type}",th.selectTypeHTML);
+            th.lineHTML = th.lineHTML.replace("{select-result}",th.selectResultHTML);
+            th.lineHTML = th.lineHTML.replace("{ready-pos}",th.readyPosHTML);
+            th.lineHTML = th.lineHTML.replace("{pos}",th.posHTML);
+            th.lineHTML = th.lineHTML.replace("{ready-pos-state}",readyPosState[0]);
+            th.lineHTML = th.lineHTML.replace("{pos-state}",posState[0]);
+            $("#gridContainer").append(th.lineHTML);
+        });
+        $("#gridContainer").on("click",".checkbox",function(){
+            th.checkRow(this);
+        });
+        $("#btn_delete").on("click",function(){
+            th.deleteRow();
+        });
+    }
+};
+
+
+var initOptions = function(){
+    var $tr = $("#gridContainer tr");
+    $tr.find(".linkBtn-ready-pos").html(readyPosState[0]);
+    $tr.find(".linkBtn-pos").html(posState[0]);
+}
+
+var init = function(){
+    initComponent();
+    initOptions();
+    Event.bindEvent();
+};
+init();
+
+
+</script>

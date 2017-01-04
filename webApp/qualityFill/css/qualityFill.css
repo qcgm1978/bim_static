@@ -1,0 +1,70 @@
+/*
+write by wuweiwei
+*/
+body{
+	font-family: "Microsoft Yahei";
+	font-size: 12px;
+}
+.container{
+	position: absolute;
+	top:510px;
+	left:0px;
+	width:100%;
+}
+
+.grid table{
+	border:1px solid #ccc;
+	width:90%;
+}
+.grid table thead{
+	background-color: #ddd;
+}
+.grid table td{
+	padding:5px;
+	border-left: 1px solid #ccc;
+	border-top:1px solid #ccc;
+}
+.grid table td.chk{
+	width:30px;
+}
+.grid table span.linkBtn-ready-pos , .grid table span.linkBtn-pos{
+	cursor: pointer;
+	color:#00a;
+}
+.grid table span.linkBtn-ready-pos:hover , .grid table span.linkBtn-pos:hover{
+	text-decoration: underline;
+}
+
+.options{
+	height: 30px;
+	line-height: 30px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	border:1px dashed #bbb;
+	margin-top:10px;
+	background-color: #eee;
+	width:90%;
+}
+.options button{
+	height: 25px;
+	line-height: 25px;
+	padding: 0;
+	padding-left:5px;
+	padding-right:5px; 
+	margin-left:10px;
+}
+.w200{
+	width:200px;
+}
+.w150{
+	width:150px;
+}
+.w180{
+	width:180px;
+}
+.w190{
+	width:190px;
+}
+.modelSelectDialog{
+	height: 500px;
+}

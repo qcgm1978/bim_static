@@ -719,6 +719,16 @@ fis.media('prod').match('*.{png,jpg,gif}', {
   optimizer: fis.plugin('png-compressor')
 });
 
+//质检系统 隐患填报模拟
+fis.match('qualityFill/tpls/qualityFill.html', {
+  release: "/static/dist/qualityFill/qualityFill.html"
+});
+fis.match('/qualityFill/js/template.min.js', {
+  packTo: '/static/dist/qualityFill/js/template.min.js'
+});
+fis.match('/qualityFill/css/**.css', {
+  packTo: '/static/dist/qualityFill/css/quality.css'
+});
 
 //  fis.match('**.html', {
 //   //useHash:true,

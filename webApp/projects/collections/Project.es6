@@ -1100,6 +1100,7 @@ App.Project = {
 				if ($('#listContextProject li[class!=disable]').length == 0) {
 					$('#listContextProject').parent().hide();
 				}
+				window.Global.DemoEnv();
 			},
 			shadow: false,
 			bindings: {

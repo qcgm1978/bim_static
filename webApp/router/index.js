@@ -470,6 +470,7 @@ window.Global = {
 		$("#topBar .navHeader .bodyConMenu").hide();
 		$("#topBar .navHeader .resources").hide();
 		$("#topBar .navHeader .services").hide();
+		$("#downLoadModelProject")[0].className = "disable";
 		$popMenu = $(".onlineNav ul li");
 		$popMenu.each(function(index){
 			if(index!=0)
