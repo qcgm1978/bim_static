@@ -50,7 +50,7 @@ App.Console = {
     $('#search_person .btn').click(function(e) {
       var account = $('.wrap input').val();
       $.ajax({
-        url: "platform/loginUser/" + account
+        url: "platform/loginUser/console1/" + account
       }).done(function(data) {
         if (data.code == 0) {
           $('#results').html('').append('<li name=' + data.data.name + ' loginId=' + data.data.loginName + ' uId=' + data.data.userId + ' ondragstart="drag(event)" draggable="true">' + data.data.name + '</li>')
