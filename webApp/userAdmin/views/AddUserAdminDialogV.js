@@ -76,7 +76,7 @@ App.userAdmin.AddUserAdminDialogV = Backbone.View.extend({
 		var _data = {
 			loginId:accrentNameVal
 		}
-	    App.userAdmin.checkUserC.fetch({
+	    return App.userAdmin.checkUserC.fetch({
 			data: _data,
 			success: function(collection, response, options) {
 				if(response.data == "exist"){
