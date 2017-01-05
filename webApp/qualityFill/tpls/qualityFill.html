@@ -11,6 +11,7 @@
     <script src="http://cdn.bootcss.com/jquery/1.9.1/jquery.min.js"></script>
     <script src="/static/dist/components/inspectSelection/js/inspectSelection.js"></script>
     <script src="/static/dist/qualityFill/js/template.min.js"></script>
+    <script src="/static/dist/qualityFill/js/wDialog.min.js"></script>
 </head>
 <body>
 
@@ -86,22 +87,25 @@
     <div class="options">
         <button id="btn_add">添加</button>
         <button id="btn_delete">删除</button>
+        <button id="btn_save">保存</button>
+    </div>
+</div>
+
+<div id="Dlg_content" style="display:none;">
+    <div class="dlg-content">
+        <div id="repeatContainer" class="projectItem" style="display:none;">
+            <span data-projectCode="{{projectCode}}" data-projectId="{{projectId}}">{{projectName}}</span>
+        </div>
+    </div>
+    <div class="dlg-button">
+        <button id="DlgBtn_close">关闭</button>
+        <button id="DlgBtn_ok">确定</button>
     </div>
 </div>
 
 </body>
 </html>
 <script type="text/javascript">
-
-/*
-template.repeat({
-    repeatId:".app-myapp",    //可以使用 repeatElement:$(".app-myapp")[0],
-    data:data,
-    count:3,
-    type:"cover"         
-    //可选择参数 type="cover" 覆盖; type="insert" 加载到现有数据前面; type="append" 加载到现有数据的后面
-});
-*/
 
 var readyPosState = ["绑定预设点","解绑"];
 var posState = ["绑定构建位置","解绑"];
@@ -128,8 +132,56 @@ var initComponent = function(){
     });        
 }
 
+var initDialog = function(){
+    overLayer.bgColor='#777';
+    overLayer.opacity=40;
+    var options={
+        id:'Dlg',
+        hasBar:true,
+        barOptions:
+        {
+            title:"请选择一个项目"
+        },
+        position:'fixed',
+        type:'center',
+        contentId:'Dlg_content',
+        className:'dialog',
+        width:800,
+        height:500,
+        isMove:false
+    };
+    window.Dlg = new wDialog(options);
+}
+
 var Event = {
     rowDOM : [],
+    initDialogEvent : function(){
+        $("#Dlg .wClose").hide();
+        window.Dlg.show();
+        $("#DlgBtn_close").on("click",function(){
+            window.Dlg.hide();
+        });
+        $("#DlgBtn_ok").on("click",function(){
+            window.Dlg.hide();
+        });
+    },
+    initDialogData : function(){
+        $.ajax({
+            url:"/platform/project/list/all/quality",
+            type:"get",
+            dataType:"json",
+            success:function(data){
+                var list = data.data;
+                template.startSymbol("{{");
+                template.endSymbol("}}");
+                template.repeat({
+                    repeatElement:$("#repeatContainer")[0],
+                    data:list,
+                    type:"cover"
+                });
+            }
+        });
+    },
     deleteRow : function(){
         var i;
         var $gridContainer = $("#gridContainer");
@@ -141,6 +193,12 @@ var Event = {
     checkRow : function(checkbox){
         var trDOM = checkbox.parentNode.parentNode;
         this.rowDOM.push(trDOM);
+    },
+    saveData : function(){
+
+    },
+    sendData : function(){
+
     },
     bindEvent : function(){
         var th = this;
@@ -211,6 +269,11 @@ var Event = {
         $("#btn_delete").on("click",function(){
             th.deleteRow();
         });
+        $("#btn_save").on("click",function(e){
+            th.saveData();
+        });
+        this.initDialogEvent();
+        this.initDialogData();
     }
 };
 
@@ -222,10 +285,12 @@ var initOptions = function(){
 }
 
 var init = function(){
-    initComponent();
+    initDialog();
+    //initComponent();
     initOptions();
     Event.bindEvent();
 };
+
 init();
 
 

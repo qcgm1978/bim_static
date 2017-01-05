@@ -68,3 +68,29 @@ body{
 .modelSelectDialog{
 	height: 500px;
 }
+
+.dialog{
+	background-color: #FFF;
+	border:1px solid #aaa;
+	box-shadow: 1px 1px 3px 1px #333;
+}
+.dialog .wDialogBar{
+	padding:5px;
+	background-color: #56bff1;
+	height: 30px;
+	line-height: 30px;
+}
+.dialog .wClose{
+	font-size: 16px;
+	font-weight:bold;
+}
+.dialog .dlg-content{
+	height: 420px;
+	overflow-y:auto;
+}
+.dialog .dlg-button{
+	text-align: center;
+}
+.dialog .projectItem{
+	float: left;
+}
