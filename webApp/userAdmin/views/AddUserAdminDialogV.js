@@ -54,6 +54,7 @@ App.userAdmin.AddUserAdminDialogV = Backbone.View.extend({
 		var target = $(evt.target);
 		var errorBox = target.next(".errorBox");
 		var accrentNameVal = target.val().trim();
+		var _this = this;
 		if(accrentNameVal == ""){
 			errorBox.html('账号名称不能为空!');
 			errorBox.css("display","block");
@@ -66,30 +67,36 @@ App.userAdmin.AddUserAdminDialogV = Backbone.View.extend({
 			this.default.submitState=false;
 			return;
 		}
-		if(this.checkUserFun(accrentNameVal)){
-			errorBox.html('账号名称已经存在，请从新输入!');
-			errorBox.css("display","block");
-			this.default.submitState=false;
-			return;
-		}
-		errorBox.css("display","none");
-		this.default.accrentName = accrentNameVal;
-		this.default.submitState=true;
+		this.checkUserFun(accrentNameVal,errorBox,function(returnBool){
+			errorBox.css("display","none");
+			_this.default.accrentName = accrentNameVal;
+			_this.default.submitState=true;
+		});
+		// if(this.checkUserFun(accrentNameVal)){
+		// 	errorBox.html('账号名称已经存在，请从新输入!');
+		// 	errorBox.css("display","block");
+		// 	this.default.submitState=false;
+		// 	return;
+		// }
+		
 	},
-	checkUserFun:function(accrentNameVal){//检查账号名称是否存在
+	checkUserFun:function(accrentNameVal,errorBox,callBack){//检查账号名称是否存在
 		var _data = {
 			loginId:accrentNameVal
 		}
-	   	return 	App.userAdmin.checkUserC.fetch({
-					data: _data,
-					success: function(collection, response, options) {
-						if(response.data == "exist"){
-							return true;
-						}else{
-							return false;
-						}
-					}
-				})
+		var _this = this;
+	   	App.userAdmin.checkUserC.fetch({
+			data: _data,
+			success: function(collection, response, options) {
+				if(response.data == "exist"){
+					errorBox.html('账号名称已经存在，请从新输入!');
+					errorBox.css("display","block");
+					_this.default.submitState=false;
+				}else{
+					callBack()
+				}
+			}
+		})
 	},
 	checkAccrentPwdFun:function(evt){//检查账号密码是否符合规范
 		var target = $(evt.target);
