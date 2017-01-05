@@ -16,6 +16,7 @@
 <body>
 
 <div class="container">
+    <div style="height:30px;line-height:30px;font-weight:bold;font-size:14px;">项目名称：<span id="projectName"></span></div>
     <div id="grid" class="grid">
         <table border="0" cellpadding="0" cellspacing="0">
             <thead>
@@ -34,7 +35,7 @@
                 <tr>
                     <td class="chk"><input type="checkbox" name="chk" class="checkbox"/></td>
                     <td class="w150">
-                        <select class="type">
+                        <select class="select-type">
                             <option>工程桩</option>
                             <option>基坑支护</option>
                             <option>地下防水</option>
@@ -109,6 +110,10 @@
 
 var readyPosState = ["绑定预设点","解绑"];
 var posState = ["绑定构建位置","解绑"];
+var Data = {
+    projectData:{},
+    formData:{}
+};
 
 var initComponent = function(){
     jQuery.support.cors = true;
@@ -160,9 +165,24 @@ var Event = {
         window.Dlg.show();
         $("#DlgBtn_close").on("click",function(){
             window.Dlg.hide();
+            $("#projectName").html(Data.projectData.projectName);
         });
         $("#DlgBtn_ok").on("click",function(){
             window.Dlg.hide();
+            $("#projectName").html(Data.projectData.projectName);
+        });
+        var $Dlg_content = $("#Dlg .dlg-content");
+        $Dlg_content.on("click","div",function(){
+            var $dataDOM;
+            $Dlg_content.find("div").removeClass("select");
+            if(!$(this).hasClass("select"))
+            {
+                $(this).addClass("select");
+                $dataDOM = $(this).find("span");
+                Data.projectData.projectCode = $dataDOM.data("projectcode");
+                Data.projectData.projectId = $dataDOM.data("projectid");
+                Data.projectData.projectName = $dataDOM.html();
+            }
         });
     },
     initDialogData : function(){
@@ -189,13 +209,20 @@ var Event = {
         {
             $gridContainer[0].removeChild(this.rowDOM[i]);
         }
+        this.rowDOM = [];
     },
     checkRow : function(checkbox){
         var trDOM = checkbox.parentNode.parentNode;
         this.rowDOM.push(trDOM);
     },
     saveData : function(){
-
+        var $trs = $("#gridContainer tr");
+        var $this;
+        $trs.each(function(index){
+            $this = $(this);
+            console.log($this.find("select.select-type")[0].value);
+            //Data.formData.
+        });
     },
     sendData : function(){
 
