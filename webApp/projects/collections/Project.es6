@@ -131,6 +131,7 @@ App.Project = {
 		// 		}
 		// 	}
 		// }
+		console.log("下载完成");
 		if(userId){
 			App.Project.Settings.Viewer.highlight({
 				type: 'userId',

@@ -91,10 +91,11 @@ App.Project.FileContainer = Backbone.View.extend({
 		var addDialogEleDom = new App.Project.FileContainer.FileStatus().render(projectId,versionId).el;
 		var fileStateDialog = new App.Comm.modules.Dialog({
 		    title:"模型转换状态",
-		    width:800,
-		    height:700,
+		    width:700,
+		    height:500,
 		    isConfirm:false,
 		    isAlert:false,
+		    cssClass: 'fileStateDialogClass',
 		    closeCallback:function(){},
 		    message:addDialogEleDom
 		});

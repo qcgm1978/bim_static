@@ -21,6 +21,7 @@ App.Project.FileContainer.FileStatus = Backbone.View.extend({
 		App.Comm.ajax(data, (data) => {
 			if(data.code == 0){
 				this.$el.html(this.template(data.data));
+				App.Comm.initScroll(this.$(".fileStateFail"), "y");
 			}
 		});
 	}

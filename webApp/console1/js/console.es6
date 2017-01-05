@@ -632,10 +632,10 @@ App.Console = {
     }
 
     $("#submit0").click(function() {
-      // if ($("#auditor").find("div").length <= 0) {
-      //   alert("请添加审核人");
-      //   return;
-      // }
+      if ($("#auditor").find("div").length <= 0) {
+        alert("请添加审核人") ;
+        return;
+      }
       var data = {
         type: 3,
         projectNo: $("#number").val().trim(),
@@ -1345,13 +1345,10 @@ App.Console = {
         title: $('#p21').val().trim(),
         costAttachments: arr,
         projectCode: $('#s21').val().trim(),
-        designFlowCode: $('#s21 option:selected').attr('designFlowCode').trim(),
         projectId: $('#s21 option:selected').attr('projectId').trim(),
-        designFlowCode: parseInt(9999999 * Math.random())
-
+        designFlowCode: $('#s21 option:selected').attr('designFlowCode').trim(),
       };
       App.Console.apply(2, 1003, data, 2);
-
     });
     //uploadtest
     $('.ready').on('click', 'i', function(e) {
