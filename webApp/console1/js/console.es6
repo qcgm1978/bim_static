@@ -632,10 +632,10 @@ App.Console = {
     }
 
     $("#submit0").click(function() {
-      // if ($("#auditor").find("div").length <= 0) {
-      //   alert("请添加审核人");
-      //   return;
-      // }
+      if ($("#auditor").find("div").length <= 0) {
+        alert("请添加审核人") ;
+        return;
+      }
       var data = {
         type: 3,
         projectNo: $("#number").val().trim(),

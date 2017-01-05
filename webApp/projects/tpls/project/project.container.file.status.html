@@ -1,4 +1,3 @@
-<% console.log(obj) %><!-- <%= obj.statusName %> -->
 <h2><%= obj.statusName %></h2>
 <table>
 	<thead>
@@ -34,10 +33,10 @@
 	<table>
 		<thead>
 			<tr>
-				<td>错误文件ID</td>
-				<td>错误文件名字</td>
-				<td>错误文件状态</td>
-				<td>错误文件类型</td>
+				<td width="50%">错误文件ID</td>
+				<td width="20%">错误文件名字</td>
+				<td width="15%">错误文件状态</td>
+				<td width="15%">错误文件类型</td>
 			</tr>
 		</thead>
 	</table>
@@ -46,10 +45,10 @@
 			<tbody>
 			<% _.each(obj.failItem,function(item){%>
 				<tr>
-					<td><%= item.source_id %></td>
-					<td><%= item.source_name %></td>
-					<td><%= item.status %></td>
-					<td><%= item.type %></td>
+					<td width="50%"><%= item.source_id %></td>
+					<td width="20%"><%= item.source_name %></td>
+					<td width="15%"><%= item.status %></td>
+					<td width="15%"><%= item.type %></td>
 				</tr>
 			<%})%>
 			</tbody>
