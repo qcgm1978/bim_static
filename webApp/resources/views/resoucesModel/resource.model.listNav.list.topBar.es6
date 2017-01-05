@@ -11,7 +11,8 @@
  		'click .returnBack': 'returnBack',
  		"click .btnFileSearch": "fileSearch",
  		"click .clearSearch": "clearSearch",
- 		"keyup #txtFileSearch": "enterSearch"
+ 		"keyup #txtFileSearch": "enterSearch",
+ 		"click .btnFileState": "btnFileStateFun",
  	},
 
  	template: _.templateUrl('/resources/tpls/resourceModel/resource.model.listNav.list.topBar.html', true),
@@ -34,7 +35,20 @@
  		}
  		return this;
  	},
-
+ 	//文件转换状态的方法
+ 	btnFileStateFun(){//add zhangyankai
+ 		var addDialogEleDom = new  App.ResourceModel.FileStatus().render().el;
+ 		var fileStateDialog = new App.Comm.modules.Dialog({
+ 		    title:"模型转换状态",
+ 		    width:700,
+ 		    height:500,
+ 		    isConfirm:false,
+ 		    isAlert:false,
+ 		    cssClass: 'fileStateDialogClass',
+ 		    closeCallback:function(){},
+ 		    message:addDialogEleDom
+ 		});
+ 	},
  	isDisabled: function() {
  		if (App.ResourceModel.Settings.CurrentVersion.status == 4 ||
  			App.ResourceModel.Settings.CurrentVersion.status == 7) {
