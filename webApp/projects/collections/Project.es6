@@ -131,7 +131,14 @@ App.Project = {
 		// 		}
 		// 	}
 		// }
-		console.log("下载完成");
+		
+		// $(".QualityProcessAcceptance .tbProcessAccessBody tr").removeClass('selected');
+		if(id){
+			$(".QualityConcerns .tbConcernsBody tr").removeClass('selected');
+			var tr = $(".QualityOpeningAcceptance .tbOpeningacceptanceBody tr[data-id='"+id+"']");
+			console.log("tr",tr);
+			tr.addClass('selected');
+		}
 		if(userId){
 			App.Project.Settings.Viewer.highlight({
 				type: 'userId',

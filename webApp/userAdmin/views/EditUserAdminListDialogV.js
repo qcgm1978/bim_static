@@ -40,13 +40,13 @@ App.userAdmin.EditUserAdminListDialogV = Backbone.View.extend({
 					for (var j = response.data.length - 1; j >= 0; j--) {
 						if(projects[i].id == response.data[j].projectId){
 							response.data[j].selected = true;
-
 						}
 					}
 				}
 				var dataArr = response.data;
 				var DialogProjectListV = new App.userAdmin.DialogProjectListV;
-				_this.$el.find(".dialogProjectList").append(DialogProjectListV.render(dataArr).el)
+				_this.$el.find(".dialogProjectList").append(DialogProjectListV.render(dataArr).el);
+				App.Comm.initScroll(_this.$(".dialogProjectList"), "y");
 			}
 		})
 	},
