@@ -47,3 +47,61 @@
 		&:hover { background-color: #D8F3FF; text-decoration: none; }
 	}
 }
+.fileStateDialogClass{
+	.fileStatus{
+		height: 100%;
+		h2{
+			font-size: 16px;
+			font-weight: normal;
+			height: 30px;
+			line-height: 30px;
+			margin-bottom: 16px;
+		}
+		table{
+			width: 100%;
+			border: solid 1px #ccc;
+			td{
+				border-right: solid 1px #ccc;
+				text-align: center;
+				height: 36px;
+				line-height: 36px;
+			}
+			td:nth-child(":last"){
+				border-right: 0;
+			}
+			thead tr{
+				border-bottom: solid 1px #ccc;
+			}
+		}
+		.failItemBox{
+			width: 100%;
+			height:285px;
+			padding-top: 16px;
+			h2{
+				margin-bottom: 8px;
+			}
+			table{
+				width: 100%;
+				thead tr{
+					border-bottom: 0;
+				}
+			}
+			.fileStateFail{
+				width: 100%;
+				height: 193px!important;
+				table{
+					border-top: 0;
+					tr{
+						border-bottom: solid 1px #ccc;
+					}
+					tr:nth-child(":last"){
+						border-bottom:0;
+					}
+					td{
+						line-height: normal;
+					}
+				}
+			}
+		}
+	}
+}

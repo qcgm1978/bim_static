@@ -72,13 +72,6 @@ App.userAdmin.AddUserAdminDialogV = Backbone.View.extend({
 			_this.default.accrentName = accrentNameVal;
 			_this.default.submitState=true;
 		});
-		// if(this.checkUserFun(accrentNameVal)){
-		// 	errorBox.html('账号名称已经存在，请从新输入!');
-		// 	errorBox.css("display","block");
-		// 	this.default.submitState=false;
-		// 	return;
-		// }
-		
 	},
 	checkUserFun:function(accrentNameVal,errorBox,callBack){//检查账号名称是否存在
 		var _data = {
