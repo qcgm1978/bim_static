@@ -178,7 +178,8 @@
 
             for (var i in pkg) {
                 if (pkg[i]['uri']) {
-                    var url = pkg[i]['uri'].slice(0, pkg[i]['uri'].indexOf('_'));
+                    //var url = pkg[i]['uri'].slice(0, pkg[i]['uri'].indexOf('_'));
+                    var url = pkg[i]['uri'].slice(0, pkg[i]['uri'].indexOf('.'));
                     App.pkg[url + '.' + pkg[i]['type']] = pkg[i]['uri'];
                 }
             }

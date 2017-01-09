@@ -192,6 +192,10 @@ var Event = {
             dataType:"json",
             success:function(data){
                 var list = data.data;
+                if(data.code!=0)
+                {
+                    list = [];
+                }
                 template.startSymbol("{{");
                 template.endSymbol("}}");
                 template.repeat({
@@ -322,7 +326,7 @@ var initOptions = function(){
 
 var init = function(){
     initDialog();
-    //initComponent();
+    initComponent();
     initOptions();
     Event.bindEvent();
 };

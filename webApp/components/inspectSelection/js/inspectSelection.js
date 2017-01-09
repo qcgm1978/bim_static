@@ -2012,6 +2012,7 @@
 				} else {
 					$target.parent().find(".selected").removeClass("selected");
 					$target.addClass("selected");
+					ModelFilter.recoverySilder(); /*add by wuweiwei*/
 				}
 			}
 			Project.showInModel($target, 2);

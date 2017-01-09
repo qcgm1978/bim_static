@@ -139,7 +139,7 @@ var Login = {
 					for (var p in data.data) {
 						Login.setCookie(p, data.data[p]);
 					}
-					Login.isDemoUser(data); //判断是否演示用户
+					Login.isDemoUser(data); //判断是否演示用户   
 				}
 				//获取用户信息
 				Login.getUserInfo();

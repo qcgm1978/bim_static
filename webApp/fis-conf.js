@@ -85,7 +85,7 @@ fis.match('/services/**.{js,es6}', {
   packTo: '/static/dist/services/services.js'
 });
 fis.match('/static/dist/services/services.js', {
-  useHash: true,
+  //useHash: true,
   release: '/static/dist/services/services.js'
 });
 fis.match('/services/**.{less,css}', {
@@ -93,7 +93,7 @@ fis.match('/services/**.{less,css}', {
   packTo: '/static/dist/services/services.css'
 });
 fis.match('/static/dist/services/services.css', {
-  useHash: true,
+  //useHash: true,
   release: '/static/dist/services/services.css'
 });
 //userAdmin用户管理页面
@@ -182,7 +182,7 @@ fis.match('/libs/**.js', {
 });
 
 fis.match('/static/dist/libs/commLib.js', {
-  useHash:true,
+  //useHash:true,
   release: '/static/dist/libs/commLib.js'
 });
 fis.match('/static/dist/libs/commLib.js', {
@@ -194,7 +194,7 @@ fis.match('/libs/**.css', {
 });
 
 fis.match('/static/dist/libs/commLibCss.css', {
-  useHash:true,
+  //useHash:true,
   release: '/static/dist/libs/commLibCss.css'
 });
 
@@ -249,7 +249,7 @@ fis.match('/commH5/**.{less,css}', {
 });
 
 fis.match('/static/dist/comm/commH5.css', {
-  useHash:true,
+  //useHash:true,
   release: '/static/dist/comm/commH5.css'
 });
 
@@ -261,7 +261,7 @@ fis.match('/commH5/**.{js,es6}', {
   packTo: '/static/dist/commH5/commH5.js'
 });
 fis.match('/static/dist/commH5/commH5.js', {
-  useHash:true,
+  //useHash:true,
   release: '/static/dist/commH5/commH5.js'
 });
 //添加用户管理页面
@@ -269,14 +269,14 @@ fis.match('/userAdmin/**.{js,es6}', {
   packTo: '/static/dist/userAdmin/userAdmin.js'
 });
 fis.match('/static/dist/userAdmin/userAdmin.js', {
-  useHash:true,
+  //useHash:true,
   release: '/static/dist/userAdmin/userAdmin.js'
 });
 fis.match('/userAdmin/**.{css,less}', {
   packTo: '/static/dist/userAdmin/userAdmin.css'
 });
 fis.match('/static/dist/userAdmin/userAdmin.css', {
-  useHash:true,
+  //useHash:true,
   release: '/static/dist/userAdmin/userAdmin.css'
 });
 //bodyContent
@@ -286,7 +286,7 @@ fis.match('/bodyContent/**.{less,css}', {
 });
 
 fis.match('/static/dist/bodyContent/bodyContent.css', {
-  useHash:true,
+  //useHash:true,
   release: '/static/dist/bodyContent/bodyContent.css'
 });
 
@@ -297,7 +297,7 @@ fis.match('/bodyContent/js/**.{js,es6}', {
 });
 
 fis.match('/static/dist/bodyContent/bodyContent.js', {
-  useHash:true,
+  //useHash:true,
   release: '/static/dist/bodyContent/bodyContent.js'
 });
 
@@ -309,7 +309,7 @@ fis.match('/login/**.{js,es6}', {
 });
 
 fis.match('/static/dist/login/login.js', {
-  useHash:true,
+  //useHash:true,
   release: '/static/dist/login/login.js'
 });
 
@@ -319,7 +319,7 @@ fis.match('/login/**.{less,css}', {
 });
 
 fis.match('/static/dist/login/login.css', {
-  useHash:true,
+  //useHash:true,
   release: '/static/dist/login/login.css'
 });
 
@@ -335,7 +335,7 @@ fis.match('/todo/**.{js,es6}', {
   packTo: '/static/dist/todo/todo.js'
 });
 fis.match('/static/dist/todo/todo.js', {
-  useHash:true,
+  //useHash:true,
   release: '/static/dist/todo/todo.js'
 });
 fis.match('/todo/**.{less,css}', {
@@ -343,7 +343,7 @@ fis.match('/todo/**.{less,css}', {
   packTo: '/static/dist/todo/todo.css'
 });
 fis.match('/static/dist/todo/todo.css', {
-  useHash:true,
+  //useHash:true,
   release: '/static/dist/todo/todo.css'
 });
 // 消息中心
@@ -352,7 +352,7 @@ fis.match('/imbox/**.{js,es6}', {
   packTo: '/static/dist/imbox/imbox.js'
 });
 fis.match('/static/dist/imbox/imbox.js', {
-  useHash:true,
+  //useHash:true,
   release: '/static/dist/imbox/imbox.js'
 });
 fis.match('/imbox/**.{less,css}', {
@@ -360,7 +360,7 @@ fis.match('/imbox/**.{less,css}', {
   packTo: '/static/dist/imbox/imbox.css'
 });
 fis.match('/static/dist/imbox/imbox.css', {
-  useHash:true,
+  //useHash:true,
   release: '/static/dist/imbox/imbox.css'
 });
 
@@ -371,7 +371,7 @@ fis.match('/suggest/**.{js,es6}', {
   packTo: '/static/dist/suggest/suggest.js'
 });
 fis.match('/static/dist/suggest/suggest.js', {
-  useHash:true,
+  //useHash:true,
   release: '/static/dist/suggest/suggest.js'
 });
 fis.match('/suggest/**.{less,css}', {
@@ -379,18 +379,18 @@ fis.match('/suggest/**.{less,css}', {
   packTo: '/static/dist/suggest/suggest.css'
 });
 fis.match('/static/dist/suggest/suggest.css', {
-  useHash:true,
+  //useHash:true,
   release: '/static/dist/suggest/suggest.css'
 });
 
 fis.match('/router/**.{js,es6}', {
-  useHash:true,
+  //useHash:true,
   //packTo: '/static/dist/$0'
   release: '/static/dist/$0'
 });
 
 fis.match('/router/**.{less,css}', {
-  useHash:true,
+  //useHash:true,
   //packTo: '/static/dist/$0'
   release: '/static/dist/$0'
 });
@@ -400,7 +400,7 @@ fis.match('/api/**.{es6,js}', {
   packTo: '/static/dist/api/api.js'
 });
 fis.match('/static/dist/api/api.js', {
-  useHash:true,
+  //useHash:true,
   release: '/static/dist/api/api.js'
 });
 
@@ -410,7 +410,7 @@ fis.match('/resources/**.{js,es6}', {
   packTo: '/static/dist/resources/resources.js'
 });
 fis.match('/static/dist/resources/resources.js', {
-  useHash:true,
+  //useHash:true,
   release: '/static/dist/resources/resources.js'
 });
 fis.match('/resources/**.{less,css}', {
@@ -418,7 +418,7 @@ fis.match('/resources/**.{less,css}', {
   packTo: '/static/dist/resources/resources.css'
 });
 fis.match('/static/dist/resources/resources.css', {
-  useHash:true,
+  //useHash:true,
   release: '/static/dist/resources/resources.css'
 });
 //合并裤文件
@@ -427,7 +427,7 @@ fis.match('/console/**.{js,es6}', {
   packTo: '/static/dist/console/console.js'
 });
 fis.match('/static/dist/console/console.js', {
-  useHash:true,
+  //useHash:true,
   release: '/static/dist/console/console.js'
 });
 fis.match('/console/**.{css,less}', {
@@ -435,7 +435,7 @@ fis.match('/console/**.{css,less}', {
   packTo: '/static/dist/console/console.css'
 });
 fis.match('/static/dist/console/console.css', {
-  useHash:true,
+  //useHash:true,
   release: '/static/dist/console/console.css'
 });
 fis.match('/console1/**.{js,es6}', {
@@ -443,7 +443,7 @@ fis.match('/console1/**.{js,es6}', {
   packTo: '/static/dist/console1/console.js'
 });
 fis.match('/static/dist/console1/console.js', {
-  useHash:true,
+  //useHash:true,
   release: '/static/dist/console1/console.js'
 });
 fis.match('/console1/**.{css,less}', {
@@ -451,26 +451,26 @@ fis.match('/console1/**.{css,less}', {
   packTo: '/static/dist/console1/console.css'
 });
 fis.match('/static/dist/console1/console.css', {
-  useHash:true,
+  //useHash:true,
   release: '/static/dist/console1/console.css'
 });
 
 //项目
 fis.match('/projects/**.{less,css}', {
-  useHash: false,
+  //useHash: false,
   packTo: '/static/dist/projects/projects.css'
 });
 fis.match('/static/dist/projects/projects.css', {
-  useHash: true,
+  //useHash: true,
   release: '/static/dist/projects/projects.css'
 });
 fis.match('/projects/**.{js,es6}', {
-  useHash: false,
+  //useHash: false,
   //useHash:true,
   packTo: '/static/dist/projects/projects.js'
 });
 fis.match('/static/dist/projects/projects.js', {
-  useHash: true,
+  //useHash: true,
   release: '/static/dist/projects/projects.js'
 });
 
@@ -481,7 +481,7 @@ fis.match('/flow/**.{js,es6}', {
   packTo: '/static/dist/flow/flow.js'
 });
 fis.match('/static/dist/flow/flow.js', {
-  useHash: true,
+  //useHash: true,
   release: '/static/dist/flow/flow.js'
 });
 fis.match('/flow/**.{less,css}', {
@@ -489,7 +489,7 @@ fis.match('/flow/**.{less,css}', {
   packTo: '/static/dist/flow/flow.css'
 });
 fis.match('/static/dist/flow/flow.css', {
-  useHash: true,
+  //useHash: true,
   release: '/static/dist/flow/flow.css'
 });
 
@@ -656,42 +656,42 @@ fis.match('/app/project/single/**.{js,es6}', {
   packTo: '/static/dist/app/project/single/project.js'
 });
 fis.match('/static/dist/app/project/single/project.js', {
-  useHash: true,
+  //useHash: true,
   release: '/static/dist/app/project/single/project.js'
 });
 fis.match('/app/project/single/**.{css,less}', {
   packTo: '/static/dist/app/project/single/project.css'
 });
 fis.match('/static/dist/app/project/single/project.css', {
-  useHash: true,
+  //useHash: true,
   release: '/static/dist/app/project/single/project.css'
 });
 fis.match('/app/project/modelChange/**.{js,es6}', {
   packTo: '/static/dist/app/project/modelChange/index.js'
 });
 fis.match('/static/dist/app/project/modelChange/index.js', {
-  useHash: true,
+  //useHash: true,
   release: '/static/dist/app/project/modelChange/index.js'
 });
 fis.match('/app/project/modelChange/**.{css,less}', {
   packTo: '/static/dist/app/project/modelChange/index.css'
 });
 fis.match('/static/dist/app/project/modelChange/index.css', {
-  useHash: true,
+  //useHash: true,
   release: '/static/dist/app/project/modelChange/index.css'
 });
 fis.match('/app/project/projectChange/**.{js,es6}', {
   packTo: '/static/dist/app/project/projectChange/index.js'
 });
 fis.match('/static/dist/app/project/projectChange/index.js', {
-  useHash: true,
+  //useHash: true,
   release: '/static/dist/app/project/projectChange/index.js'
 });
 fis.match('/app/project/projectChange/**.{css,less}', {
   packTo: '/static/dist/app/project/projectChange/index.css'
 });
 fis.match('/static/dist/app/project/projectChange/index.css', {
-  useHash: true,
+  //useHash: true,
   release: '/static/dist/app/project/projectChange/index.css'
 });
 
@@ -732,6 +732,22 @@ fis.match('/qualityFill/js/wDialog.min.js', {
 fis.match('/qualityFill/css/**.css', {
   packTo: '/static/dist/qualityFill/css/quality.css'
 });
+
+
+//topNav.css,js
+fis.match('/topNav/css/**.less', {
+  packTo: '/static/dist/topNav/css/topNav.css'
+});
+fis.match('/static/dist/topNav/css/topNav.css', {
+  release: '/static/dist/topNav/css/topNav.css'
+});
+fis.match('/topNav/js/**.es6', {
+  packTo: '/static/dist/topNav/js/topNav.js'
+});
+fis.match('/static/dist/topNav/js/topNav.js', {
+  release: '/static/dist/topNav/js/topNav.js'
+});
+
 
 //  fis.match('**.html', {
 //   //useHash:true,
