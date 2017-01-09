@@ -632,8 +632,20 @@ App.Console = {
     }
 
     $("#submit0").click(function() {
+      if ($("#originator").find("div").length <= 0) {
+        alert("请添加发起人");
+        return;
+      }
       if ($("#auditor").find("div").length <= 0) {
         alert("请添加审核人");
+        return;
+      }
+      if ($("#querenPeople").find("div").length <= 0) {
+        alert("请添加确认人");
+        return;
+      }
+      if ($("#sendee").find("div").length <= 0) {
+        alert("请添加接收人");
         return;
       }
       var data = {
@@ -641,38 +653,37 @@ App.Console = {
         projectNo: $("#number").val().trim(),
         name: $("#famTitle").val().trim(),
         province: $("#province option:selected").html().trim(),
-        projectType: $("#projectFormat option:selected").html().trim(),
-        estateType: $("#s01").val().trim(),
+        subType: $("#s01").val().trim(),//项目类型
+        estateType: $("#projectModel").val().trim(),// 项目模式
+        projectType: $("#projectFormat").val().trim(),//项目业态
         region: $("#adminZone option:selected").html().trim(),
         openTime: $("#openDate").val().trim(),
         delistingDate: $("#delistDate").val().trim(),
         designUnit: $("#launchDepartment").val().trim(),
-        subType: $("#s01").val().trim(),
         "initiator": App.Console.getPerson(0),
         "auditor": App.Console.getPerson(1),
         "confirmor": App.Console.getPerson(2),
         "receiver": App.Console.getPerson(3)
       };
-      console.log(data)
       var stringData = JSON.stringify(data);
-      // $.ajax({
-      //   url: "platform/project",
-      //   data: stringData,
-      //   headers: {
-      //     "Content-Type": "application/json"
-      //   },
-      //   type: "POST"
-      // }).done(function(data) {
-      //   if (data.code == "1") {
-      //     if (data.message == "projectNo repeat!") {
-      //       alert("项目编号重复");
-      //     }
-      //   }else{
-      //     if (data.message == "success") {
-      //       alert("成功");
-      //     }
-      //   }
-      // });
+      $.ajax({
+        url: "platform/project",
+        data: stringData,
+        headers: {
+          "Content-Type": "application/json"
+        },
+        type: "POST"
+      }).done(function(data) {
+        if (data.code == "1") {
+          if (data.message == "projectNo repeat!") {
+            alert("项目编号重复");
+          }
+        }else{
+          if (data.message == "success") {
+            alert("成功");
+          }
+        }
+      });
     });
     $("#submit1").click(function() {
       var data = {
