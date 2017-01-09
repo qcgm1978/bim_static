@@ -633,7 +633,7 @@ App.Console = {
 
     $("#submit0").click(function() {
       if ($("#auditor").find("div").length <= 0) {
-        alert("请添加审核人") ;
+        alert("请添加审核人");
         return;
       }
       var data = {
@@ -642,9 +642,10 @@ App.Console = {
         name: $("#famTitle").val().trim(),
         province: $("#province option:selected").html().trim(),
         projectType: $("#projectFormat option:selected").html().trim(),
-        estateType: $("#projectModel option:selected").html().trim(),
+        estateType: $("#s01").val().trim(),
         region: $("#adminZone option:selected").html().trim(),
         openTime: $("#openDate").val().trim(),
+        delistingDate: $("#delistDate").val().trim(),
         designUnit: $("#launchDepartment").val().trim(),
         subType: $("#s01").val().trim(),
         "initiator": App.Console.getPerson(0),
@@ -652,25 +653,26 @@ App.Console = {
         "confirmor": App.Console.getPerson(2),
         "receiver": App.Console.getPerson(3)
       };
+      console.log(data)
       var stringData = JSON.stringify(data);
-      $.ajax({
-        url: "platform/project",
-        data: stringData,
-        headers: {
-          "Content-Type": "application/json"
-        },
-        type: "POST"
-      }).done(function(data) {
-        if (data.code == "1") {
-          if (data.message == "projectNo repeat!") {
-            alert("项目编号重复");
-          }
-        }else{
-          if (data.message == "success") {
-            alert("成功");
-          }
-        }
-      });
+      // $.ajax({
+      //   url: "platform/project",
+      //   data: stringData,
+      //   headers: {
+      //     "Content-Type": "application/json"
+      //   },
+      //   type: "POST"
+      // }).done(function(data) {
+      //   if (data.code == "1") {
+      //     if (data.message == "projectNo repeat!") {
+      //       alert("项目编号重复");
+      //     }
+      //   }else{
+      //     if (data.message == "success") {
+      //       alert("成功");
+      //     }
+      //   }
+      // });
     });
     $("#submit1").click(function() {
       var data = {
@@ -1285,29 +1287,37 @@ App.Console = {
 
     })
   },
-
+  refreshProjectListFun(){//成本 三步提交成功之后都会从新刷新项目列表的方法
+    $.ajax({
+      url: "/platform/project/list/all/cost"
+    }).done(function(data) {
+      var str = '<option value="0">请选择</option>',
+          optionDom = '<option value="0">请选择</option>',
+          datas = data.data;
+      $('#s11,#s21,#transferProject').html("");
+      $('#projectList_two,#projectList').html("");
+      $.each(datas, function(index, data) {
+        str += "<option projectId=" + data.projectId + " id=" + data.id + " value=" + data.projectCode + ">" + data.projectName + "</option>";
+      });
+      $('#s11,#s21,#transferProject').append(str);
+      $("#projectList_two,#projectList").append(optionDom);
+    });
+  },
   cost() {
     var tpl = _.templateUrl('/console1/tpls/cost/cost.html', true);
     $("#contains").html(tpl);
-    $('textarea').hide();
-
+    $('textarea').hide();    
     $.ajax({
       // url: "/platform/project/cost/mapping",
       url: "/platform/project/list/all/cost"
     }).done(function(data) {
       var str = '',
         datas = data.data;
-
       $.each(datas, function(index, data) {
-        //console.log(data);
-        str += "<option designFlowCode=" + data.projectCode + " projectId=" + data.projectId + " id=" + data.id + " value=" + data.projectCode + ">" + data.projectName + "</option>";
+        str += "<option projectId=" + data.projectId + " id=" + data.id + " value=" + data.projectCode + ">" + data.projectName + "</option>";
       });
-      $('#s11,#s21').append(str);
-
+      $('#s11,#s21,#transferProject').append(str);
     });
-
-
-
     $("#submit1").click(function() {
       var div = $('#form1 div'),
         arr = [];
@@ -1323,13 +1333,14 @@ App.Console = {
         workflowCode: parseInt(9999999 * Math.random()),
         costAttachments: arr,
         projectCode: $('#s11').val().trim(),
-        designFlowCode: $('#s11 option:selected').attr('designFlowCode').trim(),
+        designFlowCode: $('#s11').val().trim(),
         projectId: $('#s11 option:selected').attr('projectId').trim(),
         title: $('#p11').val().trim()
       };
-      App.Console.apply(1, 1001, data, 2);
+      App.Console.apply(1, 1001, data, 2,function(){
+        App.Console.refreshProjectListFun();
+      });
     });
-
     $("#submit2").click(function() {
       var div = $('#form2 div'),
         arr = [];
@@ -1346,10 +1357,86 @@ App.Console = {
         costAttachments: arr,
         projectCode: $('#s21').val().trim(),
         projectId: $('#s21 option:selected').attr('projectId').trim(),
-        designFlowCode: $('#s21 option:selected').attr('designFlowCode').trim(),
+        designFlowCode: $("#projectList").val().trim(),
       };
-      App.Console.apply(2, 1003, data, 2);
+      App.Console.apply(2, 1003, data, 2,function(){
+        App.Console.refreshProjectListFun();
+      });
     });
+    //start 成本的第三个提交的方法
+    $("#transferSubmitBtn").click(function(){
+      var imgListBox = $("#form3 div")
+          arr = [];
+      imgListBox.each(function(index, item) {
+        arr.push({
+          "type": 1,
+          "description": $(item).find('span').text(),
+          "url": location.origin + '/platform/mock/costfile?token=123&filePath=' + $(item).data('path')
+        })
+      })
+      var data = {
+        workflowCode: parseInt(9999999 * Math.random()),
+        title: $('#transfer_title').val().trim(),
+        costAttachments: arr,
+        projectCode: $('#transferProject').val().trim(),
+        projectId: $('#transferProject option:selected').attr('projectId').trim(),
+        designFlowCode: $("#projectList_two").val().trim(),
+      };
+      App.Console.apply(3, 1004, data, 2,function(){
+        App.Console.refreshProjectListFun();
+      });
+    })
+    //end 成本的第三个提交的方法
+    //start 成本第二个提交的选择项目 获取项目清单的方法
+    $("#s21").change(function(event) {
+      var optionDom = '<option value="0">请选择</option>';
+      var projectList = $("#projectList");
+      var target = $(event.target);
+      var projectCode = target.val().trim();
+      var projectId = target.find('option:selected').attr("projectId").trim();
+      var data = {
+        code:projectCode,
+        type:10,
+        projectId:projectId
+      }
+      $.ajax({
+        type: "GET",
+        data:data,
+        url: "/platform/project/console1/workflow/query"
+      }).done(function(data) {
+        projectList.html("");
+        $.each(data.data, function(index, data) {
+          optionDom += "<option value=" + data.workflowCode + ">" + data.title + "</option>";
+        });
+        projectList.append(optionDom);
+      });
+    });
+    //end 成本第二个提交的选择项目 获取项目清单的方法
+    //start 成本第三个提交的选择项目 获取项目清单的方法
+    $("#transferProject").change(function(event) {
+      var optionDom = '<option value="0">请选择</option>';
+      var projectListTwo = $("#projectList_two");
+      var target = $(event.target);
+      var projectCode = target.val().trim();
+      var projectId = target.find('option:selected').attr("projectId").trim();
+      var data = {
+        code:projectCode,
+        type:11,
+        projectId:projectId
+      }
+      $.ajax({
+        type: "GET",
+        data:data,
+        url: "/platform/project/console1/workflow/query"
+      }).done(function(data) {
+        projectListTwo.html("");
+        $.each(data.data, function(index, data) {
+          optionDom += "<option value=" + data.workflowCode + ">" + data.title + "</option>";
+        });
+        projectListTwo.append(optionDom);
+      });
+    });
+    //end 成本第三个提交的选择项目 获取项目清单的方法
     //uploadtest
     $('.ready').on('click', 'i', function(e) {
       $(this).parent().remove();
@@ -1377,7 +1464,6 @@ App.Console = {
       }
     });
 
-
     var choose1 = document.getElementById('choose1');
     FileAPI.event.on(choose1, 'change', function(evt) {
       var files = FileAPI.getFiles(evt); // Retrieve file list
@@ -1399,8 +1485,30 @@ App.Console = {
           }
         });
       }
-
     });
+    //start 成本的第三步上传功能
+    var choose2 = document.getElementById('choose2');
+    FileAPI.event.on(choose2, 'change', function(evt) {
+      var files = FileAPI.getFiles(evt); // Retrieve file list
+      if (files.length) {
+        FileAPI.upload({
+          url: '/platform/mock/costfile?token=123',
+          files: {
+            file: files
+          },
+          progress: function(evt) { /* ... */ },
+          filecomplete: function(err, xhr, file) {
+            var data = JSON.parse(xhr.response);
+            if (data.code == 0) {
+              $('#form3').append('<div data-path="' + data.data.filePath + '"><span>' + file.name + '</span></div>')
+            } else {
+              alert('上传失败')
+            }
+          }
+        });
+      }
+    });
+    //end 成本的第三步上传功能
   },
   quest(index, num, obj, type) {
     var datainit = JSON.parse($('#data' + index).val());
@@ -1435,23 +1543,24 @@ App.Console = {
       },
       type: "POST"
     }).done(function(data) {
-      $("#result" + index).val(JSON.stringify(data))
-      alert(data.message || data.code)
+      $("#result" + index).val(JSON.stringify(data));
+      if (data.message == "success") {
+        alert("成功");
+      } else {
+        alert(data.message || data.code)
+      }
     });
   },
-  apply(index, num, obj, type) {
+  apply(index, num, obj, type,callback) {
     var datainit = JSON.parse($('#data' + index).val());
     if (typeof obj != 'undefined') {
-      console.log(datainit)
       for (var g in obj) {
         datainit[g] = obj[g];
-
       }
       if (datainit['initiator'] && datainit['initiator']['userId'] == 123) {
         var userId = JSON.parse(localStorage.user)['userId'];
         datainit['initiator']['userId'] = datainit['auditor'][0]['userId'] = datainit['confirmor'][0]['userId'] = datainit['receiver'][0]['userId'] = userId;
       }
-
       var data = {
         "msgContent": JSON.stringify({
           "messageId": "411a109141d6473c83a86aa0480d6610",
@@ -1471,7 +1580,6 @@ App.Console = {
         "sysCode": "1"
       };
     }
-
     $.ajax({
       url: type == 1 ? "sixD/internal/message" : "platform/internal/message",
       data: JSON.stringify(data),
@@ -1481,10 +1589,12 @@ App.Console = {
       type: "POST"
     }).done(function(data) {
       $("#result" + index).val(JSON.stringify(data))
-      console.log(data);
       if (location.port != 81) {
         setTimeout(function() {
-          alert('成功')
+          alert('成功');
+          if(callback) {
+            callback();
+          }
         }, 2500);
       }
 
@@ -1606,7 +1716,7 @@ App.Console = {
               str += '<option  value="' + item.id + '">' + item.name + '</option>';
             }
           });
-          $("#" + versionid).html("<option value=''>请选择版本</option>"+str);
+          $("#" + versionid).html("<option value=''>请选择版本</option>" + str);
 
         });
       });

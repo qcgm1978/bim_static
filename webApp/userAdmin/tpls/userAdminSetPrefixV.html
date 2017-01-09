@@ -1,6 +1,35 @@
-<h2>用户前缀</h2>
+<!-- <h2>用户前缀</h2>
 <div class="userAdminPrefixInputBox">
 	<label>eg:</label>
 	<input type="text" id="userAdminPrefixInput" value="<%= obj.state.prefix %>" placeholder="请配置用户前缀">
 	<button id="submitPrefixBtn">确定</button>
-</div>
+</div> -->
+<%  if(obj.state.length>0) {%>
+	<table>
+		<thead>
+			<tr>
+				<td>登录账号 </td>
+				<td>账号前缀</td>
+				<td>用户名称</td>
+				<td>账号密码</td>
+				<td>账号操作</td>
+			</tr>
+		</thead>
+		<tbody>
+			<% _.each(obj.state,function(item){%>
+				<tr>
+					<td><%= item.loginid %></td>
+					<td><%= item.prefix %></td>
+					<td><%= item.username %></td>
+					<td><%= item.pwd %></td>
+					<td>
+						<a href="javascript:;" data-loginid='<%= item.loginid %>' class="viewUserItem viewUserEdite">编辑</a>
+						<a href="javascript:;" data-loginid='<%= item.loginid %>' class="viewUserItem viewUserDelete">删除</a>
+					</td>
+				</tr>
+			<% }) %>
+		</tbody>
+	</table>
+<% }else{ %>
+	<div class="nullViewUserList">还没有浏览用户，请点击添加按钮添加</div>
+<% } %>
