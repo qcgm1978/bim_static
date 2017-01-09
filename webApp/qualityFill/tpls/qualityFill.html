@@ -215,6 +215,14 @@ var Event = {
         var trDOM = checkbox.parentNode.parentNode;
         this.rowDOM.push(trDOM);
     },
+    checkAllRow : function(){
+        var i;
+        var $trs = $("#gridContainer tr");
+        for(i=0;i<$trs.length;i++)
+        {
+            this.checkRow($($trs[i]).find(".checkbox")[0]);
+        }
+    },
     saveData : function(){
         var $trs = $("#gridContainer tr");
         var $this;
@@ -274,6 +282,7 @@ var Event = {
             if($(this).prop("checked"))
             {
                 $(".checkbox").prop("checked",true);
+                th.checkAllRow();
             }
             else
             {
