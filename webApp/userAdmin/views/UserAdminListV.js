@@ -35,8 +35,8 @@ App.userAdmin.UserAdminListV = Backbone.View.extend({
 		//初始化窗口
 		App.userAdmin.UserAdminListV.EditDialog = new App.Comm.modules.Dialog({
 		    title:"编辑用户",
-		    width:400,
-		    height:300,
+		    width:600,
+		    height:400,
 		    isConfirm:false,
 		    isAlert:false,
 		    closeCallback:function(){},
