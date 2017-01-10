@@ -112,10 +112,54 @@ var readyPosState = ["绑定预设点","解绑"];
 var posState = ["绑定构建位置","解绑"];
 var Data = {
     projectData:{},
-    formData:{}
+    formData:{
+        "messageId": "ddcc2bc8964b4dfabdf05c1898997324",
+        "messageType": "QUALITY-1004",
+        "timestamp": "1482722921867",
+        "code": true,
+        "message": "success",
+        "data": []
+    },
+    itemData : {
+        "id": "7a6bdcca-b0b4-41eb-92fd-e59a6f87d723",
+        "projectCode": "02aa76f5-59fe-47fb-af75-5fb736319f0d",
+        "acceptanceType": 1,
+        "name": "屋面二次开洞未补做蓄水试验",
+        "discoverDate": 1482721932000,
+        "rectifyDate": 1482940800000,
+        "rectifyCount": 0,
+        "status": 1,
+        "levelId": 2,
+        "organizationTypeID": 1,
+        "dangerImageID": "3e972410-0208-41fd-be0e-1f56308b209b",
+        "ratingCategoryID": 2,
+        "presetPointID": null,
+        "PresetPointCompoentID": null,
+        "componentID": null,
+        "location": null,
+        "axis": null
+    }
 };
 
-var initComponent = function(){
+var Url = {
+    getParam : function(key){
+        var search = location.search;
+        search = search.replace("?","");
+        var items = search.split("&");
+        var item,i;
+        for(i=0;i<items.length;i++)
+        {
+            item = items[i].split("=");
+            if(item[0]==key)
+            {
+                return item[1];
+            }
+        }
+        return "";          
+    }   
+};
+
+var initComponent = function(projectCode){
     jQuery.support.cors = true;
     var viewer = new InspectModelSelection({
         type: "process",//open process
@@ -123,7 +167,8 @@ var initComponent = function(){
         height: "500px",
         width:"1200px",
         //projectCode: '36caa07c-4c7d-4c95-84ae-fb56f53f0dc3',  //projectNo
-        projectCode : "edbae83a-8a9f-4dfa-9588-18d7d33f71b6",
+        //projectCode : "edbae83a-8a9f-4dfa-9588-18d7d33f71b6",
+        projectCode : projectCode,
         /*
         token:"4aeba9fa8574d9a7f5e6ff2fbc54cd5cf45d7f3949df6bdf1f5c49f4349baa01a76b19a3118007e98a2546f76a1e5c7c6dff6a0b87795a92",
         appKey: "60e8a1d9fc1d44d7b6a4cf85ae2987ed",
@@ -134,7 +179,7 @@ var initComponent = function(){
             $('#test').val(JSON.stringify(res))
         },
         withCheckpoint : true
-    });        
+    });
 }
 
 var initDialog = function(){
@@ -170,6 +215,8 @@ var Event = {
         $("#DlgBtn_ok").on("click",function(){
             window.Dlg.hide();
             $("#projectName").html(Data.projectData.projectName);
+            initComponent(Data.projectData.projectCode);
+            console.log(777);
         });
         var $Dlg_content = $("#Dlg .dlg-content");
         $Dlg_content.on("click","div",function(){
@@ -235,11 +282,24 @@ var Event = {
             console.log($this.find("select.select-type")[0].value);
             //Data.formData.
         });
+        this.sendData();
     },
     sendData : function(){
+        $.ajax({
+            url:"/sixD/internal/message",
+            type:"post",
+            dataType:"json",
+            data:{
+                id:"111"
+            },
+            success : function(data){
 
+            }
+
+        });
     },
     bindEvent : function(){
+    /*事件入口*/
         var th = this;
         this.lineHTML = '<tr><td class="chk"><input type="checkbox" name="chk" class="checkbox"/></td>'+
                         '<td>{select-type}</td>'+
@@ -312,8 +372,8 @@ var Event = {
         $("#btn_save").on("click",function(e){
             th.saveData();
         });
-        this.initDialogEvent();
-        this.initDialogData();
+        //this.initDialogEvent();
+        //this.initDialogData();
     }
 };
 
@@ -325,9 +385,8 @@ var initOptions = function(){
 }
 
 var init = function(){
-    initDialog();
-    initComponent();
     initOptions();
+    initComponent(Url.getParam("projectCode"));
     Event.bindEvent();
 };
 
