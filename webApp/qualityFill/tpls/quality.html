@@ -62,8 +62,8 @@ var Event = {
         });
         $("#DlgBtn_ok").on("click",function(){
             window.Dlg.hide();
-            var href = "/static/dist/qualityFill/quality.html?projectCode={projectCode}&projectId={projectId}&projectName={projectName}";
-            var link = href.replace("{projectCode}",window.projectCode).replace("{projectId}",window.projectId).replace("{projectName}",window.projectName);
+            var href = "/static/dist/qualityFill/qualityFill.html?projectCode={projectCode}&projectId={projectId}&projectName={projectName}";
+            var link = href.replace("{projectCode}",window.projectCode).replace("{projectId}",window.projectId).replace("{projectName}",encodeURI(window.projectName));
             window.location.href = link;
         });
         var $Dlg_content = $("#Dlg .dlg-content");

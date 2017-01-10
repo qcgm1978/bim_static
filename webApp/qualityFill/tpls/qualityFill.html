@@ -382,6 +382,8 @@ var initOptions = function(){
     var $tr = $("#gridContainer tr");
     $tr.find(".linkBtn-ready-pos").html(readyPosState[0]);
     $tr.find(".linkBtn-pos").html(posState[0]);
+
+    $("#projectName").html(decodeURI(Url.getParam("projectName")));
 }
 
 var init = function(){
