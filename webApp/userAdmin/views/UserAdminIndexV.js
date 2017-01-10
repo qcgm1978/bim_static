@@ -4,6 +4,7 @@ App.userAdmin.UserAdminIndexV = Backbone.View.extend({
 	events: {
  		"click #viewUlTab li": "switchTab",
  		"click #addViewUserBtn": "addViewUserFun",
+ 		"click #addViewUserPrefixFun": "addViewUserPrefixFun",
  	},
 	render:function(){
 		this.$el.html(this.template());
@@ -25,8 +26,8 @@ App.userAdmin.UserAdminIndexV = Backbone.View.extend({
 	},
 	renderAddPrefixDom:function(){//加载添加前缀的方法
 		$("#viewShowBox").find("div.viewUserSet").siblings().css("display","none").end().css("display","block");
-		var UserAdminSetPrefixV = new App.userAdmin.UserAdminSetPrefixV;
-		this.$el.find(".viewUserSetBox").html(UserAdminSetPrefixV.render().el);
+		var UserAdminPrefixListV = new App.userAdmin.UserAdminPrefixListV;
+		this.$el.find(".viewUserSetBox").html(UserAdminPrefixListV.render().el);
 	},
 	renderUserAdminListDom:function(){//加载添加用户的方法
 		$("#viewShowBox").find("div.viewUserList").siblings().css("display","none").end().css("display","block");
@@ -47,4 +48,19 @@ App.userAdmin.UserAdminIndexV = Backbone.View.extend({
 		    message:addDialogEleDom
 		});
 	},
+	addViewUserPrefixFun:function(evt){//添加用户前缀的方法
+		var addDialogEle = new App.userAdmin.AddUserAdminPrefixDialogV;
+		var addDialogEleDom = addDialogEle.render().el;
+		//初始化窗口
+		App.userAdmin.UserAdminIndexV.AddPrefixDialog = new App.Comm.modules.Dialog({
+		    title:"新建用户前缀",
+		    width: 380,
+	    	height: 100,
+		    isConfirm:false,
+		    isAlert:false,
+		    closeCallback:function(){},
+		    message:addDialogEleDom
+		});
+	},
+
 })

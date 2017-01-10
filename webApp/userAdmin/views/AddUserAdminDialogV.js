@@ -23,8 +23,8 @@ App.userAdmin.AddUserAdminDialogV = Backbone.View.extend({
 	    App.userAdmin.getPrefixsDataC.fetch({
 			success: function(collection, response, options) {
 				var dataArr = response.data;
-				var AddUserAdminDialogPrefixListV = new App.userAdmin.AddUserAdminDialogPrefixListV;
-				_this.$el.find(".prefixBox").append(AddUserAdminDialogPrefixListV.render(dataArr).el);
+				var DialogProjectPrefixListV = new App.userAdmin.DialogProjectPrefixListV;
+				_this.$el.find(".prefixBox").append(DialogProjectPrefixListV.render(dataArr).el);
 			}
 		})
 	},
@@ -124,7 +124,7 @@ App.userAdmin.AddUserAdminDialogV = Backbone.View.extend({
 	},
 	submitFun:function(e){	
 		var selectCheckBox = $(".projectUlBox").find("label.selectCheckBox");
-		var selectPrefixBox = $(".selectPrefixBox");
+		var selectPrefixBox = $(".selectPrefixBox").text().trim();
 		var projectIdArr = [];
 		if(selectCheckBox.length<=0){
 			alert("分配的项目不能为空!");
@@ -137,13 +137,14 @@ App.userAdmin.AddUserAdminDialogV = Backbone.View.extend({
 		for (var i = selectCheckBox.length - 1; i >= 0; i--) {
 			projectIdArr.push(parseInt($(selectCheckBox[i]).data("projectid")));
 		}
-		this.submitAjaxFun(projectIdArr);
+		this.submitAjaxFun(projectIdArr,selectPrefixBox);
 	},
-	submitAjaxFun:function(projectIdArr){//添加用户的方法
+	submitAjaxFun:function(projectIdArr,selectPrefixBoxVal){//添加用户的方法
 		var _data = {
 			"userName":this.default.userName,
 			"loginId":this.default.accrentName,
 		    "pwd":this.default.accrentPwd,
+		    "prefix":selectPrefixBoxVal,
 		    "projects":projectIdArr
 		}
 		//保存数据

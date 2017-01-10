@@ -135,36 +135,47 @@
 			.viewUserSetBox{
 				width: 100%;
 				height: 100%;
-				.userAdminPrefixBox{
-					width: 100%;
-					height: 100%;
-					h2{
-						font-size: 16px;
-						color: #333;
-						line-height: 25px;
-						height: 25px;
-					}
-					.userAdminPrefixInputBox{
-						width: 100%;
-						margin: 24px 0;
-						&>label{
-							float: left;
-							height: 23px;
-							line-height: 23px;
-							width: 50px;
-							text-align: right;
-							padding-right: 16px;
-						}
-						&>input{
-							float: left;
-							width: 100px;
-							height:25px;
-							line-height: 25px;
-							padding: 0 8px;
-							margin-right: 16px;
-						}
-					}
-				}
+				position: relative;
+				z-index: 8;
+				margin-top: -38px;
+	    		padding-top: 54px;
+	    		table{
+	    			width: 100%;
+	    			border: #aaa solid 1px;
+	    			thead{
+	    				background-color: #ccc;
+	    				tr td{
+	    					border-right: #aaa solid 1px;
+	    					font-size: 16px;
+	    				}
+	    			}
+	    			tbody tr td{
+	    				font-size: 14px;
+	    				width: 20%;
+	    			}
+	    		}
+	    		table tr td{
+	    			height: 48px;
+	    			line-height: 48px;
+	    			color: #333;
+	    			text-align: left;
+	    			border-bottom: #aaa solid 1px;
+	    			border-right: #aaa solid 1px;
+	    			padding-left: 16px;
+	    			a.viewUserItem{
+	    				border: 0;
+	    				width: auto;
+	    				margin-right: 32px;
+	    				&:hover{
+	    					color: #408cdf;
+	    					text-decoration: underline;
+	    				}
+	    			}
+	    		}
+	    		table tr td:nth-child(":last"){
+	    			border-bottom: 0;
+	    			border-right: 0;
+	    		}
 			}
 		}
 	}
@@ -278,6 +289,65 @@
 		min-height:32px;
 		height: 32px;
 		margin-top: 20px;
+	}
+}
+.addViewUserPrefixBox{
+	width: 100%;
+	height: 100%;
+	.addViewUserPrefixInput{
+		width: 100%;
+		height: 36px;
+		label{
+			height: 36px;
+			line-height: 36px;
+			width: 80px;
+			float: left;
+			font-weight: normal;
+		}
+		.inputBox{
+			width: 260px;
+			float: left;
+			position: relative;
+			input{
+				width: 256px;
+				height: 36px;
+				line-height: 36px;
+				padding: 0 8px;
+			}
+			input::-webkit-input-placeholder{
+		　　	color: #333 !important;
+		　　}
+			.errorBox{
+				position: absolute;
+				left: 0;
+				padding-left: 8px;
+				top: 37px;
+				color: red;
+				height: 25px;
+				line-height: 25px;
+				font-size: 12px;
+				font-weight: bold;
+				display: none;
+			}
+		}
+		button{
+			width: 256px;
+			height: 36px;
+			line-height: 36px;
+			background:none;
+			margin:0;
+			padding:0;
+			border: 0;
+			background-color: #ccc;
+			color: #333;
+			font-size: 14px;
+			&:hover{
+				color: #408cdf;
+			}
+		}
+	}
+	.last_addViewUserInput{
+		margin-top: 28px;
 	}
 }
 .deleteViewUserBox{

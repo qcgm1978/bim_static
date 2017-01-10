@@ -340,6 +340,8 @@ App.API = {
 		getFileStatus:"platform/report/job/status",//获取文件上传转换状态的地址
 
 		getPrefixsList:"platform/testuser/prefix",//获取用户前缀列表的地址
+		checkUserPrefix:"platform/testuser/check/prefix",//检查用户前缀是否存在的地址
+		addViewUserPrefix:"platform/testuser/prefix",//添加用户前缀的地址
 	},
 
 	DEBUGURL: {

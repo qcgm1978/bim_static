@@ -109,4 +109,19 @@ App.userAdmin = {
 			}
 		}
 	})),
+	checkUserPrefixC:new(Backbone.Collection.extend({//检查用户前缀是否存在的collection方法
+		model: Backbone.Model.extend({
+			defaults: function() {
+				return {
+					title: ''
+				}
+			}
+		}),
+		urlType: "checkUserPrefix",
+		parse: function(response) {
+			if (response.message == "success") {
+				return response.data;
+			}
+		}
+	})),
 };
