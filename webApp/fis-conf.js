@@ -327,7 +327,10 @@ fis.match('/libs/jquery/jquery-1.12.0.min.js', {
   //useHash:true,
   packTo: '/static/dist/login/jquery-1.12.0.min.js'
 });
-
+fis.match('/libs/jquery/underscore.1.8.2.js', {
+  //useHash:true,
+  packTo: '/static/dist/login/underscore.1.8.2.js'
+});
 
 // 代办
 fis.match('/todo/**.{js,es6}', {
@@ -722,6 +725,9 @@ fis.media('prod').match('*.{png,jpg,gif}', {
 //质检系统 隐患填报模拟
 fis.match('qualityFill/tpls/qualityFill.html', {
   release: "/static/dist/qualityFill/qualityFill.html"
+});
+fis.match('qualityFill/tpls/quality.html', {
+  release: "/static/dist/qualityFill/quality.html"
 });
 fis.match('/qualityFill/js/template.min.js', {
   packTo: '/static/dist/qualityFill/js/template.min.js'
