@@ -107,6 +107,9 @@
 </body>
 </html>
 <script type="text/javascript">
+Array.clone = function(oldAr,newAr){
+
+}
 
 var readyPosState = ["绑定预设点","解绑"];
 var posState = ["绑定构建位置","解绑"];
@@ -216,7 +219,6 @@ var Event = {
             window.Dlg.hide();
             $("#projectName").html(Data.projectData.projectName);
             initComponent(Data.projectData.projectCode);
-            console.log(777);
         });
         var $Dlg_content = $("#Dlg .dlg-content");
         $Dlg_content.on("click","div",function(){
