@@ -608,7 +608,7 @@ App.Console = {
             str = '';
           $.each(items, function(i, item) {
             if (item.projectCode) {
-              str += '<option value="' + item.projectCode + '" id="' + item.projectCode + '">' + item.name + '</option>';
+              str += '<option value="' + item.projectCode + '" versionId="' + item.projectId + '" id="' + item.projectCode + '">' + item.name + '</option>';
             }
           });
           $("#s41").html("<option value=''>请选择</option>" + str);
@@ -741,6 +741,7 @@ App.Console = {
       };
       App.Console.quest(3, 1014, data);
     });
+    //start 项目模拟的第五步
     $("#submit4").click(function() {
       var data = {
         workflowId: parseInt(9999999 * Math.random()),
@@ -748,12 +749,14 @@ App.Console = {
         title: $("#p41").val().trim(),
         description: $("#p42").val().trim(),
         "initiator": App.Console.getPerson(0),
+        versionId: $('#s41 option:selected').attr("versionId").trim(),
         "auditor": App.Console.getPerson(1),
         "confirmor": App.Console.getPerson(2),
         "receiver": App.Console.getPerson(3)
       };
       App.Console.quest(4, 1015, data);
     });
+    //end 项目模拟的第五步
     $("#submit5").click(function() {
       var data = {
         workflowId: $('#s51').val().trim(),

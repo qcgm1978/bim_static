@@ -1,5 +1,5 @@
 <% if(obj.state.length>0) {%>
 	<% _.each(obj.state,function(item){%>
-		<option value="1">前缀一</option>
+		<option value=<%= item.id %>><%= item.prefix %></option>
 	<%})%>
 <%}%>

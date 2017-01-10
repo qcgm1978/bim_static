@@ -83,7 +83,7 @@ App.BodyContent.control = {
             }
 
         });
-       // this.initEvent();
+       this.initEvent();
     },
 
     initEvent:function(){
@@ -93,6 +93,7 @@ App.BodyContent.control = {
                 alert('没有操作权限')
             }else{
                 var url=$(this).attr('murl');
+                
                 window.open(url,'_blank');
             }
 

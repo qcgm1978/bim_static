@@ -22,7 +22,6 @@ App.userAdmin.AddUserAdminDialogV = Backbone.View.extend({
 		var _this = this;
 	    App.userAdmin.getPrefixsDataC.fetch({
 			success: function(collection, response, options) {
-				console.log(response);
 				var dataArr = response.data;
 				var AddUserAdminDialogPrefixListV = new App.userAdmin.AddUserAdminDialogPrefixListV;
 				_this.$el.find(".prefixBox").append(AddUserAdminDialogPrefixListV.render(dataArr).el);
@@ -125,7 +124,7 @@ App.userAdmin.AddUserAdminDialogV = Backbone.View.extend({
 	},
 	submitFun:function(e){	
 		var selectCheckBox = $(".projectUlBox").find("label.selectCheckBox");
-		var selectPrefixBox = $("#selectPrefixBox");
+		var selectPrefixBox = $(".selectPrefixBox");
 		var projectIdArr = [];
 		console.log(selectPrefixBox.val());
 		if(selectCheckBox.length<=0){

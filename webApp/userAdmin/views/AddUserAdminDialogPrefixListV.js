@@ -3,8 +3,7 @@ App.userAdmin.AddUserAdminDialogPrefixListV = Backbone.View.extend({
 	className:"selectPrefixBox",
 	template:_.templateUrl("/userAdmin/tpls/dialogPrefixList.html"),
 	render:function(data){
-		console.log(data);
-		//this.$el.html(this.template({state:data}));
+		this.$el.html(this.template({state:data}));
 		return this;
 	}
 })
