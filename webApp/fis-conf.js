@@ -39,7 +39,7 @@ fis.match('::package', {
 // less 文件处理
 fis.match('*.less', {
   release: "/static/dist/$0",
-  useHash: true,
+  //useHash: true,
   parser: fis.plugin('less'),
   rExt: '.css'
 });
@@ -48,7 +48,7 @@ fis.match('*.less', {
 //es6 编译
 fis.match('*.es6', {
   release: "/static/dist/$0",
-  useHash: true,
+  //useHash: true,
   parser: fis.plugin('babel-6.x'),
   rExt: 'js'
 });
