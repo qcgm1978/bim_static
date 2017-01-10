@@ -15,7 +15,19 @@ App.userAdmin.AddUserAdminDialogV = Backbone.View.extend({
 	render:function(){
 		this.$el.html(this.template());
 		this.getProjectData();//获取用户的信息方法
+		this.getPrefixData();//获取用户前缀列表的方法
 		return this;
+	},
+	getPrefixData:function(){//获取用户前缀的方法
+		var _this = this;
+	    App.userAdmin.getPrefixsDataC.fetch({
+			success: function(collection, response, options) {
+				console.log(response);
+				var dataArr = response.data;
+				var AddUserAdminDialogPrefixListV = new App.userAdmin.AddUserAdminDialogPrefixListV;
+				_this.$el.find(".prefixBox").append(AddUserAdminDialogPrefixListV.render(dataArr).el);
+			}
+		})
 	},
 	getProjectData:function(projects){//获取全部项目的方法
 		var _this = this;
@@ -113,7 +125,9 @@ App.userAdmin.AddUserAdminDialogV = Backbone.View.extend({
 	},
 	submitFun:function(e){	
 		var selectCheckBox = $(".projectUlBox").find("label.selectCheckBox");
+		var selectPrefixBox = $("#selectPrefixBox");
 		var projectIdArr = [];
+		console.log(selectPrefixBox.val());
 		if(selectCheckBox.length<=0){
 			alert("分配的项目不能为空!");
 			return;

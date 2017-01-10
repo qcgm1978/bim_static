@@ -23,12 +23,12 @@ App.userAdmin.UserAdminIndexV = Backbone.View.extend({
 			}
 		}
 	},
-	renderAddPrefixDom:function(){//tab切换效果
+	renderAddPrefixDom:function(){//加载添加前缀的方法
 		$("#viewShowBox").find("div.viewUserSet").siblings().css("display","none").end().css("display","block");
 		var UserAdminSetPrefixV = new App.userAdmin.UserAdminSetPrefixV;
 		this.$el.find(".viewUserSetBox").html(UserAdminSetPrefixV.render().el);
 	},
-	renderUserAdminListDom:function(){//渲染页面的方法
+	renderUserAdminListDom:function(){//加载添加用户的方法
 		$("#viewShowBox").find("div.viewUserList").siblings().css("display","none").end().css("display","block");
 		var UserAdminListV = new App.userAdmin.UserAdminListV;
 		this.$el.find(".viewUserListBox").html(UserAdminListV.render().el);
@@ -40,7 +40,7 @@ App.userAdmin.UserAdminIndexV = Backbone.View.extend({
 		App.userAdmin.UserAdminIndexV.AddDialog = new App.Comm.modules.Dialog({
 		    title:"新建用户",
 		    width:600,
-		    height:400,
+		    height:454,
 		    isConfirm:false,
 		    isAlert:false,
 		    closeCallback:function(){},

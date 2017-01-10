@@ -94,4 +94,19 @@ App.userAdmin = {
 			}
 		}
 	})),
+	getPrefixsDataC:new(Backbone.Collection.extend({//获取弹出层用户前缀列表的collection方法
+		model: Backbone.Model.extend({
+			defaults: function() {
+				return {
+					title: ''
+				}
+			}
+		}),
+		urlType: "getPrefixsList",
+		parse: function(response) {
+			if (response.message == "success") {
+				return response.data;
+			}
+		}
+	})),
 };
