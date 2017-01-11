@@ -306,12 +306,23 @@ var Event = {
     bindGoJian : function(curDOM){
         window.viewer.data();
         window.viewer.data();
+        console.log(window.viewerData.risk);
         /*var json = JSON.stringify(window.viewerData);*/
-        if(window.viewerData==undefined)
+        try
         {
-            $(curDOM).prev().html(window.viewerData.risk.components.locationName);
-            console.log(window.viewerData.risk.components);
+            if(curDOM.innerHTML == posState[0])
+            {
+                $(curDOM).prev().html(window.viewerData.risk.components.locationName);
+                console.log(window.viewerData.risk.components);
+                curDOM.innerHTML = posState[1];
+            }
+            else
+            {
+                $(curDOM).prev().html("");
+                curDOM.innerHTML = posState[0];
+            }
         }
+        catch(e){;}
     },
     bindEvent : function(){
     /*事件入口*/
