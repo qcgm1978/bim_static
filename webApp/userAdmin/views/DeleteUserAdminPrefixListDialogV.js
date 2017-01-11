@@ -25,8 +25,13 @@ App.userAdmin.DeleteUserAdminPrefixListDialogV = Backbone.View.extend({
 		App.Comm.ajax(data,function(result){
 			if(result.data == "ok"){
 				var UserAdminIndexV = new App.userAdmin.UserAdminIndexV;
-		       		UserAdminIndexV.renderAddPrefixDom();
-				App.userAdmin.UserAdminPrefixListV.Dialog.close();
+					UserAdminIndexV.renderAddPrefixDom();
+					App.userAdmin.UserAdminPrefixListV.Dialog.close();
+					return;
+			}
+			if(result.data == "prefix used"){
+				alert("当前前缀已经被绑定！");
+				return;
 			}
 		})
 	},

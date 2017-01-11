@@ -1,16 +1,15 @@
 App.userAdmin.AddUserAdminDialogV = Backbone.View.extend({
 	default:{
-		userName:'',
-		accrentName:'',
-		accrentPwd:'',
-		submitState:false,
+		prefixVal:"",
+		accrentNameVal:'',
+		userNameVal:'',
+		accrentPassWordVal:'',
+		selectProjectArr:'',
+		canSubmit:false,
 	},
 	template:_.templateUrl("/userAdmin/tpls/addViewUserDialog.html"),
 	events: {
  		"click .button": "submitFun",
- 		"blur #userName": "checkUserNameFun",
- 		"blur #accrentName": "checkAccrentNameFun",
- 		"blur #accrentPassWord": "checkAccrentPwdFun",
  	},
 	render:function(){
 		this.$el.html(this.template());
@@ -39,115 +38,122 @@ App.userAdmin.AddUserAdminDialogV = Backbone.View.extend({
 			}
 		})
 	},
-	checkUserNameFun:function(evt){//检查用户名称是否是符合规范的方法
-		var target = $(evt.target);
-		var errorBox = target.next(".errorBox");
-		var cTextName =  /[^\u0000-\u00FF]/;//用户名只能是中文名称
-		var userNameVal = target.val().trim();
-		if(userNameVal == ""){
-			errorBox.html('用户名不能为空!');
-			errorBox.css("display","block");
-			this.default.submitState=false;
-			return;
-		}
-		if(!cTextName.test(userNameVal)){
-			errorBox.html('用户名称必须是中文!');
-			errorBox.css("display","block");
-			this.default.submitState=false;
-			return;
-		}
-		errorBox.css("display","none");
-		this.default.userName = userNameVal;
-		this.default.submitState=true;
+	checkPrefixFun:function(){//检查前缀是否存在
+		var prefixBox = $(".selectPrefixBox");
+		var prefixBoxVal = prefixBox.val().trim();
+		this.default.prefixVal = prefixBoxVal;
 	},
-	checkAccrentNameFun:function(evt){//检查账号名称是否符合规范
+	checkAccrentNameFun:function(){//检验登录账号是否合法的方法
+		var accrentName = $("#accrentName");
+		var accrentNameVal = accrentName.val().trim();
+		var errorBox = accrentName.next(".errorBox");
 		var accrentNameEdg = /^[0-9a-zA-Z]+$/ig ;//账号名称只能是数字或者字母或者数字和字母的组合
-		var target = $(evt.target);
-		var errorBox = target.next(".errorBox");
-		var accrentNameVal = target.val().trim();
-		var _this = this;
-		if(accrentNameVal == ""){
-			errorBox.html('账号名称不能为空!');
+		this.default.accrentNameVal = accrentNameVal;
+		if(this.default.accrentNameVal == ""){
+			errorBox.html('登录账号不能为空!');
 			errorBox.css("display","block");
-			this.default.submitState=false;
 			return;
 		}
-		if(!accrentNameEdg.test(accrentNameVal)){
+		if(!accrentNameEdg.test(this.default.accrentNameVal)){
 			errorBox.html('账号名称必须是字母和数字!');
 			errorBox.css("display","block");
-			this.default.submitState=false;
 			return;
 		}
-		this.checkUserFun(accrentNameVal,errorBox,function(returnBool){
-			errorBox.css("display","none");
-			_this.default.accrentName = accrentNameVal;
-			_this.default.submitState=true;
-		});
+		this.checkUserFun();//检查账号名称是否存在
 	},
-	checkUserFun:function(accrentNameVal,errorBox,callBack){//检查账号名称是否存在
-		var _data = {
-			loginId:accrentNameVal
-		}
+	checkUserFun:function(callBack){//检查账号名称是否存在
 		var _this = this;
+		var _data = {
+			loginId:this.default.prefixVal+this.default.accrentNameVal
+		}
 	   	App.userAdmin.checkUserC.fetch({
 			data: _data,
 			success: function(collection, response, options) {
+				var accrentName = $("#accrentName");
+				var errorBox = accrentName.next(".errorBox");
 				if(response.data == "exist"){
 					errorBox.html('账号名称已经存在，请从新输入!');
 					errorBox.css("display","block");
-					_this.default.submitState=false;
+					_this.default.canSubmit = false;
 				}else{
-					callBack()
+					errorBox.html('');
+					errorBox.css("display","none");
+					_this.default.canSubmit = true;
 				}
 			}
 		})
 	},
-	checkAccrentPwdFun:function(evt){//检查账号密码是否符合规范
-		var target = $(evt.target);
-		var errorBox = target.next(".errorBox");
-		var accrentPwdVal = target.val().trim();
-		if(accrentPwdVal == ""){
+	checkUserNameFun:function(){//检查用户名称是否合法
+		var userName = $("#userName");
+		var userNameVal = userName.val().trim();
+		var errorBox = userName.next(".errorBox");
+		var cTextName =  /[^\u0000-\u00FF]/;//用户名只能是中文名称
+		this.default.userNameVal = userNameVal;
+		if(this.default.userNameVal == ""){
+			errorBox.html('用户名称不能为空!');
+			errorBox.css("display","block");
+			return;
+		}
+		if(!cTextName.test(this.default.userNameVal)){
+			errorBox.html('用户名称必须是中文!');
+			errorBox.css("display","block");
+			return;
+		}
+		errorBox.html('');
+		errorBox.css("display","none");
+	},
+	checkAccrentPwdFun:function(){//检查账号密码是否合法
+		var accrentPassWord = $("#accrentPassWord");
+		var accrentPassWordVal = accrentPassWord.val().trim();
+		var errorBox = accrentPassWord.next(".errorBox");
+		this.default.accrentPassWordVal = accrentPassWordVal;
+		if(this.default.accrentPassWordVal == ""){
 			errorBox.html('账号密码不能为空!');
 			errorBox.css("display","block");
-			this.default.submitState=false;
 			return;
 		}
-		if(accrentPwdVal.length<6){
+		if(this.default.accrentPassWordVal.length<6){
 			errorBox.html('账号密码不能小于6位!');
 			errorBox.css("display","block");
-			this.default.submitState=false;
 			return;
 		}
+		errorBox.html('');
 		errorBox.css("display","none");
-		this.default.accrentPwd = accrentPwdVal;
-		this.default.submitState=true;
 	},
-	submitFun:function(e){	
+	checkSelectProject:function(){//检查是否分配了项目
 		var selectCheckBox = $(".projectUlBox").find("label.selectCheckBox");
-		var selectPrefixBox = $(".selectPrefixBox").val().trim();
+		var projectErrorBox = $(".projectErrorBox");
 		var projectIdArr = [];
 		if(selectCheckBox.length<=0){
-			alert("分配的项目不能为空!");
+			projectErrorBox.html("请给用户分配项目权限!");
+			projectErrorBox.css("display","block");
 			return;
 		}
-		if(!this.default.submitState){
-			alert("请按要求填写内容");
-			return;
-		}
+		projectErrorBox.html("");
+		projectErrorBox.css("display","none");
 		for (var i = selectCheckBox.length - 1; i >= 0; i--) {
 			projectIdArr.push(parseInt($(selectCheckBox[i]).data("projectid")));
 		}
-		this.submitAjaxFun(projectIdArr,selectPrefixBox);
+		this.default.selectProjectArr = projectIdArr;
+	},
+	submitFun:function(){	
+		this.checkPrefixFun();//检验前缀的方法
+		this.checkAccrentNameFun();//检验登录账号是否合法的方法
+		this.checkUserNameFun();//检查用户名称是否合法
+		this.checkAccrentPwdFun();//检查账号密码是否合法
+		this.checkSelectProject();//检查是否分配了项目
+		if(this.default.prefixVal!=""&&this.default.accrentNameVal!=""&&this.default.userNameVal!=""&&this.default.accrentPassWordVal!=""&&this.default.selectProjectArr.length>0&&this.default.canSubmit){
+			this.submitAjaxFun();
+		}
 	},
 	submitAjaxFun:function(projectIdArr,selectPrefixBoxVal){//添加用户的方法
 		var _data = {
-			"userName":this.default.userName,
-			"loginId":this.default.accrentName,
-		    "pwd":this.default.accrentPwd,
-		    "prefix":selectPrefixBoxVal,
-		    "projects":projectIdArr
+			"prefix":this.default.prefixVal,
+			"loginId":this.default.accrentNameVal,
+			"userName":this.default.userNameVal,
+		    "pwd":this.default.accrentPassWordVal,
+		    "projects":this.default.selectProjectArr
 		}
-		//保存数据
 		var saveViewUserDataModel = Backbone.Model.extend({
 			defaults: _data,
 		    urlType: "addViewUser",
@@ -159,6 +165,6 @@ App.userAdmin.AddUserAdminDialogV = Backbone.View.extend({
 		       		UserAdminIndexV.renderUserAdminListDom();
 				App.userAdmin.UserAdminIndexV.AddDialog.close();
 			}
-	    })  
-	},
+	    })
+	}
 })
