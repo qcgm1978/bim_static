@@ -1,7 +1,5 @@
 App.userAdmin.AddUserAdminPrefixDialogV = Backbone.View.extend({
 	default:{
-		submitState:false,
-		oldPrefixName:'',
 		newPrefixName:''	
 	},
 	tagName:'div',
@@ -9,61 +7,53 @@ App.userAdmin.AddUserAdminPrefixDialogV = Backbone.View.extend({
 	template:_.templateUrl("/userAdmin/tpls/addViewUserPrefixDialog.html"),
 	events: {
  		"click .button": "submitFun",
- 		"blur #prefixName": "checkPrefixNameFun",
  	},
 	render:function(){
-		this.default.submitState=false;
 		this.$el.html(this.template());
 		return this;
 	},
-	checkPrefixNameFun:function(evt){
+	checkPrefixNameAjaxFun:function(){//检查前缀是否存在了
 		var _this = this;
-		var target = $(evt.target);
-		var errorBox = target.next(".errorBox");
-		var prefixVal = target.val().trim();
-		if(prefixVal == ""){
-			target.focus();
-			errorBox.html('用户前缀不能为空!');
-			errorBox.css("display","block");
-			this.default.submitState=false;
-			return;
-		}
-		if(prefixVal !== this.default.oldPrefixName){
-			this.checkPrefixNameAjaxFun(prefixVal,errorBox,function(prefixBool){
-				_this.default.submitState=true;
-			});
-		}
-		errorBox.css("display","none");
-		this.default.newPrefixName = prefixVal;
-	},
-	checkPrefixNameAjaxFun:function(prefixVal,errorBox,callBack){
-		var _this = this;
+		var prefixName = $("#prefixName");
+		var errorBox = $("#errorBox");
 		var _data = {
-			prefix:prefixVal
+			prefix:this.default.newPrefixName
 		}
 	   	App.userAdmin.checkUserPrefixC.fetch({
 			data: _data,
 			success: function(collection, response, options) {
 				if(response.data == "exist"){
-					errorBox.html('用户前缀已经存在，请从新输入!');
+					errorBox.html('前缀已经存在，请从新输入!');
 					errorBox.css("display","block");
-					_this.default.submitState=false;
+					prefixName.focus();
 				}else{
-					callBack()
+					errorBox.html('');
+					errorBox.css("display","none");
+					_this.submitAjaxFun();
 				}
 			}
 		})
 	},
-	submitFun:function(){
-		if(!this.default.submitState){
-			alert("请按要求填写内容");
+	submitFun:function(){//添加前缀的时候提交验证的方法
+		var prefixName = $("#prefixName");
+		var errorBox = $("#errorBox");
+		var prefixNameVal = prefixName.val().trim();
+		if(prefixNameVal == ""){
+			errorBox.html('前缀不能为空!');
+			errorBox.css("display","block");
+			prefixName.focus();
 			return;
 		}
+		errorBox.html('');
+		errorBox.css("display","none");
+		this.default.newPrefixName = prefixNameVal;
+		this.checkPrefixNameAjaxFun();//检查前缀是否存在了
+	},
+	submitAjaxFun:function(){//验证都通过之后提交
 		var UserAdminIndexV = new App.userAdmin.UserAdminIndexV;
 		var data = {
 			 "prefix":this.default.newPrefixName
 		}
-		//保存数据
 		var saveViewUserDataModel = Backbone.Model.extend({
 			defaults: data,
 		    urlType: "addViewUserPrefix",
@@ -75,5 +65,6 @@ App.userAdmin.AddUserAdminPrefixDialogV = Backbone.View.extend({
 				App.userAdmin.UserAdminIndexV.AddPrefixDialog.close();
 			}
 	    })
-	}
+	},
+	
 })
