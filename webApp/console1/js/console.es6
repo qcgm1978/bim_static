@@ -1316,11 +1316,11 @@ App.Console = {
       $("#projectList_two,#projectList").append(optionDom);
     });
   },
-  cost() {
+  cost() {//成本模拟流程
     var tpl = _.templateUrl('/console1/tpls/cost/cost.html', true);
     $("#contains").html(tpl);
     $('textarea').hide();    
-    $.ajax({
+    $.ajax({//成本第一步
       // url: "/platform/project/cost/mapping",
       url: "/platform/project/list/all/cost"
     }).done(function(data) {
@@ -1329,7 +1329,27 @@ App.Console = {
       $.each(datas, function(index, data) {
         str += "<option projectId=" + data.projectId + " id=" + data.id + " value=" + data.projectCode + ">" + data.projectName + "</option>";
       });
-      $('#s11,#s21,#transferProject').append(str);
+      $('#s11').append(str);
+    });
+    $.ajax({//成本第二步
+      url: "platform/project/list/all/cost/change?type=10"
+    }).done(function(data) {
+      var str = '',
+        datas = data.data;
+      $.each(datas, function(index, data) {
+        str += "<option projectId=" + data.projectId + " id=" + data.id + " value=" + data.projectCode + ">" + data.projectName + "</option>";
+      });
+      $('#s21').append(str);
+    });
+    $.ajax({//成本第三步
+      url: "platform/project/list/all/cost/change?type=11"
+    }).done(function(data) {
+      var str = '',
+        datas = data.data;
+      $.each(datas, function(index, data) {
+        str += "<option projectId=" + data.projectId + " id=" + data.id + " value=" + data.projectCode + ">" + data.projectName + "</option>";
+      });
+      $('#transferProject').append(str);
     });
     $("#submit1").click(function() {
       var div = $('#form1 div'),

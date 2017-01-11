@@ -30,7 +30,7 @@ App.userAdmin.UserAdminPrefixListV = Backbone.View.extend({
 	deleteViewUserFun:function(evt){//删除浏览用户前缀的列表的方法
 		var _this =  this;
 		var target = $(evt.target);
-		var deleteId = target.data("loginid");
+		var deleteId = target.data("prefixname");
 		var deleteDialogEle = new App.userAdmin.DeleteUserAdminPrefixListDialogV;
 		var deleteDialogEleDom = deleteDialogEle.render(deleteId).el;
 		App.userAdmin.UserAdminPrefixListV.Dialog = new App.Comm.modules.Dialog({

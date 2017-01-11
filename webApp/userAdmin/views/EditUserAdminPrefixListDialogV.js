@@ -37,6 +37,7 @@ App.userAdmin.EditUserAdminPrefixListDialogV  = Backbone.View.extend({
 		}
 		errorBox.css("display","none");
 		this.default.newPrefixName = prefixVal;
+		this.default.submitState=true;
 	},
 	checkPrefixNameAjaxFun:function(prefixVal,errorBox,callBack){
 		var _this = this;

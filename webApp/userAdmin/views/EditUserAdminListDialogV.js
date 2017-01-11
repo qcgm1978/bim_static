@@ -14,10 +14,15 @@ App.userAdmin.EditUserAdminListDialogV = Backbone.View.extend({
 		this.getViewUserInfoFun(editId);//获取用户的信息方法
 		return this;
 	},
-	getPrefixData:function(){//获取用户前缀的方法
+	getPrefixData:function(prefix){//获取用户前缀的方法
 		var _this = this;
 	    App.userAdmin.getPrefixsDataC.fetch({
 			success: function(collection, response, options) {
+				for (var j = response.data.length - 1; j >= 0; j--) {
+					if(prefix == response.data[j].prefix){
+						response.data[j].selected = true;
+					}
+				}
 				var dataArr = response.data;
 				var DialogProjectPrefixListV = new App.userAdmin.DialogProjectPrefixListV;
 				_this.$el.find(".prefixBox").append(DialogProjectPrefixListV.render(dataArr).el);
@@ -38,7 +43,7 @@ App.userAdmin.EditUserAdminListDialogV = Backbone.View.extend({
 					_this.default.accrentPwd = response.data.pwd;
 					_this.$el.html(_this.template({state:response.data}));
 					_this.getProjectData(response.data.projects);//获取全部项目的方法
-					_this.getPrefixData();//获取用户前缀列表的方法
+					_this.getPrefixData(response.data.prefix);//获取用户前缀列表的方法
 				}
 			}
 		})
@@ -102,7 +107,7 @@ App.userAdmin.EditUserAdminListDialogV = Backbone.View.extend({
 	},
 	submitFun:function(e){
 		var selectCheckBox = $(".projectUlBox").find("label.selectCheckBox");
-		var selectPrefixBox = $(".selectPrefixBox").text().trim();
+		var selectPrefixBox = $(".selectPrefixBox").val().trim();
 		var projectIdArr = [];
 		if(selectCheckBox.length<=0){
 			alert("分配的项目不能为空!")

@@ -124,7 +124,7 @@ App.userAdmin.AddUserAdminDialogV = Backbone.View.extend({
 	},
 	submitFun:function(e){	
 		var selectCheckBox = $(".projectUlBox").find("label.selectCheckBox");
-		var selectPrefixBox = $(".selectPrefixBox").text().trim();
+		var selectPrefixBox = $(".selectPrefixBox").val().trim();
 		var projectIdArr = [];
 		if(selectCheckBox.length<=0){
 			alert("分配的项目不能为空!");
