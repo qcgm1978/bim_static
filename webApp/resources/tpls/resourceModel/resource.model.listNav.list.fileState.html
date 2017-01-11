@@ -1,4 +1,91 @@
-<h2><%= obj.statusName %></h2>
+<h2><label>文件状态：</label><%= obj.allStatusName %></h2>
+<h3>rvt文件转换状态：</h3>
+<table>
+	<thead>
+		<tr>
+			<td>等待转换</td>
+			<td>转换中</td>
+			<td>转换成功</td>
+			<td>转换失败</td>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td><%= obj.rvtQueueCount %></td>
+			<td><%= obj.rvtExecuteCount %></td>
+			<td><%= obj.rvtSuccessCount %></td>
+			<td><a href="javascript:;" class="lookRvtFailList" data-failcount="<%= obj.rvtFailCount %>"><%= obj.rvtFailCount %></a></td>
+		</tr>
+	</tbody>
+</table>
+<div class="failItemBox rvtFailBox">
+	<table>
+		<thead>
+			<tr>
+				<td width="50%">错误文件ID</td>
+				<td width="25%">错误文件名字</td>
+				<td width="25%">错误文件类型</td>
+			</tr>
+		</thead>
+	</table>
+	<div class="fileStateFail">
+		<table>
+			<tbody>
+			<% _.each(obj.rvtFailList,function(item){%>
+				<tr>
+					<td width="50%"><%= item.source_id %></td>
+					<td width="25%"><%= item.source_name %></td>
+					<td width="25%"><%= item.type %></td>
+				</tr>
+			<%})%>
+			</tbody>
+		</table>
+	</div>
+</div>
+<h3>dwg文件转换状态：</h3>
+<table>
+	<thead>
+		<tr>
+			<td>等待转换</td>
+			<td>转换中</td>
+			<td>转换成功</td>
+			<td>转换失败</td>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td><%= obj.dwgQueueCount %></td>
+			<td><%= obj.dwgExecuteCount %></td>
+			<td><%= obj.dwgSuccessCount %></td>
+			<td><a href="javascript:;" class="lookDwgFailList" data-failcount="<%= obj.dwgFailCount %>"><%= obj.dwgFailCount %></a></td>
+		</tr>
+	</tbody>
+</table>
+<div class="failItemBox dwgFailBox">
+	<table>
+		<thead>
+			<tr>
+				<td width="50%">错误文件ID</td>
+				<td width="25%">错误文件名字</td>
+				<td width="25%">错误文件类型</td>
+			</tr>
+		</thead>
+	</table>
+	<div class="fileStateFail">
+		<table>
+			<tbody>
+			<% _.each(obj.dwgFailList,function(item){%>
+				<tr>
+					<td width="50%"><%= item.source_id %></td>
+					<td width="25%"><%= item.source_name %></td>
+					<td width="25%"><%= item.type %></td>
+				</tr>
+			<%})%>
+			</tbody>
+		</table>
+	</div>
+</div>
+<!-- <h2><%= obj.statusName %></h2>
 <table>
 	<thead>
 		<tr>
@@ -55,3 +142,4 @@
 </div>
 <%}%>
 <%}%>
+ -->

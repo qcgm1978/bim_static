@@ -337,6 +337,7 @@ App.API = {
 		getViewUserInfo:"platform/testuser/loginId",//获取全部项目的列表
 		getViewUserPrefix:"platform/testuser/prefix",//获取获取用户前缀的方法
 
+		// getFileStatus:"platform/report/job/status",//获取文件上传转换状态的地址
 		getFileStatus:"platform/report/job/status",//获取文件上传转换状态的地址
 
 		getPrefixsList:"platform/testuser/prefix",//获取用户前缀列表的地址
