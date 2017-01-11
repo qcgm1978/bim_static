@@ -1,18 +1,36 @@
 App.userAdmin.EditUserAdminListDialogV = Backbone.View.extend({
 	default:{
-		userName:'',
-		accrentName:'',
-		accrentPwd:''
+		prefixVal:"",
+		userNameVal:'',
+		accrentPassWordVal:'',
+		selectProjectArr:'',
 	},
 	template:_.templateUrl("/userAdmin/tpls/editViewUserDialog.html"),
 	events: {
  		"click .button": "submitFun",
- 		"blur #userName": "checkUserNameFun",
- 		"blur #accrentPassWord": "checkAccrentPwdFun",
  	},
 	render:function(editId){
 		this.getViewUserInfoFun(editId);//获取用户的信息方法
 		return this;
+	},
+	getViewUserInfoFun:function(editId){//获取用户的信息方法
+		var _this = this;
+	    var _data = {
+	    	loginId:editId,
+	    }
+	    App.userAdmin.getViewUserInfoC.fetch({
+			data: _data,
+			success: function(collection, response, options) {
+				if(response.code == 0){
+					_this.default.userNameVal = response.data.username;
+					_this.default.accrentNameVal = response.data.loginid;
+					_this.default.accrentPassWordVal = response.data.pwd;
+					_this.$el.html(_this.template({state:response.data}));
+					_this.getProjectData(response.data.projects);//获取全部项目的方法
+					_this.getPrefixData(response.data.prefix);//获取用户前缀列表的方法
+				}
+			}
+		})
 	},
 	getPrefixData:function(prefix){//获取用户前缀的方法
 		var _this = this;
@@ -26,25 +44,6 @@ App.userAdmin.EditUserAdminListDialogV = Backbone.View.extend({
 				var dataArr = response.data;
 				var DialogProjectPrefixListV = new App.userAdmin.DialogProjectPrefixListV;
 				_this.$el.find(".prefixBox").append(DialogProjectPrefixListV.render(dataArr).el);
-			}
-		})
-	},
-	getViewUserInfoFun:function(editId){//获取用户的信息方法
-		var _this = this;
-	    var _data = {
-	    	loginId:editId,
-	    }
-	    App.userAdmin.getViewUserInfoC.fetch({
-			data: _data,
-			success: function(collection, response, options) {
-				if(response.code == 0){
-					_this.default.userName = response.data.username;
-					_this.default.accrentName = response.data.loginid;
-					_this.default.accrentPwd = response.data.pwd;
-					_this.$el.html(_this.template({state:response.data}));
-					_this.getProjectData(response.data.projects);//获取全部项目的方法
-					_this.getPrefixData(response.data.prefix);//获取用户前缀列表的方法
-				}
 			}
 		})
 	},
@@ -66,66 +65,80 @@ App.userAdmin.EditUserAdminListDialogV = Backbone.View.extend({
 			}
 		})
 	},
-	checkUserNameFun:function(evt){//检查用户名称是否是符合规范的方法
-		var target = $(evt.target);
-		var errorBox = target.next(".errorBox");
+	checkPrefixFun:function(){//检查前缀是否存在
+		var prefixBox = $(".selectPrefixBox");
+		var prefixBoxVal = prefixBox.val().trim();
+		this.default.prefixVal = prefixBoxVal;
+	},
+	checkUserNameFun:function(){//检查用户名称是否合法
+		var userName = $("#userName");
+		var userNameVal = userName.val().trim();
+		var errorBox = userName.next(".errorBox");
 		var cTextName =  /[^\u0000-\u00FF]/;//用户名只能是中文名称
-		var userNameVal = target.val().trim();
-		if(userNameVal == ""){
-			target.focus();
-			errorBox.html('用户名不能为空!');
+		this.default.userNameVal = userNameVal;
+		if(this.default.userNameVal == ""){
+			errorBox.html('用户名称不能为空!');
 			errorBox.css("display","block");
 			return;
 		}
-		if(!cTextName.test(userNameVal)){
-			target.focus();
+		if(!cTextName.test(this.default.userNameVal)){
 			errorBox.html('用户名称必须是中文!');
 			errorBox.css("display","block");
 			return;
 		}
+		errorBox.html('');
 		errorBox.css("display","none");
-		this.default.userName = userNameVal;
 	},
-	checkAccrentPwdFun:function(evt){//检查账号密码是否符合规范
-		var target = $(evt.target);
-		var errorBox = target.next(".errorBox");
-		var accrentPwdVal = target.val().trim();
-		if(accrentPwdVal == ""){
-			target.focus();
+	checkAccrentPwdFun:function(){//检查账号密码是否合法
+		var accrentPassWord = $("#accrentPassWord");
+		var accrentPassWordVal = accrentPassWord.val().trim();
+		var errorBox = accrentPassWord.next(".errorBox");
+		this.default.accrentPassWordVal = accrentPassWordVal;
+		if(this.default.accrentPassWordVal == ""){
 			errorBox.html('账号密码不能为空!');
 			errorBox.css("display","block");
 			return;
 		}
-		if(accrentPwdVal.length<6){
-			target.focus();
+		if(this.default.accrentPassWordVal.length<6){
 			errorBox.html('账号密码不能小于6位!');
 			errorBox.css("display","block");
 			return;
 		}
+		errorBox.html('');
 		errorBox.css("display","none");
-		this.default.accrentPwd = accrentPwdVal;
 	},
-	submitFun:function(e){
+	checkSelectProject:function(){//检查是否分配了项目
 		var selectCheckBox = $(".projectUlBox").find("label.selectCheckBox");
-		var selectPrefixBox = $(".selectPrefixBox").val().trim();
+		var projectErrorBox = $(".projectErrorBox");
 		var projectIdArr = [];
 		if(selectCheckBox.length<=0){
-			alert("分配的项目不能为空!")
+			projectErrorBox.html("请给用户分配项目权限!");
+			projectErrorBox.css("display","block");
 			return;
 		}
+		projectErrorBox.html("");
+		projectErrorBox.css("display","none");
 		for (var i = selectCheckBox.length - 1; i >= 0; i--) {
 			projectIdArr.push(parseInt($(selectCheckBox[i]).data("projectid")));
 		}
-		this.submitAjaxFun(projectIdArr,selectPrefixBox);
+		this.default.selectProjectArr = projectIdArr;
 	},
-	submitAjaxFun:function(projectIdArr,selectPrefixBoxVal){//更新用户信息
-		var _this = this;
+	submitFun:function(){	
+		this.checkPrefixFun();//检验前缀的方法
+		this.checkUserNameFun();//检查用户名称是否合法
+		this.checkAccrentPwdFun();//检查账号密码是否合法
+		this.checkSelectProject();//检查是否分配了项目
+		if(this.default.prefixVal!=""&&this.default.userNameVal!=""&&this.default.accrentPassWordVal!=""&&this.default.selectProjectArr.length>0){
+			this.submitAjaxFun();
+		}
+	},
+	submitAjaxFun:function(projectIdArr,selectPrefixBoxVal){//添加用户的方法
 		var _data = {
-			"userName":this.default.userName,
-			"loginId":this.default.accrentName,
-		    "pwd":this.default.accrentPwd,
-		    "prefix":selectPrefixBoxVal,
-		    "projects":projectIdArr
+			"prefix":this.default.prefixVal,
+			"loginId":this.default.accrentNameVal,
+			"userName":this.default.userNameVal,
+		    "pwd":this.default.accrentPassWordVal,
+		    "projects":this.default.selectProjectArr
 		}
 		$.ajax({
 		    type:"PUT",
@@ -140,5 +153,5 @@ App.userAdmin.EditUserAdminListDialogV = Backbone.View.extend({
 	       		}
 		    }
 		});
-	},
+	}
 })

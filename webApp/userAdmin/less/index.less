@@ -192,6 +192,7 @@
 		font-size: 14px;
 		color: #333;
 		float: left;
+		position: relative;
 		label{
 			height: 48px;
 			line-height: 48px;
@@ -240,7 +241,7 @@
 			}
 		}
 		.dialogProjectList{
-			height: 184px!important;
+			height: 162px!important;
 			padding-top: 14px;
 		}
 		button{
@@ -283,13 +284,25 @@
 			}
 		}
 		ul:after{clear:both;content:'.';display:block;width: 0;height: 0;visibility:hidden;}
+		.projectErrorBox{
+			position: absolute;
+			left: 88px;
+			bottom: -30px;
+			color: red;
+			height: 25px;
+			line-height: 25px;
+			font-size: 12px;
+			font-weight: bold;
+			display: none;
+		}
 	}
 	.addViewUserBox:after {clear:both;content:'.';display:block;width: 0;height: 0;visibility:hidden;}
 	.last_addViewUserInput{
 		min-height:32px;
 		height: 32px;
-		margin-top: 20px;
+		margin-top: 35px;
 	}
+	
 }
 .addViewUserPrefixBox{
 	width: 100%;
