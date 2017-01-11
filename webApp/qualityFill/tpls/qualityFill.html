@@ -164,7 +164,7 @@ var Url = {
 
 var initComponent = function(projectCode){
     jQuery.support.cors = true;
-    var viewer = new InspectModelSelection({
+    window.viewer = new InspectModelSelection({
         type: "process",//open process
         ruleType: '',//构件分类
         height: "500px",
@@ -179,7 +179,7 @@ var initComponent = function(projectCode){
         appKey: "60e8a1d9fc1d44d7b6a4cf85ae2987ed",
         token: "4aeba9fa8574d9a768aa3aba59e72c0bbe4990ba9d63f1d97d8139fe57b9b84d855bb56f3b437c42ac9454501cfac6e88764578b07e256dcd793183be0b561627222bea5cb3420fee5242fdabfef8ad39dcc2e271e1f0452322fbd98c9681359d23c02b79118bb99773001ea2ba359553023d7ef8b317995",
         callback: function (res) {
-            $('#test').val(JSON.stringify(res))
+            window.viewerData = res;
         },
         withCheckpoint : true
     });
@@ -300,6 +300,19 @@ var Event = {
 
         });
     },
+    bindYuSheDian:function(){
+        window.viewer.data();
+    },
+    bindGoJian : function(curDOM){
+        window.viewer.data();
+        window.viewer.data();
+        /*var json = JSON.stringify(window.viewerData);*/
+        if(window.viewerData==undefined)
+        {
+            $(curDOM).prev().html(window.viewerData.risk.components.locationName);
+            console.log(window.viewerData.risk.components);
+        }
+    },
     bindEvent : function(){
     /*事件入口*/
         var th = this;
@@ -374,6 +387,14 @@ var Event = {
         $("#btn_save").on("click",function(e){
             th.saveData();
         });
+        /*绑定预设点*/
+        $("#gridContainer").on("click",".linkBtn-ready-pos",function(){
+            th.checkRow(this);
+        });
+        /*绑定构建位置*/
+        $("#gridContainer").on("click",".linkBtn-pos",function(){
+            th.bindGoJian(this);
+        });       
         //this.initDialogEvent();
         //this.initDialogData();
     }

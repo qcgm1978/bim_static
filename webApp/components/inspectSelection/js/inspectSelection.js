@@ -1996,6 +1996,7 @@
 			var data = model.toJSON();
 			this.$(".tbOpeningacceptanceBody tbody").html(this.template(data));
 			//  this.bindScroll();
+			console.log(data);
 		},
 
 		//选择检查点
