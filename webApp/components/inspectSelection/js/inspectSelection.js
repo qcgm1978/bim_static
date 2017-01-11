@@ -2001,6 +2001,7 @@
 
 		//选择检查点
 		selectInspect: function(e) {
+			alert(8);
 			var $target = $(e.currentTarget);
 			Project.currentInspectId = $target.data('id');
 			if(Project.isSelect!='close'){

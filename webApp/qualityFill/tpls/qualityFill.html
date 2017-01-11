@@ -300,8 +300,26 @@ var Event = {
 
         });
     },
-    bindYuSheDian:function(){
+    bindYuSheDian:function(curDOM){
         window.viewer.data();
+        var $tr = $("#presetPointPanel .tbOpeningacceptanceBody tr");
+        console.log($tr[0]);
+        /*var json = JSON.stringify(window.viewerData);*/
+        try
+        {
+            if(curDOM.innerHTML == readyPosState[0])
+            {
+                $(curDOM).prev().html($tr.find("td").html());
+                curDOM.innerHTML = readyPosState[1];
+            }
+            else
+            {
+                window.viewer.data();
+                $(curDOM).prev().html("");
+                curDOM.innerHTML = readyPosState[0];
+            }
+        }
+        catch(e){;}
     },
     bindGoJian : function(curDOM){
         window.viewer.data();
@@ -313,7 +331,6 @@ var Event = {
             if(curDOM.innerHTML == posState[0])
             {
                 $(curDOM).prev().html(window.viewerData.risk.components.locationName);
-                console.log(window.viewerData.risk.components);
                 curDOM.innerHTML = posState[1];
             }
             else
@@ -400,7 +417,7 @@ var Event = {
         });
         /*绑定预设点*/
         $("#gridContainer").on("click",".linkBtn-ready-pos",function(){
-            th.checkRow(this);
+            th.bindYuSheDian(this);
         });
         /*绑定构建位置*/
         $("#gridContainer").on("click",".linkBtn-pos",function(){
