@@ -22,9 +22,9 @@
 	<table>
 		<thead>
 			<tr>
-				<td width="50%">错误文件ID</td>
-				<td width="25%">错误文件名字</td>
-				<td width="25%">错误文件类型</td>
+				<td width="285">错误文件名字</td>
+				<td width="100">错误文件类型</td>
+				<td width="256">错误文件ID</td>
 			</tr>
 		</thead>
 	</table>
@@ -33,9 +33,9 @@
 			<tbody>
 			<% _.each(obj.rvtFailList,function(item){%>
 				<tr>
-					<td width="50%"><%= item.source_id %></td>
-					<td width="25%"><%= item.source_name %></td>
-					<td width="25%"><%= item.type %></td>
+					<td width="285"><%= item.source_name %></td>
+					<td width="100"><%= item.type %></td>
+					<td width="256"><%= item.source_id %></td>
 				</tr>
 			<%})%>
 			</tbody>
@@ -65,9 +65,9 @@
 	<table>
 		<thead>
 			<tr>
-				<td width="50%">错误文件ID</td>
-				<td width="25%">错误文件名字</td>
-				<td width="25%">错误文件类型</td>
+				<td width="285">错误文件名字</td>
+				<td width="100">错误文件类型</td>
+				<td width="256">错误文件ID</td>
 			</tr>
 		</thead>
 	</table>
@@ -76,9 +76,9 @@
 			<tbody>
 			<% _.each(obj.dwgFailList,function(item){%>
 				<tr>
-					<td width="50%"><%= item.source_id %></td>
-					<td width="25%"><%= item.source_name %></td>
-					<td width="25%"><%= item.type %></td>
+					<td width="285"><%= item.source_name %></td>
+					<td width="100"><%= item.type %></td>
+					<td width="256"><%= item.source_id %></td>
 				</tr>
 			<%})%>
 			</tbody>

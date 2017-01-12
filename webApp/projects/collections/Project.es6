@@ -80,6 +80,55 @@ App.Project = {
 		var id = marker? marker.id:"",
 			userId=marker? marker.userId:"",
 			data={};
+		if($(".btnCk").hasClass("selected")){
+			if ($(".QualityProcessAcceptance").is(":visible")) {//过程验收
+				$(".QualityProcessAcceptance .tbProcessAccessBody tr").removeClass('selected');
+				if(id){
+					var tr = $(".QualityProcessAcceptance .tbProcessAccessBody tr[data-id='"+id+"']");
+					if(tr){
+						tr.addClass('selected');
+					}
+				}
+			}
+			if ($(".QualityOpeningAcceptance").is(":visible")) {//开业验收
+				$(".QualityOpeningAcceptance .tbOpeningacceptanceBody tr").removeClass('selected');
+				if(id){
+					var tr = $(".QualityOpeningAcceptance .tbOpeningacceptanceBody tr[data-id='"+id+"']");
+					if(tr){
+						tr.addClass('selected');
+					}
+				}
+			}
+			if ($(".QualityConcerns").is(":visible")) {//隐患
+				$(".QualityConcerns .tbConcernsBody tr").removeClass('selected');
+				if(id){
+					var tr = $(".QualityConcerns .tbConcernsBody tr[data-id='"+id+"']");
+					if(tr){
+						tr.addClass('selected');
+					}
+				}
+			}
+		}
+		if(userId){
+			App.Project.Settings.Viewer.highlight({
+				type: 'userId',
+				ids: [userId]
+			});
+			App.Project.Settings.Viewer.viewer.getFilters().setSelectedIds([userId]);//选中与否
+			App.Project.presetClickEvent(userId);//点击气泡 加载当前的属性
+		}else{
+			App.Project.Settings.Viewer.viewer.getFilters().setSelectedIds();//选中与否
+			App.Project.resetProperNull();//清空属性面板的内容
+			App.Project.Settings.Viewer.viewer.render();
+		}
+		var viewer = App.Project.Settings.Viewer,
+			isIsolateState = viewer.viewer.getFilters().isIsolateState();
+		if(isIsolateState){
+			$('#isolation').show();
+		}else{
+			$('#isolation').hide();
+		}
+
 		// if ($(".QualityProcessAcceptance").is(":visible")) {
 		// 	$(".QualityProcessAcceptance .tbProcessAccessBody tr").removeClass('selected');
 		// 	if(id){
@@ -87,11 +136,11 @@ App.Project = {
 		// 		if(tr.length>0){
 		// 			tr.addClass('selected');
 		// 		}else{
-		// 			data=App.Project.catchPageData('process',{id:id});//内存中取数据
-		// 			App.Project.qualityTab.ProcessAcceptanceOptions.pageIndex = data.pageIndex;
-		// 			App.Project.QualityAttr.ProcessAcceptanceCollection.reset();
-		// 			App.Project.QualityAttr.ProcessAcceptanceCollection.push({data:data});
-		// 			App.Project.qualityTab.pageInfo.call(App.Project.qualityTab, data,'processacceptance',true);
+		// 			// data=App.Project.catchPageData('process',{id:id});//内存中取数据
+		// 			// App.Project.qualityTab.ProcessAcceptanceOptions.pageIndex = data.pageIndex;
+		// 			// App.Project.QualityAttr.ProcessAcceptanceCollection.reset();
+		// 			// App.Project.QualityAttr.ProcessAcceptanceCollection.push({data:data});
+		// 			// App.Project.qualityTab.pageInfo.call(App.Project.qualityTab, data,'processacceptance',true);
 		// 			tr = $(".QualityProcessAcceptance .tbProcessAccessBody tr[data-id='"+id+"']");
 		// 			tr.addClass("selected");
 		// 		}
@@ -131,39 +180,6 @@ App.Project = {
 		// 		}
 		// 	}
 		// }
-		
-		// $(".QualityProcessAcceptance .tbProcessAccessBody tr").removeClass('selected');
-		// if(id){
-		// 	$(".QualityConcerns .tbConcernsBody tr").removeClass('selected');
-		// 	var tr = $(".QualityOpeningAcceptance .tbOpeningacceptanceBody tr[data-id='"+id+"']");
-		// 	console.log("tr",tr);
-		// 	tr.addClass('selected');
-		// }
-		if(userId){
-			App.Project.Settings.Viewer.highlight({
-				type: 'userId',
-				ids: [userId]
-			});
-			App.Project.Settings.Viewer.viewer.getFilters().setSelectedIds([userId]);//选中与否
-			App.Project.presetClickEvent(userId);//点击气泡 加载当前的属性
-		}else{
-			// App.Project.Settings.Viewer.highlight({
-			// 	type: 'userId',
-			// 	ids: undefined
-			// });
-			App.Project.Settings.Viewer.viewer.getFilters().setSelectedIds();//选中与否
-			App.Project.resetProperNull();//清空属性面板的内容
-			App.Project.Settings.Viewer.viewer.render();
-		}
-		var viewer = App.Project.Settings.Viewer,
-			isIsolateState = viewer.viewer.getFilters().isIsolateState();
-		if(isIsolateState){
-			$('#isolation').show();
-		}else{
-			$('#isolation').hide();
-
-
-		}
 	},
 
 	checkSelectComponent:function(userId){
@@ -2322,83 +2338,7 @@ App.Project = {
 			projectVersionId: App.Project.Settings.CurrentVersion.id,
 			markerClick:App.Project.markerClick
 		}).showInModel($target, type, paramObj);
-
-		return
-
-		var _this = this,
-			key = "", //楼层关键字
-			componentId = paramObj ? paramObj.uuid : $target.data('uuid'), //构件ID
-			location = paramObj ? paramObj.location : $target.data('location'), //位置信息
-			color = $target.data('color'), //标记颜色
-			cat = $target.data('cat'), //构件分类
-			marginRule = _this.marginRule[cat] || {},
-			_files = App.Project.Settings.Viewer.FloorFilesData; //文件ID数据对象
-		if ($target.hasClass("selected")) {
-			$target.parent().find(".selected").removeClass("selected");
-			App.Project.Settings.Viewer.loadMarkers();
-			App.Project.Settings.Viewer.highlight({
-				type: 'userId',
-				ids: undefined
-			});
-			return
-		} else {
-			$target.parents('.rightPropertyContent').find(".qualityContainer").find(".selected").removeClass('selected');
-			$target.parents('.rightPropertyContent').find(".planContainer").find(".selected").removeClass('selected');
-			$target.parent().find(".selected").removeClass("selected");
-			$target.addClass("selected");
-		}
-
-		var _temp = location,
-			_loc = "",
-			_secenId = componentId.split('.')[0], //用于过滤文件ID
-			box = _this.formatBBox(_temp.boundingBox),
-			ids = [componentId];
-		if (type == 3) { //隐患
-			_loc = _this.formatMark(location, 'S021'.charAt(color), $target.data('id'), 1);
-		} else {
-			_loc = _this.formatMark(location, '543'.charAt(color),$target.data('id'));
-		}
-		_this.showMarks(_loc);
-
-		//过滤所属楼层 start
-		var _floors = App.Project.Settings.Viewer.FloorsData;
-		_.find(_floors, function(item) {
-				if (_.contains(item.fileEtags, _secenId)) {
-					key = item.floor;
-					return true;
-				}
-			})
-			//过滤所属楼层 end
-
-		//没有分类的时候 只过滤单文件 start
-		if (!cat) {
-			App.Project.recoverySilder();
-			//_this.linkSilder('floors', key);
-			/*var _hideFileIds = _.filter(_files, function(i) {
-				return i != _secenId;
-			})
-			App.Project.Settings.Viewer.fileFilter({
-				ids: _hideFileIds,
-				total: [_secenId]
-			});*/
-			_this.linkSilderSpecial('specialty', [paramObj.fileName],[paramObj.specialty]);
-			_this.zoomModelOther(ids, box);
-			return;
-		}
-		//没有分类的时候 只过滤单文件 end
-		if (_this.filterRule.single.indexOf(cat) != -1) {
-			_this.sigleRule(cat,key,function(margin,ratio){
-				if(cat=="幕墙"||cat=='外保温'){
-					_this.zoomModel(ids, box, margin||marginRule.margin, ratio||marginRule.ratio);
-				}else{
-					_this.zoomModelOther(ids, box, margin||marginRule.margin, ratio||marginRule.ratio,location);
-				}
-
-			});
-		}else{
-			App.Project.recoverySilder();
-			_this.linkSilder('floors',key);
-		}
+		return;
 	},
 
 	showMarks: function(marks) {
