@@ -14,6 +14,7 @@ App.userAdmin.AddUserAdminDialogV = Backbone.View.extend({
 	template:_.templateUrl("/userAdmin/tpls/addViewUserDialog.html"),
 	events: {
  		"click .button": "submitFun",
+ 		"blur #accrentName":"checkUserFun"
  	},
 	render:function(){
 		this.$el.html(this.template());
@@ -68,12 +69,13 @@ App.userAdmin.AddUserAdminDialogV = Backbone.View.extend({
 			this.default.accrentNameBool=false;
 			return;
 		}
-		this.checkUserFun();//检查账号名称是否存在
 	},
-	checkUserFun:function(callBack){//检查账号名称是否存在
+	checkUserFun:function(){//检查账号名称是否存在
 		var _this = this;
+		var accrentName = $("#accrentName");
+		var accrentNameVal = accrentName.val().trim();
 		var _data = {
-			loginId:this.default.prefixVal+this.default.accrentNameVal
+			loginId:this.default.prefixVal+accrentNameVal
 		}
 	   	App.userAdmin.checkUserC.fetch({
 			data: _data,
