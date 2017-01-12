@@ -4,6 +4,10 @@ App.userAdmin.EditUserAdminListDialogV = Backbone.View.extend({
 		userNameVal:'',
 		accrentPassWordVal:'',
 		selectProjectArr:'',
+		prefixBool:true,
+		userNameBool:true,
+		accrentPassWordBool:true,
+		selectProjectBool:true,
 	},
 	template:_.templateUrl("/userAdmin/tpls/editViewUserDialog.html"),
 	events: {
@@ -74,18 +78,14 @@ App.userAdmin.EditUserAdminListDialogV = Backbone.View.extend({
 		var userName = $("#userName");
 		var userNameVal = userName.val().trim();
 		var errorBox = userName.next(".errorBox");
-		var cTextName =  /[^\u0000-\u00FF]/;//用户名只能是中文名称
 		this.default.userNameVal = userNameVal;
 		if(this.default.userNameVal == ""){
 			errorBox.html('用户名称不能为空!');
 			errorBox.css("display","block");
+			this.default.userNameBool=false;
 			return;
 		}
-		if(!cTextName.test(this.default.userNameVal)){
-			errorBox.html('用户名称必须是中文!');
-			errorBox.css("display","block");
-			return;
-		}
+		this.default.userNameBool=true;
 		errorBox.html('');
 		errorBox.css("display","none");
 	},
@@ -97,13 +97,16 @@ App.userAdmin.EditUserAdminListDialogV = Backbone.View.extend({
 		if(this.default.accrentPassWordVal == ""){
 			errorBox.html('账号密码不能为空!');
 			errorBox.css("display","block");
+			this.default.accrentPassWordBool=false;
 			return;
 		}
 		if(this.default.accrentPassWordVal.length<6){
 			errorBox.html('账号密码不能小于6位!');
 			errorBox.css("display","block");
+			this.default.accrentPassWordBool=false;
 			return;
 		}
+		this.default.accrentPassWordBool=true;
 		errorBox.html('');
 		errorBox.css("display","none");
 	},
@@ -114,6 +117,7 @@ App.userAdmin.EditUserAdminListDialogV = Backbone.View.extend({
 		if(selectCheckBox.length<=0){
 			projectErrorBox.html("请给用户分配项目权限!");
 			projectErrorBox.css("display","block");
+			this.default.selectProjectBool=false;
 			return;
 		}
 		projectErrorBox.html("");
@@ -122,13 +126,14 @@ App.userAdmin.EditUserAdminListDialogV = Backbone.View.extend({
 			projectIdArr.push(parseInt($(selectCheckBox[i]).data("projectid")));
 		}
 		this.default.selectProjectArr = projectIdArr;
+		this.default.selectProjectBool = true;
 	},
 	submitFun:function(){	
 		this.checkPrefixFun();//检验前缀的方法
 		this.checkUserNameFun();//检查用户名称是否合法
 		this.checkAccrentPwdFun();//检查账号密码是否合法
 		this.checkSelectProject();//检查是否分配了项目
-		if(this.default.prefixVal!=""&&this.default.userNameVal!=""&&this.default.accrentPassWordVal!=""&&this.default.selectProjectArr.length>0){
+		if(this.default.prefixBool&&this.default.userNameBool&&this.default.accrentPassWordBool&&this.default.selectProjectBool){
 			this.submitAjaxFun();
 		}
 	},

@@ -47,6 +47,12 @@ App.userAdmin.EditUserAdminPrefixListDialogV  = Backbone.View.extend({
 			prefixName.focus();
 			return;
 		}
+		if(prefixNameVal.length>10){
+			errorBox.html('前缀最长不能超过十位!');
+			errorBox.css("display","block");
+			prefixName.focus();
+			return;
+		}
 		if(prefixNameVal !== this.default.oldPrefixName){
 			this.default.newPrefixName = prefixNameVal;
 			this.checkPrefixNameAjaxFun();//检查当前的前缀是否已经存在了
