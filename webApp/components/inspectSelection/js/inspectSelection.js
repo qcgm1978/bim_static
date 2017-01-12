@@ -2001,7 +2001,6 @@
 
 		//选择检查点
 		selectInspect: function(e) {
-			alert(8);
 			var $target = $(e.currentTarget);
 			Project.currentInspectId = $target.data('id');
 			if(Project.isSelect!='close'){
@@ -2014,7 +2013,6 @@
 				} else {
 					$target.parent().find(".selected").removeClass("selected");
 					$target.addClass("selected");
-					ModelFilter.recoverySilder(); /*add by wuweiwei*/
 				}
 			}
 			Project.showInModel($target, 2);

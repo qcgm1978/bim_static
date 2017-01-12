@@ -363,7 +363,7 @@ var AppRoute = Backbone.Router.extend({
 			}
 
 			//_.require('/static/dist/libs/libsH5.js');
-			$("head").append('<script type="text/javascript" src="/static/dist/libs/libsH5_20160313.js?' + App.time + '"></script>');
+			$("head").append('<script type="text/javascript" src="/static/dist/libs/libsH5.js"></script>');
 		}
 
 		App.Comm.delCookie("token_cookie");
