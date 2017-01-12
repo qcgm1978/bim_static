@@ -470,14 +470,24 @@ window.Global = {
 		$("#topBar .navHeader .bodyConMenu").hide();
 		$("#topBar .navHeader .resources").hide();
 		$("#topBar .navHeader .services").hide();
-		$("#downLoadModelProject")[0].className = "disable";
-		$popMenu = $(".onlineNav ul li");
-		$popMenu.each(function(index){
-			if(index!=0)
-			{
-				this.style.display = "none";
-			}
-		});
+		
+		try
+		{
+			$("#downLoadModelProject")[0].className = "disable";
+		}catch(e){;}
+		
+		try
+		{
+			$popMenu = $(".onlineNav ul li");
+			$popMenu.each(function(index){
+				if(index!=0)
+				{
+					this.style.display = "none";
+				}
+			});
+		}catch(e){;}
+
+
 		/*隐藏头像登录等信息*/
 		var $topBar = $("#topBar");
 		$topBar.find("img").css("display","none");
