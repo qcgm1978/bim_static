@@ -145,7 +145,6 @@ App.Project.QualityProcessAcceptance = Backbone.View.extend({
 
 	//模型中显示
 	showInModel(event) { 
-	 
 		App.Project.showInModel($(event.target).closest("tr"),1);  
 	},
 	

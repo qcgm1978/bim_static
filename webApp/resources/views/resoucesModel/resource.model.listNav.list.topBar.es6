@@ -39,7 +39,7 @@
  	btnFileStateFun(){//add zhangyankai
  		var addDialogEleDom = new  App.ResourceModel.FileStatus().render().el;
  		var fileStateDialog = new App.Comm.modules.Dialog({
- 		    title:"模型转换状态",
+ 		    title:"文件转换状态",
  		    width:700,
  		    height:300,
  		    isConfirm:false,
