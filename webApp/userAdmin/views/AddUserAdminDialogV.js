@@ -74,8 +74,10 @@ App.userAdmin.AddUserAdminDialogV = Backbone.View.extend({
 		var _this = this;
 		var accrentName = $("#accrentName");
 		var accrentNameVal = accrentName.val().trim();
+		var prefixBox = $(".selectPrefixBox");
+		var prefixBoxVal = prefixBox.val().trim();
 		var _data = {
-			loginId:this.default.prefixVal+accrentNameVal
+			loginId:prefixBoxVal+accrentNameVal
 		}
 	   	App.userAdmin.checkUserC.fetch({
 			data: _data,
