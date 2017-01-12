@@ -363,7 +363,7 @@ var AppRoute = Backbone.Router.extend({
 			}
 
 			//_.require('/static/dist/libs/libsH5.js');
-			$("head").append('<script type="text/javascript" src="/static/dist/libs/libsH5_20160313.js?' + App.time + '"></script>');
+			$("head").append('<script type="text/javascript" src="/static/dist/libs/libsH5.js"></script>');
 		}
 
 		App.Comm.delCookie("token_cookie");
@@ -470,14 +470,24 @@ window.Global = {
 		$("#topBar .navHeader .bodyConMenu").hide();
 		$("#topBar .navHeader .resources").hide();
 		$("#topBar .navHeader .services").hide();
-		$("#downLoadModelProject")[0].className = "disable";
-		$popMenu = $(".onlineNav ul li");
-		$popMenu.each(function(index){
-			if(index!=0)
-			{
-				this.style.display = "none";
-			}
-		});
+		
+		try
+		{
+			$("#downLoadModelProject")[0].className = "disable";
+		}catch(e){;}
+		
+		try
+		{
+			$popMenu = $(".onlineNav ul li");
+			$popMenu.each(function(index){
+				if(index!=0)
+				{
+					this.style.display = "none";
+				}
+			});
+		}catch(e){;}
+
+
 		/*隐藏头像登录等信息*/
 		var $topBar = $("#topBar");
 		$topBar.find("img").css("display","none");
