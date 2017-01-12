@@ -9,12 +9,12 @@ body{
 	position: absolute;
 	top:510px;
 	left:0px;
-	width:100%;
+	width:99%;
 }
 
 .grid table{
 	border:1px solid #ccc;
-	width:90%;
+	width:100%;
 }
 .grid table thead{
 	background-color: #ddd;
@@ -43,7 +43,7 @@ body{
 	border:1px dashed #bbb;
 	margin-top:10px;
 	background-color: #eee;
-	width:90%;
+	width:99%;
 }
 .options button{
 	height: 25px;
@@ -65,10 +65,21 @@ body{
 .w190{
 	width:190px;
 }
+.w-big{
+	width: 190px;
+}
+.w-middle{
+	width: 110px;
+}
+.w-small{
+	width:70px;
+}
 .modelSelectDialog{
 	height: 500px;
 }
-
+input{
+	width:99%;
+}
 .dialog{
 	background-color: #FFF;
 	border:1px solid #aaa;

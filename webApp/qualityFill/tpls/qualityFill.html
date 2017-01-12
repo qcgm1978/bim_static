@@ -22,13 +22,19 @@
             <thead>
                 <tr>
                     <td class="chk"><input type="checkbox" name="chk" class="chkAll"/></td>
-                    <td class="w150">类别</td>
-                    <td class="w190">分部</td>
-                    <td class="w190">分项</td>
-                    <td>预设点</td>
-                    <td class="w150">检查结果</td>
-                    <td class="w190">隐患</td>
-                    <td>构建位置</td>
+                    <td class="w-midlle">类别</td>
+                    <td class="w-small">分部</td>
+                    <td class="w-small">分项</td>
+                    <td class="w-big">预设点</td>
+                    <td class="w-small">检查结果</td>
+                    <td class="w-middle">隐患</td>
+                    <td class="w-big">构建位置</td>
+                    <td class="w-small">创建日期</td>
+                    <td class="w-small">整改日期</td>
+                    <td class="w-small">整改次数</td>
+                    <td class="w-small">状态</td>
+                    <td class="w-small">等级</td>
+                    <td class="w-small">填报人</td>
                 </tr>
             </thead>
             <tbody id="gridContainer">
@@ -64,8 +70,8 @@
                             <option>竖井</option>
                         </select>
                     </td>
-                    <td class="w190"><input type="text" name="part1" class="w180 input_part1"/></td>
-                    <td class="w190"><input type="text" name="part2" class="w180 input_part2"/></td>
+                    <td><input type="text" name="part1" class="input_part1"/></td>
+                    <td><input type="text" name="part2" class="input_part2"/></td>
                     <td>
                         <span class="ready-pos" data-readypos=""></span>
                         <span class="linkBtn-ready-pos"></span>
@@ -76,10 +82,31 @@
                         <option>不合格</option>
                     </select>
                     </td>
-                    <td class="w190"><input type="text" name="part2" class="w180 input_part3"/></td>
+                    <td><input type="text" name="part2" class="input_part3"/></td>
                     <td>
                         <span class="pos" data-pos=""></span>
                         <span class="linkBtn-pos"></span>
+                    </td>
+                    <td><input type="" name="" class="input_date1"/></td>
+                    <td><input type="" name="" class="input_date2"/></td>
+                    <td><input type="" name="" class="input_counter"/></td>
+                    <td>
+                        <select class="select-state">
+                            <option>待整改</option>
+                            <option>已整改</option>
+                            <option>已关闭</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="select-level">
+                            <option>一般</option>
+                            <option>较大</option>
+                            <option>重大</option>
+                            <option>特大</option>
+                        </select>
+                    </td>
+                    <td>
+                        <input type="" name="" class="input_person"/>
                     </td>
                 </tr>
             </tbody>
@@ -107,12 +134,20 @@
 </body>
 </html>
 <script type="text/javascript">
-Array.clone = function(oldAr,newAr){
-
+Array.clone = function(old){
+    var v,news;
+    for(v in old)
+    {
+        news[v] = old[v];
+    }
+    return news;
 }
+
+//Object.prototype.toString.call(obj) === '[object Array]'
 
 var readyPosState = ["绑定预设点","解绑"];
 var posState = ["绑定构建位置","解绑"];
+
 var Data = {
     projectData:{},
     formData:{
@@ -279,8 +314,10 @@ var Event = {
     saveData : function(){
         var $trs = $("#gridContainer tr");
         var $this;
+        var data;
         $trs.each(function(index){
             $this = $(this);
+            data = Array.clone(Data.itemData);
             console.log($this.find("select.select-type")[0].value);
             //Data.formData.
         });
@@ -302,19 +339,20 @@ var Event = {
     },
     bindYuSheDian:function(curDOM){
         window.viewer.data();
-        var $tr = $("#presetPointPanel .tbOpeningacceptanceBody tr");
-        console.log($tr[0]);
+        window.viewer.data();
         /*var json = JSON.stringify(window.viewerData);*/
         try
         {
             if(curDOM.innerHTML == readyPosState[0])
             {
-                $(curDOM).prev().html($tr.find("td").html());
+                window.viewer.showInModel({presetId : window.viewerData.presetPoint.id});
+                $(curDOM).prev().html(window.viewerData.presetPoint.locationName);
+                $(curDOM).attr("data",JSON.stringify(window.viewerData.presetPoint));
                 curDOM.innerHTML = readyPosState[1];
             }
             else
             {
-                window.viewer.data();
+                viewer.showInModel({});
                 $(curDOM).prev().html("");
                 curDOM.innerHTML = readyPosState[0];
             }
@@ -325,18 +363,21 @@ var Event = {
         window.viewer.data();
         window.viewer.data();
         console.log(window.viewerData.risk);
+        console.log(JSON.stringify(window.viewerData.risk));
         /*var json = JSON.stringify(window.viewerData);*/
         try
         {
             if(curDOM.innerHTML == posState[0])
             {
                 $(curDOM).prev().html(window.viewerData.risk.components.locationName);
+                $(curDOM).attr("data",JSON.stringify(window.viewerData.risk));
                 curDOM.innerHTML = posState[1];
             }
             else
             {
                 $(curDOM).prev().html("");
                 curDOM.innerHTML = posState[0];
+                $(curDOM).attr("data","");
             }
         }
         catch(e){;}
@@ -352,6 +393,27 @@ var Event = {
                         '<td>{select-result}</td>'+
                         '<td><input type="text" name="part2" class="w180 input_part3"/></td>'+
                         '<td>{pos}</td>'+
+                        '<td><input type="" name="" class="input_date1"/></td>'+
+                        '<td><input type="" name="" class="input_date2"/></td>'+
+                        '<td><input type="" name="" class="input_counter"/></td>'+
+                        '<td>'+
+                            '<select class="select-state">'+
+                                '<option>待整改</option>'+
+                                '<option>已整改</option>'+
+                                '<option>已关闭</option>'+
+                            '</select>'+
+                        '</td>'+
+                        '<td>'+
+                            '<select class="select-level">'+
+                                '<option>一般</option>'+
+                                '<option>较大</option>'+
+                                '<option>重大</option>'+
+                                '<option>特大</option>'+
+                            '</select>'+
+                        '</td>'+
+                        '<td>'+
+                            '<input type="" name="" class="input_person"/>'+
+                        '</td>'+
                         '</tr>';
         this.selectTypeHTML ='<select class="select-type">'+
                                 '<option>工程桩</option>'+
@@ -405,6 +467,7 @@ var Event = {
             th.lineHTML = th.lineHTML.replace("{ready-pos-state}",readyPosState[0]);
             th.lineHTML = th.lineHTML.replace("{pos-state}",posState[0]);
             $("#gridContainer").append(th.lineHTML);
+            viewer.showInModel({});
         });
         $("#gridContainer").on("click",".checkbox",function(){
             th.checkRow(this);
@@ -422,7 +485,16 @@ var Event = {
         /*绑定构建位置*/
         $("#gridContainer").on("click",".linkBtn-pos",function(){
             th.bindGoJian(this);
-        });       
+        });
+
+        /*td click*/
+        var $gridContainer = $("#gridContainer");
+        $gridContainer.on("click","td",function(){
+            //viewer.showInModel({});
+            //$gridContainer.find("tr").css("background-color","");
+            //$(this).parent().css("background-color","#aaa");
+        });
+
         //this.initDialogEvent();
         //this.initDialogData();
     }
