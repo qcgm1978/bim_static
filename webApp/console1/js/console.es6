@@ -652,9 +652,9 @@ App.Console = {
         projectNo: $("#number").val().trim(),
         name: $("#famTitle").val().trim(),
         province: $("#province option:selected").html().trim(),
-        subType: $("#s01").val().trim(),//项目类型
-        estateType: $("#projectModel").val().trim(),// 项目模式
-        projectType: $("#projectFormat").val().trim(),//项目业态
+        subType: $("#s01").val().trim(), //项目类型
+        estateType: $("#projectModel").val().trim(), // 项目模式
+        projectType: $("#projectFormat").val().trim(), //项目业态
         region: $("#adminZone option:selected").html().trim(),
         openTime: $("#openDate").val().trim(),
         delistingDate: $("#delistDate").val().trim(),
@@ -677,7 +677,7 @@ App.Console = {
           if (data.message == "projectNo repeat!") {
             alert("项目编号重复");
           }
-        }else{
+        } else {
           if (data.message == "success") {
             alert("成功");
           }
@@ -781,7 +781,7 @@ App.Console = {
       App.Console.quest(5, 1016, data);
     });
   },
-  //项目变更
+  //项目变更流程模拟
   projectChange() {
     var tpl = _.templateUrl('/console1/tpls/projectChange/projectchange.html', true);
     $("#contains").html(tpl);
@@ -790,45 +790,34 @@ App.Console = {
     setTimeout(function() {
       $('body').append('<script type="text/javascript" src="/static/dist/components/fileSelection/js/fileSelection.js"></' + 'script>')
     }, 1000)
-
     $.ajax({
       url: "platform/project?type=3&pageItemCount=100000"
     }).done(function(data) {
-
       var items = data.data.items,
         str = '';
-
       $.each(items, function(i, item) {
         if (item.id) {
-
           str += '<option id="' + item.id + '" value="' + item.projectNo + '">' + item.name + '</option>';
         }
-
       });
       $("#s11").html("<option value=''>请选择</option>" + str).change(function() {
         $.ajax({
           url: "platform/project/" + $(this).find('option:selected').attr('id') + "/version"
         }).done(function(data) {
-
           var items = data.data,
             str = '';
-
           $.each(items, function(i, item) {
             if (item.id) {
-
               str += '<option  value="' + item.id + '">' + item.name + '</option>';
             }
-
           });
           $("#s12").html(str);
-
         });
       });
     });
     //7.2
     this.fn['7.2'] = function() {
         App.Console.auditSheet1(9, '#s21', 8);
-
       }
       //7.3
     this.fn['7.3'] = function() {
@@ -1300,13 +1289,13 @@ App.Console = {
 
     })
   },
-  refreshProjectListFun(){//成本 三步提交成功之后都会从新刷新项目列表的方法
+  refreshProjectListFun() { //成本 三步提交成功之后都会从新刷新项目列表的方法
     $.ajax({
       url: "/platform/project/list/all/cost"
     }).done(function(data) {
       var str = '<option value="0">请选择</option>',
-          optionDom = '<option value="0">请选择</option>',
-          datas = data.data;
+        optionDom = '<option value="0">请选择</option>',
+        datas = data.data;
       $('#s11,#s21,#transferProject').html("");
       $('#projectList_two,#projectList').html("");
       $.each(datas, function(index, data) {
@@ -1316,11 +1305,11 @@ App.Console = {
       $("#projectList_two,#projectList").append(optionDom);
     });
   },
-  cost() {//成本模拟流程
+  cost() { //成本模拟流程
     var tpl = _.templateUrl('/console1/tpls/cost/cost.html', true);
     $("#contains").html(tpl);
-    $('textarea').hide();    
-    $.ajax({//成本第一步
+    $('textarea').hide();
+    $.ajax({ //成本第一步
       // url: "/platform/project/cost/mapping",
       url: "/platform/project/list/all/cost"
     }).done(function(data) {
@@ -1331,7 +1320,7 @@ App.Console = {
       });
       $('#s11').append(str);
     });
-    $.ajax({//成本第二步
+    $.ajax({ //成本第二步
       url: "platform/project/list/all/cost/change?type=10"
     }).done(function(data) {
       var str = '',
@@ -1341,7 +1330,7 @@ App.Console = {
       });
       $('#s21').append(str);
     });
-    $.ajax({//成本第三步
+    $.ajax({ //成本第三步
       url: "platform/project/list/all/cost/change?type=11"
     }).done(function(data) {
       var str = '',
@@ -1370,7 +1359,7 @@ App.Console = {
         projectId: $('#s11 option:selected').attr('projectId').trim(),
         title: $('#p11').val().trim()
       };
-      App.Console.apply(1, 1001, data, 2,function(){
+      App.Console.apply(1, 1001, data, 2, function() {
         App.Console.refreshProjectListFun();
       });
     });
@@ -1392,35 +1381,35 @@ App.Console = {
         projectId: $('#s21 option:selected').attr('projectId').trim(),
         designFlowCode: $("#projectList").val().trim(),
       };
-      App.Console.apply(2, 1003, data, 2,function(){
+      App.Console.apply(2, 1003, data, 2, function() {
         App.Console.refreshProjectListFun();
       });
     });
     //start 成本的第三个提交的方法
-    $("#transferSubmitBtn").click(function(){
-      var imgListBox = $("#form3 div")
-          arr = [];
-      imgListBox.each(function(index, item) {
-        arr.push({
-          "type": 1,
-          "description": $(item).find('span').text(),
-          "url": location.origin + '/platform/mock/costfile?token=123&filePath=' + $(item).data('path')
+    $("#transferSubmitBtn").click(function() {
+        var imgListBox = $("#form3 div")
+        arr = [];
+        imgListBox.each(function(index, item) {
+          arr.push({
+            "type": 1,
+            "description": $(item).find('span').text(),
+            "url": location.origin + '/platform/mock/costfile?token=123&filePath=' + $(item).data('path')
+          })
         })
+        var data = {
+          workflowCode: parseInt(9999999 * Math.random()),
+          title: $('#transfer_title').val().trim(),
+          costAttachments: arr,
+          projectCode: $('#transferProject').val().trim(),
+          projectId: $('#transferProject option:selected').attr('projectId').trim(),
+          designFlowCode: $("#projectList_two").val().trim(),
+        };
+        App.Console.apply(3, 1004, data, 2, function() {
+          App.Console.refreshProjectListFun();
+        });
       })
-      var data = {
-        workflowCode: parseInt(9999999 * Math.random()),
-        title: $('#transfer_title').val().trim(),
-        costAttachments: arr,
-        projectCode: $('#transferProject').val().trim(),
-        projectId: $('#transferProject option:selected').attr('projectId').trim(),
-        designFlowCode: $("#projectList_two").val().trim(),
-      };
-      App.Console.apply(3, 1004, data, 2,function(){
-        App.Console.refreshProjectListFun();
-      });
-    })
-    //end 成本的第三个提交的方法
-    //start 成本第二个提交的选择项目 获取项目清单的方法
+      //end 成本的第三个提交的方法
+      //start 成本第二个提交的选择项目 获取项目清单的方法
     $("#s21").change(function(event) {
       var optionDom = '<option value="0">请选择</option>';
       var projectList = $("#projectList");
@@ -1428,13 +1417,13 @@ App.Console = {
       var projectCode = target.val().trim();
       var projectId = target.find('option:selected').attr("projectId").trim();
       var data = {
-        code:projectCode,
-        type:10,
-        projectId:projectId
+        code: projectCode,
+        type: 10,
+        projectId: projectId
       }
       $.ajax({
         type: "GET",
-        data:data,
+        data: data,
         url: "/platform/project/console1/workflow/query"
       }).done(function(data) {
         projectList.html("");
@@ -1453,13 +1442,13 @@ App.Console = {
       var projectCode = target.val().trim();
       var projectId = target.find('option:selected').attr("projectId").trim();
       var data = {
-        code:projectCode,
-        type:11,
-        projectId:projectId
+        code: projectCode,
+        type: 11,
+        projectId: projectId
       }
       $.ajax({
         type: "GET",
-        data:data,
+        data: data,
         url: "/platform/project/console1/workflow/query"
       }).done(function(data) {
         projectListTwo.html("");
@@ -1584,7 +1573,7 @@ App.Console = {
       }
     });
   },
-  apply(index, num, obj, type,callback) {
+  apply(index, num, obj, type, callback) {
     var datainit = JSON.parse($('#data' + index).val());
     if (typeof obj != 'undefined') {
       for (var g in obj) {
@@ -1625,7 +1614,7 @@ App.Console = {
       if (location.port != 81) {
         setTimeout(function() {
           alert('成功');
-          if(callback) {
+          if (callback) {
             callback();
           }
         }, 2500);

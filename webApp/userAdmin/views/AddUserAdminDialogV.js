@@ -5,7 +5,11 @@ App.userAdmin.AddUserAdminDialogV = Backbone.View.extend({
 		userNameVal:'',
 		accrentPassWordVal:'',
 		selectProjectArr:'',
-		canSubmit:false,
+		prefixBool:false,
+		accrentNameBool:false,
+		userNameBool:false,
+		accrentPassWordBool:false,
+		selectProjectBool:false,
 	},
 	template:_.templateUrl("/userAdmin/tpls/addViewUserDialog.html"),
 	events: {
@@ -42,6 +46,9 @@ App.userAdmin.AddUserAdminDialogV = Backbone.View.extend({
 		var prefixBox = $(".selectPrefixBox");
 		var prefixBoxVal = prefixBox.val().trim();
 		this.default.prefixVal = prefixBoxVal;
+		if(this.default.prefixVal != ""){
+			this.default.prefixBool = true;
+		}
 	},
 	checkAccrentNameFun:function(){//检验登录账号是否合法的方法
 		var accrentName = $("#accrentName");
@@ -52,11 +59,13 @@ App.userAdmin.AddUserAdminDialogV = Backbone.View.extend({
 		if(this.default.accrentNameVal == ""){
 			errorBox.html('登录账号不能为空!');
 			errorBox.css("display","block");
+			this.default.accrentNameBool=false;
 			return;
 		}
 		if(!accrentNameEdg.test(this.default.accrentNameVal)){
 			errorBox.html('账号名称必须是字母和数字!');
 			errorBox.css("display","block");
+			this.default.accrentNameBool=false;
 			return;
 		}
 		this.checkUserFun();//检查账号名称是否存在
@@ -74,11 +83,11 @@ App.userAdmin.AddUserAdminDialogV = Backbone.View.extend({
 				if(response.data == "exist"){
 					errorBox.html('账号名称已经存在，请从新输入!');
 					errorBox.css("display","block");
-					_this.default.canSubmit = false;
+					_this.default.accrentNameBool = false;
 				}else{
 					errorBox.html('');
 					errorBox.css("display","none");
-					_this.default.canSubmit = true;
+					_this.default.accrentNameBool = true;
 				}
 			}
 		})
@@ -87,20 +96,16 @@ App.userAdmin.AddUserAdminDialogV = Backbone.View.extend({
 		var userName = $("#userName");
 		var userNameVal = userName.val().trim();
 		var errorBox = userName.next(".errorBox");
-		var cTextName =  /[^\u0000-\u00FF]/;//用户名只能是中文名称
 		this.default.userNameVal = userNameVal;
 		if(this.default.userNameVal == ""){
 			errorBox.html('用户名称不能为空!');
 			errorBox.css("display","block");
-			return;
-		}
-		if(!cTextName.test(this.default.userNameVal)){
-			errorBox.html('用户名称必须是中文!');
-			errorBox.css("display","block");
+			this.default.userNameBool=false;
 			return;
 		}
 		errorBox.html('');
 		errorBox.css("display","none");
+		this.default.userNameBool=true;
 	},
 	checkAccrentPwdFun:function(){//检查账号密码是否合法
 		var accrentPassWord = $("#accrentPassWord");
@@ -110,15 +115,18 @@ App.userAdmin.AddUserAdminDialogV = Backbone.View.extend({
 		if(this.default.accrentPassWordVal == ""){
 			errorBox.html('账号密码不能为空!');
 			errorBox.css("display","block");
+			this.default.accrentPassWordBool=false;
 			return;
 		}
 		if(this.default.accrentPassWordVal.length<6){
 			errorBox.html('账号密码不能小于6位!');
 			errorBox.css("display","block");
+			this.default.accrentPassWordBool=false;
 			return;
 		}
 		errorBox.html('');
 		errorBox.css("display","none");
+		this.default.accrentPassWordBool=true;
 	},
 	checkSelectProject:function(){//检查是否分配了项目
 		var selectCheckBox = $(".projectUlBox").find("label.selectCheckBox");
@@ -127,6 +135,7 @@ App.userAdmin.AddUserAdminDialogV = Backbone.View.extend({
 		if(selectCheckBox.length<=0){
 			projectErrorBox.html("请给用户分配项目权限!");
 			projectErrorBox.css("display","block");
+			this.default.selectProjectBool=false;
 			return;
 		}
 		projectErrorBox.html("");
@@ -135,6 +144,7 @@ App.userAdmin.AddUserAdminDialogV = Backbone.View.extend({
 			projectIdArr.push(parseInt($(selectCheckBox[i]).data("projectid")));
 		}
 		this.default.selectProjectArr = projectIdArr;
+		this.default.selectProjectBool=true;
 	},
 	submitFun:function(){	
 		this.checkPrefixFun();//检验前缀的方法
@@ -142,7 +152,7 @@ App.userAdmin.AddUserAdminDialogV = Backbone.View.extend({
 		this.checkUserNameFun();//检查用户名称是否合法
 		this.checkAccrentPwdFun();//检查账号密码是否合法
 		this.checkSelectProject();//检查是否分配了项目
-		if(this.default.prefixVal!=""&&this.default.accrentNameVal!=""&&this.default.userNameVal!=""&&this.default.accrentPassWordVal!=""&&this.default.selectProjectArr.length>0&&this.default.canSubmit){
+		if(this.default.prefixBool&&this.default.accrentNameBool&&this.default.userNameBool&&this.default.accrentPassWordBool&&this.default.selectProjectBool){
 			this.submitAjaxFun();
 		}
 	},

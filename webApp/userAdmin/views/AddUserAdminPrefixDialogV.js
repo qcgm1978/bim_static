@@ -44,6 +44,12 @@ App.userAdmin.AddUserAdminPrefixDialogV = Backbone.View.extend({
 			prefixName.focus();
 			return;
 		}
+		if(prefixNameVal.length>10){
+			errorBox.html('前缀最长不能超过十位!');
+			errorBox.css("display","block");
+			prefixName.focus();
+			return;
+		}
 		errorBox.html('');
 		errorBox.css("display","none");
 		this.default.newPrefixName = prefixNameVal;
