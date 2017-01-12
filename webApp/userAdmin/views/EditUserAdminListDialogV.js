@@ -4,7 +4,6 @@ App.userAdmin.EditUserAdminListDialogV = Backbone.View.extend({
 		userNameVal:'',
 		accrentPassWordVal:'',
 		selectProjectArr:'',
-		prefixBool:true,
 		userNameBool:true,
 		accrentPassWordBool:true,
 		selectProjectBool:true,
@@ -29,25 +28,10 @@ App.userAdmin.EditUserAdminListDialogV = Backbone.View.extend({
 					_this.default.userNameVal = response.data.username;
 					_this.default.accrentNameVal = response.data.loginid;
 					_this.default.accrentPassWordVal = response.data.pwd;
+					_this.default.prefixVal = response.data.prefix;
 					_this.$el.html(_this.template({state:response.data}));
 					_this.getProjectData(response.data.projects);//获取全部项目的方法
-					_this.getPrefixData(response.data.prefix);//获取用户前缀列表的方法
 				}
-			}
-		})
-	},
-	getPrefixData:function(prefix){//获取用户前缀的方法
-		var _this = this;
-	    App.userAdmin.getPrefixsDataC.fetch({
-			success: function(collection, response, options) {
-				for (var j = response.data.length - 1; j >= 0; j--) {
-					if(prefix == response.data[j].prefix){
-						response.data[j].selected = true;
-					}
-				}
-				var dataArr = response.data;
-				var DialogProjectPrefixListV = new App.userAdmin.DialogProjectPrefixListV;
-				_this.$el.find(".prefixBox").append(DialogProjectPrefixListV.render(dataArr).el);
 			}
 		})
 	},
@@ -68,11 +52,6 @@ App.userAdmin.EditUserAdminListDialogV = Backbone.View.extend({
 				App.Comm.initScroll(_this.$(".dialogProjectList"), "y");
 			}
 		})
-	},
-	checkPrefixFun:function(){//检查前缀是否存在
-		var prefixBox = $(".selectPrefixBox");
-		var prefixBoxVal = prefixBox.val().trim();
-		this.default.prefixVal = prefixBoxVal;
 	},
 	checkUserNameFun:function(){//检查用户名称是否合法
 		var userName = $("#userName");
@@ -129,11 +108,10 @@ App.userAdmin.EditUserAdminListDialogV = Backbone.View.extend({
 		this.default.selectProjectBool = true;
 	},
 	submitFun:function(){	
-		this.checkPrefixFun();//检验前缀的方法
 		this.checkUserNameFun();//检查用户名称是否合法
 		this.checkAccrentPwdFun();//检查账号密码是否合法
 		this.checkSelectProject();//检查是否分配了项目
-		if(this.default.prefixBool&&this.default.userNameBool&&this.default.accrentPassWordBool&&this.default.selectProjectBool){
+		if(this.default.userNameBool&&this.default.accrentPassWordBool&&this.default.selectProjectBool){
 			this.submitAjaxFun();
 		}
 	},
