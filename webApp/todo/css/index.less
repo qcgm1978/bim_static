@@ -20,14 +20,37 @@
 			border-bottom: 1px solid #CCCCCC;
 			li{
 				margin: 10px 25px 0px 12px;
-				.title { padding-left: 15px; width: 59%;float: left;font-size: 14px;color: #999;}
+				.title { 
+					padding-left: 15px; 
+					width: 59%;
+					float: left;
+					font-size: 14px;
+					color: #999;
+					height: 46px;
+					line-height: 46px;
+					a{
+						white-space: nowrap;
+						max-width: 100%;
+						display: inline-block;
+						overflow: hidden;
+						text-overflow: ellipsis;
+					}
+				}
 				.operator { float: left; width: 14%; font-size: 14px;color: #999;}
 				.date { float: left; width: 26%; padding-right: 30px;font-size: 14px; color: #999; text-align: left;}
 			}
 		}
 	}
 	.todoDetailView { height: 48px; line-height: 48px; border: 1px #ccc solid; margin: 10px 25px 0px 12px; position: relative;
-		.title { padding-left: 15px; width: 59%; float: left; }
+		.title { padding-left: 15px; width: 59%; float: left; height: 46px; line-height: 46px;
+			a{
+				white-space: nowrap;
+				max-width: 100%;
+				display: inline-block;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+		}
 		.operator { float: left; width: 14%; }
 		.date { float: left; width: 26%; text-align: left; padding-right: 30px; }
 		.newMsg { position: absolute; right: 0px; top: 0px; bottom: 0px; width: 30px; background: url(/todo/images/new.png) no-repeat; }

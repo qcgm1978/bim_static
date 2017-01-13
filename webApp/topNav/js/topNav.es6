@@ -6,6 +6,7 @@ App.TopNav = {
 		var _userInfo = JSON.parse(localStorage.getItem("user"));
 		if (_userInfo) {
 			$("#loginName").html(_userInfo.name);
+			$("#loginName").attr("title",_userInfo.name);
 			$("#uiAccount").html(_userInfo.loginName);
 			$("#uiPosition").html(_userInfo.position);
 			$("#uiPartment").html(_userInfo.org ? _userInfo.org[0].name : '');//

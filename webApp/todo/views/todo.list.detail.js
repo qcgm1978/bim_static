@@ -33,7 +33,6 @@ App.Todo.TodoDetailView=Backbone.View.extend({
 	
 
 	render:function(){
-	 
 		var data=this.model.toJSON();
 		data.type=App.Todo.Settings.type;
 		this.$el.html(this.template(data)).attr("cid",this.model.cid); 
