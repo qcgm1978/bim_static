@@ -13,9 +13,9 @@ App.Projects.searchView = Backbone.View.extend({
          complete: "",
          open: "",
          openTimeStart: "", 
-         openTimEnd: ""
+         openTimEnd: "",
+
 	},
-	//
 	events: {
 		"click .seniorSearch": "seniorSearch",
 		"click .btnSearch": "searchProject",
@@ -26,11 +26,10 @@ App.Projects.searchView = Backbone.View.extend({
 	},
 
 	template: _.templateUrl("/projects/tpls/project.search.html"),
-
-
 	render: function() {
 		var _this=this;
 		this.$el.html(this.template());
+		this.getProvinceSelectFun();//获取省市筛选的省列表
 		//type=="my-backbone-fast" && this.$el.find(".fast").addClass('selected')|| this.$el.find(".msg").addClass('selected');
 
 		this.$(".pickProjectType").myDropDown({
@@ -82,9 +81,26 @@ App.Projects.searchView = Backbone.View.extend({
 		})
 
 		return this;
-
 	},
-
+	getProvinceSelectFun:function(){//获取省市筛选的省列表
+		var pickProvince = this.$("#pickProvince");
+		var html = '<li class="myItem" data-val="">全部</li>';
+		pickProvince.html('');
+		$.ajax({
+		    type:"GET",
+		    url:"platform/project/province",
+		    success:function(response){
+		       if(response.code == 0){
+		       		if(response.data.length>0){
+		       			for(var i=0,len=response.data.length-1;i<=len;i++){
+		       				html+='<li class="myItem" data-val="'+response.data[i].province+'">'+response.data[i].province+'</li>'
+		       			}
+		       			pickProvince.append(html);
+		       		}
+	       		}
+		    }
+		});
+	},
 	clearSearch:function(){
 		this.formData={
 			 name:"",
