@@ -17,9 +17,15 @@
 
 <div id="Dlg_content" style="display:block;">
     <div class="dlg-content">
-        <div id="repeatContainer" class="projectItem" style="display:none;">
-            <span data-projectCode="{{projectCode}}" data-projectId="{{projectId}}">{{projectName}}</span>
+        <div class="dlg-content-type">
+            <label>验收类型：</label><span data-type="open">开工验收</span><span data-type="process">过程验收</span>
         </div>
+        <div>
+            <div id="repeatContainer" class="projectItem" style="display:none;">
+                <span data-projectCode="{{projectCode}}" data-projectId="{{projectId}}">{{projectName}}</span>
+            </div>            
+        </div>
+
     </div>
     <div class="dlg-button">
         <button id="DlgBtn_close">关闭</button>
@@ -62,12 +68,13 @@ var Event = {
         });
         $("#DlgBtn_ok").on("click",function(){
             window.Dlg.hide();
-            var href = "/static/dist/qualityFill/qualityFill.html?projectCode={projectCode}&projectId={projectId}&projectName={projectName}";
-            var link = href.replace("{projectCode}",window.projectCode).replace("{projectId}",window.projectId).replace("{projectName}",encodeURI(window.projectName));
+            var href = "/static/dist/qualityFill/qualityFill.html?projectCode={projectCode}&projectId={projectId}&projectName={projectName}&type={type}&typeName={typeName}";
+            var link = href.replace("{projectCode}",window.projectCode).replace("{projectId}",window.projectId).replace("{projectName}",encodeURI(window.projectName)).replace("{type}",window.type).replace("{typeName}",window.typeName);
             window.location.href = link;
         });
+
         var $Dlg_content = $("#Dlg .dlg-content");
-        $Dlg_content.on("click","div",function(){
+        $Dlg_content.on("click",".projectItem",function(){
             var $dataDOM;
             $Dlg_content.find("div").removeClass("select");
             if(!$(this).hasClass("select"))
@@ -78,6 +85,13 @@ var Event = {
                 window.projectId = $dataDOM.data("projectid");
                 window.projectName = $dataDOM.html();
             }
+        });
+
+        $(".dlg-content-type").on("click","span",function(){
+            window.type = $(this).data("type");
+            window.typeName = $(this).html();
+            $(".dlg-content-type").find("span").removeClass("select");
+            $(this).addClass("select");
         });
     },
     initDialogData : function(){
