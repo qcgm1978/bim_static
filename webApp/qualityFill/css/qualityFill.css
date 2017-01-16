@@ -99,6 +99,36 @@ input{
 	height: 420px;
 	overflow-y:auto;
 }
+.dialog .dlg-content .dlg-content-type{
+	height:50px;
+	line-height:50px;
+	padding-top:10px;
+}
+.dialog .dlg-content .dlg-content-type label{
+	display: block;
+	float: left;
+	height:30px;
+	line-height:30px;
+}
+.dialog .dlg-content .dlg-content-type span{
+	height:30px;
+	line-height:30px;
+	display: block;
+	float:left;
+	padding-left:5px;
+	padding-right: 5px;
+	margin-left:10px;
+	margin-right: 10px;
+	background-color: #ccc;
+	cursor: pointer;
+}
+.dialog .dlg-content .dlg-content-type span.select{
+	background-color: #00c;
+}
+.dialog .dlg-content .dlg-content-type span:hover{
+	background-color: #00c;
+	color:#FFF;
+}
 .dialog .dlg-button{
 	text-align: center;
 }

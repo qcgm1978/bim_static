@@ -16,15 +16,15 @@
 <body>
 
 <div class="container">
-    <div style="height:30px;line-height:30px;font-weight:bold;font-size:14px;">项目名称：<span id="projectName"></span></div>
+    <div style="height:30px;line-height:30px;font-weight:bold;font-size:14px;">
+        项目名称：<span id="projectName"></span>&nbsp;&nbsp;&nbsp;&nbsp;
+        项目名称：<span id="typeName"></span>
+    </div>
     <div id="grid" class="grid">
         <table border="0" cellpadding="0" cellspacing="0">
             <thead>
                 <tr>
                     <td class="chk"><input type="checkbox" name="chk" class="chkAll"/></td>
-                    <td class="w-midlle">类别</td>
-                    <td class="w-small">分部</td>
-                    <td class="w-small">分项</td>
                     <td class="w-big">预设点</td>
                     <td class="w-small">检查结果</td>
                     <td class="w-middle">隐患</td>
@@ -35,54 +35,23 @@
                     <td class="w-small">状态</td>
                     <td class="w-small">等级</td>
                     <td class="w-small">填报人</td>
+                    <td class="w-small">打分类型</td>
                 </tr>
             </thead>
             <tbody id="gridContainer">
                 <tr>
                     <td class="chk"><input type="checkbox" name="chk" class="checkbox"/></td>
-                    <td class="w150">
-                        <select class="select-type">
-                            <option>工程桩</option>
-                            <option>基坑支护</option>
-                            <option>地下防水</option>
-                            <option>梁柱节点</option>
-                            <option>钢结构悬挑构件</option>
-                            <option>幕墙</option>
-                            <option>外保温</option>
-                            <option>采光顶</option>
-                            <option>步行街吊顶风口</option>
-                            <option>卫生间防水</option>
-                            <option>屋面防水</option>
-                            <option>屋面虹吸雨排</option>
-                            <option>消防泵房</option>
-                            <option>给水泵房</option>
-                            <option>湿式报警阀室</option>
-                            <option>空调机房</option>
-                            <option>冷冻机房</option>
-                            <option>变配电室</option>
-                            <option>发电机房</option>
-                            <option>慧云机房</option>
-                            <option>电梯机房</option>
-                            <option>电梯底坑</option>
-                            <option>吊顶</option>
-                            <option>地面</option>
-                            <option>中庭栏杆</option>
-                            <option>竖井</option>
-                        </select>
-                    </td>
-                    <td><input type="text" name="part1" class="input_part1"/></td>
-                    <td><input type="text" name="part2" class="input_part2"/></td>
                     <td>
                         <span class="ready-pos" data-readypos=""></span>
                         <span class="linkBtn-ready-pos"></span>
                     </td>
                     <td>
-                    <select class="select-result w150">
+                    <select class="select-result">
                         <option>合格</option>
                         <option>不合格</option>
                     </select>
                     </td>
-                    <td><input type="text" name="part2" class="input_part3"/></td>
+                    <td><input type="text" name="part2" class="input_trouble"/></td>
                     <td>
                         <span class="pos" data-pos=""></span>
                         <span class="linkBtn-pos"></span>
@@ -91,22 +60,41 @@
                     <td><input type="" name="" class="input_date2"/></td>
                     <td><input type="" name="" class="input_counter"/></td>
                     <td>
+                        <!--隐患状态-->
                         <select class="select-state">
-                            <option>待整改</option>
-                            <option>已整改</option>
-                            <option>已关闭</option>
+                            <option value="1">待整改</option>
+                            <option value="2">已整改</option>
+                            <option value="3">已关闭</option>
                         </select>
                     </td>
                     <td>
+                        <!--患等级级-->
                         <select class="select-level">
-                            <option>一般</option>
-                            <option>较大</option>
-                            <option>重大</option>
-                            <option>特大</option>
+                            <option value="1">一般</option>
+                            <option value="2">较大</option>
+                            <option value="3">重大</option>
+                            <option value="4">特大</option>
                         </select>
                     </td>
                     <td>
-                        <input type="" name="" class="input_person"/>
+                        <!--隐患提出方编码-->
+                        <select class="select-person">
+                            <option value="1">质检中心</option>
+                            <option value="2">第三方</option>
+                            <option value="3">项目公司</option>
+                            <option value="4">监理单位</option>
+                        </select>
+                    </td>
+                    <td>
+                        <!--打分类别-->
+                        <select class="select-type">
+                            <option value="1">实测实量</option>
+                            <option value="2">防水工程</option>
+                            <option value="3">施工质量</option>
+                            <option value="4">安全文明</option>
+                            <option value="5">总包内业资料</option>
+                            <option value="6">材料设备</option>
+                        </select>
                     </td>
                 </tr>
             </tbody>
@@ -134,14 +122,24 @@
 </body>
 </html>
 <script type="text/javascript">
-Array.clone = function(old){
-    var v,news;
+
+Object.clone = function(old){
+    var v,result;
+    if(old.length==undefined)
+    {
+        result = {};
+    }
+    else
+    {
+        result = [];
+    }
     for(v in old)
     {
-        news[v] = old[v];
+        result[v] = old[v];
     }
-    return news;
+    return result;
 }
+
 
 //Object.prototype.toString.call(obj) === '[object Array]'
 
@@ -160,7 +158,8 @@ var Data = {
     },
     itemData : {
         "id": "7a6bdcca-b0b4-41eb-92fd-e59a6f87d723",
-        "projectCode": "02aa76f5-59fe-47fb-af75-5fb736319f0d",
+        "projectCode": "02aa76f5-59fe-47fb-af75-5fb736319f0d", 
+        "projectId" : "",
         "acceptanceType": 1,
         "name": "屋面二次开洞未补做蓄水试验",
         "discoverDate": 1482721932000,
@@ -197,10 +196,11 @@ var Url = {
     }   
 };
 
-var initComponent = function(projectCode){
+var initComponent = function(projectCode,type){
     jQuery.support.cors = true;
     window.viewer = new InspectModelSelection({
-        type: "process",//open process
+        //type: "process",//open process
+        type : type,
         ruleType: '',//构件分类
         height: "500px",
         width:"1200px",
@@ -314,12 +314,23 @@ var Event = {
     saveData : function(){
         var $trs = $("#gridContainer tr");
         var $this;
-        var data;
+        var itemData;
         $trs.each(function(index){
-            $this = $(this);
-            data = Array.clone(Data.itemData);
-            console.log($this.find("select.select-type")[0].value);
-            //Data.formData.
+            $tr = $(this);
+            //itemData = Object.clone(Data.itemData);
+            itemData.id = 1;
+            itemData.projectId = Url.getParam("projectId");
+            itemData.projectCode = Url.getParam("projectCode");
+            itemData.acceptanceType = Url.getParam("type")=="process"? 1 : 2 ;
+            itemData.name = $tr.find(".input_trouble").val();
+            itemData.discoverDate = $tr.find(".input_date1").val();
+            itemData.rectifyDate = $tr.find(".input_date2").val();
+            itemData.rectifyCount = $tr.find(".input_counter").val();
+            itemData.status = $tr.find(".select-state")[0].value;
+            itemData.levelId = $tr.find(".select-level")[0].value;
+            itemData.organizationTypeID = $tr.find(".select-person")[0].value;
+            itemData.ratingCategoryID = $tr.find(".select-type")[0].value;
+            Data.formData.data.push(itemData);
         });
         this.sendData();
     },
@@ -386,33 +397,45 @@ var Event = {
     /*事件入口*/
         var th = this;
         this.lineHTML = '<tr><td class="chk"><input type="checkbox" name="chk" class="checkbox"/></td>'+
-                        '<td>{select-type}</td>'+
-                        '<td><input type="text" name="part1" class="w180 input_part1"/></td>'+
-                        '<td><input type="text" name="part2" class="w180 input_part2"/></td>'+
                         '<td>{ready-pos}</td>'+
                         '<td>{select-result}</td>'+
-                        '<td><input type="text" name="part2" class="w180 input_part3"/></td>'+
+                        '<td><input type="text" name="part2" class="input_trouble"/></td>'+
                         '<td>{pos}</td>'+
                         '<td><input type="" name="" class="input_date1"/></td>'+
                         '<td><input type="" name="" class="input_date2"/></td>'+
                         '<td><input type="" name="" class="input_counter"/></td>'+
                         '<td>'+
                             '<select class="select-state">'+
-                                '<option>待整改</option>'+
-                                '<option>已整改</option>'+
-                                '<option>已关闭</option>'+
+                                '<option value="1">待整改</option>'+
+                                '<option value="2">已整改</option>'+
+                                '<option value="3">已关闭</option>'+
                             '</select>'+
                         '</td>'+
                         '<td>'+
                             '<select class="select-level">'+
-                                '<option>一般</option>'+
-                                '<option>较大</option>'+
-                                '<option>重大</option>'+
-                                '<option>特大</option>'+
+                                '<option value="1">一般</option>'+
+                                '<option value="2">较大</option>'+
+                                '<option value="3">重大</option>'+
+                                '<option value="4">特大</option>'+
                             '</select>'+
                         '</td>'+
                         '<td>'+
-                            '<input type="" name="" class="input_person"/>'+
+                            '<select class="select-person">'+
+                                '<option value="1">质检中心</option>'+
+                                '<option value="2">第三方</option>'+
+                                '<option value="3">项目公司</option>'+
+                                '<option value="4">监理单位</option>'+
+                            '</select>'+
+                        '</td>'+
+                        '<td>'+
+                            '<select>'+
+                                '<option value="1">实测实量</option>'+
+                                '<option value="2">防水工程</option>'+
+                                '<option value="3">施工质量</option>'+
+                                '<option value="4">安全文明</option>'+
+                                '<option value="5">总包内业资料</option>'+
+                                '<option value="6">材料设备</option>'+
+                            '</select>'+
                         '</td>'+
                         '</tr>';
         this.selectTypeHTML ='<select class="select-type">'+
@@ -443,7 +466,7 @@ var Event = {
                                 '<option>中庭栏杆</option>'+
                                 '<option>竖井</option>'+
                             '</select>';
-        this.selectResultHTML = '<select class="select-result w150"><option>合格</option><option>不合格</option></select>';
+        this.selectResultHTML = '<select class="select-result"><option>合格</option><option>不合格</option></select>';
         this.readyPosHTML = '<span class="ready-pos" data-readypos=""></span><span class="linkBtn-ready-pos">{ready-pos-state}</span>';
         this.posHTML =      '<span class="pos" data-pos=""></span><span class="linkBtn-pos">{pos-state}</span>';
 
@@ -460,7 +483,7 @@ var Event = {
         });
 
         $("#btn_add").on("click",function(){
-            th.lineHTML = th.lineHTML.replace("{select-type}",th.selectTypeHTML);
+            //th.lineHTML = th.lineHTML.replace("{select-type}",th.selectTypeHTML);
             th.lineHTML = th.lineHTML.replace("{select-result}",th.selectResultHTML);
             th.lineHTML = th.lineHTML.replace("{ready-pos}",th.readyPosHTML);
             th.lineHTML = th.lineHTML.replace("{pos}",th.posHTML);
@@ -507,11 +530,12 @@ var initOptions = function(){
     $tr.find(".linkBtn-pos").html(posState[0]);
 
     $("#projectName").html(decodeURI(Url.getParam("projectName")));
+    $("#typeName").html(decodeURI(Url.getParam("typeName")));
 }
 
 var init = function(){
     initOptions();
-    initComponent(Url.getParam("projectCode"));
+    initComponent(Url.getParam("projectCode"),Url.getParam("type"));
     Event.bindEvent();
 };
 
