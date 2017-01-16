@@ -171,7 +171,22 @@ a:visited, a:active, a:focus{
 	.header, .item { height: 38px; line-height: 38px; border-bottom: 1px #ccc solid;
 		&.selected { background-color: #A8DBFD; }
 	}
-	.header { background-color: #eee; }
+	.header { 
+		background-color: #eee;
+		&>span{
+			float: left;
+		}
+	}
+	.item{
+		width: 100%;
+		float: left;
+		span{
+			float: left;
+			display: block;
+			height: 38px;
+			line-height: 38px;
+		}
+	}
 	&.changeContrastBox { .fileName { width: 42%; overflow:hidden; }
 		.changeContrast { width: 7%; text-align: center; overflow:hidden;}
 		.fileStatus { width: 10%; overflow:hidden;}

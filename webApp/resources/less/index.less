@@ -37,7 +37,15 @@
 #standardLibs, #famLibs { height: 100%; margin-top: -40px; position: relative; padding: 70px 40px 0px 40px;
 	.standar { .loading { text-align: center; color: #ccc; line-height: 40px; }
 		.item { font-size: 14px; height: 46px; line-height: 45px; border-bottom: 1px #ccc solid; color: #333; text-align: center; }
-		&.standarHeader { .item { height: 36px; line-height: 36px; border: 1px #ccc solid; border-width: 1px 0px; background-color: #eee; color: #999; }
+		&.standarHeader { 
+			.item { 
+				height: 36px; 
+				line-height: 36px; 
+				border: 1px #ccc solid; 
+				border-width: 1px 0px; 
+				background-color: #eee; 
+				color: #999; 
+			}
 		}
 		span { float: left; vertical-align: middle; font-size: 14px; }
 		.title { width: 32%; text-align: left; padding-left: 30px;
@@ -58,7 +66,7 @@
 	}
 }
 .standarBody { position: absolute; left: 40px; right: 40px; top: 106px; bottom: 0px;
-	.standarPagination { float: right; }
+	.standarPagination { float: right;margin-right: 20px; }
 	.sumDesc { margin-top: 20px; }
 }
 #resourceModelLeftNav { z-index: 99; background-color: #fff; position: absolute; top: 87px; bottom: 0px; left: 0px; border: 1px #ccc solid; border-width: 0px 1px; width: 238px;
@@ -66,7 +74,7 @@
 	.modelTreeBox { display: none; height: 100%; }
 }
 #resourceListContent { margin-left: 10px; position: absolute; bottom: 20px; top: 124px; right: 0; left: 227px;
-	.fileBody { margin-top: -51px; padding-top: 40px; height: 100%;
+	.fileBody { margin-top: -51px; padding-top: 40px; height: 100%;width: 100%;float: left;
 		.btnEnter { margin-left: 5px; margin-right: 5px; cursor: pointer; }
 	}
 }
