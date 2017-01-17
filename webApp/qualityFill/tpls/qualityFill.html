@@ -146,12 +146,25 @@ var posState = ["绑定构建位置","解绑"];
 var Data = {
     projectData:{},
     formData:{
-        "messageId": "ddcc2bc8964b4dfabdf05c1898997324",
-        "messageType": "QUALITY-1004",
-        "timestamp": "1482722921867",
-        "code": true,
-        "message": "success",
-        "data": []
+        "msgCreateTime": 1461727280227,
+        "msgId": "b2e5b467ef214f6196ac3f826017806e",
+        "msgSendTime": 0,
+        "srcMsgType": "QUALITY-BIM",
+        "retryTimes": 0,
+        //"message": "success",
+        "status": 0,
+        "sysCode": "1",
+        "msgContent":""
+        /*
+        "msgContent" : JSON.stringify({
+            "messageId": "411a109141d6473c83a86aa0480d6610",
+            "messageType": "QUALITY-1004",
+            "message": "是",
+            "timestamp": (new Date).getTime(),
+            "code": 0,
+            "data": []
+        })
+        */
     },
     itemData : {/*save into the formData > data*/
         "id": "7a6bdcca-b0b4-41eb-92fd-e59a6f87d723",
@@ -312,15 +325,14 @@ var Event = {
     saveData : function(){
         var $trs = $("#gridContainer tr");
         var $this;
-        var itemData , $tr , componentData , presetPointData , dataid;
+        var itemData , itemDatas=[] , $tr , componentData , presetPointData , dataid;
         var point , pos;
-        Data.formData.data = [];
+
         $trs.each(function(index){
             $tr = $(this);
             dataid = $tr.attr("dataid");
             var itemData = {};
-            //componentDataS = $tr.find(".linkBtn-pos").attr("data");
-            //presetPointDataS = $tr.find(".linkBtn-ready-pos").attr("data");
+
             pos = Data.cacheData[dataid+"pos"];
             point = Data.cacheData[dataid+"point"];
             if(pos!=undefined)
@@ -328,15 +340,25 @@ var Event = {
                 itemData.componentID = pos.id;
                 itemData.location = JSON.stringify(pos.location);
             }
+            else
+            {
+                itemData.componentID = "";
+                itemData.location = null;
+            }
             if(point!=undefined)
             {
                 //presetPointData = JSON.prase(presetPointData);
                 itemData.presetPointID = point.id;
                 itemData.axis = JSON.stringify(point.axis);
             }
+            else
+            {
+                itemData.presetPointID = "";
+                itemData.axis = null;                
+            }
 
-            console.log( $tr.find(".input_date1").val() );
-            console.log( Date.getLong($tr.find(".input_date1").val()) );
+            itemData.PresetPointCompoentID = "";
+            itemData.dangerImageID = "";
             itemData.id = Date.guid();
             itemData.projectId = Url.getParam("projectId");
             itemData.projectCode = Url.getParam("projectCode");
@@ -349,14 +371,23 @@ var Event = {
             itemData.levelId = $tr.find(".select-level")[0].value;
             itemData.organizationTypeID = $tr.find(".select-person")[0].value;
             itemData.ratingCategoryID = $tr.find(".select-type")[0].value;
-
-            Data.formData.data.push(itemData);
+            itemDatas.push(itemData);
         });
+
+        Data.formData.msgContent = JSON.stringify({
+        "messageId": "411a109141d6473c83a86aa0480d6610",
+        "messageType": "QUALITY-1004",
+        "message": "是",
+        "timestamp": (new Date).getTime(),
+        "code": 0,
+        "data": itemDatas
+        });
+
         console.log("save",Data.formData);
         this.sendData();
     },
     sendData : function(){
-        console.log(Data.formData);
+        console.log(JSON.stringify(Data.formData));
         $.ajax({
             url:"/sixD/internal/message",
             //url:"http://192.168.79.56/sixD/internal/message",
@@ -364,7 +395,7 @@ var Event = {
             headers: {
                     "Content-Type": "application/json"
             },
-            data:JSON.stringify(Data.formData),
+            data:JSON.stringify(Data.formData)
         }).done(function(data){
             console.log(data);
         });
