@@ -85,8 +85,16 @@ App.Project = {
 				$(".QualityProcessAcceptance .tbProcessAccessBody tr").removeClass('selected');
 				if(id){
 					var tr = $(".QualityProcessAcceptance .tbProcessAccessBody tr[data-id='"+id+"']");
-					if(tr){
+					if(tr.length>0){
 						tr.addClass('selected');
+					}else{
+						data=App.Project.catchPageData('process',{id:id});//内存中取数据
+						App.Project.qualityTab.ProcessAcceptanceOptions.pageIndex = data.pageIndex;
+						App.Project.QualityAttr.ProcessAcceptanceCollection.reset();
+						App.Project.QualityAttr.ProcessAcceptanceCollection.push({data:data});
+						App.Project.qualityTab.pageInfo.call(App.Project.qualityTab, data,'processacceptance',true);
+						tr = $(".QualityProcessAcceptance .tbProcessAccessBody tr[data-id='"+id+"']");
+						tr.addClass("selected");
 					}
 				}
 			}
@@ -94,8 +102,16 @@ App.Project = {
 				$(".QualityOpeningAcceptance .tbOpeningacceptanceBody tr").removeClass('selected');
 				if(id){
 					var tr = $(".QualityOpeningAcceptance .tbOpeningacceptanceBody tr[data-id='"+id+"']");
-					if(tr){
+					if(tr.length>0){
 						tr.addClass('selected');
+					}else{//如果当前列表有翻页执行的方法
+						data=App.Project.catchPageData('process',{id:id});//内存中取数据
+						App.Project.qualityTab.OpeningAcceptanceOptions.pageIndex = data.pageIndex;
+						App.Project.QualityAttr.OpeningAcceptanceCollection.reset();
+						App.Project.QualityAttr.OpeningAcceptanceCollection.push({data:data});
+						App.Project.qualityTab.pageInfo.call(App.Project.qualityTab, data,'openingacceptance',true);
+						tr = $(".QualityOpeningAcceptance .tbOpeningacceptanceBody tr[data-id='"+id+"']");
+						tr.addClass("selected");
 					}
 				}
 			}
@@ -103,8 +119,16 @@ App.Project = {
 				$(".QualityConcerns .tbConcernsBody tr").removeClass('selected');
 				if(id){
 					var tr = $(".QualityConcerns .tbConcernsBody tr[data-id='"+id+"']");
-					if(tr){
+					if(tr.length>0){
 						tr.addClass('selected');
+					}else{
+						data=App.Project.catchPageData('process',{id:id});//内存中取数据
+						App.Project.qualityTab.ConcernsOptions.pageIndex = data.pageIndex;
+						App.Project.QualityAttr.ConcernsCollection.reset();
+						App.Project.QualityAttr.ConcernsCollection.push({data:data});
+						App.Project.qualityTab.pageInfo.call(App.Project.qualityTab, data,'concerns',true);
+						tr = $(".QualityConcerns .tbConcernsBody tr[data-id='"+id+"']");
+						tr.addClass("selected");
 					}
 				}
 			}
@@ -128,58 +152,6 @@ App.Project = {
 		}else{
 			$('#isolation').hide();
 		}
-
-		// if ($(".QualityProcessAcceptance").is(":visible")) {
-		// 	$(".QualityProcessAcceptance .tbProcessAccessBody tr").removeClass('selected');
-		// 	if(id){
-		// 		var tr = $(".QualityProcessAcceptance .tbProcessAccessBody tr[data-id='"+id+"']");
-		// 		if(tr.length>0){
-		// 			tr.addClass('selected');
-		// 		}else{
-		// 			// data=App.Project.catchPageData('process',{id:id});//内存中取数据
-		// 			// App.Project.qualityTab.ProcessAcceptanceOptions.pageIndex = data.pageIndex;
-		// 			// App.Project.QualityAttr.ProcessAcceptanceCollection.reset();
-		// 			// App.Project.QualityAttr.ProcessAcceptanceCollection.push({data:data});
-		// 			// App.Project.qualityTab.pageInfo.call(App.Project.qualityTab, data,'processacceptance',true);
-		// 			tr = $(".QualityProcessAcceptance .tbProcessAccessBody tr[data-id='"+id+"']");
-		// 			tr.addClass("selected");
-		// 		}
-		// 	}
-		// }
-		// if ($(".QualityOpeningAcceptance").is(":visible")) {
-		// 	$(".QualityOpeningAcceptance .tbOpeningacceptanceBody tr").removeClass('selected');
-		// 	if(id){
-		// 		var tr = $(".QualityOpeningAcceptance .tbOpeningacceptanceBody tr[data-id='"+id+"']");
-		// 		if(tr.length>0){
-		// 			tr.addClass('selected');
-		// 		}else{
-		// 			data=App.Project.catchPageData('open',{id:id});
-		// 			App.Project.qualityTab.OpeningAcceptanceOptions.pageIndex = data.pageIndex;
-		// 			App.Project.QualityAttr.OpeningAcceptanceCollection.reset();
-		// 			App.Project.QualityAttr.OpeningAcceptanceCollection.push({data:data});
-		// 			App.Project.qualityTab.pageInfo.call(App.Project.qualityTab, data,'openingacceptance',true);
-		// 			tr = $(".QualityOpeningAcceptance .tbOpeningacceptanceBody tr[data-id='"+id+"']");
-		// 			tr.addClass("selected");
-		// 		}
-		// 	}
-		// }
-		// if ($(".QualityConcerns").is(":visible")) {
-		// 	$(".QualityConcerns .tbConcernsBody tr").removeClass('selected');
-		// 	if(id){
-		// 		var tr = $(".QualityOpeningAcceptance .tbOpeningacceptanceBody tr[data-id='"+id+"']");
-		// 		if(tr.length>0){
-		// 			tr.addClass('selected');
-		// 		}else{
-		// 			data=App.Project.catchPageData('dis',{id:id});
-		// 			App.Project.qualityTab.ConcernsOptions.pageIndex = data.pageIndex;
-		// 			App.Project.QualityAttr.ConcernsCollection.reset();
-		// 			App.Project.QualityAttr.ConcernsCollection.push({data:data});
-		// 			App.Project.qualityTab.pageInfo.call(App.Project.qualityTab, data,'concerns',true);
-		// 			tr = $(".QualityConcerns .tbConcernsBody tr[data-id='"+id+"']");
-		// 			tr.addClass("selected");
-		// 		}
-		// 	}
-		// }
 	},
 
 	checkSelectComponent:function(userId){
