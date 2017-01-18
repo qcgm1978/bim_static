@@ -25,7 +25,20 @@ body{
 	border-top:1px solid #ccc;
 }
 .grid table td.chk{
+	width:180px;
+}
+.grid table td.chk input{
 	width:30px;
+}
+.spanBtn{
+	border: 1px solid #777;
+	background-color: #ccc;
+	cursor: pointer;
+}
+.spanBtn:hover{
+	border: 1px solid #777;
+	background-color: #ddd;
+	cursor: pointer;
 }
 .grid table span.linkBtn-ready-pos , .grid table span.linkBtn-pos{
 	cursor: pointer;
@@ -66,7 +79,7 @@ body{
 	width:190px;
 }
 .w-big{
-	width: 190px;
+	width: 200px;
 }
 .w-middle{
 	width: 110px;
@@ -78,7 +91,7 @@ body{
 	height: 500px;
 }
 input{
-	width:99%;
+	width:110px;
 }
 .dialog{
 	background-color: #FFF;
@@ -152,4 +165,16 @@ input{
 .dialog .select{
 	background-color: #777;
 	color:#FFF;
+}
+.dialog .dlg-content-upload{
+	height: 200px;
+}
+.dialog .dlg-content-upload input{
+	width:480px;
+	display: block;
+	margin:0 auto;
+	margin-top:10px;
+}
+#gridContainer tr{
+	height: 70px;
 }

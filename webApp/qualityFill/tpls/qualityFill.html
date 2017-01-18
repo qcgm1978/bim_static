@@ -8,6 +8,11 @@
     <META HTTP-EQUIV="Cache-Control" CONTENT="no-store, must-revalidate">
     <title>BIM总发包管理平台- 隐患填报模拟</title>
     <link rel="styleSheet" href="/static/dist/qualityFill/css/quality.css" />
+    <style type="text/css">
+    #Dlg{
+        top:510px!important;
+    }
+    </style>
     <script src="http://cdn.bootcss.com/jquery/1.9.1/jquery.min.js"></script>
     <script src="/static/dist/components/inspectSelection/js/inspectSelection.js"></script>
     <script src="/static/dist/qualityFill/js/template.min.js"></script>
@@ -25,9 +30,9 @@
             <thead>
                 <tr>
                     <td class="chk"><input type="checkbox" name="chk" class="chkAll"/></td>
-                    <td class="w-big">预设点</td>
+                    <td class="">预设点</td>
                     <td class="w-small">检查结果</td>
-                    <td class="w-middle">隐患</td>
+                    <td class="w-middle">隐患名称</td>
                     <td class="w-big">构建位置</td>
                     <td class="w-small">创建日期</td>
                     <td class="w-small">整改日期</td>
@@ -40,7 +45,11 @@
             </thead>
             <tbody id="gridContainer">
                 <tr dataid="0">
-                    <td class="chk"><input type="checkbox" name="chk" class="checkbox"/></td>
+                    <td class="chk">
+                        <input type="checkbox" name="chk" class="checkbox"/>
+                        <span class="spanBtn uploadBtn">上传图片</span>
+                        <img src="" style="width:60px;height:60px;" align="middle"/>
+                    </td>
                     <td>
                         <span class="ready-pos" data-readypos=""></span>
                         <span class="linkBtn-ready-pos"></span>
@@ -56,8 +65,8 @@
                         <span class="pos" data-pos=""></span>
                         <span class="linkBtn-pos"></span>
                     </td>
-                    <td><input type="" name="" class="input_date1"/></td>
-                    <td><input type="" name="" class="input_date2"/></td>
+                    <td><input type="" name="" class="input_date1" placeholder="格式:yyyy-mm-dd" title="格式如:2017-01-02"/></td>
+                    <td><input type="" name="" class="input_date2" placeholder="格式:yyyy-mm-dd" title="格式如:2017-01-02"/></td>
                     <td><input type="" name="" class="input_counter"/></td>
                     <td>
                         <!--隐患状态-->
@@ -104,13 +113,18 @@
         <button id="btn_add">添加</button>
         <button id="btn_delete">删除</button>
         <button id="btn_save">保存</button>
+        <button id="btn_unbind">解绑预设点</button>
     </div>
 </div>
 
+<!---->
+
 <div id="Dlg_content" style="display:none;">
-    <div class="dlg-content">
-        <div id="repeatContainer" class="projectItem" style="display:none;">
-            <span data-projectCode="{{projectCode}}" data-projectId="{{projectId}}">{{projectName}}</span>
+    <div class="dlg-content-upload">
+        <div id="" class="">
+            <form actioin="" id="form1">
+            <input type="file" name="fileField" id="fileField"/>
+            </form>
         </div>
     </div>
     <div class="dlg-button">
@@ -122,6 +136,7 @@
 </body>
 </html>
 <script type="text/javascript">
+
 Date.guid = function(){
     var date = new Date(),dataid="";
     dataid = date.getFullYear().toString() + 
@@ -239,15 +254,16 @@ var initDialog = function(){
         hasBar:true,
         barOptions:
         {
-            title:"请选择一个项目"
+            title:"上传图片"
         },
         position:'fixed',
         type:'center',
         contentId:'Dlg_content',
         className:'dialog',
-        width:800,
-        height:500,
-        isMove:false
+        width:500,
+        height:300,
+        isMove:true,
+        top:510
     };
     window.Dlg = new wDialog(options);
 }
@@ -256,28 +272,35 @@ var Event = {
     rowDOM : [],
     initDialogEvent : function(){
         $("#Dlg .wClose").hide();
-        window.Dlg.show();
         $("#DlgBtn_close").on("click",function(){
             window.Dlg.hide();
-            $("#projectName").html(Data.projectData.projectName);
         });
         $("#DlgBtn_ok").on("click",function(){
             window.Dlg.hide();
-            $("#projectName").html(Data.projectData.projectName);
-            initComponent(Data.projectData.projectCode);
         });
-        var $Dlg_content = $("#Dlg .dlg-content");
+        var $Dlg_content = $("#Dlg .dlg-content-upload");
         $Dlg_content.on("click","div",function(){
-            var $dataDOM;
-            $Dlg_content.find("div").removeClass("select");
-            if(!$(this).hasClass("select"))
-            {
-                $(this).addClass("select");
-                $dataDOM = $(this).find("span");
-                Data.projectData.projectCode = $dataDOM.data("projectcode");
-                Data.projectData.projectId = $dataDOM.data("projectid");
-                Data.projectData.projectName = $dataDOM.html();
-            }
+
+        });
+        /*选择文件开始上传*/
+        $("#fileField").on("change",function(){
+            var url = "/sixD/{projectId}/{projectVerionId}/problem/attachment/upload";
+            url = url.replace("{projectId}",Url.getParam("projectId"));
+            url = url.replace("{projectVerionId}",Url.getParam("projectId"));
+            var form=document.getElementById("form1");
+            var fd = new FormData(form);
+            $.ajax({
+                url : url,
+                type: "POST",
+                data:fd,
+                processData: false,  // 告诉jQuery不要去处理发送的数据
+                contentType: false,  // 告诉jQuery不要去设置Content-Type请求头
+                success:function(response,status,xhr){
+                    window.Data.curTrDOM.setAttribute("imageId",response.data.imageId);
+                    $(window.Data.curTrDOM).find("img").attr("src","/sixD"+response.data.imageUrl);
+                    alert("上传成功！");
+                }
+            });
         });
     },
     initDialogData : function(){
@@ -325,20 +348,21 @@ var Event = {
     saveData : function(){
         var $trs = $("#gridContainer tr");
         var $this;
-        var itemData , itemDatas=[] , $tr , componentData , presetPointData , dataid;
+        var itemData , itemDatas=[] , $tr , componentData , presetPointData , dataid , imageId;
         var point , pos;
 
         $trs.each(function(index){
             $tr = $(this);
             dataid = $tr.attr("dataid");
+            imageId = $tr.attr("imageid");
             var itemData = {};
 
             pos = Data.cacheData[dataid+"pos"];
             point = Data.cacheData[dataid+"point"];
             if(pos!=undefined)
             {
-                itemData.componentID = pos.id;
-                itemData.location = JSON.stringify(pos.location);
+                itemData.componentID = pos.fileUniqueId;
+                itemData.location = (pos.location);
             }
             else
             {
@@ -349,7 +373,7 @@ var Event = {
             {
                 //presetPointData = JSON.prase(presetPointData);
                 itemData.presetPointID = point.id;
-                itemData.axis = JSON.stringify(point.axis);
+                itemData.axis = (point.axis);
             }
             else
             {
@@ -358,7 +382,7 @@ var Event = {
             }
 
             itemData.PresetPointCompoentID = "";
-            itemData.dangerImageID = "";
+            itemData.dangerImageID = imageId;/*上传图片后的ID*/
             itemData.id = Date.guid();
             itemData.projectId = Url.getParam("projectId");
             itemData.projectCode = Url.getParam("projectCode");
@@ -397,7 +421,10 @@ var Event = {
             },
             data:JSON.stringify(Data.formData)
         }).done(function(data){
-            console.log(data);
+            if(data.code==0)
+            {
+                alert("保存成功！");
+            }
         });
     },
     bindYuSheDian:function(curDOM){
@@ -426,6 +453,7 @@ var Event = {
             }
         }
         catch(e){;}
+        
     },
     bindGoJian : function(curDOM){/*curDOM is td > span*/
         var tr = curDOM.parentNode.parentNode ,dataid;
@@ -456,13 +484,13 @@ var Event = {
     bindEvent : function(){
     /*事件入口*/
         var th = this;
-        this.lineHTML = '<tr dataid="{dataid}"><td class="chk"><input type="checkbox" name="chk" class="checkbox"/></td>'+
+        this.lineHTML = '<tr dataid="{dataid}"><td class="chk"><input type="checkbox" name="chk" class="checkbox"/><span class="spanBtn uploadBtn">上传图片</span><img src="" style="width:60px;height:60px;" align="middle"/></td>'+
                         '<td>{ready-pos}</td>'+
                         '<td>{select-result}</td>'+
                         '<td><input type="text" name="part2" class="input_trouble"/></td>'+
                         '<td>{pos}</td>'+
-                        '<td><input type="" name="" class="input_date1"/></td>'+
-                        '<td><input type="" name="" class="input_date2"/></td>'+
+                        '<td><input type="" name="" class="input_date1" placeholder="格式:yyyy-mm-dd"/></td>'+
+                        '<td><input type="" name="" class="input_date2" placeholder="格式:yyyy-mm-dd"/></td>'+
                         '<td><input type="" name="" class="input_counter"/></td>'+
                         '<td>'+
                             '<select class="select-state">'+
@@ -488,7 +516,7 @@ var Event = {
                             '</select>'+
                         '</td>'+
                         '<td>'+
-                            '<select>'+
+                            '<select class="select-type">'+
                                 '<option value="1">实测实量</option>'+
                                 '<option value="2">防水工程</option>'+
                                 '<option value="3">施工质量</option>'+
@@ -562,6 +590,7 @@ var Event = {
 
             viewer.showInModel({});
         });
+
         $("#gridContainer").on("click",".checkbox",function(){
             th.checkRow(this);
         });
@@ -570,6 +599,9 @@ var Event = {
         });
         $("#btn_save").on("click",function(e){
             th.saveData();
+        });
+        $("#btn_unbind").on("click",function(e){
+            viewer.showInModel({});
         });
         /*绑定预设点*/
         $("#gridContainer").on("click",".linkBtn-ready-pos",function(){
@@ -580,16 +612,12 @@ var Event = {
             th.bindGoJian(this);
         });
 
-        /*td click*/
-        var $gridContainer = $("#gridContainer");
-        $gridContainer.on("click","td",function(){
-            //viewer.showInModel({});
-            //$gridContainer.find("tr").css("background-color","");
-            //$(this).parent().css("background-color","#aaa");
+        /*上传图片*/
+        $("#gridContainer").on("click",".uploadBtn",function(){
+            window.Data.curTrDOM = this.parentNode.parentNode;
+            window.Dlg.show();
         });
-
-        //this.initDialogEvent();
-        //this.initDialogData();
+        this.initDialogEvent();
     }
 };
 
@@ -604,6 +632,7 @@ var initOptions = function(){
 }
 
 var init = function(){
+    initDialog();
     initOptions();
     initComponent(Url.getParam("projectCode"),Url.getParam("type"));
     Event.bindEvent();
