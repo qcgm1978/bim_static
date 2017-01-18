@@ -1130,11 +1130,14 @@ App.Project = {
 			bindings: {
 				'previewModel': function($target) {},
 				'downLoadModelProject': function(item) {
-
 					var $item = $(item),
 						//下载链接 
-						fileVersionId = $item.find(".filecKAll").data("fileversionid");
-
+						fileVersionId = $item.find(".filecKAll").data("fileversionid"),
+						sizeData = $item.find(".filecKAll").attr("data-sizeData");
+					if(sizeData == ""){
+						alert("文件为空，不能下载！");
+						return;
+					}
 					App.Comm.checkDownLoad(App.Project.Settings.projectId, App.Project.Settings.CurrentVersion.id, fileVersionId);
 
 				},
@@ -1723,7 +1726,12 @@ App.Project = {
 				alert("请选择需要下载的文件");
 				return;
 			}
-
+			if ($selFile.length == 1) {
+				if($($selFile[0]).attr("data-sizeData")==""){
+					alert("文件为空，不能下载！");
+					return;
+				}
+			}
 			var FileIdArr = [];
 			$selFile.each(function(i, item) {
 				FileIdArr.push($(this).data("fileversionid"));
