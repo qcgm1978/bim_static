@@ -42,7 +42,14 @@ a:hover{
 }
 #projectModes { position: absolute; left: 0px; right: 0px; top: 184px; bottom: 0px;
 	.proListSite { position: relative; height: 100%; }
-	.proListContent { position: absolute; top: 40px; left: 20px; right: 20px; bottom: 40px; }
+	.proListContent { 
+		position: absolute; top: 40px; left: 20px; right: 20px; bottom: 40px; 
+		.proListBoxScroll{
+			.mCSB_scrollTools_vertical{
+				right: -16px!important;
+			}
+		}
+	}
 	.pagingBox{position: absolute;bottom: 0px;left:20px;right: 20px;line-height: 40px;
 		.sumDesc { float: left; margin-left: 20px; }
 		.listPagination { float: right; margin-right: 20px; }
