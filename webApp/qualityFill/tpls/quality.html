@@ -67,6 +67,16 @@ var Event = {
             $("#projectName").html(Data.projectData.projectName);
         });
         $("#DlgBtn_ok").on("click",function(){
+            if(window.projectCode==undefined||window.projectCode=="")
+            {
+                alert("请选择一个项目");
+                return;
+            }
+            if(window.type==undefined||window.type=="")
+            {
+                alert("请选择验收类型");
+                return;
+            }
             window.Dlg.hide();
             var href = "/static/dist/qualityFill/qualityFill.html?projectCode={projectCode}&projectId={projectId}&projectName={projectName}&type={type}&typeName={typeName}";
             var link = href.replace("{projectCode}",window.projectCode).replace("{projectId}",window.projectId).replace("{projectName}",encodeURI(window.projectName)).replace("{type}",window.type).replace("{typeName}",window.typeName);
