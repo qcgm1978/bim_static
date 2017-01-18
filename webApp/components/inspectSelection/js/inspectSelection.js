@@ -1204,8 +1204,6 @@
 			})
 			var _url = ourl + '/doc/' + this.Settings.projectId + '/' + this.Settings.projectVersionId + '?' + _this.Settings.token_cookie + '&modelId=';
 			viewer.on("click", function(model) {
-
-
 				var _userId = model.intersect.userId || "",
 					_axisObj = model.intersect.axisGridInfo || {},
 					_boundingBox=model.intersect.worldBoundingBox,
@@ -1224,7 +1222,18 @@
 					boundingBox: _boundingBox,
 					position: _position
 				});
-				Project.locationName[_userId] = '轴' + _axisObj.abcName + '-' + _axisObj.numeralName;
+				var offsetXFU,offsetYFU;
+				if(_axisObj.offsetX>0){
+					offsetXFU = "+"+_axisObj.offsetX;
+				}else{
+					offsetXFU = _axisObj.offsetX;
+				}
+				if(_axisObj.offsetY>0){
+					offsetYFU = "+"+_axisObj.offsetY;
+				}else{
+					offsetYFU = _axisObj.offsetY;
+				}
+				Project.locationName[_userId] = _axisObj.abcName+'轴'+offsetYFU+','+_axisObj.numeralName+'轴'+offsetXFU;
 				Project.axis[_userId] = JSON.stringify(_axisObj);
 				Project.components[_userId] = _boundingBox;
 				/*$.ajax({

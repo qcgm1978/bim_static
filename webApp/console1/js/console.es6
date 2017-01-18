@@ -802,7 +802,7 @@ App.Console = {
       });
       $("#s11").html("<option value=''>请选择</option>" + str).change(function() {
         $.ajax({
-          url: "platform/project/" + $(this).find('option:selected').attr('id') + "/version"
+          url: "platform/project/" + $(this).find('option:selected').attr('id') + "/version/bgmn"
         }).done(function(data) {
           var items = data.data,
             str = '';
