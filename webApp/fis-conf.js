@@ -739,6 +739,9 @@ fis.match('/qualityFill/js/template.min.js', {
 fis.match('/qualityFill/js/wDialog.min.js', {
   packTo: '/static/dist/qualityFill/js/wDialog.min.js'
 });
+fis.match('/qualityFill/js/jquery.jedate.js', {
+  packTo: '/static/dist/qualityFill/js/jquery.jedate.js'
+});
 fis.match('/qualityFill/css/**.css', {
   packTo: '/static/dist/qualityFill/css/quality.css'
 });
