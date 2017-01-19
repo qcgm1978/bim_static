@@ -1106,7 +1106,8 @@ App.Project = {
 						//下载链接 
 						fileVersionId = $item.find(".filecKAll").data("fileversionid"),
 						sizeData = $item.find(".filecKAll").attr("data-sizeData");
-					if(sizeData == ""){
+						isfolder = $item.find(".filecKAll").attr("data-isfolder");
+					if(sizeData == "" && isfolder=="false"){
 						alert("文件为空，不能下载！");
 						return;
 					}
@@ -1699,7 +1700,8 @@ App.Project = {
 				return;
 			}
 			if ($selFile.length == 1) {
-				if($($selFile[0]).attr("data-sizeData")==""){
+				var isfolder = $($selFile[0]).attr("data-isfolder");
+				if($($selFile[0]).attr("data-sizeData")=="" && isfolder=="false"){
 					alert("文件为空，不能下载！");
 					return;
 				}
