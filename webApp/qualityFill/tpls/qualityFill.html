@@ -229,7 +229,7 @@ var initDate = function(){
         festival:true,
         ishmsVal:false,
         minDate: '2016-06-16 23:59:59',
-        maxDate: $.nowDate(0),
+        //maxDate: $.nowDate(0),
         format:"YYYY-MM-DD",
         zIndex:3000,
     });
@@ -238,7 +238,7 @@ var initDate = function(){
         festival:true,
         ishmsVal:false,
         minDate: '2016-06-16 23:59:59',
-        maxDate: $.nowDate(0),
+        //maxDate: $.nowDate(0),
         format:"YYYY-MM-DD",
         zIndex:3000,
     });
@@ -453,7 +453,8 @@ var Event = {
             }
 
             itemData.PresetPointCompoentID = "";
-            itemData.dangerImageID = imageId;/*上传图片后的ID*/
+            itemData.dangerImageID = imageId==undefined ? "" : imageId;/*上传图片后的ID*/
+            console.log("imageid",itemData.dangerImageID);
             itemData.id = Date.guid();
             itemData.projectId = Url.getParam("projectId");
             itemData.projectCode = Url.getParam("projectCode");
