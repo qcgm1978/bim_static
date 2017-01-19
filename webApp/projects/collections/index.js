@@ -204,7 +204,6 @@
 
 
      initEvent: function() {
-
          //日期控件初始化
          $('#dateStar').datetimepicker({
              language: 'zh-CN',
@@ -225,7 +224,7 @@
              $(this).next().focus();
          });
          //单选
-         $(".groupRadio").myRadioCk();
+         // $(".groupRadio").myRadioCk();
          // $(".groupRadio2").myRadioCk();
      },
 

@@ -65,6 +65,17 @@ App.Projects.searchView = Backbone.View.extend({
 		this.$(".pickOpening").myDropDown({
 			zIndex:95,
 			click:function($item){
+				if($item.html()=="是"){
+					$("#showDateBox").css("display","inline-block");
+				}else{
+					$("#dateStar").val("");
+					$("#dateEnd").val("");
+					_this.formData.openTimeStart="";
+					_this.formData.openTimEnd="";
+					$('#dateStar').datetimepicker('setEndDate', "");
+					$('#dateEnd').datetimepicker('setStartDate', "");
+					$("#showDateBox").css("display","none");
+				}
 				_this.formData.open=$item.attr('data-val');
 			}
 		});
@@ -75,9 +86,11 @@ App.Projects.searchView = Backbone.View.extend({
 
 		this.$('#dateStar').on('change',function(){
 			_this.formData.openTimeStart=$(this).val();
+			$('#dateEnd').datetimepicker('setStartDate', $(this).val());
 		})
 		this.$('#dateEnd').on('change',function(){
 			_this.formData.openTimEnd=$(this).val();
+			$('#dateStar').datetimepicker('setEndDate', $(this).val());
 		})
 
 		return this;
