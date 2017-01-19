@@ -66,8 +66,8 @@
                         <span class="pos" data-pos=""></span>
                         <span class="linkBtn-pos"></span>
                     </td>
-                    <td><input type="" name="" class="input_date1 wicon" title="格式如:2017-01-02"/></td>
-                    <td><input type="" name="" class="input_date2 wicon" title="格式如:2017-01-02"/></td>
+                    <td><input type="" name="" class="input_date1 wicon" title="格式如:2017-01-02" readonly="readonly" /></td>
+                    <td><input type="" name="" class="input_date2 wicon" title="格式如:2017-01-02" readonly="readonly" /></td>
                     <td><input type="" name="" class="input_counter"/></td>
                     <td>
                         <!--隐患状态-->
@@ -233,6 +233,15 @@ var initDate = function(){
         format:"YYYY-MM-DD",
         zIndex:3000,
     });
+    $(".input_date2").jeDate({
+        isinitVal:false,
+        festival:true,
+        ishmsVal:false,
+        minDate: '2016-06-16 23:59:59',
+        maxDate: $.nowDate(0),
+        format:"YYYY-MM-DD",
+        zIndex:3000,
+    });
 }
 
 var initComponent = function(projectCode,type){
@@ -362,9 +371,10 @@ var Event = {
     /*
     检查页面是否必填
     通过验证返回true,未通过返回false
+    返回值:
     */
         var $trs = $("#gridContainer tr");
-        var $tr , result = false;
+        var $tr , result = {result:true};
         $trs.each(function(index){
             $tr = $(this);
             $input_trouble = $tr.find(".input_trouble");
@@ -373,18 +383,37 @@ var Event = {
             $input_counter = $tr.find(".input_counter");
             if($input_trouble.val()=="" || $input_date1.val()=="" || $input_date2.val()=="" || $input_counter.val()=="")
             {
-                return false;
+                result =  {
+                    result:false,
+                    text:"隐患名称、创建日期、整改日期、整改次数必填！"
+                };
+                return;
             }
-            if(1){}
+            if(Date.getLong($input_date1.val())>Date.getLong($input_date2.val()) )
+            {
+                result = {
+                    result:false,
+                    text:"创建日期 小于 整改日期！"
+                };
+                return;
+            }
         });
 
-
+        return result;
     },
     saveData : function(){
         var $trs = $("#gridContainer tr");
         var $this;
         var itemData , itemDatas=[] , $tr , componentData , presetPointData , dataid , imageId;
         var point , pos;
+        var validate;
+
+        validate = this.validate();
+        if(!validate.result)
+        {
+            alert(validate.text);
+            return;
+        }
 
         $trs.each(function(index){
             $tr = $(this);
@@ -528,8 +557,8 @@ var Event = {
                         '<td>{select-result}</td>'+
                         '<td><input type="text" name="part2" class="input_trouble"/></td>'+
                         '<td>{pos}</td>'+
-                        '<td><input type="" name="" class="input_date1 wicon"/></td>'+
-                        '<td><input type="" name="" class="input_date2 wicon"/></td>'+
+                        '<td><input type="" name="" class="input_date1 wicon" readonly="readonly" /></td>'+
+                        '<td><input type="" name="" class="input_date2 wicon" readonly="readonly" /></td>'+
                         '<td><input type="" name="" class="input_counter"/></td>'+
                         '<td>'+
                             '<select class="select-state">'+
@@ -626,7 +655,7 @@ var Event = {
             th.lineHTML = th.lineHTML.replace("{pos-state}",posState[0]);
             th.lineHTML = th.lineHTML.replace("{dataid}", dataid );
             $("#gridContainer").append(th.lineHTML);
-
+            initDate();
             viewer.showInModel({});
         });
 
