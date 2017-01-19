@@ -17,6 +17,7 @@
     <script src="/static/dist/components/inspectSelection/js/inspectSelection.js"></script>
     <script src="/static/dist/qualityFill/js/template.min.js"></script>
     <script src="/static/dist/qualityFill/js/wDialog.min.js"></script>
+    <script src="/static/dist/qualityFill/js/jquery.jedate.js"></script>
 </head>
 <body>
 
@@ -65,8 +66,8 @@
                         <span class="pos" data-pos=""></span>
                         <span class="linkBtn-pos"></span>
                     </td>
-                    <td><input type="" name="" class="input_date1" placeholder="格式:yyyy-mm-dd" title="格式如:2017-01-02"/></td>
-                    <td><input type="" name="" class="input_date2" placeholder="格式:yyyy-mm-dd" title="格式如:2017-01-02"/></td>
+                    <td><input type="" name="" class="input_date1 wicon" title="格式如:2017-01-02"/></td>
+                    <td><input type="" name="" class="input_date2 wicon" title="格式如:2017-01-02"/></td>
                     <td><input type="" name="" class="input_counter"/></td>
                     <td>
                         <!--隐患状态-->
@@ -222,6 +223,18 @@ var Url = {
     }   
 };
 
+var initDate = function(){
+    $(".input_date1").jeDate({
+        isinitVal:false,
+        festival:true,
+        ishmsVal:false,
+        minDate: '2016-06-16 23:59:59',
+        maxDate: $.nowDate(0),
+        format:"YYYY-MM-DD",
+        zIndex:3000,
+    });
+}
+
 var initComponent = function(projectCode,type){
     jQuery.support.cors = true;
     window.viewer = new InspectModelSelection({
@@ -345,6 +358,28 @@ var Event = {
             this.checkRow($($trs[i]).find(".checkbox")[0]);
         }
     },
+    validate:function(){
+    /*
+    检查页面是否必填
+    通过验证返回true,未通过返回false
+    */
+        var $trs = $("#gridContainer tr");
+        var $tr , result = false;
+        $trs.each(function(index){
+            $tr = $(this);
+            $input_trouble = $tr.find(".input_trouble");
+            $input_date1 = $tr.find(".input_date1");
+            $input_date2 = $tr.find(".input_date2");
+            $input_counter = $tr.find(".input_counter");
+            if($input_trouble.val()=="" || $input_date1.val()=="" || $input_date2.val()=="" || $input_counter.val()=="")
+            {
+                return false;
+            }
+            if(1){}
+        });
+
+
+    },
     saveData : function(){
         var $trs = $("#gridContainer tr");
         var $this;
@@ -354,7 +389,14 @@ var Event = {
         $trs.each(function(index){
             $tr = $(this);
             dataid = $tr.attr("dataid");
-            imageId = $tr.attr("imageid");
+            try
+            {
+                imageId = $tr.attr("imageid");
+            }catch(e)
+            {
+                imageId = "";
+            }
+            
             var itemData = {};
 
             pos = Data.cacheData[dataid+"pos"];
@@ -486,8 +528,8 @@ var Event = {
                         '<td>{select-result}</td>'+
                         '<td><input type="text" name="part2" class="input_trouble"/></td>'+
                         '<td>{pos}</td>'+
-                        '<td><input type="" name="" class="input_date1" placeholder="格式:yyyy-mm-dd"/></td>'+
-                        '<td><input type="" name="" class="input_date2" placeholder="格式:yyyy-mm-dd"/></td>'+
+                        '<td><input type="" name="" class="input_date1 wicon"/></td>'+
+                        '<td><input type="" name="" class="input_date2 wicon"/></td>'+
                         '<td><input type="" name="" class="input_counter"/></td>'+
                         '<td>'+
                             '<select class="select-state">'+
@@ -629,6 +671,7 @@ var initOptions = function(){
 }
 
 var init = function(){
+    initDate();
     initDialog();
     initOptions();
     initComponent(Url.getParam("projectCode"),Url.getParam("type"));
