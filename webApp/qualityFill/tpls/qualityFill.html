@@ -57,8 +57,8 @@
                     </td>
                     <td>
                     <select class="select-result">
-                        <option>合格</option>
-                        <option>不合格</option>
+                        <option value="1">合格</option>
+                        <option value="2">不合格</option>
                     </select>
                     </td>
                     <td><input type="text" name="part2" class="input_trouble"/></td>
@@ -623,7 +623,7 @@ var Event = {
                                 '<option>中庭栏杆</option>'+
                                 '<option>竖井</option>'+
                             '</select>';
-        this.selectResultHTML = '<select class="select-result"><option>合格</option><option>不合格</option></select>';
+        this.selectResultHTML = '<select class="select-result"><option value="1">合格</option><option value="2">不合格</option></select>';
         this.readyPosHTML = '<span class="ready-pos" data-readypos=""></span><span class="linkBtn-ready-pos">{ready-pos-state}</span>';
         this.posHTML =      '<span class="pos" data-pos=""></span><span class="linkBtn-pos">{pos-state}</span>';
 

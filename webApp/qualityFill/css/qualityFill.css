@@ -4,6 +4,7 @@ write by wuweiwei
 body{
 	font-family: "Microsoft Yahei";
 	font-size: 12px;
+	min-height: 990px;
 }
 .container{
 	position: absolute;
