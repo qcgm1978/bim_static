@@ -39,7 +39,7 @@ App.ResourceModel.ListNav = Backbone.View.extend({
 
 	//左侧试图
 	navClickCB: function(type) {
-
+		var _this = this;
 		if (this.$el.closest('body').length <= 0) {
 			this.remove();
 			return;
@@ -97,21 +97,41 @@ App.ResourceModel.ListNav = Backbone.View.extend({
 			});
             //加载完成后加载
 			App.ResourceModel.Settings.Viewer.on("loaded", function() {
-
 				$('#lockAxisZ').show();
-
 			});
 			App.ResourceModel.Settings.Viewer.on("click", function(model) {
 				var viewer = App.ResourceModel.Settings.Viewer,
-						isIsolateState = viewer.viewer.getFilters().isIsolateState();
+					isIsolateState = viewer.viewer.getFilters().isIsolateState(),
+					selectedIds = viewer.getSelectedIds();
 				if(isIsolateState){
 					$('#isolation').show();
-				}else{
+				}else {
 					$('#isolation').hide();
-
-
 				}
 				if (!model.intersect) {
+					if(selectedIds){
+						var obj;
+						if(Object.keys(selectedIds).length==1){
+							for(var i in selectedIds){
+								obj = {
+									userId : i,
+									sceneId : selectedIds[i]['sceneId']
+								}
+							}
+							App.ResourceModel.PropertiesCollection.projectId = App.ResourceModel.Settings.CurrentVersion.projectId;
+							App.ResourceModel.PropertiesCollection.projectVersionId = App.ResourceModel.Settings.CurrentVersion.id;
+							App.ResourceModel.PropertiesCollection.fetch({
+								data: {
+									elementId: obj.userId,
+									sceneId: obj.sceneId
+								}
+							});
+						}
+					}else{
+						$("#navContainer .attrContent").html('<div class="nullTip">请选择构件</div>');
+					}
+					return;
+				}else if(Object.keys(selectedIds).length>1){
 					$("#navContainer .attrContent").html('<div class="nullTip">请选择构件</div>');
 					return;
 				}
@@ -128,7 +148,6 @@ App.ResourceModel.ListNav = Backbone.View.extend({
 		}
 
 	},
-
 	reTemplate: _.templateUrl('/resources/tpls/resourceModel/resources.model.attr.detail.html'),
 
 	//重新渲染苏醒
