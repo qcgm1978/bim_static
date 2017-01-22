@@ -1172,6 +1172,9 @@ App.Project = {
 		App.Project.FileCollection.push(model)
 	},
 	afterCreateNewFolder(file, parentId) {
+		console.log("file",file);
+		console.log("parentId",parentId);
+		
 		var $treeViewMar = $(".projectNavFileContainer .treeViewMar"),
 			$treeViewMarUl = $treeViewMar.find(".treeViewMarUl");
 
