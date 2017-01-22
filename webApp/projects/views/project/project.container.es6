@@ -522,8 +522,6 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		});
 
 		viewer.on("click", function(model) {
-
-
 			//取消计划高亮
 			var result = that.cancelhighlightPlan(),
 			    viewer = App.Project.Settings.Viewer,
@@ -533,17 +531,12 @@ App.Project.ProjectContainer = Backbone.View.extend({
 				$('#isolation').show();
 			}else{
 				$('#isolation').hide();
-
-
 			}
-
 			App.Project.Settings.ModelObj = null;
 			if (!model.intersect) {
-
 				if(selectedIds){
 					var obj,
 						arr = [];
-
 					if(Object.keys(selectedIds).length==1){
 						for(var i in selectedIds){
 							obj = {
@@ -560,11 +553,8 @@ App.Project.ProjectContainer = Backbone.View.extend({
 									}
 								}
 							}
-
 						};
 						that.viewerPropertyRender();
-
-
 					}else{
 						for(var i in selectedIds){
 							if(arr[0]){
@@ -585,7 +575,6 @@ App.Project.ProjectContainer = Backbone.View.extend({
 								userId : uid,
 								sceneId : info['sceneId']
 							};
-
 						App.Project.Settings.ModelObj = {
 							intersect: {
 								userId:obj.userId,
@@ -595,53 +584,19 @@ App.Project.ProjectContainer = Backbone.View.extend({
 									}
 								}
 							}
-
 						};
 						that.viewerPropertyRender();
-
 					}
 				}else{
 					that.resetProperNull();
-
 				}
-
 				return;
 			}else if(Object.keys(selectedIds).length>1){
 				that.resetProperNull();
 				return;
-					/*var arr = [];
-
-
-						for(var i in selectedIds){
-							if(arr[0]){
-								if(arr[0] != selectedIds[i]['classCode'] ){
-									that.resetProperNull();
-									return;
-								}
-
-							}else{
-								arr[0] = selectedIds[i]['classCode']
-							}
-						}*/
-
-
 			}
-
-			// if (result) {
-			// 	viewer.highlight({
-			// 		type: 'userId',
-			// 		ids: [model.intersect.userId]
-			// 	});
-			// }
-
-
 			App.Project.Settings.ModelObj = model;
-			//App.Project.Settings.modelId = model.userId;
 			that.viewerPropertyRender();
-			//展开
-			//		$("#projectContainer .rightProperty").css('marginRight', '0');
-			//		$("#projectContainer .rightProperty .icon-caret-left").attr('class', 'icon-caret-right');
-
 		});
 
 		//分享
