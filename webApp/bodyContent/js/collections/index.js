@@ -26,12 +26,12 @@ App.BodyContent.control = {
         this.loadData(this.todoCollection, {
             status: 1,
             pageIndex: 1,
-            pageItemCount: 6
+            pageItemCount: 12
         });
         this.loadData(this.doneCollection, {
             status: 2,
             pageIndex: 1,
-            pageItemCount: 6
+            pageItemCount: 12
         });
         this.loadData(this.slideCollection, {
             type: 3,
