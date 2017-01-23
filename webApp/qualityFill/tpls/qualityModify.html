@@ -205,7 +205,8 @@ var Event = {
     },
 
     getGridData : function(projectId){
-        var url = "/sixD/{projectId}/{projectId}/problem";
+        //var url = "/sixD/{projectId}/{projectId}/problem";
+        var url = "/sixD/{projectId}/{projectId}/problem/zjmn";
         url = url.replace("{projectId}",projectId).replace("{projectId}",projectId);
         $.ajax({
             url:url,
