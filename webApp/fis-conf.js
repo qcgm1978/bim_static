@@ -733,6 +733,9 @@ fis.match('qualityFill/tpls/qualityFill.html', {
 fis.match('qualityFill/tpls/quality.html', {
   release: "/static/dist/qualityFill/quality.html"
 });
+fis.match('qualityFill/tpls/qualityModify.html', {
+  release: "/static/dist/qualityFill/qualityModify.html"
+});
 fis.match('/qualityFill/js/template.min.js', {
   packTo: '/static/dist/qualityFill/js/template.min.js'
 });

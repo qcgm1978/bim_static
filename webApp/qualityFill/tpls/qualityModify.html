@@ -9,7 +9,6 @@
     <title>隐患填报模拟修改</title>
     <link rel="styleSheet" href="/static/dist/qualityFill/css/quality.css" />
     <script src="http://cdn.bootcss.com/jquery/1.9.1/jquery.min.js"></script>
-    <script src="/static/dist/components/inspectSelection/js/inspectSelection.js"></script>
     <script src="/static/dist/qualityFill/js/template.min.js"></script>
     <script src="/static/dist/qualityFill/js/wDialog.min.js"></script>
 </head>
@@ -19,10 +18,10 @@
     <table border="0" cellpadding="0" cellspacing="0">
         <thead>
             <tr>
-                <td class="chk"><input type="checkbox" name="chk" class="chkAll"/></td>
-                <td class="">预设点</td>
-                <td class="w-small">检查结果</td>
-                <td class="w-middle">隐患名称</td>
+                <td class="chk">隐患图片</td>
+                <td class="w-middle">预设点</td>
+                <!--<td class="w-small">检查结果</td>-->
+                <td class="">隐患描述</td>
                 <td class="w-big">构件位置</td>
                 <td class="w-small">创建日期</td>
                 <td class="w-small">整改日期</td>
@@ -31,69 +30,49 @@
                 <td class="w-small">等级</td>
                 <td class="w-small">填报人</td>
                 <td class="w-small">打分类型</td>
+                <td class="w-small">操作</td>
             </tr>
         </thead>
         <tbody id="gridContainer">
-            <tr dataid="0">
+            <tr id="Grid" style="display:none;">
                 <td class="chk">
-                    <input type="checkbox" name="chk" class="checkbox"/>
-                    <span class="spanBtn uploadBtn">上传图片</span>
-                    <img src="" style="width:60px;height:60px;" align="middle"/>
+                    <img src="{{imageUrl}}" style="width:60px;height:60px;" align="middle"/>
                 </td>
                 <td>
                     <span class="ready-pos" data-readypos=""></span>
                     <span class="linkBtn-ready-pos"></span>
                 </td>
+                <!--
                 <td>
-                <select class="select-result">
-                    <option value="1">合格</option>
-                    <option value="2">不合格</option>
-                </select>
+                    <span class="passLabel">{{}}</span>
+                    <select class="pass" style="display:none;">
+                        <option value="1">合格</option>
+                        <option value="2">不合格</option>
+                    </select>
                 </td>
-                <td><input type="text" name="part2" class="input_trouble"/></td>
+                -->
+                <td>{{name}}</td>
                 <td>
                     <span class="pos" data-pos=""></span>
                     <span class="linkBtn-pos"></span>
                 </td>
-                <td><input type="" name="" class="input_date1 wicon" title="格式如:2017-01-02" readonly="readonly" /></td>
-                <td><input type="" name="" class="input_date2 wicon" title="格式如:2017-01-02" readonly="readonly" /></td>
-                <td><input type="" name="" class="input_counter"/></td>
+                <td>{{discoverDate}}</td>
+                <td>{{rectifyDate}}</td>
+                <td>{{rectifyCount}}</td>
                 <td>
-                    <!--隐患状态-->
-                    <select class="select-state">
+                    <span class="status">{{status}}</span>
+                    <select class="select-status" style="display:none;">
                         <option value="1">待整改</option>
                         <option value="2">已整改</option>
                         <option value="3">已关闭</option>
                     </select>
                 </td>
-                <td>
-                    <!--患等级级-->
-                    <select class="select-level">
-                        <option value="1">一般</option>
-                        <option value="2">较大</option>
-                        <option value="3">重大</option>
-                        <option value="4">特大</option>
-                    </select>
-                </td>
-                <td>
-                    <!--隐患提出方编码-->
-                    <select class="select-person">
-                        <option value="1">质检中心</option>
-                        <option value="2">第三方</option>
-                        <option value="3">项目公司</option>
-                        <option value="4">监理单位</option>
-                    </select>
-                </td>
-                <td>
-                    <!--打分类别-->
-                    <select class="select-type">
-                        <option value="1">实测实量</option>
-                        <option value="2">防水工程</option>
-                        <option value="3">施工质量</option>
-                        <option value="4">安全文明</option>
-                        <option value="5">总包内业资料</option>
-                        <option value="6">材料设备</option>
-                    </select>
+                <td>{{levelId}}</td>
+                <td>{{organizationTypeId}}</td>
+                <td>{{ratingCategoryId}}</td>
+                <td class="w-small">
+                    <button class="btn_modify">修改</button>
+                    <button class="btn_save" style="display:none;">保存</button>
                 </td>
             </tr>
         </tbody>
@@ -102,9 +81,6 @@
 
 <div id="Dlg_content" style="display:block;">
     <div class="dlg-content">
-        <div class="dlg-content-type">
-            <label>验收类型：</label><span data-type="process">过程验收</span><span data-type="open">开业验收</span>
-        </div>
         <div>
             <div id="repeatContainer" class="projectItem" style="display:none;">
                 <span data-projectCode="{{projectCode}}" data-projectId="{{projectId}}">{{projectName}}</span>
@@ -121,6 +97,36 @@
 </body>
 </html>
 <script type="text/javascript">
+Date.getDateFromMill = function(value){
+    var date = new Date(value);
+    return date.getFullYear() + "-" + (date.getMonth()+1) + "-" + date.getDate();
+}
+
+var Label = {
+    checkResult:['','合格','不合格'],
+    status:['','待整改','已整改','已关闭'],
+    level :['','一般','较大','重大','特大'],
+    person:['','质检中心','第三方','项目公司','监理单位'],
+    classic:['','实测实量','防水工程','施工质量','安全文明','总包内业资料','材料设备']
+};
+
+var Url = {
+    getParam : function(key){
+        var search = location.search;
+        search = search.replace("?","");
+        var items = search.split("&");
+        var item,i;
+        for(i=0;i<items.length;i++)
+        {
+            item = items[i].split("=");
+            if(item[0]==key)
+            {
+                return item[1];
+            }
+        }
+        return "";          
+    }   
+};
 
 var initDialog = function(){
     overLayer.bgColor='#777';
@@ -145,6 +151,7 @@ var initDialog = function(){
 
 var Event = {
     initDialogEvent : function(){
+        var th = this;
         $("#Dlg .wClose").hide();
         window.Dlg.show();
         $("#DlgBtn_close").on("click",function(){
@@ -157,15 +164,8 @@ var Event = {
                 alert("请选择一个项目");
                 return;
             }
-            if(window.type==undefined||window.type=="")
-            {
-                alert("请选择验收类型");
-                return;
-            }
             window.Dlg.hide();
-            var href = "/static/dist/qualityFill/qualityFill.html?projectCode={projectCode}&projectId={projectId}&projectName={projectName}&type={type}&typeName={typeName}";
-            var link = href.replace("{projectCode}",window.projectCode).replace("{projectId}",window.projectId).replace("{projectName}",encodeURI(window.projectName)).replace("{type}",window.type).replace("{typeName}",window.typeName);
-            window.location.href = link;
+            th.getGridData(window.projectId);
         });
 
         var $Dlg_content = $("#Dlg .dlg-content");
@@ -180,13 +180,6 @@ var Event = {
                 window.projectId = $dataDOM.data("projectid");
                 window.projectName = $dataDOM.html();
             }
-        });
-
-        $(".dlg-content-type").on("click","span",function(){
-            window.type = $(this).data("type");
-            window.typeName = $(this).html();
-            $(".dlg-content-type").find("span").removeClass("select");
-            $(this).addClass("select");
         });
     },
     initDialogData : function(){
@@ -210,9 +203,88 @@ var Event = {
             }
         });
     },
+
+    getGridData : function(projectId){
+        var url = "/sixD/{projectId}/{projectId}/problem";
+        url = url.replace("{projectId}",projectId).replace("{projectId}",projectId);
+        $.ajax({
+            url:url,
+            type:"get",
+            dataType:"json",
+            success:function(data){
+                var list = data.data.items;
+                console.log(list);
+                if(data.code!=0)
+                {
+                    list = [];
+                }
+                template.startSymbol("{{");
+                template.endSymbol("}}");
+                template.repeat({
+                    repeatElement:$("#Grid")[0],
+                    data:list,
+                    type:"cover",
+                    process:function(dataRow){
+                        var item = dataRow.item;
+                        return{
+                            "discoverDate" : Date.getDateFromMill(item.discoverDate),
+                            "rectifyDate" : Date.getDateFromMill(item.rectifyDate),
+                            "status" : Label.status[item.status],
+                            "levelId" : Label.level[item.levelId],
+                            "organizationTypeId" : Label.person[item.organizationTypeId],
+                            "ratingCategoryId" : Label.classic[item.ratingCategoryId]
+                        }
+                    }
+                });
+            }
+        });        
+    },
+    
     bindEvent : function(){
-        this.initDialogEvent();
-        this.initDialogData();
+        var projectId = Url.getParam("projectId");
+        if(projectId=="")
+        {
+            this.initDialogEvent();
+            this.initDialogData();
+        }
+        else
+        {
+            this.getGridData(projectId);
+        }
+        $("#gridContainer").on("click","button.btn_modify",function(){
+            var tr = this.parentNode.parentNode;
+            $span = $(tr).find(".status");
+            $select = $(tr).find(".select-status");
+            $btnSave = $(tr).find("button.btn_save");
+            $select.show();
+            $span.hide();
+            this.style.display = "none";
+            $btnSave.show();
+        });
+        $("#gridContainer").on("click","button.btn_save",function(){
+            var btnSave = this;
+            var tr = btnSave.parentNode.parentNode;
+
+            $span = $(tr).find(".status");
+            $select = $(tr).find(".select-status");
+            $btnModify = $(tr).find("button.btn_modify");            
+            $.ajax({
+                url:"/qqq",
+                type:"get",
+                success:function(data){
+                    $span.show();
+                    $span.html(Label.checkResult[$select.val()]);
+                    $select.hide();
+                    $btnModify.show();
+                    $btnSave.hide();
+                },
+                error:function(e){
+                    console.log(e);
+                }
+            });
+
+
+        });
     }
 };
 

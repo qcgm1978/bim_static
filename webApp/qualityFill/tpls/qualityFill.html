@@ -33,7 +33,7 @@
                     <td class="chk"><input type="checkbox" name="chk" class="chkAll"/></td>
                     <td class="">预设点</td>
                     <td class="w-small">检查结果</td>
-                    <td class="w-middle">隐患名称</td>
+                    <td class="w-middle">隐患描述</td>
                     <td class="w-big">构件位置</td>
                     <td class="w-small">创建日期</td>
                     <td class="w-small">整改日期</td>
@@ -115,6 +115,7 @@
         <button id="btn_delete">删除</button>
         <button id="btn_save">保存</button>
         <button id="btn_unbind">解绑预设点</button>
+        <button id="btn_see">查看隐患</button>
     </div>
 </div>
 
@@ -137,6 +138,18 @@
 </body>
 </html>
 <script type="text/javascript">
+var Global = {
+    restfulType:{
+        "MQ2":"QUALITY-1004",
+        "MQ1":"QUALITY-1005"
+    },
+    restfulMessage:""
+};
+
+
+var readyPosState = ["绑定预设点","解绑"];
+var posState = ["绑定构件位置","解绑"];
+
 
 Date.guid = function(){
     var date = new Date(),dataid="";
@@ -155,9 +168,6 @@ Date.getLong = function(stringDate){
 }
 
 //Object.prototype.toString.call(obj) === '[object Array]'
-
-var readyPosState = ["绑定预设点","解绑"];
-var posState = ["绑定构件位置","解绑"];
 
 var Data = {
     projectData:{},
@@ -381,6 +391,7 @@ var Event = {
             $input_date1 = $tr.find(".input_date1");
             $input_date2 = $tr.find(".input_date2");
             $input_counter = $tr.find(".input_counter");
+            $image = $tr.find("img");
             if($input_trouble.val()=="" || $input_date1.val()=="" || $input_date2.val()=="" || $input_counter.val()=="")
             {
                 result =  {
@@ -397,6 +408,15 @@ var Event = {
                 };
                 return;
             }
+
+            if($image.attr("src")=="")
+            {
+                result = {
+                    result:false,
+                    text:"图片未上传，请上传图片！"
+                }
+                return;
+            }
         });
 
         return result;
@@ -404,7 +424,7 @@ var Event = {
     saveData : function(){
         var $trs = $("#gridContainer tr");
         var $this;
-        var itemData , itemDatas=[] , $tr , componentData , presetPointData , dataid , imageId;
+        var itemData , itemDatas=[], itemDatas2=[] , $tr , componentData , presetPointData , dataid , imageId;
         var point , pos;
         var validate;
 
@@ -425,11 +445,23 @@ var Event = {
             {
                 imageId = "";
             }
-            
-            var itemData = {};
-
+            itemData = {};
             pos = Data.cacheData[dataid+"pos"];
             point = Data.cacheData[dataid+"point"];
+
+
+
+            if($tr.find(".linkBtn-ready-pos").html()==readyPosState[1]&&$tr.find(".select-result").val()==1) /*绑定预设点,就走MQ1(结构少)*/
+            {
+                itemData.id = Date.guid();
+                itemData.projectCode = Url.getParam("projectCode");
+                itemData.acceptanceType = Url.getParam("type")=="process"? 1 : 2 ;
+                itemData.acceptanceId = null;
+                itemData.presetPointID = itemData.presetPointID = point.id;
+                itemDatas2.push(itemData);
+                return;
+            }
+
             if(pos!=undefined)
             {
                 itemData.componentID = pos.fileUniqueId;
@@ -449,12 +481,11 @@ var Event = {
             else
             {
                 itemData.presetPointID = "";
-                itemData.axis = null;                
+                itemData.axis = null;   
             }
 
             itemData.PresetPointCompoentID = "";
             itemData.dangerImageID = imageId==undefined ? "" : imageId;/*上传图片后的ID*/
-            console.log("imageid",itemData.dangerImageID);
             itemData.id = Date.guid();
             itemData.projectId = Url.getParam("projectId");
             itemData.projectCode = Url.getParam("projectCode");
@@ -467,8 +498,23 @@ var Event = {
             itemData.levelId = $tr.find(".select-level")[0].value;
             itemData.organizationTypeID = $tr.find(".select-person")[0].value;
             itemData.ratingCategoryID = $tr.find(".select-type")[0].value;
+            itemData.locationName = $tr.find(".pos").html();
             itemDatas.push(itemData);
         });
+
+        if(itemDatas2.length>0) /*MQ1接口,QUALITY-1005 结构少*/
+        {
+            Data.formData.msgContent = JSON.stringify({
+            "messageId": "411a109141d6473c83a86aa0480d6610",
+            "messageType": "QUALITY-1005",
+            "message": "是",
+            "timestamp": (new Date).getTime(),
+            "code": 0,
+            "data": itemDatas2
+            });
+            console.log("save-1005",Data.formData);
+            this.sendData();
+        }
 
         Data.formData.msgContent = JSON.stringify({
         "messageId": "411a109141d6473c83a86aa0480d6610",
@@ -478,14 +524,14 @@ var Event = {
         "code": 0,
         "data": itemDatas
         });
-
-        console.log("save",Data.formData);
+        console.log("save-1004",Data.formData);
         this.sendData();
     },
+
     sendData : function(){
         console.log(JSON.stringify(Data.formData));
         $.ajax({
-            url:"/sixD/internal/message",
+            url:"/sixD/internal/message",   /*MQ 隐患接口*/
             //url:"http://192.168.79.56/sixD/internal/message",
             type:"POST",
             headers: {
@@ -685,6 +731,14 @@ var Event = {
         $("#gridContainer").on("click",".uploadBtn",function(){
             window.Data.curTrDOM = this.parentNode.parentNode;
             window.Dlg.show();
+        });
+
+        /*查看隐患-列表,转到新页面qualityModify.html*/
+        $("#btn_see").on("click",function(){
+            var href = "/static/dist/qualityFill/qualityModify.html?projectId={projectId}";
+            href = href.replace("{projectId}",Url.getParam("projectId"));
+            //location.href = href;
+            window.open(href);
         });
         this.initDialogEvent();
     }
