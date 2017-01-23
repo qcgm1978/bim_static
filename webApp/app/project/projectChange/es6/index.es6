@@ -339,7 +339,11 @@ App.Index = {
 	 
 
 	},
-
+	//属性置空
+	setAttrNull(){
+		App.Index.Settings.ModelObj = null;
+		$("#projectContainer .designProperties").html(' <div class="nullTip">请选择构件</div>');
+	},
 	//渲染属性
 	renderAttr() {
 
@@ -347,10 +351,11 @@ App.Index = {
 			$("#projectContainer .designProperties").html(' <div class="nullTip">请选择构件</div>');
 			return;
 		}
+
 		var data = {
 			URLtype: "projectDesinProperties",
 			data: {
-				baseModelId: App.Index.Settings.baseModelId,
+				baseModelId: App.Index.Settings.baseModelIdD,
 				currentModelId: App.Index.Settings.differModelId,
 				projectId: App.Index.Settings.projectId,
 				projectVersionId: App.Index.Settings.projectVersionId,
@@ -514,8 +519,8 @@ App.Index = {
 				return;
 			}
 			var firstData = lists[0].comparisons[0];
-			// that.Settings.baseModelId = firstData.output.replace("_output","");
-			that.Settings.baseModelId = firstData.baseModel;
+			that.Settings.baseModelIdD = firstData.baseModel;
+			that.Settings.baseModelId = firstData.output.replace("_output","");
 			that.Settings.differModelId = firstData.currentModel;
 
 			//渲染模型
@@ -547,6 +552,7 @@ App.Index = {
 
 
 					App.Index.Settings.changeModel = null;
+
 					App.Index.Settings.baseModelId = $item.data("basemodelid");
 					App.Index.Settings.differModelId = $item.data("differmodelid");
 					App.Index.Settings.differFileVersionId = differFileVersionId;

@@ -845,6 +845,9 @@
         var ProjectContainer = new App.Project.ProjectContainer;
         ProjectContainer.resetProperNull();
       }
+      if(App.Index){
+        App.Index.setAttrNull();
+      }
       filter.revertAll();
       self.filter({
         ids:['10.01'],
