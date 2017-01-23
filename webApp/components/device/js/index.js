@@ -88,8 +88,6 @@
             return Project.dataCore.list;
         }
     }
-
-
     function DeviceSelection(options) {
         var _this = this;
         if (!(this instanceof DeviceSelection)) {
@@ -152,9 +150,7 @@
             })
         }
     }
-
     DeviceSelection.prototype = {
-
         initCookie: function (ourl, appKey, token) {
             var that = this,
                 isVerification = false,
@@ -181,7 +177,6 @@
             });
             return isVerification;
         },
-
         setCookie: function (name, value) {
             var Days = 30,
                 host = this.Settings.host || ourl,
@@ -201,7 +196,6 @@
             if (cval != null)
                 document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString() + ";domain=" + doMain + ";path=/";
         },
-
         init: function () {
             if (this.isIE()) {
                 this.activeXObject();
@@ -209,7 +203,6 @@
                 this.loadLib();
             }
         },
-
         setData:function(data){
             Project.data=data;
         },
@@ -239,24 +232,19 @@
                     WebView.zoomFactor = screen.deviceXDPI / screen.logicalXDPI;
                 }
             }
-
             WebView.url = ourl + "/static/dist/components/device/modal.html?sourceId=" + this.Settings.sourceId + "&etag=" +
                 this.Settings.etag + "&projectId=" + this.Settings.projectId + "&projectVersionId=" + this.Settings.projectVersionId + "&ruleType=" + this.Settings.ruleType + "&appKey=" +
                 this.Settings.appKey + "&token=" + this.Settings.token + "&height=" + this.Settings.height + "&width=" + this.Settings.width;
             WebView.height = this.Settings.height || "510px";
             WebView.width = this.Settings.width || "960px";
-
             //窗体变化
             window.onresize = resizeWebView;
             resizeWebView();
-
-
             var data=JSON.stringify({
                 data:this.Settings.data,
                 selectedData:this.Settings.selectedData,
                 setting:this.Settings
             });
-
             WebView.registerEvent('newWindow', function(url){
                 if(/onData$/.test(url)){
                     WebView.runScript('getData()',function(data){
@@ -272,14 +260,11 @@
                     });
                 }
             });
-
-
           /* setTimeout(function(){
                WebView.runScript("init('"+data+"')", function() {
                });
            },1000)*/
         },
-
         loadLib: function () {
             var self = this,
                 srciptUrl = ourl + '/static/dist/libs/libsH5.js',
@@ -316,8 +301,6 @@
                     strVar += "    <\/div>";
                     $('#deviceSelector').append(strVar);
                 }
-
-
                  self.initStyle();
               //  self.initEvent();
                // return
@@ -359,7 +342,6 @@
 
             })
         },
-
         initStyle:function(){
             if(!this.Settings.isShowConfirm){
                 $('.deviceSelector .rightSilderBar .contentbar ').css('bottom','40px')
@@ -367,7 +349,6 @@
                 $('.footTool').hide();
             }
         },
-
         initEvent: function () {
             var _self=this;
             $('.deviceSelector .before').click(function () {
@@ -427,7 +408,6 @@
                 Project.dispatchIE("/?commType=onData");
             })
         },
-
         pageInfo:function(param){
             var _this=this;
             $(".listPagination").empty().pagination(param.totalItemCount, {
@@ -444,10 +424,8 @@
                 prev_text: "上一页",
                 next_text: "下一页"
             });
-
             $('.footPage').css('textAlign','right');
         },
-
         loadModal: function () {
             var _this=this;
             var viewer = new bimView({
@@ -465,13 +443,9 @@
                 $('#modelView .modelSidebar').addClass('hideMap');
                 $('#isolation').show();/*add by wangbing*/
             });
-
             viewer.on('click',function(){
-
                 $('#isolation').show();
-
             })
-
             viewer.viewer.setMarkerClickCallback(function(marker){
                 var id = marker? marker.id:"",
                     userId=marker? marker.userId:"",
@@ -482,15 +456,18 @@
                     if(t.length){
                         t.addClass('preview');
                     }
-                    Project.viewer.getFilters().setSelectedIds([userId]);
+                    Project.Viewer.highlight({
+                        type: 'userId',
+                        ids: [userId]
+                    });
+                    Project.Viewer.viewer.getFilters().setSelectedIds([userId]);//选中与否
+                    // Project.viewer.getFilters().setSelectedIds([userId]);
                 }else{
                     var t=$('tr.preview').removeClass('preview');;
                 }
             });
-
             Project.Viewer=viewer;
         },
-
         loadComponentList:function(param){
             var result=Tools.catchPageData(param);
             var data=result.items;
@@ -552,7 +529,6 @@
             });
             Project.Viewer.viewer.getFilters().setSelectedIds(ids);
         },
-
         showInModel:function(isAll){
             var _this=this;
             var list=isAll?Project.data:Project.dataCore.list,
@@ -573,7 +549,5 @@
             _this.zoom(ids,markers,boxs);
         }
     }
-
-
     win.DeviceSelection = DeviceSelection;
 }(window))
