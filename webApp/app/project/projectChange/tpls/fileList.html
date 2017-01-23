@@ -8,9 +8,9 @@
 	        		 <li class="myItemGroup"><span><%=item.specialtyName%></span></li>
 	        		 	<ul class="groups">
 	        		 		 
-	                   		<% $.each(item.comparisons,function(i,item){  %>
+	                   		<% $.each(item.comparisons,function(i,item){ <!-- data-basemodelid="<%=item.output.replace('_output','')%>" -->%>
 	                   			<li class="myItem"  
-	                   			data-basemodelid="<%=item.output.replace('_output','')%>"
+	                   			data-basemodelid="<%=item.baseModel%>"
 	                   			data-differmodelid="<%=item.currentModel%>"
 	                   			data-differFileVersionId="<%=item.currentVersion%>"
 	                   			data-baseFileVersionId="<%=item.baseVersion%>">

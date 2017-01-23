@@ -522,7 +522,6 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		});
 
 		viewer.on("click", function(model) {
-			console.log("model",model);
 			//取消计划高亮
 			var result = that.cancelhighlightPlan(),
 			    viewer = App.Project.Settings.Viewer,
@@ -716,38 +715,38 @@ App.Project.ProjectContainer = Backbone.View.extend({
 
 	//重置 内容为空
 	resetProperNull() {
+		App.Project.Settings.ModelObj = "";
+		$(".rightPropertyContentBox .CostProperties").html('<div class="nullTip">请选择构件</div>');
+		$(".rightPropertyContentBox .QualityProperties").html('<div class="nullTip">请选择构件</div>');
+		$(".rightPropertyContentBox .planProperties").html('<div class="nullTip">请选择构件</div>');
+		$(".rightPropertyContentBox .designProperties").html('<div class="nullTip">请选择构件</div>');
+		// var projectNav = App.Project.Settings.projectNav,
+		// 	property = App.Project.Settings.property,
+		// 	$el;
+		// if (property == "poperties") {
 
-		var projectNav = App.Project.Settings.projectNav,
-			property = App.Project.Settings.property,
-			$el;
-		if (property == "poperties") {
+		// 	//if (projectNav == "design") {
+		// 	//	//设计
+		// 	//	$el = $(".rightPropertyContentBox .designProperties");
 
-			//if (projectNav == "design") {
-			//	//设计
-			//	$el = $(".rightPropertyContentBox .designProperties");
+		// 	if (projectNav == "cost") {
+		// 		//成本
+		// 		$el = $(".rightPropertyContentBox .CostProperties");
 
-			if (projectNav == "cost") {
-				//成本
-				$el = $(".rightPropertyContentBox .CostProperties");
-
-			} else if (projectNav == "quality") {
-				//质量
-				$el = $(".rightPropertyContentBox .QualityProperties");
-			} else if (projectNav == "plan") {
-				//计划
-				$el = $(".rightPropertyContentBox .planProperties");
-			}else{
-				//设计  或者没有选中任何一栏时的默认属性页
-				$el = $(".rightPropertyContentBox .designProperties");
-			}
-		}
-		if ($el) {
-			// $el.html('<div class="nullTip">请选择构件</div>');
-			$(".rightPropertyContentBox .CostProperties").html('<div class="nullTip">请选择构件</div>')
-			$(".rightPropertyContentBox .QualityProperties").html('<div class="nullTip">请选择构件</div>')
-			$(".rightPropertyContentBox .planProperties").html('<div class="nullTip">请选择构件</div>')
-			$(".rightPropertyContentBox .designProperties").html('<div class="nullTip">请选择构件</div>')
-		}
+		// 	} else if (projectNav == "quality") {
+		// 		//质量
+		// 		$el = $(".rightPropertyContentBox .QualityProperties");
+		// 	} else if (projectNav == "plan") {
+		// 		//计划
+		// 		$el = $(".rightPropertyContentBox .planProperties");
+		// 	}else{
+		// 		//设计  或者没有选中任何一栏时的默认属性页
+		// 		$el = $(".rightPropertyContentBox .designProperties");
+		// 	}
+		// }
+		// if ($el) {
+		// 	$el.html('<div class="nullTip">请选择构件</div>');
+		// }
 
 	},
 

@@ -841,6 +841,10 @@
       var self = this;
       var viewer = self.viewer;
       var filter = viewer.getFilters();
+      if(App.Project){
+        var ProjectContainer = new App.Project.ProjectContainer;
+        ProjectContainer.resetProperNull();
+      }
       filter.revertAll();
       self.filter({
         ids:['10.01'],
