@@ -149,7 +149,9 @@ App.ResourceModel.ListNav = Backbone.View.extend({
 
 	},
 	reTemplate: _.templateUrl('/resources/tpls/resourceModel/resources.model.attr.detail.html'),
-
+	resetProperNull:function(){//置空属性
+		$("#navContainer .attrContent").html('<div class="nullTip">请选择构件</div>');
+	},
 	//重新渲染苏醒
 	reRender: function(model) {
 
