@@ -11,6 +11,11 @@
     <script src="http://cdn.bootcss.com/jquery/1.9.1/jquery.min.js"></script>
     <script src="/static/dist/qualityFill/js/template.min.js"></script>
     <script src="/static/dist/qualityFill/js/wDialog.min.js"></script>
+    <style type="text/css">
+    .grid table td.chk{
+        width:70px;
+    }
+    </style>
 </head>
 <body>
 
@@ -19,7 +24,7 @@
         <thead>
             <tr>
                 <td class="chk">隐患图片</td>
-                <td class="w-middle">预设点</td>
+                <td class="w-big">预设点</td>
                 <!--<td class="w-small">检查结果</td>-->
                 <td class="">隐患描述</td>
                 <td class="w-big">构件位置</td>
@@ -34,14 +39,11 @@
             </tr>
         </thead>
         <tbody id="gridContainer">
-            <tr id="Grid" style="display:none;">
+            <tr id="Grid" style="display:none;" dataid="{{id}}">
                 <td class="chk">
                     <img src="{{imageUrl}}" style="width:60px;height:60px;" align="middle"/>
                 </td>
-                <td>
-                    <span class="ready-pos" data-readypos=""></span>
-                    <span class="linkBtn-ready-pos"></span>
-                </td>
+                <td>{{presetPointName}}</td>
                 <!--
                 <td>
                     <span class="passLabel">{{}}</span>
@@ -52,10 +54,7 @@
                 </td>
                 -->
                 <td>{{name}}</td>
-                <td>
-                    <span class="pos" data-pos=""></span>
-                    <span class="linkBtn-pos"></span>
-                </td>
+                <td>{{locationName}}</td>
                 <td>{{discoverDate}}</td>
                 <td>{{rectifyDate}}</td>
                 <td>{{rectifyCount}}</td>
@@ -109,6 +108,8 @@ var Label = {
     person:['','质监中心','第三方','项目公司','监理单位'],
     classic:['','实测实量','防水工程','施工质量','安全文明','总包内业资料','材料设备']
 };
+
+var Data = {};
 
 var Url = {
     getParam : function(key){
@@ -214,7 +215,8 @@ var Event = {
             dataType:"json",
             success:function(data){
                 var list = data.data.items;
-                console.log(list);
+                window.Data.formData = items;
+                console.log(data);
                 if(data.code!=0)
                 {
                     list = [];
@@ -233,7 +235,8 @@ var Event = {
                             "status" : Label.status[item.status],
                             "levelId" : Label.level[item.levelId],
                             "organizationTypeId" : Label.person[item.organizationTypeId],
-                            "ratingCategoryId" : Label.classic[item.ratingCategoryId]
+                            "ratingCategoryId" : Label.classic[item.ratingCategoryId],
+                            "locationName" : item.locationName==null ? "" : locationName
                         }
                     }
                 });
@@ -242,6 +245,7 @@ var Event = {
     },
     
     bindEvent : function(){
+        var th = this;
         var projectId = Url.getParam("projectId");
         if(projectId=="")
         {
@@ -254,6 +258,7 @@ var Event = {
         }
         $("#gridContainer").on("click","button.btn_modify",function(){
             var tr = this.parentNode.parentNode;
+            tr.style.backgroundColor = "#ddd";
             $span = $(tr).find(".status");
             $select = $(tr).find(".select-status");
             $btnSave = $(tr).find("button.btn_save");
@@ -265,26 +270,28 @@ var Event = {
         $("#gridContainer").on("click","button.btn_save",function(){
             var btnSave = this;
             var tr = btnSave.parentNode.parentNode;
-
+            tr.style.backgroundColor = "#FFF";
             $span = $(tr).find(".status");
             $select = $(tr).find(".select-status");
             $btnModify = $(tr).find("button.btn_modify");            
-            $.ajax({
-                url:"/qqq",
-                type:"get",
-                success:function(data){
-                    $span.show();
-                    $span.html(Label.checkResult[$select.val()]);
-                    $select.hide();
-                    $btnModify.show();
-                    $btnSave.hide();
-                },
-                error:function(e){
-                    console.log(e);
-                }
-            });
+            th.saveData();
+        });
+    },
 
-
+    saveData:function(){
+        $.ajax({
+            url:"/sixD/internal/message",   /*MQ 隐患接口*/
+            type:"POST",
+            success:function(data){
+                $span.show();
+                $span.html(Label.checkResult[$select.val()]);
+                $select.hide();
+                $btnModify.show();
+                $btnSave.hide();
+            },
+            error:function(e){
+                console.log(e);
+            }
         });
     }
 };

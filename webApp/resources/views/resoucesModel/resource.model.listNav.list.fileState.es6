@@ -15,8 +15,8 @@
 		var data = {
 			URLtype: "getFileStatus",
 			data: {
-				projectId: App.ResourceModel.FileCollection.projectId,
-				versionId: App.ResourceModel.FileCollection.projectVersionId,
+				projectId: App.ResourceModel.FileCollection.projectId || App.ResourceModel.FileThumCollection.projectId,
+				versionId: App.ResourceModel.FileCollection.projectVersionId || App.ResourceModel.FileThumCollection.projectVersionId,
 			}
 		}
 		App.Comm.ajax(data, (data) => {

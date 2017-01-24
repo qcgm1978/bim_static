@@ -1,6 +1,9 @@
 /*
 write by wuweiwei
 */
+html{
+
+}
 body{
 	font-family: "Microsoft Yahei";
 	font-size: 12px;
@@ -82,10 +85,10 @@ body{
 	width: 200px;
 }
 .w-middle{
-	width: 110px;
+	width: 130px;
 }
 .w-small{
-	width:70px;
+	width:90px;
 }
 .modelSelectDialog{
 	height: 500px;

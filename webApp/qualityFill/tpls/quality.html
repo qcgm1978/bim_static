@@ -60,12 +60,15 @@ var initDialog = function(){
 
 var Event = {
     initDialogEvent : function(){
+        var url = "http://bim-uat.wanda-dev.cn/sixD/{projectId}/{projectVerionId}/problem/code/zjmn?projectCode={projectCode}";
         $("#Dlg .wClose").hide();
         window.Dlg.show();
+        
         $("#DlgBtn_close").on("click",function(){
             window.Dlg.hide();
             $("#projectName").html(Data.projectData.projectName);
         });
+
         $("#DlgBtn_ok").on("click",function(){
             if(window.projectCode==undefined||window.projectCode=="")
             {
@@ -77,7 +80,25 @@ var Event = {
                 alert("请选择验收类型");
                 return;
             }
+
             window.Dlg.hide();
+
+            if(window.projectCode == "consoleCode")
+            {
+                url = url.replace("{projectId}",window.projectId).replace("{projectVerionId}",window.projectId).replace("{projectCode}",window.projectCode);
+                $.ajax({
+                    url:url,
+                    type:"get",
+                    success:function(data){
+                        var href = "/static/dist/qualityFill/qualityFill.html?projectCode={projectCode}&projectId={projectId}&projectName={projectName}&type={type}&typeName={typeName}";
+                        var link = href.replace("{projectCode}",window.projectCode).replace("{projectId}",window.projectId).replace("{projectName}",encodeURI(window.projectName)).replace("{type}",window.type).replace("{typeName}",window.typeName);
+                        window.location.href = link;
+                    }
+                });
+
+                return;            
+            }
+
             var href = "/static/dist/qualityFill/qualityFill.html?projectCode={projectCode}&projectId={projectId}&projectName={projectName}&type={type}&typeName={typeName}";
             var link = href.replace("{projectCode}",window.projectCode).replace("{projectId}",window.projectId).replace("{projectName}",encodeURI(window.projectName)).replace("{type}",window.type).replace("{typeName}",window.typeName);
             window.location.href = link;

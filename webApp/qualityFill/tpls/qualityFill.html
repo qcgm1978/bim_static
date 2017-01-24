@@ -35,9 +35,9 @@
                     <td class="w-small">检查结果</td>
                     <td class="w-middle">隐患描述</td>
                     <td class="w-big">构件位置</td>
-                    <td class="w-small">创建日期</td>
-                    <td class="w-small">整改日期</td>
-                    <td class="w-small">整改次数</td>
+                    <td class="w-middle">创建日期</td>
+                    <td class="w-middle">整改日期</td>
+                    <td class="w-middle">整改次数</td>
                     <td class="w-small">状态</td>
                     <td class="w-small">等级</td>
                     <td class="w-small">填报人</td>
@@ -66,8 +66,8 @@
                         <span class="pos" data-pos=""></span>
                         <span class="linkBtn-pos"></span>
                     </td>
-                    <td><input type="" name="" class="input_date1 wicon" title="格式如:2017-01-02" readonly="readonly" /></td>
-                    <td><input type="" name="" class="input_date2 wicon" title="格式如:2017-01-02" readonly="readonly" /></td>
+                    <td><input type="" name="" class="input_date1 wicon" title="格式如:2017-01-02" /></td>
+                    <td><input type="" name="" class="input_date2 wicon" title="格式如:2017-01-02" /></td>
                     <td><input type="" name="" class="input_counter"/></td>
                     <td>
                         <!--隐患状态-->
@@ -604,8 +604,8 @@ var Event = {
                         '<td>{select-result}</td>'+
                         '<td><input type="text" name="part2" class="input_trouble"/></td>'+
                         '<td>{pos}</td>'+
-                        '<td><input type="" name="" class="input_date1 wicon" readonly="readonly" /></td>'+
-                        '<td><input type="" name="" class="input_date2 wicon" readonly="readonly" /></td>'+
+                        '<td><input type="" name="" class="input_date1 wicon" /></td>'+
+                        '<td><input type="" name="" class="input_date2 wicon" /></td>'+
                         '<td><input type="" name="" class="input_counter"/></td>'+
                         '<td>'+
                             '<select class="select-state">'+
@@ -741,15 +741,46 @@ var Event = {
             window.open(href);
         });
 
+        /*合格不合格select 事件*/
         $("#gridContainer").on("change",".select-result",function(){
             var $tr = $(this.parentNode.parentNode);
-            $tr.find(".input_trouble");
-            $tr.find(".linkBtn-pos");
-            $tr.find(".pos");
-            $tr.find(".input_date1");
-            $tr.find(".input_date2");
-            $tr.find(".input_date2");
-
+            var $input_trouble = $tr.find(".input_trouble");
+            var $linkBtn_pos = $tr.find(".linkBtn-pos");
+            var $pos = $tr.find(".pos");
+            var $input_date1 = $tr.find(".input_date1");
+            var $input_date2 = $tr.find(".input_date2");
+            var $input_counter = $tr.find(".input_counter");
+            var $select_state = $tr.find(".select-state");
+            var $select_level = $tr.find(".select-level");
+            var $select_person = $tr.find(".select-person");
+            var $select_type = $tr.find(".select-type");
+            
+            if(this.value=="1")/*合格*/
+            {
+                $input_trouble.show();
+                $linkBtn_pos.show();
+                $pos.show();
+                $input_date1.show();
+                $input_date2.show();
+                $input_counter.show();
+                $select_state.show();
+                $select_level.show();
+                $select_person.show();
+                $select_type.show();
+            }
+            else /*不合格*/
+            {
+                $input_trouble.hide();
+                $linkBtn_pos.hide();
+                $pos.hide();
+                $input_date1.hide();
+                $input_date2.hide();
+                $input_counter.hide();
+                $select_state.hide();
+                $select_level.hide();
+                $select_person.hide();
+                $select_type.hide();
+            }
         });
     
         this.initDialogEvent();
