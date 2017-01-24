@@ -39,7 +39,7 @@
             </tr>
         </thead>
         <tbody id="gridContainer">
-            <tr id="Grid" style="display:none;" dataid="{{id}}">
+            <tr id="Grid" style="display:none;" dataid="{{id}}" dataindex="{{dataIndex}}">
                 <td class="chk">
                     <img src="{{imageUrl}}" style="width:60px;height:60px;" align="middle"/>
                 </td>
@@ -109,7 +109,30 @@ var Label = {
     classic:['','实测实量','防水工程','施工质量','安全文明','总包内业资料','材料设备']
 };
 
-var Data = {};
+var Data = {
+    formData:{
+        "msgCreateTime": 1461727280227,
+        "msgId": "b2e5b467ef214f6196ac3f826017806e",
+        "msgSendTime": 0,
+        "srcMsgType": "QUALITY-BIM",
+        "retryTimes": 0,
+        "status": 0,
+        "sysCode": "1",
+        "msgContent":""
+        /*
+        "msgContent" : JSON.stringify({
+            "messageId": "411a109141d6473c83a86aa0480d6610",
+            "messageType": "QUALITY-1004",
+            "message": "是",
+            "timestamp": (new Date).getTime(),
+            "code": 0,
+            "data": []
+        })
+        */
+    },
+    listData : [],
+    listDataCrrentIndex:-1
+};
 
 var Url = {
     getParam : function(key){
@@ -215,8 +238,8 @@ var Event = {
             dataType:"json",
             success:function(data){
                 var list = data.data.items;
-                window.Data.formData = items;
-                console.log(data);
+                window.Data.listData = list;
+
                 if(data.code!=0)
                 {
                     list = [];
@@ -236,7 +259,8 @@ var Event = {
                             "levelId" : Label.level[item.levelId],
                             "organizationTypeId" : Label.person[item.organizationTypeId],
                             "ratingCategoryId" : Label.classic[item.ratingCategoryId],
-                            "locationName" : item.locationName==null ? "" : locationName
+                            "locationName" : item.locationName==null ? "" : locationName,
+                            "dataIndex" : dataRow.index
                         }
                     }
                 });
@@ -256,9 +280,11 @@ var Event = {
         {
             this.getGridData(projectId);
         }
+
         $("#gridContainer").on("click","button.btn_modify",function(){
             var tr = this.parentNode.parentNode;
-            tr.style.backgroundColor = "#ddd";
+            tr.style.backgroundColor = "#84C1FF";
+            Data.listDataCrrentIndex = $(tr).attr("dataindex");
             $span = $(tr).find(".status");
             $select = $(tr).find(".select-status");
             $btnSave = $(tr).find("button.btn_save");
@@ -267,6 +293,7 @@ var Event = {
             this.style.display = "none";
             $btnSave.show();
         });
+
         $("#gridContainer").on("click","button.btn_save",function(){
             var btnSave = this;
             var tr = btnSave.parentNode.parentNode;
@@ -279,20 +306,36 @@ var Event = {
     },
 
     saveData:function(){
+
+        Data.formData.msgContent = JSON.stringify({
+        "messageId": "411a109141d6473c83a86aa0480d6610",
+        "messageType": "QUALITY-1004",
+        "message": "是",
+        "timestamp": (new Date).getTime(),
+        "code": 0,
+        "data": itemDatas
+        });
+
         $.ajax({
             url:"/sixD/internal/message",   /*MQ 隐患接口*/
+            //url:"http://192.168.79.56/sixD/internal/message",
             type:"POST",
-            success:function(data){
+            headers: {
+                    "Content-Type": "application/json"
+            },
+            data:JSON.stringify(Data.formData)
+        }).done(function(data){
+            if(data.code==0)
+            {
                 $span.show();
                 $span.html(Label.checkResult[$select.val()]);
                 $select.hide();
                 $btnModify.show();
                 $btnSave.hide();
-            },
-            error:function(e){
-                console.log(e);
+                alert("保存成功！");
             }
         });
+
     }
 };
 

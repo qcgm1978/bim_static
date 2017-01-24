@@ -60,7 +60,7 @@ var initDialog = function(){
 
 var Event = {
     initDialogEvent : function(){
-        var url = "http://bim-uat.wanda-dev.cn/sixD/{projectId}/{projectVerionId}/problem/code/zjmn?projectCode={projectCode}";
+        var url = "/sixD/{projectId}/{projectVerionId}/problem/code/zjmn?projectCode={projectCode}";
         $("#Dlg .wClose").hide();
         window.Dlg.show();
         
@@ -81,24 +81,23 @@ var Event = {
                 return;
             }
 
-            window.Dlg.hide();
-
             if(window.projectCode == "consoleCode")
             {
                 url = url.replace("{projectId}",window.projectId).replace("{projectVerionId}",window.projectId).replace("{projectCode}",window.projectCode);
                 $.ajax({
                     url:url,
-                    type:"get",
+                    type:"POST",
                     success:function(data){
                         var href = "/static/dist/qualityFill/qualityFill.html?projectCode={projectCode}&projectId={projectId}&projectName={projectName}&type={type}&typeName={typeName}";
-                        var link = href.replace("{projectCode}",window.projectCode).replace("{projectId}",window.projectId).replace("{projectName}",encodeURI(window.projectName)).replace("{type}",window.type).replace("{typeName}",window.typeName);
+                        var link = href.replace("{projectCode}",data.data.projectCode).replace("{projectId}",window.projectId).replace("{projectName}",encodeURI(window.projectName)).replace("{type}",window.type).replace("{typeName}",window.typeName);
                         window.location.href = link;
                     }
                 });
-
+                window.Dlg.hide();
                 return;            
             }
 
+            window.Dlg.hide();
             var href = "/static/dist/qualityFill/qualityFill.html?projectCode={projectCode}&projectId={projectId}&projectName={projectName}&type={type}&typeName={typeName}";
             var link = href.replace("{projectCode}",window.projectCode).replace("{projectId}",window.projectId).replace("{projectName}",encodeURI(window.projectName)).replace("{type}",window.type).replace("{typeName}",window.typeName);
             window.location.href = link;

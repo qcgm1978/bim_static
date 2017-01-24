@@ -17,7 +17,7 @@
     <script src="/static/dist/components/inspectSelection/js/inspectSelection.js"></script>
     <script src="/static/dist/qualityFill/js/template.min.js"></script>
     <script src="/static/dist/qualityFill/js/wDialog.min.js"></script>
-    <script src="/static/dist/qualityFill/js/jquery.jedate.js"></script>
+    <script src="/static/dist/qualityFill/js/zebra_datepicker.js"></script>
 </head>
 <body>
 
@@ -57,8 +57,8 @@
                     </td>
                     <td>
                     <select class="select-result">
-                        <option value="1">合格</option>
-                        <option value="2">不合格</option>
+                        <option value="1">不合格</option>
+                        <option value="2">合格</option>
                     </select>
                     </td>
                     <td><input type="text" name="part2" class="input_trouble"/></td>
@@ -132,6 +132,16 @@
     <div class="dlg-button">
         <!--<button id="DlgBtn_close">关闭</button>-->
         <button id="DlgBtn_ok">确定</button>
+    </div>
+</div>
+
+<div id="Dlg_content_alert" style="display:none;">
+    <div class="dlg-content-upload" style="line-height:60px;">
+        数据保存成功！
+    </div>
+    <div class="dlg-button">
+        <!--<button id="DlgBtn_close">关闭</button>-->
+        <button id="DlgBtn_ok_alert">确定</button>
     </div>
 </div>
 
@@ -234,6 +244,7 @@ var Url = {
 };
 
 var initDate = function(){
+    /*
     $(".input_date1").jeDate({
         isinitVal:false,
         festival:true,
@@ -252,6 +263,9 @@ var initDate = function(){
         format:"YYYY-MM-DD",
         zIndex:3000,
     });
+    */
+    $(".input_date1").Zebra_DatePicker();
+    $(".input_date2").Zebra_DatePicker();
 }
 
 var initComponent = function(projectCode,type){
@@ -298,6 +312,27 @@ var initDialog = function(){
         top:510
     };
     window.Dlg = new wDialog(options);
+
+    options={
+        id:'DlgAlert',
+        hasBar:true,
+        barOptions:
+        {
+            title:"提示"
+        },
+        position:'fixed',
+        type:'center',
+        contentId:'Dlg_content_alert',
+        className:'dialog',
+        width:500,
+        height:150,
+        isMove:false,
+        top:510
+    };
+
+    window.DlgAlert = new wDialog(options);
+
+
 }
 
 var Event = {
@@ -310,6 +345,10 @@ var Event = {
         $("#DlgBtn_ok").on("click",function(){
             window.Dlg.hide();
         });
+        $("#DlgBtn_ok_alert").on("click",function(){
+            window.DlgAlert.hide();
+        });
+
         var $Dlg_content = $("#Dlg .dlg-content-upload");
         $Dlg_content.on("click","div",function(){
 
@@ -392,6 +431,11 @@ var Event = {
             $input_date2 = $tr.find(".input_date2");
             $input_counter = $tr.find(".input_counter");
             $image = $tr.find("img");
+            $result = $tr.find(".select-result");
+            if($result.val()=="2")
+            {
+                return;
+            }
             if($input_trouble.val()=="" || $input_date1.val()=="" || $input_date2.val()=="" || $input_counter.val()=="")
             {
                 result =  {
@@ -541,7 +585,7 @@ var Event = {
         }).done(function(data){
             if(data.code==0)
             {
-                alert("保存成功！");
+                window.DlgAlert.show();
             }
         });
     },
@@ -669,7 +713,7 @@ var Event = {
                                 '<option>中庭栏杆</option>'+
                                 '<option>竖井</option>'+
                             '</select>';
-        this.selectResultHTML = '<select class="select-result"><option value="1">合格</option><option value="2">不合格</option></select>';
+        this.selectResultHTML = '<select class="select-result"><option value="1">不合格</option><option value="2">合格</option></select>';
         this.readyPosHTML = '<span class="ready-pos" data-readypos=""></span><span class="linkBtn-ready-pos">{ready-pos-state}</span>';
         this.posHTML =      '<span class="pos" data-pos=""></span><span class="linkBtn-pos">{pos-state}</span>';
 

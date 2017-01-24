@@ -17,6 +17,10 @@
 			data: {
 				projectId: App.ResourceModel.FileCollection.projectId || App.ResourceModel.FileThumCollection.projectId,
 				versionId: App.ResourceModel.FileCollection.projectVersionId || App.ResourceModel.FileThumCollection.projectVersionId,
+				/*
+				"|| App.ResourceModel.FileThumCollection.projectId" add by wuwiwei
+				"|| App.ResourceModel.FileThumCollection.projectVersionId" add by wuweiwei
+				*/
 			}
 		}
 		App.Comm.ajax(data, (data) => {
