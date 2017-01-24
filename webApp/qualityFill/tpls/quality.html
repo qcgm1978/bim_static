@@ -86,7 +86,7 @@ var Event = {
                 url = url.replace("{projectId}",window.projectId).replace("{projectVerionId}",window.projectId).replace("{projectCode}",window.projectCode);
                 $.ajax({
                     url:url,
-                    type:"POST",
+                    type:"get",
                     success:function(data){
                         var href = "/static/dist/qualityFill/qualityFill.html?projectCode={projectCode}&projectId={projectId}&projectName={projectName}&type={type}&typeName={typeName}";
                         var link = href.replace("{projectCode}",data.data.projectCode).replace("{projectId}",window.projectId).replace("{projectName}",encodeURI(window.projectName)).replace("{type}",window.type).replace("{typeName}",window.typeName);
