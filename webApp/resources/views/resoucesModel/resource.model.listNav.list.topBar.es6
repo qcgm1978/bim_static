@@ -15,11 +15,11 @@
  		"click .btnFileState": "btnFileStateFun",
  	},
 
- 	template: _.templateUrl('/resources/tpls/resourceModel/resource.model.listNav.list.topBar.html', true),
+ 	template: _.templateUrl('/resources/tpls/resourceModel/resource.model.listNav.list.topBar.html'),
 
  	render: function() {
  		var type = App.ResourcesNav.Settings.type=="famLibs"?'family':'model';
- 		this.$el.html(this.template);
+ 		this.$el.html(this.template({type:type}));
  		if (App.AuthObj.lib) {
 
  			if(!App.Comm.isAuth('create',type)){
@@ -37,6 +37,7 @@
  	},
  	//文件转换状态的方法
  	btnFileStateFun(){//add zhangyankai
+ 		if(App.ResourcesNav.Settings.type=="famLibs") return;
  		var addDialogEleDom = new  App.ResourceModel.FileStatus().render().el;
  		var fileStateDialog = new App.Comm.modules.Dialog({
  		    title:"文件转换状态",
