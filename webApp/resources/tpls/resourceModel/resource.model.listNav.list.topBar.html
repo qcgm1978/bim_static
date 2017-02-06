@@ -8,6 +8,10 @@
     <span class="btnFileUpload btnNormal" id="file-upload-btn" style="position: relative; z-index: 0;"><em class="myIcon-upload"></em>上传</span>
     <span class="btnFileDownLoad btnNormal"><em class="myIcon-download"></em>下载</span>
     <span class=" btnNormal btnFileDel"><em class="myIcon-del"></em>删除</span>
-    <span class="btnFileState btnNormal">文件转换状态</span>
+    <% if(obj.type=="family"){%>
+    	<span class="btnFileState btnNormal" style="cursor: default;">文件转换状态</span>
+    <%}else {%>
+    	<span class="btnFileState btnNormal">文件转换状态</span>
+    <%}%>
 </div>
 <div class="searchCount">共搜索到 <span class="count">-</span> 个相关结果</div>
