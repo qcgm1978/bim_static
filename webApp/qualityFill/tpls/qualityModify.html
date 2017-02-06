@@ -39,7 +39,7 @@
             </tr>
         </thead>
         <tbody id="gridContainer">
-            <tr id="Grid" style="display:none;" dataid="{{id}}" dataindex="{{dataIndex}}">
+            <tr id="Grid" style="display:none;" dataid="{{problemId}}" dataindex="{{dataIndex}}">
                 <td class="chk">
                     <img src="{{imageUrl}}" style="width:60px;height:60px;" align="middle"/>
                 </td>
@@ -72,6 +72,7 @@
                 <td class="w-small">
                     <button class="btn_modify">修改</button>
                     <button class="btn_save" style="display:none;">保存</button>
+                    <button class="btn_cancel" style="display:none;">取消</button>
                 </td>
             </tr>
         </tbody>
@@ -131,7 +132,9 @@ var Data = {
         */
     },
     listData : [],
-    listDataCrrentIndex:-1
+    listDataCrrentIndex:-1,
+    isEdit : false,
+    isSend : false
 };
 
 var Url = {
@@ -259,8 +262,9 @@ var Event = {
                             "levelId" : Label.level[item.levelId],
                             "organizationTypeId" : Label.person[item.organizationTypeId],
                             "ratingCategoryId" : Label.classic[item.ratingCategoryId],
-                            "locationName" : item.locationName==null ? "" : locationName,
-                            "dataIndex" : dataRow.index
+                            "locationName" : item.locationName==null ? "" : item.locationName,
+                            "dataIndex" : dataRow.index,
+                            "presetPointName" : item.presetPointName==null ? "" : item.presetPointName
                         }
                     }
                 });
@@ -283,15 +287,41 @@ var Event = {
 
         $("#gridContainer").on("click","button.btn_modify",function(){
             var tr = this.parentNode.parentNode;
+            var status;
+            if(Data.isEdit)
+            {
+                return;
+            }
             tr.style.backgroundColor = "#84C1FF";
             Data.listDataCrrentIndex = $(tr).attr("dataindex");
-            $span = $(tr).find(".status");
-            $select = $(tr).find(".select-status");
-            $btnSave = $(tr).find("button.btn_save");
+
+            var $span = $(tr).find(".status");
+            var $select = $(tr).find(".select-status");
+            var $btnSave = $(tr).find("button.btn_save");
+            var $btnCancel = $(tr).find("button.btn_cancel");
             $select.show();
             $span.hide();
             this.style.display = "none";
             $btnSave.show();
+            $btnCancel.show();
+            Data.isEdit = true;
+        });
+
+        $("#gridContainer").on("click","button.btn_cancel",function(){
+            var tr = this.parentNode.parentNode;
+            tr.style.backgroundColor = "#FFF";
+            Data.listDataCrrentIndex = -1;
+            var $span = $(tr).find(".status");
+            var $select = $(tr).find(".select-status");
+            var $btnSave = $(tr).find("button.btn_save");
+            var $btnCancel = $(tr).find("button.btn_cancel");
+            var $btnModify = $(tr).find("button.btn_modify");
+            $select.hide();
+            $span.show();
+            $btnSave.hide();
+            $btnCancel.hide();
+            $btnModify.show();
+            Data.isEdit = false;
         });
 
         $("#gridContainer").on("click","button.btn_save",function(){
@@ -300,12 +330,29 @@ var Event = {
             tr.style.backgroundColor = "#FFF";
             $span = $(tr).find(".status");
             $select = $(tr).find(".select-status");
-            $btnModify = $(tr).find("button.btn_modify");            
-            th.saveData();
+            $btnModify = $(tr).find("button.btn_modify");        
+            th.saveData($(tr));
+            Data.isEdit = false;
         });
     },
 
-    saveData:function(){
+    saveData:function($tr){
+        var dataAr=[];
+        var dataItem = {};
+        if(Data.isSend)/*是否正在发送*/
+        {
+            return;
+        }
+        $span = $tr.find(".status");
+        $select = $tr.find(".select-status");
+        $btnSave = $tr.find(".btn_save");
+        $btnCancel = $tr.find(".btn_cancel");
+        dataItem = Data.listData[Data.listDataCrrentIndex];
+        dataItem.id = dataItem.id.toString();
+        dataItem.projectId = dataItem.projectId.toString();
+        dataItem.status = $select.val();
+        dataItem.id = dataItem.problemId;
+        dataAr.push(dataItem);
 
         Data.formData.msgContent = JSON.stringify({
         "messageId": "411a109141d6473c83a86aa0480d6610",
@@ -313,8 +360,10 @@ var Event = {
         "message": "是",
         "timestamp": (new Date).getTime(),
         "code": 0,
-        "data": Data.listData[Data.listDataCrrentIndex]
+        "data": dataAr
         });
+
+        Data.isSend = true;
 
         $.ajax({
             url:"/sixD/internal/message",   /*MQ 隐患接口*/
@@ -328,10 +377,12 @@ var Event = {
             if(data.code==0)
             {
                 $span.show();
-                $span.html(Label.checkResult[$select.val()]);
+                $span.html(Label.status[$select.val()]);
                 $select.hide();
                 $btnModify.show();
                 $btnSave.hide();
+                $btnCancel.hide();
+                Data.isSend = false;
                 alert("保存成功！");
             }
         });
