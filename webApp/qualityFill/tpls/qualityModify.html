@@ -264,7 +264,8 @@ var Event = {
                             "ratingCategoryId" : Label.classic[item.ratingCategoryId],
                             "locationName" : item.locationName==null ? "" : item.locationName,
                             "dataIndex" : dataRow.index,
-                            "presetPointName" : item.presetPointName==null ? "" : item.presetPointName
+                            "presetPointName" : item.presetPointName==null ? "" : item.presetPointName,
+                            "rectifyCount" : item.rectifyCount==null ? "0" : item.rectifyCount
                         }
                     }
                 });
@@ -294,11 +295,12 @@ var Event = {
             }
             tr.style.backgroundColor = "#84C1FF";
             Data.listDataCrrentIndex = $(tr).attr("dataindex");
-
+            status = Data.listData[Data.listDataCrrentIndex].status;
             var $span = $(tr).find(".status");
             var $select = $(tr).find(".select-status");
             var $btnSave = $(tr).find("button.btn_save");
             var $btnCancel = $(tr).find("button.btn_cancel");
+            $select[0].selectedIndex = status -1;
             $select.show();
             $span.hide();
             this.style.display = "none";

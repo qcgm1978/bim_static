@@ -186,6 +186,9 @@ input{
 #gridContainer tr{
 	height: 70px;
 }
+#gridContainer tr:hover{
+	background-color: #eaeaea;
+}
 
 
 /*日期控件style*/
