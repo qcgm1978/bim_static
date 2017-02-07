@@ -97,6 +97,8 @@
 </body>
 </html>
 <script type="text/javascript">
+
+
 Date.getDateFromMill = function(value){
     var date = new Date(value);
     return date.getFullYear() + "-" + (date.getMonth()+1) + "-" + date.getDate();
@@ -133,8 +135,8 @@ var Data = {
     },
     listData : [],
     listDataCrrentIndex:-1,
-    isEdit : false,
-    isSend : false
+    isEdit : false, /*是否已编辑*/
+    isSend : false  /*是否保存中*/
 };
 
 var Url = {
