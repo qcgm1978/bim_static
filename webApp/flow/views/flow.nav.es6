@@ -17,9 +17,12 @@ App.Flow.NavView=Backbone.View.extend({
 		this.listenTo(App.Flow.Controller.flowNavCollection,'reset',this.load);
 	},
 	flowAdminBtnFun(){//管理依据的按钮点击之后的方法
+		var flowContainer = $("#flowContainer");
 		var ContentAdminBasiView = new App.Flow.ContentAdminBasiView();
-		$("#flowContainer").empty();
-		$("#flowContainer").html(ContentAdminBasiView.render().el);
+		$(".flowTabNav > li").removeClass("itemSelected");
+		flowContainer.empty();
+		flowContainer.css("margin-top","34px");
+		flowContainer.html(ContentAdminBasiView.render().el);
 	},
 	switchModel(e){
 		var $target=$(e.currentTarget);
