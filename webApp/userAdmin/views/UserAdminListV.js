@@ -1,4 +1,6 @@
 App.userAdmin.UserAdminListV = Backbone.View.extend({
+	tagName:'div',
+	className:'userAdminClassName',
 	default:{
 		pageIndex:1
 	},
@@ -10,6 +12,17 @@ App.userAdmin.UserAdminListV = Backbone.View.extend({
 	render:function(){
 		this.getViewUserListFun();//第一次进入 获取用户列表的方法
 		return this;
+	},
+	initScroll:function(){
+		$(".userAdminListClass").mCustomScrollbar({
+             set_height: "100%",
+             theme: 'minimal-dark',
+             axis: 'y',
+             keyboard: {
+                 enable: true
+             },
+             scrollInertia: 0
+         });
 	},
 	getViewUserListFun:function(){//获取浏览用户列表的方法
 		var _this = this;
@@ -23,6 +36,24 @@ App.userAdmin.UserAdminListV = Backbone.View.extend({
 				if(response.code == 0){
 					_this.$el.html("");
 					_this.$el.html(_this.template({state:response.data.items}));
+					var $content = $(".pagingBox");
+					var pageCount = response.data.totalItemCount;
+					$content.find(".sumDesc").html('共 ' + pageCount + ' 个用户');
+					$content.find(".listPagination").empty().pagination(pageCount, {
+					    items_per_page: response.data.pageItemCount,
+					    current_page: response.data.pageIndex - 1,
+					    num_edge_entries: 3, //边缘页数
+					    num_display_entries: 5, //主体页数
+					    link_to: 'javascript:void(0);',
+					    itemCallback: function(pageIndex) {
+					        //加载数据
+					        _this.default.pageIndex = pageIndex + 1;
+					        _this.getViewUserListFun();
+					    },
+					    prev_text: "上一页",
+					    next_text: "下一页"
+					});
+					_this.initScroll();
 				}
 			}
 		})

@@ -1,4 +1,6 @@
 App.userAdmin.UserAdminPrefixListV = Backbone.View.extend({
+	tagName:'div',
+	className:'userAdminClassName',
 	default:{
 		pageIndex:1
 	},
@@ -10,6 +12,17 @@ App.userAdmin.UserAdminPrefixListV = Backbone.View.extend({
 	render:function(){
 		this.getViewUserPrefixListFun();//第一次进入 获取用户前缀列表的方法
 		return this;
+	},
+	initScroll:function(){
+		$(".userAdminListClass").mCustomScrollbar({
+             set_height: "100%",
+             theme: 'minimal-dark',
+             axis: 'y',
+             keyboard: {
+                 enable: true
+             },
+             scrollInertia: 0
+         });
 	},
 	getViewUserPrefixListFun:function(){//获取浏览用户前缀列表的方法
 		var _this = this;
@@ -23,6 +36,7 @@ App.userAdmin.UserAdminPrefixListV = Backbone.View.extend({
 				if(response.code == 0){
 					_this.$el.html("");
 					_this.$el.html(_this.template({state:response.data}));
+					_this.initScroll();
 				}
 			}
 		})
