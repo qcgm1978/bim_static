@@ -344,6 +344,9 @@ App.API = {
 		checkUserPrefix:"platform/testuser/check/prefix",//检查用户前缀是否存在的地址
 		addViewUserPrefix:"platform/testuser/prefix",//添加用户前缀的地址
 		deleteViewUserPrefix:"platform/testuser/prefix",//删除用户前缀的地址
+
+		relLink:"platform/relLink",//获取链接地址的接口
+
 	},
 
 	DEBUGURL: {

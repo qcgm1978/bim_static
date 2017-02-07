@@ -22,7 +22,7 @@ App.Flow.NavView=Backbone.View.extend({
 			$('.itemSelected').removeClass('itemSelected');
 			$target.addClass('itemSelected');
 			var id=$target.data('id');
-			this.$("#flowMoreBtn a").attr('href',$target.data('link'))
+			this.$("#flowMoreBtn a").attr('href',$target.data('link'));
 			this.loadContent(id);
 		}
 	},
