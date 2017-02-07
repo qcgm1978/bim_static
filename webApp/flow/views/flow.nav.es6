@@ -9,13 +9,18 @@ App.Flow.NavView=Backbone.View.extend({
 	template:_.templateUrl("/flow/tpls/flow.nav.html",true),
 
 	events:{
-		'click .flowTabItem':'switchModel'
+		'click .flowTabItem':'switchModel',
+		'click #flowAdminBtn a':'flowAdminBtnFun',
 	},
 	
 	initialize(){
 		this.listenTo(App.Flow.Controller.flowNavCollection,'reset',this.load);
 	},
-
+	flowAdminBtnFun(){//管理依据的按钮点击之后的方法
+		var ContentAdminBasiView = new App.Flow.ContentAdminBasiView();
+		$("#flowContainer").empty();
+		$("#flowContainer").html(ContentAdminBasiView.render().el);
+	},
 	switchModel(e){
 		var $target=$(e.currentTarget);
 		if(!$target.hasClass('itemSelected')){
