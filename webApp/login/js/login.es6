@@ -6,8 +6,7 @@ var Login = {
 		var Days = 0.02,
 			exp = new Date();
 		exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 1000);
-		//document.cookie = name + "=" + value + ";expires=" + exp.toGMTString() + ";domain=" + Login.doMain + ";path=/";
-		document.cookie = name + "=" + value + ";expires=" + exp.toGMTString() + ";domain=" + "139.217.25.150" + ";path=/";
+		document.cookie = name + "=" + value + ";expires=" + exp.toGMTString() + ";domain=" + Login.doMain + ";path=/";
 	},
 	//获取cookie
 	getCookie: function(key, cookis) {
