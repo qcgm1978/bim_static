@@ -19,13 +19,22 @@ App.Flow.NavView=Backbone.View.extend({
 	flowAdminBtnFun(){//管理依据的按钮点击之后的方法
 		var flowContainer = $("#flowContainer");
 		var ContentAdminBasiView = new App.Flow.ContentAdminBasiView();
+		$("#flowAdminBtn").addClass("adminAbsiOn");
 		$(".flowTabNav > li").removeClass("itemSelected");
 		flowContainer.empty();
 		flowContainer.css("margin-top","34px");
 		flowContainer.html(ContentAdminBasiView.render().el);
+		this.bindEvent();
+	},
+	bindEvent:function(){
+		$('#downZip').on('click',function(){
+			var id=$(this).data('id');
+			window.open(id,'_blank');
+		})
 	},
 	switchModel(e){
 		var $target=$(e.currentTarget);
+		$("#flowAdminBtn").removeClass("adminAbsiOn");
 		if(!$target.hasClass('itemSelected')){
 			$('.itemSelected').removeClass('itemSelected');
 			$target.addClass('itemSelected');

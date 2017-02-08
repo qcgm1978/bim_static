@@ -31,7 +31,12 @@ App.Flow.Controller={
 		$("#pageLoading").hide();
 		
 	},
-	
+	flowPageName:function(pageName){
+        var ContentAdminBasiPageView = new App.Flow.ContentAdminBasiPageView().render(pageName).el;
+        $('#contains').empty("");
+        $('#contains').html(ContentAdminBasiPageView);
+        $("#pageLoading").hide();
+    },
 	flowCollection:new (Backbone.Collection.extend({
          model: Backbone.Model.extend({
              defaults: function() {

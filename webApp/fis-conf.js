@@ -109,6 +109,15 @@ fis.match('flow/**.html', {
   //useHash:true,
   release: "/static/dist/tpls/$0"
 });
+fis.match('flow/tpls/down/BIM总发包操作手册.zip', {
+  //useHash:true,
+  release: "/static/dist/tpls/$0"
+});
+fis.match('flow/tpls/text_images/**.png', {
+  //useHash:true,
+  release: "/static/dist/tpls/$0"
+});
+
 fis.match('libs/**.html', {
   //useHash:true,
   release: "/static/dist/tpls/$0"
