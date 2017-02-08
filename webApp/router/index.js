@@ -8,6 +8,7 @@ var AppRoute = Backbone.Router.extend({
 		'projects/:id/:versionId': 'project',
 		'projects/:id/:versionId/:viewPintId': 'projectViewPoint',
 		'flow': 'flow',
+		'flow/:pageName': 'flowDetail',
 		'resources': 'resources',
 		'resources/:type': 'resource',
 		'resources/:type/:optionType': 'resourceMapping',
@@ -178,7 +179,16 @@ var AppRoute = Backbone.Router.extend({
 		_.require('/static/dist/flow/flow.js');
 		App.Flow.Controller.init();
 	},
-
+	flowDetail: function(pageName) {
+		if (this.reset() == false) {
+			return;
+		}
+		//业务流程的栏目 执行的js
+		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".flow").addClass('selected');
+		_.require('/static/dist/flow/flow.css');
+		_.require('/static/dist/flow/flow.js');
+		App.Flow.Controller.flowPageName(pageName);
+	},
 	//资源库
 	resources: function() {
 
