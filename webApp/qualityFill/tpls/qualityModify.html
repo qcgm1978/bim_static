@@ -6,7 +6,7 @@
     <!--<meta http-equiv="pragma" content="no-cache"> -->
     <META HTTP-EQUIV="pragma" CONTENT="no-cache">
     <META HTTP-EQUIV="Cache-Control" CONTENT="no-store, must-revalidate">
-    <title>隐患填报模拟修改</title>
+    <title>隐患填报列表</title>
     <link rel="styleSheet" href="/static/dist/qualityFill/css/quality.css" />
     <script src="http://cdn.bootcss.com/jquery/1.9.1/jquery.min.js"></script>
     <script src="/static/dist/qualityFill/js/template.min.js"></script>
@@ -19,6 +19,11 @@
 </head>
 <body>
 
+<div style="height:50px;line-height:50px;font-weight:bold;font-size:18px;">
+    <span>项目名称：</span>
+    <span id="title"></span>
+    <span style="color: #A23400">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;隐患列表</span>
+</div>
 <div id="grid" class="grid">
     <table border="0" cellpadding="0" cellspacing="0">
         <thead>
@@ -92,6 +97,13 @@
         <button id="DlgBtn_close">关闭</button>
         <button id="DlgBtn_ok">确定</button>
     </div>
+</div>
+
+<div id="loading" class="loading">
+    数据加载中...
+</div>
+<div id="noDataTip" class="noDataTip">
+    无数据！
 </div>
 
 </body>
@@ -248,7 +260,9 @@ var Event = {
                 if(data.code!=0)
                 {
                     list = [];
+                    $("#noDataTip").show();
                 }
+                $("#loading").hide();
                 template.startSymbol("{{");
                 template.endSymbol("}}");
                 template.repeat({
@@ -398,6 +412,7 @@ var Event = {
 var init = function(){
     initDialog();
     Event.bindEvent();
+    $("#title").html(decodeURI(Url.getParam("projectName")));
 };
 
 init();

@@ -115,7 +115,7 @@
         <button id="btn_delete">删除</button>
         <button id="btn_save">保存</button>
         <button id="btn_unbind">解绑预设点</button>
-        <button id="btn_see">查看隐患</button>
+        <button id="btn_see" style="background-color:#D3FF93">查看隐患列表</button>
     </div>
 </div>
 
@@ -495,7 +495,7 @@ var Event = {
 
 
 
-            if($tr.find(".linkBtn-ready-pos").html()==readyPosState[1]&&$tr.find(".select-result").val()==1) /*绑定预设点,就走MQ1(结构少)*/
+            if($tr.find(".linkBtn-ready-pos").html()==readyPosState[1]&&$tr.find(".select-result").val()==2) /*绑定预设点,就走MQ1(结构少),合格*/
             {
                 itemData.id = Date.guid();
                 itemData.projectCode = Url.getParam("projectCode");
@@ -546,7 +546,7 @@ var Event = {
             itemDatas.push(itemData);
         });
 
-        if(itemDatas2.length>0) /*MQ1接口,QUALITY-1005 结构少*/
+        if(itemDatas2.length>0) /*MQ1接口,QUALITY-1005 结构少（合格）*/
         {
             Data.formData.msgContent = JSON.stringify({
             "messageId": "411a109141d6473c83a86aa0480d6610",
@@ -560,17 +560,20 @@ var Event = {
             this.sendData();
         }
 
-        Data.formData.msgContent = JSON.stringify({
-        "messageId": "411a109141d6473c83a86aa0480d6610",
-        "messageType": "QUALITY-1004",
-        "message": "是",
-        "timestamp": (new Date).getTime(),
-        "code": 0,
-        "data": itemDatas
-        });
-        console.log("save-1004",Data.formData);
+        if(itemDatas.length>0) /*MQ2接口,QUALITY-1004 结构度（不合格）*/
+        {
+            Data.formData.msgContent = JSON.stringify({
+            "messageId": "411a109141d6473c83a86aa0480d6610",
+            "messageType": "QUALITY-1004",
+            "message": "是",
+            "timestamp": (new Date).getTime(),
+            "code": 0,
+            "data": itemDatas
+            });
+            console.log("save-1004", itemDatas);
+            this.sendData();
+        }
 
-        this.sendData();
 
         $("#gridContainer").html("");
     },
@@ -679,11 +682,11 @@ var Event = {
                         '</td>'+
                         '<td>'+
                             '<select class="select-type">'+
-                                '<option value="1">实测实量</option>'+
+
                                 '<option value="2">防水工程</option>'+
                                 '<option value="3">施工质量</option>'+
                                 '<option value="4">安全文明</option>'+
-                                '<option value="5">总包内业资料</option>'+
+
                                 '<option value="6">材料设备</option>'+
                             '</select>'+
                         '</td>'+
@@ -782,8 +785,9 @@ var Event = {
 
         /*查看隐患-列表,转到新页面qualityModify.html*/
         $("#btn_see").on("click",function(){
-            var href = "/static/dist/qualityFill/qualityModify.html?projectId={projectId}";
+            var href = "/static/dist/qualityFill/qualityModify.html?projectId={projectId}&projectName={projectName}";
             href = href.replace("{projectId}",Url.getParam("projectId"));
+            href = href.replace("{projectName}",(Url.getParam("projectName")));
             //location.href = href;
             window.open(href);
         });
@@ -802,7 +806,7 @@ var Event = {
             var $select_person = $tr.find(".select-person");
             var $select_type = $tr.find(".select-type");
             
-            if(this.value=="1")/*合格*/
+            if(this.value=="1")/*不合格*/
             {
                 $input_trouble.show();
                 $linkBtn_pos.show();
@@ -815,7 +819,7 @@ var Event = {
                 $select_person.show();
                 $select_type.show();
             }
-            else /*不合格*/
+            else /*合格*/
             {
                 $input_trouble.hide();
                 $linkBtn_pos.hide();

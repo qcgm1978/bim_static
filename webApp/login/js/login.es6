@@ -2,10 +2,32 @@ var Login = {
 
 	doMain: window.location.host.substring(window.location.host.indexOf(".")),
 
+	isIp : function(){
+		//判断URL是否是IP地址,是IP地址返回IP地址,否则返回空字符串
+		var ip="";
+		var host = location.host;
+		var reg = /\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/;
+		
+		if(reg.test(host))
+		{
+			ip = host;
+		}
+		else
+		{
+			ip = "";
+		}
+		return ip;
+	},
+
 	setCookie(name, value) {
+		var ip = Login.isIp();
 		var Days = 0.02,
 			exp = new Date();
 		exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 1000);
+		if(ip!="")
+		{
+			Login.doMain = ip;
+		}
 		document.cookie = name + "=" + value + ";expires=" + exp.toGMTString() + ";domain=" + Login.doMain + ";path=/";
 	},
 	//获取cookie

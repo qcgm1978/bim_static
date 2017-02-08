@@ -189,6 +189,32 @@ input{
 #gridContainer tr:hover{
 	background-color: #eaeaea;
 }
+.loading{
+	position: fixed;
+	width:200px;
+	height: 30px;
+	line-height: 30px;
+	border:1px solid #aaa;
+	background-color: #96FED1;
+	top:10%;
+	left:50%;
+	margin-left:-100px;
+	text-align: center;
+}
+.noDataTip{
+	position: fixed;
+	width:200px;
+	height: 30px;
+	line-height: 30px;
+	border:1px solid #aaa;
+	background-color: #96FED1;
+	top:10%;
+	left:50%;
+	margin-left:-100px;
+	text-align: center;
+	display: none;
+}
+
 
 
 /*日期控件style*/
