@@ -19,7 +19,7 @@
     }
     window.App={};
     var Project = {
-        pageSize:20,
+        pageSize:14,
         pageNum:1,
         Settings: null,
         data:null,
