@@ -24,6 +24,7 @@ ViewComp.MemberManager = Backbone.View.extend({
 		"click .closeicon":"clearSearch",
 		"keyup #searchContent":"searchCli"
 	},
+	isSearch : false,
 	initialize:function(){
 		
 	//	this.listenTo(App.Services.projectMember.projectMemberOrgCollection,'reset',this.initView)
