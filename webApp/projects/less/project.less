@@ -32,6 +32,12 @@
 			&.showPropety { display: block; }
 		}
 		.projectCotent { position: relative; height: 100%; margin-left: 240px;
+			.containerHeader{
+				height: 27px;
+			}
+			.opBox{
+				float: left;
+			}
 			&.showPropety { margin-left: 0px; }
 			.fileContainer { padding: 10px; height: 100%; box-sizing: border-box;
 				.fileContainerScroll { position: absolute; top: 75px; bottom: 0px; left: 10px; right: 10px; }
@@ -614,4 +620,15 @@
 	line-height: normal!important;
 	margin-top: 12px!important;
 	cursor: pointer!important;
+}
+//修改版本的展示效果
+.showContentList{
+	display: none;
+	width: 100%;
+	height: auto;
+}
+.versionNoheaderShow{
+	.showContentList{
+		display: block;
+	}
 }
