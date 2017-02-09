@@ -172,6 +172,7 @@ Date.guid = function(){
              date.getMilliseconds().toString();
     return dataid;
 }
+
 Date.getLong = function(stringDate){
     var date = new Date(stringDate);
     return date.getTime();
@@ -471,7 +472,7 @@ var Event = {
         var itemData , itemDatas=[], itemDatas2=[] , $tr , componentData , presetPointData , dataid , imageId;
         var point , pos;
         var validate;
-
+        var itemIndex = 0; /*用Date.Guid()+itemIndex*/
         validate = this.validate();
         if(!validate.result)
         {
@@ -480,6 +481,7 @@ var Event = {
         }
 
         $trs.each(function(index){
+            itemIndex++;
             $tr = $(this);
             dataid = $tr.attr("dataid");
             try
@@ -497,7 +499,7 @@ var Event = {
 
             if($tr.find(".linkBtn-ready-pos").html()==readyPosState[1]&&$tr.find(".select-result").val()==2) /*绑定预设点,就走MQ1(结构少),合格*/
             {
-                itemData.id = Date.guid();
+                itemData.id = Date.guid() + itemIndex.toString();
                 itemData.projectCode = Url.getParam("projectCode");
                 itemData.acceptanceType = Url.getParam("type")=="process"? 1 : 2 ;
                 itemData.acceptanceId = null;
@@ -530,7 +532,7 @@ var Event = {
 
             itemData.PresetPointCompoentID = "";
             itemData.dangerImageID = imageId==undefined ? "" : imageId;/*上传图片后的ID*/
-            itemData.id = Date.guid();
+            itemData.id = Date.guid() + itemIndex.toString();
             itemData.projectId = Url.getParam("projectId");
             itemData.projectCode = Url.getParam("projectCode");
             itemData.acceptanceType = Url.getParam("type")=="process"? 1 : 2 ;

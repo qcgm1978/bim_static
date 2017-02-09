@@ -60,6 +60,12 @@
             var self = upload
             options.init = {
                 FilesAdded: function(up, files) {
+
+                    if(!options.beforeAdd(files))/*返回false,终止上传;返回true,继续上传 add by wuweiwei 2017-2-9*/
+                    {
+                        return;
+                    }
+
                     if (!options.canUploadFile()) {
                         //jquery.plupload.quere.js b绑定了 FilesAdded 这个时候文件已经存在了，所以 要删除
                         App.isUploading = false;
@@ -86,9 +92,10 @@
                             file.parentId = parentId
                         })
                     }
-                    up.start()
+                    up.start();
                 },
                 BeforeUpload: function(up, file) {
+
                     if (options.getUploadedBytesUrl && (file.size > options.skipCheckSize && typeof file.uploadedBytes === 'undefined')) {
                         up.stop()
                         $.getJSON(options.getUploadedBytesUrl(file.parentId), {
@@ -100,7 +107,7 @@
                         })
                     } else {
                       
-                        var fn =file.fullPath || file.name
+                        var fn =file.fullPath || file.name;
                         up.settings.multipart_params = {
                             fileId: file.parentId,
                             fileName: fn,
@@ -114,6 +121,7 @@
                     }
                 },
                 UploadFile: function(up, file) {
+
                     isUploading = true;
                     /*self.maskTree.createMask();*/
                 },
