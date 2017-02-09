@@ -121,19 +121,20 @@ App.Project.FileContainer = Backbone.View.extend({
 		}
 
 		App.Comm.ajax(data, (data) => {
-
 			if (data.code == 0) {
 				var count = data.data.length;
 				this.$(".clearSearch").show();
-				this.$(".opBox").hide();
+				this.$(".opBox").find(".btnNewFolder").hide();
+				this.$(".opBox").find(".btnFileUpload").hide();
+				this.$(".opBox").find(".btnFileState").hide();
 				this.$(".searchCount").show().find(".count").text(count);
 				App.Project.FileCollection.reset();
 
 				if (count > 0) {
 					var _temp=data.data||[];
-					_.each(_temp,function(item){
-						item.isSearch='search';
-					})
+					// _.each(_temp,function(item){
+					// 	item.isSearch='search';
+					// })
 					App.Project.FileCollection.push(_temp);
 				} else {
 					App.Project.FileCollection.trigger("searchNull");
@@ -150,9 +151,10 @@ App.Project.FileContainer = Backbone.View.extend({
 
 	//清除搜索
 	clearSearch() {
-
 		this.$(".clearSearch").hide();
-		this.$(".opBox").show();
+		this.$(".opBox").find(".btnNewFolder").show();
+		this.$(".opBox").find(".btnFileUpload").show();
+		this.$(".opBox").find(".btnFileState").show();
 		this.$(".searchCount").hide();
 		$("#txtFileSearch").val("");
 		App.Project.Settings.searchText="";

@@ -1321,6 +1321,7 @@ App.Project = {
 				var fileVersionId = $item.find(".filecKAll").data("fileversionid"),
 					id = $item.find(".text").data("id"),
 					models = App.Project.FileCollection.models;
+				$(".count").text(parseInt($(".count").text())-1);
 				//修改数据
 				$.each(models, function(i, model) {
 					if (model.toJSON().id == id) {
@@ -1750,11 +1751,11 @@ App.Project = {
 			var $selFile = $("#projectContainer .fileContent :checkbox:checked").parent();
 
 			if ($selFile.length < 1) {
-				App.Services.Dialog.alert('请选择需要删除的文件...');
+				alert('请选择需要删除的文件...');
 				return;
 			}
 			if ($selFile.length > 1) {
-				App.Services.Dialog.alert('目前只支持单文件删除...');
+				alert('目前只支持单文件删除...');
 				return;
 			}
 			var $item = $selFile.closest(".item");
@@ -1950,7 +1951,9 @@ App.Project = {
 
 				//清除搜索
 				$("#projectContainer .fileContainer").find(".clearSearch").hide().end().
-				find(".opBox").show().end().
+				find(".btnNewFolder").show().end().
+				find(".btnFileUpload").show().end().
+				find(".btnFileState").show().end().
 				find(".searchCount").hide().end().
 				find("#txtFileSearch").val("");
 				App.Project.Settings.searchText = "";

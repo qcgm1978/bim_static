@@ -21,8 +21,8 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		"keyup .projectList .txtSearch": "filterProject",
 		"keyup .projectVersionList .txtSearch": "filterProjectVersion",
 		"click .modleTitleBar": "triggerUpDown",
-		"click .modleShowHide": "slideUpAndDown"
-
+		"click .modleShowHide": "slideUpAndDown",
+		"click .versionNoheader .header": "listSlideUpAndDown"
 	},
 
 	render: function() {
@@ -57,31 +57,55 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		}
 
 	},
-
+	listSlideUpAndDown(evt) { //版本列表的折叠与打开
+		evt.stopPropagation();
+		var target = $(evt.target);
+		var targetPar = target.parent();
+		var targetParSib = targetPar.siblings();
+		if (targetParSib.hasClass("versionNoheaderShow")) {
+			targetParSib.removeClass("versionNoheaderShow");
+		}
+		if (targetPar.hasClass("versionNoheaderShow")) {
+			targetPar.removeClass("versionNoheaderShow");
+		} else {
+			targetPar.addClass("versionNoheaderShow");
+		}
+	},
 	//过滤项目版本
 	filterProjectVersion(event, t) {
 		var $target = t || $(event.target),
 			val = $target.val().trim(),
-			type = this.currentVersionType || 'release';
-		$list = $target.parent().find(".container " + " ." + type + "VersionBox" + " a.item"),
+			type = this.currentVersionType || 'release',
+			$list = $target.parent().find(".container " + " ." + type + "VersionBox" + " a.item"),
 			$noheader = $target.parent().find('.' + type + 'VersionBox' + ' .versionNoheader');
-		$noheader.show();
-		$list.show();
-		$list.each(function() {
-			if ($(this).find(".vName").text().indexOf(val) < 0) {
-				$(this).hide();
-			}
-		});
-		$noheader.each(function() {
-				if (!$(this).find('.item').is(':visible')) {
+		if(val == ""){
+			$(".releaseVersionBox").find(".versionNoheader").removeClass('versionNoheaderShow').eq(0).addClass('versionNoheaderShow');
+			$(".changeVersionBox").find(".versionNoheader").removeClass('versionNoheaderShow').eq(0).addClass('versionNoheaderShow');
+			$noheader.show();
+			$list.show();
+			return;
+		}else{
+			$(".versionNoheader").addClass('versionNoheaderShow');
+			$noheader.show();
+			$list.show();
+			$list.each(function() {
+				if ($(this).find(".vName").text().indexOf(val) < 0) {
+					$(this).hide();
+				}
+			});
+			$noheader.each(function() {
+				var len=0;
+				var thisItem = $(this).find('.item');
+				thisItem.each(function(){
+					if($(this).css("display")!="block"){
+						len++;
+					}
+				})
+				if(thisItem.length == len){
 					$(this).hide();
 				}
 			})
-			/*if (!val) {
-				$list.show();
-			} else {
-				
-			}*/
+		}
 	},
 
 	triggerUpDown: function(e) {
@@ -135,21 +159,21 @@ App.Project.ProjectContainer = Backbone.View.extend({
 								var type1 = '',
 									type2 = '';
 								for (var j = 0; j < props[i]['value'].length; j++) {
-									if(props[i]['value'][j]['unit'] && props[i]['value'][j]['unit'].slice(0,2)=="01"){
+									if (props[i]['value'][j]['unit'] && props[i]['value'][j]['unit'].slice(0, 2) == "01") {
 
 										type1 += '<li class="modleItem"><div class="modleNameText overflowEllipsis modleName2"><a target="_blank" href="' + props[i]['value'][j]['value'] + '">' + props[i]['value'][j]['name'] + '</a>&nbsp;&nbsp;</div></li>';
-									}else if(props[i]['value'][j]['unit'] && props[i]['value'][j]['unit'].slice(0,2)=="02"){
+									} else if (props[i]['value'][j]['unit'] && props[i]['value'][j]['unit'].slice(0, 2) == "02") {
 
 										type2 += '<li class="modleItem"><div class="modleNameText overflowEllipsis modleName2"><a target="_blank" href="' + props[i]['value'][j]['value'] + '">' + props[i]['value'][j]['name'] + '</a>&nbsp;&nbsp;</div></li>';
 
-									}else{
+									} else {
 										str += '<li class="modleItem"><div class="modleNameText overflowEllipsis modleName2"><a target="_blank" href="' + props[i]['value'][j]['value'] + '">' + props[i]['value'][j]['name'] + '</a>&nbsp;&nbsp;</div></li>';
 
 									}
 
 								}
-								type1 ? str +=('<li class="modleItem"><span class="modleName overflowEllipsis"><div class="modleNameText overflowEllipsis">过程验收</div></span> <span class="modleVal rEnd"></span> </li>'+ type1 ):'';
-								type2 ? str +=('<li class="modleItem"><span class="modleName overflowEllipsis"><div class="modleNameText overflowEllipsis">开业验收</div></span> <span class="modleVal rEnd"></span> </li>'+ type2 ):'';
+								type1 ? str += ('<li class="modleItem"><span class="modleName overflowEllipsis"><div class="modleNameText overflowEllipsis">过程验收</div></span> <span class="modleVal rEnd"></span> </li>' + type1) : '';
+								type2 ? str += ('<li class="modleItem"><span class="modleName overflowEllipsis"><div class="modleNameText overflowEllipsis">开业验收</div></span> <span class="modleVal rEnd"></span> </li>' + type2) : '';
 
 							} else {
 								str += '<li class="modleItem"><div class="modleNameText overflowEllipsis modleName2">' + props[i]['property'] + '</div></li>';
@@ -244,7 +268,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 			$("#pageLoading").show();
 			location.reload();
 		} else {
-			App.count ++;
+			App.count++;
 			if ($target.prop("href") != location.href && App.Project.Settings.Viewer) {
 				App.Project.Settings.Viewer.destroy();
 				App.Project.Settings.Viewer = null;
@@ -524,46 +548,46 @@ App.Project.ProjectContainer = Backbone.View.extend({
 		viewer.on("click", function(model) {
 			//取消计划高亮
 			var result = that.cancelhighlightPlan(),
-			    viewer = App.Project.Settings.Viewer,
-			    isIsolateState = viewer.viewer.getFilters().isIsolateState(),
-			    selectedIds = viewer.getSelectedIds();
-			if(isIsolateState){
+				viewer = App.Project.Settings.Viewer,
+				isIsolateState = viewer.viewer.getFilters().isIsolateState(),
+				selectedIds = viewer.getSelectedIds();
+			if (isIsolateState) {
 				$('#isolation').show();
-			}else{
+			} else {
 				$('#isolation').hide();
 			}
 			App.Project.Settings.ModelObj = null;
 			if (!model.intersect) {
-				if(selectedIds){
+				if (selectedIds) {
 					var obj,
 						arr = [];
-					if(Object.keys(selectedIds).length==1){
-						for(var i in selectedIds){
+					if (Object.keys(selectedIds).length == 1) {
+						for (var i in selectedIds) {
 							obj = {
-								userId : i,
-								sceneId : selectedIds[i]['sceneId']
+								userId: i,
+								sceneId: selectedIds[i]['sceneId']
 							}
 						}
 						App.Project.Settings.ModelObj = {
 							intersect: {
-								userId:obj.userId,
-								object:{
-									userData:{
-										sceneId:obj.sceneId
+								userId: obj.userId,
+								object: {
+									userData: {
+										sceneId: obj.sceneId
 									}
 								}
 							}
 						};
 						that.viewerPropertyRender();
-					}else{
-						for(var i in selectedIds){
-							if(arr[0]){
-								if(arr[0] != selectedIds[i]['classCode'] ){
+					} else {
+						for (var i in selectedIds) {
+							if (arr[0]) {
+								if (arr[0] != selectedIds[i]['classCode']) {
 									that.resetProperNull();
 									return;
 								}
 
-							}else{
+							} else {
 								arr[0] = selectedIds[i]['classCode']
 							}
 						}
@@ -571,27 +595,27 @@ App.Project.ProjectContainer = Backbone.View.extend({
 						var uid = Object.keys(selectedIds)[0],
 							info = selectedIds[uid];
 
-							obj = {
-								userId : uid,
-								sceneId : info['sceneId']
-							};
+						obj = {
+							userId: uid,
+							sceneId: info['sceneId']
+						};
 						App.Project.Settings.ModelObj = {
 							intersect: {
-								userId:obj.userId,
-								object:{
-									userData:{
-										sceneId:obj.sceneId
+								userId: obj.userId,
+								object: {
+									userData: {
+										sceneId: obj.sceneId
 									}
 								}
 							}
 						};
 						that.viewerPropertyRender();
 					}
-				}else{
+				} else {
 					that.resetProperNull();
 				}
 				return;
-			}else if(Object.keys(selectedIds).length>1){
+			} else if (Object.keys(selectedIds).length > 1) {
 				that.resetProperNull();
 				return;
 			}
@@ -638,7 +662,7 @@ App.Project.ProjectContainer = Backbone.View.extend({
 				type: "classCode"
 			});
 			$('#lockAxisZ').show();
-			
+
 			/*add by wuweiwei init filter checkbox state*/
 			$($("#specialty .itemContent")[0]).find(".m-lbl").addClass("m-lbl-2");
 		});
