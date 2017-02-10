@@ -21,13 +21,16 @@ var Login = {
 
 	setCookie(name, value) {
 		var ip = Login.isIp();
-		var Days = 0.002,
+		var Days = 0.02,
 			exp = new Date();
-		//exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 1000);
-		exp.setTime(exp.getTime() + 5000);
+		exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 1000);
 		if(ip!="")
 		{
 			Login.doMain = ip;
+		}
+		if(location.host == "bim-demo.wanda.cn")
+		{
+			exp.setTime(exp.getTime() + 365 * 24 * 60 * 60 * 1000);
 		}
 		document.cookie = name + "=" + value + ";expires=" + exp.toGMTString() + ";domain=" + Login.doMain + ";path=/";
 	},
