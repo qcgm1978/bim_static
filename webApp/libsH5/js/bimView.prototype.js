@@ -843,8 +843,20 @@
       var viewer = self.viewer;
       var filter = viewer.getFilters();
       if(App.Project){
-        var ProjectContainer = new App.Project.ProjectContainer;
-        ProjectContainer.resetProperNull();
+        if(App.Project.ProjectContainer){
+          var ProjectContainer = new App.Project.ProjectContainer;
+          ProjectContainer.resetProperNull();
+        }else{
+          App.Project.resetModelNull();
+        }
+        // if(App.Project.ProjectContainer){
+        //   var ProjectContainer = new App.Project.ProjectContainer;
+        //   ProjectContainer.resetProperNull();
+        // }else{
+        //   var ProjectContainer = new App.Project.ProjectContainer;
+        //   ProjectContainer.resetProperNull();
+        // }
+        
       }
       if(App.Index){
         App.Index.setAttrNull();
