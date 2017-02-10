@@ -28,6 +28,10 @@ var Login = {
 		{
 			Login.doMain = ip;
 		}
+		if(location.host == "bim-demo.wanda.cn")
+		{
+			exp.setTime(exp.getTime() + 365 * 24 * 60 * 60 * 1000);
+		}
 		document.cookie = name + "=" + value + ";expires=" + exp.toGMTString() + ";domain=" + Login.doMain + ";path=/";
 	},
 	//获取cookie
