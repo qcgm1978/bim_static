@@ -21,7 +21,7 @@ var Login = {
 
 	setCookie(name, value) {
 		var ip = Login.isIp();
-		var Days = 0.02,
+		var Days = 0.002,
 			exp = new Date();
 		exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 1000);
 		if(ip!="")
