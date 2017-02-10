@@ -22,6 +22,23 @@
 			//初始化
 			App.Comm.upload.init(upload, {
 
+				beforeAdd : function(files){
+					var i;
+					var name = "";
+					var result = true;
+					for(i=0;i<files.length;i++)
+					{
+						name = files[i].name;
+						if(name.indexOf(".db")>0)
+						{
+							alert("不能上传扩展名为.db的文件，请重新选择！");
+							result = false;
+							break;
+						}
+					}
+					return result;
+				},
+
 				getParentId: function() {
 
 					return App.ResourceModel.Settings.fileVersionId;
@@ -73,7 +90,6 @@
 
 				//上传成功
 				fileUploaded: function(response, file) {
-
 					var data = JSON.parse(response.response),
 						type = App.ResourceModel.Settings.type,
 						models = App.ResourceModel.FileCollection.models,

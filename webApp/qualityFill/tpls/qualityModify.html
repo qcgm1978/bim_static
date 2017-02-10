@@ -254,13 +254,25 @@ var Event = {
             type:"get",
             dataType:"json",
             success:function(data){
-                var list = data.data.items;
-                window.Data.listData = list;
-
+                var list;
                 if(data.code!=0)
                 {
                     list = [];
                     $("#noDataTip").show();
+                }
+                else
+                {
+                    if(data.data==null)
+                    {
+                        list = [];
+                        $("#noDataTip").show();
+                    }
+                    else
+                    {
+                        list = data.data.items;
+                    }
+                    
+                    window.Data.listData = list;
                 }
                 $("#loading").hide();
                 template.startSymbol("{{");
