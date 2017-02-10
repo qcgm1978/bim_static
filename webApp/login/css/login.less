@@ -87,3 +87,66 @@ a { color: #fff; text-decoration: none; }
     }
   }
 }
+.bodyBgDialog{
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 99998;
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: none;
+}
+.dialogAlertBox{
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 999999;
+  width: 600px;
+  height: 500px;
+  background-color: #fff;
+  border:#ccc solid 1px;
+  border-radius: 4px;
+  margin-left: -300px;
+  margin-top: -250px;
+  display: none;
+  .dialogAlertBox_header{
+    width: 100%;
+    position: relative;
+    height: 50px;
+    &>a{
+      width: 16px;
+      height: 16px;
+      position: absolute;
+      right: 20px;
+      top: 16px;
+      background: url(/static/dist/images/comm/images/dialogs/close.png) no-repeat;
+      cursor: pointer;
+      opacity: .8;
+      &:hover{
+        background: url(/static/dist/images/comm/images/dialogs/close-hover.png) no-repeat;
+      }
+    }
+  }
+  .dialogAlertBox_content{
+    width: 100%;
+    height: 400px;
+  }
+  .dialogAlertBox_footer{
+    width: 100%;
+    position: relative;
+    height: 50px;
+    padding-top: 10px;
+    text-align: center;
+    &>button{
+      width: 200px;
+      height: 30px;
+      line-height: 30px;
+      text-align: center;
+      background: #ccc;
+      border:#aaa solid 1px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+  }
+}
