@@ -7,13 +7,22 @@
 
  	events: {
  		"click .serviceNav .item": "switchTab",
- 		"click .flowSliderUl .item":"slideBarClick"
+ 		"click .flowSliderUl .item":"slideBarClick",
+ 		"keyup #serchData":"serchDataFun",
+ 		"click .searchItem":"searchItemClickFun"
  	},
-
+ 	default:{
+ 		timeout:0
+ 	},
  	//初始化事件
  	initialize() {
  		this.listenTo(App.Services.ProjectCollection.ProjectSlideBarCollection, "add", this.slideBarAdd);
  		this.listenTo(App.Services.ProjectCollection.ProjectSlideBarCollection, "reset", this.resetLoading);
+ 		$(document).on("click",function(){
+ 			var serachDataList = $("#serachDataList");
+ 			serachDataList.hide();
+ 			serachDataList.empty();
+ 		})
  	},
 
 
@@ -69,7 +78,60 @@
 
  		return this;
  	},
-
+ 	//搜索项目的方法
+ 	serchDataFun(e){
+ 		var _this = this;
+ 		var target = $(e.target);
+ 		var targetVal = target.val().trim();
+ 		if(this.default.timeout){
+ 			clearTimeout(this.default.timeout);
+ 		}
+	    this.default.timeout = setTimeout(function(){
+	    	if(targetVal){
+	    		_this.searchFun(targetVal);
+	    	}
+	    },200);
+ 	},
+ 	//执行搜索的方法
+ 	searchFun(targetVal){
+ 		//重置，拉取数据
+ 		var data = {
+ 			URLtype: "fetchManageProjects",
+ 			data: {
+ 				name: targetVal
+ 			}
+ 		};
+ 		App.Comm.ajax(data,function(result){
+	 		var html= "";
+			var ulBox = $("<ul></ul>");
+			var serachDataList = $("#serachDataList");
+			serachDataList.empty();
+ 			if(result.code==0){
+ 				var datas = result.data;
+ 				if(datas.length>0){
+ 					for(var i=0,len=datas.length-1;i<=len;i++){
+						html+='<li class="searchItem" data-projectid="'+datas[i].id+'" title="'+datas[i].name+'">'+datas[i].name+'</li>';
+ 					}
+ 				}else if(datas.length==0){
+ 					html+='<li>搜索内容为空！</li>';
+ 				}
+ 				ulBox.append(html);
+				serachDataList.append(ulBox);
+ 				serachDataList.show();
+ 			}
+ 		})
+ 	},
+ 	//搜索之后项目点击的方法
+ 	searchItemClickFun(e){
+ 		var target = $(e.target);
+ 		var targetId = target.data("projectid");
+ 		var targetText = target.html();
+ 		var serchData = $("#serchData");
+ 		serchData.val(targetText);
+ 		var clickEle = this.$(".flowSliderUl").find('.item[data-projectid='+targetId+']');
+ 		clickEle.click();
+ 		this.$(".slideBarScroll").mCustomScrollbar("scrollTo",'.flowSliderUl .item[data-projectid='+targetId+']');
+ 	},
  	//获取数据	
  	fetchData() {
  	
@@ -81,10 +143,6 @@
  		App.Services.ProjectCollection.ProjectSlideBarCollection.reset();
 
  		App.Services.ProjectCollection.ProjectSlideBarCollection.fetch({
- 			data: {
- 				pageIndex: 1,
- 				pageItemCount: 30
- 			},
  			success(child, data) {
  				that.$(".folwSlideBar .header .count").text(data.data.length);
  				this.$(".flowSliderUl .item:first").click();
