@@ -85,7 +85,11 @@ App.Project.FileContainer = Backbone.View.extend({
 	},
 
 	//文件转换状态的方法
-	btnFileStateFun(){//add zhangyankai
+	btnFileStateFun(e){//add zhangyankai
+		if($(".btnFileState").hasClass("disable")) //modify by wuweiwei 2017-2-10
+		{
+			return;
+		}
 		var projectId = App.Project.Settings.projectId;
 		var versionId = App.Project.Settings.versionId;
 		var addDialogEleDom = new App.Project.FileContainer.FileStatus().render(projectId,versionId).el;

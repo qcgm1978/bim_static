@@ -96,7 +96,16 @@ App.Services.projectMember = {
 		parse: function(response) {
 			if (response.code == 0) {
 				var _member=response.data.member||[],
-					_org=response.data.org||[],
+					_org=response.data.org||[];
+				_org=_.map(_org,function(item){
+					return item={
+						name:item.name,
+						project: item.parent == null ? "" : item.parent.namePath,
+						id:item.id, //成员ID
+						outer:item.outer,
+						org:true
+					}
+				});
 				_member=_.map(_member,function(item){
 					return item={
 						name:item.name,
@@ -104,16 +113,7 @@ App.Services.projectMember = {
 						id:item.id, //成员ID
 						outer:item.outer
 					}
-				})
-				_org=_.map(_org,function(item){
-					return item={
-						name:item.name,
-						project:item.parent.namePath,
-						id:item.id, //成员ID
-						outer:item.outer,
-						org:true
-					}
-				})
+				});
 				return _member.concat(_org);
 			}else{
 				return []
