@@ -282,7 +282,9 @@ App.Project = {
 			$('.tips span').html('无法三维预览，请<a href="javascript:;" onclick="App.Project.downLoad();" style="font-size:20px;text-decoration:underline;color:#CFCFCF;">下载</a>查看');
 		})
 	},
-
+	resetModelNull(){
+		$('.designProperties').html('<div class="nullTip">请选择构件</div>');
+	},
 	//渲染dwg 文件
 	renderDwg(modelId) {
 
