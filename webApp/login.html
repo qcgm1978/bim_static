@@ -43,7 +43,7 @@
                                 <div class="remember" style="display:none;">一周内自动登录</div>
                             </div>
                             <input class="btnLogin" id="btnLogin" type="button" value="登录" />
-                            <div class="login_demo"><a href="http://bim-demo.wanda.cn/">登录演示系统</a></div>
+                            <div class="login_demo" id="login_demo"><a href="javascript:;">登录演示系统</a></div>
                         </div>
                     </div>
                 </div>
@@ -95,6 +95,16 @@
                 <a target="_blank" href="/static/dist/app/todo/instruction.html">大连万达商业地产股份有限公司 &copy; 2016 WANDA版权所有</a>
             </div>
         </div>
+        <div class="bodyBgDialog" id="bodyBgDialog"></div>
+        <div class="dialogAlertBox" id="dialogAlertBox">
+            <div class="dialogAlertBox_header">
+                <a href="javascript:;" class="closeDialog" id="closeDialog"></a>
+            </div>
+            <div class="dialogAlertBox_content"></div>
+            <div class="dialogAlertBox_footer">
+                <button id="openDemoPage">确定</button>
+            </div>
+        </div>
         <script type="text/javascript" src="/login/js/jquery-1.12.0.min.js"></script>
         <script type="text/javascript" src="/login/js/login.es6"></script>
         <script type="text/javascript"> 
@@ -103,6 +113,29 @@
             } else{
                  Login.init();
             }  
+            $(function(){
+                var host = document.location.host;
+                var login_demo = $("#login_demo");
+                var closeDialog = $("#closeDialog");
+                var openDemoPage = $("#openDemoPage");
+                var bodyBgDialog = $("#bodyBgDialog");
+                var dialogAlertBox = $("#dialogAlertBox");
+                if(host.indexOf("demo")>0){
+                    login_demo.hide();
+                    return;
+                }
+                login_demo.on("click","a",function(){
+                    bodyBgDialog.show();
+                    dialogAlertBox.show();
+                })
+                closeDialog.on("click",function(){
+                    bodyBgDialog.hide();
+                    dialogAlertBox.hide();
+                })
+                openDemoPage.on("click",function(){
+                    window.open("http://bim-demo.wanda.cn");
+                })
+            })
         </script>
     </body>
 </html>
