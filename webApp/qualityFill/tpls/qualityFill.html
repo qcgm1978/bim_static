@@ -244,7 +244,7 @@ var Url = {
     }   
 };
 
-var initDate = function(){
+var initDate = function($tr){
     /*
     $(".input_date1").jeDate({
         isinitVal:false,
@@ -265,8 +265,8 @@ var initDate = function(){
         zIndex:3000,
     });
     */
-    $(".input_date1").Zebra_DatePicker();
-    $(".input_date2").Zebra_DatePicker();
+    $tr.find(".input_date1").Zebra_DatePicker();
+    $tr.find(".input_date2").Zebra_DatePicker();
 }
 
 var initComponent = function(projectCode,type){
@@ -472,7 +472,14 @@ var Event = {
         var itemData , itemDatas=[], itemDatas2=[] , $tr , componentData , presetPointData , dataid , imageId;
         var point , pos;
         var validate;
-        var itemIndex = 0; /*用Date.Guid()+itemIndex*/
+        var itemIndex = 0;      /*用Date.Guid()+itemIndex*/
+        var isNotHeGe = false; 
+        /*
+        isNotHeGe
+        判断 检查结果=“合格”的表格行数据是否都绑定预设点;
+        诺 检查结果=“合格” 的行没有绑定预设点就返回true ,然后提示不能保存
+        */
+
         validate = this.validate();
         if(!validate.result)
         {
@@ -480,6 +487,7 @@ var Event = {
             return;
         }
 
+        /*便利所有表格行数据*/
         $trs.each(function(index){
             itemIndex++;
             $tr = $(this);
@@ -496,7 +504,10 @@ var Event = {
             point = Data.cacheData[dataid+"point"];
 
 
-
+            if($tr.find(".linkBtn-ready-pos").html()!=readyPosState[1]&&$tr.find(".select-result").val()==2)
+            {
+                isNotHeGe = true; /*检查结果="合格" 情况下 没有绑定预设点*/
+            }
             if($tr.find(".linkBtn-ready-pos").html()==readyPosState[1]&&$tr.find(".select-result").val()==2) /*绑定预设点,就走MQ1(结构少),合格*/
             {
                 itemData.id = Date.guid() + itemIndex.toString();
@@ -547,6 +558,15 @@ var Event = {
             itemData.locationName = $tr.find(".pos").html();
             itemDatas.push(itemData);
         });
+
+
+        if(isNotHeGe)
+        {
+            alert("检查结果为“合格”的数据，必须绑定预设点！");
+            return;
+        }
+
+
 
         if(itemDatas2.length>0) /*MQ1接口,QUALITY-1005 结构少（合格）*/
         {
@@ -754,7 +774,7 @@ var Event = {
             th.lineHTML = th.lineHTML.replace("{pos-state}",posState[0]);
             th.lineHTML = th.lineHTML.replace("{dataid}", dataid );
             $("#gridContainer").append(th.lineHTML);
-            initDate();
+            initDate($("#gridContainer tr:last"));
             viewer.showInModel({});
         });
 
@@ -851,7 +871,7 @@ var initOptions = function(){
 }
 
 var init = function(){
-    initDate();
+    initDate($("#gridContainer tr:last"));
     initDialog();
     initOptions();
     initComponent(Url.getParam("projectCode"),Url.getParam("type"));
