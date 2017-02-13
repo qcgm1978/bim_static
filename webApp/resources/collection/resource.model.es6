@@ -456,6 +456,10 @@ App.ResourceModel = {
 					models = App.ResourceModel.FileThumCollection.models;
 				}
 				$(".count").text(models.length-1);
+				if(models.length==0){
+					this.$el.find(".fileContent").html('<li class="loading"><i class="iconTip"></i>未搜索到相关文件/文件夹</li>');
+					return;
+				}
 				//修改数据
 				$.each(models, function(i, model) {
 					if (model.toJSON().id == id) {
