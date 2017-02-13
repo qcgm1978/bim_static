@@ -903,7 +903,8 @@ App.Project = {
 			App.ajax(data, function(data) {
 
 				if (data.code == 0) {
-					obj.url = data.data.url;
+					//obj.url = data.data.url;
+					obj.url = "http://" + location.host + "/" + data.data.url;
 					var dialogHtml = App.Project.templateUrl('/libsH5/tpls/comment/bimview.share.dialog.html')(obj),
 						opts = {
 							title: "分享快照",
