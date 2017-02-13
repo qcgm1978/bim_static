@@ -198,7 +198,7 @@ var dwgViewer = function(options) {
 
       var that = this;
       //设置不同的工具
-      $("#modelBox .bim .commentBar").on("click", ".bar-item", function() {
+      $("#modelBox .bim .commentBar").on("click", ".bar-item", function(e) {
 
         var $this = $(this);
 
@@ -206,6 +206,11 @@ var dwgViewer = function(options) {
         var fn = $this.data('id'),
             group = $this.data('group'),
             type = $this.data('type');
+        console.log(type);
+        if(type=="more")
+        {
+            $(".subBar").show();
+        }
         if(type == "comment-color"){
           $this.addClass('selected').siblings().removeClass('selected');
           var  parent= $this.parent().parent(),
@@ -214,7 +219,8 @@ var dwgViewer = function(options) {
               param = $this.data('param');
           parent.attr('data-color',colors);
           that.dwgHelper.setAnnotationStyle({'stroke-color': param,'fil-color':param });
-
+          $(".subBar").hide();
+          e.stopPropagation();
         }else{
           that.dwgHelper.setAnnotationType(that.__commentToolBarType[$this.data("id")]);
 
