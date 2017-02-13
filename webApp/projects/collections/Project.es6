@@ -1321,7 +1321,7 @@ App.Project = {
 				var fileVersionId = $item.find(".filecKAll").data("fileversionid"),
 					id = $item.find(".text").data("id"),
 					models = App.Project.FileCollection.models;
-				$(".count").text(parseInt($(".count").text())-1);
+				$(".count").text(models.length-1);
 				//修改数据
 				$.each(models, function(i, model) {
 					if (model.toJSON().id == id) {

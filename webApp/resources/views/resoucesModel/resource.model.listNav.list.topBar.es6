@@ -194,16 +194,16 @@
  		}
 
  		App.Comm.ajax(data, (data) => {
-
  			if (data.code == 0) {
  				var count = data.data.length,
  					collection,
  					type = App.ResourceModel.Settings.type;
 
  				this.$(".clearSearch").show();
- 				this.$(".opBox").hide();
+ 				this.$(".opBox").find(".btnNewFolder").hide();
+				this.$(".opBox").find(".btnFileUpload").hide();
+				this.$(".opBox").find(".btnFileState").hide();
  				this.$(".searchCount").show().find(".count").text(count);
-
  				if (type == "standardLibs") {
  					collection = App.ResourceModel.FileCollection;
  				} else if (type == "famLibs") {
@@ -214,9 +214,9 @@
 
  				if (count > 0) {
  					var _temp=data.data||[];
-					_.each(_temp,function(item){
-						item.isSearch='search';
-					})
+					// _.each(_temp,function(item){
+					// 	item.isSearch='search';
+					// })
  					collection.push(_temp);
  				} else {
  					collection.trigger("searchNull");
@@ -235,7 +235,10 @@
  	clearSearch() {
 
  		this.$(".clearSearch").hide();
- 		this.$(".opBox").show();
+ 		this.$(".opBox").find(".btnNewFolder").show();
+		this.$(".opBox").find(".btnFileUpload").show();
+		this.$(".opBox").find(".btnFileState").show();
+ 		// this.$(".opBox").show();
  		this.$(".searchCount").hide();
  		$("#txtFileSearch").val("");
 
