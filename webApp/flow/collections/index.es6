@@ -1,7 +1,9 @@
 App.Flow=App.Flow||{};
 
 App.Flow.Controller={
-
+    default:{
+        tabType:''
+    },
     icon:{
         '成本管理':'m-chengbenguanli',
         '商管工程':'m-shangguangongcheng',
@@ -18,7 +20,7 @@ App.Flow.Controller={
     },
 
 	init:function(){
-	
+	   
 		//实例化
 		$('#contains').html(new App.Flow.View().render().$el);
         new App.Flow.NavView();
