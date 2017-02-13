@@ -244,7 +244,7 @@ var Url = {
     }   
 };
 
-var initDate = function(){
+var initDate = function($tr){
     /*
     $(".input_date1").jeDate({
         isinitVal:false,
@@ -265,8 +265,8 @@ var initDate = function(){
         zIndex:3000,
     });
     */
-    $(".input_date1").Zebra_DatePicker();
-    $(".input_date2").Zebra_DatePicker();
+    $tr.find(".input_date1").Zebra_DatePicker();
+    $tr.find(".input_date2").Zebra_DatePicker();
 }
 
 var initComponent = function(projectCode,type){
@@ -774,7 +774,7 @@ var Event = {
             th.lineHTML = th.lineHTML.replace("{pos-state}",posState[0]);
             th.lineHTML = th.lineHTML.replace("{dataid}", dataid );
             $("#gridContainer").append(th.lineHTML);
-            initDate();
+            initDate($("#gridContainer tr:last"));
             viewer.showInModel({});
         });
 
@@ -871,7 +871,7 @@ var initOptions = function(){
 }
 
 var init = function(){
-    initDate();
+    initDate($("#gridContainer tr:last"));
     initDialog();
     initOptions();
     initComponent(Url.getParam("projectCode"),Url.getParam("type"));
