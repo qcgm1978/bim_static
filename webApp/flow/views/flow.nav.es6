@@ -12,8 +12,13 @@ App.Flow.NavView=Backbone.View.extend({
 		'click .flowTabItem':'switchModel',
 		'click #flowAdminBtn a':'flowAdminBtnFun',
 	},
-	
 	initialize(){
+		// if(App.Flow.Controller.default.tabType=="back"){
+		// 	this.flowAdminBtnFun();
+		// 	this.load();
+		// }else{
+		// 	this.listenTo(App.Flow.Controller.flowNavCollection,'reset',this.load);
+		// }
 		this.listenTo(App.Flow.Controller.flowNavCollection,'reset',this.load);
 	},
 	flowAdminBtnFun(){//管理依据的按钮点击之后的方法
@@ -34,6 +39,7 @@ App.Flow.NavView=Backbone.View.extend({
 	},
 	switchModel(e){
 		var $target=$(e.currentTarget);
+		App.Flow.Controller.default.tabType="";
 		$("#flowAdminBtn").removeClass("adminAbsiOn");
 		if(!$target.hasClass('itemSelected')){
 			$('.itemSelected').removeClass('itemSelected');
@@ -49,7 +55,11 @@ App.Flow.NavView=Backbone.View.extend({
 		var _html=_.template(this.template);
 		this.$el.html(_html(data));
 		$("#flowTabNavContainer").html(this.$el);
-		this.loadContent(data.data[0].id);
+		if(App.Flow.Controller.default.tabType=="back"){
+			this.flowAdminBtnFun();
+		}else{
+			this.loadContent(data.data[0].id);
+		}
 		return this;
 	},
 

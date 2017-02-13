@@ -628,8 +628,6 @@ App.Comm = {
 			}else{
 				_.first().show();
 			}
-
-
 			return
 		}
 		App.Comm.ajax({

@@ -37,7 +37,9 @@ App.ResourceFamLibs.leftNav = Backbone.View.extend({
 				}
 				//清除搜索
 				$("#navContainer").find(".clearSearch").hide().end().
-				find(".opBox").show().end().
+				find(".btnNewFolder").show().end().
+				find(".btnFileUpload").show().end().
+				find(".btnFileState").show().end().
 				find(".searchCount").hide();
 				$("#txtFileSearch").val("");
 				App.ResourceModel.Settings.searchText = "";

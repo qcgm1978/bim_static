@@ -440,7 +440,6 @@ App.ResourceModel = {
 
 	//删除文件弹出层
 	delFileDialog: function($item) {
-
 		var dialog = new App.Comm.modules.Dialog({
 			width: 580,
 			height: 168,
@@ -450,60 +449,36 @@ App.ResourceModel = {
 			okClass: "delFile",
 			okText: '确&nbsp;&nbsp;认',
 			okCallback: function() {
-
 				var fileVersionId = $item.find(".filecKAll").data("fileversionid"),
 					id = $item.find(".text").data("id"),
 					models = App.ResourceModel.FileCollection.models;
-
 				if (App.ResourceModel.Settings.type == "famLibs") {
 					models = App.ResourceModel.FileThumCollection.models;
 				}
-
+				$(".count").text(models.length-1);
+				if(models.length==0){
+					this.$el.find(".fileContent").html('<li class="loading"><i class="iconTip"></i>未搜索到相关文件/文件夹</li>');
+					return;
+				}
 				//修改数据
 				$.each(models, function(i, model) {
 					if (model.toJSON().id == id) {
-
 						model.urlType = "deleteFile";
 						model.projectId = App.ResourceModel.Settings.CurrentVersion.projectId;
 						model.projectVersionId = App.ResourceModel.Settings.CurrentVersion.id;
 						model.fileVersionId = fileVersionId;
 						model.destroy();
-
 						return false;
 					}
 				});
-
-				// //请求数据
-				// var data = {
-				// 	URLtype: "deleteFile",
-				// 	type: "DELETE",
-				// 	data: {
-				// 		projectId: App.ResourceModel.Settings.CurrentVersion.projectId,
-				// 		projectVersionId: App.ResourceModel.Settings.CurrentVersion.id,
-				// 		fileVersionId: fileVersionId
-				// 	}
-				// };
-
-				// //删除
-				// App.Comm.ajax(data, function(data) {
-				// 	console.log(data);
-				// });
 			},
 			message: $item.find(".folder").length > 0 ? "确认要删除该文件夹么？" : "确认要删除该文件么？"
-
-
 		});
-
 	},
-
-
-
 	//获取文件名称 搜索
 	getName(name) {
-
 		var searchText = App.ResourceModel.Settings.searchText;
 		if (searchText) {
-
 			name = name.replace(searchText.toLowerCase(), '<span class="searchText">' + searchText.toLowerCase() + '</span>').replace(searchText.toUpperCase(), '<span class="searchText">' + searchText.toUpperCase() + '</span>');
 		}
 		return name;

@@ -60,7 +60,4 @@ App.INBox.imboxContainerView=Backbone.View.extend({
 
          });
 	}
-
-
 })
-
