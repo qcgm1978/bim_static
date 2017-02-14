@@ -126,9 +126,13 @@ App.INBox.comment = {
 
 		CommentCollections.ViewComments.fetch({
 			success(model, data) {
-				$(".commentRemark .remarkBox .count").text(data.data.length);
-				this.$(".reMarkListBox").css("bottom", this.$(".talkReMark").height() + 10);
-				$comment.find(".fullLoading").hide();
+				if(data.code==0){
+					$(".commentRemark .remarkBox .count").text(data.data.length);
+					this.$(".reMarkListBox").css("bottom", this.$(".talkReMark").height() + 10);
+					$comment.find(".fullLoading").hide();
+				}else{
+					alert(data.message);
+				}
 			}
 		});
 		$('.wrapper .title').text($(_this).text());
@@ -344,7 +348,6 @@ App.INBox.comment = {
 			commentViewPoint() {
 
 				CommentApi.saveCommentStart(null, "commentViewPoint", (data) => {
-
 					//上传地址或者评论视点后
 					CommentApi.afterUploadAddressViewPoint.call(this, {
 						pictureUrl: data.pic,
@@ -642,6 +645,7 @@ App.INBox.comment = {
 			},
 
 			initialize() {
+				this.model.off('destroy');
 				this.listenTo(this.model, "destroy", this.remove);
 			},
 
@@ -688,40 +692,26 @@ App.INBox.comment = {
 
 			//删除评论
 			delTalk(event) {
-
 				$.confirmPlus('确认删除该评论么？', () => {
 					var $el = $(event.target),
 						id = $el.data("id");
-
 					this.model.projectId = App.Project.Settings.projectId;
 					this.model.viewPointId = viewPointId;
 					this.model.commentId = id;
-
 					if (App.Project && App.Project.Settings.isShare) {
 						this.model.urlType = "delCommentByToken";
 						this.model.auth = App.Project.Settings.token;
 					} else {
 						this.model.urlType = "delComment";
 					}
-
 					this.model.destroy();
 				});
-
-				// if (!confirm('确认删除该评论么？')) {
-				// 	return;
-				// }
-
-
-
 			},
 
 			//删除后
 			remove() {
-
 				var $count = $(".commentRemark .remarkBox .count");
-				// $count.text(+$count.text() - 1);之前的代码
-				// $count.text($count.text() - 1); //张延凯修改
-
+				$count.text($count.text() - 1); //张延凯修改
 				this.$el.slideUp(function() {
 
 					var $this = $(this),
@@ -735,9 +725,7 @@ App.INBox.comment = {
 
 				});
 			}
-
 		})
-
 	},
 };
 
