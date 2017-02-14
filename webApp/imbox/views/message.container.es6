@@ -1,18 +1,49 @@
 App.INBox=App.INBox||{}
-App.INBox.imboxContainerView=Backbone.View.extend({
-
+App.INBox.imboxContainerView = Backbone.View.extend({
+    tagName: 'div',
+    className: 'contentBox',
 	template:_.templateUrl('./imbox/tpls/container.html',true),
-
 	initialize : function(){
         this.listenTo(App.INBox.messageCollection,"reset",this.renderData);
         this.listenTo(App.INBox.messageAllCollection,"reset",this.renderAllData);
     },
-
 	render(){
 		this.$el.html(this.template);
+
 		return this;
 	},
-
+    //滚动条
+    bindTreeScroll() {
+        var $modelTree = $(".scrollBoxUl");
+        if (!$modelTree.hasClass('mCustomScrollbar')) {
+            $modelTree.mCustomScrollbar({
+                set_height: "100%",
+                set_width: "100%",
+                theme: 'minimal-dark',
+                axis: 'y',
+                keyboard: {
+                    enable: true
+                },
+                scrollInertia: 0
+            });
+        }
+    },
+     //滚动条
+    bindTreeScrollS() {
+        var $modelTree = $(".scrollBoxUlS");
+        if (!$modelTree.hasClass('mCustomScrollbar')) {
+            $modelTree.mCustomScrollbar({
+                set_height: "100%",
+                set_width: "100%",
+                theme: 'minimal-dark',
+                axis: 'y',
+                keyboard: {
+                    enable: true
+                },
+                scrollInertia: 0
+            });
+        }
+    },
 	renderData(item){
         var _data=item.toJSON()[0];
 		var _html=_.templateUrl('./imbox/tpls/list.html');
@@ -32,10 +63,9 @@ App.INBox.imboxContainerView=Backbone.View.extend({
              },
              prev_text: "上一页",
              next_text: "下一页"
-
          });
+        this.bindTreeScroll();
 	},
-
 	renderAllData(item){
         var _data=item.toJSON()[0];
 		var _html=_.templateUrl('./imbox/tpls/list.html');
@@ -57,7 +87,7 @@ App.INBox.imboxContainerView=Backbone.View.extend({
              }, 
              prev_text: "上一页",
              next_text: "下一页"
-
          });
+        this.bindTreeScrollS();
 	}
 })
