@@ -22,12 +22,30 @@ App.Project.PlanAnalog = Backbone.View.extend({
 
 	template: _.templateUrl("/projects/tpls/project/plan/project.plan.property.planAnalog.detail.html"),
 
+	//绑定滚动条
+	bindScroll() {
 
+		var $materialequipmentListScroll = this.$(".planContent");
+
+		if ($materialequipmentListScroll.hasClass('mCustomScrollbar')) {
+			return;
+		}
+
+		$materialequipmentListScroll.mCustomScrollbar({
+			set_height: "100%",
+			theme: 'minimal-dark',
+			axis: 'y',
+			keyboard: {
+				enable: true
+			},
+			scrollInertia: 0
+		});
+	},
 	addOne: function(model) {
 
 		var data = model.toJSON();
 		this.$(".tbPlan tbody").html(this.template(data));
-
+		this.bindScroll();
 		var OrderArr = _.sortBy(data.data, "planStartTime"),
 		    PlayArr = [],
 		    toTranslucent = [],
