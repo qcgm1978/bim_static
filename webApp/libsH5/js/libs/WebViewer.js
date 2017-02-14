@@ -18778,7 +18778,7 @@ CLOUD.EditorManager = function () {
 
     this.animationDuration = 500; // 500毫秒
     this.animationFrameTime = 13; // 周期性执行或调用函数之间的时间间隔，以毫秒计
-    this.enableAnimation = true; // 是否允许动画
+    this.enableAnimation = false; // 是否允许动画
     this.isUpdateRenderList = true; // 是否更新渲染列表
 
     this.movePad = null;
