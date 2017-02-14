@@ -244,6 +244,7 @@ ViewComp.MemberManager = Backbone.View.extend({
 					dataPrivilegeId:App.Comm.getCookie("currentPid")
 				});
 				App.Services.maskWindow.close();
+				App.Services.projectMember.addedObject = res.data; /*add by wuweiwei 2017-2-14*/
 			}else{
 				alert("添加失败");
 				$("#dataLoading").hide();
