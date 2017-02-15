@@ -518,8 +518,10 @@
       // 普通模式
       var self = this;
       self.pub('home');
-      self.viewer.setStandardView(CLOUD.EnumStandardView.ISO);
+      // self.viewer.setStandardView(CLOUD.EnumStandardView.ISO);
+      self.viewer.goToInitialView();
       self.zoomToBuilding();
+
     },
     front: function() {
       var self = this,

@@ -1,4 +1,4 @@
-.imboxNavWrap { & .header { height: 40px; border-bottom: 1px solid #ccc; line-height: 40px; padding-left: 20px;  background-color: #f5f5f5;font-size: 14px;color: #6E6E6E;}
+.imboxNavWrap {position: absolute;left: 0;top: 50px; width: 100%; height: 86px; & .header { height: 40px; border-bottom: 1px solid #ccc; line-height: 40px; padding-left: 20px;  background-color: #f5f5f5;font-size: 14px;color: #6E6E6E;}
 	& .imboxNav { min-width: 1000px; margin: 0 20px; height: 45px; border-bottom: 1px #ccc solid;
 		& ul { & li {float: left; list-style-type: none; font-size: 14px; width: 130px; height: 36px; line-height: 36px; text-align: center; margin-top: 10px; cursor: pointer;color: #CCCCCC;
 				&.selected { background-color: #fff; border: 1px #ccc solid; border-bottom: 1px #fff solid; border-top: 2px solid #06c; color: #6E6E6E;}
@@ -6,16 +6,28 @@
 		}
 	}
 }
-& #imboxContent { height: 100%; padding-bottom: 40px;
-	& ul { border: 1px solid #ccc; border-top: none; margin: 0 20px; position: absolute; left: 0; right: 0; bottom: 80px; top: 134px; border-bottom: none; }
+& #imboxContent { height: 100%; padding-bottom: 10px;.commissionBox{height: 100%;width: 100%; padding: 0 20px;}
+	& ul {width: 100%; height: 100%;}
 	& li { height: 50px; line-height: 50px; margin: 0 20px; border-bottom: 1px solid #ccc; box-sizing: border-box; font-size: 14px;
 		& .title { width: 48%; display: inline-block;
 			& i { background: url('../images/icon.png') -28px -400px no-repeat; width: 40px; height: 20px; display: inline-block; display: inline-block; vertical-align: -10px; }
 		}
 		& .time { width: 48%; display: inline-block; text-align: right; float: right;}
 	}
-	& .page { height:70px;position: absolute; bottom: 10px; right: 20px; left: 20px; border: 1px solid #ccc; border-top: none; }
-	& .alreadyBox { display: none; }
+	& .page { 
+		height:50px;position: absolute; bottom: 10px; right: 20px; left: 20px; border: 1px solid #ccc; border-top: none; 
+		.alreadyListPagination{
+			width: 100%;
+			height: 30px;
+			margin-top: 15px;
+			float:left;
+			.pagination{
+				margin: 0;
+				margin-right: 15px;
+			}
+		}
+	}
+	& .alreadyBox { display: none;height: 100%;width: 100%; padding: 0 20px;}
 	
 	& .noData { width: 100%; display: inline-block; text-align: center; padding-top: 100px; color: #ccc; font-size: 20px;
 		& .tip { background: url('../images/icon.png') no-repeat -40px -260px; width: 40px; height: 40px; display: inline-block; vertical-align: -17px; margin-right: 20px; }
@@ -218,4 +230,17 @@ ul.reMarkList{
 //解决公共样式的问题
 #confirm .content{
 	 color: #fff;
+}
+.scrollBoxUl,.scrollBoxUlS{
+	height: 100%;
+	width: 100%;
+	padding: 0 0 50px 0;
+	position: relative;
+	border: 1px solid #ccc;
+	border-top: none;
+	border-bottom: none;
+}
+.contentBox{
+	height: 100%;
+	padding-top: 86px;
 }

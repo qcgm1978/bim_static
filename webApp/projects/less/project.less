@@ -139,7 +139,7 @@
 			}
 		}
 	}
-	.actionAnalog { position: absolute; bottom: 0px; width: 100%; min-width: 398px; height: 80px; background-color: #eee;
+	.actionAnalog { position: absolute; bottom: 0px; width: 100%; min-width: 540px; height: 80px; background-color: #eee;
 		.progressAnalog { height: 50px; line-height: 55px; vertical-align: top; padding-left: 15px;
 			i { cursor: pointer; }
 			.process { position: absolute; top: 23px; height: 30px; left: 45px; right: 0px;
@@ -155,7 +155,40 @@
 		&.planPlanPublicity { top: 0px;
 			.selDate { margin-bottom: 7px; margin-top: 7px; margin-left: 7px; }
 		}
-		.planContent { height: 100%; overflow-y: auto;
+		.tbPlanHeader{
+			width: 100%; min-width: 540px;border: none; border-bottom: 1px solid #ccc;
+			tr { cursor: pointer; }
+			th{ 
+				border: 1px #ccc solid; 
+				text-align: center; 
+				height: 28px; 
+				line-height: 28px; 
+			    box-sizing: border-box;
+
+			}
+			.ckItem{
+				width: 7%;
+				border-left: none !important;
+			 	padding-left: 8px;
+			}
+			.planId{
+				width: 9%;
+			    
+			}
+			.operationalMatters{
+				width: 40%;
+				.overflowEllipsis { width: 98%; vertical-align: top; }
+			}
+			.start { width: 20%; }
+			.end { width: 20%; }
+		}
+		.planContent { 
+			height: 100%;
+			margin-top: -31px;
+		    padding-top: 30px;
+		    height: 100%;
+		    min-width: 540px;
+		    width: 100%;
 			.tbPlan { width: 100%; min-width: 398px; border: none; border-bottom: 1px solid #ccc;
 				tr { cursor: pointer; }
 				th, td { border: 1px #ccc solid; }

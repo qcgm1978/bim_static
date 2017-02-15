@@ -54,6 +54,7 @@ App.Project.PlanModel = Backbone.View.extend({
 	addOne: function(model) {
 		var data = model.toJSON();
 		this.$(".tbPlan tbody").html(this.template(data));
+		this.bindScroll();
 		var codes = [];
 		$('.planSearch .treeCheckbox input').prop('checked', false);
 		$.each(data.data, function(i, item) {
@@ -68,6 +69,25 @@ App.Project.PlanModel = Backbone.View.extend({
 		//App.Project.PlanAttr.PlanAnalogCollection.projectVersionId = App.Project.Settings.CurrentVersion.id;
 		//App.Project.PlanAttr.PlanAnalogCollection.fetch();
 		this.codes = codes;
+	},
+	//绑定滚动条
+	bindScroll() {
+
+		var $materialequipmentListScroll = this.$(".planContent");
+
+		if ($materialequipmentListScroll.hasClass('mCustomScrollbar')) {
+			return;
+		}
+
+		$materialequipmentListScroll.mCustomScrollbar({
+			set_height: "100%",
+			theme: 'minimal-dark',
+			axis: 'y',
+			keyboard: {
+				enable: true
+			},
+			scrollInertia: 0
+		});
 	},
 	//切换显示此节点关联模型
 	switch () {
