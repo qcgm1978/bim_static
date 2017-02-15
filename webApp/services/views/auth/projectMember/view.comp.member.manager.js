@@ -245,6 +245,7 @@ ViewComp.MemberManager = Backbone.View.extend({
 				});
 				App.Services.maskWindow.close();
 				App.Services.projectMember.addedObject = res.data; /*add by wuweiwei 2017-2-14*/
+				console.log("addedObject",App.Services.projectMember.addedObject);
 			}else{
 				alert("添加失败");
 				$("#dataLoading").hide();

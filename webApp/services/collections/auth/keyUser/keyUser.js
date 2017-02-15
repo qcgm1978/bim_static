@@ -52,6 +52,23 @@ App.Services.KeyUser = {
     this.partid = [];
   },
 
+  /*高亮显示新加用户*/
+  HeightLightPage : function(ids){
+      var $list,i,j;
+      $list = $(".keyUserList").find("li");
+      for(i=0;i<ids.length;i++)
+      {
+          for(j=0;j<$list.length;j++)
+          {
+              if(ids[i]==$list[j].getAttribute("data-uid"))
+              {
+                  //$($list[j]).trigger("click");
+                  $list[j].className = ("active");
+              }
+          }
+      }
+  },
+
   loadData : function(collection,data,fn) {
 
     data = data || {};

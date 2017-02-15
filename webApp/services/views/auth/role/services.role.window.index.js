@@ -105,6 +105,7 @@ App.Services.roleWindowIndex = Backbone.View.extend({
             success:function(collection, response, options){
                 if(response.code == 0){
                     App.Services.role.collection.add(response.data);
+                    $("#roleList li:last").css("background-color","#a8dbfd");
                 }
                 setTimeout(function(){
                     App.Services.roleAddStatus = 0;

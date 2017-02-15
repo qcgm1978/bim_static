@@ -684,12 +684,14 @@ App.Services.addKeyUser = Backbone.View.extend({
         $('#dataLoading').hide();
 
         if(data.code == 0){
+          App.Services.KeyUser.addedUserIds = data.data.userId; /*add by wuweiwei 2017-2-15 function:获取添加的用户userId ,本字段为数组*/
           $('.mod-dialog,.mod-dialog-masklayer').hide();
           //刷新关键用户列表
           App.Services.KeyUser.loadData(App.Services.KeyUser.KeyUserList, '', function(r){
             if(r && !r.code && r.data){
               App.Services.KeyUser.KeyUserList.set(r.data);
               App.Services.KeyUser.userList = r.data;
+              App.Services.KeyUser.HeightLightPage(App.Services.KeyUser.addedUserIds); /*高亮显示新加用户*/
             }
           });
           App.Services.KeyUser.clearAll();

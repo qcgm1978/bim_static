@@ -94,7 +94,7 @@ App.Services.projectMember.members = Backbone.View.extend({
           {
               if(addedList[i] == $memberList[j].getAttribute("id"))
               {
-                  $memberList[j].style.backgroundColor = "#93cdf3";
+                  $memberList[j].style.backgroundColor = "#a8dbfd";
                   break;
               }
           }
