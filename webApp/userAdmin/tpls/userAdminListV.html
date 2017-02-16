@@ -1,33 +1,31 @@
 
 <%  if(obj.state.length>0) {%>
 	<div class="userAdminListClass">
-		<div>
-			<table>
-				<thead>
+		<table>
+			<thead>
+				<tr>
+					<td>登录账号 </td>
+					<td>账号前缀</td>
+					<td>用户名称</td>
+					<td>账号密码</td>
+					<td>账号操作</td>
+				</tr>
+			</thead>
+			<tbody>
+				<% _.each(obj.state,function(item){%>
 					<tr>
-						<td>登录账号 </td>
-						<td>账号前缀</td>
-						<td>用户名称</td>
-						<td>账号密码</td>
-						<td>账号操作</td>
+						<td><%= item.loginid %></td>
+						<td><%= item.prefix %></td>
+						<td><%= item.username %></td>
+						<td><%= item.pwd %></td>
+						<td>
+							<a href="javascript:;" data-loginid='<%= item.loginid %>' class="viewUserItem viewUserEdite">编辑</a>
+							<a href="javascript:;" data-loginid='<%= item.loginid %>' class="viewUserItem viewUserDelete">删除</a>
+						</td>
 					</tr>
-				</thead>
-				<tbody>
-					<% _.each(obj.state,function(item){%>
-						<tr>
-							<td><%= item.loginid %></td>
-							<td><%= item.prefix %></td>
-							<td><%= item.username %></td>
-							<td><%= item.pwd %></td>
-							<td>
-								<a href="javascript:;" data-loginid='<%= item.loginid %>' class="viewUserItem viewUserEdite">编辑</a>
-								<a href="javascript:;" data-loginid='<%= item.loginid %>' class="viewUserItem viewUserDelete">删除</a>
-							</td>
-						</tr>
-					<% }) %>
-				</tbody>
-			</table>
-		</div>
+				<% }) %>
+			</tbody>
+		</table>
 	</div>
 	<div class="pagingBox">
        <div class="sumDesc"></div><div class="listPagination"></div>
