@@ -104,8 +104,22 @@ App.Services.roleWindowIndex = Backbone.View.extend({
         App.Services.newRoleModel.save(data,{
             success:function(collection, response, options){
                 if(response.code == 0){
-                    App.Services.role.collection.add(response.data);
-                    $("#roleList li:last").css("background-color","#a8dbfd");
+                    //App.Services.role.collection.add(response.data);
+                    console.log("role",response.data.roleId);
+                    App.Services.role.loadData(function(){
+                        var $list = $("#roleList li");
+                        var newRoleId = response.data.roleId; /*新增角色ID*/
+                        var len = $list.length;
+                        var i;
+                        for(i=0;i<len;i++)
+                        {
+                            if(newRoleId == $($list[i]).find(".sele").attr("id"))
+                            {
+                                $($list[i]).css("background-color","#a8dbfd");
+                            }
+                        }
+                    });
+                    
                 }
                 setTimeout(function(){
                     App.Services.roleAddStatus = 0;

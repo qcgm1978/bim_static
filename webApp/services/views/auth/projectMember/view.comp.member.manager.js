@@ -125,10 +125,20 @@ ViewComp.MemberManager = Backbone.View.extend({
 					}
 				},
 				callback: {
+					
 					beforeDblClick:function(){
 						return true;
 					},
+					/*
 					onDblClick: function(event, treeId, treeNode) {
+						if(!treeNode.userId && !treeNode.isParent){
+							_this.loadChildren(_this,treeNode.outer,treeNode.orgId,treeNode);
+						}else if(treeNode.userId){
+							_this.addOption();
+						}
+					},
+					*/
+					onClick: function(event, treeId, treeNode) {
 						if(!treeNode.userId && !treeNode.isParent){
 							_this.loadChildren(_this,treeNode.outer,treeNode.orgId,treeNode);
 						}else if(treeNode.userId){

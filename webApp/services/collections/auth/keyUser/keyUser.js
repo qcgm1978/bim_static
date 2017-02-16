@@ -52,7 +52,7 @@ App.Services.KeyUser = {
     this.partid = [];
   },
 
-  /*高亮显示新加用户*/
+  /*add by wuweiwei 2017-2-15 高亮显示新加用户*/
   HeightLightPage : function(ids){
       var $list,i,j;
       $list = $(".keyUserList").find("li");
@@ -62,7 +62,10 @@ App.Services.KeyUser = {
           {
               if(ids[i]==$list[j].getAttribute("data-uid"))
               {
-                  //$($list[j]).trigger("click");
+                  if(ids.length==1)
+                  {
+                      $($list[j]).trigger("click");
+                  }
                   $list[j].className = ("active");
               }
           }
