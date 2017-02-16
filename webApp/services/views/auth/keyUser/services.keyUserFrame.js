@@ -39,6 +39,14 @@ App.Services.keyUserFrame = Backbone.View.extend({
         var uuid = App.Services.KeyUser.uuid = $(e.target).attr('data-uid');
 
         $(e.target).toggleClass('active').siblings().removeClass('active');
+
+        /*add by wuweiwei 2017-2-16 当不选中时右侧页面重置为空页面 begin*/
+        if(!$(e.target).hasClass('active'))
+        {
+            $("#contains .keyBody").html('<h1 class="remindicon" style="margin:100px auto;font-size:18px;width:371px;color: #ccc;">暂无信息,请点击选择左侧的关键用户!</h1>');
+            return;
+        }
+        /* end */
         var datas = {
             uid : uuid
         };
