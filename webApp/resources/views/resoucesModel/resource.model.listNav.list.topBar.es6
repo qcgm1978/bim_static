@@ -241,7 +241,7 @@
  		// this.$(".opBox").show();
  		this.$(".searchCount").hide();
  		$("#txtFileSearch").val("");
-
+ 		$(".ckAll").prop("checked",false);
  		App.ResourceModel.Settings.searchText = "";
 
  		var collection,
