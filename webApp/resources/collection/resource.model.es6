@@ -275,14 +275,13 @@ App.ResourceModel = {
 
 
 			var status = App.ResourceModel.Settings.CurrentVersion.status;
-			
 			if (status != 9 && status != 4 && status != 7) {
 				//上传
 				App.ResourceUpload.init($(document.body));
-				$("#navContainer .topBar").find(".btnNewFolder,.btnFileUpload,.btnFileDel").show();  
+				// $("#navContainer .topBar").find(".btnNewFolder,.btnFileUpload,.btnFileDel").show();  
 
 			} else {
-				$("#navContainer .topBar").find(".btnNewFolder,.btnFileUpload,.btnFileDel").hide();
+				// $("#navContainer .topBar").find(".btnNewFolder,.btnFileUpload,.btnFileDel").hide();
 			}
 
 

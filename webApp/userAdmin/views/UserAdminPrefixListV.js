@@ -1,6 +1,6 @@
 App.userAdmin.UserAdminPrefixListV = Backbone.View.extend({
 	tagName:'div',
-	className:'userAdminClassName',
+	className:'userAdminListClass',
 	default:{
 		pageIndex:1
 	},

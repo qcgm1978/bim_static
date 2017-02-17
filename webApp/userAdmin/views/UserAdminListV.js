@@ -15,7 +15,6 @@ App.userAdmin.UserAdminListV = Backbone.View.extend({
 	},
 	initScroll:function(){
 		$(".userAdminListClass").mCustomScrollbar({
-             set_height: "100%",
              theme: 'minimal-dark',
              axis: 'y',
              keyboard: {

@@ -1,21 +1,26 @@
 .addViewUserContent{
-	width: 100%;
-	height: 100%;
-	padding-top: 16px;
-	padding-bottom: 20px;
 	& div{
 		box-sizing: border-box;
 	}
+	width: 100%;
+	height: 100%;
+	padding-top: 16px;
+	position: relative;
 	.viewUserTopTab{
 		width: 100%;
 		height: 38px;
 	    background-color: #eee;
 	    border: 1px solid #ccc;
 	    border-width: 1px 0px;
-	    padding-top: 8px;
-	    padding-left: 20px;
-	    position: relative;
+	    position: absolute;
+	    top: 16px;
+	    left: 0;
+	    padding: 8px 0 0 20px;
 	    z-index: 10;
+	    .viewUlTab{
+	    	width: 100%;
+	    	height: 100%;
+	    }
 	    & li{
 	    	border-top: 2px solid #eee;
 		    float: left;
@@ -35,14 +40,12 @@
 	.viewUserContent{
 		width: 100%;
 	    height: 100%;
-	    margin-top: -38px;
-	    padding-top: 38px;
-    	position: relative;
-    	z-index: 8;
+	    padding-top: 36px;
     	&>div{
     		width: 100%;
     		height: 100%;
-			padding: 20px;
+			padding: 20px 20px 50px 20px;
+			position: relative;
     		display: none;
     		a{
     		    text-decoration: none;
@@ -55,7 +58,6 @@
     		    font-size: 14px;
     		    line-height: 30px;
     		    text-align: center;
-    		    position: relative;
     			z-index: 10;
     		    &:hover{
     		    	color: #333;
@@ -68,6 +70,11 @@
     		    	position: relative;
     		    	top: 2px;
     		    }
+    		}
+    		#addViewUserBtn{
+    			position: absolute;
+    			left: 20px;
+    			top: 20px;
     		}
     		.nullViewUserList{
 				position: fixed;
@@ -87,47 +94,47 @@
 			.viewUserListBox{
 				width: 100%;
 				height: 100%;
-				position: relative;
-				z-index: 8;
-				margin-top: -38px;
-	    		padding-top: 54px;
+	    		padding-top: 50px;
+	    		position: relative;
+    			.pagingBox{
+    				position: absolute;
+    				bottom: -40px;
+    				left:0;
+    				right: 0;
+					.sumDesc { float: left; height: 25px; line-height: 25px;}
+					.listPagination { float: right;
+						a{
+							text-decoration: none;
+							border: solid 1px #ccc;
+							color: #666;
+							width: auto;
+							display: inline-block;
+							vertical-align: middle;
+							padding: 0px 5px;
+							margin-right: 5px;
+							margin-bottom:0;
+							min-width: 1em;
+							height: 25px;
+							line-height: 25px;
+							text-align: center;
+							font-size: 12px;
+							&:hover{
+								border-color: #0075df;
+								color: #0075df;
+							}
+						}
+						span{
+							margin-bottom: 0;
+						}
+					}
+					.pagination {margin: 0px;}
+				}
 	    		.mCSB_scrollTools_vertical{
 	    			right: -18px!important;
 	    		}
 	    		.userAdminClassName{
 	    			height: 100%;
 	    			position: relative;
-	    			.pagingBox{
-	    				position: absolute;
-	    				bottom: -48px;
-	    				left:20px;
-	    				right: 20px;
-	    				line-height: 40px;
-    					.sumDesc { float: left; margin-left: 20px; }
-    					.listPagination { float: right; margin-right: 20px; 
-    						a{
-    							text-decoration: none;
-    							border: solid 1px #ccc;
-    							color: #666;
-    							width: auto;
-    							display: inline-block;
-    							vertical-align: middle;
-    							padding: 0px 5px;
-    							margin-right: 5px;
-    							margin-bottom: 5px;
-    							min-width: 1em;
-    							height: 25px;
-    							line-height: 25px;
-    							text-align: center;
-    							font-size: 12px;
-    							&:hover{
-    								border-color: #0075df;
-    								color: #0075df;
-    							}
-    						}
-    					}
-    					.pagination {margin: 0px;}
-    				}
 	    		}
 	    		.userAdminListClass{
 	    			height:100%;
@@ -174,13 +181,15 @@
 		.viewUserSet{
 			width: 100%;
 			height: 100%;
-			padding-bottom: 0;
+			padding-bottom: 20px;
+			#addViewUserPrefixFun{
+				position: absolute;
+				left: 20px;
+				top: 20px;
+			}
 			.viewUserSetBox{
 				width: 100%;
 				height: 100%;
-				position: relative;
-				z-index: 8;
-				margin-top: -38px;
 	    		padding-top: 54px;
 	    		.mCSB_scrollTools_vertical{
 	    			right: -18px!important;
