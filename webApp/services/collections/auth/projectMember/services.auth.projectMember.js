@@ -97,6 +97,15 @@ App.Services.projectMember = {
 			if (response.code == 0) {
 				var _member=response.data.member||[],
 					_org=response.data.org||[];
+
+				_member=_.map(_member,function(item){
+					return item={
+						name:item.name,
+						project:item.org[0]?item.org[0].namePath:null,
+						id:item.id, //成员ID
+						outer:item.outer
+					}
+				});
 				_org=_.map(_org,function(item){
 					return item={
 						name:item.name,
@@ -106,14 +115,7 @@ App.Services.projectMember = {
 						org:true
 					}
 				});
-				_member=_.map(_member,function(item){
-					return item={
-						name:item.name,
-						project:item.org[0]?item.org[0].namePath:null,
-						id:item.id, //成员ID
-						outer:item.outer
-					}
-				});
+				
 				return _member.concat(_org);
 			}else{
 				return []
