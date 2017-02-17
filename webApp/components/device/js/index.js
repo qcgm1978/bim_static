@@ -389,8 +389,14 @@
                 if(event.target.className=='colItem'){
                     var $target=$(event.target);
                     $target=$target.closest('tr');
+                    var markers=[];
                     if($target.hasClass('preview')){
                         $target.removeClass('preview');
+                        Project.Viewer.highlight({
+                            type: 'userId',
+                            ids: []
+                        });
+                        Project.Viewer.loadMarkers(markers);
                     }else{
                         $('.contentList tr.preview').removeClass('preview');
                         $target.addClass('preview');
@@ -398,6 +404,17 @@
                         var val=$target.data('item');
                         var item = _.find(list, function(item){ return item.id==val; });
                         var box=item.boundingbox||item.boundingBox;
+                        var location={
+                            componentId:item.componentId,
+                            position : box.max,
+                            boundingBox:box
+                        } 
+                        markers.push(_self.formatMark(location,0,item.id));
+                        Project.Viewer.loadMarkers(markers);
+                        Project.Viewer.highlight({
+                            type: 'userId',
+                            ids: [item.componentId]
+                        });
                         Project.Viewer.zoomToBox( _self.formatBBox(box));
                     }
                 }
@@ -451,19 +468,22 @@
                     userId=marker? marker.userId:"",
                     data={};
                 if(id){
-                    _this.loadComponentList({id:id});
-                    var t=$('tr[data-item="'+id+'"]');
-                    if(t.length){
-                        t.addClass('preview');
-                    }
                     Project.Viewer.highlight({
                         type: 'userId',
                         ids: [userId]
                     });
                     Project.Viewer.viewer.getFilters().setSelectedIds([userId]);//选中与否
+                    // _this.loadComponentList({id:id});
+                    // var t=$('tr[data-item="'+id+'"]');
+                    // if(t.length){
+                    //     t.addClass('preview');
+                    // }
                     // Project.viewer.getFilters().setSelectedIds([userId]);
                 }else{
-                    var t=$('tr.preview').removeClass('preview');;
+                    // var t=$('tr.preview').removeClass('preview');
+                    
+                    Project.Viewer.viewer.getFilters().setSelectedIds();//选中与否
+                    Project.Viewer.viewer.render();
                 }
             });
             Project.Viewer=viewer;
@@ -521,13 +541,13 @@
         },
         zoom:function(ids,markers,boxs){
             Project.Viewer.setAllView(boxs,0.01);
-            Project.Viewer.loadMarkers(markers);
+            // Project.Viewer.loadMarkers(markers);
             Project.Viewer.translucent(true);
-            Project.Viewer.highlight({
-                type: 'userId',
-                ids: ids
-            });
-            Project.Viewer.viewer.getFilters().setSelectedIds(ids);
+            // Project.Viewer.highlight({
+            //     type: 'userId',
+            //     ids: ids
+            // });
+            // Project.Viewer.viewer.getFilters().setSelectedIds(ids);
         },
         showInModel:function(isAll){
             var _this=this;
