@@ -142,7 +142,7 @@ ViewComp.MemberManager = Backbone.View.extend({
 						if(!treeNode.userId && !treeNode.isParent){
 							_this.loadChildren(_this,treeNode.outer,treeNode.orgId,treeNode);
 						}else if(treeNode.userId){
-							_this.addOption();
+							//_this.addOption();
 						}
 					}
 				},

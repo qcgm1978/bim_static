@@ -106,7 +106,7 @@ App.Services.roleWindowIndex = Backbone.View.extend({
                 if(response.code == 0){
                     //App.Services.role.collection.add(response.data);
                     console.log("role",response.data.roleId);
-                    App.Services.role.loadData(function(){
+                    App.Services.role.init(function(){
                         var $list = $("#roleList li");
                         var newRoleId = response.data.roleId; /*新增角色ID*/
                         var len = $list.length;

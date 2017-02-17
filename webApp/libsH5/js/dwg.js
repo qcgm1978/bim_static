@@ -202,17 +202,22 @@ var dwgViewer = function(options) {
 
         var $this = $(this);
 
-        $this.addClass("selected").siblings().removeClass("selected");
         var fn = $this.data('id'),
             group = $this.data('group'),
             type = $this.data('type');
-        console.log(type);
+
         if(type=="more")
         {
+            $this.addClass("selected");
             $(".subBar").show();
         }
+        if(type == "comment")
+        {
+            that.shapeType = $this.data("id");
+            $this.addClass("selected").siblings().removeClass("selected");
+        }
         if(type == "comment-color"){
-          $this.addClass('selected').siblings().removeClass('selected');
+          //$this.addClass('selected').siblings().removeClass('selected');
           var  parent= $this.parent().parent(),
               precolor = parent.data('color'),
               colors = $this.data('color'),
@@ -222,8 +227,8 @@ var dwgViewer = function(options) {
           $(".subBar").hide();
           e.stopPropagation();
         }else{
-          that.dwgHelper.setAnnotationType(that.__commentToolBarType[$this.data("id")]);
-
+          //that.dwgHelper.setAnnotationType(that.__commentToolBarType[$this.data("id")]);
+          that.dwgHelper.setAnnotationType(that.shapeType);
         }
 
       })
