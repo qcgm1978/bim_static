@@ -310,6 +310,9 @@
                     item.fileName&&data.push(item.fileName);
                 })
                 data= _.uniq(data);
+                alert(Project.Settings.projectId)
+                alert(Project.Settings.projectVersionId)
+                alert(data)
                 $.ajax({
                     url:'/doc/api/fileNames',
                     type:'post',
