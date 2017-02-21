@@ -73,7 +73,7 @@
         },
 
         //格式化已选数据
-        formatSelectedData:function(){
+        formatSelectedData:function(){//google
             Project.dataCore.list=[];
             if(Project.Settings.selectedData){
                 _.each(Project.Settings.selectedData,function(item){
@@ -114,7 +114,7 @@
         } else {
             this.Settings.token_cookie = "";
         }
-        if (this.Settings.etag) {
+        if (this.Settings.etag) {//ie下 执行了model页面之后再次执行进来
             ourl = options.host || ourl;
             Project.Settings = _this.Settings;
             Project.data=Project.Settings.data;
@@ -199,9 +199,9 @@
         },
         init: function () {
             if (this.isIE()) {
-                this.activeXObject();
+                this.activeXObject();//ie
             } else {
-                this.loadLib();
+                this.loadLib();//google
             }
         },
         setData:function(data){
@@ -210,22 +210,22 @@
         getData:function(){
             return Project.dataCore;
         },
-        isIE: function () {
-            if (!!window.ActiveXObject || "ActiveXObject" in window)
+        isIE: function () {//判断浏览器类型
+            if (!!window.ActiveXObject || "ActiveXObject" in window){
                 return true;
-            else
+            }else{
                 return false;
+            }
         },
-        //activeXObject 渲染模型
-        activeXObject: function () {
+        activeXObject: function () {//ie下查看 activeXObject 渲染模型
             var _this=this;
+
             WebView = document.createElement("object");
             WebView.classid = "CLSID:15A5F85D-A81B-45D1-A03A-6DBC69C891D1";
 
             var viewport = document.getElementById('deviceSelector');
             viewport.appendChild(WebView);
-
-            function resizeWebView() {
+            function resizeWebView() {//窗体变化
                 //重置
                 if (window.devicePixelRatio) {
                     WebView.zoomFactor = window.devicePixelRatio;
@@ -255,18 +255,20 @@
                 if(/onSelect$/.test(url)){
                     Project.Settings.callback.call(this,{});
                 }
-                if(/onLoad$/.test(url)){
-
+                if(/onLoad$/.test(url)){//ie下操作
                     WebView.runScript("init('"+data+"')", function() {
                     });
                 }
             });
-          /* setTimeout(function(){
-               WebView.runScript("init('"+data+"')", function() {
-               });
-           },1000)*/
         },
-        loadLib: function () {
+        initStyle:function(){//google
+            if(!this.Settings.isShowConfirm){
+                $('.deviceSelector .rightSilderBar .contentbar ').css('bottom','40px')
+                $('.deviceSelector .rightSilderBar .footBar ').css('bottom','-40px')
+                $('.footTool').hide();
+            }
+        }, 
+        loadLib: function () {//google。ie第二次进来执行
             var self = this,
                 srciptUrl = ourl + '/static/dist/libs/libsH5.js',
                 commjs = ourl + '/static/dist/comm/comm_20160313.js',
@@ -302,9 +304,7 @@
                     strVar += "    <\/div>";
                     $('#deviceSelector').append(strVar);
                 }
-                 self.initStyle();
-              //  self.initEvent();
-               // return
+                 self.initStyle();//google
                 var data=[];
                 _.each(Project.data,function(item){
                     item.fileName&&data.push(item.fileName);
@@ -329,28 +329,19 @@
                                 });
                                 if(_temp){
                                     item.componentId= _temp.modelId+"."+item.uniqueId;
-                                   // item.componentId= 'a2e03fbc9984306fd90b9b939ae3b37d.5b7e29a9-6026-41d3-ad72-1b10d59c4b02-002aa916';
                                 }else{
                                     item.componentId= "";
                                 }
                                 count++;
                             })
-                            Tools.formatSelectedData();
-                            self.loadModal();
+                            Tools.formatSelectedData();//google
+                            self.loadModal();//google
                         }
                     }
                 })
-
             })
         },
-        initStyle:function(){
-            if(!this.Settings.isShowConfirm){
-                $('.deviceSelector .rightSilderBar .contentbar ').css('bottom','40px')
-                $('.deviceSelector .rightSilderBar .footBar ').css('bottom','-40px')
-                $('.footTool').hide();
-            }
-        },
-        initEvent: function () {
+        initEvent: function () {//google
             var _self=this;
             $('.deviceSelector .before').click(function () {
                 if ($(this).hasClass('closeBtn')) {
@@ -367,7 +358,6 @@
                     $(this).html("关闭");
                 }
             })
-
             $('.contentList').on('click',function(event){
                 if(event.target.className=='checkBoxInput'){
                     var $target=$(event.target),
@@ -405,46 +395,27 @@
                         var val=$target.data('item');
                         var item = _.find(list, function(item){ return item.id==val; });
                         var box=item.boundingbox||item.boundingBox;
+                        alert(item.componentId)
                         var location={
                             componentId:item.componentId,
                             position : box.max,
                             boundingBox:box
                         } 
-                        markers.push(_self.formatMark(location,0,item.id));
-                        Project.Viewer.loadMarkers(markers);
+                        markers.push(_self.formatMark(location,0,item.id));//google
+                        Project.Viewer.loadMarkers(markers);//google
                         Project.Viewer.highlight({
                             type: 'userId',
                             ids: [item.componentId]
                         });
-                        Project.Viewer.zoomToBox( _self.formatBBox(box));
+                        Project.Viewer.zoomToBox( _self.formatBBox(box));//google
                     }
                 }
-
             })
-
             $('.confirm').click(function(){
                 Project.dispatchIE("/?commType=onData");
             })
         },
-        pageInfo:function(param){
-            var _this=this;
-            $(".listPagination").empty().pagination(param.totalItemCount, {
-                items_per_page: param.pageItemCount,
-                current_page: param.pageIndex-1,
-                num_edge_entries: 2, //边缘页数
-                num_display_entries: 3, //主体页数
-                link_to: 'javascript:void(0);',
-                itemCallback: function(pageIndex) {
-                    _this.loadComponentList({
-                        pageNum:pageIndex+1
-                    });
-                },
-                prev_text: "上一页",
-                next_text: "下一页"
-            });
-            $('.footPage').css('textAlign','right');
-        },
-        loadModal: function () {
+        loadModal: function () {//google
             var _this=this;
             var viewer = new bimView({
                 type: 'model',
@@ -455,9 +426,9 @@
                 projectVersionId: this.Settings.projectVersionId
             })
             viewer.on("loaded", function () {
-                _this.loadComponentList.call(_this);
-                _this.initEvent();
-                _this.showInModel(true);
+                _this.loadComponentList.call(_this);//google
+                _this.initEvent();//google
+                _this.showInModel(true);//google
                 $('#modelView .modelSidebar').addClass('hideMap');
                 $('#isolation').show();/*add by wangbing*/
             });
@@ -489,7 +460,7 @@
             });
             Project.Viewer=viewer;
         },
-        loadComponentList:function(param){
+        loadComponentList:function(param){//google
             var result=Tools.catchPageData(param);
             var data=result.items;
             var strVar = "",
@@ -508,7 +479,7 @@
                 strVar += "                <\/tr>";
             })
             $('.contentList').empty().append(strVar);
-            this.pageInfo(result);
+            this.pageInfo(result);//google
 
             $('.contentList').niceScroll({
                 cursorcolor:"#CFCFCF",
@@ -516,31 +487,7 @@
                 cursoropacitymax: 0.5
             })
         },
-        formatMark: function(location, color, id, shaType) {
-            var _temp = location;
-            if (typeof location === 'string') {
-                _temp = JSON.parse(location)
-            }
-            _temp.shapeType = Number(_temp.shapeType || shaType || 0);
-            _temp.state = Number(_temp.state || color || 0);
-            _temp.userId = _temp.userId || _temp.componentId;
-            _temp.id = id || '';
-            return JSON.stringify(_temp);
-        },
-        formatBBox: function(data) {
-            if (!data) {
-                return [];
-            }
-            var box = [],
-                min = data.min,
-                minArr = [min.x, min.y, min.z],
-                max = data.max,
-                maxArr = [max.x, max.y, max.z];
-            box.push(minArr);
-            box.push(maxArr);
-            return box;
-        },
-        zoom:function(ids,markers,boxs){
+        zoom:function(ids,markers,boxs){//google
             Project.Viewer.setAllView(boxs,0.01);
             // Project.Viewer.loadMarkers(markers);
             Project.Viewer.translucent(true);
@@ -550,7 +497,7 @@
             // });
             // Project.Viewer.viewer.getFilters().setSelectedIds(ids);
         },
-        showInModel:function(isAll){
+        showInModel:function(isAll){//google
             var _this=this;
             var list=isAll?Project.data:Project.dataCore.list,
                 markers=[],
@@ -567,8 +514,50 @@
                 markers.push(_this.formatMark(location,0,item.id));
                 boxs.push(box);
             })
-            _this.zoom(ids,markers,boxs);
-        }
+            _this.zoom(ids,markers,boxs);//google
+        },
+        pageInfo:function(param){//google
+            var _this=this;
+            $(".listPagination").empty().pagination(param.totalItemCount, {
+                items_per_page: param.pageItemCount,
+                current_page: param.pageIndex-1,
+                num_edge_entries: 2, //边缘页数
+                num_display_entries: 3, //主体页数
+                link_to: 'javascript:void(0);',
+                itemCallback: function(pageIndex) {
+                    _this.loadComponentList({
+                        pageNum:pageIndex+1
+                    });
+                },
+                prev_text: "上一页",
+                next_text: "下一页"
+            });
+            $('.footPage').css('textAlign','right');
+        },
+        formatMark: function(location, color, id, shaType) {//google
+            var _temp = location;
+            if (typeof location === 'string') {
+                _temp = JSON.parse(location)
+            }
+            _temp.shapeType = Number(_temp.shapeType || shaType || 0);
+            _temp.state = Number(_temp.state || color || 0);
+            _temp.userId = _temp.userId || _temp.componentId;
+            _temp.id = id || '';
+            return JSON.stringify(_temp);
+        },
+        formatBBox: function(data) {//google
+            if (!data) {
+                return [];
+            }
+            var box = [],
+                min = data.min,
+                minArr = [min.x, min.y, min.z],
+                max = data.max,
+                maxArr = [max.x, max.y, max.z];
+            box.push(minArr);
+            box.push(maxArr);
+            return box;
+        },
     }
     win.DeviceSelection = DeviceSelection;
 }(window))
