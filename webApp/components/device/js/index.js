@@ -89,6 +89,7 @@
         }
     }
     function DeviceSelection(options) {
+        console.log("options",options);
         var _this = this;
         if (!(this instanceof DeviceSelection)) {
             return new DeviceSelection(options);
