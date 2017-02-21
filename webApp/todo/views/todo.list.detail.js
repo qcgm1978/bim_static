@@ -16,7 +16,7 @@ App.Todo.TodoDetailView=Backbone.View.extend({
 
 	//代办
 	events:{
-		 
+		"click .title a":"openUrlHandle"
 	},  
 
 	template:_.templateUrl("./todo/tpls/todo.list.detail.html"),
@@ -36,9 +36,23 @@ App.Todo.TodoDetailView=Backbone.View.extend({
 		var data=this.model.toJSON();
 		data.type=App.Todo.Settings.type;
 		this.$el.html(this.template(data)).attr("cid",this.model.cid); 
-		 
 		return this;
 
+	},
+	openUrlHandle:function(event){
+		var target = $(event.target);
+		var todoId = target.attr("data-todoId");
+		var openUrl = target.attr("data-pcUrl");
+		var data = {
+			URLtype: "setFetchTodoData",
+			type: "PUT",
+			data: {
+				todoId: todoId
+			}
+		};
+		App.Comm.ajax(data,(resultData)=>{
+			App.Todo.loadData();
+		})
+		window.open(openUrl,"_blank");
 	}
-
 });

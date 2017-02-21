@@ -108,6 +108,7 @@ App.API = {
 
 		//代办$chars
 		fetchTodoData: "platform/todo", //获取代办数据
+		setFetchTodoData: "platform/todo/{todoId}/read", //获取代办数据
 
 		//项目
 		fetchProjects: "platform/project?type=3", //项目列表
