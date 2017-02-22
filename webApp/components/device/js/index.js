@@ -67,7 +67,6 @@
                 pageItemCount:opts.pageSize,
                 pageIndex:opts.pageNum,
                 totalItemCount:_len
-
             }
             return result;
         },
@@ -98,7 +97,6 @@
             appKey: "18fbec1ae3da477fb47d842a53164b14",
             token: "abc3f4a2981217088aed5ecf8ede5b6397eed0795978449bda40a6987f9d6f7b0d061e9c8ad279d740ef797377b4995eb55766ccf753691161e73c592cf2416f9744adce39e1c37623a794a245027e79cd3573e7938aff5b4913fe3ed4dbea6d5be4693d85fe52f972e47e6da4617a508e5948f65135c63f",
             isShowConfirm:true
-
         }
 
         //合并参数
@@ -284,24 +282,60 @@
                 //兼容Chrome浏览器
                 if ($('#modelView').length <= 0) {
                     var strVar = "";
-                    strVar += "<div id=\"modelView\" class=\"model\"><\/div>";
+                    strVar += "    <div id=\"modelView\" class=\"model\"><\/div>";
                     strVar += "    <div class=\"rightSilderBar\">";
-                    strVar += "        <div class=\"before\">展开<\/div>";
-                    strVar += "        <div class=\"headerBar\"><\/div>";
-                    strVar += "        <div class=\"contentbar\">";
+                    strVar += "      <div class=\"before\">展开<\/div>";
+                    strVar += "      <div class=\"hedaerSearch\">";
+                    strVar += "        <span class=\"searchToggle\">选择筛选条件</span>";
+                    strVar += "        <span class=\"clearSearch\">清除条件</span>";
+                    strVar += "      </div>";
+                    strVar += "      <div class=\"searchDetail\">";
+                    strVar += "        <div class=\"searchOptons\">";
+                    strVar += "          <div class=\"optonLine\">";
+                    strVar += "            <div class=\"myDropDown floorOption\">";
+                    strVar += "                <span class=\"myDropText\">";
+                    strVar += "                <span>楼层：</span> <span class=\"text\">全部</span> <i class=\"myDropArrorw\"></i> </span>";
+                    strVar += "                <ul class=\"myDropList\">";
+                    strVar += "                </ul>";
+                    strVar += "            </div>";
+                    strVar += "            <div class=\"searchName\">";
+                    strVar += "                <span>位置：</span>";
+                    strVar += "                <input type=\"text\" class=\"txtSearchName\" placeholder=\"请输入关键字\"/>";
+                    strVar += "            </div>";
+                    strVar += "          </div>";
+                    strVar += "          <div class=\"optonLine btnOption\">";
+                    strVar += "            <input type=\"button\" class=\"myBtn myBtn-primary btnFilter\" value=\"筛选\" />";
+                    strVar += "          </div>";
+                    strVar += "        </div>";
+                    strVar += "      </div>";
+                    strVar += "      <div class=\"headerBar\"><\/div>";
+                    strVar += "      <div class=\"contentbar\">";
+                    strVar += "        <div class=\"contentbarBox\">";
+                    strVar += "          <div class=\"listTheader\">";
+                    strVar += "            <table>";
+                    strVar += "              <tr>";
+                    strVar += "                <td class=\"checkbox\"><input class=\"checkBoxInput\" type=\"checkbox\"></td>";
+                    strVar += "                <td>楼层</td>";
+                    strVar += "                <td>位置</td>";
+                    strVar += "              </tr>";
+                    strVar += "            </table>";
+                    strVar += "          </div>";
+                    strVar += "          <div class=\"listTBody\">";
                     strVar += "            <table  cellspacing=\"0\" >";
-                    strVar += "                <thead>";
-                    strVar += "                <tr>";
-                    strVar += "                    <th class=\"checkbox\"><\/th>";
-                    strVar += "                    <th>构件编码<\/th>";
-                    strVar += "                <\/tr>";
-                    strVar += "                <\/thead>";
-                    strVar += "                <tbody class=\"contentList\">";
-                    strVar += "                <\/tbody>";
-                    strVar += "            <\/table>";
-                    strVar += "    <\/div>";
-                    strVar += "        <div class=\"footBar\"><div class=\"footPage\"><div class=\"sumDesc\"></div><div class=\"listPagination\">正在加载...<\/div><\/div><div class=\"footTool\"><a class=\"mmh-btn confirm\">确认<\/a><\/div><\/div>";
-                    strVar += "    <\/div>";
+                    strVar += "              <tbody class=\"contentList\">";
+                    strVar += "              </tbody>";
+                    strVar += "            </table>";
+                    strVar += "          </div>";
+                    strVar += "        </div>";
+                    strVar += "      </div>";
+                    strVar += "      <div class=\"footBar\">";
+                    strVar += "        <div class=\"footPage\">";
+                    strVar += "          <div class=\"sumDesc\"></div>";
+                    strVar += "          <div class=\"listPagination\">正在加载...</div>";
+                    strVar += "        </div>";
+                    strVar += "        <div class=\"footTool\"><a class=\"mmh-btn confirm\">确认</a></div>";
+                    strVar += "      </div>";
+                    strVar += "    </div>";
                     $('#deviceSelector').append(strVar);
                 }
                  self.initStyle();//google
@@ -310,9 +344,9 @@
                     item.fileName&&data.push(item.fileName);
                 })
                 data= _.uniq(data);
-                alert(Project.Settings.projectId)
-                alert(Project.Settings.projectVersionId)
-                alert(data)
+                // alert(Project.Settings.projectId)
+                // alert(Project.Settings.projectVersionId)
+                // alert(data)
                 $.ajax({
                     url:'/doc/api/fileNames',
                     type:'post',
@@ -337,6 +371,7 @@
                                 }
                                 count++;
                             })
+                            self.loadFloorData();//获取楼层的信息
                             Tools.formatSelectedData();//google
                             self.loadModal();//google
                         }
@@ -344,8 +379,47 @@
                 })
             })
         },
+        loadFloorData:function(){//获取楼层的信息
+            var ajaxUrl = "/doc/"+Project.Settings.projectId+"/"+Project.Settings.projectVersionId+"/floor/info";
+            $.ajax({
+                type:"get",
+                url:ajaxUrl,
+                contentType:'application/json',
+                success:function(response){
+                    var html = "<li class='myItem' data-val=''>全部</li>";
+                    if(response.code == 0){
+                        var data = response.data;
+                        if(data.length>0){
+                           for(var i=0,dataLen=data.length-1;i<=dataLen;i++){
+                               html+='<li class="myItem" data-val="'+data[i].code+'">'+data[i].floor+'</li>'
+                           }
+                           $(".myDropList").append(html);
+                        }
+                    }
+                }
+            });
+        },
         initEvent: function () {//google
             var _self=this;
+            $(".searchToggle").click(function(e){//搜索的切换效果
+                var $searchDetail = $(".searchDetail");
+                if ($searchDetail.is(":animated")) {
+                    return;
+                }
+                $(e.currentTarget).toggleClass('expandArrowIcon');
+                $searchDetail.slideToggle();
+                
+            })
+            //清空搜索条件
+            $(".clearSearch").click(function() {
+                $(".floorOption .text").html('全部');
+                $(".txtSearchName").val('');
+            })
+            $(".floorOption").myDropDown({
+                click: function($item) {
+                    // _self.changePA('floor', $item.data("val"))
+                }
+            });
             $('.deviceSelector .before').click(function () {
                 if ($(this).hasClass('closeBtn')) {
                     $('.deviceSelector .rightSilderBar').animate({
@@ -398,7 +472,7 @@
                         var val=$target.data('item');
                         var item = _.find(list, function(item){ return item.id==val; });
                         var box=item.boundingbox||item.boundingBox;
-                        alert(item.componentId)
+                        // alert(item.componentId)
                         var location={
                             componentId:item.componentId,
                             position : box.max,
@@ -465,30 +539,85 @@
         },
         loadComponentList:function(param){//google
             var result=Tools.catchPageData(param);
-            var data=result.items;
-            var strVar = "",
-                list=Project.dataCore.list;
-            _.each(data,function(item){
-                var _flag=_.find(list,function(listItem){return listItem.id==item.id });
-                strVar += " <tr data-item="+item.id+" data-cid="+item.componentId+">";
-                strVar += "                    <td class=\"checkbox\">";
-                if(_flag){
-                    strVar += "                        <input checked=\"checked\" class=\"checkBoxInput\" type=\"checkbox\">";
-                }else{
-                    strVar += "                        <input class=\"checkBoxInput\" type=\"checkbox\">";
-                }
-                strVar += "                    <\/td>";
-                strVar += "                    <td  class=\"colItem\">"+item.uniqueId+"<\/td>";
-                strVar += "                <\/tr>";
-            })
-            $('.contentList').empty().append(strVar);
-            this.pageInfo(result);//google
+            var componentListUrl = "/sixD/"+Project.Settings.projectId+"/"+Project.Settings.projectVersionId+"/material/equipment";
+            var urlData= [{
+                "fileName": "WDGC-Q-AR-B01-构造柱.rvt",
+                "revitFileId": "5d68b36c-be08-47fe-bbbc-7113ee36b953",
+                "uniqueId": "238691c2-ac82-4509-8756-57dc37b357f0-00082c63",
+                "boundingbox": {
+                    "min": {
+                        "x": -123131.73324769066,
+                        "y": 68664.52547268308,
+                        "z": -4299.999999999999
+                    },
+                    "max": {
+                        "x": -122931.73324769066,
+                        "y": 71964.52547268309,
+                        "z": -750.0000000000027
+                    }
+                },
+                "id": "rid_uuid_1",
+                "componentId": "a7b881bc0a6a57333d16e634c41acc84.8987404e-67d4-42cb-adf0-1532249fd8b0-00222613"
+            },
+            {
+                "fileName": "WDGC-Q-AR-B01-构造柱.rvt",
+                "revitFileId": "5d68b36c-be08-47fe-bbbc-7113ee36b953",
+                "uniqueId": "238691c2-ac82-4509-8756-57dc37b357f0-00082cdd",
+                "boundingbox": {
+                    "min": {
+                        "x": -122431.73324769066,
+                        "y": 68314.52547286882,
+                        "z": -4679.999999999999
+                    },
+                    "max": {
+                        "x": -114731.73324769083,
+                        "y": 68514.52547286885,
+                        "z": -750.0000000000027
+                    }
+                },
+                "id": "rid_uuid_2",
+                "componentId": "a7b881bc0a6a57333d16e634c41acc84.8987404e-67d4-42cb-adf0-1532249fd8b0-00222613"
+            }]
 
-            $('.contentList').niceScroll({
-                cursorcolor:"#CFCFCF",
-                cursoropacitymin: 0.5,
-                cursoropacitymax: 0.5
-            })
+            // result.items
+            $.ajax({
+                type:"post",
+                url:componentListUrl,
+                data:JSON.stringify({"employees":urlData}),
+                contentType: "application/json",
+                success:function(response){
+                    if(response.code == 0){
+                        console.log(response);
+                    }
+                }
+            });
+
+
+            // var result=Tools.catchPageData(param);
+            // var data=result.items;
+            // var strVar = "",
+            //     list=Project.dataCore.list;
+            // _.each(data,function(item){
+            //     var _flag=_.find(list,function(listItem){return listItem.id==item.id });
+            //     strVar += " <tr data-item="+item.id+" data-cid="+item.componentId+">";
+            //     strVar += "                    <td class=\"checkbox\">";
+            //     if(_flag){
+            //         strVar += "                        <input checked=\"checked\" class=\"checkBoxInput\" type=\"checkbox\">";
+            //     }else{
+            //         strVar += "                        <input class=\"checkBoxInput\" type=\"checkbox\">";
+            //     }
+            //     strVar += "                    <\/td>";
+            //     strVar += "                    <td  class=\"colItem\">"+item.uniqueId+"<\/td>";
+            //     strVar += "                <\/tr>";
+            // })
+            // $('.contentList').empty().append(strVar);
+            // this.pageInfo(result);//google
+
+            // $('.contentList').niceScroll({
+            //     cursorcolor:"#CFCFCF",
+            //     cursoropacitymin: 0.5,
+            //     cursoropacitymax: 0.5
+            // })
         },
         zoom:function(ids,markers,boxs){//google
             Project.Viewer.setAllView(boxs,0.01);
