@@ -1236,6 +1236,37 @@
 				Project.locationName[_userId] = _axisObj.abcName+'轴'+offsetYFU+','+_axisObj.numeralName+'轴'+offsetXFU;
 				Project.axis[_userId] = JSON.stringify(_axisObj);
 				Project.components[_userId] = _boundingBox;
+
+				/*获取楼层信息 begin*/
+				_url = "/sixD/{projectId}/{projectVersionId}/quality/axis/?elementId={elementId}";
+				_url = _url.replace("{projectId}",_this.Settings.projectId);
+				_url = _url.replace("{projectVersionId}",_this.Settings.projectVersionId);
+				_url = _url.replace("{elementId}",model.intersect.userId);
+				_url = ourl + _url;
+
+				$.ajax({
+					url:_url,
+					type:"get",
+					dataType:"json",
+					success:function(data){
+						var floor;
+						if(data.code!=0)
+						{
+							return;
+						}
+						if(data.data==null)
+						{
+							return;
+						}
+						floor = data.data.floor;
+						if(floor!=null)
+						{
+							Project.locationName[_userId] = Project.locationName[_userId] + ",楼层 " + floor;
+						}
+					}
+				});
+				/* end */
+
 				/*$.ajax({
 					url: fileUrl,
 					success: function(data) {
