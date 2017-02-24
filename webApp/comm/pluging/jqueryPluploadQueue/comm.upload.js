@@ -61,7 +61,7 @@
             options.init = {
                 FilesAdded: function(up, files) {
 
-                    if(!options.beforeAdd(files))/*返回false,终止上传;返回true,继续上传 add by wuweiwei 2017-2-9*/
+                    if(options.beforeAdd!=undefined&&!options.beforeAdd(files))/*返回false,终止上传;返回true,继续上传 add by wuweiwei 2017-2-9*/
                     {
                         return;
                     }
