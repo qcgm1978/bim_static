@@ -464,6 +464,10 @@
                 $(".searchDetail").slideUp();
                 $(".searchToggle").removeClass('expandArrowIcon');
                 Project.data = htmlData;//修改了 初始化的数据 此数据也用于了分页效果
+                if($(".btnCk").hasClass("selected")){
+                    $(".btnCk").removeClass("selected");
+                    Project.Viewer.loadMarkers();
+                }
                 if(Project.data.length>0){
                     _self.showInModel(false);//google
                 }else{
@@ -481,9 +485,19 @@
             })
             $(".clearSearch").click(function() {//清空搜索条件
                 var checkAllBoxS = $(".checkAllBox");
+
                 checkAllBoxS.prop("checked",false);
+                Project.dataCore.list=[];//点击清空按钮的时候 页面列表从新刷新
+                Project.data = _self.Settings.searchDatas;//把初始化的时候存起来的数据 复制给全选 使用的数据 用于全选使用
+
                 $(".floorOption .text").html('全部');
+
                 $(".txtSearchName").val('');
+
+                if($(".btnCk").hasClass("selected")){
+                    $(".btnCk").removeClass("selected");
+                }
+                Project.Viewer.loadMarkers();
                 _self.Settings.checkboxLen = 0;
                 Project.dataCore.list=[];//点击清空按钮的时候 页面列表从新刷新
                 Project.data = _self.Settings.searchDatas;//把初始化的时候存起来的数据 复制给全选 使用的数据 用于全选使用
