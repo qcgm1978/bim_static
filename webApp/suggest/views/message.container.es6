@@ -18,6 +18,7 @@ App.Suggest.containerView=Backbone.View.extend({
         var _data=item.toJSON();
 		var _html=_.templateUrl('./suggest/tpls/list.html');
 		this.$('.commissionLists').html(_html({data:_data}));
+        this.scrollFun();
         /*this.$(".commissionListPagination").empty().pagination(_data.totalItemCount, {
              items_per_page:_data.pageItemCount,
              current_page:_data.pageIndex-1,
@@ -30,8 +31,10 @@ App.Suggest.containerView=Backbone.View.extend({
              next_text: "下一页"
 
          });*/
-	}
-
+	},
+    scrollFun:function(){
+        
+    }
 
 })
 
