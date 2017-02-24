@@ -27,6 +27,7 @@
         dataCore:{
           list:[]
         },
+        checkboxAllText:'选择全部记录',
         dispatchIE:function(url) {
             if (navigator.userAgent.indexOf("QtWebEngine/5.7.0") > -1) {
                 window.open(url);
@@ -405,15 +406,14 @@
         },
         initEvent: function () {//google
             var _self=this;
-            $(".groupRadio").myRadioCk({
+            $(".groupRadio").myRadioCk({//点击显示搜索结果对应位置执行的方法
                 click:function(isCk){
                     $(".contentList>tr").removeClass('preview');
-                    Project.Viewer.highlight({
-                        type: 'userId',
-                        ids: []
-                    });
-                    Project.Viewer.loadMarkers();
-                    _self.showInModel(true);//google
+                    if(Project.data.length>0){
+                        _self.showInModel(true);//google
+                    }else{
+                        _self.showInModel(false);//google
+                    }
                     if(isCk){
                         Project.Viewer.loadMarkers(_self.Settings.markers);
                     }
@@ -421,14 +421,17 @@
             });
             $(".checkAllBox").click(function(e){//全选按钮的方法
                 var target = $(e.target);
-                // var allDatas = _self.Settings.searchDatasList;//点击全选的时候 刷新列表的数据
                 var allDatas = Project.data;//点击全选的时候 刷新列表的数据
                 var targetBool = target.prop("checked");
                 Project.dataCore.list = targetBool?allDatas:[];//同时设置用于判断哪些是选中的数据的
                 _self.Settings.checkboxLen = targetBool?allDatas.length:0;
+                Project.checkboxAllText=targetBool?"取消全部记录":"选择全部记录";
                 _self.addDomHtml();//拼接html结构
             })
-            
+            $(".checkAllBox").on("mouseover",function(event) {
+                /* Act on the event */
+                event.target.title=Project.checkboxAllText;
+            });
             $(".btnFilter").click(function(e){//点击筛选按钮执行的方法
                 var floorText = $(".floorOption .text").html();
                 var txtSearchNameVal = $(".txtSearchName").val();
@@ -455,12 +458,18 @@
                         }
                     }
                 }
-                // _self.Settings.searchDatasList = htmlData;//当做了一些筛选之后 重置点击全选 选中的数组
+                if ($(".searchDetail").is(":animated")) {
+                    return;
+                }
                 $(".searchDetail").slideUp();
                 $(".searchToggle").removeClass('expandArrowIcon');
                 Project.data = htmlData;//修改了 初始化的数据 此数据也用于了分页效果
+                if(Project.data.length>0){
+                    _self.showInModel(false);//google
+                }else{
+                    _self.showInModel(true);//google
+                }
                 _self.addDomHtml();//拼接html结构
-                // _self.showInModel(true);//google
             })
             $(".searchToggle").click(function(e){//搜索的切换效果
                 var $searchDetail = $(".searchDetail");
@@ -469,7 +478,6 @@
                 }
                 $(e.currentTarget).toggleClass('expandArrowIcon');
                 $searchDetail.slideToggle();
-                
             })
             $(".clearSearch").click(function() {//清空搜索条件
                 var checkAllBoxS = $(".checkAllBox");
@@ -478,7 +486,6 @@
                 $(".txtSearchName").val('');
                 _self.Settings.checkboxLen = 0;
                 Project.dataCore.list=[];//点击清空按钮的时候 页面列表从新刷新
-                // _self.Settings.searchDatasList = _self.Settings.searchDatas;//把初始化的时候存起来的数据 复制给全选 使用的数据 用于全选使用
                 Project.data = _self.Settings.searchDatas;//把初始化的时候存起来的数据 复制给全选 使用的数据 用于全选使用
                 $(".searchDetail").slideUp();
                 $(".searchToggle").removeClass('expandArrowIcon');
@@ -505,13 +512,12 @@
                 }
             })
 
-            $('.contentList').on('click',function(event){
+            $('.contentList').on('click',function(event){//右侧列表点击之后执行的方法
                 if(event.target.className=='checkBoxInput'){//点击的是列表前面的复选框
                     var $target=$(event.target),
                         flag=$target.is(':checked');
                     var val=$target.closest('tr').data('item');
                     var list=Project.data;
-                    // var allDatas = _self.Settings.searchDatasList;//点击单个列表的时候 用于判断当前的全选按钮是否选中的数据
                     var allDatas = Project.data;//点击单个列表的时候 用于判断当前的全选按钮是否选中的数据
                     var allDatasLen = allDatas.length;
                     var obj = _.find(list, function(item){ return item.id==val; });
@@ -527,6 +533,7 @@
                     }else{
                         _self.Settings.checkboxLen--;
                     }
+                    Project.checkboxAllText=allDatasLen==_self.Settings.checkboxLen?"取消全部记录":"选择全部记录";
                     if(allDatasLen==_self.Settings.checkboxLen){
                         $(".checkAllBox").prop('checked', true);
                     }else{
@@ -669,49 +676,6 @@
                 success:function(response){
                     if(response.code == 0){
                         var data = response.data;
-                        // var data = [{
-                        //   "id": "rid_uuid_1",
-                        //   "fileName": "WDGC-Q-AR-B01-构造柱.rvt",
-                        //   "componentId": "a7b881bc0a6a57333d16e634c41acc84.8987404e-67d4-42cb-adf0-1532249fd8b0-00222613",
-                        //   "revitFileId": "5d68b36c-be08-47fe-bbbc-7113ee36b953",
-                        //   "uniqueId": "238691c2-ac82-4509-8756-57dc37b357f0-00082c63",
-                        //   "boundingbox": {
-                        //     "min": {
-                        //       "x": -123131.73324769066,
-                        //       "y": 68664.52547268308,
-                        //       "z": -4299.999999999999
-                        //     },
-                        //     "max": {
-                        //       "x": -122931.73324769066,
-                        //       "y": 71964.52547268309,
-                        //       "z": -750.0000000000027
-                        //     }
-                        //   },
-                        //   "floor": "B01",
-                        //   "axis": "F,G,17,18"
-                        // },
-                        // {
-                        //   "id": "rid_uuid_2",
-                        //   "fileName": "WDGC-Q-AR-B01-构造柱.rvt",
-                        //   "componentId": "a7b881bc0a6a57333d16e634c41acc84.8987404e-67d4-42cb-adf0-1532249fd8b0-00222613",
-                        //   "revitFileId": "5d68b36c-be08-47fe-bbbc-7113ee36b953",
-                        //   "uniqueId": "238691c2-ac82-4509-8756-57dc37b357f0-00082cdd",
-                        //   "boundingbox": {
-                        //     "min": {
-                        //       "x": -122431.73324769066,
-                        //       "y": 68314.52547286882,
-                        //       "z": -4679.999999999999
-                        //     },
-                        //     "max": {
-                        //       "x": -114731.73324769083,
-                        //       "y": 68514.52547286885,
-                        //       "z": -750.0000000000027
-                        //     }
-                        //   },
-                        //   "floor": "B02",
-                        //   "axis": "F,G,17,18"
-                        // }]
-                        // Project.data = data;//初始化的时候 存起来 点击全选的时候的数据
                         _this.Settings.searchDatas = data;//初始化用于筛选用的数据 每次在这里数组里面筛选
                         Project.data = data;
                         _this.addDomHtml();//拼接html结构
@@ -745,7 +709,7 @@
             $('.contentList').empty().append(strVar);
             this.pageInfo(result);//google
         },
-        zoom:function(ids,markers,boxs){//google
+        zoom:function(ids,boxs){//google
             Project.Viewer.setAllView(boxs,0.01);
             Project.Viewer.translucent(true);
             // Project.Viewer.loadMarkers(markers);/
@@ -758,7 +722,7 @@
         showInModel:function(isAll){//google
             var _this=this;
             // var list=isAll?Project.data:Project.dataCore.list,
-            var list=isAll?Project.dataEntry:Project.dataCore.list,
+            var list=isAll?Project.dataEntry:Project.data,
                 markers=[],
                 ids=[],
                 boxs=[];
@@ -774,7 +738,7 @@
                 boxs.push(box);
             })
             this.Settings.markers = markers;
-            _this.zoom(ids,markers,boxs);//google
+            _this.zoom(ids,boxs);//google
         },
         pageInfo:function(param){//google
             var _this=this;
