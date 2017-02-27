@@ -13,8 +13,9 @@
     // 构件树
     fetchFloors: "view/{etag}/{sourceId}/floor", // 获取楼层
     fetchSpecialty: "view/{etag}/{sourceId}/specialty", // 获取楼层,专业信息
-    fetchCategory: "view/{etag}/{sourceId}/categories", // 获取构件信息
-    fetchCoding: 'view/category/coding/{etag}', //获取构件编码信息
+    fetchCategory: "doc/filter/tree/{etag}/{sourceId}/categories", // 获取构件分类信息
+    // fetchCoding: 'view/category/coding/{etag}', //获取构件编码信息
+    fetchCoding: 'doc/filter/tree/classCode/{etag}', //获取构件分类编码编码信息
     // 获取构件信息
     fetchComponentById:'sixD/{projectId}/{projectVersionId}/element',
     //快照
