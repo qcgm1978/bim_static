@@ -26,6 +26,9 @@ var AppRoute = Backbone.Router.extend({
 		"post/detail/:id": 'postDetail',
 		'suggest':'suggest',
 		'userAdmin':'userAdmin',
+		'BIMperformance':'BIMperformances',                /*BIM性能测试,非用户使用*/
+		'BIMperformance/:id/:versionId':'BIMperformance',   /*BIM性能测试,非用户使用*/
+		'meeting':'meeting' 
 	},
 	//start 添加浏览用户的路由方法
 	userAdmin:function(){
@@ -354,6 +357,52 @@ var AppRoute = Backbone.Router.extend({
 
 
 	},
+
+	/*视频会议*/
+	meeting : function(){
+		_.require('/static/dist/meeting/meeting.js');
+		var viewer = new App.Meeting.Page();
+		$(document.getElementsByTagName("body")[0]).html(viewer.render().el);
+	},
+
+	/*测试BIM性能 begin*/
+
+	BIMperformances : function(){
+
+		if (this.reset() == false) {
+			return;
+		}
+		//销毁上传
+		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".projects").addClass('selected');
+		//加载css js
+		_.require('/static/dist/BIMperformance/libsH5.js');
+		_.require('/static/dist/BIMperformance/projects.css');
+		_.require('/static/dist/BIMperformance/projects.js');
+		App.Projects.init();
+
+	},
+
+	BIMperformance : function(id, versionId){
+
+		if (this.reset() == false) {
+			return;
+		}
+
+		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".projects").addClass('selected');
+		_.require('/static/dist/BIMperformance/libsH5.js');
+		_.require('/static/dist/BIMperformance/projects.css');
+		_.require('/static/dist/BIMperformance/projects.js');
+
+		App.Project.Settings = $.extend({}, App.Project.Defaults);
+
+		App.Project.Settings.projectId = id;
+
+		App.Project.Settings.versionId = versionId;
+		App.Project.init();
+
+	},
+
+	/* end */
 
 
 

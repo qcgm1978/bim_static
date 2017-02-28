@@ -779,6 +779,43 @@ fis.match('/static/dist/topNav/js/topNav.js', {
   release: '/static/dist/topNav/js/topNav.js'
 });
 
+//视频会议
+fis.match('/meeting/**.{js,es6}', {
+  packTo: '/static/dist/meeting/meeting.js'
+});
+fis.match('/static/dist/meeting/meeting.js', {
+  release: '/static/dist/meeting/meeting.js'
+});
+fis.match('/meeting/**.html', {
+  release: "/static/dist/tpls/$0"
+});
+
+
+
+//测试BIM模型性能
+fis.match('/BIMperformance/libsH5/**.{js,es6}', {
+  packTo: '/static/dist/BIMperformance/libsH5.js'
+});
+fis.match('/static/dist/BIMperformance/libsH5.js', {
+  release: '/static/dist/BIMperformance/libsH5.js'
+});
+
+fis.match('/BIMperformance/projects/**.{less,css}', {
+  packTo: '/static/dist/BIMperformance/projects.css'
+});
+fis.match('/static/dist/BIMperformance/projects.css', {
+  release: '/static/dist/BIMperformance/projects.css'
+});
+
+fis.match('/BIMperformance/projects/**.{js,es6}', {
+  packTo: '/static/dist/BIMperformance/projects.js'
+});
+fis.match('/static/dist/BIMperformance/projects.js', {
+  release: '/static/dist/BIMperformance/projects.js'
+});
+
+
+
 
 //  fis.match('**.html', {
 //   //useHash:true,
