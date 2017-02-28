@@ -142,7 +142,7 @@
         },function(datas){
           var data = datas.data.tree;
           var total = datas.data.total;
-          $("#category").find("span.treeText").empty().html("分类编码"+"<span class='treeColor'>("+total+")</span>");
+          $("#category").find("span.treeText").empty().html("构件类型"+"<span class='treeColor'>("+total+")</span>");
           var category = bimView.comm.viewTree({
             arr:data,
             type:'categoryId',
