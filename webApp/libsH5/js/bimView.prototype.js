@@ -329,7 +329,7 @@
             data: 'code',
             children: 'isChild',
             isChecked: isChecked,
-            isSelected: isSelected
+            isSelected: isSelected,
           });
           $li.append(children);
         }

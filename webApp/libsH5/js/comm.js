@@ -156,12 +156,16 @@
         }
         $.each(arr,function(i,item){
           var type = _opt.type,
-              itemName,data,iconStatus,input,span;
+              itemName,data,iconStatus,input,span,itemClassCodeNumber;
           if(dataType == 'arr'){
             itemName = item[name];
+            if(type=="classCode"){
+              itemClassCodeNumber = item["classCodeNumber"];
+            }
             data = item[_opt.data] ? item[_opt.data].toString() :'';
           }else{
             itemName = item;
+
             if(prefix!=null){
               data = prefix +"_"+ i;
             }else{
@@ -178,18 +182,43 @@
           }else{
             input = '<input type="checkbox" />'
           }
-          if(_opt.isSelected){
-           span = '<span class="treeText selected">'+itemName+'</span>'
-          }else{
-            if(_opt.type=='classCode'){
-              span = '<span class="treeText" title="'+item['code']+'">'+itemName+'</span>'
-            }else if(_opt.name=="specialty"){
-              span = '<span class="treeText" mcode="'+item['specialtyCode']+'">'+itemName+'</span>'
+          if(type == "classCode"){
+            if(_opt.isSelected){
+             span = '<span class="treeText selected">'+itemName+'<span class="treeColor">('+itemClassCodeNumber+')</span></span>'
             }else{
-              span = '<span class="treeText">'+itemName+'</span>'
+              if(_opt.type=='classCode'){
+                span = '<span class="treeText" title="'+item['code']+'">'+itemName+'<span class="treeColor">('+itemClassCodeNumber+')</span></span>'
+              }else if(_opt.name=="specialty"){
+                span = '<span class="treeText" mcode="'+item['specialtyCode']+'">'+itemName+'<span class="treeColor">('+itemClassCodeNumber+')</span></span>'
+              }else{
+                span = '<span class="treeText">'+itemName+'<span class="treeColor">('+itemClassCodeNumber+')</span></span>'
+              }
             }
+          }else{
+            if(_opt.isSelected){
+             span = '<span class="treeText selected">'+itemName+'</span>'
+            }else{
+              if(_opt.type=='classCode'){
+                span = '<span class="treeText" title="'+item['code']+'">'+itemName+'</span>'
+              }else if(_opt.name=="specialty"){
+                span = '<span class="treeText" mcode="'+item['specialtyCode']+'">'+itemName+'</span>'
+              }else{
+                span = '<span class="treeText">'+itemName+'</span>'
+              }
 
+            }
           }
+          // if(_opt.isSelected){
+          //  span = '<span class="treeText selected">'+itemName+'('+itemClassCodeNumber+')</span>'
+          // }else{
+          //   if(_opt.type=='classCode'){
+          //     span = '<span class="treeText" title="'+item['code']+'">'+itemName+'('+itemClassCodeNumber+')</span>'
+          //   }else if(_opt.name=="specialty"){
+          //     span = '<span class="treeText" mcode="'+item['specialtyCode']+'">'+itemName+'('+itemClassCodeNumber+')</span>'
+          //   }else{
+          //     span = '<span class="treeText">'+itemName+'('+itemClassCodeNumber+')</span>'
+          //   }
+          // }
           var tmpHtml;
           if(isleaf==undefined)  /* modify by wuweiwei:class = m-lbl-root & m-lbl-leaf 是方便DOM操作 */
           {
