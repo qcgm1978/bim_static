@@ -10,7 +10,7 @@ App.Projects.listView=Backbone.View.extend({
 		"click .aProName":"beforeBreak"
 	},
 
-	template:_.templateUrl("/projects/tpls/project.list.detail.html"), 
+	template:_.templateUrl("/BIMperformance/projects/tpls/project.list.detail.html"), 
 
 	render:function(){
 		//渲染数据

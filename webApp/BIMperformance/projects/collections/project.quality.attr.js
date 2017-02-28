@@ -1,5 +1,5 @@
 /**
- * @require /projects/collections/Project.js
+ * @require /BIMperformance/projects/collections/Project.js
  */
 App.Project.QualityAttr = {
 

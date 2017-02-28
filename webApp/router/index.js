@@ -368,10 +368,6 @@ var AppRoute = Backbone.Router.extend({
 	/*测试BIM性能 begin*/
 
 	BIMperformances : function(){
-
-		if (this.reset() == false) {
-			return;
-		}
 		//销毁上传
 		$("#topBar .navHeader").find(".item").removeClass("selected").end().find(".projects").addClass('selected');
 		//加载css js
@@ -379,7 +375,7 @@ var AppRoute = Backbone.Router.extend({
 		_.require('/static/dist/BIMperformance/projects.css');
 		_.require('/static/dist/BIMperformance/projects.js');
 		App.Projects.init();
-
+		document.title = "=BIM模型性能测试=";
 	},
 
 	BIMperformance : function(id, versionId){
@@ -399,7 +395,7 @@ var AppRoute = Backbone.Router.extend({
 
 		App.Project.Settings.versionId = versionId;
 		App.Project.init();
-
+		document.title = "=BIM模型性能测试=";
 	},
 
 	/* end */

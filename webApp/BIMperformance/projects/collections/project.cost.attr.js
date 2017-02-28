@@ -1,6 +1,6 @@
 /**
- * @require /projects/collections/Project.es6
- */
+ * @require /BIMperformance/projects/collections/Project.es6
+*/
 App.Project.CostAttr={
 
 		//清单 collection
