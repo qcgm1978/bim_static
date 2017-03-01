@@ -19,7 +19,7 @@
     }
     window.App={};
     var Project = {
-        pageSize:14,
+        pageSize:12,
         pageNum:1,
         Settings: null,
         dataEntry:null,
@@ -90,7 +90,6 @@
         }
     }
     function DeviceSelection(options) {
-        console.log("options",options);
         var _this = this;
         if (!(this instanceof DeviceSelection)) {
             return new DeviceSelection(options);
@@ -404,7 +403,7 @@
                 }
             });
         },
-        initEvent: function () {//google
+        initEvent: function () {//google模型加载完成之后 执行事件绑定事件
             var _self=this;
             $(".groupRadio").myRadioCk({//点击显示搜索结果对应位置执行的方法
                 click:function(isCk){
@@ -463,6 +462,8 @@
                 }
                 $(".searchDetail").slideUp();
                 $(".searchToggle").removeClass('expandArrowIcon');
+                var checkAllBoxS = $(".checkAllBox");
+                checkAllBoxS.prop("checked",false);
                 Project.data = htmlData;//修改了 初始化的数据 此数据也用于了分页效果
                 if($(".btnCk").hasClass("selected")){
                     $(".btnCk").removeClass("selected");
@@ -484,30 +485,11 @@
                 $searchDetail.slideToggle();
             })
             $(".clearSearch").click(function() {//清空搜索条件
-                var checkAllBoxS = $(".checkAllBox");
-
-                checkAllBoxS.prop("checked",false);
-                Project.dataCore.list=[];//点击清空按钮的时候 页面列表从新刷新
-                Project.data = _self.Settings.searchDatas;//把初始化的时候存起来的数据 复制给全选 使用的数据 用于全选使用
-
-                $(".floorOption .text").html('全部');
-
-                $(".txtSearchName").val('');
-
-                if($(".btnCk").hasClass("selected")){
-                    $(".btnCk").removeClass("selected");
-                }
-                Project.Viewer.loadMarkers();
-                _self.Settings.checkboxLen = 0;
-                Project.dataCore.list=[];//点击清空按钮的时候 页面列表从新刷新
-                Project.data = _self.Settings.searchDatas;//把初始化的时候存起来的数据 复制给全选 使用的数据 用于全选使用
-                $(".searchDetail").slideUp();
-                $(".searchToggle").removeClass('expandArrowIcon');
+                _self.resetFun();//点击情况按钮之后 情况之前所有的设置
                 _self.addDomHtml();//拼接html结构
             })
             $(".floorOption").myDropDown({
                 click: function($item) {
-                    // _self.changePA('floor', $item.data("val"))
                 }
             });
             $('.deviceSelector .before').click(function () {
@@ -525,7 +507,6 @@
                     $(this).html("关闭");
                 }
             })
-
             $('.contentList').on('click',function(event){//右侧列表点击之后执行的方法
                 if(event.target.className=='checkBoxInput'){//点击的是列表前面的复选框
                     var $target=$(event.target),
@@ -593,6 +574,33 @@
                 Project.dispatchIE("/?commType=onData");
             })
         },
+        resetFun:function(){//公用的重置的方法
+            var checkAllBoxS = $(".checkAllBox");
+            checkAllBoxS.prop("checked",false);
+            $(".floorOption .text").html('全部');
+            $(".txtSearchName").val('');
+            if($(".btnCk").hasClass("selected")){
+                $(".btnCk").removeClass("selected");
+            }
+            $(".searchDetail").slideUp();
+            $(".searchToggle").removeClass('expandArrowIcon');
+            Project.dataCore.list=[];//点击清空按钮的时候 页面列表从新刷新
+            Project.data = this.Settings.searchDatas;//把初始化的时候存起来的数据 复制给全选 使用的数据 用于全选使用
+            this.Settings.checkboxLen = 0;
+            this.resetModelFun();
+            // Project.Viewer.loadMarkers();
+            // Project.Viewer.highlight({
+            //     type: 'userId',
+            //     ids: []
+            // });
+        },
+        resetModelFun:function(){//重置模型渲染
+            Project.Viewer.loadMarkers();
+            Project.Viewer.highlight({
+                type: 'userId',
+                ids: []
+            });
+        },
         loadModal: function () {//google
             var _this=this;
             var viewer = new bimView({
@@ -638,50 +646,10 @@
             });
             Project.Viewer=viewer;
         },
-        loadComponentList:function(param){//google
-            // var result=Tools.catchPageData(param);//用于当前数据 分页格式化
-            //  // result.items 772af781efa944901a8ea5a61f1db9b6
-            // Project.DataEntry//传进来的数据
+        loadComponentList:function(param){//google 获取右侧列表的数据的方法
             var _this = this;
-            var componentListUrl = "/sixD/972066904318560/972066904318560/material/equipment";
-            var urlData= [{
-                "fileName": "WDGC-Q-AR-B01-构造柱.rvt",
-                "revitFileId": "5d68b36c-be08-47fe-bbbc-7113ee36b953",
-                "uniqueId": "238691c2-ac82-4509-8756-57dc37b357f0-00082c63",
-                "boundingbox": {
-                    "min": {
-                        "x": -123131.73324769066,
-                        "y": 68664.52547268308,
-                        "z": -4299.999999999999
-                    },
-                    "max": {
-                        "x": -122931.73324769066,
-                        "y": 71964.52547268309,
-                        "z": -750.0000000000027
-                    }
-                },
-                "id": "rid_uuid_1",
-                "componentId": "a7b881bc0a6a57333d16e634c41acc84.8987404e-67d4-42cb-adf0-1532249fd8b0-00222613"
-            },
-            {
-                "fileName": "WDGC-Q-AR-B01-构造柱.rvt",
-                "revitFileId": "5d68b36c-be08-47fe-bbbc-7113ee36b953",
-                "uniqueId": "238691c2-ac82-4509-8756-57dc37b357f0-00082cdd",
-                "boundingbox": {
-                    "min": {
-                        "x": -122431.73324769066,
-                        "y": 68314.52547286882,
-                        "z": -4679.999999999999
-                    },
-                    "max": {
-                        "x": -114731.73324769083,
-                        "y": 68514.52547286885,
-                        "z": -750.0000000000027
-                    }
-                },
-                "id": "rid_uuid_2",
-                "componentId": "a7b881bc0a6a57333d16e634c41acc84.8987404e-67d4-42cb-adf0-1532249fd8b0-00222613"
-            }]
+            var componentListUrl = "/sixD/"+Project.Settings.projectId+"/"+Project.Settings.projectVersionId+"/material/equipment";
+            var urlData = Project.dataEntry;
             $.ajax({
                 type:"post",
                 url:componentListUrl,
@@ -699,7 +667,7 @@
         },
         addDomHtml:function(param){//拼接html结构
             var result=Tools.catchPageData(param);
-            var data = Project.data;
+            var data = result.items;
             var strVar = "",
                 list=Project.dataCore.list;
             if(data.length>0){
