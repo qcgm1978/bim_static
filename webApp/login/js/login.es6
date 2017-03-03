@@ -287,7 +287,7 @@ var Login = {
 		console.log("AuthUser_AuthMAC:",AuthUser_AuthMAC);
 		console.log("AuthUser_Signature:",AuthUser_Signature);
 
-		var url = "/platform/login/inner?AuthUser_AuthNum={AuthUser_AuthNum}&AuthUser_AuthToken={AuthUser_AuthToken}&AuthUser_AuthMAC={AuthUser_AuthMAC}";
+		var url = "/platform/login/inner";
 
 		if(AuthUser_AuthToken == undefined)
 		{
@@ -299,13 +299,12 @@ var Login = {
 		}
 		if(AuthUser_AuthNum.length>5 && AuthUser_AuthToken.length>5 && AuthUser_AuthMAC.length>5 && OUTSSO_AuthNum==undefined && AuthUser_Signature.length>5)
 		{
-			url = url.replace("{AuthUser_AuthNum}",AuthUser_AuthNum);
-			url = url.replace("{AuthUser_AuthToken}",AuthUser_AuthToken);
-			url = url.replace("{AuthUser_AuthMAC}",AuthUser_AuthMAC);
 			$.ajax({
 				url:url,
-				type :"get",
+				type :"post",
 				dataType:"json",
+				contentType: "application/json",
+				data : JSON.stringify({"AuthUser_AuthNum":AuthUser_AuthNum,"AuthUser_AuthToken":AuthUser_AuthToken,"AuthUser_AuthMAC":AuthUser_AuthMAC});
 				success:function(data){
 					var obj,p,i;
 					if(data.code==0)
