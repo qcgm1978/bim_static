@@ -304,7 +304,7 @@ var Login = {
 				type :"post",
 				dataType:"json",
 				contentType: "application/json",
-				data : JSON.stringify({"AuthUser_AuthNum":AuthUser_AuthNum,"AuthUser_AuthToken":AuthUser_AuthToken,"AuthUser_AuthMAC":AuthUser_AuthMAC});
+				data : JSON.stringify({"AuthUser_AuthNum":AuthUser_AuthNum,"AuthUser_AuthToken":AuthUser_AuthToken,"AuthUser_AuthMAC":AuthUser_AuthMAC}),
 				success:function(data){
 					var obj,p,i;
 					if(data.code==0)
