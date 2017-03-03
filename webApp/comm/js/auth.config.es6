@@ -73,6 +73,21 @@ App.Comm.AuthConfig = {
 			extendedAttribute : {
 				tab : '<li data-type="extend"   class="item ">扩展属性管理</li>'
 
+			},
+			//公告属性管理
+			announcementAttribute : {
+				tab : '<li data-type="announcement"   class="item ">公告管理</li>'
+
+			},
+			//反馈属性管理
+			feedbackAttribute : {
+				tab : '<li data-type="feedback"   class="item ">反馈管理</li>'
+
+			},
+			//资源属性管理
+			resourceAttribute : {
+				tab : '<li data-type="resource"   class="item ">资源管理</li>'
+
 			}
 		}
 	},
