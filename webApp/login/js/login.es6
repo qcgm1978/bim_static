@@ -270,6 +270,45 @@ var Login = {
 
 	},
 
+	//万达系统登陆后,然后在本项目中自动登录
+	checkSSO : function(){
+		var AuthUser_LoginId   = Login.getCookie("AuthUser_LoginId");
+		var AuthUser_LoginInfo = Login.getCookie("AuthUser_LoginInfo");
+
+		var AuthUser_AuthNum = Login.getCookie("AuthUser_AuthNum");
+		var AuthUser_AuthToken = Login.getCookie("AuthUser_AuthToken");
+		var AuthUser_AuthMAC = Login.getCookie("AuthUser_AuthMAC");
+
+		var url = "/platform/login/inner?AuthUser_AuthNum={AuthUser_AuthNum}&AuthUser_AuthToken={AuthUser_AuthToken}&AuthUser_AuthMAC={AuthUser_AuthMAC}";
+		url = url.replace("{AuthUser_AuthNum}",AuthUser_AuthNum);
+		url = url.replace("{AuthUser_AuthToken}",AuthUser_AuthToken);
+		url = url.replace("{AuthUser_AuthMAC}",AuthUser_AuthMAC);
+
+		if(AuthUser_LoginId != undefined && AuthUser_LoginInfo!=undefined && AuthUser_AuthToken == undefined)
+		{
+			$.ajax({
+				url:url,
+				type :"get",
+				dataType:"json",
+				success:function(data){
+					var obj,p,i;
+					if(data.code==0)
+					{
+						for(i=0;i<data.data.length;i++)
+						{
+							obj = data.data[i];
+							for (var p in obj) 
+							{
+								Login.setCookie(p, obj[p]);
+							}				
+						}
+						Login.signIn();
+					}
+				}
+			});
+		}
+	},
+
 	clearCookie() {
 
 		var keys = Login.cookieNames(document.cookie);
