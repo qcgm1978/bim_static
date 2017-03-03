@@ -280,12 +280,13 @@ var Login = {
 		var AuthUser_AuthMAC = Login.getCookie("AuthUser_AuthMAC");
 
 		var url = "/platform/login/inner?AuthUser_AuthNum={AuthUser_AuthNum}&AuthUser_AuthToken={AuthUser_AuthToken}&AuthUser_AuthMAC={AuthUser_AuthMAC}";
-		url = url.replace("{AuthUser_AuthNum}",AuthUser_AuthNum);
-		url = url.replace("{AuthUser_AuthToken}",AuthUser_AuthToken);
-		url = url.replace("{AuthUser_AuthMAC}",AuthUser_AuthMAC);
+
 
 		if(AuthUser_LoginId != undefined && AuthUser_LoginInfo!=undefined && AuthUser_AuthToken == undefined)
 		{
+			url = url.replace("{AuthUser_AuthNum}",AuthUser_AuthNum);
+			url = url.replace("{AuthUser_AuthToken}",AuthUser_AuthToken);
+			url = url.replace("{AuthUser_AuthMAC}",AuthUser_AuthMAC);
 			$.ajax({
 				url:url,
 				type :"get",
