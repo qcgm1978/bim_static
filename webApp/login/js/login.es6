@@ -276,6 +276,7 @@ var Login = {
 	checkSSO : function(){
 		var OUTSSO_AuthNum   = Login.getCookie("OUTSSO_AuthNum");
 
+		var AuthUser_LoginId = Login.getCookie("AuthUser_LoginId");
 		var AuthUser_AuthNum = Login.getCookie("AuthUser_AuthNum");
 		var AuthUser_AuthToken = Login.getCookie("AuthUser_AuthToken");
 		var AuthUser_AuthMAC = Login.getCookie("AuthUser_AuthMAC");
@@ -299,6 +300,11 @@ var Login = {
 		}
 		if(AuthUser_AuthNum.length>5 && AuthUser_AuthToken.length>5 && AuthUser_AuthMAC.length>5 && OUTSSO_AuthNum==undefined && AuthUser_Signature.length>5)
 		{
+			Login.delCookie("AuthUser_loginId");
+			Login.delCookie("AuthUser_loginInfo");
+			Login.delCookie("AuthUser_Signature");
+			Login.delCookie("wd_sso_user");
+
 			$.ajax({
 				url:url,
 				type :"post",
