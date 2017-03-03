@@ -279,25 +279,25 @@ var Login = {
 		var AuthUser_AuthNum = Login.getCookie("AuthUser_AuthNum");
 		var AuthUser_AuthToken = Login.getCookie("AuthUser_AuthToken");
 		var AuthUser_AuthMAC = Login.getCookie("AuthUser_AuthMAC");
-		var wd_sso_user = Login.getCookie("wd_sso_user");
+		var AuthUser_Signature = Login.getCookie("AuthUser_Signature");
 
 		console.log("OUTSSO_AuthNum:",OUTSSO_AuthNum);
 		console.log("AuthUser_AuthNum:",AuthUser_AuthNum);
 		console.log("AuthUser_AuthToken:",AuthUser_AuthToken);
 		console.log("AuthUser_AuthMAC:",AuthUser_AuthMAC);
-		console.log("wd_sso_user:",wd_sso_user);
+		console.log("AuthUser_Signature:",AuthUser_Signature);
 
 		var url = "/platform/login/inner?AuthUser_AuthNum={AuthUser_AuthNum}&AuthUser_AuthToken={AuthUser_AuthToken}&AuthUser_AuthMAC={AuthUser_AuthMAC}";
 
-		if(AuthUser_AuthToken==undefined)
+		if(AuthUser_AuthToken == undefined)
 		{
 			return;
 		}
-		if(wd_sso_user == undefined)
+		if(AuthUser_Signature == undefined)
 		{
 			return;
 		}
-		if(AuthUser_AuthNum.length>5 && AuthUser_AuthToken.length>5 && AuthUser_AuthMAC.length>5 && OUTSSO_AuthNum==undefined && wd_sso_user.length>5)
+		if(AuthUser_AuthNum.length>5 && AuthUser_AuthToken.length>5 && AuthUser_AuthMAC.length>5 && OUTSSO_AuthNum==undefined && AuthUser_Signature.length>5)
 		{
 			url = url.replace("{AuthUser_AuthNum}",AuthUser_AuthNum);
 			url = url.replace("{AuthUser_AuthToken}",AuthUser_AuthToken);
