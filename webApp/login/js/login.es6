@@ -71,6 +71,15 @@ var Login = {
 			document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString() + ";domain=" + Login.doMain + ";path=/";
 	},
 
+	//删除cookie
+	delCook: function(name) {
+		var exp = new Date();
+		exp.setTime(exp.getTime() - 1);
+		var cval = this.getCookie(name);
+		if (cval != null)
+			document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString() + ";domain=" + Login.doMain + ";path=/";
+	},
+
 	//cookie名称
 	cookieNames: function(cookies) {
 
@@ -318,10 +327,11 @@ var Login = {
 		var AuthUser_AuthToken = Login.getCookie("AuthUser_AuthToken");
 		var AuthUser_AuthMAC = Login.getCookie("AuthUser_AuthMAC");
 
-		Login.delCookie("AuthUser_loginId");
-		Login.delCookie("AuthUser_loginInfo");
-		Login.delCookie("AuthUser_Signature");
-		Login.delCookie("wd_sso_user");
+		Login.delCook("AuthUser_loginId");
+		Login.delCook("AuthUser_loginInfo");
+		Login.delCook("AuthUser_Signature");
+		Login.delCook("wd_sso_user");
+
 		return {"AuthUser_AuthNum":AuthUser_AuthNum,"AuthUser_AuthToken":AuthUser_AuthToken,"AuthUser_AuthMAC":AuthUser_AuthMAC};		
 	},
 
