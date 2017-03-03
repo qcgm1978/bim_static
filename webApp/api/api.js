@@ -270,6 +270,7 @@ App.API = {
 
 		//扩展属性
 		extendAttrList:"platform/setting/extensions/property/{classKey}", // 扩展列表
+		resourceList:"platform/setting/extensions/property/{classKey}", // 获取资源列表的接口
 		extendAttrInsert:"platform/setting/extensions/property",//新增
 		extendAttrUpdate:"platform/setting/extensions/property",//更新扩展属性
 		extendAttrDel:"platform/setting/extensions/property/{classKey}?property={property}",//删除扩展属性
